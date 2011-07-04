@@ -17,35 +17,95 @@
  *
  * Authors: Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at>
  */
+/**
+ * Basisklasse fuer Menue Addons
+ * 
+ * Diese Klasse dient als Basisklasse fuer alle Menue Addons des CMS Systems
+ */
 
 require_once(dirname(__FILE__).'/../../include/basis_db.class.php');
 
 class menu_addon extends basis_db
 {
-	protected $items=array(); //title, link, target, name
+	/**
+	 * Konfigurationsarray fuer die Linkliste 
+	 * $items[0] = array ('title'=>'title des links',
+	 *                    'link'=>'url des links',
+	 *                    'target'=>'target des links',
+	 *                    'name'=>'Anzeigename des Links'); 
+	 */
+	protected $items=array();
+	
+	/**
+	 * HTML Code fuer direkte Ausgabe
+	 */
 	protected $block;
 	
+	/**
+	 * Wenn true, wird der HauptLink im Menue angezeigt, sonst nicht
+	 */
+	protected $link=true;
+	
+	/**
+	 * Konfigurationsarray fuer den HauptLink
+	 * array ('name'=>'name des links',
+	 *        'link'=>'url des links',
+	 *        'target'=>'target des links',
+	 *        'content_id'=>'content_id des submenues das aufklappen soll'); 
+	 */
+	protected $linkitem = array();
+		
 	/**
 	 * Konstruktor
 	 */
 	public function __construct()
 	{
+		global $includeparams;
+		
+		$content = $includeparams['content'];
+		
+		$this->linkitem = array('name'=>$content->titel,
+						'link'=>'#open',
+						'target'=>'_self',
+						'content_id'=>$content->content_id);
 	}
 
+	/**
+	 * Ausgabe der Daten
+	 */
+	public function output()
+	{
+		global $includeparams;
+		$content = $includeparams['content'];
+		
+		if($this->link)
+			DrawLink($this->linkitem['link'],$this->linkitem['target'],$this->linkitem['name'],$this->linkitem['content_id']);
+		echo '
+			<table class="tabcontent" id="Content'.$content->content_id.'" style="display: '.($content->menu_open?'visible':'none').'"><tr><td>';
+		
+		$this->outputBlock();
+		$this->outputItems();
+		
+		echo '</td></tr></table>';
+	}
+	
 	/**
 	 * Gibt alle Items als Linkliste aus
 	 * 
 	 */
 	public function outputItems()
 	{
-		echo '<ul style="margin-top: 0px; margin-bottom: 0px;">';
-		foreach($this->items as $row)
+		if(count($this->items)>0)
 		{
-			echo '<li>
-				<a class="Item2" title="'.$row['title'].'" href="'.$row['link'].'" target="'.$row['target'].'">'.$row['name'].'</a>
-				</li>';
+			echo '<ul style="margin-top: 0px; margin-bottom: 0px;">';
+			foreach($this->items as $row)
+			{
+				echo '<li>
+					<a class="Item2" title="'.$row['title'].'" href="'.$row['link'].'" target="'.$row['target'].'">'.$row['name'].'</a>
+					</li>';
+			}
+			echo '</ul>';
 		}
-		echo '</ul>';
 	}
 	
 	/**

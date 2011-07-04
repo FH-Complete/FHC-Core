@@ -1,4 +1,32 @@
 <?php
+/* Copyright (C) 2011 FH Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at>
+ */
+/**
+ * Menue Addon zur Auswahl von LVs
+ * 
+ * Dieses Addon erstellt ein Formular zur Auswahl von Studiengang und Semester und zeigt die
+ * zugehoerigen LVs an
+ * 
+ * Parameter fuer das Params Array:
+ * - studiengang_kz
+ * - semester
+ */
 require_once(dirname(__FILE__).'/menu_addon.class.php');
 require_once(dirname(__FILE__).'/../../include/studiengang.class.php');
 require_once(dirname(__FILE__).'/../../include/lehrveranstaltung.class.php');
@@ -11,6 +39,12 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 {
 	public function __construct()
 	{
+		global $params;
+
+		parent::__construct();
+		
+		$this->link=false;
+		
 		$sprache = getSprache();
 		$user = get_uid();
 		$student = new student();
@@ -45,11 +79,11 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 		$stg_obj = new studiengang();
 		$stg_obj->getAll('typ, kurzbz');
 
-		if(isset($_GET['studiengang_kz']) && is_numeric($_GET['studiengang_kz']))
-			$studiengang_kz=$_GET['studiengang_kz'];
+		if(isset($params['studiengang_kz']) && is_numeric($_params['studiengang_kz']))
+			$studiengang_kz=$params['studiengang_kz'];
 		
-		if(isset($_GET['semester']) && is_numeric($_GET['semester']))
-			$semester=$_GET['semester'];
+		if(isset($params['semester']) && is_numeric($params['semester']))
+			$semester=$params['semester'];
 		else
 			$semester=1;
 		
@@ -73,7 +107,7 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 				}
 			}
 		}
-
+		
 		$this->block.='
 			  	</select>
 			  	</td>
@@ -95,6 +129,11 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 		}
 		if($semester>$max)
 			$semester=1;
+			
+		$params['studiengang_kz'] = $studiengang_kz;
+		$params['semester'] = $semester;
+		$params['studiengang_kurzbz'] = $short;
+		
 		for($i=0;$i<$max;$i++)
 		{
 			if(($i+1)==$semester)
@@ -144,7 +183,7 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 			}
 		}
 		$this->block.='</table>';
-		$this->outputBlock();
+		$this->output();
 	}
 	
 	private function CutString($strVal, $limit)
