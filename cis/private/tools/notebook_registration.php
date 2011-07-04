@@ -14,15 +14,18 @@
 	
 	require_once('../../../include/basis_db.class.php');
 	if (!$db = new basis_db())
-	      die('Fehler beim Oeffnen der Datenbankverbindung');
+	      die($p->t("global/fehlerBeimOeffnenDerDatenbankverbindung"));
   
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/File/SearchReplace.php');
 	require_once('../../../include/File/Match.php');
+	require_once('../../../include/phrasen.class.php'); 
 
 	if (!$user=get_uid())
-		die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden ! <a href="javascript:history.back()">Zur&uuml;ck</a>');
+		die($p->t("global/nichtAngemeldet").'! <a href="javascript:history.back()">'.$p->t("global/zurueck").'</a>');
 
+		$sprache = getSprache(); 
+		$p=new phrasen($sprache); 
 
 	
 	$mac_result = trim((isset($_REQUEST['mac_result']) ? $_REQUEST['mac_result']:''));
@@ -64,7 +67,7 @@
     <td class="tdwidth10">&nbsp;</td>
     <td><table class="tabcontent">
       <tr>
-        <td class="ContentHeader"><font class="ContentHeader">&nbsp;Infrastruktur - Notebook-Registration</font></td>
+        <td class="ContentHeader"><font class="ContentHeader">&nbsp;<?php echo $p->t("infrastruktur/titelNotebookRegistration");?></font></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
@@ -85,7 +88,7 @@
 			else if ($txtUID && $txtPassword)
 			{
 				//$ldap_conn = @ConnectLDAP("pdc1.technikum-wien.at") or die("Der LDAP-Server ist nicht erreichbar.");
-				$ldap_conn = ldap_connect(LDAP_SERVER) or die("Der LDAP-Server ist nicht erreichbar.");
+				$ldap_conn = ldap_connect(LDAP_SERVER) or die($p->t("global/LDAPserverNichtErreichbar"));
 				$user_dn = "uid=$txtUID, ou=People, dc=technikum-wien, dc=at";
 
 				if(!@ldap_bind($ldap_conn, $user_dn, $txtPassword) === true)
@@ -117,10 +120,10 @@
 						$name = $row->vorname.' '.$row->nachname;
 					}
 					else
-						die('Fehler beim ermitteln der UID');
+						die($p->t("global/fehlerBeimErmittelnDerUID"));
 				}
 				else
-					die('Fehler beim ermitteln der UID');
+					die($p->t("global/fehlerBeimErmittelnDerUID"));
 
 			$mac = mb_eregi_replace(":", "", mb_eregi_replace("-", "", mb_strtoupper($txtMAC)));
 
@@ -141,7 +144,7 @@
 				$fuser = $mfiles->match[2];
 				$fuser = split(" ", $fuser);
 				$fuser = $fuser[0];
-				//hier könnte man noch eine email schicken oder dgl.
+				//hier könnte man noch eine email oder dgl. schicken
 				if ($fuser != $txtUID)
 					$error = 3;
 			}
@@ -217,15 +220,12 @@
 			} // eof !error (2)
 			} // eof if $txtMAC
 ?>
-		  <p>
-			  Sollten Sie mehr als ein Notebook registrieren lassen wollen, wenden Sie sich bitte an <a class="Item" href="mailto:support@technikum-wien.at?Subject=Notebook-Registration">support@technikum-wien.at</a>,
- da nur ein Eintrag pro Person m&ouml;glich ist.</p>
-			  <p>Geben Sie die MAC-Adresse in folgendem Format an: 00-50-DA-C2-32-1C, oder 00:50:DA:C2:32:1C</p>
+		  <p><?php echo $p->t("infrastruktur/notebook_absatz1");?></p>
 			  <p>
 			  <form method="post" name="regMAC">
 			    <table class="tabcontent">
 				  <tr>
-					<td width="90" class="tdwrap">MAC-Adresse:</td>
+					<td width="90" class="tdwrap"><?php echo $p->t("global/MACadresse");?>:</td>
 					<td class="tdwrap"><input class="TextBox" type="text" name="txtMAC" size="20"<?php if(isset($txtMAC) && $txtMAC != "") echo 'value="'.$txtMAC.'"'; ?>></td>
 				  </tr>
 				  <tr>
@@ -233,49 +233,47 @@
 					<td class="tdwrap"><input class="TextBox" type="text" name="txtUID" size="20" value="<?php echo $txtUID;?>"></td>
 				  </tr>
 				  <tr>
-					<td class="tdwrap">*Passwort:</td>
-					<td class="tdwrap"><input class="TextBox" type="password" name="txtPassword" size="20" value=""><br><small>* ... muss nur angegeben werden, wenn UID nicht gleich dem angemeldetem Benutzer</td>
+					<td class="tdwrap">*<?php echo $p->t("global/passwort");?>:</td>
+					<td class="tdwrap"><input class="TextBox" type="password" name="txtPassword" size="20" value=""><br><small>* ... <?php echo $p->t("infrastruktur/notebook_anmerkung");?></td>
 			  </tr>
 		  <tr>
 			  	<td>&nbsp;</td>
 			  </tr>
 			  <tr>
-			  	<td class="tdwrap"><input type="submit" name="cmdRegsiter" value="Eintragen"></td>
-				<td class="tdwrap"><input type="reset" name="cmdCancel" value="Abbrechen" onClick="document.regMAC.txtMAC.focus();"></td>
+			  	<td class="tdwrap"><input type="submit" name="cmdRegsiter" value="<?php echo $p->t("global/eintragen");?>"></td>
+				<td class="tdwrap"><input type="reset" name="cmdCancel" value="<?php echo $p->t("global/abbrechen");?>" onClick="document.regMAC.txtMAC.focus();"></td>
 			  </tr>
 			</table>
   	      </form>
 		  <?php
 		  	if ($error == 1)
-				echo '<h3>Es muss ein Passwort eingegeben werden, wenn die UID geändert wird.</h3>';
+				echo '<h3>'.$p->t("infrastruktur/passwortEingebenWennUIDgeaendert").'.</h3>';
 			else if ($error == 2)
-				echo '<h3>Geben Sie das Passwort bitte erneut ein.</h3>';
+				echo '<h3>'.$p->t("infrastruktur/passwortErneutEingeben").'.</h3>';
 			else if ($error == 3)
-				echo '<h3>Die MAC Adresse ist bereits in Verwendung, bitte melden Sie sich bei der ITS <a href="mailto:its@technikum-wien.at">its@technikum-wien.at</a></h3>';
+				echo '<h3>'.$p->t("infrastruktur/MACadresseBereitsVerwendet").'.</h3>';
 
 		  	if(isset($mac_result) && $mac_result!='')
 			{
 				if($mac_result == 0)
 				{
-					echo '<h3>Die MAC-Adresse wurde erfolgreich eingetragen!</h3>';
+					echo '<h3>'.$p->t("infrastruktur/MACadresseErfolgreichEingetragen").'.</h3>';
 				}
 				else if($mac_result == 1)
 				{
-					echo '<h3>Die MAC-Adresse wurde erfolgreich ge&auml;ndert!</h3>';
+					echo '<h3>'.$p->t("infrastruktur/MACadresseErfolgreichGeaendert").'.</h3>';
 				}
 				else if($mac_result == 2)
 				{
-					echo '<h3>Die angegebene MAC-Adresse ist fehlerhaft!</h3>';
+					echo '<h3>'.$p->t("infrastruktur/MACadresseFehlerhaft").'.</h3>';
 				}
 				else if($mac_result == 3)
 				{
-					echo '<h3>Sie k&ouml;nnen Ihre MAC-Adresse nicht eintragen, da Sie nicht daf&uuml;r freigeschalten wurden.</h3><br>';
+					echo '<h3>'.$p->t("infrastruktur/MACadresseNichtFreigeschalten").'.</h3>';
 				}
 		  	}
 		  ?>
-		  <p>Die &Auml;nderungen werden in ca. 30 Minuten wirksam. Bitte haben Sie etwas Geduld.</p>
-		  <p>Um das Internet nutzen zu k&ouml;nnen, lassen Sie bitte die Netzwerkverbindungseinstellungen vom DHCP-Server zuweisen.<br>
-	      In Ihrem Browser tragen Sie bitte den Proxy-Server: <strong>proxy.technikum-wien.at</strong> und den Port <strong>3128</strong> ein.</p></td>
+		  <p><?php echo $p->t("infrastruktur/notebook_absatz2");?></p></td>
 	  </tr>
     </table></td>
 	<td class="tdwidth30">&nbsp;</td>
