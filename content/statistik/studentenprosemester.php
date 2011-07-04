@@ -129,7 +129,7 @@ else
 	</style>
 	</head>
 	<body class="Background_main">';
-	echo "<h2>Studenten / Semester</h2>";
+	echo "<h2>Studierende / Semester</h2>";
 	echo '<table class="liste" style="border: 1px solid black" cellspacing="0"><tr class="liste"><th>'.$stsem.'</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>Gesamt</th></tr>';
 
 	while($row = $db->db_fetch_object($result))

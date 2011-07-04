@@ -53,7 +53,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 	<body>';
 
 
-	echo "<h2>Studentenstatistik $stsem";
+	echo "<h2>Studierendenstatistik $stsem";
 	echo '<span style="position:absolute; right:15px;">'.date('d.m.Y').'</span></h2><br>';
 	echo '</h2>';
 	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">Studiensemester: <SELECT name="stsem">';
