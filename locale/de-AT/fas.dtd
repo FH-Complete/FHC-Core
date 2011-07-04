@@ -121,7 +121,7 @@
 <!ENTITY menu-statistic-substatistik.label		"Statistik">
 <!ENTITY menu-statistic-substatistik.accesskey	"S">
 
-<!ENTITY menu-statistic-substatistik-studentenprosemester.label		"Student/Semester">
+<!ENTITY menu-statistic-substatistik-studentenprosemester.label		"Studierende/Semester">
 <!ENTITY menu-statistic-substatistik-studentenprosemester.accesskey	"S">
 
 <!ENTITY menu-statistic-substatistik-studentenprosemester-excel.key			"E">
@@ -168,7 +168,7 @@
 <!ENTITY menu-statistic-lektorenstatistik.accesskey	"L">
 
 <!ENTITY menu-statistic-studentenstatistik.key			"S">
-<!ENTITY menu-statistic-studentenstatistik.label		"Studentenstatistik">
+<!ENTITY menu-statistic-studentenstatistik.label		"Studierendenstatistik">
 <!ENTITY menu-statistic-studentenstatistik.accesskey	"S">
 
 <!ENTITY menu-statistic-mitarbeiterstatistik.key		"M">
