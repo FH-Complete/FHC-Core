@@ -26,6 +26,8 @@
  * Parameter fuer das Params Array:
  * - studiengang_kz
  * - semester
+ * - studiengang_kurzbz_lo 3-stelliges Studiengangskuerzel kleingeschrieben
+ * - studiengang_kurzbz_hi 3-stelliges Studiengangskuerzel grossgeschrieben
  */
 require_once(dirname(__FILE__).'/menu_addon.class.php');
 require_once(dirname(__FILE__).'/../../include/studiengang.class.php');
@@ -79,7 +81,7 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 		$stg_obj = new studiengang();
 		$stg_obj->getAll('typ, kurzbz');
 
-		if(isset($params['studiengang_kz']) && is_numeric($_params['studiengang_kz']))
+		if(isset($params['studiengang_kz']) && is_numeric($params['studiengang_kz']))
 			$studiengang_kz=$params['studiengang_kz'];
 		
 		if(isset($params['semester']) && is_numeric($params['semester']))
@@ -132,7 +134,8 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 			
 		$params['studiengang_kz'] = $studiengang_kz;
 		$params['semester'] = $semester;
-		$params['studiengang_kurzbz'] = $short;
+		$params['studiengang_kurzbz_lo'] = strtolower($short);
+		$params['studiengang_kurzbz_hi'] = $short;
 		
 		for($i=0;$i<$max;$i++)
 		{

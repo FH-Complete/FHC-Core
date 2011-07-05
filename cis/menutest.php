@@ -26,6 +26,11 @@ require_once('../config/cis.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../cms/menu.inc.php');
 $sprache = getSprache();
+
+//Output Buffering aktivieren
+//Falls eine Authentifizierung benoetigt wird, muss ein Header
+//gesendet werden. Dies funktioniert nur, wenn vorher nicht ausgegeben wurde
+ob_start();
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -100,10 +105,29 @@ $sprache = getSprache();
 			<td>&nbsp;</td>
 		</tr>
 <?php
-	$content_id=$_GET['content_id'];
+	//TODO: ins config
+	define('CIS_MENU_ENTRY_CONTENT',28);
+	
+	if(isset($_GET['content_id']) && $_GET['content_id']!='')
+		$content_id=$_GET['content_id'];
+	else
+		$content_id=CIS_MENU_ENTRY_CONTENT;
+	
+	if($content_id!=CIS_MENU_ENTRY_CONTENT)
+	{
+		echo '<tr>
+				<td class="tdwidth10" nowrap>&nbsp;</td>
+				<td><a class="HyperItem" href="?content_id='.CIS_MENU_ENTRY_CONTENT.'">&lt;&lt; HOME</a></td>
+				</tr>
+				<tr><td></td></tr>';
+	}
 	require_once('../cms/menu.inc.php');
 	drawSubmenu($content_id);
+	
+	//Gepufferten Output ausgeben
+	ob_end_flush();
 ?>
+	</table>
 	</td>
 </tr>
 </table>
