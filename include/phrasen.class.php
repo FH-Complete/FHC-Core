@@ -61,14 +61,14 @@ class phrasen extends basis_db
 		$sprache->load(DEFAULT_LANGUAGE);
 		
 		//Default Sprache laden
-		$filename = dirname(__FILE__).'/../locale/cms/'.$sprache->locale.'/'.$module.'.php';
+		$filename = dirname(__FILE__).'/../locale/'.$sprache->locale.'/'.$module.'.php';
 		if(file_exists($filename))
 			include($filename);
 		
 		$sprache = new sprache();
 		$sprache->load($this->sprache);
 		//Anzeigesprache laden
-		$filename = dirname(__FILE__).'/../locale/cms/'.$sprache->locale.'/'.$module.'.php';
+		$filename = dirname(__FILE__).'/../locale/'.$sprache->locale.'/'.$module.'.php';
 		if(file_exists($filename))
 			include($filename);
 		$this->loadedModules[]=$module;
