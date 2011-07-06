@@ -1,4 +1,3 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <?php
 /* Copyright (C) 2006 Technikum-Wien
  *
@@ -21,89 +20,90 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/studiensemester.class.php');
+require_once('../../../include/lehrveranstaltung.class.php');
+require_once('../../../include/studiengang.class.php');
+require_once('../../../include/moodle_course.class.php');
+require_once('../../../include/phrasen.class.php');
 
-	require_once('../../../config/cis.config.inc.php');
-	require_once('../../../include/functions.inc.php');
-	require_once('../../../include/benutzerberechtigung.class.php');
-    require_once('../../../include/studiensemester.class.php');
-    require_once('../../../include/lehrveranstaltung.class.php');
-    require_once('../../../include/studiengang.class.php');
-    require_once('../../../include/moodle_course.class.php');
+if (!$db = new basis_db())
+	die('Fehler beim Herstellen der Datenbankverbindung');
 
-   	if (!$db = new basis_db())
-		die('Fehler beim Herstellen der Datenbankverbindung');
+if (!$user=get_uid())
+	die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden !');
 
-    if (!$user=get_uid())
-		die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden !');
+// Init
+$user_is_allowed_to_upload=false;
 
-	// Init
-	$user_is_allowed_to_upload=false;
-
-	// Plausib
-	if(check_lektor($user))
-       $is_lector=true;
-	else
-	   $is_lector=false;
+// Plausib
+if(check_lektor($user))
+	$is_lector=true;
+else
+	$is_lector=false;
 	   
-	if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
-		$lvid = $_GET['lvid'];
-	else
-		die('Fehlerhafte Parameteruebergabe');
+if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
+	$lvid = $_GET['lvid'];
+else
+	die('Fehlerhafte Parameteruebergabe');
 	
-	$lv_obj = new lehrveranstaltung();
-	$lv_obj->load($lvid);
-	$lv=$lv_obj;
+$lv_obj = new lehrveranstaltung();
+$lv_obj->load($lvid);
+$lv=$lv_obj;
 
-	$studiengang_kz = $lv->studiengang_kz;
-	$semester = $lv->semester;
-	$short = $lv->lehreverzeichnis;
+$studiengang_kz = $lv->studiengang_kz;
+$semester = $lv->semester;
+$short = $lv->lehreverzeichnis;
 
-	$stg_obj = new studiengang();
-	$stg_obj->load($lv->studiengang_kz);
+$stg_obj = new studiengang();
+$stg_obj->load($lv->studiengang_kz);
 
-	$kurzbz = $stg_obj->kuerzel;
+$kurzbz = $stg_obj->kuerzel;
 
-	$short_name = $lv->bezeichnung;
-	//$fachbereich_id = $row->fachbereich_id;
-	$short_short_name = $lv->lehreverzeichnis;
+$short_name = $lv->bezeichnung;
 
-	$rechte = new benutzerberechtigung();
-	$rechte->getBerechtigungen($user);
+$short_short_name = $lv->lehreverzeichnis;
 
-	//Handbuch ausliefern
-	if (isset($_GET["handbuch"])){
-		$filename = BENOTUNGSTOOL_PATH."handbuch_benotungstool.pdf";
-		header('Content-Type: application/octet-stream');
-		header('Content-disposition: attachment; filename="handbuch_benotungstool.pdf"');
-		readfile($filename);
-		exit;
-	}	
-	
-?>
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+$sprache = getSprache();
+$p = new phrasen($sprache);
+
+//Handbuch ausliefern
+if (isset($_GET["handbuch"])){
+	$filename = BENOTUNGSTOOL_PATH."handbuch_benotungstool.pdf";
+	header('Content-Type: application/octet-stream');
+	header('Content-disposition: attachment; filename="handbuch_benotungstool.pdf"');
+	readfile($filename);
+	exit;
+}
+?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
-<style type="text/css">
-.transparent {
-    filter:alpha(opacity=90);
-    -moz-opacity:0.9;
-    -khtml-opacity: 0.9;
-    opacity: 0.9;
-}
-</style> 
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
+	<style type="text/css">
+	.transparent {
+	    filter:alpha(opacity=90);
+	    -moz-opacity:0.9;
+	    -khtml-opacity: 0.9;
+	    opacity: 0.9;
+	}
+	</style> 
 
-<script language="JavaScript">
-function showSemPlanHelp(){
-	document.getElementById("semplanhelp").style.visibility = "visible";
-}
-function hideSemPlanHelp(){
-	document.getElementById("semplanhelp").style.visibility = "hidden";
-}
+	<script language="JavaScript">
+	function showSemPlanHelp(){
+		document.getElementById("semplanhelp").style.visibility = "visible";
+	}
+	function hideSemPlanHelp(){
+		document.getElementById("semplanhelp").style.visibility = "hidden";
+	}
 
-</script>   
+	</script>   
 </head>
-
 <body>
 <div id="semplanhelp" style="position:absolute; top:200px; left:200px; width:500px; height:250px; background-color:#cccccc; visibility:hidden; border-style:solid; border-width:1px; border-color:#333333;" class="transparent">
 <table width="100%">
@@ -131,7 +131,7 @@ function hideSemPlanHelp(){
 		echo $lv_obj->bezeichnung.' '.$lv_obj->lehrform_kurzbz.' / '.$kurzbz.'-'.$semester;
 
 		$qry = "SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
-				WHERE lehrveranstaltung_id='$lvid' ORDER BY ende DESC LIMIT 1";
+				WHERE lehrveranstaltung_id='".addslashes($lvid)."' ORDER BY ende DESC LIMIT 1";
 		$stsem = new studiensemester();
 		if($lv->studiengang_kz==0)
 			$angezeigtes_stsem = $stsem->getNearest();
@@ -152,15 +152,15 @@ function hideSemPlanHelp(){
 	    			tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND 
 	    			tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND 
 	    			tbl_person.person_id=tbl_benutzer.person_id AND 
-	    			lehrveranstaltung_id='$lvid' AND 
+	    			lehrveranstaltung_id='".addslashes($lvid)."' AND 
 	    			tbl_lehreinheitmitarbeiter.mitarbeiter_uid NOT like '_Dummy%' AND 
 	    			tbl_benutzer.aktiv=true AND tbl_person.aktiv=true AND 
-	    			studiensemester_kurzbz='$angezeigtes_stsem' 
+	    			studiensemester_kurzbz='".addslashes($angezeigtes_stsem)."' 
 	    		ORDER BY uid, lvleiter desc) as a ORDER BY lvleiter desc, nachname, vorname";
 
 		if(!$result = $db->db_query($qry))
 		{
-			echo 'Es konnten keine Lektoren zugeordnet werden';
+			echo $p->t('lehre/keineLektorenZugeordnet');
 		}
 		else
 		{
@@ -168,7 +168,7 @@ function hideSemPlanHelp(){
 
 			if(!($num_rows_result > 0))
 			{
-				echo 'Derzeit sind keine Lektoren f&uuml;r dieses Fach zugeteilt.';
+				echo $p->t('lehre/keineLektorenZugeordnet');
 			}
 			else
 			{
