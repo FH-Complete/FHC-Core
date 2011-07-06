@@ -703,7 +703,7 @@ class content extends basis_db
 						tbl_content.template_kurzbz<>'news' AND 
 						content_id NOT IN (SELECT child_content_id FROM campus.tbl_contentchild WHERE child_content_id=tbl_content.content_id)
 					) as a
-				ORDER BY sort";
+				ORDER BY sort, content_id";
 		
 		if($result = $this->db_query($qry))
 		{
