@@ -152,7 +152,7 @@ $datum_obj = new datum();
 	
 	//Tabelle auf Basis der Bestellungen
 	$qry = "SELECT 
-				sum(menge*preisprove*(100+mwst)/100) as brutto_bestellung,
+				sum(menge*preisprove*(100+COALESCE(mwst,0))/100) as brutto_bestellung,
 				0 as brutto_rechnung,
 				tbl_bestellung.kostenstelle_id
 			FROM 
@@ -165,7 +165,7 @@ $datum_obj = new datum();
 			UNION
 			SELECT 
 				0 as brutto_bestellung,
-				sum(betrag*(100+mwst)/100) as brutto_rechnung,
+				sum(betrag*(100+COALESCE(mwst,0))/100) as brutto_rechnung,
 				tbl_bestellung.kostenstelle_id
 			FROM 
 				wawi.tbl_bestellung 
