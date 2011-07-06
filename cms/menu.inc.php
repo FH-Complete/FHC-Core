@@ -83,7 +83,7 @@ function drawEntry($item)
 		if($item['template']=='include')
 			IncludeMenuAddon($item['content_id']);
 		elseif($item['template']=='redirect')
-			Redirect($item['content_id'], $item['name']);
+			Redirect($item['content_id'], $item['name'], $item['content_id']);
 		else
 			DrawLink($item['link'], 'content', $item['name'], $item['content_id']);
 		
@@ -148,8 +148,9 @@ function DrawLink($link, $target, $name, $content_id=null)
  * 
  * @param $content_id ContentID des Redirects
  * @param $name Anzeigename des Links
+ * @param $content_id_Submenu ID des Submenues das geoeffnet werden soll (optional)
  */
-function Redirect($content_id, $name)
+function Redirect($content_id, $name, $content_id_Submenu=null)
 {
 	global $sprache, $params;
 	
@@ -178,7 +179,7 @@ function Redirect($content_id, $name)
 	else
 		$target='';
 		
-	DrawLink($url, $target, $name);
+	DrawLink($url, $target, $name, $content_id_Submenu);
 }
 
 /**
