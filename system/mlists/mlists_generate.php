@@ -477,6 +477,37 @@ $error_msg='';
 		flush();
 	}
 
+	// ***************************
+	// TW_STD abgleichen
+    flush();
+    setGeneriert('TW_STD');
+    echo 'TW_STD wird abgeglichen!<br>';
+	$sql_query="DELETE FROM public.tbl_benutzergruppe 
+				WHERE UPPER(gruppe_kurzbz)='TW_STD'	
+				AND uid not in (SELECT uid FROM campus.vw_student WHERE aktiv)";
+	if($result = $db->db_query($sql_query))
+	{
+		echo $db->db_affected_rows($result).' Eintraege entfernt<br>';
+	}
+	else
+	{
+		$error_msg.=$db->db_last_error();
+	}
+	
+	// Studenten holen die nicht im Verteiler sind
+	$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, insertamum, insertvon) 
+				SELECT uid,'TW_STD',now(),'mlists_generate' 
+				FROM campus.vw_student 
+				WHERE aktiv
+				AND uid NOT in(SELECT uid FROM public.tbl_benutzergruppe 
+								WHERE UPPER(gruppe_kurzbz)='TW_STD')";
+	if($result = $db->db_query($sql_query))
+	{
+		echo $db->db_affected_rows($result).' Eintraege hinzugefuegt<br>';
+	}
+	else
+		$error_msg.=$db->db_last_error();
+	
 	
    	// **************************************************************
 	// Moodle - LektorenVerteiler abgleichen
