@@ -74,6 +74,15 @@ function EntryHasChilds($item)
  */
 function drawEntry($item)
 {
+	$content = new content();
+	//pruefen ob der Content eine Berechtigung erfordert
+	if($content->islocked($item['content_id']))
+	{
+		$user = get_uid();
+		//wenn der User nicht berechtigt ist, dann wird der Eintrag nicht angezeigt
+		if(!$content->berechtigt($item['content_id'], $user))
+			return;
+	}
 	if(EntryHasChilds($item))
 	{
 		echo '
