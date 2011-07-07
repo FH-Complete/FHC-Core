@@ -35,9 +35,6 @@ $sprache = getSprache();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
-if(!$rechte->isBerechtigt('basis/news'))
-	die('Sie haben keine Berechtigung für diese Seite');
-
 $p = new phrasen($sprache);
 
 if(isset($_GET['studiengang_kz']))
@@ -49,6 +46,25 @@ if(isset($_GET['semester']))
 	$semester = $_GET['semester'];
 else
 	$semester = null;
+
+if(check_lektor($uid))
+	$is_lector=true;
+else
+	$is_lector=false;
+	
+if(!$rechte->isBerechtigt('basis/news'))
+	$berechtigt=false;
+else
+	$berechtigt=true;
+
+if(!$is_lector && !$berechtigt)
+	die('Sie haben keine Berechtigung zum Eintragen/Bearbeiten von News');
+
+if($studiengang_kz=='0' && is_null($semester))
+{
+	if(!$berechtigt)
+		die('Sie haben keine Berechtigung zum Eintragen/Bearbeiten von allgemeinen News');	
+}
 
 $news_id = (isset($_REQUEST['news_id'])?$_REQUEST['news_id']:null);
 $datum_obj = new datum();
