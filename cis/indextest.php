@@ -37,7 +37,17 @@ if(isset($_GET['sprache']))
 if(isset($_GET['content_id']))
 	$id = $_GET['content_id'];
 else
-	$id = 28;
+	$id = '';
+	
+if(isset($_GET['menu']))
+	$menu = $_GET['menu'];
+else
+	$menu = 'menutest.php?content_id='.$id;
+	
+if(isset($_GET['content']))
+	$content = $_GET['content'];
+else
+	$content = 'public/news.php';
 ?>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -48,6 +58,19 @@ else
 	<link href="../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
 </head>
+<script type="text/javascript">
+function changeSprache(sprache)
+{
+	var menu = '';
+	var content = '';
+	menu = document.getElementById('menue').contentWindow.location.href;
+	content = document.getElementById('content').contentWindow.location.href;
+	menu = escape(menu);
+	content = escape(content);
+	
+	window.location.href="indextest.php?sprache="+sprache+"&content_id=<?php echo $id;?>&menu="+menu+"&content="+content;
+}
+</script>
 <body>
 <table class="tabcontent">
 	 
@@ -71,18 +94,18 @@ else
 				$sprache->getAll(true);
 				foreach($sprache->result as $row)
 				{
-					echo ' <a href="indextest.php?sprache='.$row->sprache.'&content_id='.$id.'" title="'.$row->sprache.'"><img src="../cms/image.php?src=flag&sprache='.$row->sprache.'" alt="'.$row->sprache.'"></a>';
+					echo ' <a href="#'.$row->sprache.'" title="'.$row->sprache.'" onclick="changeSprache(\''.$row->sprache.'\'); return false;"><img src="../cms/image.php?src=flag&sprache='.$row->sprache.'" alt="'.$row->sprache.'"></a>';
 				}
 				?>
 				</td>
    	    <td nowrap><?php require_once('../include/'.EXT_FKT_PATH.'/cis_menu_global.inc.php'); 	?></td>
 	</tr>
 </table>
-<iframe id="menue" src="menutest.php?content_id=<?php echo $id; ?>" name="menu" frameborder="0">
+<iframe id="menue" src="<?php echo $menu; ?>" name="menu" frameborder="0">
 	No iFrames
 </iframe>
 <!-- <iframe id="content" src="public/news.php" name="content" frameborder="0">  -->
-<iframe id="content" src="public/news.php" name="content" frameborder="0">
+<iframe id="content" src="<?php echo $content; ?>" name="content" frameborder="0">
 	No iFrames
 </iframe>
 </body>
