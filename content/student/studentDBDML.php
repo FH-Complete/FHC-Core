@@ -1848,8 +1848,8 @@ if(!$error)
 							$qry = "SELECT vorname, nachname, uid 
 									FROM public.vw_betriebsmittelperson 
 									WHERE betriebsmitteltyp='Zutrittskarte' AND 
-										nummer::bigint='".$_POST['nummer']."'::bigint AND 
-										person_id<>'".$_POST['person_id']."' AND
+										nummer='".$_POST['nummer']."'::varchar AND 
+										person_id<>".$_POST['person_id']." AND
 										retouram is null";
 							if($result_bmp = $db->db_query($qry))
 							{
