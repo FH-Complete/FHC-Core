@@ -29,9 +29,13 @@ require_once('../../../include/benutzer.class.php');
 require_once('../../../include/student.class.php');
 require_once('../../../include/benutzerfunktion.class.php');
 require_once('../../../include/globals.inc.php');
+require_once('../../../include/phrasen.class.php');
 
 if (!$db = new basis_db())
-    die('Fehler beim Oeffnen der Datenbankverbindung');
+    die($p->t("global/fehlerBeimOeffnenDerDatenbankverbindung"));
+	
+	$sprache = getSprache(); 
+	$p=new phrasen($sprache); 
 	
 $uid=get_uid();
 $cmbLektorMitarbeiter=(isset($_REQUEST['cmbLektorMitarbeiter'])?$_REQUEST['cmbLektorMitarbeiter']:'all');
@@ -833,21 +837,21 @@ if(isset($do_search) || $do_excel)
       </tr>
 	  <tr>
 	  	<td nowrap>
-	  	  Suche nach:
+	  	  <?php echo $p->t("personensuche/sucheNach");?>:
 	  	  <input type="text" name="txtSearchQuery" size="45" value="<?php echo $txtSearchQuery; ?>">
 
-	  	  Kennzeichen
+	  	  <?php echo $p->t("personensuche/kennzeichen");?>
 	  	  <select name="cmbLektorMitarbeiter">
-			  <option <?php echo ($cmbLektorMitarbeiter=='all'?' selected="selected" ':'');  ;?> value="all">Alle Personen</option>
-			  <option <?php echo ($cmbLektorMitarbeiter=='Mitarbeiter_Alle'?' selected="selected" ':'');?> value="Mitarbeiter_Alle">MitarbeiterIn</option>
-			  <option <?php echo ($cmbLektorMitarbeiter=='Mitarbeiter_Fix'?' selected="selected" ':'');?> value="Mitarbeiter_Fix">MitarbeiterIn Fix</option>
-			  <option <?php echo ($cmbLektorMitarbeiter=='Mitarbeiter_Extern'?' selected="selected" ':'');?> value="Mitarbeiter_Extern">MitarbeiterIn Extern</option>
-			  <option <?php echo ($cmbLektorMitarbeiter=='Student'?' selected="selected" ':'');?> value="Student">StudentIn</option>
+			  <option <?php echo ($cmbLektorMitarbeiter=='all'?' selected="selected" ':'');  ;?> value="all"><?php echo $p->t("personensuche/allePersonen");?></option>
+			  <option <?php echo ($cmbLektorMitarbeiter=='Mitarbeiter_Alle'?' selected="selected" ':'');?> value="Mitarbeiter_Alle"><?php echo $p->t("personensuche/mitarbeiterIn");?></option>
+			  <option <?php echo ($cmbLektorMitarbeiter=='Mitarbeiter_Fix'?' selected="selected" ':'');?> value="Mitarbeiter_Fix"><?php echo $p->t("personensuche/mitarbeiterInFix");?></option>
+			  <option <?php echo ($cmbLektorMitarbeiter=='Mitarbeiter_Extern'?' selected="selected" ':'');?> value="Mitarbeiter_Extern"><?php echo $p->t("personensuche/mitarbeiterInExtern");?></option>
+			  <option <?php echo ($cmbLektorMitarbeiter=='Student'?' selected="selected" ':'');?> value="Student"><?php echo $p->t("personensuche/studentIn");?></option>
 	  	  </select>
 
-	  	  in Gruppe
+	  	  <?php echo $p->t("personensuche/inGruppe");?>
 	  	  <select name="cmbChoice">
-			  <option value="all">Alle Kategorien</option>
+			  <option value="all"><?php echo $p->t("personensuche/alleKategorien");?></option>
 			  <?php
 				$fkt_obj = new funktion();
 				$fkt_obj->getAll();
@@ -864,7 +868,7 @@ if(isset($do_search) || $do_excel)
 				}
 			  ?>
 	  	  </select>
-	  	  <input onclick="document.SearchFormular.target = '_self';"  type="submit" name="btnSearch" value="Suchen">
+	  	  <input onclick="document.SearchFormular.target = '_self';"  type="submit" name="btnSearch" value="<?php echo $p->t("global/suchen");?>">
 
 	  	  </tr>
 
@@ -893,22 +897,22 @@ if(isset($do_search) || $do_excel)
 		if($num_rows > 0)
 		{
 			echo "<table border=\"0\" cellpadding=\"0\" cellspacing=\"1\" width=\"100%\">";
-			echo "<tr>
-					<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Titel</font></td>
-					<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Vorname</font></td>
-					<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Nachname</font></td>
-					<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Titel</font></td>
-					<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Telefonnummer</font></td>
-					<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;E-Mail Adresse</font></td>
-					<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Raum</font></td>
-					<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Studiengang</font></td>
-					<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Semester</font></td>
-					<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Hauptverteiler</font></td>
-					<td style=\"display:none;\" align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Alias</font></td>
-					<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Kz</font></td>
-					<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Funktion</font></td>
-					<td align=\"left\" class=\"ContentHeader\" class='tdwrap'><font class=\"ContentHeader\">&nbsp;Handy</font></td>								
-			";
+			echo '<tr>
+					<td align="left" class="ContentHeader" class="tdwrap"><font class="ContentHeader">&nbsp;'.$p->t("global/titel").'</font></td>
+					<td align="left" class="ContentHeader" class="tdwrap"><font class="ContentHeader">&nbsp;'.$p->t("global/vorname").'</font></td>
+					<td align="left" class="ContentHeader" class="tdwrap"><font class="ContentHeader">&nbsp;'.$p->t("global/nachname").'</font></td>
+					<td align="left" class="ContentHeader" class="tdwrap"><font class="ContentHeader">&nbsp;'.$p->t("global/titel").'</font></td>
+					<td align="left" class="ContentHeader" class="tdwrap"><font class="ContentHeader">&nbsp;'.$p->t("global/telefonnummer").'</font></td>
+					<td align="left" class="ContentHeader" class="tdwrap"><font class="ContentHeader">&nbsp;'.$p->t("global/emailAdresse").'</font></td>
+					<td align="left" class="ContentHeader" class="tdwrap"><font class="ContentHeader">&nbsp;'.$p->t("global/raum").'</font></td>
+					<td align="left" class="ContentHeader" class="tdwrap"><font class="ContentHeader">&nbsp;'.$p->t("global/studiengang").'</font></td>
+					<td align="left" class="ContentHeader" class="tdwrap"><font class="ContentHeader">&nbsp;'.$p->t("global/semester").'</font></td>
+					<td align="left" class="ContentHeader" class="tdwrap"><font class="ContentHeader">&nbsp;'.$p->t("personensuche/hauptverteiler").'</font></td>
+					<td style="display:none;" align="left" class="ContentHeader" class="tdwrap"><font class="ContentHeader">&nbsp;Alias</font></td>
+					<td align="left" class="ContentHeader" class="tdwrap"><font class="ContentHeader">&nbsp;'.$p->t("personensuche/art").'</font></td>
+					<td align="left" class="ContentHeader" class="tdwrap"><font class="ContentHeader">&nbsp;'.$p->t("global/funktion").'</font></td>
+					<td align="left" class="ContentHeader" class="tdwrap"><font class="ContentHeader">&nbsp;'.$p->t("global/handy").'</font></td>								
+			';
 			echo '</tr>
 				  <tr>
 				  	<td class="tdwrap">&nbsp;</td>
@@ -1064,11 +1068,11 @@ if(isset($do_search) || $do_excel)
 		}
 			
 		if(!isset($do_search))
-			echo '<br>Bitte geben Sie einen Suchbegriff ein, nach dem gesucht werden soll.';
+			echo '<br>'.$p->t("personensuche/bitteSuchbegriffEingeben").'.';
 		else if($num_rows > 0)
-			echo 'Es wurden '.$num_rows.' Eintr&auml;ge gefunden.';
+			echo '<br>'.$p->t("personensuche/esWurden") .'&nbsp' .$num_rows. '&nbsp'.$p->t("personensuche/eintraegeGefunden");
 		else if(isset($do_search))
-			echo 'Es wurden keine Eintr&auml;ge gefunden.';
+			echo '<br>'.$p->t("personensuche/keineEintraegeGefunden");
 ?>
 		</td>
 	  </tr>

@@ -28,9 +28,13 @@ require_once('../../include/benutzer.class.php');
 require_once('../../include/student.class.php');
 require_once('../../include/lehrverband.class.php');
 require_once('../../include/benutzerfunktion.class.php');
+require_once('../../include/phrasen.class.php');
+	
+		$sprache = getSprache(); 
+		$p=new phrasen($sprache); 
 
 if (!$db = new basis_db())
-	die('Fehler beim Oeffnen der Datenbankverbindung');
+	die($p->t("global/fehlerBeimOeffnenDerDatenbankverbindung"));
 
 $user=get_uid();
 
@@ -125,22 +129,22 @@ if(!$is_lector)
 	
     	<table class="tabcontent">
 	      <tr>
-	        <td width ="690" class="ContentHeader"><font class="ContentHeader">Kommunikation - Mailverteiler</font></td>
+	        <td width ="690" class="ContentHeader"><font class="ContentHeader"><?php echo $p->t("mailverteiler/titel");?></font></td>
 	      </tr>
 	      </table>
 		  
 		  <br><br>
-		   	<strong><font class="error">Hinweis:&nbsp;</font></strong>Diese Verteiler d&uuml;rfen nur f&uuml;r Fachhochschul-relevante Zwecke verwendet werden!
+		   	<?php echo $p->t("mailverteiler/absatz1");?>
 	   		<br>
 		   	<?php
 		   	if(MAILVERTEILER_SPERRE) 
 			{
-		   		echo '<strong><font class="error">Info:&nbsp;</font></strong>Infos bez&uuml;glich  <a class="Item" href="../cisdocs/Mailverteiler.pdf" target="_blank">Berechtigungskonzept</a> Mailverteiler, <a class="Item" href="../cisdocs/bedienung_mailverteiler.pdf" target="_blank">Bedienungsanleitung</a> Mailverteiler';
+		   		echo $p->t("mailverteiler/absatz2");
 		   	}
 			?>
             <br>
 			<hr>
-		   	<h3>Zum Verteiler anzeigen bitte auf &nbsp;[&nbsp;<img src='../../skin/images/bullet_arrow_right.png' title='anzeigen' alt='anzeigen' border='0'>&nbsp;]&nbsp;klicken&nbsp; bzw. zum Ausblenden auf&nbsp;&nbsp;[&nbsp;<img src='../../skin/images/bullet_arrow_down.png' title='Ausblenden' alt='Ausblenden' border='0'>&nbsp;]&nbsp;klicken</h3>
+		   	<?php echo $p->t("mailverteiler/absatz3");?>
 	   		<br>
 <?php
 		$stg_obj = new studiengang();

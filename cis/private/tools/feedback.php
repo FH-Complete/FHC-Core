@@ -28,13 +28,17 @@
     require_once('../../../config/cis.config.inc.php');
 	require_once('../../../include/basis_db.class.php');
 	if (!$db = new basis_db())
-    	  die('Fehler beim Oeffnen der Datenbankverbindung');
+    	  die($p->t("global/fehlerBeimOeffnenDerDatenbankverbindung"));
 	  	
     require_once('../../../include/functions.inc.php');
     require_once('../../../include/mail.class.php');
+	require_once('../../../include/phrasen.class.php');
+	
+		$sprache = getSprache(); 
+		$p=new phrasen($sprache); 
 
 	if (!$user=get_uid())
-		die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden ! <a href="javascript:history.back()">Zur&uuml;ck</a>');
+		die($p->t("global/nichtAngemeldet").'! <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -105,7 +109,7 @@
     <td class="tdwidth10">&nbsp;</td>
     <td><table class="tabcontent">
       <tr>
-        <td class="ContentHeader"><font class="ContentHeader">&nbsp;Kommunikation - Feedback</font></td>
+        <td class="ContentHeader"><font class="ContentHeader">&nbsp;<?php echo $p->t("feedback/titelFeedback");?></font></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
@@ -116,34 +120,27 @@
 		  <?php
 			if(isset($message_sent) && $message_sent)
 			{
-				echo "<h3>Vielen Dank f&uuml;r Ihr Feedback!</h3>";
-		  		echo "<h3>Ihre Nachricht wurde an das zust&auml;ndige Personal weitergeleitet.</h3></td>";
+				echo '<h3>'.$p->t("feedback/vielenDankFuerIhrFeedback").'!</h3>';
+		  		echo '<h3>'.$p->t("feedback/ihreNachrichtWurdeWeitergeleitet").'.</h3></td>';
 
 				exit;
 			}
 			else if(isset($message_sent) && !$message_sent)
 			{
-				echo "<h3>Ihr Feedback wurde nicht weitergeleitet!</h3>";
-		  		echo "<h3>Bitte wenden Sie sich an die Administration.</h3></td>";
+				echo '<h3>'.$p->t("feedback/feedbackNichtWeitergeleitet").'!</h3>';
+		  		echo '<h3>'.$p->t("feedback/wendenSieSichAnDieAdministration").'.</h3></td>';
 
 				exit;
 			}
 		  ?>
-		  <h3>Ihre Meinung z&auml;hlt!</h3>
-		  <h3>Hier k&ouml;nnen Sie uns Feedback geben.</h3>
-		  <p>Helfen Sie mit, unseren Service zu verbessern und geben Sie uns hier Ihr Feedback. Haben Sie spezielle W&uuml;nsche und Anregungen f&uuml;r uns, vermissen Sie wichtige Informationen oder wollen Sie uns mal richtig die Meinung sagen? F&uuml;r Ihre Beitr&auml;ge haben wir immer ein offenes Ohr. Denn nur wenn wir Ihre Meinung kennen, k&ouml;nnen wir auf Ihre Belange und W&uuml;nsche eingehen.</p>
-		  <p>Für technische Gebrechen verwenden Sie bitte das <a href='https://bug.technikum-wien.at' target="_blank" class='Item'>Bugtracking-System</a></p>
-		  <table class="tabcontent">
-		  	<tr>
-			  <td nowrap><br>
-			    Bitte geben Sie hier Ihr Feedback ein:<br>
-				<textarea style="width: 99%; heigth: 166px" name="txtFeedbackMessage" rows="10" cols="70" maxlength="2000"></textarea></td>
+		  <?php echo $p->t("feedback/absatz1");?>
+		  	<textarea style="width: 99%; heigth: 166px" name="txtFeedbackMessage" rows="10" cols="70" maxlength="2000"></textarea></td>
 			</tr>
 			<tr>
 			  <td nowrap>
 			  	<input type="hidden" name="feedback_submit">
-			  	<input type="submit" name="btnSend" value="Abschicken">&nbsp;
-				<input type="reset" name="btnCancel" value="Zur&uuml;cksetzen" onClick="document.FeedbackFormular.txtFeedbackMessage.focus();"></td>
+			  	<input type="submit" name="btnSend" value="<?php echo $p->t("global/abschicken");?>">&nbsp;
+				<input type="reset" name="btnCancel" value="<?php echo $p->t("global/zuruecksetzen");?>" onClick="document.FeedbackFormular.txtFeedbackMessage.focus();"></td>
 			</tr>
 		  </table>
 	  	  </form>
