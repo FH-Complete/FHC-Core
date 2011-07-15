@@ -67,7 +67,7 @@
     <td class="tdwidth10">&nbsp;</td>
     <td><table class="tabcontent">
       <tr>
-        <td class="ContentHeader"><font class="ContentHeader">&nbsp;<?php echo $p->t("infrastruktur/titelNotebookRegistration");?></font></td>
+        <td class="ContentHeader"><font class="ContentHeader">&nbsp;<?php echo $p->t("notebookregister/titelNotebookRegistration");?></font></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
@@ -220,7 +220,7 @@
 			} // eof !error (2)
 			} // eof if $txtMAC
 ?>
-		  <p><?php echo $p->t("infrastruktur/notebook_absatz1");?></p>
+		  <p><?php echo $p->t("notebookregister/notebook_absatz1");?></p>
 			  <p>
 			  <form method="post" name="regMAC">
 			    <table class="tabcontent">
@@ -234,7 +234,7 @@
 				  </tr>
 				  <tr>
 					<td class="tdwrap">*<?php echo $p->t("global/passwort");?>:</td>
-					<td class="tdwrap"><input class="TextBox" type="password" name="txtPassword" size="20" value=""><br><small>* ... <?php echo $p->t("infrastruktur/notebook_anmerkung");?></td>
+					<td class="tdwrap"><input class="TextBox" type="password" name="txtPassword" size="20" value=""><br><small>* ... <?php echo $p->t("notebookregister/notebook_anmerkung");?></td>
 			  </tr>
 		  <tr>
 			  	<td>&nbsp;</td>
@@ -247,33 +247,33 @@
   	      </form>
 		  <?php
 		  	if ($error == 1)
-				echo '<h3>'.$p->t("infrastruktur/passwortEingebenWennUIDgeaendert").'.</h3>';
+				echo '<h3>'.$p->t("notebookregister/passwortEingebenWennUIDgeaendert").'.</h3>';
 			else if ($error == 2)
-				echo '<h3>'.$p->t("infrastruktur/passwortErneutEingeben").'.</h3>';
+				echo '<h3>'.$p->t("notebookregister/passwortErneutEingeben").'.</h3>';
 			else if ($error == 3)
-				echo '<h3>'.$p->t("infrastruktur/MACadresseBereitsVerwendet").'.</h3>';
+				echo '<h3>'.$p->t("notebookregister/MACadresseBereitsVerwendet").'.</h3>';
 
 		  	if(isset($mac_result) && $mac_result!='')
 			{
 				if($mac_result == 0)
 				{
-					echo '<h3>'.$p->t("infrastruktur/MACadresseErfolgreichEingetragen").'.</h3>';
+					echo '<h3>'.$p->t("notebookregister/MACadresseErfolgreichEingetragen").'.</h3>';
 				}
 				else if($mac_result == 1)
 				{
-					echo '<h3>'.$p->t("infrastruktur/MACadresseErfolgreichGeaendert").'.</h3>';
+					echo '<h3>'.$p->t("notebookregister/MACadresseErfolgreichGeaendert").'.</h3>';
 				}
 				else if($mac_result == 2)
 				{
-					echo '<h3>'.$p->t("infrastruktur/MACadresseFehlerhaft").'.</h3>';
+					echo '<h3>'.$p->t("notebookregister/MACadresseFehlerhaft").'.</h3>';
 				}
 				else if($mac_result == 3)
 				{
-					echo '<h3>'.$p->t("infrastruktur/MACadresseNichtFreigeschalten").'.</h3>';
+					echo '<h3>'.$p->t("notebookregister/MACadresseNichtFreigeschalten").'.</h3>';
 				}
 		  	}
 		  ?>
-		  <p><?php echo $p->t("infrastruktur/notebook_absatz2");?></p></td>
+		  <p><?php echo $p->t("notebookregister/notebook_absatz2");?></p></td>
 	  </tr>
     </table></td>
 	<td class="tdwidth30">&nbsp;</td>
