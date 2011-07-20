@@ -109,7 +109,7 @@ $mimetypes = array(
 	'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'=>'excel.gif',
 	'application/vnd.oasis.opendocument.text'=>'openoffice0.jpg',
 	'application/msword'=>'dotpic.gif',
-	'application/zip'=>'zippic.jpg',
+	'application/x-zip'=>'zippic.gif',
 
 );
 
