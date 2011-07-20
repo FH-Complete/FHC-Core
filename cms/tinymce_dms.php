@@ -110,7 +110,8 @@ $mimetypes = array(
 	'application/vnd.oasis.opendocument.text'=>'openoffice0.jpg',
 	'application/msword'=>'dotpic.gif',
 	'application/x-zip'=>'zippic.gif',
-
+	'image/jpeg'=>'imgpic.gif',
+	'image/gif'=>'imgpic.gif',
 );
 
 // Hole Datei aus Import Verzeichnis
@@ -423,7 +424,7 @@ function drawFilesList($rows)
 		if(array_key_exists($row->mimetype,$mimetypes))
 			echo '<img src="../skin/images/'.$mimetypes[$row->mimetype].'" style="height: 15px">';
 		else
-			echo '<img src="../skin/images/blank.png" style="height: 15px">';
+			echo '<img src="../skin/images/blank.gif" style="height: 15px">';
 			
 		// wenn es noch höhere Versionen zu diesem Dokument gibt, wird dieses gekennzeichnet 
 		$newVersion = '';
