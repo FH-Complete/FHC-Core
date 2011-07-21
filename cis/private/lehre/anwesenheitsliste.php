@@ -31,9 +31,14 @@
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/studiengang.class.php');
 	require_once('../../../include/lehrveranstaltung.class.php');
+	require_once('../../../include/phrasen.class.php');
+	
+	
+	$sprache = getSprache(); 
+	$p=new phrasen($sprache); 
 	
 	if (!$db = new basis_db())
-			die('Fehler beim Herstellen der Datenbankverbindung');
+			die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
 			
   	$error=0;	
     if(isset($_GET['stg_kz']) && is_numeric($_GET['stg_kz']))
@@ -54,7 +59,7 @@
     if(isset($_GET['stsem']) && check_stsem($_GET['stsem']))
     	$stsem = $_GET['stsem'];
     else 
-    	die('Studiensemester ist ungueltig');
+    	die($p->t('anwesenheitsliste/studiensemesterIstUngueltig'));
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -71,7 +76,7 @@
     <td class="tdwidth10">&nbsp;</td>
     <td><table class="tabcontent">
       <tr>
-        <td class="ContentHeader" width="70%"><font class="ContentHeader">&nbsp;Anwesenheits- und Notenlisten</font></td>
+        <td class="ContentHeader" width="70%"><font class="ContentHeader">&nbsp;<?php echo $p->t('lehre/anwesenheitsUndNotenlisten');?></font></td>
       </tr>
 	  <tr>
 	  	<td>
@@ -94,9 +99,9 @@
 	  	
 	  	$lv = new lehrveranstaltung($lvid);
 	  	  	
-	  	$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&stsem=$stsem'>Gesamtliste $lv->bezeichnung</a></td></tr>";
-	  	$awbild_content .= "<tr><td><a class='Item' href='anwesenheitsliste_bilder.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&stsem=$stsem'>Gesamtliste $lv->bezeichnung</a></td></tr>";
-	  	$nt_content .= "<tr><td><a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&lvid=$lvid&stsem=$stsem'>Gesamtliste $lv->bezeichnung</a></td></tr>";
+	  	$aw_content .= "<tr><td><a class='Item' href='anwesenheitsliste.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&stsem=$stsem'>".$p->t('anwesenheitsliste/gesamtliste')." $lv->bezeichnung</a></td></tr>";
+	  	$awbild_content .= "<tr><td><a class='Item' href='anwesenheitsliste_bilder.pdf.php?stg=$stg_kz&sem=$sem&lvid=$lvid&stsem=$stsem'>".$p->t('anwesenheitsliste/gesamtliste')." $lv->bezeichnung</a></td></tr>";
+	  	$nt_content .= "<tr><td><a class='Item' href='notenliste.xls.php?stg=$stg_kz&sem=$sem&lvid=$lvid&stsem=$stsem'>".$p->t('anwesenheitsliste/gesamtliste')." $lv->bezeichnung</a></td></tr>";
 	  	
 
 	  	echo "</table>";
@@ -179,25 +184,25 @@
 
 	  	if($nt_content=='' && $aw_content=='')
 	  	{
-	  		echo "Derzeit sind in diesem Studiengang / Semester keine Studenten vorhanden";
+	  		echo $p->t('anwesenheitsliste/keineStudentenVorhanden');
 	  	}
 	  	else
 	  	{
 		  	if($aw_content!='')
-				$aw_content = "<table border='0'><tr class='liste'><td><b>Anwesenheitslisten</b></td></tr>".$aw_content."</table>";
+				$aw_content = "<table border='0'><tr class='liste'><td><b>".$p->t('anwesenheitsliste/anwesenheitslisten')."</b></td></tr>".$aw_content."</table>";
 		  	else
-		  		$aw_content = "Derzeit sind in diesem Studiengang / Semester keine Studenten vorhanden";
+		  		$aw_content = $p->t('anwesenheitsliste/keineStudentenVorhanden');
 		  	
 		  	if($awbild_content!='')
-				$awbild_content = "<table border='0'><tr class='liste'><td><b>Anwesenheitslisten mit Bildern</b></td></tr>".$awbild_content."</table>";
+				$awbild_content = "<table border='0'><tr class='liste'><td><b>".$p->t('anwesenheitsliste/anwesenheitslistenMitBildern')."</b></td></tr>".$awbild_content."</table>";
 		  	else
-		  		$awbild_content = "Derzeit sind in diesem Studiengang / Semester keine Studenten vorhanden";
+		  		$awbild_content = $p->t('anwesenheitsliste/keineStudentenVorhanden');
 
 		  	if($nt_content!='')
-				$nt_content = "<table border='0'><tr class='liste'><td><b>Notenlisten</b></td></tr>".$nt_content."</table>";
+				$nt_content = "<table border='0'><tr class='liste'><td><b>".$p->t('anwesenheitsliste/notenlisten')."</b></td></tr>".$nt_content."</table>";
 		  	else
-		  		$nt_content = "Derzeit sind in diesem Studiengang / Semester keine Studenten vorhanden";
-		  	echo "Zum Erstellen der Liste klicken Sie bitte auf die gew&uuml;nschte Gruppe!";
+		  		$nt_content = $p->t('anwesenheitsliste/keineStudentenVorhanden');
+		  	echo $p->t('anwesenheitsliste/erstellenDerListeKlicken');
 		  	echo "<br /><br/>";
 		  	echo "<table>
 		  		
@@ -219,11 +224,11 @@
 	else
 	{
 		if($error==1)
-			echo 'Es konnte keine Verbindung zur Datenbank hergestellt werden';
+			echo $p->t('global/fehlerBeimOeffnenDerDatenbankverbindung');
 		elseif($error=2)
-			echo 'Fehlerhafte Parameteruebergabe. Bitte versuchen Sie es erneut';
+			echo $p->t('anwesenheitsliste/fehlerhafteParameteruebergabe');
 		else
-			echo 'Unbekannter Fehler';
+			echo $p->t('global/unbekannterFehleraufgetreten');
 	}
 	  	?>
 	  	</td>
