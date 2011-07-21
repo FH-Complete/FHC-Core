@@ -29,20 +29,21 @@
    @edit	08-11-2006 Versionierung entfernt: Studiensemester=WS2007
    			02-01-2007 Umstellung auf die neue DB
 */
-	require_once('../../../../config/cis.config.inc.php');
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung 
-// ------------------------------------------------------------------------------------------
-	require_once('../../../../include/basis_db.class.php');
-	if (!$db = new basis_db())
-			die('Fehler beim Herstellen der Datenbankverbindung');
-			
-   require_once('../../../../include/functions.inc.php');
-   require_once('../../../../include/studiengang.class.php');
-   require_once('../../../../include/lehrveranstaltung.class.php');
-   require_once('../../../../include/lvinfo.class.php');
-   require_once('../../../../include/studiensemester.class.php');
+require_once('../../../../config/cis.config.inc.php');
+require_once('../../../../include/basis_db.class.php');	
+require_once('../../../../include/functions.inc.php');
+require_once('../../../../include/studiengang.class.php');
+require_once('../../../../include/lehrveranstaltung.class.php');
+require_once('../../../../include/lvinfo.class.php');
+require_once('../../../../include/studiensemester.class.php');
+require_once('../../../../include/phrasen.class.php');
 
+$sprache1 = getSprache(); 
+$p=new phrasen($sprache1);
+
+if (!$db = new basis_db())
+	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
+   
    $output = '';
    $errormsg = '';
 ?>
@@ -51,7 +52,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
-<title>ECTS - LV INFO</title>
+<title><?php echo $p->t('courseInformation/ectsInformation')?></title>
 
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -78,7 +79,7 @@
 	$user = get_uid();
     //Berechtigung ueberpruefen
     if(!check_lektor($user))
-    	die("<br><center>Sie haben keine Berechtigung f&uuml;r diesen Bereich</center>");
+    	die("<br><center>".$p->t('global/keineBerechtigungFuerDieseSeite')."</center>");
 	
     if(isset($_GET['lvid']))
     	$lv=$_GET['lvid'];
@@ -232,9 +233,9 @@
 					$save_log_error=true;
 
 			if($save_error)
-				$errormsg.= "Achtung: Fehler beim Speichern der Daten! Bitte versuchen Sie es erneut".$lv_obj_sav->lastqry;
+				$errormsg.= $p->t('courseInformation/achtungFehlerBeimSpeichern')." ".$lv_obj_sav->lastqry;
 			if($save_log_error)
-				$errormsg.= "Fehler beim Schreiben des Log Files.";
+				$errormsg.= $p->t('courseInformation/fehlerLogFile');
 		}
 	}
 
@@ -247,7 +248,7 @@
 	//Anzeigen des DropDown Menues mit Stg
 	if($stg_obj->getAll('typ, kurzbz'))
 	{
-		$output .= "Studiengang <SELECT name='stg' onChange='javascript:window.document.auswahlFrm.changed.value=\"stg\";window.document.auswahlFrm.submit();'>";
+		$output .= $p->t('global/studiengang')." <SELECT name='stg' onChange='javascript:window.document.auswahlFrm.changed.value=\"stg\";window.document.auswahlFrm.submit();'>";
 
 		$stgselected=false;
 		unset($firststg);
@@ -292,7 +293,7 @@
 
 	if($stg_obj->load($stg))
 	{
-		$output .= "Semester <SELECT name='sem' onChange='javascript:window.document.auswahlFrm.changed.value=\"sem\";window.document.auswahlFrm.submit();'>";
+		$output .= $p->t('global/semester')." <SELECT name='sem' onChange='javascript:window.document.auswahlFrm.changed.value=\"sem\";window.document.auswahlFrm.submit();'>";
 
 		unset($firstsem);
 		$semselected=false;
@@ -334,7 +335,7 @@
 	$lv_obj = new lehrveranstaltung();
 	if($lv_obj->load_lva($stg,$sem,null,true))
 	{
-       $output .= "Lehrveranstaltung <SELECT name='lv' onChange='javascript:window.document.auswahlFrm.changed.value=\"lv\";window.document.auswahlFrm.submit();'>";
+       $output .= $p->t('global/lehrveranstaltung')." <SELECT name='lv' onChange='javascript:window.document.auswahlFrm.changed.value=\"lv\";window.document.auswahlFrm.submit();'>";
        $vorhanden=false;
        unset($firstlv);
 
@@ -366,7 +367,7 @@
 	}
 
 	$output .= "<input type='hidden' name='changed' value=''>";
-	$output .= "<input type='Submit' value='Anzeigen'>";
+	$output .= "<input type='Submit' value='".$p->t('global/anzeigen')."'>";
 	$output .= "</form>";
 	$output .= "</td>";
 
@@ -374,10 +375,10 @@
 	//Menue ausgeben
 	$output .= "\n";
 	$output .= "<ul>";
-	$output .= "<li>&nbsp;<a class='Item' href='index.php?stg=$stg&sem=$sem&lv=$lv'><font size='3'>Bearbeiten</font></a></li>";
-	$output .= "<li>&nbsp;<a class='Item' href='freigabe.php?stg=$stg&sem=$sem&lv=$lv'><font size='3'>Freigabe</font></a></li>";
-	$output .= "<li>&nbsp;<a class='Item' href='beispiele.html'><font size='3'>Beispiele</font></a></li>";
-	$output .= "<li>&nbsp;<a class='Item' href='terminologie.html'><font size='3'>Terminologie</font></a></li>";
+	$output .= "<li>&nbsp;<a class='Item' href='index.php?stg=$stg&sem=$sem&lv=$lv'><font size='3'>".$p->t('global/bearbeiten')."</font></a></li>";
+	$output .= "<li>&nbsp;<a class='Item' href='freigabe.php?stg=$stg&sem=$sem&lv=$lv'><font size='3'>".$p->t('courseInformation/freigabe')."</font></a></li>";
+	$output .= "<li>&nbsp;<a class='Item' href='beispiele.html'><font size='3'>".$p->t('global/beispiele')."</font></a></li>";
+	$output .= "<li>&nbsp;<a class='Item' href='terminologie.html'><font size='3'>".$p->t('courseInformation/terminologie')."</font></a></li>";
 	$output .= "</ul>";
 	$output .= "</td></tr></table>";
 
@@ -386,7 +387,7 @@
 	//Kopfzeile hinausschreiben und $output ausgeben
 	echo "<table class='tabcontent'><tr><td width='3%'>&nbsp;</td><td>";
 	echo "<table class='tabcontent'><tr>";
-	echo "<td class='ContentHeader'><font class='ContentHeader'>&nbsp;LV-INFO - ". $stg_obj->kuerzel ."- ".$sem.". Semester</font></td></tr></table>";
+	echo "<td class='ContentHeader'><font class='ContentHeader'>&nbsp;".$p->t('courseInformation/lvInfoSemester',array($stg_obj->kuerzel, $sem))."</font></td></tr></table>";
 	echo $output;
 
 	if(isset($lv) && isset($stg) && isset($sem)) // Wenn oben alles Ausgewaehlt wurde
@@ -441,13 +442,13 @@
 		echo "<Form name='editFrm' action='".$_SERVER['PHP_SELF']."' method='POST'>";
 
 		echo "<table class='tabcontent'>";
-		echo "<tr><td width='200'><b>ECTS - Credits</b></td><td width='400'>".($lv_obj->ects!=''?number_format($lv_obj->ects,1,'.',''):'')."</td><td align='right' nowrap>Bei Fehlern in den Fixfeldern bitte an die <a class='Item' href='mailto:$stg_obj1->email'>zust&auml;ndige Assistentin</a> wenden.</td></tr>";
+		echo "<tr><td width='200'><b>".$p->t('courseInformation/ectsCredits')."</b></td><td width='400'>".($lv_obj->ects!=''?number_format($lv_obj->ects,1,'.',''):'')."</td><td align='right' nowrap>".$p->t('courseInformation/beiFehlernInDenFixfeldern',array($stg_obj1->email))."</td></tr>";
 
 		$stsem_obj = new studiensemester();
 		$stsem = $stsem_obj->getaktorNext();
 		//Namen der Lehrenden Auslesen
 		$qry = "SELECT * FROM campus.vw_mitarbeiter, lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lv' AND tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE lehrveranstaltung_id='$lv' ORDER BY ende DESC LIMIT 1) AND mitarbeiter_uid=uid";
-		echo "<tr><td class='tdvertical' nowrap><b>Lehrende laut Lehrauftrag</b></td><td nowrap>";
+		echo "<tr><td class='tdvertical' nowrap><b>".$p->t('courseInformation/lehrendeLautLehrauftrag')."</b></td><td nowrap>";
 		$helparray = array();
 		if($result=$db->db_query($qry))
 		{
@@ -485,7 +486,7 @@
 																)	   											
 								  )";
 	   
-	   echo "<tr><td class='tdvertical'><b>Institutsleiter</b></td><td>";
+	   echo "<tr><td class='tdvertical'><b>".$p->t('courseInformation/institutsleiter')."</b></td><td>";
 	   if($result=$db->db_query($qry))
 	   {
 	   	   while($row=$db->db_fetch_object($result))
@@ -513,7 +514,7 @@
 				vw_mitarbeiter.uid=COALESCE(koordinator, tbl_benutzerfunktion.uid) AND
 				tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1)";
 	   
-		echo "<tr><td class='tdvertical'><b>Institutskoordinator</b></td><td>";
+		echo "<tr><td class='tdvertical'><b>".$p->t('courseInformation/institutskoordinator')."</b></td><td>";
 	   if($result=$db->db_query($qry))
 	   {
 	   	   while($row=$db->db_fetch_object($result))
@@ -535,7 +536,7 @@
 
 	   echo "</td></tr>";
 	   //Sprache ausgeben
-	   echo "<tr><td><b>Unterrichtssprache</b></td><td>$lv_obj->sprache";
+	   echo "<tr><td><b>".$p->t('courseInformation/unterrichtssprache')."</b></td><td>$lv_obj->sprache";
 	   echo "</td></tr></table><br><br>";
 
 	   //Eingabefelder anzeigen
@@ -611,16 +612,16 @@
          </td>
        </tr>
        <tr class="liste0">
-         <td align=center colspan=2><br><input type="checkbox" name="freig_de" '. (isset($freig_de) && ($freig_de==true || $freig_de=='1')?'checked':'').'/><i>Freigeben</i><br><br></td>
+         <td align=center colspan=2><br><input type="checkbox" name="freig_de" '. (isset($freig_de) && ($freig_de==true || $freig_de=='1')?'checked':'').'/><i>'.$p->t('courseInformation/freigeben').'</i><br><br></td>
 
 
-         <td align=center colspan=2><input type="checkbox" name="freig_en" '. (isset($freig_en) && ($freig_en==true || $freig_en=='1')?'checked':'').'/><i>Freigeben</i> </td>
+         <td align=center colspan=2><input type="checkbox" name="freig_en" '. (isset($freig_en) && ($freig_en==true || $freig_en=='1')?'checked':'').'/><i>'.$p->t('courseInformation/freigeben').'</i> </td>
          <td ></td>
        </tr>';
 	   echo "</table><br>";
 	   echo "<div align='right'>";
-	   echo "<input type='button' value='Speichern' onClick='save();'>";
-	   echo "<input type='button' value='Voransicht' onClick='javascript:window.document.editFrm.action=\"preview.php\";window.document.editFrm.target=\"_blank\";window.document.editFrm.submit();'>";
+	   echo "<input type='button' value='".$p->t('global/speichern')."' onClick='save();'>";
+	   echo "<input type='button' value='".$p->t('courseInformation/voransicht')."' onClick='javascript:window.document.editFrm.action=\"preview.php\";window.document.editFrm.target=\"_blank\";window.document.editFrm.submit();'>";
 	   echo "</div>";
 	   if(isset($error) && $error!='')
 	   	   	echo $error;
