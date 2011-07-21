@@ -26,6 +26,11 @@ $this->phrasen['global/eintragen']='Eintragen';
 $this->phrasen['global/zurueck']='Zurück';
 $this->phrasen['global/abschicken']='Abschicken'; 
 $this->phrasen['global/zuruecksetzen']='Zurücksetzen'; 
+$this->phrasen['global/datei']='Datei'; 
+$this->phrasen['global/auswaehlen']='Auswählen'; 
+$this->phrasen['global/umbenennen']='Umbenennen';
+$this->phrasen['global/anzeigen']='Anzeigen';
+$this->phrasen['global/bearbeiten']='Bearbeiten';
 
 $this->phrasen['global/vorname']='Vorname';
 $this->phrasen['global/nachname']='Nachname';
@@ -69,6 +74,7 @@ $this->phrasen['global/verband']='Verband';
 $this->phrasen['global/kalender']='Kalender'; 
 $this->phrasen['global/beginn']='Beginn'; 
 $this->phrasen['global/ende']='Ende';
+$this->phrasen['global/beispiele']='Beispiele';
 
 $this->phrasen['global/anmelden']='Anmelden'; 
 $this->phrasen['global/angemeldet']='Angemeldet'; 
@@ -81,12 +87,14 @@ $this->phrasen['global/fehleraufgetreten']='Es ist ein Fehler aufgetreten';
 $this->phrasen['global/emailgesendetan']='E-Mail gesendet an'; 
 $this->phrasen['global/keineBerechtigungFuerDieseSeite']='Sie haben keine Berechtigung für diese Seite';
 $this->phrasen['global/fehlerBeimOeffnenDerDatenbankverbindung']='Fehler beim Öffnen der Datenbankverbindung'; 
+$this->phrasen['global/fehlerBeimLesenAusDatenbank']='Fehler beim Lesen aus der Datenbank'; 
 $this->phrasen['global/userNichtGefunden']='Es wurde kein User gefunden'; 
 $this->phrasen['global/datumNichtGesetzt']='Datum ist nicht gesetzt';
 $this->phrasen['global/studiensemesterKonnteNichtGefundenWerden'] = 'Studiensemester konnte nicht gefunden werden';
 $this->phrasen['global/fehlerBeimErmittelnDerUID'] = 'Fehler beim ermitteln der UID';
 $this->phrasen['global/nichtAngemeldet'] = 'Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden';
-$this->phrasen['global/LDAPserverNichtErreichbar']='Der LDAP-Server ist nicht erreichbar'; 
+$this->phrasen['global/LDAPserverNichtErreichbar']='Der LDAP-Server ist nicht erreichbar';
+$this->phrasen['global/unbekannterFehleraufgetreten']='Es ist ein unbekannter Fehler aufgetreten'; 
 
 // LV - Plan
 $this->phrasen['global/lehrveranstaltungsplan']='Lehrveranstaltungsplan'; 
