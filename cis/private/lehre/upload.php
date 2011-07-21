@@ -25,19 +25,19 @@
 // ------------------------------------------------------------------------------------------
 //	Datenbankanbindung 
 // ------------------------------------------------------------------------------------------
-	require_once('../../../include/basis_db.class.php');
-	if (!$db = new basis_db())
-			die('Fehler beim Herstellen der Datenbankverbindung');
-			
+	require_once('../../../include/basis_db.class.php');			
     require_once('../../../include/functions.inc.php');
     require_once('../../../include/benutzerberechtigung.class.php');
+    require_once ('../../../include/phrasen.class.php');
 
 
+    $sprache = getSprache(); 
+	$p=new phrasen($sprache); 
+    
+	if (!$db = new basis_db())
+		die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
 	$user = get_uid();
 
-	
-	
-	
 	if(isset($_GET['course_id']))
 		$course_id = $_GET['course_id'];
 
@@ -101,11 +101,11 @@
 
 			if(!($num_rows_student > 0))
 			{
-				die('<p align="center"><strong>Der Benutzer '.$user.'</strong> konnte nicht zugeordnet werden!</p>');
+				die('<p align="center"><strong>'.$p->t('upload/benutzerKonnteNichtZugeordnetWerden',array($user)).'</strong>!</p>');
 			}
 		}
 		else
-			die('<p align="center"><strong>Der Benutzer '.$user.'</strong> konnte nicht zugeordnet werden!</p>');
+			die('<p align="center"><strong>'.$p->t('upload/benutzerKonnteNichtZugeordnetWerden',array($user)).'</strong>!</p>');
 
 		$islector = false;
 	}
@@ -134,7 +134,7 @@
 		{
 			del = false;
 
-			return confirm("Wollen Sie die ausgewaehlten Verzeichnisse wirklich loeschen? Dieser Vorgang ist unwiderruflich!");
+			return confirm("<?php echo $p->t('upload/wollenSieOrdnerWirklichLoeschen'); ?>!");
 		}
 		else
 			return true;
@@ -146,7 +146,7 @@
 		{
 			del = false;
 
-			return confirm("Wollen Sie die ausgewaehlten Dateien wirklich loeschen? Dieser Vorgang ist unwiderruflich!");
+			return confirm("<?php echo $p->t('upload/wollenSieOrdnerWirklichLoeschen'); ?>!");
 		}
 		else
 			return true;
@@ -163,7 +163,7 @@
 		}
 		else
 		{
-			alert('Der Verzeichnisname darf nur Buchstaben und Zahlen beinhalten');
+			alert('<?php echo $p->t('upload/verzeichnisnameDarfNurBuchstaben'); ?>');
 			return false;
 		}
 	}
@@ -194,7 +194,7 @@ A:hover {
 		<td width="97%"><table class="tabcontent"><tr><td>
 			<table cellSpacing="2" cellPadding="2" width="100%" border="0">
 			  <tr>
-				<td align="center" class="ContentHeader" colSpan="5" height="20"><b><font class="ContentHeader">Datei Upload</font></b></td>
+				<td align="center" class="ContentHeader" colSpan="5" height="20"><b><font class="ContentHeader"><?php echo $p->t('upload/dateiUpload');?></font></b></td>
 			  </tr>
 			  <?php
 				if($islector)
@@ -213,11 +213,11 @@ A:hover {
 
 					   if(!($num_rows_lector_dispatch > 0) && !$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('lehre') && !$rechte->isBerechtigt('assistenz'))
 					   {
-					   		die('<p align="center"><strong>Es konnten keine Studieng&auml;nge definiert werden!</strong></p>');
+					   		die('<p align="center"><strong>'.$p->t('upload/keineStudiengaengeDefiniert').'!</strong></p>');
 					   }
 
 
-					   echo 'Studiengang: ';
+					   echo $p->t('global/studiengang').': ';
 					   echo "\n<select name=\"course\" onChange=\"MM_jumpMenu('self',this,0)\">";
 
 						//STUDIENGANG
@@ -391,15 +391,15 @@ A:hover {
 					   //$sql_query = "SELECT DISTINCT ON(semester) semester FROM lehre.tbl_lehrfachzuteilung WHERE lektor_uid='$user' AND NOT(lehrfachzuteilung_kurzbz='') AND studiengang_kz='$course_id' ORDER BY semester";
 					   $sql_query = "SELECT DISTINCT semester FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehrveranstaltung WHERE tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND mitarbeiter_uid='$user' AND studiengang_kz='$course_id' AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>'' ORDER BY semester";
 					   if(!$result_lector_dispatch = $db->db_query($sql_query))
-					   		die('Fehler beim Lesen aus der Datenbank');
+					   		die($p->t('global/fehlerBeimLesenAusDatenbank'));
 
 					   $num_rows_lector_dispatch = $db->db_num_rows($result_lector_dispatch);
 
 					   if(!($num_rows_lector_dispatch > 0) && !$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('lehre') && !$rechte->isBerechtigt('assistenz'))
-							die('<p align="center"><strong<font size="2" face="Arial, Helvetica, sans-serif">Es konnten keine Semester definiert werden!</font></p>');
+							die('<p align="center"><strong<font size="2" face="Arial, Helvetica, sans-serif">'.$p->t('upload/keineSemesterDefiniert').'!</font></p>');
 
 
-					   echo 'Semester: ';
+					   echo $p->t('global/semester').': ';
 					   echo "\n<select name=\"term\" onChange=\"MM_jumpMenu('self',this,0)\" class=\"xxxs_black\">";
 					   //SEMESTER
 					   $sem_arr = array();
@@ -502,7 +502,7 @@ A:hover {
 						//LEHRFAECHER
 
 						if(!$result_lector_dispatch = $db->db_query($sql_query))
-							die('<p align="center"><strong>Es konnten keine Gegenst&auml;nde definiert werden!</p>');
+							die('<p align="center"><strong>'.$p->t('upload/keineGegenstaendeDefiniert').'!</p>');
 
 						$num_rows_lector_dispatch = $db->db_num_rows($result_lector_dispatch);
 						//echo $sql_query;
@@ -510,11 +510,11 @@ A:hover {
 
 					   if(!($num_rows_lector_dispatch > 0))
 					   {
-					      die('<p align="center"><strong>Es konnten keine Gegenst&auml;nde definiert werden!</p>');
+					      die('<p align="center"><strong>'.$p->t('upload/keineGegenstaendeDefiniert').'!</p>');
 					   }
 
 					   //echo '</font>';
-					   echo 'Gegenstand: ';
+					   echo $p->t('global/lehrveranstaltung').': ';
 					   echo "\n<select name=\"short\" onChange=\"MM_jumpMenu('self',this,0)\" class=\"xxxs_black\">";
 
 					   for($i = 0; $i < $num_rows_lector_dispatch; $i++)
@@ -558,24 +558,25 @@ A:hover {
 					$sql_query = "SELECT DISTINCT tbl_lehrveranstaltung.bezeichnung, lehreverzeichnis, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM public.tbl_student, lehre.tbl_lehrveranstaltung, public.tbl_studiengang WHERE lehreverzeichnis='$short' AND tbl_student.studiengang_kz='$course_id' AND tbl_student.semester='$term_id' AND  tbl_student.student_uid='$user' AND tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz AND tbl_lehrveranstaltung.studiengang_kz=tbl_student.studiengang_kz AND tbl_lehrveranstaltung.semester=tbl_student.semester AND tbl_lehrveranstaltung.lehre=true LIMIT 1";
 
 					if(!$result_path_elements = $db->db_query($sql_query))
-						die('<p align="center"><strong>Der Benutzer '.$user.'</strong> konnte nicht zugeordnet werden!</p>');
+						die('<p align="center"><strong>'.$p->t('upload/benutzerKonnteNichtZugeordnetWerden',array($user)).'</strong>!</p>');
 
 					if(!$result_path_elements)
-						die('<p align="center"><strong>Der Benutzer '.$user.'</strong> konnte nicht zugeordnet werden!</p>');
+						die('<p align="center"><strong>'.$p->t('upload/benutzerKonnteNichtZugeordnetWerden',array($user)).'</strong>!</p>');
 					$num_rows_path_elements = $db->db_num_rows($result_path_elements);
 					if(!($num_rows_path_elements > 0))
 					{
 						// Pruefen ob dieser Kurs ein Wahlfach ist
 						$sql_query = "SELECT DISTINCT vw_student_lehrveranstaltung.bezeichnung, vw_student_lehrveranstaltung.lehreverzeichnis, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM campus.vw_student_lehrveranstaltung , public.tbl_studiengang WHERE vw_student_lehrveranstaltung.lehre=true AND vw_student_lehrveranstaltung.studiengang_kz='".addslashes($course_id)."' AND vw_student_lehrveranstaltung.semester='".addslashes($term_id)."'	AND vw_student_lehrveranstaltung.lehreverzeichnis='".addslashes($short)."' AND vw_student_lehrveranstaltung.uid='".addslashes($user)."'	AND tbl_studiengang.studiengang_kz=vw_student_lehrveranstaltung.studiengang_kz LIMIT 1; ";
 						if(!$result_path_elements = $db->db_query($sql_query))
-							die('<p align="center"><strong>Der Benutzer '.$user.'</strong> konnte nicht zugeordnet werden!</p>');
+							die('<p align="center"><strong>'.$p->t('upload/benutzerKonnteNichtZugeordnetWerden',array($user)).'</strong>!</p>');
 						if(!$result_path_elements)
-							die('<p align="center"><strong>Der Benutzer '.$user.'</strong> konnte nicht zugeordnet werden!</p>');
+							die('<p align="center"><strong>'.$p->t('upload/benutzerKonnteNichtZugeordnetWerden',array($user)).'</strong>!</p>');
 						$num_rows_path_elements = $db->db_num_rows($result_path_elements);
 						if(!($num_rows_path_elements > 0))
 						{
 							echo "<tr><td>";
-							die('<p align="center"><strong>Sie haben keine Berechtigung für diesen Bereich</td></tr></table>');
+							die('<p align="center"><strong>'.$p->t('global/keineBerechtigungFuerDieseSeite')
+							.'</td></tr></table>');
 						}
 					}
 					$row = $db->db_fetch_object($result_path_elements, 0);
@@ -609,7 +610,7 @@ A:hover {
 
 								  	  if(!check_filename($file_name))
 								  	  {
-										echo "<center><b><font color='red'>Dateiname von Datei ".($i+1)." ist ung&uuml;ltig! Der Dateiname darf nur Buchstaben und Zahlen enthalten.</b></font></center>";
+										echo "<center><b><font color='red'>".$p->t('upload/dateinameDarfNurBuchstaben', array($i+1)).".</b></font></center>";
 								  	  }
 								  	  else
 								  	  {
@@ -787,7 +788,7 @@ A:hover {
 
 						    echo "  <tr>";
 						    echo "    <td align=\"right\" width=\"32%\">";
-						    echo "      <strong><font face=\"Arial,Helvetica,sans-serif\" size=\"2\">$j. Datei:&nbsp;</font></strong>";
+						    echo "      <strong><font face=\"Arial,Helvetica,sans-serif\" size=\"2\">$j. ".$p->t('global/datei').":&nbsp;</font></strong>";
 						    echo "    </td>";
 						    echo "    <td align=\"left\" width=\"68%\">";
 							echo "      <input type=\"file\" name=\"userfile_$i\" size=\"30\">";
@@ -795,7 +796,7 @@ A:hover {
 						    echo "  </tr>";
 						  }
 						?>
-                        <div align="center"><font face="Arial" size="2">&nbsp;<input type="checkbox" name="overwrite" value="overwrite">&nbsp;Dateien automatisch &uuml;berschreiben</font></div>
+                        <div align="center"><font face="Arial" size="2">&nbsp;<input type="checkbox" name="overwrite" value="overwrite">&nbsp;<?php echo $p->t('upload/dateienAutomatischUeberschreiben');?></font></div>
                         </font></b></div></td>
                 </tr>
               </table>
@@ -803,8 +804,8 @@ A:hover {
                   echo "<table class='tabcontent'>";
                   echo "  <tr>";
 			      echo "    <td align=\"right\" width=\"59%\">";
-			      echo "<span style='font-size:8pt;'>Max. Uploadgröße (alle Dateien): <b>15 MB</b></span>";
-			      echo "      <input id=\"btnupload\" type=\"submit\" name=\"upload\" value=\"Upload\">";
+			      echo "<span style='font-size:8pt;'>".$p->t('upload/maxUploadgroesse').": <b>15 MB</b></span>";
+			      echo "      <input id=\"btnupload\" type=\"submit\" name=\"".$p->t('upload/upload')."\" value=\"Upload\">";
 			      echo "    </td>";
 			      echo "    <td width=\"41%\">&nbsp;</td>";
 			      echo "  </tr>";
@@ -816,7 +817,7 @@ A:hover {
 				<tr>
 
 			  <td align="middle" class="ContentHeader2" colSpan="5" height="24">
-				<p align="left"><b>&nbsp;Neues Verzeichnis erstellen:</b></td>
+				<p align="left"><b>&nbsp;<?php echo $p->t('upload/neuesVerzeichnisErstellen');?>:</b></td>
 				</tr>
 				<tr>
 
@@ -829,7 +830,7 @@ A:hover {
 						{
 							if(!check_filename($new_dir_name_text))
 							{
-								echo '<center><b>Verzeichnisname ist ungueltig!</b></center>';
+								echo '<center><b>'.$p->t('upload/verzeichnisnameDarfNurBuchstaben').'!</b></center>';
 							}
 							else
 							{
@@ -911,8 +912,8 @@ A:hover {
 						}
 					}
 
-					echo "<b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\">&nbsp;Verzeichnisname:&nbsp;";
-					echo "<input id='new_dir_name_text' type=\"text\" name=\"new_dir_name_text\" size=\"30\">&nbsp;<input type=\"submit\" value=\"Verzeichnis erstellen\" name=\"create_dir\" onclick='return checkvz(\"new_dir_name_text\")'>";
+					echo "<b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\">&nbsp;".$p->t('upload/verzeichnisname').":&nbsp;";
+					echo "<input id='new_dir_name_text' type=\"text\" name=\"new_dir_name_text\" size=\"30\">&nbsp;<input type=\"submit\" value=\"".$p->t('upload/verzeichnisErstellen')."\" name=\"create_dir\" onclick='return checkvz(\"new_dir_name_text\")'>";
 					echo "</font></b>";
 					echo "</td>";
 
@@ -949,7 +950,7 @@ A:hover {
 					echo '<img src="../../../skin/images/folderup.gif">';
 				}
 				?>
-				<b>Unterordner von
+				<b><?php echo $p->t('upload/unterordnerVon');?>
 				<?php
 				if(isset($subdir) && $subdir != "")
 				{
@@ -971,11 +972,11 @@ A:hover {
 			 ?>:</b></font></td>
 				</tr>
 				<tr>
-					<td align="middle" class="ContentHeader"><b>Ausw&auml;hlen</b></td>
-					<td align="middle" class="ContentHeader"><b>Name</b></td>
-					<td align="middle" class="ContentHeader"><b>Aktionen</b></td>
-					<td align="middle" class="ContentHeader"><b># Dateien</b></td>
-					<td align="middle" height="20" class="ContentHeader"><b>KB Gespeichert</b></td>
+					<td align="middle" class="ContentHeader"><b><?php echo $p->t('upload/auswaehlen');?></b></td>
+					<td align="middle" class="ContentHeader"><b><?php echo $p->t('upload/name');?></b></td>
+					<td align="middle" class="ContentHeader"><b><?php echo $p->t('upload/aktionen');?></b></td>
+					<td align="middle" class="ContentHeader"><b># <?php echo $p->t('upload/dateien');?></b></td>
+					<td align="middle" height="20" class="ContentHeader"><b><?php echo $p->t('upload/kbGespeichert');?></b></td>
 				</tr>
 					<?php
 						if(isset($subdir) && $subdir != "")
@@ -1114,7 +1115,7 @@ A:hover {
 											}
 										}
 
-										echo "</b></td><td align=\"middle\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><input type=\"submit\" name=\"rename_dir\" value=\"Umbenennen\">&nbsp;<input type=\"submit\" name=\"delete_dir\" value=\"L&ouml;schen\" onClick=\"del=true;\"></font>";
+										echo "</b></td><td align=\"middle\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><input type=\"submit\" name=\"rename_dir\" value=\"".$p->t('global/umbenennen')."\">&nbsp;<input type=\"submit\" name=\"delete_dir\" value=\"".$p->t('global/loeschen')."\" onClick=\"del=true;\"></font>";
 									}
 									else if(isset($delete_dir) && isset($check_state))
 									{
@@ -1133,7 +1134,7 @@ A:hover {
 											$tmp_dir_entry = dir($dest_dir->path.'/'.$entry);
 										}
 
-										echo "</b></td><td align=\"middle\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><input type=\"submit\" name=\"rename_dir\" value=\"Umbenennen\">&nbsp;<input type=\"submit\" name=\"delete_dir\" value=\"L&ouml;schen\" onClick=\"del=true;\"></font>";
+										echo "</b></td><td align=\"middle\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><input type=\"submit\" name=\"rename_dir\" value=\"".$p->t('global/umbenennen')."\">&nbsp;<input type=\"submit\" name=\"delete_dir\" value=\"".$p->t('global/loeschen')."\" onClick=\"del=true;\"></font>";
 									}
 
 									if(isset($tmp_dir_entry))
@@ -1188,7 +1189,7 @@ A:hover {
 							if(!isset($dir_empty) || $dir_empty == true)
 							{
 								echo "<tr><td align=\"middle\" colSpan=\"5\" height=\"20\" bgcolor=\"#F2F2F2\"><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\">";
-								echo "&nbsp;&nbsp;Es wurden keine Ordner gefunden.";
+								echo "&nbsp;&nbsp;".$p->t('upload/keineOrdnerGefunden').".";
 								echo "</font></b></td></tr>";
 							}
 
@@ -1199,40 +1200,41 @@ A:hover {
 							$dir_count = 0;
 
 							echo "<tr><td align=\"middle\" colSpan=\"5\" height=\"20\" bgcolor=\"#F2F2F2\"><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\">";
-							echo "&nbsp;&nbsp;Es wurden keine Ordner gefunden / Hauptordner nicht gefunden.";
+							echo "&nbsp;&nbsp;".$p->t('upload/keineOrdnerGefunden').".";
 							echo "</font></b></td></tr>";
 						}
 					?>
 				<tr>
 
-              <td align="middle" class="ContentHeader" colSpan="5" height="24"><font class="ContentHeader"><?php	if(isset($subdir) && $subdir != "")
-																																					{
-																																						if(!@is_dir($upload_root.'/'.$uploaddir.'/'.$subdir))
-																																						{
-																																							unset($subdir);
+              <td align="middle" class="ContentHeader" colSpan="5" height="24"><font class="ContentHeader">
+            <?php	if(isset($subdir) && $subdir != "")
+			{
+				if(!@is_dir($upload_root.'/'.$uploaddir.'/'.$subdir))
+				{
+					unset($subdir);
 
-																																							echo '<img src="../../../skin/images/folderup.gif" border="0">';
-																																						}
-																																						else
-																																						{
-																																							// XXX
+					echo '<img src="../../../skin/images/folderup.gif" border="0">';
+				}
+				else
+				{
+					// XXX
 
-																																							if(isset($short))
-																																							{
-																																								echo '<a href="upload.php?course_id='.$course_id.'&term_id='.$term_id.'&short='.$short.'&subdir='.substr($subdir, 0, mb_strrpos($subdir, '/',0)).'"><img src="../../../skin/images/folderup.gif" border="0"></a>';
-																																							}
-																																							else
-																																							{
-																																								echo '<a href="upload.php?course_id='.$course_id.'&term_id='.$term_id.'&short='.$row_lesson->kuerzel.'&subdir='.mb_substr($subdir, 0, mb_strrpos($subdir, '/',0)).'"><img src="../../../skin/images/folderup.gif" border="0"></a>';
-																																							}
-																																						}
-																																					}
-																																					else
-																																					{
-																																						echo '<img src="../../../skin/images/folderup.gif" border="0">';
-																																					}
-																																					?>
-                <b>Dateien im Ordner
+					if(isset($short))
+					{
+						echo '<a href="upload.php?course_id='.$course_id.'&term_id='.$term_id.'&short='.$short.'&subdir='.substr($subdir, 0, mb_strrpos($subdir, '/',0)).'"><img src="../../../skin/images/folderup.gif" border="0"></a>';
+					}
+					else
+					{
+						echo '<a href="upload.php?course_id='.$course_id.'&term_id='.$term_id.'&short='.$row_lesson->kuerzel.'&subdir='.mb_substr($subdir, 0, mb_strrpos($subdir, '/',0)).'"><img src="../../../skin/images/folderup.gif" border="0"></a>';
+					}
+				}
+			}
+			else
+			{
+				echo '<img src="../../../skin/images/folderup.gif" border="0">';
+			}
+			?>
+                <b><?php echo $p->t('upload/dateienImOrdner');?>
                 <?php
 					 if(isset($subdir) && $subdir != "")
 					{
@@ -1254,12 +1256,11 @@ A:hover {
 				?>:</b></font></td>
 				</tr>
 				<tr>
-					<td align="middle" class="ContentHeader"><b>Ausw&auml;hlen</b></td>
-					<td align="middle" class="ContentHeader"><b>Name</b></td>
-					<td align="middle" class="ContentHeader"><b>Aktionen</b></td>
-					<td align="middle" class="ContentHeader"><b>Gr&ouml;&szlig;e (KB)</b></td>
-					<td align="middle" height="20" class="ContentHeader"><b>Zuletzt modifiziert</b></td>
-
+					<td align="middle" class="ContentHeader"><b><?php echo $p->t('upload/auswaehlen');?></b></td>
+					<td align="middle" class="ContentHeader"><b><?php echo $p->t('upload/name');?></b></td>
+					<td align="middle" class="ContentHeader"><b><?php echo $p->t('upload/aktionen');?></b></td>
+					<td align="middle" class="ContentHeader"><b># <?php echo $p->t('upload/dateien');?></b></td>
+					<td align="middle" height="20" class="ContentHeader"><b><?php echo $p->t('upload/kbGespeichert');?></b></td>
 				</tr>
 				<tr>
 					<?php
@@ -1361,7 +1362,7 @@ A:hover {
 											}
 										}
 
-										echo "</b></td><td align=\"middle\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><input type=\"submit\" name=\"rename_file\" value=\"Umbenennen\">&nbsp;<input type=\"submit\" name=\"delete_file\" value=\"L&ouml;schen\" onClick=\"del=true;\"></font>";
+										echo "</b></td><td align=\"middle\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><input type=\"submit\" name=\"rename_file\" value=\"".$p->t('global/umbenennen')."\">&nbsp;<input type=\"submit\" name=\"delete_file\" value=\"".$p->t('global/loeschen')."\" onClick=\"del=true;\"></font>";
 									}
 									else if(isset($delete_file) && isset($check_state))
 									{
@@ -1375,7 +1376,7 @@ A:hover {
 									}
 									else
 									{
-										echo "</b></td><td align=\"middle\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><input type=\"submit\" name=\"rename_file\" value=\"Umbenennen\">&nbsp;<input type=\"submit\" name=\"delete_file\" value=\"L&ouml;schen\" onClick=\"del=true;\"></font>";
+										echo "</b></td><td align=\"middle\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><input type=\"submit\" name=\"rename_file\" value=\"".$p->t('global/umbenennen')."\">&nbsp;<input type=\"submit\" name=\"delete_file\" value=\"".$p->t('global/loeschen')."\" onClick=\"del=true;\"></font>";
 									}
 
 									$cur_filesize = round(filesize($dest_dir->path.'/'.$entry) / 1024);
@@ -1412,7 +1413,7 @@ A:hover {
 							if(!isset($null_file) || $null_file == true)
 							{
 								echo "<tr><td align=\"middle\" colSpan=\"5\" height=\"20\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\">";
-								echo "&nbsp;&nbsp;Es wurden keine Dateien gefunden.";
+								echo "&nbsp;&nbsp;".$p->t('upload/keineDateienGefunden').".";
 								echo "</font></b></td></tr>";
 							}
 							else
@@ -1441,25 +1442,25 @@ A:hover {
 					?>
 				</tr>
 				<tr>
-					<td align="middle" class="MarkLine" colSpan="5" height="20"><font face="Arial,Helvetica,sans-serif" size="2"><i><?php echo $total_filecount; ?> Dateien in <?php echo $dir_count; ?> Ordner(n), <?php echo $total_filesize; ?> KB gesamt.</i></font></td>
+					<td align="middle" class="MarkLine" colSpan="5" height="20"><font face="Arial,Helvetica,sans-serif" size="2"><i><?php echo $p->t('upload/dateienInOrdnern',array($total_filecount,$dir_count,$total_filesize) );?></i></font></td>
 				</tr>
 				<?php
 					if(isset($unallowed_upload) && $unallowed_upload == true)
 					{
 						unset($unallowed_upload);
 
-						echo '<td align="middle" class="MarkLine" colSpan="5" height="20"><font size="2" color="#FF0000">Fehler: Sie haben versucht eine Datei auf den Server zu laden deren Dateiformat nicht unterst&uuml;tzt wird.</font></td>';
+						echo '<td align="middle" class="MarkLine" colSpan="5" height="20"><font size="2" color="#FF0000">'.$p->t('upload/dateiAufServerDateiformat').'.</font></td>';
 					}
 					else if(isset($unallowed_rename) && $unallowed_rename == true)
 					{
 						unset($unallowed_rename);
 
-						echo '<td align="middle" class="MarkLine" colSpan="5" height="20"><font size="2" color="#FF0000">Fehler: Sie haben versucht das Formatattribut einer Datei in ein neues zu &auml;ndern welches nicht unterst&uuml;tzt wird.</font></td>';
+						echo '<td align="middle" class="MarkLine" colSpan="5" height="20"><font size="2" color="#FF0000">'.$p->t('upload/formattributInEinNeues').'.</font></td>';
 					}
 					if(isset($no_overwrite_error) && $no_overwrite_error == true)
 					{
 						unset($no_overwrite_error);
-						echo '<td align="middle" class="MarkLine" colSpan="5" height="20"><font size="2" color="#FF0000">Fehler: Die Datei existiert bereits! Bitte verwenden Sie die Option "Dateien automatisch überschreiben"</font></td>';
+						echo '<td align="middle" class="MarkLine" colSpan="5" height="20"><font size="2" color="#FF0000">'.$p->t('upload/dateiExistiertBereits').'</font></td>';
 					}
 
 				?>
