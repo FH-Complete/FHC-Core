@@ -227,7 +227,7 @@ if(!is_null($method))
 			$content->getContent($content_id);
 			
 			$content->new = true;
-			$content->sichtbar=false;
+			$content->sichtbar=true;
 			$content->sprache=$_POST['sprache'];
 			$content->insertvon = $user;
 			$content->insertamum = date('Y-m-d H:i:s');
