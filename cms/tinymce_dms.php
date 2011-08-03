@@ -90,6 +90,60 @@ require_once('../include/dms.class.php');
 		}
 		return false;
 	}
+
+		var __js_page_array = new Array();
+	    function js_toggle_container(conid)
+	    {
+			if (document.getElementById)
+			{
+	        	var block = "table-row";
+				if (navigator.appName.indexOf('Microsoft') > -1)
+					block = 'block';
+					
+				// Aktueller Anzeigemode ermitteln	
+	            var status = __js_page_array[conid];
+	            if (status == null)
+				{
+			 		if (document.getElementById && document.getElementById(conid)) 
+					{  
+						status=document.getElementById(conid).style.display;
+					} else if (document.all && document.all[conid]) {      
+						status=document.all[conid].style.display;
+			      	} else if (document.layers && document.layers[conid]) {                          
+					 	status=document.layers[conid].style.display;
+			        }							
+				}	
+				
+				// Anzeigen oder Ausblenden
+	            if (status == 'none')
+	            {
+			 		if (document.getElementById && document.getElementById(conid)) 
+					{  
+						document.getElementById(conid).style.display = 'block';
+					} else if (document.all && document.all[conid]) {      
+						document.all[conid].style.display='block';
+			      	} else if (document.layers && document.layers[conid]) {                          
+					 	document.layers[conid].style.display='block';
+			        }				
+	            	__js_page_array[conid] = 'block';
+	            }
+	            else
+	            {
+			 		if (document.getElementById && document.getElementById(conid)) 
+					{  
+						document.getElementById(conid).style.display = 'none';
+					} else if (document.all && document.all[conid]) {      
+						document.all[conid].style.display='none';
+			      	} else if (document.layers && document.layers[conid]) {                          
+					 	document.layers[conid].style.display='none';
+			        }				
+	            	__js_page_array[conid] = 'none';
+	            }
+	            return false;
+	     	}
+	     	else
+	     		return true;
+	  	}
 	</script>
 </head>
 <body>
@@ -100,6 +154,8 @@ $kategorie_kurzbz = isset($_REQUEST['kategorie_kurzbz'])?$_REQUEST['kategorie_ku
 $searchstring = isset($_REQUEST['searchstring'])?$_REQUEST['searchstring']:'';
 $importFile = isset($_REQUEST['importFile'])?$_REQUEST['importFile']:'';
 $versionId = isset($_REQUEST['versionid'])?$_REQUEST['versionid']:'';
+$renameId = isset($_GET['renameid'])?$_GET['renameid']:'';
+$version = isset($_GET['version'])?$_GET['version']:'';
 $suche = false; 
 
 $mimetypes = array(
@@ -109,9 +165,11 @@ $mimetypes = array(
 	'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'=>'excel.gif',
 	'application/vnd.oasis.opendocument.text'=>'openoffice0.jpg',
 	'application/msword'=>'dotpic.gif',
+	'application/vnd.ms-excel'=>'excel.gif',
 	'application/x-zip'=>'zippic.gif',
 	'image/jpeg'=>'imgpic.gif',
 	'image/gif'=>'imgpic.gif',
+	'image/png'=>'imgpic.gif',
 );
 
 // Hole Datei aus Import Verzeichnis
@@ -221,12 +279,38 @@ if(isset($_POST['fileupload']))
 	}
 }
 
+if(isset($_POST['action']) && $_POST['action']=='rename')
+{
+	$name = $_POST['dateiname'];
+	$dms_id = $_POST['dms_id'];
+	$version = $_POST['version'];
+	
+	$dms = new dms();
+	if($dms->load($dms_id, $version))
+	{
+		$dms->name = $name;
+		if($dms->save(false))
+			echo '<span class="ok">Dateiname wurde erfolgreich geändert</span>';
+		else
+			echo '<span class="error">Fehler beim Ändern des Dateinamens:'.$dms->errormsg.'</span>';
+	}
+	else
+		echo '<span class="error">Fehler beim Laden des Eintrages</span>';
+}
+
 if($versionId != '')
 {	
 	//  Übersicht der Versionen
 	echo '<h1>Versionsübersicht</h1>'; 
 	echo '<span style="float:right";><a href="'.$_SERVER['PHP_SELF'].'">zurück</a></span>'; 
 	drawAllVersions($versionId); 
+}
+elseif($renameId!='')
+{
+	//  Übersicht der Versionen
+	echo '<h1>Versionsübersicht</h1>'; 
+	echo '<span style="float:right";><a href="'.$_SERVER['PHP_SELF'].'">zurück</a></span>'; 
+	drawRenameForm($renameId, $version);
 }
 else 
 {
@@ -245,15 +329,46 @@ else
 		//Kategorien anzeigen
 	$dms = new dms();
 	$dms->getKategorie();
+	echo '
+	<table class="tabcontent">
+	<tr>
+		<td width="159" valign="top" class="tdwrap">
+			<table class="tabcontent">
+				<tr>
+					<td class="tdwidth10" nowrap>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>';
 	drawKategorieMenue($dms->result);
+	echo '</table></td></tr></table>';
+	echo '<script>
+	$(document).ready(function() 
+	{ 
+		OpenTreeToKategorie("'.$kategorie_kurzbz.'");
+	});
 	
+	//Klappt den Kategoriebaum auf, damit die ausgewaehlte Kategorie sichtbar ist
+	function OpenTreeToKategorie(kategorie)
+	{
+		elem = document.getElementById(kategorie);
+		if(elem.nodeName=="TABLE")
+			elem.style.display="block";
+		while(true)
+		{
+			if(!elem.parentNode)
+				break;
+			else
+				elem = elem.parentNode;
+			
+			if(elem.nodeName=="TABLE" && elem.className=="tabcontent")
+				elem.style.display="block";
+		}				
+	}
+	</script>';
 	echo '</td>
 		<td valign="top" style="border-top: 1px solid lightblue; width: 100%;">';
 	//Dokumente der Ausgewaehlten Kategorie laden und Anzeigen
 	$dms = new dms();
-	
-
-	
+		
 	if($searchstring!='')
 	{
 		$dms->search($searchstring);
@@ -381,27 +496,44 @@ function drawFilesFromImport()
 function drawKategorieMenue($rows)
 {	
 	global $kategorie_kurzbz;
-	echo '<ul>';
+	
+	//echo '<ul>';
 	foreach($rows as $row)
 	{
 		if($kategorie_kurzbz=='')
 			$kategorie_kurzbz=$row->kategorie_kurzbz;
 		if($kategorie_kurzbz==$row->kategorie_kurzbz)
-			$class='class="marked"';
+			$class='marked';
 		else
 			$class='';
 		
-		echo '<li>
-			<a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$row->kategorie_kurzbz.'" '.$class.'>';
-		echo $row->bezeichnung.'</a>';
 		$dms = new dms();
 		$dms->getKategorie($row->kategorie_kurzbz);
 		if(count($dms->result)>0)
+		{
+			echo '
+			<tr>
+				<td class="tdwidth10" nowrap>&nbsp;</td>
+	          	<td class="tdwrap">
+	          		<a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$row->kategorie_kurzbz.'" class="MenuItem" onClick="js_toggle_container(\''.$row->kategorie_kurzbz.'\');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;<span class="'.$class.'">'.$row->bezeichnung.'</span></a>
+					<table class="tabcontent" id="'.$row->kategorie_kurzbz.'" style="display: none;">';
 			drawKategorieMenue($dms->result);
-		echo '</li>';
+			echo '	</table>
+	          	</td>
+        	</tr>';
+		}
+		else
+		{
+			echo '
+			<tr>
+				<td class="tdwidth10" nowrap>&nbsp;</td>
+	          	<td class="tdwrap"><a id="'.$row->kategorie_kurzbz.'" href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$row->kategorie_kurzbz.'" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;<span class="'.$class.'">'.$row->bezeichnung.'</span></a></td>
+        	</tr>';			
+		}
+		
 	}
-	echo '
-				</ul>';
+	//echo '</table>';
+	//echo '</ul>';
 }
 /**
  * Zeichnet die Files in Listenform
@@ -456,6 +588,7 @@ function drawFilesList($rows)
 						<li><a href="dms.php?id='.$row->dms_id.'&version='.$row->version.'" style="font-size:small" target="_blank">Herunterladen</a></li>
 						<li><a href="id://'.$row->dms_id.'/Upload" onclick="return upload(\''.$row->dms_id.'\',\''.$row->name.'\')" style="font-size:small">Neue Version hochladen</a></li>
 						<li><a href="'.$_SERVER['PHP_SELF'].'?versionid='.$row->dms_id.'" style="font-size:small" >Alle Versionen anzeigen</a></li>
+						<li><a href="'.$_SERVER['PHP_SELF'].'?renameid='.$row->dms_id.'&version='.$row->version.'&kategorie_kurzbz='.$row->kategorie_kurzbz.'" style="font-size:small" >Datei umbenennen</a></li>
 					</ul>
 				</li>
 			  </ul>';
@@ -467,57 +600,33 @@ function drawFilesList($rows)
 			</table>';
 	$suche = false;
 }
+
 /**
- * Zeichnet die Files mit Vorschau
- * 
- * @param $rows DMS Result Object
+ * Erstellt das Formular zum Umbenennen von Dokumenten
+ * @param $dms_id ID des Dokuments
+ * @param $version Versionsnummer des Dokuments
  */
-function drawFilesThumb($rows)
+function drawRenameForm($dms_id, $version)
 {
-	global $mimetypes;
-	echo '
-			<table>
-				<tr>';
-	$anzahl=0;
-	foreach($rows as $row)
+	global $kategorie_kurzbz;
+	
+	$dms = new dms();
+	if($dms->load($dms_id, $version))
 	{
-		if($anzahl>2)
-		{
-			echo "
-				</tr>
-				<tr>";
-			$anzahl=0;
-		}
-		echo '
-					<td>';
-		echo '<center>';
-		echo '<a href="id://'.$row->dms_id.'/Auswahl" onclick="FileBrowserDialog.mySubmit('.$row->dms_id.'); return false;" style="font-size: small" title="'.$row->beschreibung.'">';
-		
-		if(array_key_exists($row->mimetype,$mimetypes))
-			echo '<img src="../skin/images/'.$mimetypes[$row->mimetype].'" style="height: 15px">';
-		else
-			echo '<img src="dms.php?id='.$row->dms_id.'&amp;notimeupdate" style="max-width: 100px">';
-		echo '</a><br>';
-		//echo '<br>'.$row->name.'</a>';
-		
-		//Upload einer neuen Version
-		echo '<ul class="sf-menu">
-				<li><a href="id://'.$row->dms_id.'/Auswahl" onclick="FileBrowserDialog.mySubmit('.$row->dms_id.');" style="font-size:small">'.$row->name.'</a>
-					<ul>
-						<li><a href="id://'.$row->dms_id.'/Auswahl" onclick="FileBrowserDialog.mySubmit('.$row->dms_id.');" style="font-size:small">Auswählen</a></li>
-						<li><a href="dms.php?id='.$row->dms_id.'&version='.$row->version.'" style="font-size:small" target="_blank">Herunterladen</a></li>
-						<li><a href="id://'.$row->dms_id.'/Upload" onclick="return upload(\''.$row->dms_id.'\',\''.$row->name.'\')" style="font-size:small">Neue Version hochladen</a></li>
-						<li><a href="id://'.$row->dms_id.'/ShowAll" onclick="return upload(\''.$row->dms_id.'\',\''.$row->name.'\')" style="font-size:small" >Alle Versionen anzeigen</a></li>
-					</ul>
-				</li>
-			  </ul>';
-		echo '</center></td>';
-		$anzahl++;
+		echo '<form action="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$kategorie_kurzbz.'" method="POST">
+		Dateiname: <input type="text" size="40" name="dateiname" value="'.htmlentities($dms->name).'">
+		<input type="hidden" name="action" value="rename">
+		<input type="hidden" name="dms_id" value="'.$dms_id.'">
+		<input type="hidden" name="version" value="'.$version.'">
+		<input type="submit" name="submit" value="Umbenennen">
+		</form>';
 	}
-	echo '	
-				</tr>
-			</table>';
+	else
+	{
+		echo '<span class="error">Fehler beim Laden des Eintrags</span>';
+	}
 }
+
 ?>
 </body>
 </html>

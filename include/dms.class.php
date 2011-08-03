@@ -142,7 +142,7 @@ class dms extends basis_db
 		}
 		else
 		{
-			$qry = "UPDATE campus.tbl_dms SET";
+			$qry = "UPDATE campus.tbl_dms SET".
 				" oe_kurzbz=".$this->addslashes($this->oe_kurzbz).",".
 				" dokument_kurzbz=".$this->addslashes($this->dokument_kurzbz).",".
 				" kategorie_kurzbz=".$this->addslashes($this->kategorie_kurzbz).",".
