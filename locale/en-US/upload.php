@@ -24,6 +24,6 @@ $this->phrasen['upload/keineGegenstaendeDefiniert']='Es konnten keine Gegenstän
 $this->phrasen['upload/keineSemesterDefiniert']='Es konnten keine Semester definiert werden';
 $this->phrasen['upload/keineStudiengaengeDefiniert']='Es konnten keine Studiengänge definiert werden';
 $this->phrasen['upload/dateiAufServerDateiformat']='Fehler: Sie haben versucht eine Datei auf den Server zu laden deren Dateiformat nicht unterstützt wird';
-$this->phrasen['upload/formattributInEinNeues'] = 'Fehler: Sie haben versucht das Formatattribut einer Datei in ein neues zu &auml;ndern welches nicht unterstützt wird';
+$this->phrasen['upload/formattributInEinNeues'] = 'Fehler: Sie haben versucht das Formatattribut einer Datei in ein neues zu ändern welches nicht unterstützt wird';
 $this->phrasen['upload/dateiExistiertBereits']='Fehler: Die Datei existiert bereits! Bitte verwenden Sie die Option "Dateien automatisch überschreiben';
 ?>
