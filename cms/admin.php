@@ -89,8 +89,8 @@ $berechtigte_oe = $rechte->getOEkurzbz('basis/cms')
 		tinyMCE.activeEditor.windowManager.open({
 			file: cmsURL,
 			title : "FHComplete File Browser",
-			width: 750,
-			height: 550,
+			width: 800,
+			height: 600,
 			resizable: "yes",
 			close_previous: "no",
 			scrollbars: "yes",
