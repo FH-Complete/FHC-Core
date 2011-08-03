@@ -2,9 +2,11 @@
 $this->phrasen['global/studiengang']='Studiengang';
 $this->phrasen['global/institut']='Institut';
 $this->phrasen['global/semester']='Semester';
+$this->phrasen['global/studiensemester']='Studiensemester';
 $this->phrasen['global/studienzentrum']='Studienzentrum';
 $this->phrasen['global/studiengangsleitung']='Studiengangsleitung';
 $this->phrasen['global/lehrveranstaltung']='Lehrveranstaltung'; 
+$this->phrasen['global/lehreinheit']='Lehreinheit';
 
 $this->phrasen['global/studiengangsmanagement']='Studiengangsmanagement';
 $this->phrasen['global/geschaeftsfuehrendeltg']='geschäftsf. Leitung';
@@ -31,9 +33,14 @@ $this->phrasen['global/auswaehlen']='Auswählen';
 $this->phrasen['global/umbenennen']='Umbenennen';
 $this->phrasen['global/anzeigen']='Anzeigen';
 $this->phrasen['global/bearbeiten']='Bearbeiten';
+$this->phrasen['global/aendern']='Ändern';
+$this->phrasen['global/kopieren']='Kopieren';
+$this->phrasen['global/ja']='Ja';
+$this->phrasen['global/nein']='Nein';
 
 $this->phrasen['global/vorname']='Vorname';
 $this->phrasen['global/nachname']='Nachname';
+$this->phrasen['global/uid']='UID';
 $this->phrasen['global/strasse']='Straße';
 $this->phrasen['global/plz']='Postleitzahl';
 $this->phrasen['global/ort']='Ort';
@@ -79,6 +86,8 @@ $this->phrasen['global/beispiele']='Beispiele';
 $this->phrasen['global/anmelden']='Anmelden'; 
 $this->phrasen['global/angemeldet']='Angemeldet'; 
 $this->phrasen['global/löschen']='Löschen'; 
+$this->phrasen['global/dateiLoeschen']='Datei Löschen'; 
+$this->phrasen['global/betreff']='Betreff';
 
 // Statusmeldungen
 $this->phrasen['global/erfolgreichgespeichert']='Erfolgreich gespeichert'; 
@@ -95,6 +104,7 @@ $this->phrasen['global/fehlerBeimErmittelnDerUID'] = 'Fehler beim ermitteln der 
 $this->phrasen['global/nichtAngemeldet'] = 'Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden';
 $this->phrasen['global/LDAPserverNichtErreichbar']='Der LDAP-Server ist nicht erreichbar';
 $this->phrasen['global/unbekannterFehleraufgetreten']='Es ist ein unbekannter Fehler aufgetreten'; 
+$this->phrasen['global/fehlerBeiDerParameteruebergabe']='Fehler bei der Uebergabe der Parameter';
 
 // LV - Plan
 $this->phrasen['global/lehrveranstaltungsplan']='Lehrveranstaltungsplan'; 
