@@ -40,12 +40,16 @@
 	require_once('../../../include/studiensemester.class.php');
 	require_once('../../../include/lehrveranstaltung.class.php');
 	require_once('../../../include/feedback.class.php');
+	require_once('../../../include/phrasen.class.php');
 
+	$sprache = getSprache();
+	$p = new phrasen($sprache);
+	
 	$user = get_uid();
 	if(check_lektor($user))
 	       $is_lector=true;
 	if(!isset($_GET['lvid']) || !is_numeric($_GET['lvid']))
-	   die('Fehler bei der Uebergabe der Parameter');
+	   die($p->t('global/fehlerBeiDerParameteruebergabe'));
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
@@ -106,7 +110,7 @@
 		</table>
 
 	<br>
-      <p><b>Betreff:&nbsp;</b>
+      <p><b><?php echo $p->t('global/betreff');?>:&nbsp;</b>
 	    <?php
 			if(isset($edit_id) && $edit_id != "" && !isset($edit_break))
 			{
@@ -115,8 +119,8 @@
 				{
 					echo '<input type="text" name="feedback_subject" value="'.$fb_obj->betreff.'" size="54"><br>';
 					echo '<textarea rows="7" name="feedback_message" cols="47">'.$fb_obj->text.'</textarea><br>';
-					echo '<input type="submit" value="&Auml;ndern" name="edit_feedback">&nbsp;';
-					echo '<input type="submit" value="Abbrechen" name="edit_break">';
+					echo '<input type="submit" value="'.$p->t('global/aendern').'" name="edit_feedback">&nbsp;';
+					echo '<input type="submit" value="'.$p->t('global/abbrechen').'" name="edit_break">';
 				}
 				else
 					echo $fb_obj->errormsg.'<br>';
@@ -125,11 +129,11 @@
 			{
 				echo '<input type="text" name="feedback_subject" size="54"><br>';
 				echo '<textarea rows="7" name="feedback_message" cols="47"></textarea><br>';
-				echo '<input type="submit" value="Abschicken" name="send_feedback">';
+				echo '<input type="submit" value="'.$p->t('global/abschicken').'" name="send_feedback">';
 			}
 		?>
         &nbsp;
-        <input type="reset" value="Zur&uuml;cksetzen" name="reset_message">
+        <input type="reset" value="<?php echo $p->t('global/zuruecksetzen');?>" name="reset_message">
       </p>
       <?php
 		if(isset($feedback_message) && $feedback_message != "")
@@ -170,7 +174,7 @@
 
 		if(isset($message_sent) && $message_sent == true)
 		{
-			echo 'Die Nachricht wurde erfolgreich eingetragen.<br><br><br>';
+			echo $p->t('feedback/erfolgreichEingetragen').'<br><br><br>';
 		}
 
 		$fb_obj = new feedback();
@@ -208,7 +212,7 @@
 			echo '</table>';
 		}
 		else
-			echo 'Fehler beim laden der Daten '.$fb_obj->errormsg;
+			echo $p->t('global/fehleraufgetreten').' '.$fb_obj->errormsg;
 	?>
     </td>
 	</form>

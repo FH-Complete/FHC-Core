@@ -27,26 +27,30 @@ require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/studiengang.class.php');
 require_once('../../../include/lehrveranstaltung.class.php');
+require_once('../../../include/phrasen.class.php');
 
 $user = get_uid();
+$sprache=getSprache(); 
+$p = new phrasen($sprache); 
+
 
 if(check_lektor($user))
 	$is_lector=true;
 
 if(!isset($_GET['lvid']) || !is_numeric($_GET['lvid']))
 {
-	die("Fehler bei der Parameteruebergabe");
+	die($p->t('semesterplan/fehlerBeiDerParameteruebergabe'));
 }
 else
 	$lvid = $_GET['lvid'];
 
 $lv_obj = new lehrveranstaltung();
 if(!$lv_obj->load($lvid))
-	die('Fehler beim Laden der Lehrveranstaltung');
+	die($p->t('semesterplan/fehlerBeimLadenDerLv'));
 $stg_obj = new studiengang();
 
 if(!$stg_obj->load($lv_obj->studiengang_kz))
-	die('Fehler beim Laden des Studienganges');
+	die($p->t('semesterplan/fehlerBeimLadenDesStudienganges'));
 
 $openpath = DOC_ROOT.'/documents/'.strtolower($stg_obj->kuerzel).'/'.$lv_obj->semester.'/'.strtolower($lv_obj->lehreverzeichnis).'/semesterplan/';
 ?>
@@ -64,7 +68,7 @@ $openpath = DOC_ROOT.'/documents/'.strtolower($stg_obj->kuerzel).'/'.$lv_obj->se
 	 */
 	function ConfirmFile(handle)
 	{
-		return confirm('Wollen Sie die ausgewählten Dateien wirklich löschen? Dieser Vorgang ist unwiderruflich!');
+		return confirm($p->t('upload/wollenSieOrdnerWirklichLoeschen'));
 	}
 	
 	</script>
@@ -85,13 +89,13 @@ $openpath = DOC_ROOT.'/documents/'.strtolower($stg_obj->kuerzel).'/'.$lv_obj->se
 
 
 	if(!$is_lector)
-		die('<tr><td class="tdwidth10">&nbsp;</td><td>Sie haben keine Berechtigung für diesen Bereich</td></tr>');
+		die('<tr><td class="tdwidth10">&nbsp;</td><td>'.$p->t('global/keineBerechtigungFuerDieseSeite').'</td></tr>');
 
 	echo '<tr><td class="tdwidth10">&nbsp;</td><td>';
 	if(isset($_POST['inhalt']))
 	{
 		$inhalt = $_POST['inhalt'];
-		if($inhalt!="____Ordnerinhalt____")
+		if($inhalt!="____".$p->t('semesterplan/ordnerinhalt')."____")
 		{
 			if(!mb_strstr($inhalt,'..'))
 			{
@@ -99,11 +103,11 @@ $openpath = DOC_ROOT.'/documents/'.strtolower($stg_obj->kuerzel).'/'.$lv_obj->se
 				{
 					writeCISlog('DELETE', "rm -r '$openpath$inhalt'");
 					exec("rm -r '$openpath$inhalt'");
-					echo '<center>Datei erfolgreich gelöscht</center>';
+					echo '<center>'.$p->t('global/erfolgreichgelöscht').'</center>';
 				}
 				else
 				{
-				   echo "<center>Die Datei $openpath$inhalt konnte nicht gefunden werden.</center>";
+				   echo "<center>".$p->t('semesterplan/dateiKonnteNichtGefundenWerden',array($openpath,$inhalt))."</center>";
 				}
 			}
 			else
@@ -114,7 +118,7 @@ $openpath = DOC_ROOT.'/documents/'.strtolower($stg_obj->kuerzel).'/'.$lv_obj->se
 		}
 		else
 		{
-			echo '<center>Bitte zuerst eine Datei auswählen</center>';
+			echo '<center>'.$p->t('semesterplan/bitteZuerstDateiAuswaehlen').'</center>';
 		}
 	}
 
@@ -133,28 +137,28 @@ $openpath = DOC_ROOT.'/documents/'.strtolower($stg_obj->kuerzel).'/'.$lv_obj->se
 					if(move_uploaded_file($_FILES['userfile']['tmp_name'],$openpath . $fn))
 					{
 						exec('sudo chown www-data:teacher "'.$openpath.$fn.'"');
-						echo '<center>Das File wurde erfolgreich hochgeladen</center>';
+						echo '<center>'.$p->t('semesterplan/fileErfolgreichHochgeladen').'</center>';
 					}
 					else
-						echo '<center>Fehler beim Upload! Bitte Versuchen Sie es erneut</center>';
+						echo '<center>'.$p->t('semesterplan/fehlerBeimUpload').'</center>';
 				}
 				else
 				{
-					echo '<center>Dieser Dateityp ist nicht erlaubt <center>';
+					echo '<center>'.$p->t('semesterplan/dateitypIstNichtErlaubt').'<center>';
 				}
 			}
 			else
-				echo '<center>Der Dateiname darf nur Buchstaben und Zahlen enthalten</center>';
+				echo '<center>'.$p->t('semesterplan/dateinameNurBuchstaben').'</center>';
 		}
 		else
-			echo '<center>Fehler beim Upload! Bitte Versuchen Sie es erneut</center>';
+			echo '<center>'.$p->t('semesterplan/fehlerBeimUpload').'</center>';
 	}
 
 	echo '</tr></td>';
 
 	echo '<tr><td class="tdwidth10">&nbsp;</td><td><form accept-charset="UTF-8" name="form1"  method="POST" action="semupload.php?lvid='.$lvid.'"  onSubmit="return ConfirmFile(this);">';
 	echo '<select name="inhalt" size=5>';
-	echo '<option selected>____Ordnerinhalt____</option>';
+	echo '<option selected>____'.$p->t('semesterplan/ordnerinhalt').'____</option>';
 	//Inhalt des Semesterplan Ordners Auslesen
 	if(is_dir($openpath))
 	{
@@ -166,13 +170,13 @@ $openpath = DOC_ROOT.'/documents/'.strtolower($stg_obj->kuerzel).'/'.$lv_obj->se
 		}
 	}
 	echo '</select>';
-	echo '<input type="submit" value="Datei Löschen">';
+	echo '<input type="submit" value="'.$p->t('global/dateiLoeschen').'">';
 	echo '</form></td><td>';
 
     //FileAuswahlfeld
 	echo '<tr><td class="tdwidth10">&nbsp;</td><td><br><form enctype="multipart/form-data" method="POST" action="semupload.php?lvid='.$lvid.'">';
 	echo ' <input type="file" name="userfile" size="30">';
-	echo ' <input type="submit" name="upload" value="Upload">';
+	echo ' <input type="submit" name="upload" value="'.$p->t('upload/upload').'">';
 	echo '</form></td><td>';
 ?>
 	</table>
