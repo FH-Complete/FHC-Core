@@ -2,9 +2,11 @@
 $this->phrasen['global/studiengang']='Degree-Program';
 $this->phrasen['global/institut']='Institute';
 $this->phrasen['global/semester']='Semester';
+$this->phrasen['global/studiensemester']='Semester';
 $this->phrasen['global/studienzentrum']='Study Center';
 $this->phrasen['global/studiengangsleitung']='Head of Department';
 $this->phrasen['global/lehrveranstaltung']='Subject';
+$this->phrasen['global/lehreinheit']='Lehreinheit';
 
 $this->phrasen['global/studiengangsmanagement']='Study Management';
 $this->phrasen['global/geschaeftsfuehrendeltg']='business Leadership';
@@ -31,9 +33,14 @@ $this->phrasen['global/auswaehlen']='Select';
 $this->phrasen['global/umbenennen']='Rename';
 $this->phrasen['global/anzeigen']='Show';
 $this->phrasen['global/bearbeiten']='Edit';
+$this->phrasen['global/aendern']='Change';
+$this->phrasen['global/kopieren']='Copy';
+$this->phrasen['global/ja']='Yes';
+$this->phrasen['global/nein']='No';
 
 $this->phrasen['global/vorname']='First Name';
 $this->phrasen['global/nachname']='Last Name';
+$this->phrasen['global/uid']='UID';
 $this->phrasen['global/strasse']='Street';
 $this->phrasen['global/plz']='Postal Code';
 $this->phrasen['global/ort']='City';
@@ -79,6 +86,8 @@ $this->phrasen['global/beispiele']='Examples';
 $this->phrasen['global/anmelden']='Register'; 
 $this->phrasen['global/angemeldet']='Registered'; 
 $this->phrasen['global/löschen']='Delete'; 
+$this->phrasen['global/dateiLoeschen']='Delete File'; 
+$this->phrasen['global/betreff']='Subject';
 
 // Statusmeldungen
 $this->phrasen['global/erfolgreichgespeichert']='Successfully saved'; 
@@ -95,6 +104,7 @@ $this->phrasen['global/fehlerBeimErmittelnDerUID'] = 'Error finding the UID';
 $this->phrasen['global/nichtAngemeldet'] = 'You are not logged in. No UID found';
 $this->phrasen['global/LDAPserverNichtErreichbar']='Error connecting to LDAP-Server'; 
 $this->phrasen['global/unbekannterFehleraufgetreten']='Unknown error occurred'; 
+$this->phrasen['global/fehlerBeiDerParameteruebergabe']='Fehler bei der Uebergabe der Parameter';
 
 // LV - Plan
 $this->phrasen['global/lehrveranstaltungsplan']='Schedule'; 
