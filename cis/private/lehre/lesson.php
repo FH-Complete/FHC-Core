@@ -29,11 +29,14 @@ require_once('../../../include/studiengang.class.php');
 require_once('../../../include/moodle_course.class.php');
 require_once('../../../include/phrasen.class.php');
 
+$sprache = getSprache();
+$p = new phrasen($sprache);
+
 if (!$db = new basis_db())
-	die('Fehler beim Herstellen der Datenbankverbindung');
+	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
 
 if (!$user=get_uid())
-	die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden !');
+	die($p->t('global/nichtAngemeldet'));
 
 // Init
 $user_is_allowed_to_upload=false;
@@ -111,12 +114,12 @@ if (isset($_GET["handbuch"])){
 <tr>
 <td colspan="2">
 <ol style="font-size:8pt;">
-	<li>Speichern Sie die Vorlage (html oder doc - Version) auf Ihrem Computer.</li>
-	<li>&Ouml;ffnen Sie die gespeicherte Datei mit ihrem Textverarbeitungsprogramm (MS Word, OpenOffice ...) bzw die html-Vorlage auch mit einem geeigneten Editor.</li>
-	<li>Erstellen Sie Ihren Semesterplan.</li>
-	<li>Speichern Sie das Dokument als 'Webseite' mit dem Namen 'index.html'<br>(In MS Word: 'Datei' -&gt; 'Speichern unter' -&gt; Dateiname: index.html, Dateityp: Webseite )</li>
-	<li>Laden Sie diese Datei nun &uuml;ber den 'Upload'-Knopf hoch.</li>
-	<li>Fertig!</li>
+	<li><?php echo $p->t('semesterplan/speichernSieDieVorlage');?>.</li>
+	<li><?php echo $p->t('semesterplan/oeffnenSieDieGespeicherteDatei');?>.</li>
+	<li><?php echo $p->t('semesterplan/erstellenSieIhrenSemesterplan');?>.</li>
+	<li><?php echo $p->t('semesterplan/speichernSieDasDokument');?><br><?php echo $p->t('semesterplan/inMSWord');?></li>
+	<li><?php echo $p->t('semesterplan/ladenSieDieDateiHoch');?>.</li>
+	<li><?php echo $p->t('semesterplan/fertig');?>!</li>
 </ol>
 </td>
 </tr>
