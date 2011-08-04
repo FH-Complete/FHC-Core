@@ -23,20 +23,8 @@ require_once('../../config/vilesci.config.inc.php');
 ?>
 // *********** Globale Variablen *****************//
 
-var LeDetailLehrfach_id; //Lehrfach_id die nach dem Laden markiert werden soll
-var LeDetailLehrfach_label; //Bezeichnung des Lehrfachs das markiert werden soll
-var LeDetailGruppeDatasource; //Datasource fuer Gruppen DropDown
-var LeDetailLektorDatasource; //Datasource fuer Lektren DropDown
-var LvSelectLehreinheit_id; //Lehreinheit_id die nach dem Rebuild des Trees markiert werden soll
-var LvOpenLehrveranstaltung_id; //Lehrveranstaltung_id der Lehreinheit die gerade gespeichert wurde. Diese LV muss vor dem Select im Tree geoeffnet werden
-var leDetailLektorUid; // UID der Lektorzuordnung die nach dem Rebuild markiert werden soll
-var leDetailLektorLehreinheit_id; // Lehreinheit_id der Lektorzuordnung die nach dem Rebuild markiert werden soll
-var lehrveranstaltungNotenTreeDatasource; //Datasource des Noten Trees
-var lehrveranstaltungNotenSelectUID=null; //UID des Noten Eintrages der nach dem Refresh markiert werden soll
-var lehrveranstaltungLvGesamtNotenTreeDatasource; //Datasource des Noten Trees
-var lehrveranstaltungLvGesamtNotenSelectUID=null; //LehreinheitID des Noten Eintrages der nach dem Refresh markiert werden soll
-var lehrveranstaltungNotenTreeloaded=false;
-var lehrveranstaltungGesamtNotenTreeloaded=false;
+var TaskTreeDatasource; //Datasource des Task Tree
+var TaskSelectID=null; //ID des Task Eintrages der nach dem Refresh markiert werden soll
 // ********** Observer und Listener ************* //
 
 // ****
@@ -44,7 +32,7 @@ var lehrveranstaltungGesamtNotenTreeloaded=false;
 // * startet Rebuild nachdem das Refresh
 // * der datasource fertig ist
 // ****
-var LvTreeSinkObserver =
+var TaskTreeSinkObserver =
 {
 	onBeginLoad : function(pSink) {},
 	onInterrupt : function(pSink) {},
@@ -52,9 +40,8 @@ var LvTreeSinkObserver =
 	onError : function(pSink, pStatus, pError) { debug('onerror:'+pError); },
 	onEndLoad : function(pSink)
 	{
-		//debug('startrebuild');
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-		document.getElementById('lehrveranstaltung-tree').builder.rebuild();
+		document.getElementById('projekttask-tree').builder.rebuild();
 	}
 };
 
@@ -62,242 +49,56 @@ var LvTreeSinkObserver =
 // * Nach dem Rebuild wird die Lehreinheit wieder
 // * markiert
 // ****
-var LvTreeListener =
+var TaskTreeListener =
 {
 	willRebuild : function(builder)
 	{
 	},
 	didRebuild : function(builder)
   	{
-  		//debug('didrebuild');
-		//timeout nur bei Mozilla notwendig da sonst die rows
+  		//timeout nur bei Mozilla notwendig da sonst die rows
 		//noch keine values haben. Ab Seamonkey funktionierts auch
 		//ohne dem setTimeout
-	    window.setTimeout(LvTreeSelectLehreinheit,10);
+	    window.setTimeout(TaskTreeSelectTask,10);
 		// Progressmeter stoppen
 		//document.getElementById('statusbar-progressmeter').setAttribute('mode','determined');
 	}
 };
-
-// ****
-// * Nach dem Rebuild wird die Lektorzuordnung
-// * wieder markiert
-// ****
-var LvLektorTreeListener =
-{
-  willRebuild : function(builder) {  },
-  didRebuild : function(builder)
-  {
-      window.setTimeout(LeLektorTreeSelectLektor,10);
-  }
-};
-
-
-// ****
-// * Observer fuer Lehrfachdropdown
-// ****
-var LeDetailLehrfachSinkObserver =
-{
-	onBeginLoad: function(aSink) { },
-	onInterrupt: function(aSink) { },
-	onResume:    function(aSink) { },
-	onEndLoad:   function(aSink) {
-		//Das richtige Lehrfach markieren
-		if(LeDetailLehrfach_id!='') //Wenn die Lehrfach_id bekannt ist, dann einfach markieren
-			document.getElementById('lehrveranstaltung-detail-menulist-lehrfach').value=LeDetailLehrfach_id;
-		else
-		{
-			if(LeDetailLehrfach_label!='') //Wenn Name bekannt ist
-			{
-
-				menulist = document.getElementById('lehrveranstaltung-detail-menulist-lehrfach');
-
-				//Alle eintraege aus menulist holen
-				var items = menulist.childNodes[1].childNodes //Anzahl der Zeilen ermitteln
-				found=false;
-			   	for(i in items)
-				{
-					//Vom Label des DropDowns den Fachbereich abschneiden
-					//der dahinter in Klammer steht
-					lflabel = items[i].label.substr(0, items[i].label.lastIndexOf('(')).trim();
-					
-					//Richtigen Eintrag suchen
-					if(lflabel==LeDetailLehrfach_label)
-					{
-						//Eintrag markieren
-						menulist.selectedIndex=i;
-						found=true;
-						break;
-					}
-		   		}
-		   		//Wenn nichts gefunden wurde, wird der erste Eintrag markiert
-		   		if(!found)
-		   			menulist.selectedIndex=0;
-			}
-		}
-	},
-	onError: function(aSink, aStatus, aErrorMsg) {
-		alert('Bei der Datenuebertragung ist ein Fehler Aufgetreten. Bitte Versuchen Sie es erneut.');
-	}
-};
-
-// ****
-// * Observer fuer Noten Tree
-// * startet Rebuild nachdem das Refresh
-// * der datasource fertig ist
-// ****
-var LehrveranstaltungNotenTreeSinkObserver =
-{
-	onBeginLoad : function(pSink) {},
-	onInterrupt : function(pSink) {},
-	onResume : function(pSink) {},
-	onError : function(pSink, pStatus, pError) {},
-	onEndLoad : function(pSink)
-	{
-		lehrveranstaltungNotenTreeloaded=false;
-		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-		document.getElementById('lehrveranstaltung-noten-tree').builder.rebuild();
-	}
-};
-
-// ****
-// * Nach dem Rebuild wird der Eintrag wieder
-// * markiert
-// ****
-var LehrveranstaltungNotenTreeListener =
-{
-  willRebuild : function(builder) {  },
-  didRebuild : function(builder)
-  {
-  	  //timeout nur bei Mozilla notwendig da sonst die rows
-  	  //noch keine values haben. Ab Seamonkey funktionierts auch
-  	  //ohne dem setTimeout
-  	  lehrveranstaltungNotenTreeloaded=true;
-      window.setTimeout(LehrveranstaltungNotenTreeSelectID,10);
-  }
-};
-
-// ****
-// * Observer fuer LvGesamtNoten Tree
-// * startet Rebuild nachdem das Refresh
-// * der datasource fertig ist
-// ****
-var LehrveranstaltungLvGesamtNotenTreeSinkObserver =
-{
-	onBeginLoad : function(pSink) {},
-	onInterrupt : function(pSink) {},
-	onResume : function(pSink) {},
-	onError : function(pSink, pStatus, pError) {},
-	onEndLoad : function(pSink)
-	{
-		lehrveranstaltungGesamtNotenTreeloaded=false;
-		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-		document.getElementById('lehrveranstaltung-lvgesamtnoten-tree').builder.rebuild();
-	}
-};
-
-// ****
-// * Nach dem Rebuild wird der Eintrag wieder
-// * markiert
-// ****
-var LehrveranstaltungLvGesamtNotenTreeListener =
-{
-  willRebuild : function(builder) {  },
-  didRebuild : function(builder)
-  {
-  	  //timeout nur bei Mozilla notwendig da sonst die rows
-  	  //noch keine values haben. Ab Seamonkey funktionierts auch
-  	  //ohne dem setTimeout
-  	  lehrveranstaltungGesamtNotenTreeloaded=true;
-      window.setTimeout(LehrveranstaltungLvGesamtNotenTreeSelectID,10);
-  }
-};
-
-// ***************** KEY Events ************************* //
-
-// ****
-// * Wird ausgefuehrt wenn eine Taste gedrueckt wird und der Focus
-// * im Lehrveranstaltungs-tree ist
-// * Beim Druecken von ENTF wird die markierte Lehreinheit geloescht
-// * Beim Druecken von F5 wird der Lehrveranstaltungstree aktualisiert
-// ****
-function LvTreeKeyPress(event)
-{
-	if(event.keyCode==46) // Entf
-		LeDelete();
-	else if(event.keyCode==116) // F5
-		LvTreeRefresh();
-}
-
-// ****
-// * Wird ausgefuehrt wenn eine Taste gedrueckt wird und der Focus
-// * im Gruppen-tree ist
-// * Beim Druecken von ENTF wird die markierte Gruppenzuordnung geloescht
-// ****
-function LvDetailGruppenTreeKeyPress(event)
-{
-	if(event.keyCode==46) //Entf
-		LeGruppeDel();
-}
-
-// ****
-// * Wird ausgefuehrt wenn eine Taste gedrueckt wird und der Focus
-// * im Mitarbeiter-tree ist
-// * Beim Druecken von ENTF wird die markierte Mitarbeiterzuordnung geloescht
-// ****
-function LvDetailMitarbeiterTreeKeyPress(event)
-{
-	if(event.keyCode==46) //Entf
-		LeMitarbeiterDel();
-}
-
-// ****
-// * Erstellt den Lehrauftrag fuer
-// * einen Mitarbeiter
-// ****
-function LvCreateLehrauftrag()
-{
-	stg = document.getElementById('LehrveranstaltungEditor').getAttribute('stg_kz');
-	uid = document.getElementById('LehrveranstaltungEditor').getAttribute('uid');
-	var ss = document.getElementById('statusbarpanel-semester').label;
-	//window.location.href = '<?php echo APP_ROOT; ?>content/lvplanung/lehrauftrag.php?stg_kz='+stg+'&uid='+uid+'&'+gettimestamp();
-	window.location.href = '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrauftrag.xml.php&xsl=Lehrauftrag&stg_kz='+stg+'&uid='+uid+'&ss='+ss+'&'+gettimestamp();
-}
 
 // ****************** FUNKTIONEN ************************** //
 
 // ****
 // * Asynchroner (Nicht blockierender) Refresh des LV Trees
 // ****
-function LvTreeRefresh()
+function TaskTreeRefresh()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
 	//markierte Lehreinheit global speichern damit diese LE nach dem
 	//refresh wieder markiert werden kann.
-	var tree = document.getElementById('lehrveranstaltung-tree');
-	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehreinheit_id"] : "lehrveranstaltung-treecol-lehreinheit_id";
+	var tree = document.getElementById('projekttask-tree');
+		
 	try
 	{
-		LvSelectLehreinheit_id=tree.view.getCellText(tree.currentIndex,col);
+		TaskSelectID = getTreeCellText(tree, "projekttask-treecol-projekttask_id", tree.currentIndex);
 	}
 	catch(e)
 	{
-		LvSelectLehreinheit_id=null;
+		TaskSelectID=null;
 	}
-	LvTreeDatasource.Refresh(false); //non blocking
+	TaskTreeDatasource.Refresh(false); //non blocking
 }
 
 // ****
-// * neue Lehreinheit anlegen
+// * neuen Task anlegen
 // ****
-function LeNeu()
+function TaskNeu()
 {
-	LeDetailDisableFields(false);
-
 	// Trick 17	(sonst gibt's ein Permission denied)
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
+	alert('Neuer Task - noch nicht implementiert');
+	/*
 	var tree = document.getElementById('lehrveranstaltung-tree');
 
 	//Details zuruecksetzen
@@ -362,30 +163,27 @@ function LeNeu()
 	
 	//Defaultwert fuer Anmerkung
 	document.getElementById('lehrveranstaltung-detail-textbox-anmerkung').value='<?php echo str_replace("'","\'",LEHREINHEIT_ANMERKUNG_DEFAULT);?>';
+	*/
 }
 // ****
 // * Selectiert die Lektorzuordnung nachdem der Tree
 // * rebuildet wurde.
 // ****
-function LeLektorTreeSelectLektor()
+function TaskTreeSelectTask()
 {
-	var tree=document.getElementById('lehrveranstaltung-detail-tree-lehreinheitmitarbeiter');
+	var tree=document.getElementById('projekttask-tree');
 	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
 
-	//In der globalen Variable ist die zu selektierende Lehreinheit gespeichert
-	if(leDetailLektorUid!=null && leDetailLektorLehreinheit_id!=null)
+	//In der globalen Variable ist die zu selektierende ID gespeichert
+	if(TaskSelectID!=null)
 	{
 	   	for(var i=0;i<items;i++)
 	   	{
-	   		//Lehreinheit_id der row holen
-			col = tree.columns ? tree.columns["lehrveranstaltung-lehreinheitmitarbeiter-treecol-lehreinheit_id"] : "lehrveranstaltung-lehreinheitmitarbeiter-treecol-lehreinheit_id";
-			lehreinheit_id=tree.view.getCellText(i,col);
-			//Uid der row holen
-			col = tree.columns ? tree.columns["lehrveranstaltung-lehreinheitmitarbeiter-treecol-mitarbeiter_uid"] : "lehrveranstaltung-lehreinheitmitarbeiter-treecol-mitarbeiter_uid";
-			uid=tree.view.getCellText(i,col);
-
+	   		//id der row holen
+	   		id = getTreeCellText(tree, "projekttask-treecol-projekttask_id", i);
+			
 			//wenn dies die zu selektierende Zeile
-			if(leDetailLektorUid==uid && leDetailLektorLehreinheit_id==lehreinheit_id)
+			if(TaskSelectID==id)
 			{
 				//Zeile markieren
 				tree.view.selection.select(i);
@@ -398,80 +196,21 @@ function LeLektorTreeSelectLektor()
 }
 
 // ****
-// * Selectiert die Lehreinheit nachdem der Tree
-// * rebuildet wurde.
+// * Task loeschen
 // ****
-function LvTreeSelectLehreinheit()
-{
-	var tree=document.getElementById('lehrveranstaltung-tree');
-	if(tree.view)
-		var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
-	else
-		return false;
-
-	//In der globalen Variable ist die zu selektierende Lehreinheit gespeichert
-	if(LvSelectLehreinheit_id!=null)
-	{
-		//Den Subtree der Lehrveranstaltung oeffnen zu der zuletzt die Lehreinheit gespeichert/angelegt wurde
-	   	//da diese sonst nicht markiert werden kann
-	   	for(var i=items-1;i>=0;i--)
-	   	{
-	   		col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrveranstaltung_id"] : "lehrveranstaltung-treecol-lehrveranstaltung_id";
-			lehrveranstaltung_id=tree.view.getCellText(i,col);
-	   		if(lehrveranstaltung_id == LvOpenLehrveranstaltung_id)
-	   		{
-	   			if(!tree.view.isContainerOpen(i))
-	   				tree.view.toggleOpenState(i);
-	   			break;
-	   		}
-	   	}
-	   	LvOpenLehrveranstaltung_id='';
-
-	   	//Jetzt die wirkliche Anzahl (aller) Zeilen holen
-	   	items = tree.view.rowCount;
-	   	for(var i=0;i<items;i++)
-	   	{
-	   		//Lehreinheit_id der row holen
-			col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehreinheit_id"] : "lehrveranstaltung-treecol-lehreinheit_id";
-			lehreinheit_id=tree.view.getCellText(i,col);
-			//Wenn Lehreinheit_id leer ist, dann kann es sein, dass der Tree noch nicht fertig geladen ist
-			//dann muss beim Listener das Timeout erhoeht werden
-
-			//wenn dies die zu selektierende Zeile
-			if(lehreinheit_id == LvSelectLehreinheit_id)
-			{
-				//Zeile markieren
-				tree.view.selection.select(i);
-				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
-				tree.treeBoxObject.ensureRowIsVisible(i);
-				return true;
-			}
-	   	}
-	}
-}
-
-// ****
-// * Lehreinheit loeschen
-// ****
-function LeDelete()
+function TaskDelete()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	var tree = document.getElementById('lehrveranstaltung-tree');
+	var tree = document.getElementById('projekttask-tree');
 
 	if (tree.currentIndex==-1)
 		return;
 
 	try
 	{
-		//Ausgewaehlte Lehreinheit holen
-        var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehreinheit_id"] : "lehrveranstaltung-treecol-lehreinheit_id";
-		var lehreinheit_id=tree.view.getCellText(tree.currentIndex,col);
-		if(lehreinheit_id=='')
-		{
-			alert('Lehrveranstaltungen koennen nur von Administratoren geloescht werden');
-			return false;
-		}
-	}
+		//Ausgewaehlten Task holen
+		id = getTreeCellText(tree, "projekttask-treecol-projekttask_id", tree.currentIndex);
+   	}
 	catch(e)
 	{
 		alert(e);
@@ -479,9 +218,11 @@ function LeDelete()
 	}
 
 	//Abfrage ob wirklich geloescht werden soll
-	if (confirm('Wollen Sie diese Lehreinheit wirklich loeschen?'))
+	if (confirm('Wollen Sie den Task mit der ID '+id+' wirklich loeschen?'))
 	{
 		//Script zum loeschen der Lehreinheit aufrufen
+		alert('Ist noch nicht implementiert!');
+		/*
 		var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
 
 		req.add('type','lehreinheit');
@@ -496,14 +237,16 @@ function LeDelete()
 		LvTreeRefresh();
 		LeDetailReset();
 		LeDetailDisableFields(true);
+		*/
 	}
 }
 
 // ****
 // * Leert alle Eingabe- und Auswahlfelder
 // ****
-function LeDetailReset()
+function TaskDetailReset()
 {
+	/*
 	document.getElementById('lehrveranstaltung-detail-textbox-lvnr').value='';
 	document.getElementById('lehrveranstaltung-detail-textbox-unr').value='';
 	document.getElementById('lehrveranstaltung-detail-textbox-lehrveranstaltung').value='';
@@ -542,13 +285,15 @@ function LeDetailReset()
 	}
 	//Refresh damit die entfernten DS auch wirklich entfernt werden
 	gruppentree.builder.rebuild();
+	*/
 }
 
 // ****
 // * Deaktiviert alle Eingabe- und Auswahlfelder
 // ****
-function LeDetailDisableFields(val)
+function TaskDisableFields(val)
 {
+	/*
 	//document.getElementById('lehrveranstaltung-detail-textbox-lvnr').disabled=val;
 	//document.getElementById('lehrveranstaltung-detail-textbox-unr').disabled=val;
 	//document.getElementById('lehrveranstaltung-detail-textbox-lehrveranstaltung').disabled=val;
@@ -567,13 +312,15 @@ function LeDetailDisableFields(val)
 	document.getElementById('lehrveranstaltung-detail-button-save').disabled=val;
 
 	document.getElementById('lehrveranstaltung-detail-textbox-unr').disabled=val;
+	*/
 }
 
 // ****
 // * Speichert die Details
 // ****
-function LeDetailSave()
+function TaskDetailSave()
 {
+/*
 	//Werte holen
 	lvnr = document.getElementById('lehrveranstaltung-detail-textbox-lvnr').value;
 	unr = document.getElementById('lehrveranstaltung-detail-textbox-unr').value;
@@ -660,78 +407,37 @@ function LeDetailSave()
 		LvTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
 	}
+*/
 }
 
 // ****
-// * Auswahl einer Lehreinheit
-// * bei Auswahl einer Lehreinheit wird diese geladen
+// * Auswahl eines Tasks
+// * bei Auswahl eines Tasks wird diese geladen
 // * und die Daten unten angezeigt
 // ****
-function LeAuswahl()
+function TaskAuswahl()
 {
-
+	
 	// Trick 17	(sonst gibt's ein Permission denied)
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	var tree = document.getElementById('lehrveranstaltung-tree');
-
-	//Felder bei Lektorenzuordnung deaktivieren
-	LeMitarbeiterDisableFields(true);
-
-	document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe').hidden=false;
-	document.getElementById('lehrveranstaltung-detail-label-lehreinheitgruppe').hidden=false;
-	document.getElementById('lehrveranstaltung-tab-lektor').collapsed=false;
-
-	lehrveranstaltungNotenTreeloaded=false;
-	lehrveranstaltungGesamtNotenTreeloaded=false;
+	var tree = document.getElementById('projekttask-tree');
 
 	if (tree.currentIndex==-1) return;
 	try
 	{
 		//Ausgewaehlte Lehreinheit holen
-        var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehreinheit_id"] : "lehrveranstaltung-treecol-lehreinheit_id";
-		var lehreinheit_id=tree.view.getCellText(tree.currentIndex,col);
-		var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrveranstaltung_id"] : "lehrveranstaltung-treecol-lehrveranstaltung_id";
-		var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
+        id = getTreeCellText(tree, "projekttask-treecol-projekttask_id", tree.currentIndex);
 
-		if(lehreinheit_id=='')
+		if(id!='')
 		{
-			//Lehrveranstaltung wurde markiert
-			//Neu Button aktivieren
-			document.getElementById('lehrveranstaltung-toolbar-neu').disabled=false;
-			document.getElementById('lehrveranstaltung-toolbar-del').disabled=true;
-
-			//Noten Tab aktivieren
-			LehrveranstaltungNotenDisableFields(false);
-
-			//Noten Tab ausblenden
-			//document.getElementById('lehrveranstaltung-tab-noten').collapsed=false;
-
-			//Noten Laden
-			LehrveranstaltungNotenLoad(lehrveranstaltung_id);
-
-			LeDetailDisableFields(true);
-			//Details zuruecksetzen
-			LeDetailReset();
-			return false;
+			//Task wurde markiert
+			//Loeschen Button aktivieren
+			document.getElementById('projekttask-toolbar-del').disabled=false;
 		}
 		else
 		{
-			LeDetailDisableFields(false);
-			LehrveranstaltungNotenDisableFields(true);
-			LehrveranstaltungNotenTreeUnload();
-
-			//Noten Tab einblenden
-			//document.getElementById('lehrveranstaltung-tab-noten').collapsed=true;
-
-			document.getElementById('lehrveranstaltung-toolbar-neu').disabled=true;
-			document.getElementById('lehrveranstaltung-toolbar-del').disabled=false;
-		}
-
-		var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrveranstaltung_id"] : "lehrveranstaltung-treecol-lehrveranstaltung_id";
-		var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
-
-		if(lehrveranstaltung_id=='')
 			return false;
+		}
 	}
 	catch(e)
 	{
@@ -739,6 +445,8 @@ function LeAuswahl()
 		return false;
 	}
 
+	alert("Details Laden von Task "+id);
+	/*
 	var req = new phpRequest('../rdf/lehreinheit.rdf.php','','');
 	req.add('lehreinheit_id',lehreinheit_id);
 
@@ -887,945 +595,5 @@ function LeAuswahl()
 	{
 		debug(e);
 	}
-}
-
-//******** LehreinheitMitarbeiter **********//
-
-// ****
-// * Speichert die Zuteilung von Lektoren
-// * zu einer Lehrveranstaltung
-// ****
-function LeMitarbeiterSave()
-{
-	//Daten holen
-	lehrfunktion = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lehrfunktion_kurzbz').value;
-	lektor = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor').value;
-	semesterstunden = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden').value;
-	planstunden = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-planstunden').value;
-	stundensatz = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz').value;
-	faktor = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-faktor').value;
-	anmerkung = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-anmerkung').value;
-	bismelden = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden').checked;
-
-	//Request absetzen
-	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
-
-	req.add('type','lehreinheit_mitarbeiter_save');
-	lehreinheit_id = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-lehreinheit_id').value;
-	mitarbeiter_uid = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-mitarbeiter_uid').value;
-	req.add('lehreinheit_id',lehreinheit_id);
-
-	req.add('lehrfunktion_kurzbz', lehrfunktion);
-	req.add('mitarbeiter_uid', lektor);
-	req.add('mitarbeiter_uid_old', mitarbeiter_uid);
-	req.add('semesterstunden', semesterstunden);
-	req.add('planstunden', planstunden);
-	req.add('stundensatz', stundensatz);
-	req.add('faktor', faktor);
-	req.add('anmerkung', anmerkung);
-	req.add('bismelden', bismelden);
-	req.add('lehreinheit_id', lehreinheit_id);
-
-	var response = req.executePOST();
-	var val =  new ParseReturnValue(response)
-
-	if (!val.dbdml_return)
-	{
-		if(val.dbdml_errormsg=='')
-			alert(response);
-		else
-			alert(val.dbdml_errormsg)
-	}
-	//else
-	//{
-		leDetailLektorUid = lektor;
-		leDetailLektorLehreinheit_id = lehreinheit_id;
-		LeLektorTreeRefresh();
-	//}
-}
-
-// ****
-// * Loescht die Zuteilung eines Lektoren zu einer Lehreinheit
-// ****
-function LeMitarbeiterDel()
-{
-	tree = document.getElementById('lehrveranstaltung-detail-tree-lehreinheitmitarbeiter');
-
-	//Nachsehen ob Mitarbeiter markiert wurde
-	var idx;
-	if(tree.currentIndex>=0)
-		idx = tree.currentIndex;
-	else
-	{
-		alert('Bitte zuerst einen Mitarbeiter markieren');
-		return false;
-	}
-
-	try
-	{
-		//UID holen
-		var col = tree.columns ? tree.columns["lehrveranstaltung-lehreinheitmitarbeiter-treecol-mitarbeiter_uid"] : "lehrveranstaltung-lehreinheitmitarbeiter-treecol-mitarbeiter_uid";
-		var uid=tree.view.getCellText(idx,col);
-		//Lehreinheit_id holen
-		var col = tree.columns ? tree.columns["lehrveranstaltung-lehreinheitmitarbeiter-treecol-lehreinheit_id"] : "lehrveranstaltung-lehreinheitmitarbeiter-treecol-lehreinheit_id";
-		var lehreinheit_id=tree.view.getCellText(idx,col);
-	}
-	catch(e)
-	{
-		alert(e);
-		return false;
-	}
-
-	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
-
-	req.add('type', 'lehreinheit_mitarbeiter_del');
-	req.add('lehreinheit_id', lehreinheit_id);
-	req.add('mitarbeiter_uid', uid);
-
-	var response = req.executePOST();
-	var val =  new ParseReturnValue(response)
-
-	if (!val.dbdml_return)
-	{
-		alert(val.dbdml_errormsg)
-	}
-	else
-	{
-		//Refresh des Trees
-		LeLektorTreeRefresh();
-	}
-}
-
-// ****
-// * Wenn bei den Lektorenzuordnungen Felder bearbeitet werden,
-// * dann wird der Speichern Button aktiviert
-// ****
-function LeMitarbeiterValueChanged()
-{
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-button-save').disabled=false;
-}
-
-// ****
-// * Wenn der Lektor geaendert wird, dann den Stundensatz aus der Tabelle Mitarbeiter holen
-// ****
-function LeMitarbeiterLektorChange()
-{
-	mitarbeiter_uid = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor').value;
-
-	var url = '<?php echo APP_ROOT ?>content/lvplanung/lehrveranstaltungDBDML.php';
-	var req = new phpRequest(url,'','');
-
-	req.add('type', 'getstundensatz');
-	req.add('mitarbeiter_uid', mitarbeiter_uid);
-
-	var response = req.executePOST();
-
-	var val =  new ParseReturnValue(response);
-
-	if (!val.dbdml_return)
-	{
-		if(val.dbdml_errormsg=='')
-			alert(response);
-		else
-			alert(val.dbdml_errormsg);
-	}
-	else
-	{
-		stundensatz = val.dbdml_data;
-	}
-
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz').value=stundensatz;
-}
-
-// ****
-// * deaktiviert/aktiviert die Lektorendetails und
-// * loescht den Inhalt der Felder
-// * wenn val=false dann werden die Felder deaktiviert
-// * wenn val=true dann werden die Felder aktiviert
-// ****
-function LeMitarbeiterDisableFields(val)
-{
-	//Felder Leeren
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lehrfunktion_kurzbz').value='Lektor';
-	//document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor').value='';
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden').value='';
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-planstunden').value='';
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz').value='';
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-faktor').value='';
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-anmerkung').value='';
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden').checked=false;
-
-	//Felder aktivieren/deaktivieren
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lehrfunktion_kurzbz').disabled=val;
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor').disabled=val;
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden').disabled=val;
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-planstunden').disabled=val;
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz').disabled=val;
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-faktor').disabled=val;
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-anmerkung').disabled=val;
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden').disabled=val;
-}
-
-// ****
-// * Bei Auswaehlen eines Mitarbeiters werden zu zugehoerigen
-// * Details geladen und angezeigt
-// ****
-function LeMitarbeiterAuswahl()
-{
-	tree = document.getElementById('lehrveranstaltung-detail-tree-lehreinheitmitarbeiter');
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-button-save').disabled=true;
-	//Falls kein Eintrag gewaehlt wurde, den ersten auswaehlen
-	var idx;
-	if(tree.currentIndex>=0)
-		idx = tree.currentIndex;
-	else
-		idx = 0;
-
-	try
-	{
-		//Lehreinheit_id holen
-		var col = tree.columns ? tree.columns["lehrveranstaltung-lehreinheitmitarbeiter-treecol-lehreinheit_id"] : "lehrveranstaltung-lehreinheitmitarbeiter-treecol-lehreinheit_id";
-		var lehreinheit_id=tree.view.getCellText(idx,col);
-
-		//Mitarbeiter_uid holen
-		var col = tree.columns ? tree.columns["lehrveranstaltung-lehreinheitmitarbeiter-treecol-mitarbeiter_uid"] : "lehrveranstaltung-lehreinheitmitarbeiter-treecol-mitarbeiter_uid";
-		var mitarbeiter_uid=tree.view.getCellText(idx,col);
-	}
-	catch(e)
-	{
-		return false;
-	}
-
-	// Url zum RDF
-	var url="<?php echo APP_ROOT; ?>rdf/lehreinheitmitarbeiter.rdf.php?"+gettimestamp();
-
-	//RDF laden
-	var req = new phpRequest(url,'','');
-	req.add('lehreinheit_id',lehreinheit_id);
-	req.add('mitarbeiter_uid',mitarbeiter_uid);
-
-	var response = req.execute();
-
-	// Trick 17	(sonst gibt's ein Permission denied)
-	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-
-	// XML in Datasource parsen
-	var dsource=parseRDFString(response, 'http://www.technikum-wien.at/lehreinheitmitarbeiter/liste');
-
-	// Daten aus RDF auslesen
-	dsource=dsource.QueryInterface(Components.interfaces.nsIRDFDataSource);
-	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
-                   getService(Components.interfaces.nsIRDFService);
-	var subject = rdfService.GetResource("http://www.technikum-wien.at/lehreinheitmitarbeiter/" + lehreinheit_id + "/"+ mitarbeiter_uid);
-   	var predicateNS = "http://www.technikum-wien.at/lehreinheitmitarbeiter/rdf";
-
-	//Daten in Variablen speichern
-	lehrfunktion_kurzbz = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#lehrfunktion_kurzbz" ));
-	semesterstunden = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#semesterstunden" ));
-	planstunden = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#planstunden" ));
-	stundensatz = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#stundensatz" ));
-	faktor = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#faktor" ));
-	anmerkung = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#anmerkung" ));
-	bismelden = getTargetHelper(dsource, subject, rdfService.GetResource( predicateNS + "#bismelden" ));
-
-	//Felder aktivieren
-	LeMitarbeiterDisableFields(false);
-	//Felder befuellen
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lehrfunktion_kurzbz').value=lehrfunktion_kurzbz;
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-menulist-lektor').value=mitarbeiter_uid;
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden').value=semesterstunden;
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-planstunden').value=planstunden;
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz').value=stundensatz;
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-faktor').value=faktor;
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-anmerkung').value=anmerkung;
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-lehreinheit_id').value=lehreinheit_id;
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-mitarbeiter_uid').value=mitarbeiter_uid;
-
-	if(bismelden=='Ja')
-		document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden').checked=true;
-	else
-		document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-checkbox-bismelden').checked=false;
-		
-	LeMitarbeiterGesamtkosten();
-}
-
-// ****
-// * Refresht den Lehreinheitmitarbeiter Tree
-// ****
-function LeLektorTreeRefresh()
-{
-    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-    try
-    {
-    	LeDetailLektorDatasource.Refresh(true); //Blocking
-    	lektortree = document.getElementById('lehrveranstaltung-detail-tree-lehreinheitmitarbeiter');
-    	lektortree.builder.rebuild();
-    }
-    catch(e)
-    {
-    	debug(e);
-    }
-}
-
-// ************* GRUPPEN ******************** //
-
-// ****
-// * Loescht die Zuordnung einer Gruppe zu einer
-// * Lehreinheit
-// ****
-function LeGruppeDel()
-{
-	tree = document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe');
-
-	//Nachsehen ob Gruppe markiert wurde
-	var idx;
-	if(tree.currentIndex>=0)
-		idx = tree.currentIndex;
-	else
-	{
-		alert('Bitte zuerst eine Gruppe markieren');
-		return false;
-	}
-
-	try
-	{
-		//Lehreinheit_id holen
-		var col = tree.columns ? tree.columns["lehrveranstaltung-lehreinheitgruppe-treecol-lehreinheitgruppe_id"] : "lehrveranstaltung-lehreinheitgruppe-treecol-lehreinheitgruppe_id";
-		var lehreinheitgruppe_id=tree.view.getCellText(idx,col);
-	}
-	catch(e)
-	{
-		alert(e);
-		return false;
-	}
-
-	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
-	neu = document.getElementById('lehrveranstaltung-detail-checkbox-new').checked;
-
-	req.add('type', 'lehreinheit_gruppe_del');
-	req.add('lehreinheitgruppe_id', lehreinheitgruppe_id);
-
-	var response = req.executePOST();
-	var val =  new ParseReturnValue(response)
-
-	if (!val.dbdml_return)
-	{
-		alert(val.dbdml_errormsg)
-	}
-	else
-	{
-		//Refresh des Trees
-		LeDetailGruppeTreeRefresh();
-		LvTreeRefresh();
-	}
-}
-
-// ****
-// * Gruppen Tree Refreshen
-// ****
-function LeDetailGruppeTreeRefresh()
-{
-    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-    try
-    {
-    	LeDetailGruppeDatasource.Refresh(true); //Blocking
-    	gruppentree = document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe');
-    	gruppentree.builder.rebuild();
-    }
-    catch(e)
-    {
-    	debug(e);
-    }
-}
-
-// ****************** NOTEN ****************** //
-
-// ****
-// * De-/Aktiviert die Noten Felder
-// ****
-function LehrveranstaltungNotenDisableFields(val)
-{
-	document.getElementById('lehrveranstaltung-note-copy').disabled=val;
-	document.getElementById('lehrveranstaltung-noten-button-import').disabled=val;
-
-	if(val)
-		LehrveranstaltungNotenDetailDisableFields(val);
-}
-
-// ****
-// * De-/Aktiviert die Noten Detail Felder
-// ****
-function LehrveranstaltungNotenDetailDisableFields(val)
-{
-	document.getElementById('lehrveranstaltung-noten-button-speichern').disabled=val;
-	document.getElementById('lehrveranstaltung-noten-menulist-note').disabled=val;
-}
-
-// ****
-// * Noten Trees Loeschen
-// ****
-function LehrveranstaltungNotenTreeUnload()
-{
- 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-
-	notentree = document.getElementById('lehrveranstaltung-noten-tree');
-	var oldDatasources = notentree.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
-	{
-		notentree.database.RemoveDataSource(oldDatasources.getNext());
-	}
-	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	notentree.builder.rebuild();
-
-	var lvgesamtnotentree = document.getElementById('lehrveranstaltung-lvgesamtnoten-tree');
-	var oldDatasources = lvgesamtnotentree.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
-	{
-		lvgesamtnotentree.database.RemoveDataSource(oldDatasources.getNext());
-	}
-	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	lvgesamtnotentree.builder.rebuild();
-}
-
-// ****
-// * Laedt die Notentrees
-// ****
-function LehrveranstaltungNotenLoad(lehrveranstaltung_id)
-{
-	// *** ZeugnisNoten ***
-	notentree = document.getElementById('lehrveranstaltung-noten-tree');
-
-	url='<?php echo APP_ROOT;?>rdf/zeugnisnote.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+"&"+gettimestamp();
-
-	try
-	{
-		LehrveranstaltungNotenTreeDatasource.removeXMLSinkObserver(LehrveranstaltungNotenTreeSinkObserver);
-		notentree.builder.removeListener(LehrveranstaltungNotenTreeListener);
-	}
-	catch(e)
-	{}
-
-	//Alte DS entfernen
-	var oldDatasources = notentree.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
-	{
-		notentree.database.RemoveDataSource(oldDatasources.getNext());
-	}
-	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	notentree.builder.rebuild();
-	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-	LehrveranstaltungNotenTreeDatasource = rdfService.GetDataSource(url);
-	LehrveranstaltungNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-	LehrveranstaltungNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-	notentree.database.AddDataSource(LehrveranstaltungNotenTreeDatasource);
-	LehrveranstaltungNotenTreeDatasource.addXMLSinkObserver(LehrveranstaltungNotenTreeSinkObserver);
-	notentree.builder.addListener(LehrveranstaltungNotenTreeListener);
-
-	// *** LvGesamtNoten ***
-	var lvgesamtnotentree = document.getElementById('lehrveranstaltung-lvgesamtnoten-tree');
-
-	url='<?php echo APP_ROOT;?>rdf/lvgesamtnote.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+"&"+gettimestamp();
-
-	try
-	{
-		LehrveranstaltungLvGesamtNotenTreeDatasource.removeXMLSinkObserver(LehrveranstaltungLvGesamtNotenTreeSinkObserver);
-		lvgesamtnotentree.builder.removeListener(LehrveranstaltungLvGesamtNotenTreeListener);
-	}
-	catch(e)
-	{}
-
-	//Alte DS entfernen
-	var oldDatasources = lvgesamtnotentree.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
-	{
-		lvgesamtnotentree.database.RemoveDataSource(oldDatasources.getNext());
-	}
-	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	lvgesamtnotentree.builder.rebuild();
-
-	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-	LehrveranstaltungLvGesamtNotenTreeDatasource = rdfService.GetDataSource(url);
-	LehrveranstaltungLvGesamtNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-	LehrveranstaltungLvGesamtNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-	lvgesamtnotentree.database.AddDataSource(LehrveranstaltungLvGesamtNotenTreeDatasource);
-	LehrveranstaltungLvGesamtNotenTreeDatasource.addXMLSinkObserver(LehrveranstaltungLvGesamtNotenTreeSinkObserver);
-	lvgesamtnotentree.builder.addListener(LehrveranstaltungLvGesamtNotenTreeListener);
-}
-
-// ****
-// * Selectiert die Noten im LVGesamtNoteTree welche nicht gleich denen
-// * im ZeugnisNoteTree sind
-// ****
-function LehrveranstaltungGesamtNotenTreeSelectDifferent()
-{
-	var zeugnistree = document.getElementById("lehrveranstaltung-noten-tree");
-	var lvgesamttree = document.getElementById("lehrveranstaltung-lvgesamtnoten-tree");
-	lvgesamttree.view.selection.clearSelection();
-	
-	if(lehrveranstaltungNotenTreeloaded && lehrveranstaltungGesamtNotenTreeloaded)
-	{
-		lvgesamttree.view.selection.clearSelection();
-		if(lvgesamttree.view)
-			var lvgesamtitems = lvgesamttree.view.rowCount; //Anzahl der Zeilen ermitteln
-		else
-			return false;
-
-		if(zeugnistree.view)
-			var zeugnisitems = zeugnistree.view.rowCount; //Anzahl der Zeilen ermitteln
-		else
-			return false;
-
-		for(var i=0;i<lvgesamtitems;i++)
-	   	{
-	   		//Daten aus LVGesamtNotenTree holen
-			col = lvgesamttree.columns ? lvgesamttree.columns["lehrveranstaltung-lvgesamtnoten-tree-student_uid"] : "lehrveranstaltung-lvgesamtnoten-tree-student_uid";
-			var lvgesamtuid=lvgesamttree.view.getCellText(i,col);
-			col = lvgesamttree.columns ? lvgesamttree.columns["lehrveranstaltung-lvgesamtnoten-tree-note"] : "lehrveranstaltung-lvgesamtnoten-tree-note";
-			var lvgesamtnote=lvgesamttree.view.getCellText(i,col);
-			col = lvgesamttree.columns ? lvgesamttree.columns["lehrveranstaltung-lvgesamtnoten-tree-benotungsdatum-iso"] : "lehrveranstaltung-lvgesamtnoten-tree-benotungsdatum-iso";
-			var lvgesamtbenotungsdatum=lvgesamttree.view.getCellText(i,col);
-
-			found=false;
-			//Schauen ob die gleiche Zeile im Zeugnisnoten Tree vorkommt
-			for(var j=0;j<zeugnisitems;j++)
-			{
-				col = zeugnistree.columns ? zeugnistree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
-				var zeugnisuid=zeugnistree.view.getCellText(j,col);
-				col = zeugnistree.columns ? zeugnistree.columns["lehrveranstaltung-noten-tree-note"] : "lehrveranstaltung-noten-tree-note";
-				var zeugnisnote=zeugnistree.view.getCellText(j,col);
-				col = zeugnistree.columns ? zeugnistree.columns["lehrveranstaltung-noten-tree-benotungsdatum-iso"] : "lehrveranstaltung-noten-tree-benotungsdatum-iso";
-				var zeugnisbenotungsdatum=zeugnistree.view.getCellText(j,col);
-				
-				//debug(zeugnisuid+'=='+lvgesamtuid+' && '+zeugnisnote+'=='+lvgesamtnote);
-				if(zeugnisuid==lvgesamtuid && zeugnisnote==lvgesamtnote && zeugnisbenotungsdatum==lvgesamtbenotungsdatum)
-				{
-					found=true;
-					break;
-				}
-				
-				//Wenn die Noten unterschiedlich sind, aber das benotungsdatum im Zeugnis
-				//nach dem benotungsdatum des lektors liegt, dann wird die zeile auch nicht markiert.
-				//damit wird verhindert, dass pruefungsnoten die nur von der assistenz eingetragen wurden,
-				//durch den alten eintrag des lektors wieder ueberschrieben werden
-				if(zeugnisuid==lvgesamtuid
-				   && zeugnisnote!=lvgesamtnote
-				   && zeugnisbenotungsdatum>lvgesamtbenotungsdatum)
-				{
-					found=true;
-					break;
-				}
-			}
-
-			if(!found)
-			{
-				//Zeile markieren
-				lvgesamttree.view.selection.rangedSelect(i,i,true);
-			}
-	   	}
-	}
-}
-
-// ****
-// * Markiert einen Eintrag im LVGesamtNotenTree
-// ****
-function LehrveranstaltungLvGesamtNotenTreeSelectID()
-{
-	LehrveranstaltungGesamtNotenTreeSelectDifferent();
-/*
-	var tree=document.getElementById('lehrveranstaltung-lvgesamtnoten-tree');
-	if(tree.view)
-		var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
-	else
-		return false;
-
-	//In der globalen Variable ist die zu selektierende Eintrag gespeichert
-	if(lehrveranstaltungLvGesamtNotenSelectUID!=null)
-	{
-	   	for(var i=0;i<items;i++)
-	   	{
-	   		//ID der row holen
-			col = tree.columns ? tree.columns["lehrveranstaltung-lvgesamtnoten-tree-student_uid"] : "lehrveranstaltung-lvgesamtnoten-tree-student_uid";
-			var uid=tree.view.getCellText(i,col);
-
-			//wenn dies die zu selektierende Zeile ist
-			if(uid == lehrveranstaltungLvGesamtNotenSelectUID)
-			{
-				//Zeile markieren
-				tree.view.selection.select(i);
-				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
-				tree.treeBoxObject.ensureRowIsVisible(i);
-				LehrveranstaltungNotenSelectUID=null;
-				return true;
-			}
-	   	}
-	}*/
-}
-
-// ****
-// * Markiert einen Eintrag im ZeugnisnotenTree
-// ****
-function LehrveranstaltungNotenTreeSelectID()
-{
-	LehrveranstaltungGesamtNotenTreeSelectDifferent();
-	/*
-	var tree=document.getElementById('lehrveranstaltung-noten-tree');
-	if(tree.view)
-		var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
-	else
-		return false;
-
-	//In der globalen Variable ist die zu selektierende Eintrag gespeichert
-	if(lehrveranstaltungNotenSelectUID!=null)
-	{
-	   	for(var i=0;i<items;i++)
-	   	{
-	   		//ID der row holen
-			col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
-			var uid=tree.view.getCellText(i,col);
-
-			//wenn dies die zu selektierende Zeile
-			if(uid == lehrveranstaltungNotenSelectUID)
-			{
-				//Zeile markieren
-				tree.view.selection.select(i);
-				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
-				tree.treeBoxObject.ensureRowIsVisible(i);
-				LehrveranstaltungNotenSelectUID=null;
-				return true;
-			}
-	   	}
-	}*/
-}
-
-// ****
-// * Uebernimmt die Noten der Lektoren fuer die Zeugnisnote
-// ****
-function LehrveranstaltungNotenMove()
-{
-	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	var tree = document.getElementById('lehrveranstaltung-lvgesamtnoten-tree');
-
-	var start = new Object();
-	var end = new Object();
-	var numRanges = tree.view.selection.getRangeCount();
-	var paramList= '';
-	var i = 0;
-
-	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
-	var req = new phpRequest(url,'','');
-
-	req.add('type', 'movenote');
-
-	for (var t = 0; t < numRanges; t++)
-	{
-  		tree.view.selection.getRangeAt(t,start,end);
-		for (var v = start.value; v <= end.value; v++)
-		{
-			col = tree.columns ? tree.columns["lehrveranstaltung-lvgesamtnoten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-lvgesamtnoten-tree-lehrveranstaltung_id";
-			lehrveranstaltung_id = tree.view.getCellText(v,col);
-			col = tree.columns ? tree.columns["lehrveranstaltung-lvgesamtnoten-tree-student_uid"] : "lehrveranstaltung-lvgesamtnoten-tree-student_uid";
-			student_uid = tree.view.getCellText(v,col);
-			col = tree.columns ? tree.columns["lehrveranstaltung-lvgesamtnoten-tree-studiensemester_kurzbz"] : "lehrveranstaltung-lvgesamtnoten-tree-studiensemester_kurzbz";
-			studiensemester_kurzbz = tree.view.getCellText(v,col);
-
-			req.add('lehrveranstaltung_id_'+i, lehrveranstaltung_id);
-			req.add('student_uid_'+i, student_uid);
-			req.add('studiensemester_kurzbz_'+i, studiensemester_kurzbz);
-			i++;
-		}
-	}
-	req.add('anzahl', i);
-
-	var response = req.executePOST();
-
-	var val =  new ParseReturnValue(response)
-
-	if (!val.dbdml_return)
-	{
-		if(val.dbdml_errormsg=='')
-			alert(response);
-		else
-			alert(val.dbdml_errormsg);
-
-		LehrveranstaltungNotenTreeDatasource.Refresh(false); //non blocking
-		SetStatusBarText('Daten wurden gespeichert');
-		LehrveranstaltungNotenDetailDisableFields(true);
-	}
-	else
-	{
-		LehrveranstaltungNotenTreeDatasource.Refresh(false); //non blocking
-		SetStatusBarText('Daten wurden gespeichert');
-		LehrveranstaltungNotenDetailDisableFields(true);
-	}
-}
-
-// ****
-// * Speichert die Noten
-// ****
-function LehrveranstaltungNoteSpeichern()
-{
-	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	var tree = document.getElementById('lehrveranstaltung-noten-tree');
-
-	if (tree.currentIndex==-1)
-	{
-		alert('Speichern nicht moeglich! Es muss eine Note im Tree ausgewaehlt sein');
-		return;
-	}
-
-	//Ausgewaehlte Nr holen
-    var col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
-	var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
-	var col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
-	var student_uid=tree.view.getCellText(tree.currentIndex,col);
-	var col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-studiensemester_kurzbz"] : "lehrveranstaltung-noten-tree-studiensemester_kurzbz";
-	var studiensemester_kurzbz=tree.view.getCellText(tree.currentIndex,col);
-
-	note = document.getElementById('lehrveranstaltung-noten-menulist-note').value;
-
-
-	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
-	var req = new phpRequest(url,'','');
-
-	req.add('type', 'savenote');
-
-	req.add('lehrveranstaltung_id', lehrveranstaltung_id);
-	req.add('student_uid', student_uid);
-	req.add('studiensemester_kurzbz', studiensemester_kurzbz);
-	req.add('note', note);
-
-	var response = req.executePOST();
-
-	var val =  new ParseReturnValue(response)
-
-	if (!val.dbdml_return)
-	{
-		if(val.dbdml_errormsg=='')
-			alert(response)
-		else
-			alert(val.dbdml_errormsg)
-	}
-	else
-	{
-		LehrveranstaltungLvGesamtNotenSelectUID=student_uid;
-		LehrveranstaltungNotenTreeDatasource.Refresh(false); //non blocking
-		SetStatusBarText('Daten wurden gespeichert');
-		LehrveranstaltungNotenDetailDisableFields(true);
-	}
-}
-
-// ***
-// * Nach dem Auswaehlen einer Note kann diese veraendert werden
-// ***
-function LehrveranstaltungNotenAuswahl()
-{
-	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	var tree = document.getElementById('lehrveranstaltung-noten-tree');
-
-	if (tree.currentIndex==-1) return;
-
-	LehrveranstaltungNotenDetailDisableFields(false);
-
-	//Ausgewaehlte Nr holen
-    var col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
-	var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
-	var col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
-	var student_uid=tree.view.getCellText(tree.currentIndex,col);
-	var col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-studiensemester_kurzbz"] : "lehrveranstaltung-noten-tree-studiensemester_kurzbz";
-	var studiensemester_kurzbz=tree.view.getCellText(tree.currentIndex,col);
-
-	//Daten holen
-	var url = '<?php echo APP_ROOT ?>rdf/zeugnisnote.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+'&uid='+student_uid+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&'+gettimestamp();
-
-	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
-                   getService(Components.interfaces.nsIRDFService);
-
-    var dsource = rdfService.GetDataSourceBlocking(url);
-
-	var subject = rdfService.GetResource("http://www.technikum-wien.at/zeugnisnote/" + lehrveranstaltung_id+'/'+student_uid+'/'+studiensemester_kurzbz);
-
-	var predicateNS = "http://www.technikum-wien.at/zeugnisnote/rdf";
-
-	//Daten holen
-
-	note = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#note" ));
-
-	if(note=='')
-		note='9';
-
-	document.getElementById('lehrveranstaltung-noten-menulist-note').value=note;
-}
-
-// ****
-// * Importiert Note aus der Zwischenablage
-// * Die Daten in der Zwischenablage sind im Format
-// * Matrikelnummer[Tabulator]Note
-// ****
-function LehrveranstaltungNotenImport()
-{
-
-	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	var data = getDataFromClipboard();
-	var tree=document.getElementById('lehrveranstaltung-tree');
-	if (tree.currentIndex==-1)
-	{
-		alert("Bitte zuerst eine Lehrveranstaltung auswaehlen");
-		return false;
-	}
-
-	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrveranstaltung_id"] : "lehrveranstaltung-treecol-lehrveranstaltung_id";
-	var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
-
-	if(lehrveranstaltung_id=='')
-	{
-		alert("Bitte zuerst eine Lehrveranstaltung auswaehlen");
-		return false;
-	}
-
-	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
-	var req = new phpRequest(url,'','');
-
-	req.add('type', 'importnoten');
-
-	req.add('lehrveranstaltung_id', lehrveranstaltung_id);
-
-	//Reihen ermitteln
-	var rows = data.split("\n");
-	var i=0;
-	for(row in rows)
-	{
-		zeile = rows[row].split("	");
-
-		if(zeile[0]!='' && zeile[1]!='')
-		{
-			req.add('matrikelnummer_'+i, zeile[0]);
-			req.add('note_'+i, zeile[1]);
-			i++;
-		}
-	}
-
-	req.add('anzahl', i);
-
-	var response = req.executePOST();
-
-	var val =  new ParseReturnValue(response)
-
-	if (!val.dbdml_return)
-	{
-		if(val.dbdml_errormsg=='')
-			alert(response);
-		else
-			alert(val.dbdml_errormsg);
-
-		LehrveranstaltungNotenTreeDatasource.Refresh(false); //non blocking
-		SetStatusBarText('Daten wurden gespeichert');
-	}
-	else
-	{
-		LehrveranstaltungNotenTreeDatasource.Refresh(false); //non blocking
-		SetStatusBarText('Daten wurden gespeichert');
-	}
-}
-
-// ****
-// * Erstellt das Zertifikat fuer die Freifaecher
-// ****
-function LehrveranstaltungFFZertifikatPrint()
-{
-	tree = document.getElementById('lehrveranstaltung-noten-tree');
-	//Alle markierten Noten holen
-	var start = new Object();
-	var end = new Object();
-	var numRanges = tree.view.selection.getRangeCount();
-	var paramList= '';
-	var anzahl=0;
-	var lvid='';
-
-	for (var t = 0; t < numRanges; t++)
-	{
-  		tree.view.selection.getRangeAt(t,start,end);
-		for (var v = start.value; v <= end.value; v++)
-		{
-			col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
-			uid = tree.view.getCellText(v,col);
-			paramList += ';'+uid;
-			anzahl = anzahl+1;
-			col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
-			lvid = tree.view.getCellText(v,col);
-		}
-	}
-	var ss = getStudiensemester();
-
-	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat.rdf.php&xsl=Zertifikat&uid='+paramList+'&ss='+ss+'&lvid='+lvid+'&'+gettimestamp();
-	window.location.href = url;
-	//prompt('test:',url);
-}
-
-// ****
-// * Loescht die markierte Note
-// ****
-function LehrveranstaltungNotenDelete()
-{
-	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	tree = document.getElementById('lehrveranstaltung-noten-tree');
-
-	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
-	uid = tree.view.getCellText(tree.currentIndex,col);
-
-	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
-	lvid = tree.view.getCellText(tree.currentIndex,col);
-
-	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-studiensemester_kurzbz"] : "lehrveranstaltung-noten-tree-studiensemester_kurzbz";
-	stsem = tree.view.getCellText(tree.currentIndex,col);
-
-	if(confirm('Wollen Sie diese Note wirklich l�schen'))
-	{
-		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
-		var req = new phpRequest(url,'','');
-
-		req.add('type', 'deletenote');
-
-		req.add('lehrveranstaltung_id', lvid);
-		req.add('student_uid', uid);
-		req.add('studiensemester_kurzbz', stsem);
-
-		var response = req.executePOST();
-
-		var val =  new ParseReturnValue(response)
-
-		if (!val.dbdml_return)
-		{
-			if(val.dbdml_errormsg=='')
-				alert(response);
-			else
-				alert(val.dbdml_errormsg);
-
-			LehrveranstaltungNotenTreeDatasource.Refresh(false); //non blocking
-		}
-		else
-		{
-			LehrveranstaltungNotenTreeDatasource.Refresh(false); //non blocking
-			LehrveranstaltungNotenDetailDisableFields(true);
-			SetStatusBarText('Eintrag wurde geloescht');
-		}
-	}
-}
-
-function LeMitarbeiterGesamtkosten()
-{
-	semesterstunden = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden').value
-	faktor = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-faktor').value
-	stundensatz = document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz').value
-	
-	if(!isNaN(semesterstunden) && !isNaN(faktor) && !isNaN(stundensatz))
-		gesamtkosten = semesterstunden*faktor*stundensatz;
-	else
-		gesamtkosten = 0;
-	
-	document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-gesamtkosten').value=gesamtkosten.toFixed(2)+' €';
-	
-	if(gesamtkosten<=0)
-		document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-gesamtkosten').setAttribute("style",'color: red');
-	else
-		document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-gesamtkosten').setAttribute("style",'color: black');
+	*/
 }

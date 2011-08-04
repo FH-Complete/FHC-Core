@@ -29,7 +29,6 @@ require_once('../../config/vilesci.config.inc.php');
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projekttaskdetail.overlay.xul.php"?>';
-echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projekttasknoten.overlay.xul.php"?>';
 ?>
 <overlay id="ProjekttaskOverlay"
 	xmlns:html="http://www.w3.org/1999/xhtml"
@@ -46,29 +45,26 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projekttasknoten.overlay.x
 	<vbox id="box-projekttask" flex="1" uid="" stg_kz="">
 	<popupset>
 		<popup id="projekttask-tree-popup">
-			<menuitem label="Entfernen" oncommand="LeDelete();" id="projekttask-tree-popup-entf" disabled="false"/>
+			<menuitem label="Entfernen" oncommand="TaskDelete();" id="projekttask-tree-popup-entf" disabled="false"/>
 		</popup>
 	</popupset>
 		<toolbox>
 			<toolbar id="projekttask-nav-toolbar">
-			<toolbarbutton id="projekttask-toolbar-neu" label="Neue Lehreinheit" oncommand="LeNeu();" disabled="true" image="../skin/images/NeuDokument.png" tooltiptext="Neue Lehreinheit anlegen" />
-			<toolbarbutton id="projekttask-toolbar-del" label="Loeschen" oncommand="LeDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Lehreinheiten löschen"/>
-			<toolbarbutton id="projekttask-toolbar-refresh" label="Aktualisieren" oncommand="LvTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
-			<toolbarbutton id="projekttask-toolbar-lehrauftrag" label="Lehrauftrag" oncommand="LvCreateLehrauftrag()" disabled="false" image="../skin/images/person.gif" tooltiptext="Lehrauftrag ausdrucken" hidden="true"/>
-			<!--<toolbarbutton id="projekttask-toolbar-refresh" label="Load" oncommand="debugload()" disabled="false"/>-->
+				<toolbarbutton id="projekttask-toolbar-neu" label="Neuer Task" oncommand="TaskNeu();" disabled="true" image="../skin/images/NeuDokument.png" tooltiptext="Neuen Task anlegen" />
+				<toolbarbutton id="projekttask-toolbar-del" label="Loeschen" oncommand="TaskDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Task löschen"/>
+				<toolbarbutton id="projekttask-toolbar-refresh" label="Aktualisieren" oncommand="TaskTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 			</toolbar>
 		</toolbox>
 
 		<!-- ************* -->
 		<!-- *  Auswahl  * -->
-		<!-- ************* rdf:null -->
+		<!-- ************* -->
 		<!-- Bem.: style="visibility:collapse" versteckt eine Spalte -->
 		<tree id="projekttask-tree" seltype="single" hidecolumnpicker="false" flex="1"
-				datasources="../../rdf/projekttask.rdf.php?foo=123" ref="http://www.technikum-wien.at/projekttask/alle-projekttasks"
+				datasources="rdf:null" ref="http://www.technikum-wien.at/projekttask/alle-projekttasks"
 				style="margin:0px;" enableColumnDrag="true"
-				onselect="LeAuswahl(this);"
+				onselect="TaskAuswahl(this);"
  				persist="height"
- 				onkeypress="LvTreeKeyPress(event)"
  				flags="dont-build-content"
  				context="projekttask-tree-popup"
 		>
@@ -127,12 +123,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projekttasknoten.overlay.x
 				<tabs orient="horizontal" id="projekttask-tabs">
 					<tab id="projekttask-tab-detail" label="Details" />
 					<tab id="projekttask-tab-mantis" label="Mantis" />
-					<tab id="projekttask-tab-noten" label="Noten" />
 				</tabs>
 				<tabpanels id="projekttask-tabpanels-main" flex="1">
 					<vbox id="projekttask-detail" />
 					<vbox id="projekttask-mantis" />
-					<vbox id="projekttask-noten" />
 				</tabpanels>
 			</tabbox>
 		</vbox>
