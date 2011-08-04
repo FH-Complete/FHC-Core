@@ -7,6 +7,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 /*echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentenoverlay.xul.php?xulapp=planner"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-week-overlay.xul.php"?>';*/
+echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektphase.overlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projekttask.overlay.xul.php"?>';
 ?>
 
@@ -139,18 +140,20 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projekttask.overlay.xul.ph
 </popupset>
 	<tabbox id="tabbox-main" flex="3" orient="vertical">
 		<tabs orient="horizontal">
+			<tab id="tab-projektphase" label="Phasen" />
 			<tab id="tab-projekttask" label="Tasks" />
-			<tab id="tab-semester" label="Semesterplan" />
-			<tab id="tab-studenten" label="Studenten" />
-			<tab id="tab-lfvt" label="Lehrveranstaltung" />
+			<tab id="tab-notiz" label="Notizen" />
+			<tab id="tab-bestellung" label="Bestellungen" />
 		</tabs>
 		<tabpanels id="tabpanels-main" flex="1">
 			<!--  Projekttask  -->
+			<vbox id="box-projektphase" />
+			<!--  Semesterplan  -->
 			<vbox id="box-projekttask" />
 			<!--  Semesterplan  -->
-			<vbox id="vboxTimeTableSemester" />
+			<vbox id="box-notiz" />
 			<!--  Studenten  -->
-			<vbox id="studentenEditor" />
+			<vbox id="box-bestellung" />
 			<!-- Lehrfachverteilung -->
             <vbox id="LehrveranstaltungEditor" />
 		</tabpanels>
