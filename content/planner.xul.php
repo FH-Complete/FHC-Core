@@ -249,12 +249,10 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 		<tabs orient="horizontal">
 			<tab id="tab-projekt" label="Projekt" />
 			<tab id="tab-ressource" label="Ressource" />
-			<tab id="tab-lektor" label="Lektor" />
 		</tabs>
 		<tabpanels id="tabpanels-left" flex="1">
 			<vbox id="box-projekt" />
 			<tree id="tree-ressource" />
-			<tree id="tree-lektor" />
 		</tabpanels>
 	</tabbox>
 	<splitter collapse="before" persist="state">
