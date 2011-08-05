@@ -39,6 +39,8 @@
 
 	if (isset($_GET['uid']))
 		$uid=$_GET['uid'];
+	else
+		$uid = $user;
 	if (isset($_GET['stdsem']))
 		$stdsem=$_GET['stdsem'];
 
@@ -50,14 +52,14 @@
 #		$user=$uid;
 #	}
 	
-	
+	/*
 	if ($uid!=$user)
 	{
 		//wenn der UID Parameter nicht dem eingeloggten User entspricht wird ein Mail an die Administratoren gesendet.
 		$mail = new mail($adress,'vilesci@'.DOMAIN,'Unerlaubter Zugriff auf Lehrveranstaltungen',"User $user hat versucht die LVAs von User $uid zu betrachten!");
 		$mail->send();
 		die("Keine Berechtigung!");
-	}
+	}*/
 
 	//Studiensemester abfragen.
 	$sql_query='SELECT * FROM public.tbl_studiensemester WHERE ende>=now() ORDER BY start';
@@ -67,7 +69,7 @@
 		$stdsem=$db->db_result($result_stdsem,0,"studiensemester_kurzbz");
 
 /*
-0000453: Sortierung von LVs - „Meine LV“
+0000453: Sortierung von LVs - ï¿½Meine LVï¿½
 1. Bachelor
 2. Name des Bachelors
 3. Studienjahr
