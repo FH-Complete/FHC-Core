@@ -42,10 +42,10 @@ class menu_addon_freifaecher extends menu_addon
 
 		foreach($lv_obj->lehrveranstaltungen AS $row)
 		{
-			$this->items[] = array('title'=>$row->bezeichnung,
+			$this->items[] = array('title'=>$row->bezeichnung_arr[$sprache],
 						 'target'=>'content',
 						 'link'=>'private/lehre/lesson.php?lvid='.$row->lehrveranstaltung_id,
-						 'name'=>'<span '.(!$row->aktiv?' style="color:gray;" ':' style=" font-weight: bold;"').'>'.$this->CutString($row->bezeichnung, 21).'</span>'
+						 'name'=>'<span '.(!$row->aktiv?' style="color:gray;" ':' style=" font-weight: bold;"').'>'.$this->CutString($row->bezeichnung_arr[$sprache], 21).'</span>'
 						);
 		}
 		
