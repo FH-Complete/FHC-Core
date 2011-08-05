@@ -1,0 +1,57 @@
+svg-shape {
+	-moz-binding: url("gantt.svg.xbl#shape");
+	-moz-user-focus: normal;
+	stroke-width: 4px;
+	font-family: Lucida Grande,Geneva,Verdana,Arial,Helvetica,sans-serif;
+	font-style: bold;
+	font-variant: normal;
+	line-height: normal;
+        font-size: 32px;
+}
+
+svg-shape .svg-shape-text {
+	fill: white;
+}
+
+svg-shape .svg-shape-rect {
+	fill: red;
+	stroke: white;
+}
+
+svg-shape:focus .svg-shape-rect {
+	fill: green;
+	stroke: white;
+}
+
+svg-shape .svg-shape-circle {
+	fill-opacity: .20;
+	stroke: white;
+}
+
+svg-shape:focus .svg-shape-circle {
+	fill-opacity: 1;
+	stroke: white;
+}
+
+#circ1 .svg-shape-circle {
+	fill: yellow;
+}
+
+#circ2 .svg-shape-circle {
+	fill: green;
+}
+
+#circ3 .svg-shape-circle {
+	fill: blue;
+}
+
+#svg-button {
+        min-width: 48px;
+        min-height: 48px;
+        max-height: 48px;
+}
+
+#background-circle .svg-shape-circle {
+	fill: lightslategray;
+}
+

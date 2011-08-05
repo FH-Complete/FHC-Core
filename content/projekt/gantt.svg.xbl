@@ -1,0 +1,180 @@
+<?xml version="1.0"?>
+<bindings
+	xmlns="http://www.mozilla.org/xbl" 
+	xmlns:xbl="http://www.mozilla.org/xbl" 
+	xmlns:html="http://www.w3.org/1999/xhtml" 
+	xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+	xmlns:svg="http://www.w3.org/2000/svg" 
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+>
+	<binding id="shape">
+		<implementation>
+			<field name="svg_shape_box"/>
+			<field name="svg_shape_type"/>
+			<field name="svg_shape_rect"/>
+			<field name="svg_shape_circle"/>
+			<field name="svg_shape_ellipse"/>
+			<field name="svg_shape_text"/>
+			<field name="svg_shape_stroke"/>
+			<field name="svg_shape_corner"/>
+			<field name="svg_shape_loaded"/>
+			<property name="disabled">
+				<getter>
+	<![CDATA[
+	return this.getAttribute('disabled') == 'true';
+	]]>
+				</getter>
+				<setter>
+	<![CDATA[
+  	if (val) {
+	  	this.setAttribute('disabled', 'true');
+  	}
+  	else {
+  		this.removeAttribute('disabled');
+  	}
+	return val;
+	]]>
+				</setter>
+			</property>
+			<property name="label">
+				<setter>
+	<![CDATA[
+	this.setText(val);
+	this.setAttribute("label", val);
+	return val;
+	]]>
+				</setter>
+			</property>
+			<constructor>
+	<![CDATA[
+	
+	const STROKE_WIDTH = 4;
+	const CORNER_RADIUS = 0;
+	
+	this.svg_shape_type = this.getAttribute("type");
+	if (!this.svg_shape_type) this.svg_shape_type = "rect";
+	
+	this.svg_shape_corner = parseInt(this.getAttribute("radius"));
+	if (isNaN(this.svg_shape_corner)) this.svg_shape_corner = CORNER_RADIUS;
+	
+	//This should not be necessary, but unfortunately getting the value
+	//from the stylesheet programmatically is not possible in current builds
+	
+	this.svg_shape_stroke = parseInt(this.getAttribute("stroke-width"));
+	if (isNaN(this.svg_shape_stroke)) this.svg_shape_stroke = STROKE_WIDTH;
+
+	var my_this = this;
+	
+	this.svg_shape_loaded = false;
+
+	this.svg_shape_box = document.getAnonymousElementByAttribute(this, "anonid", "svg-shape-box");
+	this.svg_shape_rect = document.getAnonymousElementByAttribute(this, "anonid", "svg-shape-rect");
+	this.svg_shape_circle = document.getAnonymousElementByAttribute(this, "anonid", "svg-shape-circle");
+	this.svg_shape_ellipse = document.getAnonymousElementByAttribute(this, "anonid", "svg-shape-ellipse");
+	this.svg_shape_text = document.getAnonymousElementByAttribute(this, "anonid", "svg-shape-text");
+	
+	my_func = function myFunction(event){ window.setTimeout(function(xbl){ xbl.click(); }, 10, my_this); }
+	this.svg_shape_box.addEventListener("click", my_func, true);
+
+	my_func = function myFunction(){ my_this.doLayout();}
+	window.addEventListener("load", my_func, true);
+
+	]]>
+			</constructor>
+			<method name="doLayout">
+				<body>
+	<![CDATA[
+	
+	if (this.svg_shape_loaded) return;
+	
+	this.svg_shape_loaded = true;
+	
+	var box_w = this.boxObject.width;
+	var box_h = this.boxObject.height;
+	var cx = box_w / 2;
+	var cy = box_h / 2;
+			
+	var stroke_w = this.svg_shape_stroke;
+	
+	//Either of the following should work, but don't
+  	//var stroke_w = document.defaultView.getComputedStyle(this.svg_shape_rect, "").getPropertyCSSValue("stroke-width").getFloatValue(CSSPrimitiveValue.CSS_PX);
+  	//var stroke_w = this.svg_shape_rect.getPresentationAttribute("stroke-width").getFloatValue(CSSPrimitiveValue.CSS_PX);
+	
+	this.svg_shape_box.setAttribute("width", box_w);
+	this.svg_shape_box.setAttribute("height", box_h);
+		
+	if (this.svg_shape_type == "circle") {
+		var r = Math.min(cx, cy);
+		
+		this.svg_shape_circle.setAttribute("cx", cx);
+		this.svg_shape_circle.setAttribute("cy", cy);
+		this.svg_shape_circle.setAttribute("r", r - stroke_w);
+	
+		this.svg_shape_rect.setAttribute("style", "display: none");
+		this.svg_shape_ellipse.setAttribute("style", "display: none");
+	}
+	else if (this.svg_shape_type == "ellipse") {
+		
+		this.svg_shape_ellipse.setAttribute("cx", cx);
+		this.svg_shape_ellipse.setAttribute("cy", cy);
+		this.svg_shape_ellipse.setAttribute("rx", cx);
+		this.svg_shape_ellipse.setAttribute("ry", cy);
+	
+		this.svg_shape_circle.setAttribute("style", "display: none");
+		this.svg_shape_rect.setAttribute("style", "display: none");
+	}
+	else {
+		this.svg_shape_rect.setAttribute("x", stroke_w / 2);
+		this.svg_shape_rect.setAttribute("y", stroke_w / 2);
+		this.svg_shape_rect.setAttribute("width", box_w - ((stroke_w / 2) + stroke_w));
+		this.svg_shape_rect.setAttribute("height", box_h - ((stroke_w / 2) + stroke_w));
+		this.svg_shape_rect.setAttribute("rx", this.svg_shape_corner);
+		this.svg_shape_rect.setAttribute("ry", this.svg_shape_corner);
+
+		this.svg_shape_circle.setAttribute("style", "display: none");
+		this.svg_shape_ellipse.setAttribute("style", "display: none");
+	}
+	  	
+	
+	this.svg_shape_text.setAttribute("x", cx);
+	this.svg_shape_text.setAttribute("y", cy - stroke_w);
+		
+  	this.setText(this.getAttribute("label"));
+
+	//Not used but useful to know
+	//var text_w = this.svg_shape_text.getComputedTextLength();	
+  	//var text_h = document.defaultView.getComputedStyle(this.svg_shape_text, "").getPropertyCSSValue("font-size").getFloatValue(CSSPrimitiveValue.CSS_PX);
+
+	]]>
+				</body>
+			</method>
+			<method name="setText">
+				<parameter name="text" /> 
+				<body>
+	<![CDATA[
+	
+	if (!text) text = "";
+	this.svg_shape_text.firstChild.nodeValue = text;
+
+	]]>
+				</body>
+			</method>
+		</implementation>
+		<resources>
+			<stylesheet src="gantt.svg.css" />
+		</resources>
+		<content>
+			<xul:hbox class="box-inherit" xbl:inherits="align,dir,pack,orient" align="center" pack="center" flex="1">
+				<svg:svg anonid="svg-shape-box" width="10px" height="10px">
+					<svg:g>
+						<svg:rect anonid="svg-shape-rect" class="svg-shape-rect" x="2" y="2" width="10" height="10" rx="8" ry="8"/>
+						<svg:circle anonid="svg-shape-circle" class="svg-shape-circle" cx="2" cy="2" r="10"/>
+						<svg:ellipse anonid="svg-shape-ellipse" class="svg-shape-ellipse" cx="2" cy="2" rx="10" ry="10"/>
+						<svg:text anonid="svg-shape-text" x="16" y="0" class="svg-shape-text">Text</svg:text>
+					</svg:g>
+				</svg:svg>
+			</xul:hbox>
+		</content>
+	</binding>
+</bindings>
+

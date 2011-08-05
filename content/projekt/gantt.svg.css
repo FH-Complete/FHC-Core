@@ -1,0 +1,36 @@
+.box-inherit {
+	-moz-box-orient: inherit;
+	-moz-box-pack: inherit;
+	-moz-box-align: inherit;
+	-moz-box-direction: inherit;
+}
+
+/* Text shape */
+
+.svg-shape-text {
+	font-weight: inherit;
+	font-style: inherit;
+	font-size: inherit;
+	font-family: inherit;
+	dominant-baseline: middle;
+	text-anchor: middle;
+}
+
+/* Rect shape */
+
+.svg-shape-rect {
+	stroke-width: inherit;
+}
+
+/* Circle shape */
+
+.svg-shape-circle {
+	stroke-width: inherit;
+}
+
+/* Ellipse shape */
+
+.svg-shape-ellipse {
+	stroke-width: inherit;
+}
+
