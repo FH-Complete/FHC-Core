@@ -131,7 +131,7 @@ if (isset($_GET["handbuch"])){
 		<td class="tdwidth10">&nbsp;</td>
 		<td class="ContentHeader"><font class="ContentHeader">&nbsp;
 		<?php
-		echo $lv_obj->bezeichnung.' '.$lv_obj->lehrform_kurzbz.' / '.$kurzbz.'-'.$semester;
+		echo $lv_obj->bezeichnung_arr[$sprache].' '.$lv_obj->lehrform_kurzbz.' / '.$kurzbz.'-'.$semester;
 
 		$qry = "SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
 				WHERE lehrveranstaltung_id='".addslashes($lvid)."' ORDER BY ende DESC LIMIT 1";

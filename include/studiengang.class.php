@@ -60,6 +60,7 @@ class studiengang extends basis_db
 	public $lgartcode;	//integer
 	public $mischform;	// boolean
 	public $projektarbeit_note_anzeige; // boolean
+	public $bezeichnung_arr = array();
 	
 	/**
 	 * Konstruktor
@@ -130,6 +131,9 @@ class studiengang extends basis_db
             	$this->moodle=($row->moodle=='t'?true:false);
 				$this->mischform=($row->mischform=='t'?true:false);
 				$this->projektarbeit_note_anzeige=($row->projektarbeit_note_anzeige=='t'?true:false);
+				
+				$this->bezeichnung_arr['German']=$this->bezeichnung;
+				$this->bezeichnung_arr['English']=$this->english;
 			}
 		}
 		else
@@ -199,6 +203,8 @@ class studiengang extends basis_db
 			$stg_obj->mischform=($row->mischform=='t'?true:false);
 			$stg_obj->projektarbeit_note_anzeige=($row->projektarbeit_note_anzeige=='t'?true:false);
 			
+			$stg_obj->bezeichnung_arr['German']=$row->bezeichnung;
+			$stg_obj->bezeichnung_arr['English']=$row->english;
 			$this->result[] = $stg_obj;
 			$this->kuerzel_arr[$row->studiengang_kz]=$stg_obj->kuerzel;
 		}
@@ -269,6 +275,9 @@ class studiengang extends basis_db
 			$stg_obj->moodle=($row->moodle=='t'?true:false);
 			$stg_obj->mischform=($row->mischform=='t'?true:false);
 			$stg_obj->projektarbeit_note_anzeige=($row->projektarbeit_note_anzeige=='t'?true:false);
+			
+			$stg_obj->bezeichnung_arr['German']=$row->bezeichnung;
+			$stg_obj->bezeichnung_arr['English']=$row->english;
 			
 			$this->result[] = $stg_obj;
 			$this->kuerzel_arr[$row->studiengang_kz]=$stg_obj->kuerzel;
@@ -527,7 +536,9 @@ class studiengang extends basis_db
 				$this->moodle=($row->moodle=='t'?true:false);
 				$this->mischform=($row->mischform=='t'?true:false);
 				$this->projektarbeit_note_anzeige=($row->projektarbeit_note_anzeige=='t'?true:false);
-								
+				
+				$this->bezeichnung_arr['German']=$this->bezeichnung;
+				$this->bezeichnung_arr['English']=$this->english;
 				return true; 
 			}
 		}

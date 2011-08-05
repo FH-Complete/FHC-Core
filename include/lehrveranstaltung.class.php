@@ -59,6 +59,7 @@ class lehrveranstaltung extends basis_db
 	public $koordinator;			// varchar(16)
 	public $bezeichnung_english;	// varchar(256)
 	public $orgform_kurzbz;
+	public $bezeichnung_arr = array();
 	
 	/**
 	 * Konstruktor
@@ -123,6 +124,9 @@ class lehrveranstaltung extends basis_db
 			$this->koordinator=$row->koordinator;
 			$this->bezeichnung_english = $row->bezeichnung_english;
 			$this->orgform_kurzbz = $row->orgform_kurzbz;
+			
+			$this->bezeichnung_arr['German']=$this->bezeichnung;
+			$this->bezeichnung_arr['English']=$this->bezeichnung_english;
 		}
 
 		return true;
@@ -176,6 +180,9 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->bezeichnung_english = $row->bezeichnung_english;
 			$lv_obj->orgform_kurzbz = $row->orgform_kurzbz;
 
+			$lv_obj->bezeichnung_arr['German']=$row->bezeichnung;
+			$lv_obj->bezeichnung_arr['English']=$row->bezeichnung_english;
+			
 			$this->lehrveranstaltungen[] = $lv_obj;
 		}
 
@@ -283,6 +290,9 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->bezeichnung_english = $row->bezeichnung_english;
 			$lv_obj->orgform_kurzbz = $row->orgform_kurzbz;
 
+			$lv_obj->bezeichnung_arr['German']=$row->bezeichnung;
+			$lv_obj->bezeichnung_arr['English']=$row->bezeichnung_english;
+			
 			$this->lehrveranstaltungen[] = $lv_obj;
 		}
 
@@ -393,7 +403,10 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->koordinator=$row->koordinator;
 			$lv_obj->bezeichnung_english = $row->bezeichnung_english;
 			$lv_obj->orgform_kurzbz = $row->orgform_kurzbz;
-	
+			
+			$lv_obj->bezeichnung_arr['German']=$row->bezeichnung;
+			$lv_obj->bezeichnung_arr['English']=$row->bezeichnung_english;
+			
 			$lv_obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 
 			$this->lehrveranstaltungen[] = $lv_obj;
@@ -454,6 +467,9 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->bezeichnung_english = $row->bezeichnung_english;
 			$lv_obj->orgform_kurzbz = $row->orgform_kurzbz;
 
+			$lv_obj->bezeichnung_arr['German']=$row->bezeichnung;
+			$lv_obj->bezeichnung_arr['English']=$row->bezeichnung_english;
+			
 			$this->lehrveranstaltungen[] = $lv_obj;
 		}
 
@@ -730,6 +746,9 @@ class lehrveranstaltung extends basis_db
 				$lv_obj->bezeichnung_english = $row->bezeichnung_english;
 				$lv_obj->orgform_kurzbz = $row->orgform_kurzbz;
 
+				$lv_obj->bezeichnung_arr['German']=$row->bezeichnung;
+				$lv_obj->bezeichnung_arr['English']=$row->bezeichnung_english;
+			
 				$this->lehrveranstaltungen[] = $lv_obj;
 			}
 			return true;
@@ -807,6 +826,9 @@ class lehrveranstaltung extends basis_db
 				$l->bezeichnung_english = $row->bezeichnung_english;
 				$l->orgform_kurzbz = $row->orgform_kurzbz;
 				
+				$l->bezeichnung_arr['German']=$row->bezeichnung;
+				$l->bezeichnung_arr['English']=$row->bezeichnung_english;
+			
 				$this->lehrveranstaltungen[]=$l;
 			}
 		}
@@ -873,6 +895,9 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->bezeichnung_english = $row->bezeichnung_english;
 			$lv_obj->orgform_kurzbz = $row->orgform_kurzbz;
 
+			$lv_obj->bezeichnung_arr['German']=$row->bezeichnung;
+			$lv_obj->bezeichnung_arr['English']=$row->bezeichnung_english;
+			
 			$this->lehrveranstaltungen[] = $lv_obj;
 		}
 

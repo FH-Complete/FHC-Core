@@ -180,7 +180,7 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 				}
 				$this->block.= '<tr>';
 				$this->block.= '	<td class="tdwrap"><ul style="margin: 0px; padding: 0px; padding-left: 20px;">';
-				$this->block.= "<li><a class=\"Item2\" title=\"".$row->bezeichnung."\" href=\"private/lehre/lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".$this->CutString($row->bezeichnung, 21).' '.$row->lehrform_kurzbz."</a></li>";
+				$this->block.= "<li><a class=\"Item2\" title=\"".$row->bezeichnung_arr[$sprache]."\" href=\"private/lehre/lesson.php?lvid=$row->lehrveranstaltung_id\" target=\"content\">".$this->CutString($row->bezeichnung_arr[$sprache], 21).' '.$row->lehrform_kurzbz."</a></li>";
 				$this->block.= '	</ul></td>';
 				$this->block.= '</tr>';
 			}

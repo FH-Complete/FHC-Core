@@ -44,66 +44,51 @@ function drawSubmenu($content_id)
 	$content = new content();
 	$sprache = getSprache();
 	
-	$arr = $content->getMenueArray($content_id, $sprache, true);
-	foreach ($arr as $row)
+	//$arr = $content->getMenueArray($content_id, $sprache, true);
+	$content->getChilds($content_id);
+	foreach ($content->result as $row)
 	{
-		drawEntry($row);
+		drawEntry($row, $sprache);
 	}
-}
-
-/**
- * Prueft ob der Menueeintrag Submenues hat
- * 
- * @param $item Menue Array
- * @return boolean
- */
-function EntryHasChilds($item)
-{
-	foreach($item as $row)
-	{
-		if(is_array($row) && isset($row['name']))
-			return true;
-	}
-	
-	return false;
 }
 
 /**
  * Zeichnet den Menueeintrag samt Untermenues
  * @param $item Menue Array
  */
-function drawEntry($item)
+function drawEntry($item, $sprache)
 {
 	$content = new content();
 	//pruefen ob der Content eine Berechtigung erfordert
-	if($content->islocked($item['content_id']))
+	if($content->islocked($item->content_id))
 	{
 		$user = get_uid();
 		//wenn der User nicht berechtigt ist, dann wird der Eintrag nicht angezeigt
-		if(!$content->berechtigt($item['content_id'], $user))
+		if(!$content->berechtigt($item->content_id, $user))
 			return;
 	}
-	if(EntryHasChilds($item))
+	$content = new content();
+	$content->getContent($item->child_content_id, $sprache, null, true, true);
+	if($content->hasChilds($content->content_id))
 	{
 		echo '
 		<tr>
 			<td class="tdwidth10" nowrap>&nbsp;</td>
 			<td class="tdwrap">';
-		if($item['template']=='include')
-			IncludeMenuAddon($item['content_id']);
-		elseif($item['template']=='redirect')
-			Redirect($item['content_id'], $item['name'], $item['content_id']);
+		if($content->template_kurzbz=='include')
+			IncludeMenuAddon($content);
+		elseif($content->template_kurzbz=='redirect')
+			Redirect($content, $content->content_id);
 		else
-			DrawLink($item['link'], 'content', $item['name'], $item['content_id']);
+			DrawLink(APP_ROOT.'cms/content.php?content_id='.$content->content_id,'content',$content->titel, $content->content_id);
 		
 		echo '
-			<table class="tabcontent" id="Content'.$item['content_id'].'" style="display: '.($item['open']=='true'?'visible':'none').'">';
-		foreach($item as $row)
+			<table class="tabcontent" id="Content'.$content->content_id.'" style="display: '.($content->menu_open?'visible':'none').'">';
+		
+		$content->getChilds($content->content_id);
+		foreach($content->result as $row)
 		{
-			if(is_array($row) && isset($row['name']))
-			{
-				drawEntry($row);
-			}
+			drawEntry($row, $sprache);
 		}	
 		echo '
 				</table>
@@ -116,12 +101,12 @@ function drawEntry($item)
 		<tr>
 		  	<td class="tdwidth10" nowrap>&nbsp;</td>
 			<td class="tdwrap">';
-		if($item['template']=='include')
-			IncludeMenuAddon($item['content_id']);
-		elseif($item['template']=='redirect')
-			Redirect($item['content_id'], $item['name']);
+		if($content->template_kurzbz=='include')
+			IncludeMenuAddon($content);
+		elseif($content->template_kurzbz=='redirect')
+			Redirect($content);
 		else
-			DrawLink($item['link'],'content',$item['name']);
+			DrawLink(APP_ROOT.'cms/content.php?content_id='.$content->content_id,'content',$content->titel);
 			
 		echo '
 			</td>
@@ -147,7 +132,7 @@ function DrawLink($link, $target, $name, $content_id=null)
 		$class='class="Item"';
 	
 	echo '<a '.$class.' href="'.$link.'" target="'.$target.'"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;'.$name.'</a>';
-	
+		
 }
 
 /**
@@ -159,13 +144,10 @@ function DrawLink($link, $target, $name, $content_id=null)
  * @param $name Anzeigename des Links
  * @param $content_id_Submenu ID des Submenues das geoeffnet werden soll (optional)
  */
-function Redirect($content_id, $name, $content_id_Submenu=null)
+function Redirect($content, $content_id_Submenu=null)
 {
 	global $sprache, $params;
-	
-	$content = new content();
-	$content->getContent($content_id, $sprache, null, true, true);
-	
+		
 	$xml = new DOMDocument();
 	if($content->content!='')
 	{
@@ -188,7 +170,7 @@ function Redirect($content_id, $name, $content_id_Submenu=null)
 	else
 		$target='';
 		
-	DrawLink($url, $target, $name, $content_id_Submenu);
+	DrawLink($url, $target, $content->titel, $content_id_Submenu);
 }
 
 /**
@@ -197,11 +179,9 @@ function Redirect($content_id, $name, $content_id_Submenu=null)
  * 
  * @param $content_id
  */
-function IncludeMenuAddon($content_id)
+function IncludeMenuAddon($content)
 {
 	global $sprache, $includeparams;
-	$content = new content();
-	$content->getContent($content_id, $sprache, null, true, true);
 	
 	$xml = new DOMDocument();
 	if($content->content!='')

@@ -486,6 +486,37 @@ class content extends basis_db
 	/************ Menue / Childnodes *****************/
 	
 	/**
+	 * Prueft ob der Content Kindelemente hat
+	 * 
+	 * @param $content_id
+	 */
+	public function hasChilds($content_id)
+	{
+		$qry = "SELECT count(*) as anzahl FROM campus.tbl_contentchild WHERE content_id='".addslashes($content_id)."'";
+		
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				if($row->anzahl>0)
+					return true;
+				else
+					return false;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Laden von Daten';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden von Daten';
+			return false;
+		}			
+	}
+	
+	/**
 	 * Liefert die Alle Childcontents des uebergebenen Contents als Array zurueck.
 	 * Dieses kann zB direkt in das Vilesci Menue integriert werden
 	 * 
