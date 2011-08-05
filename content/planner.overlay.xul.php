@@ -9,6 +9,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungoverlay
 echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-week-overlay.xul.php"?>';*/
 echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektphase.overlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projekttask.overlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
 ?>
 
 <!DOCTYPE overlay >
@@ -89,47 +90,6 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projekttask.overlay.xul.ph
     </tree>
 </vbox>
 
-<!--<tree id="tree-ort" onselect="onOrtSelect();"
-	seltype="single" hidecolumnpicker="false" flex="1"
-	datasources="../rdf/ort.rdf.php" ref="http://www.technikum-wien.at/ort/alle-orte">
-	<treecols>
-	    <treecol id="raumtyp" label="Raumtyp" flex="2" primary="true" persist="hidden, width, ordinal"/>
-	    <splitter class="tree-splitter"/>
-	    <treecol id="ort_kurzbz" label="Raum" flex="4" hidden="true" persist="hidden, width, ordinal"/>
-	    <splitter class="tree-splitter"/>
-	    <treecol id="hierarchie" label="HI" flex="1" hidden="true" persist="hidden, width, ordinal"/>
-	    <splitter class="tree-splitter"/>
-	     <treecol id="ort_bezeichnung" label="Bezeichnung" flex="3" hidden="true" persist="hidden, width, ordinal"/>
-	    <splitter class="tree-splitter"/>
-	    <treecol id="max_person" label="MaxP" flex="1" hidden="true" persist="hidden, width, ordinal"/>
-	    <splitter class="tree-splitter"/>
-	    <treecol id="raumtypen" label="Raumtypen" flex="1" hidden="true" persist="hidden, width, ordinal"/>
-	    <splitter class="tree-splitter"/>
-	    <treecol id="stockwerk" label="Stockwerk" flex="1" hidden="true" persist="hidden, width, ordinal"/>
-	    <splitter class="tree-splitter"/>
-	    <treecol id="planbezeichnung" label="Planbezeichnung" flex="1" hidden="true" persist="hidden, width, ordinal"/>
-	</treecols>
-
-	<template>
-	    <rule>
-	      <treechildren>
-	       <treeitem uri="rdf:*">
-	         <treerow>
-	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#raumtyp"/>
-	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#ort_kurzbz"/>
-	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#hierarchie"/>
-	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#ort_bezeichnung"/>
-	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#max_person"/>
-	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#raumtypen"/>
-	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#stockwerk"/>
-	           <treecell label="rdf:http://www.technikum-wien.at/ort/rdf#planbezeichnung"/>
-	         </treerow>
-	       </treeitem>
-	      </treechildren>
-	    </rule>
-  </template>
-</tree>-->
-
 <vbox id="vbox-main">
 <popupset>
 		<popup id="fasoverlay-lektor-tree-popup">
@@ -143,18 +103,17 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projekttask.overlay.xul.ph
 			<tab id="tab-projektphase" label="Phasen" />
 			<tab id="tab-projekttask" label="Tasks" />
 			<tab id="tab-notiz" label="Notizen" />
+			<tab id="tab-dokumente" label="Dokumente" />
 			<tab id="tab-bestellung" label="Bestellungen" />
+			<tab id="tab-gantt" label="Gantt" />
 		</tabs>
 		<tabpanels id="tabpanels-main" flex="1">
-			<!--  Projekttask  -->
 			<vbox id="box-projektphase" />
-			<!--  Semesterplan  -->
 			<vbox id="box-projekttask" />
-			<!--  Semesterplan  -->
 			<vbox id="box-notiz" />
-			<!--  Studenten  -->
+			<vbox id="box-dokumente" />
 			<vbox id="box-bestellung" />
-			<!-- Lehrfachverteilung -->
+			<vbox id="box-gantt" />
             <vbox id="LehrveranstaltungEditor" />
 		</tabpanels>
 	</tabbox>

@@ -65,7 +65,7 @@ for ($i=0;$i<count($projekt_obj->result);$i++)
       			</RDF:Description>'."\n";
 	$descr.='<RDF:Description RDF:about="'.$rdf_url.$projekt->oe_kurzbz.'/'.$projekt->projekt_kurzbz.'" >
 		<PROJEKTPHASE:bezeichnung>'.$projekt->titel.'</PROJEKTPHASE:bezeichnung>
-		<PROJEKTPHASE:oe_kurzbz></PROJEKTPHASE:oe_kurzbz>
+		<PROJEKTPHASE:oe_kurzbz>'.$projekt->oe_kurzbz.'</PROJEKTPHASE:oe_kurzbz>
 		<PROJEKTPHASE:projekt_kurzbz>'.$projekt->projekt_kurzbz.'</PROJEKTPHASE:projekt_kurzbz>
 		<PROJEKTPHASE:projekt_phase></PROJEKTPHASE:projekt_phase>
 		<PROJEKTPHASE:projekt_phase_id></PROJEKTPHASE:projekt_phase_id>
