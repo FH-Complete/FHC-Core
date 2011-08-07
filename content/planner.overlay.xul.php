@@ -5,8 +5,8 @@ header("Content-type: application/vnd.mozilla.xul+xml");
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
 /*echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentenoverlay.xul.php?xulapp=planner"?>';
-echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-week-overlay.xul.php"?>';*/
+echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projekt.overlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektphase.overlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projekttask.overlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
@@ -19,26 +19,25 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
 	xmlns:html="http://www.w3.org/1999/xhtml"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	>
-<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/fasoverlay.js.php" />
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/planner.overlay.js.php" />
 <script type="application/x-javascript" src="chrome://global/content/nsTransferable.js"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/DragAndDrop.js"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/dragboard.js.php"/>
 
-<vbox id="box-projekt">
+<vbox id="box-projektmenue">
     <popupset>
 	<popup id="projekttask-tree-popup">
 	    <menuitem label="Entfernen" oncommand="LeDelete();" id="projekttask-tree-popup-entf" disabled="false"/>
 	</popup>
     </popupset>
     <toolbox>
-	<toolbar id="projekttask-nav-toolbar">
-	    <toolbarbutton id="projekt-toolbar-neu" label="Neues Projekt" oncommand="ProjektNeu();" disabled="true" image="../skin/images/NeuDokument.png" tooltiptext="Neues Projekt anlegen" />
-	    <toolbarbutton id="projekt-toolbar-del" label="Loeschen" oncommand="ProjektDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Projekt löschen"/>
-	    <toolbarbutton id="projekt-toolbar-refresh" label="Aktualisieren" oncommand="ProjektRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
+	<toolbar id="toolbar-projektmenue">
+	    <toolbarbutton id="toolbarbutton-projektmenue-neu" label="Neues Projekt" oncommand="ProjektNeu();" disabled="true" image="../skin/images/NeuDokument.png" tooltiptext="Neues Projekt anlegen" />
+	    <toolbarbutton id="toolbarbutton-projektmenue-del" label="Loeschen" oncommand="ProjektDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Projekt löschen"/>
+	    <toolbarbutton id="toolbarbutton-projektmenue-refresh" label="Aktualisieren" oncommand="ProjektRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 	</toolbar>
     </toolbox>
-    <tree id="tree-projekt" onselect="onProjektSelect();"
+    <tree id="tree-projektmenue" onselect="treeProjektSelect();"
 	seltype="single" hidecolumnpicker="false" flex="1"
 	datasources="../rdf/projektphase.rdf.php?foo=<?php echo time(); ?>" ref="http://www.technikum-wien.at/projektphase/alle-projektphasen"
 	enableColumnDrag="true"
@@ -49,23 +48,23 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
 	ondragexit="nsDragAndDrop.dragExit(event,verbandtreeDDObserver)"
 	>
 	<treecols>
-	    <treecol id="tree-projekt-bezeichnung" label="Bezeichnung" flex="15" primary="true" />
+	    <treecol id="treecol-projektmenue-bezeichnung" label="Bezeichnung" flex="15" primary="true" />
 	    <splitter class="tree-splitter"/>
-	    <treecol id="tree-projekt-oe" label="OE" flex="2" hidden="true" />
+	    <treecol id="treecol-projektmenue-oe" label="OE" flex="2" hidden="true" />
 	    <splitter class="tree-splitter"/>
-	    <treecol id="tree-projekt-projekt_kurzbz" label="Projekt" flex="2" hidden="true"/>
+	    <treecol id="treecol-projektmenue-projekt_kurzbz" label="Projekt" flex="2" hidden="true"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="tree-projekt-projekt_phase" label="Phase" flex="2" hidden="true"/>
+	    <treecol id="treecol-projektmenue-projekt_phase" label="Phase" flex="2" hidden="true"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="tree-projekt-projekt_phase_id" label="PhaseID" flex="2" hidden="true"/>
+	    <treecol id="treecol-projektmenue-projekt_phase_id" label="PhaseID" flex="2" hidden="true"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="tree-projekt-titel" label="Titel" flex="2" hidden="true"/>
+	    <treecol id="treecol-projektmenue-titel" label="Titel" flex="2" hidden="true"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="tree-projekt-nummer" label="Nummer" flex="1" hidden="false"/>
+	    <treecol id="treecol-projektmenue-nummer" label="Nummer" flex="1" hidden="false"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="tree-projekt-beginn" label="Beginn" flex="1" hidden="false"/>
+	    <treecol id="treecol-projektmenue-beginn" label="Beginn" flex="1" hidden="false"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="tree-projekt-ende" label="Ende" flex="1" hidden="false"/>
+	    <treecol id="treecol-projektmenue-ende" label="Ende" flex="1" hidden="false"/>
 	</treecols>
 
 	<template>
@@ -100,6 +99,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
 </popupset>
 	<tabbox id="tabbox-main" flex="3" orient="vertical">
 		<tabs orient="horizontal">
+			<tab id="tab-projekt" label="Projekte" />
 			<tab id="tab-projektphase" label="Phasen" />
 			<tab id="tab-projekttask" label="Tasks" />
 			<tab id="tab-notiz" label="Notizen" />
@@ -108,6 +108,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
 			<tab id="tab-gantt" label="Gantt" />
 		</tabs>
 		<tabpanels id="tabpanels-main" flex="1">
+			<vbox id="box-projekt" />
 			<vbox id="box-projektphase" />
 			<vbox id="box-projekttask" />
 			<vbox id="box-notiz" />
