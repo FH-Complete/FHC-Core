@@ -117,10 +117,13 @@ class projekt extends basis_db
 	 * @param  $projekt_kurzbz ID der zu ladenden Projektarbeit
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getProjekte($uid=null)
+	public function getProjekte($oe=null,$uid=null)
 	{
-		$qry = "SELECT * FROM fue.tbl_projekt ORDER BY oe_kurzbz";
-
+		$qry = 'SELECT * FROM fue.tbl_projekt';
+		if (!is_null($oe))
+			$qry.= " WHERE oe_kurzbz='$oe'";
+		$qry.= ' ORDER BY oe_kurzbz;';
+		//echo $qry;
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())

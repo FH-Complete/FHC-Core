@@ -26,8 +26,12 @@ require_once('../include/projekt.class.php');
 
 $rdf_url='http://www.technikum-wien.at/projekt/';
 
+if(isset($_GET['oe']))
+	$oe=$_GET['oe'];
+else 
+	$oe=null;
 $projekt_obj = new projekt();
-$projekt_obj->getProjekte();
+$projekt_obj->getProjekte($oe);
 //var_dump($projekt_obj);
 ?>
 <RDF:RDF
@@ -38,48 +42,21 @@ $projekt_obj->getProjekte();
 <?php
 $descr='';
 $sequenz='';
-$lastOE=null;
 for ($i=0;$i<count($projekt_obj->result);$i++)
 {
-	$currentOE=$projekt_obj->result[$i]->oe_kurzbz;
-	//echo $currentOE;
-	$nextOE=(($i<count($projekt_obj->result)-1)?$projekt_obj->result[$i+1]->oe_kurzbz:null);
-	//echo $nextOE;
 	$projekt=$projekt_obj->result[$i];
-	// Bin ich schon in der naechsten OE? Oder vielleicht in der ersten?
-	if ($lastOE!=$currentOE || $i==0)
-		$descr.='<RDF:Description RDF:about="'.$rdf_url.$projekt->oe_kurzbz.'" >
-			<PROJEKT:bezeichnung>'.$projekt->oe_kurzbz.'</PROJEKT:bezeichnung>
-			<PROJEKT:oe_kurzbz>'.$projekt->oe_kurzbz.'</PROJEKT:oe_kurzbz>
-			<PROJEKT:projekt_kurzbz></PROJEKT:projekt_kurzbz>
-			<PROJEKT:nummer></PROJEKT:nummer>
-			<PROJEKT:titel></PROJEKT:titel>
-			<PROJEKT:beschreibung></PROJEKT:beschreibung>
-			<PROJEKT:beginn></PROJEKT:beginn>
-			<PROJEKT:ende></PROJEKT:ende>
-      			</RDF:Description>'."\n";
 	$descr.='<RDF:Description RDF:about="'.$rdf_url.$projekt->oe_kurzbz.'/'.$projekt->projekt_kurzbz.'" >
-		<PROJEKT:bezeichnung>'.$projekt->titel.'</PROJEKT:bezeichnung>
-		<PROJEKT:oe_kurzbz></PROJEKT:oe_kurzbz>
 		<PROJEKT:projekt_kurzbz>'.$projekt->projekt_kurzbz.'</PROJEKT:projekt_kurzbz>
+		<PROJEKT:oe_kurzbz>'.$projekt->oe_kurzbz.'</PROJEKT:oe_kurzbz>
 		<PROJEKT:nummer>'.$projekt->nummer.'</PROJEKT:nummer>
 		<PROJEKT:titel>'.$projekt->titel.'</PROJEKT:titel>
 		<PROJEKT:beschreibung>'.$projekt->beschreibung.'</PROJEKT:beschreibung>
 		<PROJEKT:beginn>'.$projekt->beginn.'</PROJEKT:beginn>
 		<PROJEKT:ende>'.$projekt->ende.'</PROJEKT:ende>
+		<PROJEKT:budget></PROJEKT:budget>
 	</RDF:Description>'."\n";
 
-	if ($lastOE!=$currentOE)
-		$sequenz.='<RDF:li RDF:resource="'.$rdf_url.$projekt->oe_kurzbz.'" />
-					<RDF:li>
-      					<RDF:Seq RDF:about="'.$rdf_url.$projekt->oe_kurzbz.'" >'."\n";
-	if ($nextOE!=$currentOE || $i==count($projekt_obj->result)-1)
-		$sequenz.='<RDF:li RDF:resource="'.$rdf_url.$projekt->oe_kurzbz.'/'.$projekt->projekt_kurzbz.'" />
-					</RDF:Seq>
-      			</RDF:li>'."\n";
-	elseif ($lastOE==$currentOE || $nextOE==$currentOE || count($projekt_obj->result)==1)
-		$sequenz.='<RDF:li RDF:resource="'.$rdf_url.$projekt->oe_kurzbz.'/'.$projekt->projekt_kurzbz.'" />'."\n";
-	$lastOE=$currentOE;
+	$sequenz.='<RDF:li RDF:resource="'.$rdf_url.$projekt->oe_kurzbz.'/'.$projekt->projekt_kurzbz.'" />'."\n";
 }
 $sequenz='<RDF:Seq about="'.$rdf_url.'alle-projekte">'."\n\t".$sequenz.'
   	</RDF:Seq>'."\n";

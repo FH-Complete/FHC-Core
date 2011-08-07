@@ -425,19 +425,19 @@ function TaskAuswahl()
 	if (tree.currentIndex==-1) return;
 	try
 	{
-	    //Ausgewaehlte Lehreinheit holen
-            id = getTreeCellText(tree, "projekttask-treecol-projekttask_id", tree.currentIndex);
+		//Ausgewaehlte Lehreinheit holen
+        id = getTreeCellText(tree, "projekttask-treecol-projekttask_id", tree.currentIndex);
 
-            if(id!='')
-            {
-                //Task wurde markiert
-                //Loeschen Button aktivieren
-                document.getElementById('projekttask-toolbar-del').disabled=false;
-            }
-            else
-            {
-                    return false;
-            }
+		if(id!='')
+		{
+			//Task wurde markiert
+			//Loeschen Button aktivieren
+			document.getElementById('projekttask-toolbar-del').disabled=false;
+		}
+		else
+		{
+			return false;
+		}
 	}
 	catch(e)
 	{

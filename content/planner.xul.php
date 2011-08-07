@@ -251,7 +251,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 			<tab id="tab-ressource" label="Ressource" />
 		</tabs>
 		<tabpanels id="tabpanels-left" flex="1">
-			<vbox id="box-projekt" />
+			<vbox id="box-projektmenue" />
 			<tree id="tree-ressource" />
 		</tabpanels>
 	</tabbox>

@@ -15,21 +15,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>
  */
 include('../config/vilesci.config.inc.php');
 ?>
 
 var TaskTreeDatasource;
 
-function onProjektSelect()
+function treeProjektSelect()
 {
 	//document.getElementById('tempus-lva-filter').value='';
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	//var contentFrame=document.getElementById('iframeTimeTableWeek');
-	var tree=document.getElementById('tree-projekt');
+	var tree=document.getElementById('tree-projektmenue');
 	
 	// Wenn auf die Ueberschrift geklickt wird, soll nix passieren
         if(tree.currentIndex==-1)
@@ -42,6 +40,12 @@ function onProjektSelect()
 	var projekt_phase_id=getTreeCellText(tree, "tree-projekt-projekt_phase_id", tree.currentIndex);
 	    
 	//alert("Projekt Phase ID "+projekt_phase_id);
+        
+        // Neu und Delete Button fuer Projekte aktivieren/deaktivieren
+        if (projekt_kurzbz=='')
+            document.getElementById('toolbarbutton-projekt-neu').disabled=false;
+        else
+            document.getElementById('toolbarbutton-projekt-neu').disabled=true;
         
         // Projektphasen neu laden
 	if(projekt_phase_id=='' && projekt_kurzbz!='')
@@ -135,6 +139,16 @@ function onProjektSelect()
 		document.getElementById('projekttask-toolbar-del').disabled=true;
 	}
 }
+
+// Dialog fuer neues Projekt starten
+function ProjektNeu()
+{
+    var tree=document.getElementById('tree-projekt');
+    var oe=getTreeCellText(tree, "tree-projekt-oe", tree.currentIndex);
+    window.open('<?php echo APP_ROOT; ?>content/projekt/projekt.window.xul.php?oe='+oe,'Projekt anlegen', 'height=384,width=512,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no');
+    //alert (oe);
+}
+
 
 function loadURL(event)
 {
