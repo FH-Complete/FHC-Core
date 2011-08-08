@@ -79,8 +79,8 @@ $berechtigte_oe = $rechte->getOEkurzbz('basis/cms')
         theme_advanced_resizing : true,
         force_br_newlines : true,
         force_p_newlines : false,
-        forced_root_block : ''
-		
+        forced_root_block : '',
+        editor_deselector : "mceNoEditor"		
 		}
 	);
 	function FHCFileBrowser(field_name, url, type, win) 
@@ -197,6 +197,7 @@ if(!is_null($method))
 			$content->sprache=DEFAULT_LANGUAGE;
 			$content->insertvon = $user;
 			$content->insertamum = date('Y-m-d H:i:s');
+			$content->beschreibung = '';
 			
 			if($content->save())
 			{
@@ -336,6 +337,7 @@ if(!is_null($method))
 			$aktiv=isset($_POST['aktiv']);
 			$menu_open=isset($_POST['menu_open']);
 			$template_kurzbz = $_POST['template_kurzbz'];
+			$beschreibung = $_POST['beschreibung'];
 			
 			if($content->getContent($content_id, $sprache, $version))
 			{
@@ -347,6 +349,7 @@ if(!is_null($method))
 				$content->template_kurzbz = $template_kurzbz;
 				$content->updateamum=date('Y-m-d H:i:s');
 				$content->updatevon=$user;
+				$content->beschreibung = $beschreibung;
 				
 				if($content->save())
 				{
@@ -1008,6 +1011,10 @@ function print_prefs()
 		<tr>
 			<td>Menü offen</td>
 			<td><input type="checkbox" name="menu_open" '.($content->menu_open?'checked':'').'></td>
+		</tr>
+		<tr>
+			<td>Beschreibung</td>
+			<td><textarea name="beschreibung" cols="50" class="mceNoEditor" >'.$content->beschreibung.'</textarea></td>
 		</tr>
 		<tr>
 			<td></td>

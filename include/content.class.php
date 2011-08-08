@@ -37,6 +37,7 @@ class content extends basis_db
 	public $oe_kurzbz;
 	public $aktiv;
 	public $menu_open;
+	public $beschreibung;
 		
 	public $contentsprache_id;
 	public $sprache;
@@ -124,6 +125,7 @@ class content extends basis_db
 				$this->menu_open = ($row->menu_open=='t'?true:false);
 				$this->aktiv = ($row->aktiv=='t'?true:false);
 				$this->gesperrt_uid = $row->gesperrt_uid;
+				$this->beschreibung = $row->beschreibung;
 				return true;
 			}
 			else
@@ -385,7 +387,7 @@ class content extends basis_db
 			
 		if($new)
 		{
-			$qry = "BEGIN;INSERT INTO campus.tbl_content(template_kurzbz, oe_kurzbz, updatevon, updateamum, insertvon, insertamum, aktiv, menu_open) VALUES(".
+			$qry = "BEGIN;INSERT INTO campus.tbl_content(template_kurzbz, oe_kurzbz, updatevon, updateamum, insertvon, insertamum, aktiv, menu_open, beschreibung) VALUES(".
 					$this->addslashes($this->template_kurzbz).','.
 					$this->addslashes($this->oe_kurzbz).','.
 					$this->addslashes($this->updatevon).','.
@@ -393,7 +395,8 @@ class content extends basis_db
 					$this->addslashes($this->insertvon).','.
 					$this->addslashes($this->insertamum).','.
 					($this->aktiv?'true':'false').','.
-					($this->menu_open?'true':'false').');';
+					($this->menu_open?'true':'false').','.
+					$this->addslashes($this->beschreibung).');';
 		}
 		else
 		{
@@ -403,7 +406,8 @@ class content extends basis_db
 					" template_kurzbz=".$this->addslashes($this->template_kurzbz).','.
 					" oe_kurzbz=".$this->addslashes($this->oe_kurzbz).','.
 					" aktiv=".($this->aktiv?'true':'false').','.
-					" menu_open=".($this->menu_open?'true':'false').
+					" menu_open=".($this->menu_open?'true':'false').','.
+					" beschreibung=".$this->addslashes($this->beschreibung).
 					" WHERE content_id='".addslashes($this->content_id)."';";
 		}
 		
@@ -635,6 +639,7 @@ class content extends basis_db
 				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
+				$obj->beschreibung = $row->beschreibung;
 				
 				$this->result[] = $obj;
 			}
@@ -751,6 +756,7 @@ class content extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->aktiv = ($row->aktiv=='t'?true:false);
 				$obj->menu_open = ($row->menu_open=='t'?true:false);
+				$obj->beschreibung = $row->beschreibung;
 				
 				$this->result[] = $obj;
 			}
@@ -793,6 +799,7 @@ class content extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->aktiv = ($row->aktiv=='t'?true:false);
 				$obj->menu_open = ($row->menu_open=='t'?true:false);
+				$obj->beschreibung = $row->beschreibung;
 				
 				$this->result[] = $obj;
 			}
