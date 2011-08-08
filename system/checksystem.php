@@ -2592,6 +2592,16 @@ if($result = @$db->db_query("SELECT character_maximum_length as len FROM informa
 	}
 }
 
+//tbl_content beschreibung hinzufuegen
+if(!$result = @$db->db_query("SELECT beschreibung FROM campus.tbl_content LIMIT 1;"))
+{
+	$qry = "ALTER TABLE campus.tbl_content ADD COLUMN beschreibung text;";
+			
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_content: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'campus.tbl_content: Spalte beschreibung hinzugefuegt!<br>';
+}
 
 echo '<br>';
 
@@ -2620,7 +2630,7 @@ $tabellen=array(
 	"campus.tbl_abgabe"  => array("abgabe_id","abgabedatei","abgabezeit","anmerkung"),
 	"campus.tbl_beispiel"  => array("beispiel_id","uebung_id","nummer","bezeichnung","punkte","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_benutzerlvstudiensemester"  => array("uid","studiensemester_kurzbz","lehrveranstaltung_id"),
-	"campus.tbl_content"  => array("content_id","template_kurzbz","updatevon","updateamum","insertamum","insertvon","oe_kurzbz","menu_open","aktiv"),
+	"campus.tbl_content"  => array("content_id","template_kurzbz","updatevon","updateamum","insertamum","insertvon","oe_kurzbz","menu_open","aktiv","beschreibung"),
 	"campus.tbl_contentchild"  => array("contentchild_id","content_id","child_content_id","updatevon","updateamum","insertamum","insertvon","sort"),
 	"campus.tbl_contentgruppe"  => array("content_id","gruppe_kurzbz","insertamum","insertvon"),
 	"campus.tbl_contentlog"  => array("contentlog_id","contentsprache_id","uid","start","ende"),
