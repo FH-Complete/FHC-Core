@@ -2575,6 +2575,23 @@ if(!$result = @$db->db_query('SELECT content_id FROM campus.tbl_news LIMIT 1;'))
 		echo 'campus.tbl_news: Spalte content_id hinzugefuegt, tbl_newssprache entfernt, div. Indizes hinzugefuegt!<br>';
 }
 
+//tbl_contentgruppe.gruppe_kurzbz auf 32 Zeichen verlaengern
+if($result = @$db->db_query("SELECT character_maximum_length as len FROM information_schema.columns WHERE column_name='gruppe_kurzbz' AND table_name='tbl_contentgruppe' AND table_schema='campus';"))
+{
+	if($row = $db->db_fetch_object($result))
+	{
+		if($row->len=='16')
+		{
+			$qry = "ALTER TABLE campus.tbl_contentgruppe ALTER COLUMN gruppe_kurzbz TYPE varchar(32);";
+			
+			if(!$db->db_query($qry))
+				echo '<strong>campus.tbl_contentgruppe: '.$db->db_last_error().'</strong><br>';
+			else 
+				echo 'campus.tbl_contentgruppe: Spalte gruppe_kurzbz auf 32 Zeichen verlaengert!<br>';
+		}
+	}
+}
+
 
 echo '<br>';
 
