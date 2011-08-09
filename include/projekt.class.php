@@ -62,41 +62,22 @@ class projekt extends basis_db
 	 */
 	public function load($projekt_kurzbz)
 	{
-		if(!is_numeric($projekt_kurzbz))
-		{
-			$this->errormsg = 'Projektarbeit_id muss eine gueltige Zahl sein';
-			return false;
-		}
+
 		
-		$qry = "SELECT * FROM fue.tbl_projekt WHERE projekt_kurzbz='$projekt_kurzbz'";
+		$qry = "SELECT * FROM fue.tbl_projekt WHERE projekt_kurzbz=".$this->addslashes($projekt_kurzbz);
 		
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
 				$this->projekt_kurzbz = $row->projekt_kurzbz;
-				$this->projekttyp_kurzbz = $row->projekttyp_kurzbz;
-				$this->titel = $row->titel;
-				$this->titel_english = $row->titel_english;
-				$this->lehreinheit_id = $row->lehreinheit_id;
-				$this->student_uid = $row->student_uid;
-				$this->firma_id = $row->firma_id;
-				$this->note = $row->note;
-				$this->punkte = $row->punkte;
-				$this->beginn = $row->beginn;
+				$this->nummer= $row->nummer;
+				$this->titel= $row->titel;
+				$this->beschreibung= $row->beschreibung;
+				$this->beginn= $row->beginn;
 				$this->ende = $row->ende;
-				$this->faktor = $row->faktor;
-				$this->freigegeben = ($row->freigegeben=='t'?true:false);
-				$this->gesperrtbis = $row->gesperrtbis;
-				$this->stundensatz = $row->stundensatz;
-				$this->gesamtstunden = $row->gesamtstunden;
-				$this->themenbereich = $row->themenbereich;
-				$this->anmerkung = $row->anmerkung;
-				$this->ext_id = $row->ext_id;
-				$this->insertamum = $row->insertamum;
-				$this->insertvon = $row->insertvon;
-				$this->updateamum = $row->updateamum;
-				$this->updatevon = $row->updatevon;
+				$this->oe_kurzbz= $row->oe_kurzbz;		
+
 				return true;
 			}
 			else 
@@ -157,67 +138,27 @@ class projekt extends basis_db
 	{
 
 		//Gesamtlaenge pruefen
-		if ($this->projekttyp_kurzbz==null)
+		if ($this->projekt_kurzbz==null)
 		{
-			$this->errormsg='Projekttyp_kurzbz darf nicht NULL sein!';
+			$this->errormsg='Projekt kurzbz darf nicht NULL sein!';
 		}
-		if ($this->lehreinheit_id==null)
+		if ($this->oe_kurzbz==null)
 		{
-			$this->errormsg='Lehreinheit_id darf nicht NULL sein!';
+			$this->errormsg='OE kurbz darf nicht NULL sein!';
 		}
-		if(mb_strlen($this->projekttyp_kurzbz)>16)
+		if(mb_strlen($this->projekt_kurzbz)>16)
 		{
 			$this->errormsg = 'Projektyp_kurzbz darf nicht länger als 16 Zeichen sein';
 			return false;
 		}
-		if(mb_strlen($this->titel)>1024)
+		if(mb_strlen($this->nummer)>8)
 		{
 			$this->errormsg = 'Titel darf nicht länger als 1024 Zeichen sein';
 			return false;
 		}
-		if(mb_strlen($this->titel_english)>1024)
+		if(mb_strlen($this->titel)>256)
 		{
 			$this->errormsg = 'Titel darf nicht länger als 1024 Zeichen sein';
-			return false;
-		}
-		if(mb_strlen($this->themenbereich)>64)
-		{
-			$this->errormsg = 'Themenbereich darf nicht länger als 64 Zeichen sein';
-			return false;
-		}
-		if(mb_strlen($this->anmerkung)>256)
-		{
-			$this->errormsg = 'Anmerkung darf nicht länger als 256 Zeichen sein';
-			return false;
-		}
-		/*if(!is_numeric($this->note))
-		{
-			$this->errormsg = 'Note muß ein numerischer Wert sein - student_uid: '.$this->student_uid;
-			return false;
-		}*/
-		if($this->punkte!='' && !is_numeric($this->punkte))
-		{
-			$this->errormsg = 'Punkte muss ein numerischer Wert sein';
-			return false;
-		}
-		if($this->faktor!='' && !is_numeric($this->faktor))
-		{
-			$this->errormsg = 'Faktor muss ein numerischer Wert sein';
-			return false;
-		}
-		if($this->stundensatz!='' && !is_numeric($this->stundensatz))
-		{
-			$this->errormsg = 'Stundensatz muss ein numerischer Wert sein';
-			return false;
-		}
-		if($this->gesamtstunden!='' && !is_numeric($this->gesamtstunden))
-		{
-			$this->errormsg = 'Gesamtstunden muss ein numerischer Wert sein';
-			return false;
-		}
-		if(!is_bool($this->freigegeben))
-		{
-			$this->errormsg = 'freigegeben ist ungueltig';
 			return false;
 		}
 
@@ -244,29 +185,14 @@ class projekt extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 
-			$qry='BEGIN; INSERT INTO lehre.tbl_projektarbeit (projekttyp_kurzbz, titel, lehreinheit_id, student_uid, firma_id, note, punkte, 
-				beginn, ende, faktor, freigegeben, gesperrtbis, stundensatz, gesamtstunden, themenbereich, anmerkung, 
-				ext_id, insertamum, insertvon, updateamum, updatevon, titel_english) VALUES('.
-			     $this->addslashes($this->projekttyp_kurzbz).', '.
-			     $this->addslashes($this->titel).', '.
-			     $this->addslashes($this->lehreinheit_id).', '.
-			     $this->addslashes($this->student_uid).', '.
-			     $this->addslashes($this->firma_id).', '.
-			     $this->addslashes($this->note).', '.
-			     $this->addslashes($this->punkte).', '.
-			     $this->addslashes($this->beginn).', '.
-			     $this->addslashes($this->ende).', '.
-			     $this->addslashes($this->faktor).', '.
-			     ($this->freigegeben?'true':'false').', '.
-			     $this->addslashes($this->gesperrtbis).', '.
-			     $this->addslashes($this->stundensatz).', '.
-			     $this->addslashes($this->gesamtstunden).', '.
-			     $this->addslashes($this->themenbereich).', '.
-			     $this->addslashes($this->anmerkung).', '.
-			     $this->addslashes($this->ext_id).',  now(), '.
-			     $this->addslashes($this->insertvon).', now(), '.
-			     $this->addslashes($this->updatevon).','.
-			     $this->addslashes($this->titel_english).');';
+			$qry='BEGIN; INSERT INTO fue.tbl_projekt (projekt_kurzbz, nummer, titel,beschreibung, beginn, ende, oe_kurzbz) VALUES('.
+		     $this->addslashes($this->projekt_kurzbz).', '.
+		     $this->addslashes($this->nummer).', '.
+		     $this->addslashes($this->titel).', '.
+		     $this->addslashes($this->beschreibung).', '.
+		     $this->addslashes($this->beginn).', '.
+		     $this->addslashes($this->ende).', '.
+		     $this->addslashes($this->oe_kurzbz).');';
 		}
 		else
 		{
@@ -304,38 +230,13 @@ class projekt extends basis_db
 		
 		if($this->db_query($qry))
 		{
-			if($new)
-			{
-				//Sequence auslesen
-				$qry = "SELECT currval('lehre.tbl_projektarbeit_projekt_kurzbz_seq') as id;";
-				if($this->db_query($qry))
-				{
-					if($row = $this->db_fetch_object())
-					{
-						$this->projekt_kurzbz = $row->id;
-						$this->db_query('COMMIT');
-						return true;
-					}
-					else 
-					{
-						$this->errormsg = 'Fehler beim Auslesen der Sequence';
-						$this->db_query('ROLLBACK;');
-						return false;
-					}
-				}
-				else 
-				{
-					$this->errormsg = 'Fehler beim Auslesen der Sequence';
-					$this->db_query('ROLLBACK;');
-					return false;
-				}
-			}
-					
+			$this->db_query('COMMIT');
 			return true;
 		}
 		else
 		{
 			$this->errormsg = 'Fehler beim Speichern der Daten';
+			$this->db_query('ROLLBACK;');
 			return false;
 		}
 	}
