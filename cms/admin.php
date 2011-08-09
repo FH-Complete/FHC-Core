@@ -884,7 +884,7 @@ function get_content_link($key, $name)
  */
 function print_childs()
 {
-	global $content_id, $sprache, $version;
+	global $content_id, $sprache, $version, $action;
 	
 	$content = new content();
 	$content->getChilds($content_id);
@@ -922,7 +922,7 @@ function print_childs()
 		echo '   <a href="'.$_SERVER['PHP_SELF'].'?action=childs&content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&contentchild_id='.$row->contentchild_id.'&method=childs_sort_down" title="Nach unten sortieren"><img src="../skin/images/down.png" alt="down"></a>';
 		echo '</td>';
 		echo '<td>',$row->child_content_id,'</td>';
-		echo '<td>',$child->titel,'</td>';
+		echo '<td><a href="'.$_SERVER['PHP_SELF'].'?action='.$action.'&sprache='.$sprache.'&content_id='.$row->child_content_id.'">',$child->titel,'</a></td>';
 		
 		echo '<td>
 				<a href="'.$_SERVER['PHP_SELF'].'?action=childs&content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&contentchild_id='.$row->contentchild_id.'&method=childs_delete" title="entfernen">
