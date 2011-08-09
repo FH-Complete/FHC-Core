@@ -85,6 +85,7 @@ if(isset($_GET['optional']) && $_GET['optional']=='true')
         		<LVA:lehrveranstaltung_id><![CDATA[]]></LVA:lehrveranstaltung_id>
         		<LVA:kurzbz><![CDATA[]]></LVA:kurzbz>
         		<LVA:bezeichnung><![CDATA[-- keine Auswahl --]]></LVA:bezeichnung>
+        		<LVA:bezeichnung_english><![CDATA[-- keine Auswahl --]]></LVA:bezeichnung_english>
         		<LVA:studiengang_kz><![CDATA[]]></LVA:studiengang_kz>
         		<LVA:semester><![CDATA[0]]></LVA:semester>
         		<LVA:sprache><![CDATA[]]></LVA:sprache>
@@ -122,6 +123,7 @@ foreach ($lehrveranstaltung->lehrveranstaltungen as $row)
         		<LVA:lehrveranstaltung_id><![CDATA['.$row->lehrveranstaltung_id.']]></LVA:lehrveranstaltung_id>
         		<LVA:kurzbz><![CDATA['.$row->kurzbz.']]></LVA:kurzbz>
         		<LVA:bezeichnung><![CDATA['.$row->bezeichnung.']]></LVA:bezeichnung>
+        		<LVA:bezeichnung_english><![CDATA['.$row->bezeichnung_english.']]></LVA:bezeichnung_english>
         		<LVA:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></LVA:studiengang_kz>
         		<LVA:semester><![CDATA['.$row->semester.']]></LVA:semester>
         		<LVA:sprache><![CDATA['.$row->sprache.']]></LVA:sprache>
