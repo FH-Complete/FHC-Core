@@ -19,101 +19,52 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Karl Burkhart <burkhart@technikum-wien.at>.
  */
- 
+ header("Cache-Control: no-cache");
+header("Cache-Control: post-check=0, pre-check=0",false);
+header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
+header("Pragma: no-cache");
+
 require_once('../config/vilesci.config.inc.php'); 
 require_once('../include/basis_db.class.php');
-require_once('../include/prestudent.class.php');
-require_once('../include/student.class.php'); 
-require_once('../include/konto.class.php');
+require_once('../include/projekt.class.php');
 require_once('../include/datum.class.php');
-require_once('stip.class.php'); 
 
-$SOAPServer = new SoapServer("stip.soap.wsdl");
-$SOAPServer->addFunction(array("getStipDaten", "getErrorCode"));
+$SOAPServer = new SoapServer(APP_ROOT."/soap/projekt.wsdl.php");
+$SOAPServer->addFunction("saveProjektDaten");
 $SOAPServer->handle();
 
+// WSDL Chache auf aus
+ini_set("soap.wsdl_cache_enabled", "0");
 
-function getStipDaten($ErhKz, $AnfragedatenID, $Bezieher)
+/**
+ * 
+ * Speichert die vom Webservice übergebenen Parameter in die DB
+ * @param string $projekt_kurzbz
+ * @param string $nummer
+ * @param string $titel
+ * @param string $beschreibung
+ * @param date $beginn
+ * @param date $ende
+ * @param string $oe_kurzbz
+ */
+function saveProjektDaten($projekt_kurzbz, $nummer, $titel, $beschreibung, $beginn, $ende, $oe_kurzbz)
 { 	
-	$prestudentID; 
-	$studentUID; 
-	$studSemester; 
-	$StipBezieher = new stip();
-	$datum_obj = new datum(); 
 	
-	if($StipBezieher->validateStipDaten($ErhKz, $AnfragedatenID, $Bezieher))
-	{
-		$StipBezieher->Semester = $Bezieher->Semester; 
-		$StipBezieher->Studienjahr = $Bezieher->Studienjahr; 
-		$StipBezieher->PersKz = $Bezieher->PersKz; 
-		$StipBezieher->SVNR = $Bezieher->SVNR; 	
-		$StipBezieher->Familienname = $Bezieher->Familienname; 
-		$StipBezieher->Vorname = $Bezieher->Vorname; 
-		$StipBezieher->Typ = $Bezieher->Typ; 
-		
-		// Studiensemester_kurzbz auslesen
-		if($Bezieher->Semester == "WS" || $Bezieher->Semester == "ws")
-		{
-			$year = mb_substr($Bezieher->Studienjahr, 0,4); 
-			$studSemester = "WS".$year; 
-		}elseif ($Bezieher->Semester == "SS" || $Bezieher->Semester == "ss")
-		{
-			$year = mb_substr($Bezieher->Studienjahr, 0,4); 
-			$studSemester = "SS".$year; 
-		}
-		
-		if(!$prestudentID = $StipBezieher->searchPersonKz($Bezieher->PersKz))
-			if(!$prestudentID = $StipBezieher->searchSvnr($Bezieher->SVNR))
-				$prestudentID = $StipBezieher->searchVorNachname($Bezieher->Vorname, $Bezieher->Familienname);
+	$projekt = new projekt();
+	$projekt->projekt_kurzbz=$projekt_kurzbz;
+	$projekt->nummer = $nummer;
+	$projekt->titel = $titel;
+	$projekt->beschreibung = $beschreibung;
+	$projekt->beginn = $beginn;
+	$projekt->ende = $ende;
+	$projekt->oe_kurzbz = $oe_kurzbz;
+	$projekt->new = true; 
 	
-		$prestudent = new prestudent(); 
-		$prestudent->load($prestudentID); 
-		$prestudent->getLastStatus($prestudentID); 
-		
-		$student = new student(); 
-		$studentUID = $student->getUID($prestudentID); 
-		$student->load($studentUID); 
-		
-		$konto = new konto(); 
-		$studGebuehr = $konto->getStudiengebuehrGesamt($studentUID, $studSemester);
-		
-		// Student wurde gefunden
-		if($StipBezieher->AntwortStatusCode == 1)
-		{
-			if($Bezieher->Typ == "as" || $Bezieher->Typ == "AS")
-			{
-				$StipBezieher->getOrgFormTeilCode($studentUID, $studSemester);
-				$StipBezieher->Studienbeitrag = $studGebuehr; 
-				$StipBezieher->Inskribiert ="j";
-				$StipBezieher->Ausbildungssemester = $StipBezieher->getSemester($prestudentID, $studSemester);						
-				$StipBezieher->StudStatusCode = $StipBezieher->getStudStatusCode($prestudentID, $studSemester);
-				if($StipBezieher->StudStatusCode==3 || $StipBezieher->StudStatusCode==4)
-					$StipBezieher->BeendigungsDatum = $datum_obj->formatDatum($prestudent->datum,'dmY');
-					
-				$StipBezieher->Erfolg = $StipBezieher->getErfolg($prestudentID, $studSemester);
-			}
-			elseif($Bezieher->Typ ="ag" || $Bezieher->Typ == "AG")
-			{
-				
-			}
-		}
-				
-		$Erhalter = sprintf("%03d",$StipBezieher->getErhalterKz()); 
-			
-		$new = array($Erhalter,$AnfragedatenID, $StipBezieher); 
-		return $new; 
-	}else
-	return new SoapFault("Server", $StipBezieher->errormsg);	
-	
+	if($projekt->save($new = true))
+		return "OK"; 
+	else
+		return new SoapFault("Server", $projekt->errormsg);
 }
-
-
-
-function getErrorCode($ErhKz, $StateCode, $StateMessage, $ErrorStatusCode, $JobId, $ErrorContent)
-{
-	return "$ErhKz, $StateCode"; 
-}
-
 ?>
 
 
