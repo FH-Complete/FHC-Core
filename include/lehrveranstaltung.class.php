@@ -127,6 +127,8 @@ class lehrveranstaltung extends basis_db
 			
 			$this->bezeichnung_arr['German']=$this->bezeichnung;
 			$this->bezeichnung_arr['English']=$this->bezeichnung_english;
+			if($this->bezeichnung_arr['English']=='')
+				$this->bezeichnung_arr['English']=$this->bezeichnung_arr['German'];
 		}
 
 		return true;
@@ -182,6 +184,8 @@ class lehrveranstaltung extends basis_db
 
 			$lv_obj->bezeichnung_arr['German']=$row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English']=$row->bezeichnung_english;
+			if($lv_obj->bezeichnung_arr['English']=='')
+				$lv_obj->bezeichnung_arr['English']=$lv_obj->bezeichnung_arr['German'];
 			
 			$this->lehrveranstaltungen[] = $lv_obj;
 		}
@@ -292,7 +296,9 @@ class lehrveranstaltung extends basis_db
 
 			$lv_obj->bezeichnung_arr['German']=$row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English']=$row->bezeichnung_english;
-			
+			if($lv_obj->bezeichnung_arr['English']=='')
+				$lv_obj->bezeichnung_arr['English']=$lv_obj->bezeichnung_arr['German'];
+				
 			$this->lehrveranstaltungen[] = $lv_obj;
 		}
 
@@ -406,6 +412,8 @@ class lehrveranstaltung extends basis_db
 			
 			$lv_obj->bezeichnung_arr['German']=$row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English']=$row->bezeichnung_english;
+			if($lv_obj->bezeichnung_arr['English']=='')
+				$lv_obj->bezeichnung_arr['English']=$lv_obj->bezeichnung_arr['German'];
 			
 			$lv_obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 
@@ -469,6 +477,8 @@ class lehrveranstaltung extends basis_db
 
 			$lv_obj->bezeichnung_arr['German']=$row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English']=$row->bezeichnung_english;
+			if($lv_obj->bezeichnung_arr['English']=='')
+				$lv_obj->bezeichnung_arr['English']=$lv_obj->bezeichnung_arr['German'];
 			
 			$this->lehrveranstaltungen[] = $lv_obj;
 		}
@@ -748,7 +758,9 @@ class lehrveranstaltung extends basis_db
 
 				$lv_obj->bezeichnung_arr['German']=$row->bezeichnung;
 				$lv_obj->bezeichnung_arr['English']=$row->bezeichnung_english;
-			
+				if($lv_obj->bezeichnung_arr['English']=='')
+					$lv_obj->bezeichnung_arr['English']=$lv_obj->bezeichnung_arr['German'];
+				
 				$this->lehrveranstaltungen[] = $lv_obj;
 			}
 			return true;
@@ -828,7 +840,9 @@ class lehrveranstaltung extends basis_db
 				
 				$l->bezeichnung_arr['German']=$row->bezeichnung;
 				$l->bezeichnung_arr['English']=$row->bezeichnung_english;
-			
+				if($l->bezeichnung_arr['English']=='')
+					$l->bezeichnung_arr['English']=$l->bezeichnung_arr['German'];
+					
 				$this->lehrveranstaltungen[]=$l;
 			}
 		}
@@ -897,7 +911,9 @@ class lehrveranstaltung extends basis_db
 
 			$lv_obj->bezeichnung_arr['German']=$row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English']=$row->bezeichnung_english;
-			
+			if($lv_obj->bezeichnung_arr['English']=='')
+				$lv_obj->bezeichnung_arr['English']=$lv_obj->bezeichnung_arr['German'];
+				
 			$this->lehrveranstaltungen[] = $lv_obj;
 		}
 
