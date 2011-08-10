@@ -25,8 +25,9 @@
 require_once('../config/cis.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../cms/menu.inc.php');
+require_once('../include/phrasen.class.php');
 $sprache = getSprache();
-
+$p = new phrasen($sprache);
 //Output Buffering aktivieren
 //Falls eine Authentifizierung benoetigt wird, muss ein Header
 //gesendet werden. Dies funktioniert nur, wenn vorher nicht ausgegeben wurde
@@ -96,14 +97,11 @@ ob_start();
 //-->
 </script>
 </head>
-<body>
+<body style="margin:0; padding:0">
 <table class="tabcontent">
-<tr>
-	<td width="159" valign="top" class="tdwrap">
-		<table class="tabcontent">
-		<tr>
-			<td>&nbsp;</td>
-		</tr>
+	<tr>
+		<td>&nbsp;</td>
+	</tr>
 <?php
 	//TODO: ins config
 	define('CIS_MENU_ENTRY_CONTENT',28);
@@ -117,7 +115,7 @@ ob_start();
 	{
 		echo '<tr>
 				<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td><a class="HyperItem" href="?content_id='.CIS_MENU_ENTRY_CONTENT.'">&lt;&lt; HOME</a></td>
+				<td><a class="HyperItem" href="?content_id='.CIS_MENU_ENTRY_CONTENT.'">&lt;&lt; '.$p->t('global/home').'</a></td>
 				</tr>
 				<tr><td></td></tr>';
 	}
@@ -127,9 +125,7 @@ ob_start();
 	//Gepufferten Output ausgeben
 	ob_end_flush();
 ?>
-	</table>
-	</td>
-</tr>
 </table>
+
 </body>
 </html>

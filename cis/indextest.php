@@ -47,7 +47,7 @@ else
 if(isset($_GET['content']))
 	$content = $_GET['content'];
 else
-	$content = 'public/news.php';
+	$content = '../cms/news.php';
 ?>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -71,23 +71,26 @@ function changeSprache(sprache)
 	window.location.href="indextest.php?sprache="+sprache+"&content_id=<?php echo $id;?>&menu="+menu+"&content="+content;
 }
 </script>
-<body>
+<body style="margin-top:0; padding-top:0">
 <table class="tabcontent">
-	 
+	 <tr>
+	 	<td></td>
+	 	<td width="100%" ></td>
+	 	<td width="100%" ></td>
+	 	<td></td>
 	<tr>
 	    <td width="170" class="tdwrap" onclick="self.location.href='indextest.php'">
 			<div class="home_logo">&nbsp;</div>
 	    </td>
-        <td id="header" width="100%">
+        <td id="header" colspan="2">
     	    	<div class="header_line" ></div>
         </td>
-		<td nowrap class="tdwrap">
+		<td nowrap >
 			<div style="font-size: 10px;"><i>Powered by <a href="http://fhcomplete.technikum-wien.at/" target="blank">FH Complete 2.0</a></i></div>
 		</td>
 	</tr>
-
-   	 <tr>
-   	 <td></td>
+	<tr>
+		<td></td>
    	 <td align="right">
    	 <?php
 				$sprache = new sprache();
@@ -98,7 +101,7 @@ function changeSprache(sprache)
 				}
 				?>
 				</td>
-   	    <td nowrap><?php require_once('../include/'.EXT_FKT_PATH.'/cis_menu_global.inc.php'); 	?></td>
+   	    <td nowrap  colspan="2"><?php require_once('../include/'.EXT_FKT_PATH.'/cis_menu_global.inc.php'); 	?></td>
 	</tr>
 </table>
 <iframe id="menue" src="<?php echo $menu; ?>" name="menu" frameborder="0">

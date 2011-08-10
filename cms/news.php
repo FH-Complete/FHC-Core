@@ -55,8 +55,13 @@ $semester = (isset($_GET['semester'])?$_GET['semester']:null);
 
 $editable = isset($_GET['edit']);
 $news = new news();
+$all=false;
 
-$news->getnews(MAXNEWSALTER, $studiengang_kz, $semester, false, null, MAXNEWS);
+//Im Editiermodus werden auch die zukuenftigen News angezeigt
+if($editable)
+	$all=true;
+	
+$news->getnews(MAXNEWSALTER, $studiengang_kz, $semester, $all, null, MAXNEWS);
 
 $xml = '<?xml version="1.0" encoding="UTF-8"?><content>';
 
@@ -68,6 +73,10 @@ foreach($news->result as $row)
 	//das Datum des News Eintrages ist nicht im XML enthalten, es muss extra hinzugefuegt werden
 	$datum = '<datum><![CDATA['.$datum_obj->formatDatum($row->datum,'d.m.Y').']]></datum>';
 	
+	if($studiengang_kz<>0 && $editable && $row->studiengang_kz==0)
+	{
+		continue;
+	}
 	//Wenn der Parameter edit uebergeben wird, dann wird neben dem Datum ein Link zum Editieren des Eintrags angezeigt
 	if($editable) 
 		$id = '<news_id><![CDATA['.$row->news_id.']]></news_id>';
@@ -77,7 +86,7 @@ foreach($news->result as $row)
 	//$xml .= $content->content;
 }
 
-if($studiengang_kz!=0)
+if($studiengang_kz!=0 && !$editable)
 	$xml.=getStgContent($studiengang_kz, $semester, $sprache);
 
 $xml .= '</content>';

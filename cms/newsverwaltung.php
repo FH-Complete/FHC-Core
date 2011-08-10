@@ -37,13 +37,13 @@ $rechte->getBerechtigungen($uid);
 
 $p = new phrasen($sprache);
 
-if(isset($_GET['studiengang_kz']))
-	$studiengang_kz=$_GET['studiengang_kz'];
+if(isset($_REQUEST['studiengang_kz']))
+	$studiengang_kz=$_REQUEST['studiengang_kz'];
 else
 	$studiengang_kz='0';
 	
-if(isset($_GET['semester']))
-	$semester = $_GET['semester'];
+if(isset($_REQUEST['semester']))
+	$semester = $_REQUEST['semester'];
 else
 	$semester = null;
 
@@ -57,18 +57,23 @@ if(!$rechte->isBerechtigt('basis/news'))
 else
 	$berechtigt=true;
 
+//Lektoren duerfen nur Studiengangsspezifische und Freifaecher News Eintragen
+//Fuer allgemeine News wird die berechtigung basis/news benoetigt
 if(!$is_lector && !$berechtigt)
 	die('Sie haben keine Berechtigung zum Eintragen/Bearbeiten von News');
 
-if($studiengang_kz=='0' && is_null($semester))
+$news_id = (isset($_REQUEST['news_id'])?$_REQUEST['news_id']:null);
+
+if($studiengang_kz=='0' && is_null($semester) && $news_id=='')
 {
 	if(!$berechtigt)
 		die('Sie haben keine Berechtigung zum Eintragen/Bearbeiten von allgemeinen News');	
 }
 
-$news_id = (isset($_REQUEST['news_id'])?$_REQUEST['news_id']:null);
 $datum_obj = new datum();
 $content = new content();
+
+$message = '';
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "http://www.w3.org/TR/html4/strict.dtd">
@@ -155,33 +160,43 @@ if(isset($_GET['action']) && $_GET['action']=='add_uebersetzung')
 	$content->gesperrt_uid='';
 	
 	if($content->saveContentSprache())
-		echo '<span class="ok">Eintrag wurde erfolgreich angelegt</span>';
+		$message.= '<span class="ok">'.$p->t('global/erfolgreichgespeichert').'</span>';
 	else
-		echo '<span class="ok">'.$content->errormsg.'</span>';
+		$message.= '<span class="error">'.$content->errormsg.'</span>';
 }
 
 //Eintrag entfernen
 if(isset($_GET['action']) && $_GET['action']=='delete')
 {
-	if(!$rechte->isBerechtigt('basis/news',null, 'suid'))
-		die('Sie haben keine Berechtigung zum Löschen von Einträgen');
+	if(!$rechte->isBerechtigt('basis/news',null, 'suid') && !$is_lector)
+		die($p->t('global/keineBerechtigungFuerDieseSeite'));
 		
 	if(isset($_GET['news_id']) && is_numeric($_GET['news_id']))
 	{
 		$news_id = $_GET['news_id'];
 		$news = new news();
-		if($news->delete($news_id))
+		if($news->load($news_id))
 		{
-			echo '<span class="ok">News wurde erfolgreich gelöscht</span>';
-			$news_id='';
+			$studiengang_kz=$news->studiengang_kz;
+			$semester = $news->semester;
+		
+			if($news->delete($news_id))
+			{
+				$message.= '<span class="ok">'.$p->t('global/erfolgreichgelöscht').'</span>';
+				$news_id='';
+			}
+			else
+			{
+				$message.= '<span class="error">'.$news->errormsg.'</span>';
+			}		
 		}
 		else
 		{
-			echo '<span class="error">'.$news->errormsg.'</span>';
-		}		
+			$message.= '<span class="error">'.$p->t('global/fehlerBeimLesenAusDatenbank').'</span>';
+		}
 	}
 	else
-		die('NewsID ist ungueltig');
+		die($p->t('global/fehlerBeiDerParameteruebergabe'));
 	
 	
 }
@@ -189,6 +204,7 @@ if(isset($_GET['action']) && $_GET['action']=='delete')
 //Speichern eines Eintrags
 if(isset($_POST['save']))
 {
+	$save_error=false;
 	$news_id = $_POST['news_id'];
 	
 	$news = new news();
@@ -271,7 +287,15 @@ if(isset($_POST['save']))
 		$content->updateamum = date('Y-m-d H:i:s');
 		$content->updatevon = $uid;
 		$content->titel = $_POST['betreff_'.$lang];
-		$content->saveContentSprache();
+		if(!$content->saveContentSprache())
+		{
+			$message.= '<span class="error">'.$content->errormsg.'</span>';
+			$save_error=true;
+		}
+	}
+	if(!$save_error)
+	{
+		$message.= '<span class="ok">'.$p->t('global/erfolgreichgespeichert').'</span>';
 	}
 }
 
@@ -284,6 +308,12 @@ if($news_id!='')
 	$sprachen = $content->getLanguages($news->content_id);
 	$studiengang_kz = $news->studiengang_kz;
 	$semester = $news->semester;
+	
+	if($studiengang_kz=='0' && $semester=='' && !$berechtigt)
+	{
+		die($p->t('global/keineBerechtigungFuerDieseSeite'));	
+	}
+		
 }
 if($studiengang_kz=='0' && $semester=='')
 	$type=$p->t('news/allgemein');
@@ -295,9 +325,9 @@ else
 echo '<h1>'.$p->t('news/newsverwaltung').' - '.$type.'</h1>';
 echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
 	<input type="hidden" name="news_id" value="'.$news_id.'">
-		<table>
+		<table  width="100%">
 			<tr>
-				<td>
+				<td width="30%">
 					<table>
 						<tr>
 							<td>'.$p->t('news/sichtbarab').'</td>
@@ -360,7 +390,7 @@ else
 			<input type="hidden" name="semester" value="'.$semester.'">';
 }
 
-echo '</td></tr></table>';
+echo '</td><td align="right" valign="top">'.$message.'</td></tr></table>';
 
 //Tabs fuer alle vorhandenen Sprachen anlegen
 echo '<div id="tabs" style="font-size:80%;">

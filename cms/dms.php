@@ -43,18 +43,25 @@ if(!$doc->load($id,$version))
 
 if(!isset($_GET['notimeupdate']))
 	$doc->touch($doc->dms_id, $doc->version);
-
-if($handle = fopen(DMS_PATH.$doc->filename,"r"))
-{
-	header("Content-type: ".$doc->mimetype);
-	header('Content-Disposition: attachment; filename="'.$doc->name.'"');
 	
-	while (!feof($handle)) 
+$filename = DMS_PATH.$doc->filename;
+if(file_exists($filename))
+{
+	if($handle = fopen($filename,"r"))
 	{
-		echo fread($handle, 8192);
+		header('Content-type: '.$doc->mimetype);
+		header('Content-Disposition: inline; filename="'.$doc->name.'"');
+		header('Content-Length: ' .filesize($filename));
+		
+		while (!feof($handle)) 
+		{
+			echo fread($handle, 8192);
+		}
+		fclose($handle);
 	}
-	fclose($handle);
+	else
+		echo 'Fehler: Datei konnte nicht geoeffnet werden';
 }
 else
-	echo 'Fehler: Datei konnte nicht geoeffnet werden';
+	echo 'Die Datei existiert nicht';
 ?>

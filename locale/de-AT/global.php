@@ -153,6 +153,7 @@ $this->phrasen['global/bereitsReserviert']='bereits reserviert';
 $this->phrasen['global/spezialgruppe']='Spezialgruppe';
 $this->phrasen['global/datumsbereichZuGross'] = 'Datumsbereich ist zu groß';
 $this->phrasen['global/springeZuKw']='Springe zu KW';
+$this->phrasen['global/home']='HOME';
 
 //infrastruktur
 $this->phrasen['global/MACadresse']='MAC-Adresse';
