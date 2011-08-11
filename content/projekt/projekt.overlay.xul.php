@@ -30,7 +30,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 /*echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektdetail.overlay.xul.php"?>';*/
 ?>
-<overlay id="OverlayProjekt"
+<overlay id="overlay-projekt"
 	xmlns:html="http://www.w3.org/1999/xhtml"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 >
@@ -45,11 +45,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	<vbox id="box-projekt" flex="1" uid="" stg_kz="">
 	<popupset>
 		<popup id="projekt-tree-popup">
-			<menuitem label="Entfernen" oncommand="TaskDelete();" id="projekt-tree-popup-entf" disabled="false"/>
+			<menuitem id="menuitem-popup-projekt-entf" label="Entfernen" oncommand="ProjektDelete();" disabled="false"/>
 		</popup>
 	</popupset>
 		<toolbox>
-			<toolbar id="projekt-nav-toolbar">
+			<toolbar id="toolbar-projekt-main">
 				<toolbarbutton id="toolbarbutton-projekt-neu" label="Neues Projekt" oncommand="ProjektNeu();" disabled="true" image="../skin/images/NeuDokument.png" tooltiptext="Neuen Task anlegen" />
 				<toolbarbutton id="toolbarbutton-projekt-del" label="Loeschen" oncommand="ProjektDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Task löschen"/>
 				<toolbarbutton id="toolbarbutton-projekt-refresh" label="Aktualisieren" oncommand="ProjektTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
@@ -130,14 +130,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		<!-- *  Detail  * -->
 		<!-- ************ -->
 		<vbox flex="1"  style="overflow:auto;margin:0px;" persist="height">
-			<tabbox id="projekt-tabbox" flex="3" orient="vertical">
-				<tabs orient="horizontal" id="projekt-tabs">
-					<tab id="projekt-tab-detail" label="Details" />
-					<tab id="projekt-tab-mantis" label="Mantis" />
+			<tabbox id="tabbox-projekt" flex="3" orient="vertical">
+				<tabs id="tabs-projekt-main" orient="horizontal">
+					<tab id="tab-projekt-detail" label="Details" />
+					<tab id="tab-projekt-mantis" label="Mantis" />
 				</tabs>
-				<tabpanels id="projekt-tabpanels-main" flex="1">
-					<vbox id="projekt-detail" />
-					<vbox id="projekt-mantis" />
+				<tabpanels id="tabpanels-projekt-main" flex="1">
+					<vbox id="box-projekt-detail" />
+					<vbox id="box-projekt-mantis" />
 				</tabpanels>
 			</tabbox>
 		</vbox>

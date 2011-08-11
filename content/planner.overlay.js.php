@@ -20,7 +20,9 @@
 include('../config/vilesci.config.inc.php');
 ?>
 
-var TaskTreeDatasource;
+var datasourceTreeProjekt;
+var datasourceTreeProjektphase;
+var datasourceTreeProjekttask;
 
 function treeProjektSelect()
 {
@@ -33,19 +35,63 @@ function treeProjektSelect()
         if(tree.currentIndex==-1)
             return;
 	
-	var bezeichnung = getTreeCellText(tree, "tree-projekt-bezeichnung", tree.currentIndex);
-	var oe=getTreeCellText(tree, "tree-projekt-oe", tree.currentIndex);
-	var projekt_kurzbz=getTreeCellText(tree, "tree-projekt-projekt_kurzbz", tree.currentIndex);
-	var projekt_phase=getTreeCellText(tree, "tree-projekt-projekt_phase", tree.currentIndex);
-	var projekt_phase_id=getTreeCellText(tree, "tree-projekt-projekt_phase_id", tree.currentIndex);
+	var bezeichnung = getTreeCellText(tree, "treecol-projektmenue-bezeichnung", tree.currentIndex);
+	var oe=getTreeCellText(tree, "treecol-projektmenue-oe", tree.currentIndex);
+	var projekt_kurzbz=getTreeCellText(tree, "treecol-projektmenue-projekt_kurzbz", tree.currentIndex);
+	var projekt_phase=getTreeCellText(tree, "treecol-projektmenue-projekt_phase", tree.currentIndex);
+	var projekt_phase_id=getTreeCellText(tree, "treecol-projektmenue-projekt_phase_id", tree.currentIndex);
 	    
 	//alert("Projekt Phase ID "+projekt_phase_id);
         
-        // Neu und Delete Button fuer Projekte aktivieren/deaktivieren
+        // Neu und Delete Button fuer Projekte und Phasen aktivieren/deaktivieren
         if (projekt_kurzbz=='')
-            document.getElementById('toolbarbutton-projekt-neu').disabled=false;
+        {
+            document.getElementById('toolbarbutton-projektmenue-neu').disabled=false;
+            document.getElementById('toolbarbutton-projektphase-neu').disabled=true;
+        }
         else
-            document.getElementById('toolbarbutton-projekt-neu').disabled=true;
+        {
+            document.getElementById('toolbarbutton-projektmenue-neu').disabled=true;
+            document.getElementById('toolbarbutton-projektphase-neu').disabled=false;
+        }
+        
+        // Projekte neu laden
+	if(projekt_phase_id=='' && projekt_kurzbz=='')
+        {
+            try
+            {
+                var datasource="<?php echo APP_ROOT; ?>rdf/projekt.rdf.php?oe="+oe+"&foo=<?php echo time(); ?>";
+                //alert("OE "+oe+" | Projekt KurzBZ "+projekt_kurzbz+" | Datasource "+datasource);
+                var treeProjekt=document.getElementById('tree-projekt');
+                //treeProjekt.datasources=datasource;
+                //Alte DS entfernen
+                var oldDatasources = treeProjekt.database.GetDataSources();
+                while(oldDatasources.hasMoreElements())
+                {
+                    treeProjekt.database.RemoveDataSource(oldDatasources.getNext());
+                }
+
+                try
+                {
+                    datasourceTreeProjekt.removeXMLSinkObserver(observerTreeProjekt);
+                    treeProjekt.builder.removeListener(listenerTreeProjekt);
+                }
+                catch(e)
+                {}
+                 
+                var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+                datasourceTreeProjekt = rdfService.GetDataSource(datasource);
+                datasourceTreeProjekt.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+                datasourceTreeProjekt.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+                treeProjekt.database.AddDataSource(datasourceTreeProjekt);
+                datasourceTreeProjekt.addXMLSinkObserver(observerTreeProjekt);
+                treeProjekt.builder.addListener(listenerTreeProjekt);
+            }
+            catch(e)
+            {
+                    debug("whoops Projekt load failed with exception: "+e);
+            }
+        }
         
         // Projektphasen neu laden
 	if(projekt_phase_id=='' && projekt_kurzbz!='')
@@ -66,18 +112,18 @@ function treeProjektSelect()
 
                 try
                 {
-                    TaskTreeDatasource.removeXMLSinkObserver(TaskTreeSinkObserver);
+                    datasourceTreeProjektphase.removeXMLSinkObserver(observerTreeProjektphase);
                     treePhase.builder.removeListener(TaskTreeListener);
                 }
                 catch(e)
                 {}
                 
                 var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-                TaskTreeDatasource = rdfService.GetDataSource(datasources);
-                TaskTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-                TaskTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-                treePhase.database.AddDataSource(TaskTreeDatasource);
-                TaskTreeDatasource.addXMLSinkObserver(TaskTreeSinkObserver);
+                datasourceTreeTask = rdfService.GetDataSource(datasources);
+                datasourceTreeTask.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+                datasourceTreeTask.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+                treePhase.database.AddDataSource(datasourceTreeTask);
+                datasourceTreeTask.addXMLSinkObserver(observerTreeProjektphase);
                 treePhase.builder.addListener(TaskTreeListener);
                 treePhase.ref=ref;
             }
@@ -105,18 +151,18 @@ function treeProjektSelect()
 
                 try
                 {
-                    TaskTreeDatasource.removeXMLSinkObserver(TaskTreeSinkObserver);
+                    datasourceTreeTask.removeXMLSinkObserver(TaskTreeSinkObserver);
                     treeTask.builder.removeListener(TaskTreeListener);
                 }
                 catch(e)
                 {}
                 
                 var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-                TaskTreeDatasource = rdfService.GetDataSource(url);
-                TaskTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-                TaskTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-                treeTask.database.AddDataSource(TaskTreeDatasource);
-                TaskTreeDatasource.addXMLSinkObserver(TaskTreeSinkObserver);
+                datasourceTreeTask = rdfService.GetDataSource(url);
+                datasourceTreeTask.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+                datasourceTreeTask.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+                treeTask.database.AddDataSource(datasourceTreeTask);
+                datasourceTreeTask.addXMLSinkObserver(TaskTreeSinkObserver);
                 treeTask.builder.addListener(TaskTreeListener);
             }
             catch(e)

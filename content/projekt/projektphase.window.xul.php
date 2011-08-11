@@ -29,67 +29,79 @@ require_once('../../config/vilesci.config.inc.php');
 
 echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 	
-if(isset($_GET['oe']))
-	$oe=$_GET['oe'];
+// projektphase_id wenn das Formular zum bearbeiten verwendet wird
+if(isset($_GET['projektphase_id']))
+	$projektphase_id=$_GET['projektphase_id'];
 else 
-	$oe='';
+	$projektphase_id='';
 //echo $oe;
+// projekt_kurzbz muss immer gesetzt sein
 if(isset($_GET['projekt_kurzbz']))
 	$projekt_kurzbz=$_GET['projekt_kurzbz'];
 else 
-	$projekt_kurzbz='';
+	$errormsg='projekt_kurzbz ist nicht gesetzt';
+// projektphase_fk wenn eine neue Phase unter einer bestehenden angelegt wird
+if(isset($_GET['projektphase_fk']))
+	$projektphase_fk=$_GET['projektphase_fk'];
+else 
+	$projektphase_fk='';
 ?>
 
-<window id="window-projekt-neu" title="Neues Projekt anlegen"
+<window id="window-projektphase-neu" title="Neue Projektphase anlegen"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        onload="initProjekt(<?php echo ($projekt_kurzbz!=''?$projekt_kurzbz:"''"); ?>)"
+        onload="initProjektphase(<?php echo ($projekt_kurzbz!=''?$projekt_kurzbz:"''"); ?>)"
         >
 	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jquery.js"></script>
 	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jqSOAPClient.js"></script>
 	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jqXMLUtils.js"></script>
-	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>content/projekt/projekt.window.js.php" />
+	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>content/projekt/projektphase.window.js.php" />
 <vbox>
 
-<checkbox id="checkbox-projekt-neu" hidden="true"/>
+<checkbox id="checkbox-projektphase-neu" hidden="true"/>
 
-<groupbox id="groupbox-projekt" flex="1">
+<groupbox id="groupbox-projektphase" flex="1">
 	<caption label="Details"/>
-		<grid id="grid-projekt-detail" style="overflow:auto;margin:4px;" flex="1">
+		<grid id="grid-projektphase-detail" style="overflow:auto;margin:4px;" flex="1">
 		  	<columns  >
 				<column flex="1"/>
 				<column flex="5"/>
 			</columns>
 			<rows>
 				<row>
-					<label value="OE (Organisationseinheit)" control="textbox-projekt-oe"/>
-					<textbox id="textbox-projekt-oe" value="<?php echo $oe; ?>" maxlength="64"/>
+					<label value="ID" control="textbox-projektphase-projektphase_id "/>
+					<textbox id="textbox-projektphase-projektphase_id" value="<?php echo $projektphase_id; ?>" maxlength="64"/>
 				</row>
 				<row>
-					<label value="Kurzbezeichnung" control="textbox-projekt-projekt_kurzbz"/>
-					<textbox id="textbox-projekt-projekt_kurzbz" maxlength="128"/>
+					<label value="Projekt (Kurzbz)" control="textbox-projektphase-projekt_kurzbz"/>
+					<textbox id="textbox-projektphase-projekt_kurzbz" value="<?php echo $projekt_kurzbz; ?>" maxlength="128"/>
 				</row>
 				<row>
-					<label value="Titel" control="textbox-projekt-titel"/>
-   					<textbox id="textbox-projekt-titel" maxlength="64"/>
+					<label value="Projektphase (FK)" control="textbox-projektphase-projektphase_fk"/>
+   					<textbox id="textbox-projektphase-projektphase_fk" value="<?php echo $projektphase_fk; ?>" maxlength="64"/>
 				</row>				
 				<row>
-					<label value="Nummer" control="textbox-projekt-nummer"/>
-   					<textbox id="textbox-projekt-nummer" checked="true"/>
+					<label value="Bezeichnung" control="textbox-projektphase-bezeichnung"/>
+   					<textbox id="textbox-projektphase-bezeichnung" checked="true"/>
 				</row>
 				<row>
-					<label value="Beschreibung" control="textbox-projekt-beschreibung"/>
-   					<textbox id="textbox-projekt-beschreibung" checked="true"/>
+					<label value="Beschreibung" control="textbox-projektphase-beschreibung"/>
+   					<textbox id="textbox-projektphase-beschreibung" checked="true"/>
 				</row>
 				<row>
-					<label value="Beginn" control="textbox-projekt-beginn"/>
-   					<textbox id="textbox-projekt-beginn" checked="true"/>
+					<label value="Start" control="textbox-projektphase-start"/>
+   					<textbox id="textbox-projektphase-start" checked="true"/>
 				</row>
-      			<row>
-					<label value="Ende" control="textbox-projekt-ende"/>
-   					<textbox id="textbox-projekt-ende" checked="true"/>
-      			</row><row>
-					<label value="Test" control="textbox-projekt-test"/>
-   					<menulist id="menulist-projekt-test" flex="1">
+				<row>
+					<label value="Ende" control="textbox-projektphase-ende"/>
+   					<textbox id="textbox-projektphase-ende" checked="true"/>
+				</row>
+				<row>
+					<label value="Budget" control="textbox-projektphase-budget"/>
+   					<textbox id="textbox-projektphase-budget" checked="true"/>
+				</row>
+				<row>
+					<label value="Test" control="textbox-projektphase-test"/>
+   					<menulist id="menulist-projektphase-test" flex="1">
 							<menupopup>
 								<menuitem value="p" label="Privatkonto"/>
 								<menuitem value="f" label="Firmenkonto"/>
@@ -104,7 +116,7 @@ else
 	</grid>
 	<hbox>
 		<spacer flex="1" />
-		<button id="button-projekt-speichern" oncommand="saveProjekt()" label="Speichern" />
+		<button id="button-projektphase-speichern" oncommand="saveProjektphase()" label="Speichern" />
 	</hbox>
 </groupbox>
 </vbox>

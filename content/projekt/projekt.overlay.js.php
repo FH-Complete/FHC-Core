@@ -23,8 +23,8 @@ require_once('../../config/vilesci.config.inc.php');
 ?>
 // *********** Globale Variablen *****************//
 
-var TaskTreeDatasource; //Datasource des Task Tree
-var TaskSelectID=null; //ID des Task Eintrages der nach dem Refresh markiert werden soll
+var datasourceTreeProjekt; //Datasource des Projekt Tree
+var IDProjektSelect=null; //ID des Task Eintrages der nach dem Refresh markiert werden soll
 // ********** Observer und Listener ************* //
 
 // ****
@@ -32,7 +32,7 @@ var TaskSelectID=null; //ID des Task Eintrages der nach dem Refresh markiert wer
 // * startet Rebuild nachdem das Refresh
 // * der datasource fertig ist
 // ****
-var TaskTreeSinkObserver =
+var observerTreeProjekt =
 {
 	onBeginLoad : function(pSink) {},
 	onInterrupt : function(pSink) {},
@@ -41,7 +41,7 @@ var TaskTreeSinkObserver =
 	onEndLoad : function(pSink)
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-		document.getElementById('projekttask-tree').builder.rebuild();
+		document.getElementById('tree-projekt').builder.rebuild();
 	}
 };
 
@@ -49,7 +49,7 @@ var TaskTreeSinkObserver =
 // * Nach dem Rebuild wird die Lehreinheit wieder
 // * markiert
 // ****
-var TaskTreeListener =
+var listenerTreeProjekt =
 {
 	willRebuild : function(builder)
 	{

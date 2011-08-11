@@ -50,9 +50,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	</popupset>
 		<toolbox>
 			<toolbar id="projektphase-nav-toolbar">
-				<toolbarbutton id="projektphase-toolbar-neu" label="Neue Phase" oncommand="PhaseNeu();" disabled="true" image="../skin/images/NeuDokument.png" tooltiptext="Neuen Task anlegen" />
-				<toolbarbutton id="projektphase-toolbar-del" label="Loeschen" oncommand="PhaseDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Task löschen"/>
-				<toolbarbutton id="projektphase-toolbar-refresh" label="Aktualisieren" oncommand="PhaseTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
+				<toolbarbutton id="toolbarbutton-projektphase-neu" label="Neue Phase" oncommand="ProjektphaseNeu();" disabled="true" image="../skin/images/NeuDokument.png" tooltiptext="Neuen Task anlegen" />
+				<toolbarbutton id="toolbarbutton-projektphase-del" label="Loeschen" oncommand="ProjektphaseDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Task löschen"/>
+				<toolbarbutton id="toolbarbutton-projektphase-refresh" label="Aktualisieren" oncommand="ProjektphaseTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 			</toolbar>
 		</toolbox>
 
@@ -63,7 +63,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		<tree id="tree-projektphase" seltype="single" hidecolumnpicker="false" flex="1"
 				datasources="../../rdf/projektphase.rdf.php?foo=<?php echo time(); ?>" ref="http://www.technikum-wien.at/projektphase/Systementwicklung/Lernquadrat"
 				style="margin:0px;" enableColumnDrag="true"
-				onselect="TaskAuswahl(this);"
+				onselect="onselectTreeProjektphase(this);"
  				persist="height"
  				flags="dont-build-content"
  				context="projektphase-tree-popup"
