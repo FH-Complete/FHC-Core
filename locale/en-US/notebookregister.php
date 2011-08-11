@@ -1,5 +1,5 @@
 <?php
-$this->phrasen['notebookregister/notebook_absatz1']='If you have to register more than one Notebook, please contact <a class="Item" href="mailto:support@technikum-wien.at?Subject=Notebook-Registration">support@technikum-wien.at</a>.<br/><br/>Enter the MAC-adresse like: 00-50-DA-C2-32-1C, or 00:50:DA:C2:32:1C';
+$this->phrasen['notebookregister/notebook_absatz1']='If you have to register more than one Notebook, please contact <a class="Item" href="mailto:support@technikum-wien.at?Subject=Notebook-Registration">support@technikum-wien.at</a>.<br/><br/>Enter the MAC-adress like: 00-50-DA-C2-32-1C, or 00:50:DA:C2:32:1C';
 $this->phrasen['notebookregister/notebook_absatz2']='The changes will take effect after about 30 minutes. Please be patient.<br/><br/>For using the internet, please let.....<br/>Enter the proxy-server: <strong>proxy.technikum-wien.at</strong> and the port <strong>3128</strong> into your browsers preferences.';
 $this->phrasen['notebookregister/notebook_anmerkung']='fill out only when UID is not the same as the user';
 $this->phrasen['notebookregister/titelNotebookRegistration']='Infrastructure - Notebook-Registration';

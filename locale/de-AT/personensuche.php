@@ -1,4 +1,5 @@
 <?php
+$this->phrasen['personensuche/personensuche']='Personensuche';
 $this->phrasen['personensuche/sucheNach']='Suche nach';
 $this->phrasen['personensuche/kennzeichen']='Kennzeichen';
 $this->phrasen['personensuche/inGruppe']='in Gruppe';
