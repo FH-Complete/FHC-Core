@@ -26,19 +26,19 @@
  * Formular zum Senden eins Feedbacks an die CIS-Administratoren
  */
     require_once('../../../config/cis.config.inc.php');
-	require_once('../../../include/basis_db.class.php');
-	if (!$db = new basis_db())
-    	  die($p->t("global/fehlerBeimOeffnenDerDatenbankverbindung"));
-	  	
+	require_once('../../../include/basis_db.class.php');	  	
     require_once('../../../include/functions.inc.php');
     require_once('../../../include/mail.class.php');
 	require_once('../../../include/phrasen.class.php');
 	
-		$sprache = getSprache(); 
-		$p=new phrasen($sprache); 
+$sprache = getSprache(); 
+$p=new phrasen($sprache); 
 
-	if (!$user=get_uid())
-		die($p->t("global/nichtAngemeldet").'! <a href="javascript:history.back()">Zur&uuml;ck</a>');
+if (!$db = new basis_db())
+    	  die($p->t("global/fehlerBeimOeffnenDerDatenbankverbindung"));
+
+if (!$user=get_uid())
+	die($p->t("global/nichtAngemeldet").'! <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">

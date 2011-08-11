@@ -1,58 +1,54 @@
 <?php
-	/*
-	 * author: maximilian schremser
-	 * email: max@technikum-wien.at
-	 * date-created: ?? 2003
-	 * date-modified: ?? by ??
-	 *		  15.9.2004  by max schremser
-	 *
-	 * manual: es wurden keine neuen einträge in der dhcp.dat eingetragen
-	 *	   seit der letzten änderung, ich wurde von ferdinand esberger
-	 * 	   gebeten dies wieder in ordnung zu bringen
-	 */
-	require_once('../../../config/cis.config.inc.php');
+/*
+ * author: maximilian schremser
+ * email: max@technikum-wien.at
+ * date-created: ?? 2003
+ * date-modified: ?? by ??
+ *		  15.9.2004  by max schremser
+ *
+ * manual: es wurden keine neuen einträge in der dhcp.dat eingetragen
+ *	   seit der letzten änderung, ich wurde von ferdinand esberger
+ * 	   gebeten dies wieder in ordnung zu bringen
+ */
+require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/basis_db.class.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/File/SearchReplace.php');
+require_once('../../../include/File/Match.php');
+require_once('../../../include/phrasen.class.php'); 
+
+$sprache = getSprache(); 
+$p=new phrasen($sprache); 
+
+if (!$db = new basis_db())
+	die($p->t("global/fehlerBeimOeffnenDerDatenbankverbindung"));
+if (!$user=get_uid())
+	die($p->t("global/nichtAngemeldet").'! <a href="javascript:history.back()">'.$p->t("global/zurueck").'</a>');
 	
-	require_once('../../../include/basis_db.class.php');
-	if (!$db = new basis_db())
-	      die($p->t("global/fehlerBeimOeffnenDerDatenbankverbindung"));
-  
-	require_once('../../../include/functions.inc.php');
-	require_once('../../../include/File/SearchReplace.php');
-	require_once('../../../include/File/Match.php');
-	require_once('../../../include/phrasen.class.php'); 
+$mac_result = trim((isset($_REQUEST['mac_result']) ? $_REQUEST['mac_result']:''));
+$txtUID = trim((isset($_REQUEST['txtUID']) ? $_REQUEST['txtUID']:''));
+$txtPassword = trim((isset($_REQUEST['txtPassword']) ? $_REQUEST['txtPassword']:''));
 
-	if (!$user=get_uid())
-		die($p->t("global/nichtAngemeldet").'! <a href="javascript:history.back()">'.$p->t("global/zurueck").'</a>');
-
-		$sprache = getSprache(); 
-		$p=new phrasen($sprache); 
-
-	
-	$mac_result = trim((isset($_REQUEST['mac_result']) ? $_REQUEST['mac_result']:''));
-	$txtUID = trim((isset($_REQUEST['txtUID']) ? $_REQUEST['txtUID']:''));
-	$txtPassword = trim((isset($_REQUEST['txtPassword']) ? $_REQUEST['txtPassword']:''));
-
-	if(check_lektor($user))
-       	$is_lector=true;
-  	else
-	        $is_lector=false;
+if(check_lektor($user))
+	$is_lector=true;
+else
+	$is_lector=false;
 		 
-	function ip_increment($ip = "")
+function ip_increment($ip = "")
+{
+	$ip = split("\.", $ip);
+
+	if($ip[3] > 0 && $ip[3] < 254)
 	{
-		$ip = split("\.", $ip);
-
-        if($ip[3] > 0 && $ip[3] < 254)
-		{
-			++$ip[3];
-        }
-		else
-		{
-        	++$ip[2];
-        	$ip[3] = 1;
-        }
-
-		return join(".", $ip);
+		++$ip[3];
 	}
+	else
+	{
+		++$ip[2];
+		$ip[3] = 1;
+	}
+	return join(".", $ip);
+}
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
