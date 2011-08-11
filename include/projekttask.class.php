@@ -250,18 +250,18 @@ class projekttask extends basis_db
 
 	/**
 	 * Loescht den Datenensatz mit der ID die uebergeben wird
-	 * @param $projekt_kurzbz ID die geloescht werden soll
+	 * @param $projekttask_id ID die geloescht werden soll
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function delete($projekt_kurzbz)
+	public function delete($projekttask_id)
 	{
-		if(!is_numeric($projekt_kurzbz))
+		if(!is_numeric($projekttask_id))
 		{
-			$this->errormsg = 'Projektarbeit_id ist ungueltig';
+			$this->errormsg = 'Projekttask_id ist ungueltig';
 			return true;
 		}
 		
-		$qry = "DELETE FROM lehre.tbl_projektarbeit WHERE projekt_kurzbz='$projekt_kurzbz'";
+		$qry = "DELETE FROM fue.tbl_projekttask WHERE projekttask_id='$projekttask_id'";
 		
 		if($this->db_query($qry))
 		{
