@@ -247,12 +247,12 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 <hbox flex="1">
 	<tabbox id="tabbox-left" orient="vertical" flex="1">
 		<tabs orient="horizontal">
-			<tab id="tab-projekt" label="Projekt" />
-			<tab id="tab-ressource" label="Ressource" />
+			<tab id="tab-projekt" label="Projektmenue" />
+			<tab id="tab-ressource" label="Ressourcemenue" />
 		</tabs>
 		<tabpanels id="tabpanels-left" flex="1">
 			<vbox id="box-projektmenue" />
-			<tree id="tree-ressource" />
+			<tree id="box-ressourcemenue" />
 		</tabpanels>
 	</tabbox>
 	<splitter collapse="before" persist="state">

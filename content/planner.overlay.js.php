@@ -24,7 +24,7 @@ var datasourceTreeProjekt;
 var datasourceTreeProjektphase;
 var datasourceTreeProjekttask;
 
-function treeProjektSelect()
+function treeProjektmenueSelect()
 {
 	//document.getElementById('tempus-lva-filter').value='';
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
@@ -189,8 +189,9 @@ function treeProjektSelect()
 // Dialog fuer neues Projekt starten
 function ProjektNeu()
 {
-    var tree=document.getElementById('tree-projekt');
-    var oe=getTreeCellText(tree, "tree-projekt-oe", tree.currentIndex);
+    // netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect"); // Trick 17
+    var tree=document.getElementById('tree-projektmenue');
+    var oe=getTreeCellText(tree, "treecol-projektmenue-oe", tree.currentIndex);
     window.open('<?php echo APP_ROOT; ?>content/projekt/projekt.window.xul.php?oe='+oe,'Projekt anlegen', 'height=384,width=512,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no');
     //alert (oe);
 }
