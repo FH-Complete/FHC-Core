@@ -21,6 +21,7 @@
 
 require_once('../../config/cis.config.inc.php');
 require_once('../../include/news.class.php');
+require_once('../../include/content.class.php');
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -50,28 +51,45 @@ require_once('../../include/news.class.php');
 		  	$news = new news();
 		  	$news->getnews(MAXNEWSALTER,0,null, false, null, MAXNEWS);
 		  	$zaehler=0;
-		  	$open=true;
 		  	foreach ($news->result as $row)
 		  	{
+		  		$lang='German';
+				$content = new content();
+				$content->getContent($row->content_id, $lang, null, null, false);
+			
+				$xml_inhalt = new DOMDocument();
+				if($content->content!='')
+				{
+					$xml_inhalt->loadXML($content->content);
+				}
+		
+				if($xml_inhalt->getElementsByTagName('verfasser')->item(0))
+					$verfasser = $xml_inhalt->getElementsByTagName('verfasser')->item(0)->nodeValue;
+				if($xml_inhalt->getElementsByTagName('betreff')->item(0))
+					$betreff = $xml_inhalt->getElementsByTagName('betreff')->item(0)->nodeValue;
+				if($xml_inhalt->getElementsByTagName('text')->item(0))
+					$text = $xml_inhalt->getElementsByTagName('text')->item(0)->nodeValue;
+			
 		  		$zaehler++;
 		  		//no comment
 		  		$datum = date('d.m.Y',strtotime(strftime($row->datum)));
-
+		  		//DMS Pfad korrigieren damit die Bilder korrekt angezeigt werden
+				$text=mb_ereg_replace("dms.php","../../cms/dms.php",$text);
+				
 				//echo $datum.'&nbsp;'.$row->verfasser.'<br><br><strong>'.$row->betreff.'</strong><br>'.$row->text.'<br><br><br>
 				echo '<div class="news">';
 				echo '
 					<div class="titel">
 					<table width="100%">
 						<tr>
-							<td width="60%" align="left">'.$row->betreff.'</td>
+							<td width="60%" align="left">'.$betreff.'</td>
 							<!--<td width="30%" align="center"></td>-->
-							<td width="30%" align="right" style="display: '.($open?'none':'block').'" id="'.$zaehler.'Mehr" ><a href="#" class="Item" onclick="return show(\''.$zaehler.'\')">mehr &gt;&gt;</a></td>
-							<td width="30%" align="right" style="display: '.($open?'block':'none').'" id="'.$zaehler.'Verfasser">'.$row->verfasser.' <span style="font-weight: normal">( '.$datum.' )</span></td>
+							<td width="30%" align="right" id="'.$zaehler.'Verfasser">'.$verfasser.' <span style="font-weight: normal">( '.$datum.' )</span></td>
 						</tr>
 					</table>
 					</div>
-					<div class="text" style="display: '.($open?'block':'none').';" id="'.$zaehler.'Text">
-					'.$row->text.'
+					<div class="text" id="'.$zaehler.'Text">
+					'.$text.'
 					</div>
 					';
 				echo "</div><br />";

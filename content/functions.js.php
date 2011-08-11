@@ -1,3 +1,4 @@
+<?php
 /* Copyright (C) 2006 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
@@ -23,6 +24,9 @@
  *
  * enthaelt globale JS Funktionen
  */
+require_once('../config/vilesci.config.inc.php');
+require_once('../include/functions.inc.php');
+?>
 
 // ****
 // * Liefert den Value aus einer XML-Datasource
@@ -247,3 +251,11 @@ String.prototype.trim = function() {
 // ****
 String.prototype.startsWith = function(str)
 {return (this.match("^"+str)==str)}
+
+// ****
+// * Liefert den Usernamne des eingeloggten Users
+// ****
+function getUsername()
+{
+	return '<?php echo get_uid(); ?>';
+}

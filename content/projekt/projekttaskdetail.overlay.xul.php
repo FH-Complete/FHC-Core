@@ -38,7 +38,44 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	<!-- *  Projekttaskdetail   * -->
 	<!-- ************************ -->
 	<vbox id="projekttask-detail" flex="1">
-	<description>Task Details</description>
+		<description>Task Details</description>
+			
+		<grid id="grid-projekttask-detail" style="overflow:auto;margin:4px;" flex="1">
+		  	<columns  >
+				<column flex="1"/>
+				<column flex="5"/>
+			</columns>
+			<rows>
+				<row>
+					<label value="Task ID" control="textbox-projekttask-detail-projekttask_id "/>
+					<textbox id="textbox-projekttaskdetail-projekttask_id"/>
+				</row>
+				<row>
+					<label value="Projektphase ID" control="textbox-projekttask-detail-projektphase_id"/>
+					<textbox id="textbox-projekttaskdetail-projektphase_id"/>
+				</row>
+				<row>
+					<label value="Bezeichnung" control="textbox-projekttask-detail-bezeichnung"/>
+   					<textbox id="textbox-projekttask-detail-bezeichnung"/>
+				</row>
+				<row>
+					<label value="Beschreibung" control="textbox-projekttask-detail-beschreibung"/>
+   					<textbox id="textbox-projekttask-detail-beschreibung"/>
+				</row>
+				<row>
+					<label value="Aufwand" control="textbox-projekttask-detail-aufwand"/>
+   					<textbox id="textbox-projekttask-detail-aufwand"/>
+				</row>
+				<row>
+					<label value="MantisID" control="textbox-projekttask-detail-mantis_id"/>
+   					<textbox id="textbox-projekttask-detail-mantis_id"/>
+				</row>
+			</rows>
+		</grid>
+		<hbox>
+			<spacer flex="1" />
+			<button id="button-projekttask-detail-speichern" oncommand="TaskDetailSave()" label="Speichern" />
+		</hbox>
 	</vbox>
 	
 	<vbox id="projekttask-mantis" flex="1">

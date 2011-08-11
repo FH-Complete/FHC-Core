@@ -53,7 +53,7 @@ html>body #menue
 #content
 {
 	width:80%;
-	height:82%;
+	height:85%;
 	left:20%;
 }
 /*Alle au�er IE 6*/
@@ -241,11 +241,26 @@ TABLE.tabcontent
 	padding: 0px;
 	border-style: none;
 	width: 100%;
-	font-size: small; 
+	font-size: small;
 	/*
 	cellspacing: 0;
 	cellpadding: 0;
 	*/
+}
+
+TABLE.menue
+{
+	margin: 0px;
+	padding: 0px;
+	border-style: none;
+	width: 100%;
+	font-size: small;
+}
+
+TABLE.menue TD
+{
+	padding-bottom: 2px;
+	padding-top: 2px;
 }
 
 TABLE.tabcontent2
@@ -653,6 +668,10 @@ img#layout
 .error
 {
 	color: #ff0000;
+}
+.ok
+{
+	color: green;
 }
 .ausblenden {display:none;}
 .einblenden {display:block;}	
