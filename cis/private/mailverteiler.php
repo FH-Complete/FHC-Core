@@ -30,8 +30,8 @@ require_once('../../include/lehrverband.class.php');
 require_once('../../include/benutzerfunktion.class.php');
 require_once('../../include/phrasen.class.php');
 	
-		$sprache = getSprache(); 
-		$p=new phrasen($sprache); 
+$sprache = getSprache(); 
+$p=new phrasen($sprache); 
 
 if (!$db = new basis_db())
 	die($p->t("global/fehlerBeimOeffnenDerDatenbankverbindung"));
@@ -55,7 +55,7 @@ if(!$is_lector)
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
-	<title>Mailverteiler</title>
+	<title><?php echo $p->t('mailverteiler/mailverteiler');?></title>
 	<script language="JavaScript" type="text/javascript">
 	<!--
 		__js_page_array = new Array();
@@ -189,7 +189,7 @@ if(!$is_lector)
 		    // Kopfzeile hinausschreiben
 		    echo "<table class='tabcontent2' id='hide".$row->kuerzel."' >";
 		    echo '<tr onClick="hide_layer(\'hide'.$row->kuerzel.'\');show_layer(\'show'.$row->kuerzel.'\');">';
-		  	echo "   <td width=\"420\" class=\"ContentHeader2\"><img src='../../skin/images/bullet_arrow_right.png' title='anzeigen' alt='anzeigen' border='0'>&nbsp;";
+		  	echo "   <td width=\"420\" class=\"ContentHeader2\"><img src='../../skin/images/bullet_arrow_right.png' title='".$p->t('mailverteiler/anzeigen')."' alt='".$p->t('mailverteiler/anzeigen')."' border='0'>&nbsp;";
 		    echo "   $row->kuerzel - $row->bezeichnung<a name=\"$row->studiengang_kz\">&nbsp;</a></td>";
 		    echo "   <td width=\"23\" class=\"ContentHeader2\">&nbsp;</td>";
 		    echo "   <td width=\"300\" class=\"ContentHeader2\">&nbsp;</td>";
@@ -201,7 +201,7 @@ if(!$is_lector)
 		    echo "<table class='tabcontent2' style='display:none;' id='show".$row->kuerzel."'>";
 		    echo '<tr  onClick="show_layer(\'hide'.$row->kuerzel.'\');hide_layer(\'show'.$row->kuerzel.'\');">';
 		
-		  	echo "   <td width=\"420\" class=\"ContentHeader2\"><img src='../../skin/images/bullet_arrow_down.png' title='ausblenden' alt='ausblenden' border='0'>&nbsp;";
+		  	echo "   <td width=\"420\" class=\"ContentHeader2\"><img src='../../skin/images/bullet_arrow_down.png' title='".$p->t('mailverteiler/ausblenden')."' alt='".$p->t('mailverteiler/ausblenden')."' border='0'>&nbsp;";
 		    echo "   $row->kuerzel - $row->bezeichnung<a name=\"$row->studiengang_kz\">&nbsp;</a></td>";
 		    echo "   <td width=\"23\" class=\"ContentHeader2\">&nbsp;</td>";
 		    echo "   <td width=\"300\" class=\"ContentHeader2\">&nbsp;</td>";
@@ -239,7 +239,7 @@ if(!$is_lector)
 					{
 						/* open a popup containing the final dispatcher address */
 						if(MAILVERTEILER_SPERRE)
-							echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row1->gruppe_kurzbz).'&amp;desc='.$row1->beschreibung.'\',\'_blank\',\'width=500,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item"><img alt="Verteiler" src="../../skin/images/open.gif" title="Verteiler &ouml;ffnen"></a>';
+							echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row1->gruppe_kurzbz).'&amp;desc='.$row1->beschreibung.'\',\'_blank\',\'width=500,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item"><img alt="'.$p->t('mailverteiler/verteilerOeffnen').'" src="../../skin/images/open.gif" title="'.$p->t('mailverteiler/verteilerOeffnen').'"></a>';
 				    	echo "&nbsp;</td>";
 					
 					 	echo " <td width='200'>";
@@ -250,7 +250,7 @@ if(!$is_lector)
 					{
 						echo "&nbsp;</td>";
 						echo " <td width='200'>";
-						echo "gesperrt";
+						echo $p->t('mailverteiler/gesperrt');
 						echo "&nbsp;</td>";
 					}
 				}
@@ -265,7 +265,7 @@ if(!$is_lector)
 				if(strtolower($row1->gruppe_kurzbz)=='tw_std')
 					echo '<td width="100" align="right">';
 				else
-					echo ' <td width="100" align="right"><a href="#" onClick="javascript:window.open(\'pers_in_grp.php?grp='.$row1->gruppe_kurzbz.'\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item">Personen</a>';
+					echo ' <td width="100" align="right"><a href="#" onClick="javascript:window.open(\'pers_in_grp.php?grp='.$row1->gruppe_kurzbz.'\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item">'.$p->t('mailverteiler/personen').'</a>';
 				echo "&nbsp;</td>";
 
 				echo "</tr>\n";
@@ -278,18 +278,18 @@ if(!$is_lector)
 		  		$qry_stud = "SELECT count(*) as anzahl FROM public.tbl_student WHERE studiengang_kz='$row->studiengang_kz' AND student_uid NOT LIKE '_Dummy%'";
 
 				if(!$row_stud=$db->db_fetch_object($db->db_query($qry_stud)))
-					echo 'Fehler beim Laden der Studenten';
+					echo $p->t('mailverteiler/fehlerBeimLadenDerStudenten');
 
 		  		if($row_stud->anzahl>0)
 		  		{
-		  			echo "<tr><td width=\"420\" >&#8226; Alle Studenten dieses Studiengangs</td>";
+		  			echo "<tr><td width=\"420\" >&#8226; ".$p->t('mailverteiler/alleStudentenDiesesStudienganges')."</td>";
 
 					// ffe, 20060508: Display the opening link for department dispatchers only for students of the particular department
 					if($is_lector || $std_obj->studiengang_kz==$row->studiengang_kz || !MAILVERTEILER_SPERRE)
 					{
 						echo " <td width=\"20\">";
 						if(MAILVERTEILER_SPERRE)
-							echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row->kuerzel).'_std&amp;desc=Alle Studenten von '.strtolower($row->kuerzel).'\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item"><img alt="Verteiler" src="../../skin/images/open.gif" title="Verteiler &ouml;ffnen"></a></td>';
+							echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row->kuerzel).'_std&amp;desc='.$p->t('mailverteiler/alleStudentenVon').' '.strtolower($row->kuerzel).'\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item"><img alt="'.$p->t('mailverteiler/verteilerOeffnen').'" src="../../skin/images/open.gif" title="'.$p->t('mailverteiler/verteilerOeffnen').'"></a></td>';
 						/* open a popup containing the final dispatcher address */
 					    echo " <td width=\"200\" ><a href=\"mailto:".strtolower($row->kuerzel)."_std@".DOMAIN."\" class=\"Item\">".strtolower($row->kuerzel)."_std@".DOMAIN."</a></td>";
 					}
@@ -299,11 +299,11 @@ if(!$is_lector)
 			  			echo " <td width=\"300\" >gesperrt</td>";
 					}
 
-				    echo ' <td width="100" align="right"><a href="#" onClick="javascript:window.open(\'stud_in_grp.php?kz='.$row->studiengang_kz.'&amp;all=true\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item">Personen</a>';
+				    echo ' <td width="100" align="right"><a href="#" onClick="javascript:window.open(\'stud_in_grp.php?kz='.$row->studiengang_kz.'&amp;all=true\',\'_blank\',\'width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item">'.$p->t('mailverteiler/personen').'</a>';
 					echo "</tr>\n";
 		  		}
 	  			echo "\n";
-	  			echo '<tr><td><a href="#" onClick="return(js_toggle_container(\''.$row->kuerzel.'\'));" class="Item">&#8226; Studentenverteiler</a>';
+	  			echo '<tr><td><a href="#" onClick="return(js_toggle_container(\''.$row->kuerzel.'\'));" class="Item">&#8226; '.$p->t('mailverteiler/studentenverteiler').'</a>';
 				echo '</td></tr></table>';
 				echo '<table class="tabcontent2" id="'.$row->kuerzel.'" style="display: none">';
 
@@ -343,7 +343,7 @@ if(!$is_lector)
 				  				$param = "kz=".$row->studiengang_kz."&amp;sem=".$row1->semester;
 				  				$strhelp = mb_strtolower($row->kuerzel.trim($row1->semester).trim($row1->verband).trim($row1->gruppe));
 								echo "<tr ".$class.">\n";
-								echo "  <td width=\"420\">&nbsp;&nbsp;&nbsp;&#8226; Semester $row1->semester";
+								echo "  <td width=\"420\">&nbsp;&nbsp;&nbsp;&#8226; ".$p->t('global/semster')." $row1->semester";
 						  		if(trim($row1->verband)!='')
 						  		{
 						  			$param .="&amp;verband=$row1->verband";
@@ -357,7 +357,7 @@ if(!$is_lector)
 					  			echo "</td>";
 					  			echo "  <td width='23'></td>";
 					  			echo "  <td width=\"200\"><a href='mailto:$strhelp@".DOMAIN."' class=\"Item\">$strhelp@".DOMAIN."</a></td>";
-					  			echo "  <td width=\"100\" align=\"right\"><a class=\"Item\" href=\"#\" onClick='javascript:window.open(\"stud_in_grp.php?".$param."\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes,resizable=1\");return false;'>Personen</a></td>";
+					  			echo "  <td width=\"100\" align=\"right\"><a class=\"Item\" href=\"#\" onClick='javascript:window.open(\"stud_in_grp.php?".$param."\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes,resizable=1\");return false;'>".$p->t('mailverteiler/personen')."</a></td>";
 					  			echo "</tr>";
 					  			$zeilenzaehler++;
 		  					}
@@ -366,7 +366,7 @@ if(!$is_lector)
 		  		}
 		  		if($zeilenzaehler==0)
 		  		{
-		  			echo "<tr><td>Keine Verteiler vorhanden</td></tr>";
+		  			echo "<tr><td>".$p->t('mailverteiler/keineVerteilerVorhanden')."</td></tr>";
 		  		}
 		  		$zeilenzaehler=0;
 		  		echo "</table>";
