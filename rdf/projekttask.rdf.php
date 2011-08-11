@@ -26,13 +26,22 @@ require_once('../include/projekttask.class.php');
 
 $rdf_url='http://www.technikum-wien.at/projekttask/';
 
+$projekttask_obj = new projekttask();
 
 $projektphase_id=4; //zum Testen, ansonsten null
 if (isset($_GET['projektphase_id']))
+{
 	$projektphase_id=$_GET['projektphase_id'];
+	$projekttask_obj->getProjekttasks($projektphase_id);
+}
+	
+if(isset($_GET['projekttask_id']))
+{
+	$projekttask_obj->load($_GET['projekttask_id']);
+	$projekttask_obj->result[] = $projekttask_obj;
+}
 
-$projekttask_obj = new projekttask();
-$projekttask_obj->getProjekttasks($projektphase_id);
+
 //var_dump($projekttask_obj);
 ?>
 <RDF:RDF
@@ -50,7 +59,7 @@ for ($i=0;$i<count($projekttask_obj->result);$i++)
 	$currentPT=$projekttask->projekttask_id;
 	$nextPT=(($i<count($projekttask_obj->result)-1)?$projekttask_obj->result[$i+1]->projekttask_id:null);
 	
-	$descr.='<RDF:Description RDF:about="'.$rdf_url.$projekttask->projektphase_id.'/'.$projekttask->projekttask_id.'" >
+	$descr.='<RDF:Description RDF:about="'.$rdf_url.$projekttask->projekttask_id.'" >
 		<PROJEKTTASK:projekttask_id>'.$projekttask->projekttask_id.'</PROJEKTTASK:projekttask_id>
 		<PROJEKTTASK:projektphase_id>'.$projekttask->projektphase_id.'</PROJEKTTASK:projektphase_id>
 		<PROJEKTTASK:bezeichnung>'.$projekttask->bezeichnung.'</PROJEKTTASK:bezeichnung>
@@ -60,18 +69,18 @@ for ($i=0;$i<count($projekttask_obj->result);$i++)
 	</RDF:Description>'."\n";
 	
 	if ($lastPT!=$currentPT)
-		$sequenz.='	<RDF:li RDF:resource="'.$rdf_url.$projekttask->projektphase_id.'/'.$projekttask->projekttask_id.'" />
+		$sequenz.='	<RDF:li RDF:resource="'.$rdf_url.$projekttask->projekttask_id.'" />
 		<RDF:li>
-      				<RDF:Seq RDF:about="'.$rdf_url.$projekttask->projektphase_id.'/'.$projekttask->projekttask_id.'" >'."\n";
+      				<RDF:Seq RDF:about="'.$rdf_url.$projekttask->projekttask_id.'" >'."\n";
 	// Neue OE oder letzter Datensatz? Dann muss Sequenz geschlossen werden.
 	if ($nextPT!=$currentPT || $i==count($projekttask_obj->result)-1)
 	{
-		$sequenz.='	<RDF:li RDF:resource="'.$rdf_url.$projekttask->projektphase_id.'/'.$projekttask->projekttask_id.'" />'."\n";
+		$sequenz.='	<RDF:li RDF:resource="'.$rdf_url.$projekttask->projekttask_id.'" />'."\n";
 		$sequenz.='			</RDF:Seq>
       			</RDF:li>'."\n";
 	}
 	elseif ($lastPT==$currentPT || $nextPT==$currentPT || count($projekttask_obj->result)==1)
-		$sequenz.='<RDF:li RDF:resource="'.$rdf_url.$projekttask->projektphase_id.'/'.$projekttask->projekttask_id.'" />'."\n";
+		$sequenz.='<RDF:li RDF:resource="'.$rdf_url.$projekttask->projekttask_id.'" />'."\n";
 	$lastPT=$currentPT;
 }
 $sequenz='<RDF:Seq about="'.$rdf_url.'alle-projekttasks">'."\n\t".$sequenz.'
