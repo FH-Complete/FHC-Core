@@ -31,11 +31,12 @@ require_once('../../../include/benutzerfunktion.class.php');
 require_once('../../../include/globals.inc.php');
 require_once('../../../include/phrasen.class.php');
 
+$sprache = getSprache(); 
+	$p=new phrasen($sprache); 
+
 if (!$db = new basis_db())
     die($p->t("global/fehlerBeimOeffnenDerDatenbankverbindung"));
 	
-	$sprache = getSprache(); 
-	$p=new phrasen($sprache); 
 	
 $uid=get_uid();
 $cmbLektorMitarbeiter=(isset($_REQUEST['cmbLektorMitarbeiter'])?$_REQUEST['cmbLektorMitarbeiter']:'all');
@@ -830,7 +831,7 @@ if(isset($do_search) || $do_excel)
     <form target="_self" method="post" action="<?php echo $_SERVER["PHP_SELF"]; ?>" name="SearchFormular" id="SearchFormular" >
     <table class="tabcontent">
       <tr>
-        <td class="ContentHeader"><font class="ContentHeader">&nbsp;Personensuche <?php echo CAMPUS_NAME;?></font></td>
+        <td class="ContentHeader"><font class="ContentHeader">&nbsp;<?php echo $p->t('personensuche/personensuche');?> <?php echo CAMPUS_NAME;?></font></td>
       </tr>
       <tr>
         <td>&nbsp;</td>
