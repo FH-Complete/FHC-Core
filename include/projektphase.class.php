@@ -231,8 +231,8 @@ class projektphase extends basis_db
 	public function save($new=null)
 	{
 		//Variablen pruefen
-		if(!$this->validate())
-			return false;
+		//if(!$this->validate())
+		//	return false;
 
 		if($new==null)
 			$new = $this->new;
@@ -241,29 +241,20 @@ class projektphase extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 
-			$qry='BEGIN; INSERT INTO lehre.tbl_projektarbeit (projekttyp_kurzbz, titel, lehreinheit_id, student_uid, firma_id, note, punkte, 
-				beginn, ende, faktor, freigegeben, gesperrtbis, stundensatz, gesamtstunden, themenbereich, anmerkung, 
-				ext_id, insertamum, insertvon, updateamum, updatevon, titel_english) VALUES('.
-			     $this->addslashes($this->projekttyp_kurzbz).', '.
-			     $this->addslashes($this->titel).', '.
-			     $this->addslashes($this->lehreinheit_id).', '.
-			     $this->addslashes($this->student_uid).', '.
-			     $this->addslashes($this->firma_id).', '.
-			     $this->addslashes($this->note).', '.
-			     $this->addslashes($this->punkte).', '.
-			     $this->addslashes($this->beginn).', '.
+			$qry='BEGIN; INSERT INTO fue.tbl_projektphase (projekt_kurzbz, projektphase_fk, bezeichnung, 
+				beschreibung, start, ende, budget, insertvon, insertamum, updatevon, updateamum) VALUES ('.
+			     $this->addslashes($this->projekt_kurzbz).', ';
+			if ($this->projektphase_fk=='')
+				$qry.='NULL, ';
+			else
+				$qry.=$this->projektphase_fk.', ';
+			$qry.=$this->addslashes($this->bezeichnung).', '.
+			     $this->addslashes($this->beschreibung).', '.
+			     $this->addslashes($this->start).', '.
 			     $this->addslashes($this->ende).', '.
-			     $this->addslashes($this->faktor).', '.
-			     ($this->freigegeben?'true':'false').', '.
-			     $this->addslashes($this->gesperrtbis).', '.
-			     $this->addslashes($this->stundensatz).', '.
-			     $this->addslashes($this->gesamtstunden).', '.
-			     $this->addslashes($this->themenbereich).', '.
-			     $this->addslashes($this->anmerkung).', '.
-			     $this->addslashes($this->ext_id).',  now(), '.
+			     $this->addslashes($this->budget).', '.
 			     $this->addslashes($this->insertvon).', now(), '.
-			     $this->addslashes($this->updatevon).','.
-			     $this->addslashes($this->titel_english).');';
+			     $this->addslashes($this->updatevon).', now() );';
 		}
 		else
 		{
@@ -304,7 +295,7 @@ class projektphase extends basis_db
 			if($new)
 			{
 				//Sequence auslesen
-				$qry = "SELECT currval('lehre.tbl_projektarbeit_projekt_kurzbz_seq') as id;";
+				$qry = "SELECT currval('fue.tbl_projektphase_projektphase_id_seq') as id;";
 				if($this->db_query($qry))
 				{
 					if($row = $this->db_fetch_object())

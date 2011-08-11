@@ -39,7 +39,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
     </toolbox>
     <tree id="tree-projektmenue" onselect="treeProjektSelect();"
 	seltype="single" hidecolumnpicker="false" flex="1"
-	datasources="../rdf/projektphase.rdf.php?foo=<?php echo time(); ?>" ref="http://www.technikum-wien.at/projektphase/alle-projektphasen"
+	datasources="<?php echo APP_ROOT; ?>rdf/projektphase.rdf.php?foo=<?php echo time(); ?>" ref="http://www.technikum-wien.at/projektphase/alle-projektphasen"
 	enableColumnDrag="true"
     	ondraggesture="nsDragAndDrop.startDrag(event,lvbgrpDDObserver);"
 	ondragdrop="nsDragAndDrop.drop(event,verbandtreeDDObserver)"

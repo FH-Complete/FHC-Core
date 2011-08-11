@@ -30,13 +30,13 @@ loadVariables($user);
 // ****
 // * Laedt die zu bearbeitenden Daten
 // ****
-function initProjekt(projekt_kurzbz)
+function initProjektphase(projektphase_id)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	
 	/*if(projekt_kurzbz!='')
 	{
-		//Daten holen
+                //Daten holen
 		var url = '<?php echo APP_ROOT ?>rdf/bankverbindung.rdf.php?bankverbindung_id='+bankverbindung_id+'&'+gettimestamp();
 			
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
@@ -94,29 +94,31 @@ function initProjekt(projekt_kurzbz)
 // ****
 // * Speichern der Daten
 // ****
-function saveProjekt()
+function saveProjektphase()
 {
-    var oe_kurzbz=document.getElementById('textbox-projekt-oe').value;
-    var projekt_kurzbz=document.getElementById('textbox-projekt-projekt_kurzbz').value;
-    //alert (projekt_kurzbz);
-    var titel=document.getElementById('textbox-projekt-titel').value;
-    var nummer=document.getElementById('textbox-projekt-nummer').value;
-    var beschreibung=document.getElementById('textbox-projekt-beschreibung').value;
-    var beginn=document.getElementById('textbox-projekt-beginn').value;
-    var ende=document.getElementById('textbox-projekt-ende').value;
-    // Variablen checken
+    var projektphase_id=document.getElementById('textbox-projektphase-projektphase_id').value;
+    var projekt_kurzbz=document.getElementById('textbox-projektphase-projekt_kurzbz').value;
+    var projektphase_fk=document.getElementById('textbox-projektphase-projektphase_fk').value;
+     var bezeichnung=document.getElementById('textbox-projektphase-bezeichnung').value;
+    var beschreibung=document.getElementById('textbox-projektphase-beschreibung').value;
+    var start=document.getElementById('textbox-projektphase-start').value;
+    var ende=document.getElementById('textbox-projektphase-ende').value;
+    var budget=document.getElementById('textbox-projektphase-budget').value;
+    alert (projekt_kurzbz);
+   // Variablen checken
     
     // SOAP-Action
-    var soapBody = new SOAPObject("saveProjektDaten");
+    var soapBody = new SOAPObject("saveProjektphase");
+    soapBody.appendChild(new SOAPObject("projektphase_id")).val(projektphase_id);
     soapBody.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
-    soapBody.appendChild(new SOAPObject("oe_kurzbz")).val(oe_kurzbz);
-    soapBody.appendChild(new SOAPObject("titel")).val(titel);
-    soapBody.appendChild(new SOAPObject("nummer")).val(nummer);
+    soapBody.appendChild(new SOAPObject("projektphase_fk")).val(projektphase_fk);
+    soapBody.appendChild(new SOAPObject("bezeichnung")).val(bezeichnung);
     soapBody.appendChild(new SOAPObject("beschreibung")).val(beschreibung);
-    soapBody.appendChild(new SOAPObject("beginn")).val(beginn);
+    soapBody.appendChild(new SOAPObject("start")).val(start);
     soapBody.appendChild(new SOAPObject("ende")).val(ende);
+    soapBody.appendChild(new SOAPObject("budget")).val(budget);
     var sr = new SOAPRequest("saveProjektDaten",soapBody);
-    SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekt.soap.php";
+    SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projektphase.soap.php";
     SOAPClient.SendRequest(sr, clb_saveProjekt);
 		
     // if(window.opener.KontaktBankverbindungSpeichern(document))
