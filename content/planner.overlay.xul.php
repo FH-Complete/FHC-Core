@@ -34,10 +34,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
 	<toolbar id="toolbar-projektmenue">
 	    <toolbarbutton id="toolbarbutton-projektmenue-neu" label="Neues Projekt" oncommand="ProjektNeu();" disabled="true" image="../skin/images/NeuDokument.png" tooltiptext="Neues Projekt anlegen" />
 	    <toolbarbutton id="toolbarbutton-projektmenue-del" label="Loeschen" oncommand="ProjektDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Projekt löschen"/>
-	    <toolbarbutton id="toolbarbutton-projektmenue-refresh" label="Aktualisieren" oncommand="ProjektRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
+	    <toolbarbutton id="toolbarbutton-projektmenue-refresh" label="Aktualisieren" oncommand="ProjektmenueRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 	</toolbar>
     </toolbox>
-    <tree id="tree-projektmenue" onselect="treeProjektSelect();"
+    <tree id="tree-projektmenue" onselect="treeProjektmenueSelect();"
 	seltype="single" hidecolumnpicker="false" flex="1"
 	datasources="<?php echo APP_ROOT; ?>rdf/projektphase.rdf.php?foo=<?php echo time(); ?>" ref="http://www.technikum-wien.at/projektphase/alle-projektphasen"
 	enableColumnDrag="true"
@@ -48,23 +48,23 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
 	ondragexit="nsDragAndDrop.dragExit(event,verbandtreeDDObserver)"
 	>
 	<treecols>
-	    <treecol id="treecol-projektmenue-bezeichnung" label="Bezeichnung" flex="15" primary="true" />
+	    <treecol id="treecol-projektmenue-bezeichnung" label="Bezeichnung" flex="5" primary="true" />
 	    <splitter class="tree-splitter"/>
 	    <treecol id="treecol-projektmenue-oe" label="OE" flex="2" hidden="true" />
 	    <splitter class="tree-splitter"/>
 	    <treecol id="treecol-projektmenue-projekt_kurzbz" label="Projekt" flex="2" hidden="true"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="treecol-projektmenue-projekt_phase" label="Phase" flex="2" hidden="true"/>
+	    <treecol id="treecol-projektmenue-projekt_phase" label="Phase" flex="1" hidden="true"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="treecol-projektmenue-projekt_phase_id" label="PhaseID" flex="2" hidden="true"/>
+	    <treecol id="treecol-projektmenue-projekt_phase_id" label="PhaseID" flex="1" hidden="true"/>
 	    <splitter class="tree-splitter"/>
 	    <treecol id="treecol-projektmenue-titel" label="Titel" flex="2" hidden="true"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="treecol-projektmenue-nummer" label="Nummer" flex="1" hidden="false"/>
+	    <treecol id="treecol-projektmenue-nummer" label="Nummer" flex="1" hidden="true"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="treecol-projektmenue-beginn" label="Beginn" flex="1" hidden="false"/>
+	    <treecol id="treecol-projektmenue-beginn" label="Beginn" flex="2" hidden="false"/>
 	    <splitter class="tree-splitter"/>
-	    <treecol id="treecol-projektmenue-ende" label="Ende" flex="1" hidden="false"/>
+	    <treecol id="treecol-projektmenue-ende" label="Ende" flex="2" hidden="false"/>
 	</treecols>
 
 	<template>

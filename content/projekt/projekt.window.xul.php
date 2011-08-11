@@ -87,7 +87,8 @@ else
       			<row>
 					<label value="Ende" control="textbox-projekt-ende"/>
    					<textbox id="textbox-projekt-ende" checked="true"/>
-      			</row><row>
+      			</row>
+			<!-- <row>
 					<label value="Test" control="textbox-projekt-test"/>
    					<menulist id="menulist-projekt-test" flex="1">
 							<menupopup>
@@ -99,8 +100,8 @@ else
       			<row>
 					<label value="Verrechnungskonto" control="bankverbindung-textbox-verrechnung"/>
    					<checkbox id="bankverbindung-checkbox-verrechnung" checked="true"/>
-      			</row>
-			</rows>
+      			</row>-->
+		</rows>
 	</grid>
 	<hbox>
 		<spacer flex="1" />
