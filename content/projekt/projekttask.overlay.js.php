@@ -23,7 +23,6 @@ require_once('../../config/vilesci.config.inc.php');
 ?>
 // *********** Globale Variablen *****************//
 
-var TaskTreeDatasource; //Datasource des Task Tree
 var TaskSelectID=null; //ID des Task Eintrages der nach dem Refresh markiert werden soll
 // ********** Observer und Listener ************* //
 
@@ -246,46 +245,12 @@ function TaskDelete()
 // ****
 function TaskDetailReset()
 {
-	/*
-	document.getElementById('lehrveranstaltung-detail-textbox-lvnr').value='';
-	document.getElementById('lehrveranstaltung-detail-textbox-unr').value='';
-	document.getElementById('lehrveranstaltung-detail-textbox-lehrveranstaltung').value='';
-	document.getElementById('lehrveranstaltung-detail-checkbox-lehre').checked=true;
-	document.getElementById('lehrveranstaltung-detail-textbox-stundenblockung').value='';
-	document.getElementById('lehrveranstaltung-detail-textbox-wochenrythmus').value='';
-	document.getElementById('lehrveranstaltung-detail-textbox-startkw').value='';
-	document.getElementById('lehrveranstaltung-detail-textbox-anmerkung').value='';
-	document.getElementById('lehrveranstaltung-detail-menulist-sprache').value='German';
-	document.getElementById('lehrveranstaltung-detail-menulist-raumtyp').value='Dummy';
-	document.getElementById('lehrveranstaltung-detail-menulist-raumtypalternativ').value='Dummy';
-	document.getElementById('lehrveranstaltung-detail-menulist-studiensemester').value=getStudiensemester();
-	document.getElementById('lehrveranstaltung-detail-menulist-lehrform').value='UE';
-	document.getElementById('lehrveranstaltung-detail-textbox-lehreinheit_id').value='';
-
-	//mitarbeiterlehreinheit tree leeren
-	lektortree = document.getElementById('lehrveranstaltung-detail-tree-lehreinheitmitarbeiter');
-
-	//Alte DS entfernen
-	var oldDatasources = lektortree.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
-	{
-		lektortree.database.RemoveDataSource(oldDatasources.getNext());
-	}
-	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	lektortree.builder.rebuild();
-
-	//Gruppentree leeren
-	gruppentree = document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe');
-
-	//Alte DS entfernen
-	var oldDatasources = gruppentree.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
-	{
-		gruppentree.database.RemoveDataSource(oldDatasources.getNext());
-	}
-	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	gruppentree.builder.rebuild();
-	*/
+	document.getElementById('textbox-projekttaskdetail-projekttask_id').value='';
+	document.getElementById('textbox-projekttaskdetail-projektphase_id').value='';
+	document.getElementById('textbox-projekttask-detail-bezeichnung').value='';
+	document.getElementById('textbox-projekttask-detail-beschreibung').checked=true;
+	document.getElementById('textbox-projekttask-detail-aufwand').value='';
+	document.getElementById('textbox-projekttask-detail-mantis_id').value='';
 }
 
 // ****
@@ -293,26 +258,12 @@ function TaskDetailReset()
 // ****
 function TaskDisableFields(val)
 {
-	/*
-	//document.getElementById('lehrveranstaltung-detail-textbox-lvnr').disabled=val;
-	//document.getElementById('lehrveranstaltung-detail-textbox-unr').disabled=val;
-	//document.getElementById('lehrveranstaltung-detail-textbox-lehrveranstaltung').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-checkbox-lehre').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-textbox-stundenblockung').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-textbox-wochenrythmus').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-textbox-startkw').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-textbox-anmerkung').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-menulist-sprache').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-menulist-lehrfach').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-menulist-raumtyp').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-menulist-raumtypalternativ').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-menulist-studiensemester').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-menulist-lehrform').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-button-save').disabled=val;
-
-	document.getElementById('lehrveranstaltung-detail-textbox-unr').disabled=val;
-	*/
+	document.getElementById('textbox-projekttaskdetail-projekttask_id').disabled=val;
+	document.getElementById('textbox-projekttaskdetail-projektphase_id').disabled=val;
+	document.getElementById('textbox-projekttask-detail-bezeichnung').disabled=val;
+	document.getElementById('textbox-projekttask-detail-beschreibung').disabled=val;
+	document.getElementById('textbox-projekttask-detail-aufwand').disabled=val;
+	document.getElementById('textbox-projekttask-detail-mantis_id').disabled=val;
 }
 
 // ****
@@ -320,94 +271,51 @@ function TaskDisableFields(val)
 // ****
 function TaskDetailSave()
 {
-/*
+
 	//Werte holen
-	lvnr = document.getElementById('lehrveranstaltung-detail-textbox-lvnr').value;
-	unr = document.getElementById('lehrveranstaltung-detail-textbox-unr').value;
-	lehrveranstaltung = document.getElementById('lehrveranstaltung-detail-textbox-lehrveranstaltung').value;
-	lehre = document.getElementById('lehrveranstaltung-detail-checkbox-lehre').checked;
-	stundenblockung = document.getElementById('lehrveranstaltung-detail-textbox-stundenblockung').value;
-	wochenrythmus = document.getElementById('lehrveranstaltung-detail-textbox-wochenrythmus').value;
-	start_kw = document.getElementById('lehrveranstaltung-detail-textbox-startkw').value;
-	anmerkung = document.getElementById('lehrveranstaltung-detail-textbox-anmerkung').value;
-	sprache = document.getElementById('lehrveranstaltung-detail-menulist-sprache').value;
-	lehrfach = document.getElementById('lehrveranstaltung-detail-menulist-lehrfach').value;
-	raumtyp = document.getElementById('lehrveranstaltung-detail-menulist-raumtyp').value;
-	raumtypalternativ = document.getElementById('lehrveranstaltung-detail-menulist-raumtypalternativ').value;
-	studiensemester = document.getElementById('lehrveranstaltung-detail-menulist-studiensemester').value;
-	lehrform = document.getElementById('lehrveranstaltung-detail-menulist-lehrform').value;
+	projekttask_id = document.getElementById('textbox-projekttaskdetail-projekttask_id').value;
+	projektphase_id = document.getElementById('textbox-projekttaskdetail-projektphase_id').value;
+	bezeichnung = document.getElementById('textbox-projekttask-detail-bezeichnung').value;
+	beschreibung = document.getElementById('textbox-projekttask-detail-beschreibung').value;
+	aufwand = document.getElementById('textbox-projekttask-detail-aufwand').value;
+	mantis_id = document.getElementById('textbox-projekttask-detail-mantis_id').value;
 
-	if(lehrveranstaltung=='')
-		return false;
+	var soapBody = new SOAPObject("saveProjekttask");
+	soapBody.appendChild(new SOAPObject("projekttask_id")).val(projekttask_id);
+	soapBody.appendChild(new SOAPObject("projektphase_id")).val(projektphase_id);
+	soapBody.appendChild(new SOAPObject("bezeichnung")).val(bezeichnung);
+	soapBody.appendChild(new SOAPObject("beschreibung")).val(beschreibung);
+	soapBody.appendChild(new SOAPObject("aufwand")).val(aufwand);
+	soapBody.appendChild(new SOAPObject("mantis_id")).val(mantis_id);
+	soapBody.appendChild(new SOAPObject("user")).val(getUsername());
+	
+	var sr = new SOAPRequest("saveProjekttask",soapBody);
 
-	if(raumtyp=='')
+	SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekttask.soap.php?"+gettimestamp();
+	SOAPClient.SendRequest(sr, clb_TaskDetailSave);
+}
+
+// ****
+// * Callback Funktion nach Speichern eines Task
+// ****
+function clb_TaskDetailSave(respObj)
+{
+	try
 	{
-		alert('Raumtyp muss ausgewaehlt werden');
-		return false;
+		var id = respObj.Body[0].saveProjekttaskResponse[0].message[0].Text;
 	}
-
-	if(raumtypalternativ=='')
+	catch(e)
 	{
-		alert('RaumtypAlternativ muss ausgewaehlt werden');
-		return false;
+		var fehler = respObj.Body[0].Fault[0].faultstring[0].Text;
+		alert('Fehler: '+fehler);
+		return;
 	}
-
-	if(sprache=='')
-	{
-		alert('Sprache muss ausgewaehlt werden');
-		return false;
-	}
-
-
-	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
-	neu = document.getElementById('lehrveranstaltung-detail-checkbox-new').checked;
-
-	if (neu)
-	{
-		req.add('do','create');
-	}
-	else
-	{
-		req.add('do','update');
-		lehreinheit_id = document.getElementById('lehrveranstaltung-detail-textbox-lehreinheit_id').value;
-		req.add('lehreinheit_id',lehreinheit_id);
-	}
-	//alert(lehreinheit_id);
-	req.add('type', 'lehreinheit');
-	req.add('unr', unr);
-	req.add('lvnr', lvnr);
-	req.add('sprache', sprache);
-	req.add('lehrveranstaltung', lehrveranstaltung);
-	req.add('lehrfach_id', lehrfach);
-	req.add('raumtyp', raumtyp);
-	req.add('raumtypalternativ', raumtypalternativ);
-	req.add('lehre', lehre);
-	req.add('stundenblockung', stundenblockung);
-	req.add('wochenrythmus', wochenrythmus);
-	req.add('start_kw', start_kw);
-	req.add('studiensemester_kurzbz', studiensemester);
-	req.add('lehrform', lehrform);
-	req.add('anmerkung', anmerkung);
-
-	var response = req.executePOST();
-
-	var val =  new ParseReturnValue(response)
-
-	if (!val.dbdml_return)
-	{
-		alert(val.dbdml_errormsg)
-	}
-	else
-	{
-		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-		document.getElementById('lehrveranstaltung-detail-checkbox-new').checked=false;
-		//LvTreeRefresh();
-		LvSelectLehreinheit_id=val.dbdml_data;
-		LvOpenLehrveranstaltung_id=lehrveranstaltung;
-		LvTreeDatasource.Refresh(false); //non blocking
-		SetStatusBarText('Daten wurden gespeichert');
-	}
-*/
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		document.getElementById('textbox-projekttaskdetail-projekttask_id').value=id;
+		
+	TaskSelectID=id;
+	datasourceTreeTask.Refresh(false); //non blocking
+	SetStatusBarText('Daten wurden gespeichert');
 }
 
 // ****

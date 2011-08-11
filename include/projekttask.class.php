@@ -150,14 +150,11 @@ class projekttask extends basis_db
 	protected function validate()
 	{
 
-		//Gesamtlaenge pruefen
-		if (!is_numeric($this->projekttask_id))
-		{
-			$this->errormsg='Projekttask_id muss eine Zahl sein!';
-		}
+		//Gesamtlaenge pruefen}
 		if (!is_numeric($this->projektphase_id))
 		{
 			$this->errormsg='Projektphase_id muss eine Zahl sein!';
+			return false;
 		}
 		if(mb_strlen($this->bezeichnung)>256)
 		{
@@ -188,9 +185,8 @@ class projekttask extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 
-			$qry='BEGIN; INSERT INTO fue.tbl_projekttask (projekttask_id, projektphase_id, bezeichnung, beschreibung, aufwand, mantis_id, insertamum, 
+			$qry='BEGIN; INSERT INTO fue.tbl_projekttask (projektphase_id, bezeichnung, beschreibung, aufwand, mantis_id, insertamum, 
 				insertvon, updateamum, updatevon) VALUES('.
-			     $this->addslashes($this->projekttask_id).', '.
 			     $this->addslashes($this->projektphase_id).', '.
 			     $this->addslashes($this->bezeichnung).', '.
 			     $this->addslashes($this->beschreibung).', '.
@@ -204,14 +200,11 @@ class projekttask extends basis_db
 		else
 		{
 			$qry='UPDATE fue.tbl_projekttask SET '.
-				'projekttask_id='.$this->addslashes($this->projekttask_id).', '.
 				'projektphase_id='.$this->addslashes($this->projektphase_id).', '.
 				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
 				'beschreibung='.$this->addslashes($this->beschreibung).', '.
 				'aufwand='.$this->addslashes($this->aufwand).', '.
 				'mantis_id='.$this->addslashes($this->mantis_id).', '.
-				'insertamum='.$this->addslashes($this->insertamum).', '.
-				'insertvon='.$this->addslashes($this->insertvon).', '.
 				'updateamum= now(), '.
 				'updatevon='.$this->addslashes($this->updatevon).' '.
 				'WHERE projekttask_id='.$this->addslashes($this->projekttask_id).';';
@@ -250,7 +243,7 @@ class projekttask extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der Daten';
+			$this->errormsg = 'Fehler beim Speichern der Daten'.$qry.$this->db_last_error();
 			return false;
 		}
 	}

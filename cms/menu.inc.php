@@ -83,7 +83,7 @@ function drawEntry($item, $sprache)
 			DrawLink(APP_ROOT.'cms/content.php?content_id='.$content->content_id,'content',$content->titel, $content->content_id);
 		
 		echo '
-			<table class="tabcontent" id="Content'.$content->content_id.'" style="display: '.($content->menu_open?'visible':'none').'">';
+			<table class="menue" id="Content'.$content->content_id.'" style="display: '.($content->menu_open?'visible':'none').'">';
 		
 		$content->getChilds($content->content_id);
 		foreach($content->result as $row)

@@ -98,7 +98,7 @@ ob_start();
 </script>
 </head>
 <body style="margin:0; padding:0">
-<table class="tabcontent">
+<table class="menue">
 	<tr>
 		<td>&nbsp;</td>
 	</tr>

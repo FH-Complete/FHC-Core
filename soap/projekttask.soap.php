@@ -29,7 +29,7 @@ require_once('../include/basis_db.class.php');
 require_once('../include/projekttask.class.php');
 require_once('../include/datum.class.php');
 
-$SOAPServer = new SoapServer(APP_ROOT."/soap/projekttask.wsdl.php");
+$SOAPServer = new SoapServer(APP_ROOT."/soap/projekttask.wsdl.php?".microtime());
 $SOAPServer->addFunction("saveProjekttask");
 $SOAPServer->handle();
 
@@ -57,16 +57,19 @@ function saveProjekttask($projekttask_id, $projektphase_id, $bezeichnung, $besch
 	// wenn projekttaskt_id == leer -> neuer task anlegen ohne laden
 	if($projekttask_id != '')
 	{
-		if($task->load($projekttask_id)== false)
+		if($projekttask->load($projekttask_id))
 		{
-			$projekttask->new = true;
-			$projekttask->insertvon = $user; 
+			$projekttask->new = false;
 		}
 		else
-			$projekttast->new = false; 
+			return new SoapFault("Server", "Fehler beim Laden"); 
 	}
-	
-	$projekttask = new projekttask();
+	else
+	{
+		$projekttask->new=true;
+		$projekttask->insertvon = $user;
+	}
+
 	$projekttask->projekttask_id=$projekttask_id;
 	$projekttask->projektphase_id=$projektphase_id;
 	$projekttask->bezeichnung=$bezeichnung;
@@ -75,8 +78,10 @@ function saveProjekttask($projekttask_id, $projektphase_id, $bezeichnung, $besch
 	$projekttask->mantis_id = $mantis_id;
 	$projekttask->updatevon = $user;
 	
-	if($projekttask->save($new = true))
-		return $projekttask->projektphase_id; 
+	if($projekttask->save())
+	{
+		return $projekttask->projekttask_id;
+	} 
 	else
 		return new SoapFault("Server", $projekttask->errormsg);
 }
