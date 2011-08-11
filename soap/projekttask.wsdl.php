@@ -19,11 +19,8 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
 		<wsdl:part name="beschreibung" type="xsd:string"></wsdl:part>
 		<wsdl:part name="aufwand" type="xsd:string"></wsdl:part>
 		<wsdl:part name="mantis_id" type="xsd:string"></wsdl:part>
-		<wsdl:part name="insertamum" type="xsd:string"></wsdl:part>
-		<wsdl:part name="insertvon" type="xsd:string"></wsdl:part>
-		<wsdl:part name="updateamum" type="xsd:string"></wsdl:part>
-		<wsdl:part name="updatevon" type="xsd:string"></wsdl:part>
-       </wsdl:message>
+		<wsdl:part name="user" type="xsd:string"></wsdl:part>
+    </wsdl:message>
 
  	<wsdl:message name="SaveProjekttaskResponse">
        <wsdl:part name="message" type="xsd:string"></wsdl:part>
