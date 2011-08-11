@@ -2603,6 +2603,18 @@ if(!$result = @$db->db_query("SELECT beschreibung FROM campus.tbl_content LIMIT 
 		echo 'campus.tbl_content: Spalte beschreibung hinzugefuegt!<br>';
 }
 
+//fue.tbl_projektphase neue Spalte personentage
+if(!$result = @$db->db_query("SELECT personentage FROM fue.tbl_projektphase LIMIT 1;"))
+{
+	$qry = "ALTER TABLE fue.tbl_projektphase ADD COLUMN personentage integer;
+			GRANT SELECT, UPDATE ON SEQUENCE fue.seq_projektphase_projektphase_id TO vilesci;";
+			
+	if(!$db->db_query($qry))
+		echo '<strong>fue.tbl_projektphase: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'fue.tbl_projektphase: Spalte personentage hinzugefuegt!<br>';
+}
+
 echo '<br>';
 
 $tabellen=array(
