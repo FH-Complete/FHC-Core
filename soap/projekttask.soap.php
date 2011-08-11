@@ -50,7 +50,7 @@ ini_set("soap.wsdl_cache_enabled", "0");
  * @param date $updateamum
  * @param string $updatevon
  */
-function saveProjekttask($projekttask_id, $projektphase_id, $bezeichnung, $beschreibung, $aufwand, $mantis_id, $insertamum, $insertvon, $updateamum, $updatevon)
+function saveProjekttask($projekttask_id, $projektphase_id, $bezeichnung, $beschreibung, $aufwand, $mantis_id, $user)
 { 	
 	
 	$projekttask = new projekttask();
@@ -58,7 +58,10 @@ function saveProjekttask($projekttask_id, $projektphase_id, $bezeichnung, $besch
 	if($projekttask_id != '')
 	{
 		if($task->load($projekttask_id)== false)
-			$projekttask->new = true; 
+		{
+			$projekttask->new = true;
+			$projekttask->insertvon = $user; 
+		}
 		else
 			$projekttast->new = false; 
 	}
@@ -70,13 +73,10 @@ function saveProjekttask($projekttask_id, $projektphase_id, $bezeichnung, $besch
 	$projekttask->beschreibung = $beschreibung;
 	$projekttask->aufwand = $aufwand;
 	$projekttask->mantis_id = $mantis_id;
-	$projekttask->insertamum = $insertamum;
-	$projekttask->insertvon = $insertvon;
-	$projekttask->updateamum = $updateamum;
-	$projekttask->updatevon = $updatevon;
+	$projekttask->updatevon = $user;
 	
 	if($projekttask->save($new = true))
-		return "OK"; 
+		return $projekttask->projektphase_id; 
 	else
 		return new SoapFault("Server", $projekttask->errormsg);
 }
