@@ -196,6 +196,37 @@ function ProjektNeu()
     //alert (oe);
 }
 
+// *****
+// * Refresht den Projektmenue Tree
+// *****
+function ProjektmenueRefresh()
+{
+	try
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		url = "<?php echo APP_ROOT; ?>rdf/projektphase.rdf.php?"+gettimestamp();
+                
+		var treeProjektmenue=document.getElementById('tree-projektmenue');
+
+		//Alte DS entfernen
+		var oldDatasources = treeProjektmenue.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			treeProjektmenue.database.RemoveDataSource(oldDatasources.getNext());
+		}
+
+		
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		datasourceTreeProjektmenue = rdfService.GetDataSource(url);
+		datasourceTreeProjektmenue.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		treeProjektmenue.database.AddDataSource(datasourceTreeProjektmenue);
+                
+	}
+	catch(e)
+	{
+		debug("whoops Projektmenue load failed with exception: "+e);
+	}
+}
 
 function loadURL(event)
 {
