@@ -294,7 +294,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit' || $_GET['type']=='new'))
 					<SELECT name="wochentag" id="wochentag">
 						<OPTION value="">-- keine Auswahl --</OPTION>';
 	
-	foreach($tagbez as $key=>$day)
+	foreach($tagbez[1] as $key=>$day)
 	{
 		if($key==$cj->wochentag && $cj->wochentag!='')
 			$selected='selected="selected"';

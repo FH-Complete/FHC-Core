@@ -174,7 +174,7 @@ if(!$person->load($uid))
 			
 			for ($j=1; $j<7; $j++)
 			{
-				echo '<TR><TD>'.$tagbez[$j].'</TD>';
+				echo '<TR><TD>'.$tagbez[1][$j].'</TD>';
 			  	for ($i=0;$i<$num_rows_stunde;$i++)
 				{
 					if (isset($wunsch[$j][$i+1]))

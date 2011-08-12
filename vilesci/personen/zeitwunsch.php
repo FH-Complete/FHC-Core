@@ -20,36 +20,34 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
+/**
+ *	kopiert von stdplan/profile/zeitwuensche.php mit dem Unterschied,
+ *  dass der User hier parametrisiert ist + Speichern läuft hier über
+ *  POST statt GET - ist aber Geschmacksache
+ *
+ */
 
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
-			
-			
-	/**
-	 *	kopiert von stdplan/profile/zeitwuensche.php mit dem Unterschied,
-	 *  dass der User hier parametrisiert ist + Speichern läuft hier über
-	 *  POST statt GET - ist aber Geschmacksache
-	 *
-	 */
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/basis_db.class.php');
+include('../../include/functions.inc.php');
+include('../../include/globals.inc.php');
 
-	include('../../include/functions.inc.php');
-	include('../../include/globals.inc.php');
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
-	if (isset($_GET['uid']))
-	{
-		$uid=$_GET['uid'];
-	} 
-	else if (isset($_POST['uid']))
-	{
-		$uid=$_POST['uid'];
-	}
-	if (!isset($uid))
-	{
-		die( "uid nicht gesetzt");
-	}
+
+if (isset($_GET['uid']))
+{
+	$uid=$_GET['uid'];
+} 
+else if (isset($_POST['uid']))
+{
+	$uid=$_POST['uid'];
+}
+if (!isset($uid))
+{
+	die( "uid nicht gesetzt");
+}
 
 
 	//Stundentabelleholen
@@ -67,19 +65,19 @@
 				//echo $$var;
 				$gewicht=$_POST[$var];
 				$stunde=$i+1;
-				$query="SELECT * FROM campus.tbl_zeitwunsch WHERE mitarbeiter_uid='$uid' AND stunde=$stunde AND tag=$t";
+				$query="SELECT * FROM campus.tbl_zeitwunsch WHERE mitarbeiter_uid='".addslashes($uid)."' AND stunde='$stunde' AND tag='$t'";
 				if(! $erg_wunsch=$db->db_query($query))
 					die($db->db_last_error());
 				$num_rows_wunsch=$db->db_num_rows($erg_wunsch);
 				if ($num_rows_wunsch==0)
 				{
-					$query="INSERT INTO campus.tbl_zeitwunsch (mitarbeiter_uid, stunde, tag, gewicht) VALUES ('$uid', $stunde, $t, $gewicht)";
+					$query="INSERT INTO campus.tbl_zeitwunsch (mitarbeiter_uid, stunde, tag, gewicht) VALUES ('$uid', '$stunde', '$t', '$gewicht')";
 					if(!($erg=$db->db_query($query)))
 						die($db->db_last_error());
 				}
 				elseif ($num_rows_wunsch==1)
 				{
-					$query="UPDATE campus.tbl_zeitwunsch SET gewicht=$gewicht WHERE mitarbeiter_uid='$uid' AND stunde=$stunde AND tag=$t";
+					$query="UPDATE campus.tbl_zeitwunsch SET gewicht=$gewicht WHERE mitarbeiter_uid='$uid' AND stunde='$stunde' AND tag='$t'";
 					//echo $query;
 					if(!($erg=$db->db_query($query)))
 						die($db->db_last_error());
@@ -149,7 +147,7 @@
 	<?php
 	for ($j=1; $j<7; $j++)
 	{
-		echo '<TR><TD>'.$tagbez[$j].'</TD>';
+		echo '<TR><TD>'.$tagbez[1][$j].'</TD>';
 	  	for ($i=0;$i<$num_rows_stunde;$i++)
 		{
 			$index=$wunsch[$j][$i+1];
