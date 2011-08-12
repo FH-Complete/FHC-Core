@@ -2607,7 +2607,8 @@ if(!$result = @$db->db_query("SELECT beschreibung FROM campus.tbl_content LIMIT 
 if(!$result = @$db->db_query("SELECT personentage FROM fue.tbl_projektphase LIMIT 1;"))
 {
 	$qry = "ALTER TABLE fue.tbl_projektphase ADD COLUMN personentage integer;
-			GRANT SELECT, UPDATE ON SEQUENCE fue.seq_projektphase_projektphase_id TO vilesci;";
+			GRANT SELECT, UPDATE ON SEQUENCE fue.seq_projektphase_projektphase_id TO vilesci;
+			GRANT SELECT, UPDATE ON SEQUENCE fue.seq_projekttask_projekttask_id TO vilesci;";
 			
 	if(!$db->db_query($qry))
 		echo '<strong>fue.tbl_projektphase: '.$db->db_last_error().'</strong><br>';
