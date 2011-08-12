@@ -97,7 +97,7 @@ Anzahl der Lektoren: <?PHP echo $anz_lektoren; ?>
 	<?php
 	for ($j=1; $j<7; $j++)
 	{
-		echo '<TR><TD>'.$tagbez[$j].'</TD>';
+		echo '<TR><TD>'.$tagbez[1][$j].'</TD>';
 	  	for ($i=0;$i<$num_rows_stunde;$i++)
 		{
 			$pos=$wunsch[$j][$i+1][4]+$wunsch[$j][$i+1][5];
@@ -134,7 +134,7 @@ Details
 	<?php
 	for ($j=1; $j<7; $j++)
 	{
-		echo '<TR><TD>'.$tagbez[$j].'</TD>';
+		echo '<TR><TD>'.$tagbez[1][$j].'</TD>';
 	  	for ($i=0;$i<$num_rows_stunde;$i++)
 		{
 			echo '<TD>';

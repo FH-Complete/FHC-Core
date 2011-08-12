@@ -118,9 +118,9 @@ echo '"Datum"'.$trenn;
 for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
 {
 	$tag=date('d',$ts);
-	$wt=date('w',$ts);
+	$wt=date('N',$ts);
 	$monat=date('M',$ts);
-	echo '"'.$tagbez[$wt].' '.$tag.'.'.$monat.'"'.$trenn;
+	echo '"'.$tagbez[1][$wt].' '.$tag.'.'.$monat.'"'.$trenn;
 }
 $zs=new zeitsperre();
 foreach ($mitarbeiter as $ma)
@@ -131,7 +131,7 @@ foreach ($mitarbeiter as $ma)
 	{
 		$tag=date('d',$ts);
 		$monat=date('M',$ts);
-		$wt=date('w',$ts);
+		$wt=date('N',$ts);
 		$grund=$zs->getTyp($ts);
 		$erbk=$zs->getErreichbarkeit($ts);
 		echo '"'.$grund.' - '.$erbk.'"'.$trenn;
