@@ -22,17 +22,18 @@
 /*
  * Erstellt eine Liste mit dem Lehrveranstaltungen und Betreuungen denen der Lektor zugeteilt ist
  */
-	require_once('../../../config/cis.config.inc.php');
-  require_once('../../../include/basis_db.class.php');
-  if (!$db = new basis_db())
+require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/basis_db.class.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/studiengang.class.php');
+require_once('../../../include/person.class.php');
+require_once('../../../include/benutzer.class.php');
+require_once('../../../include/mail.class.php');
+require_once('../../../include/phrasen.class.php');
+
+	if (!$db = new basis_db())
       die('Fehler beim Oeffnen der Datenbankverbindung');
   
-	require_once('../../../include/functions.inc.php');
-	require_once('../../../include/studiengang.class.php');
-	require_once('../../../include/person.class.php');
-	require_once('../../../include/benutzer.class.php');
-	require_once('../../../include/mail.class.php');
-
 	$adress=MAIL_ADMIN;
 
 	$user=get_uid();
@@ -44,23 +45,6 @@
 	if (isset($_GET['stdsem']))
 		$stdsem=$_GET['stdsem'];
 
-	
-##	if(defined('MAIL_DEBUG') && MAIL_DEBUG!='') // Testsystem
-#	{	
-#		$stdsem='WS2009';
-#		$uid='ahofmann';
-#		$user=$uid;
-#	}
-	
-	/*
-	if ($uid!=$user)
-	{
-		//wenn der UID Parameter nicht dem eingeloggten User entspricht wird ein Mail an die Administratoren gesendet.
-		$mail = new mail($adress,'vilesci@'.DOMAIN,'Unerlaubter Zugriff auf Lehrveranstaltungen',"User $user hat versucht die LVAs von User $uid zu betrachten!");
-		$mail->send();
-		die("Keine Berechtigung!");
-	}*/
-
 	//Studiensemester abfragen.
 	$sql_query='SELECT * FROM public.tbl_studiensemester WHERE ende>=now() ORDER BY start';
 	$result_stdsem=$db->db_query($sql_query);
@@ -68,8 +52,9 @@
 	if (!isset($stdsem))
 		$stdsem=$db->db_result($result_stdsem,0,"studiensemester_kurzbz");
 
+	$p = new phrasen(getSprache());
 /*
-0000453: Sortierung von LVs - �Meine LV�
+0000453: Sortierung von LVs - Meine LV
 1. Bachelor
 2. Name des Bachelors
 3. Studienjahr
@@ -95,54 +80,60 @@
 		JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 		JOIN public.tbl_studiengang USING(studiengang_kz)
 		JOIN lehre.tbl_lehrfach USING(lehrfach_id)
-		WHERE studiensemester_kurzbz='$stdsem' AND mitarbeiter_uid='$uid'";
+		WHERE studiensemester_kurzbz='".addslashes($stdsem)."' AND mitarbeiter_uid='".addslashes($uid)."'";
  	$sql_query.=" ORDER BY stg_kurzbz,lv_semester,lv_bezeichnung";
 	$result=$db->db_query($sql_query);
 	$num_rows=$db->db_num_rows($result);
-?>
-<html>
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title>Reservierungsliste</title>
-	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
-	<script language="Javascript">
-	<!--
-	function printhelp()
-	{
-		alert('Erklärung\n'+
-			'LVNR: Interne FAS-Nummer der Lehrveranstaltung\n'+
-			'STG-S-V-G: Studiengang-Semester-Verband-Gruppe\n'+
-			'Gruppe: Spezialgruppen (Module, Projektgruppen, Spezialisierungsgruppen)\n'+
-			'Block: blockung (1->Einzelstunden; 2->Doppelstunden; ...)\n'+
-			'WR: Wochenrythmus (1->jede Woche; 2->jede 2. Woche; ...)\n'+
-			'Std: gesamte Semesterstunden\n'+
-			'KW: Kalenderwoche in der die Lehrveranstaltung startet');
-	}
-	-->
-	</script>
-</head>
-<body id="inhalt">
-	<H2>
-		<table class="tabcontent">
-		<tr>
-			<td>
-				&nbsp;<a class="Item" href="index.php">Userprofil</a> &gt;&gt;
-				&nbsp;Lehrveranstaltungen (<?php echo $stdsem;?>)
-			</td>
-			<td align="right"></td>
-		</tr>
-		</table>
-	</H2>
-	<?php
+
+	echo '
+	<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>'.$p->t('lvaliste/titel').'</title>
+		<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
+		<script language="Javascript">
+		<!--
+		function printhelp()
+		{
+			alert("'.$p->t('lvaliste/hilfeText').'");
+		}
+		-->
+		</script>
+	</head>
+	<body id="inhalt">
+	<H1>'.$p->t('lvaliste/titel').' ( '.$stdsem.' )</H1>';
+	echo '<table width="100%"><tr><td>';
 	for ($i=0;$i<$num_rows_stdsem;$i++)
 	{
 		$row=$db->db_fetch_object($result_stdsem);
 		echo '<A class="Item" href="lva_liste.php?uid='.$uid.'&stdsem='.$row->studiensemester_kurzbz.'">'.$row->studiensemester_kurzbz.'</A> - ';
 	}
+	echo '</td><td align="right">';
+	echo '<a href="#" onclick="printhelp()" class="Item">'.$p->t('lvaliste/hilfeAnzeigen').'</a>';
+	echo '</td></tr></table>';
 	if ($num_rows>0)
 	{
-		echo '<BR><BR><H3>Lehrveranstaltungen - <a href="#" onclick="printhelp()" class="Item">Hilfe</a></H3><table border="0">';
-		echo '<tr class="liste"><th>LVNR</th><th>Lehrfach</th><th>Lehrform</th><th>LV Bezeichnung</th><th>Lehrfach Bezeichnung</th><th>Lektor</th><th>STG</th><th>S</th><th>Gruppen</th><th>Raumtyp</th><th>Alternativ</th><th>Block</th><th>WR</th><th>Std</th><th>KW</th><th>Anmerkung</th></tr>';
+		
+		echo '<h3>'.$p->t('lvaliste/lehrveranstaltungen').'</h3>';
+		echo '
+		<table border="0">
+			<tr class="liste">
+				<th>'.$p->t('lvaliste/lehrfach').'</th>
+				<th>'.$p->t('lvaliste/lehrform').'</th>
+				<th>'.$p->t('lvaliste/lvBezeichnung').'</th>
+				<th>'.$p->t('lvaliste/lehrfachBezeichnung').'</th>
+				<th>'.$p->t('lvaliste/lektor').'</th>
+				<th>'.$p->t('lvaliste/studiengang').'</th>
+				<th>'.$p->t('lvaliste/semester').'</th>
+				<th>'.$p->t('lvaliste/gruppen').'</th>
+				<th>'.$p->t('lvaliste/raumtyp').'</th>
+				<th>'.$p->t('lvaliste/raumtypalternativ').'</th>
+				<th>'.$p->t('lvaliste/blockung').'</th>
+				<th>'.$p->t('lvaliste/wochenrythmus').'</th>
+				<th>'.$p->t('lvaliste/stunden').'</th>
+				<th>'.$p->t('lvaliste/kalenderwoche').'</th>
+				<th>'.$p->t('lvaliste/anmerkung').'</th>
+			</tr>';
 		$stg_obj = new studiengang();
 		$stg_obj->getAll();
 		
@@ -152,21 +143,15 @@
 			$row=$db->db_fetch_object($result);
 
 			echo '<tr class="liste'.$zeile.'">';
-			echo '<td>'.$row->lvnr.'</td>';
 			echo '<td>'.$row->lehrfach.'</td>';
-			echo '<td>'.$row->lehrform_kurzbz.'</td>';
-##			$qry = "SELECT bezeichnung FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='$row->lehrveranstaltung_id'";
-#			$result_lv = $db->db_query($qry);
-#			$row_lv = $db->db_fetch_object($result_lv);
-#			echo '<td>'.$row_lv->bezeichnung.'</td>';
-	
+			echo '<td>'.$row->lehrform_kurzbz.'</td>';	
 			echo '<td>'.$row->lv_bezeichnung.'</td>';			
 			echo '<td>'.$row->lehrfach_bez.'</td>';
 			echo '<td>'.$row->lektor.'</td>';
 			echo '<td>'.$row->stg_kurzbz.'</td>';
 			echo '<td>'.$row->semester.'</td>';
 			
-			$qry ="SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
+			$qry ="SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='".addslashes($row->lehreinheit_id)."'";
 			$gruppe='';
 			if($result_grp = $db->db_query($qry))
 			{
@@ -191,7 +176,7 @@
 		echo '</table>';
 	}
 	else
-		echo 'Keine Datens&auml;tze vorhanden!<BR>';
+		echo $p->t('lvaliste/keineDatensaetze').'<BR>';
 		
 	//Betreuungen
 
@@ -207,9 +192,9 @@
 			WHERE
 				tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND
 				tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
-				tbl_lehreinheit.studiensemester_kurzbz='$stdsem' AND
+				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stdsem)."' AND
 				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
-				tbl_projektbetreuer.person_id='$mitarbeiter->person_id'";
+				tbl_projektbetreuer.person_id='".addslashes($mitarbeiter->person_id)."'";
 	
 	$stg_obj = new studiengang();
 	$stg_obj->getAll();
@@ -218,19 +203,19 @@
 	{
 		if($db->db_num_rows($result)>0)
 		{
-			echo '<H3>Betreuungen</H3>';
+			echo '<H3>'.$p->t('lvaliste/betreuungen').'</H3>';
 			echo '<table>';
 			echo '<tr class="liste">';
-			echo '<th>Stg</th>';
-			echo '<th>Sem</th>';
-			echo '<th>Lehrveranstaltung</th>';
-			echo '<th>Student</th>';
-			echo '<th>Titel der Projektarbeit</th>';
+			echo '<th>'.$p->t('lvaliste/studiengang').'</th>';
+			echo '<th>'.$p->t('lvaliste/semester').'</th>';
+			echo '<th>'.$p->t('lvaliste/lvBezeichnung').'</th>';
+			echo '<th>'.$p->t('lvaliste/student').'</th>';
+			echo '<th>'.$p->t('lvaliste/titelProjektarbeit').'</th>';
 			echo '</tr>';
-			
+			$i=0;
 			while($row = $db->db_fetch_object($result))
 			{
-				echo '<tr>';
+				echo '<tr class="liste'.($i%2).'">';
 				
 				echo '<td>'.$stg_obj->kuerzel_arr[$row->studiengang_kz].'</td>';
 				echo '<td>'.$row->semester.'</td>';
@@ -239,6 +224,7 @@
 				echo '<td>'.$row->titel.'</td>';
 				
 				echo '</tr>';
+				$i++;
 			}
 			echo '</table>';
 		}
@@ -258,12 +244,12 @@
 			WHERE
 				tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
-				tbl_lehreinheit.studiensemester_kurzbz='$stdsem' AND
-				(tbl_lehrveranstaltung.koordinator='$uid' 
+				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stdsem)."' AND
+				(tbl_lehrveranstaltung.koordinator='".addslashes($uid)."' 
 				OR 
 				 ( tbl_lehrveranstaltung.koordinator is null and (tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz) IN (SELECT studiengang_kz, fachbereich_kurzbz 
 				 																FROM public.tbl_benutzerfunktion JOIN public.tbl_studiengang USING(oe_kurzbz)
-									 										  WHERE funktion_kurzbz='fbk' AND uid='$uid' 
+									 										  WHERE funktion_kurzbz='fbk' AND uid='".addslashes($uid)."' 
 														  					and ( tbl_benutzerfunktion.datum_bis is null or now() between tbl_benutzerfunktion.datum_von and tbl_benutzerfunktion.datum_bis )
 																			))
 				 )
@@ -275,18 +261,19 @@
 	{
 		if($db->db_num_rows($result)>0)
 		{
-			echo '<H3>Koordination</H3>';
+			echo '<H3>'.$p->t('lvaliste/koordination').'</H3>';
 			echo '<table>';
 			echo '<tr class="liste">';
-			echo '<th>Stg</th>';
-			echo '<th>Sem</th>';
-			echo '<th>Institut</th>';
-			echo '<th>LV</th>';
-			echo '<th>Lektoren</th>';
+			echo '<th>'.$p->t('lvaliste/studiengang').'</th>';
+			echo '<th>'.$p->t('lvaliste/semester').'</th>';
+			echo '<th>'.$p->t('lvaliste/institut').'</th>';
+			echo '<th>'.$p->t('lvaliste/lvBezeichnung').'</th>';
+			echo '<th>'.$p->t('lvaliste/lektor').'</th>';
 			echo '</tr>';
+			$i=0;
 			while($row = $db->db_fetch_object($result))
 			{
-			//Fachbereichskoordinatoren holen
+				//Fachbereichskoordinatoren holen
 				$qry = "SELECT distinct
 							uid,titelpre, titelpost, vorname, nachname
 						FROM 
@@ -296,10 +283,10 @@
 							lehre.tbl_lehreinheit
 						WHERE 
 							tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
-							tbl_lehreinheit.lehrveranstaltung_id='$row->lehrveranstaltung_id' AND
+							tbl_lehreinheit.lehrveranstaltung_id='".addslashes($row->lehrveranstaltung_id)."' AND
 							tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND
 							tbl_benutzer.person_id=tbl_person.person_id AND
-							tbl_lehreinheit.studiensemester_kurzbz='$stdsem'";
+							tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stdsem)."'";
 				$lektoren='';
 				if($result_lkt = $db->db_query($qry))
 				{
@@ -311,19 +298,19 @@
 					}
 				}
 					
-				echo '<tr valign="top">';
-					echo '<td title="Kordinator '.$row->koordinator.'  StdgKz '.$row->studiengang_kz .'">'.$stg_obj->kuerzel_arr[$row->studiengang_kz].'</td>';
+				echo '<tr valign="top" class="liste'.($i%2).'">';
+					echo '<td>'.$stg_obj->kuerzel_arr[$row->studiengang_kz].'</td>';
 					echo '<td>'.$row->semester.'</td>';
 					echo '<td>'.$row->fachbereich_kurzbz.'</td>';
 					echo '<td>'.$row->bezeichnung.'</td>';
 					echo '<td>'.$lektoren.'</td>';
 				echo '</tr>';
+				$i++;
 			}
 			echo '</table>';
 		}
 	}
-echo "<BR>Fehler und Feedback bitte an den betreffenden Studiengang!<BR>
-		 <HR>";
+echo '<BR>'.$p->t('lvaliste/fehlerAnStudiengang').'<BR>';
 ?>
 </body>
 </html>
