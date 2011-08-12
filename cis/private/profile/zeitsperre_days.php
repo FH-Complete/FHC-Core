@@ -75,13 +75,15 @@
 		for ($ts=$ts_beginn;$ts<=$ts_ende; $ts+=$datum_obj->ts_day)
 		{
 			$tag=date('d',$ts);
-			$wt=date('w',$ts);
+			$wt=date('N',$ts);
 			$monat=date('M',$ts);
-			if ($wt==0 || $wt==6)
+
+			if ($wt==6 || $wt==7)
 				$class='feiertag';
 			else
 				$class='';
-			echo "<th class='$class'><div align=\"center\">$tagbez[$wt]<BR>$monat<br>$tag</div></th>";
+				
+			echo "<th class='$class'><div align=\"center\">".$tagbez[1][$wt]."<BR>$monat<br>$tag</div></th>";
 		}
 		?>
 	</TR>
@@ -97,8 +99,8 @@
 		{
 			$tag=date('d',$ts);
 			$monat=date('M',$ts);
-			$wt=date('w',$ts);
-			if ($wt==0 || $wt==6)
+			$wt=date('N',$ts);
+			if ($wt==6 || $wt==7)
 				$class='feiertag';
 			else
 				$class='';
