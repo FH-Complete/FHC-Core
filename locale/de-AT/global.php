@@ -61,6 +61,7 @@ $this->phrasen['global/universität']='Universität';
 $this->phrasen['global/code']='Code';
 $this->phrasen['global/adresse']='Adresse';
 $this->phrasen['global/emailAdresse']='E-Mail Adresse'; 
+$this->phrasen['global/mail']='Mail';
 $this->phrasen['global/telefon']='Telefon';
 $this->phrasen['global/telefonnummer']='Telefonnummer'; 
 $this->phrasen['global/handy']='Handy';
