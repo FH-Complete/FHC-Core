@@ -283,10 +283,6 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 		if($rechte->isBerechtigt('system/developer'))
 			echo '<statusbarpanel label="'.DB_NAME.'"/>';
 	?>
-	<statusbarpanel id="statusbarpanel-db_table" label="<?php echo $db_stpl_table; ?>"/>
-	<statusbarpanel>
-		<toolbarbutton id="statusbarpanel-ignore_kollision" label="Kollisionscheck <?php echo ($ignore_kollision=='true'?'AUS':'AN'); ?>" <?php echo ($ignore_kollision=='true'?'style="background-color: RED;"':'');?> oncommand="updateignorekollision()"/>
-	</statusbarpanel>
 	<statusbarpanel id="statusbarpanel-text" label="<?php echo htmlspecialchars($error_msg); ?>" flex="4" crop="right" />
 	<statusbarpanel id="progress-panel" class="statusbarpanel-progress">
 		<progressmeter id="statusbar-progressmeter" class="progressmeter-statusbar" mode="determined" value="0%"/>

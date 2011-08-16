@@ -45,7 +45,7 @@ $sequenz='';
 for ($i=0;$i<count($projekt_obj->result);$i++)
 {
 	$projekt=$projekt_obj->result[$i];
-	$descr.='<RDF:Description RDF:about="'.$rdf_url.$projekt->oe_kurzbz.'/'.$projekt->projekt_kurzbz.'" >
+	$descr.='<RDF:Description RDF:about="'.$rdf_url.$projekt->projekt_kurzbz.'" >
 		<PROJEKT:projekt_kurzbz>'.$projekt->projekt_kurzbz.'</PROJEKT:projekt_kurzbz>
 		<PROJEKT:oe_kurzbz>'.$projekt->oe_kurzbz.'</PROJEKT:oe_kurzbz>
 		<PROJEKT:nummer>'.$projekt->nummer.'</PROJEKT:nummer>
@@ -56,7 +56,7 @@ for ($i=0;$i<count($projekt_obj->result);$i++)
 		<PROJEKT:budget></PROJEKT:budget>
 	</RDF:Description>'."\n";
 
-	$sequenz.='<RDF:li RDF:resource="'.$rdf_url.$projekt->oe_kurzbz.'/'.$projekt->projekt_kurzbz.'" />'."\n";
+	$sequenz.='<RDF:li RDF:resource="'.$rdf_url.$projekt->projekt_kurzbz.'" />'."\n";
 }
 $sequenz='<RDF:Seq about="'.$rdf_url.'alle-projekte">'."\n\t".$sequenz.'
   	</RDF:Seq>'."\n";

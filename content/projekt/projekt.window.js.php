@@ -115,12 +115,11 @@ function saveProjekt()
     soapBody.appendChild(new SOAPObject("beschreibung")).val(beschreibung);
     soapBody.appendChild(new SOAPObject("beginn")).val(beginn);
     soapBody.appendChild(new SOAPObject("ende")).val(ende);
+    soapBody.appendChild(new SOAPObject("neu")).val('true');
+    
     var sr = new SOAPRequest("saveProjekt",soapBody);
-    SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekt.soap.php";
+    SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekt.soap.php?"+gettimestamp();
     SOAPClient.SendRequest(sr, clb_saveProjekt);
-		
-    // if(window.opener.KontaktBankverbindungSpeichern(document))
-    //  window.close();
 }
 
 function clb_saveProjekt(respObj)

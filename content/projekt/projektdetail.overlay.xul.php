@@ -35,11 +35,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 >
 
 	<!-- ************************ -->
-	<!-- *  Projekttaskdetail   * -->
+	<!-- *  Projektdetail   * -->
 	<!-- ************************ -->
 	<vbox id="box-projekt-detail" flex="1">
 		<!-- <description>Projekt Details</description> -->
-			
+		<vbox hidden="true">
+			<label value="Neu"/>
+			<checkbox id="checkbox-projekt-detail-neu" checked="true" />
+		</vbox>
 		<grid id="grid-projekt-detail" style="overflow:auto;margin:4px;" flex="1">
 		  	<columns  >
 				<column flex="1"/>
@@ -64,18 +67,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				</row>
 				<row>
 					<label value="Beschreibung" control="textbox-projekt-detail-beschreibung"/>
-   					<textbox id="textbox-projekt-detail-beschreibung"/>
-				</row>
-				<row>
-					<label value="Personentage" control="textbox-projekt-detail-personentage"/>
-   					<textbox id="textbox-projekt-detail-personentage"/>
+   					<textbox id="textbox-projekt-detail-beschreibung" multiline="true"/>
 				</row>
 				<row>
 					<label value="Beginn" control="textbox-projekt-detail-beginn"/>
    					<textbox id="textbox-projekt-detail-beginn"/>
 				</row>
 				<row>
-					<label value="MantisID" control="textbox-projekt-detail-ende"/>
+					<label value="Ende" control="textbox-projekt-detail-ende"/>
    					<textbox id="textbox-projekt-detail-ende"/>
 				</row>
 			</rows>

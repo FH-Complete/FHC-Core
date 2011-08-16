@@ -22,9 +22,7 @@ require_once('../../config/vilesci.config.inc.php');
 
 ?>
 // *********** Globale Variablen *****************//
-
-var datasourceTreeProjekt; //Datasource des Projekt Tree
-var IDProjektSelect=null; //ID des Task Eintrages der nach dem Refresh markiert werden soll
+var ProjektSelectKurzbz=null; //Kurzbz des Projekt Eintrages der nach dem Refresh markiert werden soll
 // ********** Observer und Listener ************* //
 
 // ****
@@ -59,7 +57,7 @@ var listenerTreeProjekt =
   		//timeout nur bei Mozilla notwendig da sonst die rows
 		//noch keine values haben. Ab Seamonkey funktionierts auch
 		//ohne dem setTimeout
-	    window.setTimeout(TaskTreeSelectTask,10);
+	    window.setTimeout(ProjektTreeSelectProjekt,10);
 		// Progressmeter stoppen
 		//document.getElementById('statusbar-progressmeter').setAttribute('mode','determined');
 	}
@@ -70,101 +68,25 @@ var listenerTreeProjekt =
 // ****
 // * Asynchroner (Nicht blockierender) Refresh des LV Trees
 // ****
-function TaskTreeRefresh()
+function ProjektTreeRefresh()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
 	//markierte Lehreinheit global speichern damit diese LE nach dem
 	//refresh wieder markiert werden kann.
-	var tree = document.getElementById('projekttask-tree');
+	var tree = document.getElementById('tree-projekt');
 		
 	try
 	{
-		TaskSelectID = getTreeCellText(tree, "projekttask-treecol-projekttask_id", tree.currentIndex);
+		ProjektSelectKurzbz = getTreeCellText(tree, "treecol-projekt-projekt_kurzbz", tree.currentIndex);
 	}
 	catch(e)
 	{
-		TaskSelectID=null;
+		ProjektSelectKurzbz=null;
 	}
-	TaskTreeDatasource.Refresh(false); //non blocking
+	datasourceTreeProjekt.Refresh(false); //non blocking
 }
 
-// ****
-// * neuen Task anlegen
-// ****
-function TaskNeu()
-{
-    // Trick 17	(sonst gibt's ein Permission denied)
-    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-
-    alert('Neuer Task - noch nicht implementiert');
-    /*
-    var tree = document.getElementById('lehrveranstaltung-tree');
-
-    //Details zuruecksetzen
-    LeDetailReset();
-
-    //Detail Tab als aktiv setzen
-    document.getElementById('lehrveranstaltung-tabbox').selectedIndex=0;
-
-    //Lektor-Tab und GruppenTree ausblenden
-    document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe').hidden=true;
-    document.getElementById('lehrveranstaltung-detail-label-lehreinheitgruppe').hidden=true;
-    document.getElementById('lehrveranstaltung-tab-lektor').collapsed=true;
-
-    //Lehrveranstaltungs_id holen
-    var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrveranstaltung_id"] : "lehrveranstaltung-treecol-lehrveranstaltung_id";
-    var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
-
-    //Lehrform setzen
-    var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrform"] : "lehrveranstaltung-treecol-lehrform";
-    var lehrform_kurzbz=tree.view.getCellText(tree.currentIndex,col);
-
-    //Lehrfach drop down setzen
-
-    //ID in globale Variable speichern
-    LeDetailLehrfach_id='';
-    var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-bezeichnung"] : "lehrveranstaltung-treecol-bezeichnung";
-    LeDetailLehrfach_label=tree.view.getCellText(tree.currentIndex,col);
-
-    lehrfachmenulist = document.getElementById('lehrveranstaltung-detail-menulist-lehrfach');
-    var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-
-    //Entfernen der alten Datasources
-    var oldDatasources = lehrfachmenulist.database.GetDataSources();
-    while(oldDatasources.hasMoreElements())
-    {
-            lehrfachmenulist.database.RemoveDataSource(oldDatasources.getNext());
-    }
-    //Refresh damit die entfernten DS auch wirklich entfernt werden
-    lehrfachmenulist.builder.rebuild();
-
-    //Url zusammenbauen
-    var url = '<?php echo APP_ROOT;?>rdf/lehrfach.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+'&'+gettimestamp();
-
-    //RDF holen
-    var newDs  = rdfService.GetDataSource(url);
-    lehrfachmenulist.database.AddDataSource(newDs);
-
-    //SinkObserver hinzufuegen
-    var sink = newDs.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-    sink.addXMLSinkObserver(LeDetailLehrfachSinkObserver);
-
-    document.getElementById('lehrveranstaltung-detail-textbox-lehrveranstaltung').value=lehrveranstaltung_id;
-    document.getElementById('lehrveranstaltung-detail-checkbox-new').checked=true;
-    document.getElementById('lehrveranstaltung-detail-textbox-stundenblockung').value='2';
-    document.getElementById('lehrveranstaltung-detail-textbox-wochenrythmus').value='1';
-    if(lehrform_kurzbz=='')
-            lehrform_kurzbz='UE';
-    document.getElementById('lehrveranstaltung-detail-menulist-lehrform').value=lehrform_kurzbz;
-
-    var stsem = getStudiensemester();
-    document.getElementById('lehrveranstaltung-detail-menulist-studiensemester').value=stsem;
-    
-    //Defaultwert fuer Anmerkung
-    document.getElementById('lehrveranstaltung-detail-textbox-anmerkung').value='<?php echo str_replace("'","\'",LEHREINHEIT_ANMERKUNG_DEFAULT);?>';
-    */
-}
 // ****
 // * Selectiert die Lektorzuordnung nachdem der Tree
 // * rebuildet wurde.
@@ -179,9 +101,9 @@ function onselectProjekt()
     try
     {
         //Ausgewaehltes Projekt holen
-        id = getTreeCellText(tree, "treecol-projekt-oe_kurzbz", tree.currentIndex) +'/'+ getTreeCellText(tree, "treecol-projekt-projekt_kurzbz", tree.currentIndex);
-        //alert(id);
-        if(id!='')
+        var projekt_kurzbz = getTreeCellText(tree, "treecol-projekt-projekt_kurzbz", tree.currentIndex);
+
+        if(projekt_kurzbz!='')
         {
             //Projekt wurde markiert
             //Loeschen Button aktivieren
@@ -189,7 +111,7 @@ function onselectProjekt()
         }
         else
         {
-                return false;
+              return false;
         }
     }
     catch(e)
@@ -199,7 +121,7 @@ function onselectProjekt()
     }
     
     var req = new phpRequest('<?php echo APP_ROOT; ?>rdf/projekt.rdf.php','','');
-    req.add('projekt_kurzbz',id);
+    req.add('projekt_kurzbz',projekt_kurzbz);
     var response = req.execute();
     
     // Datasource holen
@@ -209,7 +131,7 @@ function onselectProjekt()
 
     var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                getService(Components.interfaces.nsIRDFService);
-    var subject = rdfService.GetResource("http://www.technikum-wien.at/projekt/" + id);
+    var subject = rdfService.GetResource("http://www.technikum-wien.at/projekt/" + projekt_kurzbz);
 
     var predicateNS = "http://www.technikum-wien.at/projekt/rdf";
 
@@ -232,7 +154,7 @@ function onselectProjekt()
     document.getElementById('textbox-projekt-detail-nummer').value=nummer;
     document.getElementById('textbox-projekt-detail-beginn').value=beginn;
     document.getElementById('textbox-projekt-detail-ende').value=ende;
-    document.getElementById('textbox-projekt-detail-personentage').value=personentage;
+    document.getElementById('checkbox-projekt-detail-neu').checked=false;
 }
 // ****
 // * Speichert die Details
@@ -248,8 +170,8 @@ function saveProjektDetail()
 	nummer = document.getElementById('textbox-projekt-detail-nummer').value;
 	beginn = document.getElementById('textbox-projekt-detail-beginn').value;
 	ende = document.getElementById('textbox-projekt-detail-ende').value;
-	personentage = document.getElementById('textbox-projekt-detail-personentage').value;
-
+	neu = document.getElementById('checkbox-projekt-detail-neu').checked;
+	
 	var soapBody = new SOAPObject("saveProjekt");
 	soapBody.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
 	soapBody.appendChild(new SOAPObject("oe_kurzbz")).val(oe_kurzbz);
@@ -258,9 +180,11 @@ function saveProjektDetail()
 	soapBody.appendChild(new SOAPObject("nummer")).val(nummer);
 	soapBody.appendChild(new SOAPObject("beginn")).val(beginn);
 	soapBody.appendChild(new SOAPObject("ende")).val(ende);
-	soapBody.appendChild(new SOAPObject("personentage")).val(personentage);
-	soapBody.appendChild(new SOAPObject("user")).val(getUsername());
 	
+	if(neu)
+		soapBody.appendChild(new SOAPObject("neu")).val('true');
+	else	
+		soapBody.appendChild(new SOAPObject("neu")).val('false');
 	var sr = new SOAPRequest("saveProjekt",soapBody);
 
 	SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekt.soap.php?"+gettimestamp();
@@ -273,7 +197,8 @@ function clb_saveProjekt(respObj)
 {
 	try
 	{
-		var id = respObj.Body[0].saveProjektResponse[0].message[0].Text;
+		var projekt_kurzbz = respObj.Body[0].saveProjektResponse[0].message[0].Text;
+		ProjektSelectKurzbz = projekt_kurzbz;
 	}
 	catch(e)
 	{
@@ -282,28 +207,54 @@ function clb_saveProjekt(respObj)
 		return;
 	}
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	document.getElementById('textbox-projekt-detail-projekt_kurzbz').value=id;
-		
-	ProjektSelectID=id;
+	
 	datasourceTreeProjekt.Refresh(false); //non blocking
 	SetStatusBarText('Daten wurden gespeichert');
 }
+// ****
+// * Selectiert ein Projekt nachdem der Tree
+// * rebuildet wurde.
+// ****
+function ProjektTreeSelectProjekt()
+{
+	var tree=document.getElementById('tree-projekt');
+	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
 
+	//In der globalen Variable ist die zu selektierende ID gespeichert
+	if(ProjektSelectKurzbz!=null)
+	{
+	   	for(var i=0;i<items;i++)
+	   	{
+	   		//id der row holen
+	   		id = getTreeCellText(tree, "treecol-projekt-projekt_kurzbz", i);
+			
+			//wenn dies die zu selektierende Zeile
+			if(ProjektSelectKurzbz==id)
+			{
+				//Zeile markieren
+				tree.view.selection.select(i);
+				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
+				tree.treeBoxObject.ensureRowIsVisible(i);
+				return true;
+			}
+	   	}
+	}
+}
 // ****
-// * Task loeschen
+// * Projekt loeschen
 // ****
-function TaskDelete()
+function ProjektDelete()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	var tree = document.getElementById('projekttask-tree');
+	var tree = document.getElementById('tree-projekt');
 
 	if (tree.currentIndex==-1)
 		return;
 
 	try
 	{
-		//Ausgewaehlten Task holen
-		id = getTreeCellText(tree, "projekttask-treecol-projekttask_id", tree.currentIndex);
+		//Ausgewaehltes Projekt holen
+		id = getTreeCellText(tree, "treecol-projekt-projekt_kurzbz", tree.currentIndex);
    	}
 	catch(e)
 	{
@@ -312,7 +263,7 @@ function TaskDelete()
 	}
 
 	//Abfrage ob wirklich geloescht werden soll
-	if (confirm('Wollen Sie den Task mit der ID '+id+' wirklich loeschen?'))
+	if (confirm('Wollen Sie das Projekt mit der Kurzbz '+id+' wirklich loeschen?'))
 	{
 		//Script zum loeschen der Lehreinheit aufrufen
 		alert('Ist noch nicht implementiert!');
@@ -338,7 +289,7 @@ function TaskDelete()
 // ****
 // * Leert alle Eingabe- und Auswahlfelder
 // ****
-function TaskDetailReset()
+function ProjektDetailReset()
 {
 	/*
 	document.getElementById('lehrveranstaltung-detail-textbox-lvnr').value='';
@@ -385,7 +336,7 @@ function TaskDetailReset()
 // ****
 // * Deaktiviert alle Eingabe- und Auswahlfelder
 // ****
-function TaskDisableFields(val)
+function ProjektDisableFields(val)
 {
 	/*
 	//document.getElementById('lehrveranstaltung-detail-textbox-lvnr').disabled=val;
@@ -406,288 +357,5 @@ function TaskDisableFields(val)
 	document.getElementById('lehrveranstaltung-detail-button-save').disabled=val;
 
 	document.getElementById('lehrveranstaltung-detail-textbox-unr').disabled=val;
-	*/
-}
-
-// ****
-// * Speichert die Details
-// ****
-function TaskDetailSave()
-{
-/*
-	//Werte holen
-	lvnr = document.getElementById('lehrveranstaltung-detail-textbox-lvnr').value;
-	unr = document.getElementById('lehrveranstaltung-detail-textbox-unr').value;
-	lehrveranstaltung = document.getElementById('lehrveranstaltung-detail-textbox-lehrveranstaltung').value;
-	lehre = document.getElementById('lehrveranstaltung-detail-checkbox-lehre').checked;
-	stundenblockung = document.getElementById('lehrveranstaltung-detail-textbox-stundenblockung').value;
-	wochenrythmus = document.getElementById('lehrveranstaltung-detail-textbox-wochenrythmus').value;
-	start_kw = document.getElementById('lehrveranstaltung-detail-textbox-startkw').value;
-	anmerkung = document.getElementById('lehrveranstaltung-detail-textbox-anmerkung').value;
-	sprache = document.getElementById('lehrveranstaltung-detail-menulist-sprache').value;
-	lehrfach = document.getElementById('lehrveranstaltung-detail-menulist-lehrfach').value;
-	raumtyp = document.getElementById('lehrveranstaltung-detail-menulist-raumtyp').value;
-	raumtypalternativ = document.getElementById('lehrveranstaltung-detail-menulist-raumtypalternativ').value;
-	studiensemester = document.getElementById('lehrveranstaltung-detail-menulist-studiensemester').value;
-	lehrform = document.getElementById('lehrveranstaltung-detail-menulist-lehrform').value;
-
-	if(lehrveranstaltung=='')
-		return false;
-
-	if(raumtyp=='')
-	{
-		alert('Raumtyp muss ausgewaehlt werden');
-		return false;
-	}
-
-	if(raumtypalternativ=='')
-	{
-		alert('RaumtypAlternativ muss ausgewaehlt werden');
-		return false;
-	}
-
-	if(sprache=='')
-	{
-		alert('Sprache muss ausgewaehlt werden');
-		return false;
-	}
-
-
-	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
-	neu = document.getElementById('lehrveranstaltung-detail-checkbox-new').checked;
-
-	if (neu)
-	{
-		req.add('do','create');
-	}
-	else
-	{
-		req.add('do','update');
-		lehreinheit_id = document.getElementById('lehrveranstaltung-detail-textbox-lehreinheit_id').value;
-		req.add('lehreinheit_id',lehreinheit_id);
-	}
-	//alert(lehreinheit_id);
-	req.add('type', 'lehreinheit');
-	req.add('unr', unr);
-	req.add('lvnr', lvnr);
-	req.add('sprache', sprache);
-	req.add('lehrveranstaltung', lehrveranstaltung);
-	req.add('lehrfach_id', lehrfach);
-	req.add('raumtyp', raumtyp);
-	req.add('raumtypalternativ', raumtypalternativ);
-	req.add('lehre', lehre);
-	req.add('stundenblockung', stundenblockung);
-	req.add('wochenrythmus', wochenrythmus);
-	req.add('start_kw', start_kw);
-	req.add('studiensemester_kurzbz', studiensemester);
-	req.add('lehrform', lehrform);
-	req.add('anmerkung', anmerkung);
-
-	var response = req.executePOST();
-
-	var val =  new ParseReturnValue(response)
-
-	if (!val.dbdml_return)
-	{
-		alert(val.dbdml_errormsg)
-	}
-	else
-	{
-		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-		document.getElementById('lehrveranstaltung-detail-checkbox-new').checked=false;
-		//LvTreeRefresh();
-		LvSelectLehreinheit_id=val.dbdml_data;
-		LvOpenLehrveranstaltung_id=lehrveranstaltung;
-		LvTreeDatasource.Refresh(false); //non blocking
-		SetStatusBarText('Daten wurden gespeichert');
-	}
-*/
-}
-
-// ****
-// * Auswahl eines Tasks
-// * bei Auswahl eines Tasks wird diese geladen
-// * und die Daten unten angezeigt
-// ****
-function TaskAuswahl()
-{
-	
-	// Trick 17	(sonst gibt's ein Permission denied)
-	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	var tree = document.getElementById('projekttask-tree');
-
-	if (tree.currentIndex==-1) return;
-	try
-	{
-		//Ausgewaehlte Lehreinheit holen
-        id = getTreeCellText(tree, "projekttask-treecol-projekttask_id", tree.currentIndex);
-
-		if(id!='')
-		{
-			//Task wurde markiert
-			//Loeschen Button aktivieren
-			document.getElementById('projekttask-toolbar-del').disabled=false;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	catch(e)
-	{
-		alert(e);
-		return false;
-	}
-
-	alert("Details Laden von Task "+id);
-	/*
-	var req = new phpRequest('<?php echo APP_ROOT; ?>rdf/lehreinheit.rdf.php','','');
-	req.add('lehreinheit_id',lehreinheit_id);
-
-	var response = req.execute();
-	// Datasource holen
-	var dsource=parseRDFString(response, 'http://www.technikum-wien.at/lehreinheit/liste');
-
-	dsource=dsource.QueryInterface(Components.interfaces.nsIRDFDataSource);
-
-	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
-                   getService(Components.interfaces.nsIRDFService);
-	var subject = rdfService.GetResource("http://www.technikum-wien.at/lehreinheit/" + lehreinheit_id);
-
-	var predicateNS = "http://www.technikum-wien.at/lehreinheit/rdf";
-
-	//Daten holen
-
-	unr = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#unr" ));
-	lvnr=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lvnr" ));
-	sprache=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#sprache" ));
-	lehrveranstaltung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehrveranstaltung_id" ));
-	lehrfach=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehrfach_id" ));
-	raumtyp=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#raumtyp" ));
-	raumtyp_alt=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#raumtypalternativ" ));
-	lehre=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehre" ));
-	stundenblockung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#stundenblockung" ));
-	wochenrythmus=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#wochenrythmus" ));
-	start_kw=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#start_kw" ));
-	anmerkung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
-	studiensemester=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiensemester_kurzbz" ));
-	lehrform=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehrform_kurzbz" ));
-	anzahl_studenten=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anzahl_studenten" ));
-
-	//Lehrfach drop down setzen
-
-	//ID in globale Variable speichern
-	LeDetailLehrfach_id=lehrfach;
-
-	lehrfachmenulist = document.getElementById('lehrveranstaltung-detail-menulist-lehrfach');
-	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-
-	//Entfernen der alten Datasources
-	var oldDatasources = lehrfachmenulist.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
-	{
-		lehrfachmenulist.database.RemoveDataSource(oldDatasources.getNext());
-	}
-
-	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	lehrfachmenulist.builder.rebuild();
-
-	//Url zusammenbauen
-	var url = '<?php echo APP_ROOT;?>rdf/lehrfach.rdf.php?lehrveranstaltung_id='+lehrveranstaltung+'&lehrfach_id='+lehrfach+'&'+gettimestamp();
-
-	//RDF holen
-	var newDs  = rdfService.GetDataSourceBlocking(url);
-	newDs.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-	newDs.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-	lehrfachmenulist.database.AddDataSource(newDs);
-
-	lehrfachmenulist.builder.rebuild();
-	//SinkObserver hinzufuegen
-	//var sink = newDs.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-	//sink.addXMLSinkObserver(LeDetailLehrfachSinkObserver);
-
-	//Daten den Feldern zuweisen
-
-	document.getElementById('lehrveranstaltung-detail-textbox-unr').value=unr;
-	document.getElementById('lehrveranstaltung-detail-textbox-lvnr').value=lvnr;
-	document.getElementById('lehrveranstaltung-detail-textbox-lehrveranstaltung').value=lehrveranstaltung;
-	if(lehre=='Ja')
-		document.getElementById('lehrveranstaltung-detail-checkbox-lehre').checked=true;
-	else
-		document.getElementById('lehrveranstaltung-detail-checkbox-lehre').checked=false;
-	document.getElementById('lehrveranstaltung-detail-textbox-stundenblockung').value=stundenblockung;
-	document.getElementById('lehrveranstaltung-detail-textbox-wochenrythmus').value=wochenrythmus;
-	document.getElementById('lehrveranstaltung-detail-textbox-startkw').value=start_kw;
-	document.getElementById('lehrveranstaltung-detail-textbox-anmerkung').value=anmerkung;
-	document.getElementById('lehrveranstaltung-detail-menulist-sprache').value=sprache;
-	document.getElementById('lehrveranstaltung-detail-menulist-lehrfach').value=lehrfach;
-	document.getElementById('lehrveranstaltung-detail-menulist-raumtyp').value=raumtyp;
-	document.getElementById('lehrveranstaltung-detail-menulist-raumtypalternativ').value=raumtyp_alt;
-	document.getElementById('lehrveranstaltung-detail-menulist-studiensemester').value=studiensemester;
-	document.getElementById('lehrveranstaltung-detail-menulist-lehrform').value=lehrform;
-	document.getElementById('lehrveranstaltung-detail-checkbox-new').checked=false;
-	document.getElementById('lehrveranstaltung-detail-textbox-lehreinheit_id').value=lehreinheit_id;
-	document.getElementById('lehrveranstaltung-detail-groupbox-caption').label='Details - Anzahl TeilnehmerInnen: '+anzahl_studenten;
-
-	//Lehreinheitmitarbeiter tree setzen
-	url='<?php echo APP_ROOT;?>rdf/lehreinheitmitarbeiter.rdf.php?lehreinheit_id='+lehreinheit_id+"&"+gettimestamp();
-	try
-	{
-		lektortree = document.getElementById('lehrveranstaltung-detail-tree-lehreinheitmitarbeiter');
-
-		try
-		{
-			lektortree.builder.removeListener(LvLektorTreeListener);
-		}
-		catch(e)
-		{}
-
-		//Alte DS entfernen
-		var oldDatasources = lektortree.database.GetDataSources();
-		while(oldDatasources.hasMoreElements())
-		{
-			lektortree.database.RemoveDataSource(oldDatasources.getNext());
-		}
-		//Refresh damit die entfernten DS auch wirklich entfernt werden
-		lektortree.builder.rebuild();
-
-		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-		LeDetailLektorDatasource = rdfService.GetDataSource(url);
-		LeDetailLektorDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-		LeDetailLektorDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-		lektortree.database.AddDataSource(LeDetailLektorDatasource);
-		lektortree.builder.addListener(LvLektorTreeListener);
-	}
-	catch(e)
-	{
-		debug(e);
-	}
-
-	//Lehreinheitgruppe tree setzen
-	url='<?php echo APP_ROOT; ?>rdf/lehreinheitgruppe.rdf.php?lehreinheit_id='+lehreinheit_id+"&"+gettimestamp();
-
-	try
-	{
-		gruppentree = document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe');
-
-		//Alte DS entfernen
-		var oldDatasources = gruppentree.database.GetDataSources();
-		while(oldDatasources.hasMoreElements())
-		{
-			gruppentree.database.RemoveDataSource(oldDatasources.getNext());
-		}
-		//Refresh damit die entfernten DS auch wirklich entfernt werden
-		gruppentree.builder.rebuild();
-
-		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-		LeDetailGruppeDatasource = rdfService.GetDataSource(url);
-		LeDetailGruppeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-		LeDetailGruppeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-		gruppentree.database.AddDataSource(LeDetailGruppeDatasource);
-	}
-	catch(e)
-	{
-		debug(e);
-	}
 	*/
 }

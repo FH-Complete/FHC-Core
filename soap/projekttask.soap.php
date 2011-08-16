@@ -27,12 +27,13 @@ header("Pragma: no-cache");
 require_once('../config/vilesci.config.inc.php'); 
 require_once('../include/basis_db.class.php');
 require_once('../include/projekttask.class.php');
-require_once('../include/benutzer');
+require_once('../include/benutzer.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/functions.inc.php');
 
 $SOAPServer = new SoapServer(APP_ROOT."/soap/projekttask.wsdl.php?".microtime());
 $SOAPServer->addFunction("saveProjekttask");
+$SOAPServer->addFunction("deleteProjekttask");
 $SOAPServer->handle();
 
 // WSDL Chache auf aus

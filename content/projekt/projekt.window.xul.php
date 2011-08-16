@@ -48,6 +48,7 @@ else
 	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jqSOAPClient.js"></script>
 	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jqXMLUtils.js"></script>
 	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>content/projekt/projekt.window.js.php" />
+	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>content/functions.js"></script>
 <vbox>
 
 <checkbox id="checkbox-projekt-neu" hidden="true"/>
@@ -62,31 +63,31 @@ else
 			<rows>
 				<row>
 					<label value="OE (Organisationseinheit)" control="textbox-projekt-oe"/>
-					<textbox id="textbox-projekt-oe" value="<?php echo $oe; ?>" maxlength="64"/>
+					<textbox id="textbox-projekt-oe" value="<?php echo $oe; ?>" maxlength="32"/>
 				</row>
 				<row>
 					<label value="Kurzbezeichnung" control="textbox-projekt-projekt_kurzbz"/>
-					<textbox id="textbox-projekt-projekt_kurzbz" maxlength="128"/>
+					<textbox id="textbox-projekt-projekt_kurzbz" maxlength="16"/>
 				</row>
 				<row>
 					<label value="Titel" control="textbox-projekt-titel"/>
-   					<textbox id="textbox-projekt-titel" maxlength="64"/>
+   					<textbox id="textbox-projekt-titel" maxlength="256"/>
 				</row>				
 				<row>
 					<label value="Nummer" control="textbox-projekt-nummer"/>
-   					<textbox id="textbox-projekt-nummer" checked="true"/>
+   					<textbox id="textbox-projekt-nummer" maxlength="8"/>
 				</row>
 				<row>
 					<label value="Beschreibung" control="textbox-projekt-beschreibung"/>
-   					<textbox id="textbox-projekt-beschreibung" checked="true"/>
+   					<textbox id="textbox-projekt-beschreibung" multiline="true"/>
 				</row>
 				<row>
 					<label value="Beginn" control="textbox-projekt-beginn"/>
-   					<textbox id="textbox-projekt-beginn" checked="true"/>
+   					<textbox id="textbox-projekt-beginn"/>
 				</row>
       			<row>
 					<label value="Ende" control="textbox-projekt-ende"/>
-   					<textbox id="textbox-projekt-ende" checked="true"/>
+   					<textbox id="textbox-projekt-ende"/>
       			</row>
 			<!-- <row>
 					<label value="Test" control="textbox-projekt-test"/>

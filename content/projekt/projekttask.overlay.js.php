@@ -85,7 +85,7 @@ function TaskTreeRefresh()
 	{
 		TaskSelectID=null;
 	}
-	TaskTreeDatasource.Refresh(false); //non blocking
+	datasourceTreeTask.Refresh(false); //non blocking
 }
 
 // ****
@@ -163,25 +163,34 @@ function TaskDelete()
 	//Abfrage ob wirklich geloescht werden soll
 	if (confirm('Wollen Sie den Task mit der ID '+id+' wirklich loeschen?'))
 	{
-		//Script zum loeschen der Lehreinheit aufrufen
-		alert('Ist noch nicht implementiert!');
-		/*
-		var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
-
-		req.add('type','lehreinheit');
-		req.add('do','delete');
-		req.add('lehreinheit_id',lehreinheit_id);
-		var response = req.executePOST();
-
-		var val =  new ParseReturnValue(response)
-		if(!val.dbdml_return)
-			alert(val.dbdml_errormsg)
-
-		LvTreeRefresh();
-		LeDetailReset();
-		LeDetailDisableFields(true);
-		*/
+		var soapBody = new SOAPObject("deleteProjekttask");
+		soapBody.appendChild(new SOAPObject("projekttask_id")).val(id);
+		var sr = new SOAPRequest("deleteProjekttask",soapBody);
+	
+		SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekttask.soap.php?"+gettimestamp();
+		SOAPClient.SendRequest(sr, clb_deleteProjekttask);
 	}
+}
+// ****
+// * Delete Callback Funktion
+// ****
+function clb_deleteProjekttask(respObj)
+{
+	try
+	{
+		var msg = respObj.Body[0].deleteProjekttaskResponse[0].message[0].Text;
+	}
+	catch(e)
+	{
+		var fehler = respObj.Body[0].Fault[0].faultstring[0].Text;
+		alert('Fehler: '+fehler);
+		return;
+	}
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+			
+	TaskSelectID='';
+	datasourceTreeTask.Refresh(false); //non blocking
+	SetStatusBarText('Eintrag wurde entfernt');
 }
 
 // ****
