@@ -1,4 +1,6 @@
 <?php
+$this->phrasen['profil/home']='HOME';
+$this->phrasen['profil/meinCis']='My CIS';
 $this->phrasen['profil/bildHochladen']='Upload picture';
 $this->phrasen['profil/email']='eMail';
 $this->phrasen['profil/intern']='Intern';
