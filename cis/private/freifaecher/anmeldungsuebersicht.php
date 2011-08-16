@@ -26,19 +26,17 @@
  */
 
 require_once('../../../config/cis.config.inc.php');
-
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung 
-// ------------------------------------------------------------------------------------------
 require_once('../../../include/basis_db.class.php');
-	if (!$db = new basis_db())
-		$db=false;
-
-
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/lehrveranstaltung.class.php');
-	
+require_once('../../../include/phrasen.class.php');
+
+if (!$db = new basis_db())
+	$db=false;
+$sprache = getSprache();
+$p = new phrasen($sprache);
+
 $user = get_uid();
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -46,7 +44,7 @@ $user = get_uid();
 	<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
-	<title>Freifaecher Anmeldungsuebersicht</title>
+	<title><?php echo $p->t('freifach/freifaecherAnmeldungsuebersicht');?></title>
 	</head>
 
 	<body>
@@ -55,14 +53,14 @@ $user = get_uid();
 	    <td class="tdwidth10">&nbsp;</td>
 	    <td><table class="tabcontent">
 	    	<tr>
-	      	<td class="ContentHeader"><font class="ContentHeader">&nbsp;Freif&auml;cher Anmeldunguebersicht</font></td>
+	      	<td class="ContentHeader"><font class="ContentHeader">&nbsp;<?php echo $p->t('freifach/freifaecherAnmeldungsuebersicht');?></font></td>
 	    	</tr>
 	    	<tr>
 	      	<td>&nbsp;</td>
 	    	</tr>
 	    	<tr>
 		    	<td>
-		    	Bitte w&auml;hlen Sie eines der Freif&auml;cher aus
+		    	<?php echo $p->t('freifach/bitteFreifachAuswaehlen');?>
 		    	<br />
 <?php
 $lvid = trim(isset($_POST['lvid'])?$_POST['lvid']:'');
@@ -77,7 +75,7 @@ if($lv_obj->load_lva('0',null,null,true,null,'bezeichnung'))
 		echo "<FORM method='POST' name='frmauswahl'>";
 			echo "<SELECT name='lvid' onchange='window.document.frmauswahl.submit();'>";
 			if($lvid=='')
-				echo "\n<OPTION value='0' selected>--Auswahl--</OPTION>";
+				echo "\n<OPTION value='0' selected>--".$p->t('freifach/auswahl')."--</OPTION>";
 			foreach($lv_obj->lehrveranstaltungen as $row)
 		{
 			if($lvid==$row->lehrveranstaltung_id)
@@ -90,7 +88,7 @@ if($lv_obj->load_lva('0',null,null,true,null,'bezeichnung'))
 }
 else
 {
-	die("Fehler bei Auslesen der Freifaecher! Bitte versuchen Sie es erneut");
+	die($p->t('freifach/fehlerBeimAuslesenFreifach'));
 }
 
 //Wenn das Formular abgeschickt wurde
@@ -113,39 +111,39 @@ if($lvid!='')
 			ORDER BY
 				nachname, vorname";
 				
-		if($result=$db->db_query($qry))
+	if($result=$db->db_query($qry))
+	{
+		$ff = array();
+		$content='';
+	
+		$mailto= "&nbsp;<a href='mailto:";
+		$content .= "<table>\n  <tr class='liste'><th></th><th>".$p->t('global/nachname')."</th><th>".$p->t('global/vorname')."</th><th>".$p->t('global/mail')."</th><th>".$p->t('global/studiengang')."</th><th>".$p->t('global/semester')."</th></tr>";
+		$i=0;
+		while($row=$db->db_fetch_object($result))
 		{
-			$ff = array();
-			$content='';
-		
-			$mailto= "&nbsp;<a href='mailto:";
-			$content .= "<table>\n  <tr class='liste'><th></th><th>Nachname</th><th>Vorname</th><th>Mail</th><th>Studiengang</th><th>Semester</th></tr>";
-			$i=0;
-			while($row=$db->db_fetch_object($result))
-			{
-				$i++;
-				$content .= "\n<tr class='liste".($i%2)."'><td>$i</td><td>$row->nachname</td><td>$row->vorname</td><td><a href='mailto:$row->uid@technikum-wien.at'>$row->uid@technikum-wien.at</a></td><td align='center'>$row->kurzbzlang</td><td align='center'>$row->semester</td></tr>";
-				if($i!=1)
-					$mailto.=",";
-				$mailto.=$row->uid."@technikum-wien.at";
-			}
-			$mailto.="'>Mail an alle in diesem Freifach senden</a>";
-			$content .= "</table>";
-		
-			if($i==0)
-			{
-				echo "<b>Es gibt noch keine Anmeldungen für dieses Freifach</b>";
-			}
-			else
-			{
-				//echo "Anzahl der Anmeldungen: ".$i;
-				echo $content;
-				echo "<br />";
-				echo $mailto;
-			}
-}
-else
-	echo "Fehler beim Auslesen der Zuteilunstabelle";
+			$i++;
+			$content .= "\n<tr class='liste".($i%2)."'><td>$i</td><td>$row->nachname</td><td>$row->vorname</td><td><a href='mailto:$row->uid@technikum-wien.at'>$row->uid@technikum-wien.at</a></td><td align='center'>$row->kurzbzlang</td><td align='center'>$row->semester</td></tr>";
+			if($i!=1)
+				$mailto.=",";
+			$mailto.=$row->uid."@technikum-wien.at";
+		}
+		$mailto.="'>".$p->t('freifach/MailAnAlleSenden')."</a>";
+		$content .= "</table>";
+	
+		if($i==0)
+		{
+			echo "<b>".$p->t('freifach/keineAnmeldungenFuerDiesesFreifach')."</b>";
+		}
+		else
+		{
+			//echo "Anzahl der Anmeldungen: ".$i;
+			echo $content;
+			echo "<br />";
+			echo $mailto;
+		}
+	}
+	else
+		echo $p->t('freifach/fehlerBeimAuslesen');
 }
 
 ?>
