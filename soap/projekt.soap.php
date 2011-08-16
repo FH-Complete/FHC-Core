@@ -30,7 +30,7 @@ require_once('../include/projekt.class.php');
 require_once('../include/datum.class.php');
 
 $SOAPServer = new SoapServer(APP_ROOT."/soap/projekt.wsdl.php");
-$SOAPServer->addFunction("saveProjektDaten");
+$SOAPServer->addFunction("saveProjekt");
 $SOAPServer->handle();
 
 // WSDL Chache auf aus
@@ -47,7 +47,7 @@ ini_set("soap.wsdl_cache_enabled", "0");
  * @param date $ende
  * @param string $oe_kurzbz
  */
-function saveProjektDaten($projekt_kurzbz, $nummer, $titel, $beschreibung, $beginn, $ende, $oe_kurzbz)
+function saveProjekt($projekt_kurzbz, $nummer, $titel, $beschreibung, $beginn, $ende, $oe_kurzbz)
 { 	
 	
 	$projekt = new projekt();

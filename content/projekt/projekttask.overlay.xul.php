@@ -63,7 +63,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projekttaskdetail.overlay.
 		<tree id="projekttask-tree" seltype="single" hidecolumnpicker="false" flex="1"
 				datasources="rdf:null" ref="http://www.technikum-wien.at/projekttask/alle-projekttasks"
 				style="margin:0px;" enableColumnDrag="true"
-				onselect="TaskAuswahl(this);"
+				onselect="onselectProjekttask(this);"
  				persist="height"
  				flags="dont-build-content"
  				context="projekttask-tree-popup"
