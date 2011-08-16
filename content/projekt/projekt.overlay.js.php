@@ -94,105 +94,199 @@ function TaskTreeRefresh()
 // ****
 function TaskNeu()
 {
-	// Trick 17	(sonst gibt's ein Permission denied)
-	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+    // Trick 17	(sonst gibt's ein Permission denied)
+    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
-	alert('Neuer Task - noch nicht implementiert');
-	/*
-	var tree = document.getElementById('lehrveranstaltung-tree');
+    alert('Neuer Task - noch nicht implementiert');
+    /*
+    var tree = document.getElementById('lehrveranstaltung-tree');
 
-	//Details zuruecksetzen
-	LeDetailReset();
+    //Details zuruecksetzen
+    LeDetailReset();
 
-	//Detail Tab als aktiv setzen
-	document.getElementById('lehrveranstaltung-tabbox').selectedIndex=0;
+    //Detail Tab als aktiv setzen
+    document.getElementById('lehrveranstaltung-tabbox').selectedIndex=0;
 
-	//Lektor-Tab und GruppenTree ausblenden
-	document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe').hidden=true;
-	document.getElementById('lehrveranstaltung-detail-label-lehreinheitgruppe').hidden=true;
-	document.getElementById('lehrveranstaltung-tab-lektor').collapsed=true;
+    //Lektor-Tab und GruppenTree ausblenden
+    document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe').hidden=true;
+    document.getElementById('lehrveranstaltung-detail-label-lehreinheitgruppe').hidden=true;
+    document.getElementById('lehrveranstaltung-tab-lektor').collapsed=true;
 
-	//Lehrveranstaltungs_id holen
-	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrveranstaltung_id"] : "lehrveranstaltung-treecol-lehrveranstaltung_id";
-	var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
+    //Lehrveranstaltungs_id holen
+    var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrveranstaltung_id"] : "lehrveranstaltung-treecol-lehrveranstaltung_id";
+    var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
 
-	//Lehrform setzen
-	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrform"] : "lehrveranstaltung-treecol-lehrform";
-	var lehrform_kurzbz=tree.view.getCellText(tree.currentIndex,col);
+    //Lehrform setzen
+    var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrform"] : "lehrveranstaltung-treecol-lehrform";
+    var lehrform_kurzbz=tree.view.getCellText(tree.currentIndex,col);
 
-	//Lehrfach drop down setzen
+    //Lehrfach drop down setzen
 
-	//ID in globale Variable speichern
-	LeDetailLehrfach_id='';
-	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-bezeichnung"] : "lehrveranstaltung-treecol-bezeichnung";
-	LeDetailLehrfach_label=tree.view.getCellText(tree.currentIndex,col);
+    //ID in globale Variable speichern
+    LeDetailLehrfach_id='';
+    var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-bezeichnung"] : "lehrveranstaltung-treecol-bezeichnung";
+    LeDetailLehrfach_label=tree.view.getCellText(tree.currentIndex,col);
 
-	lehrfachmenulist = document.getElementById('lehrveranstaltung-detail-menulist-lehrfach');
-	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+    lehrfachmenulist = document.getElementById('lehrveranstaltung-detail-menulist-lehrfach');
+    var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 
-	//Entfernen der alten Datasources
-	var oldDatasources = lehrfachmenulist.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
-	{
-		lehrfachmenulist.database.RemoveDataSource(oldDatasources.getNext());
-	}
-	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	lehrfachmenulist.builder.rebuild();
+    //Entfernen der alten Datasources
+    var oldDatasources = lehrfachmenulist.database.GetDataSources();
+    while(oldDatasources.hasMoreElements())
+    {
+            lehrfachmenulist.database.RemoveDataSource(oldDatasources.getNext());
+    }
+    //Refresh damit die entfernten DS auch wirklich entfernt werden
+    lehrfachmenulist.builder.rebuild();
 
-	//Url zusammenbauen
-	var url = '<?php echo APP_ROOT;?>rdf/lehrfach.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+'&'+gettimestamp();
+    //Url zusammenbauen
+    var url = '<?php echo APP_ROOT;?>rdf/lehrfach.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+'&'+gettimestamp();
 
-	//RDF holen
-	var newDs  = rdfService.GetDataSource(url);
-	lehrfachmenulist.database.AddDataSource(newDs);
+    //RDF holen
+    var newDs  = rdfService.GetDataSource(url);
+    lehrfachmenulist.database.AddDataSource(newDs);
 
-	//SinkObserver hinzufuegen
-	var sink = newDs.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-	sink.addXMLSinkObserver(LeDetailLehrfachSinkObserver);
+    //SinkObserver hinzufuegen
+    var sink = newDs.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+    sink.addXMLSinkObserver(LeDetailLehrfachSinkObserver);
 
-	document.getElementById('lehrveranstaltung-detail-textbox-lehrveranstaltung').value=lehrveranstaltung_id;
-	document.getElementById('lehrveranstaltung-detail-checkbox-new').checked=true;
-	document.getElementById('lehrveranstaltung-detail-textbox-stundenblockung').value='2';
-	document.getElementById('lehrveranstaltung-detail-textbox-wochenrythmus').value='1';
-	if(lehrform_kurzbz=='')
-		lehrform_kurzbz='UE';
-	document.getElementById('lehrveranstaltung-detail-menulist-lehrform').value=lehrform_kurzbz;
+    document.getElementById('lehrveranstaltung-detail-textbox-lehrveranstaltung').value=lehrveranstaltung_id;
+    document.getElementById('lehrveranstaltung-detail-checkbox-new').checked=true;
+    document.getElementById('lehrveranstaltung-detail-textbox-stundenblockung').value='2';
+    document.getElementById('lehrveranstaltung-detail-textbox-wochenrythmus').value='1';
+    if(lehrform_kurzbz=='')
+            lehrform_kurzbz='UE';
+    document.getElementById('lehrveranstaltung-detail-menulist-lehrform').value=lehrform_kurzbz;
 
-	var stsem = getStudiensemester();
-	document.getElementById('lehrveranstaltung-detail-menulist-studiensemester').value=stsem;
-	
-	//Defaultwert fuer Anmerkung
-	document.getElementById('lehrveranstaltung-detail-textbox-anmerkung').value='<?php echo str_replace("'","\'",LEHREINHEIT_ANMERKUNG_DEFAULT);?>';
-	*/
+    var stsem = getStudiensemester();
+    document.getElementById('lehrveranstaltung-detail-menulist-studiensemester').value=stsem;
+    
+    //Defaultwert fuer Anmerkung
+    document.getElementById('lehrveranstaltung-detail-textbox-anmerkung').value='<?php echo str_replace("'","\'",LEHREINHEIT_ANMERKUNG_DEFAULT);?>';
+    */
 }
 // ****
 // * Selectiert die Lektorzuordnung nachdem der Tree
 // * rebuildet wurde.
 // ****
-function TaskTreeSelectTask()
+function onselectProjekt()
 {
-	var tree=document.getElementById('projekttask-tree');
-	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+    // Trick 17	(sonst gibt's ein Permission denied)
+    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+    var tree = document.getElementById('tree-projekt');
 
-	//In der globalen Variable ist die zu selektierende ID gespeichert
-	if(TaskSelectID!=null)
+    if (tree.currentIndex==-1) return;
+    try
+    {
+        //Ausgewaehltes Projekt holen
+        id = getTreeCellText(tree, "treecol-projekt-oe_kurzbz", tree.currentIndex) +'/'+ getTreeCellText(tree, "treecol-projekt-projekt_kurzbz", tree.currentIndex);
+        //alert(id);
+        if(id!='')
+        {
+            //Projekt wurde markiert
+            //Loeschen Button aktivieren
+            document.getElementById('toolbarbutton-projekt-del').disabled=false;
+        }
+        else
+        {
+                return false;
+        }
+    }
+    catch(e)
+    {
+            alert(e);
+            return false;
+    }
+    
+    var req = new phpRequest('<?php echo APP_ROOT; ?>rdf/projekt.rdf.php','','');
+    req.add('projekt_kurzbz',id);
+    var response = req.execute();
+    
+    // Datasource holen
+    var dsource=parseRDFString(response, 'http://www.technikum-wien.at/projekt/alle-projekte');
+
+    dsource=dsource.QueryInterface(Components.interfaces.nsIRDFDataSource);
+
+    var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
+               getService(Components.interfaces.nsIRDFService);
+    var subject = rdfService.GetResource("http://www.technikum-wien.at/projekt/" + id);
+
+    var predicateNS = "http://www.technikum-wien.at/projekt/rdf";
+
+    //Daten holen
+    var projekt_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#projekt_kurzbz" ));
+    var oe_kurzbz=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#oe_kurzbz" ));
+    var titel=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#titel" ));
+    var beschreibung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#beschreibung" ));
+    var nummer=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#nummer" ));
+    var beginn=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#beginn" ));
+    var ende=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ende" ));
+    var personentage=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#personentage" ));
+    
+    //Daten den Feldern zuweisen
+
+    document.getElementById('textbox-projekt-detail-projekt_kurzbz').value=projekt_kurzbz;
+    document.getElementById('textbox-projekt-detail-oe_kurzbz').value=oe_kurzbz;
+    document.getElementById('textbox-projekt-detail-titel').value=titel;
+    document.getElementById('textbox-projekt-detail-beschreibung').value=beschreibung;
+    document.getElementById('textbox-projekt-detail-nummer').value=nummer;
+    document.getElementById('textbox-projekt-detail-beginn').value=beginn;
+    document.getElementById('textbox-projekt-detail-ende').value=ende;
+    document.getElementById('textbox-projekt-detail-personentage').value=personentage;
+}
+// ****
+// * Speichert die Details
+// ****
+function saveProjektDetail()
+{
+
+	//Werte holen
+	projekt_kurzbz = document.getElementById('textbox-projekt-detail-projekt_kurzbz').value;
+	oe_kurzbz = document.getElementById('textbox-projekt-detail-oe_kurzbz').value;
+	titel = document.getElementById('textbox-projekt-detail-titel').value;
+	beschreibung = document.getElementById('textbox-projekt-detail-beschreibung').value;
+	nummer = document.getElementById('textbox-projekt-detail-nummer').value;
+	beginn = document.getElementById('textbox-projekt-detail-beginn').value;
+	ende = document.getElementById('textbox-projekt-detail-ende').value;
+	personentage = document.getElementById('textbox-projekt-detail-personentage').value;
+
+	var soapBody = new SOAPObject("saveProjekt");
+	soapBody.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
+	soapBody.appendChild(new SOAPObject("oe_kurzbz")).val(oe_kurzbz);
+	soapBody.appendChild(new SOAPObject("titel")).val(titel);
+	soapBody.appendChild(new SOAPObject("beschreibung")).val(beschreibung);
+	soapBody.appendChild(new SOAPObject("nummer")).val(nummer);
+	soapBody.appendChild(new SOAPObject("beginn")).val(beginn);
+	soapBody.appendChild(new SOAPObject("ende")).val(ende);
+	soapBody.appendChild(new SOAPObject("personentage")).val(personentage);
+	soapBody.appendChild(new SOAPObject("user")).val(getUsername());
+	
+	var sr = new SOAPRequest("saveProjekt",soapBody);
+
+	SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekt.soap.php?"+gettimestamp();
+	SOAPClient.SendRequest(sr, clb_saveProjekt);
+}
+// ****
+// * Callback Funktion nach Speichern eines Projekts
+// ****
+function clb_saveProjekt(respObj)
+{
+	try
 	{
-	   	for(var i=0;i<items;i++)
-	   	{
-	   		//id der row holen
-	   		id = getTreeCellText(tree, "projekttask-treecol-projekttask_id", i);
-			
-			//wenn dies die zu selektierende Zeile
-			if(TaskSelectID==id)
-			{
-				//Zeile markieren
-				tree.view.selection.select(i);
-				//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
-				tree.treeBoxObject.ensureRowIsVisible(i);
-				return true;
-			}
-	   	}
+		var id = respObj.Body[0].saveProjektResponse[0].message[0].Text;
 	}
+	catch(e)
+	{
+		var fehler = respObj.Body[0].Fault[0].faultstring[0].Text;
+		alert('Fehler: '+fehler);
+		return;
+	}
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	document.getElementById('textbox-projekt-detail-projekt_kurzbz').value=id;
+		
+	ProjektSelectID=id;
+	datasourceTreeProjekt.Refresh(false); //non blocking
+	SetStatusBarText('Daten wurden gespeichert');
 }
 
 // ****
@@ -447,7 +541,7 @@ function TaskAuswahl()
 
 	alert("Details Laden von Task "+id);
 	/*
-	var req = new phpRequest('../rdf/lehreinheit.rdf.php','','');
+	var req = new phpRequest('<?php echo APP_ROOT; ?>rdf/lehreinheit.rdf.php','','');
 	req.add('lehreinheit_id',lehreinheit_id);
 
 	var response = req.execute();

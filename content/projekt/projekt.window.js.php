@@ -107,7 +107,7 @@ function saveProjekt()
     // Variablen checken
     
     // SOAP-Action
-    var soapBody = new SOAPObject("saveProjektDaten");
+    var soapBody = new SOAPObject("saveProjekt");
     soapBody.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
     soapBody.appendChild(new SOAPObject("oe_kurzbz")).val(oe_kurzbz);
     soapBody.appendChild(new SOAPObject("titel")).val(titel);
@@ -115,7 +115,7 @@ function saveProjekt()
     soapBody.appendChild(new SOAPObject("beschreibung")).val(beschreibung);
     soapBody.appendChild(new SOAPObject("beginn")).val(beginn);
     soapBody.appendChild(new SOAPObject("ende")).val(ende);
-    var sr = new SOAPRequest("saveProjektDaten",soapBody);
+    var sr = new SOAPRequest("saveProjekt",soapBody);
     SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekt.soap.php";
     SOAPClient.SendRequest(sr, clb_saveProjekt);
 		
@@ -127,7 +127,7 @@ function clb_saveProjekt(respObj)
 {
     try
     {
-        var msg = respObj.Body[0].saveProjektDatenResponse[0].message[0].Text;
+        var msg = respObj.Body[0].saveProjektResponse[0].message[0].Text;
 	alert('Antwort: '+msg);
     }
     catch(e)

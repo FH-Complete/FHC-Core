@@ -213,7 +213,7 @@ function TaskDisableFields(val)
 // ****
 // * Speichert die Details
 // ****
-function TaskDetailSave()
+function saveProjekttaskDetail()
 {
 
 	//Werte holen
@@ -236,13 +236,13 @@ function TaskDetailSave()
 	var sr = new SOAPRequest("saveProjekttask",soapBody);
 
 	SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekttask.soap.php?"+gettimestamp();
-	SOAPClient.SendRequest(sr, clb_TaskDetailSave);
+	SOAPClient.SendRequest(sr, clb_saveProjekttask);
 }
 
 // ****
 // * Callback Funktion nach Speichern eines Task
 // ****
-function clb_TaskDetailSave(respObj)
+function clb_saveProjekttask(respObj)
 {
 	try
 	{
@@ -267,7 +267,7 @@ function clb_TaskDetailSave(respObj)
 // * bei Auswahl eines Tasks wird diese geladen
 // * und die Daten unten angezeigt
 // ****
-function TaskAuswahl()
+function onselectProjekttask()
 {
 	
 	// Trick 17	(sonst gibt's ein Permission denied)
@@ -330,3 +330,4 @@ function TaskAuswahl()
 	document.getElementById('textbox-projekttask-detail-aufwand').value=aufwand;
 	document.getElementById('textbox-projekttask-detail-mantis_id').value=mantis_id;
 }
+                                

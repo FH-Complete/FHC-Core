@@ -28,7 +28,7 @@ require_once('../../config/vilesci.config.inc.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
-/*echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektdetail.overlay.xul.php"?>';*/
+echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektdetail.overlay.xul.php"?>';
 ?>
 <overlay id="overlay-projekt"
 	xmlns:html="http://www.w3.org/1999/xhtml"
@@ -63,7 +63,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		<tree id="tree-projekt" seltype="single" hidecolumnpicker="false" flex="1"
 				datasources="../../rdf/projekt.rdf.php?foo=<?php echo time(); ?>" ref="http://www.technikum-wien.at/projekt/alle-projekte"
 				style="margin:0px;" enableColumnDrag="true"
-				onselect="TaskAuswahl(this);"
+				onselect="onselectProjekt(this);"
  				persist="height"
  				flags="dont-build-content"
  				context="projekt-tree-popup"
@@ -133,11 +133,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			<tabbox id="tabbox-projekt" flex="3" orient="vertical">
 				<tabs id="tabs-projekt-main" orient="horizontal">
 					<tab id="tab-projekt-detail" label="Details" />
-					<tab id="tab-projekt-mantis" label="Mantis" />
+					<tab id="tab-projekt-ressource" label="Ressource" />
 				</tabs>
 				<tabpanels id="tabpanels-projekt-main" flex="1">
 					<vbox id="box-projekt-detail" />
-					<vbox id="box-projekt-mantis" />
+					<vbox id="box-projekt-ressource" />
 				</tabpanels>
 			</tabbox>
 		</vbox>

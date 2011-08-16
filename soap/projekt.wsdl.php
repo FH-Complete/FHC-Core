@@ -28,7 +28,7 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
   	</wsdl:message>
    
  <wsdl:portType name="ConfigPortType" >
-       <wsdl:operation name="saveProjektDaten">
+       <wsdl:operation name="saveProjekt">
            <wsdl:input message="tns:SaveProjektRequest"></wsdl:input>
            <wsdl:output message="tns:SaveProjektResponse"></wsdl:output>        
        </wsdl:operation>
@@ -36,8 +36,8 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
 
    <wsdl:binding name="ConfigBinding" type="tns:ConfigPortType">
        <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
-       <wsdl:operation name="saveProjektDaten">
-           <soap:operation soapAction="<?php echo APP_ROOT."soap/saveProjektDaten";?>" />
+       <wsdl:operation name="saveProjekt">
+           <soap:operation soapAction="<?php echo APP_ROOT."soap/saveProjekt";?>" />
            <wsdl:input> 
                <soap:body use="encoded" namespace="http://localhost/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
            </wsdl:input>
