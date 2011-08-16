@@ -32,13 +32,16 @@ require_once('../../../../include/beispiel.class.php');
 require_once('../../../../include/studentnote.class.php');
 require_once('../../../../include/datum.class.php');
 require_once('../../../../include/legesamtnote.class.php');
+require_once('../../../../include/phrasen.class.php');
 
+$sprache = getSprache(); 
+$p = new phrasen($sprache); 
 if (!$db = new basis_db())
-	die('Fehler beim Herstellen der Datenbankverbindung');
+	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
 
 $user = get_uid();
 if(!check_lektor($user))
-	die('Sie haben keine Berechtigung fuer diesen Bereich');
+	die($p->t('global/keineBerechtigungFuerDieseSeite'));
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
@@ -46,7 +49,7 @@ $rechte->getBerechtigungen($user);
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid'])) //Lehrveranstaltung_id
 	$lvid = $_GET['lvid'];
 else
-	die('Fehlerhafte Parameteruebergabe');
+	die($p->t('global/fehlerBeiDerParameteruebergabe'));
 
 if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id'])) //Lehreinheit_id
 	$lehreinheit_id = $_GET['lehreinheit_id'];
@@ -67,7 +70,7 @@ else
 	$stsem = '';
 
 if($stsem!='' && !check_stsem($stsem))
-	die('Studiensemester ist ungueltig');
+	die($p->t('global/studiensemesterKonnteNichtGefundenWerden'));
 
 //Vars
 $datum_obj = new datum();
@@ -94,7 +97,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 	}
 	function confirmdelete()
 	{
-		return confirm('Wollen Sie die markierten Einträge wirklich löschen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
+		return confirm(<?php echo $p->t('gesamtnote/wollenSieWirklichLoeschen');?>);
 	}
   
   
@@ -134,7 +137,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 		note = document.getElementById(uid).note.value;	
 		if ((note < 0) || (note > 5 && note != 8 && note != 7))
 		{
-			alert("Bitte geben Sie eine Note von 1 - 5 bzw. 7 (nicht beurteilt) oder 8 (teilgenommen) ein!");
+			alert("<?php echo $p->t('benotungstool/noteEingeben');?>");
 			document.getElementById(uid).note.value="";
 		}
 		else
@@ -192,7 +195,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 echo '<table class="tabcontent">';
 echo ' <tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
-echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;Benotungstool';
+echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;'.$p->t('benotungstool/benotungstool');
 echo '</font></td><td  class="ContentHeader" align="right">'."\n";
 
 //Studiensemester laden
@@ -203,7 +206,7 @@ if($stsem=='')
 $stsem_obj->getAll();
 
 //Studiensemester DropDown
-$stsem_content = "Studiensemester: <SELECT name='stsem' onChange=\"MM_jumpMenu('self',this,0)\">\n";
+$stsem_content = $p->t('global/studiensemester').": <SELECT name='stsem' onChange=\"MM_jumpMenu('self',this,0)\">\n";
 
 foreach($stsem_obj->studiensemester as $studiensemester)
 {
@@ -236,7 +239,7 @@ if($result = $db->db_query($qry))
 	if($db->db_num_rows($result)>0)
 	{
 		//Lehreinheiten DropDown
-		echo " Lehreinheit: <SELECT name='lehreinheit_id' onChange=\"MM_jumpMenu('self',this,0)\">\n";
+		echo $p->t('global/lehreinheit')." : <SELECT name='lehreinheit_id' onChange=\"MM_jumpMenu('self',this,0)\">\n";
 		while($row = $db->db_fetch_object($result))
 		{
 			if($lehreinheit_id=='')
@@ -288,7 +291,7 @@ if($result = $db->db_query($qry))
 }
 else
 {
-	echo 'Fehler beim Auslesen der Lehreinheiten';
+	echo $p->t('benotungstool/fehlerBeimAuslesen');
 }
 echo $stsem_content;
 echo '</td><tr></table>';
@@ -299,7 +302,7 @@ echo "<td>\n";
 echo "<b>$lv_obj->bezeichnung</b><br>";
 
 if($lehreinheit_id=='')
-	die('Es wurde keine passende Lehreinheit in diesem Studiensemester gefunden');
+	die($p->t('benotungstool/keinePassendeLehreinheitGefunden'));
 
 //Menue
 include("menue.inc.php");
@@ -342,8 +345,8 @@ if (isset($_REQUEST["submit"]) && ($_POST["student_uid"] != '')){
 		echo "<span class='error'>".$legesamtnote->errormsg."</span>";
 }
 
-echo "<h3>LE Gesamtnote verwalten</h3>";
-echo "Noten: 1-5, 7 (nicht beurteilt), 8 (teilgenommen)";
+echo "<h3>".$p->t('benotungstool/leGesamtnotenVerwalten')."</h3>";
+echo $p->t('benotungstool/noten');
 
 
 //Studentenliste
@@ -362,14 +365,14 @@ echo "
 				<td>&nbsp;</td>
 			</tr>
 			<tr>
-				<td class='ContentHeader2'>UID</td>
-				<td class='ContentHeader2'>Nachname</td>
-				<td class='ContentHeader2'>Vorname</td>
-				<td class='ContentHeader2'>Gesamtnote</td>
+				<td class='ContentHeader2'>".$p->t('global/uid')."</td>
+				<td class='ContentHeader2'>".$p->t('global/nachname')."</td>
+				<td class='ContentHeader2'>".$p->t('global/vorname')."</td>
+				<td class='ContentHeader2'>".$p->t('benotungstool/gesamtnote')."</td>
 				<td class='ContentHeader2'>&nbsp;</td>
 				<td class='ContentHeader2'></td>
 				<td class='ContentHeader2'></td>
-				<td class='ContentHeader2'>LE-Gesamtnote</td>
+				<td class='ContentHeader2'>".$p->t('benotungstool/leGesamtnote')."</td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
@@ -458,7 +461,7 @@ if($result_stud = $db->db_query($qry_stud))
 				if ($note_final == 0)
 					$note_final = null;
 			}
-		}
+		} 
 		echo "<form  accept-charset='UTF-8' name='$row_stud->uid' id='$row_stud->uid' method='POST' action='legesamtnoteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><td><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_final' name='note'><input type='button' value='->' onclick='saveLENote(\"$row_stud->uid\")'></td></form>";
 		if ($note == 5)
 			$negmarkier = " style='color:red; font-weight:bold;'";
