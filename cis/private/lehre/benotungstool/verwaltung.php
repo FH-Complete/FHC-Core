@@ -20,14 +20,9 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
- require_once('../../../../config/cis.config.inc.php');
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung 
-// ------------------------------------------------------------------------------------------
-	require_once('../../../../include/basis_db.class.php');
-	if (!$db = new basis_db())
-			die('Fehler beim Herstellen der Datenbankverbindung');
-			
+require_once('../../../../config/cis.config.inc.php');
+require_once('../../../../include/basis_db.class.php');
+
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/studiengang.class.php');
@@ -38,6 +33,15 @@ require_once('../../../../include/uebung.class.php');
 require_once('../../../../include/beispiel.class.php');
 require_once('../../../../include/datum.class.php');
 require_once('functions.inc.php');
+require_once('../../../../include/phrasen.class.php');
+
+$sprache = getSprache(); 
+$p = new phrasen($sprache);
+
+if (!$db = new basis_db())
+		die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
+			
+
 function microtime_float()
 {
     list($usec, $sec) = explode(" ", microtime());
@@ -64,7 +68,7 @@ $time = microtime_float();
 	}
 	function confirmdelete()
 	{
-		return confirm('Wollen Sie die markierten Einträge wirklich löschen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
+		return confirm('<?php $p->t('gesamtnote/wollenSieWirklichLoeschen');?>');
 	}
 	
 	//Aus- und Einblenden der Listen
@@ -105,7 +109,7 @@ $time = microtime_float();
 $user = get_uid();
 //$user = "goeschka";
 if(!check_lektor($user))
-	die('Sie haben keine Berechtigung fuer diesen Bereich');
+	die($p->t('global/keineBerechtigungFuerDieseSeite'));
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
@@ -113,7 +117,7 @@ $rechte->getBerechtigungen($user);
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid'])) //Lehrveranstaltung_id
 	$lvid = $_GET['lvid'];
 else
-	die('Fehlerhafte Parameteruebergabe');
+	die($p->t('global/fehlerBeiDerParameteruebergabe'));
 
 if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id'])) //Lehreinheit_id
 	$lehreinheit_id = $_GET['lehreinheit_id'];
@@ -160,7 +164,7 @@ $copy_dropdown = '';
 echo '<table class="tabcontent" height="100%">';
 echo ' <tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
-echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;Benotungstool';
+echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;'.$p->t('benotungstool/benotungstool');
 echo '</font></td><td  class="ContentHeader" align="right">'."\n";
 
 //Studiensemester laden
@@ -172,7 +176,7 @@ $stsem_obj->getAll();
 
 
 //Studiensemester DropDown
-$stsem_content = "Studiensemester: <SELECT name='stsem' onChange=\"MM_jumpMenu('self',this,0)\">\n";
+$stsem_content = $p->t('global/studiensemester').": <SELECT name='stsem' onChange=\"MM_jumpMenu('self',this,0)\">\n";
 
 foreach($stsem_obj->studiensemester as $studiensemester)
 {
@@ -206,7 +210,7 @@ if($result =  $db->db_query($qry))
 	if($db->db_num_rows($result)>1)
 	{
 		//Lehreinheiten DropDown
-		echo " Lehreinheit: <SELECT name='lehreinheit_id' onChange=\"MM_jumpMenu('self',this,0)\">\n";
+		echo $p->t('global/lehreinheit').": <SELECT name='lehreinheit_id' onChange=\"MM_jumpMenu('self',this,0)\">\n";
 		$copy_dropdown = "<select name='lehreinheit_id_target'><option></option>";
 		while($row = $db->db_fetch_object($result))
 		{
@@ -266,7 +270,7 @@ if($result =  $db->db_query($qry))
 }
 else
 {
-	echo 'Fehler beim Auslesen der Lehreinheiten';
+	echo $p->t('benotungstool/fehlerBeimAuslesen');
 }
 echo $stsem_content;
 echo '</td><tr></table>';
@@ -278,7 +282,7 @@ echo "<td>\n";
 echo "<b>$lv_obj->bezeichnung</b><br>";
 
 if($lehreinheit_id=='')
-	die('Es gibt keine Lehreinheiten in diesem Studiensemester f&uuml;r die Sie eine Berechtigung besitzen');
+	die($p->t('benotungstool/esGibtKeineLehreinheiten'));
 
 //Menue
 include("menue.inc.php");
@@ -307,7 +311,7 @@ if (isset($_REQUEST["copy_uebung"]))
 	$uebung_id_source = $_REQUEST["uebung_id_source"];
 	$lehreinheit_id_target = $_REQUEST["lehreinheit_id_target"];
 	if (!is_numeric($uebung_id_source) or !is_numeric($lehreinheit_id_target))
-		echo "<span class='error'>Übung und Lehreinheit muss ausgewählt sein!</span>";
+		echo "<span class='error'>".$p->t('benotungstool/uebungUndLehreinheit')."!</span>";
 	else
 	{
 		$ueb_1 = new uebung($uebung_id_source);
@@ -359,7 +363,7 @@ if (isset($_REQUEST["copy_uebung"]))
 			if (!$ueb_1_target->save($new))
 			{
 				$error = 1;
-				echo "<span class='error'>Hauptübung konnte nicht kopiert werden!</span>";
+				echo "<span class='error'>".$p->t('benotungstool/hauptuebungKonnteNichtKopiertWerden')."!</span>";
 			}
 				
 			else
@@ -422,7 +426,7 @@ if (isset($_REQUEST["copy_uebung"]))
 						if (!$ueb_2_target->save($new))
 						{
 							$error = 1;
-							echo "<span class='error'>Übung konnte nicht kopiert werden!</span>";
+							echo "<span class='error'>".$p->t('benotungstool/uebungKonnteNichtKopiertWerden')."!</span>";
 						}
 						
 						//angabedatei syncen
@@ -479,7 +483,7 @@ if (isset($_REQUEST["copy_uebung"]))
 								if (!$bsp_target->save($new))
 								{
 									$error = 1;
-									echo "<span class='error'>Beispiele konnten nicht angelegt werden</span>";							
+									echo "<span class='error'>".$p->t('benotungstool/beispieleKonntenNichtAngelegtWerden')."</span>";							
 								}
 								
 								//Notenschlüssel synchronisieren
@@ -503,16 +507,16 @@ if (isset($_REQUEST["copy_uebung"]))
 			
 		}
 		else
-			echo "<span class='error'>Fehler beim Datenbankzugriff!</span>";
+			echo "<span class='error'>".$p->t('global/fehlerBeimOeffnenDerDatenbankverbindung')."!</span>";
 			
 		if ($error == 0)
-			echo "Übung erfolgreich kopiert! (Ü: ".$copy_insert."/".$copy_update."; B: ".$copy_insert_bsp."/".$copy_update_bsp.")";
+			echo $p->t('benotungstool/uebungErfolgreichKopiert')."! (Ü: ".$copy_insert."/".$copy_update."; B: ".$copy_insert_bsp."/".$copy_update_bsp.")";
 	}
 }
 
 
 
-echo "<h3>Übungen anlegen und verwalten</h3>";
+echo "<h3>".$p->t('benotungstool/uebungenAnlegenUndVerwalten')."</h3>";
 echo "</tr></table>";
 
 //Anlegen einer neuen Uebung
@@ -526,12 +530,12 @@ if(isset($_POST['uebung_neu']))
 		if($thema=='')
 		{
 			//$error_thema .= "<span class='error'>Thema muss eingegeben werden</span>";
-			echo "<span class='error'>Thema muss eingegeben werden</span>";
+			echo "<span class='error'>".$p->t('benotungstool/themaMussEingegebenWerden')."</span>";
 			$error=true;
 		}
 		if(!is_numeric($gewicht))
 		{
-			echo "<span class='error'>Gewicht muss eine Zahl sein</span>";
+			echo "<span class='error'>".$p->t('benotungstool/gewichtMussEineZahlSein')."</span>";
 			$error = true;
 		}
 
@@ -573,7 +577,7 @@ if(isset($_POST['uebung_neu']))
 
 	}
 	else
-		echo "<span class='error'>Übung konnte nicht angelegt werden!</span><br>";
+		echo "<span class='error'>".$p->t('benotungstool/uebungKonnteNichtAngelegtWerden')."!</span><br>";
 }
 
 
@@ -603,7 +607,7 @@ if(isset($_POST['uebung_edit']))
 	$error = false;
 	if($thema=='')
 	{
-		echo "<span class='error'>Thema muss eingegeben werden'</span>";
+		echo "<span class='error'>".$p->t('benotungstool/themaMussEingegebenWerden')."'</span>";
 		$error = true;
 	}
 
@@ -707,32 +711,32 @@ if(isset($_GET['kopieren']) && $_GET['kopieren']=='true')
 									}
 
 									if($error_bsp_save)
-										echo "<span class='error'>Fehler: Es konnten nicht alle Beispiel kopiert werden</span>";
+										echo "<span class='error'>".$p->t('benotungstool/fehlerNichtAlleBeispieleKopiert')."</span>";
 									else
-										echo "Daten wurden erfolgreich kopiert";
+										echo $p->t('benotungstool/datenErfolgreichKopiert');
 								}
 							}
 							else
 							{
 
-								echo "<span class='error'>Fehler beim kopieren der Daten: $uebung_dest->errormsg</span>";
+								echo "<span class='error'>".$p->t('benotungstool/fehlerKopierenDerDaten').": $uebung_dest->errormsg</span>";
 							}
 						}
 						else
-							echo "<span class='error'>Fehler beim Kopieren: In der Ziel-Lehreinheit existiert bereits eine Kreuzerlliste mit diesem Namen!</span>";
+							echo "<span class='error'>".$p->t('benotungstool/fehlerBeimKopieren')."!</span>";
 					}
 					else
-						echo "<span class='error'>Sie haben keine Berechtigung f&uuml;r diese Aktion</span>";
+						echo "<span class='error'>".$p->t('global/keineBerechtigungFuerDieseSeite')."</span>";
 				}
 			}
 			else
-				echo "<span class='error'>Uebung ".$_GET['uebung_copy_id']." wurde nicht gefunden</span>";
+				echo "<span class='error'>".$p->t('benotungstool/uebung')." ".$_GET['uebung_copy_id']." ".$p->t('benotungstool/wurdeNichtGefunden')."</span>";
 		}
 		else
-			echo "<span class='error'>Uebung ".$_GET['uebung_copy_id']." wurde nicht gefunden</span>";
+			echo "<span class='error'>".$p->t('benotungstool/uebung')." ".$_GET['uebung_copy_id']." ".$p->t('benotungstool/wurdeNichtGefunden')."</span>";
 	}
 	else
-		echo "<span class='error'>Fehler bei der Parameteruebergabe</span>";
+		echo "<span class='error'>".$p->t('global/fehlerBeiDerParameteruebergabe')."</span>";
 }
 
 //Uebersichtstabelle
@@ -741,20 +745,20 @@ if(isset($uebung_id) && $uebung_id!='')
 	echo "<table><tr><td valign='top'>";
 	//Bearbeiten der ausgewaehlten Uebung
 	echo "<form action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id' method=POST>\n";
-	echo "<table><tr><td colspan='2' width='340' class='ContentHeader3'>Ausgew&auml;hlte Übung bearbeiten</td><td>&nbsp;</td></tr>\n";
+	echo "<table><tr><td colspan='2' width='340' class='ContentHeader3'>".$p->t('benotungstool/ausgewaehlteUebungBearbeiten')."</td><td>&nbsp;</td></tr>\n";
 	echo "<tr><td>&nbsp;</td><td></td></tr>";
 
 	$uebung_obj = new uebung();
 	$uebung_obj->load($uebung_id);
 
 	echo "
-	<tr><td>Thema</td><td align='right'><input type='text' name='thema'  maxlength='32' value='$uebung_obj->bezeichnung'></td><td>$error_thema</td></tr>
+	<tr><td>".$p->t('benotungstool/thema')."</td><td align='right'><input type='text' name='thema'  maxlength='32' value='$uebung_obj->bezeichnung'></td><td>$error_thema</td></tr>
 	<!--
-	<tr><td>Freigabe</td><td align='right'>von <input type='text' size='16' name='freigabevon' value='".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon))."'></td></tr>
-	<tr><td>(Format: 31.12.2007 14:30)</td><td align='right'>bis <input type='text' size='16' name='freigabebis' value='".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis))."'></td></tr>
-	<tr><td>Statistik f&uuml;r Studenten anzeigen <input type='checkbox' name='statistik' ".($uebung_obj->statistik?'checked':'')."></td><td></td></tr>
+	<tr><td>".$p->t('benotungstool/freigabe')."</td><td align='right'>von <input type='text' size='16' name='freigabevon' value='".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon))."'></td></tr>
+	<tr><td>".$p->t('benotungstool/format')."</td><td align='right'>bis <input type='text' size='16' name='freigabebis' value='".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis))."'></td></tr>
+	<tr><td>".$p->t('benotungstool/statistikFuerStudentenAnzeigen')." <input type='checkbox' name='statistik' ".($uebung_obj->statistik?'checked':'')."></td><td></td></tr>
 	-->
-	<tr><td colspan=2 align='right'><input type='submit' name='uebung_edit' value='Speichern'></td></tr>
+	<tr><td colspan=2 align='right'><input type='submit' name='uebung_edit' value='".$p->t('global/speichern')."'></td></tr>
 	</table>
 	</form>";
 
@@ -773,7 +777,7 @@ else
 	
 	echo "<table><tr><td valign='top'>";
 	echo "<form accept-charset='UTF-8' name='del' action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method='POST'>";
-	echo "<table width='440'><tr><td colspan='3' class='ContentHeader3'>Vorhandene Übungen bearbeiten</td></tr>";
+	echo "<table width='440'><tr><td colspan='3' class='ContentHeader3'>".$p->t('benotungstool/vorhandeneUebungenBearbeiten')."</td></tr>";
 
 	$uebung_obj = new uebung();
 	$uebung_obj->load_uebung($lehreinheit_id,$level=1,$uebung_id=null);
@@ -782,7 +786,7 @@ else
 	$has_copy_content=false;
 	if($anzahl>0)
 	{
-		echo "<tr><td></td><td></td><td>&nbsp;</td><td></td></tr><tr><th>Thema</th><th>Freigeschalten</th><th>Auswahl</th></tr>";
+		echo "<tr><td></td><td></td><td>&nbsp;</td><td></td></tr><tr><th>".$p->t('benotungstool/thema')."</th><th>".$p->t('benotungstool/freigeschalten')."</th><th>".$p->t('benotungstool/auswahl')."</th></tr>";
 
 		//Alle Lehreinheiten holen die zu dieser lehrveranstaltung gehoeren
 		//und der angemeldete User berechtigt ist
@@ -861,30 +865,30 @@ else
 			{
 				echo "<tr><td width='200'><li style='margin-left:20px;'><a href='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$subrow->uebung_id&liste_id=$row->uebung_id'>".$subrow->bezeichnung."</a></li></td><td width='150'>";
 				if((strtotime(strftime($subrow->freigabevon))<=time()) && (strtotime(strftime($subrow->freigabebis))>=time()))
-					echo 'Ja';
+					echo $p->t('global/ja');
 				else
-					echo 'Nein';
+					echo $p->t('global/nein');
 				echo "</td><td align='center'><input type='Checkbox' name='uebung[]' value='$subrow->uebung_id'></td></tr>";
 			}
 			//echo "</ul>";
 			echo "</table>";
 			echo "</td></tr>";
 		}
-		echo "<tr><td colspan='3' align='right'><input type='Submit' value='Auswahl löschen' name='delete_uebung' onclick='return confirmdelete();'></td><td></td></tr>";
+		echo "<tr><td colspan='3' align='right'><input type='Submit' value='".$p->t('benotungstool/auswahlLoeschen')."' name='delete_uebung' onclick='return confirmdelete();'></td><td></td></tr>";
 		echo "</form>";
 		if ($copy_dropdown != '')
 		{		
 			echo "<tr><td colspan='3'>&nbsp;</td></tr>";
-			echo "<tr><td colspan='3' class='ContentHeader3'>Vorhandene Übungen kopieren</td></tr>";
+			echo "<tr><td colspan='3' class='ContentHeader3'>".$p->t('benotungstool/vorhandeneUebungenKopieren')."</td></tr>";
 			
 			$uebung_id_source_dropdown .= "</select>";
 			echo "<tr><td colspan='3'>";
-			echo "<form name='copy' action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method='POST'><table><tr><td>Übung</td><td></td><td>Lehreinheit</td><td></td></tr><tr><td>".$uebung_id_source_dropdown."</td><td>-></td><td>".$copy_dropdown."</td><td><input type='submit' name='copy_uebung' value='kopieren'></td></tr></table></form>";
+			echo "<form name='copy' action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method='POST'><table><tr><td>".$p->t('benotungstool/uebung')."</td><td></td><td>".$p->t('global/lehreinheit')."</td><td></td></tr><tr><td>".$uebung_id_source_dropdown."</td><td>-></td><td>".$copy_dropdown."</td><td><input type='submit' name='copy_uebung' value='".$p->t('global/kopieren')."'></td></tr></table></form>";
 			echo "</td></tr>";
 		}
 	}
 	else
-		echo "<tr><td colspan='3'>Derzeit sind keine Übungen angelegt</td><td></td></tr>";
+		echo "<tr><td colspan='3'>".$p->t('benotungstool/derzeitSindKeineUebungenAngelegt')."</td><td></td></tr>";
 
 	echo "</table>
 	<br><br>";
@@ -911,18 +915,18 @@ else
 	echo "
 	<form action='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' method=POST>
 	<table >
-	<tr><td width='440' colspan=2 class='ContentHeader3'>Neue Übung anlegen</td><td></td></tr>
-	<tr><td>Thema</td><td align='right'><input type='text' name='thema' maxlength='32' value='$thema'></td><td><span class='error'>$error_thema</td></tr>
-	<tr><td>Gewicht</td><td align='right'><input type='text' size='16' name='gewicht' value='1'></td><td>$error_gewicht</td></tr>
-		<tr><td>Positiv </td><td><input type='checkbox' name='positiv'></td></tr>
+	<tr><td width='440' colspan=2 class='ContentHeader3'>".$p->t('benotungstool/neueUebungAnlegen')."</td><td></td></tr>
+	<tr><td>".$p->t('benotungstool/thema')."</td><td align='right'><input type='text' name='thema' maxlength='32' value='$thema'></td><td><span class='error'>$error_thema</td></tr>
+	<tr><td>".$p->t('benotungstool/gewicht')."</td><td align='right'><input type='text' size='16' name='gewicht' value='1'></td><td>$error_gewicht</td></tr>
+		<tr><td>".$p->t('benotungstool/positiv')." </td><td><input type='checkbox' name='positiv'></td></tr>
 	<!--
-	<tr><td>Anzahl der Beispiele</td><td align='right'><input type='text' name='anzahlderbeispiele' maxlength='2' size='2' value='$anzahlderbeispiele'></td><td>$error_anzahlderbeispiele</td></tr>
-	<tr><td>Anzahl Punkte pro Beispiel</td><td align='right'><input type='text' name='punkteprobeispiel' value='$punkteprobeispiel'></td><td>$error_punkteprobeispiel</td></tr>
-	<tr><td>Freigabe</td><td align='right'>von <input type='text' size='16' name='freigabevon' value='$freigabevon'></td><td>$error_freigabevon</td></tr>
-	<tr><td>(Format: 31.12.2007 14:30)</td><td align='right'>bis <input type='text' size='16' name='freigabebis' value='$freigabebis'></td><td>$error_freigabebis</td></tr>
-	<tr><td>Statistik f&uuml;r Studenten anzeigen <input type='checkbox' name='statistik'></td><td></td></tr>
+	<tr><td>".$p->t('benotungstool/anzahlDerBeispiele')."</td><td align='right'><input type='text' name='anzahlderbeispiele' maxlength='2' size='2' value='$anzahlderbeispiele'></td><td>$error_anzahlderbeispiele</td></tr>
+	<tr><td>".$p->t('benotungstool/anzahlPunkteProBeispiel')."</td><td align='right'><input type='text' name='punkteprobeispiel' value='$punkteprobeispiel'></td><td>$error_punkteprobeispiel</td></tr>
+	<tr><td>".$p->t('benotungstool/freigabe')."</td><td align='right'>von <input type='text' size='16' name='freigabevon' value='$freigabevon'></td><td>$error_freigabevon</td></tr>
+	<tr><td>".$p->t('benotungstool/format')."</td><td align='right'>bis <input type='text' size='16' name='freigabebis' value='$freigabebis'></td><td>$error_freigabebis</td></tr>
+	<tr><td>".$p->t('benotungstool/statistikFuerStudentenAnzeigen')." <input type='checkbox' name='statistik'></td><td></td></tr>
 	-->
-	<tr><td colspan=2 align='right'><input type='submit' name='uebung_neu' value='Anlegen'></td></tr>
+	<tr><td colspan=2 align='right'><input type='submit' name='uebung_neu' value='".$p->t('benotungstool/anlegen')."'></td></tr>
 	</table>
 	</form>
 	";

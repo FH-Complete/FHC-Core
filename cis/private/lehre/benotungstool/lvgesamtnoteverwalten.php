@@ -40,27 +40,31 @@ require_once('../../../../include/benutzer.class.php');
 require_once('../../../../include/mitarbeiter.class.php');
 require_once('../../../../include/moodle_course.class.php');
 require_once('../../../../include/mail.class.php');
+require_once('../../../../include/phrasen.class.php');
 
 $summe_stud=0;
 $summe_t2=0;
 $summe_komm=0;
 $summe_ng=0;
 
+$sprache = getSprache();
+$p = new phrasen($sprache);
+
 if (!$db = new basis_db())
-	die('Fehler beim Herstellen der Datenbankverbindung');
+	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
 
 $debg=(isset($_REQUEST['debug'])?$_REQUEST['debug']:'');	
 
 $user = get_uid();
 if(!check_lektor($user))
-	die('Sie haben keine Berechtigung fuer diesen Bereich');
+	die($p->t('global/keineBerechtigungFuerDieseSeite'));
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid'])) //Lehrveranstaltung_id
 	$lvid = $_GET['lvid'];
 else
-	die('Fehlerhafte Parameteruebergabe');
+	die($p->t('global/fehlerBeiDerParameteruebergabe'));
 
 if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id'])) //Lehreinheit_id
 	$lehreinheit_id = $_GET['lehreinheit_id'];
@@ -122,7 +126,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 	
 	function confirmdelete()
 	{
-		return confirm('Wollen Sie die markierten Einträge wirklich löschen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
+		return confirm(<?php echo $p->t('gesamtnote/wollenSieWirklichLoeschen').'!!'; ?>);
 	}
 
 	function getTopOffset()
@@ -190,7 +194,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 		//wenn die Note gleich bleibt dann abbrechen
 		if 	(note == note_orig && note != "")
 		{
-			alert("Note unverändert!");
+			alert(<?php echo $p->t('gesamtnote/noteUnveraendert').'!';?>);
 			return true;
 		}
 		else if ((note < 0) || (note > 5 && note != 8 && note != 7))
@@ -551,7 +555,7 @@ if($result = $db->db_query($qry))
 	}
 }
 else 
-	die('Fehler');
+	die($p->t('global/fehleraufgetreten'));
 
 $htmlOutput='';
 	

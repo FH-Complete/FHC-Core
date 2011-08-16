@@ -18,38 +18,38 @@ else if ($pfile == 'statistik.php')
 	$class_statistik = 'benotungstool_tabs_active';
 	
 echo "\n\n<!--Menue-->\n";
-echo "<br><div><ul><li><a href='lvgesamtnoteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'>Lehrveranstaltung benoten</font></a></li><li><a href='".APP_ROOT."cis/cisdocs/handbuch_benotungstool.pdf' class='Item' target='_blank'><font size='3'>Handbuch Benotungstool (PDF)</font></a></li></ul></div>";
+echo "<br><div><ul><li><a href='lvgesamtnoteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'>".$p->t('benotungstool/lehrveranstaltungBenoten')."</font></a></li><li><a href='".APP_ROOT."cis/cisdocs/handbuch_benotungstool.pdf' class='Item' target='_blank'><font size='3'>".$p->t('benotungstool/handbuchBenotungstool')."</font></a></li></ul></div>";
 echo "<br>\n";
 echo "<table cellpadding='3' width='100%'>\n";
 echo "	<tr>\n";
-echo "		<td class='$class_uebung'><a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'>Übungen</font></a></td>\n";
-echo "		<td class='$class_benotung'><a href='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'>Benotung</font></a></td>\n";
-echo "		<td class='$class_anwesenheit'><a href='anwesenheitstabelle.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id' class='Item'><font size='3'>Anwesenheits- und Übersichtstabelle</font></a></td>\n";
-echo "		<td class='$class_statistik'><a href='statistik.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'>Statistik</font></a></td>\n";
+echo "		<td class='$class_uebung'><a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'>".$p->t('benotungstool/uebungen')."</font></a></td>\n";
+echo "		<td class='$class_benotung'><a href='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'>".$p->t('benotungstool/benotung')."</font></a></td>\n";
+echo "		<td class='$class_anwesenheit'><a href='anwesenheitstabelle.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id' class='Item'><font size='3'>".$p->t('benotungstool/anwesenheitstabelle')."</font></a></td>\n";
+echo "		<td class='$class_statistik'><a href='statistik.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'><font size='3'>".$p->t('benotungstool/statistik')."</font></a></td>\n";
 echo "	</tr>\n";
 echo "	<tr>\n";
 echo "		<td colspan='4' class='benotungstool_subtab'>";
 
 if ($pfile == "verwaltung.php")
-	echo "<b>Übersicht</b>";
+	echo "<b>".$p->t('benotungstool/uebersicht')."</b>";
 else if ($pfile == "verwaltung_listen.php")
 {
-	echo "<a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id'>Übersicht</a> \n";
+	echo "<a href='verwaltung.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id'>".$p->t('benotungstool/uebersicht')."</a> \n";
 	if (isset($_GET["liste_id"]) && !isset($_GET["uebung_id"]))
-		echo "		| <b>Übung</b> \n";
+		echo "		| <b>".$p->t('benotungstool/uebung')."</b> \n";
 	if (isset($_GET["liste_id"]) && isset($_GET["uebung_id"]))
-		echo "		| <a href='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id'>Übung</a> | <b>Liste</b> \n";
+		echo "		| <a href='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id'>".$p->t('benotungstool/uebung')."</a> | <b>".$p->t('benotungstool/liste')."</b> \n";
 }
 
 if ($pfile == "studentenpunkteverwalten.php" && (!isset($_GET["uid"]) || $_GET["uid"]==""))
-	echo "<b>Übungsnoten verwalten: Übersicht</b> | <a href='legesamtnoteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id'>LE-Noten verwalten</a> | <a href='lvgesamtnoteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id'>LV-Noten verwalten</a>";
+	echo "<b>".$p->t('benotungstool/uebungsnotenVerwalten').": ".$p->t('benotungstool/uebersicht')."</b> | <a href='legesamtnoteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id'>".$p->t('benotungstool/leNotenVerwalten')."</a> | <a href='lvgesamtnoteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id'>".$p->t('benotungstool/lvNotenVerwalten')."</a>";
 else if ($pfile == "studentenpunkteverwalten.php")
-	echo "<b>Übungsnoten verwalten: Detail</b> / <a href='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'>Übersicht</a> | <a href='legesamtnoteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id'>LE-Noten verwalten</a> | <a href='lvgesamtnoteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id'>LV-Noten verwalten</a>";
+	echo "<b>".$p->t('benotungstool/uebungsnotenVerwalten').": ".$p->t('benotungstool/detail')."</b> / <a href='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'>".$p->t('benotungstool/uebersicht')."</a> | <a href='legesamtnoteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id'>".$p->t('benotungstool/leNotenVerwalten')."</a> | <a href='lvgesamtnoteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id'>".$p->t('benotungstool/lvNotenVerwalten')."</a>";
 	
 else if ($pfile == "legesamtnoteverwalten.php")
-	echo "<a href='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'>Übungsnoten verwalten</a> | <b>LE-Noten verwalten</b> | <a href='lvgesamtnoteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id'>LV-Noten verwalten</a>";
+	echo "<a href='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'>".$p->t('benotungstool/uebungsnotenVerwalten')."</a> | <b>".$p->t('benotungstool/leNotenVerwalten')."</b> | <a href='lvgesamtnoteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id'>".$p->t('benotungstool/lvNotenVerwalten')."</a>";
 else if ($pfile == "lvgesamtnoteverwalten.php")
-	echo "<a href='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'>Übungsnoten verwalten</a> | <a href='legesamtnoteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id'>LE-Noten verwalten</a> | <b>LV-Noten verwalten</b>";
+	echo "<a href='studentenpunkteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id' class='Item'>".$p->t('benotungstool/uebungsnotenVerwalten')."</a> | <a href='legesamtnoteverwalten.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id'>".$p->t('benotungstool/leNotenVerwalten')."</a> | <b>".$p->t('benotungstool/lvNotenVerwalten')."</b>";
 
 if	($pfile == 'anwesenheitstabelle.php')
 	echo "&nbsp;";

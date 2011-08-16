@@ -38,6 +38,10 @@ require_once('../../../../include/benutzerberechtigung.class.php');
 require_once('../../../../include/uebung.class.php');
 require_once('../../../../include/beispiel.class.php');
 require_once('../../../../include/datum.class.php');
+require_once('../../../../include/phrasen.class.php');
+
+$sprache = getSprache(); 
+$p = new phrasen($sprache);
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -59,7 +63,7 @@ require_once('../../../../include/datum.class.php');
 	}
 	function confirmdelete()
 	{
-		return confirm('Wollen Sie die markierten Einträge wirklich löschen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren!!');
+		return confirm('<?php echo $p->t('gesamtnote/wollenSieWirklichLoeschen');?>');
 	}
   //-->
 </script>
@@ -70,7 +74,7 @@ require_once('../../../../include/datum.class.php');
 $user = get_uid();
 
 if(!check_lektor($user))
-	die('Sie haben keine Berechtigung fuer diesen Bereich');
+	die($p->t('global/keineBerechtigungFuerDieseSeite'));
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
@@ -78,7 +82,7 @@ $rechte->getBerechtigungen($user);
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid'])) //Lehrveranstaltung_id
 	$lvid = $_GET['lvid'];
 else
-	die('Fehlerhafte Parameteruebergabe');
+	die($p->t('global/fehlerBeiDerParameteruebergabe'));
 
 if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id'])) //Lehreinheit_id
 	$lehreinheit_id = $_GET['lehreinheit_id'];
@@ -107,7 +111,7 @@ $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 echo '<table class="tabcontent" height="100%">';
 echo ' <tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
-echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;Benotungstool';
+echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;'.$p->t('benotungstool/benotungstool');
 echo '</font></td><td  class="ContentHeader" align="right">'."\n";
 
 //Studiensemester laden
@@ -205,7 +209,7 @@ if($result = $db->db_query($qry))
 }
 else
 {
-	echo 'Fehler beim Auslesen der Lehreinheiten';
+	echo $p->t('benotungstool/fehlerBeimAuslesen');
 }
 echo $stsem_content;
 echo '</td><tr></table>';
@@ -215,7 +219,7 @@ echo "<td>\n";
 echo "<b>$lv_obj->bezeichnung</b><br>";
 
 if($lehreinheit_id=='')
-	die('Es wurde keine passende Lehreinheit in diesem Studiensemester gefunden');
+	die($p->t('benotungstool/keinePassendeLehreinheitGefunden'));
 
 //Menue
 include("menue.inc.php");
@@ -230,7 +234,7 @@ echo "<br>
 <!--Menue Ende-->\n";
 */
 
-echo "<h3>Statistik für Kreuzerllisten</h3>";
+echo "<h3>".$p->t('benotungstool/statistikFuerKreuzerllisten')."</h3>";
 $uebung_obj = new uebung();
 $uebung_obj->load_uebung($lehreinheit_id,1);
 if(count($uebung_obj->uebungen)>0)
@@ -302,18 +306,18 @@ if(count($uebung_obj->uebungen)>0)
 		<table>
 		<tr>
 			<td><b>+</b>...</td>
-			<td><u>freigeschaltet</u>.</td>
+			<td><u>".$p->t('benotungstool/freigeschaltet')."</u>.</td>
 		</tr>
 		<tr>
 			<td><b>-</b>...</td>
-			<td><u>nicht freigeschaltet</u>.</td>
+			<td><u>".$p->t('benotungstool/nichtFreigeschaltet')."</u>.</td>
 		</tr>
 		</table>
 	</td>
 </tr></table>";
 }
 else
-	die("Derzeit gibt es keine Uebungen");
+	die($p->t('benotungstool/derzeitSindKeineUebungenAngelegt'));
 
 
 echo "<br><br><br>";
