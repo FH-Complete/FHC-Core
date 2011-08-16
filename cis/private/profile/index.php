@@ -31,92 +31,95 @@ require_once('../../../include/datum.class.php');
 require_once('../../../include/betriebsmittel.class.php');
 require_once('../../../include/betriebsmittelperson.class.php');
 require_once('../../../include/betriebsmitteltyp.class.php');  
+require_once('../../../include/phrasen.class.php');
+
+$sprache = getSprache(); 
+$p=new phrasen($sprache);
   
-	if (!$db = new basis_db())
-		die('Fehler beim Oeffnen der Datenbankverbindung');
+if (!$db = new basis_db())
+	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
       
-	$uid=get_uid();
+$uid=get_uid();
 	
-	$datum_obj = new datum();
+$datum_obj = new datum();
 	
-	$ansicht=false; //Wenn ein anderer User sich das Profil ansieht (Bei Personensuche)
-	if(isset($_GET['uid']))
-	{
-		$uid=stripslashes($_GET['uid']);
-		$ansicht=true;
-	}
+$ansicht=false; //Wenn ein anderer User sich das Profil ansieht (Bei Personensuche)
+if(isset($_GET['uid']))
+{
+	$uid=stripslashes($_GET['uid']);
+	$ansicht=true;
+}
 		
-	$stg = '';
+$stg = '';
 
-	$stg_obj = new studiengang();
-	$stg_obj->getAll('typ, kurzbz', false);
+$stg_obj = new studiengang();
+$stg_obj->getAll('typ, kurzbz', false);
+
+$stg_arr = array();
+foreach ($stg_obj->result as $row)
+	$stg_arr[$row->studiengang_kz]=$row->kurzbzlang;
 	
-	$stg_arr = array();
-	foreach ($stg_obj->result as $row)
-		$stg_arr[$row->studiengang_kz]=$row->kurzbzlang;
-	
-	if(!($erg=$db->db_query("SELECT * FROM campus.vw_benutzer WHERE uid='$uid'")))
-		die($db->db_last_error());
-	$num_rows=$db->db_num_rows($erg);
-	if ($num_rows==1)
-	{
-		$person_id=$db->db_result($erg,0,"person_id");
-		$vorname=$db->db_result($erg,0,"vorname");
-		$vornamen=$db->db_result($erg,0,"vornamen");
-		$nachname=$db->db_result($erg,0,"nachname");
-		$gebdatum=$db->db_result($erg,0,"gebdatum");
-		$gebort=$db->db_result($erg,0,"gebort");
-		$titelpre=$db->db_result($erg,0,"titelpre");
-		$titelpost=$db->db_result($erg,0,"titelpost");
-		$email=$db->db_result($erg,0,"uid").'@'.DOMAIN;
-		$email_alias=$db->db_result($erg,0,"alias");
-		$hp=$db->db_result($erg,0,"homepage");
-		$aktiv=$db->db_result($erg,0,"aktiv");
-		$foto=$db->db_result($erg,0,"foto");
-	}
-	if(!($erg_stud=$db->db_query("SELECT studiengang_kz, semester, verband, gruppe, matrikelnr, typ::varchar(1) || kurzbz AS stgkz, tbl_studiengang.bezeichnung AS stgbz FROM public.tbl_student JOIN public.tbl_studiengang USING(studiengang_kz) WHERE student_uid='$uid'")))
-		die($db->db_last_error());
-	$stud_num_rows=$db->db_num_rows($erg_stud);
+if(!($erg=$db->db_query("SELECT * FROM campus.vw_benutzer WHERE uid='$uid'")))
+	die($db->db_last_error());
+$num_rows=$db->db_num_rows($erg);
+if ($num_rows==1)
+{
+	$person_id=$db->db_result($erg,0,"person_id");
+	$vorname=$db->db_result($erg,0,"vorname");
+	$vornamen=$db->db_result($erg,0,"vornamen");
+	$nachname=$db->db_result($erg,0,"nachname");
+	$gebdatum=$db->db_result($erg,0,"gebdatum");
+	$gebort=$db->db_result($erg,0,"gebort");
+	$titelpre=$db->db_result($erg,0,"titelpre");
+	$titelpost=$db->db_result($erg,0,"titelpost");
+	$email=$db->db_result($erg,0,"uid").'@'.DOMAIN;
+	$email_alias=$db->db_result($erg,0,"alias");
+	$hp=$db->db_result($erg,0,"homepage");
+	$aktiv=$db->db_result($erg,0,"aktiv");
+	$foto=$db->db_result($erg,0,"foto");
+}
+if(!($erg_stud=$db->db_query("SELECT studiengang_kz, semester, verband, gruppe, matrikelnr, typ::varchar(1) || kurzbz AS stgkz, tbl_studiengang.bezeichnung AS stgbz FROM public.tbl_student JOIN public.tbl_studiengang USING(studiengang_kz) WHERE student_uid='$uid'")))
+	die($db->db_last_error());
+$stud_num_rows=$db->db_num_rows($erg_stud);
 
-	if ($stud_num_rows==1)
-	{
-		$stg=$db->db_result($erg_stud,0,"studiengang_kz");
-		$stgbez=$db->db_result($erg_stud,0,"stgbz");
-		$stgkz=$db->db_result($erg_stud,0,"stgkz");
-		$semester=$db->db_result($erg_stud,0,"semester");
-		$verband=$db->db_result($erg_stud,0,"verband");
-		$gruppe=$db->db_result($erg_stud,0,"gruppe");
-		$matrikelnr=$db->db_result($erg_stud,0,"matrikelnr");
-	}
-	if(!($erg_lekt=$db->db_query("SELECT * FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='$uid'")))
-		die($db->db_last_error());
-
+if ($stud_num_rows==1)
+{
+	$stg=$db->db_result($erg_stud,0,"studiengang_kz");
+	$stgbez=$db->db_result($erg_stud,0,"stgbz");
+	$stgkz=$db->db_result($erg_stud,0,"stgkz");
+	$semester=$db->db_result($erg_stud,0,"semester");
+	$verband=$db->db_result($erg_stud,0,"verband");
+	$gruppe=$db->db_result($erg_stud,0,"gruppe");
+	$matrikelnr=$db->db_result($erg_stud,0,"matrikelnr");
+}
+if(!($erg_lekt=$db->db_query("SELECT * FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='$uid'")))
+	die($db->db_last_error());
 		
-	$lekt_num_rows=$db->db_num_rows($erg_lekt);
-	if ($lekt_num_rows==1)
-	{
-		$row=$db->db_fetch_object($erg_lekt,0);
-		$kurzbz=$row->kurzbz;
-		$tel=$row->telefonklappe;
+$lekt_num_rows=$db->db_num_rows($erg_lekt);
+if ($lekt_num_rows==1)
+{
+	$row=$db->db_fetch_object($erg_lekt,0);
+	$kurzbz=$row->kurzbz;
+	$tel=$row->telefonklappe;
 
-		$vorwahl = '';
-		if($tel != "")
+	$vorwahl = '';
+	if($tel != "")
+	{
+		$vorwahl = '+43 1 333 40 77-';
+		if($row->standort_id!='')
 		{
-			$vorwahl = '+43 1 333 40 77-';
-			if($row->standort_id!='')
-			{
-				$qry = "SELECT kontakt FROM public.tbl_kontakt WHERE standort_id='$row->standort_id' AND kontakttyp='telefon'";
-				if($result_tel = $db->db_query($qry))
-					if($row_tel = $db->db_fetch_object($result_tel))
-						$vorwahl = $row_tel->kontakt;
-			}
-		}	
-	}
+			$qry = "SELECT kontakt FROM public.tbl_kontakt WHERE standort_id='$row->standort_id' AND kontakttyp='telefon'";
+			if($result_tel = $db->db_query($qry))
+				if($row_tel = $db->db_fetch_object($result_tel))
+					$vorwahl = $row_tel->kontakt;
+		}
+	}	
+}
 
-	// Mail-Groups
-	if(!($erg_mg=$db->db_query("SELECT gruppe_kurzbz, beschreibung FROM campus.vw_persongruppe WHERE mailgrp AND uid='$uid'  ".(isset($semester)?" and semester=$semester ":'')."  ORDER BY gruppe_kurzbz")))
-		die($db->db_last_error());
-	$nr_mg=$db->db_num_rows($erg_mg);
+// Mail-Groups
+if(!($erg_mg=$db->db_query("SELECT gruppe_kurzbz, beschreibung FROM campus.vw_persongruppe WHERE mailgrp AND uid='$uid'  ".(isset($semester)?" and semester=$semester ":'')."  ORDER BY gruppe_kurzbz")))
+	die($db->db_last_error());
+$nr_mg=$db->db_num_rows($erg_mg);
 	
 	
 ?>
@@ -198,16 +201,16 @@ require_once('../../../include/betriebsmitteltyp.class.php');
     		<td colspan="2" class="MarkLine" width="60%">
     		<table width="100%"><tr><td>
       		<P><br>
-      			Username: '.$uid.'<br>
-      			Titel: '.$titelpre.' <br>
-        		Vornamen: '.$vorname.'  '.$vornamen.'<br>
-        		Nachname:'.$nachname.'<br>
-        		Postnomen: '.$titelpost.'<br>';
+      			'.$p->t('global/username').': '.$uid.'<br>
+      			'.$p->t('global/titel').': '.$titelpre.' <br>
+        		'.$p->t('global/vorname').': '.$vorname.'  '.$vornamen.'<br>
+        		'.$p->t('global/nachname').': '.$nachname.'<br>
+        		'.$p->t('global/postnomen').': '.$titelpost.'<br>';
         		
 		if(!$ansicht)
 		{
-        	echo '	Geburtsdatum: '.$datum_obj->formatDatum($gebdatum,'d.m.Y')."<br>
-        			Geburtsort: $gebort<br>";
+        	echo '	'.$p->t('global/geburtsdatum').': '.$datum_obj->formatDatum($gebdatum,'d.m.Y')."<br>
+        			".$p->t('global/geburtsort').": $gebort<br>";
         		
         }
         
@@ -221,21 +224,21 @@ require_once('../../../include/betriebsmitteltyp.class.php');
         else
         {
         	if(!$ansicht)
-        		echo "<a href='#BildUpload' onclick='window.open(\"../bildupload.php?person_id=$person_id\",\"BildUpload\", \"height=100,width=500,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\"); return false;'>Bild hochladen</a>";
+        		echo "<a href='#BildUpload' onclick='window.open(\"../bildupload.php?person_id=$person_id\",\"BildUpload\", \"height=100,width=500,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\"); return false;'>".$p->t('profil/bildHochladen')."</a>";
         }
       	echo '
       		</td></tr></table>
       		<P>
-      			<b>eMail</b><br>
-        		Intern: <a class="Item" href="mailto:'.$uid.'@'.DOMAIN.'">'.$uid.'@'.DOMAIN.'</a><br>';
+      			<b>'.$p->t('profil/email').'</b><br>
+        		'.$p->t('profil/intern').': <a class="Item" href="mailto:'.$uid.'@'.DOMAIN.'">'.$uid.'@'.DOMAIN.'</a><br>';
 
 		if($email_alias!='' && !in_array($stg,$noalias))
 		{
-			echo "Alias: <a class='Item' href='mailto:$email_alias@".DOMAIN."'>$email_alias@".DOMAIN."</a>";
+			echo $p->t('profil/alias').": <a class='Item' href='mailto:$email_alias@".DOMAIN."'>$email_alias@".DOMAIN."</a>";
 		}
     echo '</P>';
 		if($hp!='')
-			echo "<P><b>Homepage</b><br><a href='$hp' target='_blank'>$hp</a></p>";
+			echo "<P><b>".$p->t('profil/homepage')."</b><br><a href='$hp' target='_blank'>$hp</a></p>";
 		echo '<p>';
 		echo '
       		</p>
@@ -247,18 +250,18 @@ require_once('../../../include/betriebsmitteltyp.class.php');
 		if ($stud_num_rows==1)
 		{
 			echo "
-				<b>Student</b><br><br>
-			Studiengang: $stgbez<br>
-			Semester: $semester<br>
-			Verband: $verband<br>
-			Gruppe: $gruppe<br>
-    		Matrikelnummer: $matrikelnr<br />";
+				<b>".$p->t('profil/student')."</b><br><br>
+			".$p->t('global/studiengang').": $stgbez<br>
+			".$p->t('global/semester').": $semester<br>
+			".$p->t('global/verband').": $verband<br>
+			".$p->t('global/gruppe').": $gruppe<br>
+    		".$p->t('profil/martrikelnummer').": $matrikelnr<br />";
     		
     		if(!$ansicht)
     		{
     			echo "
 		    		<br />
-		    		<A class='Item' href='../lehre/notenliste.php'>Leistungsbeurteilung</a><br />";
+		    		<A class='Item' href='../lehre/notenliste.php'>".$p->t('profil/leistungsbeurteilung')."</a><br />";
     		}
 		}
 		
@@ -267,17 +270,17 @@ require_once('../../../include/betriebsmitteltyp.class.php');
 			echo "
 				<P>
 				<b>Lektor</b><br><br>
-			Kurzzeichen: $kurzbz<BR>";
+			".$p->t('profil/kurzzeichen').": $kurzbz<BR>";
 			
 								
 			if($tel!='')
-				echo "Telefon TW: $vorwahl $tel<BR><BR>";
+				echo $p->t('profil/telefonTw').": $vorwahl $tel<BR><BR>";
 				
 			if(!$ansicht)
 			{
 				echo '
-					<A class="Item" href="zeitwunsch.php?uid='.$uid.'">Zeitw&uuml;nsche</A><BR>
-					<A class="Item" href="lva_liste.php?uid='.$uid.'">Lehrveranstaltungen</A>';
+					<A class="Item" href="zeitwunsch.php?uid='.$uid.'">'.$p->t('profil/zeitwuensche').'</A><BR>
+					<A class="Item" href="lva_liste.php?uid='.$uid.'">'.$p->t('profil/lehrveranstaltungen').'</A>';
 			}
 		}
 		
@@ -300,7 +303,7 @@ require_once('../../../include/betriebsmitteltyp.class.php');
 			{
 				if($db->db_num_rows($result_funktion)>0)
 				{
-					echo '<br><br><b>Funktionen</b><table><tr class="liste"><th>Bezeichnung</th><th>Organisationseinheit</th><th>Semester</th><th>Institut</th></tr>';
+					echo '<br><br><b>'.$p->t('profil/funktionen').'</b><table><tr class="liste"><th>'.$p->t('global/bezeichnung').'</th><th>'.$p->t('profil/organisationseinheit').'</th><th>'.$p->t('global/semester').'</th><th>'.$p->t('global/institut').'</th></tr>';
 
 					while($row_funktion = $db->db_fetch_object($result_funktion))
 					{
@@ -319,7 +322,7 @@ require_once('../../../include/betriebsmitteltyp.class.php');
 	        {
 	      		if (is_array($oBetriebsmittelperson->result) && count($oBetriebsmittelperson->result)>0)
 	    	  	{
-	    			echo '<br><br><b>Entlehnte Betriebsmittel</b><table><tr class="liste"><th>Betriebsmittel</th><th>Nummer</th><th>Ausgegeben am</th></tr>';
+	    			echo '<br><br><b>'.$p->t('profil/entlehnteBetriebsmittel').'</b><table><tr class="liste"><th>'.$p->t('profil/betriebsmittel').'</th><th>'.$p->t('profil/nummer').'</th><th>'.$p->t('profil/ausgegebenAm').'</th></tr>';
 	   
 		            for ($i=0;$i<count($oBetriebsmittelperson->result);$i++)
 		            {
@@ -345,13 +348,13 @@ require_once('../../../include/betriebsmitteltyp.class.php');
   		</tr>
   		<TR>
     		<TD colspan="2">
-      		<P><B>Mail-Verteiler</B><BR><BR>
+      		<P><B>'.$p->t('mailverteiler/mailverteiler').'</B><BR><BR>
       		';
 		//Mailverteiler
 		if(!$ansicht)
-			echo "<SMALL>Sie sind Mitglied in folgenden Verteilern:</SMALL>";
+			echo "<SMALL>".$p->t('profil/sieSindMitgliedInFolgendenVerteilern').":</SMALL>";
 		else
-			echo "<SMALL>Der User $uid ist Mitglied in folgenden Verteilern:</SMALL>";
+			echo "<SMALL>".$p->t('profil/derUserIstInFolgendenVerteilern',array($uid)).":</SMALL>";
         
 		echo '
         	</P>
@@ -369,13 +372,13 @@ require_once('../../../include/betriebsmitteltyp.class.php');
 		if (isset($matrikelnr))
 		{
 			echo '<TR><TD><A class="Item" href="mailto:'.strtolower(trim($stgkz)).'_std@'.DOMAIN.'">'.strtolower($stgkz).'_std&nbsp;</TD>';
-    		echo "<TD>&nbsp;Alle Studenten von $stgbez</TD><TD></TD></TR>";
+    		echo "<TD>&nbsp;".$p->t('profil/alleStudentenVon')." $stgbez</TD><TD></TD></TR>";
 			echo '<TR><TD><A class="Item" href="mailto:'.strtolower(trim($stgkz)).trim($semester).'@'.DOMAIN.'">'.strtolower($stgkz).$semester.'&nbsp;</TD>';
-    		echo "<TD>&nbsp;Alle Studenten von $stgkz $semester</TD><TD></TD></TR>";
+    		echo "<TD>&nbsp;".$p->t('profil/alleStudentenVon')." $stgkz $semester</TD><TD></TD></TR>";
 			echo '<TR><TD><A class="Item" href="mailto:'.strtolower(trim($stgkz)).trim($semester).strtolower(trim($verband)).'@'.DOMAIN.'">'.strtolower($stgkz).$semester.strtolower($verband).'&nbsp;</TD>';
-    		echo "<TD>&nbsp;Alle Studenten von $stgkz $semester$verband</TD><TD></TD></TR>";
+    		echo "<TD>&nbsp;".$p->t('profil/alleStudentenVon')." $stgkz $semester$verband</TD><TD></TD></TR>";
 			echo '<TR><TD><A class="Item" href="mailto:'.strtolower(trim($stgkz)).trim($semester).strtolower(trim($verband)).trim($gruppe).'@'.DOMAIN.'">'.strtolower($stgkz).$semester.strtolower($verband).$gruppe.'&nbsp;</TD>';
-    		echo "<TD>&nbsp;Alle Studenten von $stgkz $semester$verband$gruppe</TD><TD></TD></TR>";
+    		echo "<TD>&nbsp;".$p->t('profil/alleStudentenVon')." $stgkz $semester$verband$gruppe</TD><TD></TD></TR>";
 		}
 
 		$mail = MAIL_ADMIN;
@@ -412,7 +415,7 @@ require_once('../../../include/betriebsmitteltyp.class.php');
 					$person = new person();
 					$person->load($person_id);
 					echo '<hr>';
-					echo '<b>Kurzbeschreibung für die &Ouml;H-Kandidatur:</b><br>';
+					echo '<b>'.$p->t('profil/kurzbeschreibungFuerOeh').':</b><br>';
 					echo '<form action="'.$_SERVER['PHP_SELF'].'" method="post">';
 					
 					// Automatically calculates the editor base path based on the _samples directory.
@@ -429,17 +432,17 @@ require_once('../../../include/betriebsmitteltyp.class.php');
 					
 					echo '
 					    <br>
-					    <input type="submit" value="Speichern" name="savekurzbeschreibung">
+					    <input type="submit" value="'.$p->t('global/speichern').'" name="savekurzbeschreibung">
 					  </form>';
 				}
 			}
 			
 			echo "
 			<HR>
-			Sollten ihre Daten nicht stimmen, wenden sie sich bitte an die <a class='Item' href=\"mailto:$mail?subject=Datenkorrektur&body=Die%20Profildaten%20fuer%20User%20'$uid'%20sind%20nicht%20korrekt.%0D
+			".$p->t('profil/solltenDatenNichtStimmen')." <a class='Item' href=\"mailto:$mail?subject=Datenkorrektur&body=Die%20Profildaten%20fuer%20User%20'$uid'%20sind%20nicht%20korrekt.%0D
 			Hier die richtigen Daten:%0DNachname:%20$nachname%0DVorname:%20$vorname%0DGeburtsdatum:%20$gebdatum
 			%0DGeburtsort:%20$gebort%0DTitelPre:%20$titelpre%0DTitelPost:%20$titelpost
-			%0D%0D***%0DPlatz fuer weitere (nicht angefuehrte Daten)%0D***\">zuständige Assistenz</a>";
+			%0D%0D***%0DPlatz fuer weitere (nicht angefuehrte Daten)%0D***\">".$p->t('profil/zustaendigeAssistenz')."</a>";
 		
 		}
 	}
@@ -447,10 +450,9 @@ require_once('../../../include/betriebsmitteltyp.class.php');
 	{
 		echo '		
 		<br><br>
-		Es wurden keine oder mehrere Profile f&uuml;r ihren Useraccount gefunden.
+		'.$p->t('profil/esWurdenKeineProfileGefunden').'.
 		<br>
-		Bitte wenden sie sich an die <a class="Item" href="mailto:'.MAIL_ADMIN.'?subject=Profilfehler&body=Es wurden zuviele oder zuwenige Profile fuer User '.$uid.' gefunden. %0DBitte kontrollieren sie die Datenbank!%0D%0DMeine Daten sind:%0DNachname:%0DVornamen:%0D...">Administration</a>
-		';
+		'.$p->t('profil/wendenSieSichAn').' <a class="Item" href="mailto:'.MAIL_ADMIN.'?subject=Profilfehler&body=Es wurden zuviele oder zuwenige Profile fuer User '.$uid.' gefunden. %0DBitte kontrollieren sie die Datenbank!%0D%0DMeine Daten sind:%0DNachname:%0DVornamen:%0D...">'.$p->t('profil/adminstration').'</a>';
 	}
 ?>
 </body>
