@@ -22,11 +22,17 @@
 /**
  * Menue Oben Rechts fuer CIS Seite
  */
+
+require_once ('../include/phrasen.class.php');
+require_once ('../include/functions.inc.php');
+
+$sprache = getSprache(); 
+$p = new phrasen($sprache); 
 ?>
 <div id="GlobalMenu">
-	[ <a class='Item' href="index.html" target="_top">HOME</a>
-	| <a class='Item' href="private/menu.php" target="menu">Mein CIS</a>
-	| <a class='Item' href="private/lehre/menu.php" target="menu">Lehrveranstaltungen</a>
+	[ <a class='Item' href="index.html" target="_top"><?php echo $p->t('profil/home');?></a>
+	| <a class='Item' href="private/menu.php" target="menu"><?php echo $p->t('profil/meinCis');?></a>
+	| <a class='Item' href="private/lehre/menu.php" target="menu"><?php echo $p->t('lvaliste/lehrveranstaltungen');?></a>
 	<?php
 	if(CHOOSE_LAYOUT)
 		echo '| <a class="Item" href="../layouts.php" target="content">Layouts</a>';
