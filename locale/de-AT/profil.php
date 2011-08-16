@@ -1,0 +1,30 @@
+<?php
+$this->phrasen['profil/bildHochladen']='Bild hochladen';
+$this->phrasen['profil/email']='eMail';
+$this->phrasen['profil/intern']='Intern';
+$this->phrasen['profil/alias']='Alias';
+$this->phrasen['profil/homepage']='Homepage';
+$this->phrasen['profil/student']='Student';
+$this->phrasen['profil/martrikelnummer']='Martrikelnummer';
+$this->phrasen['profil/leistungsbeurteilung']='Leistungsbeurteilung';
+$this->phrasen['profil/kurzzeichen']='Kurzzeichen';
+$this->phrasen['profil/telefonTw']='Telefon TW';
+$this->phrasen['profil/zeitwuensche']='Zeitwünsche';
+$this->phrasen['profil/lehrveranstaltungen']='Lehrveranstaltungen';
+$this->phrasen['profil/organisationseinheit']='Organisationseinheit';
+$this->phrasen['profil/funktionen']='Funktionen';
+$this->phrasen['profil/entlehnteBetriebsmittel']='Entlehnte Betriebsmittel';
+$this->phrasen['profil/betriebsmittel']='Betriebsmittel';
+$this->phrasen['profil/nummer']='Nummer';
+$this->phrasen['profil/ausgegebenAm']='Ausgegeben am';
+$this->phrasen['profil/sieSindMitgliedInFolgendenVerteilern']='Sie sind Mitglied in folgenden Verteilern';
+$this->phrasen['profil/derUserIstInFolgendenVerteilern'] = 'Der User %s ist Mitglied in folgenden Verteilern';
+$this->phrasen['profil/alleStudentenVon']='Alle Studenten von';
+$this->phrasen['profil/kurzbeschreibungFuerOeh']='Kurzbeschreibung für die ÖH-Kandidatur';
+$this->phrasen['profil/solltenDatenNichtStimmen']='Sollten ihre Daten nicht stimmen, wenden sie sich bitte an die zuständige Assistenz';
+$this->phrasen['profil/esWurdenKeineProfileGefunden']='Es wurden keine oder mehrere Profile f&uuml;r ihren Useraccount gefunden';
+$this->phrasen['profil/adminstration']='Administration';
+$this->phrasen['profil/zustaendigeAssistenz']='zuständige Assistenz';
+$this->phrasen['profil/wendenSieSichAn']='Bitte wenden sie sich an die';
+$this->phrasen['profil/solltenDatenNichtStimmen']='Sollten ihre Daten nicht stimmen, wenden sie sich bitte an die';
+?>
