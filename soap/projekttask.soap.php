@@ -27,7 +27,9 @@ header("Pragma: no-cache");
 require_once('../config/vilesci.config.inc.php'); 
 require_once('../include/basis_db.class.php');
 require_once('../include/projekttask.class.php');
+require_once('../include/benutzer');
 require_once('../include/datum.class.php');
+require_once('../include/functions.inc.php');
 
 $SOAPServer = new SoapServer(APP_ROOT."/soap/projekttask.wsdl.php?".microtime());
 $SOAPServer->addFunction("saveProjekttask");
@@ -45,14 +47,11 @@ ini_set("soap.wsdl_cache_enabled", "0");
  * @param string $beschreibung
  * @param string $aufwand
  * @param string $mantis_id
- * @param date $insertamum
- * @param string $insertvon
- * @param date $updateamum
- * @param string $updatevon
+ * @param string $user
  */
 function saveProjekttask($projekttask_id, $projektphase_id, $bezeichnung, $beschreibung, $aufwand, $mantis_id, $user)
 { 	
-	
+	$user = get_uid(); 
 	$projekttask = new projekttask();
 	// wenn projekttaskt_id == leer -> neuer task anlegen ohne laden
 	if($projekttask_id != '')
@@ -82,6 +81,20 @@ function saveProjekttask($projekttask_id, $projektphase_id, $bezeichnung, $besch
 	{
 		return $projekttask->projekttask_id;
 	} 
+	else
+		return new SoapFault("Server", $projekttask->errormsg);
+}
+
+/**
+ * 
+ * Löscht den Task mit der vom Webservice übergebenen ID 
+ * @param $projekttask_id
+ */
+function deleteProjekttask($projekttask_id)
+{
+	$projekttask = new projekttask();
+	if($projekttask->delete($projekttask_id))
+		return "OK";
 	else
 		return new SoapFault("Server", $projekttask->errormsg);
 }

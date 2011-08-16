@@ -25,11 +25,22 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
  	<wsdl:message name="SaveProjekttaskResponse">
        <wsdl:part name="message" type="xsd:string"></wsdl:part>
   	</wsdl:message>
-   
+  	
+  	<wsdl:message name="DeleteProjekttaskRequest">
+  		<wsdl:part name="projekttask_id" type="xsd:string"></wsdl:part>
+  	</wsdl:message>
+    <wsdl:message name="DeleteProjekttaskResponse">
+  		<wsdl:part name="projekttask_id" type="xsd:string"></wsdl:part>
+  	</wsdl:message>
+ 
  <wsdl:portType name="ConfigPortType" >
        <wsdl:operation name="saveProjekttask">
            <wsdl:input message="tns:SaveProjekttaskRequest"></wsdl:input>
            <wsdl:output message="tns:SaveProjekttaskResponse"></wsdl:output>        
+       </wsdl:operation>
+       <wsdl:operation name="deleteProjekttask">
+           <wsdl:input message="tns:DeleteProjekttaskRequest"></wsdl:input>
+           <wsdl:output message="tns:DeleteProjekttaskResponse"></wsdl:output>        
        </wsdl:operation>
    </wsdl:portType>
 
@@ -37,6 +48,15 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
        <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
        <wsdl:operation name="saveProjekttask">
            <soap:operation soapAction="<?php echo APP_ROOT."soap/saveProjekttask";?>" />
+           <wsdl:input> 
+               <soap:body use="encoded" namespace="http://localhost/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+           </wsdl:input>
+           <wsdl:output>
+               <soap:body use="encoded" namespace="http://localhost/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+           </wsdl:output>
+       </wsdl:operation> 
+       <wsdl:operation name="deleteProjekttask">
+           <soap:operation soapAction="<?php echo APP_ROOT."soap/deleteProjekttask";?>" />
            <wsdl:input> 
                <soap:body use="encoded" namespace="http://localhost/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
            </wsdl:input>
