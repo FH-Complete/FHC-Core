@@ -27,14 +27,14 @@ require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/lehrveranstaltung.class.php');
-
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung 
-// ------------------------------------------------------------------------------------------
+require_once('../../../include/phrasen.class.php');
 require_once('../../../include/basis_db.class.php');
-	if (!$db = new basis_db())
-		$db=false;
 
+$sprache = getSprache(); 
+$p = new phrasen($sprache);
+
+if (!$db = new basis_db())
+	$db=false;
 
 $user = get_uid();
 
@@ -48,7 +48,7 @@ $stsem = $stsem_obj->getaktorNext();
 	<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
-	<title>Freifaecher Anmeldung</title>
+	<title><?php echo $p->t('freifach/freifaecherAnmeldung');?></title>
 	</head>
 
 	<body>
@@ -57,14 +57,14 @@ $stsem = $stsem_obj->getaktorNext();
 	    <td class="tdwidth10">&nbsp;</td>
 	    <td><table class="tabcontent">
 	    	<tr>
-	      	<td class="ContentHeader"><font class="ContentHeader">&nbsp;Freif&auml;cher Anmeldung</font></td>
+	      	<td class="ContentHeader"><font class="ContentHeader">&nbsp;<?php echo $p->t('freifach/freifaecherAnmeldung');?></font></td>
 	    	</tr>
 	    	<tr>
 	      	<td>&nbsp;</td>
 	    	</tr>
 	    	<tr>
 		    	<td>
-		    	Bitte markieren Sie die Freif&auml;cher f&uuml;r die Sie sich Anmelden m&ouml;chten
+		    	<?php echo $p->t('freifach/markierenFreifachFuerAnmeldung');?>:
 		    	<br />
 <?php
 //Wenn das Formular abgeschickt wurde
@@ -77,7 +77,7 @@ if(isset($_POST['submit']))
 		//Zuerst die alten Eintraege herausloeschen...
 		$qry = "DELETE FROM campus.tbl_benutzerlvstudiensemester WHERE uid='$user' AND studiensemester_kurzbz='$stsem'";
 		if(!$db->db_query($qry))
-			die('Fehler beim aktualisieren der Freifaecherzuteilung! Bitte Versuchen Sie es erneut');
+			die($p->t('freifach/fehlerBeimAktualisieren'));
 
 		//...dann die angeklickten FF hinzufuegen
 		foreach ($_POST['chkbox'] as $elem)
@@ -86,20 +86,20 @@ if(isset($_POST['submit']))
 			if(!$db->db_query($qry))
 			{
 				$db->db_query('ROLLBACK');
-				die("Freifaecher konnten nicht zugeteilt werden! Bitte Versuchen Sie es erneut");
+				die($p->t('freifach/freifaecherNichtZugeteilt'));
 			}
 		}
 		$db->db_query('COMMIT');
-		echo "<b>Ihre Daten wurden erfolgreich aktualisiert!</b><br />";
+		echo "<b>".$p->t('freifach/datenErfolgreichAktualisiert')."!</b><br />";
 	}
 	else
 	{
 		//Wenn keine Checkbox angeklickt wurde, alle Eintraege herausloeschen
 		$qry = "DELETE FROM campus.tbl_benutzerlvstudiensemester WHERE uid='$user' AND studiensemester_kurzbz='$stsem'";
 		if(!$db->db_query($qry))
-				die("Fehler beim aktualisieren der Freifaecherzuteilung! Bitte Versuchen Sie es erneut");
+				die($p->t('freifach/fehlerBeimAktualisieren'));
 		else
-				echo "<b>Ihre Daten wurden erfolgreich aktualisiert!</b><br />";
+				echo "<b>".$p->t('freifach/datenErfolgreichAktualisiert')."!</b><br />";
 	}
 }
 
@@ -112,7 +112,7 @@ if($result=$db->db_query($qry))
 				$ff[] = $row->lehrveranstaltung_id;
 }
 else
-	echo 'Fehler beim Auslesen der Zuteilunstabelle';
+	echo $p->t('freifach/fehlerBeimAuslesen');;
 
 echo '<br />';
 //Freifaecher laden
@@ -145,13 +145,13 @@ if($lv_obj->load_lva('0',null,null,true,null,'bezeichnung'))
 		$i++;
 	}
 	echo "</td></tr><tr><td></td><td>&nbsp;</td></tr>";
-	echo "<tr><td></td><td><input type='submit' name='submit' value='Speichern'></td></tr>";
+	echo "<tr><td></td><td><input type='submit' name='submit' value='".$p->t('global/speichern')."'></td></tr>";
 	echo "</table>";
 	echo "</form>";
 }
 else
 {
-	die("Fehler bei Auslesen der Freifaecher! Bitte versuchen Sie es erneut");
+	die($p->t('freifach/fehlerBeimAuslesenFreifach'));
 }
 ?>
 				</td>
