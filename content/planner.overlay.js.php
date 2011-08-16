@@ -56,11 +56,9 @@ function treeProjektmenueSelect()
         }
         
         // Projekte neu laden
-	if(projekt_phase_id=='' && projekt_kurzbz=='')
-        {
             try
             {
-                var datasource="<?php echo APP_ROOT; ?>rdf/projekt.rdf.php?oe="+oe+"&foo=<?php echo time(); ?>";
+                var datasource="<?php echo APP_ROOT; ?>rdf/projekt.rdf.php?oe="+oe+"&"+gettimestamp();
                 //alert("OE "+oe+" | Projekt KurzBZ "+projekt_kurzbz+" | Datasource "+datasource);
                 var treeProjekt=document.getElementById('tree-projekt');
                 //treeProjekt.datasources=datasource;
@@ -90,8 +88,7 @@ function treeProjektmenueSelect()
             catch(e)
             {
                     debug("whoops Projekt load failed with exception: "+e);
-            }
-        }
+    }
         
         // Projektphasen neu laden
 	if(projekt_phase_id=='' && projekt_kurzbz!='')

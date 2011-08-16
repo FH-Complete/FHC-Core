@@ -29,7 +29,7 @@ require_once('../include/basis_db.class.php');
 require_once('../include/projekt.class.php');
 require_once('../include/datum.class.php');
 
-$SOAPServer = new SoapServer(APP_ROOT."/soap/projekt.wsdl.php");
+$SOAPServer = new SoapServer(APP_ROOT."/soap/projekt.wsdl.php?".microtime());
 $SOAPServer->addFunction("saveProjekt");
 $SOAPServer->handle();
 
@@ -46,8 +46,9 @@ ini_set("soap.wsdl_cache_enabled", "0");
  * @param date $beginn
  * @param date $ende
  * @param string $oe_kurzbz
+ * @param boolean $neu
  */
-function saveProjekt($projekt_kurzbz, $nummer, $titel, $beschreibung, $beginn, $ende, $oe_kurzbz)
+function saveProjekt($projekt_kurzbz, $nummer, $titel, $beschreibung, $beginn, $ende, $oe_kurzbz, $neu)
 { 	
 	
 	$projekt = new projekt();
@@ -58,10 +59,13 @@ function saveProjekt($projekt_kurzbz, $nummer, $titel, $beschreibung, $beginn, $
 	$projekt->beginn = $beginn;
 	$projekt->ende = $ende;
 	$projekt->oe_kurzbz = $oe_kurzbz;
-	$projekt->new = true; 
+	if($neu=='true')
+		$projekt->new = true; 
+	else
+		$projekt->new = false;
 	
-	if($projekt->save($new = true))
-		return "OK"; 
+	if($projekt->save())
+		return $projekt->projekt_kurzbz;
 	else
 		return new SoapFault("Server", $projekt->errormsg);
 }

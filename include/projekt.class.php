@@ -153,12 +153,12 @@ class projekt extends basis_db
 		}
 		if(mb_strlen($this->nummer)>8)
 		{
-			$this->errormsg = 'Titel darf nicht länger als 1024 Zeichen sein';
+			$this->errormsg = 'Nummer darf nicht länger als 8 Zeichen sein';
 			return false;
 		}
 		if(mb_strlen($this->titel)>256)
 		{
-			$this->errormsg = 'Titel darf nicht länger als 1024 Zeichen sein';
+			$this->errormsg = 'Titel darf nicht länger als 256 Zeichen sein';
 			return false;
 		}
 
@@ -198,45 +198,27 @@ class projekt extends basis_db
 		{
 			//Updaten des bestehenden Datensatzes
 
-			//Pruefen ob projekt_kurzbz eine gueltige Zahl ist
-			if(!is_numeric($this->projekt_kurzbz))
-			{
-				$this->errormsg = 'projekt_kurzbz muss eine gueltige Zahl sein';
-				return false;
-			}
-
-			$qry='UPDATE lehre.tbl_projektarbeit SET '.
-				'projekttyp_kurzbz='.$this->addslashes($this->projekttyp_kurzbz).', '.
+			$qry='UPDATE fue.tbl_projekt SET '.
+				'projekt_kurzbz='.$this->addslashes($this->projekt_kurzbz).', '.
+				'nummer='.$this->addslashes($this->nummer).', '.
 				'titel='.$this->addslashes($this->titel).', '.
-				'titel_english='.$this->addslashes($this->titel_english).', '.
-				'lehreinheit_id='.$this->addslashes($this->lehreinheit_id).', '.
-				'student_uid='.$this->addslashes($this->student_uid).', '.
-				'firma_id='.$this->addslashes($this->firma_id).', '.
-				'note='.$this->addslashes($this->note).', '.
-				'punkte='.$this->addslashes($this->punkte).', '.
+				'beschreibung='.$this->addslashes($this->beschreibung).', '.
 				'beginn='.$this->addslashes($this->beginn).', '.
 				'ende='.$this->addslashes($this->ende).', '.
-				'faktor='.$this->addslashes($this->faktor).', '.
-				'freigegeben='.($this->freigegeben?'true':'false').', '.
-				'gesperrtbis='.$this->addslashes($this->gesperrtbis).', '.
-				'stundensatz='.$this->addslashes($this->stundensatz).', '.
-				'gesamtstunden='.$this->addslashes($this->gesamtstunden).', '.
-				'themenbereich='.$this->addslashes($this->themenbereich).', '.
-				'anmerkung='.$this->addslashes($this->anmerkung).', '.
-				'updateamum= now(), '.
-				'updatevon='.$this->addslashes($this->updatevon).' '.
+				'oe_kurzbz='.$this->addslashes($this->oe_kurzbz).' '.
 				'WHERE projekt_kurzbz='.$this->addslashes($this->projekt_kurzbz).';';
 		}
 		
 		if($this->db_query($qry))
 		{
-			$this->db_query('COMMIT');
+			if($new)
+				$this->db_query('COMMIT');
+			
 			return true;
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der Daten';
-			$this->db_query('ROLLBACK;');
+			$this->errormsg = 'Fehler beim Speichern der Daten'.$qry;
 			return false;
 		}
 	}

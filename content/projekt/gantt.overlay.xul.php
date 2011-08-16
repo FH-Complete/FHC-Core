@@ -38,7 +38,7 @@ echo '<?xml-stylesheet href="gantt.css" type="text/css"?>';
 >
 
 	<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/phpRequest.js.php" />
-	<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/projekt/gantt.overlay.js.php" />
+	<!-- <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/projekt/gantt.overlay.js.php" />-->
 	<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/functions.js.php" />
 
 	<!-- ************************ -->

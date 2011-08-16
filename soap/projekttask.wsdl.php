@@ -30,7 +30,7 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
   		<wsdl:part name="projekttask_id" type="xsd:string"></wsdl:part>
   	</wsdl:message>
     <wsdl:message name="DeleteProjekttaskResponse">
-  		<wsdl:part name="projekttask_id" type="xsd:string"></wsdl:part>
+  		<wsdl:part name="message" type="xsd:string"></wsdl:part>
   	</wsdl:message>
  
  <wsdl:portType name="ConfigPortType" >
