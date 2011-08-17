@@ -30,14 +30,21 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/zeitwunsch.class.php');
 require_once('../../../include/benutzer.class.php');
+require_once('../../../include/phrasen.class.php');
+require_once('../../../include/sprache.class.php');
+
+$sprache = getSprache(); 
+$lang = new sprache(); 
+$lang->load($sprache);
+$p = new phrasen($sprache); 
 
 if (!$db = new basis_db())
-	die('Fehler beim Oeffnen der Datenbankverbindung');
+	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
 
 $uid = get_uid();
 
 if(!check_lektor($uid))
-	die('Sie haben keine Berechtigung fuer diese Seite');
+	die($p->t('global/keineBerechtigungFuerDieseSeite'));
 
 $PHP_SELF = $_SERVER['PHP_SELF'];
 
@@ -125,7 +132,7 @@ if(!$person->load($uid))
 			
 			if(error)
 			{
-				alert('Es duerfen nur die Werte -2, -1, 1 und 2 eingetragen werden');
+				alert('<?php echo $p->t('zeitwunsch/falscheWerteEingetragen');?>');
 				return false;
 			}
 			else
@@ -142,24 +149,24 @@ if(!$person->load($uid))
 	    <td>
 	    <table class="tabcontent">
 	      <tr>
-			<td class="ContentHeader" width="95%"><font class="ContentHeader">&nbsp;Zeitwunsch</font></td>
+			<td class="ContentHeader" width="95%"><font class="ContentHeader">&nbsp;<?php echo $p->t('zeitwunsch/zeitwunsch');?></font></td>
 			<td class="ContentHeader" align="right">
 				<A onclick="window.open('zeitwunsch_help.html','Hilfe', 'height=320,width=480,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');" class="hilfe" target="_blank">
 				<font class="ContentHeader">
-				HELP&nbsp;
+				<?php echo $p->t('zeitwunsch/help')?>&nbsp;
 				</font>
 				</A>
 			</td>
 		  </tr>
 		</table>
 		<?php
-			echo "<H3>Zeitw&uuml;nsche von $person->titelpre $person->vorname $person->nachname $person->titelpost</H3>";
+			echo "<H3>".$p->t('zeitwunsch/zeitwunschVon')." $person->titelpre $person->vorname $person->nachname $person->titelpost</H3>";
 		
 			echo '<FORM name="zeitwunsch" method="post" action="zeitwunsch.php?type=save" onsubmit="return checkvalues()">
   				<TABLE>
     			<TR>';
     		
-		  	echo '<th>Stunde<br>Beginn<br>Ende</th>';
+		  	echo '<th>'.$p->t('global/stunde').'<br>'.$p->t('global/beginn').'<br>'.$p->t('global/ende').'</th>';
 			for ($i=0;$i<$num_rows_stunde; $i++)
 			{
 				$beginn=$db->db_result($result_stunde,$i,'"beginn"');
@@ -174,7 +181,7 @@ if(!$person->load($uid))
 			
 			for ($j=1; $j<7; $j++)
 			{
-				echo '<TR><TD>'.$tagbez[1][$j].'</TD>';
+				echo '<TR><TD>'.$tagbez[$lang->index][$j].'</TD>';
 			  	for ($i=0;$i<$num_rows_stunde;$i++)
 				{
 					if (isset($wunsch[$j][$i+1]))
@@ -191,40 +198,42 @@ if(!$person->load($uid))
 			echo '
 			</TABLE>
 			<INPUT type="hidden" name="uid" value="'.$uid.'">
-			<INPUT type="submit" name="Abschicken" value="Speichern">
+			<INPUT type="submit" name="Abschicken" value="'.$p->t('global/speichern').'">
 			';
 			
 			if($zw->updateamum!='')
 			{
-				echo '<font size="x-small">Letzte Änderung: '.$datum_obj->formatDatum($zw->updateamum,'d.m.Y H:i:s').' von '.$zw->updatevon.'</font>';
+				echo '<font size="x-small">'.$p->t('zeitwunsch/letzteAenderung').': '.$datum_obj->formatDatum($zw->updateamum,'d.m.Y H:i:s').' '.$p->t('zeitwunsch/von').' '.$zw->updatevon.'</font>';
 			}
 			?>
 			
 			</FORM>
-			<hr>
-			Das Formular zum Eintragen der Zeitsperren finden Sie <a href='zeitsperre_resturlaub.php' class='Item'>hier</a>
-			<H3>Erkl&auml;rung:</H3>
-			<P>Bitte kontrollieren/&auml;ndern Sie Ihre Zeitw&uuml;nsche und klicken Sie anschlie&szlig;end
-			  auf &quot;Speichern&quot;!<BR><BR>
+			<hr><?php 
+			$href = "<a href='zeitsperre_resturlaub.php' class='Item'>";
+			echo $p->t('zeitwunsch/formularZumEintragenDerZeitsperren', array($href));
+			?>
+			</a>
+			<H3><?php echo $p->t('zeitwunsch/erklärung');?>:</H3>
+			<P><?php echo $p->t('zeitwunsch/kontrollierenSieIhreZeitwuensche');?>!<BR><BR>
 			</P>
 			<TABLE align="center">
 			  <TR>
-			    <TH><B>Wert</B></TH>
+			    <TH><B><?php echo $p->t('zeitwunsch/wert');?></B></TH>
 			    <TH>
-			      <DIV align="center"><B>Bedeutung</B></DIV>
+			      <DIV align="center"><B><?php echo $p->t('zeitwunsch/bedeutung');?></B></DIV>
 			    </TH>
 			  </TR>
 			  <TR>
 			    <TD>
 			      <DIV align="right">2</DIV>
 			    </TD>
-			    <TD>Hier m&ouml;chte ich unterrichten</TD>
+			    <TD><?php echo $p->t('zeitwunsch/hierMoechteIchUnterrichten');?></TD>
 			  </TR>
 			  <TR>
 			    <TD>
 			      <DIV align="right">1</DIV>
 			    </TD>
-			    <TD>Hier kann ich unterrichten</TD>
+			    <TD><?php echo $p->t('zeitwunsch/hierKannIchUnterrichten');?></TD>
 			  </TR>
 			  <!--<TR>
 			    <TD>
@@ -236,26 +245,22 @@ if(!$person->load($uid))
 			    <TD>
 			      <DIV align="right">-1</DIV>
 			    </TD>
-			    <TD>Hier nur in extremen Notf&auml;llen</TD>
+			    <TD><?php echo $p->t('zeitwunsch/nurInNotfaellen');?></TD>
 			  </TR>
 			  <TR>
 			    <TD>
 			      <DIV align="right">-2</DIV>
 			    </TD>
-			    <TD>Hier auf gar keinen Fall !!!</TD>
+			    <TD><?php echo $p->t('zeitwunsch/hierAufGarKeinenFall');?> !!!</TD>
 			  </TR>
 			</TABLE>
 			<P>&nbsp;</P>
-			<H3>Folgende Punkte sind zu beachten:</H3>
+			<H3><?php echo $p->t('zeitwunsch/folgendePunkteSindZuBeachten');?>:</H3>
 			<OL>
-			  <LI> Verwenden Sie den Wert -2 nur, wenn Sie zu dieser Stunde wirklich nicht
-			    k&ouml;nnen, um eine bessere Optimierung zu erm&ouml;glichen.</LI>
-			  <LI>Es sollten f&uuml;r jede Stunde die tats&auml;chlich unterrichtet wird,
-			    mindestens das 3-fache an positiven Zeitw&uuml;nschen angegeben werden.<BR>
-			    Beispiel: Sie unterrichten 4 Stunden/Woche, dann sollten Sie mindestens
-			    12 Stunden im Raster mit positiven Werten ausf&uuml;llen.</LI>
+			  <LI> <?php echo $p->t('zeitwunsch/verwendenSieDenWertNur');?></LI>
+			  <LI><?php echo $p->t('zeitwunsch/esSolltenFuerJedeStunde');?></LI>
 			</OL>
-			<P>Bei Problemen wenden Sie sich bitte an die <A class="Item" href="mailto:<?php echo MAIL_LVPLAN;?>">LV-Koordinationsstelle</A>.</P>
+			<P><?php echo $p->t('global/fehlerUndFeedback');?> <A class="Item" href="mailto:<?php echo MAIL_LVPLAN;?>"><?php echo $p->t('global/lvKoordinationsstelle');?></A>.</P>
 			</td>
 		</tr>
 	</table>
