@@ -70,6 +70,7 @@ $this->phrasen['global/bezeichnung']='Description';
 $this->phrasen['global/datum']='Date'; 
 $this->phrasen['global/stunde']='Hour'; 
 $this->phrasen['global/person']='Person'; 
+$this->phrasen['global/personenkz']='StudentID'; 
 $this->phrasen['global/personen']='Number of Persons'; 
 $this->phrasen['global/beschreibung']='Description'; 
 $this->phrasen['global/angelegtAm']='created:'; 
@@ -92,6 +93,7 @@ $this->phrasen['global/angemeldet']='Registered';
 $this->phrasen['global/löschen']='Delete'; 
 $this->phrasen['global/dateiLoeschen']='Delete File'; 
 $this->phrasen['global/betreff']='Subject';
+$this->phrasen['global/handbuch']='Manual';
 
 // Statusmeldungen
 $this->phrasen['global/erfolgreichgespeichert']='Successfully saved'; 
@@ -109,6 +111,9 @@ $this->phrasen['global/nichtAngemeldet'] = 'You are not logged in. No UID found'
 $this->phrasen['global/LDAPserverNichtErreichbar']='Error connecting to LDAP-Server'; 
 $this->phrasen['global/unbekannterFehleraufgetreten']='Unknown error occurred'; 
 $this->phrasen['global/fehlerBeiDerParameteruebergabe']='Fehler bei der Uebergabe der Parameter';
+$this->phrasen['global/warnungWirklichLoeschen']='Do you want to delete this record?';
+$this->phrasen['global/dateiErfolgreichHochgeladen']='File successfully uploaded';
+$this->phrasen['global/dateiNichtErfolgreichHochgeladen']='Failed to upload File. Please retry';
 $this->phrasen['global/FuerDieseAktionBenoetigenSieAdministrationsrechte']='You must be Administrator.';
 
 // LV - Plan
@@ -125,6 +130,7 @@ $this->phrasen['global/reservierungsliste']='Reservation list';
 $this->phrasen['global/reservierungenLoeschen']='Delete room reservations';
 $this->phrasen['global/raumsuche']='Room search';
 $this->phrasen['global/lehrverband']='Lehr-Verband'; 
+$this->phrasen['global/stg']='Stg'; 
 $this->phrasen['global/sem']='Sem'; 
 $this->phrasen['global/ver']='Ver'; 
 $this->phrasen['global/grp']='Grp'; 

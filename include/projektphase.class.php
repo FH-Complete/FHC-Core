@@ -111,7 +111,7 @@ class projektphase extends basis_db
 	public function getProjektphasen($projekt_kurzbz)
 	{
 		$this->result=array();
-		$qry = "SELECT * FROM fue.tbl_projektphase WHERE projekt_kurzbz='$projekt_kurzbz' ORDER BY start;";
+		$qry = "SELECT * FROM fue.tbl_projektphase WHERE projekt_kurzbz='$projekt_kurzbz' ORDER BY start, projektphase_fk DESC;";
 		//echo "\n".$qry."\n";
 		
 		if($this->db_query($qry))
@@ -154,70 +154,18 @@ class projektphase extends basis_db
 	{
 
 		//Gesamtlaenge pruefen
-		if ($this->projekttyp_kurzbz==null)
-		{
-			$this->errormsg='Projekttyp_kurzbz darf nicht NULL sein!';
-		}
-		if ($this->lehreinheit_id==null)
-		{
-			$this->errormsg='Lehreinheit_id darf nicht NULL sein!';
-		}
-		if(mb_strlen($this->projekttyp_kurzbz)>16)
-		{
-			$this->errormsg = 'Projektyp_kurzbz darf nicht länger als 16 Zeichen sein';
-			return false;
-		}
-		if(mb_strlen($this->titel)>1024)
-		{
-			$this->errormsg = 'Titel darf nicht länger als 1024 Zeichen sein';
-			return false;
-		}
-		if(mb_strlen($this->titel_english)>1024)
-		{
-			$this->errormsg = 'Titel darf nicht länger als 1024 Zeichen sein';
-			return false;
-		}
-		if(mb_strlen($this->themenbereich)>64)
-		{
-			$this->errormsg = 'Themenbereich darf nicht länger als 64 Zeichen sein';
-			return false;
-		}
-		if(mb_strlen($this->anmerkung)>256)
-		{
-			$this->errormsg = 'Anmerkung darf nicht länger als 256 Zeichen sein';
-			return false;
-		}
-		/*if(!is_numeric($this->note))
-		{
-			$this->errormsg = 'Note muß ein numerischer Wert sein - student_uid: '.$this->student_uid;
-			return false;
-		}*/
-		if($this->punkte!='' && !is_numeric($this->punkte))
-		{
-			$this->errormsg = 'Punkte muss ein numerischer Wert sein';
-			return false;
-		}
-		if($this->faktor!='' && !is_numeric($this->faktor))
-		{
-			$this->errormsg = 'Faktor muss ein numerischer Wert sein';
-			return false;
-		}
-		if($this->stundensatz!='' && !is_numeric($this->stundensatz))
-		{
-			$this->errormsg = 'Stundensatz muss ein numerischer Wert sein';
-			return false;
-		}
-		if($this->gesamtstunden!='' && !is_numeric($this->gesamtstunden))
-		{
-			$this->errormsg = 'Gesamtstunden muss ein numerischer Wert sein';
-			return false;
-		}
-		if(!is_bool($this->freigegeben))
-		{
-			$this->errormsg = 'freigegeben ist ungueltig';
-			return false;
-		}
 
+		if(mb_strlen($this->bezeichnung)>32)
+		{
+			$this->errormsg='Bezeichnung darf nicht laenger als 32 Zeichen sein';
+			return false;
+		}
+		if(mb_strlen($this->projekt_kurzbz)>16)
+		{
+			$this->errormsg.='Projekt Kurzbz darf nicht länger als 16 Zeichen sein';
+			return false;
+		}
+		
 		$this->errormsg = '';
 		return true;
 	}
@@ -242,52 +190,34 @@ class projektphase extends basis_db
 			//Neuen Datensatz einfuegen
 
 			$qry='BEGIN; INSERT INTO fue.tbl_projektphase (projekt_kurzbz, projektphase_fk, bezeichnung, 
-				beschreibung, start, ende, budget, insertvon, insertamum, updatevon, updateamum) VALUES ('.
-			     $this->addslashes($this->projekt_kurzbz).', ';
-			if ($this->projektphase_fk=='')
-				$qry.='NULL, ';
-			else
-				$qry.=$this->projektphase_fk.', ';
-			$qry.=$this->addslashes($this->bezeichnung).', '.
+				beschreibung, start, ende, budget, insertvon, insertamum, updatevon, updateamum, personentage) VALUES ('.
+			     $this->addslashes($this->projekt_kurzbz).', '.
+			     $this->addslashes($this->projektphase_fk).', '.
+				 $this->addslashes($this->bezeichnung).', '.
 			     $this->addslashes($this->beschreibung).', '.
 			     $this->addslashes($this->start).', '.
 			     $this->addslashes($this->ende).', '.
 			     $this->addslashes($this->budget).', '.
 			     $this->addslashes($this->insertvon).', now(), '.
-			     $this->addslashes($this->updatevon).', now() );';
+			     $this->addslashes($this->updatevon).', now(), '.
+			     $this->addslashes($this->personentage).' );';
 		}
 		else
 		{
 			//Updaten des bestehenden Datensatzes
 
-			//Pruefen ob projekt_kurzbz eine gueltige Zahl ist
-			if(!is_numeric($this->projekt_kurzbz))
-			{
-				$this->errormsg = 'projekt_kurzbz muss eine gueltige Zahl sein';
-				return false;
-			}
-
-			$qry='UPDATE lehre.tbl_projektarbeit SET '.
-				'projekttyp_kurzbz='.$this->addslashes($this->projekttyp_kurzbz).', '.
-				'titel='.$this->addslashes($this->titel).', '.
-				'titel_english='.$this->addslashes($this->titel_english).', '.
-				'lehreinheit_id='.$this->addslashes($this->lehreinheit_id).', '.
-				'student_uid='.$this->addslashes($this->student_uid).', '.
-				'firma_id='.$this->addslashes($this->firma_id).', '.
-				'note='.$this->addslashes($this->note).', '.
-				'punkte='.$this->addslashes($this->punkte).', '.
-				'beginn='.$this->addslashes($this->beginn).', '.
+			$qry='UPDATE fue.tbl_projektphase SET '.
+				'projekt_kurzbz='.$this->addslashes($this->projekt_kurzbz).', '.
+				'projektphase_fk='.$this->addslashes($this->projektphase_fk).', '.
+				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
+				'beschreibung='.$this->addslashes($this->beschreibung).', '.
+				'start='.$this->addslashes($this->start).', '.
 				'ende='.$this->addslashes($this->ende).', '.
-				'faktor='.$this->addslashes($this->faktor).', '.
-				'freigegeben='.($this->freigegeben?'true':'false').', '.
-				'gesperrtbis='.$this->addslashes($this->gesperrtbis).', '.
-				'stundensatz='.$this->addslashes($this->stundensatz).', '.
-				'gesamtstunden='.$this->addslashes($this->gesamtstunden).', '.
-				'themenbereich='.$this->addslashes($this->themenbereich).', '.
-				'anmerkung='.$this->addslashes($this->anmerkung).', '.
+				'budget='.$this->addslashes($this->budget).', '.
+				'personentage='.$this->addslashes($this->personentage).', '.
 				'updateamum= now(), '.
 				'updatevon='.$this->addslashes($this->updatevon).' '.
-				'WHERE projekt_kurzbz='.$this->addslashes($this->projekt_kurzbz).';';
+				'WHERE projektphase_id='.$this->addslashes($this->projektphase_id).';';
 		}
 		
 		if($this->db_query($qry))
@@ -295,12 +225,12 @@ class projektphase extends basis_db
 			if($new)
 			{
 				//Sequence auslesen
-				$qry = "SELECT currval('fue.tbl_projektphase_projektphase_id_seq') as id;";
+				$qry = "SELECT currval('fue.seq_projektphase_projektphase_id') as id;";
 				if($this->db_query($qry))
 				{
 					if($row = $this->db_fetch_object())
 					{
-						$this->projekt_kurzbz = $row->id;
+						$this->projektphase_id = $row->id;
 						$this->db_query('COMMIT');
 						return true;
 					}
@@ -327,7 +257,7 @@ class projektphase extends basis_db
 			return false;
 		}
 	}
-
+ 
 	/**
 	 * Loescht den Datenensatz mit der ID die uebergeben wird
 	 * @param $projekt_kurzbz ID die geloescht werden soll

@@ -22,8 +22,6 @@ require_once('../../config/vilesci.config.inc.php');
 
 ?>
 // *********** Globale Variablen *****************//
-
-var datasourceTreeProjektphase; //Datasource des Tree Projektphase
 var selectIDProjektphase=null; //ID des Task Eintrages der nach dem Refresh markiert werden soll
 // ********** Observer und Listener ************* //
 
@@ -41,7 +39,7 @@ var observerTreeProjektphase =
 	onEndLoad : function(pSink)
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-		document.getElementById('projekttask-tree').builder.rebuild();
+		document.getElementById('tree-projektphase').builder.rebuild();
 	}
 };
 
@@ -49,7 +47,7 @@ var observerTreeProjektphase =
 // * Nach dem Rebuild wird die Lehreinheit wieder
 // * markiert
 // ****
-var TaskTreeListener =
+var ProjektphaseTreeListener =
 {
 	willRebuild : function(builder)
 	{
@@ -59,119 +57,176 @@ var TaskTreeListener =
   		//timeout nur bei Mozilla notwendig da sonst die rows
 		//noch keine values haben. Ab Seamonkey funktionierts auch
 		//ohne dem setTimeout
-	    window.setTimeout(TaskTreeSelectTask,10);
+	    window.setTimeout(ProjektphaseTreeSelectPhase,10);
 		// Progressmeter stoppen
 		//document.getElementById('statusbar-progressmeter').setAttribute('mode','determined');
 	}
 };
 
 // ****************** FUNKTIONEN ************************** //
+// ****
+// * Auswahl einer Phase
+// ****
+function onselectTreeProjektphase()
+{
+    // Trick 17	(sonst gibt's ein Permission denied)
+    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+    var tree = document.getElementById('tree-projektphase');
 
+    if (tree.currentIndex==-1) return;
+    try
+    {
+        //Ausgewaehltes Projekt holen
+        var projektphase_id = getTreeCellText(tree, "treecol-projektphase-projekt_phase_id", tree.currentIndex);
+
+        if(projektphase_id!='')
+        {
+            //Projektphase wurde markiert
+            //Loeschen Button aktivieren
+            document.getElementById('toolbarbutton-projektphase-del').disabled=false;
+        }
+        else
+        {
+              return false;
+        }
+    }
+    catch(e)
+    {
+            alert(e);
+            return false;
+    }
+    
+    var req = new phpRequest('<?php echo APP_ROOT; ?>rdf/projektphase.rdf.php','','');
+    req.add('projektphase_id',projektphase_id);
+    var response = req.execute();
+    
+    // Datasource holen
+    var dsource=parseRDFString(response, 'http://www.technikum-wien.at/projektphase/alle-projektphasen');
+
+    dsource=dsource.QueryInterface(Components.interfaces.nsIRDFDataSource);
+
+    var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
+               getService(Components.interfaces.nsIRDFService);
+    var subject = rdfService.GetResource("http://www.technikum-wien.at/projektphase/" + projektphase_id);
+
+    var predicateNS = "http://www.technikum-wien.at/projektphase/rdf";
+
+    //Daten holen
+    var projekt_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#projekt_kurzbz" ));
+    var projektphase_fk=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#projektphase_fk" ));
+    var bezeichnung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bezeichnung" ));
+    var beschreibung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#beschreibung" ));
+    var start=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#start" ));
+    var ende=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ende" ));
+    var budget=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#budget" ));
+    var personentage=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#personentage" ));
+    
+    //Daten den Feldern zuweisen
+
+    document.getElementById('textbox-projektphase-detail-projekt_kurzbz').value=projekt_kurzbz;
+    document.getElementById('textbox-projektphase-detail-projektphase_id').value=projektphase_id;
+    document.getElementById('textbox-projektphase-detail-projektphase_fk').value=projektphase_fk;
+    document.getElementById('textbox-projektphase-detail-beschreibung').value=beschreibung;
+    document.getElementById('textbox-projektphase-detail-bezeichnung').value=bezeichnung;
+    document.getElementById('textbox-projektphase-detail-start').value=start;
+    document.getElementById('textbox-projektphase-detail-ende').value=ende;
+    document.getElementById('textbox-projektphase-detail-budget').value=budget;
+    document.getElementById('textbox-projektphase-detail-personentage').value=personentage;
+    document.getElementById('checkbox-projektphase-detail-neu').checked=false;
+}
 // ****
-// * Asynchroner (Nicht blockierender) Refresh des LV Trees
+// * Asynchroner (Nicht blockierender) Refresh des Trees
 // ****
-function TaskTreeRefresh()
+function ProjektphaseTreeRefresh()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
 	//markierte Lehreinheit global speichern damit diese LE nach dem
 	//refresh wieder markiert werden kann.
-	var tree = document.getElementById('projekttask-tree');
+	var tree = document.getElementById('tree-projektphase');
 		
 	try
 	{
-		selectIDProjektphase = getTreeCellText(tree, "projekttask-treecol-projekttask_id", tree.currentIndex);
+		selectIDProjektphase = getTreeCellText(tree, "treecol-projektphase-projekt_phase_id", tree.currentIndex);
 	}
 	catch(e)
 	{
 		selectIDProjektphase=null;
 	}
+	
 	datasourceTreeProjektphase.Refresh(false); //non blocking
 }
 
 // ****
-// * neuen Task anlegen
+// * Speichert die Details
 // ****
-function TaskNeu()
+function saveProjektphaseDetail()
 {
-	// Trick 17	(sonst gibt's ein Permission denied)
-	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
-	alert('Neuer Task - noch nicht implementiert');
-	/*
-	var tree = document.getElementById('lehrveranstaltung-tree');
+	//Werte holen
+	projektphase_id = document.getElementById('textbox-projektphase-detail-projektphase_id').value;
+	projektphase_fk = document.getElementById('textbox-projektphase-detail-projektphase_fk').value;
+	projekt_kurzbz = document.getElementById('textbox-projektphase-detail-projekt_kurzbz').value;
+	bezeichnung = document.getElementById('textbox-projektphase-detail-bezeichnung').value;
+	beschreibung = document.getElementById('textbox-projektphase-detail-beschreibung').value;
+	start = document.getElementById('textbox-projektphase-detail-start').value;
+	ende = document.getElementById('textbox-projektphase-detail-ende').value;
+	budget = document.getElementById('textbox-projektphase-detail-budget').value;
+	personentage = document.getElementById('textbox-projektphase-detail-personentage').value;
+	neu = document.getElementById('checkbox-projektphase-detail-neu').checked;
 
-	//Details zuruecksetzen
-	LeDetailReset();
-
-	//Detail Tab als aktiv setzen
-	document.getElementById('lehrveranstaltung-tabbox').selectedIndex=0;
-
-	//Lektor-Tab und GruppenTree ausblenden
-	document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe').hidden=true;
-	document.getElementById('lehrveranstaltung-detail-label-lehreinheitgruppe').hidden=true;
-	document.getElementById('lehrveranstaltung-tab-lektor').collapsed=true;
-
-	//Lehrveranstaltungs_id holen
-	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrveranstaltung_id"] : "lehrveranstaltung-treecol-lehrveranstaltung_id";
-	var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
-
-	//Lehrform setzen
-	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrform"] : "lehrveranstaltung-treecol-lehrform";
-	var lehrform_kurzbz=tree.view.getCellText(tree.currentIndex,col);
-
-	//Lehrfach drop down setzen
-
-	//ID in globale Variable speichern
-	LeDetailLehrfach_id='';
-	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-bezeichnung"] : "lehrveranstaltung-treecol-bezeichnung";
-	LeDetailLehrfach_label=tree.view.getCellText(tree.currentIndex,col);
-
-	lehrfachmenulist = document.getElementById('lehrveranstaltung-detail-menulist-lehrfach');
-	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-
-	//Entfernen der alten Datasources
-	var oldDatasources = lehrfachmenulist.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
-	{
-		lehrfachmenulist.database.RemoveDataSource(oldDatasources.getNext());
-	}
-	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	lehrfachmenulist.builder.rebuild();
-
-	//Url zusammenbauen
-	var url = '<?php echo APP_ROOT;?>rdf/lehrfach.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+'&'+gettimestamp();
-
-	//RDF holen
-	var newDs  = rdfService.GetDataSource(url);
-	lehrfachmenulist.database.AddDataSource(newDs);
-
-	//SinkObserver hinzufuegen
-	var sink = newDs.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-	sink.addXMLSinkObserver(LeDetailLehrfachSinkObserver);
-
-	document.getElementById('lehrveranstaltung-detail-textbox-lehrveranstaltung').value=lehrveranstaltung_id;
-	document.getElementById('lehrveranstaltung-detail-checkbox-new').checked=true;
-	document.getElementById('lehrveranstaltung-detail-textbox-stundenblockung').value='2';
-	document.getElementById('lehrveranstaltung-detail-textbox-wochenrythmus').value='1';
-	if(lehrform_kurzbz=='')
-		lehrform_kurzbz='UE';
-	document.getElementById('lehrveranstaltung-detail-menulist-lehrform').value=lehrform_kurzbz;
-
-	var stsem = getStudiensemester();
-	document.getElementById('lehrveranstaltung-detail-menulist-studiensemester').value=stsem;
+	var soapBody = new SOAPObject("saveProjektphase");
+	soapBody.appendChild(new SOAPObject("projektphase_id")).val(projektphase_id);
+	soapBody.appendChild(new SOAPObject("projektphase_fk")).val(projektphase_fk);
+	soapBody.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
+	soapBody.appendChild(new SOAPObject("bezeichnung")).val(bezeichnung);
+	soapBody.appendChild(new SOAPObject("beschreibung")).val(beschreibung);
+	soapBody.appendChild(new SOAPObject("start")).val(start);
+	soapBody.appendChild(new SOAPObject("ende")).val(ende);
+	soapBody.appendChild(new SOAPObject("budget")).val(budget);
+	soapBody.appendChild(new SOAPObject("personentage")).val(personentage);
+	if(neu)
+		soapBody.appendChild(new SOAPObject("neu")).val('true');
+	else
+		soapBody.appendChild(new SOAPObject("neu")).val('false');
+	soapBody.appendChild(new SOAPObject("user")).val(getUsername());
 	
-	//Defaultwert fuer Anmerkung
-	document.getElementById('lehrveranstaltung-detail-textbox-anmerkung').value='<?php echo str_replace("'","\'",LEHREINHEIT_ANMERKUNG_DEFAULT);?>';
-	*/
+	var sr = new SOAPRequest("saveProjektphase",soapBody);
+
+	SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projektphase.soap.php?"+gettimestamp();
+	SOAPClient.SendRequest(sr, clb_saveProjektphase);
 }
+
+// ****
+// * Callback Funktion nach Speichern eines Task
+// ****
+function clb_saveProjektphase(respObj)
+{
+	try
+	{
+		var id = respObj.Body[0].SaveProjektphaseResponse[0].message[0].Text;
+	}
+	catch(e)
+	{
+		var fehler = respObj.Body[0].Fault[0].faultstring[0].Text;
+		alert('Fehler: '+fehler);
+		return;
+	}
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	document.getElementById('textbox-projektphase-detail-projektphase_id').value=id;
+		
+	selectIDProjektphase=id;
+	datasourceTreeProjektphase.Refresh(false); //non blocking
+	SetStatusBarText('Daten wurden gespeichert');
+}
+
 // ****
 // * Selectiert die Lektorzuordnung nachdem der Tree
 // * rebuildet wurde.
 // ****
-function TaskTreeSelectTask()
+function ProjektphaseTreeSelectPhase()
 {
-	var tree=document.getElementById('projekttask-tree');
+	var tree=document.getElementById('tree-projektphase');
 	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
 
 	//In der globalen Variable ist die zu selektierende ID gespeichert
@@ -180,7 +235,7 @@ function TaskTreeSelectTask()
 	   	for(var i=0;i<items;i++)
 	   	{
 	   		//id der row holen
-	   		id = getTreeCellText(tree, "projekttask-treecol-projekttask_id", i);
+	   		id = getTreeCellText(tree, "treecol-projektphase-projekt_phase_id", i);
 			
 			//wenn dies die zu selektierende Zeile
 			if(selectIDProjektphase==id)
@@ -202,7 +257,7 @@ function ProjektphaseNeu()
     netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
     var tree=document.getElementById('tree-projektmenue');
-    alert(tree);
+    
     var projekt_kurzbz=getTreeCellText(tree, "treecol-projektmenue-projekt_kurzbz", tree.currentIndex);
     window.open('<?php echo APP_ROOT; ?>content/projekt/projektphase.window.xul.php?projekt_kurzbz='+projekt_kurzbz,'Projektphase anlegen', 'height=384,width=512,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no');
     //alert (oe);

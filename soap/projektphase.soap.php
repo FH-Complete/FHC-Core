@@ -29,7 +29,7 @@ require_once('../include/basis_db.class.php');
 require_once('../include/projektphase.class.php');
 require_once('../include/datum.class.php');
 
-$SOAPServer = new SoapServer(APP_ROOT."/soap/projektphase.wsdl.php");
+$SOAPServer = new SoapServer(APP_ROOT."/soap/projektphase.wsdl.php?".microtime());
 $SOAPServer->addFunction("saveProjektphase");
 $SOAPServer->handle();
 
@@ -47,10 +47,22 @@ ini_set("soap.wsdl_cache_enabled", "0");
  * @param date $start
  * @param date $ende
  * @param string $budget
+ * @param string $personentage
+ * @param string $user
+ * @param string $neu
  */
-function saveProjektphase($projektphase_id, $projekt_kurzbz, $projektphase_fk, $bezeichnung, $beschreibung, $start, $ende, $budget)
+function saveProjektphase($projektphase_id, $projekt_kurzbz, $projektphase_fk, $bezeichnung, $beschreibung, $start, $ende, $budget, $personentage, $user, $neu)
 { 	
 	$projektphase = new projektphase();
+	if($projektphase_id!='')
+	{
+		$projektphase->load($projektphase_id);
+	}
+	else
+	{
+		$projektphase->insertvon = $user;
+		$projektphase->insertamum=date('Y-m-d H:i:s');
+	}
 	$projektphase->projektphase_id=$projektphase_id;
 	$projektphase->projekt_kurzbz=$projekt_kurzbz;
 	$projektphase->projektphase_fk=$projektphase_fk;
@@ -59,10 +71,17 @@ function saveProjektphase($projektphase_id, $projekt_kurzbz, $projektphase_fk, $
 	$projektphase->start = $start;
 	$projektphase->ende = $ende;
 	$projektphase->budget = $budget;
-	$projektphase->new = true; 
+	$projektphase->personentage = $personentage;
+	$projektphase->updatevon = $user;
+	$projektphase->updateamum = date('Y-m-d H:i:s');
 	
-	if($projektphase->save($new = true))
-		return "OK"; 
+	if($neu=='true')
+		$projektphase->new = true;
+	else
+		$projektphase->new = false; 
+	
+	if($projektphase->save())
+		return $projektphase->projektphase_id; 
 	else
 		return new SoapFault("Server", $projektphase->errormsg);
 }

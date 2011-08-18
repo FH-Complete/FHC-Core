@@ -37,8 +37,12 @@ require_once('../../../include/datum.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/mail.class.php');
-	if (!$db = new basis_db())
-		$db=false;
+require_once('../../../include/phrasen.class.php');
+
+if (!$db = new basis_db())
+	$db=false;
+$sprache = getSprache();
+$p = new phrasen($sprache);
 		
 $fixtermin=false;
 
@@ -100,28 +104,28 @@ if(isset($_GET['id']) && isset($_GET['uid']))
 echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
-<head>
-<title>Abgabe Lektor Details</title>
-<link rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
-<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
-<script language="Javascript">
-	function confdel()
-	{
-		return confirm("Wollen Sie diesen Eintrag wirklich loeschen");
-	}
-</script>
-</head>
+	<head>
+		<title>'.$p->t('abgabetool/abgabetool').'</title>
+		<link rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
+		<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
+		<script language="Javascript">
+			function confdel()
+			{
+				return confirm("'.$p->t('global/warnungWirklichLoeschen').'");
+			}
+		</script>
+	</head>
 <body class="Background_main"  style="background-color:#eeeeee;">
-<h3>Abgabe Lektorenbereich</h3>';
+<h3>'.$p->t('abgabetool/abgabeLektorenbereich').'</h3>';
 
 // Speichern eines Termines
 if(isset($_POST["schick"]))
 {
 	if($datum)
 	{
-		$qry_std="SELECT * FROM campus.vw_benutzer where uid='$uid'";
+		$qry_std="SELECT * FROM campus.vw_benutzer where uid='".addslashes($uid)."'";
 		if(!$result_std=$db->db_query($qry_std))
 		{
 			echo "<font color=\"#FF0000\">Student konnte nicht gefunden werden!</font><br>&nbsp;";
@@ -132,7 +136,7 @@ if(isset($_POST["schick"]))
 			if($command=='insert')
 			{
 				$qrychk="SELECT * FROM campus.tbl_paabgabe 
-					WHERE projektarbeit_id='$projektarbeit_id' AND paabgabetyp_kurzbz='$paabgabetyp_kurzbz' AND fixtermin=".($fixtermin==1?'true':'false')." AND datum='$datum' AND kurzbz='$kurzbz'";
+					WHERE projektarbeit_id='".addslashes($projektarbeit_id)."' AND paabgabetyp_kurzbz='".addslashes($paabgabetyp_kurzbz)."' AND fixtermin=".($fixtermin==1?'true':'false')." AND datum='".addslashes($datum)."' AND kurzbz='".addslashes($kurzbz)."'";
 				if($result=$db->db_query($qrychk))
 				{
 					if($db->db_num_rows($result)>0)
@@ -143,16 +147,16 @@ if(isset($_POST["schick"]))
 					{
 						//neuer Termin
 						$qry="INSERT INTO campus.tbl_paabgabe (projektarbeit_id, paabgabetyp_kurzbz, fixtermin, datum, kurzbz, abgabedatum, insertvon, insertamum, updatevon, updateamum) 
-							VALUES ('$projektarbeit_id', '$paabgabetyp_kurzbz', ".($fixtermin==1?'true':'false').", '$datum', '$kurzbz', NULL, '$user', now(), NULL, NULL)";
+							VALUES ('".addslashes($projektarbeit_id)."', '".addslashes($paabgabetyp_kurzbz)."', ".($fixtermin==1?'true':'false').", '".addslashes($datum)."', '".addslashes($kurzbz)."', NULL, '".addslashes($user)."', now(), NULL, NULL)";
 						//echo $qry;	
 						if(!$result=$db->db_query($qry))
 						{
-							echo "<font color=\"#FF0000\">Termin konnte nicht eingetragen werden!</font><br>&nbsp;";	
+							echo "<span class=\"error\">".$p->t('global/fehleraufgetreten')."</span><br>&nbsp;";	
 						}
 						else 
 						{
 							$row=@$db->db_fetch_object($result);
-							$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$paabgabetyp_kurzbz."'";
+							$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".addslashes($paabgabetyp_kurzbz)."'";
 							if($result_typ=$db->db_query($qry_typ))
 							{
 								$row_typ=@$db->db_fetch_object($result_typ);
@@ -165,11 +169,11 @@ if(isset($_POST["schick"]))
 							"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr(e) Betreuer(in) hat einen neuen Termin angelegt:\n".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung.", ".$kurzbz."\n\nMfG\nIhr(e) Betreuer(in)\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
 							if(!$mail->send())
 							{
-								echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den Studierenden!</font><br>&nbsp;";	
+								echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerMailStudent')."</font><br>&nbsp;";	
 							}
 							else 
 							{
-								echo "Mail verschickt an: ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."<br>";
+								echo $p->t('abgabetool/mailVerschicktAn').": ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."<br>";
 							}
 						}
 						$command='';
@@ -177,23 +181,23 @@ if(isset($_POST["schick"]))
 				}
 				else 
 				{
-					echo "Datenbank-Zugriffsfehler!";
+					echo $p->t('global/fehlerBeimLesenAusDatenbank');
 				}
 			}
 			if($command=='update')
 			{
 				//Terminänderung
 				//Ermittlung der alten Daten
-				$qry_old="SELECT * FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";
+				$qry_old="SELECT * FROM campus.tbl_paabgabe WHERE paabgabe_id='".addslashes($paabgabe_id)."' AND insertvon='".addslashes($user)."'";
 				if(!$result_old=$db->db_query($qry_old))
 				{
-					echo "<font color=\"#FF0000\">Termin konnte nicht gefunden werden!</font><br>&nbsp;";	
+					echo "<font color=\"#FF0000\">".$p->t('abgabetool/terminNichtGefunden')."</font><br>&nbsp;";	
 				}
 				else 
 				{
 					$row_old=@$db->db_fetch_object($result_old);
 					//Abgabetyp
-					$qry_told="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$row_old->paabgabetyp_kurzbz."'";
+					$qry_told="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".addslashes($row_old->paabgabetyp_kurzbz)."'";
 					if($result_told=$db->db_query($qry_told))
 					{
 						$row_told=@$db->db_fetch_object($result_told);
@@ -204,23 +208,23 @@ if(isset($_POST["schick"]))
 					}
 					//Termin updaten
 					$qry="UPDATE campus.tbl_paabgabe SET
-						projektarbeit_id = '".$projektarbeit_id."', 
-						paabgabetyp_kurzbz = '".$paabgabetyp_kurzbz."', 
+						projektarbeit_id = '".addslashes($projektarbeit_id)."', 
+						paabgabetyp_kurzbz = '".addslashes($paabgabetyp_kurzbz)."', 
 						fixtermin = ".($fixtermin==1?'true':'false').", 
-						datum = '".$datum."', 
-						kurzbz = '".$kurzbz."', 
-						updatevon = '".$user."', 
+						datum = '".addslashes($datum)."', 
+						kurzbz = '".addslashes($kurzbz)."', 
+						updatevon = '".addslashes($user)."', 
 						updateamum = now() 
-						WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";
+						WHERE paabgabe_id='".addslashes($paabgabe_id)."' AND insertvon='".addslashes($user)."'";
 					//echo $qry;	
 					if(!$result=$db->db_query($qry))
 					{
-						echo "<font color=\"#FF0000\">Termin&auml;nderung konnte nicht eingetragen werden!</font><br>&nbsp;";	
+						echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerTerminEintragen')."</font><br>&nbsp;";	
 					}
 					else 
 					{
 						//Abgabetyp
-						$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$paabgabetyp_kurzbz."'";
+						$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".addslashes($paabgabetyp_kurzbz)."'";
 						if(!$result=$db->db_query($qry))
 						{
 								$row_typ=@$db->db_fetch_object($result_typ);
@@ -233,29 +237,30 @@ if(isset($_POST["schick"]))
 						"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr(e) Betreuer(in) hat einen Termin geändert:\nVon: ".$datum_obj->formatDatum($row_old->datum,'d.m.Y').", ".$row_told->bezeichnung.", ".$row_old->kurzbz."\nAuf: ".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung." ".$kurzbz."\n\nMfG\nIhr(e) Betreuer(in)\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
 						if(!$mail->send())
 						{
-							echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den Studierenden!</font><br>&nbsp;";	
+							echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerMailStudent')."</font><br>&nbsp;";	
 						}
 						else 
 						{
-							echo "Mail verschickt an: ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."<br>";
+							echo $p->t('abgabetool/mailVerschicktAn').": ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."<br>";
 						}
 					}
 				}
 				$command='';
 			}
+			/*
 			if(isset($mail))
 			{
 				$mail->setReplyTo($user."@".DOMAIN);
 				if(!$mail->send())
 				{
-					echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails!</font><br>&nbsp;";	
+					echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerMail')."</font><br>&nbsp;";	
 				}
-			}
+			}*/
 		}
 	}
 	else 
 	{
-		echo "<font color=\"#FF0000\">Datumseingabe ung&uuml;ltig!</font><br>&nbsp;";
+		echo "<font color=\"#FF0000\">".$p->t('global/datumUngueltig')."</font><br>&nbsp;";
 	}
 	unset($_POST["schick"]);
 }
@@ -265,26 +270,26 @@ if(isset($_POST["del"]))
 	if($datum)
 	{
 		//Ermittlung der alten Daten
-		$qry_old="SELECT * FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";
+		$qry_old="SELECT * FROM campus.tbl_paabgabe WHERE paabgabe_id='".addslashes($paabgabe_id)."' AND insertvon='".addslashes($user)."'";
 		if(!$result_old=$db->db_query($qry_old))
 		{
-			echo "<font color=\"#FF0000\">Termin konnte nicht gefunden werden!</font><br>&nbsp;";	
+			echo "<font color=\"#FF0000\">".$p->t('abgabetool/terminNichtGefunden')."</font><br>&nbsp;";	
 		}
 		else 
 		{
 			$row_old=@$db->db_fetch_object($result_old);
-			$qry_std="SELECT * FROM campus.vw_benutzer where uid='$uid'";
+			$qry_std="SELECT * FROM campus.vw_benutzer where uid='".addslashes($uid)."'";
 			if(!$result_std=$db->db_query($qry_std))
 			{
-				echo "<font color=\"#FF0000\">Student konnte nicht gefunden werden!</font><br>&nbsp;";
+				echo "<font color=\"#FF0000\">".$p->t('global/userNichtGefunden')."</font><br>&nbsp;";
 			}
 			else
 			{
 				$row_std=@$db->db_fetch_object($result_std);
-				$qry="DELETE FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."' AND insertvon='$user'";	
+				$qry="DELETE FROM campus.tbl_paabgabe WHERE paabgabe_id='".addslashes($paabgabe_id)."' AND insertvon='".addslashes($user)."'";	
 				if(!$result=$db->db_query($qry))
 				{
-					echo "<font color=\"#FF0000\">Fehler beim Löschen des Termins!</font><br>&nbsp;";
+					echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerTerminLoeschen')."</font><br>&nbsp;";
 				}
 				else 
 				{
@@ -293,11 +298,11 @@ if(isset($_POST["del"]))
 					$mail->setReplyTo($user."@".DOMAIN);
 					if(!$mail->send())
 					{
-						echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den Studierenden!</font><br>&nbsp;";	
+						echo "<font color=\"#FF0000\">".$p->t('fehlerMailStudent')."</font><br>&nbsp;";	
 					}
 					else 
 					{
-						echo "Mail verschickt an: ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."<br>";
+						echo $p->t('abgabetool/mailVerschicktAn').": ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."<br>";
 					}
 				}
 			}
@@ -305,14 +310,14 @@ if(isset($_POST["del"]))
 	}
 	else 
 	{
-		echo "<font color=\"#FF0000\">Datumseingabe ung&uuml;ltig!</font><br>&nbsp;";
+		echo "<font color=\"#FF0000\">".$p->t('global/datumUngueltig')."</font><br>&nbsp;";
 	}
 	unset($_POST["del"]);
 }
 
-$qry="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$projektarbeit_id."' ORDER BY datum;";
+$qry="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".addslashes($projektarbeit_id)."' ORDER BY datum;";
 $studentenname='';
-$qry_nam="SELECT trim(COALESCE(vorname,'')||' '||COALESCE(nachname,'')) as studnam FROM campus.vw_student WHERE uid='$uid'";
+$qry_nam="SELECT trim(COALESCE(vorname,'')||' '||COALESCE(nachname,'')) as studnam FROM campus.vw_student WHERE uid='".addslashes($uid)."'";
 $result_nam=$db->db_query($qry_nam);
 while ($result_nam && $row_nam=$db->db_fetch_object($result_nam))
 {
@@ -320,28 +325,37 @@ while ($result_nam && $row_nam=$db->db_fetch_object($result_nam))
 }
 $htmlstr .= "<table width=100%>\n";
 //$htmlstr .= "<tr><td style='font-size:16px'>Student: <b>".$uid."</b></td>";
-$htmlstr .= "<tr><td style='font-size:16px'>Student: <b>".$studentenname."</b></td>";
+$htmlstr .= "<tr><td style='font-size:16px'>".$p->t('abgabetool/student').": <b>".$studentenname."</b></td>";
 $htmlstr .= "<td width=10% align=center><form action='../../../include/".EXT_FKT_PATH."/abgabe_lektor_benotung.php' title='Benotungsformular' target='_blank' method='GET'>";
 $htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
 $htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
 //$htmlstr .= "<a href='../../cisdocs/Projektarbeitsabgabe_FHTW_Anleitung.pdf' target='_blank'><img src='../../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0></a>&nbsp;&nbsp;&nbsp;";
-$htmlstr .= "<input type='submit' name='note' value='benoten'></form></td>";
+$htmlstr .= "<input type='submit' name='note' value='".$p->t('abgabetool/benoten')."'></form></td>";
 if($betreuerart!="Zweitbegutachter")
 {
 	$htmlstr .= "<td width=10% align=center><form action='https://www1.ephorus.de/' title='ephorus' target='_blank' method='GET'>";
-	$htmlstr .= "<input type='submit' name='ephorus' value='Plagiatspr&uuml;fung'></form></td></tr>";
+	$htmlstr .= "<input type='submit' name='ephorus' value='".$p->t('abgabetool/plagiatspruefung')."'></form></td></tr>";
 }
 else 
 {
 	$htmlstr .= "<td>&nbsp;</td></tr>";
 }
-$htmlstr .= "<tr><td style='font-size:16px'>Titel: <b>".$titel."<b></td><td></td><td valign=\"right\"><a href='abgabe_student_frameset.php?uid=$uid' target='_blank'>Studentenansicht</a></td>";
+$htmlstr .= "<tr><td style='font-size:16px'>Titel: <b>".$titel."<b></td><td></td><td valign=\"right\"><a href='abgabe_student_frameset.php?uid=$uid' target='_blank'>".$p->t('abgabetool/studentenansicht')."</a></td>";
 $htmlstr .= "</tr>\n";
 $htmlstr .= "</table>\n";
-$htmlstr .= "<br><b>Abgabetermine:</b>\n";
+$htmlstr .= "<br><b>".$p->t('abgabetool/abgabetermine').":</b>\n";
 $htmlstr .= "<table class='detail' style='padding-top:10px;' >\n";
 $htmlstr .= "<tr></tr>\n";
-$htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibung der Abgabe</td><td>abgegeben am</td><td></td><td></td><td></td></tr>\n";
+$htmlstr .= "<tr>
+				<td>".$p->t('abgabetool/fix')."</td>
+				<td>".$p->t('abgabetool/datum')."</td>
+				<td>".$p->t('abgabetool/abgabetyp')."</td>
+				<td>".$p->t('abgabetool/beschreibungAbgabe')."</td>
+				<td>".$p->t('abgabetool/abgegebenAm')."</td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>\n";
 $result=@$db->db_query($qry);
 	while ($row=@$db->db_fetch_object($result))
 	{
@@ -393,11 +407,11 @@ $result=@$db->db_query($qry);
 		//$htmlstr .= "<td><input type='checkbox' name='fixtermin' ".($row->fixtermin=='t'?'checked="checked" style="background-color:#FF0000;"':'')." disabled>";
 		if($row->fixtermin=='t')
 		{
-			$htmlstr .= "<td><img src='../../../skin/images/bullet_red.png' alt='J' title='Fixer Abgabetermin' border=0></td>";
+			$htmlstr .= "<td><img src='../../../skin/images/bullet_red.png' alt='J' title='".$p->t('abgabetool/fixerAbgabetermin')."' border=0></td>";
 		}
 		else 
 		{
-			$htmlstr .= "<td><img src='../../../skin/images/bullet_green.png' alt='N' title='Variabler Abgabetermin' border=0></td>";
+			$htmlstr .= "<td><img src='../../../skin/images/bullet_green.png' alt='N' title='".$p->t('abgabetool/variablerAbgabetermin')."' border=0></td>";
 		}
 		$htmlstr .= "		</td>\n";
 		$htmlstr .= "		<td><input  type='text' name='datum' style='background-color:".$bgcol.";font-weight:bold; color:".$fcol." ' value='".$datum_obj->formatDatum($row->datum,'d.m.Y')."' size='10' maxlegth='10'></td>\n";
@@ -424,11 +438,11 @@ $result=@$db->db_query($qry);
 		$htmlstr .= "		<td>".($row->abgabedatum==''?'&nbsp;':$datum_obj->formatDatum($row->abgabedatum,'d.m.Y'))."</td>\n";		
 		if($user==$row->insertvon && $betreuerart!="Zweitbegutachter")
 		{		
-			$htmlstr .= "		<td><input type='submit' name='schick' value='speichern' title='Termin&auml;nderung speichern'></td>";
+			$htmlstr .= "		<td><input type='submit' name='schick' value='".$p->t('global/speichern')."' title='".$p->t('abgabetool/terminaenderungSpeichern')."'></td>";
 		
 			if(!$row->abgabedatum)
 			{
-				$htmlstr .= "		<td><input type='submit' name='del' value='l&ouml;schen' onclick='return confdel()' title='Termin l&ouml;schen'></td>";
+				$htmlstr .= "		<td><input type='submit' name='del' value='".$p->t('global/loeschen')."' onclick='return confdel()' title='".$p->t('abgabetool/terminLoeschen')."'></td>";
 			}
 			else 
 			{
@@ -441,7 +455,7 @@ $result=@$db->db_query($qry);
 		}
 		if(file_exists(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf'))
 		{
-			$htmlstr .= "		<td><a href='".$_SERVER['PHP_SELF']."?id=".$row->paabgabe_id."&uid=$uid' target='_blank'><img src='../../../skin/images/pdf.ico' alt='PDF' title='abgegebene Datei' border=0></a></td>";
+			$htmlstr .= "		<td><a href='".$_SERVER['PHP_SELF']."?id=".$row->paabgabe_id."&uid=$uid' target='_blank'><img src='../../../skin/images/pdf.ico' alt='PDF' title='".$p->t('abgabetool/abgegebeneDatei')."' border=0></a></td>";
 		}
 		else 
 		{
@@ -449,7 +463,7 @@ $result=@$db->db_query($qry);
 		}
 		if($row->abgabedatum && $row->paabgabetyp_kurzbz=="end")
 		{
-			$htmlstr .= "		<td><a href='abgabe_lektor_zusatz.php?paabgabe_id=".$row->paabgabe_id."&uid=$uid&projektarbeit_id=$projektarbeit_id' target='_blank'><img src='../../../skin/images/folder.gif' alt='zusätzliche Daten' title='Kontrolle der Zusatzdaten' border=0></a></td>";
+			$htmlstr .= "		<td><a href='abgabe_lektor_zusatz.php?paabgabe_id=".$row->paabgabe_id."&uid=$uid&projektarbeit_id=$projektarbeit_id' target='_blank'><img src='../../../skin/images/folder.gif' alt='zusätzliche Daten' title='".$p->t('abgabetool/kontrolleZusatzdaten')."' border=0></a></td>";
 		}
 		else 
 		{
@@ -489,7 +503,7 @@ $htmlstr .= "		<td><input  type='text' name='kurzbz' size='60' maxlegth='256'></
 $htmlstr .= "		<td>&nbsp;</td>\n";		
 if($betreuerart!="Zweitbegutachter")
 {
-	$htmlstr .= "		<td><input type='submit' name='schick' value='speichern' title='neuen Termin speichern'></td>";
+	$htmlstr .= "		<td><input type='submit' name='schick' value='".$p->t('global/speichern')."' title='".$p->t('abgabetool/neuenTerminSpeichern')."'></td>";
 }
 else 
 {

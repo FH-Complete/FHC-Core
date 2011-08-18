@@ -71,6 +71,7 @@ $this->phrasen['global/datum']='Datum';
 $this->phrasen['global/stunde']='Stunde'; 
 $this->phrasen['global/person']='Person'; 
 $this->phrasen['global/personen']='Personen'; 
+$this->phrasen['global/personenkz']='Personenkz.'; 
 $this->phrasen['global/beschreibung']='Beschreibung'; 
 $this->phrasen['global/angelegtAm']='angelegt am'; 
 $this->phrasen['global/funktion']='Funktion'; //Mitarbeiterfunktion zB Assistenz
@@ -92,6 +93,7 @@ $this->phrasen['global/angemeldet']='Angemeldet';
 $this->phrasen['global/löschen']='Löschen'; 
 $this->phrasen['global/dateiLoeschen']='Datei Löschen'; 
 $this->phrasen['global/betreff']='Betreff';
+$this->phrasen['global/handbuch']='Handbuch';
 
 // Statusmeldungen
 $this->phrasen['global/erfolgreichgespeichert']='Erfolgreich gespeichert'; 
@@ -109,6 +111,9 @@ $this->phrasen['global/nichtAngemeldet'] = 'Sie sind nicht angemeldet. Es wurde 
 $this->phrasen['global/LDAPserverNichtErreichbar']='Der LDAP-Server ist nicht erreichbar';
 $this->phrasen['global/unbekannterFehleraufgetreten']='Es ist ein unbekannter Fehler aufgetreten'; 
 $this->phrasen['global/fehlerBeiDerParameteruebergabe']='Fehler bei der Uebergabe der Parameter';
+$this->phrasen['global/warnungWirklichLoeschen']='Wollen Sie diesen Datensatz wirklich löschen?';
+$this->phrasen['global/dateiErfolgreichHochgeladen']='Die Datei wurde erfolgreich hochgeladen';
+$this->phrasen['global/dateiNichtErfolgreichHochgeladen']='Die Datei wurde nicht erfolgreich hochgeladen. Bitte wiederholen Sie den Vorgang';
 $this->phrasen['global/FuerDieseAktionBenoetigenSieAdministrationsrechte']='Fuer diese Aktion benoetigen Sie Administratorenrechte';
 
 // LV - Plan
@@ -125,6 +130,7 @@ $this->phrasen['global/reservierungsliste']='Reservierungsliste';
 $this->phrasen['global/reservierungenLoeschen']='Reservierungen löschen';
 $this->phrasen['global/raumsuche']='Raumsuche';
 $this->phrasen['global/lehrverband']='Lehr-Verband'; 
+$this->phrasen['global/stg']='Stg'; 
 $this->phrasen['global/sem']='Sem'; 
 $this->phrasen['global/ver']='Ver'; 
 $this->phrasen['global/grp']='Grp'; 

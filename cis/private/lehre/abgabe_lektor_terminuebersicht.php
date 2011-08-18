@@ -24,11 +24,14 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/phrasen.class.php');
 
 $uid = get_uid();
 $user = '';
 $db = new basis_db();
 $datum_obj = new datum();
+$sprache = getSprache();
+$p = new phrasen($sprache);
 
 echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
@@ -60,18 +63,20 @@ echo '
 
 if(isset($_GET['user']))
 {
+	//Terminliste von anderen Personen darf nur dann angezeigt werden, wenn 
+	//die entsprechende Berechtigung vorhanden ist
 	$rechte = new benutzerberechtigung();
 	if(!$rechte->getBerechtigungen($uid))
-		die('Fehler beim Laden der Berechtigungen');
+		die($p->t('global/fehlerBeimLesenAusDatenbank'));
 	if(!$rechte->isBerechtigt('lehre/abgabetool'))
-		die('Sie haben keine Berechtigung um die Terminliste von anderen Personen zu sehen');
+		die($p->t('global/keineBerechtigungFuerDieseSeite'));
 	$user = $_GET['user'];
 }
 else
 	$user = $uid;
 $lektor = new benutzer();
 if(!$lektor->load($user))
-	die('Lektor konnte nicht geladen werden');
+	die($p->t('global/fehlerBeimErmittelnDerUID'));
 
 $sql_query = "
 	SELECT 
@@ -91,13 +96,13 @@ $sql_query = "
 		JOIN public.tbl_studiengang ON(tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz)
 		JOIN campus.tbl_paabgabetyp USING(paabgabetyp_kurzbz)
 	WHERE
-		tbl_projektbetreuer.person_id='".$lektor->person_id."' AND tbl_paabgabe.datum>=now() AND bn_student.aktiv
+		tbl_projektbetreuer.person_id='".addslashes($lektor->person_id)."' AND tbl_paabgabe.datum>=now() AND bn_student.aktiv
 	ORDER BY tbl_paabgabe.datum	
 	";
 
 if($result = $db->db_query($sql_query))
 {
-	echo "<h2>Termin&uuml;bersicht - $lektor->titelpre $lektor->vorname $lektor->nachname $lektor->titelpost</h2>";
+	echo "<h2>".$p->t('abgabetool/terminuebersicht')." - $lektor->titelpre $lektor->vorname $lektor->nachname $lektor->titelpost</h2>";
 	
 	if($db->db_num_rows($result)>0)
 	{
@@ -105,13 +110,13 @@ if($result = $db->db_query($sql_query))
 		echo '
 			<thead>
 			<tr class="liste">
-				<th>Datum</th>
-				<th>Fix</th>
-				<th>Typ</th>
-				<th>Bezeichnung</th>
-				<th>Student</th>
-				<th>Stg</th>
-				<th>Sem</th>
+				<th>'.$p->t('abgabetool/datum').'</th>
+				<th>'.$p->t('abgabetool/fix').'</th>
+				<th>'.$p->t('abgabetool/typ').'</th>
+				<th>'.$p->t('abgabetool/beschreibungAbgabe').'</th>
+				<th>'.$p->t('abgabetool/student').'</th>
+				<th>'.$p->t('global/stg').'</th>
+				<th>'.$p->t('global/sem').'</th>
 			</tr>
 			</thead>
 			<tbody>
@@ -133,7 +138,7 @@ if($result = $db->db_query($sql_query))
 		echo "\n</tbody></table>";
 	}
 	else
-		echo 'Derzeit sind keine Termine vorhanden';
+		echo $p->t('abgabetool/keineTermineVorhanden');
 }
 
 echo '</body></html>';

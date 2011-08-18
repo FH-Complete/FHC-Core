@@ -23,24 +23,24 @@
 /*******************************************************************************************************
  *				abgabe_lektor
  * 		abgabe_lektor ist die Lektorenseite des Abgabesystems 
- * 			f&uuml;r Diplom- und Bachelorarbeiten
+ * 			fuer Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 
 require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/basis_db.class.php');			
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/studiengang.class.php');
+require_once('../../../include/datum.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/mail.class.php');
+require_once('../../../include/phrasen.class.php');
 
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung 
-// ------------------------------------------------------------------------------------------
-require_once('../../../include/basis_db.class.php');
-	if (!$db = new basis_db())
-		$db=false;
-		
-	require_once('../../../include/functions.inc.php');
-	require_once('../../../include/studiengang.class.php');
-	require_once('../../../include/datum.class.php');
-	require_once('../../../include/benutzerberechtigung.class.php');
-	require_once('../../../include/mail.class.php');
+$sprache = getSprache();
+$p = new phrasen($sprache);
 
+if (!$db = new basis_db())
+	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
+	
 $i=0;
 $irgendwas='';
 foreach($_POST as $key=>$value)
@@ -82,36 +82,36 @@ if(isset($_POST["schick"]))
 	for($j=0;$j<count($termine)-1;$j++)
 	{
 		$qrychk="SELECT * FROM campus.tbl_paabgabe 
-			WHERE projektarbeit_id='".$termine[$j]."' AND paabgabetyp_kurzbz='$paabgabetyp_kurzbz' 
-			AND fixtermin=".($fixtermin==1?'true':'false')." AND datum='$datum' AND kurzbz='$kurzbz'";
+			WHERE projektarbeit_id='".addslashes($termine[$j])."' AND paabgabetyp_kurzbz='".addslashes($paabgabetyp_kurzbz)."' 
+			AND fixtermin=".($fixtermin==1?'true':'false')." AND datum='".addslashes($datum)."' AND kurzbz='".addslashes($kurzbz)."'";
 		//echo $qrychk;
 		if($result=$db->db_query($qrychk))
 		{
 			if($db->db_num_rows($result)>0)
 			{
-				echo "Datensatz bereits vorhanden";
+				echo $p->t('abgabetool/terminVorhanden');
 			}
 			else 
 			{
 				//pruefen, ob user zweitbetreuer
-				$qry2="SELECT * FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id='".$termine[$j]."' AND betreuerart_kurzbz='Zweitbegutachter' 
-					AND person_id=(SELECT person_id FROM campus.vw_mitarbeiter WHERE uid='".$user."')";
+				$qry2="SELECT * FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id='".addslashes($termine[$j])."' AND betreuerart_kurzbz='Zweitbegutachter' 
+					AND person_id=(SELECT person_id FROM campus.vw_mitarbeiter WHERE uid='".addslashes($user)."')";
 				$result2=$db->db_query($qry2);
 				//zweitbetreuer koennen keine termine eintragen
 				if($db->db_num_rows($result2)==0)
 				{
 					//echo "neuer Termin";
 					$qry="INSERT INTO campus.tbl_paabgabe (projektarbeit_id, paabgabetyp_kurzbz, fixtermin, datum, kurzbz, abgabedatum, insertvon, insertamum, updatevon, updateamum) 
-						VALUES ('".$termine[$j]."', '$paabgabetyp_kurzbz', ".($fixtermin==1?'true':'false').", '$datum', '$kurzbz', NULL, '$user', now(), NULL, NULL)";
+						VALUES ('".addslashes($termine[$j])."', '".addslashes($paabgabetyp_kurzbz)."', ".($fixtermin==1?'true':'false').", '".addslashes($datum)."', '".addslashes($kurzbz)."', NULL, '".addslashes($user)."', now(), NULL, NULL)";
 					//echo $qry;	
 					if(!$result=$db->db_query($qry))
 					{
-						echo "<font color=\"#FF0000\">Termin konnte nicht eingetragen werden!</font><br>&nbsp;";	
+						echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerTerminEintragen')."</font><br>&nbsp;";	
 					}
 					else 
 					{
 						$row=$db->db_fetch_object($result);
-						$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$paabgabetyp_kurzbz."'";
+						$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".addslashes($paabgabetyp_kurzbz)."'";
 						if($result_typ=$db->db_query($qry_typ))
 						{
 							$row_typ=$db->db_fetch_object($result_typ);
@@ -121,7 +121,7 @@ if(isset($_POST["schick"]))
 							$row_typ->bezeichnung='';
 						}
 						//Student zu projektarbeit_id suchen
-						$qry_std="SELECT * FROM campus.vw_student WHERE uid IN(SELECT student_uid FROM lehre.tbl_projektarbeit WHERE projektarbeit_id=$termine[$j])";
+						$qry_std="SELECT * FROM campus.vw_student WHERE uid IN(SELECT student_uid FROM lehre.tbl_projektarbeit WHERE projektarbeit_id='".addslashes($termine[$j])."')";
 						if($result_std=@$db->db_query($qry_std))
 						{
 							$row_std=$db->db_fetch_object($result_std);
@@ -129,74 +129,76 @@ if(isset($_POST["schick"]))
 							"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr(e) Betreuer(in) hat einen neuen Termin angelegt:\n".$datum_obj->formatDatum($datum,'d.m.Y').", ".$row_typ->bezeichnung.", ".$kurzbz."\n\nMfG\nIhr(e) Betreuer(in)\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
 							if(!$mail->send())
 							{
-								echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den Studierenden! ($row_std->uid)</font><br>&nbsp;";	
+								echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerMailStudent')." ($row_std->uid)</font><br>&nbsp;";	
 							}
 							else 
 							{
-								echo "Mail verschickt an: ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."<br>";
+								echo $p->t('abgabetool/mailVerschicktAn').": ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."<br>";
 							}
 						}
 					}
 				}
 				else 
 				{
-					echo "Zweitbetreuer bei ".$termine[$j]." <br>";	
+					echo $p->t('abgabetool/zweitbetreuerBei')." ".$termine[$j]." <br>";	
 				}
 				$command='';
 			}
 		}
 		else 
 		{
-			echo "Datenbank-Zugriffsfehler!";
+			echo $p->t('global/fehlerBeimLesenAusDatenbank');
 		}
 	}
 }
 
 $htmlstr='';
 
-	echo '
-		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-		<html>
-		<head>
+echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+	<head>
 		<title>Mehrfachtermin PA-Abgabe</title>
 		<link rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
 		<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
-		</head>
-		<body class="Background_main"  style="background-color:#eeeeee;">
-		<h3>Eingabe eines Termins f&uuml;r mehrere Personen</h3>';
-		//Eingabezeile f&uuml;r neuen Termin
-		$htmlstr .= "<br><b>Abgabetermin:</b>\n";
-		$htmlstr .= "<table class='detail' style='padding-top:10px;' >\n";
-		$htmlstr .= "<form action='".$_SERVER['PHP_SELF']."' method='POST' name='multitermin'>\n";
-		$htmlstr .= "<input type='hidden' name='irgendwas' value='".$irgendwas."'>\n";
-		$htmlstr .= "<tr></tr>\n";
-		$htmlstr .= "<tr><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibung der Abgabe</td></tr>\n";
-		$htmlstr .= "<tr id='termin'>\n";
-		//$htmlstr .= "<td><input type='checkbox' name='fixtermin'></td>";
-		$htmlstr .= "		<td><input  type='text' name='datum' size='10' maxlegth='10'></td>\n";
-		$htmlstr .= "		<td><select name='paabgabetyp_kurzbz'>\n";
-		$qry_typ = "SELECT * FROM campus.tbl_paabgabetyp";
-		$result_typ=$db->db_query($qry_typ);
-		while ($row_typ=@$db->db_fetch_object($result_typ))
-		{
-			if($row_typ->paabgabetyp_kurzbz!='end' && $row_typ->paabgabetyp_kurzbz!='note' && $row_typ->paabgabetyp_kurzbz!='enda')
-			{
-				$htmlstr .= "			<option value='".$row_typ->paabgabetyp_kurzbz."'>$row_typ->bezeichnung</option>";
-			}
-		}		
-		$htmlstr .= "		</select></td>\n";
-		$htmlstr .= "		<td><input  type='text' name='kurzbz' size='60' maxlegth='256'></td>\n";		
-		$htmlstr .= "		<td>&nbsp;</td>\n";		
-		$htmlstr .= "		<td><input type='submit' name='schick' value='speichern' title='neuen Termin speichern'></td>";
-		
-		$htmlstr .= "</tr>\n";
-		$htmlstr .= "</form>\n";
-		$htmlstr .= "</table>\n";
-		$htmlstr .= "</body></html>\n";
-		
-		echo $htmlstr;
-		echo '</body></html>';
+	</head>
+	<body class="Background_main"  style="background-color:#eeeeee;">
+		<h3>'.$p->t('abgabetool/eingabeTerminPersonen').'</h3>';
+
+//Eingabezeile f&uuml;r neuen Termin
+$htmlstr .= "<br><b>".$p->t('abgabetool/abgabetermine').":</b>\n";
+$htmlstr .= "<table class='detail' style='padding-top:10px;' >\n";
+$htmlstr .= "<form action='".$_SERVER['PHP_SELF']."' method='POST' name='multitermin'>\n";
+$htmlstr .= "<input type='hidden' name='irgendwas' value='".$irgendwas."'>\n";
+$htmlstr .= "<tr></tr>\n";
+$htmlstr .= "<tr>
+				<td>".$p->t('abgabetool/datum')."</td>
+				<td>".$p->t('abgabetool/abgabetyp')."</td>
+				<td>".$p->t('abgabetool/beschreibungAbgabe')."</td></tr>\n";
+$htmlstr .= "<tr id='termin'>\n";
+//$htmlstr .= "<td><input type='checkbox' name='fixtermin'></td>";
+$htmlstr .= "		<td><input  type='text' name='datum' size='10' maxlegth='10'></td>\n";
+$htmlstr .= "		<td><select name='paabgabetyp_kurzbz'>\n";
+$qry_typ = "SELECT * FROM campus.tbl_paabgabetyp";
+$result_typ=$db->db_query($qry_typ);
+while ($row_typ=@$db->db_fetch_object($result_typ))
+{
+	if($row_typ->paabgabetyp_kurzbz!='end' && $row_typ->paabgabetyp_kurzbz!='note' && $row_typ->paabgabetyp_kurzbz!='enda')
+	{
+		$htmlstr .= "			<option value='".$row_typ->paabgabetyp_kurzbz."'>$row_typ->bezeichnung</option>";
+	}
+}		
+$htmlstr .= "		</select></td>\n";
+$htmlstr .= "		<td><input  type='text' name='kurzbz' size='60' maxlegth='256'></td>\n";		
+$htmlstr .= "		<td>&nbsp;</td>\n";		
+$htmlstr .= "		<td><input type='submit' name='schick' value='".$p->t('global/speichern')."'></td>";
+
+$htmlstr .= "</tr>\n";
+$htmlstr .= "</form>\n";
+$htmlstr .= "</table>\n";
+
+echo $htmlstr;
+echo '</body></html>';
 
 ?>

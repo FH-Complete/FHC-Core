@@ -110,18 +110,18 @@ function treeProjektmenueSelect()
                 try
                 {
                     datasourceTreeProjektphase.removeXMLSinkObserver(observerTreeProjektphase);
-                    treePhase.builder.removeListener(TaskTreeListener);
+                    treePhase.builder.removeListener(ProjektphaseTreeListener);
                 }
                 catch(e)
                 {}
                 
                 var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-                datasourceTreeTask = rdfService.GetDataSource(datasources);
-                datasourceTreeTask.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-                datasourceTreeTask.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-                treePhase.database.AddDataSource(datasourceTreeTask);
-                datasourceTreeTask.addXMLSinkObserver(observerTreeProjektphase);
-                treePhase.builder.addListener(TaskTreeListener);
+                datasourceTreeProjektphase = rdfService.GetDataSource(datasources);
+                datasourceTreeProjektphase.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+                datasourceTreeProjektphase.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+                treePhase.database.AddDataSource(datasourceTreeProjektphase);
+                datasourceTreeProjektphase.addXMLSinkObserver(observerTreeProjektphase);
+                treePhase.builder.addListener(ProjektphaseTreeListener);
                 treePhase.ref=ref;
             }
             catch(e)
