@@ -109,6 +109,7 @@ $this->phrasen['global/nichtAngemeldet'] = 'You are not logged in. No UID found'
 $this->phrasen['global/LDAPserverNichtErreichbar']='Error connecting to LDAP-Server'; 
 $this->phrasen['global/unbekannterFehleraufgetreten']='Unknown error occurred'; 
 $this->phrasen['global/fehlerBeiDerParameteruebergabe']='Fehler bei der Uebergabe der Parameter';
+$this->phrasen['global/FuerDieseAktionBenoetigenSieAdministrationsrechte']='You must be Administrator.';
 
 // LV - Plan
 $this->phrasen['global/lehrveranstaltungsplan']='Schedule'; 
@@ -158,6 +159,8 @@ $this->phrasen['global/spezialgruppe']='Special group';
 $this->phrasen['global/datumsbereichZuGross'] = 'Invalid date';
 $this->phrasen['global/springeZuKw']='Jump to KW';
 $this->phrasen['global/home']='HOME';
+$this->phrasen['global/nichtVorhanden']='is not existing.';
+$this->phrasen['global/bitteWendenSieSichAn']='Please contact the';
 
 //infrastruktur
 $this->phrasen['global/MACadresse']='MAC-adress';

@@ -109,6 +109,7 @@ $this->phrasen['global/nichtAngemeldet'] = 'Sie sind nicht angemeldet. Es wurde 
 $this->phrasen['global/LDAPserverNichtErreichbar']='Der LDAP-Server ist nicht erreichbar';
 $this->phrasen['global/unbekannterFehleraufgetreten']='Es ist ein unbekannter Fehler aufgetreten'; 
 $this->phrasen['global/fehlerBeiDerParameteruebergabe']='Fehler bei der Uebergabe der Parameter';
+$this->phrasen['global/FuerDieseAktionBenoetigenSieAdministrationsrechte']='Fuer diese Aktion benoetigen Sie Administratorenrechte';
 
 // LV - Plan
 $this->phrasen['global/lehrveranstaltungsplan']='Lehrveranstaltungsplan'; 
@@ -158,6 +159,8 @@ $this->phrasen['global/spezialgruppe']='Spezialgruppe';
 $this->phrasen['global/datumsbereichZuGross'] = 'Datumsbereich ist zu groß';
 $this->phrasen['global/springeZuKw']='Springe zu KW';
 $this->phrasen['global/home']='HOME';
+$this->phrasen['global/nichtVorhanden']='nicht vorhanden.';
+$this->phrasen['global/bitteWendenSieSichAn']='Bitte wenden Sie sich an den';
 
 //infrastruktur
 $this->phrasen['global/MACadresse']='MAC-Adresse';
