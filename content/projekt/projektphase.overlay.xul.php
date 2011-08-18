@@ -127,11 +127,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			<tabbox id="projektphase-tabbox" flex="3" orient="vertical">
 				<tabs orient="horizontal" id="projektphase-tabs">
 					<tab id="projektphase-tab-detail" label="Details" />
-					<tab id="projektphase-tab-mantis" label="Mantis" />
+					<tab id="projektphase-tab-ressource" label="Ressourcen" />
 				</tabs>
 				<tabpanels id="projektphase-tabpanels-main" flex="1">
 					<vbox id="projektphase-detail" />
-					<vbox id="projektphase-mantis" />
+					<vbox id="projektphase-ressource" />
 				</tabpanels>
 			</tabbox>
 		</vbox>
