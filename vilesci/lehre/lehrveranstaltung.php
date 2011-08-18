@@ -375,10 +375,10 @@ foreach ($studiengang as $stg)
 	{
 		$outp.="<OPTION value='$stg->studiengang_kz' ".($stg->studiengang_kz==$stg_kz?'selected':'').">$stg->kuerzel - $stg->kurzbzlang</OPTION>";
 	}
-	$s[$stg->studiengang_kz]->max_sem=8; // $stg->max_semester;
+	$s[$stg->studiengang_kz]->max_sem=9; // $stg->max_semester;
 	$s[$stg->studiengang_kz]->kurzbz=$stg->kurzbzlang;
 }
-$s['']->max_sem=8;
+$s['']->max_sem=9;
 
 $outp.='</SELECT>';
 
