@@ -97,6 +97,8 @@
 			$maxlength[$i] = 18;
 			$worksheet->write(2,++$i,"EMail", $format_bold);
 			$maxlength[$i] = 5;
+			$worksheet->write(2,++$i,"Einstiegssemester", $format_bold);
+			$maxlength[$i] = 15;
 			$worksheet->write(2,++$i,"STRASSE", $format_bold);
 			$maxlength[$i] = 6;
 			$worksheet->write(2,++$i,"PLZ", $format_bold);
@@ -104,7 +106,7 @@
 			$worksheet->write(2,++$i,"ORT", $format_bold);
 			$maxlength[$i] = 3;
 			
-			$qry = "SELECT *, (SELECT kontakt FROM tbl_kontakt WHERE kontakttyp='email' AND person_id=tbl_prestudent.person_id AND zustellung=true LIMIT 1) as email FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE reihungstest_id='$reihungstest->reihungstest_id' ORDER BY nachname, vorname";
+			$qry = "SELECT *, (SELECT kontakt FROM tbl_kontakt WHERE kontakttyp='email' AND person_id=tbl_prestudent.person_id AND zustellung=true LIMIT 1) as email,(SELECT ausbildungssemester FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND datum=(SELECT MAX(datum) FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND status_kurzbz='Interessent') LIMIT 1) as ausbildungssemester FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE reihungstest_id='$reihungstest->reihungstest_id' ORDER BY nachname, vorname";
 
 			if($result = $db->db_query($qry))
 			{
@@ -153,7 +155,11 @@
 					$worksheet->write($zeile,++$i,$row->email);
 					if(strlen($row->email)>$maxlength[$i])
 						$maxlength[$i] = mb_strlen($row->email);
-					
+						
+					$worksheet->write($zeile,++$i,$row->ausbildungssemester);
+					if(strlen($row->ausbildungssemester)>$maxlength[$i])
+						$maxlength[$i] = mb_strlen($row->ausbildungssemester);
+						
 					$qry = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id' AND zustelladresse=true LIMIT 1";
 					if($result_adresse = $db->db_query($qry))
 					{
