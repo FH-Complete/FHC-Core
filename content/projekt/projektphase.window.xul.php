@@ -49,12 +49,12 @@ else
 
 <window id="window-projektphase-neu" title="Neue Projektphase anlegen"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        onload="initProjektphase(<?php echo ($projekt_kurzbz!=''?$projekt_kurzbz:"''"); ?>)"
         >
 	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jquery.js"></script>
 	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jqSOAPClient.js"></script>
 	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jqXMLUtils.js"></script>
 	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>content/projekt/projektphase.window.js.php" />
+	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>content/functions.js.php" />
 <vbox>
 
 <checkbox id="checkbox-projektphase-neu" hidden="true"/>
@@ -73,7 +73,7 @@ else
 				</row>
 				<row>
 					<label value="Projekt (Kurzbz)" control="textbox-projektphase-projekt_kurzbz"/>
-					<textbox id="textbox-projektphase-projekt_kurzbz" value="<?php echo $projekt_kurzbz; ?>" maxlength="128"/>
+					<textbox id="textbox-projektphase-projekt_kurzbz" value="<?php echo $projekt_kurzbz; ?>" maxlength="16"/>
 				</row>
 				<row>
 					<label value="Projektphase (FK)" control="textbox-projektphase-projektphase_fk"/>
@@ -81,24 +81,29 @@ else
 				</row>				
 				<row>
 					<label value="Bezeichnung" control="textbox-projektphase-bezeichnung"/>
-   					<textbox id="textbox-projektphase-bezeichnung" checked="true"/>
+   					<textbox id="textbox-projektphase-bezeichnung" maxlength="32" />
 				</row>
 				<row>
 					<label value="Beschreibung" control="textbox-projektphase-beschreibung"/>
-   					<textbox id="textbox-projektphase-beschreibung" checked="true"/>
+   					<textbox id="textbox-projektphase-beschreibung"/>
 				</row>
 				<row>
 					<label value="Start" control="textbox-projektphase-start"/>
-   					<textbox id="textbox-projektphase-start" checked="true"/>
+   					<textbox id="textbox-projektphase-start"/>
 				</row>
 				<row>
 					<label value="Ende" control="textbox-projektphase-ende"/>
-   					<textbox id="textbox-projektphase-ende" checked="true"/>
+   					<textbox id="textbox-projektphase-ende"/>
 				</row>
 				<row>
 					<label value="Budget" control="textbox-projektphase-budget"/>
-   					<textbox id="textbox-projektphase-budget" checked="true"/>
+   					<textbox id="textbox-projektphase-budget"/>
 				</row>
+				<row>
+					<label value="Personentage" control="textbox-projektphase-personentage"/>
+   					<textbox id="textbox-projektphase-personentage"/>
+				</row>
+				<!--
 				<row>
 					<label value="Test" control="textbox-projektphase-test"/>
    					<menulist id="menulist-projektphase-test" flex="1">
@@ -112,6 +117,7 @@ else
 					<label value="Verrechnungskonto" control="bankverbindung-textbox-verrechnung"/>
    					<checkbox id="bankverbindung-checkbox-verrechnung" checked="true"/>
       			</row>
+      			-->
 			</rows>
 	</grid>
 	<hbox>

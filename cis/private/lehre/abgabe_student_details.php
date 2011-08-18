@@ -32,9 +32,13 @@ require_once('../../../include/student.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/mail.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/phrasen.class.php');
+
+$anzeigesprache = getSprache();
+$p = new phrasen($anzeigesprache);
 
 if (!$db = new basis_db())
-	die('Fehler beim Herstellen der Datenbankverbindung');
+	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
 
 if(!isset($_POST['uid']))
 {
@@ -92,7 +96,7 @@ if($uid=='-1')
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 	<html>
 	<head>
-		<title>PA-Abgabe</title>
+		<title>'.$p->t('abgabetool/ueberschrift').'</title>
 		<link rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
 		<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -103,11 +107,11 @@ if($uid!=$user)
 {
 	$student = new student();
 	if(!$student->load($uid))
-		die('Student ist ungueltig');
+		die($p->t('global/userNichtGefunden'));
 	
 	$stg_obj = new studiengang();
 	if(!$stg_obj->load($student->studiengang_kz))
-		die('Studiengang des Studenten ist ungueltig');
+		die($p->t('global/fehlerBeimLesenAusDatenbank'));
 	
 	//Studentenansicht
 	//Rechte Pruefen
@@ -140,7 +144,7 @@ if($uid!=$user)
 	
 	if(!$allowed)
 	{
-		die('Sie haben keine Berechtigung zum Anzeigen der Studentenansicht');
+		die($p->t('abgabetool/keineBerechtigungStudentenansicht'));
 	}
 }	
 $datum_obj = new datum();
@@ -201,13 +205,13 @@ if($command=='add')
 		}
 		else 
 		{
-			echo "<font color=\"#FF0000\">DB: Update fehlgeschlagen!</font><br>&nbsp;";
+			echo "<font color=\"#FF0000\">".$p->t('global/fehleraufgetreten')."</font><br>&nbsp;";
 			$command='';
 		}
 	}
 	else 
 	{
-		echo "<font color=\"#FF0000\">Dateneingabe unvollst&auml;ndig!</font><br>&nbsp;";
+		echo "<font color=\"#FF0000\">".$p->t('abgabetool/dateneingabeUnvollstaendig')."</font><br>&nbsp;";
 		$command='';
 	}
 }
@@ -232,11 +236,11 @@ if($command=="update" && $error!=true)
 						updateamum = now() 
 						WHERE paabgabe_id='".addslashes($paabgabe_id)."'";
 					$result=$db->db_query($qry);
-					echo 'Die Datei wurde erfolgreich hochgeladen';
+					echo $p->t('global/dateiErfolgreichHochgeladen');
 				} 
 				else 
 				{
-					echo "Upload nicht gefunden! Bitte wiederholen Sie den Fileupload.";
+					echo $p->t('global/dateiNichtErfolgreichHochgeladen');
 				}
 			}
 			else 
@@ -256,11 +260,11 @@ if($command=="update" && $error!=true)
 						WHERE paabgabe_id='".$paabgabe_id."'";
 					$result=$db->db_query($qry);*/
 
-					echo '<h3>Abgabe Studentenbereich - Zus&auml;tzliche Daten f&uuml;r die Abgabe</h3>';
-					$qry_zd="SELECT * FROM lehre.tbl_projektarbeit WHERE projektarbeit_id='".$projektarbeit_id."'";
+					echo '<h3>'.$p->t('abgabetool/abgabeStudentenbereich').' - '.$p->t('abgabetool/abgabeZusatzdaten').'</h3>';
+					$qry_zd="SELECT * FROM lehre.tbl_projektarbeit WHERE projektarbeit_id='".addslashes($projektarbeit_id)."'";
 					$result_zd=@$db->db_query($qry_zd);
 					$row_zd=@$db->db_fetch_object($result_zd);
-					$htmlstr = "<div>Betreuer: <b>".$betreuer."</b><br>Titel: <b>".$titel."<b><br><br></div>\n";
+					$htmlstr = "<div>".$p->t('abgabetool/betreuer').": <b>".$betreuer."</b><br>".$p->t('abgabetool/titel').": <b>".$titel."<b><br><br></div>\n";
 					$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
 					$htmlstr .= "<tr></tr>\n";
 					$htmlstr .= "<form accept-charset='UTF-8' action='".$_SERVER['PHP_SELF']."' method='POST' name='".$projektarbeit_id."'>\n";
@@ -273,8 +277,8 @@ if($command=="update" && $error!=true)
 					$htmlstr .= "<input type='hidden' name='betreuer' value='".$betreuer."'>\n";
 					$htmlstr .= "<input type='hidden' name='command' value='add'>\n";
 					$htmlstr .= "<tr>\n";
-					$htmlstr .= "<td><b>Sprache der Arbeit:</b></td><td>";
-					$sprache = @$db->db_query("SELECT sprache FROM tbl_sprache");
+					$htmlstr .= "<td><b>".$p->t('abgabetool/spracheDerArbeit').":</b></td><td>";
+					$sprache = @$db->db_query("SELECT sprache FROM public.tbl_sprache");
 				    $num = $db->db_num_rows($sprache);
 				    if ($num > 0) 
 				    {
@@ -291,22 +295,22 @@ if($command=="update" && $error!=true)
 				        $htmlstr .= "</SELECT> \n";
 				    }
 				    $htmlstr .= "</td></tr>\n";
-					$htmlstr .= "<tr><td width='30%'><b>Kontrollierte Schlagw&ouml;rter:*</b></td>
+					$htmlstr .= "<tr><td width='30%'><b>".$p->t('abgabetool/kontrollierteSchlagwoerter').":*</b></td>
 								<td width='40%'><input  type='text' name='kontrollschlagwoerter'  id='kontrollschlagwoerter' value='".$kontrollschlagwoerter."' size='60' maxlength='150'></td>
 								<td  width='30%' align='left'><input type='button' name='SWD' value='    SWD    ' onclick='window.open(\"abgabe_student_swd.php\")'></td></tr>\n";
-					$htmlstr .= "<tr><td><b>Dt. Schlagw&ouml;rter:</b></td>
+					$htmlstr .= "<tr><td><b>".$p->t('abgabetool/deutscheSchlagwoerter').":</b></td>
 								<td><input  type='text' name='schlagwoerter' value='".$schlagwoerter."' size='60' maxlength='150'></td></tr>\n";
-					$htmlstr .= "<tr><td><b>Engl. Schlagw&ouml;rter:</b></td>
+					$htmlstr .= "<tr><td><b>".$p->t('abgabetool/englischeSchlagwoerter').":</b></td>
 								<td><input  type='text' name='schlagwoerter_en' value='".$schlagwoerter_en."' size='60' maxlength='150'></td></tr>\n";
-					$htmlstr .= "<tr><td valign='top'><b>Abstract </b>(max. 5000 Zeichen):*</td>
+					$htmlstr .= "<tr><td valign='top'><b>".$p->t('abgabetool/abstract')." </b>".$p->t('abgabetool/maxZeichen').":*</td>
 								<td><textarea name='abstract' cols='46'  rows='7'>$abstract</textarea></td></tr>\n";
-					$htmlstr .= "<tr><td valign='top'><b>Abstract engl.</b>(max. 5000 Zeichen):*</td>
+					$htmlstr .= "<tr><td valign='top'><b>".$p->T('abgabetool/abstractEng')."</b>".$p->t('abgabetool/maxZeichen').":*</td>
 								<td><textarea name='abstract_en' cols='46'  rows='7'>$abstract_en</textarea></td></tr>\n";
-					$htmlstr .= "<tr><td><b>Seitenanzahl:*</b></td>
+					$htmlstr .= "<tr><td><b>".$p->t('abgabetool/seitenanzahl').":*</b></td>
 								<td><input  type='text' name='seitenanzahl' value='".$seitenanzahl."' size='5' maxlength='4'></td></tr>\n";
-					$htmlstr .= "<tr></tr><td>&nbsp;</td><tr><td style='font-size:70%'>* Pflichtfeld - bitte immer bef&uuml;llen</td></tr>
+					$htmlstr .= "<tr></tr><td>&nbsp;</td><tr><td style='font-size:70%'>* ".$p->t('abgabetool/pflichtfeld')."</td></tr>
 								<tr><td>&nbsp;</td></tr>\n";
-					$htmlstr .= "<tr><td><input type='submit' name='schick' value='abschicken'></td>";
+					$htmlstr .= "<tr><td><input type='submit' name='schick' value='".$p->t('global/abschicken')."'></td>";
 					$htmlstr .= "</tr>\n";
 					$htmlstr .= "</form>\n";
 					$htmlstr .= "</table>\n";	
@@ -315,7 +319,7 @@ if($command=="update" && $error!=true)
 				} 
 				else 
 				{
-					echo "Upload nicht gefunden! Bitte wiederholen Sie den Fileupload.";
+					echo $p->t('global/dateiNichtErfolgreichHochgeladen');
 				}
 			}
 			//E-Mail an 1.Begutachter
@@ -326,19 +330,19 @@ if($command=="update" && $error!=true)
 					FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
 					LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
 					LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid) 
-					WHERE public.tbl_person.person_id='$bid'";
+					WHERE public.tbl_person.person_id='".addslashes($bid)."'";
 				if(!$betr=$db->db_query($qry_betr))
 				{
-					echo "<font color=\"#FF0000\">Fehler beim Laden der Betreuer!</font><br>&nbsp;";
+					echo "<font color=\"#FF0000\">".$p->t('global/fehlerBeimLesenAusDatenbank')."</font><br>&nbsp;";
 				}
 				else
 				{
 					if($row_betr=$db->db_fetch_object($betr))
 					{
-						$qry_std="SELECT * FROM campus.vw_benutzer where uid='$uid'";
+						$qry_std="SELECT * FROM campus.vw_benutzer where uid='".addslashes($uid)."'";
 						if(!$result_std=$db->db_query($qry_std))
 						{
-							echo "<font color=\"#FF0000\">Datensatz konnte nicht gefunden werden!</font><br>&nbsp;";
+							echo "<font color=\"#FF0000\">".$p->t('global/fehlerBeimLesenAusDatenbank')."</font><br>&nbsp;";
 						}
 						else
 						{
@@ -349,22 +353,23 @@ if($command=="update" && $error!=true)
 							$mail->setReplyTo($user."@".DOMAIN);
 							if(!$mail->send())
 							{
-								echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den (Erst-)Begutachter!</font><br>&nbsp;";	
+								echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerMailBegutachter')."</font><br>&nbsp;";	
 							}
 						}
 					}
 					else 
 					{
-						echo "<font color=\"#FF0000\">Betreuer nicht gefunden. Kein Mail verschickt!</font><br>&nbsp;";
+						echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerBetreuerNichtGefundenKeinMail')."</font><br>&nbsp;";
 					}
 				}
 			}
 		}
 		else 
 		{
-			echo "Upload ist keine pdf-Datei! Bitte wiederholen Sie den Fileupload.";
+			echo $p->t('abgabetool/keinPDF');
 		}
 	}
+	
 	$error=false;		
 }
 if($command!="add" && $command!="update") 
@@ -380,15 +385,15 @@ if($uid==-1||$projektarbeit_id==-1||$titel==-1)
 
 if($command!="add")
 {
-	echo '<h3>Abgabe Studentenbereich</h3>';
+	echo '<h3>'.$p->t('abgabetool/abgabeStudentenbereich').'</h3>';
 
 	//Einlesen der Termine
 	$qry="";	
-	$htmlstr = "<div>Betreuer: <b>".$betreuer."</b><br>Titel: <b>".$titel."<b><br><br><b>Abgabetermine:</b></div>\n";
+	$htmlstr = "<div>".$p->t('abgabetool/betreuer').": <b>".$betreuer."</b><br>".$p->t('abgabetool/titel').": <b>".$titel."<b><br><br><b>".$p->t('abgabetool/abgabetermine').":</b></div>\n";
 	$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
 	$htmlstr .= "<tr></tr>\n";
-	$qry="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$projektarbeit_id."' AND paabgabetyp_kurzbz!='note' ORDER BY datum;";
-	$htmlstr .= "<tr><td>fix</td><td>Datum </td><td>Abgabetyp</td><td>Kurzbeschreibung der Abgabe</td><td>abgegeben am</td><td colspan='2'>Dateiupload (<b>nur pdf</b>)</td><td></td></tr>\n";
+	$qry="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".addslashes($projektarbeit_id)."' AND paabgabetyp_kurzbz!='note' ORDER BY datum;";
+	$htmlstr .= "<tr><td>".$p->t('abgabetool/fix')."</td><td>".$p->t('abgabetool/datum')." </td><td>".$p->t('abgabetool/abgabetyp')."</td><td>".$p->t('abgabetool/beschreibungAbgabe')."</td><td>".$p->t('abgabetool/abgegebenAm')."</td><td colspan='2'>".$p->t('abgabetool/dateiupload')."(<b>".$p->t('abgabetool/nurPDF')."</b>)</td><td></td></tr>\n";
 	$result=@$db->db_query($qry);
 		while ($row=@$db->db_fetch_object($result))
 		{
@@ -448,15 +453,15 @@ if($command!="add")
 			//$htmlstr .= "<td><input type='checkbox' name='fixtermin' ".($row->fixtermin=='t'?'checked=\"checked\"':'')." disabled>";
 			if($row->fixtermin=='t')
 			{
-				$htmlstr .= "<td><img src='../../../skin/images/bullet_red.png' alt='J' title='Fixer Abgabetermin' border=0></td>";
+				$htmlstr .= "<td><img src='../../../skin/images/bullet_red.png' alt='J' title='".$p->t('abgabetool/fixerAbgabetermin')."' border=0></td>";
 			}
 			else 
 			{
-				$htmlstr .= "<td><img src='../../../skin/images/bullet_green.png' alt='N' title='Variabler Abgabetermin' border=0></td>";
+				$htmlstr .= "<td><img src='../../../skin/images/bullet_green.png' alt='N' title='".$p->t('abgabetool/variablerAbgabetermin')."' border=0></td>";
 			}
 			$htmlstr .= "		</td>\n";
 			$htmlstr .= "		<td align='center' style='background-color:".$bgcol.";font-weight:bold; color:".$fcol."'>".$datum_obj->formatDatum($row->datum,'d.m.Y')."</td>\n";
-			$qry_typ="SELECT * FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$row->paabgabetyp_kurzbz."'";
+			$qry_typ="SELECT * FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".addslashes($row->paabgabetyp_kurzbz)."'";
 			$result_typ=$db->db_query($qry_typ);
 			$row_typ=$db->db_fetch_object($result_typ);
 			$htmlstr .= "              <td>$row_typ->bezeichnung</td>\n";
@@ -474,13 +479,13 @@ if($command!="add")
 				if($row->fixtermin=='t' && $row->datum<date('Y-m-d'))
 				{
 					//Termin ist überschritten - es wird kein Upload für diesen Termin mehr angeboten
-					$htmlstr .= "		<td>&nbsp;&nbsp;</td><td> Termin vorbei</td>";
+					$htmlstr .= "		<td>&nbsp;&nbsp;</td><td> ".$p->t('abgabetool/terminVorbei')."</td>";
 				}
 				else 
 				{
 					//Datei kann hochgeladen werden
 					$htmlstr .= "		<td><input  type='file' name='datei' size='60' accept='application/pdf'></td>\n";
-					$htmlstr .= "		<td><input type='submit' name='schick' value=' abgeben ' title='ausgew&auml;hlte Datei hochladen'></td>";
+					$htmlstr .= "		<td><input type='submit' name='schick' value='".$p->t('global/abschicken')."'></td>";
 				}
 			}
 			$htmlstr .= "	</tr>\n";

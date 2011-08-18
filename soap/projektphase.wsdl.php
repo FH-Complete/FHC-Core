@@ -14,13 +14,16 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
 
 	<wsdl:message name="SaveProjektphaseRequest">
 		<wsdl:part name="projektphase_id" type="xsd:string"></wsdl:part>
-		<wsdl:part name="oe_kurzbz" type="xsd:string"></wsdl:part>
+		<wsdl:part name="projekt_kurzbz" type="xsd:string"></wsdl:part>
 		<wsdl:part name="projektphase_fk" type="xsd:string"></wsdl:part>
 		<wsdl:part name="bezeichnung" type="xsd:string"></wsdl:part>
 		<wsdl:part name="beschreibung" type="xsd:string"></wsdl:part>
 		<wsdl:part name="start" type="xsd:string"></wsdl:part>
 		<wsdl:part name="ende" type="xsd:string"></wsdl:part>
 		<wsdl:part name="budget" type="xsd:string"></wsdl:part>
+		<wsdl:part name="personentage" type="xsd:string"></wsdl:part>
+		<wsdl:part name="user" type="xsd:string"></wsdl:part>
+		<wsdl:part name="neu" type="xsd:boolean"></wsdl:part>
        </wsdl:message>
 
  	<wsdl:message name="SaveProjektphaseResponse">

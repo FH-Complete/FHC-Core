@@ -104,7 +104,8 @@ function saveProjektphase()
     var start=document.getElementById('textbox-projektphase-start').value;
     var ende=document.getElementById('textbox-projektphase-ende').value;
     var budget=document.getElementById('textbox-projektphase-budget').value;
-    alert (projekt_kurzbz);
+    var personentage=document.getElementById('textbox-projektphase-personentage').value;
+    
    // Variablen checken
     
     // SOAP-Action
@@ -117,19 +118,19 @@ function saveProjektphase()
     soapBody.appendChild(new SOAPObject("start")).val(start);
     soapBody.appendChild(new SOAPObject("ende")).val(ende);
     soapBody.appendChild(new SOAPObject("budget")).val(budget);
+    soapBody.appendChild(new SOAPObject("personentage")).val(personentage);
+    soapBody.appendChild(new SOAPObject("user")).val(getUsername());
+    soapBody.appendChild(new SOAPObject("neu")).val("true");
     var sr = new SOAPRequest("saveProjektDaten",soapBody);
-    SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projektphase.soap.php";
-    SOAPClient.SendRequest(sr, clb_saveProjekt);
-		
-    // if(window.opener.KontaktBankverbindungSpeichern(document))
-    //  window.close();
+    SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projektphase.soap.php?"+gettimestamp();
+    SOAPClient.SendRequest(sr, clb_saveProjektphase);
 }
 
-function clb_saveProjekt(respObj)
+function clb_saveProjektphase(respObj)
 {
     try
     {
-        var msg = respObj.Body[0].saveProjektDatenResponse[0].message[0].Text;
+        var msg = respObj.Body[0].SaveProjektphaseResponse[0].message[0].Text;
 	alert('Antwort: '+msg);
     }
     catch(e)

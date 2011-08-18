@@ -28,7 +28,7 @@ require_once('../../config/vilesci.config.inc.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
-/*echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektphasedetail.overlay.xul.php"?>';*/
+echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektphasedetail.overlay.xul.php"?>';
 ?>
 <overlay id="ProjektphaseOverlay"
 	xmlns:html="http://www.w3.org/1999/xhtml"
@@ -69,33 +69,37 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
  				context="projektphase-tree-popup"
 		>
 			<treecols>
-				<treecol id="treecol-projektphase-projekt_phase" label="Phase" flex="5" hidden="false" primary="true" persist="hidden, width, ordinal"
+				<treecol id="treecol-projektphase-projekt_phase" label="Phase" flex="5" hidden="false" primary="true" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#bezeichnung"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="treecol-projektphase-projekt_phase_id" label="PhaseID" flex="2" hidden="true"  persist="hidden, width, ordinal"
+				<treecol id="treecol-projektphase-projekt_phase_id" label="PhaseID" flex="2" hidden="true"  persist="hidden width ordinal"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#projektphase_id"/>
+					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#projekt_phase_id"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="treecol-projektphase-projekt_kurzbz" label="Projekt" flex="2" hidden="true" persist="hidden, width, ordinal"
-					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#projektphase_id"/>
-				<splitter class="tree-splitter"/>
-				<treecol id="treecol-projektphase-beschreibung" label="Beschreibung" flex="5" hidden="true" persist="hidden, width, ordinal"
+				<treecol id="treecol-projektphase-beschreibung" label="Beschreibung" flex="5" hidden="true" persist="hidden width ordinal"
 				   class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#beschreibung"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="treecol-projektphase-start" label="Start" flex="2" hidden="false" persist="hidden, width, ordinal"
+				<treecol id="treecol-projektphase-beginn" label="Beginn" flex="2" hidden="false" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#start" />
+					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#beginn" />
 				<splitter class="tree-splitter"/>
-				<treecol id="treecol-projektphase-ende" label="Ende" flex="2" hidden="false" persist="hidden, width, ordinal"
+				<treecol id="treecol-projektphase-ende" label="Ende" flex="2" hidden="false" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#ende" />
 				<splitter class="tree-splitter"/>
-				<treecol id="treecol-projektphase-budget" label="Budger" flex="2" hidden="false" persist="hidden, width, ordinal"
+				<treecol id="treecol-projektphase-budget" label="Budget" flex="2" hidden="false" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#budget" />
+				<treecol id="treecol-projektphase-oe_kurzbz" label="Organisationseinheit" flex="2" hidden="false" persist="hidden width ordinal"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#oe_kurzbz" />
+				<treecol id="treecol-projektphase-projekt_kurzbz" label="Projekt" flex="2" hidden="true" persist="hidden width ordinal"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#projekt_kurzbz"/>
+				<splitter class="tree-splitter"/>
+				
 			</treecols>
 
 			<template>
@@ -104,11 +108,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<treeitem uri="rdf:*">
 							<treerow dbID="rdf:http://www.technikum-wien.at/projektphase/rdf#projektphase_id" >
 								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#bezeichnung"/>
-								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#projektphase_id"/>
+								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#projekt_phase_id"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#beschreibung"/>
-								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#start"/>
+								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#beginn"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#ende"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#budget"/>
+								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#oe_kurzbz"/>
+								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#projekt_kurzbz"/>
 							</treerow>
 						</treeitem>
 					</treechildren>
