@@ -33,9 +33,13 @@ require_once('../../../include/benutzer.class.php');
 require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/mail.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/phrasen.class.php');
+
+$sprache = getSprache(); 
+$p = new phrasen($sprache); 
 
 if (!$db = new basis_db())
-	die('Fehler beim Oeffnen der Datenbankverbindung');
+	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
   
 $uid = get_uid();
 
@@ -56,7 +60,7 @@ if(isset($_GET['uid']))
 	}
 	else 
 	{
-		die('Fuer diese Aktion benoetigen Sie Administratorenrechte');
+		die($p->t('global/FuerDieseAktionBenoetigenSieAdministrationsrechte'));
 	}
 }
 $datum_obj = new datum();
@@ -168,7 +172,7 @@ function checkdatum()
     <td>
     <table class="tabcontent">
       <tr>
-		<td class="ContentHeader"><font class="ContentHeader">&nbsp;Zeitsperren</font></td>
+		<td class="ContentHeader"><font class="ContentHeader">&nbsp;<?php echo $p->t('zeitsperre/zeitsperren');?></font></td>
 	  </tr>
 	</table>
 	<br>
@@ -187,13 +191,13 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 	if(isset($_POST['vondatum']) && !$datum_obj->checkDatum($_POST['vondatum']))
 	{
 		$error=true;
-		$error_msg .= 'Von-Datum ist ung&uuml;ltig ';
+		$error_msg .= $p->t('zeitsperre/vonDatumUngueltig').' ';
 	}
 	//bis-datum pruefen $datum_obj->formatDatum($_POST['bisdatum']
 	if(isset($_POST['bisdatum']) && !$datum_obj->checkDatum($_POST['bisdatum']))
 	{
 		$error=true;
-		$error_msg .= 'Bis-Datum ist ung&uuml;ltig ';
+		$error_msg .= $p->t('zeitsperre/bisDatumUngueltig').' ';
 	}
 
 	//von - bis-datum pruefen von darf nicht groesser als bis sein
@@ -209,7 +213,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		else
 		{
 			$error=true;
-			$error_msg .= 'kein g&uuml;ltiges VON-Datum ';
+			$error_msg .= $p->t('zeitsperre/vonDatumUngueltig').' ';
 		}			 	
 	}
 	else
@@ -228,7 +232,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		else
 		{
 			$error=true;
-			$error_msg .= 'kein g&uuml;ltiges BIS-Datum ';
+			$error_msg .= $p->t('zeitsperre/bisDatumUngueltig').' ';
 		}
 	}
 	else
@@ -239,7 +243,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 	if($vondatum > $bisdatum)
 	{
 		$error=true;
-		$error_msg .= 'VON-Datum gr&ouml;&szlig;er als Bis-Datum! ';
+		$error_msg .= $p->t('zeitsperre/vonDatumGroesserAlsBisDatum').'! ';
 	}
 	
 	
@@ -251,7 +255,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		if(!is_numeric($_GET['id']))
 		{
 			$error=true;
-			$error_msg.='Invalid id ';
+			$error_msg.=$p->t('zeitsperre/ungueltigeId').' ';
 		}
 		else
 		{
@@ -262,7 +266,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 
 			//pruefen ob die geladene id auch von der person ist die angemeldet ist
 			if($zeitsperre->mitarbeiter_uid!=$uid)
-				die('Sie haben keine Berechtigung fuer diese Zeitsperre');
+				die($p->t('zeitsperre/sieHabenKeineBerechtigung'));
 		}
 	}
 	else
@@ -275,7 +279,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 	if(!$error && $zeitsperre->freigabeamum!='')
 	{
 		$error = true;
-		$error_msg.='Dieser Urlaub kann nicht mehr editiert werden, da er schon freigegeben wurde';
+		$error_msg.=$p->t('zeitsperre/urlaubKannNichtMehrEditiertWerden');
 	}
 	if(!$error)
 	{
@@ -293,7 +297,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 
 		if($zeitsperre->save())
 		{
-			echo "<h3>Daten wurden erfolgreich gespeichert</h3>";
+			echo "<h3>".$p->t('global/erfolgreichgespeichert')."</h3>";
 			if(URLAUB_TOOLS)
 			{
 				if($zeitsperre->new && $zeitsperre->zeitsperretyp_kurzbz=='Urlaub')
@@ -328,22 +332,22 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 						$mail = new mail($to, $from, 'Freigabeansuchen', $message);
 						if($mail->send())
 						{
-							echo "<br><b>Freigabemail wurde an $to versandt</b>";
+							echo "<br><b>".$p->t('urlaubstool/freigabemailWurdeVersandt',array($to))."</b>";
 						}
 						else
 						{
-							echo "<br><span class='error'>Fehler beim Senden des Freigabemails an $to</span>";
+							echo "<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten',array($to))."</span>";
 						}
 					}
 					else
 					{
-						echo "<br><span class='error'>Es konnte keine Freigabemail versendet werden da kein Vorgesetzter eingetragen ist</span>";
+						echo "<br><span class='error'>".$p->t('urlaubstool/konnteKeinFreigabemailVersendetWerden')."</span>";
 					}
 				}
 			}
 		}
 		else
-			echo "<span class='error'>Fehler beim Speichern der Daten</span>";
+			echo "<span class='error'>".$p->t('global/fehleraufgetreten')."</span>";
 	}
 	else
 		echo "<span class='error'>$error_msg</span>";
@@ -360,13 +364,13 @@ if(isset($_GET['type']) && $_GET['type']=='delete_sperre')
 	{
 		if($zeit->delete($_GET['id']))
 		{
-			echo "Eintrag wurde geloescht";
+			echo $p->t('global/erfolgreichgelöscht');
 		}
 		else
-			echo "<span class='error'>Fehler beim loeschen des Eintrages</span>";
+			echo "<span class='error'>".$p->t('global/fehleraufgetreten')."</span>";
 	}
 	else
-		echo "<span class='error'>Sie haben keine Berechtigung diesen Datensatz zu loeschen</span>";
+		echo "<span class='error'>".$p->t('zeitsperre/keineBerechtigungDatensatzLoeschen')."</span>";
 }
 
 //zeitsperren des users laden
@@ -386,7 +390,7 @@ if($result = $db->db_query($qry))
 //liste aller zeitsperren ausgeben
 if(count($zeit->result)>0)
 {
-	$content_table.= '<table><tr class="liste"><th>Bezeichnung</th><th>Grund</th><th>Von</th><th>Bis</th><th>Vertretung</th><th>Erreichbarkeit</th><th>Freigegeben</th></tr>';
+	$content_table.= '<table><tr class="liste"><th>'.$p->t('global/bezeichnung').'</th><th>'.$p->t('zeitsperre/grund').'</th><th>Von</th><th>Bis</th><th>Vertretung</th><th>Erreichbarkeit</th><th>Freigegeben</th></tr>';
 	$i=0;
 	foreach ($zeit->result as $row)
 	{
