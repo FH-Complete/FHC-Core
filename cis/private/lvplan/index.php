@@ -26,14 +26,16 @@ require_once('../../../include/basis_db.class.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/phrasen.class.php'); 
   	  	
+$sprache = getSprache(); 
+$p=new phrasen($sprache); 
+
 if (!$db = new basis_db())
-	die('Fehler beim Oeffnen der Datenbankverbindung');
+	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
   
 if (!$uid=get_uid())
 	die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden ! <a href="javascript:history.back()">Zur&uuml;ck</a>');
 	
-$sprache = getSprache(); 
-$p=new phrasen($sprache); 
+
 	
 $sql_query="SET search_path TO campus; SELECT titelpre, titelpost, uid, nachname, vorname FROM vw_benutzer WHERE uid LIKE '$uid'";
 	//echo $sql_query;
@@ -106,7 +108,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 		if (isset($uid))
 			echo $uid;
 		else
-			echo 'nicht vorhanden! Bitte wenden Sie sich an den <A href="mailto:'.MAIL_ADMIN.'">Admin</A>!';
+			echo $p->t('global/nichtVorhanden').' '.$p->t('global/bitteWendenSieSichAn').'<A href="mailto:'.MAIL_ADMIN.'">Admin</A>!';
 	?><BR>
   	<DIV align="left">
   		<a class="Item" href="stpl_week.php?pers_uid=<?php echo $uid; ?>"><?php echo $titelpre.' '.$vornamen." ".$nachname.' '.$titelpost;?></a>

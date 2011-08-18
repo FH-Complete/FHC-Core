@@ -29,11 +29,13 @@ require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/ort.class.php');
 require_once('../../../include/phrasen.class.php');
 
-if (!$db = new basis_db())
-	die('Fehler beim Oeffnen der Datenbankverbindung');
-	
 $sprache = getSprache(); 
 $p=new phrasen($sprache); 
+
+if (!$db = new basis_db())
+	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
+	
+
 
 $uid=get_uid();
 ?>
@@ -42,7 +44,7 @@ $uid=get_uid();
 <HTML>
 <HEAD>
 	<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<TITLE>Lehrveranstaltungsplan Technikum-Wien</TITLE>
+	<TITLE><?php echo $p->t('global/lehrveranstaltungsplan');?> Technikum-Wien</TITLE>
 	<script type="text/javascript">
 		<!--
 		function MM_jumpMenu(targ,selObj,restore)
