@@ -55,6 +55,9 @@ else
 	$berechtigt_studiengang=$berechtigung->getStgKz('admin');
 	if($berechtigung->isBerechtigt('inout/uebersicht'))
 		$show_inout_block=true;
+
+	if(isset($_GET['studiengang_kz']))
+		$berechtigt_studiengang=array_merge($berechtigt_studiengang,array($_GET['studiengang_kz']));
 }
 $orgform_sequence=array();
 
