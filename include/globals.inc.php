@@ -16,7 +16,7 @@
 	$cfgStdBgcolor[5]="#48FA66";
 	$cfgStdBgcolor[6]="#CCFFCC";
 
-	// Wochentage auf Deutsch (Zeitwunsch)
+	// Mehrsprachige Wochentage
 	global $tagbez;
 	$tagbez=array();
 	$tagbez[1][1]="Montag";
@@ -33,6 +33,35 @@
 	$tagbez[2][5]="Friday";
 	$tagbez[2][6]="Saturday";
 	$tagbez[2][7]="Sunday";
+	
+	// Mehrsprache Monatstage 
+	global $monatsname;
+	$monatsname = array();
+	$monatsname[1][0]="Januar";
+	$monatsname[1][1]="Februar";
+	$monatsname[1][2]="März";
+	$monatsname[1][3]="April";
+	$monatsname[1][4]="Mai";
+	$monatsname[1][5]="Juni";
+	$monatsname[1][6]="Juli";
+	$monatsname[1][7]="August";
+	$monatsname[1][8]="September";
+	$monatsname[1][9]="Oktober";
+	$monatsname[1][10]="November";
+	$monatsname[1][11]="Dezember";
+	$monatsname[2][0]="January";
+	$monatsname[2][1]="February";
+	$monatsname[2][2]="March";
+	$monatsname[2][3]="April";
+	$monatsname[2][4]="May";
+	$monatsname[2][5]="June";
+	$monatsname[2][6]="July";
+	$monatsname[2][7]="August";
+	$monatsname[2][8]="September";
+	$monatsname[2][9]="October";
+	$monatsname[2][10]="November";
+	$monatsname[2][11]="December";
+	//$monatsname = array("Januar", "Februar", "M&auml;rz", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember");
 
 	// Studiengaenge die keine Alias Email Adressen erhalten
 	$noalias=array();
