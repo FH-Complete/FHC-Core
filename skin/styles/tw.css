@@ -7,9 +7,9 @@ body
 	font-size: x-small;
 	/*overflow:visible;*/
 	/*IE hack*/
-	voice-family: "\"}\"";
+	/*voice-family: "\"}\"";
 	voice-family: inherit;
-	font-size: small;
+	font-size: small;*/
 	/*IE hack end*/
 }
 iframe
@@ -453,7 +453,7 @@ TABLE.stdplan TD
 /* Fonts */
 h1 
 { 
-	font-size: small;
+	font-size: x-small;
 	color: #ffffff; 
 	background-color: #008381; /*gruen*/
 	font-weight: bold;
