@@ -16,9 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
- *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> 
  *
  */
 
@@ -74,6 +72,34 @@ class basis
 			$string.="'".addslashes($row)."'";
 		}
 		return $string;
+	}
+	
+	/**
+	 * Berechnet die Kalenderwoche eines gegebenen Datums
+	 * Datum muss timestamp uebergeben werden
+	 * @param $datum
+	 */
+	function kw($datum)
+	{
+		//$woche=date("W",mktime($date[hours],$date[minutes],$date[seconds],$date[mon],$date[mday],$date[year]));
+		if (!date("w",$datum))
+			$datum+=86400;
+		//echo date("l j.m.Y - W",$datum);
+		$woche=date("W",$datum);
+		//if ($woche==53)
+		//	$woche=1;
+		return $woche;
+	}
+	
+	function jump_week($datum, $wochen)
+	{
+		$stunde_vor=date("G",$datum);
+		// Eine Woche sind 604800 Sekunden
+		$datum+=604800*$wochen;
+		$stunde_nach=date("G",$datum);
+		if ($stunde_nach!=$stunde_vor)
+			$datum+=3600;
+		return $datum;
 	}
 }
 ?>
