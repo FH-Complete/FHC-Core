@@ -25,6 +25,11 @@ header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/projektbenutzer.class.php');
+$pb= new projektbenutzer();
+$pb->load();
+$pb->getUIDs();
+$datum=$pb->jump_week(time(),-30);
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 ?>
@@ -76,16 +81,20 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<label value="Ressource" />
 								<?php
 								for ($i=0; $i<20; $i++)
-									echo '<box><label value="KW ',$i,' " /></box>';
+									echo '<box><label value="KW ',($pb->kw($pb->jump_week($datum,$i))),' " /></box>';
 								?>
 							</row>
-							<row style="background-color:lightgreen; border:1px solid black">
-								<label value="Paminger" />
-								<?php
-								for ($i=0; $i<20; $i++)
-									echo '<box><label value=" ',($i % 4),' " /></box>';
-								?>
-							</row>
+							<?php
+							//echo count($pb->uids);
+							foreach ($pb->uids as $uid)
+							{
+								echo '<row style="background-color:lightgreen; border:1px solid black">
+									<label value="',$uid,'" />';
+								for ($j=0; $j<20; $j++)
+									echo '<box><label value=" ',($pb->getProjektePerUID($uid,$pb->jump_week($datum,$i))),' " /></box>';
+								echo '</row>';
+							}
+							?>
 						</rows>
 					</grid>
 				</box>
