@@ -29,7 +29,7 @@ require_once('../../include/projektbenutzer.class.php');
 $pb= new projektbenutzer();
 $pb->load();
 $pb->getUIDs();
-$datum=$pb->jump_week(time(),-30);
+$datum=$pb->jump_week(time(),0);
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 ?>
