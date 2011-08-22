@@ -288,6 +288,7 @@ function onselectProjekttask()
 	{
 	    //Ausgewaehlte Lehreinheit holen
             id = getTreeCellText(tree, "projekttask-treecol-projekttask_id", tree.currentIndex);
+            mantis_id = getTreeCellText(tree, "projekttask-treecol-mantis_id", tree.currentIndex);
 
             if(id!='')
             {
@@ -331,12 +332,39 @@ function onselectProjekttask()
 	var mantis_id=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#mantis_id" ));
 	
 	//Daten den Feldern zuweisen
-
 	document.getElementById('textbox-projekttaskdetail-projekttask_id').value=projekttask_id;
 	document.getElementById('textbox-projekttaskdetail-projektphase_id').value=projektphase_id;
 	document.getElementById('textbox-projekttask-detail-bezeichnung').value=bezeichnung;
 	document.getElementById('textbox-projekttask-detail-beschreibung').value=beschreibung;
 	document.getElementById('textbox-projekttask-detail-aufwand').value=aufwand;
 	document.getElementById('textbox-projekttask-detail-mantis_id').value=mantis_id;
+        
+        // ---------------------------------------------------------------------------------------------
+        // Mantis
+        //alert('|'+mantis_id+'|');
+        if (mantis_id!='')
+        {
+            //alert('|'+mantis_id+'|');
+            var req = new phpRequest('../rdf/mantis.rdf.php','','');
+            req.add('issue_id',mantis_id);
+            response = req.execute();
+            // Datasource holen
+            dsource=parseRDFString(response, 'http://www.technikum-wien.at/mantis/alle-issues');
+            dsource=dsource.QueryInterface(Components.interfaces.nsIRDFDataSource);
+            rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
+                       getService(Components.interfaces.nsIRDFService);
+            subject = rdfService.GetResource("http://www.technikum-wien.at/mantis/" + mantis_id);
+            predicateNS = "http://www.technikum-wien.at/mantis/rdf";
+    
+            //Daten holen
+            var issue_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#issue_id" ));
+            var issue_summary=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#issue_summary" ));
+            var issue_description=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#issue_description" ));
+            
+            //Daten den Feldern zuweisen
+            document.getElementById('textbox-projekttask-mantis-mantis_id').value=mantis_id;
+            document.getElementById('textbox-projekttask-mantis-issue_summary').value=issue_summary;
+            document.getElementById('textbox-projekttask-mantis-issue_description').value=issue_description;
+        }
 }
                                 

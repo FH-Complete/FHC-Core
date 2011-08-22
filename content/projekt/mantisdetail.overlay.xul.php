@@ -29,52 +29,41 @@ require_once('../../config/vilesci.config.inc.php');
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 ?>
-<overlay id="ProjekttaskDetailOverlay"
+<overlay id="overlayMantisDetail"
 	xmlns:html="http://www.w3.org/1999/xhtml"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 >
 
 	<!-- ************************ -->
-	<!-- *  Projekttaskdetail   * -->
+	<!-- *  Mantisdetail   * -->
 	<!-- ************************ -->
-	<vbox id="box-projekttask-detail" flex="1">
+	<vbox id="box-projekttask-mantis" flex="1">
 		<description>Task Details</description>
 			
-		<grid id="grid-projekttask-detail" style="overflow:auto;margin:4px;" flex="1">
+		<grid id="grid-projekttask-mantis" style="overflow:auto;margin:4px;" flex="1">
 		  	<columns  >
 				<column flex="1"/>
 				<column flex="5"/>
 			</columns>
 			<rows>
 				<row>
-					<label value="Task ID" control="textbox-projekttask-detail-projekttask_id "/>
-					<textbox id="textbox-projekttaskdetail-projekttask_id"/>
+					<label value="Mantis ID" control="textbox-projekttask-mantis-mantis_id"/>
+					<textbox id="textbox-projekttask-mantis-mantis_id"/>
 				</row>
 				<row>
-					<label value="Projektphase ID" control="textbox-projekttask-detail-projektphase_id"/>
-					<textbox id="textbox-projekttaskdetail-projektphase_id"/>
+					<label value="Summary" control="textbox-projekttask-mantis-issue_summary"/>
+					<textbox id="textbox-projekttask-mantis-issue_summary"/>
 				</row>
 				<row>
-					<label value="Bezeichnung" control="textbox-projekttask-detail-bezeichnung"/>
-   					<textbox id="textbox-projekttask-detail-bezeichnung"/>
+					<label value="Description" control="textbox-projekttask-mantis-issue_description"/>
+   					<textbox id="textbox-projekttask-mantis-issue_description"/>
 				</row>
-				<row>
-					<label value="Beschreibung" control="textbox-projekttask-detail-beschreibung"/>
-   					<textbox id="textbox-projekttask-detail-beschreibung"/>
-				</row>
-				<row>
-					<label value="Aufwand" control="textbox-projekttask-detail-aufwand"/>
-   					<textbox id="textbox-projekttask-detail-aufwand"/>
-				</row>
-				<row>
-					<label value="MantisID" control="textbox-projekttask-detail-mantis_id"/>
-   					<textbox id="textbox-projekttask-detail-mantis_id"/>
-				</row>
+				
 			</rows>
 		</grid>
 		<hbox>
 			<spacer flex="1" />
-			<button id="button-projekttask-detail-speichern" oncommand="saveProjekttaskDetail()" label="Speichern" />
+			<button id="button-projekttask-mantis-speichern" oncommand="saveProjekttaskMantis()" label="Speichern" />
 		</hbox>
 	</vbox>
 	
