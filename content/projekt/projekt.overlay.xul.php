@@ -69,17 +69,17 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektdetail.overlay.xul.
  				context="projekt-tree-popup"
 		>
 			<treecols>
-				<treecol id="treecol-projekt-projekt_kurzbz" label="Projekt" flex="5" hidden="false" primary="true" persist="hidden, width, ordinal"
+				<treecol id="treecol-projekt-titel" label="Titel" flex="4" hidden="false" primary="true" persist="hidden, width, ordinal"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/projekt/rdf#titel"/>
+				<splitter class="tree-splitter"/>
+				<treecol id="treecol-projekt-projekt_kurzbz" label="Projekt (kurzbz)" flex="4" hidden="true" persist="hidden, width, ordinal"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projekt/rdf#projekt_kurzbz"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="treecol-projekt-nummer" label="Nummer" flex="2" hidden="true"  persist="hidden, width, ordinal"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projekt/rdf#nummer"/>
-				<splitter class="tree-splitter"/>
-				<treecol id="treecol-projekt-titel" label="Titel" flex="2" hidden="true" persist="hidden, width, ordinal"
-					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/projekt/rdf#titel"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="treecol-projekt-oe_kurzbz" label="OE (Organisationseinheit)" flex="2" hidden="true" persist="hidden, width, ordinal"
 					class="sortDirectionIndicator"
