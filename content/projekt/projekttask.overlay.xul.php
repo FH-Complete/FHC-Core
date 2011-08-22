@@ -29,6 +29,7 @@ require_once('../../config/vilesci.config.inc.php');
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projekttaskdetail.overlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/mantisdetail.overlay.xul.php"?>';
 ?>
 <overlay id="ProjekttaskOverlay"
 	xmlns:html="http://www.w3.org/1999/xhtml"
@@ -125,8 +126,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projekttaskdetail.overlay.
 					<tab id="projekttask-tab-mantis" label="Mantis" />
 				</tabs>
 				<tabpanels id="projekttask-tabpanels-main" flex="1">
-					<vbox id="projekttask-detail" />
-					<vbox id="projekttask-mantis" />
+					<vbox id="box-projekttask-detail" />
+					<vbox id="box-projekttask-mantis" />
 				</tabpanels>
 			</tabbox>
 		</vbox>
