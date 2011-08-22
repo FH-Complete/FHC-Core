@@ -824,7 +824,7 @@ class wochenplan extends basis_db
 					</td>'.$this->crlf;
 				
 				//Spezialgruppe
-				echo '<td>'.$p->t('global/spezialgruppe').'</td><td><SELECT name="gruppe_kurzbz">'.$this->crlf;
+				echo '<td>'.$p->t('lvplan/spezialgruppe').'</td><td><SELECT name="gruppe_kurzbz">'.$this->crlf;
 				echo '<OPTION value="">*</OPTION>'.$this->crlf;
 				
 				//Spezialgruppen aus den Studiengaengen mit erweiterten Reservierungsberechtigung holen
@@ -2198,7 +2198,7 @@ function jahreskalenderjump($link)
 	$datum=mktime();
 	$woche=kalenderwoche($datum);
 	$datum=montag($datum);
-	echo '			<SMALL><CENTER><B>'.$p->t('global/springeZuKw').'</B><BR><SMALL>'.$crlf;
+	echo '			<SMALL><CENTER><B>'.$p->t('lvplan/springeZuKw').'</B><BR><SMALL>'.$crlf;
 	for ($anz=1;$anz<26;$anz++)
 	{
 		$linknew=$link.'&datum='.$datum;
