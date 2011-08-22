@@ -2126,21 +2126,20 @@ class wochenplan extends basis_db
 							$sta = explode(":",$start_time);	 //sta start time array
 							$eda = explode(".",$end_date);    //eda end date array
 							$eta = explode(":",$end_time);	 //eta end time array
-							
-							//Der Zusatz "Z" am Ende legt fest, dass es sich um die Zeitzone UTC handelt
-							//deshalb werden 2 Stunden von der Zeit abgezogen.
+														
 							//Die Zeitzone muss angegeben werden, da sonst der Google Kalender die Endzeiten nicht richtig erkennt 
-							$start_date_time_ical = $sda[2].$sda[1].$sda[0].'T'.sprintf('%02s',($sta[0]-2)).$sta[1].$sta[2].'Z';  //neu gruppieren der Startzeit und des Startdatums
-							$end_date_time_ical = $eda[2].$eda[1].$eda[0].'T'.sprintf('%02s',($eta[0]-2)).$eta[1].$eta[2].'Z';  //neu gruppieren der Startzeit und des Startdatums
-	
+							// diese wird in stpl_kalender global definiert und bei den Start und Ende Zeiten mitangegeben
+							$start_date_time_ical = $sda[2].$sda[1].$sda[0].'T'.sprintf('%02s',($sta[0])).$sta[1].$sta[2];  //neu gruppieren der Startzeit und des Startdatums
+							$end_date_time_ical = $eda[2].$eda[1].$eda[0].'T'.sprintf('%02s',($eta[0])).$eta[1].$eta[2];  //neu gruppieren der Startzeit und des Startdatums
+							
 							echo $this->crlf.'BEGIN:VEVENT'.$this->crlf
 								.'UID:'.'FH'.$lvb.$this->std_plan[$i][$j][$idx]->ort.$this->std_plan[$i][$j][$idx]->lektor.$lehrfach[$idx].$start_date_time_ical.$this->crlf
 								.'SUMMARY:'.$lehrfach[$idx].'  '.$this->std_plan[$i][$j][$idx]->ort.' - '.$lvb.$this->crlf
 								.'DESCRIPTION:'.$lehrfach[$idx].'\n'.$this->std_plan[$i][$j][$idx]->lektor.'\n'.$lvb.'\n'.$this->std_plan[$i][$j][$idx]->ort.$this->crlf
 								.'LOCATION:'.$this->std_plan[$i][$j][$idx]->ort.$this->crlf
 								.'CATEGORIES:'.$lvplan_kategorie.$this->crlf
-								.'DTSTART:'.$start_date_time_ical.$this->crlf
-								.'DTEND:'.$end_date_time_ical.$this->crlf
+								.'DTSTART;TZID=Europe/Vienna:'.$start_date_time_ical.$this->crlf
+								.'DTEND;TZID=Europe/Vienna:'.$end_date_time_ical.$this->crlf
 								.'END:VEVENT';
 						}
 						else
