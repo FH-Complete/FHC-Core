@@ -41,32 +41,32 @@ echo '
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title>'.$p->t('global/reservierungsliste').'</title>
+	<title>'.$p->t('lvplan/reservierungsliste').'</title>
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 	<script language="Javascript">
 	function checkdata()
 	{
 		if(document.getElementById("datum").value=="")
 		{
-			alert("'.$p->t('global/datumAngeben').'");
+			alert("'.$p->t('lvplan/datumAngeben').'");
 			return false;
 		}
 		datum = document.getElementById("datum").value
 		if(datum.length!=10)
 		{
-			alert("'.$p->t('global/datumUngueltig').'");
+			alert("'.$p->t('lvplan/datumUngueltig').'");
 			return false;
 		}
 		
 		if(document.getElementById("vonzeit").value=="")
 		{
-			alert("'.$p->t('global/vonZeitEingeben').'");
+			alert("'.$p->t('lvplan/vonZeitEingeben').'");
 			return false;
 		}
 				
 		if(document.getElementById("biszeit").value=="")
 		{
-			alert("'.$p->t('global/bisZeitEingeben').'");
+			alert("'.$p->t('lvplan/bisZeitEingeben').'");
 			return false;
 		}
 		return true;
@@ -76,7 +76,7 @@ echo '
 <body id="inhalt">
 	<H2><table class="tabcontent">
 		<tr>
-		<td>&nbsp;<a class="Item" href="index.php">'.$p->t('global/lehrveranstaltungsplan').'</a> &gt;&gt; '.$p->t('global/raumsuche').'</td>
+		<td>&nbsp;<a class="Item" href="index.php">'.$p->t('lvplan/lehrveranstaltungsplan').'</a> &gt;&gt; '.$p->t('lvplan/raumsuche').'</td>
 		<td align="right"></td>
 		</tr>
 		</table>
@@ -87,7 +87,7 @@ echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST" onsubmit="return che
 		'.$p->t('global/datum').'* <input type="text" name="datum" id="datum" size="10" value="'.$datum.'">
 		'.$p->t('global/von').'* <input type="text" name="vonzeit" id="vonzeit" size="5" value="'.$vonzeit.'">
 		'.$p->t('global/bis').'* <input type="text" name="biszeit" id="biszeit" size="5" value="'.$biszeit.'">
-		'.$p->t('global/raumtyp').': <SELECT name="raumtyp">
+		'.$p->t('lvplan/raumtyp').': <SELECT name="raumtyp">
 		<OPTION value="">'.$p->t('global/alle').'</OPTION>';
 $raumtyp_obj = new raumtyp();
 $raumtyp_obj->getAll();
@@ -102,7 +102,7 @@ foreach ($raumtyp_obj->result as $row)
 	echo '<OPTION value="'.$row->raumtyp_kurzbz.'" '.$selected.'>'.$row->raumtyp_kurzbz.'</OPTION>';
 }
 echo '	</SELECT>
-		'.$p->t('global/anzahlPersonen').' <input type="text" size="3" name="anzahlpersonen" value="'.$anzahlpersonen.'">
+		'.$p->t('lvplan/anzahlPersonen').' <input type="text" size="3" name="anzahlpersonen" value="'.$anzahlpersonen.'">
 		<input type="submit" name="sent" value="'.$p->t('global/suchen').'" />
 	  </form>';
 if($sent)
@@ -110,17 +110,17 @@ if($sent)
 	$error=false;
 	if($datum=='')
 	{
-		echo "<br>".$p->t('global/datumAngeben');
+		echo "<br>".$p->t('lvplan/datumAngeben');
 		$error = true;
 	}
 	if($vonzeit=='')
 	{
-		echo "<br>".$p->t('global/vonZeitEingeben');
+		echo "<br>".$p->t('lvplan/vonZeitEingeben');
 		$error = true;
 	}
 	if($biszeit=='')
 	{
-		echo "<br>".$p->t('global/bisZeitEingeben');
+		echo "<br>".$p->t('lvplan/bisZeitEingeben');
 		$error = true;
 	}
 	
@@ -129,20 +129,20 @@ if($sent)
 		//Von Zeit pruefen
 		if(!preg_match('/^[0-9]{2}:[0-9]{2}$/', $vonzeit))
 		{
-			echo "<br>".$p->t('global/vonZeitFormat');
+			echo "<br>".$p->t('lvplan/vonZeitFormat');
 			$error = true;
 		}
 		//Bis Zeit pruefen
 		if(!preg_match('/^[0-9]{2}:[0-9]{2}$/', $biszeit))
 		{
-			echo "<br>".$p->t('global/bisZeitFormat');
+			echo "<br>".$p->t('lvplan/bisZeitFormat');
 			$error = true;
 		}
 		
 		//Datum pruefen
 		if(!$datum_obj->checkDatum($datum))
 		{
-			echo "<br>".$p->t('global/datumUngueltig');
+			echo "<br>".$p->t('lvplan/datumUngueltig');
 			$error = true;
 		}
 	}
@@ -156,18 +156,18 @@ if($sent)
 		else 
 		{
 			echo '<br><table>';
-			echo '<tr class="liste"><th>'.$p->t('global/raum').'</th><th>'.$p->t('global/bezeichnung').'</th><th>'.$p->t('global/nummer').'</th><th>'.$p->t('global/personen').'</th><th>'.$p->t('global/aktion').'</th></tr>';
+			echo '<tr class="liste"><th>'.$p->t('lvplan/raum').'</th><th>'.$p->t('global/bezeichnung').'</th><th>'.$p->t('global/nummer').'</th><th>'.$p->t('global/personen').'</th><th>'.$p->t('global/aktion').'</th></tr>';
 			$i=0;
 			$datum_sec = $datum_obj->mktime_datum($datum)-1;
 			foreach ($ort->result as $row)
 			{
 				$i++;
 				echo '<tr class="liste'.($i%2).'">';
-				echo '<td><a href="'.RAUMINFO_PATH.$row->ort_kurzbz.'.html" class="Item" title="'.$p->t('global/rauminfoAnzeigen').'">'.$row->ort_kurzbz.'</td>';
+				echo '<td><a href="'.RAUMINFO_PATH.$row->ort_kurzbz.'.html" class="Item" title="'.$p->t('lvplan/rauminfoAnzeigen').'">'.$row->ort_kurzbz.'</td>';
 				echo "<td>$row->bezeichnung</td>";
 				echo "<td>$row->planbezeichnung</td>";
 				echo "<td>$row->max_person</td>";
-				echo "<td><a href='stpl_week.php?type=ort&ort_kurzbz=$row->ort_kurzbz&datum=".$datum_sec."' class='Item'>".$p->t('global/zurReservierung')."</a></td>";
+				echo "<td><a href='stpl_week.php?type=ort&ort_kurzbz=$row->ort_kurzbz&datum=".$datum_sec."' class='Item'>".$p->t('lvplan/zurReservierung')."</a></td>";
 				echo '</tr>';
 				flush();
 			}

@@ -221,7 +221,7 @@ function ip_increment($ip = "")
 			  <form method="post" name="regMAC">
 			    <table class="tabcontent">
 				  <tr>
-					<td width="90" class="tdwrap"><?php echo $p->t("global/MACadresse");?>:</td>
+					<td width="90" class="tdwrap"><?php echo $p->t("notebookregister/MACadresse");?>:</td>
 					<td class="tdwrap"><input class="TextBox" type="text" name="txtMAC" size="20"<?php if(isset($txtMAC) && $txtMAC != "") echo 'value="'.$txtMAC.'"'; ?>></td>
 				  </tr>
 				  <tr>

@@ -905,7 +905,7 @@ if(isset($do_search) || $do_excel)
 					<td align="left" class="ContentHeader" class="tdwrap"><font class="ContentHeader">&nbsp;'.$p->t("global/titel").'</font></td>
 					<td align="left" class="ContentHeader" class="tdwrap"><font class="ContentHeader">&nbsp;'.$p->t("global/telefonnummer").'</font></td>
 					<td align="left" class="ContentHeader" class="tdwrap"><font class="ContentHeader">&nbsp;'.$p->t("global/emailAdresse").'</font></td>
-					<td align="left" class="ContentHeader" class="tdwrap"><font class="ContentHeader">&nbsp;'.$p->t("global/raum").'</font></td>
+					<td align="left" class="ContentHeader" class="tdwrap"><font class="ContentHeader">&nbsp;'.$p->t("lvplan/raum").'</font></td>
 					<td align="left" class="ContentHeader" class="tdwrap"><font class="ContentHeader">&nbsp;'.$p->t("global/studiengang").'</font></td>
 					<td align="left" class="ContentHeader" class="tdwrap"><font class="ContentHeader">&nbsp;'.$p->t("global/semester").'</font></td>
 					<td align="left" class="ContentHeader" class="tdwrap"><font class="ContentHeader">&nbsp;'.$p->t("personensuche/hauptverteiler").'</font></td>
