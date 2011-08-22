@@ -78,8 +78,8 @@ else
 				<th class='table-sortable:default'>".$p->t('global/vorname')."</th>
 				<th class='table-sortable:alphanumeric'>".$p->t('global/nachname')."</th>";
 	$htmlstr .= "<th class='table-sortable:alphanumeric'>".$p->t('abgabetool/typ')."</th>
-				<th class='table-sortable:alphanumeric'>".$p->t('global/stg')."</th>
-				<th class='table-sortable:alphanumeric'>".$p->t('global/sem')."</th>
+				<th class='table-sortable:alphanumeric'>".$p->t('lvplan/stg')."</th>
+				<th class='table-sortable:alphanumeric'>".$p->t('lvplan/sem')."</th>
 				<th>".$p->t('abgabetool/titel')."</th>
 				<th class='table-sortable:alphanumeric'>".$p->t('abgabetool/betreuerart')."</th>";
 	$htmlstr .= "</tr></thead><tbody>\n";

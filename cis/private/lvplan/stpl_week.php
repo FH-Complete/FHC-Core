@@ -44,7 +44,7 @@ $uid=get_uid();
 <HTML>
 <HEAD>
 	<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<TITLE><?php echo $p->t('global/lehrveranstaltungsplan');?> Technikum-Wien</TITLE>
+	<TITLE><?php echo $p->t('lvplan/lehrveranstaltungsplan');?> Technikum-Wien</TITLE>
 	<script type="text/javascript">
 		<!--
 		function MM_jumpMenu(targ,selObj,restore)
@@ -61,7 +61,7 @@ $uid=get_uid();
 <BODY id="inhalt">
 <H2><table class="tabcontent">
 	<tr>
-	<td>&nbsp;<a class="Item" href="index.php"><?php echo $p->t('global/lehrveranstaltungsplan');?></a> &gt;&gt; <?php echo $p->t('global/wochenplan');?></td>
+	<td>&nbsp;<a class="Item" href="index.php"><?php echo $p->t('lvplan/lehrveranstaltungsplan');?></a> &gt;&gt; <?php echo $p->t('lvplan/wochenplan');?></td>
 	<td align="right"><A href="help/index.html" class="hilfe" target="_blank">HELP&nbsp;</A></td>
 	</tr>
 	</table>
@@ -196,7 +196,7 @@ if (isset($reserve) && $raumres)
 {
 	$ort_obj = new ort();
 	if(!$ort_obj->load($ort_kurzbz))
-		die($p->t('global/raumExistiertNicht'));
+		die($p->t('lvplan/raumExistiertNicht'));
 	
 	if(!$erg_std=$db->db_query("SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
 	{
@@ -221,11 +221,11 @@ if (isset($reserve) && $raumres)
 				if(!$reservierung->isReserviert($ort_kurzbz, $datum_res, $stunde))
 				{
 					if (empty($_REQUEST['titel']) && empty($_REQUEST['beschreibung']))
-						echo "<br>".$p->t('global/titelUndBeschreibungFehlt')."! <br>";
+						echo "<br>".$p->t('lvplan/titelUndBeschreibungFehlt')."! <br>";
 					else if (empty($_REQUEST['titel']) )
-						echo "<br>".$p->t('global/titelFehlt')."! <br>";
+						echo "<br>".$p->t('lvplan/titelFehlt')."! <br>";
 					else if ( empty($_REQUEST['beschreibung']))
-						echo "<br>".$p->t('global/beschreibungFehlt')."! <br>";
+						echo "<br>".$p->t('lvplan/beschreibungFehlt')."! <br>";
 					else
 					{			 
 	  					$reservierung = new reservierung();
@@ -260,7 +260,7 @@ if (isset($reserve) && $raumres)
 				}
 				else
 				{
-					echo "<br>$ort_kurzbz ".$p->t('global/bereitsReserviert').": $datum_res - Stunde $stunde <br>";
+					echo "<br>$ort_kurzbz ".$p->t('lvplan/bereitsReserviert').": $datum_res - Stunde $stunde <br>";
 				}	
 			}
 		}
@@ -303,6 +303,6 @@ if (isset($count))
 	echo "Es wurde".($count!=1?'n':'')." $count Stunde".($count!=1?'n':'')." reserviert!<BR>";
 ?>
 <HR>
-<P><?php echo $p->t('global/fehlerUndFeedback');?> <A class="Item" href="mailto:<?php echo MAIL_LVPLAN?>"><?php echo $p->t('global/lvKoordinationsstelle');?></A>.</P>
+<P><?php echo $p->t('lvplan/fehlerUndFeedback');?> <A class="Item" href="mailto:<?php echo MAIL_LVPLAN?>"><?php echo $p->t('lvplan/lvKoordinationsstelle');?></A>.</P>
 </BODY>
 </HTML>

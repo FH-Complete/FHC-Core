@@ -37,7 +37,7 @@ $num_rows=$db->db_num_rows($erg);
 ?>
 <html>
 <head>
-	<title><?php echo $p->t('global/uebersichtDerLehrverbaende');?></title>
+	<title><?php echo $p->t('lvplan/uebersichtDerLehrverbaende');?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </head>
@@ -45,7 +45,7 @@ $num_rows=$db->db_num_rows($erg);
 <body id="inhalt">
 	<H2><table class="tabcontent" id="inhalt">
 		<tr>
-		<td>&nbsp;<a class="Item" href="index.php"><?php echo $p->t('global/lehrveranstaltungsplan');?></a> &gt;&gt; <?php echo $p->t('global/lehrverbaende');?></td>
+		<td>&nbsp;<a class="Item" href="index.php"><?php echo $p->t('lvplan/lehrveranstaltungsplan');?></a> &gt;&gt; <?php echo $p->t('lvplan/lehrverbaende');?></td>
 		<td align="right"><A href="help/index.html" class="hilfe" target="_blank">HELP&nbsp;</A></td>
 		</tr>
 		</table>

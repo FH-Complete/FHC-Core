@@ -115,8 +115,8 @@ if($result = $db->db_query($sql_query))
 				<th>'.$p->t('abgabetool/typ').'</th>
 				<th>'.$p->t('abgabetool/beschreibungAbgabe').'</th>
 				<th>'.$p->t('abgabetool/student').'</th>
-				<th>'.$p->t('global/stg').'</th>
-				<th>'.$p->t('global/sem').'</th>
+				<th>'.$p->t('lvplan/stg').'</th>
+				<th>'.$p->t('lvplan/sem').'</th>
 			</tr>
 			</thead>
 			<tbody>

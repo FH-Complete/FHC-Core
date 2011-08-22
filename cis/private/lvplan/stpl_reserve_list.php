@@ -50,14 +50,14 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title><?php echo $p->t('global/reservierungsliste');?></title>
+	<title><?php echo $p->t('lvplan/reservierungsliste');?></title>
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </head>
 <body id="inhalt">
 	<H2>
 		<table class="tabcontent">
 			<tr>
-				<td>&nbsp;<a class="Item" href="index.php"><?php echo $p->t('global/lehrveranstaltungsplan');?></a> &gt;&gt; <?php echo $p->t('global/reservierungen');?></td>
+				<td>&nbsp;<a class="Item" href="index.php"><?php echo $p->t('lvplan/lehrveranstaltungsplan');?></a> &gt;&gt; <?php echo $p->t('lvplan/reservierungen');?></td>
 				<td align="right"><A href="help/index.html" class="hilfe" target="_blank">HELP&nbsp;</A></td>
 			</tr>
 		</table>
@@ -70,7 +70,7 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 			die('ungueltige ID');
 		$sql_query="DELETE FROM campus.tbl_reservierung WHERE reservierung_id='".addslashes($id)."'";
 		if($db->db_query($sql_query))
-			echo '<b>'.$p->t('global/reservierungWurdeGeloescht').'</b><br>';
+			echo '<b>'.$p->t('lvplan/reservierungWurdeGeloescht').'</b><br>';
 		else 
 			echo '<b>'.$p->t('global/fehleraufgetreten').'!</b><br>';
 	}
@@ -91,7 +91,7 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 	
 	if ($num_rows_res>0)
 	{
-		echo $p->t('global/eigeneReservierungen').':<br>';
+		echo $p->t('lvplan/eigeneReservierungen').':<br>';
 		echo '<table border="0">';
 		echo '
 			<tr class="liste">
@@ -150,14 +150,14 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 		$num_rows_res=$db->db_num_rows($erg_res);
 		if ($num_rows_res>0)
 		{
-			echo $p->t('global/alleReservierungen').':<br>';
+			echo $p->t('lvplan/alleReservierungen').':<br>';
 			echo '<table border="0">';
 			echo '
 				<tr class="liste">
 					<th>'.$p->t('global/datum').'</th>
 					<th>'.$p->t('global/titel').'</th>
 					<th>'.$p->t('global/stunde').'</th>
-					<th>'.$p->t('global/raum').'</th>
+					<th>'.$p->t('lvplan/raum').'</th>
 					<th>'.$p->t('global/person').'</th>
 					<th>'.$p->t('global/beschreibung').'</th>
 					<th>'.$p->t('global/aktion').'</th>
@@ -196,7 +196,7 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 		}
 	}
 	else 
-		echo '<a href="stpl_reserve_list.php?alle=true">'.$p->t('global/alleReservierungenAnzeigen').'</a>';
+		echo '<a href="stpl_reserve_list.php?alle=true">'.$p->t('lvplan/alleReservierungenAnzeigen').'</a>';
 	
 ?>
 </body>

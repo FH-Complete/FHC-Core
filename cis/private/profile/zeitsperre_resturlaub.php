@@ -390,7 +390,7 @@ if($result = $db->db_query($qry))
 //liste aller zeitsperren ausgeben
 if(count($zeit->result)>0)
 {
-	$content_table.= '<table><tr class="liste"><th>'.$p->t('global/bezeichnung').'</th><th>'.$p->t('zeitsperre/grund').'</th><th>Von</th><th>Bis</th><th>Vertretung</th><th>Erreichbarkeit</th><th>Freigegeben</th></tr>';
+	$content_table.= '<table><tr class="liste"><th>'.$p->t('global/bezeichnung').'</th><th>'.$p->t('zeitsperre/grund').'</th><th>'.$p->t('global/von').'</th><th>'.$p->t('global/bis').'</th><th>'.$p->t('urlaubstool/vertretung').'</th><th>'.$p->t('urlaubstool/erreichbarkeit').'</th><th>'.$p->t('zeitsperre/freigegeben').'</th></tr>';
 	$i=0;
 	foreach ($zeit->result as $row)
 	{
@@ -409,15 +409,15 @@ if(count($zeit->result)>0)
 							<td align='center'>".($row->freigabeamum!=''?'Ja':'')."</td>";
 		if($row->freigabeamum=='' || $row->zeitsperretyp_kurzbz!='Urlaub')
 		{
-			$content_table.="<td><a href='$PHP_SELF?type=edit&id=$row->zeitsperre_id' class='Item'>edit</a></td>
-							 <td><a href='$PHP_SELF?type=delete_sperre&id=$row->zeitsperre_id' onclick='return conf_del()' class='Item'>delete</a></td>";
+			$content_table.="<td><a href='$PHP_SELF?type=edit&id=$row->zeitsperre_id' class='Item'>".$p->t('zeitsperre/edit')."</a></td>
+							 <td><a href='$PHP_SELF?type=delete_sperre&id=$row->zeitsperre_id' onclick='return conf_del()' class='Item'>".$p->t('zeitsperre/loeschen')."</a></td>";
 		}
 		$content_table.="</tr>";
 	}
 	$content_table.= '</table>';
 }
 else
-	$content_table.= "Derzeit sind keine Zeitsperren eingetragen!";
+	$content_table.= $p->t('zeitsperre/keineZeitsperrenEingetragen')."!";
 
 $zeitsperre = new zeitsperre();
 $action = "$PHP_SELF?type=new_sperre";

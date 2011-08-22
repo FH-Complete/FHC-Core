@@ -98,7 +98,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 <font size="2">
 	<table class="tabcontent">
 		<tr>
-			<td class="ContentHeader"><font class="ContentHeader">&nbsp;<?php echo $p->t("global/lehrveranstaltungsplan");?></font></td>
+			<td class="ContentHeader"><font class="ContentHeader">&nbsp;<?php echo $p->t("lvplan/lehrveranstaltungsplan");?></font></td>
 			<td align="right" class="ContentHeader"><A href="help/index.html" class="hilfe" target="_blank"><font class="ContentHeader">HELP&nbsp;</font></A></td>
 		</tr>
 	</table>
@@ -108,29 +108,29 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 		if (isset($uid))
 			echo $uid;
 		else
-			echo $p->t('global/nichtVorhanden').' '.$p->t('global/bitteWendenSieSichAn').'<A href="mailto:'.MAIL_ADMIN.'">Admin</A>!';
+			echo $p->t('lvplan/nichtVorhanden').' '.$p->t('lvplan/bitteWendenSieSichAn').'<A href="mailto:'.MAIL_ADMIN.'">Admin</A>!';
 	?><BR>
   	<DIV align="left">
   		<a class="Item" href="stpl_week.php?pers_uid=<?php echo $uid; ?>"><?php echo $titelpre.' '.$vornamen." ".$nachname.' '.$titelpost;?></a>
-		&nbsp; -> <?php echo $p->t("global/persoenlicherLvPlan");?><BR>
-		<a class="Item" href="../profile/index.php"><?php echo $p->t("global/profil");?></a>	
-		&nbsp; -> <?php echo $p->t("global/stammdatenKontrollieren")?><BR>
+		&nbsp; -> <?php echo $p->t("lvplan/persoenlicherLvPlan");?><BR>
+		<a class="Item" href="../profile/index.php"><?php echo $p->t("lvplan/profil");?></a>	
+		&nbsp; -> <?php echo $p->t("lvplan/stammdatenKontrollieren")?><BR>
 	</DIV>
 	<BR>
 	<FORM name="Auswahl" action="stpl_week.php">
 		<table class="tabcontent">
 		<tr>
 			<td width="50%" class="ContentHeader2">
-				&nbsp;<?php echo $p->t("global/saalplan"); ?>
+				&nbsp;<?php echo $p->t("lvplan/saalplan"); ?>
 			</td>
 			<td width="50%" class="ContentHeader2">
-				&nbsp;<?php echo $p->t("global/lektorenplan"); ?>
+				&nbsp;<?php echo $p->t("lvplan/lektorenplan"); ?>
 			</td>
 		</tr>
 		<tr>
 			<td>
 			<BR>
-			<?php echo $p->t('global/saal');?>
+			<?php echo $p->t('lvplan/saal');?>
 			<select name="select" onChange="MM_jumpMenu('self',this,0)">
         		<option value="stpl_week.php" selected>... ??? ...</option>
         	  	<?php
@@ -141,14 +141,14 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 				}
 				?>
 			</select>
-			(<?php echo $p->t("global/saalreservierung"); ?>)<BR><BR>
-			<A class="Item" href="stpl_reserve_list.php"><?php echo $p->t('global/reservierungsliste'); ?></A> (<?php echo $p->t('global/reservierungenLoeschen'); ?>)<BR>
-			<A class="Item" href="raumsuche.php"><?php echo $p->t('global/raumsuche'); ?></A><BR>
+			(<?php echo $p->t("lvplan/saalreservierung"); ?>)<BR><BR>
+			<A class="Item" href="stpl_reserve_list.php"><?php echo $p->t('lvplan/reservierungsliste'); ?></A> (<?php echo $p->t('lvplan/reservierungenLoeschen'); ?>)<BR>
+			<A class="Item" href="raumsuche.php"><?php echo $p->t('lvplan/raumsuche'); ?></A><BR>
 			</td>
 
 			<td valign="top">
 			<br>
-			<?php echo $p->t('global/lektor'); ?>
+			<?php echo $p->t('lvplan/lektor'); ?>
 	  		<select name="lektor" onChange="MM_jumpMenu('self',this,0)">
 			    	<option value="stpl_week.php" selected>... ??? ...</option>
 			    	<?php
@@ -163,7 +163,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 		</tr>
 		</table>
 		<br><br>
-		<table class="tabcontent"><tr><td class="ContentHeader2">&nbsp;<?php echo $p->t('global/lehrverband');?></td></tr></table>
+		<table class="tabcontent"><tr><td class="ContentHeader2">&nbsp;<?php echo $p->t('lvplan/lehrverband');?></td></tr></table>
 		<table width="40%" border="0" cellpadding="0" cellspacing="3">
 		<tr nowrap>
 		<td width="20%" valign="middle">
@@ -180,7 +180,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 			</select>
 		</td>
 		<td valign="middle">
-			<?php echo $p->t('global/sem');?><BR>
+			<?php echo $p->t('lvplan/sem');?><BR>
 			<select name="sem">
 			<option value="1">1</option>
 			<option value="2">2</option>
@@ -193,7 +193,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 			</select>
 		</td>
 		<td valign="middle">
-			<?php echo $p->t('global/ver');?><BR>
+			<?php echo $p->t('lvplan/ver');?><BR>
 			<select name="ver" >
 			<option value="0" selected>*</option>
 			<option value="A">A</option>
@@ -205,7 +205,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 			</select>
 		</td>
 		<td valign="middle" >
-			<?php echo $p->t('global/grp');?><BR>
+			<?php echo $p->t('lvplan/grp');?><BR>
 			<select name="grp">
 			<option value="0" selected>*</option>
 			<option value="1">1</option>
@@ -221,9 +221,9 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 		</tr>
 		</table>
 	</form>
-	<a class="Item" href="verband_uebersicht.php"><?php echo $p->t('global/lehrverbaende')?></a> -> <?php echo $p->t('global/uebersichtDerLehrverbaende');?><BR>
+	<a class="Item" href="verband_uebersicht.php"><?php echo $p->t('lvplan/lehrverbaende')?></a> -> <?php echo $p->t('lvplan/uebersichtDerLehrverbaende');?><BR>
 <BR><BR><HR>
-<P><?php echo $p->t('global/fehlerUndFeedback');?> <A class="Item" href="mailto:<?php echo MAIL_LVPLAN?>"><?php echo $p->t('global/lvKoordinationsstelle');?></A>.</P>
+<P><?php echo $p->t('lvplan/fehlerUndFeedback');?> <A class="Item" href="mailto:<?php echo MAIL_LVPLAN?>"><?php echo $p->t('lvplan/lvKoordinationsstelle');?></A>.</P>
 <!--
 <P class=little>
     Erstellt am 24.8.2001 von <A href="mailto:pam@technikum-wien.at">Christian Paminger</A>.<BR>

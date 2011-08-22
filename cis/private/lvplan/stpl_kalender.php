@@ -181,7 +181,7 @@ if(!isset($begin) || !isset($ende))
 
 if($ende-$begin>31536000)
 {
-	die($p->t('global/datumsbereichZuGross')."!");
+	die($p->t('lvplan/datumsbereichZuGross')."!");
 }
 
 if(!isset($type))
@@ -277,7 +277,7 @@ elseif($format=='ical')
 // Print in HTML-File
 else
 {
-	echo '<P class="dont-print">'.$p->t('global/fehlerUndFeedback').' <A class="Item" href="mailto:'.MAIL_LVPLAN.'">'.$p->t('global/lvKoordinationsstelle').'</A></P>';
+	echo '<P class="dont-print">'.$p->t('lvlplan/fehlerUndFeedback').' <A class="Item" href="mailto:'.MAIL_LVPLAN.'">'.$p->t('lvplan/lvKoordinationsstelle').'</A></P>';
 	echo '</body></html>';
 }
 ?>

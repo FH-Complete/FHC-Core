@@ -111,7 +111,7 @@ if(!$person->load($uid))
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 	<head>
-		<title>Zeitwunsch</title>
+		<title><?php echo $p->t('zeitwunsch/zeitwunsch');?></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 		<script type="text/javascript">
@@ -260,7 +260,7 @@ if(!$person->load($uid))
 			  <LI> <?php echo $p->t('zeitwunsch/verwendenSieDenWertNur');?></LI>
 			  <LI><?php echo $p->t('zeitwunsch/esSolltenFuerJedeStunde');?></LI>
 			</OL>
-			<P><?php echo $p->t('global/fehlerUndFeedback');?> <A class="Item" href="mailto:<?php echo MAIL_LVPLAN;?>"><?php echo $p->t('global/lvKoordinationsstelle');?></A>.</P>
+			<P><?php echo $p->t('lvplan/fehlerUndFeedback');?> <A class="Item" href="mailto:<?php echo MAIL_LVPLAN;?>"><?php echo $p->t('lvplan/lvKoordinationsstelle');?></A>.</P>
 			</td>
 		</tr>
 	</table>

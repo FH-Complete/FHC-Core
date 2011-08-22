@@ -260,7 +260,7 @@ if(isset($_POST["schick"]))
 	}
 	else 
 	{
-		echo "<font color=\"#FF0000\">".$p->t('global/datumUngueltig')."</font><br>&nbsp;";
+		echo "<font color=\"#FF0000\">".$p->t('lvplan/datumUngueltig')."</font><br>&nbsp;";
 	}
 	unset($_POST["schick"]);
 }
@@ -310,7 +310,7 @@ if(isset($_POST["del"]))
 	}
 	else 
 	{
-		echo "<font color=\"#FF0000\">".$p->t('global/datumUngueltig')."</font><br>&nbsp;";
+		echo "<font color=\"#FF0000\">".$p->t('lvplan/datumUngueltig')."</font><br>&nbsp;";
 	}
 	unset($_POST["del"]);
 }
