@@ -30,6 +30,7 @@ $pb= new projektbenutzer();
 $pb->load();
 $pb->getUIDs();
 $datum=$pb->jump_week(time(),0);
+$showWeeks=15;
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 ?>
@@ -72,7 +73,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<columns>
 							<column style="background-color:lightblue; border:1px solid black" />
 							<?php
-								for ($i=0; $i<20; $i++)
+								for ($i=0; $i<$showWeeks; $i++)
 									echo '<column />';
 							?>
 						</columns>
@@ -80,7 +81,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<row style="background-color:lightgreen; border:1px solid black">
 								<label value="Ressource" />
 								<?php
-								for ($i=0; $i<20; $i++)
+								for ($i=0; $i<$showWeeks; $i++)
 									echo '<box><label value="KW ',($pb->kw($pb->jump_week($datum,$i))),' " /></box>';
 								?>
 							</row>
@@ -90,7 +91,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							{
 								echo '<row style="background-color:lightgreen; border:1px solid black">
 									<label value="',$uid,'" />';
-								for ($j=0; $j<20; $j++)
+								for ($j=0; $j<$showWeeks; $j++)
 									echo '<box><label value=" ',($pb->getProjektePerUID($uid,$pb->jump_week($datum,$i))),' " /></box>';
 								echo '</row>';
 							}
