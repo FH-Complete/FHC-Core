@@ -115,7 +115,7 @@ ob_start();
 	{
 		echo '<tr>
 				<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td><a class="HyperItem" href="?content_id='.CIS_MENU_ENTRY_CONTENT.'">&lt;&lt; '.$p->t('global/home').'</a></td>
+				<td><a class="HyperItem" href="?content_id='.CIS_MENU_ENTRY_CONTENT.'">&lt;&lt; '.$p->t('lvplan/home').'</a></td>
 				</tr>
 				<tr><td></td></tr>';
 	}
