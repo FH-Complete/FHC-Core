@@ -3,8 +3,8 @@ $this->phrasen['anwesenheitsliste/studiensemesterIstUngueltig']='No valid semest
 $this->phrasen['anwesenheitsliste/anwesenheitslisten']='Attandance lists';
 $this->phrasen['anwesenheitsliste/notenlisten']='Grade lists';
 $this->phrasen['anwesenheitsliste/anwesenheitslistenMitBildern']='Attandance lists with pictures';
-$this->phrasen['anwesenheitsliste/keineStudentenVorhanden']='Derzeit sind in diesem Studiengang / Semester keine Studenten vorhanden';
-$this->phrasen['anwesenheitsliste/erstellenDerListeKlicken']='Zum Erstellen der Liste klicken Sie bitte auf die gewünschte Gruppe!';
-$this->phrasen['anwesenheitsliste/gesamtliste']='Gesamtliste';
-$this->phrasen['anwesenheitsliste/fehlerhafteParameteruebergabe']='Fehlerhafte Parameterübergabe. Bitte versuchen Sie es erneut';
+$this->phrasen['anwesenheitsliste/keineStudentenVorhanden']='There are currently no students in this degree program / semester';
+$this->phrasen['anwesenheitsliste/erstellenDerListeKlicken']='To create the list, please click on the diesired group!';
+$this->phrasen['anwesenheitsliste/gesamtliste']='Complete List';
+$this->phrasen['anwesenheitsliste/fehlerhafteParameteruebergabe']='Incorrect prameter transfer. Please try again.';
 ?>

@@ -116,59 +116,7 @@ $this->phrasen['global/dateiErfolgreichHochgeladen']='Die Datei wurde erfolgreic
 $this->phrasen['global/dateiNichtErfolgreichHochgeladen']='Die Datei wurde nicht erfolgreich hochgeladen. Bitte wiederholen Sie den Vorgang';
 $this->phrasen['global/FuerDieseAktionBenoetigenSieAdministrationsrechte']='Fuer diese Aktion benoetigen Sie Administratorenrechte';
 
-// LV - Plan
-$this->phrasen['global/lehrveranstaltungsplan']='Lehrveranstaltungsplan'; 
-$this->phrasen['global/persoenlicherLvPlan']='Ihr persönlicher Lehrveranstaltungsplan'; 
-$this->phrasen['global/stammdatenKontrollieren']='Hier können Sie Ihre Stammdaten kontrollieren'; 
-$this->phrasen['global/profil']='PROFIL'; 
-$this->phrasen['global/saalplan']='Saalplan'; 
-$this->phrasen['global/lektorenplan']='Lektorenplan'; 
-$this->phrasen['global/saalreservierung']='Saalreservierung'; 
-$this->phrasen['global/saal']='Saal'; 
-$this->phrasen['global/lektor']='Lektor'; 
-$this->phrasen['global/reservierungsliste']='Reservierungsliste';
-$this->phrasen['global/reservierungenLoeschen']='Reservierungen löschen';
-$this->phrasen['global/raumsuche']='Raumsuche';
-$this->phrasen['global/lehrverband']='Lehr-Verband'; 
-$this->phrasen['global/stg']='Stg'; 
-$this->phrasen['global/sem']='Sem'; 
-$this->phrasen['global/ver']='Ver'; 
-$this->phrasen['global/grp']='Grp'; 
-$this->phrasen['global/lehrverbaende']='Lehrverbände'; 
-$this->phrasen['global/uebersichtDerLehrverbaende']='Übersicht der Lehrverbände'; 
-$this->phrasen['global/fehlerUndFeedback']='Fehler und Feedback bitte an'; 
-$this->phrasen['global/lvKoordinationsstelle']='LV-Koordinationsstelle'; 
-$this->phrasen['global/reservierungen']='Reservierungen'; 
-$this->phrasen['global/reservierungWurdeGeloescht']='Reservierung wurde geloescht'; 
-$this->phrasen['global/alleReservierungenAnzeigen']='Alle Reservierungen anzeigen'; 
-$this->phrasen['global/alleReservierungen']='Alle Reservierungen'; 
-$this->phrasen['global/zurReservierung']='Zur Reservierung'; 
-$this->phrasen['global/raum']='Raum'; 
-$this->phrasen['global/raeume']='Räume'; 
-$this->phrasen['global/raumtyp']='Raumtyp'; 
-$this->phrasen['global/anzahlPersonen']='Anzahl Personen'; 
-$this->phrasen['global/datumAngeben']='Es muss ein Datum angegeben werden'; 
-$this->phrasen['global/vonZeitEingeben']='VON-Zeit muss eingegeben werden'; 
-$this->phrasen['global/bisZeitEingeben']='BIS-Zeit muss eingegeben werden'; 
-$this->phrasen['global/datumUngueltig']='Das angegebene Datum ist ungueltig! Bitte geben Sie das Datum im Format dd.mm.YYYY (31.12.2011) ein'; 
-$this->phrasen['global/rauminfoAnzeigen']='Rauminfo anzeigen';
-$this->phrasen['global/vonZeitFormat']='VON-Zeit muss im Format hh:mm (12:30) angegeben werden';
-$this->phrasen['global/bisZeitFormat']='BIS-Zeit muss im Format hh:mm (12:30) angegeben werden';
-$this->phrasen['global/eigeneReservierungen']='Eigene Reservierungen'; 
-$this->phrasen['global/wochenplan']='Wochenplan'; 
-$this->phrasen['global/raumExistiertNicht']='Dieser Ort existiert nicht';
-$this->phrasen['global/titelUndBeschreibungFehlt']='Eingabe Titel und Beschreibung fehlt'; 
-$this->phrasen['global/titelFehlt']='Eingabe Titel fehlt';
-$this->phrasen['global/beschreibungFehlt']='Eingabe Beschreibung fehlt';
-$this->phrasen['global/bereitsReserviert']='bereits reserviert';
-$this->phrasen['global/spezialgruppe']='Spezialgruppe';
-$this->phrasen['global/datumsbereichZuGross'] = 'Datumsbereich ist zu groß';
-$this->phrasen['global/springeZuKw']='Springe zu KW';
-$this->phrasen['global/home']='HOME';
-$this->phrasen['global/nichtVorhanden']='nicht vorhanden.';
-$this->phrasen['global/bitteWendenSieSichAn']='Bitte wenden Sie sich an den';
-
 //infrastruktur
-$this->phrasen['global/MACadresse']='MAC-Adresse';
+
 $this->phrasen['global/passwort']='Passwort';
 ?>
