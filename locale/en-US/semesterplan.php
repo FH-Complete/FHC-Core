@@ -1,19 +1,19 @@
 <?php 
-$this->phrasen['semesterplan/fehlerBeiDerParameteruebergabe']='Fehler bei der Parameteruebergabe';
-$this->phrasen['semesterplan/fehlerBeimLadenDerLv']='Fehler beim Laden der Lehrveranstaltung';
+$this->phrasen['semesterplan/fehlerBeiDerParameteruebergabe']='Error in the parameter transfer';
+$this->phrasen['semesterplan/fehlerBeimLadenDerLv']='Error loading the course';
 $this->phrasen['semesterplan/fehlerBeimLadenDesStudienganges']='Fehler beim Laden des Studienganges';
-$this->phrasen['semesterplan/ordnerinhalt']='Ordnerinhalt';
-$this->phrasen['semesterplan/dateiKonnteNichtGefundenWerden']='Die Datei %s%s konnte nicht gefunden werden';
-$this->phrasen['semesterplan/bitteZuerstDateiAuswaehlen']='Bitte zuerst eine Datei auswählen';
-$this->phrasen['semesterplan/fileErfolgreichHochgeladen']='Das File wurde erfolgreich hochgeladen';
+$this->phrasen['semesterplan/ordnerinhalt']='Content of the folder';
+$this->phrasen['semesterplan/dateiKonnteNichtGefundenWerden']='The file %s%s could not be found';
+$this->phrasen['semesterplan/bitteZuerstDateiAuswaehlen']='Please select a file first';
+$this->phrasen['semesterplan/fileErfolgreichHochgeladen']='The file was uploaded successfully';
 $this->phrasen['semesterplan/fehlerBeimUpload']='Fehler beim Upload! Bitte Versuchen Sie es erneut';
-$this->phrasen['semesterplan/dateitypIstNichtErlaubt']='Dieser Dateityp ist nicht erlaubt';
-$this->phrasen['semesterplan/dateinameNurBuchstaben']='Der Dateiname darf nur Buchstaben und Zahlen enthalten';
-$this->phrasen['semesterplan/speichernSieDieVorlage']='Speichern Sie die Vorlage (html oder doc - Version) auf Ihrem Computer';
-$this->phrasen['semesterplan/oeffnenSieDieGespeicherteDatei']='Öffnen Sie die gespeicherte Datei mit ihrem Textverarbeitungsprogramm (MS Word, OpenOffice ...) bzw die html-Vorlage auch mit einem geeigneten Editor';
-$this->phrasen['semesterplan/erstellenSieIhrenSemesterplan']='Erstellen Sie Ihren Semesterplan';
-$this->phrasen['semesterplan/speichernSieDasDokument']='Speichern Sie das Dokument als "Webseite" mit dem Namen "index.html"';
-$this->phrasen['semesterplan/inMSWord']='(In MS Word: "Datei" -> "Speichern unter" -> Dateiname: index.html, Dateityp: Webseite )';
-$this->phrasen['semesterplan/ladenSieDieDateiHoch']='Laden Sie diese Datei nun über den "Upload"-Knopf hoch.';
+$this->phrasen['semesterplan/dateitypIstNichtErlaubt']='This file type is not allowed';
+$this->phrasen['semesterplan/dateinameNurBuchstaben']='The file name may only contain letters and numbers';
+$this->phrasen['semesterplan/speichernSieDieVorlage']='Save the template (html or doc - version) to your computer';
+$this->phrasen['semesterplan/oeffnenSieDieGespeicherteDatei']='Open the saved file with your word processing program (MS Word, OpenOffice ...) or the html-template with a suitable editor';
+$this->phrasen['semesterplan/erstellenSieIhrenSemesterplan']='Create your semester schedule';
+$this->phrasen['semesterplan/speichernSieDasDokument']='Save the document as a “Web Page” with the name “index.html”';
+$this->phrasen['semesterplan/inMSWord']='(In MS Word: “File” -> “Save As” -> File name: index.html, Save as type: Web Page)';
+$this->phrasen['semesterplan/ladenSieDieDateiHoch']='Now upload this file with the “Upload” button.';
 $this->phrasen['semesterplan/fertig']='Finished';
 ?>

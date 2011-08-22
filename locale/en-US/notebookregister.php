@@ -10,4 +10,5 @@ $this->phrasen['notebookregister/MACadresseErfolgreichEingetragen']='The MAC add
 $this->phrasen['notebookregister/MACadresseErfolgreichGeaendert']='The MAC address has been changed successfully';
 $this->phrasen['notebookregister/MACadresseFehlerhaft']='The specified MAC address is incorrect';
 $this->phrasen['notebookregister/MACadresseNichtFreigeschalten']='You can not register your MAC address. You do not have registration privileges';
+$this->phrasen['notebookregister/MACadresse']='MAC-Adress';
 ?>
