@@ -89,7 +89,7 @@ class mantis extends basis_db
 	// Ticket holen
 	public function getIssue()
 	{
-		$params=array('username' => 'pam', 'password' => 'jfie02','issue_id' => 1);
+		$params=array('username' => 'pam', 'password' => '','issue_id' => 1);
 		$result = $this->soapClient->__soapCall('mc_issue_get',$params);
 		
 		$this->issue_id = $result->id;			
