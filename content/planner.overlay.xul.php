@@ -102,7 +102,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
 		<tabs orient="horizontal">
 			<tab id="tab-projekt" label="Projekte" />
 			<tab id="tab-projektphase" label="Phasen" />
-			<tab id="tab-projekttask" label="Tasks" />
+			<tab id="tab-projekttask" label="Tasks" selected="true" />
 			<tab id="tab-ressource" label="Ressourcen" />
 			<tab id="tab-notiz" label="Notizen" />
 			<tab id="tab-dokumente" label="Dokumente" />
