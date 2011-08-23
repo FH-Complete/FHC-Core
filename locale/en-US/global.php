@@ -37,6 +37,7 @@ $this->phrasen['global/aendern']='Change';
 $this->phrasen['global/kopieren']='Copy';
 $this->phrasen['global/ja']='Yes';
 $this->phrasen['global/nein']='No';
+$this->phrasen['global/download']='Download';
 
 $this->phrasen['global/username']='Username';
 $this->phrasen['global/vorname']='First Name';
@@ -106,6 +107,7 @@ $this->phrasen['global/fehlerBeimLesenAusDatenbank']='Error reading from databas
 $this->phrasen['global/userNichtGefunden']='No user found'; 
 $this->phrasen['global/datumNichtGesetzt']='Date is missing';
 $this->phrasen['global/studiensemesterKonnteNichtGefundenWerden'] = 'No semester found';
+$this->phrasen['global/studiengangKonnteNichtGefundenWerden'] = 'Program not found';
 $this->phrasen['global/fehlerBeimErmittelnDerUID'] = 'Error finding the UID';
 $this->phrasen['global/nichtAngemeldet'] = 'You are not logged in. No UID found';
 $this->phrasen['global/LDAPserverNichtErreichbar']='Error connecting to LDAP-Server'; 
@@ -115,6 +117,7 @@ $this->phrasen['global/warnungWirklichLoeschen']='Do you want to delete this rec
 $this->phrasen['global/dateiErfolgreichHochgeladen']='File successfully uploaded';
 $this->phrasen['global/dateiNichtErfolgreichHochgeladen']='Failed to upload File. Please retry';
 $this->phrasen['global/FuerDieseAktionBenoetigenSieAdministrationsrechte']='You must be Administrator.';
+$this->phrasen['global/dateiExistiertNicht']='File not found';
 
 //infrastruktur
 

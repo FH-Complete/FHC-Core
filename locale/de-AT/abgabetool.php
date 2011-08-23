@@ -47,7 +47,8 @@ $this->phrasen['abgabetool/emailAnBetreuer']='Email an Betreuer schreiben';
 $this->phrasen['abgabetool/dateiupload']='Dateiupload';
 $this->phrasen['abgabetool/nurPDF']='nur PDF';
 $this->phrasen['abgabetool/terminVorbei']='Termin vorbei';
-
+$this->phrasen['abgabetool/projektabgabeUebersicht']='Projektabgabe - Übersicht';
+$this->phrasen['abgabetool/termin']='Termin';
 
 $this->phrasen['abgabetool/keineTermineVorhanden']='Derzeit sind keine Termine vorhanden';
 $this->phrasen['abgabetool/TeminVorhanden']='Dieser Termin ist bereits vorhanden';

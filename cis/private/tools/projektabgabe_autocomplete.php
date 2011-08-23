@@ -31,18 +31,18 @@
 	header( 'Pragma: no-cache' );
 	header('Content-Type: text/html;charset=UTF-8');
 
-// ---------------- Vilesci Include Dateien einbinden
 	require_once('../../../config/cis.config.inc.php');
-	include_once('../../../include/basis_db.class.php');
-	require_once('../../../include/benutzerberechtigung.class.php');	
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung
-// ------------------------------------------------------------------------------------------
-
+	require_once('../../../include/basis_db.class.php');
+	require_once('../../../include/benutzerberechtigung.class.php');
+	require_once('../../../include/functions.inc.php');	
+	require_once('../../../include/phrasen.class.php');
+	
+	$sprache = getSprache();
+	$p = new phrasen($sprache);
+	
 	if (!$db = new basis_db())
-		die('Datenbank kann nicht geoeffnet werden.  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-		
-  	require_once('../../../include/functions.inc.php');
+		die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
+	
 	if (!$uid = get_uid())
 		die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
 
@@ -50,7 +50,7 @@
 	$rechte->getBerechtigungen($uid);	
 	$berechtigung_kurzbz = 'lehre/abgabetool:download';
 	if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt($berechtigung_kurzbz))
-		die('Sie haben hierzu keine Berechtigung !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+		die($p->t('global/fehlerBeimErmittelnDerUID'));
 		
 // ------------------------------------------------------------------------------------------
 // Initialisierung
@@ -95,9 +95,9 @@ cellSeparator (default value: "|")
 							AND lehre.tbl_projektarbeit.note IS NULL 
 						";
 			if ($stg_kz!='')
-				$qry.=" AND public.tbl_studiengang.studiengang_kz='$stg_kz'";
+				$qry.=" AND public.tbl_studiengang.studiengang_kz='".addslashes($stg_kz)."'";
 			if ($abgabetyp!='')
-				$qry.=" AND campus.tbl_paabgabe.paabgabetyp_kurzbz='$abgabetyp'";
+				$qry.=" AND campus.tbl_paabgabe.paabgabetyp_kurzbz='".addslashes($abgabetyp)."'";
 			$qry.=" ORDER BY termin desc";	
 				
 			$pArt='';
@@ -110,6 +110,7 @@ cellSeparator (default value: "|")
 			$pLimit='';
 			$pSql=$qry;
 			$json=array();	
+			array_push($json, array ('oTermin' => '','oTerminAnzeige' => '-'.$p->t('global/alle').'-' ));
 			if (!$oRresult=$db->SQL($pArt,$pDistinct,$pFields,$pTable,$pWhere,$pOrder,$pLimit,$pSql))
 			{
 				array_push($json, array ('oTermin' => '','oTerminAnzeige' => $db->errormsg ));
