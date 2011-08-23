@@ -37,6 +37,7 @@ $this->phrasen['global/aendern']='Ändern';
 $this->phrasen['global/kopieren']='Kopieren';
 $this->phrasen['global/ja']='Ja';
 $this->phrasen['global/nein']='Nein';
+$this->phrasen['global/download']='Download';
 
 $this->phrasen['global/username']='Username';
 $this->phrasen['global/vorname']='Vorname';
@@ -106,6 +107,7 @@ $this->phrasen['global/fehlerBeimLesenAusDatenbank']='Fehler beim Lesen aus der 
 $this->phrasen['global/userNichtGefunden']='Es wurde kein User gefunden'; 
 $this->phrasen['global/datumNichtGesetzt']='Datum ist nicht gesetzt';
 $this->phrasen['global/studiensemesterKonnteNichtGefundenWerden'] = 'Studiensemester konnte nicht gefunden werden';
+$this->phrasen['global/studiengangKonnteNichtGefundenWerden'] = 'Studiengang konnte nicht gefunden werden';
 $this->phrasen['global/fehlerBeimErmittelnDerUID'] = 'Fehler beim ermitteln der UID';
 $this->phrasen['global/nichtAngemeldet'] = 'Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden';
 $this->phrasen['global/LDAPserverNichtErreichbar']='Der LDAP-Server ist nicht erreichbar';
@@ -115,6 +117,7 @@ $this->phrasen['global/warnungWirklichLoeschen']='Wollen Sie diesen Datensatz wi
 $this->phrasen['global/dateiErfolgreichHochgeladen']='Die Datei wurde erfolgreich hochgeladen';
 $this->phrasen['global/dateiNichtErfolgreichHochgeladen']='Die Datei wurde nicht erfolgreich hochgeladen. Bitte wiederholen Sie den Vorgang';
 $this->phrasen['global/FuerDieseAktionBenoetigenSieAdministrationsrechte']='Fuer diese Aktion benoetigen Sie Administratorenrechte';
+$this->phrasen['global/dateiExistiertNicht']='Die Datei existiert nicht';
 
 //infrastruktur
 

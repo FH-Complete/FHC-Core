@@ -27,18 +27,20 @@
  *******************************************************************************************************/
 
 require_once('../../../config/cis.config.inc.php');
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung 
-// ------------------------------------------------------------------------------------------
-		
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/studiengang.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/mail.class.php');
-	if (!$db = new basis_db())
-		$db=false;
+require_once('../../../include/phrasen.class.php');
+
+$sprache = getSprache();
+$p = new phrasen($sprache);
+
+if (!$db = new basis_db())
+	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
+
 $aktion='';
 if(isset($_REQUEST['aktion']))
 {
@@ -64,7 +66,7 @@ if(isset($_GET['id']) && isset($_GET['uid']))
 	if($rechte->isBerechtigt($berechtigung_kurzbz))
 	{
 		if(!is_numeric($_GET['id']) || $_GET['id']=='')
-			die('Fehler bei Parameteruebergabe');
+			die($p->t('global/fehlerBeiDerParameteruebergabe'));
 		
 		$file = $_GET['id'].'_'.$_GET['uid'].'.pdf';
 		$filename = PAABGABE_PATH.$file;
@@ -74,7 +76,7 @@ if(isset($_GET['id']) && isset($_GET['uid']))
 	}
 	else 
 	{
-		die("Sie haben hierzu keine Berechtigung!");
+		die($p->t('global/keineBerechtigungFuerDieseSeite'));
 	}
 	exit();
 }
@@ -82,11 +84,11 @@ if(isset($_GET['id']) && isset($_GET['uid']))
 
 if($aktion!='zip')
 {
-	?>
+	echo '
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 	<html>
 	<head>
-		<title>Projektabgabe</title>
+		<title>'.$p->t('abgabetool/projektabgabeUebersicht').'</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 		<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
@@ -103,18 +105,17 @@ if($aktion!='zip')
 	    <td>
 	    	<table class="tabcontent">
 		      <tr>
-		        <td class="ContentHeader"><font class="ContentHeader">Projektabgabe - &Uuml;bersicht</font></td>
+		        <td class="ContentHeader"><font class="ContentHeader">'.$p->t('abgabetool/projektabgabeUebersicht').'</font></td>
 		      </tr>
 		    </table>
-		    <br>
-	<?php 
+		    <br>';
 	
 	$s = new studiengang();
 	$s->loadArray($rechte->getStgKz($berechtigung_kurzbz),'typ,kurzbz');
 		
 	echo'<form method="GET" action="'.$_SERVER['PHP_SELF'].'" name="abgabeFrm">';
 
-	echo " Studiengang: <SELECT onchange='set_termin();' id='stg_kz' name='stg_kz'>";
+	echo $p->t('global/studiengang').": <SELECT onchange='set_termin();' id='stg_kz' name='stg_kz'>";
 	echo '<option value="" '. (!isset($_REQUEST['stg_kz']) || empty($stg_kz)?' selected ':'') .'>-</option>';
 	foreach ($s->result as $stg)
 	{
@@ -123,7 +124,7 @@ if($aktion!='zip')
 	echo "</SELECT><input type=hidden name=aktion value=\"\">";
 
 
-	echo "   Abgabetyp: <SELECT onchange='set_termin();' id='abgabetyp' name='abgabetyp'>";
+	echo $p->t('abgabetool/abgabetyp').": <SELECT onchange='set_termin();' id='abgabetyp' name='abgabetyp'>";
 	$qry_atyp="SELECT * FROM campus.tbl_paabgabetyp";
 	echo '<option value="" '.(!isset($_REQUEST['abgabetyp']) || empty($abgabetyp)?' selected ':'').'>-</option>';
 	if($result_atyp=$db->db_query($qry_atyp))
@@ -155,8 +156,8 @@ if($aktion!='zip')
 			$qry_termin.=" ORDER BY termin desc";	
 
 	
-	echo '&nbsp;Termin&nbsp;<select name="termin" id="termin">
-				<option value=""  '. (!isset($_REQUEST['termin']) || empty($termin)?' selected ':'') .'>-</option> ';
+	echo '&nbsp;'.$p->t('abgabetool/termin').'&nbsp;<select name="termin" id="termin">
+				<option value=""  '. (!isset($_REQUEST['termin']) || empty($termin)?' selected ':'') .'>-'.$p->t('global/alle').'-</option> ';
 	if($result_termin=$db->db_query($qry_termin))
 	{
 		while($row_termin=$db->db_fetch_object($result_termin))
@@ -193,7 +194,7 @@ if($aktion!='zip')
 						}
 					</script>	
 <?php
-	echo "&nbsp;<INPUT type='submit' name='ok' value='OK' onclick=\"f=document.abgabeFrm;f.aktion.value='';\">&nbsp;<INPUT type='button' value='ZIP' onclick=\"f=document.abgabeFrm;f.aktion.value='zip';f.submit();\"></FORM><br>";
+	echo "&nbsp;<INPUT type='submit' name='ok' value='".$p->t('global/anzeigen')."' onclick=\"f=document.abgabeFrm;f.aktion.value='';\">&nbsp;<INPUT type='button' value='ZIP' onclick=\"f=document.abgabeFrm;f.aktion.value='zip';f.submit();\"></FORM><br>";
 	}
 	
 ##if($stg_kz!='' || $abgabetyp!='' || $termin!='')
@@ -204,7 +205,7 @@ if(isset($_REQUEST['ok']) || (isset($_REQUEST['aktion']) && $_REQUEST['aktion']=
 	$s=new studiengang();
 	if($stg_kz!='' && !$s->load($stg_kz))
 	{
-		die("Studiengang konnte nicht geladen werden!");
+		die($p->t('global/studiengangKonnteNichtGefundenWerden'));
 	}
 	
 	if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt($berechtigung_kurzbz, $s->oe_kurzbz))
@@ -225,11 +226,11 @@ if(isset($_REQUEST['ok']) || (isset($_REQUEST['aktion']) && $_REQUEST['aktion']=
 			//AND public.tbl_benutzer.aktiv
 			//AND lehre.tbl_projektarbeit.note IS NULL
 			if ($stg_kz!='')
-				$qry.=" AND public.tbl_studiengang.studiengang_kz='$stg_kz'";
+				$qry.=" AND public.tbl_studiengang.studiengang_kz='".addslashes($stg_kz)."'";
 			if ($abgabetyp!='')
-				$qry.=" AND campus.tbl_paabgabe.paabgabetyp_kurzbz='$abgabetyp'";
+				$qry.=" AND campus.tbl_paabgabe.paabgabetyp_kurzbz='".addslashes($abgabetyp)."'";
 			if ($termin!='')
-				$qry.=" AND campus.tbl_paabgabe.datum='$termin'";
+				$qry.=" AND campus.tbl_paabgabe.datum='".addslashes($termin)."'";
 		$qry.=" ORDER BY nachname  ";
 ##		$qry.=" ORDER BY tbl_projektarbeit.projektarbeit_id desc) as xy ";		
 ##		$qry.=" ORDER BY nachname";	
@@ -246,11 +247,14 @@ if(isset($_REQUEST['ok']) || (isset($_REQUEST['aktion']) && $_REQUEST['aktion']=
 		{
 			$htmlstr .= "<table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe' border=1>\n";
 			$htmlstr .= "<thead><tr class='liste'>\n";
-			$htmlstr .= "<th>download</th><th>Termin</th><th>Abgabetyp</th><th class='table-sortable:default'>UID</th>
-						<th class='table-sortable:default'>Vorname</th>
-						<th class='table-sortable:alphanumeric'>Nachname</th>";
-			$htmlstr .= "<th class='table-sortable:default'>Typ</th>
-						<th>Titel</th>";
+			$htmlstr .= "<th>".$p->t('global/download')."</th>
+						<th>".$p->t('abgabetool/termin')."</th>
+						<th>".$p->t('abgabetool/abgabetyp')."</th>
+						<th class='table-sortable:default'>".$p->t('global/uid')."</th>
+						<th class='table-sortable:default'>".$p->t('global/vorname')."</th>
+						<th class='table-sortable:alphanumeric'>".$p->t('global/nachname')."</th>";
+			$htmlstr .= "<th class='table-sortable:default'>".$p->t('abgabetool/typ')."</th>
+						<th>".$p->t('abgabetool/titel')."</th>";
 			$htmlstr .= "</tr></thead><tbody>\n";
 			$i = 0;
 			while($row=$db->db_fetch_object($erg))
@@ -289,7 +293,7 @@ if(isset($_REQUEST['ok']) || (isset($_REQUEST['aktion']) && $_REQUEST['aktion']=
 	} 
 	else 
 	{
-		die("Keine Zugriffsberechtigung!");
+		die($p->t('global/keineBerechtigungFuerDieseSeite'));
 	}
 }
 
@@ -324,7 +328,7 @@ else
 	}
 	else 
 	{
-		echo "<br>Fehler bei der Dateierstellung!";
+		echo $p->t('global/dateiExistiertNicht');
 	}
 }
 ?>
