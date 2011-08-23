@@ -338,6 +338,39 @@ function onselectProjekttask()
 	document.getElementById('textbox-projekttask-detail-beschreibung').value=beschreibung;
 	document.getElementById('textbox-projekttask-detail-aufwand').value=aufwand;
 	document.getElementById('textbox-projekttask-detail-mantis_id').value=mantis_id;
+        // Mantis Tab reset
+        document.getElementById('textbox-projekttask-mantis-mantis_id').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_summary').value=bezeichnung;
+        document.getElementById('textbox-projekttask-mantis-issue_description').value=beschreibung;
+        document.getElementById('textbox-projekttask-mantis-issue_view_state_id').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_view_state_name').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_last_updated').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_project_id').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_project_name').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_category').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_priority_id').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_priority_name').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_severity_id').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_severity_name').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_status_id').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_status_name').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_reporter_id').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_reporter_name').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_reporter_real_name').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_reporter_email').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_reproducibility_id').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_reproducibility_name').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_date_submitted').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_sponsorship_total').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_projection_id').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_projection_name').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_eta_id').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_eta_name').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_resolution_id').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_resolution_name').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_attachments').value='';
+        document.getElementById('textbox-projekttask-mantis-issue_due_date').value='';
+            
         
         // ---------------------------------------------------------------------------------------------
         // Mantis
