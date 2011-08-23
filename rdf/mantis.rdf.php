@@ -55,6 +55,34 @@ $mantis->getIssue($issue_id);
 		    <MANTIS:issue_id><?php echo $mantis->issue_id;  ?></MANTIS:issue_id>
 		    <MANTIS:issue_summary><?php echo $mantis->issue_summary;  ?></MANTIS:issue_summary>
 		    <MANTIS:issue_description><?php echo $mantis->issue_description;  ?></MANTIS:issue_description>
+		    <MANTIS:issue_view_state_id><?php echo $mantis->issue_view_state->id;  ?></MANTIS:issue_view_state_id>
+		    <MANTIS:issue_view_state_name><?php echo $mantis->issue_view_state->name;  ?></MANTIS:issue_view_state_name>
+		    <MANTIS:issue_last_updated><?php echo $mantis->issue_last_updated;  ?></MANTIS:issue_last_updated>
+		    <MANTIS:issue_project_id><?php echo $mantis->issue_project->id;  ?></MANTIS:issue_project_id>
+		    <MANTIS:issue_project_name><?php echo $mantis->issue_project->name;  ?></MANTIS:issue_project_name>
+		    <MANTIS:issue_category><?php echo $mantis->issue_category;  ?></MANTIS:issue_category>
+		    <MANTIS:issue_priority_id><?php echo $mantis->issue_priority->id;  ?></MANTIS:issue_priority_id>
+		    <MANTIS:issue_priority_name><?php echo $mantis->issue_priority->name;  ?></MANTIS:issue_priority_name>
+		    <MANTIS:issue_severity_id><?php echo $mantis->issue_severity->id;  ?></MANTIS:issue_severity_id>
+		    <MANTIS:issue_severity_name><?php echo $mantis->issue_severity->name;  ?></MANTIS:issue_severity_name>
+		    <MANTIS:issue_status_id><?php echo $mantis->issue_status->id;  ?></MANTIS:issue_status_id>
+		    <MANTIS:issue_status_name><?php echo $mantis->issue_status->name;  ?></MANTIS:issue_status_name>
+		    <MANTIS:issue_reporter_id><?php echo $mantis->issue_reporter->id;  ?></MANTIS:issue_reporter_id>
+		    <MANTIS:issue_reporter_name><?php echo $mantis->issue_reporter->name;  ?></MANTIS:issue_reporter_name>
+		    <MANTIS:issue_reporter_real_name><?php echo $mantis->issue_reporter->real_name;  ?></MANTIS:issue_reporter_real_name>
+		    <MANTIS:issue_reporter_email><?php echo $mantis->issue_reporter->email;  ?></MANTIS:issue_reporter_email>
+		    <MANTIS:issue_reproducibility_id><?php echo $mantis->issue_reproducibility->id;  ?></MANTIS:issue_reproducibility_id>
+		    <MANTIS:issue_reproducibility_name><?php echo $mantis->issue_reproducibility->name;  ?></MANTIS:issue_reproducibility_name>
+		    <MANTIS:issue_date_submitted><?php echo $mantis->issue_date_submitted;  ?></MANTIS:issue_date_submitted>
+		    <MANTIS:issue_sponsorship_total><?php echo $mantis->issue_sponsorship_total;  ?></MANTIS:issue_sponsorship_total>
+		    <MANTIS:issue_projection_id><?php echo $mantis->issue_projection->id;  ?></MANTIS:issue_projection_id>
+		    <MANTIS:issue_projection_name><?php echo $mantis->issue_projection->name;  ?></MANTIS:issue_projection_name>
+		    <MANTIS:issue_eta_id><?php echo $mantis->issue_eta->id;  ?></MANTIS:issue_eta_id>
+		    <MANTIS:issue_eta_name><?php echo $mantis->issue_eta->name;  ?></MANTIS:issue_eta_name>
+		    <MANTIS:issue_resolution_id><?php echo $mantis->issue_resolution->id;  ?></MANTIS:issue_resolution_id>
+		    <MANTIS:issue_resolution_name><?php echo $mantis->issue_resolution->name;  ?></MANTIS:issue_resolution_name>
+		    <MANTIS:issue_attachments><?php echo $mantis->issue_attachments;  ?></MANTIS:issue_attachments>
+		    <MANTIS:issue_due_date><?php echo $mantis->issue_due_date;  ?></MANTIS:issue_due_date>
 	    </RDF:Description>
 	</RDF:li>
     </RDF:Seq>
