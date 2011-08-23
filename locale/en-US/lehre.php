@@ -14,7 +14,7 @@ $this->phrasen['lehre/upload']='Upload';
 $this->phrasen['lehre/ziparchiv']='Zip-File';
 $this->phrasen['lehre/ziparchivTitle']='Download all Files as Zip-File';
 $this->phrasen['lehre/anwesenheitsUndNotenlisten']='Attendance and grade list';
-$this->phrasen['lehre/leistungsuebersicht']='Leistungsübersicht'; //@ToDo
+$this->phrasen['lehre/leistungsuebersicht']='Performance List';
 $this->phrasen['lehre/newsgroups']='Newsgroups';
 $this->phrasen['lehre/feedback']='Feedback';
 

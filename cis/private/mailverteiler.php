@@ -190,7 +190,7 @@ if(!$is_lector)
 		    echo "<table class='tabcontent2' id='hide".$row->kuerzel."' >";
 		    echo '<tr onClick="hide_layer(\'hide'.$row->kuerzel.'\');show_layer(\'show'.$row->kuerzel.'\');">';
 		  	echo "   <td width=\"420\" class=\"ContentHeader2\"><img src='../../skin/images/bullet_arrow_right.png' title='".$p->t('mailverteiler/anzeigen')."' alt='".$p->t('mailverteiler/anzeigen')."' border='0'>&nbsp;";
-		    echo "   $row->kuerzel - $row->bezeichnung<a name=\"$row->studiengang_kz\">&nbsp;</a></td>";
+		    echo "   $row->kuerzel - ".$row->bezeichnung_arr[$sprache]."<a name=\"$row->studiengang_kz\">&nbsp;</a></td>";
 		    echo "   <td width=\"23\" class=\"ContentHeader2\">&nbsp;</td>";
 		    echo "   <td width=\"300\" class=\"ContentHeader2\">&nbsp;</td>";
 			echo "   <td width=\"100\" class=\"ContentHeader2\" align=\"right\"><a class=\"Item2\" href=\"mailverteiler.php#\">top&nbsp;</a></td>";
@@ -202,7 +202,7 @@ if(!$is_lector)
 		    echo '<tr  onClick="show_layer(\'hide'.$row->kuerzel.'\');hide_layer(\'show'.$row->kuerzel.'\');">';
 		
 		  	echo "   <td width=\"420\" class=\"ContentHeader2\"><img src='../../skin/images/bullet_arrow_down.png' title='".$p->t('mailverteiler/ausblenden')."' alt='".$p->t('mailverteiler/ausblenden')."' border='0'>&nbsp;";
-		    echo "   $row->kuerzel - $row->bezeichnung<a name=\"$row->studiengang_kz\">&nbsp;</a></td>";
+		    echo "   $row->kuerzel - ".$row->bezeichnung_arr[$sprache]."<a name=\"$row->studiengang_kz\">&nbsp;</a></td>";
 		    echo "   <td width=\"23\" class=\"ContentHeader2\">&nbsp;</td>";
 		    echo "   <td width=\"300\" class=\"ContentHeader2\">&nbsp;</td>";
 			echo "   <td width=\"100\" class=\"ContentHeader2\" align=\"right\"><a class=\"Item2\" href=\"mailverteiler.php#\">top&nbsp;</a></td>";
@@ -343,16 +343,16 @@ if(!$is_lector)
 				  				$param = "kz=".$row->studiengang_kz."&amp;sem=".$row1->semester;
 				  				$strhelp = mb_strtolower($row->kuerzel.trim($row1->semester).trim($row1->verband).trim($row1->gruppe));
 								echo "<tr ".$class.">\n";
-								echo "  <td width=\"420\">&nbsp;&nbsp;&nbsp;&#8226; ".$p->t('global/semster')." $row1->semester";
+								echo "  <td width=\"420\">&nbsp;&nbsp;&nbsp;&#8226; ".$p->t('global/semester')." $row1->semester";
 						  		if(trim($row1->verband)!='')
 						  		{
 						  			$param .="&amp;verband=$row1->verband";
-						  			echo " Verband $row1->verband";
+						  			echo ' '.$p->t('global/verband')." $row1->verband";
 						  		}
 						  		if(trim($row1->gruppe)!='')
 						  		{
 									$param .="&amp;grp=$row1->gruppe";
-						  			echo " Gruppe $row1->gruppe";
+						  			echo ' '.$p->t('global/gruppe')." $row1->gruppe";
 						  		}
 					  			echo "</td>";
 					  			echo "  <td width='23'></td>";
