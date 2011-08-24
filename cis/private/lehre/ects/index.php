@@ -377,8 +377,8 @@ if (!$db = new basis_db())
 	$output .= "<ul>";
 	$output .= "<li>&nbsp;<a class='Item' href='index.php?stg=$stg&sem=$sem&lv=$lv'><font size='3'>".$p->t('global/bearbeiten')."</font></a></li>";
 	$output .= "<li>&nbsp;<a class='Item' href='freigabe.php?stg=$stg&sem=$sem&lv=$lv'><font size='3'>".$p->t('courseInformation/freigabe')."</font></a></li>";
-	$output .= "<li>&nbsp;<a class='Item' href='beispiele.html'><font size='3'>".$p->t('global/beispiele')."</font></a></li>";
-	$output .= "<li>&nbsp;<a class='Item' href='terminologie.html'><font size='3'>".$p->t('courseInformation/terminologie')."</font></a></li>";
+	$output .= "<li>&nbsp;<a class='Item' href='beispiele.php'><font size='3'>".$p->t('global/beispiele')."</font></a></li>";
+	$output .= "<li>&nbsp;<a class='Item' href='terminologie.php'><font size='3'>".$p->t('courseInformation/terminologie')."</font></a></li>";
 	$output .= "</ul>";
 	$output .= "</td></tr></table>";
 
