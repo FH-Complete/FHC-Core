@@ -151,7 +151,7 @@ if(!$person->load($uid))
 	      <tr>
 			<td class="ContentHeader" width="95%"><font class="ContentHeader">&nbsp;<?php echo $p->t('zeitwunsch/zeitwunsch');?></font></td>
 			<td class="ContentHeader" align="right">
-				<A onclick="window.open('zeitwunsch_help.html','Hilfe', 'height=320,width=480,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');" class="hilfe" target="_blank">
+				<A onclick="window.open('zeitwunsch_help.php','Hilfe', 'height=320,width=480,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');" class="hilfe" target="_blank">
 				<font class="ContentHeader">
 				<?php echo $p->t('zeitwunsch/help')?>&nbsp;
 				</font>
