@@ -131,13 +131,13 @@ if(!check_lektor($user))
 				if($db->db_query($qry))
 					WriteLog($qry,$user);
 				else
-					echo "Fehler beim Datenbankzugriff";
+					echo $p->t('global/fehlerBeimLesenAusDatenbank');
 			}
 			else
-				echo "Fehler beim Datenbankzugriff";
+				echo $p->t('global/fehlerBeimLesenAusDatenbank');
 		}
 		else
-			echo "Fehler beim Datenbankzugriff";
+			echo $p->t('global/fehlerBeimLesenAusDatenbank');
 	}
 
 ?>
@@ -173,8 +173,8 @@ function ask() {
 								<ul>
 								<li>&nbsp;<a href='index.php?<?php echo "stg=$stg&sem=".(isset($sem)?$sem:'')."&lv=$lv"?>'><font size='3'><?php echo $p->t('global/bearbeiten');?></font></a></li>
 								<li>&nbsp;<a href='freigabe.php?<?php echo "stg=$stg&sem=".(isset($sem)?$sem:'')."&lv=$lv"?>'><font size='3'><?php echo $p->t('courseInformation/freigabe');?></font></a></li>
-								<li>&nbsp;<a href='beispiele.html'><font size='3'><?php echo $p->t('global/beispiele');?></font></a></li>
-								<li>&nbsp;<a href='terminologie.html'><font size='3'><?php echo $p->t('courseInformation/terminologie');?></font></a></li>
+								<li>&nbsp;<a href='beispiele.php'><font size='3'><?php echo $p->t('global/beispiele');?></font></a></li>
+								<li>&nbsp;<a href='terminologie.php'><font size='3'><?php echo $p->t('courseInformation/terminologie');?></font></a></li>
 				 				</ul>
 							</td>
 			          </tr>
@@ -196,7 +196,7 @@ function ask() {
        			AND tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz
        			ORDER by kurzbzlang";
        if(!$result=$db->db_query($qry))
-          die ('<center>Fehler bei einer Datenbankabfrage</center>');
+          die ('<center>'.$p->t('global/fehlerBeimLesenAusDatenbank').'</center>');
 
        echo $p->t('global/studiengang')."   <SELECT name='stg' onChange='javascript:window.document.auswFrm.status.value=\"changestg\";window.document.auswFrm.submit();'>";
        //$firststg;
