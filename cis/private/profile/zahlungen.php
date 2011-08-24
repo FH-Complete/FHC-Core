@@ -28,7 +28,10 @@
 	require_once('../../../include/benutzer.class.php');
 	require_once('../../../include/datum.class.php');
 	require_once('../../../include/studiengang.class.php');
-
+	require_once('../../../include/phrasen.class.php');
+	
+	$sprache = getSprache();
+	$p = new phrasen($sprache);
 	$uid=get_uid();
 	$datum_obj = new datum();
 
@@ -36,10 +39,10 @@
 			<html>
 			<head>
 				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-				<title>Zahlungen</title>
+				<title>'.$p->t('tools/zahlungen').'</title>
 				<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 			</head>
-			<body id="inhalt">';
+			<body>';
 
 	$studiengang = new studiengang();
 	$studiengang->getAll();
@@ -52,15 +55,7 @@
 	if(!$benutzer->load($uid))
 		die('Benutzer wurde nicht gefunden');
 	
-	echo '<table class="tabcontent">
-  			<tr>
-    			<td class="tdwidth10">&nbsp;</td>
-    			<td>
-    				<table class="tabcontent">
-	      				<tr>
-	        				<td width ="690" class="ContentHeader"><font class="ContentHeader">Zahlungen von '.$benutzer->vorname.' '.$benutzer->nachname.'</font></td>
-	      				</tr>
-	      			</table>';
+	echo '<h1>'.$p->t('tools/zahlungen').' - '.$benutzer->vorname.' '.$benutzer->nachname.'</h1>';
 		
 	$konto = new konto();
 	$konto->getBuchungstyp();
@@ -75,7 +70,14 @@
 	{
 		echo '<br><br><table>';
 		echo '<tr class="liste">';
-		echo '<td>Datum</td><td>Typ</td><td>Stg</td><td>Studiensemester</td><td>Buchungstext</td><td>Betrag</td><td>Zahlungsbestätigung</td>';
+		echo '
+			<td>'.$p->t('global/datum').'</td>
+			<td>'.$p->t('tools/zahlungstyp').'</td>
+			<td>'.$p->t('lvplan/stg').'</td>
+			<td>'.$p->t('global/studiensemester').'</td>
+			<td>'.$p->t('tools/buchungstext').'</td>
+			<td>'.$p->t('tools/betrag').'</td>
+			<td>'.$p->t('tools/zahlungsbestaetigung').'</td>';
 		echo '</tr>';
 		$i=0;
 		foreach ($konto->result as $row)
@@ -110,13 +112,13 @@
 			echo '<td align="right">'.($betrag<0?'-':($betrag>0?'+':'')).sprintf('%.2f',abs($row['parent']->betrag)).' €</td>';
 			echo '<td align="center">';
 			if($betrag==0 && $row['parent']->betrag<0)
-				echo '<a href="../pdfExport.php?xml=konto.rdf.php&xsl=Zahlung&uid='.$uid.'&buchungsnummern='.$row['parent']->buchungsnr.'" title="Bestaetigung drucken"><img src="../../../skin/images/pdfpic.gif" alt="Bestaetigung drucken"></a>';
+				echo '<a href="../pdfExport.php?xml=konto.rdf.php&xsl=Zahlung&uid='.$uid.'&buchungsnummern='.$row['parent']->buchungsnr.'" title="'.$p->t('tools/bestaetigungDrucken').'"><img src="../../../skin/images/pdfpic.gif" alt="'.$p->t('tools/bestaetigungDrucken').'"></a>';
 			elseif($row['parent']->betrag>0)
 			{
 				//Auszahlung
 			}
 			else
-				echo 'offen';
+				echo $p->t('tools/offen');
 			echo '</td>';
 			echo '</tr>';
 		}
@@ -124,7 +126,7 @@
 	}
 	else 
 	{
-		echo 'Derzeit sind keine Zahlungen vorhanden';
+		echo $p->t('tools/keineZahlungenVorhanden');
 	}	
 	echo '</td></tr></table';
 	
