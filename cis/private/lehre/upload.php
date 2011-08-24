@@ -805,7 +805,7 @@ A:hover {
                   echo "  <tr>";
 			      echo "    <td align=\"right\" width=\"59%\">";
 			      echo "<span style='font-size:8pt;'>".$p->t('upload/maxUploadgroesse').": <b>15 MB</b></span>";
-			      echo "      <input id=\"btnupload\" type=\"submit\" name=\"".$p->t('upload/upload')."\" value=\"Upload\">";
+			      echo "      <input id=\"btnupload\" type=\"submit\" name=\"upload\" value=\"Upload\">";
 			      echo "    </td>";
 			      echo "    <td width=\"41%\">&nbsp;</td>";
 			      echo "  </tr>";
@@ -949,9 +949,7 @@ A:hover {
 				{
 					echo '<img src="../../../skin/images/folderup.gif">';
 				}
-				?>
-				<b><?php echo $p->t('upload/unterordnerVon');?>
-				<?php
+				echo "<b>".$p->t('upload/unterordnerVon');
 				if(isset($subdir) && $subdir != "")
 				{
 					if(!@is_dir($upload_root.'/'.$uploaddir.'/'.$subdir))
