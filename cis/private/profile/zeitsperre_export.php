@@ -31,6 +31,12 @@ require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/zeitsperre.class.php');
 require_once('../../../include/datum.class.php');
+require_once('../../../include/sprache.class.php');
+
+$sprache = getSprache();
+$sprache_obj = new sprache();
+$sprache_obj->load($sprache);
+$sprache_index=$sprache_obj->index;
 
 $crlf=crlf();
 $trenn=";";
@@ -120,13 +126,13 @@ for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
 	$tag=date('d',$ts);
 	$wt=date('N',$ts);
 	$monat=date('M',$ts);
-	echo '"'.$tagbez[1][$wt].' '.$tag.'.'.$monat.'"'.$trenn;
+	echo '"'.$tagbez[$sprache_index][$wt].' '.$tag.'.'.$monat.'"'.$trenn;
 }
 $zs=new zeitsperre();
 foreach ($mitarbeiter as $ma)
 {
 	$zs->getzeitsperren($ma->uid, false);
-	echo mb_convert_encoding($crlf.'"'.$ma->nachname.' '.$ma->vorname.'"'.$trenn,'ISO-8859-15','UTF-8');
+	echo $crlf.'"'.$ma->nachname.' '.$ma->vorname.'"'.$trenn;
 	for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
 	{
 		$tag=date('d',$ts);

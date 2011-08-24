@@ -27,6 +27,10 @@ require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/resturlaub.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/phrasen.class.php');
+
+$sprache = getSprache();
+$p = new phrasen($sprache);
 
 $uid = get_uid();
 
@@ -34,7 +38,7 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
 if (!$rechte->isBerechtigt('admin',0) && !$rechte->isBerechtigt('mitarbeiter'))
-	die('Sie haben keine Berechtigung fuer diese Seite');
+	die($p->t('global/keineBerechtigungFuerDieseSeite'));
 
 $db = new basis_db();
 
@@ -55,78 +59,73 @@ else
 	$datum_ende='31.Aug.'.$jahr;
 	$geschaeftsjahr=($jahr-1).'/'.$jahr;
 }
-?>
 
+echo '
 <html>
 <head>
-	<title>Resturlaubstage</title>
+	<title>'.$p->t('zeitsperre/resturlaubstage').'</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </head>
 
-<body id="inhalt">
-	<H2>
-		<table class="tabcontent">
-			<tr>
-				<td>&nbsp;Resturlaubstage</td>
-			</tr>
-		</table>
-	</H2>
+<body>
+	<h1>Resturlaubstage</H1>
 
 	<TABLE >
     <TR class="liste">
-    	<TH>Nachname</TH>
-    	<TH>Vorname</TH>
-    	<TH>Resturlaubstage per <?php echo $datum_beginn ?></TH>
-    	<TH>aktueller Stand</TH>
-    	<TH>Resturlaubstage per <?php echo $datum_ende ?></TH>
+    	<TH>'.$p->t('global/nachname').'</TH>
+    	<TH>'.$p->t('global/vorname').'</TH>
+    	<TH>'.$p->t('zeitsperre/resturlaubstagePerDatum',array($datum_beginn)).'</TH>
+    	<TH>'.$p->t('zeitsperre/aktuellerStand').'</TH>
+    	<TH>'.$p->t('zeitsperre/resturlaubstagePerDatum',array($datum_ende)).'</TH>
 	</TR>
+	';
+	
+$obj=new resturlaub();
+$obj->getResturlaubFixangestellte();
+$i=0;
 
-	<?php
-	$obj=new resturlaub();
-	$obj->getResturlaubFixangestellte();
-	$i=0;
+foreach ($obj->result as $row)
+{
+	echo '<TR class="liste'.($i%2).'">';
+	echo "<TD>$row->nachname</TD><TD>$row->vorname $row->vornamen</TD>";
+	echo "<TD>$row->resturlaubstage</TD>";
 
-	foreach ($obj->result as $row)
+	//Urlaub berechnen (date_part('month', vondatum)>9 AND date_part('year', vondatum)='".(date('Y')-1)."') OR (date_part('month', vondatum)<9 AND date_part('year', vondatum)='".date('Y')."')
+	$qry = "SELECT 
+			(SELECT sum(bisdatum-vondatum+1) as anzahltage FROM campus.tbl_zeitsperre
+			 WHERE zeitsperretyp_kurzbz='Urlaub' AND mitarbeiter_uid='".addslashes($row->mitarbeiter_uid)."' AND
+			 (
+				vondatum>='".addslashes($datum_beginn_iso)."' AND bisdatum<='".addslashes($datum_ende_iso)."'
+			 )) as anzahltage,
+			 (SELECT sum(bisdatum-vondatum+1) as anzahltage FROM campus.tbl_zeitsperre
+			 WHERE zeitsperretyp_kurzbz='Urlaub' AND mitarbeiter_uid='".addslashes($row->mitarbeiter_uid)."' AND
+			 (
+				vondatum>='".addslashes($datum_beginn_iso)."' AND bisdatum<=now()
+			 )) as anzahltageaktuell
+			 ";
+	$tttt="\n";
+	if($result_summe = $db->db_query($qry))
 	{
-		echo '<TR class="liste'.($i%2).'">';
-		echo "<TD>$row->nachname</TD><TD>$row->vorname $row->vornamen</TD>";
-		echo "<TD>$row->resturlaubstage</TD>";
-
-		//Urlaub berechnen (date_part('month', vondatum)>9 AND date_part('year', vondatum)='".(date('Y')-1)."') OR (date_part('month', vondatum)<9 AND date_part('year', vondatum)='".date('Y')."')
-		$qry = "SELECT 
-				(SELECT sum(bisdatum-vondatum+1) as anzahltage FROM campus.tbl_zeitsperre
-				 WHERE zeitsperretyp_kurzbz='Urlaub' AND mitarbeiter_uid='$row->mitarbeiter_uid' AND
-				 (
-					vondatum>='$datum_beginn_iso' AND bisdatum<='$datum_ende_iso'
-				 )) as anzahltage,
-				 (SELECT sum(bisdatum-vondatum+1) as anzahltage FROM campus.tbl_zeitsperre
-				 WHERE zeitsperretyp_kurzbz='Urlaub' AND mitarbeiter_uid='$row->mitarbeiter_uid' AND
-				 (
-					vondatum>='$datum_beginn_iso' AND bisdatum<=now()
-				 )) as anzahltageaktuell
-				 ";
-		$tttt="\n";
-		if($result_summe = $db->db_query($qry))
+		if($row_summe = $db->db_fetch_object($result_summe))
 		{
-			if($row_summe = $db->db_fetch_object($result_summe))
-			{
-				$gebuchterurlaub = $row_summe->anzahltage;
-				$gebuchterurlaubaktuell = $row_summe->anzahltageaktuell;
-			}
+			$gebuchterurlaub = $row_summe->anzahltage;
+			$gebuchterurlaubaktuell = $row_summe->anzahltageaktuell;
 		}
-		if($gebuchterurlaub=='')
-			$gebuchterurlaub=0;
-		if($gebuchterurlaubaktuell=='')
-			$gebuchterurlaubaktuell=0;
-			
-		echo '<td>'.($row->urlaubstageprojahr+$row->resturlaubstage-$gebuchterurlaubaktuell).'</td>';
-		echo '<td>'.($row->urlaubstageprojahr+$row->resturlaubstage-$gebuchterurlaub).'</td>';
-		echo '</TR>';
-		$i++;
 	}
-	?>
-
-  </TABLE>
-</body>
-</html>
+	if($gebuchterurlaub=='')
+		$gebuchterurlaub=0;
+	if($gebuchterurlaubaktuell=='')
+		$gebuchterurlaubaktuell=0;
+		
+	echo '<td>'.($row->urlaubstageprojahr+$row->resturlaubstage-$gebuchterurlaubaktuell).'</td>';
+	echo '<td>'.($row->urlaubstageprojahr+$row->resturlaubstage-$gebuchterurlaub).'</td>';
+	echo '</TR>';
+	$i++;
+}
+	
+	echo '
+	</table>
+	</body>
+</html>';
+?>

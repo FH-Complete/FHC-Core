@@ -33,7 +33,15 @@ require_once('../../../include/zeitsperre.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/fachbereich.class.php');
 require_once('../../../include/organisationseinheit.class.php');
+require_once('../../../include/phrasen.class.php');
+require_once('../../../include/sprache.class.php');
 
+	$sprache = getSprache();
+	$p = new phrasen($sprache);
+	$sprache_obj = new sprache();
+	$sprache_obj->load($sprache);
+	$sprache_index=$sprache_obj->index;
+	
 	$uid = get_uid();
 
 	if(isset($_GET['lektor']))
@@ -118,33 +126,26 @@ require_once('../../../include/organisationseinheit.class.php');
 			$mitarbeiter=$ma->getMitarbeiterStg(true,null,$stge,$funktion);
 	}
 
-?>
+echo '
 <html>
 <head>
-	<title>Zeitsperren</title>
+	<title>'.$p->t('zeitsperre/zeitsperren').'</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </head>
+<body>
+	<h1>'.$p->t('zeitsperre/zeitsperren').'</h1>
 
-<body id="inhalt">
-	<H2>
-		<table class="tabcontent">
-			<tr>
-				<td>&nbsp;Zeitsperren</td>
-			</tr>
-		</table>
-	</H2>
-
-	<H3>Zeitsperren von <?php echo $datum_beginn.' bis '.$datum_ende; ?></H3>
-	<?php
+	<H3>'.$p->T('zeitsperre/zeitsperreVonBis',array($datum_beginn, $datum_ende)).'</H3>';
+	
 		if(isset($_GET['organisationseinheit']))
 		{
 			echo '<br>';
-			echo '<FORM action="'.$_SERVER['PHP_SELF'].'" method="GET">Organisationseinheit: <SELECT name="organisationseinheit">';
+			echo '<FORM action="'.$_SERVER['PHP_SELF'].'" method="GET">'.$p->t('global/organisationseinheit').': <SELECT name="organisationseinheit">';
 			$oe_obj = new organisationseinheit();
 			$oe_obj->getAll();
 
-			echo "<option value='' ".(is_null($organisationseinheit)?'selected':'').">-- Auswahl --</option>";
+			echo "<option value='' ".(is_null($organisationseinheit)?'selected':'').">-- ".$p->t('global/auswahl')." --</option>";
 			foreach ($oe_obj->result as $oe)
 			{
 				if($oe->aktiv)
@@ -157,25 +158,25 @@ require_once('../../../include/organisationseinheit.class.php');
 					echo "<option value='$oe->oe_kurzbz' $selected>$oe->organisationseinheittyp_kurzbz $oe->bezeichnung</option>";
 				}
 			}
-			echo '</SELECT><input style="display:none;" type="Text" name="days" value="'.$days.'"><input type="submit" value="Anzeigen"></FORM>';
+			echo '</SELECT><input style="display:none;" type="Text" name="days" value="'.$days.'"><input type="submit" value="'.$p->t('global/anzeigen').'"></FORM>';
 			echo '<br>';
 		}
-	?>
-	<a class="Item" href="<?php echo $export_link; ?>">Excel</a>
+	echo '
+	<a class="Item" href="'.$export_link.'">Excel</a>
 	<TABLE id="zeitsperren">
-    <TR>
-    	<?php
-	  	echo '<th>Monat<br>Tag</th>';
+    <TR>';
+    	
+	  	echo '<th>'.$p->t('zeitsperre/monat').'<br>'.$p->t('zeitsperre/tag').'</th>';
 		for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
 		{
 			$tag=date('d',$ts);
-			$wt=date('w',$ts);
+			$wt=date('N',$ts);
 			$monat=date('M',$ts);
-			if ($wt==0 || $wt==6)
+			if ($wt==7 || $wt==6)
 				$class='feiertag';
 			else
 				$class='';
-			echo "<th class='$class'><div align=\"center\">$monat<br>$tag</div></th>";
+			echo "<th class='$class'><div align=\"center\">".$tagbez[$sprache_index][$wt]."<br>$monat<br>$tag</div></th>";
 		}
 		?>
 	</TR>
@@ -195,8 +196,8 @@ require_once('../../../include/organisationseinheit.class.php');
 				{
 					$tag=date('d',$ts);
 					$monat=date('M',$ts);
-					$wt=date('w',$ts);
-					if ($wt==0 || $wt==6)
+					$wt=date('N',$ts);
+					if ($wt==7 || $wt==6)
 						$class=' class="feiertag" ';
 					else
 						$class='';
