@@ -75,20 +75,20 @@ $num_rows_stunde=$db->db_num_rows($result_stunde);
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd"><html>
 <head>
-<title>Zeitsperre</title>
+<title><?php echo $p->t('zeitsperre/zeitsperre');?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 <script language="Javascript">
 function conf_del()
 {
-	return confirm('Wollen Sie diesen Eintrag wirklich löschen?');
+	return confirm('<?php echo $p->t('global/warnungWirklichLoeschen');?>');
 }
 
 function checkval()
 {
 	if(document.getElementById('vertretung_uid').value=='')
 	{
-		alert('Bitte zuerst eine Vertretung auswählen');
+		alert('<?php echo $p->t('zeitsperre/bitteZuerstVertretungAuswaehlen');?>');
 		return false;
 	}
 	else
@@ -103,13 +103,13 @@ function checkdatum()
 {
 	if(document.getElementById('vondatum').value.length<10)
 	{
-		alert('Von-Datum ist ungültig. Bitte beachten Sie das führende nullen angegeben werden müssen (Beispiel: 01.01.2008)');
+		alert('<?php echo $p->t('zeitsperre/vonDatumIstUngueltigNullenAngeben');?>');
 		return false;
 	}
 
 	if(document.getElementById('bisdatum').value.length<10)
 	{
-		alert('Bis-Datum ist ungültig. Bitte beachten Sie das führende nullen angegeben werden müssen (Beispiel: 01.01.2008)');
+		alert('<?php echo $p->t('zeitsperre/bisDatumIstUngueltigNullenAngeben');?>');
 		return false;
 	}
 
@@ -120,7 +120,7 @@ function checkdatum()
       Monat=Datum.substring(3,5); 
 	  if (parseInt(Monat,10)<1 || parseInt(Monat,10)>12)
 	  {	
-		alert('Von-Datum Monat'+ document.getElementById('vondatum').value+ ' ist nicht richtig.');
+		alert('<?php echo $p->t('zeitsperre/vonDatumMonat');?>'+ document.getElementById('vondatum').value+ ' <?php echo $p->t('zeitsperre/istNichtRichtig');?>.');
 		document.getElementById('vondatum').focus();
 	  	return false;
 	  }
@@ -134,7 +134,7 @@ function checkdatum()
       Monat=Datum.substring(3,5); 
 	  if (parseInt(Monat,10)<1 || parseInt(Monat,10)>12)
 	  {	
-		alert('Bis-Datum Monat'+ document.getElementById('bisdatum').value+ ' ist nicht richtig.');
+		alert('<?php echo $p->t('zeitsperre/bisDatumMonat');?>'+ document.getElementById('bisdatum').value+ ' <?php echo $p->t('zeitsperre/istNichtRichtig');?>.');
 		document.getElementById('bisdatum').focus();
 	  	return false;
 	  }
@@ -145,7 +145,7 @@ function checkdatum()
 	
 	  if (vonDatum>bisDatum)  
 	  {
-		alert('Von-Datum '+ document.getElementById('vondatum').value+ ' ist groesser als das Bis-Datum '+document.getElementById('bisdatum').value);
+		alert('<?php echo $p->t('zeitsperre/vonDatum');?> '+ document.getElementById('vondatum').value+ ' <?php echo $p->t('zeitsperre/istGroesserAlsBisDatum');?> '+document.getElementById('bisdatum').value);
 		document.getElementById('vondatum').focus();
 	  	return false;
 	  }
@@ -430,20 +430,20 @@ if(isset($_GET['type']) && $_GET['type']=='edit')
 		//pruefen ob dieser datensatz auch dem angemeldeten user gehoert
 		if($zeitsperre->mitarbeiter_uid!=$uid)
 		{
-			die("<span class='error'>Sie haben keine Berechtigung diese Zeitsperre zu aendern</span>");
+			die("<span class='error'>".$p->t('zeitsperre/sieHabenKeineBerechtigungZuAendern')."</span>");
 		}
 		$action = "$PHP_SELF?type=edit_sperre&id=".$_GET['id'];
 	}
 	else
 	{
-		die("<span class='error'>Fehlerhafte Parameteruebergabe</span>");
+		die("<span class='error'>".$p->t('global/fehlerBeiDerParameteruebergabe')."</span>");
 	}
 }
 //formular zum editieren und neu anlegen der zeitsperren
 $content_form='';
 $content_form.= '<form method="POST" action="'.$action.'" onsubmit="return checkdatum()">';
 $content_form.= "<table>\n";
-$content_form.= '<tr><td>Grund</td><td><SELECT name="zeitsperretyp_kurzbz">';
+$content_form.= '<tr><td>'.$p->t('zeitsperre/grund').'</td><td><SELECT name="zeitsperretyp_kurzbz">';
 //dropdown fuer zeitsperretyp
 $qry = "SELECT * FROM campus.tbl_zeitsperretyp ORDER BY zeitsperretyp_kurzbz";
 if($result = $db->db_query($qry))
@@ -457,10 +457,10 @@ if($result = $db->db_query($qry))
 	}
 }
 $content_form.= '</SELECT>';
-$content_form.= '<tr><td>Bezeichnung</td><td><input type="text" name="bezeichnung" maxlength="32" value="'.$zeitsperre->bezeichnung.'"></td></tr>';
-$content_form.= '<tr><td>von</td><td><input type="text" size="10" maxlength="10" name="vondatum" id="vondatum" value="'.($zeitsperre->vondatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->vondatum)):(!isset($_POST['vondatum'])?date('d.m.Y'):$_POST['vondatum'])).'"> ';
+$content_form.= '<tr><td>'.$p->t('global/bezeichnung').'</td><td><input type="text" name="bezeichnung" maxlength="32" value="'.$zeitsperre->bezeichnung.'"></td></tr>';
+$content_form.= '<tr><td>'.$p->t('global/von').'</td><td><input type="text" size="10" maxlength="10" name="vondatum" id="vondatum" value="'.($zeitsperre->vondatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->vondatum)):(!isset($_POST['vondatum'])?date('d.m.Y'):$_POST['vondatum'])).'"> ';
 //dropdown fuer vonstunde
-$content_form.= "Stunde (inklusive)";
+$content_form.= $p->t('zeitsperre/stundeInklusive');
 
 $content_form.= "<SELECT name='vonstunde'>\n";
 if($zeitsperre->vonstunde=='')
@@ -480,9 +480,9 @@ for($i=0;$i<$num_rows_stunde;$i++)
 
 $content_form.= "</SELECT></td></tr>";
 
-$content_form.= '<tr><td>bis</td><td><input type="text" size="10" maxlength="10" name="bisdatum" id="bisdatum" value="'.($zeitsperre->bisdatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->bisdatum)):(!isset($_POST['bisdatum'])?date('d.m.Y'):$_POST['bisdatum'])).'"> ';
+$content_form.= '<tr><td>'.$p->t('global/bis').'</td><td><input type="text" size="10" maxlength="10" name="bisdatum" id="bisdatum" value="'.($zeitsperre->bisdatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->bisdatum)):(!isset($_POST['bisdatum'])?date('d.m.Y'):$_POST['bisdatum'])).'"> ';
 //dropdown fuer bisstunde
-$content_form.= "Stunde (inklusive)";
+$content_form.= $p->t('zeitsperre/stundeInklusive');
 $content_form.= "<SELECT name='bisstunde'>\n";
 
 if($zeitsperre->bisstunde=='')
@@ -501,7 +501,7 @@ for($i=0;$i<$num_rows_stunde;$i++)
 
 $content_form.= "</SELECT></td></tr>";
 
-$content_form.= "<tr><td>Erreichbarkeit</td><td><SELECT name='erreichbarkeit'>";
+$content_form.= "<tr><td>".$p->t('urlaubstool/erreichbarkeit')."</td><td><SELECT name='erreichbarkeit'>";
 foreach ($erreichbarkeit_arr as $erreichbarkeit_key=>$erreichbarkeit_beschreibung)
 {
 	if($zeitsperre->erreichbarkeit_kurzbz == $erreichbarkeit_key)
@@ -512,11 +512,11 @@ foreach ($erreichbarkeit_arr as $erreichbarkeit_key=>$erreichbarkeit_beschreibun
 
 $content_form.= '</SELECT></td></tr>';
 
-$content_form.= "<tr><td>Vertretung</td><td><SELECT name='vertretung_uid' id='vertretung_uid'>";
+$content_form.= "<tr><td>".$p->t('urlaubstool/vertretung')."</td><td><SELECT name='vertretung_uid' id='vertretung_uid'>";
 //dropdown fuer vertretung
 $qry = "SELECT * FROM campus.vw_mitarbeiter WHERE uid not LIKE '\\\_%' ORDER BY nachname, vorname";
 
-$content_form.= "<OPTION value=''>-- Auswahl --</OPTION>\n";
+$content_form.= "<OPTION value=''>-- ".$p->t('benotungstool/auswahl')." --</OPTION>\n";
 
 if($result = $db->db_query($qry))
 {
@@ -536,7 +536,7 @@ if(isset($_GET['type']) && $_GET['type']=='edit')
 else
 	$content_form.= "<input type='submit' name='submit_zeitsperre' value='Hinzufügen'>";
 $content_form.= '</td></tr>';
-$content_form.= "<tr><td>&nbsp;</td><td style='color:red'>Achtung: Es werden alle eingegeben Tage berücksichtigt, daher müssen mehrtägige Zeitsperren<br> an Unterbrechungen wie Wochenenden oder Feiertagen unterteilt werden!</td</tr>";
+$content_form.= "<tr><td>&nbsp;</td><td style='color:red'>".$p->t('zeitsperre/achtungEsWerdenAlleEingegebenenTage')."</td</tr>";
 $content_form.= '</table></form>';
 
 // ******* RESTURLAUB ******** //
@@ -573,7 +573,7 @@ if(URLAUB_TOOLS)
 		$datum_ende='31.Aug.'.$jahr;
 		$geschaeftsjahr=($jahr-1).'/'.$jahr;
 	}
-	$content_resturlaub.="<h3>Urlaub im Gesch&auml;ftsjahr $geschaeftsjahr</h3>";
+	$content_resturlaub.="<h3>".$p->t('zeitsperre/urlaubImGeschaeftsjahr')." $geschaeftsjahr</h3>";
 	/*
 	$content_resturlaub.='<form method="POST" action="'.$PHP_SELF.'?type=save_resturlaub"><table>';
 	$content_resturlaub.='<tr><td>Resturlaubstage (31.08.)</td><td><input type="text" size="6" '.$disabled.' id="resturlaubstage" name="resturlaubstage" value="'.$resturlaubstage.'" oninput="berechnen()"/></td></tr>';
@@ -596,11 +596,11 @@ if(URLAUB_TOOLS)
 	$gebuchterurlaub = $row->anzahltage;
 	if($gebuchterurlaub=='')
 		$gebuchterurlaub=0;
-	$content_resturlaub.="<table><tr><td nowrap>Anspruch</td><td align='right'  nowrap>$anspruch Tage</td><td nowrap class='grey'>&nbsp;&nbsp;&nbsp( j&auml;hrlich )</td></tr>";
-	$content_resturlaub.="<tr><td nowrap>+ Resturlaub</td><td align='right'  nowrap>$resturlaubstage Tage</td><td nowrap class='grey'>&nbsp;&nbsp;&nbsp;( Stichtag: $datum_beginn )</td></tr>";
-	$content_resturlaub.="<tr><td nowrap>- aktuell gebuchter Urlaub&nbsp;</td><td align='right'  nowrap>$gebuchterurlaub Tage</td><td nowrap class='grey'>&nbsp;&nbsp;&nbsp;( $datum_beginn - $datum_ende )</td></tr>";
-	$content_resturlaub.="<tr><td style='border-top: 1px solid black;'  nowrap>aktueller Stand</td><td style='border-top: 1px solid black;' align='right' nowrap>".($anspruch+$resturlaubstage-$gebuchterurlaub)." Tage</td><td nowrap class='grey'>&nbsp;&nbsp;&nbsp;( Stichtag: $datum_ende )</td></tr>";
-	$content_resturlaub .="<tr></tr><tr><td><a href='../../cisdocs/AblaufUrlaubserfassung.pdf'> [AblaufUrlaubserfassung.pdf] </a></td><td><button type='button' name='hilfe' value='Hilfe' onclick='alert(\"Anspruch: Anzahl der Urlaubstage, auf die in diesem Geschäftsjahr (1.9. bis 31.8) ein Anrecht ensteht. \\nResturlaub: Anzahl der Urlaubstage, aus vergangenen Geschäftsjahren, die noch nicht verbraucht wurden. \\naktuell gebuchter Urlaub: Anzahl aller eingetragenen Urlaubstage. \\nAchtung: Als Urlaubstag gelten ALLE Tage zwischen von-Datum und bis-Datum d.h. auch alle Wochenenden, Feiertage und arbeitsfreie Tage. Beispiel: Ein Kurzurlaub beginnt mit einem Donnerstag und endet am darauffolgenden Dienstag, so wird zuerst eine Eintragung mit dem Datum des Donnerstags im von-Feld und dem Datum des letzten Urlaubstag vor dem Wochenende, meistens der Freitag, eingegeben. Danach wird eine Eintagung des zweiten Teils, von Montag bis Dienstag vorgenommen.\\naktueller Stand: Die zur Zeit noch verfügbaren Urlaubstage.\");'>Hilfe</button></td></tr>";
+	$content_resturlaub.="<table><tr><td nowrap>".$p->t('urlaubstool/anspruch')."</td><td align='right'  nowrap>$anspruch ".$p->t('urlaubstool/tage')."</td><td nowrap class='grey'>&nbsp;&nbsp;&nbsp( ".$p->t('urlaubstool/jaehrlich')." )</td></tr>";
+	$content_resturlaub.="<tr><td nowrap>+ ".$p->t('urlaubstool/resturlaub')."</td><td align='right'  nowrap>$resturlaubstage ".$p->t('urlaubstool/tage')."</td><td nowrap class='grey'>&nbsp;&nbsp;&nbsp;( ".$p->t('urlaubstool/stichtag').": $datum_beginn )</td></tr>";
+	$content_resturlaub.="<tr><td nowrap>- ".$p->t('urlaubstool/aktuellGebuchterUrlaub')."&nbsp;</td><td align='right'  nowrap>$gebuchterurlaub ".$p->t('urlaubstool/tage')."</td><td nowrap class='grey'>&nbsp;&nbsp;&nbsp;( $datum_beginn - $datum_ende )</td></tr>";
+	$content_resturlaub.="<tr><td style='border-top: 1px solid black;'  nowrap>".$p->t('urlaubstool/aktuellerStand')."</td><td style='border-top: 1px solid black;' align='right' nowrap>".($anspruch+$resturlaubstage-$gebuchterurlaub)." ".$p->t('urlaubstool/tage')."</td><td nowrap class='grey'>&nbsp;&nbsp;&nbsp;( ".$p->t('urlaubstool/stichtag').": $datum_ende )</td></tr>";
+	$content_resturlaub .="<tr></tr><tr><td><a href='../../cisdocs/AblaufUrlaubserfassung.pdf'> [AblaufUrlaubserfassung.pdf] </a></td><td><button type='button' name='hilfe' value='Hilfe' onclick='alert(\"".$p->t('urlaubstool/anspruchAnzahlDerUrlaubstage')."\");'>".$p->t('global/hilfe')."</button></td></tr>";
 	$content_resturlaub .='<tr><td></td></tr>';
 	$content_resturlaub.="</table>";
 }
