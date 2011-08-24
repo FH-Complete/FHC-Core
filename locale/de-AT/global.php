@@ -7,6 +7,7 @@ $this->phrasen['global/studienzentrum']='Studienzentrum';
 $this->phrasen['global/studiengangsleitung']='Studiengangsleitung';
 $this->phrasen['global/lehrveranstaltung']='Lehrveranstaltung'; 
 $this->phrasen['global/lehreinheit']='Lehreinheit';
+$this->phrasen['global/organisationseinheit']='Organisationseinheit';
 
 $this->phrasen['global/studiengangsmanagement']='Studiengangsmanagement';
 $this->phrasen['global/geschaeftsfuehrendeltg']='geschäftsf. Leitung';
@@ -39,6 +40,7 @@ $this->phrasen['global/kopieren']='Kopieren';
 $this->phrasen['global/ja']='Ja';
 $this->phrasen['global/nein']='Nein';
 $this->phrasen['global/download']='Download';
+$this->phrasen['global/auswahl']='Auswahl';
 
 $this->phrasen['global/username']='Username';
 $this->phrasen['global/vorname']='Vorname';

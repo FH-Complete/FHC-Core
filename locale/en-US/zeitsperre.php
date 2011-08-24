@@ -26,4 +26,12 @@ $this->phrasen['zeitsperre/vonDatumMonat']='From-date month';
 $this->phrasen['zeitsperre/bisDatumMonat']='To-date month';
 $this->phrasen['zeitsperre/istGroesserAlsBisDatum']='is later than To-date';
 $this->phrasen['zeitsperre/vonDatum']='From-date';
+
+$this->phrasen['zeitsperre/resturlaubstage']='Resturlaubstage';
+$this->phrasen['zeitsperre/aktuellerStand']='aktueller Stand';
+$this->phrasen['zeitsperre/resturlaubstagePerDatum']='Resturlaubstage per %1$s';
+
+$this->phrasen['zeitsperre/zeitsperreVonBis']='Zeitsperren von %1$s bis %2$s';
+$this->phrasen['zeitsperre/monat']='Month';
+$this->phrasen['zeitsperre/tag']='Day';
 ?>

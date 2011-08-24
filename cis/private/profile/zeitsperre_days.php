@@ -19,99 +19,97 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-// **
-// * @brief Uebersicht der Zeitsperren fuer Lektorengruppen
+/*
+ * Erstelle eine Liste mit allen Personen die innerhalb der naechsten 2
+ * Wochen eine Zeitsperre eingetragen haben
+ */
 
-  require_once('../../../config/cis.config.inc.php');
-	require_once('../../../include/globals.inc.php');
-	require_once('../../../include/functions.inc.php');
-	require_once('../../../include/person.class.php');
-	require_once('../../../include/benutzer.class.php');
-	require_once('../../../include/mitarbeiter.class.php');
-	require_once('../../../include/studiensemester.class.php');
-	require_once('../../../include/zeitsperre.class.php');
-	require_once('../../../include/datum.class.php');
+require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/globals.inc.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/person.class.php');
+require_once('../../../include/benutzer.class.php');
+require_once('../../../include/mitarbeiter.class.php');
+require_once('../../../include/studiensemester.class.php');
+require_once('../../../include/zeitsperre.class.php');
+require_once('../../../include/datum.class.php');
+require_once('../../../include/phrasen.class.php');
+require_once('../../../include/sprache.class.php');
 
+$datum_obj = new datum();
 
-	$datum_obj = new datum();
-
-    $days=trim((isset($_REQUEST['days']) && is_numeric($_REQUEST['days'])?$_REQUEST['days']:14));
-
+$days=trim((isset($_REQUEST['days']) && is_numeric($_REQUEST['days'])?$_REQUEST['days']:14));
 	
-	$datum_beginn=date('Y-m-d');
-	$ts_beginn=$datum_obj->mktime_fromdate($datum_beginn);
-	$ts_ende=$datum_obj->jump_day($ts_beginn,$days);
-	$datum_ende=date('Y-m-d',$ts_ende);
+$datum_beginn=date('Y-m-d');
+$ts_beginn=$datum_obj->mktime_fromdate($datum_beginn);
+$ts_ende=$datum_obj->jump_day($ts_beginn,$days);
+$datum_ende=date('Y-m-d',$ts_ende);
 
-	// Lektoren holen
-	$ma=new mitarbeiter();
-	$mitarbeiter=$ma->getMitarbeiterZeitsperre($datum_beginn,$datum_ende);
-?>
+// Lektoren holen
+$ma=new mitarbeiter();
+$mitarbeiter=$ma->getMitarbeiterZeitsperre($datum_beginn,$datum_ende);
 
+$sprache = getSprache();
+$p = new phrasen($sprache);
+$sprache_obj = new sprache();
+$sprache_obj->load($sprache);
+$sprache_index=$sprache_obj->index;
+
+echo '
 <html>
 <head>
-	<title>Zeitsperren</title>
+	<title>'.$p->t('zeitsperre/zeitsperren').'</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </head>
 
-<body id="inhalt">
-	<H2>
-		<table class="tabcontent">
-			<tr>
-				<td>&nbsp;Zeitsperren</td>
-				<td align="right">
-					<A onclick="window.open('zeitwunsch_help.html','Hilfe', 'height=320,width=480,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');" class="hilfe" target="_blank">HELP&nbsp;</A>
-				</td>
-			</tr>
-		</table>
-	</H2>
+<body>
+	<H1>'.$p->t('zeitsperre/zeitsperren').'</H1>
 
-	<H3>Zeitsperren von <?php echo $datum_beginn.' bis '.$datum_ende; ?></H3>
+	<H3>'.$p->t('zeitsperre/zeitsperreVonBis',array($datum_beginn, $datum_ende)).'</H3>
 	<TABLE id="zeitsperren">
-    <TR>
-    	<?php
-	  	echo '<th>Monat<br>Tag</th>';
-		for ($ts=$ts_beginn;$ts<=$ts_ende; $ts+=$datum_obj->ts_day)
-		{
-			$tag=date('d',$ts);
-			$wt=date('N',$ts);
-			$monat=date('M',$ts);
-
-			if ($wt==6 || $wt==7)
-				$class='feiertag';
-			else
-				$class='';
+    <TR>';
+    	
+echo '<th>'.$p->t('zeitsperre/monat').'<br>'.$p->t('zeitsperre/tag').'</th>';
+for ($ts=$ts_beginn;$ts<=$ts_ende; $ts+=$datum_obj->ts_day)
+{
+	$tag=date('d',$ts);
+	$wt=date('N',$ts);
+	$monat=date('M',$ts);
+	
+	if ($wt==6 || $wt==7)
+		$class='feiertag';
+	else
+		$class='';
 				
-			echo "<th class='$class'><div align=\"center\">".$tagbez[1][$wt]."<BR>$monat<br>$tag</div></th>";
-		}
-		?>
-	</TR>
+	echo "<th class='$class'><div align=\"center\">".$tagbez[$sprache_index][$wt]."<BR>$monat<br>$tag</div></th>";
+}
 
-	<?php
-	$zs=new zeitsperre();
-	foreach ($mitarbeiter as $ma)
+echo '</TR>';
+
+$zs=new zeitsperre();
+foreach ($mitarbeiter as $ma)
+{
+	$zs->getzeitsperren($ma->uid);
+	echo '<TR>';
+	echo "<td>$ma->nachname $ma->vorname</td>";
+	for ($ts=$ts_beginn;$ts<=$ts_ende; $ts+=$datum_obj->ts_day)
 	{
-		$zs->getzeitsperren($ma->uid);
-		echo '<TR>';
-		echo "<td>$ma->nachname $ma->vorname</td>";
-		for ($ts=$ts_beginn;$ts<=$ts_ende; $ts+=$datum_obj->ts_day)
-		{
-			$tag=date('d',$ts);
-			$monat=date('M',$ts);
-			$wt=date('N',$ts);
-			if ($wt==6 || $wt==7)
-				$class='feiertag';
-			else
-				$class='';
-			$grund=$zs->getTyp($ts);
-			$erbk=$zs->getErreichbarkeit($ts);
-			echo "<td class='$class'>$grund<br>$erbk</td>";
-		}
-		echo '</TR>';
+		$tag=date('d',$ts);
+		$monat=date('M',$ts);
+		$wt=date('N',$ts);
+		if ($wt==6 || $wt==7)
+			$class='feiertag';
+		else
+			$class='';
+		$grund=$zs->getTyp($ts);
+		$erbk=$zs->getErreichbarkeit($ts);
+		echo "<td class='$class'>$grund<br>$erbk</td>";
 	}
-	?>
+	echo '</TR>';
+}
 
-  </TABLE>
-</body>
-</html>
+echo '  </TABLE>
+	</body>
+</html>';
+?>
