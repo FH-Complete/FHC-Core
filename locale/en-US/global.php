@@ -96,6 +96,7 @@ $this->phrasen['global/löschen']='Delete';
 $this->phrasen['global/dateiLoeschen']='Delete File'; 
 $this->phrasen['global/betreff']='Subject';
 $this->phrasen['global/handbuch']='Manual';
+$this->phrasen['global/hilfe']='Help';
 
 // Statusmeldungen
 $this->phrasen['global/erfolgreichgespeichert']='Successfully saved'; 

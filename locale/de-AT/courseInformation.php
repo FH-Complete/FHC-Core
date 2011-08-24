@@ -13,4 +13,10 @@ $this->phrasen['courseInformation/institutsleiter']='Institutsleiter';
 $this->phrasen['courseInformation/institutskoordinator']='Institutskoordinator';
 $this->phrasen['courseInformation/unterrichtssprache']='Unterrichtssprache';
 $this->phrasen['courseInformation/voransicht']='Voransicht';
+$this->phrasen['courseInformation/fehlerBeimSchreibenDesLog']='Fehler beim Schreiben des Log-files';
+$this->phrasen['courseInformation/ectsLvInfo']='ECTS - LV INFO';
+$this->phrasen['courseInformation/lvInfoFreigabe']='LV Info - Freigabe';
+$this->phrasen['courseInformation/bearbeitetVon']='Bearbeitet von';
+$this->phrasen['courseInformation/updateAm']='Update am';
+$this->phrasen['courseInformation/online']='Online';
 ?>
