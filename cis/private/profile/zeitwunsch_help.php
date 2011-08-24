@@ -23,16 +23,12 @@
  * Uebersicht der Zeitsperren der Mitarbeiter
  */
 require_once('../../../config/cis.config.inc.php');
-require_once('../../../include/globals.inc.php');
 require_once('../../../include/functions.inc.php');
-require_once('../../../include/person.class.php');
-require_once('../../../include/benutzer.class.php');
-require_once('../../../include/mitarbeiter.class.php');
-require_once('../../../include/studiensemester.class.php');
-require_once('../../../include/zeitsperre.class.php');
-require_once('../../../include/datum.class.php');
-require_once('../../../include/fachbereich.class.php');
-require_once('../../../include/organisationseinheit.class.php');
+require_once('../../../include/phrasen.class.php');
+
+$sprache = getSprache(); 
+$p= new phrasen($sprache);
+
 ?>
 
 <html>
@@ -42,28 +38,27 @@ require_once('../../../include/organisationseinheit.class.php');
 <link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </head>
 <body id="inhalt">
-<H3>Erkl&auml;rung:</H3>
-<P>Bitte kontrollieren/&auml;ndern Sie Ihre Zeitw&uuml;nsche und klicken Sie anschlie&szlig;end
-  auf &quot;Speichern&quot;!<BR><BR>
+<H3><?php echo $p->t('zeitwunsch/erklaerung');?>:</H3>
+<P><?php echo $p->t('zeitwunsch/kontrollierenSieIhreZeitwuensche');?>!<BR><BR>
 </P>
 <TABLE align="center" name="Zeitwerte">
   <TR>
-    <TH><B>Wert</B></TH>
+    <TH><B><?php echo $p->t('zeitwunsch/wert');?></B></TH>
     <TH>
-      <DIV align="center"><B>Bedeutung</B></DIV>
+      <DIV align="center"><B><?php echo $p->t('zeitwunsch/bedeutung');?></B></DIV>
     </TH>
   </TR>
   <TR>
     <TD>
       <DIV align="right">2</DIV>
     </TD>
-    <TD>Hier m&ouml;chte ich unterrichten</TD>
+    <TD><?php echo $p->t('zeitwunsch/hierMoechteIchUnterrichten');?>!</TD>
   </TR>
   <TR>
     <TD>
       <DIV align="right">1</DIV>
     </TD>
-    <TD>Hier kann ich unterrichten</TD>
+    <TD><?php echo $p->t('zeitwunsch/hierKannIchUnterrichten');?>!</TD>
   </TR>
   <!--<TR>
     <TD>
@@ -75,25 +70,21 @@ require_once('../../../include/organisationseinheit.class.php');
     <TD>
       <DIV align="right">-1</DIV>
     </TD>
-    <TD>Hier nur in extremen Notf&auml;llen</TD>
+    <TD><?php echo $p->t('zeitwunsch/nurInNotfaellen');?>!</TD>
   </TR>
   <TR>
     <TD>
       <DIV align="right">-2</DIV>
     </TD>
-    <TD>Hier auf gar keinen Fall !!!</TD>
+    <TD><?php echo $p->t('zeitwunsch/hierAufGarKeinenFall');?>!</TD>
   </TR>
 </TABLE>
 <P>&nbsp;</P>
-<H3>Folgende Punkte sind zu beachten:</H3>
+<H3><?php echo $p->t('zeitwunsch/folgendePunkteSindZuBeachten');?>:</H3>
 <OL>
-  <LI> Verwenden Sie den Wert -2 nur, wenn Sie zu dieser Stunde wirklich nicht
-    k&ouml;nnen, um eine bessere Optimierung zu erm&ouml;glichen.</LI>
-  <LI>Es sollten f&uuml;r jede Stunde die tats&auml;chlich unterrichtet wird,
-    mindestens das 3-fache an positiven Zeitw&uuml;nschen angegeben werden.<BR>
-    Beispiel: Sie unterrichten 4 Stunden/Woche, dann sollten Sie mindestens
-    12 Stunden im Raster mit positiven Werten ausf&uuml;llen.</LI>
+  <LI> <?php echo $p->t('zeitwunsch/verwendenSieDenWertNur');?>.</LI>
+  <LI> <?php echo $p->t('zeitwunsch/esSolltenFuerJedeStunde');?>.</LI>
 </OL>
-<P>Bei Problemen wenden Sie sich bitte an die <A class="Item" href="mailto:lvplan@technikum-wien.at">LV-Koordinationsstelle</A>.</P>
+<P><?php echo $p->t('zeitwunsch/beiProblemenWendenSieSichAn');?> <A class="Item" href="mailto:lvplan@technikum-wien.at"><?php echo $p->t('lvplan/lvKoordinationsstelle');?></A>.</P>
 </body>
 </html>
