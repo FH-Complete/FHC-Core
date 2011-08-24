@@ -13,4 +13,10 @@ $this->phrasen['courseInformation/institutsleiter']='Department Head';
 $this->phrasen['courseInformation/institutskoordinator']='Department Coordinator';
 $this->phrasen['courseInformation/unterrichtssprache']='Language of Instruction';
 $this->phrasen['courseInformation/voransicht']='Preview';
+$this->phrasen['courseInformation/fehlerBeimSchreibenDesLog']='Error: creating log-file';
+$this->phrasen['courseInformation/ectsLvInfo']='ECTS - LV INFO';
+$this->phrasen['courseInformation/lvInfoFreigabe']='LV Info - Release';
+$this->phrasen['courseInformation/bearbeitetVon']='Edited by';
+$this->phrasen['courseInformation/updateAm']='Update';
+$this->phrasen['courseInformation/online']='Online';
 ?>

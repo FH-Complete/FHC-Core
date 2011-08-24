@@ -1,5 +1,6 @@
 <?php
 $this->phrasen['zeitsperre/zeitsperren']='Zeitsperren';
+$this->phrasen['zeitsperre/zeitsperre']='Zeitsperre';
 $this->phrasen['zeitsperre/vonDatumUngueltig']='Von-Datum ist ungültig';
 $this->phrasen['zeitsperre/bisDatumUngueltig']='Bis-Datum ist ungültig';
 $this->phrasen['zeitsperre/vonDatumGroesserAlsBisDatum']='VON-Datum größer als Bis-Datum';
@@ -13,4 +14,16 @@ $this->phrasen['zeitsperre/keineZeitsperrenEingetragen']='Derzeit sind keine Zei
 $this->phrasen['zeitsperre/edit']='edit';
 $this->phrasen['zeitsperre/loeschen']='löschen';
 $this->phrasen['zeitsperre/wollenSieEintragWirklichLoeschen']='Wollen Sie diesen Eintrag wirklich löschen';
+$this->phrasen['zeitsperre/stundeInklusive']='Stunde (inklusive)';
+$this->phrasen['zeitsperre/achtungEsWerdenAlleEingegebenenTage']='Achtung: Es werden alle eingegeben Tage berücksichtigt, daher müssen mehrtägige Zeitsperren<br> an Unterbrechungen wie Wochenenden oder Feiertagen unterteilt werden!';
+$this->phrasen['zeitsperre/urlaubImGeschaeftsjahr']='Urlaub im Geschäftsjahr';
+$this->phrasen['zeitsperre/sieHabenKeineBerechtigungZuAendern']='Sie haben keine Berechtigung die Zeitsperre zu ändern.';
+$this->phrasen['zeitsperre/vonDatumIstUngueltigNullenAngeben']='Von-Datum ist ungültig. Bitte beachten Sie das führende nullen angegeben werden müssen (Beispiel: 01.01.2008)';
+$this->phrasen['zeitsperre/bisDatumIstUngueltigNullenAngeben']='Bis-Datum ist ungültig. Bitte beachten Sie das führende nullen angegeben werden müssen (Beispiel: 01.01.2008)';
+$this->phrasen['zeitsperre/bitteZuerstVertretungAuswaehlen']='Bitte zuerst eine Vertretung auswählen';
+$this->phrasen['zeitsperre/istNichtRichtig']='ist nicht richtig';
+$this->phrasen['zeitsperre/vonDatumMonat']='Von-Datum Monat';
+$this->phrasen['zeitsperre/bisDatumMonat']='Bis-Datum Monat';
+$this->phrasen['zeitsperre/istGroesserAlsBisDatum']='ist groesser als das Bis-Datum';
+$this->phrasen['zeitsperre/vonDatum']='Von-Datum';
 ?>

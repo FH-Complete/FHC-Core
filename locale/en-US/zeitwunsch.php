@@ -16,4 +16,7 @@ $this->phrasen['zeitwunsch/nurInNotfaellen']='Hier nur in extremen Notfällen';
 $this->phrasen['zeitwunsch/hierAufGarKeinenFall']='Hier auf gar keinen Fall'; 
 $this->phrasen['zeitwunsch/folgendePunkteSindZuBeachten']='Folgende Punkte sind zu beachten';
 $this->phrasen['zeitwunsch/verwendenSieDenWertNur']='Verwenden Sie den Wert -2 nur, wenn Sie zu dieser Stunde wirklich nicht können, um eine bessere Optimierung zu ermöglichen.';
+$this->phrasen['zeitwunsch/esSolltenFuerJedeStunde']='Es sollten für jede Stunde die tatsächlich unterrichtet wird, mindestens das 3-fache an positiven Zeitwünschen angegeben werden.<BR> Beispiel: Sie unterrichten 4 Stunden/Woche, dann sollten Sie mindestens 12 Stunden im Raster mit positiven Werten ausfüllen.';
+$this->phrasen['zeitwunsch/erklaerung']='Explanation';
+$this->phrasen['zeitwunsch/beiProblemenWendenSieSichAn']='Bei Problemen wenden Sie sich bitte an die';
 ?>
