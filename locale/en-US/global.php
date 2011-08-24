@@ -43,6 +43,7 @@ $this->phrasen['global/download']='Download';
 $this->phrasen['global/username']='Username';
 $this->phrasen['global/vorname']='First Name';
 $this->phrasen['global/nachname']='Last Name';
+$this->phrasen['global/name']='Name';
 $this->phrasen['global/uid']='UID';
 $this->phrasen['global/postnomen']='Postnomen';
 $this->phrasen['global/strasse']='Street';

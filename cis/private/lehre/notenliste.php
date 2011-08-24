@@ -29,21 +29,27 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/note.class.php');
+require_once('../../../include/phrasen.class.php');
+require_once('../../../include/studiengang.class.php');
+require_once('../../../include/lehrveranstaltung.class.php');
+
+$sprache = getSprache();
+$p = new phrasen($sprache);
 
 if (!$db = new basis_db())
-	die('Fehler beim Herstellen der Datenbankverbindung');
-?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
+
+echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
-	<title>Leistungsbeurteilung</title>
+	<title>'.$p->t('tools/leistungsbeurteilung').'</title>
 
 	<script language="JavaScript" type="text/javascript">
 	function MM_jumpMenu(targ, selObj, restore)
 	{
-	  eval(targ + ".location='" + selObj.options[selObj.selectedIndex].value + "'");
+	  eval(targ + ".location=\'" + selObj.options[selObj.selectedIndex].value + "\'");
 
 	  if(restore)
 	  {
@@ -54,19 +60,8 @@ if (!$db = new basis_db())
 </head>
 
 <body>
-	<table class="tabcontent" id="inhalt">
-		<tr>
-	    <td class="tdwidth10">&nbsp;</td>
-	    <td><table class="tabcontent">
-	    	<tr>
-	      		<td class="ContentHeader"><font class="ContentHeader">&nbsp;Leistungsbeurteilung</font></td>
-	    	</tr>
-	    	<tr>
-	      		<td>&nbsp;</td>
-	    	</tr>
-	    	<tr>
-	    		<td>
-<?php
+	<h1>'.$p->t('tools/leistungsbeurteilung').'</h1>';
+
 
 if(isset($_GET['stsem']))
 	$stsem = $_GET['stsem'];
@@ -81,12 +76,12 @@ $error = '';
 
 if(!check_student($user))
 {
-	$error .= 'Sie m&uuml;ssen als Student eingeloggt sein um ihre Noten abzufragen!';
+	$error .= $p->t('tools/mussAlsStudentEingeloggtSein');
 	echo $error;
 }
 else
 {
-	$qry = "SELECT vw_student.vorname, vw_student.nachname, tbl_studiengang.bezeichnung 
+	$qry = "SELECT vw_student.vorname, vw_student.nachname, tbl_studiengang.studiengang_kz 
 		FROM public.tbl_studiengang JOIN campus.vw_student USING (studiengang_kz) 
 		WHERE campus.vw_student.uid = '".addslashes($user)."'";
 	
@@ -98,7 +93,9 @@ else
 		
 		$vorname= $row->vorname;
 		$nachname = $row->nachname;
-		$stg_name = $row->bezeichnung;
+		$stg_obj = new studiengang();
+		$stg_obj->load($row->studiengang_kz);
+		$stg_name = $stg_obj->bezeichnung_arr[$sprache];
 	}
 	
 	//Aktuelles Studiensemester ermitteln
@@ -111,9 +108,9 @@ else
 
 	
 	echo "<br />";
-	echo "<b>Name:</b> $vorname $nachname<br />";
-	echo "<b>Studiengang:</b>  $stg_name<br />";
-	echo "<b>Studiensemester:</b> <SELECT name='stsem' onChange=\"MM_jumpMenu('self',this,0)\">";
+	echo "<b>".$p->t('global/name').":</b> $vorname $nachname<br />";
+	echo "<b>".$p->t('global/studiengang').":</b>  $stg_name<br />";
+	echo "<b>".$p->t('global/studiensemester')."</b> <SELECT name='stsem' onChange=\"MM_jumpMenu('self',this,0)\">";
 	foreach ($stsem_obj->studiensemester as $semrow)
 	{
 		if($stsem == $semrow->studiensemester_kurzbz)
@@ -128,7 +125,7 @@ else
 
 	//Lehrveranstaltungen und Noten holen
 	$qry = "SELECT
-				tbl_lehrveranstaltung.bezeichnung, tbl_zeugnisnote.note, tbl_lvgesamtnote.note as lvnote, tbl_zeugnisnote.benotungsdatum, tbl_lvgesamtnote.freigabedatum, tbl_lvgesamtnote.benotungsdatum as lvbenotungsdatum
+				tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_zeugnisnote.note, tbl_lvgesamtnote.note as lvnote, tbl_zeugnisnote.benotungsdatum, tbl_lvgesamtnote.freigabedatum, tbl_lvgesamtnote.benotungsdatum as lvbenotungsdatum
 			FROM
 				lehre.tbl_lehrveranstaltung, lehre.tbl_zeugnisnote
 			LEFT OUTER JOIN
@@ -149,8 +146,11 @@ else
 		$i=0;
 		while($row=$db->db_fetch_object($result))
 		{
+			$lv_obj = new lehrveranstaltung();
+			$lv_obj->load($row->lehrveranstaltung_id);
+			
 			$i++;
-			$tbl.= "<tr class='liste".($i%2)."'><td>$row->bezeichnung</td>";
+			$tbl.= "<tr class='liste".($i%2)."'><td>".$lv_obj->bezeichnung_arr[$sprache]."</td>";
 			$tbl.= "<td>";
 			
 			//Nur freigegebene Noten anzeigen
@@ -184,22 +184,16 @@ else
 
 		$tbl.= "</table>";
 		if($i==0)
-			echo "Es wurden noch keine Beurteilungen eingetragen";
+			echo $p->t('tools/nochKeineBeurteilungEingetragen');
 		else
 			echo $tbl;
 	}
 	else
 	{
-		$error .= "Fehler beim Auslesen der Noten";
+		$error .= $p->t('tools/fehlerBeimAuslesenDerNoten');
 	}
 }
 echo $error;
+echo '</body>
+</html>';
 ?>
-				</td>
-			</tr>
-			</table>
-		</td>
-	</tr>
-	</table>
-</body>
-</html>
