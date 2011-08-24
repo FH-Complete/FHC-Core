@@ -30,21 +30,21 @@
   	 			03-01-2006 Anpassung an neue DB
 */
 	
-	require_once('../../../../config/cis.config.inc.php');
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung 
-// ------------------------------------------------------------------------------------------
-	require_once('../../../../include/basis_db.class.php');
-	if (!$db = new basis_db())
-			die('Fehler beim Herstellen der Datenbankverbindung');
-			
-	require_once('../../../../include/functions.inc.php');
-	require_once('../../../../include/studiensemester.class.php');
-	require_once('../../../../include/lvinfo.class.php');
+require_once('../../../../config/cis.config.inc.php');
+require_once('../../../../include/basis_db.class.php');
+require_once('../../../../include/functions.inc.php');
+require_once('../../../../include/studiensemester.class.php');
+require_once('../../../../include/lvinfo.class.php');
+require_once('../../../../include/phrasen.class.php');
 
-	$user = get_uid();
-	if(!check_lektor($user))
-		die('<center>Sie haben keine Berechtigung fuer diesen Bereich</center>');
+$sprache = getSprache(); 
+$p = new phrasen($sprache); 
+
+if (!$db = new basis_db())
+	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
+$user = get_uid();
+if(!check_lektor($user))
+	die('<center>'.$p->t('global/keineBerechtigungFuerDieseSeite').'</center>');
 
 	/* WriteLog($qry,$uid)
 	 * @brief Schreib die Querys im format: uid - datum - qry ins LogFile
@@ -95,14 +95,14 @@
 		{
 			if(!WriteLog($lvinfo_obj->lastqry,$user))
 			{
-				echo "<br>Fehler beim Schreiben des Log-files<br>";
+				echo "<br>".$p->t('courseInformation/fehlerBeimSchreibenDesLog')."<br>";
 			}
 			$db->db_query('COMMIT');
 		}
 		else
 		{
 			$db->db_query('ROLLBACK');
-			echo "<br>Fehler beim loeschen<br>";
+			echo "<br>".$p->t('global/fehleraufgetreten')."<br>";
 		}
 	}
 
@@ -146,10 +146,10 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
-<title>ECTS - LV INFO</title>
+<title><?php echo $p->t('courseInformation/ectsLvInfo');?></title>
 <script language="JavaScript" type="text/javascript">
 function ask() {
-	return confirm("Wollen sie diese LV-Information wirklich loeschen ?")
+	return confirm("<?php echo $p->t('global/warnungWirklichLoeschen');?>");
 }
 </script>
 </head>
@@ -160,7 +160,7 @@ function ask() {
     <td>
     	<table class="tabcontent">
 	      <tr>
-	        <td class="ContentHeader"><font class="ContentHeader">&nbsp;LV Info - Freigabe</font></td>
+	        <td class="ContentHeader"><font class="ContentHeader">&nbsp;<?php echo $p->t('courseInformation/lvInfoFreigabe');?></font></td>
 	      </tr>
 		  <tr>
 			   <td>
@@ -171,10 +171,10 @@ function ask() {
 						    </td>
 							<td>
 								<ul>
-								<li>&nbsp;<a href='index.php?<?php echo "stg=$stg&sem=".(isset($sem)?$sem:'')."&lv=$lv"?>'><font size='3'>Bearbeiten</font></a></li>
-								<li>&nbsp;<a href='freigabe.php?<?php echo "stg=$stg&sem=".(isset($sem)?$sem:'')."&lv=$lv"?>'><font size='3'>Freigabe</font></a></li>
-								<li>&nbsp;<a href='beispiele.html'><font size='3'>Beispiele</font></a></li>
-								<li>&nbsp;<a href='terminologie.html'><font size='3'>Terminologie</font></a></li>
+								<li>&nbsp;<a href='index.php?<?php echo "stg=$stg&sem=".(isset($sem)?$sem:'')."&lv=$lv"?>'><font size='3'><?php echo $p->t('global/bearbeiten');?></font></a></li>
+								<li>&nbsp;<a href='freigabe.php?<?php echo "stg=$stg&sem=".(isset($sem)?$sem:'')."&lv=$lv"?>'><font size='3'><?php echo $p->t('courseInformation/freigabe');?></font></a></li>
+								<li>&nbsp;<a href='beispiele.html'><font size='3'><?php echo $p->t('global/beispiele');?></font></a></li>
+								<li>&nbsp;<a href='terminologie.html'><font size='3'><?php echo $p->t('courseInformation/terminologie');?></font></a></li>
 				 				</ul>
 							</td>
 			          </tr>
@@ -198,7 +198,7 @@ function ask() {
        if(!$result=$db->db_query($qry))
           die ('<center>Fehler bei einer Datenbankabfrage</center>');
 
-       echo "Studiengang   <SELECT name='stg' onChange='javascript:window.document.auswFrm.status.value=\"changestg\";window.document.auswFrm.submit();'>";
+       echo $p->t('global/studiengang')."   <SELECT name='stg' onChange='javascript:window.document.auswFrm.status.value=\"changestg\";window.document.auswFrm.submit();'>";
        //$firststg;
        $vorhanden=false;
 
@@ -228,9 +228,9 @@ function ask() {
        			AND tbl_lehrveranstaltung.studiengang_kz='$stg'
        			ORDER by semester";
        if(!$result=$db->db_query($qry))
-          die ("<center>Fehler bei einer Datenbankabfrage</center>");
+          die ("<center>".$p->t('global/fehleraufgetreten')."</center>");
 
-       echo " Semester   <SELECT name='sem' onChange='javascript:window.document.auswFrm.submit();'>";
+       echo " ".$p->t('global/semester')."   <SELECT name='sem' onChange='javascript:window.document.auswFrm.submit();'>";
 
        //$firstsem;
        $vorhanden=false;
@@ -264,11 +264,11 @@ function ask() {
 	              <table class="tabcontent">
 	              <tr class='liste'>
 	                 <th>x</th>
-	                 <th>Lehrfach</th>
-	                 <th>Bearbeitet von</th>
-	                 <th>Update am</th>
-	                 <th>Anzeigen</th>
-	                 <th>Online<br>de &nbsp; en</th>
+	                 <th><?php echo $p->t('lvaliste/lehrfach');?></th>
+	                 <th><?php echo $p->t('courseInformation/bearbeitetVon');?></th>
+	                 <th><?php echo $p->t('courseInformation/updateAm');?></th>
+	                 <th><?php echo $p->t('global/anzeigen');?></th>
+	                 <th><?php echo $p->t('courseInformation/online');?><br>de &nbsp; en</th>
 	              </tr>
 
 		             <?php
