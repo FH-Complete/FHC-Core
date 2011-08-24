@@ -33,7 +33,7 @@ $p= new phrasen($sprache);
 
 <html>
 <head>
-<title>Profil</title>
+<title><?php echo $p->t('zeitwunsch/profil');?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </head>
