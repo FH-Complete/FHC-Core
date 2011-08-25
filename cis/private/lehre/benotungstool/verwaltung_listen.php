@@ -1085,7 +1085,7 @@ else
 		$studentuebung = new uebung();
 		if (!$studentuebung->check_studentuebung($liste_id))
 		{
-			echo "<tr><td colspan='3'>Derzeit sind keine Aufgaben angelegt</td><td></td></tr>";
+			echo "<tr><td colspan='3'>".$p->t('benotungstool/derzeitSindKeineAufgabenAngelegt')."</td><td></td></tr>";
 			$anzeigen = 'beide';
 		}
 		else
@@ -1203,7 +1203,7 @@ else
 		echo "
 	<form accept-charset='UTF-8' action='verwaltung_listen.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&liste_id=$liste_id' method=POST enctype='multipart/form-data'>
 	<table >
-	<tr><td width='440' colspan=2 class='ContentHeader3'>Neue Abgabe anlegen</td><td></td></tr>
+	<tr><td width='440' colspan=2 class='ContentHeader3'>".$p->t('benotungstool/neueAbgabeAnlegen')."</td><td></td></tr>
 	<tr><td>".$p->t('benotungstool/thema')."</td><td align='right'><input type='text' name='thema' maxlength='32' value='".htmlentities($thema,ENT_QUOTES,'UTF-8')."'></td><td><span class='error'>$error_thema</td></tr>
 	<tr><td>".$p->t('benotungstool/freigabe')."</td><td align='right'>von <input type='text' size='16' name='freigabevon' value='$freigabevon'></td><td>$error_freigabevon</td></tr>
 	<tr><td>".$p->t('benotungstool/format')."</td><td align='right'>bis <input type='text' size='16' name='freigabebis' value='$freigabebis'></td><td>$error_freigabebis</td></tr>
