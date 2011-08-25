@@ -240,7 +240,7 @@ $uebung_obj->load_uebung($lehreinheit_id,1);
 if(count($uebung_obj->uebungen)>0)
 {
 	echo "<table width='100%'><tr><td valign='top'>";
-	echo "<br>Wählen Sie eine Kreuzerlliste: <SELECT name='uebung' onChange=\"MM_jumpMenu('self',this,0)\">\n";
+	echo "<br>".$p->t('benotungstool/waehlenSieEineKreuzerlliste').": <SELECT name='uebung' onChange=\"MM_jumpMenu('self',this,0)\">\n";
 	echo "<option value='statistik.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=' selected></option>";
 	foreach ($uebung_obj->uebungen as $row)
 	{
