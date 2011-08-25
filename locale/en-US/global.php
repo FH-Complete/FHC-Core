@@ -6,7 +6,7 @@ $this->phrasen['global/studiensemester']='Semester';
 $this->phrasen['global/studienzentrum']='Study Center';
 $this->phrasen['global/studiengangsleitung']='Head of Department';
 $this->phrasen['global/lehrveranstaltung']='Subject';
-$this->phrasen['global/lehreinheit']='Lehreinheit';
+$this->phrasen['global/lehreinheit']='Teaching unit';
 $this->phrasen['global/organisationseinheit']='Organisation Unit';
 
 $this->phrasen['global/studiengangsmanagement']='Study Management';
@@ -92,6 +92,8 @@ $this->phrasen['global/kalender']='Calendar';
 $this->phrasen['global/beginn']='Start'; 
 $this->phrasen['global/ende']='End';
 $this->phrasen['global/beispiele']='Examples';
+$this->phrasen['global/neu']='New';
+$this->phrasen['global/ok']='OK';
 
 $this->phrasen['global/anmelden']='Register'; 
 $this->phrasen['global/angemeldet']='Registered'; 
@@ -123,6 +125,7 @@ $this->phrasen['global/dateiErfolgreichHochgeladen']='File successfully uploaded
 $this->phrasen['global/dateiNichtErfolgreichHochgeladen']='Failed to upload File. Please retry';
 $this->phrasen['global/FuerDieseAktionBenoetigenSieAdministrationsrechte']='You must be Administrator.';
 $this->phrasen['global/dateiExistiertNicht']='File not found';
+$this->phrasen['global/fehlerBeimAktualisierenDerDaten']='Fehler beim Aktualiseren der Daten';
 
 //infrastruktur
 

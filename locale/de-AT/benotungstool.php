@@ -126,4 +126,7 @@ $this->phrasen['benotungstool/prozentPunkten']='Prozent</a> / <u>Punkten</u>';
 $this->phrasen['benotungstool/notenschluesselDefinieren']='Notenschlüssel definieren';
 $this->phrasen['benotungstool/minimum']='Minimum';
 $this->phrasen['benotungstool/standardwerteSetzen']='Standardwerte setzen';
+$this->phrasen['benotungstool/neueAbgabeAnlegen']='Neue Abgabe anlegen';
+$this->phrasen['benotungstool/derzeitSindKeineAufgabenAngelegt']='Derzeit sind keine Aufgaben angelegt';
+$this->phrasen['benotungstool/waehlenSieEineKreuzerlliste']='Wählen Sie eine Kreuzerlliste';
 ?>
