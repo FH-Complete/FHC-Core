@@ -25,7 +25,7 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 function get_uid()
 {
 	if(isset($_SERVER['REMOTE_USER']))
-		return (isset($_SERVER['REMOTE_USER'])?mb_strtolower(trim($_SERVER['REMOTE_USER'])):'');
+		return mb_strtolower(trim($_SERVER['REMOTE_USER']));
 	else
 	{
 		if(isset($_SESSION['user']))
@@ -41,13 +41,14 @@ function get_uid()
 function get_original_uid()
 {
 	if(isset($_SERVER['REMOTE_USER']))
-		return (isset($_SERVER['REMOTE_USER'])?mb_strtolower(trim($_SERVER['REMOTE_USER'])):'');
+		return mb_strtolower(trim($_SERVER['REMOTE_USER']));
 	else
 	{
 		if(isset($_SESSION['user_original']))
 			return $_SESSION['user_original'];
 	}
 }
+
 
 function login_as_user($uid)
 {

@@ -27,6 +27,7 @@ require_once('../config/cis.config.inc.php');
 require_once('../include/content.class.php');
 require_once('../include/template.class.php');
 require_once('../include/functions.inc.php');
+require_once('../include/phrasen.class.php');
 
 if(isset($_GET['content_id']))
 	$content_id = $_GET['content_id'];
@@ -37,6 +38,7 @@ $version = (isset($_GET['version'])?$_GET['version']:null);
 $sprache = (isset($_GET['sprache'])?$_GET['sprache']:getSprache());
 $sichtbar = !isset($_GET['sichtbar']);
 
+$p = new phrasen($sprache);
 //XML Content laden
 $content = new content();
 
@@ -44,7 +46,19 @@ if($content->islocked($content_id))
 {
 	$uid = get_uid();
 	if(!$content->berechtigt($content_id, $uid))
-		die($uid.': Sie haben keine Berechtigung fuer diese Seite');
+	{
+		echo '<html>
+				<head>
+					<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+					<link href="../skin/style.css.php" rel="stylesheet" type="text/css">
+				</head>
+				<body>
+					<h1>'.CAMPUS_NAME.'</h1>
+					'.$p->t('global/keineBerechtigungFuerDieseSeite').'
+				</body>
+				</html>';
+		exit;
+	}		
 }
 
 if(!$content->getContent($content_id, $sprache, $version, $sichtbar, true))
