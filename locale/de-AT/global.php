@@ -102,6 +102,7 @@ $this->phrasen['global/dateiLoeschen']='Datei Löschen';
 $this->phrasen['global/betreff']='Betreff';
 $this->phrasen['global/handbuch']='Handbuch';
 $this->phrasen['global/hilfe']='Hilfe';
+$this->phrasen['global/benutzer']='Benutzer';
 
 // Statusmeldungen
 $this->phrasen['global/erfolgreichgespeichert']='Erfolgreich gespeichert'; 
