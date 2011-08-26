@@ -41,7 +41,6 @@ $p = new phrasen($sprache);
 if (!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
 		
-
 function microtime_float()
 {
     list($usec, $sec) = explode(" ", microtime());
@@ -246,7 +245,7 @@ if($result = $db->db_query($qry))
 	if($db->db_num_rows($result)>1)
 	{
 		//Lehreinheiten DropDown
-		echo " Lehreinheit: <SELECT name='lehreinheit_id' onChange=\"MM_jumpMenu('self',this,0)\">\n";
+		echo " ".$p->t('global/lehreinheit').": <SELECT name='lehreinheit_id' onChange=\"MM_jumpMenu('self',this,0)\">\n";
 		while($row = $db->db_fetch_object($result))
 		{
 			if($lehreinheit_id=='')
@@ -309,7 +308,7 @@ echo '</td><tr></table>';
 echo '<table width="100%"><tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
 echo "<td>\n";
-echo "<b>$lv_obj->bezeichnung</b><br>";
+echo "<b>".$lv_obj->bezeichnung_arr[$sprache]."</b><br>";
 
 if($lehreinheit_id=='')
 	die($p->t('benotungstool/esGibtKeineLehreinheiten'));
@@ -830,8 +829,9 @@ if(isset($_GET["uebung_id"]) && $_GET["uebung_id"]!='')
 
 	$uebung_obj = new uebung();
 	$uebung_obj->load($uebung_id);
-	$downloadname = mb_ereg_replace($uebung_id,ereg_replace(' ','_',$uebung_obj->bezeichnung), $uebung_obj->angabedatei);
-	
+	//$downloadname = mb_ereg_replace($uebung_id,ereg_replace(' ','_',$uebung_obj->bezeichnung), $uebung_obj->angabedatei);
+	$downloadname = mb_str_replace(' ', '_', $uebung_obj->bezeichnung);
+	$downloadname = mb_str_replace($uebung_id, $downloadname, $uebung_obj->angabedatei);
 	echo "
 	<tr><td>".$p->t('benotungstool/thema')."</td><td align='right'><input type='text' name='thema'  maxlength='32' value='".htmlentities($uebung_obj->bezeichnung,ENT_QUOTES,'UTF-8')."'></td><td>$error_thema</td></tr>
 	<tr><td>".$p->t('benotungstool/freigabe')."</td><td align='right'>von <input type='text' size='16' name='freigabevon' value='".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon))."'></td></tr>

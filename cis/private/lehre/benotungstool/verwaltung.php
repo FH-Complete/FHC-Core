@@ -279,7 +279,7 @@ echo '<table width="100%"><tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
 echo "<td>\n";
 
-echo "<b>$lv_obj->bezeichnung</b><br>";
+echo "<b>".$lv_obj->bezeichnung_arr[$sprache]."</b><br>";
 
 if($lehreinheit_id=='')
 	die($p->t('benotungstool/esGibtKeineLehreinheiten'));
