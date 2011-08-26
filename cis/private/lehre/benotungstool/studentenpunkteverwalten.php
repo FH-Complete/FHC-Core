@@ -20,14 +20,8 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
- require_once('../../../../config/cis.config.inc.php');
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung 
-// ------------------------------------------------------------------------------------------
-	require_once('../../../../include/basis_db.class.php');
-	if (!$db = new basis_db())
-			die('Fehler beim Herstellen der Datenbankverbindung');
-			
+require_once('../../../../config/cis.config.inc.php');
+require_once('../../../../include/basis_db.class.php');		
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/studiengang.class.php');
@@ -41,9 +35,11 @@ require_once('../../../../include/datum.class.php');
 require_once('functions.inc.php');
 require_once('../../../../include/phrasen.class.php');
 
+if (!$db = new basis_db())
+		die('Fehler beim Herstellen der Datenbankverbindung');
+		
 $sprache = getSprache(); 
 $p = new phrasen($sprache); 
-
 
 $user = get_uid();
 
@@ -175,7 +171,7 @@ else
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
-<title>Benotungstool</title>
+<title><?php echo $p->t('benotungstool/benotungstool');?></title>
 <script language="JavaScript" type="text/javascript">
 <!--
 	function MM_jumpMenu(targ, selObj, restore)
@@ -203,7 +199,7 @@ else
 echo '<table class="tabcontent" height="100%">';
 echo ' <tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
-echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;Benotungstool';
+echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;'.$p->t('benotungstool/benotungstool');
 echo '</font></td><td  class="ContentHeader" align="right">'."\n";
 
 //Studiensemester laden
@@ -214,7 +210,7 @@ if($stsem=='')
 $stsem_obj->getAll();
 
 //Studiensemester DropDown
-$stsem_content = "Studiensemester: <SELECT name='stsem' onChange=\"MM_jumpMenu('self',this,0)\">\n";
+$stsem_content = $p->t('global/studiensemester').": <SELECT name='stsem' onChange=\"MM_jumpMenu('self',this,0)\">\n";
 
 foreach($stsem_obj->studiensemester as $studiensemester)
 {
@@ -307,7 +303,7 @@ echo '</td><tr></table>';
 echo '<table width="100%"><tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
 echo "<td>\n";
-echo "<b>$lv_obj->bezeichnung</b><br>";
+echo "<b>".$lv_obj->bezeichnung_arr[$sprache]."</b><br>";
 
 if($lehreinheit_id=='')
 	die($p->t('benotungstool/keinePassendeLehreinheitGefunden'));

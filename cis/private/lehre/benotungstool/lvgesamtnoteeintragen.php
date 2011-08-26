@@ -20,14 +20,8 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
- require_once('../../../../config/cis.config.inc.php');
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung 
-// ------------------------------------------------------------------------------------------
-	require_once('../../../../include/basis_db.class.php');
-	if (!$db = new basis_db())
-			die('Fehler beim Herstellen der Datenbankverbindung');
-			
+require_once('../../../../config/cis.config.inc.php');
+require_once('../../../../include/basis_db.class.php');			
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/studiengang.class.php');
@@ -45,10 +39,13 @@ require_once('../../../../include/person.class.php');
 require_once('../../../../include/benutzer.class.php');
 require_once('../../../../include/student.class.php');
 
+if (!$db = new basis_db())
+	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
+		
 $user = get_uid();
 
 if(!check_lektor($user))
-	die('Sie haben keine Berechtigung fuer diesen Bereich');
+	die($p->t('global/keineBerechtigungFuerDieseSeite'));
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
@@ -56,7 +53,7 @@ $rechte->getBerechtigungen($user);
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid'])) //Lehrveranstaltung_id
 	$lvid = $_GET['lvid'];
 else
-	die('Fehlerhafte Parameteruebergabe');
+	die($p->t('global/fehlerBeiDerParameteruebergabe'));
 
 //Laden der Lehrveranstaltung
 $lv_obj = new lehrveranstaltung();
@@ -98,7 +95,7 @@ if(!$rechte->isBerechtigt('admin',0) &&
 	if($result = $db->db_query($qry))
 	{
 		if($db->db_num_rows($result)==0)
-			die('Sie haben keine Berechtigung für diese Seite');
+			die($p->t('global/keineBerechtigungFuerDieseSeite'));
 	}
 	else 
 	{
@@ -117,7 +114,7 @@ function savenote($db,$lvid, $student_uid, $note)
 		{
 			$student = new student();
 			$student->load($student_uid);
-			return 'Der Student '.$student->nachname.' '.$student->vorname.' ('.trim($student->matrikelnr).') ist dieser Lehrveranstaltung nicht zugeordnet. Die Note wird nicht uebernommen!'."\n";
+			return $p->t('benotungstool/studentIstLvNichtZugeordnet', array($student->nachname, $student->vorname, trim($student->matrikelnr)))."\n";
 		}
 	
 	$lvgesamtnote = new lvgesamtnote();
@@ -168,7 +165,7 @@ if (isset($_REQUEST["submit"]))
 		if((($note>0) && ($note < 6)) || ($note == 7) || ($note==8))
 			$response = savenote($db,$lvid, $student_uid, $note);
 		else
-			$response = "Bitte geben Sie eine Note von 1 - 5 bzw. 7 (nicht beurteilt) oder 8 (teilgenommen) ein!";
+			$response = $p->t('benotungstool/noteEingeben')."!";
 		
 		echo $response;
 	}
@@ -188,7 +185,7 @@ if (isset($_REQUEST["submit"]))
 					$student = new student();
 					if(!$student_uid = $student->getUidFromMatrikelnummer($matrikelnummer))
 					{
-						$response.="\nStudent mit der Matrikelnummer ".$matrikelnummer.' existiert nicht';
+						$response.="\n".$p->t('benotungstool/studentMitMatrikelnummerExistiertNicht',array($matrikelnummer));
 						continue;
 					}
 					if((($note>0) && ($note < 6)) || ($note == 7) || ($note==8))
@@ -200,12 +197,12 @@ if (isset($_REQUEST["submit"]))
 					else
 					{
 						$student->load($student_uid);
-						$response .= "\nFehlerhafte Note bei Student $student->nachname $student->vorname. Bitte geben Sie eine Note von 1 - 5 bzw. 7 (nicht beurteilt) oder 8 (teilgenommen) ein!";
+						$response .= "\n".$p->t('benotungstool/fehlerhafteNoteBeiStudent', array($student->vorname, $student->nachname))." ".$p->t('benotungstool/noteEingeben');
 					}
 				}
 				else 
 				{
-					$response.="\nFehler bei der Parameteruebergabe";					
+					$response.="\n".$p->t('global/fehlerBeiDerParameteruebergabe');					
 				}
 			}
 		}
