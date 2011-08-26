@@ -21,6 +21,11 @@
  */
 require_once('../../config/cis.config.inc.php');
 require_once('../../include/functions.inc.php');
+require_once('../../include/phrasen.class.php');
+
+$sprache = getSprache();
+$p = new phrasen($sprache);
+$uid = get_uid();
 
 function mail_id_generator()
 {
@@ -57,23 +62,24 @@ function mail_id_generator()
 	}
     return $mail_id;
 }
-?>
+
+echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
-	<title>&Ouml;ffnen eines Mailverteilers</title>
+	<title>'.$p->t('mailverteiler/oeffnenEinesVerteilers').'</title>
 </head>
-<body id="inhalt">
-<?php
- if(isset($_REQUEST['token']) && isset($_REQUEST['grp']))
- {
- 	echo '
- 	<table class="tabcontent">
+<body>';
+
+if(isset($_REQUEST['token']) && isset($_REQUEST['grp']))
+{
+	echo '
+	<table class="tabcontent">
  		<tr>
- 	        	<td class="ContentHeader"><font class="ContentHeader">Mailverteiler</font></td>
- 	        	<td class="ContentHeader"><font class="ContentHeader">Status</font></td>
+ 	        	<td class="ContentHeader"><font class="ContentHeader">'.$p->t('mailverteiler/mailverteiler').'</font></td>
+ 	        	<td class="ContentHeader"><font class="ContentHeader">'.$p->t('mailverteiler/status').'</font></td>
  	      	</tr>';
  	
 	/* Generate an random String  */
@@ -84,7 +90,7 @@ function mail_id_generator()
 	exec($command);
 
 	/* ffe, 20051020 - do a little logging */
-	$message= date("F j G:i:s") . " mailgroup: [" . $_REQUEST['grp'] . "] (using " . $mail_id . ") requested by [" . $_SERVER['PHP_AUTH_USER'] . "]\n";
+	$message= date("F j G:i:s") . " mailgroup: [" . $_REQUEST['grp'] . "] (using " . $mail_id . ") requested by [" . $uid . "]\n";
 
 	$filet = fopen(LOG_PATH.'.htmlistopen.log', "a");
    	fwrite($filet, $message, mb_strlen($message));
@@ -94,31 +100,30 @@ function mail_id_generator()
 	echo "
 	<tr>
 		<td><a href='mailto:".$_REQUEST['grp'].$mail_id."@technikum-wien.at'>".$_REQUEST['desc']."</a></td>
-		<td>Ge&ouml;ffnet (Code: ".$mail_id.")</td>
+		<td>".$p->t('mailverteiler/geoeffnet')." (Code: ".$mail_id.")</td>
 	</tr>
 	<tr>
 	<td colspan='2'>
-	<p>Um ein Mail an den Verteiler zu senden klicken Sie bitte auf den obigen Link. Ihr Mailprogramm &ouml;ffnet automatisch eine Vorlage f&uuml;r ein neues Mail, welche bereits die korrekte Adresse enth&auml;lt.</p>
+	<p>".$p->t('mailverteiler/klickenZumSchicken')."</p>
 
-	<p>Das Senden ist f&uuml;r den Zeitraum von <b>2 Stunden</b> bzw. f&uuml;r die <b>einmalige</b> Benutzung unter der Adresse <a href='mailto:".$_REQUEST['grp'].$mail_id."@technikum-wien.at'>".$_REQUEST['grp'].$mail_id."@technikum-wien.at</a> m&ouml;glich.</p>
+	<p>".$p->t('mailverteiler/infoBenutzung',array($_REQUEST['grp'].$mail_id."@technikum-wien.at"))."</p>
 	</td>
 	</tr>
 	</table>
 	";
- }
- else
- {
- 	if($_REQUEST['grp']=="")
- 	{
- 		exit();
- 	}
- 	else
- 	{
- 		//Fixed for https
- 		//echo"Bitte best&auml;tigen Sie das &Ouml;ffnen des Verteilers ".$_REQUEST['grp'].": <a href=\"http://".$_SERVER['SERVER_NAME'].$_SERVER['SCRIPT_NAME']."?grp=".$_REQUEST['grp']."&desc=".$_REQUEST['desc']."&token=1\">Best&auml;tige</a>";
- 		echo"Bitte best&auml;tigen Sie das &Ouml;ffnen des Verteilers ".$_REQUEST['grp'].": <a href=\"".$_SERVER['SCRIPT_NAME']."?grp=".$_REQUEST['grp']."&desc=".$_REQUEST['desc']."&token=1\">Best&auml;tige</a>";
+}
+else
+{
+	if($_REQUEST['grp']=="")
+	{
+		exit();
 	}
- }
+	else
+	{
+		echo $p->t('mailverteiler/bestaetigeOeffnen',array($_REQUEST['grp']))." : <a href=\"".$_SERVER['SCRIPT_NAME']."?grp=".$_REQUEST['grp']."&desc=".$_REQUEST['desc']."&token=1\">".$p->t('mailverteiler/bestaetige')."</a>";
+	}
+}
+ 
+echo '</body>
+</html>';
 ?>
-</body>
-</html>

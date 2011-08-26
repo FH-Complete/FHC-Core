@@ -20,25 +20,20 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
- ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
-	<title>Personen im Mailverteiler</title>
-</head>
-<body id="inhalt">
-<?php
   require_once('../../config/cis.config.inc.php');
   require_once('../../include/basis_db.class.php');
   require_once('../../include/functions.inc.php');
   require_once('../../include/studiensemester.class.php');
+  require_once('../../include/phrasen.class.php');
+  
+  $sprache = getSprache();
+  $p = new phrasen($sprache);
+  
   if (!$db = new basis_db())
-  		die('Fehler beim Oeffnen der Datenbankverbindung');
+  		die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
   
   if (!$user=get_uid())
-		die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden ! <a href="javascript:history.back()">Zur&uuml;ck</a>');
+		die($p->t('global/fehlerBeimErmittelnDerUID'));
 
 	$stsem_obj = new studiensemester();
 	$stsem = $stsem_obj->getaktorNext();
@@ -48,17 +43,26 @@
   else
        $is_lector=false;       
        
-?>
+echo '
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
+	<title>'.$p->t('mailverteiler/personenImVerteiler').'</title>
+</head>
+<body id="inhalt">
+
 	<table class="tabcontent">
 		<tr>
-			<td class="ContentHeader"><font class="ContentHeader">Nachname</font></td>
-			<td class="ContentHeader"><font class="ContentHeader">Vorname</font></td>
-			<td class="ContentHeader"><font class="ContentHeader">E-Mail</font></td>
-		</tr>
+			<td class="ContentHeader"><font class="ContentHeader">'.$p->t('global/nachname').'</font></td>
+			<td class="ContentHeader"><font class="ContentHeader">'.$p->t('global/vorname').'</font></td>
+			<td class="ContentHeader"><font class="ContentHeader">'.$p->t('global/mail').'</font></td>
+		</tr>';
 
-<?php
+
  		  //$sql_query = "SELECT vornamen AS vn,nachname AS nn,a.uid as uid FROM public.tbl_personmailgrp AS a, public.tbl_person AS b WHERE a.uid=b.uid AND a.mailgrp_kurzbz='$grp' ORDER BY nachname";
-	  $qry = "SELECT uid, vorname, nachname FROM campus.vw_benutzer JOIN tbl_benutzergruppe USING (uid) WHERE gruppe_kurzbz='".addslashes($_GET['grp'])."' AND (studiensemester_kurzbz IS NULL OR studiensemester_kurzbz='$stsem') ORDER BY nachname, vorname";
+	  $qry = "SELECT uid, vorname, nachname FROM campus.vw_benutzer JOIN tbl_benutzergruppe USING (uid) WHERE gruppe_kurzbz='".addslashes($_GET['grp'])."' AND (studiensemester_kurzbz IS NULL OR studiensemester_kurzbz='".addslashes($stsem)."') ORDER BY nachname, vorname";
 	  if($result=$db->db_query($qry))
 	  {
 	  	while($row = $db->db_fetch_object($result))
@@ -70,7 +74,8 @@
 	      	echo "</tr>";
 		}
 	  }
+echo '
+		</table>
+	</body>
+</html>';
 ?>
-	</table>
-</body>
-</html>
