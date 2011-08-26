@@ -101,6 +101,11 @@ $berechtigte_oe = $rechte->getOEkurzbz('basis/cms')
 		});
 		return false;
 	}
+
+	function openDMS()
+	{
+		window.open ("<?php echo APP_ROOT;?>cms/tinymce_dms.php","DMS","resizable=1,width=800,height=600");
+	}
 	</script>
 </head>
 
@@ -615,7 +620,7 @@ if(!is_null($method))
 echo '<table width="100%">
 	<tr>
 		<td colspan="2">
-		<h1>FH Complete CMS</h1>
+		<h1>FH Complete CMS <span style="float: right"><a href="#DMS" onclick="openDMS(); return false;">DMS anzeigen</a>&nbsp;</span></h1>
 		</td>
 	</tr>
 	<tr>
