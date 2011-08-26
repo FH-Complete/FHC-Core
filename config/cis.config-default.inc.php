@@ -47,6 +47,9 @@ define('DOC_ROOT','/var/www/cis/htdocs');
 // Externe Funktionen - Unterordner im Include-Verzeichnis
 define('EXT_FKT_PATH','tw');
 
+//ID des CMS-Contents bei dem das CIS Menue beginnt 
+define('CIS_MENU_ENTRY_CONTENT',1);
+
 //Zusaetzliches Menue bei Lehrveranstaltungen anzeigen (Lektorenbereich, Info u. Kommunikation, etc)
 define('CIS_EXT_MENU',true);
 
