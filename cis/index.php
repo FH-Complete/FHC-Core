@@ -21,8 +21,32 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  *
  */
-
 require_once('../config/cis.config.inc.php');
+require_once('../include/functions.inc.php');
+require_once('../include/sprache.class.php');
+ob_start();
+if(isset($_GET['sprache']))
+{
+	$sprache = new sprache();
+	if($sprache->load($_GET['sprache']))
+		setSprache($_GET['sprache']);
+	else
+		die('Sprache invalid');
+}
+if(isset($_GET['content_id']))
+	$id = $_GET['content_id'];
+else
+	$id = '';
+	
+if(isset($_GET['menu']))
+	$menu = $_GET['menu'];
+else
+	$menu = 'menu.php?content_id='.$id;
+	
+if(isset($_GET['content']))
+	$content = $_GET['content'];
+else
+	$content = '../cms/news.php';
 ?>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -33,44 +57,65 @@ require_once('../config/cis.config.inc.php');
 	<link href="../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
 </head>
-<body>
+<script type="text/javascript">
+function changeSprache(sprache)
+{
+	var menu = '';
+	var content = '';
+	menu = document.getElementById('menue').contentWindow.location.href;
+	content = document.getElementById('content').contentWindow.location.href;
+	menu = escape(menu);
+	content = escape(content);
+	
+	window.location.href="index.php?sprache="+sprache+"&content_id=<?php echo $id;?>&menu="+menu+"&content="+content;
+}
+</script>
+<body style="margin-top:0; padding-top:0">
 <table class="tabcontent">
-	 
+	 <tr>
+	 	<td></td>
+	 	<td width="100%" ></td>
+	 	<td width="100%" ></td>
+	 	<td></td>
 	<tr>
 	    <td width="170" class="tdwrap" onclick="self.location.href='index.php'">
 			<div class="home_logo">&nbsp;</div>
 	    </td>
-		
-        <td id="header" width="100%">
+        <td id="header" colspan="2">
     	    	<div class="header_line" ></div>
         </td>
-		<td nowrap class="tdwrap">
+		<td nowrap >
 			<div style="font-size: 10px;"><i>Powered by <a href="http://fhcomplete.technikum-wien.at/" target="blank">FH Complete 2.0</a></i></div>
 		</td>
 	</tr>
-
-   	 <tr>
-			<td id="footer">&nbsp;</td>
-    	    <td colspan="2"><?php require_once('../include/'.EXT_FKT_PATH.'/cis_menu_global.inc.php'); 	?></td>
+	<tr>
+		<td></td>
+   	 <td align="right"  nowrap  colspan="2">
+   	 <?php require_once('../include/'.EXT_FKT_PATH.'/cis_menu_global.inc.php'); 	?>
+   	 
+				</td>
+   	    <td align="right">
+   	    <?php
+  
+				$sprache = new sprache();
+				$sprache->getAll(true);
+				foreach($sprache->result as $row)
+				{
+					echo ' <a href="#'.$row->sprache.'" title="'.$row->sprache.'" onclick="changeSprache(\''.$row->sprache.'\'); return false;"><img src="../cms/image.php?src=flag&sprache='.$row->sprache.'" alt="'.$row->sprache.'"></a>';
+				}
+				?>
+   	    </td>
 	</tr>
 </table>
-<iframe id="menue" src="menu.php" name="menu" frameborder="0">
+<iframe id="menue" src="<?php echo $menu; ?>" name="menu" frameborder="0">
 	No iFrames
 </iframe>
-<iframe id="content" src="public/news.php" name="content" frameborder="0">
+<!-- <iframe id="content" src="public/news.php" name="content" frameborder="0">  -->
+<iframe id="content" src="<?php echo $content; ?>" name="content" frameborder="0">
 	No iFrames
 </iframe>
 </body>
-<!--<frameset rows="77,*,1" cols="*" frameborder="NO" border="0" framespacing="0">
-	<frame src="topbar.html" name="topbar" scrolling="NO" noresize>
-	<frameset rows="*" cols="200,*" framespacing="0" frameborder="NO" border="0">
-		<frame src="menu.html" name="menu" scrolling="AUTO" noresize>
-    	<frame src="public/news.php" name="content">
-  	</frameset>
-	<noframes>
-		<body>
-		<p>Diese Seite verwendet Frames. Frames werden von Ihrem Browser aber nicht	unterstÃ¼tzt.</p>
-		</body>
-	</noframes>
-</frameset> -->
 </html>
+<?php
+ob_end_flush();
+?>

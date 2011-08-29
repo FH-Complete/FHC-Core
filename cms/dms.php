@@ -49,6 +49,9 @@ if(file_exists($filename))
 {
 	if($handle = fopen($filename,"r"))
 	{
+		if($doc->mimetype=='')
+			$doc->mimetype='application/octetstream';
+		
 		header('Content-type: '.$doc->mimetype);
 		header('Content-Disposition: inline; filename="'.$doc->name.'"');
 		header('Content-Length: ' .filesize($filename));
