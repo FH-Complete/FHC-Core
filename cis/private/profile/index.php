@@ -280,7 +280,7 @@ $nr_mg=$db->db_num_rows($erg_mg);
 			{
 				echo '
 					<A class="Item" href="zeitwunsch.php?uid='.$uid.'">'.$p->t('profil/zeitwuensche').'</A><BR>
-					<A class="Item" href="lva_liste.php?uid='.$uid.'">'.$p->t('profil/lehrveranstaltungen').'</A>';
+					<A class="Item" href="lva_liste.php?uid='.$uid.'">'.$p->t('lvaliste/lehrveranstaltungen').'</A>';
 			}
 		}
 		
@@ -303,7 +303,7 @@ $nr_mg=$db->db_num_rows($erg_mg);
 			{
 				if($db->db_num_rows($result_funktion)>0)
 				{
-					echo '<br><br><b>'.$p->t('profil/funktionen').'</b><table><tr class="liste"><th>'.$p->t('global/bezeichnung').'</th><th>'.$p->t('profil/organisationseinheit').'</th><th>'.$p->t('global/semester').'</th><th>'.$p->t('global/institut').'</th></tr>';
+					echo '<br><br><b>'.$p->t('profil/funktionen').'</b><table><tr class="liste"><th>'.$p->t('global/bezeichnung').'</th><th>'.$p->t('global/organisationseinheit').'</th><th>'.$p->t('global/semester').'</th><th>'.$p->t('global/institut').'</th></tr>';
 
 					while($row_funktion = $db->db_fetch_object($result_funktion))
 					{
