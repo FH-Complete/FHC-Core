@@ -27,6 +27,7 @@ require_once(dirname(__FILE__).'/../../include/functions.inc.php');
 require_once(dirname(__FILE__).'/../../include/phrasen.class.php');
 require_once(dirname(__FILE__).'/../../include/studiensemester.class.php');
 require_once(dirname(__FILE__).'/../../include/studiengang.class.php');
+require_once(dirname(__FILE__).'/../../include/lehrveranstaltung.class.php');
 
 class menu_addon_meinelv extends menu_addon
 {
@@ -45,6 +46,9 @@ class menu_addon_meinelv extends menu_addon
 		//Meine LVs Student
 		if(!$is_lector)
 		{
+			$studiengang_obj = new studiengang();
+			$studiengang_obj->getAll();
+
 			if ($stsemobj = new studiensemester())
 			{
 				$stsem = $stsemobj->getAktorNext();
@@ -56,20 +60,23 @@ class menu_addon_meinelv extends menu_addon
 				{
 					while($row = $this->db_fetch_object($result))
 					{
+						$lv_obj = new lehrveranstaltung();
+						$lv_obj->load($row->lehrveranstaltung_id);
+
 						if($row->studiengang_kz==0 && $row->semester==0) // Freifach
 						{
-							$this->items[] = array('title'=>$row->bezeichnung,
+							$this->items[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
 							 'target'=>'content',
 							 'link'=>'private/freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id,
-							 'name'=>'FF '.$this->CutString($row->bezeichnung, $cutlength)
+							 'name'=>'FF '.$this->CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength)
 							);
 						}
 						else
 						{
-							$this->items[] = array('title'=>$row->bezeichnung,
+							$this->items[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
 							 'target'=>'content',
 							 'link'=>'private/lehre/lesson.php?lvid='.$row->lehrveranstaltung_id,
-							 'name'=>$stg[$row->studiengang_kz].$row->semester.' '.$this->CutString($row->bezeichnung, $cutlength)
+							 'name'=>$studiengang_obj->kuerzel_arr[$row->studiengang_kz].$row->semester.' '.$this->CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength)
 							);
 						}
 					}
@@ -98,9 +105,12 @@ class menu_addon_meinelv extends menu_addon
 				{
 					while($row = $this->db_fetch_object($result))
 					{
+						$lv_obj = new lehrveranstaltung();
+						$lv_obj->load($row->lehrveranstaltung_id);
+
 						if($row->studiengang_kz==0 AND $row->semester==0)
 						{
-							$this->items[] = array('title'=>$row->bezeichnung,
+							$this->items[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
 							 'target'=>'content',
 							 'link'=>'private/freifaecher/lesson.php?lvid='.$row->lehrveranstaltung_id,
 							 'name'=>'FF '.$this->CutString($row->lehreverzeichnis, $cutlength)
@@ -112,10 +122,10 @@ class menu_addon_meinelv extends menu_addon
 							$stg_obj->load($row->studiengang_kz);
 							$kurzbz = $stg_obj->kuerzel.'-'.$row->semester;
 							
-							$this->items[] = array('title'=>$row->bezeichnung,
+							$this->items[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
 							 'target'=>'content',
 							 'link'=>'private/lehre/lesson.php?lvid='.$row->lehrveranstaltung_id,
-							 'name'=>$kurzbz.' '.$this->CutString($row->bezeichnung, $cutlength)
+							 'name'=>$kurzbz.' '.$this->CutString($lv_obj->bezeichnung_arr[$sprache], $cutlength)
 							);
 						}	
 					}
