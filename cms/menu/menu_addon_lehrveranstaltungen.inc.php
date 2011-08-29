@@ -51,7 +51,10 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 		$user = get_uid();
 		$student = new student();
 		if($student->load($user))
+		{
 			$studiengang_kz=$student->studiengang_kz;
+			$semester=$student->semester;
+		}
 			
 		$p = new phrasen($sprache);
 		
@@ -87,7 +90,10 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 		if(isset($params['semester']) && is_numeric($params['semester']))
 			$semester=$params['semester'];
 		else
-			$semester=1;
+		{
+			if(!isset($semester))
+				$semester=1;
+		}
 		
 		$sel_kurzbzlang='';
 		foreach($stg_obj->result as $row)
