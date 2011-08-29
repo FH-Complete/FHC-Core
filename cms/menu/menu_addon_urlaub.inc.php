@@ -82,6 +82,8 @@ class menu_addon_urlaub extends menu_addon
 				}
 			}
 		}
+		else
+			$this->link=false;
 		
 		$this->output();
 	}
