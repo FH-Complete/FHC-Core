@@ -46,7 +46,8 @@
 		die('Fehler bei der Parameteruebergabe');
 
 	$lv_obj = new lehrveranstaltung();
-	$lv_obj->load($lvid);
+	if(!$lv_obj->load($lvid))
+		die('Fehler beim Laden der LV');
 
 	$stg_obj=new studiengang();
 	$stg_obj->load($lv_obj->studiengang_kz);
@@ -94,12 +95,12 @@
 		<td>
 			<?php
 				$is_berechtigt=false;
-				$qry = "SELECT distinct fachbereich_kurzbz FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE lehrveranstaltung_id='$lvid'";
+				$qry = "SELECT distinct oe_kurzbz FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN public.tbl_fachbereich USING(fachbereich_kurzbz) WHERE lehrveranstaltung_id='".addslashes($lvid)."'";
 				if($result = $db->db_query($qry))
 				{
 					while($row = $db->db_fetch_object($result))
 					{
-						if($rechte->isBerechtigt('lehre',$lv_obj->studiengang_kz,null,$row->fachbereich_kurzbz))
+						if($rechte->isBerechtigt('lehre',$row->oe_kurzbz,null))
 							$is_berechtigt=true;
 					}
 				}
