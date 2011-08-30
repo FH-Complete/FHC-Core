@@ -52,6 +52,7 @@ $this->phrasen['global/strasse']='Straße';
 $this->phrasen['global/plz']='Postleitzahl';
 $this->phrasen['global/ort']='Ort';
 $this->phrasen['global/anmerkung']='Anmerkung';
+$this->phrasen['global/anmerkungen']='Anmerkungen';
 $this->phrasen['global/sprache']='Sprache';
 $this->phrasen['global/englisch']='Englisch';
 $this->phrasen['global/deutsch']='Deutsch';
