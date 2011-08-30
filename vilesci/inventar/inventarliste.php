@@ -120,6 +120,8 @@ $worksheet->write($zeile,++$spalte,'Org.',$format_bold);
 $maxlength[$spalte]=5;
 $worksheet->write($zeile,++$spalte,'Datum',$format_bold);
 $maxlength[$spalte]=5;
+$worksheet->write($zeile,++$spalte,'Leasing Bis',$format_bold);
+$maxlength[$spalte]=7;
 $worksheet->write($zeile,++$spalte,'Bruttobetrag',$format_bold);
 $maxlength[$spalte]=12;
 
@@ -159,6 +161,7 @@ for ($pos=0;$pos<count($resultBetriebsmittel);$pos++)
 	InsertCell($zeile,++$spalte,$resultBetriebsmittel[$pos]->bestellnr);
 	InsertCell($zeile,++$spalte,$oOrganisationseinheit->bezeichnung?$oOrganisationseinheit->bezeichnung:$resultBetriebsmittel[$pos]->oe_kurzbz);
 	InsertCell($zeile,++$spalte,$datum_obj->formatDatum($resultBetriebsmittel[$pos]->betriebsmittelstatus_datum,'d.m.Y'),$format_date);
+	InsertCell($zeile,++$spalte,$datum_obj->formatDatum($resultBetriebsmittel[$pos]->leasing_bis,'d.m.Y'),$format_date);
 			
 	//Wenn Verbindung zu einem Bestelldetail vorhanden ist, wird der Bruttobetrag des Details
 	//in der Liste angezeigt
