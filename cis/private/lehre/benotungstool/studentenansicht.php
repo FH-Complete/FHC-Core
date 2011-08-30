@@ -23,14 +23,8 @@
 // * Studentenansicht fuers Kreuzerltool
 // ********************
 
- require_once('../../../../config/cis.config.inc.php');
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung 
-// ------------------------------------------------------------------------------------------
-	require_once('../../../../include/basis_db.class.php');
-	if (!$db = new basis_db())
-			die('Fehler beim Herstellen der Datenbankverbindung');
-			
+require_once('../../../../config/cis.config.inc.php');
+require_once('../../../../include/basis_db.class.php');		
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/studiengang.class.php');
@@ -44,9 +38,14 @@ require_once('../../../../include/studentnote.class.php');
 require_once('../../../../include/legesamtnote.class.php');
 require_once('../../../../include/lvgesamtnote.class.php');
 require_once('../../../../include/zeugnisnote.class.php');
+require_once('../../../../include/phrasen.class.php');
 include('functions.inc.php');
 
+$sprache = getSprache(); 
+$p = new phrasen($sprache); 
 
+if (!$db = new basis_db())
+		die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
 $user = get_uid();
 //$user = 'if06b172';
 //$user = 'if06b144';
@@ -55,7 +54,7 @@ $lektorenansicht = 0;
 if(isset($_GET['lvid']) && is_numeric($_GET['lvid'])) //Lehrveranstaltung_id
 	$lvid = $_GET['lvid'];
 else
-	die('Fehlerhafte Parameteruebergabe');
+	die($p->t('global/fehlerBeiDerParameteruebergabe'));
 
 if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id'])) //Lehreinheit_id
 	$lehreinheit_id = $_GET['lehreinheit_id'];
@@ -71,7 +70,7 @@ if(check_lektor($user) && (isset($_GET['uid']) && $_GET["uid"] != ""))
 	$rights->getBerechtigungen($user); 
 	$lehreinheit=new lehreinheit($_GET["lehreinheit_id"]);
 	if(!check_lektor_lehrveranstaltung($user, $lehreinheit->lehrveranstaltung_id, $lehreinheit->studiensemester_kurzbz) && !$rights->isBerechtigt('admin',0))
-			die("Sie haben keine Berechtigung für diese Lehreinheit");
+			die($p->t('global/keineBerechtigungFuerDieseSeite'));
 	$lektorenansicht = 1;
 	$user = $_GET["uid"];
 }
@@ -128,7 +127,7 @@ if (isset($_GET["download"])){
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
-<title>Kreuzerltool</title>
+<title><?php echo $p->t('benotungstool/kreuzerltool');?></title>
 <script language="JavaScript" type="text/javascript">
 <!--
 	function MM_jumpMenu(targ, selObj, restore)
@@ -244,7 +243,7 @@ else
 echo '<table class="tabcontent" height="100%">';
 echo ' <tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
-echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;Benotungstool';
+echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;'.$p->t('benotungstool/benotungstool');
 echo '</font></td><td  class="ContentHeader" align="right">'."\n";
 
 //Studiensemester laden
@@ -307,7 +306,7 @@ if($result = $db->db_query($qry))
 	if($db->db_num_rows($result)>1)
 	{
 		//Lehreinheiten DropDown
-		echo " Lehreinheit: <SELECT name='lehreinheit_id' onChange=\"MM_jumpMenu('self',this,0)\">\n";
+		echo $p->t('global/lehreinheit')." : <SELECT name='lehreinheit_id' onChange=\"MM_jumpMenu('self',this,0)\">\n";
 		while($row = $db->db_fetch_object($result))
 		{
 			if($lehreinheit_id=='')
@@ -363,17 +362,17 @@ if($result = $db->db_query($qry))
 }
 else
 {
-	echo 'Fehler beim Auslesen der Lehreinheiten';
+	echo $p->t('benotungstool/fehlerBeimAuslesen');
 }
 
 echo '</td><tr></table>';
 echo '<table><tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
 echo "<td width='100%'>\n";
-echo "<table width='100%'><tr><td><b>$lv_obj->bezeichnung</b></td><td align='right'><a href='../../../../documents/".strtolower($stg_obj->kuerzel)."/$lv_obj->semester/$lv_obj->lehreverzeichnis/download/' target='_blank' class='Item'>Downloadverzeichnis anzeigen</a></td></tr></table><br>";
+echo "<table width='100%'><tr><td><b>".$lv_obj->bezeichnung_arr[$sprache]."</b></td><td align='right'><a href='../../../../documents/".strtolower($stg_obj->kuerzel)."/$lv_obj->semester/$lv_obj->lehreverzeichnis/download/' target='_blank' class='Item'>".$p->t('benotungstool/downloadverzeichnisAnzeigen')."</a></td></tr></table><br>";
 
 if($lehreinheit_id=='')		
-	die('Derzeit gibt es keine Kreuzerllisten f&uuml;r diese Lehrveranstaltung');
+	die($p->t('benotungstool/keineKreuzerllistenFuerDieseLehrveranstaltung'));
 
 $qry = "SELECT vorname, nachname FROM campus.vw_student WHERE uid='$user'";
 $name='';
@@ -401,13 +400,13 @@ if (!isset($_GET["notenuebersicht"]))
 	
 	if ($l > 0)
 	{
-		echo "<br><b>Leistungsuebersicht / <a href='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&notenuebersicht=1&uid=$user'>Notenübersicht</a> f&uuml;r $name</b><br><br>";
+		echo "<br><b>".$p->t('lehre/leistungsuebersicht')." / <a href='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&notenuebersicht=1&uid=$user'>".$p->t('benotungstool/notenuebersichtFuer')." $name</b><br><br>";
 		$uebung_obj = new uebung();
 		$uebung_obj->load_uebung($lehreinheit_id,1);
 		if(count($uebung_obj->uebungen)>0)
 		{
 			echo "<table width='100%'><tr><td valign='top'>";
-			echo "<br>Wählen Sie bitte eine Aufgabe aus (Kreuzerllisten, Abgaben): <SELECT name='uebung' onChange=\"MM_jumpMenu('self',this,0)\">\n";
+			echo "<br>".$p->t('benotungstool/waehlenSieEineAufgabeAus').": <SELECT name='uebung' onChange=\"MM_jumpMenu('self',this,0)\">\n";
 			echo "<option value='studentenansicht.php?lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uid=$user' selected></option>";
 			foreach ($uebung_obj->uebungen as $row)
 			{
@@ -468,18 +467,18 @@ if (!isset($_GET["notenuebersicht"]))
 				<table>
 				<tr>
 					<td><b>+</b>...</td>
-					<td><u>freigeschaltet</u>.</td>
+					<td><u>".$p->t('benotungstool/freigeschaltet')."</u>.</td>
 				</tr>
 				<tr>
 					<td><b>-</b>...</td>
-					<td><u>nicht freigeschaltet</u>.</td>
+					<td><u>".$p->t('benotungstool/nichtFreigeschaltet')."</u>.</td>
 				</tr>
 				</table>
 			</td>
 		</tr></table>";
 		}
 		else
-			die("Derzeit gibt es keine Uebungen");
+			die($p->t('benotungstool/derzeitGibtEsKeineUebungen'));
 	}
 	else
 	{
@@ -550,7 +549,7 @@ if (!isset($_GET["notenuebersicht"]))
 							{
 								if($hlp->vorbereitet!=$stud_bsp_obj->vorbereitet)
 								{
-									echo "<span class='error'>Das Beispiel $row->bezeichnung kann nicht mehr angekreuzt werden<br></span>";
+									echo "<span class='error'>".$p->t('benotungstool/dasBeispielKannNichtMehrAngekreuztWerden',array($row->bezeichnung))."<br></span>";
 									$error = true;
 								}
 							}
@@ -568,17 +567,17 @@ if (!isset($_GET["notenuebersicht"]))
 				else
 				{
 					$error=true;				
-					echo "Zu viele Beispiele angekreuzt!<br>";
+					echo $p->t('benotungstool/zuVieleBeispieleAngekreuzt')."!<br>";
 				}
 			}
 	
 			if($error)
-				echo "<span class='error'>Es konnten nicht alle Daten gespeichert werden</span><br>";
+				echo "<span class='error'>".$p->t('benotungstool/esKonntenNichtAlleDatenGespeichertWerden')."</span><br>";
 			else
-				echo "Die Daten wurden erfolgreich gespeichert<br>";
+				echo $p->t('global/erfolgreichgespeichert')."<br>";
 		}
 		else
-			echo "<span class='error'>Die &Auml;nderungen k&ouml;nnen nicht gespeichert werden, da diese Kreuzerlliste nicht freigegeben ist!</span>";
+			echo "<span class='error'>".$p->t('benotungstool/nichtGespeichertKreuzerllisteNichtFreigegeben')."!</span>";
 	}
 	
 	//********ANZEIGE DER EINGETRAGENEN KREUZERL***********
@@ -587,10 +586,10 @@ if (!isset($_GET["notenuebersicht"]))
 		$uebung_obj = new uebung();
 		$uebung_obj->load($uebung_id);
 		$downloadname = mb_ereg_replace($uebung_id,mb_ereg_replace(' ','_',$uebung_obj->bezeichnung), $uebung_obj->angabedatei);
-		echo "Freigegeben von ".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon))." bis ".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis));
+		echo $p->t('benotungstool/freigegebenVon')." ".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon))." ".$p->t('global/bis')." ".date('d.m.Y H:i',$datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis));
 		echo "<br><br><h3><u>$uebung_obj->bezeichnung</u></h3>";
 		if ($uebung_obj->angabedatei)
-			echo "Angabe: <a href='studentenansicht.php?uid=$user&lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&download=".$downloadname."'>".$downloadname."</a><br><br>";
+			echo $p->t('benotungstool/angabe').": <a href='studentenansicht.php?uid=$user&lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&download=".$downloadname."'>".$downloadname."</a><br><br>";
 		
 		
 		$ueb_obj = new uebung();
@@ -606,8 +605,8 @@ if (!isset($_GET["notenuebersicht"]))
 			$mitarbeit = 0;
 			$note = null;
 		}
-		$anmerkung = ereg_replace("\n","<br>",$anmerkung);
-		
+	//	$anmerkung = ereg_replace("\n","<br>",$anmerkung);
+		$anmerkung = mb_str_replace("\n", "<br>", $anmerkung);
 		if ($uebung_obj->beispiele)
 		{
 			
@@ -647,24 +646,24 @@ if (!isset($_GET["notenuebersicht"]))
 			{
 				echo " <table>";
 				if ($uebung_obj->maxbsp > 0)
-					echo "<tr><td>Maximale Anzahl der Beispiele/Student:</td><td><b>".$uebung_obj->maxbsp."</b></td></tr>";
+					echo "<tr><td>".$p->t('benotungstool/maxBeispieleStudent').":</td><td><b>".$uebung_obj->maxbsp."</b></td></tr>";
 				if ($uebung_obj->maxstd > 0)
-					echo "<tr><td>Maximale Anzahl Studenten/Beispiel:</td><td style='background-color:#dddddd;'><b>".$uebung_obj->maxstd."</b></td></tr>";
+					echo "<tr><td>".$p->t('benotungstool/maxStudentenBeispiel').":</td><td style='background-color:#dddddd;'><b>".$uebung_obj->maxstd."</b></td></tr>";
 				echo "</table>";	
 				echo "
 				<form accept-charset='UTF-8' method='POST' name='bspform' action='studentenansicht.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&uid=$user'>
 				<table width='100%'>
 					<tr>
 						<td valign='top'><div style='width: 70%;'>
-						".($anmerkung!=''?'<b>Anmerkungen:</b><br> '.$anmerkung.'<br><br>':'')."
+						".($anmerkung!=''?'<b>'.$p->t('global/anmerkungen').':</b><br> '.$anmerkung.'<br><br>':'')."
 						</div>
 							<table border='1'>
 							<tr>
-								<td class='ContentHeader2'>Beispiel</td>
-							    <td class='ContentHeader2'>Vorbereitet</td>
-							    <td class='ContentHeader2'>Nicht vorbereitet</td>
-							    <td class='ContentHeader2'>Probleme</td>
-							    <td class='ContentHeader2'>Punkte</td>
+								<td class='ContentHeader2'>".$p->t('benotungstool/beispiel')."</td>
+							    <td class='ContentHeader2'>".$p->t('benotungstool/vorbereitet')."</td>
+							    <td class='ContentHeader2'>".$p->t('benotungstool/nichtVorbereitet')."</td>
+							    <td class='ContentHeader2'>".$p->t('benotungstool/probleme')."</td>
+							    <td class='ContentHeader2'>".$p->t('benotungstool/punkte')."</td>
 							</tr>";
 				
 				
@@ -712,17 +711,17 @@ if (!isset($_GET["notenuebersicht"]))
 				
 				//Speichern button nur Anzeigen wenn die Uebung Freigegeben ist
 				if($datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis)>time())
-					echo "<tr><td align='right' colspan=5><input type='submit' value='Speichern' name='submit'></td></form></tr>";
+					echo "<tr><td align='right' colspan=5><input type='submit' value='".$p->t('global/speichern')."' name='submit'></td></form></tr>";
 				
 				echo "</table>";
 			}
 			else
-				echo "<table><tr><td>Keine Beispiele angelegt</td></tr></table><table width='100%'><tr><td width='70%'></div><table><tr><td>&nbsp;</td></tr></table>";
+				echo "<table><tr><td>".$p->t('benotungstool/keineBeispieleAngelegt')."</td></tr></table><table width='100%'><tr><td width='70%'></div><table><tr><td>&nbsp;</td></tr></table>";
 			
 			if ($uebung_obj->abgabe)
 			{
 				
-				echo "<br><table><tr><td>Abgabedatei:</td></tr>\n";
+				echo "<br><table><tr><td>".$p->t('benotungstool/abgabedatei').":</td></tr>\n";
 				$uebung_obj->load_studentuebung($user, $uebung_id);
 				if ($uebung_obj->abgabe_id)
 				{		
@@ -739,7 +738,7 @@ if (!isset($_GET["notenuebersicht"]))
 					echo "	<tr>\n";
 					echo "	<form accept-charset='UTF-8' method='POST' action='studentenansicht.php?uid=$user&lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem' enctype='multipart/form-data' name='kl_angabe'>\n";
 					echo "		<td>\n";
-					echo "			<input type='file' name='abgabedatei'> <input type='submit' name='abgabe' value='Abgeben'>";
+					echo "			<input type='file' name='abgabedatei'> <input type='submit' name='abgabe' value='".$p->t('benotungstool/abgeben')."'>";
 					echo "		</td>\n";	
 					echo "	</form>\n";
 					echo "</tr>\n";
@@ -806,42 +805,42 @@ if (!isset($_GET["notenuebersicht"]))
 			
 				<table border='1' width='210'>
 				<tr>
-					<td colspan='2' class='ContentHeader2'>Diese Kreuzerlliste:</td>
+					<td colspan='2' class='ContentHeader2'>".$p->t('benotungstool/dieseKreuzerlliste').":</td>
 				</tr>
 				<tr>
-					<td width='180'>Punkte insgesamt m&ouml;glich:</td>
+					<td width='180'>".$p->t('benotungstool/punkteInsgesamtMoeglich').":</td>
 					<td width='30'>$punkte_gesamt</td>
 				</tr>
 				<tr>
-					<td>Punkte eingetragen:</td>
+					<td>".$p->t('benotungstool/punkteEingetragen').":</td>
 					<td>$punkte_eingetragen</td>
 				</tr>
 				</table>
 				<br><br>
 				<table border='1' width='210'>
 				<tr>
-					<td colspan='2' class='ContentHeader2'>Alle Kreuzerllisten dieser Übung:</td>
+					<td colspan='2' class='ContentHeader2'>".$p->t('benotungstool/alleKreuzerllistenDieserUebung').":</td>
 				</tr>
 				<tr>
-					<td width='180'>Punkte insgesamt m&ouml;glich:</td>
+					<td width='180'>".$p->t('benotungstool/punkteInsgesamtMoeglich').":</td>
 					<td width='30'>$punkte_gesamt_alle</td>
 				</tr>
 				<tr>
-					<td>Punkte eingetragen:</td>
+					<td>".$p->t('benotungstool/punkteEingetragen').":</td>
 					<td>$punkte_eingetragen_alle</td>
 				</tr>
 				</table>
 				<br><br>
 				<table border='1' width='210'>
 				<tr>
-					<td colspan='2' class='ContentHeader2'>Mitarbeitspunkte:</td>
+					<td colspan='2' class='ContentHeader2'>".$p->t('benotungstool/mitarbeitspunkte').":</td>
 				</tr>
 				<tr>
-					<td width='180'>Bisher insgesamt:</td>
+					<td width='180'>".$p->t('benotungstool/bisherInsgesamt').":</td>
 					<td width='30'>$mitarbeit_alle</td>
 				</tr>
 				<tr>
-					<td>Diese Kreuzerlliste:</td>
+					<td>".$p->t('benotungstool/dieseKreuzerlliste').":</td>
 					<td>$mitarbeit</td>
 				</tr>
 				</table>
@@ -859,7 +858,7 @@ if (!isset($_GET["notenuebersicht"]))
 			//**********STATISTIK***************
 			if($uebung_obj->statistik)
 			{
-				echo "<h3>Statistik</h3>";
+				echo "<h3>".$p->t('benotungstool/statistik')."</h3>";
 				$beispiel_obj = new beispiel();
 				if($beispiel_obj->load_beispiel($uebung_id))
 				{
@@ -919,7 +918,7 @@ if (!isset($_GET["notenuebersicht"]))
 				          		</tr>';
 						}
 						echo "</table>";
-						echo "<br><br>Es haben insgesamt <u>$gesamt Studenten</u> eingetragen.";
+						echo "<br><br>".$p->t('bentotungstool/esHabenStudentenEingetragen',array($gesamt));
 					}
 				}
 				else
@@ -932,11 +931,11 @@ if (!isset($_GET["notenuebersicht"]))
 		{
 			
 			echo "<table width='100%'>\n";
-			echo "<tr><td>".($note!=''?'<b>Note: </b>'.$note.'<br><br>':'')."</td></tr>\n";
+			echo "<tr><td>".($note!=''?'<b>'.$p->t('benotungstool/note').': </b>'.$note.'<br><br>':'')."</td></tr>\n";
 			echo"	
 			<tr>
 					<td valign='top'>
-					".($anmerkung!=''?'<b>Anmerkungen:</b><br> '.$anmerkung.'<br><br>':'')."
+					".($anmerkung!=''?'<b>'.$p->t('global/anmerkungen').':</b><br> '.$anmerkung.'<br><br>':'')."
 					</td>";
 			echo "</tr>\n";
 		
@@ -946,7 +945,7 @@ if (!isset($_GET["notenuebersicht"]))
 			{		
 				$uebung_obj->load_abgabe($uebung_obj->abgabe_id);	
 				echo " <tr>";
-				echo"	<td>Abgabedatei: <a href='studentenansicht.php?uid=$user&lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&download_abgabe=".$uebung_obj->abgabedatei."'>".$uebung_obj->abgabedatei."</a>";
+				echo"	<td>".$p->t('benotungstool/abgabedatei').": <a href='studentenansicht.php?uid=$user&lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&download_abgabe=".$uebung_obj->abgabedatei."'>".$uebung_obj->abgabedatei."</a>";
 				if($datum_obj->mktime_fromtimestamp($uebung_obj->freigabevon)<time() && $datum_obj->mktime_fromtimestamp($uebung_obj->freigabebis)>time())	
 					echo " <a href='studentenansicht.php?uid=$user&lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem&deleteabgabe=1'>[del]</a><br></td>";
 				echo "</tr>";
@@ -956,8 +955,8 @@ if (!isset($_GET["notenuebersicht"]))
 				echo "	<tr>\n";
 				echo "	<form accept-charset='UTF-8' method='POST' action='studentenansicht.php?uid=$user&lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&stsem=$stsem' enctype='multipart/form-data'>\n";
 				echo "		<td>\n";
-				echo "			<br>Anmerkung:<br><textarea name='abgabe_anmerkung' rows='3' cols='50'>".$uebung_obj->abgabe_anmerkung."</textarea><br>";				
-				echo "			<br>Datei:<br><input type='file' name='abgabedatei'> <input type='submit' name='abgabe' value='Abgeben'>";
+				echo "			<br>".$p->t('global/anmerkung').":<br><textarea name='abgabe_anmerkung' rows='3' cols='50'>".$uebung_obj->abgabe_anmerkung."</textarea><br>";				
+				echo "			<br>".$p->t('global/datei').":<br><input type='file' name='abgabedatei'> <input type='submit' name='abgabe' value='".$p->t('benotungstool/abgeben')."'>";
 				echo "		</td>\n";	
 				echo "	</form>\n";
 				echo "</tr>\n";
@@ -991,7 +990,7 @@ else
 			}
 
 		echo "<br><hr><br>";	
-		echo "Bitte Wählen Sie eine/n Studierende/n aus: ";
+		echo $p->t('benotungstool/studentenAuswaehlen').": ";
 		$key = array_search($uid,$uid_arr);
 		$prev = $key-1;
 		$next = $key+1;
@@ -1014,7 +1013,7 @@ else
 		echo "<br><hr><br>";
 	}
 	
-	echo "<br><b><a href='studentenansicht.php?uid=$user&lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id'>Leistungsuebersicht</a> / Notenübersicht f&uuml;r $name</b><br><br>";	
+	echo "<br><b><a href='studentenansicht.php?uid=$user&lvid=$lvid&stsem=$stsem&lehreinheit_id=$lehreinheit_id'>".$p->t('benotungstool/leistungsuebersichtNotenuebersichtFuer')." $name</b><br><br>";	
 	echo "<table><tr><td>";
 	
 	$uebung_obj = new uebung();
@@ -1024,11 +1023,11 @@ else
 		
 		echo "<table style='border: 1px #dddddd solid'>";
 		echo "	<tr>\n";
-		echo "		<th colspan='2'>Aufgabe</th>\n";
-		echo "		<th>Gewicht</th>\n";
-		echo "		<th>Punkte</th>";
-		echo "		<th>Teilnote</th>\n";
-		echo "		<th>Note</th>";
+		echo "		<th colspan='2'>".$p->t('benotungstool/aufgabe')."</th>\n";
+		echo "		<th>".$p->t('benotungstool/gewicht')."</th>\n";
+		echo "		<th>".$p->t('benotungstool/punkte')."</th>";
+		echo "		<th>".$p->t('benotungstool/teilnote')."</th>\n";
+		echo "		<th>".$p->t('benotungstool/note')."</th>";
 		echo "	</tr>\n";
 		foreach ($uebung_obj->uebungen as $row)
 		{	
@@ -1109,11 +1108,11 @@ else
 			$gesamtnote = 5;
 		else
 			$gesamtnote = $l1note->studentgesamtnote;
-		echo "<tr style='background-color:#dddddd;'><td colspan='5'>Errechnete Gesamtnote: </td><td align='center'>".$gesamtnote."</td></tr>";
+		echo "<tr style='background-color:#dddddd;'><td colspan='5'>".$p->t('benotungstool/errechneteGesamtnote').": </td><td align='center'>".$gesamtnote."</td></tr>";
 	
 		
 		echo "</table>";
-		echo "<span style='font-size:8pt;'>* muss positiv sein</span>";
+		echo "<span style='font-size:8pt;'>".$p->t('benotungstool/mussPositivSein')."</span>";
 	}
 	
 	echo "</td><td valign='top'>";
@@ -1142,17 +1141,17 @@ else
 		$znote = null;
 	
 	echo "<table style='border: 1px #dddddd solid'>\n";
-	echo "	<tr><th colspan='2'>Eingetragene Noten</th></tr>";
+	echo "	<tr><th colspan='2'>".$p->t('benotungstool/eingetrageneNoten')."</th></tr>";
 	echo "<tr>\n";
-	echo "<td>Lehreinheit</td>";
+	echo "<td>".$p->t('global/lehreinheit')."</td>";
 	echo "<td>".$lenote."</td>";
 	echo "</tr>\n";
 	echo "<tr>\n";
-	echo "<td>Lehrveranstaltung</td>";
+	echo "<td>".$p->t('global/lehrveranstaltung')."</td>";
 	echo "<td>".$lvnote."</td>";
 	echo "</tr>\n";
 	echo "<tr>\n";
-	echo "<td>Zeugnis</td>";
+	echo "<td>".$p->t('benotungstool/zeunis')."</td>";
 	echo "<td>".$znote."</td>";
 	echo "</tr>\n";
 	echo "</table>";

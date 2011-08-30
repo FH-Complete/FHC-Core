@@ -34,13 +34,11 @@ require_once('../../../../include/studentnote.class.php');
 require_once('../../../../include/datum.class.php');
 require_once('functions.inc.php');
 require_once('../../../../include/phrasen.class.php');
-
-if (!$db = new basis_db())
-		die('Fehler beim Herstellen der Datenbankverbindung');
 		
 $sprache = getSprache(); 
 $p = new phrasen($sprache); 
-
+if (!$db = new basis_db())
+		die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
 $user = get_uid();
 
 if(!check_lektor($user))
@@ -734,7 +732,7 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 				<td width='30'>$mitarbeit_alle</td>
 			</tr>
 			<tr>
-				<td>".$p->t('benotungstool/diseKreuzerlliste').":</td>
+				<td>".$p->t('benotungstool/dieseKreuzerlliste').":</td>
 				<td><input type='text' size=2 name='punkte' value='$mitarbeit'></td>
 			</tr>
 			</table>
