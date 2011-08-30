@@ -29,7 +29,7 @@ function get_uid()
 	else
 	{
 		if(isset($_SESSION['user']))
-			return $_SESSION['user'];
+			return mb_strtolower($_SESSION['user']);
 		else
 			return manual_basic_auth();
 	}
@@ -885,7 +885,7 @@ function manual_basic_auth()
     	exit;
 	}
 	else
-		return $_SERVER['PHP_AUTH_USER'];
+		return mb_strtolower($_SERVER['PHP_AUTH_USER']);
 }
 
 /**
