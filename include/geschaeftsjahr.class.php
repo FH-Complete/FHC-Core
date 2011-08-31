@@ -147,7 +147,8 @@ class geschaeftsjahr extends basis_db
 	 */
 	public function getakt()
 	{
-		$qry = "SELECT geschaeftsjahr_kurzbz FROM public.tbl_geschaeftsjahr WHERE start <= now() AND ende >= now()";
+		$qry = "SELECT geschaeftsjahr_kurzbz FROM public.tbl_geschaeftsjahr WHERE start <= CURRENT_DATE
+		 AND ende >= CURRENT_DATE";
 
 		if(!$this->db_query($qry))
 		{

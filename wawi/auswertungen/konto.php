@@ -140,7 +140,7 @@ if(isset($_POST['show']))
 				JOIN wawi.tbl_rechnung USING(bestellung_id)
 				JOIN wawi.tbl_rechnungsbetrag USING(rechnung_id)
 			WHERE
-				tbl_bestellung.insertamum>='$gj->start' AND tbl_bestellung.insertamum<'$gj->ende' 
+				tbl_bestellung.insertamum::date>='$gj->start' AND tbl_bestellung.insertamum::date<='$gj->ende' 
 				AND kostenstelle_id IN ($kstIN)
 			order by beschreibung
 			";

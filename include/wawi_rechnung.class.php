@@ -157,10 +157,10 @@ class wawi_rechnung extends basis_db
 			$qry.= ' AND tbl_rechnung.buchungsdatum <= '.$this->addslashes($buchungsdatum_bis);
 			
 		if ($erstelldatum_von != '')
-			$qry.= ' AND tbl_bestellung.insertamum >= '.$this->addslashes($erstelldatum_von);
+			$qry.= ' AND tbl_bestellung.insertamum::date >= '.$this->addslashes($erstelldatum_von);
 			
 		if ($erstelldatum_bis != '')
-			$qry.= ' AND tbl_bestellung.insertamum <= '.$this->addslashes($erstelldatum_bis);
+			$qry.= ' AND tbl_bestellung.insertamum::date <= '.$this->addslashes($erstelldatum_bis);
 		
 		if ($bestelldatum_von != '')
 			$qry.= " AND status.bestellstatus_kurzbz = 'Bestellung' AND status.datum >= ".$this->addslashes($bestelldatum_von);
