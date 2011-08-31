@@ -159,7 +159,7 @@ $datum_obj = new datum();
 				wawi.tbl_bestellung 
 				JOIN wawi.tbl_bestelldetail USING(bestellung_id)
 			WHERE
-				tbl_bestellung.insertamum>='".addslashes($vondatum)."' AND tbl_bestellung.insertamum<'".addslashes($endedatum)."' 
+				tbl_bestellung.insertamum::date>='".addslashes($vondatum)."' AND tbl_bestellung.insertamum::date<='".addslashes($endedatum)."' 
 				AND kostenstelle_id IN($kstIN)
 			GROUP BY kostenstelle_id
 			UNION
@@ -172,7 +172,7 @@ $datum_obj = new datum();
 				JOIN wawi.tbl_rechnung USING(bestellung_id)
 				JOIN wawi.tbl_rechnungsbetrag USING(rechnung_id)
 			WHERE
-				tbl_bestellung.insertamum>='".addslashes($vondatum)."' AND tbl_bestellung.insertamum<'".addslashes($endedatum)."' 
+				tbl_bestellung.insertamum::date>='".addslashes($vondatum)."' AND tbl_bestellung.insertamum::date<='".addslashes($endedatum)."' 
 				AND kostenstelle_id IN($kstIN)
 			GROUP BY kostenstelle_id
 			";

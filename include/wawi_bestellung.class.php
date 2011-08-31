@@ -202,10 +202,10 @@ class wawi_bestellung extends basis_db
 			$qry.= " AND UPPER(bestellung.titel) LIKE UPPER('%".addslashes($titel)."%')"; 
 	
 		if ($evon != '')
-			$qry.= ' AND bestellung.insertamum > date('.$this->addslashes($evon).')';
+			$qry.= ' AND bestellung.insertamum::date >= date('.$this->addslashes($evon).')';
 				
 		if ($ebis != '')
-			$qry.= ' AND bestellung.insertamum < '.$this->addslashes($ebis);
+			$qry.= ' AND bestellung.insertamum::date <= '.$this->addslashes($ebis);
 
 		if ($bvon != '')
 			$qry.= " AND status.bestellstatus_kurzbz = 'Bestellung' and status.datum > ".$this->addslashes($bvon);
