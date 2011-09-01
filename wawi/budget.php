@@ -123,7 +123,10 @@ foreach($kst->result as $row)
 	$budget = $kst->getBudget($row->kostenstelle_id, $geschaeftsjahr_kurzbz);
 	echo '<tr>';
 	echo '<td>',$row->kostenstelle_id,'</th>';
-	echo '<td>',$row->bezeichnung,'</th>';
+	if($row->aktiv)
+		echo '<td>',$row->bezeichnung,'</th>';
+	else
+		echo '<td><strike>',$row->bezeichnung,'</strike></th>';
 	echo '<td><input type="text" size="13" maxlenght="13" name="budget_'.$row->kostenstelle_id.'" value="'.$budget.'" class="number"></td>';
 	echo '</tr>';
 }
