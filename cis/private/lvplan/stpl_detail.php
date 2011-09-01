@@ -34,9 +34,13 @@ require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/ort.class.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/datum.class.php');
+require_once('../../../include/phrasen.class.php');
+
+$sprache = getSprache(); 
+$p = new phrasen($sprache); 
 
 if (!$db = new basis_db())
-	die('Fehler beim Oeffnen der Datenbankverbindung');
+	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
 
 // Variablen uebernehmen
 if (isset($_GET['type']))
@@ -58,10 +62,10 @@ if (isset($_GET['sem']))
 	$sem=$_GET['sem'];
 	
 if($sem!='' && !is_numeric($sem))
-	die('Semester ist ungueltig');
+	die($p->t('lvplan/semesterIstUngueltig'));
 
 if($stunde!='' && !is_numeric($stunde))
-	die('Stunde ist ungueltig');
+	die($p->t('lvplan/stundeIstUngueltig'));
 
 if (isset($_GET['ver']))
 	$ver=$_GET['ver'];
@@ -73,7 +77,7 @@ if (isset($_GET['gruppe_kurzbz']))
 
 $datum_obj = new datum();
 if(!$datum_obj->checkDatum($datum))
-	die('Datum ist ungueltig');
+	die($p->t('lvplan/datumIstUngueltig'));
 
 $stsem = getStudiensemesterFromDatum($datum);
 //Stundenplan
@@ -138,14 +142,14 @@ $num_rows_repl=$db->db_num_rows($erg_repl);
     <link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </head>
 <body id="inhalt">
-<H2>Lehrveranstaltungsplan &rArr; Details</H2>
-Datum: <?php echo htmlentities($datum); ?><BR>
-Stunde: <?php echo htmlentities($stunde); ?><BR><BR>
+<H2><?php echo $p->t('lvplan/lehrveranstaltungsplan');?> &rArr; <?php echo $p->t('abgabetool/details');?></H2>
+<?php echo $p->t('abgabetool/datum');?>: <?php echo htmlentities($datum); ?><BR>
+<?php echo $p->t('global/stunde').': '.htmlentities($stunde); ?><BR><BR>
 
 <table class="stdplan">
 <?php
 if ($num_rows_stpl>0)
-echo '<tr> <th>UNr</th><th>Lektor</th><th>Ort</th><th>Lehrfach</th><th>Bezeichnung</th><th>Verband</th><th>Einheit</th><th>Info</th></tr>';
+echo '<tr> <th>'.$p->t('lvplan/unr').'</th><th>'.$p->t('lvaliste/lektor').'</th><th>'.$p->t('global/ort').'</th><th>'.$p->t('lvaliste/lehrfach').'</th><th>'.$p->t('global/bezeichnung').'</th><th>'.$p->t('global/verband').'</th><th>'.$p->t('lvplan/einheit').'</th><th>'.$p->t('lvplan/info').'</th></tr>';
 $ort = new ort();
 for ($i=0; $i<$num_rows_stpl; $i++)
 {
@@ -194,9 +198,9 @@ for ($i=0; $i<$num_rows_stpl; $i++)
 <?php
 if ($num_rows_repl>0)
 {
-    echo '<h2>Reservierungen</h2>';
+    echo '<h2>'.$p->t('lvplan/reservierungen').'</h2>';
     echo '<table class="stdplan">';
-    echo '<tr><th>Titel</th><th>Ort</th><th>Person</th><th>Beschreibung</th></tr>';
+    echo '<tr><th>'.$p->t('global/titel').'</th><th>'.$p->t('global/ort').'</th><th>'.$p->t('global/person').'</th><th>'.$p->t('global/beschreibung').'</th></tr>';
     for ($i=0; $i<$num_rows_repl; $i++)
     {
         $titel=$db->db_result($erg_repl,$i,"titel");
@@ -215,5 +219,5 @@ if ($num_rows_repl>0)
     echo '</table>';
 }
 ?>
-<P>Fehler und Feedback bitte an <A class="Item" href="mailto:<?php echo MAIL_LVPLAN;?>">LV-Koordinationsstelle</A>.</P>
+<P><?php echo $p->t('lvplan/fehlerUndFeedback')?> <A class="Item" href="mailto:<?php echo MAIL_LVPLAN;?>"><?php echo $p->t('lvplan/lvKoordinationsstelle')?></A>.</P>
 </body></html>
