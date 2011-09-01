@@ -468,7 +468,7 @@ if($aktion == 'suche')
 		$datum = new datum(); 
 		$datum=getdate(); 
 		
-		if ($datum['mon']<=9)
+		if ($datum['mon']<9)
 			$suchdatum="01.09.".($datum['year']-1);
 		else
 			$suchdatum="01.09.".$datum['year'];
