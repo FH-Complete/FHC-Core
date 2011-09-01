@@ -49,4 +49,10 @@ $this->phrasen['lvplan/springeZuKw']='Springe zu KW';
 $this->phrasen['lvplan/home']='HOME';
 $this->phrasen['lvplan/nichtVorhanden']='nicht vorhanden.';
 $this->phrasen['lvplan/bitteWendenSieSichAn']='Bitte wenden Sie sich an den';
+$this->phrasen['lvplan/semesterIstUngueltig']='Semester ist ungültig';
+$this->phrasen['lvplan/stundeIstUngueltig']='Stunde ist ungültig';
+$this->phrasen['lvplan/datumIstUngueltig']='Datum ist ungueltig';
+$this->phrasen['lvplan/einheit']='Einheit';
+$this->phrasen['lvplan/info']='Info';
+$this->phrasen['lvplan/unr']='UNr';
 ?>

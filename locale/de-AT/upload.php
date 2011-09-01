@@ -26,4 +26,13 @@ $this->phrasen['upload/keineStudiengaengeDefiniert']='Es konnten keine Studieng�
 $this->phrasen['upload/dateiAufServerDateiformat']='Fehler: Sie haben versucht eine Datei auf den Server zu laden deren Dateiformat nicht unterstützt wird';
 $this->phrasen['upload/formattributInEinNeues'] = 'Fehler: Sie haben versucht das Formatattribut einer Datei in ein neues zu ändern welches nicht unterstützt wird';
 $this->phrasen['upload/dateiExistiertBereits']='Fehler: Die Datei existiert bereits! Bitte verwenden Sie die Option "Dateien automatisch überschreiben';
+$this->phrasen['upload/fehlerBeimLoeschenDesOrdners']='Fehler beim löschen des Ordners';
+$this->phrasen['upload/studentenUploadVerwalten']='Studenten-Upload verwalten';
+$this->phrasen['upload/fehlerBeimLadenDerLv']='Fehler beim Laden der LV';
+$this->phrasen['upload/studentenUploadEinsehen']='Studenten-Upload einsehen';
+$this->phrasen['upload/studentenUploadverzeichnis']='Studenten-Uploadverzeichnis';
+$this->phrasen['upload/leeren']='leeren';
+$this->phrasen['upload/studentenUploadverzeichnisLeeren']='Studenten-Uploadverzeichnis leeren';
+$this->phrasen['upload/esWurdeKeinPfadDefiniert']='Es wurde kein Pfad definiert';
+$this->phrasen['upload/wollenSieUploadWirklichLeeren']='Wollen Sie das Uploadverzeichnis wirklich leeren? Dieser Vorgang ist unwiderruflich';
 ?>

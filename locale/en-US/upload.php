@@ -26,4 +26,13 @@ $this->phrasen['upload/keineStudiengaengeDefiniert']='No degree programs could b
 $this->phrasen['upload/dateiAufServerDateiformat']='Error: You have tried to upload a file to the server that is not a supported format';
 $this->phrasen['upload/formattributInEinNeues'] = 'Error: You have tried to change the format attribute of a file to a new attribute that is not supported';
 $this->phrasen['upload/dateiExistiertBereits']='Error: The file already exists! Please use the option “Overwrite files automatically”';
+$this->phrasen['upload/fehlerBeimLoeschenDesOrdners']='Error: deleting folder';
+$this->phrasen['upload/studentenUploadVerwalten']='Studenten-Upload verwalten';
+$this->phrasen['upload/fehlerBeimLadenDerLv']='Error loading subject';
+$this->phrasen['upload/studentenUploadEinsehen']='Studenten-Upload einsehen';
+$this->phrasen['upload/studentenUploadverzeichnis']='Studenten-Uploadverzeichnis';
+$this->phrasen['upload/leeren']='clear';
+$this->phrasen['upload/studentenUploadverzeichnisLeeren']='Studenten-Uploadverzeichnis leeren';
+$this->phrasen['upload/esWurdeKeinPfadDefiniert']='Es wurde kein Pfad definiert';
+$this->phrasen['upload/wollenSieUploadWirklichLeeren']='Wollen Sie das Uploadverzeichnis wirklich leeren? Dieser Vorgang ist unwiderruflich';
 ?>
