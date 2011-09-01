@@ -21,41 +21,39 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
-	require_once('../../../config/cis.config.inc.php');
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung 
-// ------------------------------------------------------------------------------------------
-	require_once('../../../include/basis_db.class.php');
-	if (!$db = new basis_db())
-			die('Fehler beim Herstellen der Datenbankverbindung');
-			
-	require_once('../../../include/functions.inc.php');
-    require_once('../../../include/benutzerberechtigung.class.php');
-    require_once('../../../include/studiengang.class.php');
-    require_once('../../../include/studiensemester.class.php');
-    require_once('../../../include/lehrveranstaltung.class.php');
+require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/basis_db.class.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/studiengang.class.php');
+require_once('../../../include/studiensemester.class.php');
+require_once('../../../include/lehrveranstaltung.class.php');
+require_once('../../../include/phrasen.class.php');
 
-	$user = get_uid();
+if (!$db = new basis_db())
+	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
 
-	$rechte= new benutzerberechtigung();
-	$rechte->getBerechtigungen($user);
+$user = get_uid();
 
-	if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
-		$lvid=$_GET['lvid'];
-	else
-		die('Fehler bei der Parameteruebergabe');
+$rechte= new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
 
-	$lv_obj = new lehrveranstaltung();
-	if(!$lv_obj->load($lvid))
-		die('Fehler beim Laden der LV');
+if(isset($_GET['lvid']) && is_numeric($_GET['lvid']))
+	$lvid=$_GET['lvid'];
+else
+	die($p->t('global/fehlerBeiDerParameteruebergabe'));
 
-	$stg_obj=new studiengang();
-	$stg_obj->load($lv_obj->studiengang_kz);
+$lv_obj = new lehrveranstaltung();
+if(!$lv_obj->load($lvid))
+	die($p->t('upload/fehlerBeimLadenDerLv'));
 
-	$openpath="../../../documents/".strtolower($stg_obj->kuerzel)."/".$lv_obj->semester."/".strtolower($lv_obj->lehreverzeichnis)."/upload/";
+$stg_obj=new studiengang();
+$stg_obj->load($lv_obj->studiengang_kz);
 
-	$stsem_obj = new studiensemester();
-	$stsem = $stsem_obj->getaktorNext();
+$openpath="../../../documents/".strtolower($stg_obj->kuerzel)."/".$lv_obj->semester."/".strtolower($lv_obj->lehreverzeichnis)."/upload/";
+
+$stsem_obj = new studiensemester();
+$stsem = $stsem_obj->getaktorNext();
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
@@ -74,7 +72,7 @@
 		{
 			del = false;
 
-			return confirm("Wollen Sie das Uploadverzeichnis wirklich leeren? Dieser Vorgang ist unwiderruflich!");
+			return confirm("<?php echo $p->t('upload/wollenSieUploadWirklichLeeren');?>!");
 		}
 	}
 </script>
@@ -84,7 +82,7 @@
 <table class="tabcontent" id="inhalt">
 	<tr>
 		<td class="tdwidth10">&nbsp;</td>
-		<td class="ContentHeader"><font class="ContentHeader">&nbsp;Studenten-Upload verwalten</font>
+		<td class="ContentHeader"><font class="ContentHeader">&nbsp;<?php echo $p->t('upload/studentenUploadVerwalten');?></font>
 	</tr>
 	<tr>
 		<td>&nbsp;</td>
@@ -105,7 +103,7 @@
 					}
 				}
 				else
-					die('Fehler beim Lesen aus der Datenbank');
+					die($p->t('global/fehlerBeimLesenAusDatenbank'));
 
 				if($rechte->isBerechtigt('lehre',$lv_obj->studiengang_kz))
 					$is_berechtigt=true;
@@ -126,10 +124,10 @@
 					}
 				}
 				else
-					die('Fehler beim Lesen aus der Datenbank');
+					die($p->t('global/fehlerBeimLesenAusDatenbank'));
 
 				if(!$is_berechtigt)
-					die('Sie haben keine Berechtigung fuer diesen Bereich');
+					die($p->t('global/keineBerechtigungFuerDieseSeite'));
 
 				//echo '<span class="error">ACHTUNG: Der Studentenupload steht nur noch bis zum Ende des Wintersemesters 2008 zur Verfügung</span><br><br>';
 				echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"lector_choice.php?lvid=$lvid\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmDir(this);\">";
@@ -144,7 +142,7 @@
 							writeCISlog('DELETE', "rm -r $openpath/*");
 						}
 						else
-							echo 'Fehler beim loeschen des Ordners';
+							echo $p->t('upload/fehlerBeimLoeschenDesOrdners');
 					}
 					echo "<script language=\"JavaScript\">document.location = \"lector_choice.php?lvid=$lvid\"</script>";
 				}
@@ -169,24 +167,24 @@
 
 						if(!$dir_empty)
 						{
-							echo "<li><a class=\"Item2\" href=\"$openpath\" target=\"_blank\">Studenten-Upload einsehen</a></li>";
-							echo "<li>Studenten-Uploadverzeichnis&nbsp;<input type=\"submit\" name=\"delete_dir\" value=\"leeren\" onClick=\"del=true;\"></li>";
+							echo "<li><a class=\"Item2\" href=\"$openpath\" target=\"_blank\">".$p->t('upload/studentenUploadEinsehen')."</a></li>";
+							echo "<li>".$p->t('upload/studentenUploadverzeichnis')."&nbsp;<input type=\"submit\" name=\"delete_dir\" value=\"".$p->t('upload/leeren')."\" onClick=\"del=true;\"></li>";
 						}
 						else
 						{
-							echo '<li>Studenten-Upload einsehen</li>';
-							echo '<li>Studenten-Uploadverzeichnis leeren</li>';
+							echo '<li>'.$p->t('upload/studentenUploadEinsehen').'</li>';
+							echo '<li>'.$p->t('upload/studentenUploadverzeichnisLeeren').'</li>';
 						}
 					}
 					else
 					{
-						echo '<li>Studenten-Upload einsehen</li>';
-						echo '<li>Studenten-Uploadverzeichnis leeren</li>';
+						echo '<li>'.$p->t('upload/studentenUploadEinsehen').'</li>';
+						echo '<li>'.$p->t('upload/studentenUploadverzeichnisLeeren').'</li>';
 					}
 				}
 				else
 				{
-					die('<p align="center">Es wurde kein Pfad definiert.</p>');
+					die('<p align="center">'.$p->t('upload/esWurdeKeinPfadDefiniert').'</p>');
 				}
 
 				echo '</form>';
