@@ -2616,6 +2616,135 @@ if(!$result = @$db->db_query("SELECT personentage FROM fue.tbl_projektphase LIMI
 		echo 'fue.tbl_projektphase: Spalte personentage hinzugefuegt!<br>';
 }
 
+if(!$result = @$db->db_query("SELECT 1 FROM campus.tbl_dms_version LIMIT 1;"))
+{
+	$qry = "
+	ALTER TABLE campus.tbl_dms RENAME TO tbl_dms_version;
+	CREATE TABLE campus.tbl_dms
+	(
+		dms_id bigint NOT NULL,
+		oe_kurzbz varchar(32),
+		dokument_kurzbz varchar(8),
+		kategorie_kurzbz varchar(32)
+	);
+	
+	ALTER TABLE campus.tbl_dms ADD CONSTRAINT fk_organisationseinheit_dms FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE campus.tbl_dms ADD CONSTRAINT fk_dokument_dms FOREIGN KEY (dokument_kurzbz) REFERENCES public.tbl_dokument (dokument_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE campus.tbl_dms ADD CONSTRAINT fk_dms_kategorie_dms FOREIGN KEY (kategorie_kurzbz) REFERENCES campus.tbl_dms_kategorie (kategorie_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE campus.tbl_dms ADD CONSTRAINT pk_tbl_dms PRIMARY KEY (dms_id);
+	ALTER TABLE campus.tbl_dms ALTER COLUMN dms_id SET DEFAULT nextval('campus.seq_dms_dms_id');
+
+	ALTER TABLE campus.tbl_dms_version ALTER COLUMN dms_id DROP DEFAULT;
+
+	INSERT INTO campus.tbl_dms(dms_id, oe_kurzbz, dokument_kurzbz, kategorie_kurzbz) SELECT distinct dms_id, oe_kurzbz, dokument_kurzbz, kategorie_kurzbz FROM campus.tbl_dms_version; 
+	
+	ALTER TABLE campus.tbl_dms_version ADD CONSTRAINT fk_dms_version_dms_id FOREIGN KEY (dms_id) REFERENCES campus.tbl_dms (dms_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE campus.tbl_dms_version DROP COLUMN oe_kurzbz;
+	ALTER TABLE campus.tbl_dms_version DROP COLUMN dokument_kurzbz;
+	ALTER TABLE campus.tbl_dms_version DROP COLUMN kategorie_kurzbz;
+	
+	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_dms TO vilesci;
+	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_dms TO web;
+	
+	CREATE SEQUENCE fue.seq_projekt_dokument_projekt_dokument_id
+	 	INCREMENT BY 1
+	 	NO MAXVALUE
+		NO MINVALUE
+		CACHE 1;
+		
+	CREATE TABLE fue.tbl_projekt_dokument
+	(
+		projekt_dokument_id bigint NOT NULL,
+		projektphase_id bigint,
+		projekt_kurzbz varchar(16),
+		dms_id bigint
+	);
+	ALTER TABLE fue.tbl_projekt_dokument ADD CONSTRAINT fk_projekt_dokument_dms FOREIGN KEY (dms_id) REFERENCES campus.tbl_dms (dms_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE fue.tbl_projekt_dokument ADD CONSTRAINT fk_projekt_dokument_projekt FOREIGN KEY (projekt_kurzbz) REFERENCES fue.tbl_projekt (projekt_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE fue.tbl_projekt_dokument ADD CONSTRAINT fk_projekt_dokument_projektphase FOREIGN KEY (projektphase_id) REFERENCES fue.tbl_projektphase (projektphase_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE fue.tbl_projekt_dokument ADD CONSTRAINT pk_tbl_projekt_dokument PRIMARY KEY (projekt_dokument_id);
+	ALTER TABLE fue.tbl_projekt_dokument ALTER COLUMN projekt_dokument_id SET DEFAULT nextval('fue.seq_projekt_dokument_projekt_dokument_id');
+	
+	ALTER TABLE fue.tbl_projekttask ADD COLUMN projekttask_fk bigint;
+	ALTER TABLE fue.tbl_projekttask ADD CONSTRAINT fk_projekttask_projekttask FOREIGN KEY (projekttask_fk) REFERENCES fue.tbl_projekttask (projekttask_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	
+	GRANT SELECT, UPDATE, INSERT, DELETE ON fue.tbl_projekt_dokument TO vilesci;
+		
+	";
+			
+	if(!$db->db_query($qry))
+		echo '<strong>DMS Update: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'DMS Update: DMS und FuE Update!<br>';
+}
+
+if(!$result = @$db->db_query("SELECT 1 FROM fue.tbl_ressource LIMIT 1;"))
+{
+	$qry = "
+	CREATE SEQUENCE fue.seq_ressource_ressource_id
+	 	INCREMENT BY 1
+	 	NO MAXVALUE
+		NO MINVALUE
+		CACHE 1;
+		
+	CREATE TABLE fue.tbl_ressource 
+	(
+	    ressource_id BIGINT NOT NULL,
+	    bezeichnung character varying(256),
+	    beschreibung text,
+	    mitarbeiter_uid character varying(32),
+	    student_uid  character varying(32),
+	    betriebsmittel_id integer,
+	    firma_id integer,
+	    insertamum date DEFAULT now() NOT NULL,
+	    insertvon character varying(32),
+	    updateamum date DEFAULT now() NOT NULL,
+	    updatevon character varying(32)
+	); 
+	
+	ALTER TABLE fue.tbl_ressource ADD CONSTRAINT fk_mitarbeiter_ressource FOREIGN KEY (mitarbeiter_uid) REFERENCES public.tbl_mitarbeiter (mitarbeiter_uid) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE fue.tbl_ressource ADD CONSTRAINT fk_student_ressource FOREIGN KEY (student_uid) REFERENCES public.tbl_student (student_uid) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE fue.tbl_ressource ADD CONSTRAINT fk_betriebsmittel_ressource FOREIGN KEY (betriebsmittel_id) REFERENCES wawi.tbl_betriebsmittel (betriebsmittel_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE fue.tbl_ressource ADD CONSTRAINT fk_firma_ressource FOREIGN KEY (firma_id) REFERENCES public.tbl_firma (firma_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE fue.tbl_ressource ADD CONSTRAINT pk_tbl_ressource PRIMARY KEY (ressource_id);
+	ALTER TABLE fue.tbl_ressource ALTER COLUMN ressource_id SET DEFAULT nextval('fue.seq_ressource_ressource_id');
+	
+	GRANT SELECT, UPDATE, INSERT, DELETE ON fue.tbl_ressource TO vilesci;
+	
+	CREATE SEQUENCE fue.seq_projekt_ressource_projekt_ressource_id
+	 	INCREMENT BY 1
+	 	NO MAXVALUE
+		NO MINVALUE
+		CACHE 1;
+		
+	CREATE TABLE fue.tbl_projekt_ressource
+	(
+		projekt_ressource_id bigint NOT NULL,
+		projektphase_id bigint,
+		projekt_kurzbz varchar(16),
+		ressource_id bigint
+	);
+	
+	ALTER TABLE fue.tbl_projekt_ressource ADD CONSTRAINT fk_projekt_ressource_ressource FOREIGN KEY (ressource_id) REFERENCES fue.tbl_ressource (ressource_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE fue.tbl_projekt_ressource ADD CONSTRAINT fk_projekt_ressource_projekt FOREIGN KEY (projekt_kurzbz) REFERENCES fue.tbl_projekt (projekt_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE fue.tbl_projekt_ressource ADD CONSTRAINT fk_projekt_ressource_projektphase FOREIGN KEY (projektphase_id) REFERENCES fue.tbl_projektphase (projektphase_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE fue.tbl_projekt_ressource ADD CONSTRAINT pk_tbl_projekt_ressource PRIMARY KEY (projekt_ressource_id);
+	ALTER TABLE fue.tbl_projekt_ressource ALTER COLUMN projekt_ressource_id SET DEFAULT nextval('fue.seq_projekt_ressource_projekt_ressource_id');
+	
+	GRANT SELECT, UPDATE, INSERT, DELETE ON fue.tbl_projekt_dokument TO vilesci;
+	
+	
+	INSERT INTO fue.tbl_ressource(student_uid, mitarbeiter_uid, betriebsmittel_id, firma_id, bezeichnung, beschreibung, insertamum, insertvon, updateamum, updatevon) SELECT distinct on(uid) null, uid, null, null, null, null, now(), null, now(), null FROM fue.tbl_projektbenutzer;
+	INSERT INTO fue.tbl_projekt_ressource (projekt_kurzbz, projektphase_id, ressource_id) SELECT projekt_kurzbz, null, (SELECT ressource_id FROM fue.tbl_ressource WHERE mitarbeiter_uid=uid) FROM fue.tbl_projektbenutzer;
+	
+	DROP TABLE fue.tbl_projektbenutzer;
+	";
+			
+	if(!$db->db_query($qry))
+		echo '<strong>Projekt Ressourcen: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Projekt Ressoruce: Ressourcen hinzugefuegt!<br>';
+}
 echo '<br>';
 
 $tabellen=array(
@@ -2648,8 +2777,9 @@ $tabellen=array(
 	"campus.tbl_contentgruppe"  => array("content_id","gruppe_kurzbz","insertamum","insertvon"),
 	"campus.tbl_contentlog"  => array("contentlog_id","contentsprache_id","uid","start","ende"),
 	"campus.tbl_contentsprache"  => array("contentsprache_id","content_id","sprache","version","sichtbar","content","reviewvon","reviewamum","updateamum","updatevon","insertamum","insertvon","titel","gesperrt_uid"),
-	"campus.tbl_dms"  => array("dms_id","version","oe_kurzbz","dokument_kurzbz","kategorie_kurzbz","filename","mimetype","name","beschreibung","letzterzugriff","updateamum","updatevon","insertamum","insertvon"),
+	"campus.tbl_dms"  => array("dms_id","oe_kurzbz","dokument_kurzbz","kategorie_kurzbz"),
 	"campus.tbl_dms_kategorie"  => array("kategorie_kurzbz","bezeichnung","beschreibung","parent_kategorie_kurzbz"),
+	"campus.tbl_dms_version"  => array("dms_id","version","filename","mimetype","name","beschreibung","letzterzugriff","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_erreichbarkeit"  => array("erreichbarkeit_kurzbz","beschreibung","farbe"),
 	"campus.tbl_feedback"  => array("feedback_id","betreff","text","datum","uid","lehrveranstaltung_id","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_legesamtnote"  => array("student_uid","lehreinheit_id","note","benotungsdatum","updateamum","updatevon","insertamum","insertvon"),
@@ -2674,9 +2804,11 @@ $tabellen=array(
 	"campus.tbl_zeitwunsch"  => array("stunde","mitarbeiter_uid","tag","gewicht","updateamum","updatevon","insertamum","insertvon"),
 	"fue.tbl_aktivitaet"  => array("aktivitaet_kurzbz","beschreibung"),
 	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz"),
-	"fue.tbl_projektbenutzer"  => array("projektbenutzer_id","uid","funktion_kurzbz","projekt_kurzbz"),
 	"fue.tbl_projektphase"  => array("projektphase_id","projekt_kurzbz","projektphase_fk","bezeichnung","beschreibung","start","ende","budget","insertamum","insertvon","updateamum","updatevon","personentage"),
-	"fue.tbl_projekttask"  => array("projekttask_id","projektphase_id","bezeichnung","beschreibung","aufwand","mantis_id","insertamum","insertvon","updateamum","updatevon"),
+	"fue.tbl_projekttask"  => array("projekttask_id","projektphase_id","bezeichnung","beschreibung","aufwand","mantis_id","insertamum","insertvon","updateamum","updatevon","projekttask_fk"),
+	"fue.tbl_projekt_dokument"  => array("projekt_dokument_id","projektphase_id","projekt_kurzbz","dms_id"),
+	"fue.tbl_projekt_ressource"  => array("projekt_ressource_id","projekt_kurzbz","projektphase_id","ressource_id"),
+	"fue.tbl_ressource"  => array("ressource_id","student_uid","mitarbeiter_uid","betriebsmittel_id","firma_id","bezeichnung","beschreibung","insertamum","insertvon","updateamum","updatevon"),
 	"kommune.tbl_match"  => array("match_id","team_sieger","wettbewerb_kurzbz","team_gefordert","team_forderer","gefordertvon","gefordertamum","matchdatumzeit","matchort","matchbestaetigtvon","matchbestaetigtamum","ergebniss","bestaetigtvon","bestaetigtamum"),
 	"kommune.tbl_team"  => array("team_kurzbz","bezeichnung","beschreibung","logo"),
 	"kommune.tbl_teambenutzer"  => array("uid","team_kurzbz"),
