@@ -2669,7 +2669,9 @@ if(!$result = @$db->db_query("SELECT 1 FROM campus.tbl_dms_version LIMIT 1;"))
 	ALTER TABLE fue.tbl_projekttask ADD CONSTRAINT fk_projekttask_projekttask FOREIGN KEY (projekttask_fk) REFERENCES fue.tbl_projekttask (projekttask_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 	
 	GRANT SELECT, UPDATE, INSERT, DELETE ON fue.tbl_projekt_dokument TO vilesci;
-		
+	GRANT SELECT, UPDATE, INSERT, DELETE ON fue.tbl_projekt_dokument TO web;
+	GRANT SELECT, UPDATE ON SEQUENCE fue.seq_projekt_dokument_projekt_dokument_id TO vilesci;
+	GRANT SELECT, UPDATE ON SEQUENCE fue.seq_projekt_dokument_projekt_dokument_id TO web;
 	";
 			
 	if(!$db->db_query($qry))
@@ -2710,6 +2712,8 @@ if(!$result = @$db->db_query("SELECT 1 FROM fue.tbl_ressource LIMIT 1;"))
 	ALTER TABLE fue.tbl_ressource ALTER COLUMN ressource_id SET DEFAULT nextval('fue.seq_ressource_ressource_id');
 	
 	GRANT SELECT, UPDATE, INSERT, DELETE ON fue.tbl_ressource TO vilesci;
+	GRANT SELECT, UPDATE ON SEQUENCE fue.seq_ressource_ressource_id TO web;
+	GRANT SELECT, UPDATE ON SEQUENCE fue.seq_ressource_ressource_id TO vilesci;
 	
 	CREATE SEQUENCE fue.seq_projekt_ressource_projekt_ressource_id
 	 	INCREMENT BY 1
@@ -2722,9 +2726,12 @@ if(!$result = @$db->db_query("SELECT 1 FROM fue.tbl_ressource LIMIT 1;"))
 		projekt_ressource_id bigint NOT NULL,
 		projektphase_id bigint,
 		projekt_kurzbz varchar(16),
-		ressource_id bigint
+		ressource_id bigint,
+		funktion_kurzbz character varying(16),
+		beschreibung text
 	);
-	
+
+	ALTER TABLE fue.tbl_projekt_ressource ADD CONSTRAINT fk_projekt_ressource_funktion FOREIGN KEY (funktion_kurzbz) REFERENCES public.tbl_funktion (funktion_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 	ALTER TABLE fue.tbl_projekt_ressource ADD CONSTRAINT fk_projekt_ressource_ressource FOREIGN KEY (ressource_id) REFERENCES fue.tbl_ressource (ressource_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 	ALTER TABLE fue.tbl_projekt_ressource ADD CONSTRAINT fk_projekt_ressource_projekt FOREIGN KEY (projekt_kurzbz) REFERENCES fue.tbl_projekt (projekt_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
 	ALTER TABLE fue.tbl_projekt_ressource ADD CONSTRAINT fk_projekt_ressource_projektphase FOREIGN KEY (projektphase_id) REFERENCES fue.tbl_projektphase (projektphase_id) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -2732,10 +2739,11 @@ if(!$result = @$db->db_query("SELECT 1 FROM fue.tbl_ressource LIMIT 1;"))
 	ALTER TABLE fue.tbl_projekt_ressource ALTER COLUMN projekt_ressource_id SET DEFAULT nextval('fue.seq_projekt_ressource_projekt_ressource_id');
 	
 	GRANT SELECT, UPDATE, INSERT, DELETE ON fue.tbl_projekt_dokument TO vilesci;
-	
+	GRANT SELECT, UPDATE ON SEQUENCE fue.seq_projekt_ressource_projekt_ressource_id TO web;
+	GRANT SELECT, UPDATE ON SEQUENCE fue.seq_projekt_ressource_projekt_ressource_id TO vilesci;
 	
 	INSERT INTO fue.tbl_ressource(student_uid, mitarbeiter_uid, betriebsmittel_id, firma_id, bezeichnung, beschreibung, insertamum, insertvon, updateamum, updatevon) SELECT distinct on(uid) null, uid, null, null, null, null, now(), null, now(), null FROM fue.tbl_projektbenutzer;
-	INSERT INTO fue.tbl_projekt_ressource (projekt_kurzbz, projektphase_id, ressource_id) SELECT projekt_kurzbz, null, (SELECT ressource_id FROM fue.tbl_ressource WHERE mitarbeiter_uid=uid) FROM fue.tbl_projektbenutzer;
+	INSERT INTO fue.tbl_projekt_ressource (projekt_kurzbz, projektphase_id, ressource_id, funktion_kurzbz, beschreibung) SELECT projekt_kurzbz, null, (SELECT ressource_id FROM fue.tbl_ressource WHERE mitarbeiter_uid=uid), funktion_kurzbz, null FROM fue.tbl_projektbenutzer;
 	
 	DROP TABLE fue.tbl_projektbenutzer;
 	";
@@ -2807,7 +2815,7 @@ $tabellen=array(
 	"fue.tbl_projektphase"  => array("projektphase_id","projekt_kurzbz","projektphase_fk","bezeichnung","beschreibung","start","ende","budget","insertamum","insertvon","updateamum","updatevon","personentage"),
 	"fue.tbl_projekttask"  => array("projekttask_id","projektphase_id","bezeichnung","beschreibung","aufwand","mantis_id","insertamum","insertvon","updateamum","updatevon","projekttask_fk"),
 	"fue.tbl_projekt_dokument"  => array("projekt_dokument_id","projektphase_id","projekt_kurzbz","dms_id"),
-	"fue.tbl_projekt_ressource"  => array("projekt_ressource_id","projekt_kurzbz","projektphase_id","ressource_id"),
+	"fue.tbl_projekt_ressource"  => array("projekt_ressource_id","projekt_kurzbz","projektphase_id","ressource_id","funktion_kurzbz","beschreibung"),
 	"fue.tbl_ressource"  => array("ressource_id","student_uid","mitarbeiter_uid","betriebsmittel_id","firma_id","bezeichnung","beschreibung","insertamum","insertvon","updateamum","updatevon"),
 	"kommune.tbl_match"  => array("match_id","team_sieger","wettbewerb_kurzbz","team_gefordert","team_forderer","gefordertvon","gefordertamum","matchdatumzeit","matchort","matchbestaetigtvon","matchbestaetigtamum","ergebniss","bestaetigtvon","bestaetigtamum"),
 	"kommune.tbl_team"  => array("team_kurzbz","bezeichnung","beschreibung","logo"),
