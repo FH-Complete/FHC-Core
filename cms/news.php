@@ -170,7 +170,7 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 		$ma = new mitarbeiter();
 		$ma->load($row->uid);
 		
-		if($ma->uid!='')
+		if($ma->uid!='' && $ma->bnaktiv)
 		{
 			$xml.='<gf_ltg>';
 			
@@ -201,7 +201,7 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 		$ma = new mitarbeiter();
 		$ma->load($row->uid);
 		
-		if($ma->uid!='')
+		if($ma->uid!='' && $ma->bnaktiv)
 		{
 			$xml.='<stv_ltg>';
 			
@@ -232,7 +232,7 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 		$ma = new mitarbeiter();
 		$ma->load($row->uid);
 		
-		if($ma->uid!='')
+		if($ma->uid!='' && $ma->bnaktiv)
 		{
 			$xml.='<ass>';
 			
@@ -267,7 +267,7 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 		$bn = new benutzer();
 		$bn->load($row->uid);
 		
-		if($bn->uid!='')
+		if($bn->uid!='' && $bn->bnaktiv)
 		{
 			$xml.='<stdv>';			
 			$xml.='<name><![CDATA['.$bn->titelpre.' '.$bn->vorname.' '.$bn->nachname.' '.$bn->titelpost.']]></name>';
