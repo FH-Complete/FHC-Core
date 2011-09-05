@@ -496,6 +496,11 @@ class content extends basis_db
 	 */
 	public function hasChilds($content_id)
 	{
+		if($content_id=='' || !is_numeric($content_id))
+		{
+			$this->errormsg = 'ContentID ungueltig';
+			return false;
+		}
 		$qry = "SELECT count(*) as anzahl FROM campus.tbl_contentchild WHERE content_id='".addslashes($content_id)."'";
 		
 		if($result = $this->db_query($qry))
