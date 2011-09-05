@@ -4,14 +4,14 @@ $this->phrasen['global/institut']='Institute';
 $this->phrasen['global/semester']='Semester';
 $this->phrasen['global/studiensemester']='Semester';
 $this->phrasen['global/studienzentrum']='Study Center';
-$this->phrasen['global/studiengangsleitung']='Head of Department';
+$this->phrasen['global/studiengangsleitung']='Program Director';
 $this->phrasen['global/lehrveranstaltung']='Subject';
 $this->phrasen['global/lehreinheit']='Teaching unit';
 $this->phrasen['global/organisationseinheit']='Organisation Unit';
 
 $this->phrasen['global/studiengangsmanagement']='Study Management';
 $this->phrasen['global/geschaeftsfuehrendeltg']='business Leadership';
-$this->phrasen['global/stellvertreter']='Deputy';
+$this->phrasen['global/stellvertreter']='Deputy Program Director';
 $this->phrasen['global/sekretariat']='Administrative Assistant';
 $this->phrasen['global/studentenvertreter']='Student Representatives';
 
