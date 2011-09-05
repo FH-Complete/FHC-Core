@@ -12,7 +12,7 @@ $this->phrasen['global/organisationseinheit']='Organisation Unit';
 $this->phrasen['global/studiengangsmanagement']='Study Management';
 $this->phrasen['global/geschaeftsfuehrendeltg']='business Leadership';
 $this->phrasen['global/stellvertreter']='Deputy';
-$this->phrasen['global/sekretariat']='Secretariat';
+$this->phrasen['global/sekretariat']='Administrative Assistant';
 $this->phrasen['global/studentenvertreter']='Student Representatives';
 
 $this->phrasen['global/lehrziele']='Teaching goals';
