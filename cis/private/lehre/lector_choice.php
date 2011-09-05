@@ -134,7 +134,7 @@ $stsem = $stsem_obj->getaktorNext();
 				//echo '<span class="error">ACHTUNG: Der Studentenupload steht nur noch bis zum Ende des Wintersemesters 2008 zur Verfügung</span><br><br>';
 				echo "<form accept-charset=\"UTF-8\" method=\"POST\" action=\"lector_choice.php?lvid=$lvid\" enctype=\"multipart/form-data\" onSubmit=\"return ConfirmDir(this);\">";
 
-				if(isset($delete_dir))
+				if(isset($_POST['delete_dir']))
 				{
 					if(@is_dir($openpath))
 					{
