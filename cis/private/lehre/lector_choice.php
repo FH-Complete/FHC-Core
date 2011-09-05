@@ -30,6 +30,8 @@ require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/lehrveranstaltung.class.php');
 require_once('../../../include/phrasen.class.php');
 
+$sprache = getSprache();
+$p = new phrasen($sprache);
 if (!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
 
