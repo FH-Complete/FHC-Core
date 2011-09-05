@@ -2738,7 +2738,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM fue.tbl_ressource LIMIT 1;"))
 	ALTER TABLE fue.tbl_projekt_ressource ADD CONSTRAINT pk_tbl_projekt_ressource PRIMARY KEY (projekt_ressource_id);
 	ALTER TABLE fue.tbl_projekt_ressource ALTER COLUMN projekt_ressource_id SET DEFAULT nextval('fue.seq_projekt_ressource_projekt_ressource_id');
 	
-	GRANT SELECT, UPDATE, INSERT, DELETE ON fue.tbl_projekt_dokument TO vilesci;
+	GRANT SELECT, UPDATE, INSERT, DELETE ON fue.tbl_projekt_ressource TO vilesci;
 	GRANT SELECT, UPDATE ON SEQUENCE fue.seq_projekt_ressource_projekt_ressource_id TO web;
 	GRANT SELECT, UPDATE ON SEQUENCE fue.seq_projekt_ressource_projekt_ressource_id TO vilesci;
 	
