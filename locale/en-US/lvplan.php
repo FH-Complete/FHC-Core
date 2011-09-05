@@ -55,4 +55,7 @@ $this->phrasen['lvplan/datumIstUngueltig']='Datum ist ungueltig';
 $this->phrasen['lvplan/einheit']='Unit';
 $this->phrasen['lvplan/info']='Info';
 $this->phrasen['lvplan/unr']='UNr';
+$this->phrasen['lvplan/ort']='Room';
+$this->phrasen['lvplan/lehrveranstaltungsplanDetails']='Schedule Details';
+$this->phrasen['lvplan/studierende']='Students'
 ?>
