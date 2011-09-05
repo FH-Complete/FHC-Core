@@ -1226,7 +1226,7 @@ if($erg=pg_query($db_conn,$qry))
 		$qry_bet="SELECT * FROM lehre.tbl_projektbetreuer 
 			JOIN public.tbl_person on(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id) 
 			WHERE projektarbeit_id='".$row->projektarbeit_id."'  
-			AND (betreuerart_kurzbz='Betreuer' OR betreuerart_kurzbz='Begutachter' OR betreuerart_kurzbz='Erstbegutachter' OR betreuerart_kurzbz='Erstbegutachter');";
+			AND (betreuerart_kurzbz='Betreuer' OR betreuerart_kurzbz='Begutachter' OR betreuerart_kurzbz='Erstbegutachter' OR betreuerart_kurzbz='Erstbetreuer');";
 		//echo $qry_bet."<br>";
 		if($result_bet=pg_query($db_conn,$qry_bet))
 		{
