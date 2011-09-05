@@ -137,7 +137,7 @@ $num_rows_repl=$db->db_num_rows($erg_repl);
 
 <html>
 <head>
-    <title>Lehrveranstaltungsplan Details</title>
+    <title><?php echo $p->t('lvplan/lehrveranstaltungsplanDetails');?></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </head>
@@ -149,7 +149,7 @@ $num_rows_repl=$db->db_num_rows($erg_repl);
 <table class="stdplan">
 <?php
 if ($num_rows_stpl>0)
-echo '<tr> <th>'.$p->t('lvplan/unr').'</th><th>'.$p->t('lvaliste/lektor').'</th><th>'.$p->t('global/ort').'</th><th>'.$p->t('lvaliste/lehrfach').'</th><th>'.$p->t('global/bezeichnung').'</th><th>'.$p->t('global/verband').'</th><th>'.$p->t('lvplan/einheit').'</th><th>'.$p->t('lvplan/info').'</th></tr>';
+echo '<tr> <th>'.$p->t('lvplan/unr').'</th><th>'.$p->t('lvaliste/lektor').'</th><th>'.$p->t('lvplan/ort').'</th><th>'.$p->t('lvaliste/lehrfach').'</th><th>'.$p->t('global/bezeichnung').'</th><th>'.$p->t('global/verband').'</th><th>'.$p->t('lvplan/einheit').'</th><th>'.$p->t('lvplan/info').'</th></tr>';
 $ort = new ort();
 for ($i=0; $i<$num_rows_stpl; $i++)
 {
@@ -181,7 +181,7 @@ for ($i=0; $i<$num_rows_stpl; $i++)
         <td><?php echo $bezeichnung; ?></td>
 
        	<td title="<?php echo $stgkurzbz.$semester.mb_strtolower($verband).$gruppe; ?>">
-			<?php echo (!is_null($semester) && !empty($semester)? '<A class="Item" title="'.$anzahl_lvb.' Studierende" href="mailto:'.$stgkurzbz.$semester.mb_strtolower($verband).$gruppe.'@'.DOMAIN .'">':''); ?>
+			<?php echo (!is_null($semester) && !empty($semester)? '<A class="Item" title="'.$anzahl_lvb.' '.$p->t('lvplan/studierende').'" href="mailto:'.$stgkurzbz.$semester.mb_strtolower($verband).$gruppe.'@'.DOMAIN .'">':''); ?>
 			<?php echo $stgkurzbz.'-'.$semester.$verband.$gruppe;?>
 			<?php echo (!is_null($semester) && !empty($semester)?'</A>':''); ?>
 		</td>
@@ -200,7 +200,7 @@ if ($num_rows_repl>0)
 {
     echo '<h2>'.$p->t('lvplan/reservierungen').'</h2>';
     echo '<table class="stdplan">';
-    echo '<tr><th>'.$p->t('global/titel').'</th><th>'.$p->t('global/ort').'</th><th>'.$p->t('global/person').'</th><th>'.$p->t('global/beschreibung').'</th></tr>';
+    echo '<tr><th>'.$p->t('global/titel').'</th><th>'.$p->t('lvplan/ort').'</th><th>'.$p->t('global/person').'</th><th>'.$p->t('global/beschreibung').'</th></tr>';
     for ($i=0; $i<$num_rows_repl; $i++)
     {
         $titel=$db->db_result($erg_repl,$i,"titel");
