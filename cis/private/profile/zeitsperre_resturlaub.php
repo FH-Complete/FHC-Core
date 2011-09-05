@@ -551,6 +551,15 @@ $anspruch = '25';
 		$resturlaubstage = $resturlaub->resturlaubstage;
 		$mehrarbeitsstunden = $resturlaub->mehrarbeitsstunden;
 		$anspruch = $resturlaub->urlaubstageprojahr;
+	}else 
+	{
+		// wenn mitarbeiter ist kein fixangestellter --> kein urlaubsanspruch
+		$mitarbeiter_anspruch = new mitarbeiter(); 
+		$mitarbeiter_anspruch->load($uid);
+		if($mitarbeiter_anspruch->fixangestellt == true)
+			$anspruch=25;
+		else 
+			$anspruch = 0; 
 	}
 //Den Bereich fuer die Resturlaubstage nur anzeigen wenn dies
 //im config angegeben ist

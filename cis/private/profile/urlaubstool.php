@@ -425,7 +425,13 @@ th, td, table
 	{
 		$resturlaubstage=0;
 		$mehrarbeitsstunden=0;
-		$anspruch=25;
+		// wenn mitarbeiter ist kein fixangestellter --> kein urlaubsanspruch
+		$mitarbeiter_anspruch = new mitarbeiter(); 
+		$mitarbeiter_anspruch->load($uid);
+		if($mitarbeiter_anspruch->fixangestellt == true)
+			$anspruch=25;
+		else 
+			$anspruch = 0; 
 	}
 
 	$jahr=date('Y');
