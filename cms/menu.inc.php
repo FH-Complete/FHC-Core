@@ -68,49 +68,51 @@ function drawEntry($item, $sprache)
 			return;
 	}
 	$content = new content();
-	$content->getContent($item->child_content_id, $sprache, null, true, true);
-	if($content->hasChilds($content->content_id))
+	if($content->getContent($item->child_content_id, $sprache, null, true, true))
 	{
-		echo '
-		<tr>
-			<td class="tdwidth10" nowrap>&nbsp;</td>
-			<td class="tdwrap">';
-		if($content->template_kurzbz=='include')
-			IncludeMenuAddon($content);
-		elseif($content->template_kurzbz=='redirect')
-			Redirect($content, $content->content_id);
-		else
-			DrawLink(APP_ROOT.'cms/content.php?content_id='.$content->content_id,'content',$content->titel, $content->content_id);
-		
-		echo '
-			<table class="menue" id="Content'.$content->content_id.'" style="display: '.($content->menu_open?'visible':'none').'">';
-		
-		$content->getChilds($content->content_id);
-		foreach($content->result as $row)
+		if($content->hasChilds($content->content_id))
 		{
-			drawEntry($row, $sprache);
-		}	
-		echo '
-				</table>
-			</td>
-		</tr>';
-	}
-	else
-	{
-		echo '
-		<tr>
-		  	<td class="tdwidth10" nowrap>&nbsp;</td>
-			<td class="tdwrap">';
-		if($content->template_kurzbz=='include')
-			IncludeMenuAddon($content);
-		elseif($content->template_kurzbz=='redirect')
-			Redirect($content);
-		else
-			DrawLink(APP_ROOT.'cms/content.php?content_id='.$content->content_id,'content',$content->titel);
+			echo '
+			<tr>
+				<td class="tdwidth10" nowrap>&nbsp;</td>
+				<td class="tdwrap">';
+			if($content->template_kurzbz=='include')
+				IncludeMenuAddon($content);
+			elseif($content->template_kurzbz=='redirect')
+				Redirect($content, $content->content_id);
+			else
+				DrawLink(APP_ROOT.'cms/content.php?content_id='.$content->content_id,'content',$content->titel, $content->content_id);
 			
-		echo '
-			</td>
-		</tr>';
+			echo '
+				<table class="menue" id="Content'.$content->content_id.'" style="display: '.($content->menu_open?'visible':'none').'">';
+			
+			$content->getChilds($content->content_id);
+			foreach($content->result as $row)
+			{
+				drawEntry($row, $sprache);
+			}	
+			echo '
+					</table>
+				</td>
+			</tr>';
+		}
+		else
+		{
+			echo '
+			<tr>
+			  	<td class="tdwidth10" nowrap>&nbsp;</td>
+				<td class="tdwrap">';
+			if($content->template_kurzbz=='include')
+				IncludeMenuAddon($content);
+			elseif($content->template_kurzbz=='redirect')
+				Redirect($content);
+			else
+				DrawLink(APP_ROOT.'cms/content.php?content_id='.$content->content_id,'content',$content->titel);
+				
+			echo '
+				</td>
+			</tr>';
+		}
 	}
 }
 
