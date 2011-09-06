@@ -9,7 +9,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-week-overlay.xul.ph
 echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projekt.overlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektphase.overlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projekttask.overlay.xul.php"?>';
-echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/ressource.overlay.xul.php"?>';
+/*echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/ressource.overlay.xul.php"?>';*/
 echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
 ?>
 
@@ -24,6 +24,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
 <script type="application/x-javascript" src="chrome://global/content/nsTransferable.js"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/DragAndDrop.js"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/dragboard.js.php"/>
+<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/projekt/ressource.js.php"/>
 
 <vbox id="box-projektmenue">
     <popupset>
@@ -38,11 +39,12 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
 	    <toolbarbutton id="toolbarbutton-projektmenue-refresh" label="Aktualisieren" oncommand="ProjektmenueRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 	</toolbar>
     </toolbox>
+    <!-- <?php echo APP_ROOT; ?>rdf/projektphase.rdf.php?foo=<?php echo time(); ?> -->
     <tree id="tree-projektmenue" onselect="treeProjektmenueSelect();"
 	seltype="single" hidecolumnpicker="false" flex="1"
 	datasources="<?php echo APP_ROOT; ?>rdf/projektphase.rdf.php?foo=<?php echo time(); ?>" ref="http://www.technikum-wien.at/projektphase/alle-projektphasen"
 	enableColumnDrag="true"
-    	ondraggesture="nsDragAndDrop.startDrag(event,lvbgrpDDObserver);"
+    ondraggesture="nsDragAndDrop.startDrag(event,lvbgrpDDObserver);"
 	ondragdrop="nsDragAndDrop.drop(event,verbandtreeDDObserver)"
 	ondragover="nsDragAndDrop.dragOver(event,verbandtreeDDObserver)"
 	ondragenter="nsDragAndDrop.dragEnter(event,verbandtreeDDObserver)"
@@ -103,7 +105,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
 			<tab id="tab-projekt" label="Projekte" />
 			<tab id="tab-projektphase" label="Phasen" />
 			<tab id="tab-projekttask" label="Tasks" selected="true" />
-			<tab id="tab-ressource" label="Ressourcen" />
+			<!-- <tab id="tab-ressource" label="Ressourcen" />  -->
 			<tab id="tab-notiz" label="Notizen" />
 			<tab id="tab-dokumente" label="Dokumente" />
 			<tab id="tab-bestellung" label="Bestellungen" />
@@ -113,7 +115,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
 			<vbox id="box-projekt" />
 			<vbox id="box-projektphase" />
 			<vbox id="box-projekttask" />
-			<vbox id="box-ressource" />
+			<!--  <vbox id="box-ressource" /> -->
 			<vbox id="box-notiz" />
 			<vbox id="box-dokumente" />
 			<vbox id="box-bestellung" />
@@ -123,4 +125,61 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
 	</tabbox>
 </vbox>
 
+
+<vbox id="box-ressourcemenue">
+    <toolbox>
+	<toolbar id="toolbar-ressourcemenue">
+	    <toolbarbutton id="toolbarbutton-ressourcemenue-neu" label="Neue Ressource" oncommand="RessourceNeu();" disabled="false" image="../skin/images/NeuDokument.png" tooltiptext="Neue Ressource anlegen" />
+	    <toolbarbutton id="toolbarbutton-ressourcemenue-del" label="Loeschen" oncommand="RessourceDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Projekt löschen"/>
+	    <toolbarbutton id="toolbarbutton-ressourcemenue-refresh" label="Aktualisieren" oncommand="RessourceRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
+	</toolbar>
+    </toolbox>
+    <tree id="tree-ressourcemenue" onselect="treeRessourcemenueSelect();"
+	seltype="single" hidecolumnpicker="false" flex="1"
+	datasources="rdf:null" ref="http://www.technikum-wien.at/ressource/liste"
+	enableColumnDrag="true"
+    ondraggesture="nsDragAndDrop.startDrag(event,ressourceDDObserver);"
+	ondragdrop="nsDragAndDrop.drop(event,ressourceDDObserver)"
+	ondragover="nsDragAndDrop.dragOver(event,ressourceDDObserver)"
+	ondragenter="nsDragAndDrop.dragEnter(event,ressourceDDObserver)"
+	ondragexit="nsDragAndDrop.dragExit(event,ressourceDDObserver)"
+	>
+	<treecols>
+	    <treecol id="treecol-ressourcemenue-description" label="Anzeige" flex="2"  primary="true"/>
+	    <splitter class="tree-splitter"/>
+	    <treecol id="treecol-ressourcemenue-ressource_id" label="ID" flex="5" hidden ="true" />
+	    <splitter class="tree-splitter"/>
+	    <treecol id="treecol-ressourcemenue-bezeichnung" label="Bezeichnung" flex="2" hidden="true" />
+	    <splitter class="tree-splitter"/>
+	    <treecol id="treecol-ressourcemenue-beschreibung" label="Beschreibung" flex="2" hidden="true"/>
+	    <splitter class="tree-splitter"/>
+	    <treecol id="treecol-ressourcemenue-mitarbeiter_uid" label="MitarbeiterUID" flex="1" hidden="true"/>
+	    <splitter class="tree-splitter"/>
+	    <treecol id="treecol-ressourcemenue-student_uid" label="StudentUID" flex="1" hidden="true"/>
+	    <splitter class="tree-splitter"/>
+	    <treecol id="treecol-ressourcemenue-betriebsmittel_id" label="BetriebsmittelID" flex="2" hidden="true"/>
+	    <splitter class="tree-splitter"/>
+	    <treecol id="treecol-ressourcemenue-firma_id" label="FirmaID" flex="1" hidden="true"/>
+	</treecols>
+
+	<template>
+	    <rule>
+	      <treechildren>
+	       <treeitem uri="rdf:*">
+	         <treerow>
+	           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#rdf_description"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#ressource_id"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#bezeichnung"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#beschreibung"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#mitarbeiter_uid"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#student_uid"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#betriebsmittel_id"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#firma_id"/>
+	         </treerow>
+	       </treeitem>
+	      </treechildren>
+	    </rule>
+	</template>
+    </tree>
+</vbox>
 </overlay>
