@@ -55,7 +55,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 					<label value="Mitarbeiter" control="ressource-menulist-mitarbeiter" />
 				    <menulist id="ressource-menulist-mitarbeiter"
 										  editable="true"
-								          datasources="<?php echo APP_ROOT?>rdf/mitarbeiter.rdf.php?filter=pam" flex="1"
+								          datasources="rdf:null" flex="1"
 								          ref="http://www.technikum-wien.at/mitarbeiter/liste" 
 								          oninput="RessourceMenulistMitarbeiterLoad(this)"
 								          oncommand="RessourceLoadMitarbeiterDaten()"
@@ -64,6 +64,24 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 						<menupopup>
 							<menuitem value="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"
 				        		      label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname ( rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid )"
+							  		  uri="rdf:*"/>
+						</menupopup>
+						</template>
+					</menulist>
+				</row>
+				<row>
+					<label value="Student" control="ressource-menulist-student" />
+				    <menulist id="ressource-menulist-student"
+										  editable="true"
+								          datasources="rdf:null" flex="1"
+								          ref="http://www.technikum-wien.at/student/alle" 
+								          oninput="RessourceMenulistStudentLoad(this)"
+								          oncommand="RessourceLoadMitarbeiterDaten()"
+								         >
+						<template>
+						<menupopup>
+							<menuitem value="rdf:http://www.technikum-wien.at/student/rdf#person_id"
+				        		      label="rdf:http://www.technikum-wien.at/student/rdf#vorname rdf:http://www.technikum-wien.at/student/rdf#nachname ( rdf:http://www.technikum-wien.at/student/rdf#uid )"
 							  		  uri="rdf:*"/>
 						</menupopup>
 						</template>
