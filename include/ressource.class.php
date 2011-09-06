@@ -98,18 +98,52 @@ class ressource extends basis_db
 
 	/**
 	 * Laedt alle Ressourcen
-	 * @param $projekt_id, null wenn alle Resourcen geladen werden sollen 
+	 * @param $projekt_kurzbz, wenn null -> werden alle ressourcen geladen 
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getRessourcen($projekt_id = null)
+	public function getAllRessourcen()
 	{
-		if($projekt_id != null)
-		{
-			// lädt nur Ressourcen zu einem Projekt
-		}
-		$this->result=array();
 		$qry = "SELECT * FROM fue.tbl_ressource order by ressource_id";
+			
+		$this->result=array();
+			
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new ressource();
+				
+				$obj->ressource_id = $row->ressource_id;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$obj->student_uid = $row->student_uid;
+				$obj->betriebsmittel_id = $row->betriebsmittel_id;
+				$obj->firma_id = $row->firma_id;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$this->result[] = $obj;
+			}
+			//var_dump($this->result);
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	public function getProjectRessourcen($project_kurzbz)
+	{
+		$qry = "SELECT ressource.* FROM fue.tbl_ressource as ressource
+		JOIN fue.tbl_projekt_ressource project ON(project.projekt_ressource_id = ressource.ressource_id) 
+		WHERE project.projekt_kurzbz ='".addslashes($projekt_kurzbz)."';";
 		
+		$this->result=array();
+			
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
