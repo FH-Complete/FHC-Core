@@ -45,12 +45,15 @@ echo '
 ';
 
 $ressource = new ressource(); 
-$ressource->getRessourcen(); 
+$ressource->getAllRessourcen(); 
 
 foreach ($ressource->result as $res)
 {
 		draw_ressource($res);
 }
+
+
+
 
 $seq= "
 	<RDF:Seq about=\"".$rdf_url."liste\" >
@@ -68,7 +71,34 @@ $seq= "
 
 $seq.="\n\t\t</RDF:Seq>\n\t</RDF:RDF>";
 
+
+draw_caption('mitarbeiter');
+draw_caption('studenten');
+draw_caption('betriebsmittel');
+draw_caption('firmen');
 echo $seq; 
+
+function draw_caption($name)
+{
+	global $rdf_url;
+	
+		echo '
+	<RDF:Description about="'.$rdf_url.$name.'" >
+    	<RESSOURCE:ressource_id></RESSOURCE:ressource_id>
+		<RESSOURCE:bezeichnung></RESSOURCE:bezeichnung>
+		<RESSOURCE:beschreibung></RESSOURCE:beschreibung>
+		<RESSOURCE:mitarbeiter_uid></RESSOURCE:mitarbeiter_uid>
+		<RESSOURCE:student_uid></RESSOURCE:student_uid>
+		<RESSOURCE:betriebsmittel_id></RESSOURCE:betriebsmittel_id>
+		<RESSOURCE:firma_id></RESSOURCE:firma_id>
+		<RESSOURCE:insertamum></RESSOURCE:insertamum>
+		<RESSOURCE:insertvon></RESSOURCE:insertvon>
+		<RESSOURCE:updateamum></RESSOURCE:updateamum>
+		<RESSOURCE:updatevon></RESSOURCE:updatevon>
+		<RESSOURCE:rdf_description><![CDATA['.ucfirst($name).']]></RESSOURCE:rdf_description>
+  	</RDF:Description>
+  	';
+}
 
 
 // funktion zum ausgeben der einzelnen ressourcen -> es wird unterschienden ob mitarbeiter/student/betriebsmittel/firma
