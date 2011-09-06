@@ -235,6 +235,39 @@ function RessourceLoadMitarbeiterDaten()
 	document.getElementById('student-projektbetreuer-textbox-stundensatz').value=stundensatz;
 }
 
+function RessourceMenulistStudentLoad(menulist, filter)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	if(typeof(filter)=='undefined')
+		v = menulist.value;
+	else
+		v = filter;
+
+	if(v.length>2)
+	{		
+		var url = '<?php echo APP_ROOT; ?>rdf/student.rdf.php?filter='+v+'&'+gettimestamp();
+		//nurmittitel=&
+		var oldDatasources = menulist.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			menulist.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		menulist.builder.rebuild();
+	
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		if(typeof(filter)=='undefined')
+			var datasource = rdfService.GetDataSource(url);
+		else
+			var datasource = rdfService.GetDataSourceBlocking(url);
+		datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		menulist.database.AddDataSource(datasource);
+		if(typeof(filter)!='undefined')
+			menulist.builder.rebuild();
+	}
+}
 
 function ressourceTreeLoad()
 {
