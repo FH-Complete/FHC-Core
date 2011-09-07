@@ -28,7 +28,7 @@ header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../config/vilesci.config.inc.php');
 
 echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
-	
+echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';	
 ?>
 
 <window id="window-ressource-neu" title="Neue Ressource anlegen"
@@ -40,6 +40,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>content/projekt/projekt.window.js.php" />
 	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>content/functions.js"></script>
 	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>content/projekt/ressource.js.php"></script>
+
 <vbox>
 
 <checkbox id="checkbox-ressource-neu" hidden="true"/>
@@ -57,8 +58,8 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 										  editable="true"
 								          datasources="rdf:null" flex="1"
 								          ref="http://www.technikum-wien.at/mitarbeiter/liste" 
-								          oninput="RessourceMenulistMitarbeiterLoad(this)"
-								          oncommand="RessourceLoadMitarbeiterDaten()"
+								          oninput="RessourceMenulistMitarbeiterLoad(this);"
+								          oncommand="alert(MenulistGetSelectedValue('ressource-menulist-mitarbeiter'));"
 								         >
 						<template>
 						<menupopup>
@@ -75,13 +76,49 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 										  editable="true"
 								          datasources="rdf:null" flex="1"
 								          ref="http://www.technikum-wien.at/student/alle" 
-								          oninput="RessourceMenulistStudentLoad(this)"
+								          oninput="RessourceMenulistStudentLoad(this);"
 								          oncommand="RessourceLoadMitarbeiterDaten()"
 								         >
 						<template>
 						<menupopup>
 							<menuitem value="rdf:http://www.technikum-wien.at/student/rdf#person_id"
 				        		      label="rdf:http://www.technikum-wien.at/student/rdf#vorname rdf:http://www.technikum-wien.at/student/rdf#nachname ( rdf:http://www.technikum-wien.at/student/rdf#uid )"
+							  		  uri="rdf:*"/>
+						</menupopup>
+						</template>
+					</menulist>
+				</row>
+				<row>
+					<label value="Betriebsmittel" control="ressource-menulist-betriebsmittel" />
+				    <menulist id="ressource-menulist-betriebsmittel"
+										  editable="true"
+								          datasources="rdf:null" flex="1"
+								          ref="http://www.technikum-wien.at/betriebsmittel/liste" 
+								          oninput="RessourceMenulistBetriebsmittelLoad(this)"
+								          oncommand="RessourceLoadMitarbeiterDaten()"
+								         >
+						<template>
+						<menupopup>
+							<menuitem value="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#betriebsmittel_id"
+				        		      label="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#beschreibung ( rdf:http://www.technikum-wien.at/betriebsmittel/rdf#inventarnummer )"
+							  		  uri="rdf:*"/>
+						</menupopup>
+						</template>
+					</menulist>
+				</row>
+				<row>
+					<label value="Firma" control="ressource-menulist-firma" />
+				    <menulist id="ressource-menulist-firma"
+										  editable="true"
+								          datasources="rdf:null" flex="1"
+								          ref="http://www.technikum-wien.at/firma/liste" 
+								          oninput="RessourceMenulistFirmaLoad(this)"
+								          oncommand="RessourceLoadMitarbeiterDaten()"
+								         >
+						<template>
+						<menupopup>
+							<menuitem value="rdf:http://www.technikum-wien.at/firma/rdf#firma_id"
+				        		      label="rdf:http://www.technikum-wien.at/firma/rdf#name"
 							  		  uri="rdf:*"/>
 						</menupopup>
 						</template>
@@ -95,24 +132,11 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 					<label value="Beschreibung" control="textbox-ressource-beschreibung"/>
    					<textbox id="textbox-ressource-beschreibung" multiline="true"/>
 				</row>
-			<!-- <row>
-					<label value="Test" control="textbox-projekt-test"/>
-   					<menulist id="menulist-projekt-test" flex="1">
-							<menupopup>
-								<menuitem value="p" label="Privatkonto"/>
-								<menuitem value="f" label="Firmenkonto"/>
-							</menupopup>
-					</menulist>
-      			</row>
-      			<row>
-					<label value="Verrechnungskonto" control="bankverbindung-textbox-verrechnung"/>
-   					<checkbox id="bankverbindung-checkbox-verrechnung" checked="true"/>
-      			</row>-->
 		</rows>
 	</grid>
 	<hbox>
 		<spacer flex="1" />
-		<button id="button-ressource-speichern" oncommand="saveProjekt()" label="Speichern" />
+		<button id="button-ressource-speichern" oncommand="saveRessource()" label="Speichern" />
 	</hbox>
 </groupbox>
 </vbox>
