@@ -64,7 +64,7 @@ $seq= "
 			</RDF:Seq>
 			<RDF:Seq about=\"".$rdf_url."betriebsmittel\" >$betriebsmittel
 			</RDF:Seq>
-			<RDF:Seq about=\"".$rdf_url."firmen\" >$firma
+			<RDF:Seq about=\"".$rdf_url."firma\" >$firma
 			</RDF:Seq>
 		</RDF:li>
 		";
@@ -75,7 +75,7 @@ $seq.="\n\t\t</RDF:Seq>\n\t</RDF:RDF>";
 draw_caption('mitarbeiter');
 draw_caption('studenten');
 draw_caption('betriebsmittel');
-draw_caption('firmen');
+draw_caption('firma');
 echo $seq; 
 
 function draw_caption($name)
@@ -86,6 +86,7 @@ function draw_caption($name)
 	<RDF:Description about="'.$rdf_url.$name.'" >
     	<RESSOURCE:ressource_id></RESSOURCE:ressource_id>
 		<RESSOURCE:bezeichnung></RESSOURCE:bezeichnung>
+		<RESSOURCE:typ><![CDATA['.ucfirst($name).']]></RESSOURCE:typ>
 		<RESSOURCE:beschreibung></RESSOURCE:beschreibung>
 		<RESSOURCE:mitarbeiter_uid></RESSOURCE:mitarbeiter_uid>
 		<RESSOURCE:student_uid></RESSOURCE:student_uid>
@@ -109,6 +110,7 @@ function draw_ressource($ressource)
 	
 	$db = new basis_db(); 
 	$RdfDescription ='';
+	$typ = '';
 	
 	// Ressource ist ein Mitarbeiter
 	if($ressource->mitarbeiter_uid != '')
@@ -125,6 +127,7 @@ function draw_ressource($ressource)
 			die('Fehler beim Laden der Mitarbeiter-daten');
 			
 		$mitarbeiter.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$ressource->ressource_id."\" />";
+		$typ ='Mitarbeiter';
 	}
 	// Ressource ist ein Student
 	if($ressource->student_uid != '')
@@ -141,6 +144,7 @@ function draw_ressource($ressource)
 			die('Fehler beim Laden der Studenten-daten');
 			
 		$student.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$ressource->ressource_id."\" />";
+		$typ ='Student';
 	}
 	
 	// Ressource ist ein Betriebsmittel
@@ -158,6 +162,7 @@ function draw_ressource($ressource)
 			die('Fehler beim Laden der Betriebsmittel-daten');
 			
 		$betriebsmittel.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$ressource->ressource_id."\" />";
+		$typ = 'Betriebsmittel';
 	}
 	
 	// Ressource ist eine Firma
@@ -175,12 +180,14 @@ function draw_ressource($ressource)
 			die('Fehler beim Laden der Firmen-daten');
 			
 		$firma.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$ressource->ressource_id."\" />";
+		$typ = 'Firma';
 	}
 	
 	echo '
 	<RDF:Description about="'.$rdf_url.$ressource->ressource_id.'" >
     	<RESSOURCE:ressource_id><![CDATA['.$ressource->ressource_id.']]></RESSOURCE:ressource_id>
 		<RESSOURCE:bezeichnung><![CDATA['.$ressource->bezeichnung.']]></RESSOURCE:bezeichnung>
+		<RESSOURCE:typ><![CDATA['.$typ.']]></RESSOURCE:typ>
 		<RESSOURCE:beschreibung><![CDATA['.$ressource->beschreibung.']]></RESSOURCE:beschreibung>
 		<RESSOURCE:mitarbeiter_uid><![CDATA['.$ressource->mitarbeiter_uid.']]></RESSOURCE:mitarbeiter_uid>
 		<RESSOURCE:student_uid><![CDATA['.$ressource->student_uid.']]></RESSOURCE:student_uid>
