@@ -1,6 +1,9 @@
 <?php 
-require_once('../../config/vilesci.config.inc.php')?>
+require_once('../../config/vilesci.config.inc.php');
+?>
 
+ 
+ 
 var datasourceTreeRessource; 
 var selectIDRessource;
 
@@ -164,8 +167,56 @@ function treeRessourcemenueSelect()
 }
 
 
+// ****
+// * Speichern der Daten
+// ****
+function saveRessource()
+{
+    var bezeichnung=document.getElementById('textbox-ressource-bezeichnung').value;
+    var beschreibung=document.getElementById('textbox-ressource-beschreibung').value;
+    var mitarbeiter_uid = MenulistGetSelectedValue('ressource-menulist-mitarbeiter'); 
+    var student_uid = MenulistGetSelectedValue('ressource-menulist-student');
+    var betriebsmittel_id = MenulistGetSelectedValue('ressource-menulist-betriebsmittel');
+    var firma_id = MenulistGetSelectedValue('ressource-menulist-firma');
+    // Variablen checken
+    
+    // SOAP-Action
+    var soapBody = new SOAPObject("saveProjekt");
+    soapBody.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
+    soapBody.appendChild(new SOAPObject("oe_kurzbz")).val(oe_kurzbz);
+    soapBody.appendChild(new SOAPObject("titel")).val(titel);
+    soapBody.appendChild(new SOAPObject("nummer")).val(nummer);
+    soapBody.appendChild(new SOAPObject("beschreibung")).val(beschreibung);
+    soapBody.appendChild(new SOAPObject("beginn")).val(beginn);
+    soapBody.appendChild(new SOAPObject("ende")).val(ende);
+    soapBody.appendChild(new SOAPObject("neu")).val('true');
+    
+    var sr = new SOAPRequest("saveProjekt",soapBody);
+    SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekt.soap.php?"+gettimestamp();
+    SOAPClient.SendRequest(sr, clb_saveProjekt);
+}
 
-
+// ****
+// * Callback Funktion nach Speichern eines Projekts
+// ****
+function clb_saveProjekt(respObj)
+{
+	try
+	{
+		var projekt_kurzbz = respObj.Body[0].saveProjektResponse[0].message[0].Text;
+		ProjektSelectKurzbz = projekt_kurzbz;
+	}
+	catch(e)
+	{
+		var fehler = respObj.Body[0].Fault[0].faultstring[0].Text;
+		alert('Fehler: '+fehler);
+		return;
+	}
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	
+	datasourceTreeProjekt.Refresh(false); //non blocking
+	SetStatusBarText('Daten wurden gespeichert');
+}
 
 
 // ****
@@ -176,6 +227,10 @@ function RessourceMenulistMitarbeiterLoad(menulist, filter)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
+	document.getElementById('ressource-menulist-student').disabled=true; 
+	document.getElementById('ressource-menulist-betriebsmittel').disabled=true; 
+	document.getElementById('ressource-menulist-firma').disabled=true; 
+
 	if(typeof(filter)=='undefined')
 		v = menulist.value;
 	else
@@ -183,7 +238,7 @@ function RessourceMenulistMitarbeiterLoad(menulist, filter)
 
 	if(v.length>2)
 	{		
-		var url = '<?php echo APP_ROOT; ?>rdf/mitarbeiter.rdf.php?filter='+v+'&'+gettimestamp();
+		var url = '<?php echo APP_ROOT; ?>rdf/mitarbeiter.rdf.php?filter='+encodeURIComponent(v)+'&'+gettimestamp();
 		//nurmittitel=&
 		var oldDatasources = menulist.database.GetDataSources();
 		while(oldDatasources.hasMoreElements())
@@ -239,6 +294,10 @@ function RessourceMenulistStudentLoad(menulist, filter)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
+	document.getElementById('ressource-menulist-mitarbeiter').disabled=true; 
+	document.getElementById('ressource-menulist-betriebsmittel').disabled=true; 
+	document.getElementById('ressource-menulist-firma').disabled=true; 
+	
 	if(typeof(filter)=='undefined')
 		v = menulist.value;
 	else
@@ -268,6 +327,106 @@ function RessourceMenulistStudentLoad(menulist, filter)
 			menulist.builder.rebuild();
 	}
 }
+
+function RessourceMenulistFirmaLoad(menulist, filter)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	document.getElementById('ressource-menulist-mitarbeiter').disabled=true; 
+	document.getElementById('ressource-menulist-betriebsmittel').disabled=true; 
+	document.getElementById('ressource-menulist-student').disabled=true; 
+	
+	if(typeof(filter)=='undefined')
+		v = menulist.value;
+	else
+		v = filter;
+
+	if(v.length>2)
+	{		
+		var url = '<?php echo APP_ROOT; ?>rdf/firma.rdf.php?filter='+v+'&'+gettimestamp();
+		//nurmittitel=&
+		var oldDatasources = menulist.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			menulist.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		menulist.builder.rebuild();
+	
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		if(typeof(filter)=='undefined')
+			var datasource = rdfService.GetDataSource(url);
+		else
+			var datasource = rdfService.GetDataSourceBlocking(url);
+		datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		menulist.database.AddDataSource(datasource);
+		if(typeof(filter)!='undefined')
+			menulist.builder.rebuild();
+	}
+}
+
+function RessourceMenulistBetriebsmittelLoad(menulist, filter)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	document.getElementById('ressource-menulist-mitarbeiter').disabled=true; 
+	document.getElementById('ressource-menulist-student').disabled=true; 
+	document.getElementById('ressource-menulist-firma').disabled=true; 
+	
+	if(typeof(filter)=='undefined')
+		v = menulist.value;
+	else
+		v = filter;
+
+	if(v.length>2)
+	{		
+	
+		var url = '<?php echo APP_ROOT; ?>rdf/betriebsmittel.rdf.php?filter='+encodeURIComponent(v)+'&'+gettimestamp();
+
+		var oldDatasources = menulist.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			menulist.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		menulist.builder.rebuild();
+	
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		if(typeof(filter)=='undefined')
+			var datasource = rdfService.GetDataSource(url);
+		else
+			var datasource = rdfService.GetDataSourceBlocking(url);
+		datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		menulist.database.AddDataSource(datasource);
+		if(typeof(filter)!='undefined')
+			menulist.builder.rebuild();
+	}
+}
+
+// ****
+// * Liefert den value eines Editierbaren DropDowns
+// * @param id = ID der Menulist
+// ****
+function MenulistGetSelectedValue(id)
+{
+	menulist = document.getElementById(id);
+	
+	//Es kann sein, dass im Eingabefeld nichts steht und
+	//trotzdem ein Eintrag auf selected gesetzt ist.
+	//In diesem Fall soll aber kein Wert zurueckgegeben werden
+	if(menulist.value=='')
+		return '';
+	
+	//Wenn es Selektierte Eintraege gibt, dann den value zurueckliefern
+	var children = menulist.getElementsByAttribute('selected','true');
+	if(children.length>0)
+		return children[0].value;
+	else
+		return '';
+}
+
 
 function ressourceTreeLoad()
 {
