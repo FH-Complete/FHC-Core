@@ -147,6 +147,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
 	<treecols>
 	    <treecol id="treecol-ressourcemenue-description" label="Anzeige" flex="2"  primary="true"/>
 	    <splitter class="tree-splitter"/>
+	   	<treecol id="treecol-ressourcemenue-typ" label="typ" flex="5" hidden ="true" />
+	    <splitter class="tree-splitter"/>
 	    <treecol id="treecol-ressourcemenue-ressource_id" label="ID" flex="5" hidden ="true" />
 	    <splitter class="tree-splitter"/>
 	    <treecol id="treecol-ressourcemenue-bezeichnung" label="Bezeichnung" flex="2" hidden="true" />
@@ -168,6 +170,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
 	       <treeitem uri="rdf:*">
 	         <treerow>
 	           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#rdf_description"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#typ"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#ressource_id"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#bezeichnung"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#beschreibung"/>
