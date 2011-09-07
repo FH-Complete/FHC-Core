@@ -173,5 +173,84 @@ class ressource extends basis_db
 		}
 	}
 	
+	/**
+	 * Speichert den aktuellen Datensatz in die Datenbank
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der ID in $projekt_kurzbz aktualisiert
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function save($new=null)
+	{
+		if($new==null)
+			$new = $this->new;
+			
+		if($new)
+		{
+			//Neuen Datensatz einfuegen
+			$qry='BEGIN; INSERT INTO fue.tbl_ressource (ressource_id, bezeichnung, beschreibung, 
+				mitarbeiter_uid, student_uid, betriebsmittel_id, firma_id, insertvon, insertamum, updatevon, updateamum) VALUES ('.
+			     $this->addslashes($this->ressource_id).', '.
+			     $this->addslashes($this->bezeichnung).', '.
+				 $this->addslashes($this->beschreibung).', '.
+			     $this->addslashes($this->mitarbeiter_uid).', '.
+			     $this->addslashes($this->student_uid).', '.
+			     $this->addslashes($this->betriebsmittel_id).', '.
+			     $this->addslashes($this->firma_id).', '.
+			     $this->addslashes($this->insertvon).', now(), '.
+			     $this->addslashes($this->updatevon).', now()); ';
+		}
+		else
+		{
+			//Updaten des bestehenden Datensatzes
+			$qry='UPDATE fue.tbl_ressource SET '.
+				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
+				'beschreibung='.$this->addslashes($this->beschreibung).', '.
+				'mitarbeiter_uid='.$this->addslashes($this->mitarbeiter_uid).', '.
+				'student_uid='.$this->addslashes($this->student_uid).', '.
+				'betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).', '.
+				'firma_id='.$this->addslashes($this->firma_id).', '.
+				'updateamum= now(), '.
+				'updatevon='.$this->addslashes($this->updatevon).' '.
+				'WHERE ressource_id='.$this->addslashes($this->ressource_id).';';
+		}
+		
+		if($this->db_query($qry))
+		{
+			if($new)
+			{
+				//Sequence auslesen
+				$qry = "SELECT currval('fue.seq_ressource_ressource_id') as id;";
+				if($this->db_query($qry))
+				{
+					if($row = $this->db_fetch_object())
+					{
+						$this->ressource_id = $row->id;
+						$this->db_query('COMMIT');
+						return true;
+					}
+					else 
+					{
+						$this->errormsg = 'Fehler beim Auslesen der Sequence';
+						$this->db_query('ROLLBACK;');
+						return false;
+					}
+				}
+				else 
+				{
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
+					$this->db_query('ROLLBACK;');
+					return false;
+				}
+			}
+					
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern der Daten';
+			return false;
+		}
+	}
+	
 }
 ?>
