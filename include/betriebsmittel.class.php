@@ -147,6 +147,56 @@ class betriebsmittel extends basis_db
 	}
 
 	/**
+	 * 
+	 * Sucht Betriebsmittel anhand der inventarnummer und filter
+	 * @param $filter, ein teil oder die ganze inventarnummer
+ 	 */
+	public function searchBetriebsmittel($filter)
+	{
+		$qry = "SELECT * FROM wawi.tbl_betriebsmittel where inventarnummer LIKE '%".addslashes($filter)."%'";
+		$this->result = array();
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$bm = new betriebsmittel();
+
+				$bm->betriebsmittel_id = $row->betriebsmittel_id;
+				$bm->beschreibung = $row->beschreibung;
+				$bm->betriebsmitteltyp = $row->betriebsmitteltyp;
+				$bm->nummer = $row->nummer;
+				$bm->inventarnummer = $row->inventarnummer;
+				$bm->reservieren = $row->reservieren;
+				$bm->ort_kurzbz = $row->ort_kurzbz;
+				$bm->updateamum = $row->updateamum;
+				$bm->updatevon = $row->updatevon;
+				$bm->insertamum = $row->insertamum;
+				$bm->insertvon = $row->insertvon;
+				$bm->beschreibung = $row->beschreibung;
+				$bm->oe_kurzbz = $row->oe_kurzbz;
+				$bm->hersteller = $row->hersteller;
+				$bm->seriennummer = $row->seriennummer;
+				$bm->bestellung_id = $row->bestellung_id;
+				$bm->bestelldetail_id = $row->bestelldetail_id;
+				$bm->afa = $row->afa;
+				$bm->verwendung = $row->verwendung;
+				$bm->anmerkung = $row->anmerkung;
+				$bm->leasing_bis = $row->leasing_bis;
+				$bm->inventuramum = $row->inventuramum;
+				$bm->inventurvon = $row->inventurvon;
+
+				$this->result[] = $bm;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
 	 * Prueft ob die Inventarnummer schon existiert
 	 *
 	 * @param $inventarnummer
