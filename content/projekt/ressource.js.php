@@ -1,5 +1,6 @@
 <?php 
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
 ?>
 
  
@@ -174,37 +175,69 @@ function saveRessource()
 {
     var bezeichnung=document.getElementById('textbox-ressource-bezeichnung').value;
     var beschreibung=document.getElementById('textbox-ressource-beschreibung').value;
-    var mitarbeiter_uid = MenulistGetSelectedValue('ressource-menulist-mitarbeiter'); 
-    var student_uid = MenulistGetSelectedValue('ressource-menulist-student');
-    var betriebsmittel_id = MenulistGetSelectedValue('ressource-menulist-betriebsmittel');
-    var firma_id = MenulistGetSelectedValue('ressource-menulist-firma');
-    // Variablen checken
     
+    if(document.getElementById('ressource-menulist-mitarbeiter').disabled==false)
+    	var mitarbeiter_uid = MenulistGetSelectedValue('ressource-menulist-mitarbeiter'); 
+    else
+    	var mitarbeiter_uid = '';
+    	
+   	if(document.getElementById('ressource-menulist-student').disabled==false)
+    	var student_uid = MenulistGetSelectedValue('ressource-menulist-student');
+    else
+    	var student_uid = '';
+    	
+    if(document.getElementById('ressource-menulist-betriebsmittel').disabled==false)
+    	var betriebsmittel_id = MenulistGetSelectedValue('ressource-menulist-betriebsmittel');
+    else
+    	var betriebsmittel_id = '';
+    	
+    if(document.getElementById('ressource-menulist-firma').disabled==false)
+    	var firma_id = MenulistGetSelectedValue('ressource-menulist-firma');
+    else
+    	var firma_id = '';
+    	
+    var ressource_id ='';
+   
     // SOAP-Action
-    var soapBody = new SOAPObject("saveProjekt");
-    soapBody.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
-    soapBody.appendChild(new SOAPObject("oe_kurzbz")).val(oe_kurzbz);
-    soapBody.appendChild(new SOAPObject("titel")).val(titel);
-    soapBody.appendChild(new SOAPObject("nummer")).val(nummer);
+    var soapBody = new SOAPObject("saveRessource");
+    soapBody.appendChild(new SOAPObject("ressource_id")).val(ressource_id);
+    soapBody.appendChild(new SOAPObject("bezeichnung")).val(bezeichnung);
     soapBody.appendChild(new SOAPObject("beschreibung")).val(beschreibung);
-    soapBody.appendChild(new SOAPObject("beginn")).val(beginn);
-    soapBody.appendChild(new SOAPObject("ende")).val(ende);
-    soapBody.appendChild(new SOAPObject("neu")).val('true');
+    soapBody.appendChild(new SOAPObject("mitarbeiter_uid")).val(mitarbeiter_uid);
+    soapBody.appendChild(new SOAPObject("student_uid")).val(student_uid);
+    soapBody.appendChild(new SOAPObject("betriebsmittel_id")).val(betriebsmittel_id);
+    soapBody.appendChild(new SOAPObject("firma_id")).val(firma_id);
+    soapBody.appendChild(new SOAPObject("user")).val(getUsername());
     
-    var sr = new SOAPRequest("saveProjekt",soapBody);
-    SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekt.soap.php?"+gettimestamp();
-    SOAPClient.SendRequest(sr, clb_saveProjekt);
+    if(mitarbeiter_uid == '' && student_uid =='' && betriebsmittel_id =='' && firma_id =='')
+    {
+    	alert('ungueltige ID'); 
+    }
+    else
+    {
+	    var sr = new SOAPRequest("saveRessource",soapBody);
+	    SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/ressource.soap.php?"+gettimestamp();
+	    SOAPClient.SendRequest(sr, clb_saveRessource);
+    }
+}
+
+
+// ****
+// * Liefert den Usernamne des eingeloggten Users
+// ****
+function getUsername()
+{
+	return '<?php echo get_uid(); ?>';
 }
 
 // ****
 // * Callback Funktion nach Speichern eines Projekts
 // ****
-function clb_saveProjekt(respObj)
+function clb_saveRessource(respObj)
 {
 	try
 	{
-		var projekt_kurzbz = respObj.Body[0].saveProjektResponse[0].message[0].Text;
-		ProjektSelectKurzbz = projekt_kurzbz;
+		var id = respObj.Body[0].saveRessourceResponse[0].message[0].Text;
 	}
 	catch(e)
 	{
@@ -213,9 +246,11 @@ function clb_saveProjekt(respObj)
 		return;
 	}
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-	
-	datasourceTreeProjekt.Refresh(false); //non blocking
-	SetStatusBarText('Daten wurden gespeichert');
+	//document.getElementById('textbox-projektphase-detail-projektphase_id').value=id;
+	//selectIDProjektphase=id;
+	window.opener.datasourceTreeRessource.Refresh(false); //non blocking
+	//SetStatusBarText('Daten wurden gespeichert');
+	window.close(); 
 }
 
 
