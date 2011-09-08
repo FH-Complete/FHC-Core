@@ -136,6 +136,11 @@ class ressource extends basis_db
 		}
 	}
 	
+	/**
+	 * 
+	 * Enter description here ...
+	 * @param unknown_type $project_kurzbz
+	 */
 	public function getProjectRessourcen($project_kurzbz)
 	{
 		$qry = "SELECT ressource.* FROM fue.tbl_ressource as ressource
@@ -173,6 +178,7 @@ class ressource extends basis_db
 		}
 	}
 	
+	
 	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -180,16 +186,15 @@ class ressource extends basis_db
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	public function save($new=null)
-	{
+	{		
 		if($new==null)
 			$new = $this->new;
 			
 		if($new)
 		{
 			//Neuen Datensatz einfuegen
-			$qry='BEGIN; INSERT INTO fue.tbl_ressource (ressource_id, bezeichnung, beschreibung, 
+			$qry='BEGIN; INSERT INTO fue.tbl_ressource (bezeichnung, beschreibung, 
 				mitarbeiter_uid, student_uid, betriebsmittel_id, firma_id, insertvon, insertamum, updatevon, updateamum) VALUES ('.
-			     $this->addslashes($this->ressource_id).', '.
 			     $this->addslashes($this->bezeichnung).', '.
 				 $this->addslashes($this->beschreibung).', '.
 			     $this->addslashes($this->mitarbeiter_uid).', '.
@@ -247,7 +252,7 @@ class ressource extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der Daten';
+			$this->errormsg = $qry;
 			return false;
 		}
 	}
