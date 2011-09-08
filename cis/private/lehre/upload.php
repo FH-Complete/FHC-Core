@@ -481,7 +481,7 @@ A:hover {
 						              tbl_lehrveranstaltung.semester='$term_id' AND
 						              tbl_lehrveranstaltung.studiengang_kz='$course_id' AND tbl_lehrveranstaltung.lehre=true";
 						//Admin und Lehreberechtigung
-						if($rechte->isBerechtigt('admin',$course_id) || $rechte->isBerechtigt('lehre',$course_id) || $rechte->isBerechtigt('lehre',null,null,'0') || $rechte->isBerechtigt('assistenz',$course_id))
+						if($rechte->isBerechtigt('admin',$course_id) || $rechte->isBerechtigt('lehre',$course_id) || $rechte->isBerechtigt('assistenz',$course_id))
 						{
 							$sql_query = "SELECT DISTINCT lehreverzeichnis AS kuerzel, bezeichnung FROM lehre.tbl_lehrveranstaltung WHERE studiengang_kz='$course_id' AND semester='$term_id' AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>''";
 						}
