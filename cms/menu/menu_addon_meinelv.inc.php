@@ -96,7 +96,7 @@ class menu_addon_meinelv extends menu_addon
 			if ($stsemobj = new studiensemester())
 			{
 				$stsem = $stsemobj->getAktorNext();
-				$qry = "SELECT distinct bezeichnung, studiengang_kz, semester, lehreverzeichnis, tbl_lehrveranstaltung.lehrveranstaltung_id  FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter
+				$qry = "SELECT distinct bezeichnung, studiengang_kz, semester, lehreverzeichnis, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.orgform_kurzbz  FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter
 				        WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				        tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
 				        mitarbeiter_uid='".addslashes($user)."' AND tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stsem)."'";
@@ -120,7 +120,7 @@ class menu_addon_meinelv extends menu_addon
 						{
 							$stg_obj = new studiengang();
 							$stg_obj->load($row->studiengang_kz);
-							$kurzbz = $stg_obj->kuerzel.'-'.$row->semester;
+							$kurzbz = $stg_obj->kuerzel.'-'.$row->semester.' '.$row->orgform_kurzbz;
 							
 							$this->items[] = array('title'=>$lv_obj->bezeichnung_arr[$sprache],
 							 'target'=>'content',
