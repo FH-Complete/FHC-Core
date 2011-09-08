@@ -246,7 +246,7 @@ function RessourceNeu()
     // netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect"); // Trick 17
     var tree=document.getElementById('tree-ressourcemenue');
    // var oe=getTreeCellText(tree, "treecol-ressourcemenue-oe", tree.currentIndex);
-    window.open('<?php echo APP_ROOT; ?>content/projekt/ressource.window.xul.php', 'height=384,width=512,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no');
+    window.open('<?php echo APP_ROOT; ?>content/projekt/ressource.window.xul.php','Neue Ressource anlegen', 'height=384,width=512,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no');
     //alert (oe);
 }
 
