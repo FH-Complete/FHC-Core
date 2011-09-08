@@ -59,7 +59,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 								          datasources="rdf:null" flex="1"
 								          ref="http://www.technikum-wien.at/mitarbeiter/liste" 
 								          oninput="RessourceMenulistMitarbeiterLoad(this);"
-								          oncommand="alert(MenulistGetSelectedValue('ressource-menulist-mitarbeiter'));"
+								          oncommand=""
 								         >
 						<template>
 						<menupopup>
@@ -77,11 +77,11 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 								          datasources="rdf:null" flex="1"
 								          ref="http://www.technikum-wien.at/student/alle" 
 								          oninput="RessourceMenulistStudentLoad(this);"
-								          oncommand="RessourceLoadMitarbeiterDaten()"
+								          oncommand=""
 								         >
 						<template>
 						<menupopup>
-							<menuitem value="rdf:http://www.technikum-wien.at/student/rdf#person_id"
+							<menuitem value="rdf:http://www.technikum-wien.at/student/rdf#uid"
 				        		      label="rdf:http://www.technikum-wien.at/student/rdf#vorname rdf:http://www.technikum-wien.at/student/rdf#nachname ( rdf:http://www.technikum-wien.at/student/rdf#uid )"
 							  		  uri="rdf:*"/>
 						</menupopup>
@@ -95,7 +95,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 								          datasources="rdf:null" flex="1"
 								          ref="http://www.technikum-wien.at/betriebsmittel/liste" 
 								          oninput="RessourceMenulistBetriebsmittelLoad(this)"
-								          oncommand="RessourceLoadMitarbeiterDaten()"
+								          oncommand=""
 								         >
 						<template>
 						<menupopup>
@@ -113,7 +113,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 								          datasources="rdf:null" flex="1"
 								          ref="http://www.technikum-wien.at/firma/liste" 
 								          oninput="RessourceMenulistFirmaLoad(this)"
-								          oncommand="RessourceLoadMitarbeiterDaten()"
+								          oncommand=""
 								         >
 						<template>
 						<menupopup>
