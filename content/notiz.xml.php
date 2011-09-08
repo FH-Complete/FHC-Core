@@ -47,7 +47,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				</xul:toolbar>
 			</xul:toolbox>
 			<xul:tree anonid="tree-notiz"
-			seltype="single" hidecolumnpicker="false" flex="1" style="height: 150px"
+			seltype="single" hidecolumnpicker="false" flex="1"
 			datasources="rdf:null" ref="http://www.technikum-wien.at/notiz/liste"
 			>
 			<xul:treecols>
@@ -104,8 +104,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			    </xul:rule>
 			</xul:template>
 		    </xul:tree>
+		    <!--
 		    <xul:button onclick="alert('value:'+document.getBindingParent(this).value);" label="GetValue" />
 		    <xul:button onclick="alert('projekt_kurzbz:'+this.getAttribute('projekt_kurzbz'));" label="GetProjektKurzbz" />
+		    -->
 		</xul:vbox>
 	</content>
 	<implementation>
@@ -133,7 +135,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 		<method name="NeueNotiz">
 			<body>
 			<![CDATA[
-				debug('Neue Notiz');
+				//debug('Neue Notiz');
 				this.openNotiz();
 			]]>
 			</body>
@@ -141,7 +143,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 		<method name="RefreshNotiz">
 			<body>
 			<![CDATA[
-				debug('Refresh Notiz');
+				//debug('Refresh Notiz');
 				netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 				this.TreeNotizDatasource.Refresh(false); //non blocking
 			]]>
@@ -158,7 +160,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			<parameter name="addobserver"/>
 			<body>
 			<![CDATA[
-				debug('LoadNotizTree');
+				//debug('LoadNotizTree');
 				 netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 				
 				try
@@ -171,7 +173,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					datasource = datasource+"&person_id="+encodeURIComponent(person_id);
 					datasource = datasource+"&prestudent_id="+encodeURIComponent(prestudent_id);
 					datasource = datasource+"&bestellung_id="+encodeURIComponent(bestellung_id);
-					
+					//debug('Source:'+datasource);
 	                var tree = document.getAnonymousElementByAttribute(this ,'anonid', 'tree-notiz');
 
 	                //Alte DS entfernen
@@ -186,43 +188,41 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 	                this.TreeNotizDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 	                this.TreeNotizDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	                tree.database.AddDataSource(this.TreeNotizDatasource);
-	                if(addobserver)
-	                {
-		                this.TreeNotizDatasource.addXMLSinkObserver({
-		                  notiz: this,
-						  onBeginLoad: function(aSink)
-						    {},
-						
-						  onInterrupt: function(aSink)
-						    {},
-						
-						  onResume: function(aSink)
-						    {},
-						
-						  onEndLoad: function(aSink)
-						    { 
-						     	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-						    
-						      //aSink.removeXMLSinkObserver(this);
-						      debug('onEndLoad start Rebuild');
-						      var tree = document.getAnonymousElementByAttribute(this.notiz ,'anonid', 'tree-notiz');
-							  tree.builder.rebuild();
-						    },
-						
-						  onError: function(aSink, aStatus, aErrorMsg)
-						    { alert("error! " + aErrorMsg); }
-						});
-		                tree.builder.addListener({
-							willRebuild : function(builder)
-							{
-							},
-							didRebuild : function(builder)
-						  	{
-						  		debug("didrebuild");
-						  		//builder.removeListener(this);
-							}
-						});
-					}
+	                
+	                this.TreeNotizDatasource.addXMLSinkObserver({
+	                  notiz: this,
+					  onBeginLoad: function(aSink)
+					    {},
+					
+					  onInterrupt: function(aSink)
+					    {},
+					
+					  onResume: function(aSink)
+					    {},
+					
+					  onEndLoad: function(aSink)
+					    { 
+					     	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+					    
+					      //aSink.removeXMLSinkObserver(this);
+					      //debug('onEndLoad start Rebuild');
+					      var tree = document.getAnonymousElementByAttribute(this.notiz ,'anonid', 'tree-notiz');
+						  tree.builder.rebuild();
+					    },
+					
+					  onError: function(aSink, aStatus, aErrorMsg)
+					    { alert("error! " + aErrorMsg); }
+					});
+	                tree.builder.addListener({
+						willRebuild : function(builder)
+						{
+						},
+						didRebuild : function(builder)
+					  	{
+					  		//debug("didrebuild");
+					  		//builder.removeListener(this);
+						}
+					});
 				}
 				catch(e)
 				{
@@ -256,7 +256,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			this.LoadNotizTree(projekt_kurzbz,projektphase_id,projekttask_id,uid,person_id,prestudent_id,bestellung_id, true);
 		</constructor>
 		<destructor>
-			debug('Notiz Binding Stop');
+			//debug('Notiz Binding Stop');
 		</destructor>
 	</implementation>
 	<handlers>

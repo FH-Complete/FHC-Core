@@ -31,7 +31,8 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 echo '<?xml-stylesheet href="'.APP_ROOT.'content/bindings.css" type="text/css"?>';
-	
+echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type="text/css"?>';
+
 if(isset($_GET['id']) && is_numeric($_GET['id']))
 	$id=$_GET['id'];
 else 
@@ -62,6 +63,18 @@ else
       			<row>
       				<label value="Titel" control="notiz-textbox-titel"/>
 		      		<textbox id="notiz-textbox-titel" maxlength="256"/>
+				</row>
+				<row>
+      				<label value="Text" control="notiz-textbox-text"/>
+		      		<textbox id="notiz-textbox-text" multiline="true"/>
+				</row>
+				<row>
+      				<label value="Start" control="notiz-box-start"/>
+		      		<box class="Datum" id="notiz-box-start"/>
+				</row>
+				<row>
+      				<label value="Ende" control="notiz-box-ende"/>
+		      		<box class="Datum" id="notiz-box-ende"/>
 				</row>
 			</rows>
 	</grid>

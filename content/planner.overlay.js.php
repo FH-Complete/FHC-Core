@@ -216,8 +216,20 @@ function treeProjektmenueSelect()
 	}
 	else
 		document.getElementById('toolbarbutton-projektdokument-neu').disabled=true;
-	
-	
+
+	//Notizen Laden
+	if(projekt_phase_id!='')
+	{
+		//Notizen zu einer Phase Laden
+		notiz = document.getElementById('box-notizen');
+		notiz.LoadNotizTree('',projekt_phase_id,'','','','','', '');
+	}
+	else if(projekt_kurzbz!='')
+	{
+		//Notizen zu einem Projekt Laden
+		notiz = document.getElementById('box-notizen');
+		notiz.LoadNotizTree(projekt_kurzbz,'','','','','','', '');
+	}
 	if(projekt_kurzbz!='')
 	{
 		//Neu Button bei Tasks aktivieren

@@ -134,10 +134,12 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektphasedetail.overlay
 				<tabs orient="horizontal" id="projektphase-tabs">
 					<tab id="projektphase-tab-detail" label="Details" />
 					<tab id="projektphase-tab-ressource" label="Ressourcen" />
+					<tab id="projektphase-tab-notizen" label="Notizen" />
 				</tabs>
 				<tabpanels id="projektphase-tabpanels-main" flex="1">
 					<vbox id="projektphase-detail" />
 					<vbox id="projektphase-ressource" />
+					<box class="Notiz" id="box-projektphase-notizen"/>
 				</tabpanels>
 			</tabbox>
 		</vbox>
