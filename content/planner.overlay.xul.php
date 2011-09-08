@@ -127,7 +127,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
 </vbox>
 
 <vbox id="box-notiz">
-	<box class="Notiz" projekt_kurzbz="Abgabetool"/>
+	<box class="Notiz" projekt_kurzbz="Abgabetool" flex="1" id="box-notizen"/>
 </vbox>
 
 <vbox id="box-ressourcemenue">

@@ -46,15 +46,24 @@ function NotizInit(id)
 		//RDF parsen
 	
 		titel = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#titel" ));
+		text = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#text" ));
+		start = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#start" ));
+		ende = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ende" ));
 		
 	}
 	else
 	{
 		//Defaultwerte bei Neuem Datensatz
 		titel='';
+		text='';
+		start='';
+		ende='';
 	}		
 	
 	document.getElementById('notiz-textbox-titel').value=titel;
+	document.getElementById('notiz-textbox-text').value=text;
+	document.getElementById('notiz-box-start').value=start;
+	document.getElementById('notiz-box-ende').value=ende;
 }
 
 // ****

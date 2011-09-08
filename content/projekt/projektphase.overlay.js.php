@@ -133,6 +133,10 @@ function onselectTreeProjektphase()
     document.getElementById('textbox-projektphase-detail-budget').value=budget;
     document.getElementById('textbox-projektphase-detail-personentage').value=personentage;
     document.getElementById('checkbox-projektphase-detail-neu').checked=false;
+    
+    //Notizen zu einer Phase Laden
+	notiz = document.getElementById('box-projektphase-notizen');
+	notiz.LoadNotizTree('',projektphase_id,'','','','','', '');
 }
 // ****
 // * Asynchroner (Nicht blockierender) Refresh des Trees

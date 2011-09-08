@@ -102,7 +102,7 @@ function onselectProjekt()
     {
         //Ausgewaehltes Projekt holen
         var projekt_kurzbz = getTreeCellText(tree, "treecol-projekt-projekt_kurzbz", tree.currentIndex);
-
+		
         if(projekt_kurzbz!='')
         {
             //Projekt wurde markiert
@@ -119,7 +119,6 @@ function onselectProjekt()
             alert(e);
             return false;
     }
-    
     var req = new phpRequest('<?php echo APP_ROOT; ?>rdf/projekt.rdf.php','','');
     req.add('projekt_kurzbz',projekt_kurzbz);
     var response = req.execute();
@@ -155,6 +154,10 @@ function onselectProjekt()
     document.getElementById('textbox-projekt-detail-beginn').value=beginn;
     document.getElementById('textbox-projekt-detail-ende').value=ende;
     document.getElementById('checkbox-projekt-detail-neu').checked=false;
+    
+    //Notizen zu einem Projekt Laden
+	notiz = document.getElementById('box-projekt-notizen');
+	notiz.LoadNotizTree(projekt_kurzbz,'','','','','','', '');
 }
 // ****
 // * Speichert die Details

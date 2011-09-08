@@ -107,9 +107,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektdetail.overlay.xul.
 					<treechildren>
 						<treeitem uri="rdf:*">
 							<treerow dbID="rdf:http://www.technikum-wien.at/projekt/rdf#projekt_kurzbz" >
+								<treecell label="rdf:http://www.technikum-wien.at/projekt/rdf#titel"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projekt/rdf#projekt_kurzbz"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projekt/rdf#nummer"/>
-								<treecell label="rdf:http://www.technikum-wien.at/projekt/rdf#titel"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projekt/rdf#oe_kurzbz"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projekt/rdf#beschreibung"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projekt/rdf#beginn"/>
@@ -134,10 +134,12 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektdetail.overlay.xul.
 				<tabs id="tabs-projekt-main" orient="horizontal">
 					<tab id="tab-projekt-detail" label="Details" />
 					<tab id="tab-projekt-ressource" label="Ressource" />
+					<tab id="tab-projekt-notizen" label="Notizen" />
 				</tabs>
 				<tabpanels id="tabpanels-projekt-main" flex="1">
 					<vbox id="box-projekt-detail" />
 					<vbox id="box-projekt-ressource" />
+					<box class="Notiz" id="box-projekt-notizen"/>
 				</tabpanels>
 			</tabbox>
 		</vbox>
