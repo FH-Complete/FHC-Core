@@ -23,6 +23,7 @@ include('../config/vilesci.config.inc.php');
 var datasourceTreeProjekt;
 var datasourceTreeProjektphase;
 var datasourceTreeProjekttask;
+var datasourceTreeDokument;
 
 function treeProjektmenueSelect()
 {
@@ -169,6 +170,52 @@ function treeProjektmenueSelect()
 	}
 	
 	document.getElementById('projekttask-toolbar-del').disabled=true;
+	
+	
+	// Dokumente laden
+	if(projekt_phase_id!='' || projekt_kurzbz!='')
+	{
+		document.getElementById('toolbarbutton-projektdokument-neu').disabled=false;
+		try
+		{
+		
+			if(projekt_phase_id!='')
+				url = "<?php echo APP_ROOT; ?>rdf/dms.rdf.php?projektphase_id="+projekt_phase_id+"&"+gettimestamp();
+	        else if(projekt_kurzbz!='')
+	        	url = "<?php echo APP_ROOT; ?>rdf/dms.rdf.php?projekt_kurzbz="+projekt_kurzbz+"&"+gettimestamp();
+	        
+	        var treeDokument=document.getElementById('tree-projektdokument');
+	
+	        //Alte DS entfernen
+			var oldDatasources = treeDokument.database.GetDataSources();
+			while(oldDatasources.hasMoreElements())
+	        {
+	        	treeDokument.database.RemoveDataSource(oldDatasources.getNext());
+			}
+	
+			try
+			{
+				datasourceTreeDokument.removeXMLSinkObserver(DokumentTreeSinkObserver);
+				treeDokument.builder.removeListener(DokumentTreeListener);
+			}
+	        catch(e)
+	        {}
+	                
+	        var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	        datasourceTreeDokument = rdfService.GetDataSource(url);
+	        datasourceTreeDokument.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	        datasourceTreeDokument.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	        treeDokument.database.AddDataSource(datasourceTreeDokument);
+	        datasourceTreeDokument.addXMLSinkObserver(DokumentTreeSinkObserver);
+	        treeDokument.builder.addListener(DokumentTreeListener);
+		}
+		catch(e)
+		{
+			debug("whoops Documents load failed with exception: "+e);
+		}
+	}
+	else
+		document.getElementById('toolbarbutton-projektdokument-neu').disabled=true;
 	
 	
 	if(projekt_kurzbz!='')

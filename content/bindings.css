@@ -21,3 +21,8 @@ box.Firma
 {
     -moz-binding: url('bindings.xml.php#Firma');
 }
+
+box.Notiz
+{
+	-moz-binding: url('notiz.xml.php#Notiz');
+}

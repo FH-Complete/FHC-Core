@@ -23,7 +23,7 @@ require_once('../config/cis.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/dms.class.php');
 
-
+$user = get_uid();
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//DE"
 "http://www.w3.org/TR/html4/strict.dtd">
@@ -149,13 +149,16 @@ require_once('../include/dms.class.php');
 <body>
 <?php
 
-$user = get_uid();
 $kategorie_kurzbz = isset($_REQUEST['kategorie_kurzbz'])?$_REQUEST['kategorie_kurzbz']:'';
 $searchstring = isset($_REQUEST['searchstring'])?$_REQUEST['searchstring']:'';
 $importFile = isset($_REQUEST['importFile'])?$_REQUEST['importFile']:'';
 $versionId = isset($_REQUEST['versionid'])?$_REQUEST['versionid']:'';
 $renameId = isset($_GET['renameid'])?$_GET['renameid']:'';
 $version = isset($_GET['version'])?$_GET['version']:'';
+$projekt_kurzbz = isset($_REQUEST['projekt_kurzbz'])?$_REQUEST['projekt_kurzbz']:'';
+$projektphase_id = isset($_REQUEST['projektphase_id'])?$_REQUEST['projektphase_id']:'';
+$openupload = isset($_GET['openupload'])?$_GET['openupload']:false;
+$newVersionID = isset($_GET['newVersionID'])?$_GET['newVersionID']:false;
 $suche = false; 
 
 $mimetypes = array(
@@ -196,6 +199,7 @@ if($importFile != '')
     	else
     	{
     		$dms->version='0';
+    		$dms->kategorie_kurzbz=$kategorie_kurzbz;
     	}
 		
 	    $dms->insertamum=date('Y-m-d H:i:s');
@@ -203,12 +207,17 @@ if($importFile != '')
     	$dms->mimetype= mime_content_type(IMPORT_PATH.$importFile); 
     	$dms->filename = $filename;
     	$dms->name = $importFile;
-    	$dms->kategorie_kurzbz=$kategorie_kurzbz;
-    	
+    	    	
     	if($dms->save(true))
     	{
     		echo 'File wurde erfolgreich hochgeladen. Filename:'.$filename.' ID:'.$dms->dms_id;
     		$dms_id=$dms->dms_id;
+    		
+    		if($projekt_kurzbz!='' || $projektphase_id!='')
+    		{
+    			if(!$dms->saveProjektzuordnung($dms_id, $projekt_kurzbz, $projektphase_id))
+    				echo $dms->errormsg;
+    		}
     	}    	
     	else
     		echo 'Fehler beim Speichern der Daten';
@@ -254,6 +263,7 @@ if(isset($_POST['fileupload']))
     	else
     	{
     		$dms->version='0';
+    		$dms->kategorie_kurzbz=$kategorie_kurzbz;
     	}
     	
     	$dms->insertamum=date('Y-m-d H:i:s');
@@ -261,12 +271,17 @@ if(isset($_POST['fileupload']))
     	$dms->mimetype=$_FILES['userfile']['type'];
     	$dms->filename = $filename;
     	$dms->name = $_FILES['userfile']['name'];
-    	$dms->kategorie_kurzbz=$kategorie_kurzbz;
-    	
+    	    	
     	if($dms->save(true))
     	{
     		echo 'File wurde erfolgreich hochgeladen. Filename:'.$filename.' ID:'.$dms->dms_id;
     		$dms_id=$dms->dms_id;
+    		
+    		if($projekt_kurzbz!='' || $projektphase_id!='')
+    		{
+    			if(!$dms->saveProjektzuordnung($dms_id, $projekt_kurzbz, $projektphase_id))
+    				echo $dms->errormsg;
+    		}
     	}    	
     	else
     	{
@@ -396,12 +411,33 @@ else
 				<input type="hidden" name="kategorie_kurzbz" id="kategorie_kurzbz" value="'.$kategorie_kurzbz.'">
 				<input type="hidden" name="dms_id" id="dms_id" value="">
 				<input type="file" name="userfile">
+				<input type="hidden" name="projekt_kurzbz" value="'.$projekt_kurzbz.'">
+				<input type="hidden" name="projektphase_id" value="'.$projektphase_id.'">
 				<input type="submit" name="fileupload" value="Upload">
 				</form>
 				<h3>Files im Import Ordner</h3>';
 				drawFilesFromImport(); 
 	echo'			
 			</div>';
+	if($openupload)
+	{
+		echo '<script>
+			$(document).ready(function() 
+			{ 
+			';
+		if($newVersionID!='')
+		{
+			$dms_obj = new dms();
+			$dms_obj->load($newVersionID);
+			echo 'upload("'.$newVersionID.'","'.$dms_obj->name.'");';
+		}
+		else
+			echo 'upload();';
+		
+		echo '
+			});
+			</script>';
+	}
 }
 
 
@@ -454,7 +490,8 @@ function drawAllVersions($id)
  */
 function drawFilesFromImport()
 {
-	global $kategorie_kurzbz; 
+	global $kategorie_kurzbz, $projekt_kurzbz, $projektphase_id;
+
 	if ($handle = opendir(IMPORT_PATH)) 
 	{
 		echo '<table> <form action ="'.$_SERVER['PHP_SELF'].'" method="POST" name="import" >'; 
@@ -484,6 +521,8 @@ function drawFilesFromImport()
 	    	<input type="hidden" name="dms_id_import" id="dms_id_import" value="">
 			<input type="hidden" name="importFile" value="">
 			<input type="hidden" name="kategorie_kurzbz" id="kategorie_kurzbz" value="'.$kategorie_kurzbz.'">
+			<input type="hidden" name="projekt_kurzbz" value="'.$projekt_kurzbz.'">
+			<input type="hidden" name="projektphase_id" value="'.$projektphase_id.'">
 		 </form></table>';  
 	    closedir($handle);
 	}

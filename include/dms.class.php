@@ -62,7 +62,7 @@ class dms extends basis_db
 	 */
 	public function load($dms_id, $version=null)
 	{
-		$qry = "SELECT * FROM campus.tbl_dms WHERE dms_id='".addslashes($dms_id)."'";
+		$qry = "SELECT tbl_dms.dms_id, * FROM campus.tbl_dms JOIN campus.tbl_dms_version USING(dms_id) WHERE dms_id='".addslashes($dms_id)."'";
 		
 		if(!is_null($version))
 			$qry.=" AND version='".addslashes($version)."'";
@@ -110,9 +110,18 @@ class dms extends basis_db
 			
 		if($new)
 		{
+			$qry = "BEGIN;";
 			
 			if($this->dms_id=='')
-				$dms_id="nextval('campus.seq_dms_dms_id')";
+			{
+				$dms_id="currval('campus.seq_dms_dms_id')";
+				
+				$qry.="INSERT INTO campus.tbl_dms(oe_kurzbz, dokument_kurzbz, kategorie_kurzbz) 
+						VALUES(".
+					$this->addslashes($this->oe_kurzbz).','.
+					$this->addslashes($this->dokument_kurzbz).','.
+					$this->addslashes($this->kategorie_kurzbz).');';
+			}
 			else
 			{
 				if(!is_numeric($this->dms_id))
@@ -122,14 +131,12 @@ class dms extends basis_db
 				}
 				$dms_id=$this->dms_id;
 			}
-			$qry = "BEGIN;INSERT INTO campus.tbl_dms(dms_id, version, oe_kurzbz, dokument_kurzbz, kategorie_kurzbz, 
+								
+			$qry.="INSERT INTO campus.tbl_dms_version(dms_id, version,  
 						filename, mimetype, name, beschreibung, letzterzugriff, insertamum, insertvon, 
 						updateamum, updatevon) VALUES(".
 					$dms_id.','.
 					$this->addslashes($this->version).','.
-					$this->addslashes($this->oe_kurzbz).','.
-					$this->addslashes($this->dokument_kurzbz).','.
-					$this->addslashes($this->kategorie_kurzbz).','.
 					$this->addslashes($this->filename).','.
 					$this->addslashes($this->mimetype).','.
 					$this->addslashes($this->name).','.
@@ -145,7 +152,9 @@ class dms extends basis_db
 			$qry = "UPDATE campus.tbl_dms SET".
 				" oe_kurzbz=".$this->addslashes($this->oe_kurzbz).",".
 				" dokument_kurzbz=".$this->addslashes($this->dokument_kurzbz).",".
-				" kategorie_kurzbz=".$this->addslashes($this->kategorie_kurzbz).",".
+				" kategorie_kurzbz=".$this->addslashes($this->kategorie_kurzbz)." ". 
+			" WHERE dms_id='".addslashes($this->dms_id)."';".
+			"UPDATE campus.tbl_dms_version SET".
 				" filename=".$this->addslashes($this->filename).",".
 				" mimetype=".$this->addslashes($this->mimetype).",".
 				" name=".$this->addslashes($this->name).",".
@@ -204,7 +213,7 @@ class dms extends basis_db
 	 */
 	public function touch($dms_id, $version)
 	{
-		$qry ="UPDATE campus.tbl_dms SET letzterzugriff=now() 
+		$qry ="UPDATE campus.tbl_dms_version SET letzterzugriff=now() 
 			WHERE dms_id='".addslashes($dms_id)."' AND version='".addslashes($version)."';";
 		
 		if($this->db_query($qry))
@@ -258,11 +267,12 @@ class dms extends basis_db
 	 */
 	public function getDocuments($kategorie_kurzbz)
 	{
-		$qry = "SELECT * FROM campus.tbl_dms where (dms_id, version) in(
-				SELECT dms_id, max(version)
-				FROM campus.tbl_dms 
-				WHERE kategorie_kurzbz='".addslashes($kategorie_kurzbz)."'
-				GROUP BY dms_id)
+		$qry = "SELECT * FROM campus.tbl_dms JOIN campus.tbl_dms_version USING(dms_id) 
+				WHERE (dms_id, version) in(
+					SELECT dms_id, max(version)
+					FROM campus.tbl_dms_version 
+					GROUP BY dms_id)
+				AND kategorie_kurzbz='".addslashes($kategorie_kurzbz)."'
 				ORDER BY name;";
 		
 		if($result = $this->db_query($qry))
@@ -302,7 +312,7 @@ class dms extends basis_db
 	 */
 	public function search($suchstring)
 	{
-		$qry = "SELECT * FROM campus.tbl_dms 
+		$qry = "SELECT * FROM campus.tbl_dms  JOIN campus.tbl_dms_version USING(dms_id)
 				WHERE lower(name) like lower('%".addslashes($suchstring)."%')
 				OR lower(beschreibung) like lower('%".addslashes($suchstring)."%')
 				;";
@@ -350,7 +360,7 @@ class dms extends basis_db
 			return false; 
 		}
 		
-		$qry =	"SELECT * FROM campus.tbl_dms
+		$qry =	"SELECT * FROM campus.tbl_dms JOIN campus.tbl_dms_version USING(dms_id)
 				 WHERE dms_id = '".addslashes($id)."' ORDER BY version ASC;";	
 		
 		if($result = $this->db_query($qry))
@@ -391,7 +401,7 @@ class dms extends basis_db
 	 */
 	public function checkVersion($id, $version)
 	{
-		$qry = "SELECT * FROM campus.tbl_dms 
+		$qry = "SELECT * FROM campus.tbl_dms_version
 		WHERE dms_id = '".addslashes($id)."' and 
 		version > '".addslashes($version)."' ;";
 
@@ -406,6 +416,153 @@ class dms extends basis_db
 		{
 			$this->errormsg = "Fehler bei der Abfrage aufgetreten"; 
 			return false; 
+		}
+	}
+	
+	/**
+	 * Laedt die Dokumente eines Projekts
+	 *
+	 * @param $kategorie_kurzbz
+	 */
+	public function getDokumenteProjekt($projekt_kurzbz)
+	{
+		$qry = "SELECT 
+					* 
+				FROM 
+					campus.tbl_dms 
+					JOIN campus.tbl_dms_version USING(dms_id)
+					JOIN fue.tbl_projekt_dokument USING(dms_id) 
+				WHERE (dms_id, version) in(
+					SELECT dms_id, max(version)
+					FROM campus.tbl_dms_version 
+					GROUP BY dms_id)
+				AND tbl_projekt_dokument.projekt_kurzbz='".addslashes($projekt_kurzbz)."'
+				ORDER BY name;";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new dms();
+				
+				$obj->dms_id = $row->dms_id;
+				$obj->version = $row->version; 
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->dokument_kurzbz = $row->dokument_kurzbz;
+				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
+				$obj->filename = $row->filename;
+				$obj->mimetype = $row->mimetype;
+				$obj->name = $row->name;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->letzterzugriff = $row->letzterzugriff;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				
+				$this->result[] = $obj;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Laedt die Dokumente einer Projektphase
+	 *
+	 * @param $kategorie_kurzbz
+	 */
+	public function getDokumenteProjektphase($projektphase_id)
+	{
+		$qry = "SELECT 
+					* 
+				FROM 
+					campus.tbl_dms 
+					JOIN campus.tbl_dms_version USING(dms_id)
+					JOIN fue.tbl_projekt_dokument USING(dms_id) 
+				WHERE (dms_id, version) in(
+					SELECT dms_id, max(version)
+					FROM campus.tbl_dms_version 
+					GROUP BY dms_id)
+				AND tbl_projekt_dokument.projektphase_id='".addslashes($projektphase_id)."'
+				ORDER BY name;";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new dms();
+				
+				$obj->dms_id = $row->dms_id;
+				$obj->version = $row->version; 
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->dokument_kurzbz = $row->dokument_kurzbz;
+				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
+				$obj->filename = $row->filename;
+				$obj->mimetype = $row->mimetype;
+				$obj->name = $row->name;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->letzterzugriff = $row->letzterzugriff;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				
+				$this->result[] = $obj;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Speichert die Zuordnung eines Dokuments zu einem Projekt
+	 * Wenn die Zuordnung bereits vorhanden ist, geschieht nichts
+	 * 
+	 * @param $dms_id
+	 * @param $projekt_kurzbz
+	 * @param $projektphase_id
+	 */
+	function saveProjektzuordnung($dms_id, $projekt_kurzbz, $projektphase_id)
+	{
+		$qry = "SELECT * FROM fue.tbl_projekt_dokument WHERE dms_id='".addslashes($dms_id)."'";
+
+		if($projekt_kurzbz!='')
+			$qry.=" AND projekt_kurzbz='".addslashes($projekt_kurzbz)."'";
+		if($projektphase_id!='')
+			$qry.=" AND projektphase_id='".addslashes($projektphase_id)."'";
+			
+		if($result = $this->db_query($qry))
+		{
+			if($this->db_num_rows($result)==0)
+			{
+				//keine Zuordnung vorhanden -> anlegen
+				$qry = "INSERT INTO fue.tbl_projekt_dokument(projektphase_id, projekt_kurzbz, dms_id) VALUES(".
+						$this->addslashes($projektphase_id).','.
+						$this->addslashes($projekt_kurzbz).','.
+						$this->addslashes($dms_id).');';
+						
+				if($this->db_query($qry))
+				{
+					return true;
+				}
+				else
+				{
+					$this->errormsg = 'Fehler beim Zuteilen des Dokuments zu einem Projekt';
+					return false;
+				}
+			}
+			else
+				return true; //Zuordnung bereits vorhanden
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
+			return false;
 		}
 	}
 }

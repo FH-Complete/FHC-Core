@@ -10,6 +10,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projekt.overlay.xul.php"?>
 echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektphase.overlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projekttask.overlay.xul.php"?>';
 /*echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/ressource.overlay.xul.php"?>';*/
+echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektdokument.overlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
 ?>
 
@@ -105,7 +106,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
 			<tab id="tab-projekt" label="Projekte" />
 			<tab id="tab-projektphase" label="Phasen" />
 			<tab id="tab-projekttask" label="Tasks" selected="true" />
-			<!-- <tab id="tab-ressource" label="Ressourcen" />  -->
+			<!--<tab id="tab-ressource" label="Ressourcen" />-->
 			<tab id="tab-notiz" label="Notizen" />
 			<tab id="tab-dokumente" label="Dokumente" />
 			<tab id="tab-bestellung" label="Bestellungen" />
@@ -115,7 +116,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
 			<vbox id="box-projekt" />
 			<vbox id="box-projektphase" />
 			<vbox id="box-projekttask" />
-			<!--  <vbox id="box-ressource" /> -->
+			<!--<vbox id="box-ressource" />-->
 			<vbox id="box-notiz" />
 			<vbox id="box-dokumente" />
 			<vbox id="box-bestellung" />
@@ -125,6 +126,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
 	</tabbox>
 </vbox>
 
+<vbox id="box-notiz">
+	<box class="Notiz" projekt_kurzbz="Abgabetool"/>
+</vbox>
 
 <vbox id="box-ressourcemenue">
     <toolbox>
@@ -185,4 +189,5 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
 	</template>
     </tree>
 </vbox>
+
 </overlay>

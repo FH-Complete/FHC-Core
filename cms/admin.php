@@ -104,7 +104,7 @@ $berechtigte_oe = $rechte->getOEkurzbz('basis/cms')
 
 	function openDMS()
 	{
-		window.open ("<?php echo APP_ROOT;?>cms/tinymce_dms.php","DMS","resizable=1,width=800,height=600");
+		window.open ("<?php echo APP_ROOT;?>cms/tinymce_dms.php","DMS","resizable=1,width=800,height=600,scrollbars=1");
 	}
 	</script>
 </head>
