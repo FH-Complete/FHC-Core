@@ -18,6 +18,12 @@
  * Authors: Karl Burkhart <burkhart@technikum-wien.at>.
  */
 
+$projekt_kurzbz=(isset($_GET['projekt_kurzbz'])?$_GET['projekt_kurzbz']:null);
+$projekt_phase=(isset($_GET['projekt_phase'])?$_GET['projekt_phase']:null);
+
+if($projekt_phase != null && (is_numeric($projekt_phase) == false ))
+	die('Ungültige ProjektphasenID'); 
+
 // header for no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
@@ -42,10 +48,15 @@ echo '
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	xmlns:RESSOURCE="'.$rdf_url.'rdf#"
 >
-';
-
+';	
 $ressource = new ressource(); 
-$ressource->getAllRessourcen(); 
+
+if($projekt_kurzbz!=null)
+	$ressource->getProjectRessourcen($projekt_kurzbz);
+else if($projekt_phase!= null)
+	$ressource->getPhaseRessourcen($projekt_phase);
+else 
+	$ressource->getAllRessourcen(); 
 
 foreach ($ressource->result as $res)
 {
