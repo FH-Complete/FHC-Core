@@ -333,6 +333,51 @@ class wawi_bestellung extends basis_db
 		}
 	}
 	
+
+	/**
+	 * 
+	 * Liefert die Bestellungen zu einem Projekt
+	 * @param $projekt_kurzbz
+	 */
+	public function getBestellungProjekt($projekt_kurzbz)
+	{
+		//$projekt_kurzbz = addslashes($projekt_kurzbz);
+		$qry = "SELECT * FROM wawi.tbl_bestellung JOIN wawi.tbl_projekt_bestellung USING (bestellung_id) WHERE projekt_kurzbz='".$projekt_kurzbz."';";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$bestellung = new wawi_bestellung(); 
+			
+				$bestellung->bestellung_id = $row->bestellung_id;
+				$bestellung->kostenstelle_id = $row->kostenstelle_id;
+				$bestellung->konto_id = $row->konto_id; 
+				$bestellung->firma_id = $row->firma_id; 
+				$bestellung->lieferadresse = $row->lieferadresse; 
+				$bestellung->rechnungsadresse = $row->rechnungsadresse; 
+				$bestellung->freigegeben = $row->freigegeben; 
+				$bestellung->bestell_nr = $row->bestell_nr;
+				$bestellung->titel = $row->titel;
+				$bestellung->bemerkung = $row->bemerkung; 
+				$bestellung->liefertermin = $row->liefertermin; 
+				$bestellung->updateamum = $row->updateamum; 
+				$bestellung->updatevon = $row->updatevon;
+				$bestellung->insertamum = $row->insertamum; 
+				$bestellung->insertvon = $row->insertvon; 
+				$bestellung->ext_id = $row->ext_id; 
+				$bestellung->zahlungstyp_kurzbz = $row->zahlungstyp_kurzbz; 
+				
+				$this->result[] = $bestellung; 
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 	/**
 	 * 
 	 * Löscht die Bestellung mit der Übergebenen ID
