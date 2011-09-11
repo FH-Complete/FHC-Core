@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2006 FHTechnikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -14,27 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
- *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+
 /**
- * @class 			Lehrstunde
- * @author	 		Christian Paminger
- * @date	 		2004/8/21
- * @version			$Revision: 1.2 $
- * Update: 			21.10.2004 von Christian Paminger
- * @brief  			Beschreibung einer Unterrichts-Stunde der Tabelle tbl_stundenplan
+ * @class 	lehrstunde
+ * @brief  	Beschreibung einer Unterrichts-Stunde der Tabelle tbl_stundenplan
+ * @author	Christian Paminger, Andreas Österreicher
+ * @date	2004/8/21
+ * @version	$Revision: 1.2 $
+ * Update: 	21.10.2009 von Christian Paminger
+ * @bug		Ein Fehler
+ * @todo	Noch zu tun
+ * @warning	Eine Warnung
  */
+
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/studiensemester.class.php');
 require_once(dirname(__FILE__).'/variable.class.php');
 
 class lehrstunde extends basis_db
 {
-	public $stundenplan_id;	// @brief id in der Datenbank
-	public $lehreinheit_id;	// @brief id der Lehreinheit in der DB
+	public $stundenplan_id;	/// @brief ID in der Datenbank
+	public $lehreinheit_id;	/// @brief id der Lehreinheit in der DB
 	public $unr;			// @brief Unterrichtsnummer
 	public $lektor_uid;		// @brief UID des Lektors
 	public $lektor_kurzbz; 	// @brief Kurzbezeichnung des Lektors
@@ -65,7 +66,7 @@ class lehrstunde extends basis_db
 	public $lastqry=null;
 
 
-	/** 
+	/*
 	 * Konstruktor
 	 *
 	 */
@@ -76,10 +77,11 @@ class lehrstunde extends basis_db
 		$this->new=TRUE;
 	}
 
-	/**
-	 * Einen Datensatz laden
-	 * @param stundenplan_id
-	 * @param stpl_table
+	/** 
+	 *  @brief Einen Datensatz aus optional angegebener Stundenplan-Tabelle laden
+	 *  \param stundenplan_id ID in der Datenbank
+	 *  \param stpl_table Name der Tabelle in der DB
+	 *  \return Boolean, Fehlermeldung kommt in das Attribut errormsg
 	 */
 	public function load($stundenplan_id,$stpl_table='stundenplandev')
 	{
@@ -239,14 +241,14 @@ class lehrstunde extends basis_db
 		$stpl_view='lehre.'.VIEW_BEGIN.$stpl_view;
 
 		// Datum im Format YYYY-MM-TT ?
-		if (!mb_ereg("([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})",$datum_von) )
+		if (!preg_match("/([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})/",$datum_von) )
 		{
 			$this->errormsg='Fehler: Startdatum hat falsches Format!';
 			return -1;
 		}
 		if ($datum_bis!=null)
 		{
-			if (!mb_ereg("([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})",$datum_bis) )
+			if (!preg_match("/([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})/",$datum_bis) )
 			{
 				$this->errormsg='Fehler: Enddatum hat falsches Format!';
 				return -1;

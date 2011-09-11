@@ -104,6 +104,8 @@ class wochenplan extends basis_db
 		
 		$this->link='stpl_week.php?type='.$type;
 		$this->kal_link='stpl_kalender.php?type='.$type;
+		// Timezone setzten
+		date_default_timezone_set('Europe/Vienna');
 		$this->datum=mktime();
 		$this->init_stdplan();
 		$this->crlf=crlf();

@@ -31,7 +31,7 @@ class zeugnisnote extends basis_db
 	public $result=array();
 
 	//Tabellenspalten
-	public $lehrveranstaltung_id;		// integer
+	public $lehrveranstaltung_id;		/// \brief ID der Lehrveranstaltung in der DB
 	public $student_uid;				// varchar(16)
 	public $studiensemester_kurzbz;	// varchar(16)
 	public $note;						// smalint
