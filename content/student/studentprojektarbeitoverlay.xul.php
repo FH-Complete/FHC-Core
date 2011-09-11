@@ -426,7 +426,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<label value="Art" control="student-projektbetreuer-menulist-betreuerart"/>
 								<menulist id="student-projektbetreuer-menulist-betreuerart" disabled="true"
 								          datasources="<?php echo APP_ROOT ?>rdf/betreuerart.rdf.php" flex="1"
-								          ref="http://www.technikum-wien.at/betreuerart/liste" >
+								          ref="http://www.technikum-wien.at/betreuerart" >
 									<template>
 										<menupopup>
 											<menuitem value="rdf:http://www.technikum-wien.at/betreuerart/rdf#betreuerart_kurzbz"
