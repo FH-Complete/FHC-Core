@@ -1,0 +1,79 @@
+@import url("chrome://global/skin/");
+
+label.kalenderwoche
+{
+	font-size: medium;
+}
+button
+{
+	font-size: x-small;
+	min-width: 10px;
+}
+menubar,menupopup,toolbar,tabpanels,tabbox,iframe,box,hbox,vbox,tree,label,description
+{
+	border: 0px;
+  	border-top: 0px;
+  	border-bottom: 0px;
+  	border-left: 0px;
+  	border-right: 0px;
+  	border-top-width: 0px;
+  	border-bottom-width: 0px;
+  	border-left-width: 0px;
+  	border-right-width: 0px;
+  	padding-top: 0px;
+  	padding-bottom: 0px;
+  	padding-left: 0px;
+  	padding-right: 0px;
+}
+menupopup
+{
+	border: 1px solid black;
+}
+grid.lvaStundenplan
+{
+	font-size: x-small;
+}
+grid.lvaStundenplan button
+{
+	font-size: x-small;
+	border: 0px;
+  	border-top: 0px;
+  	border-bottom: 0px;
+  	border-left: 0px;
+  	border-right: 0px;
+  	border-top-width: 0px;
+  	border-bottom-width: 0px;
+  	border-left-width: 0px;
+  	border-right-width: 0px;
+  	padding-top: 0px;
+  	padding-bottom: 0px;
+  	padding-left: 0px;
+  	padding-right: 0px;
+}
+
+
+tree treecol {
+	background-color: #FFFFCC; 
+	border: 1px solid black;	
+}
+
+tree {
+	font-size:9pt;
+	font-family:Arial;	
+}
+
+box.studentDetail {
+    -moz-binding: url('lehrveranstaltungbinding.xml.php#studentDetail');
+}
+
+label,textbox {
+	font-size:9pt;
+	font-family:Arial;
+}
+
+treechildren::-moz-tree-row(selected) { background-color: #FFFFAA; }
+treechildren::-moz-tree-row(odd) { background-color: #EEEEEE; }
+treechildren::-moz-tree-row(odd, selected) { background-color: #FFFFAA; }
+treechildren::-moz-tree-row(even, selected) { background-color: #FFFFAA; }
+treechildren::-moz-tree-cell-text(selected) { color: #000000; }
+treechildren::-moz-tree-cell-text(odd, selected) { color: #000000; }
