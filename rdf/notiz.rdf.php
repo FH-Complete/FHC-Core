@@ -29,6 +29,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 // DAO
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/notiz.class.php');
+require_once('../include/datum.class.php');
 
 $rdf_url='http://www.technikum-wien.at/notiz';
 
@@ -50,6 +51,7 @@ $uid=(isset($_GET['uid'])?$_GET['uid']:null);
 $person_id=(isset($_GET['person_id'])?$_GET['person_id']:null);
 $prestudent_id=(isset($_GET['prestudent_id'])?$_GET['prestudent_id']:null);
 $bestellung_id=(isset($_GET['bestellung_id'])?$_GET['bestellung_id']:null);
+$datum_obj = new datum();
 
 if(!$notiz->getNotiz($erledigt, $projekt_kurzbz, $projektphase_id, $projekttask_id, $uid, $person_id, $prestudent_id, $bestellung_id))
 	die($notiz->errormsg);
@@ -64,8 +66,10 @@ foreach($notiz->result as $row)
 			<NOTIZ:text><![CDATA['.$row->text.']]></NOTIZ:text>
 			<NOTIZ:verfasser_uid><![CDATA['.$row->verfasser_uid.']]></NOTIZ:verfasser_uid>
 			<NOTIZ:bearbeiter_uid><![CDATA['.$row->bearbeiter_uid.']]></NOTIZ:bearbeiter_uid>
-			<NOTIZ:start><![CDATA['.$row->start.']]></NOTIZ:start>
-			<NOTIZ:ende><![CDATA['.$row->ende.']]></NOTIZ:ende>
+			<NOTIZ:start><![CDATA['.$datum_obj->formatDatum($row->start,'d.m.Y').']]></NOTIZ:start>
+			<NOTIZ:ende><![CDATA['.$datum_obj->formatDatum($row->ende,'d.m.Y').']]></NOTIZ:ende>
+			<NOTIZ:startISO><![CDATA['.$row->start.']]></NOTIZ:startISO>
+			<NOTIZ:endeISO><![CDATA['.$row->ende.']]></NOTIZ:endeISO>
 			<NOTIZ:erledigt><![CDATA['.($row->erledigt?'Ja':'Nein').']]></NOTIZ:erledigt>
 			<NOTIZ:insertamum><![CDATA['.$row->insertamum.']]></NOTIZ:insertamum>
 			<NOTIZ:insertvon><![CDATA['.$row->insertvon.']]></NOTIZ:insertvon>

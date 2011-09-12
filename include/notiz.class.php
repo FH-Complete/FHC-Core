@@ -149,7 +149,7 @@ class notiz extends basis_db
 				'ende='.$this->addslashes($this->ende).', '.
 				'erledigt='.($this->erledigt?'true':'false').', '.
 				'updateamum='.$this->addslashes($this->updateamum).', '.
-				'updatevon='.$this->addslashes($this->updatevon).', '.
+				'updatevon='.$this->addslashes($this->updatevon).' '.
 				'WHERE notiz_id='.$this->addslashes($this->notiz_id).';';
 		}
 
@@ -184,11 +184,39 @@ class notiz extends basis_db
 		}
 		else
 		{
-			$this->errormsg = "Fehler beim Speichern des Datensatzes";
+			$this->errormsg = "Fehler beim Speichern des Datensatzes".$qry;
 			return false;
 		}
 	}
-	
+
+	/**
+	 * Speichert die Zuordnung einer Notiz
+	 * 
+	 */
+	public function saveZuordnung()
+	{
+		$qry = "INSERT INTO public.tbl_notizzuordnung(notiz_id, projekt_kurzbz, projektphase_id, projekttask_id, 
+						uid, person_id, prestudent_id, bestellung_id) VALUES(".
+				$this->addslashes($this->notiz_id).','.
+				$this->addslashes($this->projekt_kurzbz).','.
+				$this->addslashes($this->projektphase_id).','.
+				$this->addslashes($this->projekttask_id).','.
+				$this->addslashes($this->uid).','.
+				$this->addslashes($this->person_id).','.
+				$this->addslashes($this->prestudent_id).','.
+				$this->addslashes($this->bestellung_id).');';
+				
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern der Daten'.$qry;
+			return false;
+		}
+			
+	}
 
 	/**
 	 * 

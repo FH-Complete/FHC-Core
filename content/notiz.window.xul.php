@@ -47,7 +47,20 @@ else
 
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/notiz.window.js.php" />
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/functions.js.php" />
+<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jquery.js"></script>
+<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jqSOAPClient.js"></script>
+<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jqXMLUtils.js"></script>
+<script type="text/javascript">
+var projekt_kurzbz = '<?php echo (isset($_GET['projekt_kurzbz'])?addslashes($_GET['projekt_kurzbz']):'');?>';
+var projektphase_id = '<?php echo (isset($_GET['projektphase_id'])?addslashes($_GET['projektphase_id']):'');?>';
+var projekttask_id = '<?php echo (isset($_GET['projekttask_id'])?addslashes($_GET['projekttask_id']):'');?>';
+var uid = '<?php echo (isset($_GET['uid'])?addslashes($_GET['uid']):'');?>';
+var person_id = '<?php echo (isset($_GET['person_id'])?addslashes($_GET['person_id']):'');?>';
+var prestudent_id = '<?php echo (isset($_GET['prestudent_id'])?addslashes($_GET['prestudent_id']):'');?>';
+var bestellung_id = '<?php echo (isset($_GET['bestellung_id'])?addslashes($_GET['bestellung_id']):'');?>';
 
+var opener_id = '<?php echo (isset($_GET['opener_id'])?addslashes($_GET['opener_id']):'');?>';
+</script>
 <vbox>
 
 <textbox id="notiz-textbox-notiz_id" hidden="true"/>

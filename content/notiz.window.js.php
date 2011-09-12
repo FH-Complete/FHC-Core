@@ -58,8 +58,10 @@ function NotizInit(id)
 		text='';
 		start='';
 		ende='';
+		id='';
 	}		
 	
+	document.getElementById('notiz-textbox-notiz_id').value=id;
 	document.getElementById('notiz-textbox-titel').value=titel;
 	document.getElementById('notiz-textbox-text').value=text;
 	document.getElementById('notiz-box-start').value=start;
@@ -71,5 +73,52 @@ function NotizInit(id)
 // ****
 function NotizSpeichern()
 {
-	alert('Noch nicht implementiert');
+	//Werte holen
+	//projekttask_id = document.getElementById('textbox-projekttaskdetail-projekttask_id').value;
+	
+	var notiz_id = document.getElementById('notiz-textbox-notiz_id').value;
+	var titel = document.getElementById('notiz-textbox-titel').value;
+	var text = document.getElementById('notiz-textbox-text').value;
+	var start = document.getElementById('notiz-box-start').iso;
+	var ende = document.getElementById('notiz-box-ende').iso;
+	var verfasser_uid = getUsername();
+	var bearbeiter_uid = getUsername();
+	
+	var soapBody = new SOAPObject("saveNotiz");
+	soapBody.appendChild(new SOAPObject("notiz_id")).val(notiz_id);
+	soapBody.appendChild(new SOAPObject("titel")).val(titel);
+	soapBody.appendChild(new SOAPObject("text")).val(text);
+	soapBody.appendChild(new SOAPObject("verfasser_uid")).val(verfasser_uid);
+	soapBody.appendChild(new SOAPObject("bearbeiter_uid")).val(bearbeiter_uid);
+	soapBody.appendChild(new SOAPObject("start")).val(start);
+	soapBody.appendChild(new SOAPObject("ende")).val(ende);
+
+	soapBody.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
+	soapBody.appendChild(new SOAPObject("projektphase_id")).val(projektphase_id);
+	soapBody.appendChild(new SOAPObject("projekttask_id")).val(projekttask_id);
+	soapBody.appendChild(new SOAPObject("uid")).val(uid);
+	soapBody.appendChild(new SOAPObject("person_id")).val(person_id);
+	soapBody.appendChild(new SOAPObject("prestudent_id")).val(prestudent_id);
+	soapBody.appendChild(new SOAPObject("bestellung_id")).val(bestellung_id);
+		
+	var sr = new SOAPRequest("saveNotiz",soapBody);
+
+	SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/notiz.soap.php?"+gettimestamp();
+	SOAPClient.SendRequest(sr, clb_saveNotiz);
+}
+
+function clb_saveNotiz(respObj)
+{
+	try
+	{
+		var id = respObj.Body[0].saveNotizResponse[0].message[0].Text;
+		window.opener.document.getElementById(opener_id).RefreshNotiz();
+		window.close();
+	}
+	catch(e)
+	{
+		var fehler = respObj.Body[0].Fault[0].faultstring[0].Text;
+		alert('Fehler: '+fehler);
+		return;
+	}	
 }

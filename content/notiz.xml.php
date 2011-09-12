@@ -69,11 +69,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-start" label="Start" flex="2" hidden="false" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/notiz/rdf#start" />
+					sort="rdf:http://www.technikum-wien.at/notiz/rdf#startISO" />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-ende" label="Ende" flex="2" hidden="false" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/notiz/rdf#ende" />
+					sort="rdf:http://www.technikum-wien.at/notiz/rdf#endeISO" />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-erledigt" label="Erledigt" flex="2" hidden="true" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
@@ -83,6 +83,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#notiz_id" />
 			    <xul:splitter class="tree-splitter"/>
+			    <xul:treecol anonid="treecol-notiz-startISO" label="StartISO" flex="2" hidden="true" persist="hidden width ordinal"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/notiz/rdf#startISO" />
+			    <xul:splitter class="tree-splitter"/>
+			    <xul:treecol anonid="treecol-notiz-ende" label="EndeISO" flex="2" hidden="true" persist="hidden width ordinal"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/notiz/rdf#endeISO" />
 			</xul:treecols>
 		
 			<xul:template>
@@ -98,6 +105,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			           <xul:treecell label="rdf:http://www.technikum-wien.at/notiz/rdf#ende"/>
 			           <xul:treecell label="rdf:http://www.technikum-wien.at/notiz/rdf#erledigt"/>
 			           <xul:treecell label="rdf:http://www.technikum-wien.at/notiz/rdf#notiz_id"/>
+			           <xul:treecell label="rdf:http://www.technikum-wien.at/notiz/rdf#startISO"/>
+			           <xul:treecell label="rdf:http://www.technikum-wien.at/notiz/rdf#endeISO"/>
 			         </xul:treerow>
 			       </xul:treeitem>
 			      </xul:treechildren>
@@ -165,6 +174,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				
 				try
 				{
+					this.setAttribute('projekt_kurzbz',projekt_kurzbz);
+					this.setAttribute('projektphase_id',projektphase_id);
+					this.setAttribute('projekttask_id',projekttask_id);
+					this.setAttribute('uid',uid);
+					this.setAttribute('person_id',person_id);
+					this.setAttribute('prestudent_id',prestudent_id);
+					this.setAttribute('bestellung_id',bestellung_id);
+				
 					var datasource="<?php echo APP_ROOT; ?>rdf/notiz.rdf.php?ts="+gettimestamp();
 					datasource = datasource+"&projekt_kurzbz="+encodeURIComponent(projekt_kurzbz);
 					datasource = datasource+"&projektphase_id="+encodeURIComponent(projektphase_id);
@@ -235,10 +252,31 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			<parameter name="id"/>
 			<body>
 			<![CDATA[
-			
-				var param = '';
+				var projekt_kurzbz = this.getAttribute('projekt_kurzbz');
+				var projektphase_id = this.getAttribute('projektphase_id');
+				var projekttask_id = this.getAttribute('projekttask_id');
+				var uid = this.getAttribute('uid');
+				var person_id = this.getAttribute('person_id');
+				var prestudent_id = this.getAttribute('prestudent_id');
+				var bestellung_id = this.getAttribute('bestellung_id');
+				
+				var opener_id = this.getAttribute('id');
+				
+				var param = ''; 
+				
+				param = param+'?projekt_kurzbz='+encodeURIComponent(projekt_kurzbz);
+				param = param+'&projektphase_id='+encodeURIComponent(projektphase_id);
+				param = param+'&projekttask_id='+encodeURIComponent(projekttask_id);
+				param = param+'&uid='+encodeURIComponent(uid);
+				param = param+'&person_id='+encodeURIComponent(person_id);
+				param = param+'&prestudent_id='+encodeURIComponent(prestudent_id);
+				param = param+'&bestellung_id='+encodeURIComponent(bestellung_id);
+				
+				param = param+'&opener_id='+encodeURIComponent(opener_id);
 				if(id!=undefined)
-					param = '?id='+id;  
+					param = param+'&id='+id;  
+				
+				
 			    window.open('<?php echo APP_ROOT; ?>content/notiz.window.xul.php'+param,'Notiz','chrome, status=no, width=500, height=350, centerscreen, resizable');
 			]]>
 			</body>
@@ -253,7 +291,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			var prestudent_id = this.getAttribute('prestudent_id');
 			var bestellung_id = this.getAttribute('bestellung_id');
 			
-			this.LoadNotizTree(projekt_kurzbz,projektphase_id,projekttask_id,uid,person_id,prestudent_id,bestellung_id, true);
+			if(projekt_kurzbz!='' || projektphase_id!='' || projekttask_id!='' 
+			   || uid!='' || person_id!='' || prestudent_id!='' || bestellung_id!='')
+			{
+				this.LoadNotizTree(projekt_kurzbz,projektphase_id,projekttask_id,uid,person_id,prestudent_id,bestellung_id, true);
+			}
 		</constructor>
 		<destructor>
 			//debug('Notiz Binding Stop');
