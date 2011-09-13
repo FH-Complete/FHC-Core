@@ -4,14 +4,14 @@ require_once('../config/vilesci.config.inc.php');
 header("Content-type: application/vnd.mozilla.xul+xml");
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
-/*echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentenoverlay.xul.php?xulapp=planner"?>';
-echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-week-overlay.xul.php"?>';*/
+
 echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projekt.overlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektphase.overlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projekttask.overlay.xul.php"?>';
-/*echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/ressource.overlay.xul.php"?>';*/
 echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektdokument.overlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/bestellung.overlay.xul.php"?>';
+/*echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/ressource.overlay.xul.php"?>';*/
 ?>
 
 <!DOCTYPE overlay >
@@ -106,20 +106,20 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/gantt.overlay.xul.php"?>';
 			<tab id="tab-projekt" label="Projekte" />
 			<tab id="tab-projektphase" label="Phasen" />
 			<tab id="tab-projekttask" label="Tasks" selected="true" />
-			<!--<tab id="tab-ressource" label="Ressourcen" />-->
 			<tab id="tab-notiz" label="Notizen" />
 			<tab id="tab-dokumente" label="Dokumente" />
 			<tab id="tab-bestellung" label="Bestellungen" />
+			<tab id="tab-ressource" label="Ressourcen" />
 			<tab id="tab-gantt" label="Gantt" />
 		</tabs>
 		<tabpanels id="tabpanels-main" flex="1">
 			<vbox id="box-projekt" />
 			<vbox id="box-projektphase" />
 			<vbox id="box-projekttask" />
-			<!--<vbox id="box-ressource" />-->
 			<vbox id="box-notiz" />
 			<vbox id="box-dokumente" />
 			<vbox id="box-bestellung" />
+			<vbox id="box-ressource" />
 			<vbox id="box-gantt" />
             <vbox id="LehrveranstaltungEditor" />
 		</tabpanels>
