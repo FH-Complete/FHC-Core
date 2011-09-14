@@ -20,6 +20,7 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
 		<wsdl:part name="bearbeiter_uid" type="xsd:string"></wsdl:part>
 		<wsdl:part name="start" type="xsd:string"></wsdl:part>
 		<wsdl:part name="ende" type="xsd:string"></wsdl:part>
+		<wsdl:part name="erledigt" type="xsd:boolean"></wsdl:part>
 		<wsdl:part name="projekt_kurzbz" type="xsd:string"></wsdl:part>
 		<wsdl:part name="projektphase_id" type="xsd:string"></wsdl:part>
 		<wsdl:part name="projekttask_id" type="xsd:string"></wsdl:part>

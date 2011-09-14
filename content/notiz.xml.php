@@ -49,6 +49,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			<xul:tree anonid="tree-notiz"
 			seltype="single" hidecolumnpicker="false" flex="1"
 			datasources="rdf:null" ref="http://www.technikum-wien.at/notiz/liste"
+			ondblclick="document.getBindingParent(this).openNotiz(document.getBindingParent(this).value);"
 			>
 			<xul:treecols>
 			    <xul:treecol anonid="treecol-notiz-titel" label="Titel" flex="5" primary="true" persist="hidden width ordinal"
@@ -301,10 +302,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			//debug('Notiz Binding Stop');
 		</destructor>
 	</implementation>
-	<handlers>
-		<handler event="dblclick">
-	      	this.openNotiz(this.value);
-	    </handler>
-	</handlers>
+	
   </binding>
 </bindings>

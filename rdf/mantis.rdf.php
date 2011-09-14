@@ -81,8 +81,9 @@ $mantis->getIssue($issue_id);
 		    <MANTIS:issue_eta_name><?php echo $mantis->issue_eta->name;  ?></MANTIS:issue_eta_name>
 		    <MANTIS:issue_resolution_id><?php echo $mantis->issue_resolution->id;  ?></MANTIS:issue_resolution_id>
 		    <MANTIS:issue_resolution_name><?php echo $mantis->issue_resolution->name;  ?></MANTIS:issue_resolution_name>
-		    <MANTIS:issue_attachments><?php echo $mantis->issue_attachments;  ?></MANTIS:issue_attachments>
 		    <MANTIS:issue_due_date><?php echo $mantis->issue_due_date;  ?></MANTIS:issue_due_date>
+		    <MANTIS:issue_steps_to_reproduce><?php echo $mantis->issue_steps_to_reproduce;  ?></MANTIS:issue_steps_to_reproduce>
+		    <MANTIS:issue_additional_information><?php echo $mantis->issue_additional_information;  ?></MANTIS:issue_additional_information>
 	    </RDF:Description>
 	</RDF:li>
     </RDF:Seq>

@@ -127,7 +127,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/bestellung.overlay.xul.php
 </vbox>
 
 <vbox id="box-notiz">
-	<box class="Notiz" projekt_kurzbz="Abgabetool" flex="1" id="box-notizen"/>
+	<box class="Notiz" flex="1" id="box-notizen"/>
 </vbox>
 
 <vbox id="box-ressourcemenue">

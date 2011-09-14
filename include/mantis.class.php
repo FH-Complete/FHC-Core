@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2007 Technikum-Wien
+/* Copyright (C) 2011 FH Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,63 +15,64 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ * 			Andreas Österreicher <andreas.oesterreicher@technikum-wien.at>
  */
-/****************************************************************************
+/**
  * @class 			Mantis
  * @author	 		Christian Paminger
  * @date	 		2011/8/22
  * @version			$Revision: 1.3 $
  * Update: 			22.08.2011 von Christian Paminger
  * @brief  			Klasse fuer die Schnittstelle zum Mantis BTS
- * Abhaengig:	 		von basis_db.class.php
- *****************************************************************************/
+ * Abhaengig:	 	von basis_db.class.php
+ */
 require_once(dirname(__FILE__).'/basis_db.class.php');
-//require_once('nusoap.php');
-//require_once(dirname(__FILE__).'/globals.inc.php'); 
 
 class mantis extends basis_db
 {
-	public $issue_id;			// @brief Connection zur Datenbank
-	public $issue_view_state;			// @brief Return Linefeed
-	public $issue_last_updated; 			// @brief Typ des Plans (Student, Lektor, Verband, Ort)
-	public $issue_project;			// @brief Benutzergruppe
-	public $issue_category;		// @brief id in der Datenbank des Benutzers
-	public $issue_priority;			// @brief Link auf eigene Seite
-	public $issue_severity;		// @brief Link auf den kalender
-	public $issue_status;			// @brief Kennzahl des Studiengangs
-	public $issue_reporter;		// @brief Bezeichnung Studiengang
-	public $issue_summary;		// @brief Kurzbezeichnung Studiengang
-	public $issue_reproducibility;		// @brief lange Kurzbezeichnung Studiengang
-	public $issue_date_submitted;			// @brief Semester
-	public $issue_sponsorship_total;			// @brief Verband (A,B,C,...)
-	public $issue_projection;			// @brief Gruppe (1,2)
-	public $issue_eta;		// @brief Account Name der Person (PK)
-	public $issue_resolution;		// @brief Titel der Person
-	public $issue_description;		// @brief Titel der Person
-	public $issue_attachments;		// @brief Personendaten
-	public $issue_due_date;		// @brief Personendaten
+	public $issue_id;					//ID
+	public $issue_view_state;			//Anzeigestatus
+	public $issue_last_updated;			//Letzte Aktualisierung
+	public $issue_project;				//Projekt
+	public $issue_category;				//Kategorie
+	public $issue_priority;				//Prioritaet
+	public $issue_severity;				//Auswirkung
+	public $issue_status;				//Status
+	public $issue_reporter;				//Reporter
+	public $issue_summary;				//Zusammendassung
+	public $issue_reproducibility;		//Reproduzierbar
+	public $issue_date_submitted;		//Meldungsdatum
+	public $issue_sponsorship_total;	
+	public $issue_projection;			//Projektion
+	public $issue_eta;					//Aufwand
+	public $issue_resolution;			//Lösung
+	public $issue_description;			//Beschreibung
+	public $issue_attachments;			//Anhang
+	public $issue_due_date;
+	public $issue_steps_to_reproduce;
+	public $issue_additional_information;
 	
 	public $soapClient;
 	public $errormsg;
 
 	/**
 	 * Konstruktor
-	 * @param $type
 	 */
 	public function __construct()
 	{
 		parent::__construct();
-		//echo 'Init SoapClient-Method!<br />';
 		$this->initSoapClient();
 	}
 
+	/**
+	 * Initialsiert den Soap Client
+	 */
 	public function initSoapClient()
 	{
 		try 
 		{ 
-			//echo 'Init SoapClient!<br />';
-			$this->soapClient = new SoapClient('http://localhost/mantis/api/soap/mantisconnect.php?wsdl'); 
+			$this->soapClient = new SoapClient(MANTIS_PFAD); 
 		}
 		catch (Exception $e)
 		{ 
@@ -79,17 +80,39 @@ class mantis extends basis_db
 		}
 	}
 
-	// Neues Ticket anlegen
+	/**
+	 * Ticket Update
+	 */
+	public function updateIssue()
+	{
+		$issue = array('summary'=>$this->issue_summary,
+					'project'=>array('id'=>$this->issue_project->id),
+					'category'=>$this->issue_category,
+					'description'=>$this->issue_description,
+					'steps_to_reproduce'=>$this->issue_steps_to_reproduce,
+					'additional_information'=>$this->issue_additional_information,
+				);				
+				
+		$params=array('username' => MANTIS_USERNAME, 'password' => MANTIS_PASSWORT,'issueId' => $this->issue_id, $issue);
+		$result = $this->soapClient->__soapCall('mc_issue_update',$params);
+		return $result;
+	}
+	
+	/**
+	 * Neues Ticket anlegen
+	 */
 	public function insertIssue()
 	{
 		$result = $this->soapClient->__soapCall('mc_version',array());
 		return $result;
 	}
 	
-	// Ticket holen
+	/**
+	 * Ticket holen
+	 */
 	public function getIssue($issue_id=1)
 	{
-		$params=array('username' => 'pam', 'password' => '','issue_id' => $issue_id);
+		$params=array('username' => MANTIS_USERNAME, 'password' => MANTIS_PASSWORT,'issue_id' => $issue_id);
 		$result = $this->soapClient->__soapCall('mc_issue_get',$params);
 		
 		$this->issue_id = $result->id;			
@@ -123,6 +146,8 @@ class mantis extends basis_db
 		$this->issue_description = $result->description;	
 		$this->issue_attachments = $result->attachments;	
 		$this->issue_due_date = $result->due_date;	
+		$this->issue_steps_to_reproduce = $result->steps_to_reproduce;
+		$this->issue_additional_information = $result->additional_information;
 		
 		return true;
 	}

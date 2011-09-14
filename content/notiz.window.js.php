@@ -49,7 +49,13 @@ function NotizInit(id)
 		text = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#text" ));
 		start = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#start" ));
 		ende = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ende" ));
-		
+		verfasser = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#verfasser_uid" ));
+		bearbeiter = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bearbeiter_uid" ));
+		erledigt = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#erledigt" ));
+		if(erledigt=='Ja')
+			erledigt=true;
+		else
+			erledigt=false;
 	}
 	else
 	{
@@ -59,6 +65,9 @@ function NotizInit(id)
 		start='';
 		ende='';
 		id='';
+		verfasser=getUsername();
+		bearbeiter='';
+		erledigt=false;
 	}		
 	
 	document.getElementById('notiz-textbox-notiz_id').value=id;
@@ -66,6 +75,15 @@ function NotizInit(id)
 	document.getElementById('notiz-textbox-text').value=text;
 	document.getElementById('notiz-box-start').value=start;
 	document.getElementById('notiz-box-ende').value=ende;
+	document.getElementById('notiz-textbox-verfasser').value=verfasser;
+	document.getElementById('notiz-checkbox-erledigt').checked=erledigt;
+	if(bearbeiter!='')
+	{
+		menulist = document.getElementById('notiz-menulist-bearbeiter');
+		NotizMenulistMitarbeiterLoad(menulist, bearbeiter);
+		MenulistSelectItemOnValue('notiz-menulist-bearbeiter', bearbeiter);
+	}
+
 }
 
 // ****
@@ -81,8 +99,9 @@ function NotizSpeichern()
 	var text = document.getElementById('notiz-textbox-text').value;
 	var start = document.getElementById('notiz-box-start').iso;
 	var ende = document.getElementById('notiz-box-ende').iso;
-	var verfasser_uid = getUsername();
-	var bearbeiter_uid = getUsername();
+	var verfasser_uid = document.getElementById('notiz-textbox-verfasser').value;
+	var bearbeiter_uid = MenulistGetSelectedValue('notiz-menulist-bearbeiter');
+	var erledigt = document.getElementById('notiz-checkbox-erledigt').checked;
 	
 	var soapBody = new SOAPObject("saveNotiz");
 	soapBody.appendChild(new SOAPObject("notiz_id")).val(notiz_id);
@@ -92,6 +111,7 @@ function NotizSpeichern()
 	soapBody.appendChild(new SOAPObject("bearbeiter_uid")).val(bearbeiter_uid);
 	soapBody.appendChild(new SOAPObject("start")).val(start);
 	soapBody.appendChild(new SOAPObject("ende")).val(ende);
+	soapBody.appendChild(new SOAPObject("erledigt")).val(erledigt);
 
 	soapBody.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
 	soapBody.appendChild(new SOAPObject("projektphase_id")).val(projektphase_id);
@@ -121,4 +141,43 @@ function clb_saveNotiz(respObj)
 		alert('Fehler: '+fehler);
 		return;
 	}	
+}
+
+
+// ****
+// * Laedt dynamisch die Personen fuer das DropDown Menue
+// * Es muessen mindestens 3 Zeichen in das DropDown Menue eingegeben werden
+// ****
+function NotizMenulistMitarbeiterLoad(menulist, filter)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	if(typeof(filter)=='undefined')
+		v = menulist.value;
+	else
+		v = filter;
+
+	if(v.length>2)
+	{		
+		var url = '<?php echo APP_ROOT; ?>rdf/mitarbeiter.rdf.php?filter='+encodeURIComponent(v)+'&'+gettimestamp();
+		//nurmittitel=&
+		var oldDatasources = menulist.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			menulist.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		menulist.builder.rebuild();
+	
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		if(typeof(filter)=='undefined')
+			var datasource = rdfService.GetDataSource(url);
+		else
+			var datasource = rdfService.GetDataSourceBlocking(url);
+		datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		menulist.database.AddDataSource(datasource);
+		if(typeof(filter)!='undefined')
+			menulist.builder.rebuild();
+	}
 }

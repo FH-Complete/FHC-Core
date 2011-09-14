@@ -34,61 +34,7 @@ function initProjektphase(projektphase_id)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	
-	/*if(projekt_kurzbz!='')
-	{
-                //Daten holen
-		var url = '<?php echo APP_ROOT ?>rdf/bankverbindung.rdf.php?bankverbindung_id='+bankverbindung_id+'&'+gettimestamp();
-			
-		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
-	                   getService(Components.interfaces.nsIRDFService);
-	    
-	    var dsource = rdfService.GetDataSourceBlocking(url);
-	    
-		var subject = rdfService.GetResource("http://www.technikum-wien.at/bankverbindung/" + bankverbindung_id);
 	
-		var predicateNS = "http://www.technikum-wien.at/bankverbindung/rdf";
-	
-		//RDF parsen
-	
-		person_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#person_id" ));
-		name = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#name" ));
-		anschrift = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anschrift" ));
-		bic = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bic" ));
-		blz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#blz" ));
-		iban = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#iban" ));
-		kontonr = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#kontonr" ));
-		typ = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#typ" ));
-		verrechnung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#verrechnung" ));
-		neu = false;
-	}
-	else
-	{
-		//Defaultwerte bei Neuem Datensatz
-		neu = true;
-		name='';
-		anschrift='';
-		bic='';
-		blz='';
-		iban='';
-		kontonr='';
-		typ='p';
-		verrechnung='Ja';
-	}		
-	
-	document.getElementById('bankverbindung-checkbox-neu').checked=neu;
-	document.getElementById('bankverbindung-textbox-person_id').value=person_id;
-	document.getElementById('bankverbindung-textbox-bankverbindung_id').value=bankverbindung_id;
-	document.getElementById('bankverbindung-textbox-name').value=name;
-	document.getElementById('bankverbindung-textbox-anschrift').value=anschrift;
-	document.getElementById('bankverbindung-textbox-bic').value=bic;
-	document.getElementById('bankverbindung-textbox-blz').value=blz;
-	document.getElementById('bankverbindung-textbox-iban').value=iban;
-	document.getElementById('bankverbindung-textbox-kontonr').value=kontonr;
-	document.getElementById('bankverbindung-menulist-typ').value=typ;
-	if(verrechnung=='Ja')
-		document.getElementById('bankverbindung-checkbox-verrechnung').checked=true;
-	else
-		document.getElementById('bankverbindung-checkbox-verrechnung').checked=false;	*/
 }
 
 // ****
@@ -130,12 +76,14 @@ function clb_saveProjektphase(respObj)
 {
     try
     {
-        var msg = respObj.Body[0].SaveProjektphaseResponse[0].message[0].Text;
-	alert('Antwort: '+msg);
+    	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+        var msg = respObj.Body[0].saveProjektphaseResponse[0].message[0].Text;
+		window.opener.ProjektphaseTreeRefresh();
+		window.close();
     }
     catch(e)
     {
-	var fehler = respObj.Body[0].Fault[0].faultstring[0].Text;
-	alert('Fehler: '+fehler);
+		var fehler = respObj.Body[0].Fault[0].faultstring[0].Text;
+		alert('Fehler: '+fehler);
     }
 }

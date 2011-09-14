@@ -196,3 +196,29 @@ function ProjektDokumentNeueVersion()
 		
 	window.open(url);
 }
+
+function ProjektDokumentZuweisen()
+{
+	var tree=document.getElementById('tree-projektmenue');
+	
+	if(tree.currentIndex==-1)
+	{
+		alert('Bitte markieren Sie zuerst ein Projekt oder eine Phase');
+		return false;
+	}
+	
+	var projekt_kurzbz=getTreeCellText(tree, "treecol-projektmenue-projekt_kurzbz", tree.currentIndex);
+	var projekt_phase_id=getTreeCellText(tree, "treecol-projektmenue-projekt_phase_id", tree.currentIndex);
+
+	if(projekt_phase_id!='')
+		var url = '<?php echo APP_ROOT;?>content/projekt/projektdokument.window.xul.php?projektphase_id='+projekt_phase_id;
+	else if(projekt_kurzbz!='')
+		var url = '<?php echo APP_ROOT;?>content/projekt/projektdokument.window.xul.php?projekt_kurzbz='+projekt_kurzbz;
+	else
+	{
+		alert('Bitte zuerst eine Phase oder ein Projekt markieren');
+		return false;
+	}
+		
+	window.open(url,'Zuteilung', 'height=384,width=512,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no');
+}

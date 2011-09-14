@@ -103,6 +103,10 @@ class dms extends basis_db
 		}
 	}
 	
+	/**
+	 * Speichert einenen DMS Eintrag
+	 * @param $new
+	 */
 	public function save($new=null)
 	{
 		if(is_null($new))
@@ -150,19 +154,19 @@ class dms extends basis_db
 		else
 		{
 			$qry = "UPDATE campus.tbl_dms SET".
-				" oe_kurzbz=".$this->addslashes($this->oe_kurzbz).",".
-				" dokument_kurzbz=".$this->addslashes($this->dokument_kurzbz).",".
-				" kategorie_kurzbz=".$this->addslashes($this->kategorie_kurzbz)." ". 
-			" WHERE dms_id='".addslashes($this->dms_id)."';".
-			"UPDATE campus.tbl_dms_version SET".
-				" filename=".$this->addslashes($this->filename).",".
-				" mimetype=".$this->addslashes($this->mimetype).",".
-				" name=".$this->addslashes($this->name).",".
-				" beschreibung=".$this->addslashes($this->beschreibung).",".
-				" letzterzugriff=".$this->addslashes($this->letzterzugriff).",".
-				" updateamum=".$this->addslashes($this->updateamum).",".
-				" updatevon=".$this->addslashes($this->updatevon).
-				" WHERE dms_id='".addslashes($this->dms_id)."' AND version='".addslashes($this->version)."';";
+						" oe_kurzbz=".$this->addslashes($this->oe_kurzbz).",".
+						" dokument_kurzbz=".$this->addslashes($this->dokument_kurzbz).",".
+						" kategorie_kurzbz=".$this->addslashes($this->kategorie_kurzbz)." ". 
+					"WHERE dms_id='".addslashes($this->dms_id)."';".
+					"UPDATE campus.tbl_dms_version SET".
+						" filename=".$this->addslashes($this->filename).",".
+						" mimetype=".$this->addslashes($this->mimetype).",".
+						" name=".$this->addslashes($this->name).",".
+						" beschreibung=".$this->addslashes($this->beschreibung).",".
+						" letzterzugriff=".$this->addslashes($this->letzterzugriff).",".
+						" updateamum=".$this->addslashes($this->updateamum).",".
+						" updatevon=".$this->addslashes($this->updatevon).
+						" WHERE dms_id='".addslashes($this->dms_id)."' AND version='".addslashes($this->version)."';";
 		}
 		
 		if($this->db_query($qry))
@@ -226,7 +230,9 @@ class dms extends basis_db
 	}
 	
 	/**
-	 * Laedt alle Kategorien
+	 * Laedt die Kategorien
+	 * @param $parent_kategorie_kurzbz Wenn die Parent Kategorie übergeben wird, werden nur die direkten 
+	 *        Unterkategorien geladen
 	 * @return boolean
 	 */
 	public function getKategorie($parent_kategorie_kurzbz='')
@@ -347,11 +353,11 @@ class dms extends basis_db
 		}
 	}
 	
-/**
- * 
- * lädt alle Versionen zu einer übergebenen ID
- * @param $id der zu ladenden Dokumente
- */
+	/**
+	 * 
+	 * lädt alle Versionen zu einer übergebenen ID
+	 * @param $id der zu ladenden Dokumente
+	 */
 	public function getAllVersions($id)
 	{
 		if(!is_numeric($id))

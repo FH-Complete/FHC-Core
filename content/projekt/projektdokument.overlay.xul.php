@@ -50,6 +50,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		<toolbox>
 			<toolbar id="toolbar-projektdokument-main">
 				<toolbarbutton id="toolbarbutton-projektdokument-neu" label="Neues Dokument hinzufügen" oncommand="ProjektDokumentNeu();" disabled="true" image="../skin/images/NeuDokument.png" tooltiptext="Neues Dokument hochladen" />
+				<toolbarbutton id="toolbarbutton-projektdokument-zuweisung" label="Dokument zuweisen" oncommand="ProjektDokumentZuweisen();" disabled="true" image="../skin/images/liste.gif" tooltiptext="Ein bereits hochgeladenes Dokument zuweisen" />
 				<toolbarbutton id="toolbarbutton-projektdokument-del" label="Loeschen" oncommand="ProjektDokumentDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Dokument löschen"/>
 				<toolbarbutton id="toolbarbutton-projektdokument-refresh" label="Aktualisieren" oncommand="ProjektDokumentTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 			</toolbar>

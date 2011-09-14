@@ -48,6 +48,7 @@ ini_set("soap.wsdl_cache_enabled", "0");
  * @param string $bearbeiter_uid
  * @param string $start
  * @param string $ende
+ * @param boolean $erledigt
  * @param string $projekt_kurzbz
  * @param string $projektphase_id
  * @param string $projekttask_id
@@ -56,7 +57,7 @@ ini_set("soap.wsdl_cache_enabled", "0");
  * @param string $prestudent_id
  * @param string $bestellung_id
  */
-function saveNotiz($notiz_id, $titel, $text, $verfasser_uid, $bearbeiter_uid, $start, $ende, $projekt_kurzbz, $projektphase_id, $projekttask_id, $uid, $person_id, $prestudent_id, $bestellung_id)
+function saveNotiz($notiz_id, $titel, $text, $verfasser_uid, $bearbeiter_uid, $start, $ende, $erledigt, $projekt_kurzbz, $projektphase_id, $projekttask_id, $uid, $person_id, $prestudent_id, $bestellung_id)
 { 	
 	$user = get_uid();
 		
@@ -89,6 +90,7 @@ function saveNotiz($notiz_id, $titel, $text, $verfasser_uid, $bearbeiter_uid, $s
 	$notiz->bearbeiter_uid = $bearbeiter_uid;
 	$notiz->start = $start;
 	$notiz->ende = $ende;
+	$notiz->erledigt=$erledigt;
 	
 	if($notiz->save())
 	{

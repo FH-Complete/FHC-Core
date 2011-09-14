@@ -39,6 +39,11 @@ elseif(isset($_GET['projektphase_id']))
 	$projektphase_id = $_GET['projektphase_id'];
 	$dms->getDokumenteProjektphase($projektphase_id);
 }
+elseif(isset($_GET['filter']))
+{
+	$filter = $_GET['filter'];
+	$dms->search($filter);
+}
 else
 	die('projekt_kurzbz oder projektphase_id muss uebergeben werden');
 

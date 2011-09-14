@@ -127,11 +127,13 @@ function clb_saveProjekt(respObj)
     try
     {
         var msg = respObj.Body[0].saveProjektResponse[0].message[0].Text;
-	alert('Antwort: '+msg);
+		window.opener.ProjektmenueRefresh();
+		window.opener.ProjektTreeRefresh();
+		window.close();
     }
     catch(e)
     {
-	var fehler = respObj.Body[0].Fault[0].faultstring[0].Text;
-	alert('Fehler: '+fehler);
+		var fehler = respObj.Body[0].Fault[0].faultstring[0].Text;
+		alert('Fehler: '+fehler);
     }
 }

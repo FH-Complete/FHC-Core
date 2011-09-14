@@ -176,6 +176,7 @@ function treeProjektmenueSelect()
 	if(projekt_phase_id!='' || projekt_kurzbz!='')
 	{
 		document.getElementById('toolbarbutton-projektdokument-neu').disabled=false;
+		document.getElementById('toolbarbutton-projektdokument-zuweisung').disabled=false;
 		try
 		{
 		
@@ -215,7 +216,10 @@ function treeProjektmenueSelect()
 		}
 	}
 	else
+	{
 		document.getElementById('toolbarbutton-projektdokument-neu').disabled=true;
+		document.getElementById('toolbarbutton-projektdokument-zuweisung').disabled=true;		
+	}
 
 	//Notizen Laden
 	if(projekt_phase_id!='')

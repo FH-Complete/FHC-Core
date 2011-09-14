@@ -566,6 +566,7 @@ function RessourceRefresh()
 function RessourceTreeSelectRessource()
 {
 
+/*
 	var tree=document.getElementById('tree-ressourcemenue');
 	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
 
@@ -595,6 +596,7 @@ function RessourceTreeSelectRessource()
 			}
 	   	}
 	}
+	*/
 }
 
 

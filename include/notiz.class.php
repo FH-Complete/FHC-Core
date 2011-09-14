@@ -21,7 +21,7 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class notiz extends basis_db
 {
-	public $new;       		// boolean
+	public $new;
 	public $result=array();
 
 	//Tabellenspalten
@@ -256,6 +256,7 @@ class notiz extends basis_db
 			$qry.=" AND prestudent_id='".addslashes($prestudent_id)."'";
 		if($bestellung_id!='')
 			$qry.=" AND bestellung_id='".addslashes($bestellung_id)."'";
+		$qry.=' ORDER BY start, ende, titel';
 		
 		if($result = $this->db_query($qry))
 		{

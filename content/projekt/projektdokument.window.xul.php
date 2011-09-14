@@ -29,84 +29,59 @@ require_once('../../config/vilesci.config.inc.php');
 
 echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/planner.css" type="text/css"?>';
-if(isset($_GET['oe']))
-	$oe=$_GET['oe'];
-else 
-	$oe='';
-//echo $oe;
 if(isset($_GET['projekt_kurzbz']))
 	$projekt_kurzbz=$_GET['projekt_kurzbz'];
 else 
 	$projekt_kurzbz='';
+//echo $oe;
+if(isset($_GET['projektphase_id']))
+	$projektphase_id=$_GET['projektphase_id'];
+else 
+	$projektphase_id='';
 ?>
 
-<window id="window-projekt-neu" title="Neues Projekt anlegen"
+<window id="window-projektdokument-zuweisen" title="Dokument zu Projekt zuweisen"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        onload="initProjekt(<?php echo ($projekt_kurzbz!=''?$projekt_kurzbz:"''"); ?>)"
+        onload="initProjektdokument(<?php echo ($projekt_kurzbz!=''?"'".$projekt_kurzbz."'":"''").','.($projektphase_id!=''?"'".$projektphase_id."'":"''"); ?>)"
         >
 	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jquery.js"></script>
 	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jqSOAPClient.js"></script>
 	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jqXMLUtils.js"></script>
-	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>content/projekt/projekt.window.js.php" />
+	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>content/projekt/projektdokument.window.js.php" />
 	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>content/functions.js"></script>
 <vbox>
 
 <checkbox id="checkbox-projekt-neu" hidden="true"/>
 
-<groupbox id="groupbox-projekt" flex="1">
-	<caption label="Details"/>
-		<grid id="grid-projekt-detail" style="overflow:auto;margin:4px;" flex="1">
+<groupbox id="groupbox-projektdokument" flex="1">
+	<caption label="Dokument suchen"/>
+		<grid id="grid-projektdokument-detail" style="overflow:auto;margin:4px;" flex="1">
 		  	<columns  >
 				<column flex="1"/>
 				<column flex="5"/>
 			</columns>
 			<rows>
-				<row>
-					<label value="OE (Organisationseinheit)" control="textbox-projekt-oe"/>
-					<textbox id="textbox-projekt-oe" value="<?php echo $oe; ?>" maxlength="32"/>
-				</row>
-				<row>
-					<label value="Kurzbezeichnung" control="textbox-projekt-projekt_kurzbz"/>
-					<textbox id="textbox-projekt-projekt_kurzbz" maxlength="16"/>
-				</row>
-				<row>
-					<label value="Titel" control="textbox-projekt-titel"/>
-   					<textbox id="textbox-projekt-titel" maxlength="256"/>
-				</row>				
-				<row>
-					<label value="Nummer" control="textbox-projekt-nummer"/>
-   					<textbox id="textbox-projekt-nummer" maxlength="8"/>
-				</row>
-				<row>
-					<label value="Beschreibung" control="textbox-projekt-beschreibung"/>
-   					<textbox id="textbox-projekt-beschreibung" multiline="true"/>
-				</row>
-				<row>
-					<label value="Beginn" control="textbox-projekt-beginn"/>
-   					<textbox id="textbox-projekt-beginn"/>
-				</row>
-      			<row>
-					<label value="Ende" control="textbox-projekt-ende"/>
-   					<textbox id="textbox-projekt-ende"/>
-      			</row>
-			<!-- <row>
-					<label value="Test" control="textbox-projekt-test"/>
-   					<menulist id="menulist-projekt-test" flex="1">
-							<menupopup>
-								<menuitem value="p" label="Privatkonto"/>
-								<menuitem value="f" label="Firmenkonto"/>
-							</menupopup>
+				<label value="Dokument" control="projektdokument-menulist-dokument" />
+				    <menulist id="projektdokument-menulist-dokument"
+							editable="true"
+							datasources="rdf:null" flex="1"
+							ref="http://www.technikum-wien.at/dms/liste" 
+							oninput="ProjektdokumentMenulistDokumentLoad(this);"
+							oncommand=""
+							>
+						<template>
+						<menupopup>
+							<menuitem value="rdf:http://www.technikum-wien.at/dms/rdf#dms_id"
+				        		      label="rdf:http://www.technikum-wien.at/dms/rdf#name"
+							  		  uri="rdf:*"/>
+						</menupopup>
+						</template>
 					</menulist>
-      			</row>
-      			<row>
-					<label value="Verrechnungskonto" control="bankverbindung-textbox-verrechnung"/>
-   					<checkbox id="bankverbindung-checkbox-verrechnung" checked="true"/>
-      			</row>-->
 		</rows>
 	</grid>
 	<hbox>
 		<spacer flex="1" />
-		<button id="button-projekt-speichern" oncommand="saveProjekt()" label="Speichern" />
+		<button id="button-projektdokument-zuweisen" oncommand="saveZuordnung()" label="Zuweisen" />
 	</hbox>
 </groupbox>
 </vbox>
