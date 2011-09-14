@@ -64,10 +64,10 @@ echo '<?xml-stylesheet href="gantt.css" type="text/css"?>';
 		</vbox>
 		<vbox flex="1">
 			<spacer flex="2"/>
-			<svg-shape flex="1" id="svg-button" type="rect" radius="12" label="Box"/>
+			<svg-shape flex="1" id="svg-button" type="rect" radius="12" label="Projekt Lernquadrat"/>
 			<spacer flex="2"/>
 			<hbox flex="4">
-				<svg-shape flex="1" id="circ1" type="circle" label="1"/>
+				<svg-shape flex="1" id="phase1" type="rect" label="Analysephase"/>
 				<svg-shape flex="1" id="circ2" type="circle" label="2" />
 				<svg-shape flex="1" id="circ3" type="circle" label="3" />
 			</hbox>
