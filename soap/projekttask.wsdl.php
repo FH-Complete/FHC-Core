@@ -32,8 +32,46 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
     <wsdl:message name="DeleteProjekttaskResponse">
   		<wsdl:part name="message" type="xsd:string"></wsdl:part>
   	</wsdl:message>
- 
- <wsdl:portType name="ConfigPortType" >
+  	
+  	<wsdl:message name="SaveMantisRequest">
+		<wsdl:part name="mantis_id" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_summary" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_description" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_view_state_id" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_view_state_name" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_last_updated" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_project_id" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_project_name" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_category" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_priority_id" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_priority_name" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_severity_id" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_severity_name" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_status_id" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_status_name" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_reporter_name" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_reporter_real_name" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_reporter_email" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_reproducibility_id" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_reproducibility_name" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_date_submitted" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_sponsorship_total" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_projection_id" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_projection_name" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_eta_id" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_eta_name" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_resolution_id" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_resolution_name" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_due_date" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_steps_to_reproduce" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_additional_information" type="xsd:string"></wsdl:part>
+    </wsdl:message>
+    
+	<wsdl:message name="SaveMantisResponse">
+       <wsdl:part name="message" type="xsd:string"></wsdl:part>
+  	</wsdl:message>
+  	
+	<wsdl:portType name="ConfigPortType" >
        <wsdl:operation name="saveProjekttask">
            <wsdl:input message="tns:SaveProjekttaskRequest"></wsdl:input>
            <wsdl:output message="tns:SaveProjekttaskResponse"></wsdl:output>        
@@ -41,6 +79,10 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
        <wsdl:operation name="deleteProjekttask">
            <wsdl:input message="tns:DeleteProjekttaskRequest"></wsdl:input>
            <wsdl:output message="tns:DeleteProjekttaskResponse"></wsdl:output>        
+       </wsdl:operation>
+       <wsdl:operation name="saveMantis">
+           <wsdl:input message="tns:SaveMantisRequest"></wsdl:input>
+           <wsdl:output message="tns:SaveMantisResponse"></wsdl:output>        
        </wsdl:operation>
    </wsdl:portType>
 
@@ -57,6 +99,15 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
        </wsdl:operation> 
        <wsdl:operation name="deleteProjekttask">
            <soap:operation soapAction="<?php echo APP_ROOT."soap/deleteProjekttask";?>" />
+           <wsdl:input> 
+               <soap:body use="encoded" namespace="http://localhost/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+           </wsdl:input>
+           <wsdl:output>
+               <soap:body use="encoded" namespace="http://localhost/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+           </wsdl:output>
+       </wsdl:operation> 
+       <wsdl:operation name="saveMantis">
+           <soap:operation soapAction="<?php echo APP_ROOT."soap/saveMantis";?>" />
            <wsdl:input> 
                <soap:body use="encoded" namespace="http://localhost/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
            </wsdl:input>

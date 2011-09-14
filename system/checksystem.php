@@ -2753,6 +2753,21 @@ if(!$result = @$db->db_query("SELECT 1 FROM fue.tbl_ressource LIMIT 1;"))
 	else 
 		echo 'Projekt Ressoruce: Ressourcen hinzugefuegt!<br>';
 }
+
+//fue.tbl_projekt neue Spalte budget
+if(!$result = @$db->db_query("SELECT budget FROM fue.tbl_projekt LIMIT 1;"))
+{
+	$qry = "ALTER TABLE fue.tbl_projekt ADD COLUMN budget numeric(12,2);
+			ALTER TABLE fue.tbl_projekttask ADD COLUMN erledigt boolean DEFAULT false;
+			ALTER TABLE public.tbl_notiz ALTER COLUMN bearbeiter_uid DROP NOT NULL;
+			";
+			
+	if(!$db->db_query($qry))
+		echo '<strong>fue.tbl_projekt: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'fue.tbl_projekt: Spalte budget hinzugefuegt!<br>
+				fue.tbl_projekttask: Spalte erledigt hinzugefuegt!<br>';
+}
 echo '<br>';
 
 $tabellen=array(
@@ -2811,9 +2826,9 @@ $tabellen=array(
 	"campus.tbl_zeitsperretyp"  => array("zeitsperretyp_kurzbz","beschreibung","farbe"),
 	"campus.tbl_zeitwunsch"  => array("stunde","mitarbeiter_uid","tag","gewicht","updateamum","updatevon","insertamum","insertvon"),
 	"fue.tbl_aktivitaet"  => array("aktivitaet_kurzbz","beschreibung"),
-	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz"),
+	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz","budget"),
 	"fue.tbl_projektphase"  => array("projektphase_id","projekt_kurzbz","projektphase_fk","bezeichnung","beschreibung","start","ende","budget","insertamum","insertvon","updateamum","updatevon","personentage"),
-	"fue.tbl_projekttask"  => array("projekttask_id","projektphase_id","bezeichnung","beschreibung","aufwand","mantis_id","insertamum","insertvon","updateamum","updatevon","projekttask_fk"),
+	"fue.tbl_projekttask"  => array("projekttask_id","projektphase_id","bezeichnung","beschreibung","aufwand","mantis_id","insertamum","insertvon","updateamum","updatevon","projekttask_fk","erledigt"),
 	"fue.tbl_projekt_dokument"  => array("projekt_dokument_id","projektphase_id","projekt_kurzbz","dms_id"),
 	"fue.tbl_projekt_ressource"  => array("projekt_ressource_id","projekt_kurzbz","projektphase_id","ressource_id","funktion_kurzbz","beschreibung"),
 	"fue.tbl_ressource"  => array("ressource_id","student_uid","mitarbeiter_uid","betriebsmittel_id","firma_id","bezeichnung","beschreibung","insertamum","insertvon","updateamum","updatevon"),

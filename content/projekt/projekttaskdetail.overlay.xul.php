@@ -38,8 +38,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	<!-- *  Projekttaskdetail   * -->
 	<!-- ************************ -->
 	<vbox id="box-projekttask-detail" flex="1">
-		<description>Task Details</description>
-			
 		<grid id="grid-projekttask-detail" style="overflow:auto;margin:4px;" flex="1">
 		  	<columns  >
 				<column flex="1"/>
@@ -48,7 +46,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			<rows>
 				<row>
 					<label value="Task ID" control="textbox-projekttask-detail-projekttask_id "/>
-					<textbox id="textbox-projekttaskdetail-projekttask_id"/>
+					<textbox id="textbox-projekttaskdetail-projekttask_id" disabled="true"/>
 				</row>
 				<row>
 					<label value="Projektphase ID" control="textbox-projekttask-detail-projektphase_id"/>

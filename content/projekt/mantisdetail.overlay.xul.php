@@ -38,8 +38,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	<!-- *  Mantisdetail   * -->
 	<!-- ************************ -->
 	<vbox id="box-projekttask-mantis" flex="1">
-		<description>Issue</description>
-			
 		<grid id="grid-projekttask-mantis" style="overflow:auto;margin:4px;" flex="1">
 		  	<columns  >
 				<column flex="1"/>
@@ -50,15 +48,24 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			<rows>
 				<row>
 					<label value="Mantis ID" control="textbox-projekttask-mantis-mantis_id"/>
-					<textbox id="textbox-projekttask-mantis-mantis_id"/>
+					<textbox id="textbox-projekttask-mantis-mantis_id" disabled="true"/>
 					<label value="last_updated" control="textbox-projekttask-mantis-issue_last_updated"/>
    					<textbox id="textbox-projekttask-mantis-issue_last_updated"/>
 				</row>
 				<row>
 					<label value="Summary" control="textbox-projekttask-mantis-issue_summary"/>
-					<textbox id="textbox-projekttask-mantis-issue_summary"/>
+					<vbox>
+						<textbox id="textbox-projekttask-mantis-issue_summary"/>
+						<spacer />
+					</vbox>
 					<label value="Description" control="textbox-projekttask-mantis-issue_description"/>
-   					<textbox id="textbox-projekttask-mantis-issue_description"/>
+   					<textbox id="textbox-projekttask-mantis-issue_description" multiline="true"/>
+				</row>
+				<row>
+					<label value="Steps to Reproduce" control="textbox-projekttask-mantis-steps_to_reproduce"/>
+   					<textbox id="textbox-projekttask-mantis-issue_steps_to_reproduce" multiline="true"/>
+					<label value="Additional Information" control="textbox-projekttask-mantis-issue_additional_information"/>
+   					<textbox id="textbox-projekttask-mantis-issue_additional_information" multiline="true"/>
 				</row>
 				<row>
 					<label value="View_state_id" control="textbox-projekttask-mantis-issue_view_state_id"/>
@@ -138,20 +145,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<label value="Resolution_name" control="textbox-projekttask-mantis-issue_resolution_name"/>
    					<textbox id="textbox-projekttask-mantis-issue_resolution_name"/>
 				</row> 
-				<row>
-					<label value="Attachments" control="textbox-projekttask-mantis-issue_attachments"/>
-   					<textbox id="textbox-projekttask-mantis-issue_attachments"/>
-				</row>
-				
 			</rows>
 		</grid>
 		<hbox>
 			<spacer flex="1" />
 			<button id="button-projekttask-mantis-speichern" oncommand="saveProjekttaskMantis()" label="Speichern" />
 		</hbox>
-	</vbox>
-	
-	<vbox id="projekttask-mantis" flex="1">
-	<description>Mantis Details</description>
 	</vbox>
 </overlay>

@@ -23,8 +23,15 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
        <wsdl:part name="oe_kurzbz" type="xsd:string"></wsdl:part>
        <wsdl:part name="neu" type="xsd:boolean"></wsdl:part>
   	</wsdl:message>
-
- 	<wsdl:message name="SaveProjektResponse">
+  	<wsdl:message name="SaveProjektResponse">
+       <wsdl:part name="message" type="xsd:string"></wsdl:part>
+  	</wsdl:message>
+	<wsdl:message name="SaveProjektdokumentZuordnungRequest">
+       <wsdl:part name="projekt_kurzbz" type="xsd:string"></wsdl:part>
+       <wsdl:part name="projektphase_id" type="xsd:string"></wsdl:part>
+       <wsdl:part name="dms_id" type="xsd:string"></wsdl:part>
+  	</wsdl:message>
+ 	<wsdl:message name="SaveProjektdokumentZuordnungResponse">
        <wsdl:part name="message" type="xsd:string"></wsdl:part>
   	</wsdl:message>
    
@@ -33,12 +40,25 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
            <wsdl:input message="tns:SaveProjektRequest"></wsdl:input>
            <wsdl:output message="tns:SaveProjektResponse"></wsdl:output>        
        </wsdl:operation>
+       <wsdl:operation name="saveProjektdokumentZuordnung">
+           <wsdl:input message="tns:SaveProjektdokumentZuordnungRequest"></wsdl:input>
+           <wsdl:output message="tns:SaveProjektdokumentZuordnungResponse"></wsdl:output>        
+       </wsdl:operation>
    </wsdl:portType>
 
    <wsdl:binding name="ConfigBinding" type="tns:ConfigPortType">
        <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
        <wsdl:operation name="saveProjekt">
            <soap:operation soapAction="<?php echo APP_ROOT."soap/saveProjekt";?>" />
+           <wsdl:input> 
+               <soap:body use="encoded" namespace="http://localhost/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+           </wsdl:input>
+           <wsdl:output>
+               <soap:body use="encoded" namespace="http://localhost/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+           </wsdl:output>
+       </wsdl:operation> 
+       <wsdl:operation name="saveProjektdokumentZuordnung">
+           <soap:operation soapAction="<?php echo APP_ROOT."soap/saveProjektdokumentZuordnung";?>" />
            <wsdl:input> 
                <soap:body use="encoded" namespace="http://localhost/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
            </wsdl:input>

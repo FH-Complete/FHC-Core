@@ -28,9 +28,11 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/basis_db.class.php');
 require_once('../include/projekt.class.php');
 require_once('../include/datum.class.php');
+require_once('../include/dms.class.php');
 
 $SOAPServer = new SoapServer(APP_ROOT."/soap/projekt.wsdl.php?".microtime());
 $SOAPServer->addFunction("saveProjekt");
+$SOAPServer->addFunction("saveProjektdokumentZuordnung");
 $SOAPServer->handle();
 
 // WSDL Chache auf aus
@@ -68,6 +70,19 @@ function saveProjekt($projekt_kurzbz, $nummer, $titel, $beschreibung, $beginn, $
 		return $projekt->projekt_kurzbz;
 	else
 		return new SoapFault("Server", $projekt->errormsg);
+}
+
+/**
+ * Speichert die Zuordnung eines Dokuments zu einem Projekt oder einer Phase
+ */
+function saveProjektdokumentZuordnung($projekt_kurzbz, $projektphase_id, $dms_id)
+{
+	$dms = new dms();
+	
+	if($dms->saveProjektzuordnung($dms_id, $projekt_kurzbz, $projektphase_id))
+		return true;
+	else
+		return new SoapFault("Server", $dms->errormsg);
 }
 ?>
 

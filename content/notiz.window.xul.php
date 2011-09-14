@@ -89,6 +89,32 @@ var opener_id = '<?php echo (isset($_GET['opener_id'])?addslashes($_GET['opener_
       				<label value="Ende" control="notiz-box-ende"/>
 		      		<box class="Datum" id="notiz-box-ende"/>
 				</row>
+				<row>
+      				<label value="Erledigt" control="notiz-checkbox-erledigt"/>
+		      		<checkbox id="notiz-checkbox-erledigt"/>
+				</row>
+				<row>
+      				<label value="Bearbeiter" control="notiz-menulist-bearbeiter"/>
+		      		<menulist id="notiz-menulist-bearbeiter"
+										  editable="true"
+								          datasources="rdf:null" flex="1"
+								          ref="http://www.technikum-wien.at/mitarbeiter/liste" 
+								          oninput="NotizMenulistMitarbeiterLoad(this);"
+								          oncommand=""
+								         >
+						<template>
+						<menupopup>
+							<menuitem value="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"
+				        		      label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname ( rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid )"
+							  		  uri="rdf:*"/>
+						</menupopup>
+						</template>
+					</menulist>
+				</row>
+				<row>
+      				<label value="Verfasser" control="notiz-textbox-verfasser"/>
+		      		<textbox id="notiz-textbox-verfasser" disabled="true"/>
+				</row>
 			</rows>
 	</grid>
 	<hbox>

@@ -1,9 +1,5 @@
 @import url("chrome://global/skin/");
 
-label.kalenderwoche
-{
-	font-size: medium;
-}
 button
 {
 	font-size: x-small;
@@ -29,28 +25,6 @@ menupopup
 {
 	border: 1px solid black;
 }
-grid.lvaStundenplan
-{
-	font-size: x-small;
-}
-grid.lvaStundenplan button
-{
-	font-size: x-small;
-	border: 0px;
-  	border-top: 0px;
-  	border-bottom: 0px;
-  	border-left: 0px;
-  	border-right: 0px;
-  	border-top-width: 0px;
-  	border-bottom-width: 0px;
-  	border-left-width: 0px;
-  	border-right-width: 0px;
-  	padding-top: 0px;
-  	padding-bottom: 0px;
-  	padding-left: 0px;
-  	padding-right: 0px;
-}
-
 
 tree treecol {
 	background-color: #FFFFCC; 
@@ -60,10 +34,6 @@ tree treecol {
 tree {
 	font-size:9pt;
 	font-family:Arial;	
-}
-
-box.studentDetail {
-    -moz-binding: url('lehrveranstaltungbinding.xml.php#studentDetail');
 }
 
 label,textbox {
