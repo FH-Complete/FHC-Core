@@ -33,8 +33,11 @@ svg-shape:focus .svg-shape-circle {
 	stroke: white;
 }
 
-#circ1 .svg-shape-circle {
-	fill: yellow;
+#phase1 {
+	fill: magenta;
+	min-width: 48px;
+        min-height: 48px;
+        max-height: 48px;
 }
 
 #circ2 .svg-shape-circle {
