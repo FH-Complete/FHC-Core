@@ -979,6 +979,67 @@ $error_msg='';
 		flush();
 	}
 	
+	
+	// Mitarbeiter Sprachen Institut
+	$mlist_name='sprachen';
+
+	$grp = new gruppe();
+	if(!$grp->exists($mlist_name))
+	{
+		$grp->gruppe_kurzbz = $mlist_name;
+		$grp->studiengang_kz = '0';
+		$grp->bezeichnung = 'sprachen';
+		$grp->beschreibung = 'Mitarbeiter des Instituts Sprachen und Kulturwissenschaften';
+		$grp->semester = '0';
+		$grp->mailgrp = true;
+		$grp->sichtbar = true;
+		$grp->generiert = true;
+		$grp->aktiv = true;
+		$grp->lehre = true;
+		$grp->insertamum = date('Y-m-d H:i:s');
+		$grp->insertvon = 'mlists_generate';
+		
+		if(!$grp->save(true, false))
+			die('Fehler: '.$grp->errormsg);
+	}
+	else 
+	{
+		setGeneriert($mlist_name);
+	}
+	
+			
+	// Lektoren holen die nicht mehr in den Verteiler gehoeren
+	echo '<br>'.$mlist_name.' wird abgeglichen!';
+	flush();
+			
+	$sql_query = "SELECT distinct uid 
+					FROM 
+						public.tbl_benutzer 
+						JOIN public.tbl_benutzerfunktion USING(uid)
+						JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid)
+					WHERE oe_kurzbz in('Sprachen') 
+					AND tbl_benutzer.aktiv
+					AND (tbl_benutzerfunktion.datum_von<=now() OR tbl_benutzerfunktion.datum_von is null)
+					AND (tbl_benutzerfunktion.datum_bis>=now() OR tbl_benutzerfunktion.datum_bis is null)";
+			
+	$sql_querys="DELETE FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='$mlist_name' AND uid NOT IN ($sql_query)";
+	if(!$db->db_query($sql_querys))
+	{
+		$error_msg.=$db->db_last_error().' '.$sql_querys;
+	}
+			
+	$sql_query.=" AND uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='$mlist_name')";
+	if(!($result_oe = $db->db_query($sql_query)))
+		$error_msg.=$db->db_last_error().' '.$sql_query;
+	// Lektoren holen die nicht im Verteiler sind
+	while($row_oe = $db->db_fetch_object($result_oe))
+	{
+	   	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row_oe->uid','".$mlist_name."', now(), 'mlists_generate')";
+		if(!$db->db_query($sql_query))
+		{
+			$error_msg.=$db->db_last_error().$sql_query;
+		}
+	}
 	echo $error_msg;
 	?>
 	<BR>
