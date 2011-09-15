@@ -22,6 +22,9 @@
 require_once('../../config/cis.config.inc.php');
 require_once('../../include/news.class.php');
 require_once('../../include/content.class.php');
+
+header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
+header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>

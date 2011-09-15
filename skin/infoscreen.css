@@ -95,7 +95,17 @@ font.ContentHeader
 	background-color: #FCFCFC;
 	padding: 0px 10px 0px 10px;
 }
+/* Margin von ersten und letzten P tag entfernen, da sonst
+   breite Raender entstehen koenne*/
+#news .news .text p:first-child
+{
+	margin-top:0px;
 
+}
+#news .news .text p:last-child
+{
+	margin-bottom:0px;
+}
 /* Images */
 img
 {
