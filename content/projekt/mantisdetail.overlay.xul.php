@@ -50,100 +50,107 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<label value="Mantis ID" control="textbox-projekttask-mantis-mantis_id"/>
 					<textbox id="textbox-projekttask-mantis-mantis_id" disabled="true"/>
 					<label value="last_updated" control="textbox-projekttask-mantis-issue_last_updated"/>
-   					<textbox id="textbox-projekttask-mantis-issue_last_updated"/>
+   					<textbox id="textbox-projekttask-mantis-issue_last_updated" disabled="true"/>
 				</row>
 				<row>
-					<label value="Summary" control="textbox-projekttask-mantis-issue_summary"/>
-					<vbox>
-						<textbox id="textbox-projekttask-mantis-issue_summary"/>
-						<spacer />
-					</vbox>
-					<label value="Description" control="textbox-projekttask-mantis-issue_description"/>
-   					<textbox id="textbox-projekttask-mantis-issue_description" multiline="true"/>
-				</row>
-				<row>
-					<label value="Steps to Reproduce" control="textbox-projekttask-mantis-steps_to_reproduce"/>
-   					<textbox id="textbox-projekttask-mantis-issue_steps_to_reproduce" multiline="true"/>
-					<label value="Additional Information" control="textbox-projekttask-mantis-issue_additional_information"/>
-   					<textbox id="textbox-projekttask-mantis-issue_additional_information" multiline="true"/>
-				</row>
-				<row>
-					<label value="View_state_id" control="textbox-projekttask-mantis-issue_view_state_id"/>
-   					<textbox id="textbox-projekttask-mantis-issue_view_state_id"/>
-					<label value="View_state_name" control="textbox-projekttask-mantis-issue_view_state_name"/>
-   					<textbox id="textbox-projekttask-mantis-issue_view_state_name"/>
-				</row>
-				<row>
-					<label value="Project_id" control="textbox-projekttask-mantis-issue_project_id"/>
+					<label value="Projekt ID" control="textbox-projekttask-mantis-issue_project_id"/>
    					<textbox id="textbox-projekttask-mantis-issue_project_id"/>
-					<label value="Project_name" control="textbox-projekttask-mantis-issue_project_name"/>
-   					<textbox id="textbox-projekttask-mantis-issue_project_name"/>
+   					<label value="Projekt Name" control="textbox-projekttask-mantis-issue_project_name"/>
+   					<textbox id="textbox-projekttask-mantis-issue_project_name" disabled="true"/>
+				</row>
+				<row>
+					<label value="Zusammenfassung" control="textbox-projekttask-mantis-issue_summary"/>
+					<textbox id="textbox-projekttask-mantis-issue_summary"/>
+					<label value="Kategorie" control="textbox-projekttask-mantis-issue_category"/>
+   					<textbox id="textbox-projekttask-mantis-issue_category" disabled="true"/>
+									
+				</row>
+				<row>
+					<label value="Beschreibung" control="textbox-projekttask-mantis-issue_description"/>
+   					<textbox id="textbox-projekttask-mantis-issue_description" multiline="true"/>
+   					<label value="Status" control="textbox-projekttask-mantis-issue_status_name"/>
+   					<vbox>
+   						<textbox id="textbox-projekttask-mantis-issue_status_name" disabled="true"/>
+   						<spacer />
+   					</vbox>
+				</row>
+				<row>
+					<label value="Schritte zur Reproduktion" control="textbox-projekttask-mantis-steps_to_reproduce"/>
+   					<textbox id="textbox-projekttask-mantis-issue_steps_to_reproduce" multiline="true"/>
+   					<label value="Priorität" control="textbox-projekttask-mantis-issue_priority_name"/>
+   					<vbox>
+   						<textbox id="textbox-projekttask-mantis-issue_priority_name" disabled="true"/>
+   						<spacer />
+   					</vbox>
+				</row>
+				<row>
+					<label value="Zusätzliche Informationen" control="textbox-projekttask-mantis-issue_additional_information"/>
+   					<textbox id="textbox-projekttask-mantis-issue_additional_information" multiline="true"/>
 				</row> 		
 				<row>
-					<label value="Category" control="textbox-projekttask-mantis-issue_category"/>
-   					<textbox id="textbox-projekttask-mantis-issue_category"/>
+					<label value="View_state_id" control="textbox-projekttask-mantis-issue_view_state_id"/>
+   					<textbox id="textbox-projekttask-mantis-issue_view_state_id" disabled="true"/>
 					<label value="Due_date" control="textbox-projekttask-mantis-issue_due_date"/>
-   					<textbox id="textbox-projekttask-mantis-issue_due_date"/>
+   					<textbox id="textbox-projekttask-mantis-issue_due_date" disabled="true"/>
 				</row>
 				<row>
 					<label value="Priority_id" control="textbox-projekttask-mantis-issue_priority_id"/>
-   					<textbox id="textbox-projekttask-mantis-issue_priority_id"/>
-					<label value="Priority_name" control="textbox-projekttask-mantis-issue_priority_name"/>
-   					<textbox id="textbox-projekttask-mantis-issue_priority_name"/>
+   					<textbox id="textbox-projekttask-mantis-issue_priority_id" disabled="true"/>
+					
 				</row>
 				<row>
 					<label value="Severity_id" control="textbox-projekttask-mantis-issue_severity_id"/>
-   					<textbox id="textbox-projekttask-mantis-issue_severity_id"/>
+   					<textbox id="textbox-projekttask-mantis-issue_severity_id" disabled="true"/>
 					<label value="Severity_name" control="textbox-projekttask-mantis-issue_severity_name"/>
-   					<textbox id="textbox-projekttask-mantis-issue_severity_name"/>
+   					<textbox id="textbox-projekttask-mantis-issue_severity_name" disabled="true"/>
 				</row>
 				<row>
 					<label value="Status_id" control="textbox-projekttask-mantis-issue_status_id"/>
-   					<textbox id="textbox-projekttask-mantis-issue_status_id"/>
-					<label value="Status_name" control="textbox-projekttask-mantis-issue_status_name"/>
-   					<textbox id="textbox-projekttask-mantis-issue_status_name"/>
+   					<textbox id="textbox-projekttask-mantis-issue_status_id" disabled="true"/>
+					<label value="View_state_name" control="textbox-projekttask-mantis-issue_view_state_name"/>
+   					<textbox id="textbox-projekttask-mantis-issue_view_state_name" disabled="true"/>
 				</row>
 				<row>
 					<label value="Reporter_id" control="textbox-projekttask-mantis-issue_reporter_id"/>
-   					<textbox id="textbox-projekttask-mantis-issue_reporter_id"/>
+   					<textbox id="textbox-projekttask-mantis-issue_reporter_id" disabled="true"/>
 					<label value="Reporter_name" control="textbox-projekttask-mantis-issue_reporter_name"/>
-   					<textbox id="textbox-projekttask-mantis-issue_reporter_name"/>
+   					<textbox id="textbox-projekttask-mantis-issue_reporter_name" disabled="true"/>
 				</row>
 				<row>
 					<label value="Reporter_real_name" control="textbox-projekttask-mantis-issue_reporter_real_name"/>
-   					<textbox id="textbox-projekttask-mantis-issue_reporter_real_name"/>
+   					<textbox id="textbox-projekttask-mantis-issue_reporter_real_name" disabled="true"/>
 					<label value="Reporter_email" control="textbox-projekttask-mantis-issue_reporter_email"/>
-   					<textbox id="textbox-projekttask-mantis-issue_reporter_email"/>
+   					<textbox id="textbox-projekttask-mantis-issue_reporter_email" disabled="true"/>
 				</row>
 				<row>
 					<label value="Reproducibility_id" control="textbox-projekttask-mantis-issue_reproducibility_id"/>
-   					<textbox id="textbox-projekttask-mantis-issue_reproducibility_id"/>
+   					<textbox id="textbox-projekttask-mantis-issue_reproducibility_id" disabled="true"/>
 					<label value="Reproducibility_name" control="textbox-projekttask-mantis-issue_reproducibility_name"/>
-   					<textbox id="textbox-projekttask-mantis-issue_reproducibility_name"/>
+   					<textbox id="textbox-projekttask-mantis-issue_reproducibility_name" disabled="true"/>
 				</row> 
 				<row>
 					<label value="Date_submitted" control="textbox-projekttask-mantis-issue_date_submitted"/>
-   					<textbox id="textbox-projekttask-mantis-issue_date_submitted"/>
+   					<textbox id="textbox-projekttask-mantis-issue_date_submitted" disabled="true"/>
 					<label value="Sponsorship_total" control="textbox-projekttask-mantis-issue_sponsorship_total"/>
-   					<textbox id="textbox-projekttask-mantis-issue_sponsorship_total"/>
+   					<textbox id="textbox-projekttask-mantis-issue_sponsorship_total" disabled="true"/>
 				</row>
 				<row>
 					<label value="Projection_id" control="textbox-projekttask-mantis-issue_projection_id"/>
-   					<textbox id="textbox-projekttask-mantis-issue_projection_id"/>
+   					<textbox id="textbox-projekttask-mantis-issue_projection_id" disabled="true"/>
 					<label value="Projection_name" control="textbox-projekttask-mantis-issue_projection_name"/>
-   					<textbox id="textbox-projekttask-mantis-issue_projection_name"/>
+   					<textbox id="textbox-projekttask-mantis-issue_projection_name" disabled="true"/>
 				</row>
 				<row>
 					<label value="eta_id" control="textbox-projekttask-mantis-issue_eta_id"/>
-   					<textbox id="textbox-projekttask-mantis-issue_eta_id"/>
+   					<textbox id="textbox-projekttask-mantis-issue_eta_id" disabled="true"/>
 					<label value="eta_name" control="textbox-projekttask-mantis-issue_eta_name"/>
-   					<textbox id="textbox-projekttask-mantis-issue_eta_name"/>
+   					<textbox id="textbox-projekttask-mantis-issue_eta_name" disabled="true"/>
 				</row>
 				<row>
 					<label value="Resolution_id" control="textbox-projekttask-mantis-issue_resolution_id"/>
-   					<textbox id="textbox-projekttask-mantis-issue_resolution_id"/>
+   					<textbox id="textbox-projekttask-mantis-issue_resolution_id" disabled="true"/>
 					<label value="Resolution_name" control="textbox-projekttask-mantis-issue_resolution_name"/>
-   					<textbox id="textbox-projekttask-mantis-issue_resolution_name"/>
+   					<textbox id="textbox-projekttask-mantis-issue_resolution_name" disabled="true"/>
 				</row> 
 			</rows>
 		</grid>

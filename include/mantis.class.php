@@ -103,7 +103,16 @@ class mantis extends basis_db
 	 */
 	public function insertIssue()
 	{
-		$result = $this->soapClient->__soapCall('mc_version',array());
+		$issue = array('summary'=>$this->issue_summary,
+					'project'=>array('id'=>$this->issue_project->id),
+					'category'=>$this->issue_category,
+					'description'=>$this->issue_description,
+					'steps_to_reproduce'=>$this->issue_steps_to_reproduce,
+					'additional_information'=>$this->issue_additional_information,
+				);
+		
+		$params=array('username' => MANTIS_USERNAME, 'password' => MANTIS_PASSWORT, $issue);
+		$result = $this->soapClient->__soapCall('mc_issue_add',$params);
 		return $result;
 	}
 	
@@ -146,8 +155,8 @@ class mantis extends basis_db
 		$this->issue_description = $result->description;	
 		$this->issue_attachments = $result->attachments;	
 		$this->issue_due_date = $result->due_date;	
-		$this->issue_steps_to_reproduce = $result->steps_to_reproduce;
-		$this->issue_additional_information = $result->additional_information;
+		$this->issue_steps_to_reproduce = (isset($result->steps_to_reproduce)?$result->steps_to_reproduce:'');
+		$this->issue_additional_information = (isset($result->additional_information)?$result->additional_information:'');
 		
 		return true;
 	}
