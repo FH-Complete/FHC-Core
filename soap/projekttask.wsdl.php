@@ -34,6 +34,7 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
   	</wsdl:message>
   	
   	<wsdl:message name="SaveMantisRequest">
+  		<wsdl:part name="projekttask_id" type="xsd:string"></wsdl:part>
 		<wsdl:part name="mantis_id" type="xsd:string"></wsdl:part>
 		<wsdl:part name="issue_summary" type="xsd:string"></wsdl:part>
 		<wsdl:part name="issue_description" type="xsd:string"></wsdl:part>

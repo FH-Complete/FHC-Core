@@ -102,22 +102,54 @@ function deleteProjekttask($projekttask_id)
 		return new SoapFault("Server", $projekttask->errormsg);
 }
 
-function saveMantis($mantis_id, $issue_summary, $issue_description, $issue_view_state_id, $issue_view_state_name, $issue_last_udpated, $issue_project_id, $issue_projekt_name, $issue_category, $issue_priority_id, $issue_priority_name, $issue_severity_id, $issue_severity_name, $issue_status_id, $issue_status_name, $issue_reporter_name, $issue_reporter_real_name, $issue_reporter_email, $issue_reproducibility_id, $issue_reproducibility_name, $issue_date_submitted, $issue_sponsorship_total, $issue_projection_id, $issue_projection_name, $issue_eta_id, $issue_eta_name, $issue_resolution_id, $issue_resolution_name, $issue_due_date, $issue_steps_to_reproduce, $issue_additional_information)
+function saveMantis($projekttask_id, $mantis_id, $issue_summary, $issue_description, $issue_view_state_id, $issue_view_state_name, $issue_last_udpated, $issue_project_id, $issue_projekt_name, $issue_category, $issue_priority_id, $issue_priority_name, $issue_severity_id, $issue_severity_name, $issue_status_id, $issue_status_name, $issue_reporter_name, $issue_reporter_real_name, $issue_reporter_email, $issue_reproducibility_id, $issue_reproducibility_name, $issue_date_submitted, $issue_sponsorship_total, $issue_projection_id, $issue_projection_name, $issue_eta_id, $issue_eta_name, $issue_resolution_id, $issue_resolution_name, $issue_due_date, $issue_steps_to_reproduce, $issue_additional_information)
 {
 	$mantis = new mantis();
 	
-	$mantis->issue_id = $mantis_id;
-	$mantis->issue_summary = $issue_summary;
-	$mantis->issue_description = $issue_description;
-	$mantis->issue_project->id = $issue_project_id;
-	$mantis->issue_category = $issue_category;
-	$mantis->issue_steps_to_reproduce = $issue_steps_to_reproduce;
-	$mantis->issue_additional_information = $issue_additional_information;
-	
-	if($mantis->updateIssue())
-		return 'ok';
+	if($mantis_id!='')
+	{
+		//Update
+		
+		$mantis->issue_id = $mantis_id;
+		$mantis->issue_summary = $issue_summary;
+		$mantis->issue_description = $issue_description;
+		$mantis->issue_project->id = $issue_project_id;
+		$mantis->issue_category = $issue_category;
+		$mantis->issue_steps_to_reproduce = $issue_steps_to_reproduce;
+		$mantis->issue_additional_information = $issue_additional_information;
+		
+		if($mantis->updateIssue())
+			return 'ok';
+		else
+			return new SoapFault("Server", 'Fehler:'.$mantis->errormsg);	
+	}
 	else
-		return new SoapFault("Server", 'Fehler:'.$mantis->errormsg);	
+	{
+		//Neu
+		$mantis->issue_summary = $issue_summary;
+		$mantis->issue_description = $issue_description;
+		$mantis->issue_project->id = $issue_project_id;
+		$mantis->issue_steps_to_reproduce = $issue_steps_to_reproduce;
+		$mantis->issue_additional_information = $issue_additional_information;
+		$mantis->issue_category = $issue_category;
+		
+		if($id = $mantis->insertIssue())
+		{
+			$projekttask = new projekttask();
+			//Mantis ID zu Projekttask speichern 
+			if($projekttask->load($projekttask_id))
+			{
+				$projekttask->new=false;
+				$projekttask->mantis_id=$id;
+				if($projekttask->save())
+					return 'ok';
+				else
+					return new SoapFault("Server", 'Fehler:'.$projekttask->errormsg);		
+			}
+		}
+		else
+			return new SoapFault("Server", 'Fehler:'.$mantis->errormsg);
+	}
 }
 ?>
 
