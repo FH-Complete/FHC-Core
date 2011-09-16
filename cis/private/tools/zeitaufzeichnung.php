@@ -27,6 +27,9 @@
 	require_once('../../../include/fachbereich.class.php');
 	require_once('../../../include/zeitaufzeichnung.class.php');
 	require_once('../../../include/datum.class.php');
+	require_once('../../../include/datum.class.php');
+	require_once('../../../include/projekt.class.php');
+	
 	  if (!$db = new basis_db())
 	      die('Fehler beim Oeffnen der Datenbankverbindung');
 echo '
@@ -205,11 +208,12 @@ if(isset($_GET['type']) && $_GET['type']=='edit')
 }
 
 //Projekte holen fuer zu denen der Benutzer zugeteilt ist
-$qry_projekt = "SELECT distinct tbl_projekt.* FROM fue.tbl_projektbenutzer JOIN fue.tbl_projekt USING(projekt_kurzbz) WHERE beginn<=now() AND (ende>=now() OR ende is null) AND uid='$user'";
+$projekt = new projekt();
 
-if($result_projekt = $db->db_query($qry_projekt))
+
+if($projekt->getProjekteMitarbeiter($user))
 {
-	if($db->db_num_rows($result_projekt)>0)
+	if(count($projekt->result)>0)
 	{
 		$bn = new benutzer();
 		if(!$bn->load($user))
@@ -224,7 +228,7 @@ if($result_projekt = $db->db_query($qry_projekt))
 		echo '<table>';
 		//Projekt
 		echo '<tr><td>Projekt</td><td><SELECT name="projekt" id="projekt">';
-		while($row_projekt = $db->db_fetch_object($result_projekt))
+		foreach($projekt->result as $row_projekt)
 		{
 			if($projekt_kurzbz == $row_projekt->projekt_kurzbz)
 				$selected = 'selected';

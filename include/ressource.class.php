@@ -300,6 +300,5 @@ class ressource extends basis_db
 			return false;
 		}
 	}
-	
 }
 ?>
