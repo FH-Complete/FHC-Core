@@ -2712,6 +2712,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM fue.tbl_ressource LIMIT 1;"))
 	ALTER TABLE fue.tbl_ressource ALTER COLUMN ressource_id SET DEFAULT nextval('fue.seq_ressource_ressource_id');
 	
 	GRANT SELECT, UPDATE, INSERT, DELETE ON fue.tbl_ressource TO vilesci;
+	GRANT SELECT ON fue.tbl_ressource TO web;
 	GRANT SELECT, UPDATE ON SEQUENCE fue.seq_ressource_ressource_id TO web;
 	GRANT SELECT, UPDATE ON SEQUENCE fue.seq_ressource_ressource_id TO vilesci;
 	
@@ -2739,6 +2740,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM fue.tbl_ressource LIMIT 1;"))
 	ALTER TABLE fue.tbl_projekt_ressource ALTER COLUMN projekt_ressource_id SET DEFAULT nextval('fue.seq_projekt_ressource_projekt_ressource_id');
 	
 	GRANT SELECT, UPDATE, INSERT, DELETE ON fue.tbl_projekt_ressource TO vilesci;
+	GRANT SELECT ON fue.tbl_projekt_ressource TO web;
 	GRANT SELECT, UPDATE ON SEQUENCE fue.seq_projekt_ressource_projekt_ressource_id TO web;
 	GRANT SELECT, UPDATE ON SEQUENCE fue.seq_projekt_ressource_projekt_ressource_id TO vilesci;
 	

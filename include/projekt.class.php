@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2007 Technikum-Wien
+/* Copyright (C) 2011 FH Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,32 +15,33 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ * 			Andreas Österreicher <andreas.oesterreicher@technikum-wien.at>
  */
 /**
- * Klasse projektarbeit
- * @create 08-02-2007
+ * Klasse projekt
+ * 
+ * Verwaltet die Projekte
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class projekt extends basis_db
 {
 	public $new;       		// boolean
-	public $result = array(); 	// adresse Objekt
+	public $result = array(); 	// projekt Objekt
 
 	//Tabellenspalten
-	public $projekt_kurzbz;	//string
-	public $nummer;		//string
-	public $titel;			//string
-	public $beschreibung;		//string
-	public $beginn;		//date 	
-	public $ende;			//date 	
-	public $oe_kurzbz;		//string
-	public $ext_id;				// integer
-	public $insertamum;			// timestamp
-	public $insertvon;			// bigint
-	public $updateamum;			// timestamp
-	public $updatevon;			// bigint
+	public $projekt_kurzbz;	// string
+	public $nummer;			// string
+	public $titel;			// string
+	public $beschreibung;	// string
+	public $beginn;			// date 	
+	public $ende;			// date 	
+	public $oe_kurzbz;		// string
+	public $insertamum;		// timestamp
+	public $insertvon;		// string
+	public $updateamum;		// timestamp
+	public $updatevon;		// string
 
 
 	/**
@@ -56,15 +57,13 @@ class projekt extends basis_db
 	}
 
 	/**
-	 * Laedt die Projektarbeit mit der ID $projekt_kurzbz
-	 * @param  $projekt_kurzbz ID der zu ladenden Projektarbeit
+	 * Laedt die Projek mit der Kurzbezeichnung $projekt_kurzbz
+	 * @param  $projekt_kurzbz Kurzbz des Projekts
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	public function load($projekt_kurzbz)
 	{
-
-		
-		$qry = "SELECT * FROM fue.tbl_projekt WHERE projekt_kurzbz=".$this->addslashes($projekt_kurzbz);
+		$qry = "SELECT * FROM fue.tbl_projekt WHERE projekt_kurzbz='".addslashes($projekt_kurzbz)."'";
 		
 		if($this->db_query($qry))
 		{
@@ -94,15 +93,15 @@ class projekt extends basis_db
 	}
 
 	/**
-	 * Laedt die Projektarbeit mit der ID $projekt_kurzbz
-	 * @param  $projekt_kurzbz ID der zu ladenden Projektarbeit
+	 * Laedt die Projeke einer Organisationseinheit
+	 * @param  $projekt_kurzbz Kurzbezeichnung des Projekts
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getProjekte($oe=null,$uid=null)
+	public function getProjekte($oe=null)
 	{
 		$qry = 'SELECT * FROM fue.tbl_projekt';
 		if (!is_null($oe))
-			$qry.= " WHERE oe_kurzbz='$oe'";
+			$qry.= " WHERE oe_kurzbz='".addslashes($oe)."'";
 		$qry.= ' ORDER BY oe_kurzbz;';
 		//echo $qry;
 		if($this->db_query($qry))
@@ -185,7 +184,7 @@ class projekt extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 
-			$qry='BEGIN; INSERT INTO fue.tbl_projekt (projekt_kurzbz, nummer, titel,beschreibung, beginn, ende, oe_kurzbz) VALUES('.
+			$qry='INSERT INTO fue.tbl_projekt (projekt_kurzbz, nummer, titel,beschreibung, beginn, ende, oe_kurzbz) VALUES('.
 		     $this->addslashes($this->projekt_kurzbz).', '.
 		     $this->addslashes($this->nummer).', '.
 		     $this->addslashes($this->titel).', '.
@@ -210,10 +209,7 @@ class projekt extends basis_db
 		}
 		
 		if($this->db_query($qry))
-		{
-			if($new)
-				$this->db_query('COMMIT');
-			
+		{			
 			return true;
 		}
 		else
@@ -224,19 +220,14 @@ class projekt extends basis_db
 	}
 
 	/**
-	 * Loescht den Datenensatz mit der ID die uebergeben wird
-	 * @param $projekt_kurzbz ID die geloescht werden soll
+	 * Loescht den Datenensatz
+	 * @param $projekt_kurzbz Projekt das geloescht werden soll
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	public function delete($projekt_kurzbz)
 	{
-		if(!is_numeric($projekt_kurzbz))
-		{
-			$this->errormsg = 'Projektarbeit_id ist ungueltig';
-			return true;
-		}
-		
-		$qry = "DELETE FROM lehre.tbl_projektarbeit WHERE projekt_kurzbz='$projekt_kurzbz'";
+
+		$qry = "DELETE FROM lehre.tbl_projek WHERE projekt_kurzbz='".addslashes($projekt_kurzbz)."'";
 		
 		if($this->db_query($qry))
 		{
@@ -250,109 +241,42 @@ class projekt extends basis_db
 	}
 	
 	/**
-	 * Laedt alle Projektarbeiten eines Studenten
-	 * @param student_uid
-	 * @return true wenn ok, false wenn Fehler
+	 * Liefert die Projekte zu denen ein Mitarbeiter zugeordnet ist
+	 * @param $mitarbeiter_uid
 	 */
-	public function getProjektarbeit($student_uid)
-	{
-		$qry = "SELECT * FROM lehre.tbl_projektarbeit WHERE student_uid='".addslashes($student_uid)."'";
-		
-		if($this->db_query($qry))
-		{
-			while($row = $this->db_fetch_object())
-			{
-				$obj = new projektarbeit();
-				
-				$obj->projekt_kurzbz = $row->projekt_kurzbz;
-				$obj->projekttyp_kurzbz = $row->projekttyp_kurzbz;
-				$obj->titel = $row->titel;
-				$obj->titel_english = $row->titel_english;
-				$obj->lehreinheit_id = $row->lehreinheit_id;
-				$obj->student_uid = $row->student_uid;
-				$obj->firma_id = $row->firma_id;
-				$obj->note = $row->note;
-				$obj->punkte = $row->punkte;
-				$obj->beginn = $row->beginn;
-				$obj->ende = $row->ende;
-				$obj->faktor = $row->faktor;
-				$obj->freigegeben = ($row->freigegeben=='t'?true:false);
-				$obj->gesperrtbis = $row->gesperrtbis;
-				$obj->stundensatz = $row->stundensatz;
-				$obj->gesamtstunden = $row->gesamtstunden;
-				$obj->themenbereich = $row->themenbereich;
-				$obj->anmerkung = $row->anmerkung;
-				$obj->ext_id = $row->ext_id;
-				$obj->insertamum = $row->insertamum;
-				$obj->insertvon = $row->insertvon;
-				$obj->updateamum = $row->updateamum;
-				$obj->updatevon = $row->updatevon;
-				
-				$this->result[] = $obj;
-			}
-			return true;
-		}
-		else 
-		{
-			$this->errormsg = 'Fehler beim Laden der Daten';
-			return false;
-		}
-	}
-	
-	/**
-	 * Laedt alle Projektarbeiten eines Studienganges/Studiensemesters
-	 * @param studiengang_kz, studiensemester_kurzbz
-	 * @return true wenn ok, false wenn Fehler
-	 */
-	public function getProjektarbeitStudiensemester($studiengang_kz, $studiensemester_kurzbz)
+	function getProjekteMitarbeiter($mitarbeiter_uid)
 	{
 		$qry = "SELECT 
-					tbl_projektarbeit.* 
+					distinct tbl_projekt.* 
 				FROM 
-					lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung
-				WHERE 
-					tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
-					tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
-					tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."' AND
-					tbl_lehreinheit.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+					fue.tbl_ressource 
+					JOIN fue.tbl_projekt_ressource USING(ressource_id)
+					JOIN fue.tbl_projekt USING(projekt_kurzbz) 
+				WHERE (beginn<=now() or beginn is null) 
+				AND (ende>=now() OR ende is null) 
+				AND mitarbeiter_uid='".addslashes($mitarbeiter_uid)."'";
 		
-		if($this->db_query($qry))
+		if($result = $this->db_query($qry))
 		{
-			while($row = $this->db_fetch_object())
+			while($row = $this->db_fetch_object($result))
 			{
-				$obj = new projektarbeit();
-				
+				$obj = new projekt();
+									
 				$obj->projekt_kurzbz = $row->projekt_kurzbz;
-				$obj->projekttyp_kurzbz = $row->projekttyp_kurzbz;
+				$obj->nummer = $row->nummer;
 				$obj->titel = $row->titel;
-				$obj->titel_english = $row->titel_english;
-				$obj->lehreinheit_id = $row->lehreinheit_id;
-				$obj->student_uid = $row->student_uid;
-				$obj->firma_id = $row->firma_id;
-				$obj->note = $row->note;
-				$obj->punkte = $row->punkte;
+				$obj->beschreibung = $row->beschreibung;
 				$obj->beginn = $row->beginn;
 				$obj->ende = $row->ende;
-				$obj->faktor = $row->faktor;
-				$obj->freigegeben = ($row->freigegeben=='t'?true:false);
-				$obj->gesperrtbis = $row->gesperrtbis;
-				$obj->stundensatz = $row->stundensatz;
-				$obj->gesamtstunden = $row->gesamtstunden;
-				$obj->themenbereich = $row->themenbereich;
-				$obj->anmerkung = $row->anmerkung;
-				$obj->ext_id = $row->ext_id;
-				$obj->insertamum = $row->insertamum;
-				$obj->insertvon = $row->insertvon;
-				$obj->updateamum = $row->updateamum;
-				$obj->updatevon = $row->updatevon;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
 				
 				$this->result[] = $obj;
 			}
 			return true;
 		}
-		else 
+		else
 		{
-			$this->errormsg = 'Fehler beim Laden der Daten';
+			$this->erromsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
