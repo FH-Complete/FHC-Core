@@ -213,7 +213,7 @@ if(isset($_POST['updateliste']))
 		<title>Inventar - Inventur</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-		<link rel="stylesheet" href="../../include/js/jquery.css" type="text/css">
+		<link rel="stylesheet" href="../../skin/jquery.css" type="text/css">
 		<script src="../../include/js/jquery.js" type="text/javascript"></script>
 		<script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script>	
 		<script type="text/javascript">
@@ -382,7 +382,7 @@ elseif($work=='uebersicht')
 {
 	echo '<hr>Die folgenden Betriebsmittel wurden in den letzten 20 Wochen nicht inventarisiert und sind zugeordnet:<br /><br />';
 	
-	$qry = "SELECT * FROM wawi.tbl_betriebsmittel 
+	$qry = "SELECT * FROM wawi.tbl_betriebsmittel LEFT JOIN wawi.tbl_bestellung USING(bestellung_id)
 			WHERE 
 				(inventuramum is null OR inventuramum < now()-'20 weeks'::interval)";
 	if($ort_kurzbz!='')
@@ -420,6 +420,7 @@ elseif($work=='uebersicht')
 				<th>Beschreibung</th>
 				<th>Verwendung</th>
 				<th>Typ</th>
+				<th>Bestellnr</th>
 				<th colspan="2">Inventur</th>
 			 </tr>';
 		$i=0;
@@ -432,6 +433,7 @@ elseif($work=='uebersicht')
 			echo '<td>',$row->beschreibung,'</td>';
 			echo '<td>',$row->verwendung,'</td>';
 			echo '<td>',$row->betriebsmitteltyp,'</td>';
+			echo '<td>',$row->bestell_nr,'</td>';
 			echo '<td>',$row->inventuramum,'</td>';
 			echo '<td>',$row->inventurvon,'</td>';
 			echo '</tr>';
