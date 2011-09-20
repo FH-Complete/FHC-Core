@@ -138,10 +138,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektdetail.overlay.xul.
 				</tabs>
 				<tabpanels id="tabpanels-projekt-main" flex="1">
 					<vbox id="box-projekt-detail" />
-					<vbox id="box-projekt-ressource" />
+					<box class="Ressource" id="box-projekt-ressourcen"/>
 					<box class="Notiz" id="box-projekt-notizen"/>
 				</tabpanels>
 			</tabbox>
 		</vbox>
-	</vbox>
+	</vbox>	
 </overlay>
