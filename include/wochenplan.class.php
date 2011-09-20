@@ -746,7 +746,7 @@ class wochenplan extends basis_db
 			if($rechte->isBerechtigt('lehre/reservierung', null, 'sui'))
 			{
 				//Lektor
-				echo '<td>Lektor</td>
+				echo '<td>'.$p->t('lvplan/lektor').':</td>
 					  <td><SELECT name="user_uid">'.$this->crlf;
 				
 				$qry = "SELECT uid, kurzbz FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid) 
@@ -774,7 +774,7 @@ class wochenplan extends basis_db
 				$stg->loadArray($rechte->getStgKz('lehre/reservierung'),'typ, kurzbz',true);
 				
 				//Studiengang
-				echo '<td>'.$p->t('global/studiengang').'</td><td> <SELECT name="studiengang_kz">'.$this->crlf;
+				echo '<td>'.$p->t('global/studiengang').':</td><td> <SELECT name="studiengang_kz">'.$this->crlf;
 				echo '<OPTION value="0">*</OPTION>'.$this->crlf;
 				foreach($stg->result as $row)
 				{
@@ -783,7 +783,7 @@ class wochenplan extends basis_db
 				echo '</SELECT></td>';
 				
 				//Semester
-				echo '<td>'.$p->t('global/semester').' </td>
+				echo '<td>'.$p->t('global/semester').':</td>
 					<td>
 					<SELECT name="semester" />
 						<OPTION value="">*</OPTION>
@@ -800,7 +800,7 @@ class wochenplan extends basis_db
 					'.$this->crlf;
 				
 				//Verband
-				echo '<td>'.$p->t('global/verband').'</td>
+				echo '<td>'.$p->t('global/verband').':</td>
 					<td>
 					<SELECT name="verband" />
 						<OPTION value="">*</OPTION>
@@ -814,7 +814,7 @@ class wochenplan extends basis_db
 					</td>'.$this->crlf;
 				
 				//Gruppe
-				echo '<td>'.$p->t('global/gruppe').'</td>
+				echo '<td>'.$p->t('global/gruppe').':</td>
 					<td>
 					<SELECT name="gruppe" />
 						<OPTION value="">*</OPTION>
@@ -826,7 +826,7 @@ class wochenplan extends basis_db
 					</td>'.$this->crlf;
 				
 				//Spezialgruppe
-				echo '<td>'.$p->t('lvplan/spezialgruppe').'</td><td><SELECT name="gruppe_kurzbz">'.$this->crlf;
+				echo '<td>'.$p->t('lvplan/spezialgruppe').':</td><td><SELECT name="gruppe_kurzbz">'.$this->crlf;
 				echo '<OPTION value="">*</OPTION>'.$this->crlf;
 				
 				//Spezialgruppen aus den Studiengaengen mit erweiterten Reservierungsberechtigung holen
