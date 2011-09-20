@@ -155,9 +155,15 @@ function onselectProjekt()
     document.getElementById('textbox-projekt-detail-ende').value=ende;
     document.getElementById('checkbox-projekt-detail-neu').checked=false;
     
+    
     //Notizen zu einem Projekt Laden
 	notiz = document.getElementById('box-projekt-notizen');
 	notiz.LoadNotizTree(projekt_kurzbz,'','','','','','', '');
+	
+	ressource = document.getElementById('box-projekt-ressourcen');
+	ressource.LoadRessourceTree(projekt_kurzbz,'');
+	
+
 }
 // ****
 // * Speichert die Details
@@ -183,7 +189,6 @@ function saveProjektDetail()
 	soapBody.appendChild(new SOAPObject("nummer")).val(nummer);
 	soapBody.appendChild(new SOAPObject("beginn")).val(beginn);
 	soapBody.appendChild(new SOAPObject("ende")).val(ende);
-	
 	if(neu)
 		soapBody.appendChild(new SOAPObject("neu")).val('true');
 	else	
@@ -220,6 +225,7 @@ function clb_saveProjekt(respObj)
 // ****
 function ProjektTreeSelectProjekt()
 {
+
 	var tree=document.getElementById('tree-projekt');
 	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
 
