@@ -96,7 +96,7 @@ function draw_caption($name)
 		echo '
 	<RDF:Description about="'.$rdf_url.$name.'" >
     	<RESSOURCE:ressource_id></RESSOURCE:ressource_id>
-		<RESSOURCE:bezeichnung></RESSOURCE:bezeichnung>
+		<RESSOURCE:bezeichnung><![CDATA['.ucfirst($name).']]></RESSOURCE:bezeichnung>
 		<RESSOURCE:typ><![CDATA['.ucfirst($name).']]></RESSOURCE:typ>
 		<RESSOURCE:beschreibung></RESSOURCE:beschreibung>
 		<RESSOURCE:mitarbeiter_uid></RESSOURCE:mitarbeiter_uid>
@@ -107,7 +107,7 @@ function draw_caption($name)
 		<RESSOURCE:insertvon></RESSOURCE:insertvon>
 		<RESSOURCE:updateamum></RESSOURCE:updateamum>
 		<RESSOURCE:updatevon></RESSOURCE:updatevon>
-		<RESSOURCE:rdf_description><![CDATA['.ucfirst($name).']]></RESSOURCE:rdf_description>
+		<RESSOURCE:rdf_description></RESSOURCE:rdf_description>
   	</RDF:Description>
   	';
 }
