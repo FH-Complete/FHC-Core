@@ -138,7 +138,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektphasedetail.overlay
 				</tabs>
 				<tabpanels id="projektphase-tabpanels-main" flex="1">
 					<vbox id="projektphase-detail" />
-					<vbox id="projektphase-ressource" />
+					<box class="Ressource" id="box-projekt-ressource-phase"/>
 					<box class="Notiz" id="box-projektphase-notizen"/>
 				</tabpanels>
 			</tabbox>
