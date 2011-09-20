@@ -157,7 +157,7 @@ function ProjektDokumentNeu()
 	var projekt_phase_id=getTreeCellText(tree, "treecol-projektmenue-projekt_phase_id", tree.currentIndex);
 
 	if(projekt_phase_id!='')
-		var url = '<?php echo APP_ROOT;?>cms/tinymce_dms.php?kategorie_kurzbz=Projekt&openupload=true&projekt_phase_id='+projekt_phase_id;
+		var url = '<?php echo APP_ROOT;?>cms/tinymce_dms.php?kategorie_kurzbz=Projekt&openupload=true&projektphase_id='+projekt_phase_id;
 	else if(projekt_kurzbz!='')
 		var url = '<?php echo APP_ROOT;?>cms/tinymce_dms.php?kategorie_kurzbz=Projekt&openupload=true&projekt_kurzbz='+projekt_kurzbz;
 	else
