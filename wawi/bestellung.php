@@ -2145,7 +2145,7 @@ if($_GET['method']=='update')
 	if($status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt') && $bestellung->freigegeben == 'f')
 		echo "<td><input type='submit' value='Erneut Abschicken' id='btn_erneut_abschicken' name='btn_erneut_abschicken' class='cursor'></td>"; 
 	echo"<td style='width:100%' align='right'>";
-	echo "<div ><a href ='pdfExport.php?xml=bestellung.rdf.php&xsl_oe_kurzbz=$kostenstelle->oe_kurzbz&xsl=Bestellung&id=$bestellung->bestellung_id'>Bestellschein generieren <img src='../skin/images/pdf.ico'></a></div>"; 
+	echo "<div ><a href ='pdfExport.php?xml=bestelldetail.rdf.php&xsl_oe_kurzbz=$kostenstelle->oe_kurzbz&xsl=Bestellung&id=$bestellung->bestellung_id'>Bestellschein generieren <img src='../skin/images/pdf.ico'></a></div>"; 
 	echo "</td></tr></table><br>";
 	if($disabled!='')
 	{
