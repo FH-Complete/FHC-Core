@@ -137,6 +137,9 @@ function onselectTreeProjektphase()
     //Notizen zu einer Phase Laden
 	notiz = document.getElementById('box-projektphase-notizen');
 	notiz.LoadNotizTree('',projektphase_id,'','','','','', '');
+	
+	ressource = document.getElementById('box-projekt-ressource-phase');
+	ressource.LoadRessourceTree('',projektphase_id);
 }
 // ****
 // * Asynchroner (Nicht blockierender) Refresh des Trees
