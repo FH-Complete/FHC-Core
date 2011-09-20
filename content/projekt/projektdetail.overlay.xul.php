@@ -84,8 +84,5 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			<button id="button-projekt-detail-speichern" oncommand="saveProjektDetail()" label="Speichern" />
 		</hbox>
 	</vbox>
-	
-	<vbox id="box-projekt-ressource" flex="1">
-	<description>Ressourcen</description>
-	</vbox>
+
 </overlay>
