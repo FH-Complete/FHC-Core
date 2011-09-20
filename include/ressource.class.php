@@ -188,7 +188,7 @@ class ressource extends basis_db
 	public function getPhaseRessourcen($projektphase_id)
 	{
 		$qry = "SELECT ressource.* FROM fue.tbl_ressource as ressource
-		JOIN fue.tbl_projekt_ressource project ON(projectressource_id = ressource.ressource_id) 
+		JOIN fue.tbl_projekt_ressource project ON(project.ressource_id = ressource.ressource_id) 
 		WHERE project.projektphase_id ='".addslashes($projektphase_id)."';";
 		
 		$this->result=array();
