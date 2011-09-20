@@ -19,7 +19,7 @@
  */
 
 require_once('../../config/vilesci.config.inc.php');
-
+die('// fuehrt zu Konflikten');
 ?>
 // *********** Globale Variablen *****************//
 var ProjektSelectKurzbz=null; //Kurzbz des Projekt Eintrages der nach dem Refresh markiert werden soll

@@ -2636,7 +2636,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM campus.tbl_dms_version LIMIT 1;"))
 
 	ALTER TABLE campus.tbl_dms_version ALTER COLUMN dms_id DROP DEFAULT;
 
-	INSERT INTO campus.tbl_dms(dms_id, oe_kurzbz, dokument_kurzbz, kategorie_kurzbz) SELECT distinct dms_id, oe_kurzbz, dokument_kurzbz, kategorie_kurzbz FROM campus.tbl_dms_version; 
+	INSERT INTO campus.tbl_dms(dms_id, oe_kurzbz, dokument_kurzbz, kategorie_kurzbz) SELECT distinct on(dms_id)  dms_id, oe_kurzbz, dokument_kurzbz, kategorie_kurzbz FROM campus.tbl_dms_version; 
 	
 	ALTER TABLE campus.tbl_dms_version ADD CONSTRAINT fk_dms_version_dms_id FOREIGN KEY (dms_id) REFERENCES campus.tbl_dms (dms_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 	ALTER TABLE campus.tbl_dms_version DROP COLUMN oe_kurzbz;
