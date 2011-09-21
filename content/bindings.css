@@ -26,3 +26,8 @@ box.Notiz
 {
 	-moz-binding: url('notiz.xml.php#Notiz');
 }
+
+box.Ressource
+{
+	-moz-binding: url('projekt/ressource.xml.php#Ressource');
+}
