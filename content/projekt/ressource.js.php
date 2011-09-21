@@ -622,14 +622,33 @@ var ressourceDDObserver=
   	},
   	onDrop: function (evt,dropdata,session)
   	{
-	    debug('Ressource onDrop'+dropdata);
+
   	},
   	onDragStart: function (evt,transferData,action)
 	{
-		debug('Ressource DragStart');
-		
-		paramList='1';
-		transferData.data=new TransferData();
-		transferData.data.addDataForFlavour("application/fhc-ressource",paramList);
+			
+		var tree = document.getElementById('tree-ressourcemenue')
+	    var row = { }
+	    var col = { }
+	    var child = { }
+
+	    //Index der Quell-Row ermitteln
+	    tree.treeBoxObject.getCellAt(evt.pageX, evt.pageY, row, col, child)
+
+	    //Beim Scrollen soll kein DnD gemacht werden
+	    if(col.value==null)
+	    	return false;
+
+	    //Daten ermitteln
+	    col = tree.columns ? tree.columns["treecol-ressourcemenue-ressource_id"] : "treecol-ressourcemenue-ressource_id";
+		id=tree.view.getCellText(row.value,col);
+		if(id!='')
+		{
+			paramList=id;
+			transferData.data=new TransferData();
+			transferData.data.addDataForFlavour("application/fhc-ressource",paramList);
+		}
+		else
+			return false;
   	}
 };
