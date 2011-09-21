@@ -81,7 +81,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			  	},
 			  	onDrop: function (evt,dropdata,session)
 			  	{
-				    debug('Ressource onDrop'+dropdata);
 			  	},
 			  	onDragStart: function (evt,transferData,action)
 				{
@@ -128,7 +127,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			  	},
 			  	onDrop: function (evt,dropdata,session)
 			  	{
-				    debug('Ressource onDrop'+dropdata);
 			  	},
 			  	onDragStart: function (evt,transferData,action)
 				{
@@ -246,7 +244,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					{
 						var datasource="<?php echo APP_ROOT; ?>rdf/ressource.rdf.php?ts="+gettimestamp();
 						datasource = datasource+"&projekt_kurzbz="+encodeURIComponent(projekt_kurzbz);
-					}else if(projektphase_id!='')
+					}
+					else if(projektphase_id!='')
 					{
 						var datasource="<?php echo APP_ROOT; ?>rdf/ressource.rdf.php?ts="+gettimestamp();
 						datasource = datasource+"&projekt_phase="+encodeURIComponent(projektphase_id);
@@ -269,7 +268,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 	                tree.database.AddDataSource(this.TreeRessourceDatasource);
 	                
 	                this.TreeRessourceDatasource.addXMLSinkObserver({
-	                  notiz: this,
+	                  ressource: this,
 					  onBeginLoad: function(aSink)
 					    {},
 					
@@ -285,7 +284,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					    
 					      //aSink.removeXMLSinkObserver(this);
 					      //debug('onEndLoad start Rebuild');
-					      var tree = document.getAnonymousElementByAttribute(this.notiz ,'anonid', 'tree-ressource');
+					      var tree = document.getAnonymousElementByAttribute(this.ressource ,'anonid', 'tree-ressource');
 						  tree.builder.rebuild();
 					    },
 					
@@ -293,19 +292,26 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					    { alert("error! " + aErrorMsg); }
 					});
 	                tree.builder.addListener({
+	                	ressource: this,
 						willRebuild : function(builder)
 						{
 						},
 						didRebuild : function(builder)
 					  	{
-					  		//debug("didrebuild");
-					  		//builder.removeListener(this);
+					  		//Nach dem Laden alle Subtrees aufklappen
+					  		var tree = document.getAnonymousElementByAttribute(this.ressource ,'anonid', 'tree-ressource');
+					  		var treeView = tree.treeBoxObject.view;
+							for (var i = 0; i < treeView.rowCount; i++) 
+							{
+								if (treeView.isContainer(i) && !treeView.isContainerOpen(i))
+								treeView.toggleOpenState(i);
+							}
 						}
 					});
 				}
 				catch(e)
 				{
-					debug("Notiz load failed with exception: "+e);
+					debug("Ressource load failed with exception: "+e);
 				}
 			]]>
 			</body>
@@ -320,8 +326,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				{
 					var projekt_kurzbz = this.getAttribute('projekt_kurzbz');
 					var projektphase_id = this.getAttribute('projektphase_id');
-					debug(projekt_kurzbz);
-					debug(id); 
+					//debug(projekt_kurzbz);
+					//debug(id); 
 					
 					var soapBody = new SOAPObject("saveProjektRessource");
 				    soapBody.appendChild(new SOAPObject("projekt_ressource_id")).val('');
@@ -341,27 +347,32 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
 				    var sr = new SOAPRequest("saveProjektRessource",soapBody);
 				    SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/ressource_projekt.soap.php?"+gettimestamp();
-				    SOAPClient.SendRequest(sr,
-				    function(respObj)
-					{
-						try
-							{
-								var id = respObj.Body[0].saveProjektRessourceResponse[0].message[0].Text;
-							}
-							catch(e)
-							{
-								var fehler = respObj.Body[0].Fault[0].faultstring[0].Text;
-								alert('Fehler: '+fehler);
-								return;
-							}
+				    
+				    function mycallb(obj) {
+					  var me=obj;
+					  this.invoke=function (respObj) {
+					    try
+						{
+							var id = respObj.Body[0].saveProjektRessourceResponse[0].message[0].Text;
+						}
+						catch(e)
+						{
+							var fehler = respObj.Body[0].Fault[0].faultstring[0].Text;
+							alert('Fehler: '+fehler);
+							return;
+						}
+						me.RefreshRessource();
+					  }
 					}
-					);
+					 
+					var cb=new mycallb(this);
+				    
+				    SOAPClient.SendRequest(sr,cb.invoke);
 
-					window.setTimeout(function(){this.RefreshRessource},2000);
 				}
 				catch(e)
 				{
-					debug("Notiz load failed with exception: "+e);
+					debug("Ressource load failed with exception: "+e);
 				}
 				
 
