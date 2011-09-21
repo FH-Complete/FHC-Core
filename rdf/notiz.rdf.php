@@ -52,8 +52,9 @@ $person_id=(isset($_GET['person_id'])?$_GET['person_id']:null);
 $prestudent_id=(isset($_GET['prestudent_id'])?$_GET['prestudent_id']:null);
 $bestellung_id=(isset($_GET['bestellung_id'])?$_GET['bestellung_id']:null);
 $datum_obj = new datum();
+$user=(isset($_GET['user'])?$_GET['user']:null);
 
-if(!$notiz->getNotiz($erledigt, $projekt_kurzbz, $projektphase_id, $projekttask_id, $uid, $person_id, $prestudent_id, $bestellung_id))
+if(!$notiz->getNotiz($erledigt, $projekt_kurzbz, $projektphase_id, $projekttask_id, $uid, $person_id, $prestudent_id, $bestellung_id, $user))
 	die($notiz->errormsg);
 
 foreach($notiz->result as $row)
