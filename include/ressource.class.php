@@ -37,6 +37,12 @@ class ressource extends basis_db
 	public $insertvon;	    	//string
 	public $updateamum;	    	//timestamp
 	public $updatevon;	    	//string
+	
+	// zwischentabelle projekt_ressource
+	public $projekt_ressource_id;
+	public $projektphase_id;
+	public $projekt_kurzbz;
+	public $funktion_kurzbz;
 
 
 	/**
@@ -222,7 +228,78 @@ class ressource extends basis_db
 		}
 	}
 	
-	
+	/**
+	 * Speichert den aktuellen Datensatz in die Datenbank
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der ID in $projekt_kurzbz aktualisiert
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function saveProjektRessource($new=null)
+	{		
+		if($new==null)
+			$new = $this->new;
+			
+		if($new)
+		{
+			//Neuen Datensatz einfuegen
+			$qry='BEGIN; INSERT INTO fue.tbl_projekt_ressource (projektphase_id, projekt_kurzbz, 
+				ressource_id, funktion_kurzbz, beschreibung) VALUES ('.
+			     $this->addslashes($this->projektphase_id).', '.
+				 $this->addslashes($this->projekt_kurzbz).', '.
+			     $this->addslashes($this->ressource_id).', '.
+			     $this->addslashes($this->funktion_kurzbz).', '.
+			     $this->addslashes($this->beschreibung).'); ';
+		}
+		else
+		{
+			//Updaten des bestehenden Datensatzes
+			$qry='UPDATE fue.tbl_projekt_ressource SET '.
+				'projektphase_id='.$this->addslashes($this->projektphase_id).', '.
+				'projekt_kurzbz='.$this->addslashes($this->projekt_kurzbz).', '.
+				'ressource_id='.$this->addslashes($this->ressource_id).', '.
+				'funktion_kurzbz='.$this->addslashes($this->funktion_kurzbz).', '.
+				'beschreibung='.$this->addslashes($this->beschreibung).' '.
+				'WHERE projekt_ressource_id='.$this->addslashes($this->projekt_ressource_id).';';
+		}
+		
+		if($this->db_query($qry))
+		{
+			if($new)
+			{
+				//Sequence auslesen
+				$qry = "SELECT currval('fue.seq_projekt_ressource_projekt_ressource_id') as id;";
+				if($this->db_query($qry))
+				{
+					if($row = $this->db_fetch_object())
+					{
+						$this->projekt_ressource_id = $row->id;
+						$this->db_query('COMMIT');
+						return true;
+					}
+					else 
+					{
+						$this->errormsg = 'Fehler beim Auslesen der Sequence';
+						$this->db_query('ROLLBACK;');
+						return false;
+					}
+				}
+				else 
+				{
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
+					$this->db_query('ROLLBACK;');
+					return false;
+				}
+			}
+					
+			return true;
+		}
+		else
+		{
+			$this->errormsg = $qry;
+			return false;
+		}
+	}	
+
 	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -297,6 +374,48 @@ class ressource extends basis_db
 		else
 		{
 			$this->errormsg = $qry;
+			return false;
+		}
+	}
+	
+	
+	/**
+	 * Laedt die Ressource mit der ID $ressource_id
+	 * @param  $ressource_id ID der zu ladenden Ressource
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function loadProjektRessource($projekt_ressource_id)
+	{
+		if(!is_numeric($projekt_ressource_id))
+		{
+			$this->errormsg = 'Ressource_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM fue.tbl_projekt_ressource WHERE projekt_ressource_id='".addslashes($projekt_ressource_id)."'";
+		
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->projekt_ressource_id = $row->projekt_ressource_id;
+				$this->projektphase_id = $row->projektphase_id;
+				$this->projekt_kurzbz = $row->projekt_kurzbz;
+				$this->ressource_id = $row->ressource_id;
+				$this->funktion_kurzbz = $row->funktion_kurzbz;
+				$this->beschreibung = $row->beschreibung;
+
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = 'Datensatz wurde nicht gefunden';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
