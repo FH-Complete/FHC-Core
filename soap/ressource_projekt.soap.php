@@ -39,13 +39,13 @@ ini_set("soap.wsdl_cache_enabled", "0");
 /**
  * 
  * Speichert in der Zwischentabelle Ressource - Projekt
- * @param unknown_type $projekt_ressource_id
- * @param unknown_type $projektphase_id
- * @param unknown_type $projekt_kurzbz
- * @param unknown_type $ressource_id
- * @param unknown_type $funktion_kurzbz
- * @param unknown_type $beschreibung
- * @param unknown_type $user
+ * @param $projekt_ressource_id
+ * @param $projektphase_id
+ * @param $projekt_kurzbz
+ * @param $ressource_id
+ * @param $funktion_kurzbz
+ * @param $beschreibung
+ * @param $user
  */
 
 function saveProjektRessource($projekt_ressource_id, $projektphase_id, $projekt_kurzbz, $ressource_id, $funktion_kurzbz, $beschreibung)
@@ -69,7 +69,7 @@ function saveProjektRessource($projekt_ressource_id, $projektphase_id, $projekt_
 
 	
 	if($ressource->saveProjektRessource())
-		return $ressource->errormsg; 
+		return $ressource->projekt_ressource_id; 
 	else
 		return new SoapFault("Server", $ressource->errormsg);
 }
