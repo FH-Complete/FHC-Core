@@ -735,11 +735,11 @@ class mitarbeiter extends benutzer
 
 	/**
 	 * Laedt die Mitarbeiter deren
-	 * Nachname mit $filter beginnt
+	 * Nachname oder uid mit $filter beginnt
 	 */
 	public function getMitarbeiterFilter($filter)
 	{
-		$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE nachname ~* '".addslashes($filter).".*'"; 
+		$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE nachname ~* '".addslashes($filter)."' OR uid ~* '".addslashes($filter)."'"; 
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())

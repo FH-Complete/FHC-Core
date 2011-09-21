@@ -229,15 +229,16 @@ class notiz extends basis_db
 	 * @param $person_id
 	 * @param $prestudent_id
 	 * @param $bestellung_id
+	 * @param $user
 	 * @return boolean
 	 */
-	public function getNotiz($erledigt=null, $projekt_kurzbz=null, $projektphase_id=null, $projekttask_id=null, $uid=null, $person_id=null, $prestudent_id=null, $bestellung_id=null)
+	public function getNotiz($erledigt=null, $projekt_kurzbz=null, $projektphase_id=null, $projekttask_id=null, $uid=null, $person_id=null, $prestudent_id=null, $bestellung_id=null, $user=null)
 	{
 		$qry = "SELECT 
 					* 
 				FROM 
 					public.tbl_notiz 
-					JOIN public.tbl_notizzuordnung USING(notiz_id)
+					LEFT JOIN public.tbl_notizzuordnung USING(notiz_id)
 				WHERE 1=1";
 		
 		if($erledigt)
@@ -256,6 +257,8 @@ class notiz extends basis_db
 			$qry.=" AND prestudent_id='".addslashes($prestudent_id)."'";
 		if($bestellung_id!='')
 			$qry.=" AND bestellung_id='".addslashes($bestellung_id)."'";
+		if($user!='')
+			$qry.=" AND (verfasser_uid='".addslashes($user)."' OR bearbeiter_uid='".addslashes($user)."')";
 		$qry.=' ORDER BY start, ende, titel';
 		
 		if($result = $this->db_query($qry))

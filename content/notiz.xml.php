@@ -167,7 +167,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			<parameter name="person_id"/>
 			<parameter name="prestudent_id"/>
 			<parameter name="bestellung_id"/>
-			<parameter name="addobserver"/>
+			<parameter name="user"/>
 			<body>
 			<![CDATA[
 				//debug('LoadNotizTree');
@@ -182,6 +182,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					this.setAttribute('person_id',person_id);
 					this.setAttribute('prestudent_id',prestudent_id);
 					this.setAttribute('bestellung_id',bestellung_id);
+					this.setAttribute('user',user);
 				
 					var datasource="<?php echo APP_ROOT; ?>rdf/notiz.rdf.php?ts="+gettimestamp();
 					datasource = datasource+"&projekt_kurzbz="+encodeURIComponent(projekt_kurzbz);
@@ -191,6 +192,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					datasource = datasource+"&person_id="+encodeURIComponent(person_id);
 					datasource = datasource+"&prestudent_id="+encodeURIComponent(prestudent_id);
 					datasource = datasource+"&bestellung_id="+encodeURIComponent(bestellung_id);
+					datasource = datasource+"&user="+encodeURIComponent(user);
 					//debug('Source:'+datasource);
 	                var tree = document.getAnonymousElementByAttribute(this ,'anonid', 'tree-notiz');
 
@@ -291,11 +293,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			var person_id = this.getAttribute('person_id');
 			var prestudent_id = this.getAttribute('prestudent_id');
 			var bestellung_id = this.getAttribute('bestellung_id');
+			var user = this.getAttribute('user');
 			
 			if(projekt_kurzbz!='' || projektphase_id!='' || projekttask_id!='' 
-			   || uid!='' || person_id!='' || prestudent_id!='' || bestellung_id!='')
+			   || uid!='' || person_id!='' || prestudent_id!='' || bestellung_id!='' || user!='')
 			{
-				this.LoadNotizTree(projekt_kurzbz,projektphase_id,projekttask_id,uid,person_id,prestudent_id,bestellung_id, true);
+				this.LoadNotizTree(projekt_kurzbz,projektphase_id,projekttask_id,uid,person_id,prestudent_id,bestellung_id, user);
 			}
 		</constructor>
 		<destructor>

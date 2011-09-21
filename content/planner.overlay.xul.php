@@ -35,8 +35,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/bestellung.overlay.xul.php
     </popupset>
     <toolbox>
 	<toolbar id="toolbar-projektmenue">
+		<!--
 	    <toolbarbutton id="toolbarbutton-projektmenue-neu" label="Neues Projekt" oncommand="ProjektNeu();" disabled="true" image="../skin/images/NeuDokument.png" tooltiptext="Neues Projekt anlegen" />
 	    <toolbarbutton id="toolbarbutton-projektmenue-del" label="Loeschen" oncommand="ProjektDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Projekt löschen"/>
+	    -->
 	    <toolbarbutton id="toolbarbutton-projektmenue-refresh" label="Aktualisieren" oncommand="ProjektmenueRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 	</toolbar>
     </toolbox>

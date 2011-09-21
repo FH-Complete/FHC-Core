@@ -195,7 +195,7 @@ if($lehrveranstaltung_id==null && $filter==null && $mitarbeiter_uid==null)
 }
 else 
 {
-	$filter = utf8_encode($filter);
+	$filter = $filter;
 	echo "<RDF:Seq about=\"".$rdf_url."liste\" >";
 	if(isset($_GET['optional']) && $_GET['optional']=='true')
 	{

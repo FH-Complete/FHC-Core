@@ -131,7 +131,7 @@ if(!$result = $db->db_query($qry))
 	while($row_lva = $db->db_fetch_object($result))
 	{
 		//Fachbereichskoordinatoren laden
-		$qry_fbk = "SELECT kurzbz FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid =
+		$qry_fbk = "SELECT kurzbz FROM public.tbl_mitarbeiter LEFT JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid) WHERE tbl_benutzer.aktiv AND mitarbeiter_uid =
 						(
 						SELECT 
 							COALESCE(koordinator, uid) as koordinator
