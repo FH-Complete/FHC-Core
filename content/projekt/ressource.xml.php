@@ -49,6 +49,91 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			seltype="single" hidecolumnpicker="false" flex="1"
 			datasources="rdf:null" ref="http://www.technikum-wien.at/ressource/liste"
 			ondblclick="document.getBindingParent(this).openNotiz(document.getBindingParent(this).value);"
+			ondragdrop="nsDragAndDrop.drop(event,
+				{
+					getSupportedFlavours : function ()
+					{
+				  	  	var flavours = new FlavourSet();
+				  	  	flavours.appendFlavour('application/fhc-ressource');
+				  	  	return flavours;
+				  	},
+				  	onDrop: function (evt,dropdata,session)
+				  	{
+					    document.getBindingParent(event.target).AddRessource(dropdata.data);
+				  	},
+				  	onDragStart: function (evt,transferData,action){}
+				})"
+			ondragover="nsDragAndDrop.dragOver(event,{
+				getSupportedFlavours : function ()
+				{
+			  	  	var flavours = new FlavourSet();
+			  	  	flavours.appendFlavour('application/fhc-ressource');
+			  	  	return flavours;
+			  	},
+			  	onDragEnter: function (evt,flavour,session)
+				{
+				},
+				onDragExit: function (evt,flavour,session)
+				{
+			  	},
+			  	onDragOver: function(evt,flavour,session)
+			  	{
+			  	},
+			  	onDrop: function (evt,dropdata,session)
+			  	{
+				    debug('Ressource onDrop'+dropdata);
+			  	},
+			  	onDragStart: function (evt,transferData,action)
+				{
+			  	}
+			})"
+			ondragenter="nsDragAndDrop.dragEnter(event,{
+				getSupportedFlavours : function ()
+				{
+			  	  	var flavours = new FlavourSet();
+			  	  	flavours.appendFlavour('application/fhc-ressource');
+			  	  	return flavours;
+			  	},
+			  	onDragEnter: function (evt,flavour,session)
+				{
+				},
+				onDragExit: function (evt,flavour,session)
+				{
+			  	},
+			  	onDragOver: function(evt,flavour,session)
+			  	{
+			  	},
+			  	onDrop: function (evt,dropdata,session)
+			  	{
+			  	},
+			  	onDragStart: function (evt,transferData,action)
+				{
+			  	}
+			})"
+			ondragexit="nsDragAndDrop.dragExit(event,{
+				getSupportedFlavours : function ()
+				{
+			  	  	var flavours = new FlavourSet();
+			  	  	flavours.appendFlavour('application/fhc-ressource');
+			  	  	return flavours;
+			  	},
+			  	onDragEnter: function (evt,flavour,session)
+				{
+				},
+				onDragExit: function (evt,flavour,session)
+				{
+			  	},
+			  	onDragOver: function(evt,flavour,session)
+			  	{
+			  	},
+			  	onDrop: function (evt,dropdata,session)
+			  	{
+				    debug('Ressource onDrop'+dropdata);
+			  	},
+			  	onDragStart: function (evt,transferData,action)
+				{
+			  	}
+			})"
 			>
 			<xul:treecols>
 				<xul:treecol anonid="treecol-ressource-bezeichnung" label="Bezeichnung" flex="2" primary="true" persist="hidden width ordinal"
@@ -141,7 +226,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			<![CDATA[
 				//debug('Refresh Notiz');
 				netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-				this.TreeNotizDatasource.Refresh(false); //non blocking
+				this.TreeRessourceDatasource.Refresh(false); //non blocking
 			]]>
 			</body>
 		</method>
@@ -150,7 +235,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			<parameter name="projektphase_id"/>
 			<body>
 			<![CDATA[
-				//debug('LoadNotizTree');
 				 netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 				
 				try
@@ -226,8 +310,65 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			]]>
 			</body>
 		</method>
+		<method name="AddRessource">
+			<parameter name="id"/>
+			<body>
+			<![CDATA[
+				 netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+				
+				try
+				{
+					var projekt_kurzbz = this.getAttribute('projekt_kurzbz');
+					var projektphase_id = this.getAttribute('projektphase_id');
+					debug(projekt_kurzbz);
+					debug(id); 
+					
+					var soapBody = new SOAPObject("saveProjektRessource");
+				    soapBody.appendChild(new SOAPObject("projekt_ressource_id")).val('');
+				    
+				    if(projekt_kurzbz != '')
+				    {
+					    soapBody.appendChild(new SOAPObject("projektphase_id")).val('');
+					    soapBody.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
+				    }else if(projektphase_id != '')
+				    {
+					    soapBody.appendChild(new SOAPObject("projektphase_id")).val(projektphase_id);
+					    soapBody.appendChild(new SOAPObject("projekt_kurzbz")).val('');				    
+				    }
+				    soapBody.appendChild(new SOAPObject("ressource_id")).val(id);
+				    soapBody.appendChild(new SOAPObject("funktion_kurzbz")).val('');
+				    soapBody.appendChild(new SOAPObject("beschreibung")).val('');
 
-		
+				    var sr = new SOAPRequest("saveProjektRessource",soapBody);
+				    SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/ressource_projekt.soap.php?"+gettimestamp();
+				    SOAPClient.SendRequest(sr,
+				    function(respObj)
+					{
+						try
+							{
+								var id = respObj.Body[0].saveProjektRessourceResponse[0].message[0].Text;
+							}
+							catch(e)
+							{
+								var fehler = respObj.Body[0].Fault[0].faultstring[0].Text;
+								alert('Fehler: '+fehler);
+								return;
+							}
+					}
+					);
+
+					window.setTimeout(function(){this.RefreshRessource},2000);
+				}
+				catch(e)
+				{
+					debug("Notiz load failed with exception: "+e);
+				}
+				
+
+			]]>
+			</body>
+		</method>
+
 		<constructor>
 			var projekt_kurzbz = this.getAttribute('projekt_kurzbz');
 			var projektphase_id = this.getAttribute('projektphase_id');
