@@ -525,8 +525,7 @@ font.ContentHeader
 	-moz-border-radius-topleft: 10px;
 	width: 100%;
 	border: 1px solid #E0E0E0;
-	background-color: #F0F0F0;
-	
+	background-color: #F0F0F0;	
 }
 #news .news .titel table
 {
@@ -537,7 +536,7 @@ font.ContentHeader
 #news .news .text
 {
 	background-color: #FCFCFC;
-	padding: 0px 10px 0px 10px;
+	padding: 5px 10px 0px 10px;
 }
 
 /* Margin von ersten und letzten P tag entfernen, da sonst
