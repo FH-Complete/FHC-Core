@@ -25,6 +25,7 @@
  * Hilfe der XSL-FO Vorlage aus der DB und generiert
  * daraus ein PDF (xslfo2pdf)
  */
+session_cache_limiter('none'); //muss gesetzt werden sonst funktioniert der Download mit IE8 nicht
 session_start();
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
