@@ -298,8 +298,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 						},
 						didRebuild : function(builder)
 					  	{
+							var tree = document.getAnonymousElementByAttribute(this.ressource ,'anonid', 'tree-ressource');
+							
+						  	//Workaround damit das Resize des Trees funktioniert
+							tree.columns.restoreNaturalOrder();
+							
 					  		//Nach dem Laden alle Subtrees aufklappen
-					  		var tree = document.getAnonymousElementByAttribute(this.ressource ,'anonid', 'tree-ressource');
 					  		var treeView = tree.treeBoxObject.view;
 							for (var i = 0; i < treeView.rowCount; i++) 
 							{

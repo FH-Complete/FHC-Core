@@ -50,46 +50,49 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			seltype="single" hidecolumnpicker="false" flex="1"
 			datasources="rdf:null" ref="http://www.technikum-wien.at/notiz/liste"
 			ondblclick="document.getBindingParent(this).openNotiz(document.getBindingParent(this).value);"
+			onclick="document.getBindingParent(this).updateErledigt(event);"
+			editable="true"
 			>
+			
 			<xul:treecols>
 			    <xul:treecol anonid="treecol-notiz-titel" label="Titel" flex="5" primary="true" persist="hidden width ordinal"
-					class="sortDirectionIndicator"
+					class="sortDirectionIndicator" editable="false"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#titel"  />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-text" label="Text" flex="2" hidden="false" persist="hidden width ordinal"
-					class="sortDirectionIndicator"
+					class="sortDirectionIndicator" editable="false"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#text" />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-verfasser" label="Verfasser" flex="2" hidden="false" persist="hidden width ordinal"
-					class="sortDirectionIndicator"
+					class="sortDirectionIndicator" editable="false"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#verfasser_uid" />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-bearbeiter" label="Bearbeiter" flex="2" hidden="true" persist="hidden width ordinal"
-					class="sortDirectionIndicator"
+					class="sortDirectionIndicator" editable="false"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#bearbeiter_uid" />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-start" label="Start" flex="2" hidden="false" persist="hidden width ordinal"
-					class="sortDirectionIndicator"
+					class="sortDirectionIndicator" editable="false"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#startISO" />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-ende" label="Ende" flex="2" hidden="false" persist="hidden width ordinal"
-					class="sortDirectionIndicator"
+					class="sortDirectionIndicator" editable="false"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#endeISO" />
 			    <xul:splitter class="tree-splitter"/>
-			    <xul:treecol anonid="treecol-notiz-erledigt" label="Erledigt" flex="2" hidden="true" persist="hidden width ordinal"
-					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/notiz/rdf#erledigt" />
+				<xul:treecol anonid="treecol-notiz-erledigt" label="Erledigt" flex="2" hidden="false" persist="hidden width ordinal"
+					class="sortDirectionIndicator" type="checkbox" editable="true"
+					sort="rdf:http://www.technikum-wien.at/notiz/rdf#erledigt_boolean" />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-notiz_id" label="NotizID" flex="2" hidden="true" persist="hidden width ordinal"
-					class="sortDirectionIndicator"
+					class="sortDirectionIndicator" editable="false"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#notiz_id" />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-startISO" label="StartISO" flex="2" hidden="true" persist="hidden width ordinal"
-					class="sortDirectionIndicator"
+					class="sortDirectionIndicator" editable="false"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#startISO" />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-ende" label="EndeISO" flex="2" hidden="true" persist="hidden width ordinal"
-					class="sortDirectionIndicator"
+					class="sortDirectionIndicator" editable="false"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#endeISO" />
 			</xul:treecols>
 		
@@ -104,7 +107,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			           <xul:treecell label="rdf:http://www.technikum-wien.at/notiz/rdf#bearbeiter_uid"/>
 			           <xul:treecell label="rdf:http://www.technikum-wien.at/notiz/rdf#start"/>
 			           <xul:treecell label="rdf:http://www.technikum-wien.at/notiz/rdf#ende"/>
-			           <xul:treecell label="rdf:http://www.technikum-wien.at/notiz/rdf#erledigt"/>
+			           <xul:treecell label="erledigt" value="rdf:http://www.technikum-wien.at/notiz/rdf#erledigt"/>
 			           <xul:treecell label="rdf:http://www.technikum-wien.at/notiz/rdf#notiz_id"/>
 			           <xul:treecell label="rdf:http://www.technikum-wien.at/notiz/rdf#startISO"/>
 			           <xul:treecell label="rdf:http://www.technikum-wien.at/notiz/rdf#endeISO"/>
@@ -156,6 +159,52 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				//debug('Refresh Notiz');
 				netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 				this.TreeNotizDatasource.Refresh(false); //non blocking
+			]]>
+			</body>
+		</method>
+		<method name="updateErledigt">
+			<parameter name="event"/>
+			<body>
+			<![CDATA[
+			    var row = new Object();
+			    var col = new Object();
+			    var childElt = new Object();
+			    //Tree holen
+			    var tree = event.currentTarget; 
+			    //Treecol ermitteln in die geklickt wurde
+			    tree.treeBoxObject.getCellAt(event.clientX, event.clientY, row, col, childElt);
+			    //abbrechen wenn auf Header oder Scrollbar geklickt wurde
+			    if(!col.value)
+			    	return 0;
+			    
+				var val = tree.view.getCellValue(row.value, col.value);
+				var text = tree.view.getCellText(row.value, col.value);
+				
+				var col = tree.columns.getColumnFor(document.getAnonymousElementByAttribute(this ,'anonid', 'treecol-notiz-notiz_id'));
+				var id = tree.view.getCellText(row.value, col);
+				
+				if(text=='erledigt')
+				{
+					var soapBody = new SOAPObject("setErledigt");
+				    soapBody.appendChild(new SOAPObject("notiz_id")).val(id);
+				    soapBody.appendChild(new SOAPObject("erledigt")).val(val);
+
+				    var sr = new SOAPRequest("setErledigt",soapBody);
+				    SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/notiz.soap.php?"+gettimestamp();
+				    				    
+				    SOAPClient.SendRequest(sr,function (respObj) {
+					    try
+						{
+							var id = respObj.Body[0].setErledigtResponse[0].message[0].Text;
+						}
+						catch(e)
+						{
+							var fehler = respObj.Body[0].Fault[0].faultstring[0].Text;
+							alert('Fehler: '+fehler);
+							return;
+						}
+					  });
+				}
 			]]>
 			</body>
 		</method>
@@ -234,15 +283,18 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					    { alert("error! " + aErrorMsg); }
 					});
 	                tree.builder.addListener({
+	                	notiz: this,
 						willRebuild : function(builder)
 						{
 						},
 						didRebuild : function(builder)
 					  	{
-					  		//debug("didrebuild");
-					  		//builder.removeListener(this);
+					  		//Workaround damit das Resize des Trees funktioniert
+					  		var tree = document.getAnonymousElementByAttribute(this.notiz ,'anonid', 'tree-notiz');
+							tree.columns.restoreNaturalOrder();
 						}
 					});
+					
 				}
 				catch(e)
 				{
@@ -299,7 +351,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			   || uid!='' || person_id!='' || prestudent_id!='' || bestellung_id!='' || user!='')
 			{
 				this.LoadNotizTree(projekt_kurzbz,projektphase_id,projekttask_id,uid,person_id,prestudent_id,bestellung_id, user);
-			}
+			}			
 		</constructor>
 		<destructor>
 			//debug('Notiz Binding Stop');

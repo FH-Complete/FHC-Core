@@ -1,5 +1,6 @@
 @import url("chrome://global/skin/");
 
+
 button
 {
 	font-size: x-small;
@@ -47,3 +48,16 @@ treechildren::-moz-tree-row(odd, selected) { background-color: #FFFFAA; }
 treechildren::-moz-tree-row(even, selected) { background-color: #FFFFAA; }
 treechildren::-moz-tree-cell-text(selected) { color: #000000; }
 treechildren::-moz-tree-cell-text(odd, selected) { color: #000000; }
+treechildren::-moz-tree-checkbox 
+{
+  /* unchecked checkbox treecells. This style MUST come before treechildren::-moz-tree-checkbox(checked) otherwise it won't take effect.  */
+  list-style-image: url("../skin/images/false_red.png");
+}
+
+treechildren::-moz-tree-checkbox(checked)
+{
+  /* css for checked cells. cbox-check.gif isn't available in Firefox 1, 2, and 3 on Mac OS X, so you should specify a URL to an image
+     in your extension or elsewhere. */
+  /*list-style-image: url("chrome://global/skin/checkbox/cbox-check.gif");*/
+  list-style-image: url("../skin/images/true_green.png");
+}
