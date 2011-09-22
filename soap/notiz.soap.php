@@ -33,6 +33,7 @@ require_once('../include/benutzerberechtigung.class.php');
 $SOAPServer = new SoapServer(APP_ROOT."/soap/notiz.wsdl.php?".microtime());
 $SOAPServer->addFunction("saveNotiz");
 $SOAPServer->addFunction("deleteNotiz");
+$SOAPServer->addFunction("setErledigt");
 $SOAPServer->handle();
 
 // WSDL Chache auf aus
@@ -133,6 +134,38 @@ function deleteNotiz($notiz_id)
 		return "OK";
 	else
 		return new SoapFault("Server", $projekttask->errormsg);
+}
+
+/**
+ * 
+ * Setzt den erledigt Status
+ * @param $notiz_id
+ * @param $erledigt
+ */
+function setErledigt($notiz_id, $erledigt)
+{ 	
+	$user = get_uid();
+		
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+		
+	if(!$rechte->isBerechtigt('basis/notiz', null, 'su'))
+		return new SoapFault("Server", "Sie haben keine Berechtigung zum Speichern von Notizen");
+	
+	$notiz = new notiz();
+	if($notiz->load($notiz_id))
+	{
+		$notiz->erledigt=$erledigt;
+		
+		if($notiz->save())
+		{
+			return true;
+		} 
+		else
+			return new SoapFault("Server", $notiz->errormsg);
+	}
+	else
+		return new SoapFault("Server", "Fehler beim Laden"); 	
 }
 ?>
 

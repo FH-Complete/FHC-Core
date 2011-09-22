@@ -71,7 +71,7 @@ foreach($notiz->result as $row)
 			<NOTIZ:ende><![CDATA['.$datum_obj->formatDatum($row->ende,'d.m.Y').']]></NOTIZ:ende>
 			<NOTIZ:startISO><![CDATA['.$row->start.']]></NOTIZ:startISO>
 			<NOTIZ:endeISO><![CDATA['.$row->ende.']]></NOTIZ:endeISO>
-			<NOTIZ:erledigt><![CDATA['.($row->erledigt?'Ja':'Nein').']]></NOTIZ:erledigt>
+			<NOTIZ:erledigt><![CDATA['.($row->erledigt?'true':'false').']]></NOTIZ:erledigt>
 			<NOTIZ:insertamum><![CDATA['.$row->insertamum.']]></NOTIZ:insertamum>
 			<NOTIZ:insertvon><![CDATA['.$row->insertvon.']]></NOTIZ:insertvon>
 			<NOTIZ:updateamum><![CDATA['.$row->updateamum.']]></NOTIZ:updateamum>

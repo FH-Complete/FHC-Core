@@ -52,7 +52,7 @@ function NotizInit(id)
 		verfasser = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#verfasser_uid" ));
 		bearbeiter = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bearbeiter_uid" ));
 		erledigt = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#erledigt" ));
-		if(erledigt=='Ja')
+		if(erledigt=='true')
 			erledigt=true;
 		else
 			erledigt=false;
