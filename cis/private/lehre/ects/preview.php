@@ -208,6 +208,7 @@ if (!$db = new basis_db())
 			JOIN public.tbl_fachbereich USING(oe_kurzbz)
 			JOIN campus.vw_mitarbeiter USING(uid) 
 		WHERE 
+			vw_mitarbeiter.aktiv AND
 			funktion_kurzbz='Leitung' AND tbl_fachbereich.fachbereich_kurzbz in($fachbereiche) AND 
 			(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 			(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
@@ -226,6 +227,7 @@ if (!$db = new basis_db())
 			FROM
 				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach, public.tbl_benutzerfunktion, campus.vw_mitarbeiter
 			WHERE
+				vw_mitarbeiter.aktiv AND
 				tbl_lehrveranstaltung.lehrveranstaltung_id='$lv' AND
 				tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
