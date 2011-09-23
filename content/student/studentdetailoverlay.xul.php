@@ -305,8 +305,25 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       							<!--<textbox id="student-prestudent-textbox-zgvmasterdatum" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/>-->
       						</hbox>
     					</row>
+    					<row>
+    						<spacer />
+    						<spacer />
+			    			<label value="Ausstellungsstaat" control="student-prestudent-menulist-ausstellungsstaat"/>
+			    			<menulist id="student-prestudent-menulist-ausstellungsstaat" disabled="true"
+							          datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php?optional=true" flex="1"
+						              ref="http://www.technikum-wien.at/nation/liste" >
+								<template>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
+							        		      label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
+										  		  uri="rdf:*"/>
+										</menupopup>
+								</template>
+							</menulist>		
+    					</row>
     				</rows>
     			</grid>
+    			
     		</groupbox>
     		<groupbox id="student-detail-groupbox-reihungstest">
 			<caption label="Reihungstest" />

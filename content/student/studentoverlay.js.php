@@ -881,6 +881,7 @@ function StudentAuswahl()
 	zgvmaster_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvmas_code" ));
 	zgvmasterort = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvmaort" ));
 	zgvmasterdatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvmadatum" ));
+	ausstellungsstaat = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ausstellungsstaat" ));
 	aufnahmeschluessel = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aufnahmeschluessel" ));
 	facheinschlberuf = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#facheinschlberuf" ));
 	reihungstest_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#reihungstest_id" ));
@@ -902,6 +903,7 @@ function StudentAuswahl()
 	document.getElementById('student-prestudent-menulist-zgvmastercode').value=zgvmaster_code;
 	document.getElementById('student-prestudent-textbox-zgvmasterort').value=zgvmasterort;
 	document.getElementById('student-prestudent-textbox-zgvmasterdatum').value=zgvmasterdatum;
+	document.getElementById('student-prestudent-menulist-ausstellungsstaat').value=ausstellungsstaat;
 	document.getElementById('student-prestudent-menulist-aufnahmeschluessel').value=aufnahmeschluessel;
 	if(facheinschlberuf=='true')
 		document.getElementById('student-prestudent-checkbox-facheinschlberuf').checked=true;
@@ -1333,6 +1335,7 @@ function StudentPrestudentDisableFields(val)
 	document.getElementById('student-prestudent-menulist-zgvmastercode').disabled=val;
 	document.getElementById('student-prestudent-textbox-zgvmasterort').disabled=val;
 	document.getElementById('student-prestudent-textbox-zgvmasterdatum').disabled=val;
+	document.getElementById('student-prestudent-menulist-ausstellungsstaat').disabled=val;
 	document.getElementById('student-prestudent-menulist-aufnahmeschluessel').disabled=val;
 	document.getElementById('student-prestudent-checkbox-facheinschlberuf').disabled=val;
 	document.getElementById('student-prestudent-menulist-reihungstest').disabled=val;
@@ -1382,6 +1385,7 @@ function StudentPrestudentSave()
 	zgvmaster_code = document.getElementById('student-prestudent-menulist-zgvmastercode').value;
 	zgvmasterort = document.getElementById('student-prestudent-textbox-zgvmasterort').value;
 	zgvmasterdatum = document.getElementById('student-prestudent-textbox-zgvmasterdatum').value;
+	ausstellungsstaat = document.getElementById('student-prestudent-menulist-ausstellungsstaat').value;
 	aufnahmeschluessel = document.getElementById('student-prestudent-menulist-aufnahmeschluessel').value;
 	facheinschlberuf = document.getElementById('student-prestudent-checkbox-facheinschlberuf').checked;
 	reihungstest_id = document.getElementById('student-prestudent-menulist-reihungstest').value;
@@ -1434,6 +1438,7 @@ function StudentPrestudentSave()
 	req.add('zgvmas_code', zgvmaster_code);
 	req.add('zgvmaort', zgvmasterort);
 	req.add('zgvmadatum', ConvertDateToISO(zgvmasterdatum));
+	req.add('ausstellungsstaat', ausstellungsstaat);
 	req.add('aufnahmeschluessel', aufnahmeschluessel);
 	req.add('facheinschlberuf', facheinschlberuf);
 	req.add('reihungstest_id', reihungstest_id);
