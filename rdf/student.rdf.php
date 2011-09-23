@@ -267,6 +267,7 @@ function draw_prestudent($row)
 			<STUDENT:zgvmaort><![CDATA['.$row->zgvmaort.']]></STUDENT:zgvmaort>
 			<STUDENT:zgvmadatum><![CDATA['.$datum_obj->convertISODate($row->zgvmadatum).']]></STUDENT:zgvmadatum>
 			<STUDENT:zgvmadatum_iso><![CDATA['.$row->zgvmadatum.']]></STUDENT:zgvmadatum_iso>
+			<STUDENT:ausstellungsstaat><![CDATA['.$row->ausstellungsstaat.']]></STUDENT:ausstellungsstaat>
 			<STUDENT:aufnahmeschluessel><![CDATA['.$row->aufnahmeschluessel.']]></STUDENT:aufnahmeschluessel>
 			<STUDENT:facheinschlberuf><![CDATA['.($row->facheinschlberuf?'true':'false').']]></STUDENT:facheinschlberuf>
 			<STUDENT:reihungstest_id><![CDATA['.$row->reihungstest_id.']]></STUDENT:reihungstest_id>
@@ -386,8 +387,7 @@ if($xmlformat=='rdf')
 
 		//$where.=" AND tbl_studentlehrverband.studiensemester_kurzbz='$studiensemester_kurzbz'";
 
-		$sql_query="SET CLIENT_ENCODING TO 'UNICODE';
-					SELECT p.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,	vorname, vornamen, geschlecht,
+		$sql_query="SELECT p.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,	vorname, vornamen, geschlecht,
 						nachname, gebdatum, tbl_prestudent.anmerkung,ersatzkennzeichen,svnr, tbl_student.matrikelnr, p.anmerkung as anmerkungen,
 						tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 						tbl_student.studiengang_kz, aufmerksamdurch_kurzbz, 

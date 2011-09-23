@@ -2770,6 +2770,19 @@ if(!$result = @$db->db_query("SELECT budget FROM fue.tbl_projekt LIMIT 1;"))
 		echo 'fue.tbl_projekt: Spalte budget hinzugefuegt!<br>
 				fue.tbl_projekttask: Spalte erledigt hinzugefuegt!<br>';
 }
+
+//fue.tbl_projekt neue Spalte budget
+if(!$result = @$db->db_query("SELECT ausstellungsstaat FROM public.tbl_prestudent"))
+{
+	$qry = "ALTER TABLE public.tbl_prestudent ADD COLUMN ausstellungsstaat varchar(3);
+			ALTER TABLE public.tbl_prestudent ADD CONSTRAINT fk_prestudent_nation FOREIGN KEY (ausstellungsstaat) REFERENCES bis.tbl_nation (nation_code) ON DELETE RESTRICT ON UPDATE CASCADE;			
+			";
+			
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_prestudent: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'public.tbl_prestudent: Spalte ausstellungsstaat hinzugefuegt!<br>';
+}
 echo '<br>';
 
 $tabellen=array(
@@ -2906,7 +2919,7 @@ $tabellen=array(
 	"public.tbl_preincoming_lehrveranstaltung"  => array("preincoming_id","lehrveranstaltung_id","insertamum","insertvon"),
 	"public.tbl_preinteressent"  => array("preinteressent_id","person_id","studiensemester_kurzbz","firma_id","erfassungsdatum","einverstaendnis","absagedatum","anmerkung","maturajahr","infozusendung","aufmerksamdurch_kurzbz","kontaktmedium_kurzbz","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preinteressentstudiengang"  => array("studiengang_kz","preinteressent_id","freigabedatum","uebernahmedatum","prioritaet","insertamum","insertvon","updateamum","updatevon"),
-	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id"),
+	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat"),
 	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung"),
 	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id"),

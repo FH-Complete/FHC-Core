@@ -432,6 +432,7 @@ if(!$error)
 				$prestudent->zgvmas_code = $_POST['zgvmas_code'];
 				$prestudent->zgvmaort = $_POST['zgvmaort'];
 				$prestudent->zgvmadatum = $_POST['zgvmadatum'];
+				$prestudent->ausstellungsstaat = $_POST['ausstellungsstaat'];
 				$prestudent->aufnahmeschluessel = $_POST['aufnahmeschluessel'];
 				$prestudent->facheinschlberuf = ($_POST['facheinschlberuf']=='true'?true:false);
 				$prestudent->reihungstest_id = $_POST['reihungstest_id'];

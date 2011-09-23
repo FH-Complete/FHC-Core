@@ -35,6 +35,7 @@ class prestudent extends person
 	public $zgvmas_code;
 	public $zgvmaort;
 	public $zgvmadatum;
+	public $ausstellungsstaat;
 	public $aufnahmeschluessel;
 	public $facheinschlberuf;
 	public $anmeldungreihungstest;
@@ -119,6 +120,7 @@ class prestudent extends person
 				$this->anmerkung = $row->anmerkung;
 				$this->ext_id_prestudent = $row->ext_id;
 				$this->dual = ($row->dual=='t'?true:false);
+				$this->ausstellungsstaat = $row->ausstellungsstaat;
 				
 				if(!person::load($row->person_id))
 					return false;
@@ -208,7 +210,8 @@ class prestudent extends person
 			       $this->addslashes($this->updatevon).",".
 			       $this->addslashes($this->ext_id_prestudent).",".
 			       $this->addslashes($this->anmerkung).",".
-			       ($this->dual?'true':'false').");";
+			       ($this->dual?'true':'false').",".
+			       $this->addslashes($this->ausstellungsstaat).");";
 		}
 		else
 		{
@@ -237,7 +240,8 @@ class prestudent extends person
 			       ' updatevon='.$this->addslashes($this->updatevon).",".
 			       ' ext_id='.$this->addslashes($this->ext_id_prestudent).",".
 			       ' anmerkung='.$this->addslashes($this->anmerkung).",".
-			       ' dual='.($this->dual?'true':'false').
+			       ' dual='.($this->dual?'true':'false').",".
+				   ' ausstellungsstaat='.$this->addslashes($this->ausstellungsstaat).
 			       " WHERE prestudent_id='".addslashes($this->prestudent_id)."';";
 		}
 		
@@ -584,6 +588,7 @@ class prestudent extends person
 				$ps->zgvmas_code = $row->zgvmas_code;
 				$ps->zgvmaort = $row->zgvmaort;
 				$ps->zgvmadatum = $row->zgvmadatum;
+				$ps->ausstellungsstaat = $row->ausstellungsstaat;
 				$ps->aufnahmeschluessel = $row->aufnahmeschluessel;
 				$ps->facheinschlberuf = ($row->facheinschlberuf=='t'?true:false);
 				$ps->anmeldungreihungstest = $row->anmeldungreihungstest;
@@ -943,6 +948,7 @@ class prestudent extends person
 				$obj->anmerkung = $row->anmerkung;
 				$obj->ext_id_prestudent = $row->ext_id;
 				$obj->dual = ($row->dual=='t'?true:false);
+				$obj->ausstellungsstaat = $row->ausstellungsstaat;
 				
 				$this->result[] = $obj;
 			}
