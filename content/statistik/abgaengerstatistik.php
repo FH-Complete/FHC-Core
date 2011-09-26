@@ -80,34 +80,93 @@ if($stsem!='')
 	
 	$qry = "SELECT studiengang_kz, kurzbz, typ, kurzbzlang, bezeichnung, orgform_kurzbz,
 
-				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
+				(SELECT count(*) FROM public.tbl_prestudent 
+					JOIN public.tbl_prestudentstatus USING (prestudent_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Abgewiesener' AND studiensemester_kurzbz='".addslashes($stsem)."'
-					) AS abgewiesener,
-				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
+					) AS abgewiesene,			
+				(SELECT count(*) FROM public.tbl_prestudent 
+					JOIN public.tbl_prestudentstatus USING (prestudent_id)
+					JOIN public.tbl_person USING (person_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Abgewiesener' AND geschlecht ='m' AND studiensemester_kurzbz='".addslashes($stsem)."'
+					) AS abgewiesene_maennlich,
+				(SELECT count(*) FROM public.tbl_prestudent 
+					JOIN public.tbl_prestudentstatus USING (prestudent_id)
+					JOIN public.tbl_person USING (person_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Abgewiesener' AND geschlecht ='w' AND studiensemester_kurzbz='".addslashes($stsem)."'
+					) AS abgewiesene_weiblich,
+				(SELECT count(*) FROM public.tbl_prestudent 
+					JOIN public.tbl_prestudentstatus USING (prestudent_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Abbrecher' AND studiensemester_kurzbz='".addslashes($stsem)."'
 					) AS abbrecher,
-				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
+				(SELECT count(*) FROM public.tbl_prestudent 
+					JOIN public.tbl_prestudentstatus USING (prestudent_id)
+					JOIN public.tbl_person USING (person_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Abbrecher' AND geschlecht ='m' AND studiensemester_kurzbz='".addslashes($stsem)."'
+					) AS abbrecher_maennlich,
+				(SELECT count(*) FROM public.tbl_prestudent 
+					JOIN public.tbl_prestudentstatus USING (prestudent_id)
+					JOIN public.tbl_person USING (person_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Abbrecher' AND geschlecht ='w' AND studiensemester_kurzbz='".addslashes($stsem)."'
+					) AS abbrecher_weiblich,
+				(SELECT count(*) FROM public.tbl_prestudent 
+					JOIN public.tbl_prestudentstatus USING (prestudent_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Unterbrecher' AND studiensemester_kurzbz='".addslashes($stsem)."'
 					) AS unterbrecher,
-				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id)
+				(SELECT count(*) FROM public.tbl_prestudent 
+					JOIN public.tbl_prestudentstatus USING (prestudent_id)
+					JOIN public.tbl_person USING (person_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Unterbrecher' AND geschlecht='m' AND studiensemester_kurzbz='".addslashes($stsem)."'
+					) AS unterbrecher_maennlich,
+				(SELECT count(*) FROM public.tbl_prestudent 
+					JOIN public.tbl_prestudentstatus USING (prestudent_id)
+					JOIN public.tbl_person USING (person_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Unterbrecher' AND geschlecht='w' AND studiensemester_kurzbz='".addslashes($stsem)."'
+					) AS unterbrecher_weiblich,
+				(SELECT count(*) FROM public.tbl_prestudent 
+					JOIN public.tbl_prestudentstatus USING (prestudent_id)
 	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND studiensemester_kurzbz='".addslashes($stsem)."'
-					) AS absolvent
+					) AS absolvent,
+				(SELECT count(*) FROM public.tbl_prestudent 
+					JOIN public.tbl_prestudentstatus USING (prestudent_id)
+					JOIN public.tbl_person USING (person_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND geschlecht='m' AND studiensemester_kurzbz='".addslashes($stsem)."'
+					) AS absolvent_maennlich,
+				(SELECT count(*) FROM public.tbl_prestudent 
+					JOIN public.tbl_prestudentstatus USING (prestudent_id)
+					JOIN public.tbl_person USING (person_id)
+	   			 	WHERE studiengang_kz=stg.studiengang_kz AND status_kurzbz='Absolvent' AND geschlecht='w' AND studiensemester_kurzbz='".addslashes($stsem)."'
+					) AS absolvent_weiblich
 			FROM
 				public.tbl_studiengang stg
 			WHERE
 				studiengang_kz>0 AND studiengang_kz<10000 AND aktiv $stgwhere
 			ORDER BY kurzbzlang; ";
-
 	if($db->db_query($qry))
 	{
 		echo "<table class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>
 				<thead>
 					<tr>
+						<th></th>
+						<th colspan ='3'>Abgewiesene </th>
+						<th colspan ='3'>Abbrecher </th>
+						<th colspan ='3'>Unterbrecher </th>
+						<th colspan ='3'>Absolventen </th>
+					</tr>
+
+					<tr>
 						<th class='table-sortable:default'>Studiengang</th>
-						<th class='table-sortable:numeric'>Abgewiesene</th>
-						<th class='table-sortable:numeric'>Abbrecher</th>
-						<th class='table-sortable:numeric'>Unterbrecher</th>
-						<th class='table-sortable:numeric'>Absolventen</th>
+						<th class='table-sortable:numeric'>m</th>
+						<th class='table-sortable:numeric'>w</th>
+						<th class='table-sortable:numeric'>Gesamt</th>
+						<th class='table-sortable:numeric'>m</th>
+						<th class='table-sortable:numeric'>w</th>
+						<th class='table-sortable:numeric'>Gesamt</th>
+						<th class='table-sortable:numeric'>m</th>
+						<th class='table-sortable:numeric'>w</th>
+						<th class='table-sortable:numeric'>Gesamt</th>
+						<th class='table-sortable:numeric'>m</th>
+						<th class='table-sortable:numeric'>w</th>
+						<th class='table-sortable:numeric'>Gesamt</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -117,9 +176,17 @@ if($stsem!='')
 		{
 			echo '<tr>';
 			echo "<td>".strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</td>";
-			echo "<td align='center'>$row->abgewiesener</td>";
+			echo "<td align='center'>$row->abgewiesene_maennlich</td>";
+			echo "<td align='center'>$row->abgewiesene_weiblich</td>";
+			echo "<td align='center'>$row->abgewiesene</td>";
+			echo "<td align='center'>$row->abbrecher_maennlich</td>";
+			echo "<td align='center'>$row->abbrecher_weiblich</td>";
 			echo "<td align='center'>$row->abbrecher</td>";
+			echo "<td align='center'>$row->unterbrecher_maennlich</td>";
+			echo "<td align='center'>$row->unterbrecher_weiblich</td>";
 			echo "<td align='center'>$row->unterbrecher</td>";
+			echo "<td align='center'>$row->absolvent_maennlich</td>";
+			echo "<td align='center'>$row->absolvent_weiblich</td>";
 			echo "<td align='center'>$row->absolvent</td>";
 			echo "</tr>";
 		}
