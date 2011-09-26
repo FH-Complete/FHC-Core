@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2007 Technikum-Wien
+/* Copyright (C) 2011 FH Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ * 			Andreas Österreicher <andreas.oesterreicher@technikum-wien.at>
  */
 /**
  * Klasse projekttask
@@ -29,18 +30,18 @@ class projekttask extends basis_db
 	public $result = array(); 	// adresse Objekt
 
 	//Tabellenspalten
-	public $projekttask_id;	    //integer
-	public $projektphase_id;    //integer
-	public $bezeichnung;	    //string
-	public $beschreibung;	    //string
-	public $aufwand;	    //string
+	public $projekttask_id; // integer
+	public $projektphase_id;// integer
+	public $bezeichnung;	// string
+	public $beschreibung;	// string
+	public $aufwand;	    // string
 	public $mantis_id;	    // integer
-	//public $beginn;	    //date 	
-	//public $ende;		    //date 	
 	public $insertamum;	    // timestamp
-	public $insertvon;	    // bigint
+	public $insertvon;	    // string
 	public $updateamum;	    // timestamp
-	public $updatevon;	    // bigint
+	public $updatevon;	    // string
+	public $erledigt;		// boolean
+	public $projekttask_fk;	// integer
 
 
 	/**
@@ -84,6 +85,8 @@ class projekttask extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
+				$this->erledigt = ($row->erledigt=='t'?true:false);
+				$this->projekttask_fk = $row->projekttask_fk;
 
 				return true;
 			}
@@ -109,9 +112,9 @@ class projekttask extends basis_db
 	public function getProjekttasks($projektphase_id,$projekt_kurzbz=null)
 	{
 		if (!is_null($projektphase_id))
-                    $qry = 'SELECT * FROM fue.tbl_projekttask WHERE projektphase_id='.$projektphase_id.';';
-                else
-                    $qry='';
+			$qry = 'SELECT * FROM fue.tbl_projekttask WHERE projektphase_id='.$projektphase_id.';';
+		else
+        	$qry='';
 
 		if($this->db_query($qry))
 		{
@@ -131,6 +134,8 @@ class projekttask extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+				$obj->erledigt = ($row->erledigt=='t'?true:false);
+				$obj->projekttask_fk = $row->projekttask_fk;
 
 				$this->result[] = $obj;
 			}
@@ -185,13 +190,15 @@ class projekttask extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 
-			$qry='BEGIN; INSERT INTO fue.tbl_projekttask (projektphase_id, bezeichnung, beschreibung, aufwand, mantis_id, insertamum, 
+			$qry='BEGIN; INSERT INTO fue.tbl_projekttask (projektphase_id, bezeichnung, beschreibung, aufwand, mantis_id, projekttask_fk, erledigt, insertamum, 
 				insertvon, updateamum, updatevon) VALUES('.
 			     $this->addslashes($this->projektphase_id).', '.
 			     $this->addslashes($this->bezeichnung).', '.
 			     $this->addslashes($this->beschreibung).', '.
 			     $this->addslashes($this->aufwand).', '.
-			     $this->addslashes($this->mantis_id).', 
+			     $this->addslashes($this->mantis_id).','.
+			     $this->addslashes($this->projekttask_fk).','.
+			     ($this->erledigt?'true':'false').',  
 			     now(), '.
 			     $this->addslashes($this->insertvon).', 
 			     now(), '.
@@ -205,6 +212,8 @@ class projekttask extends basis_db
 				'beschreibung='.$this->addslashes($this->beschreibung).', '.
 				'aufwand='.$this->addslashes($this->aufwand).', '.
 				'mantis_id='.$this->addslashes($this->mantis_id).', '.
+				'projekttask_fk='.$this->addslashes($this->projekttask_fk).', '.
+				'erledigt='.($this->erledigt?'true':'false').', '.
 				'updateamum= now(), '.
 				'updatevon='.$this->addslashes($this->updatevon).' '.
 				'WHERE projekttask_id='.$this->addslashes($this->projekttask_id).';';
@@ -272,114 +281,6 @@ class projekttask extends basis_db
 			$this->errormsg = 'Fehler beim Loeschen des Datensatzes';
 			return false;
 		}		
-	}
-	
-	/**
-	 * Laedt alle Projektarbeiten eines Studenten
-	 * @param student_uid
-	 * @return true wenn ok, false wenn Fehler
-	 */
-	public function getProjektarbeit($student_uid)
-	{
-		$qry = "SELECT * FROM lehre.tbl_projektarbeit WHERE student_uid='".addslashes($student_uid)."'";
-		
-		if($this->db_query($qry))
-		{
-			while($row = $this->db_fetch_object())
-			{
-				$obj = new projektarbeit();
-				
-				$obj->projekt_kurzbz = $row->projekt_kurzbz;
-				$obj->projekttyp_kurzbz = $row->projekttyp_kurzbz;
-				$obj->titel = $row->titel;
-				$obj->titel_english = $row->titel_english;
-				$obj->lehreinheit_id = $row->lehreinheit_id;
-				$obj->student_uid = $row->student_uid;
-				$obj->firma_id = $row->firma_id;
-				$obj->note = $row->note;
-				$obj->punkte = $row->punkte;
-				$obj->beginn = $row->beginn;
-				$obj->ende = $row->ende;
-				$obj->faktor = $row->faktor;
-				$obj->freigegeben = ($row->freigegeben=='t'?true:false);
-				$obj->gesperrtbis = $row->gesperrtbis;
-				$obj->stundensatz = $row->stundensatz;
-				$obj->gesamtstunden = $row->gesamtstunden;
-				$obj->themenbereich = $row->themenbereich;
-				$obj->anmerkung = $row->anmerkung;
-				$obj->ext_id = $row->ext_id;
-				$obj->insertamum = $row->insertamum;
-				$obj->insertvon = $row->insertvon;
-				$obj->updateamum = $row->updateamum;
-				$obj->updatevon = $row->updatevon;
-				
-				$this->result[] = $obj;
-			}
-			return true;
-		}
-		else 
-		{
-			$this->errormsg = 'Fehler beim Laden der Daten';
-			return false;
-		}
-	}
-	
-	/**
-	 * Laedt alle Projektarbeiten eines Studienganges/Studiensemesters
-	 * @param studiengang_kz, studiensemester_kurzbz
-	 * @return true wenn ok, false wenn Fehler
-	 */
-	public function getProjektarbeitStudiensemester($studiengang_kz, $studiensemester_kurzbz)
-	{
-		$qry = "SELECT 
-					tbl_projektarbeit.* 
-				FROM 
-					lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung
-				WHERE 
-					tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
-					tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
-					tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."' AND
-					tbl_lehreinheit.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
-		
-		if($this->db_query($qry))
-		{
-			while($row = $this->db_fetch_object())
-			{
-				$obj = new projektarbeit();
-				
-				$obj->projekt_kurzbz = $row->projekt_kurzbz;
-				$obj->projekttyp_kurzbz = $row->projekttyp_kurzbz;
-				$obj->titel = $row->titel;
-				$obj->titel_english = $row->titel_english;
-				$obj->lehreinheit_id = $row->lehreinheit_id;
-				$obj->student_uid = $row->student_uid;
-				$obj->firma_id = $row->firma_id;
-				$obj->note = $row->note;
-				$obj->punkte = $row->punkte;
-				$obj->beginn = $row->beginn;
-				$obj->ende = $row->ende;
-				$obj->faktor = $row->faktor;
-				$obj->freigegeben = ($row->freigegeben=='t'?true:false);
-				$obj->gesperrtbis = $row->gesperrtbis;
-				$obj->stundensatz = $row->stundensatz;
-				$obj->gesamtstunden = $row->gesamtstunden;
-				$obj->themenbereich = $row->themenbereich;
-				$obj->anmerkung = $row->anmerkung;
-				$obj->ext_id = $row->ext_id;
-				$obj->insertamum = $row->insertamum;
-				$obj->insertvon = $row->insertvon;
-				$obj->updateamum = $row->updateamum;
-				$obj->updatevon = $row->updatevon;
-				
-				$this->result[] = $obj;
-			}
-			return true;
-		}
-		else 
-		{
-			$this->errormsg = 'Fehler beim Laden der Daten';
-			return false;
-		}
 	}
 }
 ?>

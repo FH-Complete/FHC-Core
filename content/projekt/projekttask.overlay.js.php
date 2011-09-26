@@ -556,4 +556,50 @@ function clb_saveProjekttaskMantis(respObj)
 		return;
 	}
 }
-                                
+
+// ****
+// * Aktualisiert den Erledigt Status eines Projekttasks
+// ****
+function ProjekttaskUpdateErledigt(event)
+{
+	var row = new Object();
+    var col = new Object();
+    var childElt = new Object();
+    //Tree holen
+    var tree = event.currentTarget; 
+    //Treecol ermitteln in die geklickt wurde
+    tree.treeBoxObject.getCellAt(event.clientX, event.clientY, row, col, childElt);
+    //abbrechen wenn auf Header oder Scrollbar geklickt wurde
+    if(!col.value)
+    	return 0;
+
+	var val = tree.view.getCellValue(row.value, col.value);
+	var text = tree.view.getCellText(row.value, col.value);
+
+	col = tree.columns ? tree.columns['projekttask-treecol-projekttask_id'] : 'projekttask-treecol-projekttask_id';
+	var id = tree.view.getCellText(row.value, col);
+
+	if(text=='erledigt')
+	{
+		var soapBody = new SOAPObject("setErledigt");
+	    soapBody.appendChild(new SOAPObject("projekttask_id")).val(id);
+	    soapBody.appendChild(new SOAPObject("erledigt")).val(val);
+
+	    var sr = new SOAPRequest("setErledigt",soapBody);
+	    SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekttask.soap.php?"+gettimestamp();
+    				    
+    	SOAPClient.SendRequest(sr,function (respObj) 
+    	{
+	    	try
+			{
+				var id = respObj.Body[0].setErledigtResponse[0].message[0].Text;
+			}
+			catch(e)
+			{
+				var fehler = respObj.Body[0].Fault[0].faultstring[0].Text;
+				alert('Fehler: '+fehler);
+				return;
+			}
+		});
+	}
+}                         

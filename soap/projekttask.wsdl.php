@@ -33,6 +33,14 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
   		<wsdl:part name="message" type="xsd:string"></wsdl:part>
   	</wsdl:message>
   	
+  	<wsdl:message name="setErledigtRequest">
+  		<wsdl:part name="projekttask_id" type="xsd:string"></wsdl:part>
+  		<wsdl:part name="erledigt" type="xsd:boolean"></wsdl:part>
+  	</wsdl:message>
+    <wsdl:message name="setErledigtResponse">
+  		<wsdl:part name="message" type="xsd:string"></wsdl:part>
+  	</wsdl:message>
+  	
   	<wsdl:message name="SaveMantisRequest">
   		<wsdl:part name="projekttask_id" type="xsd:string"></wsdl:part>
 		<wsdl:part name="mantis_id" type="xsd:string"></wsdl:part>
@@ -85,6 +93,10 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
            <wsdl:input message="tns:SaveMantisRequest"></wsdl:input>
            <wsdl:output message="tns:SaveMantisResponse"></wsdl:output>        
        </wsdl:operation>
+       <wsdl:operation name="setErledigt">
+           <wsdl:input message="tns:setErledigtRequest"></wsdl:input>
+           <wsdl:output message="tns:setErledigtResponse"></wsdl:output>        
+       </wsdl:operation>
    </wsdl:portType>
 
    <wsdl:binding name="ConfigBinding" type="tns:ConfigPortType">
@@ -109,6 +121,15 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
        </wsdl:operation> 
        <wsdl:operation name="saveMantis">
            <soap:operation soapAction="<?php echo APP_ROOT."soap/saveMantis";?>" />
+           <wsdl:input> 
+               <soap:body use="encoded" namespace="http://localhost/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+           </wsdl:input>
+           <wsdl:output>
+               <soap:body use="encoded" namespace="http://localhost/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+           </wsdl:output>
+       </wsdl:operation> 
+         <wsdl:operation name="setErledigt">
+           <soap:operation soapAction="<?php echo APP_ROOT."soap/setErledigt";?>" />
            <wsdl:input> 
                <soap:body use="encoded" namespace="http://localhost/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
            </wsdl:input>

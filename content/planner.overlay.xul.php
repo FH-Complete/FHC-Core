@@ -45,7 +45,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/bestellung.overlay.xul.php
     <!-- <?php echo APP_ROOT; ?>rdf/projektphase.rdf.php?foo=<?php echo time(); ?> -->
     <tree id="tree-projektmenue" onselect="treeProjektmenueSelect();"
 	seltype="single" hidecolumnpicker="false" flex="1"
-	datasources="<?php echo APP_ROOT; ?>rdf/projektphase.rdf.php?foo=<?php echo time(); ?>" ref="http://www.technikum-wien.at/projektphase/alle-projektphasen"
+	datasources="<?php echo APP_ROOT; ?>rdf/projektphase.rdf.php?foo=<?php echo time(); ?>" ref="http://www.technikum-wien.at/projektphase"
 	enableColumnDrag="true"
     ondraggesture="nsDragAndDrop.startDrag(event,lvbgrpDDObserver);"
 	ondragdrop="nsDragAndDrop.drop(event,verbandtreeDDObserver)"
@@ -108,22 +108,21 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/bestellung.overlay.xul.php
 			<tab id="tab-projekt" label="Projekte" />
 			<tab id="tab-projektphase" label="Phasen" />
 			<tab id="tab-projekttask" label="Tasks" selected="true" />
-			<tab id="tab-notiz" label="Notizen" />
 			<tab id="tab-dokumente" label="Dokumente" />
 			<tab id="tab-bestellung" label="Bestellungen" />
 			<tab id="tab-ressource" label="Ressourcen" />
 			<tab id="tab-gantt" label="Gantt" />
+			<tab id="tab-notiz" label="Eigene Notizen" />
 		</tabs>
 		<tabpanels id="tabpanels-main" flex="1">
 			<vbox id="box-projekt" />
 			<vbox id="box-projektphase" />
 			<vbox id="box-projekttask" />
-			<vbox id="box-notiz" />
 			<vbox id="box-dokumente" />
 			<vbox id="box-bestellung" />
 			<vbox id="box-ressource" />
 			<vbox id="box-gantt" />
-            <vbox id="LehrveranstaltungEditor" />
+            <vbox id="box-notiz" />
 		</tabpanels>
 	</tabbox>
 </vbox>

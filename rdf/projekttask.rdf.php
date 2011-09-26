@@ -17,14 +17,11 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>
  */
-header("Content-type: application/xhtml+xml");
-echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/projekttask.class.php');
-
-$rdf_url='http://www.technikum-wien.at/projekttask/';
+require_once('../include/rdf.class.php');
 
 $projekttask_obj = new projekttask();
 
@@ -41,53 +38,27 @@ if(isset($_GET['projekttask_id']))
 	$projekttask_obj->result[] = $projekttask_obj;
 }
 
+$oRdf = new rdf('PROJEKTTASK','http://www.technikum-wien.at/projekttask');
+$oRdf->sendHeader();
 
-//var_dump($projekttask_obj);
-?>
-<RDF:RDF
-	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	xmlns:PROJEKTTASK="<?php echo $rdf_url; ?>rdf#"
->
-
-<?php
-$descr='';
-$sequenz='';
 $lastPT=null;
-for ($i=0;$i<count($projekttask_obj->result);$i++)
+foreach($projekttask_obj->result as $projekttask)
 {
-	$projekttask=$projekttask_obj->result[$i];
-	$currentPT=$projekttask->projekttask_id;
-	$nextPT=(($i<count($projekttask_obj->result)-1)?$projekttask_obj->result[$i+1]->projekttask_id:null);
+	$i=$oRdf->newObjekt($projekttask->projekttask_id);
 	
-	$descr.='<RDF:Description RDF:about="'.$rdf_url.$projekttask->projekttask_id.'" >
-		<PROJEKTTASK:projekttask_id>'.$projekttask->projekttask_id.'</PROJEKTTASK:projekttask_id>
-		<PROJEKTTASK:projektphase_id>'.$projekttask->projektphase_id.'</PROJEKTTASK:projektphase_id>
-		<PROJEKTTASK:bezeichnung>'.$projekttask->bezeichnung.'</PROJEKTTASK:bezeichnung>
-		<PROJEKTTASK:beschreibung>'.$projekttask->beschreibung.'</PROJEKTTASK:beschreibung>
-		<PROJEKTTASK:aufwand>'.$projekttask->aufwand.'</PROJEKTTASK:aufwand>
-		<PROJEKTTASK:mantis_id>'.$projekttask->mantis_id.'</PROJEKTTASK:mantis_id>
-	</RDF:Description>'."\n";
+	$oRdf->obj[$i]->setAttribut('projekttask_id',$projekttask->projekttask_id);
+	$oRdf->obj[$i]->setAttribut('projektphase_id',$projekttask->projektphase_id);
+	$oRdf->obj[$i]->setAttribut('bezeichnung',$projekttask->bezeichnung);
+	$oRdf->obj[$i]->setAttribut('beschreibung',$projekttask->beschreibung);
+	$oRdf->obj[$i]->setAttribut('aufwand',$projekttask->aufwand);
+	$oRdf->obj[$i]->setAttribut('mantis_id',$projekttask->mantis_id);
+	$oRdf->obj[$i]->setAttribut('erledigt',$projekttask->erledigt);
+	$oRdf->obj[$i]->setAttribut('projekttask_fk',$projekttask->projekttask_fk);
 	
-	if ($lastPT!=$currentPT)
-		$sequenz.='	<RDF:li RDF:resource="'.$rdf_url.$projekttask->projekttask_id.'" />
-		<RDF:li>
-      				<RDF:Seq RDF:about="'.$rdf_url.$projekttask->projekttask_id.'" >'."\n";
-	// Neue OE oder letzter Datensatz? Dann muss Sequenz geschlossen werden.
-	if ($nextPT!=$currentPT || $i==count($projekttask_obj->result)-1)
-	{
-		$sequenz.='	<RDF:li RDF:resource="'.$rdf_url.$projekttask->projekttask_id.'" />'."\n";
-		$sequenz.='			</RDF:Seq>
-      			</RDF:li>'."\n";
-	}
-	elseif ($lastPT==$currentPT || $nextPT==$currentPT || count($projekttask_obj->result)==1)
-		$sequenz.='<RDF:li RDF:resource="'.$rdf_url.$projekttask->projekttask_id.'" />'."\n";
-	$lastPT=$currentPT;
+	if($projekttask->projekttask_fk!='')
+		$oRdf->addSequence($projekttask->projekttask_id, $projekttask->projekttask_fk);
+	else
+		$oRdf->addSequence($projekttask->projekttask_id);
 }
-$sequenz='<RDF:Seq about="'.$rdf_url.'alle-projekttasks">'."\n\t".$sequenz.'
-  	</RDF:Seq>'."\n";
-echo $descr."\n";
-echo $sequenz;
-
-
+$oRdf->sendRdfText();
 ?>
-</RDF:RDF>
