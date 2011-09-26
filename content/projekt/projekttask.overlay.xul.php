@@ -62,12 +62,13 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/mantisdetail.overlay.xul.p
 		<!-- ************* -->
 		<!-- Bem.: style="visibility:collapse" versteckt eine Spalte -->
 		<tree id="projekttask-tree" seltype="single" hidecolumnpicker="false" flex="1"
-				datasources="rdf:null" ref="http://www.technikum-wien.at/projekttask/alle-projekttasks"
+				datasources="rdf:null" ref="http://www.technikum-wien.at/projekttask"
 				style="margin:0px;" enableColumnDrag="true"
 				onselect="onselectProjekttask(this);"
+				onclick="ProjekttaskUpdateErledigt(event);"
  				persist="height"
- 				flags="dont-build-content"
  				context="projekttask-tree-popup"
+ 				editable="true"
 		>
 			<treecols>
 				<treecol id="projekttask-treecol-bezeichnung" label="Bezeichnung" flex="5" hidden="false" primary="true" persist="hidden, width, ordinal"
@@ -88,11 +89,15 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/mantisdetail.overlay.xul.p
 				<splitter class="tree-splitter"/>
 				<treecol id="projekttask-treecol-aufwand" label="Aufwand" flex="2" hidden="false" persist="hidden, width, ordinal"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/projekttask/rdf#sprache" />
+					sort="rdf:http://www.technikum-wien.at/projekttask/rdf#aufwand" />
 				<splitter class="tree-splitter"/>
 				<treecol id="projekttask-treecol-mantis_id" label="MantisID" flex="2" hidden="false" persist="hidden, width, ordinal"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/projekttask/rdf#ects" />
+					sort="rdf:http://www.technikum-wien.at/projekttask/rdf#mantis_id" />
+				<splitter class="tree-splitter"/>
+				<treecol id="projekttask-treecol-erledigt" label="Erledigt" flex="2" hidden="false" persist="hidden, width, ordinal"
+					class="sortDirectionIndicator" editable="true" type="checkbox"
+					sort="rdf:http://www.technikum-wien.at/projekttask/rdf#erledigt" />
 				<splitter class="tree-splitter"/>
 			</treecols>
 
@@ -106,6 +111,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/mantisdetail.overlay.xul.p
 							<treecell label="rdf:http://www.technikum-wien.at/projekttask/rdf#beschreibung"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projekttask/rdf#aufwand"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projekttask/rdf#mantis_id"/>
+							<treecell label="erledigt" value="rdf:http://www.technikum-wien.at/projekttask/rdf#erledigt"/>
 						</treerow>
 					</treeitem>
 				</treechildren>

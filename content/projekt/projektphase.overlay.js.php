@@ -101,7 +101,7 @@ function onselectTreeProjektphase()
     var response = req.execute();
     
     // Datasource holen
-    var dsource=parseRDFString(response, 'http://www.technikum-wien.at/projektphase/alle-projektphasen');
+    var dsource=parseRDFString(response, 'http://www.technikum-wien.at/projektphase');
 
     dsource=dsource.QueryInterface(Components.interfaces.nsIRDFDataSource);
 

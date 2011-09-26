@@ -36,6 +36,7 @@ $SOAPServer = new SoapServer(APP_ROOT."/soap/projekttask.wsdl.php?".microtime())
 $SOAPServer->addFunction("saveProjekttask");
 $SOAPServer->addFunction("deleteProjekttask");
 $SOAPServer->addFunction("saveMantis");
+$SOAPServer->addFunction("setErledigt");
 $SOAPServer->handle();
 
 // WSDL Chache auf aus
@@ -151,6 +152,33 @@ function saveMantis($projekttask_id, $mantis_id, $issue_summary, $issue_descript
 			return new SoapFault("Server", 'Fehler:'.$mantis->errormsg);
 	}
 }
+
+/**
+ * 
+ * Setzt den Erledigt Status
+ * @param $projekttask_id
+ * @param $erledigt
+ */
+function setErledigt($projekttask_id, $erledigt)
+{ 	
+	$projekttask = new projekttask();
+	
+	if($projekttask->load($projekttask_id))
+	{
+		$projekttask->new = false;
+		$projekttask->erledigt=$erledigt;
+		
+		if($projekttask->save())
+		{
+			return $projekttask->projekttask_id;
+		} 
+		else
+			return new SoapFault("Server", $projekttask->errormsg);
+	}
+	else
+		return new SoapFault("Server", "Fehler beim Laden"); 
+}
+
 ?>
 
 
