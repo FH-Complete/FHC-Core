@@ -189,9 +189,10 @@ if(!$person->load($uid))
 						$index=$wunsch[$j][$i+1];
 					else
 						$index=1;
-					$id='bgcolor';
-					$id.=$index+3;
-					echo '<TD style="padding-left: 5px; padding-right:5px;" align="center" id="'.$id.'"><INPUT align="right" type="text" name="wunsch'.$j.'_'.$i.'" size="1" maxlength="2" value="'.$index.'"></TD>';
+					//$id='bgcolor';
+					//$id.=$index+3;
+					$bgcolor=$cfgStdBgcolor[$index+3];
+					echo '<TD style="padding-left: 5px; padding-right:5px;" align="center"  bgcolor="'.$bgcolor.'"><INPUT align="right" type="text" name="wunsch'.$j.'_'.$i.'" size="1" maxlength="2" value="'.$index.'"></TD>';
 				}
 				echo '</TR>';
 			}
