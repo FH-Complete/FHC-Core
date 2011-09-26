@@ -98,6 +98,7 @@ echo '
 					<th>Erstellung</th>
 					<th>Freigegeben</th>
 					<th>Geliefert</th>
+					<th>Bestellt</th>
 					<th>Brutto</th>
 					<th>Titel</th>
 					<th>Letze Änderung</th>
@@ -108,6 +109,7 @@ echo '
 		{
 			$firmenname = '';
 			$geliefert ='nein';
+			$bestellt ='nein';
 			$status = new wawi_bestellstatus(); 
 			if(is_numeric($row->firma_id))
 			{
@@ -121,6 +123,9 @@ echo '
 			
 			if($status->isStatiVorhanden($row->bestellung_id, 'Lieferung'))
 						$geliefert = 'ja';
+			
+			if($status->isStatiVorhanden($row->bestellung_id, 'Bestellung'))
+						$bestellt = 'ja';
 				
 			$brutto = $bestellung->getBrutto($row->bestellung_id);
 			echo '	<tr>
@@ -131,6 +136,7 @@ echo '
 						<td>'.$date->formatDatum($row->insertamum, "d.m.Y").'</td>
 						<td>'.$freigegeben.'</td>
 						<td>'.$geliefert.'</td>
+						<td>'.$bestellt.'</td>
 						<td>'.number_format($brutto, 2, ",",".").'</td>
 						<td>'.$row->titel.'</td>
 						<td nowrap>'.$date->formatDatum($row->updateamum, "d.m.Y").' '.$row->updatevon.'</td>
