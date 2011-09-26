@@ -229,13 +229,13 @@ if(!$person->load($uid))
 			    <TD>
 			      <DIV align="right">2</DIV>
 			    </TD>
-			    <TD><?php echo $p->t('zeitwunsch/hierMoechteIchUnterrichten');?></TD>
+			    <TD>&nbsp;&nbsp;<?php echo $p->t('zeitwunsch/hierMoechteIchUnterrichten');?></TD>
 			  </TR>
 			  <TR>
 			    <TD>
 			      <DIV align="right">1</DIV>
 			    </TD>
-			    <TD><?php echo $p->t('zeitwunsch/hierKannIchUnterrichten');?></TD>
+			    <TD>&nbsp;&nbsp;<?php echo $p->t('zeitwunsch/hierKannIchUnterrichten');?></TD>
 			  </TR>
 			  <!--<TR>
 			    <TD>
@@ -247,13 +247,13 @@ if(!$person->load($uid))
 			    <TD>
 			      <DIV align="right">-1</DIV>
 			    </TD>
-			    <TD><?php echo $p->t('zeitwunsch/nurInNotfaellen');?></TD>
+			    <TD>&nbsp;&nbsp;<?php echo $p->t('zeitwunsch/nurInNotfaellen');?></TD>
 			  </TR>
 			  <TR>
 			    <TD>
 			      <DIV align="right">-2</DIV>
 			    </TD>
-			    <TD><?php echo $p->t('zeitwunsch/hierAufGarKeinenFall');?> !!!</TD>
+			    <TD>&nbsp;&nbsp;<?php echo $p->t('zeitwunsch/hierAufGarKeinenFall');?></TD>
 			  </TR>
 			</TABLE>
 			<P>&nbsp;</P>
