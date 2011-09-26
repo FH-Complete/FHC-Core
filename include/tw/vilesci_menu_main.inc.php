@@ -102,7 +102,7 @@ $menu=array
 	),
 	'Personen'=> 	array
 	(
-		'name'=>'Personen', 'opener'=>'true', 'hide'=>'true', 'image'=>'system-users.png',
+		'name'=>'Personen', 'opener'=>'true', 'hide'=>'true', 'image'=>'system-users.png', 'permissions'=>array('admin','lv-plan','support'),
 		'link'=>'left.php?categorie=Personen', 'target'=>'nav',
 		'Suche'=>array('name'=>'Suche', 'link'=>'personen/suche.php', 'target'=>'main','permissions'=>array('admin','lv-plan','support')),
 		'Zusammenlegen'=>array('name'=>'Zusammenlegen', 'link'=>'stammdaten/personen_wartung.php', 'target'=>'main', 'permissions'=>array('admin','lv-plan','support')),
@@ -191,7 +191,7 @@ $menu=array
 	),
 	'Auswertung'=>	array
 	(
-		'name'=>'Auswertung', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support','assistenz','wawi/inventar'), 'image'=>'statistic.png',
+		'name'=>'Auswertung', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support','assistenz','wawi/inventar','basis/statistik'), 'image'=>'statistic.png',
 		'link'=>'left.php?categorie=Auswertung', 'target'=>'nav',
 	/*
 		'Raumauslastung'=>array('name'=>'Raumauslastung...', 'link'=>'lehre/raumauslastung.php', 'target'=>'main'),
