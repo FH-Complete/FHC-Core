@@ -40,7 +40,8 @@
 	if (!($berechtigung->isBerechtigt('admin') || 
 		  $berechtigung->isBerechtigt('support') || 
 		  $berechtigung->isBerechtigt('preinteressent') || 
-		  $berechtigung->isBerechtigt('lehre') || 
+		  $berechtigung->isBerechtigt('lehre') ||
+		  $berechtigung->isBerechtigt('basis/statistik') ||  
 		  $berechtigung->isBerechtigt('lv-plan') ))
 		die ('Keine Berechtigung!');
 	
