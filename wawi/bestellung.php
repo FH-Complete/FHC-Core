@@ -2336,6 +2336,16 @@ function getDetailRow($i, $bestelldetail_id='', $sort='', $menge='', $ve='', $be
 function sendFreigabeMails($uids, $bestellung, $user)
 {
 	global $date;
+	$tags = new tags(); 
+	$tags->GetTagsByBestellung($bestellung->bestellung_id);
+	$tagsAusgabe='';
+	foreach($tags->result as $res)
+	{
+		if($tagsAusgabe!='')
+			$tagsAusgabe.=', ';
+			
+		$tagsAusgabe.=$res->tag;
+	}
 	$msg = '';
 		
 	$kst_mail = new wawi_kostenstelle(); 
@@ -2356,6 +2366,7 @@ function sendFreigabeMails($uids, $bestellung, $user)
 	$email.="Kontaktperson: ".$besteller->titelpre.' '.$besteller->vorname.' '.$besteller->nachname.' '.$besteller->titelpost."<br>";
 	$email.="Erstellt am: ".$date->formatDatum($bestellung->insertamum,'d.m.Y')."<br>";
 	$email.="Kostenstelle: ".$kst_mail->bezeichnung."<br>Konto: ".$konto_mail->kurzbz."<br>";
+	$email.="Tags: ".$tagsAusgabe."<br>";
 	
 	$email.="Link: <a href='".APP_ROOT."/index.php?content=bestellung.php&method=update&id=$bestellung->bestellung_id'>zur Bestellung </a>";
 	
@@ -2422,6 +2433,16 @@ function sendZentraleinkaufFreigegeben($bestellung)
 function sendBestellerMail($bestellung, $status)
 {
 	global $date;
+	$tags = new tags(); 
+	$tags->GetTagsByBestellung($bestellung->bestellung_id);
+	$tagsAusgabe='';
+	foreach($tags->result as $res)
+	{
+		if($tagsAusgabe!='')
+			$tagsAusgabe.=', ';
+			
+		$tagsAusgabe.=$res->tag;
+	}
 	$msg = '';
 	
 	$kst_mail = new wawi_kostenstelle(); 
@@ -2449,7 +2470,8 @@ function sendBestellerMail($bestellung, $status)
 	$email.="Firma: ".$firma_mail->name."<br>";
 	$email.="Erstellt am: ".$date->formatDatum($bestellung->insertamum,'d.m.Y')."<br>";
 	$email.="Kostenstelle: ".$kst_mail->bezeichnung."<br>Konto: ".$konto_mail->kurzbz."<br>";
-	
+	$email.="Tags: ".$tagsAusgabe."<br>";
+		
 	$email.="Link: <a href='".APP_ROOT."/index.php?content=bestellung.php&method=update&id=$bestellung->bestellung_id'>zur Bestellung </a>";
 	
 	$mail = new mail($bestellung->besteller_uid.'@'.DOMAIN, 'no-reply', 'Bestellung '.$bestellung->bestell_nr, 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
