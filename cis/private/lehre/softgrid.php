@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
  
 /* Copyright (C) 2008 Technikum-Wien
@@ -87,6 +87,11 @@ require_once('../../../config/cis.config.inc.php');
 </head>
 <body>
 	<h1>Applikationsliste</h1>
+	<table>
+	<tr>
+		<td><br/>Nähere Informationen zu Softgrid sowie eine Installationsanleitung finden Sie unter "Infrastruktur - SoftGrid".<br/><br/></td>
+	</tr>
+	</table>
 <?php
 
 	$cSoftGridApplicationsRoot=array('%CSIDL_PROGRAMS%\\SoftGrid Applications\\','%CSIDL_PROGRAMS%\\SoftGrid Applications');
