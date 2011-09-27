@@ -101,6 +101,18 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 		<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			function checkEid()
+			{
+				if(document.projektabgabe.eiderklaerung.checked == false) 
+				{
+					alert("'.$p->t('abgabetool/erklaerungNichtAkzeptiert').'!");
+					return false; 
+				}
+					return true; 
+			}
+		</script>
+		
 	</head>
 	<body class="Background_main"  style="background-color:#eeeeee;">';
 if($uid!=$user)
@@ -267,7 +279,7 @@ if($command=="update" && $error!=true)
 					$htmlstr = "<div>".$p->t('abgabetool/betreuer').": <b>".$betreuer."</b><br>".$p->t('abgabetool/titel').": <b>".$titel."<b><br><br></div>\n";
 					$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
 					$htmlstr .= "<tr></tr>\n";
-					$htmlstr .= "<form accept-charset='UTF-8' action='".$_SERVER['PHP_SELF']."' method='POST' name='".$projektarbeit_id."'>\n";
+					$htmlstr .= "<form accept-charset='UTF-8' action='".$_SERVER['PHP_SELF']."' method='POST' name='projektabgabe'>\n";
 					$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
 					$htmlstr .= "<input type='hidden' name='paabgabe_id' value='".$paabgabe_id."'>\n";
 					$htmlstr .= "<input type='hidden' name='paabgabetyp_kurzbz' value='".$paabgabetyp_kurzbz."'>\n";
@@ -304,16 +316,19 @@ if($command=="update" && $error!=true)
 								<td><input  type='text' name='schlagwoerter_en' value='".$schlagwoerter_en."' size='60' maxlength='150'></td></tr>\n";
 					$htmlstr .= "<tr><td valign='top'><b>".$p->t('abgabetool/abstract')." </b>".$p->t('abgabetool/maxZeichen').":*</td>
 								<td><textarea name='abstract' cols='46'  rows='7'>$abstract</textarea></td></tr>\n";
-					$htmlstr .= "<tr><td valign='top'><b>".$p->T('abgabetool/abstractEng')."</b>".$p->t('abgabetool/maxZeichen').":*</td>
+					$htmlstr .= "<tr><td valign='top'><b>".$p->t('abgabetool/abstractEng')."</b>".$p->t('abgabetool/maxZeichen').":*</td>
 								<td><textarea name='abstract_en' cols='46'  rows='7'>$abstract_en</textarea></td></tr>\n";
 					$htmlstr .= "<tr><td><b>".$p->t('abgabetool/seitenanzahl').":*</b></td>
 								<td><input  type='text' name='seitenanzahl' value='".$seitenanzahl."' size='5' maxlength='4'></td></tr>\n";
-					$htmlstr .= "<tr></tr><td>&nbsp;</td><tr><td style='font-size:70%'>* ".$p->t('abgabetool/pflichtfeld')."</td></tr>
+					$htmlstr .="<tr><td>&nbsp;</td></tr>\n";
+					$htmlstr .="<tr><td colspan='2'><p align='justify'>".$p->t('abgabetool/eidesstattlicheErklaerung')."</p></td><td></td></tr>\n";
+					$htmlstr .= "<tr><td><b>".$p->t('abgabetool/gelesenUndAkzeptiert').":* <input type='checkbox' name='eiderklaerung'></b></td></tr>";
+					$htmlstr .="<tr></tr><td>&nbsp;</td><tr><td style='font-size:70%'>* ".$p->t('abgabetool/pflichtfeld')."</td></tr>
 								<tr><td>&nbsp;</td></tr>\n";
-					$htmlstr .= "<tr><td><input type='submit' name='schick' value='".$p->t('global/abschicken')."'></td>";
+					$htmlstr .= "<tr><td><input type='submit' name='schick' onclick='return checkEid();' value='".$p->t('global/abschicken')."'></td>";
 					$htmlstr .= "</tr>\n";
 					$htmlstr .= "</form>\n";
-					$htmlstr .= "</table>\n";	
+					$htmlstr .= "</table>\n";
 					$htmlstr .= "</body></html>";
 					echo $htmlstr;
 				} 
