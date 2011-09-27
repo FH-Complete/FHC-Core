@@ -64,4 +64,8 @@ $this->phrasen['abgabetool/fehlerMailBegutachter']='Fehler beim Versenden des Ma
 $this->phrasen['abgabetool/fehlerBetreuerNichtGefundenKeinMail']='Betreuer nicht gefunden. Kein Mail verschickt!';
 $this->phrasen['abgabetool/keinPDF']='Upload ist keine pdf-Datei! Bitte wiederholen Sie den Fileupload.';
 $this->phrasen['abgabetool/dateiZuGross']='Die Datei ist zu groß! Maximale Dateigröße 15 MB';
+
+$this->phrasen['abgabetool/eidesstattlicheErklaerung']='Ich erkläre hiermit an Eides statt, dass ich die vorliegende Arbeit selbständig angefertigt habe. Die aus fremden Quellen direkt oder indirekt übernommenen Gedanken sind als solche kenntlich gemacht. Die Arbeit wurde bisher weder in gleicher noch in ähnlicher Form einer anderen Prüfungsbehörde vorgelegt und auch noch nicht veröffentlicht.';
+$this->phrasen['abgabetool/gelesenUndAkzeptiert']='Gelesen und akzeptiert';
+$this->phrasen['abgabetool/erklaerungNichtAkzeptiert']='Erklärung nicht akzeptiert';
 ?>
