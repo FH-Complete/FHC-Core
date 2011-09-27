@@ -98,8 +98,8 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 				<th>'.$p->t('global/datum').'</th>
 				<th>'.$p->t('global/titel').'</th>
 				<th>'.$p->t('global/stunde').'</th>
-				<th>'.$ort_kurzbz.'</th>
-				<th>'.$pers_uid.'</th>
+				<th>'.$p->t('lvplan/raum').'</th>
+				<th>'.$p->t('global/uid').'</th>
 				<th>'.$p->t('global/beschreibung').'</th>
 				<th>'.$p->t('global/aktion').'</th>
 			</tr>';
