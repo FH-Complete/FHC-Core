@@ -44,6 +44,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				<xul:toolbar >
 					<xul:toolbarbutton label="Neue Notiz" oncommand="document.getBindingParent(this).NeueNotiz()" image="../skin/images/NeuDokument.png" tooltiptext="Neue Notiz anlegen" />
 					<xul:toolbarbutton label="Aktualisieren" oncommand="document.getBindingParent(this).RefreshNotiz()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
+					<xul:toolbarbutton label="Filter" type="menu">							
+				      <xul:menupopup>
+						    <xul:menuitem label="Alle Notizen anzeigen" oncommand="document.getBindingParent(this).LoadNotizTree(document.getBindingParent(this).getAttribute('projekt_kurzbz'),document.getBindingParent(this).getAttribute('projektphase_id'),document.getBindingParent(this).getAttribute('projekttask_id'),document.getBindingParent(this).getAttribute('uid'),document.getBindingParent(this).getAttribute('person_id'),document.getBindingParent(this).getAttribute('prestudent_id'),document.getBindingParent(this).getAttribute('bestellung_id'), document.getBindingParent(this).getAttribute('user'), null);" tooltiptext="Alle Notizen anzeigen"/>
+							<xul:menuitem label="nur offene Notizen anzeigen" oncommand="document.getBindingParent(this).LoadNotizTree(document.getBindingParent(this).getAttribute('projekt_kurzbz'),document.getBindingParent(this).getAttribute('projektphase_id'),document.getBindingParent(this).getAttribute('projekttask_id'),document.getBindingParent(this).getAttribute('uid'),document.getBindingParent(this).getAttribute('person_id'),document.getBindingParent(this).getAttribute('prestudent_id'),document.getBindingParent(this).getAttribute('bestellung_id'), document.getBindingParent(this).getAttribute('user'), false);" tooltiptext="nur offene Notizen anzeigen"/>
+				      </xul:menupopup>
+				    </xul:toolbarbutton>
 				</xul:toolbar>
 			</xul:toolbox>
 			<xul:tree anonid="tree-notiz"
@@ -217,6 +223,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			<parameter name="prestudent_id"/>
 			<parameter name="bestellung_id"/>
 			<parameter name="user"/>
+			<parameter name="erledigt"/>
 			<body>
 			<![CDATA[
 				//debug('LoadNotizTree');
@@ -232,6 +239,15 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					this.setAttribute('prestudent_id',prestudent_id);
 					this.setAttribute('bestellung_id',bestellung_id);
 					this.setAttribute('user',user);
+					
+					//Wenn kein Erledigt Parameter uebergeben wird, dann wird die zuletzt 
+					//verwendete Einstellung verwendet
+					if(typeof erledigt=="undefined")
+						erledigt = this.getAttribute('erledigt');
+
+					if(typeof erledigt!="undefined")
+						this.setAttribute('erledigt',erledigt);
+
 				
 					var datasource="<?php echo APP_ROOT; ?>rdf/notiz.rdf.php?ts="+gettimestamp();
 					datasource = datasource+"&projekt_kurzbz="+encodeURIComponent(projekt_kurzbz);
@@ -242,6 +258,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					datasource = datasource+"&prestudent_id="+encodeURIComponent(prestudent_id);
 					datasource = datasource+"&bestellung_id="+encodeURIComponent(bestellung_id);
 					datasource = datasource+"&user="+encodeURIComponent(user);
+
+					//Wenn es als Parameter uebergeben wird, ist es ein boolean, sonst ein String
+					if((typeof erledigt=="boolean" && erledigt==true) || (typeof erledigt=="string" && erledigt=='true'))
+						datasource = datasource+"&erledigt=true";
+					else if((typeof erledigt=="boolean" && erledigt==false)	|| (typeof erledigt=="string" && erledigt=='false'))
+						datasource = datasource+"&erledigt=false";
+					
+					
 					//debug('Source:'+datasource);
 	                var tree = document.getAnonymousElementByAttribute(this ,'anonid', 'tree-notiz');
 
