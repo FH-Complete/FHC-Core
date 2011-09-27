@@ -241,8 +241,13 @@ class notiz extends basis_db
 					LEFT JOIN public.tbl_notizzuordnung USING(notiz_id)
 				WHERE 1=1";
 		
-		if($erledigt)
-			$qry.=" AND erledigt=true";
+		if(!is_null($erledigt))
+		{
+			if($erledigt)
+				$qry.=" AND erledigt=true";
+			else
+				$qry.=" AND erledigt=false";
+		}
 		if($projekt_kurzbz!='')
 			$qry.=" AND projekt_kurzbz='".addslashes($projekt_kurzbz)."'";
 		if($projektphase_id!='')

@@ -43,7 +43,10 @@ echo '
 ';
 
 $notiz = new notiz();
-$erledigt=null;
+if(isset($_GET['erledigt']))
+	$erledigt=($_GET['erledigt']=='true'?true:false);
+else
+	$erledigt=null;
 $projekt_kurzbz=(isset($_GET['projekt_kurzbz'])?$_GET['projekt_kurzbz']:null);
 $projektphase_id=(isset($_GET['projektphase_id'])?$_GET['projektphase_id']:null);
 $projekttask_id=(isset($_GET['projekttask_id'])?$_GET['projekttask_id']:null);
