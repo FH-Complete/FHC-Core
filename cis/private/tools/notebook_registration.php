@@ -28,6 +28,7 @@ if (!$user=get_uid())
 $mac_result = trim((isset($_REQUEST['mac_result']) ? $_REQUEST['mac_result']:''));
 $txtUID = trim((isset($_REQUEST['txtUID']) ? $_REQUEST['txtUID']:''));
 $txtPassword = trim((isset($_REQUEST['txtPassword']) ? $_REQUEST['txtPassword']:''));
+$txtMAC = trim((isset($_REQUEST['txtMAC']) ? $_REQUEST['txtMAC']:''));
 
 if(check_lektor($user))
 	$is_lector=true;
@@ -104,116 +105,115 @@ function ip_increment($ip = "")
 			// ändern oder eintragen einer mac adresse
 			if (!$error)
 			{
-
-			if(isset($txtMAC) && $txtMAC != "")
-			{
-				$sql_query = "SELECT DISTINCT vorname, nachname FROM campus.vw_benutzer WHERE uid='".addslashes($txtUID)."' LIMIT 1";
-
-				if($result = $db->db_query($sql_query))
+				if(isset($txtMAC) && $txtMAC != "")
 				{
-					if($row = $db->db_fetch_object($result))
+					$sql_query = "SELECT DISTINCT vorname, nachname FROM campus.vw_benutzer WHERE uid='".addslashes($txtUID)."' LIMIT 1";
+	
+					if($result = $db->db_query($sql_query))
 					{
-						$name = $row->vorname.' '.$row->nachname;
+						if($row = $db->db_fetch_object($result))
+						{
+							$name = $row->vorname.' '.$row->nachname;
+						}
+						else
+							die($p->t("global/fehlerBeimErmittelnDerUID"));
 					}
 					else
 						die($p->t("global/fehlerBeimErmittelnDerUID"));
-				}
-				else
-					die($p->t("global/fehlerBeimErmittelnDerUID"));
-
-			$mac = mb_eregi_replace(":", "", mb_eregi_replace("-", "", mb_strtoupper($txtMAC)));
-
-			$filename_dat = '../../../../system/dhcp.dat';
-			$filename_ip  = '../../../../system/dhcp.ip';
-
-			copy($filename_dat, '../../../../system/backup/dhcp_'.date('j-m-Y_H-i-s').'.dat');
-
-			unset($mfiles);
-			// leich gepfuscht aber funktioniert
-			$mfiles = new File_Match("/$mac?\s(.{1}) (.*)\s?/", $filename_dat, '', 0, array('#',';'));
-			$mfiles->setFindFunction('preg');
-			$mfiles->doFind();
-			$VLAN='';
-			if($mfiles->occurences)
-			{
-				$VLAN = $mfiles->match[1];
-				$fuser = $mfiles->match[2];
-				$fuser = split(" ", $fuser);
-				$fuser = $fuser[0];
-				//hier könnte man noch eine email oder dgl. schicken
-				if ($fuser != $txtUID)
-					$error = 3;
-			}
-
-			unset($mfiles);
-
-		     	if(!$VLAN) $VLAN = 'S';
-
-
-			if (!$error)
-			{
-			if($VLAN != 'S')
-			{
-				$mac_result = 3;
-			}
-			else if ($VLAN == 'S')
-			{
-				$mfiles = new File_SearchReplace("/.*?\sS\s$txtUID\s(.*)?\snb-$txtUID\s(.*)/", "$mac S $txtUID $1 nb-$txtUID $name", $filename_dat, '', 0, array("#", ";"));
-
-				$mfiles->setSearchFunction('preg');
-
-				if(preg_match("/[A-Fa-f0-9]{12}/", $mac) && $mac != '' && mb_strlen($mac) == 12)
-				{
-					$mfiles->doSearch();
-
-					// neuen eintrag erzeugen und ip hochzählen
-					if($mfiles->occurences == 0)
+	
+					$mac = mb_eregi_replace(":", "", mb_eregi_replace("-", "", mb_strtoupper($txtMAC)));
+		
+					$filename_dat = '../../../../system/dhcp.dat';
+					$filename_ip  = '../../../../system/dhcp.ip';
+		
+					copy($filename_dat, '../../../../system/backup/dhcp_'.date('j-m-Y_H-i-s').'.dat');
+		
+					unset($mfiles);
+					// leich gepfuscht aber funktioniert
+					$mfiles = new File_Match("/$mac?\s(.{1}) (.*)\s?/", $filename_dat, '', 0, array('#',';'));
+					$mfiles->setFindFunction('preg');
+					$mfiles->doFind();
+					$VLAN='';
+					if($mfiles->occurences)
 					{
-						//$content = file($filename_dat, "r");
-						//$content = implode('', $content);
-						$content = file_get_contents($filename_dat);
-
-						//$ip = file($filename_ip);
-						//$ip = trim($ip[0]);
-						$ip = file_get_contents($filename_ip);
-
-						$ip = trim($ip);
-						$ip = ip_increment($ip);
-
-						// nachschauen ob, die mac adresse schon
-						// einmal gespeichert wurde
-						$sfiles = new File_Match("/$mac?\s/", $filename_dat, '', 0, array('#',';'));
-						$sfiles->doFind();
-
-						if($sfiles->occurences)
-						{
-							echo 'MAC IN USE';
+						$VLAN = $mfiles->match[1];
+						$fuser = $mfiles->match[2];
+						$fuser = split(" ", $fuser);
+						$fuser = $fuser[0];
+						//hier könnte man noch eine email oder dgl. schicken
+						if ($fuser != $txtUID)
 							$error = 3;
-						}
-						else
-						{
-							$mfiles->writeout($filename_dat, $content."$mac S $txtUID $ip nb-$txtUID $name\n");
-							$mfiles->writeout($filename_ip, $ip);
-							$mac_result = 0;
-							unset($txtMAC);
-						}
-						unset($sfiles);
-
 					}
-					else if($mfiles->occurences > 0)
+		
+					unset($mfiles);
+	
+			     	if(!$VLAN) 
+			     		$VLAN = 'S';
+	
+					if (!$error)
 					{
-						$mac_result = 1;
-
-						unset($txtMAC);
-					}
-				}
-				else if($mac)
-				{
-					$mac_result = 2;
-				}
-			} // eof !$vlan == s
-			} // eof !$error
-			} // eof !error (2)
+						if($VLAN != 'S')
+						{
+							$mac_result = 3;
+						}
+						else if ($VLAN == 'S')
+						{
+							$mfiles = new File_SearchReplace("/.*?\sS\s$txtUID\s(.*)?\snb-$txtUID\s(.*)/", "$mac S $txtUID $1 nb-$txtUID $name", $filename_dat, '', 0, array("#", ";"));
+			
+							$mfiles->setSearchFunction('preg');
+			
+							if(preg_match("/[A-Fa-f0-9]{12}/", $mac) && $mac != '' && mb_strlen($mac) == 12)
+							{
+								$mfiles->doSearch();
+			
+								// neuen eintrag erzeugen und ip hochzählen
+								if($mfiles->occurences == 0)
+								{
+									//$content = file($filename_dat, "r");
+									//$content = implode('', $content);
+									$content = file_get_contents($filename_dat);
+			
+									//$ip = file($filename_ip);
+									//$ip = trim($ip[0]);
+									$ip = file_get_contents($filename_ip);
+			
+									$ip = trim($ip);
+									$ip = ip_increment($ip);
+			
+									// nachschauen ob, die mac adresse schon
+									// einmal gespeichert wurde
+									$sfiles = new File_Match("/$mac?\s/", $filename_dat, '', 0, array('#',';'));
+									$sfiles->doFind();
+			
+									if($sfiles->occurences)
+									{
+										echo 'MAC IN USE';
+										$error = 3;
+									}
+									else
+									{
+										$mfiles->writeout($filename_dat, $content."$mac S $txtUID $ip nb-$txtUID $name\n");
+										$mfiles->writeout($filename_ip, $ip);
+										$mac_result = 0;
+										unset($txtMAC);
+									}
+									unset($sfiles);
+			
+								}
+								else if($mfiles->occurences > 0)
+								{
+									$mac_result = 1;
+			
+									unset($txtMAC);
+								}
+							}
+							else if($mac)
+							{
+								$mac_result = 2;
+							}
+						} // eof !$vlan == s
+					} // eof !$error
+				} // eof !error (2)
 			} // eof if $txtMAC
 ?>
 		  <p><?php echo $p->t("notebookregister/notebook_absatz1");?></p>
@@ -242,13 +242,14 @@ function ip_increment($ip = "")
 			</table>
   	      </form>
 		  <?php
+		  //echo "error:".$error;
 		  	if ($error == 1)
 				echo '<h3>'.$p->t("notebookregister/passwortEingebenWennUIDgeaendert").'.</h3>';
 			else if ($error == 2)
 				echo '<h3>'.$p->t("notebookregister/passwortErneutEingeben").'.</h3>';
 			else if ($error == 3)
 				echo '<h3>'.$p->t("notebookregister/MACadresseBereitsVerwendet").'.</h3>';
-
+		//echo "result:".$mac_result;
 		  	if(isset($mac_result) && $mac_result!='')
 			{
 				if($mac_result == 0)
