@@ -720,7 +720,7 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 echo '<table width="100%" height="10px"><tr><td>';
 echo "<h3><a href='javascript:window.history.back()'>".$p->t('global/zurueck')."</a></h3>";
 echo '</td><td align="right">';
-echo '<a href="'.APP_ROOT.'cis/cisdocs/handbuch_benotungstool.pdf" class="Item" target="_blank">Handbuch (PDF)</a>';
+echo '<a href="'.APP_ROOT.'cms/dms.php?id=32" class="Item" target="_blank">Handbuch (PDF)</a>';
 echo '</td></tr></table>';
 
 
