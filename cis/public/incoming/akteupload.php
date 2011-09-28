@@ -35,6 +35,8 @@ header("Content-Type: text/html; charset=utf-8");
 
 if(isset($_GET['lang']))
 	setSprache($_GET['lang']);
+	
+$dokumenttyp = (isset($_GET['dokumenttyp']))? $_GET['dokumenttyp'] : 'LearnAgr';
 $sprache = getSprache(); 
 $p=new phrasen($sprache); 
 
@@ -134,7 +136,7 @@ if(isset($_GET['person_id']))
 				foreach ($dokument->result as $dok)
 				{
 					$selected =""; 
-					if($dok->dokument_kurzbz == "LearnAgr")
+					if($dok->dokument_kurzbz == $dokumenttyp)
 						$selected = "selected";
 					echo '<option '.$selected.' value="'.$dok->dokument_kurzbz.'" >'.$dok->bezeichnung."</option>\n";
 				}
