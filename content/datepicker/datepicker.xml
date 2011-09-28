@@ -39,13 +39,20 @@
 			]]></handler>
 		</handlers>
 	</binding>
-	<binding id="datepicker-month" extends="xul:label">
-		<content value=""/>
+	<binding id="datepicker-month">
+		<content>
+			<xul:label xbl:inherits="value" />
+		</content>
 	</binding>
-	<binding id="datepicker-year" extends="xul:label">
-		<content value=""/>
+	<binding id="datepicker-year">
+		<content>
+			<xul:label xbl:inherits="value" />
+		</content>
 	</binding>
-	<binding id="datepicker-day" extends="xul:label">
+	<binding id="datepicker-day">
+		<content>
+			<xul:label xbl:inherits="value" />
+		</content>
 		<implementation>
 			<field name="_datepicker">null</field>
 			<property name="datepicker">
