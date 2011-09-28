@@ -238,9 +238,10 @@ else if($method=="lehrveranstaltungen")
 				$lehrveranstaltung->load($lv); 
 				$studiengang = new studiengang(); 
 				$studiengang->load($lehrveranstaltung->studiengang_kz);
+				$studiengang_language = ($sprache == 'German') ? $studiengang->bezeichnung : $studiengang->english;  
 				echo '<tr>';
 				echo '<td> <a href="incoming.php?method=lehrveranstaltungen&mode=delete&id='.$lv.'&view=own">'.$p->t('global/löschen').'</a></td>';
-				echo '<td>',$studiengang->kurzbzlang,'</td>';
+				echo '<td>',$studiengang_language,'</td>';
 				echo '<td>',$lehrveranstaltung->semester,'</td>';
 				echo '<td>',$lehrveranstaltung->bezeichnung,'</td>';
 				echo '<td>',$lehrveranstaltung->bezeichnung_english,'</td>';
@@ -334,12 +335,16 @@ else if($method=="lehrveranstaltungen")
 				$freieplaetze = $row->incoming - $row->anzahl;
 				if($freieplaetze>0)
 				{
+					$studiengang = new studiengang(); 
+					$studiengang->load($row->studiengang_kz);
+					$studiengang_language = ($sprache == 'German') ? $studiengang->bezeichnung : $studiengang->english;  
+					
 					echo '<tr>';
 					if(!$preincoming->checkLehrveranstaltung($preincoming->preincoming_id, $row->lehrveranstaltung_id))
 						echo '<td><a href="incoming.php?method=lehrveranstaltungen&mode=add&id='.$row->lehrveranstaltung_id.'">'.$p->t('global/anmelden').'</a></td>';
 					else
 						echo '<td>'.$p->t('global/angemeldet').'</td>';
-					echo '<td>',$stg->kuerzel_arr[$row->studiengang_kz],'</td>';
+					echo '<td>',$studiengang_language,'</td>';
 					echo '<td>',$row->semester,'</td>';
 					echo '<td>',$row->bezeichnung,'</td>';
 					echo '<td>',$row->bezeichnung_english,'</td>';
@@ -1185,7 +1190,6 @@ else if ($method == "profil")
 			</tr>
 			<tr>
 				<td>'.$p->t('global/staatsbuergerschaft').'</td>
-
 				<td><SELECT name="staatsbuerger">
 				<option value="staat_auswahl">-- select --</option>';
 				foreach ($nation->nation as $nat)
@@ -1193,7 +1197,10 @@ else if ($method == "profil")
 					$selected="";
 					if($person->staatsbuergerschaft == $nat->code)
 						$selected = "selected"; 
-					echo '<option '.$selected.' value="'.$nat->code.'" >'.$nat->langtext."</option>\n";
+					if($sprache == 'English')
+						echo '<option '.$selected.' value="'.$nat->code.'" >'.$nat->engltext."</option>\n";
+					else
+						echo '<option '.$selected.' value="'.$nat->code.'" >'.$nat->langtext."</option>\n";
 				}
 	
 echo'			</td>	
@@ -1253,6 +1260,7 @@ echo'			<td>'.$p->t('incoming/abgelegtin').'</td>
 				<input type="hidden" name="emergency_name_id" id="emergency_name_id" value="'.$preincoming->person_id_emergency.'"></td></tr>				
 			<tr>
 				<td>E-Mail</td>'; 
+	$email ='';
 	foreach($kontakt->result as $kon)
 	{
 		if($kon->kontakttyp == "email")
@@ -1279,7 +1287,8 @@ echo'			<td>'.$p->t('incoming/abgelegtin').'</td>
 				<input type="hidden" name="emergency_emailId" id="emergency_emailId" value="'.$emEmailId.'"></td>
 			</tr>	
 			<tr>
-				<td colspan="4" align = "center"><input type="submit" name="submit_profil" value="'.$p->t('global/speichern').'" onclick="return checkProfil()"></td>		
+				<td></td><td></td><td align = "center"><input type="submit" name="submit_profil" value="'.$p->t('global/speichern').'" onclick="return checkProfil()"></td>
+				<td><a href="'.APP_ROOT.'/cis/public/incoming/akteupload.php?person_id='.$person->person_id.'&dokumenttyp=Lebenslf" onclick="FensterOeffnen(this.href); return false;">'.$p->t('incoming/uploadCv').'</a></td>
 			</tr>
 
 			</table>
@@ -1289,6 +1298,13 @@ echo'			<td>'.$p->t('incoming/abgelegtin').'</td>
 	</form>
 	
 	<script type="text/javascript">
+	
+	function FensterOeffnen (adresse) 
+	{
+		MeinFenster = window.open(adresse, "Info", "width=500,height=500,left=100,top=200");
+  		MeinFenster.focus();
+	}
+	
 	function checkProfil()
 	{
 		if(document.ProfilForm.staatsbuerger.options[0].selected == true) 
@@ -1359,6 +1375,11 @@ echo 	'<script type="text/javascript">
 	}
 	echo '</table>'; 
 }
+else if($method == 'learningAgreement')
+{
+	
+}
+
 // Ausgabe Menü
 else 
 {
@@ -1366,22 +1387,25 @@ else
 		<fieldset>
 		<table align ="center"  border="0">
 				<tr>	
-					<td><a href="incoming.php?method=profil">'.$p->t('incoming/persönlichedateneditieren').'</a></td>
+					<td>1. <a href="incoming.php?method=profil">'.$p->t('incoming/persönlichedateneditieren').'</a></td>
 				</tr>
 				<tr>
-					<td><a href="incoming.php?method=university">'.$p->t("incoming/eigeneuniversitaet").'</a></td>
+					<td>2. <a href="incoming.php?method=university">'.$p->t("incoming/eigeneuniversitaet").'</a></td>
 				</tr>
 				<tr>
-					<td><a href ="incoming.php?method=austauschprogram">'.$p->t('incoming/austauschprogram').'</a></td>	
+					<td>3. <a href ="incoming.php?method=austauschprogram">'.$p->t('incoming/austauschprogram').'</a></td>	
 				</tr>				
 				<tr>
-					<td><a href="incoming.php?method=lehrveranstaltungen">'.$p->t('incoming/lehrveranstaltungenauswählen').'</a></td>
+					<td>4. <a href="incoming.php?method=lehrveranstaltungen">'.$p->t('incoming/lehrveranstaltungenauswählen').'</a></td>
 				</tr>
 				<tr>
-					<td><a href="learningAgreementPdf.php?id='.$preincoming->preincoming_id.'">'.$p->t('incoming/learningagreementerstellen').'</a></td>
+					<td>5. <a href="learningAgreementPdf.php?id='.$preincoming->preincoming_id.'">'.$p->t('incoming/learningagreementerstellen').'</a></td>
 				</tr>
 				<tr>
-					<td><a href="incoming.php?method=files">'.$p->t("incoming/uploadvondateien").'</a></td>
+					<td>6. <a href="'.APP_ROOT.'/cis/public/incoming/akteupload.php?person_id='.$person->person_id.'&dokumenttyp=LearnAgr" onclick="FensterOeffnen(this.href); return false;">'.$p->t("incoming/uploadLearningAgreement").'</a></td>
+				</tr>
+				<tr>
+					<td>7. <a href="incoming.php?method=files">'.$p->t("incoming/uploadvondateien").'</a></td>
 				</tr>
 			</table>
 			<table width="100%" border="0">
@@ -1389,6 +1413,15 @@ else
 					<td align="right"><a href="logout.php">Logout</a> </td>
 				</tr>
 			</table>';
+	
+	echo '<script type="text/javascript">
+			function FensterOeffnen (adresse) 
+			{
+				MeinFenster = window.open(adresse, "Info", "width=500,height=500,left=100,top=200");
+		  		MeinFenster.focus();
+			}
+			</script>';
+
 }
 ?>
 	</body>
