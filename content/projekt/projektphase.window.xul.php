@@ -70,7 +70,7 @@ else
 			<rows>
 				<row>
 					<label value="ID" control="textbox-projektphase-projektphase_id "/>
-					<textbox id="textbox-projektphase-projektphase_id" value="<?php echo $projektphase_id; ?>" maxlength="64"/>
+					<textbox id="textbox-projektphase-projektphase_id" disabled="true" value="<?php echo $projektphase_id; ?>" maxlength="64"/>
 				</row>
 				<row>
 					<label value="Projekt (Kurzbz)" control="textbox-projektphase-projekt_kurzbz"/>
