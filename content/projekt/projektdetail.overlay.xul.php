@@ -77,6 +77,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<label value="Ende" control="textbox-projekt-detail-ende"/>
    					<textbox id="textbox-projekt-detail-ende"/>
 				</row>
+				<row>
+					<label value="Budget" control="textbox-projekt-detail-budget"/>
+   					<textbox id="textbox-projekt-detail-budget"/>
+				</row>
 			</rows>
 		</grid>
 		<hbox>

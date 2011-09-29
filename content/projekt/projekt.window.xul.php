@@ -89,6 +89,10 @@ else
 					<label value="Ende" control="textbox-projekt-ende"/>
    					<textbox id="textbox-projekt-ende"/>
       			</row>
+      			<row>
+					<label value="Budget" control="textbox-projekt-budget"/>
+   					<textbox id="textbox-projekt-budget"/>
+      			</row>
 			<!-- <row>
 					<label value="Test" control="textbox-projekt-test"/>
    					<menulist id="menulist-projekt-test" flex="1">

@@ -103,6 +103,7 @@ function saveProjekt()
     var nummer=document.getElementById('textbox-projekt-nummer').value;
     var beschreibung=document.getElementById('textbox-projekt-beschreibung').value;
     var beginn=document.getElementById('textbox-projekt-beginn').value;
+    var budget=document.getElementById('textbox-projekt-budget').value;
     var ende=document.getElementById('textbox-projekt-ende').value;
     // Variablen checken
     
@@ -115,6 +116,7 @@ function saveProjekt()
     soapBody.appendChild(new SOAPObject("beschreibung")).val(beschreibung);
     soapBody.appendChild(new SOAPObject("beginn")).val(beginn);
     soapBody.appendChild(new SOAPObject("ende")).val(ende);
+    soapBody.appendChild(new SOAPObject("budget")).val(budget);
     soapBody.appendChild(new SOAPObject("neu")).val('true');
     
     var sr = new SOAPRequest("saveProjekt",soapBody);
