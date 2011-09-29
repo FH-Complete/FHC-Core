@@ -38,7 +38,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jqSOAPClient.js"></script>
 	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jqXMLUtils.js"></script>
 	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>content/projekt/projekt.window.js.php" />
-	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>content/functions.js"></script>
+	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>content/functions.js.php"></script>
 	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>content/projekt/ressource.js.php"></script>
 
 <vbox>
@@ -126,7 +126,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 				</row>
 				<row>
 					<label value="Bezeichnung" control="textbox-ressource-bezeichnung"/>
-					<textbox id="textbox-ressource-bezeichnung" maxlength="16"/>
+					<textbox id="textbox-ressource-bezeichnung" maxlength="256"/>
 				</row>
 				<row>
 					<label value="Beschreibung" control="textbox-ressource-beschreibung"/>
