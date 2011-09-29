@@ -142,6 +142,7 @@ function onselectProjekt()
     var nummer=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#nummer" ));
     var beginn=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#beginn" ));
     var ende=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ende" ));
+    var budget=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#budget" ));
     var personentage=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#personentage" ));
     
     //Daten den Feldern zuweisen
@@ -153,6 +154,7 @@ function onselectProjekt()
     document.getElementById('textbox-projekt-detail-nummer').value=nummer;
     document.getElementById('textbox-projekt-detail-beginn').value=beginn;
     document.getElementById('textbox-projekt-detail-ende').value=ende;
+    document.getElementById('textbox-projekt-detail-budget').value=budget;
     document.getElementById('checkbox-projekt-detail-neu').checked=false;
     
     
@@ -179,6 +181,7 @@ function saveProjektDetail()
 	nummer = document.getElementById('textbox-projekt-detail-nummer').value;
 	beginn = document.getElementById('textbox-projekt-detail-beginn').value;
 	ende = document.getElementById('textbox-projekt-detail-ende').value;
+	budget = document.getElementById('textbox-projekt-detail-budget').value;
 	neu = document.getElementById('checkbox-projekt-detail-neu').checked;
 	
 	var soapBody = new SOAPObject("saveProjekt");
@@ -189,6 +192,7 @@ function saveProjektDetail()
 	soapBody.appendChild(new SOAPObject("nummer")).val(nummer);
 	soapBody.appendChild(new SOAPObject("beginn")).val(beginn);
 	soapBody.appendChild(new SOAPObject("ende")).val(ende);
+	soapBody.appendChild(new SOAPObject("budget")).val(budget);
 	if(neu)
 		soapBody.appendChild(new SOAPObject("neu")).val('true');
 	else	
