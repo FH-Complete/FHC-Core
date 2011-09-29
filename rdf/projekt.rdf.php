@@ -53,7 +53,7 @@ for ($i=0;$i<count($projekt_obj->result);$i++)
 		<PROJEKT:beschreibung>'.$projekt->beschreibung.'</PROJEKT:beschreibung>
 		<PROJEKT:beginn>'.$projekt->beginn.'</PROJEKT:beginn>
 		<PROJEKT:ende>'.$projekt->ende.'</PROJEKT:ende>
-		<PROJEKT:budget></PROJEKT:budget>
+		<PROJEKT:budget>'.$projekt->budget.'</PROJEKT:budget>
 	</RDF:Description>'."\n";
 
 	$sequenz.='<RDF:li RDF:resource="'.$rdf_url.$projekt->projekt_kurzbz.'" />'."\n";
