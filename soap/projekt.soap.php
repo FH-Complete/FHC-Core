@@ -50,7 +50,7 @@ ini_set("soap.wsdl_cache_enabled", "0");
  * @param string $oe_kurzbz
  * @param boolean $neu
  */
-function saveProjekt($projekt_kurzbz, $nummer, $titel, $beschreibung, $beginn, $ende, $oe_kurzbz, $neu)
+function saveProjekt($projekt_kurzbz, $nummer, $titel, $beschreibung, $beginn, $ende, $budget, $oe_kurzbz, $neu)
 { 	
 	
 	$projekt = new projekt();
@@ -60,6 +60,7 @@ function saveProjekt($projekt_kurzbz, $nummer, $titel, $beschreibung, $beginn, $
 	$projekt->beschreibung = $beschreibung;
 	$projekt->beginn = $beginn;
 	$projekt->ende = $ende;
+	$projekt->budget = $budget;
 	$projekt->oe_kurzbz = $oe_kurzbz;
 	if($neu=='true')
 		$projekt->new = true; 
