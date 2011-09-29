@@ -121,7 +121,7 @@ else
 			$oRdf->obj[$idx]->setAttribut('titel',$projektphase->bezeichnung);
 			$oRdf->obj[$idx]->setAttribut('beschreibung',$projektphase->beschreibung);
 			$oRdf->obj[$idx]->setAttribut('beginn',$projektphase->start);
-			$oRdf->obj[$idx]->setAttribut('ende',$projekt->ende);
+			$oRdf->obj[$idx]->setAttribut('ende',$projektphase->ende);
 			$oRdf->obj[$idx]->setAttribut('budget',$projektphase->budget);
 			$oRdf->obj[$idx]->setAttribut('personentage',$projektphase->personentage);
 			
