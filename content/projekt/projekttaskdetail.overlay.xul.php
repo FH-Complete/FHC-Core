@@ -58,7 +58,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				</row>
 				<row>
 					<label value="Beschreibung" control="textbox-projekttask-detail-beschreibung"/>
-   					<textbox id="textbox-projekttask-detail-beschreibung"/>
+   					<textbox id="textbox-projekttask-detail-beschreibung" multiline="true"/>
 				</row>
 				<row>
 					<label value="Aufwand" control="textbox-projekttask-detail-aufwand"/>
