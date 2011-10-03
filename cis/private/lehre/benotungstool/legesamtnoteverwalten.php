@@ -97,7 +97,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 	}
 	function confirmdelete()
 	{
-		return confirm(<?php echo $p->t('gesamtnote/wollenSieWirklichLoeschen');?>);
+		return confirm('<?php echo $p->t('gesamtnote/wollenSieWirklichLoeschen');?>');
 	}
   
   
@@ -135,7 +135,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
    function saveLENote(uid)
    {
 		note = document.getElementById(uid).note.value;	
-		if ((note < 0) || (note > 5 && note != 8 && note != 7))
+		if ((note < 0) || (note > 5 && note != 8 && note != 7 && note!=16))
 		{
 			alert("<?php echo $p->t('benotungstool/noteEingeben');?>");
 			document.getElementById(uid).note.value="";
