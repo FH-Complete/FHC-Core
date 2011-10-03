@@ -146,7 +146,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										<menuitem value="g" label="geschieden"/>
 										<menuitem value="l" label="ledig"/>
 										<menuitem value="v" label="verheiratet"/>
-										<menuitem value="w" label="verwittwet"/>
+										<menuitem value="w" label="verwitwet"/>
 								</menupopup>								
 							</menulist>
 							<label value="Anzahl der Kinder" control="student-detail-textbox-anzahlderkinder"/>
