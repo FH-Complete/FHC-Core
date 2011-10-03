@@ -38,11 +38,15 @@ require_once('../../../../include/zeugnisnote.class.php');
 require_once('../../../../include/person.class.php');
 require_once('../../../../include/benutzer.class.php');
 require_once('../../../../include/student.class.php');
+require_once('../../../../include/phrasen.class.php');
 
 if (!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
 		
 $user = get_uid();
+
+$sprache = getSprache();
+$p = new phrasen($sprache);
 
 if(!check_lektor($user))
 	die($p->t('global/keineBerechtigungFuerDieseSeite'));
@@ -162,7 +166,7 @@ if (isset($_REQUEST["submit"]))
 	{
 		$student_uid = $_REQUEST["student_uid"];
 		$note = $_REQUEST["note"];
-		if((($note>0) && ($note < 6)) || ($note == 7) || ($note==8))
+		if((($note>0) && ($note < 6)) || ($note == 7) || ($note==8) || ($note==16))
 			$response = savenote($db,$lvid, $student_uid, $note);
 		else
 			$response = $p->t('benotungstool/noteEingeben')."!";
@@ -188,7 +192,7 @@ if (isset($_REQUEST["submit"]))
 						$response.="\n".$p->t('benotungstool/studentMitMatrikelnummerExistiertNicht',array($matrikelnummer));
 						continue;
 					}
-					if((($note>0) && ($note < 6)) || ($note == 7) || ($note==8))
+					if((($note>0) && ($note < 6)) || ($note == 7) || ($note==8) || ($note==16))
 					{
 						$val=savenote($db,$lvid, $student_uid, $note);
 						if($val!='neu' && $val!='update' && $val!='update_f')
