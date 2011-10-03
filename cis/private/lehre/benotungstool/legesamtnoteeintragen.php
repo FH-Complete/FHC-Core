@@ -90,7 +90,7 @@ $note = $_REQUEST["note"];
 
 // lvgesamtnote für studenten speichern
 
-if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '') && ((($note>0) && ($note < 6)) || ($note == 7) || ($note==8))  ){
+if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '') && ((($note>0) && ($note < 6)) || ($note == 7) || ($note==8) || ($note==16))  ){
 	
 	$jetzt = date("Y-m-d H:i:s");	
 	$student_uid = $_REQUEST["student_uid"];	
