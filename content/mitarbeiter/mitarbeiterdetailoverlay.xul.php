@@ -146,10 +146,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<label value="Familienstand" control="mitarbeiter-detail-menulist-familienstand"/>
       						<menulist id="mitarbeiter-detail-menulist-familienstand" disabled="true" oncommand="MitarbeiterDetailValueChange()">
 								<menupopup>
+										<menuitem value="" label="--keine Auswahl--"/>
 										<menuitem value="g" label="geschieden"/>
 										<menuitem value="l" label="ledig"/>
 										<menuitem value="v" label="verheiratet"/>
-										<menuitem value="w" label="verwittwet"/>
+										<menuitem value="w" label="verwitwet"/>
 								</menupopup>								
 							</menulist>
 							<label value="Anzahl der Kinder" control="mitarbeiter-detail-textbox-anzahlderkinder"/>
