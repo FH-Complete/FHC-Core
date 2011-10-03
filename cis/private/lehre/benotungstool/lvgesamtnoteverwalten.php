@@ -197,9 +197,9 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 			alert('<?php echo $p->t('gesamtnote/noteUnveraendert');?>');
 			return true;
 		}
-		else if ((note < 0) || (note > 5 && note != 8 && note != 7))
+		else if ((note < 0) || (note > 5 && note != 8 && note != 7 && note!=16))
 		{
-			alert('<?php $p->t('benotungstool/noteEingeben');?>');
+			alert('<?php echo $p->t('benotungstool/noteEingeben');?>');
 			document.getElementById(uid).note.value="";
 		}
 		else
@@ -283,7 +283,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 	function pruefungSpeichern()
 	{
 		var note = document.nachpruefung_form.note.value;
-		if ((note < 0) || (note > 5 && note != 8 && note != 7 && note != 9 && note != ""))
+		if ((note < 0) || (note > 5 && note != 8 && note != 7 && note != 9 && note!=16 && note != ""))
 		{
 			alert("<?php echo $p->t('benotungstool/noteEingebenOderLeer');?>!");
 			document.getElementById(uid).note.value="";
