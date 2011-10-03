@@ -99,6 +99,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektphasedetail.overlay
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#projekt_kurzbz"/>
 				<splitter class="tree-splitter"/>
+				<treecol id="treecol-projektphase-fortschritt" label="Fortschritt[%]" flex="2" hidden="true" persist="hidden width ordinal"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#fortschritt"/>
+					<splitter class="tree-splitter"/>
 				
 			</treecols>
 
@@ -115,6 +119,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektphasedetail.overlay
 								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#budget"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#oe_kurzbz"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#projekt_kurzbz"/>
+								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#fortschritt"/>
 							</treerow>
 						</treeitem>
 					</treechildren>
