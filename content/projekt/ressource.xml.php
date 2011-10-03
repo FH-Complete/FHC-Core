@@ -49,6 +49,20 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			seltype="single" hidecolumnpicker="false" flex="1"
 			datasources="rdf:null" ref="http://www.technikum-wien.at/ressource/liste"
 			ondblclick="document.getBindingParent(this).openNotiz(document.getBindingParent(this).value);"
+			ondrop="nsDragAndDrop.drop(event,
+				{
+					getSupportedFlavours : function ()
+					{
+				  	  	var flavours = new FlavourSet();
+				  	  	flavours.appendFlavour('application/fhc-ressource');
+				  	  	return flavours;
+				  	},
+				  	onDrop: function (evt,dropdata,session)
+				  	{
+					    document.getBindingParent(event.target).AddRessource(dropdata.data);
+				  	},
+				  	onDragStart: function (evt,transferData,action){}
+				})"
 			ondragdrop="nsDragAndDrop.drop(event,
 				{
 					getSupportedFlavours : function ()
@@ -78,6 +92,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			  	},
 			  	onDragOver: function(evt,flavour,session)
 			  	{
+			  		evt.preventDefault();
 			  	},
 			  	onDrop: function (evt,dropdata,session)
 			  	{
