@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>
+ * 			Karl Burkhart <burkhart@technikum-wien.at>
  */
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
@@ -30,10 +31,16 @@ $oRdf->sendHeader();
 if(isset($_GET['projektphase_id']))
 {
 	$phase = new projektphase();
+	$timestamp = time(); 
+	$timestamp = date('Y-m-d');
 	
 	$phase->load($_GET['projektphase_id']);
-	
+	$ergebnis = $phase->getFortschritt($_GET['projektphase_id']);
 	$i=$oRdf->newObjekt($phase->projektphase_id);
+
+	// hat phase schon begonnen
+	if($timestamp <= $projektphase->start || $projektphase->start == '')
+		$ergebnis = "-";
 	
 	$oRdf->obj[$i]->setAttribut('projektphase_id',$phase->projektphase_id);
 	$oRdf->obj[$i]->setAttribut('projekt_kurzbz',$phase->projekt_kurzbz);
@@ -43,6 +50,7 @@ if(isset($_GET['projektphase_id']))
 	$oRdf->obj[$i]->setAttribut('start',$phase->start);
 	$oRdf->obj[$i]->setAttribut('ende',$phase->ende);
 	$oRdf->obj[$i]->setAttribut('budget',$phase->budget);
+	$oRdf->obj[$i]->setAttribut('fortschritt',$ergebnis);
 	$oRdf->obj[$i]->setAttribut('personentage',$phase->personentage);
 	
 	if($phase->projektphase_fk!='')
@@ -108,7 +116,15 @@ else
 		for ($j=0;$j<count($projektphase_obj->result);$j++)
 		{
 			$projektphase=$projektphase_obj->result[$j];
-			//var_dump($projektphase);
+					
+			$timestamp = time(); 
+			$timestamp = date('Y-m-d');
+
+			$ergebnis = $projektphase->getFortschritt($projektphase->projektphase_id);
+			
+			// hat phase schon begonnen
+			if($timestamp <= $projektphase->start || $projektphase->start == '')
+				$ergebnis = "-";
 			
 			$idx=$oRdf->newObjekt($projekt->oe_kurzbz.'/'.$projekt->projekt_kurzbz.'/'.$projektphase->projektphase_id);
 	
@@ -122,6 +138,7 @@ else
 			$oRdf->obj[$idx]->setAttribut('beschreibung',$projektphase->beschreibung);
 			$oRdf->obj[$idx]->setAttribut('beginn',$projektphase->start);
 			$oRdf->obj[$idx]->setAttribut('ende',$projektphase->ende);
+			$oRdf->obj[$idx]->setAttribut('fortschritt',$ergebnis);
 			$oRdf->obj[$idx]->setAttribut('budget',$projektphase->budget);
 			$oRdf->obj[$idx]->setAttribut('personentage',$projektphase->personentage);
 			
