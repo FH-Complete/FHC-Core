@@ -16,12 +16,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>
+ * 			Karl Burkhart <burkhart@technikum-wien.at>
  */
 /**
  * Klasse projekttask
  * @create 2011-05-23
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/projekttask.class.php');
 
 class projektphase extends basis_db
 {
@@ -391,5 +393,50 @@ class projektphase extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * 
+	 * gibt den Fortschritt der Phase in Prozent zurück --> Phasen die auf die übergebene Phase zeigen werden berücksichtigt
+	 * @param $projektphase_id
+	 */
+	public function getFortschritt($projektphase_id)
+	{
+		$qry = "Select * from fue.tbl_projektphase phase 
+		join fue.tbl_projekttask task using(projektphase_id) 
+		where task.projektphase_id = '".addslashes($projektphase_id)."'
+		OR task.projektphase_id IN (
+		
+		WITH RECURSIVE tasks(projektphase_fk) as 
+		(
+			SELECT projektphase_id FROM fue.tbl_projektphase
+			WHERE projektphase_fk='".addslashes($projektphase_id)."'
+			UNION ALL
+			SELECT p.projektphase_id FROM fue.tbl_projektphase p, tasks 
+			WHERE p.projektphase_fk=tasks.projektphase_fk
+		)SELECT *
+		FROM tasks)";
+		
+		$taskAnzahl = 0; 
+		// erledige tasks
+		$i = 0; 
+		$ergebnis = 0; 
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$taskAnzahl++;
+				if($row->erledigt == 't')
+					$i++;
+			}
+		}
+		$taskAnzahl = ($taskAnzahl == 0)? 1 : $taskAnzahl;	
+		$ergebnis = ($i*100)/$taskAnzahl; 
+		
+		return sprintf("%01.2f", $ergebnis); 
+	}
+	
+
+	
 }
 ?>
