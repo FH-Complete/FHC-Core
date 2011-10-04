@@ -128,17 +128,20 @@ if(isset($_GET['person_id']))
 	echo "	<form method='POST' enctype='multipart/form-data' action='$PHP_SELF?person_id=".$_GET['person_id']."'>
 			<table>
 				<tr>
-					<td>Dokument: <input type='file' name='bild' />
+					<td>".$p->t('incoming/dokument').": <input type='file' name='bild' />
 					<input type='submit' name='submitbild' value='Upload' /></td>
 				</tr>
 				<tr>
 					<td>Typ: <SELECT name='dokumenttyp'>";
 				foreach ($dokument->result as $dok)
 				{
-					$selected =""; 
-					if($dok->dokument_kurzbz == $dokumenttyp)
-						$selected = "selected";
-					echo '<option '.$selected.' value="'.$dok->dokument_kurzbz.'" >'.$dok->bezeichnung."</option>\n";
+					if($dok->dokument_kurzbz == 'Lebenslf' || $dok->dokument_kurzbz == 'Motivat' || $dok->dokument_kurzbz == 'Zeugnis' || $dok->dokument_kurzbz == 'Lichtbil' || $dok->dokument_kurzbz == 'LearnAgr')
+					{
+						$selected =""; 
+						if($dok->dokument_kurzbz == $dokumenttyp)
+							$selected = "selected";
+						echo '<option '.$selected.' value="'.$dok->dokument_kurzbz.'" >'.$dok->bezeichnung."</option>\n";
+					}
 				}
 echo "				</select>
 					</td>
