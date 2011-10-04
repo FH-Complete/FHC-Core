@@ -34,12 +34,13 @@ if(isset($_GET['projektphase_id']))
 	$timestamp = time(); 
 	$timestamp = date('Y-m-d');
 	
-	$phase->load($_GET['projektphase_id']);
+	if(!$phase->load($_GET['projektphase_id']))
+		die('Fehler beim Laden der Phase');
 	$ergebnis = $phase->getFortschritt($_GET['projektphase_id']);
 	$i=$oRdf->newObjekt($phase->projektphase_id);
 
 	// hat phase schon begonnen
-	if($timestamp <= $projektphase->start || $projektphase->start == '')
+	if($timestamp <= $phase->start || $phase->start == '')
 		$ergebnis = "-";
 	
 	$oRdf->obj[$i]->setAttribut('projektphase_id',$phase->projektphase_id);
