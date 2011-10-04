@@ -26,4 +26,5 @@ $this->phrasen['incoming/studienrichtung']='Studienbezeichnung';
 $this->phrasen['incoming/jahrestudiert']='Jahre studiert';
 $this->phrasen['incoming/uploadLearningAgreement']= 'Upload Learning Agreement';
 $this->phrasen['incoming/uploadCv']='Upload CV';
+$this->phrasen['incoming/dokument']='Dokument';
 ?>
