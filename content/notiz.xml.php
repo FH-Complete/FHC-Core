@@ -55,7 +55,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			<xul:tree anonid="tree-notiz"
 			seltype="single" hidecolumnpicker="false" flex="1"
 			datasources="rdf:null" ref="http://www.technikum-wien.at/notiz/liste"
-			ondblclick="document.getBindingParent(this).openNotiz(document.getBindingParent(this).value);"
+			ondblclick="document.getBindingParent(this).edit(event);"
 			onclick="document.getBindingParent(this).updateErledigt(event);"
 			editable="true"
 			>
@@ -211,6 +211,19 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 						}
 					  });
 				}
+			]]>
+			</body>
+		</method>
+		<method name="edit">
+			<parameter name="event"/>
+			<body>
+			<![CDATA[
+			    var id = this.value;
+			    
+			    if(id!='')
+			    {
+			    	this.openNotiz(id);
+			    }
 			]]>
 			</body>
 		</method>
