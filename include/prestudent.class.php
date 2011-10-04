@@ -183,7 +183,7 @@ class prestudent extends person
 		
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
-			$qry = 'BEGIN;INSERT INTO public.tbl_prestudent (aufmerksamdurch_kurzbz, person_id, studiengang_kz, berufstaetigkeit_code, ausbildungcode, zgv_code, zgvort, zgvdatum, zgvmas_code, zgvmaort, zgvmadatum, aufnahmeschluessel, facheinschlberuf, reihungstest_id, anmeldungreihungstest, reihungstestangetreten, rt_gesamtpunkte, rt_punkte1, rt_punkte2, bismelden, insertamum, insertvon, updateamum, updatevon, ext_id, anmerkung, dual) VALUES('.
+			$qry = 'BEGIN;INSERT INTO public.tbl_prestudent (aufmerksamdurch_kurzbz, person_id, studiengang_kz, berufstaetigkeit_code, ausbildungcode, zgv_code, zgvort, zgvdatum, zgvmas_code, zgvmaort, zgvmadatum, aufnahmeschluessel, facheinschlberuf, reihungstest_id, anmeldungreihungstest, reihungstestangetreten, rt_gesamtpunkte, rt_punkte1, rt_punkte2, bismelden, insertamum, insertvon, updateamum, updatevon, ext_id, anmerkung, dual, ausstellungsstaat) VALUES('.
 			       $this->addslashes($this->aufmerksamdurch_kurzbz).",".
 			       $this->addslashes($this->person_id).",".
 			       $this->addslashes($this->studiengang_kz).",".
