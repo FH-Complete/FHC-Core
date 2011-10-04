@@ -36,8 +36,10 @@ require_once('../../include/benutzer.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/student.class.php');
 require_once('../../include/lehrverband.class.php');
+require_once('../../include/studiengang.class.php');
 require_once('../../include/bisio.class.php');
 require_once('../../include/firma.class.php');
+require_once('../../include/mail.class.php');
 require_once('../../include/'.EXT_FKT_PATH.'/generateuid.inc.php');
 
 $user = get_uid();
@@ -460,6 +462,34 @@ if($method!='')
 				{
 					$db->db_query('COMMIT');
 					$message.='<span class="ok">Uebernahme erfolgreich</span>';
+					
+					// Email an Assistenz
+					$person = new person(); 
+					$person->load($inc->person_id);
+					$studiengang = new studiengang(); 
+					$studiengang->load($studiengang_kz);
+					$lvs = $inc->getLehrveranstaltungen($inc->preincoming_id);
+					
+					$emailtext=  "Dies ist eine automatisch generierte E-Mail.<br><br>";
+					$emailtext.= "Es wurde ein neuer Incoming in den Studiengang übernommen.<br><br>";
+					$emailtext.= "<b>Vorname/Nachname: </b>".$person->vorname." ".$person->nachname."<br>";
+					$emailtext.= "<b>Von: </b>".$inc->von." <br><b>Bis:</b>".$inc->bis."<br>"; 
+					$emailtext.= "<b>Lehrveranstaltungen: </b><br>";
+
+					foreach ($lvs  as $lv)
+					{
+						$lehrveranstaltung = new lehrveranstaltung(); 
+						$lehrveranstaltung->load($lv);
+						$emailtext.= $lehrveranstaltung->bezeichnung."</br>";
+					}
+					
+					$mail = new mail($studiengang->email, 'no-reply', 'Incoming Übernahme', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
+					$mail->setHTMLContent($emailtext); 
+					if(!$mail->send())
+						$message.= '<br /><span class="error">Fehler beim Senden des Mails</span>';
+					else
+						$message.= '<br /><span class="ok">Email an Assistenz gesendet</span>';					
+	
 				}
 				else
 				{
@@ -467,6 +497,7 @@ if($method!='')
 					$message.='<span class="error">'.$errormsg.'</span>';
 				}
 			}
+
 			break;
 		default:
 			break;
@@ -1099,5 +1130,6 @@ function clean_string($string)
     return ereg_replace("[^a-zA-Z0-9]", "", $string);
     //[:space:]
  }
+ 
 
 ?>
