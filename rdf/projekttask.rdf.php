@@ -52,7 +52,7 @@ foreach($projekttask_obj->result as $projekttask)
 	$oRdf->obj[$i]->setAttribut('beschreibung',$projekttask->beschreibung);
 	$oRdf->obj[$i]->setAttribut('aufwand',$projekttask->aufwand);
 	$oRdf->obj[$i]->setAttribut('mantis_id',$projekttask->mantis_id);
-	$oRdf->obj[$i]->setAttribut('erledigt',$projekttask->erledigt);
+	$oRdf->obj[$i]->setAttribut('erledigt',($projekttask->erledigt?'true':'false'));
 	$oRdf->obj[$i]->setAttribut('projekttask_fk',$projekttask->projekttask_fk);
 	
 	if($projekttask->projekttask_fk!='')
