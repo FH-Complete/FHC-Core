@@ -26,4 +26,5 @@ $this->phrasen['incoming/studienrichtung']='Name of Program';
 $this->phrasen['incoming/jahrestudiert']='Years completetd when starting at UAS FH TW';
 $this->phrasen['incoming/uploadLearningAgreement']= 'Upload Learning Agreement';
 $this->phrasen['incoming/uploadCv']='Upload CV';
+$this->phrasen['incoming/dokument']='Document';
 ?>
