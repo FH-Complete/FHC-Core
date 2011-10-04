@@ -1375,10 +1375,6 @@ echo 	'<script type="text/javascript">
 	}
 	echo '</table>'; 
 }
-else if($method == 'learningAgreement')
-{
-	
-}
 
 // Ausgabe Menü
 else 
