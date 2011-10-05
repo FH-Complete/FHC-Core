@@ -2771,7 +2771,7 @@ if(!$result = @$db->db_query("SELECT budget FROM fue.tbl_projekt LIMIT 1;"))
 				fue.tbl_projekttask: Spalte erledigt hinzugefuegt!<br>';
 }
 
-//fue.tbl_projekt neue Spalte budget
+//public.tbl_prestudent neue Spalte ausstellungsstaat
 if(!$result = @$db->db_query("SELECT ausstellungsstaat FROM public.tbl_prestudent"))
 {
 	$qry = "ALTER TABLE public.tbl_prestudent ADD COLUMN ausstellungsstaat varchar(3);
@@ -2782,6 +2782,43 @@ if(!$result = @$db->db_query("SELECT ausstellungsstaat FROM public.tbl_prestuden
 		echo '<strong>public.tbl_prestudent: '.$db->db_last_error().'</strong><br>';
 	else 
 		echo 'public.tbl_prestudent: Spalte ausstellungsstaat hinzugefuegt!<br>';
+}
+
+//wawi.tbl_betriebsmittel neue Spalte anschaffungswert und anschaffungsdatum
+if(!$result = @$db->db_query("SELECT anschaffungswert FROM wawi.tbl_betriebsmittel"))
+{
+	$qry = "ALTER TABLE wawi.tbl_betriebsmittel ADD COLUMN anschaffungswert numeric(12,2);
+			ALTER TABLE wawi.tbl_betriebsmittel ADD COLUMN anschaffungsdatum date;
+			ALTER TABLE wawi.tbl_betriebsmittel ADD COLUMN tiefe numeric(6,2);
+			ALTER TABLE wawi.tbl_betriebsmittel ADD COLUMN hoehe numeric(6,2);
+			ALTER TABLE wawi.tbl_betriebsmittel ADD COLUMN breite numeric(6,2);
+			ALTER TABLE wawi.tbl_betriebsmitteltyp ADD COLUMN mastershapename varchar(256);
+			
+			UPDATE wawi.tbl_betriebsmittel SET anschaffungswert = (SELECT (preisprove/100*(100+mwst)) FROM wawi.tbl_bestelldetail WHERE bestelldetail_id=tbl_betriebsmittel.bestelldetail_id);
+			UPDATE wawi.tbl_betriebsmittel SET anschaffungsdatum = (SELECT datum FROM wawi.tbl_bestellung_bestellstatus WHERE bestellung_id=tbl_betriebsmittel.bestellung_id AND bestellstatus_kurzbz='Lieferung');
+			";
+			
+	if(!$db->db_query($qry))
+		echo '<strong>wawi.tbl_betriebsmittel: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'wawi.tbl_betriebsmittel: Spalte anschaffungswert und anschaffungsdatum hinzugefuegt!<br>';
+}
+
+//tbl_ort.planbezeichnung von 5 auf 8 Zeichen verlaengern
+if($result = @$db->db_query("SELECT character_maximum_length as len FROM information_schema.columns WHERE column_name='planbezeichnung' AND table_name='tbl_ort' AND table_schema='public';"))
+{
+	if($row = $db->db_fetch_object($result))
+	{
+		if($row->len=='5')
+		{
+			$qry = "ALTER TABLE public.tbl_ort ALTER COLUMN planbezeichnung TYPE varchar(8);";
+			
+			if(!$db->db_query($qry))
+				echo '<strong>public.tbl_ort: '.$db->db_last_error().'</strong><br>';
+			else 
+				echo 'public.tbl_ort: Spalte planbezeichnung auf 8 Zeichen verlaengert!<br>';
+		}
+	}
 }
 echo '<br>';
 
@@ -2955,10 +2992,10 @@ $tabellen=array(
 	"system.tbl_rolleberechtigung"  => array("berechtigung_kurzbz","rolle_kurzbz","art"),
 	"system.tbl_server"  => array("server_kurzbz","beschreibung"),
 	"wawi.tbl_betriebsmittelperson"  => array("betriebsmittelperson_id","betriebsmittel_id","person_id", "anmerkung", "kaution", "ausgegebenam", "retouram","insertamum", "insertvon","updateamum", "updatevon","ext_id"),
-	"wawi.tbl_betriebsmittel"  => array("betriebsmittel_id","betriebsmitteltyp","oe_kurzbz", "ort_kurzbz", "beschreibung", "nummer", "hersteller","seriennummer", "bestellung_id","bestelldetail_id", "afa","verwendung","anmerkung","reservieren","updateamum","updatevon","insertamum","insertvon","ext_id","inventarnummer","leasing_bis","inventuramum","inventurvon"),
+	"wawi.tbl_betriebsmittel"  => array("betriebsmittel_id","betriebsmitteltyp","oe_kurzbz", "ort_kurzbz", "beschreibung", "nummer", "hersteller","seriennummer", "bestellung_id","bestelldetail_id", "afa","verwendung","anmerkung","reservieren","updateamum","updatevon","insertamum","insertvon","ext_id","inventarnummer","leasing_bis","inventuramum","inventurvon","anschaffungsdatum","anschaffungswert","hoehe","breite","tiefe"),
 	"wawi.tbl_betriebsmittel_betriebsmittelstatus"  => array("betriebsmittelbetriebsmittelstatus_id","betriebsmittel_id","betriebsmittelstatus_kurzbz", "datum", "updateamum", "updatevon", "insertamum", "insertvon","anmerkung"),
 	"wawi.tbl_betriebsmittelstatus"  => array("betriebsmittelstatus_kurzbz","beschreibung"),
-	"wawi.tbl_betriebsmitteltyp"  => array("betriebsmitteltyp","beschreibung","anzahl","kaution","typ_code"),
+	"wawi.tbl_betriebsmitteltyp"  => array("betriebsmitteltyp","beschreibung","anzahl","kaution","typ_code","mastershapename"),
 	"wawi.tbl_budget"  => array("geschaeftsjahr_kurzbz","kostenstelle_id","budget"),
 	"wawi.tbl_zahlungstyp"  => array("zahlungstyp_kurzbz","bezeichnung"),
 	"wawi.tbl_konto"  => array("konto_id","kontonr","beschreibung","kurzbz","aktiv","insertamum","insertvon","updateamum","updatevon"),

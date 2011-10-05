@@ -44,6 +44,7 @@
 	require_once('../../include/wawi_bestelldetail.class.php');
 	require_once('../../include/wawi_bestellung.class.php');
 	require_once('../../include/wawi_kostenstelle.class.php');
+	require_once('../../include/wawi_bestellstatus.class.php');
 	
 	if (!$uid = get_uid())
 		die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
@@ -82,10 +83,16 @@
   	$betriebsmittelstatus_kurzbz=trim((isset($_REQUEST['betriebsmittelstatus_kurzbz']) ? $_REQUEST['betriebsmittelstatus_kurzbz']:$default_status_vorhanden));
 	$firma_id=trim(isset($_REQUEST['firma_id'])?$_REQUEST['firma_id']:'');
 	$bestellnr=trim(isset($_REQUEST['bestellnr'])?$_REQUEST['bestellnr']:'');
-
+	
   	$afa=trim(isset($_REQUEST['afa']) ? $_REQUEST['afa']:3);
   	$leasing_bis=trim(isset($_REQUEST['leasing_bis']) ? $_REQUEST['leasing_bis']:'');
 
+  	$anschaffungswert=isset($_REQUEST['anschaffungswert']) ? $_REQUEST['anschaffungswert']:'';
+  	$anschaffungsdatum=isset($_REQUEST['anschaffungsdatum']) ? $_REQUEST['anschaffungsdatum']:'';
+  	$hoehe=isset($_REQUEST['hoehe'])?$_REQUEST['hoehe']:'';
+	$breite=isset($_REQUEST['breite'])?$_REQUEST['breite']:'';
+	$tiefe=isset($_REQUEST['tiefe'])?$_REQUEST['tiefe']:'';
+	
 	$jahr_monat=trim(isset($_REQUEST['jahr_monat']) ? $_REQUEST['jahr_monat']:'');
   	$inventur_jahr=trim(isset($_REQUEST['inventur_jahr']) ? $_REQUEST['inventur_jahr']:'');
 
@@ -218,6 +225,11 @@
 			$verwendung = $oBetriebsmittel->verwendung;
 			$anmerkung = $oBetriebsmittel->anmerkung;
 			$leasing_bis = $oBetriebsmittel->leasing_bis;
+			$anschaffungsdatum = $oBetriebsmittel->anschaffungsdatum;
+			$anschaffungswert = $oBetriebsmittel->anschaffungswert;
+			$hoehe = $oBetriebsmittel->hoehe;
+			$breite = $oBetriebsmittel->breite;
+			$tiefe = $oBetriebsmittel->tiefe;
 
 			$bestellung_id_old=$bestellung_id;
 			$bestelldetail_id_old=$bestelldetail_id;
@@ -281,6 +293,12 @@
 			if(!$bestelldetail->load($bestelldetail_id))
 				$errormsg[]=$bestelldetail->errormsg;
 			$bestelldetail->result[] = $bestelldetail;
+			
+			if($anschaffungswert=='')
+			{
+				$anschaffungswert = ($bestelldetail->preisprove/100*(100+$bestelldetail->mwst));
+				$anschaffungswert = number_format(str_replace(',','.',$anschaffungswert),2,'.','');
+			}
 		}
 		else
 		{
@@ -300,7 +318,10 @@
 			$kostenstelle->load($bestellung->kostenstelle_id);
 			$oe_kurzbz=$kostenstelle->oe_kurzbz;
 			$anmerkung.=trim($bestellung->bemerkung);
-			
+			$bestellstatus = new wawi_bestellstatus();
+			$bestellstatus->getStatiFromBestellung('Lieferung', $bestellung_id);
+			$anschaffungsdatum = $bestellstatus->datum;
+						
 			foreach($bestelldetail->result as $row)
 			{
 				if (isset($row->beschreibung))
@@ -625,7 +646,35 @@
 								?>
 								</select>
 							</td>
+							<td>&nbsp;<label for="anschaffungsdatum">Anschaffungsdatum</label>&nbsp;</td>
+							<td>
+								<input id="anschaffungsdatum" name="anschaffungsdatum" size="10" maxlength="11" value="<?php echo $anschaffungsdatum;?>">
+								<script type="text/javascript" language="JavaScript1.2">
+								$(document).ready(function() 
+								{
+									$( "#anschaffungsdatum" ).datepicker($.datepicker.regional['de']);
+								});
+								</script>
+							</td>
+							<td>&nbsp;<label for="anschaffungswert">Anschaffungswert</label>&nbsp;</td>
+							<td>
+								<input id="anschaffungswert" name="anschaffungswert" size="10" maxlength="11" value="<?php echo $anschaffungswert;?>">
+							</td>
 
+						</tr>
+						<tr>
+							<td>&nbsp;<label for="hoehe">Höhe in Meter</label>&nbsp;</td>
+							<td>
+								<input id="hoehe" name="hoehe" size="4" maxlength="8" value="<?php echo $hoehe;?>">
+							</td>
+							<td>&nbsp;<label for="breite">Breite in Meter</label>&nbsp;</td>
+							<td>
+								<input id="breite" name="breite" size="4" maxlength="8" value="<?php echo $breite;?>">
+							</td>
+							<td>&nbsp;<label for="tiefe">Tiefe in Meter</label>&nbsp;</td>
+							<td>
+								<input id="tiefe" name="tiefe" size="4" maxlength="8" value="<?php echo $tiefe;?>">
+							</td>
 						</tr>
 					</table>
 				</td>
@@ -696,6 +745,11 @@ $anmerkung_array=(isset($_REQUEST['anmerkung_array'])?$_REQUEST['anmerkung_array
 $verwendung_array=(isset($_REQUEST['verwendung_array'])?$_REQUEST['verwendung_array']:array());
 $leasing_bis_array=(isset($_REQUEST['leasing_bis_array'])?$_REQUEST['leasing_bis_array']:array());
 $afa_array=(isset($_REQUEST['afa_array'])?$_REQUEST['afa_array']:array());
+$anschaffungsdatum_array=(isset($_REQUEST['anschaffungsdatum_array'])?$_REQUEST['anschaffungsdatum_array']:array());
+$anschaffungswert_array=(isset($_REQUEST['anschaffungswert_array'])?$_REQUEST['anschaffungswert_array']:array());
+$hoehe_array=(isset($_REQUEST['hoehe_array'])?$_REQUEST['hoehe_array']:array());
+$breite_array=(isset($_REQUEST['breite_array'])?$_REQUEST['breite_array']:array());
+$tiefe_array=(isset($_REQUEST['tiefe_array'])?$_REQUEST['tiefe_array']:array());
 
 for ($pos=0;$pos<$anzahl;$pos++) 
 {
@@ -720,6 +774,11 @@ for ($pos=0;$pos<$anzahl;$pos++)
 	$verwendung_array[$pos]=trim(isset($verwendung_array[$pos]) && $work=='save' ?trim($verwendung_array[$pos]):$verwendung);
 	$leasing_bis_array[$pos]=trim(isset($leasing_bis_array[$pos]) && $work=='save' ?trim($leasing_bis_array[$pos]):$leasing_bis);
 	$afa_array[$pos]=trim(isset($afa_array[$pos]) && $work=='save' ?trim($afa_array[$pos]):$afa);
+	$anschaffungsdatum_array[$pos]=trim(isset($anschaffungsdatum_array[$pos]) && $work=='save' ?trim($anschaffungsdatum_array[$pos]):$anschaffungsdatum);
+	$anschaffungswert_array[$pos]=trim(isset($anschaffungswert_array[$pos]) && $work=='save' ?trim($anschaffungswert_array[$pos]):$anschaffungswert);
+	$hoehe_array[$pos]=isset($hoehe_array[$pos]) && $work=='save' ?trim($hoehe_array[$pos]):$hoehe;
+	$breite_array[$pos]=isset($breite_array[$pos]) && $work=='save' ?trim($breite_array[$pos]):$breite;
+	$tiefe_array[$pos]=isset($tiefe_array[$pos]) && $work=='save' ?trim($tiefe_array[$pos]):$tiefe;
 	
 	if ($work=='save')
 	{
@@ -760,6 +819,31 @@ for ($pos=0;$pos<$anzahl;$pos++)
 			$oBetriebsmittel->verwendung=$verwendung_array[$pos];
 			$oBetriebsmittel->anmerkung=$anmerkung_array[$pos];
 			$oBetriebsmittel->leasing_bis=$datum_obj->formatDatum($leasing_bis_array[$pos],'Y-m-d');
+			
+			//wenn kein Anschaffungsdatum eingetragen ist und eine Bestellung zugeordnet ist,
+			//wird das lieferdatum der Bestellung uebernommen
+			if($oBetriebsmittel->bestellung_id!='' && $anschaffungsdatum_array[$pos]=='')
+			{
+				$bestellung = new wawi_bestellstatus();
+				$bestellung->getStatiFromBestellung('Lieferung', $oBetriebsmittel->bestellung_id);
+				$anschaffungsdatum_array[$pos]=$bestellung->datum;
+			}
+			
+			$oBetriebsmittel->anschaffungsdatum = $datum_obj->formatDatum($anschaffungsdatum_array[$pos],'Y-m-d');
+			
+			//Wenn kein Anschaffungswert eingetragen ist, und eine BestelldetailID angegeben ist,
+			//wird der Anschaffungswert von der Bestellung uebernommen
+			if($oBetriebsmittel->bestelldetail_id!='' && $anschaffungswert_array[$pos]=='')
+			{
+				$bestellung = new wawi_bestelldetail();
+				$bestellung->load($oBetriebsmittel->bestelldetail_id);
+				$anschaffungswert_array[$pos]=($bestellung->preisprove/100*(100+$bestellung->mwst));
+				$anschaffungswert_array[$pos]=number_format(str_replace(',','.',$anschaffungswert_array[$pos]),2,'.','');
+			}
+			$oBetriebsmittel->anschaffungswert = $anschaffungswert_array[$pos];
+			$oBetriebsmittel->hoehe = number_format(str_replace(',','.',$hoehe_array[$pos]),2,'.','');
+			$oBetriebsmittel->breite = number_format(str_replace(',','.',$breite_array[$pos]),2,'.','');
+			$oBetriebsmittel->tiefe = number_format(str_replace(',','.',$tiefe_array[$pos]),2,'.','');
 			
 			if ($oBetriebsmittel->save())
 			{
@@ -1177,6 +1261,34 @@ for ($pos=0;$pos<$anzahl;$pos++)
 													echo '<option  '.($afa_array[$pos]==$i?' selected="selected" ':'').'  value="'.$i.'">'.$i.' Jahre</option>';
 											?>
 										</select>
+									</td>
+									<td>&nbsp;<label for="anschaffungsdatum_array<?php echo $pos; ?>">Anschaffungsdatum</label>&nbsp;</td>
+									<td>
+										<input id="anschaffungsdatum_array<?php echo $pos; ?>" name="anschaffungsdatum_array[]" size="10" maxlength="11" value="<?php echo $anschaffungsdatum_array[$pos]; ?>">
+										<script type="text/javascript" language="JavaScript1.2">
+										$(document).ready(function() 
+										{
+												$( "#anschaffungsdatum_array<?php echo $pos; ?>" ).datepicker($.datepicker.regional['de']);
+										});
+										</script>
+									</td>
+									<td>&nbsp;<label for="anschaffungswert_array<?php echo $pos; ?>">Anschaffungswert</label>&nbsp;</td>
+									<td>
+										<input id="anschaffungswert_array<?php echo $pos; ?>" name="anschaffungswert_array[]" size="10" maxlength="11" value="<?php echo $anschaffungswert_array[$pos]; ?>">
+									</td>
+								</tr>
+								<tr>
+									<td>&nbsp;<label for="hoehe_array<?php echo $pos; ?>">Höhe in Meter</label>&nbsp;</td>
+									<td>
+										<input id="hoehe_array<?php echo $pos; ?>" name="hoehe_array[]" size="4" maxlength="8" value="<?php echo $hoehe_array[$pos];?>">
+									</td>
+									<td>&nbsp;<label for="breite">Breite in Meter</label>&nbsp;</td>
+									<td>
+										<input id="breite_array<?php echo $pos; ?>" name="breite_array[]" size="4" maxlength="8" value="<?php echo $breite_array[$pos];?>">
+									</td>
+									<td>&nbsp;<label for="tiefe">Tiefe in Meter</label>&nbsp;</td>
+									<td>
+										<input id="tiefe_array<?php echo $pos; ?>" name="tiefe_array[]" size="4" maxlength="8" value="<?php echo $tiefe_array[$pos];?>">
 									</td>
 								</tr>
 							</table>

@@ -301,7 +301,7 @@ if (!$uid = get_uid())
 // ------------------------------------------------------------------------------------------
 	// Organisation - Inventarverwalter
 	$oes=new organisationseinheit();
-	if (!$oOrganisationseinheit->loadArray($oBenutzerberechtigung->getOEkurzbz($berechtigung_kurzbz),'oe_kurzbz'))
+	if (!$oOrganisationseinheit->loadArray($oBenutzerberechtigung->getOEkurzbz($berechtigung_kurzbz),'organisationseinheittyp_kurzbz,bezeichnung'))
 		$errormsg[]=$oOrganisationseinheit->errormsg;
 	$extend_search=true;	
 	
@@ -1029,7 +1029,9 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 			{
 				$htmlstring.='<tr>
 						<th align="right" valign="top">Verwendung&nbsp;:&nbsp;</th>
-						<td colspan="5">'.$info.'</td>
+						<td colspan="3">'.$info.'</td>
+						<th align="right">Leasing bis&nbsp;:&nbsp;</th>
+						<td>'.$datum_obj->formatDatum($resBetriebsmittel->leasing_bis,'d.m.Y').'</td>
 					</tr>';
 			}
 
@@ -1069,8 +1071,8 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 			$htmlstring.='<th align="right">AfA Ende&nbsp;:&nbsp;</th>
 						<td>'.$datum_obj->formatDatum($resBetriebsmittel->betriebsmittelstatus_datum_afa,'d.m.Y').'</td>
 
-						<th align="right">Leasing bis&nbsp;:&nbsp;</th>
-						<td>'.$datum_obj->formatDatum($resBetriebsmittel->leasing_bis,'d.m.Y').'</td>
+						<th align="right">Anschaffungsdatum&nbsp;:&nbsp;</th>
+						<td>'.$datum_obj->formatDatum($resBetriebsmittel->anschaffungsdatum,'d.m.Y').'</td>
 					</tr>';
 			$htmlstring.='
 					<tr>
@@ -1083,6 +1085,9 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 						<input type="submit" value="Inventur" />
 						</form>
 						</td>
+						<td></td>
+						<th align="right">Anschaffungswert&nbsp;:&nbsp;</th>
+						<td>'.$resBetriebsmittel->anschaffungswert.'</td>
 					</tr>';
 		$htmlstring.='<tr><td colspan="6">&nbsp;</td></tr>';
 
