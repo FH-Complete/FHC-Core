@@ -181,7 +181,7 @@
 			if (!$oRresult=$db->SQL($pArt,$pDistinct,$pFields,$pTable,$pWhere,$pOrder,$pLimit,$pSql))
 				exit(' |'.$db->errormsg."\n");
 			for ($i=0;$i<count($oRresult);$i++)
-				echo html_entity_decode($oRresult[$i]->inventarnummer).'|'. (is_null($oRresult[$i]->beschreibung) || empty($oRresult[$i]->beschreibung) || $oRresult[$i]->beschreibung=='NULL' || $oRresult[$i]->beschreibung=='null'?'':html_entity_decode($oRresult[$i]->beschreibung))."\n";
+				echo html_entity_decode($oRresult[$i]->inventarnummer).'|'. (is_null($oRresult[$i]->beschreibung) || empty($oRresult[$i]->beschreibung) || $oRresult[$i]->beschreibung=='NULL' || $oRresult[$i]->beschreibung=='null'?'':html_entity_decode(mb_str_replace("\n","",$oRresult[$i]->beschreibung)))."\n";
 			break;
 
 		// Ort - Inventarorte suche

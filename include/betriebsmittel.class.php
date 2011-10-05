@@ -62,6 +62,11 @@ class betriebsmittel extends basis_db
 	public $inventuramum;		// timestamp
 	public $inventurvon;		// string
 
+	public $anschaffungswert;
+	public $anschaffungsdatum;
+	public $hoehe;
+	public $breite;
+	public $tiefe;
 
 	/**
 	 * Konstruktor
@@ -122,6 +127,11 @@ class betriebsmittel extends basis_db
 				$this->leasing_bis = $row->leasing_bis;
 				$this->inventuramum = $row->inventuramum;
 				$this->inventurvon = $row->inventurvon;
+				$this->anschaffungsdatum = $row->anschaffungsdatum;
+				$this->anschaffungswert = $row->anschaffungswert;
+				$this->hoehe = $row->hoehe;
+				$this->breite = $row->breite;
+				$this->tiefe = $row->tiefe;
 				
 				return true;
 			}
@@ -257,7 +267,8 @@ class betriebsmittel extends basis_db
 			$qry='INSERT INTO wawi.tbl_betriebsmittel (beschreibung, betriebsmitteltyp, nummer
 				, inventarnummer, reservieren, ort_kurzbz
 				,ext_id, insertamum, insertvon, updateamum, updatevon,oe_kurzbz,hersteller,seriennummer
-				,bestellung_id,bestelldetail_id,afa,verwendung,anmerkung,leasing_bis, inventuramum, inventurvon) VALUES('.
+				,bestellung_id,bestelldetail_id,afa,verwendung,anmerkung,leasing_bis, inventuramum, inventurvon, 
+				anschaffungsdatum, anschaffungswert, hoehe, breite, tiefe) VALUES('.
 				$this->addslashes($this->beschreibung).', '.
 				$this->addslashes($this->betriebsmitteltyp).', '.
 				$this->addslashes($this->nummer).', '.
@@ -279,8 +290,12 @@ class betriebsmittel extends basis_db
 				$this->addslashes($this->anmerkung) .', '.
 				($this->leasing_bis?$this->addslashes($this->leasing_bis):'null') .', '.
 				$this->addslashes($this->inventuramum) .', '.
-				$this->addslashes($this->inventurvon) .');' ;
-				
+				$this->addslashes($this->inventurvon) .', '.
+				$this->addslashes($this->anschaffungsdatum).', '.
+				$this->addslashes($this->anschaffungswert).', '.
+				$this->addslashes($this->hoehe).', '.
+				$this->addslashes($this->breite).', '.
+				$this->addslashes($this->tiefe).');' ;				
 		}
 		else
 		{
@@ -310,7 +325,12 @@ class betriebsmittel extends basis_db
 				'anmerkung='.$this->addslashes($this->anmerkung).', '.
 				'leasing_bis='.($this->leasing_bis?$this->addslashes($this->leasing_bis):'null').', '.
 				'inventuramum='.$this->addslashes($this->inventuramum).', '.
-				'inventurvon='.$this->addslashes($this->inventurvon).' '.
+				'inventurvon='.$this->addslashes($this->inventurvon).', '.
+				'anschaffungsdatum='.$this->addslashes($this->anschaffungsdatum).', '.
+				'anschaffungswert='.$this->addslashes($this->anschaffungswert).', '.
+				'hoehe='.$this->addslashes($this->hoehe).', '.
+				'breite='.$this->addslashes($this->breite).', '.
+				'tiefe='.$this->addslashes($this->tiefe).' '.
 				'WHERE betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).';';
 		}
 

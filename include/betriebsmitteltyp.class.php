@@ -95,7 +95,7 @@ class betriebsmitteltyp extends basis_db
 	{
 		$this->result=array();
 		$this->errormsg = '';
-		$qry = "SELECT * FROM wawi.tbl_betriebsmitteltyp ORDER BY betriebsmitteltyp";
+		$qry = "SELECT * FROM wawi.tbl_betriebsmitteltyp ORDER BY beschreibung";
 		
 		if($this->db_query($qry))
 		{

@@ -121,9 +121,11 @@ $maxlength[$spalte]=5;
 $worksheet->write($zeile,++$spalte,'Datum',$format_bold);
 $maxlength[$spalte]=5;
 $worksheet->write($zeile,++$spalte,'Leasing Bis',$format_bold);
-$maxlength[$spalte]=7;
-$worksheet->write($zeile,++$spalte,'Bruttobetrag',$format_bold);
-$maxlength[$spalte]=12;
+$maxlength[$spalte]=11;
+$worksheet->write($zeile,++$spalte,'Anschaffungsdatum',$format_bold);
+$maxlength[$spalte]=17;
+$worksheet->write($zeile,++$spalte,'Anschaffungswert',$format_bold);
+$maxlength[$spalte]=16;
 
 for ($pos=0;$pos<count($resultBetriebsmittel);$pos++)
 {
@@ -163,14 +165,8 @@ for ($pos=0;$pos<count($resultBetriebsmittel);$pos++)
 	InsertCell($zeile,++$spalte,$datum_obj->formatDatum($resultBetriebsmittel[$pos]->betriebsmittelstatus_datum,'d.m.Y'),$format_date);
 	InsertCell($zeile,++$spalte,$datum_obj->formatDatum($resultBetriebsmittel[$pos]->leasing_bis,'d.m.Y'),$format_date);
 			
-	//Wenn Verbindung zu einem Bestelldetail vorhanden ist, wird der Bruttobetrag des Details
-	//in der Liste angezeigt
-	if($resultBetriebsmittel[$pos]->bestelldetail_id!='')
-	{
-		$bestelldetail = new wawi_bestelldetail();
-		$bestelldetail->load($resultBetriebsmittel[$pos]->bestelldetail_id);
-		InsertCell($zeile,++$spalte,$bestelldetail->preisprove/100*(100+$bestelldetail->mwst), $format_right);
-	}		
+	InsertCell($zeile,++$spalte,$datum_obj->formatDatum($resultBetriebsmittel[$pos]->anschaffungsdatum,'d.m.Y'),$format_date);
+	InsertCell($zeile,++$spalte,$resultBetriebsmittel[$pos]->anschaffungswert);
 }
 $maxlength[1]=30;
 $maxlength[2]=30;
