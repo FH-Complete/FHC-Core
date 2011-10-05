@@ -2820,6 +2820,21 @@ if($result = @$db->db_query("SELECT character_maximum_length as len FROM informa
 		}
 	}
 }
+
+//fue.tbl_projekttask ende und ressource spalte
+if(!$result = @$db->db_query("SELECT ende FROM fue.tbl_projekttask"))
+{
+	$qry = "ALTER TABLE fue.tbl_projekttask ADD COLUMN ende date;
+			ALTER TABLE fue.tbl_projekttask ADD COLUMN ressource_id integer;
+
+			ALTER TABLE fue.tbl_projekttask ADD CONSTRAINT fk_ressource_projekttask FOREIGN KEY (ressource_id) REFERENCES fue.tbl_ressource (ressource_id) ON DELETE RESTRICT ON UPDATE CASCADE;	
+			";
+			
+	if(!$db->db_query($qry))
+		echo '<strong>fue.tbl_projekttask: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'fue.tbl_projekttask: Spalte ende und ressource_id hinzugefuegt!<br>';
+}
 echo '<br>';
 
 $tabellen=array(
@@ -2880,7 +2895,7 @@ $tabellen=array(
 	"fue.tbl_aktivitaet"  => array("aktivitaet_kurzbz","beschreibung"),
 	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz","budget"),
 	"fue.tbl_projektphase"  => array("projektphase_id","projekt_kurzbz","projektphase_fk","bezeichnung","beschreibung","start","ende","budget","insertamum","insertvon","updateamum","updatevon","personentage"),
-	"fue.tbl_projekttask"  => array("projekttask_id","projektphase_id","bezeichnung","beschreibung","aufwand","mantis_id","insertamum","insertvon","updateamum","updatevon","projekttask_fk","erledigt"),
+	"fue.tbl_projekttask"  => array("projekttask_id","projektphase_id","bezeichnung","beschreibung","aufwand","mantis_id","insertamum","insertvon","updateamum","updatevon","projekttask_fk","erledigt","ende","ressource_id"),
 	"fue.tbl_projekt_dokument"  => array("projekt_dokument_id","projektphase_id","projekt_kurzbz","dms_id"),
 	"fue.tbl_projekt_ressource"  => array("projekt_ressource_id","projekt_kurzbz","projektphase_id","ressource_id","funktion_kurzbz","beschreibung"),
 	"fue.tbl_ressource"  => array("ressource_id","student_uid","mitarbeiter_uid","betriebsmittel_id","firma_id","bezeichnung","beschreibung","insertamum","insertvon","updateamum","updatevon"),
