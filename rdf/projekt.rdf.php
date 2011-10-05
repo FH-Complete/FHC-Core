@@ -23,6 +23,7 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/projekt.class.php');
+require_once('../include/datum.class.php');
 
 $rdf_url='http://www.technikum-wien.at/projekt/';
 
@@ -33,13 +34,13 @@ else
 $projekt_obj = new projekt();
 $projekt_obj->getProjekte($oe);
 //var_dump($projekt_obj);
-?>
+$datum_obj = new datum();
+echo '
 <RDF:RDF
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	xmlns:PROJEKT="<?php echo $rdf_url; ?>rdf#"
->
+	xmlns:PROJEKT="'.$rdf_url.'rdf#"
+>';
 
-<?php
 $descr='';
 $sequenz='';
 for ($i=0;$i<count($projekt_obj->result);$i++)
@@ -51,8 +52,10 @@ for ($i=0;$i<count($projekt_obj->result);$i++)
 		<PROJEKT:nummer>'.$projekt->nummer.'</PROJEKT:nummer>
 		<PROJEKT:titel>'.$projekt->titel.'</PROJEKT:titel>
 		<PROJEKT:beschreibung>'.$projekt->beschreibung.'</PROJEKT:beschreibung>
-		<PROJEKT:beginn>'.$projekt->beginn.'</PROJEKT:beginn>
-		<PROJEKT:ende>'.$projekt->ende.'</PROJEKT:ende>
+		<PROJEKT:beginn_iso>'.$projekt->beginn.'</PROJEKT:beginn_iso>
+		<PROJEKT:beginn>'.$datum_obj->formatDatum($projekt->beginn,'d.m.Y').'</PROJEKT:beginn>
+		<PROJEKT:ende_iso>'.$projekt->ende.'</PROJEKT:ende_iso>
+		<PROJEKT:ende>'.$datum_obj->formatDatum($projekt->ende,'d.m.Y').'</PROJEKT:ende>
 		<PROJEKT:budget>'.$projekt->budget.'</PROJEKT:budget>
 	</RDF:Description>'."\n";
 

@@ -83,11 +83,11 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektphasedetail.overlay
 				<splitter class="tree-splitter"/>
 				<treecol id="treecol-projektphase-beginn" label="Beginn" flex="2" hidden="false" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#beginn" />
+					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#beginn_iso" />
 				<splitter class="tree-splitter"/>
 				<treecol id="treecol-projektphase-ende" label="Ende" flex="2" hidden="false" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#ende" />
+					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#ende_iso" />
 				<splitter class="tree-splitter"/>
 				<treecol id="treecol-projektphase-budget" label="Budget" flex="2" hidden="false" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
@@ -102,7 +102,14 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektphasedetail.overlay
 				<treecol id="treecol-projektphase-fortschritt" label="Fortschritt[%]" flex="2" hidden="true" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#fortschritt"/>
-					<splitter class="tree-splitter"/>
+				<splitter class="tree-splitter"/>
+				<treecol id="treecol-projektphase-beginniso" label="BeginnISO" flex="2" hidden="true" persist="hidden width ordinal"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#beginn_iso" />
+				<splitter class="tree-splitter"/>
+				<treecol id="treecol-projektphase-endeiso" label="EndeISO" flex="2" hidden="true" persist="hidden width ordinal"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#ende_iso" />
 				
 			</treecols>
 
@@ -120,6 +127,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektphasedetail.overlay
 								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#oe_kurzbz"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#projekt_kurzbz"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#fortschritt"/>
+								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#beginn_iso"/>
+								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#ende_iso"/>
 							</treerow>
 						</treeitem>
 					</treechildren>

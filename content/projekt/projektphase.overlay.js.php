@@ -176,8 +176,8 @@ function saveProjektphaseDetail()
 	projekt_kurzbz = document.getElementById('textbox-projektphase-detail-projekt_kurzbz').value;
 	bezeichnung = document.getElementById('textbox-projektphase-detail-bezeichnung').value;
 	beschreibung = document.getElementById('textbox-projektphase-detail-beschreibung').value;
-	start = document.getElementById('textbox-projektphase-detail-start').value;
-	ende = document.getElementById('textbox-projektphase-detail-ende').value;
+	start = document.getElementById('textbox-projektphase-detail-start').iso;
+	ende = document.getElementById('textbox-projektphase-detail-ende').iso;
 	budget = document.getElementById('textbox-projektphase-detail-budget').value;
 	personentage = document.getElementById('textbox-projektphase-detail-personentage').value;
 	neu = document.getElementById('checkbox-projektphase-detail-neu').checked;
@@ -211,7 +211,7 @@ function clb_saveProjektphase(respObj)
 {
 	try
 	{
-		var id = respObj.Body[0].SaveProjektphaseResponse[0].message[0].Text;
+		var id = respObj.Body[0].saveProjektphaseResponse[0].message[0].Text;
 	}
 	catch(e)
 	{

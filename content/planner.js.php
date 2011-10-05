@@ -53,16 +53,7 @@ var globalProgressmeter=new Progressmeter('statusbar-progressmeter');
 //globalProgressmeter.StartPM();
 
 function closeWindow()
-{
-	//Warnung wenn Daten veraendert aber noch nicht gespeichert wurden
-	if(MitarbeiterDetailValueChanged)
-	{
-		if(!confirm('Achtung! Mitarbeiterdaten wurden veraendert aber noch nicht gespeichert. Programm wirklich beenden? \n(Die geaenderten Daten gehen dabei verloren)'))
-			return false;
-	}
-
-	MitarbeiterDetailValueChanged=false;
-	
+{	
 	window.close();
 }
 

@@ -91,15 +91,22 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektdetail.overlay.xul.
 				<splitter class="tree-splitter"/>
 				<treecol id="treecol-projekt-beginn" label="Start" flex="2" hidden="false" persist="hidden, width, ordinal"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/projekt/rdf#beginn" />
+					sort="rdf:http://www.technikum-wien.at/projekt/rdf#beginn_iso" />
 				<splitter class="tree-splitter"/>
 				<treecol id="treecol-projekt-ende" label="Ende" flex="2" hidden="false" persist="hidden, width, ordinal"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/projekt/rdf#ende" />
+					sort="rdf:http://www.technikum-wien.at/projekt/rdf#ende_iso" />
 				<splitter class="tree-splitter"/>
 				<treecol id="treecol-projekt-budget" label="Budget" flex="2" hidden="false" persist="hidden, width, ordinal"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projekt/rdf#budget" />
+				<treecol id="treecol-projekt-beginniso" label="StartISO" flex="2" hidden="true" persist="hidden, width, ordinal"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/projekt/rdf#beginn_iso" />
+				<splitter class="tree-splitter"/>
+				<treecol id="treecol-projekt-endeiso" label="EndeISO" flex="2" hidden="true" persist="hidden, width, ordinal"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/projekt/rdf#ende_iso" />
 			</treecols>
 
 			<template>
@@ -115,6 +122,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektdetail.overlay.xul.
 								<treecell label="rdf:http://www.technikum-wien.at/projekt/rdf#beginn"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projekt/rdf#ende"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projekt/rdf#budget"/>
+								<treecell label="rdf:http://www.technikum-wien.at/projekt/rdf#beginn_iso"/>
+								<treecell label="rdf:http://www.technikum-wien.at/projekt/rdf#ende_iso"/>
 							</treerow>
 						</treeitem>
 					</treechildren>
