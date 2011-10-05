@@ -51,19 +51,48 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			<rows>
 				<row>
 					<label value="Projekt (KurzBz)" control="textbox-projekt-detail-projekt_kurzbz "/>
-					<textbox id="textbox-projekt-detail-projekt_kurzbz"/>
+					<hbox>
+						<textbox id="textbox-projekt-detail-projekt_kurzbz" size="16" maxlength="16" readonly="true"/>
+						<spacer />
+					</hbox>
 				</row>
 				<row>
 					<label value="OE (Organisationseinheit)" control="textbox-projekt-detail-oe_kurzbz"/>
-					<textbox id="textbox-projekt-detail-oe_kurzbz"/>
+					<hbox>
+						<menulist id="menulist-projekt-detail-oe_kurzbz"
+								  xmlns:ORGANISATIONSEINHEIT="http://www.technikum-wien.at/organisationseinheit/rdf#"
+						          datasources="<?php echo APP_ROOT;?>rdf/organisationseinheit.rdf.php"
+						          ref="http://www.technikum-wien.at/organisationseinheit/liste" >
+							<template>
+								<rule ORGANISATIONSEINHEIT:aktiv='false'>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/organisationseinheit/rdf#oe_kurzbz"
+							        		      label="rdf:http://www.technikum-wien.at/organisationseinheit/rdf#organisationseinheittyp_kurzbz rdf:http://www.technikum-wien.at/organisationseinheit/rdf#bezeichnung"
+										  		  uri="rdf:*" style="text-decoration:line-through;"/>
+										</menupopup>
+								</rule>
+								<rule>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/organisationseinheit/rdf#oe_kurzbz"
+							        		      label="rdf:http://www.technikum-wien.at/organisationseinheit/rdf#organisationseinheittyp_kurzbz rdf:http://www.technikum-wien.at/organisationseinheit/rdf#bezeichnung"
+										  		  uri="rdf:*"/>
+										</menupopup>
+								</rule>
+							</template>
+						</menulist>
+						<spacer />
+					</hbox>
 				</row>
 				<row>
 					<label value="Titel" control="textbox-projekt-detail-titel"/>
-   					<textbox id="textbox-projekt-detail-titel"/>
+   					<textbox id="textbox-projekt-detail-titel" maxlength="256"/>
 				</row>
 				<row>
 					<label value="Nummer" control="textbox-projekt-detail-nummer"/>
-   					<textbox id="textbox-projekt-detail-nummer"/>
+					<hbox>
+   						<textbox id="textbox-projekt-detail-nummer" maxlength="8"/>
+   						<spacer />
+   					</hbox>
 				</row>
 				<row>
 					<label value="Beschreibung" control="textbox-projekt-detail-beschreibung"/>
@@ -71,15 +100,18 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				</row>
 				<row>
 					<label value="Beginn" control="textbox-projekt-detail-beginn"/>
-   					<textbox id="textbox-projekt-detail-beginn"/>
+   					<box class="Datum" id="textbox-projekt-detail-beginn"/>
 				</row>
 				<row>
 					<label value="Ende" control="textbox-projekt-detail-ende"/>
-   					<textbox id="textbox-projekt-detail-ende"/>
+   					<box class="Datum" id="textbox-projekt-detail-ende"/>
 				</row>
 				<row>
 					<label value="Budget" control="textbox-projekt-detail-budget"/>
-   					<textbox id="textbox-projekt-detail-budget"/>
+					<hbox>
+   						<textbox id="textbox-projekt-detail-budget" size="12" maxlength="13"/>
+   						<spacer />
+   					</hbox>
 				</row>
 			</rows>
 		</grid>

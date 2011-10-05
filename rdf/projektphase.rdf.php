@@ -24,9 +24,11 @@ require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/projekt.class.php');
 require_once('../include/projektphase.class.php');
 require_once('../include/rdf.class.php');
+require_once('../include/datum.class.php');
 
 $oRdf = new rdf('PROJEKTPHASE','http://www.technikum-wien.at/projektphase');
 $oRdf->sendHeader();
+$datum_obj = new datum();
 
 if(isset($_GET['projektphase_id']))
 {
@@ -48,8 +50,10 @@ if(isset($_GET['projektphase_id']))
 	$oRdf->obj[$i]->setAttribut('projektphase_fk',$phase->projektphase_fk);
 	$oRdf->obj[$i]->setAttribut('bezeichnung',$phase->bezeichnung);
 	$oRdf->obj[$i]->setAttribut('beschreibung',$phase->beschreibung);
-	$oRdf->obj[$i]->setAttribut('start',$phase->start);
-	$oRdf->obj[$i]->setAttribut('ende',$phase->ende);
+	$oRdf->obj[$i]->setAttribut('start_iso',$phase->start);
+	$oRdf->obj[$i]->setAttribut('ende_iso',$phase->ende);
+	$oRdf->obj[$i]->setAttribut('start',$datum_obj->formatDatum($phase->start,'d.m.Y'));
+	$oRdf->obj[$i]->setAttribut('ende',$datum_obj->formatDatum($phase->ende,'d.m.Y'));
 	$oRdf->obj[$i]->setAttribut('budget',$phase->budget);
 	$oRdf->obj[$i]->setAttribut('fortschritt',$ergebnis);
 	$oRdf->obj[$i]->setAttribut('personentage',$phase->personentage);
@@ -89,8 +93,11 @@ else
 			$oRdf->obj[$idx]->setAttribut('nummer','');
 			$oRdf->obj[$idx]->setAttribut('titel','');
 			$oRdf->obj[$idx]->setAttribut('beschreibung','');
+			$oRdf->obj[$idx]->setAttribut('beginn_iso','');
+			$oRdf->obj[$idx]->setAttribut('ende_iso','');
 			$oRdf->obj[$idx]->setAttribut('beginn','');
 			$oRdf->obj[$idx]->setAttribut('ende','');
+			$oRdf->obj[$idx]->setAttribut('typ','organisationseinheit');
 			
 			$oRdf->addSequence($projekt->oe_kurzbz);
 			
@@ -107,8 +114,11 @@ else
 		$oRdf->obj[$idx]->setAttribut('nummer',$projekt->nummer);
 		$oRdf->obj[$idx]->setAttribut('titel',$projekt->titel);
 		$oRdf->obj[$idx]->setAttribut('beschreibung',$projekt->beschreibung);
-		$oRdf->obj[$idx]->setAttribut('beginn',$projekt->beginn);
-		$oRdf->obj[$idx]->setAttribut('ende',$projekt->ende);
+		$oRdf->obj[$idx]->setAttribut('beginn_iso',$projekt->beginn);
+		$oRdf->obj[$idx]->setAttribut('ende_iso',$projekt->ende);
+		$oRdf->obj[$idx]->setAttribut('beginn',$datum_obj->formatDatum($projekt->beginn,'d.m.Y'));
+		$oRdf->obj[$idx]->setAttribut('ende',$datum_obj->formatDatum($projekt->ende,'d.m.Y'));
+		$oRdf->obj[$idx]->setAttribut('typ','projekt');
 		
 		$oRdf->addSequence($projekt->oe_kurzbz.'/'.$projekt->projekt_kurzbz, $projekt->oe_kurzbz);
 				
@@ -137,11 +147,14 @@ else
 			$oRdf->obj[$idx]->setAttribut('nummer','');
 			$oRdf->obj[$idx]->setAttribut('titel',$projektphase->bezeichnung);
 			$oRdf->obj[$idx]->setAttribut('beschreibung',$projektphase->beschreibung);
-			$oRdf->obj[$idx]->setAttribut('beginn',$projektphase->start);
-			$oRdf->obj[$idx]->setAttribut('ende',$projektphase->ende);
+			$oRdf->obj[$idx]->setAttribut('beginn_iso',$projektphase->start);
+			$oRdf->obj[$idx]->setAttribut('ende_iso',$projektphase->ende);
+			$oRdf->obj[$idx]->setAttribut('beginn',$datum_obj->formatDatum($projektphase->start,'d.m.Y'));
+			$oRdf->obj[$idx]->setAttribut('ende',$datum_obj->formatDatum($projektphase->ende,'d.m.Y'));
 			$oRdf->obj[$idx]->setAttribut('fortschritt',$ergebnis);
 			$oRdf->obj[$idx]->setAttribut('budget',$projektphase->budget);
 			$oRdf->obj[$idx]->setAttribut('personentage',$projektphase->personentage);
+			$oRdf->obj[$idx]->setAttribut('typ','phase');
 			
 			if (!is_null($projektphase->projektphase_fk))
 				$oRdf->addSequence($projekt->oe_kurzbz.'/'.$projekt->projekt_kurzbz.'/'.$projektphase->projektphase_id, $projekt->oe_kurzbz.'/'.$projekt->projekt_kurzbz.'/'.$projektphase->projektphase_fk);

@@ -78,7 +78,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/bestellung.overlay.xul.php
 	      <treechildren>
 	       <treeitem uri="rdf:*">
 	         <treerow>
-	           <treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#bezeichnung"/>
+	           <treecell src="../skin/images/rdf:http://www.technikum-wien.at/projektphase/rdf#typ^.png" label="rdf:http://www.technikum-wien.at/projektphase/rdf#bezeichnung"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#oe_kurzbz"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#projekt_kurzbz"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#projekt_phase"/>
@@ -109,9 +109,11 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/bestellung.overlay.xul.php
 			<tab id="tab-projektphase" label="Phasen" />
 			<tab id="tab-projekttask" label="Tasks" selected="true" />
 			<tab id="tab-dokumente" label="Dokumente" />
+			<!--
 			<tab id="tab-bestellung" label="Bestellungen" />
 			<tab id="tab-ressource" label="Ressourcen" />
 			<tab id="tab-gantt" label="Gantt" />
+			-->
 			<tab id="tab-notiz" label="Eigene Notizen" />
 		</tabs>
 		<tabpanels id="tabpanels-main" flex="1">
@@ -119,9 +121,11 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/bestellung.overlay.xul.php
 			<vbox id="box-projektphase" />
 			<vbox id="box-projekttask" />
 			<vbox id="box-dokumente" />
+			<!--
 			<vbox id="box-bestellung" />
 			<vbox id="box-ressource" />
 			<vbox id="box-gantt" />
+			-->
             <vbox id="box-notiz" />
 		</tabpanels>
 	</tabbox>

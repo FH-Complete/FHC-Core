@@ -62,7 +62,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				</row>
 				<row>
 					<label value="Bezeichnung" control="textbox-projektphase-detail-bezeichnung"/>
-   					<textbox id="textbox-projektphase-detail-bezeichnung"/>
+					<hbox>
+   						<textbox id="textbox-projektphase-detail-bezeichnung" maxlength="32" size="32"/>
+   						<spacer />
+   					</hbox>
 				</row>
 				<row>
 					<label value="Beschreibung" control="textbox-projektphase-detail-beschreibung"/>
@@ -70,19 +73,25 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				</row>
 				<row>
 					<label value="Start" control="textbox-projektphase-detail-start"/>
-   					<textbox id="textbox-projektphase-detail-start"/>
+   					<box class="Datum" id="textbox-projektphase-detail-start"/>
 				</row>
 				<row>
 					<label value="Ende" control="textbox-projektphase-detail-ende"/>
-   					<textbox id="textbox-projektphase-detail-ende"/>
+   					<box class="Datum" id="textbox-projektphase-detail-ende"/>
 				</row>
 				<row>
 					<label value="Budget" control="textbox-projektphase-detail-budget"/>
-   					<textbox id="textbox-projektphase-detail-budget"/>
+					<hbox>
+   						<textbox id="textbox-projektphase-detail-budget" size="12" maxlength="13"/>
+   						<spacer />
+   					</hbox>
 				</row>
 				<row>
 					<label value="Personentage" control="textbox-projektphase-detail-personentage"/>
-   					<textbox id="textbox-projektphase-detail-personentage"/>
+					<hbox>
+   						<textbox id="textbox-projektphase-detail-personentage" size="4" maxlenght="5"/>
+   						<spacer />
+   					</hbox>
 				</row>
 			</rows>
 		</grid>
