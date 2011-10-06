@@ -308,7 +308,7 @@ if (!$uid = get_uid())
 	$resultOrganisationseinheit=$oOrganisationseinheit->result;
 
 	// Typtable
-	if (!$oBetriebsmitteltyp->getAll())
+	if (!$oBetriebsmitteltyp->getAll('typ_code, beschreibung'))
 		$errormsg[]=$oBetriebsmitteltyp->errormsg;
 	$resultBetriebsmitteltyp=$oBetriebsmitteltyp->result;
 

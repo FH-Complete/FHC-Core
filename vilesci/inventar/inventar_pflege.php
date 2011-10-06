@@ -173,7 +173,7 @@
 // ------------------------------------------------------------------------------------------
 
 	// Typtable
-	if (!$oBetriebsmitteltyp->getAll())
+	if (!$oBetriebsmitteltyp->getAll('typ_code, beschreibung'))
 		$errormsg[]=$oBetriebsmitteltyp->errormsg;
 	$resultBetriebsmitteltyp=$oBetriebsmitteltyp->result;
 
@@ -628,7 +628,7 @@
 
 							<td>&nbsp;<label for="leasing_bis">Leasing bis</label>&nbsp;</td>
 							<td>
-								<input id="leasing_bis" name="leasing_bis" size="10" maxlength="11" value="<?php echo $leasing_bis;?>">
+								<input id="leasing_bis" name="leasing_bis" size="10" maxlength="11" value="<?php echo $datum_obj->formatDatum($leasing_bis,'d.m.Y');?>">
 								<script type="text/javascript" language="JavaScript1.2">
 								$(document).ready(function() 
 								{
@@ -648,7 +648,7 @@
 							</td>
 							<td>&nbsp;<label for="anschaffungsdatum">Anschaffungsdatum</label>&nbsp;</td>
 							<td>
-								<input id="anschaffungsdatum" name="anschaffungsdatum" size="10" maxlength="11" value="<?php echo $anschaffungsdatum;?>">
+								<input id="anschaffungsdatum" name="anschaffungsdatum" size="10" maxlength="11" value="<?php echo $datum_obj->formatDatum($anschaffungsdatum,'d.m.Y');?>">
 								<script type="text/javascript" language="JavaScript1.2">
 								$(document).ready(function() 
 								{
@@ -840,10 +840,24 @@ for ($pos=0;$pos<$anzahl;$pos++)
 				$anschaffungswert_array[$pos]=($bestellung->preisprove/100*(100+$bestellung->mwst));
 				$anschaffungswert_array[$pos]=number_format(str_replace(',','.',$anschaffungswert_array[$pos]),2,'.','');
 			}
-			$oBetriebsmittel->anschaffungswert = $anschaffungswert_array[$pos];
-			$oBetriebsmittel->hoehe = number_format(str_replace(',','.',$hoehe_array[$pos]),2,'.','');
-			$oBetriebsmittel->breite = number_format(str_replace(',','.',$breite_array[$pos]),2,'.','');
-			$oBetriebsmittel->tiefe = number_format(str_replace(',','.',$tiefe_array[$pos]),2,'.','');
+			if($anschaffungswert_array[$pos]!='')
+				$oBetriebsmittel->anschaffungswert = number_format(str_replace(',','.',$anschaffungswert_array[$pos]),2,'.','');
+			else
+				$oBetriebsmittel->anschaffungswert ='';
+			if($hoehe_array[$pos]!='')
+				$oBetriebsmittel->hoehe = number_format(str_replace(',','.',$hoehe_array[$pos]),2,'.','');
+			else
+				$oBetriebsmittel->hoehe = '';
+				
+			if($breite_array[$pos]!='')
+				$oBetriebsmittel->breite = number_format(str_replace(',','.',$breite_array[$pos]),2,'.','');
+			else
+				$oBetriebsmittel->breite = '';
+				
+			if($tiefe_array[$pos]!='')
+				$oBetriebsmittel->tiefe = number_format(str_replace(',','.',$tiefe_array[$pos]),2,'.','');
+			else
+				$oBetriebsmittel->tiefe = '';
 			
 			if ($oBetriebsmittel->save())
 			{
@@ -1245,7 +1259,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 								<tr>
 									<td>&nbsp;<label for="leasing_bis_array<?php echo $pos; ?>">Leasing bis</label>&nbsp;</td>
 									<td>
-										<input id="leasing_bis_array<?php echo $pos; ?>" name="leasing_bis_array[]" size="10" maxlength="11" value="<?php echo $leasing_bis_array[$pos]; ?>">
+										<input id="leasing_bis_array<?php echo $pos; ?>" name="leasing_bis_array[]" size="10" maxlength="11" value="<?php echo $datum_obj->formatDatum($leasing_bis_array[$pos],'d.m.Y'); ?>">
 										<script type="text/javascript" language="JavaScript1.2">
 										$(document).ready(function() 
 										{
@@ -1264,7 +1278,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 									</td>
 									<td>&nbsp;<label for="anschaffungsdatum_array<?php echo $pos; ?>">Anschaffungsdatum</label>&nbsp;</td>
 									<td>
-										<input id="anschaffungsdatum_array<?php echo $pos; ?>" name="anschaffungsdatum_array[]" size="10" maxlength="11" value="<?php echo $anschaffungsdatum_array[$pos]; ?>">
+										<input id="anschaffungsdatum_array<?php echo $pos; ?>" name="anschaffungsdatum_array[]" size="10" maxlength="11" value="<?php echo $datum_obj->formatDatum($anschaffungsdatum_array[$pos],'d.m.Y'); ?>">
 										<script type="text/javascript" language="JavaScript1.2">
 										$(document).ready(function() 
 										{

@@ -91,11 +91,11 @@ class betriebsmitteltyp extends basis_db
 	 * Laedt alle BetriebsmittelTypen
 	 * @return true wenn ok, false wenn Fehler
 	 */
-	public function getAll()
+	public function getAll($order='beschreibung')
 	{
 		$this->result=array();
 		$this->errormsg = '';
-		$qry = "SELECT * FROM wawi.tbl_betriebsmitteltyp ORDER BY beschreibung";
+		$qry = "SELECT * FROM wawi.tbl_betriebsmitteltyp ORDER BY ".$order;
 		
 		if($this->db_query($qry))
 		{
