@@ -52,6 +52,13 @@ if($studiengang_kz!='')
 	$format_bold =& $workbook->addFormat();
 	$format_bold->setBold();
 		
+	$format_bold_merge =& $workbook->addFormat();
+	$format_bold_merge->setBold();
+	$format_bold_merge->setAlign('merge');
+	
+	$format_center =& $workbook->addFormat();
+	$format_center->setAlign('merge');
+		
 	$format_rotate =& $workbook->addFormat();
 	$format_rotate->setTextRotation(270);
 	$format_rotate->setAlign('center');
@@ -65,6 +72,8 @@ if($studiengang_kz!='')
 	$maxlength[$spalte]=7;
 	$worksheet->write($zeile,++$spalte,'STATUS',$format_bold);
 	$maxlength[$spalte]=6;
+	$worksheet->write($zeile,++$spalte,'SEMESTER',$format_bold);
+	$maxlength[$spalte]=8;
 	
 	$dokumente = new dokument();
 	$dokumente->getDokumente($studiengang_kz);
@@ -77,8 +86,10 @@ if($studiengang_kz!='')
 	}
 		
 	// Daten holen
-	$qry = "SELECT nachname, vorname, prestudent_id, public.get_rolle_prestudent(prestudent_id, NULL) as status FROM 
-				public.tbl_person JOIN public.tbl_prestudent USING(person_id) 
+	$qry = "SELECT DISTINCT nachname, vorname, prestudent_id, public.get_rolle_prestudent(prestudent_id, NULL) AS status, tbl_studentlehrverband.semester FROM 
+				public.tbl_person JOIN public.tbl_prestudent USING(person_id)
+				LEFT JOIN public.tbl_student USING (prestudent_id)
+				LEFT JOIN public.tbl_studentlehrverband USING (student_uid)
 			WHERE 
 				prestudent_id IN(
 				SELECT 
@@ -92,7 +103,9 @@ if($studiengang_kz!='')
 					 							prestudent_id=tbl_prestudent.prestudent_id) AND studiengang_kz='".addslashes($studiengang_kz)."')<>0 
 					 	AND tbl_prestudentstatus.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND studiengang_kz='".addslashes($studiengang_kz)."'
 			)
-			ORDER BY nachname, vorname
+			AND (tbl_studentlehrverband.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' OR tbl_studentlehrverband.studiensemester_kurzbz is null)
+			
+			ORDER BY nachname, vorname, semester
 		   ";
 		
 	if($result = $db->db_query($qry))
@@ -114,6 +127,10 @@ if($studiengang_kz!='')
 			$worksheet->write($zeile,++$spalte, $row->status);
 			if(mb_strlen($row->status)>$maxlength[$spalte])
 				$maxlength[$spalte]=mb_strlen($row->status);
+			
+			$worksheet->write($zeile,++$spalte, $row->semester, $format_center);
+			if(mb_strlen($row->semester)>$maxlength[$spalte])
+				$maxlength[$spalte]=mb_strlen($row->semester);
 
 			$dokumente = new dokument();
 			$dokumente->getPrestudentDokumente($row->prestudent_id);
@@ -121,7 +138,7 @@ if($studiengang_kz!='')
 			foreach ($dokumente->result as $docs)
 			{
 				if(isset($dokumente_arr[$docs->dokument_kurzbz]))
-					$worksheet->write($zeile,$dokumente_arr[$docs->dokument_kurzbz], 'X', $format_bold);
+					$worksheet->write($zeile,$dokumente_arr[$docs->dokument_kurzbz], 'X', $format_bold_merge);
 			}
 		}
 	}
