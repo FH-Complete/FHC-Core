@@ -42,6 +42,8 @@ class projekttask extends basis_db
 	public $updatevon;	    // string
 	public $erledigt;		// boolean
 	public $projekttask_fk;	// integer
+	public $ende = null; 			// timestamp
+	public $ressource_id = null; 	// integer
 
 
 	/**
@@ -87,6 +89,8 @@ class projekttask extends basis_db
 				$this->updatevon = $row->updatevon;
 				$this->erledigt = ($row->erledigt=='t'?true:false);
 				$this->projekttask_fk = $row->projekttask_fk;
+				$this->ende = $row->ende; 
+				$this->ressource_id = $row->ressource_id; 
 
 				return true;
 			}
@@ -136,6 +140,8 @@ class projekttask extends basis_db
 				$obj->updatevon = $row->updatevon;
 				$obj->erledigt = ($row->erledigt=='t'?true:false);
 				$obj->projekttask_fk = $row->projekttask_fk;
+				$obj->ende = $row->ende; 
+				$obj->ressource_id = $row->ressource_id; 
 
 				$this->result[] = $obj;
 			}
@@ -190,7 +196,7 @@ class projekttask extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 
-			$qry='BEGIN; INSERT INTO fue.tbl_projekttask (projektphase_id, bezeichnung, beschreibung, aufwand, mantis_id, projekttask_fk, erledigt, insertamum, 
+			$qry='BEGIN; INSERT INTO fue.tbl_projekttask (projektphase_id, bezeichnung, beschreibung, aufwand, mantis_id, projekttask_fk, ende, ressource_id, erledigt, insertamum, 
 				insertvon, updateamum, updatevon) VALUES('.
 			     $this->addslashes($this->projektphase_id).', '.
 			     $this->addslashes($this->bezeichnung).', '.
@@ -198,6 +204,8 @@ class projekttask extends basis_db
 			     $this->addslashes($this->aufwand).', '.
 			     $this->addslashes($this->mantis_id).','.
 			     $this->addslashes($this->projekttask_fk).','.
+			     $this->addslashes($this->ende).','.
+			     $this->addslashes($this->ressource_id).','.
 			     ($this->erledigt?'true':'false').',  
 			     now(), '.
 			     $this->addslashes($this->insertvon).', 
@@ -213,6 +221,8 @@ class projekttask extends basis_db
 				'aufwand='.$this->addslashes($this->aufwand).', '.
 				'mantis_id='.$this->addslashes($this->mantis_id).', '.
 				'projekttask_fk='.$this->addslashes($this->projekttask_fk).', '.
+				'ende='.$this->addslashes($this->ende).', '.
+				'ressource_id='.$this->addslashes($this->ressource_id).', '.
 				'erledigt='.($this->erledigt?'true':'false').', '.
 				'updateamum= now(), '.
 				'updatevon='.$this->addslashes($this->updatevon).' '.

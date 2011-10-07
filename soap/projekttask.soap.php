@@ -53,7 +53,7 @@ ini_set("soap.wsdl_cache_enabled", "0");
  * @param string $mantis_id
  * @param string $user
  */
-function saveProjekttask($projekttask_id, $projektphase_id, $bezeichnung, $beschreibung, $aufwand, $mantis_id, $user)
+function saveProjekttask($projekttask_id, $projektphase_id, $bezeichnung, $beschreibung, $aufwand, $mantis_id, $user, $ende, $ressource_id)
 { 	
 	$user = get_uid(); 
 	$projekttask = new projekttask();
@@ -80,6 +80,8 @@ function saveProjekttask($projekttask_id, $projektphase_id, $bezeichnung, $besch
 	$projekttask->aufwand = $aufwand;
 	$projekttask->mantis_id = $mantis_id;
 	$projekttask->updatevon = $user;
+	$projekttask->ende = $ende; 
+	$projekttask->ressource_id = $ressource_id; 
 	
 	if($projekttask->save())
 	{

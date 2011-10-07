@@ -24,6 +24,8 @@ $projekt_phase=(isset($_GET['projekt_phase'])?$_GET['projekt_phase']:null);
 if($projekt_phase != null && (is_numeric($projekt_phase) == false ))
 	die('Ungültige ProjektphasenID'); 
 
+
+
 // header for no cache
 header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
@@ -49,6 +51,31 @@ echo '
 	xmlns:RESSOURCE="'.$rdf_url.'rdf#"
 >
 ';	
+
+$optional = '';
+$optional_description = '';
+if(isset($_GET['optional']))
+{
+	$optional.="\n\t\t\t<RDF:li resource=\"".$rdf_url."opt"."\" />";
+	
+	$optional_description = '
+	<RDF:Description about="'.$rdf_url.'opt" >
+    	<RESSOURCE:ressource_id></RESSOURCE:ressource_id>
+		<RESSOURCE:bezeichnung></RESSOURCE:bezeichnung>
+		<RESSOURCE:typ><![CDATA[Auswahl]]></RESSOURCE:typ>
+		<RESSOURCE:beschreibung></RESSOURCE:beschreibung>
+		<RESSOURCE:mitarbeiter_uid></RESSOURCE:mitarbeiter_uid>
+		<RESSOURCE:student_uid></RESSOURCE:student_uid>
+		<RESSOURCE:betriebsmittel_id></RESSOURCE:betriebsmittel_id>
+		<RESSOURCE:firma_id></RESSOURCE:firma_id>
+		<RESSOURCE:insertamum></RESSOURCE:insertamum>
+		<RESSOURCE:insertvon></RESSOURCE:insertvon>
+		<RESSOURCE:updateamum></RESSOURCE:updateamum>
+		<RESSOURCE:updatevon></RESSOURCE:updatevon>
+		<RESSOURCE:rdf_description></RESSOURCE:rdf_description>
+  	</RDF:Description>';
+}
+
 $ressource = new ressource(); 
 
 if($projekt_kurzbz!=null)
@@ -63,9 +90,6 @@ foreach ($ressource->result as $res)
 		draw_ressource($res);
 }
 
-
-
-
 $seq= "
 	<RDF:Seq about=\"".$rdf_url."liste\" >
 		<RDF:li>
@@ -78,15 +102,24 @@ $seq= "
 			<RDF:Seq about=\"".$rdf_url."firma\" >$firma
 			</RDF:Seq>
 		</RDF:li>
+	\n\t\t</RDF:Seq>
+		<RDF:Seq about=\"".$rdf_url."alle\" >
+			$optional
+			$mitarbeiter
+			$student
+			$betriebsmittel
+			$firma
+	\n\t\t</RDF:Seq>
 		";
 
-$seq.="\n\t\t</RDF:Seq>\n\t</RDF:RDF>";
+$seq.="\n\t</RDF:RDF>";
 
 
 draw_caption('mitarbeiter');
 draw_caption('studenten');
 draw_caption('betriebsmittel');
 draw_caption('firma');
+echo $optional_description; 
 echo $seq; 
 
 function draw_caption($name)

@@ -22,6 +22,9 @@ require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/projekttask.class.php');
 require_once('../include/rdf.class.php');
+require_once('../include/datum.class.php');
+
+$datum_obj = new datum();
 
 $projekttask_obj = new projekttask();
 
@@ -54,6 +57,8 @@ foreach($projekttask_obj->result as $projekttask)
 	$oRdf->obj[$i]->setAttribut('mantis_id',$projekttask->mantis_id);
 	$oRdf->obj[$i]->setAttribut('erledigt',($projekttask->erledigt?'true':'false'));
 	$oRdf->obj[$i]->setAttribut('projekttask_fk',$projekttask->projekttask_fk);
+	$oRdf->obj[$i]->setAttribut('ressource_id',$projekttask->ressource_id);
+	$oRdf->obj[$i]->setAttribut('ende',$datum_obj->formatDatum($projekttask->ende,'d.m.Y'));
 	
 	if($projekttask->projekttask_fk!='')
 		$oRdf->addSequence($projekttask->projekttask_id, $projekttask->projekttask_fk);
