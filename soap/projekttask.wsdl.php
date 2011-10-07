@@ -20,6 +20,8 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
 		<wsdl:part name="aufwand" type="xsd:string"></wsdl:part>
 		<wsdl:part name="mantis_id" type="xsd:string"></wsdl:part>
 		<wsdl:part name="user" type="xsd:string"></wsdl:part>
+		<wsdl:part name="ende" type="xsd:string"></wsdl:part>
+		<wsdl:part name="ressource_id" type="xsd:string"></wsdl:part>
     </wsdl:message>
 
  	<wsdl:message name="SaveProjekttaskResponse">

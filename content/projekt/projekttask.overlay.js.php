@@ -66,6 +66,40 @@ var TaskTreeListener =
 
 // ****************** FUNKTIONEN ************************** //
 
+
+
+// ****
+// * Laedt dynamisch die Personen fuer das DropDown Menue
+// ****
+function RessourceTaskLoad(menulist, id)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	var url = '<?php echo APP_ROOT; ?>rdf/ressource.rdf.php?projekt_phase='+id+'&optional&'+gettimestamp();
+	//nurmittitel=&
+	var oldDatasources = menulist.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		menulist.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	menulist.builder.rebuild();
+
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	//if(typeof(filter)=='undefined')
+	//	var datasource = rdfService.GetDataSource(url);
+	//else
+
+	var datasource = rdfService.GetDataSourceBlocking(url);
+
+	datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	menulist.database.AddDataSource(datasource);
+	menulist.builder.rebuild();
+	
+}
+
+
 // ****
 // * Asynchroner (Nicht blockierender) Refresh des LV Trees
 // ****
@@ -219,6 +253,30 @@ function TaskDisableFields(val)
 	document.getElementById('textbox-projekttask-detail-mantis_id').disabled=val;
 }
 
+
+// ****
+// * Liefert den value eines Editierbaren DropDowns
+// * @param id = ID der Menulist
+// ****
+function MenulistGetSelectedValue(id)
+{
+	menulist = document.getElementById(id);
+	
+	//Es kann sein, dass im Eingabefeld nichts steht und
+	//trotzdem ein Eintrag auf selected gesetzt ist.
+	//In diesem Fall soll aber kein Wert zurueckgegeben werden
+	if(menulist.value=='')
+		return '';
+	
+	//Wenn es Selektierte Eintraege gibt, dann den value zurueckliefern
+	var children = menulist.getElementsByAttribute('selected','true');
+	if(children.length>0)
+		return children[0].value;
+	else
+		return '';
+}
+
+
 // ****
 // * Speichert die Details
 // ****
@@ -232,7 +290,9 @@ function saveProjekttaskDetail()
 	beschreibung = document.getElementById('textbox-projekttask-detail-beschreibung').value;
 	aufwand = document.getElementById('textbox-projekttask-detail-aufwand').value;
 	mantis_id = document.getElementById('textbox-projekttask-detail-mantis_id').value;
-
+	ressource_id = MenulistGetSelectedValue('textbox-projekttask-detail-ressource'); 	
+	ende = document.getElementById('textbox-projekttask-detail-ende').iso;
+	alert(ressource_id); 
 	var soapBody = new SOAPObject("saveProjekttask");
 	soapBody.appendChild(new SOAPObject("projekttask_id")).val(projekttask_id);
 	soapBody.appendChild(new SOAPObject("projektphase_id")).val(projektphase_id);
@@ -241,6 +301,8 @@ function saveProjekttaskDetail()
 	soapBody.appendChild(new SOAPObject("aufwand")).val(aufwand);
 	soapBody.appendChild(new SOAPObject("mantis_id")).val(mantis_id);
 	soapBody.appendChild(new SOAPObject("user")).val(getUsername());
+	soapBody.appendChild(new SOAPObject("ressource_id")).val(ressource_id);
+	soapBody.appendChild(new SOAPObject("ende")).val(ende);
 	
 	var sr = new SOAPRequest("saveProjekttask",soapBody);
 
@@ -330,14 +392,21 @@ function onselectProjekttask()
 	var beschreibung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#beschreibung" ));
 	var aufwand=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aufwand" ));
 	var mantis_id=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#mantis_id" ));
+	var ressource_id=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ressource_id" ));
+	var ende=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ende" ));
 	
 	//Daten den Feldern zuweisen
+	var menulist = document.getElementById('textbox-projekttask-detail-ressource');
+	RessourceTaskLoad(menulist, projektphase_id);
 	document.getElementById('textbox-projekttaskdetail-projekttask_id').value=projekttask_id;
+	document.getElementById('textbox-projekttask-detail-ende').value=ende;
 	document.getElementById('textbox-projekttaskdetail-projektphase_id').value=projektphase_id;
 	document.getElementById('textbox-projekttask-detail-bezeichnung').value=bezeichnung;
 	document.getElementById('textbox-projekttask-detail-beschreibung').value=beschreibung;
 	document.getElementById('textbox-projekttask-detail-aufwand').value=aufwand;
 	document.getElementById('textbox-projekttask-detail-mantis_id').value=mantis_id;
+	MenulistSelectItemOnValue('textbox-projekttask-detail-ressource', ressource_id);
+	//document.getElementById('textbox-projekttask-detail-ressource').value=ressource_id;
 	
 	//Mantis Tab reset
 	document.getElementById('textbox-projekttask-mantis-issue_summary').value=bezeichnung;

@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>
+ * 			Karl Burkhart <burkhart@technikum-wien.at>
  */
 
 header("Cache-Control: no-cache");
@@ -46,11 +47,17 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			<rows>
 				<row>
 					<label value="Task ID" control="textbox-projekttask-detail-projekttask_id "/>
-					<textbox id="textbox-projekttaskdetail-projekttask_id" disabled="true"/>
+					<hbox>
+						<textbox id="textbox-projekttaskdetail-projekttask_id" disabled="true" size="5"/>
+						<spacer />
+					</hbox>
 				</row>
 				<row>
 					<label value="Projektphase ID" control="textbox-projekttask-detail-projektphase_id"/>
-					<textbox id="textbox-projekttaskdetail-projektphase_id"/>
+					<hbox>
+						<textbox id="textbox-projekttaskdetail-projektphase_id" size="5" disabled="true"/>
+						<spacer />
+					</hbox>
 				</row>
 				<row>
 					<label value="Bezeichnung" control="textbox-projekttask-detail-bezeichnung"/>
@@ -62,11 +69,47 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				</row>
 				<row>
 					<label value="Aufwand" control="textbox-projekttask-detail-aufwand"/>
-   					<textbox id="textbox-projekttask-detail-aufwand"/>
+					<hbox>
+   						<textbox id="textbox-projekttask-detail-aufwand" size="5" maxlength="5"/>
+   						<spacer />
+   					</hbox>
 				</row>
 				<row>
 					<label value="MantisID" control="textbox-projekttask-detail-mantis_id"/>
-   					<textbox id="textbox-projekttask-detail-mantis_id"/>
+					<hbox>
+   						<textbox id="textbox-projekttask-detail-mantis_id" size="5" maxlength="5"/>
+   						<spacer />
+   					</hbox>
+				</row>
+				<row>
+      				<label value="Ressource" control="textbox-projekttask-detail-ressource"/>
+			      		<menulist id="textbox-projekttask-detail-ressource"
+				          datasources="rdf:null"
+				          xmlns:RESSOURCE="http://www.technikum-wien.at/ressource/rdf#"
+				          ref="http://www.technikum-wien.at/ressource/alle" 
+				          oncommand=""
+				         >
+							<template>
+								<rule RESSOURCE:typ="Auswahl">
+									<menupopup>
+										<menuitem value=""
+								       		      label=" Auswahl "
+										  		  uri="rdf:*"/>
+										</menupopup>
+								</rule>
+								<rule>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/ressource/rdf#ressource_id"
+						        			      label="rdf:http://www.technikum-wien.at/ressource/rdf#bezeichnung ( rdf:http://www.technikum-wien.at/ressource/rdf#typ )"
+									  			  uri="rdf:*"/>
+									</menupopup>
+								</rule>
+							</template>
+						</menulist>
+				</row>
+				<row>
+					<label value="Ende" control="textbox-projekttask-detail-ende"/>
+   					<box class="Datum" id="textbox-projekttask-detail-ende"/>
 				</row>
 			</rows>
 		</grid>
