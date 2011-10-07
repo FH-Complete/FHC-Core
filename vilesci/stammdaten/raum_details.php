@@ -151,7 +151,7 @@
 	$htmlstr .= "					<td>Bezeichnung</td>\n";
 	$htmlstr .= "					<td><input class='detail' type='text' name='bezeichnung' size='32' maxlength='64' value='".$bezeichnung."' onchange='submitable()'></td>\n";
 	$htmlstr .= "					<td>Planbezeichnung</td>\n";
-	$htmlstr .= " 					<td><input class='detail' type='text' name='planbezeichnung' size='12' maxlength='5' value='".$planbezeichnung."' onchange='submitable()'></td>\n";
+	$htmlstr .= " 					<td><input class='detail' type='text' name='planbezeichnung' size='12' maxlength='8' value='".$planbezeichnung."' onchange='submitable()'></td>\n";
 	$htmlstr .= "				</tr>\n";
 	$htmlstr .= "				<tr>\n";
 	$htmlstr .= "					<td>Max Person</td>\n";
