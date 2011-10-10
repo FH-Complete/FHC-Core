@@ -62,6 +62,46 @@ if(isset($_GET['projektphase_id']))
 		$oRdf->addSequence($phase->projektphase_id, $phase->projektphase_fk);
 	else
 		$oRdf->addSequence($phase->projektphase_id);
+		
+}else if(isset($_GET['projekt_kurzbz']))
+{
+	$projektphase = new projektphase();
+	$projektphase->getProjektphasen($_GET['projekt_kurzbz']);
+	
+	if(isset($_GET['optional']))
+	{
+		$idx=$oRdf->newObjekt('opt');
+		
+		$oRdf->obj[$idx]->setAttribut('projektphase_id','');		
+		$oRdf->obj[$idx]->setAttribut('projekt_kurzbz', '');		
+		$oRdf->obj[$idx]->setAttribut('projektphase_fk', '');
+		$oRdf->obj[$idx]->setAttribut('bezeichnung','< Auswahl >');		
+		$oRdf->obj[$idx]->setAttribut('beschreibung', '');		
+		$oRdf->obj[$idx]->setAttribut('start', '');
+		$oRdf->obj[$idx]->setAttribut('ende', '');
+		$oRdf->obj[$idx]->setAttribut('budget', '');		
+		$oRdf->obj[$idx]->setAttribut('personentage', '');	
+		
+		$oRdf->addSequence('opt');
+	}
+		
+	foreach($projektphase->result as $phase)
+	{
+		$idx=$oRdf->newObjekt($phase->projektphase_id);
+		
+		$oRdf->obj[$idx]->setAttribut('projektphase_id',$phase->projektphase_id);		
+		$oRdf->obj[$idx]->setAttribut('projekt_kurzbz', $phase->projekt_kurzbz);		
+		$oRdf->obj[$idx]->setAttribut('projektphase_fk', $phase->projektphase_fk);
+		$oRdf->obj[$idx]->setAttribut('bezeichnung',$phase->bezeichnung);		
+		$oRdf->obj[$idx]->setAttribut('beschreibung', $phase->beschreibung);		
+		$oRdf->obj[$idx]->setAttribut('start', $phase->start);
+		$oRdf->obj[$idx]->setAttribut('ende', $phase->ende);
+		$oRdf->obj[$idx]->setAttribut('budget', $phase->budget);		
+		$oRdf->obj[$idx]->setAttribut('personentage', $phase->personentage);		
+	
+		$oRdf->addSequence($phase->projektphase_id);
+	}
+	
 }
 else
 {
