@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>
+ * 			Karl Burkhart <burkhart@technikum-wien.at>
  */
 
 header("Cache-Control: no-cache");
@@ -57,8 +58,21 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<textbox id="textbox-projektphase-detail-projekt_kurzbz"/>
 				</row>
 				<row>
-					<label value="Projektphase FK" control="textbox-projektphase-detail-projektphase_fk "/>
-					<textbox id="textbox-projektphase-detail-projektphase_fk"/>
+      				<label value="Projektphase FK" control="menulist-projektphase-detail-projektphase_fk"/>
+			      		<menulist id="menulist-projektphase-detail-projektphase_fk"
+				          datasources="rdf:null"
+				          ref="http://www.technikum-wien.at/projektphase" 
+				          oncommand=""
+				         >
+							<template>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/projektphase/rdf#projektphase_id"
+						        			      label="rdf:http://www.technikum-wien.at/projektphase/rdf#bezeichnung"
+									  			  uri="rdf:*"/>
+									</menupopup>
+
+							</template>
+						</menulist>
 				</row>
 				<row>
 					<label value="Bezeichnung" control="textbox-projektphase-detail-bezeichnung"/>

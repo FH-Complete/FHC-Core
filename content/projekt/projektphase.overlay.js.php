@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>
+ * 			Karl Burkhart <burkhart@technikum-wien.>
  */
 
 require_once('../../config/vilesci.config.inc.php');
@@ -64,6 +65,39 @@ var ProjektphaseTreeListener =
 };
 
 // ****************** FUNKTIONEN ************************** //
+
+// ****
+// * Laedt dynamisch die Personen fuer das DropDown Menue
+// ****
+function ProjektphaseFkLoad(menulist, id)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	
+	var url = '<?php echo APP_ROOT; ?>rdf/projektphase.rdf.php?projekt_kurzbz='+id+'&optional&'+gettimestamp();
+	//nurmittitel=&
+	var oldDatasources = menulist.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		menulist.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	menulist.builder.rebuild();
+
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	//if(typeof(filter)=='undefined')
+	//	var datasource = rdfService.GetDataSource(url);
+	//else
+
+	var datasource = rdfService.GetDataSourceBlocking(url);
+
+	datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	menulist.database.AddDataSource(datasource);
+	menulist.builder.rebuild();
+	
+}
+
+
 // ****
 // * Auswahl einer Phase
 // ****
@@ -122,10 +156,10 @@ function onselectTreeProjektphase()
     var personentage=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#personentage" ));
     
     //Daten den Feldern zuweisen
-
+	var menulist = document.getElementById('menulist-projektphase-detail-projektphase_fk');
+	ProjektphaseFkLoad(menulist, projekt_kurzbz);
     document.getElementById('textbox-projektphase-detail-projekt_kurzbz').value=projekt_kurzbz;
     document.getElementById('textbox-projektphase-detail-projektphase_id').value=projektphase_id;
-    document.getElementById('textbox-projektphase-detail-projektphase_fk').value=projektphase_fk;
     document.getElementById('textbox-projektphase-detail-beschreibung').value=beschreibung;
     document.getElementById('textbox-projektphase-detail-bezeichnung').value=bezeichnung;
     document.getElementById('textbox-projektphase-detail-start').value=start;
@@ -133,6 +167,7 @@ function onselectTreeProjektphase()
     document.getElementById('textbox-projektphase-detail-budget').value=budget;
     document.getElementById('textbox-projektphase-detail-personentage').value=personentage;
     document.getElementById('checkbox-projektphase-detail-neu').checked=false;
+    MenulistSelectItemOnValue('menulist-projektphase-detail-projektphase_fk', projektphase_fk);
     
     //Notizen zu einer Phase Laden
 	notiz = document.getElementById('box-projektphase-notizen');
@@ -172,7 +207,7 @@ function saveProjektphaseDetail()
 
 	//Werte holen
 	projektphase_id = document.getElementById('textbox-projektphase-detail-projektphase_id').value;
-	projektphase_fk = document.getElementById('textbox-projektphase-detail-projektphase_fk').value;
+	projektphase_fk = document.getElementById('menulist-projektphase-detail-projektphase_fk').value;
 	projekt_kurzbz = document.getElementById('textbox-projektphase-detail-projekt_kurzbz').value;
 	bezeichnung = document.getElementById('textbox-projektphase-detail-bezeichnung').value;
 	beschreibung = document.getElementById('textbox-projektphase-detail-beschreibung').value;
