@@ -51,11 +51,17 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			<rows>
 				<row>
 					<label value="Projektphase ID" control="textbox-projektphase-detail-projektphase_id "/>
-					<textbox id="textbox-projektphase-detail-projektphase_id" readonly="true"/>
+					<hbox>
+						<textbox id="textbox-projektphase-detail-projektphase_id" readonly="true" size="3"/>
+						<spacer />
+					</hbox>
 				</row>
 				<row>
 					<label value="Projekt Kurzbz" control="textbox-projektphase-detail-projekt_kurzbz"/>
-					<textbox id="textbox-projektphase-detail-projekt_kurzbz"/>
+					<hbox>
+						<textbox id="textbox-projektphase-detail-projekt_kurzbz" size="16" maxlength="16" readonly="true"/>
+						<spacer />
+					</hbox>
 				</row>
 				<row>
       				<label value="Projektphase FK" control="menulist-projektphase-detail-projektphase_fk"/>

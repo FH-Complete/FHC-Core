@@ -69,12 +69,13 @@ var ProjektphaseTreeListener =
 // ****
 // * Laedt dynamisch die Personen fuer das DropDown Menue
 // ****
-function ProjektphaseFkLoad(menulist, id)
+function ProjektphaseFkLoad(menulist, kurzbz, id)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	
-	var url = '<?php echo APP_ROOT; ?>rdf/projektphase.rdf.php?projekt_kurzbz='+id+'&optional&'+gettimestamp();
+	var url = '<?php echo APP_ROOT; ?>rdf/projektphase.rdf.php?projekt_kurzbz='+kurzbz+'&phase_id='+id+'&optional&'+gettimestamp();
 	//nurmittitel=&
+
 	var oldDatasources = menulist.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
 	{
@@ -157,7 +158,7 @@ function onselectTreeProjektphase()
     
     //Daten den Feldern zuweisen
 	var menulist = document.getElementById('menulist-projektphase-detail-projektphase_fk');
-	ProjektphaseFkLoad(menulist, projekt_kurzbz);
+	ProjektphaseFkLoad(menulist, projekt_kurzbz, projektphase_id);
     document.getElementById('textbox-projektphase-detail-projekt_kurzbz').value=projekt_kurzbz;
     document.getElementById('textbox-projektphase-detail-projektphase_id').value=projektphase_id;
     document.getElementById('textbox-projektphase-detail-beschreibung').value=beschreibung;
