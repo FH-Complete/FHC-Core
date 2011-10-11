@@ -55,7 +55,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<row>
 					<label value="Projektphase ID" control="textbox-projekttask-detail-projektphase_id"/>
 					<hbox>
-						<textbox id="textbox-projekttaskdetail-projektphase_id" size="5" disabled="true"/>
+						<textbox id="textbox-projekttaskdetail-projektphase_id" size="3" disabled="true"/>
 						<spacer />
 					</hbox>
 				</row>
