@@ -105,6 +105,59 @@ class projektphase extends basis_db
 		}
 	}
 
+	
+	/**
+	 * Laedt die Projektphasen mit zu einem Projekt
+	 * @param  $projekt_kurzbz Projekt der zu ladenden Projektphasen
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getProjektphasenForFk($projekt_kurzbz, $projektphase_id)
+	{
+		$this->result=array();
+		$qry = "Select * from fue.tbl_projektphase where projekt_kurzbz = '".addslashes($projekt_kurzbz)."' and projektphase_id not in (
+		WITH RECURSIVE tasks(projektphase_fk) as 
+		(
+			SELECT projektphase_id FROM fue.tbl_projektphase
+			WHERE projektphase_fk='".addslashes($projektphase_id)."'
+			UNION ALL
+			SELECT p.projektphase_id FROM fue.tbl_projektphase p, tasks 
+			WHERE p.projektphase_fk=tasks.projektphase_fk
+		) SELECT *
+		FROM tasks) and projektphase_id not in ('".addslashes($projektphase_id)."')";
+		//echo "\n".$qry."\n";
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new projektphase();
+				
+				$obj->projekt_kurzbz = $row->projekt_kurzbz;
+				$obj->projektphase_id = $row->projektphase_id;
+				$obj->projektphase_fk = $row->projektphase_fk;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->start = $row->start;
+				$obj->ende = $row->ende;
+				//$obj->personentage = $row->personentage;
+				$obj->budget = $row->budget;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				
+				$this->result[] = $obj;
+			}
+			//var_dump($this->result);
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
 	/**
 	 * Laedt die Projektphasen mit zu einem Projekt
 	 * @param  $projekt_kurzbz Projekt der zu ladenden Projektphasen
