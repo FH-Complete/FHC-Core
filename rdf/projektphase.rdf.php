@@ -30,15 +30,18 @@ $oRdf = new rdf('PROJEKTPHASE','http://www.technikum-wien.at/projektphase');
 $oRdf->sendHeader();
 $datum_obj = new datum();
 
-if(isset($_GET['projektphase_id']))
+$projektphase_id = isset($_GET['projektphase_id'])?$_GET['projektphase_id'] : '';
+$projekt_kurzbz = isset($_GET['projekt_kurzbz'])?$_GET['projekt_kurzbz'] : '';
+
+if($projektphase_id != '')
 {
 	$phase = new projektphase();
 	$timestamp = time(); 
 	$timestamp = date('Y-m-d');
 	
-	if(!$phase->load($_GET['projektphase_id']))
+	if(!$phase->load($projektphase_id))
 		die('Fehler beim Laden der Phase');
-	$ergebnis = $phase->getFortschritt($_GET['projektphase_id']);
+	$ergebnis = $phase->getFortschritt($projektphase_id);
 	$i=$oRdf->newObjekt($phase->projektphase_id);
 
 	// hat phase schon begonnen
@@ -63,10 +66,15 @@ if(isset($_GET['projektphase_id']))
 	else
 		$oRdf->addSequence($phase->projektphase_id);
 		
-}else if(isset($_GET['projekt_kurzbz']))
+}else if($projekt_kurzbz != '')
 {
 	$projektphase = new projektphase();
-	$projektphase->getProjektphasen($_GET['projekt_kurzbz']);
+	
+	// gesetzt wenn abfrage für fk ansonsten lade alle phasen zur projekt_kurzbz
+	if(isset($_GET['phase_id']))
+		$projektphase->getProjektphasenForFk($projekt_kurzbz, $_GET['phase_id']);
+	else 
+		$projektphase->getProjektphasen($projekt_kurzbz); 
 	
 	if(isset($_GET['optional']))
 	{
