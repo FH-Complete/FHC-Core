@@ -311,7 +311,7 @@
 			$errormsg[]=$bestellung->errormsg;
 		else
 		{
-			$anmerkung=trim($bestellung->titel);
+			$verwendung=trim($bestellung->titel);
 			$besteller=$bestellung->besteller_uid;
 			
 			$kostenstelle = new wawi_kostenstelle();
@@ -656,7 +656,7 @@
 								});
 								</script>
 							</td>
-							<td>&nbsp;<label for="anschaffungswert">Anschaffungswert</label>&nbsp;</td>
+							<td>&nbsp;<label for="anschaffungswert">Anschaffungswert (brutto)</label>&nbsp;</td>
 							<td>
 								<input id="anschaffungswert" name="anschaffungswert" size="10" maxlength="11" value="<?php echo $anschaffungswert;?>">
 							</td>
@@ -1286,7 +1286,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 										});
 										</script>
 									</td>
-									<td>&nbsp;<label for="anschaffungswert_array<?php echo $pos; ?>">Anschaffungswert</label>&nbsp;</td>
+									<td>&nbsp;<label for="anschaffungswert_array<?php echo $pos; ?>">Anschaffungswert (brutto)</label>&nbsp;</td>
 									<td>
 										<input id="anschaffungswert_array<?php echo $pos; ?>" name="anschaffungswert_array[]" size="10" maxlength="11" value="<?php echo $anschaffungswert_array[$pos]; ?>">
 									</td>
