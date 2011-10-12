@@ -94,7 +94,10 @@ $format_bold->setAlign('center');
 
 $format_date =& $workbook->addFormat();
 $format_date->setNumFormat('DD.MM.YYYY');
-	
+
+$format_number =& $workbook->addFormat();
+$format_number->setNumFormat('0,0.00');
+
 $format_right =& $workbook->addFormat();
 $format_right->setAlign('right');
 
@@ -156,8 +159,8 @@ for ($pos=0;$pos<count($resultBetriebsmittel);$pos++)
 
 	
 	InsertCell($zeile,$spalte,$resultBetriebsmittel[$pos]->inventarnummer);
-	InsertCell($zeile,++$spalte,$resultBetriebsmittel[$pos]->beschreibung);
-	InsertCell($zeile,++$spalte,$resultBetriebsmittel[$pos]->verwendung);
+	InsertCell($zeile,++$spalte,mb_str_replace("\r\n"," ",$resultBetriebsmittel[$pos]->beschreibung));
+	InsertCell($zeile,++$spalte,mb_str_replace("\r\n"," ",$resultBetriebsmittel[$pos]->verwendung));
 	InsertCell($zeile,++$spalte,$resultBetriebsmittel[$pos]->seriennummer);
 	InsertCell($zeile,++$spalte,$resultBetriebsmittel[$pos]->ort_kurzbz);
 	InsertCell($zeile,++$spalte,$resultBetriebsmittel[$pos]->bestellnr);
@@ -166,7 +169,7 @@ for ($pos=0;$pos<count($resultBetriebsmittel);$pos++)
 	InsertCell($zeile,++$spalte,$datum_obj->formatDatum($resultBetriebsmittel[$pos]->leasing_bis,'d.m.Y'),$format_date);
 			
 	InsertCell($zeile,++$spalte,$datum_obj->formatDatum($resultBetriebsmittel[$pos]->anschaffungsdatum,'d.m.Y'),$format_date);
-	InsertCell($zeile,++$spalte,$resultBetriebsmittel[$pos]->anschaffungswert);
+	InsertCell($zeile,++$spalte,$resultBetriebsmittel[$pos]->anschaffungswert, $format_number);
 }
 $maxlength[1]=30;
 $maxlength[2]=30;
