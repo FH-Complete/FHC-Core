@@ -42,9 +42,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			</xul:popupset>
 			<xul:toolbox>
 				<xul:toolbar >
-					<xul:toolbarbutton label="Neue Notiz" oncommand="document.getBindingParent(this).NeueNotiz()" image="../skin/images/NeuDokument.png" tooltiptext="Neue Notiz anlegen" />
-					<xul:toolbarbutton label="Aktualisieren" oncommand="document.getBindingParent(this).RefreshNotiz()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
-					<xul:toolbarbutton label="Filter" type="menu">							
+					<xul:toolbarbutton anonid="toolbarbutton-notiz-neu" label="Neue Notiz" oncommand="document.getBindingParent(this).NeueNotiz()" image="../skin/images/NeuDokument.png" tooltiptext="Neue Notiz anlegen" />
+					<xul:toolbarbutton anonid="toolbarbutton-notiz-aktualisieren" label="Aktualisieren" oncommand="document.getBindingParent(this).RefreshNotiz()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
+					<xul:toolbarbutton anonid="toolbarbutton-notiz-filter" label="Filter" type="menu">							
 				      <xul:menupopup>
 						    <xul:menuitem label="Alle Notizen anzeigen" oncommand="document.getBindingParent(this).LoadNotizTree(document.getBindingParent(this).getAttribute('projekt_kurzbz'),document.getBindingParent(this).getAttribute('projektphase_id'),document.getBindingParent(this).getAttribute('projekttask_id'),document.getBindingParent(this).getAttribute('uid'),document.getBindingParent(this).getAttribute('person_id'),document.getBindingParent(this).getAttribute('prestudent_id'),document.getBindingParent(this).getAttribute('bestellung_id'), document.getBindingParent(this).getAttribute('user'), null);" tooltiptext="Alle Notizen anzeigen"/>
 							<xul:menuitem label="nur offene Notizen anzeigen" oncommand="document.getBindingParent(this).LoadNotizTree(document.getBindingParent(this).getAttribute('projekt_kurzbz'),document.getBindingParent(this).getAttribute('projektphase_id'),document.getBindingParent(this).getAttribute('projekttask_id'),document.getBindingParent(this).getAttribute('uid'),document.getBindingParent(this).getAttribute('person_id'),document.getBindingParent(this).getAttribute('prestudent_id'),document.getBindingParent(this).getAttribute('bestellung_id'), document.getBindingParent(this).getAttribute('user'), false);" tooltiptext="nur offene Notizen anzeigen"/>
@@ -55,8 +55,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			<xul:tree anonid="tree-notiz"
 			seltype="single" hidecolumnpicker="false" flex="1"
 			datasources="rdf:null" ref="http://www.technikum-wien.at/notiz/liste"
-			ondblclick="document.getBindingParent(this).edit(event);"
 			onclick="document.getBindingParent(this).updateErledigt(event);"
+			onselect="document.getBindingParent(this).edit(event);"
 			editable="true"
 			>
 			
@@ -127,10 +127,80 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 		    <xul:button onclick="alert('value:'+document.getBindingParent(this).value);" label="GetValue" />
 		    <xul:button onclick="alert('projekt_kurzbz:'+this.getAttribute('projekt_kurzbz'));" label="GetProjektKurzbz" />
 		    -->
+		    <xul:splitter collapse="after" persist="state">
+				<xul:grippy />
+			</xul:splitter>
+		    <xul:vbox flex="1">
+		    	<xul:textbox anonid="textbox-notiz-notiz_id" hidden="true"/>
+				
+				<xul:groupbox flex="1">
+					<xul:caption anonid="caption-notiz-detail" label="Neue Notiz"/>
+						<xul:grid anonid="grid-notiz-detail" style="overflow:auto;margin:4px;" flex="1">
+						  	<xul:columns  >
+								<xul:column flex="1"/>
+								<xul:column flex="5"/>
+							</xul:columns>
+							<xul:rows>
+				      			<xul:row>
+				      				<xul:label value="Titel"/>
+						      		<xul:textbox anonid="textbox-notiz-titel" maxlength="256"/>
+								</xul:row>
+								<xul:row>
+				      				<xul:label value="Text"/>
+						      		<xul:textbox anonid="textbox-notiz-text" multiline="true" rows="6"/>
+								</xul:row>
+								<xul:row>
+				      					<xul:label value="Start"/>
+				      				<xul:hbox>
+						      			<xul:box class="Datum" anonid="box-notiz-start"/>
+						      			<xul:label value="Erledigt "/>
+						      			<xul:checkbox anonid="checkbox-notiz-erledigt"/>
+						      		</xul:hbox>
+								</xul:row>
+								<xul:row>
+									<xul:label value="Ende"/>
+									<xul:hbox flex="1">
+						      			<xul:box class="Datum" anonid="box-notiz-ende"/>
+										<xul:label value="Verfasser"/>
+							      		<xul:textbox anonid="textbox-notiz-verfasser" disabled="true"/>
+							      	</xul:hbox>
+						      	</xul:row>
+								<xul:row>
+				      				<xul:label value="Bearbeiter"/>
+				      				<xul:hbox>
+				      					<xul:hbox flex="1">
+								      		<xul:menulist anonid="menulist-notiz-bearbeiter"
+													editable="true" flex="1"
+													datasources="rdf:null"
+													ref="http://www.technikum-wien.at/mitarbeiter/liste" 
+													oninput="document.getBindingParent(this).BearbeiterLoad(this);"
+													oncommand=""
+											>
+												<xul:template>
+												<xul:menupopup>
+													<xul:menuitem value="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid"
+										        		      label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname rdf:http://www.technikum-wien.at/mitarbeiter/rdf#nachname ( rdf:http://www.technikum-wien.at/mitarbeiter/rdf#uid )"
+													  		  uri="rdf:*"/>
+												</xul:menupopup>
+												</xul:template>
+											</xul:menulist>
+										</xul:hbox>
+										
+							      	</xul:hbox>
+								</xul:row>
+							</xul:rows>
+					</xul:grid>
+					<xul:hbox>
+						<xul:spacer flex="1" />
+						<xul:button anonid="button-notiz-speichern" oncommand="document.getBindingParent(this).Save()" label="Speichern" />
+					</xul:hbox>
+				</xul:groupbox>
+		    </xul:vbox>
 		</xul:vbox>
 	</content>
 	<implementation>
 		<field name="TreeNotizDatasource" />
+		<field name="selectID" />
 		<property name="value">
 			<getter>
 				try
@@ -151,11 +221,149 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				]]>
 			</setter>
 		</property>
+		
+		<method name="DisableDetails">
+		<parameter name="val"/>
+			<body>
+			<![CDATA[
+				document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-titel').disabled=val;
+				document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-text').disabled=val;
+				document.getAnonymousElementByAttribute(this ,'anonid', 'box-notiz-start').disabled=val;
+				document.getAnonymousElementByAttribute(this ,'anonid', 'box-notiz-ende').disabled=val;
+				document.getAnonymousElementByAttribute(this ,'anonid', 'menulist-notiz-bearbeiter').disabled=val;
+				document.getAnonymousElementByAttribute(this ,'anonid', 'checkbox-notiz-erledigt').disabled=val;
+				document.getAnonymousElementByAttribute(this ,'anonid', 'button-notiz-speichern').disabled=val;
+			]]>
+			</body>
+		</method>
+		<method name="DisableControls">
+		<parameter name="val"/>
+			<body>
+			<![CDATA[
+				document.getAnonymousElementByAttribute(this ,'anonid', 'toolbarbutton-notiz-neu').disabled=val;
+				document.getAnonymousElementByAttribute(this ,'anonid', 'toolbarbutton-notiz-aktualisieren').disabled=val;
+				document.getAnonymousElementByAttribute(this ,'anonid', 'toolbarbutton-notiz-filter').disabled=val;
+			]]>
+			</body>
+		</method>
+		<method name="ResetDetails">
+			<body>
+			<![CDATA[
+				document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-notiz_id').value='';
+				document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-titel').value='';
+				document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-text').value='';
+				document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-verfasser').value=getUsername();
+				document.getAnonymousElementByAttribute(this ,'anonid', 'box-notiz-start').value='';
+				document.getAnonymousElementByAttribute(this ,'anonid', 'box-notiz-ende').value='';
+				document.getAnonymousElementByAttribute(this ,'anonid', 'menulist-notiz-bearbeiter').value='';
+			]]>
+			</body>
+		</method>
+		<method name="Save">
+			<body>
+			<![CDATA[
+				var notiz_id = document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-notiz_id').value;
+				var titel = document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-titel').value;
+				var text = document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-text').value;
+				var start = document.getAnonymousElementByAttribute(this ,'anonid', 'box-notiz-start').iso;
+				var ende = document.getAnonymousElementByAttribute(this ,'anonid', 'box-notiz-ende').iso;
+				var verfasser_uid = document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-verfasser').value;
+								
+				menulist = document.getAnonymousElementByAttribute(this ,'anonid', 'menulist-notiz-bearbeiter');
+	
+				//Es kann sein, dass im Eingabefeld nichts steht und
+				//trotzdem ein Eintrag auf selected gesetzt ist.
+				//In diesem Fall soll aber kein Wert zurueckgegeben werden
+				if(menulist.value=='')
+				{
+					bearbeiter_uid='';
+				}
+				else
+				{				
+					//Wenn es Selektierte Eintraege gibt, dann den value zurueckliefern
+					var children = menulist.getElementsByAttribute('selected','true');
+					if(children.length>0)
+						bearbeiter_uid =  children[0].value;
+					else
+						bearbeiter_uid = '';
+				}
+					
+				var erledigt = document.getAnonymousElementByAttribute(this ,'anonid', 'checkbox-notiz-erledigt').checked;
+				
+				var projekt_kurzbz = this.getAttribute('projekt_kurzbz');
+				var projektphase_id = this.getAttribute('projektphase_id');
+				var projekttask_id = this.getAttribute('projekttask_id');
+				var uid = this.getAttribute('uid');
+				var person_id = this.getAttribute('person_id');
+				var prestudent_id = this.getAttribute('prestudent_id');
+				var bestellung_id = this.getAttribute('bestellung_id');
+				
+				var soapBody = new SOAPObject("saveNotiz");
+				//soapBody.appendChild(new SOAPObject("username")).val('joe');
+				//soapBody.appendChild(new SOAPObject("passwort")).val('waschl');
+				
+				var notiz = new SOAPObject("notiz");
+				notiz.appendChild(new SOAPObject("notiz_id")).val(notiz_id);
+				notiz.appendChild(new SOAPObject("titel")).val(titel);
+				notiz.appendChild(new SOAPObject("text")).val(text);
+				notiz.appendChild(new SOAPObject("verfasser_uid")).val(verfasser_uid);
+				notiz.appendChild(new SOAPObject("bearbeiter_uid")).val(bearbeiter_uid);
+				notiz.appendChild(new SOAPObject("start")).val(start);
+				notiz.appendChild(new SOAPObject("ende")).val(ende);
+				notiz.appendChild(new SOAPObject("erledigt")).val(erledigt);
+			
+				notiz.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
+				notiz.appendChild(new SOAPObject("projektphase_id")).val(projektphase_id);
+				notiz.appendChild(new SOAPObject("projekttask_id")).val(projekttask_id);
+				notiz.appendChild(new SOAPObject("uid")).val(uid);
+				notiz.appendChild(new SOAPObject("person_id")).val(person_id);
+				notiz.appendChild(new SOAPObject("prestudent_id")).val(prestudent_id);
+				notiz.appendChild(new SOAPObject("bestellung_id")).val(bestellung_id);
+				soapBody.appendChild(notiz);
+								
+				var sr = new SOAPRequest("saveNotiz",soapBody);
+			
+				SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/notiz.soap.php?"+gettimestamp();
+				
+				 function mycallb(obj) {
+				  var me=obj;
+				  this.invoke=function (respObj) {
+				    try
+					{
+						var id = respObj.Body[0].saveNotizResponse[0].message[0].Text;
+						me.selectID=id;
+					}
+					catch(e)
+					{
+						try
+						{
+							var fehler = respObj.Body[0].Fault[0].faultstring[0].Text;
+						}
+						catch(e)
+						{
+							var fehler = e;
+						}
+						alert('Fehler: '+fehler);
+						return;
+					}
+					me.RefreshNotiz();
+				  }
+				}
+					 
+				var cb=new mycallb(this);
+					
+				SOAPClient.SendRequest(sr, cb.invoke);
+			
+			]]>
+			</body>
+		</method>
 		<method name="NeueNotiz">
 			<body>
 			<![CDATA[
 				//debug('Neue Notiz');
-				this.openNotiz();
+				this.ResetDetails();
+				this.DisableDetails(false);
+				document.getAnonymousElementByAttribute(this ,'anonid', 'caption-notiz-detail').label="Neue Notiz";
 			]]>
 			</body>
 		</method>
@@ -222,8 +430,89 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			    
 			    if(id!='')
 			    {
-			    	this.openNotiz(id);
+			    	this.DisableDetails(false);
+			    	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+			    	//Daten holen
+					var url = '<?php echo APP_ROOT ?>rdf/notiz.rdf.php?notiz_id='+id+'&'+gettimestamp();
+						
+					var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
+				                   getService(Components.interfaces.nsIRDFService);
+				    
+				    var dsource = rdfService.GetDataSourceBlocking(url);
+				    
+					var subject = rdfService.GetResource("http://www.technikum-wien.at/notiz/" + id);
+				
+					var predicateNS = "http://www.technikum-wien.at/notiz/rdf";
+				
+					//RDF parsen
+				
+					titel = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#titel" ));
+					text = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#text" ));
+					start = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#start" ));
+					ende = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ende" ));
+					verfasser = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#verfasser_uid" ));
+					bearbeiter = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bearbeiter_uid" ));
+					erledigt = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#erledigt" ));
+					if(erledigt=='true')
+						erledigt=true;
+					else
+						erledigt=false;
+						
+					document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-notiz_id').value=id;
+					document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-titel').value=titel;
+					document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-text').value=text;
+					document.getAnonymousElementByAttribute(this ,'anonid', 'box-notiz-start').value=start;
+					document.getAnonymousElementByAttribute(this ,'anonid', 'box-notiz-ende').value=ende;
+					document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-verfasser').value=verfasser;
+					document.getAnonymousElementByAttribute(this ,'anonid', 'checkbox-notiz-erledigt').checked=erledigt;
+					if(bearbeiter!='')
+					{
+						menulist = document.getAnonymousElementByAttribute(this ,'anonid', 'menulist-notiz-bearbeiter');
+						this.BearbeiterLoad(menulist, bearbeiter);
+						
+						var children = menulist.getElementsByAttribute('value',bearbeiter);
+						menulist.selectedItem=children[0];	
+					}
+					document.getAnonymousElementByAttribute(this ,'anonid', 'caption-notiz-detail').label="Bearbeiten";
 			    }
+			]]>
+			</body>
+		</method>
+		<method name="BearbeiterLoad">
+			<parameter name="menulist" />
+			<parameter name="filter" />
+			<body>
+			<![CDATA[
+				netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		
+				if(typeof(filter)=='undefined')
+					v = menulist.value;
+				else
+					v = filter;
+			
+				if(v.length>2)
+				{		
+					var url = '<?php echo APP_ROOT; ?>rdf/mitarbeiter.rdf.php?filter='+encodeURIComponent(v)+'&'+gettimestamp();
+					
+					var oldDatasources = menulist.database.GetDataSources();
+					while(oldDatasources.hasMoreElements())
+					{
+						menulist.database.RemoveDataSource(oldDatasources.getNext());
+					}
+					//Refresh damit die entfernten DS auch wirklich entfernt werden
+					menulist.builder.rebuild();
+				
+					var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+					if(typeof(filter)=='undefined')
+						var datasource = rdfService.GetDataSource(url);
+					else
+						var datasource = rdfService.GetDataSourceBlocking(url);
+					datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+					datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+					menulist.database.AddDataSource(datasource);
+					if(typeof(filter)!='undefined')
+						menulist.builder.rebuild();
+				}
 			]]>
 			</body>
 		</method>
@@ -244,6 +533,15 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				
 				try
 				{
+					this.initialsiert=false;
+					var tree = document.getAnonymousElementByAttribute(this,'anonid', 'tree-notiz');
+					if(tree.view)
+						tree.view.selection.clearSelection();
+					this.DisableControls(false);
+					this.DisableDetails(true);
+					this.ResetDetails();
+									
+					
 					this.setAttribute('projekt_kurzbz',projekt_kurzbz);
 					this.setAttribute('projektphase_id',projektphase_id);
 					this.setAttribute('projekttask_id',projekttask_id);
@@ -330,6 +628,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					  		var tree = document.getAnonymousElementByAttribute(this.notiz ,'anonid', 'tree-notiz');
 					  		if(tree.columns)
 								tree.columns.restoreNaturalOrder();
+							notiz.selectItem();
 						}
 					});
 					
@@ -338,6 +637,39 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				{
 					debug("Notiz load failed with exception: "+e);
 				}
+			]]>
+			</body>
+		</method>
+		<method name="selectItem">
+			<body>
+			<![CDATA[
+				var tree=document.getAnonymousElementByAttribute(this,'anonid', 'tree-notiz');
+				if(tree.view)
+				{
+					var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+				
+					//In der globalen Variable ist die zu selektierende ID gespeichert
+					if(this.selectID!=null)
+					{
+					   	for(var i=0;i<items;i++)
+					   	{
+					   		//id der row holen
+							var col = tree.columns.getColumnFor(document.getAnonymousElementByAttribute(this ,'anonid', 'treecol-notiz-notiz_id'));
+							id = tree.view.getCellText(i, col);
+						
+							//wenn dies die zu selektierende Zeile
+							if(this.selectID==id)
+							{
+								//Zeile markieren
+								tree.view.selection.select(i);
+								//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
+								tree.treeBoxObject.ensureRowIsVisible(i);
+								this.selectID=null;
+								return true;
+							}
+					   	}
+					}
+				}				
 			]]>
 			</body>
 		</method>
@@ -376,6 +708,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 		</method>
 		
 		<constructor>
+			this.DisableControls(true);
+			this.DisableDetails(true);
 			var projekt_kurzbz = this.getAttribute('projekt_kurzbz');
 			var projektphase_id = this.getAttribute('projektphase_id');
 			var projekttask_id = this.getAttribute('projekttask_id');
@@ -389,7 +723,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			   || uid!='' || person_id!='' || prestudent_id!='' || bestellung_id!='' || user!='')
 			{
 				this.LoadNotizTree(projekt_kurzbz,projektphase_id,projekttask_id,uid,person_id,prestudent_id,bestellung_id, user);
-			}			
+			}
+			document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-verfasser').value=getUsername();
 		</constructor>
 		<destructor>
 			//debug('Notiz Binding Stop');

@@ -23,6 +23,7 @@ header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
+session_start();
 
 require_once('../config/vilesci.config.inc.php'); 
 require_once('../include/notiz.class.php');
@@ -39,79 +40,87 @@ $SOAPServer->handle();
 // WSDL Chache auf aus
 ini_set("soap.wsdl_cache_enabled", "0");
 
+function check_user($username, $passwort)
+{
+	if($username=='')
+	{
+		$user = get_uid();
+		if($user=='')
+			return false;
+		return $user;
+	}
+	else
+	{
+		if(!checkldapuser($username,$passwort))
+			return false;
+		else
+			return $username;
+	}
+}
+
 /**
  * 
- * Speichert die vom Webservice übergebenen Parameter in die DB
- * @param string $notiz_id
- * @param string $titel
- * @param string $text
- * @param string $verfasser_uid
- * @param string $bearbeiter_uid
- * @param string $start
- * @param string $ende
- * @param boolean $erledigt
- * @param string $projekt_kurzbz
- * @param string $projektphase_id
- * @param string $projekttask_id
- * @param string $uid
- * @param string $person_id
- * @param string $prestudent_id
- * @param string $bestellung_id
+ * Speichert Notizen in die Datenbank
+ * 
+ * @param string $username
+ * @param string $passwort
+ * @param complextype $notiz
  */
-function saveNotiz($notiz_id, $titel, $text, $verfasser_uid, $bearbeiter_uid, $start, $ende, $erledigt, $projekt_kurzbz, $projektphase_id, $projekttask_id, $uid, $person_id, $prestudent_id, $bestellung_id)
+function saveNotiz($username, $passwort, $notiz)
 { 	
-	$user = get_uid();
-		
+	if(!$user = check_user($username, $passwort))
+		return new SoapFault("Server", "Invalid Credentials");	
+	
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
 		
 	if(!$rechte->isBerechtigt('basis/notiz', null, 'sui'))
 		return new SoapFault("Server", "Sie haben keine Berechtigung zum Speichern von Notizen");
 	
-	$notiz = new notiz();
-	if($notiz_id != '')
+	$notiz_obj = new notiz();
+	if($notiz->notiz_id != '')
 	{
-		if($notiz->load($notiz_id))
+		if($notiz_obj->load($notiz->notiz_id))
 		{
-			$notiz->new = false;
+			$notiz_obj->new = false;
 		}
 		else
 			return new SoapFault("Server", "Fehler beim Laden"); 
 	}
 	else
 	{
-		$notiz->new=true;
-		$notiz->insertvon = $user;
-		$notiz->insertamum = date('Y-m-d H:i:s');
+		$notiz_obj->new=true;
+		$notiz_obj->insertvon = $user;
+		$notiz_obj->insertamum = date('Y-m-d H:i:s');
 	}
 
-	$notiz->titel=$titel;
-	$notiz->text=$text;
-	$notiz->verfasser_uid = $verfasser_uid;
-	$notiz->bearbeiter_uid = $bearbeiter_uid;
-	$notiz->start = $start;
-	$notiz->ende = $ende;
-	$notiz->erledigt=$erledigt;
+	$notiz_obj->titel=$notiz->titel;
+	$notiz_obj->text=$notiz->text;
+	$notiz_obj->verfasser_uid = $notiz->verfasser_uid;
+	$notiz_obj->bearbeiter_uid = $notiz->bearbeiter_uid;
+	$notiz_obj->start = $notiz->start;
+	$notiz_obj->ende = $notiz->ende;
+	$notiz_obj->erledigt=$notiz->erledigt;
 	
-	if($notiz->save())
+	if($notiz_obj->save())
 	{
-		if($notiz->new)
+		if($notiz_obj->new)
 		{
-			$notiz->projekt_kurzbz = $projekt_kurzbz;
-			$notiz->projektphase_id = $projektphase_id;
-			$notiz->projekttask_id = $projekttask_id;
-			$notiz->uid = $uid;
-			$notiz->person_id = $person_id;
-			$notiz->prestudent_id = $prestudent_id;
-			$notiz->bestellung_id = $bestellung_id;
+			$notiz_obj->projekt_kurzbz = $notiz->projekt_kurzbz;
+			$notiz_obj->projektphase_id = $notiz->projektphase_id;
+			$notiz_obj->projekttask_id = $notiz->projekttask_id;
+			$notiz_obj->uid = $notiz->uid;
+			$notiz_obj->person_id = $notiz->person_id;
+			$notiz_obj->prestudent_id = $notiz->prestudent_id;
+			$notiz_obj->bestellung_id = $notiz->bestellung_id;
 			
-			if(!$notiz->saveZuordnung())
-				return new SoapFault("Server", $notiz->errormsg);
+			if(!$notiz_obj->saveZuordnung())
+				return new SoapFault("Server", $notiz_obj->errormsg);
 		}		
-		return $notiz->notiz_id;
+		return $notiz_obj->notiz_id;
 	} 
 	else
-		return new SoapFault("Server", $notiz->errormsg);
+		return new SoapFault("Server", $notiz_obj->errormsg);
 }
 
 /**
