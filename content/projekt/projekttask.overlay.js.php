@@ -292,7 +292,7 @@ function saveProjekttaskDetail()
 	mantis_id = document.getElementById('textbox-projekttask-detail-mantis_id').value;
 	ressource_id = MenulistGetSelectedValue('textbox-projekttask-detail-ressource'); 	
 	ende = document.getElementById('textbox-projekttask-detail-ende').iso;
-	alert(ressource_id); 
+	//alert(ressource_id); 
 	var soapBody = new SOAPObject("saveProjekttask");
 	soapBody.appendChild(new SOAPObject("projekttask_id")).val(projekttask_id);
 	soapBody.appendChild(new SOAPObject("projektphase_id")).val(projektphase_id);
