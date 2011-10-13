@@ -62,11 +62,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			
 			<xul:treecols>
 			    <xul:treecol anonid="treecol-notiz-titel" label="Titel" flex="5" primary="true" persist="hidden width ordinal"
-					class="sortDirectionIndicator" editable="false"
+					class="sortDirectionIndicator" editable="false" sortActive="true"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#titel"  />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-text" label="Text" flex="2" hidden="false" persist="hidden width ordinal"
-					class="sortDirectionIndicator" editable="false"
+					class="sortDirectionIndicator" editable="false" 
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#text" />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-verfasser" label="Verfasser" flex="2" hidden="false" persist="hidden width ordinal"
@@ -221,7 +221,36 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				]]>
 			</setter>
 		</property>
-		
+		<method name="sort">
+			<parameter name="treecol"/>
+			<body>
+			<![CDATA[
+			netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+			tree = document.getAnonymousElementByAttribute(this ,'anonid', 'tree-notiz');
+					
+			 var direction = treecol.getAttribute("sortDirection");
+		       var current = treecol.parentNode.firstChild;
+		       while (current) {
+		          if (current.nodeType==1 && current.localName=="treecol") {
+		             current.removeAttribute("sortDirection");
+		          }
+		          current = current.nextSibling;
+		       }
+		       if (direction=="ascending") {
+		          direction = "descending";
+		          treecol.setAttribute("sortDirection",direction);
+		       } else {
+		          direction = "ascending";
+		          treecol.setAttribute("sortDirection",direction);
+		       } 
+			var sortService = Components.classes["@mozilla.org/xul/xul-sort-service;1"].
+			                    getService(Components.interfaces.nsIXULSortService);
+			sortService.sort(tree, treecol.getAttribute('sort'), direction);
+			treecol.parentNode.parentNode.builder.rebuild();
+			debug('sorted in dir:'+direction);
+			]]>
+			</body>
+		</method>
 		<method name="DisableDetails">
 		<parameter name="val"/>
 			<body>
