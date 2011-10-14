@@ -164,6 +164,10 @@ if($method =="austauschprogram")
 					</td>
 					</tr>
 					</table>
+				<tr>
+					<td><input type="button" value="'.$p->t('global/zurueck').'" onclick="document.location.href = \'incoming.php?method=university\'"; ><input type="button" value="'.$p->t('incoming/weiter').'" onclick="document.location.href = \'incoming.php?method=lehrveranstaltungen\'"; style="float:right"></td>
+				</tr>
+					
 				</table>
 			</form>
 		
@@ -259,13 +263,12 @@ else if($method=="lehrveranstaltungen")
 		echo '<br><br><br> 
 			<table border ="0" width="100%">
 				<tr>
-					<td width="25%"></td>
+					<td width="25%" align="center"><input type="button" value="'.$p->t('global/zurueck').'" onclick="document.location.href = \'incoming.php?method=austauschprogram\'";></td>
 					<td width="25%" align="center"><a href="incoming.php?method=lehrveranstaltungen">'.$p->t('incoming/übersichtlehrveranstaltungen').'</a></td>
 					<td width="25%" align="center"><a href="incoming.php?method=lehrveranstaltungen&view=own">'.$p->t('incoming/eigenelehrveranstaltungen').'</a></td>
-					<td width="25%"></td>
+					<td width="25%" align="center"><input type="button" value="'.$p->t('incoming/hauptmenue').'" onclick="document.location.href = \'incoming.php\'";></td>
 				</tr>
-				<tr><td>&nbsp;</td></tr>
-			</table>';
+			</table> <br><br>';
 		
 		$qry = "SELECT 
 					tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.studiengang_kz, 
@@ -815,7 +818,7 @@ else if ($method == "university")
 	} 
 
 	echo '	<form method="POST" action="incoming.php?method=university" name="UniversityForm">
-				<table border ="0" style="margin-top:50px;" align="center" >
+				<table border ="0" style="margin-top:5%;" align="center" >
 				<tr><td>
 					<fieldset>
 					<table border ="0">
@@ -916,7 +919,10 @@ echo'					<td>'.$p->t('incoming/masterstudiengang').'</td>
 					</td>
 					</tr>
 					</table>
-				</table>
+					<tr>
+						<td><input type="button" value="'.$p->t('global/zurueck').'" onclick="document.location.href = \'incoming.php?method=profil\'"; ><input type="button" value="'.$p->t('incoming/weiter').'" onclick="document.location.href = \'incoming.php?method=austauschprogram\'"; style="float:right"></td>
+					</tr>
+						</table>
 			</form>
 		
 		<script type="text/javascript">
@@ -1154,15 +1160,15 @@ else if ($method == "profil")
 	}
 	// Ausgabe Profil Formular
 	echo'<form action="incoming.php?method=profil" method="POST" name="ProfilForm">
-	<table border =0 align="center" style="margin-top:5%;" >
+	<table align="center" style="margin-top:5%;" >
 	<tr valign="top" ><td>
 		<fieldset>
-		<table border = "0" >
+		<table>
 		<tr><td>
 			<tr>
 				<td>'.$p->t('global/titel').' Pre</td>
 				<td><input type="text" size="20" maxlength="64" name="titel_pre" value="'.$person->titelpre.'"></td>
-				<td>'.$p->t('incoming/zugangsvoraussetzung').'</td>
+				<td>'.$p->t('incoming/zugangsvoraussetzung').'&sup1;</td>
 				<td><input type="text" name="zgv" size=40 value="'.$preincoming->zgv.'"></td>
 			</tr>
 			<tr>
@@ -1244,7 +1250,7 @@ echo'			<td>'.$p->t('incoming/abgelegtin').'</td>
 				</td></td>
 			</tr>				
 			<tr>
-				<td>Nation</td>
+				<td>'.$p->t('incoming/nation').'</td>
 				<td><SELECT name="nation">
 				<option value="nat_auswahl">-- select --</option>';
 				foreach ($nation->nation as $nat)
@@ -1252,7 +1258,10 @@ echo'			<td>'.$p->t('incoming/abgelegtin').'</td>
 					$selected="";
 					if($adresse->result[0]->nation == $nat->code)
 						$selected = "selected"; 
-					echo '<option '.$selected.' value="'.$nat->code.'" >'.$nat->langtext."</option>\n";
+					if($sprache == 'English')
+						echo '<option '.$selected.' value="'.$nat->code.'" >'.$nat->engltext."</option>\n";
+					else
+						echo '<option '.$selected.' value="'.$nat->code.'" >'.$nat->langtext."</option>\n";
 				}		
 	echo '		</td>
 				<td>'.$p->t('global/vorname').'</td>
@@ -1287,19 +1296,35 @@ echo'			<td>'.$p->t('incoming/abgelegtin').'</td>
 				<input type="hidden" name="emergency_emailId" id="emergency_emailId" value="'.$emEmailId.'"></td>
 			</tr>	
 			<tr>
-				<td></td><td></td><td align = "center"><input type="submit" name="submit_profil" value="'.$p->t('global/speichern').'" onclick="return checkProfil()"></td>
-				<td><a href="'.APP_ROOT.'/cis/public/incoming/akteupload.php?person_id='.$person->person_id.'&dokumenttyp=Lebenslf" onclick="FensterOeffnen(this.href); return false;">'.$p->t('incoming/uploadCv').'</a></td>
+				<td></td>
+				<td></td>
+				<td align="center"><input type="button" value="'.$p->t('incoming/uploadCv').'" onclick=FensterOeffnen("'.APP_ROOT.'/cis/public/incoming/akteupload.php?person_id='.$person->person_id.'&dokumenttyp=Lebenslf");></td>
+				<td></td>
 			</tr>
-
+			<tr>
+				<td></td><td></td><td align = "center"><input type="submit" name="submit_profil" value="'.$p->t('global/speichern').'" onclick="return checkProfil()"></td>
+				<td></td>
+			</tr>
 			</table>
 		</td>
 		</tr>
+		<tr>
+			<td align="right"><input type="button" value="'.$p->t('incoming/weiter').'" onclick="document.location.href = \'incoming.php?method=university\'";></td>
+		</tr>
+		<tr>
+			<td colspan="5">&sup1; '.$p->t('incoming/zugangsvoraussetzungFussnote').'</td>
+			</tr>
+		</table>
+		<table border =0 align="center" style="margin-top:5%;" >
+		<tr><td>
+
+		</td></tr>
 		</table>
 	</form>
 	
 	<script type="text/javascript">
 	
-	function FensterOeffnen (adresse) 
+	function FensterOeffnen(adresse) 
 	{
 		MeinFenster = window.open(adresse, "Info", "width=500,height=500,left=100,top=200");
   		MeinFenster.focus();
@@ -1362,7 +1387,7 @@ echo 	'<script type="text/javascript">
 	echo '<table  align="center" border="0">
 			<tr>
 				<th></th>
-				<th>Name</th>
+				<th>'.$p->t('incoming/name').'</th>
 				<th>'.$p->t('global/bezeichnung').'</th>
 			</tr>'; 
 	foreach ($akte->result as $ak)

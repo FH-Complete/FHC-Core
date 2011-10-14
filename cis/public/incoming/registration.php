@@ -95,7 +95,10 @@ echo '	<form action="registration.php" method="POST" name="RegistrationForm">
 					 <option value="staat_auswahl">-- select --</option>\n';
 					foreach ($nation->nation as $nat)
 					{
-						echo '<option value="'.$nat->code.'" >'.$nat->langtext."</option>\n";
+						if($sprache == 'English')
+							echo '<option value="'.$nat->code.'" >'.$nat->engltext."</option>\n";
+						else
+							echo '<option value="'.$nat->code.'" >'.$nat->langtext."</option>\n";
 					}
 							
 	echo'		</tr>		
@@ -121,12 +124,15 @@ echo '	<form action="registration.php" method="POST" name="RegistrationForm">
 					<td><input type="text" size="40" maxlength="256" name="ort"></td>
 				</tr>				
 				<tr>
-					<td>Nation</td>
+					<td>'.$p->t('incoming/nation').'</td>
 					<td><SELECT name="nation">\n 
 					<option value="nat_auswahl">-- select --</option>\n';
 					foreach ($nation->nation as $nat)
 					{
-						echo '<option value="'.$nat->code.'" >'.$nat->langtext."</option>\n";
+						if($sprache == 'English')
+							echo '<option value="'.$nat->code.'" >'.$nat->engltext."</option>\n";
+						else
+							echo '<option value="'.$nat->code.'" >'.$nat->langtext."</option>\n";
 					}
 							
 	echo '		</tr>				
@@ -223,7 +229,7 @@ if(isset($_REQUEST['submit']))
 	$adresse->new = true; 
 
 	if(!$adresse->save())
-		die('Fehler beim Anlegen der Adresse aufgetreten.');  
+		die($p->t('incoming/fehlerAdresse'));  
 
 	$kontakt->person_id = $person->person_id; 
 	$kontakt->kontakttyp = "email"; 
@@ -231,7 +237,7 @@ if(isset($_REQUEST['submit']))
 	$kontakt->new = true; 
 	
 	if(!$kontakt->save())
-		die('Fehler beim Anlegen des Kontaktes aufgetreten.');
+		die($p->t('incoming/fehlerKontakt'));
 
 	$preincoming->person_id = $person->person_id; 
 	$preincoming->anmerkung = $anmerkung; 
@@ -247,7 +253,7 @@ if(isset($_REQUEST['submit']))
 	if(!$preincoming->save())
 	{
 		echo $preincoming->errormsg; 
-		die('Fehler beim Anlegen des Preincoming aufgetreten.'); 
+		die($p->t('incoming/fehlerIncoming')); 
 	}		
 	echo sendMail($zugangscode, $email); 
 }
@@ -255,11 +261,7 @@ if(isset($_REQUEST['submit']))
 function sendMail($zugangscode, $email)
 {
 	global $p; 
-	$emailtext= "Dies ist eine automatisch generierte E-Mail.<br><br>";
-	$emailtext.= "Vielen Dank für Ihre Registrierung an der Fachhochschule Technikum Wien.<br><br>Sie wurden erfolgreich am System registriert.<br><br><br>Mit Hilfe Ihrer UID: <b>".$zugangscode."</b> können Sie sich in unserem 
-	System (<a href=\"".APP_ROOT."/cis/public/incoming\">Link zur Anmeldung</a>) anmelden und Ihre Daten bearbeiten.<br><br><br> 
-	Mit freundlichen Grüßen, <br><br>FH Technikum Wien International<br>Center for International Relations & Cross-Cultural Education<br>UAS Technikum Wien<br>Hoechstaedtplatz 5, 1200 Wien, AUSTRIA"; 
-	
+	$emailtext= $p->t('incoming/registrationEmail', array($zugangscode)); 
 	$mail = new mail($email, 'no-reply', 'Incoming-Registration', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
 	$mail->setHTMLContent($emailtext); 
 	if(!$mail->send())
