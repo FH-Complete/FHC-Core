@@ -76,7 +76,7 @@ if (isset($_POST['userid']))
 		<form action ="index.php" method="POST">
 		<table border ="0" width ="100%" height="40%">
 			<tr height="50%">
-				<td align ="center"><span style="font-size:1.2em"></span></td>
+				<td align ="center" valign="center"><h3><?php echo $p->t('incoming/welcomeToUAS');?></h3><span style="font-size:1.2em"></span></td>
 			</tr>
 			<tr >
 				<td align="center" valign="bottom"> <img src="../../../skin/images/tw_logo_02.jpg"></td>
@@ -87,7 +87,7 @@ if (isset($_POST['userid']))
 				<td>&nbsp;</td>
 			</tr>
 			<tr>
-				<td align="center"><a href="registration.php">Registration</a></td>
+				<td align="center"><a href="registration.php"><?php echo $p->t('incoming/registration');?></a></td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
