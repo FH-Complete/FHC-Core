@@ -90,20 +90,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				          oncommand=""
 				         >
 							<template>
-								<rule RESSOURCE:typ="Auswahl">
-									<menupopup>
-										<menuitem value=""
-								       		      label=" Auswahl "
-										  		  uri="rdf:*"/>
-										</menupopup>
-								</rule>
-								<rule>
+
 									<menupopup>
 										<menuitem value="rdf:http://www.technikum-wien.at/ressource/rdf#ressource_id"
 						        			      label="rdf:http://www.technikum-wien.at/ressource/rdf#bezeichnung ( rdf:http://www.technikum-wien.at/ressource/rdf#typ )"
 									  			  uri="rdf:*"/>
 									</menupopup>
-								</rule>
 							</template>
 						</menulist>
 				</row>
