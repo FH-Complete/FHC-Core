@@ -51,10 +51,20 @@
 	</binding>
 	<binding id="datepicker-day">
 		<content>
-			<xul:label xbl:inherits="value" />
+			<xul:label xbl:inherits="value" onclick="this.parentNode._fireEvent()" style="cursor: pointer"/>
 		</content>
 		<implementation>
 			<field name="_datepicker">null</field>
+			<method name="_fireEvent">
+				<body><![CDATA[
+				var evt = document.createEvent("MouseEvents");
+				try {
+					evt.initMouseEvent("click", true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, this);
+					this.dispatchEvent(evt);
+				} catch(e) {};
+			]]></body>
+			</method>
+
 			<property name="datepicker">
 				<getter><![CDATA[
 					if(this._datepicker==null) {
