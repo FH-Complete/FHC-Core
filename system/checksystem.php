@@ -2835,6 +2835,68 @@ if(!$result = @$db->db_query("SELECT ende FROM fue.tbl_projekttask"))
 	else 
 		echo 'fue.tbl_projekttask: Spalte ende und ressource_id hinzugefuegt!<br>';
 }
+
+//public.tbl_ampel Tabellen fuer Ampelsystem
+if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_ampel"))
+{
+	$qry = "
+		
+			CREATE SEQUENCE public.seq_ampel_ampel_id
+			 	INCREMENT BY 1
+			 	NO MAXVALUE
+				NO MINVALUE
+				CACHE 1;
+				
+			CREATE SEQUENCE public.seq_ampel_benutzer_bestaetigt_ampel_benutzer_bestaetigt_id
+			 	INCREMENT BY 1
+			 	NO MAXVALUE
+				NO MINVALUE
+				CACHE 1;
+				
+			CREATE TABLE public.tbl_ampel
+			(
+				ampel_id bigint NOT NULL,
+				kurzbz varchar(64),
+				beschreibung text,
+				benutzer_select text NOT NULL,
+				deadline date NOT NULL,
+				vorlaufzeit smallint NOT NULL,
+				verfallszeit smallint NOT NULL,
+				insertamum timestamp,
+				insertvon varchar(32),
+				updateamum timestamp,
+				updatevon varchar(32)
+			);
+			
+			CREATE TABLE public.tbl_ampel_benutzer_bestaetigt
+			(
+				ampel_benutzer_bestaetigt_id bigint NOT NULL,
+				ampel_id integer NOT NULL,
+				uid varchar(32) NOT NULL,
+				insertamum timestamp,
+				insertvon varchar(32)
+			);
+			
+			ALTER TABLE public.tbl_ampel ADD CONSTRAINT pk_tbl_ampel PRIMARY KEY (ampel_id);
+			ALTER TABLE public.tbl_ampel_benutzer_bestaetigt ADD CONSTRAINT pk_tbl_ampel_benutzer_bestaetigt PRIMARY KEY (ampel_benutzer_bestaetigt_id);
+			ALTER TABLE public.tbl_ampel ALTER COLUMN ampel_id SET DEFAULT nextval('public.seq_ampel_ampel_id');
+			ALTER TABLE public.tbl_ampel_benutzer_bestaetigt ALTER COLUMN ampel_benutzer_bestaetigt_id SET DEFAULT nextval('public.seq_ampel_benutzer_bestaetigt_ampel_benutzer_bestaetigt_id');
+			
+			ALTER TABLE public.tbl_ampel_benutzer_bestaetigt ADD CONSTRAINT fk_ampel_ampel_benutzer_bestaetigt FOREIGN KEY (ampel_id) REFERENCES public.tbl_ampel (ampel_id) ON DELETE CASCADE ON UPDATE CASCADE;
+			ALTER TABLE public.tbl_ampel_benutzer_bestaetigt ADD CONSTRAINT fk_benutzer_ampel_benutzer_bestaetigt FOREIGN KEY (uid) REFERENCES public.tbl_benutzer (uid) ON DELETE CASCADE ON UPDATE CASCADE;
+	
+			GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_ampel TO vilesci;
+			GRANT SELECT ON public.tbl_ampel TO web;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_ampel_benutzer_bestaetigt TO vilesci;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_ampel_benutzer_bestaetigt TO web;
+			
+			";
+			
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_ampel: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'public.tbl_ampel: Tabellen fuer Ampelsystem hinzugefuegt!<br>';
+}
 echo '<br>';
 
 $tabellen=array(
@@ -2932,6 +2994,8 @@ $tabellen=array(
 	"lehre.tbl_zeugnisnote"  => array("lehrveranstaltung_id","student_uid","studiensemester_kurzbz","note","uebernahmedatum","benotungsdatum","bemerkung","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_adresse"  => array("adresse_id","person_id","name","strasse","plz","ort","gemeinde","nation","typ","heimatadresse","zustelladresse","firma_id","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id"),
+	"public.tbl_ampel"  => array("ampel_id","kurzbz","beschreibung","benutzer_select","deadline","vorlaufzeit","verfallszeit","insertamum","insertvon","updateamum","updatevon"),
+	"public.tbl_ampel_benutzer_bestaetigt"  => array("ampel_benutzer_bestaetigt_id","ampel_id","uid","insertamum","insertvon"),
 	"public.tbl_aufmerksamdurch"  => array("aufmerksamdurch_kurzbz","beschreibung","ext_id"),
 	"public.tbl_aufnahmeschluessel"  => array("aufnahmeschluessel"),
 	"public.tbl_bankverbindung"  => array("bankverbindung_id","person_id","name","anschrift","bic","blz","iban","kontonr","typ","verrechnung","updateamum","updatevon","insertamum","insertvon","ext_id"),

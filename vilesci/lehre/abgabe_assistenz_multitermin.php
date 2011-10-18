@@ -27,17 +27,17 @@
  * 			für Diplom- und Bachelorarbeiten
  *******************************************************************************************************/
 
-	require_once('../../config/vilesci.config.inc.php');
-	require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
-	require_once('../../include/functions.inc.php');
-	require_once('../../include/studiengang.class.php');
-	require_once('../../include/datum.class.php');
-	require_once('../../include/benutzerberechtigung.class.php');
-	require_once('../../include/mail.class.php');
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/basis_db.class.php');			
+require_once('../../include/functions.inc.php');
+require_once('../../include/studiengang.class.php');
+require_once('../../include/datum.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/mail.class.php');
 
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+	
 $i=0;
 $zaehl=0;
 
@@ -72,7 +72,7 @@ $paabgabetyp_kurzbz = (isset($_POST['paabgabetyp_kurzbz'])?$_POST['paabgabetyp_k
 $stg_kz = (isset($_POST['stg_kz'])?$_POST['stg_kz']:'');
 $p2id = (isset($_POST['p2id'])?$_POST['p2id']:'');
 
-$qry_stg="SELECT * FROM public.tbl_studiengang WHERE studiengang_kz='$stg_kz'";
+$qry_stg="SELECT * FROM public.tbl_studiengang WHERE studiengang_kz='".addslashes($stg_kz)."'";
 if($result_stg=$db->db_query($qry_stg))
 {
 	if($row_stg=$db->db_fetch_object($result_stg))
@@ -105,7 +105,7 @@ $stg_arr = array();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', null, 'suid', $fachbereich_kurzbz) )
+if(!$rechte->isBerechtigt('admin', $stg_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_kz, 'suid'))
 	die('Sie haben keine Berechtigung für diesen Studiengang');
 
 $datum_obj = new datum();
@@ -150,8 +150,8 @@ if(isset($_POST["schick"]) && $error=='')
 		{
 			//schleife termine
 			$qrychk="SELECT * FROM campus.tbl_paabgabe 
-				WHERE projektarbeit_id='".$termine[$j]."' AND paabgabetyp_kurzbz='$paabgabetyp_kurzbz[$x]' 
-				AND fixtermin=".($fixtermin[$x]==1?'true':'false')." AND datum='$datum[$x]' AND kurzbz='$kurzbz[$x]'";
+				WHERE projektarbeit_id='".addslashes($termine[$j])."' AND paabgabetyp_kurzbz='".addslashes($paabgabetyp_kurzbz[$x])."' 
+				AND fixtermin=".($fixtermin[$x]==1?'true':'false')." AND datum='".addslashes($datum[$x])."' AND kurzbz='".addslashes($kurzbz[$x])."'";
 			//echo $qrychk;
 			if($result=$db->db_query($qrychk))
 			{
@@ -163,7 +163,7 @@ if(isset($_POST["schick"]) && $error=='')
 				{
 					//echo "neuer Termin";
 					$qry="INSERT INTO campus.tbl_paabgabe (projektarbeit_id, paabgabetyp_kurzbz, fixtermin, datum, kurzbz, abgabedatum, insertvon, insertamum, updatevon, updateamum) 
-						VALUES ('".$termine[$j]."', '$paabgabetyp_kurzbz[$x]', ".($fixtermin[$x]==1?'true':'false').", '$datum[$x]', '$kurzbz[$x]', NULL, '$user', now(), NULL, NULL)";
+						VALUES ('".addslashes($termine[$j])."', '".addslashes($paabgabetyp_kurzbz[$x])."', ".($fixtermin[$x]==1?'true':'false').", '".addslashes($datum[$x])."', '".addslashes($kurzbz[$x])."', NULL, '".addslashes($user)."', now(), NULL, NULL)";
 					//echo $qry;	
 					if(!$result=$db->db_query($qry))
 					{
@@ -172,7 +172,7 @@ if(isset($_POST["schick"]) && $error=='')
 					else 
 					{
 						$row=@$db->db_fetch_object($result);
-						$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$paabgabetyp_kurzbz[$x]."'";
+						$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".addslashes($paabgabetyp_kurzbz[$x])."'";
 						if($result_typ=$db->db_query($qry_typ))
 						{
 							$row_typ=$db->db_fetch_object($result_typ);
@@ -191,7 +191,7 @@ if(isset($_POST["schick"]) && $error=='')
 			}
 		}			
 		//Student zu projektarbeit_id suchen
-		$qry_std="SELECT * FROM campus.vw_student WHERE uid IN(SELECT student_uid FROM lehre.tbl_projektarbeit WHERE projektarbeit_id=$termine[$j])";
+		$qry_std="SELECT * FROM campus.vw_student WHERE uid IN(SELECT student_uid FROM lehre.tbl_projektarbeit WHERE projektarbeit_id='".addslashes($termine[$j])."')";
 		if($result_std=$db->db_query($qry_std))
 		{
 			//Mail an Studierenden
@@ -217,7 +217,7 @@ if(isset($_POST["schick"]) && $error=='')
 					FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
 					LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
 					LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid) 
-					WHERE projektarbeit_id=$termine[$j] AND (tbl_benutzer.aktiv OR tbl_benutzer.aktiv IS NULL) 
+					WHERE projektarbeit_id='".addslashes($termine[$j])."' AND (tbl_benutzer.aktiv OR tbl_benutzer.aktiv IS NULL) 
 					AND (tbl_projektbetreuer.betreuerart_kurzbz='Erstbegutachter' OR tbl_projektbetreuer.betreuerart_kurzbz='Betreuer')";
 			if(!$betr=$db->db_query($qry_betr))
 			{
@@ -257,7 +257,7 @@ if(isset($_POST["schick"]) && $error=='')
 					JOIN public.tbl_kontakt ON(tbl_person.person_id=tbl_kontakt.person_id)
 					LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
 					LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid) 
-					WHERE projektarbeit_id=$termine[$j] AND (tbl_benutzer.aktiv OR tbl_benutzer.aktiv IS NULL) 
+					WHERE projektarbeit_id='".addslashes($termine[$j])."' AND (tbl_benutzer.aktiv OR tbl_benutzer.aktiv IS NULL) 
 					AND (tbl_projektbetreuer.betreuerart_kurzbz='Zweitbegutachter') AND kontakttyp='email' AND zustellung LIMIT 1";
 			if(!$betr=$db->db_query($qry_betr))
 			{

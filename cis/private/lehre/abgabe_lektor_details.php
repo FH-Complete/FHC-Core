@@ -68,7 +68,7 @@ else
 	$paabgabe_id = (isset($_POST['paabgabe_id'])?$_POST['paabgabe_id']:'-1');
 	$fixtermin = (isset($_POST['fixtermin'])?1:0);
 	$datum = (isset($_POST['datum'])?$_POST['datum']:'');
-	$kurzbz = (isset($_POST['kurzbz'])?$_POST['kurzbz']:'');
+	$kurzbz = (isset($_POST['kurzbz'])?htmlspecialchars_decode($_POST['kurzbz']):'');
 	$paabgabetyp_kurzbz = (isset($_POST['paabgabetyp_kurzbz'])?$_POST['paabgabetyp_kurzbz']:'');
 	$betreuerart = (isset($_POST['betreuerart'])?$_POST['betreuerart']:'-1');
 }
@@ -362,7 +362,7 @@ $result=@$db->db_query($qry);
 		$htmlstr .= "<form action='".$_SERVER['PHP_SELF']."' method='POST' name='".$row->projektarbeit_id."'>\n";
 		$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$row->projektarbeit_id."'>\n";
 		$htmlstr .= "<input type='hidden' name='paabgabe_id' value='".$row->paabgabe_id."'>\n";
-		$htmlstr .= "<input type='hidden' name='titel' value='".$titel."'>\n";
+		$htmlstr .= "<input type='hidden' name='titel' value='".htmlspecialchars($titel,ENT_QUOTES)."'>\n";
 		$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
 		$htmlstr .= "<input type='hidden' name='betreuerart' value='".$betreuerart."'>\n";
 		$htmlstr .= "<input type='hidden' name='command' value='update'>\n";
@@ -434,7 +434,7 @@ $result=@$db->db_query($qry);
 			}
 		}		
 		$htmlstr .= "		</select></td>\n";
-		$htmlstr .= "		<td><input type='text' name='kurzbz' value='".$row->kurzbz."' size='60' maxlegth='256'></td>\n";		
+		$htmlstr .= "		<td><input type='text' name='kurzbz' value='".htmlspecialchars($row->kurzbz,ENT_QUOTES)."' size='60' maxlegth='256'></td>\n";		
 		$htmlstr .= "		<td>".($row->abgabedatum==''?'&nbsp;':$datum_obj->formatDatum($row->abgabedatum,'d.m.Y'))."</td>\n";		
 		if($user==$row->insertvon && $betreuerart!="Zweitbegutachter")
 		{		
