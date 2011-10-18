@@ -74,6 +74,7 @@ function generateMitarbeiterUID($vorname, $nachname, $lektor)
 		$uid .= mb_substr($vorname,0,$vn);
 		
 		$uid = mb_str_replace(' ','',$uid);
+		$uid = mb_str_replace('-','',$uid);
 
 		if(!$bn->uid_exists($uid) && !in_array($uid, $reserviert))
 			if($bn->errormsg=='')
