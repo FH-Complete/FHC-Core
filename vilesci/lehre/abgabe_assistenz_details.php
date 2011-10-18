@@ -74,7 +74,7 @@ if(!isset($_POST['uid']))
 			JOIN lehre.tbl_lehrveranstaltung USING(studiengang_kz) 
 			JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id)
 			JOIN lehre.tbl_projektarbeit USING(lehreinheit_id)
-			WHERE projektarbeit_id='$projektarbeit_id'";
+			WHERE projektarbeit_id='".addslashes($projektarbeit_id)."'";
 		if($result_stg=$db->db_query($qry_stg))
 		{
 			if($row_stg=$db->db_fetch_object($result_stg))
@@ -109,7 +109,7 @@ else
 	$paabgabetyp_kurzbz = (isset($_POST['paabgabetyp_kurzbz'])?$_POST['paabgabetyp_kurzbz']:'-1');
 	$fixtermin = (isset($_POST['fixtermin'])?1:0);
 	$datum = (isset($_POST['datum'])?$_POST['datum']:'');
-	$kurzbz = (isset($_POST['kurzbz'])?$_POST['kurzbz']:'');
+	$kurzbz = (isset($_POST['kurzbz'])?htmlspecialchars_decode($_POST['kurzbz']):'');
 	$erst = (isset($_POST['erst'])?$_POST['erst']:'');
 	$stgbez = (isset($_POST['stgbez'])?$_POST['stgbez']:'');
 	$stg_kz = (isset($_POST['stg_kz'])?$_POST['stg_kz']:'');
@@ -171,8 +171,8 @@ if(isset($_POST["schick"]))
 			if($command=='insert')
 			{
 				$qrychk="SELECT * FROM campus.tbl_paabgabe 
-					WHERE projektarbeit_id='$projektarbeit_id' AND paabgabetyp_kurzbz='$paabgabetyp_kurzbz' 
-					AND fixtermin=".($fixtermin==1?'true':'false')." AND datum='$datum' AND kurzbz='$kurzbz'";
+					WHERE projektarbeit_id='".addslashes($projektarbeit_id)."' AND paabgabetyp_kurzbz='".addslashes($paabgabetyp_kurzbz)."' 
+					AND fixtermin=".($fixtermin==1?'true':'false')." AND datum='".addslashes($datum)."' AND kurzbz='".addslashes($kurzbz)."'";
 				if($result=$db->db_query($qrychk))
 				{
 					if($db->db_num_rows($result)>0)
@@ -183,7 +183,7 @@ if(isset($_POST["schick"]))
 					{
 						//neuer Termin
 						$qry="INSERT INTO campus.tbl_paabgabe (projektarbeit_id, paabgabetyp_kurzbz, fixtermin, datum, kurzbz, abgabedatum, insertvon, insertamum, updatevon, updateamum) 
-							VALUES ('$projektarbeit_id', '$paabgabetyp_kurzbz', ".($fixtermin==1?'true':'false').", '$datum', '$kurzbz', NULL, '$user', now(), NULL, NULL)";
+							VALUES ('".addslashes($projektarbeit_id)."', '".addslashes($paabgabetyp_kurzbz)."', ".($fixtermin==1?'true':'false').", '".addslashes($datum)."', '".addslashes($kurzbz)."', NULL, '".addslashes($user)."', now(), NULL, NULL)";
 						//echo $qry;	
 						if(!$result=$db->db_query($qry))
 						{
@@ -192,7 +192,7 @@ if(isset($_POST["schick"]))
 						else 
 						{
 							$row=$db->db_fetch_object($result);
-							$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$paabgabetyp_kurzbz."'";
+							$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".addslashes($paabgabetyp_kurzbz)."'";
 							if($result_typ=$db->db_query($qry_typ))
 							{
 								$row_typ=$db->db_fetch_object($result_typ);
@@ -223,7 +223,7 @@ if(isset($_POST["schick"]))
 								FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
 								LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
 								LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid) 
-								WHERE mitarbeiter_uid='$erst'";
+								WHERE mitarbeiter_uid='".addslashes($erst)."'";
 							if(!$betr=$db->db_query($qry_betr))
 							{
 								echo "<font color=\"#FF0000\">Fehler beim Laden des Erstbegutachters!</font><br>";
@@ -255,7 +255,7 @@ if(isset($_POST["schick"]))
 								$qry_betr="SELECT DISTINCT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,  
 									anrede, kontakt 
 									FROM public.tbl_person JOIN public.tbl_kontakt USING(person_id) 
-									WHERE person_id='$p2id' AND kontakttyp='email' AND zustellung LIMIT 1";
+									WHERE person_id='".addslashes($p2id)."' AND kontakttyp='email' AND zustellung LIMIT 1";
 								if(!$betr=$db->db_query($qry_betr))
 								{
 									echo "<font color=\"#FF0000\">Fehler beim Laden des Zweitbegutachters!</font><br>";
@@ -295,7 +295,7 @@ if(isset($_POST["schick"]))
 			{
 				//Terminänderung
 				//Ermittlung der alten Daten
-				$qry_old="SELECT * FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."'";
+				$qry_old="SELECT * FROM campus.tbl_paabgabe WHERE paabgabe_id='".addslashes($paabgabe_id)."'";
 				if(!$result_old=$db->db_query($qry_old))
 				{
 					echo "<font color=\"#FF0000\">Termin konnte nicht gefunden werden!</font><br>&nbsp;";	
@@ -304,7 +304,7 @@ if(isset($_POST["schick"]))
 				{
 					$row_old=$db->db_fetch_object($result_old);
 					//Abgabetyp
-					$qry_told="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$row_old->paabgabetyp_kurzbz."'";
+					$qry_told="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".addslashes($row_old->paabgabetyp_kurzbz)."'";
 					if($result_told=$db->db_query($qry_told))
 					{
 						$row_told=$db->db_fetch_object($result_told);
@@ -316,14 +316,14 @@ if(isset($_POST["schick"]))
 					}
 					//Termin updaten
 					$qry="UPDATE campus.tbl_paabgabe SET
-						projektarbeit_id = '".$projektarbeit_id."', 
-						paabgabetyp_kurzbz = '".$paabgabetyp_kurzbz."', 
+						projektarbeit_id = '".addslashes($projektarbeit_id)."', 
+						paabgabetyp_kurzbz = '".addslashes($paabgabetyp_kurzbz)."', 
 						fixtermin = ".($fixtermin==1?'true':'false').", 
-						datum = '".$datum."', 
-						kurzbz = '".$kurzbz."', 
-						updatevon = '".$user."', 
+						datum = '".addslashes($datum)."', 
+						kurzbz = '".addslashes($kurzbz)."', 
+						updatevon = '".addslashes($user)."', 
 						updateamum = now() 
-						WHERE paabgabe_id='".$paabgabe_id."'";
+						WHERE paabgabe_id='".addslashes($paabgabe_id)."'";
 					//echo $qry;	
 					if(!$result=$db->db_query($qry))
 					{
@@ -332,7 +332,7 @@ if(isset($_POST["schick"]))
 					else 
 					{
 						//Abgabetyp
-						$qry_told="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".$paabgabetyp_kurzbz."'";
+						$qry_told="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".addslashes($paabgabetyp_kurzbz)."'";
 						if($result_told=$db->db_query($qry_told))
 						{
 							$row_typ=$db->db_fetch_object($result_told);
@@ -364,7 +364,7 @@ if(isset($_POST["schick"]))
 							FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
 							LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
 							LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid) 
-							WHERE mitarbeiter_uid='$erst'";
+							WHERE mitarbeiter_uid='".addslashes($erst)."'";
 						if(!$betr=$db->db_query($qry_betr))
 						{
 							echo "<font color=\"#FF0000\">Fehler beim Laden von Erstbegutachter(in)!</font><br>";
@@ -396,7 +396,7 @@ if(isset($_POST["schick"]))
 							$qry_betr="SELECT DISTINCT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,  
 								anrede, kontakt 
 								FROM public.tbl_person JOIN public.tbl_kontakt USING(person_id) 
-								WHERE person_id='$p2id' AND kontakttyp='email' AND zustellung LIMIT 1";
+								WHERE person_id='".addslashes($p2id)."' AND kontakttyp='email' AND zustellung LIMIT 1";
 							if(!$betr=$db->db_query($qry_betr))
 							{
 								echo "<font color=\"#FF0000\">Fehler beim Laden von Zweitbegutachter(in)!</font><br>";
@@ -441,7 +441,7 @@ if(isset($_POST["del"]))
 	if($datum)
 	{
 		//Ermittlung der alten Daten
-		$qry_old="SELECT * FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."'";
+		$qry_old="SELECT * FROM campus.tbl_paabgabe WHERE paabgabe_id='".addslashes($paabgabe_id)."'";
 		if(!$result_old=$db->db_query($qry_old))
 		{
 			echo "<font color=\"#FF0000\">Termin konnte nicht gefunden werden!</font><br>&nbsp;";	
@@ -449,7 +449,7 @@ if(isset($_POST["del"]))
 		else 
 		{
 			$row_old=$db->db_fetch_object($result_old);
-			$qry_std="SELECT * FROM campus.vw_benutzer where uid='$uid'";
+			$qry_std="SELECT * FROM campus.vw_benutzer where uid='".addslashes($uid)."'";
 			if(!$result_std=$db->db_query($qry_std))
 			{
 				echo "<font color=\"#FF0000\">Student konnte nicht gefunden werden!</font><br>&nbsp;";
@@ -457,7 +457,7 @@ if(isset($_POST["del"]))
 			else
 			{
 				$row_std=$db->db_fetch_object($result_std);
-				$qry="DELETE FROM campus.tbl_paabgabe WHERE paabgabe_id='".$paabgabe_id."'";	
+				$qry="DELETE FROM campus.tbl_paabgabe WHERE paabgabe_id='".addslashes($paabgabe_id)."'";	
 				if(!$result=$db->db_query($qry))
 				{
 					echo "<font color=\"#FF0000\">Fehler beim L&ouml;schen des Termins!</font><br>&nbsp;";
@@ -486,7 +486,7 @@ if(isset($_POST["del"]))
 						FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
 						LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
 						LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid) 
-						WHERE mitarbeiter_uid='$erst'";
+						WHERE mitarbeiter_uid='".addslashes($erst)."'";
 					if(!$betr=$db->db_query($qry_betr))
 					{
 						echo "<font color=\"#FF0000\">Fehler beim Laden der Betreuer!</font><br>&nbsp;";
@@ -518,7 +518,7 @@ if(isset($_POST["del"]))
 						$qry_betr="SELECT DISTINCT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,  
 							anrede, kontakt 
 							FROM public.tbl_person JOIN public.tbl_kontakt USING(person_id) 
-							WHERE person_id='$p2id' AND kontakttyp='email' AND zustellung LIMIT 1";
+							WHERE person_id='".addslashes($p2id)."' AND kontakttyp='email' AND zustellung LIMIT 1";
 						if(!$betr=$db->db_query($qry_betr))
 						{
 							echo "<font color=\"#FF0000\">Fehler beim Laden von Zweitbegutachter(in)!</font><br>&nbsp;";
@@ -561,9 +561,9 @@ if(isset($_POST["enda"]))
 	//Abgabetermin mit akt. Datum speichern
 	$qry="UPDATE campus.tbl_paabgabe SET
 		abgabedatum = now(), 
-		updatevon = '".$user."', 
+		updatevon = '".addslashes($user)."', 
 		updateamum = now() 
-		WHERE paabgabe_id='".$paabgabe_id."'";
+		WHERE paabgabe_id='".addslashes($paabgabe_id)."'";
 	//echo $qry;	
 	if(!$result=$db->db_query($qry))
 	{
@@ -580,9 +580,9 @@ if(isset($_POST["note"]))
 	//Abgabetermin mit akt. Datum speichern
 	$qry="UPDATE campus.tbl_paabgabe SET
 		abgabedatum = now(), 
-		updatevon = '".$user."', 
+		updatevon = '".addslashes($user)."', 
 		updateamum = now() 
-		WHERE paabgabe_id='".$paabgabe_id."'";
+		WHERE paabgabe_id='".addslashes($paabgabe_id)."'";
 	//echo $qry;	
 	if(!$result=$db->db_query($qry))
 	{
@@ -594,14 +594,14 @@ if(isset($_POST["note"]))
 	}
 }
 $studentenname='';
-$qry_nam="SELECT trim(COALESCE(vorname,'')||' '||COALESCE(nachname,'')) as studnam FROM campus.vw_student WHERE uid='$uid'";
+$qry_nam="SELECT trim(COALESCE(vorname,'')||' '||COALESCE(nachname,'')) as studnam FROM campus.vw_student WHERE uid='".addslashes($uid)."'";
 $result_nam=$db->db_query($qry_nam);
 while ($result_nam && $row_nam=$db->db_fetch_object($result_nam))
 {
 	$studentenname=$row_nam->studnam;
 }
 
-$qry="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$projektarbeit_id."' ORDER BY datum;";
+$qry="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".addslashes($projektarbeit_id)."' ORDER BY datum;";
 $htmlstr .= "<table width=100%>\n";
 $htmlstr .= "<tr><td style='font-size:16px'>Student: <b>".$studentenname."</b></td><td align='right'><a href='".CIS_ROOT."cis/private/lehre/abgabe_student_frameset.php?uid=$uid' target='_blank'>Studentenansicht</a></td></tr>";
 $htmlstr .= "<tr><td style='font-size:16px'>Titel: <b>".$titel."<b><br></td>";
@@ -682,7 +682,7 @@ $htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibun
 			}
 		}		
 		$htmlstr .= "		</select></td>\n";
-		$htmlstr .= "		<td><input  type='text' name='kurzbz' value='".$row->kurzbz."' size='60' maxlegth='256'></td>\n";		
+		$htmlstr .= "		<td><input  type='text' name='kurzbz' value='".htmlspecialchars($row->kurzbz,ENT_QUOTES)."' size='60' maxlegth='256'></td>\n";		
 		$htmlstr .= "		<td>".($row->abgabedatum==''?'&nbsp;':$datum_obj->formatDatum($row->abgabedatum,'d.m.Y'))."</td>\n";
 			
 		$htmlstr .= "		<td><input type='submit' name='schick' value='speichern' title='Termin&auml;nderung speichern'></td>";
