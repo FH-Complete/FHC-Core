@@ -128,15 +128,17 @@ function saveNotiz($username, $passwort, $notiz)
  * Löscht die Notiz mit der vom Webservice übergebenen ID 
  * @param $notiz_id
  */
-function deleteNotiz($notiz_id)
+function deleteNotiz($username, $passwort, $notiz_id)
 {
-	$user = get_uid();
-		
+	
+	if(!$user = check_user($username, $passwort))
+		return new SoapFault("Server", "Invalid Credentials");
+	
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
 		
 	if(!$rechte->isBerechtigt('basis/notiz', null, 'suid'))
-		return new SoapFault("Server", "Sie haben keine Berechtigung zum Speichern von Notizen");
+		return new SoapFault("Server", "Sie haben keine Berechtigung zum Loeschen von Notizen");
 	
 	$notiz = new notiz();
 	if($notiz->delete($notiz_id))

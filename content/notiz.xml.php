@@ -43,7 +43,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			<xul:toolbox>
 				<xul:toolbar >
 					<xul:toolbarbutton anonid="toolbarbutton-notiz-neu" label="Neue Notiz" oncommand="document.getBindingParent(this).NeueNotiz()" image="../skin/images/NeuDokument.png" tooltiptext="Neue Notiz anlegen" />
-					<xul:toolbarbutton anonid="toolbarbutton-notiz-aktualisieren" label="Aktualisieren" oncommand="document.getBindingParent(this).RefreshNotiz()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
+					<xul:toolbarbutton anonid="toolbarbutton-notiz-del" label="Loeschen" oncommand="document.getBindingParent(this).Loeschen()" image="../skin/images/DeleteIcon.png" disabled="true" tooltiptext="Notiz löschen"/>
+					<xul:toolbarbutton anonid="toolbarbutton-notiz-aktualisieren" label="Aktualisieren" oncommand="document.getBindingParent(this).RefreshNotiz()" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 					<xul:toolbarbutton anonid="toolbarbutton-notiz-filter" label="Filter" type="menu">							
 				      <xul:menupopup>
 						    <xul:menuitem label="Alle Notizen anzeigen" oncommand="document.getBindingParent(this).LoadNotizTree(document.getBindingParent(this).getAttribute('projekt_kurzbz'),document.getBindingParent(this).getAttribute('projektphase_id'),document.getBindingParent(this).getAttribute('projekttask_id'),document.getBindingParent(this).getAttribute('uid'),document.getBindingParent(this).getAttribute('person_id'),document.getBindingParent(this).getAttribute('prestudent_id'),document.getBindingParent(this).getAttribute('bestellung_id'), document.getBindingParent(this).getAttribute('user'), null);" tooltiptext="Alle Notizen anzeigen"/>
@@ -393,6 +394,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				this.ResetDetails();
 				this.DisableDetails(false);
 				document.getAnonymousElementByAttribute(this ,'anonid', 'caption-notiz-detail').label="Neue Notiz";
+				
+				var sr = new SOAPRequest("saveNotiz",soapBody);
+			
+				SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/notiz.soap.php?"+gettimestamp();
 			]]>
 			</body>
 		</method>
@@ -405,6 +410,64 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			]]>
 			</body>
 		</method>
+		<method name="Loeschen">
+			<body>
+			<![CDATA[
+			
+				var notiz_id = document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-notiz_id').value;
+				
+				// falls nichts markiert ist
+				if(notiz_id =='')
+					alert('Keine Notiz ausgewählt')
+				else
+				{
+					//Abfrage ob wirklich geloescht werden soll
+					if (confirm('Wollen Sie die Notiz mit der ID: '+notiz_id+' wirklich loeschen?'))
+					{
+	
+						var soapBody = new SOAPObject("deleteNotiz");
+						//soapBody.appendChild(new SOAPObject("username")).val('joe');
+						//soapBody.appendChild(new SOAPObject("passwort")).val('waschl');
+						soapBody.appendChild(new SOAPObject("notiz_id")).val(notiz_id);
+						
+						var sr = new SOAPRequest("deleteNotiz",soapBody);
+					
+						SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/notiz.soap.php?"+gettimestamp();
+						
+						function mycallb(obj) {
+						  var me=obj;
+						  this.invoke=function (respObj) {
+						    try
+							{
+								var id = respObj.Body[0].deleteNotizResponse[0].message[0].Text;
+								me.selectID=id;
+							}
+							catch(e)
+							{
+								try
+								{
+									var fehler = respObj.Body[0].Fault[0].faultstring[0].Text;
+								}
+								catch(e)
+								{
+									var fehler = e;
+								}
+								alert('Fehler: '+fehler);
+								return;
+							}
+							me.RefreshNotiz();
+						  }
+						}
+						
+						var cb=new mycallb(this);
+						
+						SOAPClient.SendRequest(sr, cb.invoke);
+					}
+				}
+			]]>
+			</body>
+		</method>
+		
 		<method name="updateErledigt">
 			<parameter name="event"/>
 			<body>
@@ -425,6 +488,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				
 				var col = tree.columns.getColumnFor(document.getAnonymousElementByAttribute(this ,'anonid', 'treecol-notiz-notiz_id'));
 				var id = tree.view.getCellText(row.value, col);
+				document.getAnonymousElementByAttribute(this ,'anonid', 'toolbarbutton-notiz-del').disabled=false; 
 				
 				if(text=='erledigt')
 				{
@@ -503,6 +567,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 						menulist.selectedItem=children[0];	
 					}
 					document.getAnonymousElementByAttribute(this ,'anonid', 'caption-notiz-detail').label="Bearbeiten";
+
 			    }
 			]]>
 			</body>
@@ -694,6 +759,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 								//Sicherstellen, dass die Zeile im sichtbaren Bereich liegt
 								tree.treeBoxObject.ensureRowIsVisible(i);
 								this.selectID=null;
+								
 								return true;
 							}
 					   	}
