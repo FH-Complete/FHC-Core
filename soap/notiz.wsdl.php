@@ -41,6 +41,8 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
        <wsdl:part name="message" type="xsd:string"></wsdl:part>
   	</wsdl:message>
   	<wsdl:message name="deleteNotizRequest">
+		<wsdl:part name="username" type="xsd:string" minOccurs="0"></wsdl:part>
+		<wsdl:part name="passwort" type="xsd:string" minOccurs="0"></wsdl:part>  	
   		<wsdl:part name="notiz_id" type="xsd:string"></wsdl:part>
   	</wsdl:message>
     <wsdl:message name="deleteNotizResponse">

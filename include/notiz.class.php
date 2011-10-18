@@ -96,6 +96,29 @@ class notiz extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Löscht eine Notiz
+	 * @param  $notiz_id
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function delete($notiz_id)
+	{
+		if(!is_numeric($notiz_id))
+		{
+			$this->errormsg = 'NotizID ist ungueltig';
+			return false;
+		}
+
+		$qry = "Delete FROM public.tbl_notiz WHERE notiz_id='".addslashes($notiz_id)."'";
+
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler beim Loeschen der Daten';
+			return false;
+		}
+		return true; 
+	}	
 
 	/**
 	 * Prueft die Daten vor dem Speichern
