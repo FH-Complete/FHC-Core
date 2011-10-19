@@ -280,7 +280,7 @@ class projekttask extends basis_db
 			return true;
 		}
 		
-		$qry = "DELETE FROM fue.tbl_projekttask WHERE projekttask_id='$projekttask_id'";
+		$qry = "DELETE FROM fue.tbl_projekttask WHERE projekttask_id=".addslashes($projekttask_id);
 		
 		if($this->db_query($qry))
 		{
