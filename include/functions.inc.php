@@ -921,4 +921,25 @@ function setSprache($sprache)
 	$_SESSION['sprache']=$sprache;
 	setcookie('sprache',$sprache,time()+60*60*24*30,'/');
 }
+
+
+function check_user($username, $passwort)
+{
+	if($username=='')
+	{
+		$user = get_uid();
+		if($user=='')
+			return false;
+		return $user;
+	}
+	else
+	{
+		if(!checkldapuser($username,$passwort))
+			return false;
+		else
+			return $username;
+	}
+}
+
+
 ?>
