@@ -28,6 +28,7 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/basis_db.class.php');
 require_once('../include/projekttask.class.php');
 require_once('../include/benutzer.class.php');
+require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/functions.inc.php');
 require_once('../include/mantis.class.php');
@@ -45,22 +46,27 @@ ini_set("soap.wsdl_cache_enabled", "0");
 /**
  * 
  * Speichert die vom Webservice übergebenen Parameter in die DB
- * @param string $projekttask_id
- * @param string $projektphase_id
- * @param string $bezeichnung
- * @param string $beschreibung
- * @param string $aufwand
- * @param string $mantis_id
- * @param string $user
+ * @param $username
+ * @param $passwort
+ * @param $task Task-Objekt
  */
-function saveProjekttask($projekttask_id, $projektphase_id, $bezeichnung, $beschreibung, $aufwand, $mantis_id, $user, $ende, $ressource_id)
+function saveProjekttask($username, $passwort, $task)
 { 	
-	$user = get_uid(); 
+
+	if(!$user = check_user($username, $passwort))
+		return new SoapFault("Server", "Invalid Credentials");	
+	
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+		
+	if(!$rechte->isBerechtigt('planner', null, 'sui'))
+		return new SoapFault("Server", "Sie haben keine Berechtigung zum Speichern von Tasks");
+	
 	$projekttask = new projekttask();
 	// wenn projekttaskt_id == leer -> neuer task anlegen ohne laden
-	if($projekttask_id != '')
+	if($task->projekttask_id != '')
 	{
-		if($projekttask->load($projekttask_id))
+		if($projekttask->load($task->projekttask_id))
 		{
 			$projekttask->new = false;
 		}
@@ -73,15 +79,15 @@ function saveProjekttask($projekttask_id, $projektphase_id, $bezeichnung, $besch
 		$projekttask->insertvon = $user;
 	}
 
-	$projekttask->projekttask_id=$projekttask_id;
-	$projekttask->projektphase_id=$projektphase_id;
-	$projekttask->bezeichnung=$bezeichnung;
-	$projekttask->beschreibung = $beschreibung;
-	$projekttask->aufwand = $aufwand;
-	$projekttask->mantis_id = $mantis_id;
-	$projekttask->updatevon = $user;
-	$projekttask->ende = $ende; 
-	$projekttask->ressource_id = $ressource_id; 
+	$projekttask->projekttask_id=$task->projekttask_id;
+	$projekttask->projektphase_id=$task->projektphase_id;
+	$projekttask->bezeichnung=$task->bezeichnung;
+	$projekttask->beschreibung = $task->beschreibung;
+	$projekttask->aufwand = $task->aufwand;
+	$projekttask->mantis_id = $task->mantis_id;
+	$projekttask->updatevon = $task->user;
+	$projekttask->ende = $task->ende; 
+	$projekttask->ressource_id = $task->ressource_id; 
 	
 	if($projekttask->save())
 	{
@@ -94,10 +100,21 @@ function saveProjekttask($projekttask_id, $projektphase_id, $bezeichnung, $besch
 /**
  * 
  * Löscht den Task mit der vom Webservice übergebenen ID 
+ * @param $username
+ * @param $passwort
  * @param $projekttask_id
  */
-function deleteProjekttask($projekttask_id)
+function deleteProjekttask($username, $passwort, $projekttask_id)
 {
+	if(!$user = check_user($username, $passwort))
+		return new SoapFault("Server", "Invalid Credentials");	
+	
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+		
+	if(!$rechte->isBerechtigt('planner', null, 'suid'))
+		return new SoapFault("Server", "Sie haben keine Berechtigung zum Loeschen von Tasks");
+	
 	$projekttask = new projekttask();
 	if($projekttask->delete($projekttask_id))
 		return "OK";
@@ -112,7 +129,6 @@ function saveMantis($projekttask_id, $mantis_id, $issue_summary, $issue_descript
 	if($mantis_id!='')
 	{
 		//Update
-		
 		$mantis->issue_id = $mantis_id;
 		$mantis->issue_summary = $issue_summary;
 		$mantis->issue_description = $issue_description;
@@ -158,11 +174,22 @@ function saveMantis($projekttask_id, $mantis_id, $issue_summary, $issue_descript
 /**
  * 
  * Setzt den Erledigt Status
+ * @param $username
+ * @param $passwort
  * @param $projekttask_id
  * @param $erledigt
  */
-function setErledigt($projekttask_id, $erledigt)
+function setErledigt($username, $passwort, $projekttask_id, $erledigt)
 { 	
+	if(!$user = check_user($username, $passwort))
+		return new SoapFault("Server", "Invalid Credentials");	
+	
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+		
+	if(!$rechte->isBerechtigt('planner', null, 'sui'))
+		return new SoapFault("Server", "Sie haben keine Berechtigung.");
+	
 	$projekttask = new projekttask();
 	
 	if($projekttask->load($projekttask_id))

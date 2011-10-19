@@ -40,24 +40,6 @@ $SOAPServer->handle();
 // WSDL Chache auf aus
 ini_set("soap.wsdl_cache_enabled", "0");
 
-function check_user($username, $passwort)
-{
-	if($username=='')
-	{
-		$user = get_uid();
-		if($user=='')
-			return false;
-		return $user;
-	}
-	else
-	{
-		if(!checkldapuser($username,$passwort))
-			return false;
-		else
-			return $username;
-	}
-}
-
 /**
  * 
  * Speichert Notizen in die Datenbank
@@ -130,7 +112,6 @@ function saveNotiz($username, $passwort, $notiz)
  */
 function deleteNotiz($username, $passwort, $notiz_id)
 {
-	
 	if(!$user = check_user($username, $passwort))
 		return new SoapFault("Server", "Invalid Credentials");
 	

@@ -5,14 +5,21 @@ echo "<?xml version='1.0' encoding='utf-8' ?>";
 ?>
 
 <wsdl:definitions name="Projekttask" 
-targetNamespace="http://localhost/soap/" 
+targetNamespace="http://www.technikum-wien.at/soap/" 
 xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
-xmlns:tns="http://localhost/soap/" 
+xmlns:tns="http://www.technikum-wien.at/soap/" 
 xmlns:xsd="http://www.w3.org/2001/XMLSchema"    
 xmlns:xsd1="http://localhost/soap/projekttask.xsd"    
 xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
 
 	<wsdl:message name="SaveProjekttaskRequest">
+		<wsdl:part name="username" type="xsd:string" minOccurs="0"></wsdl:part>
+		<wsdl:part name="passwort" type="xsd:string" minOccurs="0"></wsdl:part>  	
+		<wsdl:part name="task" type="tns:task"></wsdl:part>
+    </wsdl:message>
+    
+    <xsd:complexType name="task">
+	  <xsd:all>	
 		<wsdl:part name="projekttask_id" type="xsd:string"></wsdl:part>
 		<wsdl:part name="projektphase_id" type="xsd:string"></wsdl:part>
 		<wsdl:part name="bezeichnung" type="xsd:string"></wsdl:part>
@@ -22,13 +29,16 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
 		<wsdl:part name="user" type="xsd:string"></wsdl:part>
 		<wsdl:part name="ende" type="xsd:string"></wsdl:part>
 		<wsdl:part name="ressource_id" type="xsd:string"></wsdl:part>
-    </wsdl:message>
+	   </xsd:all>
+	 </xsd:complexType>
 
  	<wsdl:message name="SaveProjekttaskResponse">
        <wsdl:part name="message" type="xsd:string"></wsdl:part>
   	</wsdl:message>
   	
   	<wsdl:message name="DeleteProjekttaskRequest">
+  		<wsdl:part name="username" type="xsd:string" minOccurs="0"></wsdl:part>
+		<wsdl:part name="passwort" type="xsd:string" minOccurs="0"></wsdl:part>  	
   		<wsdl:part name="projekttask_id" type="xsd:string"></wsdl:part>
   	</wsdl:message>
     <wsdl:message name="DeleteProjekttaskResponse">
@@ -36,6 +46,8 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
   	</wsdl:message>
   	
   	<wsdl:message name="setErledigtRequest">
+  	  	<wsdl:part name="username" type="xsd:string" minOccurs="0"></wsdl:part>
+		<wsdl:part name="passwort" type="xsd:string" minOccurs="0"></wsdl:part>  
   		<wsdl:part name="projekttask_id" type="xsd:string"></wsdl:part>
   		<wsdl:part name="erledigt" type="xsd:boolean"></wsdl:part>
   	</wsdl:message>
