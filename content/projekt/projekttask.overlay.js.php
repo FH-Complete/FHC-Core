@@ -292,18 +292,23 @@ function saveProjekttaskDetail()
 	mantis_id = document.getElementById('textbox-projekttask-detail-mantis_id').value;
 	ressource_id = MenulistGetSelectedValue('textbox-projekttask-detail-ressource'); 	
 	ende = document.getElementById('textbox-projekttask-detail-ende').iso;
-	//alert(ressource_id); 
-	var soapBody = new SOAPObject("saveProjekttask");
-	soapBody.appendChild(new SOAPObject("projekttask_id")).val(projekttask_id);
-	soapBody.appendChild(new SOAPObject("projektphase_id")).val(projektphase_id);
-	soapBody.appendChild(new SOAPObject("bezeichnung")).val(bezeichnung);
-	soapBody.appendChild(new SOAPObject("beschreibung")).val(beschreibung);
-	soapBody.appendChild(new SOAPObject("aufwand")).val(aufwand);
-	soapBody.appendChild(new SOAPObject("mantis_id")).val(mantis_id);
-	soapBody.appendChild(new SOAPObject("user")).val(getUsername());
-	soapBody.appendChild(new SOAPObject("ressource_id")).val(ressource_id);
-	soapBody.appendChild(new SOAPObject("ende")).val(ende);
 	
+	var soapBody = new SOAPObject("saveProjekttask");
+	//soapBody.appendChild(new SOAPObject("username")).val('joe');
+	//soapBody.appendChild(new SOAPObject("passwort")).val('waschl');
+				
+	var task = new SOAPObject("task");
+	task.appendChild(new SOAPObject("projekttask_id")).val(projekttask_id);
+	task.appendChild(new SOAPObject("projektphase_id")).val(projektphase_id);
+	task.appendChild(new SOAPObject("bezeichnung")).val(bezeichnung);
+	task.appendChild(new SOAPObject("beschreibung")).val(beschreibung);
+	task.appendChild(new SOAPObject("aufwand")).val(aufwand);
+	task.appendChild(new SOAPObject("mantis_id")).val(mantis_id);
+	task.appendChild(new SOAPObject("user")).val(getUsername());
+	task.appendChild(new SOAPObject("ressource_id")).val(ressource_id);
+	task.appendChild(new SOAPObject("ende")).val(ende);
+	soapBody.appendChild(task);
+							
 	var sr = new SOAPRequest("saveProjekttask",soapBody);
 
 	SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekttask.soap.php?"+gettimestamp();
@@ -651,6 +656,8 @@ function ProjekttaskUpdateErledigt(event)
 	if(text=='erledigt')
 	{
 		var soapBody = new SOAPObject("setErledigt");
+		//soapBody.appendChild(new SOAPObject("username")).val('joe');
+		//soapBody.appendChild(new SOAPObject("passwort")).val('waschl');
 	    soapBody.appendChild(new SOAPObject("projekttask_id")).val(id);
 	    soapBody.appendChild(new SOAPObject("erledigt")).val(val);
 
