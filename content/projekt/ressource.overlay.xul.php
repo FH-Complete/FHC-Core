@@ -25,12 +25,12 @@ header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
 require_once('../../config/vilesci.config.inc.php');
-require_once('../../include/projektbenutzer.class.php');
+/*require_once('../../include/projektbenutzer.class.php');
 $pb= new projektbenutzer();
 $pb->load();
-$pb->getUIDs();
-$datum=$pb->jump_week(time(),0);
-$showWeeks=15;
+$pb->getUIDs();*/
+//$datum=$pb->jump_week(time(),0);
+//$showWeeks=15;
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 ?>
@@ -50,56 +50,31 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	<!-- *  Projekttask   * -->
 	<!-- ************************ -->
 	<vbox id="box-ressource" flex="1" uid="" stg_kz="">
-		<popupset>
-			<popup id="popup-ressource">
-				<menuitem label="Entfernen" oncommand="TaskDelete();" id="ressource-tree-popup-entf" disabled="false"/>
-			</popup>
-		</popupset>
 		<tabbox id="ressource-tabbox" flex="3" orient="vertical">
 			<tabs orient="horizontal" id="ressource-tabs">
 				<tab id="tab-ressource-projekt" label="Projekte" />
 				<tab id="tab-ressource-projektphase" label="Projektphasen" />
 			</tabs>
 			<tabpanels id="tabpanels-ressource-main" flex="1">
-				<box orient="vertical" id="box-ressource-projekt">
+				<vbox>
 					<toolbox>
-						<toolbar id="toolbar-ressource-projektase-nav-toolbar">
-							<toolbarbutton id="toolbarbutton-ressource-zoomin" label="Zoom In" oncommand="PhaseNeu();" disabled="true" image="../skin/images/NeuDokument.png" tooltiptext="Neuen Task anlegen" />
-							<toolbarbutton id="toolbarbutton-ressource-zoomout" label="Zoom Out" oncommand="PhaseDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Task löschen"/>
-							<toolbarbutton id="toolbarbutton-ressource-print" label="Drucken" oncommand="PhaseTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
+						<toolbar>
+							<toolbarbutton id="toolbarbutton-ressource-projekt-aktualisieren" label="Aktualisieren" oncommand="document.getElementById('iframe-ressource-projekt').setAttribute('src','<?php echo APP_ROOT; ?>content/projekt/ressourcenauslastung.php?typ=projekt&amp;'+gettimestamp());" image="../skin/images/refresh.png" tooltiptext="Neu laden"/>
+							<toolbarbutton id="toolbarbutton-ressource-projekt-drucken" label="Drucken" oncommand="foo = window.open('<?php echo APP_ROOT; ?>content/projekt/ressourcenauslastung.php?typ=projekt');foo.print();" image="../skin/images/drucken.png" tooltiptext="Drucken"/>
 						</toolbar>
 					</toolbox>
-					<grid id="grid-ressource-projekt">
-						<columns>
-							<column style="background-color:lightblue; border:1px solid black" />
-							<?php
-								for ($i=0; $i<$showWeeks; $i++)
-									echo '<column />';
-							?>
-						</columns>
-						<rows>
-							<row style="background-color:lightgreen; border:1px solid black">
-								<label value="Ressource" />
-								<?php
-								for ($i=0; $i<$showWeeks; $i++)
-									echo '<box><label value="KW ',($pb->kw($pb->jump_week($datum,$i))),' " /></box>';
-								?>
-							</row>
-							<?php
-							//echo count($pb->uids);
-							foreach ($pb->uids as $uid)
-							{
-								echo '<row style="background-color:lightgreen; border:1px solid black">
-									<label value="',$uid,'" />';
-								for ($j=0; $j<$showWeeks; $j++)
-									echo '<box><label value=" ',($pb->getProjektePerUID($uid,$pb->jump_week($datum,$i))),' " /></box>';
-								echo '</row>';
-							}
-							?>
-						</rows>
-					</grid>
-				</box>
-				<vbox id="ressource-ressource" />
+					<iframe id="iframe-ressource-projekt" flex="5" src="<?php echo APP_ROOT; ?>content/projekt/ressourcenauslastung.php?typ=projekt" />
+				</vbox>
+				<vbox>
+					<toolbox>
+						<toolbar>
+							<toolbarbutton id="toolbarbutton-ressource-projektphase-aktualisieren" label="Aktualisieren" oncommand="document.getElementById('iframe-ressource-projektphase').setAttribute('src','<?php echo APP_ROOT; ?>content/projekt/ressourcenauslastung.php?typ=phase&amp;'+gettimestamp());" image="../skin/images/refresh.png" tooltiptext="Neu laden"/>
+							<toolbarbutton id="toolbarbutton-ressource-projektphase-drucken" label="Drucken" oncommand="foo = window.open('<?php echo APP_ROOT; ?>content/projekt/ressourcenauslastung.php?typ=phase');foo.print();" image="../skin/images/drucken.png" tooltiptext="Drucken"/>
+						</toolbar>
+					</toolbox>
+				
+					<iframe id="iframe-ressource-projektphase" flex="5" src="<?php echo APP_ROOT; ?>content/projekt/ressourcenauslastung.php?typ=phase" />
+				</vbox>
 			</tabpanels>
 		</tabbox>
 	</vbox>

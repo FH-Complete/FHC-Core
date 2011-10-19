@@ -419,5 +419,95 @@ class ressource extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Liefert die Ressourcen aller Projekte die zu einem bestimmten Datum aktiv sind
+	 * 
+	 * @param $datum
+	 */
+	public function getProjektRessoureDatum($datum)
+	{
+		$qry = "
+		SELECT 
+			distinct
+			tbl_projekt_ressource.*, tbl_projekt.beginn as start, tbl_projekt.ende, 
+			tbl_ressource.student_uid, tbl_ressource.mitarbeiter_uid, tbl_ressource.betriebsmittel_id, tbl_ressource.firma_id, 
+			tbl_ressource.bezeichnung, tbl_ressource.beschreibung
+		FROM 
+			fue.tbl_ressource
+			LEFT JOIN fue.tbl_projekt_ressource USING(ressource_id)
+			LEFT JOIN fue.tbl_projekt USING(projekt_kurzbz)
+		WHERE
+			(tbl_projekt.beginn<='".addslashes($datum)."' OR tbl_projekt.beginn is null) AND 
+			(tbl_projekt.ende>='".addslashes($datum)."' OR tbl_projekt.ende is null)  ";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new ressource();
+				$obj->projekt_ressource_id = $row->projekt_ressource_id;
+				$obj->projekt_kurzbz = $row->projekt_kurzbz;
+				$obj->projektphase_id = $row->projektphase_id;
+				$obj->start = $row->start;
+				$obj->ende = $row->ende;
+								
+				$obj->ressource_id = $row->ressource_id;
+				$obj->student_uid = $row->student_uid;
+				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$obj->betriebsmittel_id = $row->betriebsmittel_id;
+				$obj->firma_id = $row->firma_id;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->beschreibung = $row->beschreibung;
+				
+				$this->result[] = $obj;
+			}
+		}		
+	}
+	
+	/**
+	 * Liefert die Ressourcen aller Projektphasen die zu einem bestimmten Datum aktiv sind
+	 * 
+	 * @param $datum
+	 */
+	public function getProjektphaseRessoureDatum($datum)
+	{
+		$qry = "
+		SELECT 
+			distinct
+			tbl_projekt_ressource.*, tbl_projektphase.start, tbl_projektphase.ende, 
+			tbl_ressource.student_uid, tbl_ressource.mitarbeiter_uid, tbl_ressource.betriebsmittel_id, tbl_ressource.firma_id, 
+			tbl_ressource.bezeichnung, tbl_ressource.beschreibung
+		FROM 
+			fue.tbl_ressource
+			LEFT JOIN fue.tbl_projekt_ressource USING(ressource_id)
+			LEFT JOIN fue.tbl_projektphase USING(projektphase_id)
+		WHERE
+			(tbl_projektphase.start<='".addslashes($datum)."' OR tbl_projektphase.start is null) AND 
+			(tbl_projektphase.ende>='".addslashes($datum)."' OR tbl_projektphase.ende is null)  ";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new ressource();
+				$obj->projekt_ressource_id = $row->projekt_ressource_id;
+				$obj->projekt_kurzbz = $row->projekt_kurzbz;
+				$obj->projektphase_id = $row->projektphase_id;
+				$obj->start = $row->start;
+				$obj->ende = $row->ende;
+								
+				$obj->ressource_id = $row->ressource_id;
+				$obj->student_uid = $row->student_uid;
+				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$obj->betriebsmittel_id = $row->betriebsmittel_id;
+				$obj->firma_id = $row->firma_id;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->beschreibung = $row->beschreibung;
+				
+				$this->result[] = $obj;
+			}
+		}		
+	}
 }
 ?>

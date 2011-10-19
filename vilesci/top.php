@@ -41,7 +41,8 @@
 		  $berechtigung->isBerechtigt('support') || 
 		  $berechtigung->isBerechtigt('preinteressent') || 
 		  $berechtigung->isBerechtigt('lehre') ||
-		  $berechtigung->isBerechtigt('basis/statistik') ||  
+		  $berechtigung->isBerechtigt('basis/statistik') ||
+		  $berechtigung->isBerechtigt('assistenz') ||    
 		  $berechtigung->isBerechtigt('lv-plan') ))
 		die ('Keine Berechtigung!');
 	
