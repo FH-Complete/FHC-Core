@@ -5,14 +5,22 @@ echo "<?xml version='1.0' encoding='utf-8' ?>";
 ?>
 
 <wsdl:definitions name="Projektphase" 
-targetNamespace="http://localhost/soap/" 
+targetNamespace="http://www.technikum-wien.at/soap/" 
 xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
-xmlns:tns="http://localhost/soap/" 
+xmlns:tns="http://www.technikum-wien.at/soap/" 
 xmlns:xsd="http://www.w3.org/2001/XMLSchema"    
 xmlns:xsd1="http://localhost/soap/projektphase.xsd"    
 xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
 
-	<wsdl:message name="SaveProjektphaseRequest">
+       
+    <wsdl:message name="SaveProjektphaseRequest">
+		<wsdl:part name="username" type="xsd:string" minOccurs="0"></wsdl:part>
+		<wsdl:part name="passwort" type="xsd:string" minOccurs="0"></wsdl:part>  	
+		<wsdl:part name="phase" type="tns:phase"></wsdl:part>
+    </wsdl:message>
+           
+     <xsd:complexType name="phase">
+	  <xsd:all>	
 		<wsdl:part name="projektphase_id" type="xsd:string"></wsdl:part>
 		<wsdl:part name="projekt_kurzbz" type="xsd:string"></wsdl:part>
 		<wsdl:part name="projektphase_fk" type="xsd:string"></wsdl:part>
@@ -24,7 +32,8 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
 		<wsdl:part name="personentage" type="xsd:string"></wsdl:part>
 		<wsdl:part name="user" type="xsd:string"></wsdl:part>
 		<wsdl:part name="neu" type="xsd:boolean"></wsdl:part>
-       </wsdl:message>
+	   </xsd:all>
+	 </xsd:complexType>
 
  	<wsdl:message name="SaveProjektphaseResponse">
        <wsdl:part name="message" type="xsd:string"></wsdl:part>

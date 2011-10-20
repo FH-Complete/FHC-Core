@@ -34,7 +34,6 @@ function initProjektphase(projektphase_id)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	
-	
 }
 
 // ****
@@ -55,19 +54,25 @@ function saveProjektphase()
    // Variablen checken
     
     // SOAP-Action
-    var soapBody = new SOAPObject("saveProjektphase");
-    soapBody.appendChild(new SOAPObject("projektphase_id")).val(projektphase_id);
-    soapBody.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
-    soapBody.appendChild(new SOAPObject("projektphase_fk")).val(projektphase_fk);
-    soapBody.appendChild(new SOAPObject("bezeichnung")).val(bezeichnung);
-    soapBody.appendChild(new SOAPObject("beschreibung")).val(beschreibung);
-    soapBody.appendChild(new SOAPObject("start")).val(start);
-    soapBody.appendChild(new SOAPObject("ende")).val(ende);
-    soapBody.appendChild(new SOAPObject("budget")).val(budget);
-    soapBody.appendChild(new SOAPObject("personentage")).val(personentage);
-    soapBody.appendChild(new SOAPObject("user")).val(getUsername());
-    soapBody.appendChild(new SOAPObject("neu")).val("true");
-    var sr = new SOAPRequest("saveProjektDaten",soapBody);
+   var soapBody = new SOAPObject("saveProjektphase");
+	//soapBody.appendChild(new SOAPObject("username")).val('joe');
+	//soapBody.appendChild(new SOAPObject("passwort")).val('waschl');
+				
+	var phase = new SOAPObject("phase");
+	phase.appendChild(new SOAPObject("projektphase_id")).val(projektphase_id);
+	phase.appendChild(new SOAPObject("projektphase_fk")).val(projektphase_fk);
+	phase.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
+	phase.appendChild(new SOAPObject("bezeichnung")).val(bezeichnung);
+	phase.appendChild(new SOAPObject("beschreibung")).val(beschreibung);
+	phase.appendChild(new SOAPObject("start")).val(start);
+	phase.appendChild(new SOAPObject("ende")).val(ende);
+	phase.appendChild(new SOAPObject("budget")).val(budget);
+	phase.appendChild(new SOAPObject("personentage")).val(personentage);
+    phase.appendChild(new SOAPObject("neu")).val("true");
+    
+    soapBody.appendChild(phase);
+    
+    var sr = new SOAPRequest("saveProjektPhase",soapBody);
     SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projektphase.soap.php?"+gettimestamp();
     SOAPClient.SendRequest(sr, clb_saveProjektphase);
 }
