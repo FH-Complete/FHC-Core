@@ -28,6 +28,8 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/basis_db.class.php');
 require_once('../include/projektphase.class.php');
 require_once('../include/datum.class.php');
+require_once('../include/functions.inc.php');
+require_once('../include/benutzerberechtigung.class.php');
 
 $SOAPServer = new SoapServer(APP_ROOT."/soap/projektphase.wsdl.php?".microtime());
 $SOAPServer->addFunction("saveProjektphase");
@@ -38,44 +40,45 @@ ini_set("soap.wsdl_cache_enabled", "0");
 
 /**
  * 
- * Speichert die vom Webservice übergebenen Parameter in die DB
- * @param string $projektphase_id
- * @param string $projekt_kurzbz
- * @param string $projektphase_fk
- * @param string $bezeichnung
- * @param string $beschreibung
- * @param date $start
- * @param date $ende
- * @param string $budget
- * @param string $personentage
- * @param string $user
- * @param string $neu
+ * Speichert die vom Webservice übergebene Phase in die DB
+ * @param $username
+ * @param $passwort
+ * @param $phase
  */
-function saveProjektphase($projektphase_id, $projekt_kurzbz, $projektphase_fk, $bezeichnung, $beschreibung, $start, $ende, $budget, $personentage, $user, $neu)
-{ 	
+function saveProjektphase($username, $passwort, $phase)
+{ 
+	if(!$user = check_user($username, $passwort))
+		return new SoapFault("Server", "Invalid Credentials");	
+	
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+		
+	if(!$rechte->isBerechtigt('planner', null, 'sui'))
+		return new SoapFault("Server", "Sie haben keine Berechtigung zum Speichern von Phasen.");
+	
 	$projektphase = new projektphase();
-	if($projektphase_id!='')
+	if($phase->projektphase_id!='')
 	{
-		$projektphase->load($projektphase_id);
+		$projektphase->load($phase->projektphase_id);
 	}
 	else
 	{
 		$projektphase->insertvon = $user;
 		$projektphase->insertamum=date('Y-m-d H:i:s');
 	}
-	$projektphase->projektphase_id=$projektphase_id;
-	$projektphase->projekt_kurzbz=$projekt_kurzbz;
-	$projektphase->projektphase_fk=$projektphase_fk;
-	$projektphase->bezeichnung = $bezeichnung;
-	$projektphase->beschreibung = $beschreibung;
-	$projektphase->start = $start;
-	$projektphase->ende = $ende;
-	$projektphase->budget = $budget;
-	$projektphase->personentage = $personentage;
+	$projektphase->projektphase_id=$phase->projektphase_id;
+	$projektphase->projekt_kurzbz=$phase->projekt_kurzbz;
+	$projektphase->projektphase_fk=$phase->projektphase_fk;
+	$projektphase->bezeichnung = $phase->bezeichnung;
+	$projektphase->beschreibung = $phase->beschreibung;
+	$projektphase->start = $phase->start;
+	$projektphase->ende = $phase->ende;
+	$projektphase->budget = $phase->budget;
+	$projektphase->personentage = $phase->personentage;
 	$projektphase->updatevon = $user;
 	$projektphase->updateamum = date('Y-m-d H:i:s');
 	
-	if($neu=='true')
+	if($phase->neu=='true')
 		$projektphase->new = true;
 	else
 		$projektphase->new = false; 
