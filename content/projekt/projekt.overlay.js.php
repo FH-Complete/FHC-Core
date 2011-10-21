@@ -185,18 +185,24 @@ function saveProjektDetail()
 	neu = document.getElementById('checkbox-projekt-detail-neu').checked;
 	
 	var soapBody = new SOAPObject("saveProjekt");
-	soapBody.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
-	soapBody.appendChild(new SOAPObject("oe_kurzbz")).val(oe_kurzbz);
-	soapBody.appendChild(new SOAPObject("titel")).val(titel);
-	soapBody.appendChild(new SOAPObject("beschreibung")).val(beschreibung);
-	soapBody.appendChild(new SOAPObject("nummer")).val(nummer);
-	soapBody.appendChild(new SOAPObject("beginn")).val(beginn);
-	soapBody.appendChild(new SOAPObject("ende")).val(ende);
-	soapBody.appendChild(new SOAPObject("budget")).val(budget);
+	//soapBody.appendChild(new SOAPObject("username")).val('joe');
+	//soapBody.appendChild(new SOAPObject("passwort")).val('waschl');
+				
+	var projekt = new SOAPObject("projekt");
+    projekt.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
+    projekt.appendChild(new SOAPObject("oe_kurzbz")).val(oe_kurzbz);
+    projekt.appendChild(new SOAPObject("titel")).val(titel);
+    projekt.appendChild(new SOAPObject("nummer")).val(nummer);
+    projekt.appendChild(new SOAPObject("beschreibung")).val(beschreibung);
+    projekt.appendChild(new SOAPObject("beginn")).val(beginn);
+    projekt.appendChild(new SOAPObject("ende")).val(ende);
+    projekt.appendChild(new SOAPObject("budget")).val(budget);
 	if(neu)
-		soapBody.appendChild(new SOAPObject("neu")).val('true');
+		projekt.appendChild(new SOAPObject("neu")).val('true');
 	else	
-		soapBody.appendChild(new SOAPObject("neu")).val('false');
+		projekt.appendChild(new SOAPObject("neu")).val('false');
+	soapBody.appendChild(projekt);
+	
 	var sr = new SOAPRequest("saveProjekt",soapBody);
 
 	SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekt.soap.php?"+gettimestamp();
