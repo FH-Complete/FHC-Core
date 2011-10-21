@@ -28,6 +28,8 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/basis_db.class.php');
 require_once('../include/ressource.class.php');
 require_once('../include/datum.class.php');
+require_once('../include/benutzerberechtigung.class.php');
+require_once('../include/functions.inc.php'); 
 
 $SOAPServer = new SoapServer(APP_ROOT."/soap/ressource.wsdl.php?".microtime());
 $SOAPServer->addFunction("saveRessource");
@@ -39,41 +41,45 @@ ini_set("soap.wsdl_cache_enabled", "0");
 /**
  * 
  * Speichert die Ressource
- * @param unknown_type $ressource_id
- * @param unknown_type $bezeichnung
- * @param unknown_type $beschreibung
- * @param unknown_type $mitarbeiter_uid
- * @param unknown_type $student_uid
- * @param unknown_type $betriebsmittel_id
- * @param unknown_type $firma_id
- * @param unknown_type $user
+ * @param $username
+ * @param $passwort
+ * @param $ressource
  */
-function saveRessource($ressource_id, $bezeichnung, $beschreibung, $mitarbeiter_uid, $student_uid, $betriebsmittel_id, $firma_id, $user)
+function saveRessource($username, $passwort, $ressource)
 { 	
-	$ressource = new ressource();
+	if(!$user = check_user($username, $passwort))
+		return new SoapFault("Server", "Invalid Credentials");	
+	
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+		
+	if(!$rechte->isBerechtigt('planner', null, 'sui'))
+		return new SoapFault("Server", "Sie haben keine Berechtigung zum Speichern von Ressourcen.");
+	
+	$ressourceNew = new ressource();
 	if($ressource_id!='')
 	{
-		$ressource->load($ressource_id);
-		$ressource->new = false;
+		$ressourceNew->load($ressource->ressource_id);
+		$ressourceNew->new = false;
 	}
 	else
 	{
-		$ressource->new = true; 
-		$ressource->insertvon = $user;
+		$ressourceNew->new = true; 
+		$ressourceNew->insertvon = $user;
 	}
-	$ressource->ressource_id=$ressource_id;
-	$ressource->bezeichnung=$bezeichnung;
-	$ressource->beschreibung=$beschreibung;
-	$ressource->mitarbeiter_uid = $mitarbeiter_uid;
-	$ressource->student_uid = $student_uid;
-	$ressource->betriebsmittel_id = $betriebsmittel_id;
-	$ressource->firma_id = $firma_id;
-	$ressource->updatevon = $user;
+	$ressourceNew->ressource_id=$ressource->ressource_id;
+	$ressourceNew->bezeichnung=$ressource->bezeichnung;
+	$ressourceNew->beschreibung=$ressource->beschreibung;
+	$ressourceNew->mitarbeiter_uid = $ressource->mitarbeiter_uid;
+	$ressourceNew->student_uid = $ressource->student_uid;
+	$ressourceNew->betriebsmittel_id = $ressource->betriebsmittel_id;
+	$ressourceNew->firma_id = $ressource->firma_id;
+	$ressourceNew->updatevon = $user;
 	
-	if($ressource->save())
-		return $ressource->ressource_id; 
+	if($ressourceNew->save())
+		return $ressourceNew->ressource_id; 
 	else
-		return new SoapFault("Server", $ressource->errormsg);
+		return new SoapFault("Server", $ressourceNew->errormsg);
 }
 ?>
 

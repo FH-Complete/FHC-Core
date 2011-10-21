@@ -28,6 +28,8 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/basis_db.class.php');
 require_once('../include/ressource.class.php');
 require_once('../include/datum.class.php');
+require_once('../include/functions.inc.php');
+require_once('../include/benutzerberechtigung.class.php');
 
 $SOAPServer = new SoapServer(APP_ROOT."/soap/ressource_projekt.wsdl.php?".microtime());
 $SOAPServer->addFunction("saveProjektRessource");
@@ -39,33 +41,37 @@ ini_set("soap.wsdl_cache_enabled", "0");
 /**
  * 
  * Speichert in der Zwischentabelle Ressource - Projekt
- * @param $projekt_ressource_id
- * @param $projektphase_id
- * @param $projekt_kurzbz
- * @param $ressource_id
- * @param $funktion_kurzbz
- * @param $beschreibung
- * @param $user
+ * @param $username
+ * @param $passwort
+ * @param $projektRessource
  */
-
-function saveProjektRessource($projekt_ressource_id, $projektphase_id, $projekt_kurzbz, $ressource_id, $funktion_kurzbz, $beschreibung)
+function saveProjektRessource($username, $passwort, $projektRessource)
 { 	
+	if(!$user = check_user($username, $passwort))
+		return new SoapFault("Server", "Invalid Credentials");	
+	
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+		
+	if(!$rechte->isBerechtigt('planner', null, 'sui'))
+		return new SoapFault("Server", "Sie haben keine Berechtigung zum Speichern von Projekten.");
+	
 	$ressource = new ressource();
-	if($projekt_ressource_id!='')
+	if($projektRessource->projekt_ressource_id!='')
 	{
-		$ressource->loadProjektRessource($projekt_ressource_id);
+		$ressource->loadProjektRessource($projektRessource->projekt_ressource_id);
 		$ressource->new = false;
 	}
 	else
 	{
 		$ressource->new = true; 
 	}
-	$ressource->projekt_ressource_id=$projekt_ressource_id;
-	$ressource->projektphase_id=$projektphase_id;
-	$ressource->projekt_kurzbz=$projekt_kurzbz;
-	$ressource->ressource_id = $ressource_id;
-	$ressource->funktion_kurzbz = $funktion_kurzbz;
-	$ressource->beschreibung = $beschreibung;
+	$ressource->projekt_ressource_id=$projektRessource->projekt_ressource_id;
+	$ressource->projektphase_id=$projektRessource->projektphase_id;
+	$ressource->projekt_kurzbz=$projektRessource->projekt_kurzbz;
+	$ressource->ressource_id = $projektRessource->ressource_id;
+	$ressource->funktion_kurzbz = $projektRessource->funktion_kurzbz;
+	$ressource->beschreibung = $projektRessource->beschreibung;
 
 	
 	if($ressource->saveProjektRessource())

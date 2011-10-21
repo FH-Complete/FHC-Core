@@ -349,21 +349,28 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					//debug(id); 
 					
 					var soapBody = new SOAPObject("saveProjektRessource");
-				    soapBody.appendChild(new SOAPObject("projekt_ressource_id")).val('');
+				    //soapBody.appendChild(new SOAPObject("username")).val('joe');
+					//soapBody.appendChild(new SOAPObject("passwort")).val('waschl');					
+					
+					var projektRessource = new SOAPObject("projektRessource");
+					
+				    projektRessource.appendChild(new SOAPObject("projekt_ressource_id")).val('');
 				    
 				    if(projekt_kurzbz != '')
 				    {
-					    soapBody.appendChild(new SOAPObject("projektphase_id")).val('');
-					    soapBody.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
+					    projektRessource.appendChild(new SOAPObject("projektphase_id")).val('');
+					    projektRessource.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
 				    }else if(projektphase_id != '')
 				    {
-					    soapBody.appendChild(new SOAPObject("projektphase_id")).val(projektphase_id);
-					    soapBody.appendChild(new SOAPObject("projekt_kurzbz")).val('');				    
+					    projektRessource.appendChild(new SOAPObject("projektphase_id")).val(projektphase_id);
+					    projektRessource.appendChild(new SOAPObject("projekt_kurzbz")).val('');				    
 				    }
-				    soapBody.appendChild(new SOAPObject("ressource_id")).val(id);
-				    soapBody.appendChild(new SOAPObject("funktion_kurzbz")).val('');
-				    soapBody.appendChild(new SOAPObject("beschreibung")).val('');
-
+				    projektRessource.appendChild(new SOAPObject("ressource_id")).val(id);
+				    projektRessource.appendChild(new SOAPObject("funktion_kurzbz")).val('');
+				    projektRessource.appendChild(new SOAPObject("beschreibung")).val('');
+					
+					soapBody.appendChild(projektRessource);
+					
 				    var sr = new SOAPRequest("saveProjektRessource",soapBody);
 				    SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/ressource_projekt.soap.php?"+gettimestamp();
 				    
