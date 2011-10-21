@@ -2889,6 +2889,10 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_ampel"))
 			GRANT SELECT ON public.tbl_ampel TO web;
 			GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_ampel_benutzer_bestaetigt TO vilesci;
 			GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_ampel_benutzer_bestaetigt TO web;
+			GRANT SELECT, UPDATE ON SEQUENCE public.seq_ampel_ampel_id TO web;
+			GRANT SELECT, UPDATE ON SEQUENCE public.seq_ampel_ampel_id TO vilesci;
+			GRANT SELECT, UPDATE ON SEQUENCE public.seq_ampel_benutzer_bestaetigt_ampel_benutzer_bestaetigt_id TO web;
+			GRANT SELECT, UPDATE ON SEQUENCE public.seq_ampel_benutzer_bestaetigt_ampel_benutzer_bestaetigt_id TO vilesci;
 			
 			";
 			
