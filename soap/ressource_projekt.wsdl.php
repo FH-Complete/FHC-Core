@@ -5,21 +5,29 @@ echo "<?xml version='1.0' encoding='utf-8' ?>";
 ?>
 
 <wsdl:definitions name="ProjektRessource" 
-targetNamespace="http://localhost/soap/" 
+targetNamespace="http://www.technikum-wien.at/soap/" 
 xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
-xmlns:tns="http://localhost/soap/" 
+xmlns:tns="http://www.technikum-wien.at/soap/" 
 xmlns:xsd="http://www.w3.org/2001/XMLSchema"    
 xmlns:xsd1="http://localhost/soap/projektressource.xsd"    
 xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
 
-	<wsdl:message name="SaveProjektRessourceRequest">
-		<wsdl:part name="projekt_ressource_id" type="xsd:int"></wsdl:part>
-		<wsdl:part name="projektphase_id" type="xsd:int"></wsdl:part>
-		<wsdl:part name="projekt_kurzbz" type="xsd:string"></wsdl:part>
-		<wsdl:part name="ressource_id" type="xsd:int"></wsdl:part>
-		<wsdl:part name="funktion_kurzbz" type="xsd:string"></wsdl:part>
-		<wsdl:part name="beschreibung" type="xsd:string"></wsdl:part>
-	</wsdl:message>
+    <wsdl:message name="SaveProjektRessourceRequest">
+		<wsdl:part name="username" type="xsd:string" minOccurs="0"></wsdl:part>
+		<wsdl:part name="passwort" type="xsd:string" minOccurs="0"></wsdl:part>  	
+		<wsdl:part name="projektRessource" type="tns:projektRessource"></wsdl:part>
+    </wsdl:message>
+
+	<xsd:complexType name="projektRessource">
+		<xsd:all>	
+			<wsdl:part name="projekt_ressource_id" type="xsd:int"></wsdl:part>
+			<wsdl:part name="projektphase_id" type="xsd:int"></wsdl:part>
+			<wsdl:part name="projekt_kurzbz" type="xsd:string"></wsdl:part>
+			<wsdl:part name="ressource_id" type="xsd:int"></wsdl:part>
+			<wsdl:part name="funktion_kurzbz" type="xsd:string"></wsdl:part>
+			<wsdl:part name="beschreibung" type="xsd:string"></wsdl:part>
+		</xsd:all>
+	</xsd:complexType>
 
  	<wsdl:message name="SaveProjektRessourceResponse">
        <wsdl:part name="message" type="xsd:string"></wsdl:part>

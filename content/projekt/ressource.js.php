@@ -200,15 +200,19 @@ function saveRessource()
    
     // SOAP-Action
     var soapBody = new SOAPObject("saveRessource");
-    soapBody.appendChild(new SOAPObject("ressource_id")).val(ressource_id);
-    soapBody.appendChild(new SOAPObject("bezeichnung")).val(bezeichnung);
-    soapBody.appendChild(new SOAPObject("beschreibung")).val(beschreibung);
-    soapBody.appendChild(new SOAPObject("mitarbeiter_uid")).val(mitarbeiter_uid);
-    soapBody.appendChild(new SOAPObject("student_uid")).val(student_uid);
-    soapBody.appendChild(new SOAPObject("betriebsmittel_id")).val(betriebsmittel_id);
-    soapBody.appendChild(new SOAPObject("firma_id")).val(firma_id);
-    soapBody.appendChild(new SOAPObject("user")).val(getUsername());
-    
+    //soapBody.appendChild(new SOAPObject("username")).val('joe');
+	//soapBody.appendChild(new SOAPObject("passwort")).val('waschl');
+	
+	var ressource = new SOAPObject("ressource");
+    ressource.appendChild(new SOAPObject("ressource_id")).val(ressource_id);
+    ressource.appendChild(new SOAPObject("bezeichnung")).val(bezeichnung);
+    ressource.appendChild(new SOAPObject("beschreibung")).val(beschreibung);
+    ressource.appendChild(new SOAPObject("mitarbeiter_uid")).val(mitarbeiter_uid);
+    ressource.appendChild(new SOAPObject("student_uid")).val(student_uid);
+    ressource.appendChild(new SOAPObject("betriebsmittel_id")).val(betriebsmittel_id);
+    ressource.appendChild(new SOAPObject("firma_id")).val(firma_id);
+	soapBody.appendChild(ressource);
+	    
     if(mitarbeiter_uid == '' && student_uid =='' && betriebsmittel_id =='' && firma_id =='')
     {
     	alert('ungueltige ID'); 
