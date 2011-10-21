@@ -48,7 +48,7 @@ else
 	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jqSOAPClient.js"></script>
 	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jqXMLUtils.js"></script>
 	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>content/projekt/projektdokument.window.js.php" />
-	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>content/functions.js"></script>
+	<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>content/functions.js.php"></script>
 <vbox>
 
 <checkbox id="checkbox-projekt-neu" hidden="true"/>
