@@ -44,6 +44,9 @@ function saveZuordnung()
     
     // SOAP-Action
     var soapBody = new SOAPObject("saveProjektdokumentZuordnung");
+    //soapBody.appendChild(new SOAPObject("username")).val('joe');
+	//soapBody.appendChild(new SOAPObject("passwort")).val('waschl');
+    
     soapBody.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
     soapBody.appendChild(new SOAPObject("projektphase_id")).val(projektphase_id);
     soapBody.appendChild(new SOAPObject("dms_id")).val(dms_id);

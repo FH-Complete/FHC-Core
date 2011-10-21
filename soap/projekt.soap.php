@@ -29,6 +29,8 @@ require_once('../include/basis_db.class.php');
 require_once('../include/projekt.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/dms.class.php');
+require_once('../include/functions.inc.php');
+require_once('../include/benutzerberechtigung.class.php');
 
 $SOAPServer = new SoapServer(APP_ROOT."/soap/projekt.wsdl.php?".microtime());
 $SOAPServer->addFunction("saveProjekt");
@@ -40,44 +42,62 @@ ini_set("soap.wsdl_cache_enabled", "0");
 
 /**
  * 
- * Speichert die vom Webservice übergebenen Parameter in die DB
- * @param string $projekt_kurzbz
- * @param string $nummer
- * @param string $titel
- * @param string $beschreibung
- * @param date $beginn
- * @param date $ende
- * @param string $oe_kurzbz
- * @param boolean $neu
+ * Speichert das vom Webservice übergebene Projekt in die DB
+ * @param $username
+ * @param $passwort
+ * @param $projekt
  */
-function saveProjekt($projekt_kurzbz, $nummer, $titel, $beschreibung, $beginn, $ende, $budget, $oe_kurzbz, $neu)
+function saveProjekt($username, $passwort, $projekt)
 { 	
+	if(!$user = check_user($username, $passwort))
+		return new SoapFault("Server", "Invalid Credentials");	
 	
-	$projekt = new projekt();
-	$projekt->projekt_kurzbz=$projekt_kurzbz;
-	$projekt->nummer = $nummer;
-	$projekt->titel = $titel;
-	$projekt->beschreibung = $beschreibung;
-	$projekt->beginn = $beginn;
-	$projekt->ende = $ende;
-	$projekt->budget = $budget;
-	$projekt->oe_kurzbz = $oe_kurzbz;
-	if($neu=='true')
-		$projekt->new = true; 
-	else
-		$projekt->new = false;
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+		
+	if(!$rechte->isBerechtigt('planner', null, 'sui'))
+		return new SoapFault("Server", "Sie haben keine Berechtigung zum Speichern von Projekten.");
 	
-	if($projekt->save())
-		return $projekt->projekt_kurzbz;
+	$projektNew = new projekt();
+	$projektNew->projekt_kurzbz=$projekt->projekt_kurzbz;
+	$projektNew->nummer = $projekt->nummer;
+	$projektNew->titel = $projekt->titel;
+	$projektNew->beschreibung = $projekt->beschreibung;
+	$projektNew->beginn = $projekt->beginn;
+	$projektNew->ende = $projekt->ende;
+	$projektNew->budget = $projekt->budget;
+	$projektNew->oe_kurzbz = $projekt->oe_kurzbz;
+	if($projekt->neu=='true')
+		$projektNew->new = true; 
 	else
-		return new SoapFault("Server", $projekt->errormsg);
+		$projektNew->new = false;
+	
+	if($projektNew->save())
+		return $projektNew->projekt_kurzbz;
+	else
+		return new SoapFault("Server", $projektNew->errormsg);
 }
 
 /**
+ * 
  * Speichert die Zuordnung eines Dokuments zu einem Projekt oder einer Phase
+ * @param $username
+ * @param $passwort
+ * @param $projekt_kurzbz
+ * @param $projektphase_id
+ * @param $dms_id
  */
-function saveProjektdokumentZuordnung($projekt_kurzbz, $projektphase_id, $dms_id)
+function saveProjektdokumentZuordnung($username, $passwort, $projekt_kurzbz, $projektphase_id, $dms_id)
 {
+	if(!$user = check_user($username, $passwort))
+		return new SoapFault("Server", "Invalid Credentials");	
+	
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+		
+	if(!$rechte->isBerechtigt('planner', null, 'sui'))
+		return new SoapFault("Server", "Sie haben keine Berechtigung zum Zuordnen von Dokumenten.");
+	
 	$dms = new dms();
 	
 	if($dms->saveProjektzuordnung($dms_id, $projekt_kurzbz, $projektphase_id))
