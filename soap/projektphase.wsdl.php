@@ -20,20 +20,20 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
     </wsdl:message>
            
      <xsd:complexType name="phase">
-	  <xsd:all>	
-		<wsdl:part name="projektphase_id" type="xsd:string"></wsdl:part>
-		<wsdl:part name="projekt_kurzbz" type="xsd:string"></wsdl:part>
-		<wsdl:part name="projektphase_fk" type="xsd:string"></wsdl:part>
-		<wsdl:part name="bezeichnung" type="xsd:string"></wsdl:part>
-		<wsdl:part name="beschreibung" type="xsd:string"></wsdl:part>
-		<wsdl:part name="start" type="xsd:string"></wsdl:part>
-		<wsdl:part name="ende" type="xsd:string"></wsdl:part>
-		<wsdl:part name="budget" type="xsd:string"></wsdl:part>
-		<wsdl:part name="personentage" type="xsd:string"></wsdl:part>
-		<wsdl:part name="user" type="xsd:string"></wsdl:part>
-		<wsdl:part name="neu" type="xsd:boolean"></wsdl:part>
-	   </xsd:all>
-	 </xsd:complexType>
+	 	<xsd:all>	
+			<wsdl:part name="projektphase_id" type="xsd:string"></wsdl:part>
+			<wsdl:part name="projekt_kurzbz" type="xsd:string"></wsdl:part>
+			<wsdl:part name="projektphase_fk" type="xsd:string"></wsdl:part>
+			<wsdl:part name="bezeichnung" type="xsd:string"></wsdl:part>
+			<wsdl:part name="beschreibung" type="xsd:string"></wsdl:part>
+			<wsdl:part name="start" type="xsd:string"></wsdl:part>
+			<wsdl:part name="ende" type="xsd:string"></wsdl:part>
+			<wsdl:part name="budget" type="xsd:string"></wsdl:part>
+			<wsdl:part name="personentage" type="xsd:string"></wsdl:part>
+			<wsdl:part name="user" type="xsd:string"></wsdl:part>
+			<wsdl:part name="neu" type="xsd:boolean"></wsdl:part>
+		</xsd:all>
+	</xsd:complexType>
 
  	<wsdl:message name="SaveProjektphaseResponse">
        <wsdl:part name="message" type="xsd:string"></wsdl:part>
