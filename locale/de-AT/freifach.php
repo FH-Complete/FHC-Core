@@ -13,4 +13,5 @@ $this->phrasen['freifach/bitteFreifachAuswaehlen']='Bitte wählen Sie eines der 
 $this->phrasen['freifach/auswahl']='Auswahl';
 $this->phrasen['freifach/MailAnAlleSenden'] ='Mail an alle in diesem Freifach senden';
 $this->phrasen['freifach/keineAnmeldungenFuerDiesesFreifach']='Es gibt noch keine Anmeldungen für dieses Freifach';
+$this->phrasen['freifach/abmeldungNurUeberAssistenz']='Bitte beachten Sie, dass die Abmeldung von einem Freifach derzeit nur über Ihre Studiengangsassistenz erfolgen kann';
 ?>
