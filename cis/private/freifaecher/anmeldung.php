@@ -156,6 +156,16 @@ else
 ?>
 				</td>
 			</tr>
+			<table>
+			<tr>
+				<td>&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td style="border-color:#0086CB; border-width:2px; border-style:solid; padding:8px"><?php echo $p->t('freifach/abmeldungNurUeberAssistenz');?>
+				</td>
+			</tr>
+			</table>
 			</table>
 		</td>
 	</tr>
