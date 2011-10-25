@@ -230,18 +230,6 @@ function treeProjektmenueSelect()
 }
 
 // ****
-// * Dialog fuer neues Projekt starten
-// ****
-function ProjektNeu()
-{
-    // netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect"); // Trick 17
-    var tree=document.getElementById('tree-projektmenue');
-    var oe=getTreeCellText(tree, "treecol-projektmenue-oe", tree.currentIndex);
-    window.open('<?php echo APP_ROOT; ?>content/projekt/projekt.window.xul.php?oe='+oe,'Projekt anlegen', 'height=384,width=512,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no');
-    //alert (oe);
-}
-
-// ****
 // * Dialog fuer neue Ressource starten
 // ****
 function RessourceNeu()

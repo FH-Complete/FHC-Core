@@ -96,7 +96,7 @@ function onselectProjekt()
     // Trick 17	(sonst gibt's ein Permission denied)
     netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
     var tree = document.getElementById('tree-projekt');
-
+	
     if (tree.currentIndex==-1) return;
     try
     {
@@ -108,6 +108,9 @@ function onselectProjekt()
             //Projekt wurde markiert
             //Loeschen Button aktivieren
             document.getElementById('toolbarbutton-projekt-del').disabled=false;
+            document.getElementById('textbox-projekt-detail-projekt_kurzbz').disabled=true;
+            ProjektDisableFields(false);
+            document.getElementById('caption-projekt-detail').label='Bearbeiten';
         }
         else
         {
@@ -310,46 +313,14 @@ function ProjektDelete()
 // ****
 function ProjektDetailReset()
 {
-	/*
-	document.getElementById('lehrveranstaltung-detail-textbox-lvnr').value='';
-	document.getElementById('lehrveranstaltung-detail-textbox-unr').value='';
-	document.getElementById('lehrveranstaltung-detail-textbox-lehrveranstaltung').value='';
-	document.getElementById('lehrveranstaltung-detail-checkbox-lehre').checked=true;
-	document.getElementById('lehrveranstaltung-detail-textbox-stundenblockung').value='';
-	document.getElementById('lehrveranstaltung-detail-textbox-wochenrythmus').value='';
-	document.getElementById('lehrveranstaltung-detail-textbox-startkw').value='';
-	document.getElementById('lehrveranstaltung-detail-textbox-anmerkung').value='';
-	document.getElementById('lehrveranstaltung-detail-menulist-sprache').value='German';
-	document.getElementById('lehrveranstaltung-detail-menulist-raumtyp').value='Dummy';
-	document.getElementById('lehrveranstaltung-detail-menulist-raumtypalternativ').value='Dummy';
-	document.getElementById('lehrveranstaltung-detail-menulist-studiensemester').value=getStudiensemester();
-	document.getElementById('lehrveranstaltung-detail-menulist-lehrform').value='UE';
-	document.getElementById('lehrveranstaltung-detail-textbox-lehreinheit_id').value='';
-
-	//mitarbeiterlehreinheit tree leeren
-	lektortree = document.getElementById('lehrveranstaltung-detail-tree-lehreinheitmitarbeiter');
-
-	//Alte DS entfernen
-	var oldDatasources = lektortree.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
-	{
-		lektortree.database.RemoveDataSource(oldDatasources.getNext());
-	}
-	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	lektortree.builder.rebuild();
-
-	//Gruppentree leeren
-	gruppentree = document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe');
-
-	//Alte DS entfernen
-	var oldDatasources = gruppentree.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
-	{
-		gruppentree.database.RemoveDataSource(oldDatasources.getNext());
-	}
-	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	gruppentree.builder.rebuild();
-	*/
+	document.getElementById('textbox-projekt-detail-projekt_kurzbz').value='';
+	//document.getElementById('menulist-projekt-detail-oe_kurzbz').value='';
+	document.getElementById('textbox-projekt-detail-titel').value='';
+	document.getElementById('textbox-projekt-detail-nummer').value='';
+	document.getElementById('textbox-projekt-detail-beschreibung').value='';
+	document.getElementById('textbox-projekt-detail-beginn').value='';
+	document.getElementById('textbox-projekt-detail-ende').value='';
+	document.getElementById('textbox-projekt-detail-budget').value='';
 }
 
 // ****
@@ -357,24 +328,35 @@ function ProjektDetailReset()
 // ****
 function ProjektDisableFields(val)
 {
-	/*
-	//document.getElementById('lehrveranstaltung-detail-textbox-lvnr').disabled=val;
-	//document.getElementById('lehrveranstaltung-detail-textbox-unr').disabled=val;
-	//document.getElementById('lehrveranstaltung-detail-textbox-lehrveranstaltung').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-checkbox-lehre').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-textbox-stundenblockung').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-textbox-wochenrythmus').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-textbox-startkw').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-textbox-anmerkung').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-menulist-sprache').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-menulist-lehrfach').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-menulist-raumtyp').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-menulist-raumtypalternativ').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-menulist-studiensemester').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-menulist-lehrform').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe').disabled=val;
-	document.getElementById('lehrveranstaltung-detail-button-save').disabled=val;
+	document.getElementById('menulist-projekt-detail-oe_kurzbz').disabled=val;
+	document.getElementById('textbox-projekt-detail-titel').disabled=val;
+	document.getElementById('textbox-projekt-detail-nummer').disabled=val;
+	document.getElementById('textbox-projekt-detail-beschreibung').disabled=val;
+	document.getElementById('textbox-projekt-detail-beginn').disabled=val;
+	document.getElementById('textbox-projekt-detail-ende').disabled=val;
+	document.getElementById('textbox-projekt-detail-budget').disabled=val;
+	document.getElementById('button-projekt-detail-speichern').disabled=val;
+}
 
-	document.getElementById('lehrveranstaltung-detail-textbox-unr').disabled=val;
-	*/
+
+// ****
+// * Neues Projekt anlegen
+// ****
+function ProjektNeu()
+{
+	//Markierung im Tree entfernen
+	var tree = document.getElementById('tree-projekt');
+	tree.view.selection.clearSelection();
+	
+	//Detailfelder resetten und aktivieren
+	ProjektDetailReset();
+	ProjektDisableFields(false);
+	
+	//Label setzen und status auf neu setzen
+	document.getElementById('textbox-projekt-detail-projekt_kurzbz').disabled=false;
+	document.getElementById('checkbox-projekt-detail-neu').checked=true;
+	document.getElementById('caption-projekt-detail').label='Neues Projekt';
+	
+	//Detail Tab auswaehlen
+	document.getElementById('tabs-projekt-main').selectedItem=document.getElementById('tab-projekt-detail');	
 }

@@ -45,9 +45,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/mantisdetail.overlay.xul.p
 	<!-- ************************ -->
 	<vbox id="box-projekttask" flex="1" uid="" stg_kz="">
 	<popupset>
-		<popup id="projekttask-tree-popup">
+		<menupopup id="projekttask-tree-popup">
 			<menuitem label="Entfernen" oncommand="TaskDelete();" id="projekttask-tree-popup-entf" disabled="false"/>
-		</popup>
+		</menupopup>
 	</popupset>
 		<toolbox>
 			<toolbar id="projekttask-nav-toolbar">

@@ -73,8 +73,9 @@ function ProjektphaseFkLoad(menulist, kurzbz, id)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	
-	var url = '<?php echo APP_ROOT; ?>rdf/projektphase.rdf.php?projekt_kurzbz='+kurzbz+'&phase_id='+id+'&optional&'+gettimestamp();
-	//nurmittitel=&
+	var url = '<?php echo APP_ROOT; ?>rdf/projektphase.rdf.php?projekt_kurzbz='+kurzbz+'&optional&'+gettimestamp();
+	if(typeof id!='undefined' && id!='')
+		url = url +'&phase_id='+id;
 
 	var oldDatasources = menulist.database.GetDataSources();
 	while(oldDatasources.hasMoreElements())
@@ -119,6 +120,8 @@ function onselectTreeProjektphase()
             //Projektphase wurde markiert
             //Loeschen Button aktivieren
             document.getElementById('toolbarbutton-projektphase-del').disabled=false;
+			ProjektphaseDetailDisable(false);
+			document.getElementById('caption-projektphase-detail').label='Bearbeiten';
         }
         else
         {
@@ -298,15 +301,70 @@ function ProjektphaseTreeSelectPhase()
 	}
 }
 
-// Dialog fuer neues Projekt starten
+// ****
+// * Setzt die Detailfelder auf die Standardwerte zurueck
+// ****
+function ProjektphaseDetailReset()
+{
+	document.getElementById('textbox-projektphase-detail-projektphase_id').value='';
+	document.getElementById('textbox-projektphase-detail-projekt_kurzbz').value='';
+	document.getElementById('textbox-projektphase-detail-bezeichnung').value='';
+	document.getElementById('textbox-projektphase-detail-beschreibung').value='';
+	document.getElementById('textbox-projektphase-detail-start').value='';
+	document.getElementById('textbox-projektphase-detail-ende').value='';
+	document.getElementById('textbox-projektphase-detail-budget').value='';
+	document.getElementById('textbox-projektphase-detail-personentage').value='';	
+}
+
+// ****
+// * Deaktiviert die Detailfelder
+// ****
+function ProjektphaseDetailDisable(val)
+{
+	document.getElementById('menulist-projektphase-detail-projektphase_fk').disabled=val;
+	document.getElementById('textbox-projektphase-detail-bezeichnung').disabled=val;
+	document.getElementById('textbox-projektphase-detail-beschreibung').disabled=val;
+	document.getElementById('textbox-projektphase-detail-start').disabled=val;
+	document.getElementById('textbox-projektphase-detail-ende').disabled=val;
+	document.getElementById('textbox-projektphase-detail-budget').disabled=val;
+	document.getElementById('textbox-projektphase-detail-personentage').disabled=val;
+	document.getElementById('button-projektphase-detail-speichern').disabled=val;
+}
+
+// ****
+// * Setzt die Felder fuer eine Neuanlage
+// ****
 function ProjektphaseNeu()
 {
-    // Trick 17	(sonst gibt's ein Permission denied)
+	var tree = document.getElementById('tree-projektphase');
+	tree.view.selection.clearSelection();
+	
+	ProjektphaseDetailReset();
+	ProjektphaseDetailDisable(false);
+	
     netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
+	//Projekt Kurzbz ermitteln
     var tree=document.getElementById('tree-projektmenue');
-    
     var projekt_kurzbz=getTreeCellText(tree, "treecol-projektmenue-projekt_kurzbz", tree.currentIndex);
-    window.open('<?php echo APP_ROOT; ?>content/projekt/projektphase.window.xul.php?projekt_kurzbz='+projekt_kurzbz,'Projektphase anlegen', 'height=384,width=512,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no');
-    //alert (oe);
+    
+    //Menulist fuer Parents laden und optionalen Eintrag markieren
+    var menulist = document.getElementById('menulist-projektphase-detail-projektphase_fk');
+    ProjektphaseFkLoad(menulist, projekt_kurzbz);
+    MenulistSelectItemOnValue('menulist-projektphase-detail-projektphase_fk', '');
+    
+    document.getElementById('textbox-projektphase-detail-projekt_kurzbz').value=projekt_kurzbz;
+    
+    //Neu Status setzen
+    document.getElementById('caption-projektphase-detail').label='Neue Phase';
+    document.getElementById('checkbox-projektphase-detail-neu').checked=true;
+    
+    //Detail Tab auswaehlen
+	document.getElementById('projektphase-tabs').selectedItem=document.getElementById('projektphase-tab-detail');	
+    
+}
+
+function ProjektphaseDelete()
+{
+	alert('noch nicht implementiert');
 }

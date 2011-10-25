@@ -286,6 +286,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				document.getAnonymousElementByAttribute(this ,'anonid', 'box-notiz-start').value='';
 				document.getAnonymousElementByAttribute(this ,'anonid', 'box-notiz-ende').value='';
 				document.getAnonymousElementByAttribute(this ,'anonid', 'menulist-notiz-bearbeiter').value='';
+				document.getAnonymousElementByAttribute(this ,'anonid', 'checkbox-notiz-erledigt').checked=false;
 			]]>
 			</body>
 		</method>
@@ -565,6 +566,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 						
 						var children = menulist.getElementsByAttribute('value',bearbeiter);
 						menulist.selectedItem=children[0];	
+					}
+					else
+					{
+						menulist = document.getAnonymousElementByAttribute(this ,'anonid', 'menulist-notiz-bearbeiter');
+						this.BearbeiterLoad(menulist, bearbeiter);
+						
+						var children = menulist.getElementsByAttribute('value',bearbeiter);
+						menulist.selectedItem=null;
 					}
 					document.getAnonymousElementByAttribute(this ,'anonid', 'caption-notiz-detail').label="Bearbeiten";
 
