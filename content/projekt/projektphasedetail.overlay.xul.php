@@ -43,85 +43,84 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			<label value="Neu"/>
 			<checkbox id="checkbox-projektphase-detail-neu" checked="true" />
 		</vbox>
-		<grid id="grid-projektphase-detail" style="overflow:auto;margin:4px;" flex="1">
-		  	<columns  >
-				<column flex="1"/>
-				<column flex="5"/>
-			</columns>
-			<rows>
-				<row>
-					<label value="Projektphase ID" control="textbox-projektphase-detail-projektphase_id "/>
-					<hbox>
-						<textbox id="textbox-projektphase-detail-projektphase_id" readonly="true" size="3"/>
-						<spacer />
-					</hbox>
-				</row>
-				<row>
-					<label value="Projekt Kurzbz" control="textbox-projektphase-detail-projekt_kurzbz"/>
-					<hbox>
-						<textbox id="textbox-projektphase-detail-projekt_kurzbz" size="16" maxlength="16" readonly="true"/>
-						<spacer />
-					</hbox>
-				</row>
-				<row>
-      				<label value="Projektphase FK" control="menulist-projektphase-detail-projektphase_fk"/>
-			      		<menulist id="menulist-projektphase-detail-projektphase_fk"
-				          datasources="rdf:null"
-				          ref="http://www.technikum-wien.at/projektphase" 
-				          oncommand=""
-				         >
-							<template>
-									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/projektphase/rdf#projektphase_id"
-						        			      label="rdf:http://www.technikum-wien.at/projektphase/rdf#bezeichnung"
-									  			  uri="rdf:*"/>
-									</menupopup>
-
-							</template>
-						</menulist>
-				</row>
-				<row>
-					<label value="Bezeichnung" control="textbox-projektphase-detail-bezeichnung"/>
-					<hbox>
-   						<textbox id="textbox-projektphase-detail-bezeichnung" maxlength="32" size="32"/>
-   						<spacer />
-   					</hbox>
-				</row>
-				<row>
-					<label value="Beschreibung" control="textbox-projektphase-detail-beschreibung"/>
-   					<textbox id="textbox-projektphase-detail-beschreibung" multiline="true"/>
-				</row>
-				<row>
-					<label value="Start" control="textbox-projektphase-detail-start"/>
-   					<box class="Datum" id="textbox-projektphase-detail-start"/>
-				</row>
-				<row>
-					<label value="Ende" control="textbox-projektphase-detail-ende"/>
-   					<box class="Datum" id="textbox-projektphase-detail-ende"/>
-				</row>
-				<row>
-					<label value="Budget" control="textbox-projektphase-detail-budget"/>
-					<hbox>
-   						<textbox id="textbox-projektphase-detail-budget" size="12" maxlength="13"/>
-   						<spacer />
-   					</hbox>
-				</row>
-				<row>
-					<label value="Personentage" control="textbox-projektphase-detail-personentage"/>
-					<hbox>
-   						<textbox id="textbox-projektphase-detail-personentage" size="4" maxlenght="5"/>
-   						<spacer />
-   					</hbox>
-				</row>
-			</rows>
-		</grid>
-		<hbox>
-			<spacer flex="1" />
-			<button id="button-projektphase-detail-speichern" oncommand="saveProjektphaseDetail()" label="Speichern" />
-		</hbox>
-	</vbox>
+		<groupbox flex="1">
+			<caption id="caption-projektphase-detail" label="Neue Phase"/>
+			<grid id="grid-projektphase-detail" style="overflow:auto;margin:4px;" flex="1">
+			  	<columns  >
+					<column flex="1"/>
+					<column flex="5"/>
+				</columns>
+				<rows>
+					<row>
+						<label value="Projektphase ID" control="textbox-projektphase-detail-projektphase_id "/>
+						<hbox>
+							<textbox id="textbox-projektphase-detail-projektphase_id" readonly="true" size="3"/>
+							<spacer />
+						</hbox>
+					</row>
+					<row>
+						<label value="Projekt Kurzbz" control="textbox-projektphase-detail-projekt_kurzbz"/>
+						<hbox>
+							<textbox id="textbox-projektphase-detail-projekt_kurzbz" size="16" maxlength="16" readonly="true"/>
+							<spacer />
+						</hbox>
+					</row>
+					<row>
+	      				<label value="Übergeordnete Projektphase" control="menulist-projektphase-detail-projektphase_fk"/>
+				      		<menulist id="menulist-projektphase-detail-projektphase_fk"
+					          datasources="rdf:null"
+					          ref="http://www.technikum-wien.at/projektphase" 
+					          disabled="true"
+					         >
+								<template>
+										<menupopup>
+											<menuitem value="rdf:http://www.technikum-wien.at/projektphase/rdf#projektphase_id"
+							        			      label="rdf:http://www.technikum-wien.at/projektphase/rdf#bezeichnung"
+										  			  uri="rdf:*"/>
+										</menupopup>
 	
-	<vbox id="projektphase-mantis" flex="1">
-	<description>asdf Details</description>
+								</template>
+							</menulist>
+					</row>
+					<row>
+						<label value="Bezeichnung" control="textbox-projektphase-detail-bezeichnung"/>
+						<hbox>
+	   						<textbox id="textbox-projektphase-detail-bezeichnung" maxlength="32" size="32" disabled="true"/>
+	   						<spacer />
+	   					</hbox>
+					</row>
+					<row>
+						<label value="Beschreibung" control="textbox-projektphase-detail-beschreibung"/>
+	   					<textbox id="textbox-projektphase-detail-beschreibung" multiline="true" disabled="true"/>
+					</row>
+					<row>
+						<label value="Start" control="textbox-projektphase-detail-start"/>
+	   					<box class="Datum" id="textbox-projektphase-detail-start" disabled="true"/>
+					</row>
+					<row>
+						<label value="Ende" control="textbox-projektphase-detail-ende"/>
+	   					<box class="Datum" id="textbox-projektphase-detail-ende" disabled="true"/>
+					</row>
+					<row>
+						<label value="Budget" control="textbox-projektphase-detail-budget"/>
+						<hbox>
+	   						<textbox id="textbox-projektphase-detail-budget" size="12" maxlength="13" disabled="true"/>
+	   						<spacer />
+	   					</hbox>
+					</row>
+					<row>
+						<label value="Personentage" control="textbox-projektphase-detail-personentage"/>
+						<hbox>
+	   						<textbox id="textbox-projektphase-detail-personentage" size="4" maxlenght="5" disabled="true"/>
+	   						<spacer />
+	   					</hbox>
+					</row>
+				</rows>
+			</grid>
+			<hbox>
+				<spacer flex="1" />
+				<button id="button-projektphase-detail-speichern" oncommand="saveProjektphaseDetail()" label="Speichern" disabled="true"/>
+			</hbox>
+		</groupbox>
 	</vbox>
 </overlay>

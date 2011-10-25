@@ -43,82 +43,85 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			<label value="Neu"/>
 			<checkbox id="checkbox-projekt-detail-neu" checked="true" />
 		</vbox>
-		<grid id="grid-projekt-detail" style="overflow:auto;margin:4px;" flex="1">
-		  	<columns  >
-				<column flex="1"/>
-				<column flex="5"/>
-			</columns>
-			<rows>
-				<row>
-					<label value="Projekt (KurzBz)" control="textbox-projekt-detail-projekt_kurzbz "/>
-					<hbox>
-						<textbox id="textbox-projekt-detail-projekt_kurzbz" size="16" maxlength="16" readonly="true"/>
-						<spacer />
-					</hbox>
-				</row>
-				<row>
-					<label value="OE (Organisationseinheit)" control="textbox-projekt-detail-oe_kurzbz"/>
-					<hbox>
-						<menulist id="menulist-projekt-detail-oe_kurzbz"
-								  xmlns:ORGANISATIONSEINHEIT="http://www.technikum-wien.at/organisationseinheit/rdf#"
-						          datasources="<?php echo APP_ROOT;?>rdf/organisationseinheit.rdf.php"
-						          ref="http://www.technikum-wien.at/organisationseinheit/liste" >
-							<template>
-								<rule ORGANISATIONSEINHEIT:aktiv='false'>
-									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/organisationseinheit/rdf#oe_kurzbz"
-							        		      label="rdf:http://www.technikum-wien.at/organisationseinheit/rdf#organisationseinheittyp_kurzbz rdf:http://www.technikum-wien.at/organisationseinheit/rdf#bezeichnung"
-										  		  uri="rdf:*" style="text-decoration:line-through;"/>
-										</menupopup>
-								</rule>
-								<rule>
-									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/organisationseinheit/rdf#oe_kurzbz"
-							        		      label="rdf:http://www.technikum-wien.at/organisationseinheit/rdf#organisationseinheittyp_kurzbz rdf:http://www.technikum-wien.at/organisationseinheit/rdf#bezeichnung"
-										  		  uri="rdf:*"/>
-										</menupopup>
-								</rule>
-							</template>
-						</menulist>
-						<spacer />
-					</hbox>
-				</row>
-				<row>
-					<label value="Titel" control="textbox-projekt-detail-titel"/>
-   					<textbox id="textbox-projekt-detail-titel" maxlength="256"/>
-				</row>
-				<row>
-					<label value="Nummer" control="textbox-projekt-detail-nummer"/>
-					<hbox>
-   						<textbox id="textbox-projekt-detail-nummer" maxlength="8"/>
-   						<spacer />
-   					</hbox>
-				</row>
-				<row>
-					<label value="Beschreibung" control="textbox-projekt-detail-beschreibung"/>
-   					<textbox id="textbox-projekt-detail-beschreibung" multiline="true"/>
-				</row>
-				<row>
-					<label value="Beginn" control="textbox-projekt-detail-beginn"/>
-   					<box class="Datum" id="textbox-projekt-detail-beginn"/>
-				</row>
-				<row>
-					<label value="Ende" control="textbox-projekt-detail-ende"/>
-   					<box class="Datum" id="textbox-projekt-detail-ende"/>
-				</row>
-				<row>
-					<label value="Budget" control="textbox-projekt-detail-budget"/>
-					<hbox>
-   						<textbox id="textbox-projekt-detail-budget" size="12" maxlength="13"/>
-   						<spacer />
-   					</hbox>
-				</row>
-			</rows>
-		</grid>
-		<hbox>
-			<spacer flex="1" />
-			<button id="button-projekt-detail-speichern" oncommand="saveProjektDetail()" label="Speichern" />
-		</hbox>
+		<groupbox flex="1">
+			<caption id="caption-projekt-detail" label="Neues Projekt"/>
+			<grid id="grid-projekt-detail" style="overflow:auto;margin:4px;" flex="1">
+			  	<columns  >
+					<column flex="1"/>
+					<column flex="5"/>
+				</columns>
+				<rows>
+					<row>
+						<label value="Projekt (KurzBz)" control="textbox-projekt-detail-projekt_kurzbz "/>
+						<hbox>
+							<textbox id="textbox-projekt-detail-projekt_kurzbz" size="16" maxlength="16" disabled="true"/>
+							<spacer />
+						</hbox>
+					</row>
+					<row>
+						<label value="OE (Organisationseinheit)" control="textbox-projekt-detail-oe_kurzbz"/>
+						<hbox>
+							<menulist id="menulist-projekt-detail-oe_kurzbz"  disabled="true"
+									  xmlns:ORGANISATIONSEINHEIT="http://www.technikum-wien.at/organisationseinheit/rdf#"
+							          datasources="<?php echo APP_ROOT;?>rdf/organisationseinheit.rdf.php"
+							          ref="http://www.technikum-wien.at/organisationseinheit/liste" >
+								<template>
+									<rule ORGANISATIONSEINHEIT:aktiv='false'>
+										<menupopup>
+											<menuitem value="rdf:http://www.technikum-wien.at/organisationseinheit/rdf#oe_kurzbz"
+								        		      label="rdf:http://www.technikum-wien.at/organisationseinheit/rdf#organisationseinheittyp_kurzbz rdf:http://www.technikum-wien.at/organisationseinheit/rdf#bezeichnung"
+											  		  uri="rdf:*" style="text-decoration:line-through;"/>
+											</menupopup>
+									</rule>
+									<rule>
+										<menupopup>
+											<menuitem value="rdf:http://www.technikum-wien.at/organisationseinheit/rdf#oe_kurzbz"
+								        		      label="rdf:http://www.technikum-wien.at/organisationseinheit/rdf#organisationseinheittyp_kurzbz rdf:http://www.technikum-wien.at/organisationseinheit/rdf#bezeichnung"
+											  		  uri="rdf:*"/>
+											</menupopup>
+									</rule>
+								</template>
+							</menulist>
+							<spacer />
+						</hbox>
+					</row>
+					<row>
+						<label value="Titel" control="textbox-projekt-detail-titel"/>
+	   					<textbox id="textbox-projekt-detail-titel" maxlength="256"  disabled="true"/>
+					</row>
+					<row>
+						<label value="Nummer" control="textbox-projekt-detail-nummer"/>
+						<hbox>
+	   						<textbox id="textbox-projekt-detail-nummer" maxlength="8"  disabled="true"/>
+	   						<spacer />
+	   					</hbox>
+					</row>
+					<row>
+						<label value="Beschreibung" control="textbox-projekt-detail-beschreibung"/>
+	   					<textbox id="textbox-projekt-detail-beschreibung" multiline="true"  disabled="true"/>
+					</row>
+					<row>
+						<label value="Beginn" control="textbox-projekt-detail-beginn"/>
+	   					<box class="Datum" id="textbox-projekt-detail-beginn"  disabled="true"/>
+					</row>
+					<row>
+						<label value="Ende" control="textbox-projekt-detail-ende"/>
+	   					<box class="Datum" id="textbox-projekt-detail-ende"  disabled="true"/>
+					</row>
+					<row>
+						<label value="Budget" control="textbox-projekt-detail-budget"/>
+						<hbox>
+	   						<textbox id="textbox-projekt-detail-budget" size="12" maxlength="13"  disabled="true"/>
+	   						<spacer />
+	   					</hbox>
+					</row>
+				</rows>
+			</grid>
+			<hbox>
+				<spacer flex="1" />
+				<button id="button-projekt-detail-speichern" oncommand="saveProjektDetail()" label="Speichern"  disabled="true"/>
+			</hbox>
+		</groupbox>
 	</vbox>
 
 </overlay>

@@ -83,6 +83,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektphasedetail.overlay
 				<splitter class="tree-splitter"/>
 				<treecol id="treecol-projektphase-beginn" label="Beginn" flex="2" hidden="false" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
+					sortActive="true"
+					sortDirection="ascending"
 					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#beginn_iso" />
 				<splitter class="tree-splitter"/>
 				<treecol id="treecol-projektphase-ende" label="Ende" flex="2" hidden="false" persist="hidden width ordinal"

@@ -39,79 +39,78 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	<!-- *  Projekttaskdetail   * -->
 	<!-- ************************ -->
 	<vbox id="box-projekttask-detail" flex="1">
-		<grid id="grid-projekttask-detail" style="overflow:auto;margin:4px;" flex="1">
-		  	<columns  >
-				<column flex="1"/>
-				<column flex="5"/>
-			</columns>
-			<rows>
-				<row>
-					<label value="Task ID" control="textbox-projekttask-detail-projekttask_id "/>
-					<hbox>
-						<textbox id="textbox-projekttaskdetail-projekttask_id" disabled="true" size="5"/>
-						<spacer />
-					</hbox>
-				</row>
-				<row>
-					<label value="Projektphase ID" control="textbox-projekttask-detail-projektphase_id"/>
-					<hbox>
-						<textbox id="textbox-projekttaskdetail-projektphase_id" size="3" disabled="true"/>
-						<spacer />
-					</hbox>
-				</row>
-				<row>
-					<label value="Bezeichnung" control="textbox-projekttask-detail-bezeichnung"/>
-   					<textbox id="textbox-projekttask-detail-bezeichnung"/>
-				</row>
-				<row>
-					<label value="Beschreibung" control="textbox-projekttask-detail-beschreibung"/>
-   					<textbox id="textbox-projekttask-detail-beschreibung" multiline="true"/>
-				</row>
-				<row>
-					<label value="Aufwand" control="textbox-projekttask-detail-aufwand"/>
-					<hbox>
-   						<textbox id="textbox-projekttask-detail-aufwand" size="5" maxlength="5"/>
-   						<spacer />
-   					</hbox>
-				</row>
-				<row>
-					<label value="MantisID" control="textbox-projekttask-detail-mantis_id"/>
-					<hbox>
-   						<textbox id="textbox-projekttask-detail-mantis_id" size="5" maxlength="5"/>
-   						<spacer />
-   					</hbox>
-				</row>
-				<row>
-      				<label value="Ressource" control="textbox-projekttask-detail-ressource"/>
-			      		<menulist id="textbox-projekttask-detail-ressource"
-				          datasources="rdf:null"
-				          xmlns:RESSOURCE="http://www.technikum-wien.at/ressource/rdf#"
-				          ref="http://www.technikum-wien.at/ressource/alle" 
-				          oncommand=""
-				         >
-							<template>
-
-									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/ressource/rdf#ressource_id"
-						        			      label="rdf:http://www.technikum-wien.at/ressource/rdf#bezeichnung ( rdf:http://www.technikum-wien.at/ressource/rdf#typ )"
-									  			  uri="rdf:*"/>
-									</menupopup>
-							</template>
-						</menulist>
-				</row>
-				<row>
-					<label value="Ende" control="textbox-projekttask-detail-ende"/>
-   					<box class="Datum" id="textbox-projekttask-detail-ende"/>
-				</row>
-			</rows>
-		</grid>
-		<hbox>
-			<spacer flex="1" />
-			<button id="button-projekttask-detail-speichern" oncommand="saveProjekttaskDetail()" label="Speichern" />
-		</hbox>
-	</vbox>
+		<groupbox flex="1">
+			<caption id="caption-projekttask-detail" label="Neuer Task"/>
+			<grid id="grid-projekttask-detail" style="overflow:auto;margin:4px;" flex="1">
+			  	<columns  >
+					<column flex="1"/>
+					<column flex="5"/>
+				</columns>
+				<rows>
+					<row>
+						<label value="Task ID" control="textbox-projekttask-detail-projekttask_id "/>
+						<hbox>
+							<textbox id="textbox-projekttaskdetail-projekttask_id" disabled="true" size="5"/>
+							<spacer />
+						</hbox>
+					</row>
+					<row>
+						<label value="Projektphase ID" control="textbox-projekttask-detail-projektphase_id"/>
+						<hbox>
+							<textbox id="textbox-projekttaskdetail-projektphase_id" size="3" disabled="true"/>
+							<spacer />
+						</hbox>
+					</row>
+					<row>
+						<label value="Bezeichnung" control="textbox-projekttask-detail-bezeichnung"/>
+	   					<textbox id="textbox-projekttask-detail-bezeichnung" disabled="true"/>
+					</row>
+					<row>
+						<label value="Beschreibung" control="textbox-projekttask-detail-beschreibung"/>
+	   					<textbox id="textbox-projekttask-detail-beschreibung" multiline="true" disabled="true"/>
+					</row>
+					<row>
+						<label value="Aufwand" control="textbox-projekttask-detail-aufwand"/>
+						<hbox>
+	   						<textbox id="textbox-projekttask-detail-aufwand" size="5" maxlength="5" disabled="true"/>
+	   						<spacer />
+	   					</hbox>
+					</row>
+					<row>
+						<label value="MantisID" control="textbox-projekttask-detail-mantis_id"/>
+						<hbox>
+	   						<textbox id="textbox-projekttask-detail-mantis_id" size="5" maxlength="5" disabled="true"/>
+	   						<spacer />
+	   					</hbox>
+					</row>
+					<row>
+	      				<label value="Ressource" control="textbox-projekttask-detail-ressource"/>
+				      		<menulist id="textbox-projekttask-detail-ressource"
+					          datasources="rdf:null"
+					          xmlns:RESSOURCE="http://www.technikum-wien.at/ressource/rdf#"
+					          ref="http://www.technikum-wien.at/ressource/alle" 
+					          disabled="true"
+					         >
+								<template>
 	
-	<vbox id="projekttask-mantis" flex="1">
-	<description>Mantis Details</description>
+										<menupopup>
+											<menuitem value="rdf:http://www.technikum-wien.at/ressource/rdf#ressource_id"
+							        			      label="rdf:http://www.technikum-wien.at/ressource/rdf#bezeichnung ( rdf:http://www.technikum-wien.at/ressource/rdf#typ )"
+										  			  uri="rdf:*"/>
+										</menupopup>
+								</template>
+							</menulist>
+					</row>
+					<row>
+						<label value="Ende" control="textbox-projekttask-detail-ende"/>
+	   					<box class="Datum" id="textbox-projekttask-detail-ende" disabled="true"/>
+					</row>
+				</rows>
+			</grid>
+			<hbox>
+				<spacer flex="1" />
+				<button id="button-projekttask-detail-speichern" oncommand="saveProjekttaskDetail()" label="Speichern" disabled="true"/>
+			</hbox>
+		</groupbox>
 	</vbox>
 </overlay>

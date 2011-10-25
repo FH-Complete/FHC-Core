@@ -127,6 +127,8 @@ function TaskTreeRefresh()
 // ****
 function TaskNeu()
 {
+	var tasktree=document.getElementById('projekttask-tree');
+	tasktree.view.selection.clearSelection();
 	tree = document.getElementById('tree-projektmenue');
 	
 	//Projektphase_id holen
@@ -139,8 +141,13 @@ function TaskNeu()
 	}
 	//Details zuruecksetzen
 	TaskDetailReset();
+	TaskDisableFields(false);
 			
 	document.getElementById('textbox-projekttaskdetail-projektphase_id').value=projektphase_id;
+	document.getElementById('caption-projekttask-detail').label='Neuer Task';
+	
+	//Detail Tab auswaehlen
+	document.getElementById('projekttask-tabs').selectedItem=document.getElementById('projekttask-tab-detail');	
 }
 // ****
 // * Selectiert die Lektorzuordnung nachdem der Tree
@@ -238,6 +245,8 @@ function TaskDetailReset()
 	document.getElementById('textbox-projekttask-detail-beschreibung').value='';
 	document.getElementById('textbox-projekttask-detail-aufwand').value='';
 	document.getElementById('textbox-projekttask-detail-mantis_id').value='';
+	MenulistSelectItemOnValue('textbox-projekttask-detail-ressource', '');
+	document.getElementById('textbox-projekttask-detail-ende').value='';
 }
 
 // ****
@@ -245,37 +254,16 @@ function TaskDetailReset()
 // ****
 function TaskDisableFields(val)
 {
-	document.getElementById('textbox-projekttaskdetail-projekttask_id').disabled=val;
-	document.getElementById('textbox-projekttaskdetail-projektphase_id').disabled=val;
+	//document.getElementById('textbox-projekttaskdetail-projekttask_id').disabled=val;
+	//document.getElementById('textbox-projekttaskdetail-projektphase_id').disabled=val;
 	document.getElementById('textbox-projekttask-detail-bezeichnung').disabled=val;
 	document.getElementById('textbox-projekttask-detail-beschreibung').disabled=val;
 	document.getElementById('textbox-projekttask-detail-aufwand').disabled=val;
 	document.getElementById('textbox-projekttask-detail-mantis_id').disabled=val;
+	document.getElementById('textbox-projekttask-detail-ressource').disabled=val;
+	document.getElementById('textbox-projekttask-detail-ende').disabled=val;
+	document.getElementById('button-projekttask-detail-speichern').disabled=val;
 }
-
-
-// ****
-// * Liefert den value eines Editierbaren DropDowns
-// * @param id = ID der Menulist
-// ****
-function MenulistGetSelectedValue(id)
-{
-	menulist = document.getElementById(id);
-	
-	//Es kann sein, dass im Eingabefeld nichts steht und
-	//trotzdem ein Eintrag auf selected gesetzt ist.
-	//In diesem Fall soll aber kein Wert zurueckgegeben werden
-	if(menulist.value=='')
-		return '';
-	
-	//Wenn es Selektierte Eintraege gibt, dann den value zurueckliefern
-	var children = menulist.getElementsByAttribute('selected','true');
-	if(children.length>0)
-		return children[0].value;
-	else
-		return '';
-}
-
 
 // ****
 // * Speichert die Details
@@ -362,6 +350,8 @@ function onselectProjekttask()
                 //Task wurde markiert
                 //Loeschen Button aktivieren
                 document.getElementById('projekttask-toolbar-del').disabled=false;
+                document.getElementById('caption-projekttask-detail').label='Bearbeiten';
+                TaskDisableFields(false);
             }
             else
             {
