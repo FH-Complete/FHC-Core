@@ -123,6 +123,8 @@ $worksheet->write($zeile,++$spalte,'Org.',$format_bold);
 $maxlength[$spalte]=5;
 $worksheet->write($zeile,++$spalte,'Datum',$format_bold);
 $maxlength[$spalte]=5;
+$worksheet->write($zeile,++$spalte,'Letzte Inventur',$format_bold);
+$maxlength[$spalte]=15;
 $worksheet->write($zeile,++$spalte,'Leasing Bis',$format_bold);
 $maxlength[$spalte]=11;
 $worksheet->write($zeile,++$spalte,'Anschaffungsdatum',$format_bold);
@@ -166,6 +168,7 @@ for ($pos=0;$pos<count($resultBetriebsmittel);$pos++)
 	InsertCell($zeile,++$spalte,$resultBetriebsmittel[$pos]->bestellnr);
 	InsertCell($zeile,++$spalte,$oOrganisationseinheit->bezeichnung?$oOrganisationseinheit->bezeichnung:$resultBetriebsmittel[$pos]->oe_kurzbz);
 	InsertCell($zeile,++$spalte,$datum_obj->formatDatum($resultBetriebsmittel[$pos]->betriebsmittelstatus_datum,'d.m.Y'),$format_date);
+	InsertCell($zeile,++$spalte,$datum_obj->formatDatum($resultBetriebsmittel[$pos]->inventuramum,'d.m.Y'),$format_date);
 	InsertCell($zeile,++$spalte,$datum_obj->formatDatum($resultBetriebsmittel[$pos]->leasing_bis,'d.m.Y'),$format_date);
 			
 	InsertCell($zeile,++$spalte,$datum_obj->formatDatum($resultBetriebsmittel[$pos]->anschaffungsdatum,'d.m.Y'),$format_date);
