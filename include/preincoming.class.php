@@ -64,7 +64,9 @@ class preincoming extends basis_db
 	public $person_id_emergency; 
 	public $person_id_coordinator_dep; 
 	public $person_id_coordinator_int; 
-	
+	public $research_area;
+	public $deutschkurs1;
+	public $deutschkurs2;
 
 	/**
 	 * Konstruktor
@@ -137,6 +139,9 @@ class preincoming extends basis_db
 			$this->person_id_emergency = $row->person_id_emergency; 
 			$this->person_id_coordinator_dep = $row->person_id_coordinator_dep; 
 			$this->person_id_coordinator_int = $row->person_id_coordinator_int; 
+			$this->deutschkurs1 = ($row->deutschkurs1=='t'?true:false);
+			$this->deutschkurs2 = ($row->deutschkurs2=='t'?true:false);
+			$this->research_area = $row->research_area; 
 		}
 		else
 		{
@@ -196,7 +201,10 @@ class preincoming extends basis_db
 				$obj->person_id_emergency = $row->person_id_emergency; 
 				$obj->person_id_coordinator_dep = $row->person_id_coordinator_dep; 
 				$obj->person_id_coordinator_int = $row->person_id_coordinator_int; 
-				
+				$obj->deutschkurs1 = ($row->deutschkurs1=='t'?true:false);
+				$obj->deutschkurs2 = ($row->deutschkurs2=='t'?true:false);
+				$obj->research_area = $row->research_area; 
+			
 				$this->result[] = $obj;
 			}
 			return true;
@@ -251,7 +259,8 @@ class preincoming extends basis_db
 					firma_id, anmerkung, universitaet, aktiv, bachelorthesis, masterthesis, 
 					von, bis, code, uebernommen, insertamum, insertvon, updateamum, updatevon,
 					zgv, zgv_ort, zgv_datum, zgv_name, zgvmaster, zgvmaster_name, zgvmaster_datum, zgvmaster_ort, program_name,
-					bachelor, master, jahre, person_id_emergency, person_id_coordinator_dep, person_id_coordinator_int)
+					bachelor, master, jahre, person_id_emergency, person_id_coordinator_dep, person_id_coordinator_int,
+					deutschkurs1, deutschkurs2, research_area)
 				  VALUES('.
 			      $this->addslashes($this->person_id).', '.
 			      $this->addslashes($this->mobilitaetsprogramm_code).', '.
@@ -282,7 +291,10 @@ class preincoming extends basis_db
 				  $this->addslashes($this->jahre).', '.
 				  $this->addslashes($this->person_id_emergency).', '.
 				  $this->addslashes($this->person_id_coordinator_dep).', '.
-				  $this->addslashes($this->person_id_coordinator_int).');';  		      
+				  $this->addslashes($this->person_id_coordinator_int).', '.
+				  ($this->deutschkurs1?'true':'false').', '.
+				  ($this->deutschkurs2?'true':'false').', '.
+				  $this->addslashes($this->research_area).' );';  		      
 		}
 		else
 		{
@@ -323,7 +335,10 @@ class preincoming extends basis_db
 				' jahre='.$this->addslashes($this->jahre).', '.
 				' person_id_emergency='.$this->addslashes($this->person_id_emergency).', '.
 				' person_id_coordinator_dep='.$this->addslashes($this->person_id_coordinator_dep).', '.
-				' person_id_coordinator_int='.$this->addslashes($this->person_id_coordinator_int).  	
+				' person_id_coordinator_int='.$this->addslashes($this->person_id_coordinator_int).', '.
+				' deutschkurs1='.($this->deutschkurs1?'true':'false').', '.
+				' deutschkurs2='.($this->deutschkurs2?'true':'false').', '.
+				' research_area='.$this->addslashes($this->research_area).' '.  	
 		      	' WHERE preincoming_id='.$this->preincoming_id.';';
 		}
 		
@@ -576,21 +591,25 @@ class preincoming extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				
-				$this->zgv = $row->zgv; 
-				$this->zgv_ort = $row->zgv_ort; 
-				$this->zgv_datum = $row->zgv_datum; 
-				$this->zgv_name = $row->zgv_name; 
-				$this->zgvmaster = $row->zgvmaster; 
-				$this->zgvmaster_name = $row->zgvmaster_name; 
-				$this->zgvmaster_datum = $row->zgvmaster_datum; 
-				$this->zgvmaster_ort = $row->zgvmaster_ort; 
-				$this->program_name = $row->program_name; 
-				$this->bachelor = ($row->bachelor=='t'?true:false);
-				$this->master = ($row->master=='t'?true:false);
-				$this->jahre = $row->jahre; 
-				$this->person_id_emergency = $row->person_id_emergency; 
-				$this->person_id_coordinator_dep = $row->person_id_coordinator_dep; 
-				$this->person_id_coordinator_int = $row->person_id_coordinator_int; 
+				$obj->zgv = $row->zgv; 
+				$obj->zgv_ort = $row->zgv_ort; 
+				$obj->zgv_datum = $row->zgv_datum; 
+				$obj->zgv_name = $row->zgv_name; 
+				$obj->zgvmaster = $row->zgvmaster; 
+				$obj->zgvmaster_name = $row->zgvmaster_name; 
+				$obj->zgvmaster_datum = $row->zgvmaster_datum; 
+				$obj->zgvmaster_ort = $row->zgvmaster_ort; 
+				$obj->program_name = $row->program_name; 
+				$obj->bachelor = ($row->bachelor=='t'?true:false);
+				$obj->master = ($row->master=='t'?true:false);
+				$obj->jahre = $row->jahre; 
+				$obj->person_id_emergency = $row->person_id_emergency; 
+				$obj->person_id_coordinator_dep = $row->person_id_coordinator_dep; 
+				$obj->person_id_coordinator_int = $row->person_id_coordinator_int;
+				 
+				$obj->deutschkurs1 = ($row->deutschkurs1=='t'?true:false);
+				$obj->deutschkurs2 = ($row->deutschkurs2=='t'?true:false);
+				$obj->research_area = $row->research_area;
 				
 				$obj->vorname = $row->vorname;
 				$obj->nachname = $row->nachname;

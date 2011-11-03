@@ -46,4 +46,15 @@ $this->phrasen['incoming/nation']='Nation';
 $this->phrasen['incoming/hauptmenue']='Hauptmenü';
 $this->phrasen['incoming/welcomeToUAS']='Willkommen bei der Online Registrierung für Incomingstudierende an der Fachhochschule Technikum Wien!';
 $this->phrasen['incoming/registration']='Registration';
+$this->phrasen['incoming/ects']='ECTS';
+$this->phrasen['incoming/dokumenttyp']='Typ';
+$this->phrasen['incoming/fileupload']='Neue Datei hochladen';
+$this->phrasen['incoming/deutschkurse']='Deutschkurse';
+$this->phrasen['incoming/deutschkurs1']='Deutsch für Anfänger';
+$this->phrasen['incoming/deutschkurs2']='Deutsch Intensivkurs';
+$this->phrasen['incoming/thesis']='Projektarbeiten';
+$this->phrasen['incoming/nothesis']='keine Projektarbeit';
+$this->phrasen['incoming/masterthesis']='Master Thesis';
+$this->phrasen['incoming/bachelorthesis']='Bachelor Thesis';
+$this->phrasen['incoming/researcharea']='Gebiet';
 ?>

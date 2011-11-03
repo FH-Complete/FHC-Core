@@ -46,4 +46,15 @@ $this->phrasen['incoming/nation']='Country';
 $this->phrasen['incoming/hauptmenue']='Main Menu';
 $this->phrasen['incoming/welcomeToUAS']='Welcome at the Online Registration Platform for Incoming Students at UAS Technikum Wien!';
 $this->phrasen['incoming/registration']='Registration';
+$this->phrasen['incoming/ects']='ECTS';
+$this->phrasen['incoming/dokumenttyp']='Type';
+$this->phrasen['incoming/fileupload']='Upload new File';
+$this->phrasen['incoming/deutschkurse']='German Courses';
+$this->phrasen['incoming/deutschkurs1']='German for Beginners';
+$this->phrasen['incoming/deutschkurs2']='Advanced German';
+$this->phrasen['incoming/thesis']='[BA] [MA] Program (at UAS)';
+$this->phrasen['incoming/nothesis']='no Thesis';
+$this->phrasen['incoming/masterthesis']='Master Thesis';
+$this->phrasen['incoming/bachelorthesis']='Bachelor Thesis';
+$this->phrasen['incoming/researcharea']='Research Area';
 ?>

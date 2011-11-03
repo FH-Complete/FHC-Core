@@ -45,9 +45,10 @@
 				</fo:block-container>
 				<fo:block-container position="absolute" top="85mm" left="15mm">
 					<fo:table table-layout="fixed" border-collapse="collapse" border-width="0.2pt" border-style="solid">
-						<fo:table-column column-width="95mm"/>
-						<fo:table-column column-width="65mm"/>
+						<fo:table-column column-width="85mm"/>
+						<fo:table-column column-width="60mm"/>
 						<fo:table-column column-width="20mm"/>
+						<fo:table-column column-width="15mm"/>
 						<fo:table-body>
 							<fo:table-row line-height="14pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
@@ -63,6 +64,11 @@
 								<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
 									<fo:block font-size="10pt" font-weight="bold" content-width="20mm" text-align="center">
 										Semester
+										</fo:block>
+								</fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
+									<fo:block font-size="10pt" font-weight="bold" content-width="15mm" text-align="center">
+										ECTS
 										</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
@@ -103,7 +109,7 @@
 				</fo:block-container>
 				<fo:block-container position="absolute" top="250mm" left="159mm">
 					<fo:block line-height="10pt" font-family="arial" font-size="9pt">
-						<xsl:text>Institutinal Stamp</xsl:text>
+						<xsl:text>Institutional Stamp</xsl:text>
 					</fo:block>
 				</fo:block-container>
 			</fo:flow>
@@ -128,6 +134,12 @@
 				<fo:block font-size="10pt" content-width="20mm" text-align="center">
 					<xsl:text> </xsl:text>
 					<xsl:value-of select="semester"/>
+				</fo:block>
+			</fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
+				<fo:block font-size="10pt" content-width="15mm" text-align="center">
+					<xsl:text> </xsl:text>
+					<xsl:value-of select="ects"/>
 				</fo:block>
 			</fo:table-cell>
 		</fo:table-row>
