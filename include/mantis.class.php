@@ -153,7 +153,7 @@ class mantis extends basis_db
 		$this->issue_resolution->id = $result->resolution->id;	
 		$this->issue_resolution->name = $result->resolution->name;	
 		$this->issue_description = $result->description;	
-		$this->issue_attachments = $result->attachments;	
+		//$this->issue_attachments = $result->attachments;	
 		$this->issue_due_date = $result->due_date;	
 		$this->issue_steps_to_reproduce = (isset($result->steps_to_reproduce)?$result->steps_to_reproduce:'');
 		$this->issue_additional_information = (isset($result->additional_information)?$result->additional_information:'');
