@@ -217,6 +217,47 @@ function treeProjektmenueSelect()
 		document.getElementById('toolbarbutton-projektdokument-zuweisung').disabled=true;		
 	}
 	
+	
+	
+	
+// Bestellung laden
+	if(projekt_phase_id=='' && projekt_kurzbz!='')
+	{
+		try
+		{
+	        url = "<?php echo APP_ROOT; ?>rdf/bestellung.rdf.php?projektKurzbz="+projekt_kurzbz+"&"+gettimestamp();
+	        var treeDokument=document.getElementById('tree-bestellung');
+	
+	        //Alte DS entfernen
+			var oldDatasources = treeDokument.database.GetDataSources();
+			while(oldDatasources.hasMoreElements())
+	        {
+	        	treeDokument.database.RemoveDataSource(oldDatasources.getNext());
+			}
+	
+			try
+			{
+				datasourceTreeDokument.removeXMLSinkObserver(DokumentTreeSinkObserver);
+				treeDokument.builder.removeListener(DokumentTreeListener);
+			}
+	        catch(e)
+	        {}
+	                
+	        var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	        datasourceTreeDokument = rdfService.GetDataSource(url);
+	        datasourceTreeDokument.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	        datasourceTreeDokument.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	        treeDokument.database.AddDataSource(datasourceTreeDokument);
+	        datasourceTreeDokument.addXMLSinkObserver(DokumentTreeSinkObserver);
+	        treeDokument.builder.addListener(DokumentTreeListener);
+		}
+		catch(e)
+		{
+			debug("whoops Documents load failed with exception: "+e);
+		}
+	}
+
+
 	if(projekt_kurzbz!='')
 	{
 		//Neu Button bei Tasks aktivieren

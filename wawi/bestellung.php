@@ -40,6 +40,7 @@ require_once '../include/wawi_aufteilung.class.php';
 require_once '../include/wawi_bestellstatus.class.php';
 require_once '../include/wawi_zahlungstyp.class.php';
 require_once '../include/tags.class.php';
+require_once '../include/projekt.class.php';
 
 $aktion ='';
 $test = 0;			// Bestelldetail Anzahl
@@ -52,6 +53,14 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 $kst=new wawi_kostenstelle(); 
 $kst->loadArray($rechte->getKostenstelle($berechtigung_kurzbz),'bezeichnung'); 
+
+$projekt = new projekt(); 
+$projekt->getProjekteMitarbeiter($user);
+$projektZugeordnet = false; 
+
+// Abfrage ob dem user ein oder mehrere Projekte zugeordnet sind
+if(count($projekt->result) > 0)
+	$projektZugeordnet = true; 
 
 if(isset($_POST['getKonto']))
 {
@@ -885,8 +894,8 @@ if($_GET['method']=='update')
 		$bestellung_new = new wawi_bestellung(); 
 		$bestellung_new->load($bestellung_id);
 		$bestellung_new_brutto = $bestellung_new->getBrutto($bestellung_id);
-		$status = new wawi_bestellstatus(); 
-			
+		$status = new wawi_bestellstatus(); 		
+		
 		if(!$rechte->isberechtigt('wawi/bestellung',null, 'sui',$bestellung_old->kostenstelle_id)
 		&& !$rechte->isberechtigt('wawi/freigabe',null, 's',$bestellung_old->kostenstelle_id)
 		&& !$rechte->isberechtigt('wawi/freigabe_advanced'))
@@ -898,6 +907,7 @@ if($_GET['method']=='update')
 			// überprüfen wenn js fehlschlägt, nicht speichern
 			if(isset($_POST['filter_kst']) || isset($_POST['titel']))
 			{
+				
 				$aufteilung_anzahl = $_POST['anz_aufteilung'];
 				$bestellung_detail_anz = $_POST['detail_anz'];
 	
@@ -917,7 +927,13 @@ if($_GET['method']=='update')
 				$bestellung_new->updatevon = $user; 
 				$bestellung_new->zahlungstyp_kurzbz = $_POST['filter_zahlungstyp'];
 				$bestellung_new->kostenstelle_id = $_POST['filter_kst'];
-								
+
+				if(isset($_POST['filter_projekt']))
+				{
+					// Projekt zu Bestellung speichern
+					$bestellung_new->saveProjektToBestellung($bestellung_new->bestellung_id, $_REQUEST['filter_projekt']);
+				}
+				
 				// wenn sich kostenstelle geändert hat, neue bestellnummer generieren
 				if($bestellung_new->kostenstelle_id != $bestellung_old->kostenstelle_id && !$status->isStatiVorhanden($bestellung_id, 'Bestellung') ) 
 				{
@@ -1381,9 +1397,36 @@ if($_GET['method']=='update')
 	echo "	<td>Firma: </td>\n";
 	echo "	<td><input type='text' name='firmenname' id='firmenname' size='60' maxlength='256' value ='".$firma->name."'>\n";
 	echo "	<input type='hidden' name='firma_id' id='firma_id' size='5' maxlength='7' value ='".$bestellung->firma_id."'></td>\n";
-	echo "	<td>Kontaktperson:</td><td colspan='2'> <input type='text' name='besteller' id='besteller' size='30' maxlength='256' value ='".$besteller_vorname.' '.$besteller_nachname."'>\n";
-	echo "	<input type='hidden' name='besteller_uid' id='besteller_uid' size='5' maxlength='7' value ='".$bestellung->besteller_uid."'></td>\n"; 
+	echo "	<td>Kontaktperson:</td><td> <input type='text' name='besteller' id='besteller' size='30' maxlength='256' value ='".$besteller_vorname.' '.$besteller_nachname."'>\n";
+	echo "  <td>";
+	// wenn user projekt zugeordnet ist -> Projekt Drop Down anzeigen
+	$ProjektUser = new projekt(); 
+	$ProjektUser->getProjektFromBestellung($bestellung->bestellung_id);
+	$Bestellung_Projekt = false; // Projekt DropDown aus allen Projekten von eingeloggten User und dem der Bestellung -> true wenn Projekt aus Bestellung in User Projekten enthalten ist
+	if($projektZugeordnet == true)
+	{	
+		echo " Projekt:";
+		echo "  <SELECT name='filter_projekt' id='filter_projekt' style='width: 230px;'>\n"; 
+		echo "   <option value=''>-- Kein Projekt ausgewählt --</option>";  
+		// Projekte vom User
+		foreach ($projekt->result as $userProjekts)
+		{
+			$selected = "";
+			if($ProjektUser->projekt_kurzbz == $userProjekts->projekt_kurzbz)
+			{
+				$selected = 'selected';
+				$Bestellung_Projekt = true; 
+			}
+				echo "    <option value='".$userProjekts->projekt_kurzbz."' $selected>".$userProjekts->titel."</option>";
+		}
+		// Projekt von der Bestellung
+		if($Bestellung_Projekt == false && $ProjektUser->projekt_kurzbz != '')
+			echo "    <option value='".$ProjektUser->projekt_kurzbz."' selected>".$ProjektUser->titel."</option>"; 
+		echo "</select>";
+	}
 	
+	echo "	<input type='hidden' name='besteller_uid' id='besteller_uid' size='5' maxlength='7' value ='".$bestellung->besteller_uid."'></td>\n"; 
+	echo "</td>";
 	echo "</tr>\n"; 
 	echo "<tr>\n"; 	
 	$disabled = '';

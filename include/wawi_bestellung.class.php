@@ -971,6 +971,69 @@ class wawi_bestellung extends basis_db
 		} 
 		return false; 
 	}
+		
+	/**
+	 * 
+	 * speichert / loescht ein Projekt zu einer Bestellung
+	 * @param $bestellungID
+	 * @param $projektKurzbz
+	 */
+	public function saveProjektToBestellung($bestellungID, $projektKurzbz)
+	{
+		// Wenn keine ProjektKurzbz übergeben wurde Lösche die Zuteilung
+		if($projektKurzbz == '')
+		{
+			$qry = "DELETE FROM wawi.tbl_projekt_bestellung WHERE bestellung_id = '".addslashes($bestellungID)."';";
+			if($this->db_query($qry))
+			{
+				return true; 
+			}
+			else 
+			{
+				$this->errormsg = "Fehler beim Löschen der Zuordnung: Projekt zu Bestellung aufgetreten.";
+				return false; 
+			}		
+		}
+		else 
+		{
+			$qry1 = "SELECT 1 FROM wawi.tbl_projekt_bestellung WHERE bestellung_id = '".addslashes($bestellungID)."';";
+	
+			if($this->db_query($qry1))
+			{
+				if($row = $this->db_fetch_object())
+				{
+					// es gibt eine Zuordnung -> UPDATE
+					$qry ="UPDATE wawi.tbl_projekt_bestellung SET projekt_kurzbz = '".addslashes($projektKurzbz)."' 
+					WHERE bestellung_id = '".addslashes($bestellungID)."';";
+			
+					if($this->db_query($qry))
+					{
+						return true; 
+					}
+					else 
+					{
+						$this->errormsg = "Fehler beim Zuordnen: Bestellung zu Projekt aufgetreten.";
+						return false; 
+					}			
+				}
+				else
+				{
+					// gibt noch keine Zuordnung -> INSERT
+					$qry ="INSERT INTO wawi.tbl_projekt_bestellung (projekt_kurzbz, bestellung_id, anteil) VALUES ('".addslashes($projektKurzbz)."', '".addslashes($bestellungID)."', '100');";
+			
+					if($this->db_query($qry))
+					{
+						return true; 
+					}
+					else 
+					{
+						$this->errormsg = "Fehler beim Zuordnen: Bestellung zu Projekt aufgetreten.";
+						return false; 
+					}
+				}
+			}
+		}
+	}
 	
 	/**
 	 * 
