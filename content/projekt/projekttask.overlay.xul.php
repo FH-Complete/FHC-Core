@@ -68,7 +68,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/mantisdetail.overlay.xul.p
 				onclick="ProjekttaskUpdateErledigt(event);"
  				persist="height"
  				context="projekttask-tree-popup"
- 				editable="true"
+ 				flags="dont-build-content"
 		>
 			<treecols>
 				<treecol id="projekttask-treecol-bezeichnung" label="Bezeichnung" flex="5" hidden="false" primary="true" persist="hidden, width, ordinal"
@@ -96,7 +96,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/mantisdetail.overlay.xul.p
 					sort="rdf:http://www.technikum-wien.at/projekttask/rdf#mantis_id" />
 				<splitter class="tree-splitter"/>
 				<treecol id="projekttask-treecol-erledigt" label="Erledigt" flex="2" hidden="false" persist="hidden, width, ordinal"
-					class="sortDirectionIndicator" editable="true" type="checkbox"
+					class="sortDirectionIndicator" type="checkbox"
 					sort="rdf:http://www.technikum-wien.at/projekttask/rdf#erledigt" />
 				<splitter class="tree-splitter"/>
 			</treecols>
