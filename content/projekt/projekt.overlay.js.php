@@ -151,7 +151,8 @@ function onselectProjekt()
     //Daten den Feldern zuweisen
 
     document.getElementById('textbox-projekt-detail-projekt_kurzbz').value=projekt_kurzbz;
-    document.getElementById('menulist-projekt-detail-oe_kurzbz').value=oe_kurzbz;
+    //document.getElementById('menulist-projekt-detail-oe_kurzbz').value=oe_kurzbz;
+    MenulistSelectItemOnValue('menulist-projekt-detail-oe_kurzbz', oe_kurzbz);
     document.getElementById('textbox-projekt-detail-titel').value=titel;
     document.getElementById('textbox-projekt-detail-beschreibung').value=beschreibung;
     document.getElementById('textbox-projekt-detail-nummer').value=nummer;
@@ -178,7 +179,8 @@ function saveProjektDetail()
 
 	//Werte holen
 	projekt_kurzbz = document.getElementById('textbox-projekt-detail-projekt_kurzbz').value;
-	oe_kurzbz = document.getElementById('menulist-projekt-detail-oe_kurzbz').value;
+	//oe_kurzbz = document.getElementById('menulist-projekt-detail-oe_kurzbz').value;
+	oe_kurzbz = MenulistGetSelectedValue('menulist-projekt-detail-oe_kurzbz'); 
 	titel = document.getElementById('textbox-projekt-detail-titel').value;
 	beschreibung = document.getElementById('textbox-projekt-detail-beschreibung').value;
 	nummer = document.getElementById('textbox-projekt-detail-nummer').value;
