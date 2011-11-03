@@ -58,48 +58,48 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			datasources="rdf:null" ref="http://www.technikum-wien.at/notiz/liste"
 			onclick="document.getBindingParent(this).updateErledigt(event);"
 			onselect="document.getBindingParent(this).edit(event);"
-			editable="true"
+			flags="dont-build-content"
 			>
 			
 			<xul:treecols>
 			    <xul:treecol anonid="treecol-notiz-titel" label="Titel" flex="5" primary="true" persist="hidden width ordinal"
-					class="sortDirectionIndicator" editable="false" sortActive="true"
+					class="sortDirectionIndicator" sortActive="true"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#titel"  />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-text" label="Text" flex="2" hidden="false" persist="hidden width ordinal"
-					class="sortDirectionIndicator" editable="false" 
+					class="sortDirectionIndicator"  
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#text" />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-verfasser" label="Verfasser" flex="2" hidden="false" persist="hidden width ordinal"
-					class="sortDirectionIndicator" editable="false"
+					class="sortDirectionIndicator" 
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#verfasser_uid" />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-bearbeiter" label="Bearbeiter" flex="2" hidden="true" persist="hidden width ordinal"
-					class="sortDirectionIndicator" editable="false"
+					class="sortDirectionIndicator" 
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#bearbeiter_uid" />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-start" label="Start" flex="2" hidden="false" persist="hidden width ordinal"
-					class="sortDirectionIndicator" editable="false"
+					class="sortDirectionIndicator" 
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#startISO" />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-ende" label="Ende" flex="2" hidden="false" persist="hidden width ordinal"
-					class="sortDirectionIndicator" editable="false"
+					class="sortDirectionIndicator" 
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#endeISO" />
 			    <xul:splitter class="tree-splitter"/>
 				<xul:treecol anonid="treecol-notiz-erledigt" label="Erledigt" flex="2" hidden="false" persist="hidden width ordinal"
-					class="sortDirectionIndicator" type="checkbox" editable="true"
+					class="sortDirectionIndicator" type="checkbox"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#erledigt_boolean" />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-notiz_id" label="NotizID" flex="2" hidden="true" persist="hidden width ordinal"
-					class="sortDirectionIndicator" editable="false"
+					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#notiz_id" />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-startISO" label="StartISO" flex="2" hidden="true" persist="hidden width ordinal"
-					class="sortDirectionIndicator" editable="false"
+					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#startISO" />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-notiz-ende" label="EndeISO" flex="2" hidden="true" persist="hidden width ordinal"
-					class="sortDirectionIndicator" editable="false"
+					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#endeISO" />
 			</xul:treecols>
 		
@@ -486,21 +486,28 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			    
 				var val = tree.view.getCellValue(row.value, col.value);
 				var text = tree.view.getCellText(row.value, col.value);
+				var newval='false';
+				if(val=='true')
+					newval='false';
+				else
+					newval='true';
 				
-				var col = tree.columns.getColumnFor(document.getAnonymousElementByAttribute(this ,'anonid', 'treecol-notiz-notiz_id'));
-				var id = tree.view.getCellText(row.value, col);
+				var col_id = tree.columns.getColumnFor(document.getAnonymousElementByAttribute(this ,'anonid', 'treecol-notiz-notiz_id'));
+				var id = tree.view.getCellText(row.value, col_id);
 				document.getAnonymousElementByAttribute(this ,'anonid', 'toolbarbutton-notiz-del').disabled=false; 
 				
 				if(text=='erledigt')
 				{
 					var soapBody = new SOAPObject("setErledigt");
 				    soapBody.appendChild(new SOAPObject("notiz_id")).val(id);
-				    soapBody.appendChild(new SOAPObject("erledigt")).val(val);
+				    soapBody.appendChild(new SOAPObject("erledigt")).val(newval);
 
 				    var sr = new SOAPRequest("setErledigt",soapBody);
 				    SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/notiz.soap.php?"+gettimestamp();
-				    				    
-				    SOAPClient.SendRequest(sr,function (respObj) {
+				    
+				    function mycallb(obj) {
+					  var me=obj;
+					  this.invoke=function (respObj) {
 					    try
 						{
 							var id = respObj.Body[0].setErledigtResponse[0].message[0].Text;
@@ -511,7 +518,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 							alert('Fehler: '+fehler);
 							return;
 						}
-					  });
+						me.RefreshNotiz();
+					  }
+					}
+					
+					var cb=new mycallb(this);
+				
+				    SOAPClient.SendRequest(sr,cb.invoke);
 				}
 			]]>
 			</body>

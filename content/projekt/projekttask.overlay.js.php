@@ -645,11 +645,16 @@ function ProjekttaskUpdateErledigt(event)
 
 	if(text=='erledigt')
 	{
+		if(val=='true')
+			newval='false';
+		else
+			newval='true';
+		
 		var soapBody = new SOAPObject("setErledigt");
 		//soapBody.appendChild(new SOAPObject("username")).val('joe');
 		//soapBody.appendChild(new SOAPObject("passwort")).val('waschl');
 	    soapBody.appendChild(new SOAPObject("projekttask_id")).val(id);
-	    soapBody.appendChild(new SOAPObject("erledigt")).val(val);
+	    soapBody.appendChild(new SOAPObject("erledigt")).val(newval);
 
 	    var sr = new SOAPRequest("setErledigt",soapBody);
 	    SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekttask.soap.php?"+gettimestamp();
@@ -659,6 +664,7 @@ function ProjekttaskUpdateErledigt(event)
 	    	try
 			{
 				var id = respObj.Body[0].setErledigtResponse[0].message[0].Text;
+				TaskTreeRefresh();
 			}
 			catch(e)
 			{
