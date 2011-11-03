@@ -2901,6 +2901,25 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_ampel"))
 	else 
 		echo 'public.tbl_ampel: Tabellen fuer Ampelsystem hinzugefuegt!<br>';
 }
+
+//public.tbl_preincoming
+if(!$result = @$db->db_query("SELECT research_area FROM public.tbl_preincoming LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_preincoming ADD COLUMN deutschkurs1 boolean;
+			ALTER TABLE public.tbl_preincoming ADD COLUMN deutschkurs2 boolean;
+			ALTER TABLE public.tbl_preincoming ADD COLUMN research_area text;
+			
+			GRANT USAGE ON SCHEMA fue TO wawi;
+			GRANT SELECT ON fue.tbl_ressource TO wawi;
+			GRANT SELECT ON fue.tbl_projekt_ressurce TO wawi;
+			";
+			
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_preincoming: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'public.tbl_preincoming: Spalten hinzugefuegt!<br>';
+}
+
 echo '<br>';
 
 $tabellen=array(
@@ -3035,7 +3054,7 @@ $tabellen=array(
 	"public.tbl_organisationseinheittyp" => array("organisationseinheittyp_kurzbz", "bezeichnung", "beschreibung"),
 	"public.tbl_person"  => array("person_id","staatsbuergerschaft","geburtsnation","sprache","anrede","titelpost","titelpre","nachname","vorname","vornamen","gebdatum","gebort","gebzeit","foto","anmerkung","homepage","svnr","ersatzkennzeichen","familienstand","geschlecht","anzahlkinder","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","bundesland_code","kompetenzen","kurzbeschreibung","zugangscode"),
 	"public.tbl_personfunktionstandort"  => array("personfunktionstandort_id","funktion_kurzbz","person_id","standort_id","position","anrede"),
-	"public.tbl_preincoming"  => array("preincoming_id","person_id","mobilitaetsprogramm_code","zweck_code","firma_id","universitaet","aktiv","bachelorthesis","masterthesis","von","bis","uebernommen","insertamum","insertvon","updateamum","updatevon","anmerkung","zgv","zgv_ort","zgv_datum","zgv_name","zgvmaster","zgvmaster_datum","zgvmaster_ort","zgvmaster_name","program_name","bachelor","master","jahre","person_id_emergency","person_id_coordinator_dep","person_id_coordinator_int","code"),
+	"public.tbl_preincoming"  => array("preincoming_id","person_id","mobilitaetsprogramm_code","zweck_code","firma_id","universitaet","aktiv","bachelorthesis","masterthesis","von","bis","uebernommen","insertamum","insertvon","updateamum","updatevon","anmerkung","zgv","zgv_ort","zgv_datum","zgv_name","zgvmaster","zgvmaster_datum","zgvmaster_ort","zgvmaster_name","program_name","bachelor","master","jahre","person_id_emergency","person_id_coordinator_dep","person_id_coordinator_int","code","deutschkurs1","deutschkurs2","research_area"),
 	"public.tbl_preincoming_lehrveranstaltung"  => array("preincoming_id","lehrveranstaltung_id","insertamum","insertvon"),
 	"public.tbl_preinteressent"  => array("preinteressent_id","person_id","studiensemester_kurzbz","firma_id","erfassungsdatum","einverstaendnis","absagedatum","anmerkung","maturajahr","infozusendung","aufmerksamdurch_kurzbz","kontaktmedium_kurzbz","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preinteressentstudiengang"  => array("studiengang_kz","preinteressent_id","freigabedatum","uebernahmedatum","prioritaet","insertamum","insertvon","updateamum","updatevon"),

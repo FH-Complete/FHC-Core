@@ -88,7 +88,7 @@ $firma->getFirmen('Partneruniversität');
 ?>
 <html>
 	<head>
-		<title>Incomming-Verwaltung</title>
+		<title>Incoming-Verwaltung</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link href="../../../include/js/tablesort/table.css" rel="stylesheet" type="text/css">
@@ -207,14 +207,61 @@ else if($method=="lehrveranstaltungen")
 				echo $p->t('global/fehleraufgetreten');  
 		}
 	}
+	if(isset($_GET['mode']) && $_GET['mode'] == "thesis")
+	{
+		switch($_GET['thesis'])
+		{
+			case 'bachelor':
+				$preincoming->bachelorthesis=true;
+				$preincoming->masterthesis=true;
+				$preincoming->research_area=$_GET['research_area'];
+				if(!$preincoming->save(false))
+					echo $preincoming->errormsg;
+				break;
+			case 'master':
+				$preincoming->bachelorthesis=false;
+				$preincoming->masterthesis=true;
+				$preincoming->research_area=$_GET['research_area'];
+				if(!$preincoming->save(false))
+					echo $preincoming->errormsg;
+				break;
+			case '':
+				$preincoming->bachelorthesis=false;
+				$preincoming->masterthesis=false;
+				$preincoming->research_area='';
+				if(!$preincoming->save(false))
+					echo $preincoming->errormsg;
+				break;
+		}
+	}
+	if(isset($_GET['type']))
+	{
+		if(isset($_GET['mode']) && $_GET['mode']=='add')
+		{
+			if($_GET['type']=='deutschkurs1')
+				$preincoming->deutschkurs1=true;
+			elseif($_GET['type']=='deutschkurs2')
+				$preincoming->deutschkurs2=true;
+			if(!$preincoming->save(false))
+				echo $preincoming->errormsg;
+		}
+		elseif(isset($_GET['mode']) && $_GET['mode']=='delete')
+		{
+			if($_GET['type']=='deutschkurs1')
+				$preincoming->deutschkurs1=false;
+			if($_GET['type']=='deutschkurs2')
+				$preincoming->deutschkurs2=false;
+			if(!$preincoming->save(false))
+				echo $preincoming->errormsg;
+		}
+	}
 	// Übersicht der eigenen LVs
 	if(isset($_GET['view']))
 	{
 		if($_GET['view']=="own")
 		{
 			$lvs = $preincoming->getLehrveranstaltungen($preincoming->preincoming_id); 
-			echo '<br><br><br> 
-
+			echo '<br><br><br>
 			<table border ="0" width="100%">
 				<tr>
 					<td width="25%"></td>
@@ -223,7 +270,41 @@ else if($method=="lehrveranstaltungen")
 					<td width="25%"></td>
 				</tr>
 				<tr><td>&nbsp;</td></tr>
-				</table>
+			</table>'; 
+
+			if($preincoming->deutschkurs1 || $preincoming->deutschkurs2)
+			{
+				//Uebersicht Deutschkurse
+				echo '<table width="90%" border="0" align="center" class="table-stripeclass:alternate table-autostripe">
+						<thead align="center">
+						<tr class="liste">
+							<th width="6%"></th>
+							<th>'.$p->t('incoming/deutschkurse').'</th>
+						</tr>
+						</thead>
+						<tbody>';
+						
+				//Deutschkurs1
+				if($preincoming->deutschkurs1)
+				{
+					echo '<tr>';
+					echo '<td> <a href="incoming.php?method=lehrveranstaltungen&mode=delete&type=deutschkurs1&view=own">'.$p->t('global/löschen').'</a></td>';
+					echo '<td>'.$p->t('incoming/deutschkurs1').'</td>';
+					echo '</tr>';
+				}
+				//Deutschkurs2
+				if($preincoming->deutschkurs2)
+				{
+					echo '<tr>';
+					echo '<td> <a href="incoming.php?method=lehrveranstaltungen&mode=delete&type=deutschkurs2&view=own">'.$p->t('global/löschen').'</a></td>';
+					echo '<td>'.$p->t('incoming/deutschkurs2').'</td>';
+					echo '</tr>';
+				}
+				echo '</tbody></table><br><br>';
+			}
+			
+			
+			echo '
 				<table width="90%" border="0" align="center" class="table-autosort:1 table-stripeclass:alternate table-autostripe">
 				<thead>
 				<tr class="liste">
@@ -269,9 +350,76 @@ else if($method=="lehrveranstaltungen")
 					<td width="25%" align="center"><input type="button" value="'.$p->t('incoming/hauptmenue').'" onclick="document.location.href = \'incoming.php\'";></td>
 				</tr>
 			</table> <br><br>';
+			
+		//Uebersicht Deutschkurse
+		echo '<table width="90%" border="0" align="center" class="table-stripeclass:alternate table-autostripe">
+				<thead align="center">
+				<tr class="liste">
+					<th colspan="2">'.$p->t('incoming/deutschkurse').'</th>
+				</tr>
+				</thead>
+				<tbody>';
+				
+		//Deutschkurs1
+		echo '<tr>';
+		if(!$preincoming->deutschkurs1)
+			echo '<td width="6%"><a href="incoming.php?method=lehrveranstaltungen&mode=add&type=deutschkurs1">'.$p->t('global/anmelden').'</a></td>';
+		else
+			echo '<td width="6%">'.$p->t('global/angemeldet').'</td>';
+		echo '<td>'.$p->t('incoming/deutschkurs1').'</td>';
+		echo '</tr>';
+		//Deutschkurs2
+		echo '<tr>';
+		if(!$preincoming->deutschkurs2)
+			echo '<td><a href="incoming.php?method=lehrveranstaltungen&mode=add&type=deutschkurs2">'.$p->t('global/anmelden').'</a></td>';
+		else
+			echo '<td>'.$p->t('global/angemeldet').'</td>';
+		echo '<td>'.$p->t('incoming/deutschkurs2').'</td>';
+		echo '</tr>';
+		echo '</tbody></table><br><br>';
 		
+		
+		echo '
+		<table width="90%" border="0" align="center" class="table-autosort:1 table-stripeclass:alternate table-autostripe">
+		<thead>
+			<tr class="liste">
+				<th>'.$p->t('incoming/thesis').'</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr valign="top">
+				<td>
+				<form action="incoming.php" method="GET">
+				<input type="hidden" name="mode" value="thesis" />
+				<input type="hidden" name="method" value="lehrveranstaltungen" />
+				<table>
+					<tr>
+						<td width="30%">
+						<input type="radio" name="thesis" value="" '.((!$preincoming->bachelorthesis && !$preincoming->masterthesis)?'checked="checked"':'').'>'.$p->t('incoming/nothesis').'<br>
+						<input type="radio" name="thesis" value="master" '.(($preincoming->masterthesis)?'checked="checked"':'').'>'.$p->t('incoming/bachelorthesis').'<br>
+						<input type="radio" name="thesis" value="bachelor" '.(($preincoming->bachelorthesis)?'checked="checked"':'').'>'.$p->t('incoming/masterthesis').'
+						</td>
+						<td valign="top">
+						'.$p->t('incoming/researcharea').'
+						</td>
+						<td>
+						<textarea name="research_area">'.$preincoming->research_area.'</textarea>
+						</td>
+						<td valign="bottom">
+							<input type="submit" value="'.$p->t('global/speichern').'">
+						</td>
+					</tr>
+				</table>
+				</form>
+			</tr>
+		</tbody>
+		</table>
+		<br><br>
+		';
+		
+		//Uebersicht LVs
 		$qry = "SELECT 
-					tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.studiengang_kz, 
+					tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.ects, 
 					tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.semester, 
 					tbl_lehrveranstaltung.bezeichnung_english, tbl_lehrveranstaltung.incoming,
 					(
@@ -317,8 +465,7 @@ else if($method=="lehrveranstaltungen")
 						AND tbl_studiengang.aktiv order by studiengang_kz
 					";
 	
-		echo '	<form action="incoming.php?method=lehrveranstaltungen" method="POST">
-				<table width="90%" border="0" align="center" class="table-autosort:1 table-stripeclass:alternate table-autostripe">
+		echo '<table width="90%" border="0" align="center" class="table-autosort:1 table-stripeclass:alternate table-autostripe">
 				<thead align="center">
 				<tr class="liste">
 					<th width="6%"></th>
@@ -326,6 +473,7 @@ else if($method=="lehrveranstaltungen")
 					<th class="table-sortable:numeric">'.$p->t('global/semester').'</th>
 					<th class="table-sortable:default">'.$p->t('global/lehrveranstaltung').'</th>
 					<th class="table-sortable:default">'.$p->t('global/lehrveranstaltung').' '.$p->t('global/englisch').'</th>
+					<th class="table-sortable:numeric">'.$p->t('incoming/ects').'</th>
 					<th>Info</th>
 					<th class="table-sortable:numeric">'.$p->t('incoming/freieplätze').'</th>
 				</tr>
@@ -351,6 +499,7 @@ else if($method=="lehrveranstaltungen")
 					echo '<td>',$row->semester,'</td>';
 					echo '<td>',$row->bezeichnung,'</td>';
 					echo '<td>',$row->bezeichnung_english,'</td>';
+					echo '<td>',$row->ects,'</td>';
 					echo '<td>
 							<a href="#Deutsch" class="Item" onclick="javascript:window.open(\'lvinfo.php?lv='.$row->lehrveranstaltung_id.'&amp;language=de\',\'Lehrveranstaltungsinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">Deutsch&nbsp;</a>
 							<a href="#Englisch" class="Item" onclick="javascript:window.open(\'lvinfo.php?lv='.$row->lehrveranstaltung_id.'&amp;language=en\',\'Lehrveranstaltungsinformation\',\'width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes\');return false;">Englisch</a>
@@ -1298,7 +1447,7 @@ echo'			<td>'.$p->t('incoming/abgelegtin').'</td>
 			<tr>
 				<td></td>
 				<td></td>
-				<td align="center"><input type="button" value="'.$p->t('incoming/uploadCv').'" onclick=FensterOeffnen("'.APP_ROOT.'/cis/public/incoming/akteupload.php?person_id='.$person->person_id.'&dokumenttyp=Lebenslf");></td>
+				<td align="center"><input type="button" value="'.$p->t('incoming/uploadCv').'" onclick=FensterOeffnen("'.APP_ROOT.'cis/public/incoming/akteupload.php?person_id='.$person->person_id.'&dokumenttyp=Lebenslf");></td>
 				<td></td>
 			</tr>
 			<tr>
@@ -1326,7 +1475,7 @@ echo'			<td>'.$p->t('incoming/abgelegtin').'</td>
 	
 	function FensterOeffnen(adresse) 
 	{
-		MeinFenster = window.open(adresse, "Info", "width=500,height=500,left=100,top=200");
+		MeinFenster = window.open(adresse, "Info", "width=600,height=200");
   		MeinFenster.focus();
 	}
 	
@@ -1365,40 +1514,38 @@ else if($method == 'files')
 				echo($p->t('global/fehleraufgetreten'));
 		}
 	}
-echo 	'<script type="text/javascript">
+	echo '<script type="text/javascript">
 		function FensterOeffnen (adresse) 
 		{
-			MeinFenster = window.open(adresse, "Info", "width=500,height=500,left=100,top=200");
+			MeinFenster = window.open(adresse, "Info", "width=600,height=200");
 	  		MeinFenster.focus();
 		}
 		</script> 
 		<br><br><br> 
-		<table border ="0" width="100%">
-			<tr>
-				<td width="25%"></td>
-				<td width="25%" align="center"><a href="'.APP_ROOT.'/cis/public/incoming/akteupload.php?person_id='.$person->person_id.'" onclick="FensterOeffnen(this.href); return false;">Upload File</a></td>
-				<td width="25%"></td>
-				<td width="25%"></td>
-			</tr>
-			<tr><td>&nbsp;</td></tr>
-		</table>';
+		<center>
+			<a href="'.APP_ROOT.'cis/public/incoming/akteupload.php?person_id='.$person->person_id.'" onclick="FensterOeffnen(this.href); return false;">',$p->t('incoming/fileupload'),'</a></td>
+		</center><br><br>';
 	
 	$akte->getAkten($person->person_id); 
-	echo '<table  align="center" border="0">
-			<tr>
-				<th></th>
-				<th>'.$p->t('incoming/name').'</th>
-				<th>'.$p->t('global/bezeichnung').'</th>
-			</tr>'; 
-	foreach ($akte->result as $ak)
-	{	
-		echo '<tr>
-				<td><a href="'.$_SERVER['PHP_SELF'].'?method=files&mode=delete&id='.$ak->akte_id.'"><img src="'.APP_ROOT.'skin/images/delete_round.png"</a></td>
-				<td><a href="'.APP_ROOT.'cis/public/incoming/akte.php?id='.$ak->akte_id.'">'.$ak->titel.'</a></td>
-				<td>'.$ak->bezeichnung.'</td>
-			</tr>';
+	
+	if(count($akte->result)>0)
+	{
+		echo '<table  align="center" border="0">
+				<tr>
+					<th></th>
+					<th>'.$p->t('incoming/name').'</th>
+					<th>'.$p->t('global/bezeichnung').'</th>
+				</tr>'; 
+		foreach ($akte->result as $ak)
+		{	
+			echo '<tr>
+					<td><a href="'.$_SERVER['PHP_SELF'].'?method=files&mode=delete&id='.$ak->akte_id.'" title="delete"><img src="'.APP_ROOT.'skin/images/delete_round.png"</a></td>
+					<td><a href="'.APP_ROOT.'cis/public/incoming/akte.php?id='.$ak->akte_id.'">'.$ak->titel.'</a></td>
+					<td>'.$ak->bezeichnung.'</td>
+				</tr>';
+		}
+		echo '</table>'; 
 	}
-	echo '</table>'; 
 }
 
 // Ausgabe Menü
@@ -1423,7 +1570,7 @@ else
 					<td>5. <a href="learningAgreementPdf.php?id='.$preincoming->preincoming_id.'">'.$p->t('incoming/learningagreementerstellen').'</a></td>
 				</tr>
 				<tr>
-					<td>6. <a href="'.APP_ROOT.'/cis/public/incoming/akteupload.php?person_id='.$person->person_id.'&dokumenttyp=LearnAgr" onclick="FensterOeffnen(this.href); return false;">'.$p->t("incoming/uploadLearningAgreement").'</a></td>
+					<td>6. <a href="'.APP_ROOT.'cis/public/incoming/akteupload.php?person_id='.$person->person_id.'&dokumenttyp=LearnAgr" onclick="FensterOeffnen(this.href); return false;">'.$p->t("incoming/uploadLearningAgreement").'</a></td>
 				</tr>
 				<tr>
 					<td>7. <a href="incoming.php?method=files">'.$p->t("incoming/uploadvondateien").'</a></td>
@@ -1438,7 +1585,7 @@ else
 	echo '<script type="text/javascript">
 			function FensterOeffnen (adresse) 
 			{
-				MeinFenster = window.open(adresse, "Info", "width=500,height=500,left=100,top=200");
+				MeinFenster = window.open(adresse, "Info", "width=500,height=200");
 		  		MeinFenster.focus();
 			}
 			</script>';

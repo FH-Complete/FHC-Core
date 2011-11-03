@@ -81,6 +81,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			echo "  <lehrveranstaltung>\n"; 
 			echo "   <bezeichnung><![CDATA[$lehrveranstaltung->bezeichnung]]></bezeichnung>\n"; 
 			echo "   <semester><![CDATA[$lehrveranstaltung->semester]]></semester>\n";
+			echo "   <ects><![CDATA[$lehrveranstaltung->ects]]></ects>\n";
 			echo "   <studiengang><![CDATA[$studiengang->english]]></studiengang>\n";
 			echo "  </lehrveranstaltung>\n"; 
 		}

@@ -145,11 +145,15 @@ if(isset($_GET['person_id']))
 	echo "	<form method='POST' enctype='multipart/form-data' action='$PHP_SELF?person_id=".$_GET['person_id']."'>
 			<table>
 				<tr>
-					<td>".$p->t('incoming/dokument').": <input type='file' name='bild' />
-					<input type='submit' name='submitbild' value='Upload' /></td>
+					<td>".$p->t('incoming/dokument').":</td>
+					<td>
+						<input type='file' name='bild' />
+					</td>
 				</tr>
 				<tr>
-					<td>Typ: <SELECT name='dokumenttyp'>";
+					<td>".$p->t('incoming/dokumenttyp').":</td>
+					<td>
+					 <SELECT name='dokumenttyp'>";
 				foreach ($dokument->result as $dok)
 				{
 					if($dok->dokument_kurzbz == 'Lebenslf' || $dok->dokument_kurzbz == 'Motivat' || $dok->dokument_kurzbz == 'Zeugnis' || $dok->dokument_kurzbz == 'Lichtbil' || $dok->dokument_kurzbz == 'LearnAgr')
@@ -165,7 +169,8 @@ echo "				</select>
 				</tr>
 				<tr><td>&nbsp;</td></tr>
 				<tr>
-					<td><input type='button' value='close' onclick='window.opener.location.reload();window.close();'></td>
+					<td></td>
+					<td><input type='submit' name='submitbild' value='Upload' /></td>
 				</tr>
 			</table>
 			</form>";

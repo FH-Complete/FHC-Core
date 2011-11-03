@@ -1058,10 +1058,23 @@ function print_lehrveranstaltungen()
 		echo '<td>'.$row->semester.'. Semester</td>';
 		echo '</tr>';
 	}
+	echo '</tbody></table>';
+	echo '
+	<table class="tablesorter">
+		<thead>
+			<tr>
+				<th>Zusatzfächer</th>
+			</tr>
+		</thead>
+		<tbody>';
 	if($inc->bachelorthesis)
-		echo '<tr><td>Bachelor Thesis</td></tr>';
+		echo '<tr><td>Bachelor Thesis: '.$inc->research_area.'</td></tr>';
 	if($inc->masterthesis)
-		echo '<tr><td>Master Thesis</td></tr>';
+		echo '<tr><td>Master Thesis: '.$inc->research_area.'</td></tr>';
+	if($inc->deutschkurs1)
+		echo '<tr><td>Deutsch für Anfänger</td></tr>';
+	if($inc->deutschkurs2)
+		echo '<tr><td>Deutsch Intensivkurs</td></tr>';
 	echo '</tbody></table>';
 	echo '</fieldset>';
 }
