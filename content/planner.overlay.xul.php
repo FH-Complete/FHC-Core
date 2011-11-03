@@ -110,8 +110,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/ressource.overlay.xul.php"
 			<tab id="tab-projekttask" label="Tasks" selected="true" />
 			<tab id="tab-dokumente" label="Dokumente" />
 			<tab id="tab-ressource" label="Ressourcen" />
-			<!--
 			<tab id="tab-bestellung" label="Bestellungen" />
+			<!--
 			<tab id="tab-gantt" label="Gantt" />
 			-->
 			<tab id="tab-notiz" label="Eigene Notizen" />
@@ -122,8 +122,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/ressource.overlay.xul.php"
 			<vbox id="box-projekttask" />
 			<vbox id="box-dokumente" />
 			<vbox id="box-ressource" />
-			<!--
 			<vbox id="box-bestellung" />
+			<!--
 			<vbox id="box-gantt" />
 			-->
             <vbox id="box-notiz" />

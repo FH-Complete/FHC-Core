@@ -285,5 +285,39 @@ class projekt extends basis_db
 			return false;
 		}
 	}
+	public function getProjektFromBestellung($bestellungID)
+	{
+		$qry ="select * from fue.tbl_projekt 
+				join wawi.tbl_projekt_bestellung USING (projekt_kurzbz) 
+				where bestellung_id= '".addslashes($bestellungID)."'"; 
+		
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->projekt_kurzbz = $row->projekt_kurzbz;
+				$this->nummer= $row->nummer;
+				$this->titel= $row->titel;
+				$this->beschreibung= $row->beschreibung;
+				$this->beginn= $row->beginn;
+				$this->ende = $row->ende;
+				$this->oe_kurzbz= $row->oe_kurzbz;	
+				$this->budget= $row->budget;	
+
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = 'Datensatz wurde nicht gefunden';
+				return false;
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
 }
 ?>
