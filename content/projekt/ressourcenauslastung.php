@@ -115,7 +115,7 @@ foreach($ressource_arr as $bezeichnung)
 					$anzahl++;
 					$phase = new projektphase();
 					$phase->load($row->projektphase_id);
-					$title .= $phase->bezeichnung.'('.$row->projektphase_id.'),';
+					$title .= $phase->bezeichnung.'('.$phase->projekt_kurzbz.'),';
 				}
 			}
 		}

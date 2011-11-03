@@ -507,7 +507,13 @@ class ressource extends basis_db
 				
 				$this->result[] = $obj;
 			}
-		}		
+		}
+		else
+		{
+			$this->errorsmg = 'Fehler beim Laden';
+			return false;
+		}
+		
 	}
 }
 ?>
