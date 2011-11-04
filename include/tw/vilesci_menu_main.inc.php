@@ -46,6 +46,7 @@ $menu=array
 			//'Zeitwuensche'=>array('name'=>'Zeitwünsche', 'link'=>'lehre/zeitwuensche.php', 'target'=>'main'),
 			'LVPlanSync'=>array('name'=>'Sync', 'link'=>'lehre/lvplan_custom_sync.php', 'target'=>'main'),
 			'Ueberbuchungen'=>array('name'=>'Überbuchungen', 'link'=>'lehre/check/ueberbuchung.php', 'target'=>'main'),
+			'Reservierungen einfuegen'=>array('name'=>'Reserv. einfügen', 'link'=>'lehre/reservierung_insert.php', 'target'=>'main'),
 		),
 		'Raummitteilung'=>array('name'=>'Raummitteilung', 'link'=>'lehre/raummitteilung.php', 'target'=>'main'),
 		
