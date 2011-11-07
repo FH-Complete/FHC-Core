@@ -470,6 +470,7 @@ else if($method=="lehrveranstaltungen")
 				<tr class="liste">
 					<th width="6%"></th>
 					<th class="table-sortable:default">'.$p->t('global/studiengang').'</th>
+					<th class="table-sortable:default">'.$p->t('abgabetool/typ').'</th>
 					<th class="table-sortable:numeric">'.$p->t('global/semester').'</th>
 					<th class="table-sortable:default">'.$p->t('global/lehrveranstaltung').'</th>
 					<th class="table-sortable:default">'.$p->t('global/lehrveranstaltung').' '.$p->t('global/englisch').'</th>
@@ -489,13 +490,18 @@ else if($method=="lehrveranstaltungen")
 					$studiengang = new studiengang(); 
 					$studiengang->load($row->studiengang_kz);
 					$studiengang_language = ($sprache == 'German') ? $studiengang->bezeichnung : $studiengang->english;  
-					
+					$typ = $studiengang->typ; 
+					if ($studiengang->typ == 'b')
+						$typ = 'BA';
+					else if ($studiengang->typ == 'm')
+						$typ = 'MA';  
 					echo '<tr>';
 					if(!$preincoming->checkLehrveranstaltung($preincoming->preincoming_id, $row->lehrveranstaltung_id))
 						echo '<td><a href="incoming.php?method=lehrveranstaltungen&mode=add&id='.$row->lehrveranstaltung_id.'">'.$p->t('global/anmelden').'</a></td>';
 					else
 						echo '<td>'.$p->t('global/angemeldet').'</td>';
 					echo '<td>',$studiengang_language,'</td>';
+					echo '<td>',$typ,'</td>';
 					echo '<td>',$row->semester,'</td>';
 					echo '<td>',$row->bezeichnung,'</td>';
 					echo '<td>',$row->bezeichnung_english,'</td>';
