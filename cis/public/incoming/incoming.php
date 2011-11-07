@@ -310,6 +310,7 @@ else if($method=="lehrveranstaltungen")
 				<tr class="liste">
 					<th></th>
 					<th class="table-sortable:default">'.$p->t('global/studiengang').'</th>
+					<th class="table-sortable:default">'.$p->t('abgabetool/typ').'</th>
 					<th class="table-sortable:numeric">'.$p->t('global/semester').'</th>
 					<th class="table-sortable:default">'.$p->t('global/lehrveranstaltung').'</th>
 					<th class="table-sortable:default">'.$p->t('global/lehrveranstaltung').' '.$p->t('global/englisch').'</th>
@@ -324,9 +325,15 @@ else if($method=="lehrveranstaltungen")
 				$studiengang = new studiengang(); 
 				$studiengang->load($lehrveranstaltung->studiengang_kz);
 				$studiengang_language = ($sprache == 'German') ? $studiengang->bezeichnung : $studiengang->english;  
+				$typ = $studiengang->typ; 
+				if ($studiengang->typ == 'b')
+					$typ = 'BA';
+				else if ($studiengang->typ == 'm')
+					$typ = 'MA';  
 				echo '<tr>';
 				echo '<td> <a href="incoming.php?method=lehrveranstaltungen&mode=delete&id='.$lv.'&view=own">'.$p->t('global/löschen').'</a></td>';
 				echo '<td>',$studiengang_language,'</td>';
+				echo '<td>',$typ,'</td>';
 				echo '<td>',$lehrveranstaltung->semester,'</td>';
 				echo '<td>',$lehrveranstaltung->bezeichnung,'</td>';
 				echo '<td>',$lehrveranstaltung->bezeichnung_english,'</td>';
