@@ -88,7 +88,7 @@ function treeProjektmenueSelect()
 	}
         
     // Projektphasen neu laden
-	if(projekt_phase_id=='' && projekt_kurzbz!='')
+	if(projekt_kurzbz!='')
 	{
 
 	    try
