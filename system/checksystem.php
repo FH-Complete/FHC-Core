@@ -2911,7 +2911,7 @@ if(!$result = @$db->db_query("SELECT research_area FROM public.tbl_preincoming L
 			
 			GRANT USAGE ON SCHEMA fue TO wawi;
 			GRANT SELECT ON fue.tbl_ressource TO wawi;
-			GRANT SELECT ON fue.tbl_projekt_ressurce TO wawi;
+			GRANT SELECT ON fue.tbl_projekt_ressource TO wawi;
 			";
 			
 	if(!$db->db_query($qry))
