@@ -111,7 +111,7 @@
 							<fo:table-row line-height="10pt">
 								<fo:table-cell>
 									<fo:block font-size="10pt" font-weight="bold">
-										 <xsl:value-of select="rechnungsadresse/strasse" />
+										  <xsl:text>Meldemannstraße 16 (Höchstädtplatz)</xsl:text>
 									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
@@ -378,6 +378,21 @@
 										 <xsl:value-of select="datum" />
 									</fo:block>
 								</fo:table-cell>
+</fo:table-row>
+								
+<fo:table-row line-height="10pt">
+<fo:table-cell border-width="0.2mm" border-style="solid">
+
+									<fo:block font-size="10pt" font-weight="bold">
+										 Telefonnr.:
+									</fo:block>
+								</fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid">
+									<fo:block font-size="10pt" font-weight="bold" padding-left="1mm">
+										 +43 1 333 40 77 - 212
+									</fo:block>
+								</fo:table-cell>
+							
 							</fo:table-row>
 						</fo:table-body>
 					</fo:table>
@@ -664,3 +679,4 @@
 		</fo:table-row>
 	</xsl:template>
 </xsl:stylesheet>
+
