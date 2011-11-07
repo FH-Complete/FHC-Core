@@ -1,13 +1,12 @@
 <?php 
 require_once('../config/vilesci.config.inc.php');
-require_once('stip.class.php'); 
 ?>
 <html>
 	<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<script type="text/javascript" src="../include/js/jqSOAPClient.js"></script> 
 		<script type="text/javascript" src="../include/js/jquery.js"></script> 
-		<title>STIP-Client</title>
+		<title>Semesterticket-Client</title>
 	</head>
 	<body>
 
@@ -56,7 +55,7 @@ require_once('stip.class.php');
 
 if(isset($_REQUEST['submit']))
 {
-	$client = new SoapClient("http://calva.technikum-wien.at/burkhart/fhcomplete/trunk/soap/semesterticket.wsdl.php?".microtime()); 
+	$client = new SoapClient(APP_ROOT."/soap/semesterticket.wsdl.php?".microtime()); 
 	
 	try
 	{
