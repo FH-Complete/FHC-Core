@@ -103,7 +103,7 @@ $menu=array
 	),
 	'Personen'=> 	array
 	(
-		'name'=>'Personen', 'opener'=>'true', 'hide'=>'true', 'image'=>'system-users.png', 'permissions'=>array('admin','lv-plan','support'),
+		'name'=>'Personen', 'opener'=>'true', 'hide'=>'true', 'image'=>'system-users.png', 'permissions'=>array('admin','lv-plan','support','mitarbeiter'),
 		'link'=>'left.php?categorie=Personen', 'target'=>'nav',
 		'Suche'=>array('name'=>'Suche', 'link'=>'personen/suche.php', 'target'=>'main','permissions'=>array('admin','lv-plan','support')),
 		'Zusammenlegen'=>array('name'=>'Zusammenlegen', 'link'=>'stammdaten/personen_wartung.php', 'target'=>'main', 'permissions'=>array('admin','lv-plan','support')),
@@ -123,7 +123,7 @@ $menu=array
 		),
 		'Mitarbeiter'=>array
 		(
-			'name'=>'Mitarbeiter','permissions'=>array('admin','lv-plan','support'),
+			'name'=>'Mitarbeiter','permissions'=>array('admin','mitarbeiter','support'),
 			'Übersicht'=>array('name'=>'Übersicht', 'link'=>'personen/lektor_uebersicht.php', 'target'=>'main'),
 			'Zeitsperren'=>array('name'=>'Zeitsperren', 'link'=>'personen/urlaubsverwaltung.php', 'target'=>'main'),
 			'Resturlaub'=>array('name'=>'Urlaub', 'link'=>'personen/resturlaub_frameset.html', 'target'=>'main')
