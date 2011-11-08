@@ -165,4 +165,6 @@ $this->phrasen['benotungstool/errechneteGesamtnote']='Errechnete Gesamtnote';
 $this->phrasen['benotungstool/mussPositivSein']='* must be positive';
 $this->phrasen['benotungstool/eingetrageneNoten']='Eingetragene Noten';
 $this->phrasen['benotungstool/zeunis']='Zeugnis';
+$this->phrasen['benotungstool/linkZumHandbuch']='dms.php?id=824';
+$this->phrasen['benotungstool/handbuch']='Handbook';
 ?>
