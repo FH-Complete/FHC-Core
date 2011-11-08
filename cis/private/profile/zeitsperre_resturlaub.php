@@ -281,6 +281,18 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		$error = true;
 		$error_msg.=$p->t('zeitsperre/urlaubKannNichtMehrEditiertWerden');
 	}
+	if(!$error && $_POST['zeitsperretyp_kurzbz']=='Urlaub')
+	{
+		if($zeitsperre->zeitsperre_id!='')
+			$id = $zeitsperre->zeitsperre_id;
+		else
+			$id = null;
+		if($zeitsperre->UrlaubEingetragen($uid, $datum_obj->formatDatum($_POST['vondatum']),$datum_obj->formatDatum($_POST['bisdatum']), $id))
+		{
+			$error = true;
+			$error_msg.=$p->t('zeitsperre/urlaubBereitsEingetragen');
+		}
+	}
 	if(!$error)
 	{
 		$zeitsperre->zeitsperretyp_kurzbz = $_POST['zeitsperretyp_kurzbz'];
@@ -325,7 +337,7 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 						
 						$message = "Dies ist eine automatische Mail! \n".
 								   "$benutzer->nachname $benutzer->vorname hat einen neuen Urlaub eingetragen:\n".
-								   "$zeitsperre->bezeichnung von $zeitsperre->vondatum bis $zeitsperre->bisdatum\n\n".
+								   "$zeitsperre->bezeichnung von ".$datum_obj->formatDatum($zeitsperre->vondatum,'d.m.Y')." bis ".$datum_obj->formatDatum($zeitsperre->bisdatum,'d.m.Y')."\n\n".
 								   "Sie können diesen unter folgender Adresse freigeben:\n".
 								   APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".$jahr;
 						$from='vilesci@'.DOMAIN;

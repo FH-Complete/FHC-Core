@@ -19,7 +19,9 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-
+/**
+ * Seite zum Eintragen von Urlaubstagen
+ */
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/zeitsperre.class.php');
@@ -166,10 +168,9 @@ if (isset($_GET['rechts_x']) || isset($_POST['rechts_x']))
 //Eintragung löschen
 if((isset($_GET['delete']) || isset($_POST['delete'])))
 {
-	//print_r($_GET['delete']);
-	//echo "<br>";
-	$qry="DELETE FROM campus.tbl_zeitsperre WHERE zeitsperre_id=".$_GET['delete']." AND (freigabevon!='' OR freigabevon IS NULL)";
-	$result = $db->db_query($qry);
+	$zeitsperre = new zeitsperre();
+	if(!$zeitsperre->delete($_GET['delete']))
+		echo $zeitsperre->errormsg;
 }
 
 //Eintragung speichern
@@ -182,96 +183,116 @@ if(isset($_GET['speichern']) && isset($_GET['wtag']))
 		$erreichbar='n';
 	}
 	$wtag=$_GET['wtag'];
-	$akette[0]=date("Y-m-d",strtotime($wtag[0]));
-	$ekette[0]=date("Y-m-d",strtotime($wtag[0]));
+	$akette[0]=$wtag[0];
+	$ekette[0]=$wtag[0];
 	for($i=1,$j=0;$i<count($wtag);$i++)
 	{
 		//ketten bilden
-		if(date("Y-m-d",strtotime($wtag[$i]))==date("Y-m-d",strtotime("+1 Day",strtotime($wtag[$i-1]))))
+		if($wtag[$i]==date("Y-m-d",strtotime("+1 Day",strtotime($wtag[$i-1]))))
 		{
-			$ekette[$j]=date("Y-m-d",strtotime($wtag[$i]));
+			$ekette[$j]=$wtag[$i];
 		}
 		else
 		{
 			$j++;
-			$akette[$j]=date("Y-m-d",strtotime($wtag[$i]));
-			$ekette[$j]=date("Y-m-d",strtotime($wtag[$i]));
+			$akette[$j]=$wtag[$i];
+			$ekette[$j]=$wtag[$i];
 		}
 
 	}
-	//print_r($akette);
-	//print_r($ekette);
-	FOR($i=0;$i<count($akette);$i++)
+	
+	//Pruefen ob bereits ein Urlaub in den markierten Bereichen vorhanden ist und ggf Abbrechen
+	//Das Problem sollte nur beim manuellen Refresh der Seite auftreten 
+	$error=false;
+	for($i=0;$i<count($akette);$i++)
 	{
-		if($vertretung!='')
+		$zeitsperre = new zeitsperre();
+		
+		if($zeitsperre->UrlaubEingetragen($uid, $akette[$i], $ekette[$i]))
 		{
-			$qryins="INSERT INTO campus.tbl_zeitsperre (
-				zeitsperretyp_kurzbz,mitarbeiter_uid,bezeichnung,vondatum,vonstunde,bisdatum,bisstunde,vertretung_uid,
-				updateamum,updatevon,insertamum,insertvon, erreichbarkeit_kurzbz, freigabeamum, freigabevon) VALUES (
-				'Urlaub','".$uid."', 'Urlaub', '".date("Y-m-d",strtotime($akette[$i]))."',
-				NULL,'".date("Y-m-d", strtotime($ekette[$i]))."',NULL,'".$vertretung."',NULL,NULL,now(),'".$uid."','".$erreichbar."',NULL,NULL
-				)";
+			$vgmail.='<br><span class="error">'.$p->t('zeitsperre/urlaubBereitsEingetragen').'</span>';
+			$error=true;
+			break;
 		}
-		else
-		{
-			$qryins="INSERT INTO campus.tbl_zeitsperre (
-				zeitsperretyp_kurzbz,mitarbeiter_uid,bezeichnung,vondatum,vonstunde,bisdatum,bisstunde,vertretung_uid,
-				updateamum,updatevon,insertamum,insertvon, erreichbarkeit_kurzbz, freigabeamum, freigabevon) VALUES (
-				'Urlaub','".$uid."', 'Urlaub', '".date("Y-m-d",strtotime($akette[$i]))."',
-				NULL,'".date("Y-m-d", strtotime($ekette[$i]))."',NULL,NULL,NULL,NULL,now(),'".$uid."','".$erreichbar."',NULL,NULL
-				)";
-		}
-		$result = $db->db_query($qryins);
 	}
-	//Mail an Vorgesetzten
-	$vorgesetzter = $ma->getVorgesetzte($uid);
-	if($vorgesetzter)
+	
+	if(!$error)
 	{
-		$to='';
-		foreach($ma->vorgesetzte as $vg)
-		{
-			if($to!='')
-			{
-				$to.=', '.$vg.'@'.DOMAIN;
-			}
-			else 
-			{
-				$to.=$vg.'@'.DOMAIN;
-			}
-		}
-		//$to = 'oesi@technikum-wien.at';
-		$benutzer = new benutzer();
-		$benutzer->load($uid);
-		$message = "Dies ist eine automatische Mail! \n".
-				   "$benutzer->nachname $benutzer->vorname hat neuen Urlaub eingetragen:\n";
-				   
 		for($i=0;$i<count($akette);$i++)
 		{
-			$message.="Von ".date("d.m.Y", strtotime($akette[$i]))." bis ".date("d.m.Y", strtotime($ekette[$i]))."\n";
+			$zeitsperre = new zeitsperre();
+			
+			$zeitsperre->new = true;
+			$zeitsperre->zeitsperretyp_kurzbz='Urlaub';
+			$zeitsperre->mitarbeiter_uid=$uid;
+			$zeitsperre->bezeichnung='Urlaub';
+			$zeitsperre->vondatum=$akette[$i];
+			$zeitsperre->vonstunde='';
+			$zeitsperre->bisdatum=$ekette[$i];
+			$zeitsperre->bisstunde='';
+			$zeitsperre->vertretung_uid=$vertretung;
+			$zeitsperre->updateamum='';
+			$zeitsperre->updatevon='';
+			$zeitsperre->insertamum=date('Y-m-d H:i:s');
+			$zeitsperre->insertvon=$uid;
+			$zeitsperre->erreichbarkeit=$erreichbar;
+			$zeitsperre->freigabeamum='';
+			$zeitsperre->freigabevon='';
+	
+			if(!$zeitsperre->save())
+				echo $zeitsperre->errormsg;
+			
 		}
-		
-		//Ab September wird das neue Jahr uebergeben
-		if(date("m",strtotime($akette[0]))>=9)
-	   		$jahr = date("Y", strtotime($akette[0]))+1;
-	   	else 
-	   		$jahr = date("Y", strtotime($akette[0]));
-	   
-		$message.="\nSie können diesen unter folgender Adresse freigeben:\n".
-		APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".$jahr;
-		
-		$mail = new mail($to, 'vilesci@'.DOMAIN,'Freigabeansuchen Urlaub', $message);
-		if($mail->send())
+		//Mail an Vorgesetzten
+		$vorgesetzter = $ma->getVorgesetzte($uid);
+		if($vorgesetzter)
 		{
-			$vgmail="<br><b>".$p->t('urlaubstool/freigabemailWurdeVersandt',array($to))."!</b>";
+			$to='';
+			foreach($ma->vorgesetzte as $vg)
+			{
+				if($to!='')
+				{
+					$to.=', '.$vg.'@'.DOMAIN;
+				}
+				else 
+				{
+					$to.=$vg.'@'.DOMAIN;
+				}
+			}
+			//$to = 'oesi@technikum-wien.at';
+			$benutzer = new benutzer();
+			$benutzer->load($uid);
+			$message = "Dies ist eine automatische Mail! \n".
+					   "$benutzer->nachname $benutzer->vorname hat neuen Urlaub eingetragen:\n";
+					   
+			for($i=0;$i<count($akette);$i++)
+			{
+				$message.="Von ".date("d.m.Y", strtotime($akette[$i]))." bis ".date("d.m.Y", strtotime($ekette[$i]))."\n";
+			}
+			
+			//Ab September wird das neue Jahr uebergeben
+			if(date("m",strtotime($akette[0]))>=9)
+		   		$jahr = date("Y", strtotime($akette[0]))+1;
+		   	else 
+		   		$jahr = date("Y", strtotime($akette[0]));
+		   
+			$message.="\nSie können diesen unter folgender Adresse freigeben:\n".
+			APP_ROOT."cis/private/profile/urlaubsfreigabe.php?uid=$uid&year=".$jahr;
+			
+			$mail = new mail($to, 'vilesci@'.DOMAIN,'Freigabeansuchen Urlaub', $message);
+			if($mail->send())
+			{
+				$vgmail="<br><b>".$p->t('urlaubstool/freigabemailWurdeVersandt',array($to))."!</b>";
+			}
+			else
+			{
+				$vgmail="<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten',array($to))."!</span>";
+			}
 		}
 		else
 		{
-			$vgmail="<br><span class='error'>".$p->t('urlaubstool/fehlerBeimSendenAufgetreten',array($to))."!</span>";
+			$vgmail="<br><span class='error'>".$p->t('urlaubstool/konnteKeinFreigabemailVersendetWerden')."</span>";
 		}
-	}
-	else
-	{
-		$vgmail="<br><span class='error'>".$p->t('urlaubstool/konnteKeinFreigabemailVersendetWerden')."</span>";
 	}
 
 }
@@ -315,7 +336,7 @@ if ((isset($wmonat) || isset($wmonat))&&(isset($wjahr) || isset($wjahr)))
 	{
 		$wbis=date("Y-m-d",mktime(0, 0, 0, ($wmonat+2) , (7-($ttt['wday']==0?7:$ttt['wday'])), $jahre[$wjahr]));
 	}
-	$qry="SELECT * FROM campus.tbl_zeitsperre WHERE zeitsperretyp_kurzbz='Urlaub' AND mitarbeiter_uid='".$uid."' AND (vondatum<='".$wbis."' AND bisdatum>'".$wvon."') ";
+	$qry="SELECT * FROM campus.tbl_zeitsperre WHERE zeitsperretyp_kurzbz='Urlaub' AND mitarbeiter_uid='".addslashes($uid)."' AND (vondatum<='".addslashes($wbis)."' AND bisdatum>'".addslashes($wvon)."') ";
 	//echo "<br>"."db:".$qry;
 	if($result = $db->db_query($qry))
 	{
@@ -374,39 +395,40 @@ $PHP_SELF = $_SERVER['PHP_SELF'];
 $datum_obj = new datum();
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-"http://www.w3.org/TR/html4/loose.dtd"><html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
-<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
-<script language="Javascript">
-function conf_del()
-{
-	return confirm('<?php echo $p->t('urlaubstool/eintragWirklichLoeschen');?>');
-}
-
-function checkval()
-{
-	if(document.getElementById('vertretung_uid').value=='')
-	{
-		alert('<?php echo $p->t('urlaubstool/zuerstVertretungAuswaehlen');?>');
-		return false;
-	}
-	else
-		return true;
-}
-</script>
-<style type="text/css">
-a:link { text-decoration:none; font-weight:bold; color:blue; }
-a:visited { text-decoration:none; font-weight:bold; color:blue; }
-th, td, table
-{
-	-moz-border-radius:10px;
-	-khtml-border-radius:10px;
-}
-</style>
-<title><?php echo $p->t('urlaubstool/urlaubstool');?></title>
-</head>
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
+		<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
+		<script language="Javascript">
+		function conf_del()
+		{
+			return confirm('<?php echo $p->t('urlaubstool/eintragWirklichLoeschen');?>');
+		}
+		
+		function checkval()
+		{
+			if(document.getElementById('vertretung_uid').value=='')
+			{
+				alert('<?php echo $p->t('urlaubstool/zuerstVertretungAuswaehlen');?>');
+				return false;
+			}
+			else
+				return true;
+		}
+		</script>
+		<style type="text/css">
+		a:link { text-decoration:none; font-weight:bold; color:blue; }
+		a:visited { text-decoration:none; font-weight:bold; color:blue; }
+		.urlaube th, .urlaube td, .urlaube
+		{
+			-moz-border-radius:10px;
+			-khtml-border-radius:10px;
+		}
+		</style>
+		<title><?php echo $p->t('urlaubstool/urlaubstool');?></title>
+	</head>
 <body>
 <?php
 	echo "<H1>".$p->t('urlaubstool/urlaubstool')." (".$uid.")</H1>";
@@ -619,7 +641,7 @@ $content.='<input type="hidden" name="wmonat" value="'.$wmonat.'">';
 $content.='<input type="hidden" name="wjahr" value="'.$wjahr.'">';
 $content.='</td></tr>';
 $content.='</table>';
-$content.='<table border=1 width="95%" align="center">';
+$content.='<table border=1 width="95%" align="center" class="urlaube">';
 
 $content.='<th style="width:14%;">'.$tagbez[$lang->index][1].'</div><th width="14%">'.$tagbez[$lang->index][2].'</th><th width="14%">'.$tagbez[$lang->index][3].'</th><th width="15%">'.$tagbez[$lang->index][4].'</th><th width="14%">'.$tagbez[$lang->index][5].'</th><th width="14%">'.$tagbez[$lang->index][6].'</th><th width="14%">'.$tagbez[$lang->index][7].'</th>';
 for ($i=0;$i<6;$i++)

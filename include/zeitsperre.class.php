@@ -395,5 +395,52 @@ class zeitsperre extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Prueft ob innerhalb des angegebenen Zeitraums bereits ein Urlaub eingetragen ist
+	 * 
+	 * @param $uid
+	 * @param $von
+	 * @param $bis
+	 * @param $id Eintrag mit dieser ID wird nicht beruecksichtigt (zB bei Editieren von Eintraegen)
+	 */
+	function UrlaubEingetragen($uid, $von, $bis, $id=null)
+	{
+		
+		$qry = "SELECT
+					1 
+				FROM 
+					campus.tbl_zeitsperre 
+				WHERE 
+					zeitsperretyp_kurzbz='Urlaub'
+					AND mitarbeiter_uid='".addslashes($uid)."' 
+					AND 
+					(
+						(vondatum BETWEEN '".addslashes($von)."' AND '".addslashes($bis)."')
+						OR
+						(bisdatum BETWEEN '".addslashes($von)."' AND '".addslashes($bis)."')
+						OR
+						(vondatum<='".addslashes($von)."' AND bisdatum>='".addslashes($bis)."')
+					)";
+		if(!is_null($id))
+			$qry.=" AND zeitsperre_id<>'".addslashes($id)."'";
+		
+		if($result = $this->db_query($qry))
+		{
+			if($this->db_num_rows($result)>0)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>
