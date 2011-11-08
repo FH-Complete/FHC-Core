@@ -34,4 +34,5 @@ $this->phrasen['zeitsperre/resturlaubstagePerDatum']='Resturlaubstage per %1$s';
 $this->phrasen['zeitsperre/zeitsperreVonBis']='Zeitsperren von %1$s bis %2$s';
 $this->phrasen['zeitsperre/monat']='Monat';
 $this->phrasen['zeitsperre/tag']='Tag';
+$this->phrasen['zeitsperre/urlaubBereitsEingetragen']='Es existiert bereits ein Urlaubseintrag im angegebenen Zeitraum.';
 ?>
