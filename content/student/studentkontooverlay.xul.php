@@ -121,6 +121,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									class="sortDirectionIndicator"
 									sort="rdf:http://www.technikum-wien.at/konto/rdf#buchungsnr" />
 								<splitter class="tree-splitter"/>
+								<treecol id="student-konto-tree-insertvon" label="Angelegt von" flex="2" hidden="true"
+									class="sortDirectionIndicator"
+									sort="rdf:http://www.technikum-wien.at/konto/rdf#insertvon" />
+								<splitter class="tree-splitter"/>
+								<treecol id="student-konto-tree-insertamum" label="Anlagedatum" flex="2" hidden="true"
+									class="sortDirectionIndicator"
+									sort="rdf:http://www.technikum-wien.at/konto/rdf#insertvon" />
+								<splitter class="tree-splitter"/>
 							</treecols>
 						
 							<template>
@@ -133,6 +141,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 											<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#studiensemester_kurzbz"/>
 											<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#buchungstyp_kurzbz"/>
 											<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#buchungsnr"/>
+											<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#insertvon"/>
+											<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#insertamum"/>
 										</treerow>
 									</treeitem>
 								</treechildren>
