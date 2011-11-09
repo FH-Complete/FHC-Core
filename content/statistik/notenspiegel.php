@@ -19,6 +19,19 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+/**
+ * Erstellt einen Notenspiegel
+ * 
+ * Parameter: 	studiengang_kz ... Studiengang der angezeigt werden soll
+ * 				semester ... Semester das angezeigt werden soll
+ * 				orgform ... Filter für Organisationsform (VZ | BB | FST | etc)
+ * 				typ	...	Output format (xls | html)
+ * 
+ * Listet alle Noten der Studierenden des Studiengangs/Semester im eingestellten Studiensemester
+ * und berechnet den Notendurchschnitt und gewichteten Notendurchschnitt.
+ * 
+ * Gewichteter Notendurchschnitt = (Note der LV) * (ECTS der LV) / (Summe aller ECTS) 
+ */
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
@@ -65,6 +78,9 @@ foreach ($result_student as $row)
 		$uids.=',';
 	$uids.="'".addslashes($row->uid)."'";
 }
+if($uids=='')
+	die('Es befinden sich keine Studierende in diesem Semester');
+
 $qry = "SELECT 
 			lehrveranstaltung_id, bezeichnung, studiengang_kz, semester, ects
 		FROM 
@@ -126,9 +142,19 @@ if($typ=='xls')
 	$format_bold->setBold();
 	$format_bold->setBorder(1);
 	
+	$format_bold_wrap =& $workbook->addFormat();
+	$format_bold_wrap->setBold();
+	$format_bold_wrap->setBorder(1);
+	$format_bold_wrap->setTextWrap();
+	
 	$format_rotate =& $workbook->addFormat();
 	$format_rotate->setTextRotation(270);
 	$format_rotate->setAlign('center');
+	
+	$format_bold_center =& $workbook->addFormat();
+	$format_bold_center->setBold();
+	$format_bold_center->setAlign('center');
+	$format_bold_center->setBorder(1);
 	
 	$format_number =& $workbook->addFormat();
 	$format_number->setNumFormat('0.00');
@@ -149,9 +175,11 @@ if($typ=='xls')
 			$workbook->setCustomColor($note+10, 255, 255, 255);
 		}
 	}
+	//30 = Grau = Nicht teilgenommen
+	$workbook->setCustomColor(30,90,90,90);
 	
 	$spalte=0;
-	$zeile=0;
+	$zeile=1;
 	
 	$worksheet->write($zeile,$spalte,'Nachname', $format_bold);
 	$maxlength[$spalte]=10;
@@ -159,15 +187,21 @@ if($typ=='xls')
 	$maxlength[$spalte]=10;
 	$worksheet->write($zeile,++$spalte,'Personenkennzeichen', $format_bold);
 	$maxlength[$spalte]=20;
+	$maxheaderheight=20;
 	
 	while($row_lva = $db->db_fetch_object($result_lva))
 	{
-		$worksheet->write($zeile,++$spalte,$stg_arr[$row_lva->studiengang_kz].$row_lva->semester.' '.$row_lva->bezeichnung.' ('.$row_lva->ects.' ECTS)', $format_rotate);
+		$value = $stg_arr[$row_lva->studiengang_kz].$row_lva->semester.' '.$row_lva->bezeichnung.' ('.$row_lva->ects.' ECTS)';
+		$worksheet->write($zeile,++$spalte,$value, $format_rotate);
 		$maxlength[$spalte]=3;
+
+		if(mb_strlen($value)>$maxheaderheight)
+			$maxheaderheight=mb_strlen($value);
+		//echo "len:".mb_strlen($value),' max:'.$maxheaderheight;
 	}
 	$worksheet->write($zeile,++$spalte,'Notendurchschnitt', $format_bold);
 	$maxlength[$spalte]=15;
-	$worksheet->write($zeile,++$spalte,'Gewichteter Notendurchschnitt', $format_bold);
+	$worksheet->write($zeile,++$spalte,"Gewichteter\nNotendurchschnitt", $format_bold_wrap);
 	$maxlength[$spalte]=15;
 	
 	$anzahl_lv=array();
@@ -197,12 +231,26 @@ if($typ=='xls')
 			$maxlength[$spalte]=strlen($row_student->vorname);
 		$worksheet->write($zeile,++$spalte,$row_student->matrikelnr, $format_bold);
 				
+		//Alle Zeugnisnoten des Studierenden holen
 		$noten = array();
 		$qry = "SELECT * FROM lehre.tbl_zeugnisnote WHERE student_uid='".addslashes($row_student->uid)."' AND studiensemester_kurzbz='".addslashes($semester_aktuell)."'";
 		if($result = $db->db_query($qry))
 			while($row = $db->db_fetch_object($result))
 				$noten[$row->lehrveranstaltung_id] = $row->note;
+			
+		//Alle LVs holen zu denen der Studierende zugeteilt ist
+		$zugeteilte_lvs=array();
+		$qry = "SELECT distinct lehrveranstaltung_id
+					FROM 
+						campus.vw_student_lehrveranstaltung 
+					WHERE 
+						uid='".addslashes($row_student->uid)."' AND 
+						studiensemester_kurzbz='".addslashes($semester_aktuell)."'";
 		
+		if($result = $db->db_query($qry))
+			while($row = $db->db_fetch_object($result))
+				$zugeteilte_lvs[] = $row->lehrveranstaltung_id;
+						
 		$anzahl=0;
 		$summe=0;
 		$rowcount=0;
@@ -245,12 +293,19 @@ if($typ=='xls')
 			}
 			else 
 			{
+				//Keine Note fuer diese LV vorhanden
 				unset($format_colored);
+				
 				$format_colored =& $workbook->addFormat();
-				$format_colored->setFgColor(19);
+				
+				if(in_array($row_lva->lehrveranstaltung_id, $zugeteilte_lvs))
+					$format_colored->setFgColor(19); // zugeteilt zur LV aber noch nicht eingetragen
+				else
+					$format_colored->setFgColor(30); //Grau - nicht zugeteilt zur LV
+				
 				$format_colored->setBorder(1);
 				$format_colored->setAlign('center');
-
+			
 				$worksheet->write($zeile,++$spalte,'',$format_colored);
 				unset($format_colored);
 			}
@@ -309,7 +364,16 @@ if($typ=='xls')
 	//Die Breite der Spalten setzen
 	foreach($maxlength as $i=>$breite)
 		$worksheet->setColumn($i, $i, $breite+2);
-		
+
+	$worksheet->write(0,0,$semester_aktuell." ".$stg->kuerzel.($semester!=''?' '.$semester.'. Semester':'').' Stand: '.date('d.m.Y'), $format_bold_center);
+	//Zellen der 1. Zeile verbinden
+	$worksheet->setMerge(0,0,0,$spalte);
+	
+	//Hoehe der 2. Zeile anpassen damit die LVs alle sichtbar sind
+	$worksheet->setRow(1,$maxheaderheight*5);
+	
+	//Ausdruck auf 1 Seite anpassen
+	$worksheet->fitToPages(1,1);
 	$workbook->close();
 }
 else 
@@ -318,7 +382,7 @@ else
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 	<html>
 	<head>
-	<title>Lehreinheit</title>
+	<title>Notenspiegel</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<style type="text/css">
@@ -368,7 +432,20 @@ else
 		if($result = $db->db_query($qry))
 			while($row = $db->db_fetch_object($result))
 				$noten[$row->lehrveranstaltung_id] = $row->note;
+				
+		//Alle LVs holen zu denen der Studierende zugeteilt ist
+		$zugeteilte_lvs=array();
+		$qry = "SELECT distinct lehrveranstaltung_id
+					FROM 
+						campus.vw_student_lehrveranstaltung 
+					WHERE 
+						uid='".addslashes($row_student->uid)."' AND 
+						studiensemester_kurzbz='".addslashes($semester_aktuell)."'";
 		
+		if($result = $db->db_query($qry))
+			while($row = $db->db_fetch_object($result))
+				$zugeteilte_lvs[] = $row->lehrveranstaltung_id;
+				
 		$anzahl=0;
 		$summe=0;
 		$rowcount=0;
@@ -407,7 +484,12 @@ else
 			}
 			else 
 			{
-				echo '<td style="background-color: #'.$noten_farben[9].'">&nbsp;</td>';
+				if(in_array($row_lva->lehrveranstaltung_id, $zugeteilte_lvs))
+					$farbe = $noten_farben[9]; //zugeteilt aber noch nicht eingetragen
+				else
+					$farbe = '5a5a5a'; //nicht zugeteilt zur lv
+					
+				echo '<td style="background-color: #'.$farbe.'">&nbsp;</td>';
 			}
 		}
 		if($anzahl!=0)
