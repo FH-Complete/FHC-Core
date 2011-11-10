@@ -20,6 +20,7 @@
  
 require_once('../config/vilesci.config.inc.php'); 
 require_once('../include/student.class.php'); 
+require_once('../include/benutzer.class.php');
 
 ini_set("soap.wsdl_cache_enabled", "0");
 	
@@ -53,6 +54,15 @@ function verifyData($parameters)
 	{
 		$student = new student(); 
 		$student_uid = $student->getUidFromMatrikelnummer($parameters->matrikelnummer); 
+		// überprüfe ob Benutzer aktiv ist
+		$benutzer = new benutzer(); 
+		$benutzer->load($student_uid); 
+		if(!$benutzer->bnaktiv)
+		{
+			$obj->result = 'false';
+			$obj->fehler ='1';
+			return $obj; 
+		}	
 		// hole prestudentID
 		$student->load($student_uid); 
 		if($student->prestudent_id == '')
@@ -93,6 +103,7 @@ function verifyData($parameters)
 				$status=$row->get_rolle_prestudent;
 			}
 		}
+		// Status Student und Diplomand gültig
 		if($status == 'Student' || $status == 'Diplomand')
 		{
 			$obj->result = 'true'; 
@@ -104,7 +115,6 @@ function verifyData($parameters)
 			$obj->fehler ='1';
 		}	
 	}
-	
 	return $obj;
 }
 
