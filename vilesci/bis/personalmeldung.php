@@ -56,8 +56,8 @@ if(mb_strstr($stsem,"WS"))
 {
 	$studiensemester->load($stsem);
 	$jahr = $datumobj->formatDatum($studiensemester->start, 'Y');
-	$bisdatum=date("Y-m-d",  mktime(0, 0, 0, 11, 15, $jahr));
-	$bisprevious=date("Y-m-d",  mktime(0, 0, 0, 11, 15, $jahr-1));
+	$bisdatum=date("Y-m-d",  mktime(0, 0, 0, 9, 1, $jahr));
+	$bisprevious=date("Y-m-d",  mktime(0, 0, 0, 9, 1, $jahr-1));
 }
 else
 {
@@ -94,7 +94,7 @@ if($result = $db->db_query($qry))
 	$datei.="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <Erhalter>
    <ErhKz>".$erhalter."</ErhKz>
-   <MeldeDatum>".date("dmY", $datumobj->mktime_fromdate($bisdatum))."</MeldeDatum>
+   <MeldeDatum>".date("dmY", mktime(0, 0, 0, 11, 15, $jahr))."</MeldeDatum>
    <PersonalMeldung>";
 	while($row = $db->db_fetch_object($result))
 	{
