@@ -42,8 +42,8 @@ $anzahl_fehler=0;
 $ausgabe='';
 $error_log_fas='';
 $update=false;
-$bismeldedatum=date("Y-m-d",  mktime(0, 0, 0, 11, 15, date("Y")));
-$bismeldedatumvorjahr=date("Y-m-d",  mktime(0, 0, 0, 11, 15, date("Y")-1));
+$bismeldedatum=date("Y-m-d",  mktime(0, 0, 0, 9, 1, date("Y")));
+$bismeldedatumvorjahr=date("Y-m-d",  mktime(0, 0, 0, 9, 1, date("Y")-1));
 
 function myaddslashes($var)
 {

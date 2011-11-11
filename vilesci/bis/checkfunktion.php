@@ -43,7 +43,7 @@ $wochen=BIS_SWS_WOCHEN;
 $stg_arr = array();
 $stg_obj = new studiengang();
 $stg_obj->getAll(null, false);
-$lastbismeldung = date('Y-m-d',mktime(0,0,0,11,15,date('Y')-1));
+$lastbismeldung = date('Y-m-d',mktime(0,0,0,9,1,date('Y')-1));
 foreach ($stg_obj->result as $stg)
 {
 	$stg_arr[$stg->studiengang_kz] = $stg->kuerzel;
