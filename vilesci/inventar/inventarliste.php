@@ -125,7 +125,7 @@ $worksheet->write($zeile,++$spalte,'Datum',$format_bold);
 $maxlength[$spalte]=5;
 $worksheet->write($zeile,++$spalte,'Letzte Inventur',$format_bold);
 $maxlength[$spalte]=15;
-$worksheet->write($zeile,++$spalte,'Leasing Bis',$format_bold);
+$worksheet->write($zeile,++$spalte,'Leasing bis',$format_bold);
 $maxlength[$spalte]=11;
 $worksheet->write($zeile,++$spalte,'Anschaffungsdatum',$format_bold);
 $maxlength[$spalte]=17;
