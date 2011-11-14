@@ -336,7 +336,7 @@
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> 6.1 \n</fo:block></fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> Weitere Angaben \n Additional information</fo:block></fo:table-cell>
-								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"><xsl:value-of select="praktikum" />\n<xsl:value-of select="auslandssemester" /></fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"><xsl:value-of select="praktikum" /><xsl:text> </xsl:text><xsl:value-of select="auslandssemester" /></fo:block></fo:table-cell>
 							</fo:table-row>
 							<fo:table-row  line-height="10pt">
 								<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"> 6.2 \n</fo:block></fo:table-cell>

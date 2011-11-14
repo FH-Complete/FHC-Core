@@ -209,9 +209,14 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$qry = "SELECT von, bis FROM bis.tbl_bisio WHERE student_uid='".$uid_arr[$i]."'";
 		if($db->db_query($qry))
 		{
-			if($row1 = $db->db_fetch_object())
+			if($db->db_num_rows()>0)
 			{
-				echo "		<auslandssemester>Auslandssemester/International semester ".$datum->convertISODate($row1->von)." - ".$datum->convertISODate($row1->bis)."</auslandssemester>";
+				echo "		<auslandssemester>";
+				while($row1 = $db->db_fetch_object())
+				{
+					echo "Auslandssemester/International semester ".$datum->convertISODate($row1->von)." - ".$datum->convertISODate($row1->bis)."\n";
+				}
+				echo "</auslandssemester>";
 			}
 		}
 		$stg_oe_obj = new studiengang($row->studiengang_kz);
