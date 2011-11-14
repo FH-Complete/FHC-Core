@@ -155,14 +155,13 @@ function validateRequest($parameter)
 		$fehler = '7';
 		return false; 
 	}
-	if($parameter->semesterkuerzel != '')
+
+	if(mb_strlen($parameter->semesterkuerzel) != 3 || ((mb_strpos($parameter->semesterkuerzel, 'W') != '2') && (mb_strpos($parameter->semesterkuerzel, 'S') != '2')))
 	{
-		if(mb_strlen($parameter->semesterkuerzel) != 3 || ((mb_strpos($parameter->semesterkuerzel, 'W') != '2') && (mb_strpos($parameter->semesterkuerzel, 'S') != '2')))
-		{
-			$fehler = '8'; 
-			return false; 
-		}
+		$fehler = '8'; 
+		return false; 
 	}
+	
 	if(mb_strlen($parameter->matrikelnummer) > 15 || $parameter->matrikelnummer == '' || !is_numeric($parameter->matrikelnummer))
 	{
 		$fehler = '9';
