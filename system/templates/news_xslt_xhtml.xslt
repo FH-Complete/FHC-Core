@@ -100,34 +100,34 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:template match="stg_ltg">
 			<b><xsl:value-of select="name" /></b><br />
 			<xsl:variable name="mail" select="email"></xsl:variable>
-			<a href="mailto:{mail}"><xsl:value-of select="email" /></a><br />
+			<a href="mailto:{$mail}"><xsl:value-of select="email" /></a><br />
 			Tel.:<xsl:value-of select="telefon" />
 			<br />
 	</xsl:template>
 	<xsl:template match="gf_ltg">
 			<b><xsl:value-of select="name" /></b><br />
 			<xsl:variable name="mail" select="email"></xsl:variable>
-			<a href="mailto:{mail}"><xsl:value-of select="email" /></a><br />
+			<a href="mailto:{$mail}"><xsl:value-of select="email" /></a><br />
 			Tel.:<xsl:value-of select="telefon" />
 			<br />
 	</xsl:template>
 	<xsl:template match="stv_ltg">
 			<b><xsl:value-of select="name" /></b><br />
 			<xsl:variable name="mail" select="email"></xsl:variable>
-			<a href="mailto:{mail}"><xsl:value-of select="email" /></a><br />
+			<a href="mailto:{$mail}"><xsl:value-of select="email" /></a><br />
 			Tel.:<xsl:value-of select="telefon" />
 			<br />
 	</xsl:template>
 	<xsl:template match="ass">
 			<b><xsl:value-of select="name" /></b><br />
 			<xsl:variable name="mail" select="email"></xsl:variable>
-			<a href="mailto:{mail}"><xsl:value-of select="email" /></a><br />
+			<a href="mailto:{$mail}"><xsl:value-of select="email" /></a><br />
 			Tel.:<xsl:value-of select="telefon" />
 			<br />
 	</xsl:template>
 	<xsl:template match="stdv">
 			<xsl:variable name="mail" select="email"></xsl:variable>
-			<a href="mailto:{mail}"><xsl:value-of select="name" /></a><br />
+			<a href="mailto:{$mail}"><xsl:value-of select="name" /></a><br />
 	</xsl:template>
 	<xsl:template match="cis_ext_menu">
 			<xsl:variable name="kurzbz" select="kurzbz"></xsl:variable>
