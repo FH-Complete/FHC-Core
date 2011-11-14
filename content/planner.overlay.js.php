@@ -197,7 +197,8 @@ function treeProjektmenueSelect()
 			}
 	        catch(e)
 	        {}
-	                
+	        treeDokument.builder.rebuild();
+	        
 	        var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	        datasourceTreeDokument = rdfService.GetDataSource(url);
 	        datasourceTreeDokument.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
