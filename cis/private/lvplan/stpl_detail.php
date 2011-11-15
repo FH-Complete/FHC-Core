@@ -81,7 +81,7 @@ if(!$datum_obj->checkDatum($datum))
 
 $stsem = getStudiensemesterFromDatum($datum);
 //Stundenplan
-$sql_query='SELECT campus.vw_stundenplan.*, tbl_lehrfach.bezeichnung, vw_mitarbeiter.titelpre, vw_mitarbeiter.nachname, vw_mitarbeiter.vorname';
+$sql_query='SELECT campus.vw_stundenplan.*, tbl_lehrfach.bezeichnung, vw_mitarbeiter.titelpre, vw_mitarbeiter.titelpost, vw_mitarbeiter.nachname, vw_mitarbeiter.vorname';
 $sql_query.=", (SELECT count(*) FROM public.tbl_studentlehrverband 
 				WHERE studiengang_kz=vw_stundenplan.studiengang_kz AND semester=vw_stundenplan.semester
 				AND (verband=vw_stundenplan.verband OR vw_stundenplan.verband is null OR trim(vw_stundenplan.verband)='')
@@ -121,7 +121,7 @@ $erg_stpl=$db->db_query($sql_query);
 $num_rows_stpl=$db->db_num_rows($erg_stpl);
 
 //Reservierungen
-$sql_query="SELECT vw_reservierung.*, vw_mitarbeiter.titelpre, vw_mitarbeiter.vorname,vw_mitarbeiter.nachname FROM campus.vw_reservierung, campus.vw_mitarbeiter WHERE datum='".addslashes($datum)."' AND stunde='".addslashes($stunde)."'";
+$sql_query="SELECT vw_reservierung.*, vw_mitarbeiter.titelpre, vw_mitarbeiter.titelpost, vw_mitarbeiter.vorname,vw_mitarbeiter.nachname FROM campus.vw_reservierung, campus.vw_mitarbeiter WHERE datum='".addslashes($datum)."' AND stunde='".addslashes($stunde)."'";
 if (isset($ort_kurzbz))
     $sql_query.=" AND vw_reservierung.ort_kurzbz='".addslashes($ort_kurzbz)."'";
 if ($type=='lektor')
@@ -159,6 +159,7 @@ for ($i=0; $i<$num_rows_stpl; $i++)
     $bezeichnung=$db->db_result($erg_stpl,$i,"bezeichnung");
     $pers_kurzbz=$db->db_result($erg_stpl,$i,"lektor");
     $titelpre=$db->db_result($erg_stpl,$i,"titelpre");
+    $titelpost=$db->db_result($erg_stpl,$i,"titelpost");
     $pers_vorname=$db->db_result($erg_stpl,$i,"vorname");
     $pers_nachname=$db->db_result($erg_stpl,$i,"nachname");
     $pers_email=$db->db_result($erg_stpl,$i,"uid").'@'.DOMAIN;
@@ -175,7 +176,7 @@ for ($i=0; $i<$num_rows_stpl; $i++)
     ?>
     <tr class="<?php echo 'liste'.$i%2; ?>">
         <td><?php echo $unr; ?></td>
-        <td><A class="Item" href="mailto:<?php echo $pers_email; ?>"><?php echo $titelpre.' '.$pers_vorname.' '.$pers_nachname; ?></A></td>
+        <td><A class="Item" href="mailto:<?php echo $pers_email; ?>"><?php echo $titelpre.' '.$pers_vorname.' '.$pers_nachname.' '.$titelpost; ?></A></td>
         <td  title="<?php echo $ort->bezeichnung;?>"><?php echo (!empty($ortkurzbz)?'<a href="'.RAUMINFO_PATH.trim($ortkurzbz).'.html" target="_blank">'.$ortkurzbz.'</a>':$ortkurzbz); ?></td>
         <td><?php echo $lehrfachkurzbz; ?></td>
         <td><?php echo $bezeichnung; ?></td>
@@ -206,6 +207,7 @@ if ($num_rows_repl>0)
         $titel=$db->db_result($erg_repl,$i,"titel");
         $ortkurzbz=$db->db_result($erg_repl,$i,"ort_kurzbz");
         $titelpre=$db->db_result($erg_repl,$i,"titelpre");
+        $titelpost=$db->db_result($erg_repl,$i,"titelpost");
    		$pers_vorname=$db->db_result($erg_repl,$i,"vorname");
    		$pers_nachname=$db->db_result($erg_repl,$i,"nachname");
     	$pers_email=$db->db_result($erg_repl,$i,"uid").'@'.DOMAIN;
@@ -213,7 +215,7 @@ if ($num_rows_repl>0)
         echo '<tr class="liste'.($i%2).'">';
         echo '<td >'.$titel.'</td>';
         echo '<td>'.(!empty($ortkurzbz)?'<a href="'.RAUMINFO_PATH.trim($ortkurzbz).'.html" target="_blank">'.$ortkurzbz.'</a>':$ortkurzbz).'</td>';
-        echo '<td  ><A href="mailto:'.$pers_email.'">'.$titelpre.' '.$pers_vorname.' '.$pers_nachname.'</A></td>';
+        echo '<td  ><A href="mailto:'.$pers_email.'">'.$titelpre.' '.$pers_vorname.' '.$pers_nachname.' '.$titelpost.'</A></td>';
         echo '<td >'.$beschreibung.'</td></tr>';
     }
     echo '</table>';
