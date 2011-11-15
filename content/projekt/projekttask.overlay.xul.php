@@ -130,10 +130,12 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/mantisdetail.overlay.xul.p
 				<tabs orient="horizontal" id="projekttask-tabs">
 					<tab id="projekttask-tab-detail" label="Details" />
 					<tab id="projekttask-tab-mantis" label="Mantis" />
+					<tab id="projekttask-tab-notizen" label="Notizen" />
 				</tabs>
 				<tabpanels id="projekttask-tabpanels-main" flex="1">
 					<vbox id="box-projekttask-detail" />
 					<vbox id="box-projekttask-mantis" />
+					<box class="Notiz" id="box-projekttask-notizen"/>
 				</tabpanels>
 			</tabbox>
 		</vbox>

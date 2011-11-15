@@ -403,6 +403,10 @@ function onselectProjekttask()
 	MenulistSelectItemOnValue('textbox-projekttask-detail-ressource', ressource_id);
 	//document.getElementById('textbox-projekttask-detail-ressource').value=ressource_id;
 	
+	 //Notizen zu eines Tasks Laden
+	notiz = document.getElementById('box-projekttask-notizen');
+	notiz.LoadNotizTree('','',projekttask_id,'','','','', '');
+	
 	//Mantis Tab reset
 	document.getElementById('textbox-projekttask-mantis-issue_summary').value=bezeichnung;
 	document.getElementById('textbox-projekttask-mantis-issue_description').value=beschreibung;
