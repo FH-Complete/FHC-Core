@@ -160,4 +160,41 @@ class mantis extends basis_db
 		
 		return true;
 	}
+
+	/**
+	 * Projekte holen
+	 */
+	public function getProjects()
+	{
+		$params=array('username' => MANTIS_USERNAME, 'password' => MANTIS_PASSWORT);
+		$result = $this->soapClient->__soapCall('mc_projects_get_user_accessible',$params);
+
+		foreach($result as $row)
+		{
+			$obj = new mantis();
+			$obj->issue_project->name = $row->name;
+			$obj->issue_project->id = $row->id;
+
+			$this->result[] = $obj;
+		}
+		return true;
+	}
+
+	/**
+	 * Kategorien holen
+	 */
+	public function getCategories($project_id)
+	{
+		$params=array('username' => MANTIS_USERNAME, 'password' => MANTIS_PASSWORT, 'project_id'=>$project_id);
+		$result = $this->soapClient->__soapCall('mc_project_get_categories',$params);
+
+		foreach($result as $val)
+		{
+			$obj = new mantis();
+			$obj->issue_category = $val;
+
+			$this->result[] = $obj;
+		}
+		return true;
+	}
 }
