@@ -369,7 +369,7 @@
 		
 				echo '<a href="benotungstool/verwaltung.php?lvid='.$lvid.$studiensem.'" class="Item">
 	    			<img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
-	    			<strong>&Uuml;bungstool<br>("Kreuzerl"-Tool)</strong></a><br>
+	    			<strong>'.$p->t('lehre/kreuzerltool').'</strong></a><br>
 	    			<a href="'.APP_ROOT.'cis/cisdocs/handbuch_benotungstool.pdf" class="Item" target="_blank">'.$p->t('lehre/benotungstoolHandbuch').' [PDF]</a>';
 		} 
 		else 
