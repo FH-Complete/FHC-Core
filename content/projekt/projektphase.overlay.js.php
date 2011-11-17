@@ -366,5 +366,54 @@ function ProjektphaseNeu()
 
 function ProjektphaseDelete()
 {
-	alert('noch nicht implementiert');
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('tree-projektphase');
+
+	if (tree.currentIndex==-1)
+		return;
+
+	try
+	{
+		//Ausgewaehlten Task holen
+		id = getTreeCellText(tree, "treecol-projektphase-projekt_phase_id", tree.currentIndex);
+   	}
+	catch(e)
+	{
+		alert(e);
+		return false;
+	}
+
+	//Abfrage ob wirklich geloescht werden soll
+	if (confirm('Wollen Sie den Phase mit der ID '+id+' wirklich loeschen?'))
+	{
+		var soapBody = new SOAPObject("deleteProjektphase");
+		soapBody.appendChild(new SOAPObject("projektphase_id")).val(id);
+		var sr = new SOAPRequest("deleteProjektphase",soapBody);
+	
+		SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projektphase.soap.php?"+gettimestamp();
+		SOAPClient.SendRequest(sr, clb_deleteProjektphase);
+	}
+}
+
+// ****
+// * Delete Callback Funktion
+// ****
+function clb_deleteProjektphase(respObj)
+{
+	try
+	{
+		var msg = respObj.Body[0].deleteProjektphaseResponse[0].message[0].Text;
+	}
+	catch(e)
+	{
+		var fehler = respObj.Body[0].Fault[0].faultstring[0].Text;
+		alert('Fehler: '+fehler);
+		return;
+	}
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+			
+	TaskSelectID='';
+	datasourceTreeProjektphase.Refresh(false); //non blocking
+	ProjektmenueRefresh()
+	SetStatusBarText('Eintrag wurde entfernt');
 }
