@@ -287,7 +287,7 @@ if ($type=="save")
 		for ($i=0; ($i<$stdblock)&&!$error; $i++)
 		{
 			$std=$stdbegin+($i % $stdblock);
-			if ( ($std==$stdbegin) && (($i>0)||($stdblock==1)) )
+			if ( ($std==$stdbegin) && (($i>0)||($stdblock==0)) )
 			{
 				$time=mktime(0, 0, 0, $date[mon], $date[mday], $date[year]);
 				$date=getdate($time+(604800*$_POST['rythmus']));
