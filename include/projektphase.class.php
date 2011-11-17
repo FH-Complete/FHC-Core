@@ -318,25 +318,121 @@ class projektphase extends basis_db
 	 * @param $projekt_kurzbz ID die geloescht werden soll
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function delete($projekt_kurzbz)
+	public function delete($projektphase_id)
 	{
-		if(!is_numeric($projekt_kurzbz))
+		if(!is_numeric($projektphase_id))
 		{
-			$this->errormsg = 'Projektarbeit_id ist ungueltig';
+			$this->errormsg = 'Projektphase_ID ist ungueltig';
 			return true;
 		}
 		
-		$qry = "DELETE FROM lehre.tbl_projektarbeit WHERE projekt_kurzbz='$projekt_kurzbz'";
+		// an projektphase hängt noch eine phase
+		if($this->existPhaseFk($projektphase_id))
+		{
+			$this->errormsg ="Phase kann nicht gelöscht werden, da noch eine andere Phase daran hängt. Bitte zuerst Phase abhängen. ";
+			return false; 
+		}
+		
+		// Beginne Transaktion und lösche alle Tasks der Phase
+		$qry1 ="Begin; DELETE FROM fue.tbl_projekttask 
+		WHERE projektphase_id ='".addslashes($projektphase_id)."';";
+		
+		if($this->db_query($qry1))
+		{
+			// Lösche alle zugewiesenen Ressourcen
+			$qry2 = "DELETE FROM fue.tbl_projekt_ressource 
+			WHERE projektphase_id ='".addslashes($projektphase_id)."';";
+			
+			if($this->db_query($qry2))
+			{
+				// Lösche den Phaseneintrag
+				$qry3 = "DELETE FROM fue.tbl_projektphase 
+				WHERE projektphase_id = '".addslashes($projektphase_id)."';";
+				
+				if($this->db_query($qry3))
+				{
+					$this->db_query('COMMIT');
+					return true; 
+				}else 
+				{
+					$this->errormsg ="Fehler beim löschen der Projektphase aufgetreten";
+					$this->db_query('ROLLBACK');
+					return false; 
+				}
+			}else
+			{
+				$this->errormsg ="Fehler beim löschen der Ressourcen aufgetreten";
+				$this->db_query('ROLLBACK');
+				return false; 
+			}
+		}else
+		{
+			$this->errormsg ="Fehler beim löschen der Tasks aufgetreten";
+			$this->db_query('ROLLBACK'); 
+			return false; 
+		}
+
+	}
+	
+	/**
+	 * 
+	 * Überprüft ob an übergebenr Phase noch eine andere Phase hängt. true wenn noch eine daran hängt
+	 * @param $projektphase_id
+	 */
+	public function existPhaseFk($projektphase_id)
+	{
+		$qry = "SELECT * FROM fue.tbl_projektphase WHERE projektphase_fk ='".addslashes($projektphase_id)."';";
 		
 		if($this->db_query($qry))
 		{
-			return true;
-		}
-		else 
+			if($row = $this->db_fetch_object())
+				return true; 
+		}else 
 		{
-			$this->errormsg = 'Fehler beim Loeschen des Datensatzes';
-			return false;
-		}		
+			$this->errormsg ="Fehler bei der Abfrage aufgetreten";
+			return false; 
+		}
+	}
+	
+	/**
+	 * 
+	 * Löscht Ressourcen einer Phase
+	 * @param $projektphase_id
+	 * @param $ressource_id -> wenn != null wird nur die eine ressource gelöscht
+	 */
+	public function deleteRessource($projektphase_id, $ressource_id = null)
+	{
+		// einzelne Ressource wird gelöscht
+		if($ressource_id != null)
+		{
+			if(!is_numeric($projektphase_id) || !is_numeric($ressource_id))
+			{
+				$this->errormsg = "Keine gültige ID übergeben";
+				return false;
+			}
+			$qry ="DELETE from fue.tbl_projekt_ressource 
+					WHERE projektphase_id ='".addslashes($projektphase_id)."' and 
+					ressource_id='".addslashes($ressource_id)."';";
+		}else
+		{
+			// gesamte Ressourcen von Phase werden gelöscht
+			if(!is_numeric($projektphase_id))
+			{
+				$htis->errormsg ="Keine gültige ID übergeben";
+			}
+			$qry ="DELETE from fue.tbl_projekt_ressource 
+					WHERE projektphase_id ='".addslashes($projektphase_id)."';";
+		}
+
+		if($this->db_query($qry))
+		{
+			return true; 
+		}else
+		{
+			$this->errormsg = "Fehler bei der Abfrage aufgetreten";
+			return false; 
+		}
+		
 	}
 	
 	/**
