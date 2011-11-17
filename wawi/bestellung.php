@@ -1750,6 +1750,7 @@ if($_GET['method']=='update')
 			inputs.each(function() {
 				if(this.id!="tags" 
 				&& !this.id.match(/^detail_tag_/) 
+				&& this.id!="filter_projekt" 
 				&& this.type!="button" 
 				&& this.type!="submit"
 				&& this.type!="hidden")
