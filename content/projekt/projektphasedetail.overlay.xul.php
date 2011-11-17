@@ -91,7 +91,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					</row>
 					<row>
 						<label value="Beschreibung" control="textbox-projektphase-detail-beschreibung"/>
-	   					<textbox id="textbox-projektphase-detail-beschreibung" multiline="true" disabled="true"/>
+	   					<textbox id="textbox-projektphase-detail-beschreibung" multiline="true" disabled="true" rows="10"/>
 					</row>
 					<row>
 						<label value="Start" control="textbox-projektphase-detail-start"/>
