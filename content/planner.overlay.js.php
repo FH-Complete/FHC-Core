@@ -130,39 +130,7 @@ function treeProjektmenueSelect()
 	// Projekttasks neu laden
 	if(projekt_phase_id!='')
 	{
-	    try
-		{
-			url = "<?php echo APP_ROOT; ?>rdf/projekttask.rdf.php?projektphase_id="+projekt_phase_id+"&"+gettimestamp();
-			
-			var treeTask=document.getElementById('projekttask-tree');
-	
-			//Alte DS entfernen
-			var oldDatasources = treeTask.database.GetDataSources();
-			while(oldDatasources.hasMoreElements())
-			{
-			    treeTask.database.RemoveDataSource(oldDatasources.getNext());
-			}
-	
-			try
-			{
-			    datasourceTreeTask.removeXMLSinkObserver(TaskTreeSinkObserver);
-			    treeTask.builder.removeListener(TaskTreeListener);
-			}
-			catch(e)
-			{}
-			
-			var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-			datasourceTreeTask = rdfService.GetDataSource(url);
-			datasourceTreeTask.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-			datasourceTreeTask.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-			treeTask.database.AddDataSource(datasourceTreeTask);
-			datasourceTreeTask.addXMLSinkObserver(TaskTreeSinkObserver);
-			treeTask.builder.addListener(TaskTreeListener);
-		}
-		catch(e)
-		{
-		    debug("whoops Projekttask load failed with exception: "+e);
-		}
+	    LoadTasks(projekt_phase_id); 
 	}
 	
 	document.getElementById('projekttask-toolbar-del').disabled=true;
@@ -301,7 +269,7 @@ function ProjektmenueRefresh()
 		{
 			treeProjektmenue.database.RemoveDataSource(oldDatasources.getNext());
 		}
-
+		treeProjektmenue.builder.rebuild();
 		
 		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 		datasourceTreeProjektmenue = rdfService.GetDataSource(url);
