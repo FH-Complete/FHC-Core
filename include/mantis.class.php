@@ -121,44 +121,53 @@ class mantis extends basis_db
 	 */
 	public function getIssue($issue_id=1)
 	{
-		$params=array('username' => MANTIS_USERNAME, 'password' => MANTIS_PASSWORT,'issue_id' => $issue_id);
-		$result = $this->soapClient->__soapCall('mc_issue_get',$params);
+		try 
+		{
+			$params=array('username' => MANTIS_USERNAME, 'password' => MANTIS_PASSWORT,'issue_id' => $issue_id);
+			$result = $this->soapClient->__soapCall('mc_issue_get',$params);
 		
-		$this->issue_id = $result->id;			
-		$this->issue_view_state->id = $result->view_state->id;	
-		$this->issue_view_state->name = $result->view_state->name;		
-		$this->issue_last_updated = $result->last_updated; 		
-		$this->issue_project->id = $result->project->id;			
-		$this->issue_project->name = $result->project->name;		
-		$this->issue_category = $result->category;		
-		$this->issue_priority->id = $result->priority->id;
-		$this->issue_priority->name = $result->priority->name;		
-		$this->issue_severity->id = $result->severity->id;		
-		$this->issue_severity->name = $result->severity->name;		
-		$this->issue_status->id = $result->status->id;			
-		$this->issue_status->name = $result->status->name;			
-		$this->issue_reporter->id = $result->reporter->id;			
-		$this->issue_reporter->name = $result->reporter->name;			
-		$this->issue_reporter->real_name = $result->reporter->real_name;			
-		$this->issue_reporter->email = $result->reporter->email;		
-		$this->issue_summary = $result->summary;		
-		$this->issue_reproducibility->id = $result->reproducibility->id;
-		$this->issue_reproducibility->name = $result->reproducibility->name;	
-		$this->issue_date_submitted = $result->date_submitted;		
-		$this->issue_sponsorship_total = $result->sponsorship_total;	
-		$this->issue_projection->id = $result->projection->id;		
-		$this->issue_projection->name = $result->projection->name;		
-		$this->issue_eta->id = $result->eta->id;		
-		$this->issue_eta->name = $result->eta->name;
-		$this->issue_resolution->id = $result->resolution->id;	
-		$this->issue_resolution->name = $result->resolution->name;	
-		$this->issue_description = $result->description;	
-		//$this->issue_attachments = $result->attachments;	
-		$this->issue_due_date = $result->due_date;	
-		$this->issue_steps_to_reproduce = (isset($result->steps_to_reproduce)?$result->steps_to_reproduce:'');
-		$this->issue_additional_information = (isset($result->additional_information)?$result->additional_information:'');
+			$this->issue_id = $result->id;			
+			$this->issue_view_state->id = $result->view_state->id;	
+			$this->issue_view_state->name = $result->view_state->name;		
+			$this->issue_last_updated = $result->last_updated; 		
+			$this->issue_project->id = $result->project->id;			
+			$this->issue_project->name = $result->project->name;		
+			$this->issue_category = $result->category;		
+			$this->issue_priority->id = $result->priority->id;
+			$this->issue_priority->name = $result->priority->name;		
+			$this->issue_severity->id = $result->severity->id;		
+			$this->issue_severity->name = $result->severity->name;		
+			$this->issue_status->id = $result->status->id;			
+			$this->issue_status->name = $result->status->name;			
+			$this->issue_reporter->id = $result->reporter->id;			
+			$this->issue_reporter->name = $result->reporter->name;			
+			$this->issue_reporter->real_name = $result->reporter->real_name;			
+			$this->issue_reporter->email = $result->reporter->email;		
+			$this->issue_summary = $result->summary;		
+			$this->issue_reproducibility->id = $result->reproducibility->id;
+			$this->issue_reproducibility->name = $result->reproducibility->name;	
+			$this->issue_date_submitted = $result->date_submitted;		
+			$this->issue_sponsorship_total = $result->sponsorship_total;	
+			$this->issue_projection->id = $result->projection->id;		
+			$this->issue_projection->name = $result->projection->name;		
+			$this->issue_eta->id = $result->eta->id;		
+			$this->issue_eta->name = $result->eta->name;
+			$this->issue_resolution->id = $result->resolution->id;	
+			$this->issue_resolution->name = $result->resolution->name;	
+			$this->issue_description = $result->description;	
+			//$this->issue_attachments = $result->attachments;	
+			$this->issue_due_date = $result->due_date;	
+			$this->issue_steps_to_reproduce = (isset($result->steps_to_reproduce)?$result->steps_to_reproduce:'');
+			$this->issue_additional_information = (isset($result->additional_information)?$result->additional_information:'');
 		
-		return true;
+			return true;
+		} 
+		catch (SoapFault $fault) 
+		{
+			$this->errormsg="SOAP-Fehler: ".$fault->faultstring;
+			return false;
+		}
+
 	}
 
 	/**
@@ -166,18 +175,26 @@ class mantis extends basis_db
 	 */
 	public function getProjects()
 	{
-		$params=array('username' => MANTIS_USERNAME, 'password' => MANTIS_PASSWORT);
-		$result = $this->soapClient->__soapCall('mc_projects_get_user_accessible',$params);
-
-		foreach($result as $row)
+		try
 		{
-			$obj = new mantis();
-			$obj->issue_project->name = $row->name;
-			$obj->issue_project->id = $row->id;
+			$params=array('username' => MANTIS_USERNAME, 'password' => MANTIS_PASSWORT);
+			$result = $this->soapClient->__soapCall('mc_projects_get_user_accessible',$params);
 
-			$this->result[] = $obj;
+			foreach($result as $row)
+			{
+				$obj = new mantis();
+				$obj->issue_project->name = $row->name;
+				$obj->issue_project->id = $row->id;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		} 
+		catch (SoapFault $fault) 
+		{
+			$this->errormsg="SOAP-Fehler: ".$fault->faultstring;
+			return false;
 		}
-		return true;
 	}
 
 	/**
@@ -185,16 +202,24 @@ class mantis extends basis_db
 	 */
 	public function getCategories($project_id)
 	{
-		$params=array('username' => MANTIS_USERNAME, 'password' => MANTIS_PASSWORT, 'project_id'=>$project_id);
-		$result = $this->soapClient->__soapCall('mc_project_get_categories',$params);
-
-		foreach($result as $val)
+		try
 		{
-			$obj = new mantis();
-			$obj->issue_category = $val;
+			$params=array('username' => MANTIS_USERNAME, 'password' => MANTIS_PASSWORT, 'project_id'=>$project_id);
+			$result = $this->soapClient->__soapCall('mc_project_get_categories',$params);
 
-			$this->result[] = $obj;
+			foreach($result as $val)
+			{
+				$obj = new mantis();
+				$obj->issue_category = $val;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		} 
+		catch (SoapFault $fault) 
+		{
+			$this->errormsg="SOAP-Fehler: ".$fault->faultstring;
+			return false;
 		}
-		return true;
 	}
 }

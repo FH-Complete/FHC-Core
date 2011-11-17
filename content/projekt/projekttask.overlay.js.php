@@ -410,7 +410,7 @@ function onselectProjekttask()
 	//Mantis Tab reset
 	document.getElementById('textbox-projekttask-mantis-issue_summary').value=bezeichnung;
 	document.getElementById('textbox-projekttask-mantis-issue_description').value=beschreibung;
-	document.getElementById('textbox-projekttask-mantis-issue_project_id').value='1';
+	//document.getElementById('textbox-projekttask-mantis-issue_project_id').value='1';
     document.getElementById('textbox-projekttask-mantis-issue_category').value='General';
 	
 	document.getElementById('textbox-projekttask-mantis-mantis_id').value='';
@@ -497,7 +497,7 @@ function onselectProjekttask()
 		document.getElementById('textbox-projekttask-mantis-issue_view_state_id').value=issue_view_state_id;
 		document.getElementById('textbox-projekttask-mantis-issue_view_state_name').value=issue_view_state_name;
 		document.getElementById('textbox-projekttask-mantis-issue_last_updated').value=issue_last_updated;
-		document.getElementById('textbox-projekttask-mantis-issue_project_id').value=issue_project_id;
+		document.getElementById('menulist-projekttask-mantis-issue_project_id').value=issue_project_id;
 		document.getElementById('textbox-projekttask-mantis-issue_project_name').value=issue_project_name;
 		document.getElementById('textbox-projekttask-mantis-issue_category').value=issue_category;
 		document.getElementById('textbox-projekttask-mantis-issue_priority_id').value=issue_priority_id;
@@ -539,7 +539,7 @@ function saveProjekttaskMantis()
 	var issue_view_state_id=document.getElementById('textbox-projekttask-mantis-issue_view_state_id').value;
 	var issue_view_state_name=document.getElementById('textbox-projekttask-mantis-issue_view_state_name').value;
 	var issue_last_updated=document.getElementById('textbox-projekttask-mantis-issue_last_updated').value;
-	var issue_project_id=document.getElementById('textbox-projekttask-mantis-issue_project_id').value;
+	var issue_project_id=document.getElementById('menulist-projekttask-mantis-issue_project_id').value;
 	var issue_project_name=document.getElementById('textbox-projekttask-mantis-issue_project_name').value;
 	var issue_category=document.getElementById('textbox-projekttask-mantis-issue_category').value;
 	var issue_priority_id=document.getElementById('textbox-projekttask-mantis-issue_priority_id').value;
@@ -678,4 +678,4 @@ function ProjekttaskUpdateErledigt(event)
 			}
 		});
 	}
-}                         
+}
