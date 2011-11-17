@@ -113,10 +113,20 @@ class projekttask extends basis_db
 	 * @param  $projekt_kurzbz ID des Projekts wenn keine Projektphase angegeben
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getProjekttasks($projektphase_id,$projekt_kurzbz=null)
+	public function getProjekttasks($projektphase_id,$projekt_kurzbz=null,$filterErledigt=null)
 	{
+		$filter = '';
+		if(!is_null($filterErledigt))
+		{
+			if($filterErledigt == 'offen')
+				$filter = " and erledigt = 'false'";
+			else if ($filterErledigt == 'erledigt')
+				$filter = " and erledigt = 'true'";
+		}
+		
+		
 		if (!is_null($projektphase_id))
-			$qry = 'SELECT * FROM fue.tbl_projekttask WHERE projektphase_id='.$projektphase_id.';';
+			$qry = 'SELECT * FROM fue.tbl_projekttask WHERE projektphase_id='.$projektphase_id.$filter.';';
 		else
         	$qry='';
 
