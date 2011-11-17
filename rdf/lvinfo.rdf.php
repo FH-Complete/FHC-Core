@@ -69,6 +69,7 @@ tbl_lehrveranstaltung.sprache as unterrichtssprache,
 tbl_lehrveranstaltung.ects as ects,
 tbl_lehrveranstaltung.semesterstunden as lv_semesterstunden,
 tbl_lehrveranstaltung.orgform_kurzbz as orgform_kurzbz,
+tbl_lehrveranstaltung.incoming as incoming,
 lower(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stg_kuerzel,
 tbl_lvinfo.*
 FROM (lehre.tbl_lehrveranstaltung JOIN campus.tbl_lvinfo USING(lehrveranstaltung_id)) JOIN public.tbl_studiengang USING(studiengang_kz)
@@ -114,6 +115,7 @@ if($db->db_query($qry))
 			<LVINFO:anmerkungen><![CDATA[<?php echo xmlclean($row->anmerkung); ?>]]></LVINFO:anmerkungen>
 			<LVINFO:kurzbeschreibung><![CDATA[<?php echo xmlclean($row->kurzbeschreibung); ?>]]></LVINFO:kurzbeschreibung>
 			<LVINFO:orgform_kurzbz><![CDATA[<?php echo xmlclean($row->orgform_kurzbz); ?>]]></LVINFO:orgform_kurzbz>
+			<LVINFO:incoming><![CDATA[<?php echo xmlclean($row->incoming); ?>]]></LVINFO:incoming>
       	</RDF:Description>
 
 <?php

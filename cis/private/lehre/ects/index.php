@@ -537,7 +537,16 @@ if (!$db = new basis_db())
 	   echo "</td></tr>";
 	   //Sprache ausgeben
 	   echo "<tr><td><b>".$p->t('courseInformation/unterrichtssprache')."</b></td><td>$lv_obj->sprache";
-	   echo "</td></tr></table><br><br>";
+	   echo "</td></tr>";
+	   
+	   //Anz. Incoming ausgeben
+	   	   
+	   if ($lv_obj->incoming > -1)
+		{
+			echo "<tr><td><b>".$p->t('courseInformation/incomingplaetze')."</b></td><td>$lv_obj->incoming";
+		}
+		else echo "<tr><td><b>".$p->t('courseInformation/incomingplaetze')."</b></td><td>0";
+			echo "</td></tr></table><br><br>";
 
 	   //Eingabefelder anzeigen
 	   echo "<table width='100%'  border='0' cellspacing='0' cellpadding='0'>";

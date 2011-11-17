@@ -156,6 +156,7 @@ if (!$db = new basis_db())
 	$lang = $lv_obj->sprache;
 	$titel_de = $lv_obj->bezeichnung;
 	$titel_en = $lv_obj->bezeichnung_english;
+	$anz_incoming = $lv_obj->incoming;
 
 	if (!isset($lv))
 		$lv=0;
@@ -315,6 +316,12 @@ if (!$db = new basis_db())
 
 		if ($ects_points)
 			echo '<tr><td>ECTS:&nbsp;</td><td>'.number_format(stripslashes($ects_points),1,'.','').'</td></tr>';
+			
+		if ($anz_incoming > -1)
+		{
+			echo '<tr><td>Incomingpl&auml;tze:&nbsp;</td><td>'.stripslashes($anz_incoming).'</td></tr>';
+		}
+		else echo '<tr><td>Incomingpl&auml;tze:&nbsp;</td><td>0</td></tr>';
 
 		echo '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
 		//Fachbereiche und Leiter/Koordinatoren anzeigen
@@ -423,8 +430,8 @@ if (!$db = new basis_db())
 				<tr><td><br />";
 
 		echo '<table border="0" cellpadding="0">';
-	    echo "<tr><td>degree programme:</td><td>$stg_kurzbz</td></tr>";
-	    echo "<tr><td>semester:</td><td>$sem</td></tr>";
+	    echo "<tr><td>Degree programme:</td><td>$stg_kurzbz</td></tr>";
+	    echo "<tr><td>Semester:</td><td>$sem</td></tr>";
 	    echo "<tr><td>&nbsp;</td><td>&nbsp;</td></tr>";
 
 		if(($anz=count($lehrendearray))>0)
@@ -454,6 +461,12 @@ if (!$db = new basis_db())
 
 	    if ($ects_points)
 			echo "<tr><td>ECTS Credits:&nbsp;</td><td>".number_format(stripslashes($ects_points),1,'.','')."</td></tr>";
+			
+		if ($anz_incoming > -1)
+		{
+			echo '<tr><td>Incoming:&nbsp;</td><td>'.stripslashes($anz_incoming).'</td></tr>';
+		}
+		else echo '<tr><td>Incoming:&nbsp;</td><td>0</td></tr>';
 
 		echo "<tr><td>&nbsp;</td><td>&nbsp;</td></tr>";
 
