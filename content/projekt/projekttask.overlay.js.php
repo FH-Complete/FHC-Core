@@ -24,6 +24,8 @@ require_once('../../config/vilesci.config.inc.php');
 // *********** Globale Variablen *****************//
 
 var TaskSelectID=null; //ID des Task Eintrages der nach dem Refresh markiert werden soll
+var filterErledigt; //Tasks filtern
+var currentProjektPhaseID; 
 // ********** Observer und Listener ************* //
 
 // ****
@@ -66,6 +68,61 @@ var TaskTreeListener =
 
 // ****************** FUNKTIONEN ************************** //
 
+
+
+// ****
+// * Laedt dynamisch die Tasks
+// ****
+function LoadTasks(projekt_phase_id, filter)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	try
+		{
+			// wenn phase übergeben wurde -> setzte globale variable
+			if(projekt_phase_id != null && projekt_phase_id != '' && typeof optional && "undefined")
+				currentProjektPhaseID = projekt_phase_id; 
+			
+			// wenn filter übergeben wurde -> setze globale variable
+			if(filter != null && filter != '' && typeof filter != "undefined")
+				filterErledigt = filter;
+				
+			url = "<?php echo APP_ROOT; ?>rdf/projekttask.rdf.php?projektphase_id="+currentProjektPhaseID+"&"+gettimestamp();	
+
+			// überprüfe ob filter gesetzt ist
+			if(filterErledigt != null)
+				url = "<?php echo APP_ROOT; ?>rdf/projekttask.rdf.php?projektphase_id="+currentProjektPhaseID+"&filter="+filterErledigt+"&"+gettimestamp();
+
+			var treeTask=document.getElementById('projekttask-tree');
+			//Alte DS entfernen
+			var oldDatasources = treeTask.database.GetDataSources();
+			while(oldDatasources.hasMoreElements())
+			{
+			    treeTask.database.RemoveDataSource(oldDatasources.getNext());
+			}
+	
+			try
+			{
+			    datasourceTreeTask.removeXMLSinkObserver(TaskTreeSinkObserver);
+			    treeTask.builder.removeListener(TaskTreeListener);
+			}
+			catch(e)
+			{}
+			
+			var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+			datasourceTreeTask = rdfService.GetDataSource(url);
+			datasourceTreeTask.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+			datasourceTreeTask.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+			treeTask.database.AddDataSource(datasourceTreeTask);
+			datasourceTreeTask.addXMLSinkObserver(TaskTreeSinkObserver);
+			treeTask.builder.addListener(TaskTreeListener);
+			
+		}
+		catch(e)
+		{
+		    debug("whoops Projekttask load failed with exception: "+e);
+		}
+}
 
 
 // ****
@@ -281,26 +338,30 @@ function saveProjekttaskDetail()
 	ressource_id = MenulistGetSelectedValue('textbox-projekttask-detail-ressource'); 	
 	ende = document.getElementById('textbox-projekttask-detail-ende').iso;
 	
-	var soapBody = new SOAPObject("saveProjekttask");
-	//soapBody.appendChild(new SOAPObject("username")).val('joe');
-	//soapBody.appendChild(new SOAPObject("passwort")).val('waschl');
-				
-	var task = new SOAPObject("task");
-	task.appendChild(new SOAPObject("projekttask_id")).val(projekttask_id);
-	task.appendChild(new SOAPObject("projektphase_id")).val(projektphase_id);
-	task.appendChild(new SOAPObject("bezeichnung")).val(bezeichnung);
-	task.appendChild(new SOAPObject("beschreibung")).val(beschreibung);
-	task.appendChild(new SOAPObject("aufwand")).val(aufwand);
-	task.appendChild(new SOAPObject("mantis_id")).val(mantis_id);
-	task.appendChild(new SOAPObject("user")).val(getUsername());
-	task.appendChild(new SOAPObject("ressource_id")).val(ressource_id);
-	task.appendChild(new SOAPObject("ende")).val(ende);
-	soapBody.appendChild(task);
-							
-	var sr = new SOAPRequest("saveProjekttask",soapBody);
-
-	SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekttask.soap.php?"+gettimestamp();
-	SOAPClient.SendRequest(sr, clb_saveProjekttask);
+	if(!isNaN(projektphase_id) && projektphase_id != '')
+	{
+		var soapBody = new SOAPObject("saveProjekttask");
+		//soapBody.appendChild(new SOAPObject("username")).val('joe');
+		//soapBody.appendChild(new SOAPObject("passwort")).val('waschl');
+					
+		var task = new SOAPObject("task");
+		task.appendChild(new SOAPObject("projekttask_id")).val(projekttask_id);
+		task.appendChild(new SOAPObject("projektphase_id")).val(projektphase_id);
+		task.appendChild(new SOAPObject("bezeichnung")).val(bezeichnung);
+		task.appendChild(new SOAPObject("beschreibung")).val(beschreibung);
+		task.appendChild(new SOAPObject("aufwand")).val(aufwand);
+		task.appendChild(new SOAPObject("mantis_id")).val(mantis_id);
+		task.appendChild(new SOAPObject("user")).val(getUsername());
+		task.appendChild(new SOAPObject("ressource_id")).val(ressource_id);
+		task.appendChild(new SOAPObject("ende")).val(ende);
+		soapBody.appendChild(task);
+								
+		var sr = new SOAPRequest("saveProjekttask",soapBody);
+	
+		SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekttask.soap.php?"+gettimestamp();
+		SOAPClient.SendRequest(sr, clb_saveProjekttask);
+	}else
+	alert('keine gueltige Projektphase_ID eingetragen');
 }
 
 // ****

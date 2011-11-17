@@ -54,6 +54,13 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/mantisdetail.overlay.xul.p
 				<toolbarbutton id="projekttask-toolbar-neu" label="Neuer Task" oncommand="TaskNeu();" disabled="true" image="../skin/images/NeuDokument.png" tooltiptext="Neuen Task anlegen" />
 				<toolbarbutton id="projekttask-toolbar-del" label="Loeschen" oncommand="TaskDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Task löschen"/>
 				<toolbarbutton id="projekttask-toolbar-refresh" label="Aktualisieren" oncommand="TaskTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
+				<toolbarbutton anonid="toolbarbutton-notiz-filter" label="Filter " type="menu">							
+					<menupopup>
+						<menuitem label="Erledigte Tasks" type="radio" name="sort" oncommand="LoadTasks(currentProjektPhaseID,'erledigt')" tooltiptext="Erledigte Tasks anzeigen"/>
+						<menuitem label="Offene Tasks" type="radio" name="sort" oncommand="LoadTasks(currentProjektPhaseID,'offen')" tooltiptext="Offene Tasks anzeigen"/>
+						<menuitem label="Alle Tasks" type="radio" name="sort" oncommand="LoadTasks(currentProjektPhaseID,'alle')" tooltiptext="Alle Tasks anzeigen"/>
+				      </menupopup>
+				</toolbarbutton>
 			</toolbar>
 		</toolbox>
 
@@ -95,6 +102,14 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/mantisdetail.overlay.xul.p
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projekttask/rdf#mantis_id" />
 				<splitter class="tree-splitter"/>
+				<treecol id="projekttask-treecol-ende" label="Ende" flex="2" hidden="false" persist="hidden, width, ordinal"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/projekttask/rdf#ende" />
+				<splitter class="tree-splitter"/>
+				<treecol id="projekttask-treecol-ressource_bezeichnung" label="Ressource" flex="2" hidden="false" persist="hidden, width, ordinal"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/projekttask/rdf#ressource_bezeichnung" />
+				<splitter class="tree-splitter"/>
 				<treecol id="projekttask-treecol-erledigt" label="Erledigt" flex="2" hidden="false" persist="hidden, width, ordinal"
 					class="sortDirectionIndicator" type="checkbox"
 					sort="rdf:http://www.technikum-wien.at/projekttask/rdf#erledigt" />
@@ -111,6 +126,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/mantisdetail.overlay.xul.p
 							<treecell label="rdf:http://www.technikum-wien.at/projekttask/rdf#beschreibung"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projekttask/rdf#aufwand"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projekttask/rdf#mantis_id"/>
+							<treecell label="rdf:http://www.technikum-wien.at/projekttask/rdf#ende"/>
+							<treecell label="rdf:http://www.technikum-wien.at/projekttask/rdf#ressource_bezeichnung"/>							
 							<treecell label="erledigt" value="rdf:http://www.technikum-wien.at/projekttask/rdf#erledigt"/>
 						</treerow>
 					</treeitem>
