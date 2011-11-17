@@ -33,6 +33,7 @@ require_once('../include/benutzerberechtigung.class.php');
 
 $SOAPServer = new SoapServer(APP_ROOT."/soap/projektphase.wsdl.php?".microtime());
 $SOAPServer->addFunction("saveProjektphase");
+$SOAPServer->addFunction("deleteProjektphase");
 $SOAPServer->handle();
 
 // WSDL Chache auf aus
@@ -88,6 +89,29 @@ function saveProjektphase($username, $passwort, $phase)
 	else
 		return new SoapFault("Server", $projektphase->errormsg);
 }
+
+/**
+ * 
+ * Loescht die übergebene Projektphase
+ * @param $username
+ * @param $passwort
+ * @param $projektphase_kurzbz
+ */
+function deleteProjektphase($username, $passwort, $projektphase_id)
+{
+	if(!$user = check_user($username, $passwort))
+		return new SoapFault("Server", "Invalid Credentials");	
+	
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+		
+	if(!$rechte->isBerechtigt('planner', null, 'suid'))
+		return new SoapFault("Server", "Sie haben keine Berechtigung zum Loeschen von Phasen");
+		
+	$phase = new projektphase();
+	if($phase->delete($projektphase_id))
+		return "OK";
+	else
+		return new SoapFault("Server", $phase->errormsg); 
+}
 ?>
-
-
