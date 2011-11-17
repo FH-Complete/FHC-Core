@@ -53,8 +53,21 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
    					<textbox id="textbox-projekttask-mantis-issue_last_updated" disabled="true"/>
 				</row>
 				<row>
-					<label value="Projekt ID" control="textbox-projekttask-mantis-issue_project_id"/>
-   					<textbox id="textbox-projekttask-mantis-issue_project_id"/>
+					<label value="Projekt ID" control="menulist-projekttask-mantis-issue_project_id"/>
+					<menulist id="menulist-projekttask-mantis-issue_project_id"
+				          datasources="<?php echo APP_ROOT;?>rdf/mantis_projects.rdf.php"
+				          ref="http://www.technikum-wien.at/mantis_project"
+
+				         >
+						<template>
+								<menupopup>
+									<menuitem value="rdf:http://www.technikum-wien.at/mantis_project/rdf#id"
+					        			      label="rdf:http://www.technikum-wien.at/mantis_project/rdf#name"
+								  			  uri="rdf:*"/>
+								</menupopup>
+
+						</template>
+					</menulist>
    					<label value="Projekt Name" control="textbox-projekttask-mantis-issue_project_name"/>
    					<textbox id="textbox-projekttask-mantis-issue_project_name" disabled="true"/>
 				</row>
