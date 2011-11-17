@@ -23,6 +23,7 @@ require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/projekttask.class.php');
 require_once('../include/rdf.class.php');
 require_once('../include/datum.class.php');
+require_once('../include/ressource.class.php'); 
 
 $datum_obj = new datum();
 
@@ -31,8 +32,16 @@ $projekttask_obj = new projekttask();
 $projektphase_id=4; //zum Testen, ansonsten null
 if (isset($_GET['projektphase_id']))
 {
-	$projektphase_id=$_GET['projektphase_id'];
-	$projekttask_obj->getProjekttasks($projektphase_id);
+	if(isset($_GET['filter']))
+	{
+		$projektphase_id=$_GET['projektphase_id'];
+		$filter = $_GET['filter'];
+		$projekttask_obj->getProjekttasks($projektphase_id,null,$filter);
+	}else
+	{
+		$projektphase_id=$_GET['projektphase_id'];
+		$projekttask_obj->getProjekttasks($projektphase_id);
+	}
 }
 	
 if(isset($_GET['projekttask_id']))
@@ -57,7 +66,14 @@ foreach($projekttask_obj->result as $projekttask)
 	$oRdf->obj[$i]->setAttribut('mantis_id',$projekttask->mantis_id);
 	$oRdf->obj[$i]->setAttribut('erledigt',($projekttask->erledigt?'true':'false'));
 	$oRdf->obj[$i]->setAttribut('projekttask_fk',$projekttask->projekttask_fk);
-	$oRdf->obj[$i]->setAttribut('ressource_id',$projekttask->ressource_id);
+	$ressource_bezeichnung ='-'; 
+	if($projekttask->ressource_id != '')
+	{
+		$ressource = new ressource(); 
+		$ressource->load($projekttask->ressource_id);
+		$ressource_bezeichnung = $ressource->bezeichnung; 
+	} 
+	$oRdf->obj[$i]->setAttribut('ressource_bezeichnung',$ressource_bezeichnung);
 	$oRdf->obj[$i]->setAttribut('ende',$datum_obj->formatDatum($projekttask->ende,'d.m.Y'));
 	
 	if($projekttask->projekttask_fk!='')
