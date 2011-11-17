@@ -50,14 +50,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<row>
 						<label value="Task ID" control="textbox-projekttask-detail-projekttask_id "/>
 						<hbox>
-							<textbox id="textbox-projekttaskdetail-projekttask_id" disabled="true" size="5"/>
+							<textbox id="textbox-projekttaskdetail-projekttask_id" disabled="true" size="3"/>
 							<spacer />
 						</hbox>
 					</row>
 					<row>
 						<label value="Projektphase ID" control="textbox-projekttask-detail-projektphase_id"/>
 						<hbox>
-							<textbox id="textbox-projekttaskdetail-projektphase_id" size="3" disabled="true"/>
+							<textbox id="textbox-projekttaskdetail-projektphase_id" size="3"/>
 							<spacer />
 						</hbox>
 					</row>
@@ -67,7 +67,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					</row>
 					<row>
 						<label value="Beschreibung" control="textbox-projekttask-detail-beschreibung"/>
-	   					<textbox id="textbox-projekttask-detail-beschreibung" multiline="true" disabled="true"/>
+	   					<textbox id="textbox-projekttask-detail-beschreibung" multiline="true" disabled="true" rows="10"/>
 					</row>
 					<row>
 						<label value="Aufwand" control="textbox-projekttask-detail-aufwand"/>
