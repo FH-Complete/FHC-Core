@@ -2921,6 +2921,84 @@ if(!$result = @$db->db_query("SELECT research_area FROM public.tbl_preincoming L
 		echo 'public.tbl_preincoming: Spalten hinzugefuegt!<br>';
 }
 
+// deutschkurs3 zu public.tbl_preincoming
+if(!$result = @$db->db_query("SELECT deutschkurs3 FROM public.tbl_preincoming LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_preincoming ADD COLUMN deutschkurs3 boolean;
+			
+			GRANT USAGE ON SCHEMA fue TO wawi;
+			GRANT SELECT ON fue.tbl_ressource TO wawi;
+			GRANT SELECT ON fue.tbl_projekt_ressource TO wawi;
+			GRANT SELECT ON fue.tbl_projekt TO wawi;
+			";
+			
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_preincoming: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'public.tbl_preincoming: Spalte deutschkurs3 hinzugefuegt!<br>';
+}
+
+// mimetype zur tbl_vorlagestudiengang hinzufuegen
+if(!@$db->db_query("SELECT mimetype FROM public.tbl_vorlage LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE public.tbl_vorlage ADD COLUMN mimetype varchar(32);
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_vorlage: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Tabelle public.tbl_vorlage Spalte mimetype hinzugefuegt!<br>';
+}
+
+// tbl_webservicetyp und tbl_webservicelog hinzufügen
+if(!@$db->db_query("SELECT 1 FROM system.tbl_webservicelog LIMIT 1"))
+{
+	$qry = "
+	CREATE SEQUENCE system.seq_webservicelog_webservicelog_id
+ 	INCREMENT BY 1
+ 	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+	
+	CREATE TABLE system.tbl_webservicetyp
+	(
+		webservicetyp_kurzbz varchar(32) NOT NULL,
+		beschreibung varchar(256)
+	);
+		
+	CREATE TABLE system.tbl_webservicelog
+	(
+		webservicelog_id Integer NOT NULL,
+		webservicetyp_kurzbz Character varying(32) NOT NULL,
+		request_id Character varying(64),
+		beschreibung Character varying(256), 
+		request_data Text,
+		execute_time Timestamp NOT NULL,
+		execute_user Character varying(32)
+	);
+			
+	ALTER TABLE system.tbl_webservicelog ALTER COLUMN webservicelog_id SET DEFAULT nextval('system.seq_webservicelog_webservicelog_id');
+	
+	ALTER TABLE system.tbl_webservicelog ADD CONSTRAINT pk_webservicelog_id PRIMARY KEY (webservicelog_id);
+	ALTER TABLE system.tbl_webservicetyp ADD CONSTRAINT pk_webservicetyp PRIMARY KEY (webservicetyp_kurzbz);
+	
+	ALTER TABLE system.tbl_webservicelog ADD CONSTRAINT fk_webservicetyp_webservicelog FOREIGN KEY(webservicetyp_kurzbz) REFERENCES system.tbl_webservicetyp(webservicetyp_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;
+	
+	GRANT SELECT, INSERT, DELETE, UPDATE ON system.tbl_webservicelog TO admin;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_webservicelog TO wawi;
+	GRANT SELECT, INSERT, DELETE, UPDATE ON system.tbl_webservicetyp TO admin;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_webservicetyp TO wawi;
+	
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>wawi.tbl_zahlungstyp: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Tabelle system.tbl_webservicelog und system.tbl_webservicetyp hinzugefuegt!<br>';
+}
+
+
 echo '<br>';
 
 $tabellen=array(
@@ -3055,7 +3133,7 @@ $tabellen=array(
 	"public.tbl_organisationseinheittyp" => array("organisationseinheittyp_kurzbz", "bezeichnung", "beschreibung"),
 	"public.tbl_person"  => array("person_id","staatsbuergerschaft","geburtsnation","sprache","anrede","titelpost","titelpre","nachname","vorname","vornamen","gebdatum","gebort","gebzeit","foto","anmerkung","homepage","svnr","ersatzkennzeichen","familienstand","geschlecht","anzahlkinder","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","bundesland_code","kompetenzen","kurzbeschreibung","zugangscode"),
 	"public.tbl_personfunktionstandort"  => array("personfunktionstandort_id","funktion_kurzbz","person_id","standort_id","position","anrede"),
-	"public.tbl_preincoming"  => array("preincoming_id","person_id","mobilitaetsprogramm_code","zweck_code","firma_id","universitaet","aktiv","bachelorthesis","masterthesis","von","bis","uebernommen","insertamum","insertvon","updateamum","updatevon","anmerkung","zgv","zgv_ort","zgv_datum","zgv_name","zgvmaster","zgvmaster_datum","zgvmaster_ort","zgvmaster_name","program_name","bachelor","master","jahre","person_id_emergency","person_id_coordinator_dep","person_id_coordinator_int","code","deutschkurs1","deutschkurs2","research_area"),
+	"public.tbl_preincoming"  => array("preincoming_id","person_id","mobilitaetsprogramm_code","zweck_code","firma_id","universitaet","aktiv","bachelorthesis","masterthesis","von","bis","uebernommen","insertamum","insertvon","updateamum","updatevon","anmerkung","zgv","zgv_ort","zgv_datum","zgv_name","zgvmaster","zgvmaster_datum","zgvmaster_ort","zgvmaster_name","program_name","bachelor","master","jahre","person_id_emergency","person_id_coordinator_dep","person_id_coordinator_int","code","deutschkurs1","deutschkurs2","research_area","deutschkurs3"),
 	"public.tbl_preincoming_lehrveranstaltung"  => array("preincoming_id","lehrveranstaltung_id","insertamum","insertvon"),
 	"public.tbl_preinteressent"  => array("preinteressent_id","person_id","studiensemester_kurzbz","firma_id","erfassungsdatum","einverstaendnis","absagedatum","anmerkung","maturajahr","infozusendung","aufmerksamdurch_kurzbz","kontaktmedium_kurzbz","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preinteressentstudiengang"  => array("studiengang_kz","preinteressent_id","freigabedatum","uebernahmedatum","prioritaet","insertamum","insertvon","updateamum","updatevon"),
@@ -3074,7 +3152,7 @@ $tabellen=array(
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","ext_id"),
 	"public.tbl_tag"  => array("tag"),
 	"public.tbl_variable"  => array("name","uid","wert"),
-	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung"),
+	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung","mimetype"),
 	"public.tbl_vorlagestudiengang"  => array("vorlagestudiengang_id","vorlage_kurzbz","studiengang_kz","version","text","oe_kurzbz"),
 	"sync.tbl_zutrittskarte"  => array("key","name","firstname","groupe","logaswnumber","physaswnumber","validstart","validend","text1","text2","text3","text4","text5","text6","pin"),
 	"testtool.tbl_ablauf"  => array("ablauf_id","gebiet_id","studiengang_kz","reihung","gewicht","semester", "insertamum","insertvon","updateamum", "updatevon"),
@@ -3093,6 +3171,8 @@ $tabellen=array(
 	"system.tbl_berechtigung"  => array("berechtigung_kurzbz","beschreibung"),
 	"system.tbl_rolle"  => array("rolle_kurzbz","beschreibung"),
 	"system.tbl_rolleberechtigung"  => array("berechtigung_kurzbz","rolle_kurzbz","art"),
+	"system.tbl_webservicelog"  => array("webservicelog_id","webservicetyp_kurzbz","request_id","beschreibung","request_data","execute_time","execute_user"),
+	"system.tbl_webservicetyp"  => array("webservicetyp_kurzbz","beschreibung"),
 	"system.tbl_server"  => array("server_kurzbz","beschreibung"),
 	"wawi.tbl_betriebsmittelperson"  => array("betriebsmittelperson_id","betriebsmittel_id","person_id", "anmerkung", "kaution", "ausgegebenam", "retouram","insertamum", "insertvon","updateamum", "updatevon","ext_id"),
 	"wawi.tbl_betriebsmittel"  => array("betriebsmittel_id","betriebsmitteltyp","oe_kurzbz", "ort_kurzbz", "beschreibung", "nummer", "hersteller","seriennummer", "bestellung_id","bestelldetail_id", "afa","verwendung","anmerkung","reservieren","updateamum","updatevon","insertamum","insertvon","ext_id","inventarnummer","leasing_bis","inventuramum","inventurvon","anschaffungsdatum","anschaffungswert","hoehe","breite","tiefe"),
