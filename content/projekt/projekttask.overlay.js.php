@@ -472,18 +472,18 @@ function onselectProjekttask()
 	document.getElementById('textbox-projekttask-mantis-issue_summary').value=bezeichnung;
 	document.getElementById('textbox-projekttask-mantis-issue_description').value=beschreibung;
 	//document.getElementById('textbox-projekttask-mantis-issue_project_id').value='1';
-    document.getElementById('textbox-projekttask-mantis-issue_category').value='General';
+    //document.getElementById('textbox-projekttask-mantis-issue_category').value='General';
 	
 	document.getElementById('textbox-projekttask-mantis-mantis_id').value='';
 	document.getElementById('textbox-projekttask-mantis-issue_view_state_id').value='';
 	document.getElementById('textbox-projekttask-mantis-issue_view_state_name').value='';
 	document.getElementById('textbox-projekttask-mantis-issue_last_updated').value='';
     document.getElementById('textbox-projekttask-mantis-issue_project_name').value='';
-    document.getElementById('textbox-projekttask-mantis-issue_priority_id').value='';
+    //document.getElementById('menulist-projekttask-mantis-issue_priority_id').value='';
     document.getElementById('textbox-projekttask-mantis-issue_priority_name').value='';
 	document.getElementById('textbox-projekttask-mantis-issue_severity_id').value='';
     document.getElementById('textbox-projekttask-mantis-issue_severity_name').value='';
-    document.getElementById('textbox-projekttask-mantis-issue_status_id').value='';
+    //document.getElementById('menulist-projekttask-mantis-issue_status_id').value='';
     document.getElementById('textbox-projekttask-mantis-issue_status_name').value='';
     document.getElementById('textbox-projekttask-mantis-issue_reporter_id').value='';
     document.getElementById('textbox-projekttask-mantis-issue_reporter_name').value='';
@@ -550,6 +550,8 @@ function onselectProjekttask()
 		var issue_due_date=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#issue_due_date" ));			 		 
 		var issue_steps_to_reproduce=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#issue_steps_to_reproduce" ));
 		var issue_additional_information=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#issue_additional_information" ));
+
+		ProjekttaskLoadCategories(issue_project_id);
 		
 		//Daten den Feldern zuweisen
 		document.getElementById('textbox-projekttask-mantis-mantis_id').value=mantis_id;
@@ -560,12 +562,12 @@ function onselectProjekttask()
 		document.getElementById('textbox-projekttask-mantis-issue_last_updated').value=issue_last_updated;
 		document.getElementById('menulist-projekttask-mantis-issue_project_id').value=issue_project_id;
 		document.getElementById('textbox-projekttask-mantis-issue_project_name').value=issue_project_name;
-		document.getElementById('textbox-projekttask-mantis-issue_category').value=issue_category;
-		document.getElementById('textbox-projekttask-mantis-issue_priority_id').value=issue_priority_id;
+		document.getElementById('menulist-projekttask-mantis-issue_category').value=issue_category;
+		document.getElementById('menulist-projekttask-mantis-issue_priority_id').value=issue_priority_id;
 		document.getElementById('textbox-projekttask-mantis-issue_priority_name').value=issue_priority_name;
 		document.getElementById('textbox-projekttask-mantis-issue_severity_id').value=issue_severity_id;
 		document.getElementById('textbox-projekttask-mantis-issue_severity_name').value=issue_severity_name;
-		document.getElementById('textbox-projekttask-mantis-issue_status_id').value=issue_status_id;
+		document.getElementById('menulist-projekttask-mantis-issue_status_id').value=issue_status_id;
 		document.getElementById('textbox-projekttask-mantis-issue_status_name').value=issue_status_name;
 		document.getElementById('textbox-projekttask-mantis-issue_reporter_id').value=issue_reporter_id;
 		document.getElementById('textbox-projekttask-mantis-issue_reporter_name').value=issue_reporter_name;
@@ -588,6 +590,47 @@ function onselectProjekttask()
 }
 
 // ****
+// * Beim Aendern des Mantis Projekts werden die zugehoerigen 
+// * Kategorien geladen
+// ****
+function ProjekttaskMantisProjektChange()
+{
+	project_id=document.getElementById('menulist-projekttask-mantis-issue_project_id').value;
+	
+	if(project_id!='')
+		ProjekttaskLoadCategories(project_id);
+}
+
+// ****
+// * Laedt die Mantis Kategorien (Blocking)
+// * @param project_id Mantis Projekt ID
+// ****
+function ProjekttaskLoadCategories(project_id)
+{
+	if(project_id!='')
+	{
+		//Kategorien zu diesem Projekt laden
+		menulist = document.getElementById('menulist-projekttask-mantis-issue_category');
+		var url = '<?php echo APP_ROOT; ?>rdf/mantis_categories.rdf.php?project_id='+project_id+'&'+gettimestamp();
+		var oldDatasources = menulist.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			menulist.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		menulist.builder.rebuild();
+	
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);	
+		var datasource = rdfService.GetDataSourceBlocking(url);
+	
+		datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		menulist.database.AddDataSource(datasource);
+		menulist.builder.rebuild();
+	}
+}
+
+// ****
 // * Speichert die Mantis-Details
 // ****
 function saveProjekttaskMantis()
@@ -602,12 +645,12 @@ function saveProjekttaskMantis()
 	var issue_last_updated=document.getElementById('textbox-projekttask-mantis-issue_last_updated').value;
 	var issue_project_id=document.getElementById('menulist-projekttask-mantis-issue_project_id').value;
 	var issue_project_name=document.getElementById('textbox-projekttask-mantis-issue_project_name').value;
-	var issue_category=document.getElementById('textbox-projekttask-mantis-issue_category').value;
-	var issue_priority_id=document.getElementById('textbox-projekttask-mantis-issue_priority_id').value;
+	var issue_category=document.getElementById('menulist-projekttask-mantis-issue_category').value;
+	var issue_priority_id=document.getElementById('menulist-projekttask-mantis-issue_priority_id').value;
 	var issue_priority_name=document.getElementById('textbox-projekttask-mantis-issue_priority_name').value;
 	var issue_severity_id=document.getElementById('textbox-projekttask-mantis-issue_severity_id').value;
 	var issue_severity_name=document.getElementById('textbox-projekttask-mantis-issue_severity_name').value;
-	var issue_status_id=document.getElementById('textbox-projekttask-mantis-issue_status_id').value;
+	var issue_status_id=document.getElementById('menulist-projekttask-mantis-issue_status_id').value;
 	var issue_status_name=document.getElementById('textbox-projekttask-mantis-issue_status_name').value;
 	var issue_reporter_id=document.getElementById('textbox-projekttask-mantis-issue_reporter_id').value;
 	var issue_reporter_name=document.getElementById('textbox-projekttask-mantis-issue_reporter_name').value;

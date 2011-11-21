@@ -134,6 +134,8 @@ function saveMantis($projekttask_id, $mantis_id, $issue_summary, $issue_descript
 		$mantis->issue_description = $issue_description;
 		$mantis->issue_project->id = $issue_project_id;
 		$mantis->issue_category = $issue_category;
+		$mantis->issue_status->id = $issue_status_id;
+		$mantis->issue_priority->id = $issue_priority_id;
 		$mantis->issue_steps_to_reproduce = $issue_steps_to_reproduce;
 		$mantis->issue_additional_information = $issue_additional_information;
 		
@@ -151,6 +153,8 @@ function saveMantis($projekttask_id, $mantis_id, $issue_summary, $issue_descript
 		$mantis->issue_steps_to_reproduce = $issue_steps_to_reproduce;
 		$mantis->issue_additional_information = $issue_additional_information;
 		$mantis->issue_category = $issue_category;
+		$mantis->issue_status->id = $issue_status_id;
+		$mantis->issue_priority->id = $issue_priority_id;
 		
 		if($id = $mantis->insertIssue())
 		{

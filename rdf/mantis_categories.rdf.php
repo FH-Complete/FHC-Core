@@ -30,15 +30,18 @@ $oRdf = new rdf('MANTIS_CATEGORIES','http://www.technikum-wien.at/mantis_categor
 $oRdf->sendHeader();
 
 $mantis = new mantis();
-$mantis->getCategories($project_id);
+if($mantis->getCategories($project_id))
+{
 
-foreach($mantis->result as $row)
-{	
-	$i=$oRdf->newObjekt($row->issue_category);
-	$oRdf->obj[$i]->setAttribut('category',$row->issue_category,true);
-	
-	$oRdf->addSequence($row->issue_category);
+	foreach($mantis->result as $row)
+	{	
+		$i=$oRdf->newObjekt($row->issue_category);
+		$oRdf->obj[$i]->setAttribut('category',$row->issue_category,true);
+		
+		$oRdf->addSequence($row->issue_category);
+	}
 }
-
+else
+	echo $mantis->errormsg;
 $oRdf->sendRdfText();
 ?>

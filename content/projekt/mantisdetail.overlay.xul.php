@@ -53,11 +53,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
    					<textbox id="textbox-projekttask-mantis-issue_last_updated" disabled="true"/>
 				</row>
 				<row>
-					<label value="Projekt ID" control="menulist-projekttask-mantis-issue_project_id"/>
+					<label value="Projekt" control="menulist-projekttask-mantis-issue_project_id"/>
 					<menulist id="menulist-projekttask-mantis-issue_project_id"
 				          datasources="<?php echo APP_ROOT;?>rdf/mantis_projects.rdf.php"
 				          ref="http://www.technikum-wien.at/mantis_project"
-
+							onselect="ProjekttaskMantisProjektChange()"
 				         >
 						<template>
 								<menupopup>
@@ -72,33 +72,83 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
    					<textbox id="textbox-projekttask-mantis-issue_project_name" disabled="true"/>
 				</row>
 				<row>
-					<label value="Zusammenfassung" control="textbox-projekttask-mantis-issue_summary"/>
-					<textbox id="textbox-projekttask-mantis-issue_summary"/>
 					<label value="Kategorie" control="textbox-projekttask-mantis-issue_category"/>
-   					<textbox id="textbox-projekttask-mantis-issue_category" disabled="true"/>
-									
+					<menulist id="menulist-projekttask-mantis-issue_category"
+				          datasources="rdf:null"
+				          ref="http://www.technikum-wien.at/mantis_categories"
+
+				         >
+						<template>
+								<menupopup>
+									<menuitem value="rdf:http://www.technikum-wien.at/mantis_categories/rdf#category"
+					        			      label="rdf:http://www.technikum-wien.at/mantis_categories/rdf#category"
+								  			  uri="rdf:*"/>
+								</menupopup>
+
+						</template>
+					</menulist>		
+				</row>
+				<row>
+					<label value="Zusammenfassung" control="textbox-projekttask-mantis-issue_summary"/>
+					<textbox id="textbox-projekttask-mantis-issue_summary"/>	
+					<label value="Reporter_real_name" control="textbox-projekttask-mantis-issue_reporter_real_name"/>
+   					<textbox id="textbox-projekttask-mantis-issue_reporter_real_name" disabled="true"/>
 				</row>
 				<row>
 					<label value="Beschreibung" control="textbox-projekttask-mantis-issue_description"/>
    					<textbox id="textbox-projekttask-mantis-issue_description" multiline="true"/>
-   					<label value="Status" control="textbox-projekttask-mantis-issue_status_name"/>
+   					<label value="View_state_name" control="textbox-projekttask-mantis-issue_view_state_name"/>
    					<vbox>
-   						<textbox id="textbox-projekttask-mantis-issue_status_name" disabled="true"/>
+   						<textbox id="textbox-projekttask-mantis-issue_view_state_name" disabled="true"/>
    						<spacer />
    					</vbox>
 				</row>
 				<row>
 					<label value="Schritte zur Reproduktion" control="textbox-projekttask-mantis-steps_to_reproduce"/>
    					<textbox id="textbox-projekttask-mantis-issue_steps_to_reproduce" multiline="true"/>
-   					<label value="Priorität" control="textbox-projekttask-mantis-issue_priority_name"/>
+   					
+				</row>
+				<row>
+					<label value="Zusätzliche Informationen" control="textbox-projekttask-mantis-issue_additional_information"/>
+   					<textbox id="textbox-projekttask-mantis-issue_additional_information" multiline="true"/>
+				</row>
+				<row>
+					<label value="Priorität" control="menulist-projekttask-mantis-issue_priority_id"/>
+   					<menulist id="menulist-projekttask-mantis-issue_priority_id">
+						<menupopup>
+							<menuitem value="10" label="keine"/>
+							<menuitem value="20" label="niedrig"/>
+							<menuitem value="30" label="normal"/>
+							<menuitem value="40" label="hoch"/>
+							<menuitem value="50" label="dringend"/>
+							<menuitem value="60" label="sofort"/>
+						</menupopup>
+					</menulist>
+					<label value="Priorität" control="textbox-projekttask-mantis-issue_priority_name"/>
    					<vbox>
    						<textbox id="textbox-projekttask-mantis-issue_priority_name" disabled="true"/>
    						<spacer />
    					</vbox>
 				</row>
 				<row>
-					<label value="Zusätzliche Informationen" control="textbox-projekttask-mantis-issue_additional_information"/>
-   					<textbox id="textbox-projekttask-mantis-issue_additional_information" multiline="true"/>
+					<label value="Status_id" control="menulist-projekttask-mantis-issue_status_id"/>
+   					<menulist id="menulist-projekttask-mantis-issue_status_id">
+						<menupopup>
+							<menuitem value="10" label="Neu"/>
+							<menuitem value="20" label="Rueckmeldung"/>
+							<menuitem value="30" label="anerkannt"/>
+							<menuitem value="40" label="bestaetigt (BL)"/>
+							<menuitem value="50" label="zugewiesen (SBL)"/>
+							<menuitem value="80" label="erledigt"/>
+							<menuitem value="90" label="geschlossen"/>
+						</menupopup>
+					</menulist>
+					<label value="Status" control="textbox-projekttask-mantis-issue_status_name"/>
+   					<vbox>
+   						<textbox id="textbox-projekttask-mantis-issue_status_name" disabled="true"/>
+   						<spacer />
+   					</vbox>
+					
 				</row> 		
 				<row>
 					<label value="View_state_id" control="textbox-projekttask-mantis-issue_view_state_id"/>
@@ -106,22 +156,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<label value="Due_date" control="textbox-projekttask-mantis-issue_due_date"/>
    					<textbox id="textbox-projekttask-mantis-issue_due_date" disabled="true"/>
 				</row>
-				<row>
-					<label value="Priority_id" control="textbox-projekttask-mantis-issue_priority_id"/>
-   					<textbox id="textbox-projekttask-mantis-issue_priority_id" disabled="true"/>
-					
-				</row>
+				
 				<row>
 					<label value="Severity_id" control="textbox-projekttask-mantis-issue_severity_id"/>
    					<textbox id="textbox-projekttask-mantis-issue_severity_id" disabled="true"/>
 					<label value="Severity_name" control="textbox-projekttask-mantis-issue_severity_name"/>
    					<textbox id="textbox-projekttask-mantis-issue_severity_name" disabled="true"/>
-				</row>
-				<row>
-					<label value="Status_id" control="textbox-projekttask-mantis-issue_status_id"/>
-   					<textbox id="textbox-projekttask-mantis-issue_status_id" disabled="true"/>
-					<label value="View_state_name" control="textbox-projekttask-mantis-issue_view_state_name"/>
-   					<textbox id="textbox-projekttask-mantis-issue_view_state_name" disabled="true"/>
 				</row>
 				<row>
 					<label value="Reporter_id" control="textbox-projekttask-mantis-issue_reporter_id"/>
@@ -130,8 +170,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
    					<textbox id="textbox-projekttask-mantis-issue_reporter_name" disabled="true"/>
 				</row>
 				<row>
-					<label value="Reporter_real_name" control="textbox-projekttask-mantis-issue_reporter_real_name"/>
-   					<textbox id="textbox-projekttask-mantis-issue_reporter_real_name" disabled="true"/>
 					<label value="Reporter_email" control="textbox-projekttask-mantis-issue_reporter_email"/>
    					<textbox id="textbox-projekttask-mantis-issue_reporter_email" disabled="true"/>
 				</row>
