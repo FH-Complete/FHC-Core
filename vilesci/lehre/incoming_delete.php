@@ -62,10 +62,11 @@
 	<p>
 	Löscht den entsprechenden Incoming aus <strong>beiden</strong> LV-Plan Tabellen und auch die Gruppenzuteilung im FAS.<br/><br/>
 		
-	Lehreinheit
-    <input type="text" name="lehreinheit_id" size="6" maxlength="10" value="<?php echo $lehreinheit_id; ?>">
+	Lehreinheit aus der der Incoming gelöscht werden soll:
+    <input type="text" name="lehreinheit_id" size="6" maxlength="10" value="<?php echo $lehreinheit_id; ?>"><br/>
 	</p>
-  <p>Studiengang
+	<p>Gruppe des Incomings, die gelöscht werden soll (zB: BME0I1)<br/>
+	Studiengang
     <select name="stgid">
 		<option value=NULL>*</option>
       <?php
