@@ -90,6 +90,7 @@ $firma->getFirmen('Partneruniversität');
 	<head>
 		<title>Incoming-Verwaltung</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<meta http-equiv="expires" content="Sat, 01 Dec 2001 00:00:00 GMT">
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link href="../../../include/js/tablesort/table.css" rel="stylesheet" type="text/css">
 	<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
@@ -1353,7 +1354,7 @@ else if ($method == "profil")
 			</tr>
 			<tr>
 				<td>'.$p->t('global/geburtsdatum').'</td>
-				<td><input type="text" size="20" name="geb_datum" value="'.$date->formatDatum($person->gebdatum,'d.m.Y').'" onfocus="this.value="""; > (dd.mm.YYYY)</td>
+				<td><input type="text" size="20" name="geb_datum" value="'.$date->formatDatum($person->gebdatum,'d.m.Y').'" onfocus="this.value=\'\'"> (dd.mm.YYYY)</td>
 				<td>&nbsp;</td>
 			</tr>
 			<tr>
