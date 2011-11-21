@@ -90,6 +90,8 @@ class mantis extends basis_db
 					'category'=>$this->issue_category,
 					'description'=>$this->issue_description,
 					'steps_to_reproduce'=>$this->issue_steps_to_reproduce,
+					'status'=>array('id'=>$this->issue_status->id),
+					'priority'=>array('id'=>$this->issue_priority->id),
 					'additional_information'=>$this->issue_additional_information,
 				);				
 				
@@ -108,6 +110,8 @@ class mantis extends basis_db
 					'category'=>$this->issue_category,
 					'description'=>$this->issue_description,
 					'steps_to_reproduce'=>$this->issue_steps_to_reproduce,
+					'status'=>$this->issue_status->id,
+					'priority'=>array('id'=>$this->issue_priority->id),
 					'additional_information'=>$this->issue_additional_information,
 				);
 		
