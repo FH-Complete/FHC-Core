@@ -2990,6 +2990,9 @@ if(!@$db->db_query("SELECT 1 FROM system.tbl_webservicelog LIMIT 1"))
 	GRANT SELECT, INSERT, DELETE, UPDATE ON system.tbl_webservicetyp TO admin;
 	GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_webservicetyp TO wawi;
 	
+	GRANT SELECT, UPDATE ON system.seq_webservicelog_webservicelog_id TO admin;
+	GRANT SELECT, UPDATE ON system.seq_webservicelog_webservicelog_id TO web;
+	
 	";
 	
 	if(!$db->db_query($qry))
