@@ -2993,6 +2993,7 @@ if(!@$db->db_query("SELECT 1 FROM system.tbl_webservicelog LIMIT 1"))
 	GRANT SELECT, UPDATE ON system.seq_webservicelog_webservicelog_id TO admin;
 	GRANT SELECT, UPDATE ON system.seq_webservicelog_webservicelog_id TO web;
 	
+	INSERT INTO system.tbl_webservicetyp(webservicetyp_kurzbz, beschreibung) VALUES('stip','Schnittstelle der Stipendienstelle');
 	";
 	
 	if(!$db->db_query($qry))
