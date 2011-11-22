@@ -880,6 +880,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 					}
 					else 
 					{
+						$oBetriebsmittel_betriebsmittelstatus->datum=date('Y-m-d');
 						$oBetriebsmittel_betriebsmittelstatus->insertvon=$uid;
 						$oBetriebsmittel_betriebsmittelstatus->insertamum=date('Y-m-d H:i:s');
 					}
