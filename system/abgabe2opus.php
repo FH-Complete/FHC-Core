@@ -26,12 +26,8 @@
  *******************************************************************************************************/
 
 require_once('../config/cis.config.inc.php');
-//require_once('../include/functions.inc.php');
-//require_once('../include/studiengang.class.php');
 require_once('../include/datum.class.php');
-//require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/mail.class.php');
-
 require_once("../opus/lib/stringValidation.php");
 require_once('../opus/lib/opus.class.php');
 
@@ -1282,8 +1278,9 @@ if($erg=pg_query($db_conn,$qry))
 				}
 				else 
 				{
-					$fehler.="\nKein Zweitbegutachter zugeordnet!";
-					$error=true;
+					//$fehler.="\nKein Zweitbegutachter zugeordnet!";
+					//$error=true;
+					$begutachter2 = $begutachter1;
 				}
 			}
 			else 
