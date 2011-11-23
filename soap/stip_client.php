@@ -5,6 +5,8 @@ require_once('stip.class.php');
 <html>
 	<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<script type="text/javascript" src="../include/js/jqSOAPClient.js"></script> 
+		<script type="text/javascript" src="../include/js/jquery.js"></script> 
 		<title>STIP-Client</title>
 	</head>
 	<body>
@@ -51,6 +53,7 @@ require_once('stip.class.php');
 		      <td align="right"></td>
 		      <td>
 		        <input type="submit" value=" Absenden " name="submit">
+		        <input type="button" onclick="sendSoap();" value="send Soap">
 		      </td>
 		    </tr>
 		</table>
@@ -61,9 +64,11 @@ require_once('stip.class.php');
 
 if(isset($_REQUEST['submit']))
 {
-	$client = new SoapClient(APP_ROOT."/soap/stip.soap.wsdl"); 
+	$client = new SoapClient(APP_ROOT."/soap/stip.wsdl.php?".microtime()); 
 	//$client = new SoapClient(APP_ROOT."/soap/stip.soap.wsdl", array('login'=>'stip','password'=>'stip'));
 	
+	$username = "test";
+	$passwort = "foo";
 	
 	$ErhKz = $_REQUEST['ErhKz'];
 	$AnfragedatenID = $_REQUEST['AnfragedatenID']; 
@@ -76,15 +81,106 @@ if(isset($_REQUEST['submit']))
 	$bezieher->Familienname= $_REQUEST['Familienname'];
 	$bezieher->Vorname= $_REQUEST['Vorname'];
 	$bezieher->Typ = $_REQUEST['Typ'];
+	$bezieher1 = new stip(); 
+	$bezieher1->Semester = $_REQUEST['Semester'];
+	$bezieher1->Studienjahr = $_REQUEST['Studienjahr'];
+	$bezieher1->PersKz= $_REQUEST['PersKz'];
+	$bezieher1->SVNR= $_REQUEST['Svnr']; 
+	$bezieher1->Familienname= $_REQUEST['Familienname'];
+	$bezieher1->Vorname= $_REQUEST['Vorname'];
+	$bezieher1->Typ = $_REQUEST['Typ'];
+	
+	$arrayBezieher = array($bezieher, $bezieher1);
+	
+	$stipbezieher = array($ErhKz, $AnfragedatenID, $arrayBezieher);
+	
+	//var_dump($stipbezieher);
+	
 	try
 	{
-		$response = $client->getStipDaten($ErhKz, $AnfragedatenID, $bezieher);
-		echo var_dump($response);
+		//$response = $client->GetStipendienbezieherStip(array("userName"=>$username,"passWord"=>$passwort,"anfrageDaten"=>array("ErhKz"=>$ErhKz, "AnfragedatenID"=>$AnfragedatenID,"Stipendiumsbezieher"=>array($bezieher, $bezieher1))));
+		$response = $client->GetStipendienbezieherStip(array("userName"=>$username,"passWord"=>$passwort,"anfrageDaten"=>array("ErhKz"=>$ErhKz, "AnfragedatenID"=>$AnfragedatenID,"Stipendiumsbezieher"=>array($bezieher))));
+		var_dump($response);
+		echo '<hr>';
+		var_dump($response->Stipendiumsbezieher->StipendiumsbezieherAntwort);
 	}
 	catch(SoapFault $fault) 
 	{
-    	echo "SOAP Fault: (faultcode: {$fault->faultcode}, faultstring: {$fault->faultstring})", E_USER_ERROR;
+    	echo "SOAP Fault: (faultcode: ".$fault->faultcode.", faultstring: ".$fault->faultstring.")", E_USER_ERROR;
 	}
 	 
 }
+
 ?>
+<script type="text/javascript">
+function gettimestamp()
+{
+	var now = new Date();
+	var ret = now.getHours()*60*60*60;
+	ret = ret + now.getMinutes()*60*60;
+	ret = ret + now.getSeconds()*60;
+	ret = ret + now.getMilliseconds();
+	return ret;
+}
+function sendSoap()
+{
+var soapBody = new SOAPObject("ns1:GetStipendienbezieherStip");
+soapBody.appendChild(new SOAPObject("ns1:userName")).val('joe');
+soapBody.appendChild(new SOAPObject("ns1:passWord")).val('waschl');
+//soapBody.ns = Array();
+//soapBody.ns['name']='ns1';
+//soapBody.ns['uri']='http://www.fhr.ac.at/BISWS/STIP/WebServices/Services/STIPServiceDecentralized';
+var anfrageDaten = new SOAPObject("ns1:anfrageDaten");
+anfrageDaten.appendChild(new SOAPObject("ns1:ErhKz")).val('005');
+anfrageDaten.appendChild(new SOAPObject("ns1:AnfragedatenID")).val('100');
+
+
+var stipendiumsbezieher = new SOAPObject("ns1:Stipendiumsbezieher");
+var stipendiumsbezieherAnfrage = new SOAPObject("ns1:StipendiumsbezieherAnfrage");
+stipendiumsbezieherAnfrage.appendChild(new SOAPObject("ns1:Semester")).val('WS');
+stipendiumsbezieherAnfrage.appendChild(new SOAPObject("ns1:Studienjahr")).val('2010/11');
+stipendiumsbezieherAnfrage.appendChild(new SOAPObject("ns1:PersKz")).val('0810256050');
+stipendiumsbezieherAnfrage.appendChild(new SOAPObject("ns1:Svnr")).val('1447081083');
+stipendiumsbezieherAnfrage.appendChild(new SOAPObject("ns1:Familienname")).val('Cihlar');
+stipendiumsbezieherAnfrage.appendChild(new SOAPObject("ns1:Vorname")).val('Markus');
+stipendiumsbezieherAnfrage.appendChild(new SOAPObject("ns1:Typ")).val('as');
+
+stipendiumsbezieher.appendChild(stipendiumsbezieherAnfrage);
+/*
+var stipendiumsbezieherAnfrage = new SOAPObject("ns1:StipendiumsbezieherAnfrage");
+stipendiumsbezieherAnfrage.appendChild(new SOAPObject("ns1:Semester")).val('WS');
+stipendiumsbezieherAnfrage.appendChild(new SOAPObject("ns1:Studienjahr")).val('2010/11');
+stipendiumsbezieherAnfrage.appendChild(new SOAPObject("ns1:PersKz")).val('2222222222');
+stipendiumsbezieherAnfrage.appendChild(new SOAPObject("ns1:Svnr")).val('2222222222');
+stipendiumsbezieherAnfrage.appendChild(new SOAPObject("ns1:Familienname")).val('2Cihlar');
+stipendiumsbezieherAnfrage.appendChild(new SOAPObject("ns1:Vorname")).val('2Markus');
+stipendiumsbezieherAnfrage.appendChild(new SOAPObject("ns1:Typ")).val('as');
+
+stipendiumsbezieher.appendChild(stipendiumsbezieherAnfrage);
+*/
+anfrageDaten.appendChild(stipendiumsbezieher);
+soapBody.appendChild(anfrageDaten);
+var sr = new SOAPRequest("GetStipendienbezieherStip",soapBody);
+sr.addNamespace('ns1','http://www.fhr.ac.at/BISWS/STIP/WebServices/Services/STIPServiceDecentralized');
+SOAPClient.Proxy="<?php echo APP_ROOT;?>/soap/stip.soap.php?"+gettimestamp();
+
+SOAPClient.SendRequest(sr, clb_saveProjektphase);
+}
+
+function clb_saveProjektphase(respObj)
+{
+try
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+    var msg = respObj.Body[0].saveProjektphaseResponse[0].message[0].Text;
+	window.opener.ProjektphaseTreeRefresh();
+	window.close();
+}
+catch(e)
+{
+	var fehler = respObj.Body[0].Fault[0].faultstring[0].Text;
+	alert('Fehler: '+fehler);
+}
+}
+
+</script>
