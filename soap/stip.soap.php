@@ -26,14 +26,16 @@ require_once('../include/konto.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/benutzer.class.php');
 require_once('../include/webservicelog.class.php'); 
+require_once('../include/mail.class.php');
 require_once('stip.class.php'); 
 
 ini_set("soap.wsdl_cache_enabled", "0");
 
 $SOAPServer = new SoapServer(APP_ROOT."/soap/stip.wsdl.php?".microtime());
-//$SOAPServer = new SoapServer("http://localhost/fhcomplete/trunk/soap/stip.wsdl.php?".microtime());
 $SOAPServer->addFunction("GetStipendienbezieherStip");
+$SOAPServer->addFunction("SendStipendienbezieherStipError");
 $SOAPServer->handle();
+
 
 function GetStipendienbezieherStip($parameters)
 { 	
@@ -54,15 +56,12 @@ function GetStipendienbezieherStip($parameters)
 
 	$StipBezieherAntwort = array(); 
 
-	//return new SoapFault("Server", "asdf".print_r($Stipendiumsbezieher->StipendiumsbezieherAnfrage, true));
 	$i=0;
 	if(!is_array($Stipendiumsbezieher->StipendiumsbezieherAnfrage))
 		$Stipendiumsbezieher->StipendiumsbezieherAnfrage = array($Stipendiumsbezieher->StipendiumsbezieherAnfrage);
 
 	foreach($Stipendiumsbezieher->StipendiumsbezieherAnfrage as $BezieherStip)
 	{
-		//$test= print_r($BezieherStip, true);
-		//return new SoapFault("Server", "asdf".$BezieherStip->Semester);
 		$prestudentID; 
 		$studentUID; 
 		$studSemester; 
@@ -157,14 +156,27 @@ function GetStipendienbezieherStip($parameters)
 		return new SoapFault("Server", $StipBezieher->errormsg);	
 	}
 	$ret = array("ErhKz"=>$ErhalterKz,"AnfragedatenID"=>$AnfrageDatenID, "Stipendiumsbezieher"=>$StipBezieherAntwort);
-	//return new SoapFault("Server", print_r($ret,true));
 	return $ret; 
-	
 }
 
-function SendStipendienbezieherStipError($ErhKz, $StateCode, $StateMessage, $ErrorStatusCode, $JobId, $ErrorContent)
+/**
+ * 
+ * Funktion nimmt Fehler entgegen und sendet sie an Admin
+ * @param $parameters -> XML SOAP File
+ */
+function SendStipendienbezieherStipError($parameters)
 {
-	return "$ErhKz, $StateCode"; 
+	$xmlData = file_get_contents('php://input'); 
+	
+/*	$log = new webservicelog(); 
+	$log->request_data = file_get_contents('php://input'); 
+	$log->webservicetyp_kurzbz = 'stip'; 
+	$log->request_id = $AnfrageDatenID; 
+	$log->beschreibung = "Error von Stip"; 
+	$log->save(true);*/
+	
+	$mail = new mail(MAIL_ADMIN, 'vilesci.technikum-wien.at', 'STIP - Error', $xmlData);
+	$mail->send(); 
 }
 
 ?>
