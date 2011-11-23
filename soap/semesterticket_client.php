@@ -34,7 +34,7 @@ require_once('../config/vilesci.config.inc.php');
 		    </tr>
 		   <tr>
 		      <td align="right">Postleitzahl:</td>
-		      <td><input name="postleitzahl" type="text" size="30" maxlength="10" value="<?php echo (isset($_REQUEST['plz']) ? $_REQUEST['plz'] : "");?>"></td>
+		      <td><input name="postleitzahl" type="text" size="30" maxlength="10" value="<?php echo (isset($_REQUEST['postleitzahl']) ? $_REQUEST['postleitzahl'] : "");?>"></td>
 		    </tr>
 		        <tr>
 		      <td align="right">Semesterkuerzel:</td>
@@ -68,7 +68,9 @@ if(isset($_REQUEST['submit']))
 		$obj->geburtsdatum = $_REQUEST['geburtsdatum'];
 		$obj->postleitzahl = $_REQUEST['postleitzahl'];
 		$obj->semesterkuerzel = $_REQUEST['semesterkuerzel'];
+		
 		$response = $client->verifyData($obj);
+		//$response = $client->verifyData(array('token'=>$_REQUEST['token'], 'matrikelnummer'=>$_REQUEST['matrikelnummer'], 'name'=>$_REQUEST['name'], 'vorname'=>$_REQUEST['vorname'], 'geburtsdatum'=>$_REQUEST['geburtsdatum'], 'postleitzahl'=>$_REQUEST['postleitzahl'], 'semesterkuerzel'=>$_REQUEST['semesterkuerzel']));
 		var_dump($response);
 	}
 	catch(SoapFault $fault) 
