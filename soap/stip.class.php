@@ -53,26 +53,26 @@ class stip extends basis_db
 		if($Bezieher->PersKz != null && strlen($Bezieher->PersKz) != 10)
 		{
 			$this->errormsg = "Kein gültiger Wert für PersKz"; 
-			return false; 
+	//		return false; 
 		}
 			
 		if(mb_strlen($Bezieher->SVNR) != 10 || !is_numeric($Bezieher->SVNR))
 		{
 			$this->errormsg = "Kein gültiger Wert für SVNR"; 
-			return false; 
+		//	return false; 
 		}
 			
 			// preg_match funktioniert noch nicht || preg_match_all('[^0-9]*',$Bezieher->Familienname)>0
 		if(mb_strlen($Bezieher->Familienname) > 255 || $Bezieher->Familienname == null || mb_strlen($Bezieher->Familienname)<2)
 		{
 			$this->errormsg = "Kein gültiger Wert für Familienname"; 
-			return false; 
+			//return false; 
 		}
 			
 		if(mb_strlen($Bezieher->Vorname) > 255 || $Bezieher->Vorname == null || mb_strlen($Bezieher->Vorname) <2)
 		{
 			$this->errormsg = "Kein gültiger Wert für Vorname"; 
-			return false; 
+		//	return false; 
 		}
 			
 		if(mb_strlen($Bezieher->Typ) != 2 || ($Bezieher->Typ != "ag" && $Bezieher->Typ != "as" && $Bezieher->Typ != "AG" && $Bezieher->Typ != "AS"))
