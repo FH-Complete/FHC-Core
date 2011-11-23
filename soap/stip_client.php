@@ -94,15 +94,26 @@ if(isset($_REQUEST['submit']))
 	
 	$stipbezieher = array($ErhKz, $AnfragedatenID, $arrayBezieher);
 	
-	//var_dump($stipbezieher);
+	
+	class foo {};
+	$obj = new foo();
+	$obj->ErrorNumber = "errornumber"; 
+	$obj->KeyAttribute = "keyattribute"; 
+	$obj->KeyValues = "keyvalues"; 
+	$obj->CheckAttribute ="checkattribute"; 
+	$obj->CheckValue ="checkvalue"; 
+	$obj->ErrorText = "errortext"; 
 	
 	try
 	{
 		//$response = $client->GetStipendienbezieherStip(array("userName"=>$username,"passWord"=>$passwort,"anfrageDaten"=>array("ErhKz"=>$ErhKz, "AnfragedatenID"=>$AnfragedatenID,"Stipendiumsbezieher"=>array($bezieher, $bezieher1))));
-		$response = $client->GetStipendienbezieherStip(array("userName"=>$username,"passWord"=>$passwort,"anfrageDaten"=>array("ErhKz"=>$ErhKz, "AnfragedatenID"=>$AnfragedatenID,"Stipendiumsbezieher"=>array($bezieher))));
-		var_dump($response);
+		$response_stip = $client->GetStipendienbezieherStip(array("userName"=>$username,"passWord"=>$passwort,"anfrageDaten"=>array("ErhKz"=>$ErhKz, "AnfragedatenID"=>$AnfragedatenID,"Stipendiumsbezieher"=>array($bezieher))));
+		var_dump($response_stip);
 		echo '<hr>';
-		var_dump($response->Stipendiumsbezieher->StipendiumsbezieherAntwort);
+		var_dump($response_stip->Stipendiumsbezieher->StipendiumsbezieherAntwort);
+		
+		$response_error = $client->SendStipendienbezieherStipError(array("userName"=>"abc", "passWord"=>"test", "errorReport"=>array("ErhKz"=>"erhkz", "StateCode"=>"statecode", "StateMessage"=>"statemessage", "ErrorStatusCode"=>"errorstatuscode", "JobID"=>"jobid", "ErrorContent"=>array($obj))));
+		var_dump($response_error);
 	}
 	catch(SoapFault $fault) 
 	{
