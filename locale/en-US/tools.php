@@ -2,7 +2,7 @@
 
 //Dokumente
 $this->phrasen['tools/dokumente']='Documents';
-$this->phrasen['tools/inskriptionsbestaetigung']='Inskriptionsbestätigung';
+$this->phrasen['tools/inskriptionsbestaetigung']='Enrollment Confirmation';
 $this->phrasen['tools/studienbeitragFuerSSBezahltAmDatum']='tuition fee for semester %1$s paid at %2$s';
 $this->phrasen['tools/studienbeitragFuerSSNochNichtBezahlt']='tuition fee for semester %1$s not yet paid';
 $this->phrasen['tools/studienerfolgsbestaetigung']='Student progress report';
@@ -10,10 +10,10 @@ $this->phrasen['tools/studiensemesterAuswaehlen']='Please select the correspondi
 $this->phrasen['tools/vorlageWohnsitzfinanzamt']='for submission to local tax office';
 
 //Leistungsbeurteilung
-$this->phrasen['tools/leistungsbeurteilung']='Leistungsbeurteilung';
-$this->phrasen['tools/mussAlsStudentEingeloggtSein']='Sie müssen als Student eingeloggt sein um ihre Noten abzufragen!';
-$this->phrasen['tools/nochKeineBeurteilungEingetragen']='Es wurden noch keine Beurteilungen eingetragen';
-$this->phrasen['tools/fehlerBeimAuslesenDerNoten']='Fehler beim Auslesen der Noten';
+$this->phrasen['tools/leistungsbeurteilung']='Performance Assessment ';
+$this->phrasen['tools/mussAlsStudentEingeloggtSein']='You must be logged in as a student to view your grades!';
+$this->phrasen['tools/nochKeineBeurteilungEingetragen']='No grade has been entered yet';
+$this->phrasen['tools/fehlerBeimAuslesenDerNoten']='Error reading the grades.';
 
 //Zahlungen
 $this->phrasen['tools/zahlungen']='Payments';

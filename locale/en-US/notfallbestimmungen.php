@@ -1,8 +1,8 @@
 ﻿<?php
-$this->phrasen['notfallbestimmungen/brandschutzbeauftragte']='Brandschutzbeauftragte';
-$this->phrasen['notfallbestimmungen/brandschutzwarte']='Brandschutzwarte';
-$this->phrasen['notfallbestimmungen/rektorat']='Rektorat';
-$this->phrasen['notfallbestimmungen/ersthelfer']='Ersthelfer';
-$this->phrasen['notfallbestimmungen/ausbildungErfolgteDurchORK']='Ausbildung erfolgte durch das <font style="color:red;">Österreichische Rote Kreuz - ÖRK';
-$this->phrasen['notfallbestimmungen/folgendePersonenStehenZurVerfuegung']='Folgende Personen stehen als ausgebildete Ersthelfer zur Verfügung';
+$this->phrasen['notfallbestimmungen/brandschutzbeauftragte']='Fire Safety Officer';
+$this->phrasen['notfallbestimmungen/brandschutzwarte']='Fire Safety Deputies';
+$this->phrasen['notfallbestimmungen/rektorat']='Rector\'s Office';
+$this->phrasen['notfallbestimmungen/ersthelfer']='First Aid Providers';
+$this->phrasen['notfallbestimmungen/ausbildungErfolgteDurchORK']='Training was conducted by the <font style="color:red;">Austrian Red Cross (ÖRK)</font>';
+$this->phrasen['notfallbestimmungen/folgendePersonenStehenZurVerfuegung']='The following persons are trained to provide first aid';
 ?>
