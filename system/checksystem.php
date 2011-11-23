@@ -2988,7 +2988,7 @@ if(!@$db->db_query("SELECT 1 FROM system.tbl_webservicelog LIMIT 1"))
 	GRANT SELECT, UPDATE ON system.seq_webservicelog_webservicelog_id TO web;
 	
 	INSERT INTO system.tbl_webservicetyp(webservicetyp_kurzbz, beschreibung) VALUES('stip','Schnittstelle der Stipendienstelle');
-	INSERT INTO system.tbl_webservicetyp(webservicetyp_kurzbz, beschreibung) VALUES('wienerlinen','Schnittstelle der Wiener Linien');
+	INSERT INTO system.tbl_webservicetyp(webservicetyp_kurzbz, beschreibung) VALUES('wienerlinien','Schnittstelle der Wiener Linien');
 	";
 	
 	if(!$db->db_query($qry))
