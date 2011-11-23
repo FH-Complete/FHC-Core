@@ -2924,13 +2924,7 @@ if(!$result = @$db->db_query("SELECT research_area FROM public.tbl_preincoming L
 // deutschkurs3 zu public.tbl_preincoming
 if(!$result = @$db->db_query("SELECT deutschkurs3 FROM public.tbl_preincoming LIMIT 1"))
 {
-	$qry = "ALTER TABLE public.tbl_preincoming ADD COLUMN deutschkurs3 boolean;
-			
-			GRANT USAGE ON SCHEMA fue TO wawi;
-			GRANT SELECT ON fue.tbl_ressource TO wawi;
-			GRANT SELECT ON fue.tbl_projekt_ressource TO wawi;
-			GRANT SELECT ON fue.tbl_projekt TO wawi;
-			";
+	$qry = "ALTER TABLE public.tbl_preincoming ADD COLUMN deutschkurs3 boolean;";
 			
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_preincoming: '.$db->db_last_error().'</strong><br>';
@@ -2942,7 +2936,7 @@ if(!$result = @$db->db_query("SELECT deutschkurs3 FROM public.tbl_preincoming LI
 if(!@$db->db_query("SELECT mimetype FROM public.tbl_vorlage LIMIT 1"))
 {
 	$qry = "
-	ALTER TABLE public.tbl_vorlage ADD COLUMN mimetype varchar(32);
+	ALTER TABLE public.tbl_vorlage ADD COLUMN mimetype varchar(64);
 	";
 	
 	if(!$db->db_query($qry))
@@ -2986,18 +2980,19 @@ if(!@$db->db_query("SELECT 1 FROM system.tbl_webservicelog LIMIT 1"))
 	ALTER TABLE system.tbl_webservicelog ADD CONSTRAINT fk_webservicetyp_webservicelog FOREIGN KEY(webservicetyp_kurzbz) REFERENCES system.tbl_webservicetyp(webservicetyp_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;
 	
 	GRANT SELECT, INSERT, DELETE, UPDATE ON system.tbl_webservicelog TO admin;
-	GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_webservicelog TO wawi;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_webservicelog TO web;
 	GRANT SELECT, INSERT, DELETE, UPDATE ON system.tbl_webservicetyp TO admin;
-	GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_webservicetyp TO wawi;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_webservicetyp TO web;
 	
 	GRANT SELECT, UPDATE ON system.seq_webservicelog_webservicelog_id TO admin;
 	GRANT SELECT, UPDATE ON system.seq_webservicelog_webservicelog_id TO web;
 	
 	INSERT INTO system.tbl_webservicetyp(webservicetyp_kurzbz, beschreibung) VALUES('stip','Schnittstelle der Stipendienstelle');
+	INSERT INTO system.tbl_webservicetyp(webservicetyp_kurzbz, beschreibung) VALUES('wienerlinen','Schnittstelle der Wiener Linien');
 	";
 	
 	if(!$db->db_query($qry))
-		echo '<strong>wawi.tbl_zahlungstyp: '.$db->db_last_error().'</strong><br>';
+		echo '<strong>system.tbl_webservicelog: '.$db->db_last_error().'</strong><br>';
 	else 
 		echo 'Tabelle system.tbl_webservicelog und system.tbl_webservicetyp hinzugefuegt!<br>';
 }
