@@ -65,8 +65,9 @@ class preincoming extends basis_db
 	public $person_id_coordinator_dep; 
 	public $person_id_coordinator_int; 
 	public $research_area;
-	public $deutschkurs1;
-	public $deutschkurs2;
+	public $deutschkurs1;		// boolean
+	public $deutschkurs2;		// boolean
+	public $deutschkurs3;		// boolean
 
 	/**
 	 * Konstruktor
@@ -141,6 +142,7 @@ class preincoming extends basis_db
 			$this->person_id_coordinator_int = $row->person_id_coordinator_int; 
 			$this->deutschkurs1 = ($row->deutschkurs1=='t'?true:false);
 			$this->deutschkurs2 = ($row->deutschkurs2=='t'?true:false);
+			$this->deutschkurs3 = ($row->deutschkurs3=='t'?true:false);
 			$this->research_area = $row->research_area; 
 		}
 		else
@@ -203,6 +205,7 @@ class preincoming extends basis_db
 				$obj->person_id_coordinator_int = $row->person_id_coordinator_int; 
 				$obj->deutschkurs1 = ($row->deutschkurs1=='t'?true:false);
 				$obj->deutschkurs2 = ($row->deutschkurs2=='t'?true:false);
+				$obj->deutschkurs3 = ($row->deutschkurs3=='t'?true:false);
 				$obj->research_area = $row->research_area; 
 			
 				$this->result[] = $obj;
@@ -294,6 +297,7 @@ class preincoming extends basis_db
 				  $this->addslashes($this->person_id_coordinator_int).', '.
 				  ($this->deutschkurs1?'true':'false').', '.
 				  ($this->deutschkurs2?'true':'false').', '.
+				  ($this->deutschkurs3?'true':'false').', '.				  
 				  $this->addslashes($this->research_area).' );';  		      
 		}
 		else
@@ -338,6 +342,7 @@ class preincoming extends basis_db
 				' person_id_coordinator_int='.$this->addslashes($this->person_id_coordinator_int).', '.
 				' deutschkurs1='.($this->deutschkurs1?'true':'false').', '.
 				' deutschkurs2='.($this->deutschkurs2?'true':'false').', '.
+				' deutschkurs3='.($this->deutschkurs3?'true':'false').', '.			
 				' research_area='.$this->addslashes($this->research_area).' '.  	
 		      	' WHERE preincoming_id='.$this->preincoming_id.';';
 		}
@@ -609,6 +614,7 @@ class preincoming extends basis_db
 				 
 				$obj->deutschkurs1 = ($row->deutschkurs1=='t'?true:false);
 				$obj->deutschkurs2 = ($row->deutschkurs2=='t'?true:false);
+				$obj->deutschkurs3 = ($row->deutschkurs3=='t'?true:false);				
 				$obj->research_area = $row->research_area;
 				
 				$obj->vorname = $row->vorname;

@@ -243,6 +243,8 @@ else if($method=="lehrveranstaltungen")
 				$preincoming->deutschkurs1=true;
 			elseif($_GET['type']=='deutschkurs2')
 				$preincoming->deutschkurs2=true;
+			elseif($_GET['type']=='deutschkurs3')
+				$preincoming->deutschkurs3=true;
 			if(!$preincoming->save(false))
 				echo $preincoming->errormsg;
 		}
@@ -252,6 +254,8 @@ else if($method=="lehrveranstaltungen")
 				$preincoming->deutschkurs1=false;
 			if($_GET['type']=='deutschkurs2')
 				$preincoming->deutschkurs2=false;
+			if($_GET['type']=='deutschkurs3')
+				$preincoming->deutschkurs3=false;				
 			if(!$preincoming->save(false))
 				echo $preincoming->errormsg;
 		}
@@ -273,7 +277,7 @@ else if($method=="lehrveranstaltungen")
 				<tr><td>&nbsp;</td></tr>
 			</table>'; 
 
-			if($preincoming->deutschkurs1 || $preincoming->deutschkurs2)
+			if($preincoming->deutschkurs1 || $preincoming->deutschkurs2 || $preincoming->deutschkurs3)
 			{
 				//Uebersicht Deutschkurse
 				echo '<table width="90%" border="0" align="center" class="table-stripeclass:alternate table-autostripe">
@@ -299,6 +303,14 @@ else if($method=="lehrveranstaltungen")
 					echo '<tr>';
 					echo '<td> <a href="incoming.php?method=lehrveranstaltungen&mode=delete&type=deutschkurs2&view=own">'.$p->t('global/löschen').'</a></td>';
 					echo '<td>'.$p->t('incoming/deutschkurs2').'</td>';
+					echo '</tr>';
+				}
+				//Deutschkurs3
+				if($preincoming->deutschkurs3)
+				{
+					echo '<tr>';
+					echo '<td> <a href="incoming.php?method=lehrveranstaltungen&mode=delete&type=deutschkurs3&view=own">'.$p->t('global/löschen').'</a></td>';
+					echo '<td>'.$p->t('incoming/deutschkurs3').'</td>';
 					echo '</tr>';
 				}
 				echo '</tbody></table><br><br>';
@@ -384,6 +396,15 @@ else if($method=="lehrveranstaltungen")
 			echo '<td>'.$p->t('global/angemeldet').'</td>';
 		echo '<td>'.$p->t('incoming/deutschkurs2').'</td>';
 		echo '</tr>';
+		//Deutschkurs3
+		echo '<tr>';
+		if(!$preincoming->deutschkurs3)
+			echo '<td width="6%"><a href="incoming.php?method=lehrveranstaltungen&mode=add&type=deutschkurs3">'.$p->t('global/anmelden').'</a></td>';
+		else
+			echo '<td width="6%">'.$p->t('global/angemeldet').'</td>';
+		echo '<td>'.$p->t('incoming/deutschkurs3').'</td>';
+		echo '</tr>';
+		
 		echo '</tbody></table><br><br>';
 		
 		
