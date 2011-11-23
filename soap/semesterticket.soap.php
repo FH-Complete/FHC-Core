@@ -21,6 +21,9 @@
 require_once('../config/vilesci.config.inc.php'); 
 require_once('../include/student.class.php'); 
 require_once('../include/benutzer.class.php');
+require_once('../include/adresse.class.php'); 
+require_once('../include/person.class.php'); 
+require_once('../include/webservicelog.class.php'); 
 
 ini_set("soap.wsdl_cache_enabled", "0");
 	
@@ -30,21 +33,30 @@ $SOAPServer->handle();
 
 $fehler = ''; 
 
+		
 /**
  * 
  * Nimmt Anfrage entgegen und überprüft ob Student auch wirklich Student ist (anhand Matrikelnummer) 
- * @param unknown_type $parameters
+ * @param $parameters
  */
 function verifyData($parameters)
 { 	
 	global $fehler; 
 	class foo{};
 	
+	$obj = new foo(); 
+	
 	if (!$db = new basis_db())
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 	
-	$obj = new foo(); 
-	
+	// Eintrag in der LogTabelle anlegen
+	$log = new webservicelog(); 
+	$log->request_data = file_get_contents('php://input'); 
+	$log->webservicetyp_kurzbz = 'wienerlinien'; 
+	$log->request_id = $parameters->token;  
+	$log->beschreibung = "Semesterticketanfrage"; 
+	$log->save(true);
+
 	if(!validateRequest($parameters))
 	{
 		$obj->result = 'false';
@@ -54,6 +66,7 @@ function verifyData($parameters)
 	{
 		$student = new student(); 
 		$student_uid = $student->getUidFromMatrikelnummer($parameters->matrikelnummer); 
+		
 		// überprüfe ob Benutzer aktiv ist
 		$benutzer = new benutzer(); 
 		$benutzer->load($student_uid); 
@@ -63,6 +76,35 @@ function verifyData($parameters)
 			$obj->fehler ='1';
 			return $obj; 
 		}	
+		
+		// Überprüfe PLZ
+		$adresse = new adresse(); 
+		$adresse->load_pers($benutzer->person_id); 
+		
+		$foundAdr = false; 
+		foreach($adresse->result as $adr)
+		{
+			if($adr->plz == $parameters->postleitzahl && $adr->typ == 'h')
+				$foundAdr = true; 
+		}
+		if($foundAdr == false)
+		{
+			// es wurde keine übereinstimmung gefunden
+			$obj->result = 'false';
+			$obj->fehler = '5'; 
+			return $obj; 
+		}
+		
+		// Überprüfe Geburtsdatum
+		$person = new person(); 
+		$person->load($benutzer->person_id); 
+		if($person->gebdatum != $parameters->geburtsdatum)
+		{
+			$obj->result = 'false'; 
+			$obj->fehler = '4';
+			return $obj; 
+		}	
+	
 		// hole prestudentID
 		$student->load($student_uid); 
 		if($student->prestudent_id == '')
