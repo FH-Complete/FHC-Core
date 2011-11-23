@@ -13,5 +13,5 @@ $this->phrasen['freifach/bitteFreifachAuswaehlen']='Please select a elective cou
 $this->phrasen['freifach/auswahl']='Select course';
 $this->phrasen['freifach/MailAnAlleSenden'] ='Send a e-mail to all students attending this course';
 $this->phrasen['freifach/keineAnmeldungenFuerDiesesFreifach']='There are no registrations for this course';
-$this->phrasen['freifach/abmeldungNurUeberAssistenz']='To withdraw from an elective course please contact the administrative assistant of your study degree program';
+$this->phrasen['freifach/abmeldungNurUeberAssistenz']='Please note that withdrawal from an elective course is currently only possible by contacting the administrative assistant directly';
 ?>
