@@ -103,7 +103,6 @@ $this->phrasen['global/löschen']='Delete';
 $this->phrasen['global/dateiLoeschen']='Delete File'; 
 $this->phrasen['global/betreff']='Subject';
 $this->phrasen['global/handbuch']='Manual';
-$this->phrasen['global/linkZumHandbuch']='dms.php?id=825'; //Verlinkung zum Handbuch im Head-Frame
 $this->phrasen['global/hilfe']='Help';
 $this->phrasen['global/benutzer']='User';
 
