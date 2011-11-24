@@ -25,7 +25,9 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 function get_uid()
 {
 	if(isset($_SERVER['REMOTE_USER']))
+	{
 		return mb_strtolower(trim($_SERVER['REMOTE_USER']));
+	}
 	else
 	{
 		if(isset($_SESSION['user']))
@@ -37,7 +39,13 @@ function get_uid()
 	//return 'oesi';
 	//return 'pam';
 }
-
+function is_user_logged_in()
+{
+	if(isset($_SERVER['PHP_AUTH_USER']) && checkldapuser($_SERVER['PHP_AUTH_USER'],$_SERVER['PHP_AUTH_PW']))
+		return true;
+	else
+		return false;
+}
 function get_original_uid()
 {
 	if(isset($_SERVER['REMOTE_USER']))
@@ -443,8 +451,7 @@ function getUidFromCardNumber($number)
 			    if (ldap_count_entries($connect, $res_id) == 0)
 			    {
 				    $number = "0".$number; 
-				    echo $number; 
-			    	 // search for card id 000[Number]
+			    	// search for card id 000[Number]
 				    if (($res_id = ldap_search($connect, LDAP_BASE_DN, "departmentNumber=$number")) == false)
 				    {
 						print "failure: search in LDAP-tree failed<br>";
@@ -452,8 +459,39 @@ function getUidFromCardNumber($number)
 				    }
 				    if (ldap_count_entries($connect, $res_id) == 0)
 			    	{
-			    		print "failure: no person found<br>"; 
-			    		return false; 
+			    		$number = "0".$number; 
+
+				    	// search for card id 0000[Number]
+					    if (($res_id = ldap_search($connect, LDAP_BASE_DN, "departmentNumber=$number")) == false)
+					    {
+							print "failure: search in LDAP-tree failed<br>";
+							return false;
+					    }
+				    	if (ldap_count_entries($connect, $res_id) == 0)
+				    	{
+				    		$number = "0".$number; 
+					    	// search for card id 00000[Number]
+						    if (($res_id = ldap_search($connect, LDAP_BASE_DN, "departmentNumber=$number")) == false)
+						    {
+								print "failure: search in LDAP-tree failed<br>";
+								return false;
+						    }
+					    	if (ldap_count_entries($connect, $res_id) == 0)
+					    	{
+					    		$number = "0".$number; 
+								// search for card id 000000[Number]
+							    if (($res_id = ldap_search($connect, LDAP_BASE_DN, "departmentNumber=$number")) == false)
+							    {
+									print "failure: search in LDAP-tree failed<br>";
+									return false;
+							    }
+							    if (ldap_count_entries($connect, $res_id) == 0)
+						    	{
+						    		print "failure: no person found<br>"; 
+						    		return false; 
+						    	}
+					    	}
+				    	}
 			    	}
 			    }
 		    }
@@ -885,7 +923,9 @@ function manual_basic_auth()
     	exit;
 	}
 	else
+	{
 		return mb_strtolower($_SERVER['PHP_AUTH_USER']);
+	}
 }
 
 /**

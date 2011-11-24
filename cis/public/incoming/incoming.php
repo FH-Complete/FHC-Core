@@ -214,7 +214,7 @@ else if($method=="lehrveranstaltungen")
 		{
 			case 'bachelor':
 				$preincoming->bachelorthesis=true;
-				$preincoming->masterthesis=true;
+				$preincoming->masterthesis=false;
 				$preincoming->research_area=$_GET['research_area'];
 				if(!$preincoming->save(false))
 					echo $preincoming->errormsg;
@@ -425,8 +425,8 @@ else if($method=="lehrveranstaltungen")
 					<tr>
 						<td width="30%">
 						<input type="radio" name="thesis" value="" '.((!$preincoming->bachelorthesis && !$preincoming->masterthesis)?'checked="checked"':'').'>'.$p->t('incoming/nothesis').'<br>
-						<input type="radio" name="thesis" value="master" '.(($preincoming->masterthesis)?'checked="checked"':'').'>'.$p->t('incoming/bachelorthesis').'<br>
-						<input type="radio" name="thesis" value="bachelor" '.(($preincoming->bachelorthesis)?'checked="checked"':'').'>'.$p->t('incoming/masterthesis').'
+						<input type="radio" name="thesis" value="bachelor" '.(($preincoming->bachelorthesis)?'checked="checked"':'').'>'.$p->t('incoming/bachelorthesis').'<br>
+						<input type="radio" name="thesis" value="master" '.(($preincoming->masterthesis)?'checked="checked"':'').'>'.$p->t('incoming/masterthesis').'
 						</td>
 						<td valign="top">
 						'.$p->t('incoming/researcharea').'

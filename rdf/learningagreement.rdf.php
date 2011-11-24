@@ -85,6 +85,11 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			echo "   <studiengang><![CDATA[$studiengang->english]]></studiengang>\n";
 			echo "  </lehrveranstaltung>\n"; 
 		}
+		
+		if($preincoming->bachelorthesis)
+			echo '<bachelorthesis><![CDATA['.$preincoming->research_area.']]></bachelorthesis>';
+		if($preincoming->masterthesis)
+			echo '<masterthesis><![CDATA['.$preincoming->research_area.']]></masterthesis>';
 		echo "</student>\n"; 
 		echo "</learningagreement>\n"; 
 	}

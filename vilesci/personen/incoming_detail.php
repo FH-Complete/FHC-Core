@@ -1074,6 +1074,8 @@ function print_lehrveranstaltungen()
 	if($inc->deutschkurs1)
 		echo '<tr><td>Deutsch für Anfänger</td></tr>';
 	if($inc->deutschkurs2)
+		echo '<tr><td>Deutsch Advanced</td></tr>';
+	if($inc->deutschkurs3)
 		echo '<tr><td>Deutsch Intensivkurs</td></tr>';
 	echo '</tbody></table>';
 	echo '</fieldset>';
