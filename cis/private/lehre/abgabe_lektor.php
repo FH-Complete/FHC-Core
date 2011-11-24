@@ -125,7 +125,7 @@ echo '
 
 <body class="background_main">';
 
-echo "<h2><div style='float: left'>".$p->t('abgabetool/ueberschrift')." ($getuid) </div><div style='text-align:right'><a href='../../private/info/handbuecher/abgabetool_lektoren.pdf' target='_blank'><img src='../../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0>&nbsp;".$p->t('global/handbuch')."</a></div></h2>";
+echo "<h2><div style='float: left'>".$p->t('abgabetool/ueberschrift')." ($getuid) </div><div style='text-align:right'><a href='../../../cms/dms.php?id=".$p->t('dms_link/abgabetoolLektorHandbuch')."' target='_blank'><img src='../../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0>&nbsp;".$p->t('global/handbuch')."</a></div></h2>";
 
 echo $htmlstr;
 

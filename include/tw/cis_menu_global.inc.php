@@ -37,6 +37,6 @@ $p = new phrasen($sprache);
 	if(CHOOSE_LAYOUT)
 		echo '| <a class="Item" href="../layouts.php" target="content">Layouts</a>';
 	?>
-	| <a class='Item' href="../cms/<?php echo $p->t('global/linkZumHandbuch');?>" target="_blank"><?php echo $p->t('global/handbuch');?></a>
+	| <a class='Item' href="../cms/dms.php?id=<?php echo $p->t('dms_link/cisHandbuch');?>" target="_blank"><?php echo $p->t('global/handbuch');?></a>
 	]
 </div>

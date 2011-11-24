@@ -370,7 +370,7 @@
 				echo '<a href="benotungstool/verwaltung.php?lvid='.$lvid.$studiensem.'" class="Item">
 	    			<img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
 	    			<strong>'.$p->t('lehre/kreuzerltool').'</strong></a><br>
-	    			<a href="'.APP_ROOT.'cis/cisdocs/handbuch_benotungstool.pdf" class="Item" target="_blank">'.$p->t('lehre/benotungstoolHandbuch').' [PDF]</a>';
+	    			<a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/benotungstoolHandbuch').'" class="Item" target="_blank">'.$p->t('lehre/benotungstoolHandbuch').' [PDF]</a>';
 		} 
 		else 
 		{
@@ -392,7 +392,7 @@
 			echo '<a href="#" onclick="alert(\''.$p->t('lehre/kreuzerltoolMitMoodleInfo').'\');" class="Item">
 	    			<img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
 	    			<strong>'.$p->t('lehre/kreuzerltool').'</strong></a><br>
-	    			<a href="'.APP_ROOT.'cis/cisdocs/handbuch_benotungstool.pdf" class="Item" target="_blank">'.$p->t('lehre/benotungstoolHandbuch').' [PDF]</a>';
+	    			<a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/benotungstoolHandbuch').'" class="Item" target="_blank">'.$p->t('lehre/benotungstoolHandbuch').' [PDF]</a>';
 		}
 	}
 	
@@ -468,7 +468,7 @@
 		}
 	    if($is_lector)
 	    	echo '<a href="moodle_wartung.php?lvid='.$lvid.'&stsem='.$angezeigtes_stsem.'" class="Item">'.$p->t('lehre/moodleWartung').'</a>
-	    		 <br /><a href="'.APP_ROOT.'cis/cisdocs/Moodle-Handbuch.pdf" class="Item" target="_blank">'.$p->t('lehre/moodleHandbuch').' [PDF]</a>';
+	    		 <br /><a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/moodleHandbuch').'" class="Item" target="_blank">'.$p->t('lehre/moodleHandbuch').' [PDF]</a>';
 	}
 	else 
 	{
