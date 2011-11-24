@@ -73,6 +73,8 @@
 								</fo:table-cell>
 							</fo:table-row>
 							<xsl:apply-templates select="lehrveranstaltung"/>
+							<xsl:apply-templates select="bachelorthesis"/>
+							<xsl:apply-templates select="masterthesis"/>
 						</fo:table-body>
 					</fo:table>
 					<fo:block font-size="10pt">\n \n PLEASE NOTE: For courses offered in German and/or English sufficient language competencies are required</fo:block>
@@ -140,6 +142,56 @@
 				<fo:block font-size="10pt" content-width="15mm" text-align="center">
 					<xsl:text> </xsl:text>
 					<xsl:value-of select="ects"/>
+				</fo:block>
+			</fo:table-cell>
+		</fo:table-row>
+	</xsl:template>
+	<xsl:template match="bachelorthesis">
+		<fo:table-row line-height="12pt">
+			<fo:table-cell display-align="center" border-width="0.2mm" border-style="solid">
+				<fo:block font-size="10pt" content-width="95mm">
+					<xsl:text> Bachelor Thesis </xsl:text>
+					<xsl:value-of select="."/>
+				</fo:block>
+			</fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
+				<fo:block font-size="10pt" content-width="55mm" text-align="center">
+					<xsl:text> </xsl:text>
+				</fo:block>
+			</fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
+				<fo:block font-size="10pt" content-width="20mm" text-align="center">
+					<xsl:text> </xsl:text>
+				</fo:block>
+			</fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
+				<fo:block font-size="10pt" content-width="15mm" text-align="center">
+					<xsl:text> </xsl:text>
+				</fo:block>
+			</fo:table-cell>
+		</fo:table-row>
+	</xsl:template>
+	<xsl:template match="masterthesis">
+		<fo:table-row line-height="12pt">
+			<fo:table-cell display-align="center" border-width="0.2mm" border-style="solid">
+				<fo:block font-size="10pt" content-width="95mm">
+					<xsl:text> Master Thesis </xsl:text>
+					<xsl:value-of select="."/>
+				</fo:block>
+			</fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
+				<fo:block font-size="10pt" content-width="55mm" text-align="center">
+					<xsl:text> </xsl:text>
+				</fo:block>
+			</fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
+				<fo:block font-size="10pt" content-width="20mm" text-align="center">
+					<xsl:text> </xsl:text>
+				</fo:block>
+			</fo:table-cell>
+			<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
+				<fo:block font-size="10pt" content-width="15mm" text-align="center">
+					<xsl:text> </xsl:text>
 				</fo:block>
 			</fo:table-cell>
 		</fo:table-row>
