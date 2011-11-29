@@ -57,17 +57,32 @@ require_once '../include/firma.class.php';
 	
 </head>
 <body>
+<h1>Check Bestellungen</h1>
 <?php 
 $min = (isset($_POST['min'])?$_REQUEST['min']:'1');
 $max = (isset($_POST['max'])?$_REQUEST['max']:'42');
+$type = (isset($_GET['type'])?$_GET['type']:'');
 
-echo '	<form action ="check_bestellung.php" method="post" name="checkForm">
+echo '
+<table>
+	<tr>
+	<td>
+		<form action ="check_bestellung.php" method="post" name="checkForm">
 		<table>
 			<tr><td>min (Wochen): </td><td><input type="text" name="min" id="min" value="'.$min.'"></td></tr>
 			<tr><td>max (Wochen): </td><td><input type="text" name="max" id="max" value="'.$max.'"></td></tr>
 			<tr><td>&nbsp;</td><td><input type="submit" name="submit" value="anzeigen" onclick="return checkKst();"></td></tr>
 		</table>
-		</form>';
+		</form>
+	</td>
+	<td width="100px">&nbsp;</td>
+	<td valign="top">
+		<form action ="check_bestellung.php?type=nichtgeliefert" method="post" name="checkForm">
+			<input type="submit" name="submit" value="Nicht gelieferte Bestellungen anzeigen"></td></tr>
+		</form>
+	</td>
+	</tr>
+</table>';
 
 echo '
 	<script type="text/javascript">
@@ -82,67 +97,73 @@ echo '
 	</script>';
 
 	$date = new datum(); 
-	$firma = new firma(); 
-	if(is_numeric($min) && is_numeric($max))
+	$firma = new firma();
+	
+	$bestellung = new wawi_bestellung();
+	if($type=='nichtgeliefert')
+		$bestellung->loadBestellungNichtGeliefert();
+	else if(is_numeric($min) && is_numeric($max))
 	{
-		$bestellung = new wawi_bestellung(); 
 		$bestellung->loadBestellungForCheck($min, $max);
-		
-		echo '	<table id="checkTable" class="tablesorter" width ="100%">
-				<thead>
-				<tr>
-					<th></th>
-					<th>Bestellnr.</th>
-					<th>Bestell_ID</th>
-					<th>Firma</th>
-					<th>Erstellung</th>
-					<th>Freigegeben</th>
-					<th>Geliefert</th>
-					<th>Bestellt</th>
-					<th>Brutto</th>
-					<th>Titel</th>
-					<th>Letze Änderung</th>
-				</tr>
-				</thead>
-				<tbody>';		
-		foreach($bestellung->result as $row)
-		{
-			$firmenname = '';
-			$geliefert ='nein';
-			$bestellt ='nein';
-			$status = new wawi_bestellstatus(); 
-			if(is_numeric($row->firma_id))
-			{
-				$firma->load($row->firma_id);	
-				$firmenname = $firma->name; 
-			}
-			if($row->freigegeben == '1')
-				$freigegeben = 'ja';
-			else
-				$freigegeben = 'nein';
-			
-			if($status->isStatiVorhanden($row->bestellung_id, 'Lieferung'))
-						$geliefert = 'ja';
-			
-			if($status->isStatiVorhanden($row->bestellung_id, 'Bestellung'))
-						$bestellt = 'ja';
-				
-			$brutto = $bestellung->getBrutto($row->bestellung_id);
-			echo '	<tr>
-						<td nowrap><a href="bestellung.php?method=update&id='.$row->bestellung_id.'" title="Bestellung bearbeiten"> <img src="../skin/images/edit_wawi.gif"></a><a href="bestellung.php?method=delete&id='.$row->bestellung_id.'" onclick="return conf_del()" title="Bestellung löschen"> <img src="../skin/images/delete_x.png"></a></td>
-						<td>'.$row->bestell_nr.'</td>
-						<td>'.$row->bestellung_id.'</td>
-						<td>'.$firmenname.'</td>
-						<td>'.$date->formatDatum($row->insertamum, "d.m.Y").'</td>
-						<td>'.$freigegeben.'</td>
-						<td>'.$geliefert.'</td>
-						<td>'.$bestellt.'</td>
-						<td>'.number_format($brutto, 2, ",",".").'</td>
-						<td>'.$row->titel.'</td>
-						<td nowrap>'.$date->formatDatum($row->updateamum, "d.m.Y").' '.$row->updatevon.'</td>
-					</tr>';
-		}
-		echo '	</tbody>
-				</table>';
 	}
+	else
+		die('Fehlerhafte Parameter');	
+		
+	echo '	<table id="checkTable" class="tablesorter" width ="100%">
+			<thead>
+			<tr>
+				<th></th>
+				<th>Bestellnr.</th>
+				<th>Bestell_ID</th>
+				<th>Firma</th>
+				<th>Erstellung</th>
+				<th>Freigegeben</th>
+				<th>Geliefert</th>
+				<th>Bestellt</th>
+				<th>Brutto</th>
+				<th>Titel</th>
+				<th>Letze Änderung</th>
+			</tr>
+			</thead>
+			<tbody>';		
+	foreach($bestellung->result as $row)
+	{
+		$firmenname = '';
+		$geliefert ='nein';
+		$bestellt ='nein';
+		$status = new wawi_bestellstatus(); 
+		if(is_numeric($row->firma_id))
+		{
+			$firma->load($row->firma_id);	
+			$firmenname = $firma->name; 
+		}
+		if($row->freigegeben == '1')
+			$freigegeben = 'ja';
+		else
+			$freigegeben = 'nein';
+		
+		if($status->isStatiVorhanden($row->bestellung_id, 'Lieferung'))
+					$geliefert = 'ja';
+		
+		if($status->isStatiVorhanden($row->bestellung_id, 'Bestellung'))
+					$bestellt = 'ja';
+			
+		$brutto = $bestellung->getBrutto($row->bestellung_id);
+		echo '	<tr>
+					<td nowrap><a href="bestellung.php?method=update&id='.$row->bestellung_id.'" title="Bestellung bearbeiten"> <img src="../skin/images/edit_wawi.gif"></a><a href="bestellung.php?method=delete&id='.$row->bestellung_id.'" onclick="return conf_del()" title="Bestellung löschen"> <img src="../skin/images/delete_x.png"></a></td>
+					<td>'.$row->bestell_nr.'</td>
+					<td>'.$row->bestellung_id.'</td>
+					<td>'.$firmenname.'</td>
+					<td>'.$date->formatDatum($row->insertamum, "d.m.Y").'</td>
+					<td>'.$freigegeben.'</td>
+					<td>'.$geliefert.'</td>
+					<td>'.$bestellt.'</td>
+					<td align="right">'.number_format($brutto, 2, ",",".").'</td>
+					<td>'.$row->titel.'</td>
+					<td nowrap>'.$date->formatDatum($row->updateamum, "d.m.Y").' '.$row->updatevon.'</td>
+				</tr>';
+	}
+	echo '	</tbody>
+			</table>';
+
 ?>

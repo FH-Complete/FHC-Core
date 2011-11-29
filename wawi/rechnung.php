@@ -334,7 +334,7 @@ if($aktion == 'suche')
 					echo '<td>'.$row->bestell_nr."</td>\n";
 					echo '<td>'.$date->formatDatum($row->rechnungsdatum, 'd.m.Y')."</td>\n";
 					echo '<td>'.$row->buchungstext."</td>\n";
-					echo '<td class="number">'.number_format($brutto,2,".","")."</td>\n";
+					echo '<td class="number">'.number_format($brutto,2,",",".")."</td>\n";
 					echo '<td>'.$freigegeben=($row->freigegeben=='t')?'ja':'nein'."</td>\n"; 
 					echo '<td>'.$date->formatDatum($row->updateamum,'d.m.Y H:i:s').' '.$row->updatevon ."</td>\n"; 
 					echo "</tr>\n";
@@ -346,7 +346,7 @@ if($aktion == 'suche')
 						<th></th>
 						<th></th>
 						<th>Summe</th>
-						<th class="number">'.number_format($brutto_gesamt,2).'</th>
+						<th class="number">'.number_format($brutto_gesamt,2,",",".").'</th>
 						<th></th>
 						<th></th>
 					</table>';	
