@@ -2997,6 +2997,30 @@ if(!@$db->db_query("SELECT 1 FROM system.tbl_webservicelog LIMIT 1"))
 		echo 'Tabelle system.tbl_webservicelog und system.tbl_webservicetyp hinzugefuegt!<br>';
 }
 
+// Beschreibung der Ampel auf Array aendern damit mehrere Sprachen verwendet werden koennen
+if($result = $db->db_query("SELECT * FROM information_schema.columns WHERE table_name='tbl_ampel' AND table_schema='public' AND column_name='beschreibung' AND data_type='text'"))
+{
+	//Wenn die Spalte vom Datentyp Text ist wird diese auf Array geaendert
+	if($db->db_num_rows($result)>0)
+	{
+		/*
+		 * - Neue Spalte hinzufuegen
+		 * - Inhalt auf index 1 kopieren
+		 * - Alte Spalte entfernen
+		 * - Neue Spalte umbennen
+		 */
+		$qry = "ALTER TABLE public.tbl_ampel ADD COLUMN beschreibung_neu text[];
+				UPDATE public.tbl_ampel SET beschreibung_neu[1]=beschreibung;
+				ALTER TABLE public.tbl_ampel DROP COLUMN beschreibung;
+				ALTER TABLE public.tbl_ampel RENAME COLUMN beschreibung_neu TO beschreibung;";
+	
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_ampel: '.$db->db_last_error().'</strong><br>';
+		else 
+			echo 'Tabelle public.tbl_ampel Bezeichnung auf Array geaendert!<br>';
+	}
+}
+
 
 echo '<br>';
 

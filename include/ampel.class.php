@@ -22,6 +22,7 @@
  *  
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/sprache.class.php');
 
 class ampel extends basis_db
 {
@@ -31,7 +32,7 @@ class ampel extends basis_db
 	//Tabellenspalten
 	public $ampel_id;		// bigint
 	public $kurzbz;			// varchar(64)
-	public $beschreibung;	// text
+	public $beschreibung = array();	// text[]
 	public $benutzer_select;// text
 	public $deadline;		// date
 	public $vorlaufzeit;	// smallint
@@ -43,7 +44,7 @@ class ampel extends basis_db
 	
 	public $ampel_benutzer_id;	// bigint
 	public $uid;				// varchar(32)
-
+	 
 	/**
 	 * Konstruktor - Laedt optional eine Ampel
 	 * @param $amepl_id
@@ -51,7 +52,7 @@ class ampel extends basis_db
 	public function __construct($ampel_id=null)
 	{
 		parent::__construct();
-		
+				
 		if(!is_null($ampel_id))
 			$this->load($ampel_id);
 	}
@@ -70,7 +71,10 @@ class ampel extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_ampel WHERE ampel_id='".addslashes($ampel_id)."'";
+		$sprache = new sprache();
+		$beschreibung = $sprache->getSprachQuery('beschreibung');
+		
+		$qry = "SELECT *,".$beschreibung." FROM public.tbl_ampel WHERE ampel_id='".addslashes($ampel_id)."'";
 
 		if($result = $this->db_query($qry))
 		{
@@ -78,7 +82,7 @@ class ampel extends basis_db
 			{
 				$this->ampel_id = $row->ampel_id;
 				$this->kurzbz = $row->kurzbz;
-				$this->beschreibung = $row->beschreibung;
+				$this->beschreibung = $sprache->parseSprachResult('beschreibung', $row);
 				$this->benutzer_select = $row->benutzer_select;
 				$this->deadline = $row->deadline;
 				$this->vorlaufzeit = $row->vorlaufzeit;
@@ -108,7 +112,10 @@ class ampel extends basis_db
 	 */
 	public function getAll()
 	{
-		$qry = "SELECT * FROM public.tbl_ampel ORDER BY deadline";
+		$sprache = new sprache();
+		$beschreibung = $sprache->getSprachQuery('beschreibung');
+		
+		$qry = "SELECT *,".$beschreibung." FROM public.tbl_ampel ORDER BY deadline";
 		
 		if($result = $this->db_query($qry))
 		{
@@ -118,7 +125,7 @@ class ampel extends basis_db
 					
 				$obj->ampel_id = $row->ampel_id;
 				$obj->kurzbz = $row->kurzbz;
-				$obj->beschreibung = $row->beschreibung;
+				$obj->beschreibung = $sprache->parseSprachResult('beschreibung', $row);
 				$obj->benutzer_select = $row->benutzer_select;
 				$obj->deadline = $row->deadline;
 				$obj->vorlaufzeit = $row->vorlaufzeit;
@@ -169,7 +176,8 @@ class ampel extends basis_db
 	 */
 	public function isZugeteilt($user, $benutzer_select)
 	{
-		$qry = "SELECT CASE WHEN '".addslashes($user)."' IN (".$row->benutzer_select.") THEN true ELSE false END as zugeteilt";
+		$qry = "SELECT CASE WHEN '".addslashes($user)."' IN (".$benutzer_select.") THEN true ELSE false END as zugeteilt";
+
 		if($result_zugeteilt = $this->db_query($qry))
 		{
 			if($row_zugeteilt = $this->db_fetch_object($result_zugeteilt))
@@ -196,10 +204,24 @@ class ampel extends basis_db
 	 * Laedt alle aktuellen Ampeln eines Users
 	 * @param $user
 	 */
-	public function loadUserAmpel($user)
+	public function loadUserAmpel($user, $zukuenftige_anzeigen=false, $bestaetigt=false)
 	{
-		$qry = "SELECT * FROM public.tbl_ampel WHERE deadline+verfallszeit>now() AND deadline-vorlaufzeit<now()";
+		$sprache = new sprache();
+		$beschreibung = $sprache->getSprachQuery('beschreibung');
 		
+		$qry = "SELECT *,".$beschreibung." FROM public.tbl_ampel WHERE deadline+verfallszeit>now()";
+		
+		if(!$zukuenftige_anzeigen)
+			$qry.=" AND deadline-vorlaufzeit<now()";
+			
+		if(!$bestaetigt)
+		{
+			$qry.=" AND NOT EXISTS
+						(SELECT ampel_id 
+						 FROM public.tbl_ampel_benutzer_bestaetigt 
+						 WHERE uid='".addslashes($user)."' AND ampel_id=tbl_ampel.ampel_id)";
+		}
+			
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
@@ -210,7 +232,7 @@ class ampel extends basis_db
 					
 					$obj->ampel_id = $row->ampel_id;
 					$obj->kurzbz = $row->kurzbz;
-					$obj->beschreibung = $row->beschreibung;
+					$obj->beschreibung = $sprache->parseSprachResult('beschreibung', $row);
 					$obj->benutzer_select = $row->benutzer_select;
 					$obj->deadline = $row->deadline;
 					$obj->vorlaufzeit = $row->vorlaufzeit;
@@ -239,13 +261,27 @@ class ampel extends basis_db
 		if(is_null($new))
 			$new = $this->new;
 			
+		$sprache = new sprache();
+		$sprache->loadIndexArray();
+			
 		if($this->new)
 		{
-			$qry = "BEGIN;INSERT INTO public.tbl_ampel (kurzbz, beschreibung, benutzer_select, deadline, 
+			$qry = "BEGIN;INSERT INTO public.tbl_ampel (kurzbz, ";
+			
+			foreach($this->beschreibung as $key=>$value)
+			{
+				$idx = $sprache->index_arr[$key];
+				$qry.=" beschreibung[$idx],";
+			}
+			
+			$qry.=" benutzer_select, deadline, 
 					vorlaufzeit, verfallszeit, insertamum, insertvon , updateamum, updatevon) VALUES(".
-					$this->addslashes($this->kurzbz).','.
-					$this->addslashes($this->beschreibung).','.
-					$this->addslashes($this->benutzer_select).','.
+					$this->addslashes($this->kurzbz).',';
+			
+			foreach($this->beschreibung as $key=>$value)
+				$this->addslashes($value).',';
+								
+			$qry .= $this->addslashes($this->benutzer_select).','.
 					$this->addslashes($this->deadline).','.
 					$this->addslashes($this->vorlaufzeit).','.
 					$this->addslashes($this->verfallszeit).','.
@@ -257,9 +293,15 @@ class ampel extends basis_db
 		else
 		{
 			$qry = 'UPDATE public.tbl_ampel SET'.
-					' kurzbz = '.$this->addslashes($this->kurzbz).','.
-					' beschreibung = '.$this->addslashes($this->beschreibung).','.
-					' benutzer_select = '.$this->addslashes($this->benutzer_select).','.
+					' kurzbz = '.$this->addslashes($this->kurzbz).',';
+			
+			foreach($this->beschreibung as $key=>$value)
+			{
+				$idx = $sprache->index_arr[$key];
+				$qry.=' beschreibung['.$idx.'] = '.$this->addslashes($value).',';
+			}
+			
+			$qry.=  ' benutzer_select = '.$this->addslashes($this->benutzer_select).','.
 					' deadline = '.$this->addslashes($this->deadline).','.
 					' vorlaufzeit = '.$this->addslashes($this->vorlaufzeit).','.
 					' verfallszeit = '.$this->addslashes($this->verfallszeit).','.
@@ -326,7 +368,30 @@ class ampel extends basis_db
 			$this->errormsg = 'Fehler beim Loeschen der Ampel';
 			return false;
 		}
-	}	
+	}
+	
+	/**
+	 * Bestaetigt die Ampel eines Users
+	 * @param $user
+	 * @param $ampel_id
+	 * @return boolean
+	 */
+	public function bestaetigen($user, $ampel_id)
+	{
+		$qry = 'INSERT INTO public.tbl_ampel_benutzer_bestaetigt(ampel_id, uid, insertamum, insertvon) VALUES('.
+				$this->addslashes($ampel_id).','.
+				$this->addslashes($user).','.
+				'now(),'.
+				$this->addslashes($user).');';
+				
+		if($this->db_query($qry))
+			return true;
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern der Daten';
+			return false;
+		}
+	}
 		
 }
 ?>

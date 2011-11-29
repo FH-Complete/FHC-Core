@@ -55,7 +55,15 @@ $datum_obj = new datum();
 	if($action=='save')
 	{
 		$kurzbz = (isset($_POST['kurzbz'])?$_POST['kurzbz']:die('Kurzbz fehlt'));
-		$beschreibung = (isset($_POST['beschreibung'])?$_POST['beschreibung']:die('Beschreibung fehlt'));
+		
+		foreach ($_POST as $key=>$value)
+		{
+			if(mb_strstr($key,'beschreibung'))
+			{
+				$idx = mb_substr($key, mb_strlen('beschreibung'));
+				$beschreibung[$idx] = $value;
+			}
+		}
 		$benutzer_select = (isset($_POST['benutzer_select'])?$_POST['benutzer_select']:die('Benutzer_select fehlt'));
 		$deadline = (isset($_POST['deadline'])?$_POST['deadline']:die('Deadline fehlt'));
 		$vorlaufzeit = (isset($_POST['vorlaufzeit'])?$_POST['vorlaufzeit']:die('Vorlaufzeit fehlt'));
@@ -124,34 +132,41 @@ $datum_obj = new datum();
 			die('Invalid Action');
 			break;
 	}
+	
 	echo '<form action="'.$_SERVER['PHP_SELF'].'?action=save" method="POST">';
-	echo '<input type="hidden" name="new" value="'.$new.'">';
-	echo '<input type="hidden" name="ampel_id" value="'.$ampel->ampel_id.'">';
+	echo '<input type="hidden" name="new" value="'.htmlspecialchars($new).'">';
+	echo '<input type="hidden" name="ampel_id" value="'.htmlspecialchars($ampel->ampel_id).'">';
 	echo '<table>';
 	echo '<tr>';
 	echo '   <td>Kurzbz</td>';	
-	echo '   <td><input type="text" name="kurzbz" size="30" maxlength="64" value="'.$ampel->kurzbz.'"></td>';
+	echo '   <td><input type="text" name="kurzbz" size="30" maxlength="64" value="'.htmlspecialchars($ampel->kurzbz).'"></td>';
 	echo '	 <td></td>';
 	echo '   <td>Deadline</td>';
-	echo '   <td><input type="text" name="deadline" size="10" maxlength="10" value="'.$datum_obj->formatDatum($ampel->deadline,'d.m.Y').'"></td>';
+	echo '   <td><input type="text" name="deadline" size="10" maxlength="10" value="'.htmlspecialchars($datum_obj->formatDatum($ampel->deadline,'d.m.Y')).'"></td>';
 	echo '</tr>';
 	echo '<tr valign="top">';
-	echo '   <td rowspan="2">Beschreibung</td>';
-	echo '   <td rowspan="2"><textarea name="beschreibung" cols="60" rows="5">'.$ampel->beschreibung.'</textarea></td>';
+	echo '   <td rowspan="2">Benutzer Select</td>';
+	echo '   <td rowspan="2"><textarea name="benutzer_select" cols="60" rows="5">'.htmlspecialchars($ampel->benutzer_select).'</textarea></td>';
 	echo '   <td></td>';
 	echo '   <td valign="middle">Vorlaufzeit (in Tagen)</td>';
-	echo '   <td valign="middle"><input type="text" name="vorlaufzeit" size="4" maxlength="4" value="'.$ampel->vorlaufzeit.'"></td>';
+	echo '   <td valign="middle"><input type="text" name="vorlaufzeit" size="4" maxlength="4" value="'.htmlspecialchars($ampel->vorlaufzeit).'"></td>';
 	echo '</tr>';
 	echo '<tr valign="top">';
 	echo '   <td></td>';
 	echo '   <td>Verfallszeit (in Tagen)</td>';
-	echo '   <td><input type="text" name="verfallszeit" size="4" maxlength="4" value="'.$ampel->verfallszeit.'"></td>';
+	echo '   <td><input type="text" name="verfallszeit" size="4" maxlength="4" value="'.htmlspecialchars($ampel->verfallszeit).'"></td>';
 	echo '</tr>';
-	echo '<tr valign="top">';
-	echo '   <td rowspan="2">Benutzer Select</td>';
-	echo '   <td rowspan="2"><textarea name="benutzer_select" cols="60" rows="5">'.$ampel->benutzer_select.'</textarea></td>';
-	echo '   <td></td>';
-	echo '</tr>';
+	
+	$sprache = new sprache();
+	$sprache->getAll();
+	foreach($sprache->result as $lang)
+	{
+		echo '<tr valign="top">';
+		echo '   <td>Beschreibung '.$lang->sprache.'</td>';
+		echo '   <td><textarea name="beschreibung'.$lang->sprache.'" cols="60" rows="5">'.htmlspecialchars((isset($ampel->beschreibung[$lang->sprache])?$ampel->beschreibung[$lang->sprache]:'')).'</textarea></td>';
+		echo '   <td></td>';
+		echo '</tr>';
+	}
 	echo '<tr valign="bottom">';
 	echo '   <td></td>';
 	echo '   <td></td>';
