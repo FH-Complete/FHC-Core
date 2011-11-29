@@ -54,8 +54,10 @@ else
 <head>
 	<title>CIS - <?php echo CAMPUS_NAME; ?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../skin/jquery.css" type="text/css">
 	<link href="../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+	<script src="../include/js/jquery.js" type="text/javascript"></script>
 </head>
 <script type="text/javascript">
 function changeSprache(sprache)
@@ -69,8 +71,21 @@ function changeSprache(sprache)
 	
 	window.location.href="index.php?sprache="+sprache+"&content_id=<?php echo $id;?>&menu="+menu+"&content="+content;
 }
+function gettimestamp()
+{
+	var now = new Date();
+	var ret = now.getHours()*60*60*60;
+	ret = ret + now.getMinutes()*60*60;
+	ret = ret + now.getSeconds()*60;
+	ret = ret + now.getMilliseconds();
+	return ret;
+}
+function loadampel()
+{
+	$('#ampel').load('ampel.php?'+gettimestamp());
+}
 </script>
-<body style="margin-top:0; padding-top:0">
+<body style="margin-top:0; padding-top:0" onload="loadampel()">
 <table class="tabcontent">
 	 <tr>
 	 	<td></td>
@@ -90,7 +105,8 @@ function changeSprache(sprache)
 	</tr>
 	<tr>
 		<td></td>
-   	 <td align="right"  nowrap  colspan="2">
+   	 <td align="right" nowrap  colspan="2">
+   	 <span id="ampel"></span>
    	 <?php require_once('../include/'.EXT_FKT_PATH.'/cis_menu_global.inc.php'); 	?>
    	 
 				</td>

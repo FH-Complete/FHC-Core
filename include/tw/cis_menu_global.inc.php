@@ -29,7 +29,7 @@ require_once ('../include/functions.inc.php');
 $sprache = getSprache(); 
 $p = new phrasen($sprache); 
 ?>
-<div id="GlobalMenu">
+<div id="GlobalMenu" style="display: inline">
 	[ <a class='Item' href="index.html" target="_top"><?php echo $p->t('profil/home');?></a>
 	| <a class='Item' href="menu.php?content_id=173" target="menu"><?php echo $p->t('profil/meinCis');?></a>
 	| <a class='Item' href="menu.php?content_id=166" target="menu"><?php echo $p->t('lvaliste/lehrveranstaltungen');?></a>

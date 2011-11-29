@@ -23,5 +23,15 @@ $this->phrasen['tools/betrag']='Betrag';
 $this->phrasen['tools/zahlungsbestaetigung']='Zahlungsbestätigung';
 $this->phrasen['tools/bestaetigungDrucken']='Bestaetigung drucken';
 $this->phrasen['tools/offen']='offen';
-$this->phrasen['tools/keineZahlungenVorhanden']='Derzeit sind keine Zahlungen vorhanden'
+$this->phrasen['tools/keineZahlungenVorhanden']='Derzeit sind keine Zahlungen vorhanden';
+
+//Ampeln
+$this->phrasen['tools/ampelsystem']='Ampelsystem';
+$this->phrasen['tools/nichtZugeteilt']='Sie sind nicht zu dieser Ampel zugeteilt';
+$this->phrasen['tools/ampelNichtGefunden']='Die angegeben Ampel wurde nicht gefunden';
+$this->phrasen['tools/ampelStatus']='Status';
+$this->phrasen['tools/ampelBeschreibung']='Beschreibung';
+$this->phrasen['tools/ampelDeadline']='Deadline';
+$this->phrasen['tools/ampelAktion']='Aktion';
+
 ?>
