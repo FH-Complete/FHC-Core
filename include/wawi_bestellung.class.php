@@ -943,6 +943,54 @@ class wawi_bestellung extends basis_db
 		}
 		return true;
 	}
+	
+	/**
+	 * 
+	 * Gibt alle Bestellungen die Bestellt aber nicht geliefert wurden
+	 */
+	public function loadBestellungNichtGeliefert()
+	{
+		$qry ="SELECT * FROM wawi.tbl_bestellung b WHERE 
+		EXISTS (SELECT bestellung_id FROM wawi.tbl_bestellung_bestellstatus where bestellung_id=b.bestellung_id AND bestellstatus_kurzbz ='Bestellung')
+		AND NOT EXISTS (SELECT bestellung_id FROM wawi.tbl_bestellung_bestellstatus where bestellung_id=b.bestellung_id AND bestellstatus_kurzbz ='Lieferung')
+		AND b.insertamum>CURRENT_DATE - '1 year'::interval
+		order by bestellung_id";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$bestellung = new wawi_bestellung(); 
+				
+				$bestellung->bestellung_id = $row->bestellung_id; 
+				$bestellung->bestell_nr = $row->bestell_nr; 
+				$bestellung->titel = $row->titel; 
+				$bestellung->bemerkung = $row->bemerkung; 
+				$bestellung->liefertermin = $row->liefertermin; 
+				$bestellung->besteller_uid = $row->besteller_uid; 
+				$bestellung->lieferadresse = $row->lieferadresse; 
+				$bestellung->kostenstelle_id = $row->kostenstelle_id; 
+				$bestellung->konto_id = $row->konto_id; 
+				$bestellung->rechnungsadresse = $row->rechnungsadresse; 
+				$bestellung->firma_id = $row->firma_id; 
+				$bestellung->freigegeben = ($row->freigegeben=='t'?true:false); 
+				$bestellung->updateamum = $row->updateamum; 
+				$bestellung->updatevon = $row->updatevon; 
+				$bestellung->insertamum = $row->insertamum; 
+				$bestellung->insertvon = $row->insertvon; 
+				$bestellung->ext_id = $row->ext_id; 
+				$bestellung->zahlungstyp_kurzbz = $row->zahlungstyp_kurzbz; 
+				
+				$this->result[] = $bestellung; 
+			}
+		}
+		else
+		{
+			$this->errormsg ="Fehler bei der Abfrage aufgetreten."; 
+			return false; 
+		}
+		return true;
+	}
 	/**
 	 * 
 	 * true wenn die Bestellung schon freigegeben wurde
