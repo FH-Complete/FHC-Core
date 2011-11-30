@@ -35,6 +35,7 @@ class vorlage extends basis_db
 	public $studiengang_kz;
 	public $version;
 	public $text;
+	public $mimetype;
 
 	/**
 	 * Konstruktor
@@ -65,7 +66,12 @@ class vorlage extends basis_db
 		
 		if($studiengang_kz!='')
 		{
-			$qry = "SELECT * FROM public.tbl_vorlagestudiengang WHERE 
+			$qry = "SELECT 
+						tbl_vorlagestudiengang.*, tbl_vorlage.mimetype 
+					FROM 
+						public.tbl_vorlagestudiengang 
+						JOIN public.tbl_vorlage USING(vorlage_kurzbz) 
+					WHERE 
 					(studiengang_kz=0 OR studiengang_kz='".addslashes($studiengang_kz)."') AND 
 					vorlage_kurzbz='".addslashes($vorlage_kurzbz)."'";
 			if(!is_null($version) && $version!='')
@@ -76,7 +82,11 @@ class vorlage extends basis_db
 		}
 		else
 		{
-			$qry = "SELECT * FROM public.tbl_vorlagestudiengang 
+			$qry = "SELECT 
+						tbl_vorlagestudiengang.*, tbl_vorlage.mimetype
+					FROM 
+						public.tbl_vorlagestudiengang 
+						JOIN public.tbl_vorlage USING(vorlage_kurzbz)
 					WHERE oe_kurzbz='".addslashes($oe_kurzbz)."' 
 						AND vorlage_kurzbz='".addslashes($vorlage_kurzbz)."'";
 			if(!is_null($version) && $version!='')
@@ -94,6 +104,7 @@ class vorlage extends basis_db
 				$this->studiengang_kz = $row->studiengang_kz;
 				$this->version = $row->version;
 				$this->text = $row->text;
+				$this->mimetype = $row->mimetype;
 				return true;
 			}
 			else 
