@@ -107,28 +107,17 @@ class projekttask extends basis_db
 		}
 	}
 
-	/**
-	 * Laedt die Projektarbeit mit der ID $projekt_kurzbz
+/**
+	 * Laedt die Projekttasks für den Statusbericht
 	 * @param  $projektphase_id ID der Projektphase, wenn null greift $projekt_kurzbz
-	 * @param  $projekt_kurzbz ID des Projekts wenn keine Projektphase angegeben
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getProjekttasks($projektphase_id,$projekt_kurzbz=null,$filterErledigt=null)
+	public function getProjekttasksForStatusbericht($projekt_kurzbz)
 	{
-		$filter = '';
-		if(!is_null($filterErledigt))
-		{
-			if($filterErledigt == 'offen')
-				$filter = " and erledigt = 'false'";
-			else if ($filterErledigt == 'erledigt')
-				$filter = " and erledigt = 'true'";
-		}
-		
-		
-		if (!is_null($projektphase_id))
-			$qry = 'SELECT * FROM fue.tbl_projekttask WHERE projektphase_id='.$projektphase_id.$filter.';';
-		else
-        	$qry='';
+			$qry ="SELECT task.* FROM fue.tbl_projekttask task
+			JOIN fue.tbl_projektphase phase ON(phase.projektphase_id = task.projektphase_id)
+			JOIN fue.tbl_projekt projekt USING(projekt_kurzbz) where projekt_kurzbz = '".addslashes($projekt_kurzbz)."' 
+			and erledigt = false and task.ende >= CURRENT_DATE ORDER BY ende LIMIT 3;";
 
 		if($this->db_query($qry))
 		{
@@ -143,7 +132,71 @@ class projekttask extends basis_db
 				$obj->aufwand = $row->aufwand;
 				$obj->mantis_id = $row->mantis_id;
 				//$obj->beginn = $row->beginn;
-				//$obj->ende = $row->ende;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->erledigt = ($row->erledigt=='t'?true:false);
+				$obj->projekttask_fk = $row->projekttask_fk;
+				$obj->ende = $row->ende; 
+				$obj->ressource_id = $row->ressource_id; 
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	
+	/**
+	 * Laedt die Projektarbeit mit der ID $projekt_kurzbz
+	 * @param  $projektphase_id ID der Projektphase, wenn null greift $projekt_kurzbz
+	 * @param  $projekt_kurzbz ID des Projekts wenn keine Projektphase angegeben
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getProjekttasks($projektphase_id,$projekt_kurzbz=null,$filterErledigt=null)
+	{
+		
+		// lade tasks zu projekt
+		if(!is_null($projekt_kurzbz))
+		{
+			$qry ="SELECT task.* FROM fue.tbl_projekttask task
+			JOIN fue.tbl_projektphase phase ON(phase.projektphase_id = task.projektphase_id)
+			JOIN fue.tbl_projekt projekt USING(projekt_kurzbz) where projekt_kurzbz = '".addslashes($projekt_kurzbz)."'";
+			
+		}elseif (!is_null($projektphase_id))
+			$qry = "SELECT * FROM fue.tbl_projekttask WHERE projektphase_id='".addslashes($projektphase_id)."'";
+		else
+        	$qry='';
+
+		if(!is_null($filterErledigt))
+		{
+			if($filterErledigt == 'offen')
+				$qry .= " and erledigt = 'false'";
+			else if ($filterErledigt == 'erledigt')
+				$qry .= " and erledigt = 'true'";
+		}	
+		
+		$qry .=';';
+        
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new projekttask();
+				     	 	 	 	 	 	
+				$obj->projekttask_id = $row->projekttask_id;
+				$obj->projektphase_id = $row->projektphase_id;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->aufwand = $row->aufwand;
+				$obj->mantis_id = $row->mantis_id;
+				//$obj->beginn = $row->beginn;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
