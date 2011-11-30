@@ -59,6 +59,7 @@ $datum_obj = new datum();
 
 $type = isset($_GET['type'])?$_GET['type']:'';
 $ampel_id = isset($_GET['ampel_id'])?$_GET['ampel_id']:'';
+$message='';
 
 if($type=='bestaetigen' && is_numeric($ampel_id))
 {
@@ -69,7 +70,9 @@ if($type=='bestaetigen' && is_numeric($ampel_id))
 		{
 			if($ampel->bestaetigen($user, $ampel_id))
 			{
-				$message = '<span class="ok">OK</span>';
+				//$message = '<span class="ok">OK</span>';
+				//Ampel Ansicht im Seiten-Header aktualisieren
+				$message='<script type="text/javascript">window.parent.loadampel()</script>';
 			}
 			else
 				$message = '<span class="error">'.$ampel->errormsg.'</span>';
@@ -81,9 +84,10 @@ if($type=='bestaetigen' && is_numeric($ampel_id))
 		$message = '<span class="error">'.$p->t('tools/ampelNichtGefunden').'</span>';
 }
 
+echo $message;
 
 $ampel = new ampel();
-$ampel->loadUserAmpel($user, true);
+$ampel->loadUserAmpel($user, true, true);
 
 echo '
 <table id="myTable" class="tablesorter">
@@ -112,30 +116,41 @@ foreach($ampel->result as $row)
 	elseif($ts_now<$ts_deadline && $ts_vorlaufzeit>=$ts_now)
 		$ampelstatus='gruen';
 	
+	if($bestaetigt = $ampel->isBestaetigt($user,$row->ampel_id))
+		$ampelstatus='';
+	
 	echo '<tr>';
 	echo '<td align="center">';
 	switch($ampelstatus)
 	{
 		case 'rot':
-			echo '<img src="../../../skin/images/ampel_rot.png">';
+			$status= '<img src="../../../skin/images/ampel_rot.png">';
 			break;
 		case 'gelb':
-			echo '<img src="../../../skin/images/ampel_gelb.png">';
+			$status= '<img src="../../../skin/images/ampel_gelb.png">';
 			break;
 		case 'gruen':
-			echo '<img src="../../../skin/images/ampel_gruen.png">';
+			$status= '<img src="../../../skin/images/ampel_gruen.png">';
 			break;
 		default:
+			$status= '-';
 			break;
 	}
+	echo $status;
+	
 	echo '</td>';
-	echo '<td>'.$row->beschreibung[$sprache].'</td>';
+	$beschreibung = $row->beschreibung[$sprache];
+	if($beschreibung=='' && isset($row->beschreibung[DEFAULT_LANGUAGE]))
+		$beschreibung = $row->beschreibung[DEFAULT_LANGUAGE];
+	echo '<td>'.$beschreibung.'</td>';
 	echo '<td>'.$datum_obj->formatDatum($row->deadline,'d.m.Y').'</td>';
 	
-	if(!$ampel->isBestaetigt($user,$row->ampel_id))
-		echo '<td><a href="'.$_SERVER['PHP_SELF'].'?ampel_id='.$row->ampel_id.'&type=bestaetigen">bestätigen</a></td>';
+	echo '<td>';
+	if(!$bestaetigt)
+		echo '<a href="'.$_SERVER['PHP_SELF'].'?ampel_id='.$row->ampel_id.'&type=bestaetigen">'.$p->t('tools/ampelBestaetigen').'</a>';
 	else
-		echo '<td></td>';
+		echo $p->t('tools/ampelBestaetigt');
+	echo '</td>';
 	
 //	echo "<td>".date('d.m.Y',$ts_now)."</td>";
 //	echo "<td align=\"center\">".date('d.m.Y',$ts_vorlaufzeit)."</td>";
