@@ -33,5 +33,7 @@ $this->phrasen['tools/ampelStatus']='Status';
 $this->phrasen['tools/ampelBeschreibung']='Beschreibung';
 $this->phrasen['tools/ampelDeadline']='Deadline';
 $this->phrasen['tools/ampelAktion']='Aktion';
+$this->phrasen['tools/ampelBestaetigen']='bestätigen';
+$this->phrasen['tools/ampelBestaetigt']='bestätigt';
 
 ?>

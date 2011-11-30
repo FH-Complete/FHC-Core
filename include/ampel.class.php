@@ -203,6 +203,12 @@ class ampel extends basis_db
 	/**
 	 * Laedt alle aktuellen Ampeln eines Users
 	 * @param $user
+	 * @param $zukuenftige_anzeigen
+	 * 				wenn true, werden alle zukuenftigen Ampeln geladen 
+	 * 				wenn false, werden nur die Ampeln geladen die innerhalb der vorlaufzeit liegen
+	 * @param $bestaetigt
+	 * 				wenn true, werden alle Ampeln geladen 
+	 * 				wenn false, werden nur die Ampeln geladen die noch nicht bestaetigt wurden
 	 */
 	public function loadUserAmpel($user, $zukuenftige_anzeigen=false, $bestaetigt=false)
 	{
@@ -253,6 +259,28 @@ class ampel extends basis_db
 	}
 	
 	/**
+	 * Prueft die Daten vor dem Speichern
+	 * @return boolean
+	 */
+	public function validate()
+	{
+		$benutzer_select = mb_strtolower($this->benutzer_select);
+		
+		if(mb_strstr($benutzer_select, 'update ') || mb_strstr($benutzer_select, 'insert '))
+		{
+			$this->errormsg = 'Der Benutzer Select darf nur Selects beinhalten';
+			return false;
+		}
+		
+		if(!mb_strstr($benutzer_select,'select '))
+		{
+			$this->errormsg = 'Der Benutzer Select muss einen Select-Befehl beinhalten';
+			return false;
+		}
+		return true;
+	}
+	
+	/**
 	 * Speichert eine Ampel
 	 * @param $new
 	 */
@@ -260,6 +288,9 @@ class ampel extends basis_db
 	{
 		if(is_null($new))
 			$new = $this->new;
+			
+		if(!$this->validate())
+			return false;
 			
 		$sprache = new sprache();
 		$sprache->loadIndexArray();
@@ -277,9 +308,9 @@ class ampel extends basis_db
 			$qry.=" benutzer_select, deadline, 
 					vorlaufzeit, verfallszeit, insertamum, insertvon , updateamum, updatevon) VALUES(".
 					$this->addslashes($this->kurzbz).',';
-			
+			reset($this->beschreibung);
 			foreach($this->beschreibung as $key=>$value)
-				$this->addslashes($value).',';
+				$qry.=$this->addslashes($value).',';
 								
 			$qry .= $this->addslashes($this->benutzer_select).','.
 					$this->addslashes($this->deadline).','.
@@ -294,7 +325,7 @@ class ampel extends basis_db
 		{
 			$qry = 'UPDATE public.tbl_ampel SET'.
 					' kurzbz = '.$this->addslashes($this->kurzbz).',';
-			
+			reset($this->beschreibung);
 			foreach($this->beschreibung as $key=>$value)
 			{
 				$idx = $sprache->index_arr[$key];
