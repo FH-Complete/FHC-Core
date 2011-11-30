@@ -161,13 +161,19 @@ class projektphase extends basis_db
 	/**
 	 * Laedt die Projektphasen mit zu einem Projekt
 	 * @param  $projekt_kurzbz Projekt der zu ladenden Projektphasen
+	 * @param  $foreignkey wenn ! gib nur die Erste Ebene der Projektphasen zurück
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getProjektphasen($projekt_kurzbz)
+	public function getProjektphasen($projekt_kurzbz, $foreignkey = null)
 	{
 		$this->result=array();
-		$qry = "SELECT * FROM fue.tbl_projektphase WHERE projekt_kurzbz='$projekt_kurzbz' ORDER BY start, projektphase_fk DESC;";
+		$qry = "SELECT * FROM fue.tbl_projektphase WHERE projekt_kurzbz='$projekt_kurzbz'";
 		//echo "\n".$qry."\n";
+		
+		if(!is_null($foreignkey))
+			$qry .= " and projektphase_fk is NULL";
+			
+		$qry .= " ORDER BY start, projektphase_fk DESC;";	
 		
 		if($this->db_query($qry))
 		{
