@@ -126,6 +126,8 @@ if(isset($_GET['all']))
 	$params.='&all='.$_GET['all'];
 if(isset($_GET["lvid"]))
 	$params.='&lvid='.$_GET["lvid"];
+if(isset($_GET['projekt_kurzbz']))
+	$params.='&projekt_kurzbz='.$_GET['projekt_kurzbz'];
 if(isset($_GET['version']) && is_numeric($_GET['version']))
 	$version = $_GET['version'];
 else 
@@ -241,21 +243,10 @@ $filename=$xsl.$nachname;
 
 if (!isset($_REQUEST["archive"]))
 {
-	if(PDF_CREATE_FUNCTION=='FOP')
+	if(mb_strstr($vorlage->mimetype, 'application/vnd.oasis.opendocument'))
 	{
-		$fop = new fop();
-		$xml = $xml_doc->saveXML();
-		//$xml = '<personen></personen>';
-		//$xsl='foobar';
-		$fop->generatePdf($xml, $xsl_content, $filename, "D");
-	}
-	else 
-	{
-		$fo2pdf = new XslFo2Pdf();
-			
 		// Load the XSL source
 		$xsl_doc = new DOMDocument;
-		
 		if(!$xsl_doc->loadXML($xsl_content))
 			die('unable to load xsl');
 		
@@ -264,9 +255,69 @@ if (!isset($_REQUEST["archive"]))
 		$proc->importStyleSheet($xsl_doc); // attach the xsl rules
 		
 		$buffer = $proc->transformToXml($xml_doc);
-		if (!$fo2pdf->generatePdf($buffer, $filename, "D"))
+		//echo $buffer;
+		//exit;
+		$tempname_content = tempnam('/tmp','vorlage');
+		file_put_contents($tempname_content, $buffer);
+		$zipfile = DOC_ROOT.'system/vorlage_zip/'.$vorlage->vorlage_kurzbz.'.ods';
+		$tempname_zip = tempnam('/tmp','zip');
+		if(copy($zipfile, $tempname_zip))
 		{
-			echo('Failed to generate PDF');
+			$zip = new ZipArchive;
+			if ($zip->open($tempname_zip) === TRUE) 
+			{
+			    $zip->addFile($tempname_content, 'content.xml');
+			    $zip->close();
+			    
+				clearstatcache(); 
+			    $fsize = filesize($tempname_zip);
+			    $handle = fopen($tempname_zip,'r');
+			    header('Content-type: '.$vorlage->mimetype);
+				header('Content-Disposition: attachment; filename="'.$vorlage->vorlage_kurzbz.'.ods"');
+			    header('Content-Length: '.$fsize); 
+			    while (!feof($handle)) 
+			    {
+				  	echo fread($handle, 8192);
+				}
+				fclose($handle);
+				unlink($tempname_zip);
+				unlink($tempname_content);
+			} 
+			else 
+			{
+			    echo 'Fehler beim Oeffnen des Zip Files';
+			}
+		}
+	}
+	else
+	{
+		if(PDF_CREATE_FUNCTION=='FOP')
+		{
+			$fop = new fop();
+			$xml = $xml_doc->saveXML();
+			//$xml = '<personen></personen>';
+			//$xsl='foobar';
+			$fop->generatePdf($xml, $xsl_content, $filename, "D");
+		}
+		else 
+		{
+			$fo2pdf = new XslFo2Pdf();
+				
+			// Load the XSL source
+			$xsl_doc = new DOMDocument;
+			
+			if(!$xsl_doc->loadXML($xsl_content))
+				die('unable to load xsl');
+			
+			// Configure the transformer
+			$proc = new XSLTProcessor;
+			$proc->importStyleSheet($xsl_doc); // attach the xsl rules
+			
+			$buffer = $proc->transformToXml($xml_doc);
+			if (!$fo2pdf->generatePdf($buffer, $filename, "D"))
+			{
+				echo('Failed to generate PDF');
+			}
 		}
 	}
 }
