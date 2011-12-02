@@ -103,7 +103,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 		plugins : "spellchecker,pagebreak,style,layer,table,advhr,advimage,advlink,inlinepopups,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras",
 			
 		// Theme options
-		theme_advanced_buttons1 : "bold,italic,underline,|,justifyleft,justifycenter,justifyright,justifyfull,|,link,unlink,image,|,bullist,formatselect,fontsizeselect", 
+		theme_advanced_buttons1 : "bold,italic,underline,|,justifyleft,justifycenter,justifyright,justifyfull,|,link,unlink,image,|,bullist,formatselect,fontsizeselect,pastetext", 
     	theme_advanced_buttons2 : "", 
     	theme_advanced_buttons3 : "",
 	    theme_advanced_toolbar_location : "top",
@@ -112,7 +112,21 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         theme_advanced_resizing : true,
         force_br_newlines : true,
         force_p_newlines : false,
-        forced_root_block : ""
+        forced_root_block : "",
+        //Formatierungen beim Einfuegen entfernen
+        paste_auto_cleanup_on_paste : true,
+        paste_remove_styles: true,
+        paste_remove_styles_if_webkit: true,
+        paste_strip_class_attributes: true,
+        paste_retain_style_properties: "",
+        paste_text_sticky: true,
+        setup : function(ed) 
+        {    
+        	ed.onInit.add(function(ed)
+            {    ed.pasteAsPlainText = true;
+                ed.controlManager.setActive("pastetext", true);
+            });
+           }
 		
 		}
 	);
