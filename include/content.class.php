@@ -1222,9 +1222,8 @@ class content extends basis_db
 	{
 		$qry = 'UPDATE campus.tbl_contentlog SET ende=now() WHERE'.
 				' uid='.$this->addslashes($user).
-				' AND contentsprache_id='.$this->addslashes($contentsprache_id).
 				' AND ende is null;'.
-				'UPDATE campus.tbl_contentsprache SET gesperrt_uid=null;';
+				'UPDATE campus.tbl_contentsprache SET gesperrt_uid=null WHERE gesperrt_uid=\''.addslashes($user).'\';';
 				
 		if($this->db_query($qry))
 			return true;
