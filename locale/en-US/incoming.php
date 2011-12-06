@@ -17,7 +17,7 @@ $this->phrasen['incoming/universitätsnameerweitert']='Sending Institution Name 
 $this->phrasen['incoming/zugangsvoraussetzung']='University Entrance Qualification';
 $this->phrasen['incoming/abgelegtin']='Place of issue (Name of Institution)';
 $this->phrasen['incoming/abgelegtinort']='Issued in (Ort)';
-$this->phrasen['incoming/abgelegtam']='Date of issue (Date, dd.mm.YYYY)';
+$this->phrasen['incoming/abgelegtam']='Date of issue (Date, dd.mm.yyyy)';
 $this->phrasen['incoming/zugangsvoraussetzungmaster']='Master Entrance Qualification';
 $this->phrasen['incoming/personimernstfall']='Person to Contact in Case of Emergency';
 $this->phrasen['incoming/bachelorstudiengang']='Bachelor´s Degree Program';
@@ -58,4 +58,5 @@ $this->phrasen['incoming/nothesis']='no Thesis';
 $this->phrasen['incoming/masterthesis']='Master Thesis';
 $this->phrasen['incoming/bachelorthesis']='Bachelor Thesis';
 $this->phrasen['incoming/researcharea']='Research Area';
+$this->phrasen['incoming/wennVorhanden']='if applicable'; 
 ?>
