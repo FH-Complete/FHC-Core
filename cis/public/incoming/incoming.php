@@ -145,16 +145,16 @@ if($method =="austauschprogram")
 	echo '					</td>
 						</tr>
 						<tr>
-							<td>'.$p->t('global/code').' </td>
+							<td>'.$p->t('global/code').'* </td>
 							<td><input type="text" name="code" size="40" maxlength="256" value="'.$preincoming->code.'"></td>
 						</tr>
 						<tr>
 							<td>'.$p->t('incoming/studiertvon').' </td>
-							<td><input type="text" name="von" size="10"  value="'.$date->formatDatum($preincoming->von,'d.m.Y').'"> (dd.mm.YYYY)</td>
+							<td><input type="text" name="von" size="10"  value="'.$date->formatDatum($preincoming->von,'d.m.Y').'"> (dd.mm.yyyy)</td>
 						</tr>
 						<tr>
 							<td>'.$p->t('incoming/studiertbis').' </td>
-							<td><input type="text" name="bis" size="10"  value="'.$date->formatDatum($preincoming->bis,'d.m.Y').'"> (dd.mm.YYYY)</td>
+							<td><input type="text" name="bis" size="10"  value="'.$date->formatDatum($preincoming->bis,'d.m.Y').'"> (dd.mm.yyyy)</td>
 						</tr>
 							<td>&nbsp;</td>
 							<td>&nbsp;</td>
@@ -167,6 +167,9 @@ if($method =="austauschprogram")
 					</table>
 				<tr>
 					<td><input type="button" value="'.$p->t('global/zurueck').'" onclick="document.location.href = \'incoming.php?method=university\'"; ><input type="button" value="'.$p->t('incoming/weiter').'" onclick="document.location.href = \'incoming.php?method=lehrveranstaltungen\'"; style="float:right"></td>
+				</tr>
+				<tr>
+					<td>* '.$p->t('incoming/wennVorhanden').'</td>
 				</tr>
 					
 				</table>
@@ -288,7 +291,16 @@ else if($method=="lehrveranstaltungen")
 						</tr>
 						</thead>
 						<tbody>';
-						
+
+				//Deutschkurs3
+				if($preincoming->deutschkurs3)
+				{
+					echo '<tr>';
+					echo '<td> <a href="incoming.php?method=lehrveranstaltungen&mode=delete&type=deutschkurs3&view=own">'.$p->t('global/löschen').'</a></td>';
+					echo '<td>'.$p->t('incoming/deutschkurs3').'</td>';
+					echo '</tr>';
+				}
+				
 				//Deutschkurs1
 				if($preincoming->deutschkurs1)
 				{
@@ -305,14 +317,7 @@ else if($method=="lehrveranstaltungen")
 					echo '<td>'.$p->t('incoming/deutschkurs2').'</td>';
 					echo '</tr>';
 				}
-				//Deutschkurs3
-				if($preincoming->deutschkurs3)
-				{
-					echo '<tr>';
-					echo '<td> <a href="incoming.php?method=lehrveranstaltungen&mode=delete&type=deutschkurs3&view=own">'.$p->t('global/löschen').'</a></td>';
-					echo '<td>'.$p->t('incoming/deutschkurs3').'</td>';
-					echo '</tr>';
-				}
+
 				echo '</tbody></table><br><br>';
 			}
 			
@@ -379,7 +384,15 @@ else if($method=="lehrveranstaltungen")
 				</tr>
 				</thead>
 				<tbody>';
-				
+
+		//Deutschkurs3
+		echo '<tr>';
+		if(!$preincoming->deutschkurs3)
+			echo '<td width="6%"><a href="incoming.php?method=lehrveranstaltungen&mode=add&type=deutschkurs3">'.$p->t('global/anmelden').'</a></td>';
+		else
+			echo '<td width="6%">'.$p->t('global/angemeldet').'</td>';
+		echo '<td>'.$p->t('incoming/deutschkurs3').'</td>';
+		echo '</tr>';
 		//Deutschkurs1
 		echo '<tr>';
 		if(!$preincoming->deutschkurs1)
@@ -395,14 +408,6 @@ else if($method=="lehrveranstaltungen")
 		else
 			echo '<td>'.$p->t('global/angemeldet').'</td>';
 		echo '<td>'.$p->t('incoming/deutschkurs2').'</td>';
-		echo '</tr>';
-		//Deutschkurs3
-		echo '<tr>';
-		if(!$preincoming->deutschkurs3)
-			echo '<td width="6%"><a href="incoming.php?method=lehrveranstaltungen&mode=add&type=deutschkurs3">'.$p->t('global/anmelden').'</a></td>';
-		else
-			echo '<td width="6%">'.$p->t('global/angemeldet').'</td>';
-		echo '<td>'.$p->t('incoming/deutschkurs3').'</td>';
 		echo '</tr>';
 		
 		echo '</tbody></table><br><br>';
@@ -1375,7 +1380,7 @@ else if ($method == "profil")
 			</tr>
 			<tr>
 				<td>'.$p->t('global/geburtsdatum').'</td>
-				<td><input type="text" size="20" name="geb_datum" value="'.$date->formatDatum($person->gebdatum,'d.m.Y').'" onfocus="this.value=\'\'"> (dd.mm.YYYY)</td>
+				<td><input type="text" size="20" name="geb_datum" value="'.$date->formatDatum($person->gebdatum,'d.m.Y').'" onfocus="this.value=\'\'"> (dd.mm.yyyy)</td>
 				<td>&nbsp;</td>
 			</tr>
 			<tr>
