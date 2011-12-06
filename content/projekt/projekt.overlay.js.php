@@ -362,3 +362,26 @@ function ProjektNeu()
 	//Detail Tab auswaehlen
 	document.getElementById('tabs-projekt-main').selectedItem=document.getElementById('tab-projekt-detail');	
 }
+
+function ProjektPrintStatusbericht()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('tree-projekt');
+
+	if (tree.currentIndex==-1)
+	{
+		alert('Kein Projekt ausgewählt!');
+		return;
+	}
+	try
+	{
+		//Ausgewaehltes Projekt holen
+		id = getTreeCellText(tree, "treecol-projekt-projekt_kurzbz", tree.currentIndex);
+   	}
+	catch(e)
+	{
+		alert(e);
+		return false;
+	}
+	window.open('<?php echo APP_ROOT ?>content/pdfExport.php?xsl=statusbericht&xml=statusbericht.rdf.php&projekt_kurzbz='+id);
+}
