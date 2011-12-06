@@ -607,11 +607,15 @@ class wochenplan extends basis_db
 						// Lektoren
 						$lektor[]=$lehrstunde->lektor;
 						// Lehrverband
+						$typ='';
+						if($lehrstunde->reservierung)
+						{
+							$studiengang = new studiengang(); 
+							$studiengang->load($lehrstunde->stg_kz);
+							$typ = $studiengang->typ; 
+						}						
 						
-						$studiengang = new studiengang(); 
-						$studiengang->load($lehrstunde->stg_kz);
-						
-						$lvb=$studiengang->typ.$lehrstunde->stg.'-'.$lehrstunde->sem;
+						$lvb=$typ.$lehrstunde->stg.'-'.$lehrstunde->sem;
 						$stg = $lehrstunde->stg_kz;
 						if ($lehrstunde->ver!=null && $lehrstunde->ver!='0' && $lehrstunde->ver!='')
 						{
