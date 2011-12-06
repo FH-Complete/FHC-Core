@@ -144,11 +144,23 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$summe_mwst=0;
 		
 		$i=0;
+		$pagebreakposition=30;
+		$pagebreak=false;
 		echo "	<details>\n";
 		foreach($details->result as $row)
 		{
-			if($i==28)
+			//wenn die Bezeichnung zu lange ist, dann muss die Seite frueher umbrechen
+			if(!$pagebreak && mb_strlen($row->beschreibung)>60)
 			{
+				//echo "reduce";
+				$pagebreakposition--;
+			}
+				
+			//echo "pos:".$pagebreakposition;
+			//echo "i:".$i;
+			if(!$pagebreak && $i>$pagebreakposition)
+			{
+				$pagebreak=true;
 				echo "</details>\n";
 				echo "<details_1>\n";
 			}
@@ -170,8 +182,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			$summe_mwst+=$row->menge*$row->preisprove/100*$row->mwst;
 			$i++;
 		}
-		
-		if($i>28)
+		//echo "pos:".$pagebreakposition;
+		if($i>$pagebreakposition)
 			echo "	</details_1>\n";
 		else
 			echo "	</details>\n";
