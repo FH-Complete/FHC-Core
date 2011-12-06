@@ -257,36 +257,29 @@ if (!isset($_REQUEST["archive"]))
 		$buffer = $proc->transformToXml($xml_doc);
 		//echo $buffer;
 		//exit;
-		$tempname_content = tempnam('/tmp','vorlage');
-		file_put_contents($tempname_content, $buffer);
+		$tempfolder = '/tmp/'.uniqid();
+		mkdir($tempfolder);
+		chdir($tempfolder);
+		file_put_contents('content.xml', $buffer);
 		$zipfile = DOC_ROOT.'system/vorlage_zip/'.$vorlage->vorlage_kurzbz.'.ods';
-		$tempname_zip = tempnam('/tmp','zip');
+		$tempname_zip = 'out.zip';
 		if(copy($zipfile, $tempname_zip))
 		{
-			$zip = new ZipArchive;
-			if ($zip->open($tempname_zip) === TRUE) 
-			{
-			    $zip->addFile($tempname_content, 'content.xml');
-			    $zip->close();
-			    
-				clearstatcache(); 
-			    $fsize = filesize($tempname_zip);
-			    $handle = fopen($tempname_zip,'r');
-			    header('Content-type: '.$vorlage->mimetype);
-				header('Content-Disposition: attachment; filename="'.$vorlage->vorlage_kurzbz.'.ods"');
-			    header('Content-Length: '.$fsize); 
-			    while (!feof($handle)) 
-			    {
-				  	echo fread($handle, 8192);
-				}
-				fclose($handle);
-				unlink($tempname_zip);
-				unlink($tempname_content);
-			} 
-			else 
-			{
-			    echo 'Fehler beim Oeffnen des Zip Files';
+			exec("zip $tempname_zip content.xml");
+			clearstatcache(); 
+		    $fsize = filesize($tempname_zip);
+		    $handle = fopen($tempname_zip,'r');
+		    header('Content-type: '.$vorlage->mimetype);
+			header('Content-Disposition: attachment; filename="'.$vorlage->vorlage_kurzbz.'.ods"');
+		    header('Content-Length: '.$fsize); 
+		    while (!feof($handle)) 
+		    {
+			  	echo fread($handle, 8192);
 			}
+			fclose($handle);
+			unlink('content.xml');
+			unlink($tempname_zip);
+			rmdir($tempfolder);
 		}
 	}
 	else
