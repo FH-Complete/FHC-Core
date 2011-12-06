@@ -676,12 +676,12 @@
 				</fo:block>
 			</fo:table-cell>
 			<fo:table-cell display-align="center">
-				<fo:block font-size="8pt" content-width="15mm" text-align="right">
+				<fo:block font-size="8pt" content-width="14mm" text-align="right">
 					<xsl:value-of select="preisprove" />
 				</fo:block>
 			</fo:table-cell>
 			<fo:table-cell display-align="center">
-				<fo:block font-size="8pt" content-width="20mm" text-align="right">
+				<fo:block font-size="8pt" content-width="19mm" text-align="right">
 					<xsl:value-of select="summe_netto" />
 				</fo:block>
 			</fo:table-cell>

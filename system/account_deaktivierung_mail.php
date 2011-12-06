@@ -204,7 +204,7 @@ echo nl2br($text);
 
 if($text!='')
 {
-	$mail = new mail(MAIL_IT.', tw_ht@technikum-wien.at, schmuderm@technikum-wien.at, vilesci@technikum-wien.at', 'vilesci@'.DOMAIN, 'Account Deaktivierung', "Dies ist eine automatische Mail!\nFolgende Warnungen zur Accountloeschung wurden versandt:\n\n".$text);
+	$mail = new mail(MAIL_IT.', vilesci@technikum-wien.at', 'vilesci@'.DOMAIN, 'Account Deaktivierung', "Dies ist eine automatische Mail!\nFolgende Warnungen zur Accountloeschung wurden versandt:\n\n".$text);
 	$mail->send();
 }
 

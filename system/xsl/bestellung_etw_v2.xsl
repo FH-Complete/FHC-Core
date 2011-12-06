@@ -670,7 +670,7 @@
 						<fo:table-column column-width="7mm"/>
 						<fo:table-column column-width="9.4mm"/>
 						<!-- <fo:table-column column-width="7.2mm"/>-->
-						<fo:table-column column-width="78.4mm"/>
+						<fo:table-column column-width="85.6mm"/><!-- 78.4mm -->
 						<fo:table-column column-width="34.8mm"/>
 						<fo:table-column column-width="14.8mm"/>
 						<fo:table-column column-width="19.8mm"/>
@@ -773,9 +773,9 @@
 				<fo:block-container position="absolute" top="25mm" left="10mm">
 					<fo:table table-layout="fixed" border-collapse="collapse">
 						<fo:table-column column-width="7mm"/>
-						<fo:table-column column-width="10mm"/>
+						<fo:table-column column-width="9.4mm"/>
 						<!-- <fo:table-column column-width="8mm"/>-->
-						<fo:table-column column-width="87mm"/>
+						<fo:table-column column-width="87mm"/> <!-- 79 -->
 						<fo:table-column column-width="35mm"/>
 						<fo:table-column column-width="15mm"/>
 						<fo:table-column column-width="20mm"/>
@@ -800,12 +800,12 @@
 								</fo:table-cell>
 								 -->
 								<fo:table-cell display-align="center">
-									<fo:block font-size="8pt" font-weight="bold" content-width="80mm" text-align="center">
+									<fo:block font-size="8pt" font-weight="bold" content-width="78mm" text-align="center">
 										Bezeichnung
 									</fo:block>
 								</fo:table-cell>
 								<fo:table-cell display-align="center">
-									<fo:block font-size="8pt" font-weight="bold" content-width="35mm" text-align="center">
+									<fo:block font-size="8pt" font-weight="bold" content-width="34mm" text-align="center">
 										ArtikelNr
 									</fo:block>
 								</fo:table-cell>
@@ -864,12 +864,12 @@
 				</fo:block>
 			</fo:table-cell>
 			<fo:table-cell display-align="center">
-				<fo:block font-size="8pt" content-width="15mm" text-align="right">
+				<fo:block font-size="8pt" content-width="14mm" text-align="right">
 					<xsl:value-of select="preisprove" />
 				</fo:block>
 			</fo:table-cell>
 			<fo:table-cell display-align="center">
-				<fo:block font-size="8pt" content-width="20mm" text-align="right">
+				<fo:block font-size="8pt" content-width="19mm" text-align="right">
 					<xsl:value-of select="summe_netto" />
 				</fo:block>
 			</fo:table-cell>
