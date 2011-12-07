@@ -47,11 +47,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/ressource.overlay.xul.php"
 	seltype="single" hidecolumnpicker="false" flex="1"
 	datasources="<?php echo APP_ROOT; ?>rdf/projektphase.rdf.php?foo=<?php echo time(); ?>" ref="http://www.technikum-wien.at/projektphase"
 	enableColumnDrag="true"
-    ondraggesture="nsDragAndDrop.startDrag(event,lvbgrpDDObserver);"
-	ondragdrop="nsDragAndDrop.drop(event,verbandtreeDDObserver)"
-	ondragover="nsDragAndDrop.dragOver(event,verbandtreeDDObserver)"
-	ondragenter="nsDragAndDrop.dragEnter(event,verbandtreeDDObserver)"
-	ondragexit="nsDragAndDrop.dragExit(event,verbandtreeDDObserver)"
+	ondragdrop="nsDragAndDrop.drop(event,projektTaskDDObserver)"
+	ondragover="nsDragAndDrop.dragOver(event,projektTaskDDObserver)"
+	ondragenter="nsDragAndDrop.dragEnter(event,projektTaskDDObserver)"
+	ondragexit="nsDragAndDrop.dragExit(event,projektTaskDDObserver)"
 	>
 	<treecols>
 	    <treecol id="treecol-projektmenue-bezeichnung" label="Bezeichnung" flex="5" primary="true" />
