@@ -483,6 +483,20 @@ function BetriebsmittelMenulistInventarLoad(menulist, filter)
 	}
 }
 
-
+// ****
+// * Erstellt eine Uebernahmebestaetigung
+// ****
+function BetriebsmittelPrintUebernahmebestaetigung()
+{
+	id = document.getElementById('betriebsmittel-textbox-betriebsmittelperson_id').value;
+	
+	if(id=='')
+	{
+		alert('Sie muessen zuerst einen Eintrag auswaehlen');
+		return false;
+	}
+	var url = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl=Uebernahme&xml=betriebsmittelperson.rdf.php&id='+id;
+	window.open(url);
+}
 
 

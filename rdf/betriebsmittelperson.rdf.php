@@ -26,12 +26,14 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
-// xml
-echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+
 // DAO
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/betriebsmittelperson.class.php');
 require_once('../include/datum.class.php');
+require_once('../include/organisationseinheit.class.php');
+require_once('../include/person.class.php');
+require_once('../include/betriebsmitteltyp.class.php');
 
 if(isset($_GET['person_id']))
 	$person_id = $_GET['person_id'];
@@ -48,36 +50,84 @@ if(isset($_GET['betriebsmittelperson_id']))
 else 
 	$betriebsmittelperson_id = null;
 
+if(isset($_GET['id']))
+	$betriebsmittelperson_id = $_GET['id'];
+
+if(isset($_GET['xmlformat']))
+	$xmlformat=$_GET['xmlformat'];
+else
+	$xmlformat='rdf';
+
 $datum = new datum();
-
-$rdf_url='http://www.technikum-wien.at/betriebsmittel';
-
-echo '
-<RDF:RDF
-	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	xmlns:BTM="'.$rdf_url.'/rdf#"
->
-
-   <RDF:Seq about="'.$rdf_url.'/liste">';
-
-
-$betriebsmittel = new betriebsmittelperson();
-if($betriebsmittelperson_id=='' && $person_id!='')
+if($xmlformat!='xml')
 {
-	if($betriebsmittel->getBetriebsmittelPerson($person_id, $betriebsmitteltyp))
-		foreach ($betriebsmittel->result as $row)
-			draw_content($row);
+	echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+	
+	$rdf_url='http://www.technikum-wien.at/betriebsmittel';
+	
+	echo '
+	<RDF:RDF
+		xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+		xmlns:BTM="'.$rdf_url.'/rdf#"
+	>
+	
+	   <RDF:Seq about="'.$rdf_url.'/liste">';
+	
+	
+	$betriebsmittel = new betriebsmittelperson();
+	if($betriebsmittelperson_id=='' && $person_id!='')
+	{
+		if($betriebsmittel->getBetriebsmittelPerson($person_id, $betriebsmitteltyp))
+			foreach ($betriebsmittel->result as $row)
+				draw_content($row);
+		else 
+			die($betriebsmittel->errormsg);
+	}
 	else 
-		die($betriebsmittel->errormsg);
+	{
+		if($betriebsmittel->load($betriebsmittelperson_id))
+			draw_content($betriebsmittel);
+		else 
+			die($betriebsmittel->errormsg);
+	}
+	echo '</RDF:Seq>
+	</RDF:RDF>';
 }
-else 
+else
 {
-	if($betriebsmittel->load($betriebsmittelperson_id))
-		draw_content($betriebsmittel);
-	else 
-		die($betriebsmittel->errormsg);
-}
+	$bmp = new betriebsmittelperson();
+	if(!$bmp->load($betriebsmittelperson_id))
+		die('Fehler '.$bmp->errormsg);
 
+	$oe = new organisationseinheit();
+	$oe->load($bmp->oe_kurzbz);
+	$organisationseinheit = $oe->organisationseinheittyp_kurzbz.' '.$oe->bezeichnung;
+	
+	$person = new person();
+	$person->load($bmp->person_id);
+	
+	$bmt = new betriebsmitteltyp();
+	$bmt->load($bmp->betriebsmitteltyp);
+	$typ = $bmt->result[0]->beschreibung;
+	echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+	echo '
+	<betriebsmittelperson>
+		<beschreibung><![CDATA['.$bmp->beschreibung.']]></beschreibung>
+		<inventarnummer><![CDATA['.$bmp->inventarnummer.']]></inventarnummer>
+		<kaution><![CDATA['.$bmp->kaution.']]></kaution>
+		<ausgegebenam><![CDATA['.$datum->convertISODate($bmp->ausgegebenam).']]></ausgegebenam>
+		<organisationseinheit><![CDATA['.$organisationseinheit.']]></organisationseinheit>
+		<titelpre><![CDATA['.$person->titelpre.']]></titelpre>
+		<vorname><![CDATA['.$person->vorname.']]></vorname>
+		<nachname><![CDATA['.$person->nachname.']]></nachname>
+		<titelpost><![CDATA['.$person->titelpost.']]></titelpost>
+		<nummer><![CDATA['.$bmp->nummer.']]></nummer>
+		<betriebsmitteltyp><![CDATA['.$bmp->betriebsmitteltyp.']]></betriebsmitteltyp>
+		<typ><![CDATA['.$typ.']]></typ>
+	</betriebsmittelperson>
+	';
+		
+}
 function draw_content($row)
 {
 	global $rdf_url, $datum;
@@ -104,7 +154,6 @@ function draw_content($row)
       </RDF:li>';
 
 }
-?>
-   </RDF:Seq>
 
-</RDF:RDF>
+?>
+   
