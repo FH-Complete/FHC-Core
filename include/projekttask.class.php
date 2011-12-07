@@ -108,7 +108,7 @@ class projekttask extends basis_db
 	}
 
 /**
-	 * Laedt die Projekttasks für den Statusbericht
+	 * Laedt die Projekttasks für den Statusbericht -> 3 nächsten Tasks eines Projektes
 	 * @param  $projektphase_id ID der Projektphase, wenn null greift $projekt_kurzbz
 	 * @return true wenn ok, false im Fehlerfall
 	 */
