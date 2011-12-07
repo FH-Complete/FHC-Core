@@ -142,6 +142,8 @@ else
 						<hbox>
 							<button id="betriebsmittel-button-neu" label="Neu" oncommand="BetriebsmittelNeu();"/>
 							<button id="betriebsmittel-button-loeschen" label="Loeschen" oncommand="BetriebsmittelDelete();"/>
+							<spacer flex="1"/>
+							<button id="betriebsmittel-button-uebernahmebestaetigung" label="Übernahmebestätigung" oncommand="BetriebsmittelPrintUebernahmebestaetigung();"/>
 						</hbox>
 						<vbox hidden="true">
 							<label value="betriebsmittel_id" control="betriebsmittel-textbox-betriebsmittel_id"/>
