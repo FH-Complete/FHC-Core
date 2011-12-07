@@ -783,3 +783,33 @@ function ProjekttaskUpdateErledigt(event)
 		});
 	}
 }
+
+/***** Drag Observer Tasks verschieben *****/
+var taskDDObserver=
+{
+	onDragStart: function (evt,transferData,action)
+	{
+		var tree = document.getElementById('projekttask-tree')
+	    var row = { }
+	    var col = { }
+	    var child = { }
+
+	    //Index der Quell-Row ermitteln
+	    tree.treeBoxObject.getCellAt(evt.pageX, evt.pageY, row, col, child)
+
+	    //Beim Scrollen soll kein DnD gemacht werden
+	    if(col.value==null)
+	    	return false;
+
+	    //Daten ermitteln
+	    col = tree.columns ? tree.columns["projekttask-treecol-projekttask_id"] : "projekttask-treecol-projekttask_id";
+		projekttaskID=tree.view.getCellText(row.value,col);
+
+		var paramList= projekttaskID
+		//debug('param:'+paramList);
+		transferData.data=new TransferData();
+		transferData.data.addDataForFlavour("application/taskID",paramList);
+
+
+  	}
+};
