@@ -38,6 +38,7 @@ $SOAPServer->addFunction("saveProjekttask");
 $SOAPServer->addFunction("deleteProjekttask");
 $SOAPServer->addFunction("saveMantis");
 $SOAPServer->addFunction("setErledigt");
+$SOAPServer->addFunction("changeProjektPhase"); 
 $SOAPServer->handle();
 
 // WSDL Chache auf aus
@@ -97,6 +98,31 @@ function saveProjekttask($username, $passwort, $task)
 		return new SoapFault("Server", $projekttask->errormsg);
 }
 
+
+/**
+ * Hängt einen Task auf eine Übergebene ProjektphasenID
+ */
+function changeProjektPhase($username, $passwort, $projekttask_id, $projektphase_id)
+{
+	if(!$user = check_user($username, $passwort))
+		return new SoapFault("Server", "Invalid Credentials");	
+		
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+		
+	if(!$rechte->isBerechtigt('planner', null, 'sui'))
+		return new SoapFault("Server", "Sie haben keine Berechtigung zum Umhängen von Tasks");
+		
+	$projekttask = new projekttask(); 
+	$projekttask->load($projekttask_id);
+	$projekttask->new = false; 
+	$projekttask->projektphase_id = $projektphase_id; 
+	
+	if($projekttask->save(false)) 
+		return $projekttask->projekttask_id;
+	else
+		return new SoapFault("Server", $projekttask->errormsg);
+}
 /**
  * 
  * Löscht den Task mit der vom Webservice übergebenen ID 
