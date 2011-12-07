@@ -164,6 +164,7 @@ class betriebsmittel extends basis_db
 	public function searchBetriebsmittel($filter)
 	{
 		$qry = "SELECT * FROM wawi.tbl_betriebsmittel where inventarnummer LIKE '%".addslashes($filter)."%'";
+		
 		$this->result = array();
 		if($this->db_query($qry))
 		{
