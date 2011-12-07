@@ -190,6 +190,7 @@ function BetriebsmittelAuswahl()
 	ausgegebenam = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ausgegebenam" ));
 	retouram = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#retouram" ));
 	betriebsmitteltyp = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#betriebsmitteltyp" ));
+	inventarnummer = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#inventarnummer" ));
 	nummer = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#nummer" ));
 	beschreibung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#beschreibung" ));
 
@@ -200,10 +201,21 @@ function BetriebsmittelAuswahl()
 	document.getElementById('betriebsmittel-textbox-kaution').value=kaution;
 	document.getElementById('betriebsmittel-textbox-ausgegebenam').value=ausgegebenam;
 	document.getElementById('betriebsmittel-textbox-retouram').value=retouram;
-	document.getElementById('betriebsmittel-menulist-betriebsmitteltyp').value=betriebsmitteltyp;
+	if(inventarnummer=='')
+		document.getElementById('betriebsmittel-menulist-betriebsmitteltyp').value=betriebsmitteltyp;
+	else
+		document.getElementById('betriebsmittel-menulist-betriebsmitteltyp').value='Inventar';
 	document.getElementById('betriebsmittel-textbox-nummer').value=nummer;
 	document.getElementById('betriebsmittel-textbox-nummerold').value=nummer;
 	document.getElementById('betriebsmittel-textbox-beschreibung').value=beschreibung;
+	BetriebsmittelTypChange();
+	menulist = document.getElementById('betriebsmittel-menulist-inventarnummer');
+	BetriebsmittelMenulistInventarLoad(menulist, inventarnummer);
+	MenulistSelectItemOnValue('betriebsmittel-menulist-inventarnummer',betriebsmittel_id);
+	
+	//Typ darf nach nach Anlegen nicht mehr geändert werden, da sonst normales Inventar
+	//angelegt werden koennte, das soll aber nur der Zentraleinkauf machen
+	document.getElementById('betriebsmittel-menulist-betriebsmitteltyp').disabled=true;
 }
 
 // ****
@@ -229,6 +241,7 @@ function BetriebsmittelDetailDisableFields(val)
 	document.getElementById('betriebsmittel-textbox-ausgegebenam').disabled=val;
 	document.getElementById('betriebsmittel-textbox-retouram').disabled=val;
 	document.getElementById('betriebsmittel-button-speichern').disabled=val;
+	document.getElementById('betriebsmittel-menulist-inventarnummer').disabled=val;
 
 	if(val)
 		BetriebsmittelDetailResetFields();
@@ -247,6 +260,7 @@ function BetriebsmittelDetailResetFields()
 	document.getElementById('betriebsmittel-textbox-ausgegebenam').value='';
 	document.getElementById('betriebsmittel-textbox-retouram').value='';
 	document.getElementById('betriebsmittel-textbox-nummerold').value='';
+	document.getElementById('betriebsmittel-menulist-inventarnummer').value='';
 }
 
 // ****
@@ -317,6 +331,9 @@ function BetriebsmittelDetailSpeichern()
 	nummerold = document.getElementById('betriebsmittel-textbox-nummerold').value;
 	beschreibung = document.getElementById('betriebsmittel-textbox-beschreibung').value;
 	neu = document.getElementById('betriebsmittel-checkbox-neu').checked;
+	inventarnummer = MenulistGetSelectedValue('betriebsmittel-menulist-inventarnummer');
+	if(inventarnummer!='')
+		betriebsmittel_id=inventarnummer;
 
 	if(ausgegebenam!='' && !CheckDatum(ausgegebenam))
 	{
@@ -402,4 +419,70 @@ function BetriebsmittelNeu()
 	document.getElementById('betriebsmittel-textbox-ausgegebenam').value=tag+'.'+monat+'.'+jahr;
 	document.getElementById('betriebsmittel-textbox-kaution').value = '0.0';
 	document.getElementById('betriebsmittel-textbox-nummerold').value='';
+	document.getElementById('betriebsmittel-menulist-inventarnummer').value='';
+	BetriebsmittelTypChange();
 }
+
+// ****
+// * Wird aufgerufen, wenn der Betriebsmitteltyp geändert wird
+// * Wenn als Betriebsmitteltyp Inventar ausgewaehlt wird, dann wird ein DropDown fuer die 
+// * Inventarnummer angezeigt, sonst ein Feld fuer die Nummer und Beschreibung
+// ****
+function BetriebsmittelTypChange()
+{
+	betriebsmitteltyp = document.getElementById('betriebsmittel-menulist-betriebsmitteltyp').value;
+	if(betriebsmitteltyp=='Inventar')
+	{
+		document.getElementById('betriebsmittel-row-nummer').hidden=true;
+		document.getElementById('betriebsmittel-row-beschreibung').hidden=true;
+		document.getElementById('betriebsmittel-row-inventarnummer').hidden=false;
+	}
+	else
+	{
+		document.getElementById('betriebsmittel-row-nummer').hidden=false;
+		document.getElementById('betriebsmittel-row-beschreibung').hidden=false;
+		document.getElementById('betriebsmittel-row-inventarnummer').hidden=true;
+	}
+}
+
+// ****
+// * Laedt dynamisch das Inventarnummern DropDown
+// * Es muessen mindestens 3 Zeichen in das DropDown Menue eingegeben werden
+// ****
+function BetriebsmittelMenulistInventarLoad(menulist, filter)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	if(typeof(filter)=='undefined')
+		v = menulist.value;
+	else
+		v = filter;
+
+	if(v.length>2)
+	{		
+		var url = '<?php echo APP_ROOT; ?>rdf/betriebsmittel.rdf.php?filter='+encodeURIComponent(v)+'&'+gettimestamp();
+
+		var oldDatasources = menulist.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			menulist.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		menulist.builder.rebuild();
+	
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		if(typeof(filter)=='undefined')
+			var datasource = rdfService.GetDataSource(url);
+		else
+			var datasource = rdfService.GetDataSourceBlocking(url);
+		datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		menulist.database.AddDataSource(datasource);
+		if(typeof(filter)!='undefined')
+			menulist.builder.rebuild();
+	}
+}
+
+
+
+

@@ -113,6 +113,10 @@ else
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#betriebsmittelperson_id" />
 							<splitter class="tree-splitter"/>
+							<treecol id="betriebsmittel-tree-beschreibung" label="Beschreibung" flex="2" hidden="false"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#beschreibung" />
+							<splitter class="tree-splitter"/>
 						</treecols>
 
 						<template>
@@ -128,6 +132,7 @@ else
 										<treecell label="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#betriebsmittel_id"/>
 										<treecell label="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#person_id"/>
 										<treecell label="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#betriebsmittelperson_id"/>
+										<treecell label="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#beschreibung"/>
 									</treerow>
 								</treeitem>
 							</treechildren>
@@ -158,19 +163,17 @@ else
 								<rows>
 									<row>
 										<label value="Typ" control="betriebsmittel-menulist-betriebsmitteltyp"/>
-										<menulist id="betriebsmittel-menulist-betriebsmitteltyp" disabled="true"
-										          datasources="<?php echo APP_ROOT ?>rdf/betriebsmitteltyp.rdf.php" flex="1"
-										          ref="http://www.technikum-wien.at/betriebsmitteltyp/liste" >
-											<template>
-												<menupopup>
-													<menuitem value="rdf:http://www.technikum-wien.at/betriebsmitteltyp/rdf#betriebsmitteltyp"
-										        		      label="rdf:http://www.technikum-wien.at/betriebsmitteltyp/rdf#betriebsmitteltyp"
-													  		  uri="rdf:*"/>
-													</menupopup>
-											</template>
+										<menulist id="betriebsmittel-menulist-betriebsmitteltyp" 
+											disabled="true" flex="1"
+											oncommand="BetriebsmittelTypChange();">
+											<menupopup>
+													<menuitem value="Zutrittskarte" label="Zutrittskarte"/>
+													<menuitem value="Schluessel" label="Schluessel"/>
+													<menuitem value="Inventar" label="Inventar"/>
+											</menupopup>
 										</menulist>
 									</row>
-									<row>
+									<row id="betriebsmittel-row-nummer">
 										<label value="Nummer" control="betriebsmittel-textbox-nummer"/>
 										<hbox>
 											<textbox id="betriebsmittel-textbox-nummerold" hidden="true"/>
@@ -178,9 +181,26 @@ else
 					      					<spacer flex="1" />
 					      				</hbox>
 									</row>
-									<row>
+									<row id="betriebsmittel-row-beschreibung">
 										<label value="Beschreibung" control="betriebsmittel-textbox-beschreibung"/>
 				      					<textbox id="betriebsmittel-textbox-beschreibung" disabled="true" multiline="true"/>
+					      			</row>
+					      			<row id="betriebsmittel-row-inventarnummer" hidden="true">
+										<label value="Inventarnummer" control="betriebsmittel-menulist-inventarnummer"/>
+				      					<menulist id="betriebsmittel-menulist-inventarnummer"
+										  editable="true" disabled="true"
+								          datasources="rdf:null" flex="1"
+								          ref="http://www.technikum-wien.at/betriebsmittel/liste" 
+								          oninput="BetriebsmittelMenulistInventarLoad(this)"
+								          >
+											<template>
+												<menupopup>
+													<menuitem value="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#betriebsmittel_id"
+										        		      label="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#inventarnummer rdf:http://www.technikum-wien.at/betriebsmittel/rdf#beschreibung"
+													  		  uri="rdf:*"/>
+												</menupopup>
+											</template>
+										</menulist>
 					      			</row>
 					      			<row>
 										<label value="Kaution" control="betriebsmittel-textbox-kaution"/>

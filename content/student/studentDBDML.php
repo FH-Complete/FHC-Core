@@ -1772,8 +1772,12 @@ if(!$error)
 		}
 		else
 		{
+			$betriebsmittel_id = $_POST['betriebsmittel_id'];
 			$bm = new betriebsmittel();
 
+			//Nur Zutrittskarten und Schluessel koennen neu angelegt werden
+			//Das andere Inventar wird vom Zentraleinkauf inventarisiert
+			//Es kann nur ausgewaehlt, aber nicht neu angelegt werden 
 			if($_POST['betriebsmitteltyp']=='Zutrittskarte' || $_POST['betriebsmitteltyp']=='Schluessel')
 			{
 				if($_POST['betriebsmitteltyp']=='Zutrittskarte')
@@ -1869,74 +1873,58 @@ if(!$error)
 								$errormsg = 'Fehler beim Laden der Zutrittskarte';
 							}
 						}
-						
-						if(!$error)
-						{
-							//Zuordnung Betriebsmittel-Person anlegen
-							$bmp = new betriebsmittelperson();
-							if($_POST['neu']!='true')
-							{
-								if($bmp->load($_POST['betriebsmittelperson_id']))
-								{
-									$bmp->updateamum = date('Y-m-d H:i:s');
-									$bmp->updatevon = $user;
-									$bmp->betriebsmittelperson_id = $_POST['betriebsmittelperson_id'];
-									$bmp->new = false;
-								}
-								else
-								{
-									/*
-									$bmp->insertamum = date('Y-m-d H:i:s');
-									$bmp->insertvon = $user;
-									$bmp->new = true;
-									*/
-									$error = true;
-									$errormsg = "Zuordnung unbekannt:".$_POST['betriebsmittelperson_id'];
-									$return = false;
-								}
-							}
-							else
-							{
-								$bmp->insertamum = date('Y-m-d H:i:s');
-								$bmp->insertvon = $user;
-								$bmp->new = true;
-							}
-			
-							if(!$error)
-							{
-								$bmp->person_id = $_POST['person_id'];
-								$bmp->betriebsmittel_id=$betriebsmittel_id;
-								$bmp->anmerkung = $_POST['anmerkung'];
-								$bmp->kaution = trim(str_replace(',','.',$_POST['kaution']));
-								$bmp->ausgegebenam = $_POST['ausgegebenam'];
-								$bmp->retouram = $_POST['retouram'];
-			
-								if($bmp->save())
-								{
-									$return = true;
-									$data = $bmp->betriebsmittelperson_id;
-								}
-								else
-								{
-									$return = false;
-									$errormsg = $bmp->errormsg;
-								}
-							}
-						}
-					}
-					else
-					{
-						$errormsg = 'Fehler:'.$bm->errormsg;
-						$return = false;
 					}
 				}
 			}
-			else 
+			
+			if(!$error)
 			{
-				$error = true;
-				$return = false;
-				$errormsg = 'Derzeit koennen nur Zutrittskarten und Schluessel geaendert werden!';
-			}
+				//Zuordnung Betriebsmittel-Person anlegen
+				$bmp = new betriebsmittelperson();
+				if($_POST['neu']!='true')
+				{
+					if($bmp->load($_POST['betriebsmittelperson_id']))
+					{
+						$bmp->updateamum = date('Y-m-d H:i:s');
+						$bmp->updatevon = $user;
+						$bmp->betriebsmittelperson_id = $_POST['betriebsmittelperson_id'];
+						$bmp->new = false;
+					}
+					else
+					{
+						$error = true;
+						$errormsg = "Zuordnung unbekannt:".$_POST['betriebsmittelperson_id'];
+						$return = false;
+					}
+				}
+				else
+				{
+					$bmp->insertamum = date('Y-m-d H:i:s');
+					$bmp->insertvon = $user;
+					$bmp->new = true;
+				}
+
+				if(!$error)
+				{
+					$bmp->person_id = $_POST['person_id'];
+					$bmp->betriebsmittel_id=$betriebsmittel_id;
+					$bmp->anmerkung = $_POST['anmerkung'];
+					$bmp->kaution = trim(str_replace(',','.',$_POST['kaution']));
+					$bmp->ausgegebenam = $_POST['ausgegebenam'];
+					$bmp->retouram = $_POST['retouram'];
+
+					if($bmp->save())
+					{
+						$return = true;
+						$data = $bmp->betriebsmittelperson_id;
+					}
+					else
+					{
+						$return = false;
+						$errormsg = $bmp->errormsg;
+					}
+				}
+			}			
 		}
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='deletebisio')
