@@ -39,6 +39,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/mantisdetail.overlay.xul.p
 	<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/phpRequest.js.php" />
 	<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/projekt/projekttask.overlay.js.php" />
 	<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/functions.js.php" />
+	<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/DragAndDrop.js"/>
 
 	<!-- ************************ -->
 	<!-- *  Projekttask   * -->
@@ -70,7 +71,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/mantisdetail.overlay.xul.p
 		<!-- Bem.: style="visibility:collapse" versteckt eine Spalte -->
 		<tree id="projekttask-tree" seltype="single" hidecolumnpicker="false" flex="1"
 				datasources="rdf:null" ref="http://www.technikum-wien.at/projekttask"
-				style="margin:0px;" enableColumnDrag="true"
+				style="margin:0px;" enableColumnDrag="true" 
+				ondraggesture="nsDragAndDrop.startDrag(event,taskDDObserver);"
+
 				onselect="onselectProjekttask(this);"
 				onclick="ProjekttaskUpdateErledigt(event);"
  				persist="height"
