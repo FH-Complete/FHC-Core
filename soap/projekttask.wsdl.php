@@ -55,6 +55,16 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
   		<wsdl:part name="message" type="xsd:string"></wsdl:part>
   	</wsdl:message>
   	
+  	  <wsdl:message name="changeProjektPhaseRequest">
+  	  	<wsdl:part name="username" type="xsd:string" minOccurs="0"></wsdl:part>
+		<wsdl:part name="passwort" type="xsd:string" minOccurs="0"></wsdl:part>  
+  		<wsdl:part name="projekttask_id" type="xsd:string"></wsdl:part>
+  		<wsdl:part name="projektphase_id" type="xsd:string"></wsdl:part>
+  	</wsdl:message>
+    <wsdl:message name="changeProjektPhaseResponse">
+  		<wsdl:part name="message" type="xsd:string"></wsdl:part>
+  	</wsdl:message>
+  	
   	<wsdl:message name="SaveMantisRequest">
   		<wsdl:part name="projekttask_id" type="xsd:string"></wsdl:part>
 		<wsdl:part name="mantis_id" type="xsd:string"></wsdl:part>
@@ -111,6 +121,10 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
            <wsdl:input message="tns:setErledigtRequest"></wsdl:input>
            <wsdl:output message="tns:setErledigtResponse"></wsdl:output>        
        </wsdl:operation>
+	   <wsdl:operation name="changeProjektPhase">
+           <wsdl:input message="tns:changeProjektPhaseRequest"></wsdl:input>
+           <wsdl:output message="tns:changeProjektPhaseResponse"></wsdl:output>        
+       </wsdl:operation>
    </wsdl:portType>
 
    <wsdl:binding name="ConfigBinding" type="tns:ConfigPortType">
@@ -151,6 +165,15 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
                <soap:body use="encoded" namespace="http://localhost/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
            </wsdl:output>
        </wsdl:operation> 
+         <wsdl:operation name="changeProjektPhase">
+           <soap:operation soapAction="<?php echo APP_ROOT."soap/changeProjektPhase";?>" />
+           <wsdl:input> 
+               <soap:body use="encoded" namespace="http://localhost/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+           </wsdl:input>
+           <wsdl:output>
+               <soap:body use="encoded" namespace="http://localhost/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+           </wsdl:output>
+       </wsdl:operation>        
    </wsdl:binding>  
  
    <wsdl:service name="Projekttask">
