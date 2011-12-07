@@ -163,7 +163,7 @@ for ($pos=0;$pos<count($resultBetriebsmittel);$pos++)
 	InsertCell($zeile,$spalte,$resultBetriebsmittel[$pos]->inventarnummer);
 	InsertCell($zeile,++$spalte,mb_str_replace("\r\n"," ",$resultBetriebsmittel[$pos]->beschreibung));
 	InsertCell($zeile,++$spalte,mb_str_replace("\r\n"," ",$resultBetriebsmittel[$pos]->verwendung));
-	InsertCell($zeile,++$spalte,$resultBetriebsmittel[$pos]->seriennummer);
+	InsertCell($zeile,++$spalte,$resultBetriebsmittel[$pos]->seriennummer,'string');
 	InsertCell($zeile,++$spalte,$resultBetriebsmittel[$pos]->ort_kurzbz);
 	InsertCell($zeile,++$spalte,$resultBetriebsmittel[$pos]->bestellnr);
 	InsertCell($zeile,++$spalte,$oOrganisationseinheit->bezeichnung?$oOrganisationseinheit->bezeichnung:$resultBetriebsmittel[$pos]->oe_kurzbz);
@@ -186,7 +186,12 @@ function InsertCell($zeile, $spalte, $value, $format=null)
 	global $maxlength, $worksheet;
 	
 	if(!is_null($format))
-		$worksheet->write($zeile,$spalte,$value, $format);
+	{
+		if($format=='string')
+			$worksheet->writeString($zeile,$spalte,$value);
+		else
+			$worksheet->write($zeile,$spalte,$value, $format);
+	}
 	else
 		$worksheet->write($zeile,$spalte,$value);
 	
