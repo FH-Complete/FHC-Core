@@ -20,7 +20,7 @@
 	define("CONN_STRING_WAWI","host=localhost port=5432 dbname=wawi user=user password=password");
 
 	define('SERVER_ROOT','http://calva.technikum-wien.at');
-	define('APP_ROOT','http://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi');
+	define('APP_ROOT','http://calva.technikum-wien.at/burkhart/fhcomplete/trunk/wawi/');
 	
 	// Externe Funktionen - Unterordner im Include-Verzeichnis
 	define('EXT_FKT_PATH','tw');
