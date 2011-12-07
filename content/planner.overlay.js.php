@@ -314,3 +314,90 @@ function parseRDFString(str, url)
 
   return memoryDS;
 }
+
+
+/***** Drag Observer fuer Tasks verschieben *****/
+var projektTaskDDObserver=
+{
+	getSupportedFlavours : function ()
+	{
+  	  	var flavours = new FlavourSet();
+  	  	flavours.appendFlavour("application/taskID");
+  	  	return flavours;
+  	},
+  	onDragEnter: function (evt,flavour,session)
+	{
+	},
+	onDragExit: function (evt,flavour,session)
+	{
+  	},
+  	onDragOver: function(evt,flavour,session)
+  	{
+  	},
+  	onDrop: function (evt,dropdata,session)
+  	{
+	    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	    try
+	    {
+	        dragservice_ds = Components.classes["@mozilla.org/widget/dragservice;1"].getService(Components.interfaces.nsIDragService);
+	    }
+	    catch (e)
+	    {
+	    	debug('treeDragDrop: e');
+	    }
+	    
+	    var ds = dragservice_ds;
+
+		var tree = document.getElementById('tree-projektmenue')
+	    var row = { }
+	    var col = { }
+	    var child = { }
+	   
+	    tree.treeBoxObject.getCellAt(evt.pageX, evt.pageY, row, col, child)
+	    
+	    	col = tree.columns ? tree.columns["treecol-projektmenue-projekt_phase_id"] : "treecol-projektmenue-projekt_phase_id";
+			projektphaseID=tree.view.getCellText(row.value,col);
+		
+		if(projektphaseID == '')
+		{
+			alert('keine phase ausgewählt!');
+			return false; 
+		}
+		var projekttask_id = dropdata.data; 
+		
+		var soapBody = new SOAPObject("changeProjektPhase");
+		//soapBody.appendChild(new SOAPObject("username")).val('joe');
+		//soapBody.appendChild(new SOAPObject("passwort")).val('waschl');
+		soapBody.appendChild(new SOAPObject("projekttask_id")).val(projekttask_id);
+		soapBody.appendChild(new SOAPObject("projektphase_id")).val(projektphaseID);
+								
+		var sr = new SOAPRequest("changeProjektPhase",soapBody);
+	
+		SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekttask.soap.php?"+gettimestamp();
+		SOAPClient.SendRequest(sr, clb_changePhaseTask);
+  	}
+};
+
+// ****
+// * Callback Funktion nach ändern einer Phase
+// ****
+function clb_changePhaseTask(respObj)
+{
+	try
+	{
+		var id = respObj.Body[0].changeProjektPhaseResponse[0].message[0].Text;
+	}
+	catch(e)
+	{
+		var fehler = respObj.Body[0].Fault[0].faultstring[0].Text;
+		alert('Fehler: '+fehler);
+		return;
+	}
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	document.getElementById('textbox-projekttaskdetail-projekttask_id').value=id;
+		
+	TaskSelectID=id;
+	datasourceTreeTask.Refresh(false); //non blocking
+	TaskTreeRefresh()
+	SetStatusBarText('Daten wurden gespeichert');
+}
