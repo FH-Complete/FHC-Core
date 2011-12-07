@@ -12,6 +12,7 @@ $this->phrasen['benotungstool/liste']='Liste';
 $this->phrasen['benotungstool/uebungsnotenVerwalten']='Übungsnoten verwalten';
 $this->phrasen['benotungstool/uebersicht']='Übersicht';
 $this->phrasen['benotungstool/leNotenVerwalten']='LE-Noten verwalten';
+$this->phrasen['benotungstool/leNoten']='LE-Noten';
 $this->phrasen['benotungstool/leGesamtnotenVerwalten']='LE Gesamtnote verwalten';
 $this->phrasen['benotungstool/leGesamtnote']='LE-Gesamtnote';
 $this->phrasen['benotungstool/lvGesamtnoteVerwalten']='LV-Gesamtnote verwalten';

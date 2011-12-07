@@ -128,7 +128,7 @@ $this->phrasen['global/dateiErfolgreichHochgeladen']='Die Datei wurde erfolgreic
 $this->phrasen['global/dateiNichtErfolgreichHochgeladen']='Die Datei wurde nicht erfolgreich hochgeladen. Bitte wiederholen Sie den Vorgang';
 $this->phrasen['global/FuerDieseAktionBenoetigenSieAdministrationsrechte']='Fuer diese Aktion benoetigen Sie Administratorenrechte';
 $this->phrasen['global/dateiExistiertNicht']='Die Datei existiert nicht';
-$this->phrasen['global/fehlerBeimAktualisierenDerDaten']='Fehler beim Aktualiseren der Daten';
+$this->phrasen['global/fehlerBeimAktualisierenDerDaten']='Fehler beim Aktualisieren der Daten';
 
 //infrastruktur
 

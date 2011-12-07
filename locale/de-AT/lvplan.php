@@ -57,5 +57,6 @@ $this->phrasen['lvplan/info']='Info';
 $this->phrasen['lvplan/unr']='UNr';
 $this->phrasen['lvplan/ort']='Ort';
 $this->phrasen['lvplan/lehrveranstaltungsplanDetails']='Lehrveranstaltungsplan Details';
-$this->phrasen['lvplan/studierende']='Studierende'
+$this->phrasen['lvplan/studierende']='Studierende';
+$this->phrasen['lvplan/uebersicht']='Übersicht';
 ?>

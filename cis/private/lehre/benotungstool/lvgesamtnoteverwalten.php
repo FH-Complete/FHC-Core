@@ -564,7 +564,7 @@ echo '<table class="tabcontent" height="100%">';
 echo ' <tr>';
 		echo '<td class="tdwidth10">&nbsp;</td>';
 		echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;'.$p->t('benotungstool/gesamtnote').'</font></td>';
-		echo '<td  class="ContentHeader" align="right">';
+		echo '<td  class="ContentHeader" align="right"><font class="ContentHeader">';
 
 //Studiensemester laden
 $stsem_obj = new studiensemester();
@@ -601,7 +601,7 @@ if(!$rechte->isBerechtigt('admin',0) &&
 	}
 }
 echo $stsem_content;
-echo '</td><tr></table>';
+echo '</font></td><tr></table>';
 
 echo '<table width="100%"><tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
@@ -720,7 +720,7 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 echo '<table width="100%" height="10px"><tr><td>';
 echo "<h3><a href='javascript:window.history.back()'>".$p->t('global/zurueck')."</a></h3>";
 echo '</td><td align="right">';
-echo '<a href="'.APP_ROOT.'cms/'.$p->t('benotungstool/linkZumHandbuch').'" class="Item" target="_blank">'.$p->t('benotungstool/handbuch').' (PDF)</a>';
+echo '<a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/benotungstoolHandbuch').'" class="Item" target="_blank">'.$p->t('benotungstool/handbuch').' (PDF)</a>';
 echo '</td></tr></table>';
 
 
@@ -769,12 +769,12 @@ echo '<table>';
 				<td class='ContentHeader2'>".$p->t('global/uid')."</td>
 				<td class='ContentHeader2'>".$p->t('global/nachname')."</td>
 				<td class='ContentHeader2'>".$p->t('global/vorname')."</td>
-				<td class='ContentHeader2'>".($grade_from_moodle?'Moodle-Note':'LE-Noten (LE-ID)')."</td>
+				<td class='ContentHeader2'>".($grade_from_moodle?''.$p->t('benotungstool/moodleNote').'':''.$p->t('benotungstool/leNoten').' (LE-ID)')."</td>
 				<td class='ContentHeader2'></td>
 				<td class='ContentHeader2'>".$p->t('benotungstool/lvNote')."<br><input type='button' onclick='readNotenAusZwischenablage()' value='".$p->t('benotungstool/importieren')."'></td>
 				<td class='ContentHeader2' align='right'>
 				<form name='freigabeform' action='".$_SERVER['PHP_SELF']."?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem' method='POST' onsubmit='return OnFreigabeSubmit()'><input type='hidden' name='freigabe' value='1'>
-				Passwort: <input type='password' size='8' id='textbox-freigabe-passwort' name='passwort'><br><input type='submit' name='frei' value='Freigabe'>
+				".$p->t('global/passwort').": <input type='password' size='8' id='textbox-freigabe-passwort' name='passwort'><br><input type='submit' name='frei' value='Freigabe'>
 				</form>
 				</td>
 				<td class='ContentHeader2'>".$p->t('benotungstool/zeugnisnote')."</td>
@@ -843,7 +843,7 @@ echo '<table>';
 						if (!$mdldaten = $moodle_course->loadNoten($lvid, $stsem, '', true,$debg))
 							$mdldaten=''; 
 					}	
-					// Verarbeiten die Kursdaten
+					// Verarbeitet die Kursdaten
 					if (!is_null($mdldaten) && is_array($mdldaten))
 					{
 							reset($mdldaten);		
@@ -911,7 +911,7 @@ echo '<table>';
 					}		
 					else
 					{
-						//den Error nur einmal anzeigen und nicht fï¿½r jeden Studenten
+						//den Error nur einmal anzeigen und nicht fuer jeden Studenten
 						$moodle_course->errormsg=trim($moodle_course->errormsg);
 						if(!$errorshown && !empty($moodle_course->errormsg) )
 						{

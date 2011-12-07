@@ -12,6 +12,7 @@ $this->phrasen['benotungstool/liste']='List';
 $this->phrasen['benotungstool/uebungsnotenVerwalten']='Manage Exercise Grades';
 $this->phrasen['benotungstool/uebersicht']='Overview';
 $this->phrasen['benotungstool/leNotenVerwalten']='Manage Teaching-unit grades';
+$this->phrasen['benotungstool/leNoten']='TU grades';
 $this->phrasen['benotungstool/leGesamtnotenVerwalten']='Manage Teaching-unit finalgrade';
 $this->phrasen['benotungstool/leGesamtnote']='Teaching unit finalgrade';
 $this->phrasen['benotungstool/lvGesamtnoteVerwalten']='Manage subject final grade';
