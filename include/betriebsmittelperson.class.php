@@ -106,6 +106,7 @@ class betriebsmittelperson extends basis_db
 				$this->updatevon = $row->updatevon;
 				$this->ext_id = $row->ext_id;
 				$this->ort_kurzbz = $row->ort_kurzbz;
+				$this->oe_kurzbz = $row->oe_kurzbz;
 				return true;
 			}
 			else 
