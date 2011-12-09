@@ -322,13 +322,23 @@ $nr_mg=$db->db_num_rows($erg_mg);
 	        {
 	      		if (is_array($oBetriebsmittelperson->result) && count($oBetriebsmittelperson->result)>0)
 	    	  	{
-	    			echo '<br><br><b>'.$p->t('profil/entlehnteBetriebsmittel').'</b><table><tr class="liste"><th>'.$p->t('profil/betriebsmittel').'</th><th>'.$p->t('profil/nummer').'</th><th>'.$p->t('profil/ausgegebenAm').'</th></tr>';
+	    			echo '<br><br><b>'.$p->t('profil/entlehnteBetriebsmittel').'</b>
+	    				<table>
+	    					<tr class="liste">
+	    						<th>'.$p->t('profil/betriebsmittel').'</th>
+	    						<th>'.$p->t('profil/nummer').'</th>
+	    						<th>'.$p->t('profil/ausgegebenAm').'</th>
+	    					</tr>';
 	   
 		            for ($i=0;$i<count($oBetriebsmittelperson->result);$i++)
 		            {
 		                if (empty($oBetriebsmittelperson->result[$i]->retouram) )
 		                {
-		      				echo "<tr class='liste1'><td>".$oBetriebsmittelperson->result[$i]->betriebsmitteltyp."</td><td>".$oBetriebsmittelperson->result[$i]->nummer."</td><td>".$datum_obj->formatDatum($oBetriebsmittelperson->result[$i]->ausgegebenam,'d.m.Y')."</td></tr>";
+		      				echo "<tr class='liste1'>
+		      						<td>".$oBetriebsmittelperson->result[$i]->betriebsmitteltyp.' '.$oBetriebsmittelperson->result[$i]->beschreibung."</td>
+		      						<td>".$oBetriebsmittelperson->result[$i]->nummer.' '.$oBetriebsmittelperson->result[$i]->inventarnummer."</td>
+		      						<td>".$datum_obj->formatDatum($oBetriebsmittelperson->result[$i]->ausgegebenam,'d.m.Y')."</td>
+		      					</tr>";
 		                }
 		            }
 		    		echo '</table>';

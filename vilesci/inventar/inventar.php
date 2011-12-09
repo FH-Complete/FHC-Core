@@ -1239,6 +1239,7 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 		$htmlstring.='<table class="liste">';
 			$htmlstring.='<tr>
 						<thead>
+							<th></th>
 							<th>Person</th>
 							<th>Ausgabe</th>
 							<th>Retour</th>
@@ -1254,6 +1255,11 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 			else
 				$classe='liste0';
 			$htmlstring.='<tr class="'.$classe.'">
+							<td>
+								<a href="../../content/pdfExport.php?xsl=Uebernahme&xml=betriebsmittelperson.rdf.php&id='.$row->betriebsmittelperson_id.'" title="Übernahmebestätigung">
+								<img src="../../skin/images/pdfpic.gif">	
+								</a>
+							</td>
 							<td>';
 										$oPerson = new person();
 										if (!$oPerson->load($row->person_id))

@@ -60,7 +60,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 							</fo:table-row>
 							<fo:table-row  line-height="40pt">
 								<fo:table-cell border-width="0.2mm" display-align="center" border-style="solid" ><fo:block font-size="11pt" vertical-align="center" font-weight="bold"> Ware/Bezeichnung</fo:block></fo:table-cell>
-								<fo:table-cell border-width="0.2mm" display-align="center" border-style="solid" ><fo:block font-size="11pt" vertical-align="center"><xsl:text> </xsl:text><xsl:value-of select="typ" /><xsl:text> </xsl:text><xsl:value-of select="beschreibung" /></fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" display-align="center" border-style="solid" ><fo:block font-size="11pt" vertical-align="center"><xsl:text> </xsl:text><xsl:value-of select="typ" /><xsl:text> </xsl:text><xsl:value-of select="substring(beschreibung,0,50)" /></fo:block></fo:table-cell>
 							</fo:table-row>
 							<fo:table-row  line-height="40pt">
 								<fo:table-cell border-width="0.2mm" display-align="center" border-style="solid" ><fo:block font-size="11pt" vertical-align="center" font-weight="bold"> Inventarnummer</fo:block></fo:table-cell>

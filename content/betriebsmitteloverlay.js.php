@@ -345,13 +345,32 @@ function BetriebsmittelDetailSpeichern()
 		alert('RetourAm Datum ist ungueltig');
 		return false;
 	}
-	/*
-	Hex-Nummern sind nun auch erlaubt
-	if(betriebsmitteltyp=='Zutrittskarte' && isNaN(nummer))
+	
+	if(betriebsmitteltyp=='Inventar' && betriebsmittel_id=='')
 	{
-		alert('Bei Zutrittskarten muss die Nummer eine gueltige Zahl sein');
-		return false;
-	}*/
+		/* Wenn nur die Inventarnummer ins DropDown eingetragen wird, 
+		 * und der Eintrag nicht ausgewaehlt wird, wird die BetriebsmittelID nicht
+		 * korrekt ausgewaehlt.
+		 * 
+		 * In diesem Fall wird hier geprueft ob im Dropdown nur 1 Eintrag vorhanden ist, 
+		 * dann wird dieser ausgewaehlt und gespeichert.
+		 */
+		menulist = document.getElementById('betriebsmittel-menulist-inventarnummer');
+		childs = menulist.getElementsByTagName('menuitem');
+
+		/* Hier wird auf Laenge 2 geprueft, da das 1. Child immer die RDF URL enthaelt
+		 * der 2. Eintrag ist dann das 1. Element im DropDown
+		 */
+		if(childs.length==2)
+		{
+			betriebsmittel_id = childs[1].value;
+		}
+		else
+		{
+			alert('Bitte waehlen Sie das entsprechende Inventar aus dem Drop Down Menue aus!');
+			return false;
+		}
+	}
 	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-studenten'))
 		studiengang_kz=window.parent.document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 	else
