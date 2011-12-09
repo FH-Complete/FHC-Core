@@ -459,7 +459,7 @@ function STPLDetailEdit()
 	if(reservierung=='true')
 		alert('Reservierungen koennen hier nicht editiert werden');
 	else
-		window.open('<?php echo APP_ROOT; ?>content/lvplanung/stpl-details-dialog.xul.php?id='+id,'Details', 'height=400,width=350,left=100,top=100,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+		window.open('<?php echo APP_ROOT; ?>content/lvplanung/stpl-details-dialog.xul.php?id='+id,'Details', 'height=500,width=450,left=100,top=100,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****

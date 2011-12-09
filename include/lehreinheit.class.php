@@ -337,11 +337,12 @@ class lehreinheit extends basis_db
 			$this->errormsg = 'Lehre muss ein boolscher Wert sein';
 			return false;
 		}
+		/*
 		if(mb_strlen($this->anmerkung)>255)
 		{
 			$this->errormsg = 'Anmerkung darf nicht laenger als 255 Zeichen sein';
 			return false;
-		}
+		}*/
 		if($this->unr!='' && !is_numeric($this->unr))
 		{
 			$this->errormsg = 'UNR muss eine gueltige Zahl sein';
