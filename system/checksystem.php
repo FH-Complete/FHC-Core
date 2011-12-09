@@ -3021,6 +3021,99 @@ if($result = $db->db_query("SELECT * FROM information_schema.columns WHERE table
 	}
 }
 
+// Anmerkung bei Lehreinheiten und LV-Plan auf Text aendern 
+if($result = $db->db_query("SELECT * FROM information_schema.columns WHERE table_name='tbl_lehreinheit' AND table_schema='lehre' AND column_name='anmerkung' AND data_type='text'"))
+{
+	//Wenn die Spalte nicht vom Datentyp Text ist wird diese auf Text geaendert
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "DROP view lehre.vw_stundenplan;
+				DROP view lehre.vw_stundenplandev;
+				DROP view lehre.vw_lva_stundenplandev;
+				DROP view lehre.vw_lva_stundenplan;
+				DROP view campus.vw_lehreinheit;
+				DROP view campus.vw_stundenplan;
+				
+				ALTER TABLE lehre.tbl_lehreinheit ALTER COLUMN anmerkung TYPE text;
+				ALTER TABLE lehre.tbl_stundenplan ALTER COLUMN anmerkung TYPE text;
+				ALTER TABLE lehre.tbl_stundenplandev ALTER COLUMN anmerkung TYPE text;
+				
+				CREATE VIEW lehre.vw_stundenplan AS
+				 SELECT tbl_stundenplan.stundenplan_id, tbl_stundenplan.unr, tbl_stundenplan.mitarbeiter_uid AS uid, tbl_stundenplan.lehreinheit_id, tbl_lehreinheit.lehrfach_id, tbl_stundenplan.datum, tbl_stundenplan.stunde, tbl_stundenplan.ort_kurzbz, tbl_stundenplan.studiengang_kz, tbl_stundenplan.semester, tbl_stundenplan.verband, tbl_stundenplan.gruppe, tbl_stundenplan.gruppe_kurzbz, tbl_stundenplan.titel, tbl_stundenplan.anmerkung, tbl_stundenplan.fix, tbl_lehreinheit.lehrveranstaltung_id, tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.kurzbzlang AS stg_kurzbzlang, tbl_studiengang.bezeichnung AS stg_bezeichnung, tbl_studiengang.typ AS stg_typ, tbl_lehrfach.fachbereich_kurzbz, tbl_lehrfach.kurzbz AS lehrfach, tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe, tbl_lehreinheit.lehrform_kurzbz AS lehrform, tbl_mitarbeiter.kurzbz AS lektor, tbl_stundenplan.updateamum, tbl_stundenplan.updatevon, tbl_stundenplan.insertamum, tbl_stundenplan.insertvon, tbl_lehreinheit.anmerkung AS anmerkung_lehreinheit
+				   FROM lehre.tbl_stundenplan
+				   JOIN public.tbl_studiengang USING (studiengang_kz)
+				   JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)
+				   JOIN lehre.tbl_lehrfach USING (lehrfach_id)
+				   JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid);
+				GRANT SELECT ON lehre.vw_stundenplan TO web;
+				GRANT SELECT ON lehre.vw_stundenplan TO admin;
+				
+				CREATE VIEW lehre.vw_stundenplandev AS
+				 SELECT tbl_stundenplandev.stundenplandev_id, tbl_stundenplandev.unr, tbl_stundenplandev.mitarbeiter_uid AS uid, tbl_stundenplandev.lehreinheit_id, tbl_lehreinheit.lehrfach_id, tbl_stundenplandev.datum, tbl_stundenplandev.stunde, tbl_stundenplandev.ort_kurzbz, tbl_stundenplandev.studiengang_kz, tbl_stundenplandev.semester, tbl_stundenplandev.verband, tbl_stundenplandev.gruppe, tbl_stundenplandev.gruppe_kurzbz, tbl_stundenplandev.titel, tbl_stundenplandev.anmerkung, tbl_stundenplandev.fix, tbl_lehreinheit.lehrveranstaltung_id, tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.kurzbzlang AS stg_kurzbzlang, tbl_studiengang.bezeichnung AS stg_bezeichnung, tbl_studiengang.typ AS stg_typ, tbl_lehrfach.fachbereich_kurzbz, tbl_lehrfach.kurzbz AS lehrfach, tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe, tbl_lehreinheit.lehrform_kurzbz AS lehrform, tbl_mitarbeiter.kurzbz AS lektor, tbl_stundenplandev.updateamum, tbl_stundenplandev.updatevon, tbl_stundenplandev.insertamum, tbl_stundenplandev.insertvon, tbl_lehreinheit.anmerkung AS anmerkung_lehreinheit
+				   FROM lehre.tbl_stundenplandev
+				   JOIN public.tbl_studiengang USING (studiengang_kz)
+				   JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)
+				   JOIN lehre.tbl_lehrfach USING (lehrfach_id)
+				   JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid);
+				GRANT SELECT ON lehre.vw_stundenplandev TO web;
+				GRANT SELECT ON lehre.vw_stundenplandev TO admin;
+				
+				CREATE VIEW lehre.vw_lva_stundenplandev AS
+				 SELECT le.lehreinheit_id, le.unr, le.lvnr, tbl_lehrfach.fachbereich_kurzbz, le.lehrfach_id, tbl_lehrfach.kurzbz AS lehrfach, tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe AS lehrfach_farbe, le.lehrform_kurzbz AS lehrform, lema.mitarbeiter_uid AS lektor_uid, tbl_mitarbeiter.kurzbz AS lektor, tbl_studiengang.studiengang_kz, upper(tbl_studiengang.typ::character varying::text || tbl_studiengang.kurzbz::text) AS studiengang, lvb.semester, lvb.verband, lvb.gruppe, lvb.gruppe_kurzbz, le.raumtyp, le.raumtypalternativ, le.stundenblockung, le.wochenrythmus, lema.semesterstunden, lema.planstunden, le.start_kw, le.anmerkung, le.studiensemester_kurzbz, ( SELECT count(*) AS count
+				           FROM lehre.tbl_stundenplandev
+				          WHERE tbl_stundenplandev.mitarbeiter_uid::text = lema.mitarbeiter_uid::text AND tbl_stundenplandev.studiengang_kz = lvb.studiengang_kz AND tbl_stundenplandev.semester = lvb.semester AND (tbl_stundenplandev.verband = lvb.verband OR (tbl_stundenplandev.verband IS NULL OR tbl_stundenplandev.verband = ''::bpchar) AND lvb.verband IS NULL) AND (tbl_stundenplandev.gruppe = lvb.gruppe OR (tbl_stundenplandev.gruppe IS NULL OR tbl_stundenplandev.gruppe = ''::bpchar) AND lvb.gruppe IS NULL) AND (tbl_stundenplandev.gruppe_kurzbz::text = lvb.gruppe_kurzbz::text OR tbl_stundenplandev.gruppe_kurzbz IS NULL AND lvb.gruppe_kurzbz IS NULL) AND tbl_stundenplandev.lehreinheit_id = lvb.lehreinheit_id) AS verplant
+				   FROM lehre.tbl_lehreinheit le
+				   JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)
+				   JOIN lehre.tbl_lehreinheitgruppe lvb USING (lehreinheit_id)
+				   JOIN public.tbl_studiengang ON lvb.studiengang_kz = tbl_studiengang.studiengang_kz
+				   JOIN lehre.tbl_lehrfach USING (lehrfach_id)
+				   JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid);
+				GRANT SELECT ON lehre.vw_lva_stundenplandev TO web;
+				GRANT SELECT ON lehre.vw_lva_stundenplandev TO admin;
+				
+				CREATE VIEW lehre.vw_lva_stundenplan AS
+				 SELECT le.lehreinheit_id, le.unr, le.lvnr, tbl_lehrfach.fachbereich_kurzbz, le.lehrfach_id, tbl_lehrfach.kurzbz AS lehrfach, tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe AS lehrfach_farbe, le.lehrform_kurzbz AS lehrform, lema.mitarbeiter_uid AS lektor_uid, ma.kurzbz AS lektor, tbl_studiengang.studiengang_kz, tbl_studiengang.kurzbz AS studiengang, lvb.semester, lvb.verband, lvb.gruppe, lvb.gruppe_kurzbz, le.raumtyp, le.raumtypalternativ, le.stundenblockung, le.wochenrythmus, lema.semesterstunden, lema.planstunden, le.start_kw, le.anmerkung, le.studiensemester_kurzbz, ( SELECT count(*) AS count
+				           FROM lehre.tbl_stundenplan
+				          WHERE tbl_stundenplan.mitarbeiter_uid::text = lema.mitarbeiter_uid::text AND tbl_stundenplan.studiengang_kz = lvb.studiengang_kz AND tbl_stundenplan.semester = lvb.semester AND (tbl_stundenplan.verband = lvb.verband OR (tbl_stundenplan.verband IS NULL OR tbl_stundenplan.verband = ''::bpchar) AND lvb.verband IS NULL) AND (tbl_stundenplan.gruppe = lvb.gruppe OR (tbl_stundenplan.gruppe IS NULL OR tbl_stundenplan.gruppe = ''::bpchar) AND lvb.gruppe IS NULL) AND (tbl_stundenplan.gruppe_kurzbz::text = lvb.gruppe_kurzbz::text OR tbl_stundenplan.gruppe_kurzbz IS NULL AND lvb.gruppe_kurzbz IS NULL) AND tbl_stundenplan.lehreinheit_id = lvb.lehreinheit_id) AS verplant
+				   FROM lehre.tbl_lehreinheit le
+				   JOIN lehre.tbl_lehreinheitgruppe lvb USING (lehreinheit_id)
+				   JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)
+				   JOIN public.tbl_studiengang USING (studiengang_kz)
+				   JOIN lehre.tbl_lehrfach USING (lehrfach_id)
+				   JOIN public.tbl_mitarbeiter ma USING (mitarbeiter_uid);
+				GRANT SELECT ON lehre.vw_lva_stundenplan TO web;
+				GRANT SELECT ON lehre.vw_lva_stundenplan TO admin;
+				
+				CREATE VIEW campus.vw_lehreinheit AS
+				 SELECT tbl_lehrveranstaltung.studiengang_kz AS lv_studiengang_kz, tbl_lehrveranstaltung.semester AS lv_semester, tbl_lehrveranstaltung.kurzbz AS lv_kurzbz, tbl_lehrveranstaltung.bezeichnung AS lv_bezeichnung, tbl_lehrveranstaltung.ects AS lv_ects, tbl_lehrveranstaltung.lehreverzeichnis AS lv_lehreverzeichnis, tbl_lehrveranstaltung.planfaktor AS lv_planfaktor, tbl_lehrveranstaltung.planlektoren AS lv_planlektoren, tbl_lehrveranstaltung.planpersonalkosten AS lv_planpersonalkosten, tbl_lehrveranstaltung.plankostenprolektor AS lv_plankostenprolektor, tbl_lehrveranstaltung.orgform_kurzbz AS lv_orgform_kurzbz, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrveranstaltung_id, tbl_lehreinheit.studiensemester_kurzbz, tbl_lehreinheit.lehrform_kurzbz, tbl_lehreinheit.stundenblockung, tbl_lehreinheit.wochenrythmus, tbl_lehreinheit.start_kw, tbl_lehreinheit.raumtyp, tbl_lehreinheit.raumtypalternativ, tbl_lehreinheit.lehre, tbl_lehreinheit.unr, tbl_lehreinheit.lvnr, tbl_lehreinheitmitarbeiter.lehrfunktion_kurzbz, tbl_lehreinheit.insertamum, tbl_lehreinheit.insertvon, tbl_lehreinheit.updateamum, tbl_lehreinheit.updatevon, tbl_lehreinheit.lehrfach_id, tbl_lehrfach.fachbereich_kurzbz, tbl_lehrfach.kurzbz AS lehrfach, tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe, tbl_lehrveranstaltung.aktiv, tbl_lehrfach.sprache, tbl_lehreinheitmitarbeiter.mitarbeiter_uid, tbl_lehreinheitmitarbeiter.semesterstunden, tbl_lehrveranstaltung.semesterstunden AS lv_semesterstunden, tbl_lehreinheitmitarbeiter.planstunden, tbl_lehreinheitmitarbeiter.stundensatz, tbl_lehreinheitmitarbeiter.faktor, tbl_lehreinheit.anmerkung, tbl_mitarbeiter.kurzbz AS lektor, tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester, tbl_lehreinheitgruppe.verband, tbl_lehreinheitgruppe.gruppe, tbl_lehreinheitgruppe.gruppe_kurzbz, tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.kurzbzlang AS stg_kurzbzlang, tbl_studiengang.bezeichnung AS stg_bez, tbl_studiengang.typ AS stg_typ, tbl_lehreinheitmitarbeiter.anmerkung AS anmerkunglektor, tbl_lehrveranstaltung.lehrform_kurzbz AS lv_lehrform_kurzbz, tbl_lehrveranstaltung.bezeichnung_english AS lv_bezeichnung_english
+				   FROM lehre.tbl_lehreinheit
+				   JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
+				   JOIN lehre.tbl_lehrfach USING (lehrfach_id)
+				   JOIN lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id)
+				   JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid)
+				   JOIN lehre.tbl_lehreinheitgruppe USING (lehreinheit_id)
+				   JOIN public.tbl_studiengang ON tbl_lehreinheitgruppe.studiengang_kz = tbl_studiengang.studiengang_kz;
+				GRANT SELECT ON campus.vw_lehreinheit TO web;
+				GRANT SELECT ON campus.vw_lehreinheit TO admin;
+				
+				CREATE VIEW campus.vw_stundenplan AS
+				 SELECT tbl_stundenplan.stundenplan_id, tbl_stundenplan.unr, tbl_stundenplan.mitarbeiter_uid AS uid, tbl_stundenplan.lehreinheit_id, tbl_lehreinheit.lehrfach_id, tbl_stundenplan.datum, tbl_stundenplan.stunde, tbl_stundenplan.ort_kurzbz, tbl_stundenplan.studiengang_kz, tbl_stundenplan.semester, tbl_stundenplan.verband, tbl_stundenplan.gruppe, tbl_stundenplan.gruppe_kurzbz, tbl_stundenplan.titel, tbl_stundenplan.anmerkung, tbl_stundenplan.fix, tbl_lehreinheit.lehrveranstaltung_id, tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.kurzbzlang AS stg_kurzbzlang, tbl_studiengang.bezeichnung AS stg_bezeichnung, tbl_studiengang.typ AS stg_typ, tbl_lehrfach.fachbereich_kurzbz, tbl_lehrfach.kurzbz AS lehrfach, tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe, tbl_lehreinheit.lehrform_kurzbz AS lehrform, tbl_mitarbeiter.kurzbz AS lektor, tbl_stundenplan.updateamum, tbl_stundenplan.updatevon, tbl_stundenplan.insertamum, tbl_stundenplan.insertvon
+				   FROM lehre.tbl_stundenplan
+				   JOIN public.tbl_studiengang USING (studiengang_kz)
+				   JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)
+				   JOIN lehre.tbl_lehrfach USING (lehrfach_id)
+				   JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid);
+				GRANT SELECT ON campus.vw_stundenplan TO web;
+				GRANT SELECT ON campus.vw_stundenplan TO admin;
+				   
+				";
+	
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_lehreinheit: '.$db->db_last_error().'</strong><br>';
+		else 
+			echo 'Anmerkung der Tabellen lehreinheit, stundenplan und stundenplandev auf text geaendert!<br>';
+	}
+}
 
 echo '<br>';
 

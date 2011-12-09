@@ -77,10 +77,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		</grid>
 	</vbox>
 	<hbox>
-	<groupbox orientation="horizontal">
+	<groupbox orientation="horizontal" flex="1">
 		<caption id="lehrveranstaltung-detail-groupbox-caption" label="Details" />
 		<!--Details-->
-		<hbox>
+		<hbox flex="1">
 		<grid datasources="rdf:null"
 		      ref="http://www.technikum-wien.at/tempus/lva/liste"
 			  style="padding:5px;">
@@ -198,11 +198,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			</rows>
 		</grid>
 
-		<vbox>
+		<vbox flex="1">
 			<label value=" Anmerkung" />
 			<textbox id="lehrveranstaltung-detail-textbox-anmerkung" rows="5" multiline="true" disabled="true"/>
 
-					<button id="lehrveranstaltung-detail-button-save" label="speichern" oncommand="LeDetailSave();" disabled="true"/>
+			<hbox>
+				<spacer flex="1" />
+				<button id="lehrveranstaltung-detail-button-save" label="speichern" oncommand="LeDetailSave();" disabled="true"/>
+			</hbox>
 		</vbox>
 		</hbox>
 	</groupbox>

@@ -88,7 +88,7 @@ $studiengang->load($stundenplan->studiengang_kz);
       			</row>
       			<row>
 					<label value="Anmerkung" />
-					<textbox id="stpl-details-dialog-textbox-anmerkung" multiline='true' value="<?php echo htmlspecialchars($stundenplan->anmerkung); ?>"  maxlength="256"/>
+					<textbox id="stpl-details-dialog-textbox-anmerkung" multiline='true' value="<?php echo htmlspecialchars($stundenplan->anmerkung); ?>"  rows="6"/>
       			</row>
 				<row>
 					<spacer />
