@@ -1,13 +1,15 @@
 @charset "utf-8";
 /* Allgemein */
-body
+body,p,div
 {
 	background-color: White;
 	font-family: Arial;
 	voice-family: inherit;
-	font-size: 19px;
+	font-size: 16px;
 	overflow:hidden;
+	text-decoration: none;
 }
+
 hr
 {
 	color:#CCCCCC;
@@ -21,20 +23,24 @@ img
 /* Links */
 a
 {
-	color: #008381; text-decoration: none;
+	color: #008381; 
+	text-decoration: none;
 	cursor: pointer;
 }
 a:hover
 {
-	color: Black; text-decoration: none;
+	color: Black; 
+	text-decoration: none;
 }
 a[onClick]:hover.Item
 {
-	color: Black; text-decoration: none;
+	color: Black; 
+	text-decoration: none;
 }
 a:hover.Item
 {
-	color: Black; text-decoration: none;
+	color: Black; 
+	text-decoration: none;
 }
 a.hilfe 
 { 
@@ -54,9 +60,13 @@ TABLE.tabcontent
 	border-style: none;
 	width: 100%;
 }
+th
+{
+	font-weight: bold;
+}
 td.ContentHeader
 {
-	background-color: #008381; /*gr�n*/
+	background-color: #008381; /*gruen*/
 	font-weight: bold;
 	height: 40px;
 	text-align: center;
@@ -76,6 +86,61 @@ font.ContentHeader
 	color: #FFFFFF;
 	font-size: 28px;
 }
+/* Formatierung der Überschriften */
+address,pre /* Adresse, Rohdaten */
+{
+	font-weight: normal;
+	font-style: normal;
+	font-size: 16px;
+	text-decoration: none;
+	font-family: Arial;
+	voice-family: inherit;
+}
+h1 /* Überschrift 1 */
+{ 
+	background-color: #CCCCCC; /*mittel-grau */
+	font-weight: bold;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	padding-left: 4px;
+	font-size: 16px;
+}
+h2 /* Überschrift 2 */
+{ 
+	font-size: 16px;
+	background-color: #CCCCCC; /*mittel-grau */
+	font-weight: normal;
+	height: 19px;
+	padding-top: 2px;
+	padding-left: 2px;
+}
+h3 /* Überschrift 3 */
+{ 
+	font-weight: bold; 
+	color: #000000; 
+	font-size: 16px;
+}
+h4 /* Überschrift 4 */
+{ 
+	font-size: 16px;
+	font-style: normal; 
+	line-height: normal; 
+	font-weight: normal; 
+	font-variant: normal; 
+	text-transform: none; 
+	color: #0086CB; /* tw-blau */
+	text-decoration: none; 
+}
+h5, h6 /* Überschrift 5,6 - Werden nicht speziell formatiert, sondern dem normalen Text angepasst */
+{
+	font-weight: normal;
+	font-style: normal;
+	font-size: 16px;
+	text-decoration: none;
+	font-family: Arial;
+	voice-family: inherit;
+	margin: 0px;
+}
 #news .news
 {
 	-moz-border-radius-topleft: 10px;
@@ -86,9 +151,10 @@ font.ContentHeader
 #news .news .titel
 {
 	font-weight: bold;
-	font-size: large;
+	font-size: 18px;
 	padding: 0px 10px 0px 10px;
 	white-space: nowrap;
+	background-color: #F0F0F0;
 }
 #news .news .text
 {
