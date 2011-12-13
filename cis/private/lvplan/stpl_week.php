@@ -62,7 +62,7 @@ $uid=get_uid();
 <H2><table class="tabcontent">
 	<tr>
 	<td>&nbsp;<a class="Item" href="index.php"><?php echo $p->t('lvplan/lehrveranstaltungsplan');?></a> &gt;&gt; <?php echo $p->t('lvplan/wochenplan');?></td>
-	<td align="right"><A href="help/index.html" class="hilfe" target="_blank">HELP&nbsp;</A></td>
+	<td align="right"><A href="../../../cms/content.php?content_id=<?php echo $p->t('dms_link/lvPlanFAQ');?>" class="hilfe" target="_blank">HELP&nbsp;</A></td>
 	</tr>
 	</table>
 </H2>
