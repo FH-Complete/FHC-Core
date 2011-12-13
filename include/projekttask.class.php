@@ -241,6 +241,32 @@ class projekttask extends basis_db
 	}
 	
 	/**
+	 * 
+	 * Wechselt die Projektphase des übergebenen Task
+	 * @param $projekttask_id
+	 * @param $projektphase_id
+	 */
+	public function changePhase($projekttask_id, $projektphase_id)
+	{
+		if(!is_numeric($projekttask_id) || !is_numeric($projektphase_id))
+		{
+			$this->errormsg = "Ungültige ID."; 
+			return false; 
+		}
+		
+		$qry ="UPDATE fue.tbl_projekttask SET projektphase_id = ".addslashes($projektphase_id)." 
+		WHERE projekttask_id = ".addslashes($projekttask_id)." OR projekttask_fk =".addslashes($projekttask_id); 
+		
+		if($this->db_query($qry))
+			return true; 
+		else
+		{
+			$this->errormsg = "Fehler bei der Abfrage aufgetreten."; 
+			return false; 
+		}
+	}
+	
+	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
 	 * andernfalls wird der Datensatz mit der ID in $projekt_kurzbz aktualisiert
