@@ -65,4 +65,8 @@ $this->phrasen['incoming/filter']='Filter';
 $this->phrasen['incoming/alleSemester']='all Semester';
 $this->phrasen['incoming/wintersemester']='Winter semester';
 $this->phrasen['incoming/sommersemester']='Summer semester';
+$this->phrasen['incoming/profil']='Profile';
+$this->phrasen['incoming/universitaet']='University';
+$this->phrasen['incoming/lehrveranstaltungen']='Subjects';
+$this->phrasen['incoming/dateien']='Files';
 ?>
