@@ -118,8 +118,8 @@ function changeProjektPhase($username, $passwort, $projekttask_id, $projektphase
 	$projekttask->new = false; 
 	$projekttask->projektphase_id = $projektphase_id; 
 	
-	if($projekttask->save(false)) 
-		return $projekttask->projekttask_id;
+	if($projekttask->changePhase($projekttask_id, $projektphase_id))
+		return true; 
 	else
 		return new SoapFault("Server", $projekttask->errormsg);
 }
