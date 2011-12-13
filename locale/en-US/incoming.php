@@ -59,4 +59,10 @@ $this->phrasen['incoming/masterthesis']='Master Thesis';
 $this->phrasen['incoming/bachelorthesis']='Bachelor Thesis';
 $this->phrasen['incoming/researcharea']='Research Area';
 $this->phrasen['incoming/wennVorhanden']='if applicable'; 
+$this->phrasen['incoming/studentenImWS']='Applicants for the winter semester choose semesters: 1,3,5';
+$this->phrasen['incoming/studentenImSS']='Applicants for the summer semester choose semesters: 2,4,6';
+$this->phrasen['incoming/filter']='Filter';
+$this->phrasen['incoming/alleSemester']='all Semester';
+$this->phrasen['incoming/wintersemester']='Winter semester';
+$this->phrasen['incoming/sommersemester']='Summer semester';
 ?>
