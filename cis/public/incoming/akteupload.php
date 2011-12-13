@@ -118,7 +118,7 @@ if(isset($_POST['submitbild']))
 			echo "<b>Fehler: $akte->errormsg</b>";
 		}
 		else
-			echo "<b>Erfolgreich gespeichert.</b>"; 
+			echo "<b>".$p->t('global/erfolgreichgespeichert')."</b>"; 
 		echo "<script>window.opener.location.reload();</script>"; 			
 		if($akte->dokument_kurzbz == "LearnAgr")
 		{

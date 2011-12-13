@@ -42,21 +42,31 @@ require_once '../../../include/firma.class.php';
 if(isset($_GET['lang']))
 	setSprache($_GET['lang']);
 	
+$sprache = getSprache(); 
+$p=new phrasen($sprache); 	
+	
 $method =""; 
 $breadcrumb = ""; 
 if(isset($_GET['method']))
 {
 	$method = htmlspecialchars($_GET['method']); 
-	$breadcrumb = "> ".ucfirst($method);
+	if($method == 'austauschprogram')
+		$breadcrumb = "> ".$p->t('incoming/austauschprogram');
+	elseif($method == 'profil')	
+		$breadcrumb = "> ".$p->t('incoming/profil');
+	elseif($method == 'university')
+		$breadcrumb = "> ".$p->t('incoming/universitaet');	
+	elseif($method == 'lehrveranstaltungen')
+		$breadcrumb = "> ".$p->t('incoming/lehrveranstaltungen'); 
+	elseif($method == 'files')
+		$breadcrumb = "> ".$p->t('incoming/dateien');
+
 }
 
 $zugangscode = $_SESSION['incoming/user']; 
 
 $nation = new nation(); 
 $nation->getAll($ohnesperre = true); 
-	
-$sprache = getSprache(); 
-$p=new phrasen($sprache); 
 
 $mobility = new mobilitaetsprogramm(); 
 $mobility->getAll(true); 
@@ -409,6 +419,8 @@ else if($method=="lehrveranstaltungen")
 			echo '<td>'.$p->t('global/angemeldet').'</td>';
 		echo '<td>'.$p->t('incoming/deutschkurs2').'</td>';
 		echo '</tr>';
+
+			
 		
 		echo '</tbody></table><br><br>';
 		
@@ -450,6 +462,62 @@ else if($method=="lehrveranstaltungen")
 		</table>
 		<br><br>
 		';
+		
+		echo '
+		<form name="filterSemester">
+		<table width="90%" border="0" align="center" table-stripeclass:alternate table-autostripe">
+			<tr>
+				<td>'.$p->t('incoming/studentenImWS').'</td>
+			</tr>
+			<tr>
+				<td>'.$p->t('incoming/studentenImSS').'</td>
+			</tr>
+			<tr>
+				<td>'.$p->t('incoming/filter').':
+					<SELECT name="filterLv" onchange=selectChange()>					
+					<option value="allSemester">'.$p->t('incoming/alleSemester').'</option>';
+					
+					// Vorauswahl der Übergebenen Filter
+					$WSemesterSelected = '';
+					$SSemesterSelected = '';
+					
+					if(isset($_GET['filter']))
+						if($_GET['filter'] == 'WSemester')
+							$WSemesterSelected ='selected';
+						elseif($_GET['filter']=='SSemester')
+							$SSemesterSelected='selected';
+		
+					echo '<option value="WSemester" '.$WSemesterSelected.'>'.$p->t('incoming/wintersemester').'</option>';
+
+					echo '<option value="SSemester" '.$SSemesterSelected.'>'.$p->t('incoming/sommersemester').'</option>';
+
+			echo'</td>
+			</tr>
+		</table>
+		
+<script language="JavaScript">
+	function selectChange() 
+	{
+	   filter =document.filterSemester.filterLv.options[document.filterSemester.filterLv.selectedIndex].value;
+	   url = document.URL;
+	   url = url+"&filter="+filter;
+	   document.location=url;
+	   
+	}
+</script>	
+		
+		</form>
+		<br><br>';
+			
+		// Filter für Semester setzen
+		$filterqry = '';
+		
+		if(isset($_GET['filter']))
+			if($_GET['filter'] == "WSemester")
+				$filterqry= "AND tbl_lehrveranstaltung.semester IN (1,3,5)";
+			elseif($_GET['filter'] == "SSemester")
+				$filterqry = "AND tbl_lehrveranstaltung.semester IN (2,4,6)";
+
 		
 		//Uebersicht LVs
 		$qry = "SELECT 
@@ -496,7 +564,7 @@ else if($method=="lehrveranstaltungen")
 						tbl_lehrveranstaltung.aktiv AND 
 						tbl_lehrveranstaltung.lehre
 						AND tbl_lehrveranstaltung.studiengang_kz>0 AND tbl_lehrveranstaltung.studiengang_kz<10000
-						AND tbl_studiengang.aktiv order by studiengang_kz
+						AND tbl_studiengang.aktiv ".$filterqry." order by studiengang_kz
 					";
 	
 		echo '<table width="90%" border="0" align="center" class="table-autosort:1 table-stripeclass:alternate table-autostripe">
