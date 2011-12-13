@@ -99,7 +99,7 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 	<table class="tabcontent">
 		<tr>
 			<td class="ContentHeader"><font class="ContentHeader">&nbsp;<?php echo $p->t("lvplan/lehrveranstaltungsplan");?></font></td>
-			<td align="right" class="ContentHeader"><A href="help/index.html" class="hilfe" target="_blank"><font class="ContentHeader">HELP&nbsp;</font></A></td>
+			<td align="right" class="ContentHeader"><A href="../../../cms/content.php?content_id=<?php echo $p->t('dms_link/lvPlanFAQ');?>" class="hilfe" target="_blank"><font class="ContentHeader">HELP&nbsp;</font></A></td>
 		</tr>
 	</table>
 	<!--<DIV align="right">Version: <?php echo VERSION; ?></DIV>-->
