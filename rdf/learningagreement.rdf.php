@@ -90,6 +90,12 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			echo '<bachelorthesis><![CDATA['.$preincoming->research_area.']]></bachelorthesis>';
 		if($preincoming->masterthesis)
 			echo '<masterthesis><![CDATA['.$preincoming->research_area.']]></masterthesis>';
+		if($preincoming->deutschkurs1)
+			echo '<deutschkurs1><![CDATA[German for Beginners]]></deutschkurs1>';
+		if($preincoming->deutschkurs2)
+			echo '<deutschkurs2><![CDATA[German Advanced]]></deutschkurs2>'; 
+		if($preincoming->deutschkurs3)
+			echo '<deutschkurs3><![CDATA[German Intensive Language Course]]></deutschkurs3>';
 		echo "</student>\n"; 
 		echo "</learningagreement>\n"; 
 	}
