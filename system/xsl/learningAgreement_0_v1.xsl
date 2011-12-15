@@ -73,10 +73,21 @@
 								</fo:table-cell>
 							</fo:table-row>
 							<xsl:apply-templates select="lehrveranstaltung"/>
+
+						</fo:table-body>
+					</fo:table>
+					
+					<fo:table table-layout="fixed" border-collapse="collapse" border-width="0.2pt" border-style="solid">
+						<fo:table-column column-width="181.2mm"/>
+						<fo:table-body>
+							<xsl:apply-templates select="deutschkurs1"/>
+							<xsl:apply-templates select="deutschkurs2"/>
+							<xsl:apply-templates select="deutschkurs3"/>
 							<xsl:apply-templates select="bachelorthesis"/>
 							<xsl:apply-templates select="masterthesis"/>
 						</fo:table-body>
 					</fo:table>
+					
 					<fo:block font-size="10pt">\n \n PLEASE NOTE: For courses offered in German and/or English sufficient language competencies are required</fo:block>
 				</fo:block-container>
 				<fo:block-container position="absolute" top="230mm" left="35mm">
@@ -149,24 +160,9 @@
 	<xsl:template match="bachelorthesis">
 		<fo:table-row line-height="12pt">
 			<fo:table-cell display-align="center" border-width="0.2mm" border-style="solid">
-				<fo:block font-size="10pt" content-width="95mm">
-					<xsl:text> Bachelor Thesis </xsl:text>
+				<fo:block font-size="10pt" content-width="180mm">
+					<xsl:text> Bachelor Thesis: </xsl:text>
 					<xsl:value-of select="."/>
-				</fo:block>
-			</fo:table-cell>
-			<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
-				<fo:block font-size="10pt" content-width="55mm" text-align="center">
-					<xsl:text> </xsl:text>
-				</fo:block>
-			</fo:table-cell>
-			<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
-				<fo:block font-size="10pt" content-width="20mm" text-align="center">
-					<xsl:text> </xsl:text>
-				</fo:block>
-			</fo:table-cell>
-			<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
-				<fo:block font-size="10pt" content-width="15mm" text-align="center">
-					<xsl:text> </xsl:text>
 				</fo:block>
 			</fo:table-cell>
 		</fo:table-row>
@@ -175,25 +171,40 @@
 		<fo:table-row line-height="12pt">
 			<fo:table-cell display-align="center" border-width="0.2mm" border-style="solid">
 				<fo:block font-size="10pt" content-width="95mm">
-					<xsl:text> Master Thesis </xsl:text>
+					<xsl:text> Master Thesis: </xsl:text>
 					<xsl:value-of select="."/>
-				</fo:block>
-			</fo:table-cell>
-			<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
-				<fo:block font-size="10pt" content-width="55mm" text-align="center">
-					<xsl:text> </xsl:text>
-				</fo:block>
-			</fo:table-cell>
-			<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
-				<fo:block font-size="10pt" content-width="20mm" text-align="center">
-					<xsl:text> </xsl:text>
-				</fo:block>
-			</fo:table-cell>
-			<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
-				<fo:block font-size="10pt" content-width="15mm" text-align="center">
-					<xsl:text> </xsl:text>
 				</fo:block>
 			</fo:table-cell>
 		</fo:table-row>
 	</xsl:template>
+	<xsl:template match="deutschkurs1">
+		<fo:table-row line-height="12pt">
+			<fo:table-cell display-align="center" border-width="0.2mm" border-style="solid">
+				<fo:block font-size="10pt" content-width="95mm">
+					<xsl:text></xsl:text>
+					<xsl:value-of select="."/>
+				</fo:block>
+			</fo:table-cell>
+		</fo:table-row>
+	</xsl:template>
+	<xsl:template match="deutschkurs2">
+		<fo:table-row line-height="12pt">
+			<fo:table-cell display-align="center" border-width="0.2mm" border-style="solid">
+				<fo:block font-size="10pt" content-width="95mm">
+					<xsl:text></xsl:text>
+					<xsl:value-of select="."/>
+				</fo:block>
+			</fo:table-cell>
+		</fo:table-row>
+	</xsl:template>	
+	<xsl:template match="deutschkurs3">
+		<fo:table-row line-height="12pt">
+			<fo:table-cell display-align="center" border-width="0.2mm" border-style="solid">
+				<fo:block font-size="10pt" content-width="95mm">
+					<xsl:text></xsl:text>
+					<xsl:value-of select="."/>
+				</fo:block>
+			</fo:table-cell>
+		</fo:table-row>
+	</xsl:template>	
 </xsl:stylesheet >
