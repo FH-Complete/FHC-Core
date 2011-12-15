@@ -150,10 +150,11 @@ var SOAPObject = function(name) {
 	this.name=name;
 	this.attributes=[];
 	this.children=[];
-	this.value=null;
+	this.value=null;v
 	this.attr=function(name, value){this.attributes.push({"name":name, "value":value});return this;};
 	this.appendChild=function(obj){this.children.push(obj);return obj;};
 	this.hasChildren=function(){return (this.children.length > 0)?true:false;};
 	this.val=function(v){if(!v){return this.value;}else{this.value=v;return this;}};
+	this.cdataval=function(v){if(!v){return this.value;}else{this.value='<![CDATA['+v+']]>';return this;}};
 	this.toString=function(){return SOAPClient.ToXML(this);};
 };

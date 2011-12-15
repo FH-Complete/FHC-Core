@@ -31,3 +31,8 @@ box.Ressource
 {
 	-moz-binding: url('projekt/ressource.xml.php#Ressource');
 }
+
+box.WYSIWYG
+{
+	-moz-binding: url('bindings.xml.php#wysiwyg');
+}
