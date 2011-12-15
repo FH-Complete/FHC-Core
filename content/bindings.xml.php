@@ -588,4 +588,161 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 	<handlers>
 	</handlers>
   </binding>
+
+  <!--
+  WYSIWYG Editor Binding
+  -->
+  <binding id="wysiwyg">
+  	<content>
+		<xul:vbox flex="1" style="margin: 5px;">
+			<xul:toolbar>
+			  <xul:toolbarbutton tooltiptext="Fett" image="../skin/images/bold.png" stlye="font-weight: bold;" oncommand="document.getBindingParent(this).setBold()"/>
+			  <xul:toolbarbutton tooltiptext="Kursiv" image="../skin/images/italic.png" style="font-style: italic;" oncommand="document.getBindingParent(this).setItalic()"/>
+			  <xul:toolbarbutton tooltiptext="Unterstrichen" image="../skin/images/underline.png" style="text-decoration: underline" oncommand="document.getBindingParent(this).setUnderline()"/>
+			  <xul:toolbarseparator />
+			  <xul:toolbarbutton tooltiptext="Linksbündig" image="../skin/images/justifyleft.png" oncommand="document.getBindingParent(this).setJustifyLeft()"/>
+			  <xul:toolbarbutton tooltiptext="Zentriert" image="../skin/images/justifycenter.png" oncommand="document.getBindingParent(this).setJustifyCenter()"/>
+			  <xul:toolbarbutton tooltiptext="Rechtsbündig" image="../skin/images/justifyright.png" oncommand="document.getBindingParent(this).setJustifyRight()"/>
+			</xul:toolbar>
+			<html:iframe anonid="wysiwyg-editor" editortype="html" src="about:blank" flex="1" type="content-primary" style="min-width: 100px; min-height: 100px; border: 1px solid gray;"/>
+		</xul:vbox>
+	</content>
+	<implementation>
+		<field name="initialisiert" />
+		<field name="disabled_state" />
+		<property name="value">
+			<getter>
+				<![CDATA[
+				if(!this.initialisiert)
+					this.init();
+				try
+				{
+					netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+					editor = document.getAnonymousElementByAttribute(this ,'anonid', 'wysiwyg-editor');
+					return editor.contentWindow.document.body.innerHTML;
+				}
+				catch(e)
+				{
+					return false;
+				}
+				
+				]]>
+			</getter>
+			<setter>
+				<![CDATA[
+					//editor initalisieren
+					if(!this.initialisiert)
+						this.init();
+					netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+					editor = document.getAnonymousElementByAttribute(this ,'anonid', 'wysiwyg-editor');
+
+					if(editor.contentWindow.document.body.innerHTML!='')
+					{
+						//Inhalt leeren
+						editor.contentDocument.execCommand("selectall", false, null);
+						editor.contentDocument.execCommand("delete", false, null);
+					}
+					//Value setzen
+					if(val!='')
+						editor.contentDocument.execCommand("inserthtml", false, val);
+				]]>
+			</setter>
+		</property>
+		<property name="disabled">
+			<getter>
+				return this.disabled_state;
+			</getter>
+			<setter>
+			<![CDATA[
+
+				if(val)
+				{
+					editor = document.getAnonymousElementByAttribute(this ,'anonid', 'wysiwyg-editor');
+					editor.contentDocument.designMode = 'off';
+					this.disabled_state=true;
+				}
+				else
+				{
+					editor = document.getAnonymousElementByAttribute(this ,'anonid', 'wysiwyg-editor');
+					editor.contentDocument.designMode = 'on';	
+					this.disabled_state=false;
+				}
+			]]>
+			</setter>
+		</property>
+		<method name="setBold">
+			<body>
+			<![CDATA[
+				netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+				editor = document.getAnonymousElementByAttribute(this ,'anonid', 'wysiwyg-editor');
+				editor.contentDocument.execCommand("bold", false, null);
+			]]>
+			</body>
+		</method>
+		<method name="setItalic">
+			<body>
+			<![CDATA[
+				netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+				editor = document.getAnonymousElementByAttribute(this ,'anonid', 'wysiwyg-editor');
+				editor.contentDocument.execCommand("italic", false, null);
+			]]>
+			</body>
+		</method>
+		<method name="setUnderline">
+			<body>
+			<![CDATA[
+				netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+				editor = document.getAnonymousElementByAttribute(this ,'anonid', 'wysiwyg-editor');
+				editor.contentDocument.execCommand("underline", false, null);
+			]]>
+			</body>
+		</method>
+
+		<method name="setJustifyLeft">
+			<body>
+			<![CDATA[
+				netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+				editor = document.getAnonymousElementByAttribute(this ,'anonid', 'wysiwyg-editor');
+				editor.contentDocument.execCommand("justifyleft", false, null);
+			]]>
+			</body>
+		</method>
+
+		<method name="setJustifyCenter">
+			<body>
+			<![CDATA[
+				netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+				editor = document.getAnonymousElementByAttribute(this ,'anonid', 'wysiwyg-editor');
+				editor.contentDocument.execCommand("justifycenter", false, null);
+			]]>
+			</body>
+		</method>
+
+		<method name="setJustifyRight">
+			<body>
+			<![CDATA[
+				netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+				editor = document.getAnonymousElementByAttribute(this ,'anonid', 'wysiwyg-editor');
+				editor.contentDocument.execCommand("justifyright", false, null);
+			]]>
+			</body>
+		</method>
+
+		<method name="init">
+			<body>
+			<![CDATA[
+			netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+			editor = document.getAnonymousElementByAttribute(this ,'anonid', 'wysiwyg-editor');
+			editor.contentDocument.designMode = 'on';
+			]]>
+			</body>
+		</method>		
+		<constructor>
+			//Intialisierung des Editors im Konstruktor funktioniert nicht immer
+			//deshalb wird er erst bei der ersten Verwendung initialisiert
+		</constructor>
+		<destructor>
+		</destructor>
+	</implementation>
+  </binding>
 </bindings>

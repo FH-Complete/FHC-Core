@@ -146,9 +146,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				      				<xul:label value="Titel"/>
 						      		<xul:textbox anonid="textbox-notiz-titel" maxlength="256"/>
 								</xul:row>
-								<xul:row>
+								<xul:row flex="1">
 				      				<xul:label value="Text"/>
-						      		<xul:textbox anonid="textbox-notiz-text" multiline="true" rows="6"/>
+						      		<xul:box class="WYSIWYG" anonid="textbox-notiz-text" flex="1"/>
 								</xul:row>
 								<xul:row>
 				      					<xul:label value="Start"/>
@@ -336,7 +336,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				var notiz = new SOAPObject("notiz");
 				notiz.appendChild(new SOAPObject("notiz_id")).val(notiz_id);
 				notiz.appendChild(new SOAPObject("titel")).val(titel);
-				notiz.appendChild(new SOAPObject("text")).val(text);
+				notiz.appendChild(new SOAPObject("text")).cdataval(text);
 				notiz.appendChild(new SOAPObject("verfasser_uid")).val(verfasser_uid);
 				notiz.appendChild(new SOAPObject("bearbeiter_uid")).val(bearbeiter_uid);
 				notiz.appendChild(new SOAPObject("start")).val(start);
@@ -391,14 +391,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 		<method name="NeueNotiz">
 			<body>
 			<![CDATA[
-				//debug('Neue Notiz');
 				this.ResetDetails();
 				this.DisableDetails(false);
 				document.getAnonymousElementByAttribute(this ,'anonid', 'caption-notiz-detail').label="Neue Notiz";
-				
-				var sr = new SOAPRequest("saveNotiz",soapBody);
-			
-				SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/notiz.soap.php?"+gettimestamp();
 			]]>
 			</body>
 		</method>
@@ -825,6 +820,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 		</method>
 		
 		<constructor>
+			//debug('load notiz:'+this.getAttribute('id'));
 			this.DisableControls(true);
 			this.DisableDetails(true);
 			var projekt_kurzbz = this.getAttribute('projekt_kurzbz');

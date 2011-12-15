@@ -609,6 +609,7 @@ function ProjekttaskLoadCategories(project_id)
 {
 	if(project_id!='')
 	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 		//Kategorien zu diesem Projekt laden
 		menulist = document.getElementById('menulist-projekttask-mantis-issue_category');
 		var url = '<?php echo APP_ROOT; ?>rdf/mantis_categories.rdf.php?project_id='+project_id+'&'+gettimestamp();
