@@ -415,7 +415,7 @@
 						<tr>
 
 							<td>&nbsp;<label for="bestellung_id">Bestellung ID</label>&nbsp;
-								<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1300);}" id="bestellung_id" name="bestellung_id" size="10" maxlength="41" value="<?php echo $bestellung_id;?>">
+								<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1300);}" id="bestellung_id" name="bestellung_id" size="10" value="<?php echo $bestellung_id;?>">
 								<script type="text/javascript" language="JavaScript1.2">				
 									$(document).ready(function() 
 									{
@@ -434,7 +434,7 @@
 								<input style="display:none" id="bestellung_id_old" name="bestellung_id_old" value="<?php echo $bestellung_id;?>">
 							</td>
 							<td>&nbsp;<label for="bestelldetail_id">Bestelldetail ID</label>&nbsp;
-								<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1300);}" id="bestelldetail_id" name="bestelldetail_id" size="6" maxlength="41" value="<?php echo $bestelldetail_id;?>">
+								<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1300);}" id="bestelldetail_id" name="bestelldetail_id" size="6" value="<?php echo $bestelldetail_id;?>">
 								<script type="text/javascript" language="JavaScript1.2">
 									$(document).ready(function() 
 									{
@@ -497,7 +497,7 @@
 							</td>
 
 							<td>&nbsp;<label for="ort_kurzbz">Ort</label>&nbsp;
-								<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1300);}" id="ort_kurzbz" name="ort_kurzbz" size="10" maxlength="20" value="<?php echo $ort_kurzbz;?>">
+								<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1300);}" id="ort_kurzbz" name="ort_kurzbz" size="10" value="<?php echo $ort_kurzbz;?>">
 									<script type="text/javascript" language="JavaScript1.2">
 									$(document).ready(function() 
 									{
@@ -529,7 +529,7 @@
 					<table class="navbar">
 						<tr>
 							<td>&nbsp;<label for="oe_kurzbz">Organisation</label>&nbsp;
-								<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1300);}" id="oe_kurzbz" name="oe_kurzbz" size="13" maxlength="14" value="<?php echo $oe_kurzbz;?>">
+								<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1300);}" id="oe_kurzbz" name="oe_kurzbz" size="13" value="<?php echo $oe_kurzbz;?>">
 								<script type="text/javascript" language="JavaScript1.2">
 									$(document).ready(function() 
 									{
@@ -585,7 +585,7 @@
 								?>
 
 						<td>&nbsp;<label for="person_id">Mitarbeiter</label>&nbsp;
-								<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1300);}" id="person_id" name="person_id" size="13" maxlength="14" value="<?php echo $person_id; ?>">
+								<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1300);}" id="person_id" name="person_id" size="13" value="<?php echo $person_id; ?>">
 									<script type="text/javascript" language="JavaScript1.2">
 									$(document).ready(function() 
 									{
@@ -697,7 +697,7 @@
 					{  // Bei Klick auf div#
 			      		if ($("#vorlage").val() == 'false') 
 						{
-				        	 $("div#container").show("slow");         // div# langsam ?ffnen
+				        	 $("div#container").show("slow");         // div# langsam oeffnen
 							 $("#vorlage").val('true');
 					    }
 						else
@@ -1000,10 +1000,10 @@ for ($pos=0;$pos<$anzahl;$pos++)
 						<th><?php echo (1 + $pos ); ?><input style="display:none;" id="betriebsmittel_id_array<?php echo $pos; ?>" name="betriebsmittel_id_array[]" value="<?php echo $betriebsmittel_id_array[$pos]; ?>"></th>
 
 						<td>&nbsp;<label for="inventarnummer_array<?php echo $pos; ?>">Inventarnummer</label>&nbsp;</td>
-						<td><input id="inventarnummer_array<?php echo $pos; ?>" name="inventarnummer_array[]" size="32" maxlength="33" value="<?php echo $inventarnummer_array[$pos]; ?>"></td>
+						<td><input id="inventarnummer_array<?php echo $pos; ?>" name="inventarnummer_array[]" size="32" value="<?php echo $inventarnummer_array[$pos]; ?>"></td>
 
 						<td>&nbsp;<label for="seriennummer_array<?php echo $pos; ?>">Seriennummer</label>&nbsp;</td>
-						<td><input id="seriennummer_array<?php echo $pos; ?>" name="seriennummer_array[]" size="32" maxlength="33" value="<?php echo $seriennummer_array[$pos]; ?>"></td>
+						<td><input id="seriennummer_array<?php echo $pos; ?>" name="seriennummer_array[]" size="32" value="<?php echo $seriennummer_array[$pos]; ?>"></td>
 						<td id="bcTarget<?php echo $pos; ?>">
 							<table>
 								<tr>
@@ -1061,7 +1061,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 								<table class="navbar">
 										<tr>
 											<td>&nbsp;<label for="bestellung_id_array<?php echo $pos; ?>">Bestellung ID</label>&nbsp;
-												<input id="bestellung_id_array<?php echo $pos; ?>" <?php echo ($vorlage=='false'?"onchange=\"if (this.value.length>0) {setTimeout('SubmitOhneVorlage()',1300);}\"":""); ?> name="bestellung_id_array[]" size="10" maxlength="41" value="<?php echo $bestellung_id_array[$pos]; ?>">
+												<input id="bestellung_id_array<?php echo $pos; ?>" <?php echo ($vorlage=='false'?"onchange=\"if (this.value.length>0) {setTimeout('SubmitOhneVorlage()',1300);}\"":""); ?> name="bestellung_id_array[]" size="10" value="<?php echo $bestellung_id_array[$pos]; ?>">
 												<script type="text/javascript" language="JavaScript1.2">
 													$(document).ready(function() 
 													{
@@ -1079,7 +1079,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 												</script>
 											</td>
 											<td>&nbsp;<label for="bestelldetail_id_array<?php echo $pos; ?>">Bestelldetail ID</label>&nbsp;
-												<input id="bestelldetail_id_array<?php echo $pos; ?>" <?php echo ($vorlage=='false'?"onchange=\"if (this.value.length>0) {setTimeout('SubmitOhneVorlageDetail()',1300);}\"":""); ?> name="bestelldetail_id_array[]" size="6" maxlength="41" value="<?php echo $bestelldetail_id_array[$pos]; ?>">
+												<input id="bestelldetail_id_array<?php echo $pos; ?>" <?php echo ($vorlage=='false'?"onchange=\"if (this.value.length>0) {setTimeout('SubmitOhneVorlageDetail()',1300);}\"":""); ?> name="bestelldetail_id_array[]" size="6" value="<?php echo $bestelldetail_id_array[$pos]; ?>">
 												<script type="text/javascript" language="JavaScript1.2">
 													$(document).ready(function() 
 													{
@@ -1146,7 +1146,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 									</td>
 
 									<td>&nbsp;<label for="ort_kurzbz_array<?php echo $pos; ?>">Ort</label>&nbsp;
-										<input id="ort_kurzbz_array<?php echo $pos; ?>" name="ort_kurzbz_array[]" size="10" maxlength="20" value="<?php echo $ort_kurzbz_array[$pos]; ?>">
+										<input id="ort_kurzbz_array<?php echo $pos; ?>" name="ort_kurzbz_array[]" size="10" value="<?php echo $ort_kurzbz_array[$pos]; ?>">
 											<script type="text/javascript" language="JavaScript1.2">
 													$(document).ready(function() 
 													{
@@ -1178,7 +1178,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 						<table class="navbar">
 							<tr>
 								<td>&nbsp;<label for="oe_kurzbz_array<?php echo $pos; ?>">Organisation</label>&nbsp;
-									<input id="oe_kurzbz_array<?php echo $pos; ?>" name="oe_kurzbz_array[]" size="13" maxlength="14" value="<?php echo $oe_kurzbz_array[$pos]; ?>" >
+									<input id="oe_kurzbz_array<?php echo $pos; ?>" name="oe_kurzbz_array[]" size="13" value="<?php echo $oe_kurzbz_array[$pos]; ?>" >
 									<script type="text/javascript" language="JavaScript1.2">
 										$(document).ready(function() 
 										{
@@ -1207,7 +1207,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 
 								<td>&nbsp;<label for="person_id_array<?php echo $pos; ?>">Mitarbeiter</label>&nbsp;
 									<input style="display:none;" id="person_id_old_array<?php echo $pos; ?>" name="person_id_old_array[]" value="<?php echo $person_id_array[$pos]; ?>" >
-									<input id="person_id_array<?php echo $pos; ?>" name="person_id_array[]" size="13" maxlength="14" value="<?php echo $person_id_array[$pos]; ?>" >
+									<input id="person_id_array<?php echo $pos; ?>" name="person_id_array[]" size="13" value="<?php echo $person_id_array[$pos]; ?>" >
 									<script type="text/javascript" language="JavaScript1.2">
 											$(document).ready(function() 
 											{
