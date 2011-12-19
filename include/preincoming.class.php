@@ -263,7 +263,7 @@ class preincoming extends basis_db
 					von, bis, code, uebernommen, insertamum, insertvon, updateamum, updatevon,
 					zgv, zgv_ort, zgv_datum, zgv_name, zgvmaster, zgvmaster_name, zgvmaster_datum, zgvmaster_ort, program_name,
 					bachelor, master, jahre, person_id_emergency, person_id_coordinator_dep, person_id_coordinator_int,
-					deutschkurs1, deutschkurs2, research_area)
+					deutschkurs1, deutschkurs2, deutschkurs3, research_area)
 				  VALUES('.
 			      $this->addslashes($this->person_id).', '.
 			      $this->addslashes($this->mobilitaetsprogramm_code).', '.
