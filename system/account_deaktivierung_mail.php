@@ -134,6 +134,32 @@ if($result = $db->db_query($qry))
 	}
 }
 
+
+// Abbrecher an Bibliothek melden wenn diese inaktiv gesetzt wurden
+$qry = "SELECT uid, vorname, nachname, titelpre, titelpost FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) JOIN public.tbl_person USING(person_id) WHERE
+		tbl_benutzer.aktiv=false AND tbl_benutzer.updateaktivam=CURRENT_DATE
+		AND get_rolle_prestudent (prestudent_id, NULL)='Abbrecher'  ";
+if($result = $db->db_query($qry))
+{
+	if($db->db_num_rows($result)>0)
+	{
+		$message = "Dies ist eine automatische Nachricht!\n\n";
+		$message.= "Die folgenden Studierenden wurden als Abbrecher eingetragen:\n\n";
+		while($row = $db->db_fetch_object($result))
+		{
+			$message.=trim($row->titelpre.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost).' ( '.$row->uid.'@'.DOMAIN." )\n";
+		}
+		$message .= "\nMit freundlichen Grüßen\n";
+		$message .= "\n";
+		$message .= "Fachhochschule Technikum Wien\n";
+		$message .= "Höchstädtplatz 5\n";
+		$message .= "1200 Wien \n";
+		$to = 'rapold@technikum-wien.at, astfaell@technikum-wien.at';
+		$mail = new mail($to,'no-reply@'.DOMAIN,'Abbrecher Information', $message);
+		$mail->send();
+	}
+}
+
 // Studenten
 $qry = "SELECT uid FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) WHERE
 		aktiv=false AND updateaktivam=CURRENT_DATE- interval '".DEL_STUDENT_WEEKS." week'
