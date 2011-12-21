@@ -184,73 +184,76 @@ class wawi_bestellung extends basis_db
 	public function getAllSearch($bestellnr, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $konto_id, $mitarbeiter_uid, $rechnung, $filter_firma, $kostenstelle_id=null, $tag=null, $zahlungstyp=null, $tagNotExists=false, $bestellposition=null,$ohneFreigabe=false)
 	{
 		$first = true; 
-		$qry = "SELECT distinct on (bestellung.bestellung_id) *, bestellung.updateamum as update, bestellung.updatevon as update_von, bestellung.insertamum as insert, bestellung.insertvon as insert_von 
+		$qry = "SELECT distinct on (bestellung.bestellung_id) *, bestellung.updateamum as update, bestellung.updatevon as update_von, bestellung.insertamum as insert, bestellung.insertvon as insert_von, betriebsmittel.inventarnummer 
 		FROM 
 		wawi.tbl_bestellung bestellung
 		LEFT JOIN wawi.tbl_bestellung_bestellstatus status USING (bestellung_id) 
 		LEFT JOIN wawi.tbl_kostenstelle kostenstelle USING (kostenstelle_id) 
 		LEFT JOIN wawi.tbl_bestellungtag bestelltag USING (bestellung_id) 
 		LEFT JOIN wawi.tbl_bestelldetail detail USING (bestellung_id)
-
+		LEFT JOIN wawi.tbl_betriebsmittel betriebsmittel USING(bestellung_id)
 		LEFT JOIN public.tbl_organisationseinheit orgaeinheit ON (orgaeinheit.oe_kurzbz = kostenstelle.oe_kurzbz)  
 		WHERE 1=1 "; 
 		
+		// Bestellnummer und Inventarnummer werden durchsucht
 		if ($bestellnr != '')
-			$qry.= " AND UPPER(bestellung.bestell_nr) LIKE UPPER('%".addslashes($bestellnr)."%')"; 
-
-		if ($titel != '')	
-			$qry.= " AND UPPER(bestellung.titel) LIKE UPPER('%".addslashes($titel)."%')"; 
+			$qry.= " AND (UPPER(bestellung.bestell_nr) LIKE UPPER('%".addslashes($bestellnr)."%') OR UPPER(betriebsmittel.inventarnummer) LIKE UPPER('%".addslashes($bestellnr)."%'))"; 
+		else 
+		{
+			if ($titel != '')	
+				$qry.= " AND UPPER(bestellung.titel) LIKE UPPER('%".addslashes($titel)."%')"; 
+		
+			if ($evon != '')
+				$qry.= ' AND bestellung.insertamum::date >= date('.$this->addslashes($evon).')';
+					
+			if ($ebis != '')
+				$qry.= ' AND bestellung.insertamum::date <= '.$this->addslashes($ebis);
 	
-		if ($evon != '')
-			$qry.= ' AND bestellung.insertamum::date >= date('.$this->addslashes($evon).')';
+			if ($bvon != '')
+				$qry.= " AND status.bestellstatus_kurzbz = 'Bestellung' and status.datum > ".$this->addslashes($bvon);
+			
+			if ($bbis != '')
+				$qry.= " AND status.bestellstatus_kurzbz = 'Bestellung' and status.datum < ".$this->addslashes($bbis);
+	
+			if ($firma_id != '')
+				$qry.= ' AND bestellung.firma_id = '.$this->addslashes($firma_id);
+	
+			if ($filter_firma != '')
+				$qry.= ' AND bestellung.firma_id = '.$this->addslashes($filter_firma);
+			
+			if ($oe_kurzbz != '')
+				$qry.= ' AND orgaeinheit.oe_kurzbz = '.$this->addslashes($oe_kurzbz);
+			
+			if ($konto_id != '')	
+				$qry.= ' AND bestellung.konto_id = '.$this->addslashes($konto_id);
+			
+			if ($mitarbeiter_uid != '')	
+				$qry.= ' AND ( bestellung.updatevon = '.$this->addslashes($mitarbeiter_uid).' OR bestellung.insertvon = '.$this->addslashes($mitarbeiter_uid)
+				.' OR bestellung.besteller_uid = '.$this->addslashes($mitarbeiter_uid).' )';
+			
+			if($rechnung)
+				$qry.= ' AND not exists  (Select bestellung.bestellung_id from wawi.tbl_rechnung rechnung where rechnung.bestellung_id=bestellung.bestellung_id)';
+			
+			if($kostenstelle_id!='')
+				$qry.= ' AND kostenstelle_id='.$this->addslashes($kostenstelle_id);
 				
-		if ($ebis != '')
-			$qry.= ' AND bestellung.insertamum::date <= '.$this->addslashes($ebis);
-
-		if ($bvon != '')
-			$qry.= " AND status.bestellstatus_kurzbz = 'Bestellung' and status.datum > ".$this->addslashes($bvon);
-		
-		if ($bbis != '')
-			$qry.= " AND status.bestellstatus_kurzbz = 'Bestellung' and status.datum < ".$this->addslashes($bbis);
-
-		if ($firma_id != '')
-			$qry.= ' AND bestellung.firma_id = '.$this->addslashes($firma_id);
-
-		if ($filter_firma != '')
-			$qry.= ' AND bestellung.firma_id = '.$this->addslashes($filter_firma);
-		
-		if ($oe_kurzbz != '')
-			$qry.= ' AND orgaeinheit.oe_kurzbz = '.$this->addslashes($oe_kurzbz);
-		
-		if ($konto_id != '')	
-			$qry.= ' AND bestellung.konto_id = '.$this->addslashes($konto_id);
-		
-		if ($mitarbeiter_uid != '')	
-			$qry.= ' AND ( bestellung.updatevon = '.$this->addslashes($mitarbeiter_uid).' OR bestellung.insertvon = '.$this->addslashes($mitarbeiter_uid)
-			.' OR bestellung.besteller_uid = '.$this->addslashes($mitarbeiter_uid).' )';
-		
-		if($rechnung)
-			$qry.= ' AND not exists  (Select bestellung.bestellung_id from wawi.tbl_rechnung rechnung where rechnung.bestellung_id=bestellung.bestellung_id)';
-		
-		if($kostenstelle_id!='')
-			$qry.= ' AND kostenstelle_id='.$this->addslashes($kostenstelle_id);
-			
-		if($zahlungstyp!='')
-			$qry.= ' AND bestellung.zahlungstyp_kurzbz = '.$this->addslashes($zahlungstyp);	
-			
-		if($tag!='')
-			$qry.= ' AND (EXISTS (SELECT 1 FROM wawi.tbl_bestellungtag WHERE tag='.$this->addslashes($tag).' AND bestellung_id=bestellung.bestellung_id)
-						OR EXISTS (SELECT 1 FROM wawi.tbl_bestelldetailtag JOIN wawi.tbl_bestelldetail USING(bestelldetail_id) WHERE tag='.$this->addslashes($tag).' AND bestellung_id=bestellung.bestellung_id)
-						)';
-		if($tagNotExists)
-			$qry.=' AND (NOT EXISTS (SELECT 1 FROM wawi.tbl_bestellungtag WHERE tag is not null AND bestellung_id=bestellung.bestellung_id) 
-					 AND NOT EXISTS (SELECT 1 FROM wawi.tbl_bestelldetailtag JOIN wawi.tbl_bestelldetail USING(bestelldetail_id) WHERE tag is not null AND bestellung_id=bestellung.bestellung_id) )';
-			
-		if($bestellposition!='')
-			$qry.=" AND EXISTS (SELECT 1 FROM wawi.tbl_bestelldetail where UPPER(beschreibung) LIKE UPPER('%".addslashes($bestellposition)."%') AND bestellung_id=bestellung.bestellung_id)";
-
-		if($ohneFreigabe)
-			$qry.=" AND bestellung.freigegeben = 'false'";
+			if($zahlungstyp!='')
+				$qry.= ' AND bestellung.zahlungstyp_kurzbz = '.$this->addslashes($zahlungstyp);	
+				
+			if($tag!='')
+				$qry.= ' AND (EXISTS (SELECT 1 FROM wawi.tbl_bestellungtag WHERE tag='.$this->addslashes($tag).' AND bestellung_id=bestellung.bestellung_id)
+							OR EXISTS (SELECT 1 FROM wawi.tbl_bestelldetailtag JOIN wawi.tbl_bestelldetail USING(bestelldetail_id) WHERE tag='.$this->addslashes($tag).' AND bestellung_id=bestellung.bestellung_id)
+							)';
+			if($tagNotExists)
+				$qry.=' AND (NOT EXISTS (SELECT 1 FROM wawi.tbl_bestellungtag WHERE tag is not null AND bestellung_id=bestellung.bestellung_id) 
+						 AND NOT EXISTS (SELECT 1 FROM wawi.tbl_bestelldetailtag JOIN wawi.tbl_bestelldetail USING(bestelldetail_id) WHERE tag is not null AND bestellung_id=bestellung.bestellung_id) )';
+				
+			if($bestellposition!='')
+				$qry.=" AND EXISTS (SELECT 1 FROM wawi.tbl_bestelldetail where UPPER(beschreibung) LIKE UPPER('%".addslashes($bestellposition)."%') AND bestellung_id=bestellung.bestellung_id)";
+	
+			if($ohneFreigabe)
+				$qry.=" AND bestellung.freigegeben = 'false'";
+		}
 			
 		if(!$this->db_query($qry))
 		{

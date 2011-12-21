@@ -487,7 +487,7 @@ if($aktion == 'suche')
 		echo "<input type='hidden' name='method' value='suche'/>";
 		echo "<table border =0>\n";
 		echo "<tr>\n";
-		echo "<td>Bestellnummer</td>\n";
+		echo "<td>Bestell.- Inventarnummer</td>\n";
 		echo "<td><input type = 'text' size ='32' maxlength = '16' name = 'bestellnr'></td>\n";
 		echo "</tr>\n";
 		echo "<tr>\n";
@@ -656,7 +656,7 @@ if($aktion == 'suche')
 			$bvon = $date->formatDatum($bvon);
 		if($bbis != '') 
 			$bbis = $date->formatDatum($bbis);
-			
+
 		if(($evon || $evon === '') && ($ebis || $ebis === '' ) && ($bvon || $bvon === '') && ($bbis || $bbis === ''))
 		{
 			// Filter firma oder firma id werden angezeigt
