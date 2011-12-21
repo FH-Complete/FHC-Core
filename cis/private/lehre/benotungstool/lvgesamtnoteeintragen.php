@@ -39,6 +39,7 @@ require_once('../../../../include/person.class.php');
 require_once('../../../../include/benutzer.class.php');
 require_once('../../../../include/student.class.php');
 require_once('../../../../include/phrasen.class.php');
+require_once('../../../../include/zeugnisnote.class.php');
 
 if (!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
@@ -166,6 +167,7 @@ if (isset($_REQUEST["submit"]))
 	{
 		$student_uid = $_REQUEST["student_uid"];
 		$note = $_REQUEST["note"];
+		
 		if((($note>0) && ($note < 6)) || ($note == 7) || ($note==8) || ($note==16))
 			$response = savenote($db,$lvid, $student_uid, $note);
 		else
@@ -192,7 +194,14 @@ if (isset($_REQUEST["submit"]))
 						$response.="\n".$p->t('benotungstool/studentMitMatrikelnummerExistiertNicht',array($matrikelnummer));
 						continue;
 					}
-					if((($note>0) && ($note < 6)) || ($note == 7) || ($note==8) || ($note==16))
+					
+					// Hole Zeugnisnote wenn schon eine eingetragen ist
+					if ($zeugnisnote = new zeugnisnote($lvid, $student_uid, $stsem))
+						$znote = $zeugnisnote->note;
+					else
+						$znote = null;	
+					
+					if(((($note>0) && ($note < 6)) || ($note == 7) || ($note==8) || ($note==16)))
 					{
 						$val=savenote($db,$lvid, $student_uid, $note);
 						if($val!='neu' && $val!='update' && $val!='update_f')
@@ -200,8 +209,12 @@ if (isset($_REQUEST["submit"]))
 					}
 					else
 					{
-						$student->load($student_uid);
-						$response .= "\n".$p->t('benotungstool/fehlerhafteNoteBeiStudent', array($student->vorname, $student->nachname))." ".$p->t('benotungstool/noteEingeben');
+						// Wenn Zeugnisnote schon 6 ist -> keine Fehlermeldung mehr
+						if($znote != 6)
+						{	
+							$student->load($student_uid);						
+							$response .= "\n".$p->t('benotungstool/fehlerhafteNoteBeiStudent', array($student->vorname, $student->nachname))." ".$p->t('benotungstool/noteEingeben');
+						}
 					}
 				}
 				else 
