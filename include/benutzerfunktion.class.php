@@ -171,7 +171,7 @@ class benutzerfunktion extends basis_db
 	 * @return false wenn nicht vorhanden oder fehler
 	 *         sonst true
 	 */
-	public function getBenutzerFunktionen($funktion_kurzbz, $oe_kurzbz='', $semester='')
+	public function getBenutzerFunktionen($funktion_kurzbz, $oe_kurzbz='', $semester='', $uid='')
 	{
 		$qry = "SELECT * FROM public.tbl_benutzerfunktion 
 				WHERE funktion_kurzbz='".addslashes($funktion_kurzbz)."'
@@ -182,7 +182,9 @@ class benutzerfunktion extends basis_db
 			$qry.=" AND oe_kurzbz='".addslashes($oe_kurzbz)."'";
 		if($semester!='')
 			$qry.=" AND semester='".addslashes($semester)."'";
-
+		if($uid!='')
+			$qry.=" AND uid='".addslashes($uid)."'";
+		
 		$qry.=" ORDER BY funktion_kurzbz, oe_kurzbz, semester";
 
 		if($result = $this->db_query($qry))

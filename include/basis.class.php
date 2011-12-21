@@ -101,5 +101,16 @@ class basis
 			$datum+=3600;
 		return $datum;
 	}
+	
+	/**
+	 * Konvertiert eine Zeichenkette, 
+	 * damit diese in HTML Dokumenten sicher ausgegeben werden kann
+	 * 
+	 * @param $value
+	 */
+	public function convert_html_chars($value)
+	{
+		return htmlspecialchars($value);
+	}
 }
 ?>
