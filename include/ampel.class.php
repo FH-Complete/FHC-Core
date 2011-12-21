@@ -423,6 +423,83 @@ class ampel extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Laedt Ampeln und Mitarbeiter zu einer OE/Ampel
+	 * @param $oe_arr
+	 * @param $ampel_id
+	 */
+	public function loadAmpelMitarbeiter($oe_arr, $ampel_id)
+	{
+		$sprache = new sprache();
+		$beschreibung = $sprache->getSprachQuery('beschreibung');
 		
+		if(!is_numeric($ampel_id) && $ampel_id!='')
+		{
+			$this->errormsg = 'Ampel ID ist ungueltig';
+			return false;
+		}
+		
+		// Ampeln holen
+		$qry = "SELECT *,".$beschreibung." FROM public.tbl_ampel";
+		if($ampel_id!='')
+			$qry.=" WHERE ampel_id='".$ampel_id."'";
+			
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				// Alle Mitarbeiter dazu holen
+				$qry = "SELECT 
+							* 
+						FROM 
+							(".$row->benutzer_select.") a 
+							JOIN public.tbl_benutzerfunktion USING(uid)
+							JOIN campus.vw_benutzer USING(uid)
+							LEFT JOIN public.tbl_ampel_benutzer_bestaetigt USING(uid)
+						WHERE
+							(tbl_ampel_benutzer_bestaetigt.ampel_id is null OR tbl_ampel_benutzer_bestaetigt.ampel_id='".$row->ampel_id."')
+							AND
+							(funktion_kurzbz='oezuordnung' AND oe_kurzbz in(".$this->implode4SQL($oe_arr)."))
+							
+						";
+
+				if($result_ma = $this->db_query($qry))
+				{
+					while($row_ma = $this->db_fetch_object($result_ma))
+					{
+						$obj = new ampel();
+						
+						$obj->ampel_id = $row->ampel_id;
+						$obj->kurzbz = $row->kurzbz;
+						$obj->beschreibung = $sprache->parseSprachResult('beschreibung', $row);
+						$obj->benutzer_select = $row->benutzer_select;
+						$obj->deadline = $row->deadline;
+						$obj->vorlaufzeit = $row->vorlaufzeit;
+						$obj->verfallszeit = $row->verfallszeit;
+						$obj->insertamum = $row->insertamum;
+						$obj->insertvon = $row->insertvon;
+						
+						$obj->vorname = $row_ma->vorname;
+						$obj->nachname = $row_ma->nachname;
+						$obj->titelpre = $row_ma->titelpre;
+						$obj->titelpost = $row_ma->titelpost;
+						$obj->oe_kurzbz = $row_ma->oe_kurzbz;
+						
+						$obj->ampel_benutzer_bestaetigt_id = $row_ma->ampel_benutzer_bestaetigt_id;
+						
+						$this->result[] = $obj;
+					}
+				}
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+		
+	}
 }
 ?>

@@ -27,6 +27,7 @@ $this->phrasen['tools/keineZahlungenVorhanden']='Currently there are no payments
 
 //Ampeln
 $this->phrasen['tools/ampelsystem']='Ampelsystem';
+$this->phrasen['tools/ampel']='Ampel';
 $this->phrasen['tools/nichtZugeteilt']='Sie sind nicht zu dieser Ampel zugeteilt';
 $this->phrasen['tools/ampelNichtGefunden']='Die angegeben Ampel wurde nicht gefunden';
 $this->phrasen['tools/ampelStatus']='Status';
@@ -35,4 +36,6 @@ $this->phrasen['tools/ampelDeadline']='Deadline';
 $this->phrasen['tools/ampelAktion']='Action';
 $this->phrasen['tools/ampelBestaetigen']='confirm';
 $this->phrasen['tools/ampelBestaetigt']='confirmed';
+$this->phrasen['tools/ampelMitarbeiter']='Employee';
+$this->phrasen['tools/ampelRestdauer']='Remaining Days';
 ?>
