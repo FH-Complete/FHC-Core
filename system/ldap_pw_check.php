@@ -56,7 +56,7 @@ if($connect=@ldap_connect(LDAP_SERVER))
 	$message.="\nHeute geaendert:".$anzahl_geaendert;
 
 	$to = MAIL_ADMIN;
-	$from = 'no-replay@'.DOMAIN;
+	$from = 'no-reply@'.DOMAIN;
 	$subject = 'Passwort Aenderung Statistik';
 
 	$mail = new mail($to, $from, $subject, $message);
