@@ -440,13 +440,13 @@ else if($method=="lehrveranstaltungen")
 				<input type="hidden" name="method" value="lehrveranstaltungen" />
 				<table>
 					<tr>
-						<td width="30%">
+						<td width="50%">
 						<input type="radio" name="thesis" value="" '.((!$preincoming->bachelorthesis && !$preincoming->masterthesis)?'checked="checked"':'').'>'.$p->t('incoming/nothesis').'<br>
 						<input type="radio" name="thesis" value="bachelor" '.(($preincoming->bachelorthesis)?'checked="checked"':'').'>'.$p->t('incoming/bachelorthesis').'<br>
 						<input type="radio" name="thesis" value="master" '.(($preincoming->masterthesis)?'checked="checked"':'').'>'.$p->t('incoming/masterthesis').'
 						</td>
-						<td valign="top">
-						'.$p->t('incoming/researcharea').'
+						<td valign="top" width ="15%" align="center">
+						'.$p->t('incoming/researcharea').':
 						</td>
 						<td>
 						<textarea name="research_area">'.$preincoming->research_area.'</textarea>
@@ -1079,7 +1079,7 @@ else if ($method == "university")
 				<tr><td>
 					<fieldset>
 					<table border ="0">
-					<tr><td colspan="2"><b>Sending Institution</b></td></tr>
+					<tr><td colspan="2"><b>'.$p->t('incoming/heimatuniversitaet').'</b></td></tr>
 					<tr>
 						<td>'.$p->t('incoming/universitätsname').' </td>
 						<td colspan="3"><SELECT name="firma"> 
