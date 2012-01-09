@@ -133,7 +133,7 @@ foreach($ampel->result as $row)
 			$status= '<img src="../../../skin/images/ampel_gruen.png">';
 			break;
 		default:
-			$status= '-';
+			$status= '<img src="../../../skin/images/true.png" height="15px">';
 			break;
 	}
 	echo $status;
