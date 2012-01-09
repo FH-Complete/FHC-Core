@@ -68,6 +68,7 @@ foreach($notiz->result as $row)
 			<NOTIZ:notiz_id><![CDATA['.$row->notiz_id.']]></NOTIZ:notiz_id>
 			<NOTIZ:titel><![CDATA['.$row->titel.']]></NOTIZ:titel>
 			<NOTIZ:text><![CDATA['.$row->text.']]></NOTIZ:text>
+			<NOTIZ:text_stripped><![CDATA['.strip_tags($row->text).']]></NOTIZ:text_stripped>
 			<NOTIZ:verfasser_uid><![CDATA['.$row->verfasser_uid.']]></NOTIZ:verfasser_uid>
 			<NOTIZ:bearbeiter_uid><![CDATA['.$row->bearbeiter_uid.']]></NOTIZ:bearbeiter_uid>
 			<NOTIZ:start><![CDATA['.$datum_obj->formatDatum($row->start,'d.m.Y').']]></NOTIZ:start>

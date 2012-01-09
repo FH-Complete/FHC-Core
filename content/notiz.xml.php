@@ -109,7 +109,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			       <xul:treeitem uri="rdf:*">
 			         <xul:treerow>
 			           <xul:treecell label="rdf:http://www.technikum-wien.at/notiz/rdf#titel"/>
-			           <xul:treecell label="rdf:http://www.technikum-wien.at/notiz/rdf#text"/>
+			           <xul:treecell label="rdf:http://www.technikum-wien.at/notiz/rdf#text_stripped"/>
 			           <xul:treecell label="rdf:http://www.technikum-wien.at/notiz/rdf#verfasser_uid"/>
 			           <xul:treecell label="rdf:http://www.technikum-wien.at/notiz/rdf#bearbeiter_uid"/>
 			           <xul:treecell label="rdf:http://www.technikum-wien.at/notiz/rdf#start"/>
