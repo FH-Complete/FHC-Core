@@ -451,12 +451,12 @@ class ampel extends basis_db
 			{
 				// Alle Mitarbeiter dazu holen
 				$qry = "SELECT 
-							* 
+							distinct on (tbl_ampel_benutzer_bestaetigt.ampel_benutzer_bestaetigt_id, a.uid) * 
 						FROM 
 							(".$row->benutzer_select.") a 
 							JOIN public.tbl_benutzerfunktion USING(uid)
 							JOIN campus.vw_benutzer USING(uid)
-							LEFT JOIN public.tbl_ampel_benutzer_bestaetigt USING(uid)
+							LEFT JOIN public.tbl_ampel_benutzer_bestaetigt on(public.tbl_ampel_benutzer_bestaetigt.uid=a.uid AND ampel_id='".$row->ampel_id."')
 						WHERE
 							(tbl_ampel_benutzer_bestaetigt.ampel_id is null OR tbl_ampel_benutzer_bestaetigt.ampel_id='".$row->ampel_id."')
 							AND
