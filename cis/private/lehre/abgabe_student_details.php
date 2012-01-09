@@ -212,7 +212,8 @@ if($command=='add')
 							updatevon = '".addslashes($user)."', 
 							updateamum = now() 
 							WHERE paabgabe_id='".addslashes($paabgabe_id)."'";
-						$result=$db->db_query($qry);
+			if($db->db_query($qry))
+				echo '<font color="green">'.$p->t('global/erfolgreichgespeichert').'</font><br>';
 			$command="update";
 		}
 		else 
@@ -287,6 +288,7 @@ if($command=="update" && $error!=true)
 					$htmlstr .= "<input type='hidden' name='titel' value='".$titel."'>\n";
 					$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
 					$htmlstr .= "<input type='hidden' name='betreuer' value='".$betreuer."'>\n";
+					$htmlstr .= "<input type='hidden' name='bid' value='".$bid."'>\n";
 					$htmlstr .= "<input type='hidden' name='command' value='add'>\n";
 					$htmlstr .= "<tr>\n";
 					$htmlstr .= "<td><b>".$p->t('abgabetool/spracheDerArbeit').":</b></td><td>";
