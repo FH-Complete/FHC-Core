@@ -47,7 +47,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 	{ 
 	    $("#myTable").tablesorter(
 		{
-			sortList: [[4,0]],
+			sortList: [[5,0]],
 			widgets: [\'zebra\']
 		}); 
 	});
@@ -138,6 +138,7 @@ echo '
 			<th>'.$p->t('tools/ampelBeschreibung').'</th>
 			<th>'.$p->t('global/institut').'</th>
 			<th>'.$p->t('tools/ampelMitarbeiter').'</th>
+			<th>'.$p->t('tools/ampelBestaetigtAm').'</th>
 			<th>'.$p->t('tools/ampelRestdauer').'</th>
 			<th>'.$p->t('tools/ampelDeadline').'</th>
 		</tr>
@@ -197,6 +198,7 @@ foreach($ampel->result as $row)
 	echo '<td>'.$institut.'</td>';
 	$name = $row->titelpre.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost;
 	echo '<td>'.$name.'</td>';
+	echo '<td>'.$datum_obj->formatDatum($row->insertamum_best,'d.m.Y').'</td>';
 	echo '<td>'.(($ts_deadline-$ts_now)/86400).'</td>';
 	echo '<td>'.$datum_obj->formatDatum($row->deadline,'d.m.Y').'</td>';
 	echo '</tr>';
