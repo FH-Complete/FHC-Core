@@ -451,7 +451,8 @@ class ampel extends basis_db
 			{
 				// Alle Mitarbeiter dazu holen
 				$qry = "SELECT 
-							distinct on (tbl_ampel_benutzer_bestaetigt.ampel_benutzer_bestaetigt_id, a.uid) * 
+							distinct on (tbl_ampel_benutzer_bestaetigt.ampel_benutzer_bestaetigt_id, a.uid) *,
+							tbl_ampel_benutzer_bestaetigt.insertamum,tbl_ampel_benutzer_bestaetigt.insertvon							
 						FROM 
 							(".$row->benutzer_select.") a 
 							JOIN public.tbl_benutzerfunktion USING(uid)
@@ -486,6 +487,8 @@ class ampel extends basis_db
 						$obj->titelpost = $row_ma->titelpost;
 						$obj->oe_kurzbz = $row_ma->oe_kurzbz;
 						
+						$obj->insertamum_best = $row_ma->insertamum;
+						$obj->insertvon_best = $row_ma->insertvon;
 						$obj->ampel_benutzer_bestaetigt_id = $row_ma->ampel_benutzer_bestaetigt_id;
 						
 						$this->result[] = $obj;

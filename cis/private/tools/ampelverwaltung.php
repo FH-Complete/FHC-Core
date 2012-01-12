@@ -68,14 +68,21 @@ if($type=='bestaetigen' && is_numeric($ampel_id))
 	{
 		if($ampel->isZugeteilt($user, $ampel->benutzer_select))
 		{
-			if($ampel->bestaetigen($user, $ampel_id))
+			if(!$ampel->isBestaetigt($user, $ampel_id))
 			{
-				//$message = '<span class="ok">OK</span>';
-				//Ampel Ansicht im Seiten-Header aktualisieren
-				$message='<script type="text/javascript">window.parent.loadampel()</script>';
+				if($ampel->bestaetigen($user, $ampel_id))
+				{
+					//$message = '<span class="ok">OK</span>';
+					//Ampel Ansicht im Seiten-Header aktualisieren
+					$message='<script type="text/javascript">window.parent.loadampel()</script>';
+				}
+				else
+					$message = '<span class="error">'.$ampel->errormsg.'</span>';
 			}
 			else
-				$message = '<span class="error">'.$ampel->errormsg.'</span>';
+			{
+				$message = '<span class="error">'.$p->t('tools/ampelBereitsBestaetigt').'</span>';
+			}
 		}
 		else
 			$message = '<span class="error">'.$p->t('tools/nichtZugeteilt').'</span>';

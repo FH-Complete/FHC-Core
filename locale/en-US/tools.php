@@ -38,4 +38,6 @@ $this->phrasen['tools/ampelBestaetigen']='confirm';
 $this->phrasen['tools/ampelBestaetigt']='confirmed';
 $this->phrasen['tools/ampelMitarbeiter']='Employee';
 $this->phrasen['tools/ampelRestdauer']='Remaining Days';
+$this->phrasen['tools/ampelBestaetigtAm']='Bestätigt am';
+$this->phrasen['tools/ampelBereitsBestaetigt']='Diese Ampel wurde bereits bestätigt';
 ?>
