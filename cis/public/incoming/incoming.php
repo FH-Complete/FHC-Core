@@ -66,8 +66,11 @@ if(isset($_GET['method']))
 $zugangscode = $_SESSION['incoming/user']; 
 
 $nation = new nation(); 
-$nation->getAll($ohnesperre = true); 
-
+if($sprache == "German")
+	$nation->getAll($ohnesperre = true); 
+else if($sprache == "English")
+	$nation->getAll($ohnesperre = true, $orderEnglish= true);
+	
 $mobility = new mobilitaetsprogramm(); 
 $mobility->getAll(true); 
 
@@ -176,7 +179,7 @@ if($method =="austauschprogram")
 					</tr>
 					</table>
 				<tr>
-					<td><input type="button" value="'.$p->t('global/zurueck').'" onclick="document.location.href = \'incoming.php?method=university\'"; ><input type="button" value="'.$p->t('incoming/weiter').'" onclick="document.location.href = \'incoming.php?method=lehrveranstaltungen\'"; style="float:right"></td>
+					<td><input type="button" value="'.$p->t('global/zurueck').'" onclick="document.location.href = \'incoming.php?method=university\'"; style="float:left"><input type="button" value="'.$p->t('incoming/weiter').'" onclick="document.location.href = \'incoming.php?method=lehrveranstaltungen\'"; style="float:right"></td>
 				</tr>
 				<tr>
 					<td>* '.$p->t('incoming/wennVorhanden').'</td>
@@ -1177,7 +1180,7 @@ echo'					<td>'.$p->t('incoming/masterstudiengang').'</td>
 					</tr>
 					</table>
 					<tr>
-						<td><input type="button" value="'.$p->t('global/zurueck').'" onclick="document.location.href = \'incoming.php?method=profil\'"; ><input type="button" value="'.$p->t('incoming/weiter').'" onclick="document.location.href = \'incoming.php?method=austauschprogram\'"; style="float:right"></td>
+						<td><input type="button" value="'.$p->t('global/zurueck').'" onclick="document.location.href = \'incoming.php?method=profil\'"; style="float:left"><input type="button" value="'.$p->t('incoming/weiter').'" onclick="document.location.href = \'incoming.php?method=austauschprogram\'"; style="float:right"></td>
 					</tr>
 						</table>
 			</form>
