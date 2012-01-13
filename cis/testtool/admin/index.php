@@ -38,7 +38,7 @@ if (!$db = new basis_db())
 
 
 $PHP_SELF=$_SERVER['PHP_SELF'];
-
+session_cache_limiter('none');
 session_start();
 
 $user=get_uid();
@@ -86,12 +86,13 @@ else
 }
 
 $save_vorschlag_error=false;
+/*<?xml-stylesheet type="text/xsl" href="../mathml.xsl"?>*/
 ?>
-<?xml version="1.0" encoding="utf-8"?>
-
-<?xml-stylesheet type="text/xsl" href="../mathml.xsl"?>
-
-<html xmlns="http://www.w3.org/1999/xhtml">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN"
+         "http://www.w3.org/Math/DTD/mathml2/xhtml-math11-f.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de">
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml; charset=utf-8" />
 <title>Testtool-Administration</title>
@@ -473,6 +474,7 @@ $qry  = "SELECT * FROM testtool.tbl_gebiet ORDER BY bezeichnung";
 if($result = $db->db_query($qry))
 {
 	echo 'Gebiet: <select onchange="window.location.href=\''.$PHP_SELF.'?gebiet_id=\'+this.value;">';
+
 	while($row = $db->db_fetch_object($result))
 	{
 		if($gebiet_id=='')
@@ -487,7 +489,6 @@ if($result = $db->db_query($qry))
 	}
 	echo '</select>';
 }
-
 echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;type=gebietpruefen' class='Item'>Pruefen</a> | ";
 echo " <a href='edit_gebiet.php?gebiet_id=$gebiet_id' class='Item'>Bearbeiten</a>";
 echo '</td><td align="right">';
