@@ -34,11 +34,15 @@ require_once '../../../include/mail.class.php';
 if(isset($_GET['lang']))
 	setSprache($_GET['lang']);
 
-$nation = new nation(); 
-$nation->getAll($ohnesperre = true); 
-
 $sprache = getSprache(); 
 $p=new phrasen($sprache); 
+	
+$nation = new nation(); 
+if($sprache == "German")
+	$nation->getAll($ohnesperre = true); 
+else if($sprache == "English")
+	$nation->getAll($ohnesperre = true, $orderEnglish= true);
+
 
 $date = new datum(); 
 
