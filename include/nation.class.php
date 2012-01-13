@@ -97,15 +97,17 @@ class nation extends basis_db
 	 * @param ohnesperre wenn dieser Parameter auf true gesetzt ist werden
 	 *        nur die nationen geliefert dessen Buerger bei uns studieren duerfen
 	 */
-	public function getAll($ohnesperre=false)
+	public function getAll($ohnesperre=false, $orderEnglish=false)
 	{
 		//Lesen der Daten aus der Datenbank
 		$qry = "SELECT * FROM bis.tbl_nation";
 		if($ohnesperre)
 			$qry .= " WHERE sperre is null";
-
-		$qry .=" ORDER BY kurztext";
-
+		if($orderEnglish == false)
+			$qry .=" ORDER BY kurztext";
+		else 
+			$qry .=" ORDER BY engltext";
+			
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
