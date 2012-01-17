@@ -21,6 +21,8 @@
  */
 require_once('../config/cis.config.inc.php');
 require_once('../include/dms.class.php');
+require_once('../include/functions.inc.php');
+require_once('../include/benutzerberechtigung.class.php');
 
 if(!isset($_GET['id']))
 	die('ID muss uebergeben werden');
@@ -40,6 +42,20 @@ if($version!='' && !is_numeric($version))
 $doc = new dms();
 if(!$doc->load($id,$version))
 	die('Dieses Dokument existiert nicht mehr');
+
+if($doc->isLocked($id))
+{
+	//Dokument erfordert Authentifizierung
+	$user = get_uid();
+	if(!$doc->isBerechtigt($id, $user))
+	{
+		//Globales DMS recht pruefen
+		$rechte = new benutzerberechtigung();
+		$rechte->getBerechtigungen($user);
+		if(!$rechte->isBerechtigt('basis/dms'))
+			die('Sie haben keinen Zugriff auf dieses Dokument');
+	}
+}
 
 if(!isset($_GET['notimeupdate']))
 	$doc->touch($doc->dms_id, $doc->version);

@@ -571,5 +571,223 @@ class dms extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * 
+	 * Liefert ein Array mit den Gruppen welche auf die Kategorie zugreifen duerfen
+	 * @param $kategorie_kurzbz
+	 */
+	function getLockGroups($kategorie_kurzbz)
+	{
+		$qry = "SELECT gruppe_kurzbz FROM 
+				(
+				WITH RECURSIVE kategorien(parent_kategorie_kurzbz) as 
+				(
+					SELECT parent_kategorie_kurzbz FROM campus.tbl_dms_kategorie 
+					WHERE kategorie_kurzbz='".addslashes($kategorie_kurzbz)."'
+					UNION ALL
+					SELECT kategorie_kurzbz FROM campus.tbl_dms_kategorie WHERE kategorie_kurzbz='".addslashes($kategorie_kurzbz)."'
+					UNION ALL
+					SELECT k.parent_kategorie_kurzbz FROM campus.tbl_dms_kategorie k, kategorien 
+					WHERE k.kategorie_kurzbz=kategorien.parent_kategorie_kurzbz
+				)
+				SELECT parent_kategorie_kurzbz
+				FROM kategorien
+				) a
+				JOIN campus.tbl_dms_kategorie_gruppe ON(a.parent_kategorie_kurzbz=kategorie_kurzbz)
+				";
+
+		if($result = $this->db_query($qry))
+		{
+			$gruppen = array();
+			while($row = $this->db_fetch_object($result))
+			{
+				$gruppen[]=$row->gruppe_kurzbz;
+			}
+			return array_unique($gruppen);
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Prueft ob fuer diese Datei eine Authentifizierung erforderlich ist
+	 * @param $dms_id
+	 * @return true wenn Auth. erforderlich
+	 * 		   false wenn nicht erforderlich
+	 * 		   false und errormsg im Fehlerfall
+	 */
+	function isLocked($dms_id)
+	{
+		$qry = "SELECT 1 FROM 
+				(
+				WITH RECURSIVE kategorien(parent_kategorie_kurzbz) as 
+				(
+					SELECT parent_kategorie_kurzbz FROM campus.tbl_dms_kategorie 
+					WHERE kategorie_kurzbz=(SELECT kategorie_kurzbz FROM campus.tbl_dms WHERE dms_id='".addslashes($dms_id)."')
+					UNION ALL
+					SELECT kategorie_kurzbz FROM campus.tbl_dms WHERE dms_id='".addslashes($dms_id)."'
+					UNION ALL
+					SELECT k.parent_kategorie_kurzbz FROM campus.tbl_dms_kategorie k, kategorien 
+					WHERE k.kategorie_kurzbz=kategorien.parent_kategorie_kurzbz
+					
+				)
+				SELECT parent_kategorie_kurzbz
+				FROM kategorien
+				) a
+				JOIN campus.tbl_dms_kategorie_gruppe ON(a.parent_kategorie_kurzbz=kategorie_kurzbz)
+				UNION
+				SELECT 1 FROM fue.tbl_projekt_dokument WHERE dms_id='".addslashes($dms_id)."'				
+				";
+
+		if($result = $this->db_query($qry))
+		{
+			if($this->db_num_rows($result)>0)
+				return true;
+			else
+				return false;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * 
+	 * Prueft ob der User fuer das Dokument berechtigt ist
+	 * Vorher sollte mit isLocked geprueft werden ob das Dokument gesperrt ist
+	 * 
+	 * @param $dms_id
+	 * @param $user
+	 * @return boolean
+	 */
+	function isBerechtigt($dms_id, $user)
+	{
+		$qry = "SELECT * FROM fue.tbl_projekt_dokument WHERE dms_id='".addslashes($dms_id)."'";
+
+		if($result = $this->db_query($qry))
+		{
+			if($this->db_num_rows($result)>0)
+			{
+				//Berechtigung auf Projekt
+
+				//Alle Mitarbeiter des Projektes oder dazughoeriger Phasen 
+				//duerfen auf die Datei zugreifen
+				//auch dann, wenn das Dokument an einer anderen Phase des gleichen Projektes haengt
+				while($row = $this->db_fetch_object($result))
+				{
+					if($row->projekt_kurzbz!='')
+					{
+						//Datei haengt an Projekt
+						$qry = "SELECT 
+									1 
+								FROM 
+									fue.tbl_ressource
+									JOIN fue.tbl_projekt_ressource USING(ressource_id)
+								WHERE
+									(tbl_ressource.student_uid='".addslashes($user)."'
+									 OR tbl_ressource.mitarbeiter_uid='".addslashes($user)."')
+									 AND 
+									 (projekt_kurzbz='".addslashes($row->projekt_kurzbz)."'
+									 OR projektphase_id in(
+									 WITH RECURSIVE phasen(projektphase_id) as 
+									(
+										SELECT projektphase_id FROM fue.tbl_projektphase 
+										WHERE projekt_kurzbz='".addslashes($row->projekt_kurzbz)."'
+										UNION ALL
+										SELECT p.projektphase_id FROM fue.tbl_projektphase p, phasen 
+										WHERE p.projektphase_fk=phasen.projektphase_id
+									)
+									SELECT projektphase_id
+									FROM phasen))";
+					}
+					else
+					{
+						//Datei haengt an Projektphase
+						$qry = "SELECT 
+									1 
+								FROM 
+									fue.tbl_ressource
+									JOIN fue.tbl_projekt_ressource USING(ressource_id)
+								WHERE
+									(tbl_ressource.student_uid='".addslashes($user)."'
+									 OR tbl_ressource.mitarbeiter_uid='".addslashes($user)."')
+									AND
+									 (
+									 tbl_projekt_ressource.projekt_kurzbz=(Select projekt_kurzbz FROM fue.tbl_projektphase where projektphase_id='".addslashes($row->projektphase_id)."')
+									 OR tbl_projekt_ressource.projektphase_id in (
+									 WITH RECURSIVE phasen(projektphase_id) as 
+									(
+										SELECT projektphase_id FROM fue.tbl_projektphase 
+										WHERE projekt_kurzbz IN (SELECT projekt_kurzbz FROM fue.tbl_projektphase WHERE projektphase_id= '".addslashes($row->projektphase_id)."')
+										UNION ALL
+										SELECT p.projektphase_id FROM fue.tbl_projektphase p, phasen 
+										WHERE p.projektphase_fk=phasen.projektphase_id
+									)
+									SELECT projektphase_id
+									FROM phasen))";
+					}
+					
+					if($result_user = $this->db_query($qry))
+					{
+						if($this->db_num_rows($result_user)>0)
+						{
+							//Zuteilung zu Projekt oder Phase gefunden
+							//Zugriff erlaubt
+							return true;
+						}
+					}
+					else
+					{
+						$this->errormsg = 'Fehler bei Abfrage';
+						return false;
+					}
+				}
+				
+				//Die Datei ist einem Projekt zugewiesen, die Person jedoch nicht
+				// -> kein Zugriff
+				return false;
+			}
+		}
+		
+		//Wenn die Datei zu keinem Projekt gehoert, dann die Gruppenrechte pruefen
+		$qry = "SELECT 1 FROM 
+				(
+				WITH RECURSIVE kategorien(parent_kategorie_kurzbz) as 
+				(
+					SELECT parent_kategorie_kurzbz FROM campus.tbl_dms_kategorie 
+					WHERE kategorie_kurzbz=(SELECT kategorie_kurzbz FROM campus.tbl_dms WHERE dms_id='".addslashes($dms_id)."')
+					UNION ALL
+					SELECT kategorie_kurzbz FROM campus.tbl_dms WHERE dms_id='".addslashes($dms_id)."'
+					UNION ALL
+					SELECT k.parent_kategorie_kurzbz FROM campus.tbl_dms_kategorie k, kategorien 
+					WHERE k.kategorie_kurzbz=kategorien.parent_kategorie_kurzbz					
+				)
+				SELECT parent_kategorie_kurzbz
+				FROM kategorien
+				) a
+				JOIN campus.tbl_dms_kategorie_gruppe ON(a.parent_kategorie_kurzbz=kategorie_kurzbz)
+				JOIN public.tbl_benutzergruppe USING(gruppe_kurzbz)
+				WHERE tbl_benutzergruppe.uid='".addslashes($user)."'";
+		if($result = $this->db_query($qry))
+		{
+			if($this->db_num_rows($result)>0)
+			{
+				return true;
+			}
+			else
+				return false;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}		
+	}
 }
 ?>
