@@ -449,20 +449,28 @@ class ampel extends basis_db
 		{
 			while($row = $this->db_fetch_object($result))
 			{
-				// Alle Mitarbeiter dazu holen
+				// Alle Mitarbeiter/Studenten dazu holen
 				$qry = "SELECT 
 							distinct on (tbl_ampel_benutzer_bestaetigt.ampel_benutzer_bestaetigt_id, a.uid) *,
 							tbl_ampel_benutzer_bestaetigt.insertamum,tbl_ampel_benutzer_bestaetigt.insertvon							
 						FROM 
 							(".$row->benutzer_select.") a 
-							JOIN public.tbl_benutzerfunktion USING(uid)
 							JOIN campus.vw_benutzer USING(uid)
+							LEFT JOIN public.tbl_benutzerfunktion USING(uid)
 							LEFT JOIN public.tbl_ampel_benutzer_bestaetigt on(public.tbl_ampel_benutzer_bestaetigt.uid=a.uid AND ampel_id='".$row->ampel_id."')
 						WHERE
 							(tbl_ampel_benutzer_bestaetigt.ampel_id is null OR tbl_ampel_benutzer_bestaetigt.ampel_id='".$row->ampel_id."')
 							AND
-							(funktion_kurzbz='oezuordnung' AND oe_kurzbz in(".$this->implode4SQL($oe_arr)."))
-							
+							(
+								(funktion_kurzbz='oezuordnung' AND oe_kurzbz in(".$this->implode4SQL($oe_arr)."))
+								OR
+								(funktion_kurzbz is null 
+								 AND (SELECT oe_kurzbz FROM 
+								 	  public.tbl_studiengang JOIN public.tbl_student USING(studiengang_kz) 
+								 	  WHERE vw_benutzer.uid=tbl_student.student_uid)
+								 	 in(".$this->implode4SQL($oe_arr).")
+								)
+							)
 						";
 
 				if($result_ma = $this->db_query($qry))

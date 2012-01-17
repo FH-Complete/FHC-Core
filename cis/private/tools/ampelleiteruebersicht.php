@@ -136,7 +136,7 @@ echo '
 		<tr>
 			<th>'.$p->t('tools/ampelStatus').'</th>
 			<th>'.$p->t('tools/ampelBeschreibung').'</th>
-			<th>'.$p->t('global/institut').'</th>
+			<th>'.$p->t('global/organisationseinheit').'</th>
 			<th>'.$p->t('tools/ampelMitarbeiter').'</th>
 			<th>'.$p->t('tools/ampelBestaetigtAm').'</th>
 			<th>'.$p->t('tools/ampelRestdauer').'</th>
