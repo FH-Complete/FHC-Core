@@ -548,13 +548,26 @@ function drawKategorieMenue($rows)
 		
 		$dms = new dms();
 		$dms->getKategorie($row->kategorie_kurzbz);
+		
+		//Suchen, ob eine Sperre fuer diese Kategorie vorhanden ist
+		$groups = $dms->getLockGroups($row->kategorie_kurzbz);
+		$locked='';
+		if(count($groups)>0)
+		{
+			$locked = '<img src="../skin/images/login.gif" height="12px" title="Zugriff nur für Mitglieder folgender Verteiler:';
+			foreach($groups as $group)
+				$locked.=" $group ";
+			$locked.='"/>';
+		}
 		if(count($dms->result)>0)
 		{
+			
 			echo '
 			<tr>
 				<td class="tdwidth10" nowrap>&nbsp;</td>
 	          	<td class="tdwrap">
 	          		<a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$row->kategorie_kurzbz.'" class="MenuItem" onClick="js_toggle_container(\''.$row->kategorie_kurzbz.'\');"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;<span class="'.$class.'">'.$row->bezeichnung.'</span></a>
+	          		'.$locked.'
 					<table class="tabcontent" id="'.$row->kategorie_kurzbz.'" style="display: none;">';
 			drawKategorieMenue($dms->result);
 			echo '	</table>
@@ -566,7 +579,7 @@ function drawKategorieMenue($rows)
 			echo '
 			<tr>
 				<td class="tdwidth10" nowrap>&nbsp;</td>
-	          	<td class="tdwrap"><a id="'.$row->kategorie_kurzbz.'" href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$row->kategorie_kurzbz.'" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;<span class="'.$class.'">'.$row->bezeichnung.'</span></a></td>
+	          	<td class="tdwrap"><a id="'.$row->kategorie_kurzbz.'" href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$row->kategorie_kurzbz.'" class="Item"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;<span class="'.$class.'">'.$row->bezeichnung.'</span></a>'.$locked.'</td>
         	</tr>';			
 		}
 		

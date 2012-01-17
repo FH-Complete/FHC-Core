@@ -3115,6 +3115,95 @@ if($result = $db->db_query("SELECT * FROM information_schema.columns WHERE table
 	}
 }
 
+// Tabelle fuer Infoscreens
+if(!@$db->db_query("SELECT 1 FROM campus.tbl_infoscreen LIMIT 1"))
+{
+	$qry = "
+	CREATE TABLE campus.tbl_infoscreen
+	(
+		infoscreen_id integer NOT NULL,
+		bezeichnung varchar(64),
+		beschreibung text,
+		ipadresse varchar(50)
+	);
+	
+	CREATE TABLE campus.tbl_infoscreen_content
+	(
+		infoscreen_content_id integer NOT NULL,
+		infoscreen_id integer,
+		content_id integer NOT NULL,
+		gueltigvon timestamp,
+		gueltigbis timestamp,
+		insertamum timestamp,
+		insertvon varchar(32),
+		updateamum timestamp,
+		updatevon varchar(32)		
+	);
+	
+	CREATE SEQUENCE campus.seq_infoscreen_infoscreen_id
+ 	INCREMENT BY 1
+ 	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+	
+	CREATE SEQUENCE campus.seq_infoscreen_content_infoscreen_content_id
+ 	INCREMENT BY 1
+ 	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+	
+	ALTER TABLE campus.tbl_infoscreen ALTER COLUMN infoscreen_id SET DEFAULT nextval('campus.seq_infoscreen_infoscreen_id');
+	ALTER TABLE campus.tbl_infoscreen_content ALTER COLUMN infoscreen_content_id SET DEFAULT nextval('campus.seq_infoscreen_content_infoscreen_content_id');
+	
+	ALTER TABLE campus.tbl_infoscreen ADD CONSTRAINT pk_infoscreen PRIMARY KEY (infoscreen_id);
+	ALTER TABLE campus.tbl_infoscreen_content ADD CONSTRAINT pk_infoscreen_content PRIMARY KEY (infoscreen_content_id);
+	
+	ALTER TABLE campus.tbl_infoscreen_content ADD CONSTRAINT fk_infoscreen_infoscreen_content FOREIGN KEY(infoscreen_id) REFERENCES campus.tbl_infoscreen(infoscreen_id) ON DELETE CASCADE ON UPDATE CASCADE;
+	ALTER TABLE campus.tbl_infoscreen_content ADD CONSTRAINT fk_content_infoscreen_content FOREIGN KEY(content_id) REFERENCES campus.tbl_content(content_id) ON DELETE CASCADE ON UPDATE CASCADE;
+	
+	GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_infoscreen TO admin;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_infoscreen_content TO admin;
+	
+	GRANT SELECT ON campus.tbl_infoscreen TO web;
+	GRANT SELECT ON campus.tbl_infoscreen_content TO web;
+	
+	GRANT SELECT, UPDATE ON campus.seq_infoscreen_infoscreen_id TO admin;
+	GRANT SELECT, UPDATE ON campus.seq_infoscreen_content_infoscreen_content_id TO admin;
+	
+	GRANT SELECT ON wawi.tbl_betriebsmittel TO web;
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_infoscreen: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Tabelle campus.tbl_infoscreen, campus.tbl_infoscreen_content hinzugefuegt!<br>';
+}
+
+// tbl_dms_kategorie_gruppe fuer DMS Berechtigungen
+if(!$result = @$db->db_query('SELECT 1 FROM campus.tbl_dms_kategorie_gruppe LIMIT 1;'))
+{
+	$qry = "
+	CREATE TABLE campus.tbl_dms_kategorie_gruppe (
+		kategorie_kurzbz varchar(32) NOT NULL,
+		gruppe_kurzbz varchar(32) NOT NULL,
+		insertamum timestamp,
+		insertvon varchar(32)
+	);
+	
+	ALTER TABLE campus.tbl_dms_kategorie_gruppe ADD CONSTRAINT fk_dms_kategorie_dms_kategorie_gruppe FOREIGN KEY(kategorie_kurzbz) REFERENCES campus.tbl_dms_kategorie (kategorie_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE campus.tbl_dms_kategorie_gruppe ADD CONSTRAINT fk_gruppe_dms_kategorie_gruppe FOREIGN KEY(gruppe_kurzbz) REFERENCES public.tbl_gruppe(gruppe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE campus.tbl_dms_kategorie_gruppe ADD CONSTRAINT pk_dms_kategorie_gruppe PRIMARY KEY(kategorie_kurzbz, gruppe_kurzbz);
+	
+	GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_dms_kategorie_gruppe TO admin;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_dms_kategorie_gruppe TO web;	
+	GRANT SELECT ON fue.tbl_projektphase TO web;
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_dms_kategorie_gruppe: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Tabelle campus.tbl_dms_kategorie_gruppe hinzugefuegt!<br>';
+}
 echo '<br>';
 
 $tabellen=array(
@@ -3149,9 +3238,12 @@ $tabellen=array(
 	"campus.tbl_contentsprache"  => array("contentsprache_id","content_id","sprache","version","sichtbar","content","reviewvon","reviewamum","updateamum","updatevon","insertamum","insertvon","titel","gesperrt_uid"),
 	"campus.tbl_dms"  => array("dms_id","oe_kurzbz","dokument_kurzbz","kategorie_kurzbz"),
 	"campus.tbl_dms_kategorie"  => array("kategorie_kurzbz","bezeichnung","beschreibung","parent_kategorie_kurzbz"),
+	"campus.tbl_dms_kategorie_gruppe" => array("kategorie_kurzbz","gruppe_kurzbz","insertamum","insertvon"),
 	"campus.tbl_dms_version"  => array("dms_id","version","filename","mimetype","name","beschreibung","letzterzugriff","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_erreichbarkeit"  => array("erreichbarkeit_kurzbz","beschreibung","farbe"),
 	"campus.tbl_feedback"  => array("feedback_id","betreff","text","datum","uid","lehrveranstaltung_id","updateamum","updatevon","insertamum","insertvon"),
+	"campus.tbl_infoscreen"  => array("infoscreen_id","bezeichnung","beschreibung","ipadresse"),
+	"campus.tbl_infoscreen_content"  => array("infoscreen_content_id","infoscreen_id","content_id","gueltigvon","gueltigbis","insertamum","insertvon","updateamum","updatevon"),
 	"campus.tbl_legesamtnote"  => array("student_uid","lehreinheit_id","note","benotungsdatum","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_lvgesamtnote"  => array("lehrveranstaltung_id","studiensemester_kurzbz","student_uid","note","mitarbeiter_uid","benotungsdatum","freigabedatum","freigabevon_uid","bemerkung","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_lvinfo"  => array("lehrveranstaltung_id","sprache","titel","lehrziele","lehrinhalte","methodik","voraussetzungen","unterlagen","pruefungsordnung","anmerkung","kurzbeschreibung","genehmigt","aktiv","updateamum","updatevon","insertamum","insertvon"),
