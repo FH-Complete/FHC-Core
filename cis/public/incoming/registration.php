@@ -90,7 +90,7 @@ echo '	<form action="registration.php" method="POST" name="RegistrationForm">
 				</tr>
 				<tr>
 					<td>'.$p->t('global/geburtsdatum').'</td>
-					<td><input type="text" size="20" name="geb_datum" value="" onfocus="this.value=""\"; > (dd.mm.YYYY)</td>
+					<td><input type="text" size="20" name="geb_datum" value="" onfocus="this.value=""\"; > (dd.mm.yyyy)</td>
 				</tr>
 				<tr>
 					<td>'.$p->t('global/staatsbuergerschaft').'</td>
