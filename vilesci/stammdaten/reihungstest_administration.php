@@ -30,6 +30,15 @@ require_once('../../include/pruefling.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/reihungstest.class.php');
 
+require_once('../../include/studiensemester.class.php');
+
+
+	
+//	Studiengang lesen 
+	$s=new studiengang();
+	$s->getAll('typ, kurzbz', false);
+	$studiengang=$s->result;
+
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
@@ -76,6 +85,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//DE" "http://www
 		<link rel="stylesheet" href="../../skin/jquery.css" type="text/css"/>
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+		
 
 		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 		<script type="text/javascript" src="../../include/js/jquery.js"></script> 
@@ -382,6 +392,136 @@ $('#prestudent_name').autocomplete('reihungstest_administration.php',
 	  	  });	  	
 </script>";
 
+
+// Uebersicht ueber die Teilgebiete der Studiengaenge
+echo '<hr><br>&Uuml;bersicht &uuml;ber die Teilgebiete der Studieng&auml;nge';
+
+
+
+//if(isset($_GET['action']) && $_GET['action']=='showreihungstests')
+
+$studiengang_kz = isset($_REQUEST['studiengang_kz'])?$_REQUEST['studiengang_kz']:1;
+
+echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">';
+$stg_obj = new studiengang();
+$stg_obj->getAll('typ, kurzbz, bezeichnung');
+echo "\n",'Studiengang <SELECT name="studiengang_kz">
+<OPTION value="">-- Bitte ausw&auml;hlen --</OPTION>';
+foreach($stg_obj->result as $row)
+{
+	if($row->studiengang_kz==$studiengang_kz)
+		$selected='selected';
+	else
+		$selected='';
+	echo '<OPTION value="'.$row->studiengang_kz.'" '.$selected.'>'.$row->kuerzel.' - '.$row->bezeichnung.'</OPTION>';
+}
+echo '</SELECT>';
+echo '&nbsp;&nbsp;<input type="submit" name="show" value="OK"></form><br>';
+
+$stsem = new studiensemester();
+$stsem->getFinished();
+foreach($stsem->studiensemester as $row)
+{
+	$qry="SELECT 
+			UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) as stg,
+			semester,
+			studiengang_kz,
+			reihung,
+			gebiet_id,
+			tbl_gebiet.bezeichnung,
+			zeit,
+			multipleresponse,
+			maxfragen,
+			zufallfrage,
+			zufallvorschlag,
+			level_start,
+			level_sprung_auf,
+			level_sprung_ab,
+			levelgleichverteilung,
+			maxpunkte,
+			antwortenprozeile 
+			FROM testtool.tbl_ablauf 
+			JOIN testtool.tbl_gebiet USING (gebiet_id) 
+			JOIN public.tbl_studiengang USING (studiengang_kz)
+			WHERE studiengang_kz='".$studiengang_kz."'
+			ORDER BY stg,semester,reihung";
+}
+
+if($result = $db->db_query($qry))
+{
+	$num_rows=$db->db_num_rows($result);
+	
+/*	echo "<script type='text/javascript'>
+			$(document).ready(function() 
+				{ 
+				    $('#".$row->studiensemester."').tablesorter(
+					{
+						sortList: [[2,0]],
+						widgets: ['zebra']
+					}); 
+				} 
+			); 
+			</script>
+		<table id='".$row->studiensemester."' class='tablesorter' style='width:auto'>
+		<tbody>";*/
+	
+	echo "<table class='liste table-stripeclass:alternate table-autostripe' border='0' style='width:auto'>
+	
+		<tbody style='width:auto; padding-left:10px'>";
+	
+	echo "<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>STG</th>
+	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>SEM</th>
+	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>KZ</th>
+	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>NR</th>
+	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Gebiet_id</th>
+	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Bezeichnung</th>
+	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Zeit</th>
+	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'><div title='Multiple Response' style='cursor:help'>MR</div></th>
+	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Maxfragen</th>
+	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'><div title='Zufallsfrage' style='cursor:help'>ZFF</div></th>
+	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'><div title='Zufallsvorschlag' style='cursor:help'>ZFV</div></th>
+	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Level-Start</th>
+	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Level auf</th>
+	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Level ab</th>
+	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'><div title='Levelgleichverteilung' style='cursor:help'>LGV</div></th>
+	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Maxpunkte</th>
+	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'><div title='Antwortenprozeile' style='cursor:help'>AWPZ</div></th>\n";
+	echo "</tr></thead>";
+	echo "<tbody>";
+	for($i=0;$i<$num_rows;$i++)
+	{
+	   $row=$db->db_fetch_object($result);
+	   echo "<tr>";
+	   echo "<td>$row->stg</td>
+	   <td>$row->semester</td>
+	   <td>$row->studiengang_kz</td>
+	   <td>$row->reihung</td>
+	   <td>$row->gebiet_id</td>
+	   <td>$row->bezeichnung</td>
+	   <td>$row->zeit</td>
+	   <td align='center'><img src='../../skin/images/".($row->multipleresponse=='t'?'true.png':'false.png')."' height='20'></td>
+	   <td align='center'>$row->maxfragen</td>
+	   <td align='center'><img src='../../skin/images/".($row->zufallfrage=='t'?'true.png':'false.png')."' height='20'></td>
+	   <td align='center'><img src='../../skin/images/".($row->zufallvorschlag=='t'?'true.png':'false.png')."' height='20'></td>
+	   <td align='center'>$row->level_start</td>
+	   <td align='center'>$row->level_sprung_auf</td>
+	   <td align='center'>$row->level_sprung_ab</td>
+	   <td align='center'><img src='../../skin/images/".($row->levelgleichverteilung=='t'?'true.png':'false.png')."' height='20'></td>
+	   <td align='center'>$row->maxpunkte</td>
+	   <td align='center'>$row->antwortenprozeile</td>";
+	   echo "</tr>\n";
+	}
+
+}
+else
+	echo "Kein Eintrag gefunden!";
+
+echo "</tbody></table>";
+	echo "<br><br>";
+	echo "</form>";
+
+
+	
 echo '</body>
 </html>';
 ?>
