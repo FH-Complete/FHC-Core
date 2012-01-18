@@ -107,7 +107,7 @@ if($lvid!='')
 				(public.tbl_student LEFT JOIN public.tbl_studiengang using (studiengang_kz)) ON (student_uid = uid)
 			WHERE
 				uid IN (SELECT uid FROM campus.tbl_benutzerlvstudiensemester
-				        WHERE lehrveranstaltung_id='$lvid' AND studiensemester_kurzbz='$stsem')
+				        WHERE lehrveranstaltung_id='".addslashes($lvid)."' AND studiensemester_kurzbz='".addslashes($stsem)."')
 			ORDER BY
 				nachname, vorname";
 				
@@ -116,18 +116,27 @@ if($lvid!='')
 		$ff = array();
 		$content='';
 	
-		$mailto= "&nbsp;<a href='mailto:";
+		//$mailto= "&nbsp;<a href='mailto:";
+		$mailto=array();
+		$mailto_idx=0;
 		$content .= "<table>\n  <tr class='liste'><th></th><th>".$p->t('global/nachname')."</th><th>".$p->t('global/vorname')."</th><th>".$p->t('global/mail')."</th><th>".$p->t('global/studiengang')."</th><th>".$p->t('global/semester')."</th></tr>";
 		$i=0;
 		while($row=$db->db_fetch_object($result))
 		{
 			$i++;
 			$content .= "\n<tr class='liste".($i%2)."'><td>$i</td><td>$row->nachname</td><td>$row->vorname</td><td><a href='mailto:$row->uid@technikum-wien.at'>$row->uid@technikum-wien.at</a></td><td align='center'>$row->kurzbzlang</td><td align='center'>$row->semester</td></tr>";
-			if($i!=1)
-				$mailto.=",";
-			$mailto.=$row->uid."@technikum-wien.at";
+			
+			if(isset($mailto[$mailto_idx]) && mb_strlen($mailto[$mailto_idx])>450)
+				$mailto_idx++;
+			
+			if(isset($mailto[$mailto_idx]))
+				$mailto[$mailto_idx]=$mailto[$mailto_idx].',';
+			else
+				$mailto[$mailto_idx]='';
+			$mailto[$mailto_idx]=$mailto[$mailto_idx].$row->uid.'@'.DOMAIN;
 		}
-		$mailto.="'>".$p->t('freifach/MailAnAlleSenden')."</a>";
+		//$mailto.="'>".$p->t('freifach/MailAnAlleSenden')."</a>";
+		
 		$content .= "</table>";
 	
 		if($i==0)
@@ -139,7 +148,17 @@ if($lvid!='')
 			//echo "Anzahl der Anmeldungen: ".$i;
 			echo $content;
 			echo "<br />";
-			echo $mailto;
+			echo "<script>
+				function openMail()
+				{";
+			if(count($mailto)>1)
+				echo "alert('Aufgrund der großen Anzahl an Empfängern, muss die Nachricht auf mehrere E-Mails aufgeteilt werden!');";
+			foreach($mailto as $val)
+				echo "window.location.href='mailto:".$val."';\n";
+			echo '
+				}
+				</script>';
+			echo '<a href="#Mail" onclick="openMail()">'.$p->t('freifach/MailAnAlleSenden').'</a>';
 		}
 	}
 	else
