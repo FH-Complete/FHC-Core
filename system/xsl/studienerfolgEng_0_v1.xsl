@@ -298,7 +298,7 @@
 									<fo:block font-size="7pt"></fo:block>
 									</fo:table-cell>
 									<fo:table-cell>
-									<fo:block font-size="7pt">participated (tg), passed (b), successfully completed (ea), not successfully completed (nea)</fo:block>
+									<fo:block font-size="7pt">Participated with success (met), passed (b), successfully completed (ea), not successfully completed (nea), did not participate (nt)</fo:block>
 									</fo:table-cell>
 								</fo:table-row>
 							</fo:table-body>
