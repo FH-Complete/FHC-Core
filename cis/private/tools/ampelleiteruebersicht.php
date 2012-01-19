@@ -136,11 +136,11 @@ echo '
 		<tr>
 			<th>'.$p->t('tools/ampelStatus').'</th>
 			<th>'.$p->t('tools/ampelBeschreibung').'</th>
-			<th>'.$p->t('global/organisationseinheit').'</th>
 			<th>'.$p->t('tools/ampelMitarbeiter').'</th>
+			<th>'.$p->t('global/organisationseinheit').'</th>
 			<th>'.$p->t('tools/ampelBestaetigtAm').'</th>
-			<th>'.$p->t('tools/ampelRestdauer').'</th>
 			<th>'.$p->t('tools/ampelDeadline').'</th>
+			<th>'.$p->t('tools/ampelRestdauer').'</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -194,13 +194,19 @@ foreach($ampel->result as $row)
 	if($beschreibung=='' && isset($row->beschreibung[DEFAULT_LANGUAGE]))
 		$beschreibung = $row->beschreibung[DEFAULT_LANGUAGE];
 	echo '<td>'.$beschreibung.'</td>';
-	$institut = $row->oe_kurzbz;
-	echo '<td>'.$institut.'</td>';
+	
 	$name = $row->titelpre.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost;
 	echo '<td>'.$name.'</td>';
+	$institut = $row->oe_kurzbz;
+	echo '<td>'.$institut.'</td>';
 	echo '<td>'.$datum_obj->formatDatum($row->insertamum_best,'d.m.Y').'</td>';
-	echo '<td>'.(($ts_deadline-$ts_now)/86400).'</td>';
 	echo '<td>'.$datum_obj->formatDatum($row->deadline,'d.m.Y').'</td>';
+	
+	//Restdauer wird nur angezeigt, wenn noch nicht bestaetigt
+	if($bestaetigt)
+		echo '<td></td>';
+	else
+		echo '<td>'.(($ts_deadline-$ts_now)/86400).'</td>';
 	echo '</tr>';
 }
 echo '</tbody></table>';

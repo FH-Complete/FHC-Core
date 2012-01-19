@@ -554,7 +554,7 @@ function drawKategorieMenue($rows)
 		$locked='';
 		if(count($groups)>0)
 		{
-			$locked = '<img src="../skin/images/login.gif" height="12px" title="Zugriff nur für Mitglieder folgender Verteiler:';
+			$locked = '<img src="../skin/images/login.gif" height="12px" title="Zugriff nur für Mitglieder folgender Gruppen:';
 			foreach($groups as $group)
 				$locked.=" $group ";
 			$locked.='"/>';
