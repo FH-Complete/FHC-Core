@@ -286,7 +286,7 @@
 									<fo:block font-size="7pt">Benotung: </fo:block>
 									</fo:table-cell>
 									<fo:table-cell>
-									<fo:block font-size="7pt">Sehr gut (1), Gut (2), Befriedigend (3), Genügend (4), Nicht genügend (5), angerechnet (ar), nicht beurteilt (nb),</fo:block>
+									<fo:block font-size="7pt">Sehr gut (1), Gut (2), Befriedigend (3), Genügend (4), Nicht genügend (5), angerechnet (ar), nicht beurteilt (nb), mit Erfolg teilgenommen (met),</fo:block>
 									</fo:table-cell>
 								</fo:table-row>
 								<fo:table-row>
@@ -294,7 +294,7 @@
 									<fo:block font-size="7pt"></fo:block>
 									</fo:table-cell>
 									<fo:table-cell>
-									<fo:block font-size="7pt">teilgenommen (tg), bestanden (b), approbiert (ap), erfolgreich absolviert (ea), nicht erfolgreich absolviert (nea)</fo:block>
+									<fo:block font-size="7pt">bestanden (b), approbiert (ap), erfolgreich absolviert (ea), nicht erfolgreich absolviert (nea), nicht teilgenommen (nt)</fo:block>
 									</fo:table-cell>
 								</fo:table-row>
 							</fo:table-body>
