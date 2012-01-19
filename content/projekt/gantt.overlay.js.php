@@ -23,6 +23,7 @@ require_once('../../config/vilesci.config.inc.php');
 ?>
 
 var global_year; 
+var global_url; 
 
 function getProperties()
 {
@@ -59,7 +60,8 @@ function showStudienjahr()
 	}	
 	projekt_kurzbz=getTreeCellText(tree, "treecol-projektmenue-projekt_kurzbz", tree.currentIndex);
 	
-	var url = 'projekt/gantt.svg.php?projekt='+projekt_kurzbz+'&studienjahr='+(global_year-1)+'&ansicht=studienjahr'
+	var url = 'projekt/gantt.svg.php?projekt='+projekt_kurzbz+'&studienjahr='+(global_year-1)+'&ansicht=studienjahr';
+	global_url = url; 
 	document.getElementById('iframe-ressource-projekt').contentWindow.location.href=url;
 }
 
@@ -83,7 +85,8 @@ function showKalenderjahr()
 	}	
 	projekt_kurzbz=getTreeCellText(tree, "treecol-projektmenue-projekt_kurzbz", tree.currentIndex);
 
-	var url = 'projekt/gantt.svg.php?projekt='+projekt_kurzbz+'&studienjahr='+global_year+'&ansicht=kalenderjahr'
+	var url = 'projekt/gantt.svg.php?projekt='+projekt_kurzbz+'&studienjahr='+global_year+'&ansicht=kalenderjahr';
+	global_url = url;
 	document.getElementById('iframe-ressource-projekt').contentWindow.location.href=url;	
 }
 
@@ -156,10 +159,12 @@ function showYearPlus()
 }
 
 function printGantt()
-{
-	alert(document.getElementById('iframe-ressource-projekt').src); 
-	foo = window.open(url);
-	foo.print();
+{ 
+	foo = window.open(global_url);
+	foo.onload = function ()
+	{
+		foo.print();
+	}
 }
 
 

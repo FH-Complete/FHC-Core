@@ -110,9 +110,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/ressource.overlay.xul.php"
 			<tab id="tab-dokumente" label="Dokumente" />
 			<tab id="tab-ressource" label="Ressourcen" />
 			<tab id="tab-bestellung" label="Bestellungen" />
-			<!--
-			<tab id="tab-gantt" label="Gantt" />
-			-->
+			<tab id="tab-ganttx" label="Gantt" />
 			<tab id="tab-notiz" label="Eigene Notizen" />
 		</tabs>
 		<tabpanels id="tabpanels-main" flex="1">
@@ -122,9 +120,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/ressource.overlay.xul.php"
 			<vbox id="box-dokumente" />
 			<vbox id="box-ressource" />
 			<vbox id="box-bestellung" />
-			<!--
-			<vbox id="box-gantt" />
-			-->
+			<vbox id="box-ganttx" />
             <vbox id="box-notiz" />
 		</tabpanels>
 	</tabbox>

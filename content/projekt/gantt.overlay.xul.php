@@ -27,73 +27,31 @@ header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../config/vilesci.config.inc.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
-echo '<?xml-stylesheet href="gantt.css" type="text/css"?>';
+/*echo '<?xml-stylesheet href="gantt.css" type="text/css"?>';*/
 ?>
+<!DOCTYPE overlay >
+<overlay id="gant" 
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        >
+<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/projekt/gantt.overlay.js.php" />
 
-<overlay id="GanttOverlay"
-	xmlns:html="http://www.w3.org/1999/xhtml"
-	xmlns:svg="http://www.w3.org/2000/svg" 
-	xmlns:xlink="http://www.w3.org/1999/xlink"
-	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
->
-
-	<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/phpRequest.js.php" />
-	<!-- <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/projekt/gantt.overlay.js.php" />-->
-	<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/functions.js.php" />
-
-	<!-- ************************ -->
-	<!-- *  Projekttask   * -->
-	<!-- ************************ -->
-	<vbox id="box-gantt" flex="1" uid="" stg_kz="">
-	<popupset>
-		<popup id="projektphase-tree-popup">
-			<menuitem label="Entfernen" oncommand="TaskDelete();" id="projektphase-tree-popup-entf" disabled="false"/>
-		</popup>
-	</popupset>
+        	        
+	<vbox id="box-ganttx" flex="1">
 		<toolbox>
-			<toolbar id="projektphase-nav-toolbar">
-				<toolbarbutton id="toolbarbutton-gantt-zoomin" label="Zoom In" oncommand="PhaseNeu();" disabled="true" image="../skin/images/NeuDokument.png" tooltiptext="Neuen Task anlegen" />
-				<toolbarbutton id="toolbarbutton-gantt-zoomout" label="Zoom Out" oncommand="PhaseDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Task löschen"/>
-				<toolbarbutton id="toolbarbutton-gantt-print" label="Drucken" oncommand="PhaseTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
+			<toolbar id="toolbar-bestellung-main">
+				
+				<toolbarbutton id="toolbarbutton-notiz-filter" label="Ansicht " type="menu">							
+					<menupopup>
+						<menuitem id="toolbarbutton-menuitem-gantt-studienjahr" label="Studienjahr" type="radio" name="sort" oncommand="drawGantt()" tooltiptext="Anzeige Studienjahr" checked="true"/>
+						<menuitem id="toolbarbutton-menuitem-gantt-kalenderjahr" label="Kalenderjahr" type="radio" name="sort" oncommand="drawGantt()" tooltiptext="Anzeige Kalenderjahr"/>
+				      </menupopup>
+				</toolbarbutton>
+				<toolbarbutton id="toolbarbutton-gantt-zurueck" label="" oncommand="showYearMinus();" disabled="false" image="../skin/images/left.png" tooltiptext="Jahr zurück"/>
+				<toolbarbutton id="toolbarbutton-gantt-vor" label="Jahr" oncommand="showYear();" disabled="false" tooltiptext="aktuelles Jahr"/>
+				<toolbarbutton id="toolbarbutton-gantt-vor" label="" oncommand="showYearPlus();" disabled="false" image="../skin/images/right.png" tooltiptext="Jahr vor"/>
+				<toolbarbutton id="toolbarbutton-gantt-drucken" label="Drucken" oncommand="printGantt();" image="../skin/images/drucken.png" tooltiptext="Drucken"/>
 			</toolbar>
 		</toolbox>
-
-		<stack flex="1">
-		<vbox flex="1">
-			<svg-shape id="background-circle" flex="1" type="circle" />
-		</vbox>
-		<vbox flex="1">
-			<spacer flex="2"/>
-			<svg-shape flex="1" id="svg-button" type="rect" radius="12" label="Projekt Lernquadrat"/>
-			<spacer flex="2"/>
-			<hbox flex="4">
-				<svg-shape flex="1" id="phase1" type="rect" label="Analysephase"/>
-				<svg-shape flex="1" id="circ2" type="circle" label="2" />
-				<svg-shape flex="1" id="circ3" type="circle" label="3" />
-			</hbox>
-			<spacer flex="1"/>
-		</vbox>
-		</stack>
-
-
-		<splitter collapse="after" persist="state">
-			<grippy />
-		</splitter>
-
-		<!-- ************ -->
-		<!-- *  Detail  * -->
-		<!-- ************ -->
-		<vbox flex="1"  style="overflow:auto;margin:0px;" persist="height">
-			<tabbox id="projektphase-tabbox" flex="3" orient="vertical">
-				<tabs orient="horizontal" id="projektphase-tabs">
-					<tab id="projektphase-tab-detail" label="Details" />
-					<tab id="projektphase-tab-mantis" label="Mantis" />
-				</tabs>
-				<tabpanels id="projektphase-tabpanels-main" flex="1">
-					<vbox id="projektphase-detail" />
-					<vbox id="projektphase-mantis" />
-				</tabpanels>
-			</tabbox>
-		</vbox>
-	</vbox>
+			<iframe id="iframe-ressource-projekt" flex="5" src="" />
+	</vbox> 
 </overlay>

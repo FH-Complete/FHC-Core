@@ -43,17 +43,22 @@ header("Content-type: application/xhtml+xml");
 
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/projektphase.class.php');
+require_once('../../include/projekt.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/datum.class.php');
 
 $projektphasen = new projektphase(); 
 if(!$projektphasen->getProjektphasen($projekt_kurzbz))
-	die('Kein gültiges Projekt übergeben');
+	die('Kein gültiges Projekt übergeben.');
+	
+$projekt = new projekt(); 
+if(!$projekt->load($projekt_kurzbz))
+	die('Konnte Projekt nicht laden.');
 	
 $datum = new datum();
 $widthPerWeek = 16;
-$startX = 270;
-$startY = 70;
+$startX = 20;
+$startY = 90;
 // KW in der 28.12 liegt ist lezte KW 
 $datum_gesamt = $studienjahr.'-12-28';
 $timestamp_gesamt = $datum->mktime_fromdate($datum_gesamt);	
@@ -65,7 +70,7 @@ $height = (count($projektphasen->result)) * 50;
 // Zeichne Kalenderjahr -> beginnend mit KW 1
 if($ansicht=='kalenderjahr')
 {
-	echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+	echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 	<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
 	"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">';
 	
@@ -77,7 +82,7 @@ if($ansicht=='kalenderjahr')
 	// Überschriften
 	echo'<text x="30%" y="40" style="font-size:33px">Kalenderjahr: '.$studienjahr.'</text>';
 	echo'<text x="'.($startX-10).'" y="'.($startY-5).'" style="font-size:13px" text-anchor="end"> KW:</text>';
-
+	
 	// Zeichne Raster
 	for($i=1; $i<=$kw_gesamt; $i++)
 	{
@@ -138,7 +143,7 @@ if($ansicht=='kalenderjahr')
 				// beginnt im vorigen und endet im aktuellen
 			else if($year_beginn < $studienjahr && $year_end == $studienjahr)
 			{
-					$width = ($kw_end)*$widthPerWeek;
+					$width = ($kw_end+1)*$widthPerWeek;
 					$x = $startX;
 			}
 		}
@@ -148,16 +153,18 @@ if($ansicht=='kalenderjahr')
 		echo'<text x="'.($startX-10).'" y="'.($startY+30+$i*50).'" style="font-size:15px" text-anchor="end">'.$phase->bezeichnung.'</text>';
 		$i++;
 	}
+	echo'<text x="10%" y="'.((($i+1)*50)+$startY).'" style="font-size:16px">Projekt: '.$projekt->titel.'</text>';
 	
 	echo '</svg>';
 }
 else if($ansicht == 'studienjahr')
 {
-	echo '<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+	echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 	<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
 	"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">';
 	echo '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-	width="100%" height="100%">';
+	width="100%" height="100%" viewBox="0 0 750 600">
+	>';
 	
 	// Überschriften
 	echo'<text x="30%" y="40" style="font-size:33px">Studienjahr: '.$studienjahr.'/'.($studienjahr+1).'</text>';
@@ -306,6 +313,8 @@ else if($ansicht == 'studienjahr')
 		echo'<text x="'.($startX-10).'" y="'.($startY+30+$i*50).'" style="font-size:15px" text-anchor="end">'.$phase->bezeichnung.'</text>';
 		$i++;
 	}
+	
+	echo'<text x="10%" y="'.((($i+1)*50)+$startY).'" style="font-size:16px">Projekt: '.$projekt->titel.'</text>';
 	
 	// aktuelle KW markieren
 	$timestamp_now = time();

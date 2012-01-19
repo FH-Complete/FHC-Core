@@ -179,6 +179,8 @@ function treeProjektmenueSelect()
 		{
 			debug("whoops Documents load failed with exception: "+e);
 		}
+		// Gantt Chart laden
+		drawGantt();
 	}
 	else
 	{
