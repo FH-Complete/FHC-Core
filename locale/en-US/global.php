@@ -128,7 +128,7 @@ $this->phrasen['global/dateiErfolgreichHochgeladen']='File successfully uploaded
 $this->phrasen['global/dateiNichtErfolgreichHochgeladen']='Failed to upload File. Please retry';
 $this->phrasen['global/FuerDieseAktionBenoetigenSieAdministrationsrechte']='You must be Administrator.';
 $this->phrasen['global/dateiExistiertNicht']='File not found';
-$this->phrasen['global/fehlerBeimAktualisierenDerDaten']='Fehler beim Aktualiseren der Daten';
+$this->phrasen['global/fehlerBeimAktualisierenDerDaten']='Error updating the data. ';
 
 //infrastruktur
 
