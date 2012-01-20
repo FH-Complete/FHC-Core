@@ -24,6 +24,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
  */
 
 require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/phrasen.class.php');
+
+	$sprache = getSprache(); 
+	$p=new phrasen($sprache);
+
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -86,10 +91,10 @@ require_once('../../../config/cis.config.inc.php');
 			
 </head>
 <body>
-	<h1>Applikationsliste</h1>
+	<h1><?php echo $p->t('tools/applikationsliste');?></h1>
 	<table>
 	<tr>
-		<td><br/>Nähere Informationen zu Softgrid sowie eine Installationsanleitung finden Sie unter "Infrastruktur - SoftGrid".<br/><br/></td>
+		<td><br/><?php echo $p->t('tools/naehereInformationenfindenSieUnter');?>.<br/><br/></td>
 	</tr>
 	</table>
 <?php
@@ -109,17 +114,17 @@ require_once('../../../config/cis.config.inc.php');
 									
 	if (!is_file($cXMLFile) && !stristr($cXMLFile,'http') )
 	{
-		die('Datei '.$cXMLFile.' wurde nicht gefunden!');
+		die($p->t('tools/datei') .$cXMLFile. $p->t('tools/wurdeNichtGefunden'));
 	}		
 
     if (!$xml = (Array)simplexml_load_file($cXMLFile))
 	{
-		die('Fehler beim Datei '.$cXMLFile.' lesen!');
+		die($p->t('tools/fehlerBeimLesenDerDatei').$cXMLFile);
 	}
 	
     if (!isset($xml['APP']))
 	{
-		die('Keine Daten gefunden.');
+		die($p->t('tools/keineDatenGefunden'));
 	}
 
 	$arrAPPMENUE=array();
@@ -253,7 +258,7 @@ require_once('../../../config/cis.config.inc.php');
 	$cHTML.='<table class="container">'; 
 
 	$bNaechsteReihe=true;
-	$cHTML.='<tr><th>Einzelanwendung</th><th>Softwarepaket</th></tr>'; 
+	$cHTML.='<tr><th>'.$p->t('tools/einzelanwendung').'</th><th>'.$p->t('tools/softwarepaket').'</th></tr>'; 
 	$cHTML.='<tr valign="top"><td><table class="container">'; 
 
 	reset($arrAPPMENUE);
