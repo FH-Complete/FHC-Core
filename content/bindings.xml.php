@@ -603,6 +603,19 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			  <xul:toolbarbutton tooltiptext="Linksbündig" image="../skin/images/justifyleft.png" oncommand="document.getBindingParent(this).setJustifyLeft()"/>
 			  <xul:toolbarbutton tooltiptext="Zentriert" image="../skin/images/justifycenter.png" oncommand="document.getBindingParent(this).setJustifyCenter()"/>
 			  <xul:toolbarbutton tooltiptext="Rechtsbündig" image="../skin/images/justifyright.png" oncommand="document.getBindingParent(this).setJustifyRight()"/>
+			  <xul:toolbarseparator />
+			  <xul:toolbarbutton label="Format" type="menu">							
+			      <xul:menupopup>
+					    <xul:menuitem label="Normal" oncommand="document.getBindingParent(this).setFormatblock('&lt;p&gt;')"/>
+						<xul:menuitem label="Heading 1" oncommand="document.getBindingParent(this).setFormatblock('&lt;h1&gt;')"/>
+						<xul:menuitem label="Heading 2" oncommand="document.getBindingParent(this).setFormatblock('&lt;h2&gt;')"/>
+						<xul:menuitem label="Heading 3" oncommand="document.getBindingParent(this).setFormatblock('&lt;h3&gt;')"/>
+						<xul:menuitem label="Heading 4" oncommand="document.getBindingParent(this).setFormatblock('&lt;h4&gt;')"/>
+						<xul:menuitem label="Heading 5" oncommand="document.getBindingParent(this).setFormatblock('&lt;h5&gt;')"/>
+						<xul:menuitem label="Heading 6" oncommand="document.getBindingParent(this).setFormatblock('&lt;h6&gt;')"/>
+						<xul:menuitem label="Formatted" oncommand="document.getBindingParent(this).setFormatblock('&lt;pre&gt;')"/>
+			      </xul:menupopup>
+			  </xul:toolbarbutton>
 			</xul:toolbar>
 			<html:iframe anonid="wysiwyg-editor" editortype="html" src="about:blank" flex="1" type="content-primary" style="min-width: 100px; min-height: 100px; border: 1px solid gray;"/>
 		</xul:vbox>
@@ -685,6 +698,16 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 				editor = document.getAnonymousElementByAttribute(this ,'anonid', 'wysiwyg-editor');
 				editor.contentDocument.execCommand("italic", false, null);
+			]]>
+			</body>
+		</method>
+		<method name="setFormatblock">
+			<parameter name="type" />
+			<body>
+			<![CDATA[
+				netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+				editor = document.getAnonymousElementByAttribute(this ,'anonid', 'wysiwyg-editor');
+				editor.contentDocument.execCommand("formatblock", false, type);
 			]]>
 			</body>
 		</method>
