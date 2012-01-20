@@ -88,6 +88,7 @@ $datum_obj = new datum();
 		$content_id = $_POST['content_id'];
 		$gueltigvon = $_POST['gueltigvon'];
 		$gueltigbis = $_POST['gueltigbis'];
+		$refreshzeit = $_POST['refreshzeit'];
 			
 		$infoscreen = new infoscreen();
 		if($infoscreen_content_id!='')
@@ -106,6 +107,7 @@ $datum_obj = new datum();
 		$infoscreen->content_id = $content_id;
 		$infoscreen->gueltigvon = $datum_obj->formatDatum($gueltigvon,'Y-m-d H:i:s');
 		$infoscreen->gueltigbis = $datum_obj->formatDatum($gueltigbis,'Y-m-d H:i:s');
+		$infoscreen->refreshzeit = $refreshzeit;
 		$infoscreen->updateamum = date('Y-m-d H:i:s');
 		$infoscreen->updatevon = $user;
 		
@@ -159,6 +161,10 @@ $datum_obj = new datum();
 			<td><input type="text" size="18" name="gueltigbis" value="',$db->convert_html_chars($datum_obj->formatDatum($infoscreen->gueltigbis,'d.m.Y H:i:s')),'" /> ( Format: ',date('d.m.Y H:i:s'),' )</td>
 		</tr>
 		<tr>
+			<td>Refreshzeit</td>
+			<td><input type="text" size="18" name="refreshzeit" value="',$db->convert_html_chars($infoscreen->refreshzeit),'" /> Zeit wie lange die Seite angezeigt wird (in Sekunden)</td>
+		</tr>
+		<tr>
 			<td></td>
 			<td><input type="submit" value="Speichern" /></td>
 		</tr>
@@ -176,6 +182,7 @@ $datum_obj = new datum();
 				<th>ContentID</th>
 				<th>Gültig von</th>
 				<th>Gültig bis</th>
+				<th>Refreshzeit</th>
 				<th colspan="2">Aktion</th>
 			</tr>
 			</thead>
@@ -189,6 +196,7 @@ $datum_obj = new datum();
 		echo '<td>',$db->convert_html_chars($row->content_id),'</td>';
 		echo '<td>',$db->convert_html_chars($datum_obj->formatDatum($row->gueltigvon,'d.m.Y H:i:s')),'</td>';		
 		echo '<td>',$db->convert_html_chars($datum_obj->formatDatum($row->gueltigbis,'d.m.Y H:i:s')),'</td>';
+		echo '<td>',$db->convert_html_chars($row->refreshzeit),'</td>';
 		echo '<td><a href="infoscreen_details.php?action=update&infoscreen_id=',$db->convert_html_chars($infoscreen_id),'&infoscreen_content_id=',$db->convert_html_chars($row->infoscreen_content_id),'">bearbeiten</a>';
 		echo '<td><a href="infoscreen_details.php?action=delete&infoscreen_id=',$db->convert_html_chars($infoscreen_id),'&infoscreen_content_id=',$db->convert_html_chars($row->infoscreen_content_id),'">entfernen</a>';
 		echo '</tr>';

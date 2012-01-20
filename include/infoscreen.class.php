@@ -34,6 +34,7 @@ class infoscreen extends basis_db
 	public $content_id;
 	public $gueltigvon;
 	public $gueltigbis;
+	public $refreshzeit;
 	public $insertamum;
 	public $insertvon;
 	public $updateamum;
@@ -115,6 +116,7 @@ class infoscreen extends basis_db
 				$this->content_id = $row->content_id;
 				$this->gueltigvon = $row->gueltigvon;
 				$this->gueltigbis = $row->gueltigbis;
+				$this->refreshzeit = $row->refreshzeit;
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
@@ -140,7 +142,7 @@ class infoscreen extends basis_db
 	 */
 	public function getAll()
 	{
-		$qry = "SELECT * FROM campus.tbl_infoscreen";
+		$qry = "SELECT * FROM campus.tbl_infoscreen ORDER BY bezeichnung";
 		
 		if($result = $this->db_query($qry))
 		{
@@ -240,11 +242,12 @@ class infoscreen extends basis_db
 		if($new)
 		{
 			$qry = "BEGIN;INSERT INTO campus.tbl_infoscreen_content(infoscreen_id, content_id, 
-					gueltigvon, gueltigbis, insertamum, insertvon, updateamum, updatevon) VALUES(".
+					gueltigvon, gueltigbis, refreshzeit, insertamum, insertvon, updateamum, updatevon) VALUES(".
 					$this->addslashes($this->infoscreen_id).','.
 					$this->addslashes($this->content_id).','.
 					$this->addslashes($this->gueltigvon).','.
 					$this->addslashes($this->gueltigbis).','.
+					$this->addslashes($this->refreshzeit).','.
 					$this->addslashes($this->insertamum).','.
 					$this->addslashes($this->insertvon).','.
 					$this->addslashes($this->updateamum).','.
@@ -257,6 +260,7 @@ class infoscreen extends basis_db
 					' content_id='.$this->addslashes($this->content_id).','.
 					' gueltigvon='.$this->addslashes($this->gueltigvon).','.
 					' gueltigbis='.$this->addslashes($this->gueltigbis).','.
+					' refreshzeit='.$this->addslashes($this->refreshzeit).','.
 					' updateamum='.$this->addslashes($this->updateamum).','.
 					' updatevon='.$this->addslashes($this->updatevon).' '.
 					' WHERE infoscreen_content_id='.$this->addslashes($this->infoscreen_content_id).';';
@@ -352,6 +356,7 @@ class infoscreen extends basis_db
 			$qry.="
 					AND (gueltigvon<=now() OR gueltigvon is null)
 					AND (gueltigbis>=now() OR gueltigbis is null)";
+		$qry.=" ORDER BY infoscreen_content_id";
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
@@ -363,6 +368,7 @@ class infoscreen extends basis_db
 				$obj->content_id = $row->content_id;
 				$obj->gueltigvon = $row->gueltigvon;
 				$obj->gueltigbis = $row->gueltigbis;
+				$obj->refreshzeit = $row->refreshzeit;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
