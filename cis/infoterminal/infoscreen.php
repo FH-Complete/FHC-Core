@@ -27,12 +27,71 @@ require_once('../../include/infoscreen.class.php');
 header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
 header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 
+if(isset($_GET['ipadresse']))
+	$ip = $_GET['ipadresse'];
+else
+	$ip = $_SERVER["REMOTE_ADDR"];
+$infoscreen = new infoscreen();
+$i=0;
+$refreshzeit = 60; // Default Refreshzeit
+
+$refreshzeiten[0]=$refreshzeit; //Refreshzeit fuer News
+$infoscreen_content[0]=-1;
+$aktuellerContentIdx=0;
+
+//Cookie erhaelt zusaetzlich die IP im Namen damit bei der Preview keine Konflikte entstehen
+$cookie = 'infoscreenContent'.str_replace('-','',str_replace('.','',$ip));
+
+//zuletzt angezeigte Seite des Terminals ermitteln 
+if(isset($_COOKIE[$cookie]))
+{
+	$lastinfoscreencontent = $_COOKIE[$cookie];
+}
+else
+{
+	$lastinfoscreencontent = -1;
+	$aktuellerContentIdx = 0;
+}
+	
+if($infoscreen->getInfoscreen($ip))
+{
+	$infoscreen_id = $infoscreen->infoscreen_id;
+	$infoscreen->getScreenContent($infoscreen_id);
+	foreach($infoscreen->result as $row)
+	{
+		$i++;
+		$content[$i] = $row->content_id;
+		$infoscreen_content[$i] = $row->infoscreen_content_id;
+		$refreshzeiten[$i] = $row->refreshzeit;
+		if($row->infoscreen_content_id==$lastinfoscreencontent)
+		{
+			$aktuellerContentIdx=$i+1;
+		}
+	}
+}
+if($aktuellerContentIdx==0 && $i>0)
+	$aktuellerContentIdx=1;
+if($aktuellerContentIdx>$i)
+	$aktuellerContentIdx=0;
+
+if(isset($refreshzeiten[$aktuellerContentIdx]) && $refreshzeiten[$aktuellerContentIdx]!='')
+	$refreshzeit = $refreshzeiten[$aktuellerContentIdx];	
+
+//echo "ScreenID: $infoscreen->infoscreen_id";
+//echo "last: $lastinfoscreencontent\n";
+//echo "current: $infoscreen_content[$aktuellerContentIdx]\n";
+//echo "current index: $aktuellerContentIdx\n";
+//echo "refreshzeit: $refreshzeit\n";
+
+// Cookie enthaelt die zuletzt angezeigte Seite
+setcookie($cookie,$infoscreen_content[$aktuellerContentIdx],time()+3600*24);
+
 echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta http-equiv="refresh" content="60">
+<meta http-equiv="refresh" content="',$refreshzeit,'">
 <link href="../../skin/infoscreen.css" rel="stylesheet" type="text/css">
 <title>Infoscreen</title>
 <style type="text/css">
@@ -53,29 +112,10 @@ echo '
 
 <body>';
 
-$ip = $_SERVER["REMOTE_ADDR"];
-$infoscreen = new infoscreen();
-$i=0;
-if($infoscreen->getInfoscreen($ip))
+if($aktuellerContentIdx!=0)
 {
-	$infoscreen_id = $infoscreen->infoscreen_id;
-	$infoscreen->getScreenContent($infoscreen_id);
-	foreach($infoscreen->result as $row)
-	{
-		$i++;
-		$content[$i] = $row->content_id;
-	}
-	//echo "screen: $infoscreen_id";
-	//echo "ip: ".$ip;
-}
-
-$zuf = rand(0,$i);
-//echo 'zuf:'.$zuf.' i:'.$i.'<br>';
-//var_dump($content);
-//echo 'show content:'.$content[$zuf].' - '.$zuf;
-if($zuf!=0)
-{
-	echo '<center style="height: 100%"><iframe src="../../cms/content.php?content_id='.$content[$zuf].'"></center>';
+	
+	echo '<center style="height: 100%"><iframe src="../../cms/content.php?content_id='.$content[$aktuellerContentIdx].'"></center>';
 }
 else
 {

@@ -61,6 +61,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <body>
 <h2>Infoscreen &Uuml;bersicht</h2>
 <div style="text-align:right">
+	<a href="infoscreen_preview.php" target="main">Übersicht anzeigen</a>&nbsp;|&nbsp;
 	<a href="infoscreen_uebersicht.php?action=new" target="uebersicht_infoscreen">Neuen Infoscreen hinzufügen</a>
 </div>';
 

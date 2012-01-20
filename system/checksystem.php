@@ -3134,6 +3134,7 @@ if(!@$db->db_query("SELECT 1 FROM campus.tbl_infoscreen LIMIT 1"))
 		content_id integer NOT NULL,
 		gueltigvon timestamp,
 		gueltigbis timestamp,
+		refreshzeit smallint,
 		insertamum timestamp,
 		insertvon varchar(32),
 		updateamum timestamp,
