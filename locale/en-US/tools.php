@@ -26,10 +26,10 @@ $this->phrasen['tools/offen']='outstanding';
 $this->phrasen['tools/keineZahlungenVorhanden']='Currently there are no payments';
 
 //Ampeln
-$this->phrasen['tools/ampelsystem']='Ampelsystem';
-$this->phrasen['tools/ampel']='Ampel';
-$this->phrasen['tools/nichtZugeteilt']='Sie sind nicht zu dieser Ampel zugeteilt';
-$this->phrasen['tools/ampelNichtGefunden']='Die angegeben Ampel wurde nicht gefunden';
+$this->phrasen['tools/ampelsystem']='Notification System';
+$this->phrasen['tools/ampel']='Notification';
+$this->phrasen['tools/nichtZugeteilt']='You have not been assigned to this notification';
+$this->phrasen['tools/ampelNichtGefunden']='The specified notification could not be found';
 $this->phrasen['tools/ampelStatus']='Status';
 $this->phrasen['tools/ampelBeschreibung']='Description';
 $this->phrasen['tools/ampelDeadline']='Deadline';
@@ -38,6 +38,16 @@ $this->phrasen['tools/ampelBestaetigen']='confirm';
 $this->phrasen['tools/ampelBestaetigt']='confirmed';
 $this->phrasen['tools/ampelMitarbeiter']='Employee';
 $this->phrasen['tools/ampelRestdauer']='Remaining Days';
-$this->phrasen['tools/ampelBestaetigtAm']='Bestätigt am';
-$this->phrasen['tools/ampelBereitsBestaetigt']='Diese Ampel wurde bereits bestätigt';
+$this->phrasen['tools/ampelBestaetigtAm']='Confirmed on';
+$this->phrasen['tools/ampelBereitsBestaetigt']='This notification has already been confirmed';
+
+//Software fuer Lehre -> Softgrid
+$this->phrasen['tools/applikationsliste']='List of Applications';
+$this->phrasen['tools/naehereInformationenfindenSieUnter']='You will find more detailed information about Softgrid and an installation guide under “Infrastructure - SoftGrid.”';
+$this->phrasen['tools/einzelanwendung']='Application';
+$this->phrasen['tools/softwarepaket']='Softwarepackage';
+$this->phrasen['tools/datei']='File ';
+$this->phrasen['tools/wurdeNichtGefunden']=' was not found!';
+$this->phrasen['tools/fehlerBeimLesenDerDatei']='Error reading file ';
+$this->phrasen['tools/keineDatenGefunden']='No data found';
 ?>

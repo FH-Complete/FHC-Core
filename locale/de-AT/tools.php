@@ -40,4 +40,14 @@ $this->phrasen['tools/ampelMitarbeiter']='Mitarbeiter';
 $this->phrasen['tools/ampelRestdauer']='Restdauer in Tagen';
 $this->phrasen['tools/ampelBestaetigtAm']='Bestätigt am';
 $this->phrasen['tools/ampelBereitsBestaetigt']='Diese Ampel wurde bereits bestätigt';
+
+//Software fuer Lehre -> Softgrid
+$this->phrasen['tools/applikationsliste']='Applikationsliste';
+$this->phrasen['tools/naehereInformationenfindenSieUnter']='Nähere Informationen zu Softgrid sowie eine Installationsanleitung finden Sie unter "Infrastruktur - SoftGrid"';
+$this->phrasen['tools/einzelanwendung']='Einzelanwendung';
+$this->phrasen['tools/softwarepaket']='Softwarepaket';
+$this->phrasen['tools/datei']='Datei ';
+$this->phrasen['tools/wurdeNichtGefunden']=' wurde nicht gefunden!';
+$this->phrasen['tools/fehlerBeimLesenDerDatei']='Fehler beim Lesen der Datei ';
+$this->phrasen['tools/keineDatenGefunden']='Keine Daten gefunden';
 ?>

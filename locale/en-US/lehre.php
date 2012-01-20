@@ -2,7 +2,7 @@
 $this->phrasen['lehre/keineLektorenZugeordnet']='Currently there are no lecturers assigned for this subject';
 
 $this->phrasen['lehre/lehrveranstaltungsinformation']='Course Information';
-$this->phrasen['lehre/lvInfoBearbeiten']='edit';
+$this->phrasen['lehre/lvInfoBearbeiten']='Edit';
 
 $this->phrasen['lehre/semesterplan']='Semesterplan';
 $this->phrasen['lehre/semesterplanUpload']='Upload';
