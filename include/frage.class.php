@@ -277,6 +277,42 @@ class frage extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Liefert die Fragen eines Gebietes
+	 *
+	 * @param $gebiet_id
+	 * @return true wenn ok, sonst false
+	 */
+	public function getFragenGebiet($gebiet_id)
+	{
+		$qry = "SELECT * FROM testtool.tbl_frage 
+				WHERE gebiet_id='".addslashes($gebiet_id)."' ORDER BY nummer";
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new frage();
+				
+				$obj->frage_id = $row->frage_id;
+				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
+				$obj->gebiet_id = $row->gebiet_id;
+				$obj->level = $row->level;
+				$obj->nummer = $row->nummer;
+				$obj->demo = ($row->demo=='t'?true:false);
+				
+				$this->result[] = $obj;
+			}
+			
+			return true;			
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 
 	/**
 	 * Laedt die naechste Frage eines Gebiets
