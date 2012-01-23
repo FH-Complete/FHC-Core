@@ -17,17 +17,17 @@
  *
  * Authors: Karl Burkhart <burkhart@technikum-wien.at>,
  */
-require_once("../../config/vilesci.config.inc.php");
-require_once("../../include/gebiet.class.php");
-require_once("../../include/frage.class.php");
-require_once("../../include/vorschlag.class.php");
+require_once("../../../config/cis.config.inc.php");
+require_once("../../../include/gebiet.class.php");
+require_once("../../../include/frage.class.php");
+require_once("../../../include/vorschlag.class.php");
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>Testool Fragen Übersicht</title>
-	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
+	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
 <body>
 <?php 
@@ -46,7 +46,7 @@ foreach ($gebiet->result as $gebietResult)
 	$selected ='';
 	if($Auswahlgebiet == $gebietResult->gebiet_id)
 		$selected = 'selected';	
-	echo '<option value="'.$gebietResult->gebiet_id.'" '.$selected.'>'.$gebietResult->gebiet_id.' - '.$gebietResult->bezeichnung.'</option>';
+	echo '<option value="'.$gebietResult->gebiet_id.'" '.$selected.'>'.$gebietResult->gebiet_id.' - '.$gebietResult->bezeichnung.' - '.$gebietResult->kurzbz.'</option>';
 }
 echo '</select></td></tr>
 <tr>
@@ -61,7 +61,7 @@ if($sprache == 'English')
 else
 	echo '<option value="English">Englisch</option>';
 
-	echo'</select>
+echo'</select>
 </td>
 <tr>
 <td colspan="2"><input type="submit" value="Anzeigen"></td></tr>
@@ -86,7 +86,7 @@ if(isset($_REQUEST['AuswahlGebiet']))
 		
 		// Bild einbinden wenn vorhanden
 		if($spracheFrage->bild!='')
-				echo "<img class='testtoolfrage' src='bild.php?src=frage&amp;frage_id=$spracheFrage->frage_id&amp;sprache=".$sprache."' /><br/><br/>\n";
+				echo "<img class='testtoolfrage' src='../bild.php?src=frage&amp;frage_id=$spracheFrage->frage_id&amp;sprache=".$sprache."' /><br/><br/>\n";
 				
 			//Sound einbinden
 		if($spracheFrage->audio!='')
@@ -95,7 +95,7 @@ if(isset($_REQUEST['AuswahlGebiet']))
 			<script language="JavaScript" src="audio-player/audio-player.js"></script>
 			<object type="application/x-shockwave-flash" data="audio-player/player.swf" id="audioplayer1" height="24" width="290">
 			<param name="movie" value="audio_player/player.swf" />
-			<param name="FlashVars" value="playerID=audioplayer1&amp;soundFile=sound.php%3Fsrc%3Dfrage%26frage_id%3D'.$sprachefrage->frage_id.'%26sprache%3D'.$sprache.'" />
+			<param name="FlashVars" value="playerID=audioplayer1&amp;soundFile=../sound.php%3Fsrc%3Dfrage%26frage_id%3D'.$sprachefrage->frage_id.'%26sprache%3D'.$sprache.'" />
 			<param name="quality" value="high" />
 			<param name="menu" value="false" />
 			<param name="wmode" value="transparent" />
@@ -119,7 +119,7 @@ if(isset($_REQUEST['AuswahlGebiet']))
 				if($anzahlBild%4==0)
 					echo "</tr>";
 				echo "<td>";
-				echo "<img class='testtoolvorschlag' src='bild.php?src=vorschlag&amp;vorschlag_id=$vor->vorschlag_id&amp;sprache=".$sprache."' /><br/>";
+				echo "<img class='testtoolvorschlag' src='../bild.php?src=vorschlag&amp;vorschlag_id=$vor->vorschlag_id&amp;sprache=".$sprache."' /><br/>";
 				echo "<br>".$vor->punkte."</td>";
 				$anzahlBild++;
 			}
@@ -129,7 +129,7 @@ if(isset($_REQUEST['AuswahlGebiet']))
 				<script language="JavaScript" src="audio-player/audio-player.js"></script>
 				<object type="application/x-shockwave-flash" data="audio-player/player.swf" id="audioplayer1" height="24" width="290">
 				<param name="movie" value="audio_player/player.swf" />
-				<param name="FlashVars" value="playerID=audioplayer1&amp;soundFile=sound.php%3Fsrc%3Dvorschlag%26vorschlag_id%3D'.$vorschlag->vorschlag_id.'%26sprache%3D'.$_SESSION['sprache'].'" />
+				<param name="FlashVars" value="playerID=audioplayer1&amp;soundFile=../sound.php%3Fsrc%3Dvorschlag%26vorschlag_id%3D'.$vorschlag->vorschlag_id.'%26sprache%3D'.$_SESSION['sprache'].'" />
 				<param name="quality" value="high" />
 				<param name="menu" value="false" />
 				<param name="wmode" value="transparent" />
