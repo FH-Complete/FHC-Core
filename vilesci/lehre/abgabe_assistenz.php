@@ -407,7 +407,7 @@ function btserienmail(trenner, stgbez)
 
 <body class="background_main">
 <?php 
-echo "<h2><div style='float:left'>Bachelor-/Diplomarbeitsbetreuungen (Studiengang $stg_kz, $stgbez)</div><div style='text-align: right;'><a href='../../cis/private/info/handbuecher/Projektarbeitsabgabe_FHTW_Anleitung_A.pdf' target='_blank'><img src='../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0>&nbsp;Handbuch</a></div></h2>";
+echo "<h2><div style='float:left'>Bachelor-/Diplomarbeitsbetreuungen (Studiengang $stg_kz, $stgbez)</div><div style='text-align: right;'><a href='../../cms/dms.php?id=963' target='_blank'><img src='../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0>&nbsp;Handbuch</a></div></h2>";
 
 echo $htmlstr;
 ?>
