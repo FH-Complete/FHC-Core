@@ -107,6 +107,8 @@ function GetStipendienbezieherStip($parameters)
 			
 				$konto = new konto(); 
 				$studGebuehr = $konto->getStudiengebuehrGesamt($studentUID, $studSemester);
+				// , als Dezimaltrennzeichen
+				$studGebuehr = str_replace('.', ',', $studGebuehr); 
 				
 				if($BezieherStip->Typ == "as" || $BezieherStip->Typ == "AS")
 				{
@@ -155,7 +157,7 @@ function GetStipendienbezieherStip($parameters)
 		}else
 		return new SoapFault("Server", $StipBezieher->errormsg);	
 	}
-	$ret = array("ErhKz"=>$ErhalterKz,"AnfragedatenID"=>$AnfrageDatenID, "Stipendiumsbezieher"=>$StipBezieherAntwort);
+	$ret = array("GetStipendienbezieherStipResult" =>array("ErhKz"=>$ErhalterKz,"AnfragedatenID"=>$AnfrageDatenID, "Stipendiumsbezieher"=>$StipBezieherAntwort));
 	return $ret; 
 }
 
@@ -168,15 +170,15 @@ function SendStipendienbezieherStipError($parameters)
 {
 	$xmlData = file_get_contents('php://input'); 
 	
-/*	$log = new webservicelog(); 
+	$log = new webservicelog(); 
 	$log->request_data = file_get_contents('php://input'); 
 	$log->webservicetyp_kurzbz = 'stip'; 
-	$log->request_id = $AnfrageDatenID; 
-	$log->beschreibung = "Error von Stip"; 
-	$log->save(true);*/
+	//$log->request_id = $AnfrageDatenID; 
+	$log->beschreibung = "Stip Error"; 
+	$log->save(true);
 	
-	$mail = new mail(MAIL_ADMIN, 'vilesci.technikum-wien.at', 'STIP - Error', $xmlData);
-	$mail->send(); 
+	$mail = new mail('burkhart@technikum-wien.at', 'vilesci.technikum-wien.at', 'STIP - Error', $xmlData);
+	$mail->send();
 }
 
 ?>
