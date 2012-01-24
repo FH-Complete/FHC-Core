@@ -64,7 +64,7 @@ require_once('stip.class.php');
 
 if(isset($_REQUEST['submit']))
 {
-	$client = new SoapClient(APP_ROOT."/soap/stip.wsdl.php?".microtime()); 
+	$client = new SoapClient("https://cis.technikum-wien.at/soap/stip.wsdl.php?".microtime()); 
 	//$client = new SoapClient(APP_ROOT."/soap/stip.soap.wsdl", array('login'=>'stip','password'=>'stip'));
 	
 	$username = "test";
@@ -110,7 +110,7 @@ if(isset($_REQUEST['submit']))
 		$response_stip = $client->GetStipendienbezieherStip(array("userName"=>$username,"passWord"=>$passwort,"anfrageDaten"=>array("ErhKz"=>$ErhKz, "AnfragedatenID"=>$AnfragedatenID,"Stipendiumsbezieher"=>array($bezieher))));
 		var_dump($response_stip);
 		echo '<hr>';
-		var_dump($response_stip->Stipendiumsbezieher->StipendiumsbezieherAntwort);
+		//var_dump($response_stip->Stipendiumsbezieher->StipendiumsbezieherAntwort);
 		
 		$response_error = $client->SendStipendienbezieherStipError(array("userName"=>"abc", "passWord"=>"test", "errorReport"=>array("ErhKz"=>"erhkz", "StateCode"=>"statecode", "StateMessage"=>"statemessage", "ErrorStatusCode"=>"errorstatuscode", "JobID"=>"jobid", "ErrorContent"=>array($obj))));
 		var_dump($response_error);
@@ -173,7 +173,7 @@ anfrageDaten.appendChild(stipendiumsbezieher);
 soapBody.appendChild(anfrageDaten);
 var sr = new SOAPRequest("GetStipendienbezieherStip",soapBody);
 sr.addNamespace('ns1','http://www.fhr.ac.at/BISWS/STIP/WebServices/Services/STIPServiceDecentralized');
-SOAPClient.Proxy="<?php echo APP_ROOT;?>/soap/stip.soap.php?"+gettimestamp();
+SOAPClient.Proxy="https://cis.technikum-wien.at/soap/stip.soap.php?"+gettimestamp();
 
 SOAPClient.SendRequest(sr, clb_saveProjektphase);
 }

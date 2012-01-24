@@ -65,22 +65,20 @@ echo "<?xml version='1.0' encoding='utf-8' ?>";
           </s:extension>
         </s:complexContent>
       </s:complexType>
-
       <s:element name="GetStipendienbezieherStipResponse">
         <s:complexType>
           <s:sequence>
-          	<s:element minOccurs="0" maxOccurs="1" name="ErhKz" type="s:string"/>
-          	<s:element minOccurs="0" maxOccurs="1" name="AnfragedatenID" type="s:string"/>
-         	<s:element minOccurs="0" maxOccurs="1" name="Stipendiumsbezieher" type="tns:ArrayOfStipendiumsbezieherAntwort"/>
+            <s:element minOccurs="0" maxOccurs="1" name="GetStipendienbezieherStipResult" type="tns:GetStipendienbezieherStipResponse"/>
           </s:sequence>
         </s:complexType>
       </s:element>
-      <!-- <s:complexType name="GetStipendienbezieherStipResponse">
+      <s:complexType name="GetStipendienbezieherStipResponse">
         <s:sequence>
-          <s:element maxOccurs="1" name="ErhKz" type="s:string"/>
-          <s:element maxOccurs="1" name="AnfragedatenID" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="ErhKz" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="AnfragedatenID" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Stipendiumsbezieher" type="tns:ArrayOfStipendiumsbezieherAntwort"/>
         </s:sequence>
-      </s:complexType> -->
+      </s:complexType>
       <s:complexType name="ArrayOfStipendiumsbezieherAntwort">
         <s:sequence>
           <s:element minOccurs="0" maxOccurs="unbounded" name="StipendiumsbezieherAntwort" nillable="true" type="tns:StipendiumsbezieherAntwort"/>
