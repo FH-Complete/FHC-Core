@@ -32,6 +32,7 @@ require_once('../../../include/betriebsmittel.class.php');
 require_once('../../../include/betriebsmittelperson.class.php');
 require_once('../../../include/betriebsmitteltyp.class.php');  
 require_once('../../../include/phrasen.class.php');
+require_once('../../../include/betriebsmittel_betriebsmittelstatus.class.php');
 
 $sprache = getSprache(); 
 $p=new phrasen($sprache);
@@ -334,11 +335,18 @@ $nr_mg=$db->db_num_rows($erg_mg);
 		            {
 		                if (empty($oBetriebsmittelperson->result[$i]->retouram) )
 		                {
+		                	$bm = new betriebsmittel_betriebsmittelstatus();
+		                	if($bm->load_last_betriebsmittel_id($oBetriebsmittelperson->result[$i]->betriebsmittel_id) 
+		                	&& $bm->betriebsmittelstatus_kurzbz<>'vorhanden')
+		                	{
+		                		continue;
+		                	}		                	
 		      				echo "<tr class='liste1'>
 		      						<td>".$oBetriebsmittelperson->result[$i]->betriebsmitteltyp.' '.$oBetriebsmittelperson->result[$i]->beschreibung."</td>
 		      						<td>".$oBetriebsmittelperson->result[$i]->nummer.' '.$oBetriebsmittelperson->result[$i]->inventarnummer."</td>
 		      						<td>".$datum_obj->formatDatum($oBetriebsmittelperson->result[$i]->ausgegebenam,'d.m.Y')."</td>
 		      					</tr>";
+		                	
 		                }
 		            }
 		    		echo '</table>';
