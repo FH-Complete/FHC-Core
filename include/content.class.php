@@ -1234,5 +1234,46 @@ class content extends basis_db
 		}
 	}
 	
+	/**
+	 * Durchsucht den Content
+	 * 
+	 * @param array $searchItems
+	 */
+	public function search($searchItems)
+	{
+		$qry = "SELECT 
+					distinct on(content_id) *
+				FROM 
+					campus.tbl_contentsprache
+					JOIN campus.tbl_content USING(content_id)
+				WHERE 
+					sichtbar=true
+					AND aktiv=true
+					AND template_kurzbz IN('contentmittitel','contentohnetitel','redirect')";
+		foreach($searchItems as $value)
+			$qry.=" AND (lower(content::text) like lower('%".addslashes($value)."%')
+					OR lower(content::text) like lower('%".addslashes(htmlentities($value,ENT_NOQUOTES,'UTF-8'))."%'))";
+		$qry.=" ORDER BY content_id DESC";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new content();
+				$obj->content_id = $row->content_id;
+				$obj->content = $row->content;
+				$obj->titel = $row->titel;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}					
+	}
+	
 }
 ?>
