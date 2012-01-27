@@ -29,14 +29,18 @@
 	require_once('../../../include/datum.class.php');
 	require_once('../../../include/datum.class.php');
 	require_once('../../../include/projekt.class.php');
+	require_once('../../../include/phrasen.class.php'); 
+
+$sprache = getSprache(); 
+$p=new phrasen($sprache); 
 	
 	  if (!$db = new basis_db())
-	      die('Fehler beim Oeffnen der Datenbankverbindung');
+	      die($p->t("global/fehlerBeimOeffnenDerDatenbankverbindung"));
 echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>Zeitaufzeichnung</title>
+<title>'.$p->t("zeitaufzeichnung/zeitaufzeichnung").'</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
@@ -68,7 +72,7 @@ function foo(val)
 
 function confdel()
 {
-	return confirm("Wollen Sie diesen Datensatz wirklich loeschen?");
+	return confirm("'.$p->t("global/warnungWirklichLoeschen").'");
 }
 
 function loaduebersicht()
@@ -93,7 +97,7 @@ echo '<table class="tabcontent">
     <td>
     	<table class="tabcontent">
 	      <tr>
-	        <td class="ContentHeader"><font class="ContentHeader">Zeitaufzeichnung</font></td>
+	        <td class="ContentHeader"><font class="ContentHeader">'.$p->t("zeitaufzeichnung/zeitaufzeichnung").'</font></td>
 	      </tr>
 	    </table>
 	    <br>';
@@ -127,7 +131,7 @@ if(isset($_POST['save']) || isset($_POST['edit']))
 	if(isset($_POST['edit']))
 	{
 		if(!$zeit->load($zeitaufzeichnung_id))
-			die('Fehler beim Laden des Datensatzes');
+			die($p->t("global/fehlerBeimLadenDesDatensatzes"));
 		
 		$zeit->new = false;
 	}
@@ -151,11 +155,11 @@ if(isset($_POST['save']) || isset($_POST['edit']))
 	
 	if(!$zeit->save())
 	{
-		echo '<b>Fehler beim Speichern der Daten: '.$zeit->errormsg.'</b><br>';
+		echo '<b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': '.$zeit->errormsg.'</b><br>';
 	}
 	else 
 	{
-		echo '<b>Daten wurden gespeichert</b><br>';
+		echo '<b>'.$p->t("global/datenWurdenGespeichert").'</b><br>';
 		$zeitaufzeichnung_id = $zeit->zeitaufzeichnung_id;
 	}
 }
@@ -170,15 +174,15 @@ if(isset($_GET['type']) && $_GET['type']=='delete')
 		if($zeit->uid==$user)
 		{
 			if($zeit->delete($zeitaufzeichnung_id))
-				echo '<b>Eintrag wurde geloescht</b><br>';
+				echo '<b>'.$p->t("global/eintragWurdeGeloescht").'</b><br>';
 			else 
-				echo '<b>Fehler beim Loeschen des Eintrages</b><br>';
+				echo '<b>'.$p->t("global/fehlerBeimLoeschenDesEintrags").'</b><br>';
 		}
 		else 
-			echo '<b>Keine Berechtigung!</b><br>';
+			echo '<b>'.$p->t("global/keineBerechtigung").'!</b><br>';
 	}
 	else 
-		echo '<b>Datensatz wurde nicht gefunden</b><br>';
+		echo '<b>'.$p->t("global/datensatzWurdeNichtGefunden").'</b><br>';
 }
 
 //Laden der Daten zum aendern
@@ -201,7 +205,7 @@ if(isset($_GET['type']) && $_GET['type']=='edit')
 		}
 		else 
 		{
-			echo "<b> Keine Berechtigung zum Aendern des Datensatzes</b>";
+			echo "<b>".$p->t("global/keineBerechtigungZumAendernDesDatensatzes")."</b>";
 			$zeitaufzeichnung_id='';
 		}
 	}
@@ -217,17 +221,17 @@ if($projekt->getProjekteMitarbeiter($user))
 	{
 		$bn = new benutzer();
 		if(!$bn->load($user))
-			die("Benutzer $user wurde nicht gefunden");
+			die($p->t("zeitaufzeichnung/benutzerWurdeNichtGefunden",array($user)));
 			
-		echo "<table width='100%'><tr><td>Zeitaufzeichnung von <b>$bn->vorname $bn->nachname</b></td>
-		      <td align='right'><a href='".$_SERVER['PHP_SELF']."' class='Item'>NEU</a></td></tr></table>";
+		echo "<table width='100%'><tr><td>".$p->t("zeitaufzeichnung/zeitaufzeichnungVon")." <b>$bn->vorname $bn->nachname</b></td>
+		      <td align='right'><a href='".$_SERVER['PHP_SELF']."' class='Item'>".$p->t("zeitaufzeichnung/neu")."</a></td></tr></table>";
 		
 		//Formular
 		echo '<br><br><form action="'.$_SERVER['PHP_SELF'].'?zeitaufzeichnung_id='.$zeitaufzeichnung_id.'" method="POST">';
 		
 		echo '<table>';
 		//Projekt
-		echo '<tr><td>Projekt</td><td><SELECT name="projekt" id="projekt">';
+		echo '<tr><td>'.$p->t("zeitaufzeichnung/projekt").'</td><td><SELECT name="projekt" id="projekt">';
 		foreach($projekt->result as $row_projekt)
 		{
 			if($projekt_kurzbz == $row_projekt->projekt_kurzbz)
@@ -240,11 +244,11 @@ if($projekt->getProjekteMitarbeiter($user))
 		echo '</SELECT><input type="button" value="Uebersicht" onclick="loaduebersicht();"></td>';
 		
 		//Studiengang
-		echo '<td>Studiengang</td><td><SELECT name="studiengang">';
+		echo '<td>'.$p->t("global/studiengang").'</td><td><SELECT name="studiengang">';
 		$stg_obj = new studiengang();
 		$stg_obj->getAll('typ, kurzbz',false);
 		
-		echo "<option value=''>-- keine Auswahl --</option>";
+		echo "<option value=''>-- ".$p->t("zeitaufzeichnung/keineAuswahl")." --</option>";
 		
 		foreach ($stg_obj->result as $stg)
 		{
@@ -261,7 +265,7 @@ if($projekt->getProjekteMitarbeiter($user))
 		
 		//Aktivitaet
 		echo '<tr>';
-		echo '<td>Aktivit&auml;t</td><td>';
+		echo '<td>'.$p->t("zeitaufzeichnung/aktivitaet").'</td><td>';
 		
 		$qry = "SELECT * FROM fue.tbl_aktivitaet ORDER by beschreibung";
 		if($result = $db->db_query($qry))
@@ -279,8 +283,8 @@ if($projekt->getProjekteMitarbeiter($user))
 			echo '</SELECT>';
 		}
 		//Fachbereich
-		echo '</td><td>Fachbereich</td><td><SELECT name="fachbereich">';
-		echo '<option value="">-- keine Auswahl --</option>';
+		echo '</td><td>'.$p->t("global/institut").'</td><td><SELECT name="fachbereich">';
+		echo '<option value="">-- '.$p->t("zeitaufzeichnung/keineAuswahl").' --</option>';
 		
 		$fb_obj = new fachbereich();
 		$fb_obj->getAll();
@@ -299,17 +303,17 @@ if($projekt->getProjekteMitarbeiter($user))
 		//Start/Ende
 		echo '
 		<tr>
-			<td>Von</td><td><input type="text" id="von" name="von" value="'.$von.'"><input type="button" value="->"  onclick="uebernehmen()"></td>
-			<td>Bis</td><td><input type="text" id="bis" name="bis" value="'.$bis.'">&nbsp;&nbsp;<img src="../../../skin/images/refresh.png" onclick="setbisdatum()"></td>
+			<td>'.$p->t("global/von").'</td><td><input type="text" id="von" name="von" value="'.$von.'"><input type="button" value="->"  onclick="uebernehmen()"></td>
+			<td>'.$p->t("global/bis").'</td><td><input type="text" id="bis" name="bis" value="'.$bis.'">&nbsp;&nbsp;<img src="../../../skin/images/refresh.png" onclick="setbisdatum()"></td>
 		<tr>';
 		//Beschreibung
-		echo '<tr><td>Beschreibung</td><td colspan="3"><textarea name="beschreibung" cols="60">'.$beschreibung.'</textarea></td></tr>';
+		echo '<tr><td>'.$p->t("global/beschreibung").'</td><td colspan="3"><textarea name="beschreibung" cols="60">'.$beschreibung.'</textarea></td></tr>';
 		echo '<tr><td></td><td></td><td></td><td align="right">';
 		//SpeichernButton
 		if($zeitaufzeichnung_id=='')
-			echo '<input type="submit" value="Speichern" name="save"></td></tr>';
+			echo '<input type="submit" value="'.$p->t("global/speichern").'" name="save"></td></tr>';
 		else 
-			echo '<input type="submit" value="&Auml;ndern" name="edit"></td></tr>';
+			echo '<input type="submit" value="'.$p->t("global/aendern").'" name="edit"></td></tr>';
 		echo '</table>';
 		echo '</form>';
 		
@@ -318,13 +322,13 @@ if($projekt->getProjekteMitarbeiter($user))
 		//Uebersichtstabelle
 		echo "<table id='t1' class='liste table-autosort:4 table-stripeclass:alternate table-autostripe'>\n";
 		echo "   <thead><tr class='liste'>\n";
-	    echo "       <th class='table-sortable:numeric'>ID</th><th class='table-sortable:default'>Projekt</th>";
-	    echo "<th class='table-sortable:default'>Aktivitaet</th><th class='table-sortable:default'>User</th>";
-	    echo "<th class='table-sortable:default'>Start</th>";
-	    echo "<th class='table-sortable:default'>Ende</th>";
-	    echo "<th class='table-sortable:default'>Dauer</th>";
-	    echo "<th class='table-sortable:default'>Beschreibung</th><th class='table-sortable:default'>Stg</th>";
-	    echo "<th class='table-sortable:default'>FB</th><th colspan='2'>Aktion</th>";
+	    echo "       <th class='table-sortable:numeric'>".$p->t("zeitaufzeichnung/id")."</th><th class='table-sortable:default'>".$p->t("zeitaufzeichnung/projekt")."</th>";
+	    echo "<th class='table-sortable:default'>".$p->t("zeitaufzeichnung/aktivitaet")."</th><th class='table-sortable:default'>".$p->t("zeitaufzeichnung/user")."</th>";
+	    echo "<th class='table-sortable:default'>".$p->t("zeitaufzeichnung/start")."</th>";
+	    echo "<th class='table-sortable:default'>".$p->t("zeitaufzeichnung/ende")."</th>";
+	    echo "<th class='table-sortable:default'>".$p->t("zeitaufzeichnung/dauer")."</th>";
+	    echo "<th class='table-sortable:default'>".$p->t("global/beschreibung")."</th><th class='table-sortable:default'>".$p->t("lvplan/stg")."</th>";
+	    echo "<th class='table-sortable:default'>".$p->t("global/institut")."</th><th colspan='2'>".$p->t("global/aktion")."</th>";
 	    echo "   </tr></thead><tbody>\n";
 	    
 	    if(isset($_GET['filter']))
@@ -361,27 +365,27 @@ if($projekt->getProjekteMitarbeiter($user))
 		        echo "       <td>$row->fachbereich_kurzbz</td>\n";
 		        echo "       <td>";
 		        if(!isset($_GET['filter']) || $row->uid==$user)
-		        	echo "<a href='".$_SERVER['PHP_SELF']."?type=edit&zeitaufzeichnung_id=$row->zeitaufzeichnung_id' class='Item'>edit</a>";
+		        	echo "<a href='".$_SERVER['PHP_SELF']."?type=edit&zeitaufzeichnung_id=$row->zeitaufzeichnung_id' class='Item'>".$p->t("global/bearbeiten")."</a>";
 		        echo "</td>\n";
 		        echo "       <td>";
 		        if(!isset($_GET['filter']) || $row->uid==$user)
-		        	echo "<a href='".$_SERVER['PHP_SELF']."?type=delete&zeitaufzeichnung_id=$row->zeitaufzeichnung_id' class='Item'  onclick='return confdel()'>delete</a>";
+		        	echo "<a href='".$_SERVER['PHP_SELF']."?type=delete&zeitaufzeichnung_id=$row->zeitaufzeichnung_id' class='Item'  onclick='return confdel()'>".$p->t("global/loeschen")."</a>";
 		        echo "</td>\n";
 		        echo "   </tr>\n";
 		        $i++;
 		    }
 	    }
 	    echo "</tbody></table>\n";
-	    echo "Gesamtdauer: $summe";
+	    echo "".$p->t("zeitaufzeichnung/gesamtdauer").": $summe";
 	}
 	else 
 	{
-		echo 'Sie sind derzeit keinen Projekten zugeordnet';
+		echo $p->t("zeitaufzeichnung/sieSindDerzeitKeinenProjektenZugeordnet");
 	}
 }
 else 
 {
-	echo 'Fehler beim Ermitteln der Projekte';
+	echo $p->t("zeitaufzeichnung/fehlerBeimErmittelnDerProjekte");
 }
 
 ?>

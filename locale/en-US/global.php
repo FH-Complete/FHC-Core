@@ -129,6 +129,15 @@ $this->phrasen['global/dateiNichtErfolgreichHochgeladen']='Failed to upload File
 $this->phrasen['global/FuerDieseAktionBenoetigenSieAdministrationsrechte']='You must be Administrator.';
 $this->phrasen['global/dateiExistiertNicht']='File not found';
 $this->phrasen['global/fehlerBeimAktualisierenDerDaten']='Error updating the data. ';
+$this->phrasen['global/fehlerBeimLadenDesDatensatzes']='Error loading entries';
+$this->phrasen['global/fehlerBeimSpeichernDerDaten']='Error saving the data';
+$this->phrasen['global/datenWurdenGespeichert']='Data saved';
+$this->phrasen['global/eintragWurdeGeloescht']='Entry deleted';
+$this->phrasen['global/fehlerBeimLoeschenDesEintrags']='Error deleting entry';
+$this->phrasen['global/keineBerechtigung']='No authority';
+$this->phrasen['global/datensatzWurdeNichtGefunden']='Data not found';
+$this->phrasen['global/keineBerechtigungZumAendernDesDatensatzes']='You dont have the authority to change to data';
+$this->phrasen['global/test']='%s Zeitaufzeichnung von';
 
 //infrastruktur
 
