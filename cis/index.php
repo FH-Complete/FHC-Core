@@ -92,26 +92,27 @@ function loadampel()
 	 	<td width="100%" ></td>
 	 	<td width="100%" ></td>
 	 	<td></td>
+	 </tr>
 	<tr>
 	    <td width="170" class="tdwrap" onclick="self.location.href='index.php'">
 			<div class="home_logo">&nbsp;</div>
 	    </td>
-        <td id="header" colspan="2">
-    	    	<div class="header_line" ></div>
+        <td id="header" colspan="2" valign="top">
+    	    <div class="header_line" ></div>	
         </td>
-		<td nowrap >
-			<div style="font-size: 10px;"><i>Powered by <a href="http://fhcomplete.technikum-wien.at/" target="blank">FH Complete 2.0</a></i></div>
-		</td>
+        <td nowrap>
+        	<div style="font-size: 10px; text-align: right">
+        		<i>Powered by <a href="http://fhcomplete.technikum-wien.at/" target="blank">FH Complete 2.0</a></i>        		
+        	</div>
+        </td>
+        
 	</tr>
 	<tr>
 		<td></td>
-   	 <td align="right" nowrap  colspan="2">
-   	 <span id="ampel"></span>
-   	 <?php require_once('../include/'.EXT_FKT_PATH.'/cis_menu_global.inc.php'); 	?>
-   	 
-				</td>
-   	    <td align="right">
-   	    <?php
+   	 	<td align="right" nowrap  colspan="2">
+   	 		<span id="ampel"></span>
+   	 		<?php require_once('../include/'.EXT_FKT_PATH.'/cis_menu_global.inc.php'); 	?>
+   	 		    <?php
   
 				$sprache = new sprache();
 				$sprache->getAll(true);
@@ -119,14 +120,19 @@ function loadampel()
 				{
 					echo ' <a href="#'.$row->sprache.'" title="'.$row->sprache.'" onclick="changeSprache(\''.$row->sprache.'\'); return false;"><img src="../cms/image.php?src=flag&sprache='.$row->sprache.'" alt="'.$row->sprache.'"></a>';
 				}
-				?>
+			?>
+   	 	</td>
+   	    <td align="right" nowrap>
+			<form name="searchform" action="private/tools/suche.php" method="GET" target="content" style="display:inline">
+        	<input type="search" size="10" name="search" placeholder="Suchbegriff ..."/>
+        	<img src="../skin/images/search.png" height="14px" onclick="document.searchform.submit()" class="suchicon"/>
+        </form>
    	    </td>
 	</tr>
 </table>
 <iframe id="menue" src="<?php echo $menu; ?>" name="menu" frameborder="0">
 	No iFrames
 </iframe>
-<!-- <iframe id="content" src="public/news.php" name="content" frameborder="0">  -->
 <iframe id="content" src="<?php echo $content; ?>" name="content" frameborder="0">
 	No iFrames
 </iframe>

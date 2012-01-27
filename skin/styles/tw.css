@@ -691,3 +691,27 @@ option.inactive
 {
 	background-color: lightgreen;
 }
+
+.suchmarker
+{
+	font-weight: bold;
+	text-decoration: underline;
+	font-size: medium;
+}
+.suchergebnis:hover
+{
+	background-color: #EEEEEE;
+}
+.suchergebnis a
+{
+	font-weight: bold;
+}
+.suchicon
+{
+	margin:0px;
+}
+.suchicon:hover
+{
+	cursor:pointer;
+	cursor:hand;
+}

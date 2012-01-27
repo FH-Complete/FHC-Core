@@ -28,6 +28,7 @@ class benutzer extends person
 	public $bnaktiv=true;	// boolean
 	public $alias;			// varchar(256)
 	public $bn_ext_id;
+	public $result = array();
 		
 	/**
 	 * Konstruktor - Uebergibt die Connection und laedt optional einen Benutzer
@@ -254,6 +255,63 @@ class benutzer extends person
 		else 
 		{
 			$this->errormsg = 'Fehler bei DatenbankAbfrage';
+			return false;
+		}
+	}
+	
+	public function search($searchItems)
+	{
+		$qry = "SELECT * FROM (SELECT
+					distinct on (uid) vorname, nachname, uid, titelpre, titelpost,alias,
+					(SELECT UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) 
+					 FROM public.tbl_student JOIN public.tbl_studiengang USING(studiengang_kz)
+					 WHERE student_uid=tbl_benutzer.uid) as studiengang,
+					(SELECT tbl_kontakt.kontakt || ' - ' ||telefonklappe 
+					FROM public.tbl_mitarbeiter
+					LEFT JOIN public.tbl_kontakt USING(standort_id) 
+					WHERE 
+						mitarbeiter_uid=tbl_benutzer.uid
+						AND (tbl_kontakt.kontakttyp='telefon' OR tbl_kontakt.kontakttyp is null)
+						) as klappe
+				FROM
+					public.tbl_person 
+					JOIN public.tbl_benutzer USING(person_id)
+				WHERE
+					tbl_benutzer.aktiv
+					AND (";
+		
+		$qry.=" lower(vorname || ' ' || nachname) like lower('%".addslashes(implode(' ',$searchItems))."%')"; 
+		$qry.=" OR lower(nachname || ' ' || vorname) like lower('%".addslashes(implode(' ',$searchItems))."%')";
+		$qry.=" OR lower(uid) like lower('%".addslashes(implode(' ',$searchItems))."%')";
+		
+		foreach($searchItems as $value)
+		{
+			$qry.=" OR lower(uid) = lower('".addslashes($value)."')"; 
+		}
+		$qry.=")) a ORDER BY nachname, vorname";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new benutzer();
+				
+				$obj->titelpre = $row->titelpre;
+				$obj->vorname  = $row->vorname;
+				$obj->nachname = $row->nachname;
+				$obj->titelpost = $row->titelpost;
+				$obj->uid = $row->uid;
+				$obj->studiengang = $row->studiengang;
+				$obj->telefonklappe = $row->klappe;
+				$obj->alias = $row->alias;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}

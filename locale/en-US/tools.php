@@ -50,4 +50,9 @@ $this->phrasen['tools/datei']='File ';
 $this->phrasen['tools/wurdeNichtGefunden']=' was not found!';
 $this->phrasen['tools/fehlerBeimLesenDerDatei']='Error reading file ';
 $this->phrasen['tools/keineDatenGefunden']='No data found';
+
+//Suche
+$this->phrasen['tools/suche']='Global Search';
+$this->phrasen['tools/content']='Content';
+
 ?>
