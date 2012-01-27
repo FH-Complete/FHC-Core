@@ -129,6 +129,15 @@ $this->phrasen['global/dateiNichtErfolgreichHochgeladen']='Die Datei wurde nicht
 $this->phrasen['global/FuerDieseAktionBenoetigenSieAdministrationsrechte']='Fuer diese Aktion benoetigen Sie Administratorenrechte';
 $this->phrasen['global/dateiExistiertNicht']='Die Datei existiert nicht';
 $this->phrasen['global/fehlerBeimAktualisierenDerDaten']='Fehler beim Aktualisieren der Daten';
+$this->phrasen['global/fehlerBeimLadenDesDatensatzes']='Fehler beim Laden des Datensatzes';
+$this->phrasen['global/fehlerBeimSpeichernDerDaten']='Fehler beim Speichern der Daten';
+$this->phrasen['global/datenWurdenGespeichert']='Daten wurden gespeichert';
+$this->phrasen['global/eintragWurdeGeloescht']='Eintrag wurde gelöscht';
+$this->phrasen['global/fehlerBeimLoeschenDesEintrags']='Fehler beim Löschen des Eintrags';
+$this->phrasen['global/keineBerechtigung']='Keine Berechtigung';
+$this->phrasen['global/datensatzWurdeNichtGefunden']='Datensatz wurde nicht gefunden';
+$this->phrasen['global/keineBerechtigungZumAendernDesDatensatzes']='Keine Berechtigung zum Ändern des Datensatzes';
+$this->phrasen['global/test']='%s Zeitaufzeichnung %s von %s';
 
 //infrastruktur
 
