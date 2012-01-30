@@ -128,7 +128,10 @@ if($method =="austauschprogram")
 		$preincoming->von = $date->formatDatum($_REQUEST['von'],'Y-m-d'); 
 		$preincoming->bis = $date->formatDatum($_REQUEST['bis'],'Y-m-d'); 
 		$preincoming->code = $_REQUEST['code']; 
-		$preincoming->mobilitaetsprogramm_code = $_REQUEST['austausch_kz']; 
+		if($_REQUEST['austausch_kz']== "austausch_auswahl")
+			$preincoming->mobilitaetsprogramm_code = ''; 
+		else
+			$preincoming->mobilitaetsprogramm_code = $_REQUEST['austausch_kz']; 
 		$preincoming->updateamum = date('Y-m-d H:i:s');
 
 		if(!$preincoming->save())
@@ -139,7 +142,7 @@ if($method =="austauschprogram")
 	// Ausgabe Austauschprogram Formular
 	echo '	<form method="POST" action="incoming.php?method=austauschprogram" name="AustauschForm">
 
-				<table  border="0" align ="center" style="border-sytle:solid;  border-width:1px; margin-top:5%;">
+				<table  border="0" align ="center" style=margin-top:5%;">
 				<tr>
 					<td>
 					<fieldset>
@@ -187,18 +190,7 @@ if($method =="austauschprogram")
 					
 				</table>
 			</form>
-		
-		<script type="text/javascript">
-		function checkAustausch()
-		{
-			if(document.AustauschForm.austausch_kz.options[0].selected == true) 
-			{
-				alert("Kein Austauschprogram ausgewählt.");
-				return false; 
-			}
-			return true; 
-		}
-		</script>';	
+';	
 }
 else if($method=="lehrveranstaltungen")
 {
