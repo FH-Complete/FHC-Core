@@ -1,4 +1,23 @@
 <?php
+/* Copyright (C) 2010 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors:		Karl Burkhart <burkhart@technikum-wien.at>.
+ */
+
 require_once('../config/vilesci.config.inc.php'); 
 require_once('../include/basis_db.class.php');
 require_once('../include/studiensemester.class.php');
@@ -28,7 +47,13 @@ class stip extends basis_db
 	public $AntwortStatusCode; 
 	
 	
-	
+	/**
+	 * 
+	 * Überprüft die Daten
+	 * @param $ErhKz
+	 * @param $Anfragedaten
+	 * @param $Bezieher
+	 */
 	function validateStipDaten($ErhKz, $Anfragedaten, $Bezieher)
 	{
 		if(strlen($ErhKz)!=3 || !is_numeric($ErhKz))
@@ -87,8 +112,8 @@ class stip extends basis_db
 	
 	/**
 	 * 
-	 * Enter description here ...
-	 * @param unknown_type $PersonKz
+	 * Suche Studenten anhand PersonKz
+	 * @param $PersonKz
 	 */
 	function searchPersonKz($PersonKz)
 	{
@@ -122,8 +147,8 @@ class stip extends basis_db
 	}
 	/**
 	 * 
-	 * Enter description here ...
-	 * @param unknown_type $Svnr
+	 * Suche Studenten anhand Sozialversicherungsnummer
+	 * @param $Svnr
 	 */
 	function searchSvnr($Svnr)
 	{
@@ -168,8 +193,8 @@ class stip extends basis_db
 	
 	/**
 	 * 
-	 * Enter description here ...
-	 * @param unknown_type $Svnr
+	 * Suche Studenten anhand Vor- und Nachname
+	 * @param $Svnr
 	 */
 	function searchVorNachname($Vorname, $Nachname)
 	{
@@ -181,6 +206,7 @@ class stip extends basis_db
 		
 		if($this->db_query($qry))
 		{
+			// wenn mehr als 1 Datensatz gefunden wird --> Fehler
 			if($this->db_num_rows() == 1 )
 			{
 				if($row = $this->db_fetch_object())
@@ -215,7 +241,7 @@ class stip extends basis_db
 	
 	/**
 	 * 
-	 * Enter description here ...
+	 * Gibt Erhalter_Kz für Technikum Wien zurück
 	 */
 	function getErhalterKz()
 	{
@@ -236,9 +262,11 @@ class stip extends basis_db
 	
 	/**
 	 * 
-	 * Enter description here ...
-	 * @param unknown_type $studentUID
-	 * @param unknown_type $studSemester
+	 * Gibt den orgform_code zurück für übergebene StudentUID und Semester
+	 * z.B. 1 für Vollzeit
+	 * z.B. 2 für Berufsbegleitend
+	 * @param $studentUID
+	 * @param $studSemester
 	 */
 	function getOrgFormTeilCode($studentUID, $studSemester)
 	{
@@ -266,6 +294,8 @@ class stip extends basis_db
 	/**
 	 * 
 	 * Ermittelt den StutStatusCode
+	 * Stati Aktiver Student[Code 1], Unterbrecher[2], Absolvent[3] und Ausgeschieden ohne Abschluss[4]
+	 * Stati Übertritt[5] kommt nicht vor
 	 */
 	public function getStudStatusCode($prestudent_id, $studiensemester_kurzbz, $bisdatum=null)
 	{
