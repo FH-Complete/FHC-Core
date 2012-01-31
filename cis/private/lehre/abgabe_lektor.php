@@ -47,7 +47,7 @@ $htmlstr = "";
 
 $showall=isset($_GET['showall']);
 	
-$sql_query = "SELECT * FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) * FROM lehre.tbl_projektarbeit LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id) 
+$sql_query = "SELECT * FROM (SELECT * FROM lehre.tbl_projektarbeit LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id) 
 			LEFT JOIN public.tbl_benutzer on(uid=student_uid)
 			LEFT JOIN public.tbl_student on(public.tbl_benutzer.uid=public.tbl_student.student_uid)
 			LEFT JOIN public.tbl_person on(tbl_benutzer.person_id=tbl_person.person_id)
