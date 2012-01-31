@@ -36,7 +36,11 @@ $SOAPServer->addFunction("GetStipendienbezieherStip");
 $SOAPServer->addFunction("SendStipendienbezieherStipError");
 $SOAPServer->handle();
 
-
+/**
+ * 
+ * Funktion nimmt ANfragen entgegen und bearbeitet diese
+ * @param $parameters -> XML SOAP File
+ */
 function GetStipendienbezieherStip($parameters)
 { 	
 	$anfrageDaten = $parameters->anfrageDaten; 
@@ -60,6 +64,7 @@ function GetStipendienbezieherStip($parameters)
 	if(!is_array($Stipendiumsbezieher->StipendiumsbezieherAnfrage))
 		$Stipendiumsbezieher->StipendiumsbezieherAnfrage = array($Stipendiumsbezieher->StipendiumsbezieherAnfrage);
 
+	// läuft alle Anfragedaten durch
 	foreach($Stipendiumsbezieher->StipendiumsbezieherAnfrage as $BezieherStip)
 	{
 		$prestudentID; 
