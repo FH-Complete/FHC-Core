@@ -104,6 +104,7 @@ function GetStipendienbezieherStip($parameters)
 				$prestudent = new prestudent(); 
 				$prestudent->load($prestudentID); 
 				$prestudent->getLastStatus($prestudentID); 
+				$prestudentStatus = new prestudent();
 			
 				$student = new student(); 
 				$studentUID = $student->getUID($prestudentID); 
@@ -118,6 +119,18 @@ function GetStipendienbezieherStip($parameters)
 				if($BezieherStip->Typ == "as" || $BezieherStip->Typ == "AS")
 				{
 					$StipBezieher->getOrgFormTeilCode($studentUID, $studSemester);
+					
+					// Wenn Studium ist VBB -> in Status vom Studenten schauen
+					if($StipBezieher->OrgFormTeilCode == 3)
+					{
+						// lade letzten status vom gesuchten semester
+						if(!$prestudentStatus->getLastStatus($prestudentID,$studSemester))
+							return new SoapFault("Server", $prestudentStatus->errormsg);	 
+						$statusOrgForm = $prestudentStatus->orgform_kurzbz; 
+						if(!$StipBezieher->OrgFormTeilCode = $StipBezieher->getOrgFormCodeFromKurzbz($statusOrgForm))
+							 return new SoapFault("Server", $StipBezieher->errormsg);	
+					}
+					
 					$StipBezieher->Studienbeitrag = $studGebuehr; 
 					$StipBezieher->Inskribiert ="j";
 					$StipBezieher->Ausbildungssemester = $StipBezieher->getSemester($prestudentID, $studSemester);						

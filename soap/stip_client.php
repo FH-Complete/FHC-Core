@@ -64,8 +64,8 @@ require_once('stip.class.php');
 
 if(isset($_REQUEST['submit']))
 {
-	$client = new SoapClient("https://cis.technikum-wien.at/soap/stip.wsdl.php?".microtime()); 
-	//$client = new SoapClient(APP_ROOT."/soap/stip.soap.wsdl", array('login'=>'stip','password'=>'stip'));
+	//$client = new SoapClient("https://cis.technikum-wien.at/soap/stip.wsdl.php?".microtime()); 
+	$client = new SoapClient(APP_ROOT."/soap/stip.wsdl.php?".microtime());
 	
 	$username = "test";
 	$passwort = "foo";
@@ -108,12 +108,12 @@ if(isset($_REQUEST['submit']))
 	{
 		//$response = $client->GetStipendienbezieherStip(array("userName"=>$username,"passWord"=>$passwort,"anfrageDaten"=>array("ErhKz"=>$ErhKz, "AnfragedatenID"=>$AnfragedatenID,"Stipendiumsbezieher"=>array($bezieher, $bezieher1))));
 		$response_stip = $client->GetStipendienbezieherStip(array("userName"=>$username,"passWord"=>$passwort,"anfrageDaten"=>array("ErhKz"=>$ErhKz, "AnfragedatenID"=>$AnfragedatenID,"Stipendiumsbezieher"=>array($bezieher))));
-		var_dump($response_stip);
+		var_dump($response_stip->GetStipendienbezieherStipResult);
 		echo '<hr>';
 		//var_dump($response_stip->Stipendiumsbezieher->StipendiumsbezieherAntwort);
 		
-		$response_error = $client->SendStipendienbezieherStipError(array("userName"=>"abc", "passWord"=>"test", "errorReport"=>array("ErhKz"=>"erhkz", "StateCode"=>"statecode", "StateMessage"=>"statemessage", "ErrorStatusCode"=>"errorstatuscode", "JobID"=>"jobid", "ErrorContent"=>array($obj))));
-		var_dump($response_error);
+	//	$response_error = $client->SendStipendienbezieherStipError(array("userName"=>"abc", "passWord"=>"test", "errorReport"=>array("ErhKz"=>"erhkz", "StateCode"=>"statecode", "StateMessage"=>"statemessage", "ErrorStatusCode"=>"errorstatuscode", "JobID"=>"jobid", "ErrorContent"=>array($obj))));
+	//	var_dump($response_error);
 	}
 	catch(SoapFault $fault) 
 	{
