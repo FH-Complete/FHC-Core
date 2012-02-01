@@ -3205,6 +3205,62 @@ if(!$result = @$db->db_query('SELECT 1 FROM campus.tbl_dms_kategorie_gruppe LIMI
 	else 
 		echo 'Tabelle campus.tbl_dms_kategorie_gruppe hinzugefuegt!<br>';
 }
+
+
+// Tabelle fuer FreeBusy
+if(!@$db->db_query("SELECT 1 FROM campus.tbl_freebusy LIMIT 1"))
+{
+	$qry = "
+	CREATE TABLE campus.tbl_freebusy
+	(
+		freebusy_id integer NOT NULL,
+		uid varchar(32) NOT NULL,
+		freebusytyp_kurzbz varchar(32) NOT NULL,
+		url varchar(1024) NOT NULL,
+		aktiv boolean NOT NULL,
+		bezeichnung varchar(256),
+		insertamum timestamp,
+		insertvon varchar(32),
+		updateamum timestamp,
+		updatevon varchar(32)
+	);
+	
+	CREATE TABLE campus.tbl_freebusytyp
+	(
+		freebusytyp_kurzbz varchar(32) NOT NULL,
+		bezeichnung varchar(256),
+		beschreibung text
+	);
+	
+	CREATE SEQUENCE campus.seq_freebusy_freebusy_id
+ 	INCREMENT BY 1
+ 	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+		
+	ALTER TABLE campus.tbl_freebusy ALTER COLUMN freebusy_id SET DEFAULT nextval('campus.seq_freebusy_freebusy_id');
+	
+	ALTER TABLE campus.tbl_freebusy ADD CONSTRAINT pk_freebusy PRIMARY KEY (freebusy_id);
+	ALTER TABLE campus.tbl_freebusytyp ADD CONSTRAINT pk_freebusytyp PRIMARY KEY (freebusytyp_kurzbz);
+	
+	ALTER TABLE campus.tbl_freebusy ADD CONSTRAINT fk_freebusytyp_freebusy FOREIGN KEY(freebusytyp_kurzbz) REFERENCES campus.tbl_freebusytyp(freebusytyp_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE campus.tbl_freebusy ADD CONSTRAINT fk_benutzer_freebusy FOREIGN KEY(uid) REFERENCES public.tbl_benutzer(uid) ON DELETE CASCADE ON UPDATE CASCADE;
+	
+	GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_freebusy TO admin;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_freebusytyp TO admin;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_freebusy TO web;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_freebusytyp TO web;
+		
+	GRANT SELECT, UPDATE ON campus.seq_freebusy_freebusy_id TO admin;
+	GRANT SELECT, UPDATE ON campus.seq_freebusy_freebusy_id TO web;
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_freebusy: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Tabelle campus.tbl_freebusy, campus.tbl_freebusytyp hinzugefuegt!<br>';
+}
+
 echo '<br>';
 
 $tabellen=array(
@@ -3243,8 +3299,10 @@ $tabellen=array(
 	"campus.tbl_dms_version"  => array("dms_id","version","filename","mimetype","name","beschreibung","letzterzugriff","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_erreichbarkeit"  => array("erreichbarkeit_kurzbz","beschreibung","farbe"),
 	"campus.tbl_feedback"  => array("feedback_id","betreff","text","datum","uid","lehrveranstaltung_id","updateamum","updatevon","insertamum","insertvon"),
+	"campus.tbl_freebusy"  => array("freebusy_id","uid","freebusytyp_kurzbz","url","aktiv","bezeichnung","insertamum","insertvon","updateamum","updatevon"),
+	"campus.tbl_freebusytyp" => array("freebusytyp_kurzbz","bezeichnung","beschreibung"),
 	"campus.tbl_infoscreen"  => array("infoscreen_id","bezeichnung","beschreibung","ipadresse"),
-	"campus.tbl_infoscreen_content"  => array("infoscreen_content_id","infoscreen_id","content_id","gueltigvon","gueltigbis","insertamum","insertvon","updateamum","updatevon"),
+	"campus.tbl_infoscreen_content"  => array("infoscreen_content_id","infoscreen_id","content_id","gueltigvon","gueltigbis","insertamum","insertvon","updateamum","updatevon","refreshzeit"),
 	"campus.tbl_legesamtnote"  => array("student_uid","lehreinheit_id","note","benotungsdatum","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_lvgesamtnote"  => array("lehrveranstaltung_id","studiensemester_kurzbz","student_uid","note","mitarbeiter_uid","benotungsdatum","freigabedatum","freigabevon_uid","bemerkung","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_lvinfo"  => array("lehrveranstaltung_id","sprache","titel","lehrziele","lehrinhalte","methodik","voraussetzungen","unterlagen","pruefungsordnung","anmerkung","kurzbeschreibung","genehmigt","aktiv","updateamum","updatevon","insertamum","insertvon"),
