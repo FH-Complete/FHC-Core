@@ -1,5 +1,5 @@
 <?php
-$this->phrasen['personensuche/personensuche']='Personensuche';
+$this->phrasen['personensuche/personensuche']='People Search';
 $this->phrasen['personensuche/sucheNach']='Search for';
 $this->phrasen['personensuche/kennzeichen']='Attribute';
 $this->phrasen['personensuche/inGruppe']='in group';

@@ -544,9 +544,9 @@ $content_form.= '</SELECT></td></tr>';
 $content_form.= '<tr><td>&nbsp;</td><td>';
 
 if(isset($_GET['type']) && $_GET['type']=='edit')
-	$content_form.= "<input type='submit' name='submit_zeitsperre' value='Speichern'>";
+	$content_form.= "<input type='submit' name='submit_zeitsperre' value='".$p->t('global/speichern')."'>";
 else
-	$content_form.= "<input type='submit' name='submit_zeitsperre' value='Hinzufügen'>";
+	$content_form.= "<input type='submit' name='submit_zeitsperre' value='".$p->t('global/hinzufuegen')."'>";
 $content_form.= '</td></tr>';
 $content_form.= "<tr><td>&nbsp;</td><td style='color:red'>".$p->t('zeitsperre/achtungEsWerdenAlleEingegebenenTage')."</td</tr>";
 $content_form.= '</table></form>';
@@ -621,7 +621,7 @@ if(URLAUB_TOOLS)
 	$content_resturlaub.="<tr><td nowrap>+ ".$p->t('urlaubstool/resturlaub')."</td><td align='right'  nowrap>$resturlaubstage ".$p->t('urlaubstool/tage')."</td><td nowrap class='grey'>&nbsp;&nbsp;&nbsp;( ".$p->t('urlaubstool/stichtag').": $datum_beginn )</td></tr>";
 	$content_resturlaub.="<tr><td nowrap>- ".$p->t('urlaubstool/aktuellGebuchterUrlaub')."&nbsp;</td><td align='right'  nowrap>$gebuchterurlaub ".$p->t('urlaubstool/tage')."</td><td nowrap class='grey'>&nbsp;&nbsp;&nbsp;( $datum_beginn - $datum_ende )</td></tr>";
 	$content_resturlaub.="<tr><td style='border-top: 1px solid black;'  nowrap>".$p->t('urlaubstool/aktuellerStand')."</td><td style='border-top: 1px solid black;' align='right' nowrap>".($anspruch+$resturlaubstage-$gebuchterurlaub)." ".$p->t('urlaubstool/tage')."</td><td nowrap class='grey'>&nbsp;&nbsp;&nbsp;( ".$p->t('urlaubstool/stichtag').": $datum_ende )</td></tr>";
-	$content_resturlaub .="<tr></tr><tr><td><a href='../../../cms/dms.php?id=759'> [Handbuch Urlaubserfassung.pdf] </a></td><td><button type='button' name='hilfe' value='Hilfe' onclick='alert(\"".$p->t('urlaubstool/anspruchAnzahlDerUrlaubstage')."\");'>".$p->t('global/hilfe')."</button></td></tr>";
+	$content_resturlaub .="<tr></tr><tr><td><a href='../../../cms/dms.php?id=".$p->t('dms_link/cisHandbuch')."'> ".$p->t('zeitsperre/beschreibungSieheCisHandbuch')." </a></td><td><button type='button' name='hilfe' value='Hilfe' onclick='alert(\"".$p->t('urlaubstool/anspruchAnzahlDerUrlaubstage')."\");'>".$p->t('global/hilfe')."</button></td></tr>";
 	$content_resturlaub .='<tr><td></td></tr>';
 	$content_resturlaub.="</table>";
 }

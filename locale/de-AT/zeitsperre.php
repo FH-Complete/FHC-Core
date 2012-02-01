@@ -18,8 +18,8 @@ $this->phrasen['zeitsperre/stundeInklusive']='Stunde (inklusive)';
 $this->phrasen['zeitsperre/achtungEsWerdenAlleEingegebenenTage']='Achtung: Es werden alle eingegebenen Tage bei der Berechnung berücksichtigt. Daher müssen mehrtägige Zeitsperren<br> an Unterbrechungen wie Wochenenden oder Feiertagen unterteilt werden!';
 $this->phrasen['zeitsperre/urlaubImGeschaeftsjahr']='Urlaub im Geschäftsjahr';
 $this->phrasen['zeitsperre/sieHabenKeineBerechtigungZuAendern']='Sie haben keine Berechtigung die Zeitsperre zu ändern.';
-$this->phrasen['zeitsperre/vonDatumIstUngueltigNullenAngeben']='Von-Datum ist ungültig. Bitte beachten Sie das führende nullen angegeben werden müssen (Beispiel: 01.01.2008)';
-$this->phrasen['zeitsperre/bisDatumIstUngueltigNullenAngeben']='Bis-Datum ist ungültig. Bitte beachten Sie das führende nullen angegeben werden müssen (Beispiel: 01.01.2008)';
+$this->phrasen['zeitsperre/vonDatumIstUngueltigNullenAngeben']='Von-Datum ist ungültig. Bitte beachten Sie das führende Nullen angegeben werden müssen (Beispiel: 01.01.2008)';
+$this->phrasen['zeitsperre/bisDatumIstUngueltigNullenAngeben']='Bis-Datum ist ungültig. Bitte beachten Sie das führende Nullen angegeben werden müssen (Beispiel: 01.01.2008)';
 $this->phrasen['zeitsperre/bitteZuerstVertretungAuswaehlen']='Bitte zuerst eine Vertretung auswählen';
 $this->phrasen['zeitsperre/istNichtRichtig']='ist nicht richtig';
 $this->phrasen['zeitsperre/vonDatumMonat']='Von-Datum Monat';
@@ -35,4 +35,5 @@ $this->phrasen['zeitsperre/zeitsperreVonBis']='Zeitsperren von %1$s bis %2$s';
 $this->phrasen['zeitsperre/monat']='Monat';
 $this->phrasen['zeitsperre/tag']='Tag';
 $this->phrasen['zeitsperre/urlaubBereitsEingetragen']='Es existiert bereits ein Urlaubseintrag im angegebenen Zeitraum.';
+$this->phrasen['zeitsperre/beschreibungSieheCisHandbuch']='Beschreibung siehe CIS-Handbuch';
 ?>
