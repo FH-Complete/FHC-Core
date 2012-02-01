@@ -291,6 +291,28 @@ class stip extends basis_db
 			return false; 
 	}
 	
+	
+	/**
+	 * 
+	 * Gibt den orgform_code zurück für übergebene orgform_kurzbz
+	 * @param orgform_kurzbz
+	 */
+	function getOrgFormCodeFromKurzbz($orgform_kurzbz)
+	{
+		$qry = "SELECT code FROM bis.tbl_orgform WHERE orgform_kurzbz = '".addslashes($orgform_kurzbz)."';";
+		
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				return $row->code; 
+			}
+			return false; 
+		}
+		else
+			return false; 
+	}
+	
 	/**
 	 * 
 	 * Ermittelt den StutStatusCode
