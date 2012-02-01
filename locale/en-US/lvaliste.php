@@ -26,6 +26,6 @@ $this->phrasen['lvaliste/fehlerAnStudiengang']='In case of Error or Feedback ple
 $this->phrasen['lvaliste/keineDatensaetze']='No Entrys for this Semester!';
 $this->phrasen['lvaliste/lehrveranstaltungen']='Courses';
 $this->phrasen['lvaliste/betreuungen']='Supervisor';
-$this->phrasen['lvaliste/koordination']='Koordination';
+$this->phrasen['lvaliste/koordination']='Coordination';
 
 ?>

@@ -42,6 +42,7 @@ $this->phrasen['global/ja']='Yes';
 $this->phrasen['global/nein']='No';
 $this->phrasen['global/download']='Download';
 $this->phrasen['global/auswahl']='Select';
+$this->phrasen['global/hinzufuegen']='Add';
 
 $this->phrasen['global/username']='Username';
 $this->phrasen['global/vorname']='First Name';
@@ -137,7 +138,6 @@ $this->phrasen['global/fehlerBeimLoeschenDesEintrags']='Error deleting entry';
 $this->phrasen['global/keineBerechtigung']='No authority';
 $this->phrasen['global/datensatzWurdeNichtGefunden']='Data not found';
 $this->phrasen['global/keineBerechtigungZumAendernDesDatensatzes']='You dont have the authority to change to data';
-$this->phrasen['global/test']='%s Zeitaufzeichnung von';
 
 //infrastruktur
 

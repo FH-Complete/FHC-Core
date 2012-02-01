@@ -3,7 +3,7 @@ $this->phrasen['zeitsperre/zeitsperren']='Mark unavailable';
 $this->phrasen['zeitsperre/zeitsperre']='Unavailable';
 $this->phrasen['zeitsperre/vonDatumUngueltig']='Invalid From-date';
 $this->phrasen['zeitsperre/bisDatumUngueltig']='Invalid To-date';
-$this->phrasen['zeitsperre/vonDatumGroesserAlsBisDatum']='VON-Datum größer als Bis-Datum';
+$this->phrasen['zeitsperre/vonDatumGroesserAlsBisDatum']='FROM-date greater than TO-date';
 $this->phrasen['zeitsperre/sieHabenKeineBerechtigung']='You have no permision';
 $this->phrasen['zeitsperre/ungueltigeId']='Invalid ID';
 $this->phrasen['zeitsperre/urlaubKannNichtMehrEditiertWerden']='This vacation can no longer be edited because it has already been approved';
@@ -31,8 +31,9 @@ $this->phrasen['zeitsperre/resturlaubstage']='Carry-over days';
 $this->phrasen['zeitsperre/aktuellerStand']='Available vacation';
 $this->phrasen['zeitsperre/resturlaubstagePerDatum']='Resturlaubstage per %1$s';
 
-$this->phrasen['zeitsperre/zeitsperreVonBis']='Zeitsperren von %1$s bis %2$s';
+$this->phrasen['zeitsperre/zeitsperreVonBis']='Unavailabilities from %1$s to %2$s';
 $this->phrasen['zeitsperre/monat']='Month';
 $this->phrasen['zeitsperre/tag']='Day';
 $this->phrasen['zeitsperre/urlaubBereitsEingetragen']='Es existiert bereits ein Urlaubseintrag im angegebenen Zeitraum.';
+$this->phrasen['zeitsperre/beschreibungSieheCisHandbuch']='For description see CIS-manual';
 ?>
