@@ -65,7 +65,7 @@ function verifyData($parameters)
 	else
 	{
 		$student = new student(); 
-		$student_uid = $student->getUidFromMatrikelnummer($parameters->matrikelnummer); 
+		$student_uid = $student->getUidFromMatrikelnummer($parameters->Matrikelnummer); 
 		
 		// überprüfe ob Benutzer aktiv ist
 		$benutzer = new benutzer(); 
@@ -77,14 +77,31 @@ function verifyData($parameters)
 			return $obj; 
 		}	
 		
+		// überprüfe vorname
+		if($benutzer->vorname != $parameters->Vorname)
+		{
+			// es wurde keine übereinstimmung gefunden
+			$obj->result = 'false';
+			$obj->fehler = '6'; 
+			return $obj; 
+		}
+		
+		if($benutzer->nachname != $parameters->Name)
+		{
+			// es wurde keine übereinstimmung gefunden
+			$obj->result = 'false';
+			$obj->fehler = '7'; 
+			return $obj; 
+		}
+		
 		// Überprüfe PLZ
 		$adresse = new adresse(); 
-		$adresse->load_pers($benutzer->person_id); 
+		$adresse->load_pers($benutzer->Person_id); 
 		
 		$foundAdr = false; 
 		foreach($adresse->result as $adr)
 		{
-			if($adr->plz == $parameters->postleitzahl && $adr->typ == 'h')
+			if($adr->plz == $parameters->Postleitzahl && $adr->typ == 'h')
 				$foundAdr = true; 
 		}
 		if($foundAdr == false)
@@ -98,7 +115,7 @@ function verifyData($parameters)
 		// Überprüfe Geburtsdatum
 		$person = new person(); 
 		$person->load($benutzer->person_id); 
-		if($person->gebdatum != $parameters->geburtsdatum)
+		if($person->gebdatum != $parameters->Geburtsdatum)
 		{
 			$obj->result = 'false'; 
 			$obj->fehler = '4';
@@ -116,8 +133,8 @@ function verifyData($parameters)
 		}
 		
 		// Übergabe von studiensemester -> z.b 11W, 12S auf WS2011, SS2012
-		$year = mb_substr($parameters->semesterkuerzel, 0,2); 
-		$semester = mb_substr($parameters->semesterkuerzel,2,1); 
+		$year = mb_substr($parameters->Semesterkuerzel, 0,2); 
+		$semester = mb_substr($parameters->Semesterkuerzel,2,1); 
 		if($semester == 'S')
 		{
 			$semester = 'SS'; 
@@ -182,29 +199,23 @@ function validateRequest($parameter)
 	
 	global $fehler; 
 	
-	if(mb_strlen($parameter->postleitzahl) > 10)
+	if(mb_strlen($parameter->Postleitzahl) > 10)
 	{
 		$fehler = '5';
 		return false; 
 	}
-	if(mb_strlen($parameter->vorname) > 255)
+	if(mb_strlen($parameter->Vorname) > 255)
 	{
 		$fehler = '6';
 		return false; 
 	}
-	if(mb_strlen($parameter->name) > 255)
+	if(mb_strlen($parameter->Name) > 255)
 	{
 		$fehler = '7';
 		return false; 
 	}
-
-	if(mb_strlen($parameter->semesterkuerzel) != 3 || ((mb_strpos($parameter->semesterkuerzel, 'W') != '2') && (mb_strpos($parameter->semesterkuerzel, 'S') != '2')))
-	{
-		$fehler = '8'; 
-		return false; 
-	}
 	
-	if(mb_strlen($parameter->matrikelnummer) > 15 || $parameter->matrikelnummer == '' || !is_numeric($parameter->matrikelnummer))
+	if(mb_strlen($parameter->Matrikelnummer) >15  || $parameter->Matrikelnummer == '' || !is_numeric($parameter->Matrikelnummer))
 	{
 		$fehler = '9';
 		return false; 
