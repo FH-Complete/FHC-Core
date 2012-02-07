@@ -124,11 +124,10 @@ function GetStipendienbezieherStip($parameters)
 					if($StipBezieher->OrgFormTeilCode == 3)
 					{
 						// lade letzten status vom gesuchten semester
-						if(!$prestudentStatus->getLastStatus($prestudentID,$studSemester))
-							return new SoapFault("Server", $prestudentStatus->errormsg);	 
+						$prestudentStatus->getLastStatus($prestudentID,$studSemester); 
 						$statusOrgForm = $prestudentStatus->orgform_kurzbz; 
-						if(!$StipBezieher->OrgFormTeilCode = $StipBezieher->getOrgFormCodeFromKurzbz($statusOrgForm))
-							 return new SoapFault("Server", $StipBezieher->errormsg);	
+						$StipBezieher->OrgFormTeilCode = $StipBezieher->getOrgFormCodeFromKurzbz($statusOrgForm);
+
 					}
 					
 					$StipBezieher->Studienbeitrag = $studGebuehr; 
@@ -148,6 +147,7 @@ function GetStipendienbezieherStip($parameters)
 					$StipBezieher->StudStatusCode = null; 
 					$StipBezieher->BeendigungsDatum = null; 
 					$StipBezieher->Studienbeitrag = null; 
+					$StipBezieher->Inskribiert ="j";
 				}
 				
 				$StipBezieherAntwort[$i] = $StipBezieher; 
