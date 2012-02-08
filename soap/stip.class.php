@@ -463,7 +463,7 @@ class stip extends basis_db
 	}
 	
 	/**
-	 * Liefert die ECTS Punkte
+	 * Liefert die ECTS Punkte aller LVs die besucht wurden
 	 * 
 	 * @param $prestudent_id
 	 * @param $studiensemester_kurzbz
@@ -475,7 +475,7 @@ class stip extends basis_db
 		
 		$obj = new zeugnisnote();
 		$ects=0;
-		if(!$obj->getZeugnisnoten($lehrveranstaltung_id=null, $uid, $studiensemester_kurzbz))
+		if(!$obj->getZeugnisnoten($lehrveranstaltung_id=null, $uid, $studiensemester_kurzbz=null))
 			die('Fehler beim Laden der Noten:'.$obj->errormsg);
 		foreach($obj->result as $row)
 		{
