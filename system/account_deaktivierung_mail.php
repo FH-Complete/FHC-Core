@@ -137,7 +137,7 @@ if($result = $db->db_query($qry))
 
 // Abbrecher an Bibliothek melden wenn diese inaktiv gesetzt wurden
 $qry = "SELECT uid, vorname, nachname, titelpre, titelpost FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) JOIN public.tbl_person USING(person_id) WHERE
-		tbl_benutzer.aktiv=false AND tbl_benutzer.updateaktivam=CURRENT_DATE
+		tbl_benutzer.aktiv=false AND tbl_benutzer.updateaktivam=(CURRENT_DATE - '1 day'::interval)::date
 		AND get_rolle_prestudent (prestudent_id, NULL)='Abbrecher'  ";
 if($result = $db->db_query($qry))
 {
@@ -156,7 +156,10 @@ if($result = $db->db_query($qry))
 		$message .= "1200 Wien \n";
 		$to = 'rapold@technikum-wien.at, astfaell@technikum-wien.at';
 		$mail = new mail($to,'no-reply@'.DOMAIN,'Abbrecher Information', $message);
-		$mail->send();
+		if($mail->send())
+			$text.="Abbrecher Infomail an $to verschickt\n";
+		else
+			$text.="Fehler beim Versenden des Abbrecher Infomails an $to !\n";  
 	}
 }
 
