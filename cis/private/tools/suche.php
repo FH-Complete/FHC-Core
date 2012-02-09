@@ -47,7 +47,7 @@ echo '<h1>',$p->t('tools/suche'),'</h1>';
 $search = (isset($_REQUEST['search'])?$_REQUEST['search']:'');
 
 echo '<form action="',$_SERVER['PHP_SELF'],'" name="searchform" method="GET">
-	<input type="search" placeholder="Suchbegriff ..." size="40" name="search" value="',$db->convert_html_chars($search),'" />
+	<input type="search" placeholder="'.$p->t('tools/suchbegriff').' ..." size="40" name="search" value="',$db->convert_html_chars($search),'" />
 	<img src="../../../skin/images/search.png" onclick="document.searchform.submit()" height="15px" class="suchicon"/>
 	</form>';
 
@@ -56,9 +56,9 @@ if($search=='')
 
 $searchItems = explode(' ',$search);
 
+searchPerson($searchItems);
 searchContent($searchItems);
 
-searchPerson($searchItems);
 
 
 function searchPerson($searchItems)
@@ -67,10 +67,9 @@ function searchPerson($searchItems)
 	$bn = new benutzer();
 	$bn->search($searchItems);
 	
-	echo '<h2>',$p->t('global/personen'),'</h2>';
-	
 	if(count($bn->result)>0)
 	{
+		echo '<h2>',$p->t('global/personen'),'</h2>';
 		echo '
 		<script type="text/javascript">	
 		$(document).ready(function() 
@@ -122,20 +121,22 @@ function searchContent($searchItems)
 	global $db,$p;
 	$cms = new content();
 	$cms->search($searchItems);
-	
-	echo '<h2>',$p->t('tools/content'),'</h2>';
-	echo '<ul>';
-	foreach($cms->result as $row)
-	{
-		echo '<li><div class="suchergebnis">';
-		echo '<a href="../../../cms/content.php?content_id=',$db->convert_html_chars($row->content_id),'">',$db->convert_html_chars($row->titel),'</a><br>';
-		$preview = findAndMark($row->content, $searchItems);
-		
-		echo $preview;
-		echo '<br /><br /></div></li>';
-	}	
-	echo '</ul>';
 
+	if(count($cms->result)>0)
+	{
+		echo '<h2>',$p->t('tools/content'),'</h2>';
+		echo '<ul>';
+		foreach($cms->result as $row)
+		{
+			echo '<li><div class="suchergebnis">';
+			echo '<a href="../../../cms/content.php?content_id=',$db->convert_html_chars($row->content_id),'">',$db->convert_html_chars($row->titel),'</a><br>';
+			$preview = findAndMark($row->content, $searchItems);
+			
+			echo $preview;
+			echo '<br /><br /></div></li>';
+		}	
+		echo '</ul>';
+	}
 }
 function findAndMark($content, $items)
 {

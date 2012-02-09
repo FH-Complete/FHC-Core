@@ -47,7 +47,7 @@ class ical extends basis_db
 	{
 		$rows = explode("\n",$ical);
 		
-		$idx = count($result);
+		$idx = count($this->result);
 		$status=0;
 		$dtstart='';
 		$dtend='';
