@@ -24,6 +24,8 @@
 require_once('../config/cis.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/sprache.class.php');
+require_once('../include/phrasen.class.php');
+
 ob_start();
 if(isset($_GET['sprache']))
 {
@@ -47,6 +49,9 @@ if(isset($_GET['content']))
 	$content = $_GET['content'];
 else
 	$content = '../cms/news.php';
+	
+$sprache = getSprache();
+$p = new phrasen($sprache);
 ?>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -124,7 +129,7 @@ function loadampel()
    	 	</td>
    	    <td align="right" nowrap>
 			<form name="searchform" action="private/tools/suche.php" method="GET" target="content" style="display:inline">
-        	<input type="search" size="10" name="search" placeholder="Suchbegriff ..."/>
+        	<input type="search" size="10" name="search" placeholder="<?php echo $p->t('tools/suchbegriff');?> ..."/>
         	<img src="../skin/images/search.png" height="14px" onclick="document.searchform.submit()" class="suchicon"/>
         </form>
    	    </td>
