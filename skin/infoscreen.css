@@ -9,15 +9,10 @@ body,p,div
 	overflow:hidden;
 	text-decoration: none;
 }
-
 hr
 {
 	color:#CCCCCC;
 	height:1px;
-}
-img
-{
-	border: 0;
 }
 
 /* Links */
@@ -145,21 +140,22 @@ h5, h6 /* Überschrift 5,6 - Werden nicht speziell formatiert, sondern dem norma
 {
 	-moz-border-radius-topleft: 10px;
 	width: 100%;
-	border: 1px solid #E0E0E0;
+	border: 1px solid #C6C6C6;
 	background-color: #F0F0F0;
 }
 #news .news .titel
 {
+	-moz-border-radius-topleft: 6px;
 	font-weight: bold;
 	font-size: 18px;
 	padding: 0px 10px 0px 10px;
 	white-space: nowrap;
-	background-color: #F0F0F0;
+	background-color: #C6C6C6;
 }
 #news .news .text
 {
 	background-color: #FCFCFC;
-	padding: 0px 10px 0px 10px;
+	padding: 5px 10px 5px 10px;
 }
 /* Margin von ersten und letzten P tag entfernen, da sonst
    breite Raender entstehen koenne*/

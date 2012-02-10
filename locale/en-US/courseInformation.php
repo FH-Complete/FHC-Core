@@ -27,5 +27,5 @@ $this->phrasen['courseInformation/beispielComputerarchitektur']='Example: Comput
 $this->phrasen['courseInformation/beispielMSEChangeManagement']='Example: MSE Change Management and Software Evolution';
 $this->phrasen['courseInformatoin/lvInfoTerminologie']='LV Info - Terminology';
 $this->phrasen['courseInformation/terminologieDeutschEnglisch']='Terminology German-English';
-$this->phrasen['courseInformation/incomingplaetze']='Incomingplätze';
+$this->phrasen['courseInformation/incomingplaetze']='Places Available for Incoming Students';
 ?>

@@ -1,4 +1,4 @@
 <?php
-$this->phrasen['gesamtnote/wollenSieWirklichLoeschen']='Wollen Sie die markierten Einträge wirklich löschen? Alle bereits eingetragenen Kreuzerl gehen dabei verloren';
+$this->phrasen['gesamtnote/wollenSieWirklichLoeschen']='Do you really want to delete the selected entries? All the checkmark lists you have entered will be lost';
 $this->phrasen['gesamtnote/noteUnveraendert']='Grade unmodified';
 ?>

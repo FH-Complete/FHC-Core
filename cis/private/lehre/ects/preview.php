@@ -464,9 +464,9 @@ if (!$db = new basis_db())
 			
 		if ($anz_incoming > -1)
 		{
-			echo '<tr><td>Incoming:&nbsp;</td><td>'.stripslashes($anz_incoming).'</td></tr>';
+			echo '<tr><td>Places Available for Incoming Students:&nbsp;</td><td>'.stripslashes($anz_incoming).'</td></tr>';
 		}
-		else echo '<tr><td>Incoming:&nbsp;</td><td>0</td></tr>';
+		else echo '<tr><td>Places Available for Incoming Students:&nbsp;</td><td>0</td></tr>';
 
 		echo "<tr><td>&nbsp;</td><td>&nbsp;</td></tr>";
 
