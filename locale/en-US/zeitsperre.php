@@ -18,8 +18,8 @@ $this->phrasen['zeitsperre/stundeInklusive']='Hour (inclusive)';
 $this->phrasen['zeitsperre/achtungEsWerdenAlleEingegebenenTage']='Notice: All the days entered will be considered vacation days! Therefore, it is necessary to divide longer vacations so that they do not include weekends or holidays!';
 $this->phrasen['zeitsperre/urlaubImGeschaeftsjahr']='Vacation in business year';
 $this->phrasen['zeitsperre/sieHabenKeineBerechtigungZuAendern']='You are not authorized to change this unvailability.';
-$this->phrasen['zeitsperre/vonDatumIstUngueltigNullenAngeben']='Von-Datum ist ungültig. Bitte beachten Sie das führende nullen angegeben werden müssen (Beispiel: 01.01.2008)';
-$this->phrasen['zeitsperre/bisDatumIstUngueltigNullenAngeben']='Bis-Datum ist ungültig. Bitte beachten Sie das führende nullen angegeben werden müssen (Beispiel: 01.01.2008)';
+$this->phrasen['zeitsperre/vonDatumIstUngueltigNullenAngeben']='The vacation start date is invalid. Please note that the dates are to be given in the following format dd.mm.yyyy (Example: 31.01.2012)';
+$this->phrasen['zeitsperre/bisDatumIstUngueltigNullenAngeben']='The vacation end date is invalid. Please note that the dates are to be given in the following format dd.mm.yyyy (Example: 31.01.2012)';
 $this->phrasen['zeitsperre/bitteZuerstVertretungAuswaehlen']='Please select a substitute first';
 $this->phrasen['zeitsperre/istNichtRichtig']='is not valid';
 $this->phrasen['zeitsperre/vonDatumMonat']='From-date month';
@@ -29,11 +29,11 @@ $this->phrasen['zeitsperre/vonDatum']='From-date';
 
 $this->phrasen['zeitsperre/resturlaubstage']='Carry-over days';
 $this->phrasen['zeitsperre/aktuellerStand']='Available vacation';
-$this->phrasen['zeitsperre/resturlaubstagePerDatum']='Resturlaubstage per %1$s';
+$this->phrasen['zeitsperre/resturlaubstagePerDatum']='Carry-over days as of %1$s';
 
 $this->phrasen['zeitsperre/zeitsperreVonBis']='Unavailabilities from %1$s to %2$s';
 $this->phrasen['zeitsperre/monat']='Month';
 $this->phrasen['zeitsperre/tag']='Day';
-$this->phrasen['zeitsperre/urlaubBereitsEingetragen']='Es existiert bereits ein Urlaubseintrag im angegebenen Zeitraum.';
+$this->phrasen['zeitsperre/urlaubBereitsEingetragen']='A vacation entry already exists in the specified period.';
 $this->phrasen['zeitsperre/beschreibungSieheCisHandbuch']='For description see CIS-manual';
 ?>

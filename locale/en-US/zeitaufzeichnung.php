@@ -12,6 +12,6 @@ $this->phrasen['zeitaufzeichnung/start']='Start';
 $this->phrasen['zeitaufzeichnung/ende']='End';
 $this->phrasen['zeitaufzeichnung/dauer']='Length';
 $this->phrasen['zeitaufzeichnung/gesamtdauer']='Total time';
-$this->phrasen['zeitaufzeichnung/sieSindDerzeitKeinenProjektenZugeordnet']='Sie sind derzeit keinen Projekten zugeordnet';
-$this->phrasen['zeitaufzeichnung/fehlerBeimErmittelnDerProjekte']='Fehler beim Ermitteln der Projekte';
+$this->phrasen['zeitaufzeichnung/sieSindDerzeitKeinenProjektenZugeordnet']='You are not currently assigned to any projects';
+$this->phrasen['zeitaufzeichnung/fehlerBeimErmittelnDerProjekte']='Error retrieving project data';
 ?>
