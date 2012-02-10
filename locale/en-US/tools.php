@@ -54,5 +54,6 @@ $this->phrasen['tools/keineDatenGefunden']='No data found';
 //Suche
 $this->phrasen['tools/suche']='Global Search';
 $this->phrasen['tools/content']='Content';
+$this->phrasen['tools/suchbegriff']='Search';
 
 ?>
