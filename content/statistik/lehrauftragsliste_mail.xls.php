@@ -32,7 +32,16 @@ require_once('../../include/studiensemester.class.php');
 require_once('../../include/mail.class.php');
 
 $stsem = new studiensemester();
-$semester_aktuell  = $stsem->getaktorNext();
+
+if(isset($_GET['stsem']))
+{
+	if(check_stsem($_GET['stsem']))
+		$semester_aktuell = $_GET['stsem'];
+	else
+		die('Studiensemester ist ungueltig');
+}
+else
+	$semester_aktuell  = $stsem->getaktorNext();
 
 $file = 'lehrauftragsliste.xls';
 
