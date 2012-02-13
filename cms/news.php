@@ -182,7 +182,7 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 				if($ma->standort_id!='')
 				{
 					$kontakt = new kontakt();
-					$kontakt->loadFirmaKontakttyp($row_course_leader->standort_id, 'telefon');
+					$kontakt->loadFirmaKontakttyp($ma->standort_id, 'telefon');
 					$hauptnummer = $kontakt->kontakt;
 				}
 				$xml.= '<telefon><![CDATA['.$hauptnummer.' - '.$ma->telefonklappe.']]></telefon>';
@@ -213,7 +213,7 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 				if($ma->standort_id!='')
 				{
 					$kontakt = new kontakt();
-					$kontakt->loadFirmaKontakttyp($row_course_leader->standort_id, 'telefon');
+					$kontakt->loadFirmaKontakttyp($ma->standort_id, 'telefon');
 					$hauptnummer = $kontakt->kontakt;
 				}
 				$xml.= '<telefon><![CDATA['.$hauptnummer.' - '.$ma->telefonklappe.']]></telefon>';
@@ -244,7 +244,7 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 				if($ma->standort_id!='')
 				{
 					$kontakt = new kontakt();
-					$kontakt->loadFirmaKontakttyp($row_course_leader->standort_id, 'telefon');
+					$kontakt->loadFirmaKontakttyp($ma->standort_id, 'telefon');
 					$hauptnummer = $kontakt->kontakt;
 				}
 				$xml.= '<telefon><![CDATA['.$hauptnummer.' - '.$ma->telefonklappe.']]></telefon>';
