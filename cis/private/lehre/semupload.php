@@ -68,7 +68,7 @@ $openpath = DOC_ROOT.'/documents/'.strtolower($stg_obj->kuerzel).'/'.$lv_obj->se
 	 */
 	function ConfirmFile(handle)
 	{
-		return confirm($p->t('upload/wollenSieOrdnerWirklichLoeschen'));
+		return confirm("<?php echo $p->t('upload/wollenSieOrdnerWirklichLoeschen'); ?>");
 	}
 	
 	</script>
@@ -170,7 +170,7 @@ $openpath = DOC_ROOT.'/documents/'.strtolower($stg_obj->kuerzel).'/'.$lv_obj->se
 		}
 	}
 	echo '</select>';
-	echo '<input type="submit" value="'.$p->t('global/dateiLoeschen').'">';
+	echo '<br><input type="submit" value="'.$p->t('global/dateiLoeschen').'">';
 	echo '</form></td><td>';
 
     //FileAuswahlfeld
