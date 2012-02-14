@@ -228,6 +228,7 @@ if(isset($_REQUEST['submit']))
 	$adresse->plz = $plz; 
 	$adresse->ort = $ort; 
 	$adresse->nation = $nation_code; 
+	$adresse->typ = 'h';
 	$adresse->heimatadresse = true; 
 	$adresse->zustelladresse = true; 
 	$adresse->new = true; 
