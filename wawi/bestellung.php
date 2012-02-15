@@ -886,7 +886,7 @@ if($_GET['method']=='update')
 	{
 		// Update auf Bestellung
 		$date = new datum(); 	
-	
+		$error = false; 
 		$save = false; 
 		$bestellung_id = $_GET['bestellung'];
 		$bestellung_old = new wawi_bestellung(); 
@@ -1048,7 +1048,10 @@ if($_GET['method']=='update')
 						$bestell_detail->new = true; 
 					}
 					if(!$bestell_detail->save())
-						echo $bestell_detail->errormsg; 
+					{
+						echo '<span class="error">'.$bestell_detail->errormsg.'</span>';
+						$error = true;  
+					}
 				}
 	
 				for($i=0; $i<$aufteilung_anzahl; $i++)
@@ -1075,11 +1078,12 @@ if($_GET['method']=='update')
 					}
 					$aufteilung->saveAufteilung(); 
 				}
-				if($bestellung_new->save())
-				{
-					$ausgabemsg.='<span class="ok">Bestellung wurde erfolgreich gespeichert!</span><br>';
-					$save = true; 
-				}
+				if($error == false)
+					if($bestellung_new->save())
+					{
+						$ausgabemsg.='<span class="ok">Bestellung wurde erfolgreich gespeichert!</span><br>';
+						$save = true; 
+					}
 			}
 		}
 		// Bestellung freigeben wird in gang gesetzt --> durch Abschick Button
@@ -2021,8 +2025,8 @@ if($_GET['method']=='update')
 		function checkNewRow(id, bestellung_id)
 		{
 			var betrag="";
+
 			betrag = $("#preisprove_"+id).val();
-			
 			// Wenn der betrag nicht leer ist,
 			// und die letzte reihe ist, 
 			// dann eine neue Zeile hinzufuegen
@@ -2037,7 +2041,8 @@ if($_GET['method']=='update')
 							document.getElementById("detail_anz").value = parseFloat(test) +1;
 							hideTags2();
 						});
-			}		
+			}	
+				
 			return false;
 		}
 		
@@ -2064,7 +2069,7 @@ if($_GET['method']=='update')
 					function(data){ 
 						if(isNaN(data))
 						{
-							alert("Fehler:"+data);
+							alert("Ungültiger Preis eingetragen."); 
 						}
 					});  
 			}
@@ -2078,7 +2083,7 @@ if($_GET['method']=='update')
 						}
 						else
 						{
-							alert("Fehler:"+data);
+							alert("Ungültiger Preis eingetragen"); 
 						}
 					});  
 			}
