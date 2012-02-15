@@ -188,7 +188,16 @@ class wawi_bestelldetail extends basis_db
 			$this->errormsg ="Artikelnummer fehlerhaft.";
 			return false; 
 		}		
-	
+		if(!is_numeric($this->preisprove))
+		{
+			$this->errormsg="Ungültiger Preis eingegeben.";
+			return false; 
+		}
+		if(!is_numeric($this->mwst) && $this->mwst != '')
+		{
+			$this->errormsg="Ungültige MWSt. eingegeben.";
+			return false; 
+		}
 		return true; 		
 	}
 	
@@ -203,7 +212,7 @@ class wawi_bestelldetail extends basis_db
 			return false; 
 			
 		$mwst = ($this->mwst == '' ? '0':$this->mwst); 
-			
+		$this->mwst = $mwst; 
 		if($this->new)
 		{
 			// insert

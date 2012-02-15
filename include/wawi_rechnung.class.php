@@ -419,6 +419,18 @@ class wawi_rechnung extends basis_db
 	 */
 	public function save_betrag()
 	{
+		if(!is_numeric($this->betrag))
+		{
+			$this->errormsg = "Ungültiger Betrag.";
+			return false; 
+		}
+		
+		if(!is_numeric($this->mwst))
+		{
+			$this->errormsg = "Ungültiger Betrag."; 
+			return false; 
+		}
+		
 		if($this->new)
 		{
 			$qry = 'BEGIN;INSERT INTO wawi.tbl_rechnungsbetrag(rechnung_id, mwst, betrag, bezeichnung) VALUES('.
@@ -449,6 +461,7 @@ class wawi_rechnung extends basis_db
 					{
 						$this->rechnugnsbetrag_id=$row->id;+
 						$this->db_query('COMMIT;');
+						return true; 
 					}
 					else
 					{

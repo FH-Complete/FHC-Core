@@ -447,7 +447,7 @@ elseif($aktion == 'save')
 
 		if(isset($_POST['transfer_datum']) && $rechte->isBerechtigt('wawi/rechnung_transfer', null, 'suid'))
 			$rechnung->transfer_datum = $date->formatDatum($_POST['transfer_datum']);
-		
+			
 		if($rechnung->save())
 		{
 			foreach($betraege as $row)
@@ -476,9 +476,10 @@ elseif($aktion == 'save')
 						$rb->new=false;
 					
 					$rb->save_betrag();
+
 				}
 			}
-			
+
 			$ausgabemsg.='<span class="ok">Daten wurden gespeichert!</span><br>';
 			$_GET['id']=$rechnung->rechnung_id;
 			$aktion = 'update';
