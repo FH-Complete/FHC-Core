@@ -11,9 +11,11 @@ $this->phrasen['tools/vorlageWohnsitzfinanzamt']='zur Vorlage beim Wohnsitzfinan
 
 //Leistungsbeurteilung
 $this->phrasen['tools/leistungsbeurteilung']='Leistungsbeurteilung';
+$this->phrasen['tools/studentWurdeNichtGefunden']='Student wurde nicht gefunden';
 $this->phrasen['tools/mussAlsStudentEingeloggtSein']='Sie müssen als Student eingeloggt sein um ihre Noten abzufragen!';
 $this->phrasen['tools/nochKeineBeurteilungEingetragen']='Es wurden noch keine Beurteilungen eingetragen';
 $this->phrasen['tools/fehlerBeimAuslesenDerNoten']='Fehler beim Auslesen der Noten';
+$this->phrasen['tools/benotungsdatumDerZeugnisnote']='Benotungsdatum der Zeugnisnote';
 
 //Zahlungen
 $this->phrasen['tools/zahlungen']='Zahlungen';
