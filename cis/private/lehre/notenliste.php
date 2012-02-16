@@ -86,7 +86,7 @@ else
 		WHERE campus.vw_student.uid = '".addslashes($user)."'";
 	
 	if (!$result=$db->db_query($qry))
-		die("Kein Studentendatensatz!");
+		die($p->t('tools/studentWurdeNichtGefunden'));
 	else
 	{
 		$row=$db->db_fetch_object($result);
@@ -142,7 +142,7 @@ else
 	if($result=$db->db_query($qry))
 	{
 		//Tabelle anzeigen
-		$tbl= "<table><tr class='liste'><th>Lehrveranstaltung</th><th>LV-Note</th><th>Zeugnisnote</th><th>Benotungsdatum der Zeugnisnote</th></tr>";
+		$tbl= "<table><tr class='liste'><th>".$p->t('global/lehrveranstaltung')."</th><th>".$p->t('benotungstool/lvNote')."</th><th>".$p->t('benotungstool/zeugnisnote')."</th><th>".$p->t('tools/benotungsdatumDerZeugnisnote')."</th></tr>";
 		$i=0;
 		while($row=$db->db_fetch_object($result))
 		{

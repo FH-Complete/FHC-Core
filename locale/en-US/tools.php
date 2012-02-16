@@ -11,9 +11,11 @@ $this->phrasen['tools/vorlageWohnsitzfinanzamt']='for submission to local tax of
 
 //Leistungsbeurteilung
 $this->phrasen['tools/leistungsbeurteilung']='Performance Assessment ';
+$this->phrasen['tools/studentWurdeNichtGefunden']='Student was not found';
 $this->phrasen['tools/mussAlsStudentEingeloggtSein']='You must be logged in as a student to view your grades!';
 $this->phrasen['tools/nochKeineBeurteilungEingetragen']='No grade has been entered yet';
 $this->phrasen['tools/fehlerBeimAuslesenDerNoten']='Error reading the grades.';
+$this->phrasen['tools/benotungsdatumDerZeugnisnote']='Date of grading';
 
 //Zahlungen
 $this->phrasen['tools/zahlungen']='Payments';

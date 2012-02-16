@@ -127,7 +127,7 @@ class wawi_rechnung extends basis_db
 	 * @param $betrag
 	 * @param $zahlungstyp
 	 */
-	public function getAllSearch($rechnungsnr, $rechnungsdatum_von, $rechnungsdatum_bis, $buchungsdatum_von, $buchungsdatum_bis, $erstelldatum_von, $erstelldatum_bis, $bestelldatum_von, $bestelldatum_bis, $bestellnummer, $firma_id, $oe_kurzbz, $konto_id, $kostenstelle_id, $betrag, $zahlungstyp='')
+	public function getAllSearch($rechnungsnr, $rechnungsdatum_von, $rechnungsdatum_bis, $buchungsdatum_von, $buchungsdatum_bis, $erstelldatum_von, $erstelldatum_bis, $bestelldatum_von, $bestelldatum_bis, $bestellnummer, $firma_id, $oe_kurzbz, $konto_id, $kostenstelle_id, $betrag, $zahlungstyp='', $ohneTransferdatum=false)
 	{
 		$first = true; 
 		$qry = "
@@ -188,6 +188,9 @@ class wawi_rechnung extends basis_db
 			
 		if($zahlungstyp!='')
 			$qry.= ' AND tbl_bestellung.zahlungstyp_kurzbz = '.$this->addslashes($zahlungstyp);
+			
+		if($ohneTransferdatum)
+			$qry.= ' AND tbl_rechnung.transfer_datum IS NULL';
 			
 		if(!$this->db_query($qry))
 		{

@@ -249,7 +249,11 @@ if($aktion == 'suche')
 		}
 		echo "</SELECT>\n";
 		echo "</td>\n";
-		echo "</tr>\n"; 
+		echo "</tr>\n"; 		
+		echo "<tr>\n";
+		echo "<td> Ohne Transferdatum: </td>\n";
+		echo "<td><input type ='checkbox' name ='ohneTransferdatum'></td>\n";
+		echo "</tr>\n";		
 		echo "<tr><td>&nbsp;</td></tr>\n";
 		echo "<tr><td><input type='submit' name ='submit' value='Suche' class='cursor'></td></tr>\n";
 		echo "</table>\n";
@@ -277,6 +281,7 @@ if($aktion == 'suche')
 		else
 			$filter_betrag='';
 		$filter_zahlungstyp = (isset($_REQUEST['filter_zahlungstyp'])?$_REQUEST['filter_zahlungstyp']:'');
+		$ohneTransferdatum = (isset ($_REQUEST['ohneTransferdatum'])?true:false);
 		
 		$rechnung = new wawi_rechnung();
 		
@@ -303,7 +308,7 @@ if($aktion == 'suche')
 		&& $bestelldatum_von!==false && $bestelldatum_bis!==false
 		)
 		{
-			if($rechnung->getAllSearch($rechnungsnr, $rechnungsdatum_von, $rechnungsdatum_bis, $buchungsdatum_von, $buchungsdatum_bis, $erstelldatum_von, $erstelldatum_bis, $bestelldatum_von, $bestelldatum_bis, $bestellnummer, $firma_id, $oe_kurzbz, $filter_konto, $filter_kostenstelle, $filter_betrag, $filter_zahlungstyp))
+			if($rechnung->getAllSearch($rechnungsnr, $rechnungsdatum_von, $rechnungsdatum_bis, $buchungsdatum_von, $buchungsdatum_bis, $erstelldatum_von, $erstelldatum_bis, $bestelldatum_von, $bestelldatum_bis, $bestellnummer, $firma_id, $oe_kurzbz, $filter_konto, $filter_kostenstelle, $filter_betrag, $filter_zahlungstyp, $ohneTransferdatum))
 			{
 				$date = new datum(); 
 				
