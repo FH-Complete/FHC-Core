@@ -811,7 +811,7 @@ if($aktion=='update')
 				//auf 2 nachkommastellen runden
 				netto = Math.round(netto*100)/100;
 				brutto = Math.round(brutto*100)/100;
-				
+
 				$("#netto").html(netto);
 				$("#brutto").html(brutto);
 			}
@@ -834,7 +834,11 @@ if($aktion=='update')
 					var netto = brutto/(100+mwst)*100;
 					
 					//auf 2 Nachkommastellen runden
-					netto = Math.round(netto*100)/100;
+					netto = netto*100; 
+					netto = Math.floor(netto); 
+					netto = netto/100; 
+
+					//netto = Math.round(netto*100)/100;
 					
 					$("#betrag_"+id).val(netto);
 				}
@@ -860,7 +864,10 @@ if($aktion=='update')
 					var brutto = netto*(100+mwst)/100;
 					
 					//auf 2 Nachkommastellen runden
-					brutto = Math.round(brutto*100)/100;
+					brutto = brutto*100; 
+					brutto = Math.floor(brutto); 
+					brutto = brutto/100; 
+					//brutto = Math.round(brutto*100)/100;
 					
 					$("#brutto_"+id).val(brutto);
 				}
