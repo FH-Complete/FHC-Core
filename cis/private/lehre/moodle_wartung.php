@@ -160,11 +160,15 @@ if(isset($_POST['neu']))
 				//Lektoren Synchronisieren
 				if(!$mdl_user->sync_lektoren($mdl_course->mdl_course_id))
 					echo $mdl_user->errormsg;
-					
+	
 				$mdl_user = new moodle_user();
 				//Studenten Synchronisieren
 				if(!$mdl_user->sync_studenten($mdl_course->mdl_course_id))
 					echo $mdl_user->errormsg;
+			}
+			else
+			{
+				echo $mdl_course->errormsg;
 			}
 		}
 		elseif($art=='le') //Getrennte Kurse fuer die Lehreinheiten
@@ -361,7 +365,7 @@ else
 	
 	echo '<br>'.$p->t('moodle/kursbezeichnung').': <input type="text" name="bezeichnung" maxlength="254" size="40" value="'.$longbezeichnung.'">';
 	echo '<br>'.$p->t('moodle/gruppenUebernehmen').': <input type="checkbox" name="gruppen" checked>';
-	echo '<br><br><input type="submit" name="'.$p->t('global/neu').'" value="'.$p->t('moodle/kursAnlegen').'">
+	echo '<br><br><input type="submit" name="neu" value="'.$p->t('moodle/kursAnlegen').'">
 			</form>';
 }
 echo '</td>';
