@@ -321,9 +321,10 @@ class frage extends basis_db
 	 * @param $pruefling_id
 	 * @param $frage_id ID der vorherigen Frage. wenn Null dann wird die erste Frage geliefert
 	 * @param $demo
+	 * @param $levelgebiet
 	 * @return frage_id der naechsten Frage oder false wenn Fehler
 	 */
-	public function getNextFrage($gebiet_id, $pruefling_id, $frage_id=null, $demo=false)
+	public function getNextFrage($gebiet_id, $pruefling_id, $frage_id=null, $demo=false, $levelgebiet=false)
 	{
 		if($demo)
 		{
@@ -344,6 +345,8 @@ class frage extends basis_db
 			
 			if(!is_null($frage_id))
 				$qry.="	AND tbl_pruefling_frage.nummer>(SELECT nummer FROM testtool.tbl_pruefling_frage WHERE pruefling_id='".addslashes($pruefling_id)."' AND frage_id='".addslashes($frage_id)."' LIMIT 1)";
+			elseif(is_null($frage_id) && $levelgebiet)
+				$qry.=" AND tbl_pruefling_frage.endtime is null ";
 				
 			$qry.="ORDER BY tbl_pruefling_frage.nummer ASC LIMIT 1";
 		}
