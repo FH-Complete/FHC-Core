@@ -106,27 +106,6 @@ else
 		}
 	}
 
-	function checkantwort()
-	{
-		antwort = document.getElementById('antwort');
-		val=antwort.getAttribut('value');
-		if(val.length>1)
-		{
-			alert('Antwort darf nur 1 Buchstabe sein');
-			return false;
-		}
-		if(val.length==0)
-			return true;
-		if(val.toUpperCase()<'A' || val.toUpperCase>'Z')
-		{
-			alert('Antwort darf nur ein Buchstabe von A-Z sein');
-			return false;
-		}
-		else
-		{
-			return true;
-		}
-	}
 	//]]>
 	</script>
 </head>
@@ -175,84 +154,93 @@ if(isset($_POST['submitantwort']) && isset($_GET['frage_id']))
 	// vor dem Speichern der Antworten, alle Antworten zu der Frage loeschen
 	// und die Antworten neu anlegen
 	// Unterscheidung ob mehrere oder nur eine Antwort uebergeben wird
-	$error=false;
 	
-	$db->db_query('BEGIN;');
-
-	// alle vorhandenen Antworten zu dieser Frage loeschen
-	$qry = "DELETE FROM testtool.tbl_antwort WHERE antwort_id in(
-				SELECT antwort_id FROM testtool.tbl_antwort JOIN testtool.tbl_vorschlag USING(vorschlag_id)
-				WHERE frage_id='".addslashes($_GET['frage_id'])."' AND pruefling_id='".addslashes($_SESSION['pruefling_id'])."')";
-
-	$db->db_query($qry);
-	
-	// Antwort nur Speichern wenn eine Antwort gewaehlt wurde	
-	if(isset($_POST['vorschlag_id']) && $_POST['vorschlag_id']!='')
+	if($levelgebiet && !isset($_POST['vorschlag_id']))
 	{
-		$vorschlaege = array();
-		//Falls nur eine einzelne Antwort kommt, diese auch in ein Array packen
-		if(!is_array($_POST['vorschlag_id']))
-			$vorschlaege[0]=$_POST['vorschlag_id'];
-		else 
-			$vorschlaege = $_POST['vorschlag_id'];
+		echo '<span class="error">Bei diesem Gebiet müssen Sie jede Frage beantworten!</span>';
+	}
+	else
+	{
 		
-		//alle Antworten Speichern
-		foreach ($vorschlaege as $vorschlag_id) 
+		$error=false;
+		
+		$db->db_query('BEGIN;');
+	
+		// alle vorhandenen Antworten zu dieser Frage loeschen
+		$qry = "DELETE FROM testtool.tbl_antwort WHERE antwort_id in(
+					SELECT antwort_id FROM testtool.tbl_antwort JOIN testtool.tbl_vorschlag USING(vorschlag_id)
+					WHERE frage_id='".addslashes($_GET['frage_id'])."' AND pruefling_id='".addslashes($_SESSION['pruefling_id'])."')";
+	
+		$db->db_query($qry);
+		
+		// Antwort nur Speichern wenn eine Antwort gewaehlt wurde	
+		if(isset($_POST['vorschlag_id']) && $_POST['vorschlag_id']!='')
 		{
-			if($vorschlag_id!='')
+			$vorschlaege = array();
+			//Falls nur eine einzelne Antwort kommt, diese auch in ein Array packen
+			if(!is_array($_POST['vorschlag_id']))
+				$vorschlaege[0]=$_POST['vorschlag_id'];
+			else 
+				$vorschlaege = $_POST['vorschlag_id'];
+			
+			//alle Antworten Speichern
+			foreach ($vorschlaege as $vorschlag_id) 
 			{
-				$antwort = new antwort();
+				if($vorschlag_id!='')
+				{
+					$antwort = new antwort();
+					
+					$antwort->new = true;
+					$antwort->vorschlag_id = $vorschlag_id;
+					$antwort->pruefling_id = $_SESSION['pruefling_id'];
+					
+					if(!$antwort->save())
+					{
+						$errormsg = $antwort->errormsg;
+						$error=true;
+					}
+				}
+			}
 				
-				$antwort->new = true;
-				$antwort->vorschlag_id = $vorschlag_id;
-				$antwort->pruefling_id = $_SESSION['pruefling_id'];
-				
-				if(!$antwort->save())
+			if(!$error)
+			{
+				//Endzeit der Frage eintragen
+				$prueflingfrage = new frage();
+				if(!$prueflingfrage->getPrueflingfrage($_SESSION['pruefling_id'], $frage_id))
 				{
 					$errormsg = $antwort->errormsg;
-					$error=true;
+					$error = true;
+				}
+				$prueflingfrage->endtime = date('Y-m-d H:i:s');
+				
+				if(!$prueflingfrage->save_prueflingfrage(false))
+				{
+					$errormsg = $prueflingfrage->errormsg;
+					$error = true;
 				}
 			}
 		}
-			
-		if(!$error)
+		
+		if($error)
 		{
-			//Endzeit der Frage eintragen
-			$prueflingfrage = new frage();
-			if(!$prueflingfrage->getPrueflingfrage($_SESSION['pruefling_id'], $frage_id))
-			{
-				$errormsg = $antwort->errormsg;
-				$error = true;
-			}
-			$prueflingfrage->endtime = date('Y-m-d H:i:s');
-			
-			if(!$prueflingfrage->save_prueflingfrage(false))
-			{
-				$errormsg = $prueflingfrage->errormsg;
-				$error = true;
-			}
+			$db->db_query('ROLLBACK;');
+			die('Fehler:'.$errormsg);
 		}
+		else 
+		{
+			$db->db_query('COMMIT;');
+		}
+		
+		$frage = new frage();
+		
+		if($levelgebiet)
+		{
+			//bei gelevelten Fragen die naechste Frage holen
+			$frage->generateFragenpool($_SESSION['pruefling_id'], $gebiet_id);
+		}
+		
+		$frage_id = $frage->getNextFrage($gebiet_id, $_SESSION['pruefling_id'], $frage_id);
 	}
-	
-	if($error)
-	{
-		$db->db_query('ROLLBACK;');
-		die('Fehler:'.$errormsg);
-	}
-	else 
-	{
-		$db->db_query('COMMIT;');
-	}
-	
-	$frage = new frage();
-	
-	if($levelgebiet)
-	{
-		//bei gelevelten Fragen die naechste Frage holen
-		$frage->generateFragenpool($_SESSION['pruefling_id'], $gebiet_id);
-	}
-	
-	$frage_id = $frage->getNextFrage($gebiet_id, $_SESSION['pruefling_id'], $frage_id);
 }
 
 //Schauen ob dieses Gebiet schon gestartet wurde
@@ -384,7 +372,7 @@ else
 		// wenn keine Frage uebergeben wurde und die maximale Fragenanzahl erreicht wurde
 		// dann ist das Gebiet fertig
 		$qry = "SELECT count(*) as anzahl FROM testtool.tbl_pruefling_frage JOIN testtool.tbl_frage USING(frage_id) 
-				WHERE gebiet_id='".addslashes($gebiet_id)."' AND pruefling_id='".addslashes($_SESSION['pruefling_id'])."'";
+				WHERE gebiet_id='".addslashes($gebiet_id)."' AND pruefling_id='".addslashes($_SESSION['pruefling_id'])."' AND tbl_pruefling_frage.endtime is not null";
 		$result = $db->db_query($qry);
 		$row = $db->db_fetch_object($result);
 		
@@ -394,7 +382,7 @@ else
 		}
 	}
 	
-	$frage_id = $frage->getNextFrage($gebiet_id, $_SESSION['pruefling_id'], null, $demo);
+	$frage_id = $frage->getNextFrage($gebiet_id, $_SESSION['pruefling_id'], null, $demo, $levelgebiet);
 	$frage->load($frage_id);
 }
 
@@ -521,7 +509,7 @@ if($frage->frage_id!='')
 	
 	if(!$demo)
 	{
-		echo "<input style=\"width:150px; height:45px; white-space:normal\" type=\"submit\" name=\"submitantwort\" value=\"Speichern und weiter Save and next\" />";
+		echo "<input style=\"width:180px; height:45px; white-space:normal\" type=\"submit\" name=\"submitantwort\" value=\"Speichern und weiter Save and next\" />";
 	}
 	echo "</form>";
 	echo '<br/><br/><br/>';
@@ -584,20 +572,18 @@ if($frage->frage_id!='')
 	else 
 	{
 		//Naechste Frage holen und Weiter-Button anzeigen
-		$frage = new frage();
-		$nextfrage = $frage->getNextFrage($gebiet_id, $_SESSION['pruefling_id'], $frage_id, $demo);
-		if($nextfrage)
+		if($demo)
 		{
-			if($demo)
-				$value="Demo";
-			else 
-				$value="Weiter";
 			
-			echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$nextfrage' class='Item'>$value &gt;&gt;</a>";
-		}
-		else
-		{
-			if($demo)
+			$frage = new frage();
+			$nextfrage = $frage->getNextFrage($gebiet_id, $_SESSION['pruefling_id'], $frage_id, $demo);
+
+			if($nextfrage)
+			{
+				$value="Demo";
+				echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$nextfrage' class='Item'>$value &gt;&gt;</a>";
+			}
+			else
 			{
 				//Naechste Frage holen und Weiter-Button anzeigen
 				//$frage = new frage();
