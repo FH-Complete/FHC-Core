@@ -117,8 +117,8 @@ function GetStipendienbezieherStip($parameters)
 				$studGebuehr = str_replace('.', ',', $studGebuehr); 
 				
 				// wenn nicht bezahlt
-	/*			if($studGebuehr == "")
-					$studGebuehr = "0,00"; */
+				if($studGebuehr == "")
+					$studGebuehr = "0,00";
 				
 				if($BezieherStip->Typ == "as" || $BezieherStip->Typ == "AS")
 				{
