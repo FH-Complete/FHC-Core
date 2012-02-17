@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>
+ * Authors: Karl Burkhart <burkhart@technikum-wien.at>
  */
 
 require_once('../../config/vilesci.config.inc.php');
@@ -51,7 +51,6 @@ function showStudienjahr()
 
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree=document.getElementById('tree-projektmenue');
-	
 	// Wenn auf die Ueberschrift geklickt wird, soll nix passieren
 	if(tree.currentIndex==-1)
 	{
@@ -59,9 +58,17 @@ function showStudienjahr()
 		return;
 	}	
 	projekt_kurzbz=getTreeCellText(tree, "treecol-projektmenue-projekt_kurzbz", tree.currentIndex);
-	
-	var url = 'projekt/gantt.svg.php?projekt='+projekt_kurzbz+'&studienjahr='+(global_year-1)+'&ansicht=studienjahr';
-	global_url = url; 
+	if(projekt_kurzbz == '')
+	{
+		oe_kurzbz = getTreeCellText(tree, "treecol-projektmenue-oe", tree.currentIndex); 
+		var url = 'projekt/gantt.svg.php?oe='+oe_kurzbz+'&studienjahr='+(global_year-1)+'&ansicht=studienjahr';
+	}
+	else
+	{
+		var url = 'projekt/gantt.svg.php?projekt='+projekt_kurzbz+'&studienjahr='+(global_year-1)+'&ansicht=studienjahr';
+		global_url = url; 
+	}
+
 	document.getElementById('iframe-ressource-projekt').contentWindow.location.href=url;
 }
 
@@ -84,8 +91,17 @@ function showKalenderjahr()
 		return;
 	}	
 	projekt_kurzbz=getTreeCellText(tree, "treecol-projektmenue-projekt_kurzbz", tree.currentIndex);
+	if(projekt_kurzbz == '')
+	{
+		oe_kurzbz = getTreeCellText(tree, "treecol-projektmenue-oe", tree.currentIndex); 
+		var url = 'projekt/gantt.svg.php?oe='+oe_kurzbz+'&studienjahr='+global_year+'&ansicht=kalenderjahr';
+	}
+	else
+	{
+			var url = 'projekt/gantt.svg.php?projekt='+projekt_kurzbz+'&studienjahr='+global_year+'&ansicht=kalenderjahr';
+		global_url = url; 
+	}
 
-	var url = 'projekt/gantt.svg.php?projekt='+projekt_kurzbz+'&studienjahr='+global_year+'&ansicht=kalenderjahr';
 	global_url = url;
 	document.getElementById('iframe-ressource-projekt').contentWindow.location.href=url;	
 }
