@@ -185,7 +185,8 @@ function treeProjektmenueSelect()
 	else
 	{
 		document.getElementById('toolbarbutton-projektdokument-neu').disabled=true;
-		document.getElementById('toolbarbutton-projektdokument-zuweisung').disabled=true;		
+		document.getElementById('toolbarbutton-projektdokument-zuweisung').disabled=true;	
+		drawGantt();	
 	}
 	
 	
