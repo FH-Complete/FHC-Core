@@ -42,6 +42,7 @@ function getProperties()
 
 function showStudienjahr()
 {
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	if(isNaN(global_year))
 	{
 		var datumAktuell = new Date();
@@ -49,7 +50,6 @@ function showStudienjahr()
 		global_year = jahrAktuell; 
 	}
 
-	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree=document.getElementById('tree-projektmenue');
 	// Wenn auf die Ueberschrift geklickt wird, soll nix passieren
 	if(tree.currentIndex==-1)
@@ -62,6 +62,7 @@ function showStudienjahr()
 	{
 		oe_kurzbz = getTreeCellText(tree, "treecol-projektmenue-oe", tree.currentIndex); 
 		var url = 'projekt/gantt.svg.php?oe='+oe_kurzbz+'&studienjahr='+(global_year-1)+'&ansicht=studienjahr';
+		global_url=url; 
 	}
 	else
 	{
@@ -95,10 +96,11 @@ function showKalenderjahr()
 	{
 		oe_kurzbz = getTreeCellText(tree, "treecol-projektmenue-oe", tree.currentIndex); 
 		var url = 'projekt/gantt.svg.php?oe='+oe_kurzbz+'&studienjahr='+global_year+'&ansicht=kalenderjahr';
+		global_url = url; 
 	}
 	else
 	{
-			var url = 'projekt/gantt.svg.php?projekt='+projekt_kurzbz+'&studienjahr='+global_year+'&ansicht=kalenderjahr';
+		var url = 'projekt/gantt.svg.php?projekt='+projekt_kurzbz+'&studienjahr='+global_year+'&ansicht=kalenderjahr';
 		global_url = url; 
 	}
 

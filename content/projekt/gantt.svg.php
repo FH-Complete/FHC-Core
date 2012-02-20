@@ -102,7 +102,7 @@ function getOeGantt()
 		"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">';
 		
 		echo '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-		width="100%" height="100%" viewBox="0 0 750 600">
+		width="100%" height="100%" viewBox="0 0 750 700">
 		<rect x="'.$startX.'" y="'.$startY.'" width="'.($kw_gesamt*$widthPerWeek).'" height="'.$height.'"
 		style="color:#000000;fill:none;stroke:#e1e1e1;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />';
 		
@@ -190,7 +190,7 @@ function getOeGantt()
 		<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
 		"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">';
 		echo '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-		width="100%" height="100%" viewBox="0 0 750 600">';
+		width="100%" height="100%" viewBox="0 0 750 700">';
 		
 		// Überschriften
 		echo'<text x="30%" y="40" style="font-size:33px">Studienjahr: '.$studienjahr.'/'.($studienjahr+1).'</text>';
@@ -397,7 +397,7 @@ function getProjektGantt()
 		"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">';
 		
 		echo '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-		width="100%" height="100%" viewBox="0 0 750 600">
+		width="100%" height="100%" viewBox="0 0 750 700">
 		<rect x="'.$startX.'" y="'.$startY.'" width="'.($kw_gesamt*$widthPerWeek).'" height="'.$height.'"
 		style="color:#000000;fill:none;stroke:#e1e1e1;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />';
 		
@@ -485,7 +485,7 @@ function getProjektGantt()
 		<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
 		"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">';
 		echo '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-		width="100%" height="100%" viewBox="0 0 750 600">';
+		width="100%" height="100%" viewBox="0 0 750 700">';
 		
 		// Überschriften
 		echo'<text x="30%" y="40" style="font-size:33px">Studienjahr: '.$studienjahr.'/'.($studienjahr+1).'</text>';
