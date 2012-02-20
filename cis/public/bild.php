@@ -19,20 +19,29 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-// Holt den Hexcode eines Bildes aus der DB wandelt es in Zeichen
+// Holt ein Bildes aus der DB wandelt es
 // um und gibt das ein Bild zurueck.
 // Aufruf mit <img src='bild.php?src=person&person_id=1>
-  require_once('../../config/cis.config.inc.php');
-  require_once('../../include/basis_db.class.php');
-  if (!$db = new basis_db())
-  		die('Fehler beim Oeffnen der Datenbankverbindung');
+require_once('../../config/cis.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/basis_db.class.php');
 
+if (!$db = new basis_db())
+	die('Fehler beim Oeffnen der Datenbankverbindung');
+
+//Wenn das Bild direkt aufgerufen wird, ist eine Authentifizierung erforderlich
+//Wenn es vom Server selbst aufgerufen wird, ist keine Auth. notwendig 
+//(z.B. fuer die Erstellung von PDFs)
+if($_SERVER['REMOTE_ADDR']!=$_SERVER['SERVER_ADDR'])
+{
+	$uid = get_uid();
+}
+  
 //default bild (ein weisser pixel)
 $cTmpHEX='/9j/4AAQSkZJRgABAQEASABIAAD/4QAWRXhpZgAATU0AKgAAAAgAAAAAAAD//gAXQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q/9sAQwAFAwQEBAMFBAQEBQUFBgcMCAcHBwcPCwsJDBEPEhIRDxERExYcFxMUGhURERghGBodHR8fHxMXIiQiHiQcHh8e/9sAQwEFBQUHBgcOCAgOHhQRFB4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4e/8AAEQgAAQABAwEiAAIRAQMRAf/EABUAAQEAAAAAAAAAAAAAAAAAAAAI/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/EABQBAQAAAAAAAAAAAAAAAAAAAAD/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCywAf/2Q==';
 //Hex Dump aus der DB holen
 if(isset($_GET['src']) && $_GET['src']=='person' && isset($_GET['person_id'])  && is_numeric($_GET['person_id']))
 {
-	//$qry = "SELECT foto FROM public.tbl_person WHERE person_id='".addslashes($_GET['person_id'])."'";
 	$qry = "SELECT inhalt as foto FROM public.tbl_akte WHERE person_id='".addslashes($_GET['person_id'])."' AND dokument_kurzbz='Lichtbil'";
 	if($result = $db->db_query($qry))
 	{
@@ -43,7 +52,6 @@ if(isset($_GET['src']) && $_GET['src']=='person' && isset($_GET['person_id'])  &
 		}
 	}
 }
-#exit($cTmpHEX);
 		
 //die bilder werden, sofern es funktioniert, in jpg umgewandelt da es sonst zu fehlern beim erstellen
 //von pdfs kommen kann.
@@ -58,9 +66,8 @@ else
 {
 	//bei manchen Bildern funktioniert die konvertierung nicht
 	//diese werden dann einfach so angezeigt.
-	  @ob_clean();
-   	header("Content-type: image/gif");
-	  exit(base64_decode($cTmpHEX));
-    
+	@ob_clean();
+	header("Content-type: image/gif");
+	exit(base64_decode($cTmpHEX));
 }
 ?>
