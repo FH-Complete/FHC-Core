@@ -269,13 +269,13 @@ for ($ldapentry=ldap_first_entry($ldap_conn,$ldap_result);$ldapentry!=false;$lda
 				if($gid==101 || $gid==120)
 				{
 					$sipass[$i]->acc_grp_name="Verwaltung";
-					$sipass[$i]->end_date=date("d.m.Y",mktime(0, 0, 0, date("m"),   date("d"),   date("Y")+20));
+					$sipass[$i]->end_date=date("d.m.Y",mktime(0, 0, 0, date("m"),   date("d"),   date("Y")+100));
 					
 				}
 				else
 				{
 					$sipass[$i]->acc_grp_name=$stg_kurzbz;
-					$sipass[$i]->end_date=date("d.m.Y",mktime(0, 0, 0, date("m"),   date("d"),   date("Y")+5));
+					$sipass[$i]->end_date=date("d.m.Y",mktime(0, 0, 0, date("m"),   date("d"),   date("Y")+50));
 				}
 				$key_nummer++;
 				$i++;
