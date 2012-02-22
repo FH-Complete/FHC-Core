@@ -28,5 +28,5 @@ $this->phrasen['lehre/moodleHandbuch']='Handbuch';
 $this->phrasen['lehre/moodleMitKreuzerltoolInfo']='Moodle kann nicht gleichzeitig mit dem Übungstool verwendet werden.\nWenn Sie Moodle verwenden wollen, müssen Sie die Übungen im Übungstool entfernen';
 
 $this->phrasen['lehre/gesamtnote']='Gesamtnote';
-$this->phrasen['lehre/studentenAbgabe']='Studenten Abgabe';
+$this->phrasen['lehre/studentenAbgabe']='Studierenden Abgabe';
 ?>
