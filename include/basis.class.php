@@ -51,6 +51,8 @@ class basis
 	 * wenn $var !='' ist werden Datenbankkritische
 	 * Zeichen mit Backslash versehen und das Ergbnis
 	 * unter Hochkomma gesetzt.
+	 *
+	 * 12/2011 DEPRECATED use db_add_param
 	 */
 	public function addslashes($var)
 	{

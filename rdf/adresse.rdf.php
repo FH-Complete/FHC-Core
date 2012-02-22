@@ -60,7 +60,8 @@ echo '
 
 if($adresse_id!='')
 {
-	$adresse->load($adresse_id);
+	if(!$adresse->load($adresse_id))
+		die('Fehler: '.$adresse->errormsg);
 	draw_rdf($adresse);
 }
 else
