@@ -1428,7 +1428,7 @@ class wochenplan extends basis_db
 				if ($l->grp!='' && $l->grp!=' ' && $l->grp!=null)
 					$lvb.=" AND (gruppe='".addslashes($l->grp)."' OR gruppe IS NULL OR gruppe='')";
 			}
-			//if ($gruppen=='')
+			//if ($gruppen!='')
 			//	$lvb.=' AND gruppe_kurzbz IS NULL';
 			$lvb.=')';
 		}
@@ -1718,8 +1718,7 @@ class wochenplan extends basis_db
 				if ($l->grp!='' && $l->grp!=' ' && $l->grp!=null)
 					$lvb.=" AND (gruppe='".addslashes($l->grp)."' OR gruppe IS NULL OR gruppe='' OR gruppe=' ')";
 			}
-			if ($gruppen=='')
-				$lvb.=' AND gruppe_kurzbz IS NULL';
+
 			$lvb.=')';
 		}
 		$lvb=mb_substr($lvb,3);
@@ -1873,9 +1872,7 @@ class wochenplan extends basis_db
 							{
 								// Bei Gruppenkollision den Wert bei allen Raumen erhoehen
 								foreach ($this->std_plan[$t][$s][0]->frei_orte as $ort=>$value)
-								{
 									$this->std_plan[$t][$s][0]->frei_orte[$ort]=(isset($this->std_plan[$t][$s][0]->frei_orte[$ort])?$this->std_plan[$t][$s][0]->frei_orte[$ort]+1:1);
-								}
 							}
 						}
 					}
@@ -1886,7 +1883,6 @@ class wochenplan extends basis_db
 					}
 				}
 			}
-			
 			// Variablen abgleichen
 			$rest-=$block;
 			if ($block>$rest)
@@ -2131,7 +2127,7 @@ class wochenplan extends basis_db
 							echo $this->crlf.'"'.$this->std_plan[$i][$j][$idx]->lehrfach.(isset($this->std_plan[$i][$j][$idx]->lehrform) && $this->std_plan[$i][$j][$idx]->lehrform!=''?'-'.$this->std_plan[$i][$j][$idx]->lehrform:'').($lvb!=''?' - '.$lvb:'').'","'.$start_date.'","'.$start_time.'","'.$end_date.'","'.$end_time.'","Aus","Aus",,,,,,,,"Stundenplan';
 							echo $this->crlf.$this->std_plan[$i][$j][$idx]->lehrfach.$this->crlf.$this->std_plan[$i][$j][$idx]->lektor.$this->crlf.$lvb.$this->crlf.$this->std_plan[$i][$j][$idx]->ort.'","StundenplanFH","'.$this->std_plan[$i][$j][$idx]->ort.'","Normal","Aus",,"Normal","2"';
 						}
-						else if ($target=='ical')
+						elseif ($target=='ical')
 						{
 							$sda = explode(".",$start_date);  //sda start date array
 							$sta = explode(":",$start_time);	 //sta start time array
@@ -2152,6 +2148,30 @@ class wochenplan extends basis_db
 								.'DTSTART;TZID=Europe/Vienna:'.$start_date_time_ical.$this->crlf
 								.'DTEND;TZID=Europe/Vienna:'.$end_date_time_ical.$this->crlf
 								.'END:VEVENT';
+						}
+						elseif ($target=='freebusy')
+						{
+							$sda = explode(".",$start_date);  //sda start date array
+							$sta = explode(":",$start_time);	 //sta start time array
+							$eda = explode(".",$end_date);    //eda end date array
+							$eta = explode(":",$end_time);	 //eta end time array
+														
+							//Die Zeitzone muss angegeben werden, da sonst der Google Kalender die Endzeiten nicht richtig erkennt 
+							// diese wird in stpl_kalender global definiert und bei den Start und Ende Zeiten mitangegeben
+							$start_date_time_ical = $sda[2].$sda[1].$sda[0].'T'.sprintf('%02s',($sta[0])).$sta[1].$sta[2];  //neu gruppieren der Startzeit und des Startdatums
+							$end_date_time_ical = $eda[2].$eda[1].$eda[0].'T'.sprintf('%02s',($eta[0])).$eta[1].$eta[2];  //neu gruppieren der Startzeit und des Startdatums
+							echo $this->crlf,'FREEBUSY: ',$start_date_time_ical,'/',$end_date_time_ical;
+							/*
+							echo $this->crlf.'BEGIN:VEVENT'.$this->crlf
+								.'UID:'.'FH'.$lvb.$this->std_plan[$i][$j][$idx]->ort.$this->std_plan[$i][$j][$idx]->lektor.$lehrfach[$idx].$start_date_time_ical.$this->crlf
+								.'SUMMARY:'.$lehrfach[$idx].'  '.$this->std_plan[$i][$j][$idx]->ort.' - '.$lvb.$this->crlf
+								.'DESCRIPTION:'.$lehrfach[$idx].'\n'.$this->std_plan[$i][$j][$idx]->lektor.'\n'.$lvb.'\n'.$this->std_plan[$i][$j][$idx]->ort.$this->crlf
+								.'LOCATION:'.$this->std_plan[$i][$j][$idx]->ort.$this->crlf
+								.'CATEGORIES:'.$lvplan_kategorie.$this->crlf
+								.'DTSTART;TZID=Europe/Vienna:'.$start_date_time_ical.$this->crlf
+								.'DTEND;TZID=Europe/Vienna:'.$end_date_time_ical.$this->crlf
+								.'END:VEVENT';
+							*/
 						}
 						else
 						{
