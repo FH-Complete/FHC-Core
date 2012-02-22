@@ -161,8 +161,8 @@ if(!$person->load($uid))
 		  </tr>
 		</table>
 		<?php
-			echo "<H3>".$p->t('zeitwunsch/zeitwunschVon')." $person->titelpre $person->vorname $person->nachname $person->titelpost</H3>";
-		
+			echo "<H3>".$p->t('zeitwunsch/zeitwunschVon')." $person->titelpre $person->vorname $person->nachname $person->titelpost<br/></H3>";
+			echo $p->t('zeitwunsch/tragenSieInDiesesNormwochenraster')."<br/><br/>";
 			echo '<FORM name="zeitwunsch" method="post" action="zeitwunsch.php?type=save" onsubmit="return checkvalues()">
   				<TABLE>
     			<TR>';
@@ -218,7 +218,7 @@ if(!$person->load($uid))
 			<H3><?php echo $p->t('zeitwunsch/erklärung');?>:</H3>
 			<P><?php echo $p->t('zeitwunsch/kontrollierenSieIhreZeitwuensche');?>!<BR><BR>
 			</P>
-			<TABLE align="center">
+			<TABLE align=center>
 			  <TR>
 			    <TH><B><?php echo $p->t('zeitwunsch/wert');?></B></TH>
 			    <TH>
@@ -260,6 +260,7 @@ if(!$person->load($uid))
 			<H3><?php echo $p->t('zeitwunsch/folgendePunkteSindZuBeachten');?>:</H3>
 			<OL>
 			  <LI> <?php echo $p->t('zeitwunsch/verwendenSieDenWertNur');?></LI>
+			  <LI><?php echo $p->t('zeitwunsch/sperrenSieNurTermine');?></LI>
 			  <LI><?php echo $p->t('zeitwunsch/esSolltenFuerJedeStunde');?></LI>
 			</OL>
 			<P><?php echo $p->t('lvplan/fehlerUndFeedback');?> <A class="Item" href="mailto:<?php echo MAIL_LVPLAN;?>"><?php echo $p->t('lvplan/lvKoordinationsstelle');?></A>.</P>
