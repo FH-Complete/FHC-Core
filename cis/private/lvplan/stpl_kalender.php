@@ -73,6 +73,7 @@ else
 $version=(isset($_GET['version'])?$_GET['version']:2);
 $target=(isset($_GET['target'])?$_GET['target']:null);
 
+$stsem=(isset($_GET['stsem'])?$_GET['stsem']:'');
 // UID bestimmen
 $uid = get_uid();
 
@@ -80,7 +81,10 @@ $uid = get_uid();
 if(!isset($begin))
 {
 	$objSS=new studiensemester();
-	$ss = $objSS->getaktorNext();
+	if($stsem=='')
+		$ss = $objSS->getaktorNext();
+	else
+		$ss = $stsem;
 	$objSS->load($ss);
 	$begin = datum::mktime_fromdate($objSS->start);
 	$ende = datum::mktime_fromdate($objSS->ende);
