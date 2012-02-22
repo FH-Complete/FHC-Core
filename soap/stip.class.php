@@ -22,6 +22,7 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/basis_db.class.php');
 require_once('../include/studiensemester.class.php');
 require_once('../include/zeugnisnote.class.php');
+require_once('../include/prestudent.class.php'); 
 
 class stip extends basis_db
 {
@@ -268,27 +269,68 @@ class stip extends basis_db
 	 * @param $studentUID
 	 * @param $studSemester
 	 */
-	function getOrgFormTeilCode($studentUID, $studSemester)
+	function getOrgFormTeilCode($studentUID, $studSemester, $prestudentID)
 	{
-		$qry = "select orgform.code, studiengang.orgform_kurzbz as studorgkz, student.student_uid, student.studiengang_kz studiengang
+					
+		// hole mischform von studenten
+		$qry_mischform = "select studiengang.mischform 
 		from public.tbl_studiengang studiengang
 		join public.tbl_student student using(studiengang_kz)
 		join public.tbl_prestudent prestudent using(prestudent_id)
-		join public.tbl_prestudentstatus status using(prestudent_id)
-		join bis.tbl_orgform orgform on(orgform.orgform_kurzbz = studiengang.orgform_kurzbz) where student_uid='$studentUID'
-		and status.studiensemester_kurzbz ='$studSemester';";
-		
-		if($this->db_query($qry))
+		where student_uid='$studentUID'";
+
+		if($this->db_query($qry_mischform))
 		{
-			if($row = $this->db_fetch_object())
+			if($row= $this->db_fetch_object())
 			{
-				$this->OrgFormTeilCode = $row->code; 
+				$mischform = ($row->mischform=='t'?true:false);
+				
+			}
+		}
+		
+		// hole OrgFormTeilCode aus studiengang
+		if($mischform == false)
+		{
+			
+			$qry = "select orgform.code, studiengang.orgform_kurzbz as studorgkz, student.student_uid, student.studiengang_kz studiengang
+			from public.tbl_studiengang studiengang
+			join public.tbl_student student using(studiengang_kz)
+			join public.tbl_prestudent prestudent using(prestudent_id)
+			join public.tbl_prestudentstatus status using(prestudent_id)
+			join bis.tbl_orgform orgform on(orgform.orgform_kurzbz = studiengang.orgform_kurzbz) where student_uid='$studentUID'
+			and status.studiensemester_kurzbz ='$studSemester';";
+			
+			// Wenn kein Status gefunden wurde -> null
+			if($this->db_query($qry))
+			{
+				if($row = $this->db_fetch_object())
+				{
+					$this->OrgFormTeilCode = $row->code; 
+					return true; 
+				}
+				$this->OrgFormTeilCode = null;
+				return false; 
+			}
+			else
+				return false; 
+		}
+		else // hole OrgFormTeilCode aus letztem Status
+		{
+
+			$prestudentStatus = new prestudent();
+			// wenn status vorhanden übernehme OrgForm
+			if($prestudentStatus->getLastStatus($prestudentID,$studSemester)) 
+			{
+				$statusOrgForm = $prestudentStatus->orgform_kurzbz; 
+				$this->OrgFormTeilCode = $this->getOrgFormCodeFromKurzbz($statusOrgForm);
 				return true; 
 			}
-			return false; 
+			else 
+				$this->OrgFormTeilCode = null; 
+				
+				
 		}
-		else
-			return false; 
+		$this->OrgFormTeilCode = null; 
 	}
 	
 	

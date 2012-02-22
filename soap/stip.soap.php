@@ -110,32 +110,27 @@ function GetStipendienbezieherStip($parameters)
 				$studentUID = $student->getUID($prestudentID); 
 
 				$student->load($studentUID); 
-			
+				$studiengang_kz = $student->studiengang_kz; 
+				
 				$konto = new konto(); 
-				$studGebuehr = $konto->getStudiengebuehrGesamt($studentUID, $studSemester);
+				$studGebuehr = $konto->getStudiengebuehrGesamt($studentUID, $studSemester, $studiengang_kz);
 				// , als Dezimaltrennzeichen
 				$studGebuehr = str_replace('.', ',', $studGebuehr); 
 				
 				// wenn nicht bezahlt
 				if($studGebuehr == "")
 					$studGebuehr = "0,00";
-				
+			
+				if(!$prestudentStatus->getLastStatus($prestudentID,$studSemester))
+					$StipBezieher->Inskribiert = 'n';
+				else
+					$StipBezieher->Inskribiert = 'j';	
+					
 				if($BezieherStip->Typ == "as" || $BezieherStip->Typ == "AS")
 				{
-					$StipBezieher->getOrgFormTeilCode($studentUID, $studSemester);
-					
-					// Wenn Studium ist VBB -> in Status vom Studenten schauen
-					if($StipBezieher->OrgFormTeilCode == 3)
-					{
-						// lade letzten status vom gesuchten semester
-						$prestudentStatus->getLastStatus($prestudentID,$studSemester); 
-						$statusOrgForm = $prestudentStatus->orgform_kurzbz; 
-						$StipBezieher->OrgFormTeilCode = $StipBezieher->getOrgFormCodeFromKurzbz($statusOrgForm);
-
-					}
-					
+					$StipBezieher->getOrgFormTeilCode($studentUID, $studSemester, $prestudentID);
+						
 					$StipBezieher->Studienbeitrag = $studGebuehr; 
-					$StipBezieher->Inskribiert ="j";
 					$StipBezieher->Ausbildungssemester = $StipBezieher->getSemester($prestudentID, $studSemester);						
 					$StipBezieher->StudStatusCode = $StipBezieher->getStudStatusCode($prestudentID, $studSemester);
 					if($StipBezieher->StudStatusCode==3 || $StipBezieher->StudStatusCode==4)
@@ -144,6 +139,7 @@ function GetStipendienbezieherStip($parameters)
 						$StipBezieher->BeendigungsDatum = null; 
 						
 					$StipBezieher->Erfolg = $StipBezieher->getErfolg($prestudentID, $studSemester);
+
 				}
 				elseif($Bezieher->Typ ="ag" || $Bezieher->Typ == "AG")
 				{
@@ -151,7 +147,6 @@ function GetStipendienbezieherStip($parameters)
 					$StipBezieher->StudStatusCode = null; 
 					$StipBezieher->BeendigungsDatum = null; 
 					$StipBezieher->Studienbeitrag = null; 
-					$StipBezieher->Inskribiert ="j";
 					$StipBezieher->OrgFormTeilCode = null; 
 				}
 				
