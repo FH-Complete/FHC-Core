@@ -737,7 +737,7 @@ if($aktion=='update')
 	
 	$i=0;
 	foreach($betraege->result as $row)
-	{
+	{; 
 		echo getBetragRow($i, $row->rechnungsbetrag_id, $row->bezeichnung, $row->betrag, $row->mwst);
 		$i++;
 	}
@@ -832,18 +832,11 @@ if($aktion=='update')
 				mwst = mwst.replace(",",".");
 				brutto = parseFloat(brutto);
 				mwst = parseFloat(mwst);
-				
 				if(!isNaN(brutto) && !isNaN(mwst))
 				{
 					// Nettopreis berechnen
 					var netto = brutto/(100+mwst)*100;
-					
-					//auf 2 Nachkommastellen runden
-					netto = netto*100; 
-					netto = Math.floor(netto); 
-					netto = netto/100; 
-
-					//netto = Math.round(netto*100)/100;
+					netto = Math.round(netto*1000)/1000;; 
 					
 					$("#betrag_"+id).val(netto);
 				}
@@ -862,17 +855,12 @@ if($aktion=='update')
 				mwst = mwst.replace(",",".");
 				netto = parseFloat(netto);
 				mwst = parseFloat(mwst);
-				
 				if(!isNaN(netto) && !isNaN(mwst))
 				{
 					// Nettopreis berechnen
 					var brutto = netto*(100+mwst)/100;
 					
-					//auf 2 Nachkommastellen runden
-					brutto = brutto*100; 
-					brutto = Math.floor(brutto); 
-					brutto = brutto/100; 
-					//brutto = Math.round(brutto*100)/100;
+					brutto = Math.floor(brutto*100)/100;
 					
 					$("#brutto_"+id).val(brutto);
 				}
@@ -931,6 +919,7 @@ if($aktion=='update')
  */
 function getBetragRow($i, $rechnungsbetrag_id='', $bezeichnung='', $betrag='', $mwst='')
 {
+
 	return '<tr id="row_'.$i.'">
 				<td>
 					<input type="hidden" name="rechnungsbetrag_id_'.$i.'" value="'.$rechnungsbetrag_id.'">
@@ -943,7 +932,7 @@ function getBetragRow($i, $rechnungsbetrag_id='', $bezeichnung='', $betrag='', $
 					<input class="number" type="text" size="5" maxlength="5" id="mwst_'.$i.'" name="mwst_'.$i.'" value="'.$mwst.'" onchange="bruttonetto('.$i.'); summe(); "> %
 				</td>
 				<td nowrap>
-					<input class="number" type="text" size="12" maxlength="15" id="brutto_'.$i.'" name="brutto_'.$i.'" value="'.($betrag*(100+$mwst)/100).'" onchange="netto('.$i.'); summe();"> &euro;
+					<input class="number" type="text" size="12" maxlength="15" id="brutto_'.$i.'" name="brutto_'.$i.'" value="'.sprintf("%01.2f",($betrag*(100+$mwst)/100)).'" onchange="netto('.$i.'); summe();"> &euro;
 				</td>
 			</tr>';
 }

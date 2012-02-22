@@ -1695,7 +1695,9 @@ if($_GET['method']=='update')
 	$i= 1; 
 	foreach($detail->result as $det)
 	{
+				
 		$brutto=($det->menge * ($det->preisprove +($det->preisprove * ($det->mwst/100))));
+		$brutto = floor( $brutto * 1000) / 1000;
 		getDetailRow($i, $det->bestelldetail_id, $det->sort, $det->menge, $det->verpackungseinheit, $det->beschreibung, $det->artikelnummer, $det->preisprove, $det->mwst, sprintf("%01.2f",$brutto), $bestellung->bestellung_id, $det->position);
 		$summe+=$brutto; 
 		$i++; 
@@ -1905,8 +1907,8 @@ if($_GET['method']=='update')
 				mwst = parseFloat(mwst);
 				brutto = menge * (brutto + (betrag+(betrag*mwst/100)));
 	    	}
-	    	brutto = Math.round(brutto*100)/100;
-		   	document.getElementById("brutto_"+id).value = brutto.toFixed(2);
+	    	brutto = Math.floor(brutto*100)/100;
+		   	document.getElementById("brutto_"+id).value = brutto;
 		    summe();
 	   	}
 
@@ -1931,9 +1933,9 @@ if($_GET['method']=='update')
 				var netto = brutto/(100+mwst)*100;
 				var netto = netto / menge;
 				
-				//auf 2 Nachkommastellen runden
-				netto = Math.round(netto*100)/100;
-				netto.toFixed(2); 
+				//auf 3 Nachkommastellen runden
+
+				netto = Math.round(netto*1000)/1000;
 				$("#preisprove_"+id).val(netto);
 	    	}
 		    summe();
@@ -1986,10 +1988,8 @@ if($_GET['method']=='update')
 				}
 				i=i+1;
 			}
-			netto = Math.round(netto*100)/100;
+			netto = Math.round(netto*1000)/1000;
 			brutto = Math.round(brutto*100)/100;
-			netto = netto.toFixed(2);
-			brutto = brutto.toFixed(2);
 			$("#netto").html(netto);
 			$("#brutto").html(brutto);
 		}
@@ -2335,7 +2335,7 @@ function getDetailRow($i, $bestelldetail_id='', $sort='', $menge='', $ve='', $be
 		if($status->isStatiVorhanden($bestell_id,'Abgeschickt') && ($rechte->isBerechtigt('wawi/bestellung_advanced') || ($rechte->isBerechtigt('wawi/freigabe', null,'suid',$bestellung->kostenstelle_id) && $bestellung->freigegeben == 'f')))
 			$removeDetail = "removeDetail(".$i.");";
 	}
-	$preisprove = sprintf("%01.2f",$preisprove); 
+	$preisprove = sprintf("%01.3f",$preisprove); 
 	
 	if($sort == '')
 		$sort = $i; 
