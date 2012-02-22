@@ -1,4 +1,28 @@
 <?php
+/* Copyright (C) 2011 FH Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> 
+ *
+ */
+/**
+ * Klasse fuer Datenbankabstraktion
+ */
+
 require_once(dirname(__FILE__).'/basis.class.php');
 
 abstract class db extends basis
@@ -9,6 +33,12 @@ abstract class db extends basis
 
 	function __construct()
 	{
+		if(!defined('FHC_INTEGER'))
+		{
+			define('FHC_INTEGER',1);
+			define('FHC_STRING',2);
+			define('FHC_BOOLEAN',3);
+		}
 		if (is_null(db::$db_conn))
 			$this->db_connect();
 	}
@@ -26,10 +56,15 @@ abstract class db extends basis
 	abstract function db_last_error();
 	abstract function db_free_result($result=null);	
 	abstract function db_version();
+	abstract function db_escape($var);
+	abstract function db_null_value($var, $qoute=true);
+	abstract function db_qoute($var);
+	abstract function db_add_param($var, $type=FHC_STRING, $nullable=true);
+	abstract function db_parse_bool($var);
 
 	
 	/**
-	 * Erzeugt aus den Funktionsparameter eine SLQ Abfrage
+	 * Erzeugt aus den Funktionsparameter eine SQL Abfrage
 	 * --- Wird in der Art Sonderzeichen gefunden wird dieses als FunktionsParmeter verarbeitet
 	 * @param art die SQL Abfrage die erzeugt werden soll Default ist 'select'
 	 * @param distinct - nur wenn art ist 'select' ist

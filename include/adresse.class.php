@@ -76,7 +76,7 @@ class adresse extends basis_db
 		}
 
 		//Daten aus der Datenbank lesen
-		$qry = "SELECT * FROM public.tbl_adresse WHERE adresse_id='".addslashes($adresse_id)."'";
+		$qry = "SELECT * FROM public.tbl_adresse WHERE adresse_id=".$this->db_add_param($adresse_id, FHC_INTEGER, false);
 
 		if(!$this->db_query($qry))
 		{
@@ -87,8 +87,8 @@ class adresse extends basis_db
 		if($row = $this->db_fetch_object())
 		{
 			$this->adresse_id		= $row->adresse_id;
-			$this->heimatadresse 	= ($row->heimatadresse=='t'?true:false);
-			$this->zustelladresse	= ($row->zustelladresse=='t'?true:false);
+			$this->heimatadresse 	= $this->db_parse_bool($row->heimatadresse);
+			$this->zustelladresse	= $this->db_parse_bool($row->zustelladresse);
 			$this->gemeinde			= $row->gemeinde;
 			$this->name				= $row->name;
 			$this->nation			= $row->nation;
@@ -127,7 +127,7 @@ class adresse extends basis_db
 		}
 
 		//Lesen der Daten aus der Datenbank
-		$qry = "SELECT * FROM public.tbl_adresse WHERE person_id='".addslashes($pers_id)."'";
+		$qry = "SELECT * FROM public.tbl_adresse WHERE person_id=".$this->db_add_param($pers_id, FHC_INTEGER, false);
 
 		if(!$this->db_query($qry))
 		{
@@ -140,7 +140,7 @@ class adresse extends basis_db
 			$adr_obj = new adresse();
 
 			$adr_obj->adresse_id      = $row->adresse_id;
-			$adr_obj->heimatadresse = ($row->heimatadresse=='t'?true:false);
+			$adr_obj->heimatadresse   = $this->db_parse_bool($row->heimatadresse);
 			$adr_obj->gemeinde        = $row->gemeinde;
 			$adr_obj->name            = $row->name;
 			$adr_obj->nation          = $row->nation;
@@ -154,7 +154,7 @@ class adresse extends basis_db
 			$adr_obj->updatevon       = $row->updatevon;
 			$adr_obj->insertamum      = $row->insertamum;
 			$adr_obj->insertvon       = $row->insertvon;
-			$adr_obj->zustelladresse  = ($row->zustelladresse=='t'?true:false);
+			$adr_obj->zustelladresse  = $this->db_parse_bool($row->zustelladresse);
 
 			$this->result[] = $adr_obj;
 		}
@@ -181,7 +181,7 @@ class adresse extends basis_db
 		}
 
 		//Lesen der Daten aus der Datenbank
-		$qry = "SELECT * FROM public.tbl_adresse WHERE firma_id='".addslashes($firma_id)."'";
+		$qry = "SELECT * FROM public.tbl_adresse WHERE firma_id=".$this->db_add_param($firma_id, FHC_INTEGER, false);
 
 		if(!$this->db_query($qry))
 		{
@@ -194,7 +194,7 @@ class adresse extends basis_db
 			$adr_obj = new adresse();
 
 			$adr_obj->adresse_id      = $row->adresse_id;
-			$adr_obj->heimatadresse = ($row->heimatadresse=='t'?true:false);
+			$adr_obj->heimatadresse   = $this->db_parse_bool($row->heimatadresse);
 			$adr_obj->gemeinde        = $row->gemeinde;
 			$adr_obj->name            = $row->name;
 			$adr_obj->nation          = $row->nation;
@@ -208,7 +208,7 @@ class adresse extends basis_db
 			$adr_obj->updatevon       = $row->updatevon;
 			$adr_obj->insertamum      = $row->insertamum;
 			$adr_obj->insertvon       = $row->insertvon;
-			$adr_obj->zustelladresse  = ($row->zustelladresse=='t'?true:false);
+			$adr_obj->zustelladresse  = $this->db_parse_bool($row->zustelladresse);
 
 			$this->result[] = $adr_obj;
 		}
@@ -280,44 +280,44 @@ class adresse extends basis_db
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO public.tbl_adresse (person_id, name, strasse, plz, typ, ort, nation, insertamum, insertvon,
 			     gemeinde, heimatadresse, zustelladresse, firma_id, updateamum, updatevon, ext_id) VALUES('.
-			      $this->addslashes($this->person_id).', '.
-			      $this->addslashes($this->name).', '.
-			      $this->addslashes($this->strasse).', '.
-			      $this->addslashes($this->plz).', '.
-			      $this->addslashes(trim($this->typ)).', '.
-			      $this->addslashes($this->ort).', '.
-			      $this->addslashes($this->nation).', now(), '.
-			      $this->addslashes($this->insertvon).', '.
-			      $this->addslashes($this->gemeinde).', '.
-			      ($this->heimatadresse?'true':'false').', '.
-			      ($this->zustelladresse?'true':'false').', '.
-			      ($this->firma_id!=null?$this->addslashes($this->firma_id):'null').', now(), '.
-			      $this->addslashes($this->updatevon).', '.
-			      $this->addslashes($this->ext_id).');';
+			      $this->db_add_param($this->person_id, FHC_INTEGER).', '.
+			      $this->db_add_param($this->name).', '.
+			      $this->db_add_param($this->strasse).', '.
+			      $this->db_add_param($this->plz).', '.
+			      $this->db_add_param(trim($this->typ)).', '.
+			      $this->db_add_param($this->ort).', '.
+			      $this->db_add_param($this->nation).', now(), '.
+			      $this->db_add_param($this->insertvon).', '.
+			      $this->db_add_param($this->gemeinde).', '.
+			      $this->db_add_param($this->heimatadresse,FHC_BOOLEAN, false).', '.
+			      $this->db_add_param($this->zustelladresse,FHC_BOOLEAN, false).', '.
+			      $this->db_add_param($this->firma_id, FHC_INTEGER).', now(), '.
+			      $this->db_add_param($this->updatevon).', '.
+			      $this->db_add_param($this->ext_id, FHC_INTEGER).');';
 		}
 		else
 		{
 			//Pruefen ob adresse_id eine gueltige Zahl ist
 			if(!is_numeric($this->adresse_id))
 			{
-				$this->errormsg = 'adresse_id muss eine gültige Zahl sein: '.$this->adresse_id."\n";
+				$this->errormsg = 'adresse_id muss eine gueltige Zahl sein';
 				return false;
 			}
 			$qry='UPDATE public.tbl_adresse SET'.
-				' person_id='.$this->addslashes($this->person_id).', '.
-				' name='.$this->addslashes($this->name).', '.
-				' strasse='.$this->addslashes($this->strasse).', '.
-				' plz='.$this->addslashes($this->plz).', '.
-		      	' typ='.$this->addslashes(trim($this->typ)).', '.
-		      	' ort='.$this->addslashes($this->ort).', '.
-		      	' nation='.$this->addslashes($this->nation).', '.
-		      	' gemeinde='.$this->addslashes($this->gemeinde).', '.
-		      	' firma_id='.$this->addslashes($this->firma_id).','.
+				' person_id='.$this->db_add_param($this->person_id, FHC_INTEGER).', '.
+				' name='.$this->db_add_param($this->name).', '.
+				' strasse='.$this->db_add_param($this->strasse).', '.
+				' plz='.$this->db_add_param($this->plz).', '.
+		      	' typ='.$this->db_add_param(trim($this->typ)).', '.
+		      	' ort='.$this->db_add_param($this->ort).', '.
+		      	' nation='.$this->db_add_param($this->nation).', '.
+		      	' gemeinde='.$this->db_add_param($this->gemeinde).', '.
+		      	' firma_id='.$this->db_add_param($this->firma_id, FHC_INTEGER).','.
 		      	' updateamum= now(), '.
-		      	' updatevon='.$this->addslashes($this->updatevon).', '.
-		      	' heimatadresse='.($this->heimatadresse?'true':'false').', '.
-		      	' zustelladresse='.($this->zustelladresse?'true':'false').' '.
-		      	'WHERE adresse_id='.$this->adresse_id.';';
+		      	' updatevon='.$this->db_add_param($this->updatevon).', '.
+		      	' heimatadresse='.$this->db_add_param($this->heimatadresse, FHC_BOOLEAN, false).', '.
+		      	' zustelladresse='.$this->db_add_param($this->zustelladresse, FHC_BOOLEAN, false).' '.
+		      	'WHERE adresse_id='.$this->db_add_param($this->adresse_id, FHC_INTEGER, false).';';
 		}
 		
 		if($this->db_query($qry))
@@ -372,7 +372,7 @@ class adresse extends basis_db
 		}
 
 		//loeschen des Datensatzes
-		$qry="DELETE FROM public.tbl_adresse WHERE adresse_id='".addslashes($adresse_id)."';";
+		$qry="DELETE FROM public.tbl_adresse WHERE adresse_id='".$this->db_add_param($adresse_id, FHC_INTEGER, false)."';";
 
 		if($this->db_query($qry))
 		{
