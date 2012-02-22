@@ -65,6 +65,7 @@ $stg->getAll();
 				tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.studiengang_kz, 
 				tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.semester, 
 				tbl_lehrveranstaltung.bezeichnung_english, tbl_lehrveranstaltung.incoming,
+				tbl_lehrveranstaltung.sprache,
 				(
 				SELECT
 					count(*)
@@ -97,6 +98,7 @@ $stg->getAll();
 				<th class="table-sortable:numeric">ID</th>
 				<th class="table-sortable:default">Studiengang</th>
 				<th class="table-sortable:numeric">Semester</th>
+				<th class="table-sortable:numeric">Sprache</th>
 				<th class="table-sortable:default">Lehrveranstaltung</th>
 				<th class="table-sortable:default">Lehrveranstaltung Englisch</th>
 				<th>LV-Info</th>
@@ -119,6 +121,7 @@ $stg->getAll();
 			echo '<td>',$row->lehrveranstaltung_id,'</td>';
 			echo '<td>',$stg->kuerzel_arr[$row->studiengang_kz],'</td>';
 			echo '<td>',$row->semester,'</td>';
+			echo '<td>',$row->sprache,'</td>';
 			echo '<td>',$row->bezeichnung,'</td>';
 			echo '<td>',$row->bezeichnung_english,'</td>';
 			echo '<td>
