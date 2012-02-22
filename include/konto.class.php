@@ -520,13 +520,16 @@ class konto extends basis_db
 	 * Gibt den Betrag der Bezahlten Studiengebühr eines Semesters zurück
 	 * @param $uid StudentUID
 	 * @param $stsem Studiensemester_kurzbz
+	 * @param $studiengang_kz Studiengang kurzbz
 	 */
-	public function getStudiengebuehrGesamt($uid, $stsem)
+	public function getStudiengebuehrGesamt($uid, $stsem, $studiengang_kz = null)
 	{
 		$qry = "select sum(betrag) as betrag from public.tbl_konto 
 				join public.tbl_benutzer benutzer using(person_id)
 				where uid='".addslashes($uid)."' and studiensemester_kurzbz = '".addslashes($stsem)."' 
-				and buchungstyp_kurzbz = 'Studiengebuehr' and betrag > 0;";
+				and buchungstyp_kurzbz = 'Studiengebuehr' and betrag > 0";
+		if($studiengang_kz!= null)
+		$qry.=" and studiengang_kz = '".addslashes($studiengang_kz)."';";
 		
 		if($this->db_query($qry))
 		{
