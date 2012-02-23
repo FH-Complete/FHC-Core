@@ -1236,7 +1236,7 @@ if($_GET['method']=='update')
 								$rechte_fg = new benutzerberechtigung();
 								$uids = $rechte_fg->getFreigabeBenutzer(null, $o); 
 								if(empty($uids))
-									$ausgabemsg .='<span class="error">Es ist niemand zur Freigabe der Kostenstelle berechtigt.</span><br>';
+									$ausgabemsg .='<span class="error">Es ist niemand zur Freigabe der Kostenstelle berechtigt. Bitte wenden Sie sich an den Support.</span><br>';
 								else 
 									$freigabe = true; 
 								break; 
