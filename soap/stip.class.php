@@ -450,28 +450,6 @@ class stip extends basis_db
 		
 		if($resultstatus = $this->db_query($qrystatus))
 		{
-			if($this->db_num_rows($resultstatus)==0)
-			{
-				$stsem = new studiensemester();
-				$psem = $stsem->getPreviousFrom($studiensemester_kurzbz);
-				
-				$qrystatus="
-					SELECT * 
-					FROM 
-						public.tbl_prestudentstatus 
-					WHERE 
-						prestudent_id='$prestudent_id' 
-						AND studiensemester_kurzbz='$psem'";
-				if(!is_null($bisdatum)) 
-					$qrystatus.=" AND (tbl_prestudentstatus.datum<'$bisdatum') ";
-				$qrystatus.=" ORDER BY datum desc, insertamum desc, ext_id desc;";
-				
-				if(!$resultstatus = $this->db_query($qrystatus))
-				{
-					$this->errormsg='Fehler beim Laden der Daten';
-					return false;
-				}
-			}
 			
 			if($rowstatus = $this->db_fetch_object($resultstatus))
 			{
