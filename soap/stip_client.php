@@ -1,6 +1,10 @@
 <?php 
 require_once('../config/vilesci.config.inc.php');
+require_once('../include/functions.inc.php');
 require_once('stip.class.php'); 
+$getuid=get_uid();
+if(!check_lektor($getuid))
+	die('Sie haben keine Berechtigung für diese Seite.');
 ?>
 <html>
 	<head>
