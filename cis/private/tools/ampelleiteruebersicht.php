@@ -24,6 +24,7 @@ require_once('../../../include/datum.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/benutzerfunktion.class.php');
 require_once('../../../include/organisationseinheit.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
 $user = get_uid();
 $sprache = getSprache();
@@ -57,8 +58,9 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 <h1>',$p->t('tools/ampelsystem'),'</h1>
 ';
 
-
 $datum_obj = new datum();
+
+//Leiter OEs holen
 $benutzerfunktion = new benutzerfunktion();
 $benutzerfunktion->getBenutzerFunktionen('Leitung', '', '', $user);
 
@@ -70,6 +72,16 @@ foreach ($benutzerfunktion->result as $row)
 	$oe = $organisationseinheit->getChilds($row->oe_kurzbz);
 	$oes = array_merge($oe, $oes);
 }
+
+//Berechtigungs OEs holen
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+if($rechte->isBerechtigt('basis/ampeluebersicht'))
+{
+	$oes_berechtigung = $rechte->getOEkurzbz('basis/ampeluebersicht');
+	$oes = array_merge($oes_berechtigung, $oes);
+}
+
 array_unique($oes);
 if(count($oes)==0)
 	die($p->t('global/keineBerechtigungFuerDieseSeite'));
