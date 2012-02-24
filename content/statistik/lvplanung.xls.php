@@ -76,7 +76,18 @@ SELECT (SELECT nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(pe
 		  								   )
 							)
 			) as koordinator,
-	
+	(SELECT vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) 
+		  WHERE uid=COALESCE(koordinator, (SELECT uid FROM public.tbl_benutzerfunktion 
+		  								  WHERE fachbereich_kurzbz=tbl_lehrfach.fachbereich_kurzbz AND 
+		  								        tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) AND 
+		  								        funktion_kurzbz='fbk' AND
+		  								        (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+												(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) 
+											LIMIT 1
+		  								   )
+							)
+			) as vorname,
+
 	tbl_lehrfach.bezeichnung as lf_bezeichnung, tbl_lehrveranstaltung.studiengang_kz,
 	tbl_lehrfach.fachbereich_kurzbz as fachbereich_kurzbz, tbl_lehreinheitmitarbeiter.mitarbeiter_uid, 
 	tbl_lehrveranstaltung.semester as lv_semester, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheitmitarbeiter.faktor,
@@ -93,10 +104,14 @@ SELECT (SELECT nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(pe
 	,(SELECT nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) 
 		  WHERE uid=(SELECT mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter  WHERE lehre.tbl_lehreinheitmitarbeiter.lehreinheit_id=lehre.tbl_lehreinheit.lehreinheit_id and lehre.tbl_lehreinheitmitarbeiter.lehrfunktion_kurzbz='LV-Leitung' LIMIT 1)
 		)as lv_leitung	
+	,(SELECT vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) 
+		  WHERE uid=(SELECT mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter  WHERE lehre.tbl_lehreinheitmitarbeiter.lehreinheit_id=lehre.tbl_lehreinheit.lehreinheit_id and lehre.tbl_lehreinheitmitarbeiter.lehrfunktion_kurzbz='LV-Leitung' LIMIT 1)
+		)as lv_leitung_vorname	
 	,(SELECT bezeichnung FROM lehre.tbl_lehrform  WHERE lehre.tbl_lehrform.lehrform_kurzbz=tbl_lehrveranstaltung.lehrform_kurzbz LIMIT 1) as lv_type
 	,tbl_lehrveranstaltung.lehrform_kurzbz
 FROM 
-	lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) 
+	lehre.tbl_lehrveranstaltung 
+	JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) 
 	JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) 
 	JOIN lehre.tbl_lehrfach USING(lehrfach_id)
 WHERE 
@@ -189,7 +204,7 @@ $maxlength[$spalte]=9;
 
 // Neu 13.11.2009 sequens
 
-$worksheet->write($zeile,++$spalte,"LV- Leitung", $format_bold);
+$worksheet->write($zeile,++$spalte,"LV-Leitung", $format_bold);
 $maxlength[$spalte]=9;
 
 $worksheet->write($zeile,++$spalte,"LV-Nummer", $format_bold);
@@ -224,13 +239,13 @@ if($result = $db->db_query($qry))
 		if($maxlength[$spalte]<mb_strlen($row->fachbereich_kurzbz))
 			$maxlength[$spalte]=mb_strlen($row->fachbereich_kurzbz);
 		//Koordinator
-		$worksheet->write($zeile,++$spalte,$row->koordinator);
-		if($maxlength[$spalte]<mb_strlen($row->koordinator))
-			$maxlength[$spalte]=mb_strlen($row->koordinator);
+		$worksheet->write($zeile,++$spalte,$row->koordinator.' '.$row->vorname);
+		if($maxlength[$spalte]<mb_strlen($row->koordinator.' '.$row->vorname))
+			$maxlength[$spalte]=mb_strlen($row->koordinator.' '.$row->vorname);
 		//Lektor
-		$worksheet->write($zeile,++$spalte,$mitarbeiter->nachname);
-		if($maxlength[$spalte]<mb_strlen($mitarbeiter->nachname))
-			$maxlength[$spalte]=mb_strlen($mitarbeiter->nachname);
+		$worksheet->write($zeile,++$spalte,$mitarbeiter->nachname.' '.$mitarbeiter->vorname);
+		if($maxlength[$spalte]<mb_strlen($mitarbeiter->nachname.' '.$mitarbeiter->vorname))
+			$maxlength[$spalte]=mb_strlen($mitarbeiter->nachname.' '.$mitarbeiter->vorname);
 		//Lehrfach
 		$worksheet->write($zeile,++$spalte,$row->lf_bezeichnung);
 		if($maxlength[$spalte]<mb_strlen($row->lf_bezeichnung))
@@ -295,9 +310,9 @@ if($result = $db->db_query($qry))
 			
 // Neu 13.11.2009 sequens
 		//LV-Leitung
-		$worksheet->write($zeile,++$spalte,$row->lv_leitung);
-		if($maxlength[$spalte]<mb_strlen($row->lv_leitung))
-			$maxlength[$spalte]=mb_strlen($row->lv_leitung);
+		$worksheet->write($zeile,++$spalte,$row->lv_leitung.' '.$row->lv_leitung_vorname);
+		if($maxlength[$spalte]<mb_strlen($row->lv_leitung.' '.$row->lv_leitung_vorname))
+			$maxlength[$spalte]=mb_strlen($row->lv_leitung.' '.$row->lv_leitung_vorname);
 
 		//LV-Nummer
 		$worksheet->write($zeile,++$spalte,$row->lehrveranstaltung_id);
@@ -343,7 +358,18 @@ if($result = $db->db_query($qry))
 											LIMIT 1
 		  								   )
 							)
-				) as koordinator, nachname, tbl_lehrfach.bezeichnung, 
+				) as koordinator, 
+				(SELECT vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) 
+		 		 WHERE uid=COALESCE(koordinator, (SELECT uid FROM public.tbl_benutzerfunktion 
+		  								  WHERE fachbereich_kurzbz=tbl_lehrfach.fachbereich_kurzbz AND 
+		  								        tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) AND 
+		  								        funktion_kurzbz='fbk' AND 
+		  								        (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
+												(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
+											LIMIT 1
+		  								   )
+							)
+				) as koordinator_vorname, nachname, vorname, tbl_lehrfach.bezeichnung, 
 				tbl_lehrveranstaltung.semester, student_uid, stunden, tbl_projektbetreuer.stundensatz, 
 				tbl_projektbetreuer.faktor
 			FROM
@@ -394,13 +420,13 @@ if($result = $db->db_query($qry))
 			if($maxlength[$spalte]<mb_strlen($row->fachbereich_kurzbz))
 				$maxlength[$spalte]=mb_strlen($row->fachbereich_kurzbz);
 			//Koordinator
-			$worksheet->write($zeile,++$spalte,$row->koordinator);
-			if($maxlength[$spalte]<mb_strlen($row->koordinator))
-				$maxlength[$spalte]=mb_strlen($row->koordinator);
+			$worksheet->write($zeile,++$spalte,$row->koordinator.' '.$row->koordinator_vorname);
+			if($maxlength[$spalte]<mb_strlen($row->koordinator.' '.$row->koordinator_vorname))
+				$maxlength[$spalte]=mb_strlen($row->koordinator.' '.$row->koordinator_vorname);
 			//Lektor
-			$worksheet->write($zeile,++$spalte,$row->nachname);
-			if($maxlength[$spalte]<mb_strlen($row->nachname))
-				$maxlength[$spalte]=mb_strlen($row->nachname);
+			$worksheet->write($zeile,++$spalte,$row->nachname.' '.$row->vorname);
+			if($maxlength[$spalte]<mb_strlen($row->nachname.' '.$row->vorname))
+				$maxlength[$spalte]=mb_strlen($row->nachname.' '.$row->vorname);
 			//Lehrfach
 			$worksheet->write($zeile,++$spalte,$row->bezeichnung);
 			if($maxlength[$spalte]<mb_strlen($row->bezeichnung))
