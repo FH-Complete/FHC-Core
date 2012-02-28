@@ -157,7 +157,7 @@ if(isset($_POST['getDetailRow']) && isset($_POST['id']))
 {
 	if(is_numeric($_POST['id']))
 	{
-		echo getDetailRow($_POST['id'],'','','','','','','','','',$_POST['bestellung_id'],$_POST['id']);
+		echo getDetailRow($_POST['id'],'','','','','','','','0','',$_POST['bestellung_id'],$_POST['id']);
 		$test++; 
 		exit;
 	}
@@ -1016,8 +1016,8 @@ if($_GET['method']=='update')
 						$bestell_detail->verpackungseinheit = $_POST["ve_$i"];
 						$bestell_detail->beschreibung = $_POST["beschreibung_$i"];
 						$bestell_detail->artikelnummer = $_POST["artikelnr_$i"];
-						$bestell_detail->preisprove = mb_str_replace(',', '.', $_POST["preisprove_$i"]);
-						$bestell_detail->mwst = $_POST["mwst_$i"];
+						$bestell_detail->preisprove = mb_str_replace(',', '.', $_POST["preis_$i"]);
+						$bestell_detail->mwst = mb_str_replace(',', '.', $_POST["mwst_$i"]);
 						$bestell_detail->updateamum = date('Y-m-d H:i:s');
 						$bestell_detail->updatevon = $user;
 						$bestell_detail->new = false; 
@@ -1034,7 +1034,7 @@ if($_GET['method']=='update')
 						$bestell_detail->verpackungseinheit = $_POST["ve_$i"];
 						$bestell_detail->beschreibung = $_POST["beschreibung_$i"];
 						$bestell_detail->artikelnummer = $_POST["artikelnr_$i"];
-						$bestell_detail->preisprove =mb_str_replace(',', '.', $_POST["preisprove_$i"]);
+						$bestell_detail->preisprove =mb_str_replace(',', '.', $_POST["preis_$i"]);
 						$bestell_detail->mwst = $_POST["mwst_$i"];
 						if($_POST["sort_$i"] != '')
 							$bestell_detail->sort = $_POST["sort_$i"];
@@ -1703,7 +1703,7 @@ if($_GET['method']=='update')
 		$i++; 
 	}
 	if($bestellung->freigegeben != 't')
-		getDetailRow($i,null,$i,null,null,null,null,null,null,null,$bestellung->bestellung_id,$i);
+		getDetailRow($i,null,$i,null,null,null,null,null,'0',null,$bestellung->bestellung_id,$i);
 		
 	$test = $i; 
 	echo "</tbody>";
@@ -1895,7 +1895,10 @@ if($_GET['method']=='update')
 	    	var brutto=0;
 	    	var menge = $("#menge_"+id).val();
 	    	var betrag = $("#preisprove_"+id).val();
+	    	document.getElementById("preis_"+id).value = betrag;
+	    	var betrag = $("#preis_"+id).val();
 	    	var mwst = $("#mwst_"+id).val();
+	    	
 	    	if(mwst =="")
 					mwst = "0";
 	    	if(betrag!="" && mwst!="" && menge!="")
@@ -1933,9 +1936,10 @@ if($_GET['method']=='update')
 				var netto = brutto/(100+mwst)*100;
 				var netto = netto / menge;
 				
-				//auf 3 Nachkommastellen runden
-
-				netto = Math.round(netto*1000)/1000;
+				//nicht runden für hiddenfeld
+				$("#preis_"+id).val(netto);
+				netto = Math.round(netto*100)/100;
+				//netto = str_replace(".",",",netto);
 				$("#preisprove_"+id).val(netto);
 	    	}
 		    summe();
@@ -1943,7 +1947,7 @@ if($_GET['method']=='update')
 	   	
 	   	function calcBruttoNetto(id)
 		{
-			var inetto = $("#preisprove_"+id).val();
+			var inetto = $("#preis_"+id).val();
 			var ibrutto = $("#brutto_"+id).val();
 			
 			if(inetto=="" || inetto==0 || inetto=="0,00")
@@ -1967,7 +1971,7 @@ if($_GET['method']=='update')
 			while(i<=anzahlRows)
 			{
 				var menge =$("#menge_"+i).val();
-				var betrag = $("#preisprove_"+i).val();
+				var betrag = $("#preis_"+i).val();
 				var mwst = $("#mwst_"+i).val();
 				if(mwst =="")
 					mwst = "0";
@@ -1988,7 +1992,7 @@ if($_GET['method']=='update')
 				}
 				i=i+1;
 			}
-			netto = Math.round(netto*1000)/1000;
+			netto = Math.round(netto*100)/100;
 			brutto = Math.round(brutto*100)/100;
 			$("#netto").html(netto);
 			$("#brutto").html(brutto);
@@ -2054,7 +2058,7 @@ if($_GET['method']=='update')
 			var ve =  $("#ve_"+i).val(); 
 			var beschreibung =  $("#beschreibung_"+i).val(); 
 			var artikelnr =  $("#artikelnr_"+i).val(); 
-			var preis =  $("#preisprove_"+i).val(); 
+			var preis =  $("#preis_"+i).val(); 
 			preis = preis.replace(",",".");
 			var mwst =  $("#mwst_"+i).val(); 
 			mwst = mwst.replace(",",".");
@@ -2069,7 +2073,7 @@ if($_GET['method']=='update')
 					function(data){ 
 						if(isNaN(data))
 						{
-							alert("Ungültiger Preis eingetragen."); 
+							alert("Ungültiger Preis eingetragen"); 
 						}
 					});  
 			}
@@ -2126,6 +2130,24 @@ if($_GET['method']=='update')
 			FelderSperren(false);			
 		}
 		
+		// beim verlassen der textbox ändere . in ,
+		function replaceKomma(rowid)
+		{
+			var mwst =  $("#mwst_"+rowid).val();
+			mwst=str_replace(".",",",mwst);
+			document.getElementById("mwst_"+rowid).value = mwst; 
+			var preisprove =  $("#preisprove_"+rowid).val(); 
+			preisprove =str_replace(".",",",preisprove);
+			document.getElementById("preisprove_"+rowid).value=preisprove;
+			var preis =  $("#preis_"+rowid).val(); 
+			preis =str_replace(".",",",preis);
+			document.getElementById("preis_"+rowid).value=preis;
+			var brutto =  $("#brutto_"+rowid).val(); 
+			brutto = str_replace(".",",",brutto);
+			document.getElementById("brutto_"+rowid).value=brutto;
+		}
+		
+		
 		// ändert sich der fokus der Bestelldetailzeile -> speichern der geänderten
 		function checkSave(rowid)
 		{
@@ -2136,14 +2158,22 @@ if($_GET['method']=='update')
 			}
 		}
 		
+		//wie PHP str_replace();
+		var str_replace = function(mysearch, myreplace, mysubject)
+		{
+		    return mysubject.split(mysearch).join(myreplace);
+		}
+		
 		// check USt
 		function checkUst(i)
 		{
 			var mwst =  $("#mwst_"+i).val();
-			if(mwst > 99 || mwst < 0 || isNaN(mwst) == true)
+			mwst=str_replace(",",".",mwst);
+			if(mwst > 99 || mwst < 0 || isNaN(mwst))
 			{
+				
 				alert("Ungültige Mehrwertssteuer eingetragen."); 
-				document.getElementById("mwst_"+i).value = "20.00";
+				document.getElementById("mwst_"+i).value = "20,00";
 				calcBruttoNetto(i); 
 			}
 		}
@@ -2314,6 +2344,7 @@ function getDetailRow($i, $bestelldetail_id='', $sort='', $menge='', $ve='', $be
 	$removeDetail ='';
 	$checkSave = ''; 
 	$checkRow = '';
+	$replaceKomma='';
 	$user=get_uid();
 	$status= new wawi_bestellstatus(); 
 	$rechte = new benutzerberechtigung();
@@ -2327,6 +2358,7 @@ function getDetailRow($i, $bestelldetail_id='', $sort='', $menge='', $ve='', $be
 		{
 			$removeDetail = "removeDetail(".$i.");"; 
 			$checkSave = "checkSave(".$i.");"; 
+			$replaceKomma = "replaceKomma(".$i.");";
 			$checkRow = "setTimeout(\"checkNewRow(".$i.",".$bestell_id.")\",100);"; 
 			$detailDown = "nunter(".$i.");"; 
 			$detailUp = "nauf(".$i.");"; 
@@ -2335,11 +2367,11 @@ function getDetailRow($i, $bestelldetail_id='', $sort='', $menge='', $ve='', $be
 		if($status->isStatiVorhanden($bestell_id,'Abgeschickt') && ($rechte->isBerechtigt('wawi/bestellung_advanced') || ($rechte->isBerechtigt('wawi/freigabe', null,'suid',$bestellung->kostenstelle_id) && $bestellung->freigegeben == 'f')))
 			$removeDetail = "removeDetail(".$i.");";
 	}
-	$preisprove = sprintf("%01.3f",$preisprove); 
 	
 	if($sort == '')
 		$sort = $i; 
-
+	$mwst = str_replace('.', ',', $mwst); 
+	
 	echo "<tr id ='row_$i'>\n";
 	echo "<td><a onClick='$removeDetail' title='Bestelldetail löschen'> <img src=\"../skin/images/delete_round.png\" class='cursor'> </a></td>\n";
 	echo "<td><a href='#' class='down' onClick='verschieben(this);'><img src='../skin/images/arrow-single-down-green.png' class='cursor' ></a></td>\n";
@@ -2349,9 +2381,9 @@ function getDetailRow($i, $bestelldetail_id='', $sort='', $menge='', $ve='', $be
 	echo "<td><input type='text' size='5' name='ve_$i' id='ve_$i' maxlength='7' value='$ve' onfocus='$checkSave'></td>\n";
 	echo "<td><input type='text' size='70' name='beschreibung_$i' id='beschreibung_$i' value='$beschreibung' onblur='$checkRow' onfocus='$checkSave'></td>\n";
 	echo "<td><input type='text' size='15' name='artikelnr_$i' id='artikelnr_$i' maxlength='32' value='$artikelnr' onfocus='$checkSave'></td>\n";
-	echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='$preisprove' onblur='$checkRow' onChange='calcBrutto($i);' onfocus='$checkSave'></td>\n";
-	echo "<td><input type='text' size='8' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcBruttoNetto($i);' onfocus='$checkSave' onblur='checkUst($i)'></td>\n";
-	echo "<td><input type='text' size='10' class='number' name ='brutto_$i' id='brutto_$i' value='$brutto' onChange ='calcNetto($i);' onfocus='$checkSave'></td>\n";
+	echo "<td><input type='text' size='15' class='number' name='preisprove_$i' id='preisprove_$i' maxlength='15' value='".sprintf("%01.2f",$preisprove)."' onblur='$checkRow $replaceKomma' onChange='calcBrutto($i);' onfocus='$checkSave'></td>\n";
+	echo "<td><input type='text' size='8' class='number' name='mwst_$i' id='mwst_$i' maxlength='5' value='$mwst' onChange='calcBruttoNetto($i);' onfocus='$checkSave' onblur='checkUst($i); $replaceKomma'></td>\n";
+	echo "<td><input type='text' size='10' class='number' name ='brutto_$i' id='brutto_$i' value='$brutto' onChange ='calcNetto($i);' onBlur='$replaceKomma' onfocus='$checkSave'></td>\n";
 	$detail_tag = new tags(); 
 	$detail_tag->GetTagsByBestelldetail($bestelldetail_id);
 	$help = $detail_tag->GetStringTags(); 
@@ -2372,6 +2404,7 @@ function getDetailRow($i, $bestelldetail_id='', $sort='', $menge='', $ve='', $be
 	echo "<td><input type='text' size='10' name='detail_tag_$i' id='detail_tag_$i' value='$help' ></td>"; 
 	echo "<td><input type='hidden' size='20' name='bestelldetailid_$i' id='bestelldetailid_$i' value='$bestelldetail_id'></td>";
 	echo "<td><input type='hidden' size='3' name='sort_$i' id='sort_$i' maxlength='2' value='$sort'></td>\n";
+	echo "<td><input type='hidden' size='3' name='preis_$i' id='preis_$i' value='$preisprove'></td>\n";
 	echo "</tr>\n";
 
 }
