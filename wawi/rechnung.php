@@ -410,7 +410,7 @@ elseif($aktion == 'save')
 				$id = mb_substr($key, mb_strlen('rechnungsbetrag_id_'));
 				$betraege[$id]['id']=$_POST['rechnungsbetrag_id_'.$id];
 				$betraege[$id]['bezeichnung']=$_POST['bezeichnung_'.$id];
-				$betraege[$id]['betrag']=mb_str_replace(',','.',$_POST['betrag_'.$id]);
+				$betraege[$id]['betrag']=mb_str_replace(',','.',$_POST['betragrechnung_'.$id]);
 				$betraege[$id]['mwst']=mb_str_replace(',','.',$_POST['mwst_'.$id]);
 			}
 		}
@@ -734,10 +734,9 @@ if($aktion=='update')
 	//Vorhandenen Betraege anzeigen
 	$betraege = new wawi_rechnung();
 	$betraege->loadBetraege($rechnung->rechnung_id);
-	
 	$i=0;
 	foreach($betraege->result as $row)
-	{; 
+	{
 		echo getBetragRow($i, $row->rechnungsbetrag_id, $row->bezeichnung, $row->betrag, $row->mwst);
 		$i++;
 	}
@@ -794,7 +793,7 @@ if($aktion=='update')
 				var brutto=0;
 				while(i<=anzahlRows)
 				{
-					var betrag = $("#betrag_"+i).val();
+					var betrag = $("#betragrechnung_"+i).val();
 					var mwst = $("#mwst_"+i).val();
 					var brutto_row = $("#brutto_"+i).val();
 					betrag = betrag.replace(",",".");
@@ -821,6 +820,12 @@ if($aktion=='update')
 				$("#brutto").html(brutto);
 			}
 			
+			//wie PHP str_replace();
+			var str_replace = function(mysearch, myreplace, mysubject)
+			{
+			    return mysubject.split(mysearch).join(myreplace);
+			}
+			
 			/**
 			 * Berechnet den Nettopreis
 			 */
@@ -836,8 +841,8 @@ if($aktion=='update')
 				{
 					// Nettopreis berechnen
 					var netto = brutto/(100+mwst)*100;
-					netto = Math.round(netto*1000)/1000;; 
-					
+					document.getElementById("betragrechnung_"+id).value=netto;
+					netto = Math.round(netto*100)/100;; 
 					$("#betrag_"+id).val(netto);
 				}
 				else
@@ -849,24 +854,48 @@ if($aktion=='update')
 			 */
 			function brutto(id)
 			{
-				var netto = $("#betrag_"+id).val();
-				var mwst = $("#mwst_"+id).val();
-				netto = netto.replace(",",".");
+			
+			var brutto=0;
+	    	var betrag = $("#betrag_"+id).val();
+	    	document.getElementById("betragrechnung_"+id).value = betrag;
+	    	var betrag = $("#betragrechnung_"+id).val();
+	    	var mwst = $("#mwst_"+id).val();
+	    	
+	    	if(mwst =="")
+					mwst = "0";
+	    	if(betrag!="" && mwst!="")
+	    	{
+	    		betrag = betrag.replace(",",".");
 				mwst = mwst.replace(",",".");
-				netto = parseFloat(netto);
+				betrag = parseFloat(betrag);
 				mwst = parseFloat(mwst);
-				if(!isNaN(netto) && !isNaN(mwst))
-				{
-					// Nettopreis berechnen
-					var brutto = netto*(100+mwst)/100;
-					
-					brutto = Math.floor(brutto*100)/100;
-					
-					$("#brutto_"+id).val(brutto);
-				}
-				else
-					$("#brutto_"+id).val(0);
+				brutto = (brutto + (betrag+(betrag*mwst/100)));
+	    	}
+	    	brutto = Math.floor(brutto*100)/100;
+		   	document.getElementById("brutto_"+id).value = brutto;
+			
+			
+
 			}
+			
+					// beim verlassen der textbox ändere . in ,
+			function replaceKomma(rowid)
+			{
+				var mwst =  $("#mwst_"+rowid).val();
+				mwst=str_replace(".",",",mwst);
+				document.getElementById("mwst_"+rowid).value = mwst; 
+				var betrag =  $("#betrag_"+rowid).val(); 
+				betrag =str_replace(".",",",betrag);
+				document.getElementById("betrag_"+rowid).value=betrag;
+				var betragrechnung =  $("#betragrechnung_"+rowid).val(); 
+				betragrechnung =str_replace(".",",",betragrechnung);
+				document.getElementById("betragrechnung_"+rowid).value=betragrechnung;
+				var brutto =  $("#brutto_"+rowid).val(); 
+				brutto = str_replace(".",",",brutto);
+				document.getElementById("brutto_"+rowid).value=brutto;
+				
+			}
+			
 			
 			$(document).ready(function() 
 			{
@@ -919,20 +948,27 @@ if($aktion=='update')
  */
 function getBetragRow($i, $rechnungsbetrag_id='', $bezeichnung='', $betrag='', $mwst='')
 {
-
+	$brutto = ($betrag+($betrag*$mwst/100));
+	if($betrag != '')
+		$betrag = sprintf("%01.2f",$betrag);
+	$betrag = mb_str_replace('.', ',', $betrag);
+	
 	return '<tr id="row_'.$i.'">
 				<td>
 					<input type="hidden" name="rechnungsbetrag_id_'.$i.'" value="'.$rechnungsbetrag_id.'">
 					<input type="text" name="bezeichnung_'.$i.'" value="'.$bezeichnung.'">
 				</td>
 				<td nowrap>
-					<input class="number" type="text" size="12" maxlength="12" id="betrag_'.$i.'" name="betrag_'.$i.'" value="'.$betrag.'"  onblur="checkNewRow('.$i.')" onchange="brutto('.$i.'); summe()"> &euro; 
+					<input class="number" type="text" size="12" maxlength="12" id="betrag_'.$i.'" name="betrag_'.$i.'" value="'.$betrag.'"  onblur="checkNewRow('.$i.'); replaceKomma('.$i.');" onchange="brutto('.$i.'); summe()"> &euro; 
 				</td>
 				<td nowrap>
-					<input class="number" type="text" size="5" maxlength="5" id="mwst_'.$i.'" name="mwst_'.$i.'" value="'.$mwst.'" onchange="bruttonetto('.$i.'); summe(); "> %
+					<input class="number" type="text" size="5" maxlength="5" id="mwst_'.$i.'" name="mwst_'.$i.'" value="'.$mwst.'" onblur="replaceKomma('.$i.');" onchange="bruttonetto('.$i.'); summe(); "> %
 				</td>
 				<td nowrap>
-					<input class="number" type="text" size="12" maxlength="15" id="brutto_'.$i.'" name="brutto_'.$i.'" value="'.sprintf("%01.2f",($betrag*(100+$mwst)/100)).'" onchange="netto('.$i.'); summe();"> &euro;
+					<input class="number" type="text" size="12" maxlength="15" id="brutto_'.$i.'" name="brutto_'.$i.'" value="'.sprintf("%01.2f",$brutto).'" onblur="replaceKomma('.$i.');" onchange="netto('.$i.'); summe();"> &euro;
+				</td>
+				<td>
+					<input type="hidden" id="betragrechnung_'.$i.'" name="betragrechnung_'.$i.'" value="'.$betrag.'">
 				</td>
 			</tr>';
 }

@@ -170,7 +170,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			echo "			<verpackungseinheit><![CDATA[$row->verpackungseinheit]]></verpackungseinheit>\n";
 			echo "			<beschreibung><![CDATA[$row->beschreibung]]></beschreibung>\n";
 			echo "			<artikelnummer><![CDATA[$row->artikelnummer]]></artikelnummer>\n";
-			echo "			<preisprove><![CDATA[",number_format($row->preisprove,3,',','.'),"]]></preisprove>\n";
+			echo "			<preisprove><![CDATA[",number_format($row->preisprove,2,',','.'),"]]></preisprove>\n";
 			echo "			<mwst><![CDATA[",number_format($row->mwst,2,',','.'),"]]></mwst>\n";
 			$summe_brutto_detail=$row->menge*$row->preisprove/100*($row->mwst+100);
 			$summe_netto_detail=$row->menge*$row->preisprove;

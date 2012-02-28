@@ -193,7 +193,7 @@ class wawi_bestelldetail extends basis_db
 			$this->errormsg="Ungültiger Preis eingegeben.";
 			return false; 
 		}
-		if(!is_numeric($this->mwst) && $this->mwst != '')
+		if(!is_numeric($this->mwst) ||  $this->mwst == '')
 		{
 			$this->errormsg="Ungültige MWSt. eingegeben.";
 			return false; 
