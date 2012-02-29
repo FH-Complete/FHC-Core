@@ -1898,7 +1898,7 @@ if($_GET['method']=='update')
 	    	document.getElementById("preis_"+id).value = betrag;
 	    	var betrag = $("#preis_"+id).val();
 	    	var mwst = $("#mwst_"+id).val();
-	    	
+
 	    	if(mwst =="")
 					mwst = "0";
 	    	if(betrag!="" && mwst!="" && menge!="")
@@ -2342,9 +2342,9 @@ if($_GET['method']=='update')
 function getDetailRow($i, $bestelldetail_id='', $sort='', $menge='', $ve='', $beschreibung='', $artikelnr='', $preisprove='', $mwst='', $brutto='', $bestell_id='', $pos='')
 {
 	$removeDetail ='';
-	$checkSave = ''; 
+	$checkSave = "checkSave(".$i.");";  
 	$checkRow = '';
-	$replaceKomma='';
+	$replaceKomma = "replaceKomma(".$i.");";
 	$user=get_uid();
 	$status= new wawi_bestellstatus(); 
 	$rechte = new benutzerberechtigung();
@@ -2357,11 +2357,7 @@ function getDetailRow($i, $bestelldetail_id='', $sort='', $menge='', $ve='', $be
 		if(!$status->isStatiVorhanden($bestell_id,'Abgeschickt'))
 		{
 			$removeDetail = "removeDetail(".$i.");"; 
-			$checkSave = "checkSave(".$i.");"; 
-			$replaceKomma = "replaceKomma(".$i.");";
 			$checkRow = "setTimeout(\"checkNewRow(".$i.",".$bestell_id.")\",100);"; 
-			$detailDown = "nunter(".$i.");"; 
-			$detailUp = "nauf(".$i.");"; 
 		}
 		
 		if($status->isStatiVorhanden($bestell_id,'Abgeschickt') && ($rechte->isBerechtigt('wawi/bestellung_advanced') || ($rechte->isBerechtigt('wawi/freigabe', null,'suid',$bestellung->kostenstelle_id) && $bestellung->freigegeben == 'f')))
