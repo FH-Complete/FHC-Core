@@ -107,7 +107,7 @@ function getOeGantt()
 		style="color:#000000;fill:none;stroke:#e1e1e1;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />';
 		
 		// Überschriften
-		echo'<text x="30%" y="40" style="font-size:33px">Kalenderjahr: '.$studienjahr.'</text>';
+		echo'<text x="25%" y="40" style="font-size:33px">Projekte Kalenderjahr: '.$studienjahr.'</text>';
 		echo'<text x="'.($startX-10).'" y="'.($startY-5).'" style="font-size:13px" text-anchor="end"> KW:</text>';
 		
 		// Zeichne Raster
@@ -193,7 +193,7 @@ function getOeGantt()
 		width="100%" height="100%" viewBox="0 0 750 700">';
 		
 		// Überschriften
-		echo'<text x="30%" y="40" style="font-size:33px">Studienjahr: '.$studienjahr.'/'.($studienjahr+1).'</text>';
+		echo'<text x="25%" y="40" style="font-size:33px">Projekte Studienjahr: '.$studienjahr.'/'.($studienjahr+1).'</text>';
 		echo'<text x="'.($startX-10).'" y="'.($startY-5).'" style="font-size:13px" text-anchor="end"> KW:</text>';
 		
 		// WS 
@@ -402,7 +402,7 @@ function getProjektGantt()
 		style="color:#000000;fill:none;stroke:#e1e1e1;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />';
 		
 		// Überschriften
-		echo'<text x="30%" y="40" style="font-size:33px">Kalenderjahr: '.$studienjahr.'</text>';
+		echo'<text x="25%" y="40" style="font-size:33px">Phasen Kalenderjahr: '.$studienjahr.'</text>';
 		echo'<text x="'.($startX-10).'" y="'.($startY-5).'" style="font-size:13px" text-anchor="end"> KW:</text>';
 		
 		// Zeichne Raster
@@ -488,7 +488,7 @@ function getProjektGantt()
 		width="100%" height="100%" viewBox="0 0 750 700">';
 		
 		// Überschriften
-		echo'<text x="30%" y="40" style="font-size:33px">Studienjahr: '.$studienjahr.'/'.($studienjahr+1).'</text>';
+		echo'<text x="25%" y="40" style="font-size:33px">Phasen Studienjahr: '.$studienjahr.'/'.($studienjahr+1).'</text>';
 		echo'<text x="'.($startX-10).'" y="'.($startY-5).'" style="font-size:13px" text-anchor="end"> KW:</text>';
 		
 		// WS 
