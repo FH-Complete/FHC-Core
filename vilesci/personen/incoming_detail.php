@@ -931,6 +931,12 @@ echo'			</td>
 				<td>Aktiv
 				<input type="checkbox" name="aktiv" '.($inc->aktiv?'checked':'').'></td>
 			</tr>
+			<tr>';
+	$registriert = new datum();
+	$insertamum = $registriert->formatDatum($inc->insertamum, 'Y-m-d');
+	echo'			<td>Registriert am:</td>
+				<td><input type="text" value="'.$insertamum.'" disabled></td>
+			</tr>
 			<tr>
 				<td></td>
 				<td></td>
