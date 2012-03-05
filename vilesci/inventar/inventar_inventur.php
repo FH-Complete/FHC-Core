@@ -269,6 +269,7 @@ if(isset($_POST['updateliste']))
 						var div = document.getElementById('inventarliste');
 						var p = document.createElement("p");
 						var txt = document.createTextNode("Error:"+inventarnummer);
+						ErrorSound();
 						p.appendChild(txt);
 						div.appendChild(p);
 						document.getElementById('inventarnummer').value='';
@@ -282,9 +283,18 @@ if(isset($_POST['updateliste']))
 		{
 		    return row[0] + " <i>" + row[1] + "<\/i> ";
 		}
+		function ErrorSound() 
+		{
+		    var audioElement = document.getElementById('sound1');
+		    audioElement.play();
+		}
 		</script>
 	</head>
 	<body>
+	
+<audio src="<?php echo APP_ROOT;?>skin/sounds/inventar_error.ogg" id="sound1"/>
+  Your browser does not support the audio tag.
+</audio>
 	<h1 title="Anwender:<?php echo $uid ?>">&nbsp;Inventar - Inventur&nbsp;</h1>
     <form name="sendform" action="<?php echo $_SERVER["PHP_SELF"];  ?>" method="post" enctype="application/x-www-form-urlencoded">
 	<div>
