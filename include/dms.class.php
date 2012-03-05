@@ -34,6 +34,8 @@ class dms extends basis_db
 	public $oe_kurzbz;
 	public $dokument_kurzbz;
 	public $kategorie_kurzbz;
+	public $parent_kategorie_kurzbz; 
+	public $gruppe_kurzbz; 
 	public $filename;
 	public $mimetype;
 	public $name;
@@ -227,6 +229,250 @@ class dms extends basis_db
 			$this->errormsg='Fehler beim Aktualisieren der Zugriffszeit';
 			return false;
 		}		
+	}
+
+	/**
+	 * 
+	 * Löscht die Kategorie der übergebenen kurzbz
+	 * Überprüft ob noch dms Einträge an zu löschender Kategorie hängen
+	 * @param $kategorie_kurzbz
+	 */
+	public function deleteKategorie($kategorie_kurzbz)
+	{
+		$qry_anzahl = "SELECT * FROM campus.tbl_dms WHERE kategorie_kurzbz=".$this->db_add_param($kategorie_kurzbz).";";
+		
+		if($result = $this->db_query($qry_anzahl))
+		{
+			// löschen nur möglich wenn keine DMS-Einträge mehr auf Kategorie hängen 
+			if($this->db_num_rows($result) == 0 )
+			{
+				$qry ="DELETE FROM campus.tbl_dms_kategorie WHERE kategorie_kurzbz =".$this->db_add_param($kategorie_kurzbz).";";
+				if($this->db_query($qry))
+				{
+					return true;
+				}
+				else
+				{
+					$this->errormsg = 'Fehler beim Löschen der Daten'."\n";
+					return false;
+				}
+			}
+			else
+			{
+				$this->errormsg = "Löschen Fehlgeschlagen! Es hängen noch DMS Einträge an dieser Kategorie";
+				return false; 
+			}
+		}
+		$this->errormsg ="Fehler beim Löschen der Daten"; 
+		return false; 
+		
+		
+	}
+	
+	/**
+	 * 
+	 * Lädt alle Gruppen der übergebenen Kategorie
+	 * @param $kategorie_kurzbz
+	 */
+	public function loadGruppenForKategorie($kategorie_kurzbz)
+	{
+		$qry = "SELECT 
+					campus.tbl_dms_kategorie_gruppe.kategorie_kurzbz,
+					campus.tbl_dms_kategorie_gruppe.insertamum,
+					campus.tbl_dms_kategorie_gruppe.insertvon,
+					campus.tbl_dms_kategorie_gruppe.gruppe_kurzbz,
+					public.tbl_gruppe.bezeichnung
+				FROM 
+					campus.tbl_dms_kategorie_gruppe
+					JOIN public.tbl_gruppe USING(gruppe_kurzbz)
+				WHERE
+					kategorie_kurzbz=".$this->db_add_param($kategorie_kurzbz)." 
+				ORDER BY gruppe_kurzbz";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new dms();
+				
+				$obj->gruppe_kurzbz = $row->gruppe_kurzbz;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->bezeichnung = $row->bezeichnung;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	
+	/**
+	 * Speichert den aktuellen Datensatz in die Datenbank
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der kurzbz $kategorie_kurzbz aktualisiert
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function saveGruppeKategorie()
+	{
+		
+		if($this->isGruppeZugeteilt($this->kategorie_kurzbz, $this->gruppe_kurzbz))
+		{
+			$this->errormsg = 'Diese Gruppe ist bereits zugeordnet';
+			return false;
+		}
+
+			//Neuen Datensatz einfuegen
+			$qry='INSERT INTO campus.tbl_dms_kategorie_gruppe (kategorie_kurzbz, gruppe_kurzbz, insertamum, insertvon) VALUES('.
+			      $this->db_add_param($this->kategorie_kurzbz).', '.
+			      $this->db_add_param($this->gruppe_kurzbz).', '.
+			      $this->db_add_param($this->insertamum).', '.
+			      $this->db_add_param($this->insertvon).');';
+		
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler beim Zuordner der Gruppe';
+			return false;
+		}
+		return true; 
+
+	}
+	
+	public function deleteGruppe($kategorie_kurzbz, $gruppe_kurzbz)
+	{
+		$qry = "DELETE FROM campus.tbl_dms_kategorie_gruppe where kategorie_kurzbz =".$this->db_add_param($kategorie_kurzbz)." AND gruppe_kurzbz =".$this->db_add_param($gruppe_kurzbz).";";
+		
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg ="Löschen der Gruppe fehlgeschlagen";
+			return false; 
+		}
+		return true; 
+	}
+	
+	
+	/**
+	 * Prueft ob eine Gruppenzuteilung vorhanden ist
+	 * 
+	 * @param kategorie_kurzbz
+	 * @param $gruppe_kurzbz
+	 * @return boolean
+	 */
+	public function isGruppeZugeteilt($kategorie_kurzbz, $gruppe_kurzbz)
+	{
+		$qry = "SELECT 1 FROM campus.tbl_dms_kategorie_gruppe WHERE kategorie_kurzbz='".addslashes($kategorie_kurzbz)."' AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."';";
+		
+		if($result = $this->db_query($qry))
+		{
+			if($this->db_num_rows($result)>0)
+				return true;
+			else
+				return false;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Zuteilung';
+			return false;
+		}
+	}
+	
+	
+	/**
+	 * Speichert den aktuellen Datensatz in die Datenbank
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der kurzbz $kategorie_kurzbz aktualisiert
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function saveKategorie()
+	{
+		if($this->new)
+		{
+			//Neuen Datensatz einfuegen
+			$qry='INSERT INTO campus.tbl_dms_kategorie (kategorie_kurzbz, bezeichnung, beschreibung, parent_kategorie_kurzbz) VALUES('.
+			      $this->db_add_param($this->kategorie_kurzbz).', '.
+			      $this->db_add_param($this->bezeichnung).', '.
+			      $this->db_add_param($this->beschreibung).', '.
+			      $this->db_add_param($this->parent_kategorie_kurzbz).');';
+		}
+		else
+		{
+			$qry='UPDATE campus.tbl_dms_kategorie SET'.
+				' bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
+				' beschreibung='.$this->db_add_param($this->beschreibung).', '.
+				' parent_kategorie_kurzbz='.$this->db_add_param($this->parent_kategorie_kurzbz).' '.
+		      	'WHERE kategorie_kurzbz='.$this->db_add_param($this->kategorie_kurzbz).';';
+		}
+		
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler beim Speichern der Kategorie';
+			return false;
+		}
+		return true; 
+
+	}
+	
+	/**
+	 * 
+	 * Laedt Kategorie anhand von kurzbz
+	 * @param $kategorie_kurzbz
+	 */
+	public function loadKategorie($kategorie_kurzbz)
+	{
+		$qry = "SELECT * FROM campus.tbl_dms_kategorie WHERE kategorie_kurzbz = ".$this->db_add_param($kategorie_kurzbz).";";
+		
+		if($result = $this->db_query($qry))
+		{
+			// wenn es keine kategorie gibt -> gib false zurück
+			if($this->db_num_rows() != 0 )
+			{
+				if($row = $this->db_fetch_object($result))
+				{
+					$this->kategorie_kurzbz = $row->kategorie_kurzbz; 
+					$this->bezeichnung = $row->bezeichnung; 
+					$this->beschreibung = $row->beschreibung; 
+					$this->parent_kategorie_kurzbz = $row->parent_kategorie_kurzbz; 
+				}
+				return true; 
+			}
+			else
+				return false;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * 
+	 * Liefert alle Kategorien zurück
+	 */
+	public function getAllKategories()
+	{
+		$qry ="SELECT * FROM campus.tbl_dms_kategorie ORDER BY bezeichnung;";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new dms(); 
+				$obj->kategorie_kurzbz = $row->kategorie_kurzbz; 
+				$obj->bezeichnung = $row->bezeichnung; 
+				$obj->beschreibung = $row->beschreibung; 
+				$obj->parent_kategorie_kurzbz = $row->parent_kategorie_kurzbz; 
+				
+				$this->result[]= $obj; 
+			}
+		}
+		else
+			return false; 
 	}
 	
 	/**
