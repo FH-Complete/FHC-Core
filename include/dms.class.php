@@ -211,7 +211,65 @@ class dms extends basis_db
 		}
 	}
 	
-	/**
+    /**
+     * Löscht einen DMS Eintrag mit übergebener ID und Version
+     * Wird die letzte Version eines Eintrages gelöscht, wird automatisch der Eintrag mitgelöscht
+     * @param $dms_id
+     * @param $version 
+     */
+    public function deleteVersion($dms_id, $version)
+    {     
+        $qry ="DELETE FROM campus.tbl_dms_version WHERE dms_id = ".$this->db_add_param($dms_id, FHC_INTEGER)." and version =".$this->db_add_param($version, FHC_INTEGER);
+        
+        if($this->db_query($qry))
+        {
+             $qry_anzahl ="SELECT 1 FROM campus.tbl_dms_version WHERE dms_id =".$this->db_add_param($dms_id, FHC_INTEGER);
+             if($result = $this->db_query($qry_anzahl))
+            {
+                // Wenn letzte Version gelöscht wurde -> lösche gesamten Eintrag
+                if($this->db_num_rows($result) == 0 )
+                {
+                    if(!$this->deleteDms($dms_id))
+                    {
+                        $this->errormsg = "Fehler beim Löschen aufgetreten"; 
+                       return false;
+                    }
+                    else
+                        return true; 
+                }
+            }   
+        }
+        else
+        {
+            $this->errormsg="Fehler beim Löschen der Version aufgetreten";
+            return false;
+        }
+    }
+
+    /**
+     * Löscht einen gesamten DMS Eintrag inklusive aller Versionen
+     * @param $dms_id 
+     */
+    public function deleteDms($dms_id)
+    {
+        // lösche Versionen
+        $qry ="BEGIN;DELETE FROM campus.tbl_dms_version WHERE dms_id =".$this->db_add_param($dms_id, FHC_INTEGER)."; ";
+        $qry.="DELETE FROM fue.tbl_projekt_dokument WHERE dms_id=".$this->db_add_param($dms_id, FHC_INTEGER)."; ";
+        $qry.="DELETE FROM campus.tbl_dms WHERE dms_id =".$this->db_add_param($dms_id, FHC_INTEGER).";";  
+        if($this->db_query($qry))
+        {
+           $this->db_query('COMMIT');
+           return true; 
+        }
+        else
+        {
+            $this->db_query('ROLLBACK');
+            $this->errormsg = "Fehler beim Löschen des Eintrages aufgetreten"; 
+            return false; 
+        }
+    }
+
+    /**
 	 * Setzt die Zeit des letzten Zugriffs auf die Datei
 	 * 
 	 * @param $dms_id
