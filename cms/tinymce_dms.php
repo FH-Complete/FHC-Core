@@ -312,6 +312,27 @@ if(isset($_POST['action']) && $_POST['action']=='rename')
 	else
 		echo '<span class="error">Fehler beim Laden des Eintrages</span>';
 }
+if(isset($_REQUEST['delete']))
+{
+    // lösche nur die Version
+    if(isset($_REQUEST['version']))
+    {
+        $dms_id = $_REQUEST['dms_id'];
+        $version = $_REQUEST['version'];
+
+        $dms = new dms(); 
+        if(!$dms->deleteVersion($dms_id, $version))
+            echo '<span class="error">'.$dms->errormsg.'</span>';
+    }else
+    {
+        // lösche gesamten Eintrag
+        $dms_id = $_REQUEST['dms_id'];
+
+        $dms = new dms(); 
+        if(!$dms->deleteDms($dms_id))
+            echo '<span class="error">'.$dms->errormsg.'</span>';
+    }
+}
 
 if($versionId != '')
 {	
@@ -329,7 +350,7 @@ elseif($renameId!='')
 }
 else 
 {
-	echo '<h1>Dokument Auswählen</h1>
+	echo '<div align="left"><h1>Dokument Auswählen</div><div align="right"><a href="admin_dms.php" target="_blank">Administration</a></div>
 		<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
 			<input type="text" name="searchstring" value="'.$searchstring.'">
 			<input type="submit" value="Suchen">
@@ -475,6 +496,7 @@ function drawAllVersions($id)
 						<li><a style="font-size:small">Erweitert</a>
 							<ul>
 								<li><a href="dms.php?id='.$dms_help->dms_id.'&version='.$dms_help->version.'" style="font-size:small" target="_blank">Herunterladen</a></li>
+                                <li><a href="'.$_SERVER['PHP_SELF'].'?dms_id='.$dms_help->dms_id.'&version='.$dms_help->version.'&delete" style="font-size:small">Löschen</a></li>
 							</ul>
 						</li>
 				 	</ul>
@@ -641,7 +663,8 @@ function drawFilesList($rows)
 						<li><a href="id://'.$row->dms_id.'/Upload" onclick="return upload(\''.$row->dms_id.'\',\''.$row->name.'\')" style="font-size:small">Neue Version hochladen</a></li>
 						<li><a href="'.$_SERVER['PHP_SELF'].'?versionid='.$row->dms_id.'" style="font-size:small" >Alle Versionen anzeigen</a></li>
 						<li><a href="'.$_SERVER['PHP_SELF'].'?renameid='.$row->dms_id.'&version='.$row->version.'&kategorie_kurzbz='.$row->kategorie_kurzbz.'" style="font-size:small" >Datei umbenennen</a></li>
-					</ul>
+                        <li><a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$row->kategorie_kurzbz.'&dms_id='.$row->dms_id.'&delete" style="font-size:small" >Löschen</a></li>
+                    </ul>
 				</li>
 			  </ul>';
 		echo '</td>
