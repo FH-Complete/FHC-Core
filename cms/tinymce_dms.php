@@ -22,8 +22,12 @@
 require_once('../config/cis.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/dms.class.php');
+require_once('../include/benutzerberechtigung.class.php');
 
 $user = get_uid();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//DE"
 "http://www.w3.org/TR/html4/strict.dtd">
@@ -312,8 +316,12 @@ if(isset($_POST['action']) && $_POST['action']=='rename')
 	else
 		echo '<span class="error">Fehler beim Laden des Eintrages</span>';
 }
+
 if(isset($_REQUEST['delete']))
 {
+    if(!$rechte->isberechtigt('basis/dms',null, 'sui', null))
+        die('Sie haben keine Berechtigung diese Seite zu sehen.');
+    
     // lösche nur die Version
     if(isset($_REQUEST['version']))
     {
@@ -321,16 +329,45 @@ if(isset($_REQUEST['delete']))
         $version = $_REQUEST['version'];
 
         $dms = new dms(); 
+        $dms->load($dms_id, $version);
+
+        //  DB Eintrag löschen
         if(!$dms->deleteVersion($dms_id, $version))
             echo '<span class="error">'.$dms->errormsg.'</span>';
+        else
+        {   
+            // File im Filesystem löschen 
+            if(unlink(DMS_PATH.$dms->filename))
+                echo '<span class="ok">Erfolgreich gelöscht!</span>';
+            else
+                echo '<span class="error">Fehler beim löschen aus dem Filesystem aufgetreten!</span>';
+        }
     }else
     {
         // lösche gesamten Eintrag
         $dms_id = $_REQUEST['dms_id'];
 
         $dms = new dms(); 
+        $error = false; 
+        
+        $dms->getAllVersions($dms_id);
+        
+        // DB Einträge löschen
         if(!$dms->deleteDms($dms_id))
             echo '<span class="error">'.$dms->errormsg.'</span>';
+        else
+        {
+            // Alle Versionen der Datei vom Filesystem löschen
+            foreach($dms->result as $obj)
+            {
+                if(!unlink(DMS_PATH.$obj->filename))
+                    $error = true; 
+            }
+            if($error)
+                echo '<span class="error">Fehler beim löschen aus dem Filesystem aufgetreten!</span>';
+            else
+                echo '<span class="ok">Erfolgreich gelöscht!</span>';
+        }
     }
 }
 
