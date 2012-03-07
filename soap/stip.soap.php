@@ -124,7 +124,12 @@ function GetStipendienbezieherStip($parameters)
 				if(!$prestudentStatus->getLastStatus($prestudentID,$studSemester))
 					$StipBezieher->Inskribiert = 'n';
 				else
-					$StipBezieher->Inskribiert = 'j';	
+                {
+                    if($prestudentStatus->status_kurzbz == 'Interessent')
+                        $StipBezieher->Inskribiert = 'n';
+                    else
+                        $StipBezieher->Inskribiert = 'j';	
+                }
 					
 				if($BezieherStip->Typ == "as" || $BezieherStip->Typ == "AS")
 				{
