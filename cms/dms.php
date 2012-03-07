@@ -59,7 +59,7 @@ if($doc->isLocked($id))
 
 if(!isset($_GET['notimeupdate']))
 	$doc->touch($doc->dms_id, $doc->version);
-	
+
 $filename = DMS_PATH.$doc->filename;
 if(file_exists($filename))
 {
