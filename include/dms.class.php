@@ -223,10 +223,10 @@ class dms extends basis_db
         
         if($this->db_query($qry))
         {
-             $qry_anzahl ="SELECT 1 FROM campus.tbl_dms_version WHERE dms_id =".$this->db_add_param($dms_id, FHC_INTEGER);
-             if($result = $this->db_query($qry_anzahl))
+            $qry_anzahl ="SELECT 1 FROM campus.tbl_dms_version WHERE dms_id =".$this->db_add_param($dms_id, FHC_INTEGER);
+            if($result = $this->db_query($qry_anzahl))
             {
-                // Wenn letzte Version gelöscht wurde -> lösche gesamten Eintrag
+            // Wenn letzte Version gelöscht wurde -> lösche gesamten Eintrag
                 if($this->db_num_rows($result) == 0 )
                 {
                     if(!$this->deleteDms($dms_id))
@@ -237,17 +237,18 @@ class dms extends basis_db
                     else
                         return true; 
                 }
-            }   
+            }
         }
         else
         {
             $this->errormsg="Fehler beim Löschen der Version aufgetreten";
             return false;
         }
+        return true; 
     }
 
     /**
-     * Löscht einen gesamten DMS Eintrag inklusive aller Versionen
+     * Löscht einen gesamten DMS Eintrag inklusive aller Versionen und Projekteinträge
      * @param $dms_id 
      */
     public function deleteDms($dms_id)
@@ -291,7 +292,7 @@ class dms extends basis_db
 
 	/**
 	 * 
-	 * Löscht die Kategorie der übergebenen kurzbz
+	 * Löscht die Kategorie und daran hängende Gruppen der übergebenen kurzbz
 	 * Überprüft ob noch dms Einträge an zu löschender Kategorie hängen
 	 * @param $kategorie_kurzbz
 	 */
@@ -304,14 +305,17 @@ class dms extends basis_db
 			// löschen nur möglich wenn keine DMS-Einträge mehr auf Kategorie hängen 
 			if($this->db_num_rows($result) == 0 )
 			{
-				$qry ="DELETE FROM campus.tbl_dms_kategorie WHERE kategorie_kurzbz =".$this->db_add_param($kategorie_kurzbz).";";
+				$qry ="BEGIN; DELETE FROM campus.tbl_dms_kategorie_gruppe where kategorie_kurzbz =".$this->db_add_param($kategorie_kurzbz, FHC_STRING)."; 
+                    DELETE FROM campus.tbl_dms_kategorie WHERE kategorie_kurzbz =".$this->db_add_param($kategorie_kurzbz, FHC_STRING).";";
 				if($this->db_query($qry))
 				{
+                    $this->db_query('COMMIT;');
 					return true;
 				}
 				else
 				{
 					$this->errormsg = 'Fehler beim Löschen der Daten'."\n";
+                    $this->db_query('ROLLBACK;');
 					return false;
 				}
 			}
@@ -323,8 +327,6 @@ class dms extends basis_db
 		}
 		$this->errormsg ="Fehler beim Löschen der Daten"; 
 		return false; 
-		
-		
 	}
 	
 	/**
@@ -662,16 +664,16 @@ class dms extends basis_db
 	 * lädt alle Versionen zu einer übergebenen ID
 	 * @param $id der zu ladenden Dokumente
 	 */
-	public function getAllVersions($id)
+	public function getAllVersions($dms_id)
 	{
-		if(!is_numeric($id))
+		if(!is_numeric($dms_id))
 		{
 			$this->errormsg = "Falsche Dokument ID"; 
 			return false; 
 		}
 		
 		$qry =	"SELECT * FROM campus.tbl_dms JOIN campus.tbl_dms_version USING(dms_id)
-				 WHERE dms_id = '".addslashes($id)."' ORDER BY version ASC;";	
+				 WHERE dms_id = '".addslashes($dms_id)."' ORDER BY version ASC;";	
 		
 		if($result = $this->db_query($qry))
 		{
