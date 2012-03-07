@@ -123,13 +123,13 @@ if(isset($_REQUEST['save']))
 			$dms->insertvon = $user; 
 			
 			if(!$dms->saveGruppeKategorie())
-				echo $dms->errormsg; 
+				echo '<span class="error">'.$dms->errormsg.'</span>'; 
 			else
-				echo "Gruppe erfolgreich zugeteilt";
+				echo '<span class="ok">Gruppe erfolgreich zugeteilt</span>';
 		}
 		else 
 		{
-			echo "Keine gültige Kategorie übergeben"; 
+			echo '<span class="error">Keine gültige Kategorie übergeben</span>';
 		}
 	}
 	else
@@ -148,9 +148,9 @@ if(isset($_REQUEST['save']))
 				$kategorieSave->parent_kategorie_kurzbz = $kategorie_auswahl;
 				$kategorieSave->new=false; 
 				if(!$kategorieSave->saveKategorie())
-					exit($kategorieSave->errormsg);
+					echo '<span class="error">'.$kategorieSave->errormsg.'</span>';
 				else 
-					echo"Erfolgreich gespeichert"; 
+					echo'<span class="ok">Erfolgreich gespeichert</span>';
 				
 			}
 			else 
@@ -162,13 +162,13 @@ if(isset($_REQUEST['save']))
 				$kategorieSave->parent_kategorie_kurzbz = $kategorie_auswahl;
 				$kategorieSave->new=true; 
 				if(!$kategorieSave->saveKategorie())
-					exit($kategorieSave->errormsg);
+					echo '<span class="error">'.$kategorieSave->errormsg.'<span class="error">';
 				else
-					echo"Erfolgreich gespeichert"; 
+					echo'<span class="ok">Erfolgreich gespeichert</span>';
 			}
 		}
 		else
-			echo "Kategorie_kurzbz darf nicht null sein."; 
+			echo '<span class="error">Kategorie_kurzbz darf nicht null sein</span>';
 	}
 }
 
@@ -180,9 +180,9 @@ if(isset($_REQUEST['delete']))
 	{
 		$dms = new dms(); 
 		if(!$dms->deleteGruppe($_REQUEST['kategorie_kurzbz'], $_REQUEST['gruppe_kurzbz']))
-			echo $dms->errormsg; 
+			echo '<span class="error">'.$dms->errormsg.'</span>';
 		else 
-			echo "Gruppe erfolgreich gelöscht"; 
+			echo'<span class="ok">Gruppe erfolgreich gelöscht!</span>';
 		
 	}
 	else 
@@ -191,9 +191,9 @@ if(isset($_REQUEST['delete']))
 		{
 			$dms = new dms(); 
 			if(!$dms->deleteKategorie($_REQUEST['kategorie_kurzbz']))
-				echo $dms->errormsg; 
+				echo '<span class="error">'.$dms->errormsg.'</span>'; 
 			else 
-				echo "Erfolgreich gelöscht"; 
+				echo '<span class="ok">Erfolgreich gelöscht</span>'; 
 		}
 		else 
 			echo "keine Kategorie übergeben"; 
