@@ -2073,7 +2073,7 @@ if($_GET['method']=='update')
 					function(data){ 
 						if(isNaN(data))
 						{
-							alert("Ungültiger Preis eingetragen"); 
+							
 						}
 					});  
 			}
@@ -2087,7 +2087,7 @@ if($_GET['method']=='update')
 						}
 						else
 						{
-							alert("Ungültiger Preis eingetragen"); 
+							
 						}
 					});  
 			}
