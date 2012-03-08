@@ -42,6 +42,12 @@ $rechte->getBerechtigungen($user);
 	<script type="text/javascript" src="../include/js/superfish.js"></script>
 	<script type="text/javascript" src="../include/tiny_mce/tiny_mce_popup.js"></script>
 	<script type="text/javascript">
+        
+    function conf_del()
+	{
+		return confirm('Möchten Sie das File wirklich löschen?');
+	}
+    
 	var FileBrowserDialog={
 			init: function(){
 			},
@@ -700,7 +706,7 @@ function drawFilesList($rows)
 						<li><a href="id://'.$row->dms_id.'/Upload" onclick="return upload(\''.$row->dms_id.'\',\''.$row->name.'\')" style="font-size:small">Neue Version hochladen</a></li>
 						<li><a href="'.$_SERVER['PHP_SELF'].'?versionid='.$row->dms_id.'" style="font-size:small" >Alle Versionen anzeigen</a></li>
 						<li><a href="'.$_SERVER['PHP_SELF'].'?renameid='.$row->dms_id.'&version='.$row->version.'&kategorie_kurzbz='.$row->kategorie_kurzbz.'" style="font-size:small" >Datei umbenennen</a></li>
-                        <li><a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$row->kategorie_kurzbz.'&dms_id='.$row->dms_id.'&delete" style="font-size:small" >Löschen</a></li>
+                        <li><a href="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$row->kategorie_kurzbz.'&dms_id='.$row->dms_id.'&delete" onclick="return conf_del()" style="font-size:small" >Löschen</a></li>
                     </ul>
 				</li>
 			  </ul>';
