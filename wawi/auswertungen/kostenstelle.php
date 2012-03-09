@@ -42,6 +42,7 @@ $kst_array = $rechte->getKostenstelle('wawi/bestellung');
 $kst_array = array_merge($kst_array, $rechte->getKostenstelle('wawi/rechnung'));
 $kst_array = array_merge($kst_array, $rechte->getKostenstelle('wawi/kostenstelle'));
 $kst_array = array_merge($kst_array, $rechte->getKostenstelle('wawi/freigabe'));
+$kst_array = array_merge($kst_array, $rechte->getKostenstelle('wawi/berichte'));
 $kst_array = array_unique($kst_array);
 if(count($kst_array)==0)
 	die('Sie benoetigen eine Kostenstellenberechtigung um diese Seite anzuzeigen');
