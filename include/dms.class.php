@@ -45,6 +45,7 @@ class dms extends basis_db
 	public $insertvon;
 	public $updateamum;
 	public $updatevon;
+	public $kategorie_kurzbz_old;
 	
 	public $bezeichnung;
 	
@@ -106,7 +107,7 @@ class dms extends basis_db
 	}
 	
 	/**
-	 * Speichert einenen DMS Eintrag
+	 * Speichert einen DMS Eintrag
 	 * @param $new
 	 */
 	public function save($new=null)
@@ -448,9 +449,12 @@ class dms extends basis_db
 	 * andernfalls wird der Datensatz mit der kurzbz $kategorie_kurzbz aktualisiert
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function saveKategorie()
+	public function saveKategorie($new=null)
 	{
-		if($this->new)
+		if(is_null($new))
+			$new = $this->new;
+
+		if($new)
 		{
 			//Neuen Datensatz einfuegen
 			$qry='INSERT INTO campus.tbl_dms_kategorie (kategorie_kurzbz, bezeichnung, beschreibung, parent_kategorie_kurzbz) VALUES('.
@@ -461,11 +465,14 @@ class dms extends basis_db
 		}
 		else
 		{
+			if($this->kategorie_kurzbz_old=='')
+				$this->kategorie_kurzbz_old=$this->kategorie_kurzbz;
 			$qry='UPDATE campus.tbl_dms_kategorie SET'.
+				' kategorie_kurzbz='.$this->db_add_param($this->kategorie_kurzbz).', '.
 				' bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
 				' beschreibung='.$this->db_add_param($this->beschreibung).', '.
 				' parent_kategorie_kurzbz='.$this->db_add_param($this->parent_kategorie_kurzbz).' '.
-		      	'WHERE kategorie_kurzbz='.$this->db_add_param($this->kategorie_kurzbz).';';
+		      	'WHERE kategorie_kurzbz='.$this->db_add_param($this->kategorie_kurzbz_old).';';
 		}
 		
 		if(!$this->db_query($qry))
@@ -497,6 +504,7 @@ class dms extends basis_db
 					$this->bezeichnung = $row->bezeichnung; 
 					$this->beschreibung = $row->beschreibung; 
 					$this->parent_kategorie_kurzbz = $row->parent_kategorie_kurzbz; 
+					$this->kategorie_kurzbz_old = $row->kategorie_kurzbz;
 				}
 				return true; 
 			}
@@ -584,7 +592,7 @@ class dms extends basis_db
 					SELECT dms_id, max(version)
 					FROM campus.tbl_dms_version 
 					GROUP BY dms_id)
-				AND kategorie_kurzbz='".addslashes($kategorie_kurzbz)."'
+				AND kategorie_kurzbz=".$this->db_add_param($kategorie_kurzbz)."
 				ORDER BY name;";
 		
 		if($result = $this->db_query($qry))
@@ -1094,6 +1102,116 @@ class dms extends basis_db
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}		
+	}
+
+	/**
+	 * 
+	 * Prueft ob der User fuer die Kategorie berechtigt ist
+	 * 
+	 * @param $kategorie_kurzbz
+	 * @param $user
+	 * @return boolean
+	 */
+	function isBerechtigtKategorie($kategorie_kurzbz, $user)
+	{
+		$this->result = array();
+		$groups = $this->getLockGroups($kategorie_kurzbz);
+
+		if(count($groups)>0)
+		{
+			$qry = "SELECT 1 FROM public.tbl_benutzergruppe
+					WHERE tbl_benutzergruppe.uid=".$this->db_add_param($user).
+					" AND gruppe_kurzbz IN(".$this->implode4SQL($groups).");";
+
+			if($result = $this->db_query($qry))
+			{
+				if($this->db_num_rows($result)>0)
+				{
+					return true;
+				}
+				else
+					return false;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Laden der Daten';
+				return false;
+			}		
+		}
+		else
+			return true;
+	}
+
+	function getDocumentFromName($name, $kategorie_kurzbz=null)
+	{
+		$qry = "SELECT * FROM campus.tbl_dms JOIN campus.tbl_dms_version USING(dms_id) 
+				WHERE (dms_id, version) in(
+					SELECT dms_id, max(version)
+					FROM campus.tbl_dms_version 
+					GROUP BY dms_id)
+				AND name=".$this->db_add_param($name);
+		if(!is_null($kategorie_kurzbz))
+			$qry .= " AND kategorie_kurzbz=".$this->db_add_param($kategorie_kurzbz);
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new dms();
+				
+				$obj->dms_id = $row->dms_id;
+				$obj->version = $row->version; 
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->dokument_kurzbz = $row->dokument_kurzbz;
+				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
+				$obj->filename = $row->filename;
+				$obj->mimetype = $row->mimetype;
+				$obj->name = $row->name;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->letzterzugriff = $row->letzterzugriff;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	public function getKategorieFromBezeichnung($bezeichnung, $parent_kategorie_kurzbz=null)
+	{
+		$qry = "SELECT * FROM campus.tbl_dms_kategorie WHERE bezeichnung=".$this->db_add_param($bezeichnung);
+
+		if(!is_null($parent_kategorie_kurzbz))
+			$qry.= " AND parent_kategorie_kurzbz=".$this->db_add_param($parent_kategorie_kurzbz);
+		else
+			$qry.=" AND parent_kategorie_kurzbz is null";
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new dms();
+				
+				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->parent_kategorie_kurzbz = $row->parent_kategorie_kurzbz;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
 	}
 }
 ?>
