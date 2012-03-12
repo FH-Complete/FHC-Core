@@ -157,7 +157,7 @@ if(isset($_POST['getDetailRow']) && isset($_POST['id']))
 {
 	if(is_numeric($_POST['id']))
 	{
-		echo getDetailRow($_POST['id'],'','','','','','','','0','',$_POST['bestellung_id'],$_POST['id']);
+		echo getDetailRow($_POST['id'],'','','','','','','','','',$_POST['bestellung_id'],$_POST['id']);
 		$test++; 
 		exit;
 	}
@@ -1028,6 +1028,8 @@ if($_GET['method']=='update')
 						$menge = $_POST["menge_$i"]; 
 						if($menge == '')
 							$menge = '0'; 
+                        
+                        $bestell_detail->mwst = ($_POST["mwst_$i"]=='')?0:mb_str_replace(',', '.', $_POST["mwst_$i"]);
 						$bestell_detail->bestellung_id = $_GET['bestellung'];
 						$bestell_detail->position = $_POST["pos_$i"];
 						$bestell_detail->menge = $menge;
@@ -1035,7 +1037,8 @@ if($_GET['method']=='update')
 						$bestell_detail->beschreibung = $_POST["beschreibung_$i"];
 						$bestell_detail->artikelnummer = $_POST["artikelnr_$i"];
 						$bestell_detail->preisprove =mb_str_replace(',', '.', $_POST["preis_$i"]);
-						$bestell_detail->mwst = $_POST["mwst_$i"];
+                        if($bestell_detail->preisprove == '')
+                            $bestell_detail->preisprove=0;
 						if($_POST["sort_$i"] != '')
 							$bestell_detail->sort = $_POST["sort_$i"];
 						else
@@ -1046,6 +1049,8 @@ if($_GET['method']=='update')
 						$bestell_detail->updateamum = date('Y-m-d H:i:s');
 						$bestell_detail->updatevon = $user;
 						$bestell_detail->new = true; 
+                        
+                        var_dump($bestell_detail);
 					}
 					if(!$bestell_detail->save())
 					{
@@ -1703,7 +1708,7 @@ if($_GET['method']=='update')
 		$i++; 
 	}
 	if($bestellung->freigegeben != 't')
-		getDetailRow($i,null,$i,null,null,null,null,null,'0',null,$bestellung->bestellung_id,$i);
+		getDetailRow($i,null,$i,null,null,null,null,null,null,null,$bestellung->bestellung_id,$i);
 		
 	$test = $i; 
 	echo "</tbody>";
