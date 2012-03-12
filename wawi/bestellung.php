@@ -1049,8 +1049,6 @@ if($_GET['method']=='update')
 						$bestell_detail->updateamum = date('Y-m-d H:i:s');
 						$bestell_detail->updatevon = $user;
 						$bestell_detail->new = true; 
-                        
-                        var_dump($bestell_detail);
 					}
 					if(!$bestell_detail->save())
 					{
