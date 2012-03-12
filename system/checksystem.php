@@ -3262,18 +3262,18 @@ if(!@$db->db_query("SELECT 1 FROM campus.tbl_freebusy LIMIT 1"))
 }
 
 
-//Rechnungsbetrag auf 3 Nachkommastellen vergroessern
+//Rechnungsbetrag auf 4 Nachkommastellen vergroessern
 if($result = $db->db_query("SELECT numeric_precision, numeric_scale FROM information_schema.columns WHERE column_name='betrag' AND table_name='tbl_rechnungsbetrag' AND table_schema='wawi';"))
 {
 	if($row = $db->db_fetch_object($result))
 	{
 		if($row->numeric_precision==12 && $row->numeric_precision_scale=2)
 		{
-			$qry = "ALTER TABLE wawi.tbl_rechnungsbetrag ALTER COLUMN betrag TYPE numeric(13,3);";
+			$qry = "ALTER TABLE wawi.tbl_rechnungsbetrag ALTER COLUMN betrag TYPE numeric(14,4);";
 			if(!$db->db_query($qry))
 				echo '<strong>waw.tbl_rechnungsbetrag: '.$db->db_last_error().'</strong><br>';
 			else 
-				echo 'wawi.tbl_rechnungsbetrag: Spalte betrag auf 3 Nachkommastellen vergroessert<br>';
+				echo 'wawi.tbl_rechnungsbetrag: Spalte betrag auf 4 Nachkommastellen vergroessert<br>';
 		}
 	}
 }
