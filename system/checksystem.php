@@ -3277,6 +3277,43 @@ if($result = $db->db_query("SELECT numeric_precision, numeric_scale FROM informa
 		}
 	}
 }
+
+// tbl_webservicerecht
+if(!$result = @$db->db_query('SELECT 1 FROM system.tbl_webservicerecht LIMIT 1;'))
+{
+	$qry = "
+	CREATE TABLE system.tbl_webservicerecht (
+		webservicerecht_id bigint NOT NULL,
+		berechtigung_kurzbz varchar(32) NOT NULL,
+		methode varchar(256) NOT NULL,
+		attribut varchar(256),
+		insertamum timestamp,
+		insertvon varchar(32),
+		updateamum timestamp,
+		updatevon varchar(32)
+	);
+	
+	CREATE SEQUENCE system.seq_webservicerecht_webservicerecht_id
+ 	INCREMENT BY 1
+ 	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+	
+	ALTER TABLE system.tbl_webservicerecht ADD CONSTRAINT pk_tbl_webservicerecht PRIMARY KEY (webservicerecht_id);
+	ALTER TABLE system.tbl_webservicerecht ALTER COLUMN webservicerecht_id SET DEFAULT nextval('system.seq_webservicerecht_webservicerecht_id');
+	ALTER TABLE system.tbl_webservicerecht ADD CONSTRAINT fk_berechtigung_webservicerecht FOREIGN KEY(berechtigung_kurzbz) REFERENCES system.tbl_berechtigung (berechtigung_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	
+	CREATE INDEX idx_webservicerecht_methode ON system.tbl_webservicerecht (methode);
+	
+	GRANT SELECT, INSERT, UPDATE, DELETE ON system.tbl_webservicerecht TO admin;
+	GRANT SELECT ON system.tbl_webservicerecht TO web;	
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>system.tbl_webservicerecht: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Tabelle system.tbl_webservicerecht hinzugefuegt!<br>';
+}
 echo '<br>';
 
 $tabellen=array(
@@ -3455,6 +3492,7 @@ $tabellen=array(
 	"system.tbl_rolle"  => array("rolle_kurzbz","beschreibung"),
 	"system.tbl_rolleberechtigung"  => array("berechtigung_kurzbz","rolle_kurzbz","art"),
 	"system.tbl_webservicelog"  => array("webservicelog_id","webservicetyp_kurzbz","request_id","beschreibung","request_data","execute_time","execute_user"),
+	"system.tbl_webservicerecht" => array("webservicerecht_id","berechtigung_kurzbz","methode","attribut","insertamum","insertvon","updateamum","updatevon"),
 	"system.tbl_webservicetyp"  => array("webservicetyp_kurzbz","beschreibung"),
 	"system.tbl_server"  => array("server_kurzbz","beschreibung"),
 	"wawi.tbl_betriebsmittelperson"  => array("betriebsmittelperson_id","betriebsmittel_id","person_id", "anmerkung", "kaution", "ausgegebenam", "retouram","insertamum", "insertvon","updateamum", "updatevon","ext_id"),
