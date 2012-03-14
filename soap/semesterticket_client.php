@@ -66,13 +66,13 @@ if(isset($_REQUEST['submit']))
 	{
 		class foo {}; 
 		$obj = new foo(); 
-		$obj->token = $_REQUEST['token'];
-		$obj->matrikelnummer = $_REQUEST['matrikelnummer'];
-		$obj->name = $_REQUEST['name'];
-		$obj->vorname = $_REQUEST['vorname'];
-		$obj->geburtsdatum = $_REQUEST['geburtsdatum'];
-		$obj->postleitzahl = $_REQUEST['postleitzahl'];
-		$obj->semesterkuerzel = $_REQUEST['semesterkuerzel'];
+		$obj->Token = $_REQUEST['token'];
+		$obj->Matrikelnummer = $_REQUEST['matrikelnummer'];
+		$obj->Name = $_REQUEST['name'];
+		$obj->Vorname = $_REQUEST['vorname'];
+		$obj->Geburtsdatum = $_REQUEST['geburtsdatum'];
+		$obj->Postleitzahl = $_REQUEST['postleitzahl'];
+		$obj->Semesterkuerzel = $_REQUEST['semesterkuerzel'];
 		
 		$response = $client->verifyData($obj);
 		//$response = $client->verifyData(array('token'=>$_REQUEST['token'], 'matrikelnummer'=>$_REQUEST['matrikelnummer'], 'name'=>$_REQUEST['name'], 'vorname'=>$_REQUEST['vorname'], 'geburtsdatum'=>$_REQUEST['geburtsdatum'], 'postleitzahl'=>$_REQUEST['postleitzahl'], 'semesterkuerzel'=>$_REQUEST['semesterkuerzel']));
