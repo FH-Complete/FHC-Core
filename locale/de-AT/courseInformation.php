@@ -28,4 +28,5 @@ $this->phrasen['courseInformation/beispielMSEChangeManagement']='Beispiel MSE Ch
 $this->phrasen['courseInformatoin/lvInfoTerminologie']='LV Info - Terminologie';
 $this->phrasen['courseInformation/terminologieDeutschEnglisch']='Terminologie Deutsch-Englisch';
 $this->phrasen['courseInformation/incomingplaetze']='Incomingplätze';
+$this->phrasen['courseInformation/pflichtfelderWerdenAufDerExternenSeiteAngezeigt']='Pflichtfelder werden auch auf der offiziellen Webseite angezeigt und sollten daher ausgefüllt werden';
 ?>

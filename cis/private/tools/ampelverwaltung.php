@@ -52,7 +52,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 </head>
 <body>
 <h1>',$p->t('tools/ampelsystem'),'</h1>
-';
+',$p->t('tools/dasAmpelsystemIstEinErinnerungsystem'),'.';
 
 
 $datum_obj = new datum();

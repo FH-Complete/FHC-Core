@@ -22,6 +22,7 @@ $this->phrasen['global/newsgroups']='Newsgroups';
 
 $this->phrasen['global/speichern']='Save';
 $this->phrasen['global/loeschen']='Delete';
+$this->phrasen['global/entfernen']='Delete';
 $this->phrasen['global/editieren']='Edit';
 $this->phrasen['global/suchen']='Search';
 $this->phrasen['global/alle']='All';
@@ -35,6 +36,7 @@ $this->phrasen['global/datei']='File';
 $this->phrasen['global/auswaehlen']='Select'; 
 $this->phrasen['global/umbenennen']='Rename';
 $this->phrasen['global/anzeigen']='Show';
+$this->phrasen['global/ausblenden']='Hide';
 $this->phrasen['global/bearbeiten']='Edit';
 $this->phrasen['global/aendern']='Change';
 $this->phrasen['global/kopieren']='Copy';
@@ -83,6 +85,13 @@ $this->phrasen['global/personen']='Number of Persons';
 $this->phrasen['global/beschreibung']='Description'; 
 $this->phrasen['global/angelegtAm']='created:'; 
 $this->phrasen['global/funktion']='Role'; //Mitarbeiterfunktion zB Assistenz
+$this->phrasen['global/montag']='Monday'; 
+$this->phrasen['global/dienstag']='Tuesday'; 
+$this->phrasen['global/mittwoch']='Wednesday'; 
+$this->phrasen['global/donnerstag']='Thursday'; 
+$this->phrasen['global/freitag']='Friday'; 
+$this->phrasen['global/samstag']='Saturday'; 
+$this->phrasen['global/sonntag']='Sunday'; 
 
 $this->phrasen['global/von']='From';
 $this->phrasen['global/bis']='To';
@@ -138,6 +147,7 @@ $this->phrasen['global/fehlerBeimLoeschenDesEintrags']='Error deleting entry';
 $this->phrasen['global/keineBerechtigung']='No authority';
 $this->phrasen['global/datensatzWurdeNichtGefunden']='Data not found';
 $this->phrasen['global/keineBerechtigungZumAendernDesDatensatzes']='You dont have the authority to change to data';
+$this->phrasen['global/keineDatenGefunden']='No data found';
 
 //infrastruktur
 

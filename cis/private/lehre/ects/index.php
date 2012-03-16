@@ -438,17 +438,16 @@ if (!$db = new basis_db())
 
 		$lv_obj = new lehrveranstaltung();
 		$lv_obj->load($lv);
-		echo "<br><br>";
 		echo "<Form name='editFrm' action='".$_SERVER['PHP_SELF']."' method='POST'>";
 
 		echo "<table class='tabcontent'>";
-		echo "<tr><td width='200'><b>".$p->t('courseInformation/ectsCredits')."</b></td><td width='400'>".($lv_obj->ects!=''?number_format($lv_obj->ects,1,'.',''):'')."</td><td align='right' nowrap>".$p->t('courseInformation/beiFehlernInDenFixfeldern',array($stg_obj1->email))."</td></tr>";
+		echo "<tr><td><b>".$p->t('courseInformation/ectsCredits')."</b></td><td>&nbsp;</td><td width='400'>".($lv_obj->ects!=''?number_format($lv_obj->ects,1,'.',''):'')."</td><td width='100%'></td></tr>";
 
 		$stsem_obj = new studiensemester();
 		$stsem = $stsem_obj->getaktorNext();
 		//Namen der Lehrenden Auslesen
 		$qry = "SELECT * FROM campus.vw_mitarbeiter, lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lv' AND tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE lehrveranstaltung_id='$lv' ORDER BY ende DESC LIMIT 1) AND mitarbeiter_uid=uid";
-		echo "<tr><td class='tdvertical' nowrap><b>".$p->t('courseInformation/lehrendeLautLehrauftrag')."</b></td><td nowrap>";
+		echo "<tr><td class='tdvertical' nowrap><b>".$p->t('courseInformation/lehrendeLautLehrauftrag')."</b></td><td>&nbsp;</td><td nowrap>";
 		$helparray = array();
 		if($result=$db->db_query($qry))
 		{
@@ -486,7 +485,7 @@ if (!$db = new basis_db())
 																)	   											
 								  )";
 	   
-	   echo "<tr><td class='tdvertical'><b>".$p->t('courseInformation/institutsleiter')."</b></td><td>";
+	   echo "<tr><td class='tdvertical'><b>".$p->t('courseInformation/institutsleiter')."</b></td><td>&nbsp;</td><td>";
 	   if($result=$db->db_query($qry))
 	   {
 	   	   while($row=$db->db_fetch_object($result))
@@ -514,7 +513,7 @@ if (!$db = new basis_db())
 				vw_mitarbeiter.uid=COALESCE(koordinator, tbl_benutzerfunktion.uid) AND
 				tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1)";
 	   
-		echo "<tr><td class='tdvertical'><b>".$p->t('courseInformation/institutskoordinator')."</b></td><td>";
+		echo "<tr><td class='tdvertical'><b>".$p->t('courseInformation/institutskoordinator')."</b></td><td>&nbsp;</td><td>";
 	   if($result=$db->db_query($qry))
 	   {
 	   	   while($row=$db->db_fetch_object($result))
@@ -536,17 +535,18 @@ if (!$db = new basis_db())
 
 	   echo "</td></tr>";
 	   //Sprache ausgeben
-	   echo "<tr><td><b>".$p->t('courseInformation/unterrichtssprache')."</b></td><td>$lv_obj->sprache";
+	   echo "<tr><td><b>".$p->t('courseInformation/unterrichtssprache')."</b></td><td>&nbsp;</td><td>$lv_obj->sprache";
 	   echo "</td></tr>";
 	   
 	   //Anz. Incoming ausgeben
 	   	   
 	   if ($lv_obj->incoming > -1)
 		{
-			echo "<tr><td><b>".$p->t('courseInformation/incomingplaetze')."</b></td><td>$lv_obj->incoming";
+			echo "<tr><td valign='top'><b>".$p->t('courseInformation/incomingplaetze')."</b></td><td>&nbsp;</td><td valign='top'>$lv_obj->incoming";
 		}
-		else echo "<tr><td><b>".$p->t('courseInformation/incomingplaetze')."</b></td><td>0";
-			echo "</td></tr></table><br><br>";
+		else echo "<tr><td valign='top'><b>".$p->t('courseInformation/incomingplaetze')."</b></td><td>0";
+			echo "</td></tr><tr><td colspan='4'><font style='font-size:smaller'>".$p->t('courseInformation/beiFehlernInDenFixfeldern',array($stg_obj1->email))."</font></td></tr>";
+			echo "<tr><td align='left' colspan='4'><br/><br/><font style='color:red'>".$p->t('courseInformation/pflichtfelderWerdenAufDerExternenSeiteAngezeigt',array($stg_obj1->email))."</font>.</td></tr></table><br><br>";
 
 	   //Eingabefelder anzeigen
 	   echo "<table width='100%'  border='0' cellspacing='0' cellpadding='0'>";
@@ -569,33 +569,33 @@ if (!$db = new basis_db())
        */
        echo '
        <tr class="liste0">
-         <td><i>Kurzbeschreibung</i> </td>
+         <td><i>Kurzbeschreibung <font style="color:red">(Pflichtfeld)</font></i> </td>
          <td align="right"><textarea rows="5" cols="40" name="kurzbeschreibung_de">'. (isset($kurzbeschreibung_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$kurzbeschreibung_de)):'').'</textarea></td>
-         <td><i>Course Description</i> </td>
+         <td><i>Course Description <font style="color:red">(Required)</font></i> </td>
          <td align="right"><textarea rows="5" cols="40" name="kurzbeschreibung_en">'. (isset($kurzbeschreibung_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$kurzbeschreibung_en)):'').'</textarea></td>
        </tr>
        <tr class="liste1">
-         <td><i>Methodik / Didaktik</i> </td>
+         <td><i>Methodik / Didaktik <font style="color:red">(Pflichtfeld)</font></i> </td>
          <td align="right"><textarea rows="5" cols="40" name="methodik_de">'. (isset($methodik_de)?stripslashes(mb_eregi_replace("<br>","\r\n", $methodik_de)):'').'</textarea></td>
-         <td><i>Teaching Methods</i> </td>
+         <td><i>Teaching Methods <font style="color:red">(Required)</font></i> </td>
          <td align="right"><textarea rows="5" cols="40" name="methodik_en">'. (isset($methodik_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$methodik_en)):'').'</textarea></td>
        </tr>';
        echo '<tr class="liste0">
-         <td><i>Kompetenzerwerb</i></td>
+         <td><i>Kompetenzerwerb <font style="color:red">(Pflichtfeld)</font></i></td>
          <td align="right"><textarea rows="5" cols="40" name="lehrziele_de">'. (isset($lehrziele_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrziele_de)):'').'</textarea></td>
-         <td><i>Learning outcome</i> </td>
+         <td><i>Learning outcome <font style="color:red">(Required)</font></i> </td>
          <td align="right"><textarea rows="5" cols="40" name="lehrziele_en">'. (isset($lehrziele_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrziele_en)):'').'</textarea></td>
        </tr>
        <tr class="liste1">
-         <td><i>Lehrinhalte</i></td>
+         <td><i>Lehrinhalte <font style="color:red">(Pflichtfeld)</font></i></td>
          <td align="right"><textarea rows="5" cols="40" name="lehrinhalte_de">'. (isset($lehrinhalte_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrinhalte_de)):'').'</textarea></td>
-         <td><i>Course Contents</i> </td>
+         <td><i>Course Contents <font style="color:red">(Required)</font></i> </td>
          <td align="right"><textarea rows="5" cols="40" name="lehrinhalte_en">'. (isset($lehrinhalte_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrinhalte_en)):'').'</textarea></td>
        </tr>
        <tr class="liste0">
-         <td><i>Vorkenntnisse</i> </td>
+         <td><i>Vorkenntnisse <font style="color:red">(Pflichtfeld)</font></i> </td>
          <td align="right"><textarea rows="5" cols="40" name="voraussetzungen_de">'. (isset($voraussetzungen_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$voraussetzungen_de)):'').'</textarea></td>
-         <td><i>Prerequisites</i></td>
+         <td><i>Prerequisites <font style="color:red">(Required)</font></i></td>
          <td align="right"><textarea rows="5" cols="40" name="voraussetzungen_en">'. (isset($voraussetzungen_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$voraussetzungen_en)):'').'</textarea></td>
        </tr>';
        echo '<tr class="liste1">

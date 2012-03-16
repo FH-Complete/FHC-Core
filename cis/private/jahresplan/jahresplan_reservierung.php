@@ -44,7 +44,7 @@
 	include_once('../../../include/jahresplan.class.php');
  	include_once('jahresplan_funktionen.inc.php');
 	if (!$is_wartungsberechtigt)
-		die('Sie sind nicht berechtigt f&uuml;r diese Seite !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+		die($p->t("global/keineBerechtigungFuerDieseSeite")).('<a href="javascript:history.back()">'.$p->t("global/zurueck").'</a>');
 
 // ------------------------------------------------------------------------------------------
 //	Init
@@ -57,7 +57,7 @@
 	// Parameter Veranstaltung
    	$veranstaltung_id=trim((isset($_REQUEST['veranstaltung_id']) ? $_REQUEST['veranstaltung_id']:''));
 	if (empty($veranstaltung_id))
-		exit('keine Veranstaltungs ID &uuml;bergeben!');
+		exit($p->t("eventkalender/keineVeranstaltungsIdUebergeben").'!');
 
   	$openfirst=trim((isset($_REQUEST['openfirst']) ? $_REQUEST['openfirst']:''));
   	$startDatum=trim((isset($_REQUEST['startDatum']) ? $_REQUEST['startDatum']:mktime(12,0,0,date("m"),date("d"),date("y")) ));
@@ -108,7 +108,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>Reservierungen zu ID <?php echo $veranstaltung_id.' - '.$userNAME;?> </title>
+<title><?php echo $p->t("eventkalender/reservierungenZurVeranstaltungsID");?> <?php echo $veranstaltung_id.' - '.$userNAME;?> </title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<script language="JavaScript" type="text/javascript">
 	<!--
@@ -123,7 +123,7 @@
 
 		if (window.opener && !window.opener.closed && openfirst!='1') 
 		{
-			if (confirm("Soll die Hauptseite neu aufgebaut werden?")) 
+			if (confirm("<?php echo $p->t("eventkalender/sollDieHauptseiteNeuAufgebautWerden");?>?")) 
 			{
 			window.opener.location.selVeranstaltung.submit();
 			}	
@@ -174,7 +174,7 @@
 
 </head>
 <body onunload="reloadOpener();">
-	<h1>Reservierung zur Veranstaltung ID <?php echo $veranstaltung_id;?></h1>
+	<h1><?php echo $p->t("eventkalender/reservierungenZurVeranstaltungsID");?> <?php echo $veranstaltung_id;?></h1>
 <?php
 // ------------------------------------------------------------------------------------------
 // Datenlesen fuer Anzeige der
@@ -225,12 +225,12 @@
 	$showHTML.=$Jahresplan->errormsg;		
 	$showHTML.='<table class="reservierungen_liste" cellpadding="1" cellspacing="1">
 			<tr>
-				<td>Reservierung ID</td>
-				<td>Ort</td>
-				<td>Titel</td>
-				<td colspan="2">Datum</td>
-				<td colspan="2">Anlage</td>				
-				<td>Veranstaltung</td>				
+				<td>'.$p->t("eventkalender/reservierungID").'</td>
+				<td>'.$p->t("lvplan/ort").'</td>
+				<td>'.$p->t("global/titel").'</td>
+				<td colspan="2">'.$p->t("global/datum").'</td>
+				<td colspan="2">'.$p->t("eventkalender/angelegtVon").'</td>				
+				<td>'.$p->t("eventkalender/veranstaltung").'</td>				
 			</tr>';
 
 	$lastkey=null;		
@@ -258,7 +258,7 @@
 			$showHTML.='
 			<tr '.($iTmpZehler%2? ' class="header_liste_row_0" ':' class="header_liste_row_1" ').'>
 			<form name="selJahresplanReservierung'.($iTmpZehler<0?'':$iTmpZehler).'_alle" target="_self" action="'. $_SERVER['PHP_SELF'] .'"  method="post" enctype="multipart/form-data">
-				<td align="center"><a href="javascript:window.document.selJahresplanReservierung'.($iTmpZehler<0?'':$iTmpZehler).'_alle.work.value=\'save\';window.document.selJahresplanReservierung'.($iTmpZehler<0?'':$iTmpZehler).'_alle.submit();">alle</a></td>
+				<td align="center"><a href="javascript:window.document.selJahresplanReservierung'.($iTmpZehler<0?'':$iTmpZehler).'_alle.work.value=\'save\';window.document.selJahresplanReservierung'.($iTmpZehler<0?'':$iTmpZehler).'_alle.submit();">'.$p->t("global/alle").'</a></td>
 				<td>'. implode("</td><td>",explode('|',$lastkey)).'</td>
 					<td colspan="5">
 					<input class="ausblenden" name="reservierung_id" value="'.$alleReservierung_id.'">
@@ -332,7 +332,7 @@
 			$showHTML.='
 			<tr '.($iTmpZehler%2? ' class="header_liste_row_0" ':' class="header_liste_row_1" ').'>
 			<form  accept-charset="UTF-8" name="selJahresplanReservierung'.($iTmpZehler<0?'':$iTmpZehler).'_alle" target="_self" action="'. $_SERVER['PHP_SELF'] .'"  method="post" enctype="multipart/form-data">
-				<td align="center"><a href="javascript:window.document.selJahresplanReservierung'.($iTmpZehler<0?'':$iTmpZehler).'_alle.work.value=\'save\';window.document.selJahresplanReservierung'.($iTmpZehler<0?'':$iTmpZehler).'_alle.submit();">alle</a></td>
+				<td align="center"><a href="javascript:window.document.selJahresplanReservierung'.($iTmpZehler<0?'':$iTmpZehler).'_alle.work.value=\'save\';window.document.selJahresplanReservierung'.($iTmpZehler<0?'':$iTmpZehler).'_alle.submit();">'.$p->t("global/alle").'</a></td>
 				<td>'. implode("</td><td>",explode('|',$lastkey)).'</td>
 					<td colspan="5">
 					<input class="ausblenden" name="reservierung_id" value="'.$alleReservierung_id.'">
@@ -357,7 +357,7 @@
 		$showHTML.='		
 		</table>';
 	$showHTML.=$error;
-	$showHTML.='<p><span class="footer_zeile">Bei Fragen geben Sie bitte immer die Veranstaltungs ID '.$veranstaltung_id.' an.</span></p>';
+	$showHTML.='<p><span class="footer_zeile">'.$p->t('eventkalender/beiFragenGebenSieImmerDieVeranstaltungsIdXYan',array($veranstaltung_id)).'.</span></p>';
 	echo $showHTML;
 ?>
 </body>

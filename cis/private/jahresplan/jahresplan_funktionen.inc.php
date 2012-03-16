@@ -22,20 +22,24 @@
  */
 
 // ---------------- Konstante
+require_once('../../../include/phrasen.class.php');
+
 if (!defined('constEingabeFehlt'))
 	define('constEingabeFehlt','Eingabe !' );
 if (!defined('constZeitDatumJJJJMMTT'))
 	define('constZeitDatumJJJJMMTT','%Y%m%d' );
 
+$sprache = getSprache();
+$p = new phrasen($sprache);
 
 // ------------------------------------------------------------------------------------------
 //	Personen Classe
 //		Anwernderdaten ermitteln
 // ------------------------------------------------------------------------------------------
 if (!$user=get_uid())
-	die('Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden !');
+	die($p->t("global/nichtAngemeldet"));
 if (!$pers = new benutzer($user))
-	die('Es wurde keine Benutzer mit UID '.$user.' gefunden !');
+	die($p->t("global/userNichtGefunden"));
 $userNAME=(isset($pers->anrede) ? $pers->anrede.' ':'');
 $userNAME.=(isset($pers->titelpre) ? $pers->titelpre.' ':'');
 $userNAME.=(isset($pers->vorname) ? $pers->vorname.' ':'');
@@ -93,6 +97,8 @@ $Jahresplan->freigabe=($is_wartungsberechtigt?false:true);
  */
 function jahresplan_veranstaltung_detailanzeige($veranstaltung,$wartungsberechtigt=false)
 {
+global $p;
+
 	// Wird von Index.php und jahresplan_detail.php aufgerufen
 	if (!defined('constZeitKalenderPopUp')) define('constZeitKalenderPopUp','%a, %d.%m.%Y' );
 	if (!defined('constZeitKalenderPopUp_zeit')) define('constZeitKalenderPopUp_zeit','%H:%M' );
@@ -100,7 +106,7 @@ function jahresplan_veranstaltung_detailanzeige($veranstaltung,$wartungsberechti
 	// Plausib Veranstaltungsdaten vorhanden
 	if ((!is_array($veranstaltung) && !is_object($veranstaltung)) || count($veranstaltung)<1 )
 	{
-		return 'keine Veranstaltung gefunden';
+		return $p->t("eventkalender/keineVeranstaltungGefunden");
 	}
 	// Veranstaltung erweitern mit Bildinformationen, kpl. Links, Anwendernamen,...
 	$veranstaltung_detail=jahresplan_funk_veranstaltung_extend($veranstaltung);
@@ -108,7 +114,7 @@ function jahresplan_veranstaltung_detailanzeige($veranstaltung,$wartungsberechti
 	// Initialisieren HTML Code Ausgabe
 	$showHTML='<div id="news">';
 	// Start Detailanzeige
-	$showHTML.='<table class="news" cellpadding="6" cellspacing="1" title="Veranstaltungsdetail ID '.$veranstaltung_detail->veranstaltung_id.'">';
+	$showHTML.='<table class="news" cellpadding="6" cellspacing="1" title="'.$p->t("eventkalender/veranstaltungsdetailID").' '.$veranstaltung_detail->veranstaltung_id.'">';
 
 	// Kategorie
 	$showHTML.='<tr style="background-color:#'.$veranstaltung_detail->farbe.';"><th>&nbsp;'.$veranstaltung_detail->bild_image.'&nbsp;'.$veranstaltung_detail->bezeichnung.'&nbsp;</th></tr>';
@@ -118,22 +124,22 @@ function jahresplan_veranstaltung_detailanzeige($veranstaltung,$wartungsberechti
 	$showHTML.='<tr><td><table border="0" cellpadding="0" cellspacing="0">';
 		if (strftime(constZeitDatumJJJJMMTT,$veranstaltung_detail->start_timestamp)==strftime(constZeitDatumJJJJMMTT,$veranstaltung_detail->ende_timestamp))
 		{
-			$showHTML.='<tr><td>Uhrzeit:&nbsp;'.strftime (constZeitKalenderPopUp_zeit,$veranstaltung_detail->start_timestamp).'&nbsp;-&nbsp;'.strftime(constZeitKalenderPopUp_zeit,$veranstaltung_detail->ende_timestamp).'&nbsp;Uhr</td></tr>';
-			$showHTML.='<tr><td>Datum:&nbsp;'.strftime(constZeitKalenderPopUp,$veranstaltung_detail->start_timestamp).'</td></tr>';
+			$showHTML.='<tr><td>'.$p->t("eventkalender/uhrzeit").':&nbsp;'.strftime (constZeitKalenderPopUp_zeit,$veranstaltung_detail->start_timestamp).'&nbsp;-&nbsp;'.strftime(constZeitKalenderPopUp_zeit,$veranstaltung_detail->ende_timestamp).'&nbsp;'.$p->t("eventkalender/uhr").'</td></tr>';
+			$showHTML.='<tr><td>'.$p->t("global/datum").':&nbsp;'.strftime(constZeitKalenderPopUp,$veranstaltung_detail->start_timestamp).'</td></tr>';
 		}
 		else	//  Ende Datum und Zeit
 		{
 			$showHTML.='<tr><td><table>';
 			$showHTML.='
-				<tr><td>Uhrzeit:&nbsp;'.strftime (constZeitKalenderPopUp_zeit,$veranstaltung_detail->start_timestamp).'&nbsp;Uhr&nbsp;-&nbsp;'. strftime (constZeitKalenderPopUp_zeit,$veranstaltung_detail->ende_timestamp).'&nbsp;Uhr</td></tr>';
+				<tr><td>'.$p->t("eventkalender/uhrzeit").':&nbsp;'.strftime (constZeitKalenderPopUp_zeit,$veranstaltung_detail->start_timestamp).'&nbsp;'.$p->t("eventkalender/uhr").'&nbsp;-&nbsp;'. strftime (constZeitKalenderPopUp_zeit,$veranstaltung_detail->ende_timestamp).'&nbsp;'.$p->t("eventkalender/uhr").'</td></tr>';
 			$showHTML.='
-				<tr><td>Datum:&nbsp;'.strftime(constZeitKalenderPopUp,$veranstaltung_detail->start_timestamp).'&nbsp;-&nbsp;'. strftime(constZeitKalenderPopUp,$veranstaltung_detail->ende_timestamp).'</td></tr>';
+				<tr><td>'.$p->t("global/datum").':&nbsp;'.strftime(constZeitKalenderPopUp,$veranstaltung_detail->start_timestamp).'&nbsp;-&nbsp;'. strftime(constZeitKalenderPopUp,$veranstaltung_detail->ende_timestamp).'</td></tr>';
 			$showHTML.='</table></td></tr>';
 		}
 	$showHTML.='</table></td></tr>';
 
 	// Veranstaltungs Inhalt und Beschreibung
-	$showHTML.='<tr><td>'.(!empty($veranstaltung_detail->inhalt)?'<b>Details</b><br>':'').nl2br($veranstaltung_detail->inhalt).'</td></tr>';
+	$showHTML.='<tr><td>'.(!empty($veranstaltung_detail->inhalt)?'<b>'.$p->t("eventkalender/details").'</b><br>':'').nl2br($veranstaltung_detail->inhalt).'</td></tr>';
 	$showHTML.='<tr><td>&nbsp;</td></tr>';
 	// Reservierung
 	$Jahresplan = new jahresplan();
@@ -143,7 +149,7 @@ function jahresplan_veranstaltung_detailanzeige($veranstaltung,$wartungsberechti
 		$showHTML.='<tr><td style="border:2px solid #CCC;" ><table>';
 
 		$showHTML.='<tr>';
-		$showHTML.='<td><h3>Raumreservierungen:</h3></td>';
+		$showHTML.='<td><h3>'.$p->t("lvplan/saalreservierung").':</h3></td>';
 		$showHTML.='</tr>';
 
 		$showHTML.='<tr><td><table>';
@@ -187,22 +193,22 @@ function jahresplan_veranstaltung_detailanzeige($veranstaltung,$wartungsberechti
 				}
 			}
 			$showHTML.='<tr>';
-				$showHTML.='<td>Titel:</td><td>'.(isset($reserv->titel)?$reserv->titel:$reserv->reservierung_titel).'</td>';
+				$showHTML.='<td>'.$p->t("global/titel").':</td><td>'.(isset($reserv->titel)?$reserv->titel:$reserv->reservierung_titel).'</td>';
 			$showHTML.='</tr>';
 			$showHTML.='<tr>';
-				$showHTML.='<td>Ort:</td><td>'.(isset($reserv->ort_kurzbz)?$reserv->ort_kurzbz:$reserv->reservierung_ort_kurzbz).'</td>';
+				$showHTML.='<td>'.$p->t("lvplan/ort").':</td><td>'.(isset($reserv->ort_kurzbz)?$reserv->ort_kurzbz:$reserv->reservierung_ort_kurzbz).'</td>';
 			$showHTML.='</tr>';
 			$showHTML.='<tr>';
-				$showHTML.='<td>Datum/Uhrzeit:</td><td>'.(isset($reserv->datum_anzeige)?$reserv->datum_anzeige:$reserv->res_datum_anzeige);
+				$showHTML.='<td>'.$p->t("global/datum").'/'.$p->t("eventkalender/uhrzeit").':</td><td>'.(isset($reserv->datum_anzeige)?$reserv->datum_anzeige:$reserv->res_datum_anzeige);
 				if (isset($reserv->beginn))
 					$showHTML.=' / '.$reserv->beginn_anzeige.' - '. (isset($lastReservierung->ende_anzeige)?$lastReservierung->ende_anzeige:$reserv->ende_anzeige);
 				$showHTML.='</td>';
 			$showHTML.='</tr>';
 			$showHTML.='<tr>';
-				$showHTML.='<td>Anlage:</td><td>'.$userNAME.'</td><td valign="top" rowspan="2">'.(isset($reserv->bild)?$reserv->bild:'').'</td>';
+				$showHTML.='<td>'.$p->t("eventkalender/reserviertVon").':</td><td>'.$userNAME.'</td><td valign="top" rowspan="2">'.(isset($reserv->bild)?$reserv->bild:'').'</td>';
 			$showHTML.='</tr>';
 			$showHTML.='<tr>';
-				$showHTML.='<td>Beschreibung:</td><td>'.(isset($reserv->beschreibung)?$reserv->beschreibung:$reserv->reservierung_beschreibung).'</td>';
+				$showHTML.='<td>'.$p->t("global/beschreibung").':</td><td>'.(isset($reserv->beschreibung)?$reserv->beschreibung:$reserv->reservierung_beschreibung).'</td>';
 			$showHTML.='</tr>';
 		}
 		$showHTML.='</table></td></tr></table></td></tr>';
@@ -211,7 +217,7 @@ function jahresplan_veranstaltung_detailanzeige($veranstaltung,$wartungsberechti
 	{
 		$showHTML.='<tr><td>'.$Jahresplan->errormsg.'</td></tr>';
 	}
-	$showHTML.='<tr><td><span class="footer_zeile">Bei Fragen geben Sie bitte immer die Veranstaltungs ID '.$veranstaltung_detail->veranstaltung_id.' an.</span></td></tr>';
+	$showHTML.='<tr><td><span class="footer_zeile">'.$p->t('eventkalender/beiFragenGebenSieImmerDieVeranstaltungsIdXYan',array($veranstaltung_detail->veranstaltung_id)).'.</span></td></tr>';
 	$showHTML.='</table>';
 	$showHTML.='</div>';
 
@@ -265,6 +271,7 @@ function jahresplan_veranstaltung_zusammenfassen($res,$iZehler)
  */
 function jahresplan_veranstaltungskategorie_kalenderanzeige($veranstaltung,$wartungsberechtigt,$Jahr,$Monat)
 {
+	global $p;
 	// Kalender
 	if (!defined('constKalenderDatumHead')) define('constKalenderDatumHead','%B  %Y' );
 	if (!defined('constKalenderDatumLang')) define('constKalenderDatumLang','%a, %d %B %G' );
@@ -309,31 +316,31 @@ function jahresplan_veranstaltungskategorie_kalenderanzeige($veranstaltung,$wart
 		// Monatsheader	- Ausgabeinformationen aufbereiten
 		if (isset($veranstaltung_kalender[$Jahr]['Monat'][$iTmpMonat]))
 		{
-			$iTmpAnzahlDaten=count($veranstaltung_kalender[$Jahr]['Monat'][$iTmpMonat])." Veranstaltungen";
+			$iTmpAnzahlDaten=count($veranstaltung_kalender[$Jahr]['Monat'][$iTmpMonat]).' '.$p->t("eventkalender/veranstaltungen");
 		}
 		else
 		{
-			$iTmpAnzahlDaten='keine Veranstaltungen';
+			$iTmpAnzahlDaten=$p->t("eventkalender/keineVeranstaltungen");
 			$veranstaltung_kalender[$Jahr]['Monat'][$iTmpMonat]=array();
 		}
 		// Monatsheader - Name
 		$cTmpInfoMonatHeaderzeile=strftime (constKalenderDatumHead, mktime(0, 0, 0, $iTmpMonat, 1, $Jahr));
-		$cTmpInfoMonat=strftime ('%Y%m', mktime(0, 0, 0, $iTmpMonat, 1, $Jahr));
+		$cTmpInfoMonat=strftime ('%Y-%m', mktime(0, 0, 0, $iTmpMonat, 1, $Jahr));
 
 		// Monatsheader - ein, ausblenden der Monatsansicht
 		if (!empty($Monat)
 		|| count($veranstaltung_kalender[$Jahr]['Monat'][$iTmpMonat])>0)
 		{
-			$cTmpStyleTableOn="<span class=\"cursor_hand\" title=\"ausblenden ".$iTmpMonat."\"  onclick=\"show_layer('anzahlMonat".$iTmpMonat."');hide_layer('showMonat".$iTmpMonat."');hide_layer('showMonatOn".$iTmpMonat."');show_layer('showMonatOff".$iTmpMonat."');\" id=\"showMonatOn".$iTmpMonat."\"><span ><img title='schliessen - close' src='../../../skin/images/bullet_arrow_down.png' alt='close' border='0'></span>&nbsp;</span>";
-			$cTmpStyleTableOff="<span class=\"cursor_hand\" title=\"anzeigen ".$iTmpMonat."\"  onclick=\"hide_layer('anzahlMonat".$iTmpMonat."');show_layer('showMonat".$iTmpMonat."');hide_layer('showMonatOff".$iTmpMonat."');show_layer('showMonatOn".$iTmpMonat."');\" style=\"display:none;\" id=\"showMonatOff".$iTmpMonat."\"><span ><img title='&ouml;ffnen - open' src='../../../skin/images/bullet_arrow_right.png' alt='open' border='0'></span>&nbsp;</span>";
+			$cTmpStyleTableOn="<span class=\"cursor_hand\" title=\"ausblenden ".$iTmpMonat."\"  onclick=\"show_layer('anzahlMonat".$iTmpMonat."');hide_layer('showMonat".$iTmpMonat."');hide_layer('showMonatOn".$iTmpMonat."');show_layer('showMonatOff".$iTmpMonat."');\" id=\"showMonatOn".$iTmpMonat."\"><span ><img title=".$p->t('eventkalender/schliessen')." src='../../../skin/images/bullet_arrow_down.png' alt='close' border='0'></span>&nbsp;</span>";
+			$cTmpStyleTableOff="<span class=\"cursor_hand\" title=\"anzeigen ".$iTmpMonat."\"  onclick=\"hide_layer('anzahlMonat".$iTmpMonat."');show_layer('showMonat".$iTmpMonat."');hide_layer('showMonatOff".$iTmpMonat."');show_layer('showMonatOn".$iTmpMonat."');\" style=\"display:none;\" id=\"showMonatOff".$iTmpMonat."\"><span ><img title=".$p->t('eventkalender/oeffnen')." src='../../../skin/images/bullet_arrow_right.png' alt='open' border='0'></span>&nbsp;</span>";
 
 			$showHTML.='<tr><td><h2>&nbsp;'.$cTmpStyleTableOn.$cTmpStyleTableOff.$cTmpInfoMonatHeaderzeile.'&nbsp;</h2></td></tr>';
 			$showHTML.='<tr><td class="ausblenden" id="anzahlMonat'.$iTmpMonat.'">'.$iTmpAnzahlDaten.'</td></tr>';
 		}
 		else
 		{
-			$cTmpStyleTableOn="<span class=\"cursor_hand\" title=\" ausblenden ".$iTmpMonat."\"  onclick=\"show_layer('anzahlMonat".$iTmpMonat."');hide_layer('showMonat".$iTmpMonat."');hide_layer('showMonatOn".$iTmpMonat."');show_layer('showMonatOff".$iTmpMonat."');\" id=\"showMonatOn".$iTmpMonat."\" style=\"display:none;\"><span ><img title='schliessen - close' src='../../../skin/images/bullet_arrow_down.png' alt='close' border='0'></span>&nbsp;</span>";
-			$cTmpStyleTableOff="<span class=\"cursor_hand\" title=\"anzeigen ".$iTmpMonat."\"  onclick=\"hide_layer('anzahlMonat".$iTmpMonat."');show_layer('showMonat".$iTmpMonat."');hide_layer('showMonatOff".$iTmpMonat."');show_layer('showMonatOn".$iTmpMonat."');\" id=\"showMonatOff".$iTmpMonat."\" ><span ><img title='&ouml;ffnen - open' src='../../../skin/images/bullet_arrow_right.png' alt='open' border='0'>&nbsp;</span></span>";
+			$cTmpStyleTableOn="<span class=\"cursor_hand\" title=\" ausblenden ".$iTmpMonat."\"  onclick=\"show_layer('anzahlMonat".$iTmpMonat."');hide_layer('showMonat".$iTmpMonat."');hide_layer('showMonatOn".$iTmpMonat."');show_layer('showMonatOff".$iTmpMonat."');\" id=\"showMonatOn".$iTmpMonat."\" style=\"display:none;\"><span ><img title=".$p->t('eventkalender/schliessen')." src='../../../skin/images/bullet_arrow_down.png' alt='close' border='0'></span>&nbsp;</span>";
+			$cTmpStyleTableOff="<span class=\"cursor_hand\" title=\"anzeigen ".$iTmpMonat."\"  onclick=\"hide_layer('anzahlMonat".$iTmpMonat."');show_layer('showMonat".$iTmpMonat."');hide_layer('showMonatOff".$iTmpMonat."');show_layer('showMonatOn".$iTmpMonat."');\" id=\"showMonatOff".$iTmpMonat."\" ><span ><img title=".$p->t('eventkalender/oeffnen')." src='../../../skin/images/bullet_arrow_right.png' alt='open' border='0'>&nbsp;</span></span>";
 
 			$showHTML.='<tr><td><h2>&nbsp;'.$cTmpStyleTableOn.$cTmpStyleTableOff.$cTmpInfoMonatHeaderzeile.'&nbsp;</h2></td></tr>';
 			$showHTML.='<tr><td id="anzahlMonat'.$iTmpMonat.'">'.$iTmpAnzahlDaten.'</td></tr>';
@@ -351,14 +358,14 @@ function jahresplan_veranstaltungskategorie_kalenderanzeige($veranstaltung,$wart
 
 		$showHTML.='<table class="kalender_kpl_monat" cellpadding="0" cellspacing="0">';
 		$showHTML.='<tr>
-				<th>KW</th>
-				<th>Montag</th>
-				<th>Dienstag</th>
-				<th>Mittwoch</th>
-				<th>Donnerstag</th>
-				<th>Freitag</th>
-				<th>Samstag</th>
-				<th>Sonntag</th>
+				<th>'.$p->t("eventkalender/kw").'</th>
+				<th>'.$p->t("global/montag").'</th>
+				<th>'.$p->t("global/dienstag").'</th>
+				<th>'.$p->t("global/mittwoch").'</th>
+				<th>'.$p->t("global/donnerstag").'</th>
+				<th>'.$p->t("global/freitag").'</th>
+				<th>'.$p->t("global/samstag").'</th>
+				<th>'.$p->t("global/sonntag").'</th>
 			</tr>';
 
 		// Wochenanzeige
@@ -373,7 +380,7 @@ function jahresplan_veranstaltungskategorie_kalenderanzeige($veranstaltung,$wart
 		
 			if (!isset($veranstaltung_kalender[$Jahr]['VerarbeitenWochen'][$iTmpMonat][$iTmpWochenIndex]))
 			{
-				echo "<br>Wochenindex $iTmpWochenIndex wurde nicht gefunden<br>";
+				echo "<br>".$p->t('eventkalender/wochenindexWurdeNichtGefunden',array($iTmpWochenIndex))."<br>";
 				break;	
 			}
 			$iTmpWoche=$veranstaltung_kalender[$Jahr]['VerarbeitenWochen'][$iTmpMonat][$iTmpWochenIndex];
@@ -416,13 +423,13 @@ function jahresplan_veranstaltungskategorie_kalenderanzeige($veranstaltung,$wart
 					&& ( empty($Monat) || (!empty($Monat) && $iTmpMonat==$Monat && $iTmpMonat!=$nowMonat && $nowWeek!=$iTmpWoche)
 					  || ($iTmpMonat==$nowMonat && $nowWeek==$iTmpWoche) ))
 					{
-						$showHTML.='<td class="kalender_woche_verbergen" title="Anzeigen '.$cTmpInfoMonat.', Woche '.$iTmpWoche.' " id="on_'.$iTmpMonat.$iTmpWoche.'" onclick="'.$cTmpStyleTableOn2.$cTmpStyleTableOn.'" >&nbsp;'.$iTmpAnzahlDaten.($iTmpWoche>53?1:$iTmpWoche).'<img title="&ouml;ffnen - open" src="../../../skin/images/bullet_arrow_right.png" alt="open" border="0"></td>';
-						$showHTML.='<td class="kalender_woche_anzeigen" title="Ausblenden '.$cTmpInfoMonat.', Woche '.$iTmpWoche.' " id="off_'.$iTmpMonat.$iTmpWoche.'" onclick="'.$cTmpStyleTableOff2.$cTmpStyleTableOff.'" >&nbsp;'.$iTmpAnzahlDaten.($iTmpWoche>53?1:$iTmpWoche).'<img title="schliessen - close" src="../../../skin/images/bullet_arrow_down.png" alt="close" border="0"></td>';
+						$showHTML.='<td class="kalender_woche_verbergen" title="'.$p->t("global/anzeigen").' '.$p->t("eventkalender/woche").' '.$iTmpWoche.' " id="on_'.$iTmpMonat.$iTmpWoche.'" onclick="'.$cTmpStyleTableOn2.$cTmpStyleTableOn.'" >&nbsp;'.$iTmpAnzahlDaten.($iTmpWoche>53?1:$iTmpWoche).'<img title='.$p->t('eventkalender/oeffnen').' src="../../../skin/images/bullet_arrow_right.png" alt="open" border="0"></td>';
+						$showHTML.='<td class="kalender_woche_anzeigen" title="'.$p->t("global/ausblenden").' '.$p->t("eventkalender/woche").' '.$iTmpWoche.' " id="off_'.$iTmpMonat.$iTmpWoche.'" onclick="'.$cTmpStyleTableOff2.$cTmpStyleTableOff.'" >&nbsp;'.$iTmpAnzahlDaten.($iTmpWoche>53?1:$iTmpWoche).'<img title='.$p->t('eventkalender/schliessen').' src="../../../skin/images/bullet_arrow_down.png" alt="close" border="0"></td>';
 					}
 					else
 					{
-						$showHTML.='<td class="kalender_woche_anzeigen" title="Anzeigen '.$cTmpInfoMonat.', Woche '.$iTmpWoche.' " id="on_'.$iTmpMonat.$iTmpWoche.'" onclick="'.$cTmpStyleTableOn2.$cTmpStyleTableOn.'" >&nbsp;'.$iTmpAnzahlDaten.($iTmpWoche>53?1:$iTmpWoche).'<img title="&ouml;ffnen - open" src="../../../skin/images/bullet_arrow_right.png" alt="open" border="0"></td>';
-						$showHTML.='<td class="kalender_woche_verbergen" title="Ausblenden '.$cTmpInfoMonat.', Woche '.$iTmpWoche.' " id="off_'.$iTmpMonat.$iTmpWoche.'"  onclick="'.$cTmpStyleTableOff2.$cTmpStyleTableOff.'" >&nbsp;'.$iTmpAnzahlDaten.($iTmpWoche>53?1:$iTmpWoche).'<img title="schliessen - close" src="../../../skin/images/bullet_arrow_down.png" alt="close" border="0"></td>';
+						$showHTML.='<td class="kalender_woche_anzeigen" title="'.$p->t("global/anzeigen").' '.$p->t("eventkalender/woche").' '.$iTmpWoche.' " id="on_'.$iTmpMonat.$iTmpWoche.'" onclick="'.$cTmpStyleTableOn2.$cTmpStyleTableOn.'" >&nbsp;'.$iTmpAnzahlDaten.($iTmpWoche>53?1:$iTmpWoche).'<img title='.$p->t('eventkalender/oeffnen').' src="../../../skin/images/bullet_arrow_right.png" alt="open" border="0"></td>';
+						$showHTML.='<td class="kalender_woche_verbergen" title="'.$p->t("global/ausblenden").' '.$p->t("eventkalender/woche").' '.$iTmpWoche.' " id="off_'.$iTmpMonat.$iTmpWoche.'"  onclick="'.$cTmpStyleTableOff2.$cTmpStyleTableOff.'" >&nbsp;'.$iTmpAnzahlDaten.($iTmpWoche>53?1:$iTmpWoche).'<img title='.$p->t('eventkalender/schliessen').' src="../../../skin/images/bullet_arrow_down.png" alt="close" border="0"></td>';
 					}
 			$showHTML.='</tr></table></td>';
 			// Kalendertage
@@ -474,14 +481,14 @@ function jahresplan_veranstaltungskategorie_kalenderanzeige($veranstaltung,$wart
 				else
 					$showHTML.='<div class="kalender_tages_container_off" id="week_'.$iTmpMonat.$iTmpWoche.$iTmpTag.'">';
 				$showHTML.='<table  width="100%" cellpadding="0" cellspacing="1">';
-				// Wartungsberechtigte bekommen einen Wartungsknopf zu jeden Tag
+				// Wartungsberechtigte bekommen einen Wartungsknopf zu jedem Tag
 				if ($wartungsberechtigt)
 				{
 					$showHTML.='<tr>';
 						$showHTML.='<td>';
 							if ($wartungsberechtigt)
 							{
-								$showHTML.='<span class="cursor_hand" onclick="callWindows(\'jahresplan_veranstaltung.php?work=neu&amp;veranstaltung_id=&amp;start_datum='.date("d.m.Y",$iTmpTimeStamp).'&amp;ende_datum='.date("d.m.Y",$iTmpTimeStamp).'\',\'Veranstaltung_Neuanlage\');"><img title="Neuanlage '.date("d.m.Y",$iTmpTimeStamp).'" src="../../../skin/images/date_edit.png" alt="Wartung Veranstaltung" border="0"></span>';
+								$showHTML.='<span class="cursor_hand" onclick="callWindows(\'jahresplan_veranstaltung.php?work=neu&amp;veranstaltung_id=&amp;start_datum='.date("d.m.Y",$iTmpTimeStamp).'&amp;ende_datum='.date("d.m.Y",$iTmpTimeStamp).'\',\'Veranstaltung_Neuanlage\');"><img title="'.$p->t("eventkalender/neuanlage").' '.date("d.m.Y",$iTmpTimeStamp).'" src="../../../skin/images/date_edit.png" alt="Wartung Veranstaltung" border="0"></span>';
 							}
 						$showHTML.='</td>';
 					$showHTML.='</tr>';
@@ -510,7 +517,7 @@ function jahresplan_veranstaltungskategorie_kalenderanzeige($veranstaltung,$wart
 
 					if (!$wartungsberechtigt)
 						$showHTML.=$cTmpJavaWartungInfo;
-					$showHTML.=' title="Veranstaltung '.$iTmpStartTagErgebniss[$iTmpVeranstaltung]->bezeichnung." ID ".$iTmpStartTagErgebniss[$iTmpVeranstaltung]->veranstaltung_id." \n".htmlspecialchars($iTmpStartTagErgebniss[$iTmpVeranstaltung]->beschreibung)." \n".htmlspecialchars($iTmpStartTagErgebniss[$iTmpVeranstaltung]->inhalt)." \n ".strftime(constKalenderDetailDatumZeit,$iTmpStartTagErgebniss[$iTmpVeranstaltung]->start_timestamp)." Uhr \n - ". ($iTmpStartTagErgebniss[$iTmpVeranstaltung]->start_datum==$iTmpStartTagErgebniss[$iTmpVeranstaltung]->ende_datum?strftime(constKalenderZeit,$iTmpStartTagErgebniss[$iTmpVeranstaltung]->ende_timestamp) : strftime(constKalenderDetailDatumZeit,$iTmpStartTagErgebniss[$iTmpVeranstaltung]->ende_timestamp) ).' Uhr">';
+					$showHTML.=' title="'.$p->t("eventkalender/veranstaltung").' '.$iTmpStartTagErgebniss[$iTmpVeranstaltung]->bezeichnung." ID ".$iTmpStartTagErgebniss[$iTmpVeranstaltung]->veranstaltung_id." \n".htmlspecialchars($iTmpStartTagErgebniss[$iTmpVeranstaltung]->beschreibung)." \n".htmlspecialchars($iTmpStartTagErgebniss[$iTmpVeranstaltung]->inhalt)." \n ".strftime(constKalenderDetailDatumZeit,$iTmpStartTagErgebniss[$iTmpVeranstaltung]->start_timestamp)." Uhr \n - ". ($iTmpStartTagErgebniss[$iTmpVeranstaltung]->start_datum==$iTmpStartTagErgebniss[$iTmpVeranstaltung]->ende_datum?strftime(constKalenderZeit,$iTmpStartTagErgebniss[$iTmpVeranstaltung]->ende_timestamp) : strftime(constKalenderDetailDatumZeit,$iTmpStartTagErgebniss[$iTmpVeranstaltung]->ende_timestamp) ).' Uhr">';
 
 						$showHTML.='<td class="kalender_tages_info">
 								<table summary="blank'.$iTmpMonat.$iTmpWoche.$iTmpTag.'" style="border:0px;vertical-align:top;text-align:left;" cellpadding="0" cellspacing="0">
@@ -530,8 +537,8 @@ function jahresplan_veranstaltungskategorie_kalenderanzeige($veranstaltung,$wart
 
 									$showHTML.=(strlen($iTmpStartTagErgebniss[$iTmpVeranstaltung]->beschreibung)>8?substr(trim($iTmpStartTagErgebniss[$iTmpVeranstaltung]->beschreibung),0,8).'<span style="font-size:7px;">...</span>' :trim($iTmpStartTagErgebniss[$iTmpVeranstaltung]->beschreibung)).'</td>';
 
-									if ($wartungsberechtigt)
-										$showHTML.='<td title="Voransicht" class="cursor_hand" '.$cTmpJavaWartungInfo.'>[i]</td>';
+									//if ($wartungsberechtigt) Kleiner Button für Vorschau des Termins. Von Kindlm am 28.02.2012 auskommentiert, da vermutlich nicht benoetigt/verwendet wird.
+									//	$showHTML.='<td title='.$p->t("eventkalender/voransicht").' class="cursor_hand" '.$cTmpJavaWartungInfo.'>[<>]</td>';
 
 									$showHTML.='</tr>
 								</table>
@@ -581,8 +588,8 @@ function jahresplan_veranstaltungskategorie_kalenderanzeige($veranstaltung,$wart
 			$showHTML.='
 			<tr><td colspan="9"><table>
 				<tr>
-					<td id="alleKW_Monat_'.$cTmpInfoMonat.'_on" onclick="hide_layer(\'alleKW_Monat_'.$cTmpInfoMonat.'_on\');show_layer(\'alleKW_Monat_'.$cTmpInfoMonat.'_off\');'.$alleKWanzeigen.'">alle Wochen &ouml;ffnen&nbsp;<img title="&ouml;ffnen - open" src="../../../skin/images/bullet_arrow_right.png" alt="open" border="0"></td>
-					<td id="alleKW_Monat_'.$cTmpInfoMonat.'_off" class="ausblenden" onclick="hide_layer(\'alleKW_Monat_'.$cTmpInfoMonat.'_off\');show_layer(\'alleKW_Monat_'.$cTmpInfoMonat.'_on\');'.$alleKWausblenden.'">alle Wochen schliessen&nbsp;<img title="schliessen - close" src="../../../skin/images/bullet_arrow_down.png" alt="close" border="0"></td>
+					<td id="alleKW_Monat_'.$cTmpInfoMonat.'_on" onclick="hide_layer(\'alleKW_Monat_'.$cTmpInfoMonat.'_on\');show_layer(\'alleKW_Monat_'.$cTmpInfoMonat.'_off\');'.$alleKWanzeigen.'">'.$p->t("eventkalender/alleWochenOeffnen").'&nbsp;<img title='.$p->t("eventkalender/oeffnen").' src="../../../skin/images/bullet_arrow_right.png" alt="open" border="0"></td>
+					<td id="alleKW_Monat_'.$cTmpInfoMonat.'_off" class="ausblenden" onclick="hide_layer(\'alleKW_Monat_'.$cTmpInfoMonat.'_off\');show_layer(\'alleKW_Monat_'.$cTmpInfoMonat.'_on\');'.$alleKWausblenden.'">'.$p->t("eventkalender/alleWochenSchliessen").'&nbsp;<img title='.$p->t("eventkalender/schliessen").' src="../../../skin/images/bullet_arrow_down.png" alt="close" border="0"></td>
 				</tr>
 			</table></td></tr>
 			';
@@ -591,7 +598,7 @@ function jahresplan_veranstaltungskategorie_kalenderanzeige($veranstaltung,$wart
 		</table></td></tr>';
 	}
 	$showHTML.='<tr><td style="color:silver;">';
-	$showHTML.='Bei Fragen geben Sie bitte immer die Veranstaltungs ID an.';
+	$showHTML.=$p->t("eventkalender/beiFragenGebenSieImmerDieVeranstaltungsIDan");
 	$showHTML.='</td></tr>';
 	$showHTML.='</table>';
 	return $showHTML;
@@ -694,7 +701,7 @@ function jahresplan_veranstaltungskategorie_kalendererzeugen($veranstaltung_tabe
 		
 			if (!isset($veranstaltung_kalender[$Jahr]['VerarbeitenWochen'][$iTmpMonat][$iTmpWochenIndex]))
 			{
-				echo "<br>Wochenindex $iTmpWochenIndex wurde nicht gefunden<br>";
+				echo "<br>".$p->t('eventkalender/wochenindexWurdeNichtGefunden',array($iTmpWochenIndex))."<br>";
 				break;	
 			}
 			$iTmpWoche=$veranstaltung_kalender[$Jahr]['VerarbeitenWochen'][$iTmpMonat][$iTmpWochenIndex];
@@ -760,6 +767,7 @@ function jahresplan_veranstaltungskategorie_kalendererzeugen($veranstaltung_tabe
  */
 function jahresplan_veranstaltung_listenanzeige($veranstaltung,$wartungsberechtigt)
 {
+global $p;
 	// Listen
 	if (!defined('constHeaderVeranstaltungsdatum')) define('constHeaderVeranstaltungsdatum','%a, %d %B %G' );
 	if (!defined('constZeileVeranstaltungsdatum')) define('constZeileVeranstaltungsdatum','%a, %d.%m.%Y  %R %H:%M' );
@@ -767,7 +775,7 @@ function jahresplan_veranstaltung_listenanzeige($veranstaltung,$wartungsberechti
 
 	// Pruefen ob Daten vorhanden sind zum anzeigen
 	if (!is_array($veranstaltung) || count($veranstaltung)<1 || !isset($veranstaltung[0]) || !isset($veranstaltung[0]->veranstaltung_id) || empty($veranstaltung[0]->veranstaltung_id) )
-		return 'keine Veranstaltung ';
+		return $p->t("eventkalender/keineVeranstaltungen") ;
 
 	// Daten in Work Array uebertragen
 	$veranstaltung_tabelle=$veranstaltung;
@@ -801,14 +809,14 @@ function jahresplan_veranstaltung_listenanzeige($veranstaltung,$wartungsberechti
 			// Titelleiste immer nach Datumanzeigen
 			$showHTML.='<tr class="header_liste_titelzeile">
 						<th>ID</th>
-						<th>Veranstaltung</th>
-						<th>Beginn</th>
-						<th>Ende</th>
+						<th>'.$p->t("eventkalender/veranstaltung").'</th>
+						<th>'.$p->t("global/beginn").'</th>
+						<th>'.$p->t("global/ende").'</th>
 					';
 			// Spezielle Anzeigen fuer Wartungsberechtigte Admins
 			if ($wartungsberechtigt)
 			{
-				$showHTML.='<th colspan="2">Aktion</th><th colspan="2">Freigabe</th>';
+				$showHTML.='<th colspan="2">'.$p->t("global/aktion").'</th><th colspan="2">'.$p->t("benotungstool/freigabe").'</th>';
 			}
 			$showHTML.='</tr>';
 			$cTmpLastKat=""; // Kategoriegruppe Init fuer Gruppenwechsel - Zeilenanzeige
@@ -885,30 +893,31 @@ function jahresplan_veranstaltung_listenanzeige($veranstaltung,$wartungsberechti
 			$cTmpScriptWartung=' onclick="callWindows(\'jahresplan_veranstaltung.php?work=show&amp;veranstaltung_id='.$veranstaltung_tabelle[$iTmpZehler]->veranstaltung_id.'\',\'Veranstaltung_Aenderung\');" ';
 			// Aendern Icon und Text
 			$showHTML.='<td '.$cTmpScriptWartung.'>
-				<img title="ID '.$veranstaltung_tabelle[$iTmpZehler]->veranstaltung_id.' aendern '.$veranstaltung_tabelle[$iTmpZehler]->titel.'" height="14px" src="../../../skin/images/date_edit.png" alt="aendern Veranstaltung" border="0">
-					&auml;ndern
+				<img title="ID '.$veranstaltung_tabelle[$iTmpZehler]->veranstaltung_id.' '.$p->t("global/aendern").' '.$veranstaltung_tabelle[$iTmpZehler]->titel.'" height="14px" src="../../../skin/images/date_edit.png" alt="aendern Veranstaltung" border="0">
+					'.$p->t("global/aendern").'
 				</td>';
 
 			// Erzeugen PopUp URL fuer Entfernen
 			// Url
-			$cTmpScriptWartung=' onclick="if (!confirm(\'Wollen Sie wirklich ID '.$veranstaltung_tabelle[$iTmpZehler]->veranstaltung_id.' l&ouml;schen ?\')) {return false;}  ; callWindows(\'jahresplan_veranstaltung.php?work=del&amp;veranstaltung_id='.$veranstaltung_tabelle[$iTmpZehler]->veranstaltung_id.'\',\'Veranstaltung_Loeschen\');" ';
+			$cTmpScriptWartung=' onclick="if (!confirm(\' '.$p->t('eventkalender/wollenSieWirklichIdXYloeschen',array($veranstaltung_tabelle[$iTmpZehler]->veranstaltung_id)).' ?\')) {return false;}  ; callWindows(\'jahresplan_veranstaltung.php?work=del&amp;veranstaltung_id='.$veranstaltung_tabelle[$iTmpZehler]->veranstaltung_id.'\',\'Veranstaltung_Loeschen\');" ';
+			
 			// Loeschen Icon und Text
 			$showHTML.='<td id="jh_va_delrow'.$iTmpZehler.'" '.$cTmpScriptWartung.'>
-				<img title="ID '.$veranstaltung_tabelle[$iTmpZehler]->veranstaltung_id.' entfernen '.$veranstaltung_tabelle[$iTmpZehler]->titel.'" height="14px" src="../../../skin/images/date_delete.png" alt="entfernen Veranstaltung" border="0">
-				entfernen
+				<img title="ID '.$veranstaltung_tabelle[$iTmpZehler]->veranstaltung_id.' '.$p->t("global/entfernen").' '.$veranstaltung_tabelle[$iTmpZehler]->titel.'" height="14px" src="../../../skin/images/date_delete.png" alt="entfernen Veranstaltung" border="0">
+				'.$p->t("global/entfernen").'
 				</td>';
 
 			// Freigabe Information und Berechtigungsinfo wer diesen Eintrag sehen darf - Oeffentlich - Mitarbeiter
 			$showHTML.='<td>';
 				$showHTML.=(!empty($veranstaltung_tabelle[$iTmpZehler]->freigabeamum)?$veranstaltung_tabelle[$iTmpZehler]->freigabeamum.', '.$veranstaltung_tabelle[$iTmpZehler]->freigabevon:'');
 				if (empty($veranstaltung_tabelle[$iTmpZehler]->freigabeamum))
-					$showHTML.='<img title="keine Freigabe" height="14px" src="../../../skin/images/login.gif" alt="keine Freigabe" border="0">';
+					$showHTML.='<img title='.$p->t("eventkalender/keineFreigabe").' height="14px" src="../../../skin/images/login.gif" alt="keine Freigabe" border="0">';
 				$showHTML.='</td>';
 
 			// Plausibfehler Datum Von-Bis ausgeben
 			if ($veranstaltung_tabelle[$iTmpZehler]->start_timestamp>$veranstaltung_tabelle[$iTmpZehler]->ende_timestamp)
 				$showHTML.='
-					<td ><b>Fehler! Start kleiner Ende</b>&nbsp;</td>
+					<td ><b>'.$p->t("eventkalender/fehlerStartKleinerEnde").'</b>&nbsp;</td>
 				';
 		}
 
@@ -918,7 +927,7 @@ function jahresplan_veranstaltung_listenanzeige($veranstaltung,$wartungsberechti
 	}
 	$showHTML.='</table>';
 
-	$showHTML.='<span class="footer_zeile">Bei Fragen geben Sie bitte immer die Veranstaltungs ID an.</span>';
+	$showHTML.='<br/><span class="footer_zeile">'.$p->t("eventkalender/beiFragenGebenSieImmerDieVeranstaltungsIDan").'.</span>';
 	// Return HTML Liste
 	return $showHTML;
 }
@@ -979,8 +988,9 @@ function jahresplan_funk_veranstaltung_extend($veranstaltung)
  */
 function jahresplan_veranstaltung_detail_user($veranstaltung,$wartungsberechtigt=false)
 {
+global $p;
 	if (!$wartungsberechtigt)
-		return 'keine Berechtigung zur Information der Anwenderdaten (Freigabe,Anlage,Aenderung)';
+		return $p->t("eventkalender/keineBerechtigungAufAnwenderinformationen");
 
 	$veranstaltung_detail=$veranstaltung;
 	if (is_array($veranstaltung_detail) && isset($veranstaltung_detail[0]) && is_array($veranstaltung_detail[0]) && isset($veranstaltung_detail[0]['veranstaltung_id']))
@@ -1012,7 +1022,7 @@ function jahresplan_veranstaltung_detail_user($veranstaltung,$wartungsberechtigt
 		}
 	}
 
-	$showHTML.='<tr><td>Freigabe von :'.$userNAME.'</td><td>'.(isset($veranstaltung_detail['freigabeamum'])?' am '.$veranstaltung_detail['freigabeamum']:'').'</td><td>'.(isset($veranstaltung_detail["freigabebild"])?' '.$veranstaltung_detail["freigabebild"]:'').'</td></tr>';
+	$showHTML.='<tr><td>'.$p->t("eventkalender/freigabeVon").': '.$userNAME.'</td><td>'.(isset($veranstaltung_detail['freigabeamum'])?' '.$p->t("eventkalender/am").' '.$veranstaltung_detail['freigabeamum']:'').'</td><td>'.(isset($veranstaltung_detail["freigabebild"])?' '.$veranstaltung_detail["freigabebild"]:'').'</td></tr>';
 	// Letzte Aenderung
 	$userNAME=$veranstaltung_detail['updatevon'];
 	$pers = new benutzer($userNAME); // Lesen Person - Benutzerdaten
@@ -1028,7 +1038,7 @@ function jahresplan_veranstaltung_detail_user($veranstaltung,$wartungsberechtigt
 			$veranstaltung_detail["updatebild"]='<img width="16" border="0" title="'.$userNAME.'" alt="Benutzerbild" src="'.$cURL.'" >';
 		}
 	}
-	$showHTML.='<tr><td>&Auml;nderung von :'.$userNAME.'</td><td>'.(isset($veranstaltung_detail['updateamum'])?' am '.$veranstaltung_detail['updateamum']:'').'</td><td>'.(isset($veranstaltung_detail["updatebild"])?' '.$veranstaltung_detail["updatebild"]:'').'</td></tr>';
+	$showHTML.='<tr><td>'.$p->t("eventkalender/aenderungVon").': '.$userNAME.'</td><td>'.(isset($veranstaltung_detail['updateamum'])?' '.$p->t("eventkalender/am").' '.$veranstaltung_detail['updateamum']:'').'</td><td>'.(isset($veranstaltung_detail["updatebild"])?' '.$veranstaltung_detail["updatebild"]:'').'</td></tr>';
 
 	// Neuanlage
 	$userNAME=$veranstaltung_detail['insertvon'];
@@ -1045,7 +1055,7 @@ function jahresplan_veranstaltung_detail_user($veranstaltung,$wartungsberechtigt
 			$veranstaltung_detail["insertbild"]='<img width="16" border="0" title="'.$userNAME.'" alt="Benutzerbild" src="'.$cURL.'" >';
 		}
 	}
-	$showHTML.='<tr><td>Neuanlage von :'.$userNAME.'</td><td>'.(isset($veranstaltung_detail['insertamum'])?' am '.$veranstaltung_detail['insertamum']:'').'</td><td>'.(isset($veranstaltung_detail["insertbild"])?' '.$veranstaltung_detail["insertbild"]:'').'</td></tr>';
+	$showHTML.='<tr><td>'.$p->t("eventkalender/angelegtVon").': '.$userNAME.'</td><td>'.(isset($veranstaltung_detail['insertamum'])?' '.$p->t("eventkalender/am").' '.$veranstaltung_detail['insertamum']:'').'</td><td>'.(isset($veranstaltung_detail["insertbild"])?' '.$veranstaltung_detail["insertbild"]:'').'</td></tr>';
 	$showHTML.='</table>';
 	return $showHTML;
 }
