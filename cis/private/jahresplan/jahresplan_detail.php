@@ -76,7 +76,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>Veranstaltungsdetail ID <?php echo $veranstaltung_id.' - '.$userNAME;?> </title>
+<title><?php echo $p->t("eventkalender/veranstaltungsdetailID");?> <?php echo $veranstaltung_id.' - '.$userNAME;?> </title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<script language="JavaScript" type="text/javascript">
 	<!--
@@ -113,7 +113,7 @@
 	}
 	else
 	{
-		echo '<h1>Veranstaltungsdetail ID '.$veranstaltung_id.' wurde nicht gefunden!</h1>';
+		echo '<h1>'.$p->t('eventkalender/veranstaltungIdXYwurdeNichtGefunden',array($veranstaltung_id)).'!</h1>';
 		echo $Jahresplan->errormsg;
 
 	}	

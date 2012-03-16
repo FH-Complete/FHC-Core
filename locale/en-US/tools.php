@@ -42,6 +42,7 @@ $this->phrasen['tools/ampelMitarbeiter']='Employee';
 $this->phrasen['tools/ampelRestdauer']='Remaining Days';
 $this->phrasen['tools/ampelBestaetigtAm']='Confirmed on';
 $this->phrasen['tools/ampelBereitsBestaetigt']='This notification has already been confirmed';
+$this->phrasen['tools/dasAmpelsystemIstEinErinnerungsystem']='Das Ampelsystem ist ein ERINNERUNGS- und BESTÄTIGUNGSSYSTEM, welches Sie auf ausstehende Aufgaben aufmerksam machen soll.<br/>Die Ampel überprüft NICHT, ob die Aufgabe tatsächlich erledigt wurde. Weitere Details entnehmen Sie bitte dem CIS-Handbuch';
 
 //Software fuer Lehre -> Softgrid
 $this->phrasen['tools/applikationsliste']='List of Applications';

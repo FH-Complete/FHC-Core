@@ -349,7 +349,7 @@ echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
 						</tr>
 						<tr>
 							<td>'.$p->t('news/sichtbarbis').'</td>
-							<td><input type="text" name="datum_bis" size="10" value="'.$datum_obj->formatDatum($news->datum_bis,'d.m.Y').'"></td>
+							<td><input type="text" name="datum_bis" size="10" value="'.$datum_obj->formatDatum($news->datum_bis,'d.m.Y').'"> '.$p->t('news/maximal30Tage').'</td>
 						</tr>
 					</table>
 				</td>
@@ -383,6 +383,7 @@ if($studiengang_kz!='0')
 			<td>
 			<SELECT name="semester">';
 	echo '<OPTION value="0">'.$p->t('news/allesemester').'</OPTION>';
+	
 	for($i=1;$i<=8;$i++)
 	{
 		if($i==$semester)
@@ -391,6 +392,10 @@ if($studiengang_kz!='0')
 			$selected='';
 		
 		echo '<OPTION value="'.$i.'" '.$selected.'>'.$p->t('news/xsemester',array($i)).'</OPTION>';
+	}
+	if($studiengang_kz=='10006')
+	{
+		echo '<OPTION value=""NULL"">'.$p->t('news/keinSemester').'</OPTION>';
 	}
 	echo '</SELECT>
 			</td>

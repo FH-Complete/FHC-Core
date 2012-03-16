@@ -22,10 +22,16 @@
  */
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
+require_once('../../../include/phrasen.class.php');
 require_once('../../../include/person.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/jahresplan.class.php');
+
+
+$sprache = getSprache();
+$p = new phrasen($sprache);
+
 require_once('jahresplan_funktionen.inc.php');
 
 setlocale (LC_ALL, 'de_DE.UTF8','de_DE@euro', 'de_DE', 'de','DE', 'ge','German');
@@ -48,24 +54,24 @@ $Monat=trim((isset($_REQUEST['Monat']) ? $_REQUEST['Monat']:date("m", mktime(0,0
 $suchtext=trim((isset($_REQUEST['suchtext']) ? $_REQUEST['suchtext']:''));
 
 if(!is_numeric($Jahr))
-	die('Jahr ist ungueltig');
+	die($p->t("eventkalender/jahrIstUngueltig"));
 if(!is_numeric($Monat))
-	die('Monat ist ungueltig');
+	die($p->t("eventkalender/monatIstUngueltig"));
 if($veranstaltung_id!='' && !is_numeric($veranstaltung_id))
-	die('VeranstaltungID ist ungueltig');
+	die($p->t("eventkalender/veranstaltungIdIstUngueltig"));
 	
 // ------------------------------------------------------------------------------------------
 // 	Alle Kategoriedaten lesen fuer Selektfeld (open in jahresplan_funktionen)
 // ------------------------------------------------------------------------------------------
 $Jahresplan->InitVeranstaltungskategorie();
 if (!$veranstaltungskategorie=$Jahresplan->loadVeranstaltungskategorie())
-	die('Fehler beim lesen der Veranstaltungskategorie ! '.$Jahresplan->errormsg);
+	die($p->t("eventkalender/fehlerBeimLesenDerVeranstaltungskategorie").$Jahresplan->errormsg);
 
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>Jahresplan</title>
+<title><?php echo $p->t("eventkalender/jahresplan");?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <style type="text/css">
@@ -188,19 +194,20 @@ if (!$veranstaltungskategorie=$Jahresplan->loadVeranstaltungskategorie())
 
 </head>
 <body>
-<?php
-	// Wartungsberechtigt bekommen noch ein Spezielles Menue
+
+	<h1>&nbsp;<?php echo $p->t('eventkalender/veranstaltungen');?>&nbsp;</h1>
+	
+	<?php
+	// Wartungsberechtigte bekommen noch ein spezielles Menue
 	if ($is_wartungsberechtigt)
-		echo '[&nbsp;<a href="index.php">Veranstaltung</a>&nbsp;|&nbsp;<a href="jahresplan_kategorie.php">Kategorie</a>&nbsp;]&nbsp;'.$userNAME;
-?>
-
-
-	<h1>&nbsp;Veranstaltungen&nbsp;</h1>
+		echo '[&nbsp;<a href="index.php">'.$p->t("eventkalender/veranstaltung").'</a>&nbsp;|&nbsp;<a href="jahresplan_kategorie.php">'.$p->t("eventkalender/kategorie").'</a>&nbsp;]&nbsp;'.$userNAME.'<br/><br/>';
+	?>
+	
 	<form accept-charset="UTF-8" name="selJahresplan" target="_self" action="<?php echo $_SERVER['PHP_SELF'];?>"  method="post" enctype="multipart/form-data">
 		<table cellpadding="0" cellspacing="0">
 		<tr>
 			<!-- Jahresauswahl -->
-			<td title="1 Jahr zur&uuml;ck" ><img onclick="if (window.document.selJahresplan.Jahr.options.selectedIndex==0) {window.document.selJahresplan.Jahr.options.selectedIndex=(window.document.selJahresplan.Jahr.options.length - 1);} else { window.document.selJahresplan.Jahr.options.selectedIndex--; }; window.document.selJahresplan.submit();" alt="1 Jahr zur&uuml;ck" src="../../../skin/images/left.gif" border="0"></td>
+			<td title="<?php echo $p->t('eventkalender/einJahrZurueck');?>" ><img onclick="if (window.document.selJahresplan.Jahr.options.selectedIndex==0) {window.document.selJahresplan.Jahr.options.selectedIndex=(window.document.selJahresplan.Jahr.options.length - 1);} else { window.document.selJahresplan.Jahr.options.selectedIndex--; }; window.document.selJahresplan.submit();" alt="<?php echo $p->t('eventkalender/einJahrZurueck');?>" src="../../../skin/images/left.gif" border="0"></td>
 			<td><select name="Jahr" onchange="window.document.selJahresplan.submit();" >
 			<?php
 				$cTmpStart=date("Y", mktime(0,0,0,date("m"),date("d"),date("y")-3));
@@ -211,10 +218,10 @@ if (!$veranstaltungskategorie=$Jahresplan->loadVeranstaltungskategorie())
 				}
 			?>
 			</select></td>
-			<td title="1 Jahr vor" ><img onclick="if (window.document.selJahresplan.Jahr.options.selectedIndex==(window.document.selJahresplan.Jahr.options.length - 1)) {window.document.selJahresplan.Jahr.options.selectedIndex=0} else {window.document.selJahresplan.Jahr.options.selectedIndex++;};window.document.selJahresplan.submit();" alt="1 Jahr vor" src="../../../skin/images/right.gif" border="0"></td>
+			<td title="<?php echo $p->t('eventkalender/einJahrVor');?>" ><img onclick="if (window.document.selJahresplan.Jahr.options.selectedIndex==(window.document.selJahresplan.Jahr.options.length - 1)) {window.document.selJahresplan.Jahr.options.selectedIndex=0} else {window.document.selJahresplan.Jahr.options.selectedIndex++;};window.document.selJahresplan.submit();" alt="<?php echo $p->t('eventkalender/einJahrVor');?>" src="../../../skin/images/right.gif" border="0"></td>
 			<td>&nbsp;</td>
 			<!-- Monatsauswahl -->
-			<td title="1 Monat zur&uuml;ck" ><img onclick="if (window.document.selJahresplan.Monat.options.selectedIndex==0) {window.document.selJahresplan.Monat.options.selectedIndex=(window.document.selJahresplan.Monat.options.length - 1);} else { window.document.selJahresplan.Monat.options.selectedIndex--; }; window.document.selJahresplan.veranstaltung_id.value='';window.document.selJahresplan.suchtext.value='';window.document.selJahresplan.submit();" alt="1 Monat zur&uuml;ck" src="../../../skin/images/left.gif" border="0"></td>
+			<td title="<?php echo $p->t('eventkalender/einMonatZurueck');?>" ><img onclick="if (window.document.selJahresplan.Monat.options.selectedIndex==0) {window.document.selJahresplan.Monat.options.selectedIndex=(window.document.selJahresplan.Monat.options.length - 1);} else { window.document.selJahresplan.Monat.options.selectedIndex--; }; window.document.selJahresplan.veranstaltung_id.value='';window.document.selJahresplan.suchtext.value='';window.document.selJahresplan.submit();" alt="<?php echo $p->t('eventkalender/einMonatZurueck');?>" src="../../../skin/images/left.gif" border="0"></td>
 			<td><select name="Monat" onchange="window.document.selJahresplan.veranstaltung_id.value='';window.document.selJahresplan.suchtext.value='';window.document.selJahresplan.submit();" >
 			<?php
 				for ($iTmpZehler=0;$iTmpZehler<=12;$iTmpZehler++)
@@ -223,13 +230,13 @@ if (!$veranstaltungskategorie=$Jahresplan->loadVeranstaltungskategorie())
 				}
 			?>
 			</select></td>
-			<td title="1 Monat vor" ><img onclick="if (window.document.selJahresplan.Monat.options.selectedIndex==(window.document.selJahresplan.Monat.options.length - 1)) {window.document.selJahresplan.Monat.options.selectedIndex=0} else {window.document.selJahresplan.Monat.options.selectedIndex++;};window.document.selJahresplan.veranstaltung_id.value='';window.document.selJahresplan.suchtext.value='';window.document.selJahresplan.submit();" alt="1 Monat vor" src="../../../skin/images/right.gif" border="0"></td>
+			<td title="<?php echo $p->t('eventkalender/einMonatVor');?>" ><img onclick="if (window.document.selJahresplan.Monat.options.selectedIndex==(window.document.selJahresplan.Monat.options.length - 1)) {window.document.selJahresplan.Monat.options.selectedIndex=0} else {window.document.selJahresplan.Monat.options.selectedIndex++;};window.document.selJahresplan.veranstaltung_id.value='';window.document.selJahresplan.suchtext.value='';window.document.selJahresplan.submit();" alt="<?php echo $p->t('eventkalender/einMonatVor');?>" src="../../../skin/images/right.gif" border="0"></td>
 			<td>&nbsp;</td>
 			<!-- Kategorieauswahl -->
 			<td><select name="veranstaltungskategorie_kurzbz" onchange="window.document.selJahresplan.submit();" >
 			<?php
 
-				echo '<option '.(empty($veranstaltungskategorie_kurzbz)?' selected="selected" ':'').' value="">alle Kategorien</option>';
+				echo '<option '.(empty($veranstaltungskategorie_kurzbz)?' selected="selected" ':'').' value="">'.$p->t("eventkalender/alleKategorien").'</option>';
 				// Init Direktzugriffstabelle der Kategorien fuer Kalender - Key:veranstaltungskategorie_kurzbz
 				// Verarbeitungskategorie - Auswahl.- Selektliste
 			  	if  (is_array($veranstaltungskategorie) || count($veranstaltungskategorie)>0)
@@ -250,16 +257,16 @@ if (!$veranstaltungskategorie=$Jahresplan->loadVeranstaltungskategorie())
 			</select></td>
 			<td>&nbsp;</td>
 			<!-- Veranstaltungs ID  -->
-			<td>ID</td>
-			<td><input onblur="if (this.value!='') { window.document.selJahresplan.Monat.options.selectedIndex=0;window.document.selJahresplan.suchtext.value='';window.document.selJahresplan.submit(); } " name="veranstaltung_id" type="text" size="4" maxlength="10" title="Veranstaltungs ID" value="<?php echo $veranstaltung_id;?>"></td>
+			<td><?php echo $p->t('eventkalender/ID');?></td>
+			<td><input onblur="if (this.value!='') { window.document.selJahresplan.Monat.options.selectedIndex=0;window.document.selJahresplan.suchtext.value='';window.document.selJahresplan.submit(); } " name="veranstaltung_id" type="text" size="4" maxlength="10" title="<?php echo $p->t('eventkalender/veranstaltungsID');?>" value="<?php echo $veranstaltung_id;?>"></td>
 			<td>&nbsp;</td>
 			<!-- Textsuche  -->
-			<td>Suche</td>
-			<td><input onblur="if (this.value!='') { window.document.selJahresplan.Monat.options.selectedIndex=0;window.document.selJahresplan.submit(); } "  name="suchtext" type="text" size="15" maxlength="30" title="suchtext" value="<?php echo $suchtext;?>"></td>
+			<td><?php echo $p->t('eventkalender/suche');?></td>
+			<td><input onblur="if (this.value!='') { window.document.selJahresplan.Monat.options.selectedIndex=0;window.document.selJahresplan.submit(); } "  name="suchtext" type="text" size="15" maxlength="30" title="<?php echo $p->t('eventkalender/suchtext');?>" value="<?php echo $suchtext;?>"></td>
 			<td>&nbsp;</td>
 			<!-- Datenanzeige Startknopf  -->
-			<td  title="Veranstaltungen anzeigen">
-				<input type="Submit" value="anzeigen">
+			<td  title="<?php echo $p->t('eventkalender/veranstaltungenAnzeigen');?>">
+				<input type="Submit" value="<?php echo $p->t('global/anzeigen');?>">
 			</td>
 			<td>&nbsp;</td>
 			<?php 
@@ -267,7 +274,7 @@ if (!$veranstaltungskategorie=$Jahresplan->loadVeranstaltungskategorie())
 			{
 				echo '
 				<td style="width:100%; text-align:right">
-					<a href="../info/unternehmenskommunikation/veranstaltungsleitfaden.php">Veranstaltungsleitfaden</a>
+					<a href="../../../cms/content.php?content_id='.$p->t("dms_link/veranstaltungsleitfaden").'">'.$p->t("eventkalender/veranstaltungsleitfaden").'</a>
 				</td>';
 			}
 			?>
@@ -353,7 +360,7 @@ if (!$veranstaltungskategorie=$Jahresplan->loadVeranstaltungskategorie())
 	}
 	else
 	{
-		echo "<br />keine Daten gefunden ".(!empty($suchtext)? ' suchtext '.$suchtext:'' ).(!empty($veranstaltung_id)? ' ID '.$veranstaltung_id:'' );
+		echo "<br />".$p->t('global/keineDatenGefunden').". ".(!empty($suchtext)? " ".$p->t('eventkalender/suchtext').": ".$suchtext:"" ).(!empty($veranstaltung_id)? " ID ".$veranstaltung_id:'' );
 	}
 	// Fehlerausgabe
 	echo '<p>'.$Jahresplan->errormsg.'</p>';

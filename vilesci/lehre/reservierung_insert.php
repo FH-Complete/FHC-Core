@@ -23,21 +23,27 @@
  */
  
 	/**
-	 *	@updated 04.11.2011 (WM)
+	 *	@updated 14.03.2012
 	 *
 	 */
 		require_once('../../config/vilesci.config.inc.php');
 		require_once('../../include/basis_db.class.php');
+		require_once('../../include/functions.inc.php');
 		if (!$db = new basis_db())
 				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 			
-
+	$uid=get_uid();
 
 	$sql_query="SELECT studiengang_kz, UPPER(oe_kurzbz) AS oe_kurzbz, bezeichnung FROM public.tbl_studiengang WHERE studiengang_kz>=0 ORDER BY oe_kurzbz";
 	//echo $sql_query."<br>";
 	$result_stg=$db->db_query($sql_query);
 	if(!$result_stg)
 		die("studiengang not found! ".$db->db_last_error());
+		
+	$sql_query="SELECT gruppe_kurzbz FROM public.tbl_gruppe WHERE lehre=true AND sichtbar=true AND aktiv=true ORDER BY gruppe_kurzbz";
+	$result_gruppe_kurzbz=$db->db_query($sql_query);
+	if(!$result_gruppe_kurzbz)
+		die("spezialgruppe not found! ".$db->db_last_error());
 		
 	$sql_query="SELECT uid, person_id, kurzbz FROM campus.vw_mitarbeiter WHERE aktiv=true ORDER BY kurzbz";
 	$result_lektor=$db->db_query($sql_query);
@@ -56,6 +62,7 @@
 	$semester=(isset($_REQUEST['semester'])?$_REQUEST['semester']:'');	
 	$verband=(isset($_REQUEST['verband'])?$_REQUEST['verband']:0);	
 	$gruppe=(isset($_REQUEST['gruppe'])?$_REQUEST['gruppe']:0);	
+	$gruppe_kurzbz=(isset($_REQUEST['gruppe_kurzbz'])?$_REQUEST['gruppe_kurzbz']:'');	
 	$tag=(isset($_REQUEST['tag'])?$_REQUEST['tag']:date('d'));	
 	$monat=(isset($_REQUEST['monat'])?$_REQUEST['monat']:date('m'));	
 	$jahr=(isset($_REQUEST['jahr'])?$_REQUEST['jahr']:date('Y'));
@@ -135,6 +142,25 @@
 		}
 		?>
     </select>
+    Spezialgruppe
+    <select name="gruppe_kurzbz">
+	  <option value="">*</option>
+      <?php
+		if ($result_gruppe_kurzbz)
+				$num_rows=$db->db_num_rows($result_gruppe_kurzbz);
+		else
+			$num_rows=0;
+		for ($i=0;$i<$num_rows;$i++)
+		{
+			$row=$db->db_fetch_object ($result_gruppe_kurzbz, $i);
+			if ($gruppe_kurzbz==$row->gruppe_kurzbz)
+				echo "<option value=\"$row->gruppe_kurzbz\" selected>$row->gruppe_kurzbz</option>";
+			else
+				echo "<option value=\"$row->gruppe_kurzbz\">$row->gruppe_kurzbz</option>";
+		}
+		?>
+    </select>
+	Wenn Spezialgruppe ausgewählt, muss Studiengang und Semester gleich der Spezialgruppe sein
   </p>
   <p>
 
@@ -293,7 +319,7 @@ if ($type=="save")
 				$date=getdate($time+(604800*$_POST['rythmus']));
 				$datum=$date[year]."-".$date[mon]."-".$date[mday];
 			}
-			$sql_query="INSERT INTO campus.tbl_reservierung(ort_kurzbz,studiengang_kz,uid,stunde,datum,titel,beschreibung,semester,verband,gruppe,insertamum,insertvon) ".
+			$sql_query="INSERT INTO campus.tbl_reservierung(ort_kurzbz,studiengang_kz,uid,stunde,datum,titel,beschreibung,semester,verband,gruppe,gruppe_kurzbz,insertamum,insertvon) ".
 					   "VALUES (
 					   '".$_POST['ortid']."',
 					   '".$_POST['stgid']."', 
@@ -304,9 +330,14 @@ if ($type=="save")
 					   '".$_POST['beschreibung']."', 
 					   ".$_POST['semester'].", 
 					   ".$_POST['verband'].", 
-					   ".$_POST['gruppe'].", 
-					   now(),
-					   '".$_SERVER['PHP_AUTH_USER']."')";
+					   ".$_POST['gruppe']."," ;
+						   	if ($_POST['gruppe_kurzbz']=='')
+								$sql_query.= 'NULL,';
+							else
+								$sql_query.= "'".$_POST['gruppe_kurzbz']."',";
+				
+					   $sql_query.= 'now(),'.
+					   "'".$uid."')";
 			//echo $sql_query;
 			$result=$db->db_query($sql_query);
 			if(!$result)
@@ -315,7 +346,7 @@ if ($type=="save")
 				$error=true;
 			}
 			else
-				echo "<strong>Ort:</strong> ".$_POST['ortid']." - <strong>Studiengang_Kz:</strong> ".$_POST['stgid']." - <strong>Semester:</strong> ".$_POST['semester']." - <strong>Verband:</strong> ".$_POST['verband']." - <strong>Gruppe:</strong> ".$_POST['gruppe']." - <strong>Lektor:</strong> ".$_POST['lektorid']." - <strong>Titel:</strong> ".$_POST['titel']." - <strong>Beschreibung:</strong> ".$_POST['beschreibung']." - <strong>Datum:</strong> $datum - <strong>Stunde:</strong> $std -- <strong>Eingefügt!</strong><br>";
+				echo "<strong>Ort:</strong> ".$_POST['ortid']." - <strong>Studiengang_Kz:</strong> ".$_POST['stgid']." - <strong>Semester:</strong> ".$_POST['semester']." - <strong>Verband:</strong> ".$_POST['verband']." - <strong>Gruppe:</strong> ".$_POST['gruppe']." - <strong>Spezialgruppe:</strong> ".$_POST['gruppe_kurzbz']." - <strong>Lektor:</strong> ".$_POST['lektorid']." - <strong>Titel:</strong> ".$_POST['titel']." - <strong>Beschreibung:</strong> ".$_POST['beschreibung']." - <strong>Datum:</strong> $datum - <strong>Stunde:</strong> $std -- <strong>Eingefügt!</strong><br>";
 
 		}
 		if (!$error)

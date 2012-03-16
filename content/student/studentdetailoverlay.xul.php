@@ -173,11 +173,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				</rows>
 			</grid>
 			</groupbox>
-			<hbox>
-				<groupbox id="student-detail-groupbox-student" flex="1">
+			
+			<vbox flex="1" >
+				<groupbox id="student-detail-groupbox-student">
 				<caption label="Student" />
-				<grid id="student-detail-grid-student" style="margin:4px;" flex="1">
-					  	<columns  >
+				<grid id="student-detail-grid-student" style="margin:4px;">
+					  	<columns >
 	    					<column flex="1"/>
 	    					<column flex="5"/>
 	    					<column flex="1"/>
@@ -223,11 +224,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	    				</rows>
 	    		</grid>
 	    		</groupbox>
-    			<vbox>
+	    		
+    			<hbox>
     				<spacer flex="1" />
     				<button id="student-detail-button-save" label="Speichern" oncommand="StudentDetailSave();" disabled="true"/>
-    			</vbox>
-    		</hbox>
+    			</hbox>
+    			
+    		</vbox>
+    		
 		</vbox>
 </vbox>
 

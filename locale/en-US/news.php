@@ -8,6 +8,7 @@ $this->phrasen['news/text']='Text';
 
 $this->phrasen['news/sichtbarab']='Date';
 $this->phrasen['news/sichtbarbis']='Visible until';
+$this->phrasen['news/maximal30Tage']='(max. 30 days, optional)';
 
 $this->phrasen['news/allgemein']='Global';
 $this->phrasen['news/freifach']='Optional Subject';
@@ -20,4 +21,5 @@ $this->phrasen['news/uebersetzungenvorhanden']='no more Translations available';
 
 $this->phrasen['news/allesemester']='All Semesters';
 $this->phrasen['news/xsemester']='Semester %s';
+$this->phrasen['news/keinSemester']='No Semester (gen. News)';
 ?>

@@ -36,7 +36,7 @@ if(is_user_logged_in())
 	{
 		echo '[';
 		if($rot>0)
-			echo '<a href="private/tools/ampelverwaltung.php" target="content" title="Red Alert"><img src="../skin/images/ampel_rot.png" style="vertical-align: bottom;"> '.$rot.'</a>';
+			echo '<a href="private/tools/ampelverwaltung.php" target="content" title="Red Alert"><img src="../skin/images/ampel_rot.gif" style="vertical-align: bottom;"> '.$rot.'</a>';
 		if($rot>0 && $gelb>0)
 			echo ' | ';
 		if($gelb>0)

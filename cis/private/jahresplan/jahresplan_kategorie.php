@@ -48,7 +48,7 @@
  	include_once('jahresplan_funktionen.inc.php');
 	
 	if (!$is_wartungsberechtigt)
-		die('Sie sind nicht berechtigt f&uuml;r diese Seite !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
+		die($p->t("global/keineBerechtigungFuerDieseSeite")).('<a href="javascript:history.back()">'.$p->t("global/zurueck").'</a>');
 
 // ------------------------------------------------------------------------------------------
 //	Init
@@ -111,11 +111,11 @@
 			}
 			else
 			{
-				$error='Veranstaltungskategorie "'.$_REQUEST['veranstaltungskategorie_kurzbz'].'" '.($Jahresplan->new?' angelegt ':' ge&auml;ndert ').'" '.$Jahresplan->errormsg;
+				$error=$p->t("eventkalender/veranstaltungskategorie").' "'.$_REQUEST['veranstaltungskategorie_kurzbz'].'" '.($Jahresplan->new? $p->t("eventkalender/angelegt") : $p->t("eventkalender/geaendert")).' '.$Jahresplan->errormsg;
 				$error.=' <script language="JavaScript1.2" type="text/javascript">
 						<!--
 							if (window.opener && !window.opener.closed) {
-								if (confirm("Soll die Hauptseite neu aufgebaut werden?")) {
+								if (confirm('.$p->t("eventkalender/sollDieHauptseiteNeuAufgebautWerden").'?)) {
 									window.opener.location.reload();
 								}	
 							}
@@ -132,7 +132,7 @@
 			}
 			else
 			{
-				$error='Veranstaltungskategorie "'.$_REQUEST['veranstaltungskategorie_kurzbz'].'" gel&ouml;scht.';
+				$error=$p->t("eventkalender/veranstaltungskategorie").' "'.$_REQUEST['veranstaltungskategorie_kurzbz'].'" '.$p->t("eventkalender/geloescht").'.';
 				$error.='	<script language="JavaScript1.2" type="text/javascript">
 						<!--
 							if (window.opener && !window.opener.closed) {
@@ -152,12 +152,12 @@
 // ------------------------------------------------------------------------------------------
 	$Jahresplan->InitVeranstaltungskategorie();
 	if (!$veranstaltungskategorie=$Jahresplan->loadVeranstaltungskategorie())
-		die('Fehler beim lesen der Veranstaltungskategorie! '.$Jahresplan->errormsg);
+		die($p->t("eventkalender/fehlerBeimLesenDerVeranstaltungskategorie").$Jahresplan->errormsg);
 ?> 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>Jahresplan</title>
+<title><?php echo $p->t("eventkalender/jahresplan");?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<style type="text/css">
@@ -166,7 +166,7 @@
 	.cursor_hand { cursor: pointer;vertical-align: top;white-space : nowrap;}
 	.ausblenden {display:none;}
 	.footer_zeile {color: silver;}
-	.pflichtfeld {style:background-color:#FFFFE0;border : 1px solid Black;}
+	.pflichtfeld {style:background-color:none ;border : 1px solid Black ;border-style: dashed;}
 	
 	tr.header_liste_row_0  {background:#FEFFEC;vertical-align: top;white-space : nowrap;}
 	tr.header_liste_row_1  {background:#F7F7F7;vertical-align: top;white-space : nowrap;}
@@ -176,15 +176,17 @@
 
 </head>
 <body>
-<?php 
- // Start Wartungsberechtigt - Anzeige des Speziellen Menues
-	$cTmpScriptWartungVeranstaltung="javascript:callWindows('jahresplan_veranstaltung.php?work=show&amp;veranstaltung_id=','Veranstaltung_Aenderung');";
-	$cTmpScriptWartungKategorie="javascript:callWindows('jahresplan_kategorie.php?work=show&amp;veranstaltungskategorie_kurzbz=','Kategorie_Aenderung');";
-?>
+	<h1>&nbsp;<?php echo $p->t("eventkalender/kategorienBearbeiten");?>&nbsp;</h1>
+	
+	<?php 
+	 // Start Wartungsberechtigt - Anzeige des Speziellen Menues
+		$cTmpScriptWartungVeranstaltung="javascript:callWindows('jahresplan_veranstaltung.php?work=show&amp;veranstaltung_id=','Veranstaltung_Aenderung');";
+		$cTmpScriptWartungKategorie="javascript:callWindows('jahresplan_kategorie.php?work=show&amp;veranstaltungskategorie_kurzbz=','Kategorie_Aenderung');";
+	?>
 		<script language="JavaScript1.2" type="text/javascript">
 		<!--
 			if (!window.opener || window.opener.closed) {
-				document.write('<?php echo '[&nbsp;<a href="index.php">Veranstaltung</a>&nbsp;|&nbsp;<a href="jahresplan_veranstaltung.php">Veranstaltung bearbeiten</a>&nbsp;|&nbsp;<a href="jahresplan_kategorie.php">Kategorie</a>&nbsp;]&nbsp;'.$userNAME; ?>');
+				document.write('<?php echo '[&nbsp;<a href="index.php">'.$p->t("eventkalender/veranstaltung").'</a>&nbsp;|&nbsp;<a href="jahresplan_veranstaltung.php">'.$p->t("eventkalender/veranstaltungBearbeiten").'</a>&nbsp;|&nbsp;<a href="jahresplan_kategorie.php">'.$p->t("eventkalender/kategorie").'</a>&nbsp;]&nbsp;'.$userNAME.'<br/><br/>'; ?>');
 			} else {
 				window.resizeTo(800,600);
 			}
@@ -193,15 +195,15 @@
 		</script>				
 
 
-	<h1>&nbsp;Kategoriebearbeiten&nbsp;</h1>
+
 	<table cellpadding="1" cellspacing="4">
 		<tr>
-			<th>Kurzbezeichnung</th>
-			<th>Bezeichnung</th>
-			<th>Farbe</th>
-			<th>Bildladen</th>
-			<th>Bild</th>
-			<th colspan="2">Aktion</th>
+			<th><?php echo $p->t("eventkalender/kurzbezeichnung");?></th>
+			<th><?php echo $p->t("global/bezeichnung");?></th>
+			<th><?php echo $p->t("eventkalender/farbe");?></th>
+			<th><?php echo $p->t("eventkalender/bildladen");?></th>
+			<th><?php echo $p->t("eventkalender/bild");?></th>
+			<th colspan="2"><?php echo $p->t("global/aktion");?></th>
 		</tr>
 			
 		<?php 
@@ -232,7 +234,7 @@
 			<td><input  <?php echo (isset($veranstaltungskategorie[$iTmpZehler]->farbe)?' style="background-color:#'.$veranstaltungskategorie[$iTmpZehler]->farbe.';"':'');?> name="farbe" onchange="if (this.value=='') {this.style.backgroundColor='transparent';} else {this.style.backgroundColor='#' + this.value;}" value="<?php echo (isset($veranstaltungskategorie[$iTmpZehler]->farbe)?$veranstaltungskategorie[$iTmpZehler]->farbe:'');?>" size="7" maxlength="6" /></td>
 
 			<td>
-				 <input size="8" maxlength="140" type="file" id="uploadBild" name="uploadBild" alt="suche" title="suchen" style="font-size:xx-small;" />
+				 <input size="8" maxlength="140" type="file" id="uploadBild" name="uploadBild" alt="suche" title="<?php echo $p->t("global/suchen");?>" style="font-size:xx-small;" />
 
 				 <input class="ausblenden" name="bild" value="<?php echo (isset($veranstaltungskategorie[$iTmpZehler]->bild)?$veranstaltungskategorie[$iTmpZehler]->bild:'');?>" />				
 			</td>
@@ -242,14 +244,14 @@
 				<?php echo (isset($veranstaltungskategorie[$iTmpZehler]->bild_image)?$veranstaltungskategorie[$iTmpZehler]->bild_image:'');?>
 			</td>
 			
-			<td class="cursor_hand" onclick="if (window.document.selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.veranstaltungskategorie_kurzbz.value=='<?php echo constEingabeFehlt; ?>')  {window.document.selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.veranstaltungskategorie_kurzbz.focus();return false;}; if (window.document.selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.bezeichnung.value.length<1) {window.document.selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.bezeichnung.focus();return false;}; window.document.selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.work.value='save';window.document.selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.submit();" >speichern <img height="14px" border="0" alt="sichern - save" src="../../../skin/images/date_edit.png" /></td>
-			<td <?php echo ($iTmpZehler<0?' class="ausblenden" ':''); ?> class="cursor_hand" onclick="window.document.selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.work.value='del';window.document.selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.submit();" >l&ouml;schen <img height="14px" border="0" alt="entfernen - delete" src="../../../skin/images/date_delete.png" /></td>
+			<td class="cursor_hand" onclick="if (window.document.selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.veranstaltungskategorie_kurzbz.value=='<?php echo constEingabeFehlt; ?>')  {window.document.selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.veranstaltungskategorie_kurzbz.focus();return false;}; if (window.document.selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.bezeichnung.value.length<1) {window.document.selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.bezeichnung.focus();return false;}; window.document.selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.work.value='save';window.document.selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.submit();" ><?php echo $p->t("global/speichern");?> <img height="14px" border="0" alt="sichern - save" src="../../../skin/images/date_edit.png" /></td>
+			<td <?php echo ($iTmpZehler<0?' class="ausblenden" ':''); ?> class="cursor_hand" onclick="window.document.selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.work.value='del';window.document.selJahresplanVeranstaltung<?php echo ($iTmpZehler<0?'':$iTmpZehler); ?>.submit();" ><?php echo $p->t("global/löschen");?> <img height="14px" border="0" alt="entfernen - delete" src="../../../skin/images/date_delete.png" /></td>
 		</tr>
 		</form>
 		<?php } ?>				
-		<tr class="footer_zeile"><td colspan="7">Kurzbezeichnung mit einem * (Stern) an erster Stelle werden nur f&uuml;r Mitarbeiter und Lektoren angezeigt.</td></tr>
+		<tr class="footer_zeile"><td colspan="7"><?php echo $p->t("eventkalender/kurzbezeichnungenMitEinemStern");?>.</td></tr>
 	</table>
-	<div><table><tr><td style="color:black;background-color:#FFFFE0;border : 1px solid Black;">&nbsp;&nbsp;&nbsp;</td><td>Pflichtfeld</td></tr></table></div>
+	<div><table><tr><td style="color:black;background-color:none ;border : 1px solid Black;border-style:dashed;">&nbsp;&nbsp;&nbsp;</td><td><?php echo $p->t("eventkalender/pflichtfeld");?></td></tr></table></div>
 
 	<?php echo $error; ?>
 </body>

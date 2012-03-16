@@ -81,14 +81,14 @@ class news extends basis_db
 				$qry.=" AND fachbereich_kurzbz='".addslashes(trim($fachbereich_kurzbz))."'";
 		}
 				
-		if(trim($studiengang_kz)=='0')
+		if(trim($studiengang_kz)=='0' || trim($studiengang_kz)=='10006')
 			$qry.=" AND studiengang_kz='".$studiengang_kz."' ".(trim($semester)!=''?(trim($semester)=='0'?' AND semester=0':''):' AND semester is null');
 		elseif(trim($studiengang_kz)=='')
 			$qry.='';
 		else
 			$qry.=" AND ((studiengang_kz='".trim($studiengang_kz)."' AND semester='".trim($semester)."') OR (studiengang_kz='".trim($studiengang_kz)."' AND semester=0) OR (studiengang_kz=0 AND semester='".trim($semester)."') OR (studiengang_kz=0 and semester is null))";
 			
-		$qry.=' ORDER BY datum DESC, updateamum DESC';
+		$qry.=' ORDER BY datum DESC';
 		if(trim($maxnews)!='0')
 			$qry.= " LIMIT ".trim($maxnews);
 
