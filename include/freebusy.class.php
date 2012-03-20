@@ -32,7 +32,7 @@ class freebusy extends basis_db
 	public $uid;
 	public $freebusytyp_kurzbz;
 	public $url;
-	public $aktiv;
+	public $aktiv=true;
 	public $bezeichnung;
 	public $insertamum;
 	public $insertvon;
@@ -68,7 +68,7 @@ class freebusy extends basis_db
 		}
 
 		//Daten aus der Datenbank lesen
-		$qry = "SELECT * FROM campus.tbl_freebusy WHERE freebusy_id='".addslashes($freebusy_id)."'";
+		$qry = "SELECT * FROM campus.tbl_freebusy WHERE freebusy_id=".$this->db_add_param($freebusy_id,FHC_INTEGER);
 
 		if(!$this->db_query($qry))
 		{
@@ -82,7 +82,7 @@ class freebusy extends basis_db
 			$this->uid = $row->uid;
 			$this->freebusytyp_kurzbz = $row->freebusytyp_kurzbz;
 			$this->url = $row->url;
-			$this->aktiv = ($row->aktiv=='t'?true:false);
+			$this->aktiv = $this->db_parse_bool($row->aktiv);
 			$this->bezeichnung = $row->bezeichnung;
 			$this->insertamum = $row->insertamum;
 			$this->insertvon = $row->insertvon;
@@ -105,7 +105,7 @@ class freebusy extends basis_db
 	 */
 	public function getFreeBusy($uid)
 	{
-		$qry = "SELECT * FROM campus.tbl_freebusy WHERE uid='".addslashes($uid)."' ORDER BY freebusy_id";
+		$qry = "SELECT * FROM campus.tbl_freebusy WHERE uid=".$this->db_add_param($uid)." ORDER BY freebusy_id";
 		
 		if($result = $this->db_query($qry))
 		{
@@ -117,7 +117,7 @@ class freebusy extends basis_db
 				$obj->uid = $row->uid;
 				$obj->freebusytyp_kurzbz = $row->freebusytyp_kurzbz;
 				$obj->url = $row->url;
-				$obj->aktiv = ($row->aktiv=='t'?true:false);
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
@@ -136,6 +136,37 @@ class freebusy extends basis_db
 	}
 	
 	/**
+	 * Laedt einen Freebusytyp
+	 * 
+	 * @param $freebusytyp_kurzbz
+	 * @return boolean
+	 */
+	public function loadTyp($freebusytyp_kurzbz)
+	{
+		$qry = "SELECT * FROM campus.tbl_freebusytyp WHERE freebusytyp_kurzbz=".$this->db_add_param($freebusytyp_kurzbz);
+		
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				$this->freebusytyp_kurzbz = $row->freebusytyp_kurzbz;
+				$this->bezeichnung = $row->bezeichnung;
+				$this->beschreibung = $row->beschreibung;
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Laden der Daten';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	/**
 	 * Laedt die FreeBusyTypen
 	 *
 	 */
@@ -149,13 +180,13 @@ class freebusy extends basis_db
 			{
 				$obj = new freebusy();
 				
-				$obj->freebusytyp_kurbz = $row->freebusytyp_kurzbz;
+				$obj->freebusytyp_kurzbz = $row->freebusytyp_kurzbz;
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->beschreibung = $row->beschreibung;
 				
 				$this->result[] = $obj;
 			}
-			return false;
+			return true;
 		}
 		else
 		{
@@ -163,5 +194,102 @@ class freebusy extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Entfernt einen Eintrag aus der Datenbank
+	 * 
+	 * @param $freebusy_id
+	 * @return boolean
+	 */
+	public function delete($freebusy_id)
+	{
+		$qry = "DELETE FROM campus.tbl_freebusy WHERE freebusy_id=".$this->db_add_param($freebusy_id, FHC_INTEGER, false);
+		
+		if($this->db_query($qry))
+			return true;
+		else
+		{
+			$this->errormsg = 'Fehler beim Löschen des Eintrages';
+			return false;
+		}
+	}
+	
+	/**
+	 * Speichert die Daten die in die Datenbank
+	 * 
+	 * @param $new boolean
+	 * @return boolean
+	 */
+	public function save($new=null)
+	{
+		if(is_null($new))
+			$new = $this->new;
+			
+		if($new)
+		{
+			$qry = 'BEGIN; INSERT INTO campus.tbl_freebusy(uid, freebusytyp_kurzbz, url, aktiv, bezeichnung, 
+					insertamum, insertvon, updateamum, updatevon) VALUES('.
+					$this->db_add_param($this->uid).','.
+					$this->db_add_param($this->freebusytyp_kurzbz).','.
+					$this->db_add_param($this->url).','.
+					$this->db_add_param($this->aktiv,FHC_BOOLEAN).','.
+					$this->db_add_param($this->bezeichnung).','.
+					$this->db_add_param($this->insertamum).','.
+					$this->db_add_param($this->insertvon).','.
+					$this->db_add_param($this->updateamum).','.
+					$this->db_add_param($this->updatevon).');';
+		}
+		else
+		{
+			$qry = 'UPDATE campus.tbl_freebusy SET '.
+					' uid='.$this->db_add_param($this->uid).','.
+					' freebusytyp_kurzbz='.$this->db_add_param($this->freebusytyp_kurzbz).','.
+					' url='.$this->db_add_param($this->url).','.
+					' aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
+					' bezeichnung='.$this->db_add_param($this->bezeichnung).','.
+					' updateamum='.$this->db_add_param($this->updateamum).','.
+					' updatevon='.$this->db_add_param($this->updatevon).' '.
+					' WHERE freebusy_id='.$this->db_add_param($this->freebusy_id, FHC_INTEGER, false);
+		}
+		
+		if($this->db_query($qry))
+		{
+			if($new)
+			{
+				$qry = "SELECT currval('campus.seq_freebusy_freebusy_id') as id";
+				if($result = $this->db_query($qry))
+				{
+					if($row = $this->db_fetch_object($result))
+					{
+						$this->freebusy_id = $row->id;
+						$this->db_query('COMMIT;');
+						return true;
+					}
+					else
+					{
+						$this->errormsg = 'Fehler beim Auslesen der Sequence';
+						$this->db_query('ROLLBACK');
+						return false;
+					}
+				}
+				else
+				{
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
+					$this->db_query('ROLLBACK');
+					return false;
+				}
+			}
+			else
+			{
+				return true;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern der Daten';
+			return false;
+		}
+	}
+	
 }
 ?>
