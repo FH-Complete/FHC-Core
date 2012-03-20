@@ -281,7 +281,8 @@ $nr_mg=$db->db_num_rows($erg_mg);
 			{
 				echo '
 					<A class="Item" href="zeitwunsch.php?uid='.$uid.'">'.$p->t('profil/zeitwuensche').'</A><BR>
-					<A class="Item" href="lva_liste.php?uid='.$uid.'">'.$p->t('lvaliste/lehrveranstaltungen').'</A>';
+					<A class="Item" href="lva_liste.php?uid='.$uid.'">'.$p->t('lvaliste/lehrveranstaltungen').'</A><br>
+					<A class="Item" href="freebusy.php">'.$p->t('freebusy/titel').'</A>';
 			}
 		}
 		

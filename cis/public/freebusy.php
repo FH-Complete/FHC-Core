@@ -53,24 +53,45 @@ $ical = new ical();
 
 foreach($freebusy->result as $row)
 {
-	
-	$fp = fopen($row->url,'r');
-	if (!$fp) 
+	if($row->aktiv)
 	{
-	    echo "$errstr ($errno)<br />\n";
+		$fp = fopen($row->url,'r');
+		if (!$fp) 
+		{
+		    echo "$errstr ($errno)<br />\n";
+		}
+		else 
+		{
+			$doc = '';
+		    while (!feof($fp)) 
+		    {
+		        $line = fgets($fp);
+		        $doc.=$line;
+		    }
+		    fclose($fp);
+		    
+		    $ical->importFreeBusy($doc, $row->freebusytyp_kurzbz);
+		}
 	}
-	else 
-	{
-		$doc = '';
-	    while (!feof($fp)) 
-	    {
-	        $line = fgets($fp);
-	        $doc.=$line;
-	    }
-	    fclose($fp);
-	    
-	    $ical->importFreeBusy($doc, $row->freebusytyp_kurzbz);
-	}
+}
+
+//Pers. LVplan
+$fp = fopen(APP_ROOT.'cis/public/freebusy_lvplan.php/'.$uid,'r');
+if (!$fp) 
+{
+    echo "$errstr ($errno)<br />\n";
+}
+else 
+{
+	$doc = '';
+    while (!feof($fp)) 
+    {
+        $line = fgets($fp);
+        $doc.=$line;
+    }
+    fclose($fp);
+    
+    $ical->importFreeBusy($doc, $row->freebusytyp_kurzbz);
 }
 echo $ical->getFreeBusy();
 echo "\nEND:VCALENDAR";
