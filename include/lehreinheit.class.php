@@ -252,7 +252,7 @@ class lehreinheit extends basis_db
 			return false;
 		}
 	}
-
+    
 	/**
 	 * Prueft die Variablen vor dem Speichern
 	 * auf Gueltigkeit.
