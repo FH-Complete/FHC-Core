@@ -61,7 +61,11 @@ class webservicerecht extends basis_db
         $berechtigungArray = array(); 
         
         foreach ($berechtigung->berechtigungen as $recht)
-            $berechtigungArray[] = $recht->berechtigung_kurzbz; 
+        {   
+            // ist berechtigung noch gültig
+            if($recht->start < date('Y-m-d') && $recht->ende > date('Y-m-d'))
+                $berechtigungArray[] = $recht->berechtigung_kurzbz; 
+        }
         
         $qry = "SELECT 1 from system.tbl_webservicerecht where methode = ".$this->db_add_param($methode)." 
             AND berechtigung_kurzbz IN (".$this->implode4SQL($berechtigungArray).');';
