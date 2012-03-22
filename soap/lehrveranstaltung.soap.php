@@ -80,17 +80,16 @@ function getLehrveranstaltungFromId($lehrveranstaltung_id, $semester, $authentif
         if(!$lehreinheit->load_lehreinheiten($lv_id, $semester))
             return new SoapFault("Server", $lehreinheit->errormsg);
 
-        $mitarbeiter = new lehreinheitmitarbeiter();
-        $gruppe = new lehreinheitgruppe(); 
-
         foreach($lehreinheit->lehreinheiten as $l)
         {
             // alle mitarbeiter einer lehreinheit
+            $mitarbeiter = new lehreinheitmitarbeiter();
             $mitarbeiter->getLehreinheitmitarbeiter($l->lehreinheit_id);
             foreach($mitarbeiter->lehreinheitmitarbeiter as $m)
                 $mitarbeiterlehreinheit[]=$m->mitarbeiter_uid; 
 
             // alle gruppen einer lehreinheit
+            $gruppe = new lehreinheitgruppe(); 
             $gruppe->getLehreinheitgruppe($l->lehreinheit_id);
             foreach($gruppe->lehreinheitgruppe as $g)
             {
@@ -172,17 +171,19 @@ function getLehrveranstaltungFromStudiengang($studiengang, $semester, $ausbildun
         if(!$lehreinheit->load_lehreinheiten($lv->lehrveranstaltung_id, $semester))
             return new SoapFault("Server", $lehreinheit->errormsg);
 
-        $mitarbeiter = new lehreinheitmitarbeiter();
-        $gruppe = new lehreinheitgruppe(); 
+       
+        
 
         foreach($lehreinheit->lehreinheiten as $l)
         {    
             // alle mitarbeiter der lehreinheit
+            $mitarbeiter = new lehreinheitmitarbeiter();
             $mitarbeiter->getLehreinheitmitarbeiter($l->lehreinheit_id);
             foreach($mitarbeiter->lehreinheitmitarbeiter as $m)
                 $mitarbeiterlehreinheit[]=$m->mitarbeiter_uid; 
 
             // alle gruppen der lehreinheit
+            $gruppe = new lehreinheitgruppe(); 
             $gruppe->getLehreinheitgruppe($l->lehreinheit_id);
             foreach($gruppe->lehreinheitgruppe as $g)
             {
