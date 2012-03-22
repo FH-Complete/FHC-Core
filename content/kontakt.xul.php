@@ -27,6 +27,9 @@ header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
 require_once('../config/vilesci.config.inc.php');
+require_once('../include/functions.inc.php');
+require_once('../include/benutzerberechtigung.class.php');
+
 echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
@@ -36,6 +39,8 @@ if(isset($_GET['person_id']) && is_numeric($_GET['person_id']))
 	$person_id = $_GET['person_id'];
 else 
 	die('Parameter person_id muss uebergeben werden');
+
+$uid = get_uid(); 
 ?>
 
 <window id="kontakt-window" title="Kontakt"
@@ -230,7 +235,11 @@ else
 			</vbox>
 		</hbox>
 	</groupbox>
-
+<?php 
+$recht = new benutzerberechtigung(); 
+$recht->getBerechtigungen($uid);
+if($recht->isberechtigt('mitarbeiter/bankdaten'))
+echo '
 	<groupbox id="kontakt-groupbox-bankverbindung">
 		<caption label="Bankverbindungen" />
 		<hbox>
@@ -313,6 +322,7 @@ else
 				<button id="kontakt-bankverbindung-loeschen" label="Loeschen" oncommand="KontaktBankverbindungDelete()" />
 			</vbox>
 		</hbox>
-	</groupbox>
+	</groupbox>';
+?>
 </vbox>
 </window>

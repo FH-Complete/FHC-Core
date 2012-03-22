@@ -281,10 +281,7 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='bankverbindungsave') // ***** BANKVERBINDUNG ***** //
 	{
-		if(($_POST['studiengang_kz']!='' && !$rechte->isBerechtigt('admin', $_POST['studiengang_kz'],'suid') && 
-		   !$rechte->isBerechtigt('assistenz', $_POST['studiengang_kz'], 'suid')) ||
-		   ($_POST['studiengang_kz']=='' && !$rechte->isBerechtigt('admin', null, 'suid') && 
-		   !$rechte->isBerechtigt('mitarbeiter', null, 'suid')))
+		if(!$rechte->isberechtigt('mitarbeiter/bankdaten'))
 		{
 			$return = false;
 			$errormsg = 'Keine Berechtigung';
@@ -335,10 +332,7 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='bankverbindungdelete')
 	{
-		if(($_POST['studiengang_kz']!='' && !$rechte->isBerechtigt('admin', $_POST['studiengang_kz'],'suid') && 
-		   !$rechte->isBerechtigt('assistenz', $_POST['studiengang_kz'], 'suid')) ||
-		   ($_POST['studiengang_kz']=='' && !$rechte->isBerechtigt('admin', null, 'suid') && 
-		   !$rechte->isBerechtigt('mitarbeiter', null, 'suid')))
+		if(!$rechte->isberechtigt('mitarbeiter/bankdaten'))
 		{
 			$return = false;
 			$errormsg = 'Keine Berechtigung';

@@ -207,29 +207,31 @@ function loadKontakte(person_id)
 	//Bankverbindungen laden
 	url = "<?php echo APP_ROOT; ?>rdf/bankverbindung.rdf.php?person_id="+person_id+"&"+gettimestamp();	
 	var treeBankverbindung=document.getElementById('kontakt-bankverbindung-tree');
-	
-	try
-	{
-		BankverbindungTreeDatasource.removeXMLSinkObserver(KontaktBankverbindungTreeSinkObserver);
-		treeBankverbindung.builder.removeListener(KontaktBankverbindungTreeListener);
-	}
-	catch(e)
-	{}
-	
-	//Alte DS entfernen
-	var oldDatasources = treeBankverbindung.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
-	{
-		treeBankverbindung.database.RemoveDataSource(oldDatasources.getNext());
-	}
-	
-	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-	BankverbindungTreeDatasource = rdfService.GetDataSource(url);
-	BankverbindungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-	BankverbindungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-	treeBankverbindung.database.AddDataSource(BankverbindungTreeDatasource);
-	BankverbindungTreeDatasource.addXMLSinkObserver(KontaktBankverbindungTreeSinkObserver);
-	treeBankverbindung.builder.addListener(KontaktBankverbindungTreeListener);
+	if(treeBankverbindung != null)
+    {
+        try
+        {
+            BankverbindungTreeDatasource.removeXMLSinkObserver(KontaktBankverbindungTreeSinkObserver);
+            treeBankverbindung.builder.removeListener(KontaktBankverbindungTreeListener);
+        }
+        catch(e)
+        {}
+
+        //Alte DS entfernen
+        var oldDatasources = treeBankverbindung.database.GetDataSources();
+        while(oldDatasources.hasMoreElements())
+        {
+            treeBankverbindung.database.RemoveDataSource(oldDatasources.getNext());
+        }
+
+        var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+        BankverbindungTreeDatasource = rdfService.GetDataSource(url);
+        BankverbindungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+        BankverbindungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+        treeBankverbindung.database.AddDataSource(BankverbindungTreeDatasource);
+        BankverbindungTreeDatasource.addXMLSinkObserver(KontaktBankverbindungTreeSinkObserver);
+        treeBankverbindung.builder.addListener(KontaktBankverbindungTreeListener);
+    }
 }
 
 // ********** ADRESSEN ********** //
