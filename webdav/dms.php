@@ -50,9 +50,9 @@ $server->setBaseUri($path);
 
 // The lock manager is reponsible for making sure users don't overwrite each others changes. Change 'data' to a different 
 // directory, if you're storing your data somewhere else.
-//$lockBackend = new Sabre_DAV_Locks_Backend_File('data/locks');
-//$lockPlugin = new Sabre_DAV_Locks_Plugin($lockBackend);
-//$server->addPlugin($lockPlugin);
+$lockBackend = new Sabre_DAV_Locks_Backend_File('data/locks');
+$lockPlugin = new Sabre_DAV_Locks_Plugin($lockBackend);
+$server->addPlugin($lockPlugin);
 
 //GUI fuer Browser
 $browser = new Sabre_DAV_Browser_Plugin();

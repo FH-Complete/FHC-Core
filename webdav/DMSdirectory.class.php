@@ -204,7 +204,7 @@ class DMSDirectory extends Sabre_DAV_Collection
 			$ext = '.'.mb_substr($name, $pos);
 		else
 			$ext ='';
-		$filename=uniqid(); 
+		$filename=uniqid().$ext; 
    		$dms->version='0';
    		$dms->kategorie_kurzbz=$this->kategorie_kurzbz;		
 	    $dms->insertamum=date('Y-m-d H:i:s');

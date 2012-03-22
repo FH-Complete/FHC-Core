@@ -191,15 +191,38 @@ class DMSFile extends Sabre_DAV_File
 		$dms = new dms();
 		if($dms->load($this->dms_id))
 		{
-			$dms->updateamum = date('Y-m-d H:i:s');
-			$dms->updatevon = $this->getUser();
-			
-			file_put_contents(DMS_PATH.$dms->filename, $data);
-			$dms->save(false);
-		}
-		else
-		{
-			throw new Sabre_DAV_Exception_FileNotFound('Failed '.$dms->errormsg);
+			$dms->version = $dms->version++;
+
+			$pos = mb_strrpos($dms->name,'.')+1;
+			if($pos>1)
+				$ext = '.'.mb_substr($dms->name, $pos);
+			else
+				$ext ='';
+			$filename=uniqid().$ext; 
+	   		$dms->version++;
+		    $dms->insertamum=date('Y-m-d H:i:s');
+	    	$dms->insertvon = $this->getUser();
+	    	$dms->filename = $filename;
+    	    	
+			if($dms->save(true))
+			{
+				if(file_put_contents(DMS_PATH.$filename, $data))
+				{
+					if(!chgrp(DMS_PATH.$filename,'dms'))
+						echo 'CHGRP failed';
+					if(!chmod(DMS_PATH.$filename, 0774))
+						echo 'CHMOD failed';
+					exec('sudo chown wwwrun '.$filename);	
+
+					$dms->save(false);
+				}
+				else
+					throw new Sabre_DAV_Exception_FileNotFound('Failed to Write File');
+			}
+			else
+			{
+				throw new Sabre_DAV_Exception_FileNotFound('Failed '.$dms->errormsg);
+			}
 		}
 	}
 }
