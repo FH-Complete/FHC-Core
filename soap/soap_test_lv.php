@@ -89,6 +89,7 @@ if(!check_lektor($getuid))
             try
             {
                 netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+                alert("OK");
                 var msg = respObj.Body[0].saveProjektphaseResponse[0].message[0].Text;
                 window.opener.ProjektphaseTreeRefresh();
                 window.close();
