@@ -37,7 +37,7 @@ if (!$uid=get_uid())
 	
 
 	
-$sql_query="SET search_path TO campus; SELECT titelpre, titelpost, uid, nachname, vorname FROM vw_benutzer WHERE uid LIKE '$uid'";
+$sql_query="SELECT titelpre, titelpost, uid, nachname, vorname FROM campus.vw_benutzer WHERE uid LIKE '$uid'";
 	//echo $sql_query;
 $result=$db->db_query($sql_query);
 
@@ -71,7 +71,7 @@ if(!$result_ort)
   	die("ort not found!");
   	
 $num_rows_ort=$db->db_num_rows($result_ort);
-$sql_query="SELECT uid, kurzbz FROM vw_mitarbeiter ORDER BY kurzbz";
+$sql_query="SELECT uid, kurzbz FROM campus.vw_mitarbeiter ORDER BY kurzbz";
 $result_lektor=$db->db_query($sql_query);
 if(!$result_lektor)
 	die("lektor not found!");

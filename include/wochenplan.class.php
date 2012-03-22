@@ -1907,6 +1907,7 @@ class wochenplan extends basis_db
 	 */
 	public function draw_week_csv($target, $lvplan_kategorie)
 	{
+		$return = array();
 		if (!date("w",$this->datum))
 			$this->datum=jump_day($this->datum,1);
 		$num_rows_stunde=$this->db_num_rows($this->stunde);
@@ -2161,17 +2162,39 @@ class wochenplan extends basis_db
 							$start_date_time_ical = $sda[2].$sda[1].$sda[0].'T'.sprintf('%02s',($sta[0])).$sta[1].$sta[2];  //neu gruppieren der Startzeit und des Startdatums
 							$end_date_time_ical = $eda[2].$eda[1].$eda[0].'T'.sprintf('%02s',($eta[0])).$eta[1].$eta[2];  //neu gruppieren der Startzeit und des Startdatums
 							echo $this->crlf,'FREEBUSY: ',$start_date_time_ical,'/',$end_date_time_ical;
-							/*
-							echo $this->crlf.'BEGIN:VEVENT'.$this->crlf
-								.'UID:'.'FH'.$lvb.$this->std_plan[$i][$j][$idx]->ort.$this->std_plan[$i][$j][$idx]->lektor.$lehrfach[$idx].$start_date_time_ical.$this->crlf
-								.'SUMMARY:'.$lehrfach[$idx].'  '.$this->std_plan[$i][$j][$idx]->ort.' - '.$lvb.$this->crlf
-								.'DESCRIPTION:'.$lehrfach[$idx].'\n'.$this->std_plan[$i][$j][$idx]->lektor.'\n'.$lvb.'\n'.$this->std_plan[$i][$j][$idx]->ort.$this->crlf
+						}
+						elseif ($target=='return')
+						{
+							$sda = explode(".",$start_date);  //sda start date array
+							$sta = explode(":",$start_time);	 //sta start time array
+							$eda = explode(".",$end_date);    //eda end date array
+							$eta = explode(":",$end_time);	 //eta end time array
+														
+							//Die Zeitzone muss angegeben werden, da sonst der Google Kalender die Endzeiten nicht richtig erkennt 
+							// diese wird in stpl_kalender global definiert und bei den Start und Ende Zeiten mitangegeben
+							$start_date_time_ical = $sda[2].$sda[1].$sda[0].'T'.sprintf('%02s',($sta[0])).$sta[1].$sta[2];  //neu gruppieren der Startzeit und des Startdatums
+							$end_date_time_ical = $eda[2].$eda[1].$eda[0].'T'.sprintf('%02s',($eta[0])).$eta[1].$eta[2];  //neu gruppieren der Startzeit und des Startdatums
+
+							$UID = 'FH'.$lvb.$this->std_plan[$i][$j][$idx]->ort.$this->std_plan[$i][$j][$idx]->lektor.$lehrfach[$idx].$start_date_time_ical;
+							$Summary = $lehrfach[$idx].'  '.$this->std_plan[$i][$j][$idx]->ort.' - '.$lvb;
+							$description = $lehrfach[$idx].'\n'.$this->std_plan[$i][$j][$idx]->lektor.'\n'.$lvb.'\n'.$this->std_plan[$i][$j][$idx]->ort;
+
+							$return[]=array('UID'=>$UID,
+							'unr'=>$unr,
+							'Summary'=>$Summary,
+							'Description'=>$description,
+							'dtstart'=>$start_date_time_ical,
+							'dtend'=>$end_date_time_ical,
+							'updateamum'=>$this->std_plan[$i][$j][$idx]->updateamum,
+							'data'=>'BEGIN:VEVENT'.$this->crlf
+								.'UID:'.$UID.$this->crlf
+								.'SUMMARY:'.$Summary.$this->crlf
+								.'DESCRIPTION:'.$description.$this->crlf
 								.'LOCATION:'.$this->std_plan[$i][$j][$idx]->ort.$this->crlf
 								.'CATEGORIES:'.$lvplan_kategorie.$this->crlf
 								.'DTSTART;TZID=Europe/Vienna:'.$start_date_time_ical.$this->crlf
 								.'DTEND;TZID=Europe/Vienna:'.$end_date_time_ical.$this->crlf
-								.'END:VEVENT';
-							*/
+								.'END:VEVENT');
 						}
 						else
 						{
@@ -2184,7 +2207,10 @@ class wochenplan extends basis_db
 			}
 			$this->datum=jump_day($this->datum, 1);
 		}
-		return true;
+		if($target=='return')
+			return $return;
+		else
+			return true;
 	}
 
 	/**
