@@ -32,6 +32,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/bankverbindung.class.php');
 require_once('../include/datum.class.php');
+require_once('../include/benutzerberechtigung.class.php');
+
+$uid = get_uid(); 
+$recht = new benutzerberechtigung(); 
+$recht->getBerechtigungen($uid);
+if(!$recht->isberechtigt('mitarbeiter/bankdaten'))
+    die('Sie haben keine Berechtigung');
 
 if(isset($_GET['person_id']))
 	$person_id = $_GET['person_id'];
