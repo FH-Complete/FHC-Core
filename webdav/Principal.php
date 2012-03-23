@@ -70,7 +70,7 @@ class MySabre_DAVACL_PrincipalBackend implements Sabre_DAVACL_IPrincipalBackend
     public function getPrincipalsByPrefix($prefixPath) 
 	{
 		//$prefixPath = principals
-		error_log('Principal.php/getPrincipalsByPrefix('.$prefixPath.')');
+		//error_log('Principal.php/getPrincipalsByPrefix('.$prefixPath.')');
         $principals = array();
 		$user = $this->getUser();
 		if($prefixPath=='principals')
@@ -113,7 +113,7 @@ class MySabre_DAVACL_PrincipalBackend implements Sabre_DAVACL_IPrincipalBackend
     public function getPrincipalByPath($path) 
 	{
 		//$path = principals/oesi
-		error_log('Principal.php/getPrincipalByPath('.$path.')');
+		//error_log('Principal.php/getPrincipalByPath('.$path.')');
 		$user = $this->getUser();
         $result = array(
             'id'  => $user,

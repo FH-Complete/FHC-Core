@@ -164,8 +164,8 @@ class MySabre_CalDAV_Backend extends Sabre_CalDAV_Backend_Abstract
 			$sekunde = mb_substr($dtstart,13,2);
 			$begin = mktime($stunde, $minute, $sekunde, $monat, $tag-1, $jahr);
 			$ende = mktime($stunde, $minute, $sekunde, $monat, $tag+1, $jahr);
-			error_log("getCalendarData unr: $unr dtstart: $dtstart");
-			error_log($begin.'/'.$ende);	
+			//error_log("getCalendarData unr: $unr dtstart: $dtstart");
+			//error_log($begin.'/'.$ende);	
 		}
 		else
 		{
@@ -179,7 +179,7 @@ class MySabre_CalDAV_Backend extends Sabre_CalDAV_Backend_Abstract
 		// Kalender erstellen
 		while($begin<$ende)
 		{
-			error_log("while");
+			//error_log("while");
 			$i++;
 			if(!date("w",$begin))
 				$begin=jump_day($begin,1);
@@ -198,8 +198,8 @@ class MySabre_CalDAV_Backend extends Sabre_CalDAV_Backend_Abstract
 			{
 				foreach($val as $row)
 				{
-					error_log("search dtstart:".$dtstart." unr:".$unr);
-					error_log("row dtstart:".$row['dtstart']." unr:".$row['unr'][0]);
+			//		error_log("search dtstart:".$dtstart." unr:".$unr);
+			//		error_log("row dtstart:".$row['dtstart']." unr:".$row['unr'][0]);
 					if($row['dtstart']==$dtstart && $row['unr'][0]==$unr)
 					{
 						error_log("found!");
@@ -265,7 +265,7 @@ END:VTIMEZONE\n".$event."\nEND:VCALENDAR";
 		$user = $calendarId;
 		$data = $this->getCalendarData($user);
 
-		error_log("Caldav_Backend.php/getCalendarObjects($calendarId) data:".print_r($data,true));
+		//error_log("Caldav_Backend.php/getCalendarObjects($calendarId) data:".print_r($data,true));
 		$return  = array();
 		foreach($data as $row)
 		{
@@ -294,7 +294,7 @@ END:VTIMEZONE\n".$event."\nEND:VCALENDAR";
      */
     public function getCalendarObject($calendarId,$objectUri) 
 	{
-		error_log("Caldav_Backend.php/getCalendarObject($calendarId, $objectUri)");
+		//error_log("Caldav_Backend.php/getCalendarObject($calendarId, $objectUri)");
 		$user = $this->getUser();
 		$data = $this->getCalendarData($user,$objectUri);
 		if(count($data)==0)
