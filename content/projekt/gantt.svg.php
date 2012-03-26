@@ -176,7 +176,7 @@ function getOeGantt()
 			}
 		
 			// zeichne balken
-			echo '<rect x="'.$x.'" y="'.($startY+10+$i*50).'" width ="'.$width.'" height ="30" fill="blue" stroke="black" />';
+			echo '<rect x="'.$x.'" y="'.($startY+10+$i*50).'" width ="'.$width.'" height ="30" fill="'.$projekt->farbe.'" stroke="black" />';
 			echo'<text x="'.($startX-10).'" y="'.($startY+30+$i*50).'" style="font-size:15px" text-anchor="end">'.$projekt->titel.'</text>';
 			$i++;
 		}
@@ -335,7 +335,7 @@ function getOeGantt()
 		
 			// zeichne balken
 			echo "test:".$test.$projekt->titel."jahr".$studienjahr;
-			echo '<rect x="'.$x.'" y="'.($startY+10+$i*50).'" width ="'.$width.'" height ="30" fill="blue" stroke="black" />';
+			echo '<rect x="'.$x.'" y="'.($startY+10+$i*50).'" width ="'.$width.'" height ="30" fill="'.$projekt->farbe.'" stroke="black" />';
 			echo'<text x="'.($startX-10).'" y="'.($startY+30+$i*50).'" style="font-size:15px" text-anchor="end">'.$projekt->titel.'</text>';
 			$i++;
 		}
@@ -362,7 +362,7 @@ function getOeGantt()
 
 /**
  * 
- * Zeichnet den Chart für alle Phasen eines übergebenen PRojektes
+ * Zeichnet den Chart für alle Phasen eines übergebenen Projektes
  */
 function getProjektGantt()
 {
@@ -471,7 +471,7 @@ function getProjektGantt()
 			}
 		
 			// zeichne balken
-			echo '<rect x="'.$x.'" y="'.($startY+10+$i*50).'" width ="'.$width.'" height ="30" fill="blue" stroke="black" />';
+			echo '<rect x="'.$x.'" y="'.($startY+10+$i*50).'" width ="'.$width.'" height ="30" fill="'.$phase->farbe.'" stroke="black" />';
 			echo'<text x="'.($startX-10).'" y="'.($startY+30+$i*50).'" style="font-size:15px" text-anchor="end">'.$phase->bezeichnung.'</text>';
 			$i++;
 		}
@@ -630,7 +630,7 @@ function getProjektGantt()
 		
 			// zeichne balken
 			echo "test:".$test.$phase->bezeichnung."jahr".$studienjahr;
-			echo '<rect x="'.$x.'" y="'.($startY+10+$i*50).'" width ="'.$width.'" height ="30" fill="blue" stroke="black" />';
+			echo '<rect x="'.$x.'" y="'.($startY+10+$i*50).'" width ="'.$width.'" height ="30" fill="'.$phase->farbe.'" stroke="black" />';
 			echo'<text x="'.($startX-10).'" y="'.($startY+30+$i*50).'" style="font-size:15px" text-anchor="end">'.$phase->bezeichnung.'</text>';
 			$i++;
 		}
