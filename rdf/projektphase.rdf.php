@@ -60,6 +60,7 @@ if($projektphase_id != '')
 	$oRdf->obj[$i]->setAttribut('budget',$phase->budget);
 	$oRdf->obj[$i]->setAttribut('fortschritt',$ergebnis);
 	$oRdf->obj[$i]->setAttribut('personentage',$phase->personentage);
+    $oRdf->obj[$i]->setAttribut('farbe',$phase->farbe);
 	
 	if($phase->projektphase_fk!='')
 		$oRdf->addSequence($phase->projektphase_id, $phase->projektphase_fk);
@@ -89,6 +90,7 @@ if($projektphase_id != '')
 		$oRdf->obj[$idx]->setAttribut('ende', '');
 		$oRdf->obj[$idx]->setAttribut('budget', '');		
 		$oRdf->obj[$idx]->setAttribut('personentage', '');	
+        $oRdf->obj[$idx]->setAttribut('farbe', '');
 		
 		$oRdf->addSequence('opt');
 	}
@@ -105,7 +107,8 @@ if($projektphase_id != '')
 		$oRdf->obj[$idx]->setAttribut('start', $phase->start);
 		$oRdf->obj[$idx]->setAttribut('ende', $phase->ende);
 		$oRdf->obj[$idx]->setAttribut('budget', $phase->budget);		
-		$oRdf->obj[$idx]->setAttribut('personentage', $phase->personentage);		
+		$oRdf->obj[$idx]->setAttribut('personentage', $phase->personentage);
+        $oRdf->obj[$idx]->setAttribut('farbe', $phase->farbe);
 	
 		$oRdf->addSequence($phase->projektphase_id);
 	}
@@ -202,6 +205,7 @@ else
 			$oRdf->obj[$idx]->setAttribut('fortschritt',$ergebnis);
 			$oRdf->obj[$idx]->setAttribut('budget',$projektphase->budget);
 			$oRdf->obj[$idx]->setAttribut('personentage',$projektphase->personentage);
+            $oRdf->obj[$idx]->setAttribut('farbe',$projektphase->farbe);
 			$oRdf->obj[$idx]->setAttribut('typ','phase');
 			
 			if (!is_null($projektphase->projektphase_fk))
@@ -209,7 +213,7 @@ else
 			else
 				$oRdf->addSequence($projekt->oe_kurzbz.'/'.$projekt->projekt_kurzbz.'/'.$projektphase->projektphase_id, $projekt->oe_kurzbz.'/'.$projekt->projekt_kurzbz);
 		}
-	}	
+	}
 }
 
 $oRdf->sendRdfText();
