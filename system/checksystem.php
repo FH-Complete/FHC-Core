@@ -3319,7 +3319,7 @@ if(!$result = @$db->db_query('SELECT 1 FROM system.tbl_webservicerecht LIMIT 1;'
 if(!@$db->db_query("SELECT farbe FROM fue.tbl_projekt LIMIT 1"))
 {
 	$qry = "
-	ALTER TABLE fue.tbl_projekt ADD COLUMN farbe varchar(7);
+	ALTER TABLE fue.tbl_projekt ADD COLUMN farbe varchar(7) DEFAULT '#FF0000' NOT NULL;
 	";
 	
 	if(!$db->db_query($qry))
@@ -3332,7 +3332,7 @@ if(!@$db->db_query("SELECT farbe FROM fue.tbl_projekt LIMIT 1"))
 if(!@$db->db_query("SELECT farbe FROM fue.tbl_projektphase LIMIT 1"))
 {
 	$qry = "
-	ALTER TABLE fue.tbl_projektphase ADD COLUMN farbe varchar(7);
+	ALTER TABLE fue.tbl_projektphase ADD COLUMN farbe varchar(7) DEFAULT '#0000FF' NOT NULL;
 	";
 	
 	if(!$db->db_query($qry))
