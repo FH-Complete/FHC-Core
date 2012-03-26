@@ -3314,6 +3314,34 @@ if(!$result = @$db->db_query('SELECT 1 FROM system.tbl_webservicerecht LIMIT 1;'
 	else 
 		echo 'Tabelle system.tbl_webservicerecht hinzugefuegt!<br>';
 }
+
+// Spalte Farbe zu Projekt hinzufügen
+if(!@$db->db_query("SELECT farbe FROM fue.tbl_projekt LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE fue.tbl_projekt ADD COLUMN farbe varchar(7);
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_vorlage: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Tabelle fue.tbl_projekt Spalte farbe hinzugefuegt!<br>';
+}
+
+// Spalte Farbe zu Projektphase hinzufügen
+if(!@$db->db_query("SELECT farbe FROM fue.tbl_projektphase LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE fue.tbl_projektphase ADD COLUMN farbe varchar(7);
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_vorlage: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Tabelle fue.tbl_projektphase Spalte farbe hinzugefuegt!<br>';
+}
+
+
 echo '<br>';
 
 $tabellen=array(
@@ -3377,8 +3405,8 @@ $tabellen=array(
 	"campus.tbl_zeitsperretyp"  => array("zeitsperretyp_kurzbz","beschreibung","farbe"),
 	"campus.tbl_zeitwunsch"  => array("stunde","mitarbeiter_uid","tag","gewicht","updateamum","updatevon","insertamum","insertvon"),
 	"fue.tbl_aktivitaet"  => array("aktivitaet_kurzbz","beschreibung"),
-	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz","budget"),
-	"fue.tbl_projektphase"  => array("projektphase_id","projekt_kurzbz","projektphase_fk","bezeichnung","beschreibung","start","ende","budget","insertamum","insertvon","updateamum","updatevon","personentage"),
+	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz","budget","farbe"),
+	"fue.tbl_projektphase"  => array("projektphase_id","projekt_kurzbz","projektphase_fk","bezeichnung","beschreibung","start","ende","budget","insertamum","insertvon","updateamum","updatevon","personentage","farbe"),
 	"fue.tbl_projekttask"  => array("projekttask_id","projektphase_id","bezeichnung","beschreibung","aufwand","mantis_id","insertamum","insertvon","updateamum","updatevon","projekttask_fk","erledigt","ende","ressource_id"),
 	"fue.tbl_projekt_dokument"  => array("projekt_dokument_id","projektphase_id","projekt_kurzbz","dms_id"),
 	"fue.tbl_projekt_ressource"  => array("projekt_ressource_id","projekt_kurzbz","projektphase_id","ressource_id","funktion_kurzbz","beschreibung"),
