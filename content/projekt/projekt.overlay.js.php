@@ -146,6 +146,7 @@ function onselectProjekt()
     var beginn=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#beginn" ));
     var ende=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ende" ));
     var budget=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#budget" ));
+    var farbe=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#farbe" ));
     var personentage=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#personentage" ));
     
     //Daten den Feldern zuweisen
@@ -159,6 +160,7 @@ function onselectProjekt()
     document.getElementById('textbox-projekt-detail-beginn').value=beginn;
     document.getElementById('textbox-projekt-detail-ende').value=ende;
     document.getElementById('textbox-projekt-detail-budget').value=budget;
+    document.getElementById('textbox-projekt-detail-farbe').value=farbe;
     document.getElementById('checkbox-projekt-detail-neu').checked=false;
     
     
@@ -187,6 +189,7 @@ function saveProjektDetail()
 	beginn = document.getElementById('textbox-projekt-detail-beginn').iso;
 	ende = document.getElementById('textbox-projekt-detail-ende').iso;
 	budget = document.getElementById('textbox-projekt-detail-budget').value;
+    farbe = document.getElementById('textbox-projekt-detail-farbe').value;
 	neu = document.getElementById('checkbox-projekt-detail-neu').checked;
 	
 	var soapBody = new SOAPObject("saveProjekt");
@@ -202,6 +205,7 @@ function saveProjektDetail()
     projekt.appendChild(new SOAPObject("beginn")).val(beginn);
     projekt.appendChild(new SOAPObject("ende")).val(ende);
     projekt.appendChild(new SOAPObject("budget")).val(budget);
+    projekt.appendChild(new SOAPObject("farbe")).val(farbe);
 	if(neu)
 		projekt.appendChild(new SOAPObject("neu")).val('true');
 	else	
@@ -337,6 +341,7 @@ function ProjektDisableFields(val)
 	document.getElementById('textbox-projekt-detail-beginn').disabled=val;
 	document.getElementById('textbox-projekt-detail-ende').disabled=val;
 	document.getElementById('textbox-projekt-detail-budget').disabled=val;
+    document.getElementById('textbox-projekt-detail-farbe').disabled=val;
 	document.getElementById('button-projekt-detail-speichern').disabled=val;
 }
 

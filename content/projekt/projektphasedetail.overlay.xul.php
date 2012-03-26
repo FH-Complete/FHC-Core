@@ -108,6 +108,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	   						<spacer />
 	   					</hbox>
 					</row>
+                    <row>
+						<label value="Farbe" control="textbox-projektphase-detail-farbe"/>
+						<hbox>
+	   						<textbox id="textbox-projektphase-detail-farbe" size="7" maxlenght="7" disabled="true"/>
+	   						<spacer />
+	   					</hbox>
+					</row>
 					<row>
 						<label value="Personentage" control="textbox-projektphase-detail-personentage"/>
 						<hbox>
