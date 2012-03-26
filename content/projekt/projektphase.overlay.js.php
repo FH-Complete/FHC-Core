@@ -158,6 +158,7 @@ function onselectTreeProjektphase()
     var ende=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ende" ));
     var budget=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#budget" ));
     var personentage=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#personentage" ));
+    var farbe=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#farbe" ));
     
     //Daten den Feldern zuweisen
 	var menulist = document.getElementById('menulist-projektphase-detail-projektphase_fk');
@@ -170,6 +171,7 @@ function onselectTreeProjektphase()
     document.getElementById('textbox-projektphase-detail-ende').value=ende;
     document.getElementById('textbox-projektphase-detail-budget').value=budget;
     document.getElementById('textbox-projektphase-detail-personentage').value=personentage;
+    document.getElementById('textbox-projektphase-detail-farbe').value=farbe;
     document.getElementById('checkbox-projektphase-detail-neu').checked=false;
     MenulistSelectItemOnValue('menulist-projektphase-detail-projektphase_fk', projektphase_fk);
     
@@ -219,6 +221,7 @@ function saveProjektphaseDetail()
 	ende = document.getElementById('textbox-projektphase-detail-ende').iso;
 	budget = document.getElementById('textbox-projektphase-detail-budget').value;
 	personentage = document.getElementById('textbox-projektphase-detail-personentage').value;
+    farbe = document.getElementById('textbox-projektphase-detail-farbe').value;
 	neu = document.getElementById('checkbox-projektphase-detail-neu').checked;
 
 	var soapBody = new SOAPObject("saveProjektphase");
@@ -235,6 +238,7 @@ function saveProjektphaseDetail()
 	phase.appendChild(new SOAPObject("ende")).val(ende);
 	phase.appendChild(new SOAPObject("budget")).val(budget);
 	phase.appendChild(new SOAPObject("personentage")).val(personentage);
+    phase.appendChild(new SOAPObject("farbe")).val(farbe);
 	if(neu)
 		phase.appendChild(new SOAPObject("neu")).val('true');
 	else
@@ -328,6 +332,7 @@ function ProjektphaseDetailDisable(val)
 	document.getElementById('textbox-projektphase-detail-ende').disabled=val;
 	document.getElementById('textbox-projektphase-detail-budget').disabled=val;
 	document.getElementById('textbox-projektphase-detail-personentage').disabled=val;
+    document.getElementById('textbox-projektphase-detail-farbe').disabled=val;
 	document.getElementById('button-projektphase-detail-speichern').disabled=val;
 }
 

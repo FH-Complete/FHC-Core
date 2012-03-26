@@ -115,6 +115,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	   						<spacer />
 	   					</hbox>
 					</row>
+                    <row>
+						<label value="Farbe" control="textbox-projekt-detail-farbe"/>
+						<hbox>
+	   						<textbox id="textbox-projekt-detail-farbe" size="7" maxlength="7"  disabled="true"/>
+	   						<spacer />
+	   					</hbox>
+					</row>
 				</rows>
 			</grid>
 			<hbox>

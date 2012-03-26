@@ -30,6 +30,7 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
 			<wsdl:part name="ende" type="xsd:string"></wsdl:part>
 			<wsdl:part name="budget" type="xsd:string"></wsdl:part>
 			<wsdl:part name="personentage" type="xsd:string"></wsdl:part>
+            <wsdl:part name="farbe" type="xsd:string"></wsdl:part>
 			<wsdl:part name="user" type="xsd:string"></wsdl:part>
 			<wsdl:part name="neu" type="xsd:boolean"></wsdl:part>
 		</xsd:all>

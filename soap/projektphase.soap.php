@@ -76,6 +76,7 @@ function saveProjektphase($username, $passwort, $phase)
 	$projektphase->ende = $phase->ende;
 	$projektphase->budget = $phase->budget;
 	$projektphase->personentage = $phase->personentage;
+    $projektphase->farbe = $phase->farbe;
 	$projektphase->updatevon = $user;
 	$projektphase->updateamum = date('Y-m-d H:i:s');
 	
