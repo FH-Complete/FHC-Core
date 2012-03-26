@@ -57,6 +57,7 @@ for ($i=0;$i<count($projekt_obj->result);$i++)
 		<PROJEKT:ende_iso>'.$projekt->ende.'</PROJEKT:ende_iso>
 		<PROJEKT:ende>'.$datum_obj->formatDatum($projekt->ende,'d.m.Y').'</PROJEKT:ende>
 		<PROJEKT:budget>'.$projekt->budget.'</PROJEKT:budget>
+        <PROJEKT:farbe>'.$projekt->farbe.'</PROJEKT:farbe>
 	</RDF:Description>'."\n";
 
 	$sequenz.='<RDF:li RDF:resource="'.$rdf_url.$projekt->projekt_kurzbz.'" />'."\n";
