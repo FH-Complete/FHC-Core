@@ -39,6 +39,7 @@ class projektphase extends basis_db
 	public $start;		    //date 	
 	public $ende;		    //date 	
 	public $personentage;	    //integer
+    public $farbe; 
 	public $budget;	    	// numeric
 	public $insertamum;	    // timestamp
 	public $insertvon;	    // bigint
@@ -85,6 +86,7 @@ class projektphase extends basis_db
 				$this->start = $row->start;
 				$this->ende = $row->ende;
 				$this->personentage = $row->personentage;
+                $this->farbe = $row->farbe;
 				$this->budget = $row->budget;
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
@@ -140,6 +142,7 @@ class projektphase extends basis_db
 				$obj->start = $row->start;
 				$obj->ende = $row->ende;
 				//$obj->personentage = $row->personentage;
+                $obj->farbe = $row->farbe;
 				$obj->budget = $row->budget;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
@@ -189,6 +192,7 @@ class projektphase extends basis_db
 				$obj->start = $row->start;
 				$obj->ende = $row->ende;
 				//$obj->personentage = $row->personentage;
+                $obj->farbe = $row->farbe;
 				$obj->budget = $row->budget;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
@@ -251,7 +255,7 @@ class projektphase extends basis_db
 			//Neuen Datensatz einfuegen
 
 			$qry='BEGIN; INSERT INTO fue.tbl_projektphase (projekt_kurzbz, projektphase_fk, bezeichnung, 
-				beschreibung, start, ende, budget, insertvon, insertamum, updatevon, updateamum, personentage) VALUES ('.
+				beschreibung, start, ende, budget, insertvon, insertamum, updatevon, updateamum, farbe, personentage) VALUES ('.
 			     $this->addslashes($this->projekt_kurzbz).', '.
 			     $this->addslashes($this->projektphase_fk).', '.
 				 $this->addslashes($this->bezeichnung).', '.
@@ -261,6 +265,7 @@ class projektphase extends basis_db
 			     $this->addslashes($this->budget).', '.
 			     $this->addslashes($this->insertvon).', now(), '.
 			     $this->addslashes($this->updatevon).', now(), '.
+                 $this->addslashes($this->farbe).', '.
 			     $this->addslashes($this->personentage).' );';
 		}
 		else
@@ -275,6 +280,7 @@ class projektphase extends basis_db
 				'start='.$this->addslashes($this->start).', '.
 				'ende='.$this->addslashes($this->ende).', '.
 				'budget='.$this->addslashes($this->budget).', '.
+                'farbe='.$this->addslashes($this->farbe).', '.
 				'personentage='.$this->addslashes($this->personentage).', '.
 				'updateamum= now(), '.
 				'updatevon='.$this->addslashes($this->updatevon).' '.

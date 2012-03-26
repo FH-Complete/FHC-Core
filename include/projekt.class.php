@@ -43,6 +43,7 @@ class projekt extends basis_db
 	public $updateamum;		// timestamp
 	public $updatevon;		// string
 	public $budget; 
+    public $farbe; 
 
 
 	/**
@@ -77,7 +78,8 @@ class projekt extends basis_db
 				$this->beginn= $row->beginn;
 				$this->ende = $row->ende;
 				$this->oe_kurzbz= $row->oe_kurzbz;	
-				$this->budget= $row->budget;	
+				$this->budget= $row->budget;
+                $this->farbe= $row->farbe;
 
 				return true;
 			}
@@ -120,6 +122,7 @@ class projekt extends basis_db
 				$obj->ende = $row->ende;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->budget = $row->budget;
+                $obj->farbe = $row->farbe;
 
 				$this->result[] = $obj;
 			}
@@ -187,7 +190,7 @@ class projekt extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 
-			$qry='INSERT INTO fue.tbl_projekt (projekt_kurzbz, nummer, titel,beschreibung, beginn, ende, budget, oe_kurzbz) VALUES('.
+			$qry='INSERT INTO fue.tbl_projekt (projekt_kurzbz, nummer, titel,beschreibung, beginn, ende, budget, farbe, oe_kurzbz) VALUES('.
 		     $this->addslashes($this->projekt_kurzbz).', '.
 		     $this->addslashes($this->nummer).', '.
 		     $this->addslashes($this->titel).', '.
@@ -195,6 +198,7 @@ class projekt extends basis_db
 		     $this->addslashes($this->beginn).', '.
 		     $this->addslashes($this->ende).', '.
 		     $this->addslashes($this->budget).', '.
+             $this->addslashes($this->farbe).', '.
 		     $this->addslashes($this->oe_kurzbz).');';
 		}
 		else
@@ -209,6 +213,7 @@ class projekt extends basis_db
 				'beginn='.$this->addslashes($this->beginn).', '.
 				'ende='.$this->addslashes($this->ende).', '.
 				'budget='.$this->addslashes($this->budget).', '.
+                'farbe='.$this->addslashes($this->farbe).', '.
 				'oe_kurzbz='.$this->addslashes($this->oe_kurzbz).' '.
 				'WHERE projekt_kurzbz='.$this->addslashes($this->projekt_kurzbz).';';
 		}
@@ -303,6 +308,7 @@ class projekt extends basis_db
 				$this->ende = $row->ende;
 				$this->oe_kurzbz= $row->oe_kurzbz;	
 				$this->budget= $row->budget;	
+                $this->farbe= $row->farbe;	
 
 				return true;
 			}
