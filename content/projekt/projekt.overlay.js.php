@@ -363,7 +363,8 @@ function ProjektNeu()
 	document.getElementById('textbox-projekt-detail-projekt_kurzbz').disabled=false;
 	document.getElementById('checkbox-projekt-detail-neu').checked=true;
 	document.getElementById('caption-projekt-detail').label='Neues Projekt';
-	
+	document.getElementById('textbox-projekt-detail-farbe').value='#FF0000';
+    
 	//Detail Tab auswaehlen
 	document.getElementById('tabs-projekt-main').selectedItem=document.getElementById('tab-projekt-detail');	
 }
