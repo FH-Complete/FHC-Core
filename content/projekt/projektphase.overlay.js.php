@@ -363,6 +363,7 @@ function ProjektphaseNeu()
     //Neu Status setzen
     document.getElementById('caption-projektphase-detail').label='Neue Phase';
     document.getElementById('checkbox-projektphase-detail-neu').checked=true;
+    document.getElementById('textbox-projektphase-detail-farbe').value='#0000FF';
     
     //Detail Tab auswaehlen
 	document.getElementById('projektphase-tabs').selectedItem=document.getElementById('projektphase-tab-detail');	
