@@ -151,7 +151,7 @@ function getLehrveranstaltungFromStudiengang($studiengang, $semester, $ausbildun
     $lehrveranstaltung = new lehrveranstaltung(); 
     $stud = new studiengang(); 
     
-    if(!$stud->getStudiengangFromOe($studiengang))
+    if(!$stud->load($studiengang))
         return new SoapFault ("Server", "Error loading Studiengang");
     
     if(!$lehrveranstaltung->load_lva_le($stud->studiengang_kz, $semester, $ausbildungssemester))

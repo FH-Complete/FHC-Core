@@ -27,23 +27,23 @@ if(!check_lektor($getuid))
             <form action="'.$_SERVER["PHP_SELF"].'?method=studiengang" method="post">
             <table border="0" cellpadding="5" cellspacing="0" bgcolor="#E0E0E0">
                 <tr>
-                    <td align="right">Name:</td>
+                    <td align="right">Name* :</td>
                     <td><input name="username" type="text" size="30" maxlength="255" value="'.(isset($_REQUEST['username']) ? $_REQUEST['username'] : "").'"></td>
                 </tr>
                 <tr>
-                    <td align="right">Passwort:</td>
+                    <td align="right">Passwort* :</td>
                     <td><input name="passwort" type="password" size="30" maxlength="255" value="'.(isset($_REQUEST['passwort']) ? $_REQUEST['passwort'] : "").'"></td>
                 </tr>
                 <tr>
-                    <td align="right">Studiengang:</td>
+                    <td align="right">Studiengang* :</td>
                     <td><input name="studiengang" type="text" size="30" maxlength="10" value="'.(isset($_REQUEST['studiengang']) ? $_REQUEST['studiengang'] : "").'"></td>
                 </tr>
                 <tr>
-                    <td align="right">Semester:</td>
+                    <td align="right">Semester* :</td>
                     <td><input name="semester" type="text" size="30" maxlength="10" value="'.(isset($_REQUEST['semester']) ? $_REQUEST['semester'] : "").'"></td>
                 </tr>    
                 <tr>
-                    <td align="right">Ausbildungssemester* :</td>
+                    <td align="right">Ausbildungssemester :</td>
                     <td><input name="aussemester" type="text" size="30" maxlength="10" value="'.(isset($_REQUEST['aussemester']) ? $_REQUEST['aussemester'] : "").'"></td>
                 </tr>  
                 <tr>
@@ -109,19 +109,19 @@ if(!check_lektor($getuid))
             <form action="'.$_SERVER["PHP_SELF"].'?method=id" method="post">
             <table border="0" cellpadding="5" cellspacing="0" bgcolor="#E0E0E0">
                 <tr>
-                    <td align="right">Name:</td>
+                    <td align="right">Name* :</td>
                     <td><input name="username" type="text" size="30" maxlength="255" value="'.(isset($_REQUEST['username']) ? $_REQUEST['username'] : "").'"></td>
                 </tr>
                 <tr>
-                    <td align="right">Passwort:</td>
+                    <td align="right">Passwort* :</td>
                     <td><input name="passwort" type="password" size="30" maxlength="255" value="'.(isset($_REQUEST['passwort']) ? $_REQUEST['passwort'] : "").'"></td>
                 </tr>
                 <tr>
-                    <td align="right">Lehrveranstaltung_id:</td>
+                    <td align="right">Lehrveranstaltung_id* :</td>
                     <td><input name="lv_id" type="text" size="30" maxlength="10" value="'.(isset($_REQUEST['lv_id']) ? $_REQUEST['lv_id'] : "").'"></td>
                 </tr>
                 <tr>
-                    <td align="right">Semester* :</td>
+                    <td align="right">Semester:</td>
                     <td><input name="semester" type="text" size="30" maxlength="10" value="'.(isset($_REQUEST['semester']) ? $_REQUEST['semester'] : "").'"></td>
                 </tr>    
                 <tr>
