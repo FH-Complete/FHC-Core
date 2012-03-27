@@ -63,7 +63,7 @@ class webservicerecht extends basis_db
         foreach ($berechtigung->berechtigungen as $recht)
         {   
             // ist berechtigung noch gültig
-            if($recht->start < date('Y-m-d') && $recht->ende > date('Y-m-d'))
+            if(($recht->start < date('Y-m-d') || $recht->start=='') && ($recht->ende > date('Y-m-d') || $recht->ende==''))
                 $berechtigungArray[] = $recht->berechtigung_kurzbz; 
         }
         
