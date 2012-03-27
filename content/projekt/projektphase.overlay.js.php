@@ -260,6 +260,7 @@ function clb_saveProjektphase(respObj)
 	try
 	{
 		var id = respObj.Body[0].saveProjektphaseResponse[0].message[0].Text;
+        drawGantt();
 	}
 	catch(e)
 	{
