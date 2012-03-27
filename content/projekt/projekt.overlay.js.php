@@ -226,6 +226,7 @@ function clb_saveProjekt(respObj)
 	{
 		var projekt_kurzbz = respObj.Body[0].saveProjektResponse[0].message[0].Text;
 		ProjektSelectKurzbz = projekt_kurzbz;
+        drawGantt();
 	}
 	catch(e)
 	{
