@@ -183,5 +183,51 @@ class ortraumtyp extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Laedt die Raumtypen eines Ortes
+	 * 
+	 * @param $ort_kurzbz
+	 * @return boolean
+	 */
+	public function getRaumtypen($ort_kurzbz)
+	{
+		if($ort_kurzbz=='')
+		{
+			$this->errormsg = 'Kein gültiger Schlüssel vorhanden';
+			return false;
+		}
+
+		$qry = "SELECT 
+					* 
+				FROM 
+					public.tbl_ortraumtyp 
+					JOIN public.tbl_raumtyp USING(raumtyp_kurzbz) 
+				WHERE 
+					ort_kurzbz=".$this->db_add_param($ort_kurzbz);
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new ortraumtyp();
+								
+				$obj->ort_kurzbz = $row->ort_kurzbz;
+				$obj->hierarchie = $row->hierarchie;
+				$obj->raumtyp_kurzbz = $row->raumtyp_kurzbz;
+				$obj->beschreibung = $row->beschreibung;
+				
+				$this->result[] = $obj;				
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+
+		return true;
+	}
 }
 ?>
