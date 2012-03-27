@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2011 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -54,7 +54,6 @@ require_once('../../include/projektphase.class.php');
 require_once('../../include/projekt.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/datum.class.php');
-
 
 if($projekt_kurzbz != '')
 {
@@ -178,7 +177,59 @@ function getOeGantt()
 			// zeichne balken
 			echo '<rect x="'.$x.'" y="'.($startY+10+$i*50).'" width ="'.$width.'" height ="30" fill="'.$projekt->farbe.'" stroke="black" />';
 			echo'<text x="'.($startX-10).'" y="'.($startY+30+$i*50).'" style="font-size:15px" text-anchor="end">'.$projekt->titel.'</text>';
-			$i++;
+            
+            // Zeichne Phasen in Projektbalken
+            $projektphasen = new projektphase(); 
+            $projektphasen->getProjektphasen($projekt->projekt_kurzbz);
+            
+            foreach($projektphasen->result as $phase)
+            {
+                $width = 0;
+                $x = 0;
+                // wenn kein start oder ende angegeben -> nichts zeichnen -> width=0
+                if($phase->start != '' && $phase->ende != '')
+                {
+                    $timestamp_beginn = $datum->mktime_fromdate($phase->start);
+                    $timestamp_end = $datum->mktime_fromdate($phase->ende);
+                    $kw_beginn = kalenderwoche($timestamp_beginn);
+                    $kw_end = kalenderwoche($timestamp_end);
+                    // kw soll bei 0 zu zeichnen beginnen
+                    $kw_beginn = $kw_beginn -1; 
+                    $kw_end = $kw_end -1;
+
+                    $year_beginn=date("Y",$timestamp_beginn);
+                    $year_end=date("Y",$timestamp_end);
+
+                    // phase beginnt und endet im Jahr
+                    if($year_end == $year_beginn && $year_beginn == $studienjahr)
+                    {
+                        $width = ($kw_end - $kw_beginn+1)*$widthPerWeek;
+                        $x = ($startX+$kw_beginn*$widthPerWeek);
+                    }
+                        // endet im nächsten jahr
+                    else if($year_beginn == $studienjahr && $year_end > $year_beginn)
+                    {
+                        $width = ($kw_gesamt - $kw_beginn)*$widthPerWeek;
+                        $x = ($startX+$kw_beginn*$widthPerWeek);
+                    }
+                        // geht über gesamtes jahr
+                    else if($year_beginn < $studienjahr && $year_end > $studienjahr)
+                    {
+                        $width = ($kw_gesamt*$widthPerWeek);
+                        $x = $startX;
+                    }
+                        // beginnt im vorigen und endet im aktuellen
+                    else if($year_beginn < $studienjahr && $year_end == $studienjahr)
+                    {
+                            $width = ($kw_end+1)*$widthPerWeek;
+                            $x = $startX;
+                    }
+                }
+                // zeichne phasenbalken
+                echo '<rect x="'.$x.'" y="'.($startY+10+$i*50).'" width ="'.$width.'" height ="10" fill="'.$phase->farbe.'" stroke="black" />';
+            }
+            
+            $i++;
 		}
 		echo'<text x="10%" y="'.((($i+1)*50)+$startY).'" style="font-size:16px">Organisationseinheit: '.$projekt->oe_kurzbz.'</text>';
 		
@@ -337,6 +388,118 @@ function getOeGantt()
 			echo "test:".$test.$projekt->titel."jahr".$studienjahr;
 			echo '<rect x="'.$x.'" y="'.($startY+10+$i*50).'" width ="'.$width.'" height ="30" fill="'.$projekt->farbe.'" stroke="black" />';
 			echo'<text x="'.($startX-10).'" y="'.($startY+30+$i*50).'" style="font-size:15px" text-anchor="end">'.$projekt->titel.'</text>';
+            
+            // Zeichne Phasen in Projektbalken
+            $projektphasen = new projektphase(); 
+            $projektphasen->getProjektphasen($projekt->projekt_kurzbz);
+            
+            foreach($projektphasen->result as $phase)
+            {
+                $width = 0;
+                $x = 0;
+                // wenn kein start oder ende angegeben -> nichts zeichnen -> width=0
+                if($phase->start != '' && $phase->ende != '')
+                {
+                    $timestamp_beginn = $datum->mktime_fromdate($phase->start);
+                    $timestamp_end = $datum->mktime_fromdate($phase->ende);
+                    $kw_beginn = kalenderwoche($timestamp_beginn);
+                    $kw_end = kalenderwoche($timestamp_end);
+                    $kw_beginn = $kw_beginn; 
+                    $kw_end = $kw_end;
+
+                    $startSS = $kw_gesamt-$kw_old;
+
+                    $year_beginn=date("Y",$timestamp_beginn);
+                    $year_end=date("Y",$timestamp_end);
+                    $test = 0; 
+                    // phase beginnt und endet im WS 
+                    if($year_end == $year_beginn && $year_beginn == $studienjahr && $kw_beginn >= $kw_old)
+                    {
+                        $width = ($kw_end - $kw_beginn + 1)*$widthPerWeek;
+                        $x = ($startX+($kw_beginn-$kw_old)*$widthPerWeek);
+                        $test = 1; 
+                    }
+                        // phase beginnt und endet im SS 
+                    if($year_end == $year_beginn && $year_beginn == $studienjahr+1 && $kw_beginn >= 1 && $kw_end <=$kw_new)
+                    {
+                        if($kw_end == 1)// es kann auch sein dass 31.12 des kalenderjahres schon in der 1. KW liegt
+                            $kw_end =$kw_new; 
+                        $width = ($kw_end - $kw_beginn + 1)*$widthPerWeek;
+                        $x = ($startX+($kw_beginn+$startSS)*$widthPerWeek);
+                        $test = 2; 
+                    }
+                        // phase beginnt im WS und endet im SS
+                    else if($year_beginn == $studienjahr && $year_end == $studienjahr+1 && $kw_beginn >= $kw_old && $kw_end <= $kw_new)
+                    {
+                        $width = ($kw_gesamt - $kw_beginn + $kw_end + 1)*$widthPerWeek;		
+                        $x = ($startX+($kw_beginn-$kw_old)*$widthPerWeek);
+                        $test = 3; 
+                    }
+                        // geht über gesamtes studienjahr
+                    else if($year_beginn == $studienjahr && $kw_beginn <= $kw_old && (($year_end == $studienjahr+1 && $kw_end >= $kw_new) || $year_end > $studienjahr+1))
+                    {
+                        $width = $y*$widthPerWeek;
+                        $x = $startX; 
+                        $test = 4; 
+                    }
+                        // geht über gesamtes studienjahr
+                    else if($year_beginn < $studienjahr && $year_end > $studienjahr+1)
+                    {
+                        $width = $y*$widthPerWeek;
+                        $x = $startX; 
+                        $test = 5; 
+                    }
+                        // beginnt früher und endet im aktuellen WS
+                    else if((($year_beginn == $studienjahr && $kw_beginn < $kw_old) || ($year_beginn < $studienjahr)) && ($year_end == $studienjahr && $kw_end >= $kw_old))
+                    {
+
+                        $width = ($kw_end - $kw_old + 1)*$widthPerWeek;
+                        $x = $startX;
+                        $test = 6; 
+                    }
+                        // beginnt früher und endet im aktuellen SS
+                    else if((($year_beginn == $studienjahr && $kw_beginn < $kw_old) || ($year_beginn < $studienjahr)) && ($year_end == $studienjahr+1 && $kw_end <= $kw_new))
+                    {
+                        if($kw_end == 1) // es kann auch sein dass 31.12 des kalenderjahres schon in der 1. KW liegt
+                            $kw_end =$kw_new; 
+                        $width = ($kw_gesamt - $kw_old + $kw_end + 1)*$widthPerWeek;
+                        $x = $startX;
+                        $test = 7; 
+                    }
+                        // beginnt im aktuellen WS und endet nach Studienjahr im aktuellen Kalenderjahr
+                    else if(($year_beginn == $studienjahr && $kw_beginn >= $kw_old) && ($year_end == $studienjahr+1 && $kw_end > $kw_new))
+                    {
+                        $width = ($kw_gesamt - $kw_beginn + $kw_new + 1)*$widthPerWeek;
+                        $x = ($startX+($kw_beginn-$kw_old)*$widthPerWeek);
+                        $test = 8; 
+                    }
+                        // beginnt im aktuellen WS und endet nach Studienjahr und nach aktuellem Kalenderjahr
+                    else if(($year_beginn == $studienjahr && $kw_beginn > $kw_old) && ($year_end > $studienjahr+1))
+                    {
+                        $width = ($kw_gesamt - $kw_beginn + $kw_new + 1)*$widthPerWeek;
+                        $x = ($startX+($kw_beginn-$kw_old)*$widthPerWeek);
+                        $test = 9; 
+                    }
+                        // beginnt im aktuellen SS und endet nach Studienjahr im aktuellen Kalenderjahr
+                    else if(($year_beginn == $studienjahr+1 && $kw_beginn <= $kw_new) && ($year_end == $studienjahr+1 && ($kw_end > $kw_new || $kw_end == 1))) // da 31.123
+                    {
+                        $width = ($y-$kw_beginn - $startSS)*$widthPerWeek;
+                        $x = ($startX+($kw_beginn+$startSS)*$widthPerWeek);
+                        $test = 10; 
+                    }
+                        // beginnt im aktuellen SS und endet nach Studienjahr und nach aktuellem Kalenderjahr
+                    else if(($year_beginn == $studienjahr+1 && $kw_beginn <= $kw_new) && ($year_end > $studienjahr+1))
+                    {
+                        $width = ($y-$kw_beginn - $startSS)*$widthPerWeek;
+                        $x = ($startX+($kw_beginn+$startSS)*$widthPerWeek);
+                        $test = 11; 
+                    }
+                }
+
+                // zeichne balken
+                echo '<rect x="'.$x.'" y="'.($startY+10+$i*50).'" width ="'.$width.'" height ="10" fill="'.$phase->farbe.'" stroke="black" />';
+            }
+            
 			$i++;
 		}
 		
@@ -629,7 +792,6 @@ function getProjektGantt()
 			}
 		
 			// zeichne balken
-			echo "test:".$test.$phase->bezeichnung."jahr".$studienjahr;
 			echo '<rect x="'.$x.'" y="'.($startY+10+$i*50).'" width ="'.$width.'" height ="30" fill="'.$phase->farbe.'" stroke="black" />';
 			echo'<text x="'.($startX-10).'" y="'.($startY+30+$i*50).'" style="font-size:15px" text-anchor="end">'.$phase->bezeichnung.'</text>';
 			$i++;
