@@ -3341,6 +3341,59 @@ if(!@$db->db_query("SELECT farbe FROM fue.tbl_projektphase LIMIT 1"))
 		echo 'Tabelle fue.tbl_projektphase Spalte farbe hinzugefuegt!<br>';
 }
 
+// Testtool View
+if(!@$db->db_query("SELECT 1 FROM testtool.vw_auswertung_ablauf LIMIT 1"))
+{
+	$qry = "CREATE VIEW testtool.vw_auswertung_ablauf AS
+		SELECT 
+		    tbl_gebiet.gebiet_id, tbl_gebiet.bezeichnung AS gebiet, tbl_ablauf.reihung, 
+		    tbl_gebiet.maxpunkte, tbl_pruefling.pruefling_id, tbl_pruefling.prestudent_id, 
+		    tbl_person.vorname, tbl_person.nachname, tbl_person.gebdatum, tbl_person.geschlecht, 
+		    tbl_pruefling.semester, 
+		    upper(tbl_studiengang.typ::character varying(1)::text || tbl_studiengang.kurzbz::text) AS stg_kurzbz, 
+		    tbl_studiengang.bezeichnung AS stg_bez, tbl_pruefling.registriert, 
+		    tbl_pruefling.idnachweis, 
+		    ( SELECT sum(tbl_vorschlag.punkte) AS sum
+		        FROM 
+		            testtool.tbl_vorschlag
+		            JOIN testtool.tbl_antwort USING (vorschlag_id)
+		            JOIN testtool.tbl_frage USING (frage_id)
+		        WHERE 
+		            tbl_antwort.pruefling_id = tbl_pruefling.pruefling_id 
+		            AND tbl_frage.gebiet_id = tbl_gebiet.gebiet_id
+		    ) AS punkte, 
+		    tbl_prestudent.reihungstest_id, tbl_ablauf.gewicht
+		FROM testtool.tbl_pruefling
+		   JOIN testtool.tbl_ablauf ON tbl_ablauf.studiengang_kz = tbl_pruefling.studiengang_kz
+		   JOIN testtool.tbl_gebiet USING (gebiet_id)
+		   JOIN public.tbl_prestudent USING (prestudent_id)
+		   JOIN public.tbl_person USING (person_id)
+		   JOIN public.tbl_studiengang ON tbl_prestudent.studiengang_kz = tbl_studiengang.studiengang_kz
+		WHERE NOT (tbl_ablauf.gebiet_id IN ( SELECT tbl_kategorie.gebiet_id
+		   FROM testtool.tbl_kategorie));
+
+		GRANT SELECT ON testtool.vw_auswertung_ablauf TO web;
+		GRANT SELECT ON testtool.vw_auswertung_ablauf TO admin;
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>testtool.vw_auswertung_ablauf: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'VIEW testtool.vw_auswertung_ablauf!<br>';
+}
+
+// URL Vorlage fuer FreeBusy Typen
+if(!@$db->db_query("SELECT url_vorlage FROM campus.tbl_freebusytyp LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE campus.tbl_freebusytyp ADD COLUMN url_vorlage varchar(1024);
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_freebusytyp: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Tabelle campus.tbl_freebusytyp Spalte url_vorlage hinzugefuegt!<br>';
+}
 
 echo '<br>';
 
@@ -3381,7 +3434,7 @@ $tabellen=array(
 	"campus.tbl_erreichbarkeit"  => array("erreichbarkeit_kurzbz","beschreibung","farbe"),
 	"campus.tbl_feedback"  => array("feedback_id","betreff","text","datum","uid","lehrveranstaltung_id","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_freebusy"  => array("freebusy_id","uid","freebusytyp_kurzbz","url","aktiv","bezeichnung","insertamum","insertvon","updateamum","updatevon"),
-	"campus.tbl_freebusytyp" => array("freebusytyp_kurzbz","bezeichnung","beschreibung"),
+	"campus.tbl_freebusytyp" => array("freebusytyp_kurzbz","bezeichnung","beschreibung","url_vorlage"),
 	"campus.tbl_infoscreen"  => array("infoscreen_id","bezeichnung","beschreibung","ipadresse"),
 	"campus.tbl_infoscreen_content"  => array("infoscreen_content_id","infoscreen_id","content_id","gueltigvon","gueltigbis","insertamum","insertvon","updateamum","updatevon","refreshzeit"),
 	"campus.tbl_legesamtnote"  => array("student_uid","lehreinheit_id","note","benotungsdatum","updateamum","updatevon","insertamum","insertvon"),
