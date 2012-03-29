@@ -38,7 +38,7 @@ $SOAPServer->handle();
 
 /**
  * 
- * Funktion nimmt ANfragen entgegen und bearbeitet diese
+ * Funktion nimmt Anfragen entgegen und bearbeitet diese
  * @param $parameters -> XML SOAP File
  */
 function GetStipendienbezieherStip($parameters)
@@ -49,7 +49,6 @@ function GetStipendienbezieherStip($parameters)
 	$ErhalterKz = $anfrageDaten->ErhKz; 
 	$AnfrageDatenID = $anfrageDaten->AnfragedatenID; 
 		
-
 	// Eintrag in der LogTabelle anlegen
 	$log = new webservicelog(); 
 	$log->request_data = file_get_contents('php://input'); 
@@ -90,7 +89,7 @@ function GetStipendienbezieherStip($parameters)
 				$studSemester = "WS".$year; 
 			}elseif ($BezieherStip->Semester == "SS" || $BezieherStip->Semester == "ss")
 			{
-				$year = mb_substr($BezieherStip->Studienjahr, 0,4); 
+				$year = mb_substr($BezieherStip->Studienjahr, 0,2).mb_substr($BezieherStip->Studienjahr, 5,7); 
 				$studSemester = "SS".$year; 
 			}
 			
@@ -138,11 +137,11 @@ function GetStipendienbezieherStip($parameters)
 					$StipBezieher->Studienbeitrag = $studGebuehr; 
                     
                     // Wenn letzter Status von Semester Interessent ist -> Semester = null
-                    if(!$prestudentStatus->status_kurzbz == 'Interessent')
+                    if($prestudentStatus->status_kurzbz != 'Interessent')
                         $StipBezieher->Ausbildungssemester = $StipBezieher->getSemester($prestudentID, $studSemester);						
 					else
-                        $StipBezieher->Ausbildungssemester = null; 
-                    
+                       $StipBezieher->Ausbildungssemester = null; 
+                     
                     $StipBezieher->StudStatusCode = $StipBezieher->getStudStatusCode($prestudentID, $studSemester);
 					if($StipBezieher->StudStatusCode==3 || $StipBezieher->StudStatusCode==4)
 						$StipBezieher->BeendigungsDatum = $datum_obj->formatDatum($prestudent->datum,'dmY');
