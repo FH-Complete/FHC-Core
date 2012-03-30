@@ -814,23 +814,9 @@ class betriebsmittel extends basis_db
 		$qry.=', tbl_bestellung.bestell_nr as bestellnr, tbl_firma.name as firmenname, tbl_firma.firma_id as firma_id';
 
 		//AfA Datum ermitteln
-		$qry.=", trim(to_char(date_part('year', 
-					(
-					SELECT datum 
-					FROM wawi.tbl_betriebsmittel_betriebsmittelstatus 
-					WHERE tbl_betriebsmittel_betriebsmittelstatus.betriebsmittel_id=tbl_betriebsmittel.betriebsmittel_id 
-					ORDER BY datum ASC, betriebsmittelbetriebsmittelstatus_id ASC 
-					LIMIT 1
-					))  + tbl_betriebsmittel.afa , '9999') 
+		$qry.=", trim(to_char(date_part('year', anschaffungsdatum)  + tbl_betriebsmittel.afa , '9999') 
 					|| '-' || 
-					to_char(
-					(
-					SELECT datum 
-					FROM wawi.tbl_betriebsmittel_betriebsmittelstatus 
-					WHERE tbl_betriebsmittel_betriebsmittelstatus.betriebsmittel_id=tbl_betriebsmittel.betriebsmittel_id 
-					ORDER BY datum ASC, betriebsmittelbetriebsmittelstatus_id ASC 
-					LIMIT 1
-					) , 'MM-DD')) as betriebsmittelstatus_datum_afa ";
+					to_char(anschaffungsdatum , 'MM-DD')) as betriebsmittelstatus_datum_afa ";
 		$qry.=' FROM wawi.tbl_betriebsmittel';
 
 		$qry.=' LEFT JOIN wawi.tbl_betriebsmitteltyp on (tbl_betriebsmitteltyp.betriebsmitteltyp=tbl_betriebsmittel.betriebsmitteltyp ) ';
