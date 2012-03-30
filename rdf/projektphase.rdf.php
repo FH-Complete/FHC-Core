@@ -117,7 +117,17 @@ if($projektphase_id != '')
 else
 {
 	$projekt_obj = new projekt();
-	$projekt_obj->getProjekte();
+    
+    if(!isset($_REQUEST['filter']))
+        $projekt_obj->getProjekte();
+    else
+    {
+        if($_REQUEST['filter']=='aktuell')
+            $projekt_obj->getProjekteAktuell();
+        else if($_REQUEST['filter']=='kommende')
+            $projekt_obj->getProjekteAktuell(true);
+    }
+    
 	$projektphase_obj = new projektphase();
 	$sequenzProjektphase = array();
 		
