@@ -520,10 +520,11 @@ if($xmlformat=='rdf')
 					FROM 
 						public.tbl_person JOIN tbl_prestudent USING (person_id) LEFT JOIN tbl_student using(prestudent_id) 
 					WHERE 
-						nachname ~* '".addslashes($filter)."' OR 
-						vorname ~* '".addslashes($filter)."' OR
+						nachname||' '||vorname ~* '".addslashes($filter)."' OR 
+						vorname||' '||nachname ~* '".addslashes($filter)."' OR
 						student_uid ~* '".addslashes($filter)."' OR
-						matrikelnr = '".addslashes($filter)."';";
+						matrikelnr = '".addslashes($filter)."' OR
+						svnr = '".addslashes($filter)."';";
 			if($db->db_query($qry))
 			{
 				while($row = $db->db_fetch_object())

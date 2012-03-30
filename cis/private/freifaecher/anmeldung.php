@@ -161,10 +161,10 @@ else
 				<td>&nbsp;
 				</td>
 			</tr>
-			<tr>
+<!-- 			<tr>  ****Von kindlm am 21.03.2012 aukommentiert, da diese Info nur zu Verwirrungen geführt hat.****
 				<td style="border-color:#0086CB; border-width:2px; border-style:solid; padding:8px"><?php echo $p->t('freifach/abmeldungNurUeberAssistenz');?>
 				</td>
-			</tr>
+			</tr>-->
 			</table>
 			</table>
 		</td>
