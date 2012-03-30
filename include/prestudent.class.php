@@ -285,7 +285,8 @@ class prestudent extends person
 	/**
 	 * Laden aller Prestudenten, die an $datum zum Reihungstest geladen sind.
 	 * Wenn $equal auf true gesetzt ist wird genau dieses Datum verwendet,
-	 * ansonsten werden auch alle mit späterem Datum geladen.
+	 * ansonsten werden auch alle mit späterem Datum geladen. ---> von kindlm am 30.03.2012 geändert 
+	 * da zukünftige Teilnehmer nicht mehr angezeigt werden sollen. 
 	 * @return true wenn erfolgreich, false im Fehlerfall
 	 */
 	public function getPrestudentRT($datum, $equal=false)
@@ -294,7 +295,7 @@ class prestudent extends person
 		if ($equal)
 			$sql_query.='=';
 		else
-			$sql_query.='>=';
+			$sql_query.='=';
 		$sql_query.="'$datum' ORDER BY nachname,vorname";
 		
 		if(!$this->db_query($sql_query))

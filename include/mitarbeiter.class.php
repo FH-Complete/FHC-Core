@@ -819,13 +819,13 @@ class mitarbeiter extends benutzer
 	{
 		$qry = "SELECT
 					distinct on(mitarbeiter_uid) *, tbl_benutzer.aktiv as aktiv, tbl_mitarbeiter.insertamum,
-					tbl_mitarbeiter.insertvon, tbl_mitarbeiter.updateamum, tbl_mitarbeiter.updatevon
+					tbl_mitarbeiter.insertvon, tbl_mitarbeiter.updateamum, tbl_mitarbeiter.updatevon, tbl_person.svnr
 				FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id))  LEFT JOIN campus.tbl_resturlaub USING(mitarbeiter_uid)
-				WHERE nachname ~* '".addslashes($filter)."' OR
-				      vorname ~* '".addslashes($filter)."' OR
+				WHERE nachname||' '||vorname ~* '".addslashes($filter)."' OR
+				      vorname||' '||nachname ~* '".addslashes($filter)."' OR
 				      uid ~* '".addslashes($filter)."'";
 		if(is_numeric($filter))
-			$qry.="OR personalnummer = '".addslashes($filter)."'";
+			$qry.="OR personalnummer = '".addslashes($filter)."' OR svnr = '".addslashes($filter)."'";
 
 		if($this->db_query($qry))
 		{
