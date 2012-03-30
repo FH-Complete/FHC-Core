@@ -96,6 +96,52 @@ class projekt extends basis_db
 		}
 	}
 
+    /**
+     * Laedt alle aktuellen Projekte
+     * @param $kommend lädt auch alle zukünftigen
+     * @return boolean 
+     */
+    public function getProjekteAktuell($filter_kommende = false, $oe=null)
+    {
+        $qry = 'SELECT * FROM fue.tbl_projekt WHERE ';
+        
+        if($filter_kommende)
+            $qry.= " ((beginn < CURRENT_TIMESTAMP AND ende > CURRENT_TIMESTAMP) OR beginn > CURRENT_TIMESTAMP)";
+        else
+            $qry.=" (beginn < CURRENT_TIMESTAMP AND ende > CURRENT_TIMESTAMP)";
+        
+        
+        if(!is_null($oe))
+            $qry.= ' AND oe_kurzbz='.$this->db_add_param ($oe);
+        
+        $qry.= ' ORDER BY oe_kurzbz;';
+        if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new projekt();
+				
+				$obj->projekt_kurzbz = $row->projekt_kurzbz;
+				$obj->nummer = $row->nummer;
+				$obj->titel = $row->titel;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->beginn = $row->beginn;
+				$obj->ende = $row->ende;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->budget = $row->budget;
+                $obj->farbe = $row->farbe;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+    }
+    
 	/**
 	 * Laedt die Projeke einer Organisationseinheit
 	 * @param  $projekt_kurzbz Kurzbezeichnung des Projekts
