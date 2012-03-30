@@ -24,6 +24,7 @@ var datasourceTreeProjekt;
 var datasourceTreeProjektphase;
 var datasourceTreeProjekttask;
 var datasourceTreeDokument;
+var global_filter = '';
 
 function treeProjektmenueSelect()
 {
@@ -39,8 +40,8 @@ function treeProjektmenueSelect()
 	var projekt_kurzbz=getTreeCellText(tree, "treecol-projektmenue-projekt_kurzbz", tree.currentIndex);
 	var projekt_phase=getTreeCellText(tree, "treecol-projektmenue-projekt_phase", tree.currentIndex);
 	var projekt_phase_id=getTreeCellText(tree, "treecol-projektmenue-projekt_phase_id", tree.currentIndex);
-	    
-       
+	  
+    
 	//Neu und Delete Button fuer Projekte und Phasen aktivieren/deaktivieren
 	if (projekt_kurzbz=='')
 	{
@@ -56,8 +57,7 @@ function treeProjektmenueSelect()
     //Projekte neu laden
 	try
 	{
-		var datasource="<?php echo APP_ROOT; ?>rdf/projekt.rdf.php?oe="+oe+"&"+gettimestamp();
-
+		var datasource="<?php echo APP_ROOT; ?>rdf/projekt.rdf.php?oe="+oe+"&filter="+global_filter+"&"+gettimestamp();
 		var treeProjekt=document.getElementById('tree-projekt');
 		//Alte DS entfernen
 		var oldDatasources = treeProjekt.database.GetDataSources();
@@ -186,7 +186,7 @@ function treeProjektmenueSelect()
 	{
 		document.getElementById('toolbarbutton-projektdokument-neu').disabled=true;
 		document.getElementById('toolbarbutton-projektdokument-zuweisung').disabled=true;	
-		drawGantt();	
+		drawGantt();
 	}
 	
 	
@@ -259,6 +259,7 @@ function RessourceNeu()
 // *****
 function ProjektmenueRefresh()
 {
+    global_filter = '';
 	try
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
@@ -278,12 +279,82 @@ function ProjektmenueRefresh()
 		datasourceTreeProjektmenue = rdfService.GetDataSource(url);
 		datasourceTreeProjektmenue.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 		treeProjektmenue.database.AddDataSource(datasourceTreeProjektmenue);
+        document.getElementById('toolbarbutton-projektmenue-label-filter').value='Alle Projekte';
                 
 	}
 	catch(e)
 	{
 		debug("whoops Projektmenue load failed with exception: "+e);
 	}
+}
+
+// *****
+// * Refresht den Projektmenue Tree
+// *****
+function ProjektmenueRefreshAktuell()
+{
+    global_filter = 'aktuell';
+	try
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		url = "<?php echo APP_ROOT; ?>rdf/projektphase.rdf.php?filter=aktuell&"+gettimestamp();
+                
+		var treeProjektmenue=document.getElementById('tree-projektmenue');
+
+		//Alte DS entfernen
+		var oldDatasources = treeProjektmenue.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			treeProjektmenue.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		treeProjektmenue.builder.rebuild();
+		
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		datasourceTreeProjektmenue = rdfService.GetDataSource(url);
+		datasourceTreeProjektmenue.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		treeProjektmenue.database.AddDataSource(datasourceTreeProjektmenue);
+        document.getElementById('toolbarbutton-projektmenue-label-filter').value='Aktuelle Projekte';
+	}
+	catch(e)
+	{
+		debug("whoops Projektmenue load failed with exception: "+e);
+	}
+}
+
+// *****
+// * Refresht den Projektmenue Tree
+// *****
+function ProjektmenueRefreshAktuellKommende()
+{
+    global_filter = 'kommende';
+	try
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		url = "<?php echo APP_ROOT; ?>rdf/projektphase.rdf.php?filter=kommende&"+gettimestamp();
+                
+		var treeProjektmenue=document.getElementById('tree-projektmenue');
+
+		//Alte DS entfernen
+		var oldDatasources = treeProjektmenue.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			treeProjektmenue.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		treeProjektmenue.builder.rebuild();
+		
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		datasourceTreeProjektmenue = rdfService.GetDataSource(url);
+		datasourceTreeProjektmenue.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		treeProjektmenue.database.AddDataSource(datasourceTreeProjektmenue);
+        document.getElementById('toolbarbutton-projektmenue-label-filter').value='Aktuelle/Kommende Projekte';
+        
+                
+	}
+	catch(e)
+	{
+		debug("whoops Projektmenue load failed with exception: "+e);
+	}
+    ProjektTreeRefresh();
 }
 
 function loadURL(event)
