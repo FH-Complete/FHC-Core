@@ -32,7 +32,18 @@ if(isset($_GET['oe']))
 else 
 	$oe=null;
 $projekt_obj = new projekt();
-$projekt_obj->getProjekte($oe);
+if(isset($_REQUEST['filter']))
+{
+    if($_REQUEST['filter']=='')
+        $projekt_obj->getProjekte($oe);
+    if($_REQUEST['filter']=='aktuell')
+        $projekt_obj->getProjekteAktuell(false, $oe);
+    if ($_REQUEST['filter'] =='kommende')
+        $projekt_obj->getProjekteAktuell(true, $oe);
+}
+else
+    $projekt_obj->getProjekte($oe);
+
 //var_dump($projekt_obj);
 $datum_obj = new datum();
 echo '
