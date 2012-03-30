@@ -195,13 +195,19 @@
 			$errormsg[]=$oBetriebsmittel->errormsg;
 	}
 
+	if(isset($_REQUEST['anzahl_lock']))
+		$anzahl_lock=true;
+	else
+		$anzahl_lock=false;
 	// Vorlagedaten lesen aus Betriebsmittel
 	if ($betriebsmittel_id!='' && empty($work) )
 	{
+		
 		$oBetriebsmittel->result=array();
 		$oBetriebsmittel->errormsg='';
 		if ($oBetriebsmittel->load($betriebsmittel_id))
 		{
+			$anzahl_lock=true;
 		  	$anzahl=1;
 
 			$betriebsmittel_id = $oBetriebsmittel->betriebsmittel_id;
@@ -256,7 +262,8 @@
 		else
 			$errormsg[]=$oBetriebsmittel->errormsg;
 	}
-
+		
+	
 	// Vorlagedaten lesen
 	if ($bestellung_id!='' && empty($work)
 	&& ($bestellung_id!=$bestellung_id_old || $bestelldetail_id!=$bestelldetail_id_old )  )
@@ -334,11 +341,13 @@
 
 			  	$hersteller=trim($row->firmenname);
 				*/
+				if(!$anzahl_lock)
 			  	$anzahl=trim(isset($row->menge)?$row->menge:$anzahl);	
 			}
 			$beschreibung = mb_substr($beschreibung, 0, 256);
 		}
 	}
+	
 
 // ------------------------------------------------------------------------------------------
 // HTML Output
@@ -396,7 +405,10 @@
 	<body>
 		<h1>&nbsp;Inventar&nbsp;</h1>
 		<form name="sendform" action="<?php echo $_SERVER["PHP_SELF"];  ?>" method="post" enctype="application/x-www-form-urlencoded">
-
+<?php
+if($betriebsmittel_id!='' || $anzahl_lock)
+	echo '<input type="hidden" name="anzahl_lock" value="1">';
+?>
 		<fieldset>
 			<legend>Vorlage&nbsp;&nbsp;&nbsp;Anzahl:
 			<select  id="anzahl" name="anzahl" onchange="document.sendform.submit();">
