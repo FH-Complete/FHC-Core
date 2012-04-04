@@ -509,7 +509,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 							</td>
 
 							<td>&nbsp;<label for="ort_kurzbz">Ort</label>&nbsp;
-								<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1300);}" id="ort_kurzbz" name="ort_kurzbz" size="10" value="<?php echo $ort_kurzbz;?>">
+								<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1300);}" id="ort_kurzbz" name="ort_kurzbz" size="16" value="<?php echo $ort_kurzbz;?>">
 									<script type="text/javascript" language="JavaScript1.2">
 									$(document).ready(function() 
 									{
@@ -1158,7 +1158,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 									</td>
 
 									<td>&nbsp;<label for="ort_kurzbz_array<?php echo $pos; ?>">Ort</label>&nbsp;
-										<input id="ort_kurzbz_array<?php echo $pos; ?>" name="ort_kurzbz_array[]" size="10" value="<?php echo $ort_kurzbz_array[$pos]; ?>">
+										<input id="ort_kurzbz_array<?php echo $pos; ?>" name="ort_kurzbz_array[]" size="16" value="<?php echo $ort_kurzbz_array[$pos]; ?>">
 											<script type="text/javascript" language="JavaScript1.2">
 													$(document).ready(function() 
 													{
