@@ -8,4 +8,5 @@ $this->phrasen['freebusy/LVPlanBezeichnung']='Persönlicher LVPlan';
 $this->phrasen['freebusy/LVPlanTyp']='LVPlan';
 $this->phrasen['freebusy/neuerEintrag']='Neuen Eintrag hinzufügen';
 $this->phrasen['freebusy/beschreibungstext1']='Auf dieser Seite können Sie verschiedene externe FreeBusy Informationen zu einer FreeBusy URL zusammenfassen.';
+$this->phrasen['freebusy/urlKannNichtGeladenWerden']='Die angegebene URL ist nicht erreichbar';
 ?>

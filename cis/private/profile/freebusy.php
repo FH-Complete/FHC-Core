@@ -59,6 +59,12 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 			widgets: [\'zebra\']
 		});			
 	});
+	
+	function seturl()
+	{
+		url = $("#typ option:selected").attr("url");
+		$("#url").val(url);
+	}
 	</script>
 </head>
 <body>
@@ -111,37 +117,46 @@ elseif($action=='save')
 		$url = $_POST['url'];
 	else
 		die($p->t('global/fehlerBeiDerParameteruebergabe'));
-	
-	$fb = new freebusy();
-	if($id!='')
-	{
-		if(!$fb->load($id))
-			die($p->t('global/fehleraufgetreten'));
-		if($fb->uid!=$user)
-			die($p->t('global/keineBerechtigungZumAendernDesDatensatzes'));
-			
-	
-		$fb->new=false;
-	}
+		
+	//Pruefen ob die URL geoeffnet werden kann
+	$fp = @fopen($url,'r');
+	if (!$fp)
+		echo '<span class="error">'.$p->t('global/fehleraufgetreten').' '.$p->t('freebusy/urlKannNichtGeladenWerden').'</span>';
 	else
 	{
-		$fb->new=true;
-		$fb->insertamum = date('Y-m-d H:i:s');
-		$fb->insertvon = $user;
-		$fb->uid = $user;
+		fclose($fp);
+		
+		$fb = new freebusy();
+		if($id!='')
+		{
+			if(!$fb->load($id))
+				die($p->t('global/fehleraufgetreten'));
+			if($fb->uid!=$user)
+				die($p->t('global/keineBerechtigungZumAendernDesDatensatzes'));
+				
+		
+			$fb->new=false;
+		}
+		else
+		{
+			$fb->new=true;
+			$fb->insertamum = date('Y-m-d H:i:s');
+			$fb->insertvon = $user;
+			$fb->uid = $user;
+		}
+		
+		$fb->updateamum = date('Y-m-d H:i:s');
+		$fb->updatevon = $user;
+		$fb->bezeichnung = $bezeichnung;
+		$fb->url = $url;
+		$fb->freebusytyp_kurzbz = $typ;
+		$fb->aktiv = $aktiv;
+		
+		if($fb->save())
+			echo '<span class="ok">'.$p->t('global/erfolgreichgespeichert').'</span>';
+		else
+			echo '<span class="error">'.$p->t('global/fehleraufgetreten').'</span>';	
 	}
-	
-	$fb->updateamum = date('Y-m-d H:i:s');
-	$fb->updatevon = $user;
-	$fb->bezeichnung = $bezeichnung;
-	$fb->url = $url;
-	$fb->freebusytyp_kurzbz = $typ;
-	$fb->aktiv = $aktiv;
-	
-	if($fb->save())
-		echo '<span class="ok">'.$p->t('global/erfolgreichgespeichert').'</span>';
-	else
-		echo '<span class="error">'.$p->t('global/fehleraufgetreten').'</span>';	
 	
 }
 
@@ -217,7 +232,8 @@ if($action=='edit' || $action=='neu')
 		<tr>
 			<td><input type="text" name="bezeichnung" size="20" maxlength="256" value="'.$db->convert_html_chars($fb->bezeichnung).'"/></td>
 			<td>
-				<select name="typ">';
+				<select name="typ" id="typ" onchange="seturl()">';
+	echo '<OPTION value="" >-- '.$p->t('global/auswahl').' --</OPTION>';
 	$fbtyp = new freebusy();
 	$fbtyp->getTyp();
 	foreach($fbtyp->result as $row)
@@ -226,12 +242,14 @@ if($action=='edit' || $action=='neu')
 			$selected='selected';
 		else
 			$selected='';
-		echo '<OPTION value="'.$row->freebusytyp_kurzbz.'" '.$selected.'>'.$row->bezeichnung,'</OPTION>';
+		
+		$vorlage = mb_str_replace('$uid',$user, $row->url_vorlage);
+		echo '<OPTION value="'.$db->convert_html_chars($row->freebusytyp_kurzbz).'" '.$selected.' url="'.$db->convert_html_chars($vorlage).'">'.$db->convert_html_chars($row->bezeichnung),'</OPTION>';
 	}
 	echo '
 				</select>
 			</td>
-			<td><input type="text" name="url" size="60" maxlength="1024" value="'.$db->convert_html_chars($fb->url).'"/></td>
+			<td><input type="text" id="url" name="url" size="60" maxlength="1024" value="'.$db->convert_html_chars($fb->url).'"/></td>
 			<td><input type="checkbox" name="aktiv" '.($fb->aktiv?'checked="checked"':'').' /></td>
 			<td><input type="submit" value="'.$p->t('global/speichern').'" /></td>
 		</tr>
