@@ -1071,7 +1071,7 @@ if(isset($do_search) || $do_excel)
 		if(!isset($do_search))
 			echo '<br>'.$p->t("personensuche/bitteSuchbegriffEingeben").'.';
 		else if($num_rows > 0)
-			echo '<br>'.$p->t("personensuche/esWurden") .'&nbsp' .$num_rows. '&nbsp'.$p->t("personensuche/eintraegeGefunden");
+			echo '<br>'.$p->t("personensuche/esWurden") .'&nbsp;' .$num_rows. '&nbsp;'.$p->t("personensuche/eintraegeGefunden");
 		else if(isset($do_search))
 			echo '<br>'.$p->t("personensuche/keineEintraegeGefunden");
 ?>
