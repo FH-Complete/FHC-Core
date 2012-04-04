@@ -5,17 +5,26 @@ require_once '../include/sabredav/lib/Sabre/autoload.php';
 require_once 'auth.class.php';
 require_once 'Caldav_Backend.php';
 require_once('Principal.php');
-
+/*
+//PHP Error To Exception
+function exception_error_handler($errno, $errstr, $errfile, $errline ) {
+    throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+}
+set_error_handler("exception_error_handler");
+*/
 // Backends
 $authBackend = new myAuth();
 $principalBackend = new MySabre_DAVACL_PrincipalBackend($authBackend);
 $calendarBackend = new MySabre_CalDAV_Backend($authBackend);
 
-$tree = array(
+/*$tree = array(
 	new Sabre_DAVACL_PrincipalCollection($principalBackend),
 	new Sabre_CalDAV_CalendarRootNode($principalBackend, $calendarBackend)
-);      
-
+);*/
+$tree = array(
+	new Sabre_CalDAV_Principal_Collection($principalBackend),
+	new Sabre_CalDAV_CalendarRootNode($principalBackend, $calendarBackend)
+);
 
 // The object tree needs in turn to be passed to the server class
 $server = new Sabre_DAV_Server($tree);
