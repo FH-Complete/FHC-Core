@@ -38,8 +38,9 @@ class freebusy extends basis_db
 	public $insertvon;
 	public $updateamum;
 	public $updatevon;
-	
+		
 	public $beschreibung;
+	public $url_vorlage;
 	
 	/**
 	 * Konstruktor
@@ -152,6 +153,7 @@ class freebusy extends basis_db
 				$this->freebusytyp_kurzbz = $row->freebusytyp_kurzbz;
 				$this->bezeichnung = $row->bezeichnung;
 				$this->beschreibung = $row->beschreibung;
+				$this->url_vorlage = $row->url_vorlage;
 				return true;
 			}
 			else
@@ -183,6 +185,7 @@ class freebusy extends basis_db
 				$obj->freebusytyp_kurzbz = $row->freebusytyp_kurzbz;
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->beschreibung = $row->beschreibung;
+				$obj->url_vorlage = $row->url_vorlage;
 				
 				$this->result[] = $obj;
 			}
