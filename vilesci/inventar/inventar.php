@@ -421,7 +421,7 @@ if (!$uid = get_uid())
 					</td>
 
 					<td><label for="ort_kurzbz">Ort</label>&nbsp;
-						<input id="ort_kurzbz" name="ort_kurzbz" size="10" maxlength="40" value="<?php echo $ort_kurzbz;?>">&nbsp;
+						<input id="ort_kurzbz" name="ort_kurzbz" size="16" maxlength="40" value="<?php echo $ort_kurzbz;?>">&nbsp;
 						<script type="text/javascript">
 						$(document).ready(function() 
 						{
@@ -1024,17 +1024,19 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 						<th align="right">Hersteller&nbsp;:&nbsp;</th>
 						<td>'.$resBetriebsmittel->hersteller.'</td>
 					</tr>';
-
-			if ($info=$resBetriebsmittel->verwendung.($resBetriebsmittel->verwendung?'<br>':'').$resBetriebsmittel->anmerkung)
-			{
-				$htmlstring.='<tr>
+			
+			$htmlstring.='<tr>
+						<th align="right" valign="top">Anmerkung&nbsp;:&nbsp;</th>
+						<td colspan="3">'.$resBetriebsmittel->anmerkung.'</td>
+						</tr>';
+			
+			$htmlstring.='<tr>
 						<th align="right" valign="top">Verwendung&nbsp;:&nbsp;</th>
-						<td colspan="3">'.$info.'</td>
+						<td colspan="3">'.$resBetriebsmittel->verwendung.'</td>
 						<th align="right">Leasing bis&nbsp;:&nbsp;</th>
 						<td>'.$datum_obj->formatDatum($resBetriebsmittel->leasing_bis,'d.m.Y').'</td>
 					</tr>';
-			}
-
+			
 			$htmlstring.='<tr><td>&nbsp;</td></tr>';
 
 			$htmlstring.='<tr>';
