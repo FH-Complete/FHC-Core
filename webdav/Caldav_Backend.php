@@ -1,5 +1,7 @@
 <?php
 require_once(dirname(__FILE__).'/../include/wochenplan.class.php');
+require_once(dirname(__FILE__).'/../include/functions.inc.php');
+require_once(dirname(__FILE__).'/../include/mitarbeiter.class.php');
 /**
  * CalDAV backend
  */
@@ -43,7 +45,8 @@ class MySabre_CalDAV_Backend extends Sabre_CalDAV_Backend_Abstract
     public function getCalendarsForUser($principalUri) 
 	{
 		//error_log("Caldav_Backend.php/getCalendarsForUser($principalUri)");
-		$user = $this->getUser();
+		//$user = $this->getUser();
+		$user = mb_substr($principalUri,11);
         $calendars = array();
 		$calendar = array(
                 'id' => $user,
@@ -115,7 +118,6 @@ class MySabre_CalDAV_Backend extends Sabre_CalDAV_Backend_Abstract
      */
     public function updateCalendar($calendarId, array $mutations) 
 	{
-
         return false;
     }
 
@@ -130,8 +132,10 @@ class MySabre_CalDAV_Backend extends Sabre_CalDAV_Backend_Abstract
 		throw new Sabre_DAV_Exception('Not Implemented');
     }
 
+	
 	public function getCalendarData($user, $objectUri=null)
 	{
+		$starttime = microtime(true);
 		$bn = new benutzer();
 		if(!$bn->load($user))
 			die('User invalid');
@@ -169,8 +173,7 @@ class MySabre_CalDAV_Backend extends Sabre_CalDAV_Backend_Abstract
 		}
 		else
 		{
-			//TODO Datum eventuell anpassen derzeit nur aktuell +/- 6 Monate
-			$begin = mktime(0,0,0,date('m')-6,date('d'),date('Y'));
+			$begin = mktime(0,0,0,date('m'),date('d')-14,date('Y'));
 			$ende = mktime(0,0,0,date('m')+6,date('d'),date('Y'));
 		}
 		$db_stpl_table = 'stundenplan';
@@ -198,11 +201,9 @@ class MySabre_CalDAV_Backend extends Sabre_CalDAV_Backend_Abstract
 			{
 				foreach($val as $row)
 				{
-			//		error_log("search dtstart:".$dtstart." unr:".$unr);
-			//		error_log("row dtstart:".$row['dtstart']." unr:".$row['unr'][0]);
+					//einzelnen Eintrag holen
 					if($row['dtstart']==$dtstart && $row['unr'][0]==$unr)
 					{
-						error_log("found!");
 						return $row;
 					}
 				}
@@ -210,7 +211,8 @@ class MySabre_CalDAV_Backend extends Sabre_CalDAV_Backend_Abstract
 			else
 				$data=array_merge($data, $val);
 		}
-
+		$endtime = microtime(true);
+		//error_log("getCalendarData time:".($endtime-$starttime));
 		//$data.="\nEND:VCALENDAR";
 		return $data;	
 	}
@@ -265,7 +267,7 @@ END:VTIMEZONE\n".$event."\nEND:VCALENDAR";
 		$user = $calendarId;
 		$data = $this->getCalendarData($user);
 
-		//error_log("Caldav_Backend.php/getCalendarObjects($calendarId) data:".print_r($data,true));
+		//error_log("Caldav_Backend.php/getCalendarObjects($calendarId) ");
 		$return  = array();
 		foreach($data as $row)
 		{
@@ -295,7 +297,8 @@ END:VTIMEZONE\n".$event."\nEND:VCALENDAR";
     public function getCalendarObject($calendarId,$objectUri) 
 	{
 		//error_log("Caldav_Backend.php/getCalendarObject($calendarId, $objectUri)");
-		$user = $this->getUser();
+		//$user = $this->getUser();
+		$user = $calendarId;
 		$data = $this->getCalendarData($user,$objectUri);
 		if(count($data)==0)
 		{

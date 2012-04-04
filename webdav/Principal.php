@@ -31,6 +31,7 @@ class MySabre_DAVACL_PrincipalBackend implements Sabre_DAVACL_IPrincipalBackend
      */
     protected $groupMembersTableName;
 
+	protected $result_ma;
     /**
      * Sets up the backend.
      * 
@@ -40,6 +41,9 @@ class MySabre_DAVACL_PrincipalBackend implements Sabre_DAVACL_IPrincipalBackend
     public function __construct($auth)
 	{
 		$this->auth = $auth;
+
+		$ma = new mitarbeiter();
+		$this->result_ma = $ma->getMitarbeiter(null,null,null);
     } 
 
 	/**
@@ -73,26 +77,54 @@ class MySabre_DAVACL_PrincipalBackend implements Sabre_DAVACL_IPrincipalBackend
 		//error_log('Principal.php/getPrincipalsByPrefix('.$prefixPath.')');
         $principals = array();
 		$user = $this->getUser();
+
 		if($prefixPath=='principals')
 		{
+			
 		    $principals[] = array(
-					'id' => 1,
+					'id' => $user,
 		            'uri' => 'principals/'.$user,
 		            '{DAV:}displayname' => $user,
 		            '{http://sabredav.org/ns}email-address' => $user.'@example.com',
 		        );
-		}
-		elseif($prefixPath=='principals/oesi')
-		{
-		    $principals[] = array(
-					'id' => 2,
+/*			$principals[] = array(
+					'id' => $user.'proxyread',
 		            'uri' => 'principals/'.$user.'/calendar-proxy-read',
 		            '{DAV:}displayname' => '',
 		            '{http://sabredav.org/ns}email-address' => '',
+		        );*/
+			//$ma = new mitarbeiter();
+			//$result = $ma->getMitarbeiter(null,null,null);
+/*
+			$i=0;
+			foreach($this->result_ma as $row)
+			{
+				$i++;
+				//if($i>10)
+				//	break;
+				if($row->uid==$user)
+					continue;
+			    $principals[] = array(
+					'id' => $row->uid,
+		            'uri' => 'principals/'.$row->uid,
+		            '{DAV:}displayname' => $row->uid,
+		            '{http://sabredav.org/ns}email-address' => $row->uid.'@example.com',
 		        );
+				$principals[] = array(
+					'id' => $row->uid.'proxyread',
+		            'uri' => 'principals/'.$row->uid.'/calendar-proxy-read',
+		            '{DAV:}displayname' => '',
+		            '{http://sabredav.org/ns}email-address' => '',
+		        );
+				
+			}*/
+		}
+		else //if($prefixPath=='principals/oesi')
+		{
+			$user = mb_substr($path,11);
 		    $principals[] = array(
-					'id' => 3,
-		            'uri' => 'principals/'.$user.'/calendar-proxy-write',
+					'id' => $user.'proxyread',
+		            'uri' => 'principals/'.$user.'/calendar-proxy-read',
 		            '{DAV:}displayname' => '',
 		            '{http://sabredav.org/ns}email-address' => '',
 		        );
@@ -114,7 +146,9 @@ class MySabre_DAVACL_PrincipalBackend implements Sabre_DAVACL_IPrincipalBackend
 	{
 		//$path = principals/oesi
 		//error_log('Principal.php/getPrincipalByPath('.$path.')');
-		$user = $this->getUser();
+		//$user = $this->getUser();
+		$user = mb_substr($path,11);
+		//error_log('user: '.$user);
         $result = array(
             'id'  => $user,
             'uri' => 'principals/'.$user,
@@ -150,7 +184,25 @@ class MySabre_DAVACL_PrincipalBackend implements Sabre_DAVACL_IPrincipalBackend
     public function getGroupMembership($principal) 
 	{
 		//$principal = username
+//		error_log('Principal.php/getGroupMembership('.$principal.')');
 		$result = array();
+		if(preg_match('/^principals\/[0-9A-Za-z\-]*$/',$principal))
+		{
+			$user = mb_substr($principal,11);
+			//$ma = new mitarbeiter();
+			//$result_ma = $ma->getMitarbeiter(null,null,null);
+			$i=0;
+			foreach($this->result_ma as $row)
+			{
+				$i++;
+				//if($i>10)
+				//	break;
+				if($row->uid==$user)
+					continue;
+
+				$result[]='principals/'.$row->uid.'/calendar-proxy-read';
+			}
+		}
         return $result;
 
     }
