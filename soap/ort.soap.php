@@ -115,7 +115,7 @@ function getOrtFromKurzbz($ort_kurzbz, $authentifizierung)
  INSERT INTO system.tbl_webservicerecht(berechtigung_kurzbz, methode, attribut) VALUES('soap/ort','getRaeume','reservieren');
  INSERT INTO system.tbl_webservicerecht(berechtigung_kurzbz, methode, attribut) VALUES('soap/ort','getRaeume','stockwerk');
  */
-function getRaeume($authentifizierung)
+function getRaeume($raumtyp_kurzbz=null, $authentifizierung)
 {
     $user = $authentifizierung->username; 
     $passwort = $authentifizierung->passwort;
@@ -131,8 +131,8 @@ function getRaeume($authentifizierung)
    
     // Daten für Lehrveranstaltung
     $ort = new ort();
-    if(!$ort->getAll())
-        return new SoapFault("Server", "Error loading Data");	
+    if(!$ort->getAll($raumtyp_kurzbz))
+        return new SoapFault("Server", "Error loading Data:".$ort->errormsg);	
 
     $return = array();
     class foo{}; 

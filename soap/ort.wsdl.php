@@ -49,6 +49,7 @@ echo "<?xml version='1.0' encoding='utf-8' ?>";
     </s:complexType>
 
 	<wsdl:message name="GetRaeumeRequest">
+		<wsdl:part minOccurs="0" maxOccurs="1" name="raumtyp_kurzbz" type="s:string"/>
         <wsdl:part minOccurs="0" maxOccurs="1" name="authentifizierung" type="tns:GetAuthentifizierung"/>
     </wsdl:message>
     
