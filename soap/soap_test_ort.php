@@ -118,6 +118,10 @@ if(!check_lektor($getuid))
 	                    <td><input id="passwort" name="passwort" type="password" size="30" maxlength="255" value="'.(isset($_REQUEST['passwort']) ? $_REQUEST['passwort'] : "").'"></td>
 	                </tr>
 	                <tr>
+	                    <td align="right">Raumtyp:</td>
+	                    <td><input id="raumtyp_kurzbz" name="raumtyp_kurzbz" type="text" size="30" maxlength="255" value="'.(isset($_REQUEST['raumtyp_kurzbz']) ? $_REQUEST['raumtyp_kurzbz'] : "").'"></td>
+	                </tr>
+	                <tr>
 	                    <td align="right"></td>
 	                    <td>
 	                        <input type="submit" value="Absenden (PHP)" name="submit">
@@ -141,13 +145,16 @@ if(!check_lektor($getuid))
 	        {
 	        	user = document.getElementById("username").value;
 	        	passwort = document.getElementById("passwort").value;
+	        	raumtyp_kurzbz = document.getElementById("raumtyp_kurzbz").value;
 	        		        	
 	            var soapBody = new SOAPObject("getRaeume");
 	            var authentifizierung = new SOAPObject("authentifizierung");
 	            authentifizierung.appendChild(new SOAPObject("username")).val(user);
 	            authentifizierung.appendChild(new SOAPObject("passwort")).val(passwort);
 	
+	            soapBody.appendChild(new SOAPObject("raumtyp_kurzbz")).val(raumtyp_kurzbz);
 	            soapBody.appendChild(authentifizierung);
+	            
 	
 	            var sr = new SOAPRequest("getRaeume",soapBody);
 	            SOAPClient.Proxy="'.APP_ROOT.'/soap/ort.soap.php?"+gettimestamp();
@@ -316,7 +323,8 @@ if(isset($_REQUEST['submit']) && $_GET['method']=='getRaeume')
         $authentifizierung = new foo();
         $authentifizierung->username=$_REQUEST['username'];
         $authentifizierung->passwort=$_REQUEST['passwort'];
-        $response = $client->getRaeume($authentifizierung);
+        $raumtyp_kurzbz=(isset($_REQUEST['raumtyp_kurzbz'])?$_REQUEST['raumtyp_kurzbz']:null);
+        $response = $client->getRaeume($raumtyp_kurzbz,$authentifizierung);
 		
 		var_dump($response);
 	}

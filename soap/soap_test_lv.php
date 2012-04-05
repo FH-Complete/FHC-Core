@@ -148,8 +148,8 @@ if(!check_lektor($getuid))
         {
             var soapBody = new SOAPObject("getLehrveranstaltungFromId");
             var authentifizierung = new SOAPObject("authentifizierung");
-            authentifizierung.appendChild(new SOAPObject("username")).val("burkhart");
-            authentifizierung.appendChild(new SOAPObject("passwort")).val("R3sid3nt");
+            authentifizierung.appendChild(new SOAPObject("username")).val("foo");
+            authentifizierung.appendChild(new SOAPObject("passwort")).val("bar");
 
             soapBody.appendChild(new SOAPObject("lehrveranstaltung_id")).val("222");
             soapBody.appendChild(new SOAPObject("semester")).val("");
