@@ -57,7 +57,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/mantisdetail.overlay.xul.p
 				<toolbarbutton id="projekttask-toolbar-refresh" label="Aktualisieren" oncommand="TaskTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 				<toolbarbutton anonid="toolbarbutton-notiz-filter" label="Filter " type="menu">							
 					<menupopup>
-						<menuitem label="Erledigte Tasks" type="radio" name="sort" oncommand="LoadTasks(currentProjektPhaseID,'erledigt')" tooltiptext="Erledigte Tasks anzeigen"/>
+                        <menuitem label="Erledigte Tasks" type="radio" name="sort" oncommand="LoadTasks(currentProjektPhaseID,'erledigt')" tooltiptext="Erledigte Tasks anzeigen"/>
 						<menuitem label="Offene Tasks" type="radio" name="sort" oncommand="LoadTasks(currentProjektPhaseID,'offen')" tooltiptext="Offene Tasks anzeigen"/>
 						<menuitem label="Alle Tasks" type="radio" name="sort" oncommand="LoadTasks(currentProjektPhaseID,'alle')" tooltiptext="Alle Tasks anzeigen"/>
 				      </menupopup>
