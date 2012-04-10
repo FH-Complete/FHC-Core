@@ -29,22 +29,10 @@ require_once('../../include/person.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/pruefling.class.php');
 require_once('../../include/studiengang.class.php');
-require_once('../../include/benutzerberechtigung.class.php');
 
 session_start();
 $reload=false;
 $reload_parent=false;
-
-
-$user=get_uid();
-$rechte = new benutzerberechtigung();
-$rechte->getBerechtigungen($user);
-
-if(!$rechte->isBerechtigt('user', null, 's'))
-	die('Sie haben keine Berechtigung fuer diese Seite');
-
-
-
 
 if (isset($_GET['logout']))
 {
