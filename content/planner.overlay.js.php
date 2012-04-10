@@ -279,7 +279,7 @@ function ProjektmenueRefresh()
 		datasourceTreeProjektmenue = rdfService.GetDataSource(url);
 		datasourceTreeProjektmenue.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 		treeProjektmenue.database.AddDataSource(datasourceTreeProjektmenue);
-        document.getElementById('toolbarbutton-projektmenue-label-filter').value='Alle Projekte';
+        SetStatusBarText('Filter: Alle Projekte');
                 
 	}
 	catch(e)
@@ -313,7 +313,7 @@ function ProjektmenueRefreshAktuell()
 		datasourceTreeProjektmenue = rdfService.GetDataSource(url);
 		datasourceTreeProjektmenue.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 		treeProjektmenue.database.AddDataSource(datasourceTreeProjektmenue);
-        document.getElementById('toolbarbutton-projektmenue-label-filter').value='Aktuelle Projekte';
+        SetStatusBarText('Filter: Aktuelle Projekte');
 	}
 	catch(e)
 	{
@@ -346,7 +346,7 @@ function ProjektmenueRefreshAktuellKommende()
 		datasourceTreeProjektmenue = rdfService.GetDataSource(url);
 		datasourceTreeProjektmenue.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 		treeProjektmenue.database.AddDataSource(datasourceTreeProjektmenue);
-        document.getElementById('toolbarbutton-projektmenue-label-filter').value='Aktuelle/Kommende Projekte';
+        SetStatusBarText('Filter: Aktuelle und Kommende Projekte');
         
                 
 	}
