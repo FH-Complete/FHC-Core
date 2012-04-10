@@ -31,15 +31,19 @@ if(isset($_REQUEST['projekt']) || isset($_REQUEST['oe']))
 else
 	die ('Kein Projekt oder OE übergeben!');
 	
+
+if(isset($_REQUEST['beginn']) && isset($_REQUEST['ende']))
+{
+    $beginn = $_REQUEST['beginn']; 
+    $ende = $_REQUEST['ende']; 
+}
+
 if(isset($_REQUEST['studienjahr']))
 	$studienjahr = $_REQUEST['studienjahr'];
-else
-	die ('Kein Studienjahr übergeben');
 	
 if(isset($_REQUEST['ansicht']))
 	$ansicht = $_REQUEST['ansicht'];
-else
-	die('es wurde keine Ansicht mitübergeben');
+
 
 // header für no cache
 header("Cache-Control: no-cache");
@@ -62,10 +66,195 @@ if($projekt_kurzbz != '')
 }
 else 
 {
-	// Zeichne alle Projekte der übergebenen OE
-	getOeGantt(); 
-		
+    if(!isset($_REQUEST['beginn']))
+        getOeGantt(); 
+	else
+        getOeGanttZeitraum($beginn, $ende); 
 }
+
+function getOeGanttZeitraum($beginn, $ende)
+{
+   	global $oe; 
+    $datum = new datum(); 
+    $widthPerWeek = 16;
+	$startX =50;
+	$startY = 90;
+    $split_date_beginn = explode('.', $beginn);
+    $split_date_ende = explode('.', $ende);
+    $timestampZeitraum_beginn = mktime(0,0,0,$split_date_beginn[1],$split_date_beginn[0], $split_date_beginn[2]); 
+    $timestampZeitraum_ende = mktime(0,0,0,$split_date_ende[1],$split_date_ende[0], $split_date_ende[2]); 
+    
+    $cw = getCwRange($timestampZeitraum_beginn, $timestampZeitraum_ende); 
+    $anzahlKw = count($cw); 
+    $beginn = $datum->formatDatum($beginn, 'Y-m-d');
+    $ende = $datum->formatDatum($ende, 'Y-m-d');
+    
+    $projekt = new projekt(); 
+    if(!$projekt->getProjekteInZeitraum($beginn, $ende, $oe))
+        die('Fehler beim laden der Projekte aufgetreten');
+    
+    $height = (count($projekt->result)) * 50; 
+        
+    echo '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+		<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+		"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">';
+		
+		echo '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+		width="100%" height="100%" viewBox="0 0 750 700">
+		<rect x="'.$startX.'" y="'.$startY.'" width="'.($anzahlKw*$widthPerWeek).'" height="'.$height.'"
+		style="color:#000000;fill:none;stroke:#e1e1e1;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />';
+		
+		// Überschriften
+		echo'<text x="15%" y="40" style="font-size:25px">Projekte zwischen '.$beginn.' und '.$ende.'</text>';
+		echo'<text x="'.($startX-10).'" y="'.($startY-5).'" style="font-size:13px" text-anchor="end"> KW:</text>';
+		
+		// Zeichne Raster
+		for($i=1; $i<=$anzahlKw; $i++)
+		{
+			$x1 = $startX + $i*$widthPerWeek;	
+			echo '<line x1="'.$x1.'" y1="'.$startY.'" x2="'.$x1.'" y2="'.($height+$startY).'" style="stroke:#e1e1e1; stroke-width:2px;" />';
+			if($i%2 == 1)
+				echo '<text x="'.($x1-$widthPerWeek).'" y="'.($startY-5).'" style="font-size:13px">'.$cw[$i-1]['week'].'</text>';
+		}
+        
+        $i=0;
+		foreach($projekt->result as $projekt)
+		{
+			$width = 0;
+			$x = 0;
+			// wenn kein start oder ende angegeben -> nichts zeichnen -> width=0
+			if($projekt->beginn != '' && $projekt->ende != '')
+			{
+				$timestamp_beginn = $datum->mktime_fromdate($projekt->beginn);
+				$timestamp_end = $datum->mktime_fromdate($projekt->ende);
+				$kw_beginn = kalenderwoche($timestamp_beginn);
+				$kw_end = kalenderwoche($timestamp_end);
+				
+				$year_beginn=date("Y",$timestamp_beginn);
+				$year_end=date("Y",$timestamp_end);
+                
+                $cw_projekt = getCwRange($timestamp_beginn, $timestamp_end); 
+                $anzahlKwProjekt = count($cw_projekt); 
+                
+                // Projekt beginnt und endet in aktuellem Zeitraum //stimmt
+                if($timestamp_beginn >= $timestampZeitraum_beginn && $timestamp_end <= $timestampZeitraum_ende)
+                {
+                    $help = $kw_beginn-$cw[0]['week'];
+                    $x = ($startX + $help*$widthPerWeek);
+                    $width = $anzahlKwProjekt*$widthPerWeek; 
+                }
+                // Projekt beginnt im und endet nach Zeitraum // stimmt
+                if($timestamp_beginn>$timestampZeitraum_beginn && $timestamp_end > $timestampZeitraum_ende)
+                {
+                    $cw_help = getCwRange($timestampZeitraum_beginn, $timestamp_beginn);
+                    $cw_help_anzahl = count($cw_help); // Anzahl der Wochen zwischen Zeitraumbeginn und Projektbeginn
+                    
+                    $x = $startX+($cw_help_anzahl*$widthPerWeek);
+                    $width = ($anzahlKw- $cw_help_anzahl)*$widthPerWeek;  
+                }                
+                // Projekt beginnt vor und endet im Zeitraum
+                if($timestamp_beginn < $timestampZeitraum_beginn && $timestamp_end < $timestampZeitraum_ende)
+                {
+                    $cw_help = getCwRange($timestampZeitraum_beginn, $timestamp_end);
+                    $cw_help_anzahl = count($cw_help); // Anzahl der Wochen zwischen Zeitraumbeginn und Projektbeginn
+                    
+                    $x = $startX;
+                    $width = ($cw_help_anzahl)*$widthPerWeek; 
+                }
+                // Projekt beginnt vor und endet nach Zeitraum
+                if($timestamp_beginn <= $timestampZeitraum_beginn && $timestamp_end >= $timestampZeitraum_ende)
+                {
+                    $x = $startX;
+                    $width = $anzahlKw *$widthPerWeek; 
+                }
+			}
+		
+			// zeichne balken
+			echo '<rect x="'.$x.'" y="'.($startY+10+$i*50).'" width ="'.$width.'" height ="30" fill="'.$projekt->farbe.'" stroke="black" />';
+			echo'<text x="'.($startX-10).'" y="'.($startY+30+$i*50).'" style="font-size:15px" text-anchor="end">'.$projekt->titel.'</text>';
+            
+            // Zeichne Phasen in Projektbalken
+            $projektphasen = new projektphase(); 
+            $projektphasen->getProjektphasen($projekt->projekt_kurzbz);
+            foreach($projektphasen->result as $phase)
+            {
+                $width = 0;
+                $x = 0;
+                // wenn kein start oder ende angegeben -> nichts zeichnen -> width=0
+                if($phase->start != '' && $phase->ende != '')
+                {
+                    $timestamp_beginn = $datum->mktime_fromdate($phase->start);
+                    $timestamp_end = $datum->mktime_fromdate($phase->ende);
+                    $kw_beginn = kalenderwoche($timestamp_beginn);
+                    $kw_end = kalenderwoche($timestamp_end);
+
+                    $year_beginn=date("Y",$timestamp_beginn);
+                    $year_end=date("Y",$timestamp_end);
+                    
+                    $cw_projekt = getCwRange($timestamp_beginn, $timestamp_end); 
+                    $anzahlKwProjekt = count($cw_projekt); 
+                    
+                    // Projekt beginnt und endet in aktuellem Zeitraum //stimmt
+                    if($timestamp_beginn > $timestampZeitraum_beginn && $timestamp_end < $timestampZeitraum_ende)
+                    {
+                        $cw_help = getCwRange($timestampZeitraum_beginn, $timestamp_beginn);
+                        $cw_help_anzahl = count($cw_help); // Anzahl der Wochen zwischen Zeitraumbeginn und Projektbeginn                       
+                        
+                        $x = $startX+($cw_help_anzahl*$widthPerWeek);
+                        $width = $anzahlKwProjekt*$widthPerWeek; 
+                    }
+                    // Projekt beginnt im und endet nach Zeitraum // stimmt
+                    if($timestamp_beginn>$timestampZeitraum_beginn && $timestamp_end > $timestampZeitraum_ende)
+                    {
+                        $cw_help = getCwRange($timestampZeitraum_beginn, $timestamp_beginn);
+                        $cw_help_anzahl = count($cw_help); // Anzahl der Wochen zwischen Zeitraumbeginn und Projektbeginn
+
+                        $x = $startX+($cw_help_anzahl*$widthPerWeek);
+                        $width = ($anzahlKw- $cw_help_anzahl)*$widthPerWeek;  
+                    }                
+                    // Projekt beginnt vor und endet im Zeitraum
+                    if($timestamp_beginn < $timestampZeitraum_beginn && $timestamp_end < $timestampZeitraum_ende && $timestamp_end > $timestampZeitraum_beginn)
+                    {
+                        $cw_help = getCwRange($timestampZeitraum_beginn, $timestamp_end);
+                        $cw_help_anzahl = count($cw_help); // Anzahl der Wochen zwischen Zeitraumbeginn und Projektbeginn
+
+                        $x = $startX;
+                        $width = ($cw_help_anzahl)*$widthPerWeek; 
+                        
+                    }
+                    // Projekt beginnt vor und endet nach Zeitraum
+                    if($timestamp_beginn <= $timestampZeitraum_beginn && $timestamp_end >= $timestampZeitraum_ende)
+                    {
+                        $x = $startX;
+                        $width = $anzahlKw *$widthPerWeek; 
+                    }
+                   
+                }
+                // zeichne phasenbalken
+                echo '<rect x="'.$x.'" y="'.($startY+10+$i*50).'" width ="'.$width.'" height ="10" fill="'.$phase->farbe.'" stroke="black" />';
+            }
+            $i++;
+		}
+        echo'<text x="10%" y="'.((($i+1)*50)+$startY).'" style="font-size:16px">Organisationseinheit: '.$projekt->oe_kurzbz.'</text>';
+        echo '</svg>';
+}
+
+function getCwRange($start, $end) 
+{ 
+	if($start > $end) {
+		throw new InvalidArgumentException('Falsche Reihenfolge der Argumente');
+	}
+ 
+	$duration = ceil(($end-$start)/3600/24/7);
+ 
+	for($i = 0; $i < $duration; ++$i) {
+		$week = mktime(0, 0, 0, date('m', $start), date('d', $start)+($i*7), date('Y', $start));
+		$cw[$i]['week'] = date('W', $week);
+		$cw[$i]['year'] = date('Y', $week);
+	}
+	return $cw;
+}
+
 
 /**
  * 
