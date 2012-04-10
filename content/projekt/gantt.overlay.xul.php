@@ -39,7 +39,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	<vbox id="box-ganttx" flex="1">
 		<toolbox>
 			<toolbar id="toolbar-bestellung-main">
-				
 				<toolbarbutton id="toolbarbutton-notiz-filter" label="Ansicht " type="menu">							
 					<menupopup>
 						<menuitem id="toolbarbutton-menuitem-gantt-studienjahr" label="Studienjahr" type="radio" name="sort" oncommand="drawGantt()" tooltiptext="Anzeige Studienjahr" checked="true"/>
@@ -47,11 +46,16 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				      </menupopup>
 				</toolbarbutton>
 				<toolbarbutton id="toolbarbutton-gantt-zurueck" label="" oncommand="showYearMinus();" disabled="false" image="../skin/images/left.png" tooltiptext="Jahr zurück"/>
-				<toolbarbutton id="toolbarbutton-gantt-vor" label="Jahr" oncommand="showYear();" disabled="false" tooltiptext="aktuelles Jahr"/>
+				<toolbarbutton id="toolbarbutton-gantt-jahr" label="Jahr" oncommand="showYear();" disabled="false" tooltiptext="aktuelles Jahr"/>
 				<toolbarbutton id="toolbarbutton-gantt-vor" label="" oncommand="showYearPlus();" disabled="false" image="../skin/images/right.png" tooltiptext="Jahr vor"/>
 				<toolbarbutton id="toolbarbutton-gantt-drucken" label="Drucken" oncommand="printGantt();" image="../skin/images/drucken.png" tooltiptext="Drucken"/>
-			</toolbar>
+                <label value="Beginn:" control="toolbarbutton-gantt-label-beginn"/>
+                <box class="Datum" id="toolbarbutton-gantt-beginn"  disabled="false"/>
+                <label value="Ende:" control="toolbarbutton-gantt-label-ende"/>
+                <box class="Datum" id="toolbarbutton-gantt-ende"  disabled="false"/>      
+                <toolbarbutton id="toolbarbutton-gantt-anzeigen" label="anzeigen" oncommand="showZeitraum(document.getElementById('toolbarbutton-gantt-beginn').value, document.getElementById('toolbarbutton-gantt-ende').value)" disabled="false" tooltiptext="Zeite Zeitraum"/>
+            </toolbar>
 		</toolbox>
-			<iframe id="iframe-ressource-projekt" flex="5" src="" />
+        <iframe id="iframe-ressource-projekt" flex="5" src="" />
 	</vbox> 
 </overlay>
