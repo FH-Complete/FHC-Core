@@ -108,6 +108,36 @@ function showKalenderjahr()
 	document.getElementById('iframe-ressource-projekt').contentWindow.location.href=url;	
 }
 
+function showZeitraum(beginn, ende)
+{
+    if(beginn != '' && ende != '')
+    {
+    	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+        var tree=document.getElementById('tree-projektmenue');
+        
+        // Wenn auf die Ueberschrift geklickt wird, soll nix passieren
+        if(tree.currentIndex==-1)
+        {
+            alert("Kein gültiges Projekt ausgewählt!");
+            return;
+        }	
+        
+        projekt_kurzbz=getTreeCellText(tree, "treecol-projektmenue-projekt_kurzbz", tree.currentIndex);
+        if(projekt_kurzbz == '')
+        {
+            oe_kurzbz = getTreeCellText(tree, "treecol-projektmenue-oe", tree.currentIndex); 
+            var url = 'projekt/gantt.svg.php?oe='+oe_kurzbz+'&beginn='+beginn+'&ende='+ende;
+            global_url = url; 
+        }
+
+        global_url = url;
+        document.getElementById('iframe-ressource-projekt').contentWindow.location.href=url;	
+    }
+    else
+        alert('kein gültiges Datum eingetragen');
+    
+}
+
 function showYear()
 {
 	var datumAktuell = new Date();
