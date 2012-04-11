@@ -112,7 +112,7 @@ class projekt extends basis_db
         
         
         if(!is_null($oe))
-            $qry.= ' AND oe_kurzbz='.$this->db_add_param ($oe);
+            $qry.= ' AND oe_kurzbz='.$this->db_add_param($oe);
         
         $qry.= ' ORDER BY oe_kurzbz;';
         if($this->db_query($qry))
@@ -141,6 +141,48 @@ class projekt extends basis_db
 			return false;
 		}
     }
+    
+    /**
+     * Laedt alle Projekte die zwischen beginn und ende liegen
+     * @param $beginn 
+     * @param $ende 
+     * @param $oe 
+     * @return boolean 
+     */
+    public function getProjekteInZeitraum($beginn, $ende, $oe=null)
+    {
+		$qry = 'select * from fue.tbl_projekt where beginn <= '.$this->db_add_param($ende).' and ende >= '.$this->db_add_param($beginn);
+		if (!is_null($oe))
+			$qry.= " AND oe_kurzbz='".addslashes($oe)."'";
+		$qry.= ' ORDER BY oe_kurzbz;';
+		//echo $qry;
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new projekt();
+				
+				$obj->projekt_kurzbz = $row->projekt_kurzbz;
+				$obj->nummer = $row->nummer;
+				$obj->titel = $row->titel;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->beginn = $row->beginn;
+				$obj->ende = $row->ende;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->budget = $row->budget;
+                $obj->farbe = $row->farbe;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+    }
+    
     
 	/**
 	 * Laedt die Projeke einer Organisationseinheit
