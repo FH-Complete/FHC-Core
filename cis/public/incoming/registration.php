@@ -274,6 +274,13 @@ function sendMail($zugangscode, $email)
 	else
 		$msg= $p->t('global/emailgesendetan')." $email!<br>";
 	
+    // sende Nachricht an Assistenz 
+    $emailtext= "Dies ist eine automatisch generierte E-Mail.<br><br>";
+    $emailtext.= "Es hat sich ein neuer Incoming am Campus International registriert.</b>"; 
+    $mail = new mail(MAIL_INTERNATIONAL, 'no-reply', 'New Incoming', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
+    $mail->setHTMLContent($emailtext); 
+    $mail->send(); 
+
 	return $msg; 
 }
 
