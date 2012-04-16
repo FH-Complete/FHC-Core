@@ -3395,6 +3395,160 @@ if(!@$db->db_query("SELECT url_vorlage FROM campus.tbl_freebusytyp LIMIT 1"))
 		echo 'Tabelle campus.tbl_freebusytyp Spalte url_vorlage hinzugefuegt!<br>';
 }
 
+// PreOutgoing
+if(!@$db->db_query("SELECT 1 from public.tbl_preoutgoing LIMIT 1"))
+{
+	$qry = "
+	CREATE TABLE public.tbl_preoutgoing
+	(
+		preoutgoing_id bigint NOT NULL,
+		uid varchar(32) NOT NULL,
+		dauer_von date,
+		dauer_bis date,
+		ansprechperson varchar(32),
+		bachelorarbeit boolean NOT NULL,
+		masterarbeit boolean NOT NULL,
+		betreuer varchar(256),
+		sprachkurs boolean NOT NULL,
+		intensivsprachkurs boolean NOT NULL,
+		sprachkurs_von date,
+		sprachkurs_bis date,
+		praktikum boolean NOT NULL,
+		praktikum_von date,
+		praktikum_bis date,
+		behinderungszuschuss boolean NOT NULL,
+		studienbeihilfe boolean NOT NULL,
+		insertamum timestamp,
+		insertvon varchar(32),
+		updateamum timestamp,
+		updatevon varchar(32)
+	);
+	
+	CREATE SEQUENCE public.seq_preoutgoing_preoutgoing_id
+ 	INCREMENT BY 1
+ 	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+	
+	ALTER TABLE public.tbl_preoutgoing ADD CONSTRAINT pk_preoutgoing PRIMARY KEY (preoutgoing_id);
+	ALTER TABLE public.tbl_preoutgoing ALTER COLUMN preoutgoing_id SET DEFAULT nextval('public.seq_preoutgoing_preoutgoing_id');
+	ALTER TABLE public.tbl_preoutgoing ADD CONSTRAINT fk_benutzer_preoutgoing FOREIGN KEY(uid) REFERENCES public.tbl_benutzer (uid) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE public.tbl_preoutgoing ADD CONSTRAINT fk_benutzer_preoutgoing_ansprechperson FOREIGN KEY(ansprechperson) REFERENCES public.tbl_benutzer (uid) ON DELETE RESTRICT ON UPDATE CASCADE;
+	
+	CREATE TABLE public.tbl_preoutgoing_lehrveranstaltung
+	(
+		preoutgoing_lehrveranstaltung_id bigint NOT NULL,
+		preoutgoing_id bigint NOT NULL,
+		bezeichnung varchar(256),
+		ects numeric(5,2),
+		endversion boolean NOT NULL,
+		insertamum timestamp,
+		insertvon varchar(256),
+		updateamum timestamp,
+		updatevon varchar(256)
+	);
+	
+	CREATE SEQUENCE public.seq_preoutgoing_lehrveranstaltung_preoutgoing_lehrveranstaltung_id
+ 	INCREMENT BY 1
+ 	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+	
+	ALTER TABLE public.tbl_preoutgoing_lehrveranstaltung ADD CONSTRAINT pk_preoutgoing_lehrveranstaltung PRIMARY KEY (preoutgoing_lehrveranstaltung_id);
+	ALTER TABLE public.tbl_preoutgoing_lehrveranstaltung ALTER COLUMN preoutgoing_lehrveranstaltung_id SET DEFAULT nextval('public.seq_preoutgoing_lehrveranstaltung_preoutgoing_lehrveranstaltung_id');
+	ALTER TABLE public.tbl_preoutgoing_lehrveranstaltung ADD CONSTRAINT fk_preoutgoing_preoutgoing_lehrveranstaltung FOREIGN KEY(preoutgoing_id) REFERENCES public.tbl_preoutgoing (preoutgoing_id) ON DELETE CASCADE ON UPDATE CASCADE;
+	
+	CREATE TABLE public.tbl_preoutgoing_status
+	(
+		preoutgoing_status_kurzbz varchar(32) NOT NULL,
+		bezeichnung varchar(256)
+	);
+	
+	ALTER TABLE public.tbl_preoutgoing_status ADD CONSTRAINT pk_preoutgoing_status PRIMARY KEY (preoutgoing_status_kurzbz);
+	
+	CREATE TABLE public.tbl_preoutgoing_preoutgoing_status
+	(
+		status_id bigint NOT NULL,
+		preoutgoing_status_kurzbz varchar(32) NOT NULL,
+		preoutgoing_id bigint NOT NULL,
+		datum date NOT NULL,
+		insertamum timestamp,
+		insertvon varchar(32),
+		updateamum timestamp,
+		updatevon varchar(32)
+	);		
+	
+	CREATE SEQUENCE public.seq_preoutgoing_preoutgoing_status_status_id
+ 	INCREMENT BY 1
+ 	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+	
+	ALTER TABLE public.tbl_preoutgoing_preoutgoing_status ADD CONSTRAINT pk_preoutgoing_preoutgoing_status PRIMARY KEY (status_id);
+	ALTER TABLE public.tbl_preoutgoing_preoutgoing_status ALTER COLUMN status_id SET DEFAULT nextval('public.seq_preoutgoing_preoutgoing_status_status_id');
+	ALTER TABLE public.tbl_preoutgoing_preoutgoing_status ADD CONSTRAINT fk_preoutgoing_status_preoutgoing_status FOREIGN KEY(preoutgoing_status_kurzbz) REFERENCES public.tbl_preoutgoing_status (preoutgoing_status_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE public.tbl_preoutgoing_preoutgoing_status ADD CONSTRAINT fk_preoutgoing_status_preoutgoing FOREIGN KEY(preoutgoing_id) REFERENCES public.tbl_preoutgoing (preoutgoing_id) ON DELETE CASCADE ON UPDATE CASCADE;
+	
+	CREATE TABLE public.tbl_preoutgoing_firma
+	(
+		preoutgoing_firma_id bigint NOT NULL,
+		preoutgoing_id bigint NOT NULL,
+		mobilitaetsprogramm_code bigint NOT NULL,
+		firma_id bigint,
+		name varchar(256),
+		auswahl boolean NOT NULL
+	);
+	
+	CREATE SEQUENCE public.seq_preoutgoing_firma_preoutgoing_firma_id
+ 	INCREMENT BY 1
+ 	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+	
+	ALTER TABLE public.tbl_preoutgoing_firma ADD CONSTRAINT pk_preoutgoing_firma PRIMARY KEY (preoutgoing_firma_id);
+	ALTER TABLE public.tbl_preoutgoing_firma ALTER COLUMN preoutgoing_firma_id SET DEFAULT nextval('public.seq_preoutgoing_firma_preoutgoing_firma_id');
+	ALTER TABLE public.tbl_preoutgoing_firma ADD CONSTRAINT fk_preoutgoing_firma_preoutgoing FOREIGN KEY(preoutgoing_id) REFERENCES public.tbl_preoutgoing (preoutgoing_id) ON DELETE CASCADE ON UPDATE CASCADE;
+	ALTER TABLE public.tbl_preoutgoing_firma ADD CONSTRAINT fk_preoutgoing_firma_mobilitaetsprogramm FOREIGN KEY(mobilitaetsprogramm_code) REFERENCES bis.tbl_mobilitaetsprogramm (mobilitaetsprogramm_code) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE public.tbl_preoutgoing_firma ADD CONSTRAINT fk_preoutgoing_firma_firma FOREIGN KEY(firma_id) REFERENCES public.tbl_firma (firma_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	
+	CREATE TABLE public.tbl_firma_mobilitaetsprogramm
+	(
+		firma_id integer NOT NULL,
+		mobilitaetsprogramm_code integer NOT NULL
+	);
+	
+	ALTER TABLE public.tbl_firma_mobilitaetsprogramm ADD CONSTRAINT pk_firma_mobilitaetsprogramm PRIMARY KEY (firma_id, mobilitaetsprogramm_code);
+	ALTER TABLE public.tbl_firma_mobilitaetsprogramm ADD CONSTRAINT fk_firma_firma_mobilitaetsprogramm FOREIGN KEY(firma_id) REFERENCES public.tbl_firma (firma_id) ON DELETE CASCADE ON UPDATE CASCADE;
+	ALTER TABLE public.tbl_firma_mobilitaetsprogramm ADD CONSTRAINT fk_mobilitaetsprogramm_firma_mobilitaetsprogramm FOREIGN KEY(mobilitaetsprogramm_code) REFERENCES bis.tbl_mobilitaetsprogramm (mobilitaetsprogramm_code) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+	ALTER TABLE bis.tbl_mobilitaetsprogramm ADD COLUMN sichtbar_outgoing boolean NOT NULL DEFAULT true;
+	
+	
+	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_preoutgoing TO admin;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_preoutgoing TO web;
+	
+	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_preoutgoing_lehrveranstaltung TO admin;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_preoutgoing_lehrveranstaltung TO web;
+			
+	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_preoutgoing_status TO admin;
+	GRANT SELECT ON public.tbl_preoutgoing_status TO web;
+	
+	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_preoutgoing_preoutgoing_status TO admin;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_preoutgoing_preoutgoing_status TO web;
+	
+	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_preoutgoing_firma TO admin;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_preoutgoing_firma TO web;
+	
+	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_firma_mobilitaetsprogramm TO admin;
+	GRANT SELECT ON public.tbl_firma_mobilitaetsprogramm TO web;
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>PreOutgoing: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'PreOutgoing Modul hinzugefuegt!<br>';
+}
+
 echo '<br>';
 
 $tabellen=array(
@@ -3412,7 +3566,7 @@ $tabellen=array(
 	"bis.tbl_gemeinde"  => array("gemeinde_id","plz","name","ortschaftskennziffer","ortschaftsname","bulacode","bulabez","kennziffer"),
 	"bis.tbl_hauptberuf"  => array("hauptberufcode","bezeichnung"),
 	"bis.tbl_lgartcode"  => array("lgartcode","kurzbz","bezeichnung","beantragung"),
-	"bis.tbl_mobilitaetsprogramm"  => array("mobilitaetsprogramm_code","kurzbz","beschreibung","sichtbar"),
+	"bis.tbl_mobilitaetsprogramm"  => array("mobilitaetsprogramm_code","kurzbz","beschreibung","sichtbar","sichtbar_outgoing"),
 	"bis.tbl_nation"  => array("nation_code","entwicklungsstand","eu","ewr","kontinent","kurztext","langtext","engltext","sperre"),
 	"bis.tbl_orgform"  => array("orgform_kurzbz","code","bezeichnung","rolle"),
 	"bis.tbl_verwendung"  => array("verwendung_code","verwendungbez"),
@@ -3513,6 +3667,7 @@ $tabellen=array(
 	"public.tbl_erhalter"  => array("erhalter_kz","kurzbz","bezeichnung","dvr","logo","zvr"),
 	"public.tbl_fachbereich"  => array("fachbereich_kurzbz","bezeichnung","farbe","studiengang_kz","aktiv","ext_id","oe_kurzbz"),
 	"public.tbl_firma"  => array("firma_id","name","anmerkung","firmentyp_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id","schule","finanzamt","steuernummer","gesperrt","aktiv"),
+	"public.tbl_firma_mobilitaetsprogramm" => array("firma_id","mobilitaetsprogramm_code"),
 	"public.tbl_firma_organisationseinheit"  => array("firma_organisationseinheit_id","firma_id","oe_kurzbz","bezeichnung","kundennummer","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_firmentyp"  => array("firmentyp_kurzbz","beschreibung"),
 	"public.tbl_firmatag"  => array("firma_id","tag","insertamum","insertvon"),
@@ -3538,6 +3693,11 @@ $tabellen=array(
 	"public.tbl_preincoming_lehrveranstaltung"  => array("preincoming_id","lehrveranstaltung_id","insertamum","insertvon"),
 	"public.tbl_preinteressent"  => array("preinteressent_id","person_id","studiensemester_kurzbz","firma_id","erfassungsdatum","einverstaendnis","absagedatum","anmerkung","maturajahr","infozusendung","aufmerksamdurch_kurzbz","kontaktmedium_kurzbz","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preinteressentstudiengang"  => array("studiengang_kz","preinteressent_id","freigabedatum","uebernahmedatum","prioritaet","insertamum","insertvon","updateamum","updatevon"),
+	"public.tbl_preoutgoing" => array("preoutgoing_id","uid","dauer_von","dauer_bis","ansprechperson","bachelorarbeit","masterarbeit","betreuer","sprachkurs","intensivsprachkurs","sprachkurs_von","sprachkurs_bis","praktikum","praktikum_von","praktikum_bis","behinderungszuschuss","studienbeihilfe","insertamum","insertvon","updateamum","updatevon"),
+	"public.tbl_preoutgoing_firma" => array("preoutgoing_firma_id","preoutgoing_id","mobilitaetsprogramm_code","firma_id","name","auswahl"),
+	"public.tbl_preoutgoing_lehrveranstaltung" => array("preoutgoing_lehrveranstaltung_id","preoutgoing_id","bezeichnung","ects","endversion","insertamum","insertvon","updateamum","updatevon"),
+	"public.tbl_preoutgoing_preoutgoing_status" => array("status_id","preoutgoing_status_kurzbz","preoutgoing_id","datum","insertamum","insertvon","updateamum","updatevon"),
+	"public.tbl_preoutgoing_status" => array("preoutgoing_status_kurzbz","bezeichnung"),
 	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat"),
 	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung"),
