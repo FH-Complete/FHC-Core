@@ -336,9 +336,17 @@ loadVariables($user);
 			}
 			else 
 			{
-				$semester = '';
-				$verband = '';
-				$gruppe = '';
+				$qry = "SELECT public.tbl_prestudentstatus.ausbildungssemester FROM public.tbl_prestudentstatus WHERE prestudent_id='$row->prestudent_id' AND (status_kurzbz='Interessent' OR status_kurzbz='Bewerber') ORDER BY datum DESC LIMIT 1";
+				if (($result_sem = $db->db_query($qry)) && ($row_sem = $db->db_fetch_object($result_sem)))
+				{
+					$semester = $row_sem->ausbildungssemester;
+				}
+				else
+				{
+					$semester = '';
+					$verband = '';
+					$gruppe = '';
+				}		
 			}
 		}
 		//Semester		
