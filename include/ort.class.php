@@ -63,10 +63,21 @@ class ort extends basis_db
 	 * Laedt alle verfuegbaren Orte
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getAll()
+	public function getAll($raumtyp_kurzbz=null)
 	{
 		$qry = 'SELECT * FROM public.tbl_ort ORDER BY ort_kurzbz;';
 
+		if(!is_null($raumtyp_kurzbz) && $raumtyp_kurzbz!='')
+		{
+			$qry = '
+				SELECT 
+					tbl_ort.* 
+				FROM 
+					public.tbl_ort 
+					JOIN public.tbl_ortraumtyp USING(ort_kurzbz) 
+				WHERE raumtyp_kurzbz='.$this->db_add_param($raumtyp_kurzbz).'
+				ORDER BY ort_kurzbz;';
+		}
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Laden der Datensaetze';
