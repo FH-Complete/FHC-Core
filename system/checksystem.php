@@ -3541,6 +3541,15 @@ if(!@$db->db_query("SELECT 1 from public.tbl_preoutgoing LIMIT 1"))
 	
 	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_firma_mobilitaetsprogramm TO admin;
 	GRANT SELECT ON public.tbl_firma_mobilitaetsprogramm TO web;
+	
+	GRANT SELECT, UPDATE ON SEQUENCE public.seq_preoutgoing_preoutgoing_id TO web;
+	GRANT SELECT, UPDATE ON SEQUENCE public.seq_preoutgoing_preoutgoing_id TO admin;
+	GRANT SELECT, UPDATE ON SEQUENCE public.seq_preoutgoing_lehrveranstaltung_preoutgoing_lehrveranstaltung_id TO web;
+	GRANT SELECT, UPDATE ON SEQUENCE public.seq_preoutgoing_lehrveranstaltung_preoutgoing_lehrveranstaltung_id TO admin;
+	GRANT SELECT, UPDATE ON SEQUENCE public.seq_preoutgoing_preoutgoing_status_status_id TO web;
+	GRANT SELECT, UPDATE ON SEQUENCE public.seq_preoutgoing_preoutgoing_status_status_id TO admin;
+	GRANT SELECT, UPDATE ON SEQUENCE public.seq_preoutgoing_firma_preoutgoing_firma_id TO web;
+	GRANT SELECT, UPDATE ON SEQUENCE public.seq_preoutgoing_firma_preoutgoing_firma_id TO admin;
 	";
 	
 	if(!$db->db_query($qry))
