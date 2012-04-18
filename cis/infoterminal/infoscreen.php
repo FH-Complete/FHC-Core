@@ -99,13 +99,13 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta http-equiv="refresh" content="',$refreshzeit,'">
 <link href="../../skin/infoscreen.css" rel="stylesheet" type="text/css">
+';
 
-
-
-<!-- Skript fuer den automatischen bildlauf--
+//Skript fuer den automatischen bildlauf
+$scroll= '
 <script type="text/javascript" language="JavaScript">
 
-var speed=1 <!--Zeilensprung in px. Wert aendern um Geschwindigkeit zu steuern. Hoeher ist schneller.--
+var speed=1 <!--Zeilensprung in px. Wert aendern um Geschwindigkeit zu steuern. Hoeher ist schneller.-->
 var currentpos=0,alt=1,curpos1=0,curpos2=-1
 function initialize()
 	{
@@ -143,12 +143,13 @@ function scrollwindow()
 	
 function startit()
 	{
-	setInterval("scrollwindow()",40) <!--Zeit in ms bis zum naechsten Bildwechsel 1000=1sek--
+	setInterval("scrollwindow()",40) <!--Zeit in ms bis zum naechsten Bildwechsel 1000=1sek-->
 	}
 	
 window.onload=initialize
-</script>
--->
+</script>';
+//echo $scroll;
+echo '
 
 
 
