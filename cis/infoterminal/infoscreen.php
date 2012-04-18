@@ -33,8 +33,9 @@ else
 	$ip = $_SERVER["REMOTE_ADDR"];
 $infoscreen = new infoscreen();
 $i=0;
-$refreshzeit = 60; // Default Refreshzeit
+$refreshzeit = 40; // Default Refreshzeit
 
+$infoscreen_id='';
 $refreshzeiten[0]=$refreshzeit; //Refreshzeit fuer News
 $infoscreen_content[0]=-1;
 $aktuellerContentIdx=0;
@@ -94,9 +95,12 @@ echo '
 <meta http-equiv="refresh" content="',$refreshzeit,'">
 <link href="../../skin/infoscreen.css" rel="stylesheet" type="text/css">
 
+
+
+<!-- Skript fuer den automatischen bildlauf--
 <script type="text/javascript" language="JavaScript">
-<!--Skript fuer den automatischen bildlauf-->
-var speed=1 <!--Wert aendern um geschwindigkeit zu steuern. Hoeher ist schneller.--> 
+
+var speed=1 <!--Zeilensprung in px. Wert aendern um Geschwindigkeit zu steuern. Hoeher ist schneller.--
 var currentpos=0,alt=1,curpos1=0,curpos2=-1
 function initialize()
 	{
@@ -134,11 +138,13 @@ function scrollwindow()
 	
 function startit()
 	{
-	setInterval("scrollwindow()",40)
+	setInterval("scrollwindow()",40) <!--Zeit in ms bis zum naechsten Bildwechsel 1000=1sek--
 	}
 	
 window.onload=initialize
 </script>
+-->
+
 
 
 <title>Infoscreen</title>
@@ -159,6 +165,7 @@ window.onload=initialize
 </head>
 <body>';
 
+echo '<!-- Last content:'.$lastinfoscreencontent.' Infoscreen-ID:'.$infoscreen_id.'-->';
 if($aktuellerContentIdx!=0)
 {
 	
@@ -172,7 +179,7 @@ else
 		  <tr>
 		    <td class="tdwidth_left">&nbsp;</td>
 		    <td><table class="tabcontent">
-		    <tr height="500px"><td>&nbsp;</td></tr>
+		    <!--<tr height="500px"><td>&nbsp;</td></tr> Einkommentieren wenn automatisches scrolling aktiv-->
 		      <tr>
 		        <td class="ContentHeader"><font class="ContentHeader">&nbsp;News</font></td>
 		      </tr>
@@ -218,7 +225,7 @@ else
 			<table width="100%">
 				<tr>
 					<td width="60%" align="left">'.$betreff.'</td>
-					<!--<td width="30%" align="center"></td>-->
+					<!--<td width="30%" align="center"></td> Einkommentieren wenn automatisches scrolling aktiv-->
 					<td width="30%" align="right" id="'.$zaehler.'Verfasser">'.$verfasser.' <span style="font-weight: normal">( '.$datum.' )</span></td>
 				</tr>
 			</table>
