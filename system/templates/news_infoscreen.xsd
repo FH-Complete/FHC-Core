@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:element name="news">
+	<xs:element name="verfasser" type="xs:string"/>
+	<xs:element name="betreff" type="xs:string"/>
+	<xs:element name="text" type="wysiwyg"/>
+</xs:element>
+</xs:schema>

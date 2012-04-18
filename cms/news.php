@@ -53,6 +53,7 @@ $db = new basis_db();
 $studiengang_kz = (isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:0);
 $semester = (isset($_GET['semester'])?$_GET['semester']:null);
 
+$infoscreen = isset($_GET['infoscreen']);
 $editable = isset($_GET['edit']);
 $news = new news();
 $all=false;
@@ -86,8 +87,15 @@ foreach($news->result as $row)
 	//$xml .= $content->content;
 }
 
-if($studiengang_kz!=0 && $studiengang_kz!=10006 && !$editable)
+if($studiengang_kz!=0 && !$editable && !$infoscreen)
 	$xml.=getStgContent($studiengang_kz, $semester, $sprache);
+
+if($studiengang_kz!=0)
+{
+	$stg_obj = new studiengang();
+	$stg_obj->load($studiengang_kz);
+	$xml.='<studiengang_bezeichnung>'.$stg_obj->bezeichnung.'</studiengang_bezeichnung>';
+}
 
 $xml .= '</content>';
 
@@ -96,8 +104,17 @@ $doc->loadXML($xml);
 
 //XSLT Vorlage laden
 $template = new template();
-if(!$template->load('news'))
-	die($template->errormsg);
+
+if($infoscreen)
+{
+	if(!$template->load('news_infoscreen'))
+		die($template->errormsg);
+}
+else
+{
+	if(!$template->load('news'))
+		die($template->errormsg);
+}
 
 $xsltemplate = new DOMDocument();
 $xsltemplate->loadXML($template->xslt_xhtml);
