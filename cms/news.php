@@ -87,7 +87,7 @@ foreach($news->result as $row)
 	//$xml .= $content->content;
 }
 
-if($studiengang_kz!=0 && !$editable && !$infoscreen)
+if($studiengang_kz!=0 && !$editable && !$infoscreen && $studiengang_kz!=10006)
 	$xml.=getStgContent($studiengang_kz, $semester, $sprache);
 
 if($studiengang_kz!=0)
