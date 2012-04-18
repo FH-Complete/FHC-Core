@@ -30,7 +30,13 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 if(isset($_GET['ipadresse']))
 	$ip = $_GET['ipadresse'];
 else
-	$ip = $_SERVER["REMOTE_ADDR"];
+{
+	if(isset($_SERVER['HTTP_X_FORWARDED_FOR']))
+		$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+	else
+		$ip = $_SERVER["REMOTE_ADDR"];
+}
+
 $infoscreen = new infoscreen();
 $i=0;
 $refreshzeit = 40; // Default Refreshzeit
@@ -87,8 +93,7 @@ if(isset($refreshzeiten[$aktuellerContentIdx]) && $refreshzeiten[$aktuellerConte
 // Cookie enthaelt die zuletzt angezeigte Seite
 setcookie($cookie,$infoscreen_content[$aktuellerContentIdx],time()+3600*24);
 
-echo '
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -104,7 +109,7 @@ var speed=1 <!--Zeilensprung in px. Wert aendern um Geschwindigkeit zu steuern. 
 var currentpos=0,alt=1,curpos1=0,curpos2=-1
 function initialize()
 	{
-	startit()
+	//startit()
 	}
 	
 function scrollwindow()
@@ -164,8 +169,7 @@ window.onload=initialize
   </style>
 </head>
 <body>';
-
-echo '<!-- Last content:'.$lastinfoscreencontent.' Infoscreen-ID:'.$infoscreen_id.'-->';
+echo '<!-- Last content:'.$lastinfoscreencontent.' Infoscreen-ID:'.$infoscreen_id.' IP:'.$ip.'-->';
 if($aktuellerContentIdx!=0)
 {
 	

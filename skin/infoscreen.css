@@ -93,12 +93,14 @@ address,pre /* Adresse, Rohdaten */
 }
 h1 /* Überschrift 1 */
 { 
-	background-color: #CCCCCC; /*mittel-grau */
+	color: #ffffff; 
+	background-color: #008381; /*gruen*/
 	font-weight: bold;
 	padding-top: 2px;
 	padding-bottom: 2px;
 	padding-left: 4px;
-	font-size: 16px;
+	font-size: 1.8em;
+	text-align: center;
 }
 h2 /* Überschrift 2 */
 { 
@@ -151,6 +153,12 @@ h5, h6 /* Überschrift 5,6 - Werden nicht speziell formatiert, sondern dem norma
 	padding: 0px 10px 0px 10px;
 	white-space: nowrap;
 	background-color: #C6C6C6;
+}
+#news .news .titel table
+{
+	font-weight: bold;
+	padding: 0px 10px 0px 10px;
+	white-space: nowrap;
 }
 #news .news .text
 {
