@@ -42,8 +42,22 @@ echo '
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>'.$p->t('lvplan/reservierungsliste').'</title>
+	<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
+	<link rel="stylesheet" href="../../../skin/jquery.css" type="text/css"/>
+	<link rel="stylesheet" href="../../../skin/fhcomplete.css" type="text/css"/>
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
+	<script type="text/javascript" src="../../../include/js/jquery.js"></script>
 	<script language="Javascript">
+	
+	$(document).ready(function() 
+	{ 
+	    $("#myTable").tablesorter(
+		{
+			sortList: [[0,0]],
+			widgets: ["zebra"]
+		});
+	}); 
+	
 	function checkdata()
 	{
 		if(document.getElementById("datum").value=="")
@@ -74,13 +88,10 @@ echo '
 	</script>
 </head>
 <body id="inhalt">
-	<H2><table class="tabcontent">
-		<tr>
-		<td>&nbsp;<a class="Item" href="index.php">'.$p->t('lvplan/lehrveranstaltungsplan').'</a> &gt;&gt; '.$p->t('lvplan/raumsuche').'</td>
-		<td align="right"></td>
-		</tr>
-		</table>
-	</H2>
+	<H1>
+		<a class="Item" href="index.php">'.$p->t('lvplan/lehrveranstaltungsplan').'</a>
+		&gt;&gt; '.$p->t('lvplan/raumsuche').'
+	</H1>
 ';
 
 echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST" onsubmit="return checkdata()">
@@ -155,8 +166,17 @@ if($sent)
 		}
 		else 
 		{
-			echo '<br><table>';
-			echo '<tr class="liste"><th>'.$p->t('lvplan/raum').'</th><th>'.$p->t('global/bezeichnung').'</th><th>'.$p->t('global/nummer').'</th><th>'.$p->t('global/personen').'</th><th>'.$p->t('global/aktion').'</th></tr>';
+			echo '<br><table class="tablesorter" id="myTable" style="width: auto">
+			<thead>
+				<tr class="liste">
+					<th>'.$p->t('lvplan/raum').'</th>
+					<th>'.$p->t('global/bezeichnung').'</th>
+					<th>'.$p->t('global/nummer').'</th>
+					<th>'.$p->t('global/personen').'</th>
+					<th>'.$p->t('global/aktion').'</th>
+				</tr>
+			</thead>
+			<tbody>';
 			$i=0;
 			$datum_sec = $datum_obj->mktime_datum($datum)-1;
 			foreach ($ort->result as $row)
@@ -171,7 +191,7 @@ if($sent)
 				echo '</tr>';
 				flush();
 			}
-			echo '</table>';
+			echo '</tbody></table>';
 		}
 	}
 }

@@ -268,26 +268,38 @@ class ort extends basis_db
 		}
 		
 		//stundevon ermitteln
-		$qry = "SELECT stunde FROM (
+		$qry = "SELECT min(stunde) as stunde FROM (
 				SELECT stunde, extract(epoch from (beginn-('".addslashes($zeit_von)."'::time))) AS delta FROM lehre.tbl_stunde
 				UNION
 				SELECT stunde, extract(epoch from (ende-('".addslashes($zeit_von)."'::time))) AS delta FROM lehre.tbl_stunde
-				) foo WHERE delta>=0 ORDER BY delta LIMIT 1;";
+				) foo WHERE delta>0";
 		
 		if($this->db_query($qry))
 			if($row = $this->db_fetch_object())
 				$stundevon = $row->stunde;
 
 		//stundebis ermitteln
-		$qry = "SELECT stunde FROM (
+		$qry = "SELECT min(stunde) as stunde FROM (
 				SELECT stunde, extract(epoch from (beginn-('".addslashes($zeit_bis)."'::time))) AS delta FROM lehre.tbl_stunde
 				UNION
 				SELECT stunde, extract(epoch from (ende-('".addslashes($zeit_bis)."'::time))) AS delta FROM lehre.tbl_stunde
-				) foo WHERE delta>=0 ORDER BY delta LIMIT 1;";
+				) foo WHERE delta>=0";
 		
 		if($this->db_query($qry))
 			if($row = $this->db_fetch_object())
 				$stundebis = $row->stunde;
+
+		if($stundevon=='')
+			$stundevon=1;
+		if($stundebis=='')
+		{
+			$stundebis=20;
+			$qry = "SELECT max(stunde) as max FROM lehre.tbl_stunde";
+			if($this->db_query($qry))
+				if($row = $this->db_fetch_object())
+					$stundebis=$row->max;
+		}
+		//echo $stundevon.'-'.$stundebis;
 		
 		//Freie Raeume suchen
 		$qry = "SELECT 
