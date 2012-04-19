@@ -38,12 +38,10 @@ else
 }
 
 $infoscreen = new infoscreen();
-$i=0;
+$i=-1;
 $refreshzeit = 40; // Default Refreshzeit
 
 $infoscreen_id='';
-$refreshzeiten[0]=$refreshzeit; //Refreshzeit fuer News
-$infoscreen_content[0]=-1;
 $aktuellerContentIdx=0;
 
 //Cookie erhaelt zusaetzlich die IP im Namen damit bei der Preview keine Konflikte entstehen
@@ -74,31 +72,27 @@ if($infoscreen->getInfoscreen($ip))
 		{
 			$aktuellerContentIdx=$i+1;
 		}
+		
 	}
 }
-if($aktuellerContentIdx==0 && $i>0)
-	$aktuellerContentIdx=1;
 if($aktuellerContentIdx>$i)
 	$aktuellerContentIdx=0;
 
 if(isset($refreshzeiten[$aktuellerContentIdx]) && $refreshzeiten[$aktuellerContentIdx]!='')
 	$refreshzeit = $refreshzeiten[$aktuellerContentIdx];	
 
-//echo "ScreenID: $infoscreen->infoscreen_id";
-//echo "last: $lastinfoscreencontent\n";
-//echo "current: $infoscreen_content[$aktuellerContentIdx]\n";
-//echo "current index: $aktuellerContentIdx\n";
-//echo "refreshzeit: $refreshzeit\n";
-
-// Cookie enthaelt die zuletzt angezeigte Seite
-setcookie($cookie,$infoscreen_content[$aktuellerContentIdx],time()+3600*24);
+if(isset($infoscreen_content) && isset($infoscreen_content[$aktuellerContentIdx]))
+{
+	// Cookie enthaelt die zuletzt angezeigte Seite
+	setcookie($cookie,$infoscreen_content[$aktuellerContentIdx],time()+3600*24);
+}
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta http-equiv="refresh" content="',$refreshzeit,'">
-<link href="../../skin/infoscreen.css" rel="stylesheet" type="text/css">
+	<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="refresh" content="',$refreshzeit,'">
+	<link href="../../skin/infoscreen.css" rel="stylesheet" type="text/css">
 ';
 
 //Skript fuer den automatischen bildlauf
@@ -148,13 +142,21 @@ function startit()
 	
 window.onload=initialize
 </script>';
+$scroll= "<script>
+function scrolldown()
+{
+	contentframe = document.getElementById('content').contentWindow;
+	contentframe.scrollBy(0,1)
+	window.setTimeout('scrolldown()',100);
+}
+window.onload=scrolldown;
+</script>
+";
 //echo $scroll;
+
 echo '
-
-
-
-<title>Infoscreen</title>
-<style type="text/css">
+	<title>Infoscreen</title>
+	<style type="text/css">
 	html, body, div, iframe 
 	{ 
 		margin:0; 
@@ -171,90 +173,23 @@ echo '
 </head>
 <body>';
 echo '<!-- Last content:'.$lastinfoscreencontent.' Infoscreen-ID:'.$infoscreen_id.' IP:'.$ip.'-->';
-if($aktuellerContentIdx!=0)
+if($infoscreen_id!='' && isset($content[$aktuellerContentIdx]))
 {
 	
-	echo '<center style="height: 100%"><iframe src="../../cms/content.php?content_id='.$content[$aktuellerContentIdx].'"></center>';
+	echo '<center style="height: 100%"><iframe id="content" src="../../cms/content.php?content_id='.$content[$aktuellerContentIdx].'" ></iframe></center>';
 }
 else
 {
-	// News anzeigen
-	echo '
-		<table id="inhalt" class="tabcontent">
-		  <tr>
-		    <td class="tdwidth_left">&nbsp;</td>
-		    <td><table class="tabcontent">
-		    <!--<tr height="500px"><td>&nbsp;</td></tr> Einkommentieren wenn automatisches scrolling aktiv-->
-		      <tr>
-		        <td class="ContentHeader"><font class="ContentHeader">&nbsp;News</font></td>
-		      </tr>
-		      <tr>
-		        <td>&nbsp;</td>
-		      </tr>
-			  <tr>
-			  	<td>
-			  	<div id="news">';
-
-  	$news = new news();
-  	$news->getnews(MAXNEWSALTER,0,null, false, null, MAXNEWS);
-  	$zaehler=0;
-  	foreach ($news->result as $row)
-  	{
-  		$lang='German';
-		$content = new content();
-		$content->getContent($row->content_id, $lang, null, null, false);
-	
-		$xml_inhalt = new DOMDocument();
-		if($content->content!='')
-		{
-			$xml_inhalt->loadXML($content->content);
-		}
-
-		if($xml_inhalt->getElementsByTagName('verfasser')->item(0))
-			$verfasser = $xml_inhalt->getElementsByTagName('verfasser')->item(0)->nodeValue;
-		if($xml_inhalt->getElementsByTagName('betreff')->item(0))
-			$betreff = $xml_inhalt->getElementsByTagName('betreff')->item(0)->nodeValue;
-		if($xml_inhalt->getElementsByTagName('text')->item(0))
-			$text = $xml_inhalt->getElementsByTagName('text')->item(0)->nodeValue;
-	
-  		$zaehler++;
-  		//no comment
-  		$datum = date('d.m.Y',strtotime(strftime($row->datum)));
-  		//DMS Pfad korrigieren damit die Bilder korrekt angezeigt werden
-		$text=mb_ereg_replace("dms.php","../../cms/dms.php",$text);
-		
-		//echo $datum.'&nbsp;'.$row->verfasser.'<br><br><strong>'.$row->betreff.'</strong><br>'.$row->text.'<br><br><br>
-		echo '<div class="news">';
-		echo '
-			<div class="titel">
-			<table width="100%">
-				<tr>
-					<td width="60%" align="left">'.$betreff.'</td>
-					<!--<td width="30%" align="center"></td> Einkommentieren wenn automatisches scrolling aktiv-->
-					<td width="30%" align="right" id="'.$zaehler.'Verfasser">'.$verfasser.' <span style="font-weight: normal">( '.$datum.' )</span></td>
-				</tr>
-			</table>
-			</div>
-			<div class="text" id="'.$zaehler.'Text">
-			'.$text.'
-			</div>
-			';
-		echo "</div><br />";
-	}
-	if($zaehler==0)
-		echo 'Zur Zeit gibt es keine aktuellen News!';
-		  
-	echo '
-			  </div>
-			</td>
-			<td>&nbsp;</td>
-		  </tr>
-		  <tr height="500px"><td>&nbsp;</td></tr>
-	    </table></td>
-		<td class="tdwidth_right">&nbsp;</td>
-	  </tr>
-	</table>';
+	echo '<br><br><br>
+		<center>
+		<h1>Infoscreen - '.CAMPUS_NAME.'</h1>
+		<br><br><br>
+		Dieser Infoscreen wurde noch nicht registriert
+		<br><br>
+		IP-Adresse:'.$ip.'
+		</center>';
 }
+
 echo '
 </body>
 </html>';
