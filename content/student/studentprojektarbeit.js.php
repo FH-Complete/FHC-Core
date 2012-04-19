@@ -1068,7 +1068,7 @@ function StudentProjektbetreuerLoadMitarbeiterDaten()
 // ****
 function StudentProjektbetreuerNeuePerson()
 {
-	window.open('<?php echo APP_ROOT; ?>vilesci/personen/personen_anlegen.php','Person anlegen','height=600,width=800,left=300,top=300,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>vilesci/personen/personen_anlegen.php','Person anlegen','height=600,width=900,left=300,top=300,hotkeys=0,resizable=yes,status=no,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
