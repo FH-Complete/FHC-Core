@@ -299,7 +299,7 @@ elseif($format=='ical')
 // Print in HTML-File
 else
 {
-	echo '<P class="dont-print">'.$p->t('lvlplan/fehlerUndFeedback').' <A class="Item" href="mailto:'.MAIL_LVPLAN.'">'.$p->t('lvplan/lvKoordinationsstelle').'</A></P>';
+	echo '<P class="dont-print">'.$p->t('lvplan/fehlerUndFeedback').' <A class="Item" href="mailto:'.MAIL_LVPLAN.'">'.$p->t('lvplan/lvKoordinationsstelle').'</A></P>';
 	echo '</body></html>';
 }
 ?>
