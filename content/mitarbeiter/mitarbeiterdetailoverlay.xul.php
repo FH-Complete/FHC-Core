@@ -87,8 +87,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       						</hbox>
       						<label value="Geburtsort" control="mitarbeiter-detail-textbox-geburtsort"/>
       						<textbox id="mitarbeiter-detail-textbox-geburtsort" disabled="true" maxlength="128" oninput="MitarbeiterDetailValueChange()"/>
-      						<label value="Geburtszeit" control="mitarbeiter-detail-textbox-geburtszeit"/>
-      						<hbox><textbox id="mitarbeiter-detail-textbox-geburtszeit" disabled="true" maxlength="5" size="5" tooltiptext="Format: hh:mm Beispiel: 10:30" oninput="MitarbeiterDetailValueChange()"/></hbox>
+      						<label value="Geburtszeit" control="mitarbeiter-detail-textbox-geburtszeit" hidden="true"/>
+      						<hbox><textbox id="mitarbeiter-detail-textbox-geburtszeit" disabled="true" maxlength="5" size="5" tooltiptext="Format: hh:mm Beispiel: 10:30" oninput="MitarbeiterDetailValueChange()" hidden="true"/></hbox>
     					</row>
     					<row>
       						<label value="SVNR" control="mitarbeiter-detail-textbox-svnr"/>
@@ -153,8 +153,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										<menuitem value="w" label="verwitwet"/>
 								</menupopup>								
 							</menulist>
-							<label value="Anzahl der Kinder" control="mitarbeiter-detail-textbox-anzahlderkinder"/>
-      						<textbox id="mitarbeiter-detail-textbox-anzahlderkinder" disabled="true" maxlength="2" oninput="MitarbeiterDetailValueChange()"/>
+							<label value="Anzahl der Kinder" control="mitarbeiter-detail-textbox-anzahlderkinder" hidden="true"/>
+      						<textbox id="mitarbeiter-detail-textbox-anzahlderkinder" disabled="true" maxlength="2" oninput="MitarbeiterDetailValueChange()" hidden="true"/>
     					</row>
     					<row>
       						<vbox>

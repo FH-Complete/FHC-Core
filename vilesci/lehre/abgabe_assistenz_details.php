@@ -603,7 +603,7 @@ while ($result_nam && $row_nam=$db->db_fetch_object($result_nam))
 
 $qry="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".addslashes($projektarbeit_id)."' ORDER BY datum;";
 $htmlstr .= "<table width=100%>\n";
-$htmlstr .= "<tr><td style='font-size:16px'>Student: <b>".$studentenname."</b></td><td align='right'><a href='".CIS_ROOT."cis/private/lehre/abgabe_student_frameset.php?uid=$uid' target='_blank'>Studentenansicht</a></td></tr>";
+$htmlstr .= "<tr><td style='font-size:16px'>Student: <b>".$studentenname."</b></td><td align='right'><a href='".CIS_ROOT."cis/private/lehre/abgabe_student_frameset.php?uid=$uid' target='_blank'>Studierendenansicht</a></td></tr>";
 $htmlstr .= "<tr><td style='font-size:16px'>Titel: <b>".$titel."<b><br></td>";
 //$htmlstr .= "<td align='right'><a href='../../cis/cisdocs/Projektarbeitsabgabe_FHTW_Anleitung.pdf' target='_blank'><img src='../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0></a>&nbsp;&nbsp;&nbsp;</td>";
 $htmlstr .= "</tr>\n";

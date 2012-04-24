@@ -75,6 +75,7 @@ function draw_content($row)
          <RDF:Description id="'.$row->projektarbeit_id.'"  about="'.$rdf_url.'/'.$row->projektarbeit_id.'" >
             <PROJEKTARBEIT:projektarbeit_id><![CDATA['.$row->projektarbeit_id.']]></PROJEKTARBEIT:projektarbeit_id>
             <PROJEKTARBEIT:projekttyp_kurzbz><![CDATA['.$row->projekttyp_kurzbz.']]></PROJEKTARBEIT:projekttyp_kurzbz>
+            <PROJEKTARBEIT:bezeichnung><![CDATA['.$row->bezeichnung.']]></PROJEKTARBEIT:bezeichnung>
             <PROJEKTARBEIT:titel><![CDATA['.$row->titel.']]></PROJEKTARBEIT:titel>
             <PROJEKTARBEIT:titel_english><![CDATA['.$row->titel_english.']]></PROJEKTARBEIT:titel_english>
             <PROJEKTARBEIT:lehreinheit_id><![CDATA['.$row->lehreinheit_id.']]></PROJEKTARBEIT:lehreinheit_id>

@@ -77,12 +77,13 @@ $trenner = new variable();
 $trenner->loadVariables($getuid);
 	
 $sql_query = "SELECT * 
-			FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) public.tbl_studiengang.bezeichnung as stgbez,* FROM lehre.tbl_projektarbeit  
+			FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) public.tbl_studiengang.bezeichnung as stgbez,tbl_projekttyp.bezeichnung AS prjbez,* FROM lehre.tbl_projektarbeit  
 			LEFT JOIN public.tbl_benutzer on(uid=student_uid) 
 			LEFT JOIN public.tbl_person on(tbl_benutzer.person_id=tbl_person.person_id)
 			LEFT JOIN lehre.tbl_lehreinheit using(lehreinheit_id) 
 			LEFT JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id) 
 			LEFT JOIN public.tbl_studiengang using(studiengang_kz)
+			LEFT JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
 			WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
 			AND public.tbl_benutzer.aktiv 
 			AND lehre.tbl_projektarbeit.note IS NULL 
@@ -248,11 +249,11 @@ else
 				$htmlstr .= "       <td><a href='abgabe_assistenz_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&erst=".$mituid."&p2id=".$p2id."&titel=".$row->titel."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";				
 			}
 		}
-		$htmlstr .= "	    <td align= center><input type='hidden' name='st_".$row->projektarbeit_id."' value='$row->uid@".DOMAIN."'><a href='mailto:$row->uid@".DOMAIN."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung bei Studiengang $row->stgbez'><img src='../../skin/images/email.png' alt='email' title='Email an Studenten'></a></td>";
+		$htmlstr .= "	    <td align= center><input type='hidden' name='st_".$row->projektarbeit_id."' value='$row->uid@".DOMAIN."'><a href='mailto:$row->uid@".DOMAIN."?subject=Betreuung ".$row->prjbez." bei Studiengang $row->stgbez'><img src='../../skin/images/email.png' alt='email' title='Email an StudentIn'></a></td>";
 		$htmlstr .= "       <td>".$row->studiensemester_kurzbz."</td>\n";
 		$htmlstr .= "       <td>".$row->vorname."</td>\n";
 		$htmlstr .= "       <td>".$row->nachname."</td>\n";
-		$htmlstr .= "       <td>".$row->projekttyp_kurzbz."</td>\n";
+		$htmlstr .= "       <td>".$row->prjbez."</td>\n";
 		$htmlstr .= "       <td>".$row->titel."</td>\n";
 		
 		//$htmlstr.="<a href='mailto:$row->uid@".DOMAIN."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung%20von%20".$row->vorname."%20".$row->nachname."'>
@@ -260,7 +261,7 @@ else
 	
 		if($muid != NULL && $muid !='')
 		{
-			$htmlstr .= "       <td><input type='hidden' name='b1_".$row->projektarbeit_id."' value='$muid'><a href='mailto:$muid?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung%20von%20".$row->vorname."%20".$row->nachname." bei Studiengang $row->stgbez' title='Email an Erstbegutachter'>".$erstbegutachter."</a></td>\n";
+			$htmlstr .= "       <td><input type='hidden' name='b1_".$row->projektarbeit_id."' value='$muid'><a href='mailto:$muid?subject=Betreuung%20".$row->prjbez."%20von%20".$row->vorname."%20".$row->nachname." bei Studiengang $row->stgbez' title='Email an Erstbegutachter'>".$erstbegutachter."</a></td>\n";
 		}
 		else
 		{
@@ -270,7 +271,7 @@ else
 		$htmlstr .= "		<td align='center'><input type='checkbox' id='m2_".$row->projektarbeit_id."' name='m2_".$row->projektarbeit_id."'></td>";
 		if($muid2 != NULL && $muid2 !='')
 		{
-			$htmlstr .= "       <td><input type='hidden' name='b2_".$row->projektarbeit_id."' value='$muid2'><a href='mailto:".$muid2."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung%20von%20".$row->vorname."%20".$row->nachname." bei Studiengang $row->stgbez' title='Email an Zweitbegutachter'>".$zweitbegutachter."</a></td>\n";
+			$htmlstr .= "       <td><input type='hidden' name='b2_".$row->projektarbeit_id."' value='$muid2'><a href='mailto:".$muid2."?subject=Betreuung%20".$row->prjbez."%20von%20".$row->vorname."%20".$row->nachname." bei Studiengang $row->stgbez' title='Email an Zweitbegutachter'>".$zweitbegutachter."</a></td>\n";
 		}
 		else
 		{
@@ -286,7 +287,7 @@ else
 	$htmlstr .= "<table><tr><td><input type='checkbox' name='alle' id='alle' onclick='markiere()'> alle markieren  </td></tr><tr><td>&nbsp;</td></tr><tr>\n";
 	$htmlstr .= "<td rowspan=2><input type='submit' name='multi' value='Terminserie anlegen' title='Termin f&uuml;r mehrere Personen anlegen.'></td>";
 	$htmlstr .= "<td rowspan=2><input type='button' name='stmail' value='E-Mail Studierende' title='E-Mail an mehrere Studierende schicken' onclick='stserienmail(\"".$trenner->variable->emailadressentrennzeichen."\",\"".$stgbez."\")'></td>";
-	$htmlstr .= "<td rowspan=2><input type='button' name='btmail' value='E-Mail Begutachter(innen)' title='E-Mail an mehrere Begutachter(innen) schicken' onclick='btserienmail(\"".$trenner->variable->emailadressentrennzeichen."\",\"".$stgbez."\")'></td></tr></table>\n";
+	$htmlstr .= "<td rowspan=2><input type='button' name='btmail' value='E-Mail Begutachter(innen)' title='E-Mail an mehrere BegutachterInnen schicken' onclick='btserienmail(\"".$trenner->variable->emailadressentrennzeichen."\",\"".$stgbez."\")'></td></tr></table>\n";
 	$htmlstr .="</td><td align='right'>".showFarbcodes().'</td></tr></table>';
 	$htmlstr .= "</form>";
 	
@@ -346,7 +347,7 @@ function stserienmail(trenner, stgbez)
 			}
 		}
 	}
-	window.location.href="mailto:"+adressen+"?subject=Bachelor- bzw. Diplomarbeitsbetreuungen bei Studiengang "+stgbez;
+	window.location.href="mailto:"+adressen+"?subject=Betreuungen Bachelorarbeit bzw. Master Thesis bei Studiengang "+stgbez;
 }
 function btserienmail(trenner, stgbez)
 {
@@ -400,7 +401,7 @@ function btserienmail(trenner, stgbez)
 			}
 		}
 	}
-	window.location.href="mailto:"+adressen+"?subject=Bachelor- bzw. Diplomarbeitsbetreuungen bei Studiengang "+stgbez;
+	window.location.href="mailto:"+adressen+"?subject=Betreuungen Bachelorarbeit bzw. Master Thesis bei Studiengang "+stgbez;
 }
 </script>
 </head>

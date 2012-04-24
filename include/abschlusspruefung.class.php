@@ -72,7 +72,7 @@ class abschlusspruefung extends basis_db
 		}
 		
 		//laden des Datensatzes
-		$qry = "SELECT * FROM lehre.tbl_abschlusspruefung WHERE abschlusspruefung_id='".addslashes($abschlusspruefung_id)."';";
+		$qry = "SELECT * FROM lehre.tbl_abschlusspruefung JOIN lehre.tbl_pruefungstyp USING (pruefungstyp_kurzbz) WHERE abschlusspruefung_id='".addslashes($abschlusspruefung_id)."';";
 		
 		if($this->db_query($qry))
 		{
@@ -90,6 +90,7 @@ class abschlusspruefung extends basis_db
 				$this->datum = $row->datum;
 				$this->sponsion = $row->sponsion;
 				$this->pruefungstyp_kurzbz = $row->pruefungstyp_kurzbz;
+				$this->beschreibung = $row->beschreibung;
 				$this->anmerkung = $row->anmerkung;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
@@ -267,7 +268,7 @@ class abschlusspruefung extends basis_db
 	 */
 	public function getAbschlusspruefungen($student_uid)
 	{
-		$qry = "SELECT * FROM lehre.tbl_abschlusspruefung WHERE student_uid='".addslashes($student_uid)."' ORDER BY datum DESC";
+		$qry = "SELECT * FROM lehre.tbl_abschlusspruefung JOIN lehre.tbl_pruefungstyp USING (pruefungstyp_kurzbz) WHERE student_uid='".addslashes($student_uid)."' ORDER BY datum DESC";
 		
 		if($this->db_query($qry))
 		{
@@ -287,6 +288,7 @@ class abschlusspruefung extends basis_db
 				$obj->datum = $row->datum;
 				$obj->sponsion = $row->sponsion;
 				$obj->pruefungstyp_kurzbz = $row->pruefungstyp_kurzbz;
+				$obj->beschreibung = $row->beschreibung;
 				$obj->anmerkung = $row->anmerkung;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;

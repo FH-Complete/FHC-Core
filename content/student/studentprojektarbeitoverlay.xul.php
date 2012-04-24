@@ -58,7 +58,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					class="sortDirectionIndicator"
 					sortActive="true"
 					sortDirection="ascending"
-					sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#projekttyp_kurzbz"/>
+					sort="rdf:http://www.technikum-wien.at/projektarbeit/rdf#bezeichnung"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="student-projektarbeit-tree-studiensemester" label="Studiensemester" flex="1" hidden="false"
 				   class="sortDirectionIndicator"
@@ -118,7 +118,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<treechildren flex="1" >
 						<treeitem uri="rdf:*">
 						<treerow>
-							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#projekttyp_kurzbz"/>
+							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#bezeichnung"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#lehreinheit_stsem"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#titel"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projektarbeit/rdf#note"/>

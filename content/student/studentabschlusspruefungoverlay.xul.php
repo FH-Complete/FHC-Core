@@ -102,10 +102,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<treecol id="student-abschlusspruefung-treecol-abschlusspruefung_id" label="Abschlusspruefung_id" flex="1" persist="hidden, width" hidden="true"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#abschlusspruefung_id" onclick="StudentAbschlusspruefungTreeSort()"/>
-				<splitter class="tree-splitter"/>
-				<treecol id="student-abschlusspruefung-treecol-pruefungstyp_kurzbz" label="Typ" flex="1" persist="hidden, width" hidden="true"
+				<splitter class="tree-splitter"/>				
+				<treecol id="student-abschlusspruefung-treecol-pruefungstyp_kurzbz" label="Typ" flex="1" persist="hidden, width"
 					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefungstyp_kurzbz" onclick="StudentAbschlusspruefungTreeSort()"/>
+					sort="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefungstyp_kurzbz" onclick="StudentAbschlusspruefungTreeSort()" hidden="true" ignoreincolumnpicker="true"/><!-- Spalte ist im columnpicker nicht auswählbar, wird aber im Hintergrund für die Erstellung der Diplomurkunde benötigt -->
+				<splitter class="tree-splitter"/>				
+				<treecol id="student-abschlusspruefung-treecol-beschreibung" label="Typ" flex="1" persist="hidden, width" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#beschreibung" onclick="StudentAbschlusspruefungTreeSort()"/>
 				<splitter class="tree-splitter"/>
 			</treecols>
 	
@@ -124,7 +128,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	   							<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#sponsion" />
 	   							<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#anmerkung" />
 	   							<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#abschlusspruefung_id" />
-	   							<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefungstyp_kurzbz" />
+	   							<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefungstyp_kurzbz"/>
+	   							<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#beschreibung"/>
 	 						</treerow>
 							</treeitem>
 						</treechildren>
