@@ -175,7 +175,7 @@ foreach ($projekt->result as $row)
 	$student = new student();
 	$student->load($row->student_uid);
 	echo "<td nowrap>$student->nachname $student->vorname $student->titelpre $student->titelpost</td>";
-	echo "<td>$row->projekttyp_kurzbz</td>";
+	echo "<td>$row->bezeichnung</td>";
 	echo "<td>$row->titel".($row->titel_english!=''?'<br>'.$row->titel_english:'')."</td>";
 	echo "<td>$row->themenbereich</td>";
 	

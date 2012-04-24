@@ -758,9 +758,9 @@ class wochenplan extends basis_db
 				echo '<td>'.$p->t('lvplan/lektor').':</td>
 					  <td><SELECT name="user_uid">'.$this->crlf;
 				
-				$qry = "SELECT uid, kurzbz FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid) 
+				$qry = "SELECT uid, kurzbz, vorname, nachname FROM campus.vw_mitarbeiter 
 						WHERE aktiv=true
-						ORDER BY kurzbz, uid";
+						ORDER BY nachname, uid";
 				
 				if($result = $this->db_query($qry))
 				{
@@ -771,7 +771,7 @@ class wochenplan extends basis_db
 						else 
 							$selected='';
 						
-						echo '<OPTION value="'.$row->uid.'" '.$selected.'>'.$row->kurzbz.'</OPTION>'.$this->crlf;
+						echo '<OPTION value="'.$row->uid.'" '.$selected.'>'.$row->nachname.' '.$row->vorname.' - '.$row->uid.'</OPTION>'.$this->crlf;
 					}
 				}
 				

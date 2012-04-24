@@ -98,8 +98,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       						<hbox><textbox id="student-detail-textbox-svnr" disabled="true" maxlength="10" size="10"/></hbox>
       						<label value="Ersatzkennzeichen" control="student-detail-textbox-ersatzkennzeichen"/>
       						<hbox><textbox id="student-detail-textbox-ersatzkennzeichen" disabled="true" maxlength="10" size="15"/></hbox>
-      						<label value="Geburtszeit" control="student-detail-textbox-geburtszeit"/>
-      						<hbox><textbox id="student-detail-textbox-geburtszeit" disabled="true" maxlength="5" size="5" tooltiptext="Format: hh:mm Beispiel: 10:30"/></hbox>
+      						<label value="Geburtszeit" control="student-detail-textbox-geburtszeit" hidden="true"/>
+      						<hbox><textbox id="student-detail-textbox-geburtszeit" disabled="true" maxlength="5" size="5" tooltiptext="Format: hh:mm Beispiel: 10:30" hidden="true"/></hbox>
     					</row>
     					<row>
 							<label value="Staatsbuergerschaft" control="student-detail-menulist-staatsbuergerschaft"/>
@@ -149,8 +149,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										<menuitem value="w" label="verwitwet"/>
 								</menupopup>								
 							</menulist>
-							<label value="Anzahl der Kinder" control="student-detail-textbox-anzahlderkinder"/>
-      						<textbox id="student-detail-textbox-anzahlderkinder" disabled="true" maxlength="2"/>
+							<label value="Anzahl der Kinder" control="student-detail-textbox-anzahlderkinder" hidden="true"/>
+      						<textbox id="student-detail-textbox-anzahlderkinder" disabled="true" maxlength="2" hidden="true"/>
     					</row>
     					<row>
       						<vbox>
@@ -436,15 +436,15 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							</menulist>
     					</row>
     					<row>
-      						<label value="Aufnahmeschluessel" control="student-prestudent-menulist-aufnahmeschluessel"/>
+      						<label value="Aufnahmeschluessel" control="student-prestudent-menulist-aufnahmeschluessel" hidden="true"/>
       						<menulist id="student-prestudent-menulist-aufnahmeschluessel" disabled="true"
 							          datasources="<?php echo APP_ROOT ?>rdf/aufnahmeschluessel.rdf.php?optional=true" flex="1"
-						              ref="http://www.technikum-wien.at/aufnahmeschluessel/alle" >
+						              ref="http://www.technikum-wien.at/aufnahmeschluessel/alle" hidden="true">
 								<template>
 									<menupopup>
 										<menuitem value="rdf:http://www.technikum-wien.at/aufnahmeschluessel/rdf#aufnahmeschluessel"
 							        		      label="rdf:http://www.technikum-wien.at/aufnahmeschluessel/rdf#bezeichnung"
-										  		  uri="rdf:*"/>
+										  		  uri="rdf:*" hidden="true"/>
 										</menupopup>
 								</template>
 							</menulist>
@@ -461,8 +461,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								</template>
 							</menulist>
 							
-							<label value="Facheinschlaegig berufstaetig" control="student-prestudent-checkbox-facheinschlberuf"/>
-							<checkbox id="student-prestudent-checkbox-facheinschlberuf" checked="true" disabled="true"/>
+							<label value="Facheinschlaegig berufstaetig" control="student-prestudent-checkbox-facheinschlberuf" hidden="true"/>
+							<checkbox id="student-prestudent-checkbox-facheinschlberuf" checked="true" disabled="true" hidden="true"/>
 							
     					</row>
     				</rows>

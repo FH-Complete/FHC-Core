@@ -33,6 +33,7 @@ class projektarbeit extends basis_db
 	//Tabellenspalten
 	public $projektarbeit_id;	// integer
 	public $projekttyp_kurzbz;	// string
+	public $bezeichnung;		// string
 	public $titel;				// string
 	public $titel_english;		// string
 	public $lehreinheit_id;		// integer
@@ -349,7 +350,7 @@ class projektarbeit extends basis_db
 	 */
 	public function getProjektarbeit($student_uid)
 	{
-		$qry = "SELECT * FROM lehre.tbl_projektarbeit WHERE student_uid='".addslashes($student_uid)."'";
+		$qry = "SELECT * FROM lehre.tbl_projektarbeit JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz) WHERE student_uid='".addslashes($student_uid)."'";
 		
 		if($this->db_query($qry))
 		{
@@ -359,6 +360,7 @@ class projektarbeit extends basis_db
 				
 				$obj->projektarbeit_id = $row->projektarbeit_id;
 				$obj->projekttyp_kurzbz = $row->projekttyp_kurzbz;
+				$obj->bezeichnung = $row->bezeichnung;
 				$obj->titel = $row->titel;
 				$obj->titel_english = $row->titel_english;
 				$obj->lehreinheit_id = $row->lehreinheit_id;
@@ -400,9 +402,12 @@ class projektarbeit extends basis_db
 	public function getProjektarbeitStudiensemester($studiengang_kz, $studiensemester_kurzbz)
 	{
 		$qry = "SELECT 
-					tbl_projektarbeit.* 
+					tbl_projektarbeit.* , tbl_projekttyp.bezeichnung 
 				FROM 
-					lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung
+					lehre.tbl_projektarbeit
+				JOIN
+					lehre.tbl_projekttyp USING (projekttyp_kurzbz), lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung
+				 
 				WHERE 
 					tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 					tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
@@ -417,6 +422,7 @@ class projektarbeit extends basis_db
 				
 				$obj->projektarbeit_id = $row->projektarbeit_id;
 				$obj->projekttyp_kurzbz = $row->projekttyp_kurzbz;
+				$obj->bezeichnung = $row->bezeichnung;
 				$obj->titel = $row->titel;
 				$obj->titel_english = $row->titel_english;
 				$obj->lehreinheit_id = $row->lehreinheit_id;

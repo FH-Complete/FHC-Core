@@ -279,6 +279,7 @@ if ($xmlformat=='rdf')
 	            <ABSCHLUSSPRUEFUNG:sponsion><![CDATA['.$datum_obj->convertISODate($row->sponsion).']]></ABSCHLUSSPRUEFUNG:sponsion>
 	            <ABSCHLUSSPRUEFUNG:sponsion_iso><![CDATA['.$row->sponsion.']]></ABSCHLUSSPRUEFUNG:sponsion_iso>
 	            <ABSCHLUSSPRUEFUNG:pruefungstyp_kurzbz><![CDATA['.$row->pruefungstyp_kurzbz.']]></ABSCHLUSSPRUEFUNG:pruefungstyp_kurzbz>
+	            <ABSCHLUSSPRUEFUNG:beschreibung><![CDATA['.$row->beschreibung.']]></ABSCHLUSSPRUEFUNG:beschreibung>
 	            <ABSCHLUSSPRUEFUNG:anmerkung><![CDATA['.$row->anmerkung.']]></ABSCHLUSSPRUEFUNG:anmerkung>
 	         </RDF:Description>
 	      </RDF:li>
