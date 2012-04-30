@@ -132,7 +132,7 @@ if(copy($zipfile, $tempname_zip))
 					$gueltigbis=$stsem_obj->ende;
 				}
 				
-				if($type='datum')
+				if($type=='datum')
 				{
 					//Nur der Datumsstempel wird erstellt
 					$xml.="
