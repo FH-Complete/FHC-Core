@@ -27,6 +27,7 @@ require_once('../../include/standort.class.php');
 require_once('../../include/adresse.class.php');
 require_once('../../include/nation.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/mobilitaetsprogramm.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -47,7 +48,7 @@ $standort_id = (isset($_REQUEST['standort_id'])?$_REQUEST['standort_id']:'');
 $oe_kurzbz = (isset($_REQUEST['oe_kurzbz'])?$_REQUEST['oe_kurzbz']:'');
 $firma_organisationseinheit_id = (isset($_REQUEST['firma_organisationseinheit_id'])?$_REQUEST['firma_organisationseinheit_id']:'');	
 $tag = (isset($_REQUEST['tag'])?$_REQUEST['tag']:'');
-
+$mobilitaetsprogramm_code = (isset($_REQUEST['mobilitaetsprogramm_code'])?$_REQUEST['mobilitaetsprogramm_code']:'');
 $save = (isset($_REQUEST['save'])?$_REQUEST['save']:null);	
 $work = (isset($_REQUEST['work'])?$_REQUEST['work']:(isset($_REQUEST['save'])?$_REQUEST['save']:null));	
 $ajax = (isset($_REQUEST['ajax'])?$_REQUEST['ajax']:null);	
@@ -101,6 +102,23 @@ if(isset($_GET['deleteorganisationseinheit']))
 	else
 		$errorstr=($errorstr?$errorstr.', ':'').'Fehler beim Loeschen Firma/Organisation : ID fehlt';
 	$tabselect=1;
+}
+
+if(isset($_GET['deletemobilitaetsprogramm']))
+{
+	if(!$rechte->isBerechtigt('basis/firma:begrenzt',null, 'suid'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
+	if(!empty($mobilitaetsprogramm_code))
+	{
+		$firma = new firma();
+		if(!$firma->deletemobilitaetsprogramm($firma_id, $mobilitaetsprogramm_code))
+		{
+			$errorstr=($errorstr?$errorstr.', ':'').'Fehler beim Loeschen Firma/Mobilitaetsprogramm:'.$firma->errormsg;
+		}
+	}
+	else
+		$errorstr=($errorstr?$errorstr.', ':'').'Fehler beim Loeschen Firma/Mobilitaetsprogramm : Code fehlt';
+	$tabselect=2;
 }
 
 //Loeschen eines Tags
@@ -161,6 +179,14 @@ switch ($work)
 		echo getOrganisationsliste($firma_id,$adresstyp_arr,$user);
 		break;
 		
+	case 'mobilitaetsprogramm':
+		echo getMobilitaetsprogrammliste($firma_id,$user);
+		break;
+	case 'saveMobilitaetsprogramm':
+		saveMobilitaetsprogramm($firma_id, $mobilitaetsprogramm_code);
+		echo getFirmadetail($firma_id,$adresstyp_arr,$user,$neu);
+		$tabselect=2;
+		break;	
 	case 'anmerkungsfeld':
 		echo getAnmerkungen($firma_id,$user);
 		break;
@@ -168,9 +194,9 @@ switch ($work)
 		$status = saveAnmerkungen($firma_id,$user, $rechte);
 		echo getFirmadetail($firma_id,$adresstyp_arr,$user,$neu);
 		echo $status;
-		$tabselect=2;
+		$tabselect=3;
 		break;
-		
+	
 	case 'saveFirma':
 		$status=saveFirma($user,$rechte); // Postdaten werden in der Funktion verarbeitet			
 		if (is_numeric($status))
@@ -256,7 +282,7 @@ function getFirmadetail($firma_id, $adresstyp_arr, $user, $neu)
 		$htmlstr.="</tr>\n";
 		$htmlstr.="<tr><td><table><tr>\n";	
 		$htmlstr.="<td>Steuernummer: </td>";
-		$htmlstr.="<td><input size='32' maxlength='32' type='text' name='steuernummer' value=".$firma->steuernummer."></td>\n";
+		$htmlstr.="<td><input size='32' maxlength='32' type='text' name='steuernummer' value='".$firma->steuernummer."'></td>\n";
 		$htmlstr.="<td>&nbsp;</td>";	
 		$htmlstr.="<td>Finanzamt: </td>";
 		// Finanzamt anzeige und suche
@@ -332,6 +358,7 @@ function getFirmadetail($firma_id, $adresstyp_arr, $user, $neu)
 				<ul class="css-tabs">
 				     <li><a href="#standort">Standorte</a></li>
 					 <li><a href="#organisationseinheit">Organisationseinheit</a></li>
+					 <li><a href="#mobilitaetsprogramm">Mobilitätsprogramm</a></li>
 					 <li><a href="#anmerkung">Anmerkungen</a></li>
 				</ul>
 				<div id="standort">
@@ -339,6 +366,9 @@ function getFirmadetail($firma_id, $adresstyp_arr, $user, $neu)
 				</div>
 				<div id="organisationseinheit">
 				'.getOrganisationsliste($firma_id, $adresstyp_arr, $user).'
+				</div>
+				<div id="mobilitaetsprogramm">
+				'.getMobilitaetsprogrammliste($firma_id, $user).'
 				</div>
 				<div id="anmerkung">
 				'.getAnmerkungen($firma_id, $user).'
@@ -567,6 +597,65 @@ function getOrganisationsliste($firma_id,$adresstyp_arr,$user)
 	
 	$htmlstr.= '</table>';
 	return $htmlstr;
+}
+// ----------------------------------------------------------------------------------------------------------------------------------
+/**
+ * Mobilitaetsprogrammliste
+ */
+function getMobilitaetsprogrammliste($firma_id,$user)
+{
+	// Init
+	$htmlstr='';
+	// Plausib
+	if (empty($firma_id) || !is_numeric($firma_id) )
+		return 'Firma fehlt.';
+ 
+	$htmlstr.= '<table class="liste">
+			<tr>
+				<th width="45%">Mobilitätsprogramm</th>
+				<th width="5%"></th>
+				<td width="15%" align="center" valign="top" colspan="2">
+				
+				<form action="'.$_SERVER['PHP_SELF'].'?firma_id='.$firma_id.'&work=saveMobilitaetsprogramm" METHOD="POST">
+					<SELECT name="mobilitaetsprogramm_code">';
+	$mob = new mobilitaetsprogramm();
+	$mob->getAll();
+	
+	foreach($mob->result as $row)
+	{
+		$htmlstr.= '<OPTION value="'.$mob->convert_html_chars($row->mobilitaetsprogramm_code).'">'.$mob->convert_html_chars($row->kurzbz).'</OPTION>';
+	}
+	$htmlstr.='				
+					</SELECT>
+					<input type="submit" value="Hinzufügen">
+				</form>
+				</td>	
+			</tr>
+			';
+	
+	// Datenlesen zur Firma	
+	$mob = new mobilitaetsprogramm();
+	if (!$mob->getFirmaMobilitaetsprogramm($firma_id))
+		return $htmlstr.'</table>';
+	$i=0;
+	foreach ($mob->result as $row)
+	{
+		$htmlstr .= "<tr class='liste". ($i%2) ."'>\n";
+		$htmlstr.= '<td>'.$row->kurzbz.'</td>';
+		$htmlstr.= "<td align='center'><a href='".$_SERVER['PHP_SELF']."?deletemobilitaetsprogramm=true&firma_id=".$firma_id."&mobilitaetsprogramm_code=".$row->mobilitaetsprogramm_code."' onclick='return confdel()'><img src='../../skin/images/application_form_delete.png' alt='loeschen' title='loeschen'/></a></td>";
+		$htmlstr.= '</tr>';
+		$i++;
+	}
+	
+	$htmlstr.= '</table>';
+	return $htmlstr;
+}
+// ----------------------------------------------------------------------------------------------------------------------------------
+function saveMobilitaetsprogramm($firma_id, $mobilitaetsprogramm_code)
+{
+	$firma = new firma();
+	if($firma->addMobilitaetsprogramm($firma_id, $mobilitaetsprogramm_code))
+		return true;
 }
 // ----------------------------------------------------------------------------------------------------------------------------------
 /**

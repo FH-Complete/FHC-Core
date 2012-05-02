@@ -833,6 +833,80 @@ class firma extends basis_db
 		}
 		return $this->firma_organisationseinheit_id;
 	}
-
+	
+	/**
+	 * Teilt einer Firma ein Mobilitaetsprogramm zu
+	 * 
+	 * @param $firma_id
+	 * @param $mobilitaetsprogramm_code
+	 * @return boolean
+	 */
+	function addMobilitaetsprogramm($firma_id, $mobilitaetsprogramm_code)
+	{
+		if(!$this->existsMobilitaetsprogramm($firma_id, $mobilitaetsprogramm_code))
+		{
+			$qry = "INSERT INTO public.tbl_firma_mobilitaetsprogramm(firma_id, mobilitaetsprogramm_code) VALUES(".
+				$this->db_add_param($firma_id, FHC_INTEGER).','.
+				$this->db_add_param($mobilitaetsprogramm_code, FHC_INTEGER).');';
+				
+			if($this->db_query($qry))
+				return true;
+			else
+				return false;
+		}
+		else
+			return true;
+	}
+	
+	/**
+	 * Prueft ob eine Mobilitaetsprogrammzuordnung zu einer Firma existiert
+	 * @param $firma_id
+	 * @param $mobilitaetsprogramm_code
+	 * @return boolean
+	 */
+	function existsMobilitaetsprogramm($firma_id, $mobilitaetsprogramm_code)
+	{
+		$qry = "SELECT 
+					* 
+				FROM 
+					public.tbl_firma_mobilitaetsprogramm
+				WHERE 
+					firma_id=".$this->db_add_param($firma_id, FHC_INTEGER)." 
+					AND mobilitaetsprogramm_code=".$this->db_add_param($mobilitaetsprogramm_code, FHC_INTEGER); 
+		if($this->db_query($qry))
+		{
+			if($this->db_num_rows()>0)
+				return true;
+			else
+				return false;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Entfernt die Zuordnung zu einem Mobilitaetsprogramm
+	 * @param $firma_id
+	 * @param $mobilitaetsprogramm_code
+	 * @return boolean
+	 */
+	function deletemobilitaetsprogramm($firma_id, $mobilitaetsprogramm_code)
+	{
+		$qry = "DELETE FROM public.tbl_firma_mobilitaetsprogramm WHERE
+				firma_id=".$this->db_add_param($firma_id, FHC_INTEGER)."
+				AND mobilitaetsprogramm_code=".$this->db_add_param($mobilitaetsprogramm_code);
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Löschen der Daten';
+			return false;
+		}
+	}
 }
 ?>
