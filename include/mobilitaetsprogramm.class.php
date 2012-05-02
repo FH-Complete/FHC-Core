@@ -66,5 +66,35 @@ class mobilitaetsprogramm extends basis_db
 			return false; 
 		}
 	}
+    
+
+    /**
+     * Lädt ein Mobilitätsprogramm
+     * @param int $mobilitaetsprogramm_code
+     * @return boolean 
+     */
+    public function load($mobilitaetsprogramm_code)
+    {
+        $qry ="SELECT * FROM bis.tbl_mobilitaetsprogramm where mobilitaetsprogramm_code =".$this->db_add_param($mobilitaetsprogramm_code, FHC_INTEGER);
+        if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+
+				$this->mobilitaetsprogramm_code = $row->mobilitaetsprogramm_code; 
+				$this->kurzbz = $row->kurzbz; 
+				$this->beschreibung = $row->beschreibung; 
+				$this->sichtbar = $row->sichtbar; 
+				
+			}
+			return true; 
+		}
+		else
+		{
+			$this->errormsg = "Fehler bei der Abfrage aufgetreten"; 
+			return false; 
+		}
+    }
+  
 
 }
