@@ -292,5 +292,55 @@ class akte extends basis_db
 			return false;
 		}			
 	}
+    
+    
+    /**
+	 * Liefert die Akten die ein Outgoing sehen darf
+	 *
+	 * @param $person_id
+	 * @return true wenn ok, sonst false
+	 */
+	public function getAktenOutgoing($person_id)
+	{
+		$qry = "SELECT 
+					akte_id, person_id, dokument_kurzbz, mimetype, erstelltam, gedruckt, 
+					titel, bezeichnung, updateamum, insertamum, updatevon, insertvon, uid 
+				FROM public.tbl_akte WHERE person_id='".addslashes($person_id)."'";
+
+			$qry.=" AND dokument_kurzbz IN ('Lebenslf','Motivat','LearnAgr')";
+		$qry.=" ORDER BY erstelltam";
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$akten = new akte();
+				
+				$akten->akte_id = $row->akte_id;
+				$akten->person_id = $row->person_id;
+				$akten->dokument_kurzbz = $row->dokument_kurzbz;
+				//$akte->inhalt = $row->inhalt;
+				$akten->mimetype = $row->mimetype;
+				$akten->erstelltam = $row->erstelltam;
+				$akten->gedruckt = ($row->gedruckt=='t'?true:false);
+				$akten->titel = $row->titel;
+				$akten->bezeichnung = $row->bezeichnung;
+				$akten->updateamum = $row->updateamum;
+				$akten->updatevon = $row->updatevon;
+				$akten->insertamum = $row->insertamum;
+				$akten->insertvon = $row->insertvon;
+				$akten->uid = $row->uid;
+				
+				$this->result[] = $akten;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}			
+	}
+    
 }
 ?>
