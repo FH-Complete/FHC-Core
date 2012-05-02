@@ -54,7 +54,7 @@ class mobilitaetsprogramm extends basis_db
 				$mobility->mobilitaetsprogramm_code = $row->mobilitaetsprogramm_code; 
 				$mobility->kurzbz = $row->kurzbz; 
 				$mobility->beschreibung = $row->beschreibung; 
-				$mobility->sichtbar = $row->sichtbar; 
+				$mobility->sichtbar = $this->db_parse_bool($row->sichtbar); 
 				
 				$this->result[]=$mobility; 
 			}
@@ -97,4 +97,41 @@ class mobilitaetsprogramm extends basis_db
     }
   
 
+	/**
+	 * Laedt die Mobilitaetsprogramme die einer Firma zugeteilt sind
+	 * @param $firma_id
+	 * @return boolean
+	 */
+	public function getFirmaMobilitaetsprogramm($firma_id)
+	{
+		$qry = "SELECT 
+					* 
+				FROM 
+					bis.tbl_mobilitaetsprogramm 
+					JOIN public.tbl_firma_mobilitaetsprogramm USING(mobilitaetsprogramm_code)
+				WHERE
+					firma_id=".$this->db_add_param($firma_id, FHC_INTEGER);
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$mobility = new mobilitaetsprogramm(); 
+				
+				$mobility->mobilitaetsprogramm_code = $row->mobilitaetsprogramm_code; 
+				$mobility->kurzbz = $row->kurzbz; 
+				$mobility->beschreibung = $row->beschreibung; 
+				$mobility->sichtbar = $this->db_parse_bool($row->sichtbar);
+				$mobility->sichtbar_outgoing = $this->db_parse_bool($row->sichtbar_outgoing);  
+				
+				$this->result[]=$mobility; 
+			}
+			return true; 
+		}
+		else
+		{
+			$this->errormsg = "Fehler bei der Abfrage aufgetreten"; 
+			return false; 
+		}
+	}
 }
