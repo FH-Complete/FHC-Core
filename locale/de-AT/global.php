@@ -149,6 +149,7 @@ $this->phrasen['global/keineBerechtigung']='Keine Berechtigung';
 $this->phrasen['global/datensatzWurdeNichtGefunden']='Datensatz wurde nicht gefunden';
 $this->phrasen['global/keineBerechtigungZumAendernDesDatensatzes']='Keine Berechtigung zum Ändern des Datensatzes';
 $this->phrasen['global/keineDatenGefunden']='Keine Daten gefunden';
+$this->phrasen['global/erfolgreichAngelegt']='Erfolgreich angelegt';
 
 //infrastruktur
 
