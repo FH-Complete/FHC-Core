@@ -21,14 +21,8 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 
- require_once('../../../../config/cis.config.inc.php');
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung 
-// ------------------------------------------------------------------------------------------
-	require_once('../../../../include/basis_db.class.php');
-	if (!$db = new basis_db())
-			die('Fehler beim Herstellen der Datenbankverbindung');
-			
+require_once('../../../../config/cis.config.inc.php');
+require_once('../../../../include/basis_db.class.php');	
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/studiengang.class.php');
@@ -46,6 +40,9 @@ require_once('../../../../include/mail.class.php');
 require_once('../../../../include/benutzerfunktion.class.php');
 require_once('../../../../include/benutzer.class.php');
 require_once('../../../../include/student.class.php');
+
+if (!$db = new basis_db())
+	die('Fehler beim Herstellen der Datenbankverbindung');
 
 $user = get_uid();
 
@@ -110,7 +107,7 @@ $student_uid = $_REQUEST["student_uid"];
 //	die('Es wurde keine passende Lehreinheit in diesem Studiensemester gefunden');
 
 $note = $_REQUEST["note"];
-if ( (($note>0) && ($note < 6)) || ($note == 7) || ($note==8) )
+if ( (($note>0) && ($note < 6)) || ($note == 7) || ($note==8) || ($note==16))
 	$note = $_REQUEST["note"];
 else
 	$note = 9;
