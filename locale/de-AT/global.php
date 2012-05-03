@@ -12,9 +12,9 @@ $this->phrasen['global/fhtw']='Fachhochschule Technikum Wien';
 
 $this->phrasen['global/studiengangsmanagement']='Studiengangsmanagement';
 $this->phrasen['global/geschaeftsfuehrendeltg']='geschäftsf. Leitung';
-$this->phrasen['global/stellvertreter']='Stellvertreter';
+$this->phrasen['global/stellvertreter']='Stellvertretung';
 $this->phrasen['global/sekretariat']='Sekretariat';
-$this->phrasen['global/studentenvertreter']='Studierendenvertreter';
+$this->phrasen['global/studentenvertreter']='Studierendenvertretung';
 
 $this->phrasen['global/lehrziele']='Lehrziele';
 $this->phrasen['global/allgemeinerdownload']='Allgemeiner Download';
