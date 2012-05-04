@@ -50,7 +50,9 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 		die('Institut existiert nicht');
 	
 	echo "<h2>Mitarbeiterstatistik (Hauptzuordnung) - ".$fachbereich->bezeichnung.'</h2>';
-	$qry = "SELECT distinct uid, nachname, vorname, titelpre, titelpost 
+	$qry = "SELECT distinct uid, anrede, nachname, vorname, titelpre, titelpost,
+			(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE oe_kurzbz='".addslashes($fachbereich->oe_kurzbz)."' AND fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv AND (datum_bis >= now() OR datum_bis IS NULL) AND (datum_von <= now() OR datum_von IS NULL) AND geschlecht='m') a) as fix_m,
+			(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE oe_kurzbz='".addslashes($fachbereich->oe_kurzbz)."' AND fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv AND (datum_bis >= now() OR datum_bis IS NULL) AND (datum_von <= now() OR datum_von IS NULL) AND geschlecht='w') a) as fix_w 
 			FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) 
 			WHERE oe_kurzbz='".addslashes($fachbereich->oe_kurzbz)."' 
 			AND fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv 
@@ -58,12 +60,28 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 			AND (datum_von <= now() OR datum_von IS NULL)
 			ORDER BY nachname, vorname";
 	
-	if($result = $db->db_query($qry))
+	if($db->db_query($qry))
 	{
-		echo "Fixangestellt - Anzahl: ".$db->db_num_rows($result)."
+		$ausgabe='';
+		$fix_m=0;
+		$fix_w=0;
+		while($row = $db->db_fetch_object())
+		{
+			$ausgabe.= '<tr>';
+			$ausgabe.= "<td>$row->anrede</td>";
+			$ausgabe.= "<td>$row->titelpre</td>";
+			$ausgabe.= "<td>$row->nachname</td>";
+			$ausgabe.= "<td>$row->vorname</td>";
+			$ausgabe.= "<td>$row->titelpost</td>";
+			$ausgabe.= "</tr>";
+			$fix_w=$row->fix_w;
+			$fix_m=$row->fix_m;
+		}
+		echo (($fix_m)+($fix_w))." Fixangestellte<br>M: ".$fix_m." <br>W: ".$fix_w."
 			<table class='liste table-stripeclass:alternate table-autostripe'>
 					<thead>
 						<tr>
+							<th>Anrede</th>
 							<th>TitelPre</th>
 							<th>Nachname</th>
 							<th>Vorname</th>
@@ -72,19 +90,13 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 					</thead>
 					<tbody>
 				 ";
-		while($row = $db->db_fetch_object($result))
-		{
-			echo '<tr>';
-			echo "<td>$row->titelpre</td>";
-			echo "<td>$row->nachname</td>";
-			echo "<td>$row->vorname</td>";
-			echo "<td>$row->titelpost</td>";
-			echo "</tr>";
-		}		
+		echo $ausgabe;
 	}
 	echo '</tbody></table>';
 	
-	$qry = "SELECT distinct uid, nachname, vorname, titelpre, titelpost 
+	$qry = "SELECT distinct uid, anrede, nachname, vorname, titelpre, titelpost, 
+			(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE oe_kurzbz='".addslashes($fachbereich->oe_kurzbz)."' AND NOT fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv AND (datum_bis >= now() OR datum_bis IS NULL) AND (datum_von <= now() OR datum_von IS NULL) AND geschlecht='m') a) as extern_m,
+			(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE oe_kurzbz='".addslashes($fachbereich->oe_kurzbz)."' AND NOT fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv AND (datum_bis >= now() OR datum_bis IS NULL) AND (datum_von <= now() OR datum_von IS NULL) AND geschlecht='w') a) as extern_w
 			FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) 
 			WHERE oe_kurzbz='".addslashes($fachbereich->oe_kurzbz)."' 
 			AND NOT fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv
@@ -92,12 +104,28 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 			AND (datum_von <= now() OR datum_von IS NULL)
 			ORDER BY nachname, vorname";
 	
-	if($result = $db->db_query($qry))
+if($db->db_query($qry))
 	{
-		echo "<br /><br />Freiangestellt - Anzahl: ".$db->db_num_rows($result)."
+		$ausgabe='';
+		$extern_m=0;
+		$extern_w=0;
+		while($row = $db->db_fetch_object())
+		{
+			$ausgabe.= '<tr>';
+			$ausgabe.= "<td>$row->anrede</td>";
+			$ausgabe.= "<td>$row->titelpre</td>";
+			$ausgabe.= "<td>$row->nachname</td>";
+			$ausgabe.= "<td>$row->vorname</td>";
+			$ausgabe.= "<td>$row->titelpost</td>";
+			$ausgabe.= "</tr>";
+			$extern_w=$row->extern_w;
+			$extern_m=$row->extern_m;
+		}
+		echo "<br /><br />".(($extern_m)+($extern_w))." Freiangestellte<br>M: ".$extern_m." <br>W: ".$extern_w."
 			<table class='liste table-stripeclass:alternate table-autostripe'>
 					<thead>
 						<tr>
+							<th>Anrede</th>
 							<th>TitelPre</th>
 							<th>Nachname</th>
 							<th>Vorname</th>
@@ -106,15 +134,7 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 					</thead>
 					<tbody>
 				 ";
-		while($row = $db->db_fetch_object($result))
-		{
-			echo '<tr>';
-			echo "<td>$row->titelpre</td>";
-			echo "<td>$row->nachname</td>";
-			echo "<td>$row->vorname</td>";
-			echo "<td>$row->titelpost</td>";
-			echo "</tr>";
-		}		
+		echo $ausgabe;
 	}
 	echo '</tbody></table>';
 }
@@ -130,13 +150,20 @@ else
 				<thead>
 					<tr>
 						<th></th>
-						<th colspan=2>Anzahl</th>
+						<th colspan=4>Anzahl</th>
 					</tr>
 					<tr>
 						<th>Institute</th>
-						<th>fix</th>
-						<th>extern</th>
+						<th colspan=2>fix</th>
+						<th colspan=2>extern</th>
 					</tr>
+					<tr>
+							<th></th>
+							<th>M</th>
+							<th>W</th>
+							<th>M</th>
+							<th>W</th>
+						</tr>
 				</thead>
 				<tbody>
 				
@@ -144,33 +171,51 @@ else
 	
 	$qry = "SELECT 
 				bezeichnung, fachbereich_kurzbz,
-				(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE oe_kurzbz=a.oe_kurzbz AND fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv AND (datum_bis >= now() OR datum_bis IS NULL) AND (datum_von <= now() OR datum_von IS NULL)) a) as fix,
-				(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE oe_kurzbz=a.oe_kurzbz AND NOT fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv AND (datum_bis >= now() OR datum_bis IS NULL) AND (datum_von <= now() OR datum_von IS NULL)) a) as extern
+				(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE oe_kurzbz=a.oe_kurzbz AND fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv AND (datum_bis >= now() OR datum_bis IS NULL) AND (datum_von <= now() OR datum_von IS NULL) AND geschlecht='m') a) as fix_m,
+				(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE oe_kurzbz=a.oe_kurzbz AND fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv AND (datum_bis >= now() OR datum_bis IS NULL) AND (datum_von <= now() OR datum_von IS NULL) AND geschlecht='w') a) as fix_w,
+				(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE oe_kurzbz=a.oe_kurzbz AND NOT fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv AND (datum_bis >= now() OR datum_bis IS NULL) AND (datum_von <= now() OR datum_von IS NULL) AND geschlecht='m') a) as extern_m,
+				(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE oe_kurzbz=a.oe_kurzbz AND NOT fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv AND (datum_bis >= now() OR datum_bis IS NULL) AND (datum_von <= now() OR datum_von IS NULL) AND geschlecht='w') a) as extern_w
 			FROM public.tbl_fachbereich a WHERE aktiv ORDER BY bezeichnung";
 	
 	if($result = $db->db_query($qry))
 	{
 		$gesamt_fix=0;
+		$gesamt_fix_m=0;
+		$gesamt_fix_w=0;
 		$gesamt_extern=0;
+		$gesamt_extern_m=0;
+		$gesamt_extern_w=0;
+		$gesamt_fix_m_nz=0;
+		$gesamt_fix_w_nz=0;
+		$gesamt_extern_m_nz=0;
+		$gesamt_extern_w_nz=0;
 
 		while($row = $db->db_fetch_object($result))
 		{
-			if($row->fix==0 && $row->extern==0)
+			if(($row->fix_m==0 && $row->fix_w==0) && ($row->extern_m==0 && $row->extern_w==0))
 			{
 				continue;
 			}
 			echo '<tr>';
 			echo "<td><a href='".$_SERVER['PHP_SELF']."?details=true&fachbereich_kurzbz=".$row->fachbereich_kurzbz."'>$row->bezeichnung</a></td>";
-			echo "<td align='center'>$row->fix</td>";
-			echo "<td align='center'>$row->extern</td>";
+			echo "<td align='center'>$row->fix_m</td>";
+			echo "<td align='center'>$row->fix_w</td>";
+			echo "<td align='center'>$row->extern_m</td>";
+			echo "<td align='center'>$row->extern_w</td>";
 			echo "</tr>";
-			$gesamt_fix+=$row->fix;
-			$gesamt_extern+=$row->extern;
+			$gesamt_fix_m+=$row->fix_m;			
+			$gesamt_fix_w+=$row->fix_w;			
+			$gesamt_fix+=(($row->fix_m)+($row->fix_w));
+			$gesamt_extern_m+=$row->extern_m;
+			$gesamt_extern_w+=$row->extern_w;
+			$gesamt_extern+=(($row->extern_m)+($row->extern_w));
 		}
 		
 		$qry = "SELECT 
-					(SELECT count(*) FROM campus.vw_mitarbeiter WHERE uid NOT in(SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='oezuordnung' AND (datum_bis >= now() OR datum_bis IS NULL) AND (datum_von <= now() OR datum_von IS NULL)) AND aktiv AND fixangestellt) as fix,
-					(SELECT count(*) FROM campus.vw_mitarbeiter WHERE uid NOT in(SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='oezuordnung' AND (datum_bis >= now() OR datum_bis IS NULL) AND (datum_von <= now() OR datum_von IS NULL)) AND aktiv AND NOT fixangestellt) as extern
+					(SELECT count(*) FROM campus.vw_mitarbeiter WHERE uid NOT in(SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='oezuordnung' AND (datum_bis >= now() OR datum_bis IS NULL) AND (datum_von <= now() OR datum_von IS NULL)) AND aktiv AND fixangestellt AND geschlecht='m') as fix_m,
+					(SELECT count(*) FROM campus.vw_mitarbeiter WHERE uid NOT in(SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='oezuordnung' AND (datum_bis >= now() OR datum_bis IS NULL) AND (datum_von <= now() OR datum_von IS NULL)) AND aktiv AND fixangestellt AND geschlecht='w') as fix_w,
+					(SELECT count(*) FROM campus.vw_mitarbeiter WHERE uid NOT in(SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='oezuordnung' AND (datum_bis >= now() OR datum_bis IS NULL) AND (datum_von <= now() OR datum_von IS NULL)) AND aktiv AND NOT fixangestellt AND geschlecht='m') as extern_m,
+					(SELECT count(*) FROM campus.vw_mitarbeiter WHERE uid NOT in(SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='oezuordnung' AND (datum_bis >= now() OR datum_bis IS NULL) AND (datum_von <= now() OR datum_von IS NULL)) AND aktiv AND NOT fixangestellt AND geschlecht='w') as extern_w
 				";
 		if($result = $db->db_query($qry))
 		{
@@ -178,17 +223,27 @@ else
 			{
 				echo '<tr>';
 				echo "<td>Nicht zugeordnet</td>";
-				echo "<td align='center'>$row->fix</td>";
-				echo "<td align='center'>$row->extern</td>";
+				echo "<td align='center'>$row->fix_m</td>";
+				echo "<td align='center'>$row->fix_w</td>";
+				echo "<td align='center'>$row->extern_m</td>";
+				echo "<td align='center'>$row->extern_w</td>";
 				echo "</tr>";
-				$gesamt_fix += $row->fix;
-				$gesamt_extern += $row->extern;
+				$gesamt_fix_m_nz += $row->fix_m;
+				$gesamt_fix_w_nz += $row->fix_w;
+				$gesamt_extern_m_nz += $row->extern_m;
+				$gesamt_extern_w_nz += $row->extern_w;
 			}
 		}
 		echo '<tr>';
-		echo '<td><b>SUMME</b></td>';
-		echo "<td align='center'><b>$gesamt_fix</b></td>";
-		echo "<td align='center'><b>$gesamt_extern</b></td>";
+		echo '<td rowspan="2"><b>SUMME</b></td>';
+		echo "<td align='center'><b>".(($gesamt_fix_m)+($gesamt_fix_m_nz))."</b></td>";
+		echo "<td align='center'><b>".(($gesamt_fix_w)+($gesamt_fix_w_nz))."</b></td>";
+		echo "<td align='center'><b>".(($gesamt_extern_m)+($gesamt_extern_m_nz))."</b></td>";
+		echo "<td align='center'><b>".(($gesamt_extern_w)+($gesamt_extern_w_nz))."</b></td>";
+		echo "</tr>";
+		echo '<tr>';
+		echo "<td align='center' colspan='2'><b>".(($gesamt_fix_m)+($gesamt_fix_m_nz)+($gesamt_fix_w)+($gesamt_fix_w_nz))."</b></td>";
+		echo "<td align='center' colspan='2'><b>".(($gesamt_extern_m)+($gesamt_extern_m_nz)+($gesamt_extern_w)+($gesamt_extern_w_nz))."</b></td>";
 		echo "</tr>";
 		
 	}
