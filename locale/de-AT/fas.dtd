@@ -51,11 +51,11 @@
 <!ENTITY menu-statistic-lehre.accesskey	"L">
 
 <!ENTITY menu-statistic-mitarbeiter.key			"M">
-<!ENTITY menu-statistic-mitarbeiter.label		"Mitarbeiter">
+<!ENTITY menu-statistic-mitarbeiter.label		"MitarbeiterInnen">
 <!ENTITY menu-statistic-mitarbeiter.accesskey	"M">
 
 <!ENTITY menu-statistic-student.key			"S">
-<!ENTITY menu-statistic-student.label		"Student">
+<!ENTITY menu-statistic-student.label		"Studierende">
 <!ENTITY menu-statistic-student.accesskey	"S">
 
 <!ENTITY menu-statistic-oehbeitraege.key		"O">
@@ -106,7 +106,7 @@
 <!ENTITY menu-statistic-notenspiegel.label		"Notenspiegel HTML">
 <!ENTITY menu-statistic-notenspiegel.accesskey	"H">
 
-<!ENTITY menu-statistic-substatistik-bewerberstatistik.label		"Bewerberstatistik">
+<!ENTITY menu-statistic-substatistik-bewerberstatistik.label		"BewerberInnenstatistik">
 <!ENTITY menu-statistic-substatistik-bewerberstatistik.accesskey	"B">
 
 <!ENTITY menu-statistic-bewerberstatistik-html.key			"H">
@@ -152,19 +152,19 @@
 <!ENTITY menu-statistic-substatistik-lvplanunggesamtsj-excel.accesskey	"E">
 
 <!ENTITY menu-statistic-abgaengerstatistik.key			"A">
-<!ENTITY menu-statistic-abgaengerstatistik.label		"Abgängerstatistik">
+<!ENTITY menu-statistic-abgaengerstatistik.label		"AbgängerInnenstatistik">
 <!ENTITY menu-statistic-abgaengerstatistik.accesskey	"A">
 
 <!ENTITY menu-statistic-absolventenstatistik.key		"B">
-<!ENTITY menu-statistic-absolventenstatistik.label		"Absolventenstatistik">
+<!ENTITY menu-statistic-absolventenstatistik.label		"AbsolventInnenstatistik">
 <!ENTITY menu-statistic-absolventenstatistik.accesskey	"B">
 
 <!ENTITY menu-statistic-absolventenzahlen.key		"Z">
-<!ENTITY menu-statistic-absolventenzahlen.label		"Absolventenzahlen">
+<!ENTITY menu-statistic-absolventenzahlen.label		"AbsolventInnenzahlen">
 <!ENTITY menu-statistic-absolventenzahlen.accesskey	"Z">
 
 <!ENTITY menu-statistic-lektorenstatistik.key		"L">
-<!ENTITY menu-statistic-lektorenstatistik.label		"Lektorenstatistik">
+<!ENTITY menu-statistic-lektorenstatistik.label		"LektorInnenstatistik">
 <!ENTITY menu-statistic-lektorenstatistik.accesskey	"L">
 
 <!ENTITY menu-statistic-studentenstatistik.key			"S">
@@ -172,7 +172,7 @@
 <!ENTITY menu-statistic-studentenstatistik.accesskey	"S">
 
 <!ENTITY menu-statistic-mitarbeiterstatistik.key		"M">
-<!ENTITY menu-statistic-mitarbeiterstatistik.label		"Mitarbeiterstatistik">
+<!ENTITY menu-statistic-mitarbeiterstatistik.label		"MitarbeiterInnenstatistik">
 <!ENTITY menu-statistic-mitarbeiterstatistik.accesskey	"M">
 
 <!ENTITY menu-statistic-studentendetails.key		"P">

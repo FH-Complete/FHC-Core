@@ -89,7 +89,7 @@ echo "<h2>Absolventen&uuml;bersicht $stsem </h2>";
 if(isset($_REQUEST["trennung"]))
 {
 	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">';
-	echo '<input type="submit" value="Geschlechtertrennung ausblenden"/></form><br>(m&auml;nnl./weibl.)<br><br>';
+	echo '<input type="submit" value="Geschlechtertrennung ausblenden"/></form><br><br>';
 }
 else 
 {
@@ -103,10 +103,33 @@ foreach ($stgall->result as $row)
 {
 	if($row->studiengang_kz>0 && $row->studiengang_kz<999)
 	{
-		echo "<th>".$row->kuerzel.'('.$row->kurzbzlang.")</th>";
+		echo "<th";
+			if(isset($_REQUEST["trennung"]))
+				{
+					echo " colspan='2'";
+				};
+			echo ">".$row->kuerzel."</th>";
 	}
 }
-echo "<th>Summe</th></tr></thead><tbody>";
+	if(isset($_REQUEST["trennung"]))
+		{
+			echo "<th colspan='2'>Summe</th></tr></thead>";
+			echo "<th></th>";
+			foreach ($stgall->result as $row)
+				{
+					if($row->studiengang_kz>0 && $row->studiengang_kz<999)
+					{
+					echo "<th>m</th><th>w</th>";
+					}
+				}
+			echo "<th>m</th><th>w</th>";
+		}
+	else echo "<th>Summe</th></tr></thead>";
+
+echo "<tbody>";
+
+
+
 $stsem=$stsem_obj->jump($stsem,1);
 $i=0;
 while($stsem_obj->jump($stsem,-1)!= $stsem)
@@ -171,11 +194,12 @@ while($stsem_obj->jump($stsem,-1)!= $stsem)
 			{
 				$absolventen_w[$stsem][$row->studiengang_kz]='0';
 			}
-			echo "<td align=center>".$absolventen[$stsem][$row->studiengang_kz];
-			if(isset($_REQUEST["trennung"]))
-			{
-				echo " <br>(".$absolventen_m[$stsem][$row->studiengang_kz]."/".$absolventen_w[$stsem][$row->studiengang_kz].")";
-			}
+			echo "<td align=center>";
+				if(isset($_REQUEST["trennung"]))
+					{
+						echo $absolventen_m[$stsem][$row->studiengang_kz]."</td><td align=center>".$absolventen_w[$stsem][$row->studiengang_kz];
+					}
+				else echo $absolventen[$stsem][$row->studiengang_kz];
 			echo "</td>";
 			if(!isset($sumstg[$row->studiengang_kz]))
 			{
@@ -197,11 +221,12 @@ while($stsem_obj->jump($stsem,-1)!= $stsem)
 			$sumsem_w+=$absolventen_w[$stsem][$row->studiengang_kz];
 		}
 	}
-	echo "<td align=center style='font-weight:bold;'>".$sumsem;
-	if(isset($_REQUEST["trennung"]))
-	{
-		echo " <br>(".$sumsem_m."/".$sumsem_w.")";
-	}
+	
+		if(isset($_REQUEST["trennung"]))
+		{
+			echo "<td align=center style='font-weight:bold;'>".$sumsem_m."</td><td align=center style='font-weight:bold;'>".$sumsem_w."";
+		}
+		else echo "<td align=center style='font-weight:bold;'>".$sumsem;
 	echo "</td>";
 	echo "</tr>";
 }
@@ -212,11 +237,11 @@ foreach ($stgall->result as $row)
 	if($row->studiengang_kz>0 && $row->studiengang_kz<999)
 	{
 		echo "<td align=center>";
-		echo $sumstg[$row->studiengang_kz];
-		if(isset($_REQUEST["trennung"]))
-		{
-			echo " <br>(".$sumstg_m[$row->studiengang_kz]."/".$sumstg_w[$row->studiengang_kz].")";
-		}
+			if(isset($_REQUEST["trennung"]))
+			{
+				echo $sumstg_m[$row->studiengang_kz]."</td><td align=center>".$sumstg_w[$row->studiengang_kz];
+			}
+			else echo $sumstg[$row->studiengang_kz];
 		$sumsum+=$sumstg[$row->studiengang_kz];
 		$sumsum_m+=$sumstg_m[$row->studiengang_kz];
 		$sumsum_w+=$sumstg_w[$row->studiengang_kz];
@@ -224,11 +249,11 @@ foreach ($stgall->result as $row)
 	}
 }
 echo "<td align=center>";
-echo $sumsum;
-if(isset($_REQUEST["trennung"]))
-{
-	echo " (".$sumsum_m."/".$sumsum_w.")";
-}
+	if(isset($_REQUEST["trennung"]))
+	{
+		echo $sumsum_m."</td><td align=center>".$sumsum_w;
+	}
+	else echo $sumsum;
 echo "</td></tr>";
 echo "</tbody></table>";
 

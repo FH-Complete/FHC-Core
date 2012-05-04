@@ -60,8 +60,10 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 	if(!$fachbereich->load($_GET['fachbereich_kurzbz']))
 		die('Institut existiert nicht');
 	
-	echo "<h2>Lektorenstatistik (Lehrauftrag ohne Betreuungen) $ws / $ss - ".$fachbereich->bezeichnung.'</h2>';
-	$qry = "SELECT distinct mitarbeiter_uid, nachname, vorname, titelpre, titelpost
+	echo "<h2>LektorInnenstatistik (Lehrauftrag ohne Betreuungen) $ws / $ss - ".$fachbereich->bezeichnung.'</h2>';
+	$qry = "SELECT distinct mitarbeiter_uid, anrede, nachname, vorname, titelpre, titelpost,
+			(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN campus.vw_mitarbeiter ON(uid=mitarbeiter_uid) WHERE studiensemester_kurzbz IN('".addslashes($ws)."','".addslashes($ss)."') AND fachbereich_kurzbz='".addslashes($fachbereich->fachbereich_kurzbz)."' AND fixangestellt AND geschlecht='m') a) AS fix_m,
+			(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN campus.vw_mitarbeiter ON(uid=mitarbeiter_uid) WHERE studiensemester_kurzbz IN('".addslashes($ws)."','".addslashes($ss)."') AND fachbereich_kurzbz='".addslashes($fachbereich->fachbereich_kurzbz)."' AND fixangestellt AND geschlecht='w') a) AS fix_w
 			FROM lehre.tbl_lehreinheitmitarbeiter 
 				JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
 				JOIN lehre.tbl_lehrfach USING(lehrfach_id) 
@@ -72,13 +74,28 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 				AND fachbereich_kurzbz='".addslashes($fachbereich->fachbereich_kurzbz)."' AND fixangestellt
 			ORDER BY nachname, vorname";
 	
-	
 	if($db->db_query($qry))
 	{
-		echo "Fixangestellt - Anzahl: ".$db->db_num_rows()."
+		$ausgabe='';
+		$fix_m=0;
+		$fix_w=0;
+		while($row = $db->db_fetch_object())
+		{
+			$ausgabe.= '<tr>';
+			$ausgabe.= "<td>$row->anrede</td>";
+			$ausgabe.= "<td>$row->titelpre</td>";
+			$ausgabe.= "<td>$row->nachname</td>";
+			$ausgabe.= "<td>$row->vorname</td>";
+			$ausgabe.= "<td>$row->titelpost</td>";
+			$ausgabe.= "</tr>";
+			$fix_w=$row->fix_w;
+			$fix_m=$row->fix_m;
+		}
+		echo (($fix_m)+($fix_w))." Fixangestellte<br>M: ".$fix_m." <br>W: ".$fix_w."
 			<table class='liste table-stripeclass:alternate table-autostripe'>
 					<thead>
 						<tr>
+							<th>Anrede</th>
 							<th>TitelPre</th>
 							<th>Nachname</th>
 							<th>Vorname</th>
@@ -87,19 +104,13 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 					</thead>
 					<tbody>
 				 ";
-		while($row = $db->db_fetch_object())
-		{
-			echo '<tr>';
-			echo "<td>$row->titelpre</td>";
-			echo "<td>$row->nachname</td>";
-			echo "<td>$row->vorname</td>";
-			echo "<td>$row->titelpost</td>";
-			echo "</tr>";
-		}		
+		echo $ausgabe;
 	}
 	echo '</tbody></table>';
 	
-	$qry = "SELECT distinct mitarbeiter_uid, nachname, vorname, titelpre, titelpost
+	$qry = "SELECT distinct mitarbeiter_uid, anrede, nachname, vorname, titelpre, titelpost,
+			(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN campus.vw_mitarbeiter ON(uid=mitarbeiter_uid) WHERE studiensemester_kurzbz IN('".addslashes($ws)."','".addslashes($ss)."') AND fachbereich_kurzbz='".addslashes($fachbereich->fachbereich_kurzbz)."' AND NOT fixangestellt AND geschlecht='m') a) AS not_fix_m,
+			(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN campus.vw_mitarbeiter ON(uid=mitarbeiter_uid) WHERE studiensemester_kurzbz IN('".addslashes($ws)."','".addslashes($ss)."') AND fachbereich_kurzbz='".addslashes($fachbereich->fachbereich_kurzbz)."' AND NOT fixangestellt AND geschlecht='w') a) AS not_fix_w
 			FROM lehre.tbl_lehreinheitmitarbeiter 
 				JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
 				JOIN lehre.tbl_lehrfach USING(lehrfach_id) 
@@ -112,10 +123,26 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 		
 	if($db->db_query($qry))
 	{
-		echo "<br /><br />Freiangestellt - Anzahl: ".$db->db_num_rows()."
+		$ausgabe='';
+		$not_fix_m=0;
+		$not_fix_w=0;
+		while($row = $db->db_fetch_object())
+		{
+			$ausgabe.= '<tr>';
+			$ausgabe.= "<td>$row->anrede</td>";
+			$ausgabe.= "<td>$row->titelpre</td>";
+			$ausgabe.= "<td>$row->nachname</td>";
+			$ausgabe.= "<td>$row->vorname</td>";
+			$ausgabe.= "<td>$row->titelpost</td>";
+			$ausgabe.= "</tr>";
+			$not_fix_w=$row->not_fix_w;
+			$not_fix_m=$row->not_fix_m;
+		}
+		echo "<br /><br />".(($not_fix_m)+($not_fix_w))." Freiangestellte<br>M: ".$not_fix_m." <br>W: ".$not_fix_w."
 			<table class='liste table-stripeclass:alternate table-autostripe'>
 					<thead>
 						<tr>
+							<th>Anrede</th>
 							<th>TitelPre</th>
 							<th>Nachname</th>
 							<th>Vorname</th>
@@ -124,15 +151,7 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 					</thead>
 					<tbody>
 				 ";
-		while($row = $db->db_fetch_object())
-		{
-			echo '<tr>';
-			echo "<td>$row->titelpre</td>";
-			echo "<td>$row->nachname</td>";
-			echo "<td>$row->vorname</td>";
-			echo "<td>$row->titelpost</td>";
-			echo "</tr>";
-		}
+		echo $ausgabe;
 	}
 	echo '</tbody></table>';
 }
@@ -182,15 +201,23 @@ else
 					<thead>
 						<tr>
 							<th></th>
-							<th colspan=2>Anzahl</th>
+							<th colspan=4>Anzahl</th>
 							<th colspan=2>ALVS</th>
 						</tr>
 						<tr>
 							<th>Institute</th>
-							<th>fix</th>
-							<th>extern</th>
+							<th colspan=2>fix</th>
+							<th colspan=2>extern</th>
 							<th>$ws</th>
 							<th>$ss</th>
+						</tr>
+						<tr>
+							<th></th>
+							<th>M</th>
+							<th>W</th>
+							<th>M</th>
+							<th>W</th>
+							<th colspan=2></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -199,38 +226,44 @@ else
 		
 		$qry = "SELECT 
 					bezeichnung, fachbereich_kurzbz,
-					(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE studiensemester_kurzbz in('".addslashes($ws)."','".addslashes($ss)."') AND fachbereich_kurzbz=a.fachbereich_kurzbz AND fixangestellt) a) as fix,
-					(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE studiensemester_kurzbz in('".addslashes($ws)."','".addslashes($ss)."') AND fachbereich_kurzbz=a.fachbereich_kurzbz AND NOT fixangestellt) a) as extern,
-					(SELECT sum(semesterstunden) FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE studiensemester_kurzbz='".addslashes($ws)."' AND fachbereich_kurzbz=a.fachbereich_kurzbz AND faktor>0 AND stundensatz>0) as ws,
-					(SELECT sum(semesterstunden) FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE studiensemester_kurzbz='".addslashes($ss)."' AND fachbereich_kurzbz=a.fachbereich_kurzbz AND faktor>0 AND stundensatz>0) as ss
+					(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN campus.vw_mitarbeiter ON(uid=mitarbeiter_uid) WHERE studiensemester_kurzbz IN('".addslashes($ws)."','".addslashes($ss)."') AND fachbereich_kurzbz=a.fachbereich_kurzbz AND fixangestellt AND geschlecht='m') a) AS fix_m,
+					(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN campus.vw_mitarbeiter ON(uid=mitarbeiter_uid) WHERE studiensemester_kurzbz IN('".addslashes($ws)."','".addslashes($ss)."') AND fachbereich_kurzbz=a.fachbereich_kurzbz AND fixangestellt AND geschlecht='w') a) AS fix_w,
+					(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN campus.vw_mitarbeiter ON(uid=mitarbeiter_uid) WHERE studiensemester_kurzbz IN('".addslashes($ws)."','".addslashes($ss)."') AND fachbereich_kurzbz=a.fachbereich_kurzbz AND NOT fixangestellt AND geschlecht='m') a) AS extern_m,
+					(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN campus.vw_mitarbeiter ON(uid=mitarbeiter_uid) WHERE studiensemester_kurzbz IN('".addslashes($ws)."','".addslashes($ss)."') AND fachbereich_kurzbz=a.fachbereich_kurzbz AND NOT fixangestellt AND geschlecht='w') a) AS extern_w,
+					(SELECT sum(semesterstunden) FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE studiensemester_kurzbz='".addslashes($ws)."' AND fachbereich_kurzbz=a.fachbereich_kurzbz AND faktor>0 AND stundensatz>0) AS ws,
+					(SELECT sum(semesterstunden) FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE studiensemester_kurzbz='".addslashes($ss)."' AND fachbereich_kurzbz=a.fachbereich_kurzbz AND faktor>0 AND stundensatz>0) AS ss
 				FROM public.tbl_fachbereich a WHERE aktiv ORDER BY bezeichnung";
 		
 		if($db->db_query($qry))
 		{
-			$gesamt_fix=0;
-			$gesamt_extern=0;
+			//$gesamt_fix=0;
+			//$gesamt_extern=0;
 			$gesamt_ws=0;
 			$gesamt_ss=0;
 			while($row = $db->db_fetch_object())
 			{
-				if($row->fix==0 && $row->extern==0)
+				if(($row->fix_m==0 && $row->fix_w==0) && ($row->extern_m==0 && $row->extern_w==0))
 				{
 					continue;
 				}
 				echo '<tr>';
 				echo "<td><a href='".$_SERVER['PHP_SELF']."?details=true&fachbereich_kurzbz=$row->fachbereich_kurzbz&ss=$ss&ws=$ws'>$row->bezeichnung</a></td>";
-				echo "<td align='center'>$row->fix</td>";
-				echo "<td align='center'>$row->extern</td>";
+				echo "<td align='center'>$row->fix_m</td>";
+				echo "<td align='center'>$row->fix_w</td>";
+				echo "<td align='center'>$row->extern_m</td>";
+				echo "<td align='center'>$row->extern_w</td>";
 				echo "<td align='center'>$row->ws</td>";
 				echo "<td align='center'>$row->ss</td>";
 				echo "</tr>";
-				$gesamt_fix+=$row->fix;
-				$gesamt_extern+=$row->extern;
+				//$gesamt_fix+=$row->fix;
+				//$gesamt_extern+=$row->extern;
 				$gesamt_ws+=$row->ws;
 				$gesamt_ss+=$row->ss;
 			}
 			echo '<tr>';
 			echo '<td><b>SUMME</b></td>';
+			echo "<td align='center'>&nbsp;</td>";
+			echo "<td align='center'>&nbsp;</td>";
 			echo "<td align='center'>&nbsp;</td>";
 			echo "<td align='center'>&nbsp;</td>";
 			echo "<td align='center'><b>$gesamt_ws</b></td>";

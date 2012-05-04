@@ -79,7 +79,7 @@ if($stsem!='')
 						<th></th>
 						<th>Anteil an Gesamt</th>
 						<th>Studienart</th>
-						<th>Geschlecht</th>
+						<th colspan=2>Geschlecht</th>
 						<th colspan=3>Staatsb&uuml;rgerschaft</th>
 					</tr>
 					<tr>
@@ -87,7 +87,8 @@ if($stsem!='')
 						<th>Studiengänge</th>
 						<th>Absolut / %</th>
 						<th>BB / VZ</th>
-						<th>m / w</th>
+						<th>m</th>
+						<th>w</th>
 						<th>&Ouml;sterreich</th>
 						<th>EU</th>
 						<th>Nicht-EU</th>
@@ -153,7 +154,8 @@ if($stsem!='')
 			$prozent = ($row->gesamt_alle!=0?$row->gesamt_stg/$row->gesamt_alle*100:0);
 			echo "<td align='center'>$row->gesamt_stg / ".sprintf('%0.2f', $prozent)." %</td>";
 			echo "<td align='center'>$row->bb / $row->vz</td>";
-			echo "<td align='center'>$row->m / $row->w</td>";
+			echo "<td align='center'>$row->m</td>";
+			echo "<td align='center'>$row->w</td>";
 			echo "<td align='center'>$row->herkunft_at</td>";
 			echo "<td align='center'>$row->herkunft_eu</td>";
 			echo "<td align='center'>$row->herkunft_noteu</td>";
@@ -173,7 +175,8 @@ if($stsem!='')
 		echo "<td>&nbsp;</td>";
 		echo "<td align='center'><b>$gesamt / ".sprintf('%0.2f', $gesamt_prozent)." %</b></td>";
 		echo "<td align='center'><b>$gesamt_bb / $gesamt_vz</b></td>";
-		echo "<td align='center'><b>$gesamt_m / $gesamt_w</b></td>";
+		echo "<td align='center'><b>$gesamt_m</b></td>";
+		echo "<td align='center'><b>$gesamt_w</b></td>";
 		echo "<td align='center'><b>$gesamt_at</b></td>";
 		echo "<td align='center'><b>$gesamt_eu</b></td>";
 		echo "<td align='center'><b>$gesamt_noteu</b></td>";
@@ -188,7 +191,8 @@ if($stsem!='')
 		<th>Studiengänge</th>
 		<th>Absolut / %</th>
 		<th>BB / VZ</th>
-		<th>m / w</th>
+		<th>m</th>
+		<th>w</th>
 		<th>&Ouml;sterreich</th>
 		<th>EU</th>
 		<th>Nicht-EU</th>
@@ -250,7 +254,8 @@ if($stsem!='')
 			$prozent = ($row->gesamt_alle!=0?$row->gesamt_stg/$row->gesamt_alle*100:0);
 			echo "<td align='center'>$row->gesamt_stg / ".sprintf('%0.2f', $prozent)." %</td>";
 			echo "<td align='center'>$row->bb / $row->vz</td>";
-			echo "<td align='center'>$row->m / $row->w</td>";
+			echo "<td align='center'>$row->m</td>";
+			echo "<td align='center'>$row->w</td>";
 			echo "<td align='center'>$row->herkunft_at</td>";
 			echo "<td align='center'>$row->herkunft_eu</td>";
 			echo "<td align='center'>$row->herkunft_noteu</td>";
@@ -270,7 +275,8 @@ if($stsem!='')
 		echo "<td>&nbsp;</td>";
 		echo "<td align='center'><b>$gesamt / ".sprintf('%0.2f', $gesamt_prozent)." %</b></td>";
 		echo "<td align='center'><b>$gesamt_bb / $gesamt_vz</b></td>";
-		echo "<td align='center'><b>$gesamt_m / $gesamt_w</b></td>";
+		echo "<td align='center'><b>$gesamt_m</b></td>";
+		echo "<td align='center'><b>$gesamt_w</b></td>";
 		echo "<td align='center'><b>$gesamt_at</b></td>";
 		echo "<td align='center'><b>$gesamt_eu</b></td>";
 		echo "<td align='center'><b>$gesamt_noteu</b></td>";
