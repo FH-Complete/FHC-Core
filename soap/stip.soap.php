@@ -27,6 +27,7 @@ require_once('../include/datum.class.php');
 require_once('../include/benutzer.class.php');
 require_once('../include/webservicelog.class.php'); 
 require_once('../include/mail.class.php');
+require_once('../include/abschlusspruefung.class.php');
 require_once('stip.class.php'); 
 
 ini_set("soap.wsdl_cache_enabled", "0");
@@ -104,10 +105,13 @@ function GetStipendienbezieherStip($parameters)
 				$prestudent->load($prestudentID); 
 				$prestudent->getLastStatus($prestudentID); 
 				$prestudentStatus = new prestudent();
-			
+
 				$student = new student(); 
 				$studentUID = $student->getUID($prestudentID); 
 
+                $abschlusspruefung = new abschlusspruefung();
+                $abschlusspruefung->getLastAbschlusspruefung($studentUID);
+                
 				$student->load($studentUID); 
 				$studiengang_kz = $student->studiengang_kz; 
 				
@@ -143,13 +147,16 @@ function GetStipendienbezieherStip($parameters)
                        $StipBezieher->Ausbildungssemester = null; 
                      
                     $StipBezieher->StudStatusCode = $StipBezieher->getStudStatusCode($prestudentID, $studSemester);
-					if($StipBezieher->StudStatusCode==3 || $StipBezieher->StudStatusCode==4)
+                    
+                    // Ausgeschieden ohne Abschluss
+					if($StipBezieher->StudStatusCode==4)
 						$StipBezieher->BeendigungsDatum = $datum_obj->formatDatum($prestudent->datum,'dmY');
-					else 
+					else if($StipBezieher->StudStatusCode==3) // Absolvent -> letzte Prüfung nehmen
+                        $StipBezieher->BeendigungsDatum = $datum_obj->formatDatum($abschlusspruefung->datum,'dmY');
+                    else
 						$StipBezieher->BeendigungsDatum = null; 
 						
 					$StipBezieher->Erfolg = $StipBezieher->getErfolg($prestudentID, $studSemester);
-
 				}
 				elseif($Bezieher->Typ ="ag" || $Bezieher->Typ == "AG")
 				{
