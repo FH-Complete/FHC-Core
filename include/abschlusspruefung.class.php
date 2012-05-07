@@ -323,6 +323,55 @@ class abschlusspruefung extends basis_db
 			return false;
 		}			
 	}
+    
+    
+    /**
+     * Liefert die letzte Abschlussprüfung eines Studenten
+     * @param type $student_uid 
+     */
+    public function getLastAbschlusspruefung($student_uid)
+    {
+		$qry = "SELECT 
+					* 
+				FROM 
+					lehre.tbl_abschlusspruefung 
+					JOIN lehre.tbl_pruefungstyp USING (pruefungstyp_kurzbz) 
+				WHERE student_uid=".$this->db_add_param($student_uid, FHC_STRING, false)."
+				ORDER BY datum DESC LIMIT 1";
+        
+        if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->abschlusspruefung_id = $row->abschlusspruefung_id;
+				$this->student_uid = $row->student_uid;
+				$this->vorsitz = $row->vorsitz;
+				$this->pruefer1 = $row->pruefer1;
+				$this->pruefer2 = $row->pruefer2;
+				$this->pruefer3 = $row->pruefer3;
+				$this->abschlussbeurteilung_kurzbz = $row->abschlussbeurteilung_kurzbz;
+				$this->note = $row->note;
+				$this->akadgrad_id = $row->akadgrad_id;
+				$this->datum = $row->datum;
+				$this->sponsion = $row->sponsion;
+				$this->pruefungstyp_kurzbz = $row->pruefungstyp_kurzbz;
+				$this->beschreibung = $row->beschreibung;
+				$this->anmerkung = $row->anmerkung;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->ext_id = $row->ext_id;
+				
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}			
+    }
 	
 }
 ?>
