@@ -158,7 +158,7 @@ function GetStipendienbezieherStip($parameters)
 						
 					$StipBezieher->Erfolg = $StipBezieher->getErfolg($prestudentID, $studSemester);
 				}
-				elseif($Bezieher->Typ ="ag" || $Bezieher->Typ == "AG")
+				elseif($Bezieher->Typ =="ag" || $Bezieher->Typ == "AG")
 				{
 					$StipBezieher->Ausbildungssemester = null;
 					$StipBezieher->StudStatusCode = null; 
