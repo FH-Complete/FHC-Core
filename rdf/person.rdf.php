@@ -54,7 +54,7 @@ echo '
 
   <RDF:Seq RDF:about="'.$rdf_url.'/liste">
 ';
-$filter = utf8_encode($filter);
+//$filter = utf8_encode($filter);
 $qry = "SELECT 
 			distinct person_id, vorname, nachname, titelpre, titelpost,
 			CASE 

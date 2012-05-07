@@ -207,7 +207,7 @@ function StudentAbschlusspruefungMenulistPersonLoad(menulist, filter)
 
 	if(v.length>2)
 	{
-		var url = '<?php echo APP_ROOT; ?>rdf/person.rdf.php?filter='+v+'&'+gettimestamp();
+		var url = '<?php echo APP_ROOT; ?>rdf/person.rdf.php?filter='+encodeURIComponent(v)+'&'+gettimestamp();
 
 		var oldDatasources = menulist.database.GetDataSources();
 		while(oldDatasources.hasMoreElements())
@@ -245,8 +245,7 @@ function StudentAbschlusspruefungMenulistMitarbeiterLoad(menulist, filter)
 
 	if(v.length>2)
 	{
-		var url = '<?php echo APP_ROOT; ?>rdf/mitarbeiter.rdf.php?filter='+v+'&'+gettimestamp();
-
+		var url = '<?php echo APP_ROOT; ?>rdf/mitarbeiter.rdf.php?filter='+encodeURIComponent(v)+'&'+gettimestamp();
 		var oldDatasources = menulist.database.GetDataSources();
 		while(oldDatasources.hasMoreElements())
 		{

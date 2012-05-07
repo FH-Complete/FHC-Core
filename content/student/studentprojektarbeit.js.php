@@ -572,6 +572,7 @@ function StudentProjektarbeitSpeichern()
 // ****
 // * Aktiviert die Detailfelder zum Neu Anlegen einer Projektarbeit
 // ****
+
 function StudentProjektarbeitNeu()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
@@ -867,7 +868,7 @@ function StudentProjektbetreuerMenulistPersonLoad(menulist, filter)
 
 	if(v.length>2)
 	{		
-		var url = '<?php echo APP_ROOT; ?>rdf/person.rdf.php?filter='+v+'&'+gettimestamp();
+		var url = '<?php echo APP_ROOT; ?>rdf/person.rdf.php?filter='+encodeURIComponent(v)+'&'+gettimestamp();
 		//nurmittitel=&
 		var oldDatasources = menulist.database.GetDataSources();
 		while(oldDatasources.hasMoreElements())
