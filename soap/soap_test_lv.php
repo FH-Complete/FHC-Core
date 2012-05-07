@@ -70,12 +70,12 @@ if(!check_lektor($getuid))
         {
             var soapBody = new SOAPObject("getLehrveranstaltungFromStudiengang");
             var authentifizierung = new SOAPObject("authentifizierung");
-            authentifizierung.appendChild(new SOAPObject("username")).val("burkhart");
-            authentifizierung.appendChild(new SOAPObject("passwort")).val("R3sid3nt");
+            authentifizierung.appendChild(new SOAPObject("username")).val("");
+            authentifizierung.appendChild(new SOAPObject("passwort")).val("");
 
-            soapBody.appendChild(new SOAPObject("studiengang")).val("bif");
-            soapBody.appendChild(new SOAPObject("semester")).val("WS2010");
-            soapBody.appendChild(new SOAPObject("ausbildungssemester")).val("3");
+            soapBody.appendChild(new SOAPObject("studiengang")).val("");
+            soapBody.appendChild(new SOAPObject("semester")).val("");
+            soapBody.appendChild(new SOAPObject("ausbildungssemester")).val("");
             soapBody.appendChild(authentifizierung);
 
             var sr = new SOAPRequest("getLehrveranstaltungFromStudiengang",soapBody);
