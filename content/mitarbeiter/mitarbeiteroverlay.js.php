@@ -412,6 +412,7 @@ function MitarbeiterDetailDisableFields(val)
 	document.getElementById('mitarbeiter-detail-textbox-anzahlderkinder').disabled=val;
 	document.getElementById('mitarbeiter-detail-button-image-upload').disabled=val;
 	document.getElementById('mitarbeiter-detail-button-image-delete').disabled=val;
+	document.getElementById('mitarbeiter-detail-button-image-infomail').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-anmerkung').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-homepage').disabled=val;
 	
@@ -1794,6 +1795,27 @@ function MitarbeiterSuche()
 	}
 	else
 		alert('Es muessen mindestens 3 Zeichen eingegeben werden');		
+}
+
+function MitarbeiterImageInfomail()
+{
+	var uid = document.getElementById('mitarbeiter-detail-textbox-uid').value;
+	var anrede = document.getElementById('mitarbeiter-detail-textbox-anrede').value;
+	var nachname = document.getElementById('mitarbeiter-detail-textbox-nachname').value;
+	var sg='';
+	if(anrede=='Frau')
+		sg = 'Sehr geehrte';
+	else
+		sg = 'Sehr geehrter';
+	if(uid!='')
+	{
+		body=sg+" "+anrede+" "+nachname+"!%0A%0AIhr Profilbild wurde entfernt, da es nicht den aktuellen Bildrichtlinen entspricht.%0ABitte laden Sie unter CIS->Profil ein neues Profilbild hoch.";
+		window.location.href="mailto:"+uid+"@<?php echo DOMAIN;?>?subject=Profilbild&body="+body;
+	}
+	else
+	{
+		alert('Nur bei Studenten verfügbar');
+	}
 }
 
 // ****

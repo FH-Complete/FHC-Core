@@ -244,6 +244,9 @@
 <!ENTITY menu-dokumente-accountinfoblatt.label	"Account InfoBlatt">
 <!ENTITY menu-dokumente-accountinfoblatt.accesskey	"A">
 
+<!ENTITY menu-dokumente-zutrittskarte.label	"Zutrittskarte">
+<!ENTITY menu-dokumente-zutrittskarte.accesskey	"Z">
+
 <!ENTITY menu-dokumente-pruefungsprotokoll.label		"Prüfungsprotokoll">
 <!ENTITY menu-dokumente-pruefungsprotokoll.accesskey	"P">
 

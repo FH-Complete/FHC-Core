@@ -1,4 +1,6 @@
 <?php
+$this->phrasen['profil/profil']='Profil';
+$this->phrasen['profil/mitarbeiter']='Mitarbeiter';
 $this->phrasen['profil/home']='HOME';
 $this->phrasen['profil/meinCis']='Mein CIS';
 $this->phrasen['profil/bildHochladen']='Bild hochladen';
@@ -27,4 +29,31 @@ $this->phrasen['profil/adminstration']='Administration';
 $this->phrasen['profil/zustaendigeAssistenz']='zuständige Assistenz';
 $this->phrasen['profil/wendenSieSichAn']='Bitte wenden sie sich an die';
 $this->phrasen['profil/solltenDatenNichtStimmen']='Sollten ihre Daten nicht stimmen, wenden sie sich bitte an die';
+
+$this->phrasen['profil/AccountInaktiv']='Achtung: Dieser Account ist nicht mehr aktiv';
+$this->phrasen['profil/inaktivStudent']='Achtung!<br> Wir möchten Sie darauf aufmerksam machen, dass Ihr Benutzerdatensatz 
+deaktiviert wurde.Durch diese Deaktivierung wurden Sie auch aus allen Email-Verteilern gelöscht. <br><br>
+Sollte innerhalb von 6 Monaten (für Studierende) bzw. 3 Wochen (für AbbrecherInnen) nach der Deaktivierung keine 
+neuerliche Aktivierung Ihres Benutzerdatensatzes erfolgen, dann werden automatisch auch<br>- Ihr Account, <br>- Ihre Mailbox (inkl. aller E-Mails) und<br>
+- Ihr Home-Verzeichnis (inkl. aller Dateien) gelöscht.<br><br>Falls es sich bei der Deaktivierung um einen Irrtum handelt, würden wir Sie bitten, 
+sich umgehend mit Ihrer Studiengangsassistenz in Verbindung zu setzen.<br>';
+
+$this->phrasen['profil/inaktivMitarbeiter']='Achtung!<br> Wir möchten Sie darauf aufmerksam machen, dass Ihr Benutzerdatensatz 
+deaktiviert wurde.Durch diese Deaktivierung wurden Sie auch aus allen Email-Verteilern gelöscht. <br><br>
+Sollte innerhalb von 12 Monaten nach der Deaktivierung keine neuerliche Aktivierung Ihres Benutzerdatensatzes erfolgen, dann werden automatisch auch<br>
+- Ihr Account, <br>- Ihre Mailbox (inkl. aller E-Mails) und<br>
+- Ihr Home-Verzeichnis (inkl. aller Dateien) gelöscht.<br><br>Falls es sich bei der Deaktivierung um einen Irrtum handelt, würden wir Sie bitten, 
+sich umgehend mit Ihrer Studiengangsassistenz in Verbindung zu setzen.<br>';
+
+$this->phrasen['profil/inaktivSonstige']='Achtung!<br> Wir möchten Sie darauf aufmerksam machen, dass Ihr Benutzerdatensatz 
+deaktiviert wurde.Durch diese Deaktivierung wurden Sie auch aus allen Email-Verteilern gelöscht. <br><br>
+Sollte innerhalb der nächsten Tagen keine neuerliche Aktivierung Ihres Benutzerdatensatzes erfolgen, dann werden automatisch auch<br>
+- Ihr Account, <br>- Ihre Mailbox (inkl. aller E-Mails) und<br>
+- Ihr Home-Verzeichnis (inkl. aller Dateien) gelöscht.<br><br>Falls es sich bei der Deaktivierung um einen Irrtum handelt, würden wir Sie bitten, 
+sich umgehend mit Ihrer Studiengangsassistenz in Verbindung zu setzen.<br>';
+
+$this->phrasen['profil/nurJPGBilder']='Derzeit koennen nur Bilder im JPG Format hochgeladen werden';
+$this->phrasen['profil/BilduploadInfotext']='Derzeit können nur Bilder im JPG Format mit einer Maximalgröße von 15MB hochgeladen werden können!<br><br><b>Bitte beachten Sie die <a href="../../cms/content.php?content_id=%s">Richtlinien für den Bildupload</a></b>';
+$this->phrasen['profil/Bild']='Bild';
+$this->phrasen['profil/Bildupload']='Bildupload';
 ?>
