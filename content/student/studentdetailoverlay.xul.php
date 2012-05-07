@@ -160,6 +160,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       								<button id="student-detail-button-image-delete" label="Delete" oncommand="StudentImageDelete();" disabled="true"/>
       								<spacer flex="1" />
       							</hbox>
+								<button id="student-detail-button-image-infomail" label="Infomail" oncommand="StudentImageInfomail();" disabled="true"/>      							
       						</vbox>
    							<hbox>
    								<image src='' id="student-detail-image" style="margin-left:5px;"/> <!--height="60" width="60"-->

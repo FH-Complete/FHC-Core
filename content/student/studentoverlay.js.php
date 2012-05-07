@@ -552,6 +552,7 @@ function StudentDetailDisableFields(val)
 	//document.getElementById('student-detail-textbox-matrikelnummer').disabled=val;
 	document.getElementById('student-detail-button-image-upload').disabled=val;
 	document.getElementById('student-detail-button-image-delete').disabled=val;
+	document.getElementById('student-detail-button-image-infomail').disabled=val;
 	//document.getElementById('student-detail-menulist-studiengang_kz').disabled=val;
 	document.getElementById('student-detail-textbox-semester').disabled=val;
 	document.getElementById('student-detail-textbox-verband').disabled=val;
@@ -724,6 +725,26 @@ function StudentImageDelete()
 	}
 	else
 		alert('Es wurde keine Person ausgewaehlt');
+}
+function StudentImageInfomail()
+{
+	var uid = document.getElementById('student-detail-textbox-uid').value;
+	var nachname = document.getElementById('student-detail-textbox-nachname').value;
+	var anrede = document.getElementById('student-detail-textbox-anrede').value;
+	var sg='';
+	if(anrede=='Frau')
+		sg = 'Sehr geehrte';
+	else
+		sg = 'Sehr geehrter';
+	if(uid!='')
+	{
+		body=sg+" "+anrede+" "+nachname+"!%0A%0AIhr Profilbild wurde entfernt, da es nicht den aktuellen Bildrichtlinen entspricht.%0ABitte laden Sie unter CIS->Profil ein neues Profilbild hoch.";
+		window.location.href="mailto:"+uid+"@<?php echo DOMAIN;?>?subject=Profilbild&body="+body;
+	}
+	else
+	{
+		alert('Nur bei Studenten verfügbar');
+	}
 }
 
 // ****

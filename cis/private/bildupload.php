@@ -22,26 +22,33 @@
  *
  */
 
-// Oberflaeche zur Aenderung von Beispielen und Upload von Bildern
+// Oberflaeche zum Upload von Bildern
 
 require_once('../../config/cis.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/akte.class.php');
+require_once('../../include/phrasen.class.php');
 
-$PHP_SELF = $_SERVER['PHP_SELF'];
+$user = get_uid();
+$sprache = getSprache();
+$p = new phrasen($sprache);
+
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
+	<title>'.$p->t('profil/Bildupload').'</title>
 </head>
-<body>';
+<body>
+<h1>'.$p->t('profil/Bildupload').'</h1>';
 
 function resize($filename, $width, $height)
 {
 	$ext = explode('.',$_FILES['bild']['name']);
-  $ext = strtolower($ext[count($ext)-1]);
+	$ext = strtolower($ext[count($ext)-1]);
 
 	// Hoehe und Breite neu berechnen
 	list($width_orig, $height_orig) = getimagesize($filename);
@@ -71,17 +78,16 @@ function resize($filename, $width, $height)
 	@imagedestroy($image);
 }
 
-$user = get_uid();
 if(isset($_GET['person_id']))
 {
 	$benutzer = new benutzer();
 	$benutzer->load($user);
 		
 	if($benutzer->person_id!=$_GET['person_id'])
-		die('Sie haben keine Berechtigung f&uuml;r diese Seite');
+		die($p->t('global/keineBerechtigungFuerDieseSeite'));
 }
 else 
-	die('Fehler bei der Parameter&uuml;bergabe');
+	die($p->t('global/fehlerBeiDerParameteruebergabe'));
 
 //Bei Upload des Bildes
 if(isset($_POST['submitbild']))
@@ -183,16 +189,17 @@ if(isset($_POST['submitbild']))
 				echo '<b>'.$person->errormsg.'</b><br />';
 		}
 		else
-			echo "<b>Derzeit koennen nur Bilder im JPG Format hochgeladen werden</b><br />";
+			echo '<b>'.$p->t('profil/nurJPGBilder').'</b><br />';
 	}
 }
 	
-echo "	Bitte beachten Sie, dass derzeit nur Bilder im JPG Format mit einer Maximalgröße von 8MB hochgeladen werden können!<br>
-		<form accept-charset='UTF-8' method='POST' enctype='multipart/form-data' action='$PHP_SELF?person_id=".$_GET['person_id']."'>
-		Bild: <input type='file' name='bild' />
-		<input type='submit' name='submitbild' value='Upload' />
+echo '<br>';
+echo $p->t('profil/BilduploadInfotext',array($p->t('dms_link/bildRichtlinien'))).'<br><br>
+		<form accept-charset="UTF-8" method="POST" enctype="multipart/form-data" action="'.$_SERVER['PHP_SELF'].'?person_id='.$_GET['person_id'].'">
+		'.$p->t('profil/Bild').': <input type="file" name="bild" />
+		<input type="submit" name="submitbild" value="Upload" />
 		</form>
-	</td></tr>";
+	</td></tr>';
 
 ?>
 </body>
