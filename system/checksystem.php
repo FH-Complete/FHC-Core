@@ -3558,6 +3558,19 @@ if(!@$db->db_query("SELECT 1 from public.tbl_preoutgoing LIMIT 1"))
 		echo 'PreOutgoing Modul hinzugefuegt!<br>';
 }
 
+// Zugangscode fuer Reihungstest
+if(!@$db->db_query("SELECT zugangscode FROM public.tbl_reihungstest LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE public.tbl_reihungstest ADD COLUMN zugangscode varchar(16);
+	UPDATE public.tbl_reihungstest SET zugangscode=trunc(random()*100000);
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_reihungstest: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'Tabelle public.tbl_reihungstest Spalte zugangscode hinzugefuegt!<br>';
+}
 echo '<br>';
 
 $tabellen=array(
@@ -3710,7 +3723,7 @@ $tabellen=array(
 	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat"),
 	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung"),
-	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id"),
+	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","zugangscode"),
 	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id"),
 	"public.tbl_semesterwochen"  => array("semester","studiengang_kz","wochen"),
 	"public.tbl_sprache"  => array("sprache","locale","flagge","index","content","bezeichnung"),

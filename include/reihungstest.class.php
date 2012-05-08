@@ -43,6 +43,7 @@ class reihungstest extends basis_db
 	public $insertvon;		//  bigint
 	public $updateamum;		//  timestamp
 	public $updatevon;		//  bigint
+	public $zugangscode;	//  varchar(16)
 	
 	/**
 	 * Konstruktor
@@ -69,7 +70,7 @@ class reihungstest extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_reihungstest WHERE reihungstest_id='".addslashes($reihungstest_id)."'";
+		$qry = "SELECT * FROM public.tbl_reihungstest WHERE reihungstest_id=".$this->db_add_param($reihungstest_id, FHC_INTEGER, false);
 		
 		if($this->db_query($qry))
 		{
@@ -86,6 +87,7 @@ class reihungstest extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
+				$this->zugangscode = $row->zugangscode;
 				return true;				
 			}
 			else 
@@ -110,7 +112,7 @@ class reihungstest extends basis_db
 	{
 		$qry = "SELECT * FROM public.tbl_reihungstest ";
 		if($datum!=null)
-			$qry.=" WHERE datum>='".addslashes($datum)."'";
+			$qry.=" WHERE datum>=".$this->db_add_param($datum);
 		$qry.=" ORDER BY datum DESC, uhrzeit";
 		
 		if($this->db_query($qry))
@@ -130,6 +132,7 @@ class reihungstest extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+				$obj->zugangscode = $row->zugangscode;
 				
 				$this->result[] = $obj;
 			}
@@ -155,7 +158,7 @@ class reihungstest extends basis_db
 			return false;
 		}
 		//Gesamtlaenge pruefen
-		if(mb_strlen($this->ort_kurzbz)>16)
+		if(mb_strlen($this->ort_kurzbz)>32)
 		{
 			$this->errormsg = 'Ort_kurzbz darf nicht länger als 16 Zeichen sein';
 			return false;
@@ -186,28 +189,29 @@ class reihungstest extends basis_db
 			//Neuen Datensatz einfuegen
 					
 			$qry='BEGIN; INSERT INTO public.tbl_reihungstest (studiengang_kz, ort_kurzbz, anmerkung, datum, uhrzeit, 
-				ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
-			     $this->addslashes($this->studiengang_kz).', '.
-			     $this->addslashes($this->ort_kurzbz).', '.
-			     $this->addslashes($this->anmerkung).', '.
-			     $this->addslashes($this->datum).', '.
-			     $this->addslashes($this->uhrzeit).', '.
-			     $this->addslashes($this->ext_id).',  now(), '.
-			     $this->addslashes($this->insertvon).', now(), '.
-			     $this->addslashes($this->updatevon).');';
+				ext_id, insertamum, insertvon, updateamum, updatevon, zugangscode) VALUES('.
+			     $this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
+			     $this->db_add_param($this->ort_kurzbz).', '.
+			     $this->db_add_param($this->anmerkung).', '.
+			     $this->db_add_param($this->datum).', '.
+			     $this->db_add_param($this->uhrzeit).', '.
+			     $this->db_add_param($this->ext_id, FHC_INTEGER).',  now(), '.
+			     $this->db_add_param($this->insertvon).', now(), '.
+			     $this->db_add_param($this->updatevon).','.
+			     'trunc(random()*100000));';
 		}
 		else
 		{			
 			$qry='UPDATE public.tbl_reihungstest SET '.
-				'studiengang_kz='.$this->addslashes($this->studiengang_kz).', '. 
-				'ort_kurzbz='.$this->addslashes($this->ort_kurzbz).', '. 
-				'anmerkung='.$this->addslashes($this->anmerkung).', '.  
-				'datum='.$this->addslashes($this->datum).', '. 
-				'uhrzeit='.$this->addslashes($this->uhrzeit).', '.
-				'ext_id='.$this->addslashes($this->ext_id).', '. 
+				'studiengang_kz='.$this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '. 
+				'ort_kurzbz='.$this->db_add_param($this->ort_kurzbz).', '.
+				'anmerkung='.$this->db_add_param($this->anmerkung).', '.  
+				'datum='.$this->db_add_param($this->datum).', '. 
+				'uhrzeit='.$this->db_add_param($this->uhrzeit).', '.
+				'ext_id='.$this->db_add_param($this->ext_id, FHC_INTEGER).', '. 
 		     	'updateamum= now(), '.
-		     	'updatevon='.$this->addslashes($this->updatevon).' '.
-				'WHERE reihungstest_id='.$this->addslashes($this->reihungstest_id).';';					
+		     	'updatevon='.$this->db_add_param($this->updatevon).' '.
+				'WHERE reihungstest_id='.$this->db_add_param($this->reihungstest_id, FHC_INTEGER, false).';';					
 		}
 		
 		if($this->db_query($qry))
@@ -254,7 +258,7 @@ class reihungstest extends basis_db
 	 */
 	public function getReihungstest($studiengang_kz)
 	{
-		$qry = "SELECT * FROM public.tbl_reihungstest WHERE studiengang_kz='".addslashes($studiengang_kz)."'";
+		$qry = "SELECT * FROM public.tbl_reihungstest WHERE studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER, false);
 		
 		if($this->db_query($qry))
 		{
@@ -273,6 +277,7 @@ class reihungstest extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+				$obj->zugangscode = $row->zugangscode;
 				
 				$this->result[] = $obj;
 			}

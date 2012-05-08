@@ -64,6 +64,7 @@
 	$studiengang = new studiengang();
 	$studiengang->getAll('typ, kurzbz', false);
 		
+	//Studierende als Excel Exportieren
 	if(isset($_GET['excel']))
 	{	
 		$reihungstest = new reihungstest();
@@ -197,11 +198,11 @@
 		echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//DE" "http://www.w3.org/TR/html4/strict.dtd">
 				<html>
 				<head>
-				<title>Reihungstest</title>
-				<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-				<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-				<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-				<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+					<title>Reihungstest</title>
+					<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+					<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+					<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+					<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 				</head>
 				<body class="Background_main">
 				<h2>Reihungstest - Verwaltung</h2>';
@@ -236,7 +237,7 @@
 			}
 			if($_POST['uhrzeit']!='' && !$datum_obj->checkUhrzeit($_POST['uhrzeit']))
 			{
-				echo '<span class="input_error">Uhrzeit ist ungueltig:'.$_POST['uhrzeit'].'. Die Uhrzeit muss im Format HH:MM:SS angegeben werden!<br></span>';
+				echo '<span class="input_error">Uhrzeit ist ungueltig. Die Uhrzeit muss im Format HH:MM:SS angegeben werden!<br></span>';
 				$error = true;
 			}
 			
@@ -258,7 +259,7 @@
 				}
 				else
 				{
-					echo '<span class="input_error">Fehler beim Speichern der Daten: '.$reihungstest->errormsg.'</span>';
+					echo '<span class="input_error">Fehler beim Speichern der Daten: '.$db->convert_html_chars($reihungstest->errormsg).'</span>';
 				}
 			}
 			$neu=false;
@@ -279,7 +280,7 @@
 			}
 			else 
 			{
-				echo '<span class="input_error"><br>Sie haben keine Berechtigung zur Uebernahme der Punkte fuer '.$row->nachname.' '.$row->vorname.'</span>';
+				echo '<span class="input_error"><br>Sie haben keine Berechtigung zur Uebernahme der Punkte fuer '.$db->convert_html_chars($row->nachname).' '.$db->convert_html_chars($row->vorname).'</span>';
 			}
 		}
 		
@@ -287,15 +288,15 @@
 		if(isset($_GET['type']) && $_GET['type']=='saveallrtpunkte')
 		{
 			$errormsg='';
-			$qry = "SELECT prestudent_id, studiengang_kz, nachname, vorname 
-					FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) 
-					WHERE reihungstest_id='".addslashes($reihungstest_id)."'";
+			$qry = "SELECT prestudent_id, tbl_prestudent.studiengang_kz, nachname, vorname, tbl_studiengang.oe_kurzbz,
+					FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) JOIN public.tbl_studiengang USING(studiengang_kz)
+					WHERE reihungstest_id=".$db->db_add_param($reihungstest_id, FHC_INTEGER);
 			// AND (rt_punkte1='' OR rt_punkte1 is null)";
 			if($result = $db->db_query($qry))
 			{
 				while($row = $db->db_fetch_object($result))
 				{
-					if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid'))
+					if($rechte->isBerechtigt('student/stammdaten', $row->oe_kurzbz,'suid'))
 					{
 						$prestudent = new prestudent();
 						$prestudent->load($row->prestudent_id);
@@ -316,16 +317,13 @@
 				}
 				if($errormsg!='')
 				{
-					echo '<span class="input_error">'.$errormsg.'</span>';
+					echo '<span class="input_error">'.$db->convert_html_chars($errormsg).'</span>';
 				}
 			}			
 		}
 		
 		echo '<br><table width="100%"><tr><td>';
 		
-		//Studiengang DropDown
-		//$studiengang = new studiengang();
-		//$studiengang->getAll('typ, kurzbz', false);
 			
 		echo "<SELECT name='studiengang' onchange='window.location.href=this.value'>";
 		if($stg_kz==-1)
@@ -344,7 +342,7 @@
 			else 
 				$selected='';
 				
-			echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=$row->studiengang_kz' $selected>$row->kuerzel</OPTION>";
+			echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=$row->studiengang_kz' $selected>".$db->convert_html_chars($row->kuerzel)."</OPTION>";
 		}
 		echo "</SELECT>";
 		
@@ -365,9 +363,9 @@
 			else
 				$selected='';
 				
-			echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&reihungstest_id=$row->reihungstest_id' $selected>$row->datum $row->uhrzeit ".$studiengang->kuerzel_arr[$row->studiengang_kz]." $row->ort_kurzbz $row->anmerkung</OPTION>";
+			echo '<OPTION value="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&reihungstest_id='.$row->reihungstest_id.'" '.$selected.'>'.$db->convert_html_chars($row->datum.' '.$row->uhrzeit.' '.$studiengang->kuerzel_arr[$row->studiengang_kz].' '.$row->ort_kurzbz.' '.$row->anmerkung).'</OPTION>';
 		}
-		echo "</SELECT>";
+		echo '</SELECT>';
 		echo "<INPUT type='button' value='Anzeigen' onclick='window.location.href=document.getElementById(\"reihungstest\").value;'>";
 		echo "</td>";
 		echo "<td align='right'>";
@@ -384,7 +382,7 @@
 		if(!$neu)
 		{
 			if(!$reihungstest->load($reihungstest_id))
-				die('Reihungstest existiert nicht: '.$reihungstest_id);
+				die('Reihungstest existiert nicht');
 		}
 		else 
 		{
@@ -401,9 +399,13 @@
 		echo '<HR>';
 		echo "<FORM method='POST' action='".$_SERVER['PHP_SELF']."'>";
 		echo "<input type='hidden' value='$reihungstest->reihungstest_id' name='reihungstest_id' />";
+
+		echo "<table>";
+		if($reihungstest->zugangscode!='')
+			echo '<tr><td>Zugangscode:</td><td><b>'.$db->convert_html_chars($reihungstest->zugangscode).'</b></td></tr>';
 		
 		//Studiengang DropDown
-		echo "<table><tr><td>Studiengang</td><td><SELECT name='studiengang_kz'>";
+		echo "<tr><td>Studiengang</td><td><SELECT name='studiengang_kz'>";
 		if($reihungstest->studiengang_kz=='')
 			$selected = 'selected';
 		else 
@@ -417,7 +419,7 @@
 			else 
 				$selected = '';
 			
-			echo "<OPTION value='$row->studiengang_kz' $selected>$row->kuerzel</OPTION>";
+			echo "<OPTION value='$row->studiengang_kz' $selected>".$db->convert_html_chars($row->kuerzel)."</OPTION>";
 		}
 		echo "</SELECT></TD></TR>";
 		
@@ -440,12 +442,12 @@
 			else 
 				$selected='';
 			
-			echo "<OPTION value='$row->ort_kurzbz' $selected>$row->ort_kurzbz</OPTION>";
+			echo "<OPTION value='$row->ort_kurzbz' $selected>".$db->convert_html_chars($row->ort_kurzbz)."</OPTION>";
 		}
 		echo '</SELECT></td></tr>';
-		echo '<tr><td>Anmerkung</td><td><input type="text" name="anmerkung" value="'.$reihungstest->anmerkung.'"></td></tr>';
+		echo '<tr><td>Anmerkung</td><td><input type="text" name="anmerkung" value="'.$db->convert_html_chars($reihungstest->anmerkung).'"></td></tr>';
 		echo '<tr><td>Datum</td><td><input type="text" name="datum" value="'.$datum_obj->convertISODate($reihungstest->datum).'"></td></tr>';
-		echo '<tr><td>Uhrzeit</td><td><input type="text" name="uhrzeit" value="'.$reihungstest->uhrzeit.'"> (Format: HH:MM:SS)</td></tr>';
+		echo '<tr><td>Uhrzeit</td><td><input type="text" name="uhrzeit" value="'.$db->convert_html_chars($reihungstest->uhrzeit).'"> (Format: HH:MM:SS)</td></tr>';
 		if(!$neu)
 			$val = 'Änderung Speichern';
 		else 
@@ -470,7 +472,7 @@
 			(SELECT ausbildungssemester FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND datum=(SELECT MAX(datum) FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_prestudent.prestudent_id AND status_kurzbz='Interessent') LIMIT 1) as ausbildungssemester 
 			FROM public.tbl_prestudent 
 			JOIN public.tbl_person USING(person_id) 
-			WHERE reihungstest_id='$reihungstest_id' 
+			WHERE reihungstest_id=".$db->db_add_param($reihungstest_id, FHC_INTEGER)." 
 			ORDER BY nachname, vorname";
 			$mailto = '';
 			if($result = $db->db_query($qry))
@@ -512,19 +514,19 @@
 							
 						}
 					}
-					echo "
+					echo '
 						<tr>
-							<td>$row->prestudent_id</td>
-							<td>$row->vorname</td>
-							<td>$row->nachname</td>
-							<td>".$stg_arr[$row->studiengang_kz]."</td>
-							<td>$row->ausbildungssemester</td>
-							<td>".$datum_obj->convertISODate($row->gebdatum)."</td>
-							<td><a href='mailto:$row->email'>$row->email</a></td>
-							<td>$rt_in_anderen_stg</td>
-							<td align='right'>".($rtergebnis==0?'-':number_format($rtergebnis,2,'.',''))."</td>
-							<td align='right'>".($rtergebnis!=0 && $row->rt_punkte1==''?'<a href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&stg_kz='.$stg_kz.'&type=savertpunkte&prestudent_id='.$row->prestudent_id.'&rtpunkte='.$rtergebnis.'" >&uuml;bertragen</a>':$row->rt_punkte1)."</td>
-						</tr>";
+							<td>'.$db->convert_html_chars($row->prestudent_id).'</td>
+							<td>'.$db->convert_html_chars($row->vorname).'</td>
+							<td>'.$db->convert_html_chars($row->nachname).'</td>
+							<td>'.$db->convert_html_chars($stg_arr[$row->studiengang_kz]).'</td>
+							<td>'.$db->convert_html_chars($row->ausbildungssemester).'</td>
+							<td>'.$db->convert_html_chars($datum_obj->convertISODate($row->gebdatum)).'</td>
+							<td><a href="mailto:'.$db->convert_html_chars($row->email).'">'.$db->convert_html_chars($row->email).'</a></td>
+							<td>'.$db->convert_html_chars($rt_in_anderen_stg).'</td>
+							<td align="right">'.($rtergebnis==0?'-':number_format($rtergebnis,2,'.','')).'</td>
+							<td align="right">'.($rtergebnis!=0 && $row->rt_punkte1==''?'<a href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&stg_kz='.$stg_kz.'&type=savertpunkte&prestudent_id='.$row->prestudent_id.'&rtpunkte='.$rtergebnis.'" >&uuml;bertragen</a>':$row->rt_punkte1).'</td>
+						</tr>';
 					
 					$mailto.= ($mailto!=''?',':'').$row->email;
 				}
