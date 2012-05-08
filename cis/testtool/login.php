@@ -20,15 +20,15 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-	require_once('../../config/cis.config.inc.php');
-  require_once('../../include/basis_db.class.php');
-  if (!$db = new basis_db())
-      die('Fehler beim Oeffnen der Datenbankverbindung');
-  
+require_once('../../config/cis.config.inc.php'); 
 require_once('../../include/person.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/pruefling.class.php');
 require_once('../../include/studiengang.class.php');
+require_once('../../include/reihungstest.class.php');
+
+if (!$db = new basis_db())
+	die('Fehler beim Oeffnen der Datenbankverbindung');
 
 session_start();
 $reload=false;
@@ -51,35 +51,52 @@ if(isset($_POST['tag']) && isset($_POST['monat']) && isset($_POST['jahr']))
 		$gebdatum='';
 }
 
-if (isset($_POST['prestudent']) && isset($gebdatum))
+if (isset($_POST['prestudent']) && isset($gebdatum) && isset($_POST['zugangscode']))
 {
 	$ps=new prestudent($_POST['prestudent']);
+	//Geburtsdatum Pruefen
 	if ($gebdatum==$ps->gebdatum)
 	{
-		$pruefling = new pruefling();
-		if($pruefling->getPruefling($ps->prestudent_id))
+		//Zugangscode fuer zugeteilten Reihungstest pruefen
+		$rt = new reihungstest();
+		if($rt->load($ps->reihungstest_id))
 		{
-			$studiengang = $pruefling->studiengang_kz;
-			$semester = $pruefling->semester;
-		}
-		else 
-		{
-			$studiengang = $ps->studiengang_kz;
-			$ps->getLastStatus($ps->prestudent_id);
-			$semester = $ps->ausbildungssemester;
-		}
-		if($semester=='')
-			$semester=1;
-		
-		$_SESSION['prestudent_id']=$_POST['prestudent'];
-		$_SESSION['studiengang_kz']=$studiengang;
-		$_SESSION['nachname']=$ps->nachname;
-		$_SESSION['vorname']=$ps->vorname;
-		$_SESSION['gebdatum']=$ps->gebdatum;
-		$stg_obj = new studiengang($studiengang);
-		$_SESSION['sprache']=$stg_obj->sprache;
+			if($_POST['zugangscode']==$rt->zugangscode)
+			{		
+				$pruefling = new pruefling();
+				if($pruefling->getPruefling($ps->prestudent_id))
+				{
+					$studiengang = $pruefling->studiengang_kz;
+					$semester = $pruefling->semester;
+				}
+				else 
+				{
+					$studiengang = $ps->studiengang_kz;
+					$ps->getLastStatus($ps->prestudent_id);
+					$semester = $ps->ausbildungssemester;
+				}
+				if($semester=='')
+					$semester=1;
 				
-		$_SESSION['semester']=$semester;
+				$_SESSION['prestudent_id']=$_POST['prestudent'];
+				$_SESSION['studiengang_kz']=$studiengang;
+				$_SESSION['nachname']=$ps->nachname;
+				$_SESSION['vorname']=$ps->vorname;
+				$_SESSION['gebdatum']=$ps->gebdatum;
+				$stg_obj = new studiengang($studiengang);
+				$_SESSION['sprache']=$stg_obj->sprache;
+						
+				$_SESSION['semester']=$semester;
+			}
+			else
+			{
+				echo '<span class="error">Der angegebene Zugangscode ist falsch</span>';
+			}
+		}
+		else
+		{
+			echo '<span class="error">Der Reihungstest dem Sie zugeteilt sind kann nicht geladen werden</span>';
+		}
 	}
 	else 
 	{
@@ -255,6 +272,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 		for($i=date('Y');$i>date('Y')-99;$i--)
 			echo '<OPTION value="'.$i.'">'.$i.'</OPTION>';
 		echo '</SELECT>';
+		echo ' Zugangscode: <input name="zugangscode" type="text" size="6" />';
 		echo '&nbsp; <INPUT type="submit" value="Login" />';
 		echo '</form>';
 		
