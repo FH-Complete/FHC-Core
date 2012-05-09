@@ -169,7 +169,7 @@ else
 		$ws = $stsem_obj->getPreviousFrom($stsem);
 		$ss = $stsem;
 	}
-	echo "<h2>Lektorenstatistik (Lehrauftrag ohne Betreuungen) $ws / $ss";
+	echo "<h2>LektorInnenstatistik (Lehrauftrag ohne Betreuungen) $ws / $ss";
 	echo '<span style="position:absolute; right:15px;">'.date('d.m.Y').'</span></h2><br>';
 	echo '</h2>';
 	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">Studiensemester: <SELECT name="stsem">';

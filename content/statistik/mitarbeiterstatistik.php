@@ -49,7 +49,7 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 	if(!$fachbereich->load($_GET['fachbereich_kurzbz']))
 		die('Institut existiert nicht');
 	
-	echo "<h2>Mitarbeiterstatistik (Hauptzuordnung) - ".$fachbereich->bezeichnung.'</h2>';
+	echo "<h2>MitarbeiterInnenstatistik (Hauptzuordnung) - ".$fachbereich->bezeichnung.'</h2>';
 	$qry = "SELECT distinct uid, anrede, nachname, vorname, titelpre, titelpost,
 			(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE oe_kurzbz='".addslashes($fachbereich->oe_kurzbz)."' AND fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv AND (datum_bis >= now() OR datum_bis IS NULL) AND (datum_von <= now() OR datum_von IS NULL) AND geschlecht='m') a) as fix_m,
 			(SELECT count(*) FROM (SELECT distinct uid FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE oe_kurzbz='".addslashes($fachbereich->oe_kurzbz)."' AND fixangestellt AND funktion_kurzbz='oezuordnung' AND aktiv AND (datum_bis >= now() OR datum_bis IS NULL) AND (datum_von <= now() OR datum_von IS NULL) AND geschlecht='w') a) as fix_w 
@@ -140,7 +140,7 @@ if($db->db_query($qry))
 }
 else 
 {
-	echo "<h2>Mitarbeiterstatistik (Hauptzuordnung)";
+	echo "<h2>MitarbeiterInnenstatistik (Hauptzuordnung)";
 	echo '<span style="position:absolute; right:15px;">'.date('d.m.Y').'</span></h2><br>';
 	echo '</h2>';
 	
