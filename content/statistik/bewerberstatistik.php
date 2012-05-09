@@ -90,7 +90,7 @@ if(isset($_GET['excel']))
 	$workbook->send("Bewerberstatistik_".date('dmY').".xls");
 	
 	// Creating a worksheet
-	$worksheet =& $workbook->addWorksheet("Bewerberstatistik ".$stsem);
+	$worksheet =& $workbook->addWorksheet("BewerberInnenstatistik ".$stsem);
 	$worksheet->setInputEncoding('utf-8');
 	
 	//Formate Definieren
@@ -111,34 +111,34 @@ if(isset($_GET['excel']))
 	
 	//Überschriften 1.Zeile
 	$i=0;
-	$worksheet->write(0,0,'Bewerberstatistik Details'.$stsem.', erstellt am '.date('d.m.Y'), $format_bold);
-	$worksheet->mergeCells(0,$i,0,$i+6);
+	$worksheet->write(0,0,'BewerberInnenstatistik Details'.$stsem.', erstellt am '.date('d.m.Y'), $format_bold);
+	$worksheet->mergeCells(0,$i,0,$i+7);
 	//Ueberschriften
 	$i=0;
 	$worksheet->write(1,$i,"Studiengang", $format_bold);
 	$maxlength[$i] = 15;
-	$worksheet->write(1,++$i,"Interessenten", $format_bold);
+	$worksheet->write(1,++$i,"InteressentInnen", $format_bold);
 	$worksheet->mergeCells(1,$i,1,$i+2);
 	$i=$i+3;
-	$worksheet->write(1,$i,"Interessenten mit ZGV", $format_bold);
+	$worksheet->write(1,$i,"InteressentInnen mit ZGV", $format_bold);
 	$worksheet->mergeCells(1,$i,1,$i+2);
 	$i=$i+3;
-	$worksheet->write(1,$i,"Interessenten mit RT Anmeldung", $format_bold);
+	$worksheet->write(1,$i,"InteressentInnen mit RT Anmeldung", $format_bold);
 	$worksheet->mergeCells(1,$i,1,$i+2);
 	$i=$i+3;
-	$worksheet->write(1,$i,"Bewerber", $format_bold);
+	$worksheet->write(1,$i,"BewerberInnen", $format_bold);
 	$worksheet->mergeCells(1,$i,1,$i+2);
 	$i=$i+3;
-	$worksheet->write(1,$i,"Aufgenommener", $format_bold);
+	$worksheet->write(1,$i,"Aufgenommene", $format_bold);
 	$worksheet->mergeCells(1,$i,1,$i+2);
 	$i=$i+3;
-	$worksheet->write(1,$i,"Aufgenommener bereinigt", $format_bold);
+	$worksheet->write(1,$i,"Aufgenommene bereinigt", $format_bold);
 	$worksheet->mergeCells(1,$i,1,$i+2);
 	$i=$i+3;
-	$worksheet->write(1,$i,"Student 1S", $format_bold);
+	$worksheet->write(1,$i,"StudentIn 1S", $format_bold);
 	$worksheet->mergeCells(1,$i,1,$i+2);
 	$i=$i+3;
-	$worksheet->write(1,$i,"Student 3S", $format_bold);
+	$worksheet->write(1,$i,"StudentIn 3S", $format_bold);
 	$worksheet->mergeCells(1,$i,1,$i+2);
 	
 	//Überschriften 2.Zeile
@@ -702,28 +702,28 @@ if(isset($_GET['excel']))
 				$i=0;
 				$worksheet->write(++$zeile,$i,"Studiengang", $format_bold);
 				$maxlength[$i] = 15;
-				$worksheet->write($zeile,++$i,"Interessenten", $format_bold);
+				$worksheet->write($zeile,++$i,"InteressentInnen", $format_bold);
 				$worksheet->mergeCells($zeile,$i,$zeile,$i+3);
 				$i=$i+4;
-				$worksheet->write($zeile,$i,"Interessenten mit ZGV", $format_bold);
+				$worksheet->write($zeile,$i,"InteressentInnen mit ZGV", $format_bold);
 				$worksheet->mergeCells($zeile,$i,$zeile,$i+3);
 				$i=$i+4;
-				$worksheet->write($zeile,$i,"Interessenten mit RT Anmeldung", $format_bold);
+				$worksheet->write($zeile,$i,"InteressentInnen mit RT Anmeldung", $format_bold);
 				$worksheet->mergeCells($zeile,$i,$zeile,$i+3);
 				$i=$i+4;
-				$worksheet->write($zeile,$i,"Bewerber", $format_bold);
+				$worksheet->write($zeile,$i,"BewerberInnen", $format_bold);
 				$worksheet->mergeCells($zeile,$i,$zeile,$i+3);
 				$i=$i+4;
-				$worksheet->write($zeile,$i,"Aufgenommener", $format_bold);
+				$worksheet->write($zeile,$i,"Aufgenommene", $format_bold);
 				$worksheet->mergeCells($zeile,$i,$zeile,$i+3);
 				$i=$i+4;
-				$worksheet->write($zeile,$i,"Aufgenommener bereinigt", $format_bold);
+				$worksheet->write($zeile,$i,"Aufgenommene bereinigt", $format_bold);
 				$worksheet->mergeCells($zeile,$i,$zeile,$i+3);
 				$i=$i+4;
-				$worksheet->write($zeile,$i,"Student 1S", $format_bold);
+				$worksheet->write($zeile,$i,"StudentIn 1S", $format_bold);
 				$worksheet->mergeCells($zeile,$i,$zeile,$i+3);				
 				$i=$i+4;
-				$worksheet->write($zeile,$i,"Student 3S", $format_bold);
+				$worksheet->write($zeile,$i,"StudentIn 3S", $format_bold);
 				$worksheet->mergeCells($zeile,$i,$zeile,$i+3);
 				
 				//Überschriften 2.Zeile
@@ -1187,7 +1187,7 @@ if(isset($_GET['excel']))
 		$datum_obj = new datum();
 		
 		// Creating second worksheet
-		$worksheet2 =& $workbook->addWorksheet("Bewerberstatistik ".$stsem. " (".$datum_obj->formatDatum($datum,'d.m.Y').")");
+		$worksheet2 =& $workbook->addWorksheet("BewerberInnenstatistik ".$stsem. " (".$datum_obj->formatDatum($datum,'d.m.Y').")");
 		$worksheet2->setInputEncoding('utf-8');	
 				
 		$j=0;
@@ -1312,34 +1312,34 @@ if(isset($_GET['excel']))
 		{
 			//Überschriften 1.Zeile
 			$i=0;
-			$worksheet2->write(0,0,'Bewerberstatistik Details'.$stsem.', erstellt am '.date('d.m.Y'), $format_bold);
+			$worksheet2->write(0,0,'BewerberInnenstatistik Details'.$stsem.', erstellt am '.date('d.m.Y'), $format_bold);
 			$worksheet2->mergeCells(0,$i,0,$i+6);
 			//Ueberschriften
 			$i=0;
 			$worksheet2->write(1,$i,"Studiengang", $format_bold);
 			$maxlength[$i] = 15;
-			$worksheet2->write(1,++$i,"Interessenten", $format_bold);
+			$worksheet2->write(1,++$i,"InteressentInnen", $format_bold);
 			$worksheet2->mergeCells(1,$i,1,$i+2);
 			$i=$i+3;
-			$worksheet2->write(1,$i,"Interessenten mit ZGV", $format_bold);
+			$worksheet2->write(1,$i,"InteressentInnen mit ZGV", $format_bold);
 			$worksheet2->mergeCells(1,$i,1,$i+2);
 			$i=$i+3;
-			$worksheet2->write(1,$i,"Interessenten mit RT Anmeldung", $format_bold);
+			$worksheet2->write(1,$i,"InteressentInnen mit RT Anmeldung", $format_bold);
 			$worksheet2->mergeCells(1,$i,1,$i+2);
 			$i=$i+3;
-			$worksheet2->write(1,$i,"Bewerber", $format_bold);
+			$worksheet2->write(1,$i,"BewerberInnen", $format_bold);
 			$worksheet2->mergeCells(1,$i,1,$i+2);
 			$i=$i+3;
-			$worksheet2->write(1,$i,"Aufgenommener", $format_bold);
+			$worksheet2->write(1,$i,"Aufgenommene", $format_bold);
 			$worksheet2->mergeCells(1,$i,1,$i+2);
 			$i=$i+3;
-			$worksheet2->write(1,$i,"Aufgenommener bereinigt", $format_bold);
+			$worksheet2->write(1,$i,"Aufgenommene bereinigt", $format_bold);
 			$worksheet2->mergeCells(1,$i,1,$i+2);
 			$i=$i+3;
-			$worksheet2->write(1,$i,"Student 1S", $format_bold);
+			$worksheet2->write(1,$i,"StudentIn 1S", $format_bold);
 			$worksheet2->mergeCells(1,$i,1,$i+2);
 			$i=$i+3;
-			$worksheet2->write(1,$i,"Student 3S", $format_bold);
+			$worksheet2->write(1,$i,"StudentIn 3S", $format_bold);
 			$worksheet2->mergeCells(1,$i,1,$i+2);
 			
 			//Überschriften 2.Zeile
@@ -1695,11 +1695,11 @@ else
 		//im Kopf des Mails Links zu den anderen Statistiken anzeigen
 		$content.='Dies ist ein automatisches Mail!<br><br>';
 		$content.='<b>Links zu den Statistiken:</b><br>
-		- <a href="'.APP_ROOT.'content/statistik/lektorenstatistik.php" target="_blank">Lektorenstatisitk</a><br>
-		- <a href="'.APP_ROOT.'content/statistik/mitarbeiterstatistik.php" target="_blank">Mitarbeiterstatistik</a><br>
-		- <a href="'.APP_ROOT.'content/statistik/bewerberstatistik.php" target="_blank">Bewerberstatistik</a><br>
-		- <a href="'.APP_ROOT.'content/statistik/studentenstatistik.php" target="_blank">Studentenstatistik</a><br>
-		- <a href="'.APP_ROOT.'content/statistik/absolventenstatistik.php" target="_blank">Absolventenstatistik</a><br><br>
+		- <a href="'.APP_ROOT.'content/statistik/lektorenstatistik.php" target="_blank">LektorInnenstatisitk</a><br>
+		- <a href="'.APP_ROOT.'content/statistik/mitarbeiterstatistik.php" target="_blank">MitarbeiterInnenstatistik</a><br>
+		- <a href="'.APP_ROOT.'content/statistik/bewerberstatistik.php" target="_blank">BewerberInnenstatistik</a><br>
+		- <a href="'.APP_ROOT.'content/statistik/studentenstatistik.php" target="_blank">Studierendenstatistik</a><br>
+		- <a href="'.APP_ROOT.'content/statistik/absolventenstatistik.php" target="_blank">AbsolventInnenstatistik</a><br><br>
 		';
 	}
 	
@@ -1715,13 +1715,13 @@ else
 			die('Studiengang existiert nicht');
 	
 		$content.='
-		<h2>Bewerberstatistik Details - '.$stg_obj->kuerzel.' '.$stsem.'<span style="position:absolute; right:15px;">'.date('d.m.Y').'</span></h2><br>
+		<h2>BewerberInnenstatistik Details - '.$stg_obj->kuerzel.' '.$stsem.'<span style="position:absolute; right:15px;">'.date('d.m.Y').'</span></h2><br>
 		';
 		$content.='<center><iframe src="bewerberstatistik.svg.php?stsem='.$stsem.'&studiengang_kz='.$studiengang_kz.'" width="500" height="500" ></iframe></center>';
 		
 		$hlp=array();
 		//Aufmerksamdurch (Prestudent)
-		$content.= '<br><h2>Aufmerksam durch (Prestudent)</h2><br>';
+		$content.= '<br><h2>Aufmerksam durch (PrestudentIn)</h2><br>';
 		$qry = "SELECT beschreibung, COALESCE(a.anzahl,0) as anzahl
 				FROM public.tbl_aufmerksamdurch LEFT JOIN 
 					(SELECT aufmerksamdurch_kurzbz, count(*) as anzahl 
@@ -1788,7 +1788,7 @@ else
 	}
 	
 	$content.='
-		<h2>Bewerberstatistik '.$stsem.'<span style="position:absolute; right:15px;">'.date('d.m.Y').'</span></h2><br>
+		<h2>BewerberInnenstatistik '.$stsem.'<span style="position:absolute; right:15px;">'.date('d.m.Y').'</span></h2><br>
 		';
 	if($stsem!='')
 	{
@@ -1952,14 +1952,14 @@ else
 					<thead>
 						<tr>
 							<th class='table-sortable:default'>Studiengang</th>
-							<th class='table-sortable:numeric'>Interessenten (m/w)</th>
-							<th class='table-sortable:numeric'>Interessenten mit ZGV (m/w)</th>
-							<th class='table-sortable:numeric'>Interessenten mit RT Anmeldung (m/w)</th>
-							<th class='table-sortable:numeric'>Bewerber (m/w)</th>
-							<th class='table-sortable:numeric'>Aufgenommener (m/w)</th>
-							<th class='table-sortable:numeric'>Aufgenommener bereinigt (m/w)</th>
-							<th class='table-sortable:numeric'>Student 1S (m/w)</th>
-							<th class='table-sortable:numeric'>Student 3S (m/w)</th>
+							<th class='table-sortable:numeric'>InteressentInnen (m/w)</th>
+							<th class='table-sortable:numeric'>InteressentInnen mit ZGV (m/w)</th>
+							<th class='table-sortable:numeric'>InteressentInnen mit RT Anmeldung (m/w)</th>
+							<th class='table-sortable:numeric'>BewerberIn (m/w)</th>
+							<th class='table-sortable:numeric'>Aufgenommene (m/w)</th>
+							<th class='table-sortable:numeric'>Aufgenommene bereinigt (m/w)</th>
+							<th class='table-sortable:numeric'>StudentIn 1S (m/w)</th>
+							<th class='table-sortable:numeric'>StudentIn 3S (m/w)</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -2212,14 +2212,14 @@ else
 						<thead>
 							<tr>
 								<th class='table-sortable:default'>Studiengang</th>
-								<th class='table-sortable:numeric'>Interessenten VZ / BB / DL / DDP</th>
-								<th class='table-sortable:numeric'>Interessenten mit ZGV VZ / BB / DL / DDP</th>
-								<th class='table-sortable:numeric'>Interessenten mit RT Anmeldung VZ / BB / DL / DDP</th>
-								<th class='table-sortable:numeric'>Bewerber 1S VZ / BB / DL / DDP</th>
-								<th class='table-sortable:numeric'>Aufgenommener VZ / BB / DL / DDP</th>
-								<th class='table-sortable:numeric'>Aufgenommener bereinigt VZ / BB / DL / DDP</th>
-								<th class='table-sortable:numeric'>Student 1S VZ / BB / DL / DDP</th>
-								<th class='table-sortable:numeric'>Student 3S VZ / BB / DL / DDP</th>
+								<th class='table-sortable:numeric'>InteressentInnen VZ / BB / DL / DDP</th>
+								<th class='table-sortable:numeric'>InteressentInnen mit ZGV VZ / BB / DL / DDP</th>
+								<th class='table-sortable:numeric'>InteressentInnen mit RT Anmeldung VZ / BB / DL / DDP</th>
+								<th class='table-sortable:numeric'>BewerberInnen 1S VZ / BB / DL / DDP</th>
+								<th class='table-sortable:numeric'>Aufgenommene VZ / BB / DL / DDP</th>
+								<th class='table-sortable:numeric'>Aufgenommene bereinigt VZ / BB / DL / DDP</th>
+								<th class='table-sortable:numeric'>StudentIn 1S VZ / BB / DL / DDP</th>
+								<th class='table-sortable:numeric'>StudentIn 3S VZ / BB / DL / DDP</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -2406,7 +2406,7 @@ else
 		
 		$content.='
 		<br><br>
-		<h2>Bewerberstatistik '.$stsem.'<span style="position:absolute; right:15px;">'.$datum_obj->formatDatum($datum,'d.m.Y').'</span></h2><br>
+		<h2>BewerberInnenstatistik '.$stsem.'<span style="position:absolute; right:15px;">'.$datum_obj->formatDatum($datum,'d.m.Y').'</span></h2><br>
 		';
 		//Bewerberdaten holen
 		$qry = "SELECT studiengang_kz, kurzbz, typ, kurzbzlang, bezeichnung, orgform_kurzbz,
@@ -2522,14 +2522,14 @@ else
 					<thead>
 						<tr>
 							<th class='table-sortable:default'>Studiengang</th>
-							<th class='table-sortable:numeric'>Interessenten (m/w)</th>
-							<th class='table-sortable:numeric'>Interessenten mit ZGV (m/w)</th>
-							<th class='table-sortable:numeric'>Interessenten mit RT Anmeldung (m/w)</th>
-							<th class='table-sortable:numeric'>Bewerber (m/w)</th>
-							<th class='table-sortable:numeric'>Aufgenommener (m/w)</th>
-							<th class='table-sortable:numeric'>Aufgenommener bereinigt(m/w)</th>
-							<th class='table-sortable:numeric'>Student 1S (m/w)</th>
-							<th class='table-sortable:numeric'>Student 3S (m/w)</th>
+							<th class='table-sortable:numeric'>InteressentInnen (m/w)</th>
+							<th class='table-sortable:numeric'>InteressentInnen mit ZGV (m/w)</th>
+							<th class='table-sortable:numeric'>InteressentInnen mit RT Anmeldung (m/w)</th>
+							<th class='table-sortable:numeric'>BewerberIn (m/w)</th>
+							<th class='table-sortable:numeric'>Aufgenommene (m/w)</th>
+							<th class='table-sortable:numeric'>Aufgenommene bereinigt(m/w)</th>
+							<th class='table-sortable:numeric'>StudentIn 1S (m/w)</th>
+							<th class='table-sortable:numeric'>StudentIn 3S (m/w)</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -2663,9 +2663,9 @@ else
 	else 
 	{
 		//Mail versenden
-		echo 'Bewerberstatistik.php - Sende Mail ...';
-		$to = 'tw_sek@technikum-wien.at, tw_stgl@technikum-wien.at, russ@technikum-wien.at, ott@technikum-wien.at, vilesci@technikum-wien.at, lehner@technikum-wien.at, teschl@technikum-wien.at, maderdon@technikum-wien.at';
-		$mailobj = new mail($to, 'vilesci@technikum-wien.at','Bewerberstatistik','Sie muessen diese Mail als HTML-Mail anzeigen, um die Statistik zu sehen');
+		echo 'BewerberInnenstatistik.php - Sende Mail ...';
+		$to = 'tw_sek@technikum-wien.at, tw_stgl@technikum-wien.at, bewerberstatistik@technikum-wien.at, vilesci@technikum-wien.at';
+		$mailobj = new mail($to, 'vilesci@technikum-wien.at','BewerberInnenstatistik','Sie muessen diese Mail als HTML-Mail anzeigen, um die Statistik zu sehen');
 		$mailobj->setHTMLContent($content);
 		
 		if($mailobj->send())
