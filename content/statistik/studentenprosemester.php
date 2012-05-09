@@ -219,7 +219,7 @@ else
 		echo "<td align='center'>".($row->s2_m!=0?$row->s2_m:'&nbsp;')."</td>";
 		echo "<td align='center'>".($row->s2_w!=0?$row->s2_w:'&nbsp;')."</td>";
 		echo "<td align='center'>".($row->s3_m!=0?$row->s3_m:'&nbsp;')."</td>";
-		echo "<td align='center'>".($row->s3_x!=0?$row->s3_w:'&nbsp;')."</td>";
+		echo "<td align='center'>".($row->s3_w!=0?$row->s3_w:'&nbsp;')."</td>";
 		echo "<td align='center'>".($row->s4_m!=0?$row->s4_m:'&nbsp;')."</td>";
 		echo "<td align='center'>".($row->s4_w!=0?$row->s4_w:'&nbsp;')."</td>";
 		echo "<td align='center'>".($row->s5_m!=0?$row->s5_m:'&nbsp;')."</td>";
