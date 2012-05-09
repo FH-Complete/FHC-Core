@@ -75,49 +75,96 @@ if($format=='xls')
 	$workbook = new Spreadsheet_Excel_Writer();
 
 	// sending HTTP headers
-	$workbook->send("StudentenSemester_".$stsem.".xls");
+	$workbook->send("StudierendeSemester_".$stsem.".xls");
 
 	// Creating a worksheet
-	$worksheet =& $workbook->addWorksheet("StudentenSemester");
+	$worksheet =& $workbook->addWorksheet("StudierendeSemester");
+	$worksheet->setInputEncoding('utf-8');
 
 	//Formate Definieren
 	$format_bold =& $workbook->addFormat();
 	$format_bold->setBold();
 	$format_bold->setBorder(1);
+	$format_bold->setAlign("center");
 
 	$format_border =& $workbook->addFormat();
 	$format_border->setBorder(1);
+	$format_border->setAlign("center");
+	
+	$format_left =& $workbook->addFormat();
+	$format_left->setBorder(1);
+	$format_left->setAlign("left");
 
+	//Überschriften 1. Zeile
+	$worksheet->write(0,0,$stsem, $format_bold);
+	$worksheet->write(0,1,'1', $format_bold);
+	$worksheet->mergeCells(0,1,0,2);
+	$worksheet->write(0,3,'2', $format_bold);
+	$worksheet->mergeCells(0,3,0,4);
+	$worksheet->write(0,5,'3', $format_bold);
+	$worksheet->mergeCells(0,5,0,6);
+	$worksheet->write(0,7,'4', $format_bold);
+	$worksheet->mergeCells(0,7,0,8);
+	$worksheet->write(0,9,'5', $format_bold);
+	$worksheet->mergeCells(0,9,0,10);
+	$worksheet->write(0,11,'6', $format_bold);
+	$worksheet->mergeCells(0,11,0,12);
+	$worksheet->write(0,13,'7', $format_bold);
+	$worksheet->mergeCells(0,13,0,14);
+	$worksheet->write(0,15,'8', $format_bold);
+	$worksheet->mergeCells(0,15,0,16);
+	$worksheet->write(0,17,'Gesamt*', $format_bold);
+	
+	//Überschriften 2. Zeile
 	$spalte=0;
 	$zeile=0;
+	$worksheet->write($zeile+1,$spalte,'', $format_bold);
+	$worksheet->write($zeile+1,++$spalte,'m', $format_bold);
+	$worksheet->write($zeile+1,++$spalte,'w', $format_bold);
+	$worksheet->write($zeile+1,++$spalte,'m', $format_bold);
+	$worksheet->write($zeile+1,++$spalte,'w', $format_bold);
+	$worksheet->write($zeile+1,++$spalte,'m', $format_bold);
+	$worksheet->write($zeile+1,++$spalte,'w', $format_bold);
+	$worksheet->write($zeile+1,++$spalte,'m', $format_bold);
+	$worksheet->write($zeile+1,++$spalte,'w', $format_bold);
+	$worksheet->write($zeile+1,++$spalte,'m', $format_bold);
+	$worksheet->write($zeile+1,++$spalte,'w', $format_bold);
+	$worksheet->write($zeile+1,++$spalte,'m', $format_bold);
+	$worksheet->write($zeile+1,++$spalte,'w', $format_bold);
+	$worksheet->write($zeile+1,++$spalte,'m', $format_bold);
+	$worksheet->write($zeile+1,++$spalte,'w', $format_bold);
+	$worksheet->write($zeile+1,++$spalte,'m', $format_bold);
+	$worksheet->write($zeile+1,++$spalte,'w', $format_bold);
+	$worksheet->write($zeile+1,++$spalte,'', $format_bold);
 
-	$worksheet->write($zeile,$spalte,$stsem, $format_bold);
-	$worksheet->write($zeile,++$spalte,'1', $format_bold);
-	$worksheet->write($zeile,++$spalte,'2', $format_bold);
-	$worksheet->write($zeile,++$spalte,'3', $format_bold);
-	$worksheet->write($zeile,++$spalte,'4', $format_bold);
-	$worksheet->write($zeile,++$spalte,'5', $format_bold);
-	$worksheet->write($zeile,++$spalte,'6', $format_bold);
-	$worksheet->write($zeile,++$spalte,'7', $format_bold);
-	$worksheet->write($zeile,++$spalte,'8', $format_bold);
-	$worksheet->write($zeile,++$spalte,'Gesamt', $format_bold);
-
+	//Tabellendaten
 	while($row = $db->db_fetch_object($result))
 	{
 		$zeile++;
 		$spalte=0;
-		$worksheet->write($zeile,$spalte,$stg_arr[$row->studiengang_kz], $format_bold);
-		$worksheet->write($zeile,++$spalte,($row->s1!=0?$row->s1:''), $format_border);
-		$worksheet->write($zeile,++$spalte,($row->s2!=0?$row->s2:''), $format_border);
-		$worksheet->write($zeile,++$spalte,($row->s3!=0?$row->s3:''), $format_border);
-		$worksheet->write($zeile,++$spalte,($row->s4!=0?$row->s4:''), $format_border);
-		$worksheet->write($zeile,++$spalte,($row->s5!=0?$row->s5:''), $format_border);
-		$worksheet->write($zeile,++$spalte,($row->s6!=0?$row->s6:''), $format_border);
-		$worksheet->write($zeile,++$spalte,($row->s7!=0?$row->s7:''), $format_border);
-		$worksheet->write($zeile,++$spalte,($row->s8!=0?$row->s8:''), $format_border);
-		$worksheet->write($zeile,++$spalte,$row->all, $format_border);
+		$worksheet->setColumn($spalte,$spalte,15);
+		$worksheet->write($zeile+1,$spalte,$stg_arr[$row->studiengang_kz], $format_left);
+		$worksheet->write($zeile+1,++$spalte,($row->s1_m!=0?$row->s1_m:''), $format_border);
+		$worksheet->write($zeile+1,++$spalte,($row->s1_w!=0?$row->s1_w:''), $format_border);
+		$worksheet->write($zeile+1,++$spalte,($row->s2_m!=0?$row->s2_m:''), $format_border);
+		$worksheet->write($zeile+1,++$spalte,($row->s2_w!=0?$row->s2_w:''), $format_border);
+		$worksheet->write($zeile+1,++$spalte,($row->s3_m!=0?$row->s3_m:''), $format_border);
+		$worksheet->write($zeile+1,++$spalte,($row->s3_w!=0?$row->s3_w:''), $format_border);
+		$worksheet->write($zeile+1,++$spalte,($row->s4_m!=0?$row->s4_m:''), $format_border);
+		$worksheet->write($zeile+1,++$spalte,($row->s4_w!=0?$row->s4_w:''), $format_border);
+		$worksheet->write($zeile+1,++$spalte,($row->s5_m!=0?$row->s5_m:''), $format_border);
+		$worksheet->write($zeile+1,++$spalte,($row->s5_w!=0?$row->s5_w:''), $format_border);
+		$worksheet->write($zeile+1,++$spalte,($row->s6_m!=0?$row->s6_m:''), $format_border);
+		$worksheet->write($zeile+1,++$spalte,($row->s6_w!=0?$row->s6_w:''), $format_border);
+		$worksheet->write($zeile+1,++$spalte,($row->s7_m!=0?$row->s7_m:''), $format_border);
+		$worksheet->write($zeile+1,++$spalte,($row->s7_w!=0?$row->s7_w:''), $format_border);
+		$worksheet->write($zeile+1,++$spalte,($row->s8_m!=0?$row->s8_m:''), $format_border);
+		$worksheet->write($zeile+1,++$spalte,($row->s8_w!=0?$row->s8_w:''), $format_border);
+		$worksheet->write($zeile+1,++$spalte,$row->all, $format_border);
 	}
-
+	$spalte=0;
+	$zeile++;
+	$worksheet->write($zeile+1,$spalte,'* Die Summe addiert nur die Semester 1-8. Falls sich aktiv Studierende im 9. oder 10. Semester befinden, weicht die Summe von den tatsaechlichen Werten ab');
 	$workbook->close();
 }
 else
@@ -126,7 +173,7 @@ else
 	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 	<html>
 	<head>
-	<title>Studenten/Semester</title>
+	<title>Studierende/Semester</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<style type="text/css">
@@ -149,7 +196,7 @@ else
 				<th colspan="2">6</th>
 				<th colspan="2">7</th>
 				<th colspan="2">8</th>
-				<th>Gesamt</th>
+				<th>Gesamt*</th>
 			</tr>
 			<tr>
 				<th>&nbsp;</th>
@@ -172,7 +219,7 @@ else
 		echo "<td align='center'>".($row->s2_m!=0?$row->s2_m:'&nbsp;')."</td>";
 		echo "<td align='center'>".($row->s2_w!=0?$row->s2_w:'&nbsp;')."</td>";
 		echo "<td align='center'>".($row->s3_m!=0?$row->s3_m:'&nbsp;')."</td>";
-		echo "<td align='center'>".($row->s3_w!=0?$row->s3_w:'&nbsp;')."</td>";
+		echo "<td align='center'>".($row->s3_x!=0?$row->s3_w:'&nbsp;')."</td>";
 		echo "<td align='center'>".($row->s4_m!=0?$row->s4_m:'&nbsp;')."</td>";
 		echo "<td align='center'>".($row->s4_w!=0?$row->s4_w:'&nbsp;')."</td>";
 		echo "<td align='center'>".($row->s5_m!=0?$row->s5_m:'&nbsp;')."</td>";
@@ -188,6 +235,7 @@ else
 	}
 
 	echo '</table>';
+	echo '<br/>* Die Summe addiert nur die Semester 1-8. Falls sich aktiv Studierende im 9. oder 10. Semester befinden, weicht die Summe von den tatsächlichen Werten ab.';
 	echo '</body>
 	</html>';
 }
