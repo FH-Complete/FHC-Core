@@ -44,7 +44,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 	</head>
 	<body>';
 
-	echo "<h2>Abgängerstatistik $stsem";
+	echo "<h2>AbgängerInnenstatistik $stsem";
 	echo '<span style="position:absolute; right:15px;">'.date('d.m.Y').'</span></h2><br>';
 	echo '</h2>';
 	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">Studiensemester: <SELECT name="stsem">';
@@ -148,9 +148,9 @@ if($stsem!='')
 					<tr>
 						<th></th>
 						<th colspan ='3'>Abgewiesene </th>
-						<th colspan ='3'>Abbrecher </th>
-						<th colspan ='3'>Unterbrecher </th>
-						<th colspan ='3'>Absolventen </th>
+						<th colspan ='3'>AbbrecherInnen </th>
+						<th colspan ='3'>UnterbrecherInnen </th>
+						<th colspan ='3'>AbsolventInnen </th>
 					</tr>
 
 					<tr>

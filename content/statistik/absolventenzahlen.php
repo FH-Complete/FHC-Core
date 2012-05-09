@@ -85,7 +85,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 	</head>
 	<body>';
 
-echo "<h2>Absolventen&uuml;bersicht $stsem </h2>";
+echo "<h2>AbsolventInnen&uuml;bersicht $stsem </h2>";
 if(isset($_REQUEST["trennung"]))
 {
 	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">';
