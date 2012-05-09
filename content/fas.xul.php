@@ -246,17 +246,17 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
 					<menu id="menu-statistic-sublvplanung" label="&menu-statistic-sublvplanung.label;" accesskey="&menu-statistic-sublvplanung.accesskey;">
 						<menupopup id="menu-statistic-substatistik-popup">
 				            <menuitem
-				               id        =  "menu-statistic-lvplanung"
-				               key       =  "menu-statistic-lvplanung:key"
-				               label     = "&menu-statistic-lvplanung.label;"
-				               command   =  "menu-statistic-lvplanung:command"
-				               accesskey = "&menu-statistic-lvplanung.accesskey;"/>
-				            <menuitem
 				               id        =  "menu-statistic-lvplanungexcel"
 				               key       =  "menu-statistic-lvplanungexcel:key"
 				               label     = "&menu-statistic-lvplanungexcel.label;"
 				               command   =  "menu-statistic-lvplanungexcel:command"
 				               accesskey = "&menu-statistic-lvplanungexcel.accesskey;"/>
+				              <menuitem
+				               id        =  "menu-statistic-lvplanung"
+				               key       =  "menu-statistic-lvplanung:key"
+				               label     = "&menu-statistic-lvplanung.label;"
+				               command   =  "menu-statistic-lvplanung:command"
+				               accesskey = "&menu-statistic-lvplanung.accesskey;"/>
 				        </menupopup>
 				    </menu>
 					<menuitem
@@ -384,17 +384,17 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
 					<menu id="menu-statistic-substatistik-bewerberstatistik" label="&menu-statistic-substatistik-bewerberstatistik.label;" accesskey="&menu-statistic-substatistik-bewerberstatistik.accesskey;">
 						<menupopup id="menu-statistic-substatistik-bewerberstatistik-popup">
 				             <menuitem
-				               id        =  "menu-statistic-bewerberstatistik-html"
-				               key       =  "menu-statistic-bewerberstatistik-html:key"
-				               label     = "&menu-statistic-bewerberstatistik-html.label;"
-				               command   =  "menu-statistic-bewerberstatistik-html:command"
-				               accesskey = "&menu-statistic-bewerberstatistik-html.accesskey;"/>
-				             <menuitem
 				               id        =  "menu-statistic-bewerberstatistik-excel"
 				               key       =  "menu-statistic-bewerberstatistik-excel:key"
 				               label     = "&menu-statistic-bewerberstatistik-excel.label;"
 				               command   =  "menu-statistic-bewerberstatistik-excel:command"
 				               accesskey = "&menu-statistic-bewerberstatistik-excel.accesskey;"/>
+				              <menuitem
+				               id        =  "menu-statistic-bewerberstatistik-html"
+				               key       =  "menu-statistic-bewerberstatistik-html:key"
+				               label     = "&menu-statistic-bewerberstatistik-html.label;"
+				               command   =  "menu-statistic-bewerberstatistik-html:command"
+				               accesskey = "&menu-statistic-bewerberstatistik-html.accesskey;"/>
 		               </menupopup>
 					</menu>
 					<menuitem
