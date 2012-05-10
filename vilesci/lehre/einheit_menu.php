@@ -37,7 +37,7 @@ if (isset($_GET['studiengang_kz']))
 else if(isset($_POST['studiengang_kz']))
 	$studiengang_kz = $_POST['studiengang_kz'];	
 else
-	$studiengang_kz=null;
+	$studiengang_kz='0';
 	
 if (isset($_GET['sem']))
 
