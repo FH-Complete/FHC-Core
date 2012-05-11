@@ -266,6 +266,59 @@ class kontakt extends basis_db
 		}	
 	}
 	
+    /**
+	 * Laedt Kontaktdaten eines bestimmten typs der Person
+	 * @param person_id
+     * @param kontakttyp
+	 * @return boolean
+	 */
+	public function load_persKontakttyp($person_id, $kontakttyp)
+	{
+		if(!is_numeric($person_id))
+		{
+			$this->errormsg = 'Person_id ist ungueltig';
+			return false;
+		}
+		
+		$qry = "SELECT tbl_kontakt.*, tbl_firma.name as firma_name, tbl_firma.firma_id 
+				FROM public.tbl_kontakt LEFT JOIN public.tbl_standort USING(standort_id) LEFT JOIN public.tbl_firma USING(firma_id) WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER)." 
+                AND kontakttyp =".$this->db_add_param($kontakttyp, FHC_STRING);
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new kontakt();
+				
+				$obj->kontakt_id = $row->kontakt_id;
+				$obj->person_id = $row->person_id;
+				$obj->standort_id = $row->standort_id;		
+				$obj->firma_id = $row->firma_id;
+				$obj->firma_name = $row->firma_name;
+				$obj->kontakttyp = $row->kontakttyp;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->kontakt = $row->kontakt;
+				$obj->zustellung = ($row->zustellung=='t'?true:false);
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->ext_id = $row->ext_id;
+				
+				$this->result[] = $obj;
+			}
+			
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+    
+    
+    
 	/**
 	 * Laedt alle Kontaktdaten einer Person
 	 * @param person_id
@@ -314,6 +367,7 @@ class kontakt extends basis_db
 			return false;
 		}
 	}
+    
 	/**
 	 * Laedt alle Kontaktdaten zu einem Standort
 	 * @param standort_id
