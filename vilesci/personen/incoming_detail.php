@@ -708,7 +708,7 @@ function print_personendetails()
 		$adresse = $adresse->result[0];
 		
 	$kontakt = new kontakt();
-	$kontakt->load_pers($person->person_id);
+	$kontakt->load_persKontakttyp($person->person_id, 'email');
 	if(isset($kontakt->result[0]))
 		$kontakt = $kontakt->result[0];
 	
