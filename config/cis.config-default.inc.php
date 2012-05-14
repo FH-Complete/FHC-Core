@@ -108,6 +108,7 @@ define('MAIL_ADMIN','vilesci@technikum-wien.at');
 define('MAIL_LVPLAN','pam@technikum-wien.at,lvplan@technikum-wien.at');
 define('MAIL_CIS','cis@technikum-wien.at');
 define('MAIL_INTERNATIONAL','erika.groh@technikum-wien.at');
+define('MAIL_INTERNATIONAL_OUTGOING', 'paivi.kumpukari-stascha@technikum-wien.at');
 
 //OPUS
 define('OPUS_SERVER','www.technikum-wien.at');
