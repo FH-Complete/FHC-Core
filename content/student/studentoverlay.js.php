@@ -736,14 +736,34 @@ function StudentImageInfomail()
 		sg = 'Sehr geehrte';
 	else
 		sg = 'Sehr geehrter';
-	if(uid!='')
-	{
-		body=sg+" "+anrede+" "+nachname+"!%0A%0AIhr Profilbild wurde entfernt, da es nicht den aktuellen Bildrichtlinen entspricht.%0ABitte laden Sie unter CIS->Profil ein neues Profilbild hoch.";
-		window.location.href="mailto:"+uid+"@<?php echo DOMAIN;?>?subject=Profilbild&body="+body;
+	
+	if(uid=='')
+	{	
+		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+		var req = new phpRequest(url,'','');
+	
+		var person_id = document.getElementById('student-detail-textbox-person_id').value;	
+		req.add('type', 'getprivatemailadress');
+		req.add('person_ids', person_id);
+		
+		var response = req.executePOST();
+	
+		var val =  new ParseReturnValue(response)
+		email = val.dbdml_data;
 	}
 	else
 	{
-		alert('Nur bei Studenten verfügbar');
+		email = uid+"@<?php echo DOMAIN;?>";
+	}
+	
+	if(email!='')
+	{
+		body=sg+" "+anrede+" "+nachname+"!%0A%0AIhr Profilbild wurde entfernt, da es nicht den aktuellen Bildrichtlinen entspricht.%0ABitte laden Sie unter CIS->Profil ein neues Profilbild hoch.";
+		window.location.href="mailto:"+email+"?subject=Profilbild&body="+body;
+	}
+	else
+	{
+		alert('E-Mail konnte nicht ermittelt werden');
 	}
 }
 
