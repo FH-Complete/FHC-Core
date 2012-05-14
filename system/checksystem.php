@@ -3571,6 +3571,21 @@ if(!@$db->db_query("SELECT zugangscode FROM public.tbl_reihungstest LIMIT 1"))
 	else 
 		echo 'Tabelle public.tbl_reihungstest Spalte zugangscode hinzugefuegt!<br>';
 }
+
+// anmerkungsfelder und stdienrichtung für Outgoing
+if(!@$db->db_query("SELECT anmerkungStudent FROM public.tbl_preoutgoing LIMIT 1"))
+{
+    $qry = "
+        ALTER TABLE public.tbl_preoutgoing ADD COLUMN anmerkung_student text;
+        ALTER TABLE public.tbl_preoutgoing ADD COLUMN anmerkung_admin text;
+        ALTER TABLE public.tbl_preoutgoing ADD COLUMN studienrichtung_Gastuniversitaet varchar(64)";
+    
+    if(!$db->db_query($qry))
+        echo '<strong>public.tbl_preoutgoing: '.$db->db_last_error().'</strong><br>';
+    else
+        echo 'Tabelle public.tbl_preoutgoing Spalten anmerkungStudent, anmerkungAdmin, studienrichtungGastuniversitaet';
+}
+
 echo '<br>';
 
 $tabellen=array(
@@ -3715,7 +3730,7 @@ $tabellen=array(
 	"public.tbl_preincoming_lehrveranstaltung"  => array("preincoming_id","lehrveranstaltung_id","insertamum","insertvon"),
 	"public.tbl_preinteressent"  => array("preinteressent_id","person_id","studiensemester_kurzbz","firma_id","erfassungsdatum","einverstaendnis","absagedatum","anmerkung","maturajahr","infozusendung","aufmerksamdurch_kurzbz","kontaktmedium_kurzbz","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preinteressentstudiengang"  => array("studiengang_kz","preinteressent_id","freigabedatum","uebernahmedatum","prioritaet","insertamum","insertvon","updateamum","updatevon"),
-	"public.tbl_preoutgoing" => array("preoutgoing_id","uid","dauer_von","dauer_bis","ansprechperson","bachelorarbeit","masterarbeit","betreuer","sprachkurs","intensivsprachkurs","sprachkurs_von","sprachkurs_bis","praktikum","praktikum_von","praktikum_bis","behinderungszuschuss","studienbeihilfe","insertamum","insertvon","updateamum","updatevon"),
+	"public.tbl_preoutgoing" => array("preoutgoing_id","uid","dauer_von","dauer_bis","ansprechperson","bachelorarbeit","masterarbeit","betreuer","sprachkurs","intensivsprachkurs","sprachkurs_von","sprachkurs_bis","praktikum","praktikum_von","praktikum_bis","behinderungszuschuss","studienbeihilfe","anmerkung_student", "anmerkung_admin", "studienrichtung_gastuniversitaet", "insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preoutgoing_firma" => array("preoutgoing_firma_id","preoutgoing_id","mobilitaetsprogramm_code","firma_id","name","auswahl"),
 	"public.tbl_preoutgoing_lehrveranstaltung" => array("preoutgoing_lehrveranstaltung_id","preoutgoing_id","bezeichnung","ects","endversion","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preoutgoing_preoutgoing_status" => array("status_id","preoutgoing_status_kurzbz","preoutgoing_id","datum","insertamum","insertvon","updateamum","updatevon"),
