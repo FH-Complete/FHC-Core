@@ -3493,7 +3493,7 @@ if(!@$db->db_query("SELECT 1 from public.tbl_preoutgoing LIMIT 1"))
 	(
 		preoutgoing_firma_id bigint NOT NULL,
 		preoutgoing_id bigint NOT NULL,
-		mobilitaetsprogramm_code bigint NOT NULL,
+		mobilitaetsprogramm_code bigint,
 		firma_id bigint,
 		name varchar(256),
 		auswahl boolean NOT NULL
