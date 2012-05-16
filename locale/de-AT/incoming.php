@@ -101,4 +101,6 @@ $this->phrasen['incoming/verwaltungVonDateien']='Verwaltung von Dateien';
 $this->phrasen['incoming/dateiname']='Dateiname';
 $this->phrasen['incoming/loeschen']='löschen';
 $this->phrasen['incoming/outgoingRegistration']='Outgoing-Registration';
+$this->phrasen['incoming/summerschool']='Summerschool';
+$this->phrasen['incoming/anmerkungen']='Anmerkungen';
 ?>
