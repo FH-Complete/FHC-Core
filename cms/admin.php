@@ -161,7 +161,7 @@ if(!is_null($method))
 			elseif(isset($_POST['freigeben']))
 			{
 				$content = new content();
-				if($content->freigeben($contentsprache_id, $user))
+				if($content->freigabeUser($user))
 					$message.='<span class="ok">Eintrag freigegeben</span>';
 				else
 					$message.='<span class="error">'.$content->errormsg.'</span>';
@@ -170,6 +170,25 @@ if(!is_null($method))
 			{
 				$message.='<span class="error">Unbekannte Sperre</span>';
 			}
+			break;
+		case 'content_sperrfreigabe':
+			//Freigabe einer Contentseite erzwingen
+			if(!isset($_GET['contentsprache_id']))
+				die('Falsche Parameteruebergabe');
+				
+			if(!$rechte->isBerechtigt('basis/cms_sperrfreigabe', null, 'su'))
+			{
+				$message.='<span class="error">Sie haben keine Berechtigung fuer diese Aktion</span>';
+				break;
+			}
+				
+			$contentsprache_id=$_GET['contentsprache_id'];
+			$content = new content();
+			if($content->freigabeContent($contentsprache_id))
+				$message.='<span class="ok">Eintrag freigegeben</span>';
+			else
+				$message.='<span class="error">'.$content->errormsg.'</span>';
+			
 			break;
 		case 'add_new_content':
 			//Anlegen von neuem Content
@@ -1133,7 +1152,7 @@ function print_rights()
  */
 function print_content()
 {
-	global $content_id, $sprache, $version, $user;
+	global $content_id, $sprache, $version, $user, $rechte;
 
 	$content = new content();
 
@@ -1144,6 +1163,13 @@ function print_content()
 	{
 		$content->getSperrLog($content->contentsprache_id);
 		echo "Dieser Content ist gesperrt von $content->uid seit $content->start!";
+		
+		if($rechte->isBerechtigt('basis/cms_sperrfreigabe',null,'su'))
+		{
+			echo '<br><br><form action="'.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&contentsprache_id='.$content->contentsprache_id.'&sprache='.$sprache.'&version='.$version.'&action=content&method=content_sperrfreigabe" method="POST">';
+			echo '<input type="submit" value="Freigabe erzwingen" name="freigeben">';
+			echo '</form>';
+		}
 		return 0;
 	}
 	

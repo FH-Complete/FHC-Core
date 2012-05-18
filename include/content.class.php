@@ -95,12 +95,12 @@ class content extends basis_db
 					campus.tbl_content
 					JOIN campus.tbl_contentsprache USING(content_id)
 				WHERE
-					tbl_content.content_id='".addslashes($content_id)."'
-					AND tbl_contentsprache.sprache='".addslashes($sprache)."'";
+					tbl_content.content_id=".$this->db_add_param($content_id, FHC_INTEGER)."
+					AND tbl_contentsprache.sprache=".$this->db_add_param($sprache);
 		if($sichtbar)
 			$qry.=" AND sichtbar=true";
 		if($version!='')
-			$qry.=" AND tbl_contentsprache.version='".addslashes(intval($version))."'";
+			$qry.=" AND tbl_contentsprache.version=".$this->db_add_param(intval($version), FHC_INTEGER);
 		$qry.=" ORDER BY version DESC LIMIT 1";
 	
 		if($result = $this->db_query($qry))
@@ -114,7 +114,7 @@ class content extends basis_db
 				$this->sprache = $row->sprache;
 				$this->contentsprache_id = $row->contentsprache_id;
 				$this->version = $row->version;
-				$this->sichtbar = ($row->sichtbar=='t'?true:false);
+				$this->sichtbar = $this->db_parse_bool($row->sichtbar);
 				$this->content = $row->content;
 				$this->reviewvon = $row->reviewvon;
 				$this->reviewamum = $row->reviewamum;
@@ -122,8 +122,8 @@ class content extends basis_db
 				$this->updatevon = $row->updatevon;
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
-				$this->menu_open = ($row->menu_open=='t'?true:false);
-				$this->aktiv = ($row->aktiv=='t'?true:false);
+				$this->menu_open = $this->db_parse_bool($row->menu_open);
+				$this->aktiv = $this->db_parse_bool($row->aktiv);
 				$this->gesperrt_uid = $row->gesperrt_uid;
 				$this->beschreibung = $row->beschreibung;
 				return true;
@@ -149,7 +149,7 @@ class content extends basis_db
 	 */
 	public function getOrganisationseinheit($content_id)
 	{
-		$qry = "SELECT oe_kurzbz FROM campus.tbl_content WHERE content_id='".addslashes($content_id)."'";
+		$qry = "SELECT oe_kurzbz FROM campus.tbl_content WHERE content_id=".$this->db_add_param($content_id, FHC_INTEGER);
 		
 		if($result = $this->db_query($qry))
 		{
@@ -184,7 +184,7 @@ class content extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT count(*) as anzahl FROM campus.tbl_contentgruppe WHERE content_id='".addslashes($content_id)."'";
+		$qry = "SELECT count(*) as anzahl FROM campus.tbl_contentgruppe WHERE content_id=".$this->db_add_param($content_id, FHC_INTEGER);
 		
 		if($result = $this->db_query($qry))
 		{
@@ -224,7 +224,7 @@ class content extends basis_db
 					campus.tbl_contentgruppe 
 					JOIN public.tbl_gruppe USING(gruppe_kurzbz)
 				WHERE
-					content_id='".addslashes($content_id)."' 
+					content_id=".$this->db_add_param($content_id, FHC_INTEGER)." 
 				ORDER BY gruppe_kurzbz";
 		
 		if($result = $this->db_query($qry))
@@ -258,7 +258,7 @@ class content extends basis_db
 	 */
 	public function deleteGruppe($content_id, $gruppe_kurzbz)
 	{
-		$qry = "DELETE FROM campus.tbl_contentgruppe WHERE content_id='".addslashes($content_id)."' AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
+		$qry = "DELETE FROM campus.tbl_contentgruppe WHERE content_id=".$this->db_add_param($content_id, FHC_INTEGER)." AND gruppe_kurzbz=".$this->db_add_param($gruppe_kurzbz);
 		
 		if($this->db_query($qry))
 		{
@@ -280,7 +280,7 @@ class content extends basis_db
 	 */
 	public function isGruppeZugeteilt($content_id, $gruppe_kurzbz)
 	{
-		$qry = "SELECT 1 FROM campus.tbl_contentgruppe WHERE content_id='".addslashes($content_id)."' AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."';";
+		$qry = "SELECT 1 FROM campus.tbl_contentgruppe WHERE content_id=".$this->db_add_param($content_id, FHC_INTEGER)." AND gruppe_kurzbz=".$this->db_add_param($gruppe_kurzbz).';';
 		
 		if($result = $this->db_query($qry))
 		{
@@ -309,10 +309,10 @@ class content extends basis_db
 		}
 		
 		$qry = 'INSERT INTO campus.tbl_contentgruppe (content_id, gruppe_kurzbz, insertamum, insertvon) VALUES('.
-				$this->addslashes($this->content_id).','.
-				$this->addslashes($this->gruppe_kurzbz).','.
-				$this->addslashes($this->insertamum).','.
-				$this->addslashes($this->insertvon).');';
+				$this->db_add_param($this->content_id, FHC_INTEGER).','.
+				$this->db_add_param($this->gruppe_kurzbz).','.
+				$this->db_add_param($this->insertamum).','.
+				$this->db_add_param($this->insertvon).');';
 				
 		if($this->db_query($qry))
 		{
@@ -345,8 +345,8 @@ class content extends basis_db
 					campus.tbl_contentgruppe 
 					JOIN public.vw_gruppen USING(gruppe_kurzbz) 
 				WHERE
-					tbl_contentgruppe.content_id='".addslashes($content_id)."'
-					AND vw_gruppen.uid='".addslashes($uid)."'";
+					tbl_contentgruppe.content_id=".$this->db_add_param($content_id, FHC_INTEGER)."
+					AND vw_gruppen.uid=".$this->db_add_param($uid);
 		if($result = $this->db_query($qry))
 		{
 			if($this->db_num_rows($result)>0)
@@ -370,7 +370,7 @@ class content extends basis_db
 	 */
 	public function saveContent($contentsprache_id, $content)
 	{
-		$qry="UPDATE campus.tbl_contentsprache SET content='".addslashes($content)."' WHERE contentsprache_id='".addslashes($contentsprache_id)."';";
+		$qry="UPDATE campus.tbl_contentsprache SET content=".$this->db_add_param($content)." WHERE contentsprache_id=".$this->dB_add_param($contentsprache_id, FHC_INTEGER).';';
 		if($this->db_query($qry))
 			return true;
 		else
@@ -388,27 +388,27 @@ class content extends basis_db
 		if($new)
 		{
 			$qry = "BEGIN;INSERT INTO campus.tbl_content(template_kurzbz, oe_kurzbz, updatevon, updateamum, insertvon, insertamum, aktiv, menu_open, beschreibung) VALUES(".
-					$this->addslashes($this->template_kurzbz).','.
-					$this->addslashes($this->oe_kurzbz).','.
-					$this->addslashes($this->updatevon).','.
-					$this->addslashes($this->updateamum).','.
-					$this->addslashes($this->insertvon).','.
-					$this->addslashes($this->insertamum).','.
-					($this->aktiv?'true':'false').','.
-					($this->menu_open?'true':'false').','.
-					$this->addslashes($this->beschreibung).');';
+					$this->db_add_param($this->template_kurzbz).','.
+					$this->db_add_param($this->oe_kurzbz).','.
+					$this->db_add_param($this->updatevon).','.
+					$this->db_add_param($this->updateamum).','.
+					$this->db_add_param($this->insertvon).','.
+					$this->db_add_param($this->insertamum).','.
+					$this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
+					$this->db_add_param($this->menu_open, FHC_BOOLEAN).','.
+					$this->db_add_param($this->beschreibung).');';
 		}
 		else
 		{
 			$qry = "UPDATE campus.tbl_content SET ".
-					" updatevon=".$this->addslashes($this->updatevon).','.
-					" updateamum=".$this->addslashes($this->updateamum).','.
-					" template_kurzbz=".$this->addslashes($this->template_kurzbz).','.
-					" oe_kurzbz=".$this->addslashes($this->oe_kurzbz).','.
-					" aktiv=".($this->aktiv?'true':'false').','.
-					" menu_open=".($this->menu_open?'true':'false').','.
-					" beschreibung=".$this->addslashes($this->beschreibung).
-					" WHERE content_id='".addslashes($this->content_id)."';";
+					" updatevon=".$this->db_add_param($this->updatevon).','.
+					" updateamum=".$this->db_add_param($this->updateamum).','.
+					" template_kurzbz=".$this->db_add_param($this->template_kurzbz).','.
+					" oe_kurzbz=".$this->db_add_param($this->oe_kurzbz).','.
+					" aktiv=".$this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
+					" menu_open=".$this->db_add_param($this->menu_open, FHC_BOOLEAN).','.
+					" beschreibung=".$this->db_add_param($this->beschreibung).
+					" WHERE content_id=".$this->db_add_param($this->content_id, FHC_INTEGER).';';
 		}
 		
 		if($this->db_query($qry))
@@ -501,7 +501,8 @@ class content extends basis_db
 			$this->errormsg = 'ContentID ungueltig';
 			return false;
 		}
-		$qry = "SELECT count(*) as anzahl FROM campus.tbl_contentchild WHERE content_id='".addslashes($content_id)."'";
+		$qry = "SELECT count(*) as anzahl FROM campus.tbl_contentchild 
+				WHERE content_id=".$this->db_add_param($content_id, FHC_INTEGER);
 		
 		if($result = $this->db_query($qry))
 		{
@@ -548,7 +549,7 @@ class content extends basis_db
 					campus.tbl_contentchild
 					JOIN campus.tbl_content ON(tbl_contentchild.child_content_id=tbl_content.content_id)
 				WHERE
-					tbl_contentchild.content_id='".addslashes($content_id)."'
+					tbl_contentchild.content_id=".$this->db_add_param($content_id, FHC_INTEGER)."
 					AND aktiv=true
 				ORDER BY sort
 				";
@@ -582,7 +583,7 @@ class content extends basis_db
 					campus.tbl_contentchild 
 					JOIN campus.tbl_content ON(tbl_content.content_id=tbl_contentchild.child_content_id)
 				WHERE 
-					tbl_contentchild.content_id='".addslashes($content_id)."'
+					tbl_contentchild.content_id=".$this->db_add_param($content_id, FHC_INTEGER)."
 				ORDER BY sort";
 		
 		if($result = $this->db_query($qry))
@@ -610,7 +611,7 @@ class content extends basis_db
 	public function getpossibleChilds($content_id, $sprache=DEFAULT_LANGUAGE)
 	{
 		$qry = "SELECT 
-					*, (SELECT titel FROM campus.tbl_contentsprache WHERE sprache='".addslashes($sprache)."' AND content_id=tbl_content.content_id ORDER BY version LIMIT 1) as titel
+					*, (SELECT titel FROM campus.tbl_contentsprache WHERE sprache=".$this->db_add_param($sprache)." AND content_id=tbl_content.content_id ORDER BY version LIMIT 1) as titel
 				FROM 
 					campus.tbl_content
 				WHERE 
@@ -618,7 +619,7 @@ class content extends basis_db
 						WITH RECURSIVE parents(content_id, child_content_id) as 
 						(
 							SELECT content_id, child_content_id FROM campus.tbl_contentchild 
-							WHERE child_content_id='".addslashes($content_id)."'
+							WHERE child_content_id=".$this->db_add_param($content_id, FHC_INTEGER)."
 							UNION ALL
 							SELECT cc.content_id, cc.child_content_id FROM campus.tbl_contentchild cc, parents 
 							WHERE cc.child_content_id=parents.content_id
@@ -626,7 +627,7 @@ class content extends basis_db
 						SELECT content_id
 						FROM parents
 						GROUP BY content_id)
-					AND content_id<>'".addslashes($content_id)."'
+					AND content_id<>".$this->db_add_param($content_id, FHC_INTEGER)."
 					AND template_kurzbz<>'news'
 				ORDER BY titel";
 
@@ -666,7 +667,7 @@ class content extends basis_db
 	 */
 	public function deleteChild($contentchild_id)
 	{
-		$qry = "DELETE FROM campus.tbl_contentchild WHERE contentchild_id='".addslashes($contentchild_id)."'";
+		$qry = "DELETE FROM campus.tbl_contentchild WHERE contentchild_id=".$this->db_add_param($contentchild_id, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 		{
@@ -680,17 +681,17 @@ class content extends basis_db
 	}
 	
 	/**
-	 * Fuegt eine Gruppe zu einem Content hinzu
+	 * Fuegt einem Content einen Childcontent hinzu
 	 * @return boolean
 	 */
 	public function addChild()
 	{
 		$qry = 'INSERT INTO campus.tbl_contentchild (content_id, child_content_id, insertamum, insertvon, sort) VALUES('.
-				$this->addslashes($this->content_id).','.
-				$this->addslashes($this->child_content_id).','.
-				$this->addslashes($this->insertamum).','.
-				$this->addslashes($this->insertvon).','.
-				$this->addslashes($this->sort).');';
+				$this->db_add_param($this->content_id, FHC_INTEGER).','.
+				$this->db_add_param($this->child_content_id, FHC_INTEGER).','.
+				$this->db_add_param($this->insertamum).','.
+				$this->db_add_param($this->insertvon).','.
+				$this->db_add_param($this->sort).');';
 				
 		if($this->db_query($qry))
 		{
@@ -698,19 +699,21 @@ class content extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Zuteilen der Gruppe';
+			$this->errormsg = 'Fehler beim Zuteilen des Eintrages';
 			return false;
 		}
 	}
 	
 	/**
-	 * Holt die hochste Sortierung eines Contentteilbaums
+	 * Holt die hoechste Sortierung eines Contentteilbaums
 	 * 
 	 * @param $content_id
 	 */
 	public function getMaxSort($content_id)
 	{
-		$qry="SELECT max(sort) as max FROM campus.tbl_contentchild WHERE content_id='".addslashes($content_id)."'";
+		$qry="SELECT max(sort) as max FROM campus.tbl_contentchild 
+				WHERE content_id=".$this->db_add_param($content_id, FHC_INTEGER);
+		
 		if($result = $this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object($result))
@@ -726,6 +729,7 @@ class content extends basis_db
 			return false;
 		}
 	}
+	
 	/**
 	 * Laedt alle Content Eintraege die keine Childs von anderen Contenteintraegen sind
 	 * @return boolean
@@ -829,9 +833,9 @@ class content extends basis_db
 					campus.tbl_contentchild 
 				WHERE 
 					content_id=(SELECT content_id FROM campus.tbl_contentchild 
-								WHERE contentchild_id='".addslashes($contentchild_id)."')
+								WHERE contentchild_id=".$this->db_add_param($contentchild_id, FHC_INTEGER).")
 					AND sort<(SELECT sort FROM campus.tbl_contentchild 
-								WHERE contentchild_id='".addslashes($contentchild_id)."')
+								WHERE contentchild_id=".$this->db_add_param($contentchild_id, FHC_INTEGER).")
 				ORDER BY sort DESC LIMIT 1;";
 		if($result = $this->db_query($qry))
 		{
@@ -854,10 +858,10 @@ class content extends basis_db
 		
 		$qry = "UPDATE campus.tbl_contentchild 
 				SET sort=(SELECT sort FROM campus.tbl_contentchild 
-						 WHERE contentchild_id='".addslashes($contentchild_id)."')
-				WHERE contentchild_id='".addslashes($nachbar_id)."';
-				UPDATE campus.tbl_contentchild SET sort='".addslashes($nachbar_sort)."' 
-				WHERE contentchild_id='".addslashes($contentchild_id)."';";
+						 WHERE contentchild_id=".$this->db_add_param($contentchild_id, FHC_INTEGER).")
+				WHERE contentchild_id=".$this->db_add_param($nachbar_id, FHC_INTEGER).";
+				UPDATE campus.tbl_contentchild SET sort=".$this->db_add_param($nachbar_sort, FHC_INTEGER)." 
+				WHERE contentchild_id=".$this->db_add_param($contentchild_id, FHC_INTEGER).';';
 		
 		if($this->db_query($qry))
 			return true;
@@ -880,9 +884,9 @@ class content extends basis_db
 					campus.tbl_contentchild 
 				WHERE 
 					content_id=(SELECT content_id FROM campus.tbl_contentchild 
-								WHERE contentchild_id='".addslashes($contentchild_id)."')
+								WHERE contentchild_id=".$this->db_add_param($contentchild_id, FHC_INTEGER).")
 					AND sort>(SELECT sort FROM campus.tbl_contentchild 
-								WHERE contentchild_id='".addslashes($contentchild_id)."')
+								WHERE contentchild_id=".$this->db_add_param($contentchild_id, FHC_INTEGER).")
 				ORDER BY sort ASC LIMIT 1;";
 		if($result = $this->db_query($qry))
 		{
@@ -905,10 +909,10 @@ class content extends basis_db
 		
 		$qry = "UPDATE campus.tbl_contentchild 
 				SET sort=(SELECT sort FROM campus.tbl_contentchild 
-						 WHERE contentchild_id='".addslashes($contentchild_id)."')
-				WHERE contentchild_id='".addslashes($nachbar_id)."';
-				UPDATE campus.tbl_contentchild SET sort='".addslashes($nachbar_sort)."' 
-				WHERE contentchild_id='".addslashes($contentchild_id)."';";
+						 WHERE contentchild_id=".$this->db_add_param($contentchild_id, FHC_INTEGER).")
+				WHERE contentchild_id=".$this->db_add_param($nachbar_id, FHC_INTEGER).";
+				UPDATE campus.tbl_contentchild SET sort=".$this->db_add_param($nachbar_sort, FHC_INTEGER)." 
+				WHERE contentchild_id=".$this->db_add_param($contentchild_id, FHC_INTEGER).';';
 		if($this->db_query($qry))
 			return true;
 		else
@@ -934,35 +938,35 @@ class content extends basis_db
 		{
 			$qry = 'INSERT INTO campus.tbl_contentsprache(sprache, content_id, version, sichtbar, content, 
 					reviewvon, reviewamum, updateamum, updatevon, insertamum, insertvon, titel, gesperrt_uid) VALUES('.
-					$this->addslashes($this->sprache).','.
-					$this->addslashes($this->content_id).','.
-					$this->addslashes($this->version).','.
-					($this->sichtbar?'true':'false').','.
-					$this->addslashes($this->content).','.
-					$this->addslashes($this->reviewvon).','.
-					$this->addslashes($this->reviewamum).','.
-					$this->addslashes($this->updateamum).','.
-					$this->addslashes($this->updatevon).','.
-					$this->addslashes($this->insertamum).','.
-					$this->addslashes($this->insertvon).','.
-					$this->addslashes($this->titel).','.
-					$this->addslashes($this->gesperrt_uid).');';					
+					$this->db_add_param($this->sprache).','.
+					$this->db_add_param($this->content_id, FHC_INTEGER).','.
+					$this->db_add_param($this->version, FHC_INTEGER).','.
+					$this->db_add_param($this->sichtbar, FHC_BOOLEAN).','.
+					$this->db_add_param($this->content).','.
+					$this->db_add_param($this->reviewvon).','.
+					$this->db_add_param($this->reviewamum).','.
+					$this->db_add_param($this->updateamum).','.
+					$this->db_add_param($this->updatevon).','.
+					$this->db_add_param($this->insertamum).','.
+					$this->db_add_param($this->insertvon).','.
+					$this->db_add_param($this->titel).','.
+					$this->db_add_param($this->gesperrt_uid).');';					
 		}
 		else
 		{
 			$qry = "UPDATE campus.tbl_contentsprache SET ".
-					" sprache=".$this->addslashes($this->sprache).','.
-					" content_id=".$this->addslashes($this->content_id).','.
-					" version=".$this->addslashes($this->version).','.
-					" sichtbar=".($this->sichtbar?'true':'false').','.
-					" content=".$this->addslashes($this->content).','.
-					" reviewvon=".$this->addslashes($this->reviewvon).','.
-					" reviewamum=".$this->addslashes($this->reviewamum).','.
-					" updatevon=".$this->addslashes($this->updatevon).','.
-					" updateamum=".$this->addslashes($this->updateamum).','.
-					" titel=".$this->addslashes($this->titel).','.
-					" gesperrt_uid=".$this->addslashes($this->gesperrt_uid).
-					" WHERE contentsprache_id='".addslashes($this->contentsprache_id)."';";
+					" sprache=".$this->db_add_param($this->sprache).','.
+					" content_id=".$this->db_add_param($this->content_id, FHC_INTEGER).','.
+					" version=".$this->db_add_param($this->version, FHC_INTEGER).','.
+					" sichtbar=".$this->db_add_param($this->sichtbar, FHC_BOOLEAN).','.
+					" content=".$this->db_add_param($this->content).','.
+					" reviewvon=".$this->db_add_param($this->reviewvon).','.
+					" reviewamum=".$this->db_add_param($this->reviewamum).','.
+					" updatevon=".$this->db_add_param($this->updatevon).','.
+					" updateamum=".$this->db_add_param($this->updateamum).','.
+					" titel=".$this->db_add_param($this->titel).','.
+					" gesperrt_uid=".$this->db_add_param($this->gesperrt_uid).
+					" WHERE contentsprache_id=".$this->db_add_param($this->contentsprache_id, FHC_INTEGER).';';
 		}
 		
 		if($this->db_query($qry))
@@ -1010,7 +1014,7 @@ class content extends basis_db
 	 */
 	public function getMaxVersion($content_id, $sprache)
 	{
-		$qry = "SELECT max(version) maxversion FROM campus.tbl_contentsprache WHERE content_id='".addslashes($content_id)."' AND sprache='".addslashes($sprache)."'";
+		$qry = "SELECT max(version) maxversion FROM campus.tbl_contentsprache WHERE content_id=".$this->db_add_param($content_id, FHC_INTEGER)." AND sprache=".$this->db_add_param($sprache);
 		if($result = $this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object($result))
@@ -1036,7 +1040,7 @@ class content extends basis_db
 					contentsprache_id, sprache, content_id, version, sichtbar, reviewamum, reviewvon,
 					updateamum, updatevon, insertamum, insertvon, titel
 				FROM campus.tbl_contentsprache 
-				WHERE content_id='".addslashes($content_id)."' AND sprache='".addslashes($sprache)."'
+				WHERE content_id=".$this->db_add_param($content_id, FHC_INTEGER)." AND sprache=".$this->db_add_param($sprache)."
 				ORDER BY version DESC";
 		
 		if($result = $this->db_query($qry))
@@ -1050,7 +1054,7 @@ class content extends basis_db
 				$obj->titel = $row->titel;
 				$obj->content_id = $row->content_id;
 				$obj->version = $row->version;
-				$obj->sichtbar = ($row->sichtbar=='t'?true:false);
+				$obj->sichtbar = $this->db_parse_bool($row->sichtbar);
 				$obj->reviewvon = $row->reviewvon;
 				$obj->reviewamum = $row->reviewamum;
 				$obj->updateamum = $row->updateamum;
@@ -1073,11 +1077,11 @@ class content extends basis_db
 	 * Liefert die Sprachen in denen der Content vorhanden ist
 	 * 
 	 * @param $content_id
-	 * @param $version
 	 */
 	public function getLanguages($content_id)
 	{
-		$qry = "SELECT distinct sprache FROM campus.tbl_contentsprache WHERE content_id='".addslashes($content_id)."'";
+		$qry = "SELECT distinct sprache FROM campus.tbl_contentsprache 
+				WHERE content_id=".$this->db_add_param($content_id, FHC_INTEGER);
 		$sprachen = array();
 		if($result = $this->db_query($qry))
 		{
@@ -1095,19 +1099,20 @@ class content extends basis_db
 	 * @param $content_id
 	 * @param $sprache
 	 * @param $version optional
+	 * @param $sichtbar optional
 	 * @return boolean
 	 */
 	public function contentSpracheExists($content_id, $sprache, $version=null, $sichtbar=null)
 	{
 		$qry = "SELECT 1 FROM campus.tbl_contentsprache 
 				WHERE 
-					content_id='".addslashes($content_id)."' 
-					AND sprache='".addslashes($sprache)."'
+					content_id=".$this->db_add_param($content_id, FHC_INTEGER)." 
+					AND sprache=".$this->db_add_param($sprache)."
 				";
 		if(!is_null($version) && $version!='')
-			$qry.=" AND version='".addslashes(intval($version))."'";
+			$qry.=" AND version=".$this->db_add_param(intval($version), FHC_INTEGER);
 		if($sichtbar)
-			$qry.=" AND sichtbar=".($sichtbar?'true':'false');
+			$qry.=" AND sichtbar=".$this->db_add_param($sichtbar, FHC_BOOLEAN);
 		
 		if($result = $this->db_query($qry))
 		{
@@ -1130,7 +1135,8 @@ class content extends basis_db
 	 */
 	public function loadContentSprache($contentsprache_id)
 	{
-		$qry = "SELECT * FROM campus.tbl_contentsprache WHERE contentsprache_id='".addslashes($contentsprache_id)."'";
+		$qry = "SELECT * FROM campus.tbl_contentsprache 
+				WHERE contentsprache_id=".$this->db_add_param($contentsprache_id, FHC_INTEGER);
 		if($result = $this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object($result))
@@ -1139,7 +1145,7 @@ class content extends basis_db
 				$this->sprache = $row->sprache;
 				$this->content_id = $row->content_id;
 				$this->version = $row->version;
-				$this->sichtbar = $row->sichtbar;
+				$this->sichtbar = $this->db_parse_bool($row->sichtbar);
 				$this->content = $row->content;
 				$this->reviewvon = $row->reviewvon;
 				$this->reviewamum = $row->reviewamum;
@@ -1174,7 +1180,9 @@ class content extends basis_db
 	 */
 	public function getSperrLog($contentsprache_id)
 	{
-		$qry = "SELECT * FROM campus.tbl_contentlog WHERE contentsprache_id='".addslashes($contentsprache_id)."' AND ende is null LIMIT 1;";
+		$qry = "SELECT * FROM campus.tbl_contentlog 
+				WHERE contentsprache_id=".$this->db_add_param($contentsprache_id, FHC_INTEGER)."
+				AND ende is null LIMIT 1;";
 		
 		if($result = $this->db_query($qry))
 		{
@@ -1198,10 +1206,10 @@ class content extends basis_db
 	public function sperren($contentsprache_id, $user)
 	{
 		$qry = 'INSERT INTO campus.tbl_contentlog(uid, contentsprache_id, start) VALUES('.
-				$this->addslashes($user).','.
-				$this->addslashes($contentsprache_id).',now());
-				UPDATE campus.tbl_contentsprache SET gesperrt_uid='.$this->addslashes($user).
-				' WHERE contentsprache_id='.$this->addslashes($contentsprache_id);
+				$this->db_add_param($user).','.
+				$this->db_add_param($contentsprache_id).',now());
+				UPDATE campus.tbl_contentsprache SET gesperrt_uid='.$this->db_add_param($user).
+				' WHERE contentsprache_id='.$this->db_add_param($contentsprache_id, FHC_INTEGER);
 				
 		if($this->db_query($qry))
 			return true;
@@ -1213,23 +1221,44 @@ class content extends basis_db
 	}
 	
 	/**
-	 * Gibt einen Eintrag nach dem Bearbeiten wieder frei
+	 * Gibt den gesperrten Content eines Users wieder frei
 	 * 
-	 * @param $contentsprache_id
 	 * @param $user
 	 */
-	public function freigeben($contentsprache_id, $user)
+	public function freigabeUser($user)
 	{
-		$qry = 'UPDATE campus.tbl_contentlog SET ende=now() WHERE'.
-				' uid='.$this->addslashes($user).
-				' AND ende is null;'.
-				'UPDATE campus.tbl_contentsprache SET gesperrt_uid=null WHERE gesperrt_uid=\''.addslashes($user).'\';';
-				
+		$qry = 'UPDATE campus.tbl_contentlog SET ende=now() WHERE uid='.$this->db_add_param($user).'
+				 AND ende is null;
+				UPDATE campus.tbl_contentsprache SET gesperrt_uid=null WHERE
+				gesperrt_uid='.$this->db_add_param($user).';';
+
 		if($this->db_query($qry))
 			return true;
 		else
 		{
-			$this->errormsg = 'Fehler beim Sperren';
+			$this->errormsg = 'Fehler beim Freigeben des Contents';
+			return false;
+		}
+	}
+	
+	/**
+	 * Gibt einen gesperrten Content wieder frei
+	 * 
+	 * @param $contentsprache_id
+	 */
+	public function freigabeContent($contentsprache_id)
+	{
+		$qry = 'UPDATE campus.tbl_contentlog SET ende=now() 
+				WHERE contentsprache_id='.$this->db_add_param($contentsprache_id).'
+					AND ende is null;
+				UPDATE campus.tbl_contentsprache SET gesperrt_uid=null WHERE 
+				contentsprache_id='.$this->db_add_param($contentsprache_id).';';
+
+		if($this->db_query($qry))
+			return true;
+		else
+		{
+			$this->errormsg = 'Fehler beim Freigeben des Contents';
 			return false;
 		}
 	}
@@ -1251,8 +1280,8 @@ class content extends basis_db
 					AND aktiv=true
 					AND template_kurzbz IN('contentmittitel','contentohnetitel','redirect')";
 		foreach($searchItems as $value)
-			$qry.=" AND (lower(content::text) like lower('%".addslashes($value)."%')
-					OR lower(content::text) like lower('%".addslashes(htmlentities($value,ENT_NOQUOTES,'UTF-8'))."%'))";
+			$qry.=" AND (lower(content::text) like lower('%".$this->db_escape($value)."%')
+					OR lower(content::text) like lower('%".$this->db_escape(htmlentities($value,ENT_NOQUOTES,'UTF-8'))."%'))";
 		$qry.=" ORDER BY content_id DESC";
 		
 		if($result = $this->db_query($qry))
