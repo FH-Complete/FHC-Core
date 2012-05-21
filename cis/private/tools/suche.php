@@ -25,6 +25,7 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/content.class.php');
 require_once('../../../include/benutzer.class.php');
+require_once('../../../include/globals.inc.php');
 
 $uid = get_uid();
 $db = new basis_db();
@@ -36,7 +37,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
-	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 	<script type="text/javascript" src="../../../include/js/jquery.js"></script> 
 	<title>Globale Suche</title>
 </head>
@@ -63,7 +64,7 @@ searchContent($searchItems);
 
 function searchPerson($searchItems)
 {
-	global $db, $p;
+	global $db, $p, $noalias;
 	$bn = new benutzer();
 	$bn->search($searchItems);
 	
@@ -105,7 +106,7 @@ function searchPerson($searchItems)
 			echo '<td>',$row->titelpost,'</td>';
 			echo '<td>',$row->studiengang,'</td>';
 			echo '<td>',$row->telefonklappe,'</td>';
-			if($row->alias!='')
+			if($row->alias!='' && !in_array($row->studiengang_kz, $noalias))
 				$mail = $row->alias.'@'.DOMAIN;
 			else
 				$mail = $row->uid.'@'.DOMAIN;
