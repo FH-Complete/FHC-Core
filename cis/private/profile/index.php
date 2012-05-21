@@ -169,7 +169,7 @@ echo '
     <b>'.$p->t('profil/email').'</b><br>
     '.$p->t('profil/intern').': <a class="Item" href="mailto:'.$user->uid.'@'.DOMAIN.'">'.$user->uid.'@'.DOMAIN.'</a><br>';
 
-if($user->alias!='' && !in_array($stg,$noalias))
+if($user->alias!='' && (!isset($user->studiengang_kz) || !in_array($user->studiengang_kz,$noalias)))
 {
 	echo $p->t('profil/alias').": <a class='Item' href='mailto:$user->alias@".DOMAIN."'>$user->alias@".DOMAIN."</a>";
 }

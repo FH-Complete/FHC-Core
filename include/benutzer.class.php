@@ -263,9 +263,11 @@ class benutzer extends person
 	{
 		$qry = "SELECT * FROM (SELECT
 					distinct on (uid) vorname, nachname, uid, titelpre, titelpost,alias,
-					(SELECT UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) 
+					(SELECT UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz)
 					 FROM public.tbl_student JOIN public.tbl_studiengang USING(studiengang_kz)
 					 WHERE student_uid=tbl_benutzer.uid) as studiengang,
+					 (SELECT studiengang_kz FROM public.tbl_student
+					 WHERE student_uid=tbl_benutzer.uid) as studiengang_kz,
 					(SELECT tbl_kontakt.kontakt || ' - ' ||telefonklappe 
 					FROM public.tbl_mitarbeiter
 					LEFT JOIN public.tbl_kontakt USING(standort_id) 
@@ -302,6 +304,7 @@ class benutzer extends person
 				$obj->titelpost = $row->titelpost;
 				$obj->uid = $row->uid;
 				$obj->studiengang = $row->studiengang;
+				$obj->studiengang_kz = $row->studiengang_kz;
 				$obj->telefonklappe = $row->klappe;
 				$obj->alias = $row->alias;
 				
