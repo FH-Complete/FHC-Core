@@ -163,7 +163,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<button id="student-detail-button-image-infomail" label="Infomail" oncommand="StudentImageInfomail();" disabled="true"/>      							
       						</vbox>
    							<hbox>
-   								<image src='' id="student-detail-image" style="margin-left:5px;"/> <!--height="60" width="60"-->
+   								<image src='' id="student-detail-image" style="margin-left:5px; width:90px; height:120px"/> <!--height="60" width="60"-->
    								<spacer flex="1"/>
    							</hbox>
       						<label value="Anmerkung" control="student-detail-textbox-anmerkung"/>
