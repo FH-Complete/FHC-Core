@@ -3573,7 +3573,7 @@ if(!@$db->db_query("SELECT zugangscode FROM public.tbl_reihungstest LIMIT 1"))
 }
 
 // anmerkungsfelder und stdienrichtung für Outgoing
-if(!@$db->db_query("SELECT anmerkungStudent FROM public.tbl_preoutgoing LIMIT 1"))
+if(!@$db->db_query("SELECT anmerkung_student FROM public.tbl_preoutgoing LIMIT 1"))
 {
     $qry = "
         ALTER TABLE public.tbl_preoutgoing ADD COLUMN anmerkung_student text;
