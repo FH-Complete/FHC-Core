@@ -102,7 +102,6 @@ function MM_jumpMenu(targ,selObj,restore){ //v3.0
 			<td align="right" class="ContentHeader"><A href="../../../cms/content.php?content_id=<?php echo $p->t('dms_link/lvPlanFAQ');?>" class="hilfe" target="_blank"><font class="ContentHeader">HELP&nbsp;</font></A></td>
 		</tr>
 	</table>
-	<!--<DIV align="right">Version: <?php echo VERSION; ?></DIV>-->
 	Username:
 	<?php
 		if (isset($uid))
