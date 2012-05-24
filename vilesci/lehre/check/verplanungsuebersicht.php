@@ -216,7 +216,10 @@ foreach($stg->result as $row_stg)
 			$gesamt_ps+=$ps;
 			$gesamt_ps_offen+=$offen;
 			$content.= "($stdverplant/$ps)";
-			$prozent = round(($ps-$offen)*100/$ps,2);
+			if($ps==0)
+				$prozent=0;
+			else
+				$prozent = round(($ps-$offen)*100/$ps,2);
 			
 			//Ueberbuchung berechnen
 			/* 
@@ -224,7 +227,10 @@ foreach($stg->result as $row_stg)
 			   Lektoren der gleichen LV sehen koennen. Deshalb ist es auch notwendig die offenen Stunden aus der DB zu holen
 			   anstatt zu berechnen
 			 */
-			$prozentueber = round(($stdverplant-$ps+$offen)*100/$ps,2);
+			if($ps==0)
+				$prozentueber=0;
+			else
+				$prozentueber = round(($stdverplant-$ps+$offen)*100/$ps,2);
 
 			$content.= '</td><td nowrap>';
 			$content.=drawprogress($prozent, $prozentueber);
