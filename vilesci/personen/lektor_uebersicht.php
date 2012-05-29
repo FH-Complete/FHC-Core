@@ -84,8 +84,7 @@ if(!isset($_GET['searchstr']))
 
 	$qry = "SELECT vw_mitarbeiter.*, tbl_standort.kurzbz as standort_kurzbz FROM campus.vw_mitarbeiter LEFT JOIN public.tbl_standort USING(standort_id)";
 	if(!empty($searchstr))
-			$qry.=" where uid  ~* '".addslashes($searchstr)."'   OR nachname  ~* '".addslashes($searchstr)."'  OR vorname  ~* '".addslashes($searchstr)."'  "; 
-	
+			$qry.=" where nachname||' '||vorname ~* '".addslashes($searchstr)."' OR vorname||' '||nachname ~* '".addslashes($searchstr)."' OR uid ~* '".addslashes($searchstr)."'  ";
 	if(isset($order))
 		$qry .= " ORDER BY $order";
 	else

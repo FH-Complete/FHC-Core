@@ -31,6 +31,7 @@ require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/basis_db.class.php');
 include('../../include/functions.inc.php');
 include('../../include/globals.inc.php');
+require_once('../../include/datum.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -48,7 +49,9 @@ if (!isset($uid))
 {
 	die( "uid nicht gesetzt");
 }
-
+$uid_benutzer = get_uid();
+$datum_obj = new datum();
+$updatevon = 0;
 
 	//Stundentabelleholen
 	if(! $result_stunde=$db->db_query("SELECT * FROM lehre.tbl_stunde ORDER BY stunde"))
@@ -71,13 +74,13 @@ if (!isset($uid))
 				$num_rows_wunsch=$db->db_num_rows($erg_wunsch);
 				if ($num_rows_wunsch==0)
 				{
-					$query="INSERT INTO campus.tbl_zeitwunsch (mitarbeiter_uid, stunde, tag, gewicht) VALUES ('$uid', '$stunde', '$t', '$gewicht')";
+					$query="INSERT INTO campus.tbl_zeitwunsch (mitarbeiter_uid, stunde, tag, gewicht, updateamum, updatevon) VALUES ('$uid', '$stunde', '$t', '$gewicht', now(), '$uid_benutzer')";
 					if(!($erg=$db->db_query($query)))
 						die($db->db_last_error());
 				}
 				elseif ($num_rows_wunsch==1)
 				{
-					$query="UPDATE campus.tbl_zeitwunsch SET gewicht=$gewicht WHERE mitarbeiter_uid='$uid' AND stunde='$stunde' AND tag='$t'";
+					$query="UPDATE campus.tbl_zeitwunsch SET gewicht=$gewicht, updateamum=now(), updatevon='$uid_benutzer' WHERE mitarbeiter_uid='$uid' AND stunde='$stunde' AND tag='$t'";
 					//echo $query;
 					if(!($erg=$db->db_query($query)))
 						die($db->db_last_error());
@@ -96,6 +99,8 @@ if (!isset($uid))
 		$stunde=$db->db_result($erg,$i,"stunde");
 		$gewicht=$db->db_result($erg,$i,"gewicht");
 		$wunsch[$tag][$stunde]=$gewicht;
+		$updateamum=$db->db_result($erg,$i,"updateamum");
+		$updatevon=$db->db_result($erg,$i,"updatevon");
 	}
 	if(!isset($wunsch))
 	{
@@ -161,6 +166,21 @@ if (!isset($uid))
 	?>
   </TABLE>
   <br/>
+  <?php 
+  if($updatevon!='')
+  {
+  	echo 'Zeitwunsch zuletzt aktualisiert von ';
+  	echo $updatevon;
+  	echo ' am ';
+  	echo $datum_obj->formatDatum($updateamum,'d.m.Y H:i:s');
+  }
+  else
+  {
+  	echo 'Noch keine Zeitwünsche eingetragen';
+  }
+  ?>
+  <br/>
+  <br/>
   <INPUT type="hidden" name="uid" value="<?php echo $uid; ?>">
   <INPUT type="submit" name="save" value="Speichern">
 </FORM>
@@ -189,12 +209,6 @@ if (!isset($uid))
       <DIV align="right">1</DIV>
     </TD>
     <TD>Hier kann ich Unterrichten</TD>
-  </TR>
-  <TR>
-    <TD>
-      <DIV align="right">0</DIV>
-    </TD>
-    <TD>keine Bedeutung</TD>
   </TR>
   <TR>
     <TD>
