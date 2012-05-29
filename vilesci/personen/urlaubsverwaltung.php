@@ -180,6 +180,8 @@ if($uid!='')
 			<th>Bezeichnung</th>
 			<th>Von</th>
 			<th>Bis</th>
+			<th>Aktualisiert am</th>
+			<th>Aktualisiert von</th>
 			<th>edit</th>
 			<th>delete</th>
 		</tr>
@@ -193,6 +195,8 @@ if($uid!='')
 		echo "<td>$row->bezeichnung</td>";
 		echo "<td>".$datum->formatDatum($row->vondatum,'d.m.Y')." ".($row->vonstunde!=''?'(Stunde '.$row->vonstunde.')':'')."</td>";
 		echo "<td>".$datum->formatDatum($row->bisdatum,'d.m.Y')." ".($row->bisstunde!=''?'(Stunde '.$row->bisstunde.')':'')."</td>";
+		echo "<td>".$datum->formatDatum($row->updateamum,'d.m.Y H:i:s')."</td>";
+		echo "<td>$row->updatevon</td>";
 		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?action=edit&uid=$uid&zeitsperre_id=$row->zeitsperre_id'><img src='../../skin/images/application_form_edit.png' alt='bearbeiten' title='bearbeiten' /></a></td>";
 		echo "<td align='center'><a href='".$_SERVER['PHP_SELF']."?action=delete&uid=$uid&zeitsperre_id=$row->zeitsperre_id' onclick='return confdel(\"$row->zeitsperretyp_kurzbz von ".$datum->formatDatum($row->vondatum,'d.m.Y')." bis ".$datum->formatDatum($row->bisdatum,'d.m.Y')."\")'><img src='../../skin/images/application_form_delete.png' alt='loeschen' title='loeschen'/></a></td>";
 		echo '</tr>';
