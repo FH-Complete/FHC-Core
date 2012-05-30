@@ -103,11 +103,12 @@ if($studiensemester_kurzbz != -1)
 		$ausgabe .= "<a href='bama_studentenstrom.svg.php?stsem=WS2008&studiengang_kz=".$row_stg->studiengang_kz."&typ=m&kurz=".$row_stg->kurzbz."' target='_blank'>";
 		$ausgabe .= "Studiengang: $row_stg->studiengang_kz, $row_stg->bezeichnung (".strtoupper($row_stg->typ.$row_stg->kurzbz).")</a></TD><TD align='center'  width='20%'>".($row_anzahl_m->anzahl+$row_anzahl_w->anzahl)." Studierende im 1.Sem.</TD></TR></TABLE>";
 		$ausgabe .= "<TABLE width=90% style='border:3px solid #D3DCE3;border-spacing:0pt;' align='center'>";
-		$ausgabe .= "<TH width='10%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Kz</TH>";
-		$ausgabe .= "<TH width='10%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Typ</TH>";
-		$ausgabe .= "<TH width='60%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Name</TH>";
-		$ausgabe .= "<TH width='10%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>M</TH>";
-		$ausgabe .= "<TH width='10%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>W</TH>";
+		$ausgabe .= "<TH width='5%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Kz</TH>";
+		$ausgabe .= "<TH width='5%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Typ</TH>";
+		$ausgabe .= "<TH width='50%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Name</TH>";
+		$ausgabe .= "<TH width='5%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>M</TH>";
+		$ausgabe .= "<TH width='5%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>W</TH>";
+		$ausgabe .= "<TH width='5%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Gesamt</TH>";
 		$ausgabe .= "<TH width='10%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Prozent M</TH>";
 		$ausgabe .= "<TH width='10%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Prozent W</TH>";
 		
@@ -136,6 +137,7 @@ if($studiensemester_kurzbz != -1)
 			$ausgabe .= "<TD style='border:1px solid #D3DCE3;'>".$row['bez']."</TD>";
 			$ausgabe .= "<TD style='border:1px solid #D3DCE3;'align='center'>".$row['count_m']."</TD>";
 			$ausgabe .= "<TD style='border:1px solid #D3DCE3;'align='center'>".$row['count_w']."</TD>";
+			$ausgabe .= "<TD style='border:1px solid #D3DCE3;'align='center'>".($row['count_w']+$row['count_m'])."</TD>";
 			if ($row_anzahl_m->anzahl==0)
 				$prozent=0;
 			else 
@@ -161,6 +163,7 @@ if($studiensemester_kurzbz != -1)
 			$ausgabe .= "<TD style='border:1px solid #D3DCE3;'>extern</TD>";
 			$ausgabe .= "<TD style='border:1px solid #D3DCE3;' align='center'>$rest_m</TD>";
 			$ausgabe .= "<TD style='border:1px solid #D3DCE3;' align='center'>$rest_w</TD>";
+			$ausgabe .= "<TD style='border:1px solid #D3DCE3;' align='center'>".($rest_w+$rest_m)."</TD>";
 			if ($row_anzahl_m->anzahl==0)
 				$prozent=0;
 			else 
@@ -233,11 +236,12 @@ if($studiensemester_kurzbz != -1)
 		$ausgabe .= "Studiengang: $row_stg->studiengang_kz, $row_stg->bezeichnung (".strtoupper($row_stg->typ.$row_stg->kurzbz).")</a></TD>";
 		$ausgabe .= "<TD align='center'  width='20%'>".($row_anzahl_m->anzahl+$row_anzahl_w->anzahl)." AbsolventInnen</TD></TR></TABLE>";
 		$ausgabe .= "<TABLE width=90% style='border:3px solid #D3DCE3;border-spacing:0pt;' align='center'>";
-		$ausgabe .= "<TH width='10%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Kz</TH>";
-		$ausgabe .= "<TH width='10%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Typ</TH>";
-		$ausgabe .= "<TH width='60%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Name</TH>";
-		$ausgabe .= "<TH width='10%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>M</TH>";
-		$ausgabe .= "<TH width='10%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>W</TH>";
+		$ausgabe .= "<TH width='5%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Kz</TH>";
+		$ausgabe .= "<TH width='5%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Typ</TH>";
+		$ausgabe .= "<TH width='50%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Name</TH>";
+		$ausgabe .= "<TH width='5%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>M</TH>";
+		$ausgabe .= "<TH width='5%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>W</TH>";
+		$ausgabe .= "<TH width='5%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Gesamt</TH>";
 		$ausgabe .= "<TH width='10%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Prozent M</TH>";
 		$ausgabe .= "<TH width='10%' style='background-color:#dddddd;border:1px solid #D3DCE3;'>Prozent W</TH>";
 
@@ -266,6 +270,7 @@ if($studiensemester_kurzbz != -1)
 			$ausgabe .= "<TD style='border:1px solid #D3DCE3;'>".$row['bez']."</TD>";
 			$ausgabe .= "<TD style='border:1px solid #D3DCE3;'align='center'>".$row['count_m']."</TD>";
 			$ausgabe .= "<TD style='border:1px solid #D3DCE3;'align='center'>".$row['count_w']."</TD>";
+			$ausgabe .= "<TD style='border:1px solid #D3DCE3;'align='center'>".($row['count_w']+$row['count_m'])."</TD>";
 			if ($row_anzahl_m->anzahl==0)
 				$prozent=0;
 			else 
@@ -292,6 +297,7 @@ if($studiensemester_kurzbz != -1)
 			$ausgabe .= "<TD style='border:1px solid #D3DCE3;'>extern</TD>";
 			$ausgabe .= "<TD style='border:1px solid #D3DCE3;' align='center'>$rest_m</TD>";
 			$ausgabe .= "<TD style='border:1px solid #D3DCE3;' align='center'>$rest_w</TD>";
+			$ausgabe .= "<TD style='border:1px solid #D3DCE3;' align='center'>".($rest_w+$rest_m)."</TD>";
 			if ($row_anzahl_m->anzahl==0)
 				$prozent=0;
 			else 
