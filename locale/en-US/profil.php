@@ -29,30 +29,27 @@ $this->phrasen['profil/zustaendigeAssistenz']='Administrative Assistant';
 $this->phrasen['profil/wendenSieSichAn']='Please contact the';
 $this->phrasen['profil/solltenDatenNichtStimmen']='If your data is incorrect, please contact the responsible';
 
-$this->phrasen['profil/AccountInaktiv']='Achtung: Dieser Account ist nicht mehr aktiv';
-$this->phrasen['profil/inaktivStudent']='Achtung!<br> Wir möchten Sie darauf aufmerksam machen, dass Ihr Benutzerdatensatz 
-deaktiviert wurde.Durch diese Deaktivierung wurden Sie auch aus allen Email-Verteilern gelöscht. <br><br>
-Sollte innerhalb von 6 Monaten (für Studierende) bzw. 3 Wochen (für AbbrecherInnen) nach der Deaktivierung keine 
-neuerliche Aktivierung Ihres Benutzerdatensatzes erfolgen, dann werden automatisch auch<br>- Ihr Account, <br>- Ihre Mailbox (inkl. aller E-Mails) und<br>
-- Ihr Home-Verzeichnis (inkl. aller Dateien) gelöscht.<br><br>Falls es sich bei der Deaktivierung um einen Irrtum handelt, würden wir Sie bitten, 
-sich umgehend mit Ihrer Studiengangsassistenz in Verbindung zu setzen.<br>';
+$this->phrasen['profil/AccountInaktiv']='NOTICE: This account is no longer active';
+$this->phrasen['profil/inaktivStudent']='NOTICE!<br> We would like to remind you that your user record has been deactivated. 
+You were also removed from all e-mail distribution lists when your account was deactivated.<br><br>
+If your user account is not reactivated within 6 months (for students) or 3 weeks (for dropouts) of being deactivated, the following data will be automatically deleted:<br>
+- Your account<br>- Your mailbox (including all e-mails) and<br>- Your home directory (including all files).<br><br>
+If your account has been deactivated by mistake, please contact the administrative assistant for your degree program immediately.<br>';
 
-$this->phrasen['profil/inaktivMitarbeiter']='Achtung!<br> Wir möchten Sie darauf aufmerksam machen, dass Ihr Benutzerdatensatz 
-deaktiviert wurde.Durch diese Deaktivierung wurden Sie auch aus allen Email-Verteilern gelöscht. <br><br>
-Sollte innerhalb von 12 Monaten nach der Deaktivierung keine neuerliche Aktivierung Ihres Benutzerdatensatzes erfolgen, dann werden automatisch auch<br>
-- Ihr Account, <br>- Ihre Mailbox (inkl. aller E-Mails) und<br>
-- Ihr Home-Verzeichnis (inkl. aller Dateien) gelöscht.<br><br>Falls es sich bei der Deaktivierung um einen Irrtum handelt, würden wir Sie bitten, 
-sich umgehend mit Ihrer Studiengangsassistenz in Verbindung zu setzen.<br>';
+$this->phrasen['profil/inaktivMitarbeiter']='NOTICE!<br> We would like to remind you that your user record has been deactivated. 
+You were also removed from all e-mail distribution lists when your account was deactivated.<br><br>
+If your user account is not reactivated within 12 months of being deactivated, the following data will be automatically deleted:<br>
+- Your account<br>- Your mailbox (including all e-mails) and<br>- Your home directory (including all files).<br><br>
+If your account has been deactivated by mistake, please contact the administrative assistant for your degree program immediately.<br>';
 
-$this->phrasen['profil/inaktivSonstige']='Achtung!<br> Wir möchten Sie darauf aufmerksam machen, dass Ihr Benutzerdatensatz 
-deaktiviert wurde.Durch diese Deaktivierung wurden Sie auch aus allen Email-Verteilern gelöscht. <br><br>
-Sollte innerhalb der nächsten Tagen keine neuerliche Aktivierung Ihres Benutzerdatensatzes erfolgen, dann werden automatisch auch<br>
-- Ihr Account, <br>- Ihre Mailbox (inkl. aller E-Mails) und<br>
-- Ihr Home-Verzeichnis (inkl. aller Dateien) gelöscht.<br><br>Falls es sich bei der Deaktivierung um einen Irrtum handelt, würden wir Sie bitten, 
-sich umgehend mit Ihrer Studiengangsassistenz in Verbindung zu setzen.<br>';
+$this->phrasen['profil/inaktivSonstige']='NOTICE!<br> We would like to remind you that your user record has been deactivated. 
+You were also removed from all e-mail distribution lists when your account was deactivated.<br><br>
+If your user account is not reactivated within the next days of being deactivated, the following data will be automatically deleted:<br>
+- Your account<br>- Your mailbox (including all e-mails) and<br>- Your home directory (including all files).<br><br>
+If your account has been deactivated by mistake, please contact the administrative assistant for your degree program immediately.<br>';
 
-$this->phrasen['profil/nurJPGBilder']='Derzeit koennen nur Bilder im JPG Format hochgeladen werden';
-$this->phrasen['profil/BilduploadInfotext']='Derzeit können nur Bilder im JPG Format mit einer Maximalgröße von 15MB hochgeladen werden können!<br><br><b>Bitte beachten Sie die <a href="../../cms/content.php?content_id=%s">Richtlinien für den Bildupload</a></b>';
+$this->phrasen['profil/nurJPGBilder']='Currently it is only possible to upload JPEG images';
+$this->phrasen['profil/BilduploadInfotext']='Currently it is only possible to upload JPG images with a maximum size of 15MB!<br><br><b>Please follow the <a href="../../cms/content.php?content_id=%s">guidelines for uploading images</a></b>';
 $this->phrasen['profil/Bild']='Picture';
 $this->phrasen['profil/Bildupload']='Upload Picture';
 ?>
