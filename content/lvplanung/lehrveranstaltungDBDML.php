@@ -249,13 +249,13 @@ if(!$error)
 						{
 							$error = true;
 							$return = false;
-							$errormsg = 'Fehler beim Update im Stundenplan'.$qry;
+							$errormsg = 'Fehler beim Update im LV-Plan'.$qry;
 						}
 					}
 					else
 					{
 						$return = false;
-						$errormsg = "Fehler: Die Aenderung des Lektors fuehrt zu einer Kollision im Stundenplan!\n".$errormsg;
+						$errormsg = "Fehler: Die Aenderung des Lektors fuehrt zu einer Kollision im LV-Plan!\n".$errormsg;
 						$error = true;
 					}
 				}
@@ -719,12 +719,12 @@ if(!$error)
 					{
 						$error = true;
 						$return = false;
-						$errormsg = 'Diese Gruppe kann nicht geloescht werden da sie bereits im LV-Plan verplant ist. Bitte wenden Sie sich an die Stundenplanstelle';
+						$errormsg = 'Diese Gruppe kann nicht geloescht werden, da sie bereits im LV-Plan verplant ist. Bitte wenden Sie sich an die LV-Planung';
 					}
 				}
 				else 
 				{
-					$errormsg = 'Fehler beim Pruefen des Stundenplanes: '.$db->db_last_error();
+					$errormsg = 'Fehler beim Pruefen des LV-Plans: '.$db->db_last_error();
 					$return = false;
 					$error = true;
 				}

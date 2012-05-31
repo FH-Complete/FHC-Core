@@ -214,10 +214,10 @@ function onLVAdoStpl(evt)
 	var doIt=true;
 	var oneDate=new Date();
 	if (aktion=='lva_stpl_del_single')
-		doIt=confirm('Es werden alle Lehrveranstaltungen aus dem Stundenplan dieser Woche geloescht!\nSind Sie sicher?')
+		doIt=confirm('Es werden alle Lehrveranstaltungen aus dem LV-Plan dieser Woche geloescht!\nSind Sie sicher?')
 	else
 		if (aktion=='lva_stpl_del_multi')
-			doIt=confirm('Es werden alle Lehrveranstaltungen aus dem Stundenplan ab dieser Woche geloescht!\nSind Sie sicher?')
+			doIt=confirm('Es werden alle Lehrveranstaltungen aus dem LV-Plan ab dieser Woche geloescht!\nSind Sie sicher?')
 		else
 			aktion+="_search";
 	var idList=evt.target.getAttribute("idList");
@@ -643,7 +643,7 @@ function TimetableDeleteEntries()
 	var doIt=true;
 	var aktion='stpl_delete_single';
 	
-	doIt=confirm('Es werden die gewaehlten Eintraege aus dem Stundenplan geloescht!\nSind Sie sicher?')
+	doIt=confirm('Es werden die gewaehlten Eintraege aus dem LV-Plan geloescht!\nSind Sie sicher?')
 
 	var attributes="\n?type="+type+"&datum="+datum+"&ort="+encodeURIComponent(ort)+"&pers_uid="+pers_uid+"\n&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"\n&gruppe="+gruppe;
 	attributes+="&aktion="+aktion;
