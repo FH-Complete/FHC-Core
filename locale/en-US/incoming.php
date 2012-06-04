@@ -100,7 +100,7 @@ $this->phrasen['incoming/uebersichtLv']='Overview of the courses';
 $this->phrasen['incoming/verwaltungVonDateien']='File management';
 $this->phrasen['incoming/dateiname']='Filename';
 $this->phrasen['incoming/loeschen']='delete';
-$this->phrasen['incoming/outgoingRegistration']='Outgoing-Registration';
+$this->phrasen['incoming/outgoingRegistration']='Outgoing-Administration';
 $this->phrasen['incoming/summerschool']='Summerschool';
 $this->phrasen['incoming/anmerkungen']='Comments';
 ?>
