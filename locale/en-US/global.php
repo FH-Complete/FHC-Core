@@ -148,7 +148,7 @@ $this->phrasen['global/keineBerechtigung']='No authority';
 $this->phrasen['global/datensatzWurdeNichtGefunden']='Data not found';
 $this->phrasen['global/keineBerechtigungZumAendernDesDatensatzes']='You dont have the authority to change to data';
 $this->phrasen['global/keineDatenGefunden']='No data found';
-$this->phrasen['global/erfolgreichAngelegt']='Erfolgreich angelegt';
+$this->phrasen['global/erfolgreichAngelegt']='Created successfully';
 
 //infrastruktur
 
