@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2009 FH Technikum-Wien
+/* Copyright (C) 2012 FH Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,14 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger 		< christian.paminger@technikum-wien.at >
- *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
- *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
- *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
- *			Alexander Nimmervoll	< nimm@technikum-wien.at >
+ * Authors: Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
  */
 /**
- * Generiert ein Updatefile fuer das Zutrittskartensystem
+ * Wird vor dem Zutrittskartenimport aufgerufen und aktualisert bei den zu loeschenden Personen das Ende Datum
  */
 require_once('../../../../config/vilesci.config.inc.php');
 require_once('../../../../include/basis_db.class.php');
@@ -282,51 +278,36 @@ for ($ldapentry=ldap_first_entry($ldap_conn,$ldap_result); $ldapentry!=false; $l
 $ausdruck='';
 for($j=0;$j<$i;$j++)
 {
-	if(trim($sipass[$j]->command==''))
+	if(trim($sipass[$j]->command=='') && substr($sipass[$j]->acc_grp_name,0,1)!='#')
 	{
-		$sipass[$j]->command='D';
-		if (substr($sipass[$j]->acc_grp_name,0,1)!='#')
-		{
-			$ausdruck.=$sipass[$j]->command."\t"; 		// Command
-			$ausdruck.=$sipass[$j]->reference."\t";		// ID
-			$ausdruck.=$sipass[$j]->last_name."\t";		// Lastname
-			$ausdruck.=$sipass[$j]->first_name."\t";		// Firstname
-			$ausdruck.=$sipass[$j]->acc_grp_name."\t";	// Access Group
-			$ausdruck.=$sipass[$j]->card_no."\n";		// Cardnumber
-		}
-	}
-	else
-	{
-		if(trim($sipass[$j]->command!='V'))
-		{
-			$ausdruck.=$sipass[$j]->command."\t"; 			// Command
-			$ausdruck.=$sipass[$j]->reference."\t";			// ID
-			$ausdruck.=$sipass[$j]->last_name."\t";			// Lastname
-			$ausdruck.=$sipass[$j]->first_name."\t";			// Firstname
-			$ausdruck.=$sipass[$j]->acc_grp_name."\t";		// Access Group
-			$ausdruck.=$sipass[$j]->card_no."\t";			// Cardnumber
-			$ausdruck.=$sipass[$j]->start_date."\t";			// Valid From
-			$ausdruck.=$sipass[$j]->end_date."\t";			// Valid till
-			$ausdruck.="0\t";						// CardState
-			$ausdruck.=$sipass[$j]->uid."\t";				// Text1 UID
-			$ausdruck.=$sipass[$j]->matrikelnr."\t";			// Text2 Matrikelnummer
-			if (isset($sipass[$j]->last_name_old))
-				$ausdruck.=$sipass[$j]->last_name_old;		// Text3 // alter Vorname
-			$ausdruck.="\t";
-			if (isset($sipass[$j]->first_name_old))
-				$ausdruck.=$sipass[$j]->first_name_old;		// Text4 // alter Nachname
-			$ausdruck.="\t";
-			if (isset($sipass[$j]->acc_grp_name_old))
-				$ausdruck.=$sipass[$j]->acc_grp_name_old;	// Text5 // alte Accessgroup
-			$ausdruck.="\t";
-			if (isset($sipass[$j]->update))
-				$ausdruck.=$sipass[$j]->update;			// Text6 // Update
-			$ausdruck.="\n";
-		}
+		//Zu loeschende Eintraege - bei diesen wird das Ende Datum gesetzt
+		$ausdruck.="U\t"; 			// Command
+		$ausdruck.=$sipass[$j]->reference."\t";			// ID
+		$ausdruck.=$sipass[$j]->last_name."\t";			// Lastname
+		$ausdruck.=$sipass[$j]->first_name."\t";			// Firstname
+		$ausdruck.=$sipass[$j]->acc_grp_name."\t";		// Access Group
+		$ausdruck.=$sipass[$j]->card_no."\t";			// Cardnumber
+		$ausdruck.=$sipass[$j]->start_date."\t";			// Valid From
+		$ausdruck.=date('d.m.Y')."\t";			// Valid till
+		$ausdruck.="0\t";						// CardState
+		$ausdruck.=$sipass[$j]->uid."\t";				// Text1 UID
+		$ausdruck.=$sipass[$j]->matrikelnr."\t";			// Text2 Matrikelnummer
+		if (isset($sipass[$j]->last_name_old))
+			$ausdruck.=$sipass[$j]->last_name_old;		// Text3 // alter Vorname
+		$ausdruck.="\t";
+		if (isset($sipass[$j]->first_name_old))
+			$ausdruck.=$sipass[$j]->first_name_old;		// Text4 // alter Nachname
+		$ausdruck.="\t";
+		if (isset($sipass[$j]->acc_grp_name_old))
+			$ausdruck.=$sipass[$j]->acc_grp_name_old;	// Text5 // alte Accessgroup
+		$ausdruck.="\t";
+		if (isset($sipass[$j]->update))
+			$ausdruck.=$sipass[$j]->update;			// Text6 // Update
+		$ausdruck.="\n";
 	}
 }
 header("Content-Type: text/text");
-header("Content-Disposition: attachment; filename=\"SiPassZutrittskartenUpdate". "_" . date("d_m_Y") . ".txt\"");
+header("Content-Disposition: attachment; filename=\"SiPassZutrittskartenUpdatePreDelete". "_" . date("d_m_Y") . ".txt\"");
 echo $ausdruck;
 
 ?>
