@@ -3586,6 +3586,27 @@ if(!@$db->db_query("SELECT anmerkung_student FROM public.tbl_preoutgoing LIMIT 1
         echo 'Tabelle public.tbl_preoutgoing Spalten anmerkungStudent, anmerkungAdmin, studienrichtungGastuniversitaet';
 }
 
+// foto_intern Boolean
+if(!@$db->db_query("SELECT foto_sperre FROM public.tbl_person LIMIT 1"))
+{
+    $qry = "ALTER TABLE public.tbl_person ADD COLUMN foto_sperre boolean NOT NULL DEFAULT false;";
+    
+    if(!$db->db_query($qry))
+        echo '<strong>public.tbl_person: '.$db->db_last_error().'</strong><br>';
+    else
+        echo 'Tabelle public.tbl_person Spalte foto_intern hinzugefuegt';
+}
+
+// nummer_myfare in Tabelle Betriebsmittel
+if(!@$db->db_query("SELECT nummer_myfare FROM wawi.tbl_betriebsmittel LIMIT 1"))
+{
+    $qry = "ALTER TABLE wawi.tbl_betriebsmittel ADD COLUMN nummer_myfare varchar(32);";
+    
+    if(!$db->db_query($qry))
+        echo '<strong>wawi.tbl_betriebsmittel: '.$db->db_last_error().'</strong><br>';
+    else
+        echo 'Tabelle wawi.tbl_betriebsmittel Spalte nummer_myfare hinzugefuegt';
+}
 echo '<br>';
 
 $tabellen=array(
@@ -3724,7 +3745,7 @@ $tabellen=array(
 	"public.tbl_ortraumtyp"  => array("ort_kurzbz","hierarchie","raumtyp_kurzbz"),
 	"public.tbl_organisationseinheit" => array("oe_kurzbz", "oe_parent_kurzbz", "bezeichnung","organisationseinheittyp_kurzbz", "aktiv","mailverteiler","freigabegrenze","kurzzeichen"),
 	"public.tbl_organisationseinheittyp" => array("organisationseinheittyp_kurzbz", "bezeichnung", "beschreibung"),
-	"public.tbl_person"  => array("person_id","staatsbuergerschaft","geburtsnation","sprache","anrede","titelpost","titelpre","nachname","vorname","vornamen","gebdatum","gebort","gebzeit","foto","anmerkung","homepage","svnr","ersatzkennzeichen","familienstand","geschlecht","anzahlkinder","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","bundesland_code","kompetenzen","kurzbeschreibung","zugangscode"),
+	"public.tbl_person"  => array("person_id","staatsbuergerschaft","geburtsnation","sprache","anrede","titelpost","titelpre","nachname","vorname","vornamen","gebdatum","gebort","gebzeit","foto","anmerkung","homepage","svnr","ersatzkennzeichen","familienstand","geschlecht","anzahlkinder","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","bundesland_code","kompetenzen","kurzbeschreibung","zugangscode", "foto_sperre"),
 	"public.tbl_personfunktionstandort"  => array("personfunktionstandort_id","funktion_kurzbz","person_id","standort_id","position","anrede"),
 	"public.tbl_preincoming"  => array("preincoming_id","person_id","mobilitaetsprogramm_code","zweck_code","firma_id","universitaet","aktiv","bachelorthesis","masterthesis","von","bis","uebernommen","insertamum","insertvon","updateamum","updatevon","anmerkung","zgv","zgv_ort","zgv_datum","zgv_name","zgvmaster","zgvmaster_datum","zgvmaster_ort","zgvmaster_name","program_name","bachelor","master","jahre","person_id_emergency","person_id_coordinator_dep","person_id_coordinator_int","code","deutschkurs1","deutschkurs2","research_area","deutschkurs3"),
 	"public.tbl_preincoming_lehrveranstaltung"  => array("preincoming_id","lehrveranstaltung_id","insertamum","insertvon"),
@@ -3774,7 +3795,7 @@ $tabellen=array(
 	"system.tbl_webservicetyp"  => array("webservicetyp_kurzbz","beschreibung"),
 	"system.tbl_server"  => array("server_kurzbz","beschreibung"),
 	"wawi.tbl_betriebsmittelperson"  => array("betriebsmittelperson_id","betriebsmittel_id","person_id", "anmerkung", "kaution", "ausgegebenam", "retouram","insertamum", "insertvon","updateamum", "updatevon","ext_id"),
-	"wawi.tbl_betriebsmittel"  => array("betriebsmittel_id","betriebsmitteltyp","oe_kurzbz", "ort_kurzbz", "beschreibung", "nummer", "hersteller","seriennummer", "bestellung_id","bestelldetail_id", "afa","verwendung","anmerkung","reservieren","updateamum","updatevon","insertamum","insertvon","ext_id","inventarnummer","leasing_bis","inventuramum","inventurvon","anschaffungsdatum","anschaffungswert","hoehe","breite","tiefe"),
+	"wawi.tbl_betriebsmittel"  => array("betriebsmittel_id","betriebsmitteltyp","oe_kurzbz", "ort_kurzbz", "beschreibung", "nummer", "hersteller","seriennummer", "bestellung_id","bestelldetail_id", "afa","verwendung","anmerkung","reservieren","updateamum","updatevon","insertamum","insertvon","ext_id","inventarnummer","leasing_bis","inventuramum","inventurvon","anschaffungsdatum","anschaffungswert","hoehe","breite","tiefe","nummer_myfare"),
 	"wawi.tbl_betriebsmittel_betriebsmittelstatus"  => array("betriebsmittelbetriebsmittelstatus_id","betriebsmittel_id","betriebsmittelstatus_kurzbz", "datum", "updateamum", "updatevon", "insertamum", "insertvon","anmerkung"),
 	"wawi.tbl_betriebsmittelstatus"  => array("betriebsmittelstatus_kurzbz","beschreibung"),
 	"wawi.tbl_betriebsmitteltyp"  => array("betriebsmitteltyp","beschreibung","anzahl","kaution","typ_code","mastershapename"),
