@@ -25,6 +25,7 @@
 require_once('../../config/cis.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/basis_db.class.php');
+require_once('../../include/benutzer.class.php');
 
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
@@ -42,12 +43,26 @@ $cTmpHEX='/9j/4AAQSkZJRgABAQEASABIAAD/4QAWRXhpZgAATU0AKgAAAAgAAAAAAAD//gAXQ3JlYX
 //Hex Dump aus der DB holen
 if(isset($_GET['src']) && $_GET['src']=='person' && isset($_GET['person_id'])  && is_numeric($_GET['person_id']))
 {
-	$qry = "SELECT inhalt as foto FROM public.tbl_akte WHERE person_id='".addslashes($_GET['person_id'])."' AND dokument_kurzbz='Lichtbil'";
+	$qry = "SELECT tbl_akte.inhalt as foto, tbl_person.foto_sperre FROM public.tbl_akte JOIN public.tbl_person USING(person_id) WHERE tbl_akte.person_id='".addslashes($_GET['person_id'])."' AND dokument_kurzbz='Lichtbil'";
 	if($result = $db->db_query($qry))
 	{
 		if($row = $db->db_fetch_object($result))
 		{
-			if($row->foto!='')
+			$gesperrt=false;
+			
+			//Schauen ob eine Foto Sperre existiert
+			if($db->db_parse_bool($row->foto_sperre))
+			{
+				$gesperrt=true;
+				
+				//Wenn der User selbst darauf zugreift darf er das Bild sehen
+				$benutzer = new benutzer();
+				$benutzer->load($uid);
+				if($benutzer->person_id==$_GET['person_id'])
+					$gesperrt=false;
+			}
+				
+			if($row->foto!='' && !$gesperrt)
 		  		$cTmpHEX=$row->foto;
 		}
 	}

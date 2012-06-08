@@ -56,4 +56,6 @@ $this->phrasen['profil/nurJPGBilder']='Derzeit koennen nur Bilder im JPG Format 
 $this->phrasen['profil/BilduploadInfotext']='Derzeit können nur Bilder im JPG Format mit einer Maximalgröße von 15MB hochgeladen werden!<br><br><b>Bitte beachten Sie die <a href="../../cms/content.php?content_id=%s">Richtlinien für den Bildupload</a></b>';
 $this->phrasen['profil/Bild']='Bild';
 $this->phrasen['profil/Bildupload']='Bildupload';
+$this->phrasen['profil/fotofreigeben']='Sperre des Profilfotos aufheben';
+$this->phrasen['profil/fotosperren']='Profilfoto für interne Zwecke sperren';
 ?>

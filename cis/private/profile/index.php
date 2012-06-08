@@ -54,6 +54,39 @@ if(isset($_GET['uid']))
 	$uid=stripslashes($_GET['uid']);
 	$ansicht=true;
 }
+
+if(!$ansicht && isset($_GET['action']))
+{
+	switch($_GET['action'])
+	{
+		case 'foto_freigabe':
+			$benutzer = new benutzer();
+			if($benutzer->load($uid))
+			{
+				$person = new person();
+				if($person->load($benutzer->person_id))
+				{
+					$person->foto_sperre=false;
+					$person->new=false;
+					$person->save();
+				}
+			}
+			break;
+		case 'foto_sperre':
+			$benutzer = new benutzer();
+			if($benutzer->load($uid))
+			{
+				$person = new person();
+				if($person->load($benutzer->person_id))
+				{
+					$person->foto_sperre=true;
+					$person->new=false;
+					$person->save();
+				}
+			}
+			break;
+	}
+}
 		
 $stg = '';
 
@@ -155,16 +188,27 @@ echo '
 	</P>
     </td>
       		<td align="right">';
-//Foto anzeigen oder Upload Button
-//if($foto!='')
+//Foto anzeigen
+
+echo '<br>';
+if(!($ansicht && $user->foto_sperre))
 	echo '<img id="personimage" src="../../public/bild.php?src=person&person_id='.$user->person_id.'" alt="'.$user->person_id.'" height="100px" width="75px">';
-//else
-//{
+
 if(!$ansicht)
 	echo "<br><a href='#BildUpload' onclick='window.open(\"../bildupload.php?person_id=$user->person_id\",\"BildUpload\", \"height=500,width=500,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\"); return false;'>".$p->t('profil/bildHochladen')."</a>";
-//}
+if($user->foto_sperre)
+	echo '<br><b>Profilfoto gesperrt</b>';
+	
+if(!$ansicht)
+{
+	if($user->foto_sperre)
+		echo '<br><a href="'.$_SERVER['PHP_SELF'].'?action=foto_freigabe">'.$p->t('profil/fotofreigeben').'</a>';
+	else
+		echo '<br><a href="'.$_SERVER['PHP_SELF'].'?action=foto_sperre">'.$p->t('profil/fotosperren').'</a>';
+}
+	
+echo '</td></tr></table>';
 echo '
-	</td></tr></table>
 	<P>
     <b>'.$p->t('profil/email').'</b><br>
     '.$p->t('profil/intern').': <a class="Item" href="mailto:'.$user->uid.'@'.DOMAIN.'">'.$user->uid.'@'.DOMAIN.'</a><br>';
@@ -237,7 +281,7 @@ if(!$ansicht)
 				JOIN public.tbl_funktion USING(funktion_kurzbz) 
 				JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
 			WHERE 
-				uid='$uid' AND 
+				uid=".$db->db_add_param($uid)." AND 
 				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
 		
@@ -295,11 +339,6 @@ if(!$ansicht)
 	    }
 	}
     
-	if(!$ansicht)
-	{
-		echo "";
-		echo "";
-	}
 	echo "</P>";
 		
 	echo '	

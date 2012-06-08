@@ -62,11 +62,12 @@ class person extends basis_db
 	public $ext_id;				// bigint
 	public $kurzbeschreibung; 	// text
 	public $zugangscode = null; // varchar(32)
+	public $foto_sperre=false;	// boolean
 
-	// *************************************************************************
-	// * Konstruktor - Uebergibt die Connection und laedt optional eine Person
-	// * @param $person_id      Person die geladen werden soll (default=null)
-	// *************************************************************************
+	/**
+	 * Konstruktor - Uebergibt die Connection und laedt optional eine Person
+	 * @param $person_id      Person die geladen werden soll (default=null)
+	 */
 	public function __construct($person_id=null)
 	{
 		parent::__construct();
@@ -75,10 +76,10 @@ class person extends basis_db
 			$this->load($person_id);
 	}
 
-	// *********************************************************
-	// * Laedt Person mit der uebergebenen ID
-	// * @param $person_id ID der Person die geladen werden soll
-	// *********************************************************
+	/**
+	 * Laedt Person mit der uebergebenen ID
+	 * @param $person_id ID der Person die geladen werden soll
+	 */
 	public function load($person_id)
 	{
 		//person_id auf gueltigkeit pruefen
@@ -87,8 +88,8 @@ class person extends basis_db
 			$qry = "SELECT person_id, sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen,
 				gebdatum, gebort, gebzeit, foto, anmerkung, homepage, svnr, ersatzkennzeichen,
 				familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon, ext_id,
-				geschlecht, staatsbuergerschaft, geburtsnation, kurzbeschreibung, zugangscode
-				FROM public.tbl_person WHERE person_id='$person_id'";
+				geschlecht, staatsbuergerschaft, geburtsnation, kurzbeschreibung, zugangscode, foto_sperre
+				FROM public.tbl_person WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 
 			if(!$this->db_query($qry))
 			{
@@ -116,7 +117,7 @@ class person extends basis_db
 				$this->ersatzkennzeichen = $row->ersatzkennzeichen;
 				$this->familienstand = $row->familienstand;
 				$this->anzahlkinder = $row->anzahlkinder;
-				$this->aktiv = ($row->aktiv=='t'?true:false);
+				$this->aktiv = $this->db_parse_bool($row->aktiv);
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
@@ -127,10 +128,11 @@ class person extends basis_db
 				$this->geburtsnation = $row->geburtsnation;
 				$this->kurzbeschreibung = $row->kurzbeschreibung;
 				$this->zugangscode = $row->zugangscode;
+				$this->foto_sperre = $this->db_parse_bool($row->foto_sperre);
 			}
 			else
 			{
-				$this->errormsg = "Es ist kein Personendatensatz mit der ID ".$person_id." vorhanden\n";
+				$this->errormsg = "Es ist kein Personendatensatz mit dieser ID vorhanden";
 				return false;
 			}
 
@@ -138,7 +140,7 @@ class person extends basis_db
 		}
 		else
 		{
-			$this->errormsg = "Die person_id muss eine gueltige Zahl sein\n";
+			$this->errormsg = "Die person_id muss eine gueltige Zahl sein";
 			return false;
 		}
 	}
@@ -150,7 +152,7 @@ class person extends basis_db
 	 */
 	public function delete($person_id)
 	{
-		$qry = "DELETE from public.tbl_person where person_id = ".addslashes($person_id).";"; 
+		$qry = "DELETE from public.tbl_person where person_id = ".$this->db_add_param($person_id, FHC_INTEGER).";"; 
 		
 		if($this->db_query($qry))
 		{
@@ -268,7 +270,7 @@ class person extends basis_db
 		if($this->svnr!='')
 		{
 			//Pruefen ob bereits ein Eintrag mit dieser SVNR vorhanden ist
-			$qry = "SELECT person_id FROM public.tbl_person WHERE svnr='$this->svnr'";
+			$qry = "SELECT person_id FROM public.tbl_person WHERE svnr=".$this->db_add_param($this->svnr);
 			if($this->db_query($qry))
 			{
 				if($row = $this->db_fetch_object())
@@ -375,12 +377,12 @@ class person extends basis_db
 		return true;
 	}
 
-	// ************************************************************
-	// * Speichert die Personendaten in die Datenbank
-	// * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
-	// * angelegt, ansonsten der Datensatz mit $person_id upgedated
-	// * @return true wenn erfolgreich, false im Fehlerfall
-	// ************************************************************
+	/**
+	 * Speichert die Personendaten in die Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz mit $person_id upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
 	public function save()
 	{
 		//Variablen auf Gueltigkeit pruefen
@@ -392,73 +394,73 @@ class person extends basis_db
 			$qry = 'INSERT INTO public.tbl_person (sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen,
 			                    gebdatum, gebort, gebzeit, foto, anmerkung, homepage, svnr, ersatzkennzeichen,
 			                    familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon,
-			                    geschlecht, geburtsnation, staatsbuergerschaft, ext_id, kurzbeschreibung, zugangscode)
-			        VALUES('.$this->addslashes($this->sprache).','.
-					$this->addslashes($this->anrede).','.
-					$this->addslashes($this->titelpost).','.
-				        $this->addslashes($this->titelpre).','.
-				        $this->addslashes($this->nachname).','.
-				        $this->addslashes($this->vorname).','.
-				        $this->addslashes($this->vornamen).','.
-				        $this->addslashes($this->gebdatum).','.
-				        $this->addslashes($this->gebort).','.
-				        $this->addslashes($this->gebzeit).','.
-				        $this->addslashes($this->foto).','.
-				        $this->addslashes($this->anmerkungen).','.
-				        $this->addslashes($this->homepage).','.
-				        $this->addslashes($this->svnr).','.
-				        $this->addslashes($this->ersatzkennzeichen).','.
-				        $this->addslashes($this->familienstand).','.
-				        $this->addslashes($this->anzahlkinder).','.
-				        ($this->aktiv?'true':'false').','.
+			                    geschlecht, geburtsnation, staatsbuergerschaft, ext_id, kurzbeschreibung, zugangscode, foto_sperre)
+			        VALUES('.$this->db_add_param($this->sprache).','.
+						$this->db_add_param($this->anrede).','.
+						$this->db_add_param($this->titelpost).','.
+				        $this->db_add_param($this->titelpre).','.
+				        $this->db_add_param($this->nachname).','.
+				        $this->db_add_param($this->vorname).','.
+				        $this->db_add_param($this->vornamen).','.
+				        $this->db_add_param($this->gebdatum).','.
+				        $this->db_add_param($this->gebort).','.
+				        $this->db_add_param($this->gebzeit).','.
+				        $this->db_add_param($this->foto).','.
+				        $this->db_add_param($this->anmerkungen).','.
+				        $this->db_add_param($this->homepage).','.
+				        $this->db_add_param($this->svnr).','.
+				        $this->db_add_param($this->ersatzkennzeichen).','.
+				        $this->db_add_param($this->familienstand).','.
+				        $this->db_add_param($this->anzahlkinder).','.
+				        $this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
 				        'now(),'.
-				        $this->addslashes($this->insertvon).','.
+				        $this->db_add_param($this->insertvon).','.
 				        'now(),'.
-				        $this->addslashes($this->updatevon).','.
-				        $this->addslashes($this->geschlecht).','.
-				        $this->addslashes($this->geburtsnation).','.
-				        $this->addslashes($this->staatsbuergerschaft).','.
-				        $this->addslashes($this->ext_id).','.
-				        $this->addslashes($this->kurzbeschreibung).','.
-				        $this->addslashes($this->zugangscode).');';
+				        $this->db_add_param($this->updatevon).','.
+				        $this->db_add_param($this->geschlecht).','.
+				        $this->db_add_param($this->geburtsnation).','.
+				        $this->db_add_param($this->staatsbuergerschaft).','.
+				        $this->db_add_param($this->ext_id).','.
+				        $this->db_add_param($this->kurzbeschreibung).','.
+				        $this->db_add_param($this->zugangscode).','.
+				        $this->db_add_param($this->foto_sperre, FHC_BOOLEAN).');';
 		}
 		else
 		{
 			//person_id auf gueltigkeit pruefen
 			if(!is_numeric($this->person_id))
 			{
-				$this->errormsg = "person_id muss eine gueltige Zahl sein\n";
+				$this->errormsg = "person_id muss eine gueltige Zahl sein";
 				return false;
 			}
 
 			$qry = 'UPDATE public.tbl_person SET'.
-			       ' sprache='.$this->addslashes($this->sprache).','.
-			       ' anrede='.$this->addslashes($this->anrede).','.
-			       ' titelpost='.$this->addslashes($this->titelpost).','.
-			       ' titelpre='.$this->addslashes($this->titelpre).','.
-			       ' nachname='.$this->addslashes($this->nachname).','.
-			       ' vorname='.$this->addslashes($this->vorname).','.
-			       ' vornamen='.$this->addslashes($this->vornamen).','.
-			       ' gebdatum='.$this->addslashes($this->gebdatum).','.
-			       ' gebort='.$this->addslashes($this->gebort).','.
-			       ' gebzeit='.$this->addslashes($this->gebzeit).','.
-			       ' foto='.$this->addslashes($this->foto).','.
-			       ' anmerkung='.$this->addslashes($this->anmerkungen).','.
-			       ' homepage='.$this->addslashes($this->homepage).','.
-			       ' svnr='.$this->addslashes($this->svnr).','.
-			       ' ersatzkennzeichen='.$this->addslashes($this->ersatzkennzeichen).','.
-			       ' familienstand='.$this->addslashes($this->familienstand).','.
-			       ' anzahlkinder='.$this->addslashes($this->anzahlkinder).','.
-			       ' aktiv='.($this->aktiv?'true':'false').','.
-			       //' insertamum='.$this->addslashes($this->insertamum).','.
-			       //' insertvon='.$this->addslashes($this->insertvon).','.
+			       ' sprache='.$this->db_add_param($this->sprache).','.
+			       ' anrede='.$this->db_add_param($this->anrede).','.
+			       ' titelpost='.$this->db_add_param($this->titelpost).','.
+			       ' titelpre='.$this->db_add_param($this->titelpre).','.
+			       ' nachname='.$this->db_add_param($this->nachname).','.
+			       ' vorname='.$this->db_add_param($this->vorname).','.
+			       ' vornamen='.$this->db_add_param($this->vornamen).','.
+			       ' gebdatum='.$this->db_add_param($this->gebdatum).','.
+			       ' gebort='.$this->db_add_param($this->gebort).','.
+			       ' gebzeit='.$this->db_add_param($this->gebzeit).','.
+			       ' foto='.$this->db_add_param($this->foto).','.
+			       ' anmerkung='.$this->db_add_param($this->anmerkungen).','.
+			       ' homepage='.$this->db_add_param($this->homepage).','.
+			       ' svnr='.$this->db_add_param($this->svnr).','.
+			       ' ersatzkennzeichen='.$this->db_add_param($this->ersatzkennzeichen).','.
+			       ' familienstand='.$this->db_add_param($this->familienstand).','.
+			       ' anzahlkinder='.$this->db_add_param($this->anzahlkinder).','.
+			       ' aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
 			       ' updateamum=now(),'.
-			       ' updatevon='.$this->addslashes($this->updatevon).','.
-			       ' geschlecht='.$this->addslashes($this->geschlecht).','.
-			       ' geburtsnation='.$this->addslashes($this->geburtsnation).','.
-			       ' staatsbuergerschaft='.$this->addslashes($this->staatsbuergerschaft).','.
-			       ' ext_id='.$this->addslashes($this->ext_id).','.
-			       ' kurzbeschreibung='.$this->addslashes($this->kurzbeschreibung).
+			       ' updatevon='.$this->db_add_param($this->updatevon).','.
+			       ' geschlecht='.$this->db_add_param($this->geschlecht).','.
+			       ' geburtsnation='.$this->db_add_param($this->geburtsnation).','.
+			       ' staatsbuergerschaft='.$this->db_add_param($this->staatsbuergerschaft).','.
+			       ' ext_id='.$this->db_add_param($this->ext_id).','.
+			       ' kurzbeschreibung='.$this->db_add_param($this->kurzbeschreibung).','.
+				   ' foto_sperre='.$this->db_add_param($this->foto_sperre, FHC_BOOLEAN).
 			       ' WHERE person_id='.$this->person_id.';';
 		}
 
@@ -473,7 +475,7 @@ class person extends basis_db
 						$this->person_id=$row->id;
 					else
 					{
-						$this->errormsg = "Sequence konnte nicht ausgelesen werden\n";
+						$this->errormsg = "Sequence konnte nicht ausgelesen werden";
 						return false;
 					}
 				}
@@ -483,13 +485,12 @@ class person extends basis_db
 					return false;
 				}
 			}
-			//Log schreiben
 			return true;
 
 		}
 		else
 		{
-			$this->errormsg = "Fehler beim Speichern des Person-Datensatzes:".$this->db_last_error();
+			$this->errormsg = "Fehler beim Speichern des Person-Datensatzes";
 			return false;
 		}
 	}
@@ -506,10 +507,10 @@ class person extends basis_db
 		
 		if($filter!='')
 		{
-			$sql_query.=" AND 	nachname ~* '".addslashes($filter)."' OR 
-								vorname ~* '".addslashes($filter)."' OR
-								(nachname || ' ' || vorname) ~* '".addslashes($filter)."' OR
-								(vorname || ' ' || nachname) ~* '".addslashes($filter)."'";
+			$sql_query.=" AND 	nachname ~* '".$this->db_escape($filter)."' OR 
+								vorname ~* '".$this->db_escape($filter)."' OR
+								(nachname || ' ' || vorname) ~* '".$this->db_escape($filter)."' OR
+								(vorname || ' ' || nachname) ~* '".$this->db_escape($filter)."'";
 		}
 
 		$sql_query .= " ORDER BY $order";
@@ -542,13 +543,14 @@ class person extends basis_db
 				$l->familienstand = $row->familienstand;
 				$l->geschlecht = $row->geschlecht;
 				$l->anzahlkinder = $row->anzahlkinder;
-				$l->aktiv = $row->aktiv;
+				$l->aktiv = $this->db_parse_bool($row->aktiv);
 				$l->updateamum = $row->updateamum;
 				$l->updatevon = $row->updatevon;
 				$l->insertamum = $row->insertamum;
 				$l->insertvon = $row->insertvon;
 				$l->ext_id = $row->ext_id;
 				$l->kurzbeschreibung = $row->kurzbeschreibung;
+				$l->foto_sperre = $this->db_parse_bool($row->foto_sperre);
 				$this->personen[]=$l;
 			}
 		}
@@ -588,15 +590,15 @@ class person extends basis_db
 		$qry.=" WHERE tbl_person.person_id=tbl_personfunktionstandort.person_id";
 
 		if($personfunktionstandort_id!='')
-			$qry.=" and tbl_personfunktionstandort.personfunktionstandort_id='".addslashes($personfunktionstandort_id)."'";
+			$qry.=" and tbl_personfunktionstandort.personfunktionstandort_id=".$this->db_add_param($personfunktionstandort_id, FHC_INTEGER);
 		if(is_numeric($standort_id))
-			$qry.=" and tbl_personfunktionstandort.standort_id='".addslashes($standort_id)."'";
+			$qry.=" and tbl_personfunktionstandort.standort_id=".$this->db_add_param($standort_id, FHC_INTEGER);
 		if(is_numeric($person_id))
-			$qry.=" and tbl_personfunktionstandort.person_id='".addslashes($person_id)."'";
+			$qry.=" and tbl_personfunktionstandort.person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 		if(is_numeric($firma_id))
-			$qry.=" and public.tbl_standort.firma_id='".addslashes($firma_id)."'";
+			$qry.=" and public.tbl_standort.firma_id=".$this->db_add_param($firma_id, FHC_INTEGER);
 		if($funktion_kurzbz!='')
-			$qry.=" and tbl_personfunktionstandort.funktion_kurzbz='".addslashes($funktion_kurzbz)."'";
+			$qry.=" and tbl_personfunktionstandort.funktion_kurzbz=".$this->db_add_param($funktion_kurzbz);
 			
 			
 			
@@ -630,14 +632,14 @@ class person extends basis_db
 			$adr_obj->familienstand = $row->familienstand;
 			$adr_obj->geschlecht = $row->geschlecht;
 			$adr_obj->anzahlkinder = $row->anzahlkinder;
-			$adr_obj->aktiv = $row->aktiv;
+			$adr_obj->aktiv = $this->db_parse_bool($row->aktiv);
 			$adr_obj->updateamum = $row->updateamum;
 			$adr_obj->updatevon = $row->updatevon;
 			$adr_obj->insertamum = $row->insertamum;
 			$adr_obj->insertvon = $row->insertvon;
 			$adr_obj->ext_id = $row->ext_id;
 			$adr_obj->kurzbeschreibung = $row->kurzbeschreibung;
-
+			$adr_obj->foto_sperre = $this->db_parse_bool($row->foto_sperre);
 				
 			$adr_obj->standort_id		= $row->standort_id;
 			$adr_obj->adresse_id		= $row->adresse_id;
@@ -653,7 +655,7 @@ class person extends basis_db
 			$adr_obj->anrede	= $row->anrede;
 			
 			$adr_obj->funktion_beschreibung	= $row->funktion_beschreibung;
-			$adr_obj->funktion_aktiv	= ($row->funktion_aktiv=='t'?true:false);
+			$adr_obj->funktion_aktiv	= $this->db_parse_bool($row->funktion_aktiv);
 			$adr_obj->funktion_fachbereich	= $row->funktion_fachbereich;
 			$adr_obj->funktion_semester	= $row->funktion_semester;			
 
@@ -669,10 +671,14 @@ class person extends basis_db
 	 */
 	public function checkZugangscode($zugangscode)
 	{
-		$qry ="Select preincoming_id 
-		from public.tbl_preincoming 
-		where person_id = (Select person_id from public.tbl_person where zugangscode='".$zugangscode."') 
-		order by insertamum DESC;";
+		$qry ="
+			SELECT 
+				preincoming_id 
+			FROM 
+				public.tbl_preincoming 
+			WHERE 
+				person_id = (SELECT person_id FROM public.tbl_person WHERE zugangscode=".$this->db_add_param($zugangscode).") 
+			ORDER BY insertamum DESC;";
 
 		if($this->db_query($qry))
 		{
@@ -697,7 +703,7 @@ class person extends basis_db
 	 */
 	public function getPersonFromZugangscode($zugangscode)
 	{
-		$qry ="Select * from public.tbl_person where zugangscode=".$this->addslashes($zugangscode).";";
+		$qry ="SELECT * FROM public.tbl_person WHERE zugangscode=".$this->db_add_param($zugangscode).";";
 
 		if($this->db_query($qry))
 		{
@@ -724,14 +730,15 @@ class person extends basis_db
 				$this->familienstand = $row->familienstand;
 				$this->geschlecht = $row->geschlecht;
 				$this->anzahlkinder = $row->anzahlkinder;
-				$this->aktiv = $row->aktiv;
+				$this->aktiv = $this->db_parse_bool($row->aktiv);
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
 				$this->kurzbeschreibung = $row->kurzbeschreibung;
-				$this->zugangscode = $row->zugangscode; 
+				$this->zugangscode = $row->zugangscode;
+				$this->foto_sperre = $this->db_parse_bool($row->foto_sperre);
 			}
 			else
 			{
