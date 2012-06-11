@@ -43,7 +43,7 @@ class reihungstest extends basis_db
 	public $insertvon;		//  bigint
 	public $updateamum;		//  timestamp
 	public $updatevon;		//  bigint
-	public $zugangscode;	//  varchar(16)
+	public $freigeschaltet=false;	//  boolean
 	
 	/**
 	 * Konstruktor
@@ -87,7 +87,7 @@ class reihungstest extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
-				$this->zugangscode = $row->zugangscode;
+				$this->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
 				return true;				
 			}
 			else 
@@ -132,7 +132,7 @@ class reihungstest extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
-				$obj->zugangscode = $row->zugangscode;
+				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
 				
 				$this->result[] = $obj;
 			}
@@ -189,7 +189,7 @@ class reihungstest extends basis_db
 			//Neuen Datensatz einfuegen
 					
 			$qry='BEGIN; INSERT INTO public.tbl_reihungstest (studiengang_kz, ort_kurzbz, anmerkung, datum, uhrzeit, 
-				ext_id, insertamum, insertvon, updateamum, updatevon, zugangscode) VALUES('.
+				ext_id, insertamum, insertvon, updateamum, updatevon, freigeschaltet) VALUES('.
 			     $this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
 			     $this->db_add_param($this->ort_kurzbz).', '.
 			     $this->db_add_param($this->anmerkung).', '.
@@ -198,7 +198,7 @@ class reihungstest extends basis_db
 			     $this->db_add_param($this->ext_id, FHC_INTEGER).',  now(), '.
 			     $this->db_add_param($this->insertvon).', now(), '.
 			     $this->db_add_param($this->updatevon).','.
-			     'trunc(random()*100000));';
+			     $this->db_add_param($this->freigeschaltet, FHC_BOOLEAN).');';
 		}
 		else
 		{			
@@ -210,7 +210,8 @@ class reihungstest extends basis_db
 				'uhrzeit='.$this->db_add_param($this->uhrzeit).', '.
 				'ext_id='.$this->db_add_param($this->ext_id, FHC_INTEGER).', '. 
 		     	'updateamum= now(), '.
-		     	'updatevon='.$this->db_add_param($this->updatevon).' '.
+		     	'updatevon='.$this->db_add_param($this->updatevon).', '.
+				'freigeschaltet='.$this->db_add_param($this->freigeschaltet, FHC_BOOLEAN).' '.
 				'WHERE reihungstest_id='.$this->db_add_param($this->reihungstest_id, FHC_INTEGER, false).';';					
 		}
 		
@@ -277,7 +278,7 @@ class reihungstest extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
-				$obj->zugangscode = $row->zugangscode;
+				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
 				
 				$this->result[] = $obj;
 			}

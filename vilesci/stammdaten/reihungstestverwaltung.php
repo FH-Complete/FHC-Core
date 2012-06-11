@@ -249,6 +249,7 @@
 				$reihungstest->datum = $datum_obj->formatDatum($_POST['datum']);
 				$reihungstest->uhrzeit = $_POST['uhrzeit'];
 				$reihungstest->updateamum = date('Y-m-d H:i:s');
+				$reihungstest->freigeschaltet = isset($_POST['freigeschaltet']);
 				$reihungstest->updatevon = $user;
 				
 				if($reihungstest->save())
@@ -401,8 +402,6 @@
 		echo "<input type='hidden' value='$reihungstest->reihungstest_id' name='reihungstest_id' />";
 
 		echo "<table>";
-		if($reihungstest->zugangscode!='')
-			echo '<tr><td>Zugangscode:</td><td><b>'.$db->convert_html_chars($reihungstest->zugangscode).'</b></td></tr>';
 		
 		//Studiengang DropDown
 		echo "<tr><td>Studiengang</td><td><SELECT name='studiengang_kz'>";
@@ -448,6 +447,7 @@
 		echo '<tr><td>Anmerkung</td><td><input type="text" name="anmerkung" value="'.$db->convert_html_chars($reihungstest->anmerkung).'"></td></tr>';
 		echo '<tr><td>Datum</td><td><input type="text" name="datum" value="'.$datum_obj->convertISODate($reihungstest->datum).'"></td></tr>';
 		echo '<tr><td>Uhrzeit</td><td><input type="text" name="uhrzeit" value="'.$db->convert_html_chars($reihungstest->uhrzeit).'"> (Format: HH:MM:SS)</td></tr>';
+		echo '<tr><td>Freigeschaltet</td><td><input type="checkbox" name="freigeschaltet" '.($reihungstest->freigeschaltet?'checked="checked"':'').'"></td></tr>';
 		if(!$neu)
 			$val = 'Änderung Speichern';
 		else 

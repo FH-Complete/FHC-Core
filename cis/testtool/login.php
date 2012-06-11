@@ -51,17 +51,17 @@ if(isset($_POST['tag']) && isset($_POST['monat']) && isset($_POST['jahr']))
 		$gebdatum='';
 }
 
-if (isset($_POST['prestudent']) && isset($gebdatum) && isset($_POST['zugangscode']))
+if (isset($_POST['prestudent']) && isset($gebdatum))
 {
 	$ps=new prestudent($_POST['prestudent']);
 	//Geburtsdatum Pruefen
 	if ($gebdatum==$ps->gebdatum)
 	{
-		//Zugangscode fuer zugeteilten Reihungstest pruefen
+		//Freischaltung fuer zugeteilten Reihungstest pruefen
 		$rt = new reihungstest();
 		if($rt->load($ps->reihungstest_id))
 		{
-			if($_POST['zugangscode']==$rt->zugangscode)
+			if($rt->freigeschaltet)
 			{		
 				$pruefling = new pruefling();
 				if($pruefling->getPruefling($ps->prestudent_id))
@@ -90,7 +90,7 @@ if (isset($_POST['prestudent']) && isset($gebdatum) && isset($_POST['zugangscode
 			}
 			else
 			{
-				echo '<span class="error">Der angegebene Zugangscode ist falsch</span>';
+				echo '<span class="error">Der zuteilte Reihungstest ist noch nicht freigeschalten</span>';
 			}
 		}
 		else
@@ -272,7 +272,6 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 		for($i=date('Y');$i>date('Y')-99;$i--)
 			echo '<OPTION value="'.$i.'">'.$i.'</OPTION>';
 		echo '</SELECT>';
-		echo ' Zugangscode: <input name="zugangscode" type="text" size="6" />';
 		echo '&nbsp; <INPUT type="submit" value="Login" />';
 		echo '</form>';
 		

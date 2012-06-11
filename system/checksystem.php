@@ -3558,18 +3558,17 @@ if(!@$db->db_query("SELECT 1 from public.tbl_preoutgoing LIMIT 1"))
 		echo 'PreOutgoing Modul hinzugefuegt!<br>';
 }
 
-// Zugangscode fuer Reihungstest
-if(!@$db->db_query("SELECT zugangscode FROM public.tbl_reihungstest LIMIT 1"))
+// Freischaltung fuer Reihungstest
+if(!@$db->db_query("SELECT freigeschaltet FROM public.tbl_reihungstest LIMIT 1"))
 {
 	$qry = "
-	ALTER TABLE public.tbl_reihungstest ADD COLUMN zugangscode varchar(16);
-	UPDATE public.tbl_reihungstest SET zugangscode=trunc(random()*100000);
+	ALTER TABLE public.tbl_reihungstest ADD COLUMN freigeschaltet boolean NOT NULL DEFAULT false;
 	";
 	
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_reihungstest: '.$db->db_last_error().'</strong><br>';
 	else 
-		echo 'Tabelle public.tbl_reihungstest Spalte zugangscode hinzugefuegt!<br>';
+		echo 'Tabelle public.tbl_reihungstest Spalte freigeschaltet hinzugefuegt!<br>';
 }
 
 // anmerkungsfelder und stdienrichtung für Outgoing
@@ -3606,6 +3605,52 @@ if(!@$db->db_query("SELECT nummer_myfare FROM wawi.tbl_betriebsmittel LIMIT 1"))
         echo '<strong>wawi.tbl_betriebsmittel: '.$db->db_last_error().'</strong><br>';
     else
         echo 'Tabelle wawi.tbl_betriebsmittel Spalte nummer_myfare hinzugefuegt';
+}
+
+// View fuer Testtool Auswertung
+if(!@$db->db_query("SELECT * FROM testtool.vw_auswertung_kategorie_semester LIMIT 1"))
+{
+    $qry = "
+    CREATE OR REPLACE testtool.vw_auswertung_kategorie_semester AS
+    SELECT 
+    	tbl_kategorie.kategorie_kurzbz, tbl_person.vorname, tbl_person.nachname, 
+    	tbl_person.gebdatum, tbl_person.geschlecht, tbl_prestudent.prestudent_id, 
+    	tbl_prestudent.reihungstest_id, tbl_gebiet.gebiet_id, 
+    	upper(tbl_studiengang.typ::character varying(1)::text || tbl_studiengang.kurzbz::text) AS stg_kurzbz, 
+    	tbl_studiengang.bezeichnung AS stg_bez, tbl_pruefling.registriert, tbl_pruefling.idnachweis, 
+    	tbl_pruefling.semester, tbl_pruefling.pruefling_id, 
+    	( SELECT sum(tbl_vorschlag.punkte) AS sum
+          FROM testtool.tbl_vorschlag
+      		JOIN testtool.tbl_antwort USING (vorschlag_id)
+   			JOIN testtool.tbl_frage USING (frage_id)
+  		  WHERE testtool.tbl_antwort.pruefling_id = testtool.tbl_pruefling.pruefling_id 
+  			AND testtool.tbl_frage.gebiet_id = testtool.tbl_gebiet.gebiet_id 
+  			AND testtool.tbl_frage.kategorie_kurzbz::text = testtool.tbl_kategorie.kategorie_kurzbz::text
+  		) AS punkte
+   FROM testtool.tbl_pruefling
+   JOIN testtool.tbl_ablauf ON tbl_ablauf.studiengang_kz = tbl_pruefling.studiengang_kz
+   JOIN testtool.tbl_gebiet USING (gebiet_id)
+   JOIN testtool.tbl_kategorie USING (gebiet_id)
+   JOIN public.tbl_prestudent USING (prestudent_id)
+   JOIN public.tbl_person USING (person_id)
+   JOIN public.tbl_studiengang ON public.tbl_prestudent.studiengang_kz = public.tbl_studiengang.studiengang_kz;
+    ";
+    
+    if(!$db->db_query($qry))
+        echo '<strong>testtool.vw_auswertung_kategorie_semester: '.$db->db_last_error().'</strong><br>';
+    else
+        echo 'View testtool.vw_auswertung_kategorie_semester hinzugefuegt';
+}
+
+// Gesperrt Attribut fuer Tabelle Gruppe
+if(!@$db->db_query("SELECT gesperrt FROM public.tbl_gruppe LIMIT 1"))
+{
+    $qry = "ALTER TABLE public.tbl_gruppe ADD COLUMN gesperrt boolean;";
+    
+    if(!$db->db_query($qry))
+        echo '<strong>public.tbl_gruppe: '.$db->db_last_error().'</strong><br>';
+    else
+        echo 'Tabelle public.tbl_gruppe Spalte gesperrt hinzugefuegt';
 }
 echo '<br>';
 
@@ -3731,7 +3776,7 @@ $tabellen=array(
 	"public.tbl_firmatag"  => array("firma_id","tag","insertamum","insertvon"),
 	"public.tbl_funktion"  => array("funktion_kurzbz","beschreibung","aktiv","fachbereich","semester"),
 	"public.tbl_geschaeftsjahr"  => array("geschaeftsjahr_kurzbz","start","ende","bezeichnung"),
-	"public.tbl_gruppe"  => array("gruppe_kurzbz","studiengang_kz","semester","bezeichnung","beschreibung","sichtbar","lehre","aktiv","sort","mailgrp","generiert","updateamum","updatevon","insertamum","insertvon","ext_id","orgform_kurzbz","gid","content_visible"),
+	"public.tbl_gruppe"  => array("gruppe_kurzbz","studiengang_kz","semester","bezeichnung","beschreibung","sichtbar","lehre","aktiv","sort","mailgrp","generiert","updateamum","updatevon","insertamum","insertvon","ext_id","orgform_kurzbz","gid","content_visible","gesperrt"),
 	"public.tbl_kontakt"  => array("kontakt_id","person_id","kontakttyp","anmerkung","kontakt","zustellung","updateamum","updatevon","insertamum","insertvon","ext_id","standort_id"),
 	"public.tbl_kontaktmedium"  => array("kontaktmedium_kurzbz","beschreibung"),
 	"public.tbl_kontakttyp"  => array("kontakttyp","beschreibung"),
@@ -3759,7 +3804,7 @@ $tabellen=array(
 	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat"),
 	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung"),
-	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","zugangscode"),
+	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet"),
 	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id"),
 	"public.tbl_semesterwochen"  => array("semester","studiengang_kz","wochen"),
 	"public.tbl_sprache"  => array("sprache","locale","flagge","index","content","bezeichnung"),
