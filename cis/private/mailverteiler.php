@@ -216,6 +216,9 @@ if(!$is_lector)
 			$zeile=0;	
 			foreach($grp_obj->result as $row1)
 			{
+				if(!$row1->aktiv)
+					continue;
+				
 				$zeile++;
 				if ($zeile%2)
 				{
@@ -232,18 +235,17 @@ if(!$is_lector)
 				// display the open-link only when its a closed dispatcher and if the user has status lector
 				// if dispatcher has attribute aktiv=true no opening action is needed
 				echo "<td width=\"23\">";
-				if(!$row1->aktiv && MAILVERTEILER_SPERRE)
+				if($row1->gesperrt && MAILVERTEILER_SPERRE)
 				{
 					//Studentenvertreter duerfen den Verteiler fuer alle Studenten oeffnen
 					if($is_lector || ($is_stdv && mb_strtolower($row1->gruppe_kurzbz)=='tw_std'))
 					{
 						/* open a popup containing the final dispatcher address */
-						if(MAILVERTEILER_SPERRE)
-							echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row1->gruppe_kurzbz).'&amp;desc='.$row1->beschreibung.'\',\'_blank\',\'width=500,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item"><img alt="'.$p->t('mailverteiler/verteilerOeffnen').'" src="../../skin/images/open.gif" title="'.$p->t('mailverteiler/verteilerOeffnen').'"></a>';
+						echo '<a href="#" onClick="javascript:window.open(\'open_grp.php?grp='.strtolower($row1->gruppe_kurzbz).'&amp;desc='.$row1->beschreibung.'\',\'_blank\',\'width=500,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\');return false;" class="Item"><img alt="'.$p->t('mailverteiler/verteilerOeffnen').'" src="../../skin/images/open.gif" title="'.$p->t('mailverteiler/verteilerOeffnen').'"></a>';
 				    	echo "&nbsp;</td>";
 					
 					 	echo " <td width='200'>";
-					 		echo "<a href='mailto:".$row1->gruppe_kurzbz."@".DOMAIN."' class='Item'>".strtolower($row1->gruppe_kurzbz)."@".DOMAIN."</a>";
+					 	echo "<a href='mailto:".$row1->gruppe_kurzbz."@".DOMAIN."' class='Item'>".strtolower($row1->gruppe_kurzbz)."@".DOMAIN."</a>";
 						echo "&nbsp;</td>";
 					}
 					else
@@ -379,10 +381,10 @@ if(!$is_lector)
 		echo "</table>";
 
 	//Menue oeffnen wenn kurzbz uebergeben wird
-  	if(isset($_GET['kbzl']) AND $_GET['kbzl']!='')
+  	if(isset($_GET['kbzl']) && $_GET['kbzl']!='')
   	{
   	   echo "<script language='javascript'>
-  	              js_toggle_container('".$_GET['kbzl']."');
+  	              js_toggle_container('".$db->convert_html_chars($_GET['kbzl'])."');
   	         </script>";
     }
 ?>
