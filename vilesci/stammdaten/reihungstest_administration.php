@@ -29,15 +29,12 @@ require_once('../../include/prestudent.class.php');
 require_once('../../include/pruefling.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/reihungstest.class.php');
-
 require_once('../../include/studiensemester.class.php');
-
-
 	
 //	Studiengang lesen 
-	$s=new studiengang();
-	$s->getAll('typ, kurzbz', false);
-	$studiengang=$s->result;
+$s=new studiengang();
+$s->getAll('typ, kurzbz', false);
+$studiengang=$s->result;
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -58,10 +55,10 @@ if(isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete']=='prestudent')
 				JOIN public.tbl_prestudent USING(person_id)
 				JOIN public.tbl_studiengang USING(studiengang_kz)
 			WHERE
-				lower(nachname) like '%".addslashes(mb_strtolower($search))."%' OR
-				lower(vorname) like '%".addslashes(mb_strtolower($search))."%' OR
-				lower(nachname || ' ' || vorname) like '%".addslashes(mb_strtolower($search))."%' OR
-				lower(vorname || ' ' || nachname) like '%".addslashes(mb_strtolower($search))."%'
+				lower(nachname) like '%".$db->db_escape(mb_strtolower($search))."%' OR
+				lower(vorname) like '%".$db->db_escape(mb_strtolower($search))."%' OR
+				lower(nachname || ' ' || vorname) like '%".$db->db_escape(mb_strtolower($search))."%' OR
+				lower(vorname || ' ' || nachname) like '%".$db->db_escape(mb_strtolower($search))."%'
 			";
 	if($result = $db->db_query($qry))
 	{
@@ -85,7 +82,6 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//DE" "http://www
 		<link rel="stylesheet" href="../../skin/jquery.css" type="text/css"/>
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-		
 
 		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 		<script type="text/javascript" src="../../include/js/jquery.js"></script> 
@@ -217,13 +213,13 @@ if(isset($_POST['deleteteilgebiet']))
 		if($pruefling->pruefling_id=='')
 			die('Pruefling wurde nicht gefunden');
 	
-		$qry = "DELETE FROM testtool.tbl_pruefling_frage where pruefling_id='$pruefling->pruefling_id' AND
-				frage_id IN (SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id='".$_POST['gebiet']."');
+		$qry = "DELETE FROM testtool.tbl_pruefling_frage where pruefling_id=".$db->db_add_param($pruefling->pruefling_id, FHC_INTEGER)." AND
+				frage_id IN (SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id=".$db->db_add_param($_POST['gebiet']).");
 				
 				DELETE FROM testtool.tbl_antwort 
-				WHERE pruefling_id='$pruefling->pruefling_id' AND 
+				WHERE pruefling_id=".$db->db_add_param($pruefling->pruefling_id)." AND 
 				vorschlag_id IN (SELECT vorschlag_id FROM testtool.tbl_vorschlag WHERE frage_id IN 
-				(SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id='".$_POST['gebiet']."'));";
+				(SELECT frage_id FROM testtool.tbl_frage WHERE gebiet_id=".$db->db_add_param($_POST['gebiet'])."));";
 		if($result = $db->db_query($qry))
 		{
 			echo '<b>'.$db->db_affected_rows($result).' Antworten wurden gelöscht</b>';
@@ -244,8 +240,8 @@ if(isset($_POST['delete_all']))
 		if($pruefling->pruefling_id=='')
 			die('Pruefling wurde nicht gefunden');
 	
-		$qry = "DELETE FROM testtool.tbl_pruefling_frage where pruefling_id='$pruefling->pruefling_id';
-				DELETE FROM testtool.tbl_antwort WHERE pruefling_id='$pruefling->pruefling_id';";
+		$qry = "DELETE FROM testtool.tbl_pruefling_frage where pruefling_id=".$db->db_add_param($pruefling->pruefling_id).";
+				DELETE FROM testtool.tbl_antwort WHERE pruefling_id=".$db->db_add_param($pruefling->pruefling_id).";";
 				
 				
 		if($result = $db->db_query($qry))
@@ -272,7 +268,7 @@ if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 				JOIN testtool.tbl_pruefling_frage ON (tbl_pruefling.pruefling_id=tbl_pruefling_frage.pruefling_id AND tbl_frage.frage_id =tbl_pruefling_frage.frage_id)
 				JOIN public.tbl_prestudent USING (prestudent_id)
 				JOIN public.tbl_person USING (person_id)
-				WHERE prestudent_id='".$_POST['prestudent_id']."'
+				WHERE prestudent_id=".$db->db_add_param($_POST['prestudent_id'])."
 				ORDER BY kurzbz,tbl_pruefling_frage.begintime,nummer";
 		if($result = $db->db_query($qry))
 		{
@@ -318,8 +314,8 @@ if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 echo '<hr><br>';
 if(isset($_POST['savedummystg']) && isset($_POST['stg']))
 {
-	$qry = "UPDATE public.tbl_prestudent SET studiengang_kz='".addslashes($_POST['stg'])."' WHERE prestudent_id='13478';
-	UPDATE testtool.tbl_pruefling SET studiengang_kz='".addslashes($_POST['stg'])."' WHERE prestudent_id='13478';";	
+	$qry = "UPDATE public.tbl_prestudent SET studiengang_kz=".$db->db_add_param($_POST['stg'])." WHERE prestudent_id='13478';
+	UPDATE testtool.tbl_pruefling SET studiengang_kz=".$db->db_add_param($_POST['stg'])." WHERE prestudent_id='13478';";	
 	if($db->db_query($qry))
 		echo '<b>Studiengang geändert!</b><br>';
 	else 
@@ -443,7 +439,7 @@ foreach($stsem->studiensemester as $row)
 			FROM testtool.tbl_ablauf 
 			JOIN testtool.tbl_gebiet USING (gebiet_id) 
 			JOIN public.tbl_studiengang USING (studiengang_kz)
-			WHERE studiengang_kz='".$studiengang_kz."'
+			WHERE studiengang_kz=".$db->db_add_param($studiengang_kz)."
 			ORDER BY stg,semester,reihung";
 }
 
@@ -517,9 +513,52 @@ else
 	echo "Kein Eintrag gefunden!";
 
 echo "</tbody></table>";
-	echo "<br><br>";
-	echo "</form>";
+echo "<br><br>";
+echo '<hr>';
+echo 'Freigeschaltene Reihungstests:';
 
+if(isset($_GET['action']) && $_GET['action']=='sperren')
+{
+	$rt = new reihungstest();
+	if($rt->load($_GET['reihungstest_id']))
+	{
+		$rt->freigeschaltet=false;
+		$rt->new=false;
+		if(!$rt->save())
+			echo 'Fehler beim Sperren:'.$rt->errormsg;
+	}
+	else
+	{
+		echo 'Fehler beim Laden des Reihungstests';
+	}
+}
+
+$qry = "SELECT * FROM public.tbl_reihungstest WHERE freigeschaltet ORDER BY datum";
+
+if($result = $db->db_query($qry))
+{
+	echo '<table class="liste">';
+	echo '<tr>
+			<th>Stg</th>
+			<th>Ort</th>
+			<th>Datum</th>
+			<th>Uhrzeit</th>
+			<th>Anmerkung</th>
+			<th>Action</th>
+		</tr>';
+	while($row = $db->db_fetch_object($result))
+	{
+		echo '<tr>';
+		echo '<td>'.$row->studiengang_kz.'</td>';
+		echo '<td>'.$row->ort_kurzbz.'</td>';
+		echo '<td>'.$row->datum.'</td>';
+		echo '<td>'.$row->uhrzeit.'</td>';
+		echo '<td>'.$row->anmerkung.'</td>';
+		echo '<td><a href="'.$_SERVER['PHP_SELF'].'?action=sperren&reihungstest_id='.$row->reihungstest_id.'">Sperren</a></td>';
+		echo '</tr>';
+	}
+	echo '</table>';
+}
 
 	
 echo '</body>
