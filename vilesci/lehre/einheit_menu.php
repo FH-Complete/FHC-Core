@@ -157,6 +157,7 @@ function doSave()
 	$e->sichtbar=isset($_POST['sichtbar']);
 	$e->generiert=isset($_POST['generiert']);
 	$e->aktiv=isset($_POST['aktiv']);
+	$e->gesperrt = isset($_POST['gesperrt']);
 	$e->sort=$_POST['sort'];
 	$e->content_visible=isset($_POST['content_visible']);
 	
@@ -220,6 +221,7 @@ function doEdit($kurzbz,$new=false)
 			<tr><td><i>Generiert</i></td><td><input type='checkbox' name='generiert' <?php echo ($e->generiert?'checked':'');?>>
 			<tr><td><i>Aktiv</i></td><td><input type='checkbox' name='aktiv' <?php echo ($e->aktiv?'checked':'');?>>
 			<tr><td><i>ContentVisible</i></td><td><input type='checkbox' name='content_visible' <?php echo ($e->content_visible?'checked':'');?>>
+			<tr><td><i>Gesperrt</i></td><td><input type='checkbox' name='gesperrt' <?php echo ($e->gesperrt?'checked':'');?>>
 			<tr>
 				<td><i>Sort</i></td><td><input type='text' name='sort' maxlength="4" value="<?php echo $e->sort;?>">
 				</td>

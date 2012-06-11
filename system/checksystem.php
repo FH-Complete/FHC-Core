@@ -3645,7 +3645,10 @@ if(!@$db->db_query("SELECT * FROM testtool.vw_auswertung_kategorie_semester LIMI
 // Gesperrt Attribut fuer Tabelle Gruppe
 if(!@$db->db_query("SELECT gesperrt FROM public.tbl_gruppe LIMIT 1"))
 {
-    $qry = "ALTER TABLE public.tbl_gruppe ADD COLUMN gesperrt boolean;";
+    $qry = "ALTER TABLE public.tbl_gruppe ADD COLUMN gesperrt boolean;
+    	UPDATE public.tbl_gruppe SET gesperrt=true WHERE aktiv=false AND sichtbar=true AND semester is null;
+    	UPDATE public.tbl_gruppe SET aktiv=true WHERE gesperrt=true;
+    	";
     
     if(!$db->db_query($qry))
         echo '<strong>public.tbl_gruppe: '.$db->db_last_error().'</strong><br>';

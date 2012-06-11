@@ -22,11 +22,31 @@
 require_once('../../config/cis.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/phrasen.class.php');
+require_once('../../include/basis_db.class.php');
+require_once('../../include/gruppe.class.php');
 
 $sprache = getSprache();
 $p = new phrasen($sprache);
 $uid = get_uid();
-
+$db = new basis_db();
+if(!isset($_REQUEST['grp']))
+	die('Falsche Parameter');
+	
+if(mb_strlen($_REQUEST['grp'])>32)
+	die('Grp ungueltig');
+	
+//Pruefen ob es eine gueltige Gruppe ist
+$gruppe = new gruppe();
+if(!$gruppe->exists($_REQUEST['grp']))
+{
+	//Wenn es keine Gruppe in der DB ist, kann es
+	//noch ein Studierendenverteiler sein
+	//bif_std
+	if(!preg_match('/^\D\D\D_std$/', $_REQUEST['grp']))
+	{
+		die('Ungueltige Gruppe');
+	}
+}
 function mail_id_generator()
 {
 	mt_srand((double)microtime()*1000000);
@@ -63,8 +83,7 @@ function mail_id_generator()
     return $mail_id;
 }
 
-echo '
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -99,14 +118,14 @@ if(isset($_REQUEST['token']) && isset($_REQUEST['grp']))
 	// for the users
 	echo "
 	<tr>
-		<td><a href='mailto:".$_REQUEST['grp'].$mail_id."@technikum-wien.at'>".$_REQUEST['desc']."</a></td>
+		<td><a href='mailto:".$_REQUEST['grp'].$mail_id."@".DOMAIN."'>".$db->convert_html_chars($_REQUEST['desc'])."</a></td>
 		<td>".$p->t('mailverteiler/geoeffnet')." (Code: ".$mail_id.")</td>
 	</tr>
 	<tr>
 	<td colspan='2'>
 	<p>".$p->t('mailverteiler/klickenZumSchicken')."</p>
 
-	<p>".$p->t('mailverteiler/infoBenutzung',array($_REQUEST['grp'].$mail_id."@technikum-wien.at"))."</p>
+	<p>".$p->t('mailverteiler/infoBenutzung',array($_REQUEST['grp'].$mail_id."@".DOMAIN))."</p>
 	</td>
 	</tr>
 	</table>
@@ -120,7 +139,7 @@ else
 	}
 	else
 	{
-		echo $p->t('mailverteiler/bestaetigeOeffnen',array($_REQUEST['grp']))." : <a href=\"".$_SERVER['SCRIPT_NAME']."?grp=".$_REQUEST['grp']."&desc=".$_REQUEST['desc']."&token=1\">".$p->t('mailverteiler/bestaetige')."</a>";
+		echo $p->t('mailverteiler/bestaetigeOeffnen',array($_REQUEST['grp']))." : <a href=\"".$_SERVER['SCRIPT_NAME']."?grp=".$_REQUEST['grp']."&desc=".$db->convert_html_chars($_REQUEST['desc'])."&token=1\">".$p->t('mailverteiler/bestaetige')."</a>";
 	}
 }
  
