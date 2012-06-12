@@ -131,7 +131,7 @@ if($uid==null)
 						tbl_lehreinheit.studiensemester_kurzbz='".addslashes($ss)."' AND
 						tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
 						tbl_lehrveranstaltung.studiengang_kz=".addslashes($studiengang_kz)." AND
-						tbl_projektbetreuer.stunden!='0' AND tbl_projektbetreuer.faktor!='0' AND tbl_projektbetreuer.stundensatz!='0'
+						tbl_projektbetreuer.stunden!='0'
 					) as mitarbeiter ORDER BY mitarbeiter_uid";
 	
 	if($db->db_query($qry))
@@ -352,7 +352,7 @@ function drawLehrauftrag($uid)
 		while($row = $db->db_fetch_object($result))
 		{
 			$brutto = $row->stunden*$row->stundensatz*$row->faktor;
-			if($brutto!=0)
+			if($row->stunden!=0)
 			{
 				switch($row->projekttyp_kurzbz)
 				{
