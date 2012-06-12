@@ -93,6 +93,9 @@ if($semester!='' && !is_numeric($semester))
 	die('Semester ist ungueltig');
 if($prestudent_id!='' && !is_numeric($prestudent_id))
 	die('PrestudentID ist ungueltig');
+//if(($reihungstest=='' && isset($_REQUEST['reihungstest'])) && ($studiengang=='' && isset($_REQUEST['studiengang'])) && ($semester=='' && isset($_REQUEST['semester'])) && ($prestudent_id=='' && isset($_REQUEST['prestudent'])) && ($datum_von=='' && isset($_REQUEST['datum_von'])) && ($datum_bis=='' && isset($_REQUEST['datum_bis'])))
+if(($reihungstest=='' && isset($_REQUEST['reihungstest'])) && $studiengang=='' && $semester=='' && $prestudent_id=='' && $datum_von=='' && $datum_bis=='')
+	die('Waehlen Sie bitte mindestens eine der Optionen aus');
 
 if($datum_von!='')
 	$datum_von = $datum_obj->formatDatum($datum_von, 'Y-m-d');
@@ -136,8 +139,8 @@ if (isset($_REQUEST['reihungstest']))
 		$sql_query.=" AND tbl_prestudent.studiengang_kz='".addslashes($studiengang)."'";
 	if($semester!='')
 		$sql_query.=" AND tbl_ablauf.semester='".addslashes($semester)."' AND tbl_ablauf.studiengang_kz=tbl_prestudent.studiengang_kz";
-	//if($prestudent_id!='')
-	//	$sql_query.=" AND prestudent_id='".addslashes($prestudent_id)."'";
+	if($prestudent_id!='')
+		$sql_query.=" AND prestudent_id='".addslashes($prestudent_id)."'";
 	
 	$sql_query.=" ORDER BY vw_auswertung_ablauf.reihung, gebiet_id";
 	
@@ -159,7 +162,7 @@ if (isset($_REQUEST['reihungstest']))
 					JOIN public.tbl_prestudent USING(prestudent_id)
 					JOIN public.tbl_reihungstest ON(vw_auswertung_ablauf.reihungstest_id=tbl_reihungstest.reihungstest_id)
 					JOIN testtool.tbl_ablauf ON(tbl_ablauf.gebiet_id=vw_auswertung_ablauf.gebiet_id)
-				WHERE 1=1 AND tbl_ablauf.studiengang_kz=tbl_prestudent.studiengang_kz /*AND tbl_ablauf.semester=vw_auswertung_ablauf.semester*/";
+				WHERE 1=1 AND tbl_ablauf.studiengang_kz=tbl_prestudent.studiengang_kz";
 	if($reihungstest!='')
 		$sql_query.=" AND vw_auswertung_ablauf.reihungstest_id='".addslashes($reihungstest)."'";
 	if($datum_von!='')
@@ -238,6 +241,8 @@ if (isset($_REQUEST['reihungstest']))
 		$sql_query.=" AND tbl_reihungstest.datum<='$datum_bis'";
 	if($studiengang!='')
 		$sql_query.=" AND tbl_prestudent.studiengang_kz='".addslashes($studiengang)."'";
+	if($prestudent_id!='')
+		$sql_query.=" AND vw_auswertung_kategorie_semester.prestudent_id='".addslashes($prestudent_id)."'";
 
 	
 	//echo $sql_query;
