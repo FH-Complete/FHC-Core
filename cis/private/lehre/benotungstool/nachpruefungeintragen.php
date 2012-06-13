@@ -107,7 +107,7 @@ $student_uid = $_REQUEST["student_uid"];
 //	die('Es wurde keine passende Lehreinheit in diesem Studiensemester gefunden');
 
 $note = $_REQUEST["note"];
-if ( (($note>0) && ($note < 6)) || ($note == 7) || ($note==8) || ($note==16))
+if ( (($note>0) && ($note < 6)) || ($note == 7) || ($note==16) || ($note==10) || ($note==14))
 	$note = $_REQUEST["note"];
 else
 	$note = 9;
@@ -208,7 +208,7 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  ){
 	}
 
 
-	if ( (($note>0) && ($note < 6)) || ($note == 7) || ($note==8) )
+	if ( (($note>0) && ($note < 6)) || ($note == 7) || ($note==16) || ($note==10) || ($note==14))
 	{
 
 		$jetzt = date("Y-m-d H:i:s");	

@@ -197,7 +197,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 			alert('<?php echo $p->t('gesamtnote/noteUnveraendert');?>');
 			return true;
 		}
-		else if ((note < 0) || (note > 5 && note != 8 && note != 7 && note!=16))
+		else if ((note < 0) || (note > 5 && note != 7 && note!=16 && note!=10 && note!=14))
 		{
 			alert('<?php echo $p->t('benotungstool/noteEingeben');?>');
 			document.getElementById(uid).note.value="";
@@ -283,7 +283,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 	function pruefungSpeichern()
 	{
 		var note = document.nachpruefung_form.note.value;
-		if ((note < 0) || (note > 5 && note != 8 && note != 7 && note != 9 && note!=16 && note != ""))
+		if ((note < 0) || (note > 5 && note != 7 && note != 9 && note!=16 && note!=10 && note!=14 && note != ""))
 		{
 			alert("<?php echo $p->t('benotungstool/noteEingebenOderLeer');?>!");
 			document.getElementById(uid).note.value="";
@@ -997,7 +997,7 @@ echo '<table>';
 				else
 					$stylestr ="";
 				echo "<td".$stylestr." align='center'>".$znote."</td>";
-				if($znote==5 || $znote==7 || $znote==9 || $znote==13 || $znote=='')
+				if($znote==5 || $znote==7 || $znote==9 || $znote==13 || $znote==13 || $znote=='')
 				{
 					$summe_ng++;
 				}

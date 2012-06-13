@@ -168,7 +168,7 @@ if (isset($_REQUEST["submit"]))
 		$student_uid = $_REQUEST["student_uid"];
 		$note = $_REQUEST["note"];
 		
-		if((($note>0) && ($note < 6)) || ($note == 7) || ($note==8) || ($note==16))
+		if((($note>0) && ($note < 6)) || ($note == 7) || ($note==16) || ($note==10) || ($note==14))
 			$response = savenote($db,$lvid, $student_uid, $note);
 		else
 			$response = $p->t('benotungstool/noteEingeben')."!";
@@ -201,7 +201,7 @@ if (isset($_REQUEST["submit"]))
 					else
 						$znote = null;	
 					
-					if(((($note>0) && ($note < 6)) || ($note == 7) || ($note==8) || ($note==16)))
+					if(((($note>0) && ($note < 6)) || ($note == 7) || ($note==16) || ($note==10) || ($note==14)))
 					{
 						$val=savenote($db,$lvid, $student_uid, $note);
 						if($val!='neu' && $val!='update' && $val!='update_f')
