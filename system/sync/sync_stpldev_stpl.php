@@ -89,6 +89,17 @@ if(isset($_GET['custom']))
 	$datum_begin = $_GET['von'];
 	$datum_ende = $_GET['bis'];
 }
+$db =new basis_db();
+// Beginnzeiten holen
+$qry = "SELECT stunde,to_char(beginn, 'HH24:MI') AS beginn FROM lehre.tbl_stunde";
+$beginnzeit_arr=array();
+if($result = $db->db_query($qry))
+{
+	while($row = $db->db_fetch_object($result))
+	{
+		$beginnzeit_arr[$row->stunde]=$row->beginn;
+	}
+}
 // ************* FUNCTIONS **************** //
 
 function getStudentsFromGroup($studiengang_kz, $semester, $verband, $gruppe, $gruppe_kurzbz, $studiensemester_kurzbz)
@@ -142,6 +153,10 @@ function getStudentsFromGroup($studiengang_kz, $semester, $verband, $gruppe, $gr
 // **************************************** //
 $message_begin='
 <style>
+th,td
+{
+	text-align:left;
+}
 .marked
 {
 	color:red;
@@ -162,7 +177,7 @@ $sql_query="SELECT * FROM lehre.vw_stundenplandev WHERE datum>='".addslashes($da
 	NOT EXISTS
 	(SELECT stundenplan_id FROM lehre.tbl_stundenplan WHERE datum>='".addslashes($datum_begin)."' AND datum<='".addslashes($datum_ende)."' AND stundenplan_id=stundenplandev_id)
 	ORDER BY datum, stunde;";
-$db =new basis_db();
+
 
 if (!$result = $db->db_query($sql_query))
 {
@@ -229,13 +244,14 @@ else
 					$message[$row->uid]->mailadress=$row->uid.'@technikum-wien.at';
 					$message[$row->uid]->message_begin=$message_begin.'<BR>';
 					$message[$row->uid]->message='<font style="color:green"><strong>Neue Stunden:</strong></font><BR>
-						<TABLE><TR><TH>Ort</TH><TH>Verband</TH><TH>Lektor</TH><TH>Datum/Std</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
+						<TABLE><TR><TH>Ort</TH><TH>Verband</TH><TH>Lektor</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
 				}
 				$message[$row->uid]->message.="\n";
 				$message[$row->uid]->message.='<TR><TD>'.$row->ort_kurzbz.'</TD>';
 				$message[$row->uid]->message.='<TD>'.mb_strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TD>';
 				$message[$row->uid]->message.='<TD>'.$row->lektor.'</TD>';
-				$message[$row->uid]->message.='<TD>'.$row->datum.'/'.$row->stunde.'</TD>';
+				$message[$row->uid]->message.='<TD>'.$row->datum.'</TD>';
+				$message[$row->uid]->message.='<TD>'.$row->stunde.' ('.$beginnzeit_arr[$row->stunde].')</TD>';
 				$message[$row->uid]->message.='<TD>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TD>';
 				$message[$row->uid]->message.='<TD>'.$row->titel.'</TD></TR>';
 			}
@@ -250,13 +266,14 @@ else
 					$message[$student]->mailadress=$student.'@technikum-wien.at';
 					$message[$student]->message_begin=$message_begin.'<BR>';
 					$message[$student]->message='<font style="color:green"><strong>Neue Stunden:</strong></font><BR>
-							<TABLE><TR><TH>Ort</TH><TH>Verband</TH><TH>Lektor</TH><TH>Datum/Std</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
+							<TABLE><TR><TH>Ort</TH><TH>Verband</TH><TH>Lektor</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
 				}
 				$message[$student]->message.="\n";
 				$message[$student]->message.='<TR><TD>'.$row->ort_kurzbz.'</TD>';
 				$message[$student]->message.='<TD>'.mb_strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TD>';
 				$message[$student]->message.='<TD>'.$row->lektor.'</TD>';
-				$message[$student]->message.='<TD>'.$row->datum.'/'.$row->stunde.'</TD>';
+				$message[$student]->message.='<TD>'.$row->datum.'</TD>';
+				$message[$student]->message.='<TD>'.$row->stunde.' ('.$beginnzeit_arr[$row->stunde].')</TD>';
 				$message[$student]->message.='<TD>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TD>';
 				$message[$student]->message.='<TD>'.$row->titel.'</TD></TR>';
 			}
@@ -312,13 +329,14 @@ else
 					$message[$row->uid]->mailadress=$row->uid.'@technikum-wien.at';
 					$message[$row->uid]->message_begin=$message_begin.'<BR>';
 					$message[$row->uid]->message.='<font style="color:#FFA100"><strong>Gel&ouml;schte Stunden:</strong></font><BR>
-						<TABLE><TR><TH>Ort</TH><TH>Verband</TH><TH>Lektor</TH><TH>Datum/Std</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
+						<TABLE><TR><TH>Ort</TH><TH>Verband</TH><TH>Lektor</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
 				}
 				$message[$row->uid]->message.="\n";
 				$message[$row->uid]->message.='<TR><TD>'.$row->ort_kurzbz.'</TD>';
 				$message[$row->uid]->message.='<TD>'.strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TD>';
 				$message[$row->uid]->message.='<TD>'.$row->lektor.'</TD>';
-				$message[$row->uid]->message.='<TD>'.$row->datum.'/'.$row->stunde.'</TD>';
+				$message[$row->uid]->message.='<TD>'.$row->datum.'</TD>';
+				$message[$row->uid]->message.='<TD>'.$row->stunde.' ('.$beginnzeit_arr[$row->stunde].')</TD>';
 				$message[$row->uid]->message.='<TD>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TD>';
 				$message[$row->uid]->message.='<TD>'.$row->titel.'</TD></TR>';
 			}
@@ -333,13 +351,14 @@ else
 					$message[$student]->mailadress=$student.'@technikum-wien.at';
 					$message[$student]->message_begin=$message_begin.'<BR>';
 					$message[$student]->message.='<font style="color:#FFA100"><strong>Gel&ouml;schte Stunden:</strong></font><BR>
-							<TABLE><TR><TH>Ort</TH><TH>Verband</TH><TH>Lektor</TH><TH>Datum/Std</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
+							<TABLE><TR><TH>Ort</TH><TH>Verband</TH><TH>Lektor</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
 				}
 				$message[$student]->message.="\n";
 				$message[$student]->message.='<TR><TD>'.$row->ort_kurzbz.'</TD>';
 				$message[$student]->message.='<TD>'.mb_strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TD>';
 				$message[$student]->message.='<TD>'.$row->lektor.'</TD>';
-				$message[$student]->message.='<TD>'.$row->datum.'/'.$row->stunde.'</TD>';
+				$message[$student]->message.='<TD>'.$row->datum.'</TD>';
+				$message[$student]->message.='<TD>'.$row->stunde.' ('.$beginnzeit_arr[$row->stunde].')</TD>';
 				$message[$student]->message.='<TD>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TD>';
 				$message[$student]->message.='<TD>'.$row->titel.'</TD></TR>';
 			}
@@ -379,6 +398,8 @@ $sql_query="SELECT vw_stundenplandev.*, vw_stundenplan.datum AS old_datum, vw_st
 //vw_stundenplandev.anmerkung!=vw_stundenplan.anmerkung OR --> von kindlm am 16.03.2012 aus obigem SQL entfernt, da nicht relevant fuer tbl_stundenplan und nur fuer intern gedacht
 
 //echo $sql_query.'<BR>';
+	
+		
 if (!$result = $db->db_query($sql_query))
 {
 	echo $sql_query.' fehlgeschlagen!<BR>'.$db->db_last_error();
@@ -457,14 +478,15 @@ else
 					$message[$row->uid]->mailadress=$row->uid.'@technikum-wien.at';
 					$message[$row->uid]->message_begin=$message_begin.'<BR>';
 					$message[$row->uid]->message.='<font style="color:blue"><strong>Ge&auml;nderte Stunden:</strong></font><BR>
-						<TABLE><TR><TH>Status</TH><TH>Ort</TH><TH>Verband</TH><TH>Lektor</TH><TH>Datum/Std</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
+						<TABLE><TR><TH>Status</TH><TH>Ort</TH><TH>Verband</TH><TH>Lektor</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
 				}
 				$message[$row->uid]->message.="\n";
 				$message[$row->uid]->message.='<TR><TD>Vorher: </TD>';
 				$message[$row->uid]->message.='<TD>'.$row->old_ort_kurzbz.'</TD>';
 				$message[$row->uid]->message.='<TD>'.mb_strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TD>';
 				$message[$row->uid]->message.='<TD>'.$row->old_lektor.'</TD>';
-				$message[$row->uid]->message.='<TD>'.$row->old_datum.'/'.$row->old_stunde.'</TD>';
+				$message[$row->uid]->message.='<TD>'.$row->old_datum.'</TD>';
+				$message[$row->uid]->message.='<TD>'.$row->old_stunde.' ('.$beginnzeit_arr[$row->old_stunde].')</TD>';
 				$message[$row->uid]->message.='<TD>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TD>';
 				$message[$row->uid]->message.='<TD>'.$row->old_titel.'</TD></TR>';
 
@@ -476,8 +498,10 @@ else
 				$message[$row->uid]->message.='<TD><span class="'.$myclass.'">'.strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</span></TD>';
 				$myclass=($row->lektor!=$row->old_lektor?'marked':'unmarked');
 				$message[$row->uid]->message.='<TD><span class="'.$myclass.'">'.$row->lektor.'</span></TD>';
-				$myclass=(($row->datum!=$row->old_datum) || ($row->stunde!=$row->old_stunde)?'marked':'unmarked');
-				$message[$row->uid]->message.='<TD><span class="'.$myclass.'">'.$row->datum.'/'.$row->stunde.'</span></TD>';
+				$myclass=(($row->datum!=$row->old_datum)?'marked':'unmarked');
+				$message[$row->uid]->message.='<TD><span class="'.$myclass.'">'.$row->datum.'</span></TD>';
+				$myclass=(($row->stunde!=$row->old_stunde)?'marked':'unmarked');
+				$message[$row->uid]->message.='<TD><span class="'.$myclass.'">'.$row->stunde.' ('.$beginnzeit_arr[$row->stunde].')</span></TD>';
 				$myclass='unmarked';
 				$message[$row->uid]->message.='<TD><span class="'.$myclass.'">'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</span></TD>';
 				$myclass=($row->titel!=$row->old_titel?'marked':'unmarked');
@@ -496,14 +520,15 @@ else
 						$message[$row->old_uid]->mailadress=$row->old_uid.'@technikum-wien.at';
 						$message[$row->old_uid]->message_begin=$message_begin.'<BR>';
 						$message[$row->old_uid]->message.='<font style="color:blue"><strong>Ge&auml;nderte Stunden:</strong></font><BR>
-							<TABLE><TR><TH>Status</TH><TH>Ort</TH><TH>Verband</TH><TH>Lektor</TH><TH>Datum/Std</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
+							<TABLE><TR><TH>Status</TH><TH>Ort</TH><TH>Verband</TH><TH>Lektor</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
 					}
 					$message[$row->old_uid]->message.="\n";
 					$message[$row->old_uid]->message.='<TR><TD>Vorher: </TD>';
 					$message[$row->old_uid]->message.='<TD>'.$row->old_ort_kurzbz.'</TD>';
 					$message[$row->old_uid]->message.='<TD>'.mb_strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TD>';
 					$message[$row->old_uid]->message.='<TD>'.$row->old_lektor.'</TD>';
-					$message[$row->old_uid]->message.='<TD>'.$row->old_datum.'/'.$row->old_stunde.'</TD>';
+					$message[$row->old_uid]->message.='<TD>'.$row->old_datum.'</TD>';
+					$message[$row->old_uid]->message.='<TD>'.$row->old_stunde.' ('.$beginnzeit_arr[$row->old_stunde].')</TD>';
 					$message[$row->old_uid]->message.='<TD>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TD>';
 					$message[$row->old_uid]->message.='<TD>'.$row->old_titel.'</TD></TR>';
 
@@ -515,8 +540,10 @@ else
 					$message[$row->old_uid]->message.='<TD><span class="'.$myclass.'">'.strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</span></TD>';
 					$myclass=($row->lektor!=$row->old_lektor?'marked':'unmarked');
 					$message[$row->old_uid]->message.='<TD><span class="'.$myclass.'">'.$row->lektor.'</span></TD>';
-					$myclass=(($row->datum!=$row->old_datum) || ($row->stunde!=$row->old_stunde)?'marked':'unmarked');
-					$message[$row->old_uid]->message.='<TD><span class="'.$myclass.'">'.$row->datum.'/'.$row->stunde.'</span></TD>';
+					$myclass=(($row->datum!=$row->old_datum)?'marked':'unmarked');
+					$message[$row->old_uid]->message.='<TD><span class="'.$myclass.'">'.$row->datum.'</TD>';
+					$myclass=(($row->stunde!=$row->old_stunde)?'marked':'unmarked');
+					$message[$row->old_uid]->message.='<TD><span class="'.$myclass.'">'.$row->stunde.' ('.$beginnzeit_arr[$row->stunde].')</span></TD>';
 					$myclass='unmarked';
 					$message[$row->old_uid]->message.='<TD><span class="'.$myclass.'">'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</span></TD>';
 					$myclass=($row->titel!=$row->old_titel?'marked':'unmarked');
@@ -534,14 +561,15 @@ else
 					$message[$student]->mailadress=$student.'@technikum-wien.at';
 					$message[$student]->message_begin=$message_begin.'<BR>';
 					$message[$student]->message.='<font style="color:blue"><strong>Ge&auml;nderte Stunden:</strong></font><BR>
-							<TABLE><TR><TH>Status</TH><TH>Ort</TH><TH>Verband</TH><TH>Lektor</TH><TH>Datum/Std</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
+							<TABLE><TR><TH>Status</TH><TH>Ort</TH><TH>Verband</TH><TH>Lektor</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
 				}
 				$message[$student]->message.="\n";
 				$message[$student]->message.='<TR><TD>Vorher: </TD>';
 				$message[$student]->message.='<TD>'.$row->old_ort_kurzbz.'</TD>';
 				$message[$student]->message.='<TD>'.mb_strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</TD>';
 				$message[$student]->message.='<TD>'.$row->old_lektor.'</TD>';
-				$message[$student]->message.='<TD>'.$row->old_datum.'/'.$row->old_stunde.'</TD>';
+				$message[$student]->message.='<TD>'.$row->old_datum.'</TD>';
+				$message[$student]->message.='<TD>'.$row->old_stunde.' ('.$beginnzeit_arr[$row->old_stunde].')</TD>';
 				$message[$student]->message.='<TD>'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</TD>';
 				$message[$student]->message.='<TD>'.$row->old_titel.'</TD></TR>';
 
@@ -553,8 +581,10 @@ else
 				$message[$student]->message.='<TD><span class="'.$myclass.'">'.mb_strtoupper($row->stg_typ.$row->stg_kurzbz).'-'.$row->semester.$row->verband.$row->gruppe.' '.$row->gruppe_kurzbz.'</span></TD>';
 				$myclass=($row->lektor!=$row->old_lektor?'marked':'unmarked');
 				$message[$student]->message.='<TD><span class="'.$myclass.'">'.$row->lektor.'</span></TD>';
-				$myclass=(($row->datum!=$row->old_datum) || ($row->stunde!=$row->old_stunde)?'marked':'unmarked');
-				$message[$student]->message.='<TD><span class="'.$myclass.'">'.$row->datum.'/'.$row->stunde.'</span></TD>';
+				$myclass=(($row->datum!=$row->old_datum)?'marked':'unmarked');
+				$message[$student]->message.='<TD><span class="'.$myclass.'">'.$row->datum.'</span></TD>';
+				$myclass=(($row->stunde!=$row->old_stunde)?'marked':'unmarked');
+				$message[$student]->message.='<TD><span class="'.$myclass.'">'.$row->stunde.' ('.$beginnzeit_arr[$row->stunde].')</span></TD>';
 				$myclass='unmarked';
 				$message[$student]->message.='<TD><span class="'.$myclass.'">'.$row->lehrfach.'-'.$row->lehrform.' ('.$row->lehrfach_bez.')</span></TD>';
 				$myclass=($row->titel!=$row->old_titel?'marked':'unmarked');

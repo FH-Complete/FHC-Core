@@ -7,21 +7,15 @@
 	<title>FH Complete</title>
 	<link href="skin/fhcomplete_website.css" rel="stylesheet" type="text/css">
 	<script type="text/javascript">
-	function maillink()
+	function PopupZugangsdaten (Adresse)
 	{
-		window.location.href="mai"+"lto:"+"systementw"+"icklung"+"@techni"+"kum-wien.at";
-	}
-	function mailpam()
-	{
-		window.location.href="mai"+"lto:"+"pam"+"@techni"+"kum-wien.at";
-	}
-	function mailkindl()
-	{
-		window.location.href="mai"+"lto:"+"kindlm"+"@techni"+"kum-wien.at";
+	MeinFenster = window.open(Adresse, "Zugangsdaten", "width=800,height=550,left=100,top=200,location=no,menubar=no,resizable=yes");
+	MeinFenster.focus();
 	}
 	</script>
+
 </head>
-<body>
+
 <div align="center" style="padding:30px;">		
 <table border="0" cellpadding="0" cellspacing="0" width="500px">
 	<tr>
@@ -38,7 +32,7 @@
 				<table align="center" cellpadding="0" cellspacing="0"><tr>
 				<td class="menu"><a class="menu" href="index.html">ÜBERBLICK</a></td>
 				<td class="menu"><a class="menu" href="fhcomplete_anforderungen.html">ANFORDERUNGEN</a></td>
-				<td class="menu"><a class="menu" href="fhcomplete_community.html">COMMUNITY</a></td>
+				<td class="menuselected"><a class="menuselected" href="fhcomplete_community.html">COMMUNITY</a></td>
 				</tr></table>
 				</td>
 			</tr>
@@ -58,38 +52,24 @@
 	</tr>
 	<tr>
 		<td>
-			<p style="font-size:20px;text-align: center;">KONTAKT</p>
+			<p style="font-size:20px;text-align: center;">COMMUNITY</p>
 		</td>
 	</tr>
 	<tr>
 		<td>
-			<table align="center" border="0" cellpadding="0" cellspacing="0" width="80%">
-				<tr>
-					<td width="60%">
-						<p style="padding-left:0px;padding-right:0px;">	<br/><br/>		
-						<b>Fachhochschule Technikum Wien</b><br/><br/>
-						<b>Systementwicklung</b><br/><br/>
-						Höchstädtplatz 5<br/>
-						1200 Wien<br/><br/>
-						
-						Ing. Dipl.-Ing. (FH) Christian Paminger<br/>
-						<i>Leitung Infrastruktur</i><br/>
-						<a href="#Mail" onclick="mailpam();">E-Mail</a><br/><br/>
-						
-						Manfred Kindl<br/>
-						<i>Systemadministration</i><br/>
-						<a href="#Mail" onclick="mailkindl();">E-Mail</a><br/><br/>
-						
-						T: +43 1 333 40 77-0<br/>
-						F: +43 1 333 40 77-259<br/><br/>
-									
-						</p>
-					</td>
-					<td width="40%">
-						<a href="http://www.technikum-wien.at" target="blank"><img title="FH Technikum Wien" height="90" alt="Logo FH Technikum Wien" src="skin/images/tw_logo_weiss.png"></a>
-					</td>
-				</tr>
-			</table>
+			<p>
+			<br/><br/>
+			FH-Complete ist als Community-Projekt gedacht, deren Mitglieder gemeinsam das System weiterentwickeln.
+			Wir verwenden das Feature-Request System Mantis, zur Verwaltung und Dokumentation des Projekts.
+			<br/><br/>
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<br/><br/>
+			<a href="http://fhcomplete.technikum-wien.at/mantis/roadmap_page.php" target="blank">Roadmap FH-Complete in Mantis</a>
+			<br/><br/>
 		</td>
 	</tr>
 	<tr height="60">
@@ -104,16 +84,19 @@
 						<a style="text-decoration:none;font-size:12px;" href="fhcomplete_impressum.html">IMPRESSUM</a>
 						</p>
 					</td>
+					<td width="100%">
+						<p style="padding-left:30px; padding-right:30px;" >			
+						<a style="text-decoration:none;font-size:12px;" href="fhcomplete_kontakt.html">KONTAKT</a>
+						</p>
+					</td>
 				</tr>
 			</table>
 		</td>
 	</tr>
 </table>
-<br/>
-<br/>
-<br/>
-<br/>
-<br/>
+
+
+
 </div>
 </body>
 </html>
