@@ -1,0 +1,129 @@
+/* Copyright (C) 2010 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *			Manfred Kindl <manfred.kindl@technikum-wien.at> and
+ *          Karl Burkhart <burkhart@technikum-wien.at>.
+ */
+@charset "utf-8";
+
+body 
+	{
+		background-color: #006095;
+	}
+	div
+	{
+		font-size:12px;
+		font-family:Arial;
+	}
+	p
+	{
+		font-size:14px;
+		font-family:Arial;
+		padding-left:50px;
+		padding-right:50px;
+		color:#D1D7DA;
+		text-align: justify;
+	}
+	td,tr
+	{
+		align:center;
+		text-align:center;
+	}
+	a
+	{
+		text-decoration:underline;
+		cursor:pointer;
+		font-size:14px;
+		color:#D1D7DA;
+		font-family:Arial;
+		border:0;
+	}
+	ul
+	{
+		list-style-type:square;
+		list-style-position:inside;
+		color:#FFF;
+		text-align:left;
+		font-size:14px;
+		font-family:Arial;
+		padding-left:50px;
+		padding-right:50px;
+		color:#D1D7DA;
+		text-align: justify;
+	}
+	img
+	{
+		border:0;
+	}
+	td.menu
+	{
+		text-align:center;
+		vertical-align:bottom;
+		width:170px;
+		background:url(images/menue.png);
+		background-position:top left;
+		background-repeat:no-repeat;
+		border-bottom:1px solid #FFF;
+		padding-bottom:5px;
+	}
+	td.menu_spacer
+	{
+		text-align:center;
+		vertical-align:bottom;
+		width:20px;
+		border-bottom:1px solid #FFF;
+		padding-bottom:5px;
+	}
+	td:hover.menu, td:active.menu, td:focus.menu, td.menuselected
+	{
+		text-align:center;
+		vertical-align:bottom;
+		width:170px;
+		background:url(images/menue_hover.png);
+		background-position:top left;
+		background-repeat:no-repeat;
+		border-bottom:1px solid #FFF;
+		padding-bottom:5px;
+		text-decoration:none;
+		cursor:pointer;
+	}
+	a.menu
+	{
+		padding-top:40px;
+		width:170px;
+		vertical-align:bottom;
+		color:#FFF;
+		text-decoration:none;
+		cursor:pointer;
+		display:block;
+		font-size:16px;
+		font-family:Arial;
+	}
+	a:hover.menu, a:active.menu, a:focus.menu, a.menuselected
+	{
+		padding-top:40px;
+		width:170px;
+		vertical-align:bottom;
+		text-decoration:none;
+		font-size:16px;
+		color:#006095;
+		cursor:pointer;
+		display:block;
+	}
+	
+	

@@ -93,7 +93,6 @@ if($semester!='' && !is_numeric($semester))
 	die('Semester ist ungueltig');
 if($prestudent_id!='' && !is_numeric($prestudent_id))
 	die('PrestudentID ist ungueltig');
-//if(($reihungstest=='' && isset($_REQUEST['reihungstest'])) && ($studiengang=='' && isset($_REQUEST['studiengang'])) && ($semester=='' && isset($_REQUEST['semester'])) && ($prestudent_id=='' && isset($_REQUEST['prestudent'])) && ($datum_von=='' && isset($_REQUEST['datum_von'])) && ($datum_bis=='' && isset($_REQUEST['datum_bis'])))
 if(($reihungstest=='' && isset($_REQUEST['reihungstest'])) && $studiengang=='' && $semester=='' && $prestudent_id=='' && $datum_von=='' && $datum_bis=='')
 	die('Waehlen Sie bitte mindestens eine der Optionen aus');
 
@@ -244,8 +243,7 @@ if (isset($_REQUEST['reihungstest']))
 	if($prestudent_id!='')
 		$sql_query.=" AND vw_auswertung_kategorie_semester.prestudent_id='".addslashes($prestudent_id)."'";
 
-	
-	//echo $sql_query;
+		
 	if(!($result=$db->db_query($sql_query)))
 	    die($db->db_last_error());
 	$gesamtpunkte=array();
@@ -277,7 +275,7 @@ if (isset($_REQUEST['reihungstest']))
 	if($studiengang!='')
 		$sql_query.=" AND tbl_prestudent.studiengang_kz='".addslashes($studiengang)."'";
 	//if($semester!='')
-	//	$sql_query.=" AND vw_auswertung_kategorie_semester.semester='".addslashes($semester)."'";
+	//	$sql_query.=" AND vw_auswertung_kategorie_semester.semester='".addslashes($semester)."'"; Auskommentiert, damit bei der Persönlichkeitsauswertung kein Kandidat verloren geht 
 	if($prestudent_id!='')
 		$sql_query.=" AND prestudent_id='".addslashes($prestudent_id)."'";
 	

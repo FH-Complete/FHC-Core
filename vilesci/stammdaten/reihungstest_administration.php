@@ -109,8 +109,12 @@ if(isset($_POST['personzuteilen']))
 		echo '<span class="error">Fehler beim Laden des Prestudenten</span>';
 	}	
 }
+//Links
+echo '<br><a href="https://cis.technikum-wien.at/cis/testtool/admin/auswertung.php" target="blank">Auswertung</a> | 
+	<a href="https://cis.technikum-wien.at/cis/testtool/admin/uebersichtFragen.php" target="blank">Fragenkatalog</a><br>
+	<hr>';
 //Anzeigen der kommenden Reihungstesttermine:
-echo '<br><br><a href="'.$_SERVER['PHP_SELF'].'?action=showreihungstests">Anzeigen der kommenden Reihungstests</a>';
+echo '<br><a href="'.$_SERVER['PHP_SELF'].'?action=showreihungstests">Anzeigen der kommenden Reihungstests</a>';
 
 if(isset($_GET['action']) && $_GET['action']=='showreihungstests')
 {
@@ -150,19 +154,6 @@ if(isset($_GET['action']) && $_GET['action']=='showreihungstests')
 		}
 		echo '</tbody></table>';
 	}
-}
-
-// Antworten des Dummy Studenten löschen
-echo '<hr><br><a href="'.$_SERVER['PHP_SELF'].'?action=deletedummyanswers" onclick="return confirm(\'Dummyanworten wirklich löschen?\');">Antworten des Dummy Studenten löschen</a>';
-
-if(isset($_GET['action']) && $_GET['action']=='deletedummyanswers')
-{
-	$qry = "DELETE FROM testtool.tbl_antwort WHERE pruefling_id=841;
-			DELETE FROM testtool.tbl_pruefling_frage where pruefling_id=841;";
-	if($db->db_query($qry))
-		echo ' <b>Antworten wurden gelöscht</b>';
-	else 
-		echo ' <b>Fehler beim Löschen der Antworten</b>';
 }
 
 // Antworten eines Gebietes einer Person löschen
@@ -309,9 +300,21 @@ if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 		}
 	}
 }
+// Antworten des Dummy Studenten löschen
+echo '<hr><br><a href="'.$_SERVER['PHP_SELF'].'?action=deletedummyanswers" onclick="return confirm(\'Dummyanworten wirklich löschen?\');">Antworten von Dieter Dummy löschen</a>';
+
+if(isset($_GET['action']) && $_GET['action']=='deletedummyanswers')
+{
+	$qry = "DELETE FROM testtool.tbl_antwort WHERE pruefling_id=841;
+			DELETE FROM testtool.tbl_pruefling_frage where pruefling_id=841;";
+	if($db->db_query($qry))
+		echo ' <b>Antworten wurden gelöscht</b>';
+	else 
+		echo ' <b>Fehler beim Löschen der Antworten</b>';
+}
 
 //Studiengang von Dummy Aendern
-echo '<hr><br>';
+echo '<br><br>';
 if(isset($_POST['savedummystg']) && isset($_POST['stg']))
 {
 	$qry = "UPDATE public.tbl_prestudent SET studiengang_kz=".$db->db_add_param($_POST['stg'])." WHERE prestudent_id='13478';
@@ -332,8 +335,7 @@ if($result = $db->db_query($qry))
 		$dummystg=$row->studiengang_kz;
 	}
 }
-echo "Prestudent Studiengang von $name ändern";
-echo '<form action="'.$_SERVER['PHP_SELF'].'" METHOD="POST">
+echo '<form action="'.$_SERVER['PHP_SELF'].'" METHOD="POST">Studiengang von '.$name.' 
 	<SELECT name="stg">';
 $stg_obj = new studiengang();
 $stg_obj->getAll('typ, kurzbz');
@@ -392,11 +394,10 @@ $('#prestudent_name').autocomplete('reihungstest_administration.php',
 // Uebersicht ueber die Teilgebiete der Studiengaenge
 echo '<hr><br>&Uuml;bersicht &uuml;ber die Teilgebiete der Studieng&auml;nge';
 
-
-
-//if(isset($_GET['action']) && $_GET['action']=='showreihungstests')
-
 $studiengang_kz = isset($_REQUEST['studiengang_kz'])?$_REQUEST['studiengang_kz']:1;
+$semester = isset($_REQUEST['semester'])?$_REQUEST['semester']:-1;
+$gesamtzeit = 0;
+$persoenlichkeit = false;
 
 echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">';
 $stg_obj = new studiengang();
@@ -412,108 +413,148 @@ foreach($stg_obj->result as $row)
 	echo '<OPTION value="'.$row->studiengang_kz.'" '.$selected.'>'.$row->kuerzel.' - '.$row->bezeichnung.'</OPTION>';
 }
 echo '</SELECT>';
+echo '<SELECT name="semester">
+<OPTION value="">-- Alle --</OPTION>';
+for ($i=0;$i<9;$i++)
+{
+	if ($semester==$i && $semester!='')
+		echo "<option value=\"$i\" selected>$i</option>";
+	else
+		echo "<option value=\"$i\">$i</option>";
+}		
+echo '</SELECT>';
 echo '&nbsp;&nbsp;<input type="submit" name="show" value="OK"></form><br>';
 
-$stsem = new studiensemester();
-$stsem->getFinished();
-foreach($stsem->studiensemester as $row)
-{
-	$qry="SELECT 
-			UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) as stg,
-			semester,
-			studiengang_kz,
-			reihung,
-			gebiet_id,
-			tbl_gebiet.bezeichnung,
-			zeit,
-			multipleresponse,
-			maxfragen,
-			zufallfrage,
-			zufallvorschlag,
-			level_start,
-			level_sprung_auf,
-			level_sprung_ab,
-			levelgleichverteilung,
-			maxpunkte,
-			antwortenprozeile 
-			FROM testtool.tbl_ablauf 
-			JOIN testtool.tbl_gebiet USING (gebiet_id) 
-			JOIN public.tbl_studiengang USING (studiengang_kz)
-			WHERE studiengang_kz=".$db->db_add_param($studiengang_kz)."
-			ORDER BY stg,semester,reihung";
-}
+$qry="SELECT 
+		UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) as stg,
+		semester,
+		studiengang_kz,
+		reihung,
+		gebiet_id,
+		tbl_gebiet.bezeichnung,
+		zeit,
+		multipleresponse,
+		maxfragen,
+		zufallfrage,
+		zufallvorschlag,
+		level_start,
+		level_sprung_auf,
+		level_sprung_ab,
+		levelgleichverteilung,
+		maxpunkte,
+		antwortenprozeile, 
+		(SELECT SUM (zeit) AS sum FROM testtool.tbl_gebiet JOIN testtool.tbl_ablauf USING (gebiet_id) WHERE studiengang_kz='".$studiengang_kz."'";
+		if ($semester!='') 
+			$qry.=" AND semester='".$semester."'";				
+		$qry.="	) AS gesamtzeit,
+		(SELECT SUM (zeit) AS sum FROM testtool.tbl_gebiet JOIN testtool.tbl_ablauf USING (gebiet_id) WHERE studiengang_kz='".$studiengang_kz."'";
+		if ($semester!='') 
+			$qry.=" AND semester='".$semester."'";				
+		$qry.="	)-'00:40:00'::time without time zone AS gesamtzeit_persoenlichkeit
+		FROM testtool.tbl_ablauf 
+		JOIN testtool.tbl_gebiet USING (gebiet_id) 
+		JOIN public.tbl_studiengang USING (studiengang_kz)
+		WHERE studiengang_kz='".$studiengang_kz."'";
+		if ($semester!='') 
+			$qry.=" AND semester='".$semester."'";
+		
+		$qry.=" ORDER BY stg,semester,reihung";
 
-if($result = $db->db_query($qry))
+//echo $qry;
+$row=$db->db_fetch_object($db->db_query($qry));
+$num_rows=$db->db_num_rows($db->db_query($qry));
+if ($studiengang_kz!=1 && $num_rows!=0)
 {
-	$num_rows=$db->db_num_rows($result);
-	
-/*	echo "<script type='text/javascript'>
-			$(document).ready(function() 
-				{ 
-				    $('#".$row->studiensemester."').tablesorter(
-					{
-						sortList: [[2,0]],
-						widgets: ['zebra']
-					}); 
-				} 
-			); 
-			</script>
-		<table id='".$row->studiensemester."' class='tablesorter' style='width:auto'>
-		<tbody>";*/
-	
-	echo "<table class='liste table-stripeclass:alternate table-autostripe' border='0' style='width:auto'>
-	
-		<tbody style='width:auto; padding-left:10px'>";
-	
-	echo "<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>STG</th>
-	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>SEM</th>
-	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>KZ</th>
-	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>NR</th>
-	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Gebiet_id</th>
-	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Bezeichnung</th>
-	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Zeit</th>
-	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'><div title='Multiple Response' style='cursor:help'>MR</div></th>
-	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Maxfragen</th>
-	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'><div title='Zufallsfrage' style='cursor:help'>ZFF</div></th>
-	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'><div title='Zufallsvorschlag' style='cursor:help'>ZFV</div></th>
-	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Level-Start</th>
-	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Level auf</th>
-	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Level ab</th>
-	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'><div title='Levelgleichverteilung' style='cursor:help'>LGV</div></th>
-	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Maxpunkte</th>
-	<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'><div title='Antwortenprozeile' style='cursor:help'>AWPZ</div></th>\n";
-	echo "</tr></thead>";
-	echo "<tbody>";
-	for($i=0;$i<$num_rows;$i++)
+	$gesamtzeit = $row->gesamtzeit;	
+	if($result = $db->db_query($qry))
 	{
-	   $row=$db->db_fetch_object($result);
-	   echo "<tr>";
-	   echo "<td>$row->stg</td>
-	   <td>$row->semester</td>
-	   <td>$row->studiengang_kz</td>
-	   <td>$row->reihung</td>
-	   <td>$row->gebiet_id</td>
-	   <td>$row->bezeichnung</td>
-	   <td>$row->zeit</td>
-	   <td align='center'><img src='../../skin/images/".($row->multipleresponse=='t'?'true.png':'false.png')."' height='20'></td>
-	   <td align='center'>$row->maxfragen</td>
-	   <td align='center'><img src='../../skin/images/".($row->zufallfrage=='t'?'true.png':'false.png')."' height='20'></td>
-	   <td align='center'><img src='../../skin/images/".($row->zufallvorschlag=='t'?'true.png':'false.png')."' height='20'></td>
-	   <td align='center'>$row->level_start</td>
-	   <td align='center'>$row->level_sprung_auf</td>
-	   <td align='center'>$row->level_sprung_ab</td>
-	   <td align='center'><img src='../../skin/images/".($row->levelgleichverteilung=='t'?'true.png':'false.png')."' height='20'></td>
-	   <td align='center'>$row->maxpunkte</td>
-	   <td align='center'>$row->antwortenprozeile</td>";
-	   echo "</tr>\n";
+		$num_rows=$db->db_num_rows($result);
+		echo "<table class='liste table-stripeclass:alternate table-autostripe' border='0' style='width:auto'>
+		
+			<tbody style='width:auto; padding-left:10px'>";
+		
+		echo "<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>STG</th>
+		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>SEM</th>
+		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>KZ</th>
+		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>NR</th>
+		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Gebiet_id</th>
+		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Bezeichnung</th>
+		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Zeit</th>
+		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'><div title='Multiple Response' style='cursor:help'>MR</div></th>
+		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Maxfragen</th>
+		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'><div title='Zufallsfrage' style='cursor:help'>ZFF</div></th>
+		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'><div title='Zufallsvorschlag' style='cursor:help'>ZFV</div></th>
+		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Level-Start</th>
+		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Level auf</th>
+		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Level ab</th>
+		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'><div title='Levelgleichverteilung' style='cursor:help'>LGV</div></th>
+		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Maxpunkte</th>
+		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'><div title='Antwortenprozeile' style='cursor:help'>AWPZ</div></th>\n";
+		echo "</tr></thead>";
+		echo "<tbody>";
+		for($i=0;$i<$num_rows;$i++)
+		{
+		   $row=$db->db_fetch_object($result);
+		   echo "<tr>";
+		   echo "<td>$row->stg</td>
+		   <td>$row->semester</td>
+		   <td>$row->studiengang_kz</td>
+		   <td>$row->reihung</td>
+		   <td>$row->gebiet_id</td>
+		   <td>$row->bezeichnung</td>";
+		   if ($row->gebiet_id==7)
+		   {
+		   		echo "<td>00:20:00*</td>";
+		   		$gesamtzeit = $row->gesamtzeit_persoenlichkeit; //Das Gebiet Persönlichkeit wird mit 20 Min. angezeigt und berechnet, läuft im System aber 60 Min.
+		   		$persoenlichkeit = true;
+		   }
+		   else 
+		   {
+		   		echo "<td>$row->zeit</td>";
+		   }	   	
+		   echo "<td align='center'><img src='../../skin/images/".($row->multipleresponse=='t'?'true.png':'false.png')."' height='20'></td>
+		   <td align='center'>$row->maxfragen</td>
+		   <td align='center'><img src='../../skin/images/".($row->zufallfrage=='t'?'true.png':'false.png')."' height='20'></td>
+		   <td align='center'><img src='../../skin/images/".($row->zufallvorschlag=='t'?'true.png':'false.png')."' height='20'></td>
+		   <td align='center'>$row->level_start</td>
+		   <td align='center'>$row->level_sprung_auf</td>
+		   <td align='center'>$row->level_sprung_ab</td>
+		   <td align='center'><img src='../../skin/images/".($row->levelgleichverteilung=='t'?'true.png':'false.png')."' height='20'></td>
+		   <td align='center'>$row->maxpunkte</td>
+		   <td align='center'>$row->antwortenprozeile</td>";
+		   echo "</tr>\n";
+		}
+		echo "<tr>";
+		echo "<td></td>";
+		echo "<td></td>";
+		echo "<td></td>";
+		echo "<td></td>";
+		echo "<td></td>";
+		echo "<td align='right'>Gesamt&nbsp;</td>";
+		echo "<td>".$gesamtzeit."</td>";
+		echo "<td></td>";
+		echo "<td></td>";
+		echo "<td></td>";
+		echo "<td></td>";
+		echo "<td></td>";
+		echo "<td></td>";
+		echo "<td></td>";
+		echo "<td></td>";
+		echo "<td></td>";
+		echo "<td></td>";
+		echo "</tr>\n";
 	}
+	else
+		echo "Kein Eintrag gefunden!";
 
+	echo "</tbody></table>";
+	if ($persoenlichkeit)
+		echo "<div style='font-size:smaller'>*Das Gebiet Persönlichkeit ist mit 60 Minuten eingestellt, kann aber in der Regel in 15-20 Minuten bearbeitet werden.</div>";
+	
+	echo "<br>";
 }
-else
-	echo "Kein Eintrag gefunden!";
 
-echo "</tbody></table>";
-echo "<br><br>";
+//Übersicht freigeschaltene Reihungstest
 echo '<hr>';
 echo 'Freigeschaltene Reihungstests:';
 
