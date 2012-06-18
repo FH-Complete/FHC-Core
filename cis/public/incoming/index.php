@@ -37,7 +37,7 @@ if (isset($_POST['userid']))
 		
 	session_start();
 	
-	$preincoming=$person->checkZugangscode($login); 
+	$preincoming=$person->checkZugangscodeIncoming($login); 
 	
 	//Zugangscode wird  überprüft
 	if($preincoming != false)
