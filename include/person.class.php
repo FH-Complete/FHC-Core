@@ -669,7 +669,7 @@ class person extends basis_db
 	 * Überprüft den übergebenen Zugangscode und retuniert die aktuelle incoming_id
 	 * @param $zugangscode
 	 */
-	public function checkZugangscode($zugangscode)
+	public function checkZugangscodeIncoming($zugangscode)
 	{
 		$qry ="
 			SELECT 
