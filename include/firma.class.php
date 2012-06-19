@@ -908,5 +908,47 @@ class firma extends basis_db
 			return false;
 		}
 	}
+    
+    /**
+     * Lädt Alle firmen die zu einem bestimmten mobilitaetsprogramm zugeordnet sind
+     * @param $mobilitaetsprogramm_code
+     * @return boolean 
+     */
+    function getFirmenMobilitaetsprogramm($mobilitaetsprogramm_code)
+    {
+        $qry = 'SELECT * FROM public.tbl_firma JOIN public.tbl_firma_mobilitaetsprogramm USING(firma_id) WHERE mobilitaetsprogramm_code ='.$this->db_add_param($mobilitaetsprogramm_code, FHC_STRING);
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+                $fi = new firma(); 
+                
+				$fi->firma_id = $row->firma_id;
+				$fi->name = $row->name;
+				$fi->anmerkung = $row->anmerkung;
+				$fi->firmentyp_kurzbz = $row->firmentyp_kurzbz;
+				$fi->updateamum = $row->updateamum;
+				$fi->updatevon = $row->updatevon;
+				$fi->insertamum = $row->insertamum;
+				$fi->insertvon = $row->insertvon;
+				$fi->ext_id = $row->ext_id;
+				$fi->schule = ($row->schule=='t'?true:false);
+				$fi->steuernummer = $row->steuernummer;				
+				$fi->gesperrt = ($row->gesperrt=='t'?true:false);
+				$fi->aktiv = ($row->aktiv=='t'?true:false);		
+				$fi->finanzamt = $row->finanzamt;				
+				
+                $this->result[] = $fi; 
+			}
+
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
+			return false;
+		}
+        
+    }
 }
 ?>
