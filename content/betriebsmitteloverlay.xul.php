@@ -183,6 +183,13 @@ else
 					      					<spacer flex="1" />
 					      				</hbox>
 									</row>
+									<row id="betriebsmittel-row-nummer2">
+										<label value="Nummer 2" control="betriebsmittel-textbox-nummer2"/>
+										<hbox>
+					      					<textbox id="betriebsmittel-textbox-nummer2" disabled="true" maxlength="12"/>
+					      					<spacer flex="1" />
+					      				</hbox>
+									</row>
 									<row id="betriebsmittel-row-beschreibung">
 										<label value="Beschreibung" control="betriebsmittel-textbox-beschreibung"/>
 				      					<textbox id="betriebsmittel-textbox-beschreibung" disabled="true" multiline="true"/>

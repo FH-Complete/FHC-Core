@@ -192,6 +192,7 @@ function BetriebsmittelAuswahl()
 	betriebsmitteltyp = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#betriebsmitteltyp" ));
 	inventarnummer = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#inventarnummer" ));
 	nummer = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#nummer" ));
+	nummer2 = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#nummer2" ));
 	beschreibung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#beschreibung" ));
 
 	document.getElementById('betriebsmittel-textbox-person_id').value=person_id;
@@ -207,6 +208,7 @@ function BetriebsmittelAuswahl()
 		document.getElementById('betriebsmittel-menulist-betriebsmitteltyp').value='Inventar';
 	document.getElementById('betriebsmittel-textbox-nummer').value=nummer;
 	document.getElementById('betriebsmittel-textbox-nummerold').value=nummer;
+	document.getElementById('betriebsmittel-textbox-nummer2').value=nummer2;
 	document.getElementById('betriebsmittel-textbox-beschreibung').value=beschreibung;
 	BetriebsmittelTypChange();
 	menulist = document.getElementById('betriebsmittel-menulist-inventarnummer');
@@ -235,6 +237,7 @@ function BetriebsmittelDetailDisableFields(val)
 {
 	document.getElementById('betriebsmittel-menulist-betriebsmitteltyp').disabled=val;
 	document.getElementById('betriebsmittel-textbox-nummer').disabled=val;
+	document.getElementById('betriebsmittel-textbox-nummer2').disabled=val;
 	document.getElementById('betriebsmittel-textbox-beschreibung').disabled=val;
 	document.getElementById('betriebsmittel-textbox-kaution').disabled=val;
 	document.getElementById('betriebsmittel-textbox-anmerkung').disabled=val;
@@ -254,6 +257,7 @@ function BetriebsmittelDetailResetFields()
 {
 	document.getElementById('betriebsmittel-menulist-betriebsmitteltyp').value='Zutrittskarte';
 	document.getElementById('betriebsmittel-textbox-nummer').value='';
+	document.getElementById('betriebsmittel-textbox-nummer2').value='';
 	document.getElementById('betriebsmittel-textbox-beschreibung').value='';
 	document.getElementById('betriebsmittel-textbox-kaution').value='';
 	document.getElementById('betriebsmittel-textbox-anmerkung').value='';
@@ -329,6 +333,7 @@ function BetriebsmittelDetailSpeichern()
 	betriebsmitteltyp = document.getElementById('betriebsmittel-menulist-betriebsmitteltyp').value;
 	nummer = document.getElementById('betriebsmittel-textbox-nummer').value;
 	nummerold = document.getElementById('betriebsmittel-textbox-nummerold').value;
+	nummer2 = document.getElementById('betriebsmittel-textbox-nummer2').value;
 	beschreibung = document.getElementById('betriebsmittel-textbox-beschreibung').value;
 	neu = document.getElementById('betriebsmittel-checkbox-neu').checked;
 	inventarnummer = MenulistGetSelectedValue('betriebsmittel-menulist-inventarnummer');
@@ -392,6 +397,7 @@ function BetriebsmittelDetailSpeichern()
 	req.add('betriebsmitteltyp', betriebsmitteltyp);
 	req.add('nummer', nummer);
 	req.add('nummerold', nummerold);
+	req.add('nummer2', nummer2);
 	req.add('beschreibung', beschreibung);
 	req.add('studiengang_kz', studiengang_kz);
 
@@ -453,12 +459,14 @@ function BetriebsmittelTypChange()
 	if(betriebsmitteltyp=='Inventar')
 	{
 		document.getElementById('betriebsmittel-row-nummer').hidden=true;
+		document.getElementById('betriebsmittel-row-nummer2').hidden=true;
 		document.getElementById('betriebsmittel-row-beschreibung').hidden=true;
 		document.getElementById('betriebsmittel-row-inventarnummer').hidden=false;
 	}
 	else
 	{
 		document.getElementById('betriebsmittel-row-nummer').hidden=false;
+		document.getElementById('betriebsmittel-row-nummer2').hidden=false;
 		document.getElementById('betriebsmittel-row-beschreibung').hidden=false;
 		document.getElementById('betriebsmittel-row-inventarnummer').hidden=true;
 	}

@@ -122,6 +122,7 @@ else
 		<nachname><![CDATA['.$person->nachname.']]></nachname>
 		<titelpost><![CDATA['.$person->titelpost.']]></titelpost>
 		<nummer><![CDATA['.$bmp->nummer.']]></nummer>
+		<nummer2><![CDATA['.$bmp->nummer2.']]></nummer2>
 		<betriebsmitteltyp><![CDATA['.$bmp->betriebsmitteltyp.']]></betriebsmitteltyp>
 		<typ><![CDATA['.$typ.']]></typ>
 	</betriebsmittelperson>
@@ -140,6 +141,7 @@ function draw_content($row)
             <BTM:beschreibung><![CDATA['.$row->beschreibung.']]></BTM:beschreibung>
             <BTM:betriebsmitteltyp><![CDATA['.$row->betriebsmitteltyp.']]></BTM:betriebsmitteltyp>
             <BTM:nummer><![CDATA['.$row->nummer.']]></BTM:nummer>
+            <BTM:nummer2><![CDATA['.$row->nummer2.']]></BTM:nummer2>
             <BTM:inventarnummer><![CDATA['.$row->inventarnummer.']]></BTM:inventarnummer>
             <BTM:reservieren><![CDATA['.($row->reservieren?'Ja':'Nein').']]></BTM:reservieren>
             <BTM:ort_kurzbz><![CDATA['.$row->ort_kurzbz.']]></BTM:ort_kurzbz>            

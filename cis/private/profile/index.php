@@ -197,14 +197,14 @@ if(!($ansicht && $user->foto_sperre))
 if(!$ansicht)
 	echo "<br><a href='#BildUpload' onclick='window.open(\"../bildupload.php?person_id=$user->person_id\",\"BildUpload\", \"height=500,width=500,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\"); return false;'>".$p->t('profil/bildHochladen')."</a>";
 if($user->foto_sperre)
-	echo '<br><b>Profilfoto gesperrt</b>';
+	echo '<br><b>'.$p->t('profil/profilfotoGesperrt').'</b>';
 	
 if(!$ansicht)
 {
 	if($user->foto_sperre)
-		echo '<br><a href="'.$_SERVER['PHP_SELF'].'?action=foto_freigabe">'.$p->t('profil/fotofreigeben').'</a>';
+		echo '<br><a href="'.$_SERVER['PHP_SELF'].'?action=foto_freigabe" title="'.$p->t('profil/infotextSperre').'">'.$p->t('profil/fotofreigeben').'</a>';
 	else
-		echo '<br><a href="'.$_SERVER['PHP_SELF'].'?action=foto_sperre">'.$p->t('profil/fotosperren').'</a>';
+		echo '<br><a href="'.$_SERVER['PHP_SELF'].'?action=foto_sperre" title="'.$p->t('profil/infotextSperre').'">'.$p->t('profil/fotosperren').'</a>';
 }
 	
 echo '</td></tr></table>';
