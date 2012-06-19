@@ -3597,14 +3597,14 @@ if(!@$db->db_query("SELECT foto_sperre FROM public.tbl_person LIMIT 1"))
 }
 
 // nummer_myfare in Tabelle Betriebsmittel
-if(!@$db->db_query("SELECT nummer_myfare FROM wawi.tbl_betriebsmittel LIMIT 1"))
+if(!@$db->db_query("SELECT nummer2 FROM wawi.tbl_betriebsmittel LIMIT 1"))
 {
-    $qry = "ALTER TABLE wawi.tbl_betriebsmittel ADD COLUMN nummer_myfare varchar(32);";
+    $qry = "ALTER TABLE wawi.tbl_betriebsmittel ADD COLUMN nummer2 varchar(32);";
     
     if(!$db->db_query($qry))
         echo '<strong>wawi.tbl_betriebsmittel: '.$db->db_last_error().'</strong><br>';
     else
-        echo 'Tabelle wawi.tbl_betriebsmittel Spalte nummer_myfare hinzugefuegt';
+        echo 'Tabelle wawi.tbl_betriebsmittel Spalte nummer2 hinzugefuegt';
 }
 
 // View fuer Testtool Auswertung

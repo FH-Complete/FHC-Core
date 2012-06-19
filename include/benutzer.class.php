@@ -318,5 +318,47 @@ class benutzer extends person
 			return false;
 		}
 	}
+	
+	/**
+	 * Laedt alle Benutzer einer Person
+	 * @param $person_id
+	 * @param $aktiv optional wenn true werden nur aktive benutzer geladen, sonst alle
+	 */
+	function getBenutzerFromPerson($person_id, $aktiv=true)
+	{
+		$qry = "SELECT 
+					person_id, titelpre, vorname, nachname, titelpost, uid
+				FROM 
+					public.tbl_benutzer
+					JOIN public.tbl_person USING(person_id)
+				WHERE
+					person_id=".$this->db_add_param($person_id, FHC_INTEGER);
+		if($aktiv)
+			$qry.=" AND tbl_benutzer.aktiv=true ";
+		
+		$qry .= "ORDER BY tbl_person.insertamum";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new benutzer();
+				
+				$obj->person_id = $row->person_id;
+				$obj->titelpre = $row->titelpre;
+				$obj->vorname  = $row->vorname;
+				$obj->nachname = $row->nachname;
+				$obj->titelpost = $row->titelpost;
+				$obj->uid = $row->uid;
+				
+				$this->result[] = $obj;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>

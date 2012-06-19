@@ -52,6 +52,7 @@ class betriebsmittelperson extends basis_db
 	public $betriebsmitteltyp;
 	public $beschreibung;
 	public $oe_kurzbz;	
+	public $nummer2;
 	
 	/**
 	 * Konstruktor
@@ -83,7 +84,7 @@ class betriebsmittelperson extends basis_db
 					tbl_betriebsmittel.*,
 					tbl_betriebsmittelperson.*
 				FROM wawi.tbl_betriebsmittel JOIN wawi.tbl_betriebsmittelperson USING(betriebsmittel_id) 
-				WHERE betriebsmittelperson_id='".addslashes($betriebsmittelperson_id)."'";
+				WHERE betriebsmittelperson_id=".$this->db_add_param($betriebsmittelperson_id, FHC_INTEGER);
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -94,7 +95,7 @@ class betriebsmittelperson extends basis_db
 				$this->betriebsmitteltyp = $row->betriebsmitteltyp;
 				$this->nummer = $row->nummer;
 				$this->inventarnummer = $row->inventarnummer;
-				$this->reservieren = ($row->reservieren=='t'?true:false);
+				$this->reservieren = $this->db_parse_bool($row->reservieren);
 				$this->person_id = $row->person_id;
 				$this->anmerkung = $row->anmerkung;
 				$this->kaution = $row->kaution;
@@ -107,17 +108,18 @@ class betriebsmittelperson extends basis_db
 				$this->ext_id = $row->ext_id;
 				$this->ort_kurzbz = $row->ort_kurzbz;
 				$this->oe_kurzbz = $row->oe_kurzbz;
+				$this->nummer2 = $row->nummer2;
 				return true;
 			}
 			else 
 			{
-				$this->errormsg = 'Es wurde kein passender Datensatz gefunden '.($this->debug?$this->db_last_error()."<br />$qry<br />":'');
+				$this->errormsg = 'Es wurde kein passender Datensatz gefunden';
 				return false;
 			}
 		}	
 		else 
 		{
-			$this->errormsg = 'Fehler beim Laden der Daten '.($this->debug?$this->db_last_error()."<br />$qry<br />":'');
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}		
 	}
@@ -187,36 +189,36 @@ class betriebsmittelperson extends basis_db
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO wawi.tbl_betriebsmittelperson (betriebsmittel_id, person_id, anmerkung, kaution, 
 			ausgegebenam, retouram, ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
-			     $this->addslashes($this->betriebsmittel_id).', '.
-			     $this->addslashes($this->person_id).', '.
-			     $this->addslashes($this->anmerkung).', '.
-			     $this->addslashes($this->kaution).', '.
-			     $this->addslashes($this->ausgegebenam).', '.
-			     $this->addslashes($this->retouram).', '.
-			     $this->addslashes($this->ext_id).',  now(), '.
-			     $this->addslashes($this->insertvon).', now(), '.
-			     $this->addslashes($this->updatevon).');';
+			     $this->db_add_param($this->betriebsmittel_id, FHC_INTEGER).', '.
+			     $this->db_add_param($this->person_id, FHC_INTEGER).', '.
+			     $this->db_add_param($this->anmerkung).', '.
+			     $this->db_add_param($this->kaution).', '.
+			     $this->db_add_param($this->ausgegebenam).', '.
+			     $this->db_add_param($this->retouram).', '.
+			     $this->db_add_param($this->ext_id).',  now(), '.
+			     $this->db_add_param($this->insertvon).', now(), '.
+			     $this->db_add_param($this->updatevon).');';
 		}
 		else
 		{	
 			//Pruefen ob betriebsmittelperson_id eine gueltige Zahl ist
 			if(!is_numeric($this->betriebsmittelperson_id))
 			{
-				$this->errormsg = 'betriebsmittel_id und Person_id muessen gueltige Zahlen sein '.($this->debug?$this->db_last_error()."<br />$qry<br />":'');
+				$this->errormsg = 'betriebsmittel_id und Person_id muessen gueltige Zahlen sein';
 				return false;
 			}
 						
 			$qry='UPDATE wawi.tbl_betriebsmittelperson SET '.
-				'betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).', '. 
-				'person_id='.$this->addslashes($this->person_id).', '. 
-				'anmerkung='.$this->addslashes($this->anmerkung).', '. 
-				'kaution='.$this->addslashes($this->kaution).', '. 
-				'ausgegebenam='.$this->addslashes($this->ausgegebenam).', '.
-				'retouram='.$this->addslashes($this->retouram).', '.
-				'ext_id='.$this->addslashes($this->ext_id).', '. 
+				'betriebsmittel_id='.$this->db_add_param($this->betriebsmittel_id, FHC_INTEGER).', '. 
+				'person_id='.$this->db_add_param($this->person_id, FHC_INTEGER).', '. 
+				'anmerkung='.$this->db_add_param($this->anmerkung).', '. 
+				'kaution='.$this->db_add_param($this->kaution).', '. 
+				'ausgegebenam='.$this->db_add_param($this->ausgegebenam).', '.
+				'retouram='.$this->db_add_param($this->retouram).', '.
+				'ext_id='.$this->db_add_param($this->ext_id).', '. 
 				'updateamum= now(), '.
-				'updatevon='.$this->addslashes($this->updatevon).' '.
-				'WHERE betriebsmittelperson_id='.$this->addslashes($this->betriebsmittelperson_id).';';
+				'updatevon='.$this->db_add_param($this->updatevon).' '.
+				'WHERE betriebsmittelperson_id='.$this->db_add_param($this->betriebsmittelperson_id, FHC_INTEGER).';';
 		}
 		
 		if($this->db_query($qry))
@@ -249,7 +251,7 @@ class betriebsmittelperson extends basis_db
 		}
 		else 
 		{
-			$this->errormsg = "Fehler beim Speichern der Betriebsmittelperson ".($this->debug?$this->db_last_error()."<br />$qry<br />":'');;			
+			$this->errormsg = 'Fehler beim Speichern der Betriebsmittelperson';			
 			return false;
 		}
 	}
@@ -268,12 +270,12 @@ class betriebsmittelperson extends basis_db
 		}
 		
 		$qry = 'DELETE FROM wawi.tbl_betriebsmittelperson 
-				WHERE betriebsmittelperson_id='.$this->addslashes($betriebsmittelperson_id);
+				WHERE betriebsmittelperson_id='.$this->db_add_param($betriebsmittelperson_id, FHC_INTEGER);
 		if($this->db_query($qry))
 			return true;
 		else
 		{
-			$this->errormsg = 'Fehler beim Loeschen der Daten '.($this->debug?$this->db_last_error()."<br />$qry<br />":'');;
+			$this->errormsg = 'Fehler beim Loeschen der Daten';
 			return false;
 		}
 	}
@@ -292,12 +294,12 @@ class betriebsmittelperson extends basis_db
 		}
 		
 		$qry = 'DELETE FROM wawi.tbl_betriebsmittelperson 
-				WHERE betriebsmittel_id='.$this->addslashes($betriebsmittel_id);
+				WHERE betriebsmittel_id='.$this->db_add_param($betriebsmittel_id, FHC_INTEGER);
 		if($this->db_query($qry))
 			return true;
 		else
 		{
-			$this->errormsg = 'Fehler beim Loeschen der Daten '.($this->debug?$this->db_last_error()."<br />$qry<br />":'');;
+			$this->errormsg = 'Fehler beim Loeschen der Daten';
 			return false;
 		}
 	}
@@ -319,9 +321,9 @@ class betriebsmittelperson extends basis_db
 			return false;
 		}
 		$qry = "SELECT * FROM wawi.tbl_betriebsmittel JOIN wawi.tbl_betriebsmittelperson USING(betriebsmittel_id) 
-				WHERE person_id='".addslashes($person_id)."'";
+				WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 		if(!is_null($betriebsmitteltyp))
-			$qry.=" AND betriebsmitteltyp='".addslashes($betriebsmitteltyp)."'";
+			$qry.=" AND betriebsmitteltyp=".$this->db_add_param($betriebsmitteltyp);
 		$qry.=" ORDER BY betriebsmitteltyp, nummer";
 		
 		if($this->db_query($qry))
@@ -336,7 +338,7 @@ class betriebsmittelperson extends basis_db
 				$bm->betriebsmitteltyp = $row->betriebsmitteltyp;
 				$bm->nummer = $row->nummer;
 				$bm->inventarnummer = $row->inventarnummer;
-				$bm->reservieren = ($row->reservieren=='t'?true:false);
+				$bm->reservieren = $this->db_parse_bool($row->reservieren);
 				$bm->ort_kurzbz = $row->ort_kurzbz;
 				$bm->person_id = $row->person_id;
 				$bm->anmerkung = $row->anmerkung;
@@ -348,7 +350,8 @@ class betriebsmittelperson extends basis_db
 				$bm->updateamum = $row->updateamum;
 				$bm->updatevon = $row->updatevon;
 				$bm->ext_id = $row->ext_id;
-				$bm->oe_kurzbz = $row->oe_kurzbz;					
+				$bm->oe_kurzbz = $row->oe_kurzbz;
+				$bm->nummer2 = $row->nummer2;					
 				$this->result[] = $bm;
 			}
 			
@@ -356,7 +359,7 @@ class betriebsmittelperson extends basis_db
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim Laden der Daten '.($this->debug?$this->db_last_error()."<br />$qry<br />":'');;
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
@@ -379,14 +382,18 @@ class betriebsmittelperson extends basis_db
 			return false;
 		}
 		
-		$qry='';
-		$qry.='SELECT * ';
-		$qry.=' FROM wawi.tbl_betriebsmittel JOIN wawi.tbl_betriebsmittelperson USING(betriebsmittel_id)'; 
-		$qry.=' WHERE betriebsmittel_id='.$this->addslashes($betriebsmittel_id);
+		$qry='
+			SELECT 
+				* 
+			FROM 
+				wawi.tbl_betriebsmittel 
+				JOIN wawi.tbl_betriebsmittelperson USING(betriebsmittel_id) 
+			WHERE betriebsmittel_id='.$this->db_add_param($betriebsmittel_id, FHC_INTEGER);
+		
 		if(!is_null($person_id))
-			$qry.=" AND person_id=".$this->addslashes($person_id);
-		$qry.=' ORDER BY ausgegebenam desc, retouram desc ';
-		$qry.=' LIMIT 1';
+			$qry.=" AND person_id=".$this->db_add_param($person_id, FHC_INTEGER);
+			
+		$qry.=' ORDER BY ausgegebenam desc, retouram desc LIMIT 1';
 		
 		if($this->db_query($qry))
 		{
@@ -398,7 +405,7 @@ class betriebsmittelperson extends basis_db
 				$this->betriebsmitteltyp = $row->betriebsmitteltyp;
 				$this->nummer = $row->nummer;
 				$this->inventarnummer = $row->inventarnummer;
-				$this->reservieren = ($row->reservieren=='t'?true:false);
+				$this->reservieren = $this->db_parse_bool($row->reservieren);
 				$this->ort_kurzbz = $row->ort_kurzbz;
 				$this->person_id = $row->person_id;
 				$this->anmerkung = $row->anmerkung;
@@ -410,7 +417,8 @@ class betriebsmittelperson extends basis_db
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->ext_id = $row->ext_id;
-				$this->oe_kurzbz = $row->oe_kurzbz;				
+				$this->oe_kurzbz = $row->oe_kurzbz;		
+				$this->nummer2 = $row->nummer2;		
 				return true;	
 			}
 			else 
@@ -421,7 +429,7 @@ class betriebsmittelperson extends basis_db
 		}	
 		else 
 		{
-			$this->errormsg = 'Fehler beim Laden der Daten '.($this->debug?$this->db_last_error()."<br> $qry <br>":'');
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}		
 	}
@@ -441,11 +449,14 @@ class betriebsmittelperson extends basis_db
 			$this->errormsg = 'Betriebsmittel_id ist ungueltig';
 			return false;
 		}
-		$qry='';
-		$qry.='SELECT * ';
-		$qry.=' FROM wawi.tbl_betriebsmittel JOIN wawi.tbl_betriebsmittelperson USING(betriebsmittel_id)'; 
-		$qry.=' WHERE betriebsmittel_id='.$this->addslashes($betriebsmittel_id);
-		$qry.=' ORDER BY ausgegebenam desc, retouram desc';
+		$qry='
+			SELECT 
+				*
+			FROM 
+				wawi.tbl_betriebsmittel 
+				JOIN wawi.tbl_betriebsmittelperson USING(betriebsmittel_id) 
+			WHERE betriebsmittel_id='.$this->db_add_param($betriebsmittel_id, FHC_INTEGER).'
+			ORDER BY ausgegebenam desc, retouram desc';
 
 		if($this->db_query($qry))
 		{
@@ -459,7 +470,7 @@ class betriebsmittelperson extends basis_db
 				$bm->betriebsmitteltyp = $row->betriebsmitteltyp;
 				$bm->nummer = $row->nummer;
 				$bm->inventarnummer = $row->inventarnummer;
-				$bm->reservieren = ($row->reservieren=='t'?true:false);
+				$bm->reservieren = $this->db_parse_bool($row->reservieren);
 				$bm->ort_kurzbz = $row->ort_kurzbz;
 				$bm->person_id = $row->person_id;
 				$bm->anmerkung = $row->anmerkung;
@@ -472,6 +483,7 @@ class betriebsmittelperson extends basis_db
 				$bm->updatevon = $row->updatevon;
 				$bm->ext_id = $row->ext_id;
 				$bm->oe_kurzbz = $row->oe_kurzbz;
+				$bm->nummer2 = $row->nummer2;
 				$this->result[] = $bm;
 			}
 
@@ -479,7 +491,65 @@ class betriebsmittelperson extends basis_db
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim Laden der Daten '.($this->debug?$this->db_last_error()."<br />$qry<br />":'');;
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Sucht welche Person die uebergebene Kartennummer hat
+	 * @param  $nummer Kartennummer
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getKartenzuordnung($nummer)
+	{
+		$qry='
+			SELECT 
+				*
+			FROM 
+				wawi.tbl_betriebsmittel 
+				JOIN wawi.tbl_betriebsmittelperson USING(betriebsmittel_id) 
+			WHERE tbl_betriebsmittel.nummer='.$this->db_add_param($nummer).'
+			AND (ausgegebenam<=now() OR ausgegebenam is NULL) 
+			AND (retouram>=now() OR retouram is NULL)';
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->betriebsmittelperson_id = $row->betriebsmittelperson_id;
+				$this->betriebsmittel_id = $row->betriebsmittel_id;
+				$this->beschreibung = $row->beschreibung;
+				$this->betriebsmitteltyp = $row->betriebsmitteltyp;
+				$this->nummer = $row->nummer;
+				$this->inventarnummer = $row->inventarnummer;
+				$this->reservieren = $this->db_parse_bool($row->reservieren);
+				$this->ort_kurzbz = $row->ort_kurzbz;
+				$this->person_id = $row->person_id;
+				$this->anmerkung = $row->anmerkung;
+				$this->kaution = $row->kaution;
+				$this->ausgegebenam = $row->ausgegebenam;
+				$this->retouram = $row->retouram;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->ext_id = $row->ext_id;
+				$this->oe_kurzbz = $row->oe_kurzbz;
+				$this->nummer2 = $row->nummer2;
+				
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Karte ist derzeit nicht ausgegeben';
+				return false;
+			}
+			
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}

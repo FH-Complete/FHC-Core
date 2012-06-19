@@ -52,10 +52,12 @@ Sollte innerhalb der nächsten Tagen keine neuerliche Aktivierung Ihres Benutzer
 - Ihr Home-Verzeichnis (inkl. aller Dateien) gelöscht.<br><br>Falls es sich bei der Deaktivierung um einen Irrtum handelt, würden wir Sie bitten, 
 sich umgehend mit Ihrer Studiengangsassistenz in Verbindung zu setzen.<br>';
 
-$this->phrasen['profil/nurJPGBilder']='Derzeit koennen nur Bilder im JPG Format hochgeladen werden';
+$this->phrasen['profil/nurJPGBilder']='Derzeit können nur Bilder im JPG Format hochgeladen werden';
 $this->phrasen['profil/BilduploadInfotext']='Derzeit können nur Bilder im JPG Format mit einer Maximalgröße von 15MB hochgeladen werden!<br><br><b>Bitte beachten Sie die <a href="../../cms/content.php?content_id=%s">Richtlinien für den Bildupload</a></b>';
-$this->phrasen['profil/Bild']='Bild';
+$this->phrasen['profil/Bild']='Profilfoto';
 $this->phrasen['profil/Bildupload']='Bildupload';
 $this->phrasen['profil/fotofreigeben']='Sperre des Profilfotos aufheben';
-$this->phrasen['profil/fotosperren']='Profilfoto für interne Zwecke sperren';
+$this->phrasen['profil/fotosperren']='Profilfoto sperren';
+$this->phrasen['profil/infotextSperre']='Gesperrte Profilbilder werden nur für Zutrittskarten verwendet und scheinen nicht auf Anwesenheitslisten oder in der Personensuche auf';
+$this->phrasen['profil/profilfotoGesperrt']='Profilfoto gesperrt';
 ?>

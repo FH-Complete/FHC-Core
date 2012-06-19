@@ -1810,6 +1810,7 @@ if(!$error)
 							{
 								$bm->beschreibung = $_POST['beschreibung'];
 								$bm->nummer = $_POST['nummer'];
+								$bm->nummer2 = $_POST['nummer2'];
 								if(!$bm->save(false))
 								{
 									$return = false;
@@ -1829,6 +1830,7 @@ if(!$error)
 							//Wenn kein Eintrag gefunden wurde, dann wird ein neuer Eintrag angelegt
 							$bm->betriebsmitteltyp = $_POST['betriebsmitteltyp'];
 							$bm->nummer = $_POST['nummer'];
+							$bm->nummer2 = $_POST['nummer2'];
 							$bm->beschreibung = $_POST['beschreibung'];
 							$bm->reservieren = false;
 							$bm->ort_kurzbz = null;
