@@ -41,8 +41,9 @@ $outgoing->loadUid($uid);
 
 // speichert outgoing
 if(isset($_REQUEST['submitOutgoing']))
-{
+{  
     $ansprechpersonUid = (isset($_REQUEST['ansprechperson_uid']))?$_REQUEST['ansprechperson_uid']:'';
+
     $datum=new datum(); 
     $zeitraum_von = $datum->formatDatum($_REQUEST['zeitraum_von'], 'Y-m-d');
     $zeitraum_bis = $datum->formatDatum($_REQUEST['zeitraum_bis'], 'Y-m-d');
@@ -50,37 +51,35 @@ if(isset($_REQUEST['submitOutgoing']))
     $preoutgoing = new preoutgoing(); 
     $preoutgoing->loadUid($outgoing->uid);
     
+    // löschen der Ansprechperson
+    if($_POST['ansprechperson']==' ' || $_POST['ansprechperson']=='' || $_POST['ansprechperson_uid'] == '')
+        $ansprechpersonUid  = '';
+    
     $preoutgoing->new = false; 
     $preoutgoing->ansprechperson = $ansprechpersonUid; 
     $preoutgoing->dauer_von = $zeitraum_von; 
     $preoutgoing->dauer_bis = $zeitraum_bis; 
+    $preoutgoing->anmerkung_student = $_POST['anmerkung'];
     $preoutgoing->updatevon = $uid; 
     
     if($preoutgoing->save())
-    {
-        // Email an Auslandsabteilung schicken
-        sendMailInternational();
         $message='<span class="ok">'.$p->t('global/erfolgreichgespeichert').'</span>';
-    }
     else
         $message='<span class="error">'.$p->t('global/fehlerBeimSpeichernDerDaten').'</span>';
 }
 
 // Updated die Daten des Preoutgoing
 if(isset($_REQUEST['zDaten']))
-{
+{   
     $preoutgoingZDaten = new preoutgoing(); 
     $preoutgoingZDaten->load($outgoing->preoutgoing_id);
-    // ERASMUS Daten 
+
+    $datum=new datum(); 
+    // wenn sprachkurs gesetzt -> erasmus programm
     if(isset($_REQUEST['sprachkurs']))
     {
-        $datum=new datum(); 
         $preoutgoingZDaten->sprachkurs_von = $datum->formatDatum($_REQUEST['sprachkurs_von'], 'Y-m-d');
         $preoutgoingZDaten->sprachkurs_bis = $datum->formatDatum($_REQUEST['sprachkurs_bis'], 'Y-m-d');
-        $preoutgoingZDaten->praktikum_von = $datum->formatDatum($_REQUEST['praktikum_von'], 'Y-m-d');
-        $preoutgoingZDaten->praktikum_bis = $datum->formatDatum($_REQUEST['praktikum_bis'], 'Y-m-d');        
-        $preoutgoingZDaten->praktikum = isset($_REQUEST['praktikum'])?true:false; 
-        
         if($_REQUEST['sprachkurs'] == 'vorbereitend')
         {
             $preoutgoingZDaten->sprachkurs = true; 
@@ -95,14 +94,22 @@ if(isset($_REQUEST['zDaten']))
         {
             $preoutgoingZDaten->sprachkurs = false; 
             $preoutgoingZDaten->intensivsprachkurs = false;
-        }
-            
+        } 
     }
+    
+    $preoutgoingZDaten->praktikum_von = $datum->formatDatum($_REQUEST['praktikum_von'], 'Y-m-d');
+    $preoutgoingZDaten->praktikum_bis = $datum->formatDatum($_REQUEST['praktikum_bis'], 'Y-m-d');        
+    $preoutgoingZDaten->praktikum = isset($_REQUEST['praktikum'])?true:false; 
+    $betreuer = isset($_POST['betreuer_uid'])?$_POST['betreuer_uid']:'';
+    
+    if($_POST['betreuer']==' ' || $_POST['betreuer']=='' || $_POST['betreuer_uid'] == '')
+        $betreuer = '';
     $preoutgoingZDaten->bachelorarbeit = isset($_REQUEST['bachelorarbeit'])?true:false; 
     $preoutgoingZDaten->masterarbeit = isset($_REQUEST['masterarbeit'])?true:false; 
     $preoutgoingZDaten->behinderungszuschuss = isset($_REQUEST['behinderungszuschuss'])?true:false; 
     $preoutgoingZDaten->studienbeihilfe = isset($_REQUEST['studienbeihilfe'])?true:false; 
-    $preoutgoingZDaten->betreuer = $_REQUEST['betreuer_uid'];
+    $preoutgoingZDaten->betreuer = $betreuer; 
+    $preoutgoingZDaten->studienrichtung_gastuniversitaet = $_REQUEST['studienrichtungGastuni'];
     $preoutgoingZDaten->new = false; 
     if(!$preoutgoingZDaten->save())
         $message='<span class="error">'.$p->t('global/fehlerBeimSpeichernDerDaten').'</span>';
@@ -125,16 +132,20 @@ if($method=='new')
     $preoutgoing->studienbeihilfe = false; 
     $preoutgoing->insertvon = $uid; 
     if($preoutgoing->save())
+    {
+        // Email an Auslandsabteilung schicken
+        sendMailInternational();
         $message='<span class="ok">'.$p->t('global/erfolgreichAngelegt').'</span>';
+    }
     else
         die($preoutgoing->errormsg);
 }
 
 // speichert die eingegebene Lehrveranstaltung
-if($method == 'saveLv')
+if(isset($_POST['saveLv']) == 'saveLv')
 {    
-    $bezeichnung = $_GET['bezeichnung'];
-    $ects = $_GET['ects'];
+    $bezeichnung = $_POST['lv_bezeichnung'];
+    $ects = $_POST['lv_ects'];
     
     $preoutgoingLv = new preoutgoing(); 
     $preoutgoingLv->preoutgoing_id = $outgoing->preoutgoing_id;
@@ -258,7 +269,6 @@ if($method =="deleteFirma")
              
             $("#myTable").tablesorter(
             {
-                sortList: [[0,0]],
                 widgets: ["zebra"]
             }); 
             $("#myTableFiles").tablesorter(
@@ -320,7 +330,7 @@ if(isset($_GET['ansicht']) == 'auswahl')
 ?>  
     <table border ="0" width="100%">
         <tr>
-            <td align="left" colspan="4"><b><h1><div style="display:block; text-align:left; float:left;"><?php echo $p->t('outgoing/outgoingRegistration'); ?></div><div style="display:block; text-align:right; margin-right:6px; "><?php echo $p->t('profil/student').': '.$name; ?></div></h1></b></td>
+            <td align="left" colspan="4"><b><h1><div style="display:block; text-align:left; float:left;"><?php echo $p->t('incoming/outgoingRegistration'); ?></div><div style="display:block; text-align:right; margin-right:6px; "><?php echo $p->t('profil/student').': '.$name; ?></div></h1></b></td>
         </tr>
         <tr><td><?php echo $message; ?></td></tr>
         <tr><td><h3><?php echo $p->t('incoming/programmAuswahl');?>:</h3></td><td><div style="display:block; text-align:right; margin-right:6px; "><a href="<?php echo $_SERVER['PHP_SELF']; ?>?method=new&ansicht=auswahl" align ="left"><?php echo $p->t('incoming/neuenOutgoingAnlegen'); ?></a></div></td></tr>
@@ -335,13 +345,13 @@ if(isset($_GET['ansicht']) == 'auswahl')
                         <td>ERASMUS</td>
                     </tr>
                     <tr>
-                        <td><SELECT name="auswahl_erasmus"> 
+                        <td><SELECT name="auswahl_erasmus" style="width: 90%" onchange="saveFirma(this.value, '7')"> 
                         <option value="erasmus_auswahl">-- select --</option>
                     <?php 
-                    $firma = new firma(); 
-                    $firma->getFirmen('Partneruniversität');
-                    foreach($firma->result as $fi)
-                        echo'<option value="'.$fi->firma_id.'" onclick="saveFirma('.$fi->firma_id.',7)">'.$fi->name.'</option>';
+                    $firmaErasmus = new firma(); 
+                    $firmaErasmus->getFirmenMobilitaetsprogramm('7');
+                    foreach($firmaErasmus->result as $fi)
+                        echo'<option value="'.$fi->firma_id.'">'.$fi->name.'</option>';
                     ?>
                         </td>
                     </tr>
@@ -351,13 +361,13 @@ if(isset($_GET['ansicht']) == 'auswahl')
                         <td>CEEPUS</td>
                     </tr>  
                     <tr>
-                        <td><SELECT name="auswahl_ceepus"> 
+                        <td><SELECT name="auswahl_ceepus" style="width: 90%" onchange="saveFirma(this.value, '6')" > 
                         <option value="ceepus_auswahl">-- select --</option>
                     <?php 
-                    $firma = new firma(); 
-                    $firma->getFirmen('Partneruniversität');
-                    foreach($firma->result as $fi)
-                        echo'<option value="'.$fi->firma_id.'" onclick="saveFirma('.$fi->firma_id.', 6)">'.$fi->name.'</option>';
+                    $firmaCeepus = new firma(); 
+                    $firmaCeepus->getFirmenMobilitaetsprogramm('6');
+                    foreach($firmaCeepus->result as $fi)
+                        echo'<option value="'.$fi->firma_id.'">'.$fi->name.'</option>';
                     ?>
                         </td>
                     </tr>
@@ -367,13 +377,13 @@ if(isset($_GET['ansicht']) == 'auswahl')
                         <td>Sonstige</td>
                     </tr>
                     <tr>
-                        <td><SELECT name="auswahl_sonstige"> 
+                        <td><SELECT name="auswahl_sonstige" style="width: 90%" onchange="saveFirma(this.value, '30')"> 
                         <option value="sonstige_auswahl">-- select --</option>
                     <?php 
-                    $firma = new firma(); 
-                    $firma->getFirmen('Partneruniversität');
-                    foreach($firma->result as $fi)
-                        echo'<option value="'.$fi->firma_id.'" onclick="saveFirma('.$fi->firma_id.', 30)">'.$fi->name.'</option>';
+                    $firmaSonstige = new firma(); 
+                    $firmaSonstige->getFirmenMobilitaetsprogramm('30');
+                    foreach($firmaSonstige->result as $fi)
+                        echo'<option value="'.$fi->firma_id.'">'.$fi->name.'</option>';
                     ?>
                         </td>
                     </tr>
@@ -414,14 +424,19 @@ if(isset($_GET['ansicht']) == 'auswahl')
                             
                             $mobilitätsprogramm = new mobilitaetsprogramm(); 
                             $mobilitätsprogramm->load($fi->mobilitaetsprogramm_code);
+                            if($mobilitätsprogramm->kurzbz == '')
+                                $mobprogramm = 'SUMMERSCHOOL';
+                            else
+                                $mobprogramm = $mobilitätsprogramm->kurzbz; 
+                            
                             if($fi->name == '')
                             {
                                 if(!$outgoing->checkStatus($outgoing->preoutgoing_id, 'freigabe'))
                                     $link = "<a href='".$_SERVER['PHP_SELF']."?method=deleteFirma&outgoingFirma_id=".$fi->preoutgoing_firma_id."&ansicht=auswahl'>delete</a>";
                                 
-                                echo " <tr><td ".$style.">".$i.": ".$firmaAuswahl->name." [".$mobilitätsprogramm->kurzbz."] $link </td></tr>";
+                                echo " <tr><td ".$style.">".$i.": ".$firmaAuswahl->name." [".$mobprogramm."] $link </td></tr>";
                             }
-                            else
+                            else // freemover
                             {
                                 if(!$outgoing->checkStatus($outgoing->preoutgoing_id, 'freigabe'))
                                     $link = "<a href='".$_SERVER['PHP_SELF']."?method=deleteFirma&outgoingFirma_id=".$fi->preoutgoing_firma_id."&ansicht=auswahl'>delete</a>";
@@ -436,7 +451,8 @@ if(isset($_GET['ansicht']) == 'auswahl')
                         <table width="100%" style="border: thin solid black; border-spacing:5px; background-color: lightgray; margin-top:5px; margin-bottom:5px;" >
                                 <tr><td><?php echo $p->t('incoming/zeitraumVon');?>:</td><td><input type="text" size="25" maxlength="40" name="zeitraum_von" id="datepicker_zeitraumvon" value="<?php echo($zeitraum_von); ?>"/></td></tr>
                                 <tr><td><?php echo $p->t('incoming/zeitraumBis');?>:</td><td><input type="text" size="25" maxlength="40" name="zeitraum_bis" id="datepicker_zeitraumbis" value="<?php echo($zeitraum_bis); ?>"/></td></tr>
-                                <tr><td><?php echo $p->t('incoming/ansprechpersonHeimatuniversitaet');?>:</td><td><input type="text" size="25" maxlength="40" name="ansprechperson" id="ansprechperson" value="<?php echo($ansprechperson->vorname.' '.$ansprechperson->nachname); ?>"/><input type="hidden" value="<?php echo ($ansprechperson->uid); ?>" id="ansprechperson_uid" name="ansprechperson_uid" /></td></tr>
+                                <tr><td><?php echo $p->t('incoming/ansprechpersonHeimatuniversitaet');?>:</td><td><input type="text" size="25" maxlength="40" name="ansprechperson" id="ansprechperson" value="<?php echo($ansprechperson->vorname.' '.$ansprechperson->nachname);?>"/><input type="hidden" value="<?php echo ($ansprechperson->uid); ?>" id="ansprechperson_uid" name="ansprechperson_uid" /></td></tr>
+                                <tr><td><?php echo $p->t('incoming/anmerkungen');?>:</td><td><textarea name="anmerkung" cols="20" rows="5"><?php echo($outgoing->anmerkung_student); ?></textarea></td></tr>
                         </table>
                         <table border="0" width ="100%">
                             <tr>
@@ -464,6 +480,28 @@ if(isset($_GET['ansicht']) == 'auswahl')
             </tr>
     </table>
     <hr>
+    <table><!--Summerschool Anmeldung -->
+        <tr><td><h3><?php echo $p->t('incoming/summerschool');?>:</h3></td></tr>
+        <tr><td>
+                 <table width="90%" style="border: thin solid black; border-spacing:10px; background-color: lightgray; margin-top:5px">
+                    <tr>
+                        <td>CEEPUS</td>
+                    </tr>  
+                    <tr>
+                        <td><SELECT name="auswahl_summerschool" onchange="saveFirma(this.value, '')" style="width: 90%">
+                        <option value="summerschool_auswahl">-- select --</option>
+                    <?php 
+                    $firmaSummerschool = new firma(); 
+                    $firmaSummerschool->getFirmen('Partneruniversität');
+                    foreach($firmaSummerschool->result as $fi)
+                        echo'<option value="'.$fi->firma_id.'">'.$fi->name.'</option>';
+                    ?>
+                            </SELECT>
+                        </td>
+                    </tr>
+                </table>
+            </td></tr>
+    </table>
         <?php
 }
 else
@@ -487,7 +525,7 @@ else
 
         ?><table border ="0" width="100%">
     <tr>
-        <td align="left" colspan="4"><b><h1><div style="display:block; text-align:left; float:left;"><?php echo $p->t('outgoing/outgoingRegistration'); ?></div><div style="display:block; text-align:right; margin-right:6px; "><?php echo("Student: ".$name); ?></div></h1></b></td>
+        <td align="left" colspan="4"><b><h1><div style="display:block; text-align:left; float:left;"><?php echo $p->t('incoming/outgoingRegistration'); ?></div><div style="display:block; text-align:right; margin-right:6px; "><?php echo("Student: ".$name); ?></div></h1></b></td>
     </tr>
     <tr><td><?php echo $message; ?></td></tr>
     <tr><td><h3><?php echo $p->t('incoming/zusaetzlicheDaten');?>:</h3></td><td></td></tr>
@@ -496,22 +534,25 @@ else
         echo '<form name="zusaetzlicheDaten" method="POST" action="'.$_SERVER['PHP_SELF'].'">';
         echo '<table width="90%" style="border: thin solid black; border-spacing:10px; background-color: lightgray; margin-top:5px; margin-bottom:5px;">';
         echo '<tr><td><table>';
+           
+        echo '<tr><td>'.$p->t('incoming/praktikum').': </td><td><input type="checkbox" name="praktikum" value="Praktikum" '.$praktikumChecked.'></td>
+                <td>'.$p->t('incoming/bachelorthesis').': <input type="checkbox" name="bachelorarbeit" '.$bscChecked.'></td>';
+        echo '<td>'.$p->t('incoming/masterthesis').': <input type="checkbox" name="masterarbeit" '.$mscChecked.'></td></tr>';
+        echo '<tr><td>'.$p->t('incoming/praktikumVon').': </td><td><input type="text" name="praktikum_von" id="datepicker_praktikumvon" value="'.$datum->formatDatum($outgoing->praktikum_von, 'd.m.Y').'"></td><td colspan="3">'.$p->t('incoming/betreuerMasterBachelor').': <input type="text" name="betreuer" id="betreuer" value="'.$betreuer->vorname.' '.$betreuer->nachname.'"><input type="hidden" name="betreuer_uid" id="betreuer_uid" value="'.$outgoing->betreuer.'"> </td></tr>';
+        echo '<tr><td>'.$p->t('incoming/praktikumBis').'</td><td><input type="text" name="praktikum_bis" id="datepicker_praktikumbis" value="'.$datum->formatDatum($outgoing->praktikum_bis, 'd.m.Y').'"></td><td colspan="3">'.$p->t('incoming/StudienrichtungGastuniversitaet').': <input type="text" name="studienrichtungGastuni" value="'.$outgoing->studienrichtung_gastuniversitaet.'"></td></tr>';
+        echo '<tr><td>&nbsp;</td></tr>';
         // zusätzliche Felder bei Erasmus
-    //       if($outgoingAuswahlFirma->mobilitaetsprogramm_code == '7')
-    //     {             
+        if($outgoingAuswahlFirma->mobilitaetsprogramm_code == '7')
+        {  
             echo '<tr><td>'.$p->t('incoming/sprachkurs').': </td><td><select name="sprachkurs">
                 <option value="kein">'.$p->t('incoming/keiner').'</option>
                 <option value="vorbereitend" '.$sprachkursSelect.'>'.$p->t('incoming/vorbereitenderSprachkurs').'</option>
                 <option value="intensiv" '.$intensivSprachkursSelect.'>'.$p->t('incoming/erasmusIntensivsprachkurs').'</option>
-                </select></td><td>'.$p->t('incoming/praktikum').': </td><td><input type="checkbox" name="praktikum" value="Praktikum" '.$praktikumChecked.'></td></tr>';
-            echo '<tr><td>'.$p->t('incoming/sprachkursVon').':</td><td> <input type="input" name="sprachkurs_von" id="datepicker_sprachkursvon" value="'.$datum->formatDatum($outgoing->sprachkurs_von, 'd.m.Y').'"></td><td>'.$p->t('incoming/praktikumVon').': </td><td><input type="input" name="praktikum_von" id="datepicker_praktikumvon" value="'.$datum->formatDatum($outgoing->praktikum_von, 'd.m.Y').'"></td></tr>';
-            echo '<tr><td>'.$p->t('incoming/sprachkursBis').': </td><td><input type="input" name="sprachkurs_bis" id="datepicker_sprachkursbis" value="'.$datum->formatDatum($outgoing->sprachkurs_bis, 'd.m.Y').'"></td><td>'.$p->t('incoming/praktikumBis').'</td><td><input type="input" name="praktikum_bis" id="datepicker_praktikumbis" value="'.$datum->formatDatum($outgoing->praktikum_bis, 'd.m.Y').'"></td></tr>';
-            echo '<tr><td>&nbsp;</td></tr>';
-        //   }
-
-        echo '<tr><td>'.$p->t('incoming/bachelorthesis').': <input type="checkbox" name="bachelorarbeit" '.$bscChecked.'></td>';
-        echo '<td>'.$p->t('incoming/masterthesis').': <input type="checkbox" name="masterarbeit" '.$mscChecked.'></td></tr>';
-        echo '<tr><td colspan="2">'.$p->t('incoming/betreuerMasterBachelor').': <input type="input" name="betreuer" id="betreuer" value="'.$betreuer->vorname.' '.$betreuer->nachname.'"><input type="hidden" name="betreuer_uid" id="betreuer_uid" value="'.$outgoing->betreuer.'"> </td></tr>'; 
+                </select></td></tr>';
+            echo '<tr><td>'.$p->t('incoming/sprachkursVon').':</td><td> <input type="text" name="sprachkurs_von" id="datepicker_sprachkursvon" value="'.$datum->formatDatum($outgoing->sprachkurs_von, 'd.m.Y').'"></td></tr>'; 
+            echo '<tr><td>'.$p->t('incoming/sprachkursBis').': </td><td><input type="text" name="sprachkurs_bis" id="datepicker_sprachkursbis" value="'.$datum->formatDatum($outgoing->sprachkurs_bis, 'd.m.Y').'"></td></tr>';
+        }
+        
         echo '<tr><td colspan="4">'.$p->t('incoming/aufgrundEinerBehinderung').': <input type="checkbox" name="behinderungszuschuss" '.$behindChecked.'>';
         echo '<tr><td colspan="4">'.$p->t('incoming/währendDesAuslandsaufenthaltes').': <input type="checkbox" name="studienbeihilfe" '.$beihilfeChecked.'>';
         echo '</table>';
@@ -522,9 +563,11 @@ else
         echo '</form>';
         echo '<hr>';
         echo '<p width="100%" align="center"><h3>'.$p->t('incoming/auswahlDerLv').'</h2></p>';
+        echo '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
         echo '<table width="90%" style="border: thin solid black; border-spacing:10px; background-color: lightgray; margin-top:5px; margin-bottom:5px;">';
-        echo '<tr><td>'.$p->t('global/bezeichnung').': <input type="text" name="lv_bezeichnung" size="64" id="lv_bezeichnung"></td><td>ECTS: <input type="text" name="lv_ects" size="4" id="lv_ects"></td><td><input type="button" value="add" onclick="saveLv();"></tr>';
+        echo '<tr><td>'.$p->t('global/bezeichnung').': <input type="text" name="lv_bezeichnung" size="64" id="lv_bezeichnung"></td><td>ECTS: <input type="text" name="lv_ects" size="4" id="lv_ects"></td><td><input type="submit" value="add" name="saveLv"></tr>';
         echo '</table>';
+        echo '</form>';
 
         $preoutgoingLv = new preoutgoing();
         $preoutgoingLv->loadLvs($outgoing_id);
@@ -555,17 +598,17 @@ else
         if(count($akte->result)>0)
         {
         echo'<table id="myTableFiles" class="tablesorter">
-        <thead>
-            <tr>
-            <th>'.$p->t('incoming/dateiname').'</th>
-            <th></th>
-            </tr>
+            <thead>
+                <tr>
+                <th>'.$p->t('incoming/dateiname').'</th>
+                <th></th>
+                </tr>
             </thead>
         <tbody>';
             foreach ($akte->result as $ak)
             {	
                 echo '<tr>
-                        <td><a href="'.APP_ROOT.'cis/public/incoming/akte.php?id='.$ak->akte_id.'">'.$ak->titel.'</a></td>
+                        <td><a href="'.APP_ROOT.'cis/private/outgoing/akte.php?id='.$ak->akte_id.'">'.$ak->titel.'</a></td>
                         <td><a href="'.$_SERVER['PHP_SELF'].'?method=files&mode=delete&id='.$ak->akte_id.'" title="delete">'.$p->t('incoming/loeschen').'</a></td>
                     </tr>';
             }
@@ -608,6 +651,10 @@ else
         {
             alert('Not yet implemented!');
         }
+        function test()
+        {
+            alert('test')
+        }
     </script>
    
     </body>
@@ -618,7 +665,7 @@ function sendMailInternational()
 {
     $emailtext= "Dies ist eine automatisch generierte E-Mail.<br><br>";
     $emailtext.= "Es hat sich ein neuer Outgoing am System registriert.</b>"; 
-    $mail = new mail(MAIL_INTERNATIONAL, 'no-reply', 'New Outgoing', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
+    $mail = new mail(MAIL_INTERNATIONAL_OUTGOING, 'no-reply', 'New Outgoing', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
     $mail->setHTMLContent($emailtext); 
     $mail->send(); 
 }

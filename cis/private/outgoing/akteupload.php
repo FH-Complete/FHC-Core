@@ -119,8 +119,12 @@ if(isset($_POST['submitbild']))
 		}
 		else
 			echo "<b>".$p->t('global/erfolgreichgespeichert')."</b>"; 
-		echo "<script>window.opener.location.reload();</script>"; 			
+        
+		echo '<script>
+        window.opener.location.href="outgoing.php";    
+        </script>'; 			
 		
+        // window.opener.location.reload();
 	}
 }
 
