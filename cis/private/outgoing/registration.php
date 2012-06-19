@@ -43,7 +43,7 @@ if($outgoing->loadUid($uid))
         <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 	</head>
 	<body>
-        <h1><?php echo $p->t('outgoing/outgoingRegistration'); ?></h1>
+        <h1><?php echo $p->t('incoming/outgoingRegistration'); ?></h1>
         <br><br>
         <table width="100%">
             <tr>
