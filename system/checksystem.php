@@ -3373,7 +3373,7 @@ if(!@$db->db_query("SELECT 1 FROM testtool.vw_auswertung_ablauf LIMIT 1"))
 		   FROM testtool.tbl_kategorie));
 
 		GRANT SELECT ON testtool.vw_auswertung_ablauf TO web;
-		GRANT SELECT ON testtool.vw_auswertung_ablauf TO admin;
+		GRANT SELECT ON testtool.vw_auswertung_ablauf TO vilesci;
 	";
 	
 	if(!$db->db_query($qry))
@@ -3634,6 +3634,9 @@ if(!@$db->db_query("SELECT * FROM testtool.vw_auswertung_kategorie_semester LIMI
    JOIN public.tbl_prestudent USING (prestudent_id)
    JOIN public.tbl_person USING (person_id)
    JOIN public.tbl_studiengang ON public.tbl_prestudent.studiengang_kz = public.tbl_studiengang.studiengang_kz;
+   
+   GRANT SELECT ON testtool.vw_auswertung_kategorie_semester TO web;
+   GRANT SELECT ON testtool.vw_auswertung_kategorie_semester TO vilesci;
     ";
     
     if(!$db->db_query($qry))
