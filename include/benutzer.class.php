@@ -353,6 +353,7 @@ class benutzer extends person
 				
 				$this->result[] = $obj;
 			}
+			return true;
 		}
 		else
 		{
