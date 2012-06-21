@@ -37,6 +37,7 @@ require_once('../../../include/benutzer.class.php');
 require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/student.class.php');
 require_once('../../../include/kontakt.class.php');
+require_once('../../../include/fotostatus.class.php');
 
 $sprache = getSprache(); 
 $p=new phrasen($sprache);
@@ -195,7 +196,12 @@ if(!($ansicht && $user->foto_sperre))
 	echo '<img id="personimage" src="../../public/bild.php?src=person&person_id='.$user->person_id.'" alt="'.$user->person_id.'" height="100px" width="75px">';
 
 if(!$ansicht)
-	echo "<br><a href='#BildUpload' onclick='window.open(\"../bildupload.php?person_id=$user->person_id\",\"BildUpload\", \"height=500,width=500,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\"); return false;'>".$p->t('profil/bildHochladen')."</a>";
+{
+	//Foto Upload nur möglich wenn das Bild noch nicht akzeptiert wurde
+	$fs = new fotostatus();
+	if(!$fs->akzeptiert($user->person_id))
+		echo "<br><a href='#BildUpload' onclick='window.open(\"../bildupload.php?person_id=$user->person_id\",\"BildUpload\", \"height=500,width=500,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\"); return false;'>".$p->t('profil/bildHochladen')."</a>";
+}
 if($user->foto_sperre)
 	echo '<br><b>'.$p->t('profil/profilfotoGesperrt').'</b>';
 	

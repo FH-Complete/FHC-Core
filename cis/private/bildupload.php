@@ -30,6 +30,7 @@ require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/akte.class.php');
 require_once('../../include/phrasen.class.php');
+require_once('../../include/fotostatus.class.php');
 
 $user = get_uid();
 $sprache = getSprache();
@@ -85,6 +86,10 @@ if(isset($_GET['person_id']))
 		
 	if($benutzer->person_id!=$_GET['person_id'])
 		die($p->t('global/keineBerechtigungFuerDieseSeite'));
+		
+	$fs = new fotostatus();
+	if($fs->akzeptiert($benutzer->person_id))
+		die($p->t('profil/profilfotoUploadGesperrt'));
 }
 else 
 	die($p->t('global/fehlerBeiDerParameteruebergabe'));
@@ -169,6 +174,20 @@ if(isset($_POST['submitbild']))
 				$person->foto = $content;
 				$person->new = false;				
 				if($person->save())
+				{
+					$fs = new fotostatus();
+					$fs->person_id=$person->person_id;
+					$fs->fotostatus_kurzbz='hochgeladen';
+					$fs->datum = date('Y-m-d');
+					$fs->insertamum = date('Y-m-d H:i:s');
+					$fs->insertvon = $user;
+					$fs->updateamum = date('Y-m-d H:i:s');
+					$fs->updatevon = $user;
+					if(!$fs->save(true))
+						echo '<span class="error">Fehler beim Setzen des Bildstatus</span>';
+					else
+					{
+					
 					echo "<b>Bild wurde erfolgreich gespeichert</b>
 						<script language='Javascript'>
 							if(typeof(opener.StudentAuswahl) == 'function') 
@@ -182,6 +201,8 @@ if(isset($_POST['submitbild']))
 							}
 							window.close();
 						</script><br />";
+					}
+				}
 				else
 					echo '<b>'.$person->errormsg.'</b><br />';
 			}

@@ -60,4 +60,5 @@ $this->phrasen['profil/fotofreigeben']='Sperre des Profilfotos aufheben';
 $this->phrasen['profil/fotosperren']='Profilfoto sperren';
 $this->phrasen['profil/infotextSperre']='Gesperrte Profilbilder werden nur für Zutrittskarten verwendet und scheinen nicht auf Anwesenheitslisten oder in der Personensuche auf';
 $this->phrasen['profil/profilfotoGesperrt']='Profilfoto gesperrt';
+$this->phrasen['profil/profilfotoUploadGesperrt']='Der Upload des Profilfotos ist nicht mehr möglich';
 ?>

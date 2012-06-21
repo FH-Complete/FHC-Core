@@ -3582,7 +3582,7 @@ if(!@$db->db_query("SELECT anmerkung_student FROM public.tbl_preoutgoing LIMIT 1
     if(!$db->db_query($qry))
         echo '<strong>public.tbl_preoutgoing: '.$db->db_last_error().'</strong><br>';
     else
-        echo 'Tabelle public.tbl_preoutgoing Spalten anmerkungStudent, anmerkungAdmin, studienrichtungGastuniversitaet';
+        echo 'Tabelle public.tbl_preoutgoing Spalten anmerkungStudent, anmerkungAdmin, studienrichtungGastuniversitaet<br>';
 }
 
 // foto_intern Boolean
@@ -3593,7 +3593,7 @@ if(!@$db->db_query("SELECT foto_sperre FROM public.tbl_person LIMIT 1"))
     if(!$db->db_query($qry))
         echo '<strong>public.tbl_person: '.$db->db_last_error().'</strong><br>';
     else
-        echo 'Tabelle public.tbl_person Spalte foto_intern hinzugefuegt';
+        echo 'Tabelle public.tbl_person Spalte foto_intern hinzugefuegt<br>';
 }
 
 // nummer_myfare in Tabelle Betriebsmittel
@@ -3604,7 +3604,7 @@ if(!@$db->db_query("SELECT nummer2 FROM wawi.tbl_betriebsmittel LIMIT 1"))
     if(!$db->db_query($qry))
         echo '<strong>wawi.tbl_betriebsmittel: '.$db->db_last_error().'</strong><br>';
     else
-        echo 'Tabelle wawi.tbl_betriebsmittel Spalte nummer2 hinzugefuegt';
+        echo 'Tabelle wawi.tbl_betriebsmittel Spalte nummer2 hinzugefuegt<br>';
 }
 
 // View fuer Testtool Auswertung
@@ -3642,7 +3642,7 @@ if(!@$db->db_query("SELECT * FROM testtool.vw_auswertung_kategorie_semester LIMI
     if(!$db->db_query($qry))
         echo '<strong>testtool.vw_auswertung_kategorie_semester: '.$db->db_last_error().'</strong><br>';
     else
-        echo 'View testtool.vw_auswertung_kategorie_semester hinzugefuegt';
+        echo 'View testtool.vw_auswertung_kategorie_semester hinzugefuegt<br>';
 }
 
 // Gesperrt Attribut fuer Tabelle Gruppe
@@ -3656,7 +3656,72 @@ if(!@$db->db_query("SELECT gesperrt FROM public.tbl_gruppe LIMIT 1"))
     if(!$db->db_query($qry))
         echo '<strong>public.tbl_gruppe: '.$db->db_last_error().'</strong><br>';
     else
-        echo 'Tabelle public.tbl_gruppe Spalte gesperrt hinzugefuegt';
+        echo 'Tabelle public.tbl_gruppe Spalte gesperrt hinzugefuegt<br>';
+}
+
+// Tabellen fuer Status des Profilfotos
+if(!@$db->db_query("SELECT 1 FROM public.tbl_person_fotostatus LIMIT 1"))
+{
+    $qry = "CREATE TABLE public.tbl_fotostatus
+    		(
+    			fotostatus_kurzbz varchar(32) NOT NULL,
+    			beschreibung varchar(256)
+    		);
+    		
+    		CREATE TABLE public.tbl_person_fotostatus
+    		(
+    			person_fotostatus_id integer NOT NULL,
+    			person_id integer NOT NULL,
+    			fotostatus_kurzbz varchar(32) NOT NULL,
+    			datum date NOT NULL,
+    			insertamum timestamp,
+    			insertvon varchar(32),
+    			updateamum timestamp,
+    			updatevon varchar(32)
+    		);
+    		
+    CREATE SEQUENCE public.seq_person_fotostatus_person_fotostatus_id
+ 	INCREMENT BY 1
+ 	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+		
+    ALTER TABLE public.tbl_fotostatus ADD CONSTRAINT pk_fotostatus PRIMARY KEY (fotostatus_kurzbz);
+    ALTER TABLE public.tbl_person_fotostatus ADD CONSTRAINT pk_person_fotostatus PRIMARY KEY (person_fotostatus_id);
+	ALTER TABLE public.tbl_person_fotostatus ALTER COLUMN person_fotostatus_id SET DEFAULT nextval('public.seq_person_fotostatus_person_fotostatus_id');
+	ALTER TABLE public.tbl_person_fotostatus ADD CONSTRAINT fk_person_person_fotostatus FOREIGN KEY(person_id) REFERENCES public.tbl_person (person_id) ON DELETE CASCADE ON UPDATE CASCADE;
+	ALTER TABLE public.tbl_person_fotostatus ADD CONSTRAINT fk_fotostatus_person_fotostatus FOREIGN KEY(fotostatus_kurzbz) REFERENCES public.tbl_fotostatus (fotostatus_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	
+	GRANT SELECT ON public.tbl_fotostatus TO web;
+	GRANT SELECT ON public.tbl_fotostatus TO vilesci;
+	GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_person_fotostatus TO web;
+	GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_person_fotostatus TO vilesci;
+	GRANT SELECT, UPDATE ON SEQUENCE public.seq_person_fotostatus_person_fotostatus_id TO web;
+	GRANT SELECT, UPDATE ON SEQUENCE public.seq_person_fotostatus_person_fotostatus_id TO vilesci;
+	
+	INSERT INTO public.tbl_fotostatus (fotostatus_kurzbz, beschreibung) VALUES('akzeptiert', 'Profilfoto wurde akzeptiert');
+	INSERT INTO public.tbl_fotostatus (fotostatus_kurzbz, beschreibung) VALUES('hochgeladen', 'Neues Profilfoto wurde hochgeladen');
+	INSERT INTO public.tbl_fotostatus (fotostatus_kurzbz, beschreibung) VALUES('abgewiesen', 'Profilfoto wurde abgewiesen');    			
+    	";
+    
+    if(!$db->db_query($qry))
+        echo '<strong>public.tbl_fotostatus: '.$db->db_last_error().'</strong><br>';
+    else
+        echo 'Tabelle public.tbl_fotostatus und public.tbl_person_fotostatus hinzugefuegt<br>';
+}
+
+// Optionaler FK auf Benutzer von Betriebsmittel
+// (wird bei Zutrittskarten gesetzt)
+if(!@$db->db_query("SELECT uid FROM wawi.tbl_betriebsmittelperson LIMIT 1"))
+{
+    $qry = "ALTER TABLE wawi.tbl_betriebsmittelperson ADD COLUMN uid varchar(32);
+		ALTER TABLE wawi.tbl_betriebsmittelperson ADD CONSTRAINT fk_benutzer_betriebsmittelperson FOREIGN KEY(uid) REFERENCES public.tbl_benutzer (uid) ON DELETE RESTRICT ON UPDATE CASCADE;    	
+    	";
+    
+    if(!$db->db_query($qry))
+        echo '<strong>wawi.tbl_betriebsmittelperson: '.$db->db_last_error().'</strong><br>';
+    else
+        echo 'Tabelle wawi.tbl_betriebsmittelperson Spalte uid hinzugefuegt<br>';
 }
 echo '<br>';
 
@@ -3780,6 +3845,7 @@ $tabellen=array(
 	"public.tbl_firma_organisationseinheit"  => array("firma_organisationseinheit_id","firma_id","oe_kurzbz","bezeichnung","kundennummer","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_firmentyp"  => array("firmentyp_kurzbz","beschreibung"),
 	"public.tbl_firmatag"  => array("firma_id","tag","insertamum","insertvon"),
+	"public.tbl_fotostatus"  => array("fotostatus_kurzbz","beschreibung"),
 	"public.tbl_funktion"  => array("funktion_kurzbz","beschreibung","aktiv","fachbereich","semester"),
 	"public.tbl_geschaeftsjahr"  => array("geschaeftsjahr_kurzbz","start","ende","bezeichnung"),
 	"public.tbl_gruppe"  => array("gruppe_kurzbz","studiengang_kz","semester","bezeichnung","beschreibung","sichtbar","lehre","aktiv","sort","mailgrp","generiert","updateamum","updatevon","insertamum","insertvon","ext_id","orgform_kurzbz","gid","content_visible","gesperrt"),
@@ -3797,6 +3863,7 @@ $tabellen=array(
 	"public.tbl_organisationseinheit" => array("oe_kurzbz", "oe_parent_kurzbz", "bezeichnung","organisationseinheittyp_kurzbz", "aktiv","mailverteiler","freigabegrenze","kurzzeichen"),
 	"public.tbl_organisationseinheittyp" => array("organisationseinheittyp_kurzbz", "bezeichnung", "beschreibung"),
 	"public.tbl_person"  => array("person_id","staatsbuergerschaft","geburtsnation","sprache","anrede","titelpost","titelpre","nachname","vorname","vornamen","gebdatum","gebort","gebzeit","foto","anmerkung","homepage","svnr","ersatzkennzeichen","familienstand","geschlecht","anzahlkinder","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","bundesland_code","kompetenzen","kurzbeschreibung","zugangscode", "foto_sperre"),
+	"public.tbl_person_fotostatus"  => array("person_fotostatus_id","person_id","fotostatus_kurzbz","datum","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_personfunktionstandort"  => array("personfunktionstandort_id","funktion_kurzbz","person_id","standort_id","position","anrede"),
 	"public.tbl_preincoming"  => array("preincoming_id","person_id","mobilitaetsprogramm_code","zweck_code","firma_id","universitaet","aktiv","bachelorthesis","masterthesis","von","bis","uebernommen","insertamum","insertvon","updateamum","updatevon","anmerkung","zgv","zgv_ort","zgv_datum","zgv_name","zgvmaster","zgvmaster_datum","zgvmaster_ort","zgvmaster_name","program_name","bachelor","master","jahre","person_id_emergency","person_id_coordinator_dep","person_id_coordinator_int","code","deutschkurs1","deutschkurs2","research_area","deutschkurs3"),
 	"public.tbl_preincoming_lehrveranstaltung"  => array("preincoming_id","lehrveranstaltung_id","insertamum","insertvon"),
@@ -3845,8 +3912,8 @@ $tabellen=array(
 	"system.tbl_webservicerecht" => array("webservicerecht_id","berechtigung_kurzbz","methode","attribut","insertamum","insertvon","updateamum","updatevon"),
 	"system.tbl_webservicetyp"  => array("webservicetyp_kurzbz","beschreibung"),
 	"system.tbl_server"  => array("server_kurzbz","beschreibung"),
-	"wawi.tbl_betriebsmittelperson"  => array("betriebsmittelperson_id","betriebsmittel_id","person_id", "anmerkung", "kaution", "ausgegebenam", "retouram","insertamum", "insertvon","updateamum", "updatevon","ext_id"),
-	"wawi.tbl_betriebsmittel"  => array("betriebsmittel_id","betriebsmitteltyp","oe_kurzbz", "ort_kurzbz", "beschreibung", "nummer", "hersteller","seriennummer", "bestellung_id","bestelldetail_id", "afa","verwendung","anmerkung","reservieren","updateamum","updatevon","insertamum","insertvon","ext_id","inventarnummer","leasing_bis","inventuramum","inventurvon","anschaffungsdatum","anschaffungswert","hoehe","breite","tiefe","nummer_myfare"),
+	"wawi.tbl_betriebsmittelperson"  => array("betriebsmittelperson_id","betriebsmittel_id","person_id", "anmerkung", "kaution", "ausgegebenam", "retouram","insertamum", "insertvon","updateamum", "updatevon","ext_id","uid"),
+	"wawi.tbl_betriebsmittel"  => array("betriebsmittel_id","betriebsmitteltyp","oe_kurzbz", "ort_kurzbz", "beschreibung", "nummer", "hersteller","seriennummer", "bestellung_id","bestelldetail_id", "afa","verwendung","anmerkung","reservieren","updateamum","updatevon","insertamum","insertvon","ext_id","inventarnummer","leasing_bis","inventuramum","inventurvon","anschaffungsdatum","anschaffungswert","hoehe","breite","tiefe","nummer2"),
 	"wawi.tbl_betriebsmittel_betriebsmittelstatus"  => array("betriebsmittelbetriebsmittelstatus_id","betriebsmittel_id","betriebsmittelstatus_kurzbz", "datum", "updateamum", "updatevon", "insertamum", "insertvon","anmerkung"),
 	"wawi.tbl_betriebsmittelstatus"  => array("betriebsmittelstatus_kurzbz","beschreibung"),
 	"wawi.tbl_betriebsmitteltyp"  => array("betriebsmitteltyp","beschreibung","anzahl","kaution","typ_code","mastershapename"),
