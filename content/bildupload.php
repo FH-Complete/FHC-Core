@@ -26,6 +26,7 @@ require_once('../include/functions.inc.php');
 require_once('../include/person.class.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/akte.class.php');
+require_once('../include/fotostatus.class.php');
 
 $PHP_SELF = $_SERVER['PHP_SELF'];
 echo "<html><body>";
@@ -150,19 +151,34 @@ if(isset($_POST['submitbild']))
 				$person->foto = $content;
 				$person->new = false;				
 				if($person->save())
-					echo "<b>Bild wurde erfolgreich gespeichert</b>
-						<script language='Javascript'>
-							if(typeof(opener.StudentAuswahl) == 'function') 
-								opener.StudentAuswahl(); 
-							if(typeof(opener.MitarbeiterAuswahl) == 'function') 
-								opener.MitarbeiterAuswahl(); 
-							if(typeof(opener.RefreshImage) == 'function' ||
-							   typeof(opener.RefreshImage) == 'object') 
-							{
-								opener.RefreshImage(); 
-							}
-							window.close();
-						</script><br />";
+				{
+					$fs = new fotostatus();
+					$fs->person_id=$person->person_id;
+					$fs->fotostatus_kurzbz='hochgeladen';
+					$fs->datum = date('Y-m-d');
+					$fs->insertamum = date('Y-m-d H:i:s');
+					$fs->insertvon = $user;
+					$fs->updateamum = date('Y-m-d H:i:s');
+					$fs->updatevon = $user;
+					if(!$fs->save(true))
+						echo '<span class="error">Fehler beim Setzen des Bildstatus</span>';
+					else
+					{
+						echo "<b>Bild wurde erfolgreich gespeichert</b>
+							<script language='Javascript'>
+								if(typeof(opener.StudentAuswahl) == 'function') 
+									opener.StudentAuswahl(); 
+								if(typeof(opener.MitarbeiterAuswahl) == 'function') 
+									opener.MitarbeiterAuswahl(); 
+								if(typeof(opener.RefreshImage) == 'function' ||
+								   typeof(opener.RefreshImage) == 'object') 
+								{
+									opener.RefreshImage(); 
+								}
+								window.close();
+							</script><br />";
+					}
+				}
 				else
 					echo '<b>'.$person->errormsg.'</b><br />';
 			}
