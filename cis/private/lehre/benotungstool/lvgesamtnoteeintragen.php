@@ -110,7 +110,7 @@ if(!$rechte->isBerechtigt('admin',0) &&
 
 function savenote($db,$lvid, $student_uid, $note)
 {
-	global $stsem, $user;
+	global $stsem, $user, $p;
 	$jetzt = date("Y-m-d H:i:s");
 	//Ermitteln ob der Student diesem Kurs zugeteilt ist
 	$qry = "SELECT 1 FROM campus.vw_student_lehrveranstaltung WHERE uid='".addslashes($student_uid)."' AND lehrveranstaltung_id='".addslashes($lvid)."'";
