@@ -30,6 +30,7 @@ loadVariables($user);
 var BetriebsmittelTreeDatasource; //Datasource des BetriebsmittelTrees
 var BetriebsmittelSelectBetriebsmittelperson_id=null; //Betriebsmittelzurodnung die nach dem Refresh markiert werden soll
 var Betriebsmittel_Person_id;
+var Betriebsmittel_Person_UID;
 // ********** Observer und Listener ************* //
 
 // ****
@@ -77,10 +78,11 @@ var BetriebsmittelTreeListener =
 // ****
 // * Laedt den Betriebsmitteltree
 // ****
-function loadBetriebsmittel(person_id)
+function loadBetriebsmittel(person_id, uid)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	Betriebsmittel_Person_id = person_id;
+	Betriebsmittel_Person_UID = uid;
 	
 	// *** Betriebsmittel ***
 	betriebsmitteltree = document.getElementById('betriebsmittel-tree');
@@ -400,6 +402,7 @@ function BetriebsmittelDetailSpeichern()
 	req.add('nummer2', nummer2);
 	req.add('beschreibung', beschreibung);
 	req.add('studiengang_kz', studiengang_kz);
+	req.add('uid', Betriebsmittel_Person_UID);
 
 	var response = req.executePOST();
 

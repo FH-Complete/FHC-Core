@@ -53,6 +53,7 @@ class betriebsmittelperson extends basis_db
 	public $beschreibung;
 	public $oe_kurzbz;	
 	public $nummer2;
+	public $uid;
 	
 	/**
 	 * Konstruktor
@@ -109,6 +110,7 @@ class betriebsmittelperson extends basis_db
 				$this->ort_kurzbz = $row->ort_kurzbz;
 				$this->oe_kurzbz = $row->oe_kurzbz;
 				$this->nummer2 = $row->nummer2;
+				$this->uid = $row->uid;
 				return true;
 			}
 			else 
@@ -188,7 +190,7 @@ class betriebsmittelperson extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO wawi.tbl_betriebsmittelperson (betriebsmittel_id, person_id, anmerkung, kaution, 
-			ausgegebenam, retouram, ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
+			ausgegebenam, retouram, ext_id, insertamum, insertvon, updateamum, updatevon, uid) VALUES('.
 			     $this->db_add_param($this->betriebsmittel_id, FHC_INTEGER).', '.
 			     $this->db_add_param($this->person_id, FHC_INTEGER).', '.
 			     $this->db_add_param($this->anmerkung).', '.
@@ -197,7 +199,8 @@ class betriebsmittelperson extends basis_db
 			     $this->db_add_param($this->retouram).', '.
 			     $this->db_add_param($this->ext_id).',  now(), '.
 			     $this->db_add_param($this->insertvon).', now(), '.
-			     $this->db_add_param($this->updatevon).');';
+			     $this->db_add_param($this->updatevon).', '.
+			     $this->db_add_param($this->uid).');';
 		}
 		else
 		{	
@@ -217,7 +220,8 @@ class betriebsmittelperson extends basis_db
 				'retouram='.$this->db_add_param($this->retouram).', '.
 				'ext_id='.$this->db_add_param($this->ext_id).', '. 
 				'updateamum= now(), '.
-				'updatevon='.$this->db_add_param($this->updatevon).' '.
+				'updatevon='.$this->db_add_param($this->updatevon).', '.
+				'uid = '.$this->db_add_param($this->uid).' '.
 				'WHERE betriebsmittelperson_id='.$this->db_add_param($this->betriebsmittelperson_id, FHC_INTEGER).';';
 		}
 		
@@ -351,7 +355,8 @@ class betriebsmittelperson extends basis_db
 				$bm->updatevon = $row->updatevon;
 				$bm->ext_id = $row->ext_id;
 				$bm->oe_kurzbz = $row->oe_kurzbz;
-				$bm->nummer2 = $row->nummer2;					
+				$bm->nummer2 = $row->nummer2;	
+				$bm->uid = $row->uid;				
 				$this->result[] = $bm;
 			}
 			
@@ -419,6 +424,7 @@ class betriebsmittelperson extends basis_db
 				$this->ext_id = $row->ext_id;
 				$this->oe_kurzbz = $row->oe_kurzbz;		
 				$this->nummer2 = $row->nummer2;		
+				$this->uid = $row->uid;
 				return true;	
 			}
 			else 
@@ -484,6 +490,8 @@ class betriebsmittelperson extends basis_db
 				$bm->ext_id = $row->ext_id;
 				$bm->oe_kurzbz = $row->oe_kurzbz;
 				$bm->nummer2 = $row->nummer2;
+				$bm->uid = $row->uid;
+				
 				$this->result[] = $bm;
 			}
 
@@ -537,6 +545,7 @@ class betriebsmittelperson extends basis_db
 				$this->ext_id = $row->ext_id;
 				$this->oe_kurzbz = $row->oe_kurzbz;
 				$this->nummer2 = $row->nummer2;
+				$this->uid = $row->uid;
 				
 				return true;
 			}
