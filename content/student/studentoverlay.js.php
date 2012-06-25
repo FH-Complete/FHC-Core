@@ -1288,7 +1288,7 @@ function StudentAuswahl()
 	document.getElementById('student-kontakt').setAttribute('src','kontakt.xul.php?person_id='+person_id);
 	
 	// ***** Betriebsmittel *****
-	document.getElementById('student-betriebsmittel').setAttribute('src','betriebsmitteloverlay.xul.php?person_id='+person_id);
+	document.getElementById('student-betriebsmittel').setAttribute('src','betriebsmitteloverlay.xul.php?person_id='+person_id+'&uid='+uid);
 
 	if(uid!='')
 	{

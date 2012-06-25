@@ -46,7 +46,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 <body>
 <h2>Profilfoto Check</h2>
 ';
-if(!$rechte->isBerechtigt('basis/person','suid'))
+if(!$rechte->isBerechtigt('basis/fhausweis','suid'))
 {
 	die('Sie haben keine Berechtigung für diese Seite');
 }

@@ -1914,6 +1914,7 @@ if(!$error)
 					$bmp->kaution = trim(str_replace(',','.',$_POST['kaution']));
 					$bmp->ausgegebenam = $_POST['ausgegebenam'];
 					$bmp->retouram = $_POST['retouram'];
+					$bmp->uid = $_POST['uid'];
 
 					if($bmp->save())
 					{

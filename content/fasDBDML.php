@@ -39,6 +39,7 @@ require_once('../include/bankverbindung.class.php');
 require_once('../include/variable.class.php');
 require_once('../include/benutzerfunktion.class.php');
 require_once('../include/studiensemester.class.php');
+require_once('../include/fotostatus.class.php');
 
 $user = get_uid();
 
@@ -530,12 +531,22 @@ if(!$error)
 			}
 			else
 			{
-				$qry = "UPDATE public.tbl_person SET foto=null WHERE person_id='".$_POST['person_id']."'";
+				$qry = "UPDATE public.tbl_person SET foto=null WHERE person_id=".$db->db_add_param($_POST['person_id']);
 				if($db->db_query($qry))
 				{
-					$qry = "DELETE FROM public.tbl_akte WHERE person_id='".$_POST['person_id']."' AND dokument_kurzbz='Lichtbil'";
+					$qry = "DELETE FROM public.tbl_akte WHERE person_id=".$db->db_add_param($_POST['person_id'])." AND dokument_kurzbz='Lichtbil'";
 					if($db->db_query($qry))
 					{
+						$fs = new fotostatus();
+						$fs->person_id = $_POST['person_id'];
+						$fs->fotostatus_kurzbz='abgewiesen';
+						$fs->datum = date('Y-m-d');
+						$fs->insertamum = date('Y-m-d H:i:s');
+						$fs->insertvon = $user;
+						$fs->updateamum = date('Y-m-d H:i:s');
+						$fs->updatevon = $user;
+						$fs->save(true);
+						
 						$return = true;
 					}
 					else 

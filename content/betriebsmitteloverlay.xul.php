@@ -26,6 +26,7 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../config/vilesci.config.inc.php');
+require_once('../include/basis.class.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
@@ -38,12 +39,20 @@ if(isset($_GET['person_id']) && is_numeric($_GET['person_id']))
 	$person_id = $_GET['person_id'];
 else
 	die('Parameter person_id muss uebergeben werden');
+
+if(isset($_GET['uid']))
+{
+	$basis = new basis();
+	$uid = $basis->convert_html_chars($_GET['uid']);
+}
+else
+	$uid='';
 ?>
 
 <window id="Betriebsmittel"
 	xmlns:html="http://www.w3.org/1999/xhtml"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-	 onload="loadBetriebsmittel(<?php echo $person_id; ?>);"
+	 onload="loadBetriebsmittel(<?php echo $person_id.",'".$uid."'"; ?>);"
 	>
 
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/betriebsmitteloverlay.js.php" />
