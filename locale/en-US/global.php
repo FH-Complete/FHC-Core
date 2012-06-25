@@ -153,4 +153,6 @@ $this->phrasen['global/erfolgreichAngelegt']='Created successfully';
 //infrastruktur
 
 $this->phrasen['global/passwort']='Password';
+$this->phrasen['global/abmelden']='Logout';
+$this->phrasen['global/emailAnAssistenz']='Email Administrative Assistant';
 ?>
