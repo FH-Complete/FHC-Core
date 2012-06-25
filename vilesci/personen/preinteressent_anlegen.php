@@ -410,6 +410,7 @@ if(isset($_POST['save']))
 		$person->aktiv = true;
 		$person->insertamum = date('Y-m-d H:i:s');
 		$person->insertvon = $user;
+        $person->zugangscode= uniqid();
 		
 		if($person->save())
 		{
