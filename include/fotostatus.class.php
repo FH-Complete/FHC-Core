@@ -22,7 +22,7 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 class fotostatus extends basis_db
 {
 	public $new;				//  boolean
-	public $result = array();	//  adresse Objekt
+	public $result = array();	//  Array für FotoStatus Objekte
 
 	//Tabellenspalten
 	public $fotostatus_kurzbz;	//  varchar(32)
@@ -75,6 +75,66 @@ class fotostatus extends basis_db
 		}
 	}
 	
+    /**
+     * Überprüft ob der übergebene Status bei der Übergebenen Person vorhanden ist
+     * @param $person_id
+     * @param $fotostatus_kurzbz
+     * @return boolean 
+     */
+    public function checkStatus($person_id, $fotostatus_kurzbz)
+    {
+        $qry = "SELECT 
+                    *
+                FROM
+                    public.tbl_person_fotostatus
+                WHERE
+                    person_id = ".$this->db_add_param($person_id, FHC_INTEGER)."
+                    AND fotostatus_kurzbz=".$this->db_add_param($fotostatus_kurzbz,FHC_STRING).";";
+        
+        if($result = $this->db_query($qry))
+        {
+            if($this->db_num_rows($result)>0)
+                return true; 
+            else
+                return false; 
+        }
+        else
+        {
+            $this->errormsg = 'Fehler beim Laden der Daten';
+            return false;
+        }
+    }
+    
+    /**
+     * Liefert alle Möglichen Stati eines Bildes zurück
+     * @return boolean 
+     */
+    public function getAllStatusKurzbz()
+    {
+        $qry = "SELECT 
+                    * 
+                FROM 
+                    tbl_fotostatus";
+        
+        if($result = $this->db_query($qry))
+        {
+            while($row  = $this->db_fetch_object($result))
+            {
+                $status = new fotostatus(); 
+                $status->fotostatus_kurzbz = $row->fotostatus_kurzbz; 
+                
+                $this->result[]=$status; 
+            }
+            return true; 
+        }
+        else
+        {
+            $this->errormsg = "Fehler bei der Abfrage aufgetreten."; 
+            return false; 
+        }
+    }
+    
+    
 	public function save($new=null)
 	{
 		if(is_null($new))
