@@ -664,6 +664,35 @@ class person extends basis_db
 		return true;
 	}
 	
+    /**
+     *
+     * Überprüfut ob der übergebene Zugangscode einer Person zugeordnet ist und 
+     * retuniert im Erfolgsfall dessen person_id
+     * @param type $zugangscode
+     * @return boolean 
+     */
+    public function checkZugangscode($zugangscode)
+    {
+        $qry = "SELECT person_id 
+                FROM public.tbl_person
+                WHERE zugangscode=".$this->db_add_param($zugangscode, FHC_STRING); 
+        
+        if($this->db_query($qry))
+        {
+            if($row = $this->db_fetch_object())
+            {
+                return $row->person_id;
+            }
+            else
+                return false; 
+        }
+        else
+        {
+            $this->errormsg = "Fehler bei der Abfrage aufgetreten";
+            return false; 
+        }
+    }
+    
 	/**
 	 * 
 	 * Überprüft den übergebenen Zugangscode und retuniert die aktuelle incoming_id
