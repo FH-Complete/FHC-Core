@@ -1045,5 +1045,44 @@ class mitarbeiter extends benutzer
 		}
 		
 	}
+
+    /**
+     * Holt alle Mitarbeiter nach einem bestimmten filter = Anfangsbuchstabe
+     * @param $filter Anfangsbuchstabe der Mitarbeiter
+     * @return boolean 
+     */
+    public function getMitarbeiterForZutrittskarte($filter)
+    {
+        $qry = "SELECT 
+                    * 
+                FROM 
+                    campus.vw_mitarbeiter 
+                WHERE 
+                    UPPER(SUBSTRING(nachname,1,1))=".$this->db_add_param($filter,FHC_STRING)." 
+                    AND aktiv='true'";
+        
+        if($result = $this->db_query($qry))
+        {
+            while($row = $this->db_fetch_object($result))
+            {
+                $mi = new mitarbeiter(); 
+                
+                $mi->vorname = $row->vorname; 
+                $mi->nachname = $row->nachname; 
+                $mi->gebdatum = $row->gebdatum; 
+                $mi->uid = $row->uid; 
+                $mi->personalnummer = $row->personalnummer; 
+                $mi->person_id = $row->person_id; 
+                
+                $this->result[] = $mi; 
+            }
+            return true; 
+        }
+        else
+        {
+            $this->errormsg = "Fehler bei der Abfrage aufgetreten";
+            return false; 
+        }
+    }
 }
 ?>

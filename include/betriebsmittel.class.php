@@ -1156,5 +1156,50 @@ class betriebsmittel extends basis_db
 		$kartennummer = preg_replace("/^0*/", "", $kartennummer);
 		return $kartennummer;
 	}
+    
+    /**
+     * Überprüft ob die Zutrittskarte zur übergerbenen uid schon ausgedruckt worden ist
+     * @param type $uid 
+     */
+    public function zutrittskartePrinted($uid)
+    {
+        $qry ="SELECT * FROM wawi.tbl_betriebsmittelperson
+            JOIN wawi.tbl_betriebsmittel USING(betriebsmittel_id) 
+            WHERE uid = ".$this->db_add_param($uid, FHC_STRING)." 
+                and betriebsmitteltyp = 'Zutrittskarte' 
+                AND nummer2 is not null";
+        
+        if($result = $this->db_query($qry))
+        {
+            if($this->db_num_rows($result) > 0)
+                return true;
+            else
+                return false;
+        }
+    }
+    
+    /**
+     * Überprüft ob die Zutrittskarte schon ausgegeben worden ist -> ausgegeben an == null und retouram != null
+     * @param $uid
+     * @return boolean 
+     */
+    public function zutrittskarteAusgegeben($uid)
+    {
+        $qry ="SELECT * FROM wawi.tbl_betriebsmittelperson WHERE uid =".$this->db_add_param($uid, FHC_STRING)." 
+            AND betriebsmittel_id IN(
+                SELECT betriebsmittel_id 
+                FROM wawi.tbl_betriebsmittelperson 
+                JOIN wawi.tbl_betriebsmittel USING (betriebsmittel_id) where uid=".$this->db_add_param($uid,FHC_STRING)." 
+                    AND betriebsmitteltyp='Zutrittskarte' and nummer2 is not null)
+                AND ausgegebenam is not null AND retouram is null";
+        
+        if($result = $this->db_query($qry))
+        {
+            if($this->db_num_rows($result)>0)
+                return true; 
+            else
+                return false; 
+        }
+    }
 }
 ?>
