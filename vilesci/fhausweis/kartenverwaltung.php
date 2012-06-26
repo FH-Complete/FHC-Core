@@ -24,18 +24,27 @@ require_once('../../include/student.class.php');
 require_once('../../include/fotostatus.class.php');
 require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/betriebsmittel.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/prestudent.class.php');
+require_once('../../include/studiensemester.class.php');
+
+$uid = get_uid();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($uid);
 
 define("anzahlSemester","10"); 
 $buchstabenArray = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','Ä','Ö','Ü');
 
 $studiengang = new studiengang(); 
-$studiengang->getAll('bezeichnung', true);
+$studiengang->getAll('oe_kurzbz', true);
 
 $fotostatus = new fotostatus(); 
 $fotostatus->getAllStatusKurzbz(); 
 
 $statusStudent=(isset($_REQUEST['select_statusStudent'])?$_REQUEST['select_statusStudent']:null);
 $statusMitarbeiter=(isset($_REQUEST['select_statusMitarbeiter'])?$_REQUEST['select_statusMitarbeiter']:null);
+$typMitarbeiter =(isset($_REQUEST['select_typ_mitarbeiter'])?$_REQUEST['select_typ_mitarbeiter']:null);
 $studiengang_kz=(isset($_REQUEST['select_studiengang'])?$_REQUEST['select_studiengang']:null);
 $semester=(isset($_REQUEST['select_semester'])?$_REQUEST['select_semester']:null);   
 $buchstabe=(isset($_REQUEST['select_buchstabe'])?$_REQUEST['select_buchstabe']:null);
@@ -65,7 +74,11 @@ $buchstabe=(isset($_REQUEST['select_buchstabe'])?$_REQUEST['select_buchstabe']:n
         </script>    
 	<title>FH-Ausweis Kartenverwaltung</title>
 </head>
-<?php echo '<body>
+<?php 
+if(!$rechte->isBerechtigt('basis/fhausweis', 'suid'))
+	die('Sie haben keine Berechtigung für diese Seite');
+
+echo '<body>
 <h2>FH-Ausweis Kartenverwaltung</h2>
 <fieldset style="display: inline">
     <legend>Studentensuche</legend>
@@ -109,6 +122,11 @@ echo'           <option value="nichtGedruckt" '.($statusStudent=='nichtGedruckt'
         <div style="float: right;"> 
             <table border="0" >
                 <tr>
+                    <td>Typ:</td>
+                    <td><select name="select_typ_mitarbeiter">
+                    <option value="intern" '.($typMitarbeiter=='intern'?'selected':'').'>Intern</option>
+                    <option value="extern" '.($typMitarbeiter=='extern'?'selected':'').'>Extern</option>
+                    </select>
                     <td>Anfangsbuchstabe:</td>
                     <td><select name="select_buchstabe">';
                     foreach($buchstabenArray as $b)
@@ -143,7 +161,7 @@ if(isset($_REQUEST['btn_submitStudent']))
 
     $studentenArray = $studenten->getStudents($studiengang_kz,$semester,null,null,null,'WS2011');
     echo '
-        <form method="POST" name="form_studentenkarten">
+        <form method="POST" name="form_studentenkarten" action="kartezuweisen.php">
         <table id="myTableFiles" class="tablesorter">
         <thead>
             <tr>
@@ -158,45 +176,51 @@ if(isset($_REQUEST['btn_submitStudent']))
     
     foreach($studentenArray as $stud)
     {
-        if($statusStudent=='gedrucktNichtAusgegeben')
+        // Wenn letzter Status nich Student ist -> nicht anzeigen
+        $prestudent = new prestudent(); 
+        $prestudent->getLastStatus($stud->prestudent_id);
+        if($prestudent->status_kurzbz == 'Student')
         {
-            // gedruckt aber noch nicht ausgegeben
-            $fotostatus = new fotostatus();
-            $fotostatus->getLastFotoStatus($stud->person_id); 
-            $betriebsmittel = new betriebsmittel(); 
-
-            // status akzeptiert und noch nicht gedruckt
-            if($fotostatus->fotostatus_kurzbz == 'akzeptiert' && $betriebsmittel->zutrittskartePrinted($stud->uid) == true && $betriebsmittel->zutrittskarteAusgegeben($stud->uid) == false)
+            if($statusStudent=='gedrucktNichtAusgegeben')
             {
-                echo '<tr><td>'.$stud->nachname.' '.$stud->vorname.'</td><td>'.$stud->gebdatum.'</td><td>'.$stud->matrikelnr.'</td><td>'.$stud->uid.'</td><td>'.$stud->person_id.'<input type="hidden" name="users" value="'.$stud->uid.'"></td></tr>';
-                $uids.=';'.$stud->uid;     
+                // gedruckt aber noch nicht ausgegeben
+                $fotostatus = new fotostatus();
+                $fotostatus->getLastFotoStatus($stud->person_id); 
+                $betriebsmittel = new betriebsmittel(); 
+
+                // status akzeptiert und noch nicht gedruckt
+                if($fotostatus->fotostatus_kurzbz == 'akzeptiert' && $betriebsmittel->zutrittskartePrinted($stud->uid) == true && $betriebsmittel->zutrittskarteAusgegeben($stud->uid) == false)
+                {
+                    echo '<tr><td>'.$stud->nachname.' '.$stud->vorname.'</td><td>'.$stud->gebdatum.'</td><td>'.$stud->matrikelnr.'</td><td>'.$stud->uid.'</td><td>'.$stud->person_id.'<input type="hidden" name="users[]" value="'.$stud->uid.'"></td></tr>';
+                    $uids.=';'.$stud->uid;     
+                }
             }
-        }
-        else if($statusStudent == 'nichtGedruckt')
-        {
-            // akzeptiert und nicht gedruckt
-            $fotostatus = new fotostatus();
-            $fotostatus->getLastFotoStatus($stud->person_id); 
-            $betriebsmittel = new betriebsmittel(); 
-
-            // status akzeptiert und noch nicht gedruckt
-            if($fotostatus->fotostatus_kurzbz == 'akzeptiert' && $betriebsmittel->zutrittskartePrinted($stud->uid) == false)
+            else if($statusStudent == 'nichtGedruckt')
             {
-                echo '<tr><td>'.$stud->nachname.' '.$stud->vorname.'</td><td>'.$stud->gebdatum.'</td><td>'.$stud->matrikelnr.'</td><td>'.$stud->uid.'</td><td>'.$stud->person_id.'<input type="hidden" name="users" value="'.$stud->uid.'"></td></tr>';
-                $uids.=';'.$stud->uid;     
+                // akzeptiert und nicht gedruckt
+                $fotostatus = new fotostatus();
+                $fotostatus->getLastFotoStatus($stud->person_id); 
+                $betriebsmittel = new betriebsmittel(); 
+
+                // status akzeptiert und noch nicht gedruckt
+                if($fotostatus->fotostatus_kurzbz == 'akzeptiert' && $betriebsmittel->zutrittskartePrinted($stud->uid) == false)
+                {
+                    echo '<tr><td>'.$stud->nachname.' '.$stud->vorname.'</td><td>'.$stud->gebdatum.'</td><td>'.$stud->matrikelnr.'</td><td>'.$stud->uid.'</td><td>'.$stud->person_id.'<input type="hidden" name="users[]" value="'.$stud->uid.'"></td></tr>';
+                    $uids.=';'.$stud->uid;     
+                }
             }
-        }
-        else
-        {
-            // letzten Status anzeigen
-            $fotostatus = new fotostatus();
-            $fotostatus->getLastFotoStatus($stud->person_id); 
-
-            // überprüfen ob letzer Status der gesuchte ist
-            if($fotostatus->fotostatus_kurzbz == $statusStudent)
+            else
             {
-                echo '<tr><td>'.$stud->nachname.' '.$stud->vorname.'</td><td>'.$stud->gebdatum.'</td><td>'.$stud->matrikelnr.'</td><td>'.$stud->uid.'</td><td>'.$stud->person_id.'<input type="hidden" name="users" value="'.$stud->uid.'"></td></tr>';
-                $uids.=';'.$stud->uid; 
+                // letzten Status anzeigen
+                $fotostatus = new fotostatus();
+                $fotostatus->getLastFotoStatus($stud->person_id); 
+
+                // überprüfen ob letzer Status der gesuchte ist
+                if($fotostatus->fotostatus_kurzbz == $statusStudent)
+                {
+                    echo '<tr><td>'.$stud->nachname.' '.$stud->vorname.'</td><td>'.$stud->gebdatum.'</td><td>'.$stud->matrikelnr.'</td><td>'.$stud->uid.'</td><td>'.$stud->person_id.'<input type="hidden" name="users[]" value="'.$stud->uid.'"></td></tr>';
+                    $uids.=';'.$stud->uid; 
+                }
             }
         }
     }
@@ -214,12 +238,24 @@ if(isset($_REQUEST['btn_submitStudent']))
 // Zeige alle Mitarbeiter an
 if(isset($_REQUEST['btn_submitMitarbeiter']))
 {
+    $studSemArray = array(); 
+    
+    $studiensemester = new studiensemester(); 
+    $studSemArray[]=$studiensemester->getakt();
+    $studSemArray[]=$studiensemester->getPrevious();
+    $studSemArray[]=$studiensemester->getBeforePrevious();
+    
+    $fixangestellt = true; 
+    if($_REQUEST['select_typ_mitarbeiter'] == 'extern')
+        $fixangestellt = false; 
+        
     $mitarbeiter = new mitarbeiter(); 
-    $mitarbeiter->getMitarbeiterForZutrittskarte($buchstabe);
+    $mitarbeiter->getMitarbeiterForZutrittskarte($buchstabe, $fixangestellt, $studSemArray);
+
     $uids = '';
     
-        echo '
-        <form method="POST" name="form_mitarbeiterkarten" action="'.$_SERVER['PHP_SELF'].'">
+    echo '
+        <form method="POST" name="form_mitarbeiterkarten" action="kartezuweisen.php">
         <table id="myTableFiles" class="tablesorter">
         <thead>
             <tr>
@@ -240,7 +276,7 @@ if(isset($_REQUEST['btn_submitMitarbeiter']))
                 $fotostatus->getLastFotoStatus($mit->person_id); 
                 $betriebsmittel = new betriebsmittel(); 
                 
-                // gedruckt aber noch nicht ausgegeben
+                // status akzeptiert, gedruckt aber noch nicht ausgegeben
                 if($fotostatus->fotostatus_kurzbz == 'akzeptiert' && $betriebsmittel->zutrittskartePrinted($mit->uid) == true && $betriebsmittel->zutrittskarteAusgegeben($mit->uid) == false)
                 {
                     $uids.=';'.$mit->uid; 
