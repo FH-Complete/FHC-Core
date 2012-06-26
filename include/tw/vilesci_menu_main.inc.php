@@ -172,8 +172,10 @@ $menu=array
 		(
 			'name'=>'FH Ausweis','permissions'=>array('basis/fhausweis'),
 			'Profilfotocheck'=>array('name'=>'Profilfoto Check','link'=>'fhausweis/bildpruefung.php','target'=>'main'),
-			'Kartentausch'=>array('name'=>'Kartentausch','link'=>'fhausweis/kartentausch.php','target'=>'main'),
+			'Kartenverwaltung'=>array('name'=>'Kartenverwaltung','link'=>'fhausweis/kartenverwaltung.php','target'=>'main'),
 			'KarteZuweisen'=>array('name'=>'Karte zuweisen','link'=>'fhausweis/kartezuweisen.php','target'=>'main'),
+			'Kartentausch'=>array('name'=>'Kartentausch','link'=>'fhausweis/kartentausch.php','target'=>'main'),
+			'Suche'=>array('name'=>'Suche','link'=>'fhausweis/search.php','target'=>'main'),
 			'Syncronisation'=>array('name'=>'Syncronisation', 'link'=>'stammdaten/imexport/zutrittskarten/index.html', 'target'=>'main')
 		)
 	),

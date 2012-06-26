@@ -418,7 +418,7 @@ function BetriebsmittelDetailSpeichern()
 	else
 	{
 		BetriebsmittelSelectBetriebsmittelperson_id=val.dbdml_data;
-		loadBetriebsmittel(Betriebsmittel_Person_id);
+		loadBetriebsmittel(Betriebsmittel_Person_id, Betriebsmittel_Person_UID);
 	}
 }
 
