@@ -1047,19 +1047,29 @@ class mitarbeiter extends benutzer
 	}
 
     /**
-     * Holt alle Mitarbeiter nach einem bestimmten filter = Anfangsbuchstabe
-     * @param $filter Anfangsbuchstabe der Mitarbeiter
+     *
+     * @param $filter Buchstabe mit dem der Mitarbeiter beginnt
+     * @param $fixangestellt false wenn externer mitarbeiter
+     * @param $studSemArray Array mit Studiensemestern in denen der externe Lektor zumindest in einem Unterrichtet haben soll
      * @return boolean 
      */
-    public function getMitarbeiterForZutrittskarte($filter)
+    public function getMitarbeiterForZutrittskarte($filter, $fixangestellt=true, $studSemArray)
     {
         $qry = "SELECT 
-                    * 
+                    vorname,nachname,gebdatum,uid,personalnummer,person_id 
                 FROM 
                     campus.vw_mitarbeiter 
                 WHERE 
                     UPPER(SUBSTRING(nachname,1,1))=".$this->db_add_param($filter,FHC_STRING)." 
                     AND aktiv='true'";
+        if($fixangestellt)
+            $qry.=" AND fixangestellt";
+        else
+            $qry.=" AND NOT fixangestellt AND EXISTS 
+                (SELECT * FROM lehre.tbl_lehreinheitmitarbeiter 
+                JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
+                WHERE tbl_lehreinheitmitarbeiter.mitarbeiter_uid=uid 
+                AND tbl_lehreinheit.studiensemester_kurzbz in (".$this->implode4SQL($studSemArray).")) ";
         
         if($result = $this->db_query($qry))
         {
