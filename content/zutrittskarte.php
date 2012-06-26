@@ -62,7 +62,8 @@ mkdir('Pictures');
 
 // Vorlage der Zutrittskarte laden
 $vorlage = new vorlage();
-$vorlage->getAktuelleVorlage('0', 'Zutrittskarte');
+if(!$vorlage->getAktuelleVorlage('0', 'Zutrittskarte'))
+	die($vorlage->errormsg);
 $xsl_content = $vorlage->text;
 
 // Vorlage ODT in den Temp Ordner kopieren

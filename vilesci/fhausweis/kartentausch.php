@@ -56,15 +56,13 @@ $db = new basis_db();
 $kartennummer_alt = (isset($_POST['kartennummer_alt'])?$_POST['kartennummer_alt']:'');
 $karten_user = (isset($_POST['karten_user'])?$_POST['karten_user']:'');
 $kartennummer_hitag = (isset($_POST['kartennummer_hitag'])?$_POST['kartennummer_hitag']:'');
-$kartennummer_myfare = (isset($_POST['kartennummer_myfare'])?$_POST['kartennummer_myfare']:'');
 $action=(isset($_POST['action'])?$_POST['action']:'');
 
 if($action=='kartentausch')
 {
 	echo '<br>Tausche Karte von User: '.$db->convert_html_chars($karten_user);
-	echo '<br>Alte Kartennummer:'.$db->convert_html_chars($kartennummer_alt);
-	echo '<br>Neue Kartennummer Hitag: '.$db->convert_html_chars($kartennummer_hitag);
-	echo '<br>Neue Kartennummer MyFARE: '.$db->convert_html_chars($kartennummer_myfare);
+	echo ' '.$db->convert_html_chars($kartennummer_alt);
+	echo ' -> '.$db->convert_html_chars($kartennummer_hitag);
 	echo '<br>';
 	
 	$benutzer = new benutzer();
@@ -75,72 +73,64 @@ if($action=='kartentausch')
 	else
 	{
 		$error=false;
-		if($kartennummer_alt!='')
+		//Neue Karte aktivieren
+		$bmp = new betriebsmittelperson();
+		if($bmp->getKartenzuordnungPerson($benutzer->person_id, $kartennummer_hitag))
 		{
-			//Alte Karte deaktivieren wenn vorhanden
-			$bmp = new betriebsmittelperson();
-			if($bmp->getKartenzuordnung($kartennummer_alt))
+			$bmp->ausgegebenam=date('Y-m-d');
+			$bmp->updateamum = date('Y-m-d H:i:s');
+			$bmp->updatevon = $uid;
+			
+			if(!$bmp->save(false))
 			{
-				if($bmp->person_id==$benutzer->person_id)
+				echo '<span class="error">Fehler beim Tauschen: '.$bmp->errormsg.'</span>';
+				$error=true;
+			}
+		}
+		else
+		{
+			echo '<span class="error">Fehler beim Tauschen: Die neue Karte wurde dieser Person noch nicht zugeordnet</span>';
+			$error = true;
+		}
+		if(!$error)
+		{
+			if($kartennummer_alt!='')
+			{
+				//Alte Karte deaktivieren wenn vorhanden
+				$bmp = new betriebsmittelperson();
+				if($bmp->getKartenzuordnung($kartennummer_alt))
 				{
-					$bmp->retouram = date('Y-m-d');
-					if(!$bmp->save(false))
+					if($bmp->person_id==$benutzer->person_id)
 					{
-						echo '<span class="error">Fehler beim Eintragen des Retourdatums</span>';
+						$bmp->retouram = date('Y-m-d');
+						if(!$bmp->save(false))
+						{
+							echo '<span class="error">Fehler beim Eintragen des Retourdatums</span>';
+							$error=true;
+						}
+					}
+					else
+					{
+						echo '<span class="error">Karte passt nicht zur Person</span>';
 						$error=true;
 					}
 				}
 				else
 				{
-					echo '<span class="error">Karte passt nicht zur Person</span>';
+					echo '<span class="error">Kartenzuordnung der alten Karte nicht gefunden</span>';
 					$error=true;
 				}
 			}
-			else
-			{
-				echo '<span class="error">Kartenzuordnung nicht gefudnen</span>';
-				$error=true;
-			}
 		}
-		
 		if(!$error)
 		{
-			//Neue Karte anlegen
-			$bm = new betriebsmittel();
-			$bm->betriebsmitteltyp='Zutrittskarte';
-			$bm->reservieren=false;
-			$bm->insertamum=date('Y-m-d H:i:s');
-			$bm->insertvon = $uid;
-			$bm->nummer=$kartennummer_hitag;
-			$bm->nummer_myfare=$kartennummer_myfare;
-			if($bm->save(true))
-			{
-				//Neue Karte der Person zuordnen
-				$bmp = new betriebsmittelperson();
-				$bmp->betriebsmittel_id=$bm->betriebsmittel_id;
-				$bmp->ausgegebenam=date('Y-m-d');
-				$bmp->insertamum = date('Y-m-d H:i:s');
-				$bmp->insertvon = $uid;
-				$bmp->person_id = $benutzer->person_id;
-				if($bmp->save(true))
-				{
-					echo '<span class="ok">Karte erfolgreich getauscht</span>';
-				}
-				else
-				{
-					echo '<span class="error">Fehler beim Tauschen: '.$bmp->errormsg.'</span>';
-				}
-			}
-			else
-			{
-				echo '<span class="error">Fehler beim Tauschen: '.$bm->errormsg.'<span>';
-			}
-		}
+			echo '<span class="ok">Karte erfolgreich getauscht</span>';
+		}			
 	}
 	$kartennummer_alt='';
 	$karten_user='';
 	$kartennummer_hitag='';
-	$kartennummer_myfare='';
+	
 	echo '<br><hr><br>';
 }
 
@@ -178,23 +168,13 @@ if($action=='sucheKarte')
 	echo 'Suche User mit der Kartennummer '.$db->convert_html_chars($kartennummer_alt).'<br>';	
 	if(!$karten_user = getUidFromCardNumber($kartennummer_alt))
 	{
-		//Wenn die Karte nicht im LDAP eingetragen ist, 
-		//dann schauen ob die Karte laut DB ausgegeben ist
-		if($bmp->getKartenzuordnung($kartennummer_alt))
-		{
-			$bn = new benutzer();
-			if($bn->getBenutzerFromPerson($bm->person_id))
-			{
-				if(isset($bn->result[0]))
-				{
-					$karten_user = $bn->result[0]->uid;
-				}
-			}
-		}
-
 		if($karten_user=='')
 			echo '<span class="error">Diese Karte ist derzeit nicht ausgegeben</span>';
 	}
+}
+if($action=='sucheUser')
+{
+	echo '<span class="ok">Bei direkten Zugriff auf die Person muss die alte Karte manuell entfernt werden!</span>';
 }
 if($karten_user!='')
 {
@@ -242,7 +222,7 @@ if($karten_user!='')
 		<input type="hidden" name="kartennummer_alt" value="'.$db->convert_html_chars($kartennummer_alt).'" />
 		<table>
 		<tr>
-			<td>Kartennummer Hitag:</td>
+			<td>Kartennummer Neu</td>
 			<td>
 				<input type="text" value="" name="kartennummer_hitag" id="kartennummer_hitag"/>
 				<script type="text/javascript">
@@ -255,9 +235,8 @@ if($karten_user!='')
 			<td><div id="hitag_description"></div></td>
 		</tr>
 		<tr>
-			<td>Kartennummer MyFARE:</td>
-			<td><input type="text" value="" name="kartennummer_myfare" id="kartennummer_myfare"/></td>
-			<td><div id="myfare_description"></div></td>
+			<td>&nbsp;</td>
+			<td></td>
 		</tr>
 		<tr>
 			<td></td>
@@ -270,18 +249,11 @@ if($karten_user!='')
 		function checkValues()
 		{
 			var hitag = document.getElementById("kartennummer_hitag");
-			var myfare = document.getElementById("kartennummer_myfare");
 			
 			if($("#kartennummer_hitag").val()=="")
 			{
 				$("#hitag_description").text("Ziehen Sie die neue Karten über Lesegerät 1");
 				$("#kartennummer_hitag").focus();
-				return false;
-			}
-			if($("#kartennummer_myfare").val()=="")
-			{
-				$("#myfare_description").text("Ziehen Sie die neue Karten über Lesegerät 2");
-				$("#kartennummer_myfare").focus();
 				return false;
 			}
 			
@@ -297,7 +269,7 @@ if($karten_user!='')
 }
 else
 {
-	echo '<br><b>Bitte ziehen Sie die alte Karte über den Kartenleser 1</b>
+	echo '<br><b>Bitte ziehen Sie die alte Karte über den Kartenleser</b>
 	<script type="text/javascript">
 		$(document).ready(function() 
 		{

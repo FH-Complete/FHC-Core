@@ -562,5 +562,64 @@ class betriebsmittelperson extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Sucht welche Person die uebergebene Kartennummer hat
+	 * @param $person_id Person ID
+	 * @param $nummer Kartennummer
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getKartenzuordnungPerson($person_id, $nummer)
+	{
+		$qry='
+			SELECT 
+				*
+			FROM 
+				wawi.tbl_betriebsmittel 
+				JOIN wawi.tbl_betriebsmittelperson USING(betriebsmittel_id) 
+			WHERE tbl_betriebsmittel.nummer='.$this->db_add_param($nummer).'
+			AND tbl_betriebsmittelperson.person_id='.$this->db_add_param($person_id);
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->betriebsmittelperson_id = $row->betriebsmittelperson_id;
+				$this->betriebsmittel_id = $row->betriebsmittel_id;
+				$this->beschreibung = $row->beschreibung;
+				$this->betriebsmitteltyp = $row->betriebsmitteltyp;
+				$this->nummer = $row->nummer;
+				$this->inventarnummer = $row->inventarnummer;
+				$this->reservieren = $this->db_parse_bool($row->reservieren);
+				$this->ort_kurzbz = $row->ort_kurzbz;
+				$this->person_id = $row->person_id;
+				$this->anmerkung = $row->anmerkung;
+				$this->kaution = $row->kaution;
+				$this->ausgegebenam = $row->ausgegebenam;
+				$this->retouram = $row->retouram;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->ext_id = $row->ext_id;
+				$this->oe_kurzbz = $row->oe_kurzbz;
+				$this->nummer2 = $row->nummer2;
+				$this->uid = $row->uid;
+				
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Karte ist derzeit nicht ausgegeben';
+				return false;
+			}
+			
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>
