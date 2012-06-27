@@ -159,7 +159,10 @@ if(isset($_REQUEST['btn_submitStudent']))
     
     $studenten = new student(); 
 
-    $studentenArray = $studenten->getStudents($studiengang_kz,$semester,null,null,null,'WS2011');
+    $studenten->getStudentsStudiengang($studiengang_kz, $semester);
+    $studentenArray = $studenten->result; 
+    
+   // $studentenArray = $studenten->getStudents($studiengang_kz,$semester,null,null,null,'WS2011');
     echo '
         <form method="POST" name="form_studentenkarten" action="kartezuweisen.php">
         <table id="myTableFiles" class="tablesorter">
