@@ -27,6 +27,8 @@ require_once('../../include/functions.inc.php');
 require_once('../../include/basis_db.class.php');
 require_once('../../include/benutzer.class.php');
 
+session_start();
+
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
 
@@ -35,7 +37,9 @@ if (!$db = new basis_db())
 //(z.B. fuer die Erstellung von PDFs)
 if($_SERVER['REMOTE_ADDR']!=$_SERVER['SERVER_ADDR'])
 {
-	$uid = get_uid();
+    // wenn session gesetzt ist von Prestudententool -> keine Abfrage da diese Studenten noch keine uid haben
+    if(!isset($_SESSION['prestudent/user']))
+       $uid = get_uid();
 }
   
 //default bild (ein weisser pixel)
