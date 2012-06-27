@@ -110,7 +110,7 @@ $pdf->SetFont('Arial','',8);
 		$maxX +=20;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->SetFont('Arial','B',8);
-		$pdf->MultiCell(130,$lineheight,'Hörer/Name',1,'L',0);
+		$pdf->MultiCell(130,$lineheight,'Hï¿½rer/Name',1,'L',0);
 		$maxX +=130;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(65,$lineheight,'Kennzeichen',1,'C',0);
@@ -125,7 +125,7 @@ $stsem_obj->load($stsem);
 $stsemdatumvon = $stsem_obj->start;
 $stsemdatumbis = $stsem_obj->ende;
 $qry = "SELECT 
-			distinct on(nachname, vorname, person_id) vorname, nachname, matrikelnr, person_id,
+			distinct on(nachname, vorname, person_id) vorname, nachname, matrikelnr, person_id, foto_sperre,
 			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 			(SELECT status_kurzbz FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
 			tbl_bisio.bisio_id, tbl_bisio.bis, tbl_bisio.von,
@@ -207,7 +207,8 @@ if($result = $db->db_query($qry))
 			$maxX +=65;
 //			$pdf->SetXY($maxX,$maxY);
 //			$pdf->MultiCell(80,$lineheight,'',0,'L',1);
-			$pdf->Image(APP_ROOT."cis/public/bild.php?src=person&person_id=".$elem->person_id,$maxX+1,$maxY+1,0,"78","jpg","");
+			if($elem->foto_sperre=='f')
+				$pdf->Image(APP_ROOT."cis/public/bild.php?src=person&person_id=".$elem->person_id,$maxX+1,$maxY+1,0,"78","jpg","");
 		   	$inhalt[]=array($i,$name,$matrikelnr,$sem_verb_grup,'');
 		}
    }
@@ -238,7 +239,7 @@ $maxY=$pdf->GetY();
 $maxX=30;
 $pdf->SetXY($maxX,$maxY);
 $pdf->SetFont('Arial','',8);
-$pdf->MultiCell(520,$lineheight,'Fehlt ein Student länger als 2 Wochen, bitte um einen deutlichen Vermerk auf der Anwesenheitsliste. Die Anwesenheitsliste bitte am Ende des Monats im Sekretariat abgeben! Bitte achten Sie darauf, dass Sie nur VOLLSTÄNDIG AUSGEFÜLLTE LISTEN abgeben!',0,'L',0);
+$pdf->MultiCell(520,$lineheight,'Fehlt ein Student lï¿½nger als 2 Wochen, bitte um einen deutlichen Vermerk auf der Anwesenheitsliste. Die Anwesenheitsliste bitte am Ende des Monats im Sekretariat abgeben! Bitte achten Sie darauf, dass Sie nur VOLLSTï¿½NDIG AUSGEFï¿½LLTE LISTEN abgeben!',0,'L',0);
 */
 
 $pdf->Output('anwesenheitsliste.pdf','I');
