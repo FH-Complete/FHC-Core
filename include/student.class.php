@@ -330,6 +330,59 @@ class student extends benutzer
 		}
 		return $result;
 	}
+    
+    
+    /**
+     * Gibt Studenten zurück die im übergebenen Studiengang und semester sind
+     * @param $studiengang_kz
+     * @param $semester
+     * @return boolean 
+     */
+    public function getStudentsStudiengang($studiengang_kz, $semester = null)
+    {
+        if($studiengang_kz == '')
+        {
+            $this->errormsg ="Es wurde kein Studiengang übergeben";
+            return false; 
+        }
+    
+        $qry = "SELECT * FROM tbl_student student 
+            JOIN tbl_benutzer ON (student_uid = uid)
+            JOIN tbl_person USING (person_id)
+            WHERE tbl_benutzer.aktiv = 'true' AND studiengang_kz =".$this->db_add_param($studiengang_kz,FHC_INTEGER); 
+        
+        if($semester != null)
+            $qry .= " AND semester =".$this->db_add_param($semester, FHC_INTEGER);
+                
+        
+        
+        if($result = $this->db_query($qry))
+        {
+            while($row = $this->db_fetch_object($result))
+            {
+                $stud = new student(); 
+                $stud->uid = $row->student_uid; 
+                $stud->matrikelnr = $row->matrikelnr; 
+                $stud->prestudent_id = $row->prestudent_id; 
+                $stud->studiengang_kz = $row->studiengang_kz; 
+                $stud->semester = $row->semester; 
+                $stud->verband = $row->verband; 
+                $stud->gruppe = $row->gruppe; 
+                $stud->person_id = $row->person_id; 
+                $stud->vorname = $row->vorname; 
+                $stud->nachname = $row->nachname; 
+                $stud->gebdatum = $row->gebdatum; 
+                
+                $this->result[] = $stud; 
+            }
+            return true; 
+        }
+        else
+        {
+            $this->errormsg = "Fehler bei der Abfrage aufgetreten";
+            return false; 
+        }
+    }
 	
 	/**
 	 * Prueft ob die StudentLehrverband Zuteilung
