@@ -209,7 +209,7 @@ if (isset($_REQUEST['zeitsperre_id']) || isset($_REQUEST['neu']))
 	$htmlstr .= "	<td><input type='text' name='bisstunde' value='$zs->bisstunde' maxlength='5'></td>";
 	$htmlstr .= "</tr>";
 	$htmlstr .= "<tr><td>Freigabedatum</td>";
-	$htmlstr .= "	<td><input type='text' name='freigabeamum' value='$zs->freigabeamum' maxlength='15'></td>";
+	$htmlstr .= "	<td><input type='text' name='freigabeamum' value='$zs->freigabeamum' maxlength='19'></td>";
 	$htmlstr .= "		<td>Freigabe</td>";
 	$htmlstr .= "		<td><select name='freigabevon'>\n";
 	$htmlstr .= "<option value=''>---ausw&auml;hlen---</option>";
