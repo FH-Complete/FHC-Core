@@ -190,7 +190,7 @@ join public.tbl_prestudent prestudent using(prestudent_id)
 join public.tbl_prestudentstatus status using(prestudent_id) 
 WHERE status.studiensemester_kurzbz = '$aktSem'  
 and lv.studiensemester_kurzbz = '$aktSem' AND status.status_kurzbz NOT IN ('Interessent','Bewerber')
-and get_rolle_prestudent (prestudent_id, null)='Student';"; 
+and get_rolle_prestudent (prestudent_id, '$aktSem')='Student';"; 
 
 if($db->db_query($qry))
 {
