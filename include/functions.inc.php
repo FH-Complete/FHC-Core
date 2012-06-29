@@ -418,14 +418,14 @@ function getUidFromCardNumber($number)
 	    // bind to ldap connection
 	    if(($bind=@ldap_bind($connect)) == false)
 	    {
-			print "bind:__FAILED__<br>\n";
+			//print "bind:__FAILED__<br>\n";
 			return false;
 	    }
 
 	    // search for card id
 	    if (($res_id = ldap_search($connect, LDAP_BASE_DN, "departmentNumber=$number")) == false)
 	    {
-			print "failure: search in LDAP-tree failed<br>";
+			//print "failure: search in LDAP-tree failed<br>";
 			return false;
 	    }
 
@@ -436,7 +436,7 @@ function getUidFromCardNumber($number)
 	    	 // search for card id 0[Number]
 		    if (($res_id = ldap_search($connect, LDAP_BASE_DN, "departmentNumber=$number")) == false)
 		    {
-				print "failure: search in LDAP-tree failed<br>";
+				//print "failure: search in LDAP-tree failed<br>";
 				return false;
 		    }
 		    if (ldap_count_entries($connect, $res_id) == 0)
@@ -445,7 +445,7 @@ function getUidFromCardNumber($number)
 		    	 // search for card id 00[Number]
 			    if (($res_id = ldap_search($connect, LDAP_BASE_DN, "departmentNumber=$number")) == false)
 			    {
-					print "failure: search in LDAP-tree failed<br>";
+					//print "failure: search in LDAP-tree failed<br>";
 					return false;
 			    }
 			    if (ldap_count_entries($connect, $res_id) == 0)
@@ -454,7 +454,7 @@ function getUidFromCardNumber($number)
 			    	// search for card id 000[Number]
 				    if (($res_id = ldap_search($connect, LDAP_BASE_DN, "departmentNumber=$number")) == false)
 				    {
-						print "failure: search in LDAP-tree failed<br>";
+						//print "failure: search in LDAP-tree failed<br>";
 						return false;
 				    }
 				    if (ldap_count_entries($connect, $res_id) == 0)
@@ -464,7 +464,7 @@ function getUidFromCardNumber($number)
 				    	// search for card id 0000[Number]
 					    if (($res_id = ldap_search($connect, LDAP_BASE_DN, "departmentNumber=$number")) == false)
 					    {
-							print "failure: search in LDAP-tree failed<br>";
+							//print "failure: search in LDAP-tree failed<br>";
 							return false;
 					    }
 				    	if (ldap_count_entries($connect, $res_id) == 0)
@@ -473,7 +473,7 @@ function getUidFromCardNumber($number)
 					    	// search for card id 00000[Number]
 						    if (($res_id = ldap_search($connect, LDAP_BASE_DN, "departmentNumber=$number")) == false)
 						    {
-								print "failure: search in LDAP-tree failed<br>";
+								//print "failure: search in LDAP-tree failed<br>";
 								return false;
 						    }
 					    	if (ldap_count_entries($connect, $res_id) == 0)
@@ -482,12 +482,12 @@ function getUidFromCardNumber($number)
 								// search for card id 000000[Number]
 							    if (($res_id = ldap_search($connect, LDAP_BASE_DN, "departmentNumber=$number")) == false)
 							    {
-									print "failure: search in LDAP-tree failed<br>";
+									//print "failure: search in LDAP-tree failed<br>";
 									return false;
 							    }
 							    if (ldap_count_entries($connect, $res_id) == 0)
 						    	{
-						    		print "failure: no person found<br>"; 
+						    		//print "failure: no person found<br>"; 
 						    		return false; 
 						    	}
 					    	}

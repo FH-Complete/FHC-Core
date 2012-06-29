@@ -58,7 +58,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 $uid = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
-if(!$rechte->isBerechtigt('basis/fhausweis'))
+if(!$rechte->isBerechtigt('basis/fhausweis') && !$rechte->isBerechtigt('assistenz'))
 	die('Sie haben keine Berechtigung für diese Seite');
 	
 $db = new basis_db();
@@ -145,7 +145,7 @@ if($person_id!='')
 		echo '<br>Neue Karte bereits gedruckt:';
 		$qry = "
 		SELECT 
-			tbl_betriebsmittelperson.ausgegebenam
+			tbl_betriebsmittelperson.ausgegebenam, tbl_betriebsmittel.nummer
 		FROM 
 			wawi.tbl_betriebsmittel 
 			JOIN wawi.tbl_betriebsmittelperson USING(betriebsmittel_id) 
@@ -154,11 +154,13 @@ if($person_id!='')
 			AND tbl_betriebsmittelperson.uid=".$db->db_add_param($row_account->uid)."
 			AND nummer2 is not null";
 		$ausgegeben='';
+		$nummer='';
 		if($result = $db->db_query($qry))
 		{
 			if($row = $db->db_fetch_object($result))
 			{
 				$ausgegeben = $row->ausgegebenam;
+				$nummer = $row->nummer;
 			}
 		}
 		if($db->db_num_rows($result)>0)
@@ -171,6 +173,28 @@ if($person_id!='')
 			echo 'Nein';
 		else
 			echo 'Ja ( '.$datum_obj->formatDatum($ausgegeben,'d.m.Y').' )';
+			
+		echo '<br>Neue Karte bereits aktiv (im LDAP): ';
+		if($nummer!='')
+		{
+			if($uidldap = getUidFromCardNumber($nummer))
+			{
+				if($uidldap==$row_account->uid)
+				{
+					echo 'Ja';
+				}
+				else
+				{
+					echo 'Ja, aber bei UID '.$uidldap;
+				}
+			}
+			else
+			{
+				echo 'Nein';
+			}		
+		}
+		else
+			echo 'Nein';
 	}
 	 
 }
