@@ -1846,3 +1846,13 @@ function MitarbeiterTreeVerwendungSort()
 {
 	debug('ToDo: MitarbeiterTreeVerwendungSort');
 }
+
+
+// ****
+// * Oeffnet ein Fenster mit den Details der gesamten Person
+// ****
+function MitarbeiterShowPersonendetails()
+{
+	person_id = document.getElementById('mitarbeiter-detail-textbox-person_id').value;
+	window.open('<?php echo APP_ROOT ?>vilesci/personen/personendetails.php?id='+person_id,'Personendetails','');
+}

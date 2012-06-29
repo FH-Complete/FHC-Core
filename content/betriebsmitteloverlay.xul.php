@@ -126,6 +126,10 @@ else
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#beschreibung" />
 							<splitter class="tree-splitter"/>
+							<treecol id="betriebsmittel-tree-uid" label="UID" flex="2" hidden="false"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#uid" />
+							<splitter class="tree-splitter"/>
 						</treecols>
 
 						<template>
@@ -142,6 +146,7 @@ else
 										<treecell label="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#person_id"/>
 										<treecell label="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#betriebsmittelperson_id"/>
 										<treecell label="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#beschreibung"/>
+										<treecell label="rdf:http://www.technikum-wien.at/betriebsmittel/rdf#uid"/>
 									</treerow>
 								</treeitem>
 							</treechildren>

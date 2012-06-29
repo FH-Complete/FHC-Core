@@ -152,6 +152,7 @@ function draw_content($row)
             <BTM:ausgegebenam><![CDATA['.$datum->convertISODate($row->ausgegebenam).']]></BTM:ausgegebenam>
             <BTM:retouram_iso><![CDATA['.$row->retouram.']]></BTM:retouram_iso>
             <BTM:retouram><![CDATA['.$datum->convertISODate($row->retouram).']]></BTM:retouram>
+            <BTM:uid><![CDATA['.$row->uid.']]></BTM:uid>
          </RDF:Description>
       </RDF:li>';
 

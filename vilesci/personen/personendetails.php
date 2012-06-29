@@ -80,6 +80,7 @@ echo "Name: $person->titelpre $person->nachname $person->vorname $person->titelp
 echo "Geburtsdatum: ".$datum_obj->formatDatum($person->gebdatum,'d.m.Y')."<br>";
 echo "Geschlecht: ".$person->geschlecht."<br>";
 
+echo '<br><a href="../fhausweis/search.php?person_id='.$person->person_id.'">Statusinformation - FH Ausweis</a><br>';
 $kontakt = new kontakt();
 $kontakt->load_pers($person->person_id);
 echo '<h3>Kontaktdaten</h3>';

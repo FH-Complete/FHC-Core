@@ -48,6 +48,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterfunktionove
 <popupset>
 	<popup id="mitarbeiter-tree-popup">
 		<menuitem label="EMail versenden" oncommand="MitarbeiterSendMail();" id="mitarbeiter-tree-popup-mail" hidden="false"/>
+		<menuitem label="Personendetails anzeigen" oncommand="MitarbeiterShowPersonendetails()" id="mitarbeiter-tree-popup-personendetails" hidden="false"/>
 	</popup>
 </popupset>
 	<hbox>
