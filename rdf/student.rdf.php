@@ -99,7 +99,7 @@ function checkfilter($row, $filter2)
 	{
 		// Alle Personen die keine Belastung auf den uebergebenen Buchungstyp haben 
 		// Incoming werden nicht beruecksichtigt
-		list($filter, $buchungstyp) = split(';',$filter2);
+		list($filter, $buchungstyp) = explode(';',$filter2);
 		$prestudent = new prestudent();
 		$prestudent->getLastStatus($row->prestudent_id);
 		
@@ -585,7 +585,7 @@ if($xmlformat=='rdf')
 else
 {
 	//XML
-	$uids = split(';',$uid);
+	$uids = explode(';',$uid);
 	echo '<studenten>';
 	foreach ($uids as $uid)
 	{
