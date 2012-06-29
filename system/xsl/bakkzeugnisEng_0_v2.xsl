@@ -63,7 +63,7 @@
 								<fo:table-cell border-width="0.2mm" border-style="solid"><fo:block vertical-align="top" line-height="14pt" font-family="arial" font-size="10pt" font-weight="bold" content-width="95mm"><xsl:text> </xsl:text><xsl:value-of select="abschlussbeurteilung_kurzbzEng" /></fo:block></fo:table-cell>
 							</fo:table-row>
 							<fo:table-row>
-								<fo:table-cell border-width="0.2mm" border-style="solid"><fo:block vertical-align="top" line-height="14pt" font-family="arial" font-size="10pt" content-width="60mm"><xsl:text> Date of assesment:</xsl:text></fo:block></fo:table-cell>
+								<fo:table-cell border-width="0.2mm" border-style="solid"><fo:block vertical-align="top" line-height="14pt" font-family="arial" font-size="10pt" content-width="60mm"><xsl:text> Date of assessment:</xsl:text></fo:block></fo:table-cell>
 								<fo:table-cell border-width="0.2mm" border-style="solid"><fo:block vertical-align="top" line-height="14pt" font-family="arial" font-size="10pt" content-width="95mm"><xsl:text> </xsl:text><xsl:value-of select="datum" /></fo:block></fo:table-cell>
 							</fo:table-row>
 							<fo:table-row>
