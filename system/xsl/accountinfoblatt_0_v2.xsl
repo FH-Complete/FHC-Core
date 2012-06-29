@@ -133,7 +133,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						Wie melde ich mich am System an?
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
-						Windows NT/XP: Melden sie sich an der Domäne TW an indem Sie die Tasten &lt;STRG&gt; + &lt;ALT&gt; + &lt;ENTF&gt; gleichzeitig drücken, danach Accountname und Passwort eingeben.
+						Windows XP/7: Melden sie sich an der Domäne TW an indem Sie die Tasten &lt;STRG&gt; + &lt;ALT&gt; + &lt;ENTF&gt; gleichzeitig drücken, danach Accountname und Passwort eingeben.
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
 						Linux: Nach dem Systemstart im Boot Manager einfach Linux auswählen. Das System startet mit dem KDE Login Manager. Dort ist ebenfalls der Accountname und das Passwort einzugeben.\n
@@ -143,8 +143,8 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						Ändern des Passwortes
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
-						Windows NT/XP: In den EDV-Räumen.\n
-						Loggen Sie sich mit Ihrem Account unter Windows NT/XP in der TW Domäne ein, drücken Sie &lt;STRG&gt; + &lt;ALT&gt; + &lt;ENTF&gt; und wählen Sie den Punkt "Kennwort ändern".
+						Windows XP/7: In den EDV-Räumen.\n
+						Loggen Sie sich mit Ihrem Account unter Windows XP/7 in der TW Domäne ein, drücken Sie &lt;STRG&gt; + &lt;ALT&gt; + &lt;ENTF&gt; und wählen Sie den Punkt "Kennwort ändern".
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
 						Linux: Passwort ändern auf Ihrem Fileserver <xsl:value-of select="fileserver" />.\n
@@ -157,7 +157,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						Wie und wo kann ich meine Daten ablegen?
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
-						Nach einem erfolgreichen Login ist unter Windows NT/XP das Laufwerk M: mit Ihrem Userverzeichnis am 
+						Nach einem erfolgreichen Login ist unter Windows XP/7 das Laufwerk M: mit Ihrem Userverzeichnis am 
 						Server verbunden. Dort haben Sie die Möglichkeit Ihre Daten abzulegen. Achten Sie immer darauf, Ihr Quota
 						(Speicherplatz den Sie zur Verfügung haben) nicht zu überschreiten! Einige Programme (wie etwa Netscape)
 						funktionieren dann nicht mehr einwandfrei.\n
@@ -182,7 +182,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					
 					<xsl:if test="bezeichnung">
 						<fo:block text-align="left" font-family="sans-serif" font-size="10pt" font-weight="bold">
-							Warum werden meine Einstellungen am Windows NT/XP Desktop nicht gespeichert?
+							Warum werden meine Einstellungen am Windows XP/7 Desktop nicht gespeichert?
 						</fo:block>
 						<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
 							Alle Studenten teilen sich dasselbe Profil. Sie können daher keine Einstellungen sichern.\n
@@ -220,7 +220,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						System Log-in:
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
-						Windows NT/XP: Hold down &lt;ctrl&gt; + &lt;alt&gt; + &lt;delete&gt; simultaneously to log in to the domain of the University of Applied Sciences Technikum Wien. Enter your user name (Account) and password in the log-in window.
+						Windows XP/7: Hold down &lt;ctrl&gt; + &lt;alt&gt; + &lt;delete&gt; simultaneously to log in to the domain of the University of Applied Sciences Technikum Wien. Enter your user name (Account) and password in the log-in window.
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
 						Linux: Start your system and choose Linux in the Boot Manager. The system will then launch KDE Log-in Manager. Enter your user name (see Account) and password in the log-in window.\n
@@ -232,7 +232,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
 						There are two ways to change your password:\n
 						In the computer labs of UAS Technikum Wien:\n
-						In Windows NT and Windows XP, hold down &lt;ctrl&gt; + &lt;alt&gt; + &lt;delete&gt; simultaneously to log in to the Technikum Wien domain. Select "Kennwort ändern" (Change Password). Then change your password.
+						In Windows XP and Windows 7, hold down &lt;ctrl&gt; + &lt;alt&gt; + &lt;delete&gt; simultaneously to log in to the Technikum Wien domain. Select "Kennwort ändern" (Change Password). Then change your password.
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
 						In Linux, use an SSH client such as Putty to log in to your file server <xsl:value-of select="fileserver" /> and enter "passwd". Then change your password.\n
@@ -243,7 +243,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						Disk space for your files:
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
-						In Windows NT and Windows XP, log in to the UAS Technikum Wien domain, and you will be automatically connected to volume M:, which contains your personal disk space.\n
+						In Windows XP and Windows 7, log in to the UAS Technikum Wien domain, and you will be automatically connected to volume M:, which contains your personal disk space.\n
 						In Linux, use an SSH client such as Putty to log in to your file server <xsl:value-of select="fileserver" />.
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt" font-weight="bold">
@@ -254,7 +254,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						Access to your files:
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
-						From within UAS Technikum Wien, you can always access volume M: in Windows NT and Windows XP. From outside, use an SSH or SCP client to connect to <xsl:value-of select="fileserver" />.\n
+						From within UAS Technikum Wien, you can always access volume M: in Windows XP and Windows 7. From outside, use an SSH or SCP client to connect to <xsl:value-of select="fileserver" />.\n
 					</fo:block>
 					
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt" font-weight="bold">
