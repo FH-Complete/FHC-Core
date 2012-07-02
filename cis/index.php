@@ -36,7 +36,11 @@ if(isset($_GET['sprache']))
 		die('Sprache invalid');
 }
 if(isset($_GET['content_id']))
+{
 	$id = $_GET['content_id'];
+	if(!is_numeric($id))
+		$id='';
+}
 else
 	$id = '';
 	
@@ -52,6 +56,7 @@ else
 	
 $sprache = getSprache();
 $p = new phrasen($sprache);
+$db = new basis_db();
 ?>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -74,7 +79,7 @@ function changeSprache(sprache)
 	menu = escape(menu);
 	content = escape(content);
 	
-	window.location.href="index.php?sprache="+sprache+"&content_id=<?php echo $id;?>&menu="+menu+"&content="+content;
+	window.location.href="index.php?sprache="+sprache+"&content_id=<?php echo $db->convert_html_chars($id);?>&menu="+menu+"&content="+content;
 }
 function gettimestamp()
 {
@@ -135,10 +140,10 @@ function loadampel()
    	    </td>
 	</tr>
 </table>
-<iframe id="menue" src="<?php echo $menu; ?>" name="menu" frameborder="0">
+<iframe id="menue" src="<?php echo $db->convert_html_chars($menu); ?>" name="menu" frameborder="0">
 	No iFrames
 </iframe>
-<iframe id="content" src="<?php echo $content; ?>" name="content" frameborder="0">
+<iframe id="content" src="<?php echo $db->convert_html_chars($content); ?>" name="content" frameborder="0">
 	No iFrames
 </iframe>
 </body>
