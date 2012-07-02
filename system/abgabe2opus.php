@@ -1522,7 +1522,7 @@ if($erg=pg_query($db_conn,$qry))
 													else 
 													{
 														mysql_query('ROLLBACK',$conn_ext);
-														$fehler1.="\nDatei wurde nicht kopiert! \n";
+														$fehler1.="\nDatei wurde nicht kopiert! \nZielpfad:".$opus_url."/pdf/".$row_file->paabgabe_id.'_'.$row->stud_uid.".pdf \nSource: ".$url_paa.$row_file->paabgabe_id.'_'.$row->stud_uid.'.pdf'."\n";
 													}
 												}
 												else 
