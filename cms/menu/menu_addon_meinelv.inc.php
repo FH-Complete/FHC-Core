@@ -51,7 +51,7 @@ class menu_addon_meinelv extends menu_addon
 
 			if ($stsemobj = new studiensemester())
 			{
-				$stsem = $stsemobj->getAktorNext();
+				$stsem = $stsemobj->getNearest();
 				$qry = "SELECT distinct lehrveranstaltung_id, bezeichnung, studiengang_kz, semester, lehre, 
 							lehreverzeichnis from campus.vw_student_lehrveranstaltung 
 						WHERE uid='".addslashes($user)."' AND studiensemester_kurzbz='".addslashes($stsem)."'
@@ -95,7 +95,7 @@ class menu_addon_meinelv extends menu_addon
 		{
 			if ($stsemobj = new studiensemester())
 			{
-				$stsem = $stsemobj->getAktorNext();
+				$stsem = $stsemobj->getNearest();
 				$qry = "SELECT distinct bezeichnung, studiengang_kz, semester, lehreverzeichnis, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.orgform_kurzbz  FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter
 				        WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				        tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
