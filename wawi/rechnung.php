@@ -320,7 +320,6 @@ if($aktion == 'suche')
 						<th>Rechnungsdatum</th>
 						<th>Buchungstext</th>
 						<th>Brutto</th>
-						<th>Freigegeben</th>
 						<th>Letzte Änderung</th>
 					  </tr></thead><tbody>\n";
 				$brutto_gesamt=0;
@@ -340,7 +339,7 @@ if($aktion == 'suche')
 					echo '<td>'.$date->formatDatum($row->rechnungsdatum, 'd.m.Y')."</td>\n";
 					echo '<td>'.$row->buchungstext."</td>\n";
 					echo '<td class="number">'.number_format($brutto,2,",",".")."</td>\n";
-					echo '<td>'.$freigegeben=($row->freigegeben=='t')?'ja':'nein'."</td>\n"; 
+					//echo '<td>'.$freigegeben=($row->freigegeben=='t')?'ja':'nein'."</td>\n"; 
 					echo '<td>'.$date->formatDatum($row->updateamum,'d.m.Y H:i:s').' '.$row->updatevon ."</td>\n"; 
 					echo "</tr>\n";
 				}
