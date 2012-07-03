@@ -704,7 +704,7 @@ if($aktion == 'suche')
 					echo '<td>'.$date->formatDatum($row->insertamum, 'd.m.Y')."</td>\n";
 					echo '<td>'.$freigegeben=($row->freigegeben=='t')?'ja':'nein'."</td>\n"; 
 					echo '<td>'.$geliefert.'</td>'; 
-					echo '<td>'.number_format($brutto, 2, ",",".")."</td>\n"; 
+					echo '<td class="number">'.number_format($brutto, 2, ",",".")."</td>\n"; 
 					echo '<td>'.$row->titel."</td>\n";
 					echo '<td>'.$date->formatDatum($row->updateamum,'d.m.Y').' '.$row->updatevon ."</td>\n"; 
 		
