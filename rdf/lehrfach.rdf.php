@@ -33,12 +33,20 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/lehrfach.class.php');
 
 if(isset($_GET['studiengang_kz']))
+{
 	$stg = $_GET['studiengang_kz'];
+	if(!is_numeric($stg))
+		die('Ungueltiger Studiengang');
+}
 else
 	$stg = '';
 
 if(isset($_GET['semester']))
+{
 	$sem = $_GET['semester'];
+	if(!is_numeric($sem))
+		die('Ungueltiges Semester');
+}
 else
 	$sem = '';
 $db = new basis_db();
@@ -47,7 +55,7 @@ if(isset($_GET['lehrveranstaltung_id']) && is_numeric($_GET['lehrveranstaltung_i
 {
 	$lvid = $_GET['lehrveranstaltung_id'];
 
-	$qry = "SELECT studiengang_kz, semester FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='$lvid'";
+	$qry = "SELECT studiengang_kz, semester FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=".$db->db_add_param($lvid);
 	
 	
 	if($db->db_query($qry))
@@ -78,7 +86,7 @@ echo '
 if(isset($_GET['lehrfach_id']) && is_numeric($_GET['lehrfach_id']))
 {
 	$lehrfach_id = $_GET['lehrfach_id'];
-	$where =" OR lehrfach_id='$lehrfach_id'";
+	$where =" OR lehrfach_id=".$db->db_add_param($lehrfach_id);
 }
 else 
 	$where = '';
@@ -92,9 +100,9 @@ $qry = "SELECT
 			lehre.tbl_lehrfach JOIN public.tbl_fachbereich USING(fachbereich_kurzbz) 
 		WHERE tbl_lehrfach.aktiv AND tbl_fachbereich.aktiv";
 if($stg!='')
-	$qry.=" AND tbl_lehrfach.studiengang_kz='$stg'";
+	$qry.=" AND tbl_lehrfach.studiengang_kz=".$db->db_add_param($stg);
 if($sem!='')
-	$qry.=" AND tbl_lehrfach.semester='$sem'";
+	$qry.=" AND tbl_lehrfach.semester=".$db->db_add_param($sem);
 	
 $qry.=$where;
 $qry.=" ORDER BY bezeichnung";
