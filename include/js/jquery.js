@@ -474,6 +474,7 @@ if(options.matchSubset){for(var i=q.length-1;i>=options.minChars;i--){var c=data
   			this.benchmark = benchmark;
   			
   			function log(s) {
+  				alert(s);
   				if (typeof console != "undefined" && typeof console.debug != "undefined") {
   					console.log(s);
   				} else {
@@ -1084,7 +1085,7 @@ if(options.matchSubset){for(var i=q.length-1;i>=options.minChars;i--){var c=data
   	ts.addParser({
   	    id: "dedate",
   	    is: function(s) {
-  	        return /^\d{1,2}.\d{1,2}.\d{2,4}$/.test(s);
+  	        return /^\d{1,2}[.]\d{1,2}[.]\d{2,4}$/.test(s);
   	    },
   	    format: function(s) {
   	        s = s.replace(/(\d{1,2}).(\d{1,2}).(\d{2,4})/, "$2/$1/$3");
@@ -1096,7 +1097,7 @@ if(options.matchSubset){for(var i=q.length-1;i>=options.minChars;i--){var c=data
   	ts.addParser({
   		id: "digitmittausenderpunkt",
   		is: function(s) {
-  			return /^[0-9]*[.][0-9]*[,]*[0-9]*$/.test(s);
+ 			return /^[0-9]*[.]*[0-9]*[,]*[0-9]*$/.test(s);
   		},
   		format: function(s) {
   			return $.tablesorter.formatFloat(s.replace('.',""));

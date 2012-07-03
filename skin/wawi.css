@@ -37,7 +37,7 @@ A:visited
 	color: blue;
 }
 
-A:focu
+A:focus
 {
 	cursor:hand; 
 }
@@ -121,7 +121,7 @@ table.dark td
 
 option.rechnung_nichtfreigegeben
 {
-	background-color: lightred;
+	background-color: lightpink;
 }
 
 option.rechnung_freigegebenvorhanden
