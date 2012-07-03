@@ -675,7 +675,7 @@ class betriebsmittel extends basis_db
 
 				if (empty($this->oe_kurzbz))
 				{
-					$qry="SELECT uid "; 
+					$qry="SELECT vw_benutzer.uid "; 
 					$qry.=" FROM wawi.tbl_betriebsmittel  ";
 					$qry.=" JOIN wawi.tbl_betriebsmittelperson USING(betriebsmittel_id) ";
 					$qry.=" JOIN campus.vw_benutzer USING(person_id) ";
