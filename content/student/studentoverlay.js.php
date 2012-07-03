@@ -3717,7 +3717,7 @@ function StudentPruefungNeu()
 }
 
 // ****
-// * Wenn die Lehrvernastaltung der Pruefung geaendert wird, dann wird die Liste der Lehreinheiten neu geladen
+// * Wenn die Lehrveranstaltung der Pruefung geaendert wird, dann wird die Liste der Lehreinheiten neu geladen
 // ****
 function StudentPruefungLVAChange()
 {
@@ -3973,6 +3973,19 @@ function StudentPruefungAuswahl()
 	MADropDown.database.AddDataSource(datasource);
 	
 	MADropDown.builder.rebuild();
+	
+	// Pruefen ob der zugeteilte Mitarbeiter in dem Dropdown vorhanden ist, ansonsten wird er zusaetzlich geladen
+	// das kann der Fall sein, wenn jemand uebers CIS eine Pruefung Eintraegt der nicht Lektor der LV ist (z.B. Admin)
+	var children = document.getElementById('student-pruefung-menulist-mitarbeiter').getElementsByAttribute('value',mitarbeiter_uid);
+	if(children.length == 0)
+	{
+		url='<?php echo APP_ROOT;?>rdf/mitarbeiter.rdf.php?mitarbeiter_uid='+mitarbeiter_uid+"&"+gettimestamp();
+		var datasource = rdfService.GetDataSourceBlocking(url);
+		datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		MADropDown.database.AddDataSource(datasource);
+		MADropDown.builder.rebuild();
+	}
 		
 	document.getElementById('student-pruefung-menulist-lehrveranstaltung').value=lehrveranstaltung_id;
 	document.getElementById('student-pruefung-menulist-lehreinheit').value=lehreinheit_id;
