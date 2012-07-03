@@ -247,7 +247,11 @@ $datum_obj = new datum();
 		echo '<tr>';
 
 		echo '<td>',$id,'</td>';
-		echo '<td>',$kostenstelle->bezeichnung,'</td>';
+		if($kostenstelle->aktiv)
+			$class='';
+		else
+			$class='class="inaktiv"';
+		echo '<td '.$class.'>',$kostenstelle->bezeichnung,'</td>';
 		echo '<td>',$kostenstelle->kurzbz,'</td>';
 		echo '<td class="number"><a href="../bestellung.php?method=suche&evon=',$vondatum,'&ebis=',$endedatum,'&filter_kostenstelle=',$id,'&submit=true">',number_format($brutto['bestellung'],2,',','.'),'</td>';
 		echo '<td class="number"><a href="../rechnung.php?method=suche&erstelldatum_von=',$vondatum,'&erstelldatum_bis=',$endedatum,'&filter_kostenstelle=',$id,'&submit=true">',number_format($brutto['rechnung'],2,',','.'),'</td>';

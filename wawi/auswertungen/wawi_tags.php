@@ -199,9 +199,13 @@ else
 		{
 			echo '</table></td><td valign="top"><table>';
 		}
+		if($kst->aktiv)
+			$class='';
+		else
+			$class='class="inaktiv"';
 		echo '<tr>
 				<td><input type="checkbox" name="kst[]" value="'.$kst->kostenstelle_id.'"></td>
-				<td nowrap>'.$kst->bezeichnung.' </td>
+				<td nowrap '.$class.'>'.$kst->bezeichnung.' </td>
 			</tr>';
 		$anzahl++;
 	}
@@ -288,7 +292,11 @@ function draw_tag_table($tags_array, $kst_tags, $table_id, $gj)
 		$kostenstelle = new wawi_kostenstelle();
 		$kostenstelle->load($kst);
 		echo '<tr>';
-		echo '<td>'.$kostenstelle->bezeichnung.'</td>';
+		if($kostenstelle->aktiv)
+			$class='';
+		else
+			$class='class="inaktiv"';
+		echo '<td '.$class.'>'.$kostenstelle->bezeichnung.'</td>';
 		
 		foreach(array_keys($tags_array) as $tags)
 		{
