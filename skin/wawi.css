@@ -143,4 +143,9 @@ input[type="submit"],input[type="button"]
 {
 	cursor: pointer;
 }
+
+.inaktiv
+{
+	text-decoration: line-through;
+}
 	
