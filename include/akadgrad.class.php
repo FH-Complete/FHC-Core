@@ -59,7 +59,7 @@ class akadgrad extends basis_db
 		}
 		
 		//laden des Datensatzes
-		$qry = "SELECT * FROM lehre.tbl_akadgrad WHERE akadgrad_id='".addslashes($akadgrad_id)."';";
+		$qry = "SELECT * FROM lehre.tbl_akadgrad WHERE akadgrad_id=".$this->db_add_param($akadgrad_id, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 		{

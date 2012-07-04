@@ -74,7 +74,7 @@ class ampel extends basis_db
 		$sprache = new sprache();
 		$beschreibung = $sprache->getSprachQuery('beschreibung');
 		
-		$qry = "SELECT *,".$beschreibung." FROM public.tbl_ampel WHERE ampel_id='".addslashes($ampel_id)."'";
+		$qry = "SELECT *,".$beschreibung." FROM public.tbl_ampel WHERE ampel_id=".$this->db_add_param($ampel_id, FHC_INTEGER);
 
 		if($result = $this->db_query($qry))
 		{
@@ -153,7 +153,7 @@ class ampel extends basis_db
 	 */
 	public function isBestaetigt($user, $ampel_id)
 	{
-		$qry = "SELECT 1 FROM public.tbl_ampel_benutzer_bestaetigt WHERE ampel_id='".addslashes($ampel_id)."' AND uid='".addslashes($user)."'";
+		$qry = "SELECT 1 FROM public.tbl_ampel_benutzer_bestaetigt WHERE ampel_id=".$this->db_add_param($ampel_id, FHC_INTEGER)."' AND uid=".$this->db_add_param($user);
 		
 		if($result = $this->db_query($qry))
 		{
@@ -176,7 +176,7 @@ class ampel extends basis_db
 	 */
 	public function isZugeteilt($user, $benutzer_select)
 	{
-		$qry = "SELECT CASE WHEN '".addslashes($user)."' IN (".$benutzer_select.") THEN true ELSE false END as zugeteilt";
+		$qry = "SELECT CASE WHEN ".$this->db_add_param($user)." IN (".$benutzer_select.") THEN true ELSE false END as zugeteilt";
 
 		if($result_zugeteilt = $this->db_query($qry))
 		{
@@ -225,7 +225,7 @@ class ampel extends basis_db
 			$qry.=" AND NOT EXISTS
 						(SELECT ampel_id 
 						 FROM public.tbl_ampel_benutzer_bestaetigt 
-						 WHERE uid='".addslashes($user)."' AND ampel_id=tbl_ampel.ampel_id)";
+						 WHERE uid=".$this->db_add_param($user)." AND ampel_id=tbl_ampel.ampel_id)";
 		}
 			
 		if($result = $this->db_query($qry))
@@ -266,7 +266,7 @@ class ampel extends basis_db
 	{
 		$benutzer_select = mb_strtolower($this->benutzer_select);
 		
-		if(mb_strstr($benutzer_select, 'update ') || mb_strstr($benutzer_select, 'insert '))
+		if(mb_strstr($benutzer_select, 'update ') || mb_strstr($benutzer_select, 'insert ') || mb_strstr($benutzer_select, 'delete '))
 		{
 			$this->errormsg = 'Der Benutzer Select darf nur Selects beinhalten';
 			return false;
@@ -307,38 +307,38 @@ class ampel extends basis_db
 			
 			$qry.=" benutzer_select, deadline, 
 					vorlaufzeit, verfallszeit, insertamum, insertvon , updateamum, updatevon) VALUES(".
-					$this->addslashes($this->kurzbz).',';
+					$this->db_add_param($this->kurzbz).',';
 			reset($this->beschreibung);
 			foreach($this->beschreibung as $key=>$value)
-				$qry.=$this->addslashes($value).',';
+				$qry.=$this->db_add_param($value).',';
 								
-			$qry .= $this->addslashes($this->benutzer_select).','.
-					$this->addslashes($this->deadline).','.
-					$this->addslashes($this->vorlaufzeit).','.
-					$this->addslashes($this->verfallszeit).','.
-					$this->addslashes($this->insertamum).','.
-					$this->addslashes($this->insertvon).','.
-					$this->addslashes($this->updateamum).','.
-					$this->addslashes($this->updatevon).');';
+			$qry .= $this->db_add_param($this->benutzer_select).','.
+					$this->db_add_param($this->deadline).','.
+					$this->db_add_param($this->vorlaufzeit).','.
+					$this->db_add_param($this->verfallszeit).','.
+					$this->db_add_param($this->insertamum).','.
+					$this->db_add_param($this->insertvon).','.
+					$this->db_add_param($this->updateamum).','.
+					$this->db_add_param($this->updatevon).');';
 		}
 		else
 		{
 			$qry = 'UPDATE public.tbl_ampel SET'.
-					' kurzbz = '.$this->addslashes($this->kurzbz).',';
+					' kurzbz = '.$this->db_add_param($this->kurzbz).',';
 			reset($this->beschreibung);
 			foreach($this->beschreibung as $key=>$value)
 			{
 				$idx = $sprache->index_arr[$key];
-				$qry.=' beschreibung['.$idx.'] = '.$this->addslashes($value).',';
+				$qry.=' beschreibung['.$idx.'] = '.$this->db_add_param($value).',';
 			}
 			
-			$qry.=  ' benutzer_select = '.$this->addslashes($this->benutzer_select).','.
-					' deadline = '.$this->addslashes($this->deadline).','.
-					' vorlaufzeit = '.$this->addslashes($this->vorlaufzeit).','.
-					' verfallszeit = '.$this->addslashes($this->verfallszeit).','.
-					' updateamum ='.$this->addslashes($this->updateamum).','.
-					' updatevon ='.$this->addslashes($this->updatevon).
-					' WHERE ampel_id='.$this->addslashes($this->ampel_id).';';					
+			$qry.=  ' benutzer_select = '.$this->db_add_param($this->benutzer_select).','.
+					' deadline = '.$this->db_add_param($this->deadline).','.
+					' vorlaufzeit = '.$this->db_add_param($this->vorlaufzeit).','.
+					' verfallszeit = '.$this->db_add_param($this->verfallszeit).','.
+					' updateamum ='.$this->db_add_param($this->updateamum).','.
+					' updatevon ='.$this->db_add_param($this->updatevon).
+					' WHERE ampel_id='.$this->db_add_param($this->ampel_id, FHC_INTEGER).';';					
 		}
 		
 		if($this->db_query($qry))
@@ -390,7 +390,7 @@ class ampel extends basis_db
 			$this->errormsg='ID ist ungueltig';
 			return false;
 		}
-		$qry = "DELETE FROM public.tbl_ampel WHERE ampel_id='".addslashes($ampel_id)."'";
+		$qry = "DELETE FROM public.tbl_ampel WHERE ampel_id=".$this->db_add_param($ampel_id);
 		
 		if($this->db_query($qry))
 			return true;
@@ -410,10 +410,10 @@ class ampel extends basis_db
 	public function bestaetigen($user, $ampel_id)
 	{
 		$qry = 'INSERT INTO public.tbl_ampel_benutzer_bestaetigt(ampel_id, uid, insertamum, insertvon) VALUES('.
-				$this->addslashes($ampel_id).','.
-				$this->addslashes($user).','.
+				$this->db_add_param($ampel_id, FHC_INTEGER).','.
+				$this->db_add_param($user).','.
 				'now(),'.
-				$this->addslashes($user).');';
+				$this->db_add_param($user).');';
 				
 		if($this->db_query($qry))
 			return true;
@@ -443,7 +443,7 @@ class ampel extends basis_db
 		// Ampeln holen
 		$qry = "SELECT *,".$beschreibung." FROM public.tbl_ampel";
 		if($ampel_id!='')
-			$qry.=" WHERE ampel_id='".$ampel_id."'";
+			$qry.=" WHERE ampel_id=".$this->db_add_param($ampel_id, FHC_INTEGER);
 			
 		if($result = $this->db_query($qry))
 		{
@@ -457,9 +457,9 @@ class ampel extends basis_db
 							(".$row->benutzer_select.") a 
 							JOIN campus.vw_benutzer USING(uid)
 							LEFT JOIN public.tbl_benutzerfunktion USING(uid)
-							LEFT JOIN public.tbl_ampel_benutzer_bestaetigt on(public.tbl_ampel_benutzer_bestaetigt.uid=a.uid AND ampel_id='".$row->ampel_id."')
+							LEFT JOIN public.tbl_ampel_benutzer_bestaetigt on(public.tbl_ampel_benutzer_bestaetigt.uid=a.uid AND ampel_id=".$this->db_add_param($row->ampel_id, FHC_INTEGER).")
 						WHERE
-							(tbl_ampel_benutzer_bestaetigt.ampel_id is null OR tbl_ampel_benutzer_bestaetigt.ampel_id='".$row->ampel_id."')
+							(tbl_ampel_benutzer_bestaetigt.ampel_id is null OR tbl_ampel_benutzer_bestaetigt.ampel_id=".$db->db_add_param($row->ampel_id).")
 							AND
 							(
 								(funktion_kurzbz='oezuordnung' AND oe_kurzbz in(".$this->implode4SQL($oe_arr)."))
