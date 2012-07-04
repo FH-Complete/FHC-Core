@@ -69,7 +69,7 @@ class akte extends basis_db
 		}
 		
 		//laden des Datensatzes
-		$qry = "SELECT * FROM public.tbl_akte WHERE akte_id='".addslashes($akte_id)."';";
+		$qry = "SELECT * FROM public.tbl_akte WHERE akte_id=".$this->db_add_param($akte_id, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 		{
@@ -81,7 +81,7 @@ class akte extends basis_db
 				$this->inhalt = $row->inhalt;
 				$this->mimetype = $row->mimetype;
 				$this->erstelltam = $row->erstelltam;
-				$this->gedruckt = ($row->gedruckt=='t'?true:false);
+				$this->gedruckt = $this->db_parse_bool($row->gedruckt);
 				$this->titel = $row->titel;
 				$this->bezeichnung = $row->bezeichnung;
 				$this->updateamum = $row->updateamum;
@@ -118,7 +118,7 @@ class akte extends basis_db
 			return false;
 		}
 		
-		$qry = "DELETE FROM public.tbl_akte WHERE akte_id = '".addslashes($akte_id)."';";
+		$qry = "DELETE FROM public.tbl_akte WHERE akte_id=".$this->db_add_param($akte_id, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 		{
@@ -172,39 +172,39 @@ class akte extends basis_db
 			//Neuen Datensatz anlegen	
 			$qry = "BEGIN;INSERT INTO public.tbl_akte (person_id, dokument_kurzbz, inhalt, mimetype, erstelltam, gedruckt, titel, 
 					bezeichnung, updateamum, updatevon, insertamum, insertvon, ext_id, uid) VALUES (".
-			       $this->addslashes($this->person_id).', '.
-			       $this->addslashes($this->dokument_kurzbz).', '.
-			       $this->addslashes($this->inhalt).', '.
-			       $this->addslashes($this->mimetype).', '.
-			       $this->addslashes($this->erstelltam).', '.
-			       ($this->gedruckt?'true':'false').', '.
-			       $this->addslashes($this->titel).', '.
-			       $this->addslashes($this->bezeichnung).', '.
-			       $this->addslashes($this->updateamum).', '.
-			       $this->addslashes($this->updatevon).', '.
-			       $this->addslashes($this->insertamum).', '.
-			       $this->addslashes($this->insertvon).', '.
-			       $this->addslashes($this->ext_id).', '.
-			       $this->addslashes($this->uid).');';
+			       $this->db_add_param($this->person_id, FHC_INTEGER).', '.
+			       $this->db_add_param($this->dokument_kurzbz).', '.
+			       $this->db_add_param($this->inhalt).', '.
+			       $this->db_add_param($this->mimetype).', '.
+			       $this->db_add_param($this->erstelltam).', '.
+			       $this->db_add_param($this->gedruckt, FHC_BOOLEAN).', '.
+			       $this->db_add_param($this->titel).', '.
+			       $this->db_add_param($this->bezeichnung).', '.
+			       $this->db_add_param($this->updateamum).', '.
+			       $this->db_add_param($this->updatevon).', '.
+			       $this->db_add_param($this->insertamum).', '.
+			       $this->db_add_param($this->insertvon).', '.
+			       $this->db_add_param($this->ext_id).', '.
+			       $this->db_add_param($this->uid).');';
 			       
 		}
 		else 
 		{
 			//Bestehenden Datensatz aktualisieren
 			$qry= "UPDATE public.tbl_akte SET".
-				  " person_id=".$this->addslashes($this->person_id).",".
-				  " dokument_kurzbz=".$this->addslashes($this->dokument_kurzbz).",".
-				  " inhalt=".$this->addslashes($this->inhalt).",".
-				  " mimetype=".$this->addslashes($this->mimetype).",".
-				  " erstelltam=".$this->addslashes($this->erstelltam).",".
-				  " gedruckt=".($this->gedruckt?'true':'false').",".
-				  " titel=".$this->addslashes($this->titel).",".
-				  " bezeichnung=".$this->addslashes($this->bezeichnung).",".
-				  " updateamum=".$this->addslashes($this->updateamum).",".
-				  " updatevon=".$this->addslashes($this->updatevon).",".
-				  " ext_id=".$this->addslashes($this->ext_id).",".
-				  " uid=".$this->addslashes($this->uid).
-				  " WHERE akte_id='".addslashes($this->akte_id)."'";
+				  " person_id=".$this->db_add_param($this->person_id, FHC_INTEGER).",".
+				  " dokument_kurzbz=".$this->db_add_param($this->dokument_kurzbz).",".
+				  " inhalt=".$this->db_add_param($this->inhalt).",".
+				  " mimetype=".$this->db_add_param($this->mimetype).",".
+				  " erstelltam=".$this->db_add_param($this->erstelltam).",".
+				  " gedruckt=".$this->db_add_param($this->gedruckt,FHC_BOOLEAN).",".
+				  " titel=".$this->db_add_param($this->titel).",".
+				  " bezeichnung=".$this->db_add_param($this->bezeichnung).",".
+				  " updateamum=".$this->db_add_param($this->updateamum).",".
+				  " updatevon=".$this->db_add_param($this->updatevon).",".
+				  " ext_id=".$this->db_add_param($this->ext_id).",".
+				  " uid=".$this->db_add_param($this->uid).
+				  " WHERE akte_id=".$this->db_add_param($this->akte_id, FHC_INTEGER);
 		}
 		
 		if($this->db_query($qry))
@@ -256,9 +256,9 @@ class akte extends basis_db
 		$qry = "SELECT 
 					akte_id, person_id, dokument_kurzbz, mimetype, erstelltam, gedruckt, 
 					titel, bezeichnung, updateamum, insertamum, updatevon, insertvon, uid 
-				FROM public.tbl_akte WHERE person_id='".addslashes($person_id)."'";
+				FROM public.tbl_akte WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 		if($dokument_kurzbz!=null)
-			$qry.=" AND dokument_kurzbz='".addslashes($dokument_kurzbz)."'";
+			$qry.=" AND dokument_kurzbz=".$this->db_add_param($dokument_kurzbz);
 		$qry.=" ORDER BY erstelltam";
 		
 		if($this->db_query($qry))
@@ -273,7 +273,7 @@ class akte extends basis_db
 				//$akte->inhalt = $row->inhalt;
 				$akten->mimetype = $row->mimetype;
 				$akten->erstelltam = $row->erstelltam;
-				$akten->gedruckt = ($row->gedruckt=='t'?true:false);
+				$akten->gedruckt = $this->db_parse_bool($row->gedruckt);
 				$akten->titel = $row->titel;
 				$akten->bezeichnung = $row->bezeichnung;
 				$akten->updateamum = $row->updateamum;
@@ -305,7 +305,7 @@ class akte extends basis_db
 		$qry = "SELECT 
 					akte_id, person_id, dokument_kurzbz, mimetype, erstelltam, gedruckt, 
 					titel, bezeichnung, updateamum, insertamum, updatevon, insertvon, uid 
-				FROM public.tbl_akte WHERE person_id='".addslashes($person_id)."'";
+				FROM public.tbl_akte WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 
 			$qry.=" AND dokument_kurzbz IN ('Lebenslf','Motivat','LearnAgr')";
 		$qry.=" ORDER BY erstelltam";
@@ -322,7 +322,7 @@ class akte extends basis_db
 				//$akte->inhalt = $row->inhalt;
 				$akten->mimetype = $row->mimetype;
 				$akten->erstelltam = $row->erstelltam;
-				$akten->gedruckt = ($row->gedruckt=='t'?true:false);
+				$akten->gedruckt = $this->db_parse_bool($row->gedruckt);
 				$akten->titel = $row->titel;
 				$akten->bezeichnung = $row->bezeichnung;
 				$akten->updateamum = $row->updateamum;
