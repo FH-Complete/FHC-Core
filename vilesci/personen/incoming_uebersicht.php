@@ -23,6 +23,7 @@ require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/preincoming.class.php');
+require_once('../../include/datum.class.php');
 
 $user = get_uid();
 
@@ -162,6 +163,7 @@ if(!$inc->getPreincoming($filter, $aktiv, $von, $bis, $uebernommen))
 	$message = '<span class="error">'.$inc->errormsg.'</span>';
 	
 echo $message;
+$datum = new datum();
 echo '
 <table id="myTable" class="tablesorter">
 	<thead>
@@ -171,6 +173,7 @@ echo '
 			<th>Nachname</th>
 			<th>Von</th>
 			<th>Bis</th>
+            <th>Registriert</th>
 			<th></th>
 		</tr>
 	</thead>
@@ -183,7 +186,8 @@ foreach($inc->result as $row)
 	echo '<td>'.$row->vorname.'</td>';
 	echo '<td>'.$row->nachname.'</td>';
 	echo '<td>'.$row->von.'</td>';
-	echo '<td>'.$row->bis.'</td>';
+	echo '<td>'.$row->bis.'</td>';  
+    echo '<td>'.$datum->formatDatum($row->insertamum, 'Y-m-d').'</td>';
 	echo '<td><a href="incoming_detail.php?preincoming_id='.$row->preincoming_id.'" target="incoming_detail">Details</a></td>';
 	echo '</tr>';
 }
