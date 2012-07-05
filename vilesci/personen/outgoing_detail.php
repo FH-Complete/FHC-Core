@@ -19,6 +19,9 @@
  * 
  */
 
+// SQL alle preoutgoings die gerade auf Auslandssemester sind 
+// select * from public.tbl_preoutgoing where dauer_von <= CURRENT_DATE AND dauer_bis >= CURRENT_DATE
+
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
@@ -31,16 +34,40 @@ require_once('../../include/nation.class.php');
 require_once('../../include/student.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/akte.class.php');
+require_once('../../include/prestudent.class.php');
+require_once('../../include/studiengang.class.php');
+require_once('../../include/mail.class.php');
+
+$user = get_uid();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+if(!$rechte->isBerechtigt('inout/outgoing', null, 'suid'))
+	die('Sie haben keine Berechtigung fuer diese Seite');
 
 $preoutgoing_id = isset($_GET['preoutgoing_id'])?$_GET['preoutgoing_id']:null;
 $action = isset($_GET['action'])?$_GET['action']:'personendetails';
 $method = isset($_GET['method'])?$_GET['method']:null;
 
-$user = get_uid();
 $message = '';
-$rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 $datum = new datum(); 
+
+if($method== 'deleteLv')
+{
+    $lv_id = $_GET['lv_id'];
+    $preoutgoingLv = new preoutgoing(); 
+    
+    // Wenn die Lv zum preoutgoing gehört wird sie gelöscht
+    
+    if($preoutgoingLv->checkLv($lv_id, $preoutgoing_id))
+    { 
+        if(!$preoutgoingLv->deleteLv($lv_id))
+            $message ='<span class="error">Fehler beim Löschen der Lehrveranstaltung aufgetreten!</span>';
+        else
+            $message ='<span class="ok">Erfolgreich gelöscht</span>';
+    }
+}
 
 // Setzt die gemeinsam ausgewählte Universität
 if($method == 'setAuswahl')
@@ -94,6 +121,7 @@ if($method=="save")
     $outgoing->studienbeihilfe = isset($_POST['studienbeihilfe'])?true:false; 
     $outgoing->betreuer = $_POST['betreuer_uid'];
     $outgoing->ansprechperson = $_POST['anprechperson_uid'];
+    $outgoing->anmerkung_student = $_POST['anmerkungStudent'];
     if($_REQUEST['sprachkurs'] == 'vorbereitend')
     {
         $outgoing->sprachkurs = true; 
@@ -116,9 +144,37 @@ if($method=="save")
         $message = '<span class="error">Es ist ein Fehler beim Speichern aufgetreten</span>';
     
 }
+
+if(isset($_POST['StatusSetzen']))
+{
+    $status = $_POST['status'];
+    // mail an assistenz senden
+    if($status =='genehmigt')
+    {
+        
+    }
+    $outgoing= new preoutgoing();
+    if($outgoing->setStatus($preoutgoing_id, $status))
+        $message = '<span class="ok">Erfolgreich gespeichert</span>';
+    else
+        $message ='<span class="error">Es ist ein Fehler beim Speichern aufgetreten</span>';
+}
+
+if(isset($_POST['submit_anmerkung']))
+{
+    $outgoing = new preoutgoing();
+    $outgoing->load($preoutgoing_id);
+    $outgoing->anmerkung_admin = $_POST['anmerkungAdmin'];
+    if($outgoing->save())
+        $message = '<span class="ok">Erfolgreich gespeichert</span>'; 
+    else
+        $message = '<span class="error">Es ist ein Fehler beim Speichern aufgetreten</span>';        
+            
+}
+
 ?>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01//EN"
         "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 	<head>
@@ -174,12 +230,6 @@ if($method=="save")
 	<body>
 
 <?php
-/*
-if(!$rechte->isBerechtigt('inout/outgoing', null, 'suid'))
-	die('Sie haben keine Berechtigung fuer diese Seite');
- 
- */
-
 if($preoutgoing_id=='')
 	exit;
 
@@ -194,6 +244,10 @@ echo '<h2>Details - '.$person->vorname.' '.$person->nachname.'</h2>';
 print_menu('Personendetails', 'personendetails');
 echo ' | ';
 print_menu('Dokumente', 'dokumente');
+echo ' | ';
+print_menu('Lehrveranstaltungen', 'lehrveranstaltungen');
+echo ' | ';
+print_menu('Anmerkungen', 'anmerkungen');
 echo '<div style="float:right">'.$message.'</div>';
 switch($action)
 {
@@ -202,6 +256,12 @@ switch($action)
 		break;
 	case 'dokumente':
 		print_dokumente();
+		break;
+    case 'lehrveranstaltungen':
+		print_lvs();
+        break;
+    case 'anmerkungen':
+        print_anmerkungen(); 
 		break;
 }
 
@@ -238,7 +298,10 @@ function print_personendetails()
     $nation->load($benutzer->staatsbuergerschaft);
     $student = new student(); 
     $student->load($benutzer->uid);
-    
+    $prestudent = new prestudent(); 
+    $prestudent->getLastStatus($student->prestudent_id);
+    $studiengang = new studiengang(); 
+    $studiengang->load($student->studiengang_kz);
     $adr_strasse='';
     $adr_plz = '';
     $adr_ort ='';
@@ -253,24 +316,29 @@ function print_personendetails()
         }
     }
     
-    
-    $i = 1; 
-    echo '<form action="'.$_SERVER['PHP_SELF'].'?method=save&preoutgoing_id='.$out->preoutgoing_id.'" method="POST"> <fieldset><table border="0" >
-        <tr><td colspan=2"><b>Auswahl Universitäten:</b></td></tr>'; 
-    foreach($outgoingFirma->firmen as $fi)
-    {
-        $firmaAuswahl = new firma(); 
-        $firmaAuswahl->load($fi->firma_id);
-        $style = $fi->auswahl?'style="color:red"':'';
+        $i = 1; 
+        echo '<form action="'.$_SERVER['PHP_SELF'].'?method=save&preoutgoing_id='.$out->preoutgoing_id.'" method="POST"> <fieldset><table border="0" >
+            <tr><td colspan=2"><b>Auswahl Universitäten:</b></td></tr>'; 
+        foreach($outgoingFirma->firmen as $fi)
+        {
+            $firmaAuswahl = new firma(); 
+            $firmaAuswahl->load($fi->firma_id);
+            $style = $fi->auswahl?'style="color:red"':'';
 
-        $mobilitätsprogramm = new mobilitaetsprogramm(); 
-        $mobilitätsprogramm->load($fi->mobilitaetsprogramm_code);
-        if($fi->name == '')
-            echo " <tr><td  colspan=2 $style>".$i.": ".$firmaAuswahl->name." [".$mobilitätsprogramm->kurzbz."] <a href='".$_SERVER['PHP_SELF']."?method=setAuswahl&outgoingFirma_id=".$fi->preoutgoing_firma_id."&preoutgoing_id=".$out->preoutgoing_id."'>Auswahl </a><a href='".$_SERVER['PHP_SELF']."?method=deleteFirma&outgoingFirma_id=".$fi->preoutgoing_firma_id."&preoutgoing_id=".$out->preoutgoing_id."'>Delete</a></td></tr>";
-        else
-            echo " <tr><td  colspan=2 $style>".$i.": ".$fi->name." [Freemover] <a href='".$_SERVER['PHP_SELF']."?method=setAuswahl&outgoingFirma_id=".$fi->preoutgoing_firma_id."&preoutgoing_id=".$out->preoutgoing_id."'>Auswahl </a><a href='".$_SERVER['PHP_SELF']."?method=deleteFirma&outgoingFirma_id=".$fi->preoutgoing_firma_id."&preoutgoing_id=".$out->preoutgoing_id."'>Delete</a></td></tr>";
-        $i++;
-    }
+            $mobilitätsprogramm = new mobilitaetsprogramm(); 
+            $mobilitätsprogramm->load($fi->mobilitaetsprogramm_code);
+            if($mobilitätsprogramm->kurzbz == '')
+                $mobprogramm = 'SUMMERSCHOOL';
+            else
+                $mobprogramm = $mobilitätsprogramm->kurzbz; 
+            if($fi->name == '')
+                echo " <tr><td  colspan=2 $style>".$i.": ".$firmaAuswahl->name." [".$mobprogramm."] <a href='".$_SERVER['PHP_SELF']."?method=setAuswahl&outgoingFirma_id=".$fi->preoutgoing_firma_id."&preoutgoing_id=".$out->preoutgoing_id."'>Auswahl </a><a href='".$_SERVER['PHP_SELF']."?method=deleteFirma&outgoingFirma_id=".$fi->preoutgoing_firma_id."&preoutgoing_id=".$out->preoutgoing_id."'>Delete</a></td></tr>";
+            else
+                echo " <tr><td  colspan=2 $style>".$i.": ".$fi->name." [Freemover] <a href='".$_SERVER['PHP_SELF']."?method=setAuswahl&outgoingFirma_id=".$fi->preoutgoing_firma_id."&preoutgoing_id=".$out->preoutgoing_id."'>Auswahl </a><a href='".$_SERVER['PHP_SELF']."?method=deleteFirma&outgoingFirma_id=".$fi->preoutgoing_firma_id."&preoutgoing_id=".$out->preoutgoing_id."'>Delete</a></td></tr>";
+            $i++;
+        }
+    if($out->checkStatus($out->preoutgoing_id, 'freigabe'))
+    {
     echo '
         <tr>
             <td  colspan=2>&nbsp;</td>
@@ -292,7 +360,17 @@ function print_personendetails()
             <td>Geburtsort:</td><td><input type="text" name="gebort" value="'.$benutzer->gebort.'" disabled></td>
             <td>Personenkennzeichen:</d><td><input type="text" name="pers_kz" value="'.$student->matrikelnr.'" disabled></td>
         </tr>
-        <tr><td>&nbsp;</td></tr>
+        <tr>
+            <td>Studiensemester:</td><td><input type="text" name="studienjahr" value="'.$prestudent->ausbildungssemester.'" disabled></td>
+            <td>Studiengang:</td><td><input type="text" name="studiengang" size="50" value="'.$studiengang->bezeichnung.'" disabled></td>
+        </tr>
+        <tr>
+            <td>Studientyp:</td><td><input type="text" name="studientyp" value="'.$studiengang->typ.'" disabled></td>
+            <td><a href ="mailto:'.$out->uid.'@'.DOMAIN.'">E-Mail schicken</a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        </tr>
         <tr><td><b>Zusätzliche Daten:</b></td></tr>
         <tr>
             <td>Zeitraum Aufenthalt: </td>
@@ -324,18 +402,86 @@ function print_personendetails()
         </tr>
         <tr>
             <td>Behinderungszuschuss:</td><td><input type="checkbox" name="behinderungszuschuss" '.$checkedBehinderung.'></td>
-        </tr>
-        <tr>
             <td>Studienbeihilfe:</td><td><input type="checkbox" name="studienbeihilfe" '.$checkedStudienbeihilfe.'></td>
         </tr>
+        <tr>
+            <td>Anmerkung Student: </td><td colspan="2"><textarea rows="3" cols="25" name="anmerkungStudent">'.$out->anmerkung_student.'</textarea>
         <tr>
             <td>
                 <input type="submit" value="Speichern">
             </td>
-        </tr>
+        </tr>';
 
+}
+echo '</table></fieldset></form>'; 
+    $outgoingStatus = new preoutgoing(); 
+    $outgoingStatus->getAllStatus($out->preoutgoing_id);
+// Status ausgabe
+echo '<h3>Status</h3>
+    	<table class="tablesorter" id="dokumente">
+		<thead>
+			<tr>
+				<th>Status</th>
+				<th>Datum</th>
+			</tr>
+		</thead>
+		<tbody>';
+    foreach($outgoingStatus->stati as $status)
+    {
+        echo '<tr><td>'.$status->preoutgoing_status_kurzbz.'</td><td>'.$status->datum.'</td></tr>';
+    }
 
-</table></fieldset></form>'; 
+ echo'</table><form action="'.$_SERVER['PHP_SELF'].'?preoutgoing_id='.$out->preoutgoing_id.'" method="POST">';
+  $preoutgoing = new preoutgoing(); 
+    $preoutgoing->getAllStatiKurzbz();
+    echo '<tr><td><SELECT name="status">';
+    foreach($preoutgoing->stati as $status_filter)
+    {
+        $selected = '';
+        if($status_filter->preoutgoing_status_kurzbz == $status)
+            $selected ='selected'; 
+        echo'<option value="'.$status_filter->preoutgoing_status_kurzbz.'" '.$selected.'>'.$status_filter->preoutgoing_status_kurzbz.'</option>';
+    }
+            
+    echo'</SELECT></td></tr>
+        <input type="submit" name="StatusSetzen" value="setzen">';
+
+}
+
+function print_lvs()
+{
+    global $person, $preoutgoing_id, $datum; 
+    
+        $preoutgoingLv = new preoutgoing();
+        $preoutgoingLv->loadLvs($preoutgoing_id);
+        echo '   
+        <script type="text/javascript">
+        $(document).ready(function() 
+		{ 
+		    $("#Lehrveranstaltung").tablesorter(
+			{
+				sortList: [[0,0]],
+				widgets: ["zebra"]
+			}); 
+		} 
+        ); 
+        </script>';
+        echo '<fieldset>';
+        echo'Folgende Lehrveranstaltungen wurden eingetragen <br><br>
+        <table id="Lehrveranstaltung" class="tablesorter">
+        <thead>
+            <tr>
+            <th>Bezeichnung</th>
+            <th>ECTS</th>
+            <th></th>
+            </tr>
+        </thead>
+        <tbody>';
+        foreach($preoutgoingLv->lehrveranstaltungen as $lv)
+        {
+            echo '<tr><td>'.$lv->bezeichnung.'</td><td>'.$lv->ects.'</td><td><a href="'.$_SERVER['PHP_SELF'].'?method=deleteLv&lv_id='.$lv->preoutgoing_lehrveranstaltung_id.'&preoutgoing_id='.$preoutgoing_id.'&action=lehrveranstaltung">löschen</a></tr>';
+        }
+        echo '</table></fieldset>';
 }
 
 function print_dokumente()
@@ -382,6 +528,16 @@ function print_dokumente()
 	echo '</fieldset>';
 }
 
+function print_anmerkungen()
+{
+    global $out; 
+    
+    echo '<br><br><form action="'.$_SERVER['PHP_SELF'].'?preoutgoing_id='.$out->preoutgoing_id.'&action=anmerkungen" method="POST">';
+    echo '<textarea rows="6" cols="30" name="anmerkungAdmin">'.$out->anmerkung_admin.'</textarea><br>';
+    echo '<input type="submit" value="Speichern" name="submit_anmerkung">';
+    echo '</form>';
+}
+
 /**
  * Erstellt einen MenuLink
  * @param $name Name des Links
@@ -393,4 +549,25 @@ function print_menu($name, $value)
 	if($value==$action)
 		$name = '<b>'.$name.'</b>';
 	echo '<a href="'.$_SERVER['PHP_SELF'].'?action='.$value.'&amp;preoutgoing_id='.$preoutgoing_id.'">'.$name.'</a>';
+}
+
+// sendet eine EMail an die Studiengangsssistenz des Outgoings
+function sendMailAssistenz()
+{
+    global $out; 
+    
+    $benutzer = new benutzer(); 
+    $benutzer->load($out->uid);
+    $student = new student(); 
+    $student->load($benutzer->uid);
+    $prestudent = new prestudent(); 
+    $prestudent->getLastStatus($student->prestudent_id);
+    $studiengang = new studiengang(); 
+    $studiengang->load($student->studiengang_kz);
+    
+    $emailtext= "Dies ist eine automatisch generierte E-Mail.<br><br>";
+    $emailtext.= "Es hat sich ein neuer Outgoing am System registriert.</b>"; 
+    $mail = new mail($studiengang->email, 'no-reply', 'New Outgoing', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
+    $mail->setHTMLContent($emailtext); 
+    $mail->send(); 
 }

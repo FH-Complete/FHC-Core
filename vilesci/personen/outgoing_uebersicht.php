@@ -24,6 +24,28 @@ require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/preoutgoing.class.php');
 require_once('../../include/benutzer.class.php');
 
+$method=isset($_POST['action'])?$_POST['action']:'';
+
+if($method == 'search')
+{
+    $datum=new datum(); 
+    $out = new preoutgoing; 
+    $von = $datum->formatDatum($_REQUEST['von'], 'Y-m-d');
+    $bis = $datum->formatDatum($_REQUEST['bis'], 'Y-m-d');
+    
+    $filter_name = $_POST['filter_name'];
+    $status = $_POST['select_status'];
+    
+    if(!$out->getOutgoingFilter($filter_name, $von, $bis, $status))
+        $message = '<span class="error">'.$out->errormsg.'</span>';
+}
+else
+{
+    $out = new preoutgoing();
+    if(!$out->getAll())
+        $message = '<span class="error">'.$out->errormsg.'</span>';
+}
+
 $user = get_uid();
 
 $rechte = new benutzerberechtigung();
@@ -59,14 +81,67 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 	<h2>Outgoing Verwaltung</h2>
 	';
 
-/*if(!$rechte->isBerechtigt('inout/outgoing', null, 'suid'))
+if(!$rechte->isBerechtigt('inout/outgoing', null, 'suid'))
 	die('Sie haben keine Berechtigung fuer diese Seite');
-*/
 
-$out = new preoutgoing();
-if(!$out->getAll())
-	$message = '<span class="error">'.$inc->errormsg.'</span>';
-	
+$von = isset($_REQUEST['von'])?$_REQUEST['von']:'';
+$bis = isset($_REQUEST['bis'])?$_REQUEST['bis']:'';
+$filter = isset($_REQUEST['filter_name'])?$_REQUEST['filter_name']:'';
+$status = isset($_REQUEST['select_status'])?$_REQUEST['select_status']:'';
+
+echo '
+<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
+	<input type="hidden" name="action" value="search">
+	<table>
+		<tr>
+			<td>Von: </td>
+			<td>
+				<input type="text" size="10" id="von" name="von" value="'.$von.'">
+				<script type="text/javascript">
+					$(document).ready(function() 
+					{ 
+					    $( "#von" ).datepicker($.datepicker.regional["de"]);
+					});
+				</script>
+			</td>
+			<td>Bis: </td>
+			<td>
+				<input type="text" size="10" name="bis" id="bis" value="'.$bis.'">
+				<script type="text/javascript">
+					$(document).ready(function() 
+					{ 
+					    $( "#bis" ).datepicker($.datepicker.regional["de"]);
+					});
+				</script>
+			</td>
+			<td>Name: </td>
+			<td><input type="text" name="filter_name" value="'.$filter.'"></td>
+            <td>Status: </td>';
+$preoutgoing = new preoutgoing(); 
+$preoutgoing->getAllStatiKurzbz();
+echo '<td><SELECT name="select_status">
+        <option value="">-- select -- </option>';
+foreach($preoutgoing->stati as $status_filter)
+{
+    $selected = '';
+    if($status_filter->preoutgoing_status_kurzbz == $status)
+        $selected ='selected'; 
+    echo'<option value="'.$status_filter->preoutgoing_status_kurzbz.'" '.$selected.'>'.$status_filter->preoutgoing_status_kurzbz.'</option>';
+}
+echo'</SELECT></td>';
+
+$aktOutgoing = new preoutgoing();
+$aktOutgoing->getAktuellOutgoing(); 
+$mailto_link = 'mailto:';
+foreach($aktOutgoing->result as $outg)
+    $mailto_link.= $outg->uid.'@'.DOMAIN.';';
+
+echo'     <td>&nbsp;<input type="submit" value="Anzeigen"/></td></tr>
+      <tr><td colspan="6"><a href="'.$mailto_link.'">Email</a> an alle zur Zeit im Ausland befindlichen Studenten senden</td>
+		</tr>
+	</table>
+</form>';
+
 echo $message;
 echo '
 <table id="myTable" class="tablesorter">
