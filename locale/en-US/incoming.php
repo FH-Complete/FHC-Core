@@ -103,4 +103,5 @@ $this->phrasen['incoming/loeschen']='delete';
 $this->phrasen['incoming/outgoingRegistration']='Outgoing-Administration';
 $this->phrasen['incoming/summerschool']='Summerschool';
 $this->phrasen['incoming/anmerkungen']='Comments';
+$this->phrasen['incoming/wochenstunden']='Weekly hours';
 ?>
