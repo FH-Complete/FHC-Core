@@ -117,6 +117,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
   <command id="menu-dokumente-studienerfolgeng-allesemester-normal:command" oncommand="StudentCreateStudienerfolg('StudienerfolgEng','', '', 'true');"/>
   <command id="menu-dokumente-studienerfolgeng-allesemester-finanzamt:command" oncommand="StudentCreateStudienerfolg('StudienerfolgEng','finanzamt', '', 'true');"/>
   <command id="menu-dokumente-accountinfoblatt:command" oncommand="PrintAccountInfoBlatt();"/>  
+  <command id="menu-dokumente-zutrittskarte:command" oncommand="PrintZutrittskarte();"/>
   <command id="menu-dokumente-pruefungsprotokoll:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple('de');"/>
   <command id="menu-dokumente-pruefungsprotokoll_englisch:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple('en');"/>
   <command id="menu-dokumente-pruefungszeugnis:command" oncommand="StudentAbschlusspruefungPrintPruefungszeugnisMultiple('deutsch');"/>
@@ -614,6 +615,12 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
                label     = "&menu-dokumente-accountinfoblatt.label;"
                command   =  "menu-dokumente-accountinfoblatt:command"
                accesskey = "&menu-dokumente-accountinfoblatt.accesskey;"/>
+            <menuitem
+               id        =  "menu-dokumente-zutrittskarte"
+               key       =  "menu-dokumente-zutrittskarte:key"
+               label     = "&menu-dokumente-zutrittskarte.label;"
+               command   =  "menu-dokumente-zutrittskarte:command"
+               accesskey = "&menu-dokumente-zutrittskarte.accesskey;"/>
 			<menuseparator/>
 			<menuitem
                id        =  "menu-dokumente-pruefungsprotokoll"

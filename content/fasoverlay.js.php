@@ -1522,6 +1522,79 @@ function PrintAccountInfoBlatt()
 	}
 }
 
+function PrintZutrittskarte()
+{
+	if(document.getElementById('main-content-tabs').selectedItem==document.getElementById('tab-studenten'))
+	{
+		//STUDENTEN
+		var tree = document.getElementById('student-tree');
+		var data='';
+
+		var start = new Object();
+		var end = new Object();
+		var numRanges = tree.view.selection.getRangeCount();
+		var paramList= '';
+		var error=0;
+
+		//alle markierten personen holen
+		for (var t = 0; t < numRanges; t++)
+		{
+	  		tree.view.selection.getRangeAt(t,start,end);
+			for (var v = start.value; v <= end.value; v++)
+			{
+				col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+				uid = tree.view.getCellText(v,col);
+				if(uid!='')
+					data = data+';'+uid;
+				else
+					error = error+1;
+			}
+		}
+		xsl = 'ZutrittskarteStud';
+	}
+	else
+	{
+		//MITARBEITER
+		var tree = document.getElementById('mitarbeiter-tree');
+		var data='';
+
+		var start = new Object();
+		var end = new Object();
+		var numRanges = tree.view.selection.getRangeCount();
+		var paramList= '';
+		var error=0;
+
+		//alle markierten personen holen
+		for (var t = 0; t < numRanges; t++)
+		{
+	  		tree.view.selection.getRangeAt(t,start,end);
+			for (var v = start.value; v <= end.value; v++)
+			{
+				col = tree.columns ? tree.columns["mitarbeiter-treecol-uid"] : "mitarbeiter-treecol-uid";
+				uid = tree.view.getCellText(v,col);
+				if(uid!='')
+					data = data+';'+uid;
+				else
+					error = error+1;
+			}
+		}
+		xsl = 'ZutrittskarteMa';
+	}
+
+	if(data!='')
+	{
+		if(error>0)
+			alert(error+' der ausgewaehlten Personen haben keinen Account');
+		action = '<?php echo APP_ROOT; ?>content/zutrittskarte.php';
+
+		OpenWindowPost(action, data);
+	}
+	else
+	{
+		alert('Bitte zuerst Personen Auswaehlen');
+	}
+}
+
 // ****
 // * Aktualisiert den Fachbereich Tree
 // ****
