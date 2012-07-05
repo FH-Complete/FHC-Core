@@ -1128,7 +1128,7 @@ class betriebsmittel extends basis_db
 		}
 		
 		if (!is_null($betriebsmittelstatus_kurzbz) && !empty($betriebsmittelstatus_kurzbz) )
-			$where.=" and upper(trim(tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelstatus_kurzbz)) = ".$this->db_escape(mb_strtoupper(trim($betriebsmittelstatus_kurzbz))) ;
+			$where.=" and upper(trim(tbl_betriebsmittel_betriebsmittelstatus.betriebsmittelstatus_kurzbz)) = ".$this->db_add_param(mb_strtoupper(trim($betriebsmittelstatus_kurzbz))) ;
 			
 		return $where;
 	}
