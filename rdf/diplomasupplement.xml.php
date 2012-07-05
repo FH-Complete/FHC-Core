@@ -83,7 +83,41 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		//Unterrichtssprache
 		$sprache_deutsch='';
 		$sprache_englisch='';
-		$qry_sprache = "SELECT sprache FROM lehre.tbl_lehrveranstaltung WHERE studiengang_kz='".addslashes($row->studiengang_kz)."' AND aktiv GROUP BY sprache ORDER BY sprache DESC";
+		if($row->mischform=='t')
+		{
+			//Bei Mischformen, die LVs auf Orgform filtern
+			$prestudent = new prestudent();
+			$prestudent->getLastStatus($row->prestudent_id);
+			if($prestudent->orgform_kurzbz!='')
+				$orgform_kurzbz=$prestudent->orgform_kurzbz;
+			else
+				$orgform_kurzbz=$row->orgform_kurzbz;
+			$qry_sprache = "
+			SELECT 
+				sprache 
+			FROM 
+				lehre.tbl_lehrveranstaltung 
+			WHERE 
+				studiengang_kz=".$db->db_add_param($row->studiengang_kz)." 
+				AND aktiv
+				AND orgform_kurzbz=".$db->db_add_param($orgform_kurzbz)." 
+			GROUP BY sprache 
+			ORDER BY sprache DESC";
+		}
+		else
+		{
+			$qry_sprache = "
+			SELECT 
+				sprache 
+			FROM 
+				lehre.tbl_lehrveranstaltung 
+			WHERE 
+				studiengang_kz=".$db->db_add_param($row->studiengang_kz)." 
+				AND aktiv 
+			GROUP BY sprache 
+			ORDER BY sprache DESC";
+		}
+		
 		if($result_sprache = $db->db_query($qry_sprache))
 		{
 			while($row_sprache = $db->db_fetch_object($result_sprache))
@@ -113,21 +147,22 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		else
 			echo '		<ects_angerechnet></ects_angerechnet>';
 			
-		if($row->orgform_kurzbz=='VBB')
+		if($row->mischform=='t' || $row->orgform_kurzbz=='VBB')
 		{
 			//Bei Mischformen, die OrgForm aus dem Status nehmen
 			$prestudent = new prestudent();
 			$prestudent->getLastStatus($row->prestudent_id);
-			$row->orgform_kurzbz=$prestudent->orgform_kurzbz;
+			if($prestudent->orgform_kurzbz!='')
+				$row->orgform_kurzbz=$prestudent->orgform_kurzbz;
 		}
 		
 		switch($row->orgform_kurzbz)
 		{
-			case 'BB':	echo '		<studienart>Berufbegleitendes Studium/Part-time degree programm</studienart>';
+			case 'BB':	echo '		<studienart>Berufbegleitendes Studium / Part-time degree programm</studienart>';
 						break;
-			case 'VZ':	echo '		<studienart>Vollzeitstudium/Full-time degree programm</studienart>';
+			case 'VZ':	echo '		<studienart>Vollzeitstudium / Full-time degree programm</studienart>';
 						break;
-			case 'DL':	echo '		<studienart>Fernstudium/Distance study</studienart>';
+			case 'DL':	echo '		<studienart>Fernstudium / Distance Learning</studienart>';
 						break;
 			default:	echo '		<studienart></studienart>';
 						break;
