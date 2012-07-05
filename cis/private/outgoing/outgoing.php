@@ -106,10 +106,11 @@ if(isset($_REQUEST['zDaten']))
         $betreuer = '';
     $preoutgoingZDaten->bachelorarbeit = isset($_REQUEST['bachelorarbeit'])?true:false; 
     $preoutgoingZDaten->masterarbeit = isset($_REQUEST['masterarbeit'])?true:false; 
+    $preoutgoingZDaten->projektarbeittitel = $_REQUEST['projektarbeittitel'];
     $preoutgoingZDaten->behinderungszuschuss = isset($_REQUEST['behinderungszuschuss'])?true:false; 
     $preoutgoingZDaten->studienbeihilfe = isset($_REQUEST['studienbeihilfe'])?true:false; 
     $preoutgoingZDaten->betreuer = $betreuer; 
-    $preoutgoingZDaten->studienrichtung_gastuniversitaet = $_REQUEST['studienrichtungGastuni'];
+    $preoutgoingZDaten->studienrichtung_gastuniversitaet = isset($_REQUEST['studienrichtungGastuni'])?$_REQUEST['studienrichtungGastuni']:'';
     $preoutgoingZDaten->new = false; 
     if(!$preoutgoingZDaten->save())
         $message='<span class="error">'.$p->t('global/fehlerBeimSpeichernDerDaten').'</span>';
@@ -146,11 +147,15 @@ if(isset($_POST['saveLv']) == 'saveLv')
 {    
     $bezeichnung = $_POST['lv_bezeichnung'];
     $ects = $_POST['lv_ects'];
+    $wochenstunden = $_POST['lv_wochenstunden'];
+    $unitcode = $_POST['lv_unitcode'];
     
     $preoutgoingLv = new preoutgoing(); 
     $preoutgoingLv->preoutgoing_id = $outgoing->preoutgoing_id;
     $preoutgoingLv->bezeichnung = $bezeichnung; 
     $preoutgoingLv->ects = $ects; 
+    $preoutgoingLv->wochenstunden = $wochenstunden; 
+    $preoutgoingLv->unitcode = $unitcode; 
     $preoutgoingLv->new = true; 
     $preoutgoingLv->insertvon = $uid; 
     if(!$preoutgoingLv->saveLv())
@@ -538,9 +543,9 @@ else
         echo '<tr><td>'.$p->t('incoming/praktikum').': </td><td><input type="checkbox" name="praktikum" value="Praktikum" '.$praktikumChecked.'></td>
                 <td>'.$p->t('incoming/bachelorthesis').': <input type="checkbox" name="bachelorarbeit" '.$bscChecked.'></td>';
         echo '<td>'.$p->t('incoming/masterthesis').': <input type="checkbox" name="masterarbeit" '.$mscChecked.'></td></tr>';
-        echo '<tr><td>'.$p->t('incoming/praktikumVon').': </td><td><input type="text" name="praktikum_von" id="datepicker_praktikumvon" value="'.$datum->formatDatum($outgoing->praktikum_von, 'd.m.Y').'"></td><td colspan="3">'.$p->t('incoming/betreuerMasterBachelor').': <input type="text" name="betreuer" id="betreuer" value="'.$betreuer->vorname.' '.$betreuer->nachname.'"><input type="hidden" name="betreuer_uid" id="betreuer_uid" value="'.$outgoing->betreuer.'"> </td></tr>';
-        echo '<tr><td>'.$p->t('incoming/praktikumBis').'</td><td><input type="text" name="praktikum_bis" id="datepicker_praktikumbis" value="'.$datum->formatDatum($outgoing->praktikum_bis, 'd.m.Y').'"></td><td colspan="3">'.$p->t('incoming/StudienrichtungGastuniversitaet').': <input type="text" name="studienrichtungGastuni" value="'.$outgoing->studienrichtung_gastuniversitaet.'"></td></tr>';
-        echo '<tr><td>&nbsp;</td></tr>';
+        echo '<tr><td>'.$p->t('incoming/praktikumVon').': </td><td><input type="text" name="praktikum_von" id="datepicker_praktikumvon" value="'.$datum->formatDatum($outgoing->praktikum_von, 'd.m.Y').'"></td><td colspan="3">'.$p->t('incoming/betreuerMasterBachelor').': </td><td><input type="text" name="betreuer" id="betreuer" value="'.$betreuer->vorname.' '.$betreuer->nachname.'"><input type="hidden" name="betreuer_uid" id="betreuer_uid" value="'.$outgoing->betreuer.'"> </td></tr>';
+        echo '<tr><td>'.$p->t('incoming/praktikumBis').': </td><td><input type="text" name="praktikum_bis" id="datepicker_praktikumbis" value="'.$datum->formatDatum($outgoing->praktikum_bis, 'd.m.Y').'"></td><td colspan="3">'.$p->t('incoming/projektarbeitstitel').': </td><td><input type="text" name="projektarbeittitel" id="projektarbeittitel" value="'.$outgoing->projektarbeittitel.'"></td></tr>';
+        echo '<tr><td>&nbsp; </td></tr>';
         // zusätzliche Felder bei Erasmus
         if($outgoingAuswahlFirma->mobilitaetsprogramm_code == '7')
         {  
@@ -549,12 +554,12 @@ else
                 <option value="vorbereitend" '.$sprachkursSelect.'>'.$p->t('incoming/vorbereitenderSprachkurs').'</option>
                 <option value="intensiv" '.$intensivSprachkursSelect.'>'.$p->t('incoming/erasmusIntensivsprachkurs').'</option>
                 </select></td></tr>';
-            echo '<tr><td>'.$p->t('incoming/sprachkursVon').':</td><td> <input type="text" name="sprachkurs_von" id="datepicker_sprachkursvon" value="'.$datum->formatDatum($outgoing->sprachkurs_von, 'd.m.Y').'"></td></tr>'; 
+            echo '<tr><td>'.$p->t('incoming/sprachkursVon').':</td><td> <input type="text" name="sprachkurs_von" id="datepicker_sprachkursvon" value="'.$datum->formatDatum($outgoing->sprachkurs_von, 'd.m.Y').'"></td><td colspan="4">'.$p->t('incoming/StudienrichtungGastuniversitaet').': <input type="text" name="studienrichtungGastuni" value="'.$outgoing->studienrichtung_gastuniversitaet.'"></td></tr>'; 
             echo '<tr><td>'.$p->t('incoming/sprachkursBis').': </td><td><input type="text" name="sprachkurs_bis" id="datepicker_sprachkursbis" value="'.$datum->formatDatum($outgoing->sprachkurs_bis, 'd.m.Y').'"></td></tr>';
         }
         
-        echo '<tr><td colspan="4">'.$p->t('incoming/aufgrundEinerBehinderung').': <input type="checkbox" name="behinderungszuschuss" '.$behindChecked.'>';
-        echo '<tr><td colspan="4">'.$p->t('incoming/währendDesAuslandsaufenthaltes').': <input type="checkbox" name="studienbeihilfe" '.$beihilfeChecked.'>';
+        echo '<tr><td colspan="6">'.$p->t('incoming/aufgrundEinerBehinderung').': <input type="checkbox" name="behinderungszuschuss" '.$behindChecked.'>';
+        echo '<tr><td colspan="6">'.$p->t('incoming/währendDesAuslandsaufenthaltes').': <input type="checkbox" name="studienbeihilfe" '.$beihilfeChecked.'>';
         echo '</table>';
         echo '</td></tr></table>';
         echo '<table width="90%">';
@@ -565,7 +570,7 @@ else
         echo '<p width="100%" align="center"><h3>'.$p->t('incoming/auswahlDerLv').'</h2></p>';
         echo '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
         echo '<table width="90%" style="border: thin solid black; border-spacing:10px; background-color: lightgray; margin-top:5px; margin-bottom:5px;">';
-        echo '<tr><td>'.$p->t('global/bezeichnung').': <input type="text" name="lv_bezeichnung" size="64" id="lv_bezeichnung"></td><td>ECTS: <input type="text" name="lv_ects" size="4" id="lv_ects"></td><td><input type="submit" value="add" name="saveLv"></tr>';
+        echo '<tr><td>'.$p->t('global/bezeichnung').': <input type="text" name="lv_bezeichnung" size="50" id="lv_bezeichnung"></td><td>Wochenstunden: <input type="text" name="lv_wochenstunden" id="lv_wochenstunden" size="4"></td><td>ECTS: <input type="text" name="lv_ects" size="4" id="lv_ects"></td><td>Unit Code: <input tpye="text" size="4" name="lv_unitcode" id="lv_unitcode"></td><td><input type="submit" value="add" name="saveLv"></tr>';
         echo '</table>';
         echo '</form>';
 
@@ -576,14 +581,16 @@ else
         <thead>
             <tr>
             <th>'.$p->t('global/bezeichnung').'</th>
+            <th>'.$p->t('incoming/wochenstunden').'</th>                
             <th>'.$p->t('incoming/ects').'</th>
+            <th>'.$p->t('incoming/unitcode').'</th>
             <th></th>
             </tr>
         </thead>
         <tbody>';
         foreach($preoutgoingLv->lehrveranstaltungen as $lv)
         {
-            echo '<tr><td>'.$lv->bezeichnung.'</td><td>'.$lv->ects.'</td><td><a href="'.$_SERVER['PHP_SELF'].'?method=deleteLv&lv_id='.$lv->preoutgoing_lehrveranstaltung_id.'">'.$p->t('incoming/loeschen').'</a></tr>';
+            echo '<tr><td>'.$lv->bezeichnung.'</td><td>'.$lv->ects.'</td><td>'.$lv->wochenstunden.'</td><td>'.$lv->unitcode.'</td><td><a href="'.$_SERVER['PHP_SELF'].'?method=deleteLv&lv_id='.$lv->preoutgoing_lehrveranstaltung_id.'">'.$p->t('incoming/loeschen').'</a></td></tr>';
 
         }
         echo '</table>';
@@ -649,7 +656,9 @@ else
 		}
         function getLearningAgreement()
         {
-            alert('Not yet implemented!');
+            var url = "<?php echo APP_ROOT ?>content/pdfExport.php?xsl=OutgoingLearning&xml=learningagreement_outgoing.rdf.php&preoutgoing_id=33&output=pdf";
+            alert(url);
+            window.location.href= url; 
         }
         function test()
         {
