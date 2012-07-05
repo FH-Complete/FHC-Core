@@ -37,6 +37,7 @@ class preoutgoing extends basis_db
     public $ansprechperson;         // uid
     public $bachelorarbeit;         // boolean
     public $masterarbeit;           // boolean
+    public $projektarbeittitel;     // varchar (128)
     public $betreuer;               // varchar(256)
     public $sprachkurs;             // boolean
     public $intensivsprachkurs;     // boolean
@@ -62,6 +63,8 @@ class preoutgoing extends basis_db
     public $bezeichnung;                        // varchar(256)
     public $ects;                               // numeric(5,2)
     public $endversion;                         // boolean
+    public $wochenstunden;                       // numeric(5,2)
+    public $unitcode;                           // varchar(16)                  
     
     /* Tabellenspalten tbl_preoutgoing_status */
     public $stati = array();                    // preoutgoing objekte
@@ -125,6 +128,7 @@ class preoutgoing extends basis_db
             $this->ansprechperson = $row->ansprechperson; 
             $this->bachelorarbeit = $this->db_parse_bool($row->bachelorarbeit);
             $this->masterarbeit = $this->db_parse_bool($row->masterarbeit);
+            $this->projektarbeittitel = $row->projektarbeittitel; 
             $this->betreuer = $row->betreuer; 
             $this->sprachkurs = $this->db_parse_bool($row->sprachkurs); 
             $this->intensivsprachkurs = $this->db_parse_bool($row->intensivsprachkurs); 
@@ -175,6 +179,7 @@ class preoutgoing extends basis_db
             $preoutgoing->ansprechperson = $row->ansprechperson; 
             $preoutgoing->bachelorarbeit = $this->db_parse_bool($row->bachelorarbeit);
             $preoutgoing->masterarbeit = $this->db_parse_bool($row->masterarbeit);
+            $preoutgoing->projektarbeittitel = $row->projektarbeittitel; 
             $preoutgoing->betreuer = $row->betreuer; 
             $preoutgoing->sprachkurs = $this->db_parse_bool($row->sprachkurs); 
             $preoutgoing->intensivsprachkurs = $this->db_parse_bool($row->intensivsprachkurs); 
@@ -232,6 +237,7 @@ class preoutgoing extends basis_db
             $this->ansprechperson = $row->ansprechperson; 
             $this->bachelorarbeit = $this->db_parse_bool($row->bachelorarbeit);
             $this->masterarbeit = $this->db_parse_bool($row->masterarbeit);
+            $this->projektarbeittitel = $row->projektarbeittitel; 
             $this->betreuer = $row->betreuer; 
             $this->sprachkurs = $this->db_parse_bool($row->sprachkurs); 
             $this->intensivsprachkurs = $this->db_parse_bool($row->intensivsprachkurs); 
@@ -267,7 +273,7 @@ class preoutgoing extends basis_db
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
-			$qry='BEGIN;INSERT INTO public.tbl_preoutgoing (uid, dauer_von, dauer_bis, ansprechperson, bachelorarbeit, masterarbeit,
+			$qry='BEGIN;INSERT INTO public.tbl_preoutgoing (uid, dauer_von, dauer_bis, ansprechperson, bachelorarbeit, masterarbeit, projektarbeittitel,
                 betreuer, sprachkurs, intensivsprachkurs, sprachkurs_von, sprachkurs_bis, praktikum, praktikum_von, praktikum_bis, behinderungszuschuss,
                 studienbeihilfe, anmerkung_student, anmerkung_admin, studienrichtung_gastuniversitaet, insertamum, insertvon, updateamum, updatevon)
 				  VALUES('.
@@ -277,6 +283,7 @@ class preoutgoing extends basis_db
                 $this->db_add_param($this->ansprechperson).', '.
                 $this->db_add_param($this->bachelorarbeit, FHC_BOOLEAN).', '.
                 $this->db_add_param($this->masterarbeit, FHC_BOOLEAN).', '.
+                $this->db_add_param($this->projektarbeittitel).', '.
                 $this->db_add_param($this->betreuer).', '.
                 $this->db_add_param($this->sprachkurs, FHC_BOOLEAN).', '.
                 $this->db_add_param($this->intensivsprachkurs, FHC_BOOLEAN).', '.
@@ -305,6 +312,7 @@ class preoutgoing extends basis_db
 		      	' ansprechperson='.$this->db_add_param($this->ansprechperson).', '.
 		      	' bachelorarbeit='.$this->db_add_param($this->bachelorarbeit, FHC_BOOLEAN).', '.
 		      	' masterarbeit='.$this->db_add_param($this->masterarbeit, FHC_BOOLEAN).', '.
+				' projektarbeittitel='.$this->db_add_param($this->projektarbeittitel).', '.                    
 				' betreuer='.$this->db_add_param($this->betreuer).', '.
 				' sprachkurs='.$this->db_add_param($this->sprachkurs, FHC_BOOLEAN).', '.
 		      	' intensivsprachkurs='.$this->db_add_param($this->intensivsprachkurs, FHC_BOOLEAN).', '.
@@ -365,9 +373,11 @@ class preoutgoing extends basis_db
     {
         if($this->new)
         {
-            $qry='BEGIN;INSERT INTO public.tbl_preoutgoing_lehrveranstaltung (preoutgoing_id, bezeichnung, ects, endversion, insertamum, insertvon, updateamum, updatevon)
+            $qry='BEGIN;INSERT INTO public.tbl_preoutgoing_lehrveranstaltung (preoutgoing_id, bezeichnung, wochenstunden, unitcode, ects, endversion, insertamum, insertvon, updateamum, updatevon)
             VALUES('.$this->db_add_param($this->preoutgoing_id, FHC_INTEGER).', '
             .$this->db_add_param($this->bezeichnung).', '
+            .$this->db_add_param($this->wochenstunden).', '
+            .$this->db_add_param($this->unitcode).', '
             .$this->db_add_param($this->ects).', false, now(), '
             .$this->db_add_param($this->insertvon).', null, null );';
         }
@@ -376,6 +386,8 @@ class preoutgoing extends basis_db
             $qry='UPDATE public.tbl_preoutgoing_lehrveranstaltung SET'.
 				' preoutgoing_id='.$this->db_add_param($this->preoutgoing_id, FHC_INTEGER).', '.
 				' bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
+				' wochenstunden='.$this->db_add_param($this->wochenstunden).', '.
+				' unitcode='.$this->db_add_param($this->unitcode).', '.                    
 				' ects='.$this->db_add_param($this->ects).', '.
 		      	' endversion='.$this->db_add_param($this->endversion, FHC_BOOLEAN).', '.
                 ' updatevon ='.$this->db_add_param($this->updatevon).', '.
@@ -443,6 +455,8 @@ class preoutgoing extends basis_db
                 $outLv->preoutgoing_lehrveranstaltung_id = $row->preoutgoing_lehrveranstaltung_id; 
                 $outLv->preoutgoing_id = $row->preoutgoing_id; 
                 $outLv->bezeichnung = $row->bezeichnung; 
+                $outLv->wochenstunden = $row->wochenstunden; 
+                $outLv->unitcode = $row->unitcode; 
                 $outLv->ects = $row->ects; 
                 $outLv->endversion = $row->endversion; 
                 $outLv->insertamum = $row->insertamum; 
@@ -937,6 +951,7 @@ class preoutgoing extends basis_db
             $preoutgoing->ansprechperson = $row->ansprechperson; 
             $preoutgoing->bachelorarbeit = $this->db_parse_bool($row->bachelorarbeit);
             $preoutgoing->masterarbeit = $this->db_parse_bool($row->masterarbeit);
+            $preoutgoing->projektarbeittitel = $this->projektarbeittitel; 
             $preoutgoing->betreuer = $row->betreuer; 
             $preoutgoing->sprachkurs = $this->db_parse_bool($row->sprachkurs); 
             $preoutgoing->intensivsprachkurs = $this->db_parse_bool($row->intensivsprachkurs); 
@@ -1010,6 +1025,7 @@ class preoutgoing extends basis_db
             $preoutgoing->dauer_bis = $row->dauer_bis;
             $preoutgoing->ansprechperson = $row->ansprechperson; 
             $preoutgoing->bachelorarbeit = $this->db_parse_bool($row->bachelorarbeit);
+            $preoutgoing->projektarbeittitel = $row->projektarbeittitel; 
             $preoutgoing->masterarbeit = $this->db_parse_bool($row->masterarbeit);
             $preoutgoing->betreuer = $row->betreuer; 
             $preoutgoing->sprachkurs = $this->db_parse_bool($row->sprachkurs); 
