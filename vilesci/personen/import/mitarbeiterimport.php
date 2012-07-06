@@ -417,6 +417,7 @@ if(isset($_POST['save']))
 		$person->geburtsnation = 'A';
 		$person->staatsbuergerschaft = 'A';
 		$person->familienstand = 'l';
+        $person->zugangscode= uniqid();
 		
 		if($person->save())
 		{
