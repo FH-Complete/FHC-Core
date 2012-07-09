@@ -1466,7 +1466,7 @@ if($erg=pg_query($db_conn,$qry))
 										if($row->freigegeben)
 										{
 											//Kopieren der Abgabedatei
-											$qry_file="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$row->projektarbeit_id."' and paabgabetyp_kurzbz='end' ORDER BY abgabedatum desc LIMIT 1";
+											$qry_file="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$row->projektarbeit_id."' and paabgabetyp_kurzbz='end' AND abgabedatum is not null ORDER BY abgabedatum desc LIMIT 1";
 											if($result_file=pg_query($db_conn,$qry_file))
 											{
 												if($row_file=pg_fetch_object($result_file))
