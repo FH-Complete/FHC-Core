@@ -58,12 +58,14 @@ if(isset($_GET['src']) && $_GET['src']=='person' && isset($_GET['person_id'])  &
 			if($db->db_parse_bool($row->foto_sperre))
 			{
 				$gesperrt=true;
-				
-				//Wenn der User selbst darauf zugreift darf er das Bild sehen
-				$benutzer = new benutzer();
-				$benutzer->load($uid);
-				if($benutzer->person_id==$_GET['person_id'])
-					$gesperrt=false;
+				if(isset($uid))
+				{
+					//Wenn der User selbst darauf zugreift darf er das Bild sehen
+					$benutzer = new benutzer();
+					$benutzer->load($uid);
+					if($benutzer->person_id==$_GET['person_id'])
+						$gesperrt=false;
+				}
 			}
 				
 			if($row->foto!='' && !$gesperrt)
