@@ -85,6 +85,7 @@ if(isset($_POST['search']))
 	{
 		echo '<table class="tablesorter" id="myTable">
 		<thead>
+			<th>Aktion</th>
 			<th>PersonID</th>
 			<th>Vorname</th>
 			<th>Nachname</th>
@@ -138,7 +139,10 @@ if($person_id!='')
 		echo 'ungeprüft';
 	else
 		echo $fs->fotostatus_kurzbz .' ( '.$datum_obj->formatDatum($fs->datum,'d.m.Y').' )';
-	
+	echo '<form action="bildpruefung.php" method="POST">';
+	echo '<input type="hidden" name="person_id" value="'.$db->convert_html_chars($person->person_id).'" />';
+	echo '<input type="submit" name="refresh" value="Bildcheck" /> ';
+
 	$benutzer = new benutzer();
 	if(!$benutzer->getBenutzerFromPerson($person->person_id))
 		echo $benutzer->errormsg;
