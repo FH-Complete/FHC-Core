@@ -106,6 +106,8 @@ if(isset($_POST['save']) && $users!='')
 				$bmp->person_id = $benutzer->person_id;
 				$bmp->insertamum = date('Y-m-d H:i:s');
 				$bmp->insertvon = $uid;
+				if(isset($_POST['ausgegeben']))
+					$bmp->ausgegebenam = date('Y-m-d');
 				$bmp->uid = $user;
 				if($bmp->save(true))
 				{
@@ -132,6 +134,7 @@ if($users!='')
 {
 	
 	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
+	Karte gleich als Ausgegeben eintragen: <input type="checkbox" name="ausgegeben"/>
 	<table id="myTable" class="tablesorter">
 	<thead>
 	<tr>

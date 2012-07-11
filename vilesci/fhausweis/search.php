@@ -133,7 +133,11 @@ if($person_id!='')
 		</tr>
 		</table>';
 	
-	echo '<br>Aktueller Fotostatus: '.$fs->fotostatus_kurzbz .' ( '.$datum_obj->formatDatum($fs->datum,'d.m.Y').' )';
+	echo '<br>Aktueller Fotostatus: ';
+	if($fs->fotostatus_kurzbz=='')
+		echo 'ungeprüft';
+	else
+		echo $fs->fotostatus_kurzbz .' ( '.$datum_obj->formatDatum($fs->datum,'d.m.Y').' )';
 	
 	$benutzer = new benutzer();
 	if(!$benutzer->getBenutzerFromPerson($person->person_id))
@@ -141,11 +145,12 @@ if($person_id!='')
 	echo '<br><br><u>Accounts:</u><br>';	
 	foreach($benutzer->result as $row_account)
 	{
-		echo '<br><br><b>'.$row_account->uid.'</b>';
-		echo '<br>Neue Karte bereits gedruckt:';
+		echo '<br><b>'.$row_account->uid.'</b>';
+		echo '<br>';
 		$qry = "
 		SELECT 
-			tbl_betriebsmittelperson.ausgegebenam, tbl_betriebsmittel.nummer
+			tbl_betriebsmittelperson.ausgegebenam, tbl_betriebsmittelperson.retouram, 
+			tbl_betriebsmittel.nummer, tbl_betriebsmittel.nummer2
 		FROM 
 			wawi.tbl_betriebsmittel 
 			JOIN wawi.tbl_betriebsmittelperson USING(betriebsmittel_id) 
@@ -157,44 +162,42 @@ if($person_id!='')
 		$nummer='';
 		if($result = $db->db_query($qry))
 		{
-			if($row = $db->db_fetch_object($result))
+			if($db->db_num_rows($result))
 			{
-				$ausgegeben = $row->ausgegebenam;
-				$nummer = $row->nummer;
-			}
-		}
-		if($db->db_num_rows($result)>0)
-			echo 'Ja';
-		else
-			echo 'Nein';
-			
-		echo '<br>Neue Karte bereits ausgegeben: ';
-		if($ausgegeben=='')
-			echo 'Nein';
-		else
-			echo 'Ja ( '.$datum_obj->formatDatum($ausgegeben,'d.m.Y').' )';
-			
-		echo '<br>Neue Karte bereits aktiv (im LDAP): ';
-		if($nummer!='')
-		{
-			if($uidldap = getUidFromCardNumber($nummer))
-			{
-				if($uidldap==$row_account->uid)
+				while($row = $db->db_fetch_object($result))
 				{
-					echo 'Ja';
-				}
-				else
-				{
-					echo 'Ja, aber bei UID '.$uidldap;
+					echo '<br>FH-Ausweis zugeteilt <span style="color: gray">('.$row->nummer.' / '.$row->nummer2.')</span><br>';
+					if($row->ausgegebenam!='')
+						echo ' Ausgegeben am '.$datum_obj->formatDatum($row->ausgegebenam,'d.m.Y');
+					else
+						echo ' Noch nicht ausgegeben';
+						
+					if($row->retouram!='')
+						echo ' - Zurückgegeben am '.$datum_obj->formatDatum($row->retouram,'d.m.Y');
+						 
+					echo '<br>FH-Ausweis im LDAP:';
+					if($uidldap = getUidFromCardNumber($nummer))
+					{
+						if($uidldap==$row_account->uid)
+						{
+							echo 'Ja';
+						}
+						else
+						{
+							echo 'Ja, aber bei UID '.$uidldap;
+						}
+					}
+					else
+					{
+						echo 'Nein';
+					}
+					echo '<br>';
 				}
 			}
 			else
-			{
-				echo 'Nein';
-			}		
+				echo 'Kein FH-Ausweis gedruckt oder zugeteilt';
 		}
-		else
-			echo 'Nein';
+		echo '<br>';
 	}
 	 
 }
