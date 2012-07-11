@@ -167,8 +167,31 @@ if(isset($_POST['person_id']))
 			}
 		}
 	}
+	if(isset($_POST['refresh']))
+	{
+		$error=true;
+	}
 }
-
+$qry_anzahl = "
+	SELECT 
+		count(*) as anzahl
+	FROM 
+		public.tbl_person 
+		JOIN public.tbl_benutzer USING(person_id)
+	WHERE 
+		foto is not NULL
+		AND tbl_benutzer.aktiv
+		AND NOT EXISTS (SELECT 1 FROM public.tbl_person_fotostatus 
+					WHERE person_id=tbl_person.person_id AND fotostatus_kurzbz='akzeptiert')
+		AND 'abgewiesen' NOT IN (SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
+						WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
+	";
+$anzahl = '';
+if($result_anzahl = $db->db_query($qry_anzahl))
+	if($row_anzahl = $db->db_fetch_object($result_anzahl))
+		$anzahl = $row_anzahl->anzahl;
+		
+echo '<br>Gesamt: '.$anzahl;
 // Laden einer Person deren Profilfoto noch nicht akzeptiert wurde
 $qry = "
 	SELECT 
@@ -188,8 +211,13 @@ if($error==true && $person_id!='')
 }
 else
 {
-	// Zufaellige Reihenfolge
-	$qry.=" AND random() <0.01";
+	// Wenn es weniger als 100 Eintraege sind kommen die Bilder nicht mehr Random, da es sonst
+	// vorkommen kann, dass kein Ergebnis geliefert wird
+	if($anzahl>100)
+	{
+		// Zufaellige Reihenfolge
+		$qry.=" AND random() <0.05";
+	}
 	
 	// Keine Eintraege die bereits akzeptiert wurden
 	$qry.="	AND NOT EXISTS (SELECT 1 FROM public.tbl_person_fotostatus 
@@ -228,8 +256,11 @@ if($result = $db->db_query($qry))
 		echo '<input type="hidden" name="person_id" value="'.$db->convert_html_chars($row->person_id).'" />';
 		echo '<input type="submit" name="akzeptieren" value="Akzeptieren" /> &nbsp;&nbsp;&nbsp;';
 		echo '<input type="submit" name="fehlerhaft" value="Fehlerhaft / Infomail" /> &nbsp;&nbsp;&nbsp;';
-		echo '<input type="submit" name="bestof" value="BestOf" /> ';
+		echo '<input type="submit" name="bestof" value="BestOf" />&nbsp;&nbsp;&nbsp; ';
+		echo '<input type="submit" name="refresh" value="Refresh" /> ';
 		echo '</form>';
+		echo '<br><br><br>';
+		echo '<a href="#FotoUpload" onclick="window.open(\'../../content/bildupload.php?person_id='.$row->person_id.'\',\'BildUpload\', \'height=50,width=600,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\'); return false;">Bild Upload</a>';
 		echo '</center>';
 	}
 	else
