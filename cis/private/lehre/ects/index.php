@@ -46,6 +46,7 @@ if (!$db = new basis_db())
    
    $output = '';
    $errormsg = '';
+   $okmsg='';
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -233,7 +234,10 @@ if (!$db = new basis_db())
 					$save_log_error=true;
 
 			if($save_error)
-				$errormsg.= $p->t('courseInformation/achtungFehlerBeimSpeichern')." ".$lv_obj_sav->lastqry;
+				$errormsg.= $p->t('courseInformation/achtungFehlerBeimSpeichern');
+			else
+				$okmsg.= $p->t('global/erfolgreichgespeichert');
+				
 			if($save_log_error)
 				$errormsg.= $p->t('courseInformation/fehlerLogFile');
 		}
@@ -396,8 +400,10 @@ if (!$db = new basis_db())
 		$stg_obj1 = new studiengang();
 		$stg_obj1->load($stg);
 
-		if(isset($errormsg))
-			echo "<font color='#FF0000' size='4'>$errormsg</font>";
+		if(isset($errormsg) && $okmsg!='')
+			echo '<span class="error">'.$errormsg.'</span><br>';
+		if(isset($okmsg) && $okmsg!='')
+			echo '<span class="ok">'.$okmsg.'</span><br>';
 
 		$lv_obj_en = new lvinfo();
 		$lv_obj_de = new lvinfo();
@@ -546,7 +552,7 @@ if (!$db = new basis_db())
 		}
 		else echo "<tr><td valign='top'><b>".$p->t('courseInformation/incomingplaetze')."</b></td><td>0";
 			echo "</td></tr><tr><td colspan='4'><font style='font-size:smaller'>".$p->t('courseInformation/beiFehlernInDenFixfeldern',array($stg_obj1->email))."</font></td></tr>";
-			echo "<tr><td align='left' colspan='4'><br/><br/><font style='color:red'>".$p->t('courseInformation/pflichtfelderWerdenAufDerExternenSeiteAngezeigt',array($stg_obj1->email))."</font>.</td></tr></table><br><br>";
+			echo "<tr><td align='left' colspan='4'><br/><br/><font style='color:black'>".$p->t('courseInformation/pflichtfelderWerdenAufDerExternenSeiteAngezeigt',array($stg_obj1->email))."</font>.</td></tr></table><br><br>";
 
 	   //Eingabefelder anzeigen
 	   echo "<table width='100%'  border='0' cellspacing='0' cellpadding='0'>";
@@ -569,33 +575,33 @@ if (!$db = new basis_db())
        */
        echo '
        <tr class="liste0">
-         <td><i>Kurzbeschreibung <font style="color:red">(Pflichtfeld)</font></i> </td>
+         <td><i>Kurzbeschreibung <font style="color:black">(Pflichtfeld)</font></i> </td>
          <td align="right"><textarea rows="5" cols="40" name="kurzbeschreibung_de">'. (isset($kurzbeschreibung_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$kurzbeschreibung_de)):'').'</textarea></td>
-         <td><i>Course Description <font style="color:red">(Required)</font></i> </td>
+         <td><i>Course Description <font style="color:black">(Required)</font></i> </td>
          <td align="right"><textarea rows="5" cols="40" name="kurzbeschreibung_en">'. (isset($kurzbeschreibung_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$kurzbeschreibung_en)):'').'</textarea></td>
        </tr>
        <tr class="liste1">
-         <td><i>Methodik / Didaktik <font style="color:red">(Pflichtfeld)</font></i> </td>
+         <td><i>Methodik / Didaktik <font style="color:black">(Pflichtfeld)</font></i> </td>
          <td align="right"><textarea rows="5" cols="40" name="methodik_de">'. (isset($methodik_de)?stripslashes(mb_eregi_replace("<br>","\r\n", $methodik_de)):'').'</textarea></td>
-         <td><i>Teaching Methods <font style="color:red">(Required)</font></i> </td>
+         <td><i>Teaching Methods <font style="color:black">(Required)</font></i> </td>
          <td align="right"><textarea rows="5" cols="40" name="methodik_en">'. (isset($methodik_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$methodik_en)):'').'</textarea></td>
        </tr>';
        echo '<tr class="liste0">
-         <td><i>Kompetenzerwerb <font style="color:red">(Pflichtfeld)</font></i></td>
+         <td><i>Kompetenzerwerb <font style="color:black">(Pflichtfeld)</font></i></td>
          <td align="right"><textarea rows="5" cols="40" name="lehrziele_de">'. (isset($lehrziele_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrziele_de)):'').'</textarea></td>
-         <td><i>Learning outcome <font style="color:red">(Required)</font></i> </td>
+         <td><i>Learning outcome <font style="color:black">(Required)</font></i> </td>
          <td align="right"><textarea rows="5" cols="40" name="lehrziele_en">'. (isset($lehrziele_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrziele_en)):'').'</textarea></td>
        </tr>
        <tr class="liste1">
-         <td><i>Lehrinhalte <font style="color:red">(Pflichtfeld)</font></i></td>
+         <td><i>Lehrinhalte <font style="color:black">(Pflichtfeld)</font></i></td>
          <td align="right"><textarea rows="5" cols="40" name="lehrinhalte_de">'. (isset($lehrinhalte_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrinhalte_de)):'').'</textarea></td>
-         <td><i>Course Contents <font style="color:red">(Required)</font></i> </td>
+         <td><i>Course Contents <font style="color:black">(Required)</font></i> </td>
          <td align="right"><textarea rows="5" cols="40" name="lehrinhalte_en">'. (isset($lehrinhalte_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrinhalte_en)):'').'</textarea></td>
        </tr>
        <tr class="liste0">
-         <td><i>Vorkenntnisse <font style="color:red">(Pflichtfeld)</font></i> </td>
+         <td><i>Vorkenntnisse <font style="color:black">(Pflichtfeld)</font></i> </td>
          <td align="right"><textarea rows="5" cols="40" name="voraussetzungen_de">'. (isset($voraussetzungen_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$voraussetzungen_de)):'').'</textarea></td>
-         <td><i>Prerequisites <font style="color:red">(Required)</font></i></td>
+         <td><i>Prerequisites <font style="color:black">(Required)</font></i></td>
          <td align="right"><textarea rows="5" cols="40" name="voraussetzungen_en">'. (isset($voraussetzungen_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$voraussetzungen_en)):'').'</textarea></td>
        </tr>';
        echo '<tr class="liste1">
