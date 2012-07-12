@@ -112,7 +112,7 @@
 
 				<fo:block-container position="absolute" top="217mm" left="16mm" height="10mm">
 					<fo:block text-align="center" line-height="10pt" font-family="arial" font-size="10pt">
-						<xsl:text>Wien, </xsl:text>
+						<xsl:text>Vienna, </xsl:text>
 						<xsl:value-of select="sponsion" />
 					</fo:block>
 				</fo:block-container>
