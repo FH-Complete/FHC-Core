@@ -51,7 +51,7 @@ class antwort extends basis_db
 	 */
 	public function load($antwort_id)
 	{
-		$qry = "SELECT * FROM testtool.tbl_antwort WHERE antwort_id='".addslashes($antwort_id)."'";
+		$qry = "SELECT * FROM testtool.tbl_antwort WHERE antwort_id=".$this->db_add_param($antwort_id, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 		{
@@ -100,15 +100,15 @@ class antwort extends basis_db
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
 			$qry = 'INSERT INTO testtool.tbl_antwort (pruefling_id, vorschlag_id) VALUES('.
-			       $this->addslashes($this->pruefling_id).",".
-			       $this->addslashes($this->vorschlag_id).");";
+			       $this->db_add_param($this->pruefling_id, FHC_INTEGER).",".
+			       $this->db_add_param($this->vorschlag_id, FHC_INTEGER).");";
 		}
 		else
 		{			
 			$qry = 'UPDATE testtool.tbl_antwort SET'.
-			       ' vorschlag_id='.$this->addslashes($this->vorschlag_id).','.
-			       ' pruefling_id='.$this->addslashes($this->pruefling_id).','.
-			       " WHERE antwort_id='".addslashes($this->antwort_id)."'";
+			       ' vorschlag_id='.$this->db_add_param($this->vorschlag_id, FHC_INTEGER).','.
+			       ' pruefling_id='.$this->db_add_param($this->pruefling_id, FHC_INTEGER).','.
+			       " WHERE antwort_id=".$this->db_add_param($this->antwort_id, FHC_INTEGER,false);
 		}
 		
 		if($this->db_query($qry))
@@ -137,7 +137,7 @@ class antwort extends basis_db
 			return false;
 		}
 		
-		$qry = "DELETE FROM testtool.tbl_antwort WHERE antwort_id='".addslashes($antwort_id)."'";
+		$qry = "DELETE FROM testtool.tbl_antwort WHERE antwort_id=".$this->db_add_param($antwort_id, FHC_INTEGER, false);
 		if($this->db_query($qry))
 		{
 			return true;
@@ -162,8 +162,8 @@ class antwort extends basis_db
 				JOIN testtool.tbl_vorschlag USING(vorschlag_id) 
 				WHERE 
 					tbl_vorschlag.frage_id=tbl_pruefling_frage.frage_id AND 
-					pruefling_id='".addslashes($pruefling_id)."' AND 
-					tbl_vorschlag.frage_id='".addslashes($frage_id)."'";
+					pruefling_id=".$this->db_add_param($pruefling_id, FHC_INTEGER)." AND 
+					tbl_vorschlag.frage_id=".$this->db_add_param($frage_id, FHC_INTEGER, false);
 		
 		if($this->db_query($qry))
 		{
