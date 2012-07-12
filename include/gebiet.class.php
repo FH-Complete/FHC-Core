@@ -72,7 +72,7 @@ class gebiet extends basis_db
 	 */
 	public function load($gebiet_id)
 	{
-		$qry = "SELECT * FROM testtool.tbl_gebiet WHERE gebiet_id='".addslashes($gebiet_id)."'";
+		$qry = "SELECT * FROM testtool.tbl_gebiet WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER);
 
 		if($this->db_query($qry))
 		{
@@ -83,15 +83,15 @@ class gebiet extends basis_db
 				$this->bezeichnung = $row->bezeichnung;
 				$this->beschreibung = $row->beschreibung;
 				$this->zeit = $row->zeit;
-				$this->multipleresponse = ($row->multipleresponse=='t'?true:false);
-				$this->kategorien = ($row->kategorien=='t'?true:false);
+				$this->multipleresponse = $this->db_parse_bool($row->multipleresponse);
+				$this->kategorien = $this->db_parse_bool($row->kategorien);
 				$this->maxfragen = $row->maxfragen;
-				$this->zufallfrage = ($row->zufallfrage=='t'?true:false);
-				$this->zufallvorschlag = ($row->zufallvorschlag=='t'?true:false);
+				$this->zufallfrage = $this->db_parse_bool($row->zufallfrage);
+				$this->zufallvorschlag = $this->db_parse_bool($row->zufallvorschlag);
 				$this->level_start = $row->level_start;
 				$this->level_sprung_auf = $row->level_sprung_auf;
 				$this->level_sprung_ab = $row->level_sprung_ab;
-				$this->levelgleichverteilung = ($row->levelgleichverteilung=='t'?true:($row->levelgleichverteilung=='f'?false:null));
+				$this->levelgleichverteilung = $this->db_parse_bool($row->levelgleichverteilung);
 				$this->maxpunkte = $row->maxpunkte;
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
@@ -194,46 +194,46 @@ class gebiet extends basis_db
 			$qry = 'BEGIN;INSERT INTO testtool.tbl_gebiet (kurzbz, bezeichnung, beschreibung, zeit, multipleresponse, 
 					kategorien, maxfragen, zufallfrage, zufallvorschlag, level_start, level_sprung_auf, level_sprung_ab, 
 					levelgleichverteilung, maxpunkte, antwortenprozeile, insertamum, insertvon , updateamum, updatevon) VALUES('.
-			       $this->addslashes($this->kurzbz).",".
-			       $this->addslashes($this->bezeichnung).",'".
-			       $this->addslashes($this->beschreibung).",'".
-			       $this->addslashes($this->zeit).",".
-			       ($this->multipleresponse?'true':'false').",".
-			       $this->addslashes($this->kategorien).",".
-			       $this->addslashes($this->maxfragen).",".
-			       ($this->zufallfrage?'true':'false').",'".
-			       ($this->zufallvorschlag?'true':'false').",'".
-			       $this->addslashes($this->level_start).",".
-			       $this->addslashes($this->level_sprung_auf).",".
-			       $this->addslashes($this->level_sprung_ab).",".
-			       ($this->levelgleichverteilung?'true':($this->levelgleichverteilung==false?'false':'null')).",".
-			       $this->addslashes($this->maxpunkte).",".
-			       $this->addslashes($this->antwortenprozeile).",".
-			       $this->addslashes($this->insertamum).",".
-			       $this->addslashes($this->insertvon).
-			       ",null, null);";
+			       $this->db_add_param($this->kurzbz).','.
+			       $this->db_add_param($this->bezeichnung).','.
+			       $this->db_add_param($this->beschreibung).','.
+			       $this->db_add_param($this->zeit).','.
+			       $this->db_add_param($this->multipleresponse, FHC_BOOLEAN).','.
+			       $this->db_add_param($this->kategorien, FHC_BOOLEAN).','.
+			       $this->db_add_param($this->maxfragen).','.
+			       $this->db_add_param($this->zufallfrage, FHC_BOOLEAN).','.
+			       $this->db_add_param($this->zufallvorschlag, FHC_BOOLEAN).','.
+			       $this->db_add_param($this->level_start).','.
+			       $this->db_add_param($this->level_sprung_auf).','.
+			       $this->db_add_param($this->level_sprung_ab).','.
+			       $this->db_add_param($this->levelgleichverteilung, FHC_BOOLEAN).','.
+			       $this->db_add_param($this->maxpunkte).','.
+			       $this->db_add_param($this->antwortenprozeile).','.
+			       $this->db_add_param($this->insertamum).','.
+			       $this->db_add_param($this->insertvon).
+			       ',null, null);';
 		}
 		else
 		{
 			$qry = 'UPDATE testtool.tbl_gebiet SET'.
-			       ' kurzbz='.$this->addslashes($this->kurzbz).','.
-			       ' bezeichnung='.$this->addslashes($this->bezeichnung).','.
-			       ' beschreibung='.$this->addslashes($this->beschreibung).','.
-			       ' zeit='.$this->addslashes($this->zeit).','.
-			       ' multipleresponse='.($this->multipleresponse?'true':'false').','.
-			       ' kategorien='.($this->kategorien?'true':'false').','.
-			       ' maxfragen='.$this->addslashes($this->maxfragen).','.
-			       ' zufallfrage='.($this->zufallfrage?'true':'false').','.
-			       ' zufallvorschlag='.($this->zufallvorschlag?'true':'false').','.
-			       ' level_start='.$this->addslashes($this->level_start).','.
-			       ' level_sprung_auf='.$this->addslashes($this->level_sprung_auf).','.
-			       ' level_sprung_ab='.$this->addslashes($this->level_sprung_ab).','.
-			       ' levelgleichverteilung='.($this->levelgleichverteilung?'true':($this->levelgleichverteilung==false?'false':'null')).','.
-			       ' maxpunkte='.$this->addslashes($this->maxpunkte).','.
-			       ' antwortenprozeile='.$this->addslashes($this->antwortenprozeile).','.
-			       ' updateamum='.$this->addslashes($this->updateamum).','.
-			       ' updatevon='.$this->addslashes($this->updatevon).
-			       " WHERE gebiet_id='".addslashes($this->gebiet_id)."';";
+			       ' kurzbz='.$this->db_add_param($this->kurzbz).','.
+			       ' bezeichnung='.$this->db_add_param($this->bezeichnung).','.
+			       ' beschreibung='.$this->db_add_param($this->beschreibung).','.
+			       ' zeit='.$this->db_add_param($this->zeit).','.
+			       ' multipleresponse='.$this->db_add_param($this->multipleresponse, FHC_BOOLEAN).','.
+			       ' kategorien='.$this->db_add_param($this->kategorien, FHC_BOOLEAN).','.
+			       ' maxfragen='.$this->db_add_param($this->maxfragen).','.
+			       ' zufallfrage='.$this->db_add_param($this->zufallfrage, FHC_BOOLEAN).','.
+			       ' zufallvorschlag='.$this->db_add_param($this->zufallvorschlag, FHC_BOOLEAN).','.
+			       ' level_start='.$this->db_add_param($this->level_start).','.
+			       ' level_sprung_auf='.$this->db_add_param($this->level_sprung_auf).','.
+			       ' level_sprung_ab='.$this->db_add_param($this->level_sprung_ab).','.
+			       ' levelgleichverteilung='.$this->db_add_param($this->levelgleichverteilung, FHC_BOOLEAN).','.
+			       ' maxpunkte='.$this->db_add_param($this->maxpunkte).','.
+			       ' antwortenprozeile='.$this->db_add_param($this->antwortenprozeile).','.
+			       ' updateamum='.$this->db_add_param($this->updateamum).','.
+			       ' updatevon='.$this->db_add_param($this->updatevon).
+			       " WHERE gebiet_id=".$this->db_add_param($this->gebiet_id, FHC_INTEGER, false).";";
 		}
 		
 		if($this->db_query($qry))
@@ -300,7 +300,7 @@ class gebiet extends basis_db
 		//Von jedem level muessen mindestens maxfragen vorhanden sein wenn levels aktiv ist
 		if($this->level_start!='')
 		{
-			$qry = "SELECT count(*) as anzahl, level FROM testtool.tbl_frage WHERE gebiet_id='".addslashes($gebiet_id)."' GROUP BY level";
+			$qry = "SELECT count(*) as anzahl, level FROM testtool.tbl_frage WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER, false)." GROUP BY level";
 			if($this->db_query($qry))
 			{
 				while($row = $this->db_fetch_object())
@@ -316,7 +316,7 @@ class gebiet extends basis_db
 		//Pruefen ob jede Fragen mindestens 2 Vorschlaege hat
 		$qry = "SELECT frage_id, nummer FROM testtool.tbl_frage 
 				WHERE (SELECT count(*) as anzahl FROM testtool.tbl_vorschlag WHERE frage_id=tbl_frage.frage_id)<2
-				AND gebiet_id='".addslashes($gebiet_id)."' AND NOT demo;";
+				AND gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." AND NOT demo;";
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -328,7 +328,7 @@ class gebiet extends basis_db
 		//Wenn Levels verwendet werden, muessen mindestens 2 Verschiedene Level vorhanden sein
 		if($this->level_start!='')
 		{
-			$qry = "SELECT level FROM testtool.tbl_frage WHERE gebiet_id='".addslashes($gebiet_id)."' AND level is not null GROUP by level";
+			$qry = "SELECT level FROM testtool.tbl_frage WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." AND level is not null GROUP by level";
 			if($this->db_query($qry))
 			{
 				if($this->db_num_rows()<2)
@@ -343,7 +343,7 @@ class gebiet extends basis_db
 		{
 			if($this->maxfragen!='' && $this->maxfragen!=0)
 			{
-				$qry = "SELECT count(*) as anzahl FROM testtool.tbl_frage WHERE gebiet_id='".addslashes($gebiet_id)."' AND not demo AND level is not null GROUP BY level";
+				$qry = "SELECT count(*) as anzahl FROM testtool.tbl_frage WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." AND not demo AND level is not null GROUP BY level";
 				if($this->db_query($qry))
 				{
 					if($row = $this->db_fetch_object())
@@ -366,7 +366,7 @@ class gebiet extends basis_db
 							SELECT level, punkte, count(*) as anzahl FROM (
 								SELECT level, sum(punkte) as punkte
 								FROM testtool.tbl_frage JOIN testtool.tbl_vorschlag USING(frage_id) 
-								WHERE punkte>0 AND not demo AND gebiet_id='".addslashes($gebiet_id)."'
+								WHERE punkte>0 AND not demo AND gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)."
 								GROUP BY frage_id, level) as a 
 							GROUP BY level, punkte ) as b 
 						GROUP BY level) as c
@@ -418,12 +418,12 @@ class gebiet extends basis_db
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->beschreibung = $row->beschreibung;
 				$obj->zeit = $row->zeit;
-				$obj->multipleresponse = ($row->multipleresponse=='t'?true:false);
-				$obj->kategorien = ($row->kategorien=='t'?true:false);
+				$obj->multipleresponse = $this->db_parse_bool($row->multipleresponse);
+				$obj->kategorien = $this->db_parse_bool($row->kategorien);
 				$obj->maxfragen = $row->maxfragen;
-				$obj->zufallfrage = ($row->zufallfrage=='t'?true:false);
-				$obj->zufallvorschlag = ($row->zufallvorschlag=='t'?true:false);
-				$obj->levelgleichverteilung = ($row->levelgleichverteilung=='t'?true:false);
+				$obj->zufallfrage = $this->db_parse_bool($row->zufallfrage);
+				$obj->zufallvorschlag = $this->db_parse_bool($row->zufallvorschlag);
+				$obj->levelgleichverteilung = $this->db_parse_bool($row->levelgleichverteilung);
 				$obj->maxpunkte = $row->maxpunkte;
 				$obj->level_start = $row->level_start;
 				$obj->level_sprung_ab = $row->level_sprung_ab;
@@ -460,7 +460,7 @@ class gebiet extends basis_db
 		{
 			$qry = "SELECT sum(punkte) as max 
 					FROM testtool.tbl_vorschlag JOIN testtool.tbl_frage USING(frage_id)
-					WHERE gebiet_id='".addslashes($gebiet_id)."' AND punkte>0 AND NOT demo";
+					WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." AND punkte>0 AND NOT demo";
 			if($this->maxfragen!='' && $this->maxfragen>0)
 				$qry.=" LIMIT $this->maxfragen";
 		}
@@ -475,12 +475,12 @@ class gebiet extends basis_db
 						SELECT 
 							level, punkte, count(*) as anz, 
 							(SELECT count(*) FROM testtool.tbl_frage 
-							WHERE gebiet_id='".addslashes($gebiet_id)."') as fragengesamt
+							WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER).") as fragengesamt
 						FROM 
 							testtool.tbl_frage
 							JOIN testtool.tbl_vorschlag USING(frage_id)
 						WHERE
-							gebiet_id='".addslashes($gebiet_id)."'
+							gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)."
 							AND NOT demo
 						GROUP BY level, punkte
 						) a
@@ -497,12 +497,12 @@ class gebiet extends basis_db
 						SELECT 
 							level, punkte, count(*) as anz, 
 							(SELECT count(*) FROM testtool.tbl_frage 
-							WHERE gebiet_id='".addslashes($gebiet_id)."') as fragengesamt
+							WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER).") as fragengesamt
 						FROM 
 							testtool.tbl_frage
 							JOIN testtool.tbl_vorschlag USING(frage_id)
 						WHERE
-							gebiet_id='".addslashes($gebiet_id)."'
+							gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)."
 							AND NOT demo
 						GROUP BY level, punkte
 						) a
@@ -519,7 +519,7 @@ class gebiet extends basis_db
 				(
 				SELECT level, frage_id, sum(punkte) as punkte 
 				FROM testtool.tbl_frage JOIN testtool.tbl_vorschlag USING(frage_id)
-				WHERE gebiet_id='".addslashes($gebiet_id)."' AND punkte>0 AND level>='$this->level_start' AND NOT demo 
+				WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." AND punkte>0 AND level>=".$this->db_add_param($this->level_start)." AND NOT demo 
 				GROUP BY level, frage_id
 				) as a 
 			GROUP by level, punkte ORDER BY level";

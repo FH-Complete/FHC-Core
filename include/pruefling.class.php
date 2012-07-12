@@ -54,7 +54,7 @@ class pruefling extends basis_db
 	 */
 	public function load($pruefling_id)
 	{
-		$qry = "SELECT * FROM testtool.tbl_pruefling WHERE pruefling_id='".addslashes($pruefling_id)."'";
+		$qry = "SELECT * FROM testtool.tbl_pruefling WHERE pruefling_id=".$this->db_add_param($pruefling_id, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 		{
@@ -76,7 +76,7 @@ class pruefling extends basis_db
 		}
 		else 
 		{
-			$this->errormsg = "Fehler beim Laden: $qry";
+			$this->errormsg = "Fehler beim Laden";
 			return false;
 		}		
 	}
@@ -106,21 +106,21 @@ class pruefling extends basis_db
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
 			$qry = 'BEGIN;INSERT INTO testtool.tbl_pruefling (studiengang_kz, idnachweis, registriert, prestudent_id, semester) VALUES('.
-			       $this->addslashes($this->studiengang_kz).",".
-			       $this->addslashes($this->idnachweis).",".
-			       $this->addslashes($this->registriert).",".
-			       $this->addslashes($this->prestudent_id).",".
-			       $this->addslashes($this->semester).");";
+			       $this->db_add_param($this->studiengang_kz).",".
+			       $this->db_add_param($this->idnachweis).",".
+			       $this->db_add_param($this->registriert).",".
+			       $this->db_add_param($this->prestudent_id).",".
+			       $this->db_add_param($this->semester).");";
 		}
 		else
 		{			
 			$qry = 'UPDATE testtool.tbl_pruefling SET'.
-			       ' studiengang_kz='.$this->addslashes($this->studiengang_kz).','.
-			       ' idnachweis='.$this->addslashes($this->idnachweis).','.
-			       ' registriert='.$this->addslashes($this->registriert).','.
-			       ' semester='.$this->addslashes($this->semester).','.
-			       ' prestudent_id='.$this->addslashes($this->prestudent_id).
-			       " WHERE pruefling_id='".addslashes($this->pruefling_id)."';";
+			       ' studiengang_kz='.$this->db_add_param($this->studiengang_kz, FHC_INTEGER).','.
+			       ' idnachweis='.$this->db_add_param($this->idnachweis).','.
+			       ' registriert='.$this->db_add_param($this->registriert).','.
+			       ' semester='.$this->db_add_param($this->semester).','.
+			       ' prestudent_id='.$this->db_add_param($this->prestudent_id, FHC_INTEGER).
+			       " WHERE pruefling_id=".$this->db_add_param($this->pruefling_id, FHC_INTEGER, false).";";
 		}
 		
 		if($this->db_query($qry))
@@ -158,7 +158,7 @@ class pruefling extends basis_db
 		else 
 		{	
 			$this->db_query('ROLLBACK');
-			$this->errormsg = 'Fehler beim Speichern der Frage:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern der Frage';
 			return false;
 		}
 	}
@@ -171,7 +171,7 @@ class pruefling extends basis_db
 	 */
 	public function getPruefling($prestudent_id)
 	{
-		$qry = "SELECT * FROM testtool.tbl_pruefling WHERE prestudent_id='".addslashes($prestudent_id)."'";
+		$qry = "SELECT * FROM testtool.tbl_pruefling WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 		{
@@ -187,13 +187,13 @@ class pruefling extends basis_db
 			}
 			else 
 			{
-				$this->errormsg = "Kein Eintrag gefunden fuer $prestudent_id";
+				$this->errormsg = "Kein Eintrag gefunden";
 				return false;
 			}				
 		}
 		else 
 		{
-			$this->errormsg = "Fehler beim Laden: $qry";
+			$this->errormsg = "Fehler beim Laden";
 			return false;
 		}		
 	}
@@ -217,7 +217,7 @@ class pruefling extends basis_db
 			$min_level = 0;
 					
 			$qry = "SELECT max(level) as max, min(level) as min FROM testtool.tbl_frage 
-					WHERE gebiet_id='".addslashes($gebiet_id)."'";
+					WHERE gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER);
 			
 			if($this->db_query($qry))
 			{
@@ -247,8 +247,8 @@ class pruefling extends basis_db
 						JOIN testtool.tbl_antwort USING(vorschlag_id)
 						JOIN testtool.tbl_frage USING(frage_id)
 					WHERE
-						tbl_frage.gebiet_id='".addslashes($gebiet_id)."' AND
-						tbl_pruefling_frage.pruefling_id='".addslashes($pruefling_id)."' AND
+						tbl_frage.gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." AND
+						tbl_pruefling_frage.pruefling_id=".$this->db_add_param($pruefling_id, FHC_INTEGER)." AND
 						tbl_antwort.pruefling_id = tbl_pruefling_frage.pruefling_id
 					ORDER BY tbl_pruefling_frage.nummer ASC";
 			
@@ -315,7 +315,7 @@ class pruefling extends basis_db
 	public function getReihungstestErgebnis($prestudent_id)
 	{
 		$qry = "SELECT * FROM testtool.vw_auswertung 
-				WHERE prestudent_id='".addslashes($prestudent_id)."'";
+				WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);
 		
 		$ergebnis=0;
 		
