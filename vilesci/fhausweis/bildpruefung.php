@@ -112,7 +112,20 @@ if(isset($_POST['person_id']))
 			$text .= "Bitte Laden Sie ein entsprechendes Profilbild im CIS unter 'Mein CIS'->'Profil' hoch.\n";
 			$text .= "\n";
 			$text .= "Herzlichen Dank\n";
-			$text .= "Fachhochschule Technikum Wien";
+			$text .= "Fachhochschule Technikum Wien\n";
+			$text .= "\n------------------\n\n";
+			if($person->geschlecht=='m')
+				$text .= "Dear Mr ".$person->vorname.' '.$person->nachname.",\n\n";
+			else
+				$text .= "Dear Ms ".$person->vorname.' '.$person->nachname.",\n\n";
+			$text .= "Your profile photograph has been checked and does not fulfil the photo criteria.\n";
+			$text .= "The current criteria can be found under the following link:\n";
+			$text .= "https://cis.technikum-wien.at/cms/content.php?content_id=6174\n";
+			$text .= "\n";
+			$text .= "Please upload a suitable profile photo in the CIS under 'My CIS'->'Profile'.\n";
+			$text .= "\n";
+			$text .= "Thank you\n";
+			$text .= "University of Applied Sciences Technikum Wien";
 			
 			$mail = new mail($to, $from, $subject, $text);
 			if($mail->send())
@@ -240,7 +253,7 @@ if($result = $db->db_query($qry))
 		<table>	
 			<tr>
 				<td>
-				<img src="../../content/bild.php?src=person&person_id='.$row->person_id.'" height="100px" width="75px">
+				<img src="../../content/bild.php?src=akte&person_id='.$row->person_id.'" height="100px" width="75px">
 				</td>
 				<td>&nbsp;</td>
 				<td>

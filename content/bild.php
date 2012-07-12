@@ -24,18 +24,28 @@
 // Aufruf mit <img src='bild.php?src=frage&frage_id=1
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/basis_db.class.php');
+$db = new basis_db();
 //base64 Dump aus der DB holen
 $cTmpHEX='/9j/4AAQSkZJRgABAQEASABIAAD/4QAWRXhpZgAATU0AKgAAAAgAAAAAAAD//gAXQ3JlYXRlZCB3aXRoIFRoZSBHSU1Q/9sAQwAFAwQEBAMFBAQEBQUFBgcMCAcHBwcPCwsJDBEPEhIRDxERExYcFxMUGhURERghGBodHR8fHxMXIiQiHiQcHh8e/9sAQwEFBQUHBgcOCAgOHhQRFB4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4e/8AAEQgAAQABAwEiAAIRAQMRAf/EABUAAQEAAAAAAAAAAAAAAAAAAAAI/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/EABQBAQAAAAAAAAAAAAAAAAAAAAD/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCywAf/2Q==';
 if(isset($_GET['src']) && $_GET['src']=='person' && isset($_GET['person_id']))
 {
-	$qry = "SELECT foto FROM public.tbl_person WHERE person_id='".addslashes($_GET['person_id'])."'";
-	$db = new basis_db();
+	$qry = "SELECT foto FROM public.tbl_person WHERE person_id=".$db->db_add_param($_GET['person_id'], FHC_INTEGER);
 	if($result = $db->db_query($qry))
 	{
 		if($row = $db->db_fetch_object($result))	
 			$cTmpHEX=$row->foto;
 	}		
 }
+elseif(isset($_GET['src']) && $_GET['src']=='akte' && isset($_GET['person_id']))
+{
+	$qry = "SELECT inhalt as foto FROM public.tbl_akte WHERE person_id=".$db->db_add_param($_GET['person_id'], FHC_INTEGER)." AND dokument_kurzbz='Lichtbil'";
+	if($result = $db->db_query($qry))
+	{
+		if($row = $db->db_fetch_object($result))	
+			$cTmpHEX=$row->foto;
+	}		
+}
+
 //Header fuer Bild schicken
 header("Content-type: image/gif");
 //base64 Werte in Zeichen umwandeln und ausgeben
