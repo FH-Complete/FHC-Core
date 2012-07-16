@@ -29,4 +29,7 @@ $this->phrasen['lehre/moodleMitKreuzerltoolInfo']='Moodle kann nicht gleichzeiti
 
 $this->phrasen['lehre/gesamtnote']='Gesamtnote';
 $this->phrasen['lehre/studentenAbgabe']='Studierenden Abgabe';
+
+$this->phrasen['lehre/mail']='E-Mail an Studierende';
+$this->phrasen['lehre/keinMailverteiler']='Für die Gruppe(n) %s existiert kein Verteiler! Die Studierenden in diesen Gruppen bekommen kein Mail.';
 ?>

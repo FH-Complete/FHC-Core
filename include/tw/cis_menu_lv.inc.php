@@ -593,6 +593,42 @@
 	}
 	echo '<p>&nbsp;</p>
 		</td>';
+	
+	$mailto='mailto:';
+	$qry = 'SELECT 
+				distinct vw_lehreinheit.stg_kurzbz, vw_lehreinheit.stg_typ, vw_lehreinheit.semester, 
+				vw_lehreinheit.verband, vw_lehreinheit.gruppe, vw_lehreinheit.gruppe_kurzbz, tbl_gruppe.mailgrp 
+			FROM 
+				campus.vw_lehreinheit 
+				LEFT JOIN public.tbl_gruppe USING(gruppe_kurzbz)
+			WHERE 
+				lehrveranstaltung_id='.$db->db_add_param($lvid).' 
+				AND studiensemester_kurzbz='.$db->db_add_param($angezeigtes_stsem);
+	$nomail='';
+	if($result = $db->db_query($qry))
+	{
+		while($row = $db->db_fetch_object($result))
+		{
+			if($row->gruppe_kurzbz!='')
+			{
+				if(!$db->db_parse_bool($row->mailgrp))
+				{
+					$nomail=$row->gruppe_kurzbz.' ';
+				}
+				else
+					$mailto.=mb_strtolower($row->gruppe_kurzbz.'@'.DOMAIN.',');
+			}
+			else
+				$mailto.=mb_strtolower($row->stg_typ.$row->stg_kurzbz.$row->semester.trim($row->verband).trim($row->gruppe).'@'.DOMAIN.',');
+		}
+	}
+	if($nomail!='')
+	{
+		$nomail = 'onclick="alert(\''.$p->t('lehre/keinMailverteiler',array($nomail)).'\');"';
+	}
+	echo '<td class="tdvertical" align="center">';
+	echo '<a href="'.$mailto.'" '.$nomail.'><img border="0" src="../../../skin/images/button_fb.jpg" width="67" height="45"><br><strong>'.$p->t('lehre/mail').'</strong></a>';
+	echo '</td>';
 
   ?>
 	</tr>
