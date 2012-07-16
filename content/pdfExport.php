@@ -124,6 +124,8 @@ if(isset($_GET['typ']))
 	$params.='&typ='.$_GET['typ'];
 if(isset($_GET['all']))
 	$params.='&all='.$_GET['all'];
+if(isset($_GET['preoutgoing_id']))
+    $params.='&preoutgoing_id='.$_GET['preoutgoing_id'];
 if(isset($_GET["lvid"]))
 	$params.='&lvid='.$_GET["lvid"];
 if(isset($_GET['projekt_kurzbz']))
@@ -132,6 +134,8 @@ if(isset($_GET['version']) && is_numeric($_GET['version']))
 	$version = $_GET['version'];
 else 
 	$version ='';
+
+$output = (isset($_GET['output'])?$_GET['output']:'odt');
 
 if($xsl=='AccountInfo')
 {
@@ -242,9 +246,21 @@ if(isset($_GET['uid']) && $_GET['uid']!='')
 $filename=$xsl.$nachname;
 
 if (!isset($_REQUEST["archive"]))
-{
+{ 
 	if(mb_strstr($vorlage->mimetype, 'application/vnd.oasis.opendocument'))
 	{
+		switch($vorlage->mimetype)
+		{
+			case 'application/vnd.oasis.opendocument.text':
+					$endung = 'odt';
+					break; 
+			case 'application/vnd.oasis.opendocument.spreadsheet':
+					$endung = 'ods'; 
+					break;               
+			default:
+					$endung = 'pdf'; 
+		}
+
 		// Load the XSL source
 		$xsl_doc = new DOMDocument;
 		if(!$xsl_doc->loadXML($xsl_content))
@@ -261,28 +277,47 @@ if (!isset($_REQUEST["archive"]))
 		mkdir($tempfolder);
 		chdir($tempfolder);
 		file_put_contents('content.xml', $buffer);
-		$zipfile = DOC_ROOT.'system/vorlage_zip/'.$vorlage->vorlage_kurzbz.'.ods';
+        
+		$zipfile = DOC_ROOT.'system/vorlage_zip/'.$vorlage->vorlage_kurzbz.'.'.$endung;
 		$tempname_zip = 'out.zip';
 		if(copy($zipfile, $tempname_zip))
 		{
 			exec("zip $tempname_zip content.xml");
 			clearstatcache(); 
-		    $fsize = filesize($tempname_zip);
-		    $handle = fopen($tempname_zip,'r');
-		    header('Content-type: '.$vorlage->mimetype);
-			header('Content-Disposition: attachment; filename="'.$vorlage->vorlage_kurzbz.'.ods"');
-		    header('Content-Length: '.$fsize); 
+            if($output == 'pdf')
+            {
+                $tempPdfName = $vorlage->vorlage_kurzbz.'.pdf';
+                exec("unoconv --stdout -f pdf $tempname_zip > $tempPdfName");
+                
+                $fsize = filesize($tempPdfName); 
+                $handle = fopen($tempPdfName,'r');
+                header('Content-type: application/pdf');
+                header('Content-Disposition: attachment; filename="'.$tempPdfName.'"');
+                header('Content-Length: '.$fsize); 
+            }
+            else if($output =='odt')
+            {
+                $fsize = filesize($tempname_zip);
+                $handle = fopen($tempname_zip,'r');
+                header('Content-type: '.$vorlage->mimetype);
+                header('Content-Disposition: attachment; filename="'.$vorlage->vorlage_kurzbz.'.'.$endung.'"');
+                header('Content-Length: '.$fsize); 
+           } 
+            
 		    while (!feof($handle)) 
 		    {
 			  	echo fread($handle, 8192);
 			}
 			fclose($handle);
+
 			unlink('content.xml');
 			unlink($tempname_zip);
+            if($output=='pdf')
+                unlink($tempPdfName);
 			rmdir($tempfolder);
 		}
 	}
-	else
+	else 
 	{
 		if(PDF_CREATE_FUNCTION=='FOP')
 		{

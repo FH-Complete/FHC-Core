@@ -4245,8 +4245,8 @@ function StudentCreateDiplSupplement()
 		return false;
 	}
 	
-	//PDF erzeugen
-	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=diplomasupplement.xml.php&xsl=DiplSupplement&xsl_stg_kz='+stg_kz+'&uid='+paramList,'DiplomaSupplement', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	//PDF erzeugen 
+	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=diplomasupplement.xml.php&output=pdf&xsl=DiplSupplement&xsl_stg_kz='+stg_kz+'&uid='+paramList,'DiplomaSupplement', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
