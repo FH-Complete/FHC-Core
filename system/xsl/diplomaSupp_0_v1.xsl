@@ -2572,7 +2572,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <text:p text:style-name="P19"/>
       <text:p text:style-name="P19"/>
       <text:p text:style-name="P19"/>
-      <text:p text:style-name="P23">¹ Type: Laboratory (LAB), Lecture (VO), Integrated Course (ILV), Seminar (SE), Tutorial (TUT), Project (PRJ), Exercise (UE), Distance Learning (FL)</text:p>
+      <text:p text:style-name="P23">¹ Type: Laboratory (LAB), Lecture (VO), Integrated Course (ILV), Seminar (SE), Tutorial (TUT), Project (PRJ), Exercise (UE), Distance Learning (FL), Other (SO)</text:p>
       <text:p text:style-name="P23">² 1 Semester period per week = 45 minutes</text:p>
       <text:p text:style-name="P23">³ Grading Scheme: excellent (1), very good (2), good (3), satisfactory (4), fail (5), not graded (nb), Credit based on previous experience/work (ar), successfully completed (ea), not successfully completed (nea)</text:p>
       <text:p text:style-name="P18">
