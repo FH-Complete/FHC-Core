@@ -482,9 +482,19 @@ $error_msg='';
     flush();
     setGeneriert('TW_STD');
     echo 'TW_STD wird abgeglichen!<br>';
+
+    //Abbrecher bleiben noch 3 Wochen im Verteiler
+    //andere inaktive noch fuer 20 Wochen
+    //damit im CIS die Menuepunkte fuer Studierende richtig angezeigt werden    
 	$sql_query="DELETE FROM public.tbl_benutzergruppe 
 				WHERE UPPER(gruppe_kurzbz)='TW_STD'	
-				AND uid not in (SELECT uid FROM campus.vw_student WHERE aktiv)";
+				AND uid not in 
+					(SELECT uid FROM campus.vw_student WHERE aktiv
+					UNION
+					SELECT uid FROM campus.vw_student WHERE aktiv=false AND get_rolle_prestudent(vw_student.prestudent_id, null)='Abbrecher' AND updateaktivam>now()-'3 weeks'::interval
+					UNION
+					SELECT uid FROM campus.vw_student WHERE aktiv=false AND get_rolle_prestudent(vw_student.prestudent_id, null)!='Abbrecher' AND updateaktivam>now()-'20 weeks'::interval
+				)";
 	if($result = $db->db_query($sql_query))
 	{
 		echo $db->db_affected_rows($result).' Eintraege entfernt<br>';
@@ -498,7 +508,11 @@ $error_msg='';
 	$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, insertamum, insertvon) 
 				SELECT uid,'TW_STD',now(),'mlists_generate' 
 				FROM campus.vw_student 
-				WHERE aktiv
+				WHERE (aktiv 
+						OR 
+						(aktiv=false AND get_rolle_prestudent(vw_student.prestudent_id, null)='Abbrecher' AND updateaktivam>now()-'3 weeks'::interval)
+						OR
+						(aktiv=false AND get_rolle_prestudent(vw_student.prestudent_id, null)!='Abbrecher' AND updateaktivam>now()-'20 weeks'::interval))
 				AND uid NOT in(SELECT uid FROM public.tbl_benutzergruppe 
 								WHERE UPPER(gruppe_kurzbz)='TW_STD')";
 	if($result = $db->db_query($sql_query))
