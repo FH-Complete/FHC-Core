@@ -1374,10 +1374,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           </table:table-cell>
           <table:table-cell table:style-name="Table3.C2" office:value-type="string">
             <text:p text:style-name="P44">
-              <text:span text:style-name="Tabelleninhalt"><xsl:value-of select="titel"/></text:span>
+              <text:span text:style-name="Tabelleninhalt"><xsl:value-of select="titel_de"/></text:span>
             </text:p>
             <text:p text:style-name="P44">
-              <text:span text:style-name="Tabelleninhalt"><xsl:value-of select="titel_kurzbz"/></text:span>
+              <text:span text:style-name="Tabelleninhalt"><xsl:value-of select="titel_en"/></text:span>
             </text:p>
           </table:table-cell>
         </table:table-row>
