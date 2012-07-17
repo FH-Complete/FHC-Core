@@ -67,7 +67,7 @@ class aufmerksamdurch extends basis_db
 	{
 		$qry = "SELECT * FROM public.tbl_aufmerksamdurch";
 		if($orderby!='')
-			$qry .= " ORDER BY ".$orderby;
+			$qry .= " ORDER BY ".$this->db_add_param($orderby);
 		
 		if($this->db_query($qry))
 		{
@@ -103,16 +103,16 @@ class aufmerksamdurch extends basis_db
 			//Neuen Datensatz einfuegen
 					
 			$qry='INSERT INTO public.tbl_aufmerksamdurch (aufmerksamdurch_kurzbz, beschreibung, ext_id) VALUES('.
-			     $this->addslashes($this->aufmerksamdurch_kurzbz).', '.
-			     $this->addslashes($this->beschreibung).', '.
-			     $this->addslashes($this->ext_id).');';
+			     $this->db_add_param($this->aufmerksamdurch_kurzbz).', '.
+			     $this->db_add_param($this->beschreibung).', '.
+			     $this->db_add_param($this->ext_id, FHC_INTEGER).');';
 		}
 		else
 		{			
 			$qry='UPDATE public.tbl_aufmerksamdurch SET '.
-				'beschreibung='.$this->addslashes($this->beschreibung).', '.
-				'ext_id='.$this->addslashes($this->ext_id).' '. 
-				'WHERE aufmerksamdurch_kurzbz='.$this->addslashes($this->aufmerksamdurch_kurzbz).';';
+				'beschreibung='.$this->db_add_param($this->beschreibung).', '.
+				'ext_id='.$this->db_add_param($this->ext_id).' '. 
+				'WHERE aufmerksamdurch_kurzbz='.$this->db_add_param($this->aufmerksamdurch_kurzbz).';';
 		}
 		
 		if($this->db_query($qry))

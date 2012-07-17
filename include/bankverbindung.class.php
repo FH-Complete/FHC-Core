@@ -72,7 +72,7 @@ class bankverbindung extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_bankverbindung WHERE bankverbindung_id='".addslashes($bankverbindung_id)."'";
+		$qry = "SELECT * FROM public.tbl_bankverbindung WHERE bankverbindung_id=".$this->db_add_param($bankverbindung_id);
 		
 		if($this->db_query($qry))
 		{
@@ -87,7 +87,7 @@ class bankverbindung extends basis_db
 				$this->iban = $row->iban;
 				$this->kontonr = $row->kontonr;
 				$this->typ = $row->typ;
-				$this->verrechnung = ($row->verrechnung=='t'?true:false);
+				$this->verrechnung = $this->db_parse_bool($row->verrechnung);
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->insertamum = $row->insertamum;
@@ -118,32 +118,32 @@ class bankverbindung extends basis_db
 		//$this->errormsg = 'Eine der Maximiallaengen wurde ueberschritten';
 		if(mb_strlen($this->name)>64)
 		{
-			$this->errormsg = 'Name darf nicht l�nger als 64 Zeichen sein';
+			$this->errormsg = 'Name darf nicht laenger als 64 Zeichen sein';
 			return false;
 		}
 		if(mb_strlen($this->anschrift)>128)
 		{
-			$this->errormsg = 'Anschrift darf nicht l�nger als 128 Zeichen sein';
+			$this->errormsg = 'Anschrift darf nicht laenger als 128 Zeichen sein';
 			return false;
 		}
 		if(mb_strlen($this->blz)>16)
 		{
-			$this->errormsg = 'BLZ darf nicht l�nger als 16 Zeichen sein';
+			$this->errormsg = 'BLZ darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
 		if(mb_strlen($this->bic)>16)
 		{
-			$this->errormsg = 'BIC darf nicht l�nger als 16 Zeichen sein';
+			$this->errormsg = 'BIC darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
 		if(mb_strlen($this->kontonr)>16)
 		{
-			$this->errormsg = 'KontoNr darf nicht l�nger als 16 Zeichen sein';
+			$this->errormsg = 'KontoNr darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
 		if(mb_strlen($this->iban)>32)
 		{
-			$this->errormsg = 'IBAN darf nicht l�nger als 32 Zeichen sein';
+			$this->errormsg = 'IBAN darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
 				
@@ -175,18 +175,18 @@ class bankverbindung extends basis_db
 
 			$qry = 'BEGIN;INSERT INTO public.tbl_bankverbindung  (person_id, name, anschrift, blz, bic,
 			       kontonr, iban, typ, ext_id, verrechnung, insertamum, insertvon, updateamum, updatevon) VALUES('.
-			       $this->addslashes($this->person_id).', '.
-			       $this->addslashes($this->name).', '.
-			       $this->addslashes($this->anschrift).', '.
-			       $this->addslashes($this->blz).', '.
-			       $this->addslashes($this->bic).', '.
-			       $this->addslashes($this->kontonr).', '.
-			       $this->addslashes($this->iban).', '.
-			       $this->addslashes($this->typ).', '.
-			       $this->addslashes($this->ext_id).', '.
-			      ($this->verrechnung?'true':'false').',  now(), '.
-			       $this->addslashes($this->insertvon).', now(), '.
-			       $this->addslashes($this->updatevon).');';
+			       $this->db_add_param($this->person_id, FHC_INTEGER).', '.
+			       $this->db_add_param($this->name).', '.
+			       $this->db_add_param($this->anschrift).', '.
+			       $this->db_add_param($this->blz).', '.
+			       $this->db_add_param($this->bic).', '.
+			       $this->db_add_param($this->kontonr).', '.
+			       $this->db_add_param($this->iban).', '.
+			       $this->db_add_param($this->typ).', '.
+			       $this->db_add_param($this->ext_id).', '.
+                   $this->db_add_param($this->verrechnung, FHC_BOOLEAN).',  now(), '.
+			       $this->db_add_param($this->insertvon).', now(), '.
+			       $this->db_add_param($this->updatevon).');';
 		}
 		else
 		{
@@ -200,19 +200,19 @@ class bankverbindung extends basis_db
 			}
 			
 			$qry='UPDATE public.tbl_bankverbindung SET '.
-			'person_id='.$this->addslashes($this->person_id).', '.
-			'name='.$this->addslashes($this->name).', '.
- 			'anschrift='.$this->addslashes($this->anschrift).', '.
- 			'blz='.$this->addslashes($this->blz).', '.
- 			'bic='.$this->addslashes($this->bic).', '.
- 			'kontonr='.$this->addslashes($this->kontonr).', '.
- 			'iban='.$this->addslashes($this->iban).', '.
- 			'typ='.$this->addslashes($this->typ).', '.
- 			'verrechnung='.($this->verrechnung?'true':'false').', '.
- 			'ext_id='.$this->addslashes($this->ext_id).', '.
- 			'updateamum='.$this->addslashes($this->updateamum).','.
- 			'updatevon='.$this->addslashes($this->updatevon).' '.
- 			'WHERE bankverbindung_id='.$this->addslashes($this->bankverbindung_id).';';
+			'person_id='.$this->db_add_param($this->person_id, FHC_INTEGER).', '.
+			'name='.$this->db_add_param($this->name).', '.
+ 			'anschrift='.$this->db_add_param($this->anschrift).', '.
+ 			'blz='.$this->db_add_param($this->blz).', '.
+ 			'bic='.$this->db_add_param($this->bic).', '.
+ 			'kontonr='.$this->db_add_param($this->kontonr).', '.
+ 			'iban='.$this->db_add_param($this->iban).', '.
+ 			'typ='.$this->db_add_param($this->typ).', '.
+ 			'verrechnung='.$this->db_add_param($this->verrechnung,FHC_BOOLEAN).', '.
+ 			'ext_id='.$this->db_add_param($this->ext_id).', '.
+ 			'updateamum='.$this->db_add_param($this->updateamum).','.
+ 			'updatevon='.$this->db_add_param($this->updatevon).' '.
+ 			'WHERE bankverbindung_id='.$this->db_add_param($this->bankverbindung_id).';';
 		}
 
 		if($this->db_query($qry))
@@ -265,13 +265,13 @@ class bankverbindung extends basis_db
 			return false;
 		}
 		
-		$qry = "DELETE FROM public.tbl_bankverbindung WHERE bankverbindung_id='".addslashes($bankverbindung_id)."'";
+		$qry = "DELETE FROM public.tbl_bankverbindung WHERE bankverbindung_id=".$this->db_add_param($bankverbindung_id, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 			return true;
 		else 
 		{
-			$this->errormsg = 'Fehler beim L�schen des Datensatzes';
+			$this->errormsg = 'Fehler beim Loeschen des Datensatzes';
 			return false;
 		}
 	}
@@ -289,7 +289,7 @@ class bankverbindung extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_bankverbindung WHERE person_id='".addslashes($person_id)."'";
+		$qry = "SELECT * FROM public.tbl_bankverbindung WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 		{
@@ -306,7 +306,7 @@ class bankverbindung extends basis_db
 				$obj->iban = $row->iban;
 				$obj->kontonr = $row->kontonr;
 				$obj->typ = $row->typ;
-				$obj->verrechnung = ($row->verrechnung=='t'?true:false);
+				$obj->verrechnung = $this->db_parse_bool($row->verrechnung);
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;
