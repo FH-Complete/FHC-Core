@@ -51,10 +51,11 @@ if(!check_lektor($uid))
 	</script>
 </head>
 <body>
-
+	<h1>Testclient für Webservices</h1>
+	
 	<form action="test_client.php" method="post">
-	        <input type="submit" value="Test PHP" name="submit">
-	        <input type="button" onclick="sendSoap();" value="Test JS">
+		<input type="submit" value="Test PHP" name="submit">
+		<input type="button" onclick="sendSoap();" value="Test JS">
 	</form>
 
 <?php 

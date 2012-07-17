@@ -1,12 +1,35 @@
 <?php 
+/* Copyright (C) 2012 FH Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ */
+/**
+ * Test Client fuer Ort Webservice
+ */
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php'); 
+require_once('../include/basis_db.class.php');
 
 $method = (isset($_GET['method'])?$_GET['method']:'getOrtFromKurzbz');
 
 $getuid = get_uid(); 
 if(!check_lektor($getuid))
 	die('Sie haben keine Berechtigung für diese Seite'); 
+$db = new basis_db();
 ?>
 <html>
 	<head>
@@ -17,11 +40,17 @@ if(!check_lektor($getuid))
         <title>SOAP TestClient für Orte</title>
 	</head>
 	<body>
-        <a href ="<?php echo $_SERVER['PHP_SELF'].'?method=getOrtFromKurzbz'?>">getOrtFromKurzbz</a><br>
-        <a href ="<?php echo $_SERVER['PHP_SELF'].'?method=getRaeume'?>">getRaeume</a><br>
-        <a href ="<?php echo $_SERVER['PHP_SELF'].'?method=searchRaum'?>">searchRaum</a><br>
-        <a href ="<?php echo APP_ROOT.'soap/ort.wsdl.php'?>">Show WSDL </a><br><br>
-        
+	<h1>Ort/Raum WebService</h1>
+	Webservice für die Abfrage der Rauminformationen
+	<h2>Funktionen</h2>
+	<ul>
+		<li><a href ="<?php echo $_SERVER['PHP_SELF'].'?method=getOrtFromKurzbz'?>">getOrtFromKurzbz</a> - Laedt Rauminformation anhandd der Kurzbezeichnung</li>
+        <li><a href ="<?php echo $_SERVER['PHP_SELF'].'?method=getRaeume'?>">getRaeume</a> - Liefert alle Räume (optional nach Raumtyp gefiltert)</li>
+        <li><a href ="<?php echo $_SERVER['PHP_SELF'].'?method=searchRaum'?>">searchRaum</a> - Sucht einen freien Raum</li>
+	</ul>
+	<a href ="<?php echo APP_ROOT.'soap/ort.wsdl.php'?>">Show WSDL </a></li>
+	<br>
+    <h2>Testformular</h2> 
         <?php 
         if($method=='getOrtFromKurzbz')
         {
@@ -29,16 +58,16 @@ if(!check_lektor($getuid))
 	            <form action="'.$_SERVER["PHP_SELF"].'?method=getOrtFromKurzbz" method="post">
 	            <table border="0" cellpadding="5" cellspacing="0" bgcolor="#E0E0E0">
 	                <tr>
-	                    <td align="right">Username:</td>
-	                    <td><input id="username" name="username" type="text" size="30" maxlength="255" value="'.(isset($_REQUEST['username']) ? $_REQUEST['username'] : "").'"></td>
+	                    <td align="right">Username* :</td>
+	                    <td><input id="username" name="username" type="text" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['username']) ? $_REQUEST['username'] : "")).'"></td>
 	                </tr>
 	                <tr>
-	                    <td align="right">Passwort:</td>
-	                    <td><input id="passwort" name="passwort" type="password" size="30" maxlength="255" value="'.(isset($_REQUEST['passwort']) ? $_REQUEST['passwort'] : "").'"></td>
+	                    <td align="right">Passwort* :</td>
+	                    <td><input id="passwort" name="passwort" type="password" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['passwort']) ? $_REQUEST['passwort'] : "")).'"></td>
 	                </tr>
 	                <tr>
-	                    <td align="right">Ort_Kurzbz:</td>
-	                    <td><input id="ort_kurzbz" name="ort_kurzbz" type="text" size="30" maxlength="10" value="'.(isset($_REQUEST['ort_kurzbz']) ? $_REQUEST['ort_kurzbz'] : "").'"></td>
+	                    <td align="right">Ort_Kurzbz* :</td>
+	                    <td><input id="ort_kurzbz" name="ort_kurzbz" type="text" size="30" maxlength="10" value="'.$db->convert_html_chars((isset($_REQUEST['ort_kurzbz']) ? $_REQUEST['ort_kurzbz'] : "")).'"></td>
 	                </tr>
 	                <tr>
 	                    <td align="right"></td>
@@ -110,16 +139,16 @@ if(!check_lektor($getuid))
 	            <form action="'.$_SERVER["PHP_SELF"].'?method=getRaeume" method="post">
 	            <table border="0" cellpadding="5" cellspacing="0" bgcolor="#E0E0E0">
 	                <tr>
-	                    <td align="right">Username:</td>
-	                    <td><input id="username" name="username" type="text" size="30" maxlength="255" value="'.(isset($_REQUEST['username']) ? $_REQUEST['username'] : "").'"></td>
+	                    <td align="right">Username* :</td>
+	                    <td><input id="username" name="username" type="text" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['username']) ? $_REQUEST['username'] : "")).'"></td>
 	                </tr>
 	                <tr>
-	                    <td align="right">Passwort:</td>
-	                    <td><input id="passwort" name="passwort" type="password" size="30" maxlength="255" value="'.(isset($_REQUEST['passwort']) ? $_REQUEST['passwort'] : "").'"></td>
+	                    <td align="right">Passwort* :</td>
+	                    <td><input id="passwort" name="passwort" type="password" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['passwort']) ? $_REQUEST['passwort'] : "")).'"></td>
 	                </tr>
 	                <tr>
 	                    <td align="right">Raumtyp:</td>
-	                    <td><input id="raumtyp_kurzbz" name="raumtyp_kurzbz" type="text" size="30" maxlength="255" value="'.(isset($_REQUEST['raumtyp_kurzbz']) ? $_REQUEST['raumtyp_kurzbz'] : "").'"></td>
+	                    <td><input id="raumtyp_kurzbz" name="raumtyp_kurzbz" type="text" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['raumtyp_kurzbz']) ? $_REQUEST['raumtyp_kurzbz'] : "")).'"></td>
 	                </tr>
 	                <tr>
 	                    <td align="right"></td>
@@ -188,36 +217,36 @@ if(!check_lektor($getuid))
 	            <form action="'.$_SERVER["PHP_SELF"].'?method=searchRaum" method="post">
 	            <table border="0" cellpadding="5" cellspacing="0" bgcolor="#E0E0E0">
 	            	<tr>
-	            		<td align="right">Datum:</td>
-	                    <td><input id="datum" name="datum" type="text" size="30" maxlength="255" value="'.(isset($_REQUEST['datum']) ? $_REQUEST['datum'] : "").'"></td>
+	            		<td align="right">Datum*:</td>
+	                    <td><input id="datum" name="datum" type="text" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['datum']) ? $_REQUEST['datum'] : "")).'"></td>
 	                </tr>
 	                <tr>
-	            		<td align="right">Zeit-Von:</td>
-	                    <td><input id="zeit_von" name="zeit_von" type="text" size="30" maxlength="255" value="'.(isset($_REQUEST['zeit_von']) ? $_REQUEST['zeit_von'] : "").'"></td>
+	            		<td align="right">Zeit-Von*:</td>
+	                    <td><input id="zeit_von" name="zeit_von" type="text" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['zeit_von']) ? $_REQUEST['zeit_von'] : "")).'"></td>
 	                </tr>
 	                <tr>
-	            		<td align="right">Zeit-Bis:</td>
-	                    <td><input id="zeit_bis" name="zeit_bis" type="text" size="30" maxlength="255" value="'.(isset($_REQUEST['zeit_bis']) ? $_REQUEST['zeit_bis'] : "").'"></td>
+	            		<td align="right">Zeit-Bis*:</td>
+	                    <td><input id="zeit_bis" name="zeit_bis" type="text" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['zeit_bis']) ? $_REQUEST['zeit_bis'] : "")).'"></td>
 	                </tr>
 	                <tr>
 	            		<td align="right">Raumtyp:</td>
-	                    <td><input id="raumtyp" name="raumtyp" type="text" size="30" maxlength="255" value="'.(isset($_REQUEST['raumtyp']) ? $_REQUEST['raumtyp'] : "").'"></td>
+	                    <td><input id="raumtyp" name="raumtyp" type="text" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['raumtyp']) ? $_REQUEST['raumtyp'] : "")).'"></td>
 	                </tr>
 	                <tr>
-	            		<td align="right">Anzahl Personen</td>
-	                    <td><input id="anzahl_personen" name="anzahl_personen" type="text" size="30" maxlength="255" value="'.(isset($_REQUEST['anzahl_personen']) ? $_REQUEST['anzahl_personen'] : "").'"></td>
+	            		<td align="right">Anzahl Personen:</td>
+	                    <td><input id="anzahl_personen" name="anzahl_personen" type="text" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['anzahl_personen']) ? $_REQUEST['anzahl_personen'] : "")).'"></td>
 	                </tr>
 	                <tr>
-	            		<td align="right">Reservierung</td>
-	                    <td><input id="reservierung" name="reservierung" type="checkbox" size="30" maxlength="255" '.(isset($_REQUEST['reservierung']) ? 'checked' : "").'></td>
+	            		<td align="right">Reservierung*:</td>
+	                    <td><input id="reservierung" name="reservierung" type="checkbox" size="30" maxlength="255" '.$db->convert_html_chars((isset($_REQUEST['reservierung']) ? 'checked' : "")).'></td>
 	                </tr>
 	                <tr>
-	                    <td align="right">Username:</td>
-	                    <td><input id="username" name="username" type="text" size="30" maxlength="255" value="'.(isset($_REQUEST['username']) ? $_REQUEST['username'] : "").'"></td>
+	                    <td align="right">Username* :</td>
+	                    <td><input id="username" name="username" type="text" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['username']) ? $_REQUEST['username'] : "")).'"></td>
 	                </tr>
 	                <tr>
-	                    <td align="right">Passwort:</td>
-	                    <td><input id="passwort" name="passwort" type="password" size="30" maxlength="255" value="'.(isset($_REQUEST['passwort']) ? $_REQUEST['passwort'] : "").'"></td>
+	                    <td align="right">Passwort* :</td>
+	                    <td><input id="passwort" name="passwort" type="password" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['passwort']) ? $_REQUEST['passwort'] : "")).'"></td>
 	                </tr>
 	                <tr>
 	                    <td align="right"></td>

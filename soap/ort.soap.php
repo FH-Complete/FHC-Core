@@ -160,7 +160,7 @@ function getRaeume($raumtyp_kurzbz=null, $authentifizierung)
 
 /**
  * 
- * Funktion searchRaum Sucht einen Raum
+ * Funktion searchRaum - Sucht einen freien Raum
  * 
  * @param date $datum
  * @param time $zeit_von

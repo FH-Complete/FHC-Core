@@ -1,10 +1,30 @@
 <?php 
+/* Copyright (C) 2012 FH Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Karl Burkhart <burkhart@technikum-wien.at>.
+ */
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
+require_once('../include/basis_db.class.php');
 require_once('stip.class.php'); 
 $getuid=get_uid();
 if(!check_lektor($getuid))
 	die('Sie haben keine Berechtigung für diese Seite.');
+$db = new basis_db();
 ?>
 <html>
 	<head>
@@ -14,44 +34,46 @@ if(!check_lektor($getuid))
 		<title>STIP-Client</title>
 	</head>
 	<body>
-
+		<h1>Testclient für Webservice Stipendienstelle</h1>
+		<a href="stip.wsdl.php">Show WSDL</a>
+		<br><br>
 		<form action="stip_client.php" method="post">
 		  <table border="0" cellpadding="5" cellspacing="0" bgcolor="#E0E0E0">
 		    <tr>
 		      <td align="right">ErhKz:</td>
-		      <td><input name="ErhKz" type="text" size="30" maxlength="3" value="<?php echo (isset($_REQUEST['ErhKz']) ? $_REQUEST['ErhKz'] : "");?>"></td>
+		      <td><input name="ErhKz" type="text" size="30" maxlength="3" value="<?php echo $db->convert_html_chars((isset($_REQUEST['ErhKz']) ? $_REQUEST['ErhKz'] : ""));?>"></td>
 		    </tr>
 		    <tr>
 		      <td align="right">AnfragedatenID:</td>
-		      <td><input name="AnfragedatenID" type="text" size="30" maxlength="40" value="<?php echo (isset($_REQUEST['AnfragedatenID']) ? $_REQUEST['AnfragedatenID'] : "");?>"></td>
+		      <td><input name="AnfragedatenID" type="text" size="30" maxlength="40" value="<?php echo $db->convert_html_chars((isset($_REQUEST['AnfragedatenID']) ? $_REQUEST['AnfragedatenID'] : ""));?>"></td>
 		    </tr>
 		        <tr>
 		      <td align="right">Semester:</td>
-		      <td><input name="Semester" type="text" size="30" maxlength="2" value="<?php echo (isset($_REQUEST['Semester']) ? $_REQUEST['Semester'] : "");?>"></td>
+		      <td><input name="Semester" type="text" size="30" maxlength="2" value="<?php echo $db->convert_html_chars((isset($_REQUEST['Semester']) ? $_REQUEST['Semester'] : ""));?>"></td>
 		    </tr>
 		        <tr>
 		      <td align="right">Studienjahr:</td>
-		      <td><input name="Studienjahr" type="text" size="30" maxlength="7" value="<?php echo (isset($_REQUEST['Studienjahr']) ? $_REQUEST['Studienjahr'] : "");?>"></td>
+		      <td><input name="Studienjahr" type="text" size="30" maxlength="7" value="<?php echo $db->convert_html_chars((isset($_REQUEST['Studienjahr']) ? $_REQUEST['Studienjahr'] : ""));?>"></td>
 		    </tr>
 		        <tr>
 		      <td align="right">PersKz:</td>
-		      <td><input name="PersKz" type="text" size="30" maxlength="11" value="<?php echo (isset($_REQUEST['PersKz']) ? $_REQUEST['PersKz'] : "");?>"></td>
+		      <td><input name="PersKz" type="text" size="30" maxlength="11" value="<?php echo $db->convert_html_chars((isset($_REQUEST['PersKz']) ? $_REQUEST['PersKz'] : ""));?>"></td>
 		    </tr>
 		        <tr>
 		      <td align="right">SVNR:</td>
-		      <td><input name="Svnr" type="text" size="30" maxlength="10" value="<?php echo (isset($_REQUEST['Svnr']) ? $_REQUEST['Svnr'] : "");?>"></td>
+		      <td><input name="Svnr" type="text" size="30" maxlength="10" value="<?php echo $db->convert_html_chars((isset($_REQUEST['Svnr']) ? $_REQUEST['Svnr'] : ""));?>"></td>
 		    </tr>
 		        <tr>
 		      <td align="right">Familienname:</td>
-		      <td><input name="Familienname" type="text" size="30" maxlength="255" value="<?php echo (isset($_REQUEST['Familienname']) ? $_REQUEST['Familienname'] : "");?>"></td>
+		      <td><input name="Familienname" type="text" size="30" maxlength="255" value="<?php echo $db->convert_html_chars((isset($_REQUEST['Familienname']) ? $_REQUEST['Familienname'] : ""));?>"></td>
 		    </tr>
 		        <tr>
 		      <td align="right">Vorname:</td>
-		      <td><input name="Vorname" type="text" size="30" maxlength="255" value="<?php echo (isset($_REQUEST['Vorname']) ? $_REQUEST['Vorname'] : "");?>"></td>
+		      <td><input name="Vorname" type="text" size="30" maxlength="255" value="<?php echo $db->convert_html_chars((isset($_REQUEST['Vorname']) ? $_REQUEST['Vorname'] : ""));?>"></td>
 		    </tr>
 		        <tr>
 		      <td align="right">Typ:</td>
-		      <td><input name="Typ" type="text" size="30" maxlength="2" value="<?php echo (isset($_REQUEST['Typ']) ? $_REQUEST['Typ'] : "");?>"></td>
+		      <td><input name="Typ" type="text" size="30" maxlength="2" value="<?php echo $db->convert_html_chars((isset($_REQUEST['Typ']) ? $_REQUEST['Typ'] : ""));?>"></td>
 		    </tr>
 		    <tr>
 		      <td align="right"></td>
@@ -68,7 +90,6 @@ if(!check_lektor($getuid))
 
 if(isset($_REQUEST['submit']))
 {
-	//$client = new SoapClient("https://cis.technikum-wien.at/soap/stip.wsdl.php?".microtime()); 
 	$client = new SoapClient(APP_ROOT."/soap/stip.wsdl.php?".microtime());
 	
 	$username = "test";
@@ -199,3 +220,5 @@ catch(e)
 }
 
 </script>
+</body>
+</html>
