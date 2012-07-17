@@ -28,20 +28,22 @@ require_once('../../../include/datum.class.php');
 require_once('../../../include/prestudent.class.php');
 require_once('../../../include/studiengang.class.php');
 
+// Sprache setzen
 if(isset($_GET['lang']))
     setSprache($_GET['lang']);
 
+$datum = new datum(); 
 $sprache = getSprache(); 
 $p = new phrasen($sprache);
 
+// Bei login wird session gesetzt
 $person_id = $_SESSION['prestudent/person_id'];
 
 $person = new person(); 
 $person->load($person_id);
 
-$datum = new datum(); 
-
 $prestudent = new prestudent(); 
+// hole prestudenten anhand person_id
 $prestudent->getPrestudenten($person->person_id);
 if(isset($prestudent->result[0]->studiengang_kz ))
     $studiengang_kz = $prestudent->result[0]->studiengang_kz; 
@@ -52,6 +54,8 @@ $studiengang = new studiengang();
 $studiengang->load($studiengang_kz);
 
 $method = (isset($_GET['method'])?$_GET['method']:''); 
+
+// emailadresse der assistenz
 $mail = ($studiengang->email!='')?$studiengang->email:MAIL_ADMIN;
 
 ?>
