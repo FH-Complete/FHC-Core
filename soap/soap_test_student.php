@@ -1,5 +1,4 @@
 <?php
-
 /* Copyright (C) 2012 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,29 +17,40 @@
  *
  * Authors:		Karl Burkhart <burkhart@technikum-wien.at>.
  */
-
+/**
+ * Test Client für Studierenden Webservice
+ */
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
+require_once('../include/basis_db.class.php');
 
 $method = (isset($_GET['method'])?$_GET['method']:'uid');
 
 $getuid = get_uid(); 
 if(!check_lektor($getuid))
 	die('Sie haben keine Berechtigung für diese Seite'); 
+$db = new basis_db();
 ?>
 <html>
 	<head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-        <script type="text/javascript" src="../include/js/jqSOAPClient.js"></script> 
-        <script type="text/javascript" src="../include/js/jquery.js"></script> 
+		<script type="text/javascript" src="../include/js/jquery.js"></script> 
         <script type="text/javascript" src="../include/js/jqXMLUtils.js"></script> 
+        <script type="text/javascript" src="../include/js/jqSOAPClient.js"></script> 
         <title>SOAP TestClient für Studenten</title>
 	</head>
     <body>
-        <a href ="<?php echo $_SERVER['PHP_SELF'].'?method=uid'?>">GetLehrveranstaltungFromUid</a><br>
-        <a href ="<?php echo $_SERVER['PHP_SELF'].'?method=matrikelnummer'?>">GetLehrveranstaltungFromMatrikelnummer</a><br>
-        <a href ="<?php echo $_SERVER['PHP_SELF'].'?method=studiengang'?>">GetLehrveranstaltungFromStudiengang</a><br><br>
-        <a href ="<?php echo APP_ROOT.'soap/student.wsdl.php'?>">Show WSDL </a><br><br>
+	<h1>Studierenden Webservice</h1>
+	Liefert Informationen ueber Studierende
+	<h2>Funktionen</h2>
+	<ul>
+        <li><a href ="<?php echo $_SERVER['PHP_SELF'].'?method=uid'?>">getStudentFromUid</a> - Liefert einen Studierenden anhand der UID</li>
+        <li><a href ="<?php echo $_SERVER['PHP_SELF'].'?method=matrikelnummer'?>">getStudentFromMatrikelnummer</a> - Liefert einen Studierenden anhand der Matrikelnummer</li>
+        <li><a href ="<?php echo $_SERVER['PHP_SELF'].'?method=studiengang'?>">getStudentFromStudiengang</a> - Liefert alle Studierende eines Studienganges / Semesters / Verbandes</li>
+	</ul>
+    <a href ="<?php echo APP_ROOT.'soap/student.wsdl.php'?>">Show WSDL </a>
+	<br>
+	<h2>Testformular</h2>
     <?php 
         
     if($method =='uid')
@@ -50,15 +60,15 @@ if(!check_lektor($getuid))
         <table border="0" cellpadding="5" cellspacing="0" bgcolor="#E0E0E0">
             <tr>
                 <td align="right">Name* :</td>
-                <td><input name="username" type="text" size="30" maxlength="255" value="'.(isset($_REQUEST['username']) ? $_REQUEST['username'] : "").'"></td>
+                <td><input name="username" type="text" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['username']) ? $_REQUEST['username'] : "")).'"></td>
             </tr>
             <tr>
                 <td align="right">Passwort* :</td>
-                <td><input name="passwort" type="password" size="30" maxlength="255" value="'.(isset($_REQUEST['passwort']) ? $_REQUEST['passwort'] : "").'"></td>
+                <td><input name="passwort" type="password" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['passwort']) ? $_REQUEST['passwort'] : "")).'"></td>
             </tr>
             <tr>
                 <td align="right">Student_uid* :</td>
-                <td><input name="student_uid" type="text" size="30" maxlength="10" value="'.(isset($_REQUEST['student_uid']) ? $_REQUEST['student_uid'] : "").'"></td>
+                <td><input name="student_uid" type="text" size="30" maxlength="10" value="'.$db->convert_html_chars((isset($_REQUEST['student_uid']) ? $_REQUEST['student_uid'] : "")).'"></td>
             </tr>
             <tr>
                 <td align="right"></td>
@@ -123,15 +133,15 @@ if(!check_lektor($getuid))
         <table border="0" cellpadding="5" cellspacing="0" bgcolor="#E0E0E0">
             <tr>
                 <td align="right">Name* :</td>
-                <td><input name="username" type="text" size="30" maxlength="255" value="'.(isset($_REQUEST['username']) ? $_REQUEST['username'] : "").'"></td>
+                <td><input name="username" type="text" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['username']) ? $_REQUEST['username'] : "")).'"></td>
             </tr>
             <tr>
                 <td align="right">Passwort* :</td>
-                <td><input name="passwort" type="password" size="30" maxlength="255" value="'.(isset($_REQUEST['passwort']) ? $_REQUEST['passwort'] : "").'"></td>
+                <td><input name="passwort" type="password" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['passwort']) ? $_REQUEST['passwort'] : "")).'"></td>
             </tr>
             <tr>
                 <td align="right">Matrikelnummer* :</td>
-                <td><input name="matrikelnummer" type="text" size="30" maxlength="10" value="'.(isset($_REQUEST['matrikelnummer']) ? $_REQUEST['matrikelnummer'] : "").'"></td>
+                <td><input name="matrikelnummer" type="text" size="30" maxlength="10" value="'.$db->convert_html_chars((isset($_REQUEST['matrikelnummer']) ? $_REQUEST['matrikelnummer'] : "")).'"></td>
             </tr>
             <tr>
                 <td align="right"></td>
@@ -196,27 +206,27 @@ if(!check_lektor($getuid))
         <table border="0" cellpadding="5" cellspacing="0" bgcolor="#E0E0E0">
             <tr>
                 <td align="right">Name* :</td>
-                <td><input name="username" type="text" size="30" maxlength="255" value="'.(isset($_REQUEST['username']) ? $_REQUEST['username'] : "").'"></td>
+                <td><input name="username" type="text" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['username']) ? $_REQUEST['username'] : "")).'"></td>
             </tr>
             <tr>
                 <td align="right">Passwort* :</td>
-                <td><input name="passwort" type="password" size="30" maxlength="255" value="'.(isset($_REQUEST['passwort']) ? $_REQUEST['passwort'] : "").'"></td>
+                <td><input name="passwort" type="password" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['passwort']) ? $_REQUEST['passwort'] : "")).'"></td>
             </tr>
             <tr>
                 <td align="right">Studiengang* :</td>
-                <td><input name="studiengang" type="text" size="30" maxlength="10" value="'.(isset($_REQUEST['studiengang']) ? $_REQUEST['studiengang'] : "").'"></td>
+                <td><input name="studiengang" type="text" size="30" maxlength="10" value="'.$db->convert_html_chars((isset($_REQUEST['studiengang']) ? $_REQUEST['studiengang'] : "")).'"></td>
             </tr>
             <tr>
                 <td align="right">Ausbildungssemester :</td>
-                <td><input name="semester" type="text" size="30" maxlength="10" value="'.(isset($_REQUEST['semester']) ? $_REQUEST['semester'] : "").'"></td>
+                <td><input name="semester" type="text" size="30" maxlength="10" value="'.$db->convert_html_chars((isset($_REQUEST['semester']) ? $_REQUEST['semester'] : "")).'"></td>
             </tr>
             <tr>
                 <td align="right">Verband :</td>
-                <td><input name="verband" type="text" size="30" maxlength="10" value="'.(isset($_REQUEST['verband']) ? $_REQUEST['verband'] : "").'"></td>
+                <td><input name="verband" type="text" size="30" maxlength="10" value="'.$db->convert_html_chars((isset($_REQUEST['verband']) ? $_REQUEST['verband'] : "")).'"></td>
             </tr>
             <tr>
                 <td align="right">Gruppe :</td>
-                <td><input name="gruppe" type="text" size="30" maxlength="10" value="'.(isset($_REQUEST['gruppe']) ? $_REQUEST['gruppe'] : "").'"></td>
+                <td><input name="gruppe" type="text" size="30" maxlength="10" value="'.$db->convert_html_chars((isset($_REQUEST['gruppe']) ? $_REQUEST['gruppe'] : "")).'"></td>
             </tr>
             <tr>
                 <td align="right"></td>
@@ -336,4 +346,6 @@ if(isset($_REQUEST['submit_studiengang']))
 }
 
 class foo{}
- ?>   </body>
+ ?>   
+</body>
+</html>

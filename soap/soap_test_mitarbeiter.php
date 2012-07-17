@@ -1,4 +1,25 @@
 <?php 
+/* Copyright (C) 2012 FH Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ */
+/**
+ * Test Client fuer Mitarbeiter Webservice
+ */
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php'); 
 require_once('../include/basis_db.class.php');
@@ -19,11 +40,18 @@ if(!check_lektor($getuid))
         <title>SOAP TestClient für Mitarbeiter</title>
 	</head>
 	<body>
-        <a href ="<?php echo $_SERVER['PHP_SELF'].'?method=getMitarbeiterFromUID'?>">getMitarbeiterFromUID</a><br>
-        <a href ="<?php echo $_SERVER['PHP_SELF'].'?method=getMitarbeiter'?>">getMitarbeiter</a><br>
-        <a href ="<?php echo $_SERVER['PHP_SELF'].'?method=SearchMitarbeiter'?>">SearchMitarbeiter</a><br>
-        <a href ="<?php echo APP_ROOT.'soap/mitarbeiter.wsdl.php'?>">Show WSDL </a><br><br>
-        
+	<h1>Mitarbeiter Webservice</h1>
+	Liefert Informationen über Mitarbeiter
+	<h2>Funktionen</h2>
+	<ul>
+		<li><a href ="<?php echo $_SERVER['PHP_SELF'].'?method=getMitarbeiterFromUID'?>">getMitarbeiterFromUID</a> - Mitarbeiterdaten anhand der UID laden</li>
+        <li><a href ="<?php echo $_SERVER['PHP_SELF'].'?method=getMitarbeiter'?>">getMitarbeiter</a> - Liefert eine Liste aller Mitarbeiter</li>
+        <li><a href ="<?php echo $_SERVER['PHP_SELF'].'?method=SearchMitarbeiter'?>">SearchMitarbeiter</a> - Sucht einen Mitarbeiter</li>
+	</ul>
+	<br>
+    <a href ="<?php echo APP_ROOT.'soap/mitarbeiter.wsdl.php'?>">Show WSDL </a>
+	<br>    
+	<h2>Testformular</h2>
         <?php 
         if($method=='getMitarbeiterFromUID')
         {
@@ -31,15 +59,15 @@ if(!check_lektor($getuid))
 	            <form action="'.$_SERVER["PHP_SELF"].'?method=getMitarbeiterFromUID" method="post">
 	            <table border="0" cellpadding="5" cellspacing="0" bgcolor="#E0E0E0">
 	                <tr>
-	                    <td align="right">Username:</td>
+	                    <td align="right">Username* :</td>
 	                    <td><input id="username" name="username" type="text" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['username']) ? $_REQUEST['username'] : "")).'"></td>
 	                </tr>
 	                <tr>
-	                    <td align="right">Passwort:</td>
+	                    <td align="right">Passwort* :</td>
 	                    <td><input id="passwort" name="passwort" type="password" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['passwort']) ? $_REQUEST['passwort'] : "")).'"></td>
 	                </tr>
 	                <tr>
-	                    <td align="right">UID:</td>
+	                    <td align="right">UID* :</td>
 	                    <td><input id="uid" name="uid" type="text" size="30" maxlength="10" value="'.$db->convert_html_chars((isset($_REQUEST['uid']) ? $_REQUEST['uid'] : "")).'"></td>
 	                </tr>
 	                <tr>
@@ -108,11 +136,11 @@ if(!check_lektor($getuid))
 	            <form action="'.$_SERVER["PHP_SELF"].'?method=getMitarbeiter" method="post">
 	            <table border="0" cellpadding="5" cellspacing="0" bgcolor="#E0E0E0">
 	                <tr>
-	                    <td align="right">Username:</td>
+	                    <td align="right">Username* :</td>
 	                    <td><input id="username" name="username" type="text" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['username']) ? $_REQUEST['username'] : "")).'"></td>
 	                </tr>
 	                <tr>
-	                    <td align="right">Passwort:</td>
+	                    <td align="right">Passwort* :</td>
 	                    <td><input id="passwort" name="passwort" type="password" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['passwort']) ? $_REQUEST['passwort'] : "")).'"></td>
 	                </tr>
 	                <tr>
@@ -178,15 +206,15 @@ if(!check_lektor($getuid))
 	            <form action="'.$_SERVER["PHP_SELF"].'?method=SearchMitarbeiter" method="post">
 	            <table border="0" cellpadding="5" cellspacing="0" bgcolor="#E0E0E0">
 	                <tr>
-	                    <td align="right">Username:</td>
+	                    <td align="right">Username* :</td>
 	                    <td><input id="username" name="username" type="text" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['username']) ? $_REQUEST['username'] : "")).'"></td>
 	                </tr>
 	                <tr>
-	                    <td align="right">Passwort:</td>
+	                    <td align="right">Passwort* :</td>
 	                    <td><input id="passwort" name="passwort" type="password" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['passwort']) ? $_REQUEST['passwort'] : "")).'"></td>
 	                </tr>
 	                <tr>
-	                    <td align="right">Suchfilter:</td>
+	                    <td align="right">Suchfilter* :</td>
 	                    <td><input id="filter" name="filter" type="text" size="30" maxlength="255" value="'.$db->convert_html_chars((isset($_REQUEST['filter']) ? $_REQUEST['filter'] : "")).'"></td>
 	                </tr>
 	                <tr>
