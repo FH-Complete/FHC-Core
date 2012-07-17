@@ -77,7 +77,7 @@ if (isset($_POST['userid']))
         <form action ="index.php" method="POST">
             <table border ="0" width ="100%" height="40%">
                 <tr height="50%">
-                    <td align ="center" valign="center"><h3>Willkommen an der Fachhochschule Technikum Wien. <br> Bitte geben Sie Ihren Zugangscode ein: </h3><span style="font-size:1.2em"></span></td>
+                    <td align ="center" valign="center"><h3><?php echo $p->t('incoming/wilkommenAnFh'); ?>. <br> <?php echo $p->t('incoming/bitteCodeEingeben'); ?>: </h3><span style="font-size:1.2em"></span></td>
                 </tr>
                 <tr >
                     <td align="center" valign="bottom"> <img src="../../../skin/images/tw_logo_02.jpg"></td>
@@ -94,7 +94,7 @@ if (isset($_POST['userid']))
                     <td>&nbsp;</td>
                 </tr>
                 <tr>
-                        <td align="center"><input type="text" size="30" value="UserID" name ="userid" onfocus="this.value='';"></td>
+                        <td align="center"><input type="text" size="30" value="<?php echo $p->t('incoming/zugangscode') ?>" name ="userid" onfocus="this.value='';"></td>
                 </tr>
                 <tr>
                     <td>&nbsp;</td>
