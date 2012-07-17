@@ -104,4 +104,7 @@ $this->phrasen['incoming/outgoingRegistration']='Outgoing-Administration';
 $this->phrasen['incoming/summerschool']='Summerschool';
 $this->phrasen['incoming/anmerkungen']='Comments';
 $this->phrasen['incoming/wochenstunden']='Weekly hours';
+$this->phrasen['incoming/wilkommenAnFh']='Welcome to the University of Applied Sciences Technikum Wien';
+$this->phrasen['incoming/bitteCodeEingeben']='Please enter your access code';
+$this->phrasen['incoming/zugangscode']='Access code';
 ?>
