@@ -86,7 +86,7 @@ class firma extends basis_db
 			return false;
 		}
 		
-		$qry = "SElECT * FROM public.tbl_firma WHERE firma_id='$firma_id'";
+		$qry = "SElECT * FROM public.tbl_firma WHERE firma_id=".$this->db_add_param($firma_id, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 		{
@@ -101,13 +101,13 @@ class firma extends basis_db
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
-				$this->schule = ($row->schule=='t'?true:false);
+				$this->schule = $this->db_parse_bool($row->schule);
 				$this->steuernummer = $row->steuernummer;				
-				$this->gesperrt = ($row->gesperrt=='t'?true:false);
-				$this->aktiv = ($row->aktiv=='t'?true:false);		
+				$this->gesperrt = $this->db_parse_bool($row->gesperrt);
+				$this->aktiv = $this->db_parse_bool($row->aktiv);
 				$this->finanzamt = $row->finanzamt;				
 				
-				$qry = "SELECT tag FROM public.tbl_firmatag WHERE firma_id='$firma_id'";
+				$qry = "SELECT tag FROM public.tbl_firmatag WHERE firma_id=".$this->db_add_param($firma_id,FHC_INTEGER);
 				if($resulttag = $this->db_query($qry))
 				{
 					while($rowtag = $this->db_fetch_object($resulttag))
@@ -170,19 +170,19 @@ class firma extends basis_db
 			$qry='INSERT INTO public.tbl_firma (name,  anmerkung, 
 					firmentyp_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id, schule,steuernummer,
 					gesperrt,aktiv,finanzamt) VALUES('.
-			     $this->addslashes($this->name).', '.
-			     $this->addslashes($this->anmerkung).', '.
-			     $this->addslashes($this->firmentyp_kurzbz).', '.
-			     $this->addslashes($this->updateamum).', '.
-			     $this->addslashes($this->updatevon).', '.
-			     $this->addslashes($this->insertamum).', '.
-			     $this->addslashes($this->insertvon).', '.
-			     $this->addslashes($this->ext_id).','.
-			     ($this->schule?'true':'false').','.
-			     $this->addslashes($this->steuernummer).', '.				 
-			     ($this->gesperrt?'true':'false').','.
-			     ($this->aktiv?'true':'false').','.				 				 
-			     ($this->finanzamt?$this->addslashes($this->finanzamt):'null').' ); '; 			 
+			     $this->db_add_param($this->name).', '.
+			     $this->db_add_param($this->anmerkung).', '.
+			     $this->db_add_param($this->firmentyp_kurzbz).', '.
+			     $this->db_add_param($this->updateamum).', '.
+			     $this->db_add_param($this->updatevon).', '.
+			     $this->db_add_param($this->insertamum).', '.
+			     $this->db_add_param($this->insertvon).', '.
+			     $this->db_add_param($this->ext_id).','.
+			     $this->db_add_param($this->schule, FHC_BOOLEAN).','.
+			     $this->db_add_param($this->steuernummer).', '.				 
+			     $this->db_add_param($this->gesperrt, FHC_BOOLEAN).','.
+			     $this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
+			     ($this->finanzamt?$this->db_add_param($this->finanzamt):'null').' ); '; 			 
 		}
 		else
 		{
@@ -195,18 +195,18 @@ class firma extends basis_db
 				return false;
 			}
 			$qry='UPDATE public.tbl_firma SET '.
-				'firma_id='.$this->addslashes($this->firma_id).', '.
-				'name='.$this->addslashes($this->name).', '.
-				'anmerkung='.$this->addslashes($this->anmerkung).', '.
+				'firma_id='.$this->db_add_param($this->firma_id).', '.
+				'name='.$this->db_add_param($this->name).', '.
+				'anmerkung='.$this->db_add_param($this->anmerkung).', '.
 				'updateamum= now(), '.
-		     	'updatevon='.$this->addslashes($this->updatevon).', '.
-		     	'firmentyp_kurzbz='.$this->addslashes($this->firmentyp_kurzbz).', '.
-		     	'schule='.($this->schule?'true':'false').', '.
-		     	'steuernummer='.$this->addslashes($this->steuernummer).', '.
-		     	'gesperrt='.($this->gesperrt?'true':'false').', '.
-		     	'aktiv='.($this->aktiv?'true':'false').', '.
-		     	'finanzamt='.($this->finanzamt?addslashes($this->finanzamt):'null').' '.
-				'WHERE firma_id='.$this->addslashes($this->firma_id).';';
+		     	'updatevon='.$this->db_add_param($this->updatevon).', '.
+		     	'firmentyp_kurzbz='.$this->db_add_param($this->firmentyp_kurzbz).', '.
+		     	'schule='.$this->db_add_param($this->schule, FHC_BOOLEAN).', '.
+		     	'steuernummer='.$this->db_add_param($this->steuernummer).', '.
+		     	'gesperrt='.$this->db_add_param($this->gesperrt, FHC_BOOLEAN).', '.
+		     	'aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
+		     	'finanzamt='.($this->finanzamt?db_add_param($this->finanzamt):'null').' '.
+				'WHERE firma_id='.$this->db_add_param($this->firma_id, FHC_INTEGER).';';
 		}
 		
 		if($this->db_query($qry))
@@ -263,8 +263,8 @@ class firma extends basis_db
 			{
 				$qry = "
 					SELECT 
-						(SELECT true FROM public.tbl_firmatag WHERE tag='".addslashes($tag)."' AND firma_id='$this->firma_id') as zugewiesen,
-						(SELECT true FROM public.tbl_tag WHERE tag='".addslashes($tag)."') as vorhanden";
+						(SELECT true FROM public.tbl_firmatag WHERE tag=".$this->db_add_param($tag)." AND firma_id=".$this->db_add_param($this->firma_id, FHC_INTEGER)." as zugewiesen,
+						(SELECT true FROM public.tbl_tag WHERE tag=".$this->db_add_param($tag).") as vorhanden";
 				if($result = $this->db_query($qry))
 				{
 					if($row = $this->db_fetch_object($result))
@@ -272,7 +272,7 @@ class firma extends basis_db
 						if($row->vorhanden!='t')
 						{
 							//Tag neu anlegen
-							$qry = "INSERT INTO public.tbl_tag(tag) VALUES('".addslashes($tag)."');";
+							$qry = "INSERT INTO public.tbl_tag(tag) VALUES(".$this->db_add_param($tag).");";
 							if(!$this->db_query($qry))
 							{
 								$this->errormsg='Fehler beim Anlegen des Tags';
@@ -284,10 +284,10 @@ class firma extends basis_db
 						{
 							//Tag zuweisen
 							$qry = "INSERT INTO public.tbl_firmatag(firma_id, tag, insertamum, insertvon) 
-									VALUES(".$this->addslashes($this->firma_id).",".
-										$this->addslashes($tag).",".
-										$this->addslashes($this->insertamum).",".
-										$this->addslashes($this->insertvon).");";
+									VALUES(".$this->db_add_param($this->firma_id,FHC_INTEGER).",".
+										$this->db_add_param($tag).",".
+										$this->db_add_param($this->insertamum).",".
+										$this->db_add_param($this->insertvon).");";
 							if(!$this->db_query($qry))
 							{
 								$this->errormsg='Fehler beim Anlegen des Tags';
@@ -326,7 +326,7 @@ class firma extends basis_db
 			return false;
 		}
 		
-		$qry = "DELETE FROM public.tbl_firmatag WHERE firma_id='".addslashes($firma_id)."' AND tag='".addslashes($tag)."'";
+		$qry = "DELETE FROM public.tbl_firmatag WHERE firma_id=".$this->db_add_param($firma_id, FHC_INTEGER)." AND tag=".$this->db_add_param($tag);
 		
 		if($this->db_query($qry))
 			return true;
@@ -344,7 +344,7 @@ class firma extends basis_db
 	 */
 	public function delete($firma_id)
 	{
-		$qry = "DELETE FROM public.tbl_firma WHERE firma_id='$firma_id'";
+		$qry = "DELETE FROM public.tbl_firma WHERE firma_id=".$this->db_add_param($firma_id, FHC_INTEGER);
 		if($this->db_query($qry))
 			return true;
 		else 
@@ -405,10 +405,10 @@ class firma extends basis_db
 				$fa->insertamum = $row->insertamum;
 				$fa->insertvon = $row->insertvon;
 				$fa->ext_id = $row->ext_id;
-				$fa->schule = ($row->schule=='t'?true:false);
+				$fa->schule = $this->db_parse_bool($row->schule);
 				$fa->steuernummer = $row->steuernummer;				
-				$fa->gesperrt = ($row->gesperrt=='t'?true:false);
-				$fa->aktiv = ($row->aktiv=='t'?true:false);		
+				$fa->gesperrt = $this->db_parse_bool($row->gesperrt);
+				$fa->aktiv = $this->db_parse_bool($row->aktiv);		
 				$fa->finanzamt = $row->finanzamt;				
 			
 				$this->result[] = $fa;
@@ -458,7 +458,7 @@ class firma extends basis_db
 		$qry = "SElECT * FROM public.tbl_firma";
 		
 		if($firmentyp_kurzbz!='')
-			$qry.=" WHERE firmentyp_kurzbz='".addslashes($firmentyp_kurzbz)."'";
+			$qry.=" WHERE firmentyp_kurzbz=".$this->db_add_param($firmentyp_kurzbz);
 		$qry.=" ORDER BY name";
 		
 		if($this->db_query($qry))
@@ -476,10 +476,10 @@ class firma extends basis_db
 				$fa->insertamum = $row->insertamum;
 				$fa->insertvon = $row->insertvon;
 				$fa->ext_id = $row->ext_id;
-				$fa->schule = ($row->schule=='t'?true:false);
+				$fa->schule = $this->db_parse_bool($row->schule);
 				$fa->steuernummer = $row->steuernummer;				
-				$fa->gesperrt = ($row->gesperrt=='t'?true:false);
-				$fa->aktiv = ($row->aktiv=='t'?true:false);		
+				$fa->gesperrt = $this->db_parse_bool($row->gesperrt);
+				$fa->aktiv = $this->db_parse_bool($row->aktiv);		
 				$fa->finanzamt = $row->finanzamt;				
 				
 				$this->result[] = $fa;
@@ -529,7 +529,7 @@ class firma extends basis_db
 					 ) ";
 		
 		if($firmentyp_kurzbz!='')
-			$qry.=" and firmentyp_kurzbz='".addslashes($firmentyp_kurzbz)."'";
+			$qry.=" and firmentyp_kurzbz=".$this->db_add_param($firmentyp_kurzbz);
 		
 		//if($filter=='' && $firmentyp_kurzbz=='')
 		//	$qry.=" limit 500 ";
@@ -550,26 +550,26 @@ class firma extends basis_db
 				$fa->insertamum = $row->insertamum;
 				$fa->insertvon = $row->insertvon;
 				$fa->ext_id = $row->ext_id;
-				$fa->schule = ($row->schule=='t'?true:false);
+				$fa->schule = $this->db_parse_bool($row->schule);
 				$fa->steuernummer = $row->steuernummer;				
-				$fa->gesperrt = ($row->gesperrt=='t'?true:false);
-				$fa->aktiv = ($row->aktiv=='t'?true:false);		
-				$fa->finanzamt = $row->finanzamt;		
-				$fa->kurzbz = $row->kurzbz;		
-				$fa->adresse_id = $row->adresse_id;		
-				$fa->standort_id = $row->standort_id;		
-				$fa->bezeichnung = $row->bezeichnung;	
-				$fa->person_id = $row->person_id;		
-				$fa->adresse_id = $row->adresse_id;		
-				$fa->strasse = $row->strasse;		
-				$fa->plz = $row->plz;	
-				$fa->ort = $row->ort;	
-				$fa->gemeinde = $row->gemeinde;		
-				$fa->nation = $row->nation;		
-				$fa->typ = $row->typ;		
-				$fa->adress_name = $row->adress_name;						
-				$fa->heimatadresse = ($row->heimatadresse=='t'?true:false);	
-				$fa->zustelladresse = ($row->zustelladresse=='t'?true:false);
+				$fa->gesperrt = $this->db_parse_bool($row->gesperrt);
+				$fa->aktiv = $this->db_parse_bool($row->aktiv);
+				$fa->finanzamt = $row->finanzamt;
+				$fa->kurzbz = $row->kurzbz;
+				$fa->adresse_id = $row->adresse_id;
+				$fa->standort_id = $row->standort_id;
+				$fa->bezeichnung = $row->bezeichnung;
+				$fa->person_id = $row->person_id;
+				$fa->adresse_id = $row->adresse_id;
+				$fa->strasse = $row->strasse;
+				$fa->plz = $row->plz;
+				$fa->ort = $row->ort;
+				$fa->gemeinde = $row->gemeinde;
+				$fa->nation = $row->nation;
+				$fa->typ = $row->typ;
+				$fa->adress_name = $row->adress_name;
+				$fa->heimatadresse = $this->db_parse_bool($row->heimatadresse);
+				$fa->zustelladresse = $this->db_parse_bool($row->zustelladresse);
 				
 				$this->result[] = $fa;
 			}
@@ -594,7 +594,7 @@ class firma extends basis_db
 	public function get_kundennummer($firma_id, $oe_kurzbz)
 	{
 		$qry = "SELECT kundennummer FROM public.tbl_firma_organisationseinheit 
-				WHERE firma_id='".addslashes($firma_id)."' AND oe_kurzbz='".addslashes($oe_kurzbz)."';";
+				WHERE firma_id=".$this->db_add_param($firma_id, FHC_INTEGER)." AND oe_kurzbz=".$this->db_add_param($oe_kurzbz).";";
 		
 		if($result = $this->db_query($qry))
 		{
@@ -644,9 +644,9 @@ class firma extends basis_db
 		$qry.=" WHERE true ";
 
 		if($firma_id!='')
-			$qry.=" and tbl_firma_organisationseinheit.firma_id='".addslashes($firma_id)."'";
+			$qry.=" and tbl_firma_organisationseinheit.firma_id=".$this->db_add_param($firma_id, FHC_INTEGER);
 		if($oe_kurzbz!='')
-			$qry.=" and tbl_firma_organisationseinheit.oe_kurzbz='".addslashes($oe_kurzbz)."'";
+			$qry.=" and tbl_firma_organisationseinheit.oe_kurzbz=".$this->db_add_param($oe_kurzbz);
 			
 		$qry.=" ORDER BY tbl_firma.name, tbl_firma_organisationseinheit.oe_kurzbz ";
 		if($this->db_query($qry))
@@ -664,21 +664,21 @@ class firma extends basis_db
 				$fa->insertamum = $row->insertamum;
 				$fa->insertvon = $row->insertvon;
 				$fa->ext_id = $row->ext_id;
-				$fa->schule = ($row->schule=='t'?true:false);
+				$fa->schule = $this->db_parse_bool($row->schule);
 				$fa->steuernummer = $row->steuernummer;				
-				$fa->gesperrt = ($row->gesperrt=='t'?true:false);
-				$fa->aktiv = ($row->aktiv=='t'?true:false);		
+				$fa->gesperrt = $this->db_parse_bool($row->gesperrt);
+				$fa->aktiv = $this->db_parse_bool($row->aktiv);		
 				$fa->finanzamt = $row->finanzamt;		
 				$fa->oe_kurzbz = $row->oe_kurzbz;	
-				$fa->firma_organisationseinheit_id = $row->firma_organisationseinheit_id;		
+				$fa->firma_organisationseinheit_id = $row->firma_organisationseinheit_id;
 				$fa->oe_parent_kurzbz = $row->oe_parent_kurzbz;		
-				$fa->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;	
-				$fa->bezeichnung = $row->bezeichnung;	
-				$fa->fobezeichnung = $row->fobezeichnung;		
-				$fa->kundennummer = $row->kundennummer;						
+				$fa->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
+				$fa->bezeichnung = $row->bezeichnung;
+				$fa->fobezeichnung = $row->fobezeichnung;
+				$fa->kundennummer = $row->kundennummer;
 
-				$fa->oe_aktiv = ($row->oe_aktiv=='t'?true:false);	
-				$fa->mailverteiler = ($row->mailverteiler=='t'?true:false);	
+				$fa->oe_aktiv = $this->db_parse_bool($row->oe_aktiv);
+				$fa->mailverteiler = $this->db_parse_bool($row->mailverteiler);
 				
 				$this->result[]=$fa;
 			}
@@ -704,7 +704,7 @@ class firma extends basis_db
 
 		$qry =" select *  ";
 		$qry.=" FROM public.tbl_firma_organisationseinheit ";
-		$qry.=" WHERE tbl_firma_organisationseinheit.firma_organisationseinheit_id='".addslashes($firma_organisationseinheit_id)."'";	
+		$qry.=" WHERE tbl_firma_organisationseinheit.firma_organisationseinheit_id=".$this->db_add_param($firma_organisationseinheit_id);	
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -717,9 +717,9 @@ class firma extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
 				$this->oe_kurzbz = $row->oe_kurzbz;	
-				$this->firma_organisationseinheit_id = $row->firma_organisationseinheit_id;		
-				$this->bezeichnung = $row->bezeichnung;		
-				$this->kundennummer = $row->kundennummer;							
+				$this->firma_organisationseinheit_id = $row->firma_organisationseinheit_id;
+				$this->bezeichnung = $row->bezeichnung;
+				$this->kundennummer = $row->kundennummer;
 			}
 			return true;
 		}
@@ -745,7 +745,7 @@ class firma extends basis_db
 		}
 		$qry = "delete from public.tbl_firma_organisationseinheit WHERE firma_organisationseinheit_id>0";
 		if ($firma_organisationseinheit_id)
-			$qry.=" and firma_organisationseinheit_id='".addslashes($firma_organisationseinheit_id)."'";
+			$qry.=" and firma_organisationseinheit_id=".$this->db_add_param($firma_organisationseinheit_id);
  			
 		if($this->db_query($qry))
 			return true;
@@ -768,15 +768,15 @@ class firma extends basis_db
 			//Neuen Datensatz einfuegen
 			$qry='INSERT INTO public.tbl_firma_organisationseinheit (firma_id,oe_kurzbz, 
 					bezeichnung,kundennummer, updateamum, updatevon, insertamum, insertvon, ext_id) VALUES('.
-			     $this->addslashes($this->firma_id).', '.
-			     $this->addslashes($this->oe_kurzbz).', '.
-			     $this->addslashes($this->bezeichnung).', '.
-			     $this->addslashes($this->kundennummer).', '.
-			     $this->addslashes($this->updateamum).', '.
-			     $this->addslashes($this->updatevon).', '.
-			     $this->addslashes($this->insertamum).', '.
-			     $this->addslashes($this->insertvon).', '.
-			     $this->addslashes($this->ext_id).' ); '; 			 
+			     $this->db_add_param($this->firma_id, FHC_INTEGER).', '.
+			     $this->db_add_param($this->oe_kurzbz).', '.
+			     $this->db_add_param($this->bezeichnung).', '.
+			     $this->db_add_param($this->kundennummer).', '.
+			     $this->db_add_param($this->updateamum).', '.
+			     $this->db_add_param($this->updatevon).', '.
+			     $this->db_add_param($this->insertamum).', '.
+			     $this->db_add_param($this->insertvon).', '.
+			     $this->db_add_param($this->ext_id).' ); ';
 		}
 		else
 		{
@@ -789,14 +789,14 @@ class firma extends basis_db
 				return false;
 			}
 			$qry='UPDATE public.tbl_firma_organisationseinheit SET '.
-				'firma_id='.$this->addslashes($this->firma_id).', '.
-				'oe_kurzbz='.$this->addslashes($this->oe_kurzbz).', '.
-				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
-				'kundennummer='.$this->addslashes($this->kundennummer).', '.
+				'firma_id='.$this->db_add_param($this->firma_id, FHC_INTEGER).', '.
+				'oe_kurzbz='.$this->db_add_param($this->oe_kurzbz).', '.
+				'bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
+				'kundennummer='.$this->db_add_param($this->kundennummer).', '.
 				'updateamum= now(), '.
-		     	'updatevon='.$this->addslashes($this->updatevon).', '.
-		     	'ext_id='.$this->addslashes($this->ext_id).' '.
-				'WHERE firma_organisationseinheit_id='.$this->addslashes($this->firma_organisationseinheit_id).';';
+		     	'updatevon='.$this->db_add_param($this->updatevon).', '.
+		     	'ext_id='.$this->db_add_param($this->ext_id).' '.
+				'WHERE firma_organisationseinheit_id='.$this->db_add_param($this->firma_organisationseinheit_id).';';
 		}
 		if($this->db_query($qry))
 		{
@@ -933,13 +933,13 @@ class firma extends basis_db
 				$fi->insertamum = $row->insertamum;
 				$fi->insertvon = $row->insertvon;
 				$fi->ext_id = $row->ext_id;
-				$fi->schule = ($row->schule=='t'?true:false);
-				$fi->steuernummer = $row->steuernummer;				
-				$fi->gesperrt = ($row->gesperrt=='t'?true:false);
-				$fi->aktiv = ($row->aktiv=='t'?true:false);		
-				$fi->finanzamt = $row->finanzamt;				
+				$fi->schule = $this->db_parse_bool($row->schule);
+				$fi->steuernummer = $row->steuernummer;
+				$fi->gesperrt = $this->db_parse_bool($row->gesperrt);
+				$fi->aktiv = $this->db_parse_bool($row->aktiv);
+				$fi->finanzamt = $row->finanzamt;
 				
-                $this->result[] = $fi; 
+                $this->result[] = $fi;
 			}
 
 		}
