@@ -42,6 +42,61 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 	<link rel="stylesheet"  href="../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<title>Profilfoto Check</title>
+	<style type="text/css">
+	.hoverbox
+	{
+		cursor: default;
+		list-style: none;
+	}
+	
+/*	.hoverbox a
+	{
+		cursor: default;
+	}*/
+	
+	.hoverbox a .preview
+	{
+		display: none;
+	}
+	
+	.hoverbox a .previewtext
+	{
+		display: none;
+	}
+	
+	.hoverbox a:active .preview
+	{
+		display: block;
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 1;
+	}
+	
+	.hoverbox a:active .previewtext
+	{
+		display: block;
+		position: absolute;
+		top: -35px;
+		left: 1px;
+		z-index: 1;
+		color: #000;
+	}
+	
+	.hoverbox .preview
+	{
+		border-style: solid;
+		border-width: 2px;
+		border-color: #000;
+		height: 100px;
+	}
+	
+	.hoverbox .image
+	{
+		width: 75px;
+		height: 100px;
+	}
+	</style>
 </head>
 <body>
 <h2>Profilfoto Check</h2>
@@ -250,10 +305,10 @@ if($result = $db->db_query($qry))
 		echo '
 		<br><br><br>
 		<center>
-		<table>	
+		<table style="position: relative;">	
 			<tr>
-				<td>
-				<img src="../../content/bild.php?src=akte&person_id='.$row->person_id.'" height="100px" width="75px">
+				<td class="hoverbox">
+				<a href="#"><p class="previewtext">Originalvorschau</p><img class="image" src="../../content/bild.php?src=akte&person_id='.$row->person_id.'"><img src="../../content/bild.php?src=akte&person_id='.$row->person_id.'" class="preview"></a>
 				</td>
 				<td>&nbsp;</td>
 				<td>

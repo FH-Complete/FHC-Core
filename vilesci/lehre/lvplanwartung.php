@@ -126,7 +126,7 @@
 		$studiensemester = $stsem_obj->studiensemester_kurzbz;
 	}
 	else  */
-		$studiensemester = $stsem_obj->getNearest();
+		$studiensemester = $semester_aktuell;
 	$where=" studiensemester_kurzbz='".$studiensemester."'";
 	if (!empty($semester))
 		$where.=" AND semester=$semester";

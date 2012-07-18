@@ -65,6 +65,11 @@ if (isset($_GET['filter_fachbereich_kurzbz']) || isset($_POST['filter_fachbereic
 else
 	$filter_fachbereich_kurzbz='';
 	
+if (isset($_GET['filter_aktiv']) || isset($_POST['filter_aktiv']))
+	$filter_aktiv=(isset($_GET['filter_aktiv'])?$_GET['filter_aktiv']:$_POST['filter_aktiv']);
+else
+	$filter_aktiv='';
+	
 
 if (isset($_POST['neu']))
 {
@@ -188,6 +193,13 @@ foreach ($fachbereiche as $fb)
 }
 $outp.="</SELECT>";
 
+$outp.="</SELECT>";
+$outp.=" Aktiv: <SELECT name='filter_aktiv'>";
+$outp.= "<option value=''".($filter_aktiv==''?' selected':'').">-- Alle --</OPTION>";
+$outp.= "<option value='true'".($filter_aktiv=='true'?'selected':'').">-- Aktiv --</OPTION>";
+$outp.= "<option value='false'".($filter_aktiv=='false'?'selected':'').">-- Nicht aktiv --</OPTION>";
+$outp.= '</SELECT>';
+
 $outp.="
 	<input type='submit' value='Anzeigen'>
 	</form>";
@@ -247,7 +259,7 @@ if (isset($_GET['type']) && $_GET['type']=='edit')
 	if(!$rechte->isBerechtigt('lehre/lehrfach',$stg_obj->oe_kurzbz,'sui'))
 		die('Sie haben keine Berechtigung fuer diese Aktion');
 		
-	echo '<form name="lehrfach_edit" method="post" action="lehrfach.php?filter_stg_kz='.$filter_stg_kz.'&filter_semester='.$filter_semester.'&filter_fachbereich_kurzbz='.$filter_fachbereich_kurzbz.'">';
+	echo '<form name="lehrfach_edit" method="post" action="lehrfach.php?filter_stg_kz='.$filter_stg_kz.'&filter_semester='.$filter_semester.'&filter_fachbereich_kurzbz='.$filter_fachbereich_kurzbz.'&filter_aktiv='.$filter_aktiv.'">';
 	echo '<p><b>Edit Lehrfach: '.$_GET['lehrfach_nr'].'</b>';
 	echo '<table>';
 	echo '<tr><td>';
@@ -298,11 +310,11 @@ if (isset($_GET['type']) && $_GET['type']=='edit')
 
 	echo '</SELECT></td></tr>';
 
-    echo '<tr><td><i>Name</i></td><td><input type="text" name="bezeichnung" size="30" maxlength="250" value="'.$lf->bezeichnung.'"></td></tr>';
+    echo '<tr><td><i>Name</i></td><td><input type="text" name="bezeichnung" size="70" maxlength="250" value="'.$lf->bezeichnung.'"></td></tr>';
 	echo '<tr><td><i>Kurzbezeichnung</i></td><td>';
-	echo '<input type="text" name="kurzbz" size="30" maxlength="12" value="'.$lf->kurzbz.'"></td></tr>';
+	echo '<input type="text" name="kurzbz" size="15" maxlength="12" value="'.$lf->kurzbz.'"></td></tr>';
 	echo '<tr><td><i>Farbe</i></td><td>';
-    echo '<input type="text" name="farbe" id="farbe" size="30" maxlength="7" value="'.$lf->farbe.'"></td></tr>';
+    echo '<input type="text" name="farbe" id="farbe" size="15" maxlength="7" value="'.$lf->farbe.'"></td></tr>';
 
 	echo '<tr><td>Aktiv</td><td><input type="checkbox" name="aktiv" value="1" '.($lf->aktiv?'checked':'').' />';
     echo '<tr><td>Sprache</td><td><select name="sprache">';
@@ -334,7 +346,7 @@ else
 	{
 		//Neuanlage
 		echo '
-				<form action="lehrfach.php?filter_stg_kz='.$filter_stg_kz.'&filter_semester='.$filter_semester.'&filter_fachbereich_kurzbz='.$filter_fachbereich_kurzbz.'" method="post" name="lehrfach_neu" id="lehrfach_neu">
+				<form action="lehrfach.php?filter_stg_kz='.$filter_stg_kz.'&filter_semester='.$filter_semester.'&filter_fachbereich_kurzbz='.$filter_fachbereich_kurzbz.'&filter_aktiv='.$filter_aktiv.'" method="post" name="lehrfach_neu" id="lehrfach_neu">
 				  <p><b>Neues Lehrfach</b>: <br/>';
 		echo '<table>';
 		echo '<tr><td>';
@@ -382,11 +394,11 @@ else
 	
 		echo '</SELECT></td></tr>';
 	
-	    echo '<tr><td><i>Name</i></td><td><input type="text" name="bezeichnung" size="30" maxlength="250" value=""></td></tr>';
+	    echo '<tr><td><i>Name</i></td><td><input type="text" name="bezeichnung" size="70" maxlength="250" value=""></td></tr>';
 		echo '<tr><td><i>Kurzbezeichnung</i></td><td>';
-		echo '<input type="text" name="kurzbz" size="30" maxlength="12" value=""></td></tr>';
+		echo '<input type="text" name="kurzbz" size="15" maxlength="12" value=""></td></tr>';
 	    echo '<tr><td><i>Farbe</i></td><td>';
-	    echo '<input type="text" name="farbe" id="farbe" size="30" maxlength="7" value=""></td></tr>';
+	    echo '<input type="text" name="farbe" id="farbe" size="15" maxlength="7" value=""></td></tr>';
 	    echo '<tr><td>Sprache</td><td><select name="sprache">';
 	
 		$qry1="SELECT * FROM public.tbl_sprache";
@@ -426,6 +438,7 @@ if(!isset($_GET['type']))
 				".($filter_stg_kz!=''?"AND tbl_lehrfach.studiengang_kz='$filter_stg_kz'":'')."
 				".($filter_semester!=''?"AND semester='$filter_semester'":'')."
 				".($filter_fachbereich_kurzbz!=''?"AND fachbereich_kurzbz = '$filter_fachbereich_kurzbz'":'')."
+				".($filter_aktiv!=''?"AND aktiv = '$filter_aktiv'":'')."
 				$where
 				ORDER BY tbl_lehrfach.kurzbz, tbl_lehrfach.lehrfach_id";
 	
@@ -469,12 +482,12 @@ if(!isset($_GET['type']))
 				<td>$row->fach</td>
 				<td>$row->bezeichnung</td>
 				<td style=\"background-color: #$row->farbe;\" >$row->farbe</td>".
-				"<td valign='middle' align='center'><form style='margin:0; padding:0' action=\"lehrfach.php?lehrfach_nr=$row->nummer&type=aktiv&filter_stg_kz=$filter_stg_kz&filter_semester=$filter_semester&filter_fachbereich_kurzbz=$filter_fachbereich_kurzbz\" method='POST'><input type='image' src='../../skin/images/".($row->aktiv=='t'?'true.png':'false.png')."' height='20' style='border:0px;'></form></td>".
+				"<td valign='middle' align='center'><form style='margin:0; padding:0' action=\"lehrfach.php?lehrfach_nr=$row->nummer&type=aktiv&filter_stg_kz=$filter_stg_kz&filter_semester=$filter_semester&filter_fachbereich_kurzbz=$filter_fachbereich_kurzbz&filter_aktiv=$filter_aktiv\" method='POST'><input type='image' src='../../skin/images/".($row->aktiv=='t'?'true.png':'false.png')."' height='20' style='border:0px;'></form></td>".
 				"<td>$row->fachbereich</td>
 				<td>$row->sprache</td>
 				<td>";
 		   if($rechte->isBerechtigt('lehre/lehrfach', null, 'sui'))
-				echo "<a href=\"lehrfach.php?lehrfach_nr=$row->nummer&type=edit&filter_stg_kz=$filter_stg_kz&filter_semester=$filter_semester&filter_fachbereich_kurzbz=$filter_fachbereich_kurzbz\">Edit</a>";
+				echo "<a href=\"lehrfach.php?lehrfach_nr=$row->nummer&type=edit&filter_stg_kz=$filter_stg_kz&filter_semester=$filter_semester&filter_fachbereich_kurzbz=$filter_fachbereich_kurzbz&filter_aktiv=$filter_aktiv\">Edit</a>";
 			echo "</td></tr>";
 		}
 		
