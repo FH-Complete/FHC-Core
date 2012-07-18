@@ -48,12 +48,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 		cursor: default;
 		list-style: none;
 	}
-	
-/*	.hoverbox a
-	{
-		cursor: default;
-	}*/
-	
+		
 	.hoverbox a .preview
 	{
 		display: none;
@@ -97,6 +92,59 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 		height: 100px;
 	}
 	</style>
+	
+	<!--[if IE]>
+	<style type="text/css">
+		.hoverbox
+	{
+		cursor: default;
+		list-style: none;
+	}
+		
+	.hoverbox a .preview
+	{
+		display: none;
+	}
+	
+	.hoverbox a .previewtext
+	{
+		display: none;
+	}
+	
+	.hoverbox .preview
+	{
+		border-style: solid;
+		border-width: 2px;
+		border-color: #000;
+		height: 100px;
+	}
+	
+	.hoverbox .image
+	{
+		width: 75px;
+		height: 100px;
+	}
+	
+	.hoverbox a:hover .preview
+	{
+		display: block;
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 1;
+	}
+
+	.hoverbox a:hover .previewtext
+	{
+		display: block;
+		position: absolute;
+		top: -35px;
+		left: 1px;
+		z-index: 1;
+		color: #000;
+	}
+	</style>
+	<![endif]-->
 </head>
 <body>
 <h2>Profilfoto Check</h2>
