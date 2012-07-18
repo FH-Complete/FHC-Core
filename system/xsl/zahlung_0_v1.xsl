@@ -143,24 +143,8 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					<!-- Tabelle ENDE -->
 					<fo:block><xsl:text>
 					</xsl:text></fo:block>
-					<fo:block><xsl:text>
-					</xsl:text></fo:block>
-					<fo:block><xsl:text>
-					</xsl:text></fo:block>
-					<fo:block><xsl:text>
-					</xsl:text></fo:block>
-					<fo:block><xsl:text>
-					</xsl:text></fo:block>
-					<fo:block><xsl:text>
-					</xsl:text></fo:block>
-					<fo:block><xsl:text>
-					</xsl:text></fo:block>
-					<fo:block><xsl:text>
-					</xsl:text></fo:block>
-					<fo:block><xsl:text>
-					</xsl:text></fo:block>
-					<fo:block><xsl:text>
-					</xsl:text></fo:block>
+
+					
 
 					<!-- Unterschrift -->
 					
