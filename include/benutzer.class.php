@@ -48,14 +48,14 @@ class benutzer extends person
 	 */
 	public function load($uid)
 	{
-		$qry = "SELECT * FROM public.tbl_benutzer WHERE uid='".addslashes($uid)."'";
+		$qry = "SELECT * FROM public.tbl_benutzer WHERE uid=".$this->db_add_param($uid);
 		
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
 				$this->uid = $row->uid;
-				$this->bnaktiv = ($row->aktiv=='t'?true:false);
+				$this->bnaktiv = $this->db_parse_bool($row->aktiv);
 				$this->alias = $row->alias;
 				if(!person::load($row->person_id))
 					return false;
@@ -110,7 +110,7 @@ class benutzer extends person
 		
 		if($this->alias!='')
 		{
-			$qry = "SELECT * FROM public.tbl_benutzer WHERE alias='".addslashes($this->alias)."' AND uid!='".addslashes($this->uid)."'";
+			$qry = "SELECT * FROM public.tbl_benutzer WHERE alias=".$this->db_add_param($this->alias)." AND uid!=".$this->db_add_param($this->uid);
 			if($this->db_query($qry))
 			{
 				if($this->db_num_rows()>0)
@@ -153,39 +153,39 @@ class benutzer extends person
 		if($new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
 			$qry = 'INSERT INTO public.tbl_benutzer (uid, aktiv, alias, person_id, insertamum, insertvon, updateamum, updatevon, ext_id) VALUES('.
-			       "'".addslashes($this->uid)."',".
-			       ($this->bnaktiv?'true':'false').','.
-			       $this->addslashes($this->alias).",'".
-			       $this->person_id."',".
-			       $this->addslashes($this->insertamum).",".
-			       $this->addslashes($this->insertvon).",".
-			       $this->addslashes($this->updateamum).",".
-			       $this->addslashes($this->updatevon).",".
-			       $this->addslashes($this->bn_ext_id).");";
+			       $this->db_add_param($this->uid).",".
+			       $this->db_add_param($this->bnaktiv,FHC_BOOLEAN).",".
+			       $this->db_add_param($this->alias).",".
+			       $this->db_add_param($this->person_id, FHC_INTEGER).",".
+			       $this->db_add_param($this->insertamum).",".
+			       $this->db_add_param($this->insertvon).",".
+			       $this->db_add_param($this->updateamum).",".
+			       $this->db_add_param($this->updatevon).",".
+			       $this->db_add_param($this->bn_ext_id).");";
 		}
 		else
 		{			
 			//Wenn der Aktiv Status geaendert wurde, dann auch updateaktivamum und updateaktivvon setzen
 			$upd='';
-			$qry = "SELECT aktiv FROM public.tbl_benutzer WHERE uid='".addslashes($this->uid)."'";
+			$qry = "SELECT aktiv FROM public.tbl_benutzer WHERE uid=".$this->db_add_param($this->uid);
 			if($this->db_query($qry))
 			{
 				if($row = $this->db_fetch_object())
 				{
-					$aktiv = ($row->aktiv=='t'?true:false);
+					$aktiv = $this->db_parse_bool($row->aktiv);
 					
 					if($aktiv!=$this->bnaktiv)
-						$upd =" updateaktivam='".$this->updateamum."', updateaktivvon='".$this->updatevon."',";
+						$upd =" updateaktivam=".$this->db_add_param($this->updateamum).", updateaktivvon=".$this->db_add_param($this->updatevon).",";
 				}
 			}
 					
 			$qry = 'UPDATE public.tbl_benutzer SET'.
-			       ' aktiv='.($this->bnaktiv?'true':'false').','.
-			       ' alias='.$this->addslashes($this->alias).','.
-			       " person_id='".$this->person_id."',".
-			       ' updateamum='.$this->addslashes($this->updateamum).','.$upd.
-			       ' updatevon='.$this->addslashes($this->updatevon).
-			       " WHERE uid='".addslashes($this->uid)."';";
+			       ' aktiv='.$this->db_add_param($this->bnaktiv, FHC_BOOLEAN).','.
+			       ' alias='.$this->db_add_param($this->alias).','.
+			       ' person_id='.$this->db_add_param($this->person_id).','.
+			       ' updateamum='.$this->db_add_param($this->updateamum).','.$upd.
+			       ' updatevon='.$this->db_add_param($this->updatevon).
+			       ' WHERE uid='.$this->db_add_param($this->uid).';';
 		}
 		
 		if($this->db_query($qry))
@@ -206,7 +206,7 @@ class benutzer extends person
 	 */
 	public function uid_exists($uid)
 	{
-		$qry = "SELECT * FROM public.tbl_benutzer WHERE uid='".addslashes($uid)."'";
+		$qry = "SELECT * FROM public.tbl_benutzer WHERE uid=".$this->db_add_param($uid);
 		
 		if($this->db_query($qry))
 		{
@@ -236,7 +236,7 @@ class benutzer extends person
 	 */
 	public function alias_exists($alias)
 	{
-		$qry = "SELECT * FROM public.tbl_benutzer WHERE alias='".addslashes($alias)."'";
+		$qry = "SELECT * FROM public.tbl_benutzer WHERE alias=".$this->db_add_param($alias);
 		
 		if($this->db_query($qry))
 		{
