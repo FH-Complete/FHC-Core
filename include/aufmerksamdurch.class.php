@@ -67,7 +67,7 @@ class aufmerksamdurch extends basis_db
 	{
 		$qry = "SELECT * FROM public.tbl_aufmerksamdurch";
 		if($orderby!='')
-			$qry .= " ORDER BY ".$this->db_add_param($orderby);
+			$qry .= " ORDER BY ".($orderby);
 		
 		if($this->db_query($qry))
 		{
