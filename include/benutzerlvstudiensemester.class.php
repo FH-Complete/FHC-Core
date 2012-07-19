@@ -68,8 +68,8 @@ class benutzerlvstudiensemester extends basis_db
 	{
 		$qry = "SELECT tbl_benutzerlvstudiensemester.uid, vw_benutzer.nachname, vw_benutzer.vorname 
 				FROM campus.tbl_benutzerlvstudiensemester, campus.vw_benutzer 
-				WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' 
-					AND lehrveranstaltung_id = '".addslashes($lehrveranstaltung_id)."' 
+				WHERE studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)." 
+					AND lehrveranstaltung_id = ".$this->db_add_param($lehrveranstaltung_id)." 
 					AND vw_benutzer.uid = tbl_benutzerlvstudiensemester.uid ORDER BY nachname";
 		
 		if(!$this->db_query($qry))
@@ -137,9 +137,9 @@ class benutzerlvstudiensemester extends basis_db
 		if($this->new)
 		{
 			$qry = 'INSERT INTO campus.tbl_benutzerlvstudiensemester (uid, studiensemester_kurzbz, lehrveranstaltung_id)
-			        VALUES('.$this->addslashes($this->uid).','.
-					$this->addslashes($this->studiensemester_kurzbz).','.
-					$this->addslashes($this->lehrveranstaltung_id).');';
+			        VALUES('.$this->db_add_param($this->uid).','.
+					$this->db_add_param($this->studiensemester_kurzbz).','.
+					$this->db_add_param($this->lehrveranstaltung_id).');';
 		}
 		else
 		{

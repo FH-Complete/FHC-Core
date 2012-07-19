@@ -105,7 +105,7 @@ class benutzerfunktion extends basis_db
 	public function benutzerfunktion_exists($uid, $benutzerfunktion)
 	{
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_benutzerfunktion 
-				WHERE uid='".addslashes($uid)."' AND funktion_kurzbz='".addslashes($benutzerfunktion)."'";
+				WHERE uid=".$this->db_add_param($uid)." AND funktion_kurzbz=".$this->db_add_param($benutzerfunktion);
 
 		if($row = $this->db_fetch_object($this->db_query($qry)))
 		{
@@ -130,8 +130,8 @@ class benutzerfunktion extends basis_db
 	public function getBenutzerFunktion($uid, $funktion_kurzbz, $oe_kurzbz)
 	{
 		$qry = "SELECT * FROM public.tbl_benutzerfunktion 
-				WHERE uid='".addslashes($uid)."' AND funktion_kurzbz='".addslashes($funktion_kurzbz)."' 
-				AND oe_kurzbz='".addslashes($oe_kurzbz)."'";
+				WHERE uid=".$this->db_add_param($uid)." AND funktion_kurzbz=".$this->db_add_param($funktion_kurzbz)." 
+				AND oe_kurzbz=".$this->db_add_param($oe_kurzbz);
 
 		if($result = $this->db_query($qry))
 		{
@@ -174,16 +174,16 @@ class benutzerfunktion extends basis_db
 	public function getBenutzerFunktionen($funktion_kurzbz, $oe_kurzbz='', $semester='', $uid='')
 	{
 		$qry = "SELECT * FROM public.tbl_benutzerfunktion 
-				WHERE funktion_kurzbz='".addslashes($funktion_kurzbz)."'
+				WHERE funktion_kurzbz=".$this->db_add_param($funktion_kurzbz)."
 				AND (datum_bis >= now() OR datum_bis IS NULL)
 				AND (datum_von <= now() OR datum_von IS NULL)";
 
 		if($oe_kurzbz!='')
-			$qry.=" AND oe_kurzbz='".addslashes($oe_kurzbz)."'";
+			$qry.=" AND oe_kurzbz=".$this->db_add_param($oe_kurzbz);
 		if($semester!='')
-			$qry.=" AND semester='".addslashes($semester)."'";
+			$qry.=" AND semester=".$this->db_add_param($semester);
 		if($uid!='')
-			$qry.=" AND uid='".addslashes($uid)."'";
+			$qry.=" AND uid=".$this->db_add_param($uid);
 		
 		$qry.=" ORDER BY funktion_kurzbz, oe_kurzbz, semester";
 
@@ -232,7 +232,7 @@ class benutzerfunktion extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE benutzerfunktion_id = '$benutzerfunktion_id';";
+		$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE benutzerfunktion_id =".$this->db_add_param($benutzerfunktion_id, FHC_INTEGER);
 
 		if(!$res = $this->db_query($qry))
 		{
@@ -278,7 +278,7 @@ class benutzerfunktion extends basis_db
 			return false;
 		}
 		
-		$qry = "DELETE FROM public.tbl_benutzerfunktion WHERE benutzerfunktion_id='$benutzerfunktion_id'";
+		$qry = "DELETE FROM public.tbl_benutzerfunktion WHERE benutzerfunktion_id=".$this->db_add_param($benutzerfunktion_id, FHC_INTEGER);
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg = $this->db_last_error();
@@ -301,7 +301,7 @@ class benutzerfunktion extends basis_db
 		{
 			//Neuen Datensatz anlegen
 			//Pruefen ob uid vorhanden
-			$qry = "SELECT uid FROM public.tbl_benutzer WHERE uid = '$this->uid';";
+			$qry = "SELECT uid FROM public.tbl_benutzer WHERE uid = ".$this->db_add_param($this->uid);
 			if(!$resx = $this->db_query($qry))
 			{
 				$this->errormsg = 'Fehler beim Laden des Datensatzes';
@@ -317,18 +317,18 @@ class benutzerfunktion extends basis_db
 			}
 			$qry = 'BEGIN;INSERT INTO public.tbl_benutzerfunktion (fachbereich_kurzbz, uid, oe_kurzbz, funktion_kurzbz, insertamum, insertvon,
 				updateamum, updatevon, semester, datum_von, datum_bis, bezeichnung) VALUES ('.
-				$this->addslashes($this->fachbereich_kurzbz).', '.
-				$this->addslashes($this->uid).', '.
-				$this->addslashes($this->oe_kurzbz).', '.
-				$this->addslashes($this->funktion_kurzbz).', '.
-				$this->addslashes($this->insertamum).', '.
-				$this->addslashes($this->insertvon).', '.
-				$this->addslashes($this->updateamum).', '.
-				$this->addslashes($this->updatevon).', '.
-				$this->addslashes($this->semester).','.
-				$this->addslashes($this->datum_von).','.
-				$this->addslashes($this->datum_bis).','.
-				$this->addslashes($this->bezeichnung).'); ';
+				$this->db_add_param($this->fachbereich_kurzbz).', '.
+				$this->db_add_param($this->uid).', '.
+				$this->db_add_param($this->oe_kurzbz).', '.
+				$this->db_add_param($this->funktion_kurzbz).', '.
+				$this->db_add_param($this->insertamum).', '.
+				$this->db_add_param($this->insertvon).', '.
+				$this->db_add_param($this->updateamum).', '.
+				$this->db_add_param($this->updatevon).', '.
+				$this->db_add_param($this->semester).','.
+				$this->db_add_param($this->datum_von).','.
+				$this->db_add_param($this->datum_bis).','.
+				$this->db_add_param($this->bezeichnung).'); ';
 		}
 		else
 		{
@@ -342,20 +342,20 @@ class benutzerfunktion extends basis_db
 			}
 
 			$qry = 'UPDATE public.tbl_benutzerfunktion SET '.
-				'benutzerfunktion_id='.$this->addslashes($this->benutzerfunktion_id).', '.
-				'fachbereich_kurzbz='.$this->addslashes($this->fachbereich_kurzbz).', '.
-				'uid='.$this->addslashes($this->uid).', '.
-				'oe_kurzbz='.$this->addslashes($this->oe_kurzbz).', '.
-				'funktion_kurzbz='.$this->addslashes($this->funktion_kurzbz).', '.
-				'insertamum='.$this->addslashes($this->insertamum).', '.
-				'insertvon='.$this->addslashes($this->insertvon).', '.
-				'updateamum='.$this->addslashes($this->updateamum).', '.
-				'updatevon='.$this->addslashes($this->updatevon).',  '.
-				'datum_von='.$this->addslashes($this->datum_von).',  '.
-				'datum_bis='.$this->addslashes($this->datum_bis).',  '.
-				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
-				'semester='.$this->addslashes($this->semester).'  '.
-				'WHERE benutzerfunktion_id = '.$this->addslashes($this->benutzerfunktion_id).';';
+				'benutzerfunktion_id='.$this->db_add_param($this->benutzerfunktion_id, FHC_INTEGER).', '.
+				'fachbereich_kurzbz='.$this->db_add_param($this->fachbereich_kurzbz).', '.
+				'uid='.$this->db_add_param($this->uid).', '.
+				'oe_kurzbz='.$this->db_add_param($this->oe_kurzbz).', '.
+				'funktion_kurzbz='.$this->db_add_param($this->funktion_kurzbz).', '.
+				'insertamum='.$this->db_add_param($this->insertamum).', '.
+				'insertvon='.$this->db_add_param($this->insertvon).', '.
+				'updateamum='.$this->db_add_param($this->updateamum).', '.
+				'updatevon='.$this->db_add_param($this->updatevon).',  '.
+				'datum_von='.$this->db_add_param($this->datum_von).',  '.
+				'datum_bis='.$this->db_add_param($this->datum_bis).',  '.
+				'bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
+				'semester='.$this->db_add_param($this->semester).'  '.
+				'WHERE benutzerfunktion_id = '.$this->db_add_param($this->benutzerfunktion_id, FHC_INTEGER).';';
 		}
 
 		if($this->db_query($qry))

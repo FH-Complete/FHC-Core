@@ -55,9 +55,9 @@ class benutzergruppe extends basis_db
 	 */
 	public function load($uid, $gruppe_kurzbz, $studiensemester_kurzbz=null)
 	{
-		$qry = "SELECT * FROM public.tbl_benutzergruppe WHERE uid='".addslashes($uid)."' AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
+		$qry = "SELECT * FROM public.tbl_benutzergruppe WHERE uid=".$this->db_add_param($uid)." AND gruppe_kurzbz=".$this->db_add_param($gruppe_kurzbz);
 		if($studiensemester_kurzbz!=null)
-			$qry.=" AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+			$qry.=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 		
 		if($this->db_query($qry))
 		{
@@ -92,7 +92,7 @@ class benutzergruppe extends basis_db
 	 */
 	public function load_uids($gruppe_kurzbz, $stsem)
 	{
-		$qry = "SELECT * FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz='".addslashes($gruppe_kurzbz)."' and studiensemester_kurzbz = '".addslashes($stsem)."'";
+		$qry = "SELECT * FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz=".$this->db_add_param($gruppe_kurzbz)." and studiensemester_kurzbz = ".$this->db_add_param($stsem);
 		
 		if($this->db_query($qry))
 		{
@@ -164,13 +164,13 @@ class benutzergruppe extends basis_db
 		if($new)
 		{		
 			$qry = 'INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, studiensemester_kurzbz)
-			        VALUES('.$this->addslashes($this->uid).','.
-					$this->addslashes($this->gruppe_kurzbz).','.
-					$this->addslashes($this->updateamum).','.
-					$this->addslashes($this->updatevon).','.
-					$this->addslashes($this->insertamum).','.
-					$this->addslashes($this->insertvon).','.
-					$this->addslashes($this->studiensemester_kurzbz).');';
+			        VALUES('.$this->$this->db_add_param($this->uid).','.
+					$this->db_add_param($this->gruppe_kurzbz).','.
+					$this->db_add_param($this->updateamum).','.
+					$this->db_add_param($this->updatevon).','.
+					$this->db_add_param($this->insertamum).','.
+					$this->db_add_param($this->insertvon).','.
+					$this->db_add_param($this->studiensemester_kurzbz).');';
 		}
 		else
 		{
@@ -201,7 +201,7 @@ class benutzergruppe extends basis_db
 	 */
 	public function delete($uid, $gruppe_kurzbz)
 	{
-		$qry = "DELETE FROM public.tbl_benutzergruppe WHERE uid='".addslashes($uid)."' AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
+		$qry = "DELETE FROM public.tbl_benutzergruppe WHERE uid=".$this->db_add_param($uid)." AND gruppe_kurzbz=".$this->db_add_param($gruppe_kurzbz);
 		
 		if($this->db_query($qry))
 			return true;
