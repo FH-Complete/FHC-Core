@@ -31,7 +31,7 @@ $p=new phrasen($sprache);
 
 if (isset($_POST['userid'])) 
 {
-    $login = $_REQUEST['userid']; 
+    $login = trim($_REQUEST['userid']); 
     $person = new person(); 
 
     session_start();
