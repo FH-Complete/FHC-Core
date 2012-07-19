@@ -45,9 +45,8 @@
 	if(!$rechte->isBerechtigt('basis/betriebsmittel'))
 		die('Sie haben keine Rechte fuer diese Seite');
 	
-	$reloadstr = "";  // neuladen der liste im oberen frame
-	$htmlstr = "";
-	$errorstr = ""; //fehler beim insert
+	$errorstr = '';  // neuladen der liste im oberen frame
+	$htmlstr = '';
 		
 	if (isset($_REQUEST['betriebsmittel_id']))
 		$betriebsmittel_id =$_REQUEST['betriebsmittel_id'];
@@ -60,10 +59,12 @@
 	$bmbetriebsmitteltyp=isset($_POST["bmbetriebsmitteltyp"])?$_POST["bmbetriebsmitteltyp"]:'';
 	$bmbeschreibung=isset($_POST["bmbeschreibung"])?$_POST["bmbeschreibung"]:'';
 	$bmnummer=isset($_POST["bmnummer"])?$_POST["bmnummer"]:'';
+	$bmnummer2=isset($_POST["bmnummer2"])?$_POST["bmnummer2"]:'';
 	
 	$bmpausgegebenam=isset($_POST["bmpausgegebenam"])?$_POST["bmpausgegebenam"]:'';
 	$bmpretouram=isset($_POST["bmpretouram"])?$_POST["bmpretouram"]:'';
 	$bmpkaution=isset($_POST["bmpkaution"])?$_POST["bmpkaution"]:'';
+	$bmpuid=isset($_POST["bmpuid"])?$_POST["bmpuid"]:'';
 	$bmpanmerkung=isset($_POST["bmpanmerkung"])?$_POST["bmpanmerkung"]:'';
 		
 	if(isset($_POST["schick"]))
@@ -78,17 +79,18 @@
 			if(!$bm->load($betriebsmittel_id))
 				die('Fehler beim Laden des Betriebsmittels');
 			$bm->nummer = $bmnummer;
+			$bm->nummer2 = $bmnummer2;
 			$bm->beschreibung = $bmbeschreibung;
 			$bm->updatevon = $user;
 			$bm->updateamum = date('Y-m-d H:i:s');
 			
 			if(!$bm->save())
 			{
-				$reloadstr.="<br>Aktualisierung des Betriebsmittel-Datensatzes fehlgeschlagen!";
+				$errorstr.='<br><span class="error">Aktualisierung des Betriebsmittel-Datensatzes fehlgeschlagen!</span>';
 			}
 			else 
 			{
-				$reloadstr.="<br>Betriebsmittel-Datensatz wurde aktualisiert.";
+				$errorstr.='<br><span class="ok">Betriebsmittel-Datensatz wurde aktualisiert.</span>';
 			}
 			if($betriebsmittelperson_id!='')
 			{
@@ -102,14 +104,15 @@
 				$bmp->anmerkung=$bmpanmerkung;
 				$bmp->updatevon=$user;
 			    $bmp->insertvon=date('Y-m-d H:i:s');
+			    $bmp->uid = $bmpuid;
 			    
 				if(!$bmp->save())
 				{
-					$reloadstr.="<br>Aktualisierung des Betriebsmittelperson-Datensatzes fehlgeschlagen!";
+					$errorstr.='<br><span class="error">Aktualisierung des Betriebsmittelperson-Datensatzes fehlgeschlagen!</span>';
 				}
 				else 
 				{
-					$reloadstr.="<br>Betriebsmittelperson-Datensatz wurde aktualisiert.";
+					$errorstr.='<br><span class="ok">Betriebsmittelperson-Datensatz wurde aktualisiert.</span>';
 				}
 			}
 		}
@@ -123,24 +126,25 @@
 		$bmp=new betriebsmittelperson($betriebsmittelperson_id);
 	
 	
-		$htmlstr .= "<form action='' method='POST'>\n";
-		$htmlstr .= "<table style='padding-top:10px;'>\n";
+		$htmlstr .= '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">'."\n";
+		$htmlstr .= "<table>\n";
 		$htmlstr .= "	<tr>\n";
 		$htmlstr .= "	<td>Betriebsmittel</td>\n";
 		$htmlstr .= "	</tr>\n";
 		$htmlstr .= "	<tr>\n";
-		$htmlstr .= "		<td><b>BM-ID </b></td><td><input type='hidden' name='bmbetriebsmittel' value='$bm->betriebsmittel_id'>".$bm->betriebsmittel_id."</td>\n";
-		$htmlstr .= "		<td><b>Betriebsmitteltyp:</b></td><td>$bm->betriebsmitteltyp</td>\n";
+		$htmlstr .= '		<td><b>BM-ID </b></td><td><input type="hidden" name="betriebsmittel_id" value="'.$db->convert_html_chars($bm->betriebsmittel_id).'">'.$db->convert_html_chars($bm->betriebsmittel_id)."</td>\n";
+		$htmlstr .= '		<td><b>Betriebsmitteltyp:</b></td><td>'.$db->convert_html_chars($bm->betriebsmitteltyp)."</td>\n";
 
-		$htmlstr .= "		<td><b>Nummer</b></td><td><input type='text' name='bmnummer' value='".$bm->nummer."' size='15' maxlength='64'></td>\n";
+		$htmlstr .= '		<td><b>Nummer</b></td><td><input type="text" name="bmnummer" value="'.$db->convert_html_chars($bm->nummer).'" size="15" maxlength="64"></td>'."\n";
 		$htmlstr .= "	</tr><tr>";
-		$htmlstr .= "		<td><b>Beschreibung </b></td><td colspan='8'><input type='text' name='bmbeschreibung' value='".$bm->beschreibung."' size='64' maxlength='64'></td>\n";
+		$htmlstr .= '		<td><b>Beschreibung </b></td><td colspan="3"><input type="text" name="bmbeschreibung" value="'.$db->convert_html_chars($bm->beschreibung).'" size="30" maxlength="64"></td>'."\n";
+		$htmlstr .= '		<td><b>Nummer2</b></td><td><input type="text" name="bmnummer2" value="'.$bm->nummer2.'" size="15" maxlenght="64"></td>'."\n";
 		$htmlstr .= "	</tr><tr>";
-		$htmlstr .= "		<td><b>insertamum </b></td><td>".$datum_obj->formatDatum($bm->insertamum,'d.m.Y H:i')."&nbsp;</td>\n";
-		$htmlstr .= "		<td><b>insertvon </b></td><td>".$bm->insertvon."</td>\n";
+		$htmlstr .= "		<td><b>Anlage</b></td>";
+		$htmlstr .= '		<td colspan="2">'.$datum_obj->formatDatum($bm->insertamum,'d.m.Y H:i')."&nbsp;(".$db->convert_html_chars($bm->insertvon).")</td>\n";
 
-		$htmlstr .= "		<td><b>updateamum</b></td><td>".$datum_obj->formatDatum($bm->updateamum,'d.m.Y H:i')."&nbsp;</td>\n";
-		$htmlstr .= "		<td><b>updatevon</b></td><td>".$bm->updatevon."</td>\n";
+		$htmlstr .= "		<td><b>Letzte Änderung</b></td>";
+		$htmlstr .= '		<td colspan="2">'.$datum_obj->formatDatum($bm->updateamum,'d.m.Y H:i')."&nbsp; (".$db->convert_html_chars($bm->updatevon).")</td>\n";
 		$htmlstr .= "	</tr><tr>";
 		$htmlstr .= "		<td>&nbsp;</td>\n";
 		$htmlstr .= "	</tr>\n";
@@ -148,17 +152,20 @@
 		$htmlstr .= "	<td>Personenzuordnung</td>\n";
 		$htmlstr .= "	</tr>\n";
 		$htmlstr .= "	<tr>\n";
-		$htmlstr .= "		<td><b>BMP-ID </b></td><td><input type='hidden' name='betriebsmittelperson_id' value='$bmp->betriebsmittelperson_id'>$bmp->betriebsmittelperson_id</td>\n";
-		$htmlstr .= "		<td><b>ausgegeben am </b></td><td><input type='text' name='bmpausgegebenam' value='".$datum_obj->formatDatum($bmp->ausgegebenam,'d.m.Y')."' size='15' maxlength='64'></td>\n";
-		$htmlstr .= "		<td><b>retour am </b></td><td><input type='text' name='bmpretouram' value='".$datum_obj->formatDatum($bmp->retouram,'d.m.Y')."' size='15' maxlength='64'></td>\n";
-		$htmlstr .= "		<td><b>Kaution </b></td><td><input type='text' name='bmpkaution' value='".$bmp->kaution."' size='15' maxlength='64'></td>\n";
+		$htmlstr .= '		<td><b>BMP-ID </b></td><td><input type="hidden" name="betriebsmittelperson_id" value="'.$db->convert_html_chars($bmp->betriebsmittelperson_id).'">'.$db->convert_html_chars($bmp->betriebsmittelperson_id)."</td>\n";
+		$htmlstr .= '		<td><b>ausgegeben am </b></td><td><input type="text" name="bmpausgegebenam" value="'.$datum_obj->formatDatum($bmp->ausgegebenam,'d.m.Y').'" size="10" maxlength="10"></td>'."\n";
+		$htmlstr .= '		<td><b>retour am </b></td><td><input type="text" name="bmpretouram" value="'.$datum_obj->formatDatum($bmp->retouram,'d.m.Y').'" size="10" maxlength="10"></td>'."\n";
+		$htmlstr .= "	</tr>\n";
+		$htmlstr .= "	<tr>\n";
+		$htmlstr .= '		<td><b>Kaution </b></td><td><input type="text" name="bmpkaution" value="'.$db->convert_html_chars($bmp->kaution).'" size="3" maxlength="6"></td>'."\n";
+		$htmlstr .= '		<td><b>UID </b></td><td><input type="text" name="bmpuid" value="'.$db->convert_html_chars($bmp->uid).'" size="10" maxlength="32"></td>'."\n";
 		$htmlstr .= "	</tr><tr>";
-		$htmlstr .= "		<td><b>Anmerkung </b></td><td colspan='8'><input type='text' name='bmpanmerkung' value='".$bmp->anmerkung."' size='64' maxlength='64'></td>\n";
+		$htmlstr .= '		<td><b>Anmerkung </b></td><td colspan="8"><input type="text" name="bmpanmerkung" value="'.$db->convert_html_chars($bmp->anmerkung).'" size="64" maxlength="64"></td>'."\n";
 		$htmlstr .= "	</tr><tr>";
-		$htmlstr .= "		<td><b>insertamum </b></td><td>".$datum_obj->formatDatum($bmp->insertamum,'d.m.Y H:i')."&nbsp;</td>\n";
-		$htmlstr .= "		<td><b>insertvon </b></td><td>".$bmp->insertvon."</td>\n";
-		$htmlstr .= "		<td><b>updateamum </b></td><td>".$datum_obj->formatDatum($bmp->updateamum,'d.m.Y H:i')."&nbsp;</td>\n";
-		$htmlstr .= "		<td><b>updatevon </b></td><td>".$bmp->updatevon."</td>\n";
+		$htmlstr .= "		<td><b>Anlage </b></td>";
+		$htmlstr .= '		<td colspan="2">'.$datum_obj->formatDatum($bmp->insertamum,'d.m.Y H:i')."&nbsp; (".$db->convert_html_chars($bmp->insertvon).")</td>\n";
+		$htmlstr .= "		<td><b>Letzte Änderung </b></td>";
+		$htmlstr .= "		<td>".$datum_obj->formatDatum($bmp->updateamum,'d.m.Y H:i')."&nbsp; (".$db->convert_html_chars($bmp->updatevon).")</td>\n";
 		$htmlstr .= "	</tr><tr>";
 		$htmlstr .= "		<td><input type='submit' name='schick' value='speichern'></td>";
 		$htmlstr .= "		<td><input type='submit' name='del' value='l&ouml;schen' onclick='return confdel()'></td>";
@@ -166,14 +173,12 @@
 		$htmlstr .= "</table>\n";
 		$htmlstr .= "</form>\n";
 	}
-	$htmlstr .= "<div class='inserterror'>".$errorstr."</div>\n";
-?>
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <head>
 <title>Betriebsmitel-Details</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <script type="text/javascript">
 
@@ -184,11 +189,11 @@ function confdel()
 
 </script>
 </head>
-<body style="background-color:#eeeeee;">
+<body>
 <h2>Betriebsmittel - Details</h2>
 <?php
 	echo $htmlstr;
-	echo $reloadstr;
+	echo $errorstr;
 ?>
 
 </body>
