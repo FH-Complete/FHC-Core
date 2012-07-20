@@ -164,7 +164,7 @@ class benutzergruppe extends basis_db
 		if($new)
 		{		
 			$qry = 'INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, studiensemester_kurzbz)
-			        VALUES('.$this->$this->db_add_param($this->uid).','.
+			        VALUES('.$this->db_add_param($this->uid).','.
 					$this->db_add_param($this->gruppe_kurzbz).','.
 					$this->db_add_param($this->updateamum).','.
 					$this->db_add_param($this->updatevon).','.
