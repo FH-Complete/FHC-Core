@@ -60,7 +60,7 @@ class erhalter extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_erhalter WHERE erhalter_kz='$erhalter_kz'";
+		$qry = "SELECT * FROM public.tbl_erhalter WHERE erhalter_kz=".$this->db_add_param($erhalter_kz);
 		
 		if($this->db_query($qry))
 		{
@@ -157,25 +157,25 @@ class erhalter extends basis_db
 		{
 			//Neuen Datensatz anlegen		
 			$qry = 'INSERT INTO public.tbl_erhalter (erhalter_kz, kurzbz, bezeichnung, dvr, logo, zvr) VALUES ('.
-				$this->addslashes($this->erhalter_kz).', '.
-				$this->addslashes($this->kurzbz).', '.
-				$this->addslashes($this->bezeichnung).', '.
-				$this->addslashes($this->dvr).', '.
-				$this->addslashes($this->logo).', '.
-				$this->addslashes($this->zvr).');';
+				$this->db_add_param($this->erhalter_kz).', '.
+				$this->db_add_param($this->kurzbz).', '.
+				$this->db_add_param($this->bezeichnung).', '.
+				$this->db_add_param($this->dvr).', '.
+				$this->db_add_param($this->logo).', '.
+				$this->db_add_param($this->zvr).');';
 		}
 		else 
 		{
 			//bestehenden Datensatz akualisieren
 			
 			$qry = 'UPDATE public.tbl_studiengang SET '. 
-				'erhalter_kz='.$this->addslashes($this->erhalter_kz).', '.
-				'kurzbz='.$this->addslashes($this->kurzbz).', '.
-				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
-				'dvr='.$this->addslashes($this->dvr).', '.
-				'logo='.$this->addslashes($this->logo).', '.
-				'zvr='.$this->addslashes($this->zvr).' '.
-				'WHERE erhalter_kz='.$this->addslashes($this->erhalter_kz).';';
+				'erhalter_kz='.$this->db_add_param($this->erhalter_kz).', '.
+				'kurzbz='.$this->db_add_param($this->kurzbz).', '.
+				'bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
+				'dvr='.$this->db_add_param($this->dvr).', '.
+				'logo='.$this->db_add_param($this->logo).', '.
+				'zvr='.$this->db_add_param($this->zvr).' '.
+				'WHERE erhalter_kz='.$this->db_add_param($this->erhalter_kz).';';
 		}
 
 		if($this->db_query($qry))
