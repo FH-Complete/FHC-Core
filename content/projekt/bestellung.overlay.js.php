@@ -24,7 +24,7 @@ require_once('../../config/vilesci.config.inc.php');
 ?>
 // *********** Globale Variablen *****************//
 
-var DokumentSelectID=null; //ID des Dokuments das nach dem Refresh markiert werden soll
+var BestellungSelectID=null; //ID des Dokuments das nach dem Refresh markiert werden soll
 // ********** Observer und Listener ************* //
 
 // ****
@@ -32,7 +32,7 @@ var DokumentSelectID=null; //ID des Dokuments das nach dem Refresh markiert werd
 // * startet Rebuild nachdem das Refresh
 // * der datasource fertig ist
 // ****
-var DokumentTreeSinkObserver =
+var BestellungTreeSinkObserver =
 {
 	onBeginLoad : function(pSink) {},
 	onInterrupt : function(pSink) {},
@@ -49,7 +49,7 @@ var DokumentTreeSinkObserver =
 // * Nach dem Rebuild wird das Dokument wieder
 // * markiert
 // ****
-var DokumentTreeListener =
+var BestellungTreeListener =
 {
 	willRebuild : function(builder)
 	{
@@ -59,7 +59,7 @@ var DokumentTreeListener =
   		//timeout nur bei Mozilla notwendig da sonst die rows
 		//noch keine values haben. Ab Seamonkey funktionierts auch
 		//ohne dem setTimeout
-	    window.setTimeout(DokumentTreeSelectDokument,10);
+	    window.setTimeout(BestellungTreeSelectBestellung,10);
 		// Progressmeter stoppen
 		//document.getElementById('statusbar-progressmeter').setAttribute('mode','determined');
 	}
@@ -68,39 +68,39 @@ var DokumentTreeListener =
 // ****************** FUNKTIONEN ************************** //
 
 // ****
-// * Asynchroner (Nicht blockierender) Refresh des Dokument Trees
+// * Asynchroner (Nicht blockierender) Refresh des Bestellung Trees
 // ****
 function BestellungTreeRefresh()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
-	//markiertes Dokument global speichern damit es nach dem
+	//markierte Bestellung global speichern damit es nach dem
 	//refresh wieder markiert werden kann.
 	var tree = document.getElementById('tree-bestellung');
 		
 	try
 	{
-		DokumentSelectID = getTreeCellText(tree, "treecol-bestellung-bestell_nr", tree.currentIndex);
+		BestellungSelectID = getTreeCellText(tree, "treecol-bestellung-bestell_nr", tree.currentIndex);
 	}
 	catch(e)
 	{
-		DokumentSelectID=null;
+		BestellungSelectID=null;
 	}
 
-	datasourceTreeDokument.Refresh(false); //non blocking
+	datasourceTreeBestellung.Refresh(false); //non blocking
 }
 
 // ****
-// * Selectiert das Dokument nachdem der Tree
+// * Selectiert die Bestellung nachdem der Tree
 // * rebuildet wurde.
 // ****
-function DokumentTreeSelectDokument()
+function BestellungTreeSelectBestellung()
 {
 	var tree=document.getElementById('tree-bestellung');
 	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
 
 	//In der globalen Variable ist die zu selektierende ID gespeichert
-	if(DokumentSelectID!=null)
+	if(BestellungSelectID!=null)
 	{
 	   	for(var i=0;i<items;i++)
 	   	{
@@ -108,7 +108,7 @@ function DokumentTreeSelectDokument()
 	   		id = getTreeCellText(tree, "treecol-bestellung-bestell_nr", i);
 			
 			//wenn dies die zu selektierende Zeile
-			if(DokumentSelectID==id)
+			if(BestellungSelectID==id)
 			{
 				//Zeile markieren
 				tree.view.selection.select(i);

@@ -24,6 +24,7 @@ var datasourceTreeProjekt;
 var datasourceTreeProjektphase;
 var datasourceTreeProjekttask;
 var datasourceTreeDokument;
+var datasourceTreeBestellung;
 var global_filter = '';
 
 function treeProjektmenueSelect()
@@ -192,40 +193,40 @@ function treeProjektmenueSelect()
 	
 	
 	
-// Bestellung laden
+	// Bestellung laden
 	if(projekt_phase_id=='' && projekt_kurzbz!='')
 	{
 		try
 		{
 	        url = "<?php echo APP_ROOT; ?>rdf/bestellung.rdf.php?projektKurzbz="+projekt_kurzbz+"&"+gettimestamp();
-	        var treeDokument=document.getElementById('tree-bestellung');
+	        var treeBestellung=document.getElementById('tree-bestellung');
 	
 	        //Alte DS entfernen
-			var oldDatasources = treeDokument.database.GetDataSources();
+			var oldDatasources = treeBestellung.database.GetDataSources();
 			while(oldDatasources.hasMoreElements())
 	        {
-	        	treeDokument.database.RemoveDataSource(oldDatasources.getNext());
+	        	treeBestellung.database.RemoveDataSource(oldDatasources.getNext());
 			}
 	
 			try
 			{
-				datasourceTreeDokument.removeXMLSinkObserver(DokumentTreeSinkObserver);
-				treeDokument.builder.removeListener(DokumentTreeListener);
+				datasourceTreeBestellung.removeXMLSinkObserver(BestellungTreeSinkObserver);
+				treeBestellung.builder.removeListener(BestellungTreeListener);
 			}
 	        catch(e)
 	        {}
 	                
 	        var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-	        datasourceTreeDokument = rdfService.GetDataSource(url);
-	        datasourceTreeDokument.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-	        datasourceTreeDokument.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-	        treeDokument.database.AddDataSource(datasourceTreeDokument);
-	        datasourceTreeDokument.addXMLSinkObserver(DokumentTreeSinkObserver);
-	        treeDokument.builder.addListener(DokumentTreeListener);
+	        datasourceTreeBestellung = rdfService.GetDataSource(url);
+	        datasourceTreeBestellung.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	        datasourceTreeBestellung.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	        treeBestellung.database.AddDataSource(datasourceTreeBestellung);
+	        datasourceTreeBestellung.addXMLSinkObserver(BestellungTreeSinkObserver);
+	        treeBestellung.builder.addListener(BestellungTreeListener);
 		}
 		catch(e)
 		{
-			debug("whoops Documents load failed with exception: "+e);
+			debug("whoops bestellung load failed with exception: "+e);
 		}
 	}
 
