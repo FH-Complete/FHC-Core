@@ -80,7 +80,7 @@ class fachbereich extends basis_db
 			$fachb_obj->farbe = $row->farbe;
 			$fachb_obj->studiengang_kz = $row->studiengang_kz;
 			$fachb_obj->ext_id = $row->ext_id;
-			$fachb_obj->aktiv = ($row->aktiv=='t'?true:false);
+			$fachb_obj->aktiv = $this->db_parse_bool($row->aktiv);
 			$fachb_obj->oe_kurzbz = $row->oe_kurzbz;
 
 			$this->result[] = $fachb_obj;
@@ -124,7 +124,7 @@ class fachbereich extends basis_db
 			$fachb_obj->farbe = $row->farbe;
 			$fachb_obj->studiengang_kz = $row->studiengang_kz;
 			$fachb_obj->ext_id = $row->ext_id;
-			$fachb_obj->aktiv = ($row->aktiv=='t'?true:false);
+			$fachb_obj->aktiv = $this->db_parse_bool($row->aktiv);
 			$fachb_obj->oe_kurzbz = $row->oe_kurzbz;
 
 			$this->result[] = $fachb_obj;
@@ -146,7 +146,7 @@ class fachbereich extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM public.tbl_fachbereich WHERE fachbereich_kurzbz = '".addslashes($fachbereich_kurzbz)."';";
+		$qry = "SELECT * FROM public.tbl_fachbereich WHERE fachbereich_kurzbz = ".$this->db_add_param($fachbereich_kurzbz).";";
 
 		if(!$this->db_query($qry))
 		{
@@ -161,7 +161,7 @@ class fachbereich extends basis_db
 			$this->farbe = $row->farbe;
 			$this->studiengang_kz = $row->studiengang_kz;
 			$this->ext_id = $row->ext_id;
-			$this->aktiv = ($row->aktiv=='t'?true:false);
+			$this->aktiv = $this->db_parse_bool($row->aktiv);
 			$this->oe_kurzbz = $row->oe_kurzbz;
 		}
 		else
@@ -214,25 +214,25 @@ class fachbereich extends basis_db
 			//Neuen Datensatz anlegen
 			$qry = 'INSERT INTO public.tbl_fachbereich (fachbereich_kurzbz, bezeichnung, farbe, aktiv, 
 					ext_id, studiengang_kz) VALUES ('.
-				$this->addslashes($this->fachbereich_kurzbz).', '.
-				$this->addslashes($this->bezeichnung).', '.
-				$this->addslashes($this->farbe).', '.
-				($this->aktiv?'true':'false').', '.
-				$this->addslashes($this->ext_id).', '.
-				$this->addslashes($this->studiengang_kz).');';
+				$this->db_add_param($this->fachbereich_kurzbz).', '.
+				$this->db_add_param($this->bezeichnung).', '.
+				$this->db_add_param($this->farbe).', '.
+				$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
+				$this->db_add_param($this->ext_id).', '.
+				$this->db_add_param($this->studiengang_kz).');';
 		}
 		else
 		{
 			//bestehenden Datensatz akualisieren
 			
 			$qry = 'UPDATE public.tbl_fachbereich SET '.
-				'fachbereich_kurzbz='.$this->addslashes($this->fachbereich_kurzbz).', '.
-				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
-				'farbe='.$this->addslashes($this->farbe).', '.
-				'aktiv='.($this->aktiv?'true':'false').', '.
-				'ext_id='.$this->addslashes($this->ext_id).', '.
-				'studiengang_kz='.$this->addslashes($this->studiengang_kz).' '.
-				'WHERE fachbereich_kurzbz = '.$this->addslashes($this->fachbereich_kurzbz).';';
+				'fachbereich_kurzbz='.$this->db_add_param($this->fachbereich_kurzbz).', '.
+				'bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
+				'farbe='.$this->db_add_param($this->farbe).', '.
+				'aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
+				'ext_id='.$this->db_add_param($this->ext_id).', '.
+				'studiengang_kz='.$this->db_add_param($this->studiengang_kz).' '.
+				'WHERE fachbereich_kurzbz = '.$this->db_add_param($this->fachbereich_kurzbz).';';
 		}
 
 		if($this->db_query($qry))
