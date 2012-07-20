@@ -796,7 +796,7 @@ class firma extends basis_db
 				'updateamum= now(), '.
 		     	'updatevon='.$this->db_add_param($this->updatevon).', '.
 		     	'ext_id='.$this->db_add_param($this->ext_id).' '.
-				'WHERE firma_organisationseinheit_id='.$this->db_add_param($this->firma_organisationseinheit_id).';';
+				'WHERE firma_organisationseinheit_id='.$this->db_add_param($this->firma_organisationseinheit_id, FHC_INTEGER).';';
 		}
 		if($this->db_query($qry))
 		{
