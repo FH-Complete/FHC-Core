@@ -48,6 +48,7 @@ if(!$rechte->isBerechtigt('mitarbeiter/stammdaten') && !$rechte->isBerechtigt('s
 
 $uid = isset($_REQUEST['data'])?$_REQUEST['data']:'';
 $type = isset($_REQUEST['type'])?$_REQUEST['type']:'normal';
+$output = isset($_REQUEST['output'])?$_REQUEST['output']:'pdf';
 if($uid=='')
 	die('Parameter data is missing');
 $uid_arr = explode(';',$uid);
@@ -190,12 +191,26 @@ if(copy($zipfile, $tempname_zip))
 	// content.xml ins ZIP-File hinzufuegen
 	exec("zip $tempname_zip content.xml");
 	
+	if($output=='pdf')
+	{
+		exec("unoconv --stdout -f pdf $tempname_zip > out.pdf");
+		$tempname_zip='out.pdf';
+	}
+	
 	//Ausgeben des Dokuments
 	clearstatcache(); 
     $fsize = filesize($tempname_zip);
     $handle = fopen($tempname_zip,'r');
-    header('Content-type: '.$vorlage->mimetype);
-	header('Content-Disposition: attachment; filename="'.$vorlage->vorlage_kurzbz.'.odt"');
+    if($output=='pdf')
+    {
+    	header('Content-type: application/pdf');
+		header('Content-Disposition: attachment; filename="'.$vorlage->vorlage_kurzbz.'.pdf"');
+    }
+    else
+    {
+	    header('Content-type: '.$vorlage->mimetype);
+		header('Content-Disposition: attachment; filename="'.$vorlage->vorlage_kurzbz.'.odt"');
+    }
     header('Content-Length: '.$fsize); 
     while (!feof($handle)) 
     {
