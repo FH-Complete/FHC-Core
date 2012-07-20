@@ -288,7 +288,7 @@ class benutzer extends person
 		
 		foreach($searchItems as $value)
 		{
-			$qry.=" OR lower(uid) = lower('".addslashes($value)."')"; 
+			$qry.=" OR lower(uid) = lower(".$this->db_add_param($value).")"; 
 		}
 		$qry.=")) a ORDER BY nachname, vorname";
 		
