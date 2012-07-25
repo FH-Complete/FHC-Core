@@ -459,7 +459,7 @@ class ampel extends basis_db
 							LEFT JOIN public.tbl_benutzerfunktion USING(uid)
 							LEFT JOIN public.tbl_ampel_benutzer_bestaetigt on(public.tbl_ampel_benutzer_bestaetigt.uid=a.uid AND ampel_id=".$this->db_add_param($row->ampel_id, FHC_INTEGER).")
 						WHERE
-							(tbl_ampel_benutzer_bestaetigt.ampel_id is null OR tbl_ampel_benutzer_bestaetigt.ampel_id=".$db->db_add_param($row->ampel_id).")
+							(tbl_ampel_benutzer_bestaetigt.ampel_id is null OR tbl_ampel_benutzer_bestaetigt.ampel_id=".$this->db_add_param($row->ampel_id).")
 							AND
 							(
 								(funktion_kurzbz='oezuordnung' AND oe_kurzbz in(".$this->implode4SQL($oe_arr)."))
