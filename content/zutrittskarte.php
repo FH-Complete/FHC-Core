@@ -111,7 +111,7 @@ if(copy($zipfile, $tempname_zip))
 					<titelpre>".$bn->titelpre."</titelpre>
 					<titelpost>".$bn->titelpost."</titelpost>
 					<personalnummer>".$ma->personalnummer."</personalnummer>
-					<ausstellungsdatum>".date('d/m/Y')."</ausstellungsdatum>
+					<ausstellungsdatum>".date('d.m.Y')."</ausstellungsdatum>
 				</mitarbeiter>";
 			}
 			else
@@ -152,9 +152,9 @@ if(copy($zipfile, $tempname_zip))
 						<nachname>".$bn->nachname."</nachname>
 						<titelpre>".$bn->titelpre."</titelpre>
 						<titelpost>".$bn->titelpost."</titelpost>
-						<gebdatum>".$datum_obj->formatDatum($bn->gebdatum,'d/m/Y')."</gebdatum>
+						<gebdatum>".$datum_obj->formatDatum($bn->gebdatum,'d.m.Y')."</gebdatum>
 						<matrikelnummer>".$student->matrikelnr."</matrikelnummer>
-						<gueltigbis>".$datum_obj->formatDatum($gueltigbis,'d/m/Y')."</gueltigbis>
+						<gueltigbis>".$datum_obj->formatDatum($gueltigbis,'d.m.Y')."</gueltigbis>
 					</student>";
 				}
 			}

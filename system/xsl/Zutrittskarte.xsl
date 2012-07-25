@@ -85,28 +85,28 @@ xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:off
   		<draw:frame draw:style-name="fr1" draw:name="Grafik_{$uid}" text:anchor-type="char" svg:x="0.55cm" svg:y="2.3cm" svg:width="2cm" svg:height="2.6cm" draw:z-index="{$idx}5">
           <draw:image xlink:href="Pictures/{$uid}.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
         </draw:frame>
-         <draw:frame text:anchor-type="paragraph" draw:z-index="{$idx}0" draw:style-name="gr1" draw:text-style-name="P7" svg:width="5cm" svg:height="0.3cm" svg:x="2.94cm" svg:y="2.4cm">
+         <draw:frame text:anchor-type="paragraph" draw:z-index="{$idx}0" draw:style-name="gr1" draw:text-style-name="P7" svg:width="5cm" svg:height="0.3cm" svg:x="2.94cm" svg:y="2.95cm">
           <draw:text-box>
             <text:p text:style-name="P7">
               <text:span text:style-name="T1"><xsl:value-of select="titelpre"/></text:span>
             </text:p>
           </draw:text-box>
         </draw:frame>
-         <draw:frame text:anchor-type="paragraph" draw:z-index="{$idx}1" draw:style-name="gr1" draw:text-style-name="P7" svg:width="5cm" svg:height="0.3cm" svg:x="2.94cm" svg:y="2.93cm">
+         <draw:frame text:anchor-type="paragraph" draw:z-index="{$idx}1" draw:style-name="gr1" draw:text-style-name="P7" svg:width="5cm" svg:height="0.3cm" svg:x="2.94cm" svg:y="3.35cm">
           <draw:text-box>
             <text:p text:style-name="P7">
               <text:span text:style-name="T1"><xsl:value-of select="vorname"/></text:span>
             </text:p>
           </draw:text-box>
         </draw:frame>
-        <draw:frame text:anchor-type="paragraph" draw:z-index="{$idx}2" draw:style-name="gr1" draw:text-style-name="P7" svg:width="5cm" svg:height="0.3cm" svg:x="2.94cm" svg:y="3.46cm">
+        <draw:frame text:anchor-type="paragraph" draw:z-index="{$idx}2" draw:style-name="gr1" draw:text-style-name="P7" svg:width="5cm" svg:height="0.3cm" svg:x="2.94cm" svg:y="3.75cm">
           <draw:text-box>
             <text:p text:style-name="P7">
-              <text:span text:style-name="T1"><xsl:value-of select="nachname"/><xsl:text> </xsl:text><xsl:value-of select="titelpost"/></text:span>
+              <text:span text:style-name="T1"><xsl:value-of select="nachname"/><xsl:if test="string-length(titelpost) &gt; 0"><xsl:text>, </xsl:text><xsl:value-of select="titelpost"/></xsl:if></text:span>
             </text:p>
           </draw:text-box>
         </draw:frame>
-        <draw:frame text:anchor-type="paragraph" draw:z-index="{$idx}3" draw:style-name="gr1" draw:text-style-name="P7" svg:width="5cm" svg:height="0.3cm" svg:x="2.94cm" svg:y="3.99cm">
+        <draw:frame text:anchor-type="paragraph" draw:z-index="{$idx}3" draw:style-name="gr1" draw:text-style-name="P7" svg:width="5cm" svg:height="0.3cm" svg:x="2.94cm" svg:y="4.15cm">
           <draw:text-box>
             <text:p text:style-name="P7">
               <text:span text:style-name="T1">Pers.-Nr. <xsl:value-of select="personalnummer"/></text:span>
@@ -156,7 +156,7 @@ xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:off
         <draw:frame text:anchor-type="paragraph" draw:z-index="{$idx}2" draw:style-name="gr1" draw:text-style-name="P7" svg:width="5.806cm" svg:height="0.3cm" svg:x="2.7cm" svg:y="3.05cm">
           <draw:text-box>
             <text:p text:style-name="P7">
-              <text:span text:style-name="T1"><xsl:value-of select="nachname"/><xsl:text> </xsl:text><xsl:value-of select="titelpost"/></text:span>
+              <text:span text:style-name="T1"><xsl:value-of select="nachname"/><xsl:if test="string-length(titelpost) &gt; 0"><xsl:text>, </xsl:text><xsl:value-of select="titelpost"/></xsl:if></text:span>
             </text:p>
           </draw:text-box>
         </draw:frame>
@@ -172,7 +172,7 @@ xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:off
 		<draw:frame text:anchor-type="paragraph" draw:z-index="{$idx}4" draw:style-name="gr1" draw:text-style-name="P7" svg:width="5.79cm" svg:height="0.3cm" svg:x="2.7cm" svg:y="3.85cm">
           <draw:text-box>
             <text:p text:style-name="P7">
-              <text:span text:style-name="T1"><xsl:value-of select="matrikelnummer"/></text:span>
+              <text:span text:style-name="T1">Matr.-Nr.<xsl:value-of select="matrikelnummer"/></text:span>
             </text:p>
           </draw:text-box>
         </draw:frame>
