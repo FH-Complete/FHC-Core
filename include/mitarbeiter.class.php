@@ -1059,9 +1059,11 @@ class mitarbeiter extends benutzer
                     vorname,nachname,gebdatum,uid,personalnummer,person_id 
                 FROM 
                     campus.vw_mitarbeiter 
-                WHERE 
-                    UPPER(SUBSTRING(nachname,1,1))=".$this->db_add_param($filter,FHC_STRING)." 
-                    AND aktiv='true'";
+                WHERE
+                	aktiv='true'";
+        if($filter!='') 
+			$qry.=" AND UPPER(SUBSTRING(nachname,1,1))=".$this->db_add_param($filter,FHC_STRING); 
+                    
         if($fixangestellt)
             $qry.=" AND fixangestellt";
         else

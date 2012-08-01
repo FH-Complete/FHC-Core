@@ -86,7 +86,10 @@ echo '<body>
         <table border="0">
             <tr>
                 <td>Studiengang:</td>
-                <td><select name="select_studiengang">';
+                <td><select name="select_studiengang">
+                <option value="incoming">Incoming</option>
+                ';
+				
                 foreach($studiengang->result as $stud)
                 {
                     if($stud->studiengang_kz < '10000')
@@ -107,7 +110,8 @@ echo'           </select>
                 {
                     echo '<option value="'.$foto->fotostatus_kurzbz.'" '.($statusStudent==$foto->fotostatus_kurzbz?'selected':'').'>'.ucfirst($foto->fotostatus_kurzbz).'</option>';
                 }
-echo'           <option value="nichtGedruckt" '.($statusStudent=='nichtGedruckt'?'selected':'').'>Akzeptiert und nicht gedruckt</option>
+echo'           <option value="nichtGedrucktAkzept" '.($statusStudent=='nichtGedrucktAkzept'?'selected':'').'>Akzeptiert und nicht gedruckt</option>
+				<option value="nichtGedruckt" '.($statusStudent=='nichtGedruckt'?'selected':'').'>nicht gedruckt</option>
                 <option value="gedrucktNichtAusgegeben" '.($statusStudent=='gedrucktNichtAusgegeben'?'selected':'').'>Gedruckt nicht ausgegeben</option>
                 </select></td>
                 <td><input name="btn_submitStudent" type="submit" value="Anzeigen"></td>
@@ -124,11 +128,12 @@ echo'           <option value="nichtGedruckt" '.($statusStudent=='nichtGedruckt'
                 <tr>
                     <td>Typ:</td>
                     <td><select name="select_typ_mitarbeiter">
-                    <option value="intern" '.($typMitarbeiter=='intern'?'selected':'').'>Intern</option>
-                    <option value="extern" '.($typMitarbeiter=='extern'?'selected':'').'>Extern</option>
+                    <option value="intern" '.($typMitarbeiter=='intern'?'selected':'').'>Fixangestellte</option>
+                    <option value="extern" '.($typMitarbeiter=='extern'?'selected':'').'>Externe mit Lehrauftrag in letzten 3 Sem.</option>
                     </select>
                     <td>Anfangsbuchstabe:</td>
-                    <td><select name="select_buchstabe">';
+                    <td><select name="select_buchstabe">
+                    <option value="">*</option>';
                     foreach($buchstabenArray as $b)
                     {
                             echo '<option value="'.$b.'" '.($b==$buchstabe?'selected':'').'>'.$b.'</option>';
@@ -159,7 +164,10 @@ if(isset($_REQUEST['btn_submitStudent']))
     
     $studenten = new student(); 
 
-    $studenten->getStudentsStudiengang($studiengang_kz, $semester);
+    if($studiengang_kz=='incoming')
+    	$studenten->getIncoming();
+    else
+    	$studenten->getStudentsStudiengang($studiengang_kz, $semester);
     $studentenArray = $studenten->result; 
     
    // $studentenArray = $studenten->getStudents($studiengang_kz,$semester,null,null,null,'WS2011');
@@ -182,7 +190,7 @@ if(isset($_REQUEST['btn_submitStudent']))
         // Wenn letzter Status nich Student ist -> nicht anzeigen
         $prestudent = new prestudent(); 
         $prestudent->getLastStatus($stud->prestudent_id);
-        if($prestudent->status_kurzbz == 'Student')
+        if($prestudent->status_kurzbz == 'Student' || ($studiengang_kz=='incoming' && $prestudent->status_kurzbz='Incoming'))
         {
             if($statusStudent=='gedrucktNichtAusgegeben')
             {
@@ -198,7 +206,7 @@ if(isset($_REQUEST['btn_submitStudent']))
                     $uids.=';'.$stud->uid;     
                 }
             }
-            else if($statusStudent == 'nichtGedruckt')
+            else if($statusStudent == 'nichtGedrucktAkzept')
             {
                 // akzeptiert und nicht gedruckt
                 $fotostatus = new fotostatus();
@@ -209,6 +217,20 @@ if(isset($_REQUEST['btn_submitStudent']))
                 if($fotostatus->fotostatus_kurzbz == 'akzeptiert' && $betriebsmittel->zutrittskartePrinted($stud->uid) == false)
                 {
                     echo '<tr><td>'.$stud->nachname.' '.$stud->vorname.'</td><td>'.$stud->gebdatum.'</td><td>'.$stud->matrikelnr.'</td><td>'.$stud->uid.'</td><td>'.$stud->person_id.'<input type="hidden" name="users[]" value="'.$stud->uid.'"></td></tr>';
+                    $uids.=';'.$stud->uid;     
+                }
+            }
+       		else if($statusStudent == 'nichtGedruckt')
+            {
+                // akzeptiert und nicht gedruckt
+                $fotostatus = new fotostatus();
+                $fotostatus->getLastFotoStatus($stud->person_id); 
+                $betriebsmittel = new betriebsmittel(); 
+
+                // noch nicht gedruckt
+                if($betriebsmittel->zutrittskartePrinted($stud->uid) == false)
+                {
+                    echo '<tr><td>'.$stud->nachname.' '.$stud->vorname.' ('.$fotostatus->fotostatus_kurzbz.')</td><td>'.$stud->gebdatum.'</td><td>'.$stud->matrikelnr.'</td><td>'.$stud->uid.'</td><td>'.$stud->person_id.'<input type="hidden" name="users[]" value="'.$stud->uid.'"></td></tr>';
                     $uids.=';'.$stud->uid;     
                 }
             }
@@ -317,7 +339,7 @@ if(isset($_REQUEST['btn_submitMitarbeiter']))
         </table>
         <table>
             <tr>
-                <td><input type="submit" value="Karten zuteilen" name="btn_kartezuteilenMitarbeiter"><input type="button" value="Karten drucken" onclick=\'window.open("../../content/zutrittskarte.php?data='.$uids.'");\'></td>
+                <td><input type="submit" value="Karten zuteilen" name="btn_kartezuteilenMitarbeiter">&nbsp;<input type="button" value="Karten drucken" onclick=\'window.open("../../content/zutrittskarte.php?data='.$uids.'");\'></td>
             </tr>
         </table>
         </form>
