@@ -42,8 +42,10 @@ class MySabre_DAVACL_PrincipalBackend implements Sabre_DAVACL_IPrincipalBackend
 	{
 		$this->auth = $auth;
 
+		/*
 		$ma = new mitarbeiter();
 		$this->result_ma = $ma->getMitarbeiter(null,null,null);
+		*/
     } 
 
 	/**
@@ -191,6 +193,7 @@ class MySabre_DAVACL_PrincipalBackend implements Sabre_DAVACL_IPrincipalBackend
 			$user = mb_substr($principal,11);
 			//$ma = new mitarbeiter();
 			//$result_ma = $ma->getMitarbeiter(null,null,null);
+			/*
 			$i=0;
 			foreach($this->result_ma as $row)
 			{
@@ -202,6 +205,8 @@ class MySabre_DAVACL_PrincipalBackend implements Sabre_DAVACL_IPrincipalBackend
 
 				$result[]='principals/'.$row->uid.'/calendar-proxy-read';
 			}
+			*/
+			//$result[]='principals/nimm/calendar-proxy-read';
 		}
         return $result;
 
