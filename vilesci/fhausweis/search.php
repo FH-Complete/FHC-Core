@@ -150,6 +150,7 @@ if($person_id!='')
 	foreach($benutzer->result as $row_account)
 	{
 		echo '<br><b>'.$row_account->uid.'</b>';
+		echo '&nbsp;-&nbsp;<a href="../../content/zutrittskarte.php?data='.$db->convert_html_chars($row_account->uid).'" target="_blank">FH Ausweis erstellen</a>';
 		echo '<br>';
 		$qry = "
 		SELECT 
