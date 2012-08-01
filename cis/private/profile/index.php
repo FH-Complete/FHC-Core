@@ -24,9 +24,7 @@ require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/globals.inc.php');
 require_once('../../../include/studiengang.class.php');
-require_once('../../../include/fckeditor/fckeditor.php');
 require_once('../../../include/person.class.php');
-require_once('../../../include/safehtml/safehtml.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/betriebsmittel.class.php');
 require_once('../../../include/betriebsmittelperson.class.php');
@@ -167,7 +165,7 @@ if(!$user->bnaktiv)
 echo '
 <table class="tabcontent">
 	<tr>
-  		<td colspan="2" class="MarkLine" width="60%" valign="top">
+  		<td colspan="2" class="MarkLine" width="60%" height="100" valign="top">
    		<table width="100%">
    			<tr>
    				<td>
@@ -232,7 +230,7 @@ echo '
 	</p>
     <br>
     </td>
-    <td rowspan="5" valign="top">';
+    <td rowspan="2" valign="top">';
       			
 echo '<P>';
 $studiengang = new studiengang();
@@ -416,7 +414,8 @@ if(!$ansicht)
 	echo '
        	</P>
     	</TD>
-  	</TR>';
+  	</TR>
+  	';
 	echo '
 			</table>
 			<BR>';
