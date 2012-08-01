@@ -1683,7 +1683,7 @@ if(!$error)
 					$dok = new dokument();
 					if($dok->load($dokument_kurzbz, $_POST['prestudent_id']))
 					{
-						if($dok->mitarbeiter_uid==$user)
+						if($dok->mitarbeiter_uid==$user || $rechte->isBerechtigt('student/dokumente',$_POST['studiengang_kz'], 'suid'))
 						{
 							if(!$dok->delete($dokument_kurzbz, $_POST['prestudent_id']))
 							{
