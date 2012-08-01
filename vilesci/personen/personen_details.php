@@ -465,12 +465,14 @@ echo "
 	<td valign='top'><textarea name='anmerkungen'>".$anmerkungen."</textarea></td>
 	<td></td>
 	<td><img id='personimage' src='../../content/bild.php?src=person&person_id=$person_id' height='100'></td>
-	<td>
+	<td colspan='2'>
 		<a href='#foo' onclick='window.open(\"../../content/bildupload.php?person_id=$person_id\",\"BildUpload\", \"height=50,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\"); return false;'>Bild hochladen</a>
 		<br><br>
 		<a href='#foo' onclick='RefreshImage(); return false;'>Bild aktualisieren</a>
 		<br><br>
 		<a href='".$_SERVER['PHP_SELF']."?person_id=$person_id&uid=$uid&deleteimage=true'>Bild entfernen</a>
+		<br><br>
+		<a href=\"../fhausweis/search.php?person_id=".$person_id."\">FH-Ausweis Status</a>
 	</td>
 </tr>
 <tr>
@@ -531,7 +533,7 @@ if(isset($uid) && $uid!='')
 	
 	
 	echo '<br><a href="../../content/pdfExport.php?xsl=AccountInfo&xml=accountinfoblatt.xml.php&uid='.$uid.'" >AccountInfoBlatt erstellen</a>';
-	echo '<br><a href="betriebsmittel_index.php?search='.$uid.'" >Betriebsmittel (Zutrittskarten) verwalten</a>';
+	echo '<br><a href="../stammdaten/betriebsmittel_frameset.php?searchstr='.$uid.'" >Betriebsmittel verwalten</a>';
 	
 
 	echo "</fieldset></td></tr>";
