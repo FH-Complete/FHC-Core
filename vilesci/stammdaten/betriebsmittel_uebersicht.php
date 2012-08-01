@@ -44,6 +44,10 @@ if(isset($_GET['searchstr']))
 	$searchstr = $_GET['searchstr'];
 else 
 	$searchstr = '';
+if(isset($_GET['typ']))
+	$typ=$_GET['typ'];
+else
+	$typ='Zutrittskarte';
 	
 $htmlstr.='
 <table width="100%">
@@ -51,7 +55,11 @@ $htmlstr.='
 <td>
 	<form accept-charset="UTF-8" name="search" method="GET">
 		Bitte Suchbegriff eingeben: 
-		<input type="text" name="searchstr" size="30" value="'.$searchstr.'">
+		<input type="text" name="searchstr" size="30" value="'.$db->convert_html_chars($searchstr).'">
+		<SELECT name="typ">
+			<option value="Zutrittskarte" '.($typ=='Zutrittskarte'?'selected':'').'>Zutrittskarte</option>
+			<option value="Schluessel" '.($typ=='Schluessel'?'selected':'').'>Schluessel</option>
+		</SELECT>
 		<input type="submit" value="Suchen">
 	</form>
 </td>
@@ -66,70 +74,130 @@ $htmlstr.='
 if(isset($_GET['searchstr']) || isset($_POST['bmsuche']))
 {
 	$bm_obj = new betriebsmittel();
+	$sql_query='';
 	if (isset($_POST['bmsuche']))
 	{
 		$bmsuche=strtoupper($_POST['bmsuche']);
 		$kartennummer = $bm_obj->transform_kartennummer($bmsuche);
 
-		$sql_query="SELECT * FROM public.vw_betriebsmittelperson
-					WHERE upper(nummer) LIKE '%".addslashes($kartennummer)."%' LIMIT 30";
+		$sql_query="SELECT 
+						distinct on(tbl_betriebsmittelperson.betriebsmittelperson_id)
+						tbl_betriebsmittel.*,
+						tbl_betriebsmittelperson.*,
+						tbl_person.vorname, tbl_person.nachname,
+						tbl_benutzer.uid, tbl_betriebsmittelperson.uid as bmpuid
+					FROM 
+						wawi.tbl_betriebsmittel 
+						JOIN wawi.tbl_betriebsmittelperson USING(betriebsmittel_id)
+						JOIN public.tbl_person USING(person_id)
+						LEFT JOIN public.tbl_benutzer USING(person_id)
+					WHERE 
+						(
+						upper(nummer) LIKE '%".$db->db_escape($kartennummer)."%'
+						OR 
+						upper(nummer2) LIKE '%".$db->db_escape($kartennummer)."%'
+						OR
+						upper(nummer) LIKE '%".$db->db_escape($bmsuche)."%'
+						OR 
+						upper(nummer2) LIKE '%".$db->db_escape($bmsuche)."%'
+						)						 
+						AND betriebsmitteltyp=".$db->db_add_param($typ)." LIMIT 30";
 		//echo $sql_query;
 	}
-	else
+	elseif(!empty($searchstr))
 	{
-		$sql_query = 'SELECT * FROM public.vw_betriebsmittelperson ';
-		if(!empty($searchstr))
-		{
+		
+		$sql_query = '
+			SELECT 
+				distinct on(tbl_betriebsmittelperson.betriebsmittelperson_id)
+				tbl_betriebsmittel.*,
+				tbl_betriebsmittelperson.*,
+				tbl_person.vorname, tbl_person.nachname,
+				tbl_benutzer.uid, tbl_betriebsmittelperson.uid as bmpuid
+			FROM 
+				wawi.tbl_betriebsmittel 
+				JOIN wawi.tbl_betriebsmittelperson USING(betriebsmittel_id)
+				JOIN public.tbl_person USING(person_id)
+				LEFT JOIN public.tbl_benutzer USING(person_id)
+			';
+		
+		//Wenn searchstring nur Hexwerte enthaelt, dann in kartennummer umwandeln
+		if(preg_match("/^[A-F0-9]+$/", $searchstr))
 			$kartennummer = $bm_obj->transform_kartennummer($searchstr);
-			$sql_query.=" where uid  ~* '".addslashes($searchstr)."'   OR nummer  ~* '".addslashes($searchstr)."' OR nummer  ~* '".addslashes($kartennummer)."' OR nachname  ~* '".addslashes($searchstr)."'  OR vorname  ~* '".addslashes($searchstr)."'  ";
-		}
-		$sql_query.="	ORDER BY nummer ";
-		if(empty($searchstr))
-			$sql_query.=" LIMIT 100 ";
+		else
+			$kartennummer='';
+		$sql_query.=" WHERE 
+					(tbl_benutzer.uid  ~* ".$db->db_add_param($searchstr)."   
+					OR nummer  = ".$db->db_add_param($searchstr)." 
+					OR nummer  = ".$db->db_add_param($kartennummer)." 
+					OR nachname  ~* ".$db->db_add_param($searchstr)." 
+					OR vorname  ~* ".$db->db_add_param($searchstr).") ";
+		
+		$sql_query.=" AND betriebsmitteltyp=".$db->db_add_param($typ);
 	}
-
-    if(!$erg=$db->db_query($sql_query))
+	//echo $sql_query;
+	if($sql_query!='')
 	{
-		$htmlstr='Fehler beim Laden der Berechtigungen';
-	}
-	else
-	{
-		$htmlstr .= "<table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>   <thead><tr class='liste'>\n";
-    	$htmlstr .= "       <th class='table-sortable:default'>Typ</th><th class='table-sortable:default'>Nummer</th>
-    						<th class='table-sortable:default'>Person (UID)</th>
-    						<th class='table-sortable:default'>Ausgabe</th><th class='table-sortable:alphanumeric'>Retour</th>";
-    	$htmlstr .= "   </tr></thead><tbody>\n";
-    	$i = 0;
-    	
-		while($row=$db->db_fetch_object($erg))
+	    if(!$erg=$db->db_query($sql_query))
 		{
-			$htmlstr .= "   <tr>\n";
-		    $htmlstr .= "       <td>".$row->betriebsmitteltyp."</td>\n";
-			$htmlstr .= '       <td>
-									<a href="betriebsmittel_details.php?betriebsmittel_id='.$row->betriebsmittel_id.'&betriebsmittelperson_id='.$row->betriebsmittelperson_id.'" 
-										target="betriebsmittel_details">'.$row->nummer."</a></td>\n";
-			$htmlstr .= "       <td>$row->nachname $row->vorname &nbsp; ( $row->uid )</td>\n";
-	    	$htmlstr .= "       <td>".$row->ausgegebenam."</td>\n";
-			$htmlstr .= "       <td>$row->retouram</td>\n";
-	    	$htmlstr .= "   </tr>\n";
-	    	$i++;
+			$htmlstr='Fehler beim Laden der Daten';
 		}
-	    $htmlstr .= "</tbody></table>\n";
+		else
+		{
+			$htmlstr .= "<table id='t1' class='tablesorter'><thead><tr>\n";
+	    	$htmlstr .= "       <th>Typ</th>
+	    						<th>Nummer</th>
+	    						<th>Nummer2</th>
+	    						<th>Person (UID)</th>
+	    						<th>Ausgabe</th>
+	    						<th>Retour</th>";
+	    	$htmlstr .= "   </tr></thead><tbody>\n";
+	    	$i = 0;
+	    	
+			while($row=$db->db_fetch_object($erg))
+			{
+				$htmlstr .= "   <tr>\n";
+			    $htmlstr .= "       <td>".$row->betriebsmitteltyp."</td>\n";
+				$htmlstr .= '       <td>
+										<a href="betriebsmittel_details.php?betriebsmittel_id='.$db->convert_html_chars($row->betriebsmittel_id).'&betriebsmittelperson_id='.$db->convert_html_chars($row->betriebsmittelperson_id).'" 
+											target="betriebsmittel_details">'.$db->convert_html_chars($row->nummer)."</a></td>\n";
+				$htmlstr .= '       <td>
+										<a href="betriebsmittel_details.php?betriebsmittel_id='.$db->convert_html_chars($row->betriebsmittel_id).'&betriebsmittelperson_id='.$db->convert_html_chars($row->betriebsmittelperson_id).'" 
+											target="betriebsmittel_details">'.$db->convert_html_chars($row->nummer2)."</a></td>\n";
+				$htmlstr .= "       <td>".$db->convert_html_chars($row->nachname.' '.$row->vorname)." &nbsp; ( ".$db->convert_html_chars($row->bmpuid)." )</td>\n";
+		    	$htmlstr .= "       <td>".$db->convert_html_chars($row->ausgegebenam)."</td>\n";
+				$htmlstr .= "       <td>".$db->convert_html_chars($row->retouram)."</td>\n";
+		    	$htmlstr .= "   </tr>\n";
+		    	$i++;
+			}
+		    $htmlstr .= "</tbody></table>\n";
+		}
 	}
-}	
+}
 ?>
 <html>
 <head>
-<title>Betriebsmittel-Uebersicht</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-<script type="text/javascript">
-<!--
-	document.getElementById('bmsuche').focus();
-//-->
-</script>
+	<title>Betriebsmittel - Uebersicht</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+	<link rel="stylesheet" href="../../skin/jquery.css" type="text/css"/>
+	<script type="text/javascript" src="../../include/js/jquery.js"></script>
+	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
+
+	<script type="text/javascript">
+	<!--
+		$(document).ready(function() 
+			{ 
+				$("#t1").tablesorter(
+				{
+					sortList: [[3,0]],
+					widgets: ["zebra"]
+				}); 
+			}); 
+			
+		document.getElementById('bmsuche').focus();
+	//-->
+	</script>
 </head>
 
 <body class="background_main">
