@@ -172,7 +172,7 @@ xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:off
 		<draw:frame text:anchor-type="paragraph" draw:z-index="{$idx}4" draw:style-name="gr1" draw:text-style-name="P7" svg:width="5.79cm" svg:height="0.3cm" svg:x="2.7cm" svg:y="3.85cm">
           <draw:text-box>
             <text:p text:style-name="P7">
-              <text:span text:style-name="T1">Matr.-Nr.<xsl:value-of select="matrikelnummer"/></text:span>
+              <text:span text:style-name="T1">Matr.-Nr. <xsl:value-of select="matrikelnummer"/></text:span>
             </text:p>
           </draw:text-box>
         </draw:frame>
