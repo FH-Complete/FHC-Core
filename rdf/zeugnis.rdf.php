@@ -137,7 +137,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				WHERE 
 				prestudent_id='".addslashes($row->prestudent_id)."' AND 
 				studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
-				status_kurzbz!='Incoming'
+				status_kurzbz not in('Incoming','Aufgenommener','Bewerber','Wartender', 'Interessent')
 				ORDER BY DATUM DESC LIMIT 1";
 		if($result_sem = $db->db_query($qry))
 		{
