@@ -75,8 +75,8 @@ $ss=new studiensemester();
 $ss->getNearestTillNext();
 $datum_begin=$ss->start;
 $datum_ende=$ss->ende;
-//$datum_begin='2008-01-07';
-$datum_ende='2012-08-04'; // $ss->ende
+//$datum_begin='2012-08-03';
+$datum_ende='2013-02-02'; // $ss->ende
 
 $stgwhere = '';
 $stgwheredev = '';
@@ -616,6 +616,44 @@ if ($sendmail)
 			echo 'Mail an '.$msg->mailadress.' konnte nicht verschickt werden!<BR>';
 			$message_sync.='Mail an '.$msg->mailadress.' konnte ***nicht*** verschickt werden!<BR>';
 		}
+	}
+}
+// Alle User bei denen sich der LVPlan veraendert hat
+// werden in ein File gesichert. Bei diesen Personen wird der LVPlan im Horde aktualisiert
+$users=array();
+foreach ($message as $uid=>$msg)
+{
+	$users[]=$uid;
+}
+// Zusaetzlich jene holen bei denen sich die Reservierungen geaendert haben
+$qry = "SELECT * FROM campus.tbl_reservierung WHERE insertamum>now()-'24 hours'::interval";
+if($result = $db->db_query($qry))
+{
+	while($row = $db->db_fetch_object($result))
+	{
+		$users[] = $row->uid;
+		//Wenn fuer eine Gruppe reserviert wurde, dann die Personen aus der Gruppe holen
+		if($row->semester!='' || $row->verband!='' || $row->gruppe!='' || $row->gruppe_kurzbz!='')
+		{
+			$studenten = getStudentsFromGroup($row->studiengang_kz, $row->semester, $row->verband, $row->gruppe, $row->gruppe_kurzbz, $ss->studiensemester_kurzbz);
+			$users = array_merge($users, $studenten);
+		}
+	}
+}
+// geaenderte User in Textfile schreiben
+$users = array_unique($users);
+if(count($users)>0)
+{
+	if($fp = fopen(DOC_ROOT.'../system/hordelvplansync/lvplanupdate.txt', 'w'))
+	{
+		foreach($users as $uid)
+		{
+			fwrite($fp, $uid."\n");
+		}
+		fclose($fp);
+
+		//Horde Syncro starten
+		//exec('php5 '.DOC_ROOT.'../system/hordelvplansync/synchordelvplan.php lvplanupdate.txt');
 	}
 }
 // Mail an Admin
