@@ -625,8 +625,17 @@ foreach ($message as $uid=>$msg)
 {
 	$users[]=$uid;
 }
-// Zusaetzlich jene holen bei denen sich die Reservierungen geaendert haben
-$qry = "SELECT * FROM campus.tbl_reservierung WHERE insertamum>now()-'24 hours'::interval";
+
+$uidfile = DOC_ROOT.'../system/hordelvplansync/lvplanupdate.txt';
+
+// Letzte Durchlaufzeit des Scripts holen
+// anhand der Aenderungszeit des Textfiles mit den UIDs
+if(!$lastmod = filemtime($uidfile))
+	$lastmod=time()-86400; // Wenn die Zeit nicht ermittelt werden kann, werden die letzten 24 Std genommen
+
+// Zusaetzlich jene holen, bei denen sich die Reservierungen geaendert haben
+$qry = "SELECT * FROM campus.tbl_reservierung WHERE insertamum>'".date('Y-m-d H:i:s',$lastmod)."'";
+
 if($result = $db->db_query($qry))
 {
 	while($row = $db->db_fetch_object($result))
@@ -644,7 +653,7 @@ if($result = $db->db_query($qry))
 $users = array_unique($users);
 if(count($users)>0)
 {
-	if($fp = fopen(DOC_ROOT.'../system/hordelvplansync/lvplanupdate.txt', 'w'))
+	if($fp = fopen($uidfile, 'w'))
 	{
 		foreach($users as $uid)
 		{
