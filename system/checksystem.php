@@ -3701,7 +3701,8 @@ if(!@$db->db_query("SELECT 1 FROM public.tbl_person_fotostatus LIMIT 1"))
 	
 	INSERT INTO public.tbl_fotostatus (fotostatus_kurzbz, beschreibung) VALUES('akzeptiert', 'Profilfoto wurde akzeptiert');
 	INSERT INTO public.tbl_fotostatus (fotostatus_kurzbz, beschreibung) VALUES('hochgeladen', 'Neues Profilfoto wurde hochgeladen');
-	INSERT INTO public.tbl_fotostatus (fotostatus_kurzbz, beschreibung) VALUES('abgewiesen', 'Profilfoto wurde abgewiesen');    			
+	INSERT INTO public.tbl_fotostatus (fotostatus_kurzbz, beschreibung) VALUES('abgewiesen', 'Profilfoto wurde abgewiesen');
+	CREATE INDEX idx_person_fotostatus_person ON public.tbl_person_fotostatus (person_id);    			
     	";
     
     if(!$db->db_query($qry))
