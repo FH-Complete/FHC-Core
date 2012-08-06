@@ -103,6 +103,48 @@ function preview()
 {
 	document.getElementById('vorschau').innerHTML = document.getElementById('text').value;
 }
+function previewvorschlag()
+{
+	document.getElementById('vorschauvorschlag').innerHTML = document.getElementById('text_vorschlag').value;
+}
+function insertfrage(aTag, eTag) 
+{
+	var input = document.forms['formular_frage'].elements['text'];
+	input.focus();
+    /* Einfügen des Formatierungscodes */
+    var start = input.selectionStart;
+    var end = input.selectionEnd;
+    var insText = input.value.substring(start, end);
+    input.value = input.value.substr(0, start) + aTag + insText + eTag + input.value.substr(end);
+    /* Anpassen der Cursorposition */
+    var pos;
+    if (insText.length == 0) {
+      pos = start + aTag.length;
+    } else {
+      pos = start + aTag.length + insText.length + eTag.length;
+    }
+    input.selectionStart = pos;
+    input.selectionEnd = pos;
+}
+function insertvorschlag(aTag, eTag) 
+{
+	var input = document.forms['formular_vorschlag'].elements['text_vorschlag'];
+	input.focus();
+    /* Einfügen des Formatierungscodes */
+    var start = input.selectionStart;
+    var end = input.selectionEnd;
+    var insText = input.value.substring(start, end);
+    input.value = input.value.substr(0, start) + aTag + insText + eTag + input.value.substr(end);
+    /* Anpassen der Cursorposition */
+    var pos;
+    if (insText.length == 0) {
+      pos = start + aTag.length;
+    } else {
+      pos = start + aTag.length + insText.length + eTag.length;
+    }
+    input.selectionStart = pos;
+    input.selectionEnd = pos;
+}
 </script>
 <style type="text/css">
 
@@ -613,14 +655,32 @@ if($frage_id!='')
 	echo '</td>';
 	//Zusaetzliche EingabeFelder anzeigen
 	echo "<td>";
-	echo "<form method='POST' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;frage_id=$frage_id'>";
+	echo "<form name='formular_frage' method='POST' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;frage_id=$frage_id'>";
 	echo "<table>";
 	//Bei Aenderungen im Textfeld werden diese sofort in der Vorschau angezeigt
 	//Wenn beim Speichern der Text kein Gueltiges XML ist, wird der vorige Text erneut angezeigt
 	
 	echo "<tr valign='top'><td colspan='2'>\n<textarea name='text' id='text' cols='50' rows='27' oninput='preview()'><![CDATA[".(isset($frage_error_text)?$frage_error_text:$frage->text)."]]></textarea>\n</td>";
-	echo "<table><tr><input type='button' value='MathML' onclick='document.getElementById(\"text\").value=\"&lt;math xmlns=\&quot;http://www.w3.org/1998/Math/MathML\&quot;&gt;&lt;/math&gt;\";' />";
-	echo "<tr>&lt;br/&gt;</tr>";
+	echo "<table><tr><td><input type='button' value='br' onclick='insertfrage(\"&lt;br/&gt;\", \"\")' />";
+	echo "<input type='button' value='F' style='font-weight:bold' onclick='insertfrage(\"&lt;strong&gt;\", \"&lt;/strong&gt;\")' />";
+	echo "<input type='button' value='K' style='font-style:italic' onclick='insertfrage(\"&lt;i&gt;\", \"&lt;/i&gt;\")' /><br/><br/>";
+	echo "<input type='button' value='MathML' onclick='insertfrage(\"&lt;math xmlns=\&quot;http://www.w3.org/1998/Math/MathML\&quot;&gt;\", \"&lt;/math&gt;\")' title='Deklaration' /><br/>";
+	echo "<input type='button' value='mrow' onclick='insertfrage(\"&lt;mrow&gt;\", \"&lt;/mrow&gt;\")' title='Zusammenhängende Zeile' /><br/>";
+	echo "<input type='button' value='mo' onclick='insertfrage(\"&lt;mo&gt;\", \"&lt;/mo&gt;\")' title='Operator (+,-,=,...)' /><br/>";
+	echo "<input type='button' value='mn' onclick='insertfrage(\"&lt;mn&gt;\", \"&lt;/mn&gt;\")' title='Number (1,2,3,...)' /><br/>";
+	echo "<input type='button' value='mi' onclick='insertfrage(\"&lt;mi&gt;\", \"&lt;/mi&gt;\")' title='Identifier (Variablen x,y,...)' /><br/>";
+	echo "<input type='button' value='mfrac' onclick='insertfrage(\"&lt;mfrac&gt;\", \"&lt;/mfrac&gt;\")' title='Bruch' /><br/>";
+	echo "<input type='button' value='msup' onclick='insertfrage(\"&lt;msup&gt;\", \"&lt;/msup&gt;\")' title='Hochgestellt' /><br/>";
+	echo "<input type='button' value='msub' onclick='insertfrage(\"&lt;msub&gt;\", \"&lt;/msub&gt;\")' title='Tiefgestellt' /><br/>";
+	echo "<input type='button' value='mspace' onclick='insertfrage(\"&lt;mspace width=\&quot;2px\&quot;/&gt;\", \"\")' title='Leerraum (einstellbar)' /><br/>";
+	echo "<input type='button' value='mfenced' onclick='insertfrage(\"&lt;mfenced&gt;\", \"&lt;/mfenced&gt;\")' title='Große Klammern' /><br/>";
+	echo "<input type='button' value='msqrt' onclick='insertfrage(\"&lt;msqrt&gt;\", \"&lt;/msqrt&gt;\")' title='Wurzel' /><br/>";
+	echo "<input type='button' value='munderover' onclick='insertfrage(\"&lt;munderover&gt;&lt;mo movablelimits=\&quot;false\&quot;&gt;Das steht mittig&lt;/mo&gt;&lt;mo&gt;Das steht unten&lt;/mo&gt;&lt;mo&gt;Das steht oben&lt;/mo&gt;&lt;/munderover&gt;\", \"\")' title='Oben und unten' /><br/>";
+	echo "<input type='button' value='mtext' onclick='insertfrage(\"&lt;mtext&gt;\", \"&lt;/mtext&gt;\")' title='Text' /><br/>";
+	echo "Operatoren:<br/>π<br/>·<br/>∑<br/>∫<br/><a href='http://de.selfhtml.org/html/referenz/zeichen.htm#benannte_iso8859_1' target='blank'>Weitere</a>";
+	echo "</td>";
+	//echo "<table><tr><input type='button' value='MathML' onclick='document.getElementById(\"text\").value=\"&lt;math xmlns=\&quot;http://www.w3.org/1998/Math/MathML\&quot;&gt;&lt;/math&gt;\";' />";
+	//echo "<tr>&lt;br/&gt;</tr>";
 	echo "</tr></table></tr>";
 	echo "<tr><td>Demo <input type='checkbox' name='demo' ".($frage->demo?'checked="true"':'')." />
 			Level <input type='text' name='level' value='$frage->level' size='1' />
@@ -650,7 +710,7 @@ if($frage_id!='')
 	}
 	//Vorschlag
 	echo '<b>Vorschlag'.($vorschlag_id!=''?' Edit':'').'</b><br /><br />';
-	echo "<form method='POST' enctype='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;frage_id=$frage_id'>";
+	echo "<form name='formular_vorschlag' method='POST' enctype='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;frage_id=$frage_id'>";
 	echo "<input type='hidden' name='vorschlag_id' value='$vorschlag->vorschlag_id' />";
 	echo '<table>';
 	echo "<tr><td>Nummer:</td><td><input type='text' name='nummer' size='3' id='nummer' value='$vorschlag->nummer' /><input type='button' value='1' onclick='document.getElementById(\"nummer\").value=\"1\";' /><input type='button' value='2' onclick='document.getElementById(\"nummer\").value=\"2\";' /><input type='button' value='3' onclick='document.getElementById(\"nummer\").value=\"3\";' /><input type='button' value='4' onclick='document.getElementById(\"nummer\").value=\"4\";' /></td></tr>";
@@ -658,8 +718,25 @@ if($frage_id!='')
 	echo "<td>Punkte:</td><td><input type='text' size='8' id='punkte' name='punkte' value='$vorschlag->punkte' /><input type='button' style='background-color:#FFBFBF' value='-1/2' onclick='document.getElementById(\"punkte\").value=\"-0.5\";' /><input type='button' style='background-color:#FFBFBF' value='-1/3' onclick='document.getElementById(\"punkte\").value=\"-0.3333\";' /><input type='button' value='+1' style='background-color:#C5FFBF' onclick='document.getElementById(\"punkte\").value=\"1\";' /><input type='button' value='+1/3' style='background-color:#C5FFBF' onclick='document.getElementById(\"punkte\").value=\"0.3333\";' /><input type='button' value='+1/2' style='background-color:#C5FFBF' onclick='document.getElementById(\"punkte\").value=\"0.5\";' /></td>";
 	echo '</tr>';
 	echo '<tr valign="top">';
-	echo '<td>Text:</td><td><textarea name="text" id="text_vorschlag" rows="25" cols="45" oninput="preview()"><![CDATA['.$vorschlag->text."]]></textarea>\n</td>";
-	echo "<td><input type='button' value='MathML' onclick='document.getElementById(\"text_vorschlag\").value=\"&lt;math xmlns=\&quot;http://www.w3.org/1998/Math/MathML\&quot;&gt;&lt;/math&gt;\";' /></td>";
+	echo '<td>Text:</td><td><textarea name="text_vorschlag" id="text_vorschlag" rows="25" cols="45" oninput="previewvorschlag()"><![CDATA['.$vorschlag->text."]]></textarea>\n</td>";
+	echo "<td><input type='button' value='br' onclick='insertvorschlag(\"&lt;br/&gt;\", \"\")' />";
+	echo "<input type='button' value='F' style='font-weight:bold' onclick='insertvorschlag(\"&lt;strong&gt;\", \"&lt;/strong&gt;\")' />";
+	echo "<input type='button' value='K' style='font-style:italic' onclick='insertvorschlag(\"&lt;i&gt;\", \"&lt;/i&gt;\")' /><br/><br/>";
+	echo "<input type='button' value='MathML' onclick='insertvorschlag(\"&lt;math xmlns=\&quot;http://www.w3.org/1998/Math/MathML\&quot;&gt;\", \"&lt;/math&gt;\")' title='Deklaration' /><br/>";
+	echo "<input type='button' value='mrow' onclick='insertvorschlag(\"&lt;mrow&gt;\", \"&lt;/mrow&gt;\")' title='Zusammenhängende Zeile' /><br/>";
+	echo "<input type='button' value='mo' onclick='insertvorschlag(\"&lt;mo&gt;\", \"&lt;/mo&gt;\")' title='Operator (+,-,=,...)' /><br/>";
+	echo "<input type='button' value='mn' onclick='insertvorschlag(\"&lt;mn&gt;\", \"&lt;/mn&gt;\")' title='Number (1,2,3,...)' /><br/>";
+	echo "<input type='button' value='mi' onclick='insertvorschlag(\"&lt;mi&gt;\", \"&lt;/mi&gt;\")' title='Identifier (Variablen x,y,...)' /><br/>";
+	echo "<input type='button' value='mfrac' onclick='insertvorschlag(\"&lt;mfrac&gt;\", \"&lt;/mfrac&gt;\")' title='Bruch' /><br/>";
+	echo "<input type='button' value='msup' onclick='insertvorschlag(\"&lt;msup&gt;\", \"&lt;/msup&gt;\")' title='Hochgestellt' /><br/>";
+	echo "<input type='button' value='msub' onclick='insertvorschlag(\"&lt;msub&gt;\", \"&lt;/msub&gt;\")' title='Tiefgestellt' /><br/>";
+	echo "<input type='button' value='mspace' onclick='insertvorschlag(\"&lt;mspace width=\&quot;2px\&quot;/&gt;\", \"\")' title='Leerraum (einstellbar)' /><br/>";
+	echo "<input type='button' value='mfenced' onclick='insertvorschlag(\"&lt;mfenced&gt;\", \"&lt;/mfenced&gt;\")' title='Große Klammern' /><br/>";
+	echo "<input type='button' value='msqrt' onclick='insertvorschlag(\"&lt;msqrt&gt;\", \"&lt;/msqrt&gt;\")' title='Wurzel' /><br/>";
+	echo "<input type='button' value='munderover' onclick='insertvorschlag(\"&lt;munderover&gt;&lt;mo movablelimits=\&quot;false\&quot;&gt;Das steht mittig&lt;/mo&gt;&lt;mo&gt;Das steht unten&lt;/mo&gt;&lt;mo&gt;Das steht oben&lt;/mo&gt;&lt;/munderover&gt;\", \"\")' title='Oben und unten' /><br/>";
+	echo "<input type='button' value='mtext' onclick='insertvorschlag(\"&lt;mtext&gt;\", \"&lt;/mtext&gt;\")' title='Text' /><br/>";
+	echo "Operatoren:<br/>π<br/>·<br/>∑<br/>∫<br/><a href='http://de.selfhtml.org/html/referenz/zeichen.htm#benannte_iso8859_1' target='blank'>Weitere</a>";
+	echo "</td>";
 	echo '</tr><tr valign="top">';
 	//Upload Feld fuer Bild
 	echo "<td>Bild:</td><td><input type='file' name='bild' /></td>";
@@ -669,6 +746,8 @@ if($frage_id!='')
 	echo "<td>Audio:</td><td><input type='file' name='audio' /></td></tr>";
 	
 	echo "<tr><td colspan='2' align='right'><input type='submit' name='submitvorschlag' value='Speichern' />".($vorschlag_id!=''?"<input type='button' value='Abbrechen' onclick=\"document.location.href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;frage_id=$frage->frage_id'\" />":'')."</td></tr>";
+	//Vorschau fuer das Text-Feld
+	echo "<tr><td colspan='2'>Vorschau:<br /><div id='vorschauvorschlag' style='border: 1px solid black' align='center'>$vorschlag->text</div></td></tr>";
 	echo "</table>";
 	echo "</form>";
 
