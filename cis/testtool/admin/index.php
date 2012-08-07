@@ -679,8 +679,6 @@ if($frage_id!='')
 	echo "<input type='button' value='mtext' onclick='insertfrage(\"&lt;mtext&gt;\", \"&lt;/mtext&gt;\")' title='Text' /><br/>";
 	echo "Operatoren:<br/>π<br/>·<br/>∑<br/>∫<br/><a href='http://de.selfhtml.org/html/referenz/zeichen.htm#benannte_iso8859_1' target='blank'>Weitere</a>";
 	echo "</td>";
-	//echo "<table><tr><input type='button' value='MathML' onclick='document.getElementById(\"text\").value=\"&lt;math xmlns=\&quot;http://www.w3.org/1998/Math/MathML\&quot;&gt;&lt;/math&gt;\";' />";
-	//echo "<tr>&lt;br/&gt;</tr>";
 	echo "</tr></table></tr>";
 	echo "<tr><td>Demo <input type='checkbox' name='demo' ".($frage->demo?'checked="true"':'')." />
 			Level <input type='text' name='level' value='$frage->level' size='1' />
@@ -718,7 +716,7 @@ if($frage_id!='')
 	echo "<td>Punkte:</td><td><input type='text' size='8' id='punkte' name='punkte' value='$vorschlag->punkte' /><input type='button' style='background-color:#FFBFBF' value='-1/2' onclick='document.getElementById(\"punkte\").value=\"-0.5\";' /><input type='button' style='background-color:#FFBFBF' value='-1/3' onclick='document.getElementById(\"punkte\").value=\"-0.3333\";' /><input type='button' value='+1' style='background-color:#C5FFBF' onclick='document.getElementById(\"punkte\").value=\"1\";' /><input type='button' value='+1/3' style='background-color:#C5FFBF' onclick='document.getElementById(\"punkte\").value=\"0.3333\";' /><input type='button' value='+1/2' style='background-color:#C5FFBF' onclick='document.getElementById(\"punkte\").value=\"0.5\";' /></td>";
 	echo '</tr>';
 	echo '<tr valign="top">';
-	echo '<td>Text:</td><td><textarea name="text_vorschlag" id="text_vorschlag" rows="25" cols="45" oninput="previewvorschlag()"><![CDATA['.$vorschlag->text."]]></textarea>\n</td>";
+	echo '<td>Text:</td><td><textarea name="text" id="text_vorschlag" rows="25" cols="45" oninput="previewvorschlag()"><![CDATA['.$vorschlag->text."]]></textarea>\n</td>";
 	echo "<td><input type='button' value='br' onclick='insertvorschlag(\"&lt;br/&gt;\", \"\")' />";
 	echo "<input type='button' value='F' style='font-weight:bold' onclick='insertvorschlag(\"&lt;strong&gt;\", \"&lt;/strong&gt;\")' />";
 	echo "<input type='button' value='K' style='font-style:italic' onclick='insertvorschlag(\"&lt;i&gt;\", \"&lt;/i&gt;\")' /><br/><br/>";
