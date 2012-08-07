@@ -256,6 +256,7 @@ class lehrstunde extends basis_db
 		}
 		else
 			$datum_bis=$datum_von;
+
 		// Person
 		if (($type=='student' || $type=='lektor') && $uid==NULL)
 		{
@@ -374,6 +375,7 @@ class lehrstunde extends basis_db
 			$sql_query=mb_substr($sql_query,3);
 			$sql_query_stdplan.=' WHERE'.$sql_query;
 		}
+
 		//echo $sql_query_stdplan;
 		//Datenbankabfrage
 		if (!$this->db_query($sql_query_stdplan))
@@ -742,6 +744,75 @@ class lehrstunde extends basis_db
 		{
 			return false;
 		}
+	}
+
+	/**
+	 * Gruppiert die einzelnen Lehrstunden zusammen
+	 */
+	public function getLehrstundenGruppiert()
+	{
+		$result = array();
+
+		foreach($this->lehrstunden as $row_lehrstunde)
+		{
+			$found=false;
+			//Pruefen ob bereits ein Eintrag vorhanden ist
+			//zu dem dazugruppiert werden kann
+
+			/*
+			Kriterien fuer Gruppierung
+				- gleiches Datum
+				- gleiche Stunde
+				- gleiche UNR
+			*/	
+			foreach($result as $key=>$row_result)
+			{
+				if($row_result->unr==$row_lehrstunde->unr 
+				&& $row_result->datum==$row_lehrstunde->datum
+				&& $row_result->stunde==$row_lehrstunde->stunde)
+				{
+					$found=true;
+					//gleicher Eintrag gefunden
+					$grpidx = count($result[$key]->gruppen);
+					$result[$key]->gruppen[$grpidx]->studiengang_kz=$row_lehrstunde->studiengang_kz;
+					$result[$key]->gruppen[$grpidx]->sem=$row_lehrstunde->sem;
+					$result[$key]->gruppen[$grpidx]->ver=$row_lehrstunde->ver;
+					$result[$key]->gruppen[$grpidx]->grp=$row_lehrstunde->grp;
+					$result[$key]->gruppen[$grpidx]->gruppe_kurzbz=$row_lehrstunde->gruppe_kurzbz;
+					if(!in_array($row_lehrstunde->lektor_uid, $result[$key]->lektor_uid))
+						$result[$key]->lektor_uid[]=$row_lehrstunde->lektor_uid;
+					if(!in_array($row_lehrstunde->ort_kurzbz, $result[$key]->ort_kurzbz))
+						$result[$key]->ort_kurzbz[]=$row_lehrstunde->ort_kurzbz;
+					break;
+				}
+			}
+
+			if(!$found)
+			{
+				// Wenn kein passender Eintrag vorhanden ist,
+				// wird ein neuer angelegt
+				$stunde=new lehrstunde();
+				$stunde->stundenplan_id=$row_lehrstunde->stundenplan_id;
+				$stunde->lehreinheit_id=$row_lehrstunde->lehreinheit_id;
+				$stunde->farbe = (isset($row_lehrstunde->farbe)?$row_lehrstunde->farbe:'FFFFFF');
+				$stunde->unr=$row_lehrstunde->unr;
+				$stunde->gruppen[0]->studiengang_kz=$row_lehrstunde->studiengang_kz;
+				$stunde->gruppen[0]->sem=$row_lehrstunde->sem;
+				$stunde->gruppen[0]->ver=$row_lehrstunde->ver;
+				$stunde->gruppen[0]->grp=$row_lehrstunde->grp;
+				$stunde->gruppen[0]->gruppe_kurzbz=$row_lehrstunde->gruppe_kurzbz;
+				$stunde->lektor_uid[]=$row_lehrstunde->lektor_uid;
+				$stunde->ort_kurzbz[]=$row_lehrstunde->ort_kurzbz;
+				$stunde->datum=$row_lehrstunde->datum;
+				$stunde->stunde=$row_lehrstunde->stunde;
+				$stunde->titel=$row_lehrstunde->titel;
+				$stunde->anmerkung=$row_lehrstunde->anmerkung;
+				$stunde->fix=$row_lehrstunde->fix;
+				$stunde->reservierung=$row_lehrstunde->reservierung;
+				$result[]=$stunde;
+			}
+		}
+		return $result;
 	}
 }
 

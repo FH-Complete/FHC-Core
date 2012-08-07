@@ -898,5 +898,65 @@ class lehreinheit extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Laedt die Daten zu einer Lehreinheit inklusive Zusatzdaten der LV und des Lehrfachs
+	 * @param $lehreinheit_id
+	 * @return boolean
+	 */
+	public function getLehreinheitDetails($lehreinheit_id)
+	{
+		$qry = "SELECT 
+					*, tbl_lehrveranstaltung.semester as lv_semester, tbl_lehrveranstaltung.studiengang_kz as lv_studiengang_kz 
+				FROM 
+					lehre.tbl_lehreinheit
+					JOIN lehre.tbl_lehrfach USING(lehrfach_id)
+					JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+				WHERE
+					tbl_lehreinheit.lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER);
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				$this->lehreinheit_id = $row->lehreinheit_id;
+				$this->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$this->lehrfach_id = $row->lehrfach_id;
+				$this->lehrform_kurzbz = $row->lehrform_kurzbz;
+				$this->stundenblockung = $row->stundenblockung;
+				$this->wochenrythmus = $row->wochenrythmus;
+				$this->start_kw = $row->start_kw;
+				$this->raumtyp = $row->raumtyp;
+				$this->raumtypalternativ = $row->raumtypalternativ;
+				$this->lehre = $this->db_parse_bool($row->lehre);
+				$this->anmerkung = $row->anmerkung;
+				$this->unr = $row->unr;
+				$this->lvnr = $row->lvnr;
+				$this->sprache = $row->sprache;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->ext_id = $row->ext_id;
+
+				$this->fachbereich_kurzbz = $row->fachbereich_kurzbz;
+				$this->farbe = $row->farbe;
+				$this->studiengang_kz = $row->lv_studiengang_kz;
+				$this->semester = $row->lv_semester;
+				return true;
+			}
+			else
+			{
+				$this->errormsg='Kein Eintrag gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei der Datenabfrage';
+			return false;
+		}
+	}
 }
 ?>
