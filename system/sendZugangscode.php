@@ -42,6 +42,7 @@ require_once('../include/kontakt.class.php');
 
 $db = new basis_db(); 
 $count = 0;
+$count_studenten = 0; 
 $countError = 0; 
 
 $qry = "SELECT * FROM public.tbl_benutzer 
@@ -62,12 +63,16 @@ if($result = $db->db_query($qry))
         $kontakt->load_persKontakttyp($row->person_id, 'email');
         
         $zugangscode = $row->zugangscode; 
-
+        $count_studenten+=1; 
+        
         // Falls mehrere vorhanden sind, an alle schicken
         foreach($kontakt->result as $kon)
         {
             if(sendMail($kon->kontakt, $row->nachname, $zugangscode))
+            {
+                echo $kon->kontakt.'</br>';
                 $count+=1; 
+            }
             else
                 $countError+=1; 
         }
@@ -77,7 +82,7 @@ else
     echo('Fehler bei der Abfrage aufgetreten');
 
 
-echo 'Email an '.$count.' Empfänger geschickt. Es sind dabei '.$countError.' aufgetreten';
+echo $count.' Emails an '.$count_studenten.' Studenten geschickt. Es sind dabei '.$countError.' Fehler aufgetreten';
 
 function sendMail($email, $name, $zugangscode)
 {
