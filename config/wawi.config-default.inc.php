@@ -38,6 +38,10 @@ define('DOMAIN','technikum-wien.at');
 //LDAP_SERVER: Speichert die Adresse des LDAP Servers
 define("LDAP_SERVER","ldap.technikum-wien.at");
 define("LDAP_BASE_DN","ou=People, dc=technikum-wien, dc=at");
+// Attribut fuer Zutrittskartennummer im LDAP
+define("LDAP_CARD_NUMBER","twHitagCardNumber");
+// Attribut fuer Zutrittskartennummer2 im LDAP
+define("LDAP_CARD_NUMBER2","twCardNumber");
 
 // Mail-Adressen (Angabe von mehreren Addressen mit ',' getrennt moeglich)
 // Wenn MAIL_DEBUG gesetzt ist, werden alle Mails an diese Adresse gesendet

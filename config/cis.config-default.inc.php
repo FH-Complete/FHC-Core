@@ -65,6 +65,10 @@ define('URLAUB_TOOLS',true);
 // LDAP_SERVER: Adresse des LDAP Servers
 define("LDAP_SERVER","www.technikum-wien.at");
 define("LDAP_BASE_DN","ou=People, dc=technikum-wien, dc=at");
+// Attribut fuer Zutrittskartennummer im LDAP
+define("LDAP_CARD_NUMBER","twHitagCardNumber");
+// Attribut fuer Zutrittskartennummer2 im LDAP
+define("LDAP_CARD_NUMBER2","twCardNumber");
 
 // Domain fuer Mailadressen etc.
 define('DOMAIN','technikum-wien.at');
