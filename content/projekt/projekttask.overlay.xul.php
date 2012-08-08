@@ -71,7 +71,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/mantisdetail.overlay.xul.p
 		<!-- Bem.: style="visibility:collapse" versteckt eine Spalte -->
 		<tree id="projekttask-tree" seltype="single" hidecolumnpicker="false" flex="1"
 				datasources="rdf:null" ref="http://www.technikum-wien.at/projekttask"
-				style="margin:0px;" enableColumnDrag="true" 
+				style="margin:0px;height:500px" enableColumnDrag="true" 
 				ondraggesture="nsDragAndDrop.startDrag(event,taskDDObserver);"
 
 				onselect="onselectProjekttask(this);"

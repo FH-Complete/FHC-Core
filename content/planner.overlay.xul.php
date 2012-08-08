@@ -102,16 +102,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/ressource.overlay.xul.php"
 </vbox>
 
 <vbox id="vbox-main">
-<popupset>
-		<popup id="fasoverlay-lektor-tree-popup">
-			<menuitem label="Mail senden" oncommand="LektorFunktionMail();" />
-			<menuseparator />
-			<menuitem label="Entfernen" oncommand="LektorFunktionDel();" />			
-		</popup>
-</popupset>
 	<tabbox id="tabbox-main" flex="3" orient="vertical">
-		<tabs orient="horizontal">
-			<tab id="tab-projekt" label="Projekte" />
+		<tabs id="tabs-planner-main" orient="horizontal">
+			<tab id="tab-projekte" label="Projekte" />
 			<tab id="tab-projektphase" label="Phasen" />
 			<tab id="tab-projekttask" label="Tasks" selected="true" />
 			<tab id="tab-dokumente" label="Dokumente" />
