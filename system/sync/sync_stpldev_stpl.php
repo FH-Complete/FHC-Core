@@ -662,7 +662,8 @@ if(count($users)>0)
 		fclose($fp);
 
 		//Horde Syncro starten
-		exec('php5 '.DOC_ROOT.'../system/hordelvplansync/synchordelvplan.php lvplanupdate.txt >>/var/log/sync/synchordelvplan.log 2>&1');
+		chdir(DOC_ROOT.'../system/hordelvplansync/');
+		exec('php5 synchordelvplan.php lvplanupdate.txt >>/var/log/sync/synchordelvplan.log 2>&1');
 	}
 }
 // Mail an Admin
