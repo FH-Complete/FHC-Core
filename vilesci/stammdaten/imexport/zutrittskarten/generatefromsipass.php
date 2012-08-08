@@ -123,7 +123,7 @@ $ldap_conn = ldap_connect("pdc1.technikum-wien.at",389);
 ldap_set_option($ldap_conn,LDAP_OPT_PROTOCOL_VERSION,3);
 $ldap_result = ldap_bind($ldap_conn);
 
-$ldap_search="(departmentNumber=*)";
+$ldap_search="(".LDAP_CARD_NUMBER."=*)";
 $ldap_result=ldap_search($ldap_conn, $ldap_basedn, $ldap_search);
 
 for ($ldapentry=ldap_first_entry($ldap_conn,$ldap_result); $ldapentry!=false; $ldapentry=ldap_next_entry($ldap_conn,$ldapentry))
@@ -162,7 +162,7 @@ for ($ldapentry=ldap_first_entry($ldap_conn,$ldap_result); $ldapentry!=false; $l
         }
      }
 
-     $ldapnumbers=ldap_get_values($ldap_conn,$ldapentry,"departmentnumber");
+     $ldapnumbers=ldap_get_values($ldap_conn,$ldapentry,LDAP_CARD_NUMBER);
 
      for ($n=0; $n < $ldapnumbers["count"]; $n++)
      {
