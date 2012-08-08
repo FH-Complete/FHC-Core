@@ -58,6 +58,9 @@ function treeProjektmenueSelect()
     //Projekte neu laden
 	try
 	{
+		// Wenn eine OE angeklickt wird, den Phase Projekte anzeigen
+		document.getElementById('tabs-planner-main').selectedItem=document.getElementById('tab-projekte');
+
 		var datasource="<?php echo APP_ROOT; ?>rdf/projekt.rdf.php?oe="+oe+"&filter="+global_filter+"&"+gettimestamp();
 		var treeProjekt=document.getElementById('tree-projekt');
 		//Alte DS entfernen
@@ -91,7 +94,8 @@ function treeProjektmenueSelect()
     // Projektphasen neu laden
 	if(projekt_kurzbz!='')
 	{
-
+		// Wenn eine Projekt angeklickt wird, den Phase Karteireiter anzeigen
+		document.getElementById('tabs-planner-main').selectedItem=document.getElementById('tab-projektphase');
 	    try
 		{
 			var datasources="<?php echo APP_ROOT; ?>rdf/projektphase.rdf.php?"+gettimestamp();
@@ -131,6 +135,8 @@ function treeProjektmenueSelect()
 	// Projekttasks neu laden
 	if(projekt_phase_id!='')
 	{
+		// Wenn eine Phase angeklickt wird, den Task Karteireiter anzeigen
+		document.getElementById('tabs-planner-main').selectedItem=document.getElementById('tab-projekttask');
 	    LoadTasks(projekt_phase_id); 
 	}
 	

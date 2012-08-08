@@ -62,7 +62,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektphasedetail.overlay
 		<!-- Bem.: style="visibility:collapse" versteckt eine Spalte -->
 		<tree id="tree-projektphase" seltype="single" hidecolumnpicker="false" flex="1"
 				datasources="../../rdf/projektphase.rdf.php?foo=<?php echo time(); ?>" ref="http://www.technikum-wien.at/projektphase/Systementwicklung/Lernquadrat"
-				style="margin:0px;" enableColumnDrag="true"
+				style="margin:0px;height:250px" enableColumnDrag="true"
 				onselect="onselectTreeProjektphase(this);"
  				persist="height"
  				flags="dont-build-content"
