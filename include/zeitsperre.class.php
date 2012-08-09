@@ -58,8 +58,11 @@ class zeitsperre extends basis_db
 	}
 
 	/**
-	 * Laedt alle Zeitsperren bei denen
-	 * ende>=now() ist und uid=$uid
+	 * Laedt alle Zeitsperren eines Benutzers wo ende>=now() ist
+	 * @param $uid
+	 * @param $bisgrenze wenn true werden nur die Zeitsperren des 
+	 * aktuellen Geschaeftsjahres geholt (1.9.-31.8.)
+	 * @return true wenn ok, false im Fehlerfall
 	 */
 	public function getzeitsperren($uid, $bisgrenze=true)
 	{
@@ -68,7 +71,7 @@ class zeitsperre extends basis_db
 		$qry = "SELECT tbl_zeitsperre.*, tbl_zeitsperretyp.*, tbl_erreichbarkeit.farbe  AS erreichbarkeit_farbe
 				FROM (campus.tbl_zeitsperre JOIN campus.tbl_zeitsperretyp USING (zeitsperretyp_kurzbz))
 					LEFT JOIN campus.tbl_erreichbarkeit USING (erreichbarkeit_kurzbz)
-				WHERE mitarbeiter_uid='".addslashes($uid)."'";
+				WHERE mitarbeiter_uid=".$this->db_add_param($uid);
 
 		if($bisgrenze)
 		{
@@ -135,7 +138,7 @@ class zeitsperre extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM campus.tbl_zeitsperre WHERE zeitsperre_id = '$zeitsperre_id';";
+		$qry = "SELECT * FROM campus.tbl_zeitsperre WHERE zeitsperre_id=".$this->db_add_param($zeitsperre_id, FHC_INTEGER);
 
 		if(!$this->db_query($qry))
 		{
@@ -184,7 +187,7 @@ class zeitsperre extends basis_db
 			return false;
 		}
 
-		$qry = "DELETE FROM campus.tbl_zeitsperre WHERE zeitsperre_id='$zeitsperre_id'";
+		$qry = "DELETE FROM campus.tbl_zeitsperre WHERE zeitsperre_id=".$this->db_add_param($zeitsperre_id, FHC_INTEGER);
 
 		if($this->db_query($qry))
 			return true;
@@ -246,21 +249,21 @@ class zeitsperre extends basis_db
 			$qry = 'INSERT INTO campus.tbl_zeitsperre (zeitsperretyp_kurzbz, mitarbeiter_uid, bezeichnung,'.
 			       ' vondatum ,vonstunde, bisdatum, bisstunde, erreichbarkeit_kurzbz, vertretung_uid, insertamum,'.
 			       ' insertvon, updateamum, updatevon, freigabeamum, freigabevon) VALUES ('.
-					$this->addslashes($this->zeitsperretyp_kurzbz).', '.
-					$this->addslashes($this->mitarbeiter_uid).', '.
-					$this->addslashes($this->bezeichnung).', '.
-					$this->addslashes($this->vondatum).', '.
-					$this->addslashes($this->vonstunde).', '.
-					$this->addslashes($this->bisdatum).', '.
-					$this->addslashes($this->bisstunde).', '.
-					$this->addslashes($this->erreichbarkeit_kurzbz).', '.
-					$this->addslashes($this->vertretung_uid).', '.
-					$this->addslashes($this->insertamum).', '.
-					$this->addslashes($this->insertvon).', '.
-					$this->addslashes($this->updateamum).', '.
-					$this->addslashes($this->updatevon).','.
-					$this->addslashes($this->freigabeamum).','.
-					$this->addslashes($this->freigabevon).'); ';
+					$this->db_add_param($this->zeitsperretyp_kurzbz).', '.
+					$this->db_add_param($this->mitarbeiter_uid).', '.
+					$this->db_add_param($this->bezeichnung).', '.
+					$this->db_add_param($this->vondatum).', '.
+					$this->db_add_param($this->vonstunde).', '.
+					$this->db_add_param($this->bisdatum).', '.
+					$this->db_add_param($this->bisstunde).', '.
+					$this->db_add_param($this->erreichbarkeit_kurzbz).', '.
+					$this->db_add_param($this->vertretung_uid).', '.
+					$this->db_add_param($this->insertamum).', '.
+					$this->db_add_param($this->insertvon).', '.
+					$this->db_add_param($this->updateamum).', '.
+					$this->db_add_param($this->updatevon).','.
+					$this->db_add_param($this->freigabeamum).','.
+					$this->db_add_param($this->freigabevon).'); ';
 		}
 		else
 		{
@@ -274,22 +277,22 @@ class zeitsperre extends basis_db
 			}
 
 			$qry = 'UPDATE campus.tbl_zeitsperre SET '.
-				'zeitsperretyp_kurzbz='.$this->addslashes($this->zeitsperretyp_kurzbz).', '.
-				'mitarbeiter_uid='.$this->addslashes($this->mitarbeiter_uid).', '.
-				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
-				'vondatum='.$this->addslashes($this->vondatum).', '.
-				'vonstunde='.$this->addslashes($this->vonstunde).', '.
-				'bisdatum='.$this->addslashes($this->bisdatum).', '.
-				'bisstunde='.$this->addslashes($this->bisstunde).', '.
-				'erreichbarkeit_kurzbz='.$this->addslashes($this->erreichbarkeit_kurzbz).', '.
-				'vertretung_uid='.$this->addslashes($this->vertretung_uid).', '.
-				'insertamum='.$this->addslashes($this->insertamum).', '.
-				'insertvon='.$this->addslashes($this->insertvon).', '.
-				'freigabeamum='.$this->addslashes($this->freigabeamum).', '.
-				'freigabevon='.$this->addslashes($this->freigabevon).', '.
-				'updateamum='.$this->addslashes($this->updateamum).', '.
-				'updatevon='.$this->addslashes($this->updatevon).'  '.
-				'WHERE zeitsperre_id = '.$this->addslashes($this->zeitsperre_id).';';
+				'zeitsperretyp_kurzbz='.$this->db_add_param($this->zeitsperretyp_kurzbz).', '.
+				'mitarbeiter_uid='.$this->db_add_param($this->mitarbeiter_uid).', '.
+				'bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
+				'vondatum='.$this->db_add_param($this->vondatum).', '.
+				'vonstunde='.$this->db_add_param($this->vonstunde).', '.
+				'bisdatum='.$this->db_add_param($this->bisdatum).', '.
+				'bisstunde='.$this->db_add_param($this->bisstunde).', '.
+				'erreichbarkeit_kurzbz='.$this->db_add_param($this->erreichbarkeit_kurzbz).', '.
+				'vertretung_uid='.$this->db_add_param($this->vertretung_uid).', '.
+				'insertamum='.$this->db_add_param($this->insertamum).', '.
+				'insertvon='.$this->db_add_param($this->insertvon).', '.
+				'freigabeamum='.$this->db_add_param($this->freigabeamum).', '.
+				'freigabevon='.$this->db_add_param($this->freigabevon).', '.
+				'updateamum='.$this->db_add_param($this->updateamum).', '.
+				'updatevon='.$this->db_add_param($this->updatevon).'  '.
+				'WHERE zeitsperre_id = '.$this->db_add_param($this->zeitsperre_id, FHC_INTEGER).';';
 		}
 
 		if($this->db_query($qry))
@@ -305,6 +308,7 @@ class zeitsperre extends basis_db
 
 	/**
 	 * Liefert ZeitsperreTypen eines Tages
+	 * @param $datum
 	 * @return string wenn ok, false im Fehlerfall
 	 */
 	public function getTyp($datum)
@@ -350,15 +354,17 @@ class zeitsperre extends basis_db
 	 */
 	public function getSperreByDate($user, $datum, $stunde)
 	{
-		$qry = "SELECT 
-					* 
-				FROM 
-					campus.tbl_zeitsperre 
-				WHERE 
-					vondatum<='$datum' AND bisdatum>='$datum' AND
-					((vondatum='$datum' AND vonstunde<='$stunde') OR vonstunde is null OR vondatum<>'$datum') AND 
-					((bisdatum='$datum' AND bisstunde>='$stunde') OR bisstunde is null OR bisdatum<>'$datum') AND 
-					mitarbeiter_uid='$user'";
+		$qry = "
+			SELECT 
+				* 
+			FROM 
+				campus.tbl_zeitsperre 
+			WHERE 
+				vondatum<=".$this->db_add_param($datum)." 
+				AND bisdatum>=".$this->db_add_param($datum)." AND
+				((vondatum=".$this->db_add_param($datum)." AND vonstunde<=".$this->db_add_param($stunde).") OR vonstunde is null OR vondatum<>".$this->db_add_param($datum).") AND 
+				((bisdatum=".$this->db_add_param($datum)." AND bisstunde>=".$this->db_add_param($stunde).") OR bisstunde is null OR bisdatum<>".$this->db_add_param($datum).") AND 
+				mitarbeiter_uid=".$this->db_add_param($user);
 
 		if($result = $this->db_query($qry))
 		{
@@ -413,17 +419,17 @@ class zeitsperre extends basis_db
 					campus.tbl_zeitsperre 
 				WHERE 
 					zeitsperretyp_kurzbz='Urlaub'
-					AND mitarbeiter_uid='".addslashes($uid)."' 
+					AND mitarbeiter_uid=".$this->db_add_param($uid)." 
 					AND 
 					(
-						(vondatum BETWEEN '".addslashes($von)."' AND '".addslashes($bis)."')
+						(vondatum BETWEEN ".$this->db_add_param($von)." AND ".$this->db_add_param($bis).")
 						OR
-						(bisdatum BETWEEN '".addslashes($von)."' AND '".addslashes($bis)."')
+						(bisdatum BETWEEN ".$this->db_add_param($von)." AND ".$this->db_add_param($bis).")
 						OR
-						(vondatum<='".addslashes($von)."' AND bisdatum>='".addslashes($bis)."')
+						(vondatum<=".$this->db_add_param($von)." AND bisdatum>=".$this->db_add_param($bis).")
 					)";
 		if(!is_null($id))
-			$qry.=" AND zeitsperre_id<>'".addslashes($id)."'";
+			$qry.=" AND zeitsperre_id<>".$this->db_add_param($id);
 		
 		if($result = $this->db_query($qry))
 		{

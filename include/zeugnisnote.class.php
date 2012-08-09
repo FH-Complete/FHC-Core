@@ -31,17 +31,17 @@ class zeugnisnote extends basis_db
 	public $result=array();
 
 	//Tabellenspalten
-	public $lehrveranstaltung_id;		/// \brief ID der Lehrveranstaltung in der DB
+	public $lehrveranstaltung_id;		/// serial
 	public $student_uid;				// varchar(16)
-	public $studiensemester_kurzbz;	// varchar(16)
+	public $studiensemester_kurzbz;		// varchar(16)
 	public $note;						// smalint
 	public $uebernahmedatum;			// date
-	public $benotungsdatum;			// date
-	public $updateamum;				// timestamp
+	public $benotungsdatum;				// date
+	public $updateamum;					// timestamp
 	public $updatevon;					// varchar(16)
-	public $insertamum;				// timestamp
+	public $insertamum;					// timestamp
 	public $insertvon;					// varchar(16)
-	public $ext_id;					// bigint
+	public $ext_id;						// bigint
 	public $bemerkung;					// text
 
 	public $lehrveranstaltung_bezeichung;
@@ -51,9 +51,11 @@ class zeugnisnote extends basis_db
 
 	/**
 	 * Konstruktor
+	 * Laedt optional eine Zeugnisnote
+	 * 
 	 * @param $lehrveranstaltung_id
-	 *        $student_uid
-	 *        $studiensemester_kurzbz
+	 * @param $student_uid
+	 * @param $studiensemester_kurzbz
 	 */
 	public function __construct($lehrveranstaltung_id=null, $student_uid=null, $studiensemester_kurzbz=null)
 	{
@@ -65,9 +67,10 @@ class zeugnisnote extends basis_db
 
 	/**
 	 * Laedt eine Zeugnisnote
-	 * @param  $lehrveranstaltung_id
-	 *         $student_uid
-	 *         $studiensemester_kurzbz
+	 * 
+	 * @param $lehrveranstaltung_id
+	 * @param $student_uid
+	 * @param $studiensemester_kurzbz
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	public function load($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz)
@@ -78,10 +81,14 @@ class zeugnisnote extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM lehre.tbl_zeugnisnote WHERE
-				lehrveranstaltung_id='$lehrveranstaltung_id' AND
-				student_uid='".addslashes($student_uid)."' AND
-				studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+		$qry = "SELECT 
+					* 
+				FROM 
+					lehre.tbl_zeugnisnote 
+				WHERE
+					lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)." 
+					AND	student_uid=".$this->db_add_param($student_uid)." 
+					AND	studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 
 		if($this->db_query($qry))
 		{
@@ -170,33 +177,34 @@ class zeugnisnote extends basis_db
 		if($new)
 		{
 			//Neuen Datensatz einfuegen
-			$qry='INSERT INTO lehre.tbl_zeugnisnote (lehrveranstaltung_id, student_uid, studiensemester_kurzbz, note, uebernahmedatum, benotungsdatum, bemerkung,
-				  updateamum, updatevon, insertamum, insertvon, ext_id) VALUES('.
-			     $this->addslashes($this->lehrveranstaltung_id).', '.
-			     $this->addslashes($this->student_uid).', '.
-			     $this->addslashes($this->studiensemester_kurzbz).', '.
-			     $this->addslashes($this->note).', '.
-			     $this->addslashes($this->uebernahmedatum).', '.
-			     $this->addslashes($this->benotungsdatum).', '.
-			     $this->addslashes($this->bemerkung).', '.
-			     $this->addslashes($this->updateamum).', '.
-			     $this->addslashes($this->updatevon).', '.
-			     $this->addslashes($this->insertamum).', '.
-			     $this->addslashes($this->insertvon).', '.
-			     $this->addslashes($this->ext_id).');';
+			$qry='INSERT INTO lehre.tbl_zeugnisnote (lehrveranstaltung_id, student_uid, 
+				studiensemester_kurzbz, note, uebernahmedatum, benotungsdatum, bemerkung,
+				updateamum, updatevon, insertamum, insertvon, ext_id) VALUES('.
+			     $this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER).', '.
+			     $this->db_add_param($this->student_uid).', '.
+			     $this->db_add_param($this->studiensemester_kurzbz).', '.
+			     $this->db_add_param($this->note).', '.
+			     $this->db_add_param($this->uebernahmedatum).', '.
+			     $this->db_add_param($this->benotungsdatum).', '.
+			     $this->db_add_param($this->bemerkung).', '.
+			     $this->db_add_param($this->updateamum).', '.
+			     $this->db_add_param($this->updatevon).', '.
+			     $this->db_add_param($this->insertamum).', '.
+			     $this->db_add_param($this->insertvon).', '.
+			     $this->db_add_param($this->ext_id).');';
 		}
 		else
 		{
 			$qry='UPDATE lehre.tbl_zeugnisnote SET '.
-				'note='.$this->addslashes($this->note).', '.
-				'uebernahmedatum='.$this->addslashes($this->uebernahmedatum).', '.
-				'benotungsdatum='.$this->addslashes($this->benotungsdatum).', '.
-				'bemerkung='.$this->addslashes($this->bemerkung).', '.
-		     	'updateamum= '.$this->addslashes($this->updateamum).', '.
-		     	'updatevon='.$this->addslashes($this->updatevon).' '.
-				'WHERE lehrveranstaltung_id='.$this->addslashes($this->lehrveranstaltung_id).' '.
-				'AND student_uid='.$this->addslashes($this->student_uid).' '.
-				'AND studiensemester_kurzbz='.$this->addslashes($this->studiensemester_kurzbz).';';
+				'note='.$this->db_add_param($this->note).', '.
+				'uebernahmedatum='.$this->db_add_param($this->uebernahmedatum).', '.
+				'benotungsdatum='.$this->db_add_param($this->benotungsdatum).', '.
+				'bemerkung='.$this->db_add_param($this->bemerkung).', '.
+		     	'updateamum= '.$this->db_add_param($this->updateamum).', '.
+		     	'updatevon='.$this->db_add_param($this->updatevon).' '.
+				'WHERE lehrveranstaltung_id='.$this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER).' '.
+				'AND student_uid='.$this->db_add_param($this->student_uid).' '.
+				'AND studiensemester_kurzbz='.$this->db_add_param($this->studiensemester_kurzbz).';';
 		}
 
 		if($this->db_query($qry))		
@@ -220,9 +228,9 @@ class zeugnisnote extends basis_db
 	public function delete($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz)
 	{
 		$qry = "DELETE FROM lehre.tbl_zeugnisnote WHERE
-				lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."' AND
-				student_uid='".addslashes($student_uid)."' AND
-				studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+				lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER, false)." AND
+				student_uid=".$this->db_add_param($student_uid)." AND
+				studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 
 		if($this->db_query($qry))
 			return true;
@@ -244,18 +252,18 @@ class zeugnisnote extends basis_db
 	{
 		$where='';
 		if($lehrveranstaltung_id!=null)
-			$where.=" AND vw_student_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."'";
+			$where.=" AND vw_student_lehrveranstaltung.lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id);
 		if($student_uid!=null)
-			$where.=" AND uid='".addslashes($student_uid)."'";
+			$where.=" AND uid=".$this->db_add_param($student_uid);
 		if($studiensemester_kurzbz!=null)
-			$where.=" AND vw_student_lehrveranstaltung.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+			$where.=" AND vw_student_lehrveranstaltung.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 		$where2='';
 		if($lehrveranstaltung_id!=null)
-			$where2.=" AND lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."'";
+			$where2.=" AND lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
 		if($student_uid!=null)
-			$where2.=" AND student_uid='".addslashes($student_uid)."'";
+			$where2.=" AND student_uid=".$this->db_add_param($student_uid);
 		if($studiensemester_kurzbz!=null)
-			$where2.=" AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+			$where2.=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 
 		$qry = "SELECT vw_student_lehrveranstaltung.lehrveranstaltung_id, uid,
 					   vw_student_lehrveranstaltung.studiensemester_kurzbz, note, uebernahmedatum, benotungsdatum,
@@ -317,7 +325,7 @@ class zeugnisnote extends basis_db
 				$obj->ects = $row->ects;
 				$obj->sort = $row->sort;
 				$obj->studiengang_kz = $row->studiengang_kz;
-				$obj->zeugnis = ($row->zeugnis=='t'?true:false);
+				$obj->zeugnis = $this->db_parse_bool($row->zeugnis);
 				$obj->lv_lehrform_kurzbz = $row->lv_lehrform_kurzbz;
 
 				$this->result[] = $obj;

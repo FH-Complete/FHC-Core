@@ -59,7 +59,7 @@ class webservicelog extends basis_db
 		}
 		
 		$qry ="SELECT * FROM system.tbl_webservicelog WHERE 
-			webservicelog_id = '".addslashes($webservicelog_id)."';";
+			webservicelog_id =".$this->db_add_param($webservicelog_id, FHC_INTEGER, false).";";
 		
 		if($this->db_query($qry))
 		{
@@ -97,13 +97,14 @@ class webservicelog extends basis_db
 		if(is_null($new))
 			$new = $this->new; 
 			
-			// insert
-			$qry ="INSERT INTO system.tbl_webservicelog(webservicetyp_kurzbz, request_id, beschreibung, request_data, execute_time, execute_user) VALUES ('".
-			addslashes($this->webservicetyp_kurzbz)."','".
-			addslashes($this->request_id)."','".
-			addslashes($this->beschreibung)."','".
-			addslashes($this->request_data)."','now()','".
-			addslashes($this->execute_user)."');";
+		// insert
+		$qry ="INSERT INTO system.tbl_webservicelog(webservicetyp_kurzbz, request_id, beschreibung, 
+					request_data, execute_time, execute_user) VALUES (".
+					$this->db_add_param($this->webservicetyp_kurzbz).",".
+					$this->db_add_param($this->request_id).",".
+					$this->db_add_param($this->beschreibung).",".
+					$this->db_add_param($this->request_data).",now(),".
+					$this->db_add_param($this->execute_user).");";
 
 		if($this->db_query($qry))
 		{
@@ -112,7 +113,6 @@ class webservicelog extends basis_db
 		else
 		{
 			$this->errormsg = "Fehler bei Insert/Update aufgetreten.";
-			$this->errormsg = $qry; 
 			return false; 
 		}
 	}
@@ -131,7 +131,7 @@ class webservicelog extends basis_db
 		}
 		
 		$qry ="SELECT * FROM system.tbl_webservicelog WHERE 
-			webservicetyp_kurzbz ='".addslashes($kurzbz)."';";
+			webservicetyp_kurzbz =".$this->db_add_param($kurzbz).";";
 		
 		if($this->db_query($qry))
 		{
