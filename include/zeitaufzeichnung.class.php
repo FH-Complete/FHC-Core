@@ -46,8 +46,6 @@ class zeitaufzeichnung extends basis_db
 	public $updatevon;				// varchar(16)
 	public $projekt_kurzbz;			// varchar(16)
 	
-	
-
 	/**
 	 * Konstruktor
 	 * @param $zeitaufzeichnung_id ID der Zeitaufzeichnung die geladen werden soll (Default=null)
@@ -75,7 +73,7 @@ class zeitaufzeichnung extends basis_db
 		}
 
 		//Daten aus der Datenbank lesen
-		$qry = "SELECT * FROM campus.tbl_zeitaufzeichnung WHERE zeitaufzeichnung_id='$zeitaufzeichnung_id'";
+		$qry = "SELECT * FROM campus.tbl_zeitaufzeichnung WHERE zeitaufzeichnung_id=".$this->db_add_param($zeitaufzeichnung_id, FHC_INTEGER);
 
 		if(!$this->db_query($qry))
 		{
@@ -135,18 +133,18 @@ class zeitaufzeichnung extends basis_db
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO campus.tbl_zeitaufzeichnung (uid, aktivitaet_kurzbz, start, ende, beschreibung, 
 			      studiengang_kz, fachbereich_kurzbz, insertamum, insertvon, updateamum, updatevon, projekt_kurzbz) VALUES('.
-			      $this->addslashes($this->uid).', '.
-			      $this->addslashes($this->aktivitaet_kurzbz).', '.
-			      $this->addslashes($this->start).', '.
-			      $this->addslashes($this->ende).', '.
-			      $this->addslashes($this->beschreibung).', '.
-			      $this->addslashes($this->studiengang_kz).', '.
-			      $this->addslashes($this->fachbereich_kurzbz).','.
-			      $this->addslashes($this->insertamum).', '.
-			      $this->addslashes($this->insertvon).', '.
-			      $this->addslashes($this->updateamum).', '.
-			      $this->addslashes($this->updatevon).', '.
-			      $this->addslashes($this->projekt_kurzbz).');';
+			      $this->db_add_param($this->uid).', '.
+			      $this->db_add_param($this->aktivitaet_kurzbz).', '.
+			      $this->db_add_param($this->start).', '.
+			      $this->db_add_param($this->ende).', '.
+			      $this->db_add_param($this->beschreibung).', '.
+			      $this->db_add_param($this->studiengang_kz).', '.
+			      $this->db_add_param($this->fachbereich_kurzbz).','.
+			      $this->db_add_param($this->insertamum).', '.
+			      $this->db_add_param($this->insertvon).', '.
+			      $this->db_add_param($this->updateamum).', '.
+			      $this->db_add_param($this->updatevon).', '.
+			      $this->db_add_param($this->projekt_kurzbz).');';
 		}
 		else
 		{
@@ -155,22 +153,22 @@ class zeitaufzeichnung extends basis_db
 			//Pruefen ob zeitaufzeichnung_id eine gueltige Zahl ist
 			if(!is_numeric($this->zeitaufzeichnung_id))
 			{
-				$this->errormsg = 'zeitaufzeichnung_id muss eine gueltige Zahl sein: '.$this->zeitaufzeichnung_id."\n";
+				$this->errormsg = 'zeitaufzeichnung_id muss eine gueltige Zahl sein';
 				return false;
 			}
 			
 			$qry='UPDATE campus.tbl_zeitaufzeichnung SET'.
-				' uid='.$this->addslashes($this->uid).', '.
-				' aktivitaet_kurzbz='.$this->addslashes($this->aktivitaet_kurzbz).', '.
-				' start='.$this->addslashes($this->start).', '.
-				' ende='.$this->addslashes($this->ende).', '.
-		      	' beschreibung='.$this->addslashes($this->beschreibung).', '.
-		      	' studiengang_kz='.$this->addslashes($this->studiengang_kz).', '.
-		      	' fachbereich_kurzbz='.$this->addslashes($this->fachbereich_kurzbz).', '.
-		      	' updateamum='.$this->addslashes($this->updateamum).', '.
-		      	' updatevon='.$this->addslashes($this->updatevon).', '.
-		      	' projekt_kurzbz='.$this->addslashes($this->projekt_kurzbz).' '.
-		      	'WHERE zeitaufzeichnung_id='.$this->zeitaufzeichnung_id.';';
+				' uid='.$this->db_add_param($this->uid).', '.
+				' aktivitaet_kurzbz='.$this->db_add_param($this->aktivitaet_kurzbz).', '.
+				' start='.$this->db_add_param($this->start).', '.
+				' ende='.$this->db_add_param($this->ende).', '.
+		      	' beschreibung='.$this->db_add_param($this->beschreibung).', '.
+		      	' studiengang_kz='.$this->db_add_param($this->studiengang_kz).', '.
+		      	' fachbereich_kurzbz='.$this->db_add_param($this->fachbereich_kurzbz).', '.
+		      	' updateamum='.$this->db_add_param($this->updateamum).', '.
+		      	' updatevon='.$this->db_add_param($this->updatevon).', '.
+		      	' projekt_kurzbz='.$this->db_add_param($this->projekt_kurzbz).' '.
+		      	'WHERE zeitaufzeichnung_id='.$this->db_add_param($this->zeitaufzeichnung_id, FHC_INTEGER, false);
 		}
 		
 		if($this->db_query($qry))
@@ -220,12 +218,12 @@ class zeitaufzeichnung extends basis_db
 		//Pruefen ob zeitaufzeichnung_id eine gueltige Zahl ist
 		if(!is_numeric($zeitaufzeichnung_id) || $zeitaufzeichnung_id == '')
 		{
-			$this->errormsg = 'zeitaufzeichnung_id muss eine gueltige Zahl sein'."\n";
+			$this->errormsg = 'zeitaufzeichnung_id muss eine gueltige Zahl sein';
 			return false;
 		}
 
 		//loeschen des Datensatzes
-		$qry="DELETE FROM campus.tbl_zeitaufzeichnung WHERE zeitaufzeichnung_id='$zeitaufzeichnung_id';";
+		$qry="DELETE FROM campus.tbl_zeitaufzeichnung WHERE zeitaufzeichnung_id=".$this->db_add_param($zeitaufzeichnung_id, FHC_INTEGER, false);
 
 		if($this->db_query($qry))
 		{
@@ -233,7 +231,7 @@ class zeitaufzeichnung extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Loeschen der Daten'."\n";
+			$this->errormsg = 'Fehler beim Loeschen der Daten';
 			return false;
 		}
 	}

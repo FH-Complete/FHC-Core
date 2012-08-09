@@ -122,23 +122,25 @@ class zeitwunsch extends basis_db
 		{
 			$qry = 'INSERT INTO campus.tbl_zeitwunsch (mitarbeiter_uid, tag, stunde, gewicht, 
 					insertamum, insertvon, updateamum, updatevon) VALUES('.
-					$this->addslashes($this->mitarbeiter_uid).','.
-					$this->addslashes($this->tag).','.
-					$this->addslashes($this->stunde).','.
-					$this->addslashes($this->gewicht).','.
-					$this->addslashes($this->insertamum).','.
-					$this->addslashes($this->insertvon).','.
-					$this->addslashes($this->updateamum).','.
-					$this->addslasheS($this->updatevon).');';
+					$this->db_add_param($this->mitarbeiter_uid).','.
+					$this->db_add_param($this->tag, FHC_INTEGER).','.
+					$this->db_add_param($this->stunde, FHC_INTEGER).','.
+					$this->db_add_param($this->gewicht, FHC_INTEGER).','.
+					$this->db_add_param($this->insertamum).','.
+					$this->db_add_param($this->insertvon).','.
+					$this->db_add_param($this->updateamum).','.
+					$this->db_add_param($this->updatevon).');';
 		}
 		else
 		{
 			$qry = 'UPDATE campus.tbl_zeitwunsch SET'.
-			       ' gewicht='.$this->addslashes($this->gewicht).', '.
-			       ' updateamum='.$this->addslashes($this->updateamum).', '.
-			       ' updatevon='.$this->addslashes($this->updatevon).
-			       " WHERE mitarbeiter_uid='".addslashes($this->mitarbeiter_uid)."' AND
-			         tag='".addslashes($this->tag)."' AND stunde='".addslashes($this->stunde)."'";
+			       ' gewicht='.$this->db_add_param($this->gewicht, FHC_INTEGER).', '.
+			       ' updateamum='.$this->db_add_param($this->updateamum).', '.
+			       ' updatevon='.$this->db_add_param($this->updatevon).
+			       " WHERE 
+			       		mitarbeiter_uid=".$this->db_add_param($this->mitarbeiter_uid, FHC_STRING, false)." 
+			       		AND tag=".$this->db_add_param($this->tag, FHC_INTEGER)." 
+			       		AND stunde=".$this->db_add_param($this->stunde, FHC_INTEGER);
 		}
 
 		if($this->db_query($qry))
@@ -161,7 +163,7 @@ class zeitwunsch extends basis_db
 	public function loadPerson($uid,$datum=null)
 	{
 		// Zeitwuensche abfragen
-		if(!$this->db_query("SELECT * FROM campus.tbl_zeitwunsch WHERE mitarbeiter_uid='".addslashes($uid)."'"))
+		if(!$this->db_query("SELECT * FROM campus.tbl_zeitwunsch WHERE mitarbeiter_uid=".$this->db_add_param($uid)))
 		{
 			$this->errormsg = $this->db_last_error();
 			return false;
@@ -185,9 +187,16 @@ class zeitwunsch extends basis_db
 			$ende=date('Y-m-d',jump_day($beginn,7));
 
 			// Zeitsperren abfragen
-			$sql="SELECT vondatum,vonstunde,bisdatum,bisstunde
-				FROM campus.tbl_zeitsperre
-				WHERE mitarbeiter_uid='".addslashes($uid)."' AND vondatum<='$ende' AND bisdatum>='$start'";
+			$sql="
+				SELECT 
+					vondatum,vonstunde,bisdatum,bisstunde
+				FROM 
+					campus.tbl_zeitsperre
+				WHERE 
+					mitarbeiter_uid=".$this->db_add_param($uid)."
+					AND vondatum<=".$this->db_add_param($ende)." 
+					AND bisdatum>=".$this->db_add_param($start);
+			
 			if(!$this->db_query($sql))
 			{
 				$this->errormsg=$this->db_last_error();
@@ -250,7 +259,7 @@ class zeitwunsch extends basis_db
 		$sql_query_leid='';
 		$sql_query_le='SELECT DISTINCT mitarbeiter_uid FROM campus.vw_lehreinheit WHERE ';
 		for ($i=0;$i<count($le_id);$i++)
-			$sql_query_leid.=" OR lehreinheit_id='".$le_id[$i]."'";
+			$sql_query_leid.=" OR lehreinheit_id=".$this->db_add_param($le_id[$i], FHC_INTEGER);
 		$sql_query_leid=mb_substr($sql_query_leid,3);
 		$sql_query_le.=$sql_query_leid;
 
@@ -278,9 +287,16 @@ class zeitwunsch extends basis_db
 			$ende=date('Y-m-d',jump_day($beginn,7));
 
 			// Zeitsperren abfragen
-			$sql="SELECT vondatum,vonstunde,bisdatum,bisstunde
-				FROM campus.tbl_zeitsperre
-				WHERE mitarbeiter_uid IN ($sql_query_le) AND vondatum<='$ende' AND bisdatum>='$start'";
+			$sql="
+				SELECT 
+					vondatum,vonstunde,bisdatum,bisstunde
+				FROM 
+					campus.tbl_zeitsperre
+				WHERE 
+					mitarbeiter_uid IN ($sql_query_le) 
+					AND vondatum<=".$this->db_add_param($ende)." 
+					AND bisdatum>=".$this->db_add_param($start);
+			
 			if(!$this->db_query($sql))
 			{
 				$this->errormsg = $this->db_last_error();
@@ -338,9 +354,9 @@ class zeitwunsch extends basis_db
 	{
 		$qry = "SELECT 1 FROM campus.tbl_zeitwunsch 
 				WHERE 
-					mitarbeiter_uid='".addslashes($uid)."' 
-					AND stunde='".addslashes($stunde)."' 
-					AND tag='".addslashes($tag)."';";
+					mitarbeiter_uid=".$this->db_add_param($uid)." 
+					AND stunde=".$this->db_add_param($stunde, FHC_INTEGER)." 
+					AND tag=".$this->db_add_param($tag, FHC_INTEGER);
 		if($this->db_query($qry))
 		{
 			if($this->db_num_rows()>0)
