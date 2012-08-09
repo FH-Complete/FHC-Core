@@ -153,8 +153,8 @@ class ampel extends basis_db
 	 */
 	public function isBestaetigt($user, $ampel_id)
 	{
-		$qry = "SELECT 1 FROM public.tbl_ampel_benutzer_bestaetigt WHERE ampel_id=".$this->db_add_param($ampel_id, FHC_INTEGER)."' AND uid=".$this->db_add_param($user);
-		
+		$qry = "SELECT 1 FROM public.tbl_ampel_benutzer_bestaetigt WHERE ampel_id=".$this->db_add_param($ampel_id, FHC_INTEGER)." AND uid=".$this->db_add_param($user);
+	
 		if($result = $this->db_query($qry))
 		{
 			if($this->db_num_rows($result)>0)
