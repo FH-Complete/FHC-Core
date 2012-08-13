@@ -61,12 +61,13 @@
 <body id="inhalt">
 <?php
 
-	$lvid = $_GET['lvid'];
+    $lvid = $_GET['lvid'];
 	$stsem_obj = new studiensemester();
 	$stsem = $stsem_obj->getaktorNext();
-	if(isset($POST["feedback_message"]))
-	   $feedback_message=$POST["feedback_message"];
-
+	if(isset($_POST['feedback_message']))
+	   $feedback_message=$_POST['feedback_message'];
+    if(isset($_POST['feedback_subject']))
+	   $feedback_subject=$_POST['feedback_subject'];
 ?>
 
 <table class="tabcontent">
