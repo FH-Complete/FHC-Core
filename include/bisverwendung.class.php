@@ -278,14 +278,14 @@ class bisverwendung extends basis_db
 					else 
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
-						$this->db_query('ROLLBACK');
+						$this->db_query('ROLLBACK;');
 						return false;
 					}
 				}
 				else 
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
-					$this->db_query('ROLLBACK');
+					$this->db_query('ROLLBACK;');
 					return false;
 				}
 			}
