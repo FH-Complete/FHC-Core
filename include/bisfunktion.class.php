@@ -69,7 +69,7 @@ class bisfunktion extends basis_db
 		}
 		
 		//laden des Datensatzes
-		$qry = "SELECT * FROM bis.tbl_bisfunktion WHERE bisverwendung_id='$bisverwendung_id' AND studiengang_kz='$studiengang_kz'";
+		$qry = "SELECT * FROM bis.tbl_bisfunktion WHERE bisverwendung_id=".$this->db_add_param($bisverwendung_id, FHC_INTEGER)." AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER).";";
 		
 		if($this->db_query($qry))
 		{
@@ -118,7 +118,7 @@ class bisfunktion extends basis_db
 			return false;
 		}
 		
-		$qry = "DELETE FROM bis.tbl_bisfunktion WHERE bisverwendung_id = '$bisverwendung_id' AND studiengang_kz='$studiengang_kz';";
+		$qry = "DELETE FROM bis.tbl_bisfunktion WHERE bisverwendung_id = ".$this->db_add_param($bisverwendung_id, FHC_INTEGER)." AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER).";";
 		
 		if($this->db_query($qry))
 		{
@@ -167,14 +167,14 @@ class bisfunktion extends basis_db
 			//Neuen Datensatz anlegen	
 			$qry = "INSERT INTO bis.tbl_bisfunktion (bisverwendung_id, studiengang_kz, sws,
 					updateamum, updatevon, insertamum, insertvon, ext_id) VALUES (".
-			       $this->addslashes($this->bisverwendung_id).', '.
-			       $this->addslashes($this->studiengang_kz).', '.
-			       $this->addslashes($this->sws).', '.
-			       $this->addslashes($this->updateamum).', '.
-			       $this->addslashes($this->updatevon).', '.
-			       $this->addslashes($this->insertamum).', '.
-			       $this->addslashes($this->insertvon).', '.
-			       $this->addslashes($this->ext_id).');';
+			       $this->db_add_param($this->bisverwendung_id, FHC_INTEGER).', '.
+			       $this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
+			       $this->db_add_param($this->sws).', '.
+			       $this->db_add_param($this->updateamum).', '.
+			       $this->db_add_param($this->updatevon).', '.
+			       $this->db_add_param($this->insertamum).', '.
+			       $this->db_add_param($this->insertvon).', '.
+			       $this->db_add_param($this->ext_id).');';
 			       
 		}
 		else 
@@ -186,12 +186,12 @@ class bisfunktion extends basis_db
 			
 			//Bestehenden Datensatz aktualisieren
 			$qry= "UPDATE bis.tbl_bisfunktion SET".
-				  " sws=".$this->addslashes($this->sws).",".
-				  " studiengang_kz=".$this->addslashes($this->studiengang_kz).",".
-				  " updateamum=".$this->addslashes($this->updateamum).",".
-				  " updatevon=".$this->addslashes($this->updatevon).",".
-				  " ext_id=".$this->addslashes($this->ext_id).
-				  " WHERE bisverwendung_id='".addslashes($this->bisverwendung_id)."' AND studiengang_kz='".addslashes($this->studiengang_kz_old)."'";
+				  " sws=".$this->db_add_param($this->sws).",".
+				  " studiengang_kz=".$this->db_add_param($this->studiengang_kz, FHC_INTEGER).",".
+				  " updateamum=".$this->db_add_param($this->updateamum).",".
+				  " updatevon=".$this->db_add_param($this->updatevon).",".
+				  " ext_id=".$this->db_add_param($this->ext_id).
+				  " WHERE bisverwendung_id=".$this->db_add_param($this->bisverwendung_id, FHC_INTEGER)." AND studiengang_kz=".$this->db_add_param($this->studiengang_kz_old, FHC_INTEGER);
 		}
 		
 		if($this->db_query($qry))
@@ -213,12 +213,12 @@ class bisfunktion extends basis_db
 	public function getBisFunktion($bisverwendung_id, $studiengang_kz=null)
 	{
 		//laden des Datensatzes
-		$qry = "SELECT * FROM bis.tbl_bisfunktion WHERE bisverwendung_id='".addslashes($bisverwendung_id)."'";
+		$qry = "SELECT * FROM bis.tbl_bisfunktion WHERE bisverwendung_id=".$this->db_add_param($bisverwendung_id, FHC_INTEGER);
 		
 		if($studiengang_kz!=null)
-			$qry.=" AND studiengang_kz='".addslashes($studiengang_kz)."'";
+			$qry.=" AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
 
-		$qry.=" ORDER BY studiengang_kz";
+		$qry.=" ORDER BY studiengang_kz;";
 		
 		if($this->db_query($qry))
 		{
