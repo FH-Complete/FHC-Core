@@ -58,7 +58,7 @@ class feedback extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM campus.tbl_feedback WHERE feedback_id='$feedback_id'";
+		$qry = "SELECT * FROM campus.tbl_feedback WHERE feedback_id=".$this->db_add_param($feedback_id, FHC_INTEGER).";";
 
 		if($this->db_query($qry))
 		{
@@ -121,7 +121,7 @@ class feedback extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM campus.tbl_feedback WHERE lehrveranstaltung_id='$lehrveranstaltung_id'";
+		$qry = "SELECT * FROM campus.tbl_feedback WHERE lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER).";";
 
 		if($this->db_query($qry))
 		{
@@ -162,20 +162,20 @@ class feedback extends basis_db
 		if($this->new)
 		{
 			$qry = 'INSERT INTO campus.tbl_feedback (betreff, text, datum, uid, lehrveranstaltung_id)
-			        VALUES('.$this->addslashes($this->betreff).','.
-					$this->addslashes($this->text).','.
-					$this->addslashes($this->datum).','.
-					$this->addslashes($this->uid).','.
-					$this->addslashes($this->lehrveranstaltung_id).');';
+			        VALUES('.$this->db_add_param($this->betreff).','.
+					$this->db_add_param($this->text).','.
+					$this->db_add_param($this->datum).','.
+					$this->db_add_param($this->uid).','.
+					$this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER).');';
 		}
 		else
 		{
 			$qry = 'UPDATE campus.tbl_feedback SET'.
-			       ' betreff='.$this->addslashes($this->betreff).','.
-			       ' text='.$this->addslashes($this->text).','.
-			       ' datum='.$this->addslashes($this->datum).','.
-			       ' uid='.$this->addslashes($this->uid).
-			       " WHERE feedback_id='".addslashes($this->feedback_id)."'";
+			       ' betreff='.$this->db_add_param($this->betreff).','.
+			       ' text='.$this->db_add_param($this->text).','.
+			       ' datum='.$this->db_add_param($this->datum).','.
+			       ' uid='.$this->db_add_param($this->uid).
+			       " WHERE feedback_id=".$this->db_add_param($this->feedback_id, FHC_INTEGER).";";
 		}
 
 		if($this->db_query($qry))

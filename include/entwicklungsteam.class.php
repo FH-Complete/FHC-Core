@@ -69,7 +69,7 @@ class entwicklungsteam extends basis_db
 		
 		//laden des Datensatzes
 		$qry = "SELECT * FROM bis.tbl_entwicklungsteam JOIN bis.tbl_besqual USING(besqualcode) 
-				WHERE mitarbeiter_uid='".addslashes($mitarbeiter_uid)."' AND studiengang_kz='$studiengang_kz'";
+				WHERE mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid)." AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER).";";
 		
 		if($this->db_query($qry))
 		{
@@ -115,7 +115,7 @@ class entwicklungsteam extends basis_db
 		}
 		
 		$qry = "DELETE FROM bis.tbl_entwicklungsteam 
-				WHERE mitarbeiter_uid = '".addslashes($mitarbeiter_uid)."' AND studiengang_kz='$studiengang_kz';";
+				WHERE mitarbeiter_uid = ".$this->db_add_param($mitarbeiter_uid)." AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER).";";
 		
 		if($this->db_query($qry))
 		{
@@ -172,16 +172,16 @@ class entwicklungsteam extends basis_db
 			//Neuen Datensatz anlegen	
 			$qry = "INSERT INTO bis.tbl_entwicklungsteam (mitarbeiter_uid, studiengang_kz, besqualcode, beginn, ende,
 					updateamum, updatevon, insertamum, insertvon, ext_id) VALUES (".
-			       $this->addslashes($this->mitarbeiter_uid).', '.
-			       $this->addslashes($this->studiengang_kz).', '.
-			       $this->addslashes($this->besqualcode).', '.
-			       $this->addslashes($this->beginn).', '.
-			       $this->addslashes($this->ende).', '.
-			       $this->addslashes($this->updateamum).', '.
-			       $this->addslashes($this->updatevon).', '.
-			       $this->addslashes($this->insertamum).', '.
-			       $this->addslashes($this->insertvon).', '.
-			       $this->addslashes($this->ext_id).');';
+			       $this->db_add_param($this->mitarbeiter_uid).', '.
+			       $this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
+			       $this->db_add_param($this->besqualcode, FHC_INTEGER).', '.
+			       $this->db_add_param($this->beginn).', '.
+			       $this->db_add_param($this->ende).', '.
+			       $this->db_add_param($this->updateamum).', '.
+			       $this->db_add_param($this->updatevon).', '.
+			       $this->db_add_param($this->insertamum).', '.
+			       $this->db_add_param($this->insertvon).', '.
+			       $this->db_add_param($this->ext_id, FHC_INTEGER).');';
 			       
 		}
 		else 
@@ -191,14 +191,14 @@ class entwicklungsteam extends basis_db
 				
 			//Bestehenden Datensatz aktualisieren
 			$qry= "UPDATE bis.tbl_entwicklungsteam SET".
-				  " besqualcode=".$this->addslashes($this->besqualcode).",".
-				  " beginn=".$this->addslashes($this->beginn).",".
-				  " studiengang_kz=".$this->addslashes($this->studiengang_kz).",".
-				  " ende=".$this->addslashes($this->ende).",".
-				  " updateamum=".$this->addslashes($this->updateamum).",".
-				  " updatevon=".$this->addslashes($this->updatevon).",".
-				  " ext_id=".$this->addslashes($this->ext_id).
-				  " WHERE mitarbeiter_uid='".addslashes($this->mitarbeiter_uid)."' AND studiengang_kz='$this->studiengang_kz_old'";
+				  " besqualcode=".$this->db_add_param($this->besqualcode, FHC_INTEGER).",".
+				  " beginn=".$this->db_add_param($this->beginn).",".
+				  " studiengang_kz=".$this->db_add_param($this->studiengang_kz, FHC_INTEGER).",".
+				  " ende=".$this->db_add_param($this->ende).",".
+				  " updateamum=".$this->db_add_param($this->updateamum).",".
+				  " updatevon=".$this->db_add_param($this->updatevon).",".
+				  " ext_id=".$this->db_add_param($this->ext_id, FHC_INTEGER).
+				  " WHERE mitarbeiter_uid=".$this->db_add_param($this->mitarbeiter_uid)." AND studiengang_kz=".$this->db_add_param($this->studiengang_kz_old, FHC_INTEGER).";";
 		}
 		
 		if($this->db_query($qry))
@@ -221,10 +221,12 @@ class entwicklungsteam extends basis_db
 	{
 		//laden des Datensatzes
 		$qry = "SELECT * FROM bis.tbl_entwicklungsteam JOIN bis.tbl_besqual USING(besqualcode) 
-				WHERE mitarbeiter_uid='".addslashes($mitarbeiter_uid)."'";
+				WHERE mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid);
 		
 		if($studiengang_kz!=null)
-			$qry.=" AND studiengang_kz='".addslashes($studiengang_kz)."'";
+			$qry.=" AND studiengang_kz=".$this->db_add_param($studiengang_kz);
+        
+        $qry.=";";
 		
 		if($this->db_query($qry))
 		{
@@ -265,7 +267,7 @@ class entwicklungsteam extends basis_db
 	public function exists($mitarbeiter_uid,$studiengang_kz)
 	{
 		$qry = "SELECT count(*) as anzahl FROM bis.tbl_entwicklungsteam 
-				WHERE mitarbeiter_uid='".addslashes($mitarbeiter_uid)."' AND studiengang_kz='".addslashes($studiengang_kz)."'";
+				WHERE mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid)." AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER).";";
 		
 		if($this->db_query($qry))
 		{
