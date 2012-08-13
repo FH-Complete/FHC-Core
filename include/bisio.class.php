@@ -74,7 +74,7 @@ class bisio extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM bis.tbl_bisio WHERE bisio_id='$bisio_id'";
+		$qry = "SELECT * FROM bis.tbl_bisio WHERE bisio_id=".$this->db_add_param($bisio_id, FHC_INTEGER).";";
 
 		if($this->db_query($qry))
 		{
@@ -177,38 +177,38 @@ class bisio extends basis_db
 			//Neuen Datensatz einfuegen
 
 			$qry='BEGIN;INSERT INTO bis.tbl_bisio (mobilitaetsprogramm_code, nation_code, von, bis, zweck_code, student_uid, updateamum, updatevon, insertamum, insertvon, ext_id, ort, universitaet, lehreinheit_id) VALUES('.
-			     $this->addslashes($this->mobilitaetsprogramm_code).', '.
-			     $this->addslashes($this->nation_code).', '.
-			     $this->addslashes($this->von).', '.
-			     $this->addslashes($this->bis).', '.
-			     $this->addslashes($this->zweck_code).', '.
-			     $this->addslashes($this->student_uid).', '.
-			     $this->addslashes($this->updateamum).', '.
-			     $this->addslashes($this->updatevon).', '.
-			     $this->addslashes($this->insertamum).', '.
-			     $this->addslashes($this->insertvon).', '.
-			     $this->addslashes($this->ext_id).','.
-			     $this->addslashes($this->ort).', '.
-			     $this->addslashes($this->universitaet).', '.
-			     $this->addslashes($this->lehreinheit_id).');';
+			     $this->db_add_param($this->mobilitaetsprogramm_code, FHC_INTEGER).', '.
+			     $this->db_add_param($this->nation_code).', '.
+			     $this->db_add_param($this->von).', '.
+			     $this->db_add_param($this->bis).', '.
+			     $this->db_add_param($this->zweck_code).', '.
+			     $this->db_add_param($this->student_uid).', '.
+			     $this->db_add_param($this->updateamum).', '.
+			     $this->db_add_param($this->updatevon).', '.
+			     $this->db_add_param($this->insertamum).', '.
+			     $this->db_add_param($this->insertvon).', '.
+			     $this->db_add_param($this->ext_id, FHC_INTEGER).','.
+			     $this->db_add_param($this->ort).', '.
+			     $this->db_add_param($this->universitaet).', '.
+			     $this->db_add_param($this->lehreinheit_id, FHC_INTEGER).');';
 		}
 		else
 		{
 			//Updaten des bestehenden Datensatzes
 			$qry = 'UPDATE bis.tbl_bisio SET '.
-				   ' mobilitaetsprogramm_code='.$this->addslashes($this->mobilitaetsprogramm_code).','.
-				   ' nation_code='.$this->addslashes($this->nation_code).','.
-				   ' von='.$this->addslashes($this->von).','.
-				   ' bis='.$this->addslashes($this->bis).','.
-				   ' zweck_code='.$this->addslashes($this->zweck_code).','.
-				   ' student_uid='.$this->addslashes($this->student_uid).','.
-				   ' updateamum='.$this->addslashes($this->updateamum).','.
-				   ' updatevon='.$this->addslashes($this->updatevon).','.
-				   ' ext_id='.$this->addslashes($this->ext_id).','.
-				   ' ort='.$this->addslashes($this->ort).','.
-				   ' universitaet='.$this->addslashes($this->universitaet).','.
-				   ' lehreinheit_id='.$this->addslashes($this->lehreinheit_id).
-				   " WHERE bisio_id='".addslashes($this->bisio_id)."';";
+				   ' mobilitaetsprogramm_code='.$this->db_add_param($this->mobilitaetsprogramm_code, FHC_INTEGER).','.
+				   ' nation_code='.$this->db_add_param($this->nation_code).','.
+				   ' von='.$this->db_add_param($this->von).','.
+				   ' bis='.$this->db_add_param($this->bis).','.
+				   ' zweck_code='.$this->db_add_param($this->zweck_code).','.
+				   ' student_uid='.$this->db_add_param($this->student_uid).','.
+				   ' updateamum='.$this->db_add_param($this->updateamum).','.
+				   ' updatevon='.$this->db_add_param($this->updatevon).','.
+				   ' ext_id='.$this->db_add_param($this->ext_id, FHC_INTEGER).','.
+				   ' ort='.$this->db_add_param($this->ort).','.
+				   ' universitaet='.$this->db_add_param($this->universitaet).','.
+				   ' lehreinheit_id='.$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).
+				   " WHERE bisio_id=".db_add_param($this->bisio_id, FHC_INTEGER).";";
 		}
 		
 		if($this->db_query($qry))
@@ -259,7 +259,7 @@ class bisio extends basis_db
 			return false;
 		}
 		
-		$qry = "DELETE FROM bis.tbl_bisio WHERE bisio_id='$bisio_id'";
+		$qry = "DELETE FROM bis.tbl_bisio WHERE bisio_id=".$this->db_add_param($bisio_id, FHC_INTEGER).";";
 		
 		if($this->db_query($qry))
 			return true;
@@ -286,10 +286,10 @@ class bisio extends basis_db
 			    	bis.tbl_zweck, 
 			    	bis.tbl_mobilitaetsprogramm 
 				WHERE 
-					student_uid='".addslashes($uid)."' AND
+					student_uid=".$this->db_add_param($uid)." AND
 					tbl_zweck.zweck_code=tbl_bisio.zweck_code AND
 					tbl_mobilitaetsprogramm.mobilitaetsprogramm_code=tbl_bisio.mobilitaetsprogramm_code
-				ORDER BY bis";
+				ORDER BY bis;";
 		
 		if($this->db_query($qry))
 		{
