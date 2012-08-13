@@ -64,7 +64,7 @@ class beispiel extends basis_db
 			$this->errormsg='Beispiel_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		$qry = "SELECT * FROM campus.tbl_beispiel WHERE beispiel_id='".addslashes($beispiel_id)."'";
+		$qry = "SELECT * FROM campus.tbl_beispiel WHERE beispiel_id=".$this->db_add_param($beispiel_id, FHC_INTEGER).';';
 
 		if($this->db_query($qry))
 		{
@@ -108,7 +108,7 @@ class beispiel extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM campus.tbl_beispiel WHERE uebung_id='".addslashes($uebung_id)."' ORDER BY bezeichnung";
+		$qry = "SELECT * FROM campus.tbl_beispiel WHERE uebung_id=".$this->db_add_param($uebung_id, FHC_INTEGER)." ORDER BY bezeichnung;";
 
 		if($this->db_query($qry))
 		{
@@ -144,7 +144,7 @@ class beispiel extends basis_db
 	 */
 	public function get_next_nummer()
 	{
-		$qry = "SELECT max(nummer) FROM campus.tbl_beispiel";
+		$qry = "SELECT max(nummer) FROM campus.tbl_beispiel;";
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -209,25 +209,25 @@ class beispiel extends basis_db
 			}
 			$qry = 'BEGIN; INSERT INTO campus.tbl_beispiel(uebung_id, punkte, bezeichnung, updateamum,
 			        updatevon, insertamum, insertvon, nummer) VALUES('.
-			        $this->addslashes($this->uebung_id).','.
-			        $this->addslashes($this->punkte).','.
-			        $this->addslashes($this->bezeichnung).','.
-			        $this->addslashes($this->updateamum).','.
-			        $this->addslashes($this->updatevon).','.
-			        $this->addslashes($this->insertamum).','.
-			        $this->addslashes($this->insertvon).','.
-					$this->addslashes($this->nummer).');';
+			        $this->db_add_param($this->uebung_id, FHC_INTEGER).','.
+			        $this->db_add_param($this->punkte).','.
+			        $this->db_add_param($this->bezeichnung).','.
+			        $this->db_add_param($this->updateamum).','.
+			        $this->db_add_param($this->updatevon).','.
+			        $this->db_add_param($this->insertamum).','.
+			        $this->db_add_param($this->insertvon).','.
+					$this->db_add_param($this->nummer).');';
 		}
 		else
 		{
 			$qry = 'UPDATE campus.tbl_beispiel SET'.
-			       ' uebung_id='.$this->addslashes($this->uebung_id).','.
-			       ' punkte='.$this->addslashes($this->punkte).','.
-			       ' bezeichnung='.$this->addslashes($this->bezeichnung).','.
-			       ' updateamum='.$this->addslashes($this->updateamum).','.
-				   ' nummer='.$this->addslashes($this->nummer).','.
-			       ' updatevon='.$this->addslashes($this->updatevon).
-			       " WHERE beispiel_id=".$this->addslashes($this->beispiel_id).";";
+			       ' uebung_id='.$this->db_add_param($this->uebung_id, FHC_INTEGER).','.
+			       ' punkte='.$this->db_add_param($this->punkte).','.
+			       ' bezeichnung='.$this->db_add_param($this->bezeichnung).','.
+			       ' updateamum='.$this->db_add_param($this->updateamum).','.
+				   ' nummer='.$this->db_add_param($this->nummer).','.
+			       ' updatevon='.$this->db_add_param($this->updatevon).
+			       " WHERE beispiel_id=".$this->db_add_param($this->beispiel_id).";";
 		}
 
 		if($this->db_query($qry))
@@ -284,7 +284,7 @@ class beispiel extends basis_db
 		}
 
 		$qry = "SELECT beispiel_id FROM campus.tbl_beispiel 
-				WHERE uebung_id='".addslashes($uebung_id)."' AND bezeichnung=".$this->addslashes($bezeichnung);
+				WHERE uebung_id=".$this->db_add_param($uebung_id, FHC_INTEGER)." AND bezeichnung=".$this->db_add_param($bezeichnung).';';
 
 		if($this->db_query($qry))
 		{
@@ -316,7 +316,7 @@ class beispiel extends basis_db
 		}
 
 		$qry = "SELECT vorbereitet FROM campus.tbl_studentbeispiel 
-				WHERE beispiel_id='".addslashes($beispiel_id)."' AND student_uid='".addslashes($uid)."'";
+				WHERE beispiel_id=".$this->db_add_param($beispiel_id,FHC_INTEGER)." AND student_uid=".$this->db_add_param($uid).';';
 
 		if($this->db_query($qry))
 		{
@@ -346,8 +346,8 @@ class beispiel extends basis_db
 			return false;
 		}
 
-		$qry = "DELETE FROM campus.tbl_studentbeispiel WHERE beispiel_id='".addslashes($beispiel_id)."';
-				DELETE FROM campus.tbl_beispiel WHERE beispiel_id='".addslashes($beispiel_id)."';";
+		$qry = "DELETE FROM campus.tbl_studentbeispiel WHERE beispiel_id=".$this->db_add_param($beispiel_id, FHC_INTEGER).";
+				DELETE FROM campus.tbl_beispiel WHERE beispiel_id=".$this->db_add_param($beispiel_id, FHC_INTEGER).";";
 
 		if($this->db_query($qry))
 			return true;
@@ -373,7 +373,7 @@ class beispiel extends basis_db
 			return false;
 		}
 		$qry = "SELECT * FROM campus.tbl_studentbeispiel 
-				WHERE student_uid='".addslashes($uid)."' AND beispiel_id='".addslashes($beispiel_id)."'";
+				WHERE student_uid=".$this->db_add_param($uid)." AND beispiel_id=".$this->db_add_param($beispiel_id, FHC_INTEGER).';';
 
 		if($this->db_query($qry))
 		{
@@ -381,8 +381,8 @@ class beispiel extends basis_db
 			{
 				$this->beispiel_id = $row->beispiel_id;
 				$this->student_uid = $row->student_uid;
-				$this->vorbereitet = ($row->vorbereitet=='t'?true:false);
-				$this->probleme = ($row->probleme=='t'?true:false);
+				$this->vorbereitet = $this->db_parse_bool($row->vorbereitet);
+				$this->probleme = $this->db_parse_bool($row->probleme);
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->insertamum = $row->insertamum;
@@ -416,7 +416,7 @@ class beispiel extends basis_db
 			return false;
 		}
 		$qry = "SELECT count(*) as anzahl FROM campus.tbl_studentbeispiel 
-				WHERE vorbereitet = true and beispiel_id='".addslashes($beispiel_id)."'";
+				WHERE vorbereitet = true and beispiel_id=".$this->db_add_param($beispiel_id, FHC_INTEGER).';';
 
 		if($this->db_query($qry))
 		{
@@ -468,23 +468,23 @@ class beispiel extends basis_db
 		{
 			$qry = 'INSERT INTO campus.tbl_studentbeispiel(student_uid, beispiel_id, vorbereitet, probleme,
 					updateamum, updatevon, insertamum, insertvon) VALUES('.
-			        $this->addslashes($this->student_uid).','.
-			        $this->addslashes($this->beispiel_id).','.
-			        ($this->vorbereitet?'true':'false').','.
-			        ($this->probleme?'true':'false').','.
-			        $this->addslashes($this->updateamum).','.
-			        $this->addslashes($this->updatevon).','.
-			        $this->addslashes($this->insertamum).','.
-					$this->addslashes($this->insertvon).');';
+			        $this->db_add_param($this->student_uid).','.
+			        $this->db_add_param($this->beispiel_id, FHC_INTEGER).','.
+			        $this->db_add_param($this->vorbereitet,FHC_BOOLEAN).','.
+			        $this->db_add_param($this->probleme).','.
+			        $this->db_add_param($this->updateamum).','.
+			        $this->db_add_param($this->updatevon).','.
+			        $this->db_add_param($this->insertamum).','.
+					$this->db_add_param($this->insertvon).');';
 		}
 		else
 		{
 			$qry = 'UPDATE campus.tbl_studentbeispiel SET'.
-			       ' vorbereitet='.($this->vorbereitet?'true':'false').','.
-			       ' probleme='.($this->probleme?'true':'false').','.
-			       ' updateamum='.$this->addslashes($this->updateamum).','.
-			       ' updatevon='.$this->addslashes($this->updatevon).
-			       " WHERE beispiel_id=".$this->beispiel_id." AND student_uid=".$this->addslashes($this->student_uid).';';
+			       ' vorbereitet='.$this->db_add_param($this->vorbereitet, FHC_BOOLEAN).','.
+			       ' probleme='.$this->db_add_param($this->probleme, FHC_BOOLEAN).','.
+			       ' updateamum='.$this->db_add_param($this->updateamum).','.
+			       ' updatevon='.$this->db_add_param($this->updatevon).
+			       " WHERE beispiel_id=".$this->db_add_param(beispiel_id, FHC_INTEGER)." AND student_uid=".$this->db_add_param($this->student_uid).';';
 		}
 
 		if($this->db_query($qry))
