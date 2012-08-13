@@ -1303,6 +1303,152 @@ class content extends basis_db
 			return false;
 		}					
 	}
-	
+
+	/**
+	 * Laedt alle Content Eintraege unterhalb eines Contents
+	 * (Ohne Newseintraege)
+	 */
+	public function getAllChilds($content_id)
+	{
+		$qry = "
+			SELECT 
+				content_id
+			FROM 
+				campus.tbl_content
+			WHERE 
+				content_id IN(
+					WITH RECURSIVE childs(content_id, child_content_id) as 
+					(
+						SELECT content_id, child_content_id FROM campus.tbl_contentchild 
+						WHERE content_id=".$this->db_add_param($content_id, FHC_INTEGER)."
+						UNION ALL
+						SELECT cc.child_content_id, null FROM campus.tbl_contentchild cc, childs
+						WHERE cc.content_id=childs.content_id
+					)
+					SELECT content_id
+					FROM childs
+					GROUP BY content_id)
+				AND template_kurzbz<>'news'
+			";
+		$ids=array();
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$ids[] = $row->content_id;
+			}
+			return $ids;
+		}
+	}
+
+	/**
+	 * 
+	 * Laedt Contenteintraege anhand einer ID Liste
+	 * @param $ids Array mit Content IDs
+	 * @param $sprache
+	 * @param $sichtbar
+	 */
+	public function loadArray($ids, $sprache, $sichtbar=null)
+	{
+		$qry='';
+		foreach($ids as $id)
+		{
+			if($qry!='')	
+				$qry.='UNION ALL';
+			$qry.= " SELECT 
+						content_id, titel, oe_kurzbz, template_kurzbz, sprache,
+						contentsprache_id, version, sichtbar, content, reviewvon, reviewamum,
+						tbl_contentsprache.updateamum, tbl_contentsprache.updatevon, 
+						tbl_contentsprache.insertamum, tbl_contentsprache.insertvon, 
+						menu_open, aktiv, gesperrt_uid, beschreibung, 
+						(SELECT CASE WHEN count(*)>0 THEN true ELSE false END 
+						 FROM campus.tbl_contentgruppe WHERE content_id=tbl_content.content_id) as locked
+					FROM 
+					campus.tbl_content
+					JOIN campus.tbl_contentsprache USING(content_id)
+				WHERE
+					tbl_content.content_id=".$this->db_add_param($id, FHC_INTEGER)."
+					AND tbl_contentsprache.sprache=".$this->db_add_param($sprache);
+			if($sichtbar)
+				$qry.=" AND sichtbar=true";
+			//Hoechste (sichtbare) Version
+			$qry.=" AND version=(SELECT max(version) FROM campus.tbl_contentsprache 
+								WHERE content_id=".$this->db_add_param($id, FHC_INTEGER)."
+					AND tbl_contentsprache.sprache=".$this->db_add_param($sprache);
+			if($sichtbar)
+				$qry.=" AND sichtbar=true";
+			$qry.=")";
+		}	
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new content();
+
+				$obj->content_id = $row->content_id;
+				$obj->titel = $row->titel;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->template_kurzbz = $row->template_kurzbz;
+				$obj->sprache = $row->sprache;
+				$obj->contentsprache_id = $row->contentsprache_id;
+				$obj->version = $row->version;
+				$obj->sichtbar = $obj->db_parse_bool($row->sichtbar);
+				$obj->content = $row->content;
+				$obj->reviewvon = $row->reviewvon;
+				$obj->reviewamum = $row->reviewamum;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->menu_open = $this->db_parse_bool($row->menu_open);
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$obj->gesperrt_uid = $row->gesperrt_uid;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->locked = $this->db_parse_bool($row->locked);
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * 
+	 * Laedt rekursiv alle Kindelemente eines Contents und liefert diese als Array zurueck
+	 * @param $content_id
+	 * @return Array mit IDs der Kindelemente
+	 */
+	public function getChildArray($content_id)
+	{
+		$qry = "
+			WITH RECURSIVE childs(content_id, child_content_id, sort) as 
+					(
+						SELECT content_id, child_content_id, sort FROM campus.tbl_contentchild 
+						WHERE content_id=".$this->db_add_param($content_id, FHC_INTEGER)."
+						UNION ALL
+						SELECT cc.content_id, cc.child_content_id, cc.sort FROM campus.tbl_contentchild cc, childs
+						WHERE cc.content_id=childs.child_content_id
+					)
+					SELECT content_id, child_content_id
+					FROM childs ORDER BY content_id, sort
+			";
+
+		$childs=array();
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				if($row->child_content_id!='')
+					$childs[$row->content_id][]=$row->child_content_id;
+			}
+			return $childs;
+		}
+	}
 }
 ?>

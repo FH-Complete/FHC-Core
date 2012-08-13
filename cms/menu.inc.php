@@ -32,7 +32,8 @@ foreach($_REQUEST as $key=>$value)
 
 //Parameter fuer Include Addons
 $includeparams = array();
-
+$contentobjects=array();
+$chldsobject = array();
 /**
  * Zeichnet einen Menueeintrag aus dem CMS System
  * 
@@ -41,78 +42,117 @@ $includeparams = array();
 function drawSubmenu($content_id)
 {
 	global $sprache;
+	global $contentarr;
+	global $childsobject;
+	global $contentobjects;
 	$content = new content();
 	$sprache = getSprache();
 	
-	//$arr = $content->getMenueArray($content_id, $sprache, true);
-	$content->getChilds($content_id);
-	foreach ($content->result as $row)
-	{
-		drawEntry($row, $sprache);
-	}
+	// Daten Laden
+	
+	// Alle Kindelemente des Contents holen
+	$ids = $content->getAllChilds($content_id);
+
+	// Alle vorkommenden Contenteintraege laden 
+	$content->loadArray($ids, $sprache, true);
+	$contentobjects = $content->result;
+	
+	// Baumstruktur laden
+	$childsobject = $content->getChildArray($content_id);
+	
+	// Menue rausschreiben
+	drawSubmenu1($content_id);
+
 }
 
+function drawSubmenu1($content_id)
+{
+	global $childsobject;
+	global $contentobjects;
+
+	if(isset($childsobject[$content_id]) && count($childsobject[$content_id])>0)
+	{
+		// jeden Untermenuepunkt durchlaufen
+		foreach($childsobject[$content_id] as $entry)
+		{
+			$contentobj=null;
+			//Content Objekt suchen
+			foreach($contentobjects as $row)
+			{
+				if($row->content_id==$entry)
+				{
+					$contentobj = $row;
+					break;
+				}
+			}
+			if(!is_null($contentobj))
+			{
+				//Eintrag zeichnen
+				drawEntry($contentobj);
+			}
+		}
+		
+
+	}
+}
 /**
  * Zeichnet den Menueeintrag samt Untermenues
  * @param $item Menue Array
  */
-function drawEntry($item, $sprache)
+function drawEntry($item)
 {
-	$content = new content();
+	global $childsobject;
+
 	//pruefen ob der Content eine Berechtigung erfordert
-	if($content->islocked($item->content_id))
+	if($item->locked)
 	{
 		$user = get_uid();
+		$content = new content();
 		//wenn der User nicht berechtigt ist, dann wird der Eintrag nicht angezeigt
 		if(!$content->berechtigt($item->content_id, $user))
 			return;
 	}
-	$content = new content();
-	if($content->getContent($item->child_content_id, $sprache, null, true, true))
+
+	if(isset($childsobject[$item->content_id]) && count($childsobject[$item->content_id])>0)
 	{
-		if($content->hasChilds($content->content_id))
-		{
-			echo '
-			<tr>
-				<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap">';
-			if($content->template_kurzbz=='include')
-				IncludeMenuAddon($content);
-			elseif($content->template_kurzbz=='redirect')
-				Redirect($content, $content->content_id);
-			else
-				DrawLink(APP_ROOT.'cms/content.php?content_id='.$content->content_id,'content',$content->titel, $content->content_id);
-			
-			echo '
-				<table class="menue" id="Content'.$content->content_id.'" style="display: '.($content->menu_open?'visible':'none').'">';
-			
-			$content->getChilds($content->content_id);
-			foreach($content->result as $row)
-			{
-				drawEntry($row, $sprache);
-			}	
-			echo '
-					</table>
-				</td>
-			</tr>';
-		}
+		// Eintrag hat Untermenue -> Aufklappbar machen
+		echo '
+		<tr>
+			<td class="tdwidth10" nowrap>&nbsp;</td>
+			<td class="tdwrap">';
+		if($item->template_kurzbz=='include')
+			IncludeMenuAddon($item);
+		elseif($item->template_kurzbz=='redirect')
+			Redirect($item, $item->content_id);
 		else
-		{
-			echo '
-			<tr>
-			  	<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td class="tdwrap">';
-			if($content->template_kurzbz=='include')
-				IncludeMenuAddon($content);
-			elseif($content->template_kurzbz=='redirect')
-				Redirect($content);
-			else
-				DrawLink(APP_ROOT.'cms/content.php?content_id='.$content->content_id,'content',$content->titel);
-				
-			echo '
-				</td>
-			</tr>';
-		}
+			DrawLink(APP_ROOT.'cms/content.php?content_id='.$item->content_id,'content',$item->titel, $item->content_id);
+			
+		echo '
+			<table class="menue" id="Content'.$item->content_id.'" style="display: '.($item->menu_open?'visible':'none').'">';
+			
+		drawSubmenu1($item->content_id);
+		echo '
+				</table>
+			</td>
+		</tr>';
+	}
+	else
+	{
+		// Normaler Eintrag ohne Untermenue
+		echo '
+		<tr>
+		  	<td class="tdwidth10" nowrap>&nbsp;</td>
+			<td class="tdwrap">';
+		if($item->template_kurzbz=='include')
+			IncludeMenuAddon($item);
+		elseif($item->template_kurzbz=='redirect')
+			Redirect($item);
+		else
+			DrawLink(APP_ROOT.'cms/content.php?content_id='.$item->content_id,'content',$item->titel);
+			
+		echo '
+			</td>
+		</tr>';
 	}
 }
 
