@@ -67,7 +67,7 @@ class dokument extends basis_db
 		}
 		
 		$qry = "SELECT * FROM public.tbl_dokumentprestudent 
-				WHERE prestudent_id='$prestudent_id' AND dokument_kurzbz='".addslashes($dokument_kurzbz)."';";
+				WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER)." AND dokument_kurzbz=".$this->db_add_param($dokument_kurzbz).";";
 		
 		if($this->db_query($qry))
 		{
@@ -149,15 +149,15 @@ class dokument extends basis_db
 		{			
 			$qry = 'INSERT INTO public.tbl_dokumentprestudent(dokument_kurzbz, prestudent_id, mitarbeiter_uid, datum, updateamum, 
 			        updatevon, insertamum, insertvon, ext_id) VALUES('.
-			        $this->addslashes($this->dokument_kurzbz).','.
-			        $this->addslashes($this->prestudent_id).','.
-			        $this->addslashes($this->mitarbeiter_uid).','.
-			        $this->addslashes($this->datum).','.
-			        $this->addslashes($this->updateamum).','.
-			        $this->addslashes($this->updatevon).','.
-			        $this->addslashes($this->insertamum).','.
-			        $this->addslashes($this->insertvon).','.
-			        $this->addslashes($this->ext_id).');';
+			        $this->db_add_param($this->dokument_kurzbz).','.
+			        $this->db_add_param($this->prestudent_id, FHC_INTEGER).','.
+			        $this->db_add_param($this->mitarbeiter_uid).','.
+			        $this->db_add_param($this->datum).','.
+			        $this->db_add_param($this->updateamum).','.
+			        $this->db_add_param($this->updatevon).','.
+			        $this->db_add_param($this->insertamum).','.
+			        $this->db_add_param($this->insertvon).','.
+			        $this->db_add_param($this->ext_id, FHC_INTEGER).');';
 		}
 		else
 		{
@@ -190,7 +190,7 @@ class dokument extends basis_db
 		}
 		
 		$qry = "DELETE FROM public.tbl_dokumentprestudent 
-				WHERE dokument_kurzbz='".addslashes($dokument_kurzbz)."' AND prestudent_id='".addslashes($prestudent_id)."'";
+				WHERE dokument_kurzbz=".$this->db_add_param($dokument_kurzbz)." AND prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER).";";
 		
 		if($this->db_query($qry))
 			return true;
@@ -216,7 +216,7 @@ class dokument extends basis_db
 		}
 		
 		$qry = "SELECT * FROM public.tbl_dokumentprestudent JOIN public.tbl_dokument USING(dokument_kurzbz) 
-				WHERE prestudent_id='$prestudent_id' ORDER BY dokument_kurzbz";
+				WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER)." ORDER BY dokument_kurzbz;";
 		
 		if($this->db_query($qry))
 		{
@@ -268,15 +268,15 @@ class dokument extends basis_db
 		}
 		
 		$qry = "SELECT * FROM public.tbl_dokument JOIN public.tbl_dokumentstudiengang USING(dokument_kurzbz) 
-				WHERE studiengang_kz='$studiengang_kz'";
+				WHERE studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
 
 		if(!is_null($prestudent_id))
 		{
 			$qry.="	AND dokument_kurzbz NOT IN (
-					SELECT dokument_kurzbz FROM public.tbl_dokumentprestudent WHERE prestudent_id='$prestudent_id')";
+					SELECT dokument_kurzbz FROM public.tbl_dokumentprestudent WHERE prestudent_id=".$this->db_add_param($prestudent_id,FHC_INTEGER).")";
 		}
 		
-		$qry.=" ORDER BY dokument_kurzbz";
+		$qry.=" ORDER BY dokument_kurzbz;";
 		
 		if($this->db_query($qry))
 		{
@@ -304,7 +304,7 @@ class dokument extends basis_db
 	public function getDokumente($studiengang_kz)
 	{
 		$qry = "SELECT * FROM public.tbl_dokumentstudiengang JOIN public.tbl_dokument USING(dokument_kurzbz) 
-				WHERE studiengang_kz='".addslashes($studiengang_kz)."'";
+				WHERE studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER).";";
 		
 		if($this->db_query($qry))
 		{
@@ -356,7 +356,7 @@ class dokument extends basis_db
 	
 	public function loadDokumenttyp($dokument_kurzbz)
 	{
-		$qry="Select * FROM public.tbl_dokument where dokument_kurzbz ='".addslashes($dokument_kurzbz)."';";
+		$qry="Select * FROM public.tbl_dokument where dokument_kurzbz =".$this->db_add_param($dokument_kurzbz).";";
 		
 		if($this->db_query($qry))
 		{
