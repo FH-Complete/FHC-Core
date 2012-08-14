@@ -72,11 +72,11 @@ class wawi_rechnung extends basis_db
 			return false; 
 		}
 		
-		$qry = "SELECT * FROM wawi.tbl_rechnung WHERE rechnung_id = '".addslashes($rechnung_id)."'";
+		$qry = "SELECT * FROM wawi.tbl_rechnung WHERE rechnung_id = ".$this->db_add_param($rechnung_id, FHC_INTEGER).';';
 		
 		if(!$this->db_query($qry))
 		{
-			$this->errormsg ="Fehler bei der Datenbankabfrage.";
+			$this->errormsg ='Fehler bei der Datenbankabfrage';
 			return false; 
 		}
 		
@@ -90,7 +90,7 @@ class wawi_rechnung extends basis_db
 			$this->rechnungsdatum = $row->rechnungsdatum;
 			$this->transfer_datum = $row->transfer_datum;
 			$this->buchungstext = $row->buchungstext;
-			$this->freigegeben = ($row->freigegeben=='t'?true:false);
+			$this->freigegeben = $this->db_parse_bool($row->freigegeben);
 			$this->freigegebenamum = $row->freigegebenamum;
 			$this->freigegebenvon = $row->freigegebenvon;
 			$this->updateamum = $row->updateamum;
@@ -100,7 +100,7 @@ class wawi_rechnung extends basis_db
 		}
 		else
 		{
-			$this->errormsg ="Fehler bei der Datenbankabfrage.";
+			$this->errormsg ='Fehler bei der Datenbankabfrage';
 			return false; 
 		}
 		return true; 
@@ -142,52 +142,52 @@ class wawi_rechnung extends basis_db
 		"; 
 		
 		if ($rechnungsnr!='')
-			$qry.= " AND UPPER(tbl_rechnung.rechnungsnr) LIKE UPPER('%$rechnungsnr%')"; 
+			$qry.= " AND UPPER(tbl_rechnung.rechnungsnr) LIKE UPPER('%".$this->db_escape($rechnungsnr)."%')"; 
 			
 		if ($rechnungsdatum_von != '')
-			$qry.= ' AND tbl_rechnung.rechnungsdatum >= '.$this->addslashes($rechnungsdatum_von);
+			$qry.= ' AND tbl_rechnung.rechnungsdatum >= '.$this->db_add_param($rechnungsdatum_von);
 		
 		if ($rechnungsdatum_bis != '')
-			$qry.= ' AND tbl_rechnung.rechnungsdatum <= '.$this->addslashes($rechnungsdatum_bis);
+			$qry.= ' AND tbl_rechnung.rechnungsdatum <= '.$this->db_add_param($rechnungsdatum_bis);
 
 		if ($buchungsdatum_von != '')
-			$qry.= ' AND tbl_rechnung.buchungsdatum >= '.$this->addslashes($buchungsdatum_von);
+			$qry.= ' AND tbl_rechnung.buchungsdatum >= '.$this->db_add_param($buchungsdatum_von);
 			
 		if ($buchungsdatum_bis != '')
-			$qry.= ' AND tbl_rechnung.buchungsdatum <= '.$this->addslashes($buchungsdatum_bis);
+			$qry.= ' AND tbl_rechnung.buchungsdatum <= '.$this->db_add_param($buchungsdatum_bis);
 			
 		if ($erstelldatum_von != '')
-			$qry.= ' AND tbl_bestellung.insertamum::date >= '.$this->addslashes($erstelldatum_von);
+			$qry.= ' AND tbl_bestellung.insertamum::date >= '.$this->db_add_param($erstelldatum_von);
 			
 		if ($erstelldatum_bis != '')
-			$qry.= ' AND tbl_bestellung.insertamum::date <= '.$this->addslashes($erstelldatum_bis);
+			$qry.= ' AND tbl_bestellung.insertamum::date <= '.$this->db_add_param($erstelldatum_bis);
 		
 		if ($bestelldatum_von != '')
-			$qry.= " AND status.bestellstatus_kurzbz = 'Bestellung' AND status.datum >= ".$this->addslashes($bestelldatum_von);
+			$qry.= " AND status.bestellstatus_kurzbz = 'Bestellung' AND status.datum >= ".$this->db_add_param($bestelldatum_von);
 		if ($bestelldatum_bis != '')
-			$qry.= " AND status.bestellstatus_kurzbz = 'Bestellung' AND status.datum <= ".$this->addslashes($bestelldatum_bis);
+			$qry.= " AND status.bestellstatus_kurzbz = 'Bestellung' AND status.datum <= ".$this->db_add_param($bestelldatum_bis);
 
 		if ($firma_id != '')
-			$qry.= ' AND tbl_bestellung.firma_id = '.$this->addslashes($firma_id);
+			$qry.= ' AND tbl_bestellung.firma_id = '.$this->db_add_param($firma_id);
 
 		if ($oe_kurzbz != '')
-			$qry.= ' AND tbl_kostenstelle.oe_kurzbz = '.$this->addslashes($oe_kurzbz);
+			$qry.= ' AND tbl_kostenstelle.oe_kurzbz = '.$this->db_add_param($oe_kurzbz);
 
 		if ($konto_id != '')	
-			$qry.= ' AND tbl_bestellung.konto_id = '.$this->addslashes($konto_id);
+			$qry.= ' AND tbl_bestellung.konto_id = '.$this->db_add_param($konto_id);
 		
 		if ($kostenstelle_id != '')	
-			$qry.= ' AND tbl_bestellung.kostenstelle_id = '.$this->addslashes($kostenstelle_id);
+			$qry.= ' AND tbl_bestellung.kostenstelle_id = '.$this->db_add_param($kostenstelle_id);
 
 		if ($bestellnummer != '')	
-			$qry.= ' AND UPPER(tbl_bestellung.bestell_nr) = UPPER('.$this->addslashes($bestellnummer).')';
+			$qry.= ' AND UPPER(tbl_bestellung.bestell_nr) = UPPER('.$this->db_add_param($bestellnummer).')';
 		
 		if ($betrag != '')
-			$qry.= ' AND (\''.$betrag.'\' = (SELECT sum(betrag) FROM wawi.tbl_rechnungsbetrag WHERE rechnung_id=tbl_rechnung.rechnung_id)
-					   OR \''.$betrag.'\' = (SELECT sum((betrag*(mwst+100)/100)) FROM wawi.tbl_rechnungsbetrag WHERE rechnung_id=tbl_rechnung.rechnung_id))';
+			$qry.= ' AND ('.$this->db_add_param($betrag).' = (SELECT sum(betrag) FROM wawi.tbl_rechnungsbetrag WHERE rechnung_id=tbl_rechnung.rechnung_id)
+					   OR '.$this->db_add_param($betrag).' = (SELECT sum((betrag*(mwst+100)/100)) FROM wawi.tbl_rechnungsbetrag WHERE rechnung_id=tbl_rechnung.rechnung_id))';
 			
 		if($zahlungstyp!='')
-			$qry.= ' AND tbl_bestellung.zahlungstyp_kurzbz = '.$this->addslashes($zahlungstyp);
+			$qry.= ' AND tbl_bestellung.zahlungstyp_kurzbz = '.$this->db_add_param($zahlungstyp);
 			
 		if($ohneTransferdatum)
 			$qry.= ' AND tbl_rechnung.transfer_datum IS NULL';
@@ -210,7 +210,7 @@ class wawi_rechnung extends basis_db
 			$obj->rechnungsdatum = $row->rechnungsdatum;
 			$obj->transfer_datum = $row->transfer_datum;
 			$obj->buchungstext = $row->buchungstext;
-			$obj->freigegeben = ($row->freigegeben=='t'?true:false);
+			$obj->freigegeben = $this->db_parse_bool($row->freigegeben);
 			$obj->freigegebenamum = $row->freigegebenamum;
 			$obj->freigegebenvon = $row->freigegebenvon;
 			$obj->updateamum = $row->updateamum;
@@ -238,11 +238,11 @@ class wawi_rechnung extends basis_db
 			return false; 
 		}		
 		
-		$qry ="DELETE FROM wawi.tbl_rechnung WHERE rechnung_id = '".addslashes($rechnung_id)."'";
+		$qry ="DELETE FROM wawi.tbl_rechnung WHERE rechnung_id = ".$this->db_add_param($rechnung_id, FHC_INTEGER).';';
 		
 		if(!$this->db_query($qry))
 		{
-			$this->errormsg ="Fehler beim Löschen der Rechnung ID $rechnung_id aufgetreten.";
+			$this->errormsg ="Fehler beim Löschen der Rechnung";
 			return false; 
 		}
 		return true; 
@@ -307,38 +307,38 @@ class wawi_rechnung extends basis_db
 			$qry = 'BEGIN; INSERT INTO wawi.tbl_rechnung (bestellung_id,rechnungstyp_kurzbz, buchungsdatum, 
 			rechnungsnr, rechnungsdatum, transfer_datum, buchungstext, freigegeben, freigegebenvon, freigegebenamum,
 			updateamum, updatevon, insertamum, insertvon) VALUES ('.
-			$this->addslashes($this->bestellung_id).', '.
-			$this->addslashes($this->rechnungstyp_kurzbz).', '.
-			$this->addslashes($this->buchungsdatum).', '.
-			$this->addslashes($this->rechnungsnr).', '.
-			$this->addslashes($this->rechnungsdatum).', '.
-			$this->addslashes($this->transfer_datum).', '.
-			$this->addslashes($this->buchungstext).', '.
-			($this->freigegeben?'true':'false').','.
-			$this->addslashes($this->freigegebenvon).', '.
-			$this->addslashes($this->freigegebenamum).', '.
-			$this->addslashes($this->updateamum).', '.
-			$this->addslashes($this->updatevon).', '.
-			$this->addslashes($this->insertamum).', '.
-			$this->addslashes($this->insertvon).'); ';
+			$this->db_add_param($this->bestellung_id, FHC_INTEGER).', '.
+			$this->db_add_param($this->rechnungstyp_kurzbz).', '.
+			$this->db_add_param($this->buchungsdatum).', '.
+			$this->db_add_param($this->rechnungsnr).', '.
+			$this->db_add_param($this->rechnungsdatum).', '.
+			$this->db_add_param($this->transfer_datum).', '.
+			$this->db_add_param($this->buchungstext).', '.
+			$this->db_add_param($this->freigegeben, FHC_BOOLEAN).','.
+			$this->db_add_param($this->freigegebenvon).', '.
+			$this->db_add_param($this->freigegebenamum).', '.
+			$this->db_add_param($this->updateamum).', '.
+			$this->db_add_param($this->updatevon).', '.
+			$this->db_add_param($this->insertamum).', '.
+			$this->db_add_param($this->insertvon).'); ';
 		}
 		else
 		{
 			//UPDATE
 			$qry = 'UPDATE wawi.tbl_rechnung SET 
-			bestellung_id = '.$this->addslashes($this->bestellung_id).', 
-			rechnungstyp_kurzbz = '.$this->addslashes($this->rechnungstyp_kurzbz).', 
-			buchungsdatum = '.$this->addslashes($this->buchungsdatum).',
-			rechnungsnr = '.$this->addslashes($this->rechnungsnr).',
-			rechnungsdatum = '.$this->addslashes($this->rechnungsdatum).',
-			transfer_datum = '.$this->addslashes($this->transfer_datum).',
-			buchungstext = '.$this->addslashes($this->buchungstext).',
-			freigegeben = '.($this->freigegeben?'true':'false').',
-			freigegebenvon = '.$this->addslashes($this->freigegebenvon).',
-			freigegebenamum = '.$this->addslashes($this->freigegebenamum).',
-			updateamum = '.$this->addslashes($this->updateamum).',
-			updatevon = '.$this->addslashes($this->updatevon).
-			' WHERE rechnung_id = '.$this->rechnung_id.';'; 
+			bestellung_id = '.$this->db_add_param($this->bestellung_id).', 
+			rechnungstyp_kurzbz = '.$this->db_add_param($this->rechnungstyp_kurzbz).', 
+			buchungsdatum = '.$this->db_add_param($this->buchungsdatum).',
+			rechnungsnr = '.$this->db_add_param($this->rechnungsnr).',
+			rechnungsdatum = '.$this->db_add_param($this->rechnungsdatum).',
+			transfer_datum = '.$this->db_add_param($this->transfer_datum).',
+			buchungstext = '.$this->db_add_param($this->buchungstext).',
+			freigegeben = '.$this->db_add_param($this->freigegeben, FHC_BOOLEAN).',
+			freigegebenvon = '.$this->db_add_param($this->freigegebenvon).',
+			freigegebenamum = '.$this->db_add_param($this->freigegebenamum).',
+			updateamum = '.$this->db_add_param($this->updateamum).',
+			updatevon = '.$this->db_add_param($this->updatevon).
+			' WHERE rechnung_id = '.$this->db_add_param($this->rechnung_id, FHC_INTEGER).';'; 
 		}
 		
 		if($this->db_query($qry))
@@ -354,18 +354,18 @@ class wawi_rechnung extends basis_db
 						$this->rechnung_id = $row->id;
 						if($this->rechnungsnr=='')
 							$this->rechnungsnr = $row->id;						
-						$this->db_query('COMMIT');
+						$this->db_query('COMMIT;');
 					}
 					else
 					{
-						$this->db_query('ROLLBACK');
+						$this->db_query('ROLLBACK;');
 						$this->errormsg = "Fehler beim Auslesen der Sequence";
 						return false;
 					}
 				}
 				else
 				{
-					$this->db_query('ROLLBACK');
+					$this->db_query('ROLLBACK;');
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
 					return false;
 				}
@@ -391,7 +391,7 @@ class wawi_rechnung extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * FROM wawi.tbl_rechnungsbetrag WHERE rechnung_id='".addslashes($rechnung_id)."' ORDER BY rechnungsbetrag_id";
+		$qry = "SELECT * FROM wawi.tbl_rechnungsbetrag WHERE rechnung_id=".$this->db_add_param($rechnung_id, FHC_INTEGER)." ORDER BY rechnungsbetrag_id;";
 		
 		if($result = $this->db_query($qry))
 		{
@@ -437,19 +437,19 @@ class wawi_rechnung extends basis_db
 		if($this->new)
 		{
 			$qry = 'BEGIN;INSERT INTO wawi.tbl_rechnungsbetrag(rechnung_id, mwst, betrag, bezeichnung) VALUES('.
-					$this->addslashes($this->rechnung_id).','.
-					$this->addslashes($this->mwst).','.
-					$this->addslashes($this->betrag).','.
-					$this->addslashes($this->bezeichnung).');';
+					$this->db_add_param($this->rechnung_id, FHC_INTEGER).','.
+					$this->db_add_param($this->mwst).','.
+					$this->db_add_param($this->betrag).','.
+					$this->db_add_param($this->bezeichnung).');';
 		}
 		else
 		{
 			$qry = 'UPDATE wawi.tbl_rechnungsbetrag SET'.
-					' rechnung_id='.$this->addslashes($this->rechnung_id).','.
-				 	' mwst='.$this->addslashes($this->mwst).','.
-					' betrag='.$this->addslashes($this->betrag).','.
-					' bezeichnung='.$this->addslashes($this->bezeichnung).
-					" WHERE rechnungsbetrag_id='".addslashes($this->rechnungsbetrag_id)."'";
+					' rechnung_id='.$this->db_add_param($this->rechnung_id, FHC_INTEGER).','.
+				 	' mwst='.$this->db_add_param($this->mwst).','.
+					' betrag='.$this->db_add_param($this->betrag).','.
+					' bezeichnung='.$this->db_add_param($this->bezeichnung).
+					" WHERE rechnungsbetrag_id=".$this->db_add_param($this->rechnungsbetrag_id, FHC_INTEGER).';';
 		}
 		
 		if($this->db_query($qry))
@@ -462,13 +462,13 @@ class wawi_rechnung extends basis_db
 				{
 					if($row = $this->db_fetch_object($result))
 					{
-						$this->rechnugnsbetrag_id=$row->id;+
+						$this->rechnugnsbetrag_id=$row->id;
 						$this->db_query('COMMIT;');
 						return true; 
 					}
 					else
 					{
-						$this->db_query('ROLLBACK');
+						$this->db_query('ROLLBACK;');
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
 						return false;
 					}
@@ -500,7 +500,7 @@ class wawi_rechnung extends basis_db
 			return false;
 		}
 		
-		$qry = "DELETE FROM wawi.tbl_rechnungsbetrag where rechnungsbetrag_id='".addslashes($rechnungsbetrag_id)."'";
+		$qry = "DELETE FROM wawi.tbl_rechnungsbetrag WHERE rechnungsbetrag_id=".$this->db_add_param($rechnungsbetrag_id, FHC_INTEGER).';';
 		if($this->db_query($qry))
 		{
 			return true;
@@ -517,7 +517,7 @@ class wawi_rechnung extends basis_db
 	 */
 	public function getRechnungstyp()
 	{
-		$qry = 'SELECT * FROM wawi.tbl_rechnungstyp ORDER BY beschreibung';
+		$qry = 'SELECT * FROM wawi.tbl_rechnungstyp ORDER BY beschreibung;';
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
@@ -544,7 +544,8 @@ class wawi_rechnung extends basis_db
 	 */
 	public function count($bestellung_id)
 	{
-		$qry = "SELECT count(*) as anzahl FROM wawi.tbl_rechnung WHERE bestellung_id='".addslashes($bestellung_id)."'";
+		$qry = "SELECT count(*) as anzahl FROM wawi.tbl_rechnung 
+		WHERE bestellung_id=".$this->db_add_param($bestellung_id, FHC_INTEGER).';';
 		
 		if($result = $this->db_query($qry))
 		{
@@ -602,8 +603,7 @@ class wawi_rechnung extends basis_db
 			return false;
 		}
 		
-		$qry = "
-				SELECT sum(brutto) as gesamt
+		$qry = "SELECT sum(brutto) as gesamt
 				FROM 
 				(
 				SELECT 
@@ -613,11 +613,10 @@ class wawi_rechnung extends basis_db
 					JOIN wawi.tbl_bestellung USING(bestellung_id)
 					JOIN wawi.tbl_rechnungsbetrag USING(rechnung_id)
 				WHERE
-					kostenstelle_id='$kostenstelle_id'
-					AND tbl_bestellung.insertamum>='".$gj->start."'
-					AND tbl_bestellung.insertamum<='".$gj->ende."'
-				) as a
-				";
+					kostenstelle_id=".$this->db_add_param($kostenstelle_id, FHC_INTEGER)."
+					AND tbl_bestellung.insertamum>=".$this->db_add_param($gj->start)."
+					AND tbl_bestellung.insertamum<=".$this->db_add_param($gj->ende)."
+				) as a;";
 		
 		if($result = $this->db_query($qry))
 		{

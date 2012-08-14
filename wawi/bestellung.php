@@ -141,7 +141,7 @@ if(isset($_POST['getSearchKonto']))
 				echo "<option value=''>-- auswählen --</option>\n";
 				foreach($konto->result as $ko)
 				{
-					echo '<option value='.$ko->konto_id.' >'.$ko->beschreibung[1]."</option>\n";
+					echo '<option value='.$ko->konto_id.' >'.$ko->kurzbz."</option>\n";
 				}
 			}
 			else 
@@ -500,7 +500,7 @@ if($aktion == 'suche')
 		echo "</tr>"; 
 		echo "<tr>\n"; 
 		echo "<td>Erstelldatum</td>\n";
-		echo "<td>von <input type ='text' id='datepicker_evon' size ='12' name ='evon' value=$suchdatum> bis <input type ='text' id='datepicker_ebis' size ='12' name = 'ebis'></td>\n";
+		echo "<td>von <input type ='text' id='datepicker_evon' size ='12' name ='evon' value='$suchdatum'> bis <input type ='text' id='datepicker_ebis' size ='12' name = 'ebis'></td>\n";
 		echo "</tr>\n";
 		echo "<tr>\n";
 		echo "<td>Bestelldatum</td>\n";
@@ -702,7 +702,7 @@ if($aktion == 'suche')
 					echo '<td>'.$row->bestellung_id."</td>\n";
 					echo '<td>'.$firmenname."</td>\n";
 					echo '<td>'.$date->formatDatum($row->insertamum, 'd.m.Y')."</td>\n";
-					echo '<td>'.$freigegeben=($row->freigegeben=='t')?'ja':'nein'."</td>\n"; 
+					echo '<td>'.($row->freigegeben?'ja':'nein')."</td>\n"; 
 					echo '<td>'.$geliefert.'</td>'; 
 					echo '<td class="number">'.number_format($brutto, 2, ",",".")."</td>\n"; 
 					echo '<td>'.$row->titel."</td>\n";
@@ -1439,7 +1439,7 @@ if($_GET['method']=='update')
 	$disabled = '';
 	if($status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung') || $status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') || $status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt'))
 		$disabled = 'disabled'; 
-	if($rechte->isberechtigt('wawi/bestellung_advanced',null, 'suid', $bestellung->kostenstelle_id) || ($rechte->isBerechtigt('wawi/freigabe', null, 'suid',$bestellung->kostenstelle_id) && $bestellung->freigegeben =='f'))	
+	if($rechte->isberechtigt('wawi/bestellung_advanced',null, 'suid', $bestellung->kostenstelle_id) || ($rechte->isBerechtigt('wawi/freigabe', null, 'suid',$bestellung->kostenstelle_id) && $bestellung->freigegeben))	
 		$disabled = '';
 	
 	echo "<td>Kostenstelle:</td><td><SELECT name='filter_kst' onchange='loadKonto(this.value)' $disabled id='filter_kst'>\n";
@@ -1595,7 +1595,7 @@ if($_GET['method']=='update')
 	echo "<td>Freigabe:</td>\n";
 	echo "<td colspan =2>";
 
-	if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt') && $bestellung->freigegeben != 't')
+	if(!$status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt') && !$bestellung->freigegeben)
 	{
 		echo "<span>Bitte Abschicken zur Freigabe.</span>"; 
 	}
@@ -2215,7 +2215,7 @@ if($_GET['method']=='update')
 		</script>';
 		
 	$disabled='';
-	if($status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') || $status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt') || ($bestellung->freigegeben == 't'))
+	if($status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') || $status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt') || ($bestellung->freigegeben))
 		$disabled='disabled';
 	
 	$aktBrutto = $bestellung->getBrutto($bestellung->bestellung_id); 
@@ -2224,7 +2224,7 @@ if($_GET['method']=='update')
 	echo '<table border ="0" style="width: auto"> <tr>'; 
 	echo "<td><div style='float:right;'><input type='submit' value='Speichern' id='btn_submit' name='btn_submit' onclick='return conf_del_budget($aktBrutto);' class='cursor'></td>"; 
 	echo "<td><input type='submit' value='Abschicken' id='btn_abschicken' name='btn_abschicken' $disabled class='cursor'></td>"; 
-	if($status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt') && $bestellung->freigegeben == 'f')
+	if($status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt') && !$bestellung->freigegeben)
 		echo "<td><input type='submit' value='Erneut Abschicken' id='btn_erneut_abschicken' name='btn_erneut_abschicken' class='cursor'></td>"; 
 	echo"<td style='width:100%' align='right'>";
 	echo "<div ><a href ='pdfExport.php?xml=bestelldetail.rdf.php&xsl_oe_kurzbz=$kostenstelle->oe_kurzbz&xsl=Bestellung&id=$bestellung->bestellung_id'>Bestellschein generieren <img src='../skin/images/pdf.ico'></a></div>"; 
@@ -2233,7 +2233,7 @@ if($_GET['method']=='update')
 	{
 		//Wenn die Advanced Berechtigung vorhanden ist, werden die Felder nicht gesperrt oder derjenige hat berechtigungen auf die kst oder oe und die bestellung ist noch nicht freigegeben
 		if(!($rechte->isBerechtigt('wawi/bestellung_advanced',null, 'suid') 
-		|| ($rechte->isBerechtigt('wawi/freigabe',null,'suid',$bestellung->kostenstelle_id)) && $bestellung->freigegeben == 'f'))
+		|| ($rechte->isBerechtigt('wawi/freigabe',null,'suid',$bestellung->kostenstelle_id)) && !$bestellung->freigegeben))
 		{
 			// Felder Sperren
 			echo '<script type="text/javascript"> 
@@ -2363,7 +2363,7 @@ function getDetailRow($i, $bestelldetail_id='', $sort='', $menge='', $ve='', $be
 			$checkRow = "setTimeout(\"checkNewRow(".$i.",".$bestell_id.")\",100);"; 
 		}
 		
-		if($status->isStatiVorhanden($bestell_id,'Abgeschickt') && ($rechte->isBerechtigt('wawi/bestellung_advanced') || ($rechte->isBerechtigt('wawi/freigabe', null,'suid',$bestellung->kostenstelle_id) && $bestellung->freigegeben == 'f')))
+		if($status->isStatiVorhanden($bestell_id,'Abgeschickt') && ($rechte->isBerechtigt('wawi/bestellung_advanced') || ($rechte->isBerechtigt('wawi/freigabe', null,'suid',$bestellung->kostenstelle_id) && !$bestellung->freigegeben)))
 			$removeDetail = "removeDetail(".$i.");";
 	}
 	
@@ -2449,7 +2449,7 @@ function sendFreigabeMails($uids, $bestellung, $user)
 	$email.="Kostenstelle: ".$kst_mail->bezeichnung."<br>Konto: ".$konto_mail->kurzbz."<br>";
 	$email.="Tags: ".$tagsAusgabe."<br>";
 	
-	$email.="Link: <a href='".APP_ROOT."/index.php?content=bestellung.php&method=update&id=$bestellung->bestellung_id'>zur Bestellung </a>";
+	$email.="Link: <a href='".APP_ROOT."index.php?content=bestellung.php&method=update&id=$bestellung->bestellung_id'>zur Bestellung </a>";
 	
 	foreach($uids as $uid)
 	{
@@ -2501,10 +2501,10 @@ function sendZentraleinkaufFreigegeben($bestellung)
 	$email.="Firma: ".$firma_mail->name."<br>";
 	$email.="Kontaktperson: ".$besteller->titelpre.' '.$besteller->vorname.' '.$besteller->nachname.' '.$besteller->titelpost."<br>";
 	$email.="Erstellt am: ".$date->formatDatum($bestellung->insertamum,'d.m.Y')."<br>";
-	$email.="Kostenstelle: ".$kst_mail->bezeichnung."<br>Konto: ".$konto_mail->kurzbz."<br>";
+	$email.="Konto: ".$konto_mail->kurzbz."<br>";
 	$email.="Tags: ".$tagsAusgabe."<br>";
 	
-	$email.="Link: <a href='".APP_ROOT."/index.php?content=bestellung.php&method=update&id=$bestellung->bestellung_id'>zur Bestellung </a>";
+	$email.="Link: <a href='".APP_ROOT."index.php?content=bestellung.php&method=update&id=$bestellung->bestellung_id'>zur Bestellung </a>";
 	
 	$mail = new mail(MAIL_ZENTRALEINKAUF, 'no-reply', 'Freigabe Bestellung', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
 	$mail->setHTMLContent($email); 
@@ -2564,7 +2564,7 @@ function sendBestellerMail($bestellung, $status)
 	$email.="Kostenstelle: ".$kst_mail->bezeichnung."<br>Konto: ".$konto_mail->kurzbz."<br>";
 	$email.="Tags: ".$tagsAusgabe."<br>";
 		
-	$email.="Link: <a href='".APP_ROOT."/index.php?content=bestellung.php&method=update&id=$bestellung->bestellung_id'>zur Bestellung </a>";
+	$email.="Link: <a href='".APP_ROOT."index.php?content=bestellung.php&method=update&id=$bestellung->bestellung_id'>zur Bestellung </a>";
 	
 	$mail = new mail($bestellung->besteller_uid.'@'.DOMAIN, 'no-reply', 'Bestellung '.$bestellung->bestell_nr, 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
 	$mail->setHTMLContent($email); 

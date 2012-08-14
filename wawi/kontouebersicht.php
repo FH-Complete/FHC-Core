@@ -100,18 +100,16 @@ if(isset($_GET['method']))
 				echo '<td>Kontonummer</td>';
 		 	 	echo "<td><input type=\"text\" size=\"32\" name=\"kontonummer\" value=\"$konto->kontonr\"></td>\n";
 		 	 	echo '</tr>';
-		 	 	$i = 1; 
+
 				foreach($sprache->result as $s)	// Mehrsprachigkeit
 				{  
 					if($s->content == true)
 					{
-						$headline = $sprache->getSpracheFromIndex($i);
 			 	 		echo '<tr>';
-			 	 		echo "<td>$headline</td>\n";
-			 	 		echo "<td><input type=\"text\" size=\"32\" name=\"beschreibung$i\" value=\"".$konto->beschreibung[$i]."\"></td>\n";
+			 	 		echo "<td>$s->sprache</td>\n";
+			 	 		echo "<td><input type=\"text\" size=\"32\" name=\"beschreibung$s->sprache\" value=\"".$konto->beschreibung[$s->sprache]."\"></td>\n";
 			 	 		echo "</tr>\n";
 					}
-					$i++;
 				}
 		 	 	echo "<tr>\n";
 		 	 	echo "<td>Kurzbezeichnung</td>\n";
@@ -148,18 +146,15 @@ if(isset($_GET['method']))
 				echo "<td>Kontonummer</td>\n";
 		 	 	echo "<td><input type=\"text\" size=\"32\" maxlength =\"32\" name=\"kontonummer\" value=\"\"></td>\n";
 		 	 	echo "</tr>\n";
-				$i = 1; 
 				foreach($sprache->result as $s)
 				{  
 					if($s->content == true)
 					{
-						$headline = $sprache->getSpracheFromIndex($i);
 			 	 		echo "<tr>\n";
-			 	 		echo "<td>$headline</td>\n";
-			 	 		echo "<td><input type=\"text\" size=\"32\" name=\"beschreibung$i\" value=\"\"></td>\n";
+			 	 		echo "<td>$s->sprache</td>\n";
+			 	 		echo "<td><input type=\"text\" size=\"32\" name=\"beschreibung$s->sprache\" value=\"\"></td>\n";
 			 	 		echo "</tr>\n";
 					}
-					$i++;			
 				}
 		 	 	echo "<tr><td>Kurzbezeichnung</td>\n";
 		 	 	echo "<td><input type=\"text\" size=\"32\" maxlength =\"32\" name=\"kurzbezeichnung\" value=\"\"></td>\n";
@@ -201,15 +196,11 @@ if(isset($_GET['method']))
 		}	
 
 		$konto->kontonr = $_POST['kontonummer'];	
-		$i = 1; 
+
 		foreach($sprache->result as $s)
-		{  
 			if($s->content == true)
-			{
-				$konto->beschreibung[$i] = $_POST['beschreibung'.$i]; 	
-			}
-			$i++;			
-		}
+				$konto->beschreibung[$s->sprache] = $_POST['beschreibung'.$s->sprache]; 	
+			
 		$konto->kurzbz = $_POST['kurzbezeichnung'];
 		$konto->updateamum = date('Y-m-d H:i:s');
 		$konto->updatevon = $user; 
@@ -303,14 +294,9 @@ if(isset($_GET['method']))
 		echo "<th>Kurzbezeichnung</th>\n";
 		$i = 1; 
 		foreach($sprache->result as $s)
-		{  
 			if($s->content == true)
-			{
-				$headline = $sprache->getSpracheFromIndex($i);
-				echo "<th>$headline</th>\n";	
-			}
-			$i++;			
-		}			
+				echo "<th>$s->sprache</th>\n";	
+				
 		echo "<th>Aktiv</th>\n";
 		echo "<th>&nbsp;</th></tr></thead><tbody>\n";	
 	
@@ -324,15 +310,10 @@ if(isset($_GET['method']))
 			echo '<td>'.$row->konto_id."</td>\n";
 			echo '<td>'.$row->kontonr."</td>\n";
 			echo '<td>'.$row->kurzbz."</td>\n";
-			$i = 1; 
 			foreach($sprache->result as $s)
-			{  
 				if($s->content == true)
-				{
-					echo '<td>'.$row->beschreibung[$i]."</td>\n";
-				}
-				$i++;			
-			}
+					echo '<td>'.$row->beschreibung[$s->sprache]."</td>\n";
+			
 			echo '<td>'.$aktiv=($row->aktiv)?'ja':'nein'."</td>\n";
 			echo "<td><input type='radio' name='radio_1' value='$row->konto_id' </td>\n";
 			echo "</tr>\n";
@@ -349,16 +330,11 @@ if(isset($_GET['method']))
 		echo "<th>Konto ID</th>\n";
 		echo "<th>Kontonummer</th>\n";
 		echo "<th>Kurzbezeichnung</th>\n";
-		$i = 1; 
+		
 		foreach($sprache->result as $s)
-		{  
 			if($s->content == true)
-			{
-				$headline = $sprache->getSpracheFromIndex($i);
-				echo "<th>$headline</th>\n";	
-			}
-			$i++;			
-		}	
+				echo "<th>$s->sprache</th>\n";	
+
 		echo "<th>Aktiv</th>\n";
 		echo "</tr></thead><tbody>\n";	
 	
@@ -371,16 +347,12 @@ if(isset($_GET['method']))
 			echo "<td>$row->konto_id</td>\n";
 			echo '<td>'.$row->kontonr."</td>\n";
 			echo '<td>'.$row->kurzbz."</td>\n";
-			$i = 1; 
+ 
 			foreach($sprache->result as $s)
-			{  
 				if($s->content == true)
-				{
-					echo '<td>'.$row->beschreibung[$i]."</td>\n";
-				}
-				$i++;			
-			}
-			echo '<td>'.$aktiv=($row->aktiv)?'ja':'nein'."</td>\n";
+					echo '<td>'.$row->beschreibung[$s->sprache]."</td>\n";
+			
+			echo '<td>'.($row->aktiv?'ja':'nein')."</td>\n";
 			echo '</tr>';
 		}
 		echo "</table>\n";
@@ -424,7 +396,7 @@ else
 		{
 			//Zeilen der Tabelle ausgeben
 			echo "<tr>\n";
-			echo "<td nowrap> <a href= \"kontouebersicht.php?method=update&amp;id=$row->konto_id\" title='Bearbeiten'> <img src=\"../skin/images/edit.gif\"> </a><a href=\"kontouebersicht.php?method=delete&amp;id=$row->konto_id\" onclick='return conf_del()' title='Löschen'> <img src=\"../skin/images/delete.gif\"></a></td>\n";
+			echo "<td nowrap> <a href= \"kontouebersicht.php?method=update&amp;id=$row->konto_id\" title='Bearbeiten'> <img src=\"../skin/images/edit_wawi.gif\"> </a><a href=\"kontouebersicht.php?method=delete&amp;id=$row->konto_id\" onclick='return conf_del()' title='Löschen'> <img src=\"../skin/images/delete_x.png\"></a></td>\n";
 			echo '<td>'.$row->kontonr."</td>\n";
 			echo '<td>'.$row->kurzbz."</td>\n";
 			
@@ -433,7 +405,10 @@ else
 			{
 				if($s->content == true)
 				{
-					echo '<td>'.$row->beschreibung[$s->index]."</td>\n"; 
+					echo '<td>';
+					if(isset($row->beschreibung[$s->sprache]))
+						echo $row->beschreibung[$s->sprache]."\n";
+					echo '</td>'; 
 				}
 				$i++;
 			}

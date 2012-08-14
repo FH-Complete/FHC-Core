@@ -28,7 +28,7 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 class sprache extends basis_db
 {
 	public $result; 
-	public static $index_arr;
+	public static $index_arr = array();
 	public $sprache; 	// string
 	public $locale; 	
 	public $index; 		// int, id des array index
@@ -56,7 +56,7 @@ class sprache extends basis_db
 	 */
 	public function load($sprache)
 	{
-		$qry = "SELECT * FROM public.tbl_sprache WHERE sprache = '".addslashes($sprache)."';";
+		$qry = "SELECT * FROM public.tbl_sprache WHERE sprache=".$this->db_add_param($sprache, FHC_STRING, false).";";
 		
 		if(!$this->db_query($qry))
 		{
@@ -68,7 +68,7 @@ class sprache extends basis_db
 			$this->sprache = $row->sprache; 
 			$this->locale = $row->locale; 
 			$this->index = $row->index; 
-			$this->content = ($row->content=='t'?true:false); 
+			$this->content = $this->db_parse_bool($row->content); 
 		}
 		return true; 		
 	}
@@ -83,7 +83,7 @@ class sprache extends basis_db
 		$qry = "SELECT *,".$this->getSprachQuery('bezeichnung')." FROM public.tbl_sprache";
 		
 		if(!is_null($content))
-			$qry.= " WHERE content=".($content?'true':'false');
+			$qry.= " WHERE content=".$this->db_add_param($content, FHC_BOOLEAN);
 		$qry.=" ORDER BY sprache";
 		
 		if(!$this->db_query($qry))
@@ -98,7 +98,7 @@ class sprache extends basis_db
 			$sprache->sprache = $row->sprache;
 			$sprache->locale = $row->locale;
 			$sprache->index = $row->index;
-			$sprache->content = ($row->content=='t'?true:false); 
+			$sprache->content = $this->db_parse_bool($row->content); 
 			$sprache->bezeichnung_arr=$this->parseSprachResult('bezeichnung',$row);
 			
 			$this->result[] = $sprache; 
@@ -123,7 +123,7 @@ class sprache extends basis_db
 		
 		while($row = $this->db_fetch_object())
 		{
-			$this->index_arr[$row->sprache]=$row->index; 
+			self::$index_arr[$row->sprache]=$row->index; 
 		}
  		return true; 
 	}
@@ -135,7 +135,7 @@ class sprache extends basis_db
 	 */
 	public function delete($sprache)
 	{
-		$qry = "DELETE FROM public.tbl_sprache WHERE sprache = '".addslashes($sprache)."';";
+		$qry = "DELETE FROM public.tbl_sprache WHERE sprache = ".$this->db_add_param($sprache, FHC_STRING, false).";";
 		
 		if(!$this->db_query($qry))
 		{
@@ -179,7 +179,7 @@ class sprache extends basis_db
 	public function getSpracheFromIndex($index)
 	{
 		$sprache = ''; 
-		$qry = "SELECT sprache FROM public.tbl_sprache WHERE index = '".addslashes($index)."';";
+		$qry = "SELECT sprache FROM public.tbl_sprache WHERE index=".$this->db_add_param($index, FHC_INTEGER, false).";";
 		
 		if(!$this->db_query($qry))
 		{
@@ -205,10 +205,10 @@ class sprache extends basis_db
 	{
 		$result = '';
 		
-		if(!isset($this->index_arr))
+		if(!isset(self::$index_arr) || count(self::$index_arr)==0)
 			$this->loadIndexArray();
 			
-		foreach($this->index_arr as $sprache=>$index)
+		foreach(self::$index_arr as $sprache=>$index)
 		{
 			$result .= $feldname.'['.$index.'] as '.$feldname.'_'.$index.',';
 		}
@@ -226,10 +226,10 @@ class sprache extends basis_db
 	{
 		$result = array();
 		
-		if(!isset($this->index_arr))
+		if(!isset(self::$index_arr) || count(self::$index_arr)==0)
 			$this->getAll();
 			
-		foreach($this->index_arr as $sprache=>$index)
+		foreach(self::$index_arr as $sprache=>$index)
 		{
 			$name = $feldname.'_'.$index;
 			if(isset($row->$name))
@@ -248,8 +248,8 @@ class sprache extends basis_db
 	 */
 	public function getBezeichnung($sprache, $anzeigesprache)
 	{
-		$qry = "SELECT bezeichnung[(SELECT index FROM public.tbl_sprache WHERE sprache='".addslashes($anzeigesprache)."')] 
-				FROM public.tbl_sprache WHERE sprache='".addslashes($sprache)."' ";
+		$qry = "SELECT bezeichnung[(SELECT index FROM public.tbl_sprache WHERE sprache=".$this->db_add_param($anzeigesprache).")] 
+				FROM public.tbl_sprache WHERE sprache=".$this->db_add_param($sprache);
 		
 		if($result = $this->db_query($qry))
 		{

@@ -301,7 +301,7 @@ class ampel extends basis_db
 			
 			foreach($this->beschreibung as $key=>$value)
 			{
-				$idx = $sprache->index_arr[$key];
+				$idx = sprache::$index_arr[$key];
 				$qry.=" beschreibung[$idx],";
 			}
 			
@@ -328,7 +328,7 @@ class ampel extends basis_db
 			reset($this->beschreibung);
 			foreach($this->beschreibung as $key=>$value)
 			{
-				$idx = $sprache->index_arr[$key];
+				$idx = sprache::$index_arr[$key];
 				$qry.=' beschreibung['.$idx.'] = '.$this->db_add_param($value).',';
 			}
 			

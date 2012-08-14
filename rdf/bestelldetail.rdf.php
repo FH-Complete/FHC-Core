@@ -114,7 +114,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		echo "		<titelpost><![CDATA[$besteller->titelpost]]></titelpost>\n";
 		echo "		<email><![CDATA[",$besteller->uid,'@',DOMAIN,"]]></email>\n";
 		echo "	</kontaktperson>\n";
-		echo "	<konto><![CDATA[",$konto->beschreibung[1],"]]></konto>\n";
+		echo "	<konto><![CDATA[",$konto->kurzbz,"]]></konto>\n";
 		echo "	<kostenstelle><![CDATA[$kostenstelle->bezeichnung]]></kostenstelle>\n";
 		echo "	<rechnungsadresse>\n";
 		echo "		<name><![CDATA[$rechnungsadresse->name]]></name>\n";

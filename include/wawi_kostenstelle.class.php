@@ -67,14 +67,14 @@ class wawi_kostenstelle extends basis_db
 	 */
 	public function load($kostenstelle_id)
 	{
-		// ob die übergebene id eine eine gültige zahl ist
+		// pruefen ob die übergebene id eine eine gültige zahl ist
 		if(!is_numeric($kostenstelle_id) || ($kostenstelle_id ==''))
 		{
 			$this->errormsg = 'Kostenstellen ID ist keine Zahl';
 			return false; 
 		}
 		
-		$qry = "SELECT * FROM wawi.tbl_kostenstelle WHERE kostenstelle_id = ".addslashes($kostenstelle_id).";";
+		$qry = 'SELECT * FROM wawi.tbl_kostenstelle WHERE kostenstelle_id='.$this->db_add_param($kostenstelle_id, FHC_INTEGER).';';
 		
 		if(!$this->db_query($qry))
 		{
@@ -88,12 +88,12 @@ class wawi_kostenstelle extends basis_db
 			$this->oe_kurzbz = $row->oe_kurzbz; 
 			$this->bezeichnung = $row->bezeichnung;
 			$this->kurzbz = $row->kurzbz;
-			$this->aktiv = ($row->aktiv=='t'?true:false);
+			$this->aktiv = $this->db_parse_bool($row->aktiv);
 			$this->updateamum = $row->updateamum;
 			$this->updatevon = $row->updatevon;
 			$this->insertamum = $row->insertamum;
 			$this->insertvon = $row->insertvon;
-			$this->ext_id = $row->ext_id; 				// ext_id = kostenstelle_id
+			$this->ext_id = $row->ext_id;
 			$this->kostenstelle_nr = $row->kostenstelle_nr;
 			$this->deaktiviertamum = $row->deaktiviertamum;
 			$this->deaktiviertvon = $row->deaktiviertvon; 	
@@ -117,9 +117,9 @@ class wawi_kostenstelle extends basis_db
 		
 		if($filter != '')
 		{
-			$qry.=" where lower(oe_kurzbz) LIKE  lower('%".addslashes($filter)."%') OR 
-						lower(bezeichnung) LIKE lower('%".addslashes($filter)."%') OR
-						lower(kurzbz) LIKE lower('%".addslashes($filter)."%')";
+			$qry.=" WHERE lower(oe_kurzbz) LIKE  lower('%".$this->db_escape($filter)."%') OR 
+						lower(bezeichnung) LIKE lower('%".$this->db_escape($filter)."%') OR
+						lower(kurzbz) LIKE lower('%".$this->db_escape($filter)."%')";
 		}
 		
 		$qry.=' ORDER BY bezeichnung;';
@@ -138,12 +138,12 @@ class wawi_kostenstelle extends basis_db
 			$obj->oe_kurzbz = $row->oe_kurzbz; 
 			$obj->bezeichnung = $row->bezeichnung;
 			$obj->kurzbz = $row->kurzbz;
-			$obj->aktiv = ($row->aktiv=='t'?true:false);
+			$obj->aktiv = $this->db_parse_bool($row->aktiv);
 			$obj->updateamum = $row->updateamum;
 			$obj->updatevon = $row->updatevon;
 			$obj->insertamum = $row->insertamum;
 			$obj->insertvon = $row->insertvon;
-			$obj->ext_id = $row->ext_id; 				// ext_id = kostenstelle_id
+			$obj->ext_id = $row->ext_id;
 			$obj->kostenstelle_nr = $row->kostenstelle_nr;
 			$obj->deaktiviertamum = $row->deaktiviertamum;
 			$obj->deaktiviertvon = $row->deaktiviertvon; 	
@@ -163,13 +163,13 @@ class wawi_kostenstelle extends basis_db
 	{
 		if(!is_numeric($kostenstelle_id) || $kostenstelle_id =='')
 		{
-			$this->errormsg = "Ungültige Kostenstellen ID";
+			$this->errormsg = 'Ungültige Kostenstellen ID';
 			return false;
 		}
-		$qry ="SELECT * FROM wawi.tbl_bestellung WHERE kostenstelle_id = ".addslashes($kostenstelle_id);
+		$qry ="SELECT * FROM wawi.tbl_bestellung WHERE kostenstelle_id = ".$this->db_add_param($kostenstelle_id, FHC_INTEGER, false).';';
 		if(!$this->db_query($qry))
 		{
-			$this->errormsg = "Fehler beim löschen des Datensatzes.";
+			$this->errormsg = 'Fehler beim Löschen des Datensatzes';
 			return false;
 		}
 		if($row = $this->db_fetch_object())
@@ -178,14 +178,14 @@ class wawi_kostenstelle extends basis_db
 			return false; 
 		}
 
-		$qry = "DELETE FROM wawi.tbl_konto_kostenstelle WHERE kostenstelle_id =".addslashes($kostenstelle_id)."; ";
-		$qry .= "DELETE FROM wawi.tbl_aufteilung_default WHERE kostenstelle_id =".addslashes($kostenstelle_id)."; ";
-		$qry .= "DELETE FROM system.tbl_benutzerrolle WHERE kostenstelle_id =".addslashes($kostenstelle_id)."; ";
-		$qry .= "DELETE FROM wawi.tbl_kostenstelle WHERE kostenstelle_id=".addslashes($kostenstelle_id).";";
+		$qry = "DELETE FROM wawi.tbl_konto_kostenstelle WHERE kostenstelle_id =".$this->db_add_param($kostenstelle_id, FHC_INTEGER, false)."; ";
+		$qry .= "DELETE FROM wawi.tbl_aufteilung_default WHERE kostenstelle_id =".$this->db_add_param($kostenstelle_id, FHC_INTEGER, false)."; ";
+		$qry .= "DELETE FROM system.tbl_benutzerrolle WHERE kostenstelle_id =".$this->db_add_param($kostenstelle_id, FHC_INTEGER, false)."; ";
+		$qry .= "DELETE FROM wawi.tbl_kostenstelle WHERE kostenstelle_id=".$this->db_add_param($kostenstelle_id, FHC_INTEGER, false).";";
 		
 		if(!$this->db_query($qry))
 		{
-			$this->errormsg = "Fehler beim löschen des Datensatzes.";
+			$this->errormsg = 'Fehler beim Löschen des Datensatzes';
 			return false;
 		}
 		return true;
@@ -242,18 +242,18 @@ class wawi_kostenstelle extends basis_db
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO wawi.tbl_kostenstelle (oe_kurzbz, bezeichnung, kurzbz, aktiv, updateamum, updatevon,
 			insertamum,	insertvon, ext_id, kostenstelle_nr, deaktiviertamum, deaktiviertvon ) VALUES('.
-			      $this->addslashes($this->oe_kurzbz).', '.
-			      $this->addslashes($this->bezeichnung).', '.
-			      $this->addslashes($this->kurzbz).', '.
-			      ($this->aktiv?'true':'false').', '.
-				  $this->addslashes($this->updateamum).', '.
-			      $this->addslashes($this->updatevon).', '.				  
-			      $this->addslashes($this->insertamum).', '.
-			      $this->addslashes($this->insertvon).', '.
-			      $this->addslashes($this->ext_id).', '.
-			      $this->addslashes($this->kostenstelle_nr).', '.
-			      $this->addslashes($this->deaktiviertamum).', '. 
-				  $this->addslashes($this->deaktiviertvon).');';
+			      $this->db_add_param($this->oe_kurzbz).', '.
+			      $this->db_add_param($this->bezeichnung).', '.
+			      $this->db_add_param($this->kurzbz).', '.
+			      $this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
+				  $this->db_add_param($this->updateamum).', '.
+			      $this->db_add_param($this->updatevon).', '.				  
+			      $this->db_add_param($this->insertamum).', '.
+			      $this->db_add_param($this->insertvon).', '.
+			      $this->db_add_param($this->ext_id).', '.
+			      $this->db_add_param($this->kostenstelle_nr).', '.
+			      $this->db_add_param($this->deaktiviertamum).', '. 
+				  $this->db_add_param($this->deaktiviertvon).');';
 
 		}
 		else
@@ -261,23 +261,23 @@ class wawi_kostenstelle extends basis_db
 			//Pruefen ob kostenstelle_id eine gueltige Zahl ist
 			if(!is_numeric($this->kostenstelle_id))
 			{
-				$this->errormsg = 'kostenstelle_id muss eine gültige Zahl sein: '.$this->kostenstelle_id."\n";
+				$this->errormsg = 'kostenstelle_id muss eine gültige Zahl sein';
 				return false;
 			}
 			$qry='UPDATE wawi.tbl_kostenstelle SET'.
-				' oe_kurzbz='.$this->addslashes($this->oe_kurzbz).', '.
-				' bezeichnung='.$this->addslashes($this->bezeichnung).', '.
-				' kurzbz='.$this->addslashes($this->kurzbz).', '.
-		      	' aktiv='.($this->aktiv?'true':'false').', '.
-				' updateamum='.$this->addslashes($this->updateamum).', '.			
-				' updatevon='.$this->addslashes($this->updatevon).', '.	
-				' insertamum='.$this->addslashes($this->insertamum).', '.
-				' insertvon='.$this->addslashes($this->insertvon).', '.
-		      	' ext_id='.$this->addslashes($this->ext_id).', '.
-				' kostenstelle_nr='.$this->addslashes($this->kostenstelle_nr).', '.			
-				' deaktiviertamum='.$this->addslashes($this->deaktiviertamum).', '.
-				' deaktiviertvon='.$this->addslashes($this->deaktiviertvon).' '.
-		      	' WHERE kostenstelle_id='.$this->kostenstelle_id.';';
+				' oe_kurzbz='.$this->db_add_param($this->oe_kurzbz).', '.
+				' bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
+				' kurzbz='.$this->db_add_param($this->kurzbz).', '.
+		      	' aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
+				' updateamum='.$this->db_add_param($this->updateamum).', '.			
+				' updatevon='.$this->db_add_param($this->updatevon).', '.	
+				' insertamum='.$this->db_add_param($this->insertamum).', '.
+				' insertvon='.$this->db_add_param($this->insertvon).', '.
+		      	' ext_id='.$this->db_add_param($this->ext_id).', '.
+				' kostenstelle_nr='.$this->db_add_param($this->kostenstelle_nr).', '.			
+				' deaktiviertamum='.$this->db_add_param($this->deaktiviertamum).', '.
+				' deaktiviertvon='.$this->db_add_param($this->deaktiviertvon).' '.
+		      	' WHERE kostenstelle_id='.$this->db_add_param($this->kostenstelle_id, FHC_INTEGER, false).';';
 		}
 		
 		if($this->db_query($qry))
@@ -319,23 +319,24 @@ class wawi_kostenstelle extends basis_db
 	
 	/**
 	 * 
-	 * loescht kostenstelle mit der id1 und legt dessen Schlüssel in anderen Tabellen auf die kostenstelle mit der id2 um
+	 * Loescht kostenstelle mit der id1 und legt dessen Schlüssel in anderen 
+	 * Tabellen auf die kostenstelle mit der id2 um
 	 * @param $id1 kostenstelle_id des radiobuttons 
 	 * @param $id2 kostenstelle_id des radiobuttons
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-		public function zusammenlegen($id1, $id2)
+	public function zusammenlegen($id1, $id2)
 	{
-		$msg='';
+	
 		$sql_query_upd1="BEGIN;";
-		$sql_query_upd1.="UPDATE wawi.tbl_aufteilung_default SET kostenstelle_id='$id2' WHERE kostenstelle_id='$id1'; ";
-		$sql_query_upd1.="UPDATE wawi.tbl_konto_kostenstelle SET kostenstelle_id='$id2' WHERE kostenstelle_id='$id1' AND konto_id NOT IN(SELECT konto_id FROM wawi.tbl_konto_kostenstelle WHERE kostenstelle_id='$id2'); ";
-		$sql_query_upd1.="DELETE FROM wawi.tbl_konto_kostenstelle WHERE kostenstelle_id='$id1';";
-		$sql_query_upd1.="DELETE FROM wawi.tbl_budget WHERE kostenstelle_id='$id1';";
-		$sql_query_upd1.="UPDATE wawi.tbl_bestellung SET kostenstelle_id='$id2' WHERE kostenstelle_id='$id1'; ";
-		$sql_query_upd1.="UPDATE system.tbl_benutzerrolle SET kostenstelle_id='$id2' WHERE kostenstelle_id='$id1'; ";
+		$sql_query_upd1.="UPDATE wawi.tbl_aufteilung_default SET kostenstelle_id=".$this->db_add_param($id2, FHC_INTEGER)." WHERE kostenstelle_id=".$this->db_add_param($id1, FHC_INTEGER)."; ";
+		$sql_query_upd1.="UPDATE wawi.tbl_konto_kostenstelle SET kostenstelle_id=".$this->db_add_param($id2, FHC_INTEGER)." WHERE kostenstelle_id=".$this->db_add_param($id1, FHC_INTEGER)." AND konto_id NOT IN(SELECT konto_id FROM wawi.tbl_konto_kostenstelle WHERE kostenstelle_id=".$this->db_add_param($id2, FHC_INTEGER)."); ";
+		$sql_query_upd1.="DELETE FROM wawi.tbl_konto_kostenstelle WHERE kostenstelle_id=".$this->db_add_param($id1, FHC_INTEGER).";";
+		$sql_query_upd1.="DELETE FROM wawi.tbl_budget WHERE kostenstelle_id=".$this->db_add_param($id1, FHC_INTEGER).";";
+		$sql_query_upd1.="UPDATE wawi.tbl_bestellung SET kostenstelle_id=".$this->db_add_param($id2, FHC_INTEGER)." WHERE kostenstelle_id=".$this->db_add_param($id1, FHC_INTEGER)."; ";
+		$sql_query_upd1.="UPDATE system.tbl_benutzerrolle SET kostenstelle_id=".$this->db_add_param($id2, FHC_INTEGER)." WHERE kostenstelle_id=".$this->db_add_param($id1, FHC_INTEGER)."; ";
 		
-		$sql_query_upd1.="DELETE FROM wawi.tbl_kostenstelle WHERE kostenstelle_id='$id1';";
+		$sql_query_upd1.="DELETE FROM wawi.tbl_kostenstelle WHERE kostenstelle_id=".$this->db_add_param($id1, FHC_INTEGER).";";
 		
 		if($this->db_query($sql_query_upd1))
 		{
@@ -345,7 +346,7 @@ class wawi_kostenstelle extends basis_db
 		else
 		{
 			$this->db_query("ROLLBACK;");
-			$this->errormsg = "fehler beim Update aufgetreten";
+			$this->errormsg = "Fehler beim Update aufgetreten";
 			return false;
 		}
 	}	
@@ -353,8 +354,8 @@ class wawi_kostenstelle extends basis_db
 	/**
 	 * 
 	 * Es wird überprüft ob der Eintrag mit den 2 IDs schon in der Zwischentabelle vorhanden ist
-	 * @param unknown_type $konto_id
-	 * @param unknown_type $kostenselle_id
+	 * @param $konto_id
+	 * @param $kostenselle_id
 	 * @return true wenn es Eintrag schon gibt, false wenn der Eintrag noch nicht vorhanden ist
 	 */
 	public function check_konto_kostenstelle($kostenstelle_id, $konto_id)
@@ -371,7 +372,7 @@ class wawi_kostenstelle extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * from wawi.tbl_konto_kostenstelle WHERE konto_id = ".addslashes($konto_id)." AND kostenstelle_id = ".addslashes($kostenstelle_id).";";
+		$qry = "SELECT * FROM wawi.tbl_konto_kostenstelle WHERE konto_id = ".$this->db_add_param($konto_id, FHC_INTEGER)." AND kostenstelle_id = ".$this->db_add_param($kostenstelle_id, FHC_INTEGER).";";
 		
 		if($this->db_query($qry))
 		{
@@ -407,7 +408,9 @@ class wawi_kostenstelle extends basis_db
 			return false;
 		}
 		
-		$qry = "INSERT INTO wawi.tbl_konto_kostenstelle (konto_id, kostenstelle_id) VALUES (".addslashes($konto_id).",".addslashes($kostenstelle_id).");";
+		$qry = "INSERT INTO wawi.tbl_konto_kostenstelle (konto_id, kostenstelle_id)	VALUES (".
+				$this->db_add_param($konto_id, FHC_INTEGER).",".
+				$this->db_add_param($kostenstelle_id, FHC_INTEGER).");";
 		
 		if($this->db_query($qry))
 		{
@@ -435,7 +438,8 @@ class wawi_kostenstelle extends basis_db
 		}
 		
 		$konto = array(); 
-		$qry = "SELECT konto_id from wawi.tbl_konto_kostenstelle WHERE kostenstelle_id = ".addslashes($kostenstelle_id).";"; 
+		$qry = "SELECT konto_id FROM wawi.tbl_konto_kostenstelle 
+				WHERE kostenstelle_id = ".$this->db_add_param($kostenstelle_id, FHC_INTEGER).";"; 
 		
 		if($this->db_query($qry))
 		{
@@ -463,8 +467,10 @@ class wawi_kostenstelle extends basis_db
 			$this->errormsg = "Ungültige Kostenstellen ID";
 			return false;
 		}		
-		$var = implode(",", $active);
-		$qry = "DELETE FROM wawi.tbl_konto_kostenstelle where kostenstelle_id = ".addslashes($kostenstelle_id)." AND konto_ID NOT IN (".addslashes($var).") ;";
+		$var = $this->implode4SQL($active);
+		$qry = "DELETE FROM wawi.tbl_konto_kostenstelle 
+				WHERE kostenstelle_id = ".$this->db_add_param($kostenstelle_id)." 
+				AND konto_ID NOT IN (".$var.") ;";
 		
 		if($this->db_query($qry))
 		{
@@ -491,7 +497,9 @@ class wawi_kostenstelle extends basis_db
 			$geschaeftsjahr_kurzbz = $gj->getAkt();
 		}
 		
-		$qry = "SELECT budget FROM wawi.tbl_budget WHERE kostenstelle_id=".$this->addslashes($kostenstelle_id)." AND geschaeftsjahr_kurzbz=".$this->addslashes($geschaeftsjahr_kurzbz).";";
+		$qry = "SELECT budget FROM wawi.tbl_budget 
+				WHERE kostenstelle_id=".$this->db_add_param($kostenstelle_id, FHC_INTEGER)." 
+				AND geschaeftsjahr_kurzbz=".$this->db_add_param($geschaeftsjahr_kurzbz).";";
 		
 		if($result = $this->db_query($qry))
 		{
@@ -546,12 +554,19 @@ class wawi_kostenstelle extends basis_db
 		{
 			if($old_budget!=$budget)
 			{
-				$qry = "UPDATE wawi.tbl_budget SET budget=".$this->addslashes($budget)." WHERE kostenstelle_id=".$this->addslashes($kostenstelle_id)." AND geschaeftsjahr_kurzbz=".$this->addslashes($geschaeftsjahr_kurzbz).";";
+				$qry = "UPDATE 
+							wawi.tbl_budget SET budget=".$this->db_add_param($budget)." 
+						WHERE 
+							kostenstelle_id=".$this->db_add_param($kostenstelle_id, FHC_INTEGER)." 
+							AND geschaeftsjahr_kurzbz=".$this->db_add_param($geschaeftsjahr_kurzbz).";";
 			}
 		}
 		else
 		{
-			$qry = "INSERT INTO wawi.tbl_budget(kostenstelle_id, geschaeftsjahr_kurzbz, budget) VALUES(".$this->addslashes($kostenstelle_id).",".$this->addslashes($geschaeftsjahr_kurzbz).",".$this->addslashes($budget).");";
+			$qry = "INSERT INTO wawi.tbl_budget(kostenstelle_id, geschaeftsjahr_kurzbz, budget) VALUES(".
+					$this->db_add_param($kostenstelle_id, FHC_INTEGER).",".
+					$this->db_add_param($geschaeftsjahr_kurzbz).",".
+					$this->db_add_param($budget).");";
 		}
 		
 		if($qry!='')
@@ -582,7 +597,7 @@ class wawi_kostenstelle extends basis_db
 		if(count($kst_id)==0)
 			return true;
 		
-		$kst_id = "'".implode("','",$kst_id)."'";
+		$kst_id = $this->implode4SQL($kst_id);
 						
 		$qry = 'SELECT * FROM wawi.tbl_kostenstelle WHERE kostenstelle_id in('.$kst_id.')';
 		if ($aktiv)
@@ -605,7 +620,7 @@ class wawi_kostenstelle extends basis_db
 			$obj->oe_kurzbz = $row->oe_kurzbz; 
 			$obj->bezeichnung = $row->bezeichnung; 
 			$obj->kurzbz = $row->kurzbz;
-			$obj->aktiv = ($row->aktiv=='t'?true:false);
+			$obj->aktiv = $this->db_parse_bool($row->aktiv);
 			$obj->updateamum = $row->updateamum; 
 			$obj->updatevon = $row->updatevon; 
 			$obj->insertamum = $row->insertamum; 

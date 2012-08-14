@@ -616,7 +616,7 @@ if($method=='search')
 			foreach($firma->result as $row)
 			{
 				echo '<tr>';
-				echo '<td><a href="firma.php?method=update&amp;id='.$row->firma_id.'" title="Bearbeiten"> <img src="../skin/images/edit.gif"> </a></td>';
+				echo '<td><a href="firma.php?method=update&amp;id='.$row->firma_id.'" title="Bearbeiten"> <img src="../skin/images/edit_wawi.gif"> </a></td>';
 				echo '<td>',$row->firma_id,'</td>';
 				echo '<td>',$row->name,'</td>';
 				echo '<td>',$row->strasse,' ',$row->plz,' ',$row->ort,'</td>';
