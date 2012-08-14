@@ -1368,13 +1368,18 @@ class content extends basis_db
 					JOIN campus.tbl_contentsprache USING(content_id)
 				WHERE
 					tbl_content.content_id=".$this->db_add_param($id, FHC_INTEGER)."
-					AND tbl_contentsprache.sprache=".$this->db_add_param($sprache);
+					AND (tbl_contentsprache.sprache=".$this->db_add_param($sprache)."
+					OR (tbl_contentsprache.sprache=".$this->db_add_param(DEFAULT_LANGUAGE)." AND
+					NOT EXISTS(SELECT * FROM campus.tbl_contentsprache 
+							WHERE 
+								content_id=".$this->db_add_param($id, FHC_INTEGER)." 
+								AND sprache=".$this->db_add_param($sprache).")))";
 			if($sichtbar)
 				$qry.=" AND sichtbar=true";
 			//Hoechste (sichtbare) Version
 			$qry.=" AND version=(SELECT max(version) FROM campus.tbl_contentsprache 
-								WHERE content_id=".$this->db_add_param($id, FHC_INTEGER)."
-					AND tbl_contentsprache.sprache=".$this->db_add_param($sprache);
+								WHERE content_id=".$this->db_add_param($id, FHC_INTEGER);
+			//." AND tbl_contentsprache.sprache=".$this->db_add_param($sprache);
 			if($sichtbar)
 				$qry.=" AND sichtbar=true";
 			$qry.=")";
