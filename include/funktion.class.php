@@ -61,7 +61,7 @@ class funktion extends basis_db
 			$qry='SELECT * FROM public.tbl_funktion order by funktion_kurzbz;';
 		else
 			$qry="SELECT * FROM public.tbl_funktion JOIN public.tbl_benutzerfunktion USING (funktion_kurzbz) 
-					WHERE uid='".addslashes($uid)."';";
+					WHERE uid=".$this->db_add_param($uid).";";
 
 		if(!$this->db_query($qry))
 		{
@@ -75,9 +75,9 @@ class funktion extends basis_db
 
 			$funktion_obj->funktion_kurzbz = $row->funktion_kurzbz;
 			$funktion_obj->beschreibung = $row->beschreibung;
-			$funktion_obj->aktiv = $row->aktiv;
-			$funktion_obj->fachbereich = ($row->fachbereich=='t'?true:false);
-			$funktion_obj->semester = ($row->semester=='t'?true:false);
+			$funktion_obj->aktiv = $this->db_parse_bool($row->aktiv);
+			$funktion_obj->fachbereich = $this->db_parse_bool($row->fachbereich);
+			$funktion_obj->semester = $this->db_parse_bool($row->semester);
 
 			$this->result[] = $funktion_obj;
 		}
@@ -111,7 +111,7 @@ class funktion extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM public.tbl_funktion WHERE funktion_kurzbz = '".addslashes($funktion_kurzbz)."';";
+		$qry = "SELECT * FROM public.tbl_funktion WHERE funktion_kurzbz = ".$this->db_add_param($funktion_kurzbz).";";
 
 		if(!$this->db_query($qry))
 		{
@@ -123,9 +123,9 @@ class funktion extends basis_db
 		{
 			$this->funktion_kurzbz = $row->funktion_kurzbz;
 			$this->beschreibung = $row->beschreibung;
-			$this->aktiv = $row->aktiv;
-			$this->fachbereich = ($row->fachbereich=='t'?true:false);
-			$this->semester = ($row->semester=='t'?true:false);
+			$this->aktiv = $this->db_parse_bool($row->aktiv);
+			$this->fachbereich = $this->db_parse_bool($row->fachbereich);
+			$this->semester = $this->db_parse_bool($row->semester);
 		}
 		else
 		{
@@ -174,11 +174,11 @@ class funktion extends basis_db
 			}
 			//Neuen Datensatz anlegen
 			$qry = 'INSERT INTO public.tbl_funktion (funktion_kurzbz, beschreibung, fachbereich, semester, aktiv) VALUES ('.
-				$this->addslashes($this->funktion_kurzbz).', '.
-				$this->addslashes($this->beschreibung).', '.
-				($this->fachbereich?'true':'false').','.
-				($this->semester?'true':'false').','.
-				($this->aktiv?'true':'false').'); ';
+				$this->db_add_param($this->funktion_kurzbz).', '.
+				$this->db_add_param($this->beschreibung).', '.
+				$this->db_add_param($this->fachbereich, FHC_BOOLEAN).','.
+				$this->db_add_param($this->semester, FHC_BOOLEAN).','.
+				$this->db_add_param($this->aktiv, FHC_BOOLEAN).'); ';
 		}
 		else
 		{
@@ -192,11 +192,11 @@ class funktion extends basis_db
 			}
 
 			$qry = 'UPDATE public.tbl_funktion SET '.
-				'beschreibung='.$this->addslashes($this->beschreibung).', '.
-				'fachbereich='.($this->fachbereich?'true':'false').','.
-				'semester='.($this->semester?'true':'false').','.
-				'aktiv='.($this->aktiv?'true':'false') .' '.
-				'WHERE funktion_kurzbz = '.$this->addslashes($this->funktion_kurzbz).';';
+				'beschreibung='.$this->db_add_param($this->beschreibung).', '.
+				'fachbereich='.$this->db_add_param($this->fachbereich, FHC_BOOLEAN).','.
+				'semester='.$this->db_add_param($this->semester, FHC_BOOLEAN).','.
+				'aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).' '.
+				'WHERE funktion_kurzbz = '.$this->db_add_param($this->funktion_kurzbz).';';
 		}
 
 		if($this->db_query($qry))

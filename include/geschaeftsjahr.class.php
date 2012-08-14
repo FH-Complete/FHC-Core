@@ -53,7 +53,7 @@ class geschaeftsjahr extends basis_db
 	 */
 	public function load($geschaeftsjahr_kurzbz)
 	{
-		$qry = "SELECT * FROM public.tbl_geschaeftsjahr WHERE geschaeftsjahr_kurzbz='".addslashes($geschaeftsjahr_kurzbz)."'";
+		$qry = "SELECT * FROM public.tbl_geschaeftsjahr WHERE geschaeftsjahr_kurzbz=".$this->db_add_param($geschaeftsjahr_kurzbz).';';
 
 		if(!$this->db_query($qry))
 		{
@@ -114,18 +114,18 @@ class geschaeftsjahr extends basis_db
 		if($this->new)
 		{
 			$qry = "INSERT INTO public.tbl_geschaeftsjahr (geschaeftsjahr_kurzbz, start, ende, bezeichnung)
-			        VALUES('".addslashes($this->geschaeftsjahr_kurzbz)."',".
-					$this->addslashes($this->start).','.
-					$this->addslashes($this->ende).'.'.
-					$this->addslashes($this->bezeichnung).');';
+			        VALUES(".$this->db_add_param($this->geschaeftsjahr_kurzbz).",".
+					$this->db_add_param($this->start).','.
+					$this->db_add_param($this->ende).'.'.
+					$this->db_add_param($this->bezeichnung).');';
 		}
 		else
 		{
 			$qry = 'UPDATE public.tbl_geschaeftsjahr SET'.
-			       ' start='.$this->addslashes($this->start).','.
-			       ' ende='.$this->addslashes($this->ende).','.
-				   ' bezeichnung='.$this->addslashes($this->bezeichnung).
-			       " WHERE geschaeftsjahr_kurzbz='$this->geschaeftsjahr_kurzbz'";
+			       ' start='.$this->db_add_param($this->start).','.
+			       ' ende='.$this->db_add_param($this->ende).','.
+				   ' bezeichnung='.$this->db_add_param($this->bezeichnung).
+			       " WHERE geschaeftsjahr_kurzbz=".$this->db_add_param($this->geschaeftsjahr_kurzbz).';';
 		}
 
 		if($this->db_query($qry))
@@ -148,7 +148,7 @@ class geschaeftsjahr extends basis_db
 	public function getakt()
 	{
 		$qry = "SELECT geschaeftsjahr_kurzbz FROM public.tbl_geschaeftsjahr WHERE start <= CURRENT_DATE
-		 AND ende >= CURRENT_DATE";
+		 AND ende >= CURRENT_DATE;";
 
 		if(!$this->db_query($qry))
 		{
@@ -175,7 +175,7 @@ class geschaeftsjahr extends basis_db
 	 */
 	public function getAll()
 	{
-		$qry = "SELECT * FROM public.tbl_geschaeftsjahr ORDER BY ende";
+		$qry = "SELECT * FROM public.tbl_geschaeftsjahr ORDER BY ende;";
 
 		if($this->db_query($qry))
 		{
@@ -206,7 +206,7 @@ class geschaeftsjahr extends basis_db
 	 */
 	public function getPrevious()
 	{
-		$qry = "SELECT geschaeftsjahr_kurzbz FROM public.tbl_geschaeftsjahr WHERE ende<now() ORDER BY ende DESC LIMIT 1";
+		$qry = "SELECT geschaeftsjahr_kurzbz FROM public.tbl_geschaeftsjahr WHERE ende<now() ORDER BY ende DESC LIMIT 1;";
 
 		if($this->db_query($qry))
 		{
@@ -238,8 +238,8 @@ class geschaeftsjahr extends basis_db
 		$newDatum = $date->formatDatum($datum,'Y-m-d');
 		
 		$qry = "SELECT * FROM public.tbl_geschaeftsjahr 
-		WHERE '$newDatum' >= public.tbl_geschaeftsjahr.start AND 
-		'$newDatum' <= public.tbl_geschaeftsjahr.ende;";
+		WHERE ".$this->db_add_param($newDatum)." >= public.tbl_geschaeftsjahr.start AND 
+		".$this->db_add_param($newDatum)." <= public.tbl_geschaeftsjahr.ende;";
 		
 		if($this->db_query($qry))
 		{
