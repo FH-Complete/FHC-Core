@@ -63,7 +63,7 @@ class ferien extends basis_db
 			return false;
 		}
 		
-		$sql_query="SELECT * FROM lehre.tbl_ferien WHERE studiengang_kz=0 OR studiengang_kz='$stg_kz' ORDER BY vondatum";
+		$sql_query="SELECT * FROM lehre.tbl_ferien WHERE studiengang_kz=0 OR studiengang_kz=".$this->db_add_param($stg_kz, FHC_INTEGER)." ORDER BY vondatum;";
 		
 		if (!$this->db_query($sql_query))
 		{
@@ -101,8 +101,8 @@ class ferien extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM lehre.tbl_ferien WHERE bezeichnung = '".addslashes($this->bezeichnung)."' 
-				AND studiengang_kz = '$this->studiengang_kz';";
+		$qry = "SELECT * FROM lehre.tbl_ferien WHERE bezeichnung = ".$this->db_add_param($this->bezeichnung)." 
+				AND studiengang_kz = ".$this->db_add_param($this->studiengang_kz, FHC_INTEGER).";";
 
 		if(!$this->db_query($qry))
 		{
@@ -167,18 +167,18 @@ class ferien extends basis_db
 		{
 			//Neuen Datensatz anlegen
 			$qry = 'INSERT INTO lehre.tbl_ferien (bezeichnung, studiengang_kz, vondatum, bisdatum) VALUES ('.
-				$this->addslashes($this->bezeichnung).', '.
-				$this->addslashes($this->studiengang_kz).', '.
-				$this->addslashes($this->vondatum).', '.
-				$this->addslashes($this->bisdatum).'); ';
+				$this->db_add_param($this->bezeichnung).', '.
+				$this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
+				$this->db_add_param($this->vondatum).', '.
+				$this->db_add_param($this->bisdatum).'); ';
 		}
 		else
 		{
 			//bestehenden Datensatz akualisieren
 			$qry = 'UPDATE lehre.tbl_ferien SET '.
-				'vondatum='.$this->addslashes($this->vondatum).', '.
-				'bisdatum='.$this->addslashes($this->bisdatum).
-				"WHERE studiengang_kz='".addslashes($this->studiengang_kz)."' AND bezeichnung='".addslashes($this->bezeichnung)."';";
+				'vondatum='.$this->db_add_param($this->vondatum).', '.
+				'bisdatum='.$this->db_add_param($this->bisdatum).
+				"WHERE studiengang_kz=".$this->db_add_param($this->studiengang_kz, FHC_INTEGER)." AND bezeichnung=".$this->db_add_param($this->bezeichnung).";";
 		}
 
 		if($this->db_query($qry))
