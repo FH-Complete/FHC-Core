@@ -86,7 +86,7 @@ class firma extends basis_db
 			return false;
 		}
 		
-		$qry = "SElECT * FROM public.tbl_firma WHERE firma_id=".$this->db_add_param($firma_id, FHC_INTEGER);
+		$qry = "SElECT * FROM public.tbl_firma WHERE firma_id=".$this->db_add_param($firma_id, FHC_INTEGER).';';
 		
 		if($this->db_query($qry))
 		{
@@ -107,7 +107,7 @@ class firma extends basis_db
 				$this->aktiv = $this->db_parse_bool($row->aktiv);
 				$this->finanzamt = $row->finanzamt;				
 				
-				$qry = "SELECT tag FROM public.tbl_firmatag WHERE firma_id=".$this->db_add_param($firma_id,FHC_INTEGER);
+				$qry = "SELECT tag FROM public.tbl_firmatag WHERE firma_id=".$this->db_add_param($firma_id,FHC_INTEGER).';';
 				if($resulttag = $this->db_query($qry))
 				{
 					while($rowtag = $this->db_fetch_object($resulttag))
@@ -177,12 +177,12 @@ class firma extends basis_db
 			     $this->db_add_param($this->updatevon).', '.
 			     $this->db_add_param($this->insertamum).', '.
 			     $this->db_add_param($this->insertvon).', '.
-			     $this->db_add_param($this->ext_id).','.
+			     $this->db_add_param($this->ext_id, FHC_INTEGER).','.
 			     $this->db_add_param($this->schule, FHC_BOOLEAN).','.
 			     $this->db_add_param($this->steuernummer).', '.				 
 			     $this->db_add_param($this->gesperrt, FHC_BOOLEAN).','.
 			     $this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
-			     ($this->finanzamt?$this->db_add_param($this->finanzamt):'null').' ); '; 			 
+			     $this->db_add_param($this->finanzamt, FHC_INTEGER).' ); '; 			 
 		}
 		else
 		{
@@ -205,7 +205,7 @@ class firma extends basis_db
 		     	'steuernummer='.$this->db_add_param($this->steuernummer).', '.
 		     	'gesperrt='.$this->db_add_param($this->gesperrt, FHC_BOOLEAN).', '.
 		     	'aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
-		     	'finanzamt='.($this->finanzamt?db_add_param($this->finanzamt):'null').' '.
+		     	'finanzamt='.$this->db_add_param($this->finanzamt, FHC_INTEGER).' '.
 				'WHERE firma_id='.$this->db_add_param($this->firma_id, FHC_INTEGER).';';
 		}
 		
@@ -220,19 +220,19 @@ class firma extends basis_db
 					if($row = $this->db_fetch_object())
 					{
 						$this->firma_id = $row->id;
-						$this->db_query('COMMIT');
+						$this->db_query('COMMIT;');
 					}
 					else 
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
-						$this->db_query('ROLLBACK');
+						$this->db_query('ROLLBACK;');
 						return false;
 					}
 				}
 				else 
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
-					$this->db_query('ROLLBACK');
+					$this->db_query('ROLLBACK;');
 					return false;
 				}
 			}
@@ -263,7 +263,7 @@ class firma extends basis_db
 			{
 				$qry = "
 					SELECT 
-						(SELECT true FROM public.tbl_firmatag WHERE tag=".$this->db_add_param($tag)." AND firma_id=".$this->db_add_param($this->firma_id, FHC_INTEGER)." as zugewiesen,
+						(SELECT true FROM public.tbl_firmatag WHERE tag=".$this->db_add_param($tag)." AND firma_id=".$this->db_add_param($this->firma_id, FHC_INTEGER).") as zugewiesen,
 						(SELECT true FROM public.tbl_tag WHERE tag=".$this->db_add_param($tag).") as vorhanden";
 				if($result = $this->db_query($qry))
 				{
@@ -326,7 +326,7 @@ class firma extends basis_db
 			return false;
 		}
 		
-		$qry = "DELETE FROM public.tbl_firmatag WHERE firma_id=".$this->db_add_param($firma_id, FHC_INTEGER)." AND tag=".$this->db_add_param($tag);
+		$qry = "DELETE FROM public.tbl_firmatag WHERE firma_id=".$this->db_add_param($firma_id, FHC_INTEGER)." AND tag=".$this->db_add_param($tag).';';
 		
 		if($this->db_query($qry))
 			return true;
@@ -344,7 +344,7 @@ class firma extends basis_db
 	 */
 	public function delete($firma_id)
 	{
-		$qry = "DELETE FROM public.tbl_firma WHERE firma_id=".$this->db_add_param($firma_id, FHC_INTEGER);
+		$qry = "DELETE FROM public.tbl_firma WHERE firma_id=".$this->db_add_param($firma_id, FHC_INTEGER).';';
 		if($this->db_query($qry))
 			return true;
 		else 
@@ -382,11 +382,11 @@ class firma extends basis_db
 				WHERE 
 				UPPER(trim(public.tbl_firma.name)) like '%".$matchcode."%'
 				AND UPPER(trim(public.tbl_firma.name)) NOT like '".$matchcode."%'
-				ORDER BY sort, name, firma_id";
+				ORDER BY sort, name, firma_id;";
 		}
 		else
 		{
-			$qry = "SELECT * FROM public.tbl_firma ORDER BY name";
+			$qry = "SELECT * FROM public.tbl_firma ORDER BY name;";
 		}
 		
 		 
@@ -428,7 +428,7 @@ class firma extends basis_db
 	 */
 	public function getFirmenTypen()
 	{
-		$qry = "SELECT * FROM public.tbl_firmentyp ORDER BY firmentyp_kurzbz";
+		$qry = "SELECT * FROM public.tbl_firmentyp ORDER BY firmentyp_kurzbz;";
 		
 		if($this->db_query($qry))
 		{
@@ -459,7 +459,7 @@ class firma extends basis_db
 		
 		if($firmentyp_kurzbz!='')
 			$qry.=" WHERE firmentyp_kurzbz=".$this->db_add_param($firmentyp_kurzbz);
-		$qry.=" ORDER BY name";
+		$qry.=" ORDER BY name;";
 		
 		if($this->db_query($qry))
 		{
@@ -533,7 +533,7 @@ class firma extends basis_db
 		
 		//if($filter=='' && $firmentyp_kurzbz=='')
 		//	$qry.=" limit 500 ";
-		$qry.=") as a ORDER BY name ";
+		$qry.=") as a ORDER BY name;";
 		
 		if($this->db_query($qry))
 		{
@@ -648,7 +648,7 @@ class firma extends basis_db
 		if($oe_kurzbz!='')
 			$qry.=" and tbl_firma_organisationseinheit.oe_kurzbz=".$this->db_add_param($oe_kurzbz);
 			
-		$qry.=" ORDER BY tbl_firma.name, tbl_firma_organisationseinheit.oe_kurzbz ";
+		$qry.=" ORDER BY tbl_firma.name, tbl_firma_organisationseinheit.oe_kurzbz;";
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -704,7 +704,7 @@ class firma extends basis_db
 
 		$qry =" select *  ";
 		$qry.=" FROM public.tbl_firma_organisationseinheit ";
-		$qry.=" WHERE tbl_firma_organisationseinheit.firma_organisationseinheit_id=".$this->db_add_param($firma_organisationseinheit_id);	
+		$qry.=" WHERE tbl_firma_organisationseinheit.firma_organisationseinheit_id=".$this->db_add_param($firma_organisationseinheit_id,FHC_INTEGER).';';	
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -745,8 +745,10 @@ class firma extends basis_db
 		}
 		$qry = "delete from public.tbl_firma_organisationseinheit WHERE firma_organisationseinheit_id>0";
 		if ($firma_organisationseinheit_id)
-			$qry.=" and firma_organisationseinheit_id=".$this->db_add_param($firma_organisationseinheit_id);
+			$qry.=" and firma_organisationseinheit_id=".$this->db_add_param($firma_organisationseinheit_id, FHC_INTEGER);
  			
+        $qry.=';';
+        
 		if($this->db_query($qry))
 			return true;
 		else 
@@ -776,7 +778,7 @@ class firma extends basis_db
 			     $this->db_add_param($this->updatevon).', '.
 			     $this->db_add_param($this->insertamum).', '.
 			     $this->db_add_param($this->insertvon).', '.
-			     $this->db_add_param($this->ext_id).' ); ';
+			     $this->db_add_param($this->ext_id, FHC_INTEGER).' ); ';
 		}
 		else
 		{
@@ -795,7 +797,7 @@ class firma extends basis_db
 				'kundennummer='.$this->db_add_param($this->kundennummer).', '.
 				'updateamum= now(), '.
 		     	'updatevon='.$this->db_add_param($this->updatevon).', '.
-		     	'ext_id='.$this->db_add_param($this->ext_id).' '.
+		     	'ext_id='.$this->db_add_param($this->ext_id, FHC_INTEGER).' '.
 				'WHERE firma_organisationseinheit_id='.$this->db_add_param($this->firma_organisationseinheit_id, FHC_INTEGER).';';
 		}
 		if($this->db_query($qry))
@@ -809,19 +811,19 @@ class firma extends basis_db
 					if($row = $this->db_fetch_object())
 					{
 						$this->firma_organisationseinheit_id = $row->id;
-						$this->db_query('COMMIT');
+						$this->db_query('COMMIT;');
 					}
 					else 
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
-						$this->db_query('ROLLBACK');
+						$this->db_query('ROLLBACK;');
 						return false;
 					}
 				}
 				else 
 				{
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
-					$this->db_query('ROLLBACK');
+					$this->db_query('ROLLBACK;');
 					return false;
 				}
 			}
@@ -872,7 +874,7 @@ class firma extends basis_db
 					public.tbl_firma_mobilitaetsprogramm
 				WHERE 
 					firma_id=".$this->db_add_param($firma_id, FHC_INTEGER)." 
-					AND mobilitaetsprogramm_code=".$this->db_add_param($mobilitaetsprogramm_code, FHC_INTEGER); 
+					AND mobilitaetsprogramm_code=".$this->db_add_param($mobilitaetsprogramm_code, FHC_INTEGER).';'; 
 		if($this->db_query($qry))
 		{
 			if($this->db_num_rows()>0)
@@ -897,7 +899,7 @@ class firma extends basis_db
 	{
 		$qry = "DELETE FROM public.tbl_firma_mobilitaetsprogramm WHERE
 				firma_id=".$this->db_add_param($firma_id, FHC_INTEGER)."
-				AND mobilitaetsprogramm_code=".$this->db_add_param($mobilitaetsprogramm_code);
+				AND mobilitaetsprogramm_code=".$this->db_add_param($mobilitaetsprogramm_code, FHC_INTEGER).';';
 		if($this->db_query($qry))
 		{
 			return true;
@@ -916,7 +918,7 @@ class firma extends basis_db
      */
     function getFirmenMobilitaetsprogramm($mobilitaetsprogramm_code)
     {
-        $qry = 'SELECT * FROM public.tbl_firma JOIN public.tbl_firma_mobilitaetsprogramm USING(firma_id) WHERE mobilitaetsprogramm_code ='.$this->db_add_param($mobilitaetsprogramm_code, FHC_STRING);
+        $qry = 'SELECT * FROM public.tbl_firma JOIN public.tbl_firma_mobilitaetsprogramm USING(firma_id) WHERE mobilitaetsprogramm_code ='.$this->db_add_param($mobilitaetsprogramm_code, FHC_INTEGER).';';
 		
 		if($this->db_query($qry))
 		{
