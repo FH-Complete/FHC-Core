@@ -274,7 +274,7 @@ function draw_konto_table($konto_array, $kst_konto, $table_id, $gj)
 	{		
 		$konto = new wawi_konto(); 
 		$konto->load($konten); 
-		echo '<th>',$konto->beschreibung[1],'</th>';
+		echo '<th>',$konto->kurzbz,'</th>';
 	}
 	echo '
 				<th>Summe</th>

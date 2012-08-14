@@ -38,7 +38,7 @@ class wawi_bestellung extends basis_db
 	public $firma_id;			// int
 	public $lieferadresse; 		// int
 	public $rechnungsadresse;	// int
-	public $freigegeben; 		// bool
+	public $freigegeben=false;	// bool
 	public $bestell_nr;			// char
 	public $titel;				// char
 	public $bemerkung; 			// char
@@ -81,7 +81,7 @@ class wawi_bestellung extends basis_db
 			return false; 
 		}
 		
-		$qry = "SELECT * FROM wawi.tbl_bestellung WHERE bestellung_id = ".addslashes($bestellung_id);
+		$qry = "SELECT * FROM wawi.tbl_bestellung WHERE bestellung_id = ".$this->db_add_param($bestellung_id, FHC_INTEGER);
 		
 		if(!$this->db_query($qry))
 		{
@@ -98,7 +98,7 @@ class wawi_bestellung extends basis_db
 			$this->firma_id = $row->firma_id; 
 			$this->lieferadresse = $row->lieferadresse; 
 			$this->rechnungsadresse = $row->rechnungsadresse; 
-			$this->freigegeben = $row->freigegeben; 
+			$this->freigegeben = $this->db_parse_bool($row->freigegeben); 
 			$this->bestell_nr = $row->bestell_nr; 
 			$this->titel = $row->titel; 
 			$this->bemerkung = $row->bemerkung;
@@ -143,7 +143,7 @@ class wawi_bestellung extends basis_db
 			$bestellung->firma_id = $row->firma_id; 
 			$bestellung->lieferadresse = $row->lieferadresse; 
 			$bestellung->rechnungsadresse = $row->rechnungsadresse; 
-			$bestellung->freigegeben = ($row->freigegeben=='t'?true:false);
+			$bestellung->freigegeben = $this->db_parse_bool($row->freigegeben);
 			$bestellung->bestell_nr = $row->bestell_nr;
 			$bestellung->titel = $row->titel;
 			$bestellung->bemerkung = $row->bemerkung; 
@@ -153,7 +153,7 @@ class wawi_bestellung extends basis_db
 			$bestellung->insertamum = $row->insertamum; 
 			$bestellung->insertvon = $row->insertvon; 
 			$bestellung->ext_id = $row->ext_id; 
-			$bestellung->zahlungstyp_kurzbz = $row->$zahlungstyp_kurzbz; 
+			$bestellung->zahlungstyp_kurzbz = $row->zahlungstyp_kurzbz; 
 			
 			$this->result[] = $bestellung; 
 		}
@@ -197,59 +197,59 @@ class wawi_bestellung extends basis_db
 		
 		// Bestellnummer und Inventarnummer werden durchsucht
 		if ($bestellnr != '')
-			$qry.= " AND (UPPER(bestellung.bestell_nr) LIKE UPPER('%".addslashes($bestellnr)."%') OR UPPER(betriebsmittel.inventarnummer) LIKE UPPER('%".addslashes($bestellnr)."%'))"; 
+			$qry.= " AND (UPPER(bestellung.bestell_nr) LIKE UPPER('%".$this->db_escape($bestellnr)."%') OR UPPER(betriebsmittel.inventarnummer) LIKE UPPER('%".$this->db_escape($bestellnr)."%'))"; 
 		else 
 		{
 			if ($titel != '')	
-				$qry.= " AND UPPER(bestellung.titel) LIKE UPPER('%".addslashes($titel)."%')"; 
+				$qry.= " AND UPPER(bestellung.titel) LIKE UPPER('%".$this->db_escape($titel)."%')"; 
 		
 			if ($evon != '')
-				$qry.= ' AND bestellung.insertamum::date >= date('.$this->addslashes($evon).')';
+				$qry.= ' AND bestellung.insertamum::date >= date('.$this->db_add_param($evon).')';
 					
 			if ($ebis != '')
-				$qry.= ' AND bestellung.insertamum::date <= '.$this->addslashes($ebis);
+				$qry.= ' AND bestellung.insertamum::date <= '.$this->db_add_param($ebis);
 	
 			if ($bvon != '')
-				$qry.= " AND status.bestellstatus_kurzbz = 'Bestellung' and status.datum > ".$this->addslashes($bvon);
+				$qry.= " AND status.bestellstatus_kurzbz = 'Bestellung' and status.datum > ".$this->db_add_param($bvon);
 			
 			if ($bbis != '')
-				$qry.= " AND status.bestellstatus_kurzbz = 'Bestellung' and status.datum < ".$this->addslashes($bbis);
+				$qry.= " AND status.bestellstatus_kurzbz = 'Bestellung' and status.datum < ".$this->db_add_param($bbis);
 	
 			if ($firma_id != '')
-				$qry.= ' AND bestellung.firma_id = '.$this->addslashes($firma_id);
+				$qry.= ' AND bestellung.firma_id = '.$this->db_add_param($firma_id, FHC_INTEGER);
 	
 			if ($filter_firma != '')
-				$qry.= ' AND bestellung.firma_id = '.$this->addslashes($filter_firma);
+				$qry.= ' AND bestellung.firma_id = '.$this->db_add_param($filter_firma);
 			
 			if ($oe_kurzbz != '')
-				$qry.= ' AND orgaeinheit.oe_kurzbz = '.$this->addslashes($oe_kurzbz);
+				$qry.= ' AND orgaeinheit.oe_kurzbz = '.$this->db_add_param($oe_kurzbz);
 			
 			if ($konto_id != '')	
-				$qry.= ' AND bestellung.konto_id = '.$this->addslashes($konto_id);
+				$qry.= ' AND bestellung.konto_id = '.$this->db_add_param($konto_id, FHC_INTEGER);
 			
 			if ($mitarbeiter_uid != '')	
-				$qry.= ' AND ( bestellung.updatevon = '.$this->addslashes($mitarbeiter_uid).' OR bestellung.insertvon = '.$this->addslashes($mitarbeiter_uid)
-				.' OR bestellung.besteller_uid = '.$this->addslashes($mitarbeiter_uid).' )';
+				$qry.= ' AND ( bestellung.updatevon = '.$this->db_add_param($mitarbeiter_uid).' OR bestellung.insertvon = '.$this->db_add_param($mitarbeiter_uid)
+				.' OR bestellung.besteller_uid = '.$this->db_add_param($mitarbeiter_uid).' )';
 			
 			if($rechnung)
 				$qry.= ' AND not exists  (Select bestellung.bestellung_id from wawi.tbl_rechnung rechnung where rechnung.bestellung_id=bestellung.bestellung_id)';
 			
 			if($kostenstelle_id!='')
-				$qry.= ' AND kostenstelle_id='.$this->addslashes($kostenstelle_id);
+				$qry.= ' AND kostenstelle_id='.$this->db_add_param($kostenstelle_id, FHC_INTEGER);
 				
 			if($zahlungstyp!='')
-				$qry.= ' AND bestellung.zahlungstyp_kurzbz = '.$this->addslashes($zahlungstyp);	
+				$qry.= ' AND bestellung.zahlungstyp_kurzbz = '.$this->db_add_param($zahlungstyp);	
 				
 			if($tag!='')
-				$qry.= ' AND (EXISTS (SELECT 1 FROM wawi.tbl_bestellungtag WHERE tag='.$this->addslashes($tag).' AND bestellung_id=bestellung.bestellung_id)
-							OR EXISTS (SELECT 1 FROM wawi.tbl_bestelldetailtag JOIN wawi.tbl_bestelldetail USING(bestelldetail_id) WHERE tag='.$this->addslashes($tag).' AND bestellung_id=bestellung.bestellung_id)
+				$qry.= ' AND (EXISTS (SELECT 1 FROM wawi.tbl_bestellungtag WHERE tag='.$this->db_add_param($tag).' AND bestellung_id=bestellung.bestellung_id)
+							OR EXISTS (SELECT 1 FROM wawi.tbl_bestelldetailtag JOIN wawi.tbl_bestelldetail USING(bestelldetail_id) WHERE tag='.$this->db_add_param($tag).' AND bestellung_id=bestellung.bestellung_id)
 							)';
 			if($tagNotExists)
 				$qry.=' AND (NOT EXISTS (SELECT 1 FROM wawi.tbl_bestellungtag WHERE tag is not null AND bestellung_id=bestellung.bestellung_id) 
 						 AND NOT EXISTS (SELECT 1 FROM wawi.tbl_bestelldetailtag JOIN wawi.tbl_bestelldetail USING(bestelldetail_id) WHERE tag is not null AND bestellung_id=bestellung.bestellung_id) )';
 				
 			if($bestellposition!='')
-				$qry.=" AND EXISTS (SELECT 1 FROM wawi.tbl_bestelldetail where UPPER(beschreibung) LIKE UPPER('%".addslashes($bestellposition)."%') AND bestellung_id=bestellung.bestellung_id)";
+				$qry.=" AND EXISTS (SELECT 1 FROM wawi.tbl_bestelldetail where UPPER(beschreibung) LIKE UPPER('%".$this->db_escape($bestellposition)."%') AND bestellung_id=bestellung.bestellung_id)";
 	
 			if($ohneFreigabe)
 				$qry.=" AND bestellung.freigegeben = 'false'";
@@ -271,7 +271,7 @@ class wawi_bestellung extends basis_db
 			$bestellung->firma_id = $row->firma_id; 
 			$bestellung->lieferadresse = $row->lieferadresse; 
 			$bestellung->rechnungsadresse = $row->rechnungsadresse; 
-			$bestellung->freigegeben = $row->freigegeben; 
+			$bestellung->freigegeben = $this->db_parse_bool($row->freigegeben); 
 			$bestellung->bestell_nr = $row->bestell_nr;
 			$bestellung->titel = $row->titel;
 			$bestellung->bemerkung = $row->bemerkung; 
@@ -294,12 +294,14 @@ class wawi_bestellung extends basis_db
 	 * @param $filter
 	 */
 	public function getBestellung($filter)
-	{
-		$filter = addslashes($filter);
-		
-		$qry = "SELECT * FROM wawi.tbl_bestellung WHERE 
-		bestellung_id::text like '%$filter%' OR
-		lower(bestell_nr) like lower('%$filter%')";
+	{		
+		$qry = "SELECT 
+					* 
+				FROM 
+					wawi.tbl_bestellung 
+				WHERE 
+					bestellung_id::text LIKE '%".$this->db_escape($filter)."%' 
+					OR lower(bestell_nr) LIKE lower('%".$this->db_escape($filter)."%')";
 		
 		if($result = $this->db_query($qry))
 		{
@@ -313,7 +315,7 @@ class wawi_bestellung extends basis_db
 				$bestellung->firma_id = $row->firma_id; 
 				$bestellung->lieferadresse = $row->lieferadresse; 
 				$bestellung->rechnungsadresse = $row->rechnungsadresse; 
-				$bestellung->freigegeben = $row->freigegeben; 
+				$bestellung->freigegeben = $this->db_parse_bool($row->freigegeben); 
 				$bestellung->bestell_nr = $row->bestell_nr;
 				$bestellung->titel = $row->titel;
 				$bestellung->bemerkung = $row->bemerkung; 
@@ -344,8 +346,12 @@ class wawi_bestellung extends basis_db
 	 */
 	public function getBestellungProjekt($projekt_kurzbz)
 	{
-		//$projekt_kurzbz = addslashes($projekt_kurzbz);
-		$qry = "SELECT * FROM wawi.tbl_bestellung JOIN wawi.tbl_projekt_bestellung USING (bestellung_id) WHERE projekt_kurzbz='".$projekt_kurzbz."';";
+		$qry = "SELECT 
+					* 
+				FROM 
+					wawi.tbl_bestellung 
+					JOIN wawi.tbl_projekt_bestellung USING (bestellung_id) 
+				WHERE projekt_kurzbz=".$this->db_add_param($projekt_kurzbz).";";
 		
 		if($result = $this->db_query($qry))
 		{
@@ -359,7 +365,7 @@ class wawi_bestellung extends basis_db
 				$bestellung->firma_id = $row->firma_id; 
 				$bestellung->lieferadresse = $row->lieferadresse; 
 				$bestellung->rechnungsadresse = $row->rechnungsadresse; 
-				$bestellung->freigegeben = $row->freigegeben; 
+				$bestellung->freigegeben = $this->db_parse_bool($row->freigegeben); 
 				$bestellung->bestell_nr = $row->bestell_nr;
 				$bestellung->titel = $row->titel;
 				$bestellung->bemerkung = $row->bemerkung; 
@@ -390,15 +396,15 @@ class wawi_bestellung extends basis_db
 	{
 		if(!is_numeric($bestellung_id))
 		{
-			$this->errormsg = "Keine gültige Bestell ID";
+			$this->errormsg = 'Keine gültige Bestell ID';
 			return false; 
 		}		
 		
-		$qry ="DELETE FROM wawi.tbl_bestellung WHERE bestellung_id = ".addslashes($bestellung_id);
+		$qry ="DELETE FROM wawi.tbl_bestellung WHERE bestellung_id = ".$this->db_add_param($bestellung_id, FHC_INTEGER);
 		
 		if(!$this->db_query($qry))
 		{
-			$this->errormsg ="Fehler beim Löschen der Bestell ID $bestellung_id aufgetreten.";
+			$this->errormsg ="Fehler beim Löschen der Bestell aufgetreten.";
 			return false; 
 		}
 		return true; 
@@ -464,56 +470,52 @@ class wawi_bestellung extends basis_db
 	 */
 	public function save()
 	{
-		/*if(!$this->validate())
-			return false; */
+		if(!$this->validate())
+			return false;
 		
 		if($this->new)
-		{
-			if($this->freigegeben === false)
-				$freigegeben_new = 'false';
-			else 
-				$freigegeben_new = 'true';
-				
+		{				
 			$qry = 'BEGIN; INSERT INTO wawi.tbl_bestellung (besteller_uid, kostenstelle_id, konto_id, firma_id, lieferadresse, rechnungsadresse, 
 			freigegeben, bestell_nr, titel, bemerkung, liefertermin, updateamum, updatevon, insertamum, insertvon, ext_id, zahlungstyp_kurzbz) VALUES ('.
-			$this->addslashes($this->besteller_uid).', '.
-			$this->addslashes($this->kostenstelle_id).', '.
-			$this->addslashes($this->konto_id).', '.
-			$this->addslashes($this->firma_id).', '.
-			$this->addslashes($this->lieferadresse).', '.
-			$this->addslashes($this->rechnungsadresse).', '.
-			$freigegeben_new.','.
-			$this->addslashes($this->bestell_nr).', '.
-			$this->addslashes($this->titel).', '.
-			$this->addslashes($this->bemerkung).', '.
-			$this->addslashes($this->liefertermin).', '.
-			$this->addslashes($this->updateamum).', '.
-			$this->addslashes($this->updatevon).', '.
-			$this->addslashes($this->insertamum).', '.
-			$this->addslashes($this->insertvon).', '.
-			$this->addslashes($this->ext_id).', '.
-			$this->addslashes($this->zahlungstyp_kurzbz).')';
+			$this->db_add_param($this->besteller_uid).', '.
+			$this->db_add_param($this->kostenstelle_id, FHC_INTEGER).', '.
+			$this->db_add_param($this->konto_id, FHC_INTEGER).', '.
+			$this->db_add_param($this->firma_id, FHC_INTEGER).', '.
+			$this->db_add_param($this->lieferadresse).', '.
+			$this->db_add_param($this->rechnungsadresse).', '.
+			$this->db_add_param($this->freigegeben, FHC_BOOLEAN).','.
+			$this->db_add_param($this->bestell_nr).', '.
+			$this->db_add_param($this->titel).', '.
+			$this->db_add_param($this->bemerkung).', '.
+			$this->db_add_param($this->liefertermin).', '.
+			$this->db_add_param($this->updateamum).', '.
+			$this->db_add_param($this->updatevon).', '.
+			$this->db_add_param($this->insertamum).', '.
+			$this->db_add_param($this->insertvon).', '.
+			$this->db_add_param($this->ext_id).', '.
+			$this->db_add_param($this->zahlungstyp_kurzbz).')';
 
 		}
 		else
 		{
 			//UPDATE
 			$qry = 'UPDATE wawi.tbl_bestellung SET 
-			besteller_uid = '.$this->addslashes($this->besteller_uid).', 
-			kostenstelle_id = '.$this->addslashes($this->kostenstelle_id).', 
-			konto_id = '.$this->addslashes($this->konto_id).',
-			firma_id = '.$this->addslashes($this->firma_id).',
-			lieferadresse = '.$this->addslashes($this->lieferadresse).',
-			rechnungsadresse = '.$this->addslashes($this->rechnungsadresse).',
-			freigegeben = '.$this->addslashes($this->freigegeben).',
-			bestell_nr = '.$this->addslashes($this->bestell_nr).',
-			titel = '.$this->addslashes($this->titel).',
-			bemerkung = '.$this->addslashes($this->bemerkung).',
-			liefertermin = '.$this->addslashes($this->liefertermin).',
-			updateamum = '.$this->addslashes($this->updateamum).',
-			updatevon ='.$this->addslashes($this->updatevon).',
-			ext_id ='.$this->addslashes($this->ext_id).',
-			zahlungstyp_kurzbz = '.$this->addslashes($this->zahlungstyp_kurzbz).' WHERE bestellung_id = '.$this->bestellung_id.';'; 
+			besteller_uid = '.$this->db_add_param($this->besteller_uid).', 
+			kostenstelle_id = '.$this->db_add_param($this->kostenstelle_id, FHC_INTEGER).', 
+			konto_id = '.$this->db_add_param($this->konto_id, FHC_INTEGER).',
+			firma_id = '.$this->db_add_param($this->firma_id, FHC_INTEGER).',
+			lieferadresse = '.$this->db_add_param($this->lieferadresse).',
+			rechnungsadresse = '.$this->db_add_param($this->rechnungsadresse).',
+			freigegeben = '.$this->db_add_param($this->freigegeben, FHC_BOOLEAN).',
+			bestell_nr = '.$this->db_add_param($this->bestell_nr).',
+			titel = '.$this->db_add_param($this->titel).',
+			bemerkung = '.$this->db_add_param($this->bemerkung).',
+			liefertermin = '.$this->db_add_param($this->liefertermin).',
+			updateamum = '.$this->db_add_param($this->updateamum).',
+			updatevon ='.$this->db_add_param($this->updatevon).',
+			ext_id ='.$this->db_add_param($this->ext_id).',
+			zahlungstyp_kurzbz = '.$this->db_add_param($this->zahlungstyp_kurzbz).' 
+			WHERE bestellung_id = '.$this->db_add_param($this->bestellung_id, FHC_INTEGER, false).';'; 
 		}
 		if($this->db_query($qry))
 		{
@@ -549,6 +551,7 @@ class wawi_bestellung extends basis_db
 		}
 		return $this->bestellung_id;
 	}
+	
 	/**
 	 * 
 	 * Rechnet den Bruttopreis einer Rechnung aus, false im Fehlerfall
@@ -563,14 +566,21 @@ class wawi_bestellung extends basis_db
 		}		
 		
 		$brutto = 0;
-		$qry_brutto= "select sum(brutto) as brutto 
-					from 
-					(select detail.menge, detail.preisprove, detail.mwst, sum(detail.menge * detail.preisprove) * ((100+COALESCE(detail.mwst,0))/100) as brutto 
-					from 
+		$qry_brutto= "
+			SELECT 
+				sum(brutto) as brutto 
+			FROM
+				(SELECT 
+					detail.menge, detail.preisprove, detail.mwst, 
+					sum(detail.menge * detail.preisprove) * ((100+COALESCE(detail.mwst,0))/100) as brutto 
+				FROM
 					wawi.tbl_bestellung as bestellung, wawi.tbl_bestelldetail as detail 
-					where 
-					bestellung.bestellung_id = detail.bestellung_id and bestellung.bestellung_id =".$bestellung_id." group by detail.menge, detail.preisprove, detail.mwst) as b;";
-		
+				WHERE 
+					bestellung.bestellung_id = detail.bestellung_id 
+					AND bestellung.bestellung_id =".$this->db_add_param($bestellung_id, FHC_INTEGER)." 
+				GROUP BY detail.menge, detail.preisprove, detail.mwst
+				) as b;";
+			
 		if($this->db_query($qry_brutto))
 		{
 			if($row = $this->db_fetch_object())
@@ -603,9 +613,14 @@ class wawi_bestellung extends basis_db
 			$bestellung_id = array(); 
 			$brutto = 0; 
 			
-			$qry = "select bestellung.bestellung_id, bestellung.kostenstelle_id 
-					FROM wawi.tbl_bestellung bestellung where bestellung.kostenstelle_id = '$kostenstelle_id' 
-					AND bestellung.insertamum >= '$start' and bestellung.insertamum <= '$ende' "; 
+			$qry = "SELECT 
+						bestellung.bestellung_id, bestellung.kostenstelle_id 
+					FROM 
+						wawi.tbl_bestellung bestellung 
+					WHERE
+						bestellung.kostenstelle_id = ".$this->db_add_param($kostenstelle_id, FHC_INTEGER)." 
+						AND bestellung.insertamum >= ".$this->db_add_param($start)."
+						AND bestellung.insertamum <= ".$this->db_add_param($ende).';'; 
 			
 			if($this->db_query($qry))
 			{
@@ -647,11 +662,14 @@ class wawi_bestellung extends basis_db
 		$this->db_query('BEGIN;'); 
 		
 		// Bestellung kopieren
-		$qry_bestellung = "INSERT INTO wawi.tbl_bestellung (bestellung_id, besteller_uid, kostenstelle_id, konto_id, firma_id, lieferadresse, rechnungsadresse, zahlungstyp_kurzbz, freigegeben, bestell_nr,
-		titel, bemerkung, liefertermin, updateamum, updatevon, insertamum, insertvon, ext_id) SELECT 
-		nextval('wawi.seq_bestellung_bestellung_id'), ".$this->addslashes($user).", kostenstelle_id, konto_id, firma_id, lieferadresse, 
-		rechnungsadresse, zahlungstyp_kurzbz, 'false', '$newBestellNummer', titel, bemerkung, liefertermin, now(), ".$this->addslashes($user).", now(), ".$this->addslashes($user).", ext_id FROM wawi.tbl_bestellung WHERE 
-		bestellung_id = ".$bestellung_id.";";
+		$qry_bestellung = "INSERT INTO wawi.tbl_bestellung (bestellung_id, besteller_uid, kostenstelle_id, 
+		konto_id, firma_id, lieferadresse, rechnungsadresse, zahlungstyp_kurzbz, freigegeben, bestell_nr,
+		titel, bemerkung, liefertermin, updateamum, updatevon, insertamum, insertvon, ext_id) 
+		SELECT nextval('wawi.seq_bestellung_bestellung_id'), ".$this->db_add_param($user).", 
+		kostenstelle_id, konto_id, firma_id, lieferadresse,	rechnungsadresse, zahlungstyp_kurzbz, 'false', 
+		".$this->db_add_param($newBestellNummer).", titel, bemerkung, liefertermin, now(), 
+		".$this->db_add_param($user).", now(), ".$this->db_add_param($user).", ext_id 
+		FROM wawi.tbl_bestellung WHERE bestellung_id = ".$this->db_add_param($bestellung_id, FHC_INTEGER).';';
 
 		if(!$this->db_query($qry_bestellung))
 			$error = true; 
@@ -674,10 +692,14 @@ class wawi_bestellung extends basis_db
 		// Bestelldetails kopieren
 		foreach ($bestelldetail->result as $detail)
 		{
-			$qry_detail ="INSERT INTO wawi.tbl_bestelldetail (bestellung_id, position, menge, verpackungseinheit, beschreibung, artikelnummer, preisprove, mwst, erhalten, sort,
-			text, insertamum, insertvon, updateamum, updatevon) SELECT $newBestellung_id, position, menge, verpackungseinheit, beschreibung, artikelnummer, preisprove, mwst, erhalten, sort,
-			text, now(), ".$this->addslashes($user).", now(), ".$this->addslashes($user)." FROM wawi.tbl_bestelldetail 
-			WHERE bestelldetail_id = ".$detail->bestelldetail_id.";"; 
+			$qry_detail ="INSERT INTO wawi.tbl_bestelldetail (bestellung_id, position, menge, 
+			verpackungseinheit, beschreibung, artikelnummer, preisprove, mwst, erhalten, sort,
+			text, insertamum, insertvon, updateamum, updatevon) 
+			SELECT ".$this->db_add_param($newBestellung_id, FHC_INTEGER).", position, menge, 
+			verpackungseinheit, beschreibung, artikelnummer, preisprove, mwst, erhalten, sort,
+			text, now(), ".$this->db_add_param($user).", now(), ".$this->db_add_param($user)." 
+			FROM wawi.tbl_bestelldetail	WHERE bestelldetail_id = ".$this->db_add_param($detail->bestelldetail_id).';';
+			 
 			if (!$this->db_query($qry_detail))
 				$error = true; 
 				
@@ -697,8 +719,9 @@ class wawi_bestellung extends basis_db
 			
 			// zugehörigen TAG kopieren
 			$qry_detailtag = "INSERT INTO wawi.tbl_bestelldetailtag (tag, bestelldetail_id, insertamum, insertvon) 
-			SELECT tag, ".$this->addslashes($newBestellDetail_id).", now(), ".$this->addslashes($user)." FROM wawi.tbl_bestelldetailtag 
-			WHERE bestelldetail_id = ".$this->addslashes($detail->bestelldetail_id).";"; 
+			SELECT tag, ".$this->db_add_param($newBestellDetail_id, FHC_INTEGER).", now(), ".
+			$this->db_add_param($user)." FROM wawi.tbl_bestelldetailtag 
+			WHERE bestelldetail_id = ".$this->db_add_param($detail->bestelldetail_id, FHC_INTEGER).';'; 
 			
 			if (!$this->db_query($qry_detailtag))
 				$error = true; 
@@ -706,20 +729,24 @@ class wawi_bestellung extends basis_db
 		}
 		
 		// aufteilung kopieren
-		$qry_aufteilung = "INSERT INTO wawi.tbl_aufteilung (bestellung_id, oe_kurzbz, anteil, updateamum, updatevon, insertamum, insertvon) 
-		SELECT ".$this->addslashes($newBestellung_id)." ,  oe_kurzbz, anteil, updateamum, updatevon, now(), ".$this->addslashes($user)." FROM wawi.tbl_aufteilung WHERE bestellung_id = ".$bestellung_id.";"; 
+		$qry_aufteilung = "INSERT INTO wawi.tbl_aufteilung (bestellung_id, oe_kurzbz, anteil, updateamum,
+		updatevon, insertamum, insertvon) SELECT ".$this->db_add_param($newBestellung_id, FHC_INTEGER)." 
+		, oe_kurzbz, anteil, updateamum, updatevon, now(), ".$this->db_add_param($user)." 
+		FROM wawi.tbl_aufteilung WHERE bestellung_id = ".$this->db_add_param($bestellung_id, FHC_INTEGER).";"; 
 		if (!$this->db_query($qry_aufteilung))
 			$error = true; 
 
 		// projekt bestellung kopieren
-		$qry_project ="INSERT INTO wawi.tbl_projekt_bestellung (projekt_kurzbz, bestellung_id, anteil) SELECT projekt_kurzbz, ".$this->addslashes($newBestellung_id).", anteil 
-		from wawi.tbl_projekt_bestellung WHERE bestellung_id = ".$bestellung_id.";"; 
+		$qry_project ="INSERT INTO wawi.tbl_projekt_bestellung (projekt_kurzbz, bestellung_id, anteil) 
+		SELECT projekt_kurzbz, ".$this->db_add_param($newBestellung_id, FHC_INTEGER).", anteil 
+		FROM wawi.tbl_projekt_bestellung WHERE bestellung_id = ".$this->db_add_param($bestellung_id, FHC_INTEGER).";"; 
 		if (!$this->db_query($qry_project))
 			$error = true; 
 		
 		// bestelltag kopieren
-		$qry_bestelltag ="INSERT INTO wawi.tbl_bestellungtag (tag, bestellung_id, insertamum, insertvon) SELECT tag, ".$this->addslashes($newBestellung_id).", now(), ".$this->addslashes($user)." 
-		from wawi.tbl_bestellungtag WHERE bestellung_id = ".$bestellung_id.";";
+		$qry_bestelltag ="INSERT INTO wawi.tbl_bestellungtag (tag, bestellung_id, insertamum, insertvon) 
+		SELECT tag, ".$this->db_add_param($newBestellung_id, FHC_INTEGER).", now(), ".$this->db_add_param($user)." 
+		FROM wawi.tbl_bestellungtag WHERE bestellung_id = ".$this->db_add_param($bestellung_id, FHC_INTEGER).";";
 		if (!$this->db_query($qry_bestelltag))
 			$error = true; 	
 			
@@ -737,13 +764,19 @@ class wawi_bestellung extends basis_db
 	
 	/**
 	 * 
-	 * Liefert die oe_kurzbz einer bestellung zurück. JOIN über Kostenstelle
+	 * Liefert die oe_kurzbz einer Bestellung zurück. JOIN über Kostenstelle
+	 * @return oe_kurzbz der Bestellung oder false im Fehlerfall
 	 */
 	public function getOe()
 	{
-		$qry = "select kostenstelle.oe_kurzbz 
-		from wawi.tbl_kostenstelle as kostenstelle, wawi.tbl_bestellung as bestellung 
-		where bestellung.kostenstelle_id = kostenstelle.kostenstelle_id and bestellung.bestellung_id = ".$this->bestellung_id.";"; 
+		$qry = "SELECT 
+					kostenstelle.oe_kurzbz 
+				FROM 
+					wawi.tbl_kostenstelle as kostenstelle, 
+					wawi.tbl_bestellung as bestellung 
+				WHERE 
+					bestellung.kostenstelle_id = kostenstelle.kostenstelle_id 
+					AND bestellung.bestellung_id = ".$this->db_add_param($this->bestellung_id, FHC_INTEGER).";"; 
 		
 		if($this->db_query($qry))
 		{
@@ -763,6 +796,7 @@ class wawi_bestellung extends basis_db
 	/**
 	 * 
 	 * Gibt alle OEs zurück die freigegeben werden müssen
+	 * @return Array von oe_kurzbz oder false im Fehlerfall
 	 */
 	public function FreigabeOe($bestellung_id)
 	{
@@ -786,14 +820,14 @@ class wawi_bestellung extends basis_db
 		$qry = "WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz, freigabegrenze) as 
 			(
 				SELECT oe_kurzbz, oe_parent_kurzbz, freigabegrenze FROM public.tbl_organisationseinheit 
-				WHERE oe_kurzbz='".addslashes($oe_bestellung)."' and aktiv = true 
+				WHERE oe_kurzbz=".$this->db_add_param($oe_bestellung)." and aktiv = true 
 				UNION ALL
 				SELECT o.oe_kurzbz, o.oe_parent_kurzbz, o.freigabegrenze FROM public.tbl_organisationseinheit o, oes 
 				WHERE o.oe_kurzbz=oes.oe_parent_kurzbz and aktiv = true
 			)
 			SELECT oe_kurzbz
 			FROM oes
-			WHERE freigabegrenze<='$brutto'
+			WHERE freigabegrenze<=".$this->db_add_param($brutto)."
 			GROUP BY oe_kurzbz,freigabegrenze ORDER BY freigabegrenze"; 
 
 		if($this->db_query($qry))
@@ -817,11 +851,11 @@ class wawi_bestellung extends basis_db
 	{
 		if(!is_numeric($bestellung_id))
 		{
-			$this->errormsg = "Keine gültige Bestell ID";
+			$this->errormsg = 'Keine gültige Bestell ID';
 			return false; 
 		}		
 	
-		$qry = "SELECT * FROM wawi.tbl_rechnung WHERE bestellung_id = ".$bestellung_id.";";
+		$qry = "SELECT * FROM wawi.tbl_rechnung WHERE bestellung_id = ".$this->db_add_param($bestellung_id, FHC_INTEGER).';';
 		
 		if($this->db_query($qry))
 		{
@@ -849,13 +883,14 @@ class wawi_bestellung extends basis_db
 			return false; 
 		}	
 		
-		$qry = "UPDATE wawi.tbl_bestellung SET bestell_nr = '".$bestellnr."' where bestellung_id = '".$bestellung_id."';"; 
+		$qry = "UPDATE wawi.tbl_bestellung SET bestell_nr = ".$this->db_add_param($bestellnr)."
+				WHERE bestellung_id = ".$this->db_add_param($bestellung_id, FHC_INTEGER).';'; 
 		
 		if($this->db_query($qry))
 			return true; 
 		else 
 		{
-			$this->errormsg ="Fehler beim Setzen von Freigegeben"; 
+			$this->errormsg ="Fehler beim Aendern der Bestellnummer"; 
 			return false;
 		} 
 	}
@@ -864,8 +899,9 @@ class wawi_bestellung extends basis_db
 	
 	/**
 	 * 
-	 * Enter description here ...
-	 * @param unknown_type $bestellung_id
+	 * Setzt die Freigabe einer Bestellung
+	 * @param $bestellung_id
+	 * @return true wenn ok, sonst false
 	 */
 	public function SetFreigegeben($bestellung_id)
 	{
@@ -875,7 +911,8 @@ class wawi_bestellung extends basis_db
 			return false; 
 		}		
 
-		$qry = "UPDATE wawi.tbl_bestellung SET freigegeben = true where bestellung_id = ".$bestellung_id.";"; 
+		$qry = "UPDATE wawi.tbl_bestellung SET freigegeben = true 
+				WHERE bestellung_id = ".$this->db_add_param($bestellung_id, FHC_INTEGER).';'; 
 		
 		if($this->db_query($qry))
 			return true; 
@@ -890,7 +927,7 @@ class wawi_bestellung extends basis_db
 	 * 
 	 * Gibt alle Bestellungen zurück die im Zeitraum zwischen max und min liegen und einen abgeschickt status und keinen Bestellstatus besitzen
 	 * @param $min	in wochen
-	 * @param $max  in wochen
+	 * @param $max in wochen
 	 */
 	public function loadBestellungForCheck($min, $max)
 	{
@@ -900,16 +937,34 @@ class wawi_bestellung extends basis_db
 			return false;
 		}
 		
-		$qry ="SELECT * FROM wawi.tbl_bestellung WHERE bestellung_id IN(
-		select b.bestellung_id
-		from wawi.tbl_bestellung as b
-		left join wawi.tbl_bestellung_bestellstatus as s using (bestellung_id)
-		where 
-		b.bestellung_id not in 
-		(SELECT bestellung_id FROM wawi.tbl_bestellung_bestellstatus where bestellung_id=b.bestellung_id AND bestellstatus_kurzbz ='Bestellung') and (bestellstatus_kurzbz = ('Abgeschickt') OR bestellstatus_kurzbz = ('Freigegeben'))
-		and b.bestellung_id = b.bestellung_id and b.insertamum <= CURRENT_DATE - '".$min." week'::interval AND b.insertamum > CURRENT_DATE - '".$max." week'::interval
-		)
-		order by bestellung_id";
+		$qry ="
+		SELECT 
+			* 
+		FROM 
+			wawi.tbl_bestellung 
+		WHERE 
+			bestellung_id IN(
+				SELECT 
+					b.bestellung_id
+				FROM 
+					wawi.tbl_bestellung as b
+					LEFT JOIN wawi.tbl_bestellung_bestellstatus as s using (bestellung_id)
+				WHERE 
+				b.bestellung_id NOT IN (
+					SELECT 
+						bestellung_id 
+					FROM 
+						wawi.tbl_bestellung_bestellstatus 
+					WHERE 
+						bestellung_id=b.bestellung_id 
+						AND bestellstatus_kurzbz ='Bestellung'
+					) 
+				AND (bestellstatus_kurzbz = ('Abgeschickt') OR bestellstatus_kurzbz = ('Freigegeben'))
+				AND b.bestellung_id = b.bestellung_id 
+				AND b.insertamum <= CURRENT_DATE - '".$this->db_escape($min)." week'::interval 
+				AND b.insertamum > CURRENT_DATE - '".$this->db_escape($max)." week'::interval
+			)
+		ORDER BY bestellung_id";
 		
 		if($result = $this->db_query($qry))
 		{
@@ -928,7 +983,7 @@ class wawi_bestellung extends basis_db
 				$bestellung->konto_id = $row->konto_id; 
 				$bestellung->rechnungsadresse = $row->rechnungsadresse; 
 				$bestellung->firma_id = $row->firma_id; 
-				$bestellung->freigegeben = ($row->freigegeben=='t'?true:false); 
+				$bestellung->freigegeben = $this->db_parse_bool($row->freigegeben); 
 				$bestellung->updateamum = $row->updateamum; 
 				$bestellung->updatevon = $row->updatevon; 
 				$bestellung->insertamum = $row->insertamum; 
@@ -953,11 +1008,18 @@ class wawi_bestellung extends basis_db
 	 */
 	public function loadBestellungNichtGeliefert()
 	{
-		$qry ="SELECT * FROM wawi.tbl_bestellung b WHERE 
-		EXISTS (SELECT bestellung_id FROM wawi.tbl_bestellung_bestellstatus where bestellung_id=b.bestellung_id AND bestellstatus_kurzbz ='Bestellung')
-		AND NOT EXISTS (SELECT bestellung_id FROM wawi.tbl_bestellung_bestellstatus where bestellung_id=b.bestellung_id AND bestellstatus_kurzbz ='Lieferung')
-		AND b.insertamum>CURRENT_DATE - '1 year'::interval
-		order by bestellung_id";
+		$qry ="
+			SELECT 
+				* 
+			FROM 
+				wawi.tbl_bestellung b 
+			WHERE 
+				EXISTS (SELECT bestellung_id FROM wawi.tbl_bestellung_bestellstatus 
+						WHERE bestellung_id=b.bestellung_id AND bestellstatus_kurzbz ='Bestellung')
+				AND NOT EXISTS (SELECT bestellung_id FROM wawi.tbl_bestellung_bestellstatus 
+						WHERE bestellung_id=b.bestellung_id AND bestellstatus_kurzbz ='Lieferung')
+				AND b.insertamum>CURRENT_DATE - '1 year'::interval
+			ORDER BY bestellung_id";
 		
 		if($result = $this->db_query($qry))
 		{
@@ -976,7 +1038,7 @@ class wawi_bestellung extends basis_db
 				$bestellung->konto_id = $row->konto_id; 
 				$bestellung->rechnungsadresse = $row->rechnungsadresse; 
 				$bestellung->firma_id = $row->firma_id; 
-				$bestellung->freigegeben = ($row->freigegeben=='t'?true:false); 
+				$bestellung->freigegeben = $this->db_parse_bool($row->freigegeben); 
 				$bestellung->updateamum = $row->updateamum; 
 				$bestellung->updatevon = $row->updatevon; 
 				$bestellung->insertamum = $row->insertamum; 
@@ -1007,7 +1069,13 @@ class wawi_bestellung extends basis_db
 			return false; 
 		}		
 
-		$qry = "SELECT * FROM wawi.tbl_bestellung WHERE freigegeben = true AND bestellung_id = ".$bestellung_id.";"; 
+		$qry = "SELECT 
+					* 
+				FROM 
+					wawi.tbl_bestellung 
+				WHERE 
+					freigegeben = true 
+					AND bestellung_id = ".$this->db_add_param($bestellung_id, FHC_INTEGER).";"; 
 		
 		if($this->db_query($qry))
 		{
@@ -1034,7 +1102,7 @@ class wawi_bestellung extends basis_db
 		// Wenn keine ProjektKurzbz übergeben wurde Lösche die Zuteilung
 		if($projektKurzbz == '')
 		{
-			$qry = "DELETE FROM wawi.tbl_projekt_bestellung WHERE bestellung_id = '".addslashes($bestellungID)."';";
+			$qry = "DELETE FROM wawi.tbl_projekt_bestellung WHERE bestellung_id = ".$this->db_add_param($bestellungID, FHC_INTEGER).";";
 			if($this->db_query($qry))
 			{
 				return true; 
@@ -1047,15 +1115,15 @@ class wawi_bestellung extends basis_db
 		}
 		else 
 		{
-			$qry1 = "SELECT 1 FROM wawi.tbl_projekt_bestellung WHERE bestellung_id = '".addslashes($bestellungID)."';";
+			$qry1 = "SELECT 1 FROM wawi.tbl_projekt_bestellung WHERE bestellung_id = ".$this->db_add_param($bestellungID, FHC_INTEGER).";";
 	
 			if($this->db_query($qry1))
 			{
 				if($row = $this->db_fetch_object())
 				{
 					// es gibt eine Zuordnung -> UPDATE
-					$qry ="UPDATE wawi.tbl_projekt_bestellung SET projekt_kurzbz = '".addslashes($projektKurzbz)."' 
-					WHERE bestellung_id = '".addslashes($bestellungID)."';";
+					$qry ="UPDATE wawi.tbl_projekt_bestellung SET projekt_kurzbz = ".$this->db_add_param($projektKurzbz)." 
+					WHERE bestellung_id = ".$this->db_add_param($bestellungID, FHC_INTEGER).";";
 			
 					if($this->db_query($qry))
 					{
@@ -1070,7 +1138,8 @@ class wawi_bestellung extends basis_db
 				else
 				{
 					// gibt noch keine Zuordnung -> INSERT
-					$qry ="INSERT INTO wawi.tbl_projekt_bestellung (projekt_kurzbz, bestellung_id, anteil) VALUES ('".addslashes($projektKurzbz)."', '".addslashes($bestellungID)."', '100');";
+					$qry ="INSERT INTO wawi.tbl_projekt_bestellung (projekt_kurzbz, bestellung_id, anteil) 
+					VALUES (".$this->db_add_param($projektKurzbz).", ".$this->db_add_param($bestellungID, FHC_INTEGER).", '100');";
 			
 					if($this->db_query($qry))
 					{
@@ -1100,8 +1169,8 @@ class wawi_bestellung extends basis_db
 				wawi.tbl_kostenstelle 
 				JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
 			WHERE 
-				kostenstelle_id='".addslashes($kostenstelle_id)."';";
-	
+				kostenstelle_id=".$this->db_add_param($kostenstelle_id, FHC_INTEGER).";";
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -1125,7 +1194,8 @@ class wawi_bestellung extends basis_db
 		$akt_year=substr($akt_year,2,2);
 		
 		$kuerzel = $kurzzeichen.$akt_year.$kostenstelle_kz.'___'; 
-		$qry = "SELECT max(substr(bestell_nr,length(bestell_nr)-2)) FROM wawi.tbl_bestellung WHERE wawi.tbl_bestellung.bestell_nr LIKE '$kuerzel';";
+		$qry = "SELECT max(substr(bestell_nr,length(bestell_nr)-2)) FROM wawi.tbl_bestellung 
+		WHERE wawi.tbl_bestellung.bestell_nr LIKE ".$this->db_add_param($kuerzel).";";
 	
 		if($this->db_query($qry))
 		{

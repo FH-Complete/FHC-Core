@@ -64,7 +64,7 @@ require_once('../include/benutzerberechtigung.class.php');
 
 $kostenstelle = new wawi_kostenstelle(); 
 $user=get_uid();
-
+$db = new basis_db();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
@@ -309,7 +309,7 @@ if(isset($_GET['method']))
 		
 		$kontos = array();	// Array der Konten die einer Kostenstelle zugewiesen sind
 		
-		$konto->getAll(null, 'beschreibung'); 	
+		$konto->getAll(); 	
 		$kontouebersicht = $konto->result; 
 		$kostenstelle_id = isset($_GET['id'])?$_GET['id']:'';
 		
@@ -343,12 +343,13 @@ if(isset($_GET['method']))
 			echo $message; 
 		}
 		
+		$kontos = $kostenstelle->get_konto_from_kostenstelle($kostenstelle_id);
 		//sucht nach allen Kontos der Kostenstelle und markiert diese
 		foreach($kontouebersicht as $ko)
 		{
 
 			$checked = '';
-			$kontos = $kostenstelle->get_konto_from_kostenstelle($kostenstelle_id);
+			
 			if(in_array($ko->konto_id,$kontos))
 			{
 				$checked='checked';
@@ -361,7 +362,7 @@ if(isset($_GET['method']))
 			}
 			$i ++;
 			echo "<tr> <td>\n";
- 			echo '<input type="checkbox" name="checkbox_'.$ko->konto_id.'" value='.$ko->konto_id." $checked>".$ko->beschreibung[1].'<br>';
+ 			echo '<input type="checkbox" name="checkbox_'.$ko->konto_id.'" value='.$ko->konto_id." $checked>".$db->convert_html_chars($ko->kurzbz).'<br>';
  			echo '</td> </tr>';		
 		}
 		
@@ -535,8 +536,8 @@ else
 			echo "
 				<td nowrap> 
 				<a href=\"kostenstellenuebersicht.php?method=allocate&amp;id=$row->kostenstelle_id\" title=\"Konten zuordnen\"> <img src=\"../skin/images/addKonto.png\"></a> 
-				<a href= \"kostenstellenuebersicht.php?method=update&amp;id=$row->kostenstelle_id\" title=\"Bearbeiten\"> <img src=\"../skin/images/edit.gif\"> </a>
-				<a href=\"kostenstellenuebersicht.php?method=delete&amp;id=$row->kostenstelle_id\" onclick='return conf_del()' title='Löschen'> <img src=\"../skin/images/delete.gif\"></a>\n
+				<a href= \"kostenstellenuebersicht.php?method=update&amp;id=$row->kostenstelle_id\" title=\"Bearbeiten\"> <img src=\"../skin/images/edit_wawi.gif\"> </a>
+				<a href=\"kostenstellenuebersicht.php?method=delete&amp;id=$row->kostenstelle_id\" onclick='return conf_del()' title='Löschen'> <img src=\"../skin/images/delete_x.png\"></a>\n
 				</td>
 				";
 			echo '<td>'.$row->kostenstelle_id."</td>\n";

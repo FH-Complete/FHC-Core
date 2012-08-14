@@ -35,8 +35,8 @@ class wawi_zahlungstyp extends basis_db
 	
 	/**
 	 * 
-	 * Konstruktor
-	 * @param unknown_type $aufteilung_id
+	 * Konstruktor - Laedt optional einen Zahlungstyp
+	 * @param $zahlungstyp_kurzbz
 	 */
 	public function __construct($zahlungstyp_kurzbz=null)
 	{
@@ -48,18 +48,18 @@ class wawi_zahlungstyp extends basis_db
 	
 	/**
 	 * 
-	 * lädt den Datensatz mit der übergebenen kurzbz
+	 * Lädt den Datensatz mit der übergebenen kurzbz
 	 * @param $zahlungstyp_kurzbz
 	 */
 	public function load($zahlungstyp_kurzbz)
 	{
-		if($zahlungstyp_kurzbz == "")
+		if($zahlungstyp_kurzbz == '')
 		{
-			$this->errormsg ="Ungueltige Zahlungstypkurzbezeichnung."; 
+			$this->errormsg ='Ungueltige Zahlungstypkurzbezeichnung'; 
 			return false; 
 		}
 		
-		$qry ="Select * FROM wawi.tbl_zahlungstyp WHERE zahlungstyp_kurzb = ".$zahlungstyp_kurzbz.";"; 
+		$qry ="SELECT * FROM wawi.tbl_zahlungstyp WHERE zahlungstyp_kurzb = ".$this->db_add_param($zahlungstyp_kurzbz).';'; 
 		
 		if($this->db_query($qry))
 		{
@@ -78,6 +78,11 @@ class wawi_zahlungstyp extends basis_db
 		
 	}
 	
+	/**
+	 * 
+	 * Laedt alle Zahlungstypen
+	 * @return true wenn ok, false im Fehlerfall
+	 */
 	public function getAll()
 	{
 		$qry = "SELECT * FROM wawi.tbl_zahlungstyp ORDER by zahlungstyp_kurzbz;"; 
@@ -96,10 +101,8 @@ class wawi_zahlungstyp extends basis_db
 		}
 		else
 		{
-			$this->errormsg = "Datenbankabfrage fehlgeschlagen"; 
+			$this->errormsg = 'Datenbankabfrage fehlgeschlagen'; 
 			return false; 
 		}
-	}
-	
-	
+	}	
 }

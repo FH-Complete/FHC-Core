@@ -35,9 +35,9 @@ class wawi_bestelldetail extends basis_db
 	public $artikelnummer; 		// char
 	public $preisprove; 		// numeric
 	public $mwst; 				// numeric
-	public $erhalten;  			// bool
+	public $erhalten=false;	// bool
 	public $sort; 				// integer
-	public $text; 				// bool
+	public $text=false;		// bool
 	public $insertamum; 		// timestamp
 	public $insertvon; 			// char
 	public $updateamum; 		// timestamp
@@ -74,7 +74,7 @@ class wawi_bestelldetail extends basis_db
 			return false; 
 		}
 		
-		$qry = 'SELECT * FROM wawi.tbl_bestelldetail WHERE bestelldetail_id = '.$this->addslashes($bestelldetail_id).';'; 
+		$qry = 'SELECT * FROM wawi.tbl_bestelldetail WHERE bestelldetail_id = '.$this->db_add_param($bestelldetail_id, FHC_INTEGER).';'; 
 		
 		if(!$this->db_query($qry))
 		{
@@ -86,16 +86,16 @@ class wawi_bestelldetail extends basis_db
 		{
 			$this->bestelldetail_id = $row->bestelldetail_id;
 			$this->bestellung_id = $row->bestellung_id; 
-			$this->positoin = $row->position; 
+			$this->position = $row->position; 
 			$this->menge = $row->menge; 
 			$this->verpackungseinheit = $row->verpackungseinheit; 
 			$this->beschreibung = $row->beschreibung; 
 			$this->artikelnummer = $row->artikelnummer; 
 			$this->preisprove = $row->preisprove; 
 			$this->mwst = $row->mwst; 
-			$this->erhalten = $row->erhalten; 
+			$this->erhalten = $this->db_parse_bool($row->erhalten); 
 			$this->sort = $row->sort; 
-			$this->text = $row->text; 
+			$this->text = $this->db_parse_bool($row->text); 
 			$this->insertamum = $row->insertamum; 
 			$this->insertvon = $row->insertvon; 
 			$this->updateamum = $row->updateamum; 
@@ -130,9 +130,9 @@ class wawi_bestelldetail extends basis_db
 			$detail->artikelnummer = $row->artikelnummer; 
 			$detail->preisprove = $row->preisprove; 
 			$detail->mwst = $row->mwst; 
-			$detail->erhalten = $row->erhalten; 
+			$detail->erhalten = $this->db_parse_bool($row->erhalten); 
 			$detail->sort = $row->sort; 
-			$detail->text = $row->text; 
+			$detail->text = $this->db_parse_bool($row->text); 
 			$detail->insertamum = $row->insertamum; 
 			$detail->insertvon = $row->insertvon; 
 			$detail->updateamum = $row->updateamum; 
@@ -156,11 +156,11 @@ class wawi_bestelldetail extends basis_db
 			return false;
 		}
 		
-		$qry = 'DELETE FROM wawi.tbl_bestelldetail WHERE bestelldetail_id ='.$this->addslashes($bestelldetail_id).';';
+		$qry = 'DELETE FROM wawi.tbl_bestelldetail WHERE bestelldetail_id ='.$this->db_add_param($bestelldetail_id).';';
 		
 		if(!$this->db_query($qry))
 		{
-			$this->errormsg = 'Fehler beim löschen des Betstelldetails.';
+			$this->errormsg = 'Fehler beim Löschen des Betstelldetails.';
 			return false; 
 		}
 		return true; 
@@ -218,14 +218,14 @@ class wawi_bestelldetail extends basis_db
 			// insert
 			$qry ='BEGIN; INSERT INTO wawi.tbl_bestelldetail (bestellung_id, position, menge, verpackungseinheit, beschreibung, artikelnummer, 
 			preisprove, mwst, erhalten, sort, text, insertamum, insertvon, updateamum, updatevon) VALUES ('.
-			$this->addslashes($this->bestellung_id).', '.
-			$this->addslashes($this->position).', '.
-			$this->addslashes($this->menge).', '.
-			$this->addslashes($this->verpackungseinheit).', '.
-			$this->addslashes($this->beschreibung).', '.
-			$this->addslashes($this->artikelnummer).', '.
-			$this->addslashes($this->preisprove).', '.
-			$this->addslashes($mwst).', 
+			$this->db_add_param($this->bestellung_id).', '.
+			$this->db_add_param($this->position).', '.
+			$this->db_add_param($this->menge).', '.
+			$this->db_add_param($this->verpackungseinheit).', '.
+			$this->db_add_param($this->beschreibung).', '.
+			$this->db_add_param($this->artikelnummer).', '.
+			$this->db_add_param($this->preisprove).', '.
+			$this->db_add_param($mwst).', 
 			false, '.
 			$this->addslashes($this->sort).',  
 			false , '.
@@ -239,19 +239,19 @@ class wawi_bestelldetail extends basis_db
 		{
 			// Update
 			$qry = 'UPDATE wawi.tbl_bestelldetail SET 
-			bestellung_id = '.$this->addslashes($this->bestellung_id).',
-			position = '.$this->addslashes($this->position).',
-			menge = '.$this->addslashes($this->menge).',
-			verpackungseinheit = '.$this->addslashes($this->verpackungseinheit).',
-			beschreibung = '.$this->addslashes($this->beschreibung).',
-			artikelnummer = '.$this->addslashes($this->artikelnummer).',
-			preisprove = '.$this->addslashes($this->preisprove).',
-			mwst = '.$this->addslashes($mwst).',
-			erhalten = '.($this->erhalten?'true':'false').',
-			sort = '.$this->addslashes($this->sort).',
-			text = '.($this->text?'true':'false').',
-			updateamum = '.$this->addslashes($this->updateamum).',
-			updatevon = '.$this->addslashes($this->updatevon).' WHERE bestelldetail_id = '.$this->bestelldetail_id.';'; 
+			bestellung_id = '.$this->db_add_param($this->bestellung_id, FHC_INTEGER).',
+			position = '.$this->db_add_param($this->position).',
+			menge = '.$this->db_add_param($this->menge).',
+			verpackungseinheit = '.$this->db_add_param($this->verpackungseinheit).',
+			beschreibung = '.$this->db_add_param($this->beschreibung).',
+			artikelnummer = '.$this->db_add_param($this->artikelnummer).',
+			preisprove = '.$this->db_add_param($this->preisprove).',
+			mwst = '.$this->db_add_param($mwst).',
+			erhalten = '.$this->db_add_param($this->erhalten, FHC_BOOLEAN).',
+			sort = '.$this->db_add_param($this->sort).',
+			text = '.$this->db_add_param($this->text, FHC_BOOLEAN).',
+			updateamum = '.$this->db_add_param($this->updateamum).',
+			updatevon = '.$this->db_add_param($this->updatevon).' WHERE bestelldetail_id = '.$this->db_add_param($this->bestelldetail_id, FHC_INTEGER).';'; 
 		}
 		
 		if($this->db_query($qry))
@@ -301,15 +301,18 @@ class wawi_bestelldetail extends basis_db
 			$this->errormsg ='Keine gültige Bestell ID.';
 			return false; 
 		}
-		$qry = "SELECT * FROM wawi.tbl_bestelldetail
+		$qry = "SELECT 
+					* 
+				FROM 
+					wawi.tbl_bestelldetail
 				WHERE
-				bestellung_id = '".$bestell_id."'";
+					bestellung_id = ".$this->db_add_param($bestell_id);
 		
 		if(!is_null($filter))
 		{
-			$qry.=" AND (lower(beschreibung) like lower('%".addslashes($filter)."%') 
-						 OR bestelldetail_id::text like '%".addslashes($filter)."%'
-						 OR artikelnummer like '%".addslashes($filter)."%'
+			$qry.=" AND (lower(beschreibung) like lower('%".$this->db_escape($filter)."%') 
+						 OR bestelldetail_id::text like '%".$this->db_escape($filter)."%'
+						 OR artikelnummer like '%".$this->db_escape($filter)."%'
 						 )";
 		}
 		$qry.=" ORDER BY sort, position;";
@@ -329,9 +332,9 @@ class wawi_bestelldetail extends basis_db
 				$detail->artikelnummer = $row->artikelnummer; 
 				$detail->preisprove = $row->preisprove; 
 				$detail->mwst = $row->mwst; 
-				$detail->erhalten = $row->erhalten; 
+				$detail->erhalten = $this->db_parse_bool($row->erhalten); 
 				$detail->sort = $row->sort; 
-				$detail->text = $row->text; 
+				$detail->text = $this->db_parse_bool($row->text); 
 				$detail->insertamum = $row->insertamum; 
 				$detail->insertvon = $row->insertvon; 
 				$detail->updateamum = $row->updateamum; 

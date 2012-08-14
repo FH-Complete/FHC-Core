@@ -66,7 +66,7 @@ class wawi_aufteilung extends basis_db
 			$this->errormsg = "Ungültige aufteilung_id.";
 			return false;
 		}
-		$qry = "SELECT * FROM wawi.tbl_aufteilung_default WHERE aufteilung_id =".$this->addslashes($aufteilung_id).';';
+		$qry = "SELECT * FROM wawi.tbl_aufteilung_default WHERE aufteilung_id =".$this->db_add_param($aufteilung_id, FHC_INTEGER).';';
 		 
 		if($this->db_query($qry))
 		{
@@ -97,13 +97,13 @@ class wawi_aufteilung extends basis_db
 	 */
 	public function getAll()
 	{
-		$qry = "SELECT *`FROM wawi.tbl_aufteilung_default;";
+		$qry = "SELECT * FROM wawi.tbl_aufteilung_default;";
 		
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
-				$aufteilung = new wawi_aufteilung(); 
+				$aufteilung = new wawi_aufteilung();
 				
 				$aufteilung->aufteilung_id = $row->aufteilung_id; 
 				$aufteilung->kostenstelle_id = $row->kostenstelle_id; 
@@ -140,9 +140,14 @@ class wawi_aufteilung extends basis_db
 			return false; 
 		}
 		
-		$qry = "SELECT aufteilung.* from wawi.tbl_aufteilung_default as aufteilung, wawi.tbl_kostenstelle as kostenstelle 
-		where
-		kostenstelle.kostenstelle_id = aufteilung.kostenstelle_id and kostenstelle.kostenstelle_id = ".$this->addslashes($kostenstelle_id).";";
+		$qry = "SELECT 
+					aufteilung.* 
+				FROM 
+					wawi.tbl_aufteilung_default as aufteilung, 
+					wawi.tbl_kostenstelle as kostenstelle 
+				WHERE
+					kostenstelle.kostenstelle_id = aufteilung.kostenstelle_id 
+					AND kostenstelle.kostenstelle_id = ".$this->db_add_param($kostenstelle_id, FHC_INTEGER).";";
 		
 		if($this->db_query($qry))
 		{
@@ -177,7 +182,9 @@ class wawi_aufteilung extends basis_db
 	public function getAufteilungFromBestellung($bestellung_id)
 	{
 		
-		$qry = "SELECT * from wawi.tbl_aufteilung where bestellung_id = ".$this->addslashes($bestellung_id)." Order by oe_kurzbz;";
+		$qry = "SELECT * FROM wawi.tbl_aufteilung 
+				WHERE bestellung_id = ".$this->db_add_param($bestellung_id, FHC_INTEGER)." 
+				ORDER BY oe_kurzbz;";
 		
 		if($this->db_query($qry))
 		{
@@ -210,7 +217,11 @@ class wawi_aufteilung extends basis_db
 	 */
 	public function AufteilungExists()
 	{
-		$qry = "SELECT * from wawi.tbl_aufteilung where bestellung_id = ".$this->addslashes($this->bestellung_id)." and oe_kurzbz = ".$this->addslashes($this->oe_kurzbz).";";
+		$qry = "SELECT * FROM wawi.tbl_aufteilung 
+				WHERE 
+					bestellung_id = ".$this->db_add_param($this->bestellung_id, FHC_INTEGER)." 
+					AND oe_kurzbz = ".$this->db_add_param($this->oe_kurzbz).";";
+		
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -236,25 +247,26 @@ class wawi_aufteilung extends basis_db
 		if($this->new == true)
 		{
 			// insert
-			$qry= "Insert into wawi.tbl_aufteilung (bestellung_id, oe_kurzbz, anteil, updateamum, updatevon, insertamum, insertvon) values ("
-			.$this->addslashes($this->bestellung_id).", "
-			.$this->addslashes($this->oe_kurzbz).", "
-			.$this->addslashes($this->anteil).", "
-			.$this->addslashes($this->updateamum).", "
-			.$this->addslashes($this->updatevon).", "
-			.$this->addslashes($this->insertamum).", "
-			.$this->addslashes($this->insertvon).");";
+			$qry= "INSERT INTO wawi.tbl_aufteilung (bestellung_id, oe_kurzbz, anteil, updateamum, 
+					updatevon, insertamum, insertvon) VALUES ("
+					.$this->db_add_param($this->bestellung_id, FHC_INTEGER).", "
+					.$this->db_add_param($this->oe_kurzbz).", "
+					.$this->db_add_param($this->anteil).", "
+					.$this->db_add_param($this->updateamum).", "
+					.$this->db_add_param($this->updatevon).", "
+					.$this->db_add_param($this->insertamum).", "
+					.$this->db_add_param($this->insertvon).");";
 		}
 		else
 		{
 			// update
-			$qry = "Update wawi.tbl_aufteilung set 
-			bestellung_id = ".$this->addslashes($this->bestellung_id).", 
-			oe_kurzbz = ".$this->addslashes($this->oe_kurzbz).", 
-			anteil = ".$this->addslashes($this->anteil).",
-			updateamum = ".$this->addslashes($this->updateamum).",
-			updatevon = ".$this->addslashes($this->updatevon)."
-			where aufteilung_id = ".$this->addslashes($this->aufteilung_id).";"; 
+			$qry = "UPDATE wawi.tbl_aufteilung SET 
+			bestellung_id = ".$this->db_add_param($this->bestellung_id).", 
+			oe_kurzbz = ".$this->db_add_param($this->oe_kurzbz).", 
+			anteil = ".$this->db_add_param($this->anteil).",
+			updateamum = ".$this->db_add_param($this->updateamum).",
+			updatevon = ".$this->db_add_param($this->updatevon)."
+			WHERE aufteilung_id = ".$this->db_add_param($this->aufteilung_id, FHC_INTEGER).";"; 
 		}
 
 		if($this->db_query($qry))

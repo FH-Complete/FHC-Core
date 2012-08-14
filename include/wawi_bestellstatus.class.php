@@ -27,21 +27,20 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class wawi_bestellstatus extends basis_db
 {
-	public $new; 				// bool
-	public $result = array(); 	// Aufteilungsobjekt array
+	public $new;
+	public $result = array(); 
 	
-	public $bestellung_bestellstatus_id; 		// integer
-	public $bestellung_id; 
-	public $bestellstatus_kurzbz; 
-	public $uid; 
-	public $oe_kurzbz; 
-	public $datum; 
-	public $insertvon; 
-	public $insertamum; 
-	public $updatevon; 
-	public $updateamum; 
-	
-	
+	public $bestellung_bestellstatus_id; 	// integer
+	public $bestellung_id; 					// integer
+	public $bestellstatus_kurzbz; 			// varchar(32)
+	public $uid; 							// varchar(32)
+	public $oe_kurzbz; 						// varchar(32)
+	public $datum; 							// date
+	public $insertvon; 						// varchar(32)
+	public $insertamum; 					// timestamp
+	public $updatevon; 						// varchar(32)
+	public $updateamum; 					// timestamp
+		
 	/**
 	 * 
 	 * Konstruktor
@@ -68,7 +67,8 @@ class wawi_bestellstatus extends basis_db
 			return false; 
 		}
 		
-		$qry= "SELECT bestellstatus.* from wawi.tbl_bestellung_bestellstatus as bestellstatus where bestellstatus = ".$this->addslashes($bestellung_bestellstatus_id).";";
+		$qry= "SELECT bestellstatus.* FROM wawi.tbl_bestellung_bestellstatus as bestellstatus 
+				WHERE bestellung_bestellstatus_id = ".$this->db_add_param($bestellung_bestellstatus_id).";";
 		
 		if($this->db_query($qry))
 		{
@@ -100,7 +100,7 @@ class wawi_bestellstatus extends basis_db
 	 */
 	public function getAll()
 	{
-		$qry = "SELECT bestellstatus.* from wawi.tbl_bestellung_bestellstatus as bestellstatus;";
+		$qry = "SELECT bestellstatus.* FROM wawi.tbl_bestellung_bestellstatus as bestellstatus;";
 		
 		if($this->db_query($qry))
 		{
@@ -153,17 +153,17 @@ class wawi_bestellstatus extends basis_db
  
 		if($oe_kurzbz!='')
 		{
-			$status .= " AND oe_kurzbz = ".$this->addslashes($oe_kurzbz); 
+			$status .= " AND oe_kurzbz = ".$this->db_add_param($oe_kurzbz); 
 		}
 		if($status_kurzbz!='')
 		{
-			$status.=" AND bestellstatus_kurzbz = ".$this->addslashes($status_kurzbz);
+			$status.=" AND bestellstatus_kurzbz = ".$this->db_add_param($status_kurzbz);
 		}
 		
 		$qry = "SELECT bestellstatus.* 
 				FROM wawi.tbl_bestellung_bestellstatus as bestellstatus
 				WHERE 
-					bestellung_id = ".$this->addslashes($bestellung_id).$status."
+					bestellung_id = ".$this->db_add_param($bestellung_id).$status."
 				ORDER BY insertamum LIMIT 1;";
 		
 		if($this->db_query($qry))
@@ -195,10 +195,17 @@ class wawi_bestellstatus extends basis_db
 			return false; 
 		}
 		
-		$qry = "INSERT INTO wawi.tbl_bestellung_bestellstatus (bestellung_id, bestellstatus_kurzbz, uid, oe_kurzbz, datum, insertvon, insertamum, updatevon, updateamum)
-		VALUES
-		(".($this->bestellung_id).", ".$this->addslashes($this->bestellstatus_kurzbz).", ".$this->addslashes($this->uid).", ".$this->addslashes($this->oe_kurzbz).", '".($this->datum)."',
-		 ".$this->addslashes($this->insertvon).", ".$this->addslashes($this->insertamum).", ".$this->addslashes($this->updatevon).", ".$this->addslashes($this->updateamum).");";
+		$qry = "INSERT INTO wawi.tbl_bestellung_bestellstatus (bestellung_id, bestellstatus_kurzbz, uid, 
+				oe_kurzbz, datum, insertvon, insertamum, updatevon, updateamum)	VALUES(".
+				$this->db_add_param($this->bestellung_id, FHC_INTEGER).", ".
+				$this->db_add_param($this->bestellstatus_kurzbz).", ".
+				$this->db_add_param($this->uid).", ".
+				$this->db_add_param($this->oe_kurzbz).", ".
+				$this->db_add_param($this->datum).", ".
+				$this->db_add_param($this->insertvon).", ".
+				$this->db_add_param($this->insertamum).", ".
+				$this->db_add_param($this->updatevon).", ".
+				$this->db_add_param($this->updateamum).");";
 		
 		if(!$this->db_query($qry))
 		{
@@ -222,9 +229,15 @@ class wawi_bestellstatus extends basis_db
 			return false; 
 		}
 		
-		$qry ="select * from wawi.tbl_bestellung_bestellstatus 
-		WHERE 
-		bestellstatus_kurzbz = ".$this->addslashes($status)." and bestellung_id = ".$this->addslashes($bestellung_id).";"; 
+		$qry ="
+			SELECT 
+				* 
+			FROM 
+				wawi.tbl_bestellung_bestellstatus 
+			WHERE 
+				bestellstatus_kurzbz=".$this->db_add_param($status)." 
+				AND bestellung_id=".$this->db_add_param($bestellung_id, FHC_INTEGER).";";
+		 
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -258,13 +271,18 @@ class wawi_bestellstatus extends basis_db
 	public function getFreigabeFromBestellung($bestellung_id, $oe_kurzbz='')
 	{
 		if($oe_kurzbz == '')
-			$oe = 'is '.$this->addslashes($oe_kurzbz);
+			$oe = ' AND oe_kurzbz is null';
 		else
-			$oe = '= '.$this->addslashes($oe_kurzbz); 
+			$oe = ' AND oe_kurzbz= '.$this->db_add_param($oe_kurzbz); 
 		
-		$qry = "Select * FROM wawi.tbl_bestellung_bestellstatus 
-		WHERE 
-		bestellung_id = ".$this->addslashes($bestellung_id)." and oe_kurzbz ".$oe." and bestellstatus_kurzbz = 'Freigabe';";
+		$qry = "SELECT 
+					* 
+				FROM 
+					wawi.tbl_bestellung_bestellstatus 
+				WHERE 
+					bestellung_id = ".$this->db_add_param($bestellung_id, FHC_INTEGER).
+					' '.$oe.
+					" AND bestellstatus_kurzbz = 'Freigabe';";
 		
 		if($this->db_query($qry))
 		{

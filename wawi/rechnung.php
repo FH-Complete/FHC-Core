@@ -332,8 +332,8 @@ if($aktion == 'suche')
 					//Zeilen der Tabelle ausgeben
 					echo "<tr>\n";
 					echo "<td nowrap> 
-							<a href= \"rechnung.php?method=update&id=$row->rechnung_id\" title=\"Bearbeiten\"> <img src=\"../skin/images/edit.gif\"> </a>
-							<a href=\"rechnung.php?method=delete&id=$row->rechnung_id\" onclick='return conf_del()' title='Löschen'> <img src=\"../skin/images/delete.gif\"></a>";
+							<a href= \"rechnung.php?method=update&id=$row->rechnung_id\" title=\"Bearbeiten\"> <img src=\"../skin/images/edit_wawi.gif\"> </a>
+							<a href=\"rechnung.php?method=delete&id=$row->rechnung_id\" onclick='return conf_del()' title='Löschen'> <img src=\"../skin/images/delete_x.png\"></a>";
 					echo '<td>'.$row->rechnungsnr."</td>\n";
 					echo '<td>'.$row->bestell_nr."</td>\n";
 					echo '<td>'.$date->formatDatum($row->rechnungsdatum, 'd.m.Y')."</td>\n";
@@ -563,7 +563,7 @@ if($aktion=='update')
 			</tr>
 			<tr>
 				<td><b>Konto:</b></td>
-				<td>'.$konto->beschreibung[1].'</td>
+				<td>'.$konto->kurzbz.'</td>
 			</tr>
 			<tr>
 				<td><b>Firma:</b></td>
