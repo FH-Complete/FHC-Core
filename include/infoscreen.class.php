@@ -66,7 +66,7 @@ class infoscreen extends basis_db
 		}
 		
 		//laden des Datensatzes
-		$qry = "SELECT * FROM campus.tbl_infoscreen WHERE infoscreen_id='".addslashes($infoscreen_id)."';";
+		$qry = "SELECT * FROM campus.tbl_infoscreen WHERE infoscreen_id=".$this->db_add_param($infoscreen_id, FHC_INTEGER).";";
 		
 		if($this->db_query($qry))
 		{
@@ -105,7 +105,7 @@ class infoscreen extends basis_db
 		}
 		
 		//laden des Datensatzes
-		$qry = "SELECT * FROM campus.tbl_infoscreen_content WHERE infoscreen_content_id='".addslashes($infoscreen_content_id)."';";
+		$qry = "SELECT * FROM campus.tbl_infoscreen_content WHERE infoscreen_content_id=".$this->db_add_param($infoscreen_content_id, FHC_INTEGER).";";
 		
 		if($this->db_query($qry))
 		{
@@ -142,7 +142,7 @@ class infoscreen extends basis_db
 	 */
 	public function getAll()
 	{
-		$qry = "SELECT * FROM campus.tbl_infoscreen ORDER BY bezeichnung";
+		$qry = "SELECT * FROM campus.tbl_infoscreen ORDER BY bezeichnung;";
 		
 		if($result = $this->db_query($qry))
 		{
@@ -179,43 +179,43 @@ class infoscreen extends basis_db
 		if($new)
 		{
 			$qry = "BEGIN;INSERT INTO campus.tbl_infoscreen(bezeichnung, beschreibung, ipadresse) VALUES(".
-					$this->addslashes($this->bezeichnung).','.
-					$this->addslashes($this->beschreibung).','.
-					$this->addslashes($this->ipadresse).');';
+					$this->db_add_param($this->bezeichnung).','.
+					$this->db_add_param($this->beschreibung).','.
+					$this->db_add_param($this->ipadresse).');';
 		}
 		else
 		{
 			$qry = 'UPDATE campus.tbl_infoscreen SET '.
-					' bezeichnung='.$this->addslashes($this->bezeichnung).','.
-					' beschreibung='.$this->addslashes($this->beschreibung).','.
-					' ipadresse='.$this->addslashes($this->ipadresse).' '.
-					' WHERE infoscreen_id='.$this->addslashes($this->infoscreen_id).';';
+					' bezeichnung='.$this->db_add_param($this->bezeichnung).','.
+					' beschreibung='.$this->db_add_param($this->beschreibung).','.
+					' ipadresse='.$this->db_add_param($this->ipadresse).' '.
+					' WHERE infoscreen_id='.$this->db_add_param($this->infoscreen_id).';';
 		}
 		
 		if($this->db_query($qry))
 		{
 			if($new)
 			{
-				$qry = "SELECT currval('campus.seq_infoscreen_infoscreen_id') as id";
+				$qry = "SELECT currval('campus.seq_infoscreen_infoscreen_id') as id;";
 				if($result = $this->db_query($qry))
 				{
 					if($row = $this->db_fetch_object($result))
 					{
 						$this->infoscreen_id = $row->id;
-						$this->db_query('COMMIT');
+						$this->db_query('COMMIT;');
 						return true;
 					}
 					else
 					{
 						$this->errormsg='Fehler beim Auslesen der Sequence';
-						$this->db_query('ROLLBACK');
+						$this->db_query('ROLLBACK;');
 						return false;
 					}
 				}
 				else
 				{
 					$this->errormsg='Fehler beim Auslesen der Sequence';
-					$this->db_query('ROLLBACK');
+					$this->db_query('ROLLBACK;');
 					return false;
 				}
 			}
@@ -243,53 +243,53 @@ class infoscreen extends basis_db
 		{
 			$qry = "BEGIN;INSERT INTO campus.tbl_infoscreen_content(infoscreen_id, content_id, 
 					gueltigvon, gueltigbis, refreshzeit, insertamum, insertvon, updateamum, updatevon) VALUES(".
-					$this->addslashes($this->infoscreen_id).','.
-					$this->addslashes($this->content_id).','.
-					$this->addslashes($this->gueltigvon).','.
-					$this->addslashes($this->gueltigbis).','.
-					$this->addslashes($this->refreshzeit).','.
-					$this->addslashes($this->insertamum).','.
-					$this->addslashes($this->insertvon).','.
-					$this->addslashes($this->updateamum).','.
-					$this->addslashes($this->updatevon).');';
+					$this->db_add_param($this->infoscreen_id, FHC_INTEGER).','.
+					$this->db_add_param($this->content_id, FHC_INTEGER).','.
+					$this->db_add_param($this->gueltigvon).','.
+					$this->db_add_param($this->gueltigbis).','.
+					$this->db_add_param($this->refreshzeit).','.
+					$this->db_add_param($this->insertamum).','.
+					$this->db_add_param($this->insertvon).','.
+					$this->db_add_param($this->updateamum).','.
+					$this->db_add_param($this->updatevon).');';
 		}
 		else
 		{
 			$qry = 'UPDATE campus.tbl_infoscreen_content SET '.
-					' infoscreen_id='.$this->addslashes($this->infoscreen_id).','.
-					' content_id='.$this->addslashes($this->content_id).','.
-					' gueltigvon='.$this->addslashes($this->gueltigvon).','.
-					' gueltigbis='.$this->addslashes($this->gueltigbis).','.
-					' refreshzeit='.$this->addslashes($this->refreshzeit).','.
-					' updateamum='.$this->addslashes($this->updateamum).','.
-					' updatevon='.$this->addslashes($this->updatevon).' '.
-					' WHERE infoscreen_content_id='.$this->addslashes($this->infoscreen_content_id).';';
+					' infoscreen_id='.$this->db_add_param($this->infoscreen_id, FHC_INTEGER).','.
+					' content_id='.$this->db_add_param($this->content_id, FHC_INTEGER).','.
+					' gueltigvon='.$this->db_add_param($this->gueltigvon).','.
+					' gueltigbis='.$this->db_add_param($this->gueltigbis).','.
+					' refreshzeit='.$this->db_add_param($this->refreshzeit).','.
+					' updateamum='.$this->db_add_param($this->updateamum).','.
+					' updatevon='.$this->db_add_param($this->updatevon).' '.
+					' WHERE infoscreen_content_id='.$this->db_add_param($this->infoscreen_content_id, FHC_INTEGER).';';
 		}
 		
 		if($this->db_query($qry))
 		{
 			if($new)
 			{
-				$qry = "SELECT currval('campus.seq_infoscreen_content_infoscreen_content_id') as id";
+				$qry = "SELECT currval('campus.seq_infoscreen_content_infoscreen_content_id') as id;";
 				if($result = $this->db_query($qry))
 				{
 					if($row = $this->db_fetch_object($result))
 					{
 						$this->infoscreen_content_id = $row->id;
-						$this->db_query('COMMIT');
+						$this->db_query('COMMIT;');
 						return true;
 					}
 					else
 					{
 						$this->errormsg='Fehler beim Auslesen der Sequence';
-						$this->db_query('ROLLBACK');
+						$this->db_query('ROLLBACK;');
 						return false;
 					}
 				}
 				else
 				{
 					$this->errormsg='Fehler beim Auslesen der Sequence';
-					$this->db_query('ROLLBACK');
+					$this->db_query('ROLLBACK;');
 					return false;
 				}
 			}
@@ -309,7 +309,7 @@ class infoscreen extends basis_db
 	 */
 	public function getInfoscreen($ipadresse)
 	{
-		$qry = "SELECT * FROM campus.tbl_infoscreen WHERE ipadresse='".addslashes($ipadresse)."'";
+		$qry = "SELECT * FROM campus.tbl_infoscreen WHERE ipadresse=".$this->db_add_param($ipadresse).';';
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -351,12 +351,12 @@ class infoscreen extends basis_db
 				FROM 
 					campus.tbl_infoscreen_content
 				WHERE 
-					(infoscreen_id='".addslashes($infoscreen_id)."' OR infoscreen_id is null)";
+					(infoscreen_id=".$this->db_add_param($infoscreen_id, FHC_INTEGER)." OR infoscreen_id is null)";
 		if($aktuell)
 			$qry.="
 					AND (gueltigvon<=now() OR gueltigvon is null)
 					AND (gueltigbis>=now() OR gueltigbis is null)";
-		$qry.=" ORDER BY infoscreen_content_id";
+		$qry.=" ORDER BY infoscreen_content_id;";
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
@@ -398,7 +398,7 @@ class infoscreen extends basis_db
 			$this->errormsg = 'ID ist ungueltig';
 			return false;
 		}
-		$qry = "DELETE FROM campus.tbl_infoscreen_content WHERE infoscreen_content_id='".addslashes($infoscreen_content_id)."'";
+		$qry = "DELETE FROM campus.tbl_infoscreen_content WHERE infoscreen_content_id=".$this->db_add_param($infoscreen_content_id, FHC_INTEGER).';';
 		if($this->db_query($qry))
 			return true;
 		else
