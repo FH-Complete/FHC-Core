@@ -208,7 +208,7 @@ class bisio extends basis_db
 				   ' ort='.$this->db_add_param($this->ort).','.
 				   ' universitaet='.$this->db_add_param($this->universitaet).','.
 				   ' lehreinheit_id='.$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).
-				   " WHERE bisio_id=".db_add_param($this->bisio_id, FHC_INTEGER).";";
+				   " WHERE bisio_id=".$this->db_add_param($this->bisio_id, FHC_INTEGER).";";
 		}
 		
 		if($this->db_query($qry))
