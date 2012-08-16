@@ -1705,7 +1705,7 @@ if($_GET['method']=='update')
 		$summe+=$brutto; 
 		$i++; 
 	}
-	if($bestellung->freigegeben != 't')
+	if(!$bestellung->freigegeben)
 		getDetailRow($i,null,$i,null,null,null,null,null,null,null,$bestellung->bestellung_id,$i);
 		
 	$test = $i; 
