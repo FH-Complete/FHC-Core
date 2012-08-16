@@ -137,7 +137,7 @@ echo '
 			$firma->load($row->firma_id);	
 			$firmenname = $firma->name; 
 		}
-		if($row->freigegeben == '1')
+		if($row->freigegeben)
 			$freigegeben = 'ja';
 		else
 			$freigegeben = 'nein';
