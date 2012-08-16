@@ -48,20 +48,16 @@ class organisationsform extends basis_db
 	 */
 	public function load($orgform_kurzbz)
 	{
-		$qry = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz='".addslashes($orgform_kurzbz)."'"; 
+		$qry = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz=".$this->db_add_param($orgform_kurzbz).';'; 
 		
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
-			{
-				$orgform = new organisationsform(); 
-				
+			{				
 				$this->orgform_kurzbz = $row->orgform_kurzbz; 
 				$this->code = $row->code; 
 				$this->bezeichnung = $row->bezeichnung; 
 				$this->rolle = $row->rolle; 
-				
-				$result[] = $orgform; 
 			}
 		}
 		else
@@ -77,7 +73,7 @@ class organisationsform extends basis_db
 	 */
 	public function getAll()
 	{
-		$qry = "Select * from bis.tbl_orgform"; 
+		$qry = "SELECT * FROM bis.tbl_orgform"; 
 		
 		if($this->db_query($qry))
 		{
@@ -90,7 +86,7 @@ class organisationsform extends basis_db
 				$orgform->bezeichnung = $row->bezeichnung; 
 				$orgform->rolle = $row->rolle; 
 				
-				$result[] = $orgform; 
+				$this->result[] = $orgform; 
 			}
 		}
 		else
@@ -100,12 +96,11 @@ class organisationsform extends basis_db
 		}
 	}
 
- /**
-  * 
-  * Orgform Kurzbezeichnung wird übergeben und alle passenden Kurzbezeichnungen werden zurückgegeben
-  * @param $orgform_kurzbz
-  */
-	
+	/**
+	* 
+	* Orgform Kurzbezeichnung wird übergeben und alle passenden Kurzbezeichnungen werden zurückgegeben
+	* @param $orgform_kurzbz
+	*/
 	public function checkOrgForm($orgform_kurzbz)
 	{	
 
@@ -129,5 +124,34 @@ class organisationsform extends basis_db
 			default:
 				return false; 
 		}
+	}
+
+	/**
+	 * Laedt alle Organisationsformen die fuer Lehrveranstaltungen verwendent werden duerfen
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getOrgformLV()
+	{
+		$qry = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz NOT IN ('VBB', 'ZGS') ORDER BY orgform_kurzbz";
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))	
+			{
+				$orgform = new organisationsform(); 
+				
+				$orgform->orgform_kurzbz = $row->orgform_kurzbz; 
+				$orgform->code = $row->code; 
+				$orgform->bezeichnung = $row->bezeichnung; 
+				$orgform->rolle = $row->rolle; 
+				
+				$this->result[] = $orgform; 
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}	
 	}
 }
