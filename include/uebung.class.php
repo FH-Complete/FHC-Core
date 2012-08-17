@@ -19,6 +19,9 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+/**
+ * Verwaltet die Uebungen des Kreuzerltools
+ */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class uebung extends basis_db
@@ -88,7 +91,7 @@ class uebung extends basis_db
 			$this->errormsg='Uebung_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		$qry = "SELECT * FROM campus.tbl_uebung WHERE uebung_id='$uebung_id'";
+		$qry = "SELECT * FROM campus.tbl_uebung WHERE uebung_id=".$this->db_add_param($uebung_id, FHC_INTEGER).';';
 
 		if($this->db_query($qry))
 		{
@@ -100,17 +103,17 @@ class uebung extends basis_db
 				$this->angabedatei = $row->angabedatei;
 				$this->freigabevon = $row->freigabevon;
 				$this->freigabebis = $row->freigabebis;
-				$this->abgabe = ($row->abgabe=='t'?true:false);
-				$this->beispiele = ($row->beispiele=='t'?true:false);
+				$this->abgabe = $this->db_parse_bool($row->abgabe);
+				$this->beispiele = $this->db_parse_bool($row->beispiele);
 				$this->bezeichnung = $row->bezeichnung;
-				$this->positiv = ($row->positiv=='t'?true:false);
+				$this->positiv = $this->db_parse_bool($row->positiv);
 				$this->defaultbemerkung = $row->defaultbemerkung;
 				$this->lehreinheit_id = $row->lehreinheit_id;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
-				$this->statistik = ($row->statistik=='t'?true:false);
+				$this->statistik = $this->db_parse_bool($row->statistik);
 				$this->liste_id = $row->liste_id;
 				$this->maxbsp = $row->maxbsp;
 				$this->maxstd = $row->maxstd;
@@ -120,13 +123,13 @@ class uebung extends basis_db
 			}
 			else
 			{
-				$this->errormsg = "Es ist keine Uebung mit der ID $uebung_id vorhanden";
+				$this->errormsg = "Es ist keine Uebung mit dieser ID vorhanden";
 				return false;
 			}
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim laden der Uebung';
+			$this->errormsg = 'Fehler beim Laden der Uebung';
 			return false;
 		}
 	}
@@ -139,7 +142,7 @@ class uebung extends basis_db
 	 */
 	public function toggle_prozent_punkte($uebung_id)
 	{
-		$qry = "UPDATE campus.tbl_uebung SET prozent = not prozent WHERE uebung_id = '".$uebung_id."'";
+		$qry = "UPDATE campus.tbl_uebung SET prozent = not prozent WHERE uebung_id = ".$this->db_add_param($uebung_id, FHC_INTEGER).";";
 		if($this->db_query($qry))
 			return true;
 		else
@@ -158,7 +161,7 @@ class uebung extends basis_db
 	 */
 	public function load_studentuebung($student_uid, $uebung_id)
 	{
-		$qry = "SELECT * FROM campus.tbl_studentuebung WHERE student_uid='".addslashes($student_uid)."' AND uebung_id='".addslashes($uebung_id)."'";
+		$qry = "SELECT * FROM campus.tbl_studentuebung WHERE student_uid=".$this->db_add_param($student_uid)." AND uebung_id=".$this->db_add_param($uebung_id, FHC_INTEGER).";";
 
 		if($this->db_query($qry))
 		{
@@ -200,7 +203,7 @@ class uebung extends basis_db
 	 */
 	public function load_abgabe($abgabe_id)
 	{
-		$qry = "SELECT * FROM campus.tbl_abgabe WHERE abgabe_id = '".addslashes($abgabe_id)."'";
+		$qry = "SELECT * FROM campus.tbl_abgabe WHERE abgabe_id = ".$this->db_add_param($abgabe_id, FHC_INTEGER).";";
 
 		if($this->db_query($qry))
 		{
@@ -233,7 +236,7 @@ class uebung extends basis_db
 	 */
 	public function check_studentuebung($uebung_id)
 	{
-		$qry = "SELECT * FROM campus.tbl_studentuebung WHERE uebung_id='".addslashes($uebung_id)."'";
+		$qry = "SELECT * FROM campus.tbl_studentuebung WHERE uebung_id=".$this->db_add_param($uebung_id, FHC_INTEGER).";";
 
 		if($this->db_query($qry))	
 		{
@@ -290,11 +293,11 @@ class uebung extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM campus.tbl_uebung WHERE lehreinheit_id='".$lehreinheit_id."'";
+		$qry = "SELECT * FROM campus.tbl_uebung WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER);
 		if ($level == 1)
 			$qry .= " and liste_id is null";
 		if ($level == 2)
-			$qry .= " and liste_id = '".$uebung_id."'";
+			$qry .= " and liste_id = ".$this->db_add_param($uebung_id, FHC_INTEGER);
 		$qry .= " ORDER BY bezeichnung";
 
 		if($this->db_query($qry))
@@ -309,17 +312,17 @@ class uebung extends basis_db
 				$uebung_obj->angabedatei = $row->angabedatei;
 				$uebung_obj->freigabevon = $row->freigabevon;
 				$uebung_obj->freigabebis = $row->freigabebis;
-				$uebung_obj->abgabe = ($row->abgabe=='t'?true:false);
-				$uebung_obj->beispiele = ($row->beispiele=='t'?true:false);
+				$uebung_obj->abgabe = $this->db_parse_bool($row->abgabe);
+				$uebung_obj->beispiele = $this->db_parse_bool($row->beispiele);
 				$uebung_obj->bezeichnung = $row->bezeichnung;
-				$uebung_obj->positiv = ($row->positiv=='t'?true:false);
+				$uebung_obj->positiv = $this->db_parse_bool($row->positiv);
 				$uebung_obj->defaultbemerkung = $row->defaultbemerkung;
 				$uebung_obj->lehreinheit_id = $row->lehreinheit_id;
 				$uebung_obj->updateamum = $row->updateamum;
 				$uebung_obj->updatevon = $row->updatevon;
 				$uebung_obj->insertamum = $row->insertamum;
 				$uebung_obj->insertvon = $row->insertvon;
-				$uebung_obj->statistik = ($row->statistik=='t'?true:false);
+				$uebung_obj->statistik = $this->db_parse_bool($row->statistik);
 				$uebung_obj->liste_id = $row->liste_id;
 				$uebung_obj->maxstd = $row->maxstd;
 				$uebung_obj->maxbsp = $row->maxbsp;
@@ -377,49 +380,49 @@ class uebung extends basis_db
 			$qry = 'BEGIN; INSERT INTO campus.tbl_uebung(gewicht, punkte, angabedatei, freigabevon, freigabebis,
 			        abgabe, beispiele, bezeichnung, positiv, defaultbemerkung, lehreinheit_id, updateamum,
 			        updatevon, insertamum, insertvon, liste_id, maxstd, maxbsp, nummer, statistik) VALUES('.
-			        $this->addslashes($this->gewicht).','.
-			        $this->addslashes($this->punkte).','.
-			        $this->addslashes($this->angabedatei).','.
-			        $this->addslashes($this->freigabevon).','.
-			        $this->addslashes($this->freigabebis).','.
-			        ($this->abgabe?'true':'false').','.
-			        ($this->beispiele?'true':'false').','.
-			        $this->addslashes($this->bezeichnung).','.
-			        ($this->positiv?'true':'false').','.
-			        $this->addslashes($this->defaultbemerkung).','.
-			        $this->addslashes($this->lehreinheit_id).','.
-			        $this->addslashes($this->updateamum).','.
-			        $this->addslashes($this->updatevon).','.
-			        $this->addslashes($this->insertamum).','.
-			        $this->addslashes($this->insertvon).','.
-					$this->addslashes($this->liste_id).','.
-					$this->addslashes($this->maxstd).','.
-					$this->addslashes($this->maxbsp).','.
-					$this->addslashes($this->nummer).','.
-			        ($this->statistik?'true':'false').');';
+			        $this->db_add_param($this->gewicht).','.
+			        $this->db_add_param($this->punkte).','.
+			        $this->db_add_param($this->angabedatei).','.
+			        $this->db_add_param($this->freigabevon).','.
+			        $this->db_add_param($this->freigabebis).','.
+			        $this->db_add_param($this->abgabe, FHC_BOOLEAN).','.
+			        $this->db_add_param($this->beispiele, FHC_BOOLEAN).','.
+			        $this->db_add_param($this->bezeichnung).','.
+			        $this->db_add_param($this->positiv, FHC_BOOLEAN).','.
+			        $this->db_add_param($this->defaultbemerkung).','.
+			        $this->db_add_param($this->lehreinheit_id).','.
+			        $this->db_add_param($this->updateamum).','.
+			        $this->db_add_param($this->updatevon).','.
+			        $this->db_add_param($this->insertamum).','.
+			        $this->db_add_param($this->insertvon).','.
+					$this->db_add_param($this->liste_id).','.
+					$this->db_add_param($this->maxstd).','.
+					$this->db_add_param($this->maxbsp).','.
+					$this->db_add_param($this->nummer).','.
+			        $this->db_add_param($this->statistik, FHC_BOOLEAN).');';
 		}
 		else
 		{
 			$qry = 'UPDATE campus.tbl_uebung SET'.
-			       ' gewicht='.$this->addslashes($this->gewicht).','.
-			       ' punkte='.$this->addslashes($this->punkte).','.
-			       ' angabedatei='.$this->addslashes($this->angabedatei).','.
-			       ' freigabevon='.$this->addslashes($this->freigabevon).','.
-			       ' freigabebis='.$this->addslashes($this->freigabebis).','.
-			       ' abgabe='.($this->abgabe?'true':'false').','.
-			       ' beispiele='.($this->beispiele?'true':'false').','.
-			       ' bezeichnung='.$this->addslashes($this->bezeichnung).','.
-			       ' positiv='.($this->positiv?'true':'false').','.
-			       ' defaultbemerkung='.$this->addslashes($this->defaultbemerkung).','.
-			       ' lehreinheit_id='.$this->addslashes($this->lehreinheit_id).','.
-			       ' updateamum='.$this->addslashes($this->updateamum).','.
-			       ' updatevon='.$this->addslashes($this->updatevon).','.
-				   ' liste_id='.$this->addslashes($this->liste_id).','.
-				   ' maxstd='.$this->addslashes($this->maxstd).','.
-				   ' maxbsp='.$this->addslashes($this->maxbsp).','.
-				   ' nummer='.$this->addslashes($this->nummer).','.
-			       ' statistik='.($this->statistik?'true':'false').
-			       " WHERE uebung_id=".$this->addslashes($this->uebung_id).";";
+			       ' gewicht='.$this->db_add_param($this->gewicht).','.
+			       ' punkte='.$this->db_add_param($this->punkte).','.
+			       ' angabedatei='.$this->db_add_param($this->angabedatei).','.
+			       ' freigabevon='.$this->db_add_param($this->freigabevon).','.
+			       ' freigabebis='.$this->db_add_param($this->freigabebis).','.
+			       ' abgabe='.$this->db_add_param($this->abgabe, FHC_BOOLEAN).','.
+			       ' beispiele='.$this->db_add_param($this->beispiele, FHC_BOOLEAN).','.
+			       ' bezeichnung='.$this->db_add_param($this->bezeichnung).','.
+			       ' positiv='.$this->db_add_param($this->positiv, FHC_BOOLEAN).','.
+			       ' defaultbemerkung='.$this->db_add_param($this->defaultbemerkung).','.
+			       ' lehreinheit_id='.$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).','.
+			       ' updateamum='.$this->db_add_param($this->updateamum).','.
+			       ' updatevon='.$this->db_add_param($this->updatevon).','.
+				   ' liste_id='.$this->db_add_param($this->liste_id).','.
+				   ' maxstd='.$this->db_add_param($this->maxstd).','.
+				   ' maxbsp='.$this->db_add_param($this->maxbsp).','.
+				   ' nummer='.$this->db_add_param($this->nummer).','.
+			       ' statistik='.$this->db_add_param($this->statistik, FHC_BOOLEAN).
+			       " WHERE uebung_id=".$this->db_add_param($this->uebung_id, FHC_INTEGER, false).";";
 		}
 
 		if($this->db_query($qry))
@@ -454,7 +457,7 @@ class uebung extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der Uebung:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern der Uebung';
 			return false;
 		}
 	}
@@ -499,34 +502,34 @@ class uebung extends basis_db
 			$qry = 'INSERT INTO campus.tbl_studentuebung(student_uid, mitarbeiter_uid, abgabe_id, uebung_id,
 					note, mitarbeitspunkte, punkte, anmerkung, benotungsdatum, updateamum,
 			        updatevon, insertamum, insertvon) VALUES('.
-			        $this->addslashes($this->student_uid).','.
-			        $this->addslashes($this->mitarbeiter_uid).','.
-			        $this->addslashes($this->abgabe_id).','.
-			        $this->addslashes($this->uebung_id).','.
-			        $this->addslashes($this->note).','.
-			        $this->addslashes($this->mitarbeitspunkte).','.
-			        $this->addslashes($this->punkte).','.
-			        $this->addslashes($this->anmerkung).','.
-			        $this->addslashes($this->benotungsdatum).','.
-			        $this->addslashes($this->updateamum).','.
-			        $this->addslashes($this->updatevon).','.
-			        $this->addslashes($this->insertamum).','.
-			        $this->addslashes($this->insertvon).');';
+			        $this->db_add_param($this->student_uid).','.
+			        $this->db_add_param($this->mitarbeiter_uid).','.
+			        $this->db_add_param($this->abgabe_id, FHC_INTEGER).','.
+			        $this->db_add_param($this->uebung_id, FHC_INTEGER).','.
+			        $this->db_add_param($this->note).','.
+			        $this->db_add_param($this->mitarbeitspunkte).','.
+			        $this->db_add_param($this->punkte).','.
+			        $this->db_add_param($this->anmerkung).','.
+			        $this->db_add_param($this->benotungsdatum).','.
+			        $this->db_add_param($this->updateamum).','.
+			        $this->db_add_param($this->updatevon).','.
+			        $this->db_add_param($this->insertamum).','.
+			        $this->db_add_param($this->insertvon).');';
 		}
 		else
 		{
 			$qry = 'UPDATE campus.tbl_studentuebung SET'.
-			       ' mitarbeiter_uid='.$this->addslashes($this->mitarbeiter_uid).','.
-			       ' abgabe_id='.$this->addslashes($this->abgabe_id).','.
-			       ' uebung_id='.$this->addslashes($this->uebung_id).','.
-			       ' note='.$this->addslashes($this->note).','.
-			       ' mitarbeitspunkte='.$this->addslashes($this->mitarbeitspunkte).','.
-			       ' punkte='.$this->addslashes($this->punkte).','.
-			       ' anmerkung='.$this->addslashes($this->anmerkung).','.
-			       ' benotungsdatum='.$this->addslashes($this->benotungsdatum).','.
-			       ' updateamum='.$this->addslashes($this->updateamum).','.
-			       ' updatevon='.$this->addslashes($this->updatevon).
-			       " WHERE uebung_id=".$this->addslashes($this->uebung_id)." AND student_uid=".$this->addslashes($this->student_uid).";";
+			       ' mitarbeiter_uid='.$this->db_add_param($this->mitarbeiter_uid).','.
+			       ' abgabe_id='.$this->db_add_param($this->abgabe_id, FHC_INTEGER).','.
+			       ' uebung_id='.$this->db_add_param($this->uebung_id, FHC_INTEGER).','.
+			       ' note='.$this->db_add_param($this->note).','.
+			       ' mitarbeitspunkte='.$this->db_add_param($this->mitarbeitspunkte).','.
+			       ' punkte='.$this->db_add_param($this->punkte).','.
+			       ' anmerkung='.$this->db_add_param($this->anmerkung).','.
+			       ' benotungsdatum='.$this->db_add_param($this->benotungsdatum).','.
+			       ' updateamum='.$this->db_add_param($this->updateamum).','.
+			       ' updatevon='.$this->db_add_param($this->updatevon).
+			       " WHERE uebung_id=".$this->db_add_param($this->uebung_id, FHC_INTEGER)." AND student_uid=".$this->db_add_param($this->student_uid).";";
 		}
 
 		if($this->db_query($qry))
@@ -555,18 +558,17 @@ class uebung extends basis_db
 		if($new)
 		{
 			$qry = 'INSERT INTO campus.tbl_abgabe(abgabedatei, abgabezeit, anmerkung) VALUES('.
-			        $this->addslashes($this->abgabedatei).','.
-			        $this->addslashes($this->abgabezeit).','.
-			        $this->addslashes($this->abgabe_anmerkung).');';
+			        $this->db_add_param($this->abgabedatei).','.
+			        $this->db_add_param($this->abgabezeit).','.
+			        $this->db_add_param($this->abgabe_anmerkung).');';
 		}
 		else
 		{
 			$qry = 'UPDATE campus.tbl_abgabe SET'.
-			       ' abgabe_id='.$this->addslashes($this->abgabe_id).','.
-			       ' abgabedatei='.$this->addslashes($this->abgabedatei).','.
-			       ' abgabezeit='.$this->addslashes($this->abgabezeit).','.
-			       ' anmerkung='.$this->addslashes($this->abgabe_anmerkung).
-			       " WHERE abgabe_id=".$this->addslashes($this->abgabe_id).";";
+			       ' abgabedatei='.$this->db_add_param($this->abgabedatei).','.
+			       ' abgabezeit='.$this->db_add_param($this->abgabezeit).','.
+			       ' anmerkung='.$this->db_add_param($this->abgabe_anmerkung).
+			       " WHERE abgabe_id=".$this->db_add_param($this->abgabe_id, FHC_INTEGER).";";
 		}
 
 		if($this->db_query($qry))
@@ -619,22 +621,21 @@ class uebung extends basis_db
 		}
 		
 		// subuebungen wegraeumen
-		$qry = "SELECT * FROM campus.tbl_uebung WHERE liste_id = '".$uebung_id."'";
+		$qry = "SELECT uebung_id, angabedatei FROM campus.tbl_uebung WHERE liste_id=".$this->db_add_param($uebung_id, FHC_INTEGER, false).';';
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{			
-				foreach (glob(BENOTUNGSTOOL_PATH."angabe/*".$row->uebung_id.".*") as $angabe)
-				{
-					if(file_exists($angabe))
-						unlink($angabe);
-				}
-				$qry = "DELETE FROM campus.tbl_studentbeispiel WHERE beispiel_id IN(SELECT beispiel_id FROM campus.tbl_beispiel WHERE uebung_id='$row->uebung_id');
-						DELETE FROM campus.tbl_abgabe WHERE abgabe_id IN(SELECT abgabe_id FROM campus.tbl_studentuebung WHERE uebung_id='$row->uebung_id');
-						DELETE FROM campus.tbl_studentuebung WHERE uebung_id='$row->uebung_id';
-						DELETE FROM campus.tbl_beispiel WHERE uebung_id='$row->uebung_id';
-						DELETE FROM campus.tbl_studentuebung WHERE uebung_id = '$row->uebung_id';
-						DELETE FROM campus.tbl_uebung WHERE uebung_id='$row->uebung_id';";
+				$angabe = BENOTUNGSTOOL_PATH."angabe/".$row->angabedatei;
+				if(file_exists($angabe))
+					unlink($angabe);
+
+				$qry = "DELETE FROM campus.tbl_studentbeispiel WHERE beispiel_id IN(SELECT beispiel_id FROM campus.tbl_beispiel WHERE uebung_id=".$this->db_add_param($row->uebung_id, FHC_INTEGER).");
+						DELETE FROM campus.tbl_abgabe WHERE abgabe_id IN(SELECT abgabe_id FROM campus.tbl_studentuebung WHERE uebung_id=".$this->db_add_param($row->uebung_id, FHC_INTEGER).");
+						DELETE FROM campus.tbl_studentuebung WHERE uebung_id=".$this->db_add_param($row->uebung_id, FHC_INTEGER).";
+						DELETE FROM campus.tbl_beispiel WHERE uebung_id=".$this->db_add_param($row->uebung_id, FHC_INTEGER).";
+						DELETE FROM campus.tbl_studentuebung WHERE uebung_id = ".$this->db_add_param($row->uebung_id, FHC_INTEGER).";
+						DELETE FROM campus.tbl_uebung WHERE uebung_id=".$this->db_add_param($row->uebung_id, FHC_INTEGER).";";
 			
 				if(!$this->db_query($qry))
 				{
@@ -643,19 +644,16 @@ class uebung extends basis_db
 				}								
 			}
 		}		
-		
-		
-		foreach (glob(BENOTUNGSTOOL_PATH."angabe/*".$uebung_id.".*") as $angabe)
-		{
-				if(file_exists($angabe))
-					unlink($angabe);
-		}
-		$qry = "DELETE FROM campus.tbl_studentbeispiel WHERE beispiel_id IN(SELECT beispiel_id FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id');
-				DELETE FROM campus.tbl_abgabe WHERE abgabe_id IN(SELECT abgabe_id FROM campus.tbl_studentuebung WHERE uebung_id='$uebung_id');
-				DELETE FROM campus.tbl_studentuebung WHERE uebung_id='$uebung_id';
-				DELETE FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id';
-				DELETE FROM campus.tbl_studentuebung WHERE uebung_id = '$uebung_id';
-				DELETE FROM campus.tbl_uebung WHERE uebung_id='$uebung_id';";
+		$angabe = BENOTUNGSTOOL_PATH."angabe/".$row->angabedatei;
+		if(file_exists($angabe))
+			unlink($angabe);
+
+		$qry = "DELETE FROM campus.tbl_studentbeispiel WHERE beispiel_id IN(SELECT beispiel_id FROM campus.tbl_beispiel WHERE uebung_id=".$this->db_add_param($uebung_id, FHC_INTEGER).");
+				DELETE FROM campus.tbl_abgabe WHERE abgabe_id IN(SELECT abgabe_id FROM campus.tbl_studentuebung WHERE uebung_id=".$this->db_add_param($uebung_id, FHC_INTEGER).");
+				DELETE FROM campus.tbl_studentuebung WHERE uebung_id=".$this->db_add_param($uebung_id, FHC_INTEGER).";
+				DELETE FROM campus.tbl_beispiel WHERE uebung_id=".$this->db_add_param($uebung_id, FHC_INTEGER).";
+				DELETE FROM campus.tbl_studentuebung WHERE uebung_id = ".$this->db_add_param($uebung_id, FHC_INTEGER).";
+				DELETE FROM campus.tbl_uebung WHERE uebung_id=".$this->db_add_param($uebung_id, FHC_INTEGER).";";
 
 		if($this->db_query($qry))
 			return true;
@@ -679,7 +677,7 @@ class uebung extends basis_db
 		}
 		
 		// subuebungen wegraeumen
-		$qry = "SELECT * FROM campus.tbl_abgabe WHERE abgabe_id = '".$abgabe_id."'";
+		$qry = "SELECT * FROM campus.tbl_abgabe WHERE abgabe_id = ".$this->db_add_param($abgabe_id, FHC_INTEGER).";";
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -687,8 +685,8 @@ class uebung extends basis_db
 				if(file_exists(BENOTUNGSTOOL_PATH."abgabe/".$row->abgabedatei))
 					unlink(BENOTUNGSTOOL_PATH."abgabe/".$row->abgabedatei);
 
-				$qry = "UPDATE campus.tbl_studentuebung set abgabe_id = null where abgabe_id = '$abgabe_id';
-						DELETE FROM campus.tbl_abgabe WHERE abgabe_id = '$abgabe_id'";
+				$qry = "UPDATE campus.tbl_studentuebung set abgabe_id = null where abgabe_id = ".$this->db_add_param($abgabe_id, FHC_INTEGER).";
+						DELETE FROM campus.tbl_abgabe WHERE abgabe_id = ".$this->db_add_param($abgabe_id, FHC_INTEGER).";";
 			
 				if(!$this->db_query($qry))
 				{

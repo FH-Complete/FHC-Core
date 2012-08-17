@@ -71,7 +71,7 @@ if (isset($_GET["download"])){
 	$uebung_id = $_GET["uebung_id"];
 	$ueb = new uebung();
 	$ueb->load($uebung_id);
-	$filename = "/documents/benotungstool/angabe/".$ueb->angabedatei;
+	$filename = BENOTUNGSTOOL_PATH."angabe/".$ueb->angabedatei;
 	header('Content-Type: application/octet-stream');
 	header('Content-disposition: attachment; filename="'.$file.'"');
 	readfile($filename);
@@ -165,7 +165,7 @@ if (isset($_GET["deletefile"])){
 	$file=$_GET["deletefile"];
 	$ueb = new uebung();
 	$ueb->load($uebung_id);
-	$filename = "/documents/benotungstool/angabe/".$ueb->angabedatei;
+	$filename = BENOTUNGSTOOL_PATH."angabe/".$ueb->angabedatei;
 	$ueb->angabedatei = '';
 	$ueb->save(false);
 	unlink($filename);
