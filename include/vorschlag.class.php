@@ -19,6 +19,10 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+/**
+ * Vorschlag Klasse
+ * Verwaltet die Antwortmoeglichkeiten zu den Testtool Fragen
+ */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class vorschlag extends basis_db
@@ -61,7 +65,7 @@ class vorschlag extends basis_db
 	 */
 	public function load($vorschlag_id, $sprache='German')
 	{
-		$qry = "SELECT * FROM testtool.tbl_vorschlag WHERE vorschlag_id='".addslashes($vorschlag_id)."'";
+		$qry = "SELECT * FROM testtool.tbl_vorschlag WHERE vorschlag_id=".$this->db_add_param($vorschlag_id, FHC_INTEGER).';';
 
 		if($this->db_query($qry))
 		{
@@ -76,13 +80,13 @@ class vorschlag extends basis_db
 			}
 			else
 			{
-				$this->errormsg = "Kein Eintrag gefunden fuer $vorschlag_id $sprache";
+				$this->errormsg = "Kein Eintrag gefunden";
 				return false;
 			}
 		}
 		else
 		{
-			$this->errormsg = "Fehler beim Laden: $qry";
+			$this->errormsg = "Fehler beim Laden des Vorschlags";
 			return false;
 		}
 	}
@@ -95,8 +99,14 @@ class vorschlag extends basis_db
 	 */
 	public function loadVorschlagSprache($vorschlag_id, $sprache)
 	{
-		$qry = "SELECT * FROM testtool.tbl_vorschlag_sprache 
-						WHERE vorschlag_id='".addslashes($vorschlag_id)."' AND sprache='".addslashes($sprache)."'";
+		$qry = "SELECT 
+					* 
+				FROM 
+					testtool.tbl_vorschlag_sprache 
+				WHERE 
+					vorschlag_id=".$this->db_add_param($vorschlag_id, FHC_INTEGER)."
+					AND sprache=".$this->db_add_param($sprache).';';
+		
 		if($this->db_query($qry))
 		{
 			if($row_sprache = $this->db_fetch_object())
@@ -133,23 +143,23 @@ class vorschlag extends basis_db
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
 			$qry = 'BEGIN;INSERT INTO testtool.tbl_vorschlag (frage_id, nummer, punkte, insertamum, insertvon, updateamum, updatevon) VALUES('.
-			       $this->addslashes($this->frage_id).','.
-			       $this->addslashes($this->nummer).','.
-				   $this->addslashes($this->punkte).','.
-				   $this->addslashes($this->insertamum).','.
-				   $this->addslashes($this->insertvon).','.
-				   $this->addslashes($this->updateamum).','.
-				   $this->addslashes($this->updatevon).');';
+			       $this->db_add_param($this->frage_id, FHC_INTEGER).','.
+			       $this->db_add_param($this->nummer).','.
+				   $this->db_add_param($this->punkte).','.
+				   $this->db_add_param($this->insertamum).','.
+				   $this->db_add_param($this->insertvon).','.
+				   $this->db_add_param($this->updateamum).','.
+				   $this->db_add_param($this->updatevon).');';
 		}
 		else
 		{
 			$qry = 'UPDATE testtool.tbl_vorschlag SET'.
-			       ' frage_id='.$this->addslashes($this->frage_id).','.
-			       ' nummer='.$this->addslashes($this->nummer).','.
-			       ' punkte='.$this->addslashes($this->punkte).','.
-			       ' updateamum='.$this->addslashes($this->updateamum).','.
-			       ' updatevon='.$this->addslashes($this->updatevon).
-					" WHERE vorschlag_id='".addslashes($this->vorschlag_id)."';";
+			       ' frage_id='.$this->db_add_param($this->frage_id, FHC_INTEGER).','.
+			       ' nummer='.$this->db_add_param($this->nummer).','.
+			       ' punkte='.$this->db_add_param($this->punkte).','.
+			       ' updateamum='.$this->db_add_param($this->updateamum).','.
+			       ' updatevon='.$this->db_add_param($this->updatevon).
+					" WHERE vorschlag_id=".$this->db_add_param($this->vorschlag_id, FHC_INTEGER, false).";";
 		}
 
 		if($this->db_query($qry))
@@ -186,7 +196,7 @@ class vorschlag extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der Frage:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern der Frage';
 			return false;
 		}
 	}
@@ -213,8 +223,8 @@ class vorschlag extends basis_db
 			return false;
 
 		$qry = "SELECT * FROM testtool.tbl_vorschlag_sprache 
-				WHERE vorschlag_id='".addslashes($this->vorschlag_id)."' AND
-				sprache='".addslashes($this->sprache)."'";
+				WHERE vorschlag_id=".$this->db_add_param($this->vorschlag_id, FHC_INTEGER)." AND
+				sprache=".$this->db_add_param($this->sprache).";";
 		if($this->db_query($qry))
 		{
 			if($this->db_num_rows()>0)
@@ -227,28 +237,28 @@ class vorschlag extends basis_db
 		{
 			$qry = 'INSERT INTO testtool.tbl_vorschlag_sprache (vorschlag_id, sprache, text, bild, audio, 
 					insertamum, insertvon, updateamum, updatevon) VALUES('.
-			       $this->addslashes($this->vorschlag_id).','.
-			       $this->addslashes($this->sprache).','.
-				   $this->addslashes($this->text).','.
-				   $this->addslashes($this->bild).','.
-				   $this->addslashes($this->audio).','.
-				   $this->addslashes($this->insertamum).','.
-				   $this->addslashes($this->insertvon).','.
-				   $this->addslashes($this->updateamum).','.
-				   $this->addslashes($this->updatevon).');';
+			       $this->db_add_param($this->vorschlag_id, FHC_INTEGER).','.
+			       $this->db_add_param($this->sprache).','.
+				   $this->db_add_param($this->text).','.
+				   $this->db_add_param($this->bild).','.
+				   $this->db_add_param($this->audio).','.
+				   $this->db_add_param($this->insertamum).','.
+				   $this->db_add_param($this->insertvon).','.
+				   $this->db_add_param($this->updateamum).','.
+				   $this->db_add_param($this->updatevon).');';
 		}
 		else
 		{
 			$qry = 'UPDATE testtool.tbl_vorschlag_sprache SET'.
-			       ' text='.$this->addslashes($this->text).',';
+			       ' text='.$this->db_add_param($this->text).',';
 			if($this->bild!='')
-				$qry.=' bild='.$this->addslashes($this->bild).',';
+				$qry.=' bild='.$this->db_add_param($this->bild).',';
 			if($this->audio!='')
-				$qry.=' audio='.$this->addslashes($this->audio).',';
+				$qry.=' audio='.$this->db_add_param($this->audio).',';
 			
-			$qry.= ' updateamum='.$this->addslashes($this->updateamum).','.
-			       ' updatevon='.$this->addslashes($this->updatevon).
-					" WHERE vorschlag_id='".addslashes($this->vorschlag_id)."' AND sprache='".addslashes($this->sprache)."';";
+			$qry.= ' updateamum='.$this->db_add_param($this->updateamum).','.
+			       ' updatevon='.$this->db_add_param($this->updatevon).
+					" WHERE vorschlag_id=".$this->db_add_param($this->vorschlag_id, FHC_INTEGER)." AND sprache=".$this->db_add_param($this->sprache).";";
 		}
 		
 		if($this->db_query($qry))
@@ -262,9 +272,17 @@ class vorschlag extends basis_db
 		}
 	}
 
+	/**
+	 * Laedt die Vorschlaege zu einer Frage
+	 * 
+	 * @param $frage_id
+	 * @param $sprache
+	 * @param $random  Wenn true, dann werden die Vorschlaege in zufaelliger 
+	 *                  Reihenfolge geladen, sonst nach nummer sortiert
+	 */
 	public function getVorschlag($frage_id, $sprache, $random)
 	{
-		$qry = "SELECT * FROM testtool.tbl_vorschlag WHERE frage_id='".addslashes($frage_id)."'";
+		$qry = "SELECT * FROM testtool.tbl_vorschlag WHERE frage_id=".$this->db_add_param($frage_id, FHC_INTEGER);
 		if($random)
 			$qry.=" ORDER BY random()";
 		else 
@@ -280,7 +298,7 @@ class vorschlag extends basis_db
 				$vs->nummer = $row->nummer;
 				$vs->punkte = $row->punkte;
 				$qry = "SELECT * FROM testtool.tbl_vorschlag_sprache 
-						WHERE vorschlag_id='".addslashes($row->vorschlag_id)."' AND sprache='".addslashes($sprache)."'";
+						WHERE vorschlag_id=".$this->db_add_param($row->vorschlag_id, FHC_INTEGER)." AND sprache=".$this->db_add_param($sprache).";";
 				if($this->db_query($qry))
 				{
 					if($row_sprache = $this->db_fetch_object())
@@ -310,7 +328,7 @@ class vorschlag extends basis_db
 	 */
 	public function delete($vorschlag_id)
 	{
-		$qry = "SELECT count(*) as anzahl FROM testtool.tbl_antwort WHERE vorschlag_id='".addslashes($vorschlag_id)."'";
+		$qry = "SELECT count(*) as anzahl FROM testtool.tbl_antwort WHERE vorschlag_id=".$this->db_add_param($vorschlag_id, FHC_INTEGER).";";
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -324,8 +342,8 @@ class vorschlag extends basis_db
 		}
 		
 		$qry = "
-			DELETE FROM testtool.tbl_vorschlag_sprache WHERE vorschlag_id='".addslashes($vorschlag_id)."';
-			DELETE FROM testtool.tbl_vorschlag WHERE vorschlag_id='".addslashes($vorschlag_id)."'";
+			DELETE FROM testtool.tbl_vorschlag_sprache WHERE vorschlag_id=".$this->db_add_param($vorschlag_id, FHC_INTEGER).";
+			DELETE FROM testtool.tbl_vorschlag WHERE vorschlag_id=".$this->db_add_param($vorschlag_id, FHC_INTEGER).';';
 		if($this->db_query($qry))
 			return true;
 		else
