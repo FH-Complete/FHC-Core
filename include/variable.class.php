@@ -54,7 +54,7 @@ class variable extends basis_db
 	 */
 	public function load($uid, $name)
 	{
-		$qry = "SELECT wert FROM public.tbl_variable WHERE uid='".addslashes($uid)."' AND name='".addslashes($name)."'";
+		$qry = "SELECT wert FROM public.tbl_variable WHERE uid=".$this->db_add_param($uid)." AND name=".$this->db_add_param($name);
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -111,7 +111,7 @@ class variable extends basis_db
 
 		if(!is_bool($new))
 		{
-			$qry ="SELECT * FROM public.tbl_variable WHERE uid='".addslashes($this->uid)."' AND name='".addslashes($this->name)."';";
+			$qry ="SELECT * FROM public.tbl_variable WHERE uid=".$this->db_add_param($this->uid)." AND name=".$this->db_add_param($this->name).";";
 			if($this->db_query($qry))
 			{
 				if($this->db_num_rows()==0)
@@ -128,15 +128,15 @@ class variable extends basis_db
 		if($new)
 		{
 			$qry = 'INSERT INTO public.tbl_variable (uid, name, wert)
-			        VALUES('.$this->addslashes($this->uid).','.
-					$this->addslashes($this->name).','.
-					$this->addslashes($this->wert).');';
+			        VALUES('.$this->db_add_param($this->uid).','.
+					$this->db_add_param($this->name).','.
+					$this->db_add_param($this->wert).');';
 		}
 		else
 		{
 			$qry = 'UPDATE public.tbl_variable SET'.
-			       ' wert='.$this->addslashes($this->wert).
-			       " WHERE uid='".addslashes($this->uid)."' AND name='".addslashes($this->name)."';";
+			       ' wert='.$this->db_add_param($this->wert).
+			       " WHERE uid=".$this->db_add_param($this->uid)." AND name=".$this->db_add_param($this->name).";";
 		}
 
 		if($this->db_query($qry))
@@ -146,7 +146,7 @@ class variable extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der Variable:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern der Variable';
 			return false;
 		}
 	}
@@ -162,7 +162,7 @@ class variable extends basis_db
 			return false;
 		}
 		
-		$qry = "DELETE FROM public.tbl_variable WHERE name='".addslashes($name)."' AND uid='".addslashes($uid)."'";
+		$qry = "DELETE FROM public.tbl_variable WHERE name=".$this->db_add_param($name)." AND uid=".$this->db_add_param($uid).';';
 		
 		if($this->db_query($qry))
 			return true;
@@ -178,7 +178,7 @@ class variable extends basis_db
 	 */
 	public function getVars($uid)
 	{
-		$qry = "SELECT * FROM public.tbl_variable WHERE uid='".addslashes($uid)."' ORDER BY name";
+		$qry = "SELECT * FROM public.tbl_variable WHERE uid=".$this->db_add_param($uid)." ORDER BY name";
 		
 		if($this->db_query($qry))
 		{
@@ -211,7 +211,7 @@ class variable extends basis_db
 	 */
 	public function loadVariables($user)
 	{			
-		if(!$this->db_query("SELECT * FROM public.tbl_variable WHERE uid='".addslashes($user)."'"))
+		if(!$this->db_query("SELECT * FROM public.tbl_variable WHERE uid=".$this->db_add_param($user).';'))
 		{
 			$this->errormsg.=$this->db_last_error();
 			return false;
@@ -222,6 +222,7 @@ class variable extends basis_db
 			$this->variable->{$row->name}=$row->wert;
 		}
 		
+		//Default Werte setzten, wenn Variable nicht gesetzt ist
 		if (!isset($this->variable->semester_aktuell))
 		{
 			if(!$this->db_query('SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ende>now() ORDER BY start LIMIT 1'))

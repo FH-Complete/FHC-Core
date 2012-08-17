@@ -19,6 +19,9 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
+/**
+ * Verwaltet die Vorlagen fuer die Dokumentenerstellung
+ */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/organisationseinheit.class.php');
 
@@ -31,11 +34,11 @@ class vorlage extends basis_db
 	public $new;
 	
 	//Tabellenspalten
-	public $vorlage_kurzbz;
-	public $studiengang_kz;
-	public $version;
-	public $text;
-	public $mimetype;
+	public $vorlage_kurzbz;	// varchar(16)
+	public $studiengang_kz; // integer
+	public $version;		// smallint
+	public $text;			// text
+	public $mimetype;		// varchar(64)
 
 	/**
 	 * Konstruktor
@@ -72,13 +75,13 @@ class vorlage extends basis_db
 						public.tbl_vorlagestudiengang 
 						JOIN public.tbl_vorlage USING(vorlage_kurzbz) 
 					WHERE 
-					(studiengang_kz=0 OR studiengang_kz='".addslashes($studiengang_kz)."') AND 
-					vorlage_kurzbz='".addslashes($vorlage_kurzbz)."'";
+					(studiengang_kz=0 OR studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER).") AND 
+					vorlage_kurzbz=".$this->db_add_param($vorlage_kurzbz);
 			if(!is_null($version) && $version!='')
 			{
-				$qry.=" AND version=='".addslashes($version)."'";
+				$qry.=" AND version=".$this->db_add_param($version, FHC_INTEGER);
 			}
-			$qry .=" ORDER BY studiengang_kz DESC, version DESC LIMIT 1";
+			$qry .=" ORDER BY studiengang_kz DESC, version DESC LIMIT 1;";
 		}
 		else
 		{
@@ -87,11 +90,11 @@ class vorlage extends basis_db
 					FROM 
 						public.tbl_vorlagestudiengang 
 						JOIN public.tbl_vorlage USING(vorlage_kurzbz)
-					WHERE oe_kurzbz='".addslashes($oe_kurzbz)."' 
-						AND vorlage_kurzbz='".addslashes($vorlage_kurzbz)."'";
+					WHERE oe_kurzbz=".$this->db_add_param($oe_kurzbz)."
+						AND vorlage_kurzbz=".$this->db_add_param($vorlage_kurzbz);
 			if(!is_null($version) && $version!='')
 			{
-				$qry.=" AND version=='".addslashes($version)."'";
+				$qry.=" AND version=".$this->db_add_param($version, FHC_INTEGER);
 			}
 			$qry.=" ORDER BY version DESC LIMIT 1";
 		}
