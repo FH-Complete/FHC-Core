@@ -108,4 +108,6 @@ $this->phrasen['incoming/wilkommenAnFh']='Welcome to the University of Applied S
 $this->phrasen['incoming/bitteCodeEingeben']='Please enter your access code';
 $this->phrasen['incoming/zugangscode']='Access code';
 $this->phrasen['incoming/projektarbeitstitel']='Title of Project';
+$this->phrasen['incoming/unitcode']='Unitcode';
+$this->phrasen['incoming/zurAnmeldung']='Registration';
 ?>
