@@ -107,4 +107,5 @@ $this->phrasen['incoming/wochenstunden']='Weekly hours';
 $this->phrasen['incoming/wilkommenAnFh']='Welcome to the University of Applied Sciences Technikum Wien';
 $this->phrasen['incoming/bitteCodeEingeben']='Please enter your access code';
 $this->phrasen['incoming/zugangscode']='Access code';
+$this->phrasen['incoming/projektarbeitstitel']='Title of Project';
 ?>
