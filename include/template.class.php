@@ -19,6 +19,9 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Karl Burkhart <karl.burkhart@technikum-wien.at>.
  */
+/**
+ * Verwaltet die Templates fuer das CMS
+ */
 require_once('basis_db.class.php');
 
 class template extends basis_db
@@ -26,11 +29,11 @@ class template extends basis_db
 	public $new;
 	public $result = array();
 
-	public $template_kurzbz;
-	public $bezeichnung;
-	public $xsd;
-	public $xslt_xhtml;
-	public $xslfo_pdf;
+	public $template_kurzbz;	// varchar(32)
+	public $bezeichnung;		// varchar(256)
+	public $xsd;				// xml
+	public $xslt_xhtml;			// xml
+	public $xslfo_pdf;			// xml
 			
 	/**
 	 * Konstruktor 
@@ -41,6 +44,12 @@ class template extends basis_db
 		parent::__construct();
 	}
 
+	/**
+	 * 
+	 * Laedt das angegeben Template
+	 * @param $template_kurzbz
+	 * @return true wenn erfolgreich, sonst false
+	 */
 	public function load($template_kurzbz)
 	{
 		$qry = "SELECT 
@@ -48,7 +57,7 @@ class template extends basis_db
 				FROM 
 					campus.tbl_template
 				WHERE
-					tbl_template.template_kurzbz='".addslashes($template_kurzbz)."'";
+					tbl_template.template_kurzbz=".$this->db_add_param($template_kurzbz).";";
 		
 		if($result = $this->db_query($qry))
 		{

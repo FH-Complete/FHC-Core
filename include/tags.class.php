@@ -57,7 +57,7 @@ class tags extends basis_db
 	 */
 	public function getAll()
 	{
-		$qry = "Select * from public.tbl_tag; ";
+		$qry = "SELECT * FROM public.tbl_tag; ";
 
 		if($this->db_query($qry))
 		{
@@ -83,15 +83,15 @@ class tags extends basis_db
 	 * Gibt die Tags einer Bestellung zurück
 	 * @param $bestellung_id
 	 */
-	public function GetTagsByBestellung($bestellung_id = '')
+	public function GetTagsByBestellung($bestellung_id)
 	{
-	/*	if(!is_numeric($bestellung_id))
+		if(!is_numeric($bestellung_id))
 		{
 			$this->errormsg = "Ungültige Bestellung ID"; 
 			return false; 
-		}*/
+		}
 		
-		$qry = "Select * from wawi.tbl_bestellungtag where bestellung_id = ".$bestellung_id.";";
+		$qry = "SELECT * FROM wawi.tbl_bestellungtag WHERE bestellung_id = ".$this->db_add_param($bestellung_id, FHC_INTEGER).';';
 		
 		if($this->db_query($qry))
 		{
@@ -145,7 +145,7 @@ class tags extends basis_db
 			return false; 
 		}
 		
-		$qry = "Select * from wawi.tbl_bestelldetailtag where bestelldetail_id = ".$bestelldetail_id.";";
+		$qry = "SELECT * FROM wawi.tbl_bestelldetailtag WHERE bestelldetail_id = ".$this->db_add_param($bestelldetail_id, FHC_INTEGER).";";
 
 		if($this->db_query($qry))
 		{
@@ -175,7 +175,7 @@ class tags extends basis_db
 	 */
 	public function TagExists()
 	{
-		$qry = "Select * from public.tbl_tag where tag = ".$this->addslashes($this->tag).";"; 
+		$qry = "SELECT * FROM public.tbl_tag WHERE tag = ".$this->db_add_param($this->tag).";"; 
 		
 		if($this->db_query($qry))
 		{
@@ -190,11 +190,18 @@ class tags extends basis_db
 	
 	/**
 	 * 
-	 * return true wenn Tag schon in der Zwischentabelle vorhanden ist, false wenn Tag noch nicht vorhanden ist
+	 * return true wenn Tag schon in der Zwischentabelle vorhanden ist, 
+	 * false wenn Tag noch nicht vorhanden ist
 	 */
 	public function BestellungTagExists()
 	{
-		$qry = "Select * from wawi.tbl_bestellungtag where tag = ".$this->addslashes($this->tag)." and bestellung_id = ".$this->addslashes($this->bestellung_id).";";
+		$qry = "SELECT 
+					* 
+				FROM 
+					wawi.tbl_bestellungtag 
+				WHERE 
+					tag = ".$this->db_add_param($this->tag)." 
+					AND bestellung_id = ".$this->db_add_param($this->bestellung_id, FHC_INTEGER).";";
 		
 		if($this->db_query($qry))
 		{
@@ -215,7 +222,7 @@ class tags extends basis_db
 	{
 		if($this->tag != '')
 		{
-			$qry = "Insert into public.tbl_tag (tag) values (".$this->addslashes($this->tag).");";
+			$qry = "INSERT INTO public.tbl_tag (tag) VALUES (".$this->db_add_param($this->tag).");";
 			
 			if($this->db_query($qry))
 			{
@@ -237,12 +244,12 @@ class tags extends basis_db
 	{ 
 		if($this->tag != '')
 		{
-			$qry = "Insert into wawi.tbl_bestellungtag (tag, bestellung_id, insertamum, insertvon) 
-			values("
-			.$this->addslashes($this->tag).","
-			.$this->addslashes($this->bestellung_id).","
-			.$this->addslashes($this->insertamum).","
-			.$this->addslashes($this->insertvon).");";
+			$qry = "INSERT INTO wawi.tbl_bestellungtag (tag, bestellung_id, insertamum, insertvon) 
+			VALUES("
+			.$this->db_add_param($this->tag).","
+			.$this->db_add_param($this->bestellung_id, FHC_INTEGER).","
+			.$this->db_add_param($this->insertamum).","
+			.$this->db_add_param($this->insertvon).");";
 			
 			if(!$this->db_query($qry))
 			{
@@ -256,13 +263,17 @@ class tags extends basis_db
 
 	/**
 	 * 
-	 * Löscht alle Einträge in der Bestellungtag Zwischentabelle die nicht Teil der eingegeben 
-	 * @param unknown_type $tagArray
+	 * Loescht die alle Tags zu einer Bestellung die nicht uebergeben werden
+	 * BestellungID muss in der Klasse gesetzt sein 
+	 * @param $tagArray Array mit Tags die nicht entfernt werden sollen
 	 */
 	public function deleteBestellungTag($tagArray)
 	{
 		$sqlTag = $this->implode4SQL($tagArray);
-		$qry = "DELETE from wawi.tbl_bestellungtag where bestellung_id = ".$this->bestellung_id." and  tag not in(".$sqlTag.");"; 
+		$qry = "DELETE FROM wawi.tbl_bestellungtag 
+				WHERE 
+					bestellung_id = ".$this->db_add_param($this->bestellung_id, FHC_INTEGER)." 
+					AND  tag not in(".$sqlTag.");"; 
  
 		if(!$this->db_query($qry))
 		{
@@ -282,12 +293,12 @@ class tags extends basis_db
 	{ 
 		if($this->tag != '')
 		{
-			$qry = "Insert into wawi.tbl_bestelldetailtag (tag, bestelldetail_id, insertamum, insertvon) 
-			values("
-			.$this->addslashes($this->tag).","
-			.$this->addslashes($this->bestelldetail_id).","
-			.$this->addslashes($this->insertamum).","
-			.$this->addslashes($this->insertvon).");";
+			$qry = "INSERT INTO wawi.tbl_bestelldetailtag (tag, bestelldetail_id, insertamum, insertvon) 
+			VALUES("
+			.$this->db_add_param($this->tag).","
+			.$this->db_add_param($this->bestelldetail_id, FHC_INTEGER).","
+			.$this->db_add_param($this->insertamum).","
+			.$this->db_add_param($this->insertvon).");";
 			
 			if(!$this->db_query($qry))
 			{
@@ -301,13 +312,17 @@ class tags extends basis_db
 	
 	/**
 	 * 
-	 * Löscht alle Einträge in der Bestellungtag Zwischentabelle die nicht Teil der eingegeben 
-	 * @param unknown_type $tagArray
+	 * Loescht die alle Tags zu einem Bestelldetail die nicht uebergeben werden
+	 * BestelldetailID muss in der Klasse gesetzt sein 
+	 * @param $tagArray Array mit Tags die nicht geloescht werden sollen
 	 */
 	public function deleteBestelldetailTag($tagArray)
 	{
 		$sqlTag = $this->implode4SQL($tagArray);
-		$qry = "DELETE from wawi.tbl_bestelldetailtag where bestelldetail_id = ".$this->bestelldetail_id." and tag not in(".$sqlTag.");"; 
+		$qry = "DELETE FROM wawi.tbl_bestelldetailtag 
+				WHERE 
+					bestelldetail_id = ".$this->db_add_param($this->bestelldetail_id, FHC_INTEGER)." 
+					AND tag not in(".$sqlTag.");"; 
  
 		if(!$this->db_query($qry))
 		{
@@ -319,12 +334,17 @@ class tags extends basis_db
 	}
 	
 	/**
+	 * Prueft ob ein Tag zu einem Bestelldetail zugeordnet ist
 	 * 
-	 * return true wenn Tag schon in der Zwischentabelle vorhanden ist, false wenn Tag noch nicht vorhanden ist
+	 * @return true wenn Tag schon in der Zwischentabelle vorhanden ist, 
+	 * false wenn Tag noch nicht vorhanden ist
 	 */
 	public function BestelldetailTagExists()
 	{
-		$qry = "Select * from wawi.tbl_bestelldetailtag where tag = ".$this->addslashes($this->tag)." and bestelldetail_id = ".$this->addslashes($this->bestelldetail_id).";";
+		$qry = "SELECT * FROM wawi.tbl_bestelldetailtag 
+				WHERE 
+					tag = ".$this->db_add_param($this->tag)." 
+					AND bestelldetail_id = ".$this->db_add_param($this->bestelldetail_id, FHC_INTEGER).";";
 		
 		if($this->db_query($qry))
 		{
@@ -338,4 +358,4 @@ class tags extends basis_db
 	}
 
 }
-
+?>
