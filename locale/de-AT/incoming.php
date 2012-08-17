@@ -108,4 +108,6 @@ $this->phrasen['incoming/wilkommenAnFh']='Willkommen an der Fachhochschule Techn
 $this->phrasen['incoming/bitteCodeEingeben']='Bitte geben Sie Ihren Zugangscode ein';
 $this->phrasen['incoming/zugangscode']='Zugangscode';
 $this->phrasen['incoming/projektarbeitstitel']='Projektarbeitstitel';
+$this->phrasen['incoming/unitcode']='Unitcode';
+$this->phrasen['incoming/zurAnmeldung']='Zur Anmeldung';
 ?>
