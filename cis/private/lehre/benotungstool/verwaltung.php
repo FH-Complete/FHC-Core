@@ -68,7 +68,7 @@ $time = microtime_float();
 	}
 	function confirmdelete()
 	{
-		return confirm('<?php $p->t('gesamtnote/wollenSieWirklichLoeschen');?>');
+		return confirm('<?php echo $p->t('gesamtnote/wollenSieWirklichLoeschen');?>');
 	}
 	
 	//Aus- und Einblenden der Listen

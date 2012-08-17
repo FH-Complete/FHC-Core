@@ -643,10 +643,20 @@ class uebung extends basis_db
 					return false;
 				}								
 			}
-		}		
-		$angabe = BENOTUNGSTOOL_PATH."angabe/".$row->angabedatei;
-		if(file_exists($angabe))
-			unlink($angabe);
+		}
+		$qry = "SELECT angabedatei FROM campus.tbl_uebung WHERE uebung_id=".$this->db_add_param($uebung_id, FHC_INTEGER).";";
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				if($row->angabedatei!='')
+				{
+					$angabe = BENOTUNGSTOOL_PATH."angabe/".$row->angabedatei;
+					if(file_exists($angabe))
+						unlink($angabe);
+				}
+			}
+		}
 
 		$qry = "DELETE FROM campus.tbl_studentbeispiel WHERE beispiel_id IN(SELECT beispiel_id FROM campus.tbl_beispiel WHERE uebung_id=".$this->db_add_param($uebung_id, FHC_INTEGER).");
 				DELETE FROM campus.tbl_abgabe WHERE abgabe_id IN(SELECT abgabe_id FROM campus.tbl_studentuebung WHERE uebung_id=".$this->db_add_param($uebung_id, FHC_INTEGER).");

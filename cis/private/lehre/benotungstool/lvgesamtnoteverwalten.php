@@ -266,7 +266,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 		y = y+50;		
 		anlegendiv.style.top = y+"px";
 	
-		str += "<tr><td colspan='2'><b><?php $p->t('benotungstool/pruefungAnlegenFuer');?> "+uid+":</b></td></tr>";
+		str += "<tr><td colspan='2'><b><?php echo $p->t('benotungstool/pruefungAnlegenFuer');?> "+uid+":</b></td></tr>";
 		str += "<tr><td>Datum:</td>";
 		str += "<td><input type='hidden' name='uid' value='"+uid+"'><input type='hidden' name='le_id' value='"+lehreinheit_id+"'><input type='text' name='datum' value='"+datum+"'> [DD.MM.YYYY]</td>";
 		str += "</tr><tr><td>Note:</td>";

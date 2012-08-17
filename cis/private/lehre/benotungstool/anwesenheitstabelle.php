@@ -56,10 +56,6 @@ $p = new phrasen($sprache);
 	  	selObj.selectedIndex = 0;
 	  }
 	}
-	function confirmdelete()
-	{
-		return confirm('<?php $p->t('gesamtnote/wollenSieWirklichLoeschen')?>');
-	}
   //-->
 </script>
 </head>
