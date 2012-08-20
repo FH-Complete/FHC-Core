@@ -552,7 +552,9 @@ if (!$db = new basis_db())
 		}
 		else echo "<tr><td valign='top'><b>".$p->t('courseInformation/incomingplaetze')."</b></td><td>0";
 			echo "</td></tr><tr><td colspan='4'><font style='font-size:smaller'>".$p->t('courseInformation/beiFehlernInDenFixfeldern',array($stg_obj1->email))."</font></td></tr>";
-			echo "<tr><td align='left' colspan='4'><br/><br/><font style='color:black'>".$p->t('courseInformation/pflichtfelderWerdenAufDerExternenSeiteAngezeigt',array($stg_obj1->email))."</font>.</td></tr></table><br><br>";
+			echo "<tr><td align='left' colspan='4'><br/><br/><font style='color:black'>".$p->t('courseInformation/pflichtfelderWerdenAufDerExternenSeiteAngezeigt',array($stg_obj1->email))."</font>.</td></tr>";
+			echo "<tr><td align='left' colspan='4'><font style='color:black'>".$p->t('courseInformation/fallsSieAufzaehlungslistenVerwenden',array($stg_obj1->email))."</font></td></tr>";
+			echo "</table><br><br>";
 
 	   //Eingabefelder anzeigen
 	   echo "<table width='100%'  border='0' cellspacing='0' cellpadding='0'>";
