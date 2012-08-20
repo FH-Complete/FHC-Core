@@ -81,7 +81,7 @@ foreach ($gebiet->result as $row)
 	echo '<OPTION value="'.$row->gebiet_id.'" '.$selected.'>'.$row->bezeichnung.' - '.$row->kurzbz.' - '.$row->zeit.'</OPTION>';	
 }
 echo '</SELECT>
-	<input type="submit" value="Bearbeiten">
+	<!--<input type="submit" value="Bearbeiten">-->
 	</form>';
 
 echo '<br /><br />';
@@ -133,7 +133,7 @@ if($gebiet_id!='')
 	$gebiet = new gebiet($gebiet_id);
 
 	echo "<hr />";
-	echo '<form accept-charset="UTF-8" action="'.$_SERVER['PHP_SELF'].'?gebiet_id='.$gebiet_id.'" method="POST">';
+	echo '<form accept-charset="UTF-8" action="'.$_SERVER['PHP_SELF'].'?gebiet_id='.$gebiet_id.'&amp;stg_kz='.$stg_kz.'" method="POST">';
 	echo '<table>';
 	
 	echo '<tr>';
