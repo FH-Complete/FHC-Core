@@ -29,4 +29,5 @@ $this->phrasen['courseInformatoin/lvInfoTerminologie']='LV Info - Terminology';
 $this->phrasen['courseInformation/terminologieDeutschEnglisch']='Terminology German-English';
 $this->phrasen['courseInformation/incomingplaetze']='Places Available for Incoming Students';
 $this->phrasen['courseInformation/pflichtfelderWerdenAufDerExternenSeiteAngezeigt']='Required fields are also displayed on the official website, and should therefore be completed';
+$this->phrasen['courseInformation/fallsSieAufzaehlungslistenVerwenden']='If you want to use bulleted lists, please enter them in the following format: <br/> <font style="color:blue">&lt;ul&gt;</font><br/><font style="color:green">&lt;li&gt;</font>List Item 1<font style="color:green">&lt;/li&gt;</font><font style="color:green">&lt;li&gt;</font>List Item 2<font style="color:green">&lt;/li&gt;</font><br/><font style="color:blue">&lt;/ul&gt;</font>';
 ?>

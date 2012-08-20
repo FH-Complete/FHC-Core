@@ -29,4 +29,5 @@ $this->phrasen['courseInformatoin/lvInfoTerminologie']='LV Info - Terminologie';
 $this->phrasen['courseInformation/terminologieDeutschEnglisch']='Terminologie Deutsch-Englisch';
 $this->phrasen['courseInformation/incomingplaetze']='Incomingplätze';
 $this->phrasen['courseInformation/pflichtfelderWerdenAufDerExternenSeiteAngezeigt']='Pflichtfelder werden auch auf der offiziellen Webseite angezeigt und sollten daher ausgefüllt werden';
+$this->phrasen['courseInformation/fallsSieAufzaehlungslistenVerwenden']='Falls Sie Aufzählungslisten verwenden möchten, geben Sie diese bitte in der folgenden Form ein: <br/> <font style="color:blue">&lt;ul&gt;</font><br/><font style="color:green">&lt;li&gt;</font>Listeneintrag1<font style="color:green">&lt;/li&gt;</font><font style="color:green">&lt;li&gt;</font>Listeneintrag2<font style="color:green">&lt;/li&gt;</font><br/><font style="color:blue">&lt;/ul&gt;</font>';
 ?>
