@@ -30,6 +30,7 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/frage.class.php');
 require_once('../../../include/vorschlag.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/studiengang.class.php');
   
 if (!$db = new basis_db())
 {
@@ -48,7 +49,10 @@ $rechte->getBerechtigungen($user);
 if(!$rechte->isBerechtigt('basis/testtool', null, 's'))
 	die('Sie haben keine Berechtigung fuer diese Seite');
 
-
+$studiengang = new studiengang();
+$studiengang->getAll('typ, kurzbz', false);
+$stg_kz = (isset($_GET['stg_kz'])?$_GET['stg_kz']:'-1');
+	
 if(isset($_GET['gebiet_id']))
 {
 	$gebiet_id = $_GET['gebiet_id'];
@@ -511,96 +515,134 @@ if(isset($_GET['type']) && $_GET['type']=='gebietpruefen' && isset($_GET['gebiet
 
 echo '<table width="100%"><tr><td>';
 
+//Liste der Studiengänge
+echo 'Studiengang: <select onchange="window.location.href=this.value">';
+		echo '<option value="'.$PHP_SELF.'?" '.$selected.'>Alle Studiengänge</option>';
+		foreach ($studiengang->result as $row) 
+		{
+			$stg_arr[$row->studiengang_kz] = $row->kuerzel;
+			if($stg_kz=='')
+				$stg_kz=$row->studiengang_kz;
+			if($row->studiengang_kz==$stg_kz)
+				$selected='selected="selected"';
+			else 
+				$selected='';
+				
+			echo '<option value="'.$PHP_SELF.'?stg_kz='.$row->studiengang_kz.'" '.$selected.'>'.$db->convert_html_chars($row->kuerzel).'</option>'."\n";
+		}
+		echo '</select>';
+
 //Liste der Gebiete
-$qry  = "SELECT * FROM testtool.tbl_gebiet ORDER BY bezeichnung";
-if($result = $db->db_query($qry))
-{
-	echo 'Gebiet: <select onchange="window.location.href=\''.$PHP_SELF.'?gebiet_id=\'+this.value;">';
-
-	while($row = $db->db_fetch_object($result))
-	{
-		if($gebiet_id=='')
-			$gebiet_id = $row->gebiet_id;
+	$qry= "SELECT * FROM testtool.tbl_ablauf WHERE studiengang_kz=".$stg_kz."";	
+	$anzahl = $db->db_num_rows($db->db_query($qry));
+	
+	if ($stg_kz!=="-1" && $anzahl!==0)
+		$qry= "SELECT * FROM testtool.tbl_gebiet LEFT JOIN testtool.tbl_ablauf USING (gebiet_id) WHERE studiengang_kz=".$stg_kz." ORDER BY semester,reihung";
+	else 
+		$qry= "SELECT * FROM testtool.tbl_gebiet ORDER BY bezeichnung";
 		
-		if($gebiet_id==$row->gebiet_id)
-			$selected='selected="selected"';
-		else 
-			$selected='';
+if (($anzahl!==0) || ($stg_kz=='-1') && ($stg_kz!==''))
+{
+	if($result = $db->db_query($qry))
+	{
+		echo ' Gebiet:<select onchange="window.location.href=\''.$PHP_SELF.'?stg_kz='.$stg_kz.'&amp;gebiet_id=\'+this.value;">';
+		//echo 'Gebiet: <select onchange="window.location.href=this.value">';
+	
+		while($row = $db->db_fetch_object($result))
+		{
+			if($gebiet_id=='')
+				$gebiet_id = $row->gebiet_id;
+			
+			if($gebiet_id==$row->gebiet_id)
+				$selected='selected="selected"';
+			else 
+				$selected='';
+			
+			if ($stg_kz=="-1")
+				echo '<option value="'.$row->gebiet_id.'" '.$selected.'>'.$row->bezeichnung.' - '.$row->kurzbz.' - '.$row->zeit.'</option>'."\n";
+			else 
+				echo '<option value="'.$row->gebiet_id.'" '.$selected.'>('.$row->semester.') - '.$row->bezeichnung.' - '.$row->kurzbz.' - '.$row->zeit.'</option>'."\n";
+		}
+		echo '</select>';
+	}
 		
-		echo '<option value="'.$row->gebiet_id.'" '.$selected.'>'.$row->gebiet_id.' - '.$row->bezeichnung.' - '.$row->kurzbz.' - '.$row->zeit.'</option>'."\n";
-	}
-	echo '</select>';
-}
-echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;type=gebietpruefen' class='Item'>Pruefen</a> | ";
-echo " <a href='edit_gebiet.php?gebiet_id=$gebiet_id' class='Item'>Bearbeiten</a>";
-echo '</td><td align="right">';
-
-//Liste der Sprachen
-
-$qry = "SELECT sprache FROM public.tbl_sprache ORDER BY sprache DESC";
-
-if($result = $db->db_query($qry))
-{
-	while($row = $db->db_fetch_object($result))
+	echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$nummer&amp;type=gebietpruefen' class='Item'>Pruefen</a> | ";
+	echo " <a href='edit_gebiet.php?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz' class='Item'>Bearbeiten</a>";
+	//echo " <br/>Gebiet_id=".$gebiet_id."";
+	echo '</td><td align="right">';
+	
+	//Liste der Sprachen
+	
+	$qry = "SELECT sprache FROM public.tbl_sprache ORDER BY sprache DESC";
+	
+	if($result = $db->db_query($qry))
 	{
-		if($sprache=='')
-			$sprache = $row->sprache;
-		if($sprache==$row->sprache)
-			$selected='style="border:1px solid black;"';
-		else 
-			$selected='';
-		echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;type=changesprache&amp;sprache=$row->sprache' class='Item' $selected><img src='../bild.php?src=flag&amp;sprache=$row->sprache' alt='$row->sprache' title='$row->sprache'/></a>";
+		while($row = $db->db_fetch_object($result))
+		{
+			if($sprache=='')
+				$sprache = $row->sprache;
+			if($sprache==$row->sprache)
+				$selected='style="border:1px solid black;"';
+			else 
+				$selected='';
+			echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;stg_kz=$stg_kz&amp;type=changesprache&amp;sprache=$row->sprache' class='Item' $selected><img src='../bild.php?src=flag&amp;sprache=$row->sprache' alt='$row->sprache' title='$row->sprache'/></a>";
+		}
 	}
-}
-echo '</td></tr></table>';
-echo '<br />';
-
-// Liste der Fragen
-$qry = "SELECT distinct nummer FROM testtool.tbl_frage WHERE gebiet_id='".addslashes($gebiet_id)."' ORDER BY nummer";
-
-if($result = $db->db_query($qry))
-{
-	echo 'Nummer: ';
-	while($row = $db->db_fetch_object($result))
+	echo '</td></tr></table>';
+	echo '<br />';
+	
+	// Liste der Fragen
+	$qry = "SELECT distinct nummer FROM testtool.tbl_frage WHERE gebiet_id='".addslashes($gebiet_id)."' ORDER BY nummer";
+	
+	if($result = $db->db_query($qry))
 	{
-		if($nummer=='')
-			$nummer = $row->nummer;
-
-		if($nummer==$row->nummer)
-			echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$row->nummer' class='Item'><u>$row->nummer</u></a> -";
-		else
-			echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$row->nummer' class='Item'>$row->nummer</a> -";
+		echo 'Nummer: ';
+		while($row = $db->db_fetch_object($result))
+		{
+			if($nummer=='')
+				$nummer = $row->nummer;
+	
+			if($nummer==$row->nummer)
+				echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$row->nummer' class='Item'><u>$row->nummer</u></a> -";
+			else
+				echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$row->nummer' class='Item'>$row->nummer</a> -";
+		}
+		echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;type=neuefrage' class='Item'>neue Frage hinzufuegen</a>";
+		if($nummer<$db->db_num_rows($result)-1)
+			echo " - <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=".($nummer+1)."' class='Item'>Weiter &gt;&gt;</a>";
 	}
-	echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;type=neuefrage' class='Item'>neue Frage hinzufuegen</a>";
-	if($nummer<$db->db_num_rows($result)-1)
-		echo " - <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=".($nummer+1)."' class='Item'>Weiter &gt;&gt;</a>";
-}
-
-echo "\n\n<br />";
-
-//Fragen holen
-$frage = new frage();
-$frage->getFragen($gebiet_id, $nummer);
-
-if(count($frage->result)==1)
-{
-	$frage_id = $frage->result[0]->frage_id;
-}
-else 
-{
-	//Wenn fuer diese Nummer mehrere Fragen vorhanden sind,
-	//koennen diese extra ausgewaehlt werden
-	echo 'FrageID: ';
-	foreach ($frage->result as $row) 
+	
+	echo "\n\n<br />";
+	
+	//Fragen holen
+	$frage = new frage();
+	$frage->getFragen($gebiet_id, $nummer);
+	
+	if(count($frage->result)==1)
 	{
-		if($frage_id=='')
-			$frage_id=$row->frage_id;
-		
-		if($frage_id==$row->frage_id)
-			echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$row->nummer&amp;frage_id=$row->frage_id' class='Item'><u>$row->frage_id</u></a> -";
-		else 
-			echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$row->nummer&amp;frage_id=$row->frage_id' class='Item'>$row->frage_id</a> -";
+		$frage_id = $frage->result[0]->frage_id;
 	}
+	else 
+	{
+		//Wenn fuer diese Nummer mehrere Fragen vorhanden sind,
+		//koennen diese extra ausgewaehlt werden
+		echo 'FrageID: ';
+		foreach ($frage->result as $row) 
+		{
+			if($frage_id=='')
+				$frage_id=$row->frage_id;
+			
+			if($frage_id==$row->frage_id)
+				echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$row->nummer&amp;frage_id=$row->frage_id' class='Item'><u>$row->frage_id</u></a> -";
+			else 
+				echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$row->nummer&amp;frage_id=$row->frage_id' class='Item'>$row->frage_id</a> -";
+		}
+	}
+}
+else
+{
+	echo ' <strong>Keine Gebiete in diesem Studiengang</strong> ';
+	echo '</td></tr></table>';
 }
 
 if($frage_id!='')
@@ -615,13 +657,13 @@ if($frage_id!='')
 	echo "<tr>";
 	//Upload Feld fuer Bild
 	echo "<td valign='bottom'>
-			<form method='POST' enctype='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;frage_id=$frage->frage_id'>
+			<form method='POST' enctype='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$nummer&amp;frage_id=$frage->frage_id'>
 			Bild: <input type='file' name='bild' />
 			<input type='submit' name='submitbild' value='Upload' />
 			</form>
 		</td>
 		<td>
-		<form method='POST' enctype='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;frage_id=$frage->frage_id'>
+		<form method='POST' enctype='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$nummer&amp;frage_id=$frage->frage_id'>
 			Audio: <input type='file' name='audio' />
 			<input type='submit' name='submitaudio' value='Upload' />
 			</form>
@@ -655,7 +697,7 @@ if($frage_id!='')
 	echo '</td>';
 	//Zusaetzliche EingabeFelder anzeigen
 	echo "<td>";
-	echo "<form name='formular_frage' method='POST' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;frage_id=$frage_id'>";
+	echo "<form name='formular_frage' method='POST' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$nummer&amp;frage_id=$frage_id'>";
 	echo "<table>";
 	//Bei Aenderungen im Textfeld werden diese sofort in der Vorschau angezeigt
 	//Wenn beim Speichern der Text kein Gueltiges XML ist, wird der vorige Text erneut angezeigt
@@ -672,7 +714,7 @@ if($frage_id!='')
 	echo "<input type='button' value='mfrac' onclick='insertfrage(\"&lt;mfrac&gt;\", \"&lt;/mfrac&gt;\")' title='Bruch' /><br/>";
 	echo "<input type='button' value='msup' onclick='insertfrage(\"&lt;msup&gt;\", \"&lt;/msup&gt;\")' title='Hochgestellt' /><br/>";
 	echo "<input type='button' value='msub' onclick='insertfrage(\"&lt;msub&gt;\", \"&lt;/msub&gt;\")' title='Tiefgestellt' /><br/>";
-	echo "<input type='button' value='mspace' onclick='insertfrage(\"&lt;mspace width=\&quot;2px\&quot;/&gt;\", \"\")' title='Leerraum (einstellbar)' /><br/>";
+	echo "<input type='button' value='mspace' onclick='insertfrage(\"&lt;mspace width=\&quot;3px\&quot;/&gt;\", \"\")' title='Leerraum (einstellbar)' /><br/>";
 	echo "<input type='button' value='mfenced' onclick='insertfrage(\"&lt;mfenced&gt;\", \"&lt;/mfenced&gt;\")' title='Große Klammern' /><br/>";
 	echo "<input type='button' value='msqrt' onclick='insertfrage(\"&lt;msqrt&gt;\", \"&lt;/msqrt&gt;\")' title='Wurzel' /><br/>";
 	echo "<input type='button' value='munderover' onclick='insertfrage(\"&lt;munderover&gt;&lt;mo movablelimits=\&quot;false\&quot;&gt;Das steht mittig&lt;/mo&gt;&lt;mo&gt;Das steht unten&lt;/mo&gt;&lt;mo&gt;Das steht oben&lt;/mo&gt;&lt;/munderover&gt;\", \"\")' title='Oben und unten' /><br/>";
@@ -708,7 +750,7 @@ if($frage_id!='')
 	}
 	//Vorschlag
 	echo '<b>Vorschlag'.($vorschlag_id!=''?' Edit':'').'</b><br /><br />';
-	echo "<form name='formular_vorschlag' method='POST' enctype='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;frage_id=$frage_id'>";
+	echo "<form name='formular_vorschlag' method='POST' enctype='multipart/form-data' action='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$nummer&amp;frage_id=$frage_id'>";
 	echo "<input type='hidden' name='vorschlag_id' value='$vorschlag->vorschlag_id' />";
 	echo '<table>';
 	echo "<tr><td>Nummer:</td><td><input type='text' name='nummer' size='3' id='nummer' value='$vorschlag->nummer' /><input type='button' value='1' onclick='document.getElementById(\"nummer\").value=\"1\";' /><input type='button' value='2' onclick='document.getElementById(\"nummer\").value=\"2\";' /><input type='button' value='3' onclick='document.getElementById(\"nummer\").value=\"3\";' /><input type='button' value='4' onclick='document.getElementById(\"nummer\").value=\"4\";' /></td></tr>";
@@ -728,7 +770,7 @@ if($frage_id!='')
 	echo "<input type='button' value='mfrac' onclick='insertvorschlag(\"&lt;mfrac&gt;\", \"&lt;/mfrac&gt;\")' title='Bruch' /><br/>";
 	echo "<input type='button' value='msup' onclick='insertvorschlag(\"&lt;msup&gt;\", \"&lt;/msup&gt;\")' title='Hochgestellt' /><br/>";
 	echo "<input type='button' value='msub' onclick='insertvorschlag(\"&lt;msub&gt;\", \"&lt;/msub&gt;\")' title='Tiefgestellt' /><br/>";
-	echo "<input type='button' value='mspace' onclick='insertvorschlag(\"&lt;mspace width=\&quot;2px\&quot;/&gt;\", \"\")' title='Leerraum (einstellbar)' /><br/>";
+	echo "<input type='button' value='mspace' onclick='insertvorschlag(\"&lt;mspace width=\&quot;3px\&quot;/&gt;\", \"\")' title='Leerraum (einstellbar)' /><br/>";
 	echo "<input type='button' value='mfenced' onclick='insertvorschlag(\"&lt;mfenced&gt;\", \"&lt;/mfenced&gt;\")' title='Große Klammern' /><br/>";
 	echo "<input type='button' value='msqrt' onclick='insertvorschlag(\"&lt;msqrt&gt;\", \"&lt;/msqrt&gt;\")' title='Wurzel' /><br/>";
 	echo "<input type='button' value='munderover' onclick='insertvorschlag(\"&lt;munderover&gt;&lt;mo movablelimits=\&quot;false\&quot;&gt;Das steht mittig&lt;/mo&gt;&lt;mo&gt;Das steht unten&lt;/mo&gt;&lt;mo&gt;Das steht oben&lt;/mo&gt;&lt;/munderover&gt;\", \"\")' title='Oben und unten' /><br/>";
@@ -743,7 +785,7 @@ if($frage_id!='')
 	//Upload Feld fuer Audio
 	echo "<td>Audio:</td><td><input type='file' name='audio' /></td></tr>";
 	
-	echo "<tr><td colspan='2' align='right'><input type='submit' name='submitvorschlag' value='Speichern' />".($vorschlag_id!=''?"<input type='button' value='Abbrechen' onclick=\"document.location.href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;frage_id=$frage->frage_id'\" />":'')."</td></tr>";
+	echo "<tr><td colspan='2' align='right'><input type='submit' name='submitvorschlag' value='Speichern' />".($vorschlag_id!=''?"<input type='button' value='Abbrechen' onclick=\"document.location.href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$nummer&amp;frage_id=$frage->frage_id'\" />":'')."</td></tr>";
 	//Vorschau fuer das Text-Feld
 	echo "<tr><td colspan='2'>Vorschau:<br /><div id='vorschauvorschlag' style='border: 1px solid black' align='center'>$vorschlag->text</div></td></tr>";
 	echo "</table>";
@@ -758,14 +800,21 @@ if($frage_id!='')
 	{
 		echo '<table><tr class="liste"><th>Nummer</th><th>Punkte</th><th>Text</th><th>Bild</th><th>Audio</th><th></th><th></th></tr>';
 
+		$a=array();
 		foreach ($vorschlag->result as $vs)
 		{
 			$i++;
-			echo "<tr class='liste".($i%2)."'><td>$vs->nummer</td>
-					  <td align='right'>$vs->punkte</td>
-					  <td>$vs->text</td>
+			echo "<tr class='liste".($i%2)."'><td>$vs->nummer</td>";
+					  if($vs->punkte>=0)
+					  {
+					  	echo "<td align='right'>$vs->punkte";
+					  }
+					  else
+					   echo "<td align='right' style='color:#FF8204'>$vs->punkte";
+					  echo "</td><td>$vs->text</td>
 					  <td><img src='../bild.php?src=vorschlag&amp;vorschlag_id=$vs->vorschlag_id&amp;sprache=$sprache' /></td>			
 					  <td>";
+			$a[] = $vs->punkte;
 			if($vs->audio!='')
 			{
 				//echo "<embed autostart='false' src='../sound.php?src=vorschlag&amp;vorschlag_id=".$vs->vorschlag_id."&amp;sprache=".$sprache."' height='20' width='150'/>";
@@ -780,10 +829,13 @@ if($frage_id!='')
 					</object>';
 			}
 			echo "	  </td>
-					  <td><a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;frage_id=$frage->frage_id&amp;vorschlag_id=$vs->vorschlag_id'>edit</a></td>
-					  <td><a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;nummer=$nummer&amp;frage_id=$frage->frage_id&amp;vorschlag_id=$vs->vorschlag_id&amp;type=delete' onclick=\"return confirm('Wollen Sie diesen Eintrag wirklich loeschen?')\">delete</a></td>
+					  <td><a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$nummer&amp;frage_id=$frage->frage_id&amp;vorschlag_id=$vs->vorschlag_id'>edit</a></td>
+					  <td><a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$nummer&amp;frage_id=$frage->frage_id&amp;vorschlag_id=$vs->vorschlag_id&amp;type=delete' onclick=\"return confirm('Wollen Sie diesen Eintrag wirklich loeschen?')\">delete</a></td>
 				  </tr>";
+		
 		}
+		
+		echo '<tr><td>Summe:</td><td align="left">'.number_format(array_sum($a),2, ".", "").'&nbsp;&nbsp;</td></tr>';
 		echo '</table>';
 	}
 }

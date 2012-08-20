@@ -50,6 +50,8 @@ if(isset($_GET['gebiet_id']))
 	$gebiet_id=$_GET['gebiet_id'];
 else 
 	$gebiet_id='';
+	
+$stg_kz = (isset($_GET['stg_kz'])?$_GET['stg_kz']:'-1');
 
 	
 echo '<h1>&nbsp;Gebiet bearbeiten</h1>';
@@ -60,7 +62,7 @@ if(!$rechte->isBerechtigt('basis/testtool'))
 $gebiet = new gebiet();
 $gebiet->getAll();
 
-echo '<a href="index.php?gebiet_id='.$gebiet_id.'" class="Item">Zurück zur Admin Seite</a><br /><br />';
+echo '<a href="index.php?gebiet_id='.$gebiet_id.'&amp;stg_kz='.$stg_kz.'" class="Item">Zurück zur Admin Seite</a><br /><br />';
 
 //Liste der Gebiete anzeigen
 echo '<form id="gebiet_form" action="'.$_SERVER['PHP_SELF'].'" method="GET">';
@@ -76,7 +78,7 @@ foreach ($gebiet->result as $row)
 	else 
 		$selected='';
 	
-	echo '<OPTION value="'.$row->gebiet_id.'" '.$selected.'>'.$row->gebiet_id.' - '.$row->bezeichnung.' - '.$row->kurzbz.' - '.$row->zeit.'</OPTION>';	
+	echo '<OPTION value="'.$row->gebiet_id.'" '.$selected.'>'.$row->bezeichnung.' - '.$row->kurzbz.' - '.$row->zeit.'</OPTION>';	
 }
 echo '</SELECT>
 	<input type="submit" value="Bearbeiten">
@@ -135,6 +137,9 @@ if($gebiet_id!='')
 	echo '<table>';
 	
 	echo '<tr>';
+	//ID
+	echo '<td>ID</td><td>'.$gebiet_id.'</td>';
+	echo '</tr><tr>';
 	//Kurzbz
 	echo '<td>Kurzbz</td><td><input type="text" maxlength="10" size="10" name="kurzbz" value="'.$gebiet->kurzbz.'"></td>';
 	echo '</tr><tr>';
