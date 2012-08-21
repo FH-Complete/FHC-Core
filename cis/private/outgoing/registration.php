@@ -51,7 +51,7 @@ if($outgoing->loadUid($uid))
             </tr>
             <tr>
                 <td align="center"> <form action ="outgoing.php?method=new&ansicht=auswahl" method="POST">
-                    <input type="submit" value="Zur Anmeldung"/>
+                    <input type="submit" value="<?php echo $p->t('incoming/zurAnmeldung');?>"/>
                      </form>
                 </td>
             </tr>
