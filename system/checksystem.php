@@ -3724,6 +3724,30 @@ if(!@$db->db_query("SELECT uid FROM wawi.tbl_betriebsmittelperson LIMIT 1"))
     else
         echo 'Tabelle wawi.tbl_betriebsmittelperson Spalte uid hinzugefuegt<br>';
 }
+
+// Bei Tabelle preoutgoing_lehrveranstaltung unitcode und wochenstunden hinzufügen
+if(!@$db->db_query("SELECT wochenstunden FROM public.tbl_preoutgoing_lehrveranstaltung LIMIT 1"))
+{
+    $qry ="ALTER TABLE public.tbl_preoutgoing_lehrveranstaltung ADD COLUMN wochenstunden numeric(5,2);
+        ALTER TABLE public.tbl_preoutgoing_lehrveranstaltung ADD COLUMN unitcode varchar(16);";
+    
+    if(!$db->db_query($qry))
+        echo '<strong>public.tbl_preoutgoing_lehrveranstaltung: '.$db->db_last_error().'</strong><br>';
+    else
+        echo 'Tabelle public.tbl_preoutgoing_lehrveranstaltung Spalten wochenstunden und unitcode hinzugefuegt<br>';
+}
+
+// Titel der Diplomarbeit hinzugefügt
+if(!@$db->db_query("SELECT projektarbeittitel FROM public.tbl_preoutgoing LIMIT 1"))
+{
+    $qry ="ALTER TABLE public.tbl_preoutgoing ADD COLUMN projektarbeittitel varchar(128);";
+    
+    if(!$db->db_query($qry))
+        echo '<strong>public.tbl_preoutgoing: '.$db->db_last_error().'</strong><br>';
+    else
+        echo 'Tabelle public.tbl_preoutgoing Spalte projektarbeittitel hinzugefuegt<br>';
+}
+
 echo '<br>';
 
 $tabellen=array(
@@ -3870,9 +3894,9 @@ $tabellen=array(
 	"public.tbl_preincoming_lehrveranstaltung"  => array("preincoming_id","lehrveranstaltung_id","insertamum","insertvon"),
 	"public.tbl_preinteressent"  => array("preinteressent_id","person_id","studiensemester_kurzbz","firma_id","erfassungsdatum","einverstaendnis","absagedatum","anmerkung","maturajahr","infozusendung","aufmerksamdurch_kurzbz","kontaktmedium_kurzbz","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preinteressentstudiengang"  => array("studiengang_kz","preinteressent_id","freigabedatum","uebernahmedatum","prioritaet","insertamum","insertvon","updateamum","updatevon"),
-	"public.tbl_preoutgoing" => array("preoutgoing_id","uid","dauer_von","dauer_bis","ansprechperson","bachelorarbeit","masterarbeit","betreuer","sprachkurs","intensivsprachkurs","sprachkurs_von","sprachkurs_bis","praktikum","praktikum_von","praktikum_bis","behinderungszuschuss","studienbeihilfe","anmerkung_student", "anmerkung_admin", "studienrichtung_gastuniversitaet", "insertamum","insertvon","updateamum","updatevon"),
+	"public.tbl_preoutgoing" => array("preoutgoing_id","uid","dauer_von","dauer_bis","ansprechperson","bachelorarbeit","masterarbeit","betreuer","sprachkurs","intensivsprachkurs","sprachkurs_von","sprachkurs_bis","praktikum","praktikum_von","praktikum_bis","behinderungszuschuss","studienbeihilfe","anmerkung_student", "anmerkung_admin", "studienrichtung_gastuniversitaet", "insertamum","insertvon","updateamum","updatevon","projektarbeittitel"),
 	"public.tbl_preoutgoing_firma" => array("preoutgoing_firma_id","preoutgoing_id","mobilitaetsprogramm_code","firma_id","name","auswahl"),
-	"public.tbl_preoutgoing_lehrveranstaltung" => array("preoutgoing_lehrveranstaltung_id","preoutgoing_id","bezeichnung","ects","endversion","insertamum","insertvon","updateamum","updatevon"),
+	"public.tbl_preoutgoing_lehrveranstaltung" => array("preoutgoing_lehrveranstaltung_id","preoutgoing_id","bezeichnung","ects","endversion","insertamum","insertvon","updateamum","updatevon","wochenstunden","unitcode"),
 	"public.tbl_preoutgoing_preoutgoing_status" => array("status_id","preoutgoing_status_kurzbz","preoutgoing_id","datum","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preoutgoing_status" => array("preoutgoing_status_kurzbz","bezeichnung"),
 	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat"),
