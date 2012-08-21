@@ -180,7 +180,7 @@ if(isset($_POST['submit_anmerkung']))
 	<head>
 		<title>Incoming</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-        <link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
+        <link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
         <link href="../../skin/tablesort.css" rel="stylesheet" type="text/css">
         <link href="../../skin/jquery.css" rel="stylesheet"  type="text/css"/>
         <script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
@@ -412,6 +412,45 @@ function print_personendetails()
             </td>
         </tr>';
 
+}
+else
+{
+    echo '
+            <tr>
+            <td  colspan=2>&nbsp;</td>
+            </tr>
+            <tr><td><b>Personendaten:</b></td></tr>
+            <tr>
+                <td>Vorname:</td><td><input type="text" name="vorname" value="'.$benutzer->vorname.'" disabled></td>
+                <td>Strasse:</t><td><input type="text" name="strasse" disabled value="'.$adr_strasse.'"></td>
+            </tr>
+            <tr>
+                <td>Nachname:</td><td><input type="text" name="nachname" value="'.$benutzer->nachname.'" disabled></td>
+                <td>PLZ/Ort:</td><td><input type="text" name="plz" size="4" disabled value="'.$adr_plz.'"> <input type="text" name="ort" disabled value="'.$adr_ort.'">
+            </tr>
+            <tr>
+                <td>Geburtsdatum:</td><td><input type="text" name="gebdatum" value="'.$datum->formatDatum($benutzer->gebdatum, 'd.m.Y').'" disabled>
+                <td>Staatsbürgerschaft:</td><td><input type="text" name="nationalitaet" value="'.$nation->kurztext.'" disabled></td>
+            </tr>
+            <tr>
+                <td>Geburtsort:</td><td><input type="text" name="gebort" value="'.$benutzer->gebort.'" disabled></td>
+                <td>Personenkennzeichen:</d><td><input type="text" name="pers_kz" value="'.$student->matrikelnr.'" disabled></td>
+            </tr>
+            <tr>
+                <td>Studiensemester:</td><td><input type="text" name="studienjahr" value="'.$prestudent->ausbildungssemester.'" disabled></td>
+                <td>Studiengang:</td><td><input type="text" name="studiengang" size="50" value="'.$studiengang->bezeichnung.'" disabled></td>
+            </tr>
+            <tr>
+                <td>Studientyp:</td><td><input type="text" name="studientyp" value="'.$studiengang->typ.'" disabled></td>
+                <td><a href ="mailto:'.$out->uid.'@'.DOMAIN.'">E-Mail schicken</a></td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>Anmerkung Student: </td><td colspan="2"><textarea rows="3" cols="25" name="anmerkungStudent">'.$out->anmerkung_student.'</textarea></td>
+            </tr>
+            </table>';
 }
 echo '</table></fieldset></form>'; 
     $outgoingStatus = new preoutgoing(); 
