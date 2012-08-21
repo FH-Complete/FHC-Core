@@ -110,4 +110,6 @@ $this->phrasen['incoming/zugangscode']='Zugangscode';
 $this->phrasen['incoming/projektarbeitstitel']='Projektarbeitstitel';
 $this->phrasen['incoming/unitcode']='Unitcode';
 $this->phrasen['incoming/zurAnmeldung']='Zur Anmeldung';
+$this->phrasen['incoming/geaendertesLA']='Geändertes Learning Agreement';
+$this->phrasen['incoming/studienrichtungGastuniversitaet']= 'Studienrichtung Gastuniversität';
 ?>
