@@ -806,6 +806,9 @@ class preoutgoing extends basis_db
     */
 	public function setStatus($preoutgoing_id, $status_kurzbz)
     {
+        if($this->checkStatus($preoutgoing_id, $status_kurzbz))
+            return true; 
+        
         $qry='BEGIN;INSERT INTO public.tbl_preoutgoing_preoutgoing_status (preoutgoing_status_kurzbz, preoutgoing_id, datum, insertamum, insertvon, updateamum, updatevon)
             VALUES('.$this->db_add_param($status_kurzbz).', '
             .$this->db_add_param($preoutgoing_id, FHC_INTEGER).', 
@@ -920,7 +923,7 @@ class preoutgoing extends basis_db
     public function getOutgoingFilter($name ='', $von ='', $bis='', $status='')
     {
         $qry ="SELECT distinct(pre.preoutgoing_id), person.vorname, person.nachname, pre.* FROM public.tbl_preoutgoing pre 
-                JOIN public.tbl_preoutgoing_preoutgoing_status status USING(preoutgoing_id) 
+                LEFT JOIN public.tbl_preoutgoing_preoutgoing_status status USING(preoutgoing_id) 
                 JOIN public.tbl_benutzer benutzer USING(uid)
                 JOIN public.tbl_person person USING(person_id)
                 WHERE (vorname LIKE '%".$name."%' OR nachname LIKE'%".$name."%')";
@@ -933,7 +936,7 @@ class preoutgoing extends basis_db
         
         if($status != '')
             $qry.= "AND status.preoutgoing_status_kurzbz =".$this->db_add_param ($status, FHC_STRING);      
-        
+
         if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
@@ -1007,7 +1010,8 @@ class preoutgoing extends basis_db
      */
     public function getAktuellOutgoing()
     {
-        $qry = "SELECT * FROM public.tbl_preoutgoing WHERE dauer_von < CURRENT_DATE AND dauer_bis > CURRENT_DATE;";
+        $qry = "SELECT * FROM public.tbl_preoutgoing where now() between dauer_von and dauer_bis;";
+        //$qry = "SELECT * FROM public.tbl_preoutgoing WHERE dauer_von < CURRENT_DATE AND dauer_bis > CURRENT_DATE;";
         
         if(!$this->db_query($qry))
         {
