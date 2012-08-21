@@ -120,7 +120,7 @@ echo '
 $preoutgoing = new preoutgoing(); 
 $preoutgoing->getAllStatiKurzbz();
 echo '<td><SELECT name="select_status">
-        <option value="">-- select -- </option>';
+        <option value="">-- alle -- </option>';
 foreach($preoutgoing->stati as $status_filter)
 {
     $selected = '';
@@ -148,6 +148,7 @@ echo '
 	<thead>
 		<tr>
 			<th>ID</th>
+            <th>UID</th>
 			<th>Vorname</th>
 			<th>Nachname</th>
 			<th>Von</th>
@@ -163,6 +164,7 @@ foreach($out->result as $row)
 	echo "\n";
 	echo '<tr>';
 	echo '<td>'.$row->preoutgoing_id.'</td>';
+    echo '<td>'.$row->uid.'</td>';
 	echo '<td>'.$user->vorname.'</td>';
 	echo '<td>'.$user->nachname.'</td>';
 	echo '<td>'.$row->dauer_von.'</td>';
