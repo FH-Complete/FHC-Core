@@ -240,7 +240,7 @@ class variable extends basis_db
 		}
 		
 		if (!isset($this->variable->db_stpl_table))
-			$this->variable->db_stpl_table='stundenplan';
+			$this->variable->db_stpl_table='stundenplandev';
 
 		if (!isset($this->variable->emailadressentrennzeichen))
 			$this->variable->emailadressentrennzeichen=',';
