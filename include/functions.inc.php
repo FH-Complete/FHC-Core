@@ -299,7 +299,7 @@ function loadVariables($user)
 	if (!isset($db_stpl_table))
 	{
 		global $db_stpl_table;
-		$db_stpl_table='stundenplan';
+		$db_stpl_table='stundenplandev';
 	}
 
 	if (!isset($kontofilterstg))
