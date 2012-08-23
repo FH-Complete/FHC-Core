@@ -82,7 +82,7 @@ xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:off
 
 
  <text:p text:style-name="P1">
-  		<draw:frame draw:style-name="fr1" draw:name="Grafik_{$uid}" text:anchor-type="char" svg:x="0.55cm" svg:y="2.3cm" svg:width="2cm" svg:height="2.6cm" draw:z-index="{$idx}5">
+  		<draw:frame draw:style-name="fr1" draw:name="Grafik_{$uid}" text:anchor-type="char" svg:x="0.5cm" svg:y="2.3cm" svg:width="1.95cm" svg:height="2.6cm" draw:z-index="{$idx}5">
           <draw:image xlink:href="Pictures/{$uid}.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>
         </draw:frame>
          <draw:frame text:anchor-type="paragraph" draw:z-index="{$idx}0" draw:style-name="gr1" draw:text-style-name="P7" svg:width="5cm" svg:height="0.3cm" svg:x="2.94cm" svg:y="2.95cm">
