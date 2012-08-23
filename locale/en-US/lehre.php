@@ -29,4 +29,8 @@ $this->phrasen['lehre/moodleMitKreuzerltoolInfo']='You can\'t use Moodle togethe
 
 $this->phrasen['lehre/gesamtnote']='Final Grade';
 $this->phrasen['lehre/studentenAbgabe']='Student Uploads';
+
+$this->phrasen['lehre/mail']='E-Mail to students';
+$this->phrasen['lehre/keinMailverteiler']='There is no e-mail distribution list for the group(s) %s! The students in these groups will not receive an e-mail.';
+
 ?>
