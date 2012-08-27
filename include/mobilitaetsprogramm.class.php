@@ -43,8 +43,10 @@ class mobilitaetsprogramm extends basis_db
 		$qry ="Select * From bis.tbl_mobilitaetsprogramm ";
 		
 		if($sichtbar == true)
-			$qry.="where sichtbar = 'true';"; 
+			$qry.="where sichtbar = 'true'"; 
 		
+        $qry.=';';
+        
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -75,7 +77,7 @@ class mobilitaetsprogramm extends basis_db
      */
     public function load($mobilitaetsprogramm_code)
     {
-        $qry ="SELECT * FROM bis.tbl_mobilitaetsprogramm where mobilitaetsprogramm_code =".$this->db_add_param($mobilitaetsprogramm_code, FHC_INTEGER);
+        $qry ="SELECT * FROM bis.tbl_mobilitaetsprogramm where mobilitaetsprogramm_code =".$this->db_add_param($mobilitaetsprogramm_code, FHC_INTEGER).';';
         if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -110,7 +112,7 @@ class mobilitaetsprogramm extends basis_db
 					bis.tbl_mobilitaetsprogramm 
 					JOIN public.tbl_firma_mobilitaetsprogramm USING(mobilitaetsprogramm_code)
 				WHERE
-					firma_id=".$this->db_add_param($firma_id, FHC_INTEGER);
+					firma_id=".$this->db_add_param($firma_id, FHC_INTEGER).';';
 		
 		if($this->db_query($qry))
 		{
