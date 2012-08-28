@@ -56,10 +56,10 @@ class lehrverband extends basis_db
 	public function exists($studiengang_kz, $semester, $verband, $gruppe)
 	{
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_lehrverband WHERE
-		            studiengang_kz='".addslashes($studiengang_kz)."' AND
-		            semester='".addslashes($semester)."' AND
-		            trim(verband)='".trim(addslashes($verband))."' AND
-		            trim(gruppe)='".trim(addslashes($gruppe))."'";
+		            studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER)." AND
+		            semester=".$this->db_add_param($semester, FHC_INTEGER)." AND
+		            trim(verband)=".trim($this->db_add_param($verband))." AND
+		            trim(gruppe)=".trim($this->db_add_param($gruppe)).";";
 
 		if($this->db_query($qry))
 		{
@@ -95,10 +95,10 @@ class lehrverband extends basis_db
 	public function load($studiengang_kz, $semester, $verband, $gruppe)
 	{
 		$qry = "SELECT * FROM public.tbl_lehrverband
-				WHERE studiengang_kz='".addslashes($studiengang_kz)."'
-				AND semester='".addslashes($semester)."'
-				AND verband='".addslashes($verband)."'
-				AND gruppe='".addslashes($gruppe)."'";
+				WHERE studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER)."
+				AND semester=".$this->db_add_param($semester, FHC_INTEGER)."
+				AND verband=".$this->db_add_param($verband)."
+				AND gruppe=".$this->db_add_param($gruppe).";";
 		
 		if($this->db_query($qry))
 		{
@@ -108,7 +108,7 @@ class lehrverband extends basis_db
 				$this->semester = $row->semester;
 				$this->verband = $row->verband;
 				$this->gruppe = $row->gruppe;
-				$this->aktiv = ($row->aktiv=='t'?true:false);
+				$this->aktiv = $this->db_parse_bool($row->aktiv);
 				$this->bezeichnung = $row->bezeichnung;
 				$this->orgform_kurzbz = $row->orgform_kurzbz;
 				return true;
@@ -166,13 +166,13 @@ class lehrverband extends basis_db
 	{
 		$qry = 'SELECT * FROM public.tbl_lehrverband WHERE aktiv=true';
 		if(!is_null($studiengang_kz))
-			$qry .=' AND studiengang_kz='.$this->addslashes($studiengang_kz);
+			$qry .=' AND studiengang_kz='.$this->db_add_param($studiengang_kz, FHC_INTEGER);
 		if(!is_null($semester))
-			$qry .=' AND semester='.$this->addslashes($semester);
+			$qry .=' AND semester='.$this->db_add_param($semester, FHC_INTEGER);
 		if(!is_null($verband))
-			$qry .=' AND verband='.$this->addslashes($verband);
+			$qry .=' AND verband='.$this->db_add_param($verband);
 
-		$qry .= ' ORDER BY studiengang_kz, semester, verband, gruppe';
+		$qry .= ' ORDER BY studiengang_kz, semester, verband, gruppe;';
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -183,7 +183,7 @@ class lehrverband extends basis_db
 				$lv_obj->semester = $row->semester;
 				$lv_obj->verband = $row->verband;
 				$lv_obj->gruppe = $row->gruppe;
-				$lv_obj->aktiv = $row->aktiv;
+				$lv_obj->aktiv = $this->db_parse_bool($row->aktiv);
 				$lv_obj->bezeichnung = $row->bezeichnung;
 				$lv_obj->orgform_kurzbz = $row->orgform_kurzbz;
 
@@ -216,24 +216,24 @@ class lehrverband extends basis_db
 		if($new)
 		{
 			$qry = 'INSERT INTO public.tbl_lehrverband (studiengang_kz, semester, verband, gruppe, aktiv, bezeichnung, orgform_kurzbz)
-			        VALUES('.$this->addslashes($this->studiengang_kz).','.
-					$this->addslashes($this->semester).','.
-					$this->addslashes($this->verband).','.
-					$this->addslashes($this->gruppe).','.
-					($this->aktiv?'true':'false').','.
-					$this->addslashes($this->bezeichnung).','.
-					$this->addslashes($this->orgform_kurzbz).');';
+			        VALUES('.$this->db_add_param($this->studiengang_kz, FHC_INTEGER).','.
+					$this->db_add_param($this->semester, FHC_INTEGER).','.
+					$this->db_add_param($this->verband).','.
+					$this->db_add_param($this->gruppe).','.
+					$this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
+					$this->db_add_param($this->bezeichnung).','.
+					$this->db_add_param($this->orgform_kurzbz).');';
 		}
 		else 
 		{
 			$qry = "UPDATE public.tbl_lehrverband SET ".
-				   " aktiv=".($this->aktiv?'true':'false').", ".
-				   " bezeichnung='".addslashes($this->bezeichnung)."',".
-				   " orgform_kurzbz=".$this->addslashes($this->orgform_kurzbz).
-				   " WHERE studiengang_kz='".addslashes($this->studiengang_kz)."'".
-				   " AND semester='".addslashes($this->semester)."'".
-				   " AND verband='".addslashes($this->verband)."'".
-				   " AND gruppe='".addslashes($this->gruppe)."';";
+				   " aktiv=".$this->db_add_param($this->aktiv, FHC_BOOLEAN).", ".
+				   " bezeichnung=".$this->db_add_param($this->bezeichnung).",".
+				   " orgform_kurzbz=".$this->db_add_param($this->orgform_kurzbz).
+				   " WHERE studiengang_kz=".db_add_param($this->studiengang_kz, FHC_INTEGER).
+				   " AND semester=".db_add_param($this->semester, FHC_INTEGER).
+				   " AND verband=".db_add_param($this->verband).
+				   " AND gruppe=".db_add_param($this->gruppe).";";
 		}
 
 		if($this->db_query($qry))

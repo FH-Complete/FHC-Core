@@ -63,7 +63,7 @@ class lehrfach extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * FROM lehre.tbl_lehrfach WHERE lehrfach_id='$lehrfach_id'";
+		$qry = "SELECT * FROM lehre.tbl_lehrfach WHERE lehrfach_id=".$this->db_add_param($lehrfach_id, FHC_INTEGER).';';
 
 		if(!$this->db_query($qry))
 		{
@@ -79,7 +79,7 @@ class lehrfach extends basis_db
 			$this->kurzbz = $row->kurzbz;
 			$this->bezeichnung = $row->bezeichnung;
 			$this->farbe = $row->farbe;
-			$this->aktiv = ($row->aktiv=='t'?true:false);
+			$this->aktiv = $this->db_parse_bool($row->aktiv);
 			$this->semester = $row->semester;
 			$this->sprache = $row->sprache;
 			$this->ext_id = $row->ext_id;
@@ -161,16 +161,16 @@ class lehrfach extends basis_db
 			$qry = 'BEGIN;INSERT INTO lehre.tbl_lehrfach (lehrfach_id, studiengang_kz, fachbereich_kurzbz, kurzbz,
 			                                  bezeichnung, farbe, aktiv, semester, sprache, ext_id)
 			        VALUES('.
-					($this->lehrfach_id!=''?$this->addslashes($this->lehrfach_id):"nextval('lehre.tbl_lehrfach_lehrfach_id_seq')").','. // HuschPfusch 4 Syncro
-					$this->addslashes($this->studiengang_kz).','.
-					$this->addslashes($this->fachbereich_kurzbz).','.
-					$this->addslashes($this->kurzbz).','.
+					($this->lehrfach_id!=''?$this->db_add_param($this->lehrfach_id, FHC_INTEGER):"nextval('lehre.tbl_lehrfach_lehrfach_id_seq')").','. // HuschPfusch 4 Syncro
+					$this->db_add_param($this->studiengang_kz, FHC_INTEGER).','.
+					$this->db_add_param($this->fachbereich_kurzbz).','.
+					$this->db_add_param($this->kurzbz).','.
 					$this->addslashes($this->bezeichnung).','.
 					$this->addslashes($this->farbe).','.
-					($this->aktiv?'true':'false').','.
-					$this->addslashes($this->semester).','.
+					$this->addslashes($this->aktiv, FHC_BOOLEAN).','.
+					$this->addslashes($this->semester, FHC_INTEGER).','.
 					$this->addslashes($this->sprache).','.
-					$this->addslashes($this->ext_id).');';
+					$this->addslashes($this->ext_id, FHC_INTEGER).');';
 		}
 		else
 		{
@@ -182,16 +182,16 @@ class lehrfach extends basis_db
 			}
 
 			$qry = 'UPDATE lehre.tbl_lehrfach SET'.
-			       ' studiengang_kz='.$this->addslashes($this->studiengang_kz).','.
-			       ' fachbereich_kurzbz='.$this->addslashes($this->fachbereich_kurzbz).','.
-			       ' kurzbz='.$this->addslashes($this->kurzbz).','.
-			       ' bezeichnung='.$this->addslashes($this->bezeichnung).','.
-			       ' farbe='.$this->addslashes($this->farbe).','.
-			       ' aktiv='.($this->aktiv?'true':'false').','.
-			       ' semester='.$this->semester.','.
-			       ' ext_id='.$this->addslashes($this->ext_id).','.
-			       ' sprache='.$this->addslashes($this->sprache).
-			       " WHERE lehrfach_id='$this->lehrfach_id'";
+			       ' studiengang_kz='.$this->db_add_param($this->studiengang_kz, FHC_INTEGER).','.
+			       ' fachbereich_kurzbz='.$this->db_add_param($this->fachbereich_kurzbz).','.
+			       ' kurzbz='.$this->db_add_param($this->kurzbz).','.
+			       ' bezeichnung='.$this->db_add_param($this->bezeichnung).','.
+			       ' farbe='.$this->db_add_param($this->farbe).','.
+			       ' aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
+			       ' semester='.$this->db_add_param($this->semester, FHC_INTEGER).','.
+			       ' ext_id='.$this->db_add_param($this->ext_id, FHC_INTEGER).','.
+			       ' sprache='.$this->db_add_param($this->sprache).
+			       " WHERE lehrfach_id=".$this->db_add_param($this->lehrfach_id, FHC_INTEGER).';';
 		}
 
 		if($this->db_query($qry))
@@ -200,7 +200,7 @@ class lehrfach extends basis_db
 			{
 				if($this->lehrfach_id=='')
 				{
-					$qry = "SELECT currval('lehre.tbl_lehrfach_lehrfach_id_seq') as id";
+					$qry = "SELECT currval('lehre.tbl_lehrfach_lehrfach_id_seq') as id;";
 					if($this->db_query($qry))
 					{
 						if($row = $this->db_fetch_object())
@@ -210,18 +210,18 @@ class lehrfach extends basis_db
 						else 
 						{
 							$this->errormsg = 'Fehler beim Auslesen der Sequence';
-							$this->db_query('ROLLBACK');
+							$this->db_query('ROLLBACK;');
 							return false;
 						}
 					}
 					else 
 					{
 						$this->errormsg = 'Fehler beim Auslesen der Sequence';
-						$this->db_query('ROLLBACK');
+						$this->db_query('ROLLBACK;');
 						return false;
 					}
 				}
-				$this->db_query('COMMIT');
+				$this->db_query('COMMIT;');
 			}
 			//Log schreiben
 			return true;
@@ -259,15 +259,15 @@ class lehrfach extends basis_db
 		   $sql_query .= " WHERE true";
 
 		if($stg!=null)
-		   $sql_query .= " AND studiengang_kz='".addslashes($stg)."'";
+		   $sql_query .= " AND studiengang_kz=".$this->db_add_param($stg, FHC_INTEGER);
 
 		if($sem!=null)
-			$sql_query .= " AND semester='".addslashes($sem)."'";
+			$sql_query .= " AND semester=".$this->db_add_param($sem, FHC_INTEGER);
 
 		if($fachb!=null)
-			$sql_query .= " AND fachbereich_kurzbz='".addslashes($fachb)."'";
+			$sql_query .= " AND fachbereich_kurzbz=".$this->db_add_param($fachb);
 
-		$sql_query .= " ORDER BY $order";
+		$sql_query .= " ORDER BY $order;";
 
 		if($this->db_query($sql_query))
 		{
@@ -279,7 +279,7 @@ class lehrfach extends basis_db
 				$l->kurzbz = $row->kurzbz;
 				$l->bezeichnung = $row->bezeichnung;
 				$l->farbe = $row->farbe;
-				$l->aktiv = $row->aktiv;
+				$l->aktiv = $this->db_parse_bool($row->aktiv);
 				$l->studiengang_kz = $row->studiengang_kz;
 				$l->semester = $row->semester;
 				$l->sprache = $row->sprache;

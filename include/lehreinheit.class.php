@@ -85,7 +85,7 @@ class lehreinheit extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$lehreinheit_id'";
+		$qry = "SELECT * FROM lehre.tbl_lehreinheit WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER).';';
 
 		if($this->db_query($qry))
 		{
@@ -101,7 +101,7 @@ class lehreinheit extends basis_db
 				$this->start_kw = $row->start_kw;
 				$this->raumtyp = $row->raumtyp;
 				$this->raumtypalternativ = $row->raumtypalternativ;
-				$this->lehre = ($row->lehre=='t'?true:false);
+				$this->lehre = $this->db_parse_bool($row->lehre);
 				$this->anmerkung = $row->anmerkung;
 				$this->unr = $row->unr;
 				$this->lvnr = $row->lvnr;
@@ -138,7 +138,7 @@ class lehreinheit extends basis_db
 			$this->errormsg = 'Lehreinheit_id muss eine gueltige Zahl sein';
 		}
 
-		$qry = "SELECT * FROM campus.vw_lehreinheit WHERE lehreinheit_id='$lehreinheit_id'";
+		$qry = "SELECT * FROM campus.vw_lehreinheit WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER).';';
 
 		if($this->db_query($qry))
 		{
@@ -156,7 +156,7 @@ class lehreinheit extends basis_db
 				$this->raumtyp = $row->raumtyp;
 				$this->raumtypalternativ = $row->raumtypalternativ;
 				$this->sprache = $row->sprache;
-				$this->lehre = ($row->lehre=='t'?true:false);
+				$this->lehre = $this->db_parse_bool($row->lehre);
 				$this->anmerkung = $row->anmerkung;
 				$this->unr = $row->unr;
 				$this->lvnr = $row->lvnr;
@@ -204,16 +204,16 @@ class lehreinheit extends basis_db
 		$this->errormsg ='';
 		
 		$qry = "SELECT * FROM lehre.tbl_lehreinheit WHERE 
-				lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."' 
-				AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+				lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)." 
+				AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 
 		if($uid!='')
-			$qry .= " AND lehreinheit_id IN ( SELECT lehreinheit_id FROM lehre.tbl_lehreinheitmitarbeiter WHERE mitarbeiter_uid='".addslashes($uid)."')";
+			$qry .= " AND lehreinheit_id IN ( SELECT lehreinheit_id FROM lehre.tbl_lehreinheitmitarbeiter WHERE mitarbeiter_uid=".$this->db_add_param($uid).")";
 
 		if($fachbereich_kurzbz!='')
-			$qry .= " AND lehrfach_id IN ( SELECT lehrfach_id FROM lehre.tbl_lehrfach WHERE fachbereich_kurzbz='".addslashes($fachbereich_kurzbz)."')";
+			$qry .= " AND lehrfach_id IN ( SELECT lehrfach_id FROM lehre.tbl_lehrfach WHERE fachbereich_kurzbz=".$this->db_add_param($fachbereich_kurzbz).")";
 
-		$qry.= "ORDER BY lehreinheit_id";
+		$qry.= "ORDER BY lehreinheit_id;";
 		
 		if($this->db_query($qry))
 		{
@@ -231,7 +231,7 @@ class lehreinheit extends basis_db
 				$le_obj->start_kw = $row->start_kw;
 				$le_obj->raumtyp = $row->raumtyp;
 				$le_obj->raumtypalternativ = $row->raumtypalternativ;
-				$le_obj->lehre = ($row->lehre=='t'?true:false);
+				$le_obj->lehre = $this->db_parse_bool($row->lehre);
 				$le_obj->anmerkung = $row->anmerkung;
 				$le_obj->unr = $row->unr;
 				$le_obj->lvnr = $row->lvnr;
@@ -377,54 +377,54 @@ class lehreinheit extends basis_db
 		if($new)
 		{
 			if($this->unr=='')
-				$unr="currval('lehre.tbl_lehreinheit_lehreinheit_id_seq')";
+				$unr="currval('lehre.tbl_lehreinheit_lehreinheit_id_seq');";
 			else
-				$unr = $this->addslashes($this->unr);
+				$unr = $this->db_add_param($this->unr, FHC_INTEGER);
 			//ToDo ID entfernen
 			$qry = 'BEGIN; INSERT INTO lehre.tbl_lehreinheit (lehrveranstaltung_id, studiensemester_kurzbz,
 			                                     lehrfach_id, lehrform_kurzbz, stundenblockung, wochenrythmus,
 			                                     start_kw, raumtyp, raumtypalternativ, lehre, anmerkung, unr, lvnr, insertamum, insertvon, updateamum, updatevon,  ext_id, sprache)
-			        VALUES('.$this->addslashes($this->lehrveranstaltung_id).','.
-					$this->addslashes($this->studiensemester_kurzbz).','.
-					$this->addslashes($this->lehrfach_id).','.
-					$this->addslashes($this->lehrform_kurzbz).','.
-					$this->addslashes($this->stundenblockung).','.
-					$this->addslashes($this->wochenrythmus).','.
-					$this->addslashes($this->start_kw).','.
-					$this->addslashes($this->raumtyp).','.
-					$this->addslashes($this->raumtypalternativ).','.
-					($this->lehre?'true':'false').','.
-					$this->addslashes($this->anmerkung).','.
+			        VALUES('.$this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER).','.
+					$this->db_add_param($this->studiensemester_kurzbz).','.
+					$this->db_add_param($this->lehrfach_id, FHC_INTEGER).','.
+					$this->db_add_param($this->lehrform_kurzbz).','.
+					$this->db_add_param($this->stundenblockung, FHC_INTEGER).','.
+					$this->db_add_param($this->wochenrythmus, FHC_INTEGER).','.
+					$this->db_add_param($this->start_kw, FHC_INTEGER).','.
+					$this->db_add_param($this->raumtyp).','.
+					$this->db_add_param($this->raumtypalternativ).','.
+					$this->db_add_param($this->lehre, FHC_BOOLEAN).','.
+					$this->db_add_param($this->anmerkung).','.
 					$unr.','.
-					$this->addslashes($this->lvnr).','.
-					$this->addslashes($this->insertamum).','.
-					$this->addslashes($this->insertvon).','.
-					$this->addslashes($this->updateamum).','.
-					$this->addslashes($this->updatevon).','.
-					$this->addslashes($this->ext_id).','.
-					$this->addslashes($this->sprache).');';
+					$this->db_add_param($this->lvnr, FHC_INTEGER).','.
+					$this->db_add_param($this->insertamum).','.
+					$this->db_add_param($this->insertvon).','.
+					$this->db_add_param($this->updateamum).','.
+					$this->db_add_param($this->updatevon).','.
+					$this->db_add_param($this->ext_id, FHC_INTEGER).','.
+					$this->db_add_param($this->sprache).');';
 		}
 		else
 		{
 			$qry = 'UPDATE lehre.tbl_lehreinheit SET'.
-			       ' lehrveranstaltung_id='.$this->addslashes($this->lehrveranstaltung_id).','.
-			       ' studiensemester_kurzbz='.$this->addslashes($this->studiensemester_kurzbz).','.
-			       ' lehrfach_id='.$this->addslashes($this->lehrfach_id).','.
-			       ' lehrform_kurzbz='.$this->addslashes($this->lehrform_kurzbz).','.
-			       ' stundenblockung='.$this->addslashes($this->stundenblockung).','.
-			       ' wochenrythmus='.$this->addslashes($this->wochenrythmus).','.
-			       ' start_kw='.$this->addslashes($this->start_kw).','.
-			       ' raumtyp='.$this->addslashes($this->raumtyp).','.
-			       ' raumtypalternativ='.$this->addslashes($this->raumtypalternativ).','.
-			       ' lehre='.($this->lehre?'true':'false').','.
-			       ' anmerkung='.$this->addslashes($this->anmerkung).','.
-			       ' unr='.$this->addslashes($this->unr).','.
-			       ' lvnr='.$this->addslashes($this->lvnr).','.
-				   ' updateamum='.$this->addslashes($this->updateamum).','.
-				   ' updatevon='.$this->addslashes($this->updatevon).','.
-				   ' sprache='.$this->addslashes($this->sprache).','.
-			       ' ext_id='.$this->addslashes($this->ext_id).
-			       " WHERE lehreinheit_id=".$this->addslashes($this->lehreinheit_id).";";
+			       ' lehrveranstaltung_id='.$this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER).','.
+			       ' studiensemester_kurzbz='.$this->db_add_param($this->studiensemester_kurzbz).','.
+			       ' lehrfach_id='.$this->db_add_param($this->lehrfach_id, FHC_INTEGER).','.
+			       ' lehrform_kurzbz='.$this->db_add_param($this->lehrform_kurzbz).','.
+			       ' stundenblockung='.$this->db_add_param($this->stundenblockung, FHC_INTEGER).','.
+			       ' wochenrythmus='.$this->db_add_param($this->wochenrythmus, FHC_INTEGER).','.
+			       ' start_kw='.$this->db_add_param($this->start_kw, FHC_INTEGER).','.
+			       ' raumtyp='.$this->db_add_param($this->raumtyp).','.
+			       ' raumtypalternativ='.$this->db_add_param($this->raumtypalternativ).','.
+			       ' lehre='.$this->db_add_param($this->lehre, FHC_BOOLEAN).','.
+			       ' anmerkung='.$this->db_add_param($this->anmerkung).','.
+			       ' unr='.$this->db_add_param($this->unr, FHC_INTEGER).','.
+			       ' lvnr='.$this->db_add_param($this->lvnr, FHC_INTEGER).','.
+				   ' updateamum='.$this->db_add_param($this->updateamum).','.
+				   ' updatevon='.$this->db_add_param($this->updatevon).','.
+				   ' sprache='.$this->db_add_param($this->sprache).','.
+			       ' ext_id='.$this->db_add_param($this->ext_id, FHC_INTEGER).
+			       " WHERE lehreinheit_id=".$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).";";
 		}
 		
 		if($this->db_query($qry))
@@ -432,7 +432,7 @@ class lehreinheit extends basis_db
 			if($new)
 			{
 				//Sequence auslesen
-				$qry ="SELECT currval('lehre.tbl_lehreinheit_lehreinheit_id_seq') AS lehreinheit_id";
+				$qry ="SELECT currval('lehre.tbl_lehreinheit_lehreinheit_id_seq') AS lehreinheit_id;";
 				if($this->db_query($qry))
 				{
 					if($row = $this->db_fetch_object())
@@ -796,7 +796,7 @@ class lehreinheit extends basis_db
 		
 		//Pruefen ob schon eine Kreuzerlliste fuer diese Lehreinheit angelegt wurde.
 		//Falls ja dann wird das loeschen verweigert
-		$qry = "SELECT count(*) as anzahl FROM campus.tbl_uebung WHERE lehreinheit_id='$lehreinheit_id'";
+		$qry = "SELECT count(*) as anzahl FROM campus.tbl_uebung WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER).";";
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -808,54 +808,90 @@ class lehreinheit extends basis_db
 				}
 				else
 				{
-					$this->db_query('BEGIN');
+					$this->db_query('BEGIN;');
 
 					//UNDO Befehl zusammenbauen
 					$undosql='';
 
 					//LehreinheitMitarbeiter
-					$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$lehreinheit_id'";
+					$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER).';';
 					if($this->db_query($qry))
 					{
 						while($row = $this->db_fetch_object())
 						{
 							$undosql.=" INSERT INTO lehre.tbl_lehreinheitmitarbeiter(lehreinheit_id, mitarbeiter_uid, lehrfunktion_kurzbz, planstunden, stundensatz, faktor, anmerkung, bismelden, updateamum, updatevon, insertamum, insertvon, semesterstunden)
-							            VALUES(".$this->addslashes($row->lehreinheit_id).",".$this->addslashes($row->mitarbeiter_uid).",".$this->addslashes($row->lehrfunktion_kurzbz).",".$this->addslashes($row->planstunden).",".$this->addslashes($row->stundensatz).",".$this->addslashes($row->faktor).",".
-										$this->addslashes($row->anmerkung).",".($row->bismelden=='t'?'true':'false').",".$this->addslashes($row->updateamum).",".$this->addslashes($row->updatevon).",".$this->addslashes($row->insertamum).",".$this->addslashes($row->insertvon).",".$this->addslashes($row->semesterstunden).");";
+							            VALUES(".$this->db_add_param($row->lehreinheit_id, FHC_INTEGER).",".
+                                        $this->db_add_param($row->mitarbeiter_uid).",".
+                                        $this->db_add_param($row->lehrfunktion_kurzbz).",".
+                                        $this->db_add_param($row->planstunden, FHC_INTEGER).",".
+                                        $this->db_add_param($row->stundensatz).",".
+                                        $this->db_add_param($row->faktor).",".
+										$this->db_add_param($row->anmerkung).",".
+                                        $this->db_add_param($row->bismelden, FHC_BOOLEAN).",".
+                                        $this->db_add_param($row->updateamum).",".
+                                        $this->db_add_param($row->updatevon).",".
+                                        $this->db_add_param($row->insertamum).",".
+                                        $this->db_add_param($row->insertvon).",".
+                                        $this->db_add_param($row->semesterstunden).");";
 						}
 					}
 
 					//LehreinheitGruppe
-					$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id'";
+					$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER).';';
 					if($this->db_query($qry))
 					{
 						while($row = $this->db_fetch_object())
 						{
 							$undosql.=" INSERT INTO lehre.tbl_lehreinheitgruppe(lehreinheitgruppe_id, lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon)
-							            VALUES(".$this->addslashes($row->lehreinheitgruppe_id).",".$this->addslashes($row->lehreinheit_id).",".$this->addslashes($row->studiengang_kz).",'".addslashes($row->semester)."','".addslashes($row->verband)."','".addslashes($row->gruppe)."',".
-										$this->addslashes($row->gruppe_kurzbz).",".$this->addslashes($row->updateamum).",".$this->addslashes($row->updatevon).",".$this->addslashes($row->insertamum).",".$this->addslashes($row->insertvon).");";
+							            VALUES(".$this->db_add_param($row->lehreinheitgruppe_id, FHC_INTEGER).",".
+                                        $this->db_add_param($row->lehreinheit_id, FHC_INTEGER).",".
+                                        $this->db_add_param($row->studiengang_kz, FHC_INTEGER).",".
+                                        $this->db_add_param($row->semester, FHC_INTEGER).",".
+                                        $this->db_add_param($row->verband).",".
+                                        $this->db_add_param($row->gruppe).",".
+										$this->db_add_param($row->gruppe_kurzbz).",".
+                                        $this->db_add_param($row->updateamum).",".
+                                        $this->db_add_param($row->updatevon).",".
+                                        $this->db_add_param($row->insertamum).",".
+                                        $this->db_add_param($row->insertvon).");";
 						}
 					}
 
 					//Lehreinheit
-					$qry = "SELECT * FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$lehreinheit_id'";
+					$qry = "SELECT * FROM lehre.tbl_lehreinheit WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER).';';
 					if($this->db_query($qry))
 					{
 						while($row = $this->db_fetch_object())
 						{
 							$undosql.=" INSERT INTO lehre.tbl_lehreinheit(lehreinheit_id, lehrveranstaltung_id, studiensemester_kurzbz, lehrfach_id, lehrform_kurzbz, stundenblockung, wochenrythmus, start_kw, raumtyp, raumtypalternativ, sprache, lehre, anmerkung, unr, lvnr,  updateamum, updatevon, insertamum, insertvon)
-							            VALUES(".$this->addslashes($row->lehreinheit_id).",".$this->addslashes($row->lehrveranstaltung_id).",".$this->addslashes($row->studiensemester_kurzbz).",".$this->addslashes($row->lehrfach_id).",".$this->addslashes($row->lehrform_kurzbz).",".$this->addslashes($row->stundenblockung).",".
-										$this->addslashes($row->wochenrythmus).",".$this->addslashes($row->startkw).",".$this->addslashes($row->raumtyp).",".$this->addslashes($row->raumtypalternativ).",".$this->addslashes($row->sprache).",".($row->wochenrythmus=='t'?'true':'false').",".
-										$this->addslashes($row->anmerkung).",".$this->addslashes($row->unr).",".$this->addslashes($row->lvnr).",".$this->addslashes($row->updateamum).",".$this->addslashes($row->updatevon).",".$this->addslashes($row->insertamum).",".$this->addslashes($row->insertvon).");";
+							            VALUES(".$this->db_add_param($row->lehreinheit_id, FHC_INTEGER).",".
+                                        $this->db_add_param($row->lehrveranstaltung_id, FHC_INTEGER).",".
+                                        $this->db_add_param($row->studiensemester_kurzbz).",".
+                                        $this->db_add_param($row->lehrfach_id, FHC_INTEGER).",".
+                                        $this->db_add_param($row->lehrform_kurzbz).",".
+                                        $this->db_add_param($row->stundenblockung, FHC_INTEGER).",".
+										$this->db_add_param($row->wochenrythmus, FHC_INTEGER).",".
+                                        $this->db_add_param($row->startkw, FHC_INTEGER).",".
+                                        $this->db_add_param($row->raumtyp).",".
+                                        $this->db_add_param($row->raumtypalternativ).",".
+                                        $this->db_add_param($row->sprache).",".
+                                        $this->db_add_param($row->lehre, FHC_BOOLEAN).",".
+										$this->db_add_param($row->anmerkung).",".
+                                        $this->db_add_param($row->unr, FHC_INTEGER).",".
+                                        $this->db_add_param($row->lvnr, FHC_INTEGER).",".
+                                        $this->db_add_param($row->updateamum).",".
+                                        $this->db_add_param($row->updatevon).",".
+                                        $this->db_add_param($row->insertamum).",".
+                                        $this->db_add_param($row->insertvon).");";
 						}
 					}
 
 					$log = new log();
 
 					//Gruppenzuteilung, Mitarbeiterzuteilung und Lehreinheit loeschen
-					$qry = "DELETE FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$lehreinheit_id';
-							DELETE FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id';
-							DELETE FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='$lehreinheit_id';";
+					$qry = "DELETE FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER).";
+							DELETE FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER).";
+							DELETE FROM lehre.tbl_lehreinheit WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER).";";
 
 					$log->new = true;
 					$log->sql = $qry;
@@ -867,19 +903,19 @@ class lehreinheit extends basis_db
 					if(!$log->save())
 					{
 						$this->errormsg = 'Fehler beim Schreiben des Log-Eintrages';
-						$this->db_query('ROLLBACK');
+						$this->db_query('ROLLBACK;');
 						return false;
 					}
 					else
 					{
 						if($this->db_query($qry))
 						{
-							$this->db_query('COMMIT');
+							$this->db_query('COMMIT;');
 							return true;
 						}
 						else
 						{
-							$this->db_query('ROLLBACK');
+							$this->db_query('ROLLBACK;');
 							$this->errormsg = $this->db_last_error();
 							return false;
 						}
@@ -913,7 +949,7 @@ class lehreinheit extends basis_db
 					JOIN lehre.tbl_lehrfach USING(lehrfach_id)
 					JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 				WHERE
-					tbl_lehreinheit.lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER);
+					tbl_lehreinheit.lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER).';';
 
 		if($result = $this->db_query($qry))
 		{

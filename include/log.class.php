@@ -57,7 +57,7 @@ class log extends basis_db
 			$this->errormsg='Log_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		$qry = "SELECT * FROM public.tbl_log WHERE log_id='$log_id'";
+		$qry = "SELECT * FROM public.tbl_log WHERE log_id=".$this->db_add_param($log_id, FHC_INTEGER).';';
 
 		if($this->db_query($qry))
 		{
@@ -92,7 +92,7 @@ class log extends basis_db
 	 */
 	public function load_undo($uid)
 	{
-		$qry = "SELECT * FROM public.tbl_log WHERE mitarbeiter_uid='".addslashes($uid)."' AND sqlundo is not null ORDER BY executetime DESC LIMIT 10";
+		$qry = "SELECT * FROM public.tbl_log WHERE mitarbeiter_uid=".$this->db_add_param($uid)." AND sqlundo is not null ORDER BY executetime DESC LIMIT 10;";
 
 		if($this->db_query($qry))
 		{
@@ -146,20 +146,20 @@ class log extends basis_db
 		if($new)
 		{
 			$qry = 'INSERT INTO public.tbl_log(executetime, mitarbeiter_uid, beschreibung, sql, sqlundo) VALUES(now(),'.
-			        $this->addslashes($this->mitarbeiter_uid).','.
-			        $this->addslashes($this->beschreibung).','.
-			        $this->addslashes($this->sql).','.
-			        $this->addslashes($this->sqlundo).');';
+			        $this->db_add_param($this->mitarbeiter_uid).','.
+			        $this->db_add_param($this->beschreibung).','.
+			        $this->db_add_param($this->sql).','.
+			        $this->db_add_param($this->sqlundo).');';
 		}
 		else
 		{
 			$qry = 'UPDATE public.tbl_log SET'.
-			       ' executetime='.$this->addslashes($this->executetime).','.
-			       ' mitarbeiter_uid='.$this->addslashes($this->mitarbeiter_uid).','.
-			       ' beschreibung='.$this->addslashes($this->beschreibung).','.
-			       ' sql='.$this->addslashes($this->sql).','.
-			       ' sqlundo='.$this->addslashes($this->sqlundo).
-			       " WHERE log_id=".$this->addslashes($this->log_id).";";
+			       ' executetime='.$this->db_add_param($this->executetime).','.
+			       ' mitarbeiter_uid='.$this->db_add_param($this->mitarbeiter_uid).','.
+			       ' beschreibung='.$this->db_add_param($this->beschreibung).','.
+			       ' sql='.$this->db_add_param($this->sql).','.
+			       ' sqlundo='.$this->db_add_param($this->sqlundo).
+			       " WHERE log_id=".$this->db_add_param($this->log_id, FHC_INTEGER).";";
 		}
 
 		if($this->db_query($qry))
@@ -187,7 +187,7 @@ class log extends basis_db
 			return false;
 		}
 
-		$qry = "DELETE FROM public.tbl_log WHERE log_id='$log_id'";
+		$qry = "DELETE FROM public.tbl_log WHERE log_id=".$this->db_add_param($log_id, FHC_INTEGER).';';
 
 		if($this->db_query($qry))
 			return true;
@@ -215,7 +215,7 @@ class log extends basis_db
 		$this->db_query('BEGIN;');
 		
 		//Undo Befehl aus Log holen
-		$qry = "SELECT * FROM public.tbl_log WHERE log_id='$log_id'";
+		$qry = "SELECT * FROM public.tbl_log WHERE log_id=".$this->db_add_param($log_id, FHC_INTEGER).";";
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -226,7 +226,7 @@ class log extends basis_db
 					if($this->db_query($row->sqlundo))
 					{
 						//Log Eintrag aus Log entfernen
-						$qry = "DELETE FROM public.tbl_log WHERE log_id='$log_id';";
+						$qry = "DELETE FROM public.tbl_log WHERE log_id=".$this->db_add_param($log_id, FHC_INTEGER).';';
 						if($this->db_query($qry))
 						{
 							$this->db_query('COMMIT;');

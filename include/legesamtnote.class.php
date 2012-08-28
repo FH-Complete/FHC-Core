@@ -60,7 +60,7 @@ class legesamtnote extends basis_db
 			return false;
 		}
 		$qry = "SELECT * FROM campus.tbl_legesamtnote 
-				WHERE student_uid = '".addslashes($student_uid)."' AND lehreinheit_id = '".addslashes($lehreinheit_id)."'";
+				WHERE student_uid = ".$this->db_add_param($student_uid)." AND lehreinheit_id = ".$this->db_add_param($lehreinheit_id, FHC_INTEGER).';';
 
 		if($this->db_query($qry))
 		{
@@ -103,7 +103,7 @@ class legesamtnote extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM campus.tbl_legesamtnote WHERE lehreinheit_id='".$lehreinheit_id."' ORDER BY student_uid";
+		$qry = "SELECT * FROM campus.tbl_legesamtnote WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER)." ORDER BY student_uid;";
 
 
 		if($this->db_query($qry))
@@ -167,25 +167,25 @@ class legesamtnote extends basis_db
 		if($this->new)
 		{
 			$qry = 'INSERT INTO campus.tbl_legesamtnote(student_uid, lehreinheit_id, note, benotungsdatum, updateamum, updatevon, insertamum, insertvon) VALUES('.
-			        $this->addslashes($this->student_uid).','.
-			        $this->addslashes($this->lehreinheit_id).','.
-			        $this->addslashes($this->note).','.
-			        $this->addslashes($this->benotungsdatum).','.
+			        $this->db_add_param($this->student_uid).','.
+			        $this->db_add_param($this->lehreinheit_id, FHC_INTEGER).','.
+			        $this->db_add_param($this->note, FHC_INTEGER).','.
+			        $this->db_add_param($this->benotungsdatum).','.
 			        'null,'.
 			        'null,'.
-			        $this->addslashes($this->insertamum).','.
-			        $this->addslashes($this->insertvon).');';
+			        $this->db_add_param($this->insertamum).','.
+			        $this->db_add_param($this->insertvon).');';
 		}
 		else
 		{
 			$qry = 'UPDATE campus.tbl_legesamtnote SET'.
-			       ' student_uid='.$this->addslashes($this->student_uid).','.
-			       ' lehreinheit_id ='.$this->addslashes($this->lehreinheit_id).','.
-			       ' note='.$this->addslashes($this->note).','.
-			       ' benotungsdatum='.$this->addslashes($this->benotungsdatum).','.
-			       ' updateamum='.$this->addslashes($this->updateamum).','.
-			       ' updatevon='.$this->addslashes($this->updatevon).
-			       " WHERE lehreinheit_id=".$this->addslashes($this->lehreinheit_id)." AND student_uid = '".$this->student_uid."';";
+			       ' student_uid='.$this->db_add_para($this->student_uid).','.
+			       ' lehreinheit_id ='.$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).','.
+			       ' note='.$this->db_add_param($this->note, FHC_INTEGER).','.
+			       ' benotungsdatum='.$this->db_add_param($this->benotungsdatum).','.
+			       ' updateamum='.$this->db_add_param($this->updateamum).','.
+			       ' updatevon='.$this->db_add_param($this->updatevon).
+			       " WHERE lehreinheit_id=".$this->db_add_param($this->lehreinheit_id, FHC_INTEGER)." AND student_uid = ".$this->db_add_param(student_uid).";";
 		}
 
 		if($this->db_query($qry))
