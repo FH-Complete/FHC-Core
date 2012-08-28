@@ -55,6 +55,7 @@ if($result = $db->db_query($qry))
 {
     while($row = $db->db_fetch_object($result))
     {
+        $kon_alt='';
         $person = new person();
         $person->load($row->person_id);
      
@@ -68,13 +69,19 @@ if($result = $db->db_query($qry))
         // Falls mehrere vorhanden sind, an alle schicken
         foreach($kontakt->result as $kon)
         {
-            if(sendMail($kon->kontakt, $row->nachname, $zugangscode))
+            if($kon_alt != $kon->kontakt)
             {
-                echo $kon->kontakt.'</br>';
-                $count+=1; 
+                
+                if(sendMail($kon->kontakt, $row->nachname, $zugangscode))
+                {
+                    echo $kon->kontakt.'</br>';
+                    $count+=1; 
+                }
+                else
+                    $countError+=1; 
             }
-            else
-                $countError+=1; 
+            
+            $kon_alt = $kon->kontakt; 
         }
     }
 }
@@ -88,7 +95,6 @@ function sendMail($email, $name, $zugangscode)
 {
     // trim zugangscode
     // an private email schicken
-    
     $msg = '<b>Sehr geehrter Herr/Frau '.$name.'</b><br><br>';
     $msg.= 'Willkommen an der Fachhochschule Technikum Wien. <br><br>';
     $msg.= 'Für Ihren FH-Ausweis, der gleichzeitig als Zutrittskarte dient, benötigen wir ein Foto von Ihnen.<br>';
