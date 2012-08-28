@@ -37,6 +37,7 @@ require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/lvinfo.class.php');
 require_once('../../../../include/studiensemester.class.php');
 require_once('../../../../include/phrasen.class.php');
+require_once('../../../../include/safehtml/safehtml.class.php');
 
 $sprache1 = getSprache(); 
 $p=new phrasen($sprache1);
@@ -130,6 +131,25 @@ if (!$db = new basis_db())
 	$methodik_de = (isset($_POST['methodik_de'])?$_POST['methodik_de']:'');
 	//$titel_de = (isset($_POST['titel_de'])?$_POST['titel_de']:'');
 
+	$parser = new SafeHTML();
+ 	$lehrziele_de = $parser->parse($lehrziele_de);
+ 	$parser = new SafeHTML();
+ 	$lehrinhalte_de = $parser->parse($lehrinhalte_de);
+ 	$parser = new SafeHTML();
+	$voraussetzungen_de = $parser->parse($voraussetzungen_de);
+	$parser = new SafeHTML();
+	$unterlagen_de = $parser->parse($unterlagen_de);
+	$parser = new SafeHTML();
+	$pruefungsordnung_de = $parser->parse($pruefungsordnung_de);
+	$parser = new SafeHTML();
+	$anmerkungen_de = $parser->parse($anmerkungen_de);
+	$parser = new SafeHTML();
+	$kurzbeschreibung_de = $parser->parse($kurzbeschreibung_de);
+	$parser = new SafeHTML();
+	$freig_de = $parser->parse($freig_de);
+	$parser = new SafeHTML();
+	$methodik_de = $parser->parse($methodik_de);
+ 	
 	$lehrziele_en = (isset($_POST['lehrziele_en'])?$_POST['lehrziele_en']:'');
 	$lehrinhalte_en = (isset($_POST['lehrinhalte_en'])?$_POST['lehrinhalte_en']:'');
 	$voraussetzungen_en = (isset($_POST['voraussetzungen_en'])?$_POST['voraussetzungen_en']:'');
@@ -141,6 +161,25 @@ if (!$db = new basis_db())
 	$methodik_en = (isset($_POST['methodik_en'])?$_POST['methodik_en']:'');
 	//$titel_en = (isset($_POST['titel_en'])?$_POST['titel_en']:'');
 
+	$parser = new SafeHTML();
+	$lehrziele_en = $parser->parse($lehrziele_en);
+	$parser = new SafeHTML();
+ 	$lehrinhalte_en = $parser->parse($lehrinhalte_en);
+ 	$parser = new SafeHTML();
+	$voraussetzungen_en = $parser->parse($voraussetzungen_en);
+	$parser = new SafeHTML();
+	$unterlagen_en = $parser->parse($unterlagen_en);
+	$parser = new SafeHTML();
+	$pruefungsordnung_en = $parser->parse($pruefungsordnung_en);
+	$parser = new SafeHTML();
+	$anmerkungen_en = $parser->parse($anmerkungen_en);
+	$parser = new SafeHTML();
+	$kurzbeschreibung_en = $parser->parse($kurzbeschreibung_en);
+	$parser = new SafeHTML();
+	$freig_en = $parser->parse($freig_en);
+	$parser = new SafeHTML();
+	$methodik_en = $parser->parse($methodik_en);
+	
 	/* WriteLog($qry,$uid)
 	* @brief Schreib die Querys im format: uid - datum - qry ins LogFile
 	* @param $qry Query anweisung
