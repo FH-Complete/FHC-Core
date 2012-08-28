@@ -50,7 +50,7 @@ class lehrfunktion extends basis_db
 	 */
 	public function load($lehrfunktion_kurzbz)
 	{
-		$qry = "SELECT * FROM lehre.tbl_lehrfunktion WHERE lehrfunktion_kurzbz = '".addslashes($lehrfunktion_kurzbz)."';";
+		$qry = "SELECT * FROM lehre.tbl_lehrfunktion WHERE lehrfunktion_kurzbz = ".$this->db_add_param($lehrfunktion_kurzbz).";";
 
 		if(!$this->db_query($qry))
 		{

@@ -49,7 +49,7 @@ class lehrform extends basis_db
 	 */
 	public function load($lehrform_kurzbz)
 	{
-		$qry = "SELECT * FROM lehre.tbl_lehrform WHERE lehrform_kurzbz='".addslashes($lehrform_kurzbz)."'";
+		$qry = "SELECT * FROM lehre.tbl_lehrform WHERE lehrform_kurzbz=".$this->db_add_param($lehrform_kurzbz).";";
 		
 		if(!$this->db_query($qry))
 		{
@@ -61,7 +61,7 @@ class lehrform extends basis_db
 		{
 			$this->lehrform_kurzbz = $row->lehrform_kurzbz;
 			$this->bezeichnung = $row->bezeichnung;
-			$this->verplanen = ($row->verplanen?true:false);
+			$this->verplanen = $this->db_parse_bool($row->verplanen);
 		}
 		else
 		{
@@ -79,7 +79,7 @@ class lehrform extends basis_db
 	 */
 	public function getAll()
 	{
-		$qry = "SELECT * FROM lehre.tbl_lehrform ORDER BY lehrform_kurzbz";
+		$qry = "SELECT * FROM lehre.tbl_lehrform ORDER BY lehrform_kurzbz;";
 		
 		if(!$this->db_query($qry))
 		{
@@ -93,7 +93,7 @@ class lehrform extends basis_db
 
 			$lf->lehrform_kurzbz = $row->lehrform_kurzbz;
 			$lf->bezeichnung = $row->bezeichnung;
-			$lf->verplanen = ($row->verplanen?true:false);
+			$lf->verplanen = $this->db_parse_bool($row->verplanen);
 
 			$this->lehrform[] = $lf;
 		}
@@ -142,16 +142,16 @@ class lehrform extends basis_db
 		if($this->new)
 		{
 			$qry = "INSERT INTO lehre.tbl_lehrform (lehrform_kurzbz, bezeichnung, verplanen)
-			        VALUES('".addslashes($this->lehrform_kurzbz)."',".
-					$this->addslashes($this->bezeichnung).','.
-					($this->verplanen?'true':'false').');';
+			        VALUES(".$this->db_add_param($this->lehrform_kurzbz).",".
+					$this->db_add_param($this->bezeichnung).','.
+					$this->db_add_param($this->verplanen, FHC_BOOLEAN).');';
 		}
 		else
 		{
 			$qry = 'UPDATE lehre.tbl_lehrform SET'.
-			       ' bezeichnung='.$this->addslashes($this->bezeichnung).','.
-			       ' verplanen='.($this->verplanen?'true':'false').
-			       " WHERE lehrform_kurzbz='$this->lehrform_kurzbz'";
+			       ' bezeichnung='.$this->db_add_param($this->bezeichnung).','.
+			       ' verplanen='.$this->db_add_param($this->verplanen, FHC_BOOLEAN).
+			       " WHERE lehrform_kurzbz=".$this->db_add_param($this->lehrform_kurzbz).';';
 		}
 
 		if($this->db_query($qry))

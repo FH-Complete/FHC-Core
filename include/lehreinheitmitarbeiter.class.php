@@ -71,8 +71,9 @@ class lehreinheitmitarbeiter extends basis_db
 		}
 
 		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter 
-				WHERE lehreinheit_id='$lehreinheit_id' AND mitarbeiter_uid='".addslashes($mitarbeiter_uid)."'";
-		if($this->db_query($qry))
+				WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER)." AND mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid).';';
+		
+        if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
@@ -84,7 +85,7 @@ class lehreinheitmitarbeiter extends basis_db
 				$this->stundensatz = $row->stundensatz;
 				$this->faktor = $row->faktor;
 				$this->anmerkung = $row->anmerkung;
-				$this->bismelden = ($row->bismelden=='t'?true:false);
+				$this->bismelden = $this->db_parse_bool($row->bismelden);
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->insertamum = $row->insertamum;
@@ -118,10 +119,10 @@ class lehreinheitmitarbeiter extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$lehreinheit_id'";
+		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER);
 		if($mitarbeiter_uid!=null)
-			$qry.=" AND mitarbeiter_uid='".addslashes($mitarbeiter_uid)."'";
-		$qry .=" ORDER BY mitarbeiter_uid";
+			$qry.=" AND mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid);
+		$qry .=" ORDER BY mitarbeiter_uid;";
 
 		if($this->db_query($qry))
 		{
@@ -136,7 +137,7 @@ class lehreinheitmitarbeiter extends basis_db
 				$obj->stundensatz = $row->stundensatz;
 				$obj->faktor = $row->faktor;
 				$obj->anmerkung = $row->anmerkung;
-				$obj->bismelden = ($row->bismelden=='t'?true:false);
+				$obj->bismelden = $this->db_parse_bool($row->bismelden);
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;
@@ -210,7 +211,7 @@ class lehreinheitmitarbeiter extends basis_db
 		if($new)
 		{
 			//Pruefen ob dieser Mitarbeiter schon zugeordnet ist
-			$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='".addslashes($this->lehreinheit_id)."' AND mitarbeiter_uid='".addslashes($this->mitarbeiter_uid)."'";
+			$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id=".$this->db_add_param($this->lehreinheit_id, FHC_INTEGER)." AND mitarbeiter_uid=".$this->db_add_param($this->mitarbeiter_uid).';';
 			if($this->db_query($qry))
 			{
 				if($this->db_num_rows()>0)
@@ -228,18 +229,18 @@ class lehreinheitmitarbeiter extends basis_db
 			//ToDo ID entfernen
 			$qry = 'INSERT INTO lehre.tbl_lehreinheitmitarbeiter (lehreinheit_id, mitarbeiter_uid, semesterstunden, planstunden,
 			                                                stundensatz, faktor, anmerkung, lehrfunktion_kurzbz, bismelden, ext_id, insertamum, insertvon)
-			        VALUES('.$this->addslashes($this->lehreinheit_id).','.
-					$this->addslashes($this->mitarbeiter_uid).','.
-					$this->addslashes($this->semesterstunden).','.
-					$this->addslashes($this->planstunden).','.
-					$this->addslashes($this->stundensatz).','.
-					$this->addslashes($this->faktor).','.
-					$this->addslashes($this->anmerkung).','.
-					$this->addslashes($this->lehrfunktion_kurzbz).','.
-					($this->bismelden?'true':'false').','.
-					$this->addslashes($this->ext_id).','.
-					$this->addslashes($this->insertamum).','.
-					$this->addslashes($this->insertvon).');';
+			        VALUES('.$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).','.
+					$this->db_add_param($this->mitarbeiter_uid).','.
+					$this->db_add_param($this->semesterstunden).','.
+					$this->db_add_param($this->planstunden, FHC_INTEGER).','.
+					$this->db_add_param($this->stundensatz).','.
+					$this->db_add_param($this->faktor).','.
+					$this->db_add_param($this->anmerkung).','.
+					$this->db_add_param($this->lehrfunktion_kurzbz).','.
+					$this->db_add_param($this->bismelden, FHC_BOOLEAN).','.
+					$this->db_add_param($this->ext_id, FHC_INTEGER).','.
+					$this->db_add_param($this->insertamum).','.
+					$this->db_add_param($this->insertvon).');';
 		}
 		else
 		{
@@ -251,24 +252,24 @@ class lehreinheitmitarbeiter extends basis_db
 			$setinsert='';
 			if($this->mitarbeiter_uid_old!=$this->mitarbeiter_uid)
 			{
-				$setinsert=", insertamum='".date('Y-m-d H:i:s')."', insertvon=".$this->addslashes($this->updatevon);
+				$setinsert=", insertamum='".date('Y-m-d H:i:s')."', insertvon=".$this->db_add_param($this->updatevon);
 			}
 
 			$qry = 'UPDATE lehre.tbl_lehreinheitmitarbeiter SET'.
-			       ' semesterstunden='.$this->addslashes($this->semesterstunden).','.
-			       ' planstunden='.$this->addslashes($this->planstunden).','.
-			       ' stundensatz='.$this->addslashes($this->stundensatz).','.
-			       ' faktor='.$this->addslashes($this->faktor).','.
-			       ' anmerkung='.$this->addslashes($this->anmerkung).','.
-			       ' lehrfunktion_kurzbz='.$this->addslashes($this->lehrfunktion_kurzbz).','.
-			       ' mitarbeiter_uid='.$this->addslashes($this->mitarbeiter_uid).','.
-			       ' bismelden='.($this->bismelden?'true':'false').','.
-			       ' updateamum='.$this->addslashes($this->updateamum).','.
-			       ' updatevon='.$this->addslashes($this->updatevon).','.
-			       ' ext_id = '.$this->addslashes($this->ext_id).
+			       ' semesterstunden='.$this->db_add_param($this->semesterstunden).','.
+			       ' planstunden='.$this->db_add_param($this->planstunden, FHC_INTEGER).','.
+			       ' stundensatz='.$this->db_add_param($this->stundensatz).','.
+			       ' faktor='.$this->db_add_param($this->faktor).','.
+			       ' anmerkung='.$this->db_add_param($this->anmerkung).','.
+			       ' lehrfunktion_kurzbz='.$this->db_add_param($this->lehrfunktion_kurzbz).','.
+			       ' mitarbeiter_uid='.$this->db_add_param($this->mitarbeiter_uid).','.
+			       ' bismelden='.$this->db_add_param($this->bismelden, FHC_BOOLEAN).','.
+			       ' updateamum='.$this->db_add_param($this->updateamum).','.
+			       ' updatevon='.$this->db_add_param($this->updatevon).','.
+			       ' ext_id = '.$this->db_add_param($this->ext_id, FHC_INTEGER).
 			       $setinsert.
-			       " WHERE lehreinheit_id=".$this->addslashes($this->lehreinheit_id)." AND
-			               mitarbeiter_uid=".$this->addslashes($this->mitarbeiter_uid_old).";";
+			       " WHERE lehreinheit_id=".$this->db_add_param($this->lehreinheit_id, FHC_INTEGER)." AND
+			               mitarbeiter_uid=".$this->db_add_param($this->mitarbeiter_uid_old).";";
 		}
 						
 		if($this->db_query($qry))
@@ -298,7 +299,7 @@ class lehreinheitmitarbeiter extends basis_db
 		}
 
 		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter 
-				WHERE lehreinheit_id='$lehreinheit_id' AND mitarbeiter_uid='".addslashes($uid)."'";
+				WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER)." AND mitarbeiter_uid=".$this->db_add_param($uid).';';
 		if($this->db_query($qry))
 		{
 			if($this->db_num_rows()>0)
@@ -327,28 +328,28 @@ class lehreinheitmitarbeiter extends basis_db
 			$this->errormsg = 'Lehreinheit_id ist ungueltig';
 			return false;
 		}
-		$qry_del = "DELETE FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$lehreinheit_id' AND mitarbeiter_uid='".addslashes($mitarbeiter_uid)."'";
-		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id='$lehreinheit_id' AND mitarbeiter_uid='".addslashes($mitarbeiter_uid)."'";
+		$qry_del = "DELETE FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER)." AND mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid).";";
+		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER)." AND mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid).";";
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
 			{
 				$undo = 'INSERT INTO lehre.tbl_lehreinheitmitarbeiter (lehreinheit_id, mitarbeiter_uid, semesterstunden, planstunden, '.
 			            ' stundensatz, faktor, anmerkung, lehrfunktion_kurzbz, bismelden, ext_id, insertamum, insertvon, updateamum, updatevon)'.
-				       	' VALUES('.$this->addslashes($row->lehreinheit_id).','.
-						$this->addslashes($row->mitarbeiter_uid).','.
-						$this->addslashes($row->semesterstunden).','.
-						$this->addslashes($row->planstunden).','.
-						$this->addslashes($row->stundensatz).','.
-						$this->addslashes($row->faktor).','.
-						$this->addslashes($row->anmerkung).','.
-						$this->addslashes($row->lehrfunktion_kurzbz).','.
-						($row->bismelden=='t'?'true':'false').','.
-						$this->addslashes($row->ext_id).','.
-						$this->addslashes($row->insertamum).','.
-						$this->addslashes($row->insertvon).','.
-						$this->addslashes($row->updateamum).','.
-						$this->addslashes($row->updatevon).');';
+				       	' VALUES('.$this->db_add_param($row->lehreinheit_id, FHC_INTEGER).','.
+						$this->db_add_param($row->mitarbeiter_uid).','.
+						$this->db_add_param($row->semesterstunden).','.
+						$this->db_add_param($row->planstunden, FHC_INTEGER).','.
+						$this->db_add_param($row->stundensatz).','.
+						$this->db_add_param($row->faktor).','.
+						$this->db_add_param($row->anmerkung).','.
+						$this->db_add_param($row->lehrfunktion_kurzbz).','.
+						$this->db_add_param($row->bismelden, FHC_BOOLEAN).','.
+						$this->db_add_param($row->ext_id, FHC_INTEGER).','.
+						$this->db_add_param($row->insertamum).','.
+						$this->db_add_param($row->insertvon).','.
+						$this->db_add_param($row->updateamum).','.
+						$this->db_add_param($row->updatevon).');';
 
 				$log = new log();
 				$log->sqlundo = $undo;

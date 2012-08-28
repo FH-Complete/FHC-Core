@@ -78,9 +78,9 @@ class lvgesamtnote extends basis_db
 		}
 		
 		$qry = "SELECT * FROM campus.tbl_lvgesamtnote WHERE 
-				lehrveranstaltung_id='$lehrveranstaltung_id' AND 
-				student_uid='".addslashes($student_uid)."' AND
-				studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+				lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)." AND 
+				student_uid=".$this->db_add_param($student_uid)." AND
+				studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz).";";
 		
 		if($this->db_query($qry))
 		{
@@ -171,34 +171,34 @@ class lvgesamtnote extends basis_db
 		{
 			//Neuen Datensatz einfuegen					
 			$qry='INSERT INTO campus.tbl_lvgesamtnote (lehrveranstaltung_id, student_uid, studiensemester_kurzbz, mitarbeiter_uid, note, freigabedatum, freigabevon_uid, benotungsdatum, bemerkung, updateamum, updatevon, insertamum, insertvon) VALUES('.
-			     $this->addslashes($this->lehrveranstaltung_id).', '.
-			     $this->addslashes($this->student_uid).', '.
-			     $this->addslashes($this->studiensemester_kurzbz).', '.
-			     $this->addslashes($this->mitarbeiter_uid).', '.
-			     $this->addslashes($this->note).', '.
-			     $this->addslashes($this->freigabedatum).', '.
-			     $this->addslashes($this->freigabevon_uid).', '.
-			     $this->addslashes($this->benotungsdatum).', '.
-			     $this->addslashes($this->bemerkung).', '.
-			     $this->addslashes($this->updateamum).', '.
-			     $this->addslashes($this->updatevon).', '.
-			     $this->addslashes($this->insertamum).', '.
-			     $this->addslashes($this->insertvon).');';
+			     $this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER).', '.
+			     $this->db_add_param($this->student_uid).', '.
+			     $this->db_add_param($this->studiensemester_kurzbz).', '.
+			     $this->db_add_param($this->mitarbeiter_uid).', '.
+			     $this->db_add_param($this->note, FHC_INTEGER).', '.
+			     $this->db_add_param($this->freigabedatum).', '.
+			     $this->db_add_param($this->freigabevon_uid).', '.
+			     $this->db_add_param($this->benotungsdatum).', '.
+			     $this->db_add_param($this->bemerkung).', '.
+			     $this->db_add_param($this->updateamum).', '.
+			     $this->db_add_param($this->updatevon).', '.
+			     $this->db_add_param($this->insertamum).', '.
+			     $this->db_add_param($this->insertvon).');';
 		}
 		else
 		{			
 			$qry='UPDATE campus.tbl_lvgesamtnote SET '.
-				'note='.$this->addslashes($this->note).', '. 
-				'freigabedatum='.$this->addslashes($this->freigabedatum).', '.
-				'freigabevon_uid='.$this->addslashes($this->freigabevon_uid).', '.
-				'benotungsdatum='.$this->addslashes($this->benotungsdatum).', '.
-				'bemerkung='.$this->addslashes($this->bemerkung).', '.
-				'mitarbeiter_uid='.$this->addslashes($this->mitarbeiter_uid).', '.
-		     	'updateamum= '.$this->addslashes($this->updateamum).', '.
-		     	'updatevon='.$this->addslashes($this->updatevon).' '.
-				'WHERE lehrveranstaltung_id='.$this->addslashes($this->lehrveranstaltung_id).' '.
-				'AND student_uid='.$this->addslashes($this->student_uid).' '.
-				'AND studiensemester_kurzbz='.$this->addslashes($this->studiensemester_kurzbz).';';
+				'note='.$this->db_add_param($this->note, FHC_INTEGER).', '. 
+				'freigabedatum='.$this->db_add_param($this->freigabedatum).', '.
+				'freigabevon_uid='.$this->db_add_param($this->freigabevon_uid).', '.
+				'benotungsdatum='.$this->db_add_param($this->benotungsdatum).', '.
+				'bemerkung='.$this->db_add_param($this->bemerkung).', '.
+				'mitarbeiter_uid='.$this->db_add_param($this->mitarbeiter_uid).', '.
+		     	'updateamum= '.$this->db_add_param($this->updateamum).', '.
+		     	'updatevon='.$this->db_add_param($this->updatevon).' '.
+				'WHERE lehrveranstaltung_id='.$this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER).' '.
+				'AND student_uid='.$this->db_add_param($this->student_uid).' '.
+				'AND studiensemester_kurzbz='.$this->db_add_param($this->studiensemester_kurzbz).';';
 		}
 		
 		if($this->db_query($qry))
@@ -222,9 +222,9 @@ class lvgesamtnote extends basis_db
 	public function delete($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz)
 	{
 		$qry = "DELETE FROM campus.tbl_lvgesamtnote WHERE 
-				lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."' AND
-				student_uid='".addslashes($student_uid)."' AND
-				studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+				lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)." AND
+				student_uid=".$this->db_add_param($student_uid)." AND
+				studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz).";";
 		
 		if($this->db_query($qry))
 			return true;
@@ -256,13 +256,15 @@ class lvgesamtnote extends basis_db
 				WHERE
 					tbl_lvgesamtnote.note=tbl_note.note AND
 					tbl_lvgesamtnote.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
-					tbl_lvgesamtnote.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
+					tbl_lvgesamtnote.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)." AND
 					tbl_lvgesamtnote.freigabedatum<now()";
 		
 		if($lehrveranstaltung_id!=null)
-			$qry.=" AND tbl_lvgesamtnote.lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."'";
+			$qry.=" AND tbl_lvgesamtnote.lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
 		if($student_uid!=null)
-			$qry.=" AND tbl_lvgesamtnote.student_uid='".addslashes($student_uid)."'";
+			$qry.=" AND tbl_lvgesamtnote.student_uid=".$this->db_add_param($student_uid);
+        
+        $qry.=';';
 		
 		if($this->db_query($qry))
 		{

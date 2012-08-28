@@ -63,7 +63,7 @@ class lehreinheitgruppe extends basis_db
 			$this->errormsg = 'Lehreinheitgruppe_id ist ungueltig';
 			return false;
 		}
-		$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id='$lehreinheitgruppe_id'";
+		$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id=".$this->db_add_param($lehreinheitgruppe_id, FHC_INTEGER).';';
 
 		if($this->db_query($qry))
 		{
@@ -155,29 +155,29 @@ class lehreinheitgruppe extends basis_db
 		if($new)
 		{
 			$qry = 'INSERT INTO lehre.tbl_lehreinheitgruppe (lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, ext_id, insertamum, insertvon)
-			        VALUES('.$this->addslashes($this->lehreinheit_id).','.
-					$this->addslashes($this->studiengang_kz).','.
-					$this->addslashes($this->semester).','.
-					$this->addslashes($this->verband).','.
-					$this->addslashes($this->gruppe).','.
-					$this->addslashes($this->gruppe_kurzbz).','.
-					$this->addslashes($this->ext_id).','.
-					$this->addslashes($this->insertamum).','.
-					$this->addslashes($this->insertvon).');';
+			        VALUES('.$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).','.
+					$this->db_add_param($this->studiengang_kz, FHC_INTEGER).','.
+					$this->db_add_param($this->semester, FHC_INTEGER).','.
+					$this->db_add_param($this->verband).','.
+					$this->db_add_param($this->gruppe).','.
+					$this->db_add_param($this->gruppe_kurzbz).','.
+					$this->db_add_param($this->ext_id, FHC_INTEGER).','.
+					$this->db_add_param($this->insertamum).','.
+					$this->db_add_param($this->insertvon).');';
 		}
 		else
 		{
 			$qry = 'UPDATE lehre.tbl_lehreinheitgruppe SET'.
-			       ' lehreinheit_id='.$this->addslashes($this->lehreinheit_id).','.
-			       ' studiengang_kz='.$this->addslashes($this->studiengang_kz).','.
-			       ' semester='.$this->addslashes($this->semester).','.
-			       ' verband='.$this->addslashes($this->verband).','.
-			       ' gruppe='.$this->addslashes($this->gruppe).','.
-			       ' gruppe_kurzbz='.$this->addslashes($this->gruppe_kurzbz).','.
-			       ' ext_id='.$this->addslashes($this->ext_id).','.
-			       ' updateamum='.$this->addslashes($this->updateamum).','.
-			       ' updatevon='.$this->addslashes($this->updatevon).
-			       " WHERE lehreinheitgruppe_id=".$this->addslashes($this->lehreinheitgruppe_id).";";
+			       ' lehreinheit_id='.$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).','.
+			       ' studiengang_kz='.$this->db_add_param($this->studiengang_kz, FHC_INTEGER).','.
+			       ' semester='.$this->db_add_param($this->semester, FHC_INTEGER).','.
+			       ' verband='.$this->db_add_param($this->verband).','.
+			       ' gruppe='.$this->db_add_param($this->gruppe).','.
+			       ' gruppe_kurzbz='.$this->db_add_param($this->gruppe_kurzbz).','.
+			       ' ext_id='.$this->db_add_param($this->ext_id, FHC_INTEGER).','.
+			       ' updateamum='.$this->db_add_param($this->updateamum).','.
+			       ' updatevon='.$this->db_add_param($this->updatevon).
+			       " WHERE lehreinheitgruppe_id=".$this->db_add_param($this->lehreinheitgruppe_id, FHC_INTEGER).";";
 		}
 
 		if($this->db_query($qry))
@@ -205,20 +205,21 @@ class lehreinheitgruppe extends basis_db
 	 */
 	public function exists($lehreinheit_id, $studiengang_kz, $semester, $verband, $gruppe, $gruppe_kurzbz)
 	{
-		$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='".addslashes($lehreinheit_id)."'";
+		$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER);
 
 		if($gruppe_kurzbz!='')
 		{
-			$qry .= " AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
+			$qry .= " AND gruppe_kurzbz=".$this->db_add_param($gruppe_kurzbz);
 		}
 		else
 		{
-			$qry .= " AND semester='".addslashes($semester)."'";
+			$qry .= " AND semester=".$this->db_add_param($semester, FHC_INTEGER);
 			if($verband!='')
-				$qry .= " AND verband='".addslashes($verband)."'";
+				$qry .= " AND verband=".$this->db_add_param($verband);
 			if($gruppe!='')
-				$qry .= " AND gruppe='".addslashes($gruppe)."'";
+				$qry .= " AND gruppe=".$this->db_add_param($gruppe);
 		}
+        $qry.=';';
 
 		if($this->db_query($qry))
 		{
@@ -249,7 +250,7 @@ class lehreinheitgruppe extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$lehreinheit_id'";
+		$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER).';';
 		
 		if($this->db_query($qry))
 		{
@@ -293,8 +294,8 @@ class lehreinheitgruppe extends basis_db
 			$this->errormsg = 'Lehreinheitgruppe_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		$qry_del = "DELETE FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id='$lehreinheitgruppe_id'";
-		$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id='$lehreinheitgruppe_id'";
+		$qry_del = "DELETE FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id=".$this->db_add_param($lehreinheitgruppe_id, FHC_INTEGER).';';
+		$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id=".$this->db_add_param($lehreinheitgruppe_id, FHC_INTEGER).';';
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -302,17 +303,17 @@ class lehreinheitgruppe extends basis_db
 				$sql_undo = "INSERT INTO lehre.tbl_lehreinheitgruppe ".
 							"(lehreinheitgruppe_id, lehreinheit_id, studiengang_kz, semester, ".
 							"verband, gruppe, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon) ".
-							"VALUES(".$this->addslashes($row->lehreinheitgruppe_id).','.
-							$this->addslashes($row->lehreinheit_id).','.
-							$this->addslashes($row->studiengang_kz).','.
-							$this->addslashes($row->semester).','.
-							$this->addslashes($row->verband).','.
-							$this->addslashes($row->gruppe).','.
-							$this->addslashes($row->gruppe_kurzbz).','.
-							$this->addslashes($row->updateamum).','.
-							$this->addslashes($row->updatevon).','.
-							$this->addslashes($row->insertamum).','.
-							$this->addslashes($row->insertvon).');';
+							"VALUES(".$this->db_add_param($row->lehreinheitgruppe_id, FHC_INTEGER).','.
+							$this->db_add_param($row->lehreinheit_id, FHC_INTEGER).','.
+							$this->db_add_param($row->studiengang_kz, FHC_INTEGER).','.
+							$this->db_add_param($row->semester, FHC_INTEGER).','.
+							$this->db_add_param($row->verband).','.
+							$this->db_add_param($row->gruppe).','.
+							$this->db_add_param($row->gruppe_kurzbz).','.
+							$this->db_add_param($row->updateamum).','.
+							$this->db_add_param($row->updatevon).','.
+							$this->db_add_param($row->insertamum).','.
+							$this->db_add_param($row->insertvon).');';
 
 				$log = new log();
 				$log->sql = $qry_del;
@@ -322,7 +323,7 @@ class lehreinheitgruppe extends basis_db
 					$grp = $row->gruppe_kurzbz;
 				else
 				{
-					$qry_stg = "SELECT UPPER(typ::varchar(1) || kurzbz) as kuerzel FROM public.tbl_studiengang WHERE studiengang_kz='$row->studiengang_kz'";
+					$qry_stg = "SELECT UPPER(typ::varchar(1) || kurzbz) as kuerzel FROM public.tbl_studiengang WHERE studiengang_kz=".$this->db_add_param($row->studiengang_kz, FHC_INTEGER).';';
 					$this->db_query($qry_stg);
 					$row_stg = $this->db_fetch_object();
 					$grp = $row_stg->kuerzel.$row->semester.$row->verband.$row->gruppe;
@@ -374,28 +375,29 @@ class lehreinheitgruppe extends basis_db
 				FROM 
 					lehre.tbl_lehreinheitgruppe 
 				WHERE 
-					lehreinheit_id='".addslashes($this->lehreinheit_id)."' AND 
-					studiengang_kz='".addslashes($this->studiengang_kz)."'";
+					lehreinheit_id=".$this->db_add_param($this->lehreinheit_id, FHC_INTEGER)." AND 
+					studiengang_kz=".$this->db_add_param($this->studiengang_kz, FHC_INTEGER);
 		if($this->semester!='')
-			$qry.=" AND semester='".addslashes($this->semester)."'";
+			$qry.=" AND semester=".$this->db_add_param($this->semester, FHC_INTEGER);
 		else 
 			$qry.=" AND (semester='' OR semester is null)";
 			
 		if($this->verband!='')
-			$qry.=" AND trim(verband)='".addslashes($this->verband)."'";
+			$qry.=" AND trim(verband)=".$this->db_add_param($this->verband);
 		else 
 			$qry.=" AND (trim(verband)='' OR verband is null)";
 			
 		if($this->gruppe!='')
-			$qry.=" AND	trim(gruppe)='".addslashes($this->gruppe)."'";
+			$qry.=" AND	trim(gruppe)=".$this->db_add_param($this->gruppe);
 		else 
 			$qry.=" AND (trim(gruppe)='' OR gruppe is null)";
 			
 		if($this->gruppe_kurzbz!='')
-			$qry.=" AND	trim(gruppe_kurzbz)='".addslashes($this->gruppe_kurzbz)."'";
+			$qry.=" AND	trim(gruppe_kurzbz)=".$this->db_add_param($this->gruppe_kurzbz);
 		else 
 			$qry.= " AND (trim(gruppe_kurzbz)='' OR gruppe_kurzbz is null)";
 		
+        $qry.=';';
 		
 		if($this->db_query($qry))
 		{

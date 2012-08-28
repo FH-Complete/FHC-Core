@@ -92,8 +92,8 @@ class lvinfo extends basis_db
 			$lvinfo_obj->pruefungsordnung 	= $row->pruefungsordnung;
 			$lvinfo_obj->anmerkungen 		= $row->anmerkung;
 			$lvinfo_obj->kurzbeschreibung	= $row->kurzbeschreibung;
-			$lvinfo_obj->genehmigt 			= ($row->genehmigt=='t'?true:false);
-			$lvinfo_obj->aktiv 				= ($row->aktiv=='t'?true:false);
+			$lvinfo_obj->genehmigt 			= $this->db_parse_bool($row->genehmigt);
+			$lvinfo_obj->aktiv 				= $this->db_parse_bool($row->aktiv);
 			$lvinfo_obj->sprache 			= $row->sprache;
 			$lvinfo_obj->insertamum 		= $row->insertamum;
 			$lvinfo_obj->insertvon 			= $row->insertvon;
@@ -119,7 +119,7 @@ class lvinfo extends basis_db
 			return false;
 		}
 		$qry = "SELECT * FROM campus.tbl_lvinfo 
-				WHERE lehrveranstaltung_id = '$lehrveranstaltung_id' AND sprache='".addslashes($sprache)."';";
+				WHERE lehrveranstaltung_id = ".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)." AND sprache=".$this->db_add_param($sprache).";";
 
 		if(!$this->db_query($qry))
 		{
@@ -139,8 +139,8 @@ class lvinfo extends basis_db
 			$this->pruefungsordnung 	= $row->pruefungsordnung;
 			$this->anmerkungen 			= $row->anmerkung;
 			$this->kurzbeschreibung		= $row->kurzbeschreibung;
-			$this->genehmigt 			= ($row->genehmigt=='t'?true:false);
-			$this->aktiv 				= ($row->aktiv=='t'?true:false);
+			$this->genehmigt 			= $this->db_parse_bool($row->genehmigt);
+			$this->aktiv 				= $this->db_parse_bool($row->aktiv);
 			$this->sprache 				= $row->sprache;
 			$this->insertamum 			= $row->insertamum;
 			$this->insertvon 			= $row->insertvon;
@@ -169,7 +169,7 @@ class lvinfo extends basis_db
 			return false;
 		}
 
-		$qry = "DELETE FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$lvinfo_id'";
+		$qry = "DELETE FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id=".$this->db_add_param($lvinfo_id, FHC_INTEGER);
 
 		if($this->db_query($qry))
 		{
@@ -219,23 +219,23 @@ class lvinfo extends basis_db
 			$qry = 'INSERT INTO campus.tbl_lvinfo (lehrveranstaltung_id, sprache, titel, methodik, lehrziele, lehrinhalte, voraussetzungen, unterlagen, pruefungsordnung, anmerkung,
 				kurzbeschreibung, genehmigt, aktiv,  insertamum, insertvon, updateamum,
 				updatevon) VALUES ('.
-				$this->addslashes($this->lehrveranstaltung_id).','.
-				$this->addslashes($this->sprache).', '.
-				$this->addslashes($this->titel).', '.
-				$this->addslashes($this->methodik).', '.
-				$this->addslashes($this->lehrziele).', '.
-				$this->addslashes($this->lehrinhalte).', '.
-				$this->addslashes($this->voraussetzungen).', '.
-				$this->addslashes($this->unterlagen).', '.
-				$this->addslashes($this->pruefungsordnung).', '.
-				$this->addslashes($this->anmerkungen).', '.
-				$this->addslashes($this->kurzbeschreibung).', '.
-				($this->genehmigt?'true':'false').', '.
-				($this->aktiv?'true':'false').', '.
-				$this->addslashes($this->insertamum).', '.
-				$this->addslashes($this->insertvon).', '.
-				$this->addslashes($this->updateamum).', '.
-				$this->addslashes($this->updatevon).');';
+				$this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER).','.
+				$this->db_add_param($this->sprache).', '.
+				$this->db_add_param($this->titel).', '.
+				$this->db_add_param($this->methodik).', '.
+				$this->db_add_param($this->lehrziele).', '.
+				$this->db_add_param($this->lehrinhalte).', '.
+				$this->db_add_param($this->voraussetzungen).', '.
+				$this->db_add_param($this->unterlagen).', '.
+				$this->db_add_param($this->pruefungsordnung).', '.
+				$this->db_add_param($this->anmerkungen).', '.
+				$this->db_add_param($this->kurzbeschreibung).', '.
+				$this->db_add_param($this->genehmigt, FHC_BOOLEAN).', '.
+				$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
+				$this->db_add_param($this->insertamum).', '.
+				$this->db_add_param($this->insertvon).', '.
+				$this->db_add_param($this->updateamum).', '.
+				$this->db_add_param($this->updatevon).');';
 
 		}
 		else
@@ -250,22 +250,22 @@ class lvinfo extends basis_db
 			}
 
 			$qry = 'UPDATE campus.tbl_lvinfo SET '.
-				'titel='.$this->addslashes($this->titel).','.
-				'methodik='.$this->addslashes($this->methodik).','.
-				'lehrziele='.$this->addslashes($this->lehrziele).', '.
-				'lehrinhalte='.$this->addslashes($this->lehrinhalte).', '.
-				'voraussetzungen='.$this->addslashes($this->voraussetzungen).', '.
-				'pruefungsordnung='.$this->addslashes($this->pruefungsordnung).', '.
-				'anmerkung='.$this->addslashes($this->anmerkungen).', '.
-				'kurzbeschreibung='.$this->addslashes($this->kurzbeschreibung).', '.
-				'unterlagen='.$this->addslashes($this->unterlagen).', '.
-				'genehmigt='.($this->genehmigt?'true':'false') .', '.
-				'aktiv='.($this->aktiv?'true':'false') .', '.
-				'insertamum='.$this->addslashes($this->insertamum).', '.
-				'insertvon='.$this->addslashes($this->insertvon).', '.
-				'updateamum='.$this->addslashes($this->updateamum).', '.
-				'updatevon='.$this->addslashes($this->updatevon).' '.
-				'WHERE lehrveranstaltung_id = '.$this->addslashes($this->lehrveranstaltung_id)." AND sprache=".$this->addslashes($this->sprache).";";
+				'titel='.$this->db_add_param($this->titel).','.
+				'methodik='.$this->db_add_param($this->methodik).','.
+				'lehrziele='.$this->db_add_param($this->lehrziele).', '.
+				'lehrinhalte='.$this->db_add_param($this->lehrinhalte).', '.
+				'voraussetzungen='.$this->db_add_param($this->voraussetzungen).', '.
+				'pruefungsordnung='.$this->db_add_param($this->pruefungsordnung).', '.
+				'anmerkung='.$this->db_add_param($this->anmerkungen).', '.
+				'kurzbeschreibung='.$this->db_add_param($this->kurzbeschreibung).', '.
+				'unterlagen='.$this->db_add_param($this->unterlagen).', '.
+				'genehmigt='.$this->db_add_param($this->genehmigt, FHC_BOOLEAN) .', '.
+				'aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN) .', '.
+				'insertamum='.$this->db_add_param($this->insertamum).', '.
+				'insertvon='.$this->db_add_param($this->insertvon).', '.
+				'updateamum='.$this->db_add_param($this->updateamum).', '.
+				'updatevon='.$this->db_add_param($this->updatevon).' '.
+				'WHERE lehrveranstaltung_id = '.$this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER)." AND sprache=".$this->db_add_param($this->sprache).";";
 		}
 
 		if($this->db_query($qry))
@@ -295,10 +295,12 @@ class lvinfo extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT count(*) as anzahl FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='$lehrveranstaltung_id'";
+		$qry = "SELECT count(*) as anzahl FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
 		
 		if(!is_null($sprache))
-			$qry .= " AND sprache='".addslashes($sprache)."'";
+			$qry .= " AND sprache=".$this->db_add_param($sprache);
+        
+        $qry.=';';
 
 		if($this->db_query($qry))
 		{
@@ -349,7 +351,7 @@ class lvinfo extends basis_db
 			aktiv, updateamum, updatevon, insertamum, insertvon) 
 		SELECT $target, sprache, titel, lehrziele,
 		lehrinhalte, methodik, voraussetzungen, unterlagen, pruefungsordnung, anmerkung, kurzbeschreibung, genehmigt,
-		aktiv, updateamum, updatevon, insertamum, insertvon FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id=$source";
+		aktiv, updateamum, updatevon, insertamum, insertvon FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id=".$this->db_add_param($source).';';
 		
 		if($this->db_query($qry))
 		{
