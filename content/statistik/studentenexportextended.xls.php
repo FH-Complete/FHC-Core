@@ -119,7 +119,8 @@ loadVariables($user);
 	$maxlength[$i]=17;
 	$worksheet->write($zeile,++$i,"GESCHLECHT", $format_bold);
 	$maxlength[$i]=10;
-	
+	$worksheet->write($zeile,++$i,"STUDIENGANG", $format_bold);
+	$maxlength[$i]=11;
 	$worksheet->write($zeile,++$i,"SEMESTER", $format_bold);
 	$maxlength[$i]=8;
 	$worksheet->write($zeile,++$i,"VERBAND", $format_bold);
@@ -178,7 +179,7 @@ loadVariables($user);
 		}
 	}
 	// Student holen
-	$qry = "SELECT *, tbl_prestudent.studiengang_kz as prestgkz 
+	$qry = "SELECT *, tbl_prestudent.studiengang_kz as prestgkz, (SELECT UPPER(typ || kurzbz) FROM public.tbl_studiengang WHERE studiengang_kz=tbl_prestudent.studiengang_kz) as stgbez
 			FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) LEFT JOIN public.tbl_student USING(prestudent_id) 
 			WHERE prestudent_id in($prestudent_ids) ORDER BY nachname, vorname";
 
@@ -291,6 +292,12 @@ loadVariables($user);
 		$worksheet->write($zeile,$i, $row->geschlecht);
 		$i++;
 		
+		//Studiengang	
+		if(mb_strlen($row->stgbez)>$maxlength[$i])
+			$maxlength[$i] = mb_strlen($row->stgbez);
+		$worksheet->write($zeile,$i, $row->stgbez);
+		$i++;
+		
 		$qry = "SELECT * FROM public.tbl_studentlehrverband JOIN public.tbl_student USING(student_uid) 
 				WHERE prestudent_id='".addslashes($row->prestudent_id)."' 
 				AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
@@ -309,6 +316,7 @@ loadVariables($user);
 				$gruppe = '';
 			}
 		}
+		
 		//Semester		
 		if(isset($semester))
 		{
