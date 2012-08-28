@@ -343,7 +343,7 @@
 			else 
 				$selected='';
 				
-			echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=$row->studiengang_kz' $selected>".$db->convert_html_chars($row->kuerzel)."</OPTION>";
+			echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=$row->studiengang_kz' $selected>".$db->convert_html_chars($row->kuerzel)."</OPTION>"."\n";
 		}
 		echo "</SELECT>";
 		
@@ -365,6 +365,7 @@
 				$selected='';
 				
 			echo '<OPTION value="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&reihungstest_id='.$row->reihungstest_id.'" '.$selected.'>'.$db->convert_html_chars($row->datum.' '.$row->uhrzeit.' '.$studiengang->kuerzel_arr[$row->studiengang_kz].' '.$row->ort_kurzbz.' '.$row->anmerkung).'</OPTION>';
+			echo "\n";
 		}
 		echo '</SELECT>';
 		echo "<INPUT type='button' value='Anzeigen' onclick='window.location.href=document.getElementById(\"reihungstest\").value;'>";
@@ -418,7 +419,7 @@
 			else 
 				$selected = '';
 			
-			echo "<OPTION value='$row->studiengang_kz' $selected>".$db->convert_html_chars($row->kuerzel)."</OPTION>";
+			echo "<OPTION value='$row->studiengang_kz' $selected>".$db->convert_html_chars($row->kuerzel)."</OPTION>\n";
 		}
 		echo "</SELECT></TD></TR>";
 		
@@ -441,13 +442,13 @@
 			else 
 				$selected='';
 			
-			echo "<OPTION value='$row->ort_kurzbz' $selected>".$db->convert_html_chars($row->ort_kurzbz)."</OPTION>";
+			echo "<OPTION value='$row->ort_kurzbz' $selected>".$db->convert_html_chars($row->ort_kurzbz)."</OPTION>\n";
 		}
 		echo '</SELECT></td></tr>';
 		echo '<tr><td>Anmerkung</td><td><input type="text" name="anmerkung" value="'.$db->convert_html_chars($reihungstest->anmerkung).'"></td></tr>';
 		echo '<tr><td>Datum</td><td><input type="text" name="datum" value="'.$datum_obj->convertISODate($reihungstest->datum).'"></td></tr>';
 		echo '<tr><td>Uhrzeit</td><td><input type="text" name="uhrzeit" value="'.$db->convert_html_chars($reihungstest->uhrzeit).'"> (Format: HH:MM:SS)</td></tr>';
-		echo '<tr><td>Freigeschaltet</td><td><input type="checkbox" name="freigeschaltet" '.($reihungstest->freigeschaltet?'checked="checked"':'').'"></td></tr>';
+		echo '<tr><td>Freigeschaltet</td><td><input type="checkbox" name="freigeschaltet" '.($reihungstest->freigeschaltet?'checked="checked"':'').'></td></tr>';
 		if(!$neu)
 			$val = 'Änderung Speichern';
 		else 
