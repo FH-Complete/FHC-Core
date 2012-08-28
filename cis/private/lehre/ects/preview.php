@@ -33,6 +33,7 @@ require_once('../../../../include/studiensemester.class.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/lvinfo.class.php');
 require_once('../../../../include/studiengang.class.php');
+require_once('../../../../include/safehtml/safehtml.class.php');
 
 if (!$db = new basis_db())
 			die('Fehler beim Herstellen der Datenbankverbindung');
@@ -93,6 +94,23 @@ if (!$db = new basis_db())
 		$pruefungsordnung_de = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['pruefungsordnung_de']));
 		$anmerkungen_de = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['anmerkungen_de']));
 
+		$parser = new SafeHTML();
+	 	$lehrziele_de = $parser->parse($lehrziele_de);
+	 	$parser = new SafeHTML();
+	 	$lehrinhalte_de = $parser->parse($lehrinhalte_de);
+	 	$parser = new SafeHTML();
+		$voraussetzungen_de = $parser->parse($voraussetzungen_de);
+		$parser = new SafeHTML();
+		$unterlagen_de = $parser->parse($unterlagen_de);
+		$parser = new SafeHTML();
+		$pruefungsordnung_de = $parser->parse($pruefungsordnung_de);
+		$parser = new SafeHTML();
+		$anmerkungen_de = $parser->parse($anmerkungen_de);
+		$parser = new SafeHTML();
+		$kurzbeschreibung_de = $parser->parse($kurzbeschreibung_de);
+		$parser = new SafeHTML();
+		$methodik_de = $parser->parse($methodik_de);
+		
 		// Englisch content variables
 		//$titel_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['titel_en']));
 		$methodik_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['methodik_en']));
@@ -103,6 +121,23 @@ if (!$db = new basis_db())
 		$unterlagen_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['unterlagen_en']));
 		$pruefungsordnung_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['pruefungsordnung_en']));
 		$anmerkungen_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['anmerkungen_en']));
+		
+		$parser = new SafeHTML();
+		$lehrziele_en = $parser->parse($lehrziele_en);
+		$parser = new SafeHTML();
+	 	$lehrinhalte_en = $parser->parse($lehrinhalte_en);
+	 	$parser = new SafeHTML();
+		$voraussetzungen_en = $parser->parse($voraussetzungen_en);
+		$parser = new SafeHTML();
+		$unterlagen_en = $parser->parse($unterlagen_en);
+		$parser = new SafeHTML();
+		$pruefungsordnung_en = $parser->parse($pruefungsordnung_en);
+		$parser = new SafeHTML();
+		$anmerkungen_en = $parser->parse($anmerkungen_en);
+		$parser = new SafeHTML();
+		$kurzbeschreibung_en = $parser->parse($kurzbeschreibung_en);
+		$parser = new SafeHTML();
+		$methodik_en = $parser->parse($methodik_en);
 	}
 	elseif(isset($_GET['lv'])) //LV Id wird uebergeben (zB bei Ansicht fuer alle von lesson.php)
 	{
