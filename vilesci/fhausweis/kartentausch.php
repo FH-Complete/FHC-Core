@@ -77,14 +77,23 @@ if($action=='kartentausch')
 		$bmp = new betriebsmittelperson();
 		if($bmp->getKartenzuordnungPerson($benutzer->person_id, $kartennummer_hitag))
 		{
-			$bmp->ausgegebenam=date('Y-m-d');
-			$bmp->updateamum = date('Y-m-d H:i:s');
-			$bmp->updatevon = $uid;
-			
-			if(!$bmp->save(false))
+			if($bmp->nummer2=='' && $kartennummer_alt!=$kartennummer_hitag)
 			{
-				echo '<span class="error">Fehler beim Tauschen: '.$bmp->errormsg.'</span>';
-				$error=true;
+				// Alte Karte und Neue Karte vermutlich vertauscht -> Abbruch
+				echo '<span class="error">Fehler beim Tauschen - Eventuell wurden alte und neue Karte vertauscht!? Bitte tauschen Sie die Karte erneut.</span>';
+				$error = true;	
+			}
+			else
+			{
+				$bmp->ausgegebenam=date('Y-m-d');
+				$bmp->updateamum = date('Y-m-d H:i:s');
+				$bmp->updatevon = $uid;
+				
+				if(!$bmp->save(false))
+				{
+					echo '<span class="error">Fehler beim Tauschen: '.$bmp->errormsg.'</span>';
+					$error=true;
+				}
 			}
 		}
 		else
@@ -92,40 +101,48 @@ if($action=='kartentausch')
 			echo '<span class="error">Fehler beim Tauschen: Die neue Karte wurde dieser Person noch nicht zugeordnet</span>';
 			$error = true;
 		}
-		if(!$error)
+		if($kartennummer_alt!=$kartennummer_hitag)
 		{
-			if($kartennummer_alt!='')
+			if(!$error)
 			{
-				//Alte Karte deaktivieren wenn vorhanden
-				$bmp = new betriebsmittelperson();
-				if($bmp->getKartenzuordnung($kartennummer_alt))
+				if($kartennummer_alt!='')
 				{
-					if($bmp->person_id==$benutzer->person_id)
+					//Alte Karte deaktivieren wenn vorhanden
+					$bmp = new betriebsmittelperson();
+					if($bmp->getKartenzuordnung($kartennummer_alt))
 					{
-						$bmp->retouram = date('Y-m-d');
-						if(!$bmp->save(false))
+						if($bmp->person_id==$benutzer->person_id)
 						{
-							echo '<span class="error">Fehler beim Eintragen des Retourdatums</span>';
+							$bmp->retouram = date('Y-m-d');
+							if(!$bmp->save(false))
+							{
+								echo '<span class="error">Fehler beim Eintragen des Retourdatums</span>';
+								$error=true;
+							}
+						}
+						else
+						{
+							echo '<span class="error">Karte passt nicht zur Person</span>';
 							$error=true;
 						}
 					}
 					else
 					{
-						echo '<span class="error">Karte passt nicht zur Person</span>';
+						echo '<span class="error">Kartenzuordnung der alten Karte nicht gefunden</span>';
 						$error=true;
 					}
 				}
-				else
-				{
-					echo '<span class="error">Kartenzuordnung der alten Karte nicht gefunden</span>';
-					$error=true;
-				}
 			}
+			if(!$error)
+			{
+				echo '<span class="ok">Karte erfolgreich getauscht</span>';
+			}	
 		}
-		if(!$error)
+		else
 		{
-			echo '<span class="ok">Karte erfolgreich getauscht</span>';
-		}			
+			echo '<span class="ok">Karte wurde aktiviert</span>';
+		}
+				
 	}
 	$kartennummer_alt='';
 	$karten_user='';
