@@ -721,7 +721,7 @@
 								</fo:table-cell>
 							</fo:table-row>
 							
-							<fo:table-row line-height="185mm">
+							<fo:table-row line-height="190mm">
 								<fo:table-cell border-width="0.2mm" border-left-style="solid">
 									<fo:block font-size="8pt" font-weight="bold" content-width="7mm">
 											<!-- pos -->
