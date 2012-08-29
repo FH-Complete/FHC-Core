@@ -243,22 +243,29 @@ if ($aktion=='stpl_move' || $aktion=='stpl_set')
 		$moved[]=$stundenplan_id;
 		$lehrstunde=new lehrstunde();
 		$lehrstunde->load($stundenplan_id,$db_stpl_table);
-		$undo.=$lehrstunde->getUndo($db_stpl_table);
-		$diffStunde=$new_stunde-$lehrstunde->stunde;
-		$lehrstunde->datum=$new_datum;
-		$lehrstunde->stunde=$new_stunde;
-		if ($ort!=$old_ort)
-			$lehrstunde->ort_kurzbz=$ort;
-		if ($aktion=='stpl_set')
-			$lehrstunde->ort_kurzbz=$new_ort;
-		$kollision=$lehrstunde->kollision($db_stpl_table);
-		if ($kollision && !$ignore_kollision)
-			$kollision_msg.=$lehrstunde->errormsg;
-		if (!$kollision || $ignore_kollision || $kollisionsanzahl>0)
+		if($rechte->isBerechtigt('lehre/lvplan',$lehrstunde->studiengang_kz,'ui'))
 		{
-			if(!$lehrstunde->save($uid,$db_stpl_table))
-				$error_msg.=$lehrstunde->errormsg;
-			$sql.=$lehrstunde->lastqry;
+			$undo.=$lehrstunde->getUndo($db_stpl_table);
+			$diffStunde=$new_stunde-$lehrstunde->stunde;
+			$lehrstunde->datum=$new_datum;
+			$lehrstunde->stunde=$new_stunde;
+			if ($ort!=$old_ort)
+				$lehrstunde->ort_kurzbz=$ort;
+			if ($aktion=='stpl_set')
+				$lehrstunde->ort_kurzbz=$new_ort;
+			$kollision=$lehrstunde->kollision($db_stpl_table);
+			if ($kollision && !$ignore_kollision)
+				$kollision_msg.=$lehrstunde->errormsg;
+			if (!$kollision || $ignore_kollision || $kollisionsanzahl>0)
+			{
+				if(!$lehrstunde->save($uid,$db_stpl_table))
+					$error_msg.=$lehrstunde->errormsg;
+				$sql.=$lehrstunde->lastqry;
+			}
+		}
+		else
+		{
+			$error_msg.="Sie haben keine Berechtigung zur Verschiebung von Stunden des Studienganges ".$lehrstunde->studiengang;
 		}
 	}
 	// Mehrfachauswahl
@@ -270,21 +277,28 @@ if ($aktion=='stpl_move' || $aktion=='stpl_set')
 			{
 				$lehrstunde=new lehrstunde();
 				$lehrstunde->load($stundenplan_id,$db_stpl_table);
-				$undo.=$lehrstunde->getUndo($db_stpl_table);
-				$lehrstunde->datum=$new_datum;
-				$lehrstunde->stunde+=$diffStunde;
-				if ($ort!=$old_ort)
-					$lehrstunde->ort_kurzbz=$ort;
-				if ($aktion=='stpl_set')
-					$lehrstunde->ort_kurzbz=$new_ort;
-				$kollision=$lehrstunde->kollision($db_stpl_table);
-				if ($kollision && !$ignore_kollision)
-					$kollision_msg.=$lehrstunde->errormsg;
-				if (!$kollision || $ignore_kollision || $kollisionsanzahl>0)
+				if($rechte->isBerechtigt('lehre/lvplan',$lehrstunde->studiengang_kz,'ui'))
 				{
-					if(!$lehrstunde->save($uid,$db_stpl_table))
-						$error_msg.=$lehrstunde->errormsg;
-					$sql.=$lehrstunde->lastqry;
+					$undo.=$lehrstunde->getUndo($db_stpl_table);
+					$lehrstunde->datum=$new_datum;
+					$lehrstunde->stunde+=$diffStunde;
+					if ($ort!=$old_ort)
+						$lehrstunde->ort_kurzbz=$ort;
+					if ($aktion=='stpl_set')
+						$lehrstunde->ort_kurzbz=$new_ort;
+					$kollision=$lehrstunde->kollision($db_stpl_table);
+					if ($kollision && !$ignore_kollision)
+						$kollision_msg.=$lehrstunde->errormsg;
+					if (!$kollision || $ignore_kollision || $kollisionsanzahl>0)
+					{
+						if(!$lehrstunde->save($uid,$db_stpl_table))
+							$error_msg.=$lehrstunde->errormsg;
+						$sql.=$lehrstunde->lastqry;
+					}
+				}
+				else
+				{
+					$error_msg.="Sie haben keine Berechtigung zur Verschiebung von Stunden des Studienganges ".$lehrstunde->studiengang;
 				}
 			}
 		}
@@ -309,206 +323,232 @@ elseif ($aktion=='stpl_delete_single' || $aktion=='stpl_delete_block')
 {
 	$lehrstunde=new lehrstunde();
 	
-	//Einzelne Stunden entfernen
-	if(isset($stpl_id))
+	if($rechte->isBerechtigt('lehre/lvplan',null,'uid'))
 	{
-		foreach ($stpl_id as $stundenplan_id)
+		//Einzelne Stunden entfernen
+		if(isset($stpl_id))
 		{
-			$lehrstunde->delete($stundenplan_id,$db_stpl_table);
-			$error_msg.=$lehrstunde->errormsg;
+			foreach ($stpl_id as $stundenplan_id)
+			{
+				$lehrstunde->delete($stundenplan_id,$db_stpl_table);
+				$error_msg.=$lehrstunde->errormsg;
+			}
+		}
+		
+		//Loeschen von mehreren Stunden
+		if(isset($stpl_idx))
+		{
+			foreach ($stpl_idx as $stundenplan_id)
+			{
+				$lehrstunde->delete($stundenplan_id,$db_stpl_table);
+				$error_msg.=$lehrstunde->errormsg;
+			}
+		}
+		
+		if(isset($res_id))
+		{
+			$reservierung=new reservierung();
+			foreach ($res_id as $reservierung_id)
+			{
+				$reservierung->delete($reservierung_id);
+				$error_msg.=$reservierung->errormsg;
+			}
+		}
+		
+		//Loeschen von mehreren Reservierungen
+		if(isset($res_idx))
+		{
+			$reservierung=new reservierung();
+			foreach ($res_idx as $reservierung_id)
+			{
+				$reservierung->delete($reservierung_id);
+				$error_msg.=$reservierung->errormsg;
+			}
 		}
 	}
-	
-	//Loeschen von mehreren Stunden
-	if(isset($stpl_idx))
+	else
 	{
-		foreach ($stpl_idx as $stundenplan_id)
-		{
-			$lehrstunde->delete($stundenplan_id,$db_stpl_table);
-			$error_msg.=$lehrstunde->errormsg;
-		}
-	}
-	
-	if(isset($res_id))
-	{
-		$reservierung=new reservierung();
-		foreach ($res_id as $reservierung_id)
-		{
-			$reservierung->delete($reservierung_id);
-			$error_msg.=$reservierung->errormsg;
-		}
-	}
-	
-	//Loeschen von mehreren Reservierungen
-	if(isset($res_idx))
-	{
-		$reservierung=new reservierung();
-		foreach ($res_idx as $reservierung_id)
-		{
-			$reservierung->delete($reservierung_id);
-			$error_msg.=$reservierung->errormsg;
-		}
+		$error_msg.="Sie haben keine Berechtigung fuer diese Aktion";
 	}
 }
 // ******************** Lehrveranstaltung setzen ******************************
 elseif ($aktion=='lva_single_set')
 {
-	$z=0;
-	foreach ($lva_id AS $le_id)
+	if($rechte->isBerechtigt('lehre/lvplan',null,'ui'))
 	{
-		$lva[$z]=new lehreinheit();
-		$lva[$z]->loadLE($le_id);
-		//$error_msg.='test'.$le_id.($lva[$i]->errormsg).($lva[$i]->stundenblockung);
-		for ($j=0;$j<$lva[$z]->stundenblockung && $error_msg=='';$j++)
-			if (!$lva[$z]->check_lva($new_datum,$new_stunde+$j,$new_ort,$db_stpl_table) && !$ignore_kollision)
-				$kollision_msg.=$lva[$z]->errormsg."\n";
-		$z++;
+		$z=0;
+		foreach ($lva_id AS $le_id)
+		{
+			$lva[$z]=new lehreinheit();
+			$lva[$z]->loadLE($le_id);
+			//$error_msg.='test'.$le_id.($lva[$i]->errormsg).($lva[$i]->stundenblockung);
+			for ($j=0;$j<$lva[$z]->stundenblockung && $error_msg=='';$j++)
+				if (!$lva[$z]->check_lva($new_datum,$new_stunde+$j,$new_ort,$db_stpl_table) && !$ignore_kollision)
+					$kollision_msg.=$lva[$z]->errormsg."\n";
+			$z++;
+		}
+		for ($i=0;$i<$z && $error_msg=='';$i++)
+		{
+			for ($j=0;$j<$lva[$i]->stundenblockung;$j++)
+				if (!$lva[$i]->save_stpl($new_datum,$new_stunde+$j,$new_ort,$db_stpl_table,$uid))
+					$error_msg.='Error: '.$lva[$i]->errormsg;
+		}
 	}
-	for ($i=0;$i<$z && $error_msg=='';$i++)
+	else
 	{
-		for ($j=0;$j<$lva[$i]->stundenblockung;$j++)
-			if (!$lva[$i]->save_stpl($new_datum,$new_stunde+$j,$new_ort,$db_stpl_table,$uid))
-				$error_msg.='Error: '.$lva[$i]->errormsg;
+		$error_msg.="Sie haben keine Berechtigung fuer diese Aktion";
 	}
 }
 //******************* Multi Verplanung ***************
 elseif ($aktion=='lva_multi_set')
 {
-	// Ferien holen
-	$ferien=new ferien();
-	if ($type=='verband')
-		$ferien->getAll($stg_kz);
-	else
-		$ferien->getAll(0);
-
-	// Ende holen
-	if (!$result_semester=$db->db_query("SELECT * FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='".addslashes($semester_aktuell)."';"))
-		die ($db->db_last_error());
-	if ($db->db_num_rows()>0)
+	if($rechte->isBerechtigt('lehre/lvplan',null,'ui'))
 	{
-		$row = $db->db_fetch_object(); 
-		$ende = $row->ende;
-	}
-	else
-		$error_msg.="Fatal Error: Ende Datum ist nicht gesetzt ($semester_aktuell)!";
+		// Ferien holen
+		$ferien=new ferien();
+		if ($type=='verband')
+			$ferien->getAll($stg_kz);
+		else
+			$ferien->getAll(0);
 	
-	$ende=mktime(0,0,1,substr($ende,5,2),substr($ende,8,2),substr($ende,0,4));
-	$anz_lvas=count($lva_id);
-	// Arrays intitialisieren
-	$wochenrythmus=array();
-	$verplant=array();
-	$block=array();
-	$wochenrythmus=array();
-	$semesterstunden=array();
-	$planstunden=array();
-	$offenestunden=array();
-	// LVAs holen
-	$sql_query='SELECT * FROM lehre.'.$lva_stpl_view.' WHERE';
-	$lvas='';
-	foreach ($lva_id as $id)
-		$lvas.=' OR lehreinheit_id='.$id;
-	$lvas=substr($lvas,3);
-	$sql_query.=$lvas;
-
-	if(!$result_lva = $db->db_query($sql_query))
-		$error_msg.=$db->db_last_error();
-	$num_rows_lva=$db->db_num_rows($result_lva);
-	// Daten aufbereiten
-	for ($i=0;$i<$num_rows_lva;$i++)
-	{
-		$row=$db->db_fetch_object($result_lva,$i);
-		$verplant[]=$row->verplant;
-		$block[]=$row->stundenblockung;
-		$wochenrythmus[]=$row->wochenrythmus;
-		$semesterstunden[]=$row->semesterstunden;
-		$planstunden[]=$row->planstunden;
-		$offenestunden[]=$row->planstunden-$row->verplant;
-	}
-	// Variablen eindeutig?
-	// Offene Stunden
-	$os=$offenestunden[0];
-	$offenestunden=array_unique($offenestunden);
-	if (count($offenestunden)==1)
-		$offenestunden=$os;
-	else
-		$error_msg.='Offene Stunden sind nicht eindeutig!';
-	
-	//Blockung
-	$blk=$block[0];
-	$block=array_unique($block);
-	if (count($block)==1)
-		$block=$blk;
-	else
-		$error_msg.='Blockung ist nicht eindeutig!';
-	//Wochenrythmus
-	$wr=$wochenrythmus[0];
-	$wochenrythmus=array_unique($wochenrythmus);
-	if (count($wochenrythmus)==1)
-		$wochenrythmus=$wr;
-	else
-		$error_msg.='Wochenrythmus ist nicht eindeutig!';
-	$count=0;
-	$rest=$offenestunden;
-	if ($rest<=0)
-		$error_msg.='Es sind bereits alle Stunden verplant!'.$rest;
-	if ($error_msg=='')
-	{
-		$d=mktime(0,0,1,substr($new_datum,5,2),substr($new_datum,8),substr($new_datum,0,4));
-		while ($rest>0 && $d<$ende)
+		// Ende holen
+		if (!$result_semester=$db->db_query("SELECT * FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='".addslashes($semester_aktuell)."';"))
+			die ($db->db_last_error());
+		if ($db->db_num_rows()>0)
 		{
-			if ($rest<$block && $rest>0)
-				$block=$rest;
-			//LVAs holen und pruefen ob moeglich
-			for ($i=0;$i<$anz_lvas;$i++)
-			{
-				$lva[$i]=new lehreinheit();
-				$lva[$i]->loadLE($lva_id[$i]);
-				for ($j=0;$j<$block;$j++)
-					if (!$lva[$i]->check_lva($new_datum,$new_stunde+$j,$new_ort,$db_stpl_table) && !$ignore_kollision)
-						$kollision_msg.=$lva[$i]->errormsg;
-			}
-			// LVAs setzen
-			for ($i=0;$i<$anz_lvas && $error_msg=='';$i++)
-				for ($j=0;$j<$block;$j++)
-					if (!$lva[$i]->save_stpl($new_datum,$new_stunde+$j,$new_ort,$db_stpl_table,$uid))
-						$error_msg.=$lva[$i]->errormsg;
-			$d=jump_week($d,$wochenrythmus);
-			while ($ferien->isferien($d))
-				$d=jump_week($d,$wochenrythmus);
-			// Es kann sein, dass die Zeitumstellung (1 Stunde) Probleme macht
-			// Falls 23 Uhr eine Stunde nach vor
-			$new_datum=date('Y-m-d',$d);
-			$rest-=$block;
+			$row = $db->db_fetch_object(); 
+			$ende = $row->ende;
 		}
+		else
+			$error_msg.="Fatal Error: Ende Datum ist nicht gesetzt ($semester_aktuell)!";
+		
+		$ende=mktime(0,0,1,substr($ende,5,2),substr($ende,8,2),substr($ende,0,4));
+		$anz_lvas=count($lva_id);
+		// Arrays intitialisieren
+		$wochenrythmus=array();
+		$verplant=array();
+		$block=array();
+		$wochenrythmus=array();
+		$semesterstunden=array();
+		$planstunden=array();
+		$offenestunden=array();
+		// LVAs holen
+		$sql_query='SELECT * FROM lehre.'.$lva_stpl_view.' WHERE';
+		$lvas='';
+		foreach ($lva_id as $id)
+			$lvas.=' OR lehreinheit_id='.$id;
+		$lvas=substr($lvas,3);
+		$sql_query.=$lvas;
+	
+		if(!$result_lva = $db->db_query($sql_query))
+			$error_msg.=$db->db_last_error();
+		$num_rows_lva=$db->db_num_rows($result_lva);
+		// Daten aufbereiten
+		for ($i=0;$i<$num_rows_lva;$i++)
+		{
+			$row=$db->db_fetch_object($result_lva,$i);
+			$verplant[]=$row->verplant;
+			$block[]=$row->stundenblockung;
+			$wochenrythmus[]=$row->wochenrythmus;
+			$semesterstunden[]=$row->semesterstunden;
+			$planstunden[]=$row->planstunden;
+			$offenestunden[]=$row->planstunden-$row->verplant;
+		}
+		// Variablen eindeutig?
+		// Offene Stunden
+		$os=$offenestunden[0];
+		$offenestunden=array_unique($offenestunden);
+		if (count($offenestunden)==1)
+			$offenestunden=$os;
+		else
+			$error_msg.='Offene Stunden sind nicht eindeutig!';
+		
+		//Blockung
+		$blk=$block[0];
+		$block=array_unique($block);
+		if (count($block)==1)
+			$block=$blk;
+		else
+			$error_msg.='Blockung ist nicht eindeutig!';
+		//Wochenrythmus
+		$wr=$wochenrythmus[0];
+		$wochenrythmus=array_unique($wochenrythmus);
+		if (count($wochenrythmus)==1)
+			$wochenrythmus=$wr;
+		else
+			$error_msg.='Wochenrythmus ist nicht eindeutig!';
+		$count=0;
+		$rest=$offenestunden;
+		if ($rest<=0)
+			$error_msg.='Es sind bereits alle Stunden verplant!'.$rest;
+		if ($error_msg=='')
+		{
+			$d=mktime(0,0,1,substr($new_datum,5,2),substr($new_datum,8),substr($new_datum,0,4));
+			while ($rest>0 && $d<$ende)
+			{
+				if ($rest<$block && $rest>0)
+					$block=$rest;
+				//LVAs holen und pruefen ob moeglich
+				for ($i=0;$i<$anz_lvas;$i++)
+				{
+					$lva[$i]=new lehreinheit();
+					$lva[$i]->loadLE($lva_id[$i]);
+					for ($j=0;$j<$block;$j++)
+						if (!$lva[$i]->check_lva($new_datum,$new_stunde+$j,$new_ort,$db_stpl_table) && !$ignore_kollision)
+							$kollision_msg.=$lva[$i]->errormsg;
+				}
+				// LVAs setzen
+				for ($i=0;$i<$anz_lvas && $error_msg=='';$i++)
+					for ($j=0;$j<$block;$j++)
+						if (!$lva[$i]->save_stpl($new_datum,$new_stunde+$j,$new_ort,$db_stpl_table,$uid))
+							$error_msg.=$lva[$i]->errormsg;
+				$d=jump_week($d,$wochenrythmus);
+				while ($ferien->isferien($d))
+					$d=jump_week($d,$wochenrythmus);
+				// Es kann sein, dass die Zeitumstellung (1 Stunde) Probleme macht
+				// Falls 23 Uhr eine Stunde nach vor
+				$new_datum=date('Y-m-d',$d);
+				$rest-=$block;
+			}
+		}
+	}
+	else
+	{
+		$error_msg.="Sie haben keine Berechtigung fuer diese Aktion";
 	}
 }
 // Lehrveranstaltungen aus dem Stundenplan loeschen
 elseif ($aktion=='lva_stpl_del_multi' || $aktion=='lva_stpl_del_single')
 {
-	$result_semester = $db->db_query("SELECT start,ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='".addslashes($semester_aktuell)."';");
-	if ($db->db_num_rows()>0)
+	if($rechte->isBerechtigt('lehre/lvplan',null,'uid'))
 	{
-		$start=date('Y-m-d',$datum);
-		if ($aktion=='lva_stpl_del_multi')
+		$result_semester = $db->db_query("SELECT start,ende FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='".addslashes($semester_aktuell)."';");
+		if ($db->db_num_rows()>0)
 		{
-			$row = $db->db_fetch_object($result_semester);
-			$ende = $row->ende;
+			$start=date('Y-m-d',$datum);
+			if ($aktion=='lva_stpl_del_multi')
+			{
+				$row = $db->db_fetch_object($result_semester);
+				$ende = $row->ende;
+			}
+			else
+				$ende=date('Y-m-d',jump_week($datum,1));
+			$anz_lvas=count($lva_id);
+			$sql_query_lvaid='';
+			$sql_query='DELETE FROM lehre.'.TABLE_BEGIN.$db_stpl_table.' WHERE (';
+			for ($i=0;$i<$anz_lvas;$i++)
+				$sql_query_lvaid.=' OR lehreinheit_id='.$lva_id[$i];
+			$sql_query_lvaid=substr($sql_query_lvaid,3);
+			$sql_query.=$sql_query_lvaid;
+			$sql_query.=") AND datum>='$start' AND datum<'$ende'";
+			if(!$result_lva_del=$db->db_query($sql_query))
+				$error_msg.=$db->db_last_error();
 		}
 		else
-			$ende=date('Y-m-d',jump_week($datum,1));
-		$anz_lvas=count($lva_id);
-		$sql_query_lvaid='';
-		$sql_query='DELETE FROM lehre.'.TABLE_BEGIN.$db_stpl_table.' WHERE (';
-		for ($i=0;$i<$anz_lvas;$i++)
-			$sql_query_lvaid.=' OR lehreinheit_id='.$lva_id[$i];
-		$sql_query_lvaid=substr($sql_query_lvaid,3);
-		$sql_query.=$sql_query_lvaid;
-		$sql_query.=") AND datum>='$start' AND datum<'$ende'";
-		if(!$result_lva_del=$db->db_query($sql_query))
-			$error_msg.=$db->db_last_error();
+			$error_msg.='Studiensemester '.$semester_aktuell.' konnte nicht gefunden werden!';
 	}
 	else
-		$error_msg.='Studiensemester '.$semester_aktuell.' konnte nicht gefunden werden!';
+		$error_msg.="Sie haben keine Berechtigung fuer diese Aktion";
 }
 
 if ($error_msg=='' && ($kollision_msg=='' || $kollisionsanzahl>0))
