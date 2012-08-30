@@ -181,7 +181,7 @@ if($person_id!='')
 						echo ' - Zurückgegeben am '.$datum_obj->formatDatum($row->retouram,'d.m.Y');
 						 
 					echo '<br>FH-Ausweis im LDAP:';
-					if($uidldap = getUidFromCardNumber($nummer))
+					if($uidldap = getUidFromCardNumber($row->nummer))
 					{
 						if($uidldap==$row_account->uid)
 						{
