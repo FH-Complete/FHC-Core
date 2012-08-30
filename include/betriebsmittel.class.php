@@ -1172,7 +1172,13 @@ class betriebsmittel extends basis_db
         if($result = $this->db_query($qry))
         {
             if($this->db_num_rows($result) > 0)
+            {
+            	if($row = $this->db_fetch_object($result))
+            	{
+            		$this->insertamum = $row->insertamum;
+            	}
                 return true;
+            }
             else
                 return false;
         }
