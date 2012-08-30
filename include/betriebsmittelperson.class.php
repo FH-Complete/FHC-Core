@@ -511,13 +511,21 @@ class betriebsmittelperson extends basis_db
 	 */
 	public function getKartenzuordnung($nummer)
 	{
+		// fuehrende Nullen bei Kartennummern auch checken
 		$qry='
 			SELECT 
 				*
 			FROM 
 				wawi.tbl_betriebsmittel 
 				JOIN wawi.tbl_betriebsmittelperson USING(betriebsmittel_id) 
-			WHERE tbl_betriebsmittel.nummer='.$this->db_add_param($nummer).'
+			WHERE 
+			(tbl_betriebsmittel.nummer='.$this->db_add_param($nummer).'
+			OR tbl_betriebsmittel.nummer='.$this->db_add_param('0'.$nummer).'
+			OR tbl_betriebsmittel.nummer='.$this->db_add_param('00'.$nummer).'
+			OR tbl_betriebsmittel.nummer='.$this->db_add_param('000'.$nummer).'
+			OR tbl_betriebsmittel.nummer='.$this->db_add_param('0000'.$nummer).'
+			OR tbl_betriebsmittel.nummer='.$this->db_add_param('00000'.$nummer).'
+			)
 			AND (ausgegebenam<=now() OR ausgegebenam is NULL) 
 			AND (retouram>=now() OR retouram is NULL)';
 
