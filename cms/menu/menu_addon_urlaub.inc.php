@@ -54,7 +54,7 @@ class menu_addon_urlaub extends menu_addon
 		
 		$rechte = new benutzerberechtigung();
 		$rechte->getBerechtigungen($user);
-		if($rechte->isBerechtigt('mitarbeiter/zeitsperre', null, 'suid'))
+		if($rechte->isBerechtigt('mitarbeiter/urlaube', null, 'suid'))
 		{
 			if(!$mitarbeiter->getPersonal('true', null, null, 'true', null, null))
 				echo 'Fehler:'.$mitarbeiter->errormsg;
