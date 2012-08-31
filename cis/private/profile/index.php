@@ -276,6 +276,49 @@ if ($type=='mitarbeiter')
 		
 if(!$ansicht)
 {
+	
+	echo '<br><br><b>FH-Ausweis Status</b><br>';
+	$bm = new betriebsmittel();
+	if($bm->zutrittskarteAusgegeben($user->uid))
+	{
+		echo '<br>FH Ausweis wurde bereits ausgegeben';
+	}
+	else
+	{
+		$fs = new fotostatus();
+		if($fs->getLastFotoStatus($user->person_id))
+		{
+			echo '<br>Foto '.$fs->fotostatus_kurzbz.' am '.$datum_obj->formatDatum($fs->datum, 'd.m.Y');
+			switch($fs->fotostatus_kurzbz)
+			{
+				case 'abgewiesen':
+					echo '<br>Laden Sie bitte ein gueltiges Foto hoch';
+					break;
+				case 'hochgeladen':
+					echo '<br>Foto wurde noch nicht akzeptiert';
+					break;
+				case 'akzeptiert':
+					if($bm->zutrittskartePrinted($user->uid))
+					{
+						echo '<br>FH Ausweis gedruckt am '.$datum_obj->formatDatum($bm->insertamum,'d.m.Y');
+						$geliefertts = $datum_obj->mktime_fromtimestamp($bm->insertamum);
+						$abholungsdatum = $datum_obj->jump_day($geliefertts, 1);	
+						echo '<br>FH Ausweis abholbereit am Empfang ab '.date('d.m.Y',$abholungsdatum);	
+					}
+					else
+						echo '<br>FH Ausweis wurde noch nicht gedruckt';
+					break;
+					
+				default:
+					echo '<br>Laden Sie bitte ein gültiges Foto hoch';
+					break;
+			}
+		}
+		else
+		{
+			echo '<br>Ihr Foto wurde noch nicht geprüft';
+		}
+	}
 	//Funktionen
 	$qry = "SELECT 
 				*, tbl_benutzerfunktion.oe_kurzbz as oe_kurzbz, tbl_organisationseinheit.bezeichnung as oe_bezeichnung,

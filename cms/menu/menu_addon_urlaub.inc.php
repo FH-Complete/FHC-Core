@@ -26,6 +26,7 @@ require_once(dirname(__FILE__).'/menu_addon.class.php');
 require_once(dirname(__FILE__).'/../../include/functions.inc.php');
 require_once(dirname(__FILE__).'/../../include/phrasen.class.php');
 require_once(dirname(__FILE__).'/../../include/mitarbeiter.class.php');
+require_once(dirname(__FILE__).'/../../include/benutzerberechtigung.class.php');
 
 class menu_addon_urlaub extends menu_addon
 {
@@ -51,6 +52,20 @@ class menu_addon_urlaub extends menu_addon
 			$untergebene.="'".addslashes($u_uid)."'";
 		}
 		
+		$rechte = new benutzerberechtigung();
+		$rechte->getBerechtigungen($user);
+		if($rechte->isBerechtigt('mitarbeiter/zeitsperre', null, 'suid'))
+		{
+			if(!$mitarbeiter->getPersonal('true', null, null, 'true', null, null))
+				echo 'Fehler:'.$mitarbeiter->errormsg;
+			foreach($mitarbeiter->result as $row)
+			{
+				if($untergebene!='')
+					$untergebene.=',';
+				$untergebene.="'".addslashes($row->uid)."'";
+			}
+		}
+		
 		if($untergebene!='')
 		{
 			$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE uid in($untergebene) AND aktiv ORDER BY nachname, vorname";
@@ -65,8 +80,10 @@ class menu_addon_urlaub extends menu_addon
 					 'link'=>'private/profile/urlaubsfreigabe.php',
 					 'name'=>$p->t('menu/urlaubAlle')
 					);
+				
 				while($row = $this->db_fetch_object($result))
 				{
+				
 					$name = $row->nachname.' '.$row->vorname.' '.$row->titelpre.' '.$row->titelpost;
 					$title = $row->nachname.' '.$row->vorname.' '.$row->titelpre.' '.$row->titelpost;
 					
