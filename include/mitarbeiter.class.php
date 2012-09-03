@@ -70,7 +70,7 @@ class mitarbeiter extends benutzer
 			return false;
 
 		$qry = "SELECT * FROM public.tbl_mitarbeiter LEFT JOIN campus.tbl_resturlaub USING(mitarbeiter_uid) 
-				WHERE mitarbeiter_uid='".addslashes($uid)."'";
+				WHERE mitarbeiter_uid=".$this->db_add_param($uid).";";
 		
 		if($this->db_query($qry))
 		{
@@ -79,15 +79,15 @@ class mitarbeiter extends benutzer
 				$this->ausbildungcode = $row->ausbildungcode;
 				$this->personalnummer = $row->personalnummer;
 				$this->kurzbz = $row->kurzbz;
-				$this->lektor = ($row->lektor=='t'?true:false);
-				$this->fixangestellt = ($row->fixangestellt=='t'?true:false);
+				$this->lektor = $this->db_parse_bool($row->lektor);
+				$this->fixangestellt = $this->db_parse_bool($row->fixangestellt);
 				$this->standort_id = $row->standort_id;
 				$this->telefonklappe = $row->telefonklappe;
 				$this->ort_kurzbz = $row->ort_kurzbz;
 				$this->stundensatz = $row->stundensatz;
 				$this->anmerkung = $row->anmerkung;
 				$this->ext_id_mitarbeiter = $row->ext_id;
-				$this->bismelden = ($row->bismelden=='t'?true:false);
+				$this->bismelden = $this->db_parse_bool($row->bismelden);
 
 				$this->urlaubstageprojahr = $row->urlaubstageprojahr;
 				$this->resturlaubstage = $row->resturlaubstage;
@@ -199,7 +199,7 @@ class mitarbeiter extends benutzer
 				do
 				{
 					//Wenn keine Personalnummer angegeben wurde, dann die naechste freie Suchen
-					$qry = "SELECT nextval('public.tbl_mitarbeiter_personalnummer_seq') as id";
+					$qry = "SELECT nextval('public.tbl_mitarbeiter_personalnummer_seq') as id;";
 					if($this->db_query($qry))
 					{
 						if($row = $this->db_fetch_object())
@@ -221,7 +221,7 @@ class mitarbeiter extends benutzer
 					//Da die Personalnummer auch direkt uebergeben werden kann, ist es moeglich, dass die Personalnummer
 					//aus dem Serial schon vergeben ist. Deshalb wird zur Sicherheit nochmal ueberprueft ob die Nr
 					//noch frei ist.
-					$qry = "SELECT personalnummer FROM public.tbl_mitarbeiter WHERE personalnummer='$personalnummer'";
+					$qry = "SELECT personalnummer FROM public.tbl_mitarbeiter WHERE personalnummer=".$this->db_add_param($personalnummer, FHC_INTEGER).';';
 					if($this->db_query($qry))
 					{
 						if($this->db_num_rows()==0)
@@ -240,7 +240,7 @@ class mitarbeiter extends benutzer
 				}
 
 				//Preufen ob die Personalnummer schon vergeben ist
-				$qry = "SELECT personalnummer FROM public.tbl_mitarbeiter WHERE personalnummer='$this->personalnummer'";
+				$qry = "SELECT personalnummer FROM public.tbl_mitarbeiter WHERE personalnummer=".$this->db_add_param($this->personalnummer, FHC_INTEGER).';';
 				if($this->db_query($qry))
 				{
 					if($this->db_num_rows()!=0)
@@ -254,43 +254,43 @@ class mitarbeiter extends benutzer
 			$qry = "INSERT INTO public.tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, ort_kurzbz,
 			                    fixangestellt, standort_id, telefonklappe, anmerkung, stundensatz, updateamum, updatevon, insertamum, insertvon, ext_id, bismelden)
 
-			        VALUES('".addslashes($this->uid)."',".
-			 	 	$this->addslashes($this->ausbildungcode).",".
-			 	 	$this->addslashes($this->personalnummer).",".
-			 	 	$this->addslashes($this->kurzbz).','.
-			 	 	($this->lektor?'true':'false').','.
-			 	 	$this->addslashes($this->ort_kurzbz).','.
-					($this->fixangestellt?'true':'false').','.
-					$this->addslashes($this->standort_id).','.
-					$this->addslashes($this->telefonklappe).','.
-					$this->addslashes($this->anmerkung).','.
-					$this->addslashes($this->stundensatz).','.
-					$this->addslashes($this->updateamum).','.
-					$this->addslashes($this->updatevon).', '.
-					$this->addslashes($this->insertamum).','.
-					$this->addslashes($this->insertvon).', '.
-					$this->addslashes($this->ext_id_mitarbeiter).','.
-					($this->bismelden?'true':'false').');';
+			        VALUES(".$this->db_add_param($this->uid).",".
+			 	 	$this->db_add_param($this->ausbildungcode, FHC_INTEGER).",".
+			 	 	$this->db_add_param($this->personalnummer, FHC_INTEGER).",".
+			 	 	$this->db_add_param($this->kurzbz).','.
+			 	 	$this->db_add_param($this->lektor, FHC_BOOLEAN).','.
+			 	 	$this->db_add_param($this->ort_kurzbz).','.
+					$this->db_add_param($this->fixangestellt,FHC_BOOLEAN).','.
+					$this->db_add_param($this->standort_id, FHC_INTEGER).','.
+					$this->db_add_param($this->telefonklappe).','.
+					$this->db_add_param($this->anmerkung).','.
+					$this->db_add_param($this->stundensatz).','.
+					$this->db_add_param($this->updateamum).','.
+					$this->db_add_param($this->updatevon).', '.
+					$this->db_add_param($this->insertamum).','.
+					$this->db_add_param($this->insertvon).', '.
+					$this->db_add_param($this->ext_id_mitarbeiter, FHC_INTEGER).','.
+					$this->db_add_param($this->bismelden, FHC_BOOLEAN).');';
 		}
 		else
 		{
 			//Bestehenden Datensatz updaten
 			$qry = 'UPDATE public.tbl_mitarbeiter SET'.
-			       ' ausbildungcode='.$this->addslashes($this->ausbildungcode).','.
-			       " personalnummer=".$this->addslashes($this->personalnummer).",". //TODO: in Produktivversion nicht angeben
-			       ' kurzbz='.$this->addslashes($this->kurzbz).','.
-			       ' lektor='.($this->lektor?'true':'false').','.
-			       ' fixangestellt='.($this->fixangestellt?'true':'false').','.
-			       ' bismelden='.($this->bismelden?'true':'false').','.
-			       ' standort_id='.$this->addslashes($this->standort_id).','.
-			       ' telefonklappe='.$this->addslashes($this->telefonklappe).','.
-			       ' ort_kurzbz='.$this->addslashes($this->ort_kurzbz).','.
-			       ' anmerkung='.$this->addslashes($this->anmerkung).','.
-			       ' stundensatz='.$this->addslashes($this->stundensatz).','.
-			       ' updateamum='.$this->addslashes($this->updateamum).','.
-			       ' updatevon='.$this->addslashes($this->updatevon).','.
-			       ' ext_id='.$this->addslashes($this->ext_id_mitarbeiter).
-			       " WHERE mitarbeiter_uid='".addslashes($this->uid)."';";
+			       ' ausbildungcode='.$this->db_add_param($this->ausbildungcode, FHC_INTEGER).','.
+			       " personalnummer=".$this->db_add_param($this->personalnummer, FHC_INTEGER).",". //TODO: in Produktivversion nicht angeben
+			       ' kurzbz='.$this->db_add_param($this->kurzbz).','.
+			       ' lektor='.$this->db_add_param($this->lektor, FHC_BOOLEAN).','.
+			       ' fixangestellt='.$this->db_add_param($this->fixangestellt, FHC_BOOLEAN).','.
+			       ' bismelden='.$this->db_add_param($this->bismelden, FHC_BOOLEAN).','.
+			       ' standort_id='.$this->db_add_param($this->standort_id, FHC_INTEGER).','.
+			       ' telefonklappe='.$this->db_add_param($this->telefonklappe).','.
+			       ' ort_kurzbz='.$this->db_add_param($this->ort_kurzbz).','.
+			       ' anmerkung='.$this->db_add_param($this->anmerkung).','.
+			       ' stundensatz='.$this->db_add_param($this->stundensatz).','.
+			       ' updateamum='.$this->db_add_param($this->updateamum).','.
+			       ' updatevon='.$this->db_add_param($this->updatevon).','.
+			       ' ext_id='.$this->db_add_param($this->ext_id_mitarbeiter, FHC_INTEGER).
+			       " WHERE mitarbeiter_uid=".$this->db_add_param($this->uid).";";
 		}
 
 		if($this->db_query($qry))
@@ -337,10 +337,10 @@ class mitarbeiter extends benutzer
 		if (!is_null($stg_kz))
 		{
 			$stg = new studiengang($stg_kz);
-			$sql_query.=" AND oe_kurzbz='".$stg->oe_kurzbz."'";
+			$sql_query.=" AND oe_kurzbz=".$this->db_add_param($stg->oe_kurzbz);
 		}
 		
-		$sql_query.=' ORDER BY nachname, vornamen, kurzbz';
+		$sql_query.=' ORDER BY nachname, vornamen, kurzbz;';
 	    
 		if(!$this->db_query($sql_query))
 		{
@@ -365,15 +365,15 @@ class mitarbeiter extends benutzer
 			$l->gebzeit=$row->gebzeit;
 			//$l->foto=$row->foto;
 			$l->anmerkung=$row->anmerkung;
-			$l->aktiv=$row->aktiv=='t'?true:false;
+			$l->aktiv= $this->db_parse_bool($row->aktiv);
 			$l->homepage=$row->homepage;
 			$l->updateamum=$row->updateamum;
 			$l->updatevon=$row->updatevon;
 			// Lektorendaten
 			$l->personalnummer=$row->personalnummer;
 			$l->kurzbz=$row->kurzbz;
-			$l->lektor=$row->lektor=='t'?true:false;
-			$l->fixangestellt=$row->fixangestellt=='t'?true:false;
+			$l->lektor= $this->db_parse_bool($row->lektor);
+			$l->fixangestellt= $this->db_parse_bool($row->fixangestellt);
 			$l->standort_id = $row->standort_id;
 			$l->telefonklappe=$row->telefonklappe;
 			
@@ -414,7 +414,7 @@ class mitarbeiter extends benutzer
 		}
 		if($fkt_kurzbz!='')
 		{
-			$sql_query.=" AND funktion_kurzbz='$fkt_kurzbz'";
+			$sql_query.=" AND funktion_kurzbz=".$this->db_add_param($fkt_kurzbz);
 		}
 		if ($stge!=null)
 		{
@@ -431,7 +431,7 @@ class mitarbeiter extends benutzer
 			if($in!='')
 				$sql_query.=' AND studiengang_kz in (-1'.$in.')';
 		}
-	    $sql_query.=' ORDER BY studiengang_kz, nachname, vorname, kurzbz';
+	    $sql_query.=' ORDER BY studiengang_kz, nachname, vorname, kurzbz;';
 	    //echo $sql_query;
 	
 		if(!$this->db_query($sql_query))
@@ -458,7 +458,7 @@ class mitarbeiter extends benutzer
 			$l->gebzeit=$row->gebzeit;
 			$l->foto=$row->foto;
 			$l->anmerkung=$row->anmerkung;
-			$l->aktiv=$row->aktiv=='t'?true:false;
+			$l->aktiv= $this->db_add_param($row->aktiv, FHC_BOOLEAN);
 			//$l->bismelden=$row->bismelden=='t'?true:false;
 			$l->homepage=$row->homepage;
 			$l->updateamum=$row->updateamum;
@@ -466,8 +466,8 @@ class mitarbeiter extends benutzer
 			// Lektorendaten
 			$l->personalnummer=$row->personalnummer;
 			$l->kurzbz=$row->kurzbz;
-			$l->lektor=$row->lektor=='t'?true:false;
-			$l->fixangestellt=$row->fixangestellt=='t'?true:false;
+			$l->lektor= $this->db_add_param($row->lektor, FHC_BOOLEAN);
+			$l->fixangestellt= $this->db_add_param($row->fixangestellt, FHC_BOOLEAN);
 			$l->standort_id = $row->standort_id;
 			$l->telefonklappe=$row->telefonklappe;
 			$l->studiengang_kz = $row->studiengang_kz;
@@ -489,7 +489,7 @@ class mitarbeiter extends benutzer
 	{
 		$sql_query="SELECT DISTINCT nachname, vorname, uid,titelpre, titelpost, vornamen
 				FROM campus.vw_mitarbeiter JOIN campus.tbl_zeitsperre ON (uid=mitarbeiter_uid)
-				WHERE ('$von'<=bisdatum AND '$bis'>=bisdatum) OR ('$bis'>=vondatum AND '$von'<=vondatum) ORDER BY nachname";
+				WHERE (".$this->db_add_param($von)."<=bisdatum AND ".$this->db_add_param($bis).">=bisdatum) OR (".$this->db_add_param($bis).">=vondatum AND ".$this->db_add_param($von)."<=vondatum) ORDER BY nachname;";
 	    
 		if(!$this->db_query($sql_query))
 		{
@@ -531,7 +531,7 @@ class mitarbeiter extends benutzer
 		}
 
 		$qry = "SELECT uid, vorname, vornamen, nachname, titelpre, titelpost, kurzbz FROM lehre.tbl_lehreinheitmitarbeiter JOIN campus.vw_mitarbeiter ON(mitarbeiter_uid=uid)
-				WHERE lehreinheit_id='$lehreinheit_id'";
+				WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER).';';
 
 		if($this->db_query($qry))
 		{
@@ -572,7 +572,7 @@ class mitarbeiter extends benutzer
 		}
 
 		$qry = "SELECT uid, vorname, vornamen, nachname, titelpre, titelpost, kurzbz FROM lehre.tbl_lehreinheitmitarbeiter, campus.vw_mitarbeiter, lehre.tbl_lehreinheit
-				WHERE lehrveranstaltung_id='$lehrveranstaltung_id' AND mitarbeiter_uid=uid AND tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id";
+				WHERE lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)." AND mitarbeiter_uid=uid AND tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id;";
 
 		if($this->db_query($qry))
 		{
@@ -645,6 +645,7 @@ class mitarbeiter extends benutzer
 			$qry.=" AND NOT EXISTS(SELECT * FROM bis.tbl_bisverwendung WHERE (ende>now() or ende is null) AND tbl_bisverwendung.mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid)";
 		}
 		
+        $qry.=';';
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -671,14 +672,14 @@ class mitarbeiter extends benutzer
 				$obj->familienstand = $row->familienstand;
 				$obj->geschlecht = $row->geschlecht;
 				$obj->anzahlkinder = $row->anzahlkinder;
-				$obj->bnaktiv = ($row->aktiv=='t'?true:false);
+				$obj->bnaktiv = $this->db_parse_bool($row->aktiv);
 				$obj->uid = $row->uid;
 				$obj->personalnummer = $row->personalnummer;
 				$obj->telefonklappe = $row->telefonklappe;
 				$obj->kurzbz = $row->kurzbz;
-				$obj->lektor = ($row->lektor=='t'?true:false);
-				$obj->fixangestellt = ($row->fixangestellt=='t'?true:false);
-				$obj->bismelden = ($row->bismelden=='t'?true:false);
+				$obj->lektor = $this->db_parse_bool($row->lektor);
+				$obj->fixangestellt = $this->db_parse_bool($row->fixangestellt);
+				$obj->bismelden = $this->db_parse_bool($row->bismelden);
 				$obj->stundensatz = $row->stundensatz;
 				$obj->ausbildungcode = $row->ausbildungcode;
 				$obj->ort_kurzbz = $row->ort_kurzbz;
@@ -709,7 +710,7 @@ class mitarbeiter extends benutzer
 	 */
 	public function kurzbz_exists($kurzbz)
 	{
-		$qry = "SELECT * FROM public.tbl_mitarbeiter WHERE kurzbz='".addslashes($kurzbz)."'";
+		$qry = "SELECT * FROM public.tbl_mitarbeiter WHERE kurzbz=".$this->db_add_param($kurzbz).';';
 
 		if($this->db_query($qry))
 		{
@@ -739,7 +740,7 @@ class mitarbeiter extends benutzer
 	 */
 	public function getMitarbeiterFilter($filter)
 	{
-		$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE nachname ~* '".addslashes($filter)."' OR uid ~* '".addslashes($filter)."'"; 
+		$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE nachname ~* ".$this->db_add_param($filter)." OR uid ~* ".$this->db_add_param($filter).';'; 
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -821,11 +822,11 @@ class mitarbeiter extends benutzer
 					distinct on(mitarbeiter_uid) *, tbl_benutzer.aktiv as aktiv, tbl_mitarbeiter.insertamum,
 					tbl_mitarbeiter.insertvon, tbl_mitarbeiter.updateamum, tbl_mitarbeiter.updatevon, tbl_person.svnr
 				FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id))  LEFT JOIN campus.tbl_resturlaub USING(mitarbeiter_uid)
-				WHERE nachname||' '||vorname ~* '".addslashes($filter)."' OR
-				      vorname||' '||nachname ~* '".addslashes($filter)."' OR
+				WHERE nachname||' '||vorname ~* ".$this->db_add_param($filter)." OR
+				      vorname||' '||nachname ~* ".$this->db_add_param($filter)." OR
 				      uid ~* '".addslashes($filter)."'";
 		if(is_numeric($filter))
-			$qry.="OR personalnummer = '".addslashes($filter)."' OR svnr = '".addslashes($filter)."'";
+			$qry.="OR personalnummer = ".$this->db_add_param($filter)." OR svnr = ".$this->db_add_param($filter).";";
 
 		if($this->db_query($qry))
 		{
@@ -853,14 +854,14 @@ class mitarbeiter extends benutzer
 				$obj->familienstand = $row->familienstand;
 				$obj->geschlecht = $row->geschlecht;
 				$obj->anzahlkinder = $row->anzahlkinder;
-				$obj->bnaktiv = ($row->aktiv=='t'?true:false);
+				$obj->bnaktiv = $this->db_parse_bool($row->aktiv);
 				$obj->uid = $row->uid;
 				$obj->personalnummer = $row->personalnummer;
 				$obj->telefonklappe = $row->telefonklappe;
 				$obj->kurzbz = $row->kurzbz;
-				$obj->lektor = ($row->lektor=='t'?true:false);
-				$obj->fixangestellt = ($row->fixangestellt=='t'?true:false);
-				$obj->bismelden = ($row->bismelden=='t'?true:false);
+				$obj->lektor = $this->db_parse_bool($row->lektor);
+				$obj->fixangestellt = $this->db_parse_bool($row->fixangestellt);
+				$obj->bismelden = $this->db_parse_bool($row->bismelden);
 				$obj->stundensatz = $row->stundensatz;
 				$obj->ausbildungcode = $row->ausbildungcode;
 				$obj->ort_kurzbz = $row->ort_kurzbz;
@@ -895,7 +896,7 @@ class mitarbeiter extends benutzer
 		$sql_query="SELECT DISTINCT campus.vw_mitarbeiter.uid, titelpre, titelpost, vorname, vornamen, nachname, gebdatum, gebort, gebzeit, anmerkung, aktiv,
 					homepage, vw_mitarbeiter.updateamum, vw_mitarbeiter.updatevon, personalnummer, kurzbz, lektor, fixangestellt, standort_id, telefonklappe FROM campus.vw_mitarbeiter
 					JOIN public.tbl_benutzerfunktion USING (uid)
-					WHERE funktion_kurzbz='oezuordnung' AND oe_kurzbz='".addslashes($oe_kurzbz)."'  AND
+					WHERE funktion_kurzbz='oezuordnung' AND oe_kurzbz=".$this->db_add_param($oe_kurzbz)." AND
 					(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 					(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
 					ORDER BY nachname, vorname";
@@ -920,15 +921,15 @@ class mitarbeiter extends benutzer
 				$l->gebzeit=$row->gebzeit;
 				//$l->foto=$row->foto;
 				$l->anmerkung=$row->anmerkung;
-				$l->aktiv=$row->aktiv=='t'?true:false;
+				$l->aktiv= $this->db_parse_bool($row->aktiv);
 				$l->homepage=$row->homepage;
 				$l->updateamum=$row->updateamum;
 				$l->updatevon=$row->updatevon;
 				// Lektorendaten
 				$l->personalnummer=$row->personalnummer;
 				$l->kurzbz=$row->kurzbz;
-				$l->lektor=$row->lektor=='t'?true:false;
-				$l->fixangestellt=$row->fixangestellt=='t'?true:false;
+				$l->lektor= $this->db_parse_bool($row->lektor);
+				$l->fixangestellt=$this->db_parse_bool($row->fixangestellt);
 				$l->standort_id = $row->standort_id;
 				$l->telefonklappe=$row->telefonklappe;
 
@@ -965,7 +966,7 @@ class mitarbeiter extends benutzer
 					oe_kurzbz in (SELECT oe_kurzbz 
 								  FROM public.tbl_benutzerfunktion 
 								  WHERE 
-									funktion_kurzbz='oezuordnung' AND uid='".addslashes($uid)."' AND
+									funktion_kurzbz='oezuordnung' AND uid=".$this->db_add_param($uid)." AND
 									(datum_von is null OR datum_von<=now()) AND
 									(datum_bis is null OR datum_bis>=now())
 								  );";
@@ -1001,7 +1002,7 @@ class mitarbeiter extends benutzer
 		
 		// Organisationseinheiten holen von denen die Person die Leitung hat
 		$qry = "SELECT * FROM public.tbl_benutzerfunktion 
-				WHERE funktion_kurzbz='Leitung' AND uid='".addslashes($uid)."' AND
+				WHERE funktion_kurzbz='Leitung' AND uid=".$this->db_add_param($uid)." AND
 				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
 		
@@ -1012,7 +1013,7 @@ class mitarbeiter extends benutzer
 			{
 				if($oe!='')
 					$oe.=',';
-				$oe.="'".addslashes($row->oe_kurzbz)."'";
+				$oe.=$this->db_add_param($row->oe_kurzbz);
 			}
 		}
 		
@@ -1028,7 +1029,7 @@ class mitarbeiter extends benutzer
 			$qry.=" OR (funktion_kurzbz='ass' AND oe_kurzbz in($oe))";
 		
 		$qry.= ") AND (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
-					 (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())";
+					 (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now());";
 		
 		if($this->db_query($qry))
 		{
