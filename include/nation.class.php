@@ -63,7 +63,7 @@ class nation extends basis_db
 	public function load($code)
 	{
 		//Lesen der Daten aus der Datenbank
-		$qry = "SELECT * FROM bis.tbl_nation WHERE nation_code='".addslashes($code)."';";
+		$qry = "SELECT * FROM bis.tbl_nation WHERE nation_code=".$this->db_add_param($code).';';
 		
 		if(!$this->db_query($qry))
 		{
@@ -75,11 +75,11 @@ class nation extends basis_db
 		{
 			$this->code = $code;
 
-			$this->sperre = ($row->sperre=='t'?true:false);
+			$this->sperre = $this->db_parse_bool($row->sperre);
 			$this->kontinent = $row->kontinent;
 			$this->entwicklungsstand = $row->entwicklungsstand;
-			$this->eu = ($row->eu=='t'?true:false);
-			$this->ewr = ($row->ewr=='t'?true:false);
+			$this->eu = $this->db_parse_bool($row->eu);
+			$this->ewr = $this->db_parse_bool($row->ewr);
 			$this->kurztext = $row->kurztext;
 			$this->langtext = $row->langtext;
 			$this->engltext = $row->engltext;
@@ -107,6 +107,8 @@ class nation extends basis_db
 			$qry .=" ORDER BY kurztext";
 		else 
 			$qry .=" ORDER BY engltext";
+        
+        $qry.=';';
 			
 		if(!$this->db_query($qry))
 		{
@@ -119,11 +121,11 @@ class nation extends basis_db
 			$nation = new nation();
 
 			$nation->code = $row->nation_code;
-			$nation->sperre = ($row->sperre=='t'?true:false);
+			$nation->sperre = $this->db_parse_bool($row->sperre);
 			$nation->kontinent = $row->kontinent;
 			$nation->entwicklungsstand = $row->entwicklungsstand;
-			$nation->eu = ($row->eu=='t'?true:false);
-			$nation->ewr = ($row->ewr=='t'?true:false);
+			$nation->eu = $this->db_parse_bool($row->eu);
+			$nation->ewr = $this->db_parse_bool($row->ewr);
 			$nation->kurztext = $row->kurztext;
 			$nation->langtext = $row->langtext;
 			$nation->engltext = $row->engltext;
@@ -142,15 +144,15 @@ class nation extends basis_db
 
 
 		$qry='INSERT INTO bis.tbl_nation (nation_code, entwicklungsstand, eu, ewr, kontinent, kurztext, langtext, engltext, sperre) VALUES('.
-			$this->addslashes($this->code).', '.
-			$this->addslashes($this->entwicklungsstand).', '.
-			$this->addslashes($this->eu).', '.
-			$this->addslashes($this->ewr).', '.
-			$this->addslashes($this->kontinent).', '.
-			$this->addslashes($this->kurztext).', '.
-			$this->addslashes($this->langtext).', '.
-			$this->addslashes($this->engltext).', '.
-			$this->addslashes($this->sperre).');';
+			$this->db_add_param($this->code).', '.
+			$this->db_add_param($this->entwicklungsstand).', '.
+			$this->db_add_param($this->eu, FHC_BOOLEAN).', '.
+			$this->db_add_param($this->ewr, FHC_BOOLEAN).', '.
+			$this->db_add_param($this->kontinent).', '.
+			$this->db_add_param($this->kurztext).', '.
+			$this->db_add_param($this->langtext).', '.
+			$this->db_add_param($this->engltext).', '.
+			$this->db_add_param($this->sperre, FHC_BOOLEAN).');';
 
 
 		if($this->db_query($qry))
