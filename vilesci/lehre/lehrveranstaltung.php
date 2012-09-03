@@ -91,6 +91,16 @@ $write_admin=false;
 $write_low=false;
 $messages='';
 
+if(isset($_POST['lvid']))
+{
+	//Wenn eine LVID uebergeben wird, dann wird die berechtigung des studienganges 
+	//dieser LV geprueft
+	$lv_obj = new lehrveranstaltung();
+	$lv_obj->load($_POST['lvid']);
+	$stg_obj = new studiengang();
+	$stg_obj->load($lv_obj->studiengang_kz);
+	$oe_studiengang = $stg_obj->oe_kurzbz;
+}
 if($rechte->isBerechtigt('lehre/lehrveranstaltung', $oe_studiengang, 'suid')
 || $rechte->isBerechtigt('lehre/lehrveranstaltung', $oe_fachbereich, 'suid'))
 	$write_admin=true;
