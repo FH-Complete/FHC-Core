@@ -458,7 +458,7 @@ class mitarbeiter extends benutzer
 			$l->gebzeit=$row->gebzeit;
 			$l->foto=$row->foto;
 			$l->anmerkung=$row->anmerkung;
-			$l->aktiv= $this->db_add_param($row->aktiv, FHC_BOOLEAN);
+			$l->aktiv= $this->db_parse_bool($row->aktiv);
 			//$l->bismelden=$row->bismelden=='t'?true:false;
 			$l->homepage=$row->homepage;
 			$l->updateamum=$row->updateamum;
@@ -466,8 +466,8 @@ class mitarbeiter extends benutzer
 			// Lektorendaten
 			$l->personalnummer=$row->personalnummer;
 			$l->kurzbz=$row->kurzbz;
-			$l->lektor= $this->db_add_param($row->lektor, FHC_BOOLEAN);
-			$l->fixangestellt= $this->db_add_param($row->fixangestellt, FHC_BOOLEAN);
+			$l->lektor= $this->db_parse_bool($row->lektor);
+			$l->fixangestellt= $this->db_parse_bool($row->fixangestellt);
 			$l->standort_id = $row->standort_id;
 			$l->telefonklappe=$row->telefonklappe;
 			$l->studiengang_kz = $row->studiengang_kz;
