@@ -1,6 +1,6 @@
 <?php 
 require_once('../config/vilesci.config.inc.php');
-header("Content-type: text/plain");
+header("Content-type: text/xml");
 echo "<?xml version='1.0' encoding='utf-8' ?>";
 ?>
 <wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
