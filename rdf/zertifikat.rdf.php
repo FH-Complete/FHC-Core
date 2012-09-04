@@ -116,16 +116,29 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		{
 			$leiter_titel = $lrow->titelpre;			
 			$leiter_vorname = $lrow->vorname;
-			$leiter_nachname = $lrow->nachname;			
+			$leiter_nachname = $lrow->nachname;	
+			$leiter_titelpost = $lrow->titelpost;	
 		}		
 	}	
 	
+	$qry = "SELECT wochen FROM public.tbl_semesterwochen 
+						WHERE (studiengang_kz, semester) in (SELECT studiengang_kz, semester 
+						FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id).")";
+	$wochen = 15;
+	if($result_wochen = $db->db_query($qry))
+	{
+		if($row_wochen = $db->db_fetch_object($result_wochen))
+		{
+			$wochen = $row_wochen->wochen;
+		}
+	}
 	$lvqry = "SELECT * from lehre.tbl_lehrveranstaltung where lehrveranstaltung_id = '".addslashes($lehrveranstaltung_id)."'";
+	
 	if($db->db_query($lvqry))
 	{
 		if ($lvrow = $db->db_fetch_object())
 		{
-			$sws = $lvrow->semesterstunden;
+			$sws = $lvrow->semesterstunden/$wochen;
 			$ects = $lvrow->ects;
 			$lvbezeichnung = $lvrow->bezeichnung;			
 		}		
@@ -179,7 +192,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml .= "		<studiensemester>".$studiensemester->bezeichnung."</studiensemester>";
 		$xml .= "\n		<vorname>".$row->vorname."</vorname>";
 		$xml .= "		<nachname>".$row->nachname."</nachname>";
-		$xml .= "		<name>".trim($row->titelpre.' '.$row->vorname.' '.strtoupper($row->nachname).' '.$row->titelpost)."</name>";
+		$xml .= "		<name>".trim($row->titelpre.' '.$row->vorname.' '.mb_strtoupper($row->nachname).($row->titelpost!=''?', '.$row->titelpost:''))."</name>";
 		$gebdatum = date('d.m.Y',strtotime($row->gebdatum));
 		$xml .= "		<gebdatum>".$gebdatum."</gebdatum>";
 		$xml .= "		<matrikelnr>".$row->matrikelnr."</matrikelnr>";
@@ -206,9 +219,9 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml .= "				<bezeichnung><![CDATA[".$lvbezeichnung."]]></bezeichnung>";
 		$xml .= "				<note>".$note."</note>";
 		$xml .= "				<note_bezeichnung>".$note_bezeichnung."</note_bezeichnung>";
-		$xml .= "				<sws>".$sws."</sws>";
+		$xml .= "				<sws>".($sws==0?'':number_format(sprintf('%.1F',$sws),1))."</sws>";
 		$xml .= "				<ects>".number_format($ects,1)."</ects>";
-		$xml .= "				<lvleiter>".$leiter_titel." ".$leiter_vorname." ".$leiter_nachname."</lvleiter>";
+		$xml .= "				<lvleiter>".$leiter_titel." ".$leiter_vorname." ".$leiter_nachname.($leiter_titelpost!=''?', '.$leiter_titelpost:'')."</lvleiter>";
 		$xml .= "				<lehrinhalte><![CDATA[".$lehrinhalte."]]></lehrinhalte>";
 
 		
