@@ -185,8 +185,21 @@ if($action=='sucheKarte')
 	echo 'Suche User mit der Kartennummer '.$db->convert_html_chars($kartennummer_alt).'<br>';	
 	if(!$karten_user = getUidFromCardNumber($kartennummer_alt))
 	{
-		if($karten_user=='')
-			echo '<span class="error">Diese Karte ist derzeit nicht ausgegeben</span>';
+		$bmp = new betriebsmittelperson();
+		if($bmp->getKartenzuordnung($kartennummer_alt))
+		{
+			if($bmp->uid!='')
+				$karten_user=$bmp->uid;
+			else
+			{
+				echo '<span class="error">Diese Karte ist derzeit nicht ausgegeben</span>';
+			}
+		}
+		else
+		{
+			if($karten_user=='')
+				echo '<span class="error">Diese Karte ist derzeit nicht ausgegeben</span>';
+		}
 	}
 }
 if($action=='sucheUser')
