@@ -276,7 +276,7 @@ if(!check_lektor($getuid) && !check_student($getuid))
 	        </script>
 	        ';
 		}
-    echo '<a href="index.html">Zurück zur Übersicht</a>';
+    echo '<a href="index.html">Zurück zur Übersicht</a><br>';
         
 echo '<div id="output">';
 class foo {};
