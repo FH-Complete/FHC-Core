@@ -27,7 +27,7 @@ require_once('../include/basis_db.class.php');
 $method = (isset($_GET['method'])?$_GET['method']:'getLVPlanFromUser');
 
 $getuid = get_uid(); 
-if(!check_lektor($getuid))
+if(!check_lektor($getuid) && !check_student($getuid))
 	die('Sie haben keine Berechtigung für diese Seite'); 
 $db = new basis_db();
 ?>
@@ -425,6 +425,7 @@ $db = new basis_db();
 	        </script>
 	        ';
 		}
+        echo '<a href="index.html">Zurück zur Übersicht</a>';
         
 echo '<div id="output">';
 class foo {};

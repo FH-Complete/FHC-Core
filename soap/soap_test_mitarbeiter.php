@@ -28,7 +28,7 @@ $db = new basis_db();
 $method = (isset($_GET['method'])?$_GET['method']:'getMitarbeiterFromUID');
 
 $getuid = get_uid(); 
-if(!check_lektor($getuid))
+if(!check_lektor($getuid) && !check_student($getuid))
 	die('Sie haben keine Berechtigung für diese Seite'); 
 ?>
 <html>
@@ -78,8 +78,8 @@ if(!check_lektor($getuid))
 	                    </td>
 	                </tr>
 	            </table>
-	        </form>';
-	        echo '
+            </form>
+            
 	        <script type="text/javascript">
 	        function gettimestamp()
 	        {
@@ -276,6 +276,7 @@ if(!check_lektor($getuid))
 	        </script>
 	        ';
 		}
+    echo '<a href="index.html">Zurück zur Übersicht</a>';
         
 echo '<div id="output">';
 class foo {};
