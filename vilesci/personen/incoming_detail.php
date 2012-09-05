@@ -769,9 +769,15 @@ function print_personendetails()
 				<td>E-Mail</td>
 				<td colspan="3"><input type="text" name="email" size="50" value="'.$kontakt->kontakt.'"></td>
 			</tr>
+            <tr>
+                <td rowspan="2">Anmerkungen</td>
+                <td colspan="2" rowspan="2"><textarea name="anmerkung" rows="4" cols="33">'.$inc->anmerkung.'</textarea></td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
 			<tr>
-				<td>Anmerkungen</td>
-				<td colspan="6"><textarea name="anmerkung" rows="4" cols="65">'.$inc->anmerkung.'</textarea></td>
+                <td valign="top">Foto</td>
+                <td ><img id="personimage" src="../../cis/public/bild.php?src=person&person_id='.$person->person_id.'" alt="'.$person->person_id.'" height="100px" width="75px"></td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td>
