@@ -38,7 +38,7 @@ if (!$db = new basis_db())
 if($_SERVER['REMOTE_ADDR']!=$_SERVER['SERVER_ADDR'])
 {
     // wenn session gesetzt ist von Prestudententool -> keine Abfrage da diese Studenten noch keine uid haben
-    if(!isset($_SESSION['prestudent/user']))
+    if(!isset($_SESSION['prestudent/user']) && !isset($_SESSION['incoming/user']))
        $uid = get_uid();
 }
   
