@@ -38,6 +38,8 @@ require_once('../include/studiensemester.class.php');
 require_once('../include/student.class.php');
 
 $user = get_uid();
+$db = new basis_db();
+
 $datum_obj = new datum();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
@@ -46,12 +48,19 @@ if(!$rechte->isBerechtigt('mitarbeiter/stammdaten') && !$rechte->isBerechtigt('s
 	die('Sie haben keine Berechtigung fuer diese Seite');
 }
 
+//UIDs werden entweder als data Parameter mit ";" getrennt übergeben
 $uid = isset($_REQUEST['data'])?$_REQUEST['data']:'';
+//ODER als POST Array über den Parameter users
+$users = isset($_REQUEST['users'])?$_REQUEST['users']:'';
 $type = isset($_REQUEST['type'])?$_REQUEST['type']:'normal';
 $output = isset($_REQUEST['output'])?$_REQUEST['output']:'pdf';
-if($uid=='')
+if($uid=='' && $users=='')
 	die('Parameter data is missing');
-$uid_arr = explode(';',$uid);
+	
+if($users!='')
+	$uid_arr=$users;
+else
+	$uid_arr = explode(';',$uid);
 
 // Tempordner fuer das erstellen des ODT anlegen
 $tempfolder = '/tmp/'.uniqid();
@@ -75,13 +84,13 @@ if(copy($zipfile, $tempname_zip))
 	// XML mit den Personendaten erstellen
 	$xml ="<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
 	<zutrittskarte>";
+		
 	foreach($uid_arr as $uid)
 	{
 		$bn = new benutzer();
 		if($bn->load($uid))
 		{
 			$gueltigbis = '';
-			$db = new basis_db();
 			
 			// Bild der Person holen
 			$bild = $qry = "SELECT inhalt as foto FROM public.tbl_akte WHERE dokument_kurzbz='Lichtbil' AND person_id=".$db->db_add_param($bn->person_id, FHC_INTEGER);
