@@ -2601,7 +2601,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           <table:table-cell table:style-name="Table13.A1" office:value-type="string">
             <text:p text:style-name="P35">……………………………………………………………</text:p>
             <text:p text:style-name="P37">
-              <text:span text:style-name="T1">FH-Prof. Dipl.-Ing. Dr. Fritz Schmöllebeck<text:line-break/>Program Director</text:span>
+              <text:span text:style-name="T1"><xsl:value-of select="stgl"/><text:line-break/>Program Director</text:span>
             </text:p>
           </table:table-cell>
         </table:table-row>
