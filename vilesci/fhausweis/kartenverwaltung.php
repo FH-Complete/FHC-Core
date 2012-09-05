@@ -254,10 +254,12 @@ if(isset($_REQUEST['btn_submitStudent']))
         </table>
         <table>
             <tr>
-                <td><input type="submit" value="Karten zuteilen" name="btn_kartezuteilenStudent"><input type="button" value="Karten drucken" onclick=\'window.open("../../content/zutrittskarte.php?data='.$uids.'");\'></td>
+                <td><input type="submit" value="Karten zuteilen" name="btn_kartezuteilenStudent" onclick="document.form_studentenkarten.action=\'kartezuweisen.php\'">
+                <input type="button" value="Karten drucken" onclick="document.form_studentenkarten.action=\'../../content/zutrittskarte.php\';document.form_studentenkarten.submit();"/></td>
             </tr>
         </table>
         </form>';
+    //<input type="button" value="Karten drucken" onclick=\'window.open("../../content/zutrittskarte.php?data='.$uids.'");\'>
 
 }
 // Zeige alle Mitarbeiter an
@@ -339,11 +341,13 @@ if(isset($_REQUEST['btn_submitMitarbeiter']))
         </table>
         <table>
             <tr>
-                <td><input type="submit" value="Karten zuteilen" name="btn_kartezuteilenMitarbeiter">&nbsp;<input type="button" value="Karten drucken" onclick=\'window.open("../../content/zutrittskarte.php?data='.$uids.'");\'></td>
+                <td><input type="submit" value="Karten zuteilen" name="btn_kartezuteilenMitarbeiter" onclick="document.form_mitarbeiterkarten.action=\'kartezuweisen.php\'">&nbsp;
+                <input type="button" value="Karten drucken" onclick="document.form_mitarbeiterkarten.action=\'../../content/zutrittskarte.php\';document.form_mitarbeiterkarten.submit();"/></td>
             </tr>
         </table>
         </form>
         </body></html>';
+    //<input type="button" value="Karten drucken" onclick=\'window.open("../../content/zutrittskarte.php?data='.$uids.'");\'>
     }
 
 ?>

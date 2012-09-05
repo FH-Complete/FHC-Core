@@ -353,7 +353,7 @@ class student extends benutzer
         
         if($semester != null)
             $qry .= " AND semester =".$this->db_add_param($semester, FHC_INTEGER);
-                
+        $qry.=" ORDER BY nachname, vorname";
         
         
         if($result = $this->db_query($qry))

@@ -95,13 +95,13 @@ class mitarbeiter extends benutzer
 			}
 			else
 			{
-				$this->errormsg = "Kein Eintrag gefunden fuer $uid\n";
+				$this->errormsg = "Kein Eintrag gefunden fuer den Benutzer\n";
 				return false;
 			}
 		}
 		else
 		{
-			$this->errormsg = "Fehler beim Laden: $qry\n";
+			$this->errormsg = "Fehler beim Laden der Daten\n";
 			return false;
 		}
 	}
@@ -144,7 +144,7 @@ class mitarbeiter extends benutzer
 		}
 		if(!is_bool($this->lektor))
 		{
-			$this->errormsg = "Lektor muss boolean sein ".$this->lektor."\n";
+			$this->errormsg = "Lektor muss boolean sein ";
 			return false;
 		}
 		if(!is_bool($this->fixangestellt))
@@ -302,7 +302,7 @@ class mitarbeiter extends benutzer
 		else
 		{
 			$this->db_query('ROLLBACK;');
-			$this->errormsg = "Fehler beim Speichern des Mitarbeiter-Datensatzes:".$this->db_last_error();
+			$this->errormsg = "Fehler beim Speichern des Mitarbeiter-Datensatzes";
 			return false;
 		}
 	}
@@ -777,11 +777,11 @@ class mitarbeiter extends benutzer
 		$qry = "SELECT vorname, nachname, titelpre, titelpost, kurzbz, vornamen, uid
 			FROM campus.vw_mitarbeiter 
 			WHERE 
-				lower(nachname) like lower('%".addslashes($filter)."%')
-				OR lower(uid) like lower('%".addslashes($filter)."%')
-				OR lower(vorname) like lower('%".addslashes($filter)."%')
-				OR lower(vorname || ' ' || nachname) like lower('%".addslashes($filter)."%')
-				OR lower(nachname || ' ' || vorname) like lower('%".addslashes($filter)."%')
+				lower(nachname) like lower('%".$this->db_escape($filter)."%')
+				OR lower(uid) like lower('%".$this->db_escape($filter)."%')
+				OR lower(vorname) like lower('%".$this->db_escape($filter)."%')
+				OR lower(vorname || ' ' || nachname) like lower('%".$this->db_escape($filter)."%')
+				OR lower(nachname || ' ' || vorname) like lower('%".$this->db_escape($filter)."%')
 			ORDER BY nachname, vorname";
 		//echo $qry;
 		if($this->db_query($qry))
@@ -824,7 +824,7 @@ class mitarbeiter extends benutzer
 				FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id))  LEFT JOIN campus.tbl_resturlaub USING(mitarbeiter_uid)
 				WHERE nachname||' '||vorname ~* ".$this->db_add_param($filter)." OR
 				      vorname||' '||nachname ~* ".$this->db_add_param($filter)." OR
-				      uid ~* '".addslashes($filter)."'";
+				      uid ~* ".$this->db_add_param($filter)." ";
 		if(is_numeric($filter))
 			$qry.="OR personalnummer = ".$this->db_add_param($filter)." OR svnr = ".$this->db_add_param($filter).";";
 
@@ -940,7 +940,7 @@ class mitarbeiter extends benutzer
 		}
 		else
 		{
-			$this->errormsg=$this->db_last_error();
+			$this->errormsg="Fehler beim Laden der Daten";
 			return false;
 		}
 	}
@@ -1073,7 +1073,7 @@ class mitarbeiter extends benutzer
                 JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
                 WHERE tbl_lehreinheitmitarbeiter.mitarbeiter_uid=uid 
                 AND tbl_lehreinheit.studiensemester_kurzbz in (".$this->implode4SQL($studSemArray).")) ";
-        
+        $qry.=" ORDER BY nachname, vorname";
         if($result = $this->db_query($qry))
         {
             while($row = $this->db_fetch_object($result))

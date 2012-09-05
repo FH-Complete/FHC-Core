@@ -503,14 +503,21 @@ class person extends basis_db
 	 */
 	public function getTab($filter, $order='person_id')
 	{
-		$sql_query = "SELECT * FROM public.tbl_person WHERE true ";
+		$sql_query = "
+			SELECT 
+				distinct on (person_id) * 
+			FROM 
+				public.tbl_person
+				LEFT JOIN public.tbl_benutzer USING(person_id) 
+			WHERE true ";
 		
 		if($filter!='')
 		{
 			$sql_query.=" AND 	nachname ~* '".$this->db_escape($filter)."' OR 
 								vorname ~* '".$this->db_escape($filter)."' OR
 								(nachname || ' ' || vorname) ~* '".$this->db_escape($filter)."' OR
-								(vorname || ' ' || nachname) ~* '".$this->db_escape($filter)."'";
+								(vorname || ' ' || nachname) ~* '".$this->db_escape($filter)."' OR
+								uid=".$this->db_add_param($filter);
 		}
 
 		$sql_query .= " ORDER BY $order";
