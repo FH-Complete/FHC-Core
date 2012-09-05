@@ -1198,7 +1198,7 @@ else if ($method == "profil")
 		$save = true; 
 		$emergencyPerson = new person(); 
 			
-	if($_REQUEST['emergency_name_id'] == "" && $_REQUEST['emergency_nachname'] != "")
+        if($_REQUEST['emergency_name_id'] == "" && $_REQUEST['emergency_nachname'] != "")
 		{
 			// Emergency Person
 			$emergencyPerson->vorname = $_REQUEST['emergency_vorname']; 
@@ -1268,7 +1268,7 @@ else if ($method == "profil")
 			// lösche Kontakt
 			if(!$emkontakt->delete($_REQUEST['emergency_emailId']))
 			{
-				die("$emkontakt->errormsg");  
+				die("$emkontakt->errormsg");
 			}
 		}
 		else if($_REQUEST['emergency_emailId']!= "")
@@ -1418,36 +1418,67 @@ else if ($method == "profil")
 		<table>
 		<tr><td>
 			<tr>
-				<td>'.$p->t('global/titel').' Pre</td>
-				<td><input type="text" size="20" maxlength="64" name="titel_pre" value="'.$person->titelpre.'"></td>
-				<td>'.$p->t('incoming/zugangsvoraussetzung').'&sup1;</td>
+				<td rowspan="4"><img id="personimage" src="../../public/bild.php?src=person&person_id='.$preincoming->person_id.'" alt="'.$preincoming->person_id.'" height="100px" width="75px"></td>';
+                    
+          echo "<td><a href='#BildUpload' onclick='window.open(\"../bildupload.php?person_id=$person->person_id\",\"BildUpload\", \"height=500,width=500,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\"); return false;'>".$p->t('profil/bildHochladen')."<a href=\"../../../cms/content.php?content_id=6174\" target=\"_blank\"> <img src=\"../../../skin/images/help.png\" width=\"18px\" height=\"18px\"></img></a></td>";
+                
+        echo '
+                <td>'.$p->t('incoming/zugangsvoraussetzung').'&sup1;</td>
 				<td><input type="text" name="zgv" size=40 value="'.$preincoming->zgv.'"></td>
 			</tr>
 			<tr>
-				<td>'.$p->t('global/vorname').'</td>
-				<td><input type="text" size="20" maxlength="32" name="vorname" value="'.$person->vorname.'"></td>
+                <td></td>
 				<td>'.$p->t('incoming/abgelegtin').'</td>
 				<td><input type="text" name="zgv_name" size=40 value="'.$preincoming->zgv_name.'"></td>
 			</tr>
 			<tr>
-				<td>'.$p->t('global/nachname').'</td>
-				<td><input type="text" size="20" maxlength="64" name="nachname" value="'.$person->nachname.'"></td>
+                <td></td>
 				<td>'.$p->t('incoming/abgelegtinort').'</td>
 				<td><input type="text" name="zgv_ort" size=40 value="'.$preincoming->zgv_ort.'"></td>
 			</tr>
 			<tr>
-				<td>'.$p->t('global/titel').' Post</td>
-				<td><input type="text" size="20" maxlength="32" name="titel_post" value="'.$person->titelpost.'"></td>
+                <td></td>
 				<td>'.$p->t('incoming/abgelegtam').'</td>
 				<td><input type="text" name="zgv_datum" size=40 value="'.$date->formatDatum($preincoming->zgv_datum,'d.m.Y').'"></td>
 			</tr>
 			<tr>
-				<td>'.$p->t('global/geburtsdatum').'</td>
-				<td><input type="text" size="20" name="geb_datum" value="'.$date->formatDatum($person->gebdatum,'d.m.Y').'" onfocus="this.value=\'\'"> (dd.mm.yyyy)</td>
 				<td>&nbsp;</td>
+                <td></td>
+                <td></td>
+                <td></td>
 			</tr>
 			<tr>
-				<td>'.$p->t('global/staatsbuergerschaft').'</td>
+				<td>'.$p->t('global/titel').' Pre</td>
+				<td><input type="text" size="20" maxlength="64" name="titel_pre" value="'.$person->titelpre.'"></td>
+				<td>'.$p->t('incoming/zugangsvoraussetzungmaster').'</td>
+				<td><input type="text" name="zgv_master" value="'.$preincoming->zgvmaster.'" size=40></td>
+            </tr>		
+			<tr>
+				<td>'.$p->t('global/vorname').'</td>
+				<td><input type="text" size="20" maxlength="32" name="vorname" value="'.$person->vorname.'"></td>
+                <td>'.$p->t('incoming/abgelegtin').'</td>
+				<td><input type="text" name="zgv_master_name" size=40 value="'.$preincoming->zgvmaster_name.'"></td>
+            </tr>	
+			<tr>
+                <td>'.$p->t('global/nachname').'</td>
+				<td><input type="text" size="20" maxlength="64" name="nachname" value="'.$person->nachname.'"></td>
+				<td>'.$p->t('incoming/abgelegtinort').'</td>
+				<td><input type="text" name="zgv_master_ort" size=40 value="'.$preincoming->zgvmaster_ort.'"></td>
+			</tr>
+			<tr>
+                <td>'.$p->t('global/titel').' Post</td>
+				<td><input type="text" size="20" maxlength="32" name="titel_post" value="'.$person->titelpost.'"></td>
+				<td>'.$p->t('incoming/abgelegtam').'</td>
+				<td><input type="text" name="zgv_master_datum" size=40 value="'.$date->formatDatum($preincoming->zgvmaster_datum,'d.m.Y').'"></td>
+			</tr>	
+            <tr>
+                <td>'.$p->t('global/geburtsdatum').'</td>
+				<td><input type="text" size="20" name="geb_datum" value="'.$date->formatDatum($person->gebdatum,'d.m.Y').'" onfocus="this.value=\'\'"> (dd.mm.yyyy)</td>
+				<td>&nbsp;</td>
+				<td></td>
+			</tr>				
+			<tr>
+                <td>'.$p->t('global/staatsbuergerschaft').'</td>
 				<td><SELECT name="staatsbuerger">
 				<option value="staat_auswahl">-- select --</option>';
 				foreach ($nation->nation as $nat)
@@ -1461,11 +1492,12 @@ else if ($method == "profil")
 						echo '<option '.$selected.' value="'.$nat->code.'" >'.$nat->langtext."</option>\n";
 				}
 	
-echo'			</td>	
-				<td>'.$p->t('incoming/zugangsvoraussetzungmaster').'</td>
-				<td><input type="text" name="zgv_master" value="'.$preincoming->zgvmaster.'" size=40></td></tr>		
+echo'			</SELECT></td>	
+				<td colspan="2">'.$p->t('incoming/personimernstfall').':</td>
+				<td></td>
+			</tr>				
 			<tr>
-				<td>'.$p->t('global/geschlecht').'</td>';
+                <td>'.$p->t('global/geschlecht').'</td>';
 	if($person->geschlecht == "m")
 		echo '
 				<td>    <input type="radio" name="geschlecht" value="m" checked> '.$p->t('global/mann').'
@@ -1475,34 +1507,38 @@ echo'			</td>
 			echo '
 				<td>    <input type="radio" name="geschlecht" value="m"> '.$p->t('global/mann').'
     					<input type="radio" name="geschlecht" value="w" checked>'.$p->t('global/frau').'
-    			</td>';		
-		
-echo'			<td>'.$p->t('incoming/abgelegtin').'</td>
-				<td><input type="text" name="zgv_master_name" size=40 value="'.$preincoming->zgvmaster_name.'"></td></tr>	
+    			</td>';
+        
+        echo    '<td>'.$p->t('global/vorname').'</td>
+				<td><input type="text" size="40" name="emergency_vorname" value="'.$personEmergency->vorname.'">
+				<input type="hidden" name="emergency_name_id" id="emergency_name_id" value="'.$preincoming->person_id_emergency.'"></td>
+            </tr>				
 			<tr>
-				<td>&nbsp;</td>
 				<td></td>
-				<td>'.$p->t('incoming/abgelegtinort').'</td>
-				<td><input type="text" name="zgv_master_ort" size=40 value="'.$preincoming->zgvmaster_ort.'"></td>
-			</tr>
-			<tr>
-				<td>'.$p->t('global/strasse').'</td>
-				<td><input type="text" size="40" maxlength="256" name="strasse" value="'.$adresse->result[0]->strasse.'"></td>
-				<td>'.$p->t('incoming/abgelegtam').'</td>
-				<td><input type="text" name="zgv_master_datum" size=40 value="'.$date->formatDatum($preincoming->zgvmaster_datum,'d.m.Y').'"></td>
+                <td></td>
+				<td>'.$p->t('global/nachname').'</td>
+				<td><input type="text" size="40" name="emergency_nachname" value="'.$personEmergency->nachname.'"></td>
 			</tr>	
+			<tr>
+                <td>'.$p->t('global/strasse').'</td>
+				<td><input type="text" size="40" maxlength="256" name="strasse" value="'.$adresse->result[0]->strasse.'"></td>
+				<td>'.$p->t('global/telefon').'</td>
+				<td><input type="text" size="40" name="emergency_telefon" value="'.$emTelefon.'">
+				<input type="hidden" name="emergency_telefonId" id="emergency_telefonId" value="'.$emTelefonId.'"></td>
+			</tr>
 			<tr>
 				<td>'.$p->t('global/plz').'</td>
 				<td><input type="text" size="10" maxlength="16" name="plz" value="'.$adresse->result[0]->plz.'"></td>
-			</tr>				
-			<tr>
-				<td>'.$p->t('global/ort').'</td>
+				<td>Email</td>
+				<td><input type="text" size="40" name="emergency_email" value="'.$emEmail.'">
+				<input type="hidden" name="emergency_emailId" id="emergency_emailId" value="'.$emEmailId.'"></td>
+			</tr>	
+            <tr>
+                <td>'.$p->t('global/ort').'</td>
 				<td><input type="text" size="40" maxlength="256" name="ort" value="'.$adresse->result[0]->ort.'"></td>
-				<td colspan="2">'.$p->t('incoming/personimernstfall').':</td>
-				</td></td>
-			</tr>				
-			<tr>
-				<td>'.$p->t('incoming/nation').'</td>
+            </tr>
+            <tr valign="top">
+                <td>'.$p->t('incoming/nation').'</td>
 				<td><SELECT name="nation">
 				<option value="nat_auswahl">-- select --</option>';
 				foreach ($nation->nation as $nat)
@@ -1515,53 +1551,43 @@ echo'			<td>'.$p->t('incoming/abgelegtin').'</td>
 					else
 						echo '<option '.$selected.' value="'.$nat->code.'" >'.$nat->langtext."</option>\n";
 				}		
-	echo '		</td>
-				<td>'.$p->t('global/vorname').'</td>
-				<td><input type="text" size="40" name="emergency_vorname" value="'.$personEmergency->vorname.'">
-				<input type="hidden" name="emergency_name_id" id="emergency_name_id" value="'.$preincoming->person_id_emergency.'"></td></tr>				
+	echo '		</select></td> 
+                <td rowspan="4">'.$p->t('global/anmerkung').'</td>
+				<td rowspan="4"><textarea name="anmerkung" cols="31" rows="5">'.$preincoming->anmerkung.'</textarea></td>
+            </tr>
 			<tr>
 				<td>E-Mail</td>'; 
-	$email ='';
-	foreach($kontakt->result as $kon)
-	{
-		if($kon->kontakttyp == "email")
-		{
-			$email = $kon->kontakt;
-		}
-	}
+            $email ='';
+            foreach($kontakt->result as $kon)
+            {
+                if($kon->kontakttyp == "email")
+                {
+                    $email = $kon->kontakt;
+                }
+            }
 	echo'		<td><input type="text" size="40" maxlength="128" name="email" value="'.$email.'"></td>
-				<td>'.$p->t('global/nachname').'</td>
-				<td><input type="text" size="40" name="emergency_nachname" value="'.$personEmergency->nachname.'"></td>
-			</tr>	
-			<tr>
-				<td>&nbsp;</td>
-				<td></td>
-				<td>'.$p->t('global/telefon').'</td>
-				<td><input type="text" size="40" name="emergency_telefon" value="'.$emTelefon.'">
-				<input type="hidden" name="emergency_telefonId" id="emergency_telefonId" value="'.$emTelefonId.'"></td>
+
 			</tr>
-			<tr valign="top">
-				<td>'.$p->t('global/anmerkung').'</td>
-				<td><textarea name="anmerkung" cols="31" rows="5">'.$preincoming->anmerkung.'</textarea></td>
-				<td>Email</td>
-				<td><input type="text" size="40" name="emergency_email" value="'.$emEmail.'">
-				<input type="hidden" name="emergency_emailId" id="emergency_emailId" value="'.$emEmailId.'"></td>
-			</tr>	
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
 			<tr>
-				<td></td>
-				<td></td>
-				<td align="center"><input type="button" value="'.$p->t('incoming/uploadCv').'" onclick=FensterOeffnen("'.APP_ROOT.'cis/public/incoming/akteupload.php?person_id='.$person->person_id.'&dokumenttyp=Lebenslf");></td>
-				<td></td>
-			</tr>
-			<tr>
-				<td></td><td></td><td align = "center"><input type="submit" name="submit_profil" value="'.$p->t('global/speichern').'" onclick="return checkProfil()"></td>
-				<td></td>
+                
+                <td align = "center" colspan="4"><input type="submit" name="submit_profil" value="'.$p->t('global/speichern').'" onclick="return checkProfil()">
+				<input type="button" value="'.$p->t('incoming/uploadCv').'" onclick="FensterOeffnen(\''.APP_ROOT.'cis/public/incoming/akteupload.php?person_id='.$person->person_id.'&dokumenttyp=Lebenslf\');"></td>
 			</tr>
 			</table>
 		</td>
 		</tr>
 		<tr>
-			<td align="right"><input type="button" value="'.$p->t('incoming/weiter').'" onclick="document.location.href = \'incoming.php?method=university\'";></td>
+			<td align="right"><input type="button" value="'.$p->t('incoming/weiter').'" onclick="document.location.href = \'incoming.php?method=university\';"></td>
 		</tr>
 		<tr>
 			<td colspan="5">&sup1; '.$p->t('incoming/zugangsvoraussetzungFussnote').'</td>
