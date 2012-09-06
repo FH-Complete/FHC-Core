@@ -36,6 +36,7 @@ class mobilitaetsprogramm extends basis_db
 	public $kurzbz;
 	public $beschreibung;
 	public $sichtbar; 
+    public $sichtbar_outgoing;
 
 
 	public function getAll($sichtbar = false)
