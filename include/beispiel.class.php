@@ -484,7 +484,7 @@ class beispiel extends basis_db
 			       ' probleme='.$this->db_add_param($this->probleme, FHC_BOOLEAN).','.
 			       ' updateamum='.$this->db_add_param($this->updateamum).','.
 			       ' updatevon='.$this->db_add_param($this->updatevon).
-			       " WHERE beispiel_id=".$this->db_add_param(beispiel_id, FHC_INTEGER)." AND student_uid=".$this->db_add_param($this->student_uid).';';
+			       " WHERE beispiel_id=".$this->db_add_param($this->beispiel_id, FHC_INTEGER)." AND student_uid=".$this->db_add_param($this->student_uid).';';
 		}
 
 		if($this->db_query($qry))
