@@ -437,24 +437,29 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			//$thesis_beschreibung = '';
 			echo "<semesters>"; 
 			
-			// hole Semesterbezeichnung für aktuelles Semester
-			$qry_semester = "Select distinct(student.semester), student.studiensemester_kurzbz
-			from campus.vw_student_lehrveranstaltung student
-			left join lehre.tbl_zeugnisnote zeugnis on(student.lehrveranstaltung_id = zeugnis.lehrveranstaltung_id AND student.uid = zeugnis.student_uid AND student.studiensemester_kurzbz = zeugnis.studiensemester_kurzbz)
-			join lehre.tbl_note note using(note) where uid = '$uid_arr[$i]' and zeugnis = true and
-			semester = '$start';";			
+           $qry_semester=" Select distinct(status.studiensemester_kurzbz)
 			
+            from lehre.tbl_zeugnisnote zeugnis 
+                join lehre.tbl_note note using(note)
+            join lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+            join public.tbl_student student USING(student_uid)
+            join public.tbl_prestudentstatus status USING(prestudent_id)
+			where student_uid = '$uid_arr[$i]' and zeugnis = true and
+			status.ausbildungssemester = '$start'";
+			
+           $semester_kurzbz = array(); 
 			if($result_semester = $db->db_query($qry_semester))
 			{
-				if($row_semester = $db->db_fetch_object($result_semester))
+				while($row_semester = $db->db_fetch_object($result_semester))
 				{
-					$semester_kurzbz = $row_semester->studiensemester_kurzbz;
+					$semester_kurzbz[] = $row_semester->studiensemester_kurzbz;
 				}
 			}
-//			$aktuellesSemester = $semester_kurzbz;
 
-			$semester = mb_substr($semester_kurzbz,0,2);
-			$year = mb_substr($semester_kurzbz, 2,4); 
+			$aktuellesSemester = $semester_kurzbz;
+
+			$semester = mb_substr($semester_kurzbz[0],0,2);
+			$year = mb_substr($semester_kurzbz[0], 2,4); 
 			
 			if($semester == 'SS')
 				$semester_kurzbz = 'Summer Semester '.$year;
@@ -466,15 +471,16 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$semester_kurzbz = 'Winter Semester '.$year.'/'.$helpyear;  
 			}
 			
+            $sqlStudent = new student(); 
+
 			echo "   <semesterKurzbz>Semester $start | $semester_kurzbz</semesterKurzbz>";
 			
-			$qry ="Select distinct(student.lehrveranstaltung_id), student.uid, student.studiengang_kz, student.kurzbz, student.bezeichnung, student.bezeichnung_english, student.semester, student.semesterstunden, student.ects, student.studiensemester_kurzbz, zeugnis.note, note.bezeichnung note_bezeichnung, note.anmerkung
-			from campus.vw_student_lehrveranstaltung student
-			left join lehre.tbl_zeugnisnote zeugnis on(student.lehrveranstaltung_id = zeugnis.lehrveranstaltung_id AND student.uid = zeugnis.student_uid AND student.studiensemester_kurzbz = zeugnis.studiensemester_kurzbz)
-			join lehre.tbl_note note using(note)
-			
-			where uid = '$uid_arr[$i]' and zeugnis = true and
-			semester = '$start';"; 
+			$qry ="Select distinct(tbl_lehrveranstaltung.lehrveranstaltung_id), tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.kurzbz, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.bezeichnung_english, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.semesterstunden, tbl_lehrveranstaltung.ects, zeugnis.studiensemester_kurzbz, zeugnis.note, note.bezeichnung note_bezeichnung, note.anmerkung
+            from lehre.tbl_zeugnisnote zeugnis 
+            join lehre.tbl_note note using(note)
+            join lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+			where student_uid = '$uid_arr[$i]' and zeugnis = true and
+			studiensemester_kurzbz in (".$sqlStudent->implode4SQL($aktuellesSemester).");"; 
 			
 			$j = 0; 
 			$wochen = 15; 
