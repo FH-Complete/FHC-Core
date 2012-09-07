@@ -297,8 +297,8 @@ $qry_anzahl = "
 	WHERE 
 		foto is not NULL
 		AND tbl_benutzer.aktiv
-		AND NOT EXISTS (SELECT 1 FROM public.tbl_person_fotostatus 
-					WHERE person_id=tbl_person.person_id AND fotostatus_kurzbz='akzeptiert')
+		AND 'akzeptiert' NOT IN(SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus 
+					WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
 		AND 'abgewiesen' NOT IN (SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
 						WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)
 	";
@@ -336,8 +336,8 @@ else
 	}
 	
 	// Keine Eintraege die bereits akzeptiert wurden
-	$qry.="	AND NOT EXISTS (SELECT 1 FROM public.tbl_person_fotostatus 
-					WHERE person_id=tbl_person.person_id AND fotostatus_kurzbz='akzeptiert')";
+	$qry.="	AND 'akzeptiert' NOT IN(SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus 
+					WHERE person_id=tbl_person.person_id ORDER BY datum desc, person_fotostatus_id desc LIMIT 1)";
 
 	// Keine Eintraege bei denen Abgewiesen der letzte Status ist
 	$qry.="	AND 'abgewiesen' NOT IN (SELECT fotostatus_kurzbz FROM public.tbl_person_fotostatus
