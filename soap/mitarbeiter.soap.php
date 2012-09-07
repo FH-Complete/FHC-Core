@@ -165,7 +165,7 @@ function SearchMitarbeiter($filter, $authentifizierung)
  
     // darf user überhaupt was von Methode sehen
     $recht = new webservicerecht(); 
-    if(!$recht->isUserAuthorized($user, 'getMitarbeiter'))
+    if(!$recht->isUserAuthorized($user, 'SearchMitarbeiter'))
         return new SoapFault("Server", "No permission");
    
     // Daten für Lehrveranstaltung
