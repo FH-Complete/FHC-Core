@@ -199,7 +199,7 @@ function selectAll()
 	echo "<select name='gruppe' onchange='document.auswahl.submit();'>";
 	echo "<option></option>";
 	$grp_obj = new gruppe();
-	if(!$grp_obj->getgruppe('0',$semester,null,'true'))
+	if(!$grp_obj->getgruppe('0',$semester,null,true))
 		echo "$lv_obj->errormsg";
 
 	foreach($grp_obj->result AS $row)
