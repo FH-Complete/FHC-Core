@@ -201,7 +201,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			
 			$studiengang->getStudiengangFromOe($aufteilung_row->oe_kurzbz); 
 			// Diplomstudiengänge nicht laden
-			if($studiengang->typ !='d' && $aufteilung_row->oe_kurzbz !='Infrastruktur' && $aufteilung_row->oe_kurzbz != 'etw')
+			if($studiengang->typ !='d' && $aufteilung_row->oe_kurzbz !='Infrastruktur' && $aufteilung_row->oe_kurzbz != 'etw' && $aufteilung_row->oe_kurzbz != 'eas')
 			{
 				echo "		<aufteilung>\n";
 				echo "			<oe><![CDATA[".strtoupper($aufteilung_row->oe_kurzbz)."]]></oe>\n"; 
