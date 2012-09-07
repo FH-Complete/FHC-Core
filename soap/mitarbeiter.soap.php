@@ -186,7 +186,7 @@ function SearchMitarbeiter($filter, $authentifizierung)
 	    $obj->email = $row->uid.'@'.DOMAIN; 
 	             
 	    // lösche alle Attribute für die user keine Berechtigung hat 
-	    $return[] = $recht->clearResponse($user, 'getMitarbeiter', $obj);
+	    $return[] = $recht->clearResponse($user, 'SearchMitarbeiter', $obj);
     }
     
     return $return; 
