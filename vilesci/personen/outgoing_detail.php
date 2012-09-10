@@ -73,11 +73,16 @@ if($method== 'deleteLv')
 if($method == 'setAuswahl')
 {
     $preoutgoing = new preoutgoing(); 
-    if(!$preoutgoing->setStatus($preoutgoing_id, 'freigabe'))
-        $message = "<span class='error'>Fehler beim Speichern aufgetreten</span>";
-    else
-        $message = "<span class='ok'>".$preoutgoing->errormsg."</span>";
+    $preoutgoing->load($preoutgoing);
     
+    if($preoutgoing->setStatus($preoutgoing_id, 'freigabe'))
+    {
+        $message = "<span class='ok'>E-Mail an Studenten geschickt</span>";
+        //sendMailStudent($preoutgoing->uid);
+    }
+    else
+        $message="<span class='error'>Fehler beim Speichern aufgetreten</span>"; 
+            
     $preoutgoing_firma_id = $_GET['outgoingFirma_id'];
     $preoutgoingFirma = new preoutgoing(); 
     $preoutgoingFirma->setAuswahlFirmaFalse($preoutgoing_id);
@@ -148,10 +153,18 @@ if($method=="save")
 if(isset($_POST['StatusSetzen']))
 {
     $status = $_POST['status'];
+    
+    $preoutgoing = new preoutgoing(); 
+    $preoutgoing->load($preoutgoing_id); 
+    
     // mail an assistenz senden
     if($status =='genehmigt')
     {
-        
+        // wenn Student dann Email an zuständige Assistenz
+        if(check_student($preoutgoing->uid))
+        {
+            //sendMailAssistenz($preoutgoing->uid);
+        }      
     }
     $outgoing= new preoutgoing();
     if($outgoing->setStatus($preoutgoing_id, $status))
@@ -591,22 +604,30 @@ function print_menu($name, $value)
 }
 
 // sendet eine EMail an die Studiengangsssistenz des Outgoings
-function sendMailAssistenz()
+function sendMailAssistenz($uid)
 {
-    global $out; 
-    
-    $benutzer = new benutzer(); 
-    $benutzer->load($out->uid);
     $student = new student(); 
-    $student->load($benutzer->uid);
-    $prestudent = new prestudent(); 
-    $prestudent->getLastStatus($student->prestudent_id);
+    $student->load($uid);
     $studiengang = new studiengang(); 
     $studiengang->load($student->studiengang_kz);
     
     $emailtext= "Dies ist eine automatisch generierte E-Mail.<br><br>";
-    $emailtext.= "Es hat sich ein neuer Outgoing am System registriert.</b>"; 
+    $emailtext.= "Es hat sich ein neuer Outgoing am System registriert.</b>";
     $mail = new mail($studiengang->email, 'no-reply', 'New Outgoing', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
+    $mail->setHTMLContent($emailtext); 
+    $mail->send(); 
+}
+
+// sendet eine EMail an den Studenten dass Universität ausgewählt wurde
+function sendMailStudent($uid)
+{
+    $email = $uid."@technikum-wien.at"; 
+    
+    $emailtext ="Dies ist eine automatisch generiert E-Mail.<br><br>"; 
+    $emailtext.="Es wurde für Ihr Auslandssemester die Universität bestätigt.<br>"; 
+    $emailtext.="Weitere angaben.... "; 
+    
+    $mail = new mail($email, 'no-reply','Bestätigung des Auslandsemesters', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
     $mail->setHTMLContent($emailtext); 
     $mail->send(); 
 }
