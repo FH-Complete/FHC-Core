@@ -135,7 +135,7 @@ if($method=='new')
     if($preoutgoing->save())
     {
         // Email an Auslandsabteilung schicken
-        //sendMailInternational();
+        sendMailInternational();
         $message='<span class="ok">'.$p->t('global/erfolgreichAngelegt').'</span>';
     }
     else
