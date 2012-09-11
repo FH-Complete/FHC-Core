@@ -23,7 +23,7 @@
  */
  
 	/**
-	 *	@updated 11.11.2011 kindl
+	 *	@updated 11.09.2012 kindl
 	 *
 	 */
 		require_once('../../config/vilesci.config.inc.php');
@@ -31,18 +31,14 @@
 		if (!$db = new basis_db())
 				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 			
-
-	$sql_query="SELECT studiengang_kz, UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) AS kuerzel, bezeichnung FROM public.tbl_studiengang WHERE studiengang_kz>=0 ORDER BY kuerzel";
+	//Spezialgruppen für DropDown
+	$sql_query="SELECT gruppe_kurzbz FROM public.tbl_gruppe WHERE studiengang_kz=10006 AND aktiv=true AND sichtbar=true ORDER BY gruppe_kurzbz";
 	//echo $sql_query."<br>";
-	$result_stg=$db->db_query($sql_query);
-	if(!$result_stg)
-		die("studiengang not found! ".$db->db_last_error());
+	$result_incgrp=$db->db_query($sql_query);
+	if(!$result_incgrp)
+		die("Keine Incoming-Gruppen gefunden! ".$db->db_last_error());
 		
-		
-	$stgid=(isset($_REQUEST['stgid'])?$_REQUEST['stgid']:'');	
-	$semester=(isset($_REQUEST['semester'])?$_REQUEST['semester']:0);	
-	$verband=(isset($_REQUEST['verband'])?$_REQUEST['verband']:0);	
-	$gruppe=(isset($_REQUEST['gruppe'])?$_REQUEST['gruppe']:0);	
+	$incgrp=(isset($_REQUEST['incgrp'])?$_REQUEST['incgrp']:'');	
 	$lehreinheit_id=(isset($_REQUEST['lehreinheit_id'])?$_REQUEST['lehreinheit_id']:'');	
 	$type=(isset($_REQUEST['type'])?$_REQUEST['type']:'');
 
@@ -60,70 +56,30 @@
 <form name="stdplan" method="post" action="incoming_delete.php">
 
 	<p>
-	Löscht den entsprechenden Incoming aus <strong>beiden</strong> LV-Plan Tabellen und auch die Gruppenzuteilung im FAS.<br/><br/>
+	Löscht einen Incoming aus <strong>beiden</strong> LV-Plan Tabellen und auch die <strong>Gruppenzuteilung im FAS</strong>.<br/><br/>
 		
 	Lehreinheit aus der der Incoming gelöscht werden soll:
     <input type="text" name="lehreinheit_id" size="6" maxlength="10" value="<?php echo $lehreinheit_id; ?>"><br/>
 	</p>
-	<p>Gruppe des Incomings, die gelöscht werden soll (zB: BME0I1)<br/>
-	Studiengang
-    <select name="stgid">
+	<p>Gruppe des Incomings, die gelöscht werden soll:  
+	<select name="incgrp">
 		<option value=NULL>*</option>
       <?php
-		if ($result_stg)
-				$num_rows=$db->db_num_rows($result_stg);
+		if ($result_incgrp)
+				$num_rows=$db->db_num_rows($result_incgrp);
 		else
 			$num_rows=0;
 		for ($i=0;$i<$num_rows;$i++)
 		{
-			$row=$db->db_fetch_object ($result_stg, $i);
-			if ($stgid==$row->studiengang_kz)
-				echo "<option value=\"$row->studiengang_kz\" selected>$row->kuerzel</option>";
+			$row=$db->db_fetch_object ($result_incgrp, $i);
+			if ($incgrp==$row->gruppe_kurzbz)
+				echo "<option value=\"$row->gruppe_kurzbz\" selected>$row->gruppe_kurzbz</option>";
 			else
-				echo "<option value=\"$row->studiengang_kz\">$row->kuerzel</option>";
+				echo "<option value=\"$row->gruppe_kurzbz\">$row->gruppe_kurzbz</option>";
 		}
 		?>
     </select>
-    Semester
-    <select name="semester">
-		
-      <?php
-		for ($i=0;$i<9;$i++)
-		{
-			if (isset($_POST['semester']) && $_POST['semester']==$i)
-				echo "<option value=\"$i\" selected>$i</option>";
-			else
-				echo "<option value=\"$i\">$i</option>";
-		}
-		?>
-    </select>
-    Verband
-    <select name="verband">
-	  <option value=NULL>I</option>
-	  
-     <?php /* $verbaende=array("'A'","'B'","'C'","'D'","'F'","'V'");
-		foreach ($verbaende as $i)
-		{
-			if (isset($_POST['verband']) && $_POST['verband']==$i)
-				echo "<option value=\"$i\" selected>$i</option>";
-			else
-				echo "<option value=\"$i\">$i</option>";
-		} */
-		?>
-	</select>
-    Gruppe
-    <select name="gruppe">
-	  <option value=NULL>*</option>
-      <?php
-		for ($i=1;$i<10;$i++)
-		{
-			if (isset($_POST['gruppe']) && $_POST['gruppe']==$i)
-				echo "<option value=\"$i\" selected>$i</option>";
-			else
-				echo "<option value=\"$i\">$i</option>";
-		}
-		?>
-    </select>
+    <br/>
   </p>
 
   <p>
@@ -140,25 +96,16 @@ if ($type=="save")
 	if (!$error)
 	{
 			$sql_query="DELETE FROM lehre.tbl_stundenplandev 
-						WHERE lehreinheit_id=".$_POST['lehreinheit_id']."
-						AND studiengang_kz='".$_POST['stgid']."' 
-						AND semester=".$_POST['semester']." 
-						AND verband='I' 
-						AND gruppe='".$_POST['gruppe']."';
+						WHERE lehreinheit_id=".$_POST['lehreinheit_id']."						
+						AND gruppe_kurzbz='".$_POST['incgrp']."';
 						
 						DELETE FROM lehre.tbl_stundenplan 
-						WHERE lehreinheit_id=".$_POST['lehreinheit_id']."
-						AND studiengang_kz='".$_POST['stgid']."' 
-						AND semester=".$_POST['semester']." 
-						AND verband='I' 
-						AND gruppe='".$_POST['gruppe']."';
+						WHERE lehreinheit_id=".$_POST['lehreinheit_id']."						
+						AND gruppe_kurzbz='".$_POST['incgrp']."';
 						
 						DELETE FROM lehre.tbl_lehreinheitgruppe 
-						WHERE lehreinheit_id=".$_POST['lehreinheit_id']."
-						AND studiengang_kz='".$_POST['stgid']."' 
-						AND semester=".$_POST['semester']." 
-						AND verband='I' 
-						AND gruppe='".$_POST['gruppe']."'";
+						WHERE lehreinheit_id=".$_POST['lehreinheit_id']."						
+						AND gruppe_kurzbz='".$_POST['incgrp']."';";
 			//echo $sql_query;
 			$result=$db->db_query($sql_query);
 			if(!$result)
@@ -167,7 +114,7 @@ if ($type=="save")
 				$error=true;
 			}
 			else
-				echo "<strong>Lehreinheit:</strong> ".$_POST['lehreinheit_id']." - <strong>Studiengang_Kz:</strong> ".$_POST['stgid']." - <strong>Semester:</strong> ".$_POST['semester']." - <strong>Verband:</strong> I - <strong>Gruppe:</strong> ".$_POST['gruppe']." -- <strong>Gelöscht!</strong><br>";
+				echo "<strong>Lehreinheit:</strong> ".$_POST['lehreinheit_id']." - <strong>Gruppe:</strong> ".$_POST['incgrp']." -- <strong>Gelöscht!</strong><br>";
 
 		if (!$error)
 			echo "<br><font style='color:green'><strong>Gruppe erfolgreich gelöscht</strong></font><br>";
