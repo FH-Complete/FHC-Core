@@ -344,7 +344,7 @@ class lehreinheitmitarbeiter extends basis_db
 						$this->db_add_param($row->faktor).','.
 						$this->db_add_param($row->anmerkung).','.
 						$this->db_add_param($row->lehrfunktion_kurzbz).','.
-						$this->db_add_param($row->bismelden, FHC_BOOLEAN).','.
+						$this->db_add_param($this->db_parse_bool($row->bismelden), FHC_BOOLEAN).','.
 						$this->db_add_param($row->ext_id, FHC_INTEGER).','.
 						$this->db_add_param($row->insertamum).','.
 						$this->db_add_param($row->insertvon).','.
