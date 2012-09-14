@@ -269,8 +269,8 @@ if ($type=='mitarbeiter')
 	{
 		echo '
 			<A class="Item" href="zeitwunsch.php?uid='.$user->uid.'">'.$p->t('profil/zeitwuensche').'</A><BR>
-			<A class="Item" href="lva_liste.php?uid='.$user->uid.'">'.$p->t('lvaliste/lehrveranstaltungen').'</A><br>';
-			//<A class="Item" href="freebusy.php">'.$p->t('freebusy/titel').'</A>';
+			<A class="Item" href="lva_liste.php?uid='.$user->uid.'">'.$p->t('lvaliste/lehrveranstaltungen').'</A><br>
+			<A class="Item" href="freebusy.php">'.$p->t('freebusy/titel').'</A>';
 	}
 }
 		
@@ -418,7 +418,7 @@ if(!$ansicht)
    		echo "<TD>&nbsp;".$p->t('profil/alleStudentenVon')." $studiengang->kuerzel $user->semester</TD></TR>";
 		echo '<TR><TD><A class="Item" href="mailto:'.strtolower(trim($studiengang->kuerzel)).trim($user->semester).strtolower(trim($user->verband)).'@'.DOMAIN.'">'.strtolower($studiengang->kuerzel).$user->semester.strtolower($user->verband).'&nbsp;</TD>';
    		echo "<TD>&nbsp;".$p->t('profil/alleStudentenVon')." $studiengang->kuerzel $user->semester$user->verband</TD></TR>";
-   		if($user->gruppe!='')
+   		if(trim($user->gruppe)!='')
    		{
 			echo '<TR><TD><A class="Item" href="mailto:'.strtolower(trim($studiengang->kuerzel)).trim($user->semester).strtolower(trim($user->verband)).trim($user->gruppe).'@'.DOMAIN.'">'.strtolower($studiengang->kuerzel).$user->semester.strtolower($user->verband).$user->gruppe.'&nbsp;</TD>';
    			echo "<TD>&nbsp;".$p->t('profil/alleStudentenVon')." $studiengang->kuerzel $user->semester$user->verband$user->gruppe</TD><TD></TD></TR>";
