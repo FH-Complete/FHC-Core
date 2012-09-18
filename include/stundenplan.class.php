@@ -69,7 +69,7 @@ class stundenplan extends basis_db
 	 */
 	public function load($stundenplan_id)
 	{
-		$qry = "SELECT * FROM lehre.tbl_$this->stpl_table WHERE ".$this->stpl_table."_id='$stundenplan_id'";
+		$qry = "SELECT * FROM lehre.tbl_$this->stpl_table WHERE ".$this->stpl_table."_id=".$this->db_add_param($stundenplan_id);
 		
 		if($this->db_query($qry))
 		{
@@ -90,7 +90,7 @@ class stundenplan extends basis_db
 				$this->stunde = $row->stunde;
 				$this->titel = $row->titel;
 				$this->anmerkung = $row->anmerkung;
-				$this->fix = ($row->fix=='t'?true:false);
+				$this->fix = $this->db_parse_bool($row->fix);
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->insertamum = $row->insertamum;
@@ -106,7 +106,7 @@ class stundenplan extends basis_db
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim Laden des Datensatzes'.$qry;
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
 			return false;
 		}
 	}
@@ -141,45 +141,46 @@ class stundenplan extends basis_db
 			$qry = 'INSERT INTO lehre.tbl_'.$this->stpl_table.' (unr, mitarbeiter_uid, datum, stunde, ort_kurzbz, gruppe_kurzbz, 
 					titel, anmerkung, lehreinheit_id, studiengang_kz, semester, verband, gruppe, fix, updateamum, updatevon, 
 					insertamum, insertvon)
-			        VALUES('.$this->addslashes($this->unr).','.
-					$this->addslashes($this->mitarbeiter_uid).','.
-					$this->addslashes($this->datum).','.
-					$this->addslashes($this->stunde).','.
-					$this->addslashes($this->ort_kurzbz).','.
-					$this->addslashes($this->gruppe_kurzbz).','.
-					$this->addslashes($this->titel).','.
-					$this->addslashes($this->anmerkung).','.
-					$this->addslashes($this->lehreinheit_id).','.
-					$this->addslashes($this->studiengang_kz).','.
-					$this->addslashes($this->semester).','.
-					$this->addslashes(($this->verband!=''?$this->verband:' ')).','.
-					$this->addslashes(($this->gruppe!=''?$this->gruppe:' ')).','.
-					($this->fix?'true':'false').','.
-					$this->addslashes($this->updateamum).','.
-					$this->addslashes($this->updatevon).','.
-					$this->addslashes($this->insertamum).','.
-					$this->addslashes($this->insertvon).');';
+			        VALUES('.
+					$this->db_add_param($this->unr).','.
+					$this->db_add_param($this->mitarbeiter_uid).','.
+					$this->db_add_param($this->datum).','.
+					$this->db_add_param($this->stunde).','.
+					$this->db_add_param($this->ort_kurzbz).','.
+					$this->db_add_param($this->gruppe_kurzbz).','.
+					$this->db_add_param($this->titel).','.
+					$this->db_add_param($this->anmerkung).','.
+					$this->db_add_param($this->lehreinheit_id).','.
+					$this->db_add_param($this->studiengang_kz).','.
+					$this->db_add_param($this->semester).','.
+					$this->db_add_param(($this->verband!=''?$this->verband:' ')).','.
+					$this->db_add_param(($this->gruppe!=''?$this->gruppe:' ')).','.
+					$this->db_add_param($this->fix, FHC_BOOLEAN).','.
+					$this->db_add_param($this->updateamum).','.
+					$this->db_add_param($this->updatevon).','.
+					$this->db_add_param($this->insertamum).','.
+					$this->db_add_param($this->insertvon).');';
 		}
 		else
 		{
 			$qry = 'UPDATE lehre.tbl_'.$this->stpl_table.' SET'.
-			       ' unr='.$this->addslashes($this->unr).','.
-			       ' mitarbeiter_uid='.$this->addslashes($this->mitarbeiter_uid).','.
-			       ' datum='.$this->addslashes($this->datum).','.
-			       ' stunde='.$this->addslashes($this->stunde).','.
-			       ' ort_kurzbz='.$this->addslashes($this->ort_kurzbz).','.
-			       ' gruppe_kurzbz='.$this->addslashes($this->gruppe_kurzbz).','.
-			       ' titel='.$this->addslashes($this->titel).','.
-			       ' anmerkung='.$this->addslashes($this->anmerkung).','.
-			       ' lehreinheit_id='.$this->addslashes($this->lehreinheit_id).','.
-			       ' studiengang_kz='.$this->addslashes($this->studiengang_kz).','.
-			       ' semester='.$this->addslashes($this->semester).','.
-			       ' verband='.$this->addslashes(($this->verband!=''?$this->verband:' ')).','.
-			       ' gruppe='.$this->addslashes(($this->gruppe!=''?$this->gruppe:' ')).','.			       
-			       ' fix='.($this->fix?'true':'false').','.
-			       ' updateamum='.$this->addslashes($this->updateamum).','.
-			       ' updatevon='.$this->addslashes($this->updatevon).
-			       " WHERE ".$this->stpl_table."_id=".$this->addslashes($this->stundenplan_id).";";
+			       ' unr='.$this->db_add_param($this->unr).','.
+			       ' mitarbeiter_uid='.$this->db_add_param($this->mitarbeiter_uid).','.
+			       ' datum='.$this->db_add_param($this->datum).','.
+			       ' stunde='.$this->db_add_param($this->stunde).','.
+			       ' ort_kurzbz='.$this->db_add_param($this->ort_kurzbz).','.
+			       ' gruppe_kurzbz='.$this->db_add_param($this->gruppe_kurzbz).','.
+			       ' titel='.$this->db_add_param($this->titel).','.
+			       ' anmerkung='.$this->db_add_param($this->anmerkung).','.
+			       ' lehreinheit_id='.$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).','.
+			       ' studiengang_kz='.$this->db_add_param($this->studiengang_kz, FHC_INTEGER).','.
+			       ' semester='.$this->db_add_param($this->semester).','.
+			       ' verband='.$this->db_add_param(($this->verband!=''?$this->verband:' ')).','.
+			       ' gruppe='.$this->db_add_param(($this->gruppe!=''?$this->gruppe:' ')).','.			       
+			       ' fix='.$this->db_add_param($this->fix, FHC_BOOLEAN).','.
+			       ' updateamum='.$this->db_add_param($this->updateamum).','.
+			       ' updatevon='.$this->db_add_param($this->updatevon).
+			       " WHERE ".$this->stpl_table."_id=".$this->db_add_param($this->stundenplan_id, FHC_INTEGER, false).";";
 		}
 
 		if($this->db_query($qry))
@@ -189,7 +190,7 @@ class stundenplan extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern des Stundenplanes:'.$this->db_last_error();
+			$this->errormsg = 'Fehler beim Speichern des Stundenplanes';
 			return false;
 		}
 	}
@@ -206,7 +207,7 @@ class stundenplan extends basis_db
 			return false;
 		}
 		
-		$qry = "DELETE FROM lehre.tbl_$this->stpl_table WHERE ".$this->stpl_table."_id='$id'";
+		$qry = "DELETE FROM lehre.tbl_$this->stpl_table WHERE ".$this->stpl_table."_id=".$this->db_add_param($id, FHC_INTEGER, false);
 		
 		if($this->db_query($qry))
 		{
@@ -214,7 +215,7 @@ class stundenplan extends basis_db
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim Loeschen des Eintrages: '.$this->db_last_error();
+			$this->errormsg = 'Fehler beim Loeschen des Eintrages';
 			return false;
 		}
 	}
