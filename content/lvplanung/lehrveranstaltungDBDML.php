@@ -213,6 +213,9 @@ if(!$error)
 				$error = true;
 			}
 			$semesterstunden_alt=$lem->semesterstunden;
+			$bismelden_alt = $lem->bismelden;
+			$faktor_alt = $lem->faktor;
+			$stundensatz_alt = $lem->stundensatz;
 
 			if(!$error)
 			{
@@ -281,12 +284,29 @@ if(!$error)
 					$le = new lehreinheit();
 					$le->load($lem->lehreinheit_id);
 	
-					//Stundenreduzierung bzw aendern der anderen Daten ist immer moeglich
-					if($semesterstunden_alt<$lem->semesterstunden)
+					if($lem->stundensatz<=0 || $lem->faktor<=0 || $lem->bismelden==false)
+						$neue_stunden_eingerechnet=false;
+					else
+						$neue_stunden_eingerechnet=true;
+						
+					if(($stundensatz_alt<=0 || $faktor_alt<=0 || $bismelden_alt==false))
+						$alte_stunden_eingerechnet=false;
+					else
+						$alte_stunden_eingerechnet=true;
+					
+					//Stundenreduzierung immer moeglich
+					if(($lem->semesterstunden>$semesterstunden_alt) || $neue_stunden_eingerechnet)
 					{
-						$qry = "SELECT
-									(sum(semesterstunden)-$semesterstunden_alt+$lem->semesterstunden) as summe
-								FROM
+						$qry = "SELECT ";
+						if($alte_stunden_eingerechnet && $neue_stunden_eingerechnet)
+							$qry.=" (sum(semesterstunden)-($semesterstunden_alt)+($lem->semesterstunden)) as summe";
+						elseif($alte_stunden_eingerechnet && !$neue_stunden_eingerechnet)
+							$qry.=" (sum(semesterstunden)-($semesterstunden_alt)) as summe";
+						elseif(!$alte_stunden_eingerechnet && $neue_stunden_eingerechnet)
+							$qry.=" (sum(semesterstunden)+($lem->semesterstunden)) as summe";
+						elseif(!$alte_stunden_eingerechnet && !$neue_stunden_eingerechnet)
+							$qry.=" (sum(semesterstunden)) as summe";
+						$qry.="	FROM
 									lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 								WHERE
 									mitarbeiter_uid='$lem->mitarbeiter_uid' AND
@@ -294,12 +314,12 @@ if(!$error)
 									faktor>0 AND
 									stundensatz>0 AND
 									bismelden";
-		
+						
 						if($db->db_query($qry))
 						{
 							if($row = $db->db_fetch_object())
 							{
-								if($row->summe>=$max_stunden)
+								if($row->summe>$max_stunden)
 								{
 									if(!$fixangestellt)
 									{
@@ -335,7 +355,7 @@ if(!$error)
 							$return = false;
 							$error=true;
 							$errormsg='Fehler beim Ermitteln der Gesamtstunden';
-						}
+						}				
 					}
 				}
 				
