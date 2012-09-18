@@ -70,16 +70,16 @@ class stunde extends basis_db
 		if($this->new)
 		{
 			$qry = "INSERT INTO lehre.tbl_stunde (stunde, beginn, ende)
-			        VALUES('".$this->stunde."',".
-					$this->addslashes($this->beginn).','.
-					$this->addslashes($this->ende).');';
+			        VALUES(".$this->db_add_param($this->stunde).",".
+					$this->db_add_param($this->beginn).','.
+					$this->db_add_param($this->ende).');';
 		}
 		else
 		{
 			$qry = 'UPDATE lehre.tbl_stunde SET'.
-			       ' beginn='.$this->addslashes($this->beginn).','.
-			       ' ende='.$this->addslashes($this->ende).
-			       " WHERE stunde=".$this->stunde;
+			       ' beginn='.$this->db_add_param($this->beginn).','.
+			       ' ende='.$this->db_add_param($this->ende).
+			       " WHERE stunde=".$this->db_add_param($this->stunde);
 		}
 
 		if($this->db_query($qry))
@@ -88,7 +88,7 @@ class stunde extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der Stunde:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern der Stunde';
 			return false;
 		}
 	}
