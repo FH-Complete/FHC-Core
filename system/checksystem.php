@@ -3748,6 +3748,139 @@ if(!@$db->db_query("SELECT projektarbeittitel FROM public.tbl_preoutgoing LIMIT 
         echo 'Tabelle public.tbl_preoutgoing Spalte projektarbeittitel hinzugefuegt<br>';
 }
 
+// Coodle
+if(!@$db->db_query("SELECT 1 FROM campus.tbl_coodle LIMIT 1"))
+{
+    $qry ="
+    CREATE TABLE campus.tbl_coodle_status
+    (
+    	coodle_status_kurzbz varchar(32) NOT NULL,
+    	bezeichnung varchar(256)
+    );
+    ALTER TABLE campus.tbl_coodle_status ADD CONSTRAINT pk_coodle_status PRIMARY KEY (coodle_status_kurzbz);
+    
+    GRANT SELECT ON campus.tbl_coodle_status TO web;
+    GRANT SELECT ON campus.tbl_coodle_status TO vilesci;
+    
+    CREATE TABLE campus.tbl_coodle
+    (
+    	coodle_id integer NOT NULL,
+    	ersteller_uid varchar(32),
+    	titel varchar(64),
+    	beschreibung text,
+    	coodle_status_kurzbz varchar(32) NOT NULL,
+    	dauer smallint,
+    	endedatum date,
+    	insertamum timestamp,
+    	insertvon varchar(32),
+    	updateamum timestamp,
+    	updatevon varchar(32)
+    );
+    
+    CREATE SEQUENCE campus.seq_coodle_coodle_id
+ 	INCREMENT BY 1
+ 	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+
+	GRANT SELECT, UPDATE ON SEQUENCE campus.seq_coodle_coodle_id TO web;
+	GRANT SELECT, UPDATE ON SEQUENCE campus.seq_coodle_coodle_id TO vilesci;
+	
+    ALTER TABLE campus.tbl_coodle ADD CONSTRAINT pk_coodle PRIMARY KEY (coodle_id);
+    ALTER TABLE campus.tbl_coodle ALTER COLUMN coodle_id SET DEFAULT nextval('campus.seq_coodle_coodle_id');
+    
+	ALTER TABLE campus.tbl_coodle ADD CONSTRAINT fk_coodle_coodle_status FOREIGN KEY(coodle_status_kurzbz) REFERENCES campus.tbl_coodle_status (coodle_status_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;
+	ALTER TABLE campus.tbl_coodle ADD CONSTRAINT fk_coodle_benutzer FOREIGN KEY(ersteller_uid) REFERENCES public.tbl_benutzer (uid) ON DELETE RESTRICT ON UPDATE CASCADE;
+	
+	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_coodle TO web;
+	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_coodle TO vilesci;
+	
+	CREATE TABLE campus.tbl_coodle_ressource
+	(
+		coodle_ressource_id integer NOT NULL,
+		coodle_id integer NOT NULL,
+		uid varchar(32),
+		ort_kurzbz varchar(16),
+		email varchar(128),
+		name varchar(256),
+		zugangscode varchar(64),
+		insertamum timestamp,
+		insertvon varchar(32),
+		updateamum timestamp,
+		updatevon varchar(32)
+	);
+	
+	CREATE SEQUENCE campus.seq_coodle_ressource_coodle_ressource_id
+ 	INCREMENT BY 1
+ 	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+
+	GRANT SELECT, UPDATE ON SEQUENCE campus.seq_coodle_ressource_coodle_ressource_id TO web;
+	GRANT SELECT, UPDATE ON SEQUENCE campus.seq_coodle_ressource_coodle_ressource_id TO vilesci;
+	
+	ALTER TABLE campus.tbl_coodle_ressource ADD CONSTRAINT pk_coodle_ressource PRIMARY KEY (coodle_ressource_id);
+    ALTER TABLE campus.tbl_coodle_ressource ALTER COLUMN coodle_ressource_id SET DEFAULT nextval('campus.seq_coodle_ressource_coodle_ressource_id');
+    
+   	ALTER TABLE campus.tbl_coodle_ressource ADD CONSTRAINT fk_coodle_ressource_coodle_id FOREIGN KEY(coodle_id) REFERENCES campus.tbl_coodle (coodle_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE campus.tbl_coodle_ressource ADD CONSTRAINT fk_coodle_ressource_uid FOREIGN KEY(uid) REFERENCES public.tbl_benutzer (uid) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE campus.tbl_coodle_ressource ADD CONSTRAINT fk_coodle_ressource_ort_kurzbz FOREIGN KEY(ort_kurzbz) REFERENCES public.tbl_ort (ort_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	
+	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_coodle_ressource TO web;
+	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_coodle_ressource TO vilesci;
+	
+	CREATE TABLE campus.tbl_coodle_termin
+	(
+		coodle_termin_id integer NOT NULL,
+		coodle_id integer NOT NULL,
+		datum date NOT NULL,
+		uhrzeit time NOT NULL,
+		auswahl boolean NOT NULL
+	);
+	
+	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_coodle_termin TO web;
+	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_coodle_termin TO vilesci;
+	
+	CREATE SEQUENCE campus.seq_coodle_termin_coodle_termin_id
+ 	INCREMENT BY 1
+ 	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+
+	GRANT SELECT, UPDATE ON SEQUENCE campus.seq_coodle_termin_coodle_termin_id TO web;
+	GRANT SELECT, UPDATE ON SEQUENCE campus.seq_coodle_termin_coodle_termin_id TO vilesci;
+	
+	ALTER TABLE campus.tbl_coodle_termin ADD CONSTRAINT pk_coodle_termin PRIMARY KEY (coodle_termin_id);
+    ALTER TABLE campus.tbl_coodle_termin ALTER COLUMN coodle_termin_id SET DEFAULT nextval('campus.seq_coodle_termin_coodle_termin_id');
+    ALTER TABLE campus.tbl_coodle_termin ADD CONSTRAINT fk_coodle_termin_coodle_termin_id FOREIGN KEY(coodle_id) REFERENCES campus.tbl_coodle (coodle_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+    
+    CREATE TABLE campus.tbl_coodle_ressource_termin
+    (
+    	coodle_ressource_id integer NOT NULL,
+    	coodle_termin_id integer NOT NULL,
+    	insertamum timestamp,
+    	insertvon varchar(32)
+    );
+    
+    ALTER TABLE campus.tbl_coodle_ressource_termin ADD CONSTRAINT pk_coodle_ressource_termin PRIMARY KEY (coodle_ressource_id, coodle_termin_id);
+    ALTER TABLE campus.tbl_coodle_ressource_termin ADD CONSTRAINT fk_coodle_ressource_termin_coodle_ressource_id FOREIGN KEY(coodle_ressource_id) REFERENCES campus.tbl_coodle_ressource (coodle_ressource_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+    ALTER TABLE campus.tbl_coodle_ressource_termin ADD CONSTRAINT fk_coodle_ressource_termin_coodle_termin_id FOREIGN KEY(coodle_termin_id) REFERENCES campus.tbl_coodle_termin (coodle_termin_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+    
+    GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_coodle_ressource_termin TO web;
+	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_coodle_ressource_termin TO vilesci;
+	
+	INSERT INTO campus.tbl_coodle_status(coodle_status_kurzbz,bezeichnung) VALUES('neu','Neu');
+	INSERT INTO campus.tbl_coodle_status(coodle_status_kurzbz,bezeichnung) VALUES('laufend','Laufend');
+	INSERT INTO campus.tbl_coodle_status(coodle_status_kurzbz,bezeichnung) VALUES('abgeschlossen','Abgeschlossen');
+	INSERT INTO campus.tbl_coodle_status(coodle_status_kurzbz,bezeichnung) VALUES('storniert','Storniert');
+    ";
+    
+    if(!$db->db_query($qry))
+        echo '<strong>Coodle: '.$db->db_last_error().'</strong><br>';
+    else
+        echo 'Tabelle fuer Coodle hinzugefuegt<br>';
+}
+
 echo '<br>';
 
 $tabellen=array(
@@ -3780,6 +3913,11 @@ $tabellen=array(
 	"campus.tbl_contentgruppe"  => array("content_id","gruppe_kurzbz","insertamum","insertvon"),
 	"campus.tbl_contentlog"  => array("contentlog_id","contentsprache_id","uid","start","ende"),
 	"campus.tbl_contentsprache"  => array("contentsprache_id","content_id","sprache","version","sichtbar","content","reviewvon","reviewamum","updateamum","updatevon","insertamum","insertvon","titel","gesperrt_uid"),
+	"campus.tbl_coodle"  => array("coodle_id","titel","beschreibung","coodle_status_kurzbz","dauer","endedatum","insertamum","insertvon","updateamum","updatevon"),
+	"campus.tbl_coodle_ressource"  => array("coodle_ressource_id","coodle_id","uid","ort_kurzbz","email","name","zugangscode","insertamum","insertvon","updateamum","updatevon"),
+	"campus.tbl_coodle_termin"  => array("coodle_termin_id","coodle_id","datum","uhrzeit","auswahl"),
+	"campus.tbl_coodle_ressource_termin"  => array("coodle_ressource_id","coodle_termin_id","insertamum","insertvon"),
+	"campus.tbl_coodle_status"  => array("coodle_status_kurzbz","bezeichnung"),
 	"campus.tbl_dms"  => array("dms_id","oe_kurzbz","dokument_kurzbz","kategorie_kurzbz"),
 	"campus.tbl_dms_kategorie"  => array("kategorie_kurzbz","bezeichnung","beschreibung","parent_kategorie_kurzbz"),
 	"campus.tbl_dms_kategorie_gruppe" => array("kategorie_kurzbz","gruppe_kurzbz","insertamum","insertvon"),
