@@ -91,7 +91,7 @@ else
     }
     fclose($fp);
     
-    $ical->importFreeBusy($doc, $row->freebusytyp_kurzbz);
+    $ical->importFreeBusy($doc, 'LVPLAN');
 }
 echo $ical->getFreeBusy();
 echo "\nEND:VCALENDAR";
