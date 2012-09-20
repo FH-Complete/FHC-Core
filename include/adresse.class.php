@@ -372,7 +372,7 @@ class adresse extends basis_db
 		}
 
 		//loeschen des Datensatzes
-		$qry="DELETE FROM public.tbl_adresse WHERE adresse_id='".$this->db_add_param($adresse_id, FHC_INTEGER, false)."';";
+		$qry="DELETE FROM public.tbl_adresse WHERE adresse_id=".$this->db_add_param($adresse_id, FHC_INTEGER, false).";";
 
 		if($this->db_query($qry))
 		{
