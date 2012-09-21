@@ -626,6 +626,10 @@
 	{
 		$nomail = 'onclick="alert(\''.$p->t('lehre/keinMailverteiler',array($nomail)).'\');"';
 	}
+	if(!$islector)
+	{
+		echo '</tr><tr>';
+	}
 	echo '<td class="tdvertical" align="center">';
 	echo '<a href="'.$mailto.'" '.$nomail.'><img border="0" src="../../../skin/images/button_fb.jpg" width="67" height="45"><br><strong>'.$p->t('lehre/mail').'</strong></a>';
 	echo '</td>';
