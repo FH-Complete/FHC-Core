@@ -959,6 +959,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         </style:tab-stops>
       </style:paragraph-properties>
       <style:text-properties fo:font-size="9pt" fo:language="de" fo:country="AT" style:font-name-asian="Arial" style:font-size-asian="9pt" style:font-size-complex="9pt"/>
+		<style:text-properties style:text-underline-style="dotted" style:text-underline-width="bold" style:text-underline-color="font-color"/>
     </style:style>
     <style:style style:name="P36" style:family="paragraph" style:parent-style-name="Standard">
       <style:paragraph-properties fo:margin-top="0.106cm" fo:margin-bottom="0cm">
@@ -1663,7 +1664,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
               <text:span text:style-name="Tabelleninhalt"><xsl:value-of select="ects"/> ECTS</text:span>
             </text:p>
             <text:p text:style-name="P44">
-              <text:span text:style-name="Tabelleninhalt">Siehe "Semesterzeugnisse"</text:span>
+              <text:span text:style-name="Tabelleninhalt">Siehe "Studiendaten"</text:span>
             </text:p>
             <text:p text:style-name="P44">
               <text:span text:style-name="Tabelleninhalt">See "Transcript of Records"</text:span>
@@ -2135,7 +2136,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
               <text:span text:style-name="Tabelleninhalt">Date</text:span>
             </text:p>
             <text:p text:style-name="P44">
-              <text:span text:style-name="Tabelleninhalt"><text:s/><xsl:value-of select="tagesdatum"/></text:span>
+              <text:span text:style-name="Tabelleninhalt"><text:s/><xsl:value-of select="datum"/></text:span>
             </text:p>
           </table:table-cell>
           <table:table-cell table:style-name="Table8.C2" office:value-type="string">
@@ -2173,6 +2174,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           </table:table-cell>
         </table:table-row>
       </table:table>
+	<text:p text:style-name="Standard"></text:p>
+	<text:p text:style-name="Standard">Siehe folgende Seiten</text:p>
+      	<text:p text:style-name="Standard">See following pages</text:p>
       <text:p text:style-name="P8"/>
       <text:p text:style-name="P8"/>
       <text:p text:style-name="P55">ANHANG: Angaben zum nationalen Hochschulsystem</text:p>
@@ -2518,7 +2522,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <text:p text:style-name="P20"/>
       <text:p text:style-name="P20">Date of Birth: <xsl:value-of select="geburtsdatum"/></text:p>
       <text:p text:style-name="P20"/>
-      <text:p text:style-name="P21">Within the period of studies at the University of Applied Science Technikum Wien from <xsl:value-of select="start_semester"/> to <xsl:value-of select="end_semester"/> in the <xsl:value-of select="studiengang_art"/>’s degree program <xsl:value-of select="studiengang_bezeichnung_englisch"/> examinations in the following subjects were passed:</text:p>
+      <text:p text:style-name="P21">Within the period of studies at the University of Applied Science Technikum Wien from <xsl:value-of select="start_semester"/> to <xsl:value-of select="end_semester"/> in the <xsl:value-of select="studiengang_typ"/>’s degree program <xsl:value-of select="studiengang_bezeichnung_englisch"/> examinations in the following subjects were passed:</text:p>
       <text:p text:style-name="P20"/>
       <table:table table:name="Table12" table:style-name="Table12">
         <table:table-column table:style-name="Table12.A"/>
@@ -2573,8 +2577,8 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <text:p text:style-name="P19"/>
       <text:p text:style-name="P19"/>
       <text:p text:style-name="P23">¹ Type: Laboratory (LAB), Lecture (VO), Integrated Course (ILV), Seminar (SE), Tutorial (TUT), Project (PRJ), Exercise (UE), Distance Learning (FL), Other (SO)</text:p>
-      <text:p text:style-name="P23">² 1 Semester period per week = 45 minutes</text:p>
-      <text:p text:style-name="P23">³ Grading Scheme: excellent (1), very good (2), good (3), satisfactory (4), fail (5), not graded (nb), Credit based on previous experience/work (ar), successfully completed (ea), not successfully completed (nea)</text:p>
+      <text:p text:style-name="P23">² 1 Semester period per week à 45 minutes</text:p>
+      <text:p text:style-name="P23">³ Grading Scheme: excellent (1), very good (2), good (3), satisfactory (4), fail (5), not graded (nb), Credit based on previous experience/work (ar), successfully completed (ea), not successfully completed (nea), Participated with success (met), participated (tg)</text:p>
       <text:p text:style-name="P18">
         <text:soft-page-break/>
       </text:p>
@@ -2594,12 +2598,12 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         <table:table-column table:style-name="Table13.A" table:number-columns-repeated="2"/>
         <table:table-row table:style-name="Table13.1">
           <table:table-cell table:style-name="Table13.A1" office:value-type="string">
-            <text:p text:style-name="P35">……………………………………………………………</text:p>
-            <text:p text:style-name="P36">Vienna, 04.06.2012</text:p>
+            <text:p text:style-name="P35">Vienna, <xsl:value-of select="datum"/><text:s text:c="13"/></text:p>
+            <text:p text:style-name="P36">Place, Date</text:p>
             <text:p text:style-name="P10"/>
           </table:table-cell>
           <table:table-cell table:style-name="Table13.A1" office:value-type="string">
-            <text:p text:style-name="P35">……………………………………………………………</text:p>
+            <text:p text:style-name="P35"><text:s text:c="70"/></text:p>
             <text:p text:style-name="P37">
               <text:span text:style-name="T1"><xsl:value-of select="stgl"/><text:line-break/>Program Director</text:span>
             </text:p>
