@@ -49,8 +49,26 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 	<title>LV-Plan - Überbuchungen</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<link rel="stylesheet" href="../../../skin/vilesci.css" type="text/css" />
-	<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
+	<link rel="stylesheet" href="../../../skin/jquery.css" type="text/css"/>
+	<script type="text/javascript" src="../../../include/js/jquery.js"></script>	
+	<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
 	<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
+	
+	<script type="text/javascript">	
+		$(document).ready(function() 
+			{ 
+			    $("#t1").tablesorter(
+				{
+					 headers:
+				       {  
+				         0 : { sorter: "isoDate"  },
+				       }, 
+					sortList: [[0,0],[1,0],[2,0]],
+					widgets: [\'zebra\']
+				}); 
+			} 
+		);
+		</script>
 </head>
 <body>
 <h2>LV-Plan Überbuchungen - '.$db_stpl_table.'</h2>
@@ -63,8 +81,10 @@ if($beginn=='' || $ende=='')
 	$stsem_akt = $stsem_obj->getaktorNext();
 	$stsem_obj->load($stsem_akt);
 	
-	$beginn = $stsem_obj->start;
-	$ende = $stsem_obj->ende;
+	//$beginn = $stsem_obj->start;
+	$beginn = date("Y-m-d");
+	//$ende = $stsem_obj->ende;
+	$ende = date("Y-m-d", strtotime('+8 days'));
 	$dontloadcontent=true;
 }
 
@@ -102,22 +122,23 @@ foreach ($ort_obj->result as $row)
 {
 	$ort[$row->ort_kurzbz]->max_person = $row->max_person;
 }
-$qry = "SELECT distinct datum, stunde, ort_kurzbz, studiensemester_kurzbz, vw_".$db_stpl_table.".studiengang_kz, vw_".$db_stpl_table.".semester, verband, gruppe, gruppe_kurzbz, UPPER(stg_typ || stg_kurzbz) as stg_kurzbz
+$qry = "SELECT DISTINCT ON (unr) vw_".$db_stpl_table.".unr,datum, stunde, ort_kurzbz, studiensemester_kurzbz, vw_".$db_stpl_table.".studiengang_kz, vw_".$db_stpl_table.".semester, verband, gruppe, gruppe_kurzbz, UPPER(stg_typ || stg_kurzbz) as stg_kurzbz, lehrfach, lehrfach_bez 
 		FROM lehre.vw_".$db_stpl_table." JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung ON(tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id)
 		WHERE datum>='".addslashes($beginn)."' AND datum<='".addslashes($ende)."'";
 if($stg_kz!='')
 	$qry.=" AND tbl_lehrveranstaltung.studiengang_kz='".addslashes($stg_kz)."'";
 
-$qry.=" ORDER BY datum, stunde, ort_kurzbz, studiensemester_kurzbz, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, stg_kurzbz";
+$qry.=" ORDER BY unr, datum, stunde, ort_kurzbz, studiensemester_kurzbz, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, stg_kurzbz";
 
-echo '<table class="liste table-autosort: table-stripeclass:alternate table-autostripe">
+echo '<table class="tablesorter" id="t1">
 		<thead>
 		<tr>
-			<th class="table-sortable:default">Datum</th>
-			<th class="table-sortable:default">Stunde</th>
-			<th class="table-sortable:default">Ort</th>
-			<th class="table-sortable:default">Studenten aktuell (Plätze maximal)</th>
-			<th class="table-sortable:default">Gruppen (Studenten aktuell)</th>
+			<th class="table-sortable:date">Datum</th>
+			<th>Stunde</th>
+			<th>Ort</th>
+			<th>Studierende aktuell (Plätze maximal)</th>
+			<th>Gruppen (Studierende aktuell)</th>
+			<th>Lehrfach</th>
 		</tr>
 		</thead>
 		<tbody>';
@@ -127,6 +148,8 @@ $lastdatum=0;
 $laststunde=0;
 $lastort=0;
 $anzahl_studenten=0;
+$lehrfach='';
+$lehrfach_bez='';
 
 function getAnzahl($studiengang_kz, $semester, $verband, $gruppe, $gruppe_kurzbz, $studiensemester_kurzbz)
 {
@@ -162,7 +185,7 @@ if($result = $db->db_query($qry))
 {
 	while($row = $db->db_fetch_object($result))
 	{
-		if($lastdatum==$row->datum && $laststunde==$row->stunde && $lastort==$row->ort_kurzbz)
+		if($lastdatum==$row->datum && $laststunde==$row->stunde && $lastort==$row->ort_kurzbz && $lehrfach==$row->lehrfach && $lehrfach_bez==$row->lehrfach_bez)
 		{
 			//Solange alles gleich ist zusammenzaehlen
 			$anzahl = getAnzahl($row->studiengang_kz, $row->semester, $row->verband, $row->gruppe, $row->gruppe_kurzbz, $row->studiensemester_kurzbz);		
@@ -178,18 +201,20 @@ if($result = $db->db_query($qry))
 				$gruppen = mb_substr($gruppen, 0, mb_strlen($gruppen)-2);
 				if($anzahl_studenten>$ort[$lastort]->max_person)
 				{
-					$diff = $anzahl_studenten-$ort[$lastort]->max_person;
+					//$diff = $anzahl_studenten-$ort[$lastort]->max_person;
+					$diffprozent = ($ort[$lastort]->max_person)/100*10;
 					
 					$style='';
-					if($diff>=2)
-						$style='style="background-color: ff6c00;"';
-					if($diff>=4)
-						$style='style="background-color: ff5400;"';
-					if($diff>=6)
+					if((($ort[$lastort]->max_person+$diffprozent)-$anzahl_studenten)<0)
+						$style='style="background-color: FCC850;"';
+					if((($ort[$lastort]->max_person+$diffprozent)-$anzahl_studenten)<-2)
+						$style='style="background-color: FF702D;"';
+					if((($ort[$lastort]->max_person+$diffprozent)-$anzahl_studenten)<-4)
 						$style='style="background-color: e83700;"';
-					if($diff>=8)
-						$style='style="background-color: a00404;"';
-					echo "<tr><td>$lastdatum</td><td>$laststunde</td><td>$lastort</td><td $style>$anzahl_studenten (".$ort[$lastort]->max_person.")</td><td>$gruppen</td></tr>";
+					if((($ort[$lastort]->max_person+$diffprozent)-$anzahl_studenten)<-6)
+						$style='style="background-color: a00404; color: d3d3d3"';
+
+					echo "<tr><td>$lastdatum</td><td>$laststunde</td><td>$lastort</td><td $style>$anzahl_studenten (".$ort[$lastort]->max_person.")</td><td>$gruppen</td><td>$lehrfach - $lehrfach_bez</td></tr>";
 				}
 				$anzahl_studenten=0;
 				$gruppen='';
@@ -202,6 +227,8 @@ if($result = $db->db_query($qry))
 		$lastdatum = $row->datum;
 		$laststunde = $row->stunde;
 		$lastort = $row->ort_kurzbz;
+		$lehrfach = $row->lehrfach;
+		$lehrfach_bez = $row->lehrfach_bez;
 	}
 }
 else 
