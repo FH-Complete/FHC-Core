@@ -1161,7 +1161,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 	</office:document-content>
  </xsl:template>
 <xsl:template match="supplement">
-
+		
       <text:sequence-decls xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0">
         <text:sequence-decl text:display-outline-level="0" text:name="Illustration"/>
         <text:sequence-decl text:display-outline-level="0" text:name="Table"/>
@@ -2179,7 +2179,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       	<text:p text:style-name="Standard">See following pages</text:p>
       <text:p text:style-name="P8"/>
       <text:p text:style-name="P8"/>
-      <text:p text:style-name="P55">ANHANG: Angaben zum nationalen Hochschulsystem</text:p>
+      <text:p text:style-name="P56">ANHANG: Angaben zum nationalen Hochschulsystem</text:p>
       <text:p text:style-name="P24"/>
       <text:p text:style-name="P41">Der postsekundäre Sektor in Österreich</text:p>
       <text:list xml:id="list2030519318" text:style-name="WW8Num16">
