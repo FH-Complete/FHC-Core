@@ -169,10 +169,12 @@
     Beschreibung
     <input type="text" name="beschreibung" size="35" maxlength="32" value="<?php echo $beschreibung; ?>">
     	
-    Lektor
+    LektorIn
     <SELECT name="lektorid">
       <?php
 		$num_rows=$db->db_num_rows($result_lektor);
+		if ($_POST['lektorid']==$row->uid)
+			$_POST['lektorid']=$uid;
 		for ($i=0;$i<$num_rows;$i++)
 		{
 			$row=$db->db_fetch_object ($result_lektor, $i);
