@@ -287,7 +287,7 @@ if (!isset($_REQUEST["archive"]))
             if($output == 'pdf')
             {
                 $tempPdfName = $vorlage->vorlage_kurzbz.'.pdf';
-                exec("unoconv --stdout -f pdf $tempname_zip > $tempPdfName");
+                exec("unoconv -e IsSkipEmptyPages=false --stdout -f pdf $tempname_zip > $tempPdfName");
                 
                 $fsize = filesize($tempPdfName); 
                 $handle = fopen($tempPdfName,'r');
