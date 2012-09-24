@@ -1050,7 +1050,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
     <style:style style:name="P59" style:family="paragraph" style:parent-style-name="Standard">
       <style:paragraph-properties fo:line-height="110%" fo:text-align="center" style:justify-single-word="false"/>
     </style:style>
-    <style:style style:name="P60" style:family="paragraph" style:parent-style-name="Standard" style:master-page-name="Standard" >
+    <style:style style:name="P60" style:family="paragraph" style:parent-style-name="Standard" style:master-page-name="Right_20_Page" >
       <style:paragraph-properties style:page-number="1">
         <style:tab-stops>
           <style:tab-stop style:position="10.502cm"/>
@@ -2577,7 +2577,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <text:p text:style-name="P19"/>
       <text:p text:style-name="P19"/>
       <text:p text:style-name="P23">¹ Type: Laboratory (LAB), Lecture (VO), Integrated Course (ILV), Seminar (SE), Tutorial (TUT), Project (PRJ), Exercise (UE), Distance Learning (FL), Other (SO)</text:p>
-      <text:p text:style-name="P23">² 1 Semester period per week à 45 minutes</text:p>
+      <text:p text:style-name="P23">² 1 Semester period per week = 45 minutes</text:p>
       <text:p text:style-name="P23">³ Grading Scheme: excellent (1), very good (2), good (3), satisfactory (4), fail (5), not graded (nb), Credit based on previous experience/work (ar), successfully completed (ea), not successfully completed (nea), Participated with success (met), participated (tg)</text:p>
       <text:p text:style-name="P18">
         <text:soft-page-break/>
