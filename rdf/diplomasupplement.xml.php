@@ -790,17 +790,18 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                             echo '<lv>
                                 <lehrform_kurzbz></lehrform_kurzbz>
                                 <benotungsdatum>'.$benotungsdatum_outgoing.'</benotungsdatum>
-                                <sws></sws>
+                                <sws>'.($row_outgoing->semesterstunden/$wochen).'</sws>
                                 <semester></semester>
                                 <kurzbz>'.$lehrform_kurzbz_outgoing.'</kurzbz>
                                 <stsem></stsem>
                                 <bezeichnung><![CDATA[]]></bezeichnung>
                                 <bezeichnung_englisch><![CDATA[International Semester Abroad: '.$datum_von.'-'.$datum_bis.', at '.$row_outgoing->ort.', '.$row_outgoing->universitaet.'. All credits earned during the International Semester Abroad (ISA) are fully credited for the '.$start.'th semester at the UAS Fachhochschule Technikum Wien.]]></bezeichnung_englisch>
                                 <ects>'.$row_outgoing->ects.'</ects>
-                                <semesterstunden>'.$row_outgoing->semesterstunden/$wochen.'</semesterstunden>
+                                <semesterstunden>'.$row_outgoing->semesterstunden.'</semesterstunden>
                                 <note>'.$note_outgoing.'</note>
                                 <lv_id></lv_id>
                             </lv>';
+                            $ects_total +=$row_outgoing->ects;
                         }
                     }
                 }
