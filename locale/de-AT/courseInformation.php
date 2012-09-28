@@ -9,8 +9,8 @@ $this->phrasen['courseInformation/lvInfoSemester']='LV-Information - %s - %s. Se
 $this->phrasen['courseInformation/ectsCredits']='ECTS - Credits';
 $this->phrasen['courseInformation/beiFehlernInDenFixfeldern']='Bei Fehlern in den Fixfeldern bitte an die <a class="Item" href="mailto:%s">zuständige Assistentin</a> wenden.';
 $this->phrasen['courseInformation/lehrendeLautLehrauftrag']='Lehrende laut Lehrauftrag';
-$this->phrasen['courseInformation/institutsleiter']='Institutsleiter';
-$this->phrasen['courseInformation/institutskoordinator']='Institutskoordinator';
+$this->phrasen['courseInformation/institutsleiter']='InstitutsleiterIn';
+$this->phrasen['courseInformation/institutskoordinator']='InstitutskoordinatorIn';
 $this->phrasen['courseInformation/unterrichtssprache']='Unterrichtssprache';
 $this->phrasen['courseInformation/voransicht']='Voransicht';
 $this->phrasen['courseInformation/fehlerBeimSchreibenDesLog']='Fehler beim Schreiben des Log-files';
