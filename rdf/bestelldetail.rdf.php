@@ -183,7 +183,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			$i++;
 		}
 		//echo "pos:".$pagebreakposition;
-		if($i>$pagebreakposition)
+		//if($i>$pagebreakposition)
+		if($pagebreak)
 			echo "	</details_1>\n";
 		else
 			echo "	</details>\n";
