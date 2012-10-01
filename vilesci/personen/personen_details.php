@@ -271,7 +271,7 @@ if(isset($_POST['savemitarbeiter']))
 	$mitarbeiter->ort_kurzbz = $ort_kurzbz;
 	$mitarbeiter->standort_id = $standort_id;
 	$mitarbeiter->anmerkung = $anmerkung;
-	$mitarbeiter->bismelden = $bismelden;
+	$mitarbeiter->bismelden = ($bismelden!=''?true:false);
 	$mitarbeiter->new = false;
 	$mitarbeiter->updateamum = date('Y-m-d H:i:s');
 	$mitarbeiter->updatevon = $user;
