@@ -39,6 +39,14 @@ class coodle extends basis_db
 	public $updatevon;				// varchar(32)
 	public $insertamum;    		  	// timestamp
 	public $insertvon;     	 		// varchar(32)
+    
+    // tbl_coodle_ressource
+    public $coodle_ressource_id;    // integer
+    public $uid;                    // varchar(32)
+    public $ort_kurzbz;             // varchar(16)
+    public $email;                  // varchar(128)
+    public $name;                   // varchar(256)
+    public $zugangscode;            // varchar(64)
 
 	/**
 	 * Konstruktor
@@ -234,5 +242,183 @@ class coodle extends basis_db
 			return false;
 		}
 	}
+    
+    /**
+     * Liefert alle Ressourcen zurück, die einer Coodleumfrage zugeteilt sind
+     * @param type $coodle_id 
+     * @return true wenn ok, false im Fehlerfall
+     */
+    public function getRessourcen($coodle_id)
+    {
+        if(!is_numeric($coodle_id) || $coodle_id == '')
+        {
+            $this->errormsg = 'Coodle_id muss eine gültige Zahl sein'."\n";
+            return false; 
+        }
+        
+        $qry ="SELECT * FROM campus.tbl_coodle_ressource WHERE coodle_id =".$this->db_add_param($coodle_id, FHC_INTEGER, false);
+        
+        if(!$this->db_query($qry))
+        {
+            $this->errormsg = 'Fehler bei der Abfrage aufgetreten!'; 
+            return false; 
+        }
+        
+        while($row = $this->db_fetch_object())
+        {
+            $coodle_ressource = new coodle(); 
+            
+            $coodle_ressource->coodle_ressource_id = $row->coodle_ressource_id; 
+            $coodle_ressource->coodle_id = $row->coodle_id; 
+            $coodle_ressource->uid = $row->uid; 
+            $coodle_ressource->ort_kurzbz = $row->ort_kurzbz; 
+            $coodle_ressource->email = $row->email; 
+            $coodle_ressource->name = $row->name; 
+            $coodle_ressource->zugangscode = $row->zugangscode; 
+            $coodle_ressource->insertamum = $row->insertamum; 
+            $coodle_ressource->insertvon = $row->insertvon; 
+            $coodle_ressource->updateamum = $row->updateamum; 
+            $coodle_ressource->updatevon = $row->updatevon; 
+            
+            $this->result[] = $coodle_ressource; 
+        }
+        
+        return true; 
+    }
+    
+    /**
+     * Liefert eine Ressource zur übergebenen ressource_id zurück
+     * @param type $coodle_ressource_id 
+     * @return true wenn ok, false im Fehlerfall
+     */
+    public function getRessourceFromId($coodle_ressource_id)
+    {
+        if(!is_numeric($coodle_ressource_id) || $coodle_ressource_id=='')
+        {
+            $this->errormsg = 'Coodle_id muss eine gültige Zahl sein'."\n";
+            return false; 
+        }
+        
+        $qry = "SELECT * FROM campus.tbl_coodle_ressource WHERE coodle_ressource_id =".$this->db_add_param($coodle_ressource_id, FHC_INTEGER, false); 
+        
+        if(!$this->db_query($qry))
+        {
+            $this->errormsg = 'Fehler bei der Abfrage aufgetreten'."\n";
+            return false; 
+        }
+        
+        if($row = $this->db_fetch_object())
+        {
+            $this->coodle_ressource_id = $row->coodle_ressource_id; 
+            $this->coodle_id = $row->coodle_id; 
+            $this->uid = $row->uid; 
+            $this->ort_kurzbz = $row->ort_kurzbz; 
+            $this->email = $row->email; 
+            $this->name = $row->name; 
+            $this->zugangscode = $row->zugangscode; 
+            $this->insertamum = $row->insertamum; 
+            $this->insertvon = $row->insertvon; 
+            $this->updateamum = $row->updateamum; 
+            $this->updatevon = $row->updatevon; 
+        }
+        else
+        {
+			$this->errormsg = 'Es ist kein Datensatz mit dieser ID vorhanden';
+            return false; 
+        }
+        
+        return true; 
+    }
+    
+    /**
+     * Liefert alle Coodleumfragen eines bestimmten Erstellers zurück
+     * @param type $ersteller_uid 
+     * @return true wenn ok, false im Fehlerfall 
+     */
+    public function getCoodleFromErsteller($ersteller_uid)
+    {
+        if($hersteller_uid =='')
+        {
+            $this->errormsg = 'Keine gültige ersteller_uid'."\n";
+            return false; 
+        }  
+        
+        $qry = "SELECT * FROM campus.tbl_coodle WHERE ersteller_uid =".$this->db_add_param($ersteller_uid, FHC_STRING, false); 
+        
+        if(!$this->db_query($qry))
+        {
+            $this->errormsg ='Fehler bei der Abfrage aufgetreten!';
+            return false; 
+        }
+        
+        while($row = $this->db_fetch_object())
+        {
+            $coodle = new coodle(); 
+            
+            $coodle->coodle_id = $row->coodle_id; 
+            $coodle->titel = $row->titel; 
+            $coodle->beschreibung = $row->beschreibung; 
+            $coodle->coodle_status_kurzbz = $row->coodle_status_kurzbz; 
+            $coodle->dauer = $row->dauer; 
+            $coodle->endedatum = $row->endedatum; 
+            $coodle->insertamum = $row->insertamum; 
+            $coodle->insertvon = $row->insertvon; 
+            $coodle->updateamum = $row->updateamum; 
+            $coodle->updatevon = $row->updatevon; 
+            $coodle->ersteller_uid = $row->ersteller_uid; 
+            
+            $this->result[] = $coodle; 
+        }
+        
+        return true; 
+    }
+    
+    /**
+     * Liefert alle Coodle Umfragen zurück wo Benutzer entweder Ersteller oder Ressource ist 
+     * und das Endedatum in der Zukunft liegt
+     * @param type $uid 
+     * @return true wenn ok, false im Fehlerfall 
+     */
+    public function getCoodleFromUser($uid)
+    {
+        if($uid == '')
+        {
+            $this->errormsg = 'keine gültige erteller_uid'; 
+            return false; 
+        }
+                
+        $qry = "SELECT campus.tbl_coodle.* 
+                FROM campus.tbl_coodle 
+                LEFT JOIN campus.tbl_coodle_ressource USING(coodle_id) 
+                WHERE uid =".$this->db_add_param($uid, FHC_STRING, false)." 
+                    OR ersteller_uid =".$this->db_add_param($uid, FHC_STRING, false)."
+                    AND endedatum >= CURRENT_DATE"; 
+        
+        if(!$this->db_query($qry))
+        {
+            $this->errormsg = 'Fehler bei der Abfrage aufgetreten'; 
+            return false; 
+        }
+        
+        while($row = $this->db_fetch_object())
+        {
+            $coodle = new coodle(); 
+            $coodle->coodle_id = $row->coodle_id; 
+            $coodle->titel = $row->titel; 
+            $coodle->beschreibung = $row->beschreibung; 
+            $coodle->coodle_status_kurzbz = $row->coodle_status_kurzbz; 
+            $coodle->dauer = $row->dauer; 
+            $coodle->insertamum = $row->insertamum; 
+            $coodle->insertvon = $row->insertvon; 
+            $coodle->updateamum = $row->updateamum; 
+            $coodle->updatevon = $row->updatevon; 
+            $coodle->endedatum = $row->endedatum; 
+            $coodle->ersteller_uid = $row->ersteller_uid; 
+            
+            $this->result[] = $coodle; 
+        }
+        
+        return true; 
+    }
 }
 ?>
