@@ -135,6 +135,11 @@ if(isset($_POST['save']))
 	{
 		echo '<span class="error">'.$coodle->errormsg.'</span>';
 	}
+    
+    echo '<script>
+        window.opener.location.href="uebersicht.php";    
+        </script>'; 
+    
 }
 elseif(isset($_GET['coodle_id']))
 {
