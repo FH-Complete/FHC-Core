@@ -24,15 +24,14 @@ require_once('basis_db.class.php');
 
 class studiensemester extends basis_db
 {
-	public $errormsg; // string
 	public $new;      // boolean
 	public $studiensemester = array(); // studiensemester Objekt
 
 	//Tabellenspalten
-	public $studiensemester_kurzbz; // varchar(16)
-	public $start; // date
-	public $ende;  // date
-	public $bezeichnung;
+	public $studiensemester_kurzbz;// varchar(16)
+	public $start; 					// date
+	public $ende; 					// date
+	public $bezeichnung;			// varchar(32)
 
 	/**
 	 * Konstruktor - Laedt optional ein StSem
@@ -48,13 +47,13 @@ class studiensemester extends basis_db
 	}
 
 	/**
-	 * Laedt das Studiensemester mit der uebergebenen ID
+	 * Laedt das Studiensemester mit der uebergebenen Kurzbz
 	 * 
 	 * @param $studiensemester_kurzbz Stsem das geladen werden soll
 	 */
 	public function load($studiensemester_kurzbz)
 	{
-		$qry = "SELECT * FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+		$qry = "SELECT * FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 
 		if(!$this->db_query($qry))
 		{
@@ -71,7 +70,7 @@ class studiensemester extends basis_db
 		}
 		else
 		{
-			$this->errormsg = "Es ist kein Studiensemester mit der Kurzbezeichung $studiensemester_kurzbz vorhanden";
+			$this->errormsg = "Es ist kein Studiensemester mit dieser Kurzbezeichung vorhanden";
 			return false;
 		}
 
@@ -89,6 +88,11 @@ class studiensemester extends basis_db
 		if(mb_strlen($this->studiensemester_kurzbz)>16)
 		{
 			$this->errormsg = 'Studiensemester Kurzbezeichnung darf nicht laenger als 16 Zeichen sein';
+			return false;
+		}
+		if(mb_strlen($this->bezeichnung)>32)
+		{
+			$this->errormsg = 'Studiensemester Bezeichnung darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
 		if($this->studiensemester_kurzbz=='')
@@ -115,16 +119,16 @@ class studiensemester extends basis_db
 		if($this->new)
 		{
 			$qry = "INSERT INTO public.tbl_studiensemester (studiensemester_kurzbz, start, ende)
-			        VALUES('".addslashes($this->studiensemester_kurzbz)."',".
-					$this->addslashes($this->start).','.
-					$this->addslashes($this->ende).');';
+			        VALUES(".$this->db_add_param($this->studiensemester_kurzbz).",".
+					$this->db_add_param($this->start).','.
+					$this->db_add_param($this->ende).');';
 		}
 		else
 		{
 			$qry = 'UPDATE public.tbl_studiensemester SET'.
-			       ' start='.$this->addslashes($this->start).','.
-			       ' ende='.$this->addslashes($this->ende).
-			       " WHERE studiensemester_kurzbz='$this->studiensemester_kurzbz'";
+			       ' start='.$this->db_add_param($this->start).','.
+			       ' ende='.$this->db_add_param($this->ende).
+			       " WHERE studiensemester_kurzbz=".$this->db_add_param($this->studiensemester_kurzbz);
 		}
 
 		if($this->db_query($qry))
@@ -318,7 +322,7 @@ class studiensemester extends basis_db
 		$qry = "SELECT * FROM public.tbl_studiensemester WHERE start>now() ";
 
 		if($art!='')
-			$qry.= " AND substring(studiensemester_kurzbz from 1 for 2)='".addslashes($art)."' ";
+			$qry.= " AND substring(studiensemester_kurzbz from 1 for 2)=".$this->db_add_param($art);
 
 		$qry.=" ORDER BY start LIMIT 1";
 
@@ -390,19 +394,19 @@ class studiensemester extends basis_db
 				}
 				else
 				{
-					$this->errormsg = 'Es wurde kein vorj�hriges Studiensemester gefunden';
+					$this->errormsg = 'Es wurde kein vorjaehriges Studiensemester gefunden';
 					return false;
 				}
 			}
 			else
 			{
-				$this->errormsg = 'Es wurde kein vorj�hriges Studiensemester gefunden';
+				$this->errormsg = 'Es wurde kein vorjaehriges Studiensemester gefunden';
 				return false;
 			}
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Ermitteln des vorj�hrigen Studiensemesters';
+			$this->errormsg = 'Fehler beim Ermitteln des vorjaehrigen Studiensemesters';
 			return false;
 		}
 	}
@@ -417,7 +421,7 @@ class studiensemester extends basis_db
 	{
 		$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester
 				WHERE ende<(SELECT start FROM public.tbl_studiensemester
-				            WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."')
+				            WHERE studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz).")
 		        ORDER BY ende DESC LIMIT 1";
 
 		if($this->db_query($qry))
@@ -449,7 +453,7 @@ class studiensemester extends basis_db
 	{
 		$qry = "SELECT studiensemester_kurzbz, start, ende FROM public.tbl_studiensemester
 				WHERE start>(SELECT ende FROM public.tbl_studiensemester
-				            WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."')
+				            WHERE studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz).")
 		        ORDER BY start LIMIT 1";
 
 		if($this->db_query($qry))
@@ -505,7 +509,7 @@ class studiensemester extends basis_db
 					SELECT studiensemester_kurzbz, start
 					FROM public.tbl_studiensemester
 					WHERE start$op(SELECT start FROM public.tbl_studiensemester
-					               WHERE studiensemester_kurzbz='$studiensemester_kurzbz')
+					               WHERE studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz).")
 					ORDER BY start $sort
 					LIMIT ".abs($wert)."
 					) as foo

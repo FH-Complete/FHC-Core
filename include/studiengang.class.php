@@ -93,7 +93,7 @@ class studiengang extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM public.tbl_studiengang WHERE studiengang_kz='".addslashes($studiengang_kz)."'";
+		$qry = "SELECT * FROM public.tbl_studiengang WHERE studiengang_kz=".$this->db_add_param($studiengang_kz);
 
 		if($this->db_query($qry))
 		{
@@ -121,16 +121,16 @@ class studiengang extends basis_db
 				$this->orgform_kurzbz = $row->orgform_kurzbz;
 				$this->zusatzinfo_html = $row->zusatzinfo_html;
 				$this->sprache = $row->sprache;
-				$this->testtool_sprachwahl = ($row->testtool_sprachwahl=='t'?true:false);
+				$this->testtool_sprachwahl = $this->db_parse_bool($row->testtool_sprachwahl);
 				$this->studienplaetze = $row->studienplaetze;
 				$this->oe_kurzbz = $row->oe_kurzbz;
 				$this->lgartcode = $row->lgartcode;
 				$this->telefon=$row->telefon;
             	$this->titelbescheidvom=$row->titelbescheidvom;
-            	$this->aktiv=($row->aktiv=='t'?true:false);
-            	$this->moodle=($row->moodle=='t'?true:false);
-				$this->mischform=($row->mischform=='t'?true:false);
-				$this->projektarbeit_note_anzeige=($row->projektarbeit_note_anzeige=='t'?true:false);
+            	$this->aktiv=$this->db_parse_bool($row->aktiv);
+            	$this->moodle=$this->db_parse_bool($row->moodle);
+				$this->mischform=$this->db_parse_bool($row->mischform);
+				$this->projektarbeit_note_anzeige=$this->db_parse_bool($row->projektarbeit_note_anzeige);
 				
 				$this->bezeichnung_arr['German']=$this->bezeichnung;
 				$this->bezeichnung_arr['English']=$this->english;
@@ -192,16 +192,16 @@ class studiengang extends basis_db
 			$stg_obj->orgform_kurzbz = $row->orgform_kurzbz;
 			$stg_obj->zusatzinfo_html = $row->zusatzinfo_html;
 			$stg_obj->sprache = $row->sprache;
-			$stg_obj->testtool_sprachwahl = ($row->testtool_sprachwahl=='t'?true:false);
+			$stg_obj->testtool_sprachwahl = $this->db_parse_bool($row->testtool_sprachwahl);
 			$stg_obj->studienplaetze = $row->studienplaetze;
 			$stg_obj->oe_kurzbz = $row->oe_kurzbz;
 			$stg_obj->lgartcode = $row->lgartcode;
             $stg_obj->telefon=$row->telefon;
             $stg_obj->titelbescheidvom=$row->titelbescheidvom;
-            $stg_obj->aktiv=($row->aktiv=='t'?true:false);
-			$stg_obj->moodle=($row->moodle=='t'?true:false);
-			$stg_obj->mischform=($row->mischform=='t'?true:false);
-			$stg_obj->projektarbeit_note_anzeige=($row->projektarbeit_note_anzeige=='t'?true:false);
+            $stg_obj->aktiv=$this->db_parse_bool($row->aktiv);
+			$stg_obj->moodle=$this->db_parse_bool($row->moodle);
+			$stg_obj->mischform=$this->db_parse_bool($row->mischform);
+			$stg_obj->projektarbeit_note_anzeige=$this->db_parse_bool($row->projektarbeit_note_anzeige);
 			
 			$stg_obj->bezeichnung_arr['German']=$row->bezeichnung;
 			$stg_obj->bezeichnung_arr['English']=$row->english;
@@ -224,7 +224,7 @@ class studiengang extends basis_db
 		if(count($kennzahlen)==0)
 			return true;
 		
-		$kennzahlen = "'".implode("','",$kennzahlen)."'";
+		$kennzahlen = $this->implode4SQL($kennzahlen);
 						
 		$qry = 'SELECT * FROM public.tbl_studiengang WHERE studiengang_kz in('.$kennzahlen.')';
 		if ($aktiv)
@@ -265,16 +265,16 @@ class studiengang extends basis_db
 			$stg_obj->orgform_kurzbz = $row->orgform_kurzbz;
 			$stg_obj->zusatzinfo_html = $row->zusatzinfo_html;
 			$stg_obj->sprache = $row->sprache;
-			$stg_obj->testtool_sprachwahl = ($row->testtool_sprachwahl=='t'?true:false);
+			$stg_obj->testtool_sprachwahl = $this->db_parse_bool($row->testtool_sprachwahl);
 			$stg_obj->studienplaetze = $row->studienplaetze;
 			$stg_obj->oe_kurzbz = $row->oe_kurzbz;
 			$stg_obj->lgartcode = $row->lgartcode;
             $stg_obj->telefon=$row->telefon;
             $stg_obj->titelbescheidvom=$row->titelbescheidvom;
-            $stg_obj->aktiv=($row->aktiv=='t'?true:false);
-			$stg_obj->moodle=($row->moodle=='t'?true:false);
-			$stg_obj->mischform=($row->mischform=='t'?true:false);
-			$stg_obj->projektarbeit_note_anzeige=($row->projektarbeit_note_anzeige=='t'?true:false);
+            $stg_obj->aktiv=$this->db_parse_bool($row->aktiv);
+			$stg_obj->moodle=$this->db_parse_bool($row->moodle);
+			$stg_obj->mischform=$this->db_parse_bool($row->mischform);
+			$stg_obj->projektarbeit_note_anzeige=$this->db_parse_bool($row->projektarbeit_note_anzeige);
 			
 			$stg_obj->bezeichnung_arr['German']=$row->bezeichnung;
 			$stg_obj->bezeichnung_arr['English']=$row->english;
@@ -315,7 +315,7 @@ class studiengang extends basis_db
 		}
 		if(!is_numeric($this->studiengang_kz))
 		{
-			$this->errormsg = 'studiengang_kz ungueltig! ('.$this->studiengang_kz.'/'.$this->ext_id.')';
+			$this->errormsg = 'studiengang_kz ungueltig!';
 			return false;
 		}
 		$this->errormsg = '';
@@ -345,75 +345,75 @@ class studiengang extends basis_db
 				typ, farbe, email, telefon, max_verband, max_semester, max_gruppe, erhalter_kz, bescheid, bescheidbgbl1,
 				bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, aktiv, ext_id, orgform_kurzbz, zusatzinfo_html, 
 				oe_kurzbz, moodle, sprache, testtool_sprachwahl, studienplaetze, lgartcode, mischform,projektarbeit_note_anzeige) VALUES ('.
-				$this->addslashes($this->studiengang_kz).', '.
-				$this->addslashes($this->kurzbz).', '.
-				$this->addslashes($this->kurzbzlang).', '.
-				$this->addslashes($this->bezeichnung).', '.
-				$this->addslashes($this->english).', '.
-				$this->addslashes($this->typ).', '.
-				$this->addslashes($this->farbe).', '.
-				$this->addslashes($this->email).', '.
-				$this->addslashes($this->telefon).', '.
-				$this->addslashes($this->max_verband).', '.
-				$this->addslashes($this->max_semester).', '.
-				$this->addslashes($this->max_gruppe).', '.
-				$this->addslashes($this->erhalter_kz).', '.
-				$this->addslashes($this->bescheid).', '.
-				$this->addslashes($this->bescheidbgbl1).', '.
-				$this->addslashes($this->bescheidbgbl2).', '.
-				$this->addslashes($this->bescheidgz).', '.
-				$this->addslashes($this->bescheidvom).', '.
-				$this->addslashes($this->titelbescheidvom).', '.
-				($this->aktiv?'true':'false').', '.
-				$this->addslashes($this->ext_id).', '.
-				$this->addslashes($this->orgform_kurzbz).', '.
-				$this->addslashes($this->zusatzinfo_html).', '.
-				$this->addslashes($this->oe_kurzbz).', '.
-				($this->moodle?'true':'false').', '.
-				$this->addslashes($this->sprache).', '.
-				($this->testtool_sprachwahl?'true':'false').', '.
-				$this->addslashes($this->studienplaetze).', '.
-				$this->addslashes($this->lgartcode).', '.
-				($this->mischform?'true':'false').','.
-				($this->projektarbeit_note_anzeige?'true':'false').');';
+				$this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
+				$this->db_add_param($this->kurzbz).', '.
+				$this->db_add_param($this->kurzbzlang).', '.
+				$this->db_add_param($this->bezeichnung).', '.
+				$this->db_add_param($this->english).', '.
+				$this->db_add_param($this->typ).', '.
+				$this->db_add_param($this->farbe).', '.
+				$this->db_add_param($this->email).', '.
+				$this->db_add_param($this->telefon).', '.
+				$this->db_add_param($this->max_verband).', '.
+				$this->db_add_param($this->max_semester).', '.
+				$this->db_add_param($this->max_gruppe).', '.
+				$this->db_add_param($this->erhalter_kz).', '.
+				$this->db_add_param($this->bescheid).', '.
+				$this->db_add_param($this->bescheidbgbl1).', '.
+				$this->db_add_param($this->bescheidbgbl2).', '.
+				$this->db_add_param($this->bescheidgz).', '.
+				$this->db_add_param($this->bescheidvom).', '.
+				$this->db_add_param($this->titelbescheidvom).', '.
+				$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
+				$this->db_add_param($this->ext_id).', '.
+				$this->db_add_param($this->orgform_kurzbz).', '.
+				$this->db_add_param($this->zusatzinfo_html).', '.
+				$this->db_add_param($this->oe_kurzbz).', '.
+				$this->db_add_param($this->moodle, FHC_BOOLEAN).', '.
+				$this->db_add_param($this->sprache).', '.
+				$this->db_add_param($this->testtool_sprachwahl, FHC_BOOLEAN).', '.
+				$this->db_add_param($this->studienplaetze).', '.
+				$this->db_add_param($this->lgartcode).', '.
+				$this->db_add_param($this->mischform, FHC_BOOLEAN).','.
+				$this->db_add_param($this->projektarbeit_note_anzeige, FHC_BOOLEAN).');';
 		}
 		else
 		{
 			//bestehenden Datensatz akualisieren
 
 			$qry = 'UPDATE public.tbl_studiengang SET '.
-				'studiengang_kz='.$this->addslashes($this->studiengang_kz).', '.
-				'kurzbz='.$this->addslashes($this->kurzbz).', '.
-				'kurzbzlang='.$this->addslashes($this->kurzbzlang).', '.
-				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
-				'english='.$this->addslashes($this->english).', '.
-				'typ='.$this->addslashes($this->typ).', '.
-				'farbe='.$this->addslashes($this->farbe).', '.
-				'email='.$this->addslashes($this->email).', '.
-				'max_verband='.$this->addslashes($this->max_verband).', '.
-				'max_semester='.$this->addslashes($this->max_semester).', '.
-				'max_gruppe='.$this->addslashes($this->max_gruppe).', '.
-				'erhalter_kz='.$this->addslashes($this->erhalter_kz).', '.
-				'bescheid='.$this->addslashes($this->bescheid).', '.
-				'bescheidbgbl1='.$this->addslashes($this->bescheidbgbl1).', '.
-				'bescheidbgbl2='.$this->addslashes($this->bescheidbgbl2).', '.
-				'bescheidgz='.$this->addslashes($this->bescheidgz).', '.
-				'bescheidvom='.$this->addslashes($this->bescheidvom).', '.
-				'titelbescheidvom='.$this->addslashes($this->titelbescheidvom).', '.
-				'ext_id='.$this->addslashes($this->ext_id).', '.
-				'telefon='.$this->addslashes($this->telefon).', '.
-				'orgform_kurzbz='.$this->addslashes($this->orgform_kurzbz).', '.
-				'aktiv='.($this->aktiv?'true':'false').', '.
-				'oe_kurzbz='.$this->addslashes($this->oe_kurzbz).','.
-				'zusatzinfo_html='.$this->addslashes($this->zusatzinfo_html).', '.
-				'moodle='.($this->moodle?'true':'false').', '.
-				'projektarbeit_note_anzeige='.($this->projektarbeit_note_anzeige?'true':'false').', '.			
-				'sprache='.$this->addslashes($this->sprache).', '.
-				'testtool_sprachwahl='.($this->testtool_sprachwahl?'true':'false').', '.
-				'studienplaetze='.$this->addslashes($this->studienplaetze).', '.
-				'lgartcode='.$this->addslashes($this->lgartcode).', '.
-				'mischform='.($this->mischform?'true':'false').' '.
-				'WHERE studiengang_kz='.$this->addslashes($this->studiengang_kz).';';
+				'studiengang_kz='.$this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
+				'kurzbz='.$this->db_add_param($this->kurzbz).', '.
+				'kurzbzlang='.$this->db_add_param($this->kurzbzlang).', '.
+				'bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
+				'english='.$this->db_add_param($this->english).', '.
+				'typ='.$this->db_add_param($this->typ).', '.
+				'farbe='.$this->db_add_param($this->farbe).', '.
+				'email='.$this->db_add_param($this->email).', '.
+				'max_verband='.$this->db_add_param($this->max_verband).', '.
+				'max_semester='.$this->db_add_param($this->max_semester).', '.
+				'max_gruppe='.$this->db_add_param($this->max_gruppe).', '.
+				'erhalter_kz='.$this->db_add_param($this->erhalter_kz).', '.
+				'bescheid='.$this->db_add_param($this->bescheid).', '.
+				'bescheidbgbl1='.$this->db_add_param($this->bescheidbgbl1).', '.
+				'bescheidbgbl2='.$this->db_add_param($this->bescheidbgbl2).', '.
+				'bescheidgz='.$this->db_add_param($this->bescheidgz).', '.
+				'bescheidvom='.$this->db_add_param($this->bescheidvom).', '.
+				'titelbescheidvom='.$this->db_add_param($this->titelbescheidvom).', '.
+				'ext_id='.$this->db_add_param($this->ext_id).', '.
+				'telefon='.$this->db_add_param($this->telefon).', '.
+				'orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).', '.
+				'aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
+				'oe_kurzbz='.$this->db_add_param($this->oe_kurzbz).','.
+				'zusatzinfo_html='.$this->db_add_param($this->zusatzinfo_html).', '.
+				'moodle='.$this->db_add_param($this->moodle, FHC_BOOLEAN).', '.
+				'projektarbeit_note_anzeige='.$this->db_add_param($this->projektarbeit_note_anzeige, FHC_BOOLEAN).', '.			
+				'sprache='.$this->db_add_param($this->sprache).', '.
+				'testtool_sprachwahl='.$this->db_add_param($this->testtool_sprachwahl, FHC_BOOLEAN).', '.
+				'studienplaetze='.$this->db_add_param($this->studienplaetze).', '.
+				'lgartcode='.$this->db_add_param($this->lgartcode).', '.
+				'mischform='.$this->db_add_param($this->mischform, FHC_INTEGER).' '.
+				'WHERE studiengang_kz='.$this->db_add_param($this->studiengang_kz, FHC_INTEGER, false).';';
 		}
 
 		if($this->db_query($qry))
@@ -439,7 +439,7 @@ class studiengang extends basis_db
 			$this->errormsg = 'Studiengang_kz muss eine gueltige Zahl sein';
 			return false;
 		}
-		$qry = "UPDATE public.tbl_studiengang SET aktiv = NOT aktiv WHERE studiengang_kz='".addslashes($studiengang_kz)."'";
+		$qry = "UPDATE public.tbl_studiengang SET aktiv = NOT aktiv WHERE studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
 
 		if($this->db_query($qry))
 		{
@@ -474,7 +474,7 @@ class studiengang extends basis_db
 					(datum_bis is null OR datum_bis>=now())";
 		
 		if(!is_null($studiengang_kz))
-			$qry.=" AND studiengang_kz='".addslashes($studiengang_kz)."'";
+			$qry.=" AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
 		
 		if($result = $this->db_query($qry))
 		{
@@ -498,7 +498,7 @@ class studiengang extends basis_db
 	 */
 	public function getStudiengangFromOe($oe_kurzbz)
 	{
-		$qry ="SELECT * FROM public.tbl_studiengang where oe_kurzbz =".$this->addslashes($oe_kurzbz); 
+		$qry ="SELECT * FROM public.tbl_studiengang WHERE oe_kurzbz =".$this->db_add_param($oe_kurzbz); 
 		
 		if($this->db_query($qry))
 		{
@@ -526,16 +526,16 @@ class studiengang extends basis_db
 				$this->orgform_kurzbz = $row->orgform_kurzbz;
 				$this->zusatzinfo_html = $row->zusatzinfo_html;
 				$this->sprache = $row->sprache;
-				$this->testtool_sprachwahl = ($row->testtool_sprachwahl=='t'?true:false);
+				$this->testtool_sprachwahl = $this->db_parse_bool($row->testtool_sprachwahl);
 				$this->studienplaetze = $row->studienplaetze;
 				$this->oe_kurzbz = $row->oe_kurzbz;
 				$this->lgartcode = $row->lgartcode;
 	            $this->telefon=$row->telefon;
 	            $this->titelbescheidvom=$row->titelbescheidvom;
-	            $this->aktiv=($row->aktiv=='t'?true:false);
-				$this->moodle=($row->moodle=='t'?true:false);
-				$this->mischform=($row->mischform=='t'?true:false);
-				$this->projektarbeit_note_anzeige=($row->projektarbeit_note_anzeige=='t'?true:false);
+	            $this->aktiv=$this->db_parse_bool($row->aktiv);
+				$this->moodle=$this->db_parse_bool($row->moodle);
+				$this->mischform=$this->db_parse_bool($row->mischform);
+				$this->projektarbeit_note_anzeige=$this->db_parse_bool($row->projektarbeit_note_anzeige);
 				
 				$this->bezeichnung_arr['German']=$this->bezeichnung;
 				$this->bezeichnung_arr['English']=$this->english;
