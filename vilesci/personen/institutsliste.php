@@ -40,17 +40,16 @@ $fb_obj->getAll();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen(get_uid());
 
-echo '
-		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-		<html>
-		<head>
+echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+	<head>
 		<title>Institutsliste</title>
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-		</head>
-		<body class="Background_main">
+	</head>
+	<body class="Background_main">
 		<h2>Liste der MitarbeiterInnen der Institute an der Fachhochschule Technikum Wien</h2>';
 
 $stsem = new studiensemester();
@@ -72,11 +71,11 @@ else
 	if(count($fb)>0)
 	{
 		$where = " AND EXISTS (SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE 
-								tbl_lehreinheit.studiensemester_kurzbz in('$ws','$ss') AND mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid AND
+								tbl_lehreinheit.studiensemester_kurzbz in(".$db->db_add_param($ws).",".$db->db_add_param($ss).") AND mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid AND
 								fachbereich_kurzbz IN(";
 		foreach ($fb as $fachbereich_kurzbz)
 		{
-			$where.="'$fachbereich_kurzbz',";
+			$where.=$db->db_add_param($fachbereich_kurzbz).",";
 		}
 		$where.="''))";
 	}
@@ -94,7 +93,7 @@ $qry = "SELECT
 					lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 				WHERE 
 					mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid AND 
-					studiensemester_kurzbz='$ws'
+					studiensemester_kurzbz=".$db->db_add_param($ws)."
 			) as lvs_wintersemester,
 			(
 				SELECT 
@@ -103,16 +102,18 @@ $qry = "SELECT
 					lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 				WHERE 
 					mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid AND 
-					studiensemester_kurzbz='$ss'
+					studiensemester_kurzbz=".$db->db_add_param($ss)."
 			) as lvs_sommersemester,
 			(
 				SELECT 
-					tbl_fachbereich.fachbereich_kurzbz
+					tbl_organisationseinheit.bezeichnung
 				FROM 
-					public.tbl_benutzerfunktion JOIN public.tbl_fachbereich USING(oe_kurzbz)
+					public.tbl_benutzerfunktion JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
 				WHERE
 					uid=tbl_mitarbeiter.mitarbeiter_uid AND
-					funktion_kurzbz='oezuordnung'
+					funktion_kurzbz='oezuordnung' AND
+					(datum_von<=now() OR datum_von is null)
+					AND (datum_bis>=now() OR datum_bis is null)
 				LIMIT 1
 			) as hauptzuteilung
 		FROM 
@@ -138,8 +139,8 @@ if($result = $db->db_query($qry))
 						<th class='table-sortable:default'>Vorname</th>
 						<th class='table-sortable:default'>Fix / Frei</th>
 						<th class='table-sortable:default'>Kompetenzen</th>
-						<th class='table-sortable:numeric'>$ws</th>
-						<th class='table-sortable:numeric'>$ss</th>
+						<th class='table-sortable:numeric'>".$db->convert_html_chars($ws)."</th>
+						<th class='table-sortable:numeric'>".$db->convert_html_chars($ss)."</th>
 						<th class='table-sortable:default'>Studiengang</th>
 						<th class='table-sortable:default'>Hauptzuteilung</th>
 						<th class='table-sortable:default'>Sonstige</th>
@@ -150,23 +151,44 @@ if($result = $db->db_query($qry))
 	while($row = $db->db_fetch_object($result))
 	{
 		echo '<tr>';
-		echo "<td>$row->nachname</td>";
-		echo "<td>$row->vorname</td>";
+		echo "<td>".$db->convert_html_chars($row->nachname)."</td>";
+		echo "<td>".$db->convert_html_chars($row->vorname)."</td>";
 		echo "<td>".($row->fixangestellt=='t'?'fix':'frei')."</td>";
-		echo "<td>$row->kompetenzen</td>";
+		echo "<td>".$db->convert_html_chars($row->kompetenzen)."</td>";
 		echo "<td>$row->lvs_wintersemester</td>";
 		echo "<td>$row->lvs_sommersemester</td>";
 		echo '<td>';
-		$qry = "SELECT distinct studiengang_kz FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) WHERE mitarbeiter_uid='$row->mitarbeiter_uid' AND studiensemester_kurzbz in('$ss', '$ws')";
+		$qry = "
+		SELECT 
+			distinct studiengang_kz 
+		FROM 
+			lehre.tbl_lehreinheitmitarbeiter 
+			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
+			JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
+		WHERE 
+			mitarbeiter_uid=".$db->db_add_param($row->mitarbeiter_uid)." 
+			AND studiensemester_kurzbz in(".$db->db_add_param($ss).", ".$db->db_add_param($ws).")";
+		
 		$text='';
 		if($result_stg = $db->db_query($qry))
 			while($row_stg = $db->db_fetch_object($result_stg))
 				$text.= $stg_obj->kuerzel_arr[$row_stg->studiengang_kz].', ';
 		echo mb_substr($text, 0, mb_strlen($text)-2);
 		echo '</td>';
-		echo "<td>".(isset($fb_obj->bezeichnung_arr[$row->hauptzuteilung])?$fb_obj->bezeichnung_arr[$row->hauptzuteilung]:'')."</td>";
+		echo "<td>".$db->convert_html_chars($row->hauptzuteilung)."</td>";
 		echo "<td>";
-		$qry = "SELECT distinct fachbereich_kurzbz FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE mitarbeiter_uid='$row->mitarbeiter_uid' AND studiensemester_kurzbz in('$ss', '$ws')";
+		$qry = "
+		SELECT 
+			distinct fachbereich_kurzbz 
+		FROM 
+			lehre.tbl_lehreinheitmitarbeiter 
+			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
+			JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
+			JOIN lehre.tbl_lehrfach USING(lehrfach_id) 
+		WHERE 
+			mitarbeiter_uid=".$db->db_add_param($row->mitarbeiter_uid)." 
+			AND studiensemester_kurzbz in(".$db->db_add_param($ss).", ".$db->db_add_param($ws).")";
+		
 		$text='';
 		if($result_fb = $db->db_query($qry))
 			while($row_fb = $db->db_fetch_object($result_fb))
