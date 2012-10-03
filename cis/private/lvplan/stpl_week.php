@@ -151,6 +151,8 @@ if (isset($_POST['titel']))
 	$titel=$_POST['titel'];
 
 //Parameter pruefen
+if($stg_kz!='' && !is_numeric($stg_kz))
+	die('Studiengang ist ungueltig');
 if($sem!='' && !is_numeric($sem))
 	die('Semester ist ungueltig');
 if(strlen($ver)>2)
