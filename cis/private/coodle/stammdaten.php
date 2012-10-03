@@ -159,7 +159,17 @@ else
 	$coodle->dauer=60;
 }
 echo '
+<br>
 <form method="POST">
+<fieldset style="width:100px;">
+<legend>';
+if($coodle->coodle_id=='')
+	echo $p->t('coodle/neuerEintrag');
+else
+	echo $p->t('coodle/bearbeiten');
+	
+echo '
+</legend>
 <input type="hidden" name="coodle_id" value="'.$db->convert_html_chars($coodle->coodle_id).'" />
 <table>
 	<tr>
@@ -167,22 +177,26 @@ echo '
 		<td><input type="text" name="titel" value="'.$db->convert_html_chars($coodle->titel).'" maxlength="64" size="50"/></td>
 	</tr>
 	<tr>
-		<td>'.$p->t('coodle/beschreibung').'</td>
+		<td valign="top">'.$p->t('coodle/beschreibung').'</td>
 		<td><textarea name="beschreibung" rows="6" cols="50">'.$db->convert_html_chars($coodle->beschreibung).'</textarea></td>
 	</tr>
 	<tr>
 		<td>'.$p->t('coodle/dauer').'</td>
-		<td><input type="text" name="dauer" value="'.$db->convert_html_chars($coodle->dauer).'" maxlength="5" size="2"/></td>
+		<td>
+			<input type="text" name="dauer" value="'.$db->convert_html_chars($coodle->dauer).'" maxlength="5" size="2"/>
+			'.$p->t('coodle/dauerminuten').'
+		</td>
 	</tr>
 	<tr>
 		<td>'.$p->t('coodle/endedatum').'</td>
-		<td><input type="text" name="endedatum" value="'.$db->convert_html_chars($datum_obj->formatDatum($coodle->endedatum,'d.m.Y')).'" maxlength="10" size="5"/></td>
+		<td><input type="text" name="endedatum" value="'.$db->convert_html_chars($datum_obj->formatDatum($coodle->endedatum,'d.m.Y')).'" maxlength="10" size="10"/></td>
 	</tr>
 	<tr>
 		<td></td>
 		<td><input type="submit" name="save" value="'.$p->t('global/speichern').'"/></td>
 	</tr>
 </table>
+</fieldset>
 </form>';
 
 echo '</body>
