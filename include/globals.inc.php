@@ -65,9 +65,9 @@
 
 	// Studiengaenge die keine Alias Email Adressen erhalten
 	$noalias=array();
-	$noalias[0]='330';
-	$noalias[1]='331';
-	$noalias[2]='204';
+	//$noalias[0]='330';
+	//$noalias[1]='331';
+	//$noalias[2]='204';
 	
 	
 ?>

@@ -103,9 +103,11 @@
 	//$qry = "SELECT vornamen, nachname, uid, alias FROM tbl_person where alias<>'' ORDER BY nachname, vornamen";
 	$qry = "SELECT vorname, nachname, uid, alias FROM (public.tbl_person JOIN public.tbl_benutzer USING(person_id)) LEFT JOIN public.tbl_student on(uid=student_uid)
 	        WHERE 
-	        	alias<>'' 
-	        	AND (studiengang_kz NOT IN($noalias_kz) OR studiengang_kz is null) 
-	        	AND (tbl_benutzer.aktiv OR 
+	        	alias<>''";
+	if($noalias_kz!='')
+		$qry.=" AND (studiengang_kz NOT IN($noalias_kz) OR studiengang_kz is null)";
+
+	$qry.="	AND (tbl_benutzer.aktiv OR 
 	        		(tbl_benutzer.aktiv=false 
 	        		AND updateaktivam >= now()-(SELECT CASE public.get_rolle_prestudent (prestudent_id,null) 
 	        										WHEN 'Abbrecher' THEN '".DEL_ABBRECHER_WEEKS." weeks'::interval
