@@ -63,7 +63,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 				       {  
 				         0 : { sorter: "isoDate"  },
 				       }, 
-					sortList: [[0,0],[1,0],[2,0]],
+					sortList: [[0,0],[1,0]],
 					widgets: [\'zebra\']
 				}); 
 			} 
@@ -122,7 +122,7 @@ foreach ($ort_obj->result as $row)
 {
 	$ort[$row->ort_kurzbz]->max_person = $row->max_person;
 }
-$qry = "SELECT DISTINCT ON (unr) vw_".$db_stpl_table.".unr,datum, stunde, ort_kurzbz, studiensemester_kurzbz, vw_".$db_stpl_table.".studiengang_kz, vw_".$db_stpl_table.".semester, verband, gruppe, gruppe_kurzbz, UPPER(stg_typ || stg_kurzbz) as stg_kurzbz, lehrfach, lehrfach_bez 
+$qry = "SELECT DISTINCT vw_".$db_stpl_table.".unr,datum, stunde, ort_kurzbz, studiensemester_kurzbz, vw_".$db_stpl_table.".studiengang_kz, vw_".$db_stpl_table.".semester, verband, gruppe, gruppe_kurzbz, UPPER(stg_typ || stg_kurzbz) as stg_kurzbz, lehrfach, lehrfach_bez 
 		FROM lehre.vw_".$db_stpl_table." JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung ON(tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id)
 		WHERE datum>='".addslashes($beginn)."' AND datum<='".addslashes($ende)."'";
 if($stg_kz!='')
@@ -134,7 +134,7 @@ echo '<table class="tablesorter" id="t1">
 		<thead>
 		<tr>
 			<th class="table-sortable:date">Datum</th>
-			<th>Stunde</th>
+			
 			<th>Ort</th>
 			<th>Studierende aktuell (Plätze maximal)</th>
 			<th>Gruppen (Studierende aktuell)</th>
@@ -150,6 +150,7 @@ $lastort=0;
 $anzahl_studenten=0;
 $lehrfach='';
 $lehrfach_bez='';
+$arr=array();
 
 function getAnzahl($studiengang_kz, $semester, $verband, $gruppe, $gruppe_kurzbz, $studiensemester_kurzbz)
 {
@@ -214,7 +215,9 @@ if($result = $db->db_query($qry))
 					if((($ort[$lastort]->max_person+$diffprozent)-$anzahl_studenten)<-6)
 						$style='style="background-color: a00404; color: d3d3d3"';
 
-					echo "<tr><td>$lastdatum</td><td>$laststunde</td><td>$lastort</td><td $style>$anzahl_studenten (".$ort[$lastort]->max_person.")</td><td>$gruppen</td><td>$lehrfach - $lehrfach_bez</td></tr>";
+					//echo "<tr><td>$lastdatum</td><td>$laststunde</td><td>$lastort</td><td $style>$anzahl_studenten (".$ort[$lastort]->max_person.")</td><td>$gruppen</td><td>$lehrfach - $lehrfach_bez</td></tr>";
+					$arr[]="<tr><td>$lastdatum</td><td>$lastort</td><td $style>$anzahl_studenten (".$ort[$lastort]->max_person.")</td><td>$gruppen</td><td>$lehrfach - $lehrfach_bez</td></tr>";
+					
 				}
 				$anzahl_studenten=0;
 				$gruppen='';
@@ -235,7 +238,9 @@ else
 {
 	echo "Fehler:".$qry;
 }
-
+$arr=array_unique($arr);
+foreach ($arr AS $row)
+	echo $row;
 echo '</tbody></table>';
 ?>
 </body>
