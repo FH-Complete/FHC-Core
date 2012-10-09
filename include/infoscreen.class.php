@@ -350,8 +350,11 @@ class infoscreen extends basis_db
 					* 
 				FROM 
 					campus.tbl_infoscreen_content
+				JOIN
+					campus.tbl_contentsprache USING (content_id)
 				WHERE 
-					(infoscreen_id=".$this->db_add_param($infoscreen_id, FHC_INTEGER)." OR infoscreen_id is null)";
+					(infoscreen_id=".$this->db_add_param($infoscreen_id, FHC_INTEGER)." OR infoscreen_id is null)
+				AND tbl_contentsprache.sprache='German'";
 		if($aktuell)
 			$qry.="
 					AND (gueltigvon<=now() OR gueltigvon is null)
@@ -373,6 +376,7 @@ class infoscreen extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+				$obj->titel = $row->titel;
 				
 				$this->result[] = $obj;
 			}
