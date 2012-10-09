@@ -180,6 +180,7 @@ $datum_obj = new datum();
 				<th>ID</th>
 				<th>InfoscreenID</th>
 				<th>ContentID</th>
+				<th>Titel</th>
 				<th>Gültig von</th>
 				<th>Gültig bis</th>
 				<th>Refreshzeit</th>
@@ -194,6 +195,7 @@ $datum_obj = new datum();
 		echo '<td>',$db->convert_html_chars($row->infoscreen_content_id),'</td>';
 		echo '<td>',$db->convert_html_chars($row->infoscreen_id),'</td>';
 		echo '<td>',$db->convert_html_chars($row->content_id),'</td>';
+		echo '<td>',$db->convert_html_chars($row->titel),'</td>';
 		echo '<td>',$db->convert_html_chars($datum_obj->formatDatum($row->gueltigvon,'d.m.Y H:i:s')),'</td>';		
 		echo '<td>',$db->convert_html_chars($datum_obj->formatDatum($row->gueltigbis,'d.m.Y H:i:s')),'</td>';
 		echo '<td>',$db->convert_html_chars($row->refreshzeit),'</td>';
