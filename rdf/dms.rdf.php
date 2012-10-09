@@ -61,7 +61,7 @@ foreach($dms->result as $row)
 		<DMS:dms_id>'.$row->dms_id.'</DMS:dms_id>
 		<DMS:projekt_kurzbz>'.$projekt_kurzbz.'</DMS:projekt_kurzbz>
 		<DMS:projektphase_id>'.$projektphase_id.'</DMS:projektphase_id>
-		<DMS:name>'.$row->name.'</DMS:name>
+		<DMS:name><![CDATA['.$row->name.']]></DMS:name>
 		<DMS:insertamum>'.$row->insertamum.'</DMS:insertamum>
 		<DMS:updateamum>'.$row->updateamum.'</DMS:updateamum>
 		<DMS:insertvon>'.$row->insertvon.'</DMS:insertvon>
