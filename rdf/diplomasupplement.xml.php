@@ -456,7 +456,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
             
             // alle semester für das ausbildungssemester holen
             // Semester wo Unterbrecher nicht holen
-           $qry_semester=" Select distinct(status.studiensemester_kurzbz)
+           $qry_semester=" Select distinct(status.studiensemester_kurzbz), datum
             from lehre.tbl_zeugnisnote zeugnis 
                 join lehre.tbl_note note using(note)
             join lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
@@ -465,7 +465,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			where student_uid = ".$db->db_add_param($uid_arr[$i])." AND
             zeugnis = true AND
 			status.ausbildungssemester = ".$db->db_add_param($start)." AND
-            status.status_kurzbz != 'Unterbrecher'";
+            status.status_kurzbz NOT IN('Unterbrecher', 'Interessent','Bewerber','Aufgenommener')
+            ORDER BY datum ASC";
 			
            $semester_kurzbz = array(); 
 			if($result_semester = $db->db_query($qry_semester))
@@ -741,7 +742,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                     echo '<lv>
                             <lehrform_kurzbz>'.$lv_test['lehrform_kurzbz'].'</lehrform_kurzbz>
                             <benotungsdatum>'.$lv_test['benotungsdatum'].'</benotungsdatum>
-                            <sws>'.number_format($lv_test['sws'],2).'</sws>
+                            <sws>'.number_format(sprintf('%.1F',$lv_test['sws']),2).'</sws>
                             <semester>'.$lv_test['semester'].'</semester>
                             <kurzbz>'.$lv_test['kurzbz'].'</kurzbz>
                             <stsem>'.$lv_test['studiensemester_kurzbz'].'</stsem>
@@ -795,7 +796,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                             echo '<lv>
                                 <lehrform_kurzbz></lehrform_kurzbz>
                                 <benotungsdatum>'.$benotungsdatum_outgoing.'</benotungsdatum>
-                                <sws>'.($row_outgoing->semesterstunden/$wochen).'</sws>
+                                <sws>'.number_format(sprintf('%.1F',($row_outgoing->semesterstunden/$wochen)),2).'</sws>
                                 <semester></semester>
                                 <kurzbz>'.$lehrform_kurzbz_outgoing.'</kurzbz>
                                 <stsem></stsem>
