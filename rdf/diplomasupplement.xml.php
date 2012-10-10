@@ -739,10 +739,16 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                 
                 foreach($arrayLvAusbildungssemester as $lv_test)
                 {
+                    $sws = number_format(sprintf('%.1F',$lv_test['sws']),2); 
+                    
+                    if($sws == '0.0')
+                        $sws = '';
+                    
+                    
                     echo '<lv>
                             <lehrform_kurzbz>'.$lv_test['lehrform_kurzbz'].'</lehrform_kurzbz>
                             <benotungsdatum>'.$lv_test['benotungsdatum'].'</benotungsdatum>
-                            <sws>'.number_format(sprintf('%.1F',$lv_test['sws']),2).'</sws>
+                            <sws>'.$sws.'</sws>
                             <semester>'.$lv_test['semester'].'</semester>
                             <kurzbz>'.$lv_test['kurzbz'].'</kurzbz>
                             <stsem>'.$lv_test['studiensemester_kurzbz'].'</stsem>
@@ -793,10 +799,16 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                             $datum = new datum(); 
                             $datum_von = $datum->formatDatum($row_outgoing->von, 'Y.m.d');
                             $datum_bis = $datum->formatDatum($row_outgoing->bis, 'Y.m.d'); 
+                            
+                            
+                            $sws = number_format(sprintf('%.1F',($row_outgoing->semesterstunden/$wochen)),2); 
+                            if($sws == '0.0')
+                                $sws = '';
+                            
                             echo '<lv>
                                 <lehrform_kurzbz></lehrform_kurzbz>
                                 <benotungsdatum>'.$benotungsdatum_outgoing.'</benotungsdatum>
-                                <sws>'.number_format(sprintf('%.1F',($row_outgoing->semesterstunden/$wochen)),2).'</sws>
+                                <sws>'.sws.'</sws>
                                 <semester></semester>
                                 <kurzbz>'.$lehrform_kurzbz_outgoing.'</kurzbz>
                                 <stsem></stsem>
