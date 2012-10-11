@@ -162,11 +162,11 @@ class projektphase extends basis_db
 	}
 	
 	/**
-	 * Laedt die Projektphasen mit zu einem Projekt
+	 * Laedt die Projektphasen zu einem Projekt
 	 * @param  $projekt_kurzbz Projekt der zu ladenden Projektphasen
 	 * @param  $foreignkey wenn ! gib nur die Erste Ebene der Projektphasen zurück
 	 * @return true wenn ok, false im Fehlerfall
-	 */
+	 */ 
 	public function getProjektphasen($projekt_kurzbz, $foreignkey = null)
 	{
 		$this->result=array();
