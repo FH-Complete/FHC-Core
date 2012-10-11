@@ -377,7 +377,7 @@ class lehreinheit extends basis_db
 		if($new)
 		{
 			if($this->unr=='')
-				$unr="currval('lehre.tbl_lehreinheit_lehreinheit_id_seq');";
+				$unr="currval('lehre.tbl_lehreinheit_lehreinheit_id_seq')";
 			else
 				$unr = $this->db_add_param($this->unr, FHC_INTEGER);
 			//ToDo ID entfernen
