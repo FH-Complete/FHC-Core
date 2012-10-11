@@ -54,6 +54,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektdetail.overlay.xul.
 				<toolbarbutton id="toolbarbutton-projekt-del" label="Loeschen" oncommand="ProjektDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Task löschen"/>
 				<toolbarbutton id="toolbarbutton-projekt-refresh" label="Aktualisieren" oncommand="ProjektTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 				<toolbarbutton id="toolbarbutton-projekt-statusbericht" label="Statusbericht" oncommand="ProjektPrintStatusbericht()" disabled="false" image="../skin/images/drucken.png" tooltiptext="Statusbericht drucken"/>
+                <toolbarbutton id="toolbarbutton-projekt-projektbeschreibung" label="Projektbeschreibung" oncommand="ProjektPrintProjektbeschreibung()" disabled="false" image="../skin/images/drucken.png" tooltiptext="Projektbeschreibung drucken"/>
 			</toolbar>
 		</toolbox>
 
