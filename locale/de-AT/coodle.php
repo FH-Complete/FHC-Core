@@ -17,4 +17,10 @@ $this->phrasen['coodle/letzterStatus']='Letzter Status';
 $this->phrasen['coodle/ersteller']='Ersteller';
 $this->phrasen['coodle/aktion']='Aktion';
 $this->phrasen['coodle/neueUmfrage']='Neue Umfrage anlegen';
+$this->phrasen['coodle/termine']='Termin anlegen';
+$this->phrasen['coodle/dragEvent']='Termin';
+$this->phrasen['coodle/terminziehenBeschreibung']='Ziehen Sie den Termin an die gewünschte Position um Terminvorschläge zu setzen';
+$this->phrasen['coodle/ressourcenBeschreibung']='Hier können Sie die FreeBusy Informationen von Räumen und Personen hinzufügen';
+$this->phrasen['coodle/ressourcen']='Ressourcen';
+$this->phrasen['coodle/weiterZurTerminauswahl']='Weiter zur Terminauswahl';
 ?>
