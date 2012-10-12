@@ -199,6 +199,11 @@ echo '
 </fieldset>
 </form>';
 
+if($coodle->coodle_id)
+{
+	echo '<br><br><a href="termin.php?coodle_id='.$db->convert_html_chars($coodle->coodle_id).'"> &gt;&gt; '.$p->t('coodle/weiterZurTerminauswahl').'</a>';
+}
+
 echo '</body>
 </html>';
 ?>

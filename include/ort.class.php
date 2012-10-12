@@ -92,12 +92,12 @@ class ort extends basis_db
 			$ort_obj->bezeichnung 		= $row->bezeichnung;
 			$ort_obj->planbezeichnung 	= $row->planbezeichnung;
 			$ort_obj->max_person 		= $row->max_person;
-			$ort_obj->aktiv 			= ($row->aktiv=='t'?true:false);
-			$ort_obj->lehre 			= ($row->lehre=='t'?true:false);
+			$ort_obj->aktiv 			= $this->db_parse_bool($row->aktiv);
+			$ort_obj->lehre 			= $this->db_parse_bool($row->lehre);
 			$ort_obj->lageplan 			= $row->lageplan;
 			$ort_obj->dislozierung 		= $row->dislozierung;
 			$ort_obj->kosten 			= $row->kosten;
-			$ort_obj->reservieren		= ($row->reservieren=='t'?true:false);
+			$ort_obj->reservieren		= $this->db_parse_bool($row->reservieren);
 			$ort_obj->ausstattung		= $row->ausstattung;
 			$ort_obj->stockwerk			= $row->stockwerk;
 			$ort_obj->standort_id	= $row->standort_id;
@@ -121,7 +121,7 @@ class ort extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM public.tbl_ort WHERE trim(ort_kurzbz) = '".addslashes(trim($ort_kurzbz))."';";
+		$qry = "SELECT * FROM public.tbl_ort WHERE trim(ort_kurzbz) = ".$this->db_add_param(trim($ort_kurzbz)).";";
 
 		if(!$this->db_query($qry))
 		{
@@ -135,12 +135,12 @@ class ort extends basis_db
 			$this->bezeichnung 		= $row->bezeichnung;
 			$this->planbezeichnung 	= $row->planbezeichnung;
 			$this->max_person 		= $row->max_person;
-			$this->aktiv 			= ($row->aktiv=='t'?true:false);
-			$this->lehre 			= ($row->lehre=='t'?true:false);
+			$this->aktiv 			= $this->db_parse_bool($row->aktiv);
+			$this->lehre 			= $this->db_parse_bool($row->lehre);
 			$this->lageplan 		= $row->lageplan;
 			$this->dislozierung 	= $row->dislozierung;
 			$this->kosten 			= $row->kosten;
-			$this->reservieren		= ($row->reservieren=='t'?true:false);
+			$this->reservieren		= $this->db_parse_bool($row->reservieren);
 			$this->ausstattung		= $row->ausstattung;
 			$this->stockwerk		= $row->stockwerk;
 			$this->standort_id	= $row->standort_id;
@@ -201,38 +201,38 @@ class ort extends basis_db
 			//Neuen Datensatz anlegen
 			$qry = 'INSERT INTO public.tbl_ort (ort_kurzbz, bezeichnung, planbezeichnung, max_person, aktiv, lehre, reservieren, lageplan,
 				dislozierung, kosten, stockwerk, standort_id, telefonklappe) VALUES ('.
-				$this->addslashes($this->ort_kurzbz).', '.
-				$this->addslashes($this->bezeichnung).', '.
-				$this->addslashes($this->planbezeichnung).', '.
-				$this->addslashes($this->max_person).', '.
-				($this->aktiv?'true':'false').', '.
-				($this->lehre?'true':'false').', '.
-				($this->reservieren?'true':'false').', '.
-				$this->addslashes($this->lageplan).', '.
-				$this->addslashes($this->dislozierung).', '.
-				$this->addslashes(str_replace(",",".",$this->kosten)).', '.
-				$this->addslashes($this->stockwerk).','.
-				$this->addslashes($this->standort_id).','.
-				$this->addslashes($this->telefonklappe).');';
+				$this->db_add_param($this->ort_kurzbz).', '.
+				$this->db_add_param($this->bezeichnung).', '.
+				$this->db_add_param($this->planbezeichnung).', '.
+				$this->db_add_param($this->max_person).', '.
+				$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
+				$this->db_add_param($this->lehre, FHC_BOOLEAN).', '.
+				$this->db_add_param($this->reservieren, FHC_BOOLEAN).', '.
+				$this->db_add_param($this->lageplan).', '.
+				$this->db_add_param($this->dislozierung).', '.
+				$this->db_add_param(str_replace(",",".",$this->kosten)).', '.
+				$this->db_add_param($this->stockwerk).','.
+				$this->db_add_param($this->standort_id).','.
+				$this->db_add_param($this->telefonklappe).');';
 		}
 		else
 		{
 			//bestehenden Datensatz akualisieren
 
 			$qry = 'UPDATE public.tbl_ort SET '.
-				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
-				'planbezeichnung='.$this->addslashes($this->planbezeichnung).', '.
-				'max_person='.$this->addslashes($this->max_person).', '.
-				'aktiv='.($this->aktiv?'true':'false') .', '.
-				'lehre='.($this->lehre?'true':'false') .', '.
-				'reservieren='.($this->reservieren?'true':'false') .', '.
-				'lageplan='.$this->addslashes($this->lageplan).', '.
-				'dislozierung='.$this->addslashes($this->dislozierung).', '.
-				'kosten='.$this->addslashes(str_replace(",",".",$this->kosten)).', '.
-				'standort_id='.$this->addslashes($this->standort_id).', '.
-				'telefonklappe='.$this->addslashes($this->telefonklappe).', '.
-				'stockwerk='.$this->addslashes($this->stockwerk).' '.
-				'WHERE ort_kurzbz = '.$this->addslashes($this->ort_kurzbz).';';
+				'bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
+				'planbezeichnung='.$this->db_add_param($this->planbezeichnung).', '.
+				'max_person='.$this->db_add_param($this->max_person).', '.
+				'aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN) .', '.
+				'lehre='.$this->db_add_param($this->lehre, FHC_BOOLEAN) .', '.
+				'reservieren='.$this->db_add_param($this->reservieren, FHC_BOOLEAN) .', '.
+				'lageplan='.$this->db_add_param($this->lageplan).', '.
+				'dislozierung='.$this->db_add_param($this->dislozierung).', '.
+				'kosten='.$this->db_add_param(str_replace(",",".",$this->kosten)).', '.
+				'standort_id='.$this->db_add_param($this->standort_id).', '.
+				'telefonklappe='.$this->db_add_param($this->telefonklappe).', '.
+				'stockwerk='.$this->db_add_param($this->stockwerk).' '.
+				'WHERE ort_kurzbz = '.$this->db_add_param($this->ort_kurzbz).';';
 		}
 
 		if($this->db_query($qry))
@@ -269,9 +269,9 @@ class ort extends basis_db
 		
 		//stundevon ermitteln
 		$qry = "SELECT min(stunde) as stunde FROM (
-				SELECT stunde, extract(epoch from (beginn-('".addslashes($zeit_von)."'::time))) AS delta FROM lehre.tbl_stunde
+				SELECT stunde, extract(epoch from (beginn-(".$this->db_add_param($zeit_von)."::time))) AS delta FROM lehre.tbl_stunde
 				UNION
-				SELECT stunde, extract(epoch from (ende-('".addslashes($zeit_von)."'::time))) AS delta FROM lehre.tbl_stunde
+				SELECT stunde, extract(epoch from (ende-(".$this->db_add_param($zeit_von)."::time))) AS delta FROM lehre.tbl_stunde
 				) foo WHERE delta>0";
 		
 		if($this->db_query($qry))
@@ -280,9 +280,9 @@ class ort extends basis_db
 
 		//stundebis ermitteln
 		$qry = "SELECT min(stunde) as stunde FROM (
-				SELECT stunde, extract(epoch from (beginn-('".addslashes($zeit_bis)."'::time))) AS delta FROM lehre.tbl_stunde
+				SELECT stunde, extract(epoch from (beginn-(".$this->db_add_param($zeit_bis)."::time))) AS delta FROM lehre.tbl_stunde
 				UNION
-				SELECT stunde, extract(epoch from (ende-('".addslashes($zeit_bis)."'::time))) AS delta FROM lehre.tbl_stunde
+				SELECT stunde, extract(epoch from (ende-(".$this->db_add_param($zeit_bis)."::time))) AS delta FROM lehre.tbl_stunde
 				) foo WHERE delta>=0";
 		
 		if($this->db_query($qry))
@@ -312,15 +312,15 @@ class ort extends basis_db
 		//if($reservierung)
 		//	$qry.=" AND reservieren";
 		if($raumtyp!=null)
-			$qry.=" AND raumtyp_kurzbz='".addslashes($raumtyp)."'";
+			$qry.=" AND raumtyp_kurzbz=".$this->db_add_param($raumtyp);
 		if($anzpersonen!=null)
-			$qry.=" AND (max_person>='".addslashes($anzpersonen)."' OR max_person is null)";
+			$qry.=" AND (max_person>=".$this->db_add_param($anzpersonen)." OR max_person is null)";
 		 
 		$qry.="	AND ort_kurzbz NOT IN 
 			(
-				SELECT ort_kurzbz FROM lehre.tbl_$db_table WHERE datum='".addslashes($datum)."' AND stunde>='".addslashes($stundevon)."' AND stunde<='".addslashes($stundebis)."'
+				SELECT ort_kurzbz FROM lehre.tbl_$db_table WHERE datum=".$this->db_add_param($datum)." AND stunde>=".$this->db_add_param($stundevon)." AND stunde<=".$this->db_add_param($stundebis)."
 				UNION
-				SELECT ort_kurzbz FROM campus.tbl_reservierung WHERE datum='".addslashes($datum)."' AND stunde>='".addslashes($stundevon)."' AND stunde<='".addslashes($stundebis)."'
+				SELECT ort_kurzbz FROM campus.tbl_reservierung WHERE datum=".$this->db_add_param($datum)." AND stunde>=".$this->db_add_param($stundevon)." AND stunde<=".$this->db_add_param($stundebis)."
 			)
 		";
 		
@@ -334,12 +334,12 @@ class ort extends basis_db
 				$ort_obj->bezeichnung 		= $row->bezeichnung;
 				$ort_obj->planbezeichnung 	= $row->planbezeichnung;
 				$ort_obj->max_person 		= $row->max_person;
-				$ort_obj->aktiv 			= ($row->aktiv=='t'?true:false);
-				$ort_obj->lehre 			= ($row->lehre=='t'?true:false);
+				$ort_obj->aktiv 			= $this->db_parse_bool($row->aktiv);
+				$ort_obj->lehre 			= $this->db_parse_bool($row->lehre);
 				$ort_obj->lageplan 			= $row->lageplan;
 				$ort_obj->dislozierung 		= $row->dislozierung;
 				$ort_obj->kosten 			= $row->kosten;
-				$ort_obj->reservieren		= ($row->reservieren=='t'?true:false);
+				$ort_obj->reservieren		= $this->db_parse_bool($row->reservieren);
 				$ort_obj->ausstattung		= $row->ausstattung;
 				$ort_obj->stockwerk			= $row->stockwerk;
 				$ort_obj->standort_id	= $row->standort_id;
@@ -354,6 +354,52 @@ class ort extends basis_db
 			$this->errormsg = 'Fehler beim Ermitteln eines Raumes';
 			return false;
 		}
+	}
+	
+	/**
+	 * Sucht nach einem Ort
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function filter($filter)
+	{
+		$qry = "
+			SELECT 
+				* 
+			FROM
+				public.tbl_ort 
+			WHERE 
+				ort_kurzbz like '%".$this->db_escape($filter)."%'
+				OR bezeichnung like '%".$this->db_escape($filter)."%'
+			ORDER BY ort_kurzbz;";
+
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler beim Laden der Datensaetze';
+			return false;
+		}
+
+		while($row = $this->db_fetch_object())
+		{
+			$ort_obj = new ort();
+
+			$ort_obj->ort_kurzbz 		= $row->ort_kurzbz;
+			$ort_obj->bezeichnung 		= $row->bezeichnung;
+			$ort_obj->planbezeichnung 	= $row->planbezeichnung;
+			$ort_obj->max_person 		= $row->max_person;
+			$ort_obj->aktiv 			= $this->db_parse_bool($row->aktiv);
+			$ort_obj->lehre 			= $this->db_parse_bool($row->lehre);
+			$ort_obj->lageplan 			= $row->lageplan;
+			$ort_obj->dislozierung 		= $row->dislozierung;
+			$ort_obj->kosten 			= $row->kosten;
+			$ort_obj->reservieren		= $this->db_parse_bool($row->reservieren);
+			$ort_obj->ausstattung		= $row->ausstattung;
+			$ort_obj->stockwerk			= $row->stockwerk;
+			$ort_obj->standort_id	= $row->standort_id;
+			$ort_obj->telefonklappe		= $row->telefonklappe;
+
+			$this->result[] = $ort_obj;
+		}
+		return true;
 	}
 }
 ?>
