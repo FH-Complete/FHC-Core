@@ -95,5 +95,35 @@ class ical extends basis_db
 	{
 		return implode($this->result);
 	}
+	
+	/**
+	 * Importiert ein FreeBusy File
+	 * 
+	 * @param $ical
+	 * @param $typ
+	 */
+	public function parseFreeBusy($ical)
+	{
+		$rows = explode("\n",$ical);
+		
+		$idx = count($this->result);
+		$status=0;
+		$dtstart='';
+		$dtend='';
+
+		foreach($rows as $row)
+		{
+			if(mb_strstr($row,'FREEBUSY:'))
+			{
+
+				$len = mb_strlen($row);
+				$slashpos = mb_strpos($row, '/');
+				$fblen = mb_strlen('FREEBUSY:');
+				$dtstart = mb_substr($row, $fblen, $len-$slashpos);
+				$dtend = mb_substr($row, $slashpos+1);
+				$this->dtresult[]=array('dtstart'=>trim($dtstart),'dtend'=>trim($dtend));
+			}
+		}
+	}
 }
 ?>

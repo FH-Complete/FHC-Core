@@ -193,7 +193,7 @@ if($coodle->coodle_id=='')
 	echo $p->t('coodle/neuerEintrag');
 else
 	echo $p->t('coodle/bearbeiten');
-echo '</h4';
+echo '</h4>';
 /*
 echo '
 <fieldset style="width:100px;">

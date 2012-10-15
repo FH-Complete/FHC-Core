@@ -22,6 +22,7 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/coodle.class.php');
 require_once('../../../include/datum.class.php');
+
 $uid = get_uid();
 $sprache = getSprache();
 $p = new phrasen($sprache);
@@ -138,42 +139,37 @@ echo '<html>
 </style>
 <script type="text/javascript">
 
-	$(document).ready(function() {
-	
-	
-		/* initialize the external events
-		-----------------------------------------------------------------*/
-	
-		$("#external-events div.external-event").each(function() {
-		
-			// create an Event Object (http://arshaw.com/fullcalendar/docs/event_data/Event_Object/)
-			// it doesn"t need to have a start or end
-			var eventObject = {
-				title: $.trim($(this).text()) // use the element"s text as the event title
+	$(document).ready(function() 
+	{
+		// Coodle Termin initialisieren	
+		$("#external-events div.external-event").each(function() 
+		{
+			var eventObject = 
+			{
+				title: $.trim($(this).text()) // use the elements text as the event title
 			};
 			
 			// store the Event Object in the DOM element so we can get to it later
 			$(this).data("eventObject", eventObject);
 			
 			// make the event draggable using jQuery UI
-			$(this).draggable({
+			$(this).draggable(
+			{
 				zIndex: 999,
 				revert: true,      // will cause the event to go back to its
 				revertDuration: 0  //  original position after the drag
 			});
-			
 		});
 	
 	
-		/* initialize the calendar
-		-----------------------------------------------------------------*/
-		
-		$("#calendar").fullCalendar({
-			header: {
-				left: "prev,next today",
-				center: "title",
-				right: "month,agendaWeek,agendaDay"
-			},
+		// Kalender Initialisieren
+		$("#calendar").fullCalendar(
+		{
+			header:	{
+						left: "prev,next today",
+						center: "title",
+						right: "month,agendaWeek,agendaDay"
+					},
 			defaultView: "agendaWeek",
 			timeFormat: {
 						    // for agendaWeek and agendaDay
@@ -211,12 +207,14 @@ echo '<html>
 						},
 			editable: true,
 			droppable: true, // this allows things to be dropped onto the calendar !!!
-			drop: function(date, allDay) { // this function is called when something is dropped
+			drop: function(date, allDay) 
+			{ 
+				// this function is called when something is dropped
 			
-				// retrieve the dropped element"s stored Event Object
+				// retrieve the dropped elements stored Event Object
 				var originalEventObject = $(this).data("eventObject");
 				
-				// we need to copy it, so that multiple events don"t have a reference to the same object
+				// we need to copy it, so that multiple events dont have a reference to the same object
 				var copiedEventObject = $.extend({}, originalEventObject);
 				
 				// assign it the date that was reported
@@ -233,7 +231,40 @@ echo '<html>
 					//$(this).remove();
 				//}
 				
-			}
+			},
+			eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view)
+			{
+				alert(
+		            event.title + " was moved " +
+		            dayDelta + " days and " +
+		            minuteDelta + " minutes."
+		        );
+		
+		        if (allDay) {
+		            alert("Event is now all-day");
+		        }else{
+		            alert("Event has a time-of-day");
+		        }
+		
+		        if (!confirm("Are you sure about this change?")) {
+		            revertFunc();
+		        }
+			},
+			eventResize: function(event,dayDelta,minuteDelta,revertFunc, ui, view) 
+			{
+
+		        alert(
+		            "The end date of " + event.title + "has been moved " +
+		            dayDelta + " days and " +
+		            minuteDelta + " minutes."
+		        );
+		
+		        if (!confirm("is this okay?")) {
+		            revertFunc();
+		        }
+		
+		    }
+			
 		});
 		
 		
@@ -277,12 +308,14 @@ echo '
 	<div id="ressourcecontainer"></div>
 	<input id="input_ressource" type="text" size="10" />
 	<script>
+	
+	// Formatieren des Eintrages im Autocomplete Feld
 	function formatItem(row) 
 	{
-		if(row[1]="Ort")
-		    return "O <i>" + row[0] + "<\/i> - "+ row[2] +" " + row[1];
+		if(row[1]=="Ort")
+		    return "<i>" + row[0] + "<\/i> - "+ row[2] +" " + row[1];
 		else
-		    return " <i>" + row[2] + "<\/i> - "+ row[0] +" " + row[1];
+		    return "<i>" + row[2] + "<\/i> - "+ row[0] +" " + row[1];
 	}
 		
 	function selectItem(li) 
@@ -290,25 +323,28 @@ echo '
 		return false;
 	}
 
-	$(document).ready(function() {
-				  $("#input_ressource").autocomplete("coodle_autocomplete.php", {
-					minChars:2,
-					matchSubset:1,matchContains:1,
-					width:300,
-					cacheLength:0,
-					onItemSelect:selectItem,
-					formatItem:formatItem,
-					extraParams:{"work":"ressource"}
-				  });
-				  
-				  $("#input_ressource").result(function(event, data, formatted) 
-				  {
-				  	var uid = data[0];
-				  	var typ = data[1];
-				  	var bezeichnung = data[2];
-				  	addRessource(uid, typ, bezeichnung);
-				  	this.value="";
-				  });
+	$(document).ready(function() 
+	{
+		// Autocomplete Feld fuer Ressourcen initialisieren	
+		$("#input_ressource").autocomplete("coodle_autocomplete.php", {
+			minChars:2,
+			matchSubset:1,matchContains:1,
+			width:300,
+			cacheLength:0,
+			onItemSelect:selectItem,
+			formatItem:formatItem,
+			extraParams:{"work":"ressource"}
+		});
+		  
+		// Auswahl eines Eintrages im Autocomplete Feld
+		$("#input_ressource").result(function(event, data, formatted) 
+		{
+			var uid = data[0];
+			var typ = data[1];
+			var bezeichnung = data[2];
+			addRessource(uid, typ, bezeichnung);
+			this.value="";
+		});
 	 });
 	
 	/*
@@ -322,6 +358,22 @@ echo '
 				</a> \
 				\'+bezeichnung+\' \
 			<br /></span>\';
+			
+				
+		$("#calendar").fullCalendar("addEventSource",
+			{
+				url:"coodle_events.php?code="+encodeURIComponent(id+typ),
+				type: "POST",
+				data:   {
+							typ: typ,
+							id: id
+						},
+				error: function() {
+					alert("Error fetching data for "+typ+" "+id);
+				},
+				color:"gray"
+				//textColor:"black"
+			});
 		$("#ressourcecontainer").append(code);
 	}
 
@@ -330,6 +382,19 @@ echo '
 	 */
 	function removeRessource(item, id, typ)
 	{
+		
+		$("#calendar").fullCalendar("removeEventSource",
+			{
+				url:"coodle_events.php?code="+encodeURIComponent(id+typ),
+				type: "POST",
+				data:   {
+							typ: typ,
+							id: id
+						},
+				error: function() {
+					alert("Error fetching data for "+typ+" "+id);
+				}
+			});
 		$(item).parent().remove();
 	}
 	</script>

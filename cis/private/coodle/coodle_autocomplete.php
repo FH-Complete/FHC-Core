@@ -37,7 +37,7 @@ switch($work)
 
 			foreach($ort->result as $row)
 			{
-				echo html_entity_decode($row->ort_kurzbz.'| Ort | '.$row->bezeichnung."\n");
+				echo html_entity_decode($row->ort_kurzbz.'|Ort|'.$row->bezeichnung."\n");
 			}
 		 	
 			$benutzer = new benutzer();
@@ -47,7 +47,7 @@ switch($work)
 				
 			foreach($benutzer->result as $row)
 			{
-				echo html_entity_decode($row->uid.'| Person | '.$row->nachname.' '.$row->vorname."\n");
+				echo html_entity_decode($row->uid.'|Person|'.$row->nachname.' '.$row->vorname."\n");
 			}
 			break;
 	default:
