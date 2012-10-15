@@ -130,6 +130,11 @@ echo '<html>
 	#input_ressource{
 		margin-top: 10px;
 	}
+
+	.ressourceItem
+	{
+		font-size: x-small;
+	}
 </style>
 <script type="text/javascript">
 
@@ -274,13 +279,15 @@ echo '
 	<script>
 	function formatItem(row) 
 	{
-	    return " <i>" + row[2] + "<\/i> - "+ row[0] +" " + row[1];
+		if(row[1]="Ort")
+		    return "O <i>" + row[0] + "<\/i> - "+ row[2] +" " + row[1];
+		else
+		    return " <i>" + row[2] + "<\/i> - "+ row[0] +" " + row[1];
 	}
 		
 	function selectItem(li) 
 	{
-		alert("Item:"+li);
-	   return false;
+		return false;
 	}
 
 	$(document).ready(function() {
@@ -303,10 +310,27 @@ echo '
 				  	this.value="";
 				  });
 	 });
-		  
-	function addRessource(uid, typ, bezeichnung)
+	
+	/*
+ 	 * Fuegt eine Ressource hinzu
+	 */  
+	function addRessource(id, typ, bezeichnung)
 	{
-		$("#ressourcecontainer").append("<span> x "+bezeichnung+"</span><br>");
+		var code = \'<span class="ressourceItem"> \
+				<a href="#delete" onclick="removeRessource(this, \\\'\'+id+\'\\\',\\\'\'+typ+\'\\\'); return false;"> \
+					<img src="../../../skin/images/delete_round.png" height="13px" title="'.$p->t('coodle/ressourceEntfernen').'"/> \
+				</a> \
+				\'+bezeichnung+\' \
+			<br /></span>\';
+		$("#ressourcecontainer").append(code);
+	}
+
+	/*
+	 * Loescht eine Ressource
+	 */
+	function removeRessource(item, id, typ)
+	{
+		$(item).parent().remove();
 	}
 	</script>
 	<p>

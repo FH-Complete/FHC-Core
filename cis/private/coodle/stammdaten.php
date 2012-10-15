@@ -84,6 +84,32 @@ echo '
 		}
 	);
 	</script>
+	<style>
+	#wrapper 
+	{
+		width: 70%;
+		padding: 0 10px 15px 10px;
+		border: 1px solid #ccc;
+		background: #eee;
+		text-align: left;
+	}
+
+	#wrapper h4 
+	{
+		font-size: 16px;
+		margin-top: 0;
+		padding-top: 1em;
+	}
+		
+	#weiter
+	{
+		width: 70%;
+		text-align: right;
+		margin-top: 20px;
+		padding: 10px;
+		/*border: 1px dotted red;*/
+	}
+	</style>
 	<title>'.$p->t('coodle/coodle').'</title>
 </head>
 <body>';
@@ -160,7 +186,16 @@ else
 }
 echo '
 <br>
-<form method="POST">
+<form method="POST">';
+echo '<div id="wrapper">
+<h4>';
+if($coodle->coodle_id=='')
+	echo $p->t('coodle/neuerEintrag');
+else
+	echo $p->t('coodle/bearbeiten');
+echo '</h4';
+/*
+echo '
 <fieldset style="width:100px;">
 <legend>';
 if($coodle->coodle_id=='')
@@ -169,7 +204,9 @@ else
 	echo $p->t('coodle/bearbeiten');
 	
 echo '
-</legend>
+</legend>';
+*/
+echo '
 <input type="hidden" name="coodle_id" value="'.$db->convert_html_chars($coodle->coodle_id).'" />
 <table>
 	<tr>
@@ -195,13 +232,16 @@ echo '
 		<td></td>
 		<td><input type="submit" name="save" value="'.$p->t('global/speichern').'"/></td>
 	</tr>
-</table>
-</fieldset>
+</table>';
+
+//echo '</fieldset>';
+echo '</div>';
+echo '
 </form>';
 
 if($coodle->coodle_id)
 {
-	echo '<br><br><a href="termin.php?coodle_id='.$db->convert_html_chars($coodle->coodle_id).'"> &gt;&gt; '.$p->t('coodle/weiterZurTerminauswahl').'</a>';
+	echo '<div id="weiter"><a href="termin.php?coodle_id='.$db->convert_html_chars($coodle->coodle_id).'"> &gt;&gt; '.$p->t('coodle/weiterZurTerminauswahl').'</a></div>';
 }
 
 echo '</body>
