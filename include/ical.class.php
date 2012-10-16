@@ -27,6 +27,7 @@ class ical extends basis_db
 {
 	public $new;
 	public $result = array();
+	public $dtresult = array();
 
 	
 	/**

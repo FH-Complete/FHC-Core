@@ -22,6 +22,8 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/coodle.class.php');
 require_once('../../../include/datum.class.php');
+require_once('../../../include/benutzer.class.php');
+require_once('../../../include/ort.class.php');
 
 $uid = get_uid();
 $sprache = getSprache();
@@ -34,9 +36,7 @@ echo '<html>
 	<link rel="stylesheet"  href="../../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 	<link rel="stylesheet" href="../../../skin/jquery.css" type="text/css"/>
-	<script type="text/javascript" src="../../../include/js/jquery.js"></script>
-	<script type="text/javascript" src="../../../include/js/jquery.tablehover.js"></script>
-	
+	<script type="text/javascript" src="../../../include/js/jquery.js"></script>	
 	<link rel="stylesheet" type="text/css" href="../../../include/js/fullcalendar/fullcalendar.css" />
 	<link rel="stylesheet" type="text/css" href="../../../include/js/fullcalendar/fullcalendar.print.css" media="print" />
 	<script type="text/javascript" src="../../../include/js/jquery-ui.js"></script>
@@ -305,7 +305,8 @@ echo '
 	</div>
 	<div id="ressourcen">
 	<h4>'.$p->t('coodle/ressourcen').'</h4>
-	<div id="ressourcecontainer"></div>
+	<div id="ressourcecontainer">
+	</div>
 	<input id="input_ressource" type="text" size="10" />
 	<script>
 	
@@ -352,14 +353,43 @@ echo '
 	 */  
 	function addRessource(id, typ, bezeichnung)
 	{
+		// Ressource Speichern
+		$.ajax({
+				type:"POST",
+				url:"coodle_worker.php", 
+				data:{ 
+						"work": "addressource",
+						"id": id, 
+						"typ": typ,
+						"coodle_id": "'.$coodle_id.'"
+					 },
+				success: function(data) 
+					{ 
+						if(data!="true")
+							alert("ERROR:"+data)
+						else
+						{
+							// Speichern der Ressource OK
+							addRessourceToContent(id, typ, bezeichnung);
+						}
+
+					},
+				error: function() { alert("error"); }
+			});
+	}
+	// Zeigt eine Ressoure mit deren Events an
+	function addRessourceToContent(id, typ, bezeichnung)
+	{
+		// Anzeige der Ressource mit Loeschen Button
 		var code = \'<span class="ressourceItem"> \
 				<a href="#delete" onclick="removeRessource(this, \\\'\'+id+\'\\\',\\\'\'+typ+\'\\\'); return false;"> \
 					<img src="../../../skin/images/delete_round.png" height="13px" title="'.$p->t('coodle/ressourceEntfernen').'"/> \
 				</a> \
 				\'+bezeichnung+\' \
 			<br /></span>\';
-			
-				
+		$("#ressourcecontainer").append(code);
+
+		// Events der Ressource hinzufuegen
 		$("#calendar").fullCalendar("addEventSource",
 			{
 				url:"coodle_events.php?code="+encodeURIComponent(id+typ),
@@ -374,13 +404,40 @@ echo '
 				color:"gray"
 				//textColor:"black"
 			});
-		$("#ressourcecontainer").append(code);
+
+	}
+	function removeRessource(item, id, typ)
+	{
+		// Ressource entfernen
+		$.ajax({
+				type:"POST",
+				url:"coodle_worker.php", 
+				data:{ 
+						"work": "removeressource",
+						"id": id, 
+						"typ": typ,
+						"coodle_id": "'.$coodle_id.'"
+					 },
+				success: function(data) 
+					{ 
+						if(data!="true")
+							alert("ERROR:"+data)
+						else
+						{
+							// Entfernen der Ressource OK
+							removeRessourceFromContent(item, id, typ);
+						}
+
+					},
+				error: function() { alert("error"); }
+			});
+	
 	}
 
 	/*
 	 * Loescht eine Ressource
 	 */
-	function removeRessource(item, id, typ)
+	function removeRessourceFromContent(item, id, typ)
 	{
 		
 		$("#calendar").fullCalendar("removeEventSource",
@@ -396,7 +453,50 @@ echo '
 				}
 			});
 		$(item).parent().remove();
+	}';
+
+// Bereits zugeteilte Ressourcen laden
+
+if(!$coodle->getRessourcen($coodle_id))
+	die('Fehler:'.$coodle->errormsg);
+echo '
+	$(document).ready(function() 
+	{';
+foreach($coodle->result as $row)
+{
+	echo "\n\t";
+	$typ='';
+	$id='';
+	$bezeichnung='';
+
+	if($row->uid!='')
+	{
+		$typ='Person';
+		$id=$row->uid;
+		$benutzer = new benutzer();
+		$benutzer->load($row->uid);
+		$bezeichnung = $benutzer->nachname.' '.$benutzer->vorname;
 	}
+	elseif($row->ort_kurzbz!='')
+	{
+		$typ='Ort';
+		$id=$row->ort_kurzbz;
+		$ort = new ort();
+		$ort->load($row->ort_kurzbz);
+		$bezeichnung = $ort->bezeichnung;
+	}
+	elseif($row->email!='')
+	{
+		$typ = 'Extern';
+		$id = $row->email;
+		$bezeichnung = $row->name;
+	}
+	echo 'addRessourceToContent("'.$db->convert_html_chars($id).'", "'.$db->convert_html_chars($typ).'", "'.$db->convert_html_chars($bezeichnung).'");';
+}
+echo '
+	});';
+
+echo '
 	</script>
 	<p>
 	'.$p->t('coodle/ressourcenBeschreibung').'
