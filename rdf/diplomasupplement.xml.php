@@ -298,6 +298,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                 $auslandssemester=true; 
 			}
 		}
+        
         // Wenn keine zusätzlichen Angaben -> "nicht zutreffend" anzeigen
         if(!$praktikum && !$auslandssemester)
         {
@@ -316,6 +317,20 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		
 		echo "		<stgl>$stgl</stgl>";
 		
+        
+        // Hole Datum der Sponsion -> wenn keine vorhanden nimm aktuelles datum
+        $qry = "SELECT sponsion FROM lehre.tbl_abschlusspruefung JOIN lehre.tbl_abschlussbeurteilung USING(abschlussbeurteilung_kurzbz) WHERE student_uid='".$uid_arr[$i]."' ORDER BY datum DESC LIMIT 1";
+        $sponsion_datum = date('d.m.Y');
+        if($db->db_query($qry))
+        {
+            if($row1= $db->db_fetch_object())
+            {
+                $sponsion_datum = $datum->formatDatum($row1->sponsion, 'd.m.Y'); 
+            }
+        }
+        
+        echo "      <sponsion_datum>$sponsion_datum</sponsion_datum>";
+        
 		$qry = "SELECT telefonklappe FROM public.tbl_mitarbeiter JOIN tbl_benutzerfunktion ON(uid=mitarbeiter_uid) WHERE funktion_kurzbz='ass' AND oe_kurzbz=".$db->db_add_param($stg_oe_obj->oe_kurzbz);
 		if($db->db_query($qry))
 		{
