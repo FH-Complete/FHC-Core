@@ -2136,7 +2136,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
               <text:span text:style-name="Tabelleninhalt">Date</text:span>
             </text:p>
             <text:p text:style-name="P44">
-              <text:span text:style-name="Tabelleninhalt"><text:s/><xsl:value-of select="datum"/></text:span>
+              <text:span text:style-name="Tabelleninhalt"><text:s/><xsl:value-of select="sponsion_datum"/></text:span>
             </text:p>
           </table:table-cell>
           <table:table-cell table:style-name="Table8.C2" office:value-type="string">
