@@ -59,12 +59,11 @@ switch($typ)
 	case 'Ort':
 			// LVPlan/Reservierungen des Raumes holen
 			
-			$stdplan = new wochenplan();
+			$stdplan = new wochenplan('ort');
 			$stdplan->load_data('ort',null,$id);
 
 			while($start<$end)
 			{
-				$i++;
 				if(!date("w",$start))
 					$start=jump_day($start,1);
 				

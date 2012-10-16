@@ -420,5 +420,136 @@ class coodle extends basis_db
         
         return true; 
     }
+
+	/**
+	 * Prueft ob eine Ressource bereits zu einer Umfrage zugeteilt ist
+	 * 
+	 * @param $coodle_id ID der CoodleUmfrage
+	 * @param $uid UID des Benutzers
+	 * @param $ort_kurzbz Ort
+	 * @param $email EMail des externen Teilnehmers
+	 * @return boolean true wenn vorhanden sonst false
+	 */
+	public function RessourceExists($coodle_id, $uid, $ort_kurzbz, $email)
+	{
+		$qry="SELECT coodle_ressource_id FROM campus.tbl_coodle_ressource WHERE coodle_id=".$this->db_add_param($coodle_id, FHC_INTEGER);
+		if($uid!='')
+			$qry.=' AND uid='.$this->db_add_param($uid);
+		if($ort_kurzbz!='')
+			$qry.=' AND ort_kurzbz='.$this->db_add_param($ort_kurzbz);
+		if($email!='')
+			$qry.=' AND email='.$this->db_add_param($email);
+
+		if($result = $this->db_query($qry))
+		{
+			if($this->db_num_rows($result)>0)
+			{
+				if($row = $this->db_fetch_object($result))
+					return $row->coodle_ressource_id;
+			}
+			else
+				return false;
+		}
+	}
+
+	/**
+	 * Validiert die Ressourcedaten vor dem Speichern
+	 */
+	public function validateRessource()
+	{
+		return true;
+	}
+
+	/**
+	 * Speichert die aktuelle Ressource in die Datenbank
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der ID in $coodle_id aktualisiert
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function saveRessource($new = null)
+	{
+		if(is_null($new))
+			$new = $this->new;
+		
+		//Variablen pruefen
+		if(!$this->validateRessource())
+			return false;
+
+		if($new)
+		{
+			//Neuen Datensatz einfuegen
+			$qry='BEGIN;INSERT INTO campus.tbl_coodle_ressource(coodle_id, uid, ort_kurzbz,
+				email, name, zugangscode, insertamum, insertvon, updateamum, updatevon) VALUES('.
+			      $this->db_add_param($this->coodle_id).', '.
+			      $this->db_add_param($this->uid).', '.
+			      $this->db_add_param($this->ort_kurzbz).', '.
+			      $this->db_add_param($this->email).', '.
+			      $this->db_add_param($this->name).', '.
+			      $this->db_add_param($this->zugangscode).', '.
+			      $this->db_add_param($this->insertamum).', '.
+			      $this->db_add_param($this->insertvon).', '.
+			      $this->db_add_param($this->updateamum).', '.
+			      $this->db_add_param($this->updatevon).');';
+		}
+		else
+		{
+			$this->errormsg = 'Update not Implemented';
+			return false;
+		}
+		
+		if($this->db_query($qry))
+		{
+			if($new)
+			{
+				//naechste ID aus der Sequence holen
+				$qry="SELECT currval('campus.seq_coodle_ressource_coodle_ressource_id') as id;";
+				if($this->db_query($qry))
+				{
+					if($row = $this->db_fetch_object())
+					{
+						$this->coodle_ressource_id = $row->id;
+						$this->db_query('COMMIT');
+					}
+					else
+					{
+						$this->db_query('ROLLBACK');
+						$this->errormsg = "Fehler beim Auslesen der Sequence";
+						return false;
+					}
+				}
+				else
+				{
+					$this->db_query('ROLLBACK');
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
+					return false;
+				}
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
+			return false;
+		}
+	}
+
+	/**
+	 * Entfernt eine Ressourcezuteilung von einer Umfrage
+	 * @param $coodle_ressource_id ID der Ressourcezuteilung
+	 * @return boolean true wenn ok, false im Fehlerfall
+	 */	
+	public function deleteRessource($coodle_ressource_id)
+	{
+		$qry = "DELETE FROM campus.tbl_coodle_ressource_termin WHERE coodle_ressource_id=".$this->db_add_param($coodle_ressource_id, FHC_INTEGER).";
+				DELETE FROM campus.tbl_coodle_ressource WHERE coodle_ressource_id=".$this->db_add_param($coodle_ressource_id).";";
+
+		if($this->db_query($qry))
+			return true;
+		else
+		{
+			$this->errormsg = 'Fehler beim Löschen der Daten';
+			return false;
+		}
+	}
 }
 ?>

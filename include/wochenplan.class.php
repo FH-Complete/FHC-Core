@@ -870,7 +870,7 @@ class wochenplan extends basis_db
 			echo '</td>';
 			
 			echo '</tr></table></form>';
-			echo ' <a href="/cis/private/lvplan/stpl_reserve_list.php">'.$p->t('lvplan/reservierungenLoeschen').' </a>';
+			echo ' <a href="stpl_reserve_list.php">'.$p->t('lvplan/reservierungenLoeschen').' </a>';
 		}
 	}
 
