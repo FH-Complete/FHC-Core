@@ -30,6 +30,19 @@ $sprache = getSprache();
 $p = new phrasen($sprache);
 $datum_obj = new datum();
 
+if(!isset($_GET['coodle_id']))
+	die($p->t('global/fehlerBeiDerParameteruebergabe'));
+	
+$coodle_id = $_GET['coodle_id'];
+
+$db = new basis_db();
+$coodle = new coodle();
+if(!$coodle->load($coodle_id))
+{
+	die($p->t($coodle->errormsg));
+}
+$event_titel = $coodle->titel;
+
 echo '<html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -209,9 +222,9 @@ echo '<html>
 			droppable: true, // this allows things to be dropped onto the calendar !!!
 			drop: function(date, allDay) 
 			{ 
-				// this function is called when something is dropped
+				// Event wird auf Kalender gezogen
 			
-				// retrieve the dropped elements stored Event Object
+				// gedropptes Event holen
 				var originalEventObject = $(this).data("eventObject");
 				
 				// we need to copy it, so that multiple events dont have a reference to the same object
@@ -221,16 +234,35 @@ echo '<html>
 				copiedEventObject.start = date;
 				copiedEventObject.allDay = allDay;
 				
-				// render the event on the calendar
-				// the last `true` argument determines if the event "sticks" (http://arshaw.com/fullcalendar/docs/event_rendering/renderEvent/)
-				$("#calendar").fullCalendar("renderEvent", copiedEventObject, true);
-				
-				// is the "remove after drop" checkbox checked?
-				//if ($("#drop-remove").is(":checked")) {
-					// if so, remove the element from the "Draggable Events" list
-					//$(this).remove();
-				//}
-				
+				// Datum konvertieren
+				datum = $.fullCalendar.formatDate(date, "yyyy-MM-dd");
+				uhrzeit = $.fullCalendar.formatDate(date, "hh:mm:ss");
+				//alert("datum:"+datum+" uhrzeit:"+uhrzeit);
+
+				// Termin Speichern
+				$.ajax({
+					type:"POST",
+					url:"coodle_worker.php", 
+					data:{ 
+							"work": "addTermin",
+							"datum": datum,
+							"uhrzeit": uhrzeit,
+							"coodle_id": "'.$coodle_id.'"
+						 },
+					success: function(data) 
+						{ 
+							if(isNaN(data))
+								alert("ERROR:"+data)
+							else
+							{
+								copiedEventObject.id=data;
+								// render the event on the calendar
+								// the last `true` argument determines if the event "sticks" (http://arshaw.com/fullcalendar/docs/event_rendering/renderEvent/)
+								$("#calendar").fullCalendar("renderEvent", copiedEventObject, true);
+							}
+						},
+					error: function() { alert("error"); }
+				});				
 			},
 			eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view)
 			{
@@ -276,18 +308,6 @@ echo '<html>
 <body>
 	<h1>'.$p->t('coodle/coodle').' - '.$p->t('coodle/termine').'</h1>';
 
-
-if(!isset($_GET['coodle_id']))
-	die($p->t('global/fehlerBeiDerParameteruebergabe'));
-	
-$coodle_id = $_GET['coodle_id'];
-
-$db = new basis_db();
-$coodle = new coodle();
-if(!$coodle->load($coodle_id))
-{
-	die($p->t($coodle->errormsg));
-}
 
 //echo '<h2>'.$coodle->titel.'</h2>';
 //echo $coodle->beschreibung;
@@ -455,13 +475,15 @@ echo '
 		$(item).parent().remove();
 	}';
 
+echo '
+	$(document).ready(function() 
+	{';
+
 // Bereits zugeteilte Ressourcen laden
 
 if(!$coodle->getRessourcen($coodle_id))
 	die('Fehler:'.$coodle->errormsg);
-echo '
-	$(document).ready(function() 
-	{';
+
 foreach($coodle->result as $row)
 {
 	echo "\n\t";
@@ -492,6 +514,24 @@ foreach($coodle->result as $row)
 		$bezeichnung = $row->name;
 	}
 	echo 'addRessourceToContent("'.$db->convert_html_chars($id).'", "'.$db->convert_html_chars($typ).'", "'.$db->convert_html_chars($bezeichnung).'");';
+}
+
+// Bereits eingetragene Terminvorschlaege laden
+$coodletermin = new coodle();
+if(!$coodletermin->getTermine($coodle_id))
+	die('Fehler:'.$coodletermin->errormsg);
+foreach($coodletermin->result as $row)
+{
+	echo '
+		var eventObject = 
+		{
+			id: "'.$db->convert_html_chars($row->coodle_termin_id).'",
+			title: "'.$db->convert_html_chars($event_titel).'",
+			start: "'.$db->convert_html_chars($row->datum).'T'.$db->convert_html_chars($row->uhrzeit).'",
+			allDay: false
+		};
+		$("#calendar").fullCalendar("renderEvent", eventObject, true);
+		';
 }
 echo '
 	});';

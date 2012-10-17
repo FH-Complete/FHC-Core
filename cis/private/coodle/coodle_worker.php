@@ -131,6 +131,43 @@ switch($work)
 			echo 'Ressource nicht gefunden';
 		}
 		break;
+
+	case 'addTermin':
+		if(isset($_POST['datum']))
+			$datum = $_POST['datum'];
+		else
+			die('Datum fehlt');
+		
+		if(isset($_POST['uhrzeit']))
+			$uhrzeit = $_POST['uhrzeit'];
+		else
+			die('Uhrzeit fehlt');
+
+		if(isset($_POST['coodle_id']))
+			$coodle_id = $_POST['coodle_id'];
+		else
+			die('CoodleID fehlt');
+	
+		$coodle = new coodle();
+		if(!$coodle->load($coodle_id))
+			die('Fehler: '.$coodle->errormsg);
+	
+		if($coodle->ersteller_uid!=$user)
+			die('Diese Aktion ist nur durch den Ersteller der Umfrage möglich');
+
+		$coodletermin = new coodle();
+
+		$coodletermin->datum = $datum;
+		$coodletermin->uhrzeit = $uhrzeit;
+		$coodletermin->coodle_id = $coodle_id;
+		
+		if($coodletermin->saveTermin(true))
+			echo $coodletermin->coodle_termin_id;
+		else
+			echo $this->errormsg;
+
+		break;
+
 	default:
 			die('Invalid Work Parameter');
 }
