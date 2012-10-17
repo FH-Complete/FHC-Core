@@ -3611,7 +3611,7 @@ if(!@$db->db_query("SELECT nummer2 FROM wawi.tbl_betriebsmittel LIMIT 1"))
 if(!@$db->db_query("SELECT * FROM testtool.vw_auswertung_kategorie_semester LIMIT 1"))
 {
     $qry = "
-    CREATE OR REPLACE testtool.vw_auswertung_kategorie_semester AS
+    CREATE OR REPLACE VIEW testtool.vw_auswertung_kategorie_semester AS
     SELECT 
     	tbl_kategorie.kategorie_kurzbz, tbl_person.vorname, tbl_person.nachname, 
     	tbl_person.gebdatum, tbl_person.geschlecht, tbl_prestudent.prestudent_id, 
@@ -3913,7 +3913,7 @@ $tabellen=array(
 	"campus.tbl_contentgruppe"  => array("content_id","gruppe_kurzbz","insertamum","insertvon"),
 	"campus.tbl_contentlog"  => array("contentlog_id","contentsprache_id","uid","start","ende"),
 	"campus.tbl_contentsprache"  => array("contentsprache_id","content_id","sprache","version","sichtbar","content","reviewvon","reviewamum","updateamum","updatevon","insertamum","insertvon","titel","gesperrt_uid"),
-	"campus.tbl_coodle"  => array("coodle_id","titel","beschreibung","coodle_status_kurzbz","dauer","endedatum","insertamum","insertvon","updateamum","updatevon"),
+	"campus.tbl_coodle"  => array("coodle_id","titel","beschreibung","coodle_status_kurzbz","dauer","endedatum","insertamum","insertvon","updateamum","updatevon","ersteller_uid"),
 	"campus.tbl_coodle_ressource"  => array("coodle_ressource_id","coodle_id","uid","ort_kurzbz","email","name","zugangscode","insertamum","insertvon","updateamum","updatevon"),
 	"campus.tbl_coodle_termin"  => array("coodle_termin_id","coodle_id","datum","uhrzeit","auswahl"),
 	"campus.tbl_coodle_ressource_termin"  => array("coodle_ressource_id","coodle_termin_id","insertamum","insertvon"),
