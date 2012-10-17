@@ -551,5 +551,110 @@ class coodle extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Prueft die Termindaten vor dem Speichern
+	 */
+	public function validateTermin()
+	{
+		return true;
+	}
+
+	/** 
+	 * Speichert einen Termin
+	 * @param new
+	 * @return boolean
+	 */
+	public function saveTermin($new)
+	{
+		if(is_null($new))
+			$new = $this->new;
+		
+		//Variablen pruefen
+		if(!$this->validateTermin())
+			return false;
+
+		if($new)
+		{
+			//Neuen Datensatz einfuegen
+			$qry='BEGIN;INSERT INTO campus.tbl_coodle_termin(coodle_id, datum, uhrzeit, auswahl) VALUES('.
+			      $this->db_add_param($this->coodle_id).', '.
+			      $this->db_add_param($this->datum).', '.
+			      $this->db_add_param($this->uhrzeit).', false);';
+		}
+		else
+		{
+			$qry='UPDATE campus.tbl_coodle_termin SET'.
+				' datum='.$this->db_add_param($this->datum).
+				' uhrzeit='.$this->db_add_param($this->uhrzeit).
+				' WHERE coodle_termin_id='.$this->db_add_param($this->coodle_termin_id);
+		}
+		
+		if($this->db_query($qry))
+		{
+			if($new)
+			{
+				//naechste ID aus der Sequence holen
+				$qry="SELECT currval('campus.seq_coodle_termin_coodle_termin_id') as id;";
+				if($this->db_query($qry))
+				{
+					if($row = $this->db_fetch_object())
+					{
+						$this->coodle_termin_id = $row->id;
+						$this->db_query('COMMIT');
+					}
+					else
+					{
+						$this->db_query('ROLLBACK');
+						$this->errormsg = "Fehler beim Auslesen der Sequence";
+						return false;
+					}
+				}
+				else
+				{
+					$this->db_query('ROLLBACK');
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
+					return false;
+				}
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
+			return false;
+		}
+	}
+
+	/**
+	 * Laedt die Terminvorschlaege zu einer Umfrage
+	 * @param $coodle_id
+	 * @return boolean
+	 */
+	public function getTermine($coodle_id)
+	{
+		$qry = "SELECT * FROM campus.tbl_coodle_termin WHERE coodle_id=".$this->db_add_param($coodle_id);
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new coodle();
+				$obj->coodle_termin_id = $row->coodle_termin_id;
+				$obj->coodle_id = $row->coodle_id;
+				$obj->datum = $row->datum;
+				$obj->uhrzeit = $row->uhrzeit;
+				$obj->auswahl = $this->db_parse_bool($row->auswahl);
+	
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg ='Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>
