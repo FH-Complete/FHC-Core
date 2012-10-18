@@ -54,6 +54,7 @@ echo '<html>
 	<link rel="stylesheet" type="text/css" href="../../../include/js/fullcalendar/fullcalendar.print.css" media="print" />
 	<script type="text/javascript" src="../../../include/js/jquery-ui.js"></script>
 	<script type="text/javascript" src="../../../include/js/fullcalendar/fullcalendar.min.js"></script>
+	<script type="text/javascript" src="../../../include/js/jquery.contextmenu.r2.js"></script>
 	<title>'.$p->t('coodle/coodle').' - '.$p->t('coodle/termine').'</title>
 	
 <style type="text/css">
@@ -159,7 +160,8 @@ echo '<html>
 		{
 			var eventObject = 
 			{
-				title: $.trim($(this).text()) // use the elements text as the event title
+				title: $.trim($(this).text()), // use the elements text as the event title
+				termin: true
 			};
 			
 			// store the Event Object in the DOM element so we can get to it later
@@ -218,7 +220,9 @@ echo '<html>
 						    week: "MMM d[ yyyy]{ \'&#8212;\'[ MMM] d yyyy}", // Sep 7 - 13 2009
 						    day: "dddd, MMM d, yyyy"                  // Tuesday, Sep 8, 2009
 						},
+			defaultEventMinutes: '.$coodle->dauer.',
 			editable: true,
+			disableResizing: true,
 			droppable: true, // this allows things to be dropped onto the calendar !!!
 			drop: function(date, allDay) 
 			{ 
@@ -236,7 +240,7 @@ echo '<html>
 				
 				// Datum konvertieren
 				datum = $.fullCalendar.formatDate(date, "yyyy-MM-dd");
-				uhrzeit = $.fullCalendar.formatDate(date, "hh:mm:ss");
+				uhrzeit = $.fullCalendar.formatDate(date, "HH:mm:ss");
 				//alert("datum:"+datum+" uhrzeit:"+uhrzeit);
 
 				// Termin Speichern
@@ -266,40 +270,82 @@ echo '<html>
 			},
 			eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view)
 			{
+				/*
 				alert(
-		            event.title + " was moved " +
-		            dayDelta + " days and " +
-		            minuteDelta + " minutes."
-		        );
-		
-		        if (allDay) {
-		            alert("Event is now all-day");
-		        }else{
-		            alert("Event has a time-of-day");
-		        }
-		
-		        if (!confirm("Are you sure about this change?")) {
-		            revertFunc();
-		        }
+		            event.id + " was moved " +
+					$.fullCalendar.formatDate(event.start,"yyyy-MM-dd HH:mm:ss")
+		        );*/
+				
+				datum = $.fullCalendar.formatDate(event.start,"yyyy-MM-dd")
+				uhrzeit = $.fullCalendar.formatDate(event.start,"HH:mm:ss")
+				// Verschiebung Speichern
+				$.ajax({
+					type:"POST",
+					url:"coodle_worker.php", 
+					data:{ 
+							"work": "moveTermin",
+							"datum": datum,
+							"uhrzeit": uhrzeit,
+							"coodle_termin_id": event.id,
+							"coodle_id": "'.$coodle_id.'"
+						 },
+					success: function(data) 
+						{ 
+							if(data!="true")
+							{
+								alert("ERROR:"+data)
+								revertFunc();
+							}
+							else
+							{
+								// Verschiebung OK
+							}
+						},
+					error: function() { alert("error"); }
+				});				
 			},
-			eventResize: function(event,dayDelta,minuteDelta,revertFunc, ui, view) 
-			{
-
-		        alert(
-		            "The end date of " + event.title + "has been moved " +
-		            dayDelta + " days and " +
-		            minuteDelta + " minutes."
-		        );
-		
-		        if (!confirm("is this okay?")) {
-		            revertFunc();
-		        }
-		
-		    }
-			
+			eventRender: function (event, element) 
+			{ 
+				// Conext Menue nur an Umfragetermine nicht an FreeBusy Eintraege haengen
+				if(event.termin)
+				{
+					element.contextMenu("myContextMenu",
+					{
+						bindings: 
+						{
+							"delete": function(t) 
+								{
+									// Termin loeschen
+									$.ajax({
+										type:"POST",
+										url:"coodle_worker.php", 
+										data:{ 
+												"work": "removeTermin",
+												"coodle_termin_id": event.id,
+												"coodle_id": "'.$coodle_id.'"
+											 },
+										success: function(data) 
+											{ 
+												if(data!="true")
+												{
+													alert("ERROR:"+data)
+													revertFunc();
+												}
+												else
+												{
+													// Loeschen aus DB OK
+													//Event aus Kalender entfernen
+													$("#calendar").fullCalendar("removeEvents", event.id);
+												}
+											},
+										error: function() { alert("error"); }
+									});				
+								},
+						}
+					});
+				}		
+			}
 		});
-		
-		
 	});
 
 	
@@ -308,7 +354,13 @@ echo '<html>
 <body>
 	<h1>'.$p->t('coodle/coodle').' - '.$p->t('coodle/termine').'</h1>';
 
-
+// Contextmenue
+echo '
+<div id="myContextMenu" class="contextMenu">
+	<ul>
+		<li id="delete"><img src="../../../skin/images/delete_round.png" />'.$p->t('global/entfernen').'</li>
+	</ul>
+</div>';
 //echo '<h2>'.$coodle->titel.'</h2>';
 //echo $coodle->beschreibung;
 
@@ -528,7 +580,8 @@ foreach($coodletermin->result as $row)
 			id: "'.$db->convert_html_chars($row->coodle_termin_id).'",
 			title: "'.$db->convert_html_chars($event_titel).'",
 			start: "'.$db->convert_html_chars($row->datum).'T'.$db->convert_html_chars($row->uhrzeit).'",
-			allDay: false
+			allDay: false,
+			termin: true
 		};
 		$("#calendar").fullCalendar("renderEvent", eventObject, true);
 		';

@@ -585,7 +585,7 @@ class coodle extends basis_db
 		else
 		{
 			$qry='UPDATE campus.tbl_coodle_termin SET'.
-				' datum='.$this->db_add_param($this->datum).
+				' datum='.$this->db_add_param($this->datum).','.
 				' uhrzeit='.$this->db_add_param($this->uhrzeit).
 				' WHERE coodle_termin_id='.$this->db_add_param($this->coodle_termin_id);
 		}
@@ -654,6 +654,56 @@ class coodle extends basis_db
 		{
 			$this->errormsg ='Fehler beim Laden der Daten';
 			return false;
+		}
+	}
+
+	/**
+	 * Laedt einen Termin
+	 * @param $coodle_termin_id
+	 * @return boolean
+	 */
+	public function loadTermin($coodle_termin_id)
+	{
+		$qry = "SELECT * FROM campus.tbl_coodle_termin WHERE coodle_termin_id=".$this->db_add_param($coodle_termin_id);
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				$this->coodle_termin_id = $row->coodle_termin_id;
+				$this->coodle_id = $row->coodle_id;
+				$this->datum = $row->datum;
+				$this->uhrzeit = $row->uhrzeit;
+				$this->auswahl = $this->db_parse_bool($row->auswahl);
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Termin wurde nicht gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg ='Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Loescht einen Termin
+	 * @param $coodle_termin_id
+	 * @return boolean
+	 */
+	public function deleteTermin($coodle_termin_id)
+	{
+		$qry = "DELETE FROM campus.tbl_coodle_termin WHERE coodle_termin_id=".$this->db_add_param($coodle_termin_id);
+		
+		if($this->db_query($qry))
+			return true;
+		else
+		{
+			$this->errormsg = 'Fehler beim Löschen des Eintrags';
 		}
 	}
 }

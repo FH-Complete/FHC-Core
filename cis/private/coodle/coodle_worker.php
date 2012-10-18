@@ -164,10 +164,86 @@ switch($work)
 		if($coodletermin->saveTermin(true))
 			echo $coodletermin->coodle_termin_id;
 		else
-			echo $this->errormsg;
+			echo $coodletermin->errormsg;
 
 		break;
 
+	case 'moveTermin':
+		if(isset($_POST['datum']))
+			$datum = $_POST['datum'];
+		else
+			die('Datum fehlt');
+		
+		if(isset($_POST['uhrzeit']))
+			$uhrzeit = $_POST['uhrzeit'];
+		else
+			die('Uhrzeit fehlt');
+
+		if(isset($_POST['coodle_id']))
+			$coodle_id = $_POST['coodle_id'];
+		else
+			die('CoodleID fehlt');
+
+		if(isset($_POST['coodle_termin_id']))
+			$coodle_termin_id = $_POST['coodle_termin_id'];
+		else
+			die('CoodleTerminID fehlt');
+	
+		$coodle = new coodle();
+		if(!$coodle->load($coodle_id))
+			die('Fehler: '.$coodle->errormsg);
+	
+		if($coodle->ersteller_uid!=$user)
+			die('Diese Aktion ist nur durch den Ersteller der Umfrage möglich');
+
+		$coodletermin = new coodle();
+		if(!$coodletermin->loadTermin($coodle_termin_id))
+			die('Fehler: '.$coodletermin->errormsg);
+
+		$coodletermin->datum = $datum;
+		$coodletermin->uhrzeit = $uhrzeit;
+		$coodletermin->coodle_termin_id = $coodle_termin_id;
+		
+		if($coodletermin->saveTermin(false))
+			echo 'true';
+		else
+			echo $coodletermin->errormsg;
+
+		break;
+
+	case 'removeTermin':
+		if(isset($_POST['coodle_id']))
+			$coodle_id = $_POST['coodle_id'];
+		else
+			die('CoodleID fehlt');
+
+		if(isset($_POST['coodle_termin_id']))
+			$coodle_termin_id = $_POST['coodle_termin_id'];
+		else
+			die('CoodleTerminID fehlt');
+	
+		$coodle = new coodle();
+		if(!$coodle->load($coodle_id))
+			die('Fehler: '.$coodle->errormsg);
+	
+		if($coodle->ersteller_uid!=$user)
+			die('Diese Aktion ist nur durch den Ersteller der Umfrage möglich');
+
+		$coodletermin = new coodle();
+		if(!$coodletermin->loadTermin($coodle_termin_id))
+			die('Fehler: '.$coodletermin->errormsg);
+
+		if($coodle->coodle_id!=$coodletermin->coodle_id)
+		{
+			die('Termin und Umfrage passen nicht zusammen!');
+		}
+		
+		if($coodletermin->deleteTermin($coodle_termin_id))
+			echo 'true';
+		else
+			echo $coodletermin->errormsg;
+
+		break;
 	default:
 			die('Invalid Work Parameter');
 }
