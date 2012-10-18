@@ -30,18 +30,95 @@ $sprache = getSprache();
 $p = new phrasen($sprache);
 $datum_obj = new datum();
 
-if(!isset($_GET['coodle_id']))
+if(!isset($_REQUEST['coodle_id']))
 	die($p->t('global/fehlerBeiDerParameteruebergabe'));
 	
-$coodle_id = $_GET['coodle_id'];
+$coodle_id = $_REQUEST['coodle_id'];
 
 $db = new basis_db();
 $coodle = new coodle();
 if(!$coodle->load($coodle_id))
 {
-	die($p->t($coodle->errormsg));
+	die($coodle->errormsg);
 }
 $event_titel = $coodle->titel;
+
+if(isset($_POST['action']) && $_POST['action']=='start')
+{
+	// Start der Umfrage
+	$coodle_termine = new coodle();
+	$coodle_termine->getTermine($coodle_id);
+	if(count($coodle_termine->result)>0)
+	{
+		$coodle_ressource = new coodle();
+		$coodle_ressource->getRessourcen($coodle_id);
+		if(count($coodle_ressource->result)>0)
+		{
+			foreach($coodle_ressource->result as $row)
+			{
+				if($row->uid!='')
+				{
+					$benuzter = new benutzer();
+					if(!$benutzer->load($row->uid))
+					{
+						echo "Fehler beim Laden des Benutzers ".$db->convert_html_chars($row->uid);
+						continue;
+					}
+					
+					if($benutzer->geschlecht=='w')
+						$anrede = "Sehr geehrte Frau ";
+					else
+						$anrede = "Sehr geehrter Herr ";
+						
+					$anrede.= $benutzer->titelpre.' '.$benutzer->vorname.' '.$row->nachname.' '.$row->titelpre;
+					
+					// Interner Teilnehmer
+					$mail = $row->uid.'@'.DOMAIN;
+					$link = APP_ROOT.'cis/public/coodle.php?coodle_id='.$coodle_id.'&uid='.$row->uid;
+				}
+				elseif($row->email!='')
+				{
+					// Externe Teilnehmer
+					$mail = $row->email;
+					$anrede='Sehr geehrte(r) Herr/Frau '.$row->name; 
+					$link=APP_ROOT.'cis/public/coodle.php?coodle_id='.$coodle_id.'&zugangscode='.$row->zugangscode;
+				}
+				else
+				{
+					// Raueme bekommen kein Mail
+					continue;
+				}
+				
+				$html.=$anrede.'<br>
+					Sie wurden zu einer Terminumfrage zum Thema "'.$db->convert_html_chars($coodle->titel).'" eingeladen.
+					Bitte folgen Sie dem Link um Ihre Terminwünsche bekannt zu geben.
+					<a href="'.$link.'">Link zur Terminumfrage</a>
+					';
+				
+				$text.=$anrede."\nSie wurden zu einer Terminumfrage zum Thema \"".$db->convert_html_chars($coodle->titel)."\" eingeladen.
+					Bitte folgen Sie dem Link um Ihre Terminwünsche bekannt zu geben.\n
+					$link";
+				
+				$mail = new mail($mail, 'no-reply@'.DOMAIN,'Termineinladung - '.$coodle->titel, $text);
+				$mail->setHTMLContent($html);
+				if($mail->send())
+				{
+					echo "Mail an $mail wurde versandt<br>";
+				} 
+			}
+			exit();
+		}
+		else
+		{
+			die($p->t('coodle/keineRessourcenVorhanden'));
+		}
+	}
+	else
+	{
+		die($p->t('coodle/keineTermineVorhanden'));
+	}
+		
+}
 
 echo '<html>
 <head>
@@ -122,7 +199,7 @@ echo '<html>
 		padding-top: 1em;
 		}
 		
-	.ressourcen { /* try to mimick the look of a real event */
+	.ressourcen {
 		margin: 10px 0;
 		padding: 2px 4px;
 		background: #3366CC;
@@ -150,6 +227,31 @@ echo '<html>
 	{
 		font-size: x-small;
 	}
+	
+	#fertig 
+	{
+		width: 150px;
+		padding: 0 10px;
+		margin-top: 50px;
+		border: 1px solid #ccc;
+		background: #eee;
+		text-align: left;
+	}
+		
+	#fertig h4 
+	{
+		font-size: 16px;
+		margin-top: 0;
+		padding-top: 1em;
+	}
+		
+	#fertig p 
+	{
+		margin: 1.5em 0;
+		font-size: 11px;
+		color: #666;
+	}
+	
 </style>
 <script type="text/javascript">
 
@@ -594,6 +696,17 @@ echo '
 	<p>
 	'.$p->t('coodle/ressourcenBeschreibung').'
 	</p>
+	</div>
+	<div id="fertig">
+		<h4>'.$p->t('coodle/umfrageStarten').'</h4>
+		<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
+		<input type="hidden" name="action" value="start" />
+		<input type="hidden" name="coodle_id" value="'.$db->convert_html_chars($coodle_id).'" />
+		<input type="submit" value="'.$p->t('coodle/umfrageStarten').'" />
+		</form>
+		<p>
+			'.$p->t('coodle/startBeschreibung').'
+		</p>
 	</div>
 </div>
 <div id="calendar"></div>

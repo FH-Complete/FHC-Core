@@ -20,8 +20,12 @@ $this->phrasen['coodle/neueUmfrage']='Neue Umfrage anlegen';
 $this->phrasen['coodle/termine']='Termine verwalten';
 $this->phrasen['coodle/dragEvent']='Termin';
 $this->phrasen['coodle/terminziehenBeschreibung']='Ziehen Sie den Termin an die gewünschte Position um Terminvorschläge zu setzen';
-$this->phrasen['coodle/ressourcenBeschreibung']='Hier können Sie Räumen und Personen zur Umfrage hinzufügen. <br><br>Tippen sie dazu den Namen in das Textfeld und wählen Sie den entsprechenden Eintrag aus.';
+$this->phrasen['coodle/ressourcenBeschreibung']='Hier können Sie Räume und Personen zur Umfrage hinzufügen. <br><br>Tippen sie dazu den Namen in das Textfeld und wählen Sie den entsprechenden Eintrag aus.';
 $this->phrasen['coodle/ressourcen']='Ressourcen';
 $this->phrasen['coodle/weiterZurTerminauswahl']='Weiter zur Terminauswahl';
 $this->phrasen['coodle/ressourceEntfernen']='Ressource entfernen';
+$this->phrasen['coodle/umfrageStarten']='Umfrage starten';
+$this->phrasen['coodle/startBeschreibung']='Klicken Sie hier um die Teilnehmer zu Informieren und die Umfrage zu starten';
+$this->phrasen['coodle/keineTermineVorhanden']='Es sind noch keine Termine für diese Umfrage vorhanden';
+$this->phrasen['coodle/keineRessourcenVorhanden']='Es sind noch keine Teilnehmer zugeordnet';
 ?>
