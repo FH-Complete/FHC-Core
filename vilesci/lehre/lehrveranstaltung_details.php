@@ -74,7 +74,7 @@
 		$lv->lehre = isset($_POST['lehre']);
 		$lv->lehreverzeichnis = $_POST['lehreverzeichnis'];
 		$lv->aktiv = isset($_POST['aktiv']);
-		$lv->planfaktor = $_POST['planfaktor'];
+		//$lv->planfaktor = $_POST['planfaktor'];
 		$lv->planlektoren = $_POST['planlektoren'];
 		$lv->planpersonalkosten = $_POST['planpersonalkosten'];
 		$lv->plankostenprolektor = $_POST['plankostenprolektor'];
@@ -222,8 +222,8 @@
 		$htmlstr .= "	<td><input type='text' name='sort' value='$lv->sort' maxlength='2'></td>";
 		$htmlstr .= "	<td>Lehreverzeichnis</td>";
 		$htmlstr .= "	<td><input type='text' name='lehreverzeichnis' value='$lv->lehreverzeichnis' maxlength='16'></td>";
-		$htmlstr .= "	<td>Planfaktor</td>";
-		$htmlstr .= "	<td><input type='text' name='planfaktor' value='$lv->planfaktor' maxlength='3'></td>";
+		//$htmlstr .= "	<td>Planfaktor</td>";
+		//$htmlstr .= "	<td><input type='text' name='planfaktor' value='$lv->planfaktor' maxlength='3'></td>";
 		$htmlstr .= "	</tr><tr>\n";
 
 		$htmlstr .= "	<td>Planlektoren</td>";

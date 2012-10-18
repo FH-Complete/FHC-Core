@@ -373,8 +373,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			    	<row>
 			    		<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz" value="Stundensatz: "/>
     					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz" disabled="true" maxlength="6" flex="1" oninput="LeMitarbeiterValueChanged();LeMitarbeiterGesamtkosten()"/>
-    					<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-faktor" value="Faktor: "/>
-    					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-faktor" disabled="true" maxlength="3" flex="1" oninput="LeMitarbeiterValueChanged();LeMitarbeiterGesamtkosten()"/>
+    					<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-faktor" hidden="true" value="Faktor: "/>
+    					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-faktor" hidden="true" disabled="true" maxlength="3" flex="1" oninput="LeMitarbeiterValueChanged();LeMitarbeiterGesamtkosten()"/>
 					</row>
 					<row>
 			    		<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-anmerkung" value="Anmerkung: "/>

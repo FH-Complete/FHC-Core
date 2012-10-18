@@ -326,7 +326,7 @@ if (!$db = new basis_db())
 		echo '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
 		if(($anz=count($lehrendearray))>0)
 		{
-			echo "<tr valign='top'><td>Lehrbeauftragte(r): </td><td>";
+			echo "<tr valign='top'><td><nobr>Lehrbeauftragte(r): </nobr></td><td>";
 
 			foreach($lehrendearray as $elem)
 			{
