@@ -23,6 +23,7 @@ $this->phrasen['profil/sieSindMitgliedInFolgendenVerteilern']='You are member of
 $this->phrasen['profil/derUserIstInFolgendenVerteilern'] = 'User %s is a member of the following mailing lists';
 $this->phrasen['profil/alleStudentenVon']='All students from';
 $this->phrasen['profil/kurzbeschreibungFuerOeh']='Brief description for the Austian Student Union candidacy';
+$this->phrasen['profil/solltenDatenNichtStimmen']='If your data is incorrect, please contact the responsible assistant';
 $this->phrasen['profil/esWurdenKeineProfileGefunden']='No profile ore multiple profiles were found for your user account';
 $this->phrasen['profil/adminstration']='Administration';
 $this->phrasen['profil/zustaendigeAssistenz']='Administrative Assistant';
@@ -48,8 +49,24 @@ If your user account is not reactivated within the next days of being deactivate
 - Your account<br>- Your mailbox (including all e-mails) and<br>- Your home directory (including all files).<br><br>
 If your account has been deactivated by mistake, please contact the administrative assistant for your degree program immediately.<br>';
 
+
+
+
 $this->phrasen['profil/nurJPGBilder']='Currently it is only possible to upload JPEG images';
 $this->phrasen['profil/BilduploadInfotext']='Currently it is only possible to upload JPG images with a maximum size of 15MB!<br><br><b>Please follow the <a href="../../cms/content.php?content_id=%s">guidelines for uploading images</a></b>';
 $this->phrasen['profil/Bild']='Picture';
 $this->phrasen['profil/Bildupload']='Upload Picture';
+$this->phrasen['profil/fotofreigeben']='Sperre des Profilfotos aufheben';
+$this->phrasen['profil/fotosperren']='Profilfoto sperren';
+$this->phrasen['profil/infotextSperre']='Gesperrte Profilbilder werden nur für Zutrittskarten verwendet und scheinen nicht auf Anwesenheitslisten oder in der Personensuche auf';
+$this->phrasen['profil/profilfotoGesperrt']='Profilfoto gesperrt';
+$this->phrasen['profil/profilfotoUploadGesperrt']='Der Upload des Profilfotos ist nicht mehr möglich';
+$this->phrasen['profil/fhausweisStatus']='FH-Ausweis Status';
+$this->phrasen['profil/fhausweisWurdeBereitsAusgegeben']='FH Ausweis wurde bereits ausgegeben oder liegt zur Abholung bereit';
+$this->phrasen['profil/ladenSieBitteEinGueltigesFotoHoch']='Laden Sie bitte ein gültiges Foto hoch';
+$this->phrasen['profil/fotoWurdeNochNichtAkzeptiert']='Foto wurde noch nicht akzeptiert';
+$this->phrasen['profil/fhausweisGedrucktAm']='FH-Ausweis gedruckt am';
+$this->phrasen['profil/fhausweisAbholbereitAmEmpfangAb']='FH-Ausweis abholbereit am Empfang ab';
+$this->phrasen['profil/fhausweisWurdeNochNichtGedruckt']='FH-Ausweis wurde noch nicht gedruckt';
+$this->phrasen['profil/ihrFotoWurdeNochNichtGeprueft']='Ihr Foto wurde noch nicht geprüft';
 ?>

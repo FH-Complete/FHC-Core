@@ -77,7 +77,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					<fo:table-column column-width="30mm"/>
 					<fo:table-column column-width="10mm"/>
 					<fo:table-column column-width="8mm"/>
-					<fo:table-column column-width="7mm"/>
+					<!-- <fo:table-column column-width="7mm"/>-->
 					<fo:table-column column-width="17mm"/>
 					<fo:table-body>
 						<fo:table-row  line-height="10pt">
@@ -87,7 +87,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 							<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" font-weight="bold"> Gruppe</fo:block></fo:table-cell>
 							<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" font-weight="bold"> Std.</fo:block></fo:table-cell>
 							<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" font-weight="bold"> Satz</fo:block></fo:table-cell>
-							<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" font-weight="bold"> Fakt.</fo:block></fo:table-cell>
+							<!-- <fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" font-weight="bold"> Fakt.</fo:block></fo:table-cell>-->
 							<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" font-weight="bold"> Brutto</fo:block></fo:table-cell>
 						</fo:table-row>
 						<xsl:apply-templates select="lehreinheit"/>
@@ -103,7 +103,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					<fo:table-column column-width="30mm"/>
 					<fo:table-column column-width="10mm"/>
 					<fo:table-column column-width="8mm"/>
-					<fo:table-column column-width="7mm"/>
+					<!-- <fo:table-column column-width="7mm"/>-->
 					<fo:table-column column-width="17mm"/>
 					<fo:table-body>
 						<fo:table-row  line-height="10pt">
@@ -113,7 +113,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 							<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" font-weight="bold"> Summe:</fo:block></fo:table-cell>
 							<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" font-weight="bold" text-align="right" content-width="10mm"><xsl:value-of select="gesamtstunden" /></fo:block></fo:table-cell>
 							<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"></fo:block></fo:table-cell>
-							<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"></fo:block></fo:table-cell>
+							<!-- <fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"></fo:block></fo:table-cell>-->
 							<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt"  font-weight="bold" content-width="17mm" text-align="right">EURO <xsl:value-of select="gesamtbetrag" /></fo:block></fo:table-cell>
 						</fo:table-row>
 					</fo:table-body>
@@ -179,7 +179,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="30mm" text-align="center"><xsl:value-of select="gruppe" /></fo:block></fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="10mm" text-align="right"><xsl:value-of select="stunden" /></fo:block></fo:table-cell>
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="8mm" text-align="right"><xsl:value-of select="satz" /></fo:block></fo:table-cell>
-			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="7mm" text-align="right"><xsl:value-of select="faktor" /></fo:block></fo:table-cell>
+			<!-- <fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="7mm" text-align="right"><xsl:value-of select="faktor" /></fo:block></fo:table-cell>-->
 			<fo:table-cell border-width="0.2mm" border-style="solid" ><fo:block font-size="8pt" content-width="17mm" text-align="right">EURO <xsl:value-of select="brutto" /></fo:block></fo:table-cell>
 		</fo:table-row>
 	</xsl:template>
@@ -197,7 +197,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						<fo:table-column column-width="30mm"/>
 						<fo:table-column column-width="10mm"/>
 						<fo:table-column column-width="8mm"/>
-						<fo:table-column column-width="7mm"/>
+						<!-- <fo:table-column column-width="7mm"/>-->
 						<fo:table-column column-width="17mm"/>
 						<fo:table-body>
 				<xsl:apply-templates select="lehreinheit"/>
