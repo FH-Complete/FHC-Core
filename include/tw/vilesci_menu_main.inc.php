@@ -104,9 +104,9 @@ $menu=array
 	),
 	'Personen'=> 	array
 	(
-		'name'=>'Personen', 'opener'=>'true', 'hide'=>'true', 'image'=>'system-users.png', 'permissions'=>array('admin','lv-plan','support','mitarbeiter'),
+		'name'=>'Personen', 'opener'=>'true', 'hide'=>'true', 'image'=>'system-users.png', 'permissions'=>array('admin','lv-plan','support','mitarbeiter','basis/person'),
 		'link'=>'left.php?categorie=Personen', 'target'=>'nav',
-		'Suche'=>array('name'=>'Suche', 'link'=>'personen/suche.php', 'target'=>'main','permissions'=>array('admin','lv-plan','support')),
+		'Suche'=>array('name'=>'Suche', 'link'=>'personen/suche.php', 'target'=>'main','permissions'=>array('admin','lv-plan','support','basis/person')),
 		'Zusammenlegen'=>array('name'=>'Zusammenlegen', 'link'=>'stammdaten/personen_wartung.php', 'target'=>'main', 'permissions'=>array('admin','lv-plan','support')),
 		'Wiederholer'=>array('name'=>'Stg-Wiederholer', 'link'=>'personen/wiederholer.php', 'target'=>'main', 'permissions'=>array('basis/person')),
 		'Gruppen'=>array
@@ -136,7 +136,7 @@ $menu=array
 			//'Neu'=>array('name'=>'Neu', 'link'=>'personen/student_edit.php?new=1', 'target'=>'main'),
 			//'Vorrückung'=>array('name'=>'Vorrückung', 'link'=>'personen/student_vorrueckung.php', 'target'=>'main'),
 		),*/
-		'Betriebsmittel'=>array('name'=>'Betriebsmittel', 'link'=>'stammdaten/betriebsmittel_frameset.html', 'target'=>'main','permissions'=>array('admin','lv-plan','support')),
+		'Betriebsmittel'=>array('name'=>'Betriebsmittel', 'link'=>'stammdaten/betriebsmittel_frameset.html', 'target'=>'main','permissions'=>array('admin','lv-plan','support','basis/betriebsmittel')),
 		'Preinteressenten'=>array('name'=>'Preinteressenten', 'link'=>'personen/preinteressent_frameset.html', 'target'=>'_blank','permissions'=>array('admin','lv-plan','support','preinteressent')),
 		'Incoming'=>array('name'=>'Incoming', 'link'=>'personen/incoming_frameset.php', 'target'=>'_blank','permissions'=>array('inout/incoming')),
         'Outgoing'=>array('name'=>'Outgoing', 'link'=>'personen/outgoing_frameset.php', 'target'=>'_blank','permissions'=>array('inout/outgoing'))
