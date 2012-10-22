@@ -110,16 +110,23 @@ if(isset($_POST['action']) && $_POST['action']=='start')
 					// Raueme bekommen kein Mail
 					continue;
 				}
+				$anrede = trim($anrede);
+				$sign = "Mit freundlichen Grüßen\n\n";
+				$sign .= "Fachhochschule Technikum Wien\n";
+				$sign .= "Höchstädtplatz 5\n";
+				$sign .= "1200 Wien\n";
 				
-				$html=$anrede.'<br>
+				
+				$html=$anrede.'!<br><br>
 					Sie wurden zu einer Terminumfrage zum Thema "'.$db->convert_html_chars($coodle->titel).'" eingeladen.
-					Bitte folgen Sie dem Link um Ihre Terminwünsche bekannt zu geben.
+					<br>
+					Bitte folgen Sie dem Link um Ihre Terminwünsche bekannt zu geben:
 					<a href="'.$link.'">Link zur Terminumfrage</a>
-					';
+					<br><br>'.nl2br($sign);
 				
-				$text=$anrede."\nSie wurden zu einer Terminumfrage zum Thema \"".$db->convert_html_chars($coodle->titel)."\" eingeladen.
-					Bitte folgen Sie dem Link um Ihre Terminwünsche bekannt zu geben.\n
-					$link";
+				$text=$anrede."!\n\nSie wurden zu einer Terminumfrage zum Thema \"".$db->convert_html_chars($coodle->titel)."\" eingeladen.\n
+					Bitte folgen Sie dem Link um Ihre Terminwünsche bekannt zu geben:\n
+					$link\n\n$sign";
 				
 				$mail = new mail($email, 'no-reply@'.DOMAIN,'Termineinladung - '.$coodle->titel, $text);
 				$mail->setHTMLContent($html);
