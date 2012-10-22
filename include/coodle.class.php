@@ -438,7 +438,7 @@ class coodle extends basis_db
 	 * @param $email EMail des externen Teilnehmers
 	 * @return boolean true wenn vorhanden sonst false
 	 */
-	public function RessourceExists($coodle_id, $uid, $ort_kurzbz, $email)
+	public function RessourceExists($coodle_id, $uid, $ort_kurzbz='', $email='')
 	{
 		$qry="SELECT coodle_ressource_id FROM campus.tbl_coodle_ressource WHERE coodle_id=".$this->db_add_param($coodle_id, FHC_INTEGER, false);
 		if($uid!='')
@@ -459,7 +459,7 @@ class coodle extends basis_db
 				return false;
 		}
 	}
-
+   
 	/**
 	 * Validiert die Ressourcedaten vor dem Speichern
 	 */
@@ -585,6 +585,47 @@ class coodle extends basis_db
             return true;
 	}
     
+    public function getRessourceFromUser($coodle_id, $uid='', $zugangscode='')
+    {
+        $qry ="SELECT * FROM campus.tbl_coodle_ressource
+            WHERE coodle_id =".$this->db_add_param($coodle_id, FHC_INTEGER, false); 
+        
+        if($uid != '')
+            $qry.= " AND uid = ".$this->db_add_param($uid, FHC_STRING, false); 
+        
+        if ($zugangscode != '')
+            $qry.= " AND zugangscode = ".$this->db_add_param($zugangscode, FHC_STRING, false);
+
+        $qry.= ';';
+
+        if($result = $this->db_query($qry))
+        {
+            if($row = $this->db_fetch_object($result))
+            {
+                $this->coodle_ressource_id =  $row->coodle_ressource_id;
+                $this->coodle_id = $row->coodle_id; 
+                $this->uid = $row->uid; 
+                $this->ort_kurzbz = $row->ort_kurzbz; 
+                $this->email = $row->email; 
+                $this->name = $row->name; 
+                $this->zugangscode = $row->zugangscode; 
+                $this->insertamum = $row->insertamum; 
+                $this->insertvon = $row->insertvon; 
+                $this->updateamum = $row->updateamum; 
+                $this->updatevon = $row->updatevon; 
+            }
+            else
+            {
+                return false; 
+            }
+            return true; 
+        }
+        else
+        {
+            $this->errormsg = "Fehler bei der Abfrage aufgetreten";
+            return false; 
+        }
+    }
     
     public function deleteRessourceTermin($ressource_id, $coodle_id)
     {
@@ -609,7 +650,7 @@ class coodle extends basis_db
     
     public function checkTermin($termin_id, $ressource_id)
     {
-        if($ressource_id == '' || !is_numeric($ressource_id) || $coodle_id == '' || !is_numeric($coodle_id))
+        if($ressource_id == '' || !is_numeric($ressource_id) || $termin_id == '' || !is_numeric($termin_id))
         {
             $this->errormsg = 'Ungültige ID übergeben';
             return false; 
