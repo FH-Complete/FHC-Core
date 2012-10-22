@@ -394,11 +394,12 @@ class coodle extends basis_db
             return false; 
         }
                 
-        $qry = "SELECT campus.tbl_coodle.* 
+        $qry = "SELECT distinct campus.tbl_coodle.* 
                 FROM campus.tbl_coodle 
                 LEFT JOIN campus.tbl_coodle_ressource USING(coodle_id) 
-                WHERE uid =".$this->db_add_param($uid, FHC_STRING, false)." 
-                    OR ersteller_uid =".$this->db_add_param($uid, FHC_STRING, false)."
+                WHERE 
+					(uid =".$this->db_add_param($uid, FHC_STRING, false)." 
+                    OR ersteller_uid =".$this->db_add_param($uid, FHC_STRING, false).")
                     AND endedatum >= CURRENT_DATE"; 
         
         if(!$this->db_query($qry))
@@ -689,7 +690,7 @@ class coodle extends basis_db
 		else
 		{
 			$qry='UPDATE campus.tbl_coodle_termin SET'.
-				' datum='.$this->db_add_param($this->datum, FHC_STRING, false).
+				' datum='.$this->db_add_param($this->datum, FHC_STRING, false).','.
 				' uhrzeit='.$this->db_add_param($this->uhrzeit, FHC_STRING, false).
 				' WHERE coodle_termin_id='.$this->db_add_param($this->coodle_termin_id, FHC_INTEGER, false).';';
 

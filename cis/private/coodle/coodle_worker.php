@@ -17,6 +17,11 @@
  *
  * Authors: Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at>
  */
+/**
+ * Worker für Coodle
+ * Speichert und Löscht die Termine und Ressourcen einer Coodle Umfrage
+ * Liefert "true" wenn der Vorgang OK war, sonst die Fehlermeldung
+ */
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/ort.class.php');
@@ -46,6 +51,9 @@ switch($work)
 			$typ=$_POST['typ'];
 		else
 			die('Typ Missing');
+
+		if(isset($_POST['bezeichnung']))
+			$bezeichnung=$_POST['bezeichnung'];
 		
 		$coodle = new coodle();
 		if(!$coodle->load($coodle_id))
@@ -62,8 +70,11 @@ switch($work)
 		{
 			case 'Ort': $ort = $id; break;
 			case 'Person': $uid = $id; break;
-			case 'Extern': $email = $id; $name=''; break; // TODO Name setzen
-			default: die('Ungueltiger Typ'); break;
+			case 'Extern': 
+				$email = $id; 
+				$name=$bezeichnung; 
+				break;
+			default: die('Ungueltiger Typ:'.$typ); break;
 		}		
 
 		if($coodle->RessourceExists($coodle_id, $uid, $ort, $email))
@@ -74,7 +85,7 @@ switch($work)
 		$coodle->ort_kurzbz = $ort;
 		$coodle->email = $email;
 		$coodle->name = $name;
-		$coodle->zugangscode = ''; //TODO
+		$coodle->zugangscode = uniqid();
 		$coodle->insertamum = date('Y-m-d H:i:s');
 		$coodle->insertvon = $user;
 		$coodle->updateamum = date('Y-m-d H:i:s');
