@@ -24,6 +24,7 @@ require_once('../../../include/coodle.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/ort.class.php');
+require_once('../../../include/mail.class.php');
 
 $uid = get_uid();
 $sprache = getSprache();
@@ -43,8 +44,24 @@ if(!$coodle->load($coodle_id))
 }
 $event_titel = $coodle->titel;
 
+if($coodle->coodle_status_kurzbz == 'storniert' || $coodle->coodle_status_kurzbz == 'abgeschlossen')
+{
+	die('Diese Umfrage ist bereits beendet');
+}
+
+
 if(isset($_POST['action']) && $_POST['action']=='start')
 {
+
+	echo '<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet"  href="../../../skin/fhcomplete.css" type="text/css">
+		<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
+	</head>
+	<body>
+	<h1>'.$p->t('coodle/coodle').' - '.$p->t('coodle/termine').'</h1>';
+
 	// Start der Umfrage
 	$coodle_termine = new coodle();
 	$coodle_termine->getTermine($coodle_id);
@@ -54,11 +71,16 @@ if(isset($_POST['action']) && $_POST['action']=='start')
 		$coodle_ressource->getRessourcen($coodle_id);
 		if(count($coodle_ressource->result)>0)
 		{
+			// Status aendern
+			$coodle->coodle_status_kurzbz='laufend';
+			if(!$coodle->save(false))
+				die('Fehler beim Setzen des Status:'. $coodle->errormsg);
+
 			foreach($coodle_ressource->result as $row)
 			{
 				if($row->uid!='')
 				{
-					$benuzter = new benutzer();
+					$benutzer = new benutzer();
 					if(!$benutzer->load($row->uid))
 					{
 						echo "Fehler beim Laden des Benutzers ".$db->convert_html_chars($row->uid);
@@ -70,18 +92,18 @@ if(isset($_POST['action']) && $_POST['action']=='start')
 					else
 						$anrede = "Sehr geehrter Herr ";
 						
-					$anrede.= $benutzer->titelpre.' '.$benutzer->vorname.' '.$row->nachname.' '.$row->titelpre;
+					$anrede.= $benutzer->titelpre.' '.$benutzer->vorname.' '.$benutzer->nachname.' '.$benutzer->titelpost;
 					
 					// Interner Teilnehmer
-					$mail = $row->uid.'@'.DOMAIN;
-					$link = APP_ROOT.'cis/public/coodle.php?coodle_id='.$coodle_id.'&uid='.$row->uid;
+					$email = $row->uid.'@'.DOMAIN;
+					$link = APP_ROOT.'cis/public/coodle.php?coodle_id='.urlencode($coodle_id).'&uid='.urlencode($row->uid);
 				}
 				elseif($row->email!='')
 				{
 					// Externe Teilnehmer
-					$mail = $row->email;
+					$email = $row->email;
 					$anrede='Sehr geehrte(r) Herr/Frau '.$row->name; 
-					$link=APP_ROOT.'cis/public/coodle.php?coodle_id='.$coodle_id.'&zugangscode='.$row->zugangscode;
+					$link=APP_ROOT.'cis/public/coodle.php?coodle_id='.urlencode($coodle_id).'&zugangscode='.urlencode($row->zugangscode);
 				}
 				else
 				{
@@ -89,24 +111,26 @@ if(isset($_POST['action']) && $_POST['action']=='start')
 					continue;
 				}
 				
-				$html.=$anrede.'<br>
+				$html=$anrede.'<br>
 					Sie wurden zu einer Terminumfrage zum Thema "'.$db->convert_html_chars($coodle->titel).'" eingeladen.
 					Bitte folgen Sie dem Link um Ihre Terminwünsche bekannt zu geben.
 					<a href="'.$link.'">Link zur Terminumfrage</a>
 					';
 				
-				$text.=$anrede."\nSie wurden zu einer Terminumfrage zum Thema \"".$db->convert_html_chars($coodle->titel)."\" eingeladen.
+				$text=$anrede."\nSie wurden zu einer Terminumfrage zum Thema \"".$db->convert_html_chars($coodle->titel)."\" eingeladen.
 					Bitte folgen Sie dem Link um Ihre Terminwünsche bekannt zu geben.\n
 					$link";
 				
-				$mail = new mail($mail, 'no-reply@'.DOMAIN,'Termineinladung - '.$coodle->titel, $text);
+				$mail = new mail($email, 'no-reply@'.DOMAIN,'Termineinladung - '.$coodle->titel, $text);
 				$mail->setHTMLContent($html);
 				if($mail->send())
 				{
-					echo "Mail an $mail wurde versandt<br>";
+					echo $p->t('coodle/mailVersandtAn',array($email))."<br>";
 				} 
 			}
-			exit();
+
+			echo '<br><b>'.$p->t('coodle/erfolgreichGestartet').'</b>';
+			echo '<br><br><a href="uebersicht.php">'.$p->t('coodle/zurueckZurUebersicht').'</a>';
 		}
 		else
 		{
@@ -118,6 +142,8 @@ if(isset($_POST['action']) && $_POST['action']=='start')
 		die($p->t('coodle/keineTermineVorhanden'));
 	}
 		
+	echo '</body></html>';
+	exit();
 }
 
 echo '<html>
@@ -187,7 +213,7 @@ echo '<html>
 	#ressourcen {
 		width: 150px;
 		padding: 0 10px;
-		margin-top: 50px;
+		margin-top: 30px;
 		border: 1px solid #ccc;
 		background: #eee;
 		text-align: left;
@@ -232,7 +258,7 @@ echo '<html>
 	{
 		width: 150px;
 		padding: 0 10px;
-		margin-top: 50px;
+		margin-top: 30px;
 		border: 1px solid #ccc;
 		background: #eee;
 		text-align: left;
@@ -339,10 +365,18 @@ echo '<html>
 				// assign it the date that was reported
 				copiedEventObject.start = date;
 				copiedEventObject.allDay = allDay;
-				
+
 				// Datum konvertieren
 				datum = $.fullCalendar.formatDate(date, "yyyy-MM-dd");
-				uhrzeit = $.fullCalendar.formatDate(date, "HH:mm:ss");
+				if(allDay)
+				{
+					uhrzeit = "08:00:00";
+					copiedEventObject.start = datum+"T"+uhrzeit;
+					copiedEventObject.allDay=false;
+				}
+				else
+					uhrzeit = $.fullCalendar.formatDate(date, "HH:mm:ss");
+
 				//alert("datum:"+datum+" uhrzeit:"+uhrzeit);
 
 				// Termin Speichern
@@ -380,6 +414,13 @@ echo '<html>
 				
 				datum = $.fullCalendar.formatDate(event.start,"yyyy-MM-dd")
 				uhrzeit = $.fullCalendar.formatDate(event.start,"HH:mm:ss")
+				if(allDay)
+				{
+					uhrzeit = "08:00:00";
+					event.start = datum+"T"+uhrzeit;
+					event.allDay=false;
+					$("#calendar").fullCalendar("renderEvent", event, true);
+				}
 				// Verschiebung Speichern
 				$.ajax({
 					type:"POST",
@@ -474,13 +515,14 @@ echo '
 	<h4>'.$p->t('coodle/dragEvent').'</h4>
 	<div class="external-event">'.$db->convert_html_chars($coodle->titel).'</div>
 	<p>
-	'.$p->t('coodle/terminziehenBeschreibung').'
+	'.$p->t('coodle/terminZiehenBeschreibung').'
 	</p>
 	</div>
 	<div id="ressourcen">
 	<h4>'.$p->t('coodle/ressourcen').'</h4>
 	<div id="ressourcecontainer">
 	</div>
+	<div id="ressourcenInput">
 	<input id="input_ressource" type="text" size="10" />
 	<script>
 	
@@ -535,6 +577,7 @@ echo '
 						"work": "addressource",
 						"id": id, 
 						"typ": typ,
+						"bezeichnung": bezeichnung,
 						"coodle_id": "'.$coodle_id.'"
 					 },
 				success: function(data) 
@@ -692,10 +735,40 @@ echo '
 	});';
 
 echo '
+	function showExterne()
+	{
+		$("#externePersonen").show();
+		$("#ressourcenInput").hide();
+	}
+
+	function showRessourcen()
+	{
+		$("#externePersonen").hide();
+		$("#ressourcenInput").show();
+	}
+		
+	function AddExternal()
+	{
+		name=$("#externePersonName").val();
+		email=$("#externePersonEmail").val();
+		addRessource(email, "Extern", name);
+	}
 	</script>
 	<p>
 	'.$p->t('coodle/ressourcenBeschreibung').'
+	<br><br><a href="#" onclick="showExterne(); return false;">'.$p->t('coodle/externePersonhinzu').'</a>
+	</div> <!-- RessourcenInput -->
+	<div id="externePersonen" style="display: none">
+	<p>
+	'.$p->t('coodle/name').': <input type="text" id="externePersonName" size="15">
+	'.$p->t('coodle/email').': <input type="text" id="externePersonEmail" size="15"><br><br>
+	'.$p->t('coodle/externeBeschreibung').'
 	</p>
+	<input type="button" value="'.$p->t('coodle/externenHinzufuegen').'" onclick="AddExternal()">
+	<br><br><a href="#" onclick="showRessourcen(); return false;">'.$p->t('coodle/Ressourcenhinzu').'</a>
+	</div>
+	</p>
+
 	</div>
 	<div id="fertig">
 		<h4>'.$p->t('coodle/umfrageStarten').'</h4>
