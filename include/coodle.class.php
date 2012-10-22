@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
+ *          Karl Burkhart <burkhart@technikum-wien.at>
  */
 /**
  * Klasse Coodle
@@ -47,6 +48,12 @@ class coodle extends basis_db
     public $email;                  // varchar(128)
     public $name;                   // varchar(256)
     public $zugangscode;            // varchar(64)
+    
+    // tbl_coodle_termin
+    public $coodle_termin_id;       // integer
+    public $datum;                  // date
+    public $uhrzeit;                // date
+    public $auswahl;                // boolean
 
 	/**
 	 * Konstruktor
@@ -432,13 +439,13 @@ class coodle extends basis_db
 	 */
 	public function RessourceExists($coodle_id, $uid, $ort_kurzbz, $email)
 	{
-		$qry="SELECT coodle_ressource_id FROM campus.tbl_coodle_ressource WHERE coodle_id=".$this->db_add_param($coodle_id, FHC_INTEGER);
+		$qry="SELECT coodle_ressource_id FROM campus.tbl_coodle_ressource WHERE coodle_id=".$this->db_add_param($coodle_id, FHC_INTEGER, false);
 		if($uid!='')
-			$qry.=' AND uid='.$this->db_add_param($uid);
+			$qry.=' AND uid='.$this->db_add_param($uid, FHC_STRING, false);
 		if($ort_kurzbz!='')
-			$qry.=' AND ort_kurzbz='.$this->db_add_param($ort_kurzbz);
+			$qry.=' AND ort_kurzbz='.$this->db_add_param($ort_kurzbz, FHC_STRING, false);
 		if($email!='')
-			$qry.=' AND email='.$this->db_add_param($email);
+			$qry.=' AND email='.$this->db_add_param($email, FHC_STRING, false);
 
 		if($result = $this->db_query($qry))
 		{
@@ -480,7 +487,7 @@ class coodle extends basis_db
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO campus.tbl_coodle_ressource(coodle_id, uid, ort_kurzbz,
 				email, name, zugangscode, insertamum, insertvon, updateamum, updatevon) VALUES('.
-			      $this->db_add_param($this->coodle_id).', '.
+			      $this->db_add_param($this->coodle_id, FHC_INTEGER).', '.
 			      $this->db_add_param($this->uid).', '.
 			      $this->db_add_param($this->ort_kurzbz).', '.
 			      $this->db_add_param($this->email).', '.
@@ -532,7 +539,98 @@ class coodle extends basis_db
 			return false;
 		}
 	}
+    
+    
+    /**
+	 * Speichert die aktuelle Ressource in die Datenbank
+	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der ID in $coodle_id aktualisiert
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function saveRessourceTermin($new = null)
+	{
+		if(is_null($new))
+			$new = $this->new;
+		
+		//Variablen pruefen
+		if(!$this->validateRessource())
+			return false;
 
+		if($new)
+		{
+            
+            // Zuerst alle Termine der person löschen
+            
+           // $this->deleteRessourceTermin($this->coodle_ressource_id, $this->coodle_termin_id); 
+			//Neuen Datensatz einfuegen
+			$qry='INSERT INTO campus.tbl_coodle_ressource_termin(coodle_ressource_id, coodle_termin_id, insertamum, insertvon) VALUES('.
+                  $this->db_add_param($this->coodle_ressource_id, FHC_INTEGER, false).', '.
+			      $this->db_add_param($this->coodle_termin_id, FHC_INTEGER, false).', 
+                      CURRENT_TIMESTAMP, '.
+			      $this->db_add_param($this->insertvon, FHC_STRING).');';
+		}
+		else
+		{
+			$this->errormsg = 'Update not Implemented';
+			return false;
+		}
+		
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
+			return false;
+		}
+        else
+            return true;
+	}
+    
+    
+    public function deleteRessourceTermin($ressource_id, $coodle_id)
+    {
+        if($ressource_id == '' || !is_numeric($ressource_id) || $coodle_id == '' || !is_numeric($coodle_id))
+        {
+            $this->errormsg = 'Ungültige ID übergeben';
+            return false; 
+        }
+        
+        $qry="DELETE FROM campus.tbl_coodle_ressource_termin
+            WHERE coodle_ressource_id =".$this->db_add_param($ressource_id, FHC_INTEGER)."
+                AND coodle_termin_id IN (SELECT coodle_termin_id FROM campus.tbl_coodle_termin WHERE coodle_id =".$this->db_add_param($coodle_id, FHC_INTEGER).");";
+        
+        $this->errormsg = $qry; 
+        
+        if($this->db_query($qry))
+            return true; 
+        else
+            return false; 
+    }
+
+    
+    public function checkTermin($termin_id, $ressource_id)
+    {
+        if($ressource_id == '' || !is_numeric($ressource_id) || $coodle_id == '' || !is_numeric($coodle_id))
+        {
+            $this->errormsg = 'Ungültige ID übergeben';
+            return false; 
+        }
+        
+        $qry="SELECT * FROM campus.tbl_coodle_ressource_termin 
+            WHERE coodle_ressource_id =".$this->db_add_param($ressource_id, FHC_INTEGER)."
+                AND coodle_termin_id=".$this->db_add_param($termin_id, FHC_INTEGER).';';
+        
+        if($result = $this->db_query($qry))
+        {
+            if($row = $this->db_fetch_row($result))
+            {
+                return true; 
+            }
+            return false; 
+        }
+        
+        return false; 
+    }
+    
+    
 	/**
 	 * Entfernt eine Ressourcezuteilung von einer Umfrage
 	 * @param $coodle_ressource_id ID der Ressourcezuteilung
@@ -540,8 +638,14 @@ class coodle extends basis_db
 	 */	
 	public function deleteRessource($coodle_ressource_id)
 	{
-		$qry = "DELETE FROM campus.tbl_coodle_ressource_termin WHERE coodle_ressource_id=".$this->db_add_param($coodle_ressource_id, FHC_INTEGER).";
-				DELETE FROM campus.tbl_coodle_ressource WHERE coodle_ressource_id=".$this->db_add_param($coodle_ressource_id).";";
+        if($coodle_ressource_id == '' || !is_numeric($coodle_ressource_id))
+        {
+            $this->errormsg = 'Ungültige ID übergeben';
+            return false; 
+        }
+        
+		$qry = "DELETE FROM campus.tbl_coodle_ressource_termin WHERE coodle_ressource_id=".$this->db_add_param($coodle_ressource_id, FHC_INTEGER, false).";
+				DELETE FROM campus.tbl_coodle_ressource WHERE coodle_ressource_id=".$this->db_add_param($coodle_ressource_id, FHC_INTEGER, false).";";
 
 		if($this->db_query($qry))
 			return true;
@@ -578,16 +682,17 @@ class coodle extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO campus.tbl_coodle_termin(coodle_id, datum, uhrzeit, auswahl) VALUES('.
-			      $this->db_add_param($this->coodle_id).', '.
-			      $this->db_add_param($this->datum).', '.
-			      $this->db_add_param($this->uhrzeit).', false);';
+			      $this->db_add_param($this->coodle_id, FHC_INTEGER, false).', '.
+			      $this->db_add_param($this->datum, FHC_STRING, false).', '.
+			      $this->db_add_param($this->uhrzeit, FHC_STRING, false).', false);';
 		}
 		else
 		{
 			$qry='UPDATE campus.tbl_coodle_termin SET'.
-				' datum='.$this->db_add_param($this->datum).','.
-				' uhrzeit='.$this->db_add_param($this->uhrzeit).
-				' WHERE coodle_termin_id='.$this->db_add_param($this->coodle_termin_id);
+				' datum='.$this->db_add_param($this->datum, FHC_STRING, false).
+				' uhrzeit='.$this->db_add_param($this->uhrzeit, FHC_STRING, false).
+				' WHERE coodle_termin_id='.$this->db_add_param($this->coodle_termin_id, FHC_INTEGER, false).';';
+
 		}
 		
 		if($this->db_query($qry))
@@ -601,18 +706,18 @@ class coodle extends basis_db
 					if($row = $this->db_fetch_object())
 					{
 						$this->coodle_termin_id = $row->id;
-						$this->db_query('COMMIT');
+						$this->db_query('COMMIT;');
 					}
 					else
 					{
-						$this->db_query('ROLLBACK');
+						$this->db_query('ROLLBACK;');
 						$this->errormsg = "Fehler beim Auslesen der Sequence";
 						return false;
 					}
 				}
 				else
 				{
-					$this->db_query('ROLLBACK');
+					$this->db_query('ROLLBACK;');
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
 					return false;
 				}
@@ -634,7 +739,7 @@ class coodle extends basis_db
 	public function getTermine($coodle_id)
 	{
 		$qry = "SELECT * FROM campus.tbl_coodle_termin WHERE coodle_id=".$this->db_add_param($coodle_id);
-
+		
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
@@ -656,6 +761,48 @@ class coodle extends basis_db
 			return false;
 		}
 	}
+
+        
+    /**
+     * Gibt die Coodle Umfrage zurück in der sich die Ressource mit dem übergebenen Zugangscode befindet
+     * @param string $zugangscode
+     * @return boolean 
+     */
+    public function getCoodleFromZugangscode($zugangscode)
+    {
+        $qry = "SELECT tbl_coodle.* from campus.tbl_coodle 
+            JOIN campus.tbl_coodle_ressource USING(coodle_id) 
+            WHERE zugangscode =".$this->db_add_param($zugangscode, FHC_STRING); 
+        
+        if($result = $this->db_query($qry))
+        {
+            while($row = $this->db_fetch_object($result))
+            {
+                $coodle = new coodle(); 
+                
+                $coodle->coodle_id = $row->coodle_id; 
+                $coodle->ersteller_uid = $row->ersteller_uid; 
+                $coodle->titel = $row->titel; 
+                $coodle->beschreibung = $row->beschreibung; 
+                $coodle->coodle_status_kurzbz = $row->coodle_status_kurzbz; 
+                $coodle->dauer = $row->dauer; 
+                $coodle->endedatum = $row->endedatum; 
+                $coodle->insertamum = $row->insertamum; 
+                $coodle->insertvon = $row->insertvon;
+                $coodle->updateamum = $row->updateamum; 
+                $coodle->updatevon = $row->updatevon; 
+                
+                $this->result[] = $coodle; 
+            }
+            return true; 
+        }
+        else
+        {
+            $this->errormsg = 'Fehler beim Laden der Daten';
+            return false; 
+        }
+    }
+
 
 	/**
 	 * Laedt einen Termin
