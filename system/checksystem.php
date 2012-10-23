@@ -3881,6 +3881,54 @@ if(!@$db->db_query("SELECT 1 FROM campus.tbl_coodle LIMIT 1"))
         echo 'Tabelle fuer Coodle hinzugefuegt<br>';
 }
 
+// Lehre Tools
+if(!@$db->db_query("SELECT 1 FROM campus.tbl_lehre_tools LIMIT 1"))
+{
+    $qry ="
+    CREATE TABLE campus.tbl_lehre_tools
+    (
+    	lehre_tools_id bigint NOT NULL,
+    	bezeichnung varchar(256)[],
+    	kurzbz varchar(32),
+    	basis_url varchar(256) NOT NULL,
+    	logo_dms_id bigint
+    );
+    
+    CREATE TABLE campus.tbl_lehre_tools_organisationseinheit
+    (
+    	lehre_tools_id bigint NOT NULL,
+    	oe_kurzbz varchar(32) NOT NULL,
+    	aktiv boolean NOT NULL DEFAULT true
+    );
+    
+    CREATE SEQUENCE campus.seq_lehre_tools_lehre_tools_id
+ 	INCREMENT BY 1
+ 	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+	
+	GRANT SELECT, UPDATE ON SEQUENCE campus.seq_lehre_tools_lehre_tools_id TO web;
+	GRANT SELECT, UPDATE ON SEQUENCE campus.seq_lehre_tools_lehre_tools_id TO vilesci;
+	
+	ALTER TABLE campus.tbl_lehre_tools ADD CONSTRAINT pk_lehre_tools PRIMARY KEY (lehre_tools_id);
+    ALTER TABLE campus.tbl_lehre_tools ALTER COLUMN lehre_tools_id SET DEFAULT nextval('campus.seq_lehre_tools_lehre_tools_id');
+    ALTER TABLE campus.tbl_lehre_tools ADD CONSTRAINT fk_dms_lehre_tools FOREIGN KEY(logo_dms_id) REFERENCES campus.tbl_dms (dms_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+    
+    ALTER TABLE campus.tbl_lehre_tools_organisationseinheit ADD CONSTRAINT pk_lehre_tools_organisationseinheit PRIMARY KEY (lehre_tools_id, oe_kurzbz);
+    ALTER TABLE campus.tbl_lehre_tools_organisationseinheit ADD CONSTRAINT fk_organisationseinheit_lehre_tools_organisationseinheit FOREIGN KEY(oe_kurzbz) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;
+    
+    GRANT SELECT ON campus.tbl_lehre_tools TO web;
+    GRANT SELECT ON campus.tbl_lehre_tools_organisationseinheit TO web;
+    
+    GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_lehre_tools TO vilesci;
+    GRANT SELECT, INSERT, UPDATE, DELETE ON campus.tbl_lehre_tools_organisationseinheit TO vilesci;	   	
+    ";
+    
+    if(!$db->db_query($qry))
+        echo '<strong>campus.tbl_lehre_tools: '.$db->db_last_error().'</strong><br>';
+    else
+        echo 'Tabelle campus.tbl_lehre_tools und campus.tbl_lehre_tools_organisationeinheit hinzugefuegt<br>';
+}
 echo '<br>';
 
 $tabellen=array(
@@ -3929,6 +3977,8 @@ $tabellen=array(
 	"campus.tbl_infoscreen"  => array("infoscreen_id","bezeichnung","beschreibung","ipadresse"),
 	"campus.tbl_infoscreen_content"  => array("infoscreen_content_id","infoscreen_id","content_id","gueltigvon","gueltigbis","insertamum","insertvon","updateamum","updatevon","refreshzeit"),
 	"campus.tbl_legesamtnote"  => array("student_uid","lehreinheit_id","note","benotungsdatum","updateamum","updatevon","insertamum","insertvon"),
+	"campus.tbl_lehre_tools" => array("lehre_tools_id","bezeichnung","kurzbz","basis_url","logo_dms_id"),
+	"campus.tbl_lehre_tools_organisationseinheit" => array("lehre_tools_id","oe_kurzbz","aktiv"),
 	"campus.tbl_lvgesamtnote"  => array("lehrveranstaltung_id","studiensemester_kurzbz","student_uid","note","mitarbeiter_uid","benotungsdatum","freigabedatum","freigabevon_uid","bemerkung","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_lvinfo"  => array("lehrveranstaltung_id","sprache","titel","lehrziele","lehrinhalte","methodik","voraussetzungen","unterlagen","pruefungsordnung","anmerkung","kurzbeschreibung","genehmigt","aktiv","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_news"  => array("news_id","uid","studiengang_kz","fachbereich_kurzbz","semester","betreff","text","datum","verfasser","updateamum","updatevon","insertamum","insertvon","datum_bis","content_id"),
