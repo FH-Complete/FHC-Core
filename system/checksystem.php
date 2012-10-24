@@ -3915,6 +3915,7 @@ if(!@$db->db_query("SELECT 1 FROM campus.tbl_lehre_tools LIMIT 1"))
     ALTER TABLE campus.tbl_lehre_tools ADD CONSTRAINT fk_dms_lehre_tools FOREIGN KEY(logo_dms_id) REFERENCES campus.tbl_dms (dms_id) ON DELETE RESTRICT ON UPDATE CASCADE;
     
     ALTER TABLE campus.tbl_lehre_tools_organisationseinheit ADD CONSTRAINT pk_lehre_tools_organisationseinheit PRIMARY KEY (lehre_tools_id, oe_kurzbz);
+    ALTER TABLE campus.tbl_lehre_tools_organisationseinheit ADD CONSTRAINT fk_lehre_tools_lehre_tools_organisationseinheit FOREIGN KEY(lehre_tools_id) REFERENCES campus.tbl_lehre_tools (lehre_tools_id) ON DELETE CASCADE ON UPDATE CASCADE;
     ALTER TABLE campus.tbl_lehre_tools_organisationseinheit ADD CONSTRAINT fk_organisationseinheit_lehre_tools_organisationseinheit FOREIGN KEY(oe_kurzbz) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;
     
     GRANT SELECT ON campus.tbl_lehre_tools TO web;
