@@ -633,7 +633,29 @@
 	echo '<td class="tdvertical" align="center">';
 	echo '<a href="'.$mailto.'" '.$nomail.'><img border="0" src="../../../skin/images/button_fb.jpg" width="67" height="45"><br><strong>'.$p->t('lehre/mail').'</strong></a>';
 	echo '</td>';
-
+	
+	$lehretools = new lehre_tools();
+	if($lehretools->getTools($lvid, $angezeigtes_stsem))
+	{
+		if(count($lehretools->result)>0)
+		{
+			echo "\n</tr><tr>\n";
+			foreach($lehretools->result as $row)
+			{
+				echo "\n";
+				echo '<td class="tdvertical" align="center">';
+				echo '<a href="'.$row->basis_url.'" target="_blank">';
+				if($row->logo_dms_id!='')
+					echo '<img src="../../../cms/dms.php?id='.$row->logo_dms_id.'" width="67" height="45"><br>';
+									
+				echo ' <strong>'.$row->bezeichnung[$sprache].'</strong>';
+				
+				if($row->logo_dms_id!='')
+				  echo '</a>';
+				echo '</td>';
+			}
+		}
+	}
   ?>
 	</tr>
 </table>
