@@ -24,6 +24,7 @@ require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/infoscreen.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/datum.class.php');
+require_once('../../include/content.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -189,13 +190,24 @@ $datum_obj = new datum();
 			</thead>
 			<tbody>';
 			
+	$jetzt = date('d.m.Y H:i:s');
+	$aktiv=false;
+
 	foreach($infoscreen->result as $row)
 	{
-		echo '<tr>';
+		$content = new content();
+		$content->getContent($row->content_id, 'German');
+		
+		if ((($datum_obj->formatDatum($row->gueltigvon,'d.m.Y H:i:s') <= $jetzt) || ($row->gueltigvon==NULL)) && (($datum_obj->formatDatum($row->gueltigbis,'d.m.Y H:i:s') >= $jetzt) || ($row->gueltigbis==NULL)))
+			$aktiv=true;
+		else 
+			$aktiv=false;
+		
+		echo '<tr '.($aktiv?'':'style="color:grey"'). '>';
 		echo '<td>',$db->convert_html_chars($row->infoscreen_content_id),'</td>';
 		echo '<td>',$db->convert_html_chars($row->infoscreen_id),'</td>';
 		echo '<td>',$db->convert_html_chars($row->content_id),'</td>';
-		echo '<td>',$db->convert_html_chars($row->titel),'</td>';
+		echo '<td>',$db->convert_html_chars($content->titel),'</td>';
 		echo '<td>',$db->convert_html_chars($datum_obj->formatDatum($row->gueltigvon,'d.m.Y H:i:s')),'</td>';		
 		echo '<td>',$db->convert_html_chars($datum_obj->formatDatum($row->gueltigbis,'d.m.Y H:i:s')),'</td>';
 		echo '<td>',$db->convert_html_chars($row->refreshzeit),'</td>';
