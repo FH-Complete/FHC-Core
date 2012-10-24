@@ -767,8 +767,8 @@ echo '
 	</div> <!-- RessourcenInput -->
 	<div id="externePersonen" style="display: none">
 	<p>
-	'.$p->t('coodle/name').': <input type="text" id="externePersonName" size="15">
-	'.$p->t('coodle/email').': <input type="text" id="externePersonEmail" size="15"><br><br>
+	'.$p->t('coodle/name').':<br> <input type="text" id="externePersonName" size="15"><br>
+	'.$p->t('coodle/email').':<br> <input type="text" id="externePersonEmail" size="15"><br><br>
 	'.$p->t('coodle/externeBeschreibung').'
 	</p>
 	<input type="button" value="'.$p->t('coodle/externenHinzufuegen').'" onclick="AddExternal()">
