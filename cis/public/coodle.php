@@ -231,7 +231,7 @@ if(isset ($_POST['save']))
                 $name = $ressource->name; 
             
             if($ressource->ort_kurzbz != '')
-                $name = $ressource->ort_kurzbz; 
+                continue;  
             
             // eigene Reihe farbig hervorheben
             if(isset($_GET['zugangscode']) && $_GET['zugangscode'] == $ressource->zugangscode)
