@@ -1,8 +1,8 @@
 <?php
 $this->phrasen['freifach/freifaecher']='Freifächer';
 $this->phrasen['freifach/freifach']='Freifach';
-$this->phrasen['freifach/freifaecherAnmeldung']='Freifächer Anmeldung';
-$this->phrasen['freifach/markierenFreifachFuerAnmeldung']='Bitte markieren Sie die Freifächer für die Sie sich Anmelden möchten';
+$this->phrasen['freifach/freifaecherAnmeldung']='Freifächer An-/Abmeldung';
+$this->phrasen['freifach/markierenFreifachFuerAnmeldung']='Bitte markieren Sie die Freifächer für die Sie sich An- bzw. Abmelden möchten';
 $this->phrasen['freifach/fehlerBeimAktualisieren']='Fehler beim aktualisieren der Freifächerzuteilung! Bitte Versuchen Sie es erneut';
 $this->phrasen['freifach/freifaecherNichtZugeteilt']='Freifächer konnten nicht zugeteilt werden! Bitte Versuchen Sie es erneut';
 $this->phrasen['freifach/datenErfolgreichAktualisiert']='Ihre Daten wurden erfolgreich aktualisiert';
