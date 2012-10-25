@@ -19,12 +19,11 @@
  * Authors: Karl Burkhart 	<burkhart@technikum-wien.at>
  */
 
-
-
 require_once('../../config/cis.config.inc.php');
 require_once('../../include/phrasen.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/coodle.class.php');
+require_once('../../include/datum.class.php');
 
 if(isset($_GET['lang']))
 	setSprache($_GET['lang']);
@@ -40,9 +39,25 @@ $coodle = new coodle();
 if(!$coodle->load($coodle_id))
     die($coodle->errormsg); 
 
+if(!$coodle->checkStatus($coodle_id))
+    die('Umfrage ist schon beendet oder noch nicht gestartet'); 
+
 // authentifizierung
 if(!isset($_GET['zugangscode']))
-    $uid = get_uid(); 
+{
+    $uid = get_uid();    
+    if(!$coodle->checkBerechtigung($coodle_id, $uid))
+        die('Keine Berechtiung für diese Umfrage'); 
+}
+else
+{
+    if(!$coodle->checkBerechtigung($coodle_id, '', $_GET['zugangscode']))
+        die('Keine Berechtigung für diese Umfrage'); 
+}
+
+// Überprüfen ob Coodle Status laufend hat 
+
+
 
 // checkboxen speichern
 if(isset ($_POST['save']))
@@ -55,6 +70,7 @@ if(isset ($_POST['save']))
         
         $coodle_help->getRessourceFromUser($coodle_id, '', $_GET['zugangscode']);
         $coodle_ressource_termin= $coodle_help->deleteRessourceTermin($coodle_help->coodle_ressource_id, $coodle_id);  
+        $message = "<span class='ok'>Erfolgreich gespeichert</span>";   // weil wenn alle checkboxen gelöscht werden kommt man nicht mehr in die speichern schleife
     }
     else
     {
@@ -62,6 +78,7 @@ if(isset ($_POST['save']))
         {
             $coodle_help->getRessourceFromUser($coodle_id, $uid);
             $coodle_ressource_termin= $coodle_help->deleteRessourceTermin($coodle_help->coodle_ressource_id, $coodle_id);
+            $message = "<span class='ok'>Erfolgreich gespeichert</span>"; 
         }
     }
     
@@ -80,9 +97,9 @@ if(isset ($_POST['save']))
             $coodle_ressource_termin->new = true; 
 
             if(!$coodle_ressource_termin->saveRessourceTermin())
-                $message= "Fehler beim Speichern aufgetreten"; 
+                $message= "<span class='error'>Fehler beim Speichern aufgetreten</span>"; 
             else
-                $message = "Erfolgreich gespeichert"; 
+                $message = "<span class='ok'>Erfolgreich gespeichert</span>"; 
         }
     }
 }
@@ -91,29 +108,68 @@ if(isset ($_POST['save']))
 
 <!DOCTYPE html>
 <head>
-<meta charset="utf-8">
-<title>Coodle Übersicht</title>
-<style type="text/css">
-    body {
-	background: #f9f9f9;
-	color: #000;
-	font: 14px Arial;
-	margin: 0 auto;
-	padding: 0;
-	position: relative;
-}
-h1,h2,h3,h4,h5,h6{ color:#008462;}
+    <meta charset="utf-8">
+    <title>Coodle Übersicht</title>
+    <style type="text/css">
+        body {
+        background: #f9f9f9;
+        color: #000;
+        font: 14px Arial;
+        margin: 0 auto;
+        padding: 0;
+        position: relative;
+    }
+    h1,h2,h3,h4,h5,h6{ color:#008462;}
 
-h5 {margin-top:0px; }
-.container {width: 100%; }
-#header {
-	background: #DCDDDF;;
-	border: 1px solid #c4c6ca;
-	position: relative;
-    padding-left: 50px; 
-	width: 100%;
-}
-</style>
+    h5 {margin-top:0px; }
+    .container {width: 100%; }
+    #header {
+        background: #DCDDDF;
+        border: 1px solid #c4c6ca;
+        position: relative;
+        padding-left: 50px; 
+
+    }
+
+    .error {
+        color:red;
+        padding-left:20px; 
+    }
+
+    .ok {
+        color:green; 
+        padding-left:20px;
+    }
+
+    #content {
+        padding: 20px 20px;
+    }
+
+    #content th {
+        color:#008462; 
+        padding-left: 10px; 
+        padding-right: 10px; 
+    }
+    
+    #content tr.owner
+    {
+        background-color: #DCDDDF;
+    }
+    
+    a
+    {
+        color: #008381; text-decoration: none;
+        cursor: pointer;
+    }
+    a:hover
+    {
+        color: Black; text-decoration: none;
+    }
+    #content table{
+        
+    }
+
+    </style>
 
 </head>
 <body>
@@ -144,15 +200,23 @@ h5 {margin-top:0px; }
         $coodle_termine = new coodle(); 
         $coodle_termine->getTermine($coodle_id);
         
-        echo "
-            <div class='container'>
-                <section id='content'>
+        $datum = new datum(); 
+        
+        echo "<br>&nbsp;";
+        if(!isset($_GET['zugangscode']))
+            echo "<a href='".APP_ROOT."/cis/private/coodle/uebersicht.php'><< zurück zur Übersicht</a>"; 
+        echo "<section id='content'>
                     <form action='' method='POST'>
 
                 <table>
                 <tr><td></td>";
         foreach($coodle_termine->result as $termin)
-            echo "<td>".$termin->datum.' '.$termin->uhrzeit."</td>";
+        {
+            $time = strtotime($termin->uhrzeit); 
+            
+            
+            echo "<th>".$datum->formatDatum($termin->datum, 'd.m.Y').'<br>'.date('H:i',$time)."</th>";
+        }
         
         echo "</tr>";
         
@@ -160,13 +224,23 @@ h5 {margin-top:0px; }
         foreach($coodle_ressourcen->result as $ressource)
         {
             $name = '';
+            $class ='normal'; 
+            
+            // wenn uid gesetzt ist nimm uid
             if($ressource->uid != '')
                 $name = $ressource->uid; 
-            
-            if($ressource->zugangscode !='')
+            // wenn uid nicht gesetzt ist nimm zugangscode
+            if($ressource->zugangscode !='' && $ressource->uid =='')
                 $name = $ressource->name; 
             
-            echo "<tr><td>".$name."</td>";
+            // eigene Reihe farbig hervorheben
+            if(isset($_GET['zugangscode']) && $_GET['zugangscode'] == $ressource->zugangscode)
+                $class ='owner';
+            
+            if(!isset($_GET['zugangscode']) && $ressource->uid == $uid)
+                $class = 'owner';
+                
+            echo "<tr class='".$class."'><td>".$name."</td>";
             // termine zu ressourcen anzeigen
             foreach($coodle_termine->result as $termin)
             {
@@ -195,10 +269,10 @@ h5 {margin-top:0px; }
         }
         
         echo "
-            
+            <tr><td>&nbsp;</td></tr>
             <tr><td><input type='submit' value='save' name='save'></td></tr>
             </table>
-            </form></section></div>";
+            </form></section></div>".$message;
 
         ?>
     </div>

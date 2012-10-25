@@ -23,6 +23,7 @@ require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/coodle.class.php');
 require_once('../../../include/functions.inc.php'); 
 require_once('../../../include/phrasen.class.php');
+require_once('../../../include/datum.class.php'); 
 
 $lang = getSprache(); 
 
@@ -94,7 +95,7 @@ if($method=='delete')
         else
         {
             if($coodle->delete($coodle_id))
-                $message ='<span class="ok">'.$p->t('global/erfolgreichgelöscht').'</span>';
+                $message ='<span class="ok">Erfolgreich storniert!</span>';
             else
                 $message ='<span class="error">'.$p->t('coodle/umfrageKonnteNichtGeloeschtWerden').'</span>';
         }
@@ -115,10 +116,12 @@ echo'<h1>'.$p->t('coodle/uebersicht').'</h1>
             <th width="40%">'.$p->t('coodle/beschreibung').'</th>
             <th>'.$p->t('coodle/letzterStatus').'</th>
             <th>'.$p->t('coodle/ersteller').'</th>
+            <th>Endedatum</th>
             <th>'.$p->t('coodle/aktion').'</th>
         </tr>
     </thead>';
 
+$datum = new datum(); 
 $coodle = new coodle(); 
 $coodle->getCoodleFromUser($uid);
 foreach($coodle->result as $c)
@@ -126,12 +129,14 @@ foreach($coodle->result as $c)
     echo '<tr>
             <td>'.$coodle->convert_html_chars($c->coodle_id).'</td>
             <td>'.$coodle->convert_html_chars($c->titel).'</td>
-            <td>'.$coodle->convert_html_chars(substr($c->beschreibung,0,40)).'</td>
+            <td>'.(substr($c->beschreibung,0,40)).'</td>
             <td>'.$coodle->convert_html_chars($c->coodle_status_kurzbz).'</td>
             <td>'.$coodle->convert_html_chars($c->ersteller_uid).'</td>
+            <td>'.$coodle->convert_html_chars($datum->formatDatum($c->endedatum, 'd.m.Y')).'</td>
             <td>
-                <a href="stammdaten.php?coodle_id='.$c->coodle_id.'" target="_blank" onclick="return conf_user(\''.$c->ersteller_uid.'\');">&nbsp;<img src="../../../skin/images/edit.png"></a> 
-                <a href="'.$_SERVER['PHP_SELF'].'?method=delete&coodle_id='.$c->coodle_id.'" onclick="return conf_user(\''.$c->ersteller_uid.'\');">&nbsp;<img src="../../../skin/images/delete_x.png"></a>
+                <a href="stammdaten.php?coodle_id='.$c->coodle_id.'" target="_blank" onclick="return conf_user(\''.$c->ersteller_uid.'\');">&nbsp;<img src="../../../skin/images/edit.png" title="Umfrage bearbeiten"></a> 
+                <a href="'.$_SERVER['PHP_SELF'].'?method=delete&coodle_id='.$c->coodle_id.'" onclick="return conf_user(\''.$c->ersteller_uid.'\');">&nbsp;<img src="../../../skin/images/delete_x.png" title="Umfrage löschen"></a>
+                <a href="../../public/coodle.php?coodle_id='.$c->coodle_id.'"> &nbsp; <img src="../../../skin/images/date_go.png" title="zur Umfrage"></a>
             </td>
         </tr>';
 }
