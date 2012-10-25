@@ -41,7 +41,7 @@ if(!$coodle->load($coodle_id))
 
 // Überprüfen ob Coodle Status laufend hat 
 if(!$coodle->checkStatus($coodle_id))
-    die('Umfrage ist schon beendet oder noch nicht gestartet'); 
+    die('Umfrage ist nicht mehr gültig'); 
 
 // authentifizierung
 if(!isset($_GET['zugangscode']))
