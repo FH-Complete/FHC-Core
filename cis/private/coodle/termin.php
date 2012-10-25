@@ -514,6 +514,7 @@ echo '
 //echo '<h2>'.$coodle->titel.'</h2>';
 //echo $coodle->beschreibung;
 
+echo '<a href="stammdaten.php?coodle_id='.$coodle_id.'">'.$p->t('coodle/ZurueckzumBearbeiten').'</a>';
 echo '
 <div id="wrap">
 
@@ -759,6 +760,8 @@ echo '
 		name=$("#externePersonName").val();
 		email=$("#externePersonEmail").val();
 		addRessource(email, "Extern", name);
+		$("#externePersonName").val("");
+		$("#externePersonEmail").val("");
 	}
 	</script>
 	<p>
