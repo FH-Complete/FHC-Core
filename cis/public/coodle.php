@@ -39,6 +39,7 @@ $coodle = new coodle();
 if(!$coodle->load($coodle_id))
     die($coodle->errormsg); 
 
+// Überprüfen ob Coodle Status laufend hat 
 if(!$coodle->checkStatus($coodle_id))
     die('Umfrage ist schon beendet oder noch nicht gestartet'); 
 
@@ -54,10 +55,6 @@ else
     if(!$coodle->checkBerechtigung($coodle_id, '', $_GET['zugangscode']))
         die('Keine Berechtigung für diese Umfrage'); 
 }
-
-// Überprüfen ob Coodle Status laufend hat 
-
-
 
 // checkboxen speichern
 if(isset ($_POST['save']))
@@ -232,6 +229,9 @@ if(isset ($_POST['save']))
             // wenn uid nicht gesetzt ist nimm zugangscode
             if($ressource->zugangscode !='' && $ressource->uid =='')
                 $name = $ressource->name; 
+            
+            if($ressource->ort_kurzbz != '')
+                $name = $ressource->ort_kurzbz; 
             
             // eigene Reihe farbig hervorheben
             if(isset($_GET['zugangscode']) && $_GET['zugangscode'] == $ressource->zugangscode)

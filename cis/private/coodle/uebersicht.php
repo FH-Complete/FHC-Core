@@ -129,7 +129,7 @@ foreach($coodle->result as $c)
     echo '<tr>
             <td>'.$coodle->convert_html_chars($c->coodle_id).'</td>
             <td>'.$coodle->convert_html_chars($c->titel).'</td>
-            <td>'.(substr($c->beschreibung,0,40)).'</td>
+            <td>'.$c->beschreibung.'</td>
             <td>'.$coodle->convert_html_chars($c->coodle_status_kurzbz).'</td>
             <td>'.$coodle->convert_html_chars($c->ersteller_uid).'</td>
             <td>'.$coodle->convert_html_chars($datum->formatDatum($c->endedatum, 'd.m.Y')).'</td>
