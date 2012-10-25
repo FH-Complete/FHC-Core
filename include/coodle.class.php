@@ -223,7 +223,7 @@ class coodle extends basis_db
 	}
 
 	/**
-	 * Loescht den Datenensatz mit der ID die uebergeben wird
+	 * Loescht den Datenensatz mit der ID die uebergeben wird => Status wird auf storniert gesetzt
 	 * @param $coodle_id ID die geloescht werden soll
 	 * @return true wenn ok, false im Fehlerfall
 	 */
@@ -237,7 +237,9 @@ class coodle extends basis_db
 		}
 
 		//loeschen des Datensatzes
-		$qry="DELETE FROM campus.tbl_coodle WHERE coodle_id=".$this->db_add_param($coodle_id, FHC_INTEGER, false).";";
+		$qry="UPDATE campus.tbl_coodle SET coodle_status_kurzbz = 'storniert' 
+            WHERE 
+            coodle_id=".$this->db_add_param($coodle_id, FHC_INTEGER, false).';';
 
 		if($this->db_query($qry))
 		{
@@ -245,7 +247,7 @@ class coodle extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Löschen der Daten'."\n";
+			$this->errormsg = 'Fehler beim stornieren aufgetreten';
 			return false;
 		}
 	}
@@ -400,7 +402,7 @@ class coodle extends basis_db
                 WHERE 
 					(uid =".$this->db_add_param($uid, FHC_STRING, false)." 
                     OR ersteller_uid =".$this->db_add_param($uid, FHC_STRING, false).")
-                    AND endedatum >= CURRENT_DATE"; 
+                    AND endedatum >= CURRENT_DATE - interval '20 days'"; 
         
         if(!$this->db_query($qry))
         {
@@ -659,7 +661,7 @@ class coodle extends basis_db
         $qry="SELECT * FROM campus.tbl_coodle_ressource_termin 
             WHERE coodle_ressource_id =".$this->db_add_param($ressource_id, FHC_INTEGER)."
                 AND coodle_termin_id=".$this->db_add_param($termin_id, FHC_INTEGER).';';
-        
+         
         if($result = $this->db_query($qry))
         {
             if($row = $this->db_fetch_row($result))
@@ -670,6 +672,47 @@ class coodle extends basis_db
         }
         
         return false; 
+    }
+    
+    
+    public function checkBerechtigung($coodle_id, $uid='', $zugangscode='')
+    {
+        if($coodle_id =='' ||  !is_numeric($coodle_id))
+        {
+            $this->errormsg = 'Ungültige Id übergeben.';
+            return false; 
+        }
+        
+        if($uid != '' && $zugangscode != '')
+        {
+            $this->errormsg = 'Uid oder Zuganscode übergeben'; 
+            return false; 
+        }
+        
+        $qry ="SELECT 1 FROM campus.tbl_coodle_ressource WHERE coodle_id=".$this->db_add_param($coodle_id, FHC_INTEGER, false).' AND ';
+        
+        if($uid != '')
+            $qry.= ' uid = '.$this->db_add_param($uid, FHC_STRING, false); 
+        
+        if($zugangscode != '')
+            $qry.= ' zugangscode ='.$this->db_add_param($zugangscode, FHC_STRING, false); 
+        
+        $qry.=';'; 
+        
+        if($result = $this->db_query($qry))
+        {
+            if($row = $this->db_fetch_object($result))
+                return true; 
+            else
+                return false; 
+        }
+        else
+        {
+            $this->errormsg = 'Fehler bei der Abfrage aufgetreten'; 
+            return false; 
+        }
+        
+        
     }
     
     
@@ -780,7 +823,7 @@ class coodle extends basis_db
 	 */
 	public function getTermine($coodle_id)
 	{
-		$qry = "SELECT * FROM campus.tbl_coodle_termin WHERE coodle_id=".$this->db_add_param($coodle_id);
+		$qry = "SELECT * FROM campus.tbl_coodle_termin WHERE coodle_id=".$this->db_add_param($coodle_id).' ORDER BY datum, uhrzeit';
 		
 		if($result = $this->db_query($qry))
 		{
@@ -895,5 +938,42 @@ class coodle extends basis_db
 			$this->errormsg = 'Fehler beim Löschen des Eintrags';
 		}
 	}
+    
+    /**
+     * Überprüft ob die übergebene Coodleumfrage den übergebenen Status besitzt
+     * @param $coodle_id
+     * @param $status
+     * @return boolean 
+     */
+    public function checkStatus($coodle_id, $status='laufend')
+    {
+        if($coodle_id == '' || !is_numeric($coodle_id))
+        {
+            $this->errormsg = 'Coodle_id muss eine Zahl sein'; 
+            return false; 
+        }
+        
+        $qry ="SELECT 1 FROM campus.tbl_coodle WHERE coodle_id = ".$this->db_add_param($coodle_id, FHC_INTEGER, false)."
+            AND coodle_status_kurzbz = ".$this->db_add_param($status, FHC_STRING, false); 
+        
+        if($result = $this->db_query($qry))
+        {
+            if($this->db_fetch_object($result))
+                return true; 
+            else
+            {
+                $this->errormsg = "Kein passender Status vorhanden"; 
+                return false; 
+            }
+        }
+        else
+        {
+            $this->errormsg = 'Fehler bei der Abfrage aufgetreten'; 
+            return false; 
+        }
+        
+    }
+    
+    
 }
 ?>
