@@ -37,4 +37,5 @@ $this->phrasen['coodle/name']='Name';
 $this->phrasen['coodle/email']='E-Mail';
 $this->phrasen['coodle/externeBeschreibung']='Tragen Sie den Namen und die E-Mail Adresse der Person ein, die Sie zur Umfrage hinzufügen möchten.';
 $this->phrasen['coodle/externenHinzufuegen']='Hinzufügen';
+$this->phrasen['coodle/ZurueckzumBearbeiten']='&lt;&lt; Zurück zum Bearbeiten';
 ?>
