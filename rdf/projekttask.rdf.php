@@ -74,6 +74,7 @@ foreach($projekttask_obj->result as $projekttask)
 		$ressource_bezeichnung = $ressource->bezeichnung; 
 	} 
 	$oRdf->obj[$i]->setAttribut('ressource_bezeichnung',$ressource_bezeichnung);
+	$oRdf->obj[$i]->setAttribut('ressource_id',$projekttask->ressource_id);
 	$oRdf->obj[$i]->setAttribut('ende',$datum_obj->formatDatum($projekttask->ende,'d.m.Y'));
 	
 	if($projekttask->projekttask_fk!='')
