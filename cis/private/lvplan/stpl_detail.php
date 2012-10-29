@@ -81,30 +81,60 @@ if(!$datum_obj->checkDatum($datum))
 
 $stsem = getStudiensemesterFromDatum($datum);
 //Stundenplan
-$sql_query='SELECT campus.vw_stundenplan.*, tbl_lehrfach.bezeichnung, vw_mitarbeiter.titelpre, vw_mitarbeiter.titelpost, vw_mitarbeiter.nachname, vw_mitarbeiter.vorname';
-$sql_query.=", (SELECT count(*) FROM public.tbl_studentlehrverband 
-				WHERE studiengang_kz=vw_stundenplan.studiengang_kz AND semester=vw_stundenplan.semester
-				AND (verband=vw_stundenplan.verband OR vw_stundenplan.verband is null OR trim(vw_stundenplan.verband)='')
-				AND (gruppe=vw_stundenplan.gruppe OR vw_stundenplan.gruppe is null OR trim(vw_stundenplan.gruppe)='')
-				AND studiensemester_kurzbz='".addslashes($stsem)."') as anzahl_lvb
-			, (SELECT count(*) FROM public.tbl_benutzergruppe 
-				WHERE gruppe_kurzbz=vw_stundenplan.gruppe_kurzbz AND studiensemester_kurzbz='".addslashes($stsem)."') as anzahl_grp";
-$sql_query.=' FROM (campus.vw_stundenplan JOIN lehre.tbl_lehrfach USING (lehrfach_id)) JOIN campus.vw_mitarbeiter USING (uid)';
-$sql_query.=" WHERE datum='".addslashes($datum)."' AND stunde='".addslashes($stunde)."'";
+$sql_query="
+SELECT 
+	campus.vw_stundenplan.*, tbl_lehrfach.bezeichnung, vw_mitarbeiter.titelpre, 
+	vw_mitarbeiter.titelpost, vw_mitarbeiter.nachname, vw_mitarbeiter.vorname,
+	(SELECT 
+		count(*) 
+	 FROM 
+	 	public.tbl_studentlehrverband 
+	 WHERE 
+	 	studiengang_kz=vw_stundenplan.studiengang_kz 
+	 	AND semester=vw_stundenplan.semester
+		AND (verband=vw_stundenplan.verband OR vw_stundenplan.verband is null OR trim(vw_stundenplan.verband)='')
+		AND (gruppe=vw_stundenplan.gruppe OR vw_stundenplan.gruppe is null OR trim(vw_stundenplan.gruppe)='')
+		AND studiensemester_kurzbz=".$db->db_add_param($stsem).") as anzahl_lvb, 
+	(SELECT 
+		count(*) 
+	 FROM 
+	 	public.tbl_benutzergruppe 
+	 WHERE 
+	 	gruppe_kurzbz=vw_stundenplan.gruppe_kurzbz 
+	 	AND studiensemester_kurzbz=".$db->db_add_param($stsem).") as anzahl_grp
+FROM 
+	campus.vw_stundenplan 
+	JOIN lehre.tbl_lehrfach USING (lehrfach_id)
+	JOIN campus.vw_mitarbeiter USING (uid)
+WHERE 
+	datum=".$db->db_add_param($datum)." 
+	AND stunde=".$db->db_add_param($stunde);
+
 if ($type=='lektor')
-    $sql_query.=" AND vw_stundenplan.uid='".addslashes($pers_uid)."' ";
+{
+    $sql_query.=" AND vw_stundenplan.uid=".$db->db_add_param($pers_uid);
+}
 elseif ($type=='ort')
-    $sql_query.=" AND vw_stundenplan.ort_kurzbz='".addslashes($ort_kurzbz)."' ";
+    $sql_query.=" AND vw_stundenplan.ort_kurzbz=".$db->db_add_param($ort_kurzbz);
 else
 {
 	if($stg_kz=='' || $sem=='')
 		die('Fehlerhafte Parameteruebergabe');
 	
-    $sql_query.=" AND vw_stundenplan.studiengang_kz='".addslashes($stg_kz)."' AND (vw_stundenplan.semester='".addslashes($sem)."'";
-    if ($type=='student')
-		$sql_query.=' OR vw_stundenplan.semester='.($sem+1);
-	$sql_query.=')';
-	
+	if($type=="verband" && $stg_kz!='' && $sem!='')
+	{
+		// Studiengangsansicht
+	    $sql_query.=" AND vw_stundenplan.studiengang_kz=".$db->db_add_param($stg_kz)." AND (vw_stundenplan.semester=".$db->db_add_param($sem);
+	    if ($type=='student')
+			$sql_query.=' OR vw_stundenplan.semester='.$db->db_add_param($sem+1);
+		$sql_query.=')';
+	}
+	else
+	{
+		// Pers. Ansicht
+		$sql_query.=" AND EXISTS (SELECT 1 FROM campus.vw_student_lehrveranstaltung 
+									WHERE lehreinheit_id=vw_stundenplan.lehreinheit_id AND uid=".$db->db_add_param($pers_uid).")";
+	}
 	// Manfred weiss nicht mehr warum, aber wir aktivieren 23-09-2009
 	// 01-10-2009: jetzt weiss ers wieder Grund: Student sieht sonst die uebergeordneten nicht
     /*
@@ -117,101 +147,129 @@ else
 
 $sql_query.=' ORDER BY unr ASC, stg_kurzbz, vw_stundenplan.semester, verband, gruppe, gruppe_kurzbz LIMIT 100';
 //echo $sql_query.'<BR>';
-$erg_stpl=$db->db_query($sql_query);
-$num_rows_stpl=$db->db_num_rows($erg_stpl);
+
+$erg_stpl = $db->db_query($sql_query);
+$num_rows_stpl = $db->db_num_rows($erg_stpl);
 
 //Reservierungen
-$sql_query="SELECT vw_reservierung.*, vw_mitarbeiter.titelpre, vw_mitarbeiter.titelpost, vw_mitarbeiter.vorname,vw_mitarbeiter.nachname FROM campus.vw_reservierung, campus.vw_mitarbeiter WHERE datum='".addslashes($datum)."' AND stunde='".addslashes($stunde)."'";
-if (isset($ort_kurzbz))
-    $sql_query.=" AND vw_reservierung.ort_kurzbz='".addslashes($ort_kurzbz)."'";
+$sql_query="
+SELECT 
+	vw_reservierung.*, vw_mitarbeiter.titelpre, vw_mitarbeiter.titelpost, 
+	vw_mitarbeiter.vorname,vw_mitarbeiter.nachname 
+FROM 
+	campus.vw_reservierung, campus.vw_mitarbeiter 
+WHERE 
+	datum=".$db->db_add_param($datum)." 
+	AND stunde=".$db->db_add_param($stunde);
+
+if (isset($ort_kurzbz) && $type=='ort')
+    $sql_query.=" AND vw_reservierung.ort_kurzbz=".$db->db_add_param($ort_kurzbz);
 if ($type=='lektor')
-    $sql_query.=" AND vw_reservierung.uid='".addslashes($pers_uid)."' ";
+    $sql_query.=" AND vw_reservierung.uid=".$db->db_add_param($pers_uid);
 $sql_query.=" AND vw_reservierung.uid=vw_mitarbeiter.uid";
 if ($type=='verband' || $type=='student')
-    $sql_query.=" AND studiengang_kz='".addslashes($stg_kz)."' AND (semester='".addslashes($sem)."' OR semester=0 OR semester IS NULL)";
+{
+    $sql_query.=" AND studiengang_kz=".$db->db_add_param($stg_kz)." 
+    AND (semester=".$db->db_add_param($sem)." OR semester=0 OR semester IS NULL)";
+}
 $sql_query.=' ORDER BY  titel LIMIT 100';
 //echo $sql_query.'<BR>';
-$erg_repl=$db->db_query($sql_query);
-$num_rows_repl=$db->db_num_rows($erg_repl);
-?>
 
-<html>
+$erg_repl = $db->db_query($sql_query);
+$num_rows_repl = $db->db_num_rows($erg_repl);
+
+echo '<html>
 <head>
-    <title><?php echo $p->t('lvplan/lehrveranstaltungsplanDetails');?></title>
+    <title>'.$p->t('lvplan/lehrveranstaltungsplanDetails').'</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </head>
 <body id="inhalt">
-<H2><?php echo $p->t('lvplan/lehrveranstaltungsplan');?> &rArr; <?php echo $p->t('abgabetool/details');?></H2>
-<?php echo $p->t('abgabetool/datum');?>: <?php echo htmlentities($datum); ?><BR>
-<?php echo $p->t('global/stunde').': '.htmlentities($stunde); ?><BR><BR>
+<H2>'.$p->t('lvplan/lehrveranstaltungsplan').' &rArr; '.$p->t('abgabetool/details').'</H2>
+'.$p->t('abgabetool/datum').': '.htmlentities($datum_obj->formatDatum($datum, 'd.m.Y')).'<BR>
+'.$p->t('global/stunde').': '.htmlentities($stunde).'<BR><BR>
+';
 
-<table class="stdplan">
-<?php
+// LVPlan
 if ($num_rows_stpl>0)
-echo '<tr> <th>'.$p->t('lvplan/unr').'</th><th>'.$p->t('lvaliste/lektor').'</th><th>'.$p->t('lvplan/ort').'</th><th>'.$p->t('lvaliste/lehrfach').'</th><th>'.$p->t('global/bezeichnung').'</th><th>'.$p->t('global/verband').'</th><th>'.$p->t('lvplan/einheit').'</th><th>'.$p->t('lvplan/info').'</th></tr>';
-$ort = new ort();
-for ($i=0; $i<$num_rows_stpl; $i++)
 {
-    $unr=$db->db_result($erg_stpl,$i,"unr");
-    $ortkurzbz=$db->db_result($erg_stpl,$i,"ort_kurzbz");
-    $lehrfachkurzbz=$db->db_result($erg_stpl,$i,"lehrfach");
-    $bezeichnung=$db->db_result($erg_stpl,$i,"bezeichnung");
-    $pers_kurzbz=$db->db_result($erg_stpl,$i,"lektor");
-    $titelpre=$db->db_result($erg_stpl,$i,"titelpre");
-    $titelpost=$db->db_result($erg_stpl,$i,"titelpost");
-    $pers_vorname=$db->db_result($erg_stpl,$i,"vorname");
-    $pers_nachname=$db->db_result($erg_stpl,$i,"nachname");
-    $pers_email=$db->db_result($erg_stpl,$i,"uid").'@'.DOMAIN;
-    $stgkurzbz=strtoupper(trim($db->db_result($erg_stpl,$i,"stg_typ").$db->db_result($erg_stpl,$i,"stg_kurzbz")));
-    $semester=trim($db->db_result($erg_stpl,$i,"semester"));
-    $verband=trim($db->db_result($erg_stpl,$i,"verband"));
-    $gruppe=trim($db->db_result($erg_stpl,$i,"gruppe"));
-    $gruppe_kurzbz=trim($db->db_result($erg_stpl,$i,"gruppe_kurzbz"));
-    $anzahl_lvb=trim($db->db_result($erg_stpl,$i,"anzahl_lvb"));
-    $anzahl_grp=trim($db->db_result($erg_stpl,$i,"anzahl_grp"));
-	$titel=trim($db->db_result($erg_stpl,$i,"titel"));
-    $gesamtanzahl = ($anzahl_grp!=0?$anzahl_grp:$anzahl_lvb);
-    $ort->load($ortkurzbz);
-    ?>
-    <tr class="<?php echo 'liste'.$i%2; ?>">
-        <td><?php echo $unr; ?></td>
-        <td><A class="Item" href="mailto:<?php echo $pers_email; ?>"><?php echo $titelpre.' '.$pers_vorname.' '.$pers_nachname.' '.$titelpost; ?></A></td>
-        <td  title="<?php echo $ort->bezeichnung;?>"><?php echo (!empty($ortkurzbz)?'<a href="'.RAUMINFO_PATH.trim($ortkurzbz).'.html" target="_blank">'.$ortkurzbz.'</a>':$ortkurzbz); ?></td>
-        <td><?php echo $lehrfachkurzbz; ?></td>
-        <td><?php echo $bezeichnung; ?></td>
+	echo '
+	<table class="stdplan">
+		<tr>
+			<th>'.$p->t('lvplan/unr').'</th>
+			<th>'.$p->t('lvaliste/lektor').'</th>
+			<th>'.$p->t('lvplan/ort').'</th>
+			<th>'.$p->t('lvaliste/lehrfach').'</th>
+			<th>'.$p->t('global/bezeichnung').'</th>
+			<th>'.$p->t('global/verband').'</th>
+			<th>'.$p->t('lvplan/einheit').'</th>
+			<th>'.$p->t('lvplan/info').'</th>
+		</tr>';
 
-       	<td title="<?php echo $stgkurzbz.$semester.mb_strtolower($verband).$gruppe; ?>">
-			<?php echo (!is_null($semester) && !empty($semester)? '<A class="Item" title="'.$anzahl_lvb.' '.$p->t('lvplan/studierende').'" href="mailto:'.$stgkurzbz.$semester.mb_strtolower($verband).$gruppe.'@'.DOMAIN .'">':''); ?>
-			<?php echo $stgkurzbz.'-'.$semester.$verband.$gruppe;?>
-			<?php echo (!is_null($semester) && !empty($semester)?'</A>':''); ?>
-		</td>
-
-        <td><A class="Item" title="<?php echo $anzahl_grp.' Studierende';?>" href="mailto:<?php echo mb_strtolower($gruppe_kurzbz).'@'.DOMAIN; ?>">
-        <?php echo $gruppe_kurzbz; ?></A></td>
-		<td><?php echo $titel; ?></td>
-        
-    </tr>
-    <?php
+	$ort = new ort();
+	while($row = $db->db_fetch_object($erg_stpl))
+	{
+	    $unr = $row->unr;
+	    $ortkurzbz = $row->ort_kurzbz;
+	    $lehrfachkurzbz = $row->lehrfach;
+	    $bezeichnung = $row->bezeichnung;
+	    $pers_kurzbz = $row->lektor;
+	    $titelpre = $row->titelpre;
+	    $titelpost = $row->titelpost;
+	    $pers_vorname = $row->vorname;
+	    $pers_nachname = $row->nachname;
+	    $pers_email = $row->uid.'@'.DOMAIN;
+	    $stgkurzbz = mb_strtoupper(trim($row->stg_typ.$row->stg_kurzbz));
+	    $semester = trim($row->semester);
+	    $verband = trim($row->verband);
+	    $gruppe = trim($row->gruppe);
+	    $gruppe_kurzbz = trim($row->gruppe_kurzbz);
+	    $anzahl_lvb = trim($row->anzahl_lvb);
+	    $anzahl_grp = trim($row->anzahl_grp);
+		$titel = trim($row->titel);
+	    $gesamtanzahl = ($anzahl_grp!=0?$anzahl_grp:$anzahl_lvb);
+	    $ort->load($ortkurzbz);
+	    
+	    echo '
+	    <tr class="liste'.($i%2).'">
+	        <td>'.$unr.'</td>
+	        <td><A class="Item" href="mailto:'.$pers_email.'">'.$titelpre.' '.$pers_vorname.' '.$pers_nachname.' '.$titelpost.'</A></td>
+	        <td  title="'.$ort->bezeichnung.'">'.(!empty($ortkurzbz)?'<a href="'.RAUMINFO_PATH.trim($ortkurzbz).'.html" target="_blank">'.$ortkurzbz.'</a>':$ortkurzbz).'</td>
+	        <td>'.$lehrfachkurzbz.'</td>
+	        <td>'.$bezeichnung.'</td>
+	       	<td title="'.$stgkurzbz.$semester.mb_strtolower($verband).$gruppe.'">
+				'.(!is_null($semester) && !empty($semester)?'<A class="Item" title="'.$anzahl_lvb.' '.$p->t('lvplan/studierende').'" href="mailto:'.$stgkurzbz.$semester.mb_strtolower($verband).$gruppe.'@'.DOMAIN .'">':'');
+		echo $stgkurzbz.'-'.$semester.$verband.$gruppe;
+		echo (!is_null($semester) && !empty($semester)?'</A>':'');
+		echo '
+			</td>
+	
+	        <td><A class="Item" title="'.$anzahl_grp.' Studierende" href="mailto:'.mb_strtolower($gruppe_kurzbz).'@'.DOMAIN.'">
+	        '.$gruppe_kurzbz.'</A></td>
+			<td>'.$titel.'</td>
+	        
+	    </tr>';    
+	}
+	echo '</table><BR>';
 }
-?>
-</table><BR>
-<?php
+
+// Reservierungen
 if ($num_rows_repl>0)
 {
     echo '<h2>'.$p->t('lvplan/reservierungen').'</h2>';
     echo '<table class="stdplan">';
     echo '<tr><th>'.$p->t('global/titel').'</th><th>'.$p->t('lvplan/ort').'</th><th>'.$p->t('global/person').'</th><th>'.$p->t('global/beschreibung').'</th></tr>';
-    for ($i=0; $i<$num_rows_repl; $i++)
+    while($row = $db->db_fetch_object($erg_repl))
     {
-        $titel=$db->db_result($erg_repl,$i,"titel");
-        $ortkurzbz=$db->db_result($erg_repl,$i,"ort_kurzbz");
-        $titelpre=$db->db_result($erg_repl,$i,"titelpre");
-        $titelpost=$db->db_result($erg_repl,$i,"titelpost");
-   		$pers_vorname=$db->db_result($erg_repl,$i,"vorname");
-   		$pers_nachname=$db->db_result($erg_repl,$i,"nachname");
-    	$pers_email=$db->db_result($erg_repl,$i,"uid").'@'.DOMAIN;
-    	$beschreibung=$db->db_result($erg_repl,$i,"beschreibung");
+        $titel=$row->titel;
+        $ortkurzbz=$row->ort_kurzbz;
+        $titelpre=$row->titelpre;
+        $titelpost=$row->titelpost;
+   		$pers_vorname=$row->vorname;
+   		$pers_nachname=$row->nachname;
+    	$pers_email=$row->uid.'@'.DOMAIN;
+    	$beschreibung=$row->beschreibung;
+    	
         echo '<tr class="liste'.($i%2).'">';
         echo '<td >'.$titel.'</td>';
         echo '<td>'.(!empty($ortkurzbz)?'<a href="'.RAUMINFO_PATH.trim($ortkurzbz).'.html" target="_blank">'.$ortkurzbz.'</a>':$ortkurzbz).'</td>';
@@ -220,6 +278,6 @@ if ($num_rows_repl>0)
     }
     echo '</table>';
 }
+echo '<P>'.$p->t('lvplan/fehlerUndFeedback').' <A class="Item" href="mailto:'.MAIL_LVPLAN.'">'.$p->t('lvplan/lvKoordinationsstelle').'</A>.</P>
+</body></html>';
 ?>
-<P><?php echo $p->t('lvplan/fehlerUndFeedback')?> <A class="Item" href="mailto:<?php echo MAIL_LVPLAN;?>"><?php echo $p->t('lvplan/lvKoordinationsstelle')?></A>.</P>
-</body></html>
