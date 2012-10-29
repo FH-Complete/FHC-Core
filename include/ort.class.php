@@ -368,8 +368,8 @@ class ort extends basis_db
 			FROM
 				public.tbl_ort 
 			WHERE 
-				ort_kurzbz like '%".$this->db_escape($filter)."%'
-				OR bezeichnung like '%".$this->db_escape($filter)."%'
+				lower(ort_kurzbz) like '%".$this->db_escape(mb_strtolower($filter))."%'
+				OR lower(bezeichnung) like '%".$this->db_escape(mb_strtolower($filter))."%'
 			ORDER BY ort_kurzbz;";
 
 		if(!$this->db_query($qry))

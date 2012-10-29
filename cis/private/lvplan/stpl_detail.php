@@ -207,8 +207,10 @@ if ($num_rows_stpl>0)
 		</tr>';
 
 	$ort = new ort();
+	$i=0;
 	while($row = $db->db_fetch_object($erg_stpl))
 	{
+		$i++;
 	    $unr = $row->unr;
 	    $ortkurzbz = $row->ort_kurzbz;
 	    $lehrfachkurzbz = $row->lehrfach;
@@ -259,8 +261,10 @@ if ($num_rows_repl>0)
     echo '<h2>'.$p->t('lvplan/reservierungen').'</h2>';
     echo '<table class="stdplan">';
     echo '<tr><th>'.$p->t('global/titel').'</th><th>'.$p->t('lvplan/ort').'</th><th>'.$p->t('global/person').'</th><th>'.$p->t('global/beschreibung').'</th></tr>';
+    $i=0;
     while($row = $db->db_fetch_object($erg_repl))
     {
+    	$i++;
         $titel=$row->titel;
         $ortkurzbz=$row->ort_kurzbz;
         $titelpre=$row->titelpre;
