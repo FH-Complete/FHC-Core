@@ -184,18 +184,22 @@ loadVariables($user);
 			$prestudent_ids .= "'".addslashes($id)."'";
 		}
 	}
-	// Student holen
-	$qry = "SELECT *, (SELECT UPPER(typ || kurzbz) FROM public.tbl_studiengang WHERE studiengang_kz=tbl_prestudent.studiengang_kz) as stgbez FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) LEFT JOIN public.tbl_student USING(prestudent_id) WHERE prestudent_id in($prestudent_ids) ORDER BY nachname, vorname";
-
-	if($result = $db->db_query($qry))
+	
+	if($prestudent_ids!='')
 	{
-		while($row = $db->db_fetch_object($result))
+		// Student holen
+		$qry = "SELECT *, (SELECT UPPER(typ || kurzbz) FROM public.tbl_studiengang WHERE studiengang_kz=tbl_prestudent.studiengang_kz) as stgbez FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) LEFT JOIN public.tbl_student USING(prestudent_id) WHERE prestudent_id in($prestudent_ids) ORDER BY nachname, vorname";
+	
+		if($result = $db->db_query($qry))
 		{
-			draw_content($row);
-			$zeile++;
+			while($row = $db->db_fetch_object($result))
+			{
+				draw_content($row);
+				$zeile++;
+			}
 		}
 	}
-	
+		
 	function draw_content($row)
 	{
 		global $maxlength, $datum_obj;
