@@ -258,7 +258,7 @@ echo '<html>
 
 	.ressourceItem
 	{
-		font-size: x-small;
+		font-size: 0.8em;
 	}
 	
 	#fertig 
@@ -490,7 +490,7 @@ echo '<html>
 											},
 										error: function() { alert("error"); }
 									});				
-								},
+								}
 						}
 					});
 				}		
@@ -531,7 +531,10 @@ echo '
 	<div id="ressourcecontainer">
 	</div>
 	<div id="ressourcenInput">
+	<p>
+	'.$p->t('coodle/ressource').':<br>
 	<input id="input_ressource" type="text" size="10" />
+	</p>
 	<script>
 	
 	// Formatieren des Eintrages im Autocomplete Feld
@@ -605,6 +608,12 @@ echo '
 	// Zeigt eine Ressoure mit deren Events an
 	function addRessourceToContent(id, typ, bezeichnung)
 	{
+		// HTML Tags aus der Bezeichnung Entfernen, sofern vorhanden
+		var div = document.createElement("div");
+	  	var text = document.createTextNode(bezeichnung);
+	  	div.appendChild(text);
+	  	bezeichnung = div.innerHTML;
+	  	
 		// Anzeige der Ressource mit Loeschen Button
 		var code = \'<span class="ressourceItem"> \
 				<a href="#delete" onclick="removeRessource(this, \\\'\'+id+\'\\\',\\\'\'+typ+\'\\\'); return false;"> \

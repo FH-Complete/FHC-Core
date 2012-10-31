@@ -37,7 +37,8 @@ switch($work)
 
 			foreach($ort->result as $row)
 			{
-				echo html_entity_decode($row->ort_kurzbz.'|Ort|'.$row->bezeichnung."\n");
+				if($row->aktiv)
+					echo html_entity_decode($row->ort_kurzbz.'|Ort|'.$row->bezeichnung."\n");
 			}
 		 	
 			$benutzer = new benutzer();
