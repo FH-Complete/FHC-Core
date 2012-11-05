@@ -134,9 +134,9 @@ foreach($coodle->result as $c)
             <td>'.$coodle->convert_html_chars($c->ersteller_uid).'</td>
             <td>'.$coodle->convert_html_chars($datum->formatDatum($c->endedatum, 'd.m.Y')).'</td>
             <td>
-                <a href="stammdaten.php?coodle_id='.$c->coodle_id.'" target="_blank" onclick="return conf_user(\''.$c->ersteller_uid.'\');">&nbsp;<img src="../../../skin/images/edit.png" title="Umfrage bearbeiten"></a> 
-                <a href="'.$_SERVER['PHP_SELF'].'?method=delete&coodle_id='.$c->coodle_id.'" onclick="return conf_user(\''.$c->ersteller_uid.'\');">&nbsp;<img src="../../../skin/images/delete_x.png" title="Umfrage löschen"></a>
-                <a href="../../public/coodle.php?coodle_id='.$c->coodle_id.'"> &nbsp; <img src="../../../skin/images/date_go.png" title="zur Umfrage"></a>
+                <a href="stammdaten.php?coodle_id='.$c->coodle_id.'" target="_blank" onclick="return conf_user(\''.$c->ersteller_uid.'\');">&nbsp;<img src="../../../skin/images/edit.png" title="'.$p->t('coodle/bearbeiten').'"></a> 
+                <a href="'.$_SERVER['PHP_SELF'].'?method=delete&coodle_id='.$c->coodle_id.'" onclick="return conf_user(\''.$c->ersteller_uid.'\');">&nbsp;<img src="../../../skin/images/delete_x.png" title="'.$p->t('coodle/loeschen').'"></a>
+                <a href="../../public/coodle.php?coodle_id='.$c->coodle_id.'"> &nbsp; <img src="../../../skin/images/date_go.png" title="'.$p->t('coodle/zurUmfrage').'"></a>
             </td>
         </tr>';
 }

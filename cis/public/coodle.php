@@ -48,14 +48,14 @@ if(!$coodle->load($coodle_id))
 
 // Überprüfen ob Coodle Status laufend oder abgeschlossen hat 
 if(!$coodle->checkStatus($coodle_id))
-    die('Umfrage ist nicht mehr gültig'); 
+    die($p->t('coodle/umfrageNichtGueltig')); 
 
 // authentifizierung
 if(!isset($_GET['zugangscode']))
 {
     $uid = get_uid();    
     if(!$coodle->checkBerechtigung($coodle_id, $uid))
-        die('Keine Berechtiung für diese Umfrage'); 
+        die($p->t('coodle/keineBerechtiung')); 
     
     // überprüfen ob ersteller gleich uid ist
     if($coodle->ersteller_uid == $uid)
@@ -64,7 +64,7 @@ if(!isset($_GET['zugangscode']))
 else
 {
     if(!$coodle->checkBerechtigung($coodle_id, '', $_GET['zugangscode']))
-        die('Keine Berechtigung für diese Umfrage'); 
+        die($p->t('coodle/keineBerechtiung')); 
 }
 
 // checkboxen speichern
@@ -78,7 +78,7 @@ if(isset ($_POST['save']))
         
         $coodle_help->getRessourceFromUser($coodle_id, '', $_GET['zugangscode']);
         $coodle_ressource_termin= $coodle_help->deleteRessourceTermin($coodle_id, $coodle_help->coodle_ressource_id);  
-        $message = "<span class='ok'>Erfolgreich gespeichert</span>";   // weil wenn alle checkboxen gelöscht werden kommt man nicht mehr in die speichern schleife
+        $message = "<span class='ok'>".$p->t('global/erfolgreichgespeichert')."</span>";   // weil wenn alle checkboxen gelöscht werden kommt man nicht mehr in die speichern schleife
     }
     else
     {
@@ -86,7 +86,7 @@ if(isset ($_POST['save']))
         {
             $coodle_help->getRessourceFromUser($coodle_id, $uid);
             $coodle_ressource_termin= $coodle_help->deleteRessourceTermin($coodle_id, $coodle_help->coodle_ressource_id);
-            $message = "<span class='ok'>Erfolgreich gespeichert</span>"; 
+            $message = "<span class='ok'>".$p->t('global/erfolgreichgespeichert')."</span>"; 
         }
     }
     
@@ -105,9 +105,9 @@ if(isset ($_POST['save']))
             $coodle_ressource_termin->new = true; 
 
             if(!$coodle_ressource_termin->saveRessourceTermin())
-                $message= "<span class='error'>Fehler beim Speichern aufgetreten</span>"; 
+                $message= "<span class='error'>".$p->t('global/fehlerBeimSpeichernDerDaten')."</span>"; 
             else
-                $message = "<span class='ok'>Erfolgreich gespeichert</span>"; 
+                $message = "<span class='ok'>".$p->t('global/erfolgreichgespeichert')."</span>"; 
         }
     }
 }
@@ -127,9 +127,9 @@ if(isset($_POST['auswahl_termin']))
         exit('Fehler beim Update aufgetreten'); 
 
     if(!$coodle_help->saveTermin(false))
-        $message="<span class='error'>Fehler beim Speichern aufgetreten</span>";
+        $message="<span class='error'>".$p->t('global/fehlerBeimSpeichernDerDaten')."</span>";
     else
-        $message="<span class='ok'>Erfolgreich gespeichert</span>"; 
+        $message="<span class='ok'>".$p->t('global/erfolgreichgespeichert')."</span>"; 
     
     $coodle_status = new coodle(); 
     $coodle_status->load($coodle_id); 
@@ -157,10 +157,10 @@ if(isset($_POST['auswahl_termin']))
         
         $raum_reservierung->stunde = '1';
         if($raum_reservierung->save(true))
-            echo "Raum wurde gespeichert"; 
+            echo $p->t('coodle/raumErfolgreichReserviert'); 
     }
     else
-        echo "0 oder mehrere räume eingetragen"; 
+        echo $p->t('coodle/keineOderMehrereRäume'); 
     
 }
 
@@ -180,7 +180,7 @@ if(isset($_GET['resend']))
 <!DOCTYPE html>
 <head>
     <meta charset="utf-8">
-    <title>Coodle Übersicht</title>
+    <title><?php echo $p->t('coodle/terminauswahl');?></title>
     <style type="text/css">
     body 
     {
@@ -256,7 +256,9 @@ if(isset($_GET['resend']))
 
         
         echo '<h1>'.$coodle->titel.'</h1>'; 
-        echo '<h5>Erstellt von '.$coodle->ersteller_uid.' ( vor '.round($differenz).' Tagen)</h5>';
+        $erstellt = array($coodle->ersteller_uid, round($differenz)); 
+        echo '<h5>'.$p->t('coodle/erstelltVon', $erstellt).'</h5>';
+       /// echo '<h5>Erstellt von '.$coodle->ersteller_uid.' ( vor '.round($differenz).' Tagen)</h5>';
         echo '<h4>'.$coodle->beschreibung.'</h4>';
         ?>
     </section>
@@ -274,10 +276,10 @@ if(isset($_GET['resend']))
         
         echo "<br>&nbsp;";
         if(!isset($_GET['zugangscode']))
-            echo "<a href='".APP_ROOT."cis/private/coodle/uebersicht.php'><< zurück zur Übersicht</a>"; 
+            echo "<a href='".APP_ROOT."cis/private/coodle/uebersicht.php'><< ".$p->t('coodle/zurueckZurUebersicht')."</a>"; 
         
          if($ersteller && $abgeschlossen)
-            echo '<a href="'.$_SERVER['PHP_SELF'].'?coodle_id='.$coodle_id.'&resend" style="padding-left:25px;">Einladungen neu verschicken</a>'; 
+            echo '<a href="'.$_SERVER['PHP_SELF'].'?coodle_id='.$coodle_id.'&resend" style="padding-left:25px;">'.$p->t('coodle/einladungNeuVerschicken').'</a>'; 
 
         echo "<section id='content'>
                     <form action='' method='POST'>
@@ -374,13 +376,9 @@ if(isset($_GET['resend']))
             
             echo "</tr>";
         }
-        
-       
-        if($abgeschlossen)
-            $message='<span class="ok">Die Umfrage ist abgeschlossen</span>'; 
-        
-       
 
+        if($abgeschlossen)
+            $message='<span class="ok">'.$p->t('coodle/umfrageAbgeschlossen').'</span>'; 
         
         echo "
             <tr><td>&nbsp;</td></tr>
@@ -389,7 +387,6 @@ if(isset($_GET['resend']))
             </form></section></div>".$message;
         ?>
     </div>
-    
     
 </body>
 </html>
