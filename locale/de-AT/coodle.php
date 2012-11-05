@@ -38,5 +38,16 @@ $this->phrasen['coodle/email']='E-Mail';
 $this->phrasen['coodle/externeBeschreibung']='Tragen Sie den Namen und die E-Mail Adresse der Person ein, die Sie zur Umfrage hinzufügen möchten.';
 $this->phrasen['coodle/externenHinzufuegen']='Hinzufügen';
 $this->phrasen['coodle/ZurueckzumBearbeiten']='&lt;&lt; Zurück zum Bearbeiten';
+$this->phrasen['coodle/umfrageNichtGueltig']='Umfrage ist nicht mehr gültig'; 
+$this->phrasen['coodle/keineBerechtigung']='Sie besitzen keine Berechtigung für diese Umfrage'; 
+$this->phrasen['coodle/raumErfolgreichReserviert']= 'Raum wurde erfolgreich reserviert';
+$this->phrasen['coodle/keineOderMehrereRäume']='Keine oder mehrere Räume eingetragen'; 
+$this->phrasen['coodle/terminauswahl']='Coodle Terminauswahl'; 
+$this->phrasen['coodle/erstelltVon']='Erstellt von %s (vor %s Tagen)'; 
+$this->phrasen['coodle/zurueckZurUebersicht']='Zurück zur Übersicht'; 
+$this->phrasen['coodle/einladungNeuVerschicken']='Einladungen neu verschicken'; 
+$this->phrasen['coodle/umfrageAbgeschlossen']='Die Umfrage ist abgeschlossen'; 
+$this->phrasen['coodle/loeschen']='Umfrage löschen'; 
+$this->phrasen['coodle/zurUmfrage']='Zur Umfrage'; 
 $this->phrasen['coodle/ressource']='Ressource';
 ?>
