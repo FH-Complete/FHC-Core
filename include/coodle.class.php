@@ -296,7 +296,7 @@ class coodle extends basis_db
     }
     
     /**
-     * Liefert eine Ressource zur übergebenen ressource_id zurück
+     * Lädt eine Ressource 
      * @param type $coodle_ressource_id 
      * @return true wenn ok, false im Fehlerfall
      */
@@ -340,51 +340,8 @@ class coodle extends basis_db
     }
     
     /**
-     * Liefert alle Coodleumfragen eines bestimmten Erstellers zurück
-     * @param type $ersteller_uid 
-     * @return true wenn ok, false im Fehlerfall 
-     */
-    public function getCoodleFromErsteller($ersteller_uid)
-    {
-        if($hersteller_uid =='')
-        {
-            $this->errormsg = 'Keine gültige ersteller_uid'."\n";
-            return false; 
-        }  
-        
-        $qry = "SELECT * FROM campus.tbl_coodle WHERE ersteller_uid =".$this->db_add_param($ersteller_uid, FHC_STRING, false); 
-        
-        if(!$this->db_query($qry))
-        {
-            $this->errormsg ='Fehler bei der Abfrage aufgetreten!';
-            return false; 
-        }
-        
-        while($row = $this->db_fetch_object())
-        {
-            $coodle = new coodle(); 
-            
-            $coodle->coodle_id = $row->coodle_id; 
-            $coodle->titel = $row->titel; 
-            $coodle->beschreibung = $row->beschreibung; 
-            $coodle->coodle_status_kurzbz = $row->coodle_status_kurzbz; 
-            $coodle->dauer = $row->dauer; 
-            $coodle->endedatum = $row->endedatum; 
-            $coodle->insertamum = $row->insertamum; 
-            $coodle->insertvon = $row->insertvon; 
-            $coodle->updateamum = $row->updateamum; 
-            $coodle->updatevon = $row->updatevon; 
-            $coodle->ersteller_uid = $row->ersteller_uid; 
-            
-            $this->result[] = $coodle; 
-        }
-        
-        return true; 
-    }
-    
-    /**
      * Liefert alle Coodle Umfragen zurück wo Benutzer entweder Ersteller oder Ressource ist 
-     * und das Endedatum in der Zukunft liegt
+     * und das Endedatum vor 20 Tagen oder in der Zukunft liegt
      * @param type $uid 
      * @return true wenn ok, false im Fehlerfall 
      */
@@ -392,17 +349,17 @@ class coodle extends basis_db
     {
         if($uid == '')
         {
-            $this->errormsg = 'keine gültige erteller_uid'; 
+            $this->errormsg = 'keine gültige uid'; 
             return false; 
         }
                 
         $qry = "SELECT distinct campus.tbl_coodle.* 
-                FROM campus.tbl_coodle 
-                LEFT JOIN campus.tbl_coodle_ressource USING(coodle_id) 
+                    FROM campus.tbl_coodle 
+                    LEFT JOIN campus.tbl_coodle_ressource USING(coodle_id) 
                 WHERE 
 					(uid =".$this->db_add_param($uid, FHC_STRING, false)." 
                     OR ersteller_uid =".$this->db_add_param($uid, FHC_STRING, false).")
-                    AND endedatum >= CURRENT_DATE - interval '20 days'"; 
+                    AND endedatum >= CURRENT_DATE - interval '20 days';"; 
         
         if(!$this->db_query($qry))
         {
@@ -449,6 +406,8 @@ class coodle extends basis_db
 			$qry.=' AND ort_kurzbz='.$this->db_add_param($ort_kurzbz, FHC_STRING, false);
 		if($email!='')
 			$qry.=' AND email='.$this->db_add_param($email, FHC_STRING, false);
+        
+        $qry.=';';
 
 		if($result = $this->db_query($qry))
 		{
@@ -543,7 +502,6 @@ class coodle extends basis_db
 		}
 	}
     
-    
     /**
 	 * Speichert die aktuelle Ressource in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
@@ -560,16 +518,12 @@ class coodle extends basis_db
 			return false;
 
 		if($new)
-		{
-            
-            // Zuerst alle Termine der person löschen
-            
-           // $this->deleteRessourceTermin($this->coodle_ressource_id, $this->coodle_termin_id); 
+		{            
 			//Neuen Datensatz einfuegen
 			$qry='INSERT INTO campus.tbl_coodle_ressource_termin(coodle_ressource_id, coodle_termin_id, insertamum, insertvon) VALUES('.
                   $this->db_add_param($this->coodle_ressource_id, FHC_INTEGER, false).', '.
 			      $this->db_add_param($this->coodle_termin_id, FHC_INTEGER, false).', 
-                      CURRENT_TIMESTAMP, '.
+                    CURRENT_TIMESTAMP, '.
 			      $this->db_add_param($this->insertvon, FHC_STRING).');';
 		}
 		else
@@ -587,6 +541,13 @@ class coodle extends basis_db
             return true;
 	}
     
+    /**
+     * Lädt eine Ressource zur übergebenen $coodle_id und $uid oder $zugangscode
+     * @param Integer $coodle_id
+     * @param varchar $uid
+     * @param varchar $zugangscode
+     * @return boolean 
+     */
     public function getRessourceFromUser($coodle_id, $uid='', $zugangscode='')
     {
         $qry ="SELECT * FROM campus.tbl_coodle_ressource
@@ -629,7 +590,13 @@ class coodle extends basis_db
         }
     }
     
-    public function deleteRessourceTermin($ressource_id, $coodle_id)
+    /**
+     * Löscht alle Termine einer Ressource zu einer übergebenen Coodleumfrage
+     * @param Integer $coodle_id
+     * @param Integer $ressource_id
+     * @return boolean 
+     */
+    public function deleteRessourceTermin($coodle_id, $ressource_id)
     {
         if($ressource_id == '' || !is_numeric($ressource_id) || $coodle_id == '' || !is_numeric($coodle_id))
         {
@@ -639,7 +606,9 @@ class coodle extends basis_db
         
         $qry="DELETE FROM campus.tbl_coodle_ressource_termin
             WHERE coodle_ressource_id =".$this->db_add_param($ressource_id, FHC_INTEGER)."
-                AND coodle_termin_id IN (SELECT coodle_termin_id FROM campus.tbl_coodle_termin WHERE coodle_id =".$this->db_add_param($coodle_id, FHC_INTEGER).");";
+                AND coodle_termin_id IN 
+                    (SELECT coodle_termin_id FROM campus.tbl_coodle_termin 
+                        WHERE coodle_id =".$this->db_add_param($coodle_id, FHC_INTEGER).");";
         
         $this->errormsg = $qry; 
         
@@ -649,7 +618,12 @@ class coodle extends basis_db
             return false; 
     }
 
-    
+    /**
+     * Überprüft ob die übergebene Ressource den übergebenen Termin ausgewählt hat
+     * @param Integer $termin_id
+     * @param Integer $ressource_id
+     * @return boolean 
+     */
     public function checkTermin($termin_id, $ressource_id)
     {
         if($ressource_id == '' || !is_numeric($ressource_id) || $termin_id == '' || !is_numeric($termin_id))
@@ -674,7 +648,13 @@ class coodle extends basis_db
         return false; 
     }
     
-    
+    /**
+     * Überprüfut ob der Benutzer entweder der Ersteller oder eine Ressource der Coodleumfrage ist
+     * @param Integer $coodle_id
+     * @param Integer $uid
+     * @param varchar $zugangscode
+     * @return boolean 
+     */
     public function checkBerechtigung($coodle_id, $uid='', $zugangscode='')
     {
         if($coodle_id =='' ||  !is_numeric($coodle_id))
@@ -711,11 +691,8 @@ class coodle extends basis_db
             $this->errormsg = 'Fehler bei der Abfrage aufgetreten'; 
             return false; 
         }
-        
-        
     }
-    
-    
+        
 	/**
 	 * Entfernt eine Ressourcezuteilung von einer Umfrage
 	 * @param $coodle_ressource_id ID der Ressourcezuteilung
@@ -751,6 +728,8 @@ class coodle extends basis_db
 
 	/** 
 	 * Speichert einen Termin
+     * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
+	 * andernfalls wird der Datensatz mit der ID in $coodle_termin_id aktualisiert
 	 * @param new
 	 * @return boolean
 	 */
@@ -775,9 +754,9 @@ class coodle extends basis_db
 		{
 			$qry='UPDATE campus.tbl_coodle_termin SET'.
 				' datum='.$this->db_add_param($this->datum, FHC_STRING, false).','.
-				' uhrzeit='.$this->db_add_param($this->uhrzeit, FHC_STRING, false).
+				' uhrzeit='.$this->db_add_param($this->uhrzeit, FHC_STRING, false).', '.
+                ' auswahl='.$this->db_add_param($this->auswahl, FHC_BOOLEAN, false).
 				' WHERE coodle_termin_id='.$this->db_add_param($this->coodle_termin_id, FHC_INTEGER, false).';';
-
 		}
 		
 		if($this->db_query($qry))
@@ -823,7 +802,15 @@ class coodle extends basis_db
 	 */
 	public function getTermine($coodle_id)
 	{
-		$qry = "SELECT * FROM campus.tbl_coodle_termin WHERE coodle_id=".$this->db_add_param($coodle_id).' ORDER BY datum, uhrzeit';
+        if($coodle_id == '' || !is_numeric($coodle_id))
+        {
+            $this->errormsg = "Ungültige Coodle_id"; 
+            return false; 
+        }
+        
+		$qry = "SELECT * FROM campus.tbl_coodle_termin
+                    WHERE coodle_id=".$this->db_add_param($coodle_id, FHC_INTEGER, false).' 
+                    ORDER BY datum, uhrzeit;';
 		
 		if($result = $this->db_query($qry))
 		{
@@ -857,7 +844,7 @@ class coodle extends basis_db
     {
         $qry = "SELECT tbl_coodle.* from campus.tbl_coodle 
             JOIN campus.tbl_coodle_ressource USING(coodle_id) 
-            WHERE zugangscode =".$this->db_add_param($zugangscode, FHC_STRING); 
+            WHERE zugangscode =".$this->db_add_param($zugangscode, FHC_STRING).';'; 
         
         if($result = $this->db_query($qry))
         {
@@ -891,12 +878,13 @@ class coodle extends basis_db
 
 	/**
 	 * Laedt einen Termin
-	 * @param $coodle_termin_id
+	 * @param Integer $coodle_termin_id
 	 * @return boolean
 	 */
 	public function loadTermin($coodle_termin_id)
 	{
-		$qry = "SELECT * FROM campus.tbl_coodle_termin WHERE coodle_termin_id=".$this->db_add_param($coodle_termin_id);
+		$qry = "SELECT * FROM campus.tbl_coodle_termin 
+                    WHERE coodle_termin_id=".$this->db_add_param($coodle_termin_id, FHC_INTEGER).';';
 
 		if($result = $this->db_query($qry))
 		{
@@ -929,7 +917,14 @@ class coodle extends basis_db
 	 */
 	public function deleteTermin($coodle_termin_id)
 	{
-		$qry = "DELETE FROM campus.tbl_coodle_termin WHERE coodle_termin_id=".$this->db_add_param($coodle_termin_id);
+        if($coodle_termin_id == '' || !is_numeric($coodle_termin_id))
+        {
+            $this->errormsg = 'Ungültige Id übergeben'; 
+            return false; 
+        }
+        
+		$qry = "DELETE FROM campus.tbl_coodle_termin 
+                    WHERE coodle_termin_id=".$this->db_add_param($coodle_termin_id, FHC_INTEGER, false).';';
 		
 		if($this->db_query($qry))
 			return true;
@@ -940,12 +935,11 @@ class coodle extends basis_db
 	}
     
     /**
-     * Überprüft ob die übergebene Coodleumfrage den übergebenen Status besitzt
-     * @param $coodle_id
-     * @param $status
+     * Überprüft ob die übergebene Coodleumfrage den Status laufend oder abgeschlossen hat
+     * @param Integer $coodle_id
      * @return boolean 
      */
-    public function checkStatus($coodle_id, $status='laufend')
+    public function checkStatus($coodle_id)
     {
         if($coodle_id == '' || !is_numeric($coodle_id))
         {
@@ -953,8 +947,9 @@ class coodle extends basis_db
             return false; 
         }
         
-        $qry ="SELECT 1 FROM campus.tbl_coodle WHERE coodle_id = ".$this->db_add_param($coodle_id, FHC_INTEGER, false)."
-            AND coodle_status_kurzbz = ".$this->db_add_param($status, FHC_STRING, false); 
+        $qry ="SELECT 1 FROM campus.tbl_coodle 
+                WHERE coodle_id = ".$this->db_add_param($coodle_id, FHC_INTEGER, false)."
+                AND coodle_status_kurzbz IN('laufend','abgeschlossen');";
         
         if($result = $this->db_query($qry))
         {
@@ -971,9 +966,146 @@ class coodle extends basis_db
             $this->errormsg = 'Fehler bei der Abfrage aufgetreten'; 
             return false; 
         }
+    }
+
+    /**
+     * Setzt die Auswahl aller Termine auf false
+     * @param Integer $coodle_id
+     * @return boolean 
+     */
+    public function setTerminFalse($coodle_id)
+    {
+        if($coodle_id == '' || !is_numeric($coodle_id))
+        {
+            $this->errormsg = "Coodle_id muss eine gültige Zahl sein"; 
+            return false; 
+        }
         
+        $qry ="UPDATE campus.tbl_coodle_Termin set auswahl='false' 
+                WHERE coodle_id=".$this->db_add_param($coodle_id, FHC_INTEGER, false).';'; 
+        
+        if($result=$this->db_query($qry))
+            return true; 
+        else
+        {
+            $this->errormsg = 'Fehler bei der Abfrage aufgetreten'; 
+            return false; 
+        }
+    }
+    
+    /**
+     * Gibt true zurück wenn der übergeben termin der ausgewählte ist für die übergebene coodle_id
+     * @param Integer $coodle_id 
+     * @param Integer $coodle_termin_id 
+     * @return boolean 
+     */
+    public function checkTerminAuswahl($coodle_id, $coodle_termin_id)
+    {
+        if($coodle_id == '' || !is_numeric($coodle_id))
+        {
+            $this->errormsg = "Coodle_id muss eine gültige Zahl sein"; 
+            return false; 
+        }
+        
+        if($coodle_termin_id == '' || !is_numeric($coodle_termin_id))
+        {
+            $this->errormsg = "termin_id muss eine gültige Zahl sein"; 
+            return false; 
+        }
+        
+        $qry = "Select * FROM campus.tbl_coodle_termin 
+                    WHERE coodle_id = ".$this->db_add_param($coodle_id, FHC_INTEGER, false)." 
+                    AND coodle_termin_id = ".$this->db_add_param($coodle_termin_id, FHC_INTEGER, false)."
+                    AND auswahl is true";
+        
+        if($result = $this->db_query($qry))
+        {
+            if($row = $this->db_fetch_object($result))
+                return true; 
+        }
+        else
+        {
+            $this->errormsg = 'Fehler bei der Abfrage aufgetreten'; 
+            return false; 
+        }
+        
+        return false; 
     }
     
     
+    /**
+     * Gibt die Id des ausgewählten Termines der Coodleumfrage zurück
+     * @param Integer $coodle_id 
+     * @param Integer $coodle_termin_id 
+     * @return boolean 
+     */
+    public function getTerminAuswahl($coodle_id)
+    {
+        if($coodle_id == '' || !is_numeric($coodle_id))
+        {
+            $this->errormsg = "Coodle_id muss eine gültige Zahl sein"; 
+            return false; 
+        }
+        
+        $qry = "Select * FROM campus.tbl_coodle_termin 
+                    WHERE coodle_id = ".$this->db_add_param($coodle_id, FHC_INTEGER, false)." 
+                    AND auswahl is true";
+        
+        if($result = $this->db_query($qry))
+        {
+            if($row = $this->db_fetch_object($result))
+                return $row->coodle_termin_id; 
+        }
+        else
+        {
+            $this->errormsg = 'Fehler bei der Abfrage aufgetreten'; 
+            return false; 
+        }
+        
+        return false; 
+    }
+    
+    /**
+     * Liefert alle Räume die als Ressource zu einer Umfrage eingetragen sind
+     * @param Integer $coodle_id
+     * @return boolean 
+     */
+    public function getRaumeFromId($coodle_id)
+    {
+        if($coodle_id == '' || !is_numeric($coodle_id))
+        {
+            $this->errormsg = "Coodle_id muss eine gültige Zahl sein"; 
+            return false; 
+        }
+        
+        $qry ="SELECT * FROM campus.tbl_coodle_ressource
+                WHERE coodle_id =".$this->db_add_param($coodle_id, FHC_INTEGER, false)." 
+                    AND ort_kurzbz is not null"; 
+        
+        if($result = $this->db_query($qry))
+        {
+            while($row = $this->db_fetch_object($result))
+            {
+                $ressource = new coodle(); 
+                
+                $ressource->coodle_ressource_id = $row->coodle_ressource_id; 
+                $ressource->coodle_id = $row->coodle_id; 
+                $ressource->ort_kurzbz = $row->ort_kurzbz;
+                $ressource->insertamum = $row->insertamum; 
+                $ressource->insertvon = $row->insertvon; 
+                $ressource->updateamum = $row->updateamum; 
+                $ressource->updatevon = $row->updatevon; 
+                
+                $this->result[] = $ressource; 
+                
+            }
+            return true; 
+        }
+        else
+        {
+            $this->erromsg = "Fehler bei der Abfrage aufgetreten"; 
+            return false; 
+        }
+    }
 }
 ?>
