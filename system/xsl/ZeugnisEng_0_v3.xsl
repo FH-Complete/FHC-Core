@@ -158,7 +158,7 @@
 								</fo:table-cell>
 								<fo:table-cell>
 								<!--non-credit participation (na) - Note im FAS nicht vorhanden-->
-									<fo:block font-size="6pt" font-family="arial">Participated with success (met), passed (b), successfully completed (ea), not successfully completed (nea), did not participate (nt)</fo:block>
+									<fo:block font-size="6pt" font-family="arial">Participated with success (met), passed (b), successfully completed (ea), not successfully completed (nea), did not participate (nt), participated(tg)</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
 						</fo:table-body>
