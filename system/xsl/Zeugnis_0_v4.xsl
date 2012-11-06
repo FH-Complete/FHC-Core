@@ -125,7 +125,7 @@
 									<fo:block font-size="6pt" font-family="arial">Notenstufen: </fo:block>
 								</fo:table-cell>
 								<fo:table-cell>
-									<fo:block font-size="6pt" font-family="arial">Sehr gut (1), Gut (2), Befriedigend (3), Genügend (4), Nicht genügend (5), mit Erfolg teilgenommen (met), nicht teilgenommen (nt)</fo:block>
+									<fo:block font-size="6pt" font-family="arial">Sehr gut (1), Gut (2), Befriedigend (3), Genügend (4), Nicht genügend (5), mit Erfolg teilgenommen (met), nicht teilgenommen (nt), teilgenommen(tg),</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
 							<fo:table-row>
