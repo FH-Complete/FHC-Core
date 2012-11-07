@@ -420,12 +420,14 @@ if($method!='')
 								
 								$adresse = new adresse();
 								$adresse->load_pers($inc->person_id);
-								$nation_code='';
+								$nation_code='A';
+								/*
+								 Gastnation muss bei Incoming immer A sein
 								if(isset($adresse->result[0]))
 									$nation_code = $adresse->result[0]->nation;
 								if($nation_code=='')
 									$nation_code='A';
-								
+								*/
 								$bisio->new = true;
 								$bisio->mobilitaetsprogramm_code = $inc->mobilitaetsprogramm_code;
 								$bisio->nation_code = $nation_code;
