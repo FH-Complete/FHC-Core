@@ -71,14 +71,14 @@ else
 if(isset ($_POST['save']))
 {
     $coodle_help = new coodle(); 
+    $error = false; 
     
     // Ressource ID von Zugangscode oder UID holen und Beiträge löschen
     if(isset($_GET['zugangscode']))
     {
-        
+        // Einträge löschen
         $coodle_help->getRessourceFromUser($coodle_id, '', $_GET['zugangscode']);
         $coodle_ressource_termin= $coodle_help->deleteRessourceTermin($coodle_id, $coodle_help->coodle_ressource_id);  
-        $message = "<span class='ok'>".$p->t('global/erfolgreichgespeichert')."</span>";   // weil wenn alle checkboxen gelöscht werden kommt man nicht mehr in die speichern schleife
     }
     else
     {
@@ -86,7 +86,6 @@ if(isset ($_POST['save']))
         {
             $coodle_help->getRessourceFromUser($coodle_id, $uid);
             $coodle_ressource_termin= $coodle_help->deleteRessourceTermin($coodle_id, $coodle_help->coodle_ressource_id);
-            $message = "<span class='ok'>".$p->t('global/erfolgreichgespeichert')."</span>"; 
         }
     }
     
@@ -105,11 +104,14 @@ if(isset ($_POST['save']))
             $coodle_ressource_termin->new = true; 
 
             if(!$coodle_ressource_termin->saveRessourceTermin())
-                $message= "<span class='error'>".$p->t('global/fehlerBeimSpeichernDerDaten')."</span>"; 
-            else
-                $message = "<span class='ok'>".$p->t('global/erfolgreichgespeichert')."</span>"; 
+                $error = true; 
         }
     }
+    
+    if($error)
+        $message= "<span class='error'>".$p->t('global/fehlerBeimSpeichernDerDaten')."</span>"; 
+    else
+        $message = "<span class='ok'>".$p->t('global/erfolgreichgespeichert')."</span>"; 
 }
 
 // endgültige auswahl des termins speichern
