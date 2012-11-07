@@ -33,6 +33,7 @@ require_once('../include/benutzerberechtigung.class.php');
 
 $SOAPServer = new SoapServer(APP_ROOT."/soap/ressource_projekt.wsdl.php?".microtime());
 $SOAPServer->addFunction("saveProjektRessource");
+$SOAPServer->addFunction("deleteProjektRessource");
 $SOAPServer->handle();
 
 // WSDL Chache auf aus
@@ -79,6 +80,47 @@ function saveProjektRessource($username, $passwort, $projektRessource)
 	else
 		return new SoapFault("Server", $ressource->errormsg);
 }
+
+/**
+ * Löscht entweder eine Projekt zu Ressource oder Phase zu Ressource Zuordnung
+ * @param type $username
+ * @param type $passwort
+ * @param type $projektRessource
+ * @return \SoapFault 
+ */
+function deleteProjektRessource($username, $passwort, $projektRessource)
+{  
+    if(!$user = check_user($username, $passwort))
+        return new SoapFault ("Server", "Invalid Credentials"); 
+    
+    $recht = new benutzerberechtigung(); 
+    $recht->getBerechtigungen($user); 
+        
+   // if(!$rechte->isBerechtigt('planner', null, 'sui'))
+	//	return new SoapFault("Server", "Sie haben keine Berechtigung zum Speichern von Projekten.");
+    
+    $ressource = new ressource(); 
+        
+    if($projektRessource->projektphase_id != '')
+    {
+        // von Projektphase löschen
+        if($ressource->deleteFromPhase($projektRessource->ressource_id, $projektRessource->projektphase_id))
+            return "Erfolg"; 
+        else
+            return "Fehler beim Löschen"; 
+        
+    }
+    else
+    {
+        // von Projekt löschen
+        if($ressource->deleteFromProjekt($projektRessource->ressource_id, $projektRessource->projekt_kurzbz))
+            return "Erfolg"; 
+        else
+            return "Fehler beim Löschen"; 
+            
+    }
+}
+
 ?>
 
 

@@ -33,10 +33,24 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
        <wsdl:part name="message" type="xsd:string"></wsdl:part>
   	</wsdl:message>
    
+    <wsdl:message name="DeleteProjektRessourceRequest">
+		<wsdl:part name="username" type="xsd:string" minOccurs="0"></wsdl:part>
+		<wsdl:part name="passwort" type="xsd:string" minOccurs="0"></wsdl:part>  	
+		<wsdl:part name="projektRessource" type="tns:projektRessource"></wsdl:part>
+    </wsdl:message>
+    
+    <wsdl:message name="DeleteProjektRessourceResponse">
+       <wsdl:part name="message" type="xsd:string"></wsdl:part>
+  	</wsdl:message>
+    
  <wsdl:portType name="ConfigPortType" >
        <wsdl:operation name="saveProjektRessource">
            <wsdl:input message="tns:SaveProjektRessourceRequest"></wsdl:input>
            <wsdl:output message="tns:SaveProjektRessourceResponse"></wsdl:output>        
+       </wsdl:operation>
+        <wsdl:operation name="deleteProjektRessource">
+           <wsdl:input message="tns:DeleteProjektRessourceRequest"></wsdl:input>
+           <wsdl:output message="tns:DeleteProjektRessourceResponse"></wsdl:output>        
        </wsdl:operation>
    </wsdl:portType>
 
@@ -44,6 +58,15 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
        <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
        <wsdl:operation name="saveProjektRessource">
            <soap:operation soapAction="<?php echo APP_ROOT."soap/saveProjektRessource";?>" />
+           <wsdl:input> 
+               <soap:body use="encoded" namespace="http://localhost/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+           </wsdl:input>
+           <wsdl:output>
+               <soap:body use="encoded" namespace="http://localhost/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+           </wsdl:output>
+       </wsdl:operation> 
+        <wsdl:operation name="deleteProjektRessource">
+           <soap:operation soapAction="<?php echo APP_ROOT."soap/deleteProjektRessource";?>" />
            <wsdl:input> 
                <soap:body use="encoded" namespace="http://localhost/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
            </wsdl:input>
