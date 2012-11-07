@@ -513,7 +513,66 @@ class ressource extends basis_db
 			$this->errorsmg = 'Fehler beim Laden';
 			return false;
 		}
-		
 	}
+    
+    /**
+     * Löscht eine Ressource zu Projekt Zuordnung
+     * @param type $ressource_id
+     * @param type $projekt_kurzbz
+     * @return boolean 
+     */
+    public function deleteFromProjekt($ressource_id, $projekt_kurzbz)
+    {
+        if($ressource_id == '' || !is_numeric($ressource_id))
+        {
+            $this->errormsg = 'Ressource Id ist keine gültige Zahl'; 
+            return false; 
+        }
+        
+        $qry="DELETE FROM fue.tbl_projekt_ressource WHERE ressource_id =".$this->db_add_param($ressource_id, FHC_INTEGER, false)." 
+                AND projekt_kurzbz=".$this->db_add_param($projekt_kurzbz, FHC_STRING, false).';'; 
+        
+        if($this->db_query($qry))
+        {   
+            return true; 
+        }
+        else
+        {
+            $this->errormsg = 'Fehler beim Löschen der Daten'; 
+            return false; 
+        }
+    }
+    
+        /**
+     * Löscht eine Ressource zu Phase Zuordnung
+     * @param type $ressource_id
+     * @param type $projekt_kurzbz
+     * @return boolean 
+     */
+    public function deleteFromPhase($ressource_id, $projektphase_id)
+    {
+        if($ressource_id == '' || !is_numeric($ressource_id))
+        {
+            $this->errormsg = 'Ressource Id ist keine gültige Zahl'; 
+            return false; 
+        }
+        
+        if($projektphase_id == '' || !is_numeric($projektphase_id))
+        {
+            $this->errormsg = 'Ressource Id ist keine gültige Zahl'; 
+            return false; 
+        }        
+        
+        $qry="DELETE FROM fue.tbl_projekt_ressource WHERE ressource_id =".$this->db_add_param($ressource_id, FHC_INTEGER, false)." 
+                AND projektphase_id=".$this->db_add_param($projektphase_id, FHC_INTEGER, false).';'; 
+        
+        if($this->db_query($qry))
+            return true; 
+        else
+        {
+            $this->errormsg = 'Fehler beim Löschen der Daten'; 
+            return false; 
+        }
+    }
 }
 ?>

@@ -43,6 +43,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			<xul:toolbox>
 				<xul:toolbar >
 					<xul:toolbarbutton label="Aktualisieren" oncommand="document.getBindingParent(this).RefreshRessource()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
+                    <xul:toolbarbutton label="Loeschen" oncommand="document.getBindingParent(this).DeleteRessource(document.getBindingParent(this).value)" disabled="false" image="../skin/images/DeleteIcon.png" tooltiptext="Ressource löschen"/>
 				</xul:toolbar>
 			</xul:toolbox>
 			<xul:tree anonid="tree-ressource"
@@ -240,6 +241,68 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				//debug('Refresh Notiz');
 				netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 				this.TreeRessourceDatasource.Refresh(false); //non blocking
+			]]>
+			</body>
+		</method>
+            <method name="DeleteRessource">
+            <parameter name="ressource_id"/>
+			<body>
+			<![CDATA[
+				//debug('Refresh Notiz');
+                netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+                try
+                {
+                    var projekt_kurzbz = this.getAttribute('projekt_kurzbz');
+                    var projektphase_id = this.getAttribute('projektphase_id');
+
+                    var soapBody = new SOAPObject("deleteProjektRessource");
+                    //soapBody.appendChild(new SOAPObject("username")).val('joe');
+                    //soapBody.appendChild(new SOAPObject("passwort")).val('waschl');					
+
+                    var projektRessource = new SOAPObject("projektRessource");
+
+                    if(projekt_kurzbz != '')
+                    {
+                        projektRessource.appendChild(new SOAPObject("projektphase_id")).val('');
+                        projektRessource.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
+                    }else if(projektphase_id != '')
+                    {
+                        projektRessource.appendChild(new SOAPObject("projektphase_id")).val(projektphase_id);
+                        projektRessource.appendChild(new SOAPObject("projekt_kurzbz")).val('');				    
+                    }
+                    projektRessource.appendChild(new SOAPObject("ressource_id")).val(ressource_id);
+                    soapBody.appendChild(projektRessource);
+                    
+                    var sr = new SOAPRequest("deleteProjektRessource",soapBody);
+				    SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/ressource_projekt.soap.php?"+gettimestamp();
+				    
+				    function mycallb(obj) {
+					  var me=obj;
+					  this.invoke=function (respObj) {
+					    try
+						{
+							var id = respObj.Body[0].deleteProjektRessourceResponse[0].message[0].Text;
+						}
+						catch(e)
+						{
+							var fehler = respObj.Body[0].Fault[0].faultstring[0].Text;
+							alert('Fehler: '+fehler);
+							return;
+						}
+						me.RefreshRessource();
+					  }
+					}
+					var cb=new mycallb(this);
+				    
+				    SOAPClient.SendRequest(sr,cb.invoke);
+
+				}
+				catch(e)
+				{
+					debug("Ressource load failed with exception: "+e);
+				}
+                    
+                
 			]]>
 			</body>
 		</method>
