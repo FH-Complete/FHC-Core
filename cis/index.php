@@ -25,7 +25,29 @@ require_once('../config/cis.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/sprache.class.php');
 require_once('../include/phrasen.class.php');
+require_once('../include/mail.class.php');
 
+/**
+ * Prueft die URL damit keine boesen URLS uebergeben werden koennen
+ * @param $param
+ */
+function validURLCheck($param)
+{
+	if(strstr($param,'://'))
+	{
+		// Der APP_ROOT muss in der URL vorkommen, sonfern es kein relativer Pfad ist
+		if(mb_strpos($param, APP_ROOT)!==0)
+		{
+			$text="Dies ist eine automatische Mail.\nEs wurde eine mögliche XSS Attacke durchgefuehrt:\n";
+			$text.="\nFolgende URL wurde versucht aufzurufen: \n".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
+			$text.="\n\nIP des Aufrufers: ".$_SERVER['REMOTE_ADDR'];
+			$text.="\n\nAuffälliger Value: $param";
+			$mail = new mail(MAIL_ADMIN, 'no-reply@'.DOMAIN, 'Versuchte XSS Attacke', $text);
+			$mail->send();
+			die('Invalid URL detected');
+		}
+	}
+}
 ob_start();
 if(isset($_GET['sprache']))
 {
@@ -43,14 +65,20 @@ if(isset($_GET['content_id']))
 }
 else
 	$id = '';
-	
+
 if(isset($_GET['menu']))
+{
 	$menu = $_GET['menu'];
+	validURLCheck($menu);
+}
 else
 	$menu = 'menu.php?content_id='.$id;
 	
 if(isset($_GET['content']))
+{
 	$content = $_GET['content'];
+	validURLCheck($content);
+}
 else
 	$content = '../cms/news.php';
 	
