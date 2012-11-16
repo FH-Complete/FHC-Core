@@ -7,7 +7,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:template match="lehrauftraege">
 		<fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format">
 			<fo:layout-master-set>
-				<fo:simple-page-master page-height="297mm" page-width="210mm" margin="5mm 25mm 5mm 25mm" master-name="PageMaster">
+ 			<fo:simple-page-master page-height="297mm" page-width="210mm" margin="5mm 25mm 5mm 25mm" master-name="PageMaster">
 					<fo:region-body margin="20mm 0mm 20mm 0mm"/>
 				</fo:simple-page-master>
 			</fo:layout-master-set>
@@ -18,31 +18,46 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:template match="lehrauftrag">
 		<fo:page-sequence master-reference="PageMaster">
 			<fo:flow  ><!--flow-name="xsl-region-body"-->
+				<!-- Titel -->
+				\n<fo:block-container position="absolute" top="15mm" left="10mm">
+				<fo:block font-size="15pt">Fachhochschule Technikum Wien Lehrauftrag</fo:block>
+				</fo:block-container>
 				<!-- Logo -->
 				<fo:block>
-					<fo:external-graphic src="../skin/images/logo.jpg"  posx="140" posy="15" width="60mm" height="20mm" />
+					<fo:external-graphic src="../skin/images/logo.jpg"  posx="140" posy="5" width="60mm" height="20mm" />
 				</fo:block>
-				<!-- Titel -->
-				<fo:block font-size="15pt">Fachhochschule Technikum Wien Lehrauftrag</fo:block>
 				<!-- Studiengang -->
+				\n<fo:block-container position="absolute" top="20mm" left="10mm">
 				<fo:block font-size="12pt">
 					\n<xsl:value-of select="studiengang" />
 				</fo:block>
+				</fo:block-container>
 				<!--Name und Adresse-->
 				<fo:block font-size="10pt">
-					\n\n
-					\n<fo:inline font-weight="bold" font-size="12pt">
-						<xsl:value-of select="mitarbeiter/name_gesamt" />
-						\n<xsl:value-of select="mitarbeiter/anschrift" />		
-						\n<xsl:value-of select="mitarbeiter/plz" /><xsl:text> </xsl:text>
-						<xsl:value-of select="mitarbeiter/ort" />
-						\n<xsl:value-of select="mitarbeiter/zuhanden" />
-					</fo:inline>				
-					\n\n<fo:block font-size="7pt">
+					\n<fo:block-container position="absolute" top="40mm" left="21mm">
+					<fo:block>
+						<fo:inline font-weight="bold" font-size="12pt">
+							\n<xsl:value-of select="mitarbeiter/name_gesamt" />
+							\n<xsl:value-of select="mitarbeiter/anschrift" />		
+							\n<xsl:value-of select="mitarbeiter/plz" /><xsl:text> </xsl:text>
+							<xsl:value-of select="mitarbeiter/ort" />
+							\n<xsl:value-of select="mitarbeiter/zuhanden" />
+						</fo:inline>
+					</fo:block>
+					</fo:block-container>
+								
+					\n<fo:block-container font-size="7pt" position="absolute" top="62mm" left="21mm">
+					<fo:block font-size="7pt">\n
 						Abs.: Fachhochschule Technikum Wien, Höchstädtplatz 5, A-1200 Wien
 					</fo:block>
+					</fo:block-container>
 					
-					\n\n\n
+					\n<fo:block-container font-size="7pt" position="absolute" top="92mm" left="5mm">
+					<fo:block font-size="7pt" color="#B3B3B3">\n
+						&#x97;
+					</fo:block>
+					</fo:block-container>
+					
 					<fo:block font-size="10pt" font-weight="bold">
 							<xsl:value-of select="studiensemester_kurzbz" />
 					</fo:block>
@@ -66,7 +81,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 				</fo:block>
 				
 				<fo:block font-size="8pt">
-					\n\n\n\n\n\n\n\n\n\nWir beauftragen Sie, im <xsl:value-of select="studiensemester" /> folgende Lehrveranstaltungen abzuhalten:\n
+					\n\n\n\n\n\n\n Wir beauftragen Sie, im <xsl:value-of select="studiensemester" /> folgende Lehrveranstaltungen abzuhalten:\n
 				</fo:block>
 				<!-- Tabelle -->
 
@@ -147,7 +162,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 							<fo:table-cell border-width="0"><fo:block font-size="8pt" ></fo:block></fo:table-cell>
 							<fo:table-cell border-width="0"><fo:block font-size="8pt" content-width="70" text-align="center" >Wien, am <xsl:value-of select="datum" /></fo:block></fo:table-cell>
 						</fo:table-row>
-						<fo:table-row  line-height="12pt">
+						<fo:table-row  line-height="3pt">
 							<fo:table-cell border-width="0"><fo:block font-size="10pt" content-width="70" text-align="center">________________________</fo:block></fo:table-cell>
 							<fo:table-cell border-width="0"><fo:block font-size="10pt" ></fo:block></fo:table-cell>
 							<fo:table-cell border-width="0"><fo:block font-size="10pt" content-width="70" text-align="center">________________________</fo:block></fo:table-cell>
