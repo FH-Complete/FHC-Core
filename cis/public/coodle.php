@@ -16,9 +16,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Karl Burkhart 	<burkhart@technikum-wien.at>
+ * Authors: Karl Burkhart 	<burkhart@technikum-wien.at>,
+ * 			Andreas Österreicher <oesi@technikum-wien.at>
  */
-
 require_once('../../config/cis.config.inc.php');
 require_once('../../include/phrasen.class.php');
 require_once('../../include/functions.inc.php');
@@ -27,16 +27,17 @@ require_once('../../include/datum.class.php');
 require_once('../../include/mail.class.php'); 
 require_once('../../include/benutzer.class.php'); 
 require_once('../../include/reservierung.class.php'); 
-
-if(isset($_GET['lang']))
-	setSprache($_GET['lang']);
+require_once('../../include/stunde.class.php');
+require_once('../../include/stundenplan.class.php');
 
 header("Content-Type: text/html; charset=utf-8");
 
 $sprache = getSprache(); 
 $p=new phrasen($sprache); 
-
+$datum_obj = new datum();
 $message = '';
+$mailMessage='';
+$saveOk=null;
 $ersteller = false; 
 $abgeschlossen = false; 
 
@@ -55,7 +56,7 @@ if(!isset($_GET['zugangscode']))
 {
     $uid = get_uid();    
     if(!$coodle->checkBerechtigung($coodle_id, $uid))
-        die($p->t('coodle/keineBerechtiung')); 
+        die($p->t('coodle/keineBerechtigung')); 
     
     // überprüfen ob ersteller gleich uid ist
     if($coodle->ersteller_uid == $uid)
@@ -109,62 +110,99 @@ if(isset ($_POST['save']))
     }
     
     if($error)
-        $message= "<span class='error'>".$p->t('global/fehlerBeimSpeichernDerDaten')."</span>"; 
+        $message.= "<span class='error'>".$p->t('global/fehlerBeimSpeichernDerDaten')."</span><br>"; 
     else
-        $message = "<span class='ok'>".$p->t('global/erfolgreichgespeichert')."</span>"; 
+    	$saveOk=true;
 }
 
 // endgültige auswahl des termins speichern
 if(isset($_POST['auswahl_termin']))
 {
-    $auswahl = $_POST['auswahl_termin']; 
-    
-    // setzte auswahl von termin_id auf true
-    $coodle_help = new coodle(); 
-    $coodle_help->loadTermin($auswahl);
-    $coodle_help->auswahl = true; 
-    
-    // alle termine der coodle_id auf false setzen
-    if(!$coodle_help->setTerminFalse($coodle_id))
-        exit('Fehler beim Update aufgetreten'); 
-
-    if(!$coodle_help->saveTermin(false))
-        $message="<span class='error'>".$p->t('global/fehlerBeimSpeichernDerDaten')."</span>";
-    else
-        $message="<span class='ok'>".$p->t('global/erfolgreichgespeichert')."</span>"; 
-    
-    $coodle_status = new coodle(); 
-    $coodle_status->load($coodle_id); 
-    $coodle_status->coodle_status_kurzbz = 'abgeschlossen'; 
-    $coodle_status->new = false; 
-    $coodle_status->save(); 
-    
-    sendEmail($coodle_id); 
-    
-    // raum reservieren
-    $coodle_raum = new coodle(); 
-    $coodle_raum->getRaumeFromId($coodle_id); 
-    
-    // wenn 1 raum eingetragen ist speichern
-    if(count($coodle_raum->result) == 1)
-    {
-        $raum_reservierung = new reservierung(); 
-        $raum_reservierung->ort_kurzb = '';
-        $raum_reservierung->studiengang_kz = '0'; 
-        $raum_reservierung->uid = $uid; 
-        $raum_reservierung->ort_kurzbz = $coodle_raum->result[0]->ort_kurzbz; 
-        $raum_reservierung->datum = $coodle_help->datum; 
-        
-        // uhrzeit in welcher stunde
-        
-        $raum_reservierung->stunde = '1';
-        if($raum_reservierung->save(true))
-            echo $p->t('coodle/raumErfolgreichReserviert'); 
-    }
-    else
-        echo $p->t('coodle/keineOderMehrereRäume'); 
-    
+	if($ersteller)
+	{
+	    $auswahl = $_POST['auswahl_termin']; 
+	    if($auswahl!='')
+	    {
+		    // setzte auswahl von termin_id auf true
+		    $coodle_help = new coodle(); 
+		    $coodle_help->loadTermin($auswahl);
+		    $coodle_help->auswahl = true; 
+		    
+		    // alle termine der coodle_id auf false setzen
+		    if(!$coodle_help->setTerminFalse($coodle_id))
+		        exit('Fehler beim Update aufgetreten'); 
+		
+		    if(!$coodle_help->saveTermin(false))
+		        $message.="<span class='error'>".$p->t('global/fehlerBeimSpeichernDerDaten')."</span><br>";
+		    else
+				$saveOk=true;
+		    
+		    $coodle_status = new coodle(); 
+		    $coodle_status->load($coodle_id); 
+		    $coodle_status->coodle_status_kurzbz = 'abgeschlossen'; 
+		    $coodle_status->new = false; 
+		    $coodle_status->save(); 
+		    
+		    sendEmail($coodle_id); 
+		    
+		    
+		    if($coodle_help->datum<RES_TAGE_LEKTOR_BIS)
+		    {
+			    // Raum reservieren
+			    $coodle_raum = new coodle(); 
+			    $coodle_raum->getRaumeFromId($coodle_id); 
+			    
+			    //Ende Uhrzeit berechnen
+			    $date = new DateTime($coodle_help->datum.' '.$coodle_help->uhrzeit);
+		    	$interval =new DateInterval('PT'.$coodle->dauer.'M');
+			    $date->add($interval);
+		    	$uhrzeit_ende = $date->format('H:i:s');
+		
+				foreach($coodle_raum->result as $raum)
+				{
+					$stunde = new stunde();
+					$stunden = $stunde->getStunden($coodle_help->uhrzeit, $uhrzeit_ende);
+					
+					// Pruefen ob der Raum frei ist
+					if(!RaumBelegt($raum->ort_kurzbz, $coodle_help->datum, $stunden))
+					{
+						$reservierung_error=false;
+						// Stunden reservieren
+						foreach($stunden as $stunde)
+						{
+					        $raum_reservierung = new reservierung(); 
+					        $raum_reservierung->studiengang_kz = '0'; 
+					        $raum_reservierung->uid = $uid; 
+					        $raum_reservierung->ort_kurzbz = $raum->ort_kurzbz; 
+					        $raum_reservierung->datum = $coodle_help->datum; 
+					        $raum_reservierung->stunde = $stunde;
+					        $raum_reservierung->titel = mb_substr($coodle->titel,0,10);
+					        $raum_reservierung->beschreibung = mb_substr($coodle->titel, 0, 32);
+					        $raum_reservierung->insertamum = date('Y-m-d H:i:s');
+					        $raum_reservierung->insertvon = $uid;
+					        
+					        //$message.= "Reserviere $raum->ort_kurzbz Stunde $stunde:";
+					        if(!$raum_reservierung->save(true))
+				        		$reservierung_error=true;			        	
+						}
+						$message.= $p->t('coodle/raumErfolgreichReserviert', array($raum->ort_kurzbz)).'<br>';
+					}
+					else
+					{
+						$message.='<span class="error">'.$p->t('coodle/raumBelegt', array($raum->ort_kurzbz)).'</span><br>';
+					}
+			    }
+		    }
+		    else
+		    {
+		    	$message.='<span class="error">'.$p->t('coodle/raumNichtReserviert', array($datum_obj->formatDatum(RES_TAGE_LEKTOR_BIS, 'd.m.Y'))).'</span><br>';
+		    }
+	    }
+	}
+	else
+		$message.= '<span class="error">'.$p-t('global/keineBerechtigung').'</span>';
 }
+
 
 $coodle->load($coodle_id); 
 
@@ -177,13 +215,15 @@ if(isset($_GET['resend']))
         sendEmail ($coodle_id);
 }
 
-?>
-
-<!DOCTYPE html>
+?><!DOCTYPE html>
+<html>
 <head>
     <meta charset="utf-8">
+    <link rel="stylesheet"  href="../../skin/fhcomplete.css" type="text/css">
+	<link rel="stylesheet" href="../../skin/style.css.php" type="text/css">
     <title><?php echo $p->t('coodle/terminauswahl');?></title>
     <style type="text/css">
+    /*
     body 
     {
         background: #f9f9f9;
@@ -197,11 +237,12 @@ if(isset($_GET['resend']))
 
     h5 {margin-top:0px; }
     .container {width: 100%; }
+    */
     #header 
     {
         background: #DCDDDF;
         border: 1px solid #c4c6ca;
-        position: relative;
+        /*position: relative;*/
         padding-left: 50px; 
     }
     .error 
@@ -209,26 +250,22 @@ if(isset($_GET['resend']))
         color:red;
         padding-left:20px; 
     }
-    .ok 
+    
+    #coodle_content 
     {
-        color:green; 
-        padding-left:20px;
+      
     }
-    #content 
-    {
-        padding: 20px 20px;
-    }
-    #content th 
+    #coodle_content th 
     {
         color:#008462; 
         padding-left: 10px; 
         padding-right: 10px; 
     }
-    #content tr.owner
+    #coodle_content tr.owner
     {
         background-color: #DCDDDF;
     }
-    #content th.auswahl
+    #coodle_content th.auswahl
     {
         color:red;
     }
@@ -241,32 +278,58 @@ if(isset($_GET['resend']))
     {
         color: Black; text-decoration: none;
     }
+    #wrapper 
+	{
+		width: 70%;
+		padding: 0px 10px 15px 10px;
+		/*
+		margin-left: auto;
+		margin-right: auto;
+		*/
+		border: 1px solid #ccc;
+		background: #eee;
+		text-align: left;
+	}
+
+	#wrapper h4 
+	{
+		font-size: 16px;
+		margin-top: 0;
+		padding-top: 1em;
+	}
     </style>
 
 </head>
 <body>
-<div class="container">
-    <section id="header">
-        <?php 
-        $coodle_help = new coodle(); 
-        $coodle_help->load($coodle_id); 
-  
-        $alt = strtotime($coodle_help->insertamum) ;
+<?php
+echo '<h1>'.$p->t('coodle/coodle').'</h1>';
 
-        $differenz = time() - $alt;
-        $differenz = $differenz / 86400;
-
+if(!isset($_GET['zugangscode']))
+	echo "<a href='".APP_ROOT."cis/private/coodle/uebersicht.php'><< ".$p->t('coodle/zurueckZurUebersicht')."</a>"; 
+echo '<br><br>';
+echo '<div id="wrapper">';
         
-        echo '<h1>'.$coodle->titel.'</h1>'; 
-        $erstellt = array($coodle->ersteller_uid, round($differenz)); 
-        echo '<h5>'.$p->t('coodle/erstelltVon', $erstellt).'</h5>';
-       /// echo '<h5>Erstellt von '.$coodle->ersteller_uid.' ( vor '.round($differenz).' Tagen)</h5>';
-        echo '<h4>'.$coodle->beschreibung.'</h4>';
-        ?>
-    </section>
+$coodle_help = new coodle(); 
+$coodle_help->load($coodle_id); 
+  
+$alt = strtotime($coodle_help->insertamum) ;
+
+$differenz = time() - $alt;
+$differenz = $differenz / 86400;
+$benutzer = new benutzer();
+$benutzer->load($coodle->ersteller_uid);
+$ersteller_name = trim($benutzer->titelpre.' '.$benutzer->vorname.' '.$benutzer->nachname.' '.$benutzer->titelpost);
+echo '<h4>'.$coodle->titel.'</h4>'; 
+$erstellt = array($ersteller_name, round($differenz)); 
+echo '<span style="color: #555555">'.$p->t('coodle/erstelltVon', $erstellt).'</span><br><br>';
+// echo '<h5>Erstellt von '.$coodle->ersteller_uid.' ( vor '.round($differenz).' Tagen)</h5>';
+echo $coodle->beschreibung;
+
+echo '    
 </div>
-    <div class="main">
-        <?php
+<br><br>
+<div>';
+        
         $coodle_ressourcen = new coodle(); 
         $coodle_ressourcen->getRessourcen($coodle_id);
         
@@ -276,14 +339,7 @@ if(isset($_GET['resend']))
         
         $datum = new datum(); 
         
-        echo "<br>&nbsp;";
-        if(!isset($_GET['zugangscode']))
-            echo "<a href='".APP_ROOT."cis/private/coodle/uebersicht.php'><< ".$p->t('coodle/zurueckZurUebersicht')."</a>"; 
-        
-         if($ersteller && $abgeschlossen)
-            echo '<a href="'.$_SERVER['PHP_SELF'].'?coodle_id='.$coodle_id.'&resend" style="padding-left:25px;">'.$p->t('coodle/einladungNeuVerschicken').'</a>'; 
-
-        echo "<section id='content'>
+        echo "<div id='coodle_content' >
                     <form action='' method='POST'>
 
                 <table>
@@ -300,7 +356,8 @@ if(isset($_GET['resend']))
             
             echo "<th class='".$class_auswahl."'>".$datum->formatDatum($termin->datum, 'd.m.Y').'<br>'.date('H:i',$time)."</th>";
         }
-        
+        if($ersteller)
+        	echo '<th class="normal">'.$p->t('coodle/keineAuswahl').'</th>';
         echo "</tr>";
         
         // ressourcen durchlaufen
@@ -360,33 +417,41 @@ if(isset($_GET['resend']))
                 
                 echo "<td align='center'><input type='checkbox' ".$checked." ".$disabled." name='check_".$ressource->coodle_ressource_id."_".$termin->coodle_termin_id."'></td>";
             }
-            
+            if($ersteller)
+            	echo '<td></td>';
             echo '</tr>';
         }
         
-         $disabled = $abgeschlossen?'disabled':'';
+        $disabled = $abgeschlossen?'disabled':'';
         
         if($ersteller)
         {
             // buttons für auswahl des endgültigen termins
-            echo '<tr><td>Auswahl:</td>';
+            echo '<tr><td>'.$p->t('coodle/auswahlEndtermin').' <a href="#Details" onclick="alert(\''.$p->t('coodle/auswahlHinweis').'\');return false;"><img src="../../skin/images/information.png" style="vertical-align: middle;"></a></td>';
             foreach($coodle_termine->result as $termin)
             {
                 $checked=($termin->auswahl)?'checked':''; 
                 echo '<td align="center"><input type="radio" name="auswahl_termin" '.$checked.' '.$disabled.' value='.$termin->coodle_termin_id.'></td>';
             }
-            
+            echo '<td align="center"><input type="radio" name="auswahl_termin" '.$disabled.' value=""></td>';
             echo "</tr>";
         }
 
-        if($abgeschlossen)
-            $message='<span class="ok">'.$p->t('coodle/umfrageAbgeschlossen').'</span>'; 
-        
+      
         echo "
             <tr><td>&nbsp;</td></tr>
-            <tr><td><input type='submit' value='save' name='save' ".$disabled."></td></tr>
+            <tr><td colspan='3'><input type='submit' value='".$p->t('global/speichern')."' name='save' ".$disabled.">";
+        
+		if($ersteller && $abgeschlossen)
+			echo '<input type="button" onclick="window.location.href=\''.$_SERVER['PHP_SELF'].'?coodle_id='.$coodle_id.'&resend\'" value="'.$p->t('coodle/einladungNeuVerschicken').'">';
+		if($saveOk===true)
+			echo ' <span class="ok">'.$p->t('global/erfolgreichgespeichert').'</span>';
+		echo "</td></tr>
             </table>
-            </form></section></div>".$message;
+            </form></div>".$message.'<br>'.$mailMessage;
+        if($abgeschlossen)
+            echo '<br><br><span class="ok">'.$p->t('coodle/umfrageAbgeschlossen').'</span>'; 
+        
         ?>
     </div>
     
@@ -403,19 +468,85 @@ if(isset($_GET['resend']))
  */
 function sendEmail($coodle_id)
 {
-     // email senden
+	global $mailMessage;
     global $p; 
-    
     $coodle_help = new coodle(); 
     $termin_id = $coodle_help->getTerminAuswahl($coodle_id); 
     $coodle_help->loadTermin($termin_id);
     
     $coodle_ressource = new coodle();
     $coodle_ressource->getRessourcen($coodle_id);
-    
     $coodle= new coodle(); 
     $coodle->load($coodle_id); 
-    
+    $ort='';
+    $teilnehmer='';
+    foreach($coodle_ressource->result as $row)
+    {    	
+    	if($row->ort_kurzbz!='')
+    	{
+    		if($ort!='')
+    			$ort.=', ';
+    		$ort.="$row->ort_kurzbz";
+    	}
+    	else
+    	{
+    		if($row->uid!='')
+    		{
+    			$benutzer = new benutzer();
+    			$benutzer->load($row->uid);
+    			$name = trim($benutzer->titelpre.' '.$benutzer->vorname.' '.$benutzer->nachname.' '.$benutzer->titelpost);
+    			$mail = $row->uid.'@'.DOMAIN;
+    		}
+    		else
+    		{
+    			$mail = $row->email;
+    			$name = $row->name;
+    		}
+    		$coodle_ressource_termin = new coodle();
+    		$partstat='';
+    		if($coodle_ressource_termin->checkTermin($termin_id, $row->coodle_ressource_id))
+    			$partstat='ACCEPTED';
+    		else
+    			$partstat='TENTATIVE';
+    		
+    		$teilnehmer.='ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT='.$partstat.';CN='.$name."\n :MAILTO:".$mail."\n";
+    	}
+    }
+    $date = new DateTime($coodle_help->datum.' '.$coodle_help->uhrzeit);
+    //Datum des Termins ins richtige Format bringen
+    $dtstart = $date->format('Ymd\THis');
+
+    //Ende Datum berechnen
+    $interval =new DateInterval('PT'.$coodle->dauer.'M');
+    $date->add($interval);
+    $dtend = $date->format('Ymd\THis');
+    $date = new DateTime();
+    $dtstamp = $date->format('Ymd\THis');
+    $benutzer = new benutzer();
+    $benutzer->load($coodle->ersteller_uid);
+    $erstellername = trim($benutzer->titelpre.' '.$benutzer->vorname.' '.$benutzer->nachname.' '.$benutzer->titelpost);
+    //Ical File erstellen
+    $ical = "BEGIN:VCALENDAR
+PRODID:-//Microsoft Corporation//Outlook 11.0 MIMEDIR//EN
+VERSION:2.0
+METHOD:PUBLISH
+BEGIN:VEVENT
+ORGANIZER:MAILTO:".$erstellername." <".$coodle->ersteller_uid."@".DOMAIN."
+".$teilnehmer."
+DTSTART;TZID=Europe/Vienna:".$dtstart."
+DTEND;TZID=Europe/Vienna:".$dtend."
+LOCATION:".$ort."
+TRANSP:OPAQUE
+SEQUENCE:0
+UID:FHCompleteCoodle".$coodle_id."
+DTSTAMP;TZID=Europe/Vienna:".$dtstamp."
+DESCRIPTION:".strip_tags($coodle->beschreibung)."
+SUMMARY:".$coodle->titel."
+PRIORITY:5
+CLASS:PUBLIC
+END:VEVENT
+END:VCALENDAR";
+
     if(count($coodle_ressource->result)>0)
     {
         foreach($coodle_ressource->result as $row)
@@ -425,7 +556,7 @@ function sendEmail($coodle_id)
                 $benutzer = new benutzer();
                 if(!$benutzer->load($row->uid))
                 {
-                    echo "Fehler beim Laden des Benutzers ".$coodle_ressource->convert_html_chars($row->uid);
+                    $mailMessage.="Fehler beim Laden des Benutzers ".$coodle_ressource->convert_html_chars($row->uid);
                     continue;
                 }
 
@@ -446,17 +577,14 @@ function sendEmail($coodle_id)
                 $anrede='Sehr geehrte(r) Herr/Frau '.$row->name; 
             }
             else
-            {
+			{
                 // Raueme bekommen kein Mail
                 continue;
             }
             $anrede = trim($anrede);
-            $sign = "Mit freundlichen Grüßen\n\n";
-            $sign .= "Fachhochschule Technikum Wien\n";
-            $sign .= "Höchstädtplatz 5\n";
-            $sign .= "1200 Wien\n";
+            $sign = $p->t('mail/signatur');
 
-            $datum = new datum(); 
+            $datum = new datum();
 
             $html=$anrede.'!<br><br>
                 Die Terminumfrage zum Thema "'.$coodle_ressource->convert_html_chars($coodle->titel).'" ist beendet.
@@ -465,14 +593,16 @@ function sendEmail($coodle_id)
                 <br><br>'.nl2br($sign);
 
             $text=$anrede."!\n\nDie Terminumfrage zum Thema \"".$coodle_help->convert_html_chars($coodle->titel).'"\" ist beendet.\n
-                Der Termin wurde auf den <b>'.$datum->formatDatum($coodle_help->datum, 'd.m.Y').' '.$coodle_help->uhrzeit.'</b> festgelegt\n.
-                \n\n$sign';
+                Der Termin wurde auf den <b>'.$datum->formatDatum($coodle_help->datum, 'd.m.Y').' '.$coodle_help->uhrzeit."</b> festgelegt\n.
+                \n\n$sign";
 
             $mail = new mail($email, 'no-reply@'.DOMAIN,'Terminbestätigung - '.$coodle->titel, $text);
             $mail->setHTMLContent($html);
+            //ICal Termineinladung hinzufuegen
+            $mail->addAttachmentPlain($ical, 'text/calendar', 'meeting.ics');
             if($mail->send())
             {
-                echo $p->t('coodle/mailVersandtAn',array($email))."<br>";
+                $mailMessage.= $p->t('coodle/mailVersandtAn',array($email))."<br>";
             } 
         }
     }
@@ -482,4 +612,38 @@ function sendEmail($coodle_id)
     }
 }
 
+/**
+ * 
+ * Prueft ob ein Raum belegt ist
+ * @param $ort_kurzbz
+ * @param $datum
+ * @param array $stunden
+ */
+function RaumBelegt($ort_kurzbz, $datum, $stunden)
+{
+	foreach($stunden as $stunde)
+	{
+		//Reservierungen pruefen
+		$raum_reservierung = new reservierung();
+		if($raum_reservierung->isReserviert($ort_kurzbz, $datum, $stunde))
+		{
+			return true;
+		}
+		
+		//Stundenplan abfragen
+		$stundenplan = new stundenplan('stundenplan');
+		if($stundenplan->isBelegt($ort_kurzbz, $datum, $stunde))
+		{
+			return true;
+		}
+		
+		//Stundenplan DEV abfragen
+		$stundenplan = new stundenplan('stundenplandev');
+		if($stundenplan->isBelegt($ort_kurzbz, $datum, $stunde))
+		{
+			return true;
+		}
+	}
+	return false;
+}
 ?>

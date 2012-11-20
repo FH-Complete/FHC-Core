@@ -54,6 +54,8 @@ class coodle extends basis_db
     public $datum;                  // date
     public $uhrzeit;                // date
     public $auswahl;                // boolean
+    
+    public $status_arr;	
 
 	/**
 	 * Konstruktor
@@ -649,6 +651,50 @@ class coodle extends basis_db
     }
     
     /**
+     * 
+     * Laedt alle Termine einer Umfrage zu denen eine Ressource zugesagt hat
+     * @param $coodle_id ID der Umfrage
+     * @param $ressource_id ID der Ressource
+     */
+    public function getRessourceTermin($coodle_id, $ressource_id)
+    {
+    	$qry = "SELECT 
+    				* 
+    			FROM 
+    				campus.tbl_coodle_ressource_termin 
+    				JOIN campus.tbl_coodle_termin USING(coodle_termin_id)
+    			WHERE 
+    				coodle_id=".$this->db_add_param($coodle_id, FHC_INTEGER)."
+    				AND coodle_ressource_id=".$this->db_add_param($ressource_id, FHC_INTEGER).";";
+    				
+    	if($result = $this->db_query($qry))
+    	{
+    		while($row = $this->db_fetch_object($result))
+    		{
+    			$obj = new coodle();
+    			
+    			$obj->coodle_id = $row->coodle_id;
+    			$obj->coodle_termin_id = $row->coodle_termin_id;
+    			$obj->datum = $row->datum;
+    			$obj->uhrzeit = $row->uhrzeit;
+    			$obj->auswahl = $this->db_parse_bool($row->auswahl);
+    			$obj->coodle_ressource_id = $row->coodle_ressource_id;
+    			$obj->coodle_termin_id = $row->coodle_termin_id;
+    			$obj->insertamum = $row->insertamum;
+    			$obj->insertvon = $row->insertvon;
+    			
+    			$this->result[] = $obj;
+    		}
+    		return true;
+    	}
+    	else
+    	{
+    		$this->errormsg = 'Fehler beim Laden der Daten';
+    		return false;
+    	}
+    }
+    
+    /**
      * Überprüfut ob der Benutzer entweder der Ersteller oder eine Ressource der Coodleumfrage ist
      * @param Integer $coodle_id
      * @param Integer $uid
@@ -675,9 +721,10 @@ class coodle extends basis_db
             $qry.= ' uid = '.$this->db_add_param($uid, FHC_STRING, false); 
         
         if($zugangscode != '')
-            $qry.= ' zugangscode ='.$this->db_add_param($zugangscode, FHC_STRING, false); 
+            $qry.= ' zugangscode ='.$this->db_add_param($zugangscode, FHC_STRING, false);
+         
+        $qry.="UNION SELECT 1 FROM campus.tbl_coodle WHERE ersteller_uid=".$this->db_add_param($uid).";";
         
-        $qry.=';'; 
         
         if($result = $this->db_query($qry))
         {
@@ -1106,6 +1153,28 @@ class coodle extends basis_db
             $this->erromsg = "Fehler bei der Abfrage aufgetreten"; 
             return false; 
         }
+    }
+    
+    /**
+     * Laedt alle Stati
+     */
+    public function loadStatus()
+    {
+    	$qry = "SELECT * FROM campus.tbl_coodle_status";
+    	
+    	if($result = $this->db_query($qry))
+    	{
+    		while($row = $this->db_fetch_object($result))
+    		{
+    			$this->status_arr[$row->coodle_status_kurzbz]=$row->bezeichnung;
+    		}
+    		return true;
+    	}
+    	else
+    	{
+    		$this->errormsg = 'Fehler beim Laden der Daten';
+    		return false;
+    	}
     }
 }
 ?>

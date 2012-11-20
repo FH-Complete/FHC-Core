@@ -48,9 +48,9 @@ echo "VERSION:2.0\n";
 echo "PRODID:-//FH TECHNIKUM WIEN//EN\n";
 echo "METHOD:PUBLISH\n";
 echo 'ORGANIZER;CN=',$bn->vorname,' ',$bn->nachname,':mailto:',$uid,'@',DOMAIN,"\n";
-echo 'DTSTAMP:',date('Ymd', mktime(date('H'),date('i'),date('s'),date('m'),date('d')-5,date('Y'))),'T',date('Hms'),"Z\n";
-echo 'DTSTART:',date('Ymd', mktime(0,0,0,date('m'),date('d')-5,date('Y'))),"T000000Z\n";
-echo 'DTEND:',date('Ymd', mktime(0,0,0,date('m'),date('d')+30,date('Y'))),"T000000Z\n";
+echo 'DTSTAMP;TZID=Europe/Vienna:',date('Ymd', mktime(date('H'),date('i'),date('s'),date('m'),date('d')-5,date('Y'))),'T',date('Hms'),"\n";
+echo 'DTSTART;TZID=Europe/Vienna:',date('Ymd', mktime(0,0,0,date('m'),date('d')-5,date('Y'))),"T000000\n";
+echo 'DTEND;TZID=Europe/Vienna:',date('Ymd', mktime(0,0,0,date('m'),date('d')+30,date('Y'))),"T000000\n";
 echo 'URL:',APP_ROOT,'cis/public/freebusy_lvplan.php/',$uid,"\n";
 echo "BEGIN:VFREEBUSY";
 

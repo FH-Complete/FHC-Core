@@ -92,5 +92,34 @@ class stunde extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * 
+	 * Liefert die Stunden innerhalb der uebergebenen Uhrzeiten
+	 * @param $uhrzeit_start
+	 * @param $uhrzeit_ende
+	 * @return array $stunden
+	 */
+	public function getStunden($uhrzeit_start, $uhrzeit_ende)
+	{
+		$stunden=array();
+		
+		$qry = "SELECT 
+					* 
+				FROM 
+					lehre.tbl_stunde 
+				WHERE 
+					(beginn BETWEEN ".$this->db_add_param($uhrzeit_start)." AND ".$this->db_add_param($uhrzeit_ende).")
+					OR (ende BETWEEN ".$this->db_add_param($uhrzeit_start)." AND ".$this->db_add_param($uhrzeit_ende).");";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$stunden[] = $row->stunde;
+			}
+		} 
+		return $stunden;
+	}
 }
 ?>

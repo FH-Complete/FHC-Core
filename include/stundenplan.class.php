@@ -219,5 +219,38 @@ class stundenplan extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * 
+	 * Prueft ob ein Stundenplaneintrag fuer den gewaehlten Ort/Datum/Stunde vorhanden ist
+	 * @param $ort_kurzbz
+	 * @param $datum
+	 * @param $stunde
+	 * @return true wenn belegt, false wenn frei, false+errormsg bei Fehler
+	 */
+	public function isBelegt($ort_kurzbz, $datum, $stunde)
+	{
+		$qry = "SELECT 
+					1 
+				FROM 
+					lehre.tbl_$this->stpl_table 
+				WHERE 
+					ort_kurzbz=".$this->db_add_param($ort_kurzbz)." 
+					AND datum=".$this->db_add_param($datum)."
+					AND stunde=".$this->db_add_param($stunde).";";
+
+		if($result = $this->db_query($qry))
+		{
+			if($this->db_num_rows($result)>0)
+				return true;
+			else
+				return false;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>

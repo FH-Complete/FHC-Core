@@ -17,6 +17,9 @@
  *
  * Authors: Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at>
  */
+/**
+ * Bearbeiten und Eintragen von Coodle Umfragen
+ */
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/phrasen.class.php');
@@ -28,6 +31,7 @@ $sprache = getSprache();
 $p = new phrasen($sprache);
 $datum_obj = new datum();
 $db = new basis_db();
+$message='';
 
 echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
@@ -105,9 +109,8 @@ echo '
 	{
 		width: 70%;
 		text-align: right;
-		margin-top: 20px;
+		margin-top: 10px;
 		padding: 10px;
-		/*border: 1px dotted red;*/
 	}
 	</style>
 	<title>'.$p->t('coodle/coodle').'</title>
@@ -155,16 +158,17 @@ if(isset($_POST['save']))
 	
 	if($coodle->save())
 	{
-		echo '<span class="ok">'.$p->t('global/erfolgreichgespeichert').'</span>';
+		$message.= '<span class="ok">'.$p->t('global/erfolgreichgespeichert').'</span>';
 	}
 	else
 	{
-		echo '<span class="error">'.$coodle->errormsg.'</span>';
+		$message.= '<span class="error">'.$coodle->errormsg.'</span>';
 	}
     
-    echo '<script>
+	/*
+    $message.='<script>
         window.opener.location.href="uebersicht.php";    
-        </script>'; 
+        </script>';*/ 
     
 }
 elseif(isset($_GET['coodle_id']))
@@ -185,6 +189,7 @@ else
 	$coodle->dauer=60;
 }
 echo '
+<a href="uebersicht.php">&lt;&lt;&nbsp;'.$p->t('coodle/zurueckZurUebersicht').'</a><br>
 <br>
 <form method="POST">';
 echo '<div id="wrapper">
@@ -194,18 +199,7 @@ if($coodle->coodle_id=='')
 else
 	echo $p->t('coodle/bearbeiten');
 echo '</h4>';
-/*
-echo '
-<fieldset style="width:100px;">
-<legend>';
-if($coodle->coodle_id=='')
-	echo $p->t('coodle/neuerEintrag');
-else
-	echo $p->t('coodle/bearbeiten');
-	
-echo '
-</legend>';
-*/
+
 echo '
 <input type="hidden" name="coodle_id" value="'.$db->convert_html_chars($coodle->coodle_id).'" />
 <table>
@@ -230,7 +224,7 @@ echo '
 	</tr>
 	<tr>
 		<td></td>
-		<td><input type="submit" name="save" value="'.$p->t('global/speichern').'"/></td>
+		<td><input type="submit" name="save" value="'.$p->t('global/speichern').'"/> '.$message.'</td>
 	</tr>
 </table>';
 

@@ -1,5 +1,4 @@
 <?php
-
 /* Copyright (C) 2012 FH Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,14 +15,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Karl Burkhart 	<burkhart@technikum-wien.at>
+ * Authors: Karl Burkhart 	<burkhart@technikum-wien.at>,
+ * 			Andreas Österreicher <oesi@technikum-wien.at>
  */
-
+/**
+ * Uebersicht ueber die Coodle Umfragen
+ */
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/coodle.class.php');
 require_once('../../../include/functions.inc.php'); 
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/datum.class.php'); 
+require_once('../../../include/benutzer.class.php');
 
 $lang = getSprache(); 
 
@@ -39,8 +42,7 @@ echo '
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         <link rel="stylesheet"  href="../../../skin/fhcomplete.css" type="text/css">
-        <link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">'; ?>
-
+        <link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
         <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
         <link href="../../../skin/tablesort.css" rel="stylesheet" type="text/css">
         <link href="../../../skin/jquery.css" rel="stylesheet"  type="text/css"/>
@@ -51,29 +53,46 @@ echo '
         {
             $("#myTableFiles").tablesorter(
             {
-                sortList: [[0,0]],
+                sortList: [[3,0]],
                 widgets: ["zebra"]
             }); 
           
         }); 
        
-       
+        $(document).ready(function() 
+                {
+                    $("#myTableFiles2").tablesorter(
+                    {
+                        sortList: [[3,1]],
+                        widgets: ["zebra"]
+                    }); 
+                  
+                }); 
+        
         function conf_user(ersteller_uid)
         {
             var uid = ersteller_uid; 
             
-            if(uid == '<?php echo $uid; ?>')
+            if(uid == "'.$uid.'")
             {
                 return true; 
             }
             else
                 {
-                    alert("<?php echo $p->t('global/keineBerechtigung'); ?>");
+                    alert("'.$p->t('global/keineBerechtigung').'");
                     return false; 
                 }
         }
         </script>
-<?php
+        <style>
+			.wrapper h4 
+			{
+				font-size: 16px;
+				margin-top: 0;
+				padding-top: 1em;
+			}
+		</style>
+';
 
 echo'   <title>'.$p->t('coodle/uebersicht').'</title>
     </head>
@@ -106,39 +125,97 @@ if($method=='delete')
 
 echo'<h1>'.$p->t('coodle/uebersicht').'</h1>
     <br>
-    <div style="display:block; text-align:left; float:left;"><a href="stammdaten.php" target="_blank">'.$p->t('coodle/neueUmfrage').'</a></div><br>
+    <div style="display:block; text-align:left; float:left;"><input type="button" onclick="window.location.href=\'stammdaten.php\'" value="'.$p->t('coodle/neueUmfrage').'"></div><br>
     <div style="display:block; text-align:right; margin-right:16px; ">'.$message.'</div>
+    <br>
+    <div class="wrapper">
+    <h4>'.$p->t('coodle/laufendeUmfragen').'</h4>
     <table id="myTableFiles" class="tablesorter">
     <thead>
         <tr>
-            <th width="5%">'.$p->t('coodle/coodleId').'</th>
+            <!--<th width="5%">'.$p->t('coodle/coodleId').'</th>-->
             <th width="20%">'.$p->t('coodle/titel').'</th>
-            <th width="40%">'.$p->t('coodle/beschreibung').'</th>
+            <!--<th width="40%">'.$p->t('coodle/beschreibung').'</th>-->
             <th>'.$p->t('coodle/letzterStatus').'</th>
             <th>'.$p->t('coodle/ersteller').'</th>
             <th>Endedatum</th>
             <th>'.$p->t('coodle/aktion').'</th>
         </tr>
-    </thead>';
+    </thead><tbody>';
 
+$beendeteUmfragen='';
 $datum = new datum(); 
 $coodle = new coodle(); 
+$coodle->loadStatus();
 $coodle->getCoodleFromUser($uid);
 foreach($coodle->result as $c)
 {
-    echo '<tr>
-            <td>'.$coodle->convert_html_chars($c->coodle_id).'</td>
+	$benutzer = new benutzer();
+	$benutzer->load($c->ersteller_uid);
+	$ersteller = $benutzer->nachname.' '.$benutzer->vorname;
+    $row =  '<tr>
+          <!-- <td>'.$coodle->convert_html_chars($c->coodle_id).'</td>-->
             <td>'.$coodle->convert_html_chars($c->titel).'</td>
-            <td>'.$c->beschreibung.'</td>
-            <td>'.$coodle->convert_html_chars($c->coodle_status_kurzbz).'</td>
-            <td>'.$coodle->convert_html_chars($c->ersteller_uid).'</td>
+            <!--<td>'.$c->beschreibung.'</td>-->
+            <td>'.$coodle->convert_html_chars($coodle->status_arr[$c->coodle_status_kurzbz]).'</td>
+            <td>'.$coodle->convert_html_chars($ersteller).'</td>
             <td>'.$coodle->convert_html_chars($datum->formatDatum($c->endedatum, 'd.m.Y')).'</td>
-            <td>
-                <a href="stammdaten.php?coodle_id='.$c->coodle_id.'" target="_blank" onclick="return conf_user(\''.$c->ersteller_uid.'\');">&nbsp;<img src="../../../skin/images/edit.png" title="'.$p->t('coodle/bearbeiten').'"></a> 
-                <a href="'.$_SERVER['PHP_SELF'].'?method=delete&coodle_id='.$c->coodle_id.'" onclick="return conf_user(\''.$c->ersteller_uid.'\');">&nbsp;<img src="../../../skin/images/delete_x.png" title="'.$p->t('coodle/loeschen').'"></a>
-                <a href="../../public/coodle.php?coodle_id='.$c->coodle_id.'"> &nbsp; <img src="../../../skin/images/date_go.png" title="'.$p->t('coodle/zurUmfrage').'"></a>
+            <td nowrap>
+            
+    
+                 ';
+	if(($c->coodle_status_kurzbz=='laufend' || $c->coodle_status_kurzbz=='neu') && $uid==$c->ersteller_uid)
+    {
+    	$row.= '
+			<a href="stammdaten.php?coodle_id='.$c->coodle_id.'"  onclick="return conf_user(\''.$c->ersteller_uid.'\');">&nbsp;<img src="../../../skin/images/edit.png" title="'.$p->t('coodle/bearbeiten').'"></a>
+			<a href="'.$_SERVER['PHP_SELF'].'?method=delete&coodle_id='.$c->coodle_id.'" onclick="return conf_user(\''.$c->ersteller_uid.'\');">&nbsp;<img src="../../../skin/images/delete_x.png" title="'.$p->t('coodle/loeschen').'"></a>';
+    }
+    else
+	{
+		$row.= '
+			<img src="../../../skin/images/edit_grau.png" title="'.$p->t('global/keineBerechtigung').'">
+			&nbsp; <img src="../../../skin/images/delete_x_grau.png" title="'.$p->t('global/keineBerechtigung').'">';		
+    }
+    
+    if($c->coodle_status_kurzbz=='laufend' || $c->coodle_status_kurzbz=='abgeschlossen')
+		$row.='<a href="../../public/coodle.php?coodle_id='.$c->coodle_id.'"> &nbsp; <img src="../../../skin/images/date_go.png" title="'.$p->t('coodle/zurUmfrage').'"></a>';
+	else
+		$row.=' &nbsp; <img src="../../../skin/images/date_go_grau.png" title="'.$p->t('global/keineBerechtigung').'">';
+    $row.='  
             </td>
         </tr>';
+    if($c->coodle_status_kurzbz=='laufend' || $c->coodle_status_kurzbz=='neu')
+		echo $row;
+	else
+		$beendeteUmfragen.=$row;
 }
+echo '</tbody></table></div>';
 
+if($beendeteUmfragen!='')
+{
+	echo '<br>
+	
+	<div class="wrapper">
+	<h4>'.$p->t('coodle/beendeteUmfragen').'</h4>
+	
+	<table id="myTableFiles2" class="tablesorter">
+	    <thead>
+	        <tr>
+	            <!--<th width="5%">'.$p->t('coodle/coodleId').'</th>-->
+	            <th width="20%">'.$p->t('coodle/titel').'</th>
+	            <!--<th width="40%">'.$p->t('coodle/beschreibung').'</th>-->
+	            <th>'.$p->t('coodle/letzterStatus').'</th>
+	            <th>'.$p->t('coodle/ersteller').'</th>
+	            <th>Endedatum</th>
+	            <th>'.$p->t('coodle/aktion').'</th>
+	        </tr>
+	    </thead>
+		<tbody>
+		    '.$beendeteUmfragen.'
+		</tbody>
+	</table>
+	</div>';
+}
+echo '</body>
+</html>';
 ?>
