@@ -17,6 +17,14 @@
  *
  * Authors: Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at>
  */
+/**
+ * Coodle Terminauswahl
+ * 
+ * Funktionen:
+ * - hinzufuegen von Ressourcen (Personen, Raeume und externe Personen)
+ * - setzen von Terminvorschlaegen
+ * - starten der Umfrage inkl. Infomail an alle Teilnehmer
+ */
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/phrasen.class.php');
@@ -33,7 +41,7 @@ $datum_obj = new datum();
 
 if(!isset($_REQUEST['coodle_id']))
 	die($p->t('global/fehlerBeiDerParameteruebergabe'));
-	
+
 $coodle_id = $_REQUEST['coodle_id'];
 
 $db = new basis_db();
@@ -46,7 +54,7 @@ $event_titel = $coodle->titel;
 
 if($coodle->coodle_status_kurzbz == 'storniert' || $coodle->coodle_status_kurzbz == 'abgeschlossen')
 {
-	die('Diese Umfrage ist bereits beendet');
+	die($p->t('coodle/umfrageNichtGueltig'));
 }
 
 
@@ -111,10 +119,7 @@ if(isset($_POST['action']) && $_POST['action']=='start')
 					continue;
 				}
 				$anrede = trim($anrede);
-				$sign = "Mit freundlichen Grüßen\n\n";
-				$sign .= "Fachhochschule Technikum Wien\n";
-				$sign .= "Höchstädtplatz 5\n";
-				$sign .= "1200 Wien\n";
+				$sign = $p->t('mail/signatur');
 				
 				
 				$html=$anrede.'!<br><br>
@@ -137,7 +142,7 @@ if(isset($_POST['action']) && $_POST['action']=='start')
 			}
 
 			echo '<br><b>'.$p->t('coodle/erfolgreichGestartet').'</b>';
-			echo '<br><br><a href="uebersicht.php">'.$p->t('coodle/zurueckZurUebersicht').'</a>';
+			echo '<br><br><a href="uebersicht.php">&lt;&lt;&nbsp;'.$p->t('coodle/zurueckZurUebersicht').'</a>';
 		}
 		else
 		{
@@ -384,7 +389,11 @@ echo '<html>
 				else
 					uhrzeit = $.fullCalendar.formatDate(date, "HH:mm:ss");
 
-				//alert("datum:"+datum+" uhrzeit:"+uhrzeit);
+				// Pruefen ob die Reservierungsgrenze ueberschritten wurde und ggf Warnung anzeigen
+				if(datum>\''.RES_TAGE_LEKTOR_BIS.'\')
+				{
+					alert("'.$p->t('coodle/ReservierungNichtMoeglich', array($datum_obj->formatDatum(RES_TAGE_LEKTOR_BIS, 'd.m.Y'))).'");
+				}
 
 				// Termin Speichern
 				$.ajax({
@@ -413,16 +422,15 @@ echo '<html>
 			},
 			eventDrop: function(event, dayDelta, minuteDelta, allDay, revertFunc, jsEvent, ui, view)
 			{
-				/*
-				alert(
-		            event.id + " was moved " +
-					$.fullCalendar.formatDate(event.start,"yyyy-MM-dd HH:mm:ss")
-		        );*/
+				// Verschiebung eines Termins
 				
 				datum = $.fullCalendar.formatDate(event.start,"yyyy-MM-dd")
 				uhrzeit = $.fullCalendar.formatDate(event.start,"HH:mm:ss")
+				
 				if(allDay)
 				{
+					// Wenn der Termin in die ganztaegig spalte gezogen wird,
+					// wird die Uhrzeit auf 8:00 uhr gesetzt
 					uhrzeit = "08:00:00";
 					event.start = datum+"T"+uhrzeit;
 					event.allDay=false;
@@ -511,8 +519,6 @@ echo '
 		<li id="delete"><img src="../../../skin/images/delete_round.png" />'.$p->t('global/entfernen').'</li>
 	</ul>
 </div>';
-//echo '<h2>'.$coodle->titel.'</h2>';
-//echo $coodle->beschreibung;
 
 echo '<a href="stammdaten.php?coodle_id='.$coodle_id.'">'.$p->t('coodle/ZurueckzumBearbeiten').'</a>';
 echo '

@@ -57,6 +57,7 @@ class mail
 		$this->CC_revievers='';
 		$this->BCC_recievers='';
 		$attachments='';
+		$this->attachmentsplain='';
 	}
 
 	/**
@@ -92,7 +93,7 @@ class mail
 
 		$header .= 'X-Mailer: FHComplete V1'.$eol; 
 	  	$header .= 'Mime-Version: 1.0'.$eol;
-		$header .= "Content-Type: multipart/related; boundary=\"$mime_boundary_mixed\"".$eol;
+		$header .= "Content-Type: multipart/mixed; boundary=\"$mime_boundary_mixed\"".$eol;
 		
 		// Body
 		$mailbody = "";
@@ -122,7 +123,25 @@ class mail
 		$mailbody .= $eol;
 		$mailbody .= "--$mime_boundary_mixed";
 		
-		// Attachments
+		// Attachments Plain
+		if (is_array($this->attachmentsplain) && (count($this->attachmentsplain) > 0)) 
+		{
+			foreach ($this->attachmentsplain as $attachment) 
+			{
+				$dispo = 'attachment';
+				$mailbody .= $eol;
+				$mailbody .= "Content-Disposition: $dispo; filename={$attachment[2]}".$eol;
+				$mailbody .= "Content-Type: {$attachment[1]}; name={$attachment[2]}".$eol;
+				
+				$mailbody .= 'Content-Transfer-Encoding: '.$attachment[3].$eol;
+				$mailbody .= $eol;
+				$mailbody .= $attachment[0];
+				$mailbody .= $eol;
+				$mailbody .= "--$mime_boundary_mixed";
+			}
+		}
+		
+		// Attachments Binary
 		if (is_array($this->attachments) && (count($this->attachments) > 0)) 
 		{
 			foreach ($this->attachments as $attachment) 
@@ -177,7 +196,7 @@ class mail
 	}
 
 	/**
-	 * Fuegt ein Attachment zum Mail hinzu
+	 * Fuegt ein Binary Attachment zum Mail hinzu
 	 * $file Dateiname des hinzuzufuegenden Files
 	 * $type MIME Type "application/xls"
 	 * $name Anzeigename des Files
@@ -206,6 +225,18 @@ class mail
 		return true;
 	}
 	
+	/**
+	 * Fuegt ein Attachment zum Mail hinzu
+	 * $content
+	 * $type MIME Type "application/xls"
+	 * $name Anzeigename des Files
+	 * $ContentID die ContentID der Datei falls sie als inline-image genutzt wird
+	 */
+	public function addAttachmentPlain($content, $type, $name, $encoding='8bit')
+	{
+		$this->attachmentsplain[] = Array($content, $type, $name, $encoding);
+		return true;
+	}
 	/**
 	 * Setzt den ReplyTo
 	 */

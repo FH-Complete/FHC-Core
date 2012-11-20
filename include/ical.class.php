@@ -83,7 +83,7 @@ class ical extends basis_db
 						$dtend='';
 					}
 				}
-				elseif(mb_strstr($row,'FREEBUSY:'))
+				elseif(mb_strpos($row,'FREEBUSY')===0)
 					$this->result[$idx].=$row."\n";
 			}
 		}
@@ -114,13 +114,13 @@ class ical extends basis_db
 
 		foreach($rows as $row)
 		{
-			if(mb_strstr($row,'FREEBUSY:'))
+			if(mb_strpos($row,'FREEBUSY')===0)
 			{
 
 				$len = mb_strlen($row);
 				$slashpos = mb_strpos($row, '/');
-				$fblen = mb_strlen('FREEBUSY:');
-				$dtstart = mb_substr($row, $fblen, $len-$slashpos);
+				$doppelpunktpos = mb_strpos($row, ':');
+				$dtstart = mb_substr($row, $doppelpunktpos+1, $len-$slashpos);
 				$dtend = mb_substr($row, $slashpos+1);
 				$this->dtresult[]=array('dtstart'=>trim($dtstart),'dtend'=>trim($dtend));
 			}
