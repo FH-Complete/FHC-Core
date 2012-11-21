@@ -39,6 +39,9 @@ $sprache = getSprache();
 $p = new phrasen($sprache);
 $datum_obj = new datum();
 
+if(!check_lektor($uid))
+	die($p->t('global/keineBerechtigung'));
+	
 if(!isset($_REQUEST['coodle_id']))
 	die($p->t('global/fehlerBeiDerParameteruebergabe'));
 

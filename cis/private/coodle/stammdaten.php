@@ -33,6 +33,9 @@ $datum_obj = new datum();
 $db = new basis_db();
 $message='';
 
+if(!check_lektor($user))
+	die($p->t('global/keineBerechtigung'));
+
 echo '
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "http://www.w3.org/TR/html4/strict.dtd">

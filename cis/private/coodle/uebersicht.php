@@ -35,8 +35,7 @@ $p = new phrasen($lang);
 $uid = get_uid(); 
 $message = '';
 
-echo '
-    <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "http://www.w3.org/TR/html4/strict.dtd">
    <html>
     <head>
@@ -124,8 +123,17 @@ if($method=='delete')
 }
 
 echo'<h1>'.$p->t('coodle/uebersicht').'</h1>
-    <br>
-    <div style="display:block; text-align:left; float:left;"><input type="button" onclick="window.location.href=\'stammdaten.php\'" value="'.$p->t('coodle/neueUmfrage').'"></div><br>
+    <br>';
+
+if(check_lektor($uid))
+{
+	echo '
+	    <div style="display:block; text-align:left; float:left;">
+	<input type="button" onclick="window.location.href=\'stammdaten.php\'" value="'.$p->t('coodle/neueUmfrage').'">
+	</div><br>';
+}
+
+echo '
     <div style="display:block; text-align:right; margin-right:16px; ">'.$message.'</div>
     <br>
     <div class="wrapper">
@@ -133,12 +141,10 @@ echo'<h1>'.$p->t('coodle/uebersicht').'</h1>
     <table id="myTableFiles" class="tablesorter">
     <thead>
         <tr>
-            <!--<th width="5%">'.$p->t('coodle/coodleId').'</th>-->
-            <th width="20%">'.$p->t('coodle/titel').'</th>
-            <!--<th width="40%">'.$p->t('coodle/beschreibung').'</th>-->
+            <th>'.$p->t('coodle/titel').'</th>
             <th>'.$p->t('coodle/letzterStatus').'</th>
             <th>'.$p->t('coodle/ersteller').'</th>
-            <th>Endedatum</th>
+            <th>'.$p->t('coodle/endedatum').'</th>
             <th>'.$p->t('coodle/aktion').'</th>
         </tr>
     </thead><tbody>';
@@ -154,9 +160,7 @@ foreach($coodle->result as $c)
 	$benutzer->load($c->ersteller_uid);
 	$ersteller = $benutzer->nachname.' '.$benutzer->vorname;
     $row =  '<tr>
-          <!-- <td>'.$coodle->convert_html_chars($c->coodle_id).'</td>-->
             <td>'.$coodle->convert_html_chars($c->titel).'</td>
-            <!--<td>'.$c->beschreibung.'</td>-->
             <td>'.$coodle->convert_html_chars($coodle->status_arr[$c->coodle_status_kurzbz]).'</td>
             <td>'.$coodle->convert_html_chars($ersteller).'</td>
             <td>'.$coodle->convert_html_chars($datum->formatDatum($c->endedatum, 'd.m.Y')).'</td>
@@ -201,12 +205,10 @@ if($beendeteUmfragen!='')
 	<table id="myTableFiles2" class="tablesorter">
 	    <thead>
 	        <tr>
-	            <!--<th width="5%">'.$p->t('coodle/coodleId').'</th>-->
-	            <th width="20%">'.$p->t('coodle/titel').'</th>
-	            <!--<th width="40%">'.$p->t('coodle/beschreibung').'</th>-->
+	            <th>'.$p->t('coodle/titel').'</th>
 	            <th>'.$p->t('coodle/letzterStatus').'</th>
 	            <th>'.$p->t('coodle/ersteller').'</th>
-	            <th>Endedatum</th>
+	            <th>'.$p->t('coodle/endedatum').'</th>
 	            <th>'.$p->t('coodle/aktion').'</th>
 	        </tr>
 	    </thead>

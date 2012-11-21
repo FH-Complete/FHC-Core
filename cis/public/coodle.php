@@ -65,7 +65,7 @@ if(!isset($_GET['zugangscode']))
 else
 {
     if(!$coodle->checkBerechtigung($coodle_id, '', $_GET['zugangscode']))
-        die($p->t('coodle/keineBerechtiung')); 
+        die($p->t('coodle/keineBerechtigung')); 
 }
 
 // checkboxen speichern
@@ -223,21 +223,7 @@ if(isset($_GET['resend']))
 	<link rel="stylesheet" href="../../skin/style.css.php" type="text/css">
     <title><?php echo $p->t('coodle/terminauswahl');?></title>
     <style type="text/css">
-    /*
-    body 
-    {
-        background: #f9f9f9;
-        color: #000;
-        font: 14px Arial;
-        margin: 0 auto;
-        padding: 0;
-        position: relative;
-    }
-    h1,h2,h3,h4,h5,h6{ color:#008462;}
 
-    h5 {margin-top:0px; }
-    .container {width: 100%; }
-    */
     #header 
     {
         background: #DCDDDF;
@@ -282,10 +268,6 @@ if(isset($_GET['resend']))
 	{
 		width: 70%;
 		padding: 0px 10px 15px 10px;
-		/*
-		margin-left: auto;
-		margin-right: auto;
-		*/
 		border: 1px solid #ccc;
 		background: #eee;
 		text-align: left;
