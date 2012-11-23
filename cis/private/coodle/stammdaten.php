@@ -167,12 +167,6 @@ if(isset($_POST['save']))
 	{
 		$message.= '<span class="error">'.$coodle->errormsg.'</span>';
 	}
-    
-	/*
-    $message.='<script>
-        window.opener.location.href="uebersicht.php";    
-        </script>';*/ 
-    
 }
 elseif(isset($_GET['coodle_id']))
 {
@@ -182,6 +176,17 @@ elseif(isset($_GET['coodle_id']))
 	{
 		if($coodle->ersteller_uid!=$user)
 			die($p->t('global/keineBerechtigungFuerDieseSeite'));
+			
+		if($coodle->coodle_status_kurzbz!='neu')
+		{
+			// Wenn bereits gestartet, abgeschlosse oder storniert, 
+			// kann nicht mehr bearbeitet werden
+			die($p->t('coodle/umfrageNichtGueltig'));
+		}
+	}
+	else
+	{
+		die('Error:'.$coodle->errormsg);
 	}
 }
 else

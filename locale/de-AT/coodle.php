@@ -58,4 +58,6 @@ $this->phrasen['coodle/raumNichtReserviert']='Achtung: Ihr Raum wurde nicht rese
 $this->phrasen['coodle/auswahlEndtermin']='Auswahl des Endtermins';
 $this->phrasen['coodle/auswahlHinweis']='Durch diese Auswahl wird der endgültige Termin ausgewählt und die Umfrage beendet. Dieser Vorgang kann nicht rückgängig gemacht werden.';
 $this->phrasen['coodle/keineAuswahl']='Keine Auswahl';
+$this->phrasen['coodle/umfrageWurdeBereitsGestartet']='Umfrage wurde bereits gestartet';
+$this->phrasen['coodle/umfrageNochNichtGestartet']='Umfrage wurde noch nicht gestartet';
 ?>
