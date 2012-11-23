@@ -118,9 +118,10 @@ class ical extends basis_db
 			{
 
 				$len = mb_strlen($row);
-				$slashpos = mb_strpos($row, '/');
 				$doppelpunktpos = mb_strpos($row, ':');
-				$dtstart = mb_substr($row, $doppelpunktpos+1, $len-$slashpos);
+				$row = mb_substr($row, $doppelpunktpos+1);
+				$slashpos = mb_strpos($row, '/');
+				$dtstart = mb_substr($row, 0, $len-$slashpos);
 				$dtend = mb_substr($row, $slashpos+1);
 				$this->dtresult[]=array('dtstart'=>trim($dtstart),'dtend'=>trim($dtend));
 			}

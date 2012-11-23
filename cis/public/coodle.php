@@ -522,8 +522,8 @@ TRANSP:OPAQUE
 SEQUENCE:0
 UID:FHCompleteCoodle".$coodle_id."
 DTSTAMP;TZID=Europe/Vienna:".$dtstamp."
-DESCRIPTION:".strip_tags($coodle->beschreibung)."
-SUMMARY:".$coodle->titel."
+DESCRIPTION:".strip_tags(html_entity_decode($coodle->beschreibung, ENT_QUOTES, 'UTF-8'))."
+SUMMARY:".strip_tags($coodle->titel)."
 PRIORITY:5
 CLASS:PUBLIC
 END:VEVENT

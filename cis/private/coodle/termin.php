@@ -55,7 +55,7 @@ if(!$coodle->load($coodle_id))
 }
 $event_titel = $coodle->titel;
 
-if($coodle->coodle_status_kurzbz == 'storniert' || $coodle->coodle_status_kurzbz == 'abgeschlossen')
+if($coodle->coodle_status_kurzbz == 'storniert' || $coodle->coodle_status_kurzbz == 'abgeschlossen' || $coodle->coodle_status_kurzbz=='laufend')
 {
 	die($p->t('coodle/umfrageNichtGueltig'));
 }

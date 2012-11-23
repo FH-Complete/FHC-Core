@@ -41,7 +41,10 @@ function validURLCheck($param)
 			$text="Dies ist eine automatische Mail.\nEs wurde eine mögliche XSS Attacke durchgefuehrt:\n";
 			$text.="\nFolgende URL wurde versucht aufzurufen: \n".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
 			$text.="\n\nIP des Aufrufers: ".$_SERVER['REMOTE_ADDR'];
+			$text.="\n\nUserAgent: ".$_SERVER['HTTP_USER_AGENT'];
+			
 			$text.="\n\nAuffälliger Value: $param";
+			
 			$mail = new mail(MAIL_ADMIN, 'no-reply@'.DOMAIN, 'Versuchte XSS Attacke', $text);
 			$mail->send();
 			die('Invalid URL detected');

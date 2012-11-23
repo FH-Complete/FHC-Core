@@ -67,12 +67,12 @@ foreach($umfragen->result as $umfrage)
 			{
 				//Start und Ende berechnen
 			    $date = new DateTime($termin->datum.' '.$termin->uhrzeit);
-			    $dtstart = $date->format('dmY\THis');
+			    $dtstart = $date->format('Ymd\THis');
 		    	$interval =new DateInterval('PT'.$umfrage->dauer.'M');
 			    $date->add($interval);
 		    	$uhrzeit_ende = $date->format('H:i:s');
-		    	$dtende = $date->format('dmY\THis');
-		    	echo "\nFREEBUSY;TZID=Europe/Vienna: $dtstart / $dtende";
+		    	$dtende = $date->format('Ymd\THis');
+		    	echo "\nFREEBUSY;TZID=Europe/Vienna: $dtstart/$dtende";
 			}
 		}
 	}
@@ -85,12 +85,12 @@ foreach($umfragen->result as $umfrage)
 		{
 			//Start und Ende berechnen
 		    $date = new DateTime($termin->datum.' '.$termin->uhrzeit);
-		    $dtstart = $date->format('dmY\THis');
+		    $dtstart = $date->format('Ymd\THis');
 	    	$interval =new DateInterval('PT'.$umfrage->dauer.'M');
 		    $date->add($interval);
 	    	$uhrzeit_ende = $date->format('H:i:s');
-	    	$dtende = $date->format('dmY\THis');
-	    	echo "\nFREEBUSY;TZID=Europe/Vienna: $dtstart / $dtende";
+	    	$dtende = $date->format('Ymd\THis');
+	    	echo "\nFREEBUSY;TZID=Europe/Vienna: $dtstart/$dtende";
 		}
 	}
 	// stornierte Umfragen werden nicht beruecksichtigt

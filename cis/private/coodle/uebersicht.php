@@ -67,21 +67,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
                     }); 
                   
                 }); 
-        
-        function conf_user(ersteller_uid)
-        {
-            var uid = ersteller_uid; 
-            
-            if(uid == "'.$uid.'")
-            {
-                return true; 
-            }
-            else
-                {
-                    alert("'.$p->t('global/keineBerechtigung').'");
-                    return false; 
-                }
-        }
+       
         </script>
         <style>
 			.wrapper h4 
@@ -165,29 +151,58 @@ foreach($coodle->result as $c)
             <td>'.$coodle->convert_html_chars($ersteller).'</td>
             <td>'.$coodle->convert_html_chars($datum->formatDatum($c->endedatum, 'd.m.Y')).'</td>
             <td nowrap>
-            
+            ';
     
-                 ';
-	if(($c->coodle_status_kurzbz=='laufend' || $c->coodle_status_kurzbz=='neu') && $uid==$c->ersteller_uid)
+    // Bearbeiten Button
+	if(($c->coodle_status_kurzbz=='neu') && $uid==$c->ersteller_uid)
     {
-    	$row.= '
-			<a href="stammdaten.php?coodle_id='.$c->coodle_id.'"  onclick="return conf_user(\''.$c->ersteller_uid.'\');">&nbsp;<img src="../../../skin/images/edit.png" title="'.$p->t('coodle/bearbeiten').'"></a>
-			<a href="'.$_SERVER['PHP_SELF'].'?method=delete&coodle_id='.$c->coodle_id.'" onclick="return conf_user(\''.$c->ersteller_uid.'\');">&nbsp;<img src="../../../skin/images/delete_x.png" title="'.$p->t('coodle/loeschen').'"></a>';
+    	$row.= '<a href="stammdaten.php?coodle_id='.$c->coodle_id.'">
+    				&nbsp;<img src="../../../skin/images/edit.png" title="'.$p->t('coodle/bearbeiten').'">
+    			</a>';
     }
     else
 	{
-		$row.= '
-			<img src="../../../skin/images/edit_grau.png" title="'.$p->t('global/keineBerechtigung').'">
-			&nbsp; <img src="../../../skin/images/delete_x_grau.png" title="'.$p->t('global/keineBerechtigung').'">';		
+		if($c->coodle_status_kurzbz=='laufend')
+			$title=$p->t('coodle/umfrageWurdeBereitsGestartet');
+		else
+			$title=$p->t('global/keineBerechtigung');
+		
+		$row.= '&nbsp;<img src="../../../skin/images/edit_grau.png" title="'.$title.'">';		
     }
     
+    // Storno Button
+    if($uid==$c->ersteller_uid && $c->coodle_status_kurzbz!='storniert' && $c->coodle_status_kurzbz!='abgeschlossen')
+    {
+    	$row.= '<a href="'.$_SERVER['PHP_SELF'].'?method=delete&coodle_id='.$c->coodle_id.'">
+    				&nbsp;<img src="../../../skin/images/delete_x.png" title="'.$p->t('coodle/loeschen').'">
+    			</a>';
+    }
+    else
+    {
+    	$row.='&nbsp; <img src="../../../skin/images/delete_x_grau.png" title="'.$p->t('global/keineBerechtigung').'">';
+    }
+
+    // Umfrage Button
     if($c->coodle_status_kurzbz=='laufend' || $c->coodle_status_kurzbz=='abgeschlossen')
-		$row.='<a href="../../public/coodle.php?coodle_id='.$c->coodle_id.'"> &nbsp; <img src="../../../skin/images/date_go.png" title="'.$p->t('coodle/zurUmfrage').'"></a>';
+    {
+		$row.= '<a href="../../public/coodle.php?coodle_id='.$c->coodle_id.'"> 
+					&nbsp; <img src="../../../skin/images/date_go.png" title="'.$p->t('coodle/zurUmfrage').'">
+				</a>';
+    }
 	else
-		$row.=' &nbsp; <img src="../../../skin/images/date_go_grau.png" title="'.$p->t('global/keineBerechtigung').'">';
+	{
+		if($c->coodle_status_kurzbz=='neu')
+			$title=$p->t('coodle/umfrageNochNichtGestartet');
+		else
+			$title=$p->t('global/keineBerechtigung');
+		
+		$row.=' &nbsp; <img src="../../../skin/images/date_go_grau.png" title="'.$title.'">';
+	}
+		
     $row.='  
             </td>
         </tr>';
+    
     if($c->coodle_status_kurzbz=='laufend' || $c->coodle_status_kurzbz=='neu')
 		echo $row;
 	else
