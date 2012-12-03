@@ -233,6 +233,7 @@ if(!$error)
 			$stundenplan->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
 			$stundenplan->updateamum = date('Y-m-d H:i:s');
 			$stundenplan->updatevon = get_uid();
+			$stundenplan->semester = $_POST['semester'];
 			
 			if($stundenplan->save(false))
 			{

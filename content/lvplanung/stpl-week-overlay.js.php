@@ -479,7 +479,12 @@ function STPLDetailSave(dialog)
 	var anmerkung = dialog.getElementById('stpl-details-dialog-textbox-anmerkung').value;
 	var fix = dialog.getElementById('stpl-details-dialog-checkbox-fix').checked;
 	var mitarbeiter_uid = dialog.getElementById('stpl-details-dialog-menulist-lektor').value;
-	
+	var semester = dialog.getElementById('stpl-details-dialog-textbox-semester').value;
+	if(semester=='')
+	{
+		alert('Semester darf nicht leer sein');
+		return false;
+	}
 	var url = '<?php echo APP_ROOT ?>content/tempusDBDML.php';
 	var req = new phpRequest(url,'','');
 	
@@ -498,6 +503,7 @@ function STPLDetailSave(dialog)
 	req.add('stundenplan_id', id);
 	req.add('fix', fix);
 	req.add('mitarbeiter_uid', mitarbeiter_uid);
+	req.add('semester',semester);
 	
 	var response = req.executePOST();
 

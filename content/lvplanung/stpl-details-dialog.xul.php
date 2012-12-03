@@ -100,7 +100,9 @@ $studiengang->load($stundenplan->studiengang_kz);
 				</row>
 				<row>
 					<label value="Semester" />
-					<label value="<?php echo $stundenplan->semester; ?>" id="stpl-details-dialog-label-semester"/>
+					<hbox>
+						<textbox value="<?php echo htmlspecialchars($stundenplan->semester); ?>" id="stpl-details-dialog-textbox-semester" maxlength="1" size="1"/>
+					</hbox>
       			</row>
       			<row>
 					<label value="Verband" />
