@@ -236,9 +236,9 @@ function selectAll()
 			foreach ($b->uids as $u)
 			{
 				if (in_array($u->uid, $spezgrp))
-					echo "<br><input type='checkbox' disabled>".$u->uid." - ".$u->nachname." ".$u->vorname;				
+					echo "<br><input type='checkbox' disabled>".$u->uid." - ".$u->nachname." ".$u->vorname." ".($u->status=='Absolvent'?'(<span style="color:red">'.$u->status.'</span>)':'('.$u->status.')');	
 				else				
-					echo "<br><input type='checkbox' name='anmeldung_".$u->uid."'>".$u->uid." - ".$u->nachname." ".$u->vorname;
+					echo "<br><input type='checkbox' name='anmeldung_".$u->uid."'>".$u->uid." - ".$u->nachname." ".$u->vorname." ".($u->status=='Absolvent'?'(<span style="color:red">'.$u->status.'</span>)':'('.$u->status.')');
 				$anz++;
 							
 				//echo "<br>".$u->uid;

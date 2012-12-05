@@ -61,16 +61,18 @@ class benutzerlvstudiensemester extends basis_db
 	 * Laedt alle uids in zu einer lv/szudiensemester - kombination
 	 * gibt auch vor- und Nachname zurueck
 	 * @param studiensemester_kurzbz
-	 * @param lehrveranstaltung_id
+	 * @param lehrveranstaltung_id   public.get_rolle_prestudent(12345,NULL) AS status
 	 * @return boolean
 	 */
 	public function get_all_uids($studiensemester_kurzbz, $lehrveranstaltung_id)
 	{
-		$qry = "SELECT tbl_benutzerlvstudiensemester.uid, vw_benutzer.nachname, vw_benutzer.vorname 
-				FROM campus.tbl_benutzerlvstudiensemester, campus.vw_benutzer 
+		$qry = "SELECT tbl_benutzerlvstudiensemester.uid, vw_benutzer.nachname, vw_benutzer.vorname, COALESCE (public.get_rolle_prestudent(prestudent_id,NULL),'-') AS status 
+				FROM campus.tbl_benutzerlvstudiensemester 
+				LEFT JOIN campus.vw_benutzer USING(uid)
+				LEFT JOIN public.tbl_student ON (uid=student_uid) 
 				WHERE studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)." 
 					AND lehrveranstaltung_id = ".$this->db_add_param($lehrveranstaltung_id)." 
-					AND vw_benutzer.uid = tbl_benutzerlvstudiensemester.uid ORDER BY nachname";
+					ORDER BY nachname";
 		
 		if(!$this->db_query($qry))
 		{
@@ -88,6 +90,7 @@ class benutzerlvstudiensemester extends basis_db
 				$lv_obj->uid = $row->uid;
 				$lv_obj->nachname = $row->nachname;
 				$lv_obj->vorname = $row->vorname;
+				$lv_obj->status = $row->status;
 				$this->uids[] = $lv_obj;
 			}
 			return true;
