@@ -36,7 +36,10 @@ function validURLCheck($param)
 	if(strstr($param,'://'))
 	{
 		// Der APP_ROOT muss in der URL vorkommen, sonfern es kein relativer Pfad ist
-		if(mb_strpos($param, APP_ROOT)!==0)
+		// HTTPS und HTTP
+		if(mb_strpos($param, APP_ROOT)!==0
+			&& mb_strpos(mb_str_replace("http://","https://", $param), APP_ROOT)!==0
+			&& mb_strpos(mb_str_replace("https://","http://", $param), APP_ROOT)!==0)
 		{
 			$text="Dies ist eine automatische Mail.\nEs wurde eine mögliche XSS Attacke durchgefuehrt:\n";
 			$text.="\nFolgende URL wurde versucht aufzurufen: \n".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
