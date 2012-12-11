@@ -47,7 +47,7 @@ class lehre_tools extends basis_db
 	{
 		parent::__construct();
 		
-		if(!is_null($lehre_tools_id_id))
+		if(!is_null($lehre_tools_id))
 			$this->load($lehre_tools_id);
 	}
 
