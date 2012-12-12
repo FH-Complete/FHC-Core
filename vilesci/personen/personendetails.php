@@ -75,10 +75,13 @@ if(!$person->load($id))
 	
 //PERSON
 echo '<h2>Person</h2>';
-echo "ID: $person->person_id<br>";
-echo "Name: $person->titelpre $person->nachname $person->vorname $person->titelpost<br>";
-echo "Geburtsdatum: ".$datum_obj->formatDatum($person->gebdatum,'d.m.Y')."<br>";
-echo "Geschlecht: ".$person->geschlecht."<br>";
+echo '<table cellspacing="3px">';
+echo "<tr><td align='right'>ID:</td><td> $person->person_id</td></tr>";
+echo "<tr><td align='right'>Name:</td><td> $person->titelpre $person->nachname $person->vorname $person->titelpost</td></tr>";
+echo "<tr><td align='right'>Geburtsdatum:</td><td> ".$datum_obj->formatDatum($person->gebdatum,'d.m.Y')."</td></tr>";
+echo "<tr><td align='right'>Geschlecht:</td><td> ".$person->geschlecht."</td></tr>";
+echo "<tr valign='top'><td align='right'>Anmerkung:</td><td width='800px'> ".$db->convert_html_chars($person->anmerkungen)."</td></tr>";
+echo '</table>';
 
 echo '<br><a href="../fhausweis/search.php?person_id='.$person->person_id.'">Statusinformation - FH Ausweis</a><br>';
 $kontakt = new kontakt();
