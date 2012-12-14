@@ -168,6 +168,7 @@ $menu=array
 		'Ampel'=>array('name'=>'Ampel', 'link'=>'stammdaten/ampel_frameset.html', 'target'=>'main','permissions'=>array('basis/ampel')),
 		'Infoscreen'=>array('name'=>'Infoscreen', 'link'=>'stammdaten/infoscreen_frameset.html', 'target'=>'main','permissions'=>array('basis/infoscreen')),
 		'Ferien'=>array('name'=>'Ferien', 'link'=>'lehre/ferienverwaltung.php', 'target'=>'main','permissions'=>array('admin')),
+		'Service'=>array('name'=>'Service', 'link'=>'stammdaten/service_frameset.html', 'target'=>'main','permissions'=>array('basis/service')),
 		'FH Ausweis'=>array
 		(
 			'name'=>'FH Ausweis','permissions'=>array('basis/fhausweis'),

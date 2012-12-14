@@ -3930,6 +3930,61 @@ if(!@$db->db_query("SELECT 1 FROM campus.tbl_lehre_tools LIMIT 1"))
     else
         echo 'Tabelle campus.tbl_lehre_tools und campus.tbl_lehre_tools_organisationeinheit hinzugefuegt<br>';
 }
+
+// SLA Services
+if(!@$db->db_query("SELECT 1 FROM public.tbl_service LIMIT 1"))
+{
+    $qry ="
+    CREATE TABLE public.tbl_service
+    (
+    	service_id bigint NOT NULL,
+    	bezeichnung varchar(64),
+    	beschreibung text,
+    	ext_id bigint,
+    	oe_kurzbz varchar(32)
+    );
+    
+    CREATE SEQUENCE public.seq_service_service_id
+ 	INCREMENT BY 1
+ 	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+	
+	GRANT SELECT, UPDATE ON SEQUENCE public.seq_service_service_id TO vilesci;
+		
+	ALTER TABLE public.tbl_service ADD CONSTRAINT pk_service PRIMARY KEY (service_id);
+    ALTER TABLE public.tbl_service ALTER COLUMN service_id SET DEFAULT nextval('public.seq_service_service_id');
+    ALTER TABLE public.tbl_service ADD CONSTRAINT fk_service_organisationseinheit FOREIGN KEY(oe_kurzbz) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+        
+    GRANT SELECT ON public.tbl_service TO web;
+    GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_service TO vilesci;
+    
+    ALTER TABLE campus.tbl_zeitaufzeichnung ADD COLUMN oe_kurzbz_1 varchar(32);
+    ALTER TABLE campus.tbl_zeitaufzeichnung ADD COLUMN oe_kurzbz_2 varchar(32);
+    ALTER TABLE campus.tbl_zeitaufzeichnung ADD COLUMN ext_id bigint;
+    ALTER TABLE campus.tbl_zeitaufzeichnung ADD COLUMN service_id bigint;
+    ALTER TABLE campus.tbl_zeitaufzeichnung ADD COLUMN kunde_uid varchar(32);
+    
+    ALTER TABLE campus.tbl_zeitaufzeichnung ADD CONSTRAINT fk_zeitaufzeichnung_organisationseinheit_1 FOREIGN KEY(oe_kurzbz_1) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+    ALTER TABLE campus.tbl_zeitaufzeichnung ADD CONSTRAINT fk_zeitaufzeichnung_organisationseinheit_2 FOREIGN KEY(oe_kurzbz_2) REFERENCES public.tbl_organisationseinheit (oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+    ALTER TABLE campus.tbl_zeitaufzeichnung ADD CONSTRAINT fk_zeitaufzeichnung_service FOREIGN KEY(service_id) REFERENCES public.tbl_service (service_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+    ALTER TABLE campus.tbl_zeitaufzeichnung ADD CONSTRAINT fk_zeitaufzeichnung_benutzer_kunde FOREIGN KEY(kunde_uid) REFERENCES public.tbl_benutzer (uid) ON DELETE RESTRICT ON UPDATE CASCADE;
+    
+    ALTER TABLE campus.tbl_zeitaufzeichnung ALTER COLUMN aktivitaet_kurzbz DROP NOT NULL;
+    ALTER TABLE campus.tbl_zeitaufzeichnung ALTER COLUMN projekt_kurzbz DROP NOT NULL;
+
+    UPDATE campus.tbl_zeitaufzeichnung SET oe_kurzbz_1 = (SELECT oe_kurzbz FROM public.tbl_studiengang WHERE studiengang_kz=tbl_zeitaufzeichnung.studiengang_kz);
+    UPDATE campus.tbl_zeitaufzeichnung SET oe_kurzbz_2 = (SELECT oe_kurzbz FROM public.tbl_fachbereich WHERE fachbereich_kurzbz=tbl_zeitaufzeichnung.fachbereich_kurzbz);
+    ALTER TABLE campus.tbl_zeitaufzeichnung DROP COLUMN studiengang_kz;
+    ALTER TABLE campus.tbl_zeitaufzeichnung DROP COLUMN fachbereich_kurzbz;
+    
+    ";
+    
+    if(!$db->db_query($qry))
+        echo '<strong>public.tl_service: '.$db->db_last_error().'</strong><br>';
+    else
+        echo 'Tabelle public.service hinzugefuegt, campus.tbl_zeitaufzeichnung geaendert<br>';
+}
 echo '<br>';
 
 $tabellen=array(
@@ -3995,7 +4050,7 @@ $tabellen=array(
 	"campus.tbl_uebung"  => array("uebung_id","gewicht","punkte","angabedatei","freigabevon","freigabebis","abgabe","beispiele","statistik","bezeichnung","positiv","defaultbemerkung","lehreinheit_id","maxstd","maxbsp","liste_id","prozent","nummer","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_veranstaltung"  => array("veranstaltung_id","titel","beschreibung","veranstaltungskategorie_kurzbz","inhalt","start","ende","freigabevon","freigabeamum","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_veranstaltungskategorie"  => array("veranstaltungskategorie_kurzbz","bezeichnung","bild","farbe"),
-	"campus.tbl_zeitaufzeichnung"  => array("zeitaufzeichnung_id","uid","aktivitaet_kurzbz","projekt_kurzbz","start","ende","beschreibung","studiengang_kz","fachbereich_kurzbz","insertamum","insertvon","updateamum","updatevon"),
+	"campus.tbl_zeitaufzeichnung"  => array("zeitaufzeichnung_id","uid","aktivitaet_kurzbz","projekt_kurzbz","start","ende","beschreibung","oe_kurzbz_1","oe_kurzbz_2","insertamum","insertvon","updateamum","updatevon","ext_id","service_id","kunde_uid"),
 	"campus.tbl_zeitsperre"  => array("zeitsperre_id","zeitsperretyp_kurzbz","mitarbeiter_uid","bezeichnung","vondatum","vonstunde","bisdatum","bisstunde","vertretung_uid","updateamum","updatevon","insertamum","insertvon","erreichbarkeit_kurzbz","freigabeamum","freigabevon"),
 	"campus.tbl_zeitsperretyp"  => array("zeitsperretyp_kurzbz","beschreibung","farbe"),
 	"campus.tbl_zeitwunsch"  => array("stunde","mitarbeiter_uid","tag","gewicht","updateamum","updatevon","insertamum","insertvon"),
@@ -4094,6 +4149,7 @@ $tabellen=array(
 	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet"),
 	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id"),
 	"public.tbl_semesterwochen"  => array("semester","studiengang_kz","wochen"),
+	"public.tbl_service" => array("service_id", "bezeichnung","beschreibung","ext_id","oe_kurzbz"),
 	"public.tbl_sprache"  => array("sprache","locale","flagge","index","content","bezeichnung"),
 	"public.tbl_standort"  => array("standort_id","adresse_id","kurzbz","bezeichnung","insertvon","insertamum","updatevon","updateamum","ext_id", "firma_id"),
 	"public.tbl_statistik"  => array("statistik_kurzbz","bezeichnung","url","r","gruppe","sql","php","content_id","insertamum","insertvon","updateamum","updatevon","berechtigung_kurzbz"),
