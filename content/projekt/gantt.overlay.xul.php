@@ -56,6 +56,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
                 <toolbarbutton id="toolbarbutton-gantt-anzeigen" label="anzeigen" oncommand="showZeitraum(document.getElementById('toolbarbutton-gantt-beginn').value, document.getElementById('toolbarbutton-gantt-ende').value)" disabled="false" tooltiptext="Zeite Zeitraum"/>
             </toolbar>
 		</toolbox>
-        <iframe id="iframe-ressource-projekt" flex="5" src="" />
+        <iframe id="iframe-gant-projekt" flex="5" src="" />
 	</vbox> 
 </overlay>
