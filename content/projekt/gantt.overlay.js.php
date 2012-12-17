@@ -70,7 +70,7 @@ function showStudienjahr()
 		global_url = url; 
 	}
 
-	document.getElementById('iframe-ressource-projekt').contentWindow.location.href=url;
+	document.getElementById('iframe-gant-projekt').contentWindow.location.href=url;
 }
 
 function showKalenderjahr()
@@ -105,7 +105,7 @@ function showKalenderjahr()
 	}
 
 	global_url = url;
-	document.getElementById('iframe-ressource-projekt').contentWindow.location.href=url;	
+	document.getElementById('iframe-gant-projekt').contentWindow.location.href=url;	
 }
 
 function showZeitraum(beginn, ende)
@@ -131,7 +131,7 @@ function showZeitraum(beginn, ende)
         }
 
         global_url = url;
-        document.getElementById('iframe-ressource-projekt').contentWindow.location.href=url;	
+        document.getElementById('iframe-gant-projekt').contentWindow.location.href=url;	
     }
     else
         alert('kein gültiges Datum eingetragen');
