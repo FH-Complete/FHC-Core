@@ -353,10 +353,10 @@ echo '
             if($ressource->uid != '')
             {
                 $benutzer->load($ressource->uid); 
-                $name =($benutzer->titelpost!='')?$benutzer->titelpost.' ':''; 
+                $name =($benutzer->titelpre!='')?$benutzer->titelpre.' ':''; 
                 $name.= $benutzer->vorname.' '; 
                 $name.=$benutzer->nachname.' '; 
-                $name.=$benutzer->titelpre; 
+                $name.=$benutzer->titelpost; 
             }
 
             // wenn uid nicht gesetzt ist nimm zugangscode

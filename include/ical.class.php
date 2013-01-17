@@ -71,13 +71,26 @@ class ical extends basis_db
 			{
 				if($typ=='Google')
 				{
+					// VEVENT mit UTC Timestamps 
 					if(mb_strstr($row,'DTSTART:'))
 					{
-						$dtstart = mb_substr($row,8,-1);
+						$dtstart = $this->ConvertTimezone(mb_substr($row,8,-1));
 					} 
 					elseif(mb_strstr($row,'DTEND:'))
 					{
-						$dtend = mb_substr($row,6,-1);
+						$dtend = $this->ConvertTimezone(mb_substr($row,6));
+						$this->result[$idx].='FREEBUSY:'.$dtstart.'/'.$dtend."\n";
+						$dtstart='';
+						$dtend='';
+					}
+				}
+				elseif($typ=='Webmail')
+				{
+					// Freebusy Eintrag mit UTC Timestamps
+					if(mb_strstr($row,'FREEBUSY:'))
+					{
+						$dtstart = $this->ConvertTimezone(mb_substr($row,9,16));
+						$dtend = $this->ConvertTimezone(mb_substr($row,26));
 						$this->result[$idx].='FREEBUSY:'.$dtstart.'/'.$dtend."\n";
 						$dtstart='';
 						$dtend='';
@@ -126,6 +139,29 @@ class ical extends basis_db
 				$this->dtresult[]=array('dtstart'=>trim($dtstart),'dtend'=>trim($dtend));
 			}
 		}
+	}
+	
+	/**
+	 * 
+	 * Konvertiert die Zeitzone eines XMLRPC (Compact) datetimes von UTC auf Europe/Vienna 
+	 * @param $datetime (zB 20080701T093807Z)
+	 */
+	function ConvertTimezone($datetime)
+	{
+		if(mb_strpos($datetime,'Z')!==0)
+		{
+			//UTC
+			$timezone = new DateTimeZone('UTC');
+		}
+		else
+		{
+			//Default
+			$timezone = new DateTimeZone('Europe/Vienna');
+		}
+		
+		$date = new DateTime($datetime, $timezone);
+		$date->setTimezone(new DateTimeZone('Europe/Vienna'));
+		return $date->format('Ymd\THis');
 	}
 }
 ?>
