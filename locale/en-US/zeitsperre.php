@@ -1,5 +1,5 @@
 <?php
-$this->phrasen['zeitsperre/zeitsperren']='Mark unavailable';
+$this->phrasen['zeitsperre/zeitsperren']='Planned Absences';
 $this->phrasen['zeitsperre/zeitsperre']='Unavailable';
 $this->phrasen['zeitsperre/vonDatumUngueltig']='Invalid From-date';
 $this->phrasen['zeitsperre/bisDatumUngueltig']='Invalid To-date';
