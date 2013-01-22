@@ -121,5 +121,35 @@ class stunde extends basis_db
 		} 
 		return $stunden;
 	}
+	
+	/**
+	 * Laedt eine Stunde
+	 * @param $stunde
+	 */
+	public function load($stunde)
+	{
+		$qry = "SELECT * FROM lehre.tbl_stunde WHERE stunde=".$this->db_add_param($stunde, FHC_INTEGER).";";
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				$this->beginn = $row->beginn;
+				$this->ende = $row->ende;
+				$this->stunde = $row->stunde;
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Stunde wurde nicht gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg ='Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
 }
 ?>
