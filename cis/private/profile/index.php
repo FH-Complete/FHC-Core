@@ -277,46 +277,46 @@ if ($type=='mitarbeiter')
 if(!$ansicht)
 {
 	
-	echo '<br><br><b>FH-Ausweis Status</b><br>';
+	echo '<br><br><b>'.$p->t('profil/fhausweisStatus').'</b><br>';
 	$bm = new betriebsmittel();
 	if($bm->zutrittskarteAusgegeben($user->uid))
 	{
-		echo '<br>FH Ausweis wurde bereits ausgegeben';
+		echo '<br>'.$p->t('profil/fhausweisWurdeBereitsAusgegeben');
 	}
 	else
 	{
 		$fs = new fotostatus();
 		if($fs->getLastFotoStatus($user->person_id))
 		{
-			echo '<br>Foto '.$fs->fotostatus_kurzbz.' am '.$datum_obj->formatDatum($fs->datum, 'd.m.Y');
+			echo '<br>'.$p->t('profil/Bild').' '.$fs->fotostatus_kurzbz.' am '.$datum_obj->formatDatum($fs->datum, 'd.m.Y');
 			switch($fs->fotostatus_kurzbz)
 			{
 				case 'abgewiesen':
-					echo '<br>Laden Sie bitte ein gueltiges Foto hoch';
+					echo '<br>'.$p->t('profil/ladenSieBitteEinGueltigesFotoHoch');
 					break;
 				case 'hochgeladen':
-					echo '<br>Foto wurde noch nicht akzeptiert';
+					echo '<br>'.$p->t('profil/fotoWurdeNochNichtAkzeptiert');
 					break;
 				case 'akzeptiert':
 					if($bm->zutrittskartePrinted($user->uid))
 					{
-						echo '<br>FH Ausweis gedruckt am '.$datum_obj->formatDatum($bm->insertamum,'d.m.Y');
+						echo '<br>'.$p->t('profil/fhausweisGedrucktAm').' '.$datum_obj->formatDatum($bm->insertamum,'d.m.Y');
 						$geliefertts = $datum_obj->mktime_fromtimestamp($bm->insertamum);
 						$abholungsdatum = $datum_obj->jump_day($geliefertts, 1);	
-						echo '<br>FH Ausweis abholbereit am Empfang ab '.date('d.m.Y',$abholungsdatum);	
+						echo '<br>'.$p->t('profil/fhausweisAbholbereitAmEmpfangAb').' '.date('d.m.Y',$abholungsdatum);	
 					}
 					else
-						echo '<br>FH Ausweis wurde noch nicht gedruckt';
+						echo '<br>'.$p->t('profil/fhausweisWurdeNochNichtGedruckt');
 					break;
 					
 				default:
-					echo '<br>Laden Sie bitte ein gültiges Foto hoch';
+					echo '<br>'.$p->t('profil/ladenSieBitteEinGueltigesFotoHoch');
 					break;
 			}
 		}
 		else
 		{
-			echo '<br>Ihr Foto wurde noch nicht geprüft';
+			echo '<br>'.$p->t('profil/ihrFotoWurdeNochNichtGeprueft');
 		}
 	}
 	//Funktionen
