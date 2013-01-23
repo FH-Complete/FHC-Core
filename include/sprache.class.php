@@ -58,19 +58,27 @@ class sprache extends basis_db
 	{
 		$qry = "SELECT * FROM public.tbl_sprache WHERE sprache=".$this->db_add_param($sprache, FHC_STRING, false).";";
 		
-		if(!$this->db_query($qry))
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->sprache = $row->sprache; 
+				$this->locale = $row->locale; 
+				$this->index = $row->index; 
+				$this->content = $this->db_parse_bool($row->content);
+				return true; 
+			}
+			else
+			{
+				$this->errormsg = 'Sprache nicht gefunden';
+				return false;
+			}
+		}
+		else
 		{
 			$this->errormsg = "Fehler bei der Abfrage.";
-			return false; 
+			return false;
 		}
-		if($row = $this->db_fetch_object())
-		{
-			$this->sprache = $row->sprache; 
-			$this->locale = $row->locale; 
-			$this->index = $row->index; 
-			$this->content = $this->db_parse_bool($row->content); 
-		}
-		return true; 		
 	}
 	
 	/**

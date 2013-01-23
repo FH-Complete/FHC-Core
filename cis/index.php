@@ -59,9 +59,11 @@ if(isset($_GET['sprache']))
 {
 	$sprache = new sprache();
 	if($sprache->load($_GET['sprache']))
+	{
 		setSprache($_GET['sprache']);
+	}
 	else
-		die('Sprache invalid');
+		setSprache(DEFAULT_LANGUAGE);
 }
 if(isset($_GET['content_id']))
 {
