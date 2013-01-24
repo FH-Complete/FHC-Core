@@ -289,7 +289,7 @@
 		if(isset($_GET['type']) && $_GET['type']=='saveallrtpunkte')
 		{
 			$errormsg='';
-			$qry = "SELECT prestudent_id, tbl_prestudent.studiengang_kz, nachname, vorname, tbl_studiengang.oe_kurzbz,
+			$qry = "SELECT prestudent_id, tbl_prestudent.studiengang_kz, nachname, vorname, tbl_studiengang.oe_kurzbz
 					FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) JOIN public.tbl_studiengang USING(studiengang_kz)
 					WHERE reihungstest_id=".$db->db_add_param($reihungstest_id, FHC_INTEGER);
 			// AND (rt_punkte1='' OR rt_punkte1 is null)";
