@@ -14,4 +14,8 @@ $this->phrasen['zeitaufzeichnung/dauer']='Length';
 $this->phrasen['zeitaufzeichnung/gesamtdauer']='Total time';
 $this->phrasen['zeitaufzeichnung/sieSindDerzeitKeinenProjektenZugeordnet']='You are not currently assigned to any projects';
 $this->phrasen['zeitaufzeichnung/fehlerBeimErmittelnDerProjekte']='Error retrieving project data';
+$this->phrasen['zeitaufzeichnung/organisationseinheit1']='Organisation Unit 1';
+$this->phrasen['zeitaufzeichnung/organisationseinheit2']='Organisation Unit 2';
+$this->phrasen['zeitaufzeichnung/service']='Service';
+$this->phrasen['zeitaufzeichnung/kunde']='Client';
 ?>

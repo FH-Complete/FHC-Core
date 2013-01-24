@@ -38,13 +38,16 @@ class zeitaufzeichnung extends basis_db
 	public $start;					// timestamp
 	public $ende;					// timestamp
 	public $beschreibung;			// varchar(256)
-	public $studiengang_kz;			// integer
-	public $fachbereich_kurzbz;		// varchar(16)
+	public $oe_kurzbz_1;			// varchar(32) ehemals studiengangs_kz
+	public $oe_kurzbz_2;			// varchar(32) ehemals fachbereich_kurzbz
 	public $insertamum;				// timestamp
 	public $insertvon;				// varchar(16)
 	public $updateamum;				// timestamp
 	public $updatevon;				// varchar(16)
 	public $projekt_kurzbz;			// varchar(16)
+	public $ext_id;					// bigint
+	public $service_id;				// integer
+	public $kunde_uid;				// varchar(32)
 	
 	/**
 	 * Konstruktor
@@ -89,13 +92,16 @@ class zeitaufzeichnung extends basis_db
 			$this->start = $row->start;
 			$this->ende = $row->ende;
 			$this->beschreibung = $row->beschreibung;
-			$this->studiengang_kz = $row->studiengang_kz;
-			$this->fachbereich_kurzbz = $row->fachbereich_kurzbz;
+			$this->oe_kurzbz_1 = $row->oe_kurzbz_1;
+			$this->oe_kurzbz_2 = $row->oe_kurzbz_2;
 			$this->insertamum = $row->insertamum;
 			$this->insertvon = $row->insertvon;
 			$this->updateamum = $row->updateamum;
 			$this->updatevon = $row->updatevon;
 			$this->projekt_kurzbz = $row->projekt_kurzbz;
+			$this->ext_id = $row->ext_id;
+			$this->service_id = $row->service_id;
+			$this->kunde_uid = $row->kunde_uid;
 		}
 		else
 		{
@@ -132,19 +138,22 @@ class zeitaufzeichnung extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO campus.tbl_zeitaufzeichnung (uid, aktivitaet_kurzbz, start, ende, beschreibung, 
-			      studiengang_kz, fachbereich_kurzbz, insertamum, insertvon, updateamum, updatevon, projekt_kurzbz) VALUES('.
+			      oe_kurzbz_1, oe_kurzbz_2, insertamum, insertvon, updateamum, updatevon, projekt_kurzbz, ext_id, service_id, kunde_uid) VALUES('.
 			      $this->db_add_param($this->uid).', '.
 			      $this->db_add_param($this->aktivitaet_kurzbz).', '.
 			      $this->db_add_param($this->start).', '.
 			      $this->db_add_param($this->ende).', '.
 			      $this->db_add_param($this->beschreibung).', '.
-			      $this->db_add_param($this->studiengang_kz).', '.
-			      $this->db_add_param($this->fachbereich_kurzbz).','.
+			      $this->db_add_param($this->oe_kurzbz_1).', '.
+			      $this->db_add_param($this->oe_kurzbz_2).','.
 			      $this->db_add_param($this->insertamum).', '.
 			      $this->db_add_param($this->insertvon).', '.
 			      $this->db_add_param($this->updateamum).', '.
 			      $this->db_add_param($this->updatevon).', '.
-			      $this->db_add_param($this->projekt_kurzbz).');';
+			      $this->db_add_param($this->projekt_kurzbz).', '.
+			      $this->db_add_param($this->ext_id).', '.
+			      $this->db_add_param($this->service_id).', '.
+			      $this->db_add_param($this->kunde_uid).');';
 		}
 		else
 		{
@@ -163,11 +172,14 @@ class zeitaufzeichnung extends basis_db
 				' start='.$this->db_add_param($this->start).', '.
 				' ende='.$this->db_add_param($this->ende).', '.
 		      	' beschreibung='.$this->db_add_param($this->beschreibung).', '.
-		      	' studiengang_kz='.$this->db_add_param($this->studiengang_kz).', '.
-		      	' fachbereich_kurzbz='.$this->db_add_param($this->fachbereich_kurzbz).', '.
+		      	' oe_kurzbz_1='.$this->db_add_param($this->oe_kurzbz_1).', '.
+		      	' oe_kurzbz_2='.$this->db_add_param($this->oe_kurzbz_2).', '.
 		      	' updateamum='.$this->db_add_param($this->updateamum).', '.
 		      	' updatevon='.$this->db_add_param($this->updatevon).', '.
-		      	' projekt_kurzbz='.$this->db_add_param($this->projekt_kurzbz).' '.
+		      	' projekt_kurzbz='.$this->db_add_param($this->projekt_kurzbz).', '.
+				' ext_id='.$this->db_add_param($this->ext_id).', '.
+				' service_id='.$this->db_add_param($this->service_id).', '.
+				' kunde_uid='.$this->db_add_param($this->kunde_uid).' '.
 		      	'WHERE zeitaufzeichnung_id='.$this->db_add_param($this->zeitaufzeichnung_id, FHC_INTEGER, false);
 		}
 		
@@ -234,6 +246,110 @@ class zeitaufzeichnung extends basis_db
 			$this->errormsg = 'Fehler beim Loeschen der Daten';
 			return false;
 		}
+	}
+	
+	/**
+	 * Laedt die Datensaetze eines Projektes
+	 * @param $projekt_kurzbz
+	 */
+	public function getListeProjekt($projekt_kurzbz)
+	{		 
+		$where = 'projekt_kurzbz='.$this->db_add_param($projekt_kurzbz);
+
+	    $qry = "SELECT 
+	    			*, to_char ((ende-start),'HH24:MI') as diff, 
+	    			(SELECT (to_char(sum(ende-start),'DD')::integer)*24+to_char(sum(ende-start),'HH24')::integer || ':' || to_char(sum(ende-start),'MI')
+	    			 FROM campus.tbl_zeitaufzeichnung 
+	    			 WHERE $where ) as summe 	    
+	    		FROM campus.tbl_zeitaufzeichnung WHERE $where
+	    		ORDER BY start DESC";
+	    
+	    if($result = $this->db_query($qry))
+	    {
+	    	while($row = $this->db_fetch_object($result))
+	    	{
+	    		$obj = new zeitaufzeichnung();
+	    		
+	    		$obj->zeitaufzeichnung_id = $row->zeitaufzeichnung_id;
+				$obj->uid = $row->uid;
+				$obj->aktivitaet_kurzbz = $row->aktivitaet_kurzbz;
+				$obj->start = $row->start;
+				$obj->ende = $row->ende;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->oe_kurzbz_1 = $row->oe_kurzbz_1;
+				$obj->oe_kurzbz_2 = $row->oe_kurzbz_2;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->projekt_kurzbz = $row->projekt_kurzbz;
+				$obj->ext_id = $row->ext_id;
+				$obj->service_id = $row->service_id;
+				$obj->kunde_uid = $row->kunde_uid;
+				$obj->summe = $row->summe;
+				$obj->diff = $row->diff;
+				
+				$this->result[] = $obj;
+	    	}
+	    	return true;
+	    }
+	    else
+	    {
+	    	$this->errormsg = 'Fehler beim Laden der Daten';
+	    	return false;
+	    }
+	}
+	
+	/**
+	 * Laedt die Zeitaufzeichnung eines Users der letzten 40 Tage
+	 * @param $user
+	 */
+	public function getListeUser($user)
+	{		 
+		$where = "uid='$user' AND ende>(now() - INTERVAL '40 days')";
+		
+	    $qry = "SELECT 
+	    			*, to_char ((ende-start),'HH24:MI') as diff, 
+	    			(SELECT (to_char(sum(ende-start),'DD')::integer)*24+to_char(sum(ende-start),'HH24')::integer || ':' || to_char(sum(ende-start),'MI')
+	    			 FROM campus.tbl_zeitaufzeichnung 
+	    			 WHERE $where ) as summe 	    
+	    		FROM campus.tbl_zeitaufzeichnung WHERE $where
+	    		ORDER BY start DESC";
+	    
+	    if($result = $this->db_query($qry))
+	    {
+	    	while($row = $this->db_fetch_object($result))
+	    	{
+	    		$obj = new zeitaufzeichnung();
+	    		
+	    		$obj->zeitaufzeichnung_id = $row->zeitaufzeichnung_id;
+				$obj->uid = $row->uid;
+				$obj->aktivitaet_kurzbz = $row->aktivitaet_kurzbz;
+				$obj->start = $row->start;
+				$obj->ende = $row->ende;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->oe_kurzbz_1 = $row->oe_kurzbz_1;
+				$obj->oe_kurzbz_2 = $row->oe_kurzbz_2;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->projekt_kurzbz = $row->projekt_kurzbz;
+				$obj->ext_id = $row->ext_id;
+				$obj->service_id = $row->service_id;
+				$obj->kunde_uid = $row->kunde_uid;
+				$obj->summe = $row->summe;
+				$obj->diff = $row->diff;
+				
+				$this->result[] = $obj;
+	    	}
+	    	return true;
+	    }
+	    else
+	    {
+	    	$this->errormsg = 'Fehler beim Laden der Daten';
+	    	return false;
+	    }
 	}
 }
 ?>
