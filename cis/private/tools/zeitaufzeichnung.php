@@ -19,109 +19,106 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-	require_once('../../../config/cis.config.inc.php');
-	require_once('../../../include/functions.inc.php');
-	require_once('../../../include/person.class.php');
-	require_once('../../../include/benutzer.class.php');
-	require_once('../../../include/studiengang.class.php');
-	require_once('../../../include/fachbereich.class.php');
-	require_once('../../../include/zeitaufzeichnung.class.php');
-	require_once('../../../include/datum.class.php');
-	require_once('../../../include/datum.class.php');
-	require_once('../../../include/projekt.class.php');
-	require_once('../../../include/phrasen.class.php'); 
+require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/person.class.php');
+require_once('../../../include/benutzer.class.php');
+require_once('../../../include/studiengang.class.php');
+require_once('../../../include/fachbereich.class.php');
+require_once('../../../include/zeitaufzeichnung.class.php');
+require_once('../../../include/datum.class.php');
+require_once('../../../include/datum.class.php');
+require_once('../../../include/projekt.class.php');
+require_once('../../../include/phrasen.class.php'); 
+require_once('../../../include/organisationseinheit.class.php');
+require_once('../../../include/service.class.php');
+require_once('../../../include/mitarbeiter.class.php');
 
 $sprache = getSprache(); 
 $p=new phrasen($sprache); 
 	
-	  if (!$db = new basis_db())
-	      die($p->t("global/fehlerBeimOeffnenDerDatenbankverbindung"));
-echo '
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+if (!$db = new basis_db())
+	die($p->t("global/fehlerBeimOeffnenDerDatenbankverbindung"));
+
+echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-<title>'.$p->t("zeitaufzeichnung/zeitaufzeichnung").'</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
-<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
-<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
-<script language="JavaScript" type="text/javascript">
-function setbisdatum()
-{
-	var now = new Date();
-	var ret = "";
-	var monat = now.getMonth();
-	monat++;
-	ret = foo(now.getDate());
-	ret = ret + "." + foo(monat);
-	ret = ret + "." + now.getFullYear();
-	ret = ret + " " + foo(now.getHours());
-	ret = ret + ":" + foo(now.getMinutes());
-	//ret = ret + ":" + foo(now.getSeconds());
+	<head>
+		<title>'.$p->t("zeitaufzeichnung/zeitaufzeichnung").'</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
+		<link href="../../../skin/tablesort.css" rel="stylesheet" type="text/css"/>
+		<link href="../../../skin/jquery.css" rel="stylesheet" type="text/css"/>
+		<script src="../../../include/js/jquery.js" type="text/javascript"></script>
+		<script language="JavaScript" type="text/javascript">
+		$(document).ready(function() 
+		{ 
+		    $("#t1").tablesorter(
+			{
+				sortList: [[4,1]],
+				widgets: ["zebra"]
+			}); 
+		});
 		
-	document.getElementById("bis").value=ret;
-}
-
-function foo(val)
-{
-	if(val<10)
-		return "0"+val;
-	else
-		return val;
-}
-
-function confdel()
-{
-	return confirm("'.$p->t("global/warnungWirklichLoeschen").'");
-}
-
-function loaduebersicht()
-{
-	projekt = document.getElementById("projekt").value;
-	
-	document.location.href="'.$_SERVER['PHP_SELF'].'?filter="+projekt;
-}
-
-function uebernehmen()
-{
-	document.getElementById("bis").value=document.getElementById("von").value;
-}
-</script>
-</head>
+		function setbisdatum()
+		{
+			var now = new Date();
+			var ret = "";
+			var monat = now.getMonth();
+			monat++;
+			ret = foo(now.getDate());
+			ret = ret + "." + foo(monat);
+			ret = ret + "." + now.getFullYear();
+			ret = ret + " " + foo(now.getHours());
+			ret = ret + ":" + foo(now.getMinutes());
+			//ret = ret + ":" + foo(now.getSeconds());
+				
+			document.getElementById("bis").value=ret;
+		}
+		
+		function foo(val)
+		{
+			if(val<10)
+				return "0"+val;
+			else
+				return val;
+		}
+		
+		function confdel()
+		{
+			return confirm("'.$p->t("global/warnungWirklichLoeschen").'");
+		}
+		
+		function loaduebersicht()
+		{
+			projekt = document.getElementById("projekt").value;
+			
+			document.location.href="'.$_SERVER['PHP_SELF'].'?filter="+projekt;
+		}
+		
+		function uebernehmen()
+		{
+			document.getElementById("bis").value=document.getElementById("von").value;
+		}
+		</script>
+	</head>
 <body>
 ';
 
-echo '<table class="tabcontent">
-  <tr>
-    <td class="tdwidth10">&nbsp;</td>
-    <td>
-    	<table class="tabcontent">
-	      <tr>
-	        <td class="ContentHeader"><font class="ContentHeader">'.$p->t("zeitaufzeichnung/zeitaufzeichnung").'</font></td>
-	      </tr>
-	    </table>
-	    <br>';
-
+echo '<h1>'.$p->t("zeitaufzeichnung/zeitaufzeichnung").'</h1>';
 
 $user = get_uid();
 $datum = new datum();
-$studiengang = new studiengang();
-$studiengang->getAll('typ, kurzbz', false);
-$stg_arr = array();
-
-foreach ($studiengang->result as $stg) 
-{
-	$stg_arr[$stg->studiengang_kz]=$stg->kuerzel;	
-}
 
 $zeitaufzeichnung_id = (isset($_GET['zeitaufzeichnung_id'])?$_GET['zeitaufzeichnung_id']:'');
 $projekt_kurzbz = (isset($_POST['projekt'])?$_POST['projekt']:'');
-$studiengang_kz = (isset($_POST['studiengang'])?$_POST['studiengang']:'');
-$fachbereich_kurzbz = (isset($_POST['fachbereich'])?$_POST['fachbereich']:'');
+$oe_kurzbz_1 = (isset($_POST['oe_kurzbz_1'])?$_POST['oe_kurzbz_1']:'');
+$oe_kurzbz_2 = (isset($_POST['oe_kurzbz_2'])?$_POST['oe_kurzbz_2']:'');
 $aktivitaet_kurzbz = (isset($_POST['aktivitaet'])?$_POST['aktivitaet']:'');
 $von = (isset($_POST['von'])?$_POST['von']:date('d.m.Y H:i'));
 $bis = (isset($_POST['bis'])?$_POST['bis']:date('d.m.Y H:i', mktime(date('H'), date('i')+10, 0, date('m'),date('d'),date('Y'))));
 $beschreibung = (isset($_POST['beschreibung'])?$_POST['beschreibung']:'');
+$service_id = (isset($_POST['service_id'])?$_POST['service_id']:'');
+$kunde_uid = (isset($_POST['kunde_uid'])?$_POST['kunde_uid']:'');
 
 //Speichern der Daten
 if(isset($_POST['save']) || isset($_POST['edit']))
@@ -147,11 +144,13 @@ if(isset($_POST['save']) || isset($_POST['edit']))
 	$zeit->start = $datum->formatDatum($von, $format='Y-m-d H:i:s');
 	$zeit->ende = $datum->formatDatum($bis, $format='Y-m-d H:i:s');
 	$zeit->beschreibung = $beschreibung;
-	$zeit->studiengang_kz = $studiengang_kz;
-	$zeit->fachbereich_kurzbz = $fachbereich_kurzbz;
+	$zeit->oe_kurzbz_1 = $oe_kurzbz_1;
+	$zeit->oe_kurzbz_2 = $oe_kurzbz_2;
 	$zeit->updateamum = date('Y-m-d H:i:s');
 	$zeit->updatevon = $user;
 	$zeit->projekt_kurzbz = $projekt_kurzbz;
+	$zeit->service_id = $service_id;
+	$zeit->kunde_uid = $kunde_uid;
 	
 	if(!$zeit->save())
 	{
@@ -199,9 +198,11 @@ if(isset($_GET['type']) && $_GET['type']=='edit')
 			$von = date('d.m.Y H:i', $datum->mktime_fromtimestamp($zeit->start));
 			$bis = date('d.m.Y H:i', $datum->mktime_fromtimestamp($zeit->ende));
 			$beschreibung = $zeit->beschreibung;
-			$studiengang_kz = $zeit->studiengang_kz;
-			$fachbereich_kurzbz = $zeit->fachbereich_kurzbz;
+			$oe_kurzbz_1 = $zeit->oe_kurzbz_1;
+			$oe_kurzbz_2 = $zeit->oe_kurzbz_2;
 			$projekt_kurzbz = $zeit->projekt_kurzbz;
+			$service_id = $zeit->service_id;
+			$kunde_uid = $zeit->kunde_uid;
 		}
 		else 
 		{
@@ -222,16 +223,28 @@ if($projekt->getProjekteMitarbeiter($user))
 		$bn = new benutzer();
 		if(!$bn->load($user))
 			die($p->t("zeitaufzeichnung/benutzerWurdeNichtGefunden",array($user)));
-			
-		echo "<table width='100%'><tr><td>".$p->t("zeitaufzeichnung/zeitaufzeichnungVon")." <b>$bn->vorname $bn->nachname</b></td>
-		      <td align='right'><a href='".$_SERVER['PHP_SELF']."' class='Item'>".$p->t("zeitaufzeichnung/neu")."</a></td></tr></table>";
+		
+		echo "<table width='100%'>
+				<tr>
+					<td>".$p->t("zeitaufzeichnung/zeitaufzeichnungVon")." 
+						<b>".$db->convert_html_chars($bn->vorname)." ".$db->convert_html_chars($bn->nachname)."</b>
+					</td>
+		      		<td align='right'>
+		      			<a href='".$_SERVER['PHP_SELF']."' class='Item'>".$p->t("zeitaufzeichnung/neu")."</a>
+		      		</td>
+		      	</tr>
+		      </table>";
 		
 		//Formular
 		echo '<br><br><form action="'.$_SERVER['PHP_SELF'].'?zeitaufzeichnung_id='.$zeitaufzeichnung_id.'" method="POST">';
 		
 		echo '<table>';
 		//Projekt
-		echo '<tr><td>'.$p->t("zeitaufzeichnung/projekt").'</td><td><SELECT name="projekt" id="projekt">';
+		echo '<tr>
+				<td>'.$p->t("zeitaufzeichnung/projekt").'</td>
+				<td><SELECT name="projekt" id="projekt">
+					<OPTION value="">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
+		
 		foreach($projekt->result as $row_projekt)
 		{
 			if($projekt_kurzbz == $row_projekt->projekt_kurzbz)
@@ -239,30 +252,59 @@ if($projekt->getProjekteMitarbeiter($user))
 			else 
 				$selected = '';
 			
-			echo "<option value='$row_projekt->projekt_kurzbz' $selected>$row_projekt->titel</option>";
+			echo '<option value="'.$db->convert_html_chars($row_projekt->projekt_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row_projekt->titel).'</option>';
 		}
 		echo '</SELECT><input type="button" value="Uebersicht" onclick="loaduebersicht();"></td>';
+		echo '</tr><tr>';
+		//OE_KURZBZ_1
+		echo '<td>'.$p->t("zeitaufzeichnung/organisationseinheit1").'</td>
+			<td colspan="3"><SELECT name="oe_kurzbz_1">';
+		$oe = new organisationseinheit();
+		$oe->getAll();
 		
-		//Studiengang
-		echo '<td>'.$p->t("global/studiengang").'</td><td><SELECT name="studiengang">';
-		$stg_obj = new studiengang();
-		$stg_obj->getAll('typ, kurzbz',false);
+		echo '<option value="">-- '.$p->t("zeitaufzeichnung/keineAuswahl").' --</option>';
 		
-		echo "<option value=''>-- ".$p->t("zeitaufzeichnung/keineAuswahl")." --</option>";
-		
-		foreach ($stg_obj->result as $stg)
+		foreach ($oe->result as $row)
 		{
-			if($stg->studiengang_kz == $studiengang_kz)
+			if($row->oe_kurzbz == $oe_kurzbz_1)
 				$selected = 'selected';
 			else 
 				$selected = '';
-			
-			echo "<option value='$stg->studiengang_kz' $selected>$stg->kuerzel ($stg->kurzbzlang)</option>";
+			if($row->aktiv)
+				$class='';
+			else
+				$class='class="inaktiv"';
+				
+			echo '<option value="'.$db->convert_html_chars($row->oe_kurzbz).'" '.$selected.' '.$class.'>'.$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung).'</option>';
 		}
 		echo '</SELECT>';
 		echo '</td>';
 		echo '</tr>';
+		echo '<tr>';	
+	
+		//OE_KURZBZ_2
+		echo '<td>'.$p->t("zeitaufzeichnung/organisationseinheit2").'</td>
+				<td colspan="3"><SELECT name="oe_kurzbz_2">';
+		echo '<option value="">-- '.$p->t("zeitaufzeichnung/keineAuswahl").' --</option>';
 		
+		$oe = new organisationseinheit();
+		$oe->getAll();
+		
+		foreach ($oe->result as $row) 
+		{
+			if($oe_kurzbz_2 == $row->oe_kurzbz)
+				$selected = 'selected';
+			else 
+				$selected = '';
+			
+			if($row->aktiv)
+				$class='';
+			else
+				$class='class="inaktiv"';
+				
+			echo '<option value="'.$db->convert_html_chars($row->oe_kurzbz).'" '.$selected.' '.$class.'>'.$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung).'</option>';
+		}
+		echo '</SELECT></td></tr>';
 		//Aktivitaet
 		echo '<tr>';
 		echo '<td>'.$p->t("zeitaufzeichnung/aktivitaet").'</td><td>';
@@ -270,7 +312,9 @@ if($projekt->getProjekteMitarbeiter($user))
 		$qry = "SELECT * FROM fue.tbl_aktivitaet ORDER by beschreibung";
 		if($result = $db->db_query($qry))
 		{
-			echo '<SELECT name="aktivitaet">';
+			echo '<SELECT name="aktivitaet">
+			<OPTION value="">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
+			
 			while($row = $db->db_fetch_object($result))
 			{
 				if($aktivitaet_kurzbz == $row->aktivitaet_kurzbz)
@@ -278,36 +322,55 @@ if($projekt->getProjekteMitarbeiter($user))
 				else
 					$selected = '';
 				
-				echo "<option value='$row->aktivitaet_kurzbz' $selected>$row->beschreibung</option>";
+				echo '<OPTION value="'.$db->convert_html_chars($row->aktivitaet_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row->beschreibung).'</option>';
 			}
 			echo '</SELECT>';
 		}
-		//Fachbereich
-		echo '</td><td>'.$p->t("global/institut").'</td><td><SELECT name="fachbereich">';
-		echo '<option value="">-- '.$p->t("zeitaufzeichnung/keineAuswahl").' --</option>';
-		
-		$fb_obj = new fachbereich();
-		$fb_obj->getAll();
-		
-		foreach ($fb_obj->result as $fb) 
+		echo '</td></tr>';
+		echo '<tr>
+			<td>'.$p->t('zeitaufzeichnung/service').'</td>
+			<td colspan="3"><SELECT name="service_id">
+			<OPTION value="">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
+		$service = new service();
+		$service->getAll();
+		foreach($service->result as $row)
 		{
-			if($fachbereich_kurzbz == $fb->fachbereich_kurzbz)
-				$selected = 'selected';
-			else 
-				$selected = '';
-			
-			echo "<option value='$fb->fachbereich_kurzbz' $selected>$fb->bezeichnung</option>";
+			if($row->service_id==$service_id)
+				$selected='selected';
+			else
+				$selected='';
+				
+			echo '<OPTION value="'.$db->convert_html_chars($row->service_id).'" '.$selected.'>'.$db->convert_html_chars($row->oe_kurzbz.' - '.$row->bezeichnung).'</OPTION>';
 		}
-		echo '</SELECT></td></tr>';
+		echo '</SELECT></td>
+			</tr>';
+		echo '<tr>
+			<td>'.$p->t('zeitaufzeichnung/kunde').'</td>
+			<td><SELECT name="kunde_uid">
+			<OPTION value="">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
+		$mitarbeiter = new mitarbeiter();
+		$result = $mitarbeiter->getMitarbeiter(null, null, null);
+		foreach($result as $row)
+		{
+			if($row->uid==$kunde_uid)
+				$selected='selected';
+			else
+				$selected='';
+				
+			echo '<OPTION value="'.$db->convert_html_chars($row->uid).'" '.$selected.'>'.$db->convert_html_chars($row->nachname.' '.$row->vorname.' - '.$row->uid).'</OPTION>';
+		}
+		echo '</SELECT>
+			</td>
+		</tr>';
 		echo '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
 		//Start/Ende
 		echo '
 		<tr>
-			<td>'.$p->t("global/von").'</td><td><input type="text" id="von" name="von" value="'.$von.'"><input type="button" value="->"  onclick="uebernehmen()"></td>
-			<td>'.$p->t("global/bis").'</td><td><input type="text" id="bis" name="bis" value="'.$bis.'">&nbsp;&nbsp;<img src="../../../skin/images/refresh.png" onclick="setbisdatum()"></td>
+			<td>'.$p->t("global/von").'</td><td><input type="text" id="von" name="von" value="'.$db->convert_html_chars($von).'"><input type="button" value="->"  onclick="uebernehmen()"></td>
+			<td>'.$p->t("global/bis").'</td><td><input type="text" id="bis" name="bis" value="'.$db->convert_html_chars($bis).'">&nbsp;&nbsp;<img src="../../../skin/images/refresh.png" onclick="setbisdatum()"></td>
 		<tr>';
 		//Beschreibung
-		echo '<tr><td>'.$p->t("global/beschreibung").'</td><td colspan="3"><textarea name="beschreibung" cols="60">'.$beschreibung.'</textarea></td></tr>';
+		echo '<tr><td>'.$p->t("global/beschreibung").'</td><td colspan="3"><textarea name="beschreibung" cols="60">'.$db->convert_html_chars($beschreibung).'</textarea></td></tr>';
 		echo '<tr><td></td><td></td><td></td><td align="right">';
 		//SpeichernButton
 		if($zeitaufzeichnung_id=='')
@@ -320,63 +383,58 @@ if($projekt->getProjekteMitarbeiter($user))
 		echo '<br><hr>';
 		
 		//Uebersichtstabelle
-		echo "<table id='t1' class='liste table-autosort:4 table-stripeclass:alternate table-autostripe'>\n";
-		echo "   <thead><tr class='liste'>\n";
-	    echo "       <th class='table-sortable:numeric'>".$p->t("zeitaufzeichnung/id")."</th><th class='table-sortable:default'>".$p->t("zeitaufzeichnung/projekt")."</th>";
-	    echo "<th class='table-sortable:default'>".$p->t("zeitaufzeichnung/aktivitaet")."</th><th class='table-sortable:default'>".$p->t("zeitaufzeichnung/user")."</th>";
-	    echo "<th class='table-sortable:default'>".$p->t("zeitaufzeichnung/start")."</th>";
-	    echo "<th class='table-sortable:default'>".$p->t("zeitaufzeichnung/ende")."</th>";
-	    echo "<th class='table-sortable:default'>".$p->t("zeitaufzeichnung/dauer")."</th>";
-	    echo "<th class='table-sortable:default'>".$p->t("global/beschreibung")."</th><th class='table-sortable:default'>".$p->t("lvplan/stg")."</th>";
-	    echo "<th class='table-sortable:default'>".$p->t("global/institut")."</th><th colspan='2'>".$p->t("global/aktion")."</th>";
-	    echo "   </tr></thead><tbody>\n";
+		echo '
+		<table id="t1" class="tablesorter">
+			<thead>
+				<tr>
+					<th>'.$p->t("zeitaufzeichnung/id").'</th>
+					<th>'.$p->t("zeitaufzeichnung/projekt").'</th>
+					<th>'.$p->t("zeitaufzeichnung/aktivitaet").'</th>
+					<th>'.$p->t("zeitaufzeichnung/user").'</th>
+					<th>'.$p->t("zeitaufzeichnung/start").'</th>
+					<th>'.$p->t("zeitaufzeichnung/ende").'</th>
+					<th>'.$p->t("zeitaufzeichnung/dauer").'</th>
+					<th>'.$p->t("global/beschreibung").'</th>
+					<th>'.$p->t("global/organisationseinheit").'</th>
+					<th>'.$p->t("global/organisationseinheit").'</th>
+					<th colspan="2">'.$p->t("global/aktion").'</th>
+	    		</tr>
+	    	</thead>
+	    <tbody>';
 	    
+	    $za = new zeitaufzeichnung();
 	    if(isset($_GET['filter']))
-	    	$where = "projekt_kurzbz='".addslashes($_GET['filter'])."'";
-	    else 
-	    	$where = "uid='$user' AND ende>(now() - INTERVAL '40 days')";
-	    	//(SELECT to_char(sum(ende-start),'HH:MI:SS') 
-	    $qry = "SELECT 
-	    			*, to_char ((ende-start),'HH24:MI') as diff, 
-	    			(SELECT (to_char(sum(ende-start),'DD')::integer)*24+to_char(sum(ende-start),'HH24')::integer || ':' || to_char(sum(ende-start),'MI')
-	    			 FROM campus.tbl_zeitaufzeichnung 
-	    			 WHERE $where ) as summe 	    
-	    		FROM campus.tbl_zeitaufzeichnung WHERE $where
-	    		ORDER BY start DESC";
-	    //AND ende>(now() - INTERVAL '40 days')
-	    //echo $qry;
-	    if($result = $db->db_query($qry))
-	    {
-		    $i = 0;
-		    $summe=0;
-			while($row=$db->db_fetch_object($result))
-		    {		        
-		    	$summe = $row->summe;
-				echo "   <tr>\n";
-		        echo "       <td>".$row->zeitaufzeichnung_id."</td>\n";
-				echo "       <td>".$row->projekt_kurzbz."</td>\n";
-		        echo "       <td>$row->aktivitaet_kurzbz</td>\n";
-		        echo "       <td>$row->uid</td>\n";
-		        echo "       <td nowrap><div style='display: none;'>$row->start</div>".date('d.m.Y H:i', $datum->mktime_fromtimestamp($row->start))."</td>\n";
-		        echo "       <td nowrap><div style='display: none;'>$row->ende</div>".date('d.m.Y H:i', $datum->mktime_fromtimestamp($row->ende))."</td>\n";
-		        echo "       <td align='right'>".$row->diff."</td>\n";
-		        echo "       <td title='".mb_eregi_replace("\r\n",' ',$row->beschreibung)."'>".$row->beschreibung."</td>\n";
-		        echo "       <td>".(isset($stg_arr[$row->studiengang_kz])?$stg_arr[$row->studiengang_kz]:$row->studiengang_kz)."</td>\n";
-		        echo "       <td>$row->fachbereich_kurzbz</td>\n";
-		        echo "       <td>";
-		        if(!isset($_GET['filter']) || $row->uid==$user)
-		        	echo "<a href='".$_SERVER['PHP_SELF']."?type=edit&zeitaufzeichnung_id=$row->zeitaufzeichnung_id' class='Item'>".$p->t("global/bearbeiten")."</a>";
-		        echo "</td>\n";
-		        echo "       <td>";
-		        if(!isset($_GET['filter']) || $row->uid==$user)
-		        	echo "<a href='".$_SERVER['PHP_SELF']."?type=delete&zeitaufzeichnung_id=$row->zeitaufzeichnung_id' class='Item'  onclick='return confdel()'>".$p->t("global/loeschen")."</a>";
-		        echo "</td>\n";
-		        echo "   </tr>\n";
-		        $i++;
-		    }
+	    	$za->getListeProjekt($_GET['filter']);
+	    else
+	    	$za->getListeUser($user);
+	   
+		$summe=0;
+		foreach($za->result as $row)
+		{		        
+			$summe = $row->summe;
+			echo '<tr>
+				<td>'.$db->convert_html_chars($row->zeitaufzeichnung_id).'</td>
+				<td>'.$db->convert_html_chars($row->projekt_kurzbz).'</td>
+		        <td>'.$db->convert_html_chars($row->aktivitaet_kurzbz).'</td>
+		        <td>'.$db->convert_html_chars($row->uid).'</td>
+		        <td nowrap>'.date('d.m.Y H:i', $datum->mktime_fromtimestamp($row->start)).'</td>
+		        <td nowrap>'.date('d.m.Y H:i', $datum->mktime_fromtimestamp($row->ende)).'</td>
+		        <td align="right">'.$db->convert_html_chars($row->diff).'</td>
+		        <td title="'.$db->convert_html_chars(mb_eregi_replace("\r\n",' ',$row->beschreibung)).'">'.$db->convert_html_chars($row->beschreibung).'</td>
+		        <td>'.$db->convert_html_chars($row->oe_kurzbz_1).'</td>
+		        <td>'.$db->convert_html_chars($row->oe_kurzbz_2).'</td>
+		        <td>';
+	        if(!isset($_GET['filter']) || $row->uid==$user)
+	        	echo '<a href="'.$_SERVER['PHP_SELF'].'?type=edit&zeitaufzeichnung_id='.$row->zeitaufzeichnung_id.'" class="Item">'.$p->t("global/bearbeiten").'</a>';
+	        echo "</td>\n";
+	        echo "       <td>";
+	        if(!isset($_GET['filter']) || $row->uid==$user)
+	        	echo '<a href="'.$_SERVER['PHP_SELF'].'?type=delete&zeitaufzeichnung_id='.$row->zeitaufzeichnung_id.'" class="Item"  onclick="return confdel()">'.$p->t("global/loeschen").'</a>';
+	        echo "</td>\n";
+	        echo "   </tr>\n";
 	    }
 	    echo "</tbody></table>\n";
-	    echo "".$p->t("zeitaufzeichnung/gesamtdauer").": $summe";
+	    echo $p->t("zeitaufzeichnung/gesamtdauer").": ".$db->convert_html_chars($summe);
 	}
 	else 
 	{
@@ -388,9 +446,6 @@ else
 	echo $p->t("zeitaufzeichnung/fehlerBeimErmittelnDerProjekte");
 }
 
+echo '</body>
+</html>'; 
 ?>
-	</td>
-  </tr>
-</table>
-</body>
-</html>
