@@ -45,10 +45,8 @@ echo '
 	<link rel="stylesheet"  href="../../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 	<link rel="stylesheet" href="../../../skin/styles/jquery.css" type="text/css">
-	<link rel="stylesheet" href="../../../skin/styles/jquery-ui.css" type="text/css">
-	
-	<script src="../../../include/js/jquery.js" type="text/javascript"></script>
-	<script src="../../../include/js/jquery-ui.js" type="text/javascript"></script>
+	<link rel="stylesheet" href="../../../skin/styles/jquery-ui1.9.2.custom.min.css" type="text/css">
+	<script src="../../../include/js/jquery1.9.min.js" type="text/javascript"></script>
 	<script type="text/javascript" src="../../../include/tiny_mce/tiny_mce.js"></script>
 	
 	<script type="text/javascript">

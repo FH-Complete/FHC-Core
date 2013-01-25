@@ -25,11 +25,15 @@ if(!isset($_REQUEST['work']))
 	die('Parameter Work missing');
 
 $work = $_REQUEST['work'];
-$q = $_REQUEST['q'];
+if(isset($_REQUEST['term']))
+	$q = $_REQUEST['term'];
+else
+	$q = $_REQUEST['q'];
 
 switch($work)
 {
 	case 'ressource':
+			$result =array();
 			$ort = new ort();
 
 			if(!$ort->filter($q))
@@ -38,7 +42,13 @@ switch($work)
 			foreach($ort->result as $row)
 			{
 				if($row->aktiv)
-					echo html_entity_decode($row->ort_kurzbz.'|Ort|'.$row->bezeichnung."\n");
+				{
+					//echo html_entity_decode($row->ort_kurzbz.'|Ort|'.$row->bezeichnung."\n");
+					$item['uid']=$row->ort_kurzbz;
+					$item['typ']='Ort';
+					$item['bezeichnung']=$row->bezeichnung;
+					$result[]=$item;
+				}
 			}
 		 	
 			$benutzer = new benutzer();
@@ -48,8 +58,13 @@ switch($work)
 				
 			foreach($benutzer->result as $row)
 			{
-				echo html_entity_decode($row->uid.'|Person|'.$row->nachname.' '.$row->vorname."\n");
+				//echo html_entity_decode($row->uid.'|Person|'.$row->nachname.' '.$row->vorname."\n");
+				$item['uid']=$row->uid;
+				$item['typ']='Person';
+				$item['bezeichnung']=$row->nachname.' '.$row->vorname;
+				$result[]=$item;
 			}
+			echo json_encode($result);
 			break;
 	default:
 			die('Invalid Work Parameter');

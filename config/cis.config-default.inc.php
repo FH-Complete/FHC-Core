@@ -141,6 +141,11 @@ define('OPUS_DB','bla');
 // Pfad zu den Opus Volltexten
 define('OPUS_PATH_PAA','/var/www/opus/volltexte/');
 
+// ***** SOGO *****
+define('SOGO_SERVER','https://sogo.technikum-wien.at/SOGo/');
+define('SOGO_USER','user');
+define('SOGO_PASSWD','passwort');
+
 // ***** Nicht aendern *****
 define('TABLE_ID','_id');
 define('TABLE_BEGIN','tbl_');

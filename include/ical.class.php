@@ -96,6 +96,25 @@ class ical extends basis_db
 						$dtend='';
 					}
 				}
+				elseif($typ=='SoGo')
+				{
+					if(mb_strstr($row,'FREEBUSY'))
+					{
+						$len = mb_strlen($row);
+						$doppelpunktpos = mb_strpos($row, ':');
+						$row = mb_substr($row, $doppelpunktpos+1);
+						$slashpos = mb_strpos($row, '/');
+						$dtstart = mb_substr($row, 0, $slashpos);
+						$dtend = mb_substr($row, $slashpos+1);
+						$this->dtresult[]=array('dtstart'=>trim($dtstart),'dtend'=>trim($dtend));
+						
+						$dtstart = $this->ConvertTimezone($dtstart);
+						$dtend = $this->ConvertTimezone($dtend);
+						$this->result[$idx].='FREEBUSY:'.$dtstart.'/'.$dtend."\n";
+						$dtstart='';
+						$dtend='';
+					}
+				}
 				elseif(mb_strpos($row,'FREEBUSY')===0)
 					$this->result[$idx].=$row."\n";
 			}
