@@ -167,10 +167,10 @@ echo '<html>
 	<link rel="stylesheet"  href="../../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 	<link rel="stylesheet" href="../../../skin/jquery.css" type="text/css"/>
-	<script type="text/javascript" src="../../../include/js/jquery.js"></script>	
+	<script type="text/javascript" src="../../../include/js/jquery1.9.min.js"></script>	
 	<link rel="stylesheet" type="text/css" href="../../../include/js/fullcalendar/fullcalendar.css" />
 	<link rel="stylesheet" type="text/css" href="../../../include/js/fullcalendar/fullcalendar.print.css" media="print" />
-	<script type="text/javascript" src="../../../include/js/jquery-ui.js"></script>
+	<link rel="stylesheet" type="text/css" href="../../../skin/jquery-ui-1.9.2.custom.min.css"/>	
 	<script type="text/javascript" src="../../../include/js/fullcalendar/fullcalendar.min.js"></script>
 	<script type="text/javascript" src="../../../include/js/jquery.contextmenu.r2.js"></script>
 	<title>'.$p->t('coodle/coodle').' - '.$p->t('coodle/termine').'</title>
@@ -314,8 +314,9 @@ echo '<html>
 			$(this).draggable(
 			{
 				zIndex: 999,
-				revert: true,      // will cause the event to go back to its
-				revertDuration: 0  //  original position after the drag
+				revert: true,		// will cause the event to go back to its
+				revertDuration: 0,  //  original position after the drag
+				scroll: false		// behebt ruckeln im IE7
 			});
 		});
 	
@@ -505,6 +506,14 @@ echo '<html>
 						}
 					});
 				}		
+			},
+			dayClick: function(date, allDay, jsEvent, view)
+			{
+				if(view.name=="month")
+				{
+					$("#calendar").fullCalendar("changeView", "agendaWeek");
+					$("#calendar").fullCalendar("gotoDate", date);
+				}
 			}
 		});
 	});
@@ -544,44 +553,31 @@ echo '
 	'.$p->t('coodle/ressource').':<br>
 	<input id="input_ressource" type="text" size="10" />
 	</p>
-	<script>
 	
-	// Formatieren des Eintrages im Autocomplete Feld
-	function formatItem(row) 
-	{
-		if(row[1]=="Ort")
-		    return "<i>" + row[0] + "<\/i> - "+ row[2] +" " + row[1];
-		else
-		    return "<i>" + row[2] + "<\/i> - "+ row[0] +" " + row[1];
-	}
-		
-	function selectItem(li) 
-	{
-		return false;
-	}
-
+	<script>
 	$(document).ready(function() 
 	{
 		// Autocomplete Feld fuer Ressourcen initialisieren	
-		$("#input_ressource").autocomplete("coodle_autocomplete.php", {
-			minChars:2,
-			matchSubset:1,matchContains:1,
-			width:300,
-			cacheLength:0,
-			onItemSelect:selectItem,
-			formatItem:formatItem,
-			extraParams:{"work":"ressource"}
-		});
-		  
-		// Auswahl eines Eintrages im Autocomplete Feld
-		$("#input_ressource").result(function(event, data, formatted) 
-		{
-			var uid = data[0];
-			var typ = data[1];
-			var bezeichnung = data[2];
-			addRessource(uid, typ, bezeichnung);
-			this.value="";
-		});
+		$("#input_ressource").autocomplete({
+			source: "coodle_autocomplete.php?work=ressource",
+			minLength:2,
+			response: function(event, ui)
+			{
+				//Value und Label fuer die Anzeige setzen
+				for(i in ui.content)
+				{
+					ui.content[i].value=ui.content[i].typ+ui.content[i].uid;
+					ui.content[i].label=ui.content[i].bezeichnung+" "+ui.content[i].uid;
+				}
+			},
+			select: function(event, ui)
+			{
+				//Ausgeaehlte Ressource zuweisen und Textfeld wieder leeren
+				addRessource(ui.item.uid, ui.item.typ, ui.item.bezeichnung);
+				ui.item.value="";
+				ui.item.label="";
+			}
+		});		
 	 });
 	
 	/*

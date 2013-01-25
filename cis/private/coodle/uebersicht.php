@@ -45,8 +45,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
         <link href="../../../skin/tablesort.css" rel="stylesheet" type="text/css">
         <link href="../../../skin/jquery.css" rel="stylesheet"  type="text/css"/>
-        <script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
-        <script src="../../../include/js/jquery.js" type="text/javascript"></script> 
+        <script src="../../../include/js/jquery1.9.min.js" type="text/javascript"></script> 
         <script type="text/javascript">
         $(document).ready(function() 
         {
