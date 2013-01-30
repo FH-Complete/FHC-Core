@@ -324,6 +324,7 @@ echo '<html>
 		// Kalender Initialisieren
 		$("#calendar").fullCalendar(
 		{
+			firstDay: 1,
 			header:	{
 						left: "prev,next today",
 						center: "title",
