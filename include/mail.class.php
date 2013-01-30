@@ -163,8 +163,11 @@ class mail
 		}
 		$mailbody .= "--".$eol;
 		
+		// Subject Encoding setzen
+		$subject = "=?UTF-8?B?".base64_encode($this->subject)."?=";
+		
 		// Senden
-		if(mail($this->to, $this->subject, $mailbody, $header))
+		if(mail($this->to, $subject, $mailbody, $header))
 			return true;
 		else 
 			return false;		
