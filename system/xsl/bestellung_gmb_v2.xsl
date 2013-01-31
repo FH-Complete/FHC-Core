@@ -111,7 +111,7 @@
 							<fo:table-row line-height="10pt">
 								<fo:table-cell>
 									<fo:block font-size="10pt" font-weight="bold">
-										  <xsl:text>Meldemannstraße 16 (Höchstädtplatz)</xsl:text>
+										  <xsl:value-of select="rechnungsadresse/strasse" />
 									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
