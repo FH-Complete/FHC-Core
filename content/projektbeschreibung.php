@@ -118,7 +118,7 @@ if(mb_strstr($vorlage->mimetype, 'application/vnd.oasis.opendocument'))
     $year = date('Y',$timestamp);
     
     $gantt = new gantt(); 
-    $gantSvg = $gantt->getBeschreibungGantt($_GET['projekt_kurzbz'], $year, 'studienjahr');
+    $gantSvg = $gantt->getBeschreibungGantt($_GET['projekt_kurzbz'], $year, 'kalenderjahr');
 
     // Bild im Temp Ordner zwischenspeichern
     file_put_contents($tempfolder.'/Pictures/20000001000071B00000242C6CF7933F.svg',$gantSvg);
