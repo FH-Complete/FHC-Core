@@ -160,7 +160,7 @@ $studiengang->load($stundenplan->studiengang_kz);
 					<checkbox id="stpl-details-dialog-checkbox-fix" checked="<?php echo ($stundenplan->fix?'true':'false'); ?>"/>
       			</row>
       			<row>
-      				<label value="Ortt" control="stpl-details-dialog-menulist-ort_kurzbz"/>
+      				<label value="Ort" control="stpl-details-dialog-menulist-ort_kurzbz"/>
 					<menulist id="stpl-details-dialog-menulist-ort_kurzbz" 
 					          flex="1">
 							<menupopup>
