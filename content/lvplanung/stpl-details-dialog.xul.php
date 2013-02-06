@@ -160,12 +160,12 @@ $studiengang->load($stundenplan->studiengang_kz);
 					<checkbox id="stpl-details-dialog-checkbox-fix" checked="<?php echo ($stundenplan->fix?'true':'false'); ?>"/>
       			</row>
       			<row>
-      				<label value="Ort" control="stpl-details-dialog-menulist-ort_kurzbz"/>
+      				<label value="Ortt" control="stpl-details-dialog-menulist-ort_kurzbz"/>
 					<menulist id="stpl-details-dialog-menulist-ort_kurzbz" 
 					          flex="1">
 							<menupopup>
 							<?php
-								$qry = "SELECT ort_kurzbz FROM public.tbl_ort ORDER BY ort_kurzbz";
+								$qry = "SELECT ort_kurzbz FROM public.tbl_ort WHERE aktiv=true ORDER BY ort_kurzbz";
 								
 								if($db->db_query($qry))
 								{
