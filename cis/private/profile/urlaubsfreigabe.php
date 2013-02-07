@@ -79,7 +79,7 @@ echo '<html>
 $mitarbeiter = new mitarbeiter();
 $mitarbeiter->getUntergebene($user);
 
-if(count($mitarbeiter->untergebene)==0 && !$rechte->isBerechtigt('admin'))
+if(count($mitarbeiter->untergebene)==0 && !$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('mitarbeiter/urlaube', null, 'suid'))
 	die('Es sind Ihnen keine Mitarbeiter zugeteilt für die sie den Urlaub freigeben dürfen');
 $untergebene = '';
 foreach ($mitarbeiter->untergebene as $row)
@@ -89,7 +89,7 @@ foreach ($mitarbeiter->untergebene as $row)
 	$untergebene .= "'".$row."'";
 }
 
-if($rechte->isBerechtigt('admin'))
+if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter/urlaube', null, 'suid'))
 {
 	if($untergebene!='')
 			$untergebene.=',';
