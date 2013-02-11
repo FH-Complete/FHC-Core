@@ -274,7 +274,10 @@ class benutzer extends person
 					WHERE 
 						mitarbeiter_uid=tbl_benutzer.uid
 						AND (tbl_kontakt.kontakttyp='telefon' OR tbl_kontakt.kontakttyp is null)
-						) as klappe
+						) as klappe,
+					(SELECT planbezeichnung FROM public.tbl_mitarbeiter
+					LEFT JOIN public.tbl_ort USING (ort_kurzbz) 
+					WHERE mitarbeiter_uid=tbl_benutzer.uid) as raum
 				FROM
 					public.tbl_person 
 					JOIN public.tbl_benutzer USING(person_id)
@@ -306,6 +309,7 @@ class benutzer extends person
 				$obj->studiengang = $row->studiengang;
 				$obj->studiengang_kz = $row->studiengang_kz;
 				$obj->telefonklappe = $row->klappe;
+				$obj->raum = $row->raum;
 				$obj->alias = $row->alias;
 				
 				$this->result[] = $obj;
