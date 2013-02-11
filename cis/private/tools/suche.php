@@ -92,7 +92,8 @@ function searchPerson($searchItems)
 					<th>',$p->t('global/titel'),'</th>
 					<th>',$p->t('global/studiengang'),'</th>
 					<th>',$p->t('global/telefonnummer'),'</th>
-					<th>',$p->t('global/mail'),'</th>
+					<th class="table-sortable:default">',$p->t('lvplan/raum'),'</th>
+					<th>',$p->t('global/mail'),'</th>					
 				</tr>
 			</thead>
 			<tbody>
@@ -106,11 +107,12 @@ function searchPerson($searchItems)
 			echo '<td>',$row->titelpost,'</td>';
 			echo '<td>',$row->studiengang,'</td>';
 			echo '<td>',$row->telefonklappe,'</td>';
+			echo '<td>',$row->raum,'</td>';
 			if($row->alias!='' && !in_array($row->studiengang_kz, $noalias))
 				$mail = $row->alias.'@'.DOMAIN;
 			else
 				$mail = $row->uid.'@'.DOMAIN;
-			echo '<td><a href="mailto:',$mail,'">',$mail,'</a></td>';		
+			echo '<td><a href="mailto:',$mail,'">',$mail,'</a></td>';
 			echo '</tr>';
 			echo "\n";
 		}
