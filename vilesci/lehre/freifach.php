@@ -208,7 +208,7 @@ function selectAll()
 			$sel = " selected";
 		else
 			$sel = "";
-		echo "	 <option value='".$row->gruppe_kurzbz."'".$sel.">".$row->gruppe_kurzbz."</option>";
+		echo "	 <option value='".$row->gruppe_kurzbz."'".$sel.">".$row->gruppe_kurzbz." (".$row->bezeichnung.")</option>";
 
 	}
 	echo "</select>";
