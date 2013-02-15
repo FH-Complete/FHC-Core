@@ -43,7 +43,7 @@ $datum_obj = new datum();
 
 if(isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete']=='prestudent')
 {
-	$search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+	$search=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
 	if (is_null($search) ||$search=='')
 		exit();	
 	$qry = "SELECT 
@@ -62,10 +62,17 @@ if(isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete']=='prestudent')
 			";
 	if($result = $db->db_query($qry))
 	{
+		$result_obj = array();
 		while($row = $db->db_fetch_object($result))
 		{
-			echo html_entity_decode($row->vorname).' '.html_entity_decode($row->nachname).'|'.html_entity_decode($row->stg).'|'.html_entity_decode($row->status).'|'.html_entity_decode($row->prestudent_id)."\n";
+			$item['vorname']=html_entity_decode($row->vorname);
+			$item['nachname']=html_entity_decode($row->nachname);
+			$item['stg']=html_entity_decode($row->stg);
+			$item['status']=html_entity_decode($row->status);
+			$item['prestudent_id']=html_entity_decode($row->prestudent_id);
+			$result_obj[]=$item;
 		}
+		echo json_encode($result_obj);
 	}
 	exit;
 }
@@ -82,9 +89,10 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//DE" "http://www
 		<link rel="stylesheet" href="../../skin/jquery.css" type="text/css"/>
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+		<link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
 
 		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-		<script type="text/javascript" src="../../include/js/jquery.js"></script> 
+		<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script> 
 	</head>
 	<body class="Background_main">
 	<h2>Reihungstest - Administration</h2>';
@@ -110,8 +118,8 @@ if(isset($_POST['personzuteilen']))
 	}	
 }
 //Links
-echo '<br><a href="https://cis.technikum-wien.at/cis/testtool/admin/auswertung.php" target="blank">Auswertung</a> | 
-	<a href="https://cis.technikum-wien.at/cis/testtool/admin/uebersichtFragen.php" target="blank">Fragenkatalog</a><br>
+echo '<br><a href="'.CIS_ROOT.'cis/testtool/admin/auswertung.php" target="blank">Auswertung</a> | 
+	<a href="'.CIS_ROOT.'cis/testtool/admin/uebersichtFragen.php" target="blank">Fragenkatalog</a><br>
 	<hr>';
 //Anzeigen der kommenden Reihungstesttermine:
 echo '<br><a href="'.$_SERVER['PHP_SELF'].'?action=showreihungstests">Anzeigen der kommenden Reihungstests</a>';
@@ -376,18 +384,24 @@ function formatItem(row)
 {
     return row[0] + ' ' + row[1] + ' ' + row[2] + ' ' + row[3];
 }	
-
-$('#prestudent_name').autocomplete('reihungstest_administration.php', 
-	  		  	{
-	  			minChars:2,
-	  			matchSubset:1,matchContains:1,
-	  			width:500,
-	  			formatItem:formatItem,
-	  			extraParams:{'autocomplete':'prestudent'	
-		  		}
-	  	  }).result(function(event, item) {
-	  		  $('#prestudent_id').val(item[3]);
-	  	  });	  	
+$('#prestudent_name').autocomplete({
+			source: 'reihungstest_administration.php?autocomplete=prestudent',
+			minLength:2,
+			response: function(event, ui)
+			{
+				//Value und Label fuer die Anzeige setzen
+				for(i in ui.content)
+				{
+					ui.content[i].value=ui.content[i].vorname+' '+ui.content[i].nachname+' '+ui.content[i].stg+' '+ui.content[i].status+' '+ui.content[i].prestudent_id;
+					ui.content[i].label=ui.content[i].vorname+' '+ui.content[i].nachname+' '+ui.content[i].stg+' '+ui.content[i].status+' '+ui.content[i].prestudent_id;
+				}
+			},
+			select: function(event, ui)
+			{
+				//Ausgeaehlte Ressource zuweisen und Textfeld wieder leeren
+				$('#prestudent_id').val(ui.item.prestudent_id);
+			}
+			});
 </script>";
 
 
@@ -443,20 +457,20 @@ $qry="SELECT
 		levelgleichverteilung,
 		maxpunkte,
 		antwortenprozeile, 
-		(SELECT SUM (zeit) AS sum FROM testtool.tbl_gebiet JOIN testtool.tbl_ablauf USING (gebiet_id) WHERE studiengang_kz='".$studiengang_kz."'";
+		(SELECT SUM (zeit) AS sum FROM testtool.tbl_gebiet JOIN testtool.tbl_ablauf USING (gebiet_id) WHERE studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
 		if ($semester!='') 
-			$qry.=" AND semester='".$semester."'";				
+			$qry.=" AND semester=".$db->db_add_param($semester, FHC_INTEGER);				
 		$qry.="	) AS gesamtzeit,
-		(SELECT SUM (zeit) AS sum FROM testtool.tbl_gebiet JOIN testtool.tbl_ablauf USING (gebiet_id) WHERE studiengang_kz='".$studiengang_kz."'";
+		(SELECT SUM (zeit) AS sum FROM testtool.tbl_gebiet JOIN testtool.tbl_ablauf USING (gebiet_id) WHERE studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
 		if ($semester!='') 
-			$qry.=" AND semester='".$semester."'";				
+			$qry.=" AND semester=".$db->db_add_param($semester, FHC_INTEGER);				
 		$qry.="	)-'00:40:00'::time without time zone AS gesamtzeit_persoenlichkeit
 		FROM testtool.tbl_ablauf 
 		JOIN testtool.tbl_gebiet USING (gebiet_id) 
 		JOIN public.tbl_studiengang USING (studiengang_kz)
-		WHERE studiengang_kz='".$studiengang_kz."'";
+		WHERE studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
 		if ($semester!='') 
-			$qry.=" AND semester='".$semester."'";
+			$qry.=" AND semester=".$db->db_add_param($semester, FHC_INTEGER);
 		
 		$qry.=" ORDER BY stg,semester,reihung";
 
