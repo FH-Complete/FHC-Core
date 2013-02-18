@@ -129,7 +129,9 @@ if(isset($_GET['searchstr']) || isset($_POST['bmsuche']))
 		$sql_query.=" WHERE 
 					(tbl_benutzer.uid  ~* ".$db->db_add_param($searchstr)."   
 					OR nummer  = ".$db->db_add_param($searchstr)." 
-					OR nummer  = ".$db->db_add_param($kartennummer)." 
+					OR nummer  = ".$db->db_add_param($kartennummer)."
+					OR nummer2  = ".$db->db_add_param($searchstr)." 
+					OR nummer2  = ".$db->db_add_param($kartennummer)."  
 					OR nachname  ~* ".$db->db_add_param($searchstr)." 
 					OR vorname  ~* ".$db->db_add_param($searchstr).") ";
 		
