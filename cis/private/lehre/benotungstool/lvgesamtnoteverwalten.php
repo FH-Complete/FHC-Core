@@ -409,7 +409,8 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 				}
 				catch(e)
 				{
-					alert('Um den Import nutzen zu können müssen sie Ihre Sicherheitseinstellungen Ändern!\n Geben Sie hierzu in der Adresszeile ihres Browsers "about:config" ein und setzen sie, in der angezeigten Liste, den Eintrag "signed.applets.codebase_pricipal_support" auf true.');
+					//alert('Um den Import nutzen zu können müssen sie Ihre Sicherheitseinstellungen Ändern!\n Geben Sie hierzu in der Adresszeile ihres Browsers "about:config" ein und setzen sie, in der angezeigten Liste, den Eintrag "signed.applets.codebase_pricipal_support" auf true.');
+					alert("Ihr Browser unterstuetzt diese Funktion nicht. Bitte verwenden Sie für den Noten Import einen Internet Explorer");
 				}
 				var clip = Components.classes["@mozilla.org/widget/clipboard;1"].getService(Components.interfaces.nsIClipboard); 
 				if (!clip) 
@@ -433,7 +434,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 			else
 			{
 				//Safari, Opera, etc
-				alert("Ihr Browser unterstuetzt diese Funktion nicht. Bitte verwenden Sie Firefox oder IE");
+				alert("Ihr Browser unterstuetzt diese Funktion nicht. Bitte verwenden Sie für den Noten Import einen Internet Explorer");
 			}
 		}
 	}
