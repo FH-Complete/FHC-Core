@@ -210,6 +210,47 @@ class projektphase extends basis_db
 			return false;
 		}
 	}
+    
+    /**
+     * Lädt alle Unterphasen zu einem Projekt
+     * @param type $phase_id
+     * @return boolean 
+     */
+    public function getAllUnterphasen($phase_id)
+    {
+        $qry = "SELECT * FROM fue.tbl_projektphase WHERE projektphase_fk =".$this->db_add_param($phase_id, FHC_INTEGER); 
+        
+        if($result = $this->db_query($qry))
+        {
+            while($row = $this->db_fetch_object())
+            {
+                $obj = new projektphase(); 
+                
+				$obj->projekt_kurzbz = $row->projekt_kurzbz;
+				$obj->projektphase_id = $row->projektphase_id;
+				$obj->projektphase_fk = $row->projektphase_fk;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->start = $row->start;
+				$obj->ende = $row->ende;
+				//$obj->personentage = $row->personentage;
+                $obj->farbe = $row->farbe;
+				$obj->budget = $row->budget;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				
+				$this->result[] = $obj;
+            }
+            return true; 
+        }
+        else
+        {
+            $this->errormsg = "Fehler beim laden der Daten"; 
+            return false; 
+        }
+    }
 
 	/**
 	 * Prueft die Variablen auf Gueltigkeit
