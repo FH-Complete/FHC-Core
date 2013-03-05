@@ -22,6 +22,7 @@
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/projekt.class.php');
 require_once('../include/projektphase.class.php');
+require_once('../include/projekttask.class.php'); 
 require_once('../include/datum.class.php');
 require_once('../include/ressource.class.php');
 require_once('../include/organisationseinheit.class.php');
@@ -38,6 +39,7 @@ if(isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
         $datum = new datum(); 
         $ressource = new ressource(); 
         $phasen = new projektphase(); 
+        
         $org = new organisationseinheit(); 
         
         if(!$projekt->load($projekt_kurzbz))
@@ -46,7 +48,8 @@ if(isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
         if(!$ressource->getProjectRessourcen($projekt_kurzbz))
             die('Fehler beim laden der Ressourcen');
         
-        if(!$phasen->getProjektphasen($projekt_kurzbz))
+        // lädt alle Phasen der ersten Ebene
+        if(!$phasen->getProjektphasen($projekt_kurzbz, true))
             die('Fehler beim laden der Phasen');
         
         if(!$org->load($projekt->oe_kurzbz))
@@ -84,6 +87,58 @@ if(isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                 echo '                  <ressource><bezeichnung><![CDATA['.$res_phase->bezeichnung.']]></bezeichnung></ressource>';
             
             echo '              </phase_ressourcen>';
+            
+            $tasks = new projekttask(); 
+            $tasks->getProjekttasks($phase->projektphase_id); 
+            foreach($tasks->result as $task)
+            {
+                $ressource_task = new ressource(); 
+                $ressource_task->load($task->ressource_id); 
+                
+                echo '              <task>';
+                echo '                  <task_bezeichnung><![CDATA['.$task->bezeichnung.']]></task_bezeichnung>';
+                echo '                  <task_beschreibung><![CDATA['.$task->beschreibung.']]></task_beschreibung>'; 
+                echo '                  <task_ende><![CDATA['.$datum->formatDatum($task->ende, 'd.m.Y').']]></task_ende>';
+                echo '                  <task_ressource><![CDATA['.$ressource_task->bezeichnung.']]></task_ressource>';
+                echo '              </task>'; 
+            }
+            
+            $unterphase = new projektphase(); 
+            $unterphase->getAllUnterphasen($phase->projektphase_id); 
+            foreach($unterphase->result as $uphase)
+            {
+                $ressource_uphasen = new ressource(); 
+                $ressource_uphasen->getPhaseRessourcen($uphase->projektphase_id);
+                
+                echo '              <unterphase>';
+                echo '                  <phase_bezeichnung><![CDATA['.$uphase->bezeichnung.']]></phase_bezeichnung>';
+                echo '                  <phase_beschreibung><![CDATA['.$uphase->beschreibung.']]></phase_beschreibung>';
+                echo '                  <phase_beginn><![CDATA['.$datum->formatDatum($uphase->start, 'd.m.Y').']]></phase_beginn>';
+                echo '                  <phase_end><![CDATA['.$datum->formatDatum($uphase->ende,'d.m.Y').']]></phase_end>';
+                echo '                  <phase_budget><![CDATA['.$uphase->budget.']]></phase_budget>';
+                echo '                  <phase_ressourcen>';
+                foreach($ressource_uphasen->result as $res_phase)
+                echo '                  <ressource><bezeichnung><![CDATA['.$res_phase->bezeichnung.']]></bezeichnung></ressource>';
+                echo '                  </phase_ressourcen>';
+                
+            $utasks = new projekttask(); 
+            $utasks->getProjekttasks($uphase->projektphase_id); 
+            foreach($utasks->result as $task)
+            {
+                $ressource_task = new ressource(); 
+                $ressource_task->load($task->ressource_id); 
+                
+                echo '              <task>';
+                echo '                  <task_bezeichnung><![CDATA['.$task->bezeichnung.']]></task_bezeichnung>';
+                echo '                  <task_beschreibung><![CDATA['.$task->beschreibung.']]></task_beschreibung>'; 
+                echo '                  <task_ende><![CDATA['.$datum->formatDatum($task->ende, 'd.m.Y').']]></task_ende>';
+                echo '                  <task_ressource><![CDATA['.$ressource_task->bezeichnung.']]></task_ressource>';
+                echo '              </task>'; 
+            }
+                
+                
+                echo '              </unterphase>';
+            }
             echo '          </phase>';
         }
         
