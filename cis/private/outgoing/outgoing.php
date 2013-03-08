@@ -347,7 +347,7 @@ if(isset($_GET['ansicht']) == 'auswahl')
        <!-- Linke Seite -> Auswahl der Universitäten -->
                 <table width="90%" style="border: thin solid black; border-spacing:10px; background-color: lightgray; margin-top:5px">
                     <tr>
-                        <td>ERASMUS</td>
+                        <td><b>ERASMUS</b>: Finanzielle Unterstützung für Studierendenmobilität bei Partnerinstitutionen in den EU-Mitgliedsstaaten, Island, Kroatien, Liechtenstein, Norwegen, der Schweiz und der Türkei.</td>
                     </tr>
                     <tr>
                         <td><SELECT name="auswahl_erasmus" style="width: 90%" onchange="saveFirma(this.value, '7')"> 
@@ -363,7 +363,7 @@ if(isset($_GET['ansicht']) == 'auswahl')
                 </table>
                 <table width="90%" style="border: thin solid black; border-spacing:10px; background-color: lightgray; margin-top:5px">
                     <tr>
-                        <td>CEEPUS</td>
+                        <td><b>CEEPUS</b>: Finanzielle Unterstützung für Studierendenmobilität bei Partnerinstitutionen im Rahmen unseres Netzwerkes in Albanien, Bosnien-Herzegowina, Bulgarien, Kosovo (Universität Prishtina), Kroatien, Mazedonien, Moldawien, Montenegro, Österreich, Polen, Rumänien, Serbien, der Slowakischen Republik, Slowenien, der Tschechischen Republik und Ungarn.</td>
                     </tr>  
                     <tr>
                         <td><SELECT name="auswahl_ceepus" style="width: 90%" onchange="saveFirma(this.value, '6')" > 
@@ -379,7 +379,7 @@ if(isset($_GET['ansicht']) == 'auswahl')
                 </table>
                 <table width="90%" style="border: thin solid black; border-spacing:10px; background-color: lightgray; margin-top:5px;">
                     <tr>
-                        <td>Sonstige</td>
+                        <td><b>Sonstige</b>: Bilaterale Abkommen zwischen der FH Technikum Wien und Hochschulen außerhalb Europas zum gegenseitigen geförderten Studierendenaustausch. Eine Liste der Partnerinstitutionen befindet sich auf unserer Homepage. </td>
                     </tr>
                     <tr>
                         <td><SELECT name="auswahl_sonstige" style="width: 90%" onchange="saveFirma(this.value, '30')"> 
@@ -395,7 +395,7 @@ if(isset($_GET['ansicht']) == 'auswahl')
                 </table>
                 <table width="90%" style="border: thin solid black; border-spacing:10px; background-color: lightgray; margin-top:5px;">
                     <tr>
-                        <td>Freemover</td>
+                        <td><b>Freemover</b>: Bewerbung bei einer Hochschule, die keine Partnerinstitution ist. Studierende planen und organisieren ihren Studienaufenthalt selbst. Meistens muss die Studiengebühr der Gasthochschule bezahlt werden. </td>
                     </tr>
                     <tr>
                         <td><input type="text" size="45" maxlength="40" name="freemover" id="freemover" /></td>
@@ -489,9 +489,9 @@ if(isset($_GET['ansicht']) == 'auswahl')
     <table><!--Summerschool Anmeldung -->
         <tr><td><h3><?php echo $p->t('incoming/summerschool');?>:</h3></td></tr>
         <tr><td>
-                 <table width="90%" style="border: thin solid black; border-spacing:10px; background-color: lightgray; margin-top:5px">
+                 <table width="46%" style="border: thin solid black; border-spacing:10px; background-color: lightgray; margin-top:5px">
                     <tr>
-                        <td>Summerschool</td>
+                        <td><b>Summerschool</b>: Meist zwei- bis dreiwöchige wissenschaftliche Fachkurse, die in den Sommerferien von Partnerhochschulen organisiert werden. Ankündigungen von Summer Schools erfolgen auf der CIS-Seite. </td>
                     </tr>  
                     <tr>
                         <td><SELECT name="auswahl_summerschool" onchange="saveFirma(this.value, '')" style="width: 90%">

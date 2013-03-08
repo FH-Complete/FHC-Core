@@ -38,17 +38,15 @@ if($outgoing->loadUid($uid))
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
     <head>
-		<title><?php echo $p->t('outgoing/outgoingRegistration'); ?></title>
+		<title><?php echo $p->t('incoming/outgoingRegistration'); ?></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 	</head>
 	<body>
         <h1><?php echo $p->t('incoming/outgoingRegistration'); ?></h1>
-        <br><br>
+        <br>
+        <div id="test" style="margin-left:50px; margin-right:50px; font-size:16px;"><?php echo $p->t('incoming/willkommenBeiOutgoingAnmeldung');?></div>
         <table width="100%">
-            <tr>
-                <td align="center"><p><?php echo $p->t('incoming/willkommenBeiOutgoingAnmeldung');?></p></td>
-            </tr>
             <tr>
                 <td align="center"> <form action ="outgoing.php?method=new&ansicht=auswahl" method="POST">
                     <input type="submit" value="<?php echo $p->t('incoming/zurAnmeldung');?>"/>
