@@ -78,7 +78,7 @@ if($method == 'setAuswahl')
     if($preoutgoing->setStatus($preoutgoing_id, 'freigabe'))
     {
         $message = "<span class='ok'>E-Mail an Studenten geschickt</span>";
-        //sendMailStudent($preoutgoing->uid);
+        sendMailStudent($preoutgoing->uid);
     }
     else
         $message="<span class='error'>Fehler beim Speichern aufgetreten</span>"; 
@@ -163,7 +163,7 @@ if(isset($_POST['StatusSetzen']))
         // wenn Student dann Email an zuständige Assistenz
         if(check_student($preoutgoing->uid))
         {
-            //sendMailAssistenz($preoutgoing->uid);
+            sendMailAssistenz($preoutgoing->uid);
         }      
     }
     $outgoing= new preoutgoing();
@@ -610,9 +610,24 @@ function sendMailAssistenz($uid)
     $student->load($uid);
     $studiengang = new studiengang(); 
     $studiengang->load($student->studiengang_kz);
+    $out = new preoutgoing(); 
+    $out->loadUid($uid); 
+    $out_auswahl = new preoutgoing(); 
+    $out_auswahl->loadAuswahl($out->preoutgoing_id); 
+    $mob = new mobilitaetsprogramm(); 
+    $mob->load($out_auswahl->mobilitaetsprogramm_code); 
+    $firm = new firma(); 
+    $firm->load($out_auswahl->firma_id); 
     
     $emailtext= "Dies ist eine automatisch generierte E-Mail.<br><br>";
-    $emailtext.= "Es hat sich ein neuer Outgoing am System registriert.</b>";
+    $emailtext.= "Ein Student ist für den Aufenthalt im Ausland gemeldet.<br>";
+    $emailtext.= "Uid: ".$student->uid."<br>";
+    $emailtext.= "Name: ".$student->vorname." ".$student->nachname."<br>";
+    $emailtext.= "Zeitraum-Von: ".$out->dauer_von."<br>";
+    $emailtext.= "Zeitraum-Bis: ".$out->dauer_bis."<br>";
+    $emailtext.= "Mobilitätsprogramm: ".$mob->kurzbz."<br>";
+    $emailtext.= "Universität: ".$firm->name."<br>";
+    
     $mail = new mail($studiengang->email, 'no-reply', 'New Outgoing', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
     $mail->setHTMLContent($emailtext); 
     $mail->send(); 
@@ -625,7 +640,7 @@ function sendMailStudent($uid)
     
     $emailtext ="Dies ist eine automatisch generiert E-Mail.<br><br>"; 
     $emailtext.="Es wurde für Ihr Auslandssemester die Universität bestätigt.<br>"; 
-    $emailtext.="Weitere angaben.... "; 
+    $emailtext.="Bitte füllen Sie auf der Registrationsseite Ihre zusätzlichen Daten aus."; 
     
     $mail = new mail($email, 'no-reply','Bestätigung des Auslandsemesters', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
     $mail->setHTMLContent($emailtext); 
