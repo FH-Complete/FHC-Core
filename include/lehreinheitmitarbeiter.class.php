@@ -315,6 +315,45 @@ class lehreinheitmitarbeiter extends basis_db
 	}
 
 	/**
+	 * Prueft ob ein Mitarbeiter einer LV zugeordnet ist
+	 * @param $lehrveranstaltung_id
+	 * @param $studiensemester_kurzbz
+	 * @param $uid
+	 * @return true wenn die Zuteilung existiert sonst false
+	 */
+	public function existsLV($lehrveranstaltung_id, $studiensemester_kurzbz,  $uid)
+	{
+		if(!is_numeric($lehrveranstaltung_id))
+		{
+			$this->errormsg = 'lehrveranstaltung_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		$qry = "SELECT 
+					1 
+				FROM 
+					lehre.tbl_lehreinheitmitarbeiter 
+					JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+				WHERE 
+					lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)." 
+					AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+					AND mitarbeiter_uid=".$this->db_add_param($uid).';';
+
+		if($this->db_query($qry))
+		{
+			if($this->db_num_rows()>0)
+				return true;
+			else
+				return false;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Lesen der Lehreinheitmitarbeiterzuteilung';
+			return false;
+		}
+	}
+
+	/**
 	 * Loescht die Zuteilung eines Mitarbeiters
 	 * zu einer Lehreinheit
 	 * @param $lehreinheit_id
