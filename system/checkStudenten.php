@@ -365,6 +365,61 @@ if($result = $db->db_query($qry))
 	}
 }
 
+/*
+ *	 Bewerber im aktuellen StSem die in Mischformstudiengängen keine Orgform eingetragen haben
+ */
+$text.="<br><br>Suche alle Bewerber die keine Orgform eingetragen haben.<br><br>"; 
+
+$qry ="
+SELECT
+	tbl_prestudent.prestudent_id, tbl_person.vorname, tbl_person.nachname, tbl_prestudent.studiengang_kz as studiengang
+FROM
+	public.tbl_prestudent
+	JOIN public.tbl_person USING(person_id)
+	JOIN public.tbl_prestudentstatus USING(prestudent_id)
+	JOIN public.tbl_studiengang USING(studiengang_kz)
+WHERE
+	tbl_prestudentstatus.status_kurzbz='Bewerber'
+	AND tbl_studiengang.mischform
+	AND (tbl_prestudentstatus.orgform_kurzbz='' OR tbl_prestudentstatus.orgform_kurzbz is null)
+	AND tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($aktSem); 
+
+if($result = $db->db_query($qry))
+{
+	while($row = $db->db_fetch_object($result))
+	{
+		$ausgabe[$row->studiengang][10][]= $row->vorname.' '.$row->nachname.' '.$row->prestudent_id; 
+		$text.= $row->vorname.' '.$row->nachname.' '.$row->prestudent_id."<br>"; 
+	}
+}
+
+/*
+ *	 Studierende im aktuellen StSem die in Mischformstudiengängen keine Orgform eingetragen haben
+ */
+$text.="<br><br>Suche alle Bewerber die keine Orgform eingetragen haben.<br><br>"; 
+
+$qry ="
+SELECT
+	tbl_prestudent.prestudent_id, tbl_person.vorname, tbl_person.nachname, tbl_prestudent.studiengang_kz as studiengang
+FROM
+	public.tbl_prestudent
+	JOIN public.tbl_person USING(person_id)
+	JOIN public.tbl_prestudentstatus USING(prestudent_id)
+	JOIN public.tbl_studiengang USING(studiengang_kz)
+WHERE
+	tbl_prestudentstatus.status_kurzbz='Student'
+	AND tbl_studiengang.mischform
+	AND (tbl_prestudentstatus.orgform_kurzbz='' OR tbl_prestudentstatus.orgform_kurzbz is null)
+	AND tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($aktSem); 
+
+if($result = $db->db_query($qry))
+{
+	while($row = $db->db_fetch_object($result))
+	{
+		$ausgabe[$row->studiengang][11][]= $row->vorname.' '.$row->nachname.' '.$row->prestudent_id; 
+		$text.= $row->vorname.' '.$row->nachname.' '.$row->prestudent_id."<br>"; 
+	}
+}
 // Ausgabe der Studenten
 foreach($ausgabe as $stg_kz=>$value)
 {
@@ -407,16 +462,26 @@ foreach($ausgabe as $stg_kz=>$value)
 			case 9:
 					echo "<tr><td>&nbsp;</td></tr><tr><td colspan='4'><b>Aktive Studenten die keinen Status im aktuellen oder nächsten Studiensemester haben</b></td></tr>";
 					break;
+			case 10:
+					echo "<tr><td>&nbsp;</td></tr><tr><td colspan='4'><b>Bewerberstati die keiner Organisationsform zugeordnet sind</b></td></tr>";
+					break;
+			case 11:
+					echo "<tr><td>&nbsp;</td></tr><tr><td colspan='4'><b>Studierendenstati die keiner Organisationsform zugeordnet sind</b></td></tr>";
+					break;
+					
 			default:
 					echo "<tr><td>&nbsp;</td></tr><tr><td colspan='4'><b>Ungültiger Code</b></td></tr>";
 					break;
 		}
 
 		foreach ($uid as $student_id)
-		{	echo "<tr>"; 
+		{	
+			echo "<tr>"; 
 			$student = new student(); 
-			$student->load($student_id);
-			echo '<td>'.$student->vorname.'</td><td>'.$student->nachname.'</td><td>'.$student->uid.'</td>'; 
+			if($student->load($student_id))
+				echo '<td>'.$student->vorname.'</td><td>'.$student->nachname.'</td><td>'.$student->uid.'</td>';
+			else
+				echo '<td colspan="3">'.$student_id,'</td>'; 
 			echo "</tr>"; 
 		}
 		
