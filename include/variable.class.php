@@ -42,7 +42,7 @@ class variable extends basis_db
 	public function __construct($uid=null, $name=null)
 	{
 		parent::__construct();
-		
+		$this->variable= new stdClass();
 		if($uid!=null && $name!=null)
 			$this->load($uid, $name);
 	}
