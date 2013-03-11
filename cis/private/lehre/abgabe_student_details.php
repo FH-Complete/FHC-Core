@@ -93,28 +93,6 @@ if($uid=='-1')
 	exit;		
 }
 
-echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-	<html>
-	<head>
-		<title>'.$p->t('abgabetool/ueberschrift').'</title>
-		<link rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
-		<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
-		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-		<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
-		<script type="text/javascript">
-			function checkEid()
-			{
-				if(document.projektabgabe.eiderklaerung.checked == false) 
-				{
-					alert("'.$p->t('abgabetool/erklaerungNichtAkzeptiert').'!");
-					return false; 
-				}
-					return true; 
-			}
-		</script>
-		
-	</head>
-	<body class="Background_main"  style="background-color:#eeeeee;">';
 if($uid!=$user)
 {
 	$student = new student();
@@ -159,6 +137,29 @@ if($uid!=$user)
 		die($p->t('abgabetool/keineBerechtigungStudentenansicht'));
 	}
 }	
+
+echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+	<html>
+	<head>
+		<title>'.$p->t('abgabetool/ueberschrift').'</title>
+		<link rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
+		<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			function checkEid()
+			{
+				if(document.projektabgabe.eiderklaerung.checked == false) 
+				{
+					alert("'.$p->t('abgabetool/erklaerungNichtAkzeptiert').'!");
+					return false; 
+				}
+					return true; 
+			}
+		</script>
+		
+	</head>
+	<body class="Background_main"  style="background-color:#eeeeee;">';
 $datum_obj = new datum();
 $error='';
 $neu = (isset($_GET['neu'])?true:false);
@@ -483,7 +484,10 @@ if($command!="add")
 			$row_typ=$db->db_fetch_object($result_typ);
 			$htmlstr .= "              <td>$row_typ->bezeichnung</td>\n";
 			$htmlstr .= "		<td width='250'>$row->kurzbz</td>\n";		
-			$htmlstr .= "		<td align='center'>".$datum_obj->formatDatum($row->abgabedatum,'d.m.Y')."</td>\n";		
+			$htmlstr .= "		<td align='center'>".$datum_obj->formatDatum($row->abgabedatum,'d.m.Y');
+			if($row->abgabedatum!='')
+				$htmlstr .= ' <a href="abgabe_student_file.php?abgabe_id='.$row->paabgabe_id.'&student_uid='.$uid.'" target="_blank" title="'.$p->t('abgabetool/downloadProjektarbeit').'"><img src="../../../skin/images/pdfpic.gif"></a>';
+			$htmlstr .= "</td>\n";		
 			
 			//Überschrittene Termine
 			if($row->paabgabetyp_kurzbz=='enda')
