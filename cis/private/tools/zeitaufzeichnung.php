@@ -17,7 +17,8 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>
+ *          Karl Burkhart <burkhart@technikum-wien.at>.
  */
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
@@ -27,12 +28,12 @@ require_once('../../../include/studiengang.class.php');
 require_once('../../../include/fachbereich.class.php');
 require_once('../../../include/zeitaufzeichnung.class.php');
 require_once('../../../include/datum.class.php');
-require_once('../../../include/datum.class.php');
 require_once('../../../include/projekt.class.php');
 require_once('../../../include/phrasen.class.php'); 
 require_once('../../../include/organisationseinheit.class.php');
 require_once('../../../include/service.class.php');
 require_once('../../../include/mitarbeiter.class.php');
+require_once('../../../include/betriebsmittelperson.class.php');
 
 $sprache = getSprache(); 
 $p=new phrasen($sprache); 
@@ -48,8 +49,11 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 		<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 		<link href="../../../skin/tablesort.css" rel="stylesheet" type="text/css"/>
 		<link href="../../../skin/jquery.css" rel="stylesheet" type="text/css"/>
-		<script src="../../../include/js/jquery.js" type="text/javascript"></script>
-		<script language="JavaScript" type="text/javascript">
+        <link rel="stylesheet" href="../../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
+		<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
+        <script type="text/javascript" src="../../../include/js/jquery1.9.min.js"></script> 
+
+        <script type="text/javascript">
 		$(document).ready(function() 
 		{ 
 		    $("#t1").tablesorter(
@@ -57,7 +61,32 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 				sortList: [[4,1]],
 				widgets: ["zebra"]
 			}); 
-		});
+
+            function formatItem(row) 
+            {
+                return row[0] + " " + row[1] + " " + row[2];
+            }	
+            
+            $("#kunde_name").autocomplete({
+			source: "zeitaufzeichnung_autocomplete.php?autocomplete=kunde",
+			minLength:2,
+			response: function(event, ui)
+			{
+				//Value und Label fuer die Anzeige setzen
+				for(i in ui.content)
+				{
+					ui.content[i].value=ui.content[i].vorname+" "+ui.content[i].nachname+" ("+ui.content[i].uid+")";
+					ui.content[i].label=ui.content[i].vorname+" "+ui.content[i].nachname+" ("+ui.content[i].uid+")";
+				}
+			},
+			select: function(event, ui)
+			{
+				//Ausgeaehlte Ressource zuweisen und Textfeld wieder leeren
+				$("#kunde_uid").val(ui.item.uid);
+			}
+			});
+
+		}); 
 		
 		function setbisdatum()
 		{
@@ -119,7 +148,17 @@ $bis = (isset($_POST['bis'])?$_POST['bis']:date('d.m.Y H:i', mktime(date('H'), d
 $beschreibung = (isset($_POST['beschreibung'])?$_POST['beschreibung']:'');
 $service_id = (isset($_POST['service_id'])?$_POST['service_id']:'');
 $kunde_uid = (isset($_POST['kunde_uid'])?$_POST['kunde_uid']:'');
+$kartennummer = (isset($_POST['kartennummer'])?$_POST['kartennummer']:'');
 
+// Wenn Kartennummer übergeben wurde dann hole uid von Karteninhaber
+if($kartennummer != '')
+{
+    $betriebsmittel = new betriebsmittelperson(); 
+    if(!$betriebsmittel->getKartenzuordnung($kartennummer))
+        die($betriebsmittel->errormsg); 
+    
+    $kunde_uid = $betriebsmittel->uid; 
+}
 //Speichern der Daten
 if(isset($_POST['save']) || isset($_POST['edit']))
 {
@@ -344,7 +383,7 @@ if($projekt->getProjekteMitarbeiter($user))
 		}
 		echo '</SELECT></td>
 			</tr>';
-		echo '<tr>
+	/*	echo '<tr>
 			<td>'.$p->t('zeitaufzeichnung/kunde').'</td>
 			<td><SELECT name="kunde_uid">
 			<OPTION value="">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
@@ -361,7 +400,26 @@ if($projekt->getProjekteMitarbeiter($user))
 		}
 		echo '</SELECT>
 			</td>
-		</tr>';
+		</tr>';*/
+        
+        // person für Kundenvoransicht laden
+        $kunde_name = '';
+        if($kunde_uid != '')
+        {
+            $user_kunde = new benutzer(); 
+            
+            if($user_kunde->load($kunde_uid))
+                $kunde_name=$user_kunde->vorname.' '.$user_kunde->nachname; 
+        }
+        echo '
+        <tr>
+            <td>Kunde</td>
+            <td><input type="text" id="kunde_name" value="'.$kunde_name.'"><input type ="hidden" id="kunde_uid" name="kunde_uid" value="'.$kunde_uid.'"> oder </td>
+        </tr>
+        <tr>
+            <td>Kunde Kartennummer(optional)</td>
+            <td><input type="text" id="kartennummer" name="kartennummer"></td>
+        </tr>'; 
 		echo '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
 		//Start/Ende
 		echo '
@@ -379,7 +437,7 @@ if($projekt->getProjekteMitarbeiter($user))
 			echo '<input type="submit" value="'.$p->t("global/aendern").'" name="edit"></td></tr>';
 		echo '</table>';
 		echo '</form>';
-		
+        
 		echo '<br><hr>';
 		
 		//Uebersichtstabelle
