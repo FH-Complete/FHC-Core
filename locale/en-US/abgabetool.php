@@ -68,4 +68,5 @@ $this->phrasen['abgabetool/dateiZuGross']='The File is too big! Maximum File siz
 $this->phrasen['abgabetool/eidesstattlicheErklaerung']='I confirm that this paper is entirely my own work. All sources and quotations have been fully acknowledged in the appropriate places with adequate footnotes and citations. Quotations have been properly acknowledged and marked with appropriate punctuation. The works consulted are listed in the bibliography. This paper has not been submitted to another examination panel in the same or a similar form, and has not been published.';
 $this->phrasen['abgabetool/gelesenUndAkzeptiert']='Read and accepted';
 $this->phrasen['abgabetool/erklaerungNichtAkzeptiert']='Declaration not accepted';
+$this->phrasen['abgabetool/downloadProjektarbeit']='Download File';
 ?>
