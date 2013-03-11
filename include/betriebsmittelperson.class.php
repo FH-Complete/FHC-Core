@@ -525,6 +525,12 @@ class betriebsmittelperson extends basis_db
 			OR tbl_betriebsmittel.nummer='.$this->db_add_param('000'.$nummer).'
 			OR tbl_betriebsmittel.nummer='.$this->db_add_param('0000'.$nummer).'
 			OR tbl_betriebsmittel.nummer='.$this->db_add_param('00000'.$nummer).'
+            OR tbl_betriebsmittel.nummer2='.$this->db_add_param($nummer).'
+			OR tbl_betriebsmittel.nummer2='.$this->db_add_param('0'.$nummer).'
+			OR tbl_betriebsmittel.nummer2='.$this->db_add_param('00'.$nummer).'
+			OR tbl_betriebsmittel.nummer2='.$this->db_add_param('000'.$nummer).'
+			OR tbl_betriebsmittel.nummer2='.$this->db_add_param('0000'.$nummer).'
+			OR tbl_betriebsmittel.nummer2='.$this->db_add_param('00000'.$nummer).'
 			)
 			AND (ausgegebenam<=now() OR ausgegebenam is NULL) 
 			AND (retouram>=now() OR retouram is NULL)';
