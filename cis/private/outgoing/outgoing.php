@@ -260,8 +260,11 @@ if($method =="deleteFirma")
         <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
         <link href="../../../skin/tablesort.css" rel="stylesheet" type="text/css">
         <link href="../../../skin/jquery.css" rel="stylesheet"  type="text/css"/>
+        <link href="../../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
         <script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
-        <script src="../../../include/js/jquery.js" type="text/javascript"></script> 
+        <script src="../../../include/js/jquery1.9.min.js" type="text/javascript"></script> 
+        
+        
         <script type="text/javascript">
         $(document).ready(function() 
         {
@@ -283,28 +286,49 @@ if($method =="deleteFirma")
             }); 
 
             
-	    $('#ansprechperson').autocomplete('outgoing_autocomplete.php', 
+            function formatItem(row) 
             {
-            minChars:2,
-            matchSubset:1,matchContains:1,
-            width:500,
-            extraParams:{'work':'outgoing_ansprechperson_search'	
-            }
-	  	  }).result(function(event, item) {
-	  		  $('#ansprechperson_uid').val(item[1]);
-	  	  });
-          
-	    $('#betreuer').autocomplete('outgoing_autocomplete.php', 
-            {
-            minChars:2,
-            matchSubset:1,matchContains:1,
-            width:500,
-            extraParams:{'work':'outgoing_ansprechperson_search'	
-            }
-	  	  }).result(function(event, item) {
-	  		  $('#betreuer_uid').val(item[1]);
-	  	  });
-          
+                return row[0] + " " + row[1] + " " + row[2];
+            }	
+            
+            
+            $("#ansprechperson").autocomplete({
+			source: "outgoing_autocomplete.php?autocomplete=mitarbeiter",
+			minLength:2,
+			response: function(event, ui)
+			{
+				//Value und Label fuer die Anzeige setzen
+				for(i in ui.content)
+				{
+					ui.content[i].value=ui.content[i].vorname+" "+ui.content[i].nachname+" ("+ui.content[i].uid+")";
+					ui.content[i].label=ui.content[i].vorname+" "+ui.content[i].nachname+" ("+ui.content[i].uid+")";
+				}
+			},
+			select: function(event, ui)
+			{
+				//Ausgeaehlte Ressource zuweisen und Textfeld wieder leeren
+				$("#ansprechperson_uid").val(ui.item.uid);
+			}
+			});
+            
+            $("#betreuer").autocomplete({
+			source: "outgoing_autocomplete.php?autocomplete=mitarbeiter",
+			minLength:2,
+			response: function(event, ui)
+			{
+				//Value und Label fuer die Anzeige setzen
+				for(i in ui.content)
+				{
+					ui.content[i].value=ui.content[i].vorname+" "+ui.content[i].nachname+" ("+ui.content[i].uid+")";
+					ui.content[i].label=ui.content[i].vorname+" "+ui.content[i].nachname+" ("+ui.content[i].uid+")";
+				}
+			},
+			select: function(event, ui)
+			{
+				//Ausgeaehlte Ressource zuweisen und Textfeld wieder leeren
+				$("#betreuer_uid").val(ui.item.uid);
+			}
+			});          
         }); 
         
         

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2012 Technikum-Wien
+/* Copyright (C) 2010 Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -16,42 +16,35 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Karl Burkhart <burkhart@technikum-wien.at>
- * 
  */
 
-	header( 'Expires:  -1' );
-	header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
-	header( 'Cache-Control: no-store, no-cache, must-revalidate' );
-	header( 'Pragma: no-cache' );
-	header('Content-Type: text/html;charset=UTF-8');
-
-	require_once('../../../config/cis.config.inc.php');
-  	require_once('../../../include/functions.inc.php');
-	require_once('../../../include/mitarbeiter.class.php');
-
-// ------------------------------------------------------------------------------------------
-// Parameter Aufruf uebernehmen
-// ------------------------------------------------------------------------------------------
-
-  	$work=trim(isset($_REQUEST['work'])?$_REQUEST['work']:(isset($_REQUEST['ajax'])?$_REQUEST['ajax']:false));
-	$work=strtolower($work);
-
-// ------------------------------------------------------------------------------------------
-//	Datenlesen
-// ------------------------------------------------------------------------------------------
-	switch ($work)
-	{			
-        // Suche nach anprechperson -> mitarbeiter
-		case 'outgoing_ansprechperson_search':
-		 	$search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
-			if (is_null($search) ||$search=='')
-				exit();	
-			$ma = new mitarbeiter();
-			$ma->search($search);
+require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/basis_db.class.php');
+require_once('../../../include/mitarbeiter.class.php'); 
 	
-			foreach($ma->result as $row)
-				echo html_entity_decode($row->vorname).' '.html_entity_decode($row->nachname).'|'.html_entity_decode($row->uid)."\n";
-			break;
+if (!$db = new basis_db())
+    die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+
+if(isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete']=='mitarbeiter')
+{
+	$search=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
+	if (is_null($search) ||$search=='')
+		exit();	
+    
+    $mitarbeiter_zeit = new mitarbeiter(); 
+
+	if($mitarbeiter_zeit->search($search))
+	{
+		$result_obj = array();
+		foreach($mitarbeiter_zeit->result as $row)
+		{
+			$item['vorname']=html_entity_decode($row->vorname);
+			$item['nachname']=html_entity_decode($row->nachname);
+			$item['uid']=html_entity_decode($row->uid);
+			$result_obj[]=$item;
+		}
+		echo json_encode($result_obj);
 	}
-	exit();
+	exit;
+}
 ?>
