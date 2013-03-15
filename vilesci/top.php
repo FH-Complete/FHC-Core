@@ -43,6 +43,7 @@
 		  $berechtigung->isBerechtigt('lehre') ||
 		  $berechtigung->isBerechtigt('basis/statistik') ||
 		  $berechtigung->isBerechtigt('basis/fhausweis') ||
+		  $berechtigung->isBerechtigt('wawi/inventar') ||
 		  $berechtigung->isBerechtigt('assistenz') ||    
 		  $berechtigung->isBerechtigt('lv-plan') ))
 		die ('Keine Berechtigung!');
