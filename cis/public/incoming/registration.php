@@ -265,7 +265,8 @@ if(isset($_REQUEST['submit']))
 
 function sendMail($zugangscode, $email)
 {
-	global $p; 
+	global $p, $vorname, $nachname; 
+   
 	$emailtext= $p->t('incoming/registrationEmail', array($zugangscode)); 
 	$mail = new mail($email, 'no-reply', 'Incoming-Registration', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
 	$mail->setHTMLContent($emailtext); 
@@ -276,7 +277,7 @@ function sendMail($zugangscode, $email)
 	
     // sende Nachricht an Assistenz 
     $emailtext= "Dies ist eine automatisch generierte E-Mail.<br><br>";
-    $emailtext.= "Es hat sich ein neuer Incoming am Campus International registriert.</b>"; 
+    $emailtext.= "Es hat sich ein neuer Incoming am Campus International registriert.<br><br>Name: ".$vorname.' '.$nachname.'<br>E-Mail: '.$email; 
     $mail = new mail(MAIL_INTERNATIONAL, 'no-reply', 'New Incoming', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
     $mail->setHTMLContent($emailtext); 
     $mail->send(); 
