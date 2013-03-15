@@ -23,6 +23,15 @@
 
 // We defined the web service functions to install.
 $functions = array(
+	'fhcomplete_get_course_grades' => array(
+        'classname'   => 'local_fhcompletews_external',
+        'methodname'  => 'get_course_grades',
+        'classpath'   => 'local/fhcompletews/externallib.php',
+        'description' => 'Get Grades of a course',
+        'type'        => 'read',
+        'capabilities'=> 'moodle/course:update,moodle/course:viewhiddencourses',
+    ),
+
 	'fhcomplete_courses_by_shortname' => array(
         'classname'   => 'local_fhcompletews_external',
         'methodname'  => 'get_courses_by_shortname',

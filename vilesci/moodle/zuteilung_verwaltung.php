@@ -46,12 +46,12 @@
         require_once('../../include/lehreinheit.class.php');
         require_once('../../include/lehreinheitgruppe.class.php');
         require_once('../../include/lehreinheitmitarbeiter.class.php');
-        include_once('../../include/moodle_course.class.php');
+        include_once('../../include/moodle19_course.class.php');
 // ***********************************************************************************************
 //      Datenbankverbindungen zu Moodle und Vilesci und Classen
 // ***********************************************************************************************
 
-        if (!$objMoodle = new moodle_course())
+        if (!$objMoodle = new moodle19_course())
 	         die('Fehler beim Oeffnen der Moodleverbindung');
 
         if (!$le_obj = new lehreinheit())
@@ -400,7 +400,7 @@
              if (!is_array($arrMoodlekurs) || count($arrMoodlekurs)<1)
                         return $content;
 
-             if (!$objMoodle = new moodle_course())
+             if (!$objMoodle = new moodle19_course())
 	              die('Fehler beim Oeffnen der Moodleverbindung');
 
              if (!$le_obj = new lehreinheit())

@@ -25,14 +25,15 @@ require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/basis_db.class.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/benutzerberechtigung.class.php');
-require_once('../../../include/moodle2_4_course.class.php');
-require_once('../../../include/moodle2_4_user.class.php');
+require_once('../../../include/moodle24_course.class.php');
+require_once('../../../include/moodle24_user.class.php');
 require_once('../../../include/lehrveranstaltung.class.php');
 require_once('../../../include/lehreinheit.class.php');
 require_once('../../../include/lehreinheitgruppe.class.php');
 require_once('../../../include/lehreinheitmitarbeiter.class.php');
 require_once('../../../include/studiengang.class.php');
 require_once('../../../include/phrasen.class.php');
+require_once('../../../include/moodle.class.php');
 
 $sprache = getSprache(); 
 $p = new phrasen($sprache); 
@@ -94,10 +95,16 @@ function togglediv()
 </head>
 <body onload="togglediv()">
 <h1>'.$db->convert_html_chars($lv->bezeichnung).'&nbsp;('.$db->convert_html_chars($stsem).')</h1>
-<br />
-<table>
+<span style="color: red; font-weight: bold">
+MOODLE 2.4 - TESTBETRIEB<br>
+Alle Einstellungen auf dieser Seite betreffen Moodle 2.4<br>
+Zur Verwaltung der aktuellen Moodlekurse verwenden Sie <a href="moodle_wartung.php?lvid='.$lvid.'&stsem='.$stsem.'">diese Seite</a>
+</span>
+<br><br>
+<hr>
+<table width="100%">
 <tr>
-<td>';
+<td valign="top">';
 
 if(isset($_POST['neu']))
 {
@@ -121,7 +128,7 @@ if(isset($_POST['neu']))
 		//Gesamte LV zu einem Moodle Kurs zusammenlegen
 		if($art=='lv')
 		{
-			$mdl_course = new moodle_course();
+			$mdl_course = new moodle24_course();
 			
 			$mdl_course->lehrveranstaltung_id = $lvid;
 			$mdl_course->studiensemester_kurzbz = $stsem;
@@ -137,12 +144,12 @@ if(isset($_POST['neu']))
 				//Eintrag in der Vilesci DB
 				$mdl_course->create_vilesci();
 	
-				$mdl_user = new moodle_user();
+				$mdl_user = new moodle24_user();
 				//Lektoren Synchronisieren
 				if(!$mdl_user->sync_lektoren($mdl_course->mdl_course_id))
 					echo $mdl_user->errormsg;
 	
-				$mdl_user = new moodle_user();
+				$mdl_user = new moodle24_user();
 				//Studenten Synchronisieren
 				if(!$mdl_user->sync_studenten($mdl_course->mdl_course_id))
 					echo $mdl_user->errormsg;
@@ -167,7 +174,7 @@ if(isset($_POST['neu']))
 			
 			if(count($lehreinheiten)>0)
 			{
-				$mdl_course = new moodle_course();
+				$mdl_course = new moodle24_course();
 				
 				$mdl_course->mdl_fullname = $_POST['bezeichnung'];
 				$mdl_course->mdl_shortname = $shortname;
@@ -188,12 +195,12 @@ if(isset($_POST['neu']))
 							echo '<br>'.$p->t('moodle/fehlerBeimAnlegenAufgetreten').':'.$mdl_course->errormsg;
 					}
 					
-					$mdl_user = new moodle_user();
+					$mdl_user = new moodle24_user();
 					//Lektoren Synchronisieren
 					if(!$mdl_user->sync_lektoren($mdl_course->mdl_course_id))
 						echo $mdl_user->errormsg;
 					
-					$mdl_user = new moodle_user();	
+					$mdl_user = new moodle24_user();	
 					//Studenten Synchronisieren
 					if(!$mdl_user->sync_studenten($mdl_course->mdl_course_id))
 						echo $mdl_user->errormsg;
@@ -213,7 +220,7 @@ if(isset($_POST['changegruppe']))
 {
 	if(isset($_POST['moodle_id']) && is_numeric($_POST['moodle_id']))
 	{
-		$mcourse = new moodle_course();
+		$mcourse = new moodle24_course();
 		if($mcourse->updateGruppenSync($_POST['moodle_id'], isset($_POST['gruppen'])))
 			echo '<b>'.$p->t('moodle/datenWurdenAktualisiert').'</b><br>';
 		else 
@@ -228,7 +235,7 @@ if(isset($_POST['changegruppe']))
 //Anlegen eines Testkurses
 if(isset($_GET['action']) && $_GET['action']=='createtestkurs')
 {
-	$mdl_course = new moodle_course();
+	$mdl_course = new moodle24_course();
 	if(!$mdl_course->loadTestkurs($lvid, $stsem))
 	{
 		$lehrveranstaltung = new lehrveranstaltung();
@@ -252,7 +259,7 @@ if(isset($_GET['action']) && $_GET['action']=='createtestkurs')
 			$id=$mdl_course->mdl_course_id;
 			$errormsg='';
 			
-			$mdl_user = new moodle_user();
+			$mdl_user = new moodle24_user();
 			//Lektoren zuweisen
 			if(!$mdl_user->sync_lektoren($id, $lvid, $stsem))
 				$errormsg.=$p->t('moodle/fehlerBeiDerLektorenZuordnung').':'.$mdl_user->errormsg.'<br>';
@@ -272,8 +279,8 @@ if(isset($_GET['action']) && $_GET['action']=='createtestkurs')
 	}
 }
 
-$mdl_course = new moodle_course();
-if($mdl_course->course_exists_for_lv($lvid, $stsem) || $mdl_course->course_exists_for_allLE($lvid, $stsem))
+$moodle = new moodle();
+if($moodle->course_exists_for_lv($lvid, $stsem) || $moodle->course_exists_for_allLE($lvid, $stsem))
 {
 	echo $p->t('moodle/esIstBereitsEinMoodleKursVorhanden');
 }
@@ -330,7 +337,7 @@ else
 			$lektoren.= ' '.$ma->mitarbeiter_uid;
 		}
 		
-		if($mdl_course->course_exists_for_le($row->lehreinheit_id))
+		if($moodle->course_exists_for_le($row->lehreinheit_id))
 			$disabled='disabled';
 		else 
 			$disabled='';
@@ -354,24 +361,35 @@ echo '</td>';
 
 echo '<td valign="top">';
 echo '<b>'.$p->t('moodle/vorhandeneMoodleKurse').'</b>';
-if(!$mdl_course->getAll($lvid, $stsem))
-	echo $mdl_course->errormsg;
+if(!$moodle->getAll($lvid, $stsem))
+	echo $moodle->errormsg;
 echo '<table>';
-foreach ($mdl_course->result as $course)
+foreach ($moodle->result as $course)
 {
-	echo '<tr>';
-	echo '<td><a href="'.MOODLE_PATH24.'course/view.php?id='.$course->mdl_course_id.'" class="Item" target="_blank">'.$course->mdl_fullname.'</a></td>';
-	echo "<td nowrap><form action='".$_SERVER['PHP_SELF']."?lvid=$lvid&stsem=$stsem' method='POST' style='margin:0px'><input type='hidden' name='moodle_id' value='$course->moodle_id'><input type='checkbox' name='gruppen' ".($course->gruppen?'checked':'').">Gruppen übernehmen <input type='submit' value='".$p->t('global/ok')."' name='changegruppe'></form></td>";
+
+	switch($course->moodle_version)
+	{
+		case '2.4':
+			$mdlcourse = new moodle24_course();
+			$mdlcourse->load($course->mdl_course_id);
+			echo '<tr>';
+			echo '<td><a href="'.$moodle->getPfad($course->moodle_version).'course/view.php?id='.$course->mdl_course_id.'" class="Item" target="_blank">'.$mdlcourse->mdl_fullname.'</a></td>';
+			echo "<td nowrap><form action='".$_SERVER['PHP_SELF']."?lvid=$lvid&stsem=$stsem' method='POST' style='margin:0px'><input type='hidden' name='moodle_id' value='$course->moodle_id'><input type='checkbox' name='gruppen' ".($course->gruppen?'checked':'').">Gruppen übernehmen <input type='submit' value='".$p->t('global/ok')."' name='changegruppe'></form></td>";
+			break;
+		default: 
+			echo '<tr><td>Moodle v'.$course->moodle_version.' - '.$course->mdl_course_id.'</td></tr>';
+			break;
+	}
 }
 echo '</table>';
 echo '</td></tr></table>';
 
 echo '<br><br><br>';
-echo '<b>'.$p->t('moodle/testkurse').'</b><br><br>';
-$mdlcourse = new moodle_course();
+echo '<b>'.$p->t('moodle/testkurse24').'</b><br><br>';
+$mdlcourse = new moodle24_course();
 if($mdlcourse->loadTestkurs($lvid, $stsem))
 {
-	echo '<a href="'.MOODLE_PATH24.'course/view.php?id='.$mdlcourse->mdl_course_id.'" class="Item" target="_blank">'.$db->convert_html_chars($mdlcourse->mdl_fullname).'</a>';
+	echo '<a href="'.$moodle->getPfad('2.4').'course/view.php?id='.$mdlcourse->mdl_course_id.'" class="Item" target="_blank">'.$db->convert_html_chars($mdlcourse->mdl_fullname).'</a>';
 }
 else 
 {

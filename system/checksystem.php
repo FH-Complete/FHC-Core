@@ -3981,9 +3981,54 @@ if(!@$db->db_query("SELECT 1 FROM public.tbl_service LIMIT 1"))
     ";
     
     if(!$db->db_query($qry))
-        echo '<strong>public.tl_service: '.$db->db_last_error().'</strong><br>';
+        echo '<strong>public.tbl_service: '.$db->db_last_error().'</strong><br>';
     else
-        echo 'Tabelle public.service hinzugefuegt, campus.tbl_zeitaufzeichnung geaendert<br>';
+        echo 'Tabelle public.tbl_service hinzugefuegt, campus.tbl_zeitaufzeichnung geaendert<br>';
+}
+
+// Service zusaetzliche Verknuepfung zu einem Content
+if(!@$db->db_query("SELECT content_id FROM public.tbl_service LIMIT 1"))
+{
+    $qry ="ALTER TABLE public.tbl_service ADD COLUMN content_id integer;
+	ALTER TABLE public.tbl_service ADD CONSTRAINT fk_content_service FOREIGN KEY(content_id) REFERENCES campus.tbl_content(content_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+    ";
+    
+    if(!$db->db_query($qry))
+        echo '<strong>public.tbl_service: '.$db->db_last_error().'</strong><br>';
+    else
+        echo 'Tabelle public.tbl_service Spalte content_id hinzugefuegt<br>';
+}
+
+// Erweiterung der Moodle Tabelle zur Verwaltung von mehreren Moodle Instanzen
+if(!@$db->db_query("SELECT * FROM lehre.tbl_moodle_version LIMIT 1"))
+{
+    $qry ="
+	CREATE TABLE lehre.tbl_moodle_version
+	(
+		moodle_version varchar(8) NOT NULL,
+		bezeichnung varchar(256),
+		pfad varchar(256)
+	);
+
+	ALTER TABLE lehre.tbl_moodle_version ADD CONSTRAINT pk_moodle_version PRIMARY KEY (moodle_version);
+
+	ALTER TABLE lehre.tbl_moodle ADD COLUMN moodle_version varchar(8);
+	ALTER TABLE lehre.tbl_moodle ADD CONSTRAINT fk_moodle_version_moodle FOREIGN KEY(moodle_version) REFERENCES lehre.tbl_moodle_version(moodle_version) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+	INSERT INTO lehre.tbl_moodle_version(moodle_version, bezeichnung, pfad) VALUES('1.9','Moodle 1.9','http://localhost/moodle/');
+	INSERT INTO lehre.tbl_moodle_version(moodle_version, bezeichnung, pfad) VALUES('2.4','Moodle 2.4','http://localhost/moodle24/');
+	UPDATE lehre.tbl_moodle SET moodle_version='1.9' WHERE moodle_version is null;
+
+	ALTER TABLE lehre.tbl_moodle ALTER COLUMN moodle_version SET NOT NULL;
+
+	GRANT SELECT ON lehre.tbl_moodle_version TO vilesci;
+	GRANT SELECT ON lehre.tbl_moodle_version TO web;
+    ";
+    
+    if(!$db->db_query($qry))
+        echo '<strong>lehre.tbl_moodle_version: '.$db->db_last_error().'</strong><br>';
+    else
+        echo 'Tabelle lehre.tbl_moodle_version hinzugefuegt; Spalte moodle_version zu Tabelle tbl_moodle hinzugefuegt<br>';
 }
 echo '<br>';
 
@@ -4079,7 +4124,8 @@ $tabellen=array(
 	"lehre.tbl_lehrform"  => array("lehrform_kurzbz","bezeichnung","verplanen"),
 	"lehre.tbl_lehrfunktion"  => array("lehrfunktion_kurzbz","beschreibung","standardfaktor","sort"),
 	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english","orgform_kurzbz","incoming"),
-	"lehre.tbl_moodle"  => array("lehrveranstaltung_id","lehreinheit_id","moodle_id","mdl_course_id","studiensemester_kurzbz","gruppen","insertamum","insertvon"),
+	"lehre.tbl_moodle"  => array("lehrveranstaltung_id","lehreinheit_id","moodle_id","mdl_course_id","studiensemester_kurzbz","gruppen","insertamum","insertvon","moodle_version"),
+	"lehre.tbl_moodle_version"  => array("moodle_version","bezeichnung","pfad"),
 	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe"),
 	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","titel_english","seitenanzahl","abgabedatum","kontrollschlagwoerter","schlagwoerter","schlagwoerter_en","abstract", "abstract_en", "sprache"),
 	"lehre.tbl_projektbetreuer"  => array("person_id","projektarbeit_id","betreuerart_kurzbz","note","faktor","name","punkte","stunden","stundensatz","updateamum","updatevon","insertamum","insertvon","ext_id"),
@@ -4149,7 +4195,7 @@ $tabellen=array(
 	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet"),
 	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id"),
 	"public.tbl_semesterwochen"  => array("semester","studiengang_kz","wochen"),
-	"public.tbl_service" => array("service_id", "bezeichnung","beschreibung","ext_id","oe_kurzbz"),
+	"public.tbl_service" => array("service_id", "bezeichnung","beschreibung","ext_id","oe_kurzbz","content_id"),
 	"public.tbl_sprache"  => array("sprache","locale","flagge","index","content","bezeichnung"),
 	"public.tbl_standort"  => array("standort_id","adresse_id","kurzbz","bezeichnung","insertvon","insertamum","updatevon","updateamum","ext_id", "firma_id"),
 	"public.tbl_statistik"  => array("statistik_kurzbz","bezeichnung","url","r","gruppe","sql","php","content_id","insertamum","insertvon","updateamum","updatevon","berechtigung_kurzbz"),
