@@ -422,16 +422,16 @@
 		//wenn bereits eine Kreuzerlliste existiert, dann den Moodle link nicht anzeigen
 		$qry = "SELECT * FROM campus.tbl_uebung WHERE 
 				lehreinheit_id IN(SELECT lehreinheit_id FROM lehre.tbl_lehreinheit 
-									WHERE lehrveranstaltung_id='".addslashes($lvid)."' 
-									AND studiensemester_kurzbz='".addslashes($angezeigtes_stsem)."')";
+									WHERE lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)."
+									AND studiensemester_kurzbz=".$db->db_add_param($angezeigtes_stsem).")";
 		
 		if($result = $db->db_query($qry))
 			if($db->db_num_rows($result)>0)
 				$showmoodle=false;
 		
-		$mdlcourse = new moodle_course();
-		$mdlcourse->getAll($lvid, $angezeigtes_stsem);
-		if(count($mdlcourse->result)>0)
+		$moodle = new moodle();
+		$moodle->getAll($lvid, $angezeigtes_stsem);
+		if(count($moodle->result)>0)
 			$showmoodle=true;
 	}
 	else 
@@ -439,21 +439,22 @@
 	if($showmoodle)
 	{
 		$link = "moodle_choice.php?lvid=$lvid&stsem=$angezeigtes_stsem";
-		if(count($mdlcourse->result)>0)
+		if(count($moodle->result)>0)
 		{
 			if(!$is_lector)
 			{
-				$course = $mdlcourse->getCourse($lvid, $angezeigtes_stsem, $user);
-				if(count($course)==1)
-					$link = MOODLE_PATH.'course/view.php?id='.$course[0];
+				$moodle->getCourse($lvid, $angezeigtes_stsem, $user);
+				if(count($moodle->result)==1)
+					$link = $moodle->getPfad($moodle->result[0]->moodle_version).'course/view.php?id='.$moodle->result[0]->mdl_course_id;
 				else 
 					$link = "moodle_choice.php?lvid=$lvid&stsem=$angezeigtes_stsem";
 			}
 			else 
 			{
-				//$mdlcourse->getAll($lvid, $angezeigtes_stsem);
-				if(count($mdlcourse->result)==1)
-					$link = MOODLE_PATH.'course/view.php?id='.$mdlcourse->result[0]->mdl_course_id;
+				if(count($moodle->result)==1)
+				{
+					$link = $moodle->getPfad($moodle->result[0]->moodle_version).'course/view.php?id='.$moodle->result[0]->mdl_course_id;
+				}
 				else 
 					$link = "moodle_choice.php?lvid=$lvid&stsem=$angezeigtes_stsem";
 			}

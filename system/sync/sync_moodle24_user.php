@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2008 Technikum-Wien
+/* Copyright (C) 2013 FH Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -15,17 +15,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  */
 /*
  * Synchronisiert die Lektoren und Studenten der aktuellen MoodleKurse
  * wenn kein aktuelles Studiensemester vorhanden ist, wird NICHT Synchronisiert
  */
 require_once('../../config/vilesci.config.inc.php');
-require_once('../../include/moodle19_course.class.php');
-require_once('../../include/moodle19_user.class.php');
+require_once('../../include/moodle24_course.class.php');
+require_once('../../include/moodle24_user.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/mail.class.php');
@@ -47,17 +45,17 @@ if($stsem_kurzbz=$stsem->getakt())
 	//nur die Eintraege des aktuellen Studiensemesters syncen
 	$qry = "SELECT distinct mdl_course_id FROM lehre.tbl_moodle 
 			WHERE studiensemester_kurzbz=".$db->db_add_param($stsem_kurzbz)."
-				AND moodle_version='1.9';";
+			AND moodle_version='2.4'";
 	if($result = $db->db_query($qry))
 	{
 		while($row = $db->db_fetch_object($result))
 		{
-			$course = new moodle19_course();
+			$course = new moodle24_course();
 			if($course->load($row->mdl_course_id))
 			{
 				$message_lkt='';
 				//Lektoren
-				$mdluser = new moodle19_user();
+				$mdluser = new moodle24_user();
 				$mitarbeiter = $mdluser->getMitarbeiter($row->mdl_course_id);
 				
 				if($mdluser->sync_lektoren($row->mdl_course_id))
@@ -77,7 +75,7 @@ if($stsem_kurzbz=$stsem->getakt())
 				}
 				
 				//Studenten
-				$mdluser = new moodle19_user();
+				$mdluser = new moodle24_user();
 				if($mdluser->sync_studenten($row->mdl_course_id))
 				{
 					$sync_studenten_gesamt+=$mdluser->sync_create;

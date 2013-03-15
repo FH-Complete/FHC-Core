@@ -1,5 +1,4 @@
 <?php
-
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -22,12 +21,147 @@
  */
 require_once($CFG->libdir . "/externallib.php");
 
-class local_fhcompletews_external extends external_api {
+class local_fhcompletews_external extends external_api 
+{
 
-   
+/**************************************************
+ * Webservice get_course_grades
+ *
+ * Laedt die Noten eines Kurses
+ **************************************************/
+	public static function get_course_grades_parameters() 
+	{
+        return new external_function_parameters(
+                array('courseid' => new external_value(PARAM_INT, 'CourseID')), 'ID of the Course'
+        );
+    }
 
+    /**
+     * Get course Grades
+     * @param int courseid
+     * @return array
+     */
+    public static function get_course_grades($courseid) 
+	{
+        global $CFG, $DB;
+        require_once($CFG->dirroot . "/course/lib.php");
+		require_once($CFG->dirroot.'/grade/export/lib.php');
 
-  public static function get_courses_by_shortname_parameters() {
+        //validate parameter
+        $params = self::validate_parameters(self::get_course_grades_parameters(),
+                        array('courseid' => $courseid));
+
+		$notenart=3; // 2=Prozent; 3=Endnote nach Skala
+		$gui=array();	  
+		$final_id='';
+		$data = array();
+
+		// Kursdaten Laden
+		if (!$course = $DB->get_record('course', array('id'=>$courseid)))
+		{
+			throw new moodle_exception('Course not found', '', '', null, 'The course ' . $courseid . ' is not found');
+			return false;
+		}
+
+		$id=$course->id;
+		$kursname=$course->fullname;
+		$shortname=$course->shortname;
+
+		//ODS Notenexport starten
+		require_login($course);
+		$context = get_context_instance(CONTEXT_COURSE, $courseid);
+		require_once($CFG->dirroot.'/grade/export/ods/grade_export_ods.php');
+
+		if (!$export = new grade_export_ods($course, 0, 0, false, false, $notenart, 2))
+		{
+			throw new moodle_exception('Fehler', '', '', null, "Moodle-Kurs ".$id." ".$shortname." - keine Export Information gefunden");
+			return false;
+		}
+
+		$grad =$export->columns;
+	
+		// Im Export sind die Noten fuer alle Abgaben, Quiz, etc enthalten
+		// Wir brauchen hier nur die Gesamtnote fuer die ganzen Kurs
+		foreach ($export->columns as $key=>$grade_item) 
+		{
+			// Gesamtnote hat den itemtype "course"
+			if($grade_item->itemtype=='course')
+			{
+				$final_id=$key;
+				break;
+			}
+		}
+
+		if($final_id=='')
+		{
+			throw new moodle_exception('Fehler', '', '', null,"Moodle-Kurs ".$id." ".$shortname." - keine Endnote gefunden");
+			return false;
+		}
+
+		// Liste mit allen Studierenden des Kurses durchlaufen
+		$geub = new grade_export_update_buffer();	 
+		$gui = new graded_users_iterator($export->course, $export->columns, $export->groupid);
+
+		$gui->init();	
+		$kursgrad =array();
+
+		while ($userdata = $gui->next_user()) 
+		{
+			$user_item=array();
+		   	$user = $userdata->user;
+		   	$user_item['vorname']=$user->firstname;
+		   	$user_item['nachname']=$user->lastname;
+		   	$user_item['idnummer']=$user->idnumber;
+			$user_item['username']=$user->username;
+
+			// Aus den vorhanden Noten wird die Endnote fuer den Kurs herausgesucht
+			if(isset($userdata->grades[$final_id]))
+			{
+			  	$gradestr = $export->format_grade($userdata->grades[$final_id]);
+		     	$user_item['note']=$gradestr;
+			}
+			
+			$data[]=$user_item;
+		}
+	
+		$gui->close();
+		$geub->close();
+	
+		if (count($data)==0)	
+		{
+			throw new moodle_exception('Fehler', '', '', null,"Moodle-Kurs ".$id." ".$shortname." - keine Kurs-Noten Informationen gefunden ");
+			return false;
+		}
+
+		return $data;
+    }
+
+    /**
+     * Returns description of method result value
+     * @return external_description
+     */
+    public static function get_course_grades_returns() 
+	{
+        return new external_multiple_structure(
+                new external_single_structure(
+                        array(
+                            'vorname' => new external_value(PARAM_TEXT, 'vorname'),
+                            'nachname' => new external_value(PARAM_TEXT, 'nachname'),
+                            'idnummer' => new external_value(PARAM_TEXT, 'idnummer'),
+                            'username' => new external_value(PARAM_TEXT, 'username'),
+                            'note' => new external_value(PARAM_TEXT, 'note'),
+                        ), 'course'
+                )
+        );
+    }
+
+/**************************************************
+ * Webservice get_courses_by_shortname
+ *
+ * Laedt Kurse anhand der Kurzbezeichnung
+ **************************************************/
+	public static function get_courses_by_shortname_parameters() 
+	{
         return new external_function_parameters(
                 array('options' => new external_single_structure(
                             array('shortnames' => new external_multiple_structure(
@@ -45,7 +179,8 @@ class local_fhcompletews_external extends external_api {
      * @param array $options
      * @return array
      */
-    public static function get_courses_by_shortname($options) {
+    public static function get_courses_by_shortname($options) 
+	{
         global $CFG, $DB;
         require_once($CFG->dirroot . "/course/lib.php");
 
@@ -63,13 +198,17 @@ class local_fhcompletews_external extends external_api {
 
         //create return value
         $coursesinfo = array();
-        foreach ($courses as $course) {
+        foreach ($courses as $course) 
+		{
 
             // now security checks
             $context = get_context_instance(CONTEXT_COURSE, $course->id);
-            try {
+            try 
+			{
                 self::validate_context($context);
-            } catch (Exception $e) {
+            } 
+			catch (Exception $e) 
+			{
                 $exceptionparam = new stdClass();
                 $exceptionparam->message = $e->getMessage();
                 $exceptionparam->shortname = $course->shortname;
@@ -91,7 +230,8 @@ class local_fhcompletews_external extends external_api {
 
             //some field should be returned only if the user has update permission
             $courseadmin = has_capability('moodle/course:update', $context);
-            if ($courseadmin) {
+            if ($courseadmin) 
+			{
                 $courseinfo['categorysortorder'] = $course->sortorder;
                 $courseinfo['idnumber'] = $course->idnumber;
                 $courseinfo['showgrades'] = $course->showgrades;
@@ -113,7 +253,8 @@ class local_fhcompletews_external extends external_api {
             }
 
             if ($courseadmin or $course->visible
-                    or has_capability('moodle/course:viewhiddencourses', $context)) {
+                    or has_capability('moodle/course:viewhiddencourses', $context)) 
+			{
                 $coursesinfo[] = $courseinfo;
             }
         }
@@ -125,7 +266,8 @@ class local_fhcompletews_external extends external_api {
      * Returns description of method result value
      * @return external_description
      */
-    public static function get_courses_by_shortname_returns() {
+    public static function get_courses_by_shortname_returns() 
+	{
         return new external_multiple_structure(
                 new external_single_structure(
                         array(
@@ -186,12 +328,21 @@ class local_fhcompletews_external extends external_api {
                 )
         );
     }
-/**
-* Returns description of get_users() parameters.
-*
-* @return external_function_parameters
-* @since Moodle 2.5
-*/
+
+
+/***********************************************************************
+ * get_users - Laedt User Anhand des Usernamens
+ * Backport von Moodle 2.5
+ * Ab Moodle 2.5 sollte dieses Webservice bereits integriert sein 
+ ***********************************************************************/
+
+
+	/**
+	* Returns description of get_users() parameters.
+	*
+	* @return external_function_parameters
+	* @since Moodle 2.5
+	*/
     public static function get_users_parameters() {
         return new external_function_parameters(
             array(
@@ -221,12 +372,12 @@ It could very slow or timeout. The function is designed to search some specific 
     }
 
     /**
-* Retrieve matching user.
-*
-* @param array $criteria the allowed array keys are id/lastname/firstname/idnumber/username/email/auth.
-* @return array An array of arrays containing user profiles.
-* @since Moodle 2.5
-*/
+	* Retrieve matching user.
+	*
+	* @param array $criteria the allowed array keys are id/lastname/firstname/idnumber/username/email/auth.
+	* @return array An array of arrays containing user profiles.
+	* @since Moodle 2.5
+	*/
     public static function get_users($criteria = array()) {
         global $CFG, $USER, $DB;
 
@@ -345,11 +496,11 @@ It could very slow or timeout. The function is designed to search some specific 
     }
 
     /**
-* Returns description of get_users result value.
-*
-* @return external_description
-* @since Moodle 2.5
-*/
+	* Returns description of get_users result value.
+	*
+	* @return external_description
+	* @since Moodle 2.5
+	*/
     public static function get_users_returns() {
         return new external_single_structure(
             array('users' => new external_multiple_structure(
@@ -360,12 +511,12 @@ It could very slow or timeout. The function is designed to search some specific 
         );
     }
 
-/**
-* Create user return value description.
-*
-* @param array $additionalfields some additional field
-* @return single_structure_description
-*/
+	/**
+	* Create user return value description.
+	*
+	* @param array $additionalfields some additional field
+	* @return single_structure_description
+	*/
     public static function user_description($additionalfields = array()) {
         $userfields = array(
                     'id' => new external_value(PARAM_INT, 'ID of the user'),
@@ -423,8 +574,6 @@ It could very slow or timeout. The function is designed to search some specific 
         }
         return new external_single_structure($userfields);
     }
-
-
 }
 
 /**
@@ -480,5 +629,3 @@ function can_view_user_details_cap($user, $course = null) {
     }
     return $result;
 }
-
-

@@ -38,7 +38,7 @@ require_once('../../../../include/pruefung.class.php');
 require_once('../../../../include/person.class.php');
 require_once('../../../../include/benutzer.class.php');
 require_once('../../../../include/mitarbeiter.class.php');
-require_once('../../../../include/moodle_course.class.php');
+require_once('../../../../include/moodle19_course.class.php');
 require_once('../../../../include/mail.class.php');
 require_once('../../../../include/phrasen.class.php');
 
@@ -839,7 +839,7 @@ echo '<table>';
 					{
 						//Noten aus Moodle
 						if (!isset($moodle_course))
-							$moodle_course = new moodle_course();
+							$moodle_course = new moodle19_course();
 							
 						if (!$mdldaten = $moodle_course->loadNoten($lvid, $stsem, '', true,$debg))
 							$mdldaten=''; 

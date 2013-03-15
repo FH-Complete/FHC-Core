@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2008 Technikum-Wien
+/* Copyright (C) 2013 FH Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -21,21 +21,23 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 /*
- * Erstellt eine Liste mit den Noten des eingeloggten Studenten
- * das betreffende Studiensemester kann ausgewaehlt werden
+ * Verwaltungsseite zum Anlegen von Moodle Kursen
  */
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/basis_db.class.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/benutzerberechtigung.class.php');
-require_once('../../../include/moodle_course.class.php');
-require_once('../../../include/moodle_user.class.php');
 require_once('../../../include/lehrveranstaltung.class.php');
 require_once('../../../include/lehreinheit.class.php');
 require_once('../../../include/lehreinheitgruppe.class.php');
 require_once('../../../include/lehreinheitmitarbeiter.class.php');
 require_once('../../../include/studiengang.class.php');
 require_once('../../../include/phrasen.class.php');
+require_once('../../../include/moodle.class.php');
+require_once('../../../include/moodle19_course.class.php');
+require_once('../../../include/moodle19_user.class.php');
+require_once('../../../include/moodle24_course.class.php');
+require_once('../../../include/moodle24_user.class.php');
 
 $sprache = getSprache(); 
 $p = new phrasen($sprache); 
@@ -102,22 +104,11 @@ function togglediv()
 </script>
 </head>
 <body onload="togglediv()">
-<table class="tabcontent" height="100%" id="inhalt">
+<h1>'.$lv->bezeichnung.'&nbsp;('.$stsem.')</h1>
+<table width="100%" >
 	<tr>
-		<td class="tdwidth10">&nbsp;</td>
-		<td class="ContentHeader"><font class="ContentHeader">'.$lv->bezeichnung.'&nbsp;('.$stsem.')</font></td>
-    </tr>
-    <tr>
-    	<td class="tdvertical">&nbsp;</td>
-        <td></td>
-	</tr>
-	<tr>
-		<td class="tdvertical">&nbsp;</td>
-		<td class="tdvertical">
-		
-		<table width="100%">
-			<tr>
-				<td>';
+		<td valign="top">';
+
 if(isset($_POST['neu']))
 {
 	if($_POST['bezeichnung']=='')
@@ -140,7 +131,7 @@ if(isset($_POST['neu']))
 		//Gesamte LV zu einem Moodle Kurs zusammenlegen
 		if($art=='lv')
 		{
-			$mdl_course = new moodle_course();
+			$mdl_course = new moodle19_course();
 			
 			$mdl_course->lehrveranstaltung_id = $lvid;
 			$mdl_course->studiensemester_kurzbz = $stsem;
@@ -156,12 +147,12 @@ if(isset($_POST['neu']))
 				//Eintrag in der Vilesci DB
 				$mdl_course->create_vilesci();
 	
-				$mdl_user = new moodle_user();
+				$mdl_user = new moodle19_user();
 				//Lektoren Synchronisieren
 				if(!$mdl_user->sync_lektoren($mdl_course->mdl_course_id))
 					echo $mdl_user->errormsg;
 	
-				$mdl_user = new moodle_user();
+				$mdl_user = new moodle19_user();
 				//Studenten Synchronisieren
 				if(!$mdl_user->sync_studenten($mdl_course->mdl_course_id))
 					echo $mdl_user->errormsg;
@@ -186,7 +177,7 @@ if(isset($_POST['neu']))
 			
 			if(count($lehreinheiten)>0)
 			{
-				$mdl_course = new moodle_course();
+				$mdl_course = new moodle19_course();
 				
 				$mdl_course->mdl_fullname = $_POST['bezeichnung'];
 				$mdl_course->mdl_shortname = $shortname;
@@ -194,7 +185,8 @@ if(isset($_POST['neu']))
 				$mdl_course->insertamum = date('Y-m-d H:i:s');
 				$mdl_course->insertvon = $user;
 				$mdl_course->lehreinheit_id=$lehreinheiten[0];
-	
+				$mdl_course->gruppen = isset($_POST['gruppen']);
+
 				//Kurs im Moodle anlegen
 				if($mdl_course->create_moodle())
 				{
@@ -206,12 +198,12 @@ if(isset($_POST['neu']))
 							echo '<br>'.$p->t('moodle/fehlerBeimAnlegenAufgetreten').':'.$mdl_course->errormsg;
 					}
 					
-					$mdl_user = new moodle_user();
+					$mdl_user = new moodle19_user();
 					//Lektoren Synchronisieren
 					if(!$mdl_user->sync_lektoren($mdl_course->mdl_course_id))
 						echo $mdl_user->errormsg;
 					
-					$mdl_user = new moodle_user();	
+					$mdl_user = new moodle19_user();	
 					//Studenten Synchronisieren
 					if(!$mdl_user->sync_studenten($mdl_course->mdl_course_id))
 						echo $mdl_user->errormsg;
@@ -231,7 +223,7 @@ if(isset($_POST['changegruppe']))
 {
 	if(isset($_POST['moodle_id']) && is_numeric($_POST['moodle_id']))
 	{
-		$mcourse = new moodle_course();
+		$mcourse = new moodle19_course();
 		if($mcourse->updateGruppenSync($_POST['moodle_id'], isset($_POST['gruppen'])))
 			echo '<b>'.$p->t('moodle/datenWurdenAktualisiert').'</b><br>';
 		else 
@@ -246,7 +238,7 @@ if(isset($_POST['changegruppe']))
 //Anlegen eines Testkurses
 if(isset($_GET['action']) && $_GET['action']=='createtestkurs')
 {
-	$mdl_course = new moodle_course();
+	$mdl_course = new moodle19_course();
 	if(!$mdl_course->loadTestkurs($lvid, $stsem))
 	{
 		$lehrveranstaltung = new lehrveranstaltung();
@@ -270,7 +262,7 @@ if(isset($_GET['action']) && $_GET['action']=='createtestkurs')
 			$id=$mdl_course->mdl_course_id;
 			$errormsg='';
 			
-			$mdl_user = new moodle_user();
+			$mdl_user = new moodle19_user();
 			//Lektoren zuweisen
 			if(!$mdl_user->sync_lektoren($id, $lvid, $stsem))
 				$errormsg.=$p->t('moodle/fehlerBeiDerLektorenZuordnung').':'.$mdl_user->errormsg.'<br>';
@@ -290,8 +282,57 @@ if(isset($_GET['action']) && $_GET['action']=='createtestkurs')
 	}
 }
 
-$mdl_course = new moodle_course();
-if($mdl_course->course_exists_for_lv($lvid, $stsem) || $mdl_course->course_exists_for_allLE($lvid, $stsem))
+//Anlegen eines Testkurses fuer Moodle 24
+if(isset($_GET['action']) && $_GET['action']=='createtestkurs24')
+{
+	$mdl_course24 = new moodle24_course();
+	if(!$mdl_course24->loadTestkurs($lvid, $stsem))
+	{
+		$lehrveranstaltung = new lehrveranstaltung();
+		$lehrveranstaltung->load($lvid);
+		$studiengang = new studiengang();
+		$studiengang->load($lehrveranstaltung->studiengang_kz);
+		
+		//$orgform = ($lehrveranstaltung->orgform_kurzbz!=''?$lehrveranstaltung->orgform_kurzbz:$studiengang->orgform_kurzbz);
+		
+		//Kurzbezeichnung generieren Format: STSEM-STG-SEM-LV/LEID/LEID/LEID...
+		$shortname = 'TK-'.$stsem.'-'.$studiengang->kuerzel.'-'.$lehrveranstaltung->semester.'-'.$lehrveranstaltung->kurzbz;
+		
+		$mdl_course24->lehrveranstaltung_id = $lvid;
+		$mdl_course24->studiensemester_kurzbz = $stsem;
+		$mdl_course24->mdl_fullname = 'Testkurs - '.$lehrveranstaltung->bezeichnung;
+		$mdl_course24->mdl_shortname = $shortname;
+
+		//TestKurs erstellen
+		if($mdl_course24->createTestkurs($lvid, $stsem))
+		{
+			$id=$mdl_course24->mdl_course_id;
+			$errormsg='';
+			
+			$mdl_user24 = new moodle24_user();
+			//Lektoren zuweisen
+			if(!$mdl_user24->sync_lektoren($id, $lvid, $stsem))
+				$errormsg.=$p->t('moodle/fehlerBeiDerLektorenZuordnung').':'.$mdl_user24->errormsg.'<br>';
+			//Teststudenten zuweisen
+			if(!$mdl_user24->createTestStudentenZuordnung($id))
+				$errormsg.=$p->t('moodle/fehlerBeiDerStudentenZuordnung').':'.$mdl_user24->errormsg.'<br>';
+				
+			if($errormsg!='')
+				echo $errormsg;
+			else
+				echo '<b>'.$p->t('moodle/testkursWurdeErfolgreichAngelegt').'</b><br>';
+		}
+	}
+	else 
+	{
+		echo '<span class="error">'.$p->t('moodle/esExistiertBereitsEinTestkurs').'</span><br>';
+	}
+}
+
+$moodle = new moodle();
+
+// Pruefen ob bereits fuer alle Lehreinheiten oder fuer die gesamte LV ein Moodle Kurs angelegt ist
+if($moodle->course_exists_for_lv($lvid, $stsem) || $moodle->course_exists_for_allLE($lvid, $stsem))
 {
 	echo $p->t('moodle/esIstBereitsEinMoodleKursVorhanden');
 }
@@ -301,8 +342,8 @@ else
 	//anlegen fuer die Lehrveranstaltung verhindern
 	$qry = "SELECT 1 FROM lehre.tbl_moodle 
 			WHERE lehreinheit_id in(SELECT lehreinheit_id FROM lehre.tbl_lehreinheit 
-									WHERE lehrveranstaltung_id='".addslashes($lvid)."' 
-									AND studiensemester_kurzbz='".addslashes($stsem)."')";
+									WHERE lehrveranstaltung_id=".$db->db_add_param($lvid)."
+									AND studiensemester_kurzbz=".$db->db_add_param($stsem).")";
 	$disable_lv='';
 	if($result = $db->db_query($qry))
 		if($db->db_num_rows($result)>0)
@@ -348,7 +389,7 @@ else
 			$lektoren.= ' '.$ma->mitarbeiter_uid;
 		}
 		
-		if($mdl_course->course_exists_for_le($row->lehreinheit_id))
+		if($moodle->course_exists_for_le($row->lehreinheit_id))
 			$disabled='disabled';
 		else 
 			$disabled='';
@@ -372,32 +413,61 @@ echo '</td>';
 
 echo '<td valign="top">';
 echo '<b>'.$p->t('moodle/vorhandeneMoodleKurse').'</b>';
-if(!$mdl_course->getAll($lvid, $stsem))
-	echo $mdl_course->errormsg;
+if(!$moodle->getAll($lvid, $stsem))
+	echo $moodle->errormsg;
 echo '<table>';
-foreach ($mdl_course->result as $course)
+foreach ($moodle->result as $course)
 {
-	echo '<tr>';
-	echo '<td><a href="'.MOODLE_PATH.'course/view.php?id='.$course->mdl_course_id.'" class="Item" target="_blank">'.$course->mdl_fullname.'</a></td>';
-	echo "<td nowrap><form action='".$_SERVER['PHP_SELF']."?lvid=$lvid&stsem=$stsem' method='POST' style='margin:0px'><input type='hidden' name='moodle_id' value='$course->moodle_id'><input type='checkbox' name='gruppen' ".($course->gruppen?'checked':'').">Gruppen übernehmen <input type='submit' value='".$p->t('global/ok')."' name='changegruppe'></td>";
+	switch($course->moodle_version)
+	{
+		case '1.9':
+			$moodlecourse = new moodle19_course();
+			$moodlecourse->load($course->mdl_course_id);
+			echo '<tr>';
+			echo '<td><a href="'.$moodle->getPfad($course->moodle_version).'course/view.php?id='.$course->mdl_course_id.'" class="Item" target="_blank">'.$moodlecourse->mdl_fullname.'</a></td>';
+			echo "<td nowrap><form action='".$_SERVER['PHP_SELF']."?lvid=$lvid&stsem=$stsem' method='POST' style='margin:0px'><input type='hidden' name='moodle_id' value='$course->moodle_id'><input type='checkbox' name='gruppen' ".($course->gruppen?'checked':'').">Gruppen übernehmen <input type='submit' value='".$p->t('global/ok')."' name='changegruppe'></form></td>";
+			echo '</tr>';
+			break;
+
+		case '2.4':
+			$moodlecourse = new moodle24_course();
+			$moodlecourse->load($course->mdl_course_id);
+			echo '<tr>';
+			echo '<td><a href="'.$moodle->getPfad($course->moodle_version).'course/view.php?id='.$course->mdl_course_id.'" class="Item" target="_blank">'.$moodlecourse->mdl_fullname.'</a></td>';
+			echo '</tr>';
+			break;
+
+		default:
+			// andere Moodle Version
+			echo '<tr><td>Unknown Moodle Version - ID '.$course->mdl_course_id.'</td></tr>';
+	}
 }
 echo '</table>';
 echo '</td></tr></table>';
 
 echo '<br><br><br>';
 echo '<b>'.$p->t('moodle/testkurse').'</b><br><br>';
-$mdlcourse = new moodle_course();
+$mdlcourse = new moodle19_course();
 if($mdlcourse->loadTestkurs($lvid, $stsem))
 {
-	echo '<a href="'.MOODLE_PATH.'course/view.php?id='.$mdlcourse->mdl_course_id.'" class="Item" target="_blank">'.$mdlcourse->mdl_fullname.'</a>';
+	echo '<a href="'.$moodle->getPfad('1.9').'course/view.php?id='.$mdlcourse->mdl_course_id.'" class="Item" target="_blank">'.$mdlcourse->mdl_fullname.'</a>';
 }
 else 
 {
 	echo "<a href='".$_SERVER['PHP_SELF']."?lvid=$lvid&stsem=$stsem&action=createtestkurs' class='Item'>".$p->t('moodle/klickenSieHierUmTestkursErstellen')."</a>";
 }
-echo '</td>
-	</tr>
-</table>
+
+echo '<br><br><hr><b>'.$p->t('moodle/testkurse24').'</b><br><br>';
+$mdlcourse24 = new moodle24_course();
+if($mdlcourse24->loadTestkurs($lvid, $stsem))
+{
+	echo '<a href="'.$moodle->getPfad('2.4').'course/view.php?id='.$mdlcourse24->mdl_course_id.'" class="Item" target="_blank">'.$mdlcourse24->mdl_fullname.'</a>';
+}
+else 
+{
+	echo "<a href='".$_SERVER['PHP_SELF']."?lvid=$lvid&stsem=$stsem&action=createtestkurs24' class='Item'>".$p->t('moodle/klickenSieHierUmTestkursErstellen24')."</a>";
+}
+echo '
 </body>
 </html>';
 ?>

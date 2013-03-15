@@ -40,7 +40,7 @@
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/globals.inc.php');
 // ---------------- Moodle Daten Classe
-	include_once('../../include/moodle_course.class.php');
+	include_once('../../include/moodle19_course.class.php');
 
 	require_once('../../include/studiensemester.class.php');
 	require_once('../../include/studiengang.class.php');	
@@ -53,7 +53,7 @@
     $content='';
     $errormsg=array();
 		
-	$objMoodle = new moodle_course();		
+	$objMoodle = new moodle19_course();		
 		
 // ***********************************************************************************************
 // POST oder GET Parameter einlesen 

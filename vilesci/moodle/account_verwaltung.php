@@ -38,7 +38,7 @@
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/globals.inc.php');
 // ---------------- Moodle Daten Classe
-	require_once('../../include/moodle_user.class.php');
+	require_once('../../include/moodle19_user.class.php');
 
 		if (!$db = new basis_db())
 		die('<div style="text-align:center;"><br />MOODLE Datenbank zurzeit NICHT Online.<br />Bitte etwas Geduld.<br />Danke</div>');
@@ -62,7 +62,7 @@
 //	Datenbankverbindungen zu Moodle und Vilesci und Classen
 // ***********************************************************************************************
 	// Classen Instanzen
-	$objMoodle = new moodle_user();	
+	$objMoodle = new moodle19_user();	
 // ***********************************************************************************************
 //	Verarbeitung einer Moodle-Account Anlageaktion
 // ***********************************************************************************************

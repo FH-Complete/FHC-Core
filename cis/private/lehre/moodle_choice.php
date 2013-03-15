@@ -21,18 +21,19 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 require_once('../../../config/cis.config.inc.php');
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung 
-// ------------------------------------------------------------------------------------------
-	require_once('../../../include/basis_db.class.php');
-	if (!$db = new basis_db())
-			die('Fehler beim Herstellen der Datenbankverbindung');
-
+require_once('../../../include/basis_db.class.php');
 require_once('../../../include/functions.inc.php');
-require_once('../../../include/moodle_course.class.php');
-require_once('../../../include/moodle_user.class.php');
+require_once('../../../include/moodle.class.php');
+require_once('../../../include/moodle19_course.class.php');
+require_once('../../../include/moodle24_course.class.php');
+require_once('../../../include/phrasen.class.php');
+
+if (!$db = new basis_db())
+	die('Fehler beim Herstellen der Datenbankverbindung');
 
 $user = get_uid();
+
+$p = new phrasen(getSprache());
 
 if(isset($_GET['lvid']))
 	$lvid=$_GET['lvid'];
@@ -51,35 +52,38 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
 <body>
-<table class="tabcontent" height="100%" id="inhalt">
-	<tr>
-		<td class="tdwidth10">&nbsp;</td>
-		<td class="ContentHeader"><font class="ContentHeader">MOODLE Kurse</font></td>
-    </tr>
-    <tr>
-    	<td class="tdvertical">&nbsp;</td>
-        <td></td>
-	</tr>
-	<tr>
-		<td class="tdvertical">&nbsp;</td>
-		<td class="tdvertical">
-		
-		<table width="100%">
-			<tr>
-				<td>';
+<h1>'.$p->t('moodle/kursUebersicht').'</h1>
 
-$mdlcourse = new moodle_course();
-$mdlcourse->getAll($lvid, $stsem);
+<table width="100%">
+	<tr>
+		<td>';
 
-foreach ($mdlcourse->result as $row)
+$moodle = new moodle();
+$moodle->getAll($lvid, $stsem);
+
+foreach ($moodle->result as $row)
 {
-	echo "<a href='".MOODLE_PATH."course/view.php?id=".$row->mdl_course_id."' class='Item'>$row->mdl_fullname</a><br>";
+	switch($row->moodle_version)
+	{
+		case '1.9':
+			$mdlcourse19=new moodle19_course();
+			$mdlcourse19->load($row->mdl_course_id);
+			echo "<a href='".$moodle->getPfad($row->moodle_version)."course/view.php?id=".$row->mdl_course_id."' class='Item'>$mdlcourse19->mdl_fullname</a><br>";
+			break;
+
+		case '2.4':
+			$mdlcourse24=new moodle24_course();
+			$mdlcourse24->load($row->mdl_course_id);
+			echo "<a href='".$moodle->getPfad($row->moodle_version)."course/view.php?id=".$row->mdl_course_id."' class='Item'>$mdlcourse24->mdl_fullname</a><br>";
+			break;
+
+		default:
+			echo $p->t('moodle/ungueltigeVersion',array($row->moodle_version)).'<br>';
+			break;
+	}
 }
 
-echo '			</td>
-			</tr>
-		</table>
-		</td>
+echo '	</td>
 	</tr>
 </table>
 </body>
