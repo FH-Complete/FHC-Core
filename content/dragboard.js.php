@@ -147,6 +147,7 @@ var LeLvbgrpDDObserver=
   	},
   	onDragOver: function(evt,flavour,session)
   	{
+		evt.preventDefault();
   	},
   	onDrop: function (evt,dropdata,session)
   	{
@@ -260,6 +261,7 @@ var LektorFunktionDDObserver=
   	},
   	onDragOver: function(evt,flavour,session)
   	{
+		evt.preventDefault();
   	},
   	onDrop: function (evt,dropdata,session)
   	{
@@ -347,6 +349,7 @@ var LeLektorDDObserver=
   	},
   	onDragOver: function(evt,flavour,session)
   	{
+		evt.preventDefault();
   	},
   	onDrop: function (evt,dropdata,session)
   	{
@@ -471,7 +474,7 @@ var boardObserver=
   	},
   	onDragOver: function(evt,flavour,session)
   	{
-  		
+  		evt.preventDefault();
   	},
   	onDrop: function (evt,dropdata,session)
   	{
@@ -551,6 +554,7 @@ var verbandtreeDDObserver=
   	},
   	onDragOver: function(evt,flavour,session)
   	{
+		evt.preventDefault();
   	},
   	onDrop: function (evt,dropdata,session)
   	{
