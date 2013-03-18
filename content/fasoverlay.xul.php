@@ -56,6 +56,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiteroverlay.xul
     ondraggesture="nsDragAndDrop.startDrag(event,lvbgrpDDObserver);"
 	datasources="../rdf/lehrverbandsgruppe.rdf.php" ref="http://www.technikum-wien.at/lehrverbandsgruppe/alle-verbaende"
 	ondragdrop="nsDragAndDrop.drop(event,verbandtreeDDObserver)"
+	ondrop="nsDragAndDrop.drop(event,verbandtreeDDObserver)"
 	ondragover="nsDragAndDrop.dragOver(event,verbandtreeDDObserver)"
 	ondragenter="nsDragAndDrop.dragEnter(event,verbandtreeDDObserver)"
 	ondragexit="nsDragAndDrop.dragExit(event,verbandtreeDDObserver)"
