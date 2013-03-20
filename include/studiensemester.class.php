@@ -563,5 +563,65 @@ class studiensemester extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Liefert $days (Default 60) Tage nach dem start des neuen Semesters noch das vorherige Studiensemester 
+	 * zurueck, danach das aktuelle.
+	 * 
+	 * 
+	 * @return studiensemester_kurzbz oder false wenn keines vorhanden
+	 */
+	public function getLastOrAktSemester($days=60)
+	{
+		$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE start<now()-'".$days." days'::interval ORDER BY start desc limit 1";
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				return $row->studiensemester_kurzbz;
+			}
+			else
+			{
+				$this->errormsg = 'Es wurde kein LastOrAkt Studiensemester gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Ermitteln des LastOrAkt Studiensemesters';
+			return false;
+		}
+	}
+	
+	/**
+	 * Liefert $days (Default 60) Tage nach dem start des neuen Semesters noch das vorherige Studiensemester 
+	 * zurueck, danach das aktuelle.
+	 * 
+	 * 
+	 * @return studiensemester_kurzbz oder false wenn keines vorhanden
+	 */
+	public function getNextOrAktSemester($days=60)
+	{
+		$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE start>now()-'".$days." days'::interval ORDER BY start limit 1";
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				return $row->studiensemester_kurzbz;
+			}
+			else
+			{
+				$this->errormsg = 'Es wurde kein NextOrAkt Studiensemester gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Ermitteln des NextOrAkt Studiensemesters';
+			return false;
+		}
+	}
 }
 ?>
