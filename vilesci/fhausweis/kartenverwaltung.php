@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Karl Burkhart 	<burkhart@technikum-wien.at>
+ * Authors: Karl Burkhart 	<burkhart@technikum-wien.at>,
+ *			Andreas Österreicher <oesi@technikum-wien.at>
  */
 
 require_once('../../config/vilesci.config.inc.php');
@@ -87,6 +88,7 @@ echo '<body>
             <tr>
                 <td>Studiengang:</td>
                 <td><select name="select_studiengang">
+				<option value="">Alle (keine Incoming)</option>
                 <option value="incoming">Incoming</option>
                 ';
 				
@@ -187,6 +189,9 @@ if(isset($_REQUEST['btn_submitStudent']))
     
     foreach($studentenArray as $stud)
     {
+		if($stud->studiengang_kz>10000)
+			continue;
+
         // Wenn letzter Status nich Student ist -> nicht anzeigen
         $prestudent = new prestudent(); 
         $prestudent->getLastStatus($stud->prestudent_id);
