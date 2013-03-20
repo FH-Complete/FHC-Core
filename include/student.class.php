@@ -340,16 +340,19 @@ class student extends benutzer
      */
     public function getStudentsStudiengang($studiengang_kz, $semester = null)
     {
+	/*
         if($studiengang_kz == '')
         {
             $this->errormsg ="Es wurde kein Studiengang übergeben";
             return false; 
         }
-    
+    */
         $qry = "SELECT * FROM public.tbl_student 
             JOIN public.tbl_benutzer ON (student_uid = uid)
             JOIN public.tbl_person USING (person_id)
-            WHERE tbl_benutzer.aktiv = 'true' AND studiengang_kz =".$this->db_add_param($studiengang_kz,FHC_INTEGER); 
+            WHERE tbl_benutzer.aktiv = 'true'";
+		if($studiengang_kz!='')
+			$qry.=" AND studiengang_kz =".$this->db_add_param($studiengang_kz,FHC_INTEGER); 
         
         if($semester != null)
             $qry .= " AND semester =".$this->db_add_param($semester, FHC_INTEGER);

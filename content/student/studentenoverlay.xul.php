@@ -58,7 +58,7 @@ else
 			<!-- *************** -->
 			<!-- *  Studenten  * -->
 			<!-- *************** -->
-			<vbox id="studentenEditor" persist="height">
+			<vbox id="studentenEditor">
 			<popupset>
 				<menupopup id="student-tree-popup" onpopupshown="">
 					<menuitem label="Student aus dieser Gruppe entfernen" oncommand="StudentGruppeDel();" id="student-tree-popup-gruppedel" hidden="false"/>
@@ -129,12 +129,14 @@ else
 				<!-- ************* -->
 				<!-- *  Auswahl  * -->
 				<!-- ************* -->
+				<vbox flex="1">
+				<vbox>
 				<tree id="student-tree" seltype="multi" hidecolumnpicker="false" flex="1"
 						datasources="rdf:null" ref="http://www.technikum-wien.at/student/alle"
 						<?php echo ($xulapp!='tempus'?'onselect="StudentAuswahl();"':'') ?>						
 						flags="dont-build-content"
 						enableColumnDrag="true"
-						style="margin:0px;"
+						style="margin:0px; height:150px"
 						persist="hidden, height"
 						ondraggesture="nsDragAndDrop.startDrag(event,studentDDObserver);"
 						context="student-tree-popup"
@@ -300,7 +302,7 @@ else
 	      				</rule>
   					</template>
 				</tree>
-
+				</vbox>
 				<?php
 				if($xulapp!='tempus')
 				{
@@ -351,5 +353,6 @@ else
 				<?php
 				}
 				?>
+			</vbox>
 			</vbox>
 </overlay>
