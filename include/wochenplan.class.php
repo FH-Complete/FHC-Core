@@ -123,6 +123,8 @@ class wochenplan extends basis_db
 		for ($i=1; $i<=TAGE_PRO_WOCHE; $i++)
 			for ($j=0; $j<20; $j++)
 			{
+				if(!isset($this->std_plan[$i][$j][0]))
+					$this->std_plan[$i][$j][0]=new stdClass();
 				$this->std_plan[$i][$j][0]->anz=0;
 				$this->std_plan[$i][$j][0]->unr=0;
 			}
@@ -291,12 +293,16 @@ class wochenplan extends basis_db
 		{
 			if($row = $this->db_fetch_object())
 			{
+				if(!isset($this->studiensemester_now))
+					$this->studiensemester_now = new stdClass();
 				$this->studiensemester_now->name=$row->studiensemester_kurzbz;
 				$this->studiensemester_now->start=mktime(0,0,0,mb_substr($row->start,5,2),mb_substr($row->start,8,2),mb_substr($row->start,0,4));
 				$this->studiensemester_now->ende=mktime(0,0,0,mb_substr($row->ende,5,2),mb_substr($row->ende,8,2),mb_substr($row->ende,0,4));#
 			}
 			if($row = $this->db_fetch_object())
 			{
+				if(!isset($this->studiensemester_next))
+					$this->studiensemester_next = new stdClass();
 				$this->studiensemester_next->name=$row->studiensemester_kurzbz;
 				$this->studiensemester_next->start=mktime(0,0,0,mb_substr($row->start,5,2),mb_substr($row->start,8,2),mb_substr($row->start,0,4));
 				$this->studiensemester_next->ende=mktime(0,0,0,mb_substr($row->ende,5,2),mb_substr($row->ende,8,2),mb_substr($row->ende,0,4));
@@ -358,6 +364,8 @@ class wochenplan extends basis_db
 			while (isset($this->std_plan[$tag][$stunde][$idx]->lektor_uid))
 				$idx++;
 			//echo $idx.'<BR>';
+			if(!isset($this->std_plan[$tag][$stunde][$idx]))
+				$this->std_plan[$tag][$stunde][$idx]=new stdClass();
 			$this->std_plan[$tag][$stunde][$idx]->unr=$this->wochenplan->lehrstunden[$i]->unr;
 			$this->std_plan[$tag][$stunde][$idx]->reservierung=$this->wochenplan->lehrstunden[$i]->reservierung;
 			if ($this->wochenplan->lehrstunden[$idx]->reservierung)
@@ -1221,8 +1229,8 @@ class wochenplan extends basis_db
 						// Ausgabe
 						echo '<button id="buttonSTPL'.$count.'"
 							tooltiptext="('.$updatevonam.') '.$titel.' - '.$anmerkung.'"
-							style="border:1px solid transparent;'.((isset($farbe) && $farbe!='')?'background-color:#'.$farbe:'').';"
-							styleOrig="border:1px solid transparent;'.((isset($farbe) && $farbe!='')?'background-color:#'.$farbe:'').';" ';
+							style="border:1px solid transparent;'.((isset($farbe) && $farbe!='')?'background-color:#'.$farbe:'').';-moz-appearance:none"
+							styleOrig="border:1px solid transparent;'.((isset($farbe) && $farbe!='')?'background-color:#'.$farbe:'').';-moz-appearance:none" ';
 						if ($berechtigung->isBerechtigt('lehre/lvplan',$stg_obj->oe_kurzbz,'uid'))
 							echo ' context="stplPopupMenue" ';
 						if ($berechtigung->isBerechtigt('lehre/lvplan',$stg_obj->oe_kurzbz,'u'))

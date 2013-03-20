@@ -106,6 +106,8 @@ class rdf
 	 */
 	public function setAttribut($name,$value,$cdata=true)
 	{
+		if(!isset($this->attr[$this->counter]))
+			$this->attr[$this->counter] = new stdClass();
 		$this->attr[$this->counter]->name=$name;
 		$this->attr[$this->counter]->value=$value;
 		$this->attr[$this->counter]->cdata=$cdata;
