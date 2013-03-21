@@ -23,6 +23,7 @@
  * Moodle 1.9 Kurs Verwaltung
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/moodle.class.php');
 
 if (!function_exists('xu_load_extension'))
 	include_once(dirname(__FILE__)."/xmlrpcutils/utils.php");
@@ -2164,13 +2165,12 @@ class moodle19_course extends basis_db
 				$this->errormsg ="Fehler xmlrpc call - Methode fehlt";
 				return false;
 			}		
-		
-		    // Aktuellen Moodle Server ermitteln.
-			if (defined('MOODLE_PATH')) // Eintrag MOODLE_PATH in Vilesci config.inc.php. Hostname herausfiltern
-			{
-				$host = parse_url(MOODLE_PATH, PHP_URL_HOST);
-				$path = parse_url(MOODLE_PATH, PHP_URL_PATH);
-			}
+
+			$moodle = new moodle();
+			$moodlepfad = $moodle->getPfad('1.9');		
+
+			$host = parse_url($moodlepfad, PHP_URL_HOST);
+			$path = parse_url($moodlepfad, PHP_URL_PATH);
 			
 			$port = '';
 			$uri = $path."xmlrpc/xmlrpc.php";
