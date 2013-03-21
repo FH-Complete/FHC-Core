@@ -83,7 +83,7 @@ else
 {
 	$qry = "SELECT vw_student.vorname, vw_student.nachname, tbl_studiengang.studiengang_kz 
 		FROM public.tbl_studiengang JOIN campus.vw_student USING (studiengang_kz) 
-		WHERE campus.vw_student.uid = '".addslashes($user)."'";
+		WHERE campus.vw_student.uid = ".$db->db_add_param($user).";";
 	
 	if (!$result=$db->db_query($qry))
 		die($p->t('tools/studentWurdeNichtGefunden'));
@@ -132,11 +132,10 @@ else
 				campus.tbl_lvgesamtnote
 			USING (lehrveranstaltung_id, student_uid)
 			WHERE
-				tbl_zeugnisnote.student_uid = '".addslashes($user)."'
-			AND
-				tbl_zeugnisnote.studiensemester_kurzbz = '".addslashes($stsem)."'
-			AND
-				tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_zeugnisnote.lehrveranstaltung_id
+				tbl_zeugnisnote.student_uid = ".$db->db_add_param($user)."
+			AND	tbl_zeugnisnote.studiensemester_kurzbz = ".$db->db_add_param($stsem)."
+			AND	(tbl_lvgesamtnote.studiensemester_kurzbz = ".$db->db_add_param($stsem)." OR tbl_lvgesamtnote.studiensemester_kurzbz is null)
+			AND	tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_zeugnisnote.lehrveranstaltung_id
 			ORDER BY bezeichnung";
 
 	if($result=$db->db_query($qry))
