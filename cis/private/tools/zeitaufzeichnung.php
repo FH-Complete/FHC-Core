@@ -440,59 +440,65 @@ if($projekt->getProjekteMitarbeiter($user))
         
 		echo '<br><hr>';
 		
-		//Uebersichtstabelle
-		echo '
-		<table id="t1" class="tablesorter">
-			<thead>
-				<tr>
-					<th>'.$p->t("zeitaufzeichnung/id").'</th>
-					<th>'.$p->t("zeitaufzeichnung/projekt").'</th>
-					<th>'.$p->t("zeitaufzeichnung/aktivitaet").'</th>
-					<th>'.$p->t("zeitaufzeichnung/user").'</th>
-					<th>'.$p->t("zeitaufzeichnung/start").'</th>
-					<th>'.$p->t("zeitaufzeichnung/ende").'</th>
-					<th>'.$p->t("zeitaufzeichnung/dauer").'</th>
-					<th>'.$p->t("global/beschreibung").'</th>
-					<th>'.$p->t("global/organisationseinheit").'</th>
-					<th>'.$p->t("global/organisationseinheit").'</th>
-					<th colspan="2">'.$p->t("global/aktion").'</th>
-	    		</tr>
-	    	</thead>
-	    <tbody>';
-	    
-	    $za = new zeitaufzeichnung();
+		$za = new zeitaufzeichnung();
 	    if(isset($_GET['filter']))
 	    	$za->getListeProjekt($_GET['filter']);
 	    else
 	    	$za->getListeUser($user);
 	   
 		$summe=0;
-		foreach($za->result as $row)
-		{		        
-			$summe = $row->summe;
-			echo '<tr>
-				<td>'.$db->convert_html_chars($row->zeitaufzeichnung_id).'</td>
-				<td>'.$db->convert_html_chars($row->projekt_kurzbz).'</td>
-		        <td>'.$db->convert_html_chars($row->aktivitaet_kurzbz).'</td>
-		        <td>'.$db->convert_html_chars($row->uid).'</td>
-		        <td nowrap>'.date('d.m.Y H:i', $datum->mktime_fromtimestamp($row->start)).'</td>
-		        <td nowrap>'.date('d.m.Y H:i', $datum->mktime_fromtimestamp($row->ende)).'</td>
-		        <td align="right">'.$db->convert_html_chars($row->diff).'</td>
-		        <td title="'.$db->convert_html_chars(mb_eregi_replace("\r\n",' ',$row->beschreibung)).'">'.$db->convert_html_chars($row->beschreibung).'</td>
-		        <td>'.$db->convert_html_chars($row->oe_kurzbz_1).'</td>
-		        <td>'.$db->convert_html_chars($row->oe_kurzbz_2).'</td>
-		        <td>';
-	        if(!isset($_GET['filter']) || $row->uid==$user)
-	        	echo '<a href="'.$_SERVER['PHP_SELF'].'?type=edit&zeitaufzeichnung_id='.$row->zeitaufzeichnung_id.'" class="Item">'.$p->t("global/bearbeiten").'</a>';
-	        echo "</td>\n";
-	        echo "       <td>";
-	        if(!isset($_GET['filter']) || $row->uid==$user)
-	        	echo '<a href="'.$_SERVER['PHP_SELF'].'?type=delete&zeitaufzeichnung_id='.$row->zeitaufzeichnung_id.'" class="Item"  onclick="return confdel()">'.$p->t("global/loeschen").'</a>';
-	        echo "</td>\n";
-	        echo "   </tr>\n";
-	    }
-	    echo "</tbody></table>\n";
+		
+		if(count($za->result)>0)
+		{
+			//Uebersichtstabelle
+			echo '
+			<table id="t1" class="tablesorter">
+				<thead>
+					<tr>
+						<th>'.$p->t("zeitaufzeichnung/id").'</th>
+						<th>'.$p->t("zeitaufzeichnung/projekt").'</th>
+						<th>'.$p->t("zeitaufzeichnung/aktivitaet").'</th>
+						<th>'.$p->t("zeitaufzeichnung/user").'</th>
+						<th>'.$p->t("zeitaufzeichnung/start").'</th>
+						<th>'.$p->t("zeitaufzeichnung/ende").'</th>
+						<th>'.$p->t("zeitaufzeichnung/dauer").'</th>
+						<th>'.$p->t("global/beschreibung").'</th>
+						<th>'.$p->t("global/organisationseinheit").'</th>
+						<th>'.$p->t("global/organisationseinheit").'</th>
+						<th colspan="2">'.$p->t("global/aktion").'</th>
+		    		</tr>
+		    	</thead>
+		    <tbody>';
+		    
+		    
+			foreach($za->result as $row)
+			{		        
+				$summe = $row->summe;
+				echo '<tr>
+					<td>'.$db->convert_html_chars($row->zeitaufzeichnung_id).'</td>
+					<td>'.$db->convert_html_chars($row->projekt_kurzbz).'</td>
+			        <td>'.$db->convert_html_chars($row->aktivitaet_kurzbz).'</td>
+			        <td>'.$db->convert_html_chars($row->uid).'</td>
+			        <td nowrap>'.date('d.m.Y H:i', $datum->mktime_fromtimestamp($row->start)).'</td>
+			        <td nowrap>'.date('d.m.Y H:i', $datum->mktime_fromtimestamp($row->ende)).'</td>
+			        <td align="right">'.$db->convert_html_chars($row->diff).'</td>
+			        <td title="'.$db->convert_html_chars(mb_eregi_replace("\r\n",' ',$row->beschreibung)).'">'.$db->convert_html_chars($row->beschreibung).'</td>
+			        <td>'.$db->convert_html_chars($row->oe_kurzbz_1).'</td>
+			        <td>'.$db->convert_html_chars($row->oe_kurzbz_2).'</td>
+			        <td>';
+		        if(!isset($_GET['filter']) || $row->uid==$user)
+		        	echo '<a href="'.$_SERVER['PHP_SELF'].'?type=edit&zeitaufzeichnung_id='.$row->zeitaufzeichnung_id.'" class="Item">'.$p->t("global/bearbeiten").'</a>';
+		        echo "</td>\n";
+		        echo "       <td>";
+		        if(!isset($_GET['filter']) || $row->uid==$user)
+		        	echo '<a href="'.$_SERVER['PHP_SELF'].'?type=delete&zeitaufzeichnung_id='.$row->zeitaufzeichnung_id.'" class="Item"  onclick="return confdel()">'.$p->t("global/loeschen").'</a>';
+		        echo "</td>\n";
+		        echo "   </tr>\n";
+		    }
+		    echo "</tbody></table>\n";
+		
 	    echo $p->t("zeitaufzeichnung/gesamtdauer").": ".$db->convert_html_chars($summe);
+		}
 	}
 	else 
 	{
