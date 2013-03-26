@@ -74,7 +74,7 @@ if (isset($_GET["toggle"]))
 }
 
 $sg = new ort();
-if (!$sg->getAll('ort_kurzbz',false))
+if (!$sg->getAll())
     die($sg->errormsg);
 
 //$htmlstr = "<table class='liste sortable'>\n";
