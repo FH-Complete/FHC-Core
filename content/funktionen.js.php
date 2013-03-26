@@ -44,7 +44,7 @@ $stg_obj->getAll();
 echo 'var organisationseinheit = {';
 $content = '';
 foreach ($stg_obj->result as $stg)
-	$content .= $stg->studiengang_kz.':"'.$stg->oe_kurzbz.'",';
+	$content .= '"'.$stg->studiengang_kz.'":"'.$stg->oe_kurzbz.'",';
 echo substr($content, 0, mb_strlen($content)-1).'};';
 
 ?>
