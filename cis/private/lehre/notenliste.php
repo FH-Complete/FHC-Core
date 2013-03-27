@@ -130,7 +130,7 @@ else
 				lehre.tbl_lehrveranstaltung, lehre.tbl_zeugnisnote
 			LEFT OUTER JOIN
 				campus.tbl_lvgesamtnote
-			USING (lehrveranstaltung_id, student_uid)
+			USING (lehrveranstaltung_id, student_uid, studiensemester_kurzbz)
 			WHERE
 				tbl_zeugnisnote.student_uid = ".$db->db_add_param($user)."
 			AND	tbl_zeugnisnote.studiensemester_kurzbz = ".$db->db_add_param($stsem)."
