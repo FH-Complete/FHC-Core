@@ -20,13 +20,12 @@
  *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
- 
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/studiensemester.class.php');
-		require_once('../../include/datum.class.php');
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/studiensemester.class.php');
+require_once('../../include/datum.class.php');
 
-		if (!$db = new basis_db())
-			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 $error_log='';
 $error_log1='';
@@ -37,64 +36,16 @@ $v='';
 $studiensemester=new studiensemester();
 $ssem=$studiensemester->getaktorNext();
 $psem=$studiensemester->getPrevious();
-$zaehl=0;
-$erhalter='';
-$stgart='';
-$orgform='';
-$status='';
 $datei='';
-$aktstatus='';
-$aktstatus_datum='';
-$mob='';
-$gast='';
-$avon='';
-$abis='';
-$zweck='';
-$bewerberM=array();
-$bewerberW=array();
-$bsem=array();
-$stsem=array();
-$usem=array();
-$asem=array();
-$absem=array();
-$iosem=array();
-$bsema=array();
-$stsema=array();
-$usema=array();
-$asema=array();
-$absema=array();
-$iosema=array();
-$bewerbercount=0;
-$bewerbercountbb=0;
-$bewerbercountvz=0;
-$bewerberM1=array();
-$bewerberW1=array();
-$bsem1=array();
-$stsem1=array();
-$bewerberM2=array();
-$bewerberW2=array();
-$bsem2=array();
-$stsem2=array();
-$datei1='';
-$datei2='';
-$stgorg="";
-$tabelle='';
-$stlist='';
-$bwlist='';
-$plausi='';
-$storgfor='';
-$sponsion='';
+$zaehl=0;
+$lehrgangsname = '';
 
+$stsem_obj = new studiensemester();
+$stsem_obj->load($ssem);
 //Beginn- und Endedatum des aktuellen Semesters
-$qry="SET client_encoding TO Unicode;SELECT * FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='".$ssem."';";
-if($result = $db->db_query($qry))
-{
-	if($row = $db->db_fetch_object($result))
-	{
-		$beginn=$row->start;
-		$ende=$row->ende;
-	}
-}
+$beginn=$stsem_obj->start;
+$ende=$stsem_obj->ende;
+
 //Ermittlung aktuelles und letztes BIS-Meldedatum
 if(mb_strstr($ssem,"WS"))
 {
@@ -124,13 +75,8 @@ if(isset($_GET['stg_kz']))
 }
 else
 {
-	//$stg_kz=228;
 	echo "<H2>Es wurde kein Lehrgang ausgew&auml;hlt!</H2>";
 	exit;
-}
-function myaddslashes($var)
-{
-	return ($var!=''?"'".addslashes($var)."'":'null');
 }
 //plausicheck
 if(isset($_GET['plausi']))
@@ -140,7 +86,7 @@ if(isset($_GET['plausi']))
 $datumobj=new datum();
 
 //Lehrgangsdaten auslesen
-$qry="SELECT * FROM public.tbl_studiengang WHERE studiengang_kz='".$stg_kz."'";
+$qry="SELECT * FROM public.tbl_studiengang WHERE studiengang_kz=".$db->db_add_param($stg_kz);
 if($result = $db->db_query($qry))
 {
 	if($row = $db->db_fetch_object($result))
@@ -159,13 +105,10 @@ if($result = $db->db_query($qry))
 		{
 			$erhalter=$row->erhalter_kz;
 		}
-		if($row->lgartcode<'1' || $row->lgartcode>'3')
-		{
-			echo "<H2>Es wurde keine gültige Lehrgangart ausgew&auml;hlt!</H2>";
-			exit;
-		}
+		$lehrgangsname = $row->bezeichnung;
 	}
 }
+$lehrgangsnummer = $erhalter.sprintf('%04s', abs($stg_kz));
 
 //Hauptselect
 $qry="SELECT DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.person_id AS pers_id, to_char(gebdatum, 'ddmmyy') AS vdat
@@ -175,15 +118,15 @@ $qry="SELECT DISTINCT ON(student_uid, nachname, vorname) *, public.tbl_person.pe
 	JOIN public.tbl_prestudent USING (prestudent_id)
 	JOIN public.tbl_prestudentstatus ON(tbl_prestudent.prestudent_id=tbl_prestudentstatus.prestudent_id)
 	WHERE bismelden IS TRUE
-	AND tbl_student.studiengang_kz='".$stg_kz."'
-	AND (((tbl_prestudentstatus.studiensemester_kurzbz='".$ssem."') AND (tbl_prestudentstatus.datum<='".$bisdatum."')
+	AND tbl_student.studiengang_kz=".$db->db_add_param($stg_kz)."
+	AND (((tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($ssem).") AND (tbl_prestudentstatus.datum<=".$db->db_add_param($bisdatum).")
 		AND (status_kurzbz='Student' OR status_kurzbz='Outgoing'
 		OR status_kurzbz='Praktikant' OR status_kurzbz='Diplomand' OR status_kurzbz='Absolvent'
 		OR status_kurzbz='Abbrecher' OR status_kurzbz='Unterbrecher'))
-		OR ((tbl_prestudentstatus.studiensemester_kurzbz='".$psem."') AND (status_kurzbz='Absolvent'
-		OR status_kurzbz='Abbrecher') AND tbl_prestudentstatus.datum>'".$bisprevious."')
-		OR (status_kurzbz='Incoming' AND student_uid IN (SELECT student_uid FROM bis.tbl_bisio WHERE (tbl_bisio.bis>='".$bisprevious."')
-			OR (tbl_bisio.von<'".$bisdatum."' AND (tbl_bisio.bis>='".$bisdatum."'  OR tbl_bisio.bis IS NULL))
+		OR ((tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($psem).") AND (status_kurzbz='Absolvent'
+		OR status_kurzbz='Abbrecher') AND tbl_prestudentstatus.datum>".$db->db_add_param($bisprevious).")
+		OR (status_kurzbz='Incoming' AND student_uid IN (SELECT student_uid FROM bis.tbl_bisio WHERE (tbl_bisio.bis>=".$db->db_add_param($bisprevious).")
+			OR (tbl_bisio.von<".$db->db_add_param($bisdatum)." AND (tbl_bisio.bis>=".$db->db_add_param($bisdatum)."  OR tbl_bisio.bis IS NULL))
 	)))
 	ORDER BY student_uid, nachname, vorname
 	";
@@ -193,16 +136,16 @@ if($result = $db->db_query($qry))
 
 	$datei.="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <Erhalter>
-  <ErhKz>".$erhalter."</ErhKz>
-  <MeldeDatum>".date("dmY", $datumobj->mktime_fromdate($bisdatum))."</MeldeDatum>
-  <LehrgangMeldung>
-      <LehrgangStamm>
-         <LehrgangNr>".($stg_kz*(-1))."</LehrgangNr>
-         <LehrgangArtCode>".$row->lgartcode."</LehrgangArtCode>";
+	<ErhKz>".$erhalter."</ErhKz>
+	<MeldeDatum>".date("dmY", $datumobj->mktime_fromdate($bisdatum))."</MeldeDatum>
+	<LehrgangMeldung>
+  		<Lehrgang>
+			<LehrgangNr>".$lehrgangsnummer."</LehrgangNr>";
+	
 	while($row = $db->db_fetch_object($result))
   	{
       	//Plausichecks
-		$qryadr="SELECT * from public.tbl_adresse WHERE heimatadresse IS TRUE AND person_id='".$row->pers_id."';";
+		$qryadr="SELECT * FROM public.tbl_adresse WHERE heimatadresse IS TRUE AND person_id=".$db->db_add_param($row->pers_id).";";
 		$results=$db->db_query($qryadr);
 
 		if($anz=$db->db_num_rows($results)!=1)
@@ -331,8 +274,8 @@ if($result = $db->db_query($qry))
 		}
 		//Bestimmen der aktuellen Prestudentrolle (Status) und des akt. Ausbildungssemesters des Studenten
 		$qrystatus="SELECT * FROM public.tbl_prestudentstatus
-		WHERE prestudent_id='".$row->prestudent_id."' AND studiensemester_kurzbz='".$ssem."'
-		AND (tbl_prestudentstatus.datum<'".$bisdatum."')
+		WHERE prestudent_id=".$db->db_add_param($row->prestudent_id)." AND studiensemester_kurzbz=".$db->db_add_param($ssem)."
+		AND (tbl_prestudentstatus.datum<".$db->db_add_param($bisdatum).")
 		ORDER BY datum desc, insertamum desc, ext_id desc;";
 		if($resultstatus = $db->db_query($qrystatus))
 		{
@@ -340,7 +283,7 @@ if($result = $db->db_query($qry))
 			{
 				if($rowstatus = $db->db_fetch_object($resultstatus))
 				{
-					$qry1="SELECT count(*) AS dipl FROM public.tbl_prestudentstatus WHERE prestudent_id='".$row->prestudent_id."' AND status_kurzbz='Diplomand'";
+					$qry1="SELECT count(*) AS dipl FROM public.tbl_prestudentstatus WHERE prestudent_id=".$db->db_add_param($row->prestudent_id)." AND status_kurzbz='Diplomand'";
 					if($result1 = $db->db_query($qry1))
 					{
 						if($row1 = $db->db_fetch_object($result1))
@@ -390,12 +333,12 @@ if($result = $db->db_query($qry))
 			}
 			else
 			{
-				$qrystatus="SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id='".$row->prestudent_id."' AND studiensemester_kurzbz='".$psem."' AND (tbl_prestudentstatus.datum<'".$bisdatum."') ORDER BY datum desc, insertamum desc, ext_id desc;";
+				$qrystatus="SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id=".$db->db_add_param($row->prestudent_id)." AND studiensemester_kurzbz=".$db->db_add_param($psem)." AND (tbl_prestudentstatus.datum<".$db->db_add_param($bisdatum).") ORDER BY datum desc, insertamum desc, ext_id desc;";
 				if($resultstatus = $db->db_query($qrystatus))
 				{
 					if($rowstatus = $db->db_fetch_object($resultstatus))
 					{
-						$qry1="SELECT count(*) AS dipl FROM public.tbl_prestudentstatus WHERE prestudent_id='".$row->prestudent_id."' AND status_kurzbz='Diplomand'";
+						$qry1="SELECT count(*) AS dipl FROM public.tbl_prestudentstatus WHERE prestudent_id=".$db->db_add_param($row->prestudent_id)." AND status_kurzbz='Diplomand'";
 						if($result1 = $db->db_query($qry1))
 						{
 							if($row1 = $db->db_fetch_object($result1))
@@ -440,7 +383,7 @@ if($result = $db->db_query($qry))
 
 		if($aktstatus=='Absolvent')
 		{
-			$qry_ap="SELECT * FROM lehre.tbl_abschlusspruefung WHERE student_uid='".$row->student_uid."' AND abschlussbeurteilung_kurzbz!='nicht' AND abschlussbeurteilung_kurzbz IS NOT NULL";
+			$qry_ap="SELECT * FROM lehre.tbl_abschlusspruefung WHERE student_uid=".$db->db_add_param($row->student_uid)." AND abschlussbeurteilung_kurzbz!='nicht' AND abschlussbeurteilung_kurzbz IS NOT NULL";
 	      		if($result_ap = $db->db_query($qry_ap))
 			{
 				$ap=0;
@@ -485,7 +428,7 @@ if($result = $db->db_query($qry))
 		{
 			//Erstellung der XML-Datei
 				$datei.="
-	 <LehrgangTeilnehmerIn>
+			<StudentIn>
             	  <PersKz>".trim($row->matrikelnr)."</PersKz>
             	  <GeburtsDatum>".date("dmY", $datumobj->mktime_fromdate($row->gebdatum))."</GeburtsDatum>
             	  <Geschlecht>".strtoupper($row->geschlecht)."</Geschlecht>";
@@ -515,41 +458,32 @@ if($result = $db->db_query($qry))
                   <ErsKz>".$row->ersatzkennzeichen."</ErsKz>";
 					}
 				}
+				//<HeimatStrasse><![CDATA[".$strasse."]]></HeimatStrasse>
 				$datei.="
 	          <StaatsangehoerigkeitCode>".$row->staatsbuergerschaft."</StaatsangehoerigkeitCode>
 	          <HeimatPLZ>".$plz."</HeimatPLZ>
 	          <HeimatGemeinde>".$gemeinde."</HeimatGemeinde>
-	          <HeimatStrasse><![CDATA[".$strasse."]]></HeimatStrasse>
 	          <HeimatNation>".$nation."</HeimatNation>
-	          <ZugangCode>".$row->zgv_code."</ZugangCode>";
-	          			if($row->zgvdatum!=null)
-				{
-					$datei.="
+	          <ZugangCode>".$row->zgv_code."</ZugangCode>
 	          <ZugangDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvdatum))."</ZugangDatum>";
-				}
-				else
+				
+				if($stgart==2)
 				{
 					$datei.="
-	          <ZugangDatum></ZugangDatum>";
-				}
-				//!!!stgart für Lehrgang überprüfen!!!
-			          if($stgart==2)
-			          {
-			          		$datei.="
-	          <ZugangMasterCode>".$row->zgvmas_code."</ZugangMasterCode>";
-	          				if($row->zgvmadatum!=null)
-					{
-			          			$datei.="
+	          <ZugangMasterCode>".$row->zgvmas_code."</ZugangMasterCode>
 	          <ZugangMasterDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvmadatum))."</ZugangMasterDatum>";
-					}
-					else
-					{
-						$datei.="
-		<ZugangMasterDatum></ZugangMasterDatum>";
-					}
-			          }
-			          $qryad="SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id='".$row->prestudent_id."' AND (status_kurzbz='Student'  OR status_kurzbz='Unterbrecher')  AND (tbl_prestudentstatus.datum<'".$bisdatum."') ORDER BY datum asc;";
-			          if($resultad = $db->db_query($qryad))
+				}
+				
+				$qryad="SELECT 
+							* 
+						FROM 
+							public.tbl_prestudentstatus 
+						WHERE 
+							prestudent_id=".$db->db_add_param($row->prestudent_id, FHC_INTEGER)."
+							AND (status_kurzbz='Student'  OR status_kurzbz='Unterbrecher')  
+							AND (tbl_prestudentstatus.datum<".$db->db_add_param($bisdatum).") ORDER BY datum asc;";
+				
+				if($resultad = $db->db_query($qryad))
 				{
 					if($rowad = $db->db_fetch_object($resultad))
 					{
@@ -557,44 +491,47 @@ if($result = $db->db_query($qry))
 	          <BeginnDatum>".date("dmY", $datumobj->mktime_fromdate($rowad->datum))."</BeginnDatum>";
 					}
 				}
-	          			if($aktstatus=='Absolvent')
+				
+				if($aktstatus=='Absolvent')
 				{
 					$datei.="
 	          <BeendigungsDatum>".date("dmY", $datumobj->mktime_fromdate($aktstatus_datum))."</BeendigungsDatum>";
 				}
 				$datei.="
-	          <TeilnehmerStatusCode>".$status."</TeilnehmerStatusCode>
-	 </LehrgangTeilnehmerIn>";				
+	          <StudStatusCode>".$status."</StudStatusCode>
+	 </StudentIn>";
 		}
 	}
 	$datei.="
-     </LehrgangStamm>
+     </Lehrgang>
   </LehrgangMeldung>
 </Erhalter>";
-	echo '	<html><head><title>BIS - Lehrgangsmeldung - ('.$stg_kz.')</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
-	</head><body>';
-	echo "<H1>BIS - Studentendaten werden &uuml;berpr&uuml;ft! Lehrgang: ".$stg_kz."</H1>\n";
+		
+	echo '
+	<html>
+		<head>
+		<title>BIS - Lehrgangsmeldung - '.$lehrgangsname.' ('.$lehrgangsnummer.')</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
+		</head>
+	<body>';
+	
+	echo "<H1>BIS - Studentendaten werden &uuml;berpr&uuml;ft! Lehrgang: ".$lehrgangsname.' ('.$lehrgangsnummer.")</H1>\n";
+	
 	if(strlen(trim($v))>0)
 	{
 		echo "<H2>Nicht plausible BIS-Daten (f&uuml;r Meldung ".$ssem."): </H2><br>";
 		echo nl2br($v."\n\n");	
 	}
-	$ddd='bisdaten/bismeldung_'.$ssem.'_Lehrgang'.$stg_kz.'.xml';
-	if(strtoupper($plausi)!='J')
-	{
-		$dateiausgabe=fopen($ddd,'w');
-		fwrite($dateiausgabe,$datei);
-		fclose($dateiausgabe);
-	}	
+	
+	$ddd='bisdaten/bismeldung_'.$ssem.'_Lehrgang'.$lehrgangsnummer.'.xml';
+	$dateiausgabe=fopen($ddd,'w');
+	fwrite($dateiausgabe,$datei);
+	fclose($dateiausgabe);
+	
 	if(file_exists($ddd))
 	{
-		echo "<a href=$ddd>XML-Datei f&uuml;r BIS-Meldung Lehrgang ".$stg_kz."</a><br>";
+		echo "<a href=$ddd>XML-Datei f&uuml;r BIS-Meldung Lehrgang ".$lehrgangsname.' ('.$lehrgangsnummer.")</a><br>";
 	}
-
-	//echo $datei;
-	
 }
-
 ?>
