@@ -95,13 +95,29 @@ function generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz)
 	
 	$jahr = substr($studiensemester_kurzbz, 4);
 	$art = substr($studiensemester_kurzbz, 0, 2);
-	switch($art)
+	
+	if($studiengang_kz<0)
 	{
-		case 'WS': $art = '1'; break;
-		case 'SS': $art = '2'; break;
-		default: $art = '0'; break;
+		$studiengang_kz=abs($studiengang_kz);
+		//Lehrgang
+		switch($art)
+		{
+			case 'WS': $art = '3'; break;
+			case 'SS': $art = '4'; break;
+			default: $art = '0'; break;
+		}
 	}
-	if($art=='2')
+	else
+	{
+		//Studiengang
+		switch($art)
+		{
+			case 'WS': $art = '1'; break;
+			case 'SS': $art = '2'; break;
+			default: $art = '0'; break;
+		}
+	}
+	if($art=='2' || $art=='4')
 		$jahr = $jahr-1;
 	$matrikelnummer = sprintf("%02d",$jahr).$art.sprintf("%04d",$studiengang_kz);
 
