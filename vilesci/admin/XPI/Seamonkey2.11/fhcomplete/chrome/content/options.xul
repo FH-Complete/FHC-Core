@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+
+<prefwindow id="fhcomplete-prefs"
+     title="FH Complete Einstellungen"
+     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+<prefpane id="fhcomplete-prefs-pane" label="FHComplete Server" image="../skin/fhcomplete.png">
+  <preferences>
+    <preference id="pref_url" name="extensions.fhcomplete.url" type="string"/>
+  </preferences>
+	<caption label="FH-Complete Server URL" />
+    <textbox preference="pref_url" id="url" maxlength="256" size="40"/>
+
+</prefpane>
+<prefpane id="fhcomplete-prefs-pane2" label="Erweiterte Einstellungen" image="../skin/settings.png">
+  <preferences>
+    <preference id="pref_fas_url" name="extensions.fhcomplete.fas_url" type="string"/>
+    <preference id="pref_tempus_url" name="extensions.fhcomplete.tempus_url" type="string"/>
+    <preference id="pref_planner_url" name="extensions.fhcomplete.planner_url" type="string"/>
+    <preference id="pref_default_app" name="extensions.fhcomplete.default_app" type="string"/>
+    <preference id="pref_app_load_delay" name="extensions.fhcomplete.app_load_delay" type="string"/>
+  </preferences>
+	<caption label="FAS URL" />
+    <textbox preference="pref_fas_url" id="fas_url" maxlength="256" size="40"/>
+	<caption label="Tempus URL" />
+    <textbox preference="pref_tempus_url" id="tempus_url" maxlength="256" size="40"/>
+	<caption label="Planner URL" />
+    <textbox preference="pref_planner_url" id="planner_url" maxlength="256" size="40"/>
+	<caption label="Default App" />
+    <textbox preference="pref_default_app" id="default_app" maxlength="256" size="40"/>
+	<caption label="Ladeverzögerung (erhöhen bei Authentifizierungsfehler)" />
+    <textbox preference="pref_app_load_delay" id="app_load_delay" maxlength="256" size="40"/>
+</prefpane>  
+</prefwindow>

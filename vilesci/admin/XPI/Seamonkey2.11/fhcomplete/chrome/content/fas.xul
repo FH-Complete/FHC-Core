@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE window >
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<window id="fhcomplete"
+		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" 
+		title="FAS" 
+		width="800"
+  		height="600"
+  		persist="screenX screenY width height sizemode"
+		onload="init(false);LoadApp('fas');"
+  	>
+	<script type="application/x-javascript" src="fhcomplete.js"/>
+	<browser id="fhcomplete_browser" type="content-primary" flex="1" src="about:blank"/>
+</window>

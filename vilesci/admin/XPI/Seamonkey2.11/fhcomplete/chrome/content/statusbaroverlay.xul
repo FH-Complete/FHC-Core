@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<overlay id="fhcomplete-overlay-browsertoolbar"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+<!-- Overlay für die Statusleiste mit Startern für die einzelnen Applikationen -->
+<script type="application/x-javascript" src="chrome://fhcomplete/content/fhcomplete.js"/>
+<statusbar id="status-bar">
+	<statusbarpanel id="fhcomplete-component-bar">
+	  <toolbarbutton id="fhcomplete-toolbarbutton-fas" oncommand="OpenApp('fas')" 
+		  tooltiptext="FAS" image="chrome://fhcomplete/skin/fasonline15.png"/>
+	  <toolbarbutton id="fhcomplete-toolbarbutton-tempus" oncommand="OpenApp('tempus')" 
+		  tooltiptext="Tempus" image="chrome://fhcomplete/skin/tempus15.png" insertbefore="fhcomplete-toolbarbutton-fas"/>
+	  <toolbarbutton id="fhcomplete-toolbarbutton-planner" oncommand="OpenApp('planner')" 
+		  tooltiptext="Planner" image="chrome://fhcomplete/skin/planner15.png" insertbefore="fhcomplete-toolbarbutton-tempus"/>
+	</statusbarpanel>
+</statusbar>
+</overlay>
