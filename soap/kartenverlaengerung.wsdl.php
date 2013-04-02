@@ -13,7 +13,7 @@ xmlns:xsd1="http://localhost/soap/projekt.xsd"
 xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
 
     <wsdl:message name="getNumberRequest">
-        <wsdl:part name="cardNr" type="xsd:string" minOccurs="0"></wsdl:part>
+        <wsdl:part name="cardNr" type="xsd:string" minOccurs="1"></wsdl:part>
     </wsdl:message>
 
     <wsdl:message name="getNumberResponse">
