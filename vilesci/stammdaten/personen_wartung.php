@@ -20,25 +20,28 @@
  *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-			
-// ***************************************************************
-// * Script zum Zusammenlegen Doppelter Studenten
-// * Es werden zwei Listen mit Studenten angezeigt
-// * Links wird der Student markiert, der mit dem
-// * rechts markierten zusammengelegt werden soll.
-// * Der linke Student wird danach entfernt.
-// ***************************************************************
+/**
+ * Script zum Zusammenlegen Doppelter Studenten
+ * Es werden zwei Listen mit Studenten angezeigt
+ * Links wird der Student markiert, der mit dem
+ * rechts markierten zusammengelegt werden soll.
+ * Der linke Student wird danach entfernt.
+ */
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/basis_db.class.php');
+require_once('../../include/person.class.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
-//DB Verbindung herstellen
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
-			
-	require_once('../../include/person.class.php');
-	require_once('../../include/functions.inc.php');
+$uid = get_uid();
 
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($uid);
+if(!$rechte->isBerechtigt('basis/person'))
+	die('Sie haben keine Berechtigung fuer diese Seite');
 
 $msg='';
 $outp='';
@@ -54,22 +57,6 @@ else
 	$person_id=NULL;
 }
 
-if (isset($_GET['order_1']) || isset($_POST['order_1']))
-{
-	$order_1=(isset($_GET['order_1'])?$_GET['order_1']:$_POST['order_1']);
-}
-else
-{
-	$order_1='person_id';
-}
-if (isset($_GET['order_2']) || isset($_POST['order_2']))
-{
-	$order_2=(isset($_GET['order_2'])?$_GET['order_2']:$_POST['order_2']);
-}
-else
-{
-	$order_2='person_id';
-}
 if (isset($_GET['radio_1']) || isset($_POST['radio_1']))
 {
 	$radio_1=(isset($_GET['radio_1'])?$_GET['radio_1']:$_POST['radio_1']);
@@ -87,18 +74,6 @@ else
 	$radio_2=-1;
 }
 
-function kuerze($string)
-{
-	if(strlen($string)>40)
-	{
-		return substr($string,0,35)."...";
-	}
-	else
-	{
-		return $string;
-	}
-}
-
 if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 {
 	if($radio_1==$radio_2)
@@ -107,148 +82,169 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 	}
 	else
 	{
-		$msg='';
-		$sql_query_upd1="BEGIN;";
-		$sql_query_upd1.="UPDATE public.tbl_benutzer SET person_id='$radio_2' WHERE person_id='$radio_1';";
-		$sql_query_upd1.="UPDATE public.tbl_konto SET person_id='$radio_2' WHERE person_id='$radio_1';";
-		$sql_query_upd1.="UPDATE public.tbl_prestudent SET person_id='$radio_2' WHERE person_id='$radio_1';";
-		//$sql_query_upd1.="UPDATE sync.tbl_syncperson SET person_portal='$radio_2' WHERE person_portal='$radio_1';";
-		$sql_query_upd1.="UPDATE lehre.tbl_abschlusspruefung SET pruefer1='$radio_2' WHERE pruefer1='$radio_1';";
-		$sql_query_upd1.="UPDATE lehre.tbl_abschlusspruefung SET pruefer2='$radio_2' WHERE pruefer2='$radio_1';";
-		$sql_query_upd1.="UPDATE lehre.tbl_abschlusspruefung SET pruefer3='$radio_2' WHERE pruefer3='$radio_1';";
-		$sql_query_upd1.="UPDATE lehre.tbl_projektbetreuer SET person_id='$radio_2' WHERE person_id='$radio_1';";
-		$sql_query_upd1.="UPDATE public.tbl_adresse SET person_id='$radio_2' WHERE person_id='$radio_1';";
-		$sql_query_upd1.="UPDATE public.tbl_akte SET person_id='$radio_2' WHERE person_id='$radio_1';";
-		$sql_query_upd1.="UPDATE public.tbl_bankverbindung SET person_id='$radio_2' WHERE person_id='$radio_1';";
-		$sql_query_upd1.="UPDATE public.tbl_kontakt SET person_id='$radio_2' WHERE person_id='$radio_1';";
-
-  	$sql_query_upd1.="UPDATE wawi.tbl_betriebsmittelperson SET person_id='$radio_2' WHERE person_id='$radio_1';";
-
-		$sql_query_upd1.="UPDATE public.tbl_preinteressent SET person_id='$radio_2' WHERE person_id='$radio_1';";
-		$sql_query_upd1.="UPDATE public.tbl_personfunktionstandort SET person_id='$radio_2' WHERE person_id='$radio_1';";
-
-
-		$sql_query_upd1.="DELETE FROM public.tbl_person WHERE person_id='$radio_1';";
-
-		if($db->db_query($sql_query_upd1))
+		$person = new person();
+		if($person->load($radio_1))
 		{
-			$msg = "Daten erfolgreich gespeichert<br>";
-			$msg .= "<br>".mb_eregi_replace(';',';<br>',$sql_query_upd1);
-			$db->db_query("COMMIT;");
-			if(@$db->db_query('SELECT person_portal FROM sync.tbl_syncperson LIMIT 1'))
+			$msg='';
+			$sql_query_upd1="BEGIN;";
+			// Wenn bei einer der Personen das Foto gesperrt ist, dann die Sperre uebernehmen
+			if($person->foto_sperre)
+				$sql_query_upd1.="UPDATE public.tbl_person SET foto_sperre=true WHERE person_id=".$db->db_add_param($radio_2, FHC_INTEGER).";";
+
+			// Wenn die zu loeschende Person ein Foto hat, und die andere nicht, 
+			// dann wird das Foto uebernommen
+			if($person->foto!='')
 			{
-				$msg.= "<br><br>Sync-Tabelle wird aktualisiert";
-				$sql_query_upd1="UPDATE sync.tbl_syncperson SET person_portal='$radio_2' WHERE person_portal='$radio_1';";
-				$db->db_query($sql_query_upd1);
-				$msg.= "<br>".mb_eregi_replace(';',';<br>',$sql_query_upd1)."COMMIT";
+				$person2 = new person();
+				$person2->load($radio_2);
+				if($person2->foto=='')
+				{
+					$sql_query_upd1.="UPDATE public.tbl_person SET foto=".$db->db_add_param($person->foto)." WHERE person_id=".$db->db_add_param($radio_2, FHC_INTEGER).";";
+				}
 			}
-			if(@$db->db_query('SELECT person_id FROM sync.tbl_syncperson LIMIT 1'))
+
+			$sql_query_upd1.="UPDATE wawi.tbl_betriebsmittelperson SET person_id=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";
+			$sql_query_upd1.="UPDATE public.tbl_benutzer SET person_id=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";
+			$sql_query_upd1.="UPDATE public.tbl_konto SET person_id=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";
+			$sql_query_upd1.="UPDATE public.tbl_prestudent SET person_id=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";
+			$sql_query_upd1.="UPDATE lehre.tbl_abschlusspruefung SET pruefer1=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE pruefer1=".$db->db_add_param($radio_1, FHC_INTEGER).";";
+			$sql_query_upd1.="UPDATE lehre.tbl_abschlusspruefung SET pruefer2=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE pruefer2=".$db->db_add_param($radio_1, FHC_INTEGER).";";
+			$sql_query_upd1.="UPDATE lehre.tbl_abschlusspruefung SET pruefer3=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE pruefer3=".$db->db_add_param($radio_1, FHC_INTEGER).";";
+			$sql_query_upd1.="UPDATE lehre.tbl_projektbetreuer SET person_id=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";
+			$sql_query_upd1.="UPDATE public.tbl_adresse SET person_id=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";
+			$sql_query_upd1.="UPDATE public.tbl_akte SET person_id=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";
+			$sql_query_upd1.="UPDATE public.tbl_bankverbindung SET person_id=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";
+			$sql_query_upd1.="UPDATE public.tbl_kontakt SET person_id=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";			
+			$sql_query_upd1.="UPDATE public.tbl_preinteressent SET person_id=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";
+			$sql_query_upd1.="UPDATE public.tbl_personfunktionstandort SET person_id=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";
+
+			$sql_query_upd1.="DELETE FROM public.tbl_person WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";
+
+			if($db->db_query($sql_query_upd1))
 			{
-				$msg.= "<br><br>Sync-Tabelle wird aktualisiert";
-				$sql_query_upd1="UPDATE sync.tbl_syncperson SET person_id='$radio_2' WHERE person_id='$radio_1';";
-				$db->db_query($sql_query_upd1);
-				$msg.= "<br>".mb_eregi_replace(';',';<br>',$sql_query_upd1)."COMMIT";
+				$msg = "Daten erfolgreich gespeichert<br>";
+				$msg .= "<br>".mb_eregi_replace(';',';<br>',$sql_query_upd1);
+				$db->db_query("COMMIT;");
 			}
+			else
+			{
+				$msg = "Die Änderung konnte nicht durchgeführt werden!";
+				$db->db_query("ROLLBACK;");
+				$msg.= "<br>".mb_eregi_replace(';',';<br><b>',$sql_query_upd1)."ROLLBACK</b>";
+			}
+			$radio_1=0;
+			$radio_2=0;
 		}
 		else
 		{
-			$msg = "Die Änderung konnte nicht durchgeführt werden!";
-			$db->db_query("ROLLBACK;");
-			$msg.= "<br>".mb_eregi_replace(';',';<br><b>',$sql_query_upd1)."ROLLBACK</b>";
+			$msg = "Fehler beim Laden von Person1";
 		}
-		$radio_1=0;
-		$radio_2=0;
 	}
 }
 if((isset($radio_1) && !isset($radio_2))||(!isset($radio_1) && isset($radio_2)) || ($radio_1<0 || $radio_2<0))
 {
 	$msg="Es muß je ein Radio-Button pro Tabelle angeklickt werden";
 }
-?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="../../skin/fhcomplete.css" rel="stylesheet" type="text/css">
+	<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
+	<link href="../../skin/jquery.css" rel="stylesheet" type="text/css"/>
+	<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>
+	<link href="../../skin/tablesort.css" rel="stylesheet" type="text/css"/>
+	<script type="text/javascript">
+	
+	$(document).ready(function() 
+	{ 
+		$('#t1').tablesorter(
+		{
+			sortList: [[1,0]],
+			widgets: ["zebra"]
+		}); 
+		$('#t2').tablesorter(
+		{
+			sortList: [[2,0]],
+			widgets: ["zebra"]
+		}); 
 
-<title>Personen-Zusammenlegung</title>
+	});
+	</script>
+
+	<title>Personen-Zusammenlegung</title>
 </head>
 <body>
-
-<H1>Zusammenlegen von Personendatensaetzen</H1>
+<H1>Zusammenlegen von Personendatensätzen</H1>
 
 <?php
 echo $outp;
 echo "<form name='suche' action='personen_wartung.php' method='POST'>";
-echo "<input name=\"filter\" type=\"text\" value=\"$filter\" size=\"64\" maxlength=\"64\">";
-echo "<input type='submit' value=' suchen '>";
+echo '<input name="filter" type="text" value="'.$db->convert_html_chars($filter).'" size="64" maxlength="64">';
+echo '<input type="submit" value=" suchen ">';
 echo "</form>";
 
-//aufruf
-?>
-<br>
-<center><h2><?php echo "<span style=\"font-size:0.7em\">".$msg."</span>"; ?></h2></center>
-<br>
-<?php
+echo '<br>
+	<center>
+	<h2><span style="font-size:0.7em">'.$msg.'</span></h2></center>
+	<br>';
+
 	//Tabellen anzeigen
-	echo "<form name='form_table' action='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=$order_2&filter=$filter' method='POST'>";
+	echo '<form name="form_table" action="personen_wartung.php?uid='.$db->convert_html_chars($person_id).'&filter='.$db->convert_html_chars($filter).'" method="POST">';
 	echo "<table width='100%' border='0' cellspacing='0' cellpadding='0'>";
 	echo "<tr>";
 
 	echo "<td valign='top'>Der wird gelöscht:";
 
 	 //Tabelle 1
-	 echo "<table class='liste'><tr class='liste'>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=person_id&order_2=$order_2&filter=$filter'>ID</a></th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=nachname&order_2=$order_2&filter=$filter'>Nachname</a></th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=vorname&order_2=$order_2&filter=$filter'>Vorname</a></th>";
-	 echo "<th>Geburtsdatum</th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=svnr&order_2=$order_2&filter=$filter'>SVNr</a></th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=ersatzkennzeichen&order_2=$order_2&filter=$filter'>Ersatzkennz.</a></th>";
-	 echo "<th>Ext-ID</th>";
-	 echo "<th>&nbsp;</th></tr>";
+	 echo '<table id="t1" class="tablesorter"><thead><tr>';
+	 echo "<th>ID</th>";
+	 echo "<th>Nachname</th>";
+	 echo "<th>Vorname</th>";
+	 echo "<th>Geb.datum</th>";
+	 echo "<th>SVNr</th>";
+	 echo "<th>Ersatzkennz.</th>";
+	 echo "<th>&nbsp;</th></tr></thead><tbody>";
 
 	 $lf  = new person();
-	 $lf->getTab($filter, $order_1);
+	 $lf->getTab($filter);
 	 $i=0;
 	 foreach($lf->personen as $l)
 	 {
-	 	echo "<tr class='liste".($i%2)."'>";
+	 	echo "<tr>";
 	 	echo "<td>$l->person_id</td>";
 	 	echo "<td>$l->nachname</td>";
 	 	echo "<td>$l->vorname</td>";
 	 	echo "<td>$l->gebdatum</td>";
 	 	echo "<td>$l->svnr</td>";
 	 	echo "<td>$l->ersatzkennzeichen</td>";
-	 	echo "<td>$l->ext_id</td>";
 	 	echo "<td><input type='radio' name='radio_1' value='$l->person_id' ".((isset($radio_1) && $radio_1==$l->person_id)?'checked':'')."></td>";
 	 	echo "</tr>";
 	 	$i++;
 	 }
-	 echo "</table>";
+	 echo "</tbody></table>";
 	 echo "</td>";
 	 echo "<td valign='top'><input type='submit' value='  ->  '></td>";
 	 echo "<td valign='top'>Der bleibt:";
 
 	 //Tabelle 2
-	 echo "<table class='liste'><tr class='liste'>";
+	 echo '<table id="t2" class="tablesorter"><thead><tr>';
 	 echo "<th>&nbsp;</th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=person_id&filter=$filter'>ID</a></th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=nachname&filter=$filter'>Nachname</a></th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=vorname&filter=$filter'>Vorname</a></th>";
-	 echo "<th>Geburtsdatum</th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=svnr&filter=$filter'>SVNr</a></th>";
-	 echo "<th><a href='personen_wartung.php?uid=$person_id&order_1=$order_1&order_2=ersatzkennzeichen&filter=$filter'>Ersatzkennz.</a></th>";
-	 echo "<th>Ext-ID</th>";
-	 echo "</tr>";
+	 echo "<th>ID</th>";
+	 echo "<th>Nachname</th>";
+	 echo "<th>Vorname</th>";
+	 echo "<th>Geb.datum</th>";
+	 echo "<th>SVNr</th>";
+	 echo "<th>Ersatzkennz.</th>";
+	 echo "</tr></thead><tbody>";
 
 	 $lf  = new person();
-	 $lf->getTab($filter, $order_2);
+	 $lf->getTab($filter);
 	 $i=0;
 	 foreach($lf->personen as $l)
 	 {
-	 	echo "<tr class='liste".($i%2)."'>";
+	 	echo "<tr>";
 	 	echo "<td><input type='radio' name='radio_2' value='$l->person_id' ".((isset($radio_2) && $radio_2==$l->person_id)?'checked':'')."></td>";
 	 	echo "<td>$l->person_id</td>";
 	 	echo "<td>$l->nachname</td>";
@@ -256,11 +252,10 @@ echo "</form>";
 	 	echo "<td>$l->gebdatum</td>";
 	 	echo "<td>$l->svnr</td>";
 	 	echo "<td>$l->ersatzkennzeichen</td>";
-	 	echo "<td>$l->ext_id</td>";
 	 	echo "</tr>";
 	 	$i++;
 	 }
-	 echo "</table>";
+	 echo "</tbody></table>";
 	 echo "</td>";
 	 echo "</tr>";
 	 echo "</table>";
