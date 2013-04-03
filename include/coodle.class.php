@@ -1176,5 +1176,45 @@ class coodle extends basis_db
     		return false;
     	}
     }
+    
+	/**
+     * Liefert alle Coodle Umfragen die das Beendigungsdatum erreicht haben 
+     * und noch nicht abgeschlossen sind
+     * @return true wenn ok, false im Fehlerfall 
+     */
+    public function getCoodleBeendet()
+    {
+        $qry = "SELECT * 
+                    FROM campus.tbl_coodle 
+                WHERE 
+                    endedatum = CURRENT_DATE - interval '1 day'
+                    AND coodle_status_kurzbz='laufend';"; 
+        
+        if(!$this->db_query($qry))
+        {
+            $this->errormsg = 'Fehler bei der Abfrage aufgetreten'; 
+            return false; 
+        }
+        
+        while($row = $this->db_fetch_object())
+        {
+            $coodle = new coodle(); 
+            $coodle->coodle_id = $row->coodle_id; 
+            $coodle->titel = $row->titel; 
+            $coodle->beschreibung = $row->beschreibung; 
+            $coodle->coodle_status_kurzbz = $row->coodle_status_kurzbz; 
+            $coodle->dauer = $row->dauer; 
+            $coodle->insertamum = $row->insertamum; 
+            $coodle->insertvon = $row->insertvon; 
+            $coodle->updateamum = $row->updateamum; 
+            $coodle->updatevon = $row->updatevon; 
+            $coodle->endedatum = $row->endedatum; 
+            $coodle->ersteller_uid = $row->ersteller_uid; 
+            
+            $this->result[] = $coodle; 
+        }
+        
+        return true; 
+    }
 }
 ?>
