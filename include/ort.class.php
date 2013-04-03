@@ -45,6 +45,10 @@ class ort extends basis_db
 	public $stockwerk;			// integer
 	public $standort_id; 	// varchar(16)
 	public $telefonklappe;		// varchar(8)
+	public $updateamum;		// timestamp without timezone
+	public $updatevon;		// varchar(32)
+	public $insertamum;		// timestamp without timezone
+	public $insertvon;		// varchar(32)
 
 	/**
 	 * Konstruktor
@@ -200,7 +204,7 @@ class ort extends basis_db
 		{
 			//Neuen Datensatz anlegen
 			$qry = 'INSERT INTO public.tbl_ort (ort_kurzbz, bezeichnung, planbezeichnung, max_person, aktiv, lehre, reservieren, lageplan,
-				dislozierung, kosten, stockwerk, standort_id, telefonklappe) VALUES ('.
+				dislozierung, kosten, stockwerk, standort_id, telefonklappe, insertamum, insertvon, updateamum, updatevon) VALUES ('.
 				$this->db_add_param($this->ort_kurzbz).', '.
 				$this->db_add_param($this->bezeichnung).', '.
 				$this->db_add_param($this->planbezeichnung).', '.
@@ -213,7 +217,11 @@ class ort extends basis_db
 				$this->db_add_param(str_replace(",",".",$this->kosten)).', '.
 				$this->db_add_param($this->stockwerk).','.
 				$this->db_add_param($this->standort_id).','.
-				$this->db_add_param($this->telefonklappe).');';
+				$this->db_add_param($this->telefonklappe).','.
+				$this->db_add_param($this->insertamum).','.
+				$this->db_add_param($this->insertvon).','.
+				$this->db_add_param($this->updateamum).','.
+				$this->db_add_param($this->updatevon).');';
 		}
 		else
 		{
@@ -231,7 +239,9 @@ class ort extends basis_db
 				'kosten='.$this->db_add_param(str_replace(",",".",$this->kosten)).', '.
 				'standort_id='.$this->db_add_param($this->standort_id).', '.
 				'telefonklappe='.$this->db_add_param($this->telefonklappe).', '.
-				'stockwerk='.$this->db_add_param($this->stockwerk).' '.
+				'stockwerk='.$this->db_add_param($this->stockwerk).', '.
+				'updateamum='.$this->db_add_param($this->updateamum).', '.
+				'updatevon='.$this->db_add_param($this->updatevon).' '.
 				'WHERE ort_kurzbz = '.$this->db_add_param($this->ort_kurzbz).';';
 		}
 
