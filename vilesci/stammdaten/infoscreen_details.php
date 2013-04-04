@@ -190,15 +190,17 @@ $datum_obj = new datum();
 			</thead>
 			<tbody>';
 			
-	$jetzt = date('d.m.Y H:i:s');
+	$jetzt = time();
 	$aktiv=false;
 
 	foreach($infoscreen->result as $row)
 	{
 		$content = new content();
 		$content->getContent($row->content_id, 'German');
+		$gueltigvon=$datum_obj->mktime_fromtimestamp($row->gueltigvon);
+		$gueltigbis=$datum_obj->formatDatum($row->gueltigbis,'d.m.Y H:i:s');
 		
-		if ((($datum_obj->formatDatum($row->gueltigvon,'d.m.Y H:i:s') <= $jetzt) || ($row->gueltigvon==NULL)) && (($datum_obj->formatDatum($row->gueltigbis,'d.m.Y H:i:s') >= $jetzt) || ($row->gueltigbis==NULL)))
+		if ((($gueltigvon<=$jetzt) || ($gueltigvon=='')) && (($gueltigbis>=$jetzt) || ($gueltigbis=='')))
 			$aktiv=true;
 		else 
 			$aktiv=false;
