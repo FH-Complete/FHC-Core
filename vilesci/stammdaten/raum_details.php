@@ -58,6 +58,7 @@
 	$stockwerk = '';
 	$standort_id = '';
 	$telefonklappe = '';
+	$content_id='';
 	
 	$neu = "true";
 	
@@ -77,6 +78,7 @@
 		$stockwerk = $_POST["stockwerk"];
 		$standort_id = $_POST["standort_id"];
 		$telefonklappe = $_POST["telefonklappe"];
+		$content_id = $_POST['content_id'];
 
 		
 		$sg_update = new ort();
@@ -94,6 +96,7 @@
 		$sg_update->stockwerk = $stockwerk;
 		$sg_update->telefonklappe = $telefonklappe;
 		$sg_update->standort_id = $standort_id;
+		$sg_update->content_id = $content_id;
 
 		
 		if ($_POST["neu"] == "true")
@@ -130,6 +133,7 @@
 		$stockwerk = $sg->stockwerk;
 		$standort_id = $sg->standort_id;
 		$telefonklappe = $sg->telefonklappe;
+		$content_id = $sg->content_id;
 		$neu = "false";
 	}
 		
@@ -229,7 +233,9 @@
 	$htmlstr .= " 					<td><textarea name='lageplan' cols='37' rows='5' onchange='submitable()'>".$lageplan."</textarea></td>\n";
 	//$htmlstr .= " 					<td>\n</td>\n<td>\n</td>\n";
 	$htmlstr .= "					<td valign='top'>Ausstattung</td>\n";
-	$htmlstr .= " 					<td colspan='2'><textarea name='ausstattung' cols='37' rows='5' onchange='submitable()'>".$ausstattung."</textarea></td>\n";
+	$htmlstr .= " 					<td><textarea name='ausstattung' cols='37' rows='5' onchange='submitable()'>".$ausstattung."</textarea></td>\n";
+	$htmlstr .= "					<td valign='top'>ContentID</td>\n";
+	$htmlstr .= " 					<td valign='top'><input type='text' name='content_id' size='5' onchange='submitable()' value='".$content_id."' /></td>\n";
 	$htmlstr .= "				</tr>\n";
 	$htmlstr .= "</table>\n";
 	$htmlstr .= "<br>\n";

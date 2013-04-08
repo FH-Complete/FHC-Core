@@ -49,6 +49,7 @@ class ort extends basis_db
 	public $updatevon;		// varchar(32)
 	public $insertamum;		// timestamp without timezone
 	public $insertvon;		// varchar(32)
+	public $content_id;
 
 	/**
 	 * Konstruktor
@@ -104,8 +105,9 @@ class ort extends basis_db
 			$ort_obj->reservieren		= $this->db_parse_bool($row->reservieren);
 			$ort_obj->ausstattung		= $row->ausstattung;
 			$ort_obj->stockwerk			= $row->stockwerk;
-			$ort_obj->standort_id	= $row->standort_id;
+			$ort_obj->standort_id		= $row->standort_id;
 			$ort_obj->telefonklappe		= $row->telefonklappe;
+			$ort_obj->content_id		= $row->content_id;
 
 			$this->result[] = $ort_obj;
 		}
@@ -147,8 +149,9 @@ class ort extends basis_db
 			$this->reservieren		= $this->db_parse_bool($row->reservieren);
 			$this->ausstattung		= $row->ausstattung;
 			$this->stockwerk		= $row->stockwerk;
-			$this->standort_id	= $row->standort_id;
+			$this->standort_id		= $row->standort_id;
 			$this->telefonklappe	= $row->telefonklappe;
+			$this->content_id 		= $row->content_id;
 		}
 		else
 		{
@@ -204,7 +207,7 @@ class ort extends basis_db
 		{
 			//Neuen Datensatz anlegen
 			$qry = 'INSERT INTO public.tbl_ort (ort_kurzbz, bezeichnung, planbezeichnung, max_person, aktiv, lehre, reservieren, lageplan,
-				dislozierung, kosten, stockwerk, standort_id, telefonklappe, insertamum, insertvon, updateamum, updatevon) VALUES ('.
+				dislozierung, kosten, stockwerk, standort_id, telefonklappe, insertamum, insertvon, updateamum, updatevon, content_id) VALUES ('.
 				$this->db_add_param($this->ort_kurzbz).', '.
 				$this->db_add_param($this->bezeichnung).', '.
 				$this->db_add_param($this->planbezeichnung).', '.
@@ -221,7 +224,8 @@ class ort extends basis_db
 				$this->db_add_param($this->insertamum).','.
 				$this->db_add_param($this->insertvon).','.
 				$this->db_add_param($this->updateamum).','.
-				$this->db_add_param($this->updatevon).');';
+				$this->db_add_param($this->updatevon).','.
+				$this->db_add_param($this->content_id).');';
 		}
 		else
 		{
@@ -241,7 +245,8 @@ class ort extends basis_db
 				'telefonklappe='.$this->db_add_param($this->telefonklappe).', '.
 				'stockwerk='.$this->db_add_param($this->stockwerk).', '.
 				'updateamum='.$this->db_add_param($this->updateamum).', '.
-				'updatevon='.$this->db_add_param($this->updatevon).' '.
+				'updatevon='.$this->db_add_param($this->updatevon).', '.
+				'content_id='.$this->db_add_param($this->content_id).' '.
 				'WHERE ort_kurzbz = '.$this->db_add_param($this->ort_kurzbz).';';
 		}
 
@@ -352,8 +357,9 @@ class ort extends basis_db
 				$ort_obj->reservieren		= $this->db_parse_bool($row->reservieren);
 				$ort_obj->ausstattung		= $row->ausstattung;
 				$ort_obj->stockwerk			= $row->stockwerk;
-				$ort_obj->standort_id	= $row->standort_id;
+				$ort_obj->standort_id		= $row->standort_id;
 				$ort_obj->telefonklappe		= $row->telefonklappe;
+				$ort_obj->content_id 		= $row->content_id;
 	
 				$this->result[] = $ort_obj;
 			}
@@ -404,8 +410,9 @@ class ort extends basis_db
 			$ort_obj->reservieren		= $this->db_parse_bool($row->reservieren);
 			$ort_obj->ausstattung		= $row->ausstattung;
 			$ort_obj->stockwerk			= $row->stockwerk;
-			$ort_obj->standort_id	= $row->standort_id;
+			$ort_obj->standort_id		= $row->standort_id;
 			$ort_obj->telefonklappe		= $row->telefonklappe;
+			$ort_obj->content_id		= $row->content_id;
 
 			$this->result[] = $ort_obj;
 		}
