@@ -32,11 +32,6 @@ require_once('../../include/benutzerberechtigung.class.php');
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
-function myaddslashes($var)
-{
-	return ($var!=''?"'".addslashes($var)."'":'null');
-}
-
 $user = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
@@ -48,6 +43,22 @@ $ausbildungssemester=0;
 $s=new studiengang();
 $s->loadArray($rechte->getStgKz('student/vorrueckung'),'typ, kurzbz', true);
 $studiengang=$s->result;
+
+echo '<html>
+<head>
+	<title>Studenten Vorrueckung</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+	<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+	<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+</head>
+<body class="Background_main">';
+
+// Output flushen damit nach dem aendern des Dropdowns gleich die neue Seite geladen wird.
+// Sonst wird bei zu langen Ladezeiten vom User noch auf einen anderen Link gedrueckt und der Studiengang
+// wieder zurueckgesetzt 
+ob_flush();
+flush();
 
 //Einlesen der studiensemester in einen Array
 $ss = new studiensemester();
@@ -94,7 +105,6 @@ else
 {
 	if (!$studiensemester_kurzbz=$ss->getakt())
 		$studiensemester_kurzbz=$ss->getaktorNext();
-	
 }
 //ausgangssemester für vorrückung
 if (isset($_GET['studiensemester_kurzbz_akt']) || isset($_POST['studiensemester_kurzbz_akt']))
@@ -104,7 +114,8 @@ if (isset($_GET['studiensemester_kurzbz_akt']) || isset($_POST['studiensemester_
 else
 {
 #	$studiensemester_kurzbz_akt=$studiensemester_kurzbz;
-	$studiensemester_kurzbz_akt=$ss->getPrevious();
+#	$studiensemester_kurzbz_akt=$ss->getPrevious();
+	$studiensemester_kurzbz_akt=$ss->getLastOrAktSemester(30);
 }
 //zielsemester für vorrückung
 if (isset($_GET['studiensemester_kurzbz_zk']) || isset($_POST['studiensemester_kurzbz_zk']))
@@ -116,12 +127,11 @@ else
 	$studiensemester_kurzbz_zk=$ss->getNextFrom($studiensemester_kurzbz_akt);
 }
 
-
-
 if(!is_numeric($stg_kz))
 {
 	$stg_kz=0;
 }
+
 //semester=100 bedeutet die Auswahl aller Semester
 if(!is_numeric($semester))
 {
@@ -143,11 +153,11 @@ $sql_query="SELECT tbl_student.*,tbl_person.*, tbl_studentlehrverband.semester a
 			tbl_studentlehrverband.gruppe as gruppe_stlv FROM tbl_studentlehrverband JOIN tbl_student USING (student_uid)
 				JOIN tbl_benutzer ON (student_uid=uid)
 				JOIN tbl_person USING (person_id)
-			WHERE tbl_benutzer.aktiv AND tbl_studentlehrverband.studiengang_kz='$stg_kz' 
-			AND studiensemester_kurzbz='$studiensemester_kurzbz' ";
+			WHERE tbl_benutzer.aktiv AND tbl_studentlehrverband.studiengang_kz=".$db->db_add_param($stg_kz, FHC_INTEGER)." 
+			AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz);
 if($semester<100)
 {
-	$sql_query.="AND tbl_studentlehrverband.semester='$semester' "; //semester = 100 wählt alle aus
+	$sql_query.="AND tbl_studentlehrverband.semester=".$db->db_add_param($semester, FHC_INTEGER); //semester = 100 wählt alle aus
 }
 $sql_query.="ORDER BY semester, nachname";
 
@@ -173,12 +183,12 @@ if (isset($_POST['vorr']))
 				tbl_studentlehrverband.gruppe as gruppe_stlv FROM tbl_studentlehrverband JOIN tbl_student USING (student_uid)
 				JOIN tbl_benutzer ON (student_uid=uid)
 				JOIN tbl_person USING (person_id)
-				WHERE tbl_benutzer.aktiv AND tbl_studentlehrverband.studiengang_kz='$stg_kz' 
-				AND studiensemester_kurzbz='$studiensemester_kurzbz_akt'";
+				WHERE tbl_benutzer.aktiv AND tbl_studentlehrverband.studiengang_kz=".$db->db_add_param($stg_kz, FHC_INTEGER)." 
+				AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz_akt);
 	
 	if($semester<100)
 	{
-		$sql_query.="AND tbl_studentlehrverband.semester='$semesterv' "; //semester = 100 wählt alle aus
+		$sql_query.="AND tbl_studentlehrverband.semester=".$db->db_add_param($semesterv); //semester = 100 wählt alle aus
 	}
 	$sql_query.="ORDER BY semester, nachname";
 	
@@ -192,9 +202,9 @@ if (isset($_POST['vorr']))
 	{
 		//aktuelle Rolle laden
 		$qry_status="SELECT * FROM public.tbl_prestudentstatus JOIN public.tbl_prestudent USING(prestudent_id) 
-		WHERE person_id=".myaddslashes($row->person_id)." 
-		AND studiengang_kz=".$row->studiengang_kz."  
-		AND studiensemester_kurzbz=".myaddslashes($studiensemester_kurzbz_akt)." 
+		WHERE prestudent_id=".$db->db_add_param($row->prestudent_id, FHC_INTEGER)."
+		AND studiengang_kz=".$db->db_add_param($row->studiengang_kz, FHC_INTEGER)."  
+		AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz_akt)." 
 		ORDER BY datum desc, tbl_prestudentstatus.insertamum desc, tbl_prestudentstatus.ext_id desc LIMIT 1;";
 		if ($result_status=$db->db_query($qry_status))
 		{
@@ -219,41 +229,41 @@ if (isset($_POST['vorr']))
 				}
 				//Lehrverbandgruppe anlegen, wenn noch nicht vorhanden
 				$qry_lvb="SELECT * FROM public.tbl_lehrverband 
-				WHERE studiengang_kz=".myaddslashes($row->studiengang_kz)." AND semester=".myaddslashes($s)."
-				AND verband=".myaddslashes($row->verband_stlv)." AND gruppe=".myaddslashes($row->gruppe_stlv).";";
+				WHERE studiengang_kz=".$db->db_add_param($row->studiengang_kz, FHC_INTEGER)." AND semester=".$db->db_add_param($s)."
+				AND verband=".$db->db_add_param($row->verband_stlv)." AND gruppe=".$db->db_add_param($row->gruppe_stlv).";";
 				if($db->db_num_rows($db->db_query($qry_lvb))<1)
 				{
 					$lvb_ins="INSERT INTO public.tbl_lehrverband (studiengang_kz, semester, verband, gruppe, aktiv, bezeichnung, ext_id) VALUES (".
-					myaddslashes($row->studiengang_kz).", ".
-					myaddslashes($s).", ".
-					myaddslashes($row->verband_stlv).", ".
-					myaddslashes($row->gruppe_stlv).", 
+					$db->db_add_param($row->studiengang_kz).", ".
+					$db->db_add_param($s).", ".
+					$db->db_add_param($row->verband_stlv).", ".
+					$db->db_add_param($row->gruppe_stlv).", 
 					TRUE, NULL, NULL);";
 					if (!$r=$db->db_query($lvb_ins))
 						die($db->db_last_error());
 				}
 				//Überprüfen ob Eintrag schon vorhanden
 				$qry_chk="SELECT * FROM public.tbl_studentlehrverband 
-						WHERE student_uid=".myaddslashes($row->student_uid)." 
-						AND studiensemester_kurzbz=".myaddslashes($next_ss).";";
+						WHERE student_uid=".$db->db_add_param($row->student_uid)." 
+						AND studiensemester_kurzbz=".$db->db_add_param($next_ss).";";
 				$sql='';
 				if($db->db_num_rows($db->db_query($qry_chk))<1)
 				{
 					//Eintragen der neuen Gruppe
 					$sql="INSERT INTO tbl_studentlehrverband (student_uid, studiensemester_kurzbz, studiengang_kz, semester, verband, gruppe, updateamum, updatevon, insertamum, insertvon, ext_id) 
-						VALUES ('$row->student_uid','$next_ss','$row->studiengang_kz',
-						'$s','$row->verband_stlv','$row->gruppe_stlv',NULL,NULL,now(),'$user',NULL);";
+						VALUES (".$db->db_add_param($row->student_uid).",".$db->db_add_param($next_ss).",".$db->db_add_param($row->studiengang_kz).",
+						".$db->db_add_param($s).",".$db->db_add_param($row->verband_stlv).",".$db->db_add_param($row->gruppe_stlv).",NULL,NULL,now(),".$db->db_add_param($user).",NULL);";
 				}
 				$qry_chk="SELECT * FROM public.tbl_prestudentstatus
-						WHERE prestudent_id=".myaddslashes($row->prestudent_id)." 
-						AND studiensemester_kurzbz=".myaddslashes($next_ss).";";
+						WHERE prestudent_id=".$db->db_add_param($row->prestudent_id)." 
+						AND studiensemester_kurzbz=".$db->db_add_param($next_ss).";";
 				if($db->db_num_rows($db->db_query($qry_chk))<1)
 				{
 					//Eintragen des neuen Status
 					$sql.="INSERT INTO tbl_prestudentstatus (prestudent_id, status_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz)
-					VALUES ($row->prestudent_id, '$row_status->status_kurzbz', '$next_ss',
-						$ausbildungssemester, now(), now(), '$user',
-					NULL, NULL, NULL, ".myaddslashes($row_status->orgform_kurzbz).");";
+					VALUES (".$db->db_add_param($row->prestudent_id).", ".$db->db_add_param($row_status->status_kurzbz).", ".$db->db_add_param($next_ss).",
+						".$db->db_add_param($ausbildungssemester).", now(), now(), ".$db->db_add_param($user).",
+					NULL, NULL, NULL, ".$db->db_add_param($row_status->orgform_kurzbz).");";
 				}
 				if($sql!='')
 				{
@@ -330,23 +340,13 @@ foreach ($ss_arr AS $sts3)
 $outp.="		</select>\n";
 $outp.="<BR>Vorr&uuml;ckung von ".$studiensemester_kurzbz_akt." / ".($semesterv<100?$semesterv.".":'alle')." Semester  -> ".$studiensemester_kurzbz_zk;
 
-//Aufbau Ausgabe
-?>
-<html>
-<head>
-<title>Studenten Vorrueckung</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-</head>
-<body class="Background_main">
-<?php
+// -------------------------------------------------------
+
 //Überschrift
 echo "<H2>Studenten Vorr&uuml;ckung (".$s[$stg_kz]->kurzbz." - ".($semester<100?$semester:'alle')." - ".
 	$studiensemester_kurzbz."), DB:".DB_NAME."</H2>";
 
-	
+
 echo '<form action="" method="POST">';
 echo '<table width="70%"><tr><td>';
 //Ausgabe der Auswahl
@@ -372,9 +372,9 @@ if ($result_std!=0)
 	{
 		$row=$db->db_fetch_object($result_std,$i);
 		$qry_status="SELECT status_kurzbz, ausbildungssemester FROM public.tbl_prestudentstatus 
-			JOIN public.tbl_prestudent USING(prestudent_id) WHERE person_id=".myaddslashes($row->person_id)." 
-			AND studiengang_kz=".$row->studiengang_kz."  
-			AND studiensemester_kurzbz=".myaddslashes($studiensemester_kurzbz)." 
+			JOIN public.tbl_prestudent USING(prestudent_id) WHERE person_id=".$db->db_add_param($row->person_id, FHC_INTEGER)." 
+			AND studiengang_kz=".$db->db_add_param($row->studiengang_kz, FHC_INTEGER)."  
+			AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." 
 			ORDER BY datum desc, tbl_prestudentstatus.insertamum desc, tbl_prestudentstatus.ext_id desc LIMIT 1;";
 		if ($result_status=$db->db_query($qry_status))
 		{
@@ -396,13 +396,12 @@ if ($result_std!=0)
 			error("Roles not found!");	
 		}
 	}
+	echo '</tbody>';
 }
 else
 	echo "Kein Eintrag gefunden!";
 ?>
-</tbody>
 </table>
-
 <br>
 </body>
 </html>
