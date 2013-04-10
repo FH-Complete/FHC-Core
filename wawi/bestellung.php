@@ -695,9 +695,12 @@ if($aktion == 'suche')
 						$firmenname = $firma->name; 
 					}
 
+                    // freigegebene oder bestellte Bestellungen können nur vom Zentraleinkauf gelöscht werden
+                    $bestellung_status_help = new wawi_bestellstatus(); 
+                    
 					//Zeilen der Tabelle ausgeben
 					echo "<tr>\n";
-					echo "<td nowrap> <a href= \"bestellung.php?method=update&id=$row->bestellung_id\" title=\"Bestellung bearbeiten\"> <img src=\"../skin/images/edit_wawi.gif\"> </a><a href=\"bestellung.php?method=delete&id=$row->bestellung_id\" onclick='return conf_del()' title='Bestellung löschen'> <img src=\"../skin/images/delete_x.png\"></a><a href= \"rechnung.php?method=update&bestellung_id=$row->bestellung_id\" title=\"Neue Rechnung anlegen\"> <img src=\"../skin/images/Calculator.png\"> </a><a href= \"bestellung.php?method=copy&id=$row->bestellung_id\" title=\"Bestellung kopieren\"> <img src=\"../skin/images/copy.png\"> </a></td>";
+					echo "<td nowrap> <a href= \"bestellung.php?method=update&id=$row->bestellung_id\" title=\"Bestellung bearbeiten\"> <img src=\"../skin/images/edit_wawi.gif\"> </a><a href=\"bestellung.php?method=delete&id=$row->bestellung_id\" onclick='return conf_del()' title='Bestellung löschen' > <img src=\"../skin/images/delete_x.png\" ></a><a href= \"rechnung.php?method=update&bestellung_id=$row->bestellung_id\" title=\"Neue Rechnung anlegen\"> <img src=\"../skin/images/Calculator.png\"> </a><a href= \"bestellung.php?method=copy&id=$row->bestellung_id\" title=\"Bestellung kopieren\"> <img src=\"../skin/images/copy.png\"> </a></td>";
 					echo '<td>'.$row->bestell_nr."</td>\n";
 					echo '<td>'.$row->bestellung_id."</td>\n";
 					echo '<td>'.$firmenname."</td>\n";
@@ -827,6 +830,7 @@ elseif($_GET['method']=='delete')
 	// Bestellung löschen
 	$id = (isset($_GET['id'])?$_GET['id']:null);
 	$bestellung = new wawi_bestellung(); 
+    $bestellung_status_help = new wawi_bestellstatus(); 
 	$bestellung->load($id); 
 	
 	if(!$rechte->isberechtigt('wawi/bestellung',null, 'suid', $bestellung->kostenstelle_id))
@@ -836,6 +840,10 @@ elseif($_GET['method']=='delete')
 	{
 		echo 'Kann nicht gelöscht werden. Der Bestellung ist eine Rechnung zugeordnet.'; 
 	}
+    else if(($bestellung_status_help->isStatiVorhanden($id, 'Bestellung') || $bestellung_status_help->isStatiVorhanden($id, 'Freigabe'))&& !$rechte->isBerechtigt('wawi/delete_advanced'))
+    {
+        echo 'Bestellte oder Freigegebene Bestellungen können nicht gelöscht werden, wenden Sie sich bitte an den Zentraleinkauf';
+    }
 	else 
 	{
 		if($bestellung->delete($id))
