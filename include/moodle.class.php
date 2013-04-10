@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>
+ * Authors: Andreas Oesterreicher   <andreas.oesterreicher@technikum-wien.at>
+ *          Karl Burkhart           <burkhart@technikum-wien.at>
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
@@ -41,10 +42,44 @@ class moodle extends basis_db
 	 */
 	public function __construct()
 	{
+        parent::__construct();
 		$this->getVersionen();
 		return true;
 	}
 	
+    
+    public function load($moodle_id)
+    {
+        $qry = "SELECT * FROM lehre.tbl_moodle WHERE moodle_id =".$this->db_add_param($moodle_id, FHC_INTEGER).';'; 
+        
+        if($result=$this->db_query($qry))
+        {
+            if($row = $this->db_fetch_object())
+            {
+				$this->moodle_id = $row->moodle_id;
+				$this->mdl_course_id = $row->mdl_course_id;
+				$this->lehreinheit_id = $row->lehreinheit_id;
+				$this->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->gruppen = $this->db_parse_bool($row->gruppen);
+				$this->moodle_version = $row->moodle_version;
+                return true; 
+            }
+            else
+            {
+                $this->errormsg = "Kein Moodleeintrag gefunden"; 
+                return false; 
+            }
+        }
+        else
+        {
+            $this->errormsg="Fehler bei der Abfrage aufgetreten"; 
+            return false; 
+        }
+    }
+    
 	/**
 	 * Laedt alle Moodlekurse zu einer LV/Stsem
 	 * plus die Moodlekurse die auf dessen LE haengen
@@ -93,9 +128,98 @@ class moodle extends basis_db
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
-		}					
-	}
+		}
+	} 
+    
+    /**
+     * gibt alle Moodlekurseinträge der Zwischentabelle für übergebenen Studiengang und Semester zurück
+     * @param type $studiengang_kz
+     * @param type $studiensemester 
+     */
+    public function getAllMoodleForStudiengang($studiengang_kz, $studiensemester, $version='2.4')
+    {
+        $qry = '
+            
+            SELECT mdl_course_id, moodle.moodle_id, moodle.lehreinheit_id, moodle.lehrveranstaltung_id, moodle.studiensemester_kurzbz, moodle.insertamum, moodle.insertvon, gruppen, moodle_version FROM lehre.tbl_moodle moodle
+            JOIN lehre.tbl_lehrveranstaltung lv USING(lehrveranstaltung_id)
+            WHERE moodle.studiensemester_kurzbz = '.$this->db_add_param($studiensemester).'
+            AND lv.studiengang_kz ='.$this->db_add_param($studiengang_kz).' 
+            AND moodle_version ='.$this->db_add_param($version).' 
+            AND moodle.lehreinheit_id is null
 
+            UNION
+
+SELECT distinct on(mdl_course_id) mdl_course_id, moodle.moodle_id, moodle.lehreinheit_id, moodle.lehrveranstaltung_id, moodle.studiensemester_kurzbz, moodle.insertamum, moodle.insertvon, gruppen, moodle_version FROM lehre.tbl_moodle moodle
+            JOIN lehre.tbl_lehreinheit le ON(moodle.lehreinheit_id = le.lehreinheit_id)
+            JOIN lehre.tbl_lehrveranstaltung lv ON(le.lehrveranstaltung_id = lv.lehrveranstaltung_id)
+            WHERE moodle.studiensemester_kurzbz = '.$this->db_add_param($studiensemester).'
+            AND lv.studiengang_kz ='.$this->db_add_param($studiengang_kz).' 
+            AND moodle_version ='.$this->db_add_param($version).' 
+            AND moodle.lehrveranstaltung_id is null
+';   
+        
+        if($result=$this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new stdClass();
+				
+				$obj->moodle_id = $row->moodle_id;
+				$obj->mdl_course_id = $row->mdl_course_id;
+				$obj->lehreinheit_id = $row->lehreinheit_id;
+				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->gruppen = $this->db_parse_bool($row->gruppen);
+				$obj->moodle_version = $row->moodle_version;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}	
+    }
+
+    
+    /**
+     * Löscht den Zuordnungseintrag in der Moodletablle
+     * @param type $moodle_id 
+     */
+    public function deleteZuordnung($mdl_course_id)
+    {
+        $qry = "DELETE FROM lehre.tbl_moodle WHERE mdl_course_id=".$this->db_add_param($mdl_course_id, FHC_INTEGER).';'; 
+        
+        if($result=$this->db_query($qry))
+            return true;
+        else
+        {
+            $this->errormsg="Fehler beim Löschen der Daten"; 
+            return false; 
+        }
+    }
+    
+    /**
+     * gibt alle LE Ids der Übergebenen Moodle_Course_ID zurück
+     */
+    public function getLeFromCourse($moodle_course_id)
+    {
+        $qry = "SELECT lehreinheit_id FROM lehre.tbl_moodle WHERE mdl_course_id =".$this->db_add_param($moodle_course_id, FHC_INTEGER).';'; 
+        $le = array(); 
+        if($result = $this->db_query($qry))
+        {
+            while($row = $this->db_fetch_object())
+            {
+                $le[] = $row->lehreinheit_id; 
+            }
+        }
+        return $le; 
+    }
+    
 	/**
 	 * Schaut ob fuer diese LV/StSem schon ein 
 	 * Moodle Kurs existiert
