@@ -629,63 +629,25 @@ class moodle24_course extends basis_db
 	
 
 	/**
-	 * Loescht einen Moodle Course im Moodel und in der DB
+	 * Loescht einen Moodle Course im Moodel 
+     * Wenn erfolgreich gelöscht wird kein Wert in response zurückgegeben
 	 * @param mdl_course_id
-	 * @param bServerinfo Detail xmlrpc Debug informationen
 	 *        
-	 * @return objekt mit den Noten der Teilnehmer dieses Kurses
-	 *
-	 * TODO anpassung moodle 2.4 eventuell Trennung in moodle.class
 	 */
-	public function deleteKurs($mdl_course_id=null,$moodle_id=null,$bServerinfo=false)
+	public function deleteKurs($mdl_course_id)
 	{
-		$this->errormsg='';
-		$this->result=array();
-			
-		if (!is_null($mdl_course_id))
-			$this->mdl_course_id=$mdl_course_id;
+		$client = new SoapClient($this->serverurl); 
 
+		$data = array($mdl_course_id); 
 
-		if (!is_null($moodle_id))
-			$this->moodle_id=$moodle_id;
-
-		if (is_null($this->mdl_course_id) || empty($this->mdl_course_id) || !is_numeric($this->mdl_course_id))
+		$response = $client->core_course_delete_courses(array($mdl_course_id));
+		if(isset($response[0]))
 		{
-			$this->errormsg='Moodle Kurs ID fehlt';
+            $this->errormsg = $response[0];
 			return false;
-		}	
+		}
 
-	// Variable Daten Initialisieren
-		$args=array();
-		$args['CourseID']=$this->mdl_course_id;
-		$method = "DeleteCourseByID";		
-
-		if (!$result=$this->callMoodleXMLRPC($method,$args,$bServerinfo)) 
-			return false;
-			
-		if (isset($result[1]))
-			$this->errormsg=$result[1];
-			
-		if ($result[0]==1 || !$this->load($this->mdl_course_id)) // Methodenaufruf erfolgreich	
-		{
-				$qry = "DELETE FROM lehre.tbl_moodle WHERE mdl_course_id='". addslashes($this->mdl_course_id) ."' ";
-				if (!is_null($this->moodle_id) && $this->moodle_id!='')
-					$qry.= " and moodle_id='".addslashes($this->moodle_id)."'"; 
-				if(!$this->db_query($qry))
-				{
-						$this->errormsg=$this->errormsg." Moodlekurs $mdl_course_id wurde NICHT gel&ouml;scht in Lehre. ";
-						return false;
-				}		
-		}	
-		else // Result = 0 ein Fehler im RFC wurde festgestellt
-		{
-			$this->errormsg=(isset($result[1])?$result[1]:" - Fehler beim Kurs ".$this->mdl_course_id." l&ouml;schen ");
-			return false;
-		}		
-		
-		if (empty($this->errormsg))	
-			$this->errormsg.="Moodlekurs ".$this->mdl_course_id." wurde gel&ouml;scht.";	
-		return true;	
+		return true;
 	
-	}		
+	}
 }

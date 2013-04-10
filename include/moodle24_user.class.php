@@ -501,7 +501,7 @@ class moodle24_user extends basis_db
 				$user->email = $username.'@'.DOMAIN;
 				$user->auth = 'ldap';
 				$user->idnumber = $username;
-				$user->lang = 'de';
+				$user->lang = 'en';
 
 				$client = new SoapClient($this->serverurl); 
 				$response = $client->core_user_create_users(array($user));
