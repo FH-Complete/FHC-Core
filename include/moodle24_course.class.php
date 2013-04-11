@@ -351,7 +351,7 @@ class moodle24_course extends basis_db
 	 *                werden soll, false wenn nicht
 	 * @return true wenn ok, false im Fehlerfall
 	 *
-	 * TODO eventuell auslagern in moodle.class
+	 * TODO eventuell auslagern in moodle.class oder ganz loeschen
 	 */
 	public function updateGruppenSync($moodle_id, $gruppen)
 	{
@@ -519,13 +519,11 @@ class moodle24_course extends basis_db
 
 	
 	/**
-	 * Laedt die Noten zu einem Moodle Course ID
+	 * Laedt die Moodle Noten zu allen Moodlekursen einer Lehrveranstaltung
 	 * @param lehrveranstaltung_id
 	 * @param $studiensemester_kurzbz
 	 *        
 	 * @return objekt mit den Noten der Teilnehmer dieses Kurses
-	 *
-	 * TODO Anpassung an Moodle 2.4 fertigstellen
 	 */
 	public function loadNoten($lehrveranstaltung_id, $studiensemester_kurzbz)
 	{
@@ -540,24 +538,27 @@ class moodle24_course extends basis_db
 
 		// Ermitteln die Lehreinheiten und Moodle ID
 		$qry = "
-		SELECT tbl_lehreinheit.lehreinheit_id, mdl_course_id,tbl_lehreinheit.studiensemester_kurzbz,tbl_lehreinheit.lehrveranstaltung_id
-			FROM lehre.tbl_moodle 
+		SELECT 
+			distinct mdl_course_id
+		FROM 
+			lehre.tbl_moodle 
 			JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id, studiensemester_kurzbz)
-			WHERE tbl_moodle.lehrveranstaltung_id > 0 ";
-		if ($this->lehrveranstaltung_id)
-			$qry.= " and tbl_moodle.lehrveranstaltung_id ='".addslashes($this->lehrveranstaltung_id)."' "; 
-		if ($this->studiensemester_kurzbz)
-			$qry.= " and tbl_moodle.studiensemester_kurzbz ='".addslashes($this->studiensemester_kurzbz)."' "; 
-		$qry.= "
+		WHERE 
+			tbl_moodle.lehrveranstaltung_id > 0 
+			AND moodle_version='2.4'
+			AND tbl_moodle.lehrveranstaltung_id =".$this->db_add_param($lehrveranstaltung_id)."
+			AND tbl_moodle.studiensemester_kurzbz =".$this->db_add_param($studiensemester_kurzbz)."
 		UNION 
-			SELECT tbl_lehreinheit.lehreinheit_id, mdl_course_id,tbl_lehreinheit.studiensemester_kurzbz,tbl_lehreinheit.lehrveranstaltung_id
-			FROM lehre.tbl_moodle
+		SELECT 
+			distinct mdl_course_id
+		FROM 
+			lehre.tbl_moodle
 			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
-			WHERE tbl_lehreinheit.lehrveranstaltung_id > 0 ";
-		if ($this->lehrveranstaltung_id)
-			$qry.= " and tbl_lehreinheit.lehrveranstaltung_id ='".addslashes($this->lehrveranstaltung_id)."' "; 
-		if ($this->studiensemester_kurzbz)
-			$qry.= " and tbl_moodle.studiensemester_kurzbz ='".addslashes($this->studiensemester_kurzbz)."' "; 
+		WHERE 
+			tbl_lehreinheit.lehrveranstaltung_id > 0
+			AND moodle_version='2.4'
+			AND tbl_lehreinheit.lehrveranstaltung_id =".$this->db_add_param($lehrveranstaltung_id)." 
+			AND tbl_moodle.studiensemester_kurzbz =".$this->db_add_param($studiensemester_kurzbz).";";
 
 		if(!$result_moodle=$this->db_query($qry))
 		{
@@ -565,66 +566,32 @@ class moodle24_course extends basis_db
 			return false;
 		}	
 
-		
-		// init
-		$_lehreinheit=array();	// Lehreinheiten zum lesen Studenten im Campus (Student und LE im FAS) 
-		$_lehrveranstaltung = array(); // Gesamte Information der Lehreinheit und Moodle IDs
-		$_studiensemester_kurzbz=array();	
-		$_lehreinheit_kpl=array();	
-		while($row = $this->db_fetch_object($result_moodle))
+
+		while($row_moodle = $this->db_fetch_object($result_moodle))
 		{
-		
-			$row->lehreinheit_id=trim($row->lehreinheit_id);
-			$_lehreinheit_kpl[$row->lehreinheit_id]=$row;
-			
-			$_lehreinheit[$row->lehreinheit_id]=$row->lehreinheit_id; // Fuer Select Campus
+			$client = new SoapClient($this->serverurl); 
+			$response = $client->fhcomplete_get_course_grades($row_moodle->mdl_course_id);
 
-			$row->lehrveranstaltung_id=trim($row->lehrveranstaltung_id);
-			$_lehrveranstaltung[$row->lehrveranstaltung_id]=$row->lehrveranstaltung_id; // Fuer Select Campus
-
-			$row->studiensemester_kurzbz=trim($row->studiensemester_kurzbz);
-			$_studiensemester_kurzbz[$row->studiensemester_kurzbz]=$row->studiensemester_kurzbz; // Fuer Select Campus
-
-		}	
-		if (count($_lehreinheit)<1) // Es gibt keine Lehreinheiten
-		{
-			$this->errormsg='Es wurde kein passender Moodle-Kurs gefunden';
-			return false;
-		}
-			
-		
-		// Von der Lehreinheit kann der Moodle-Kurs ermittelt werden
-		$this->mdl_course_id=trim($_lehreinheit_kpl[$row->lehreinheit_id]->mdl_course_id);
-		if ($last_moodle_id==$this->mdl_course_id)	
-			continue;
-		$last_moodle_id=$this->mdl_course_id;
-
-
-		$client = new SoapClient($serverurl); 
-		$response = $client->fhcomplete_get_course_grades($this->mdl_course_id);
-
-		if (count($response)>0) 	
-		{
-
-			foreach($response as $row)
+			if (count($response)>0) 	
 			{
 
-				$userobj = new stdClass();
-				$userobj->vorname = $row->vorname;
-				$userobj->nachname = $row->nachname;
-				$userobj->idnummer = $row->idnummer;
-				$userobj->username = $row->username;
-				$userobj->note = $row->note;
-
-				$this->result[]=$obj;
-			}	
-			return true;						
-		}		
-		else 
-		{
-			$this->errormsg = 'Fehler beim Laden der Moodle Noten';
-			return false;
-		}		
+				foreach($response as $row)
+				{
+					if($row['note']!='-')
+					{
+						$userobj = new stdClass();
+						$userobj->mdl_course_id = $row_moodle->mdl_course_id;
+						$userobj->vorname = $row['vorname'];
+						$userobj->nachname = $row['nachname'];
+						$userobj->idnummer = $row['idnummer'];
+						$userobj->uid = $row['username'];
+						$userobj->note = $row['note'];
+						$this->result[]=$userobj;
+					}
+				}	
+			}
+		}
+		return true;
 	}
 	
 

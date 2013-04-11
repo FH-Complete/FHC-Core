@@ -341,8 +341,8 @@ class moodle24_user extends basis_db
 							$data->courseid=$mdl_course_id;
 							$client->enrol_manual_enrol_users(array($data));
 
-							$this->log.="\nStudentIn $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
-							$this->log_public.="\nStudentIn $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
+							$this->log.="\nStudentIn $row_user->student_uid wurde zum Kurs hinzugefügt";
+							$this->log_public.="\nStudentIn $row_user->student_uid wurde zum Kurs hinzugefügt";
 							$this->sync_create++;
 						}
 						//Gruppenzuteilung
@@ -365,8 +365,8 @@ class moodle24_user extends basis_db
 								//wenn nicht dann zuteilen
 								$this->createGroupMember($groupid, $this->mdl_user_id);
 								$this->group_update++;
-								$this->log.="\nStudentIn $this->mdl_user_firstname $this->mdl_user_lastname wurde der Gruppe $gruppenbezeichnung zugeordnet";
-								$this->log_public.="\nStudentIn $this->mdl_user_firstname $this->mdl_user_lastname wurde der Gruppe $gruppenbezeichnung zugeordnet";
+								$this->log.="\nStudentIn $row_user->student_uid wurde der Gruppe $gruppenbezeichnung zugeordnet";
+								$this->log_public.="\nStudentIn $row_user->student_uid wurde der Gruppe $gruppenbezeichnung zugeordnet";
 							}
 						}						
 					}
@@ -477,6 +477,9 @@ class moodle24_user extends basis_db
 	 */
 	public function createUser($uid)
 	{
+		if($uid=='_DummyLektor')
+			return true;
+
 		$qry = "SELECT uid, vorname, nachname FROM campus.vw_benutzer WHERE uid=".$this->db_add_param($uid);
 		if($this->db_query($qry))
 		{
