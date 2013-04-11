@@ -29,6 +29,7 @@ $this->phrasen['profil/adminstration']='Administration';
 $this->phrasen['profil/zustaendigeAssistenz']='zuständige Assistenz';
 $this->phrasen['profil/wendenSieSichAn']='Bitte wenden sie sich an die';
 $this->phrasen['profil/solltenDatenNichtStimmen']='Sollten ihre Daten nicht stimmen, wenden sie sich bitte an die';
+$this->phrasen['profil/buero']='Büro';
 
 $this->phrasen['profil/AccountInaktiv']='Achtung: Dieser Account ist nicht mehr aktiv';
 $this->phrasen['profil/inaktivStudent']='Achtung!<br> Wir möchten Sie darauf aufmerksam machen, dass Ihr Benutzerdatensatz 

@@ -29,6 +29,7 @@ $this->phrasen['profil/adminstration']='Administration';
 $this->phrasen['profil/zustaendigeAssistenz']='Administrative Assistant';
 $this->phrasen['profil/wendenSieSichAn']='Please contact the';
 $this->phrasen['profil/solltenDatenNichtStimmen']='If your data is incorrect, please contact the responsible';
+$this->phrasen['profil/buero']='Office';
 
 $this->phrasen['profil/AccountInaktiv']='NOTICE: This account is no longer active';
 $this->phrasen['profil/inaktivStudent']='NOTICE!<br> We would like to remind you that your user record has been deactivated. 

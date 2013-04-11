@@ -130,12 +130,28 @@ echo '
 	<title>'.$p->t('profil/profil').'</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
-	<script language="Javascript">
+	<script type="text/javascript" src="../../../include/js/jquery.js"></script>
+	<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
+	<script language="JavaScript" type="text/javascript">
 	<!--
 		function RefreshImage()
 		{
 			window.location.reload();
 		}
+		
+		$(document).ready(function() 
+		{ 
+			$("#t1").tablesorter(
+			{
+				sortList: [[0,0]],
+				widgets: ["zebra"]
+			}); 
+			$("#t2").tablesorter(
+			{
+				sortList: [[0,0]],
+				widgets: ["zebra"]
+			});
+		});
 	-->
 	</script>
 </head>
@@ -175,14 +191,13 @@ echo '
   		'.$p->t('global/vorname').': '.$user->vorname.'  '.$user->vornamen.'<br>
    		'.$p->t('global/nachname').': '.$user->nachname.'<br>
   		'.$p->t('global/postnomen').': '.$user->titelpost.'<br>';
-        		
+		
 if(!$ansicht)
 {
 	echo '	'.$p->t('global/geburtsdatum').': '.$datum_obj->formatDatum($user->gebdatum,'d.m.Y')."<br>
 	".$p->t('global/geburtsort').": $user->gebort<br>";
         		
-}
-        
+}  
 echo '
 	</P>
     </td>
@@ -263,7 +278,11 @@ if ($type=='mitarbeiter')
 		
 						
 	if($user->telefonklappe!='')
-		echo $p->t('profil/telefonTw').": $vorwahl $user->telefonklappe<BR><BR>";
+		echo $p->t('profil/telefonTw').": $vorwahl - $user->telefonklappe<BR>";
+	if ($user->ort_kurzbz!='')
+		echo $p->t('profil/buero').': '.$user->ort_kurzbz.'<br>';
+		
+	echo '<br>';
 		
 	if(!$ansicht)
 	{
@@ -319,6 +338,8 @@ if(!$ansicht)
 			echo '<br>'.$p->t('profil/ihrFotoWurdeNochNichtGeprueft');
 		}
 	}
+	echo '<br><br>';
+}
 	//Funktionen
 	$qry = "SELECT 
 				*, tbl_benutzerfunktion.oe_kurzbz as oe_kurzbz, tbl_organisationseinheit.bezeichnung as oe_bezeichnung,
@@ -336,16 +357,17 @@ if(!$ansicht)
 	{
 		if($db->db_num_rows($result_funktion)>0)
 		{
-			echo '<br><br><b>'.$p->t('profil/funktionen').'</b><table><tr class="liste"><th>'.$p->t('global/bezeichnung').'</th><th>'.$p->t('global/organisationseinheit').'</th><th>'.$p->t('global/semester').'</th><th>'.$p->t('global/institut').'</th></tr>';
+			echo '<b>'.$p->t('profil/funktionen').'</b><table class="tablesorter" id="t1"><thead><tr><th>'.$p->t('global/bezeichnung').'</th><th>'.$p->t('global/organisationseinheit').'</th><th>'.$p->t('global/semester').'</th><th>'.$p->t('global/institut').'</th></tr></thead><tbody>';
 
 			while($row_funktion = $db->db_fetch_object($result_funktion))
 			{
-				echo "<tr class='liste1'><td>$row_funktion->bf_bezeichnung</td><td nowrap>".$row_funktion->organisationseinheittyp_kurzbz.' '.$row_funktion->oe_bezeichnung."</td><td>$row_funktion->semester</td><td>$row_funktion->fachbereich_kurzbz</td></tr>";
+				echo "<tr><td>$row_funktion->bf_bezeichnung</td><td nowrap>".$row_funktion->organisationseinheittyp_kurzbz.' '.$row_funktion->oe_bezeichnung."</td><td>$row_funktion->semester</td><td>$row_funktion->fachbereich_kurzbz</td></tr>";
 			}
-			echo '</table>';
+			echo '</tbody></table><br>';
 		}
 	}
-
+if(!$ansicht)
+{
     // Betriebsmittel Personen
     $oBetriebsmittelperson = new betriebsmittelperson();
     $oBetriebsmittelperson->result=array();
@@ -355,13 +377,15 @@ if(!$ansicht)
 	{
 		if (is_array($oBetriebsmittelperson->result) && count($oBetriebsmittelperson->result)>0)
 	    {
-	    	echo '<br><br><b>'.$p->t('profil/entlehnteBetriebsmittel').'</b>
-	    			<table>
-	    				<tr class="liste">
+	    	echo '<b>'.$p->t('profil/entlehnteBetriebsmittel').'</b>
+	    			<table class="tablesorter" id="t2">
+	    			<thead>
+	    				<tr>
 	    					<th>'.$p->t('profil/betriebsmittel').'</th>
 	    					<th>'.$p->t('profil/nummer').'</th>
 	    					<th>'.$p->t('profil/ausgegebenAm').'</th>
-	    				</tr>';
+	    				</tr>
+	    			</thead><tbody>';
 	   
 			for ($i=0;$i<count($oBetriebsmittelperson->result);$i++)
 			{
@@ -373,15 +397,15 @@ if(!$ansicht)
 		           	{
 		          		continue;
 		           	}		                	
-					echo "<tr class='liste1'>
-		      				<td>".$oBetriebsmittelperson->result[$i]->betriebsmitteltyp.' '.$oBetriebsmittelperson->result[$i]->beschreibung."</td>
+					echo "<tr'>
+		      				<td>".$oBetriebsmittelperson->result[$i]->betriebsmitteltyp.' '.$oBetriebsmittelperson->result[$i]->beschreibung.(isset($oBetriebsmittelperson->result[$i]->verwendung)?' ('.$oBetriebsmittelperson->result[$i]->verwendung.')':'')."</td>
 		      				<td>".$oBetriebsmittelperson->result[$i]->nummer.' '.$oBetriebsmittelperson->result[$i]->inventarnummer."</td>
 		      				<td>".$datum_obj->formatDatum($oBetriebsmittelperson->result[$i]->ausgegebenam,'d.m.Y')."</td>
 		      			</tr>";
 		                	
 		            }
 		        }
-		    	echo '</table>';
+		    	echo '</tbody></table>';
 			}
 	    }
 	}
