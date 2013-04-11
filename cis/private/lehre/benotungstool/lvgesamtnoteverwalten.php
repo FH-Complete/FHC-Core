@@ -39,6 +39,7 @@ require_once('../../../../include/person.class.php');
 require_once('../../../../include/benutzer.class.php');
 require_once('../../../../include/mitarbeiter.class.php');
 require_once('../../../../include/moodle19_course.class.php');
+require_once('../../../../include/moodle24_course.class.php');
 require_once('../../../../include/mail.class.php');
 require_once('../../../../include/phrasen.class.php');
 
@@ -530,8 +531,8 @@ $qry = "SELECT
 			JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id)
 			JOIN campus.tbl_uebung USING(lehreinheit_id)
 		WHERE 
-			studiensemester_kurzbz='".addslashes($stsem)."' AND
-			lehrveranstaltung_id='".addslashes($lvid)."'
+			studiensemester_kurzbz=".$db->db_add_param($stsem)." AND
+			lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)."
 		UNION
 		SELECT 
 			1
@@ -539,8 +540,8 @@ $qry = "SELECT
 			campus.tbl_legesamtnote 
 		WHERE 
 			lehreinheit_id in (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit 
-								WHERE studiensemester_kurzbz='".addslashes($stsem)."' AND
-								lehrveranstaltung_id='".addslashes($lvid)."')
+								WHERE studiensemester_kurzbz=".$db->db_add_param($stsem)." AND
+								lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER).")
 		
 		";
 if($result = $db->db_query($qry))
@@ -589,8 +590,8 @@ if(!$rechte->isBerechtigt('admin',0) &&
 {
 	$qry = "SELECT lehreinheit_id FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id)
 			JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) 
-			WHERE tbl_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lvid)."' AND
-			tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stsem)."' AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid='".addslashes($user)."'";
+			WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
+			tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stsem)." AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid=".$db->db_add_param($user).';';
 	if($result = $db->db_query($qry))
 	{
 		if($db->db_num_rows($result)==0)
@@ -608,20 +609,10 @@ echo '<table width="100%"><tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
 echo "<td>";
 echo "<b>".$lv_obj->bezeichnung_arr[$sprache]."</b>";
-/*
-if($lehreinheit_id=='')
-	die('Es wurde keine passende Lehreinheit in diesem Studiensemester gefunden');
-
-if(!isset($_GET['standalone']))
-{
-	//Menue
-	include("menue.inc.php");
-}*/
-
 
 // lvgesamtnote für Studenten speichern
-if (isset($_REQUEST["submit"]) && ($_POST["student_uid"] != '')){
-	
+if (isset($_REQUEST["submit"]) && ($_POST["student_uid"] != ''))
+{	
 	$jetzt = date("Y-m-d H:i:s");	
 	$student_uid = $_POST["student_uid"];
 	$lvid = $_REQUEST["lvid"];
@@ -663,10 +654,18 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 	{
 		$jetzt = date("Y-m-d H:i:s");
 		$neuenoten = 0;
-		$studlist = "<table border='1'><tr><td><b>Mat. Nr.</b></td><td><b>".$p->t('global/nachname')."</b></td><td><b>".$p->t('global/vorname')."</b></td><td><b>".$p->t('benotungstool/note')."</b></td></tr>\n";
+		$studlist = "<table border='1'><tr><td><b>".$p->t('global/personenkz')."</b></td><td><b>".$p->t('global/nachname')."</b></td><td><b>".$p->t('global/vorname')."</b></td><td><b>".$p->t('benotungstool/note')."</b></td></tr>\n";
 
 		// studentenquery					
-		$qry_stud = "SELECT DISTINCT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".addslashes($stsem)."' and lehrveranstaltung_id = '".addslashes($lvid)."' ORDER BY nachname, vorname ";
+		$qry_stud = "SELECT 
+						DISTINCT uid, vorname, nachname, matrikelnr 
+					FROM 
+						campus.vw_student_lehrveranstaltung 
+						JOIN campus.vw_student USING(uid) 
+					WHERE
+						studiensemester_kurzbz = ".$db->db_add_param($stsem)."
+						AND lehrveranstaltung_id = ".$db->db_add_param($lvid, FHC_INTEGER)."
+					ORDER BY nachname, vorname ";
         if($result_stud = $db->db_query($qry_stud))
 		{
 			$i=1;
@@ -687,8 +686,6 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 			}	
 		}
 		
-		//		}
-		//	}
 		$studlist .= "</table>";
 		
 		//mail an assistentin und den user selber verschicken	
@@ -709,12 +706,11 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 			$mail->setHTMLContent($htmlcontent);
 			$mail->setReplyTo($lektor_adresse);
 			$mail->send();
-			//mail($adressen,"Notenfreigabe ".$lv->bezeichnung,"<html><body><b>".$lv->bezeichnung." - ".$stsem."</b> (".$lv->semester.". Sem.) <br><br>Benutzer ".$freigeber." (".$mit->kurzbz.") hat die LV-Noten f&uuml;r folgende Studenten freigegeben:<br><br>".$studlist."<br>Mail wurde verschickt an: ".$adressen."</body></html>","From: vilesci@".DOMAIN."\nContent-Type: text/html\n");
 		}	
 	}
 	else 
 	{
-		echo '<span><font class="error">Fehler beim Freigeben der Noten: Das Uebergebene Passwort ist falsch</font></span>';
+		echo '<span><font class="error">'.$p->t('gesamtnote/passwortFalsch').'</font></span>';
 	}
 }
 
@@ -807,8 +803,37 @@ echo '<table>';
 				<td colspan='11'>&nbsp;</td>
 			</tr>";
 
+
+		if($grade_from_moodle)
+		{
+			$moodle24 = new moodle24_course();
+			$moodle24->loadNoten($lvid, $stsem);
+
+			$moodle24_course_bezeichung=array();
+
+			// Bezeichnungen der Moodlekurse laden
+			foreach($moodle24->result as $obj)
+			{
+				if(!isset($moodle24_course_bezeichnung))
+				{
+					$moodle24course = new moodle24_course();
+					$moodle24course->load($obj->mdl_course_id);
+
+					$moodle24_course_bezeichung[$obj->mdl_course_id]=$moodle24course->mdl_shortname;
+				}
+			}
+		}
+
 		// studentenquery					
-		$qry_stud = "SELECT DISTINCT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".addslashes($stsem)."' and lehrveranstaltung_id = '".addslashes($lvid)."' ORDER BY nachname, vorname ";
+		$qry_stud = "SELECT 
+						DISTINCT uid, vorname, nachname, matrikelnr 
+					FROM 
+						campus.vw_student_lehrveranstaltung 
+						JOIN campus.vw_student USING(uid) 
+					WHERE 
+						studiensemester_kurzbz = ".$db->db_add_param($stsem)."
+						AND lehrveranstaltung_id = ".$db->db_add_param($lvid)."
+					ORDER BY nachname, vorname ";
       	$mdldaten=null;
 	    if($result_stud = $db->db_query($qry_stud))
 		{
@@ -820,9 +845,6 @@ echo '<table>';
 				
 				echo "<tr class='liste".($i%2)."'>
 					<td><a href='mailto:$row_stud->uid@".DOMAIN."'><img src='../../../../skin/images/button_mail.gif'></a></td>";
-					//<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->uid</a></td>
-					//<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->nachname</a></td>
-					//<td><a href='studentenpunkteverwalten.php?lvid=$lvid&lehreinheit_id=$lehreinheit_id&uebung_id=$uebung_id&uid=$row_stud->uid&stsem=$stsem' class='Item'>$row_stud->vorname</a></td>";
 				echo "
 					<td>$row_stud->uid</td>
 					<td>$row_stud->nachname</td>
@@ -834,6 +856,8 @@ echo '<table>';
 				$note=0;
 				if($grade_from_moodle)
 				{
+					//Moodle 1.9
+
 					// Alle Moodlekursdaten zu Lehreinheit und Semester lesen wenn noch nicht belegt.
 					if (is_null($mdldaten))
 					{
@@ -889,7 +913,7 @@ echo '<table>';
 		    									$leneg = " style='font-weight:bold'";
 											
 										   $mdl_shortname=$mdldaten[$imdldaten]->mdl_shortname;
-			  							   $title="\r\nNote in Moodlekurse: ".$mdldaten[$imdldaten]->mdl_course_id ."\r\n\r\n".$kursname.', '.$mdl_shortname."\r\n";
+			  							   $title="\r\nMoodle 1.9 KursID: ".$mdldaten[$imdldaten]->mdl_course_id ."\r\n\r\n".$kursname.', '.$mdl_shortname."\r\n";
 									       foreach ($kursasObj[$iKurs] as $key => $value) 
 										   {
 												$title.=$key."=>".$value."\r\n";
@@ -919,7 +943,30 @@ echo '<table>';
 							echo '<br><b>'.$moodle_course->errormsg.'</b><br>';
 							$errorshown=true;
 						}
-					}					
+					}
+
+					// Moodle 2.4
+					if(isset($moodle24) && count($moodle24->result)>0)
+					{
+						foreach($moodle24->result as $moodle24_noten)
+						{
+							if($moodle24_noten->uid==$row_stud->uid)
+							{
+								$note_le+=$moodle24_noten->note;
+								$le_anz+=1;
+								if ($moodle24_noten->note == 5)
+									$leneg = " style='color:red; font-weight:bold'";
+								else
+									$leneg = ' style="font-weight: bold;"';
+								$title="Moodle 2.4 KursID: ".$moodle24_noten->mdl_course_id.
+								"\nKursbezeichnung: ".$moodle24_course_bezeichung[$moodle24_noten->mdl_course_id].
+								"\nUser: ".$moodle24_noten->uid.
+								"\nNote: $moodle24_noten->note";
+								$note_les_str .= "<br><span".$leneg.">".$moodle24_noten->note."</span><span  title='".$title."' style='font-size:10px'> (".$moodle24_course_bezeichung[$moodle24_noten->mdl_course_id].")</span> ";
+
+							}
+						}
+					}
 				}
 				else 
 				{
