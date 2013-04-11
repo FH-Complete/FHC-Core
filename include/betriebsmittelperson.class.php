@@ -342,6 +342,7 @@ class betriebsmittelperson extends basis_db
 				$bm->betriebsmitteltyp = $row->betriebsmitteltyp;
 				$bm->nummer = $row->nummer;
 				$bm->inventarnummer = $row->inventarnummer;
+				$bm->verwendung = $row->verwendung;
 				$bm->reservieren = $this->db_parse_bool($row->reservieren);
 				$bm->ort_kurzbz = $row->ort_kurzbz;
 				$bm->person_id = $row->person_id;
