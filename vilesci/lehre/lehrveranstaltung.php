@@ -56,10 +56,6 @@ if (isset($_GET['semester']) || isset($_POST['semester']))
 	$semester=(isset($_GET['semester'])?$_GET['semester']:$_POST['semester']);
 else
 	$semester=0;
-if (isset($_GET['isaktiv']) || isset($_POST['isaktiv']))
-	$isaktiv=(isset($_GET['isaktiv'])?$_GET['isaktiv']:$_POST['isaktiv']);
-else
-	$isaktiv='';
 
 if(!is_numeric($stg_kz) && $stg_kz!='')
 	$stg_kz='';
@@ -112,6 +108,14 @@ if($rechte->isBerechtigt('lehre/lehrveranstaltung:begrenzt', $oe_studiengang, 's
 if(!$rechte->isBerechtigt('lehre/lehrveranstaltung:begrenzt'))
 	die('Sie haben keine Berechtigung fuer diese Seite');
 
+if (isset($_GET['isaktiv']) || isset($_POST['isaktiv']))
+	$isaktiv=(isset($_GET['isaktiv'])?$_GET['isaktiv']:$_POST['isaktiv']);
+else
+	if($write_admin)
+		$isaktiv='';
+	else
+		$isaktiv='true';
+		
 // Speichern der Daten
 if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 {
@@ -257,6 +261,24 @@ if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 			else 
 				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
 		}
+		
+		//Lehrform Speichern
+		if(isset($_POST['lf']))
+		{
+			$lv_obj = new lehrveranstaltung();
+			if($lv_obj->load($_POST['lvid']))
+			{
+				$lv_obj->lehrform_kurzbz=$_POST['lf'];
+				$lv_obj->updateamum = date('Y-m-d H:i:s');
+				$lv_obj->updatevon = $user;
+				if($lv_obj->save(false))
+					exit('true');
+				else 
+					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
+			}
+			else 
+				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
+		}
 	
 		//Projektarbeit Feld setzen
 		if(isset($_POST['projektarbeit']))
@@ -279,6 +301,24 @@ if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 	else 
 	{
 		exit('Sie haben keine Schreibrechte fuer diese Seite');
+	}
+}
+
+//Lehrformen holen
+$qry = "
+SELECT
+	lehrform_kurzbz,
+	bezeichnung
+FROM
+	lehre.tbl_lehrform ORDER BY lehrform_kurzbz";
+
+$lf = array();
+if($result = $db->db_query($qry))
+{
+	while($row = $db->db_fetch_object($result))
+	{
+		$lf[$row->lehrform_kurzbz]['lehrform_kurzbz']=$row->lehrform_kurzbz;
+		$lf[$row->lehrform_kurzbz]['bezeichnung']=$row->bezeichnung;
 	}
 }
 
@@ -323,25 +363,22 @@ if($result = $db->db_query($qry))
 
 //Lehrveranstaltungen holen
 
-//Wenn nicht admin, dann nur die aktiven anzeigen
+//Wenn nicht admin, werden erst nur die aktiven angezeigt, es koennen aber auch die inaktiven eingeblendet werden
+
 $aktiv='';
 $isaktiv=trim($isaktiv);
-if(!$write_admin)
-	$aktiv = ' AND tbl_lehrveranstaltung.aktiv=true';
-else 
+
+if($isaktiv=='true')
 {
-	if($isaktiv=='true')
-	{
-		$aktiv = ' AND tbl_lehrveranstaltung.aktiv=true';	
-	}
-	elseif($isaktiv=='false')
-	{
-		$aktiv = ' AND tbl_lehrveranstaltung.aktiv=false';
-	}
-	else
-	{
-		$aktiv='';
-	}
+	$aktiv = ' AND tbl_lehrveranstaltung.aktiv=true';	
+}
+elseif($isaktiv=='false')
+{
+	$aktiv = ' AND tbl_lehrveranstaltung.aktiv=false';
+}
+else
+{
+	$aktiv='';
 }
 
 if($fachbereich_kurzbz !='')
@@ -407,19 +444,19 @@ foreach ($fachb->result as $fb)
 
 $outp.= '</SELECT>';
 
-if($write_admin)
-{
+//if($write_admin) Von kindlm am 12.04.2013 auskommentiert, da Assistentinnen auch bei inaktiven LV's die Lehrform aendern koennen sollen
+//{
 	//Aktiv DropDown
 	$outp.= ' Aktiv <SELECT name="isaktiv" id="isaktiv">';
 	$outp.= "<OPTION value=''".($isaktiv==''?' selected':'').">-- Alle --</OPTION>";
 	$outp.= "<OPTION value='true '".($isaktiv=='true'?'selected':'').">-- Aktiv --</OPTION>";
 	$outp.= "<OPTION value='false '".($isaktiv=='false'?'selected':'').">-- Nicht aktiv --</OPTION>";
 	$outp.= '</SELECT>';
-}
-else 
+//}
+/*else 
 {
 	$isaktiv='aktiv';
-}
+}*/
 $outp.= '<input type="submit" value="Anzeigen">';
 $outp .="</form>";
 
@@ -449,7 +486,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 			{		
 				if(document.getElementById("select_stg_kz").value==\'\' && document.getElementById("select_fachbereich_kurzbz").value==\'\')
 				{
-					alert("Studiengang und Fachbereich dürfen nicht gleichzeitig auf \'Alle\' gesetzt sein");
+					alert("Studiengang und Institut dürfen nicht gleichzeitig auf \'Alle\' gesetzt sein");
 					return false;
 				}
 				else
@@ -530,6 +567,27 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 						{
 							$("#fbkok"+lvid).css("background-color", "lightgreen");
 							window.setTimeout(function(){$("#fbkok"+lvid).css("background-color", "");}, 500);
+						}
+
+					},
+					error: function() { alert("error"); }
+				});
+			}
+			
+			function changelehrform(lvid, lf)
+			{
+				$.ajax({
+					type:"POST",
+					url:"lehrveranstaltung.php", 
+					data:{ "lvid": lvid, "lf": lf },
+					success: function(data) 
+					{ 
+						if(data!="true")
+							alert("ERROR:"+data)
+						else
+						{
+							$("#lf"+lvid).css("background-color", "lightgreen");
+							window.setTimeout(function(){$("#lf"+lvid).css("background-color", "");}, 500);
 						}
 
 					},
@@ -617,7 +675,7 @@ if ($result_lv!=0)
 	echo "<th>ID</th>
 		  <th>Kurzbz</th>
 		  <th>Bezeichnung</th>
-		  <th>LF</th>
+		  <th>Lehrform</th>
 		  <th>Stg</th>
 		  <th>Orgform</th>
 		  <th title='Semesterstunden'>SS</th>
@@ -653,7 +711,23 @@ if ($result_lv!=0)
 		else
 			echo $db->convert_html_chars($row->bezeichnung);
 		echo '</td>';
-		echo '<td>'.$db->convert_html_chars($row->lehrform_kurzbz).'</td>';
+
+		//Lehrform
+		echo '<td style="white-space:nowrap;">';
+		echo '<SELECT id="lf'.$row->lehrveranstaltung_id.'">';
+		echo '<option value="">--</option>';
+		foreach ($lf as $lehrform=>$lf_kz)
+		{
+			if($lehrform==$row->lehrform_kurzbz)
+				$selected='selected';
+			else
+				$selected='';
+			echo '<option value="'.$db->convert_html_chars($lehrform).'" '.$selected.'>'.$db->convert_html_chars($lf_kz['lehrform_kurzbz']).'</option>';
+		}
+		echo '</SELECT><input type="button" value="ok" id="lf'.$row->lehrveranstaltung_id.'" onclick="changelehrform(\''.$row->lehrveranstaltung_id.'\',$(\'#lf'.$row->lehrveranstaltung_id.'\').val())">';
+		echo '</td>';
+		
+		//Studiengang
 		echo '<td>'.$db->convert_html_chars($s[$row->studiengang_kz]->kurzbz).'</td>';
 		//Organisationsform
 		echo '<td style="white-space:nowrap;">';
