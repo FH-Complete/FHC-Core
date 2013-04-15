@@ -313,7 +313,7 @@ $qry = "
 	SELECT 
 		*,
 		(SELECT 1 FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid) 
-		 WHERE person_id=tbl_person.person_id) as mitarbeiter
+		 WHERE person_id=tbl_person.person_id LIMIT 1) as mitarbeiter
 	FROM 
 		public.tbl_person 
 		JOIN public.tbl_benutzer USING(person_id)
