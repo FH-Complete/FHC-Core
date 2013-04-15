@@ -153,7 +153,8 @@
                     <th>Moodle ID</th>
                     <th>Semester</th>
                     <th>Version</th>
-                    <th></th>
+                    <th>1)</th>
+                    <th>2)</th>
                 </tr>
             </thead>
             <tbody>';
@@ -190,12 +191,16 @@
                     <td>'.$row->mdl_course_id.'</td>
                     <td>'.$lv->semester.'</td>
                     <td>'.$row->moodle_version.'</td>
-                    <td><a href="'.$_SERVER['PHP_SELF'].'?method=delete&moodle_id='.$row->moodle_id.'&moodle_studiensemester='.$studiensemester_kurzbz.'&moodle_studiengang_kz='.$studiengang_kz.'"><img src="../../skin/images/delete.gif"></a><a href="'.$_SERVER['PHP_SELF'].'?method=delete&all&moodle_id='.$row->moodle_id.'&moodle_studiensemester='.$studiensemester_kurzbz.'&moodle_studiengang_kz='.$studiengang_kz.'"><img src="../../skin/images/cross.png"></a></td>
+                    <td><a href="'.$_SERVER['PHP_SELF'].'?method=delete&moodle_id='.$row->moodle_id.'&moodle_studiensemester='.$studiensemester_kurzbz.'&moodle_studiengang_kz='.$studiengang_kz.'"><img src="../../skin/images/delete.gif" title="Löscht aus Zwischentabelle"></a></td>
+                    <td><a href="'.$_SERVER['PHP_SELF'].'?method=delete&all&moodle_id='.$row->moodle_id.'&moodle_studiensemester='.$studiensemester_kurzbz.'&moodle_studiengang_kz='.$studiengang_kz.'"><img src="../../skin/images/cross.png" title="Löscht aus Zwischentabelle und den Moodlekurs"></a></td>
                 </tr>';
         }
         echo '</tbody></table>';
     }
 
-	echo '</body></html>'
+    echo "<span style='font-size:12px;'>1: Löscht Eintrag nur aus Zwischentabelle <br>
+            2: Löscht Eintrag in Zwischentabelle und den Moodlekurs </span>"; 
+    
+	echo "</body></html>"
     
 ?>
