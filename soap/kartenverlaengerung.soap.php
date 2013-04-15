@@ -25,6 +25,7 @@ require_once('../include/betriebsmittelperson.class.php');
 require_once('../include/studiensemester.class.php'); 
 require_once('../include/benutzer.class.php'); 
 require_once('../include/webservicelog.class.php'); 
+require_once('../include/datum.class.php'); 
 
 ini_set("soap.wsdl_cache_enabled", "0");
 
@@ -60,7 +61,7 @@ function getNumber($cardNr)
     // aktuelles Semester konnte nicht geladen werden
     // lädt das aktuelle semester und nach 60 Tagen nach Anfang des Semesters das nächste
     $studSemester = new studiensemester(); 
-    if(!$aktSemester= $studSemester->getNextOrAktSemester())
+    if(!$aktSemester= $studSemester->getNextOrAktSemester('90'))
     {
         $objArray = array('datum'=>'', 'errorMessage'=>'Konnte Semester nicht laden. Bitte wenden Sie sich an den Service Desk.');  
         return $objArray;   
@@ -70,10 +71,13 @@ function getNumber($cardNr)
     if(!$konto->checkStudienbeitrag($cardPerson->uid, $aktSemester))
     {
         $objArray = array('datum'=>'', 'errorMessage'=>'Studienbeitrag noch nicht gezahlt.');  
-        return $objArray;   
+        return $objArray;
     }
     
-    $objArray = array('datum'=>'bezahlt', 'errorMessage'=>'');  
+    $studSemester->load($aktSemester); 
+    $datum = new datum(); 
+    
+    $objArray = array('datum'=>'gültig bis '.$datum->formatDatum($studSemester->ende, 'd.m.Y'), 'errorMessage'=>'');  
     return $objArray;  
     
 }
