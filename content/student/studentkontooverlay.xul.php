@@ -234,6 +234,31 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 											</template>
 										</menulist>
 									</row>
+									<row>
+										<label value="Studiengang" control="student-konto-menulist-studiengang_kz"/>
+										<menulist id="student-konto-menulist-studiengang_kz" disabled="true"
+												xmlns:STG="http://www.technikum-wien.at/studiengang/rdf#"
+										          datasources="<?php echo APP_ROOT ?>rdf/studiengang.rdf.php" flex="1"
+										          ref="http://www.technikum-wien.at/studiengang/liste" >
+											<template>
+												<!--<rule STG:aktiv="false">
+													<menupopup>
+													<menuitem value="rdf:http://www.technikum-wien.at/buchungstyp/rdf#buchungstyp_kurzbz"
+										        		      label="rdf:http://www.technikum-wien.at/buchungstyp/rdf#beschreibung"
+													  		  uri="rdf:*" style="text-decoration:line-through;"/>
+													</menupopup>
+												</rule>-->
+												<rule>
+													<menupopup>
+													<menuitem value="rdf:http://www.technikum-wien.at/studiengang/rdf#studiengang_kz"
+										        		      label="rdf:http://www.technikum-wien.at/studiengang/rdf#kuerzel"
+													  		  uri="rdf:*"/>
+													</menupopup>
+												</rule>
+												
+											</template>
+										</menulist>
+									</row>
 								</rows>
 							</grid>
 							<hbox>
