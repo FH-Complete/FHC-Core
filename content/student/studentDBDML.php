@@ -1439,6 +1439,7 @@ if(!$error)
 					$buchung->mahnspanne = $_POST['mahnspanne'];
 					$buchung->buchungstyp_kurzbz = $_POST['buchungstyp_kurzbz'];
 					$buchung->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
+					$buchung->studiengang_kz = $_POST['studiengang_kz'];
 					$buchung->new = false;
 					$buchung->updateamum = date('Y-m-d H:i:s');
 					$buchung->updatevon = $user;

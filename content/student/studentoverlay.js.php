@@ -2036,6 +2036,7 @@ function StudentKontoAuswahl()
 	document.getElementById('student-konto-menulist-buchungstyp').value=buchungstyp_kurzbz;
 	document.getElementById('student-konto-textbox-buchungsnr').value=buchungsnr;
 	document.getElementById('student-konto-menulist-studiensemester').value=studiensemester_kurzbz;
+	document.getElementById('student-konto-menulist-studiengang_kz').value=studiengang_kz;
 }
 
 // ****
@@ -2248,6 +2249,7 @@ function StudentKontoDetailDisableFields(val)
 	document.getElementById('student-konto-textbox-mahnspanne').disabled=val;
 	document.getElementById('student-konto-menulist-buchungstyp').disabled=val;
 	document.getElementById('student-konto-menulist-studiensemester').disabled=val;
+	document.getElementById('student-konto-menulist-studiengang_kz').disabled=val;
 	document.getElementById('student-konto-button-speichern').disabled=val;
 }
 
@@ -2265,6 +2267,7 @@ function StudentKontoDetailSpeichern()
 	buchungstyp_kurzbz = document.getElementById('student-konto-menulist-buchungstyp').value;
 	buchungsnr = document.getElementById('student-konto-textbox-buchungsnr').value;
 	studiensemester_kurzbz = document.getElementById('student-konto-menulist-studiensemester').value;
+	studiengang_kz = document.getElementById('student-konto-menulist-studiengang_kz').value;
 	
 	if(buchungsdatum!='' && !CheckDatum(buchungsdatum))
 	{
@@ -2283,6 +2286,7 @@ function StudentKontoDetailSpeichern()
 	req.add('buchungstyp_kurzbz', buchungstyp_kurzbz);
 	req.add('buchungsnr', buchungsnr);
 	req.add('studiensemester_kurzbz', studiensemester_kurzbz);
+	req.add('studiengang_kz', studiengang_kz);
 
 	var response = req.executePOST();
 
