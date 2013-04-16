@@ -23,7 +23,7 @@ require_once('../config/vilesci.config.inc.php');
 ?>
 var menuUndoDatasource=0;
 var STPLlastDetailUrl='leer';
-
+var addon = Array();
 //Speichert die Position der Scrollbalken in der Wochenuebersicht
 TimeTableWeekPositionX=0;
 TimeTableWeekPositionY=0;
@@ -82,6 +82,10 @@ function onLoad()
   		//Studenten Tab beim starten markieren
   		//document.getElementById('main-content-tabs').selectedItem=document.getElementById('tab-studenten');
 
+		for(i in addon)
+		{
+			addon[i].init();
+		}
   		//Funktion ueberschreiben damit sie nicht nochmal aufgerufen wird
   		//wenn zb ein IFrame geladen wird
   		onLoad=function() {return false};
