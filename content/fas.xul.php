@@ -71,6 +71,15 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/DragAndDrop.js"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/functions.js.php"/>
 
+<?php
+// ADDONS
+$addons = explode(";",ACTIVE_ADDONS);
+foreach($addons as $addon)
+{
+	echo '<script type="application/x-javascript" src="'.APP_ROOT.'addons/'.$addon.'/content/init.js.php" />';
+}
+?>
+
 <commandset id="maincommands">
   <command id="menu-file-close:command" oncommand="closeWindow();"/>
   <command id="menu-properties-studiensemester:command" oncommand="studiensemesterChange();"/>

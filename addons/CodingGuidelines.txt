@@ -1,0 +1,29 @@
+Coding Guidlines für Addon-Entwickung
+=====================================
+
+Hier sind einige Coding Guidlines die beachtet werden sollten um Konflikte zu vermeiden
+
+
+XUL-Applikationen
+=================
+
+IDs von XUL Elementen sollten immer nach folgendem Schema benannt werden:
+
+addon-namedesaddons-xultag-bezeichnung
+
+Ein Beispiel für das Addon mit dem Namen Template
+<tree id="addon-template-tree-adressen">
+
+Namen von globalen Variablen sollten immer nach folgendem Schema benannt werden:
+
+AddonNamedesAddonsMeineVariable
+
+Ein Beispiel für das Addon mit dem Namen Template
+AddonTemplatePersonID=0
+
+Namen von Funktionen sollten immer nach folgendem Schema benannt werden:
+
+AddonNamedesAddonsMeineFunktion
+
+Ein Beispiel für das Addon mit dem Namen Template
+function AddonTemplateSave()
