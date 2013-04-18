@@ -239,11 +239,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <!-- STUDENT PREStudent -->
 <vbox id="student-prestudent" style="overflow:auto; margin:0px;" flex="1">
 <popupset>
-	<popup id="student-prestudent-rolle-tree-popup">
+	<menupopup id="student-prestudent-rolle-tree-popup">
 		<menuitem label="Bearbeiten" oncommand="StudentRolleBearbeiten();" id="student-prestudent-rolle-tree-popup-edit" hidden="false"/>
 		<menuitem label="Neuen Status hinzufuegen" oncommand="StudentRolleAdd();" id="student-prestudent-rolle-tree-popup-add" hidden="false"/>
 		<menuitem label="Entfernen" oncommand="StudentPrestudentRolleDelete();" id="student-prestudent-rolle-tree-popup-delete" hidden="false"/>		
-	</popup>
+	</menupopup>
 </popupset>
 		<vbox hidden="true">
 			<label value="Neu"/>
