@@ -170,21 +170,21 @@ foreach ($sg->result as $twraum)
 	
 	$htmlstr .= "       <div style='display: none'>".$db->convert_html_chars($twraum->lehre)."</div> <td align='center'><a href='#Lehre' onclick='changeboolean(\"".$twraum->ort_kurzbz."\",\"lehre\"); return false'>";
 	$htmlstr .= "       <input type='hidden' id='lehre".$twraum->ort_kurzbz."' value='".($twraum->lehre=="t"?"true":"false")."'>";
-	$htmlstr .= "       <img id='lehreimg".$twraum->ort_kurzbz."' src='../../skin/images/".($twraum->lehre=="t"?"true.png":"false.png")."' height='20'>";
+	$htmlstr .= "       <img id='lehreimg".$twraum->ort_kurzbz."' alt='Lehre' title='Lehre' src='../../skin/images/".($twraum->lehre=="t"?"true.png":"false.png")."' height='20'>";
 	$htmlstr .= "       </a></td>";
 	
 	// Reservieren boolean setzen
 	
 	$htmlstr .= "       <div style='display: none'>".$db->convert_html_chars($twraum->reservieren)."</div> <td align='center'><a href='#Reservieren' onclick='changeboolean(\"".$twraum->ort_kurzbz."\",\"reservieren\"); return false'>";
 	$htmlstr .= "       <input type='hidden' id='reservieren".$twraum->ort_kurzbz."' value='".($twraum->reservieren=="t"?"true":"false")."'>";
-	$htmlstr .= "       <img id='reservierenimg".$twraum->ort_kurzbz."' src='../../skin/images/".($twraum->reservieren=="t"?"true.png":"false.png")."' style='margin:0;' height='20'>";
+	$htmlstr .= "       <img id='reservierenimg".$twraum->ort_kurzbz."' alt='Reservieren' title='Reservieren' src='../../skin/images/".($twraum->reservieren=="t"?"true.png":"false.png")."' style='margin:0;' height='20'>";
 	$htmlstr .= "       </a></td>";
 	
 	// Aktiv boolean setzen
 	
 	$htmlstr .= "       <div style='display: none'>".$db->convert_html_chars($twraum->aktiv)."</div> <td align='center'><a href='#Aktiv' onclick='changeboolean(\"".$twraum->ort_kurzbz."\",\"aktiv\"); return false'>";
 	$htmlstr .= "       <input type='hidden' id='aktiv".$twraum->ort_kurzbz."' value='".($twraum->aktiv=="t"?"true":"false")."'>";
-	$htmlstr .= "       <img id='aktivimg".$twraum->ort_kurzbz."' src='../../skin/images/".($twraum->aktiv=="t"?"true.png":"false.png")."' style='margin:0;' height='20'>";
+	$htmlstr .= "       <img id='aktivimg".$twraum->ort_kurzbz."' alt='Aktiv' title='Aktiv' src='../../skin/images/".($twraum->aktiv=="t"?"true.png":"false.png")."' style='margin:0;' height='20'>";
 	$htmlstr .= "       </a></td>";
 	
 	$htmlstr .= "       <td>".$twraum->kosten."</td>\n";
