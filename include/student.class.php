@@ -255,16 +255,13 @@ class student extends benutzer
 		}
 		else
 		{
-			if ($stg_kz>=0)
-			{
-				$where.=" tbl_studentlehrverband.studiengang_kz='".addslashes($stg_kz)."'";
-				if ($sem!=null)
-					$where.=" AND tbl_studentlehrverband.semester='".addslashes($sem)."'";
-				if ($ver!=null)
-					$where.=" AND tbl_studentlehrverband.verband='".addslashes($ver)."'";
-				if ($grp!=null)
-					$where.=" AND tbl_studentlehrverband.gruppe='".addslashes($grp)."'";
-			}
+			$where.=" tbl_studentlehrverband.studiengang_kz='".addslashes($stg_kz)."'";
+			if ($sem!=null)
+				$where.=" AND tbl_studentlehrverband.semester='".addslashes($sem)."'";
+			if ($ver!=null)
+				$where.=" AND tbl_studentlehrverband.verband='".addslashes($ver)."'";
+			if ($grp!=null)
+				$where.=" AND tbl_studentlehrverband.gruppe='".addslashes($grp)."'";
 		}			
 
 		if($stsem!=null)
