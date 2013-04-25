@@ -26,6 +26,7 @@ require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/studiensemester.class.php');
 require_once('../include/variable.class.php');
+require_once('../include/addon.class.php');
 
 $user=get_uid();
 
@@ -73,10 +74,11 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
 
 <?php
 // ADDONS
-$addons = explode(";",ACTIVE_ADDONS);
-foreach($addons as $addon)
+$addon_obj = new addon();
+$addon_obj->loadAddons();
+foreach($addon_obj->result as $addon)
 {
-	echo '<script type="application/x-javascript" src="'.APP_ROOT.'addons/'.$addon.'/content/init.js.php" />';
+	echo '<script type="application/x-javascript" src="'.APP_ROOT.'addons/'.$addon->kurzbz.'/content/init.js.php" />';
 }
 ?>
 
