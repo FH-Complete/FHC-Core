@@ -178,7 +178,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <style:text-properties fo:font-size="9pt" style:font-size-asian="9pt" style:font-name-complex="Arial" style:font-size-complex="9pt"/>
     </style:style>
     <style:style style:name="P22" style:family="paragraph" style:parent-style-name="Heading_20_1" style:master-page-name="First_20_Page">
-      <style:paragraph-properties style:page-number="auto"/>
+      <style:paragraph-properties style:page-number="1"/>
       <style:text-properties style:language-complex="zxx" style:country-complex="none"/>
     </style:style>
     <style:style style:name="P23" style:family="paragraph" style:parent-style-name="Heading_20_2">
