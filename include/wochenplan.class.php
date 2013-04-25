@@ -715,7 +715,7 @@ class wochenplan extends basis_db
 					echo '&grp='.$this->grp;
 					echo '&ort_kurzbz='.$this->std_plan[$i][$j][0]->ort;		//.'">'
 					echo "','Details', 'height=320,width=550,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=no,toolbar=no,location=no,menubar=no,dependent=yes');";
-					echo '" title="'.$titel.'" ';
+					echo '" title="'.$this->convert_html_chars($titel).'" ';
 					echo ' href="#">';
 
 					// Ausgabe
@@ -724,7 +724,7 @@ class wochenplan extends basis_db
 					
 					if($titel!='' && !$reservierung)
 					{
-						echo '<img src="../../../skin/images/sticky.png" tooltip="'.$titel.'"/>';
+						echo '<img src="../../../skin/images/sticky.png" tooltip="'.$this->convert_html_chars($titel).'"/>';
 					}
 					echo '<BR />';
 					if ($this->type=='ort' || $this->type=='lektor')
