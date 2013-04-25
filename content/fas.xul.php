@@ -133,6 +133,7 @@ foreach($addons as $addon)
   <command id="menu-dokumente-pruefungszeugnis_englisch:command" oncommand="StudentAbschlusspruefungPrintPruefungszeugnisMultiple('englisch');"/>
   <command id="menu-dokumente-urkunde_deutsch:command" oncommand="StudentAbschlusspruefungPrintUrkundeMultiple('deutsch')"/>
   <command id="menu-dokumente-urkunde_englisch:command" oncommand="StudentAbschlusspruefungPrintUrkundeMultiple('englisch')"/>
+  <command id="menu-dokumente-ausbildungsvertrag:command" oncommand="StudentPrintAusbildungsvertrag();"/>
   <command id="menu-extras-reihungstest:command" oncommand="ExtrasShowReihungstest();"/>
   <command id="menu-extras-firma:command" oncommand="ExtrasShowFirmenverwaltung();"/>
   <command id="menu-extras-lvverwaltung:command" oncommand="ExtrasShowLVverwaltung();"/>
@@ -667,6 +668,12 @@ foreach($addons as $addon)
                label     = "&menu-dokumente-urkunde_englisch.label;"
                command   =  "menu-dokumente-urkunde_englisch:command"
                accesskey = "&menu-dokumente-urkunde_englisch.accesskey;"/>
+            <menuitem
+               id        =  "menu-dokumente-ausbildungsvertrag"
+               key       =  "menu-dokumente-ausbildungsvertrag:key"
+               label     = "&menu-dokumente-ausbildungsvertrag.label;"
+               command   =  "menu-dokumente-ausbildungsvertrag:command"
+               accesskey = "&menu-dokumente-ausbildungsvertrag.accesskey;"/>
           </menupopup>
     </menu>
     <!-- ***** Zusatzmenues inkludieren ***** -->

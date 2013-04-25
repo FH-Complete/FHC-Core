@@ -4254,6 +4254,43 @@ function StudentCreateDiplSupplement()
 }
 
 // ****
+// * Erstellt das Diploma Supplement fuer einen oder mehrere Studenten
+// ****
+function StudentPrintAusbildungsvertrag()
+{
+    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	tree = document.getElementById('student-tree');
+
+	//Markierte Studenten holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var paramList= '';
+
+	for (var t = 0; t < numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+			var uid=tree.view.getCellText(v,col);
+			paramList += ';'+uid;
+			stg_kz=getTreeCellText(tree,"student-treecol-studiengang_kz", v);
+		}
+	}
+	
+	if(paramList.replace(";",'')=='')
+	{
+		alert('Bitte einen Studenten auswaehlen');
+		return false;
+	}
+	
+	//PDF erzeugen 
+	window.open('<?php echo APP_ROOT; ?>content/createAusbildungsvertrag.php?xml=ausbildungsvertrag.xml.php&xsl=Ausbildungsver&output=pdf&uid='+paramList,'Ausbildungsvertrag', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+
+// ****
 // * Erstellt die Studienerfolgsbestaetigung fuer einen oder mehrere Studenten
 // ****
 function StudentCreateStudienerfolg(xsl, finanzamt, studiensemester, all)
