@@ -643,7 +643,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           <style:list-level-label-alignment text:label-followed-by="listtab" fo:text-indent="-0.635cm" fo:margin-left="1.27cm"/>
         </style:list-level-properties>
       </text:list-level-style-number>
-      <text:list-level-style-number text:level="2" style:num-suffix="." style:num-format="a" style:num-letter-sync="true">
+      <text:list-level-style-number text:level="2" style:num-suffix="." style:num-format="1">
         <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
           <style:list-level-label-alignment text:label-followed-by="listtab" fo:text-indent="-0.635cm" fo:margin-left="2.54cm"/>
         </style:list-level-properties>
