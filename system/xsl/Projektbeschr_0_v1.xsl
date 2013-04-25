@@ -73,6 +73,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         </style:tab-stops>
       </style:paragraph-properties>
     </style:style>
+    <style:style style:name="P22" style:family="paragraph" style:parent-style-name="Standard">
+      <style:paragraph-properties fo:break-after="page"/>
+    </style:style>
+
     <style:style style:name="T1" style:family="text">
       <style:text-properties fo:font-weight="normal" style:font-weight-asian="normal" style:font-weight-complex="normal"/>
     </style:style>
@@ -747,10 +751,12 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         <text:list-item>
           <text:p text:style-name="P4">Ressourcen:</text:p>
           <text:list>
-        	<xsl:apply-templates select="projekt_ressourcen"/>          
+        	<xsl:apply-templates select="projekt_ressourcen"/>     
+     
           </text:list>
         </text:list-item>
       </text:list>
+ <text:p text:style-name="P22"/>
       <text:p text:style-name="Standard"/>
       <text:p text:style-name="Standard"/>
       <text:list xml:id="list1375412226" text:continue-list="list849006553" text:style-name="Numbering_20_1">
@@ -765,7 +771,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         </draw:frame>
       </text:p>
         <xsl:apply-templates select="phasen"/>
-
  </xsl:template>
 
 
@@ -821,8 +826,126 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           </text:list>
         </text:list-item>
       </text:list>
- 	<text:p text:style-name="Standard"/>
+
+      <text:p text:style-name="Standard"/>
+      <text:list xml:id="list1389790540" text:continue-list="list54441676" text:style-name="Numbering_20_1">
+        <text:list-item>
+          <text:list>
+            <text:list-item>
+              <text:list>
+                <text:list-item>
+                	<text:h text:style-name="Heading_20_3" text:outline-level="3"><text:bookmark-start text:name="__RefHeading__343_971256360"/>Tasks<text:bookmark-end text:name="__RefHeading__343_971256360"/></text:h>
+                </text:list-item>
+              </text:list>
+            </text:list-item>
+          </text:list>
+        </text:list-item>
+      </text:list>
+      <text:list xml:id="list1017227384" text:continue-list="list117999972" text:style-name="L4">
+			<xsl:apply-templates select="task"/>
+      </text:list>
+	<xsl:apply-templates select="unterphase"/>
  </xsl:template>
+
+
+
+
+
+
+<xsl:template match="unterphase">
+<text:list xml:id="list1389790543" text:continue-list="list1389790540" text:style-name="Numbering_20_1" text:continue-numbering="true" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0">
+		<text:list-item>
+			<text:list>
+				<text:list-item>
+					<text:list>
+						<text:list-item>
+                			<text:h text:style-name="Heading_20_3" text:outline-level="3"><text:bookmark-start text:name="__RefHeading__343_971256360"/>Unterphase: <xsl:value-of select="phase_bezeichnung"/><text:bookmark-end text:name="__RefHeading__343_971256360"/></text:h>
+							<text:list xml:id="list600377900">
+								<text:list-item>
+									<text:h text:style-name="Heading_20_3" text:outline-level="3"><text:bookmark-start text:name="__RefHeading__345_971256360"/>Beschreibung<text:bookmark-end text:name="__RefHeading__345_971256360"/></text:h>
+								</text:list-item>
+							</text:list>
+               			</text:list-item>
+					</text:list>
+				</text:list-item>
+			</text:list>
+		</text:list-item>
+	</text:list>
+	<text:p text:style-name="Standard"><xsl:value-of select="phase_beschreibung"/></text:p>
+	<text:p text:style-name="Standard"/>
+    <text:list xml:id="list600377935" text:continue-list="list1389790540" text:style-name="Numbering_20_1">
+	<text:list-item>
+  		<text:list>
+    		<text:list-item>
+      			<text:list>
+        			<text:list-item>
+						<text:list>
+							<text:list-item>
+		              			<text:h text:style-name="Heading_20_3" text:outline-level="3"><text:bookmark-start text:name="__RefHeading__345_971256360"/>Eckdaten<text:bookmark-end text:name="__RefHeading__345_971256360"/></text:h>
+			<text:list xml:id="list117873187" text:style-name="L4">
+				<text:list-item>
+		      		<text:p text:style-name="P7">Beginn: <xsl:value-of select="phase_beginn"/></text:p>
+		    	</text:list-item>
+		    	<text:list-item>
+					<text:p text:style-name="P7">Ende: <xsl:value-of select="phase_end"/></text:p>
+		   		</text:list-item>
+		    	<text:list-item>
+					<text:p text:style-name="P7">Budget: <xsl:value-of select="phase_budget"/></text:p>
+		    	</text:list-item>
+		   		<text:list-item>
+					<text:p text:style-name="P7">Ressourcen:</text:p>
+					<text:list>
+						<xsl:apply-templates select="phase_ressourcen"/>
+	      			</text:list>
+				</text:list-item>
+		  	</text:list>
+		            			</text:list-item>
+		          			</text:list>
+		        		</text:list-item>
+		      		</text:list>
+		    	</text:list-item>
+			</text:list>
+		    	</text:list-item>
+			</text:list>
+	<text:p text:style-name="Standard"/>
+			<text:list xml:id="list600377937" text:continue-list="list1389790540" text:style-name="Numbering_20_1">
+        <text:list-item>
+          <text:list>
+            <text:list-item>
+              <text:list>
+                <text:list-item>
+                  <text:list>
+                    <text:list-item>
+		              				<text:h text:style-name="Heading_20_3" text:outline-level="3"><text:bookmark-start text:name="__RefHeading__345_971256360"/>Tasks<text:bookmark-end text:name="__RefHeading__345_971256360"/></text:h>
+                    </text:list-item>
+                  </text:list>
+                </text:list-item>
+              </text:list>
+            </text:list-item>
+          </text:list>
+        </text:list-item>
+      </text:list>
+      <text:list xml:id="list1017227382" text:continue-list="list117999972" text:style-name="L4">
+			<xsl:apply-templates select="task"/>
+      </text:list>
+<text:p text:style-name="Standard"/>
+ </xsl:template>
+
+<xsl:template match="task">
+	<text:list-item>
+			<text:p text:style-name="P7" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0"><text:s/><xsl:value-of select="task_bezeichnung"/> (Ressource: <text:s/><xsl:value-of select="task_ressource"/>)</text:p>
+	<xsl:if test="task_beschreibung != ''">	
+	<text:list>
+		<text:list-item>
+	  		<text:p text:style-name="P7"><xsl:value-of select="task_beschreibung"/></text:p>
+		</text:list-item>
+	</text:list>
+	</xsl:if>
+		
+	</text:list-item>
+</xsl:template>
+
+
 
   <xsl:template match="phase_ressourcen">
     <xsl:apply-templates select="ressource"/>
