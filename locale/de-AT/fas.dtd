@@ -207,6 +207,10 @@
 <!ENTITY menu-dokumente-diplsupplement.label	"Diploma Supplement">
 <!ENTITY menu-dokumente-diplsupplement.accesskey	"S">
 
+<!ENTITY menu-dokumente-ausbildungsvertrag.key		"A">
+<!ENTITY menu-dokumente-ausbildungsvertrag.label	"Ausbildungsvertrag">
+<!ENTITY menu-dokumente-ausbildungsvertrag.accesskey	"A">
+
 <!ENTITY menu-dokumente-studienerfolg.label	"Studienerfolgsbestaetigung">
 <!ENTITY menu-dokumente-studienerfolg.accesskey	"E">
 
