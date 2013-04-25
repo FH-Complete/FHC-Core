@@ -412,9 +412,13 @@ foreach ($studiengang as $stg)
 	{
 		$outp.="<OPTION value='$stg->studiengang_kz' ".($stg->studiengang_kz==$stg_kz?'selected':'').">".$db->convert_html_chars($stg->kuerzel.' - '.$stg->kurzbzlang)."</OPTION>";
 	}
+	if(!isset($s[$stg->studiengang_kz]))
+		$s[$stg->studiengang_kz]=new stdClass();
 	$s[$stg->studiengang_kz]->max_sem=9; // $stg->max_semester;
 	$s[$stg->studiengang_kz]->kurzbz=$stg->kurzbzlang;
 }
+if(!isset($s['']))
+	$s['']=new stdClass();
 $s['']->max_sem=9;
 
 $outp.='</SELECT>';

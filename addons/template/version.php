@@ -18,7 +18,7 @@
  */
 
 // Name des Addons
-$addon_name = 'FH-Complete Addon Template';
+$addon_name = 'Template';
 
 // Versionsnummer des Addons
 $addon_version = '0.01';

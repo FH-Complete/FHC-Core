@@ -3,6 +3,9 @@ Coding Guidlines für Addon-Entwickung
 
 Hier sind einige Coding Guidlines die beachtet werden sollten um Konflikte zu vermeiden
 
+Bennung von Addons
+==================
+Der Name des Addons (Ordnerbezeichnung) darf keine Leerzeichen, Umlaute oder Sonderzeichen enthalten
 
 XUL-Applikationen
 =================

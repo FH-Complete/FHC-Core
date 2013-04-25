@@ -275,4 +275,23 @@ $statistik = new statistik();
 $statistik = $statistik->getMenueArray(1);
 $menu['Auswertung']=array_merge($menu['Auswertung'],$statistik);
 //var_dump($menu['Auswertung']);
+
+require_once(dirname(__FILE__).'/../addon.class.php');
+$addon_obj = new addon();
+if($addon_obj->loadAddons())
+{
+	if(count($addon_obj->result)>0)
+	{
+		$menu['Addons']=array
+		(
+			'name'=>'Addons', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('basis/addon'), 'image'=>'statistic.png',
+			'link'=>'left.php?categorie=Addons', 'target'=>'nav'
+		);
+
+		foreach($addon_obj->result as $row)
+		{	
+			$menu['Addons'][$row->kurzbz]=array('name'=>$row->addon_name, 'link'=>'../addons/'.$row->kurzbz.'/vilesci/index.php', 'target'=>'main');
+		}
+	}
+}
 ?>
