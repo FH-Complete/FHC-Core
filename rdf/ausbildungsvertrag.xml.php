@@ -90,6 +90,7 @@ foreach($uid_arr as $uid)
 			echo "\t\t<matrikelnr>".trim($student->matrikelnr)."</matrikelnr>\n";
 			echo "\t\t<studiengang>".$studiengang->bezeichnung."</studiengang>\n";
 			echo "\t\t<studiengang_englisch>".$studiengang->english."</studiengang_englisch>\n";
+            echo "\t\t<studiengang_kurzbz>".$studiengang->kurzbzlang."</studiengang_kurzbz>\n";
 			echo "\t\t<studiengang_kz>".sprintf('%04s', $studiengang->studiengang_kz)."</studiengang_kz>\n";
             echo "\t\t<studiengangSprache>".$studiengang->sprache."</studiengangSprache>"; 
             
