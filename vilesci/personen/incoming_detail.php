@@ -40,6 +40,7 @@ require_once('../../include/studiengang.class.php');
 require_once('../../include/bisio.class.php');
 require_once('../../include/firma.class.php');
 require_once('../../include/mail.class.php');
+require_once('../../include/datum.class.php'); 
 require_once('../../include/'.EXT_FKT_PATH.'/generateuid.inc.php');
 
 $user = get_uid();
@@ -750,6 +751,7 @@ function print_personendetails()
 					<OPTION value="">-- keine Auswahl --</OPTION>
 					';
 	$nation = new nation();
+    $datum = new datum(); 
 	$nation->getAll();
 	foreach($nation->nation as $row)
 	{
@@ -769,7 +771,14 @@ function print_personendetails()
 				<td><input type="text" name="titelpost" size="10" value="'.$person->titelpost.'"></td>
 				<td></td>
 				<td>E-Mail</td>
-				<td colspan="3"><input type="text" name="email" size="50" value="'.$kontakt->kontakt.'"></td>
+				<td colspan="2"><input type="text" name="email" size="50" value="'.$kontakt->kontakt.'"></td>
+			</tr>
+            <tr>
+				<td>Geburtsdatum</td>
+				<td>'.$datum->formatDatum($person->gebdatum, 'd.m.Y').'</td>
+				<td></td>
+				<td>&nbsp;</td>
+                <td>&nbsp;</td>
 			</tr>
             <tr>
                 <td rowspan="2">Anmerkungen</td>
