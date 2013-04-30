@@ -231,7 +231,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 						if($row_firma->name!='')
 						{
 							$firma = " bei Firma: $row_firma->name";
-							$firma_eng = " written at: $row_firma->name";
+							$firma_eng = " at: $row_firma->name";
 						}
 					}
 				}
