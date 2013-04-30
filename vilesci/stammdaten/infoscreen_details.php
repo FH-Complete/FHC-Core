@@ -192,25 +192,31 @@ $datum_obj = new datum();
 			
 	$jetzt = time();
 	$aktiv=false;
+	$zukunft=false;
 
 	foreach($infoscreen->result as $row)
 	{
 		$content = new content();
 		$content->getContent($row->content_id, 'German');
 		$gueltigvon=$datum_obj->mktime_fromtimestamp($row->gueltigvon);
-		$gueltigbis=$datum_obj->formatDatum($row->gueltigbis,'d.m.Y H:i:s');
+		$gueltigbis=$datum_obj->mktime_fromtimestamp($row->gueltigbis);
 		
 		if ((($gueltigvon<=$jetzt) || ($gueltigvon=='')) && (($gueltigbis>=$jetzt) || ($gueltigbis=='')))
 			$aktiv=true;
 		else 
 			$aktiv=false;
+			
+		if ($aktiv==false && ($gueltigvon>=$jetzt))
+			$zukunft=true;
+		else
+			$zukunft=false;
 		
-		echo '<tr '.($aktiv?'':'style="color:grey"'). '>';
+		echo '<tr '.($aktiv==true?'':'style="color:grey"').'>';
 		echo '<td>',$db->convert_html_chars($row->infoscreen_content_id),'</td>';
 		echo '<td>',$db->convert_html_chars($row->infoscreen_id),'</td>';
 		echo '<td>',$db->convert_html_chars($row->content_id),'</td>';
 		echo '<td>',$db->convert_html_chars($content->titel),'</td>';
-		echo '<td>',$db->convert_html_chars($datum_obj->formatDatum($row->gueltigvon,'d.m.Y H:i:s')),'</td>';		
+		echo '<td '.($zukunft==true?'style="color:black"':''). '>',$db->convert_html_chars($datum_obj->formatDatum($row->gueltigvon,'d.m.Y H:i:s')),'</td>';		
 		echo '<td>',$db->convert_html_chars($datum_obj->formatDatum($row->gueltigbis,'d.m.Y H:i:s')),'</td>';
 		echo '<td>',$db->convert_html_chars($row->refreshzeit),'</td>';
 		echo '<td><a href="infoscreen_details.php?action=update&infoscreen_id=',$db->convert_html_chars($infoscreen_id),'&infoscreen_content_id=',$db->convert_html_chars($row->infoscreen_content_id),'">bearbeiten</a>';
