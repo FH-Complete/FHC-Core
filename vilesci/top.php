@@ -62,7 +62,7 @@
 <body  style="background-color:#eeeeee; margin:0; padding:0;">
 
 <div class="logo">
-<table>
+<table class="logo">
 <tr>
 <?php
 function checkpermission($permissions)
@@ -100,7 +100,7 @@ foreach($menu AS $m)
 	if($firstcat=='' && isset($m['link']) && $m['target']=='nav')
 		$firstcat=$m['link'];
 	if (isset($m['link']))
-		echo '<a href="'.$m['link'].'" ';
+		echo '<a class="toplink" href="'.$m['link'].'" ';
 	if (isset($m['target']))
 		echo 'target="'.$m['target'].'" ';
 	if (isset($m['link']))

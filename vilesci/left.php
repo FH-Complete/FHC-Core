@@ -158,7 +158,7 @@ if(isset($_GET['categorie']))
 					if (isset($m2['target']))
 						echo 'target="'.$m2['target'].'" ';
 					if (isset($m2['link']))
-						echo '><img title="'.$m2['name'].'" src="../skin/images/bullet_go.png" alt="page go" border="0">&nbsp;';
+						echo '><img title="'.$m2['name'].'" src="../skin/images/square_blue.png" alt="page go" border="0">&nbsp;';
 					if (isset($m2['name']))
 						echo $m2['name'];
 					if (isset($m2['link']))
