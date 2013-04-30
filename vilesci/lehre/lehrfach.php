@@ -100,7 +100,35 @@ if (isset($_POST['neu']))
 		echo "<br>$lf->errormsg<br>";
 	}
 }
+if (isset($_GET['neu']))
+{
+	$stg_obj = new studiengang();
+	if(!$stg_obj->load($_GET['stg_kz']))
+		die('Studiengang wurde nicht gefunden');
+	
+	if(!$rechte->isBerechtigt('lehre/lehrfach', $stg_obj->oe_kurzbz, 'sui'))
+		die('Sie haben keine Berechtigung fuer diese Aktion');
 
+	$lf = new lehrfach();
+	$lf->new=true;
+	$lf->studiengang_kz=$_GET['stg_kz'];
+	$lf->fachbereich_kurzbz=$_GET['fachbereich_kurzbz'];
+	$lf->kurzbz=$_GET['kurzbz'];
+	$lf->bezeichnung = $_GET['bezeichnung'];
+	$lf->farbe = $_GET['farbe'];
+	$lf->aktiv = true;
+	$lf->semester = $_GET['semester'];
+	$lf->sprache = $_GET['sprache'];
+	$lf->updateamum = date('Y-m-d H:i:s');
+	$lf->updatevon = $user;
+	$lf->insertamum = date('Y-m-d H:i:s');
+	$lf->insertvon = $user;
+
+	if(!$lf->save())
+	{
+		echo "<br>$lf->errormsg<br>";
+	}
+}
 if (isset($_POST['type']) && $_POST['type']=='editsave')
 {
 	$stg_obj = new studiengang();
@@ -210,8 +238,19 @@ echo '
 		<title>Lehrfach Verwaltung</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+		<link rel="stylesheet" href="../../skin/jquery.css" type="text/css"/>
+		<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
+		<script type="text/javascript" src="../../include/js/jquery.js"></script>
+		<script type="text/javascript">
+		$(document).ready(function() 
+			{ 
+				$("#t1").tablesorter(
+				{
+					sortList: [[2,0],[4,0],[0,0]],
+					widgets: ["zebra"]
+				}); 
+			}); 
+		</script>
 	</head>
 	<body>
 		<H2>Lehrfach Verwaltung ('.$s[$filter_stg_kz]->kurzbz.' '.$filter_semester.' '.$filter_fachbereich_kurzbz.')</H2>
@@ -288,7 +327,7 @@ if (isset($_GET['type']) && $_GET['type']=='edit')
 	}
 	echo "</SELECT></td></tr>";
 	echo '
-	<tr><td><i>Institut</i></td><td><SELECT name="fachbereich_kurzbz" onchange="document.getElementById(\'farbe\').value=this.options[this.selectedIndex].getAttribute(\'farbe\')">
+	<tr><td>Institut</td><td><SELECT name="fachbereich_kurzbz" onchange="document.getElementById(\'farbe\').value=this.options[this.selectedIndex].getAttribute(\'farbe\')">
       			<option value="-1">- ausw&auml;hlen -</option>';
 	foreach($fachbereiche as $fb)
 	{
@@ -310,10 +349,10 @@ if (isset($_GET['type']) && $_GET['type']=='edit')
 
 	echo '</SELECT></td></tr>';
 
-    echo '<tr><td><i>Name</i></td><td><input type="text" name="bezeichnung" size="70" maxlength="250" value="'.$lf->bezeichnung.'"></td></tr>';
-	echo '<tr><td><i>Kurzbezeichnung</i></td><td>';
+    echo '<tr><td>Name</td><td><input type="text" name="bezeichnung" size="70" maxlength="250" value="'.$lf->bezeichnung.'"></td></tr>';
+	echo '<tr><td>Kurzbezeichnung</td><td>';
 	echo '<input type="text" name="kurzbz" size="15" maxlength="12" value="'.$lf->kurzbz.'"></td></tr>';
-	echo '<tr><td><i>Farbe</i></td><td>';
+	echo '<tr><td>Farbe</td><td>';
     echo '<input type="text" name="farbe" id="farbe" size="15" maxlength="7" value="'.$lf->farbe.'"></td></tr>';
 
 	echo '<tr><td>Aktiv</td><td><input type="checkbox" name="aktiv" value="1" '.($lf->aktiv?'checked':'').' />';
@@ -375,7 +414,7 @@ else
 		}
 		echo "</SELECT></td></tr>";
 		echo '
-		<tr><td><i>Institut</i></td><td><SELECT name="fachbereich_kurzbz" onchange="document.getElementById(\'farbe\').value=this.options[this.selectedIndex].getAttribute(\'farbe\')">
+		<tr><td>Institut</td><td><SELECT name="fachbereich_kurzbz" onchange="document.getElementById(\'farbe\').value=this.options[this.selectedIndex].getAttribute(\'farbe\')">
 	      			<option value="-1">- ausw&auml;hlen -</option>';
 	
 		foreach($fachbereiche as $fb)
@@ -394,10 +433,10 @@ else
 	
 		echo '</SELECT></td></tr>';
 	
-	    echo '<tr><td><i>Name</i></td><td><input type="text" name="bezeichnung" size="70" maxlength="250" value=""></td></tr>';
-		echo '<tr><td><i>Kurzbezeichnung</i></td><td>';
+	    echo '<tr><td>Name</td><td><input type="text" name="bezeichnung" size="70" maxlength="250" value=""></td></tr>';
+		echo '<tr><td>Kurzbezeichnung</td><td>';
 		echo '<input type="text" name="kurzbz" size="15" maxlength="12" value=""></td></tr>';
-	    echo '<tr><td><i>Farbe</i></td><td>';
+	    echo '<tr><td>Farbe</td><td>';
 	    echo '<input type="text" name="farbe" id="farbe" size="15" maxlength="7" value=""></td></tr>';
 	    echo '<tr><td>Sprache</td><td><select name="sprache">';
 	
@@ -451,21 +490,21 @@ if(!isset($_GET['type']))
 	{
 		echo '
 		<h3>&Uuml;bersicht - '.$db->db_num_rows($result_lehrfach).' Einträge</h3>
-		<table class="liste table-autosort:2 table-stripeclass:alternate table-autostripe">
+		<table class="tablesorter" id="t1">
 		<thead>';
 		
 		echo "
-			<tr class='liste'>
-				<th class='table-sortable:default'>ID</th>
-				<th class='table-sortable:default'>Stg</th>
-				<th class='table-sortable:default'>Sem</th>
-				<th class='table-sortable:default'>Kurzbz</th>
-				<th class='table-sortable:default'>Bezeichnung</th>
-				<th class='table-sortable:default'>Farbe</th>
-				<th class='table-sortable:default'>Aktiv</th>
-				<th class='table-sortable:default'>Institut</th>
-				<th class='table-sortable:default'>Sprache</th>
-				<th class='table-sortable:default'>&nbsp;</th>
+			<tr>
+				<th>ID</th>
+				<th>Stg</th>
+				<th>Sem</th>
+				<th>Kurzbz</th>
+				<th>Bezeichnung</th>
+				<th>Farbe</th>
+				<th>Aktiv</th>
+				<th>Institut</th>
+				<th>Sprache</th>
+				<th>&nbsp;</th>
 			</tr>
 		</thead>
 		<tbody>";

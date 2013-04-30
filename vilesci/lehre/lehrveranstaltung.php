@@ -692,7 +692,8 @@ if ($result_lv!=0)
 		  <th>Zeugnis</th>
 		  <th title='Soll diese Lehrveranstaltung bei Diplom-/Bachelorarbeit ausgewaehlt werden koennen?'>BA/DA</th>
 		  <th>Koordinator</th>
-		  <th>LV-Info</th>\n";
+		  <th>LV-Info</th>
+		  <th>Lehrfach</th>\n";
 	echo "</tr></thead>";
 	echo "<tbody>";
 	for($i=0;$i<$num_rows;$i++)
@@ -746,7 +747,7 @@ if ($result_lv!=0)
 		<div style="display: none">'.$db->convert_html_chars($row->lehre).'</div>
 		<a href="Lehre" onclick="changeboolean(\''.$row->lehrveranstaltung_id.'\',\'lehre\'); return false">
 		<input type="hidden" id="lehre'.$row->lehrveranstaltung_id.'" value="'.($row->lehre=='t'?'true':'false').'">
-		<img id="lehreimg'.$row->lehrveranstaltung_id.'" src="../../skin/images/'.($row->lehre=='t'?'true.png':'false.png').'" height="20">
+		<img id="lehreimg'.$row->lehrveranstaltung_id.'" title="Lehre" src="../../skin/images/'.($row->lehre=='t'?'true.png':'false.png').'" height="20">
 		</a></td>';
 		//LehreVz
 		echo '<td  style="white-space:nowrap;">';
@@ -766,7 +767,7 @@ if ($result_lv!=0)
 			echo '<div style="display: none">'.$db->convert_html_chars($row->aktiv).'</div>';
 			echo '<a href="Aktiv" onclick="changeboolean(\''.$row->lehrveranstaltung_id.'\',\'aktiv\'); return false">
 				<input type="hidden" id="aktiv'.$row->lehrveranstaltung_id.'" value="'.($row->aktiv=='t'?'true':'false').'">
-				<img id="aktivimg'.$row->lehrveranstaltung_id.'" src="../../skin/images/'.($row->aktiv=='t'?'true.png':'false.png').'" height="20">
+				<img id="aktivimg'.$row->lehrveranstaltung_id.'" title="Aktiv" src="../../skin/images/'.($row->aktiv=='t'?'true.png':'false.png').'" height="20">
 				</a>
 			';
 		}
@@ -790,7 +791,7 @@ if ($result_lv!=0)
 				<div style="display: none">'.$db->convert_html_chars($row->zeugnis).'</div>
 				<a href="Zeugnis" onclick="changeboolean(\''.$row->lehrveranstaltung_id.'\',\'zeugnis\'); return false">
 				<input type="hidden" id="zeugnis'.$row->lehrveranstaltung_id.'" value="'.($row->zeugnis=='t'?'true':'false').'">
-				<img id="zeugnisimg'.$row->lehrveranstaltung_id.'" src="../../skin/images/'.($row->zeugnis=='t'?'true.png':'false.png').'" height="20">
+				<img id="zeugnisimg'.$row->lehrveranstaltung_id.'" title="Zeugnis" src="../../skin/images/'.($row->zeugnis=='t'?'true.png':'false.png').'" height="20">
 				</a>
 			</td>';
 		//Projektarbeit
@@ -798,7 +799,7 @@ if ($result_lv!=0)
 				<div style="display: none">'.$db->convert_html_chars($row->projektarbeit).'</div>
 				<a href="Projektarbeit" onclick="changeboolean(\''.$row->lehrveranstaltung_id.'\',\'projektarbeit\'); return false">
 				<input type="hidden" id="projektarbeit'.$row->lehrveranstaltung_id.'" value="'.($row->projektarbeit=='t'?'true':'false').'">
-				<img id="projektarbeitimg'.$row->lehrveranstaltung_id.'" src="../../skin/images/'.($row->projektarbeit=='t'?'true.png':'false.png').'" height="20">
+				<img id="projektarbeitimg'.$row->lehrveranstaltung_id.'" title="Projektarbeit" src="../../skin/images/'.($row->projektarbeit=='t'?'true.png':'false.png').'" height="20">
 				</a>
 			</td>';
 		//FBK
@@ -827,6 +828,22 @@ if ($result_lv!=0)
 		}
 		else 
 			echo 'vorhanden';
+		echo '</td>';
+		//Lehrfach anlegen
+		echo "<td nowrap>";
+		if($write_admin)		
+			echo '<a href="lehrfach.php?neu
+			&filter_stg_kz='.$db->convert_html_chars($row->studiengang_kz).'
+			&filter_semester='.$db->convert_html_chars($row->semester).'
+			&filter_fachbereich_kurzbz=&filter_aktiv=
+			&stg_kz='.$row->studiengang_kz.'
+			&kurzbz='.$db->convert_html_chars($row->kurzbz).'
+			&bezeichnung='.$db->convert_html_chars($row->bezeichnung).'
+			&semester='.$db->convert_html_chars($row->semester).'
+			&farbe=&fachbereich_kurzbz=Dummy
+			&sprache='.$db->convert_html_chars($row->sprache).'" target="_parent" method="post">LF Neu</a>';
+		else		
+			echo $db->convert_html_chars($row->lehrveranstaltung_id);
 		echo '</td>';
 		echo "</tr>\n";
 	}

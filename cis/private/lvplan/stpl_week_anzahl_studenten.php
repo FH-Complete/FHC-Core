@@ -48,7 +48,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
-	<meat http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title>Anzahl Studenten Lehrveranstaltungsplan FH Technikum-Wien</title>
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<script src="../../../include/js/jquery.js" type="text/javascript"></script>
@@ -136,8 +136,7 @@
 
 								});								
 							});								
-						</script>	
-					</div>	
+						</script>		
 					</td>
 					<td id="info_close" align="right" style="color:#FFF;cursor: default;" class="ContentHeader">
 					<div>schliessen  <img border="0" src="../../../skin/images/cross.png" title="schliessen">&nbsp;</div>
@@ -150,7 +149,6 @@
 					   			});
 							});
 						</script>	
-					</div>
 					</td>
 					</tr></table>							
 					<div id="infodetail" style="font-size:medium;text-align:left;background-color: #F5F5F5;padding: 15px 15px 15px 15px;"></div>

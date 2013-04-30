@@ -28,7 +28,7 @@ $menu=array
 	//'Admin'=> 		array('name'=>'Admin', 'link'=>'admin/menu.html', 'target'=>'main'),
 	'LVPlan'=> 		array
 	(
-		'name'=>'LV-Plan', 'opener'=>'true', 'hide'=>'false', 'permissions'=>array('admin','lv-plan'), 'image'=>'lvplan.png',
+		'name'=>'LV-Plan', 'opener'=>'true', 'hide'=>'false', 'permissions'=>array('admin','lv-plan'), 'image'=>'vilesci_lvplan.png',
 		'link'=>'left.php?categorie=LVPlan', 'target'=>'nav',
 		'Gruppenverwaltung'=>array('name'=>'Gruppenverwaltung', 'permissions'=>array('admin','lv-plan','support'), 'link'=>'stammdaten/lvbgruppenverwaltung.php', 'target'=>'main'),
 		'Lehrveranstaltung'=>array('name'=>'Lehrveranstaltung', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
@@ -58,10 +58,17 @@ $menu=array
 			'Zeitsperren'=>array('name'=>'Zeitsperren', 'link'=>'personen/urlaubsverwaltung.php', 'target'=>'main'),
 		),
 		
+		'Vorrueckung'=>	array
+		(
+			'name'=>'Vorrueckung', 'permissions'=>array('admin','lv-plan','support'),
+			'Lehreinheiten'=>array('name'=>'Lehreinheiten', 'link'=>'lehre/lehreinheiten_vorrueckung.php', 'target'=>'main'),
+			'Studenten'=>array('name'=>'Studenten', 'link'=>'personen/student_vorrueckung.php', 'target'=>'main')
+		),
+		
 	),
 	'Lehre'=> 		array
 	(
-		'name'=>'Lehre', 'opener'=>'true', 'hide'=>'false', 'permissions'=>array('admin','lv-plan','support', 'lehre'), 'image'=>'x-office-presentation.png',
+		'name'=>'Lehre', 'opener'=>'true', 'hide'=>'false', 'permissions'=>array('admin','lv-plan','support', 'lehre'), 'image'=>'vilesci_lehre.png',
 		'link'=>'left.php?categorie=Lehre', 'target'=>'nav',
 		'Gruppenverwaltung'=>array('name'=>'Gruppen', 'permissions'=>array('admin','lv-plan','support'), 'link'=>'stammdaten/lvbgruppenverwaltung.php', 'target'=>'main'),
 		'Lehrveranstaltung'=>array('name'=>'Lehrveranstaltung', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
@@ -106,7 +113,7 @@ $menu=array
 	),
 	'Personen'=> 	array
 	(
-		'name'=>'Personen', 'opener'=>'true', 'hide'=>'true', 'image'=>'system-users.png', 'permissions'=>array('admin','lv-plan','support','mitarbeiter','basis/person'),
+		'name'=>'Personen', 'opener'=>'true', 'hide'=>'true', 'image'=>'vilesci_personen.png', 'permissions'=>array('admin','lv-plan','support','mitarbeiter','basis/person'),
 		'link'=>'left.php?categorie=Personen', 'target'=>'nav',
 		'Suche'=>array('name'=>'Suche', 'link'=>'personen/suche.php', 'target'=>'main','permissions'=>array('admin','lv-plan','support','basis/person')),
 		'Zusammenlegen'=>array('name'=>'Zusammenlegen', 'link'=>'stammdaten/personen_wartung.php', 'target'=>'main', 'permissions'=>array('admin','lv-plan','support')),
@@ -145,7 +152,7 @@ $menu=array
 	),
 	'Stammdaten'=>	array
 	(
-		'name'=>'Stammdaten', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support','basis/berechtigung','basis/variable','basis/studiengang','basis/ort','basis/firma','basis/fhausweis'), 'image'=>'folder.png',
+		'name'=>'Stammdaten', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support','basis/berechtigung','basis/variable','basis/studiengang','basis/ort','basis/firma','basis/fhausweis'), 'image'=>'vilesci_stammdaten.png',
 		'link'=>'left.php?categorie=Stammdaten', 'target'=>'nav',
 		'Betriebsmittel'=>array('name'=>'Betriebsmittel', 'link'=>'stammdaten/betriebsmittel_frameset.php', 'target'=>'main','permissions'=>array('basis/betriebsmittel')),
 		'Reihungstest'=>array('name'=>'Reihungstest', 'link'=>'stammdaten/reihungstestverwaltung.php', 'target'=>'main','permissions'=>array('admin','assistenz')),
@@ -186,7 +193,7 @@ $menu=array
 	),
 	'Wartung'=>	array
 	(
-		'name'=>'Wartung', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support','basis/firma'), 'image'=>'edit-clear.png',
+		'name'=>'Wartung', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support','basis/firma'), 'image'=>'vilesci_wartung.png',
 		'link'=>'left.php?categorie=Wartung', 'target'=>'nav',
 		'Vorrueckung'=>	array
 		(
@@ -207,7 +214,7 @@ $menu=array
 	),
 	'Auswertung'=>	array
 	(
-		'name'=>'Auswertung', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support','assistenz','wawi/inventar','basis/statistik'), 'image'=>'statistic.png',
+		'name'=>'Auswertung', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support','assistenz','wawi/inventar','basis/statistik'), 'image'=>'vilesci_statistik.png',
 		'link'=>'left.php?categorie=Auswertung', 'target'=>'nav',
 	/*
 		'Raumauslastung'=>array('name'=>'Raumauslastung...', 'link'=>'lehre/raumauslastung.php', 'target'=>'main'),
@@ -229,7 +236,7 @@ $menu=array
 	),
 	'Inventar'=>	array
 	(
-		'name'=>'Inventar', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','wawi','support','wawi/inventar'), 'image'=>'edit-paste.png',
+		'name'=>'Inventar', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','wawi','support','wawi/inventar'), 'image'=>'vilesci_inventar.png',
 		'link'=>'left.php?categorie=Inventar', 'target'=>'nav',
 		'Inventar'=>	array
 		(
@@ -243,7 +250,7 @@ $menu=array
 	),	
 	'Admin'=>	array
 	(
-		'name'=>'Admin', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support'), 'image'=>'emblem-system.png',
+		'name'=>'Admin', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support'), 'image'=>'vilesci_admin.png',
 		'link'=>'left.php?categorie=Admin', 'target'=>'nav',
 		'Tools'=>	array
 		(
@@ -264,7 +271,7 @@ $menu=array
 	),
 	'SD-Tools'=>	array
 	(
-		'name'=>'SD-Tools', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support'), 'image'=>'network-workgroup.png',
+		'name'=>'SD-Tools', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support'), 'image'=>'vilesci_sdtools.png',
 		'link'=>'https://sdtools.technikum-wien.at', 'target'=>'_blank',
 	)
 	
@@ -284,7 +291,7 @@ if($addon_obj->loadAddons())
 	{
 		$menu['Addons']=array
 		(
-			'name'=>'Addons', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('basis/addon'), 'image'=>'statistic.png',
+			'name'=>'Addons', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('basis/addon'), 'image'=>'vilesci_addons.png',
 			'link'=>'left.php?categorie=Addons', 'target'=>'nav'
 		);
 
