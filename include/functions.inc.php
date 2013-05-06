@@ -20,6 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once('betriebsmittelperson.class.php'); 
 
 // Auth: Benutzer des Webportals
 function get_uid()
@@ -413,103 +414,12 @@ function checkalias($alias)
  */
 function getUidFromCardNumber($number)
 {
-	if($connect=@ldap_connect(LDAP_SERVER))
-	{
-	    // bind to ldap connection
-	    if(($bind=@ldap_bind($connect)) == false)
-	    {
-			//print "bind:__FAILED__<br>\n";
-			return false;
-	    }
+    $betriebsmittel = new betriebsmittelperson(); 
+    if($betriebsmittel->getKartenzuordnung($number))
+        return $betriebsmittel->uid; 
+    else
+        return false; 
 
-	    // search for card id
-	    if (($res_id = ldap_search($connect, LDAP_BASE_DN, LDAP_CARD_NUMBER."=$number")) == false)
-	    {
-			//print "failure: search in LDAP-tree failed<br>";
-			return false;
-	    }
-
-	    // wurde keiner gefunden, versuche mit 0 davor
-		if (ldap_count_entries($connect, $res_id) == 0)
-	    {
-	    	$number = "0".$number; 
-	    	 // search for card id 0[Number]
-		    if (($res_id = ldap_search($connect, LDAP_BASE_DN, LDAP_CARD_NUMBER."=$number")) == false)
-		    {
-				//print "failure: search in LDAP-tree failed<br>";
-				return false;
-		    }
-		    if (ldap_count_entries($connect, $res_id) == 0)
-		    {
-			    $number = "0".$number; 
-		    	 // search for card id 00[Number]
-			    if (($res_id = ldap_search($connect, LDAP_BASE_DN, LDAP_CARD_NUMBER."=$number")) == false)
-			    {
-					//print "failure: search in LDAP-tree failed<br>";
-					return false;
-			    }
-			    if (ldap_count_entries($connect, $res_id) == 0)
-			    {
-				    $number = "0".$number; 
-			    	// search for card id 000[Number]
-				    if (($res_id = ldap_search($connect, LDAP_BASE_DN, LDAP_CARD_NUMBER."=$number")) == false)
-				    {
-						//print "failure: search in LDAP-tree failed<br>";
-						return false;
-				    }
-				    if (ldap_count_entries($connect, $res_id) == 0)
-			    	{
-			    		$number = "0".$number; 
-
-				    	// search for card id 0000[Number]
-					    if (($res_id = ldap_search($connect, LDAP_BASE_DN, LDAP_CARD_NUMBER."=$number")) == false)
-					    {
-							//print "failure: search in LDAP-tree failed<br>";
-							return false;
-					    }
-				    	if (ldap_count_entries($connect, $res_id) == 0)
-				    	{
-				    		$number = "0".$number; 
-					    	// search for card id 00000[Number]
-						    if (($res_id = ldap_search($connect, LDAP_BASE_DN, LDAP_CARD_NUMBER."=$number")) == false)
-						    {
-								//print "failure: search in LDAP-tree failed<br>";
-								return false;
-						    }
-					    	if (ldap_count_entries($connect, $res_id) == 0)
-					    	{
-					    		$number = "0".$number; 
-								// search for card id 000000[Number]
-							    if (($res_id = ldap_search($connect, LDAP_BASE_DN, LDAP_CARD_NUMBER."=$number")) == false)
-							    {
-									//print "failure: search in LDAP-tree failed<br>";
-									return false;
-							    }
-							    if (ldap_count_entries($connect, $res_id) == 0)
-						    	{
-						    		//print "failure: no person found<br>"; 
-						    		return false; 
-						    	}
-					    	}
-				    	}
-			    	}
-			    }
-		    }
-	    }
-		$info = ldap_get_entries($connect, $res_id); 
-		// gibt uid der Person zurück --> [0] für erste Person 
-		return($info[0]['uid'][0]); 
-	    
-	    @ldap_close($connect);
-		return true;
-	}
-	else
-	{
-		// no conection to ldap server
-		echo "no connection to '$ldap_server'<br>\n";
-	}
-	@ldap_close($connect);
-	return(false);
 }
 
 // ****************************************************************
@@ -547,7 +457,7 @@ function checkldapuser($username,$password)
 
 		if (( $user_dn = ldap_get_dn($connect, $entry_id)) == false)
 		{
-			print "failure: user-dn coulnd't be fetched<br>\n";
+			print "failure: user-dn coulnd't be fetched<br>\n";          
 			return false;
 	    }
 
