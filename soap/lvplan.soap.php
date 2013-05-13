@@ -27,6 +27,7 @@ require_once('../include/functions.inc.php');
 require_once('../include/webservicerecht.class.php');
 require_once('../include/lehrstunde.class.php');
 require_once('../include/lehreinheit.class.php');
+require_once('../include/lehrveranstaltung.class.php'); 
 
 ini_set("soap.wsdl_cache_enabled", "0");
 
@@ -91,6 +92,8 @@ function getLVPlanFromUser($uid, $von, $bis, $authentifizierung)
     class foo{}; 
 	
 	$result = $ls->getLehrstundenGruppiert();
+    $lv = new lehrveranstaltung(); 
+    
 	foreach($result as $row)
    	{
    		$Object = new foo();
@@ -100,10 +103,18 @@ function getLVPlanFromUser($uid, $von, $bis, $authentifizierung)
 			$Object->studiengang_kz = $le->studiengang_kz;
 			$Object->semester = $le->semester;
 			$Object->institut = $le->fachbereich_kurzbz;
+            $Object->lehrveranstaltung_id = $le->lehrveranstaltung_id; 
 		}
 
-		$Object->anmerkung = $row->anmerkung;
-		$Object->titel = $row->titel;
+        if(isset($Object->lehrveranstaltung_id))
+        {
+            $lv->load($Object->lehrveranstaltung_id);
+            $Object->titel = $lv->bezeichnung;
+        }
+        else
+            $Object->titel = $row->titel;
+        
+        $Object->anmerkung = $row->anmerkung;
 		$Object->stunde = $row->stunde;
 		$Object->datum = $row->datum;
 		$Object->lehreinheit_id = $row->lehreinheit_id;
