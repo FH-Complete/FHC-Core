@@ -185,6 +185,7 @@ function searchRaum($datum, $zeit_von, $zeit_bis, $raumtyp=null, $anzpersonen=nu
 	$user = $authentifizierung->username; 
     $passwort = $authentifizierung->passwort;
 
+    $anzpersonen = 0;
     // User authentifizieren
     if(!check_user($user, $passwort))
         return new SoapFault("Server", "Invalid Credentials");	
