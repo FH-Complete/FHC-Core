@@ -1,8 +1,8 @@
 <?php
 $this->phrasen['freifach/freifaecher']='Free elective courses';
 $this->phrasen['freifach/freifach']='Free elective course';
-$this->phrasen['freifach/freifaecherAnmeldung']='Registration/Withdrawal for elective courses';
-$this->phrasen['freifach/markierenFreifachFuerAnmeldung']='Please select the elective courses you want to register or unsubscribe to';
+$this->phrasen['freifach/freifaecherAnmeldung']='Registration for elective courses';
+$this->phrasen['freifach/markierenFreifachFuerAnmeldung']='Please select the elective courses you want to register to';
 $this->phrasen['freifach/fehlerBeimAktualisieren']='Error updating the allocation of electives! Please try again.';
 $this->phrasen['freifach/freifaecherNichtZugeteilt']='Electives could not be allocated! Please try again';
 $this->phrasen['freifach/datenErfolgreichAktualisiert']='Your data has been successfully updated';
