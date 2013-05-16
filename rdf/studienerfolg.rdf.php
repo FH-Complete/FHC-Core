@@ -36,6 +36,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 {
 	global $xml, $note_arr, $datum;
 
+	$db = new basis_db();
 	$query = "SELECT 
 				tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.bezeichnung, 
 				tbl_studentlehrverband.semester, tbl_person.titelpre, tbl_person.titelpost, 
@@ -49,12 +50,10 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 				tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz 
 				and tbl_student.student_uid = tbl_benutzer.uid 
 				and tbl_benutzer.person_id = tbl_person.person_id 
-				and tbl_student.student_uid = '".$uid."' 
+				and tbl_student.student_uid = ".$db->db_add_param($uid)." 
 				and tbl_studentlehrverband.student_uid=tbl_student.student_uid 
 				and tbl_studiensemester.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz 
-				and tbl_studentlehrverband.studiensemester_kurzbz = '".$studiensemester_kurzbz."'";
-
-	$db = new basis_db();
+				and tbl_studentlehrverband.studiensemester_kurzbz = ".$db->db_add_param($studiensemester_kurzbz);
 	
 	if($db->db_query($query))
 	{
@@ -71,8 +70,8 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	$qry_semester = "SELECT tbl_prestudentstatus.ausbildungssemester as semester FROM public.tbl_student, public.tbl_prestudentstatus 
 					WHERE tbl_student.prestudent_id=tbl_prestudentstatus.prestudent_id 
 						AND tbl_prestudentstatus.status_kurzbz in('Student','Incoming','Outgoing','Praktikant','Diplomand') 
-						AND studiensemester_kurzbz='".addslashes($studiensemester_aktuell)."' 
-						AND tbl_student.student_uid = '".addslashes($uid)."'";
+						AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_aktuell)." 
+						AND tbl_student.student_uid = ".$db->db_add_param($uid);
 	
 	if($db->db_query($qry_semester))
 		if($row_semester = $db->db_fetch_object())
@@ -84,8 +83,8 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	$qry_semester = "SELECT tbl_prestudentstatus.ausbildungssemester as semester FROM public.tbl_student, public.tbl_prestudentstatus 
 					WHERE tbl_student.prestudent_id=tbl_prestudentstatus.prestudent_id 
 						AND tbl_prestudentstatus.status_kurzbz in('Student','Incoming','Outgoing','Praktikant','Diplomand') 
-						AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' 
-						AND tbl_student.student_uid = '".addslashes($uid)."'";
+						AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." 
+						AND tbl_student.student_uid = ".$db->db_add_param($uid);
 		
 	if($db->db_query($qry_semester))
 		if($row_semester = $db->db_fetch_object())
@@ -122,7 +121,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 		die('Fehler beim Laden der Noten:'.$obj->errormsg);
 
 	$qry = "SELECT wochen FROM public.tbl_semesterwochen 
-			WHERE studiengang_kz='$row->studiengang_kz' AND semester='$row->semester'";
+			WHERE studiengang_kz=".$db->db_add_param($row->studiengang_kz)." AND semester=".$db->db_add_param($row->semester);
 	$wochen = 15;
 	if($db->db_query($qry))
 		if($row_wochen = $db->db_fetch_object())
@@ -135,8 +134,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 
 	foreach ($obj->result as $row)
 	{
-		//Note darf nicht teilnote(0), negativ(5), noch nicht eingetragen(7), nicht beurteilt (9), nicht erfolgreich absolviert (13), angerechnet(6) sein
-		if($row->zeugnis && $row->note!=0 && $row->note!=5 && $row->note!=7 && $row->note!=9 && $row->note!=13 && $row->note!=6)
+		if($row->zeugnis)
 		{
 			if ($row->note)
 				$note = $note_arr[$row->note];
