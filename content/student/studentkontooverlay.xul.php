@@ -129,6 +129,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									class="sortDirectionIndicator"
 									sort="rdf:http://www.technikum-wien.at/konto/rdf#insertvon" />
 								<splitter class="tree-splitter"/>
+								<treecol id="student-konto-tree-studiengang" label="Studiengang" flex="2" hidden="true"
+									class="sortDirectionIndicator"
+									sort="rdf:http://www.technikum-wien.at/konto/rdf#studiengang_kuerzel" />
+								<splitter class="tree-splitter"/>
 							</treecols>
 						
 							<template>
@@ -143,6 +147,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 											<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#buchungsnr"/>
 											<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#insertvon"/>
 											<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#insertamum"/>
+											<treecell label="rdf:http://www.technikum-wien.at/konto/rdf#studiengang_kuerzel"/>
 										</treerow>
 									</treeitem>
 								</treechildren>
