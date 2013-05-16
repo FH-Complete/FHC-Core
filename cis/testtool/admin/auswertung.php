@@ -77,6 +77,7 @@ $kategorie=array();
 $erg_kat=array();
 $datum_obj = new datum();
 $zgv_arr=array();
+$zgvma_arr=array();
 
 $datum_von = isset($_REQUEST['datum_von'])?$_REQUEST['datum_von']:'';
 $datum_bis = isset($_REQUEST['datum_bis'])?$_REQUEST['datum_bis']:'';
@@ -107,7 +108,13 @@ $qry = "SELECT * FROM bis.tbl_zgv";
 if($result = $db->db_query($qry))
 	while($row = $db->db_fetch_object($result))
 		$zgv_arr[$row->zgv_code]=$row->zgv_kurzbz;
-
+		
+$zgvma_arr['']='';
+$qry = "SELECT * FROM bis.tbl_zgvmaster";
+if($result = $db->db_query($qry))
+	while($row = $db->db_fetch_object($result))
+		$zgvma_arr[$row->zgvmas_code]=$row->zgvmas_kurzbz;
+		
 // Reihungstests laden
 $sql_query="SELECT * FROM public.tbl_reihungstest WHERE date_part('year',datum)=date_part('year',now()) ORDER BY datum,uhrzeit";
 
@@ -207,6 +214,7 @@ if (isset($_REQUEST['reihungstest']))
 		$ergebnis[$row->pruefling_id]->stg_bez=$row->stg_bez;
 		$ergebnis[$row->pruefling_id]->semester=$row->semester;
 		$ergebnis[$row->pruefling_id]->zgv=$row->zgv_code;
+		$ergebnis[$row->pruefling_id]->zgvma=$row->zgvmas_code;
 
 		if(!isset($ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]))
 			$ergebnis[$row->pruefling_id]->gebiet[$row->gebiet_id]=new stdClass();
@@ -281,7 +289,7 @@ if (isset($_REQUEST['reihungstest']))
 			(SELECT typ FROM testtool.tbl_kriterien 
 			 WHERE gebiet_id=vw_auswertung_kategorie_semester.gebiet_id AND punkte=vw_auswertung_kategorie_semester.punkte 
 			 AND kategorie_kurzbz=vw_auswertung_kategorie_semester.kategorie_kurzbz) as typ,
-			tbl_prestudent.zgv_code
+			tbl_prestudent.zgv_code, tbl_prestudent.zgvmas_code
 		FROM 
 			testtool.vw_auswertung_kategorie_semester 
 			JOIN public.tbl_prestudent USING(prestudent_id)
@@ -324,6 +332,7 @@ if (isset($_REQUEST['reihungstest']))
 		$erg_kat[$row->pruefling_id]->stg_bez=$row->stg_bez;
 		$erg_kat[$row->pruefling_id]->semester=$row->semester;
 		$erg_kat[$row->pruefling_id]->zgv = $row->zgv_code;
+		$erg_kat[$row->pruefling_id]->zgvma = $row->zgvmas_code;
 		$erg_kat[$row->pruefling_id]->kategorie[$row->kategorie_kurzbz]->name=$row->kategorie_kurzbz;
 		$erg_kat[$row->pruefling_id]->kategorie[$row->kategorie_kurzbz]->typ=$row->typ;
 		$erg_kat[$row->pruefling_id]->kategorie[$row->kategorie_kurzbz]->punkte=number_format($row->punkte,2).'/'.number_format($gesamtpunkte[$row->kategorie_kurzbz],2);
@@ -429,8 +438,11 @@ if(isset($_REQUEST['format']) && $_REQUEST['format']=='xls')
 	$worksheet->write(0,++$spalte,'ZGV', $format_bold);
 	$worksheet->mergeCells(0,9,1,9);
 	$maxlength[9]=20;
+	$worksheet->write(0,++$spalte,'ZGV MA', $format_bold);
+	$worksheet->mergeCells(0,10,1,10);
+	$maxlength[10]=20;
 	
-	$spalte=8;
+	$spalte=9;
 	$zeile=0;
 	
 	foreach ($gebiet AS $gbt)
@@ -444,7 +456,7 @@ if(isset($_REQUEST['format']) && $_REQUEST['format']=='xls')
 	$worksheet->mergeCells($zeile,++$spalte,0,$spalte+1);
 	$maxlength[$spalte]=12;
 	
-	$spalte=9;
+	$spalte=10;
 	$zeile=0;
 	
 	foreach ($gebiet AS $gbt)
@@ -481,6 +493,7 @@ if(isset($_REQUEST['format']) && $_REQUEST['format']=='xls')
 			$worksheet->write($zeile,++$spalte,$erg->stg_bez);
 			$worksheet->write($zeile,++$spalte,$erg->semester);
 			$worksheet->write($zeile,++$spalte,$zgv_arr[$erg->zgv]);
+			$worksheet->write($zeile,++$spalte,$zgvma_arr[$erg->zgvma]);
 			foreach ($gebiet AS $gbt)
 				if (isset($erg->gebiet[$gbt->gebiet_id]))
 				{
@@ -547,9 +560,12 @@ if(isset($_REQUEST['format']) && $_REQUEST['format']=='xls')
 	$worksheet2->write(0,++$spalte,'ZGV', $format_bold);
 	$worksheet2->mergeCells(0,9,1,9);
 	$maxlength[9]=20;
+	$worksheet2->write(0,++$spalte,'ZGV MA', $format_bold);
+	$worksheet2->mergeCells(0,10,1,10);
+	$maxlength[10]=20;
 
 	
-	$spalte=8;
+	$spalte=9;
 	$zeile=0;
 	
 	foreach ($kategorie AS $gbt)
@@ -560,7 +576,7 @@ if(isset($_REQUEST['format']) && $_REQUEST['format']=='xls')
 		$maxlength[$spalte]=10;
 	}
 	
-	$spalte=9;
+	$spalte=10;
 	$zeile=0;
 	
 	foreach ($kategorie AS $gbt)
@@ -592,6 +608,7 @@ if(isset($_REQUEST['format']) && $_REQUEST['format']=='xls')
 		$worksheet2->write($zeile,++$spalte,$erg->stg_bez);
 		$worksheet2->write($zeile,++$spalte,$erg->semester);
 		$worksheet2->write($zeile,++$spalte,$zgv_arr[$erg->zgv]);
+		$worksheet2->write($zeile,++$spalte,$zgvma_arr[$erg->zgvma]);
 		foreach ($kategorie AS $gbt)
 		{		
 			$worksheet2->write($zeile,++$spalte,$erg->kategorie[$gbt->name]->punkte);
@@ -707,6 +724,7 @@ else
 				<th rowspan="2">PrestudentIn_ID</th><th rowspan="2">Nachname</th><th rowspan="2">Vornamen</th>
 				<th rowspan="2">GebDatum</th><th rowspan="2">G</th>
 				<th rowspan="2">ZGV</th>
+				<th rowspan="2">ZGV MA</th>
 				<th rowspan="2">Registriert</th><th rowspan="2">STG</th><th rowspan="2">Studiengang</th><th title="Semester" rowspan="2">S</th>';
 		
 				foreach ($gebiet AS $gbt)
@@ -727,7 +745,7 @@ else
 		  	foreach ($ergb AS $erg)
 		  	{
 		  		echo "<tr><td>$erg->prestudent_id [<a href=auswertung_detail_prestudent.php?prestudent_id=$erg->prestudent_id target='blank'>Detail</a>]</td><td>$erg->nachname</td><td>$erg->vorname</td><td>$erg->gebdatum</td><td>$erg->geschlecht</td>
-		  				<td>".$zgv_arr[$erg->zgv]."</td><td>$erg->registriert</td><td>$erg->stg_kurzbz</td><td>$erg->stg_bez</td><td>$erg->semester</td>";
+		  				<td>".$zgv_arr[$erg->zgv]."</td><td>".$zgvma_arr[$erg->zgvma]."</td><td>$erg->registriert</td><td>$erg->stg_kurzbz</td><td>$erg->stg_bez</td><td>$erg->semester</td>";
 		  		//<td>$erg->idnachweis</td>
 		  		foreach ($gebiet AS $gbt)
 		  			if (isset($erg->gebiet[$gbt->gebiet_id]))
@@ -752,6 +770,7 @@ else
 				<th rowspan="2">PrestudentID</th><th rowspan="2">Nachname</th><th rowspan="2">Vornamen</th>
 				<th rowspan="2">GebDatum</th><th rowspan="2">G</th>
 				<th rowspan="2">ZGV</th>
+				<th rowspan="2">ZGV MA</th>
 				<th rowspan="2">Registriert</th><th rowspan="2">STG</th><th rowspan="2">Studiengang</th><th rowspan="2">S</th>';
 		
 				foreach ($kategorie AS $gbt)
@@ -767,7 +786,7 @@ else
 		   	foreach ($erg_kat AS $erg)
 		  	{
 		  		echo "<tr><td>$erg->prestudent_id</td><td>$erg->nachname</td><td>$erg->vorname</td><td>$erg->gebdatum</td><td>$erg->geschlecht</td>
-		  					<td>".$zgv_arr[$erg->zgv]."</td><td>$erg->registriert</td><td>$erg->stg_kurzbz</td><td>$erg->stg_bez</td><td>$erg->semester</td>";
+		  					<td>".$zgv_arr[$erg->zgv]."</td><td>".$zgvma_arr[$erg->zgvma]."</td><td>$erg->registriert</td><td>$erg->stg_kurzbz</td><td>$erg->stg_bez</td><td>$erg->semester</td>";
 		  		//<td>$erg->idnachweis</td>
 		  		foreach ($kategorie AS $gbt)
 					echo '<td>'.$erg->kategorie[$gbt->name]->punkte.'</td><td>'.$erg->kategorie[$gbt->name]->typ.'</td>';
