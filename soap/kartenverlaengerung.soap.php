@@ -57,7 +57,7 @@ function getNumber($cardNr)
         $objArray = array('datum'=>'', 'errorMessage'=>'Die Person kann nicht geladen werden. Bitte wenden Sie sich an den Service Desk.');  
         return $objArray;   
     }
-    
+    /*
     // lädt das aktuelle semester und nach 75 Tagen nach Anfang des Semesters das nächste
     $studSemester = new studiensemester(); 
     if(!$aktSemester= $studSemester->getNextOrAktSemester('75'))
@@ -65,15 +65,24 @@ function getNumber($cardNr)
         $objArray = array('datum'=>'', 'errorMessage'=>'Konnte Semester nicht laden. Bitte wenden Sie sich an den Service Desk.');  
         return $objArray;   
     }
-    
-    // überprüft ob Studienbeitrag bezahlt wurde
+    */
+    // hole Semester des letzten eingezahlten Studienbeitrages
     $konto = new konto(); 
+    if(!$aktSemester= $konto->getLastStudienbeitrag($cardPerson->uid))
+    {
+        $objArray = array('datum'=>'', 'errorMessage'=>'Fehler beim Auslesen des Studienganges. Bitte wenden Sie sich an den Service Desk.');  
+        return $objArray;
+    }  
+    
+    /*
+    // überprüft ob Studienbeitrag bezahlt wurde
     if(!$konto->checkStudienbeitrag($cardPerson->uid, $aktSemester))
     {
         $objArray = array('datum'=>'', 'errorMessage'=>'Studienbeitrag noch nicht gezahlt.');  
         return $objArray;
     }
-    
+    */
+    $studSemester = new studiensemester(); 
     $studSemester->load($aktSemester); 
     $datum = new datum(); 
     

@@ -514,6 +514,63 @@ class konto extends basis_db
 			return false;
 		}
 	}
+    
+    
+    
+    /**
+	 * ueberprueft, ob studiengebuehr gebucht ist fuer
+	 * student_uid und studiensemester
+	 * gibt true/false zurueck und setzt bei true das buchungsdatum $this->buchungsdatum
+	 */
+	public function getLastStudienbeitrag($uid)
+	{
+		$subqry = "SELECT tbl_konto.buchungsnr, tbl_konto.buchungsdatum, tbl_konto.buchungsnr_verweis, tbl_konto.studiensemester_kurzbz FROM public.tbl_konto, public.tbl_benutzer, public.tbl_student
+					WHERE 
+						tbl_benutzer.uid = '".addslashes($uid)."' 
+						AND tbl_benutzer.uid = tbl_student.student_uid
+						AND tbl_benutzer.person_id = tbl_konto.person_id 
+						AND tbl_konto.studiengang_kz=tbl_student.studiengang_kz
+						AND tbl_konto.buchungstyp_kurzbz = 'Studiengebuehr' ORDER BY buchungsnr DESC";
+		
+		if($result = $this->db_query($subqry))
+		{
+			if ($this->db_num_rows($result)==0)
+				return false;
+			else
+			{
+				while ($subrow = $this->db_fetch_object($result))
+				{
+                    if($subrow->buchungsnr_verweis != '')
+                    {
+                        $qry = "SELECT sum(betrag) as differenz FROM public.tbl_konto 
+                            WHERE buchungsnr=".$this->db_add_param($subrow->buchungsnr_verweis, FHC_INTEGER)." OR buchungsnr_verweis=".$this->db_add_param($subrow->buchungsnr_verweis, FHC_INTEGER).";";
+                        
+                        if($result_test = $this->db_query($qry))
+                        {
+                            if($row = $this->db_fetch_object($result_test))
+                            {
+                                if ($row->differenz == 0)
+                                {
+                                    return $subrow->studiensemester_kurzbz;
+                                }
+                            }
+
+                        }
+                        else
+                        {
+                            $this->errormsg = 'Fehler beim Ermitteln der Differenz';
+                            return false;
+                        }
+                    }
+				}
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler bei einer Abfrage';
+			return false;
+		}
+	}
 	
 	/**
 	 * 
