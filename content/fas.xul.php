@@ -117,7 +117,7 @@ foreach($addon_obj->result as $addon)
   <command id="menu-dokumente-inskriptionsbestaetigung:command" oncommand="StudentPrintInskriptionsbestaetigung();"/>
   <command id="menu-dokumente-zeugnis:command" oncommand="StudentCreateZeugnis('Zeugnis');"/>
   <command id="menu-dokumente-zeugniseng:command" oncommand="StudentCreateZeugnis('ZeugnisEng');"/>
-  <command id="menu-dokumente-sammelzeugnis:command" oncommand="StudentCreateSammelzeugnis('Sammelzeugnis');"/>
+  <!--<command id="menu-dokumente-sammelzeugnis:command" oncommand="StudentCreateSammelzeugnis('Sammelzeugnis');"/>-->
   <command id="menu-dokumente-diplsupplement:command" oncommand="StudentCreateDiplSupplement();"/>
   <command id="menu-dokumente-studienerfolg-normal:command" oncommand="StudentCreateStudienerfolg('Studienerfolg');"/>
   <command id="menu-dokumente-studienerfolg-finanzamt:command" oncommand="StudentCreateStudienerfolg('Studienerfolg','finanzamt');"/>
@@ -483,12 +483,13 @@ foreach($addon_obj->result as $addon)
                label     = "&menu-dokumente-zeugniseng.label;"
                command   =  "menu-dokumente-zeugniseng:command"
                accesskey = "&menu-dokumente-zeugniseng.accesskey;"/>
-            <menuitem
+<!--            <menuitem
                id        = "menu-dokumente-sammelzeugnis"
                key       = "&menu-dokumente-sammelzeugnis.key;"
                label     = "&menu-dokumente-sammelzeugnis.label;"
                command   = "menu-dokumente-sammelzeugnis:command"
                accesskey = "&menu-dokumente-sammelzeugnis.accesskey;"/>
+-->
             <menuitem
                id        =  "menu-dokumente-diplsupplement"
                key       =  "menu-dokumente-diplsupplement:key"
