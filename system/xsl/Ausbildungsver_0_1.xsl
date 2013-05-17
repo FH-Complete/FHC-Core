@@ -469,10 +469,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           <text:p text:style-name="P40">Der Erhalter ist weiters verpflichtet, das Studium auf der Grundlage höchster Qualitätsansprüche hinsichtlich der Erreichung der Ausbildungsziele zu gestalten und allfällige Änderungen des akkreditierten Studienganges bekannt zu geben.</text:p>
         </text:list-item>
         <text:list-item>
-          <text:p text:style-name="P40">Der Erhalter ist nur dann berechtigt, die der Studentin oder dem Studenten zur Verfügung gestellte FHTW- eMail-Adresse weiterzugeben, wenn im Sinne von § 47 Datenschutzgesetz (DSG 2000) das öffentliche oder wissenschaftliche Interesse gegenüber dem privaten Einzelinteresse überwiegt.</text:p>
+          <text:p text:style-name="P40">Der Erhalter ist nur dann berechtigt, die der Studentin oder dem Studenten zur Verfügung gestellte FHTW-E-Mail-Adresse weiterzugeben, wenn im Sinne von § 47 Datenschutzgesetz (DSG 2000) das öffentliche oder wissenschaftliche Interesse gegenüber dem privaten Einzelinteresse überwiegt.</text:p>
         </text:list-item>
       </text:list>
-      <text:p text:style-name="P5"/>
+      <text:p text:style-name="P38"/>
       <text:list xml:id="list1403787711" text:continue-list="list890989597" text:style-name="WW8Num7">
         <text:list-item>
           <text:list>
@@ -501,7 +501,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       </text:list>
       <text:p text:style-name="P28">6.2 Pflichten</text:p>
       <text:p text:style-name="P29">6.2.1 Studienbeitrag</text:p>
-      <text:p text:style-name="P5">Die Studentin bzw. der Student ist verpflichtet, zwei Wochen vor Beginn jedes Semesters (StudienanfängerInnen: bis 20. August vor Studienbeginn) einen Studienbeitrag gemäß Fachhochschul-Studiengesetz (BGBl. Nr. 340/1993 idgF) in der Höhe von derzeit € 363,36 netto pro Semester zu entrichten. Dies gilt auch in Semestern mit DiplomandInnenenstatus o.ä. Im Falle einer Erhöhung des gesetzlichen Studienbeitragssatzes erhöht sich der angeführte Betrag entsprechend. <text:soft-page-break/>Bei Nichtantritt des Studiums oder Abbruch zu Beginn oder während des Semesters verfällt der Studienbeitrag.</text:p>
+      <text:p text:style-name="P5">Die Studentin bzw. der Student ist verpflichtet, zwei Wochen vor Beginn jedes Semesters (StudienanfängerInnen: bis 20. August vor Studienbeginn) einen Studienbeitrag gemäß Fachhochschul-Studiengesetz (BGBl. Nr. 340/1993 idgF) in der Höhe von derzeit € 363,36 netto pro Semester zu entrichten. Dies gilt auch in Semestern mit DiplomandInnenstatus o.ä. Im Falle einer Erhöhung des gesetzlichen Studienbeitragssatzes erhöht sich der angeführte Betrag entsprechend. <text:soft-page-break/>Bei Nichtantritt des Studiums oder Abbruch zu Beginn oder während des Semesters verfällt der Studienbeitrag.</text:p>
       <text:p text:style-name="P31">6.2.2 Studierendenbeitrag („ÖH-Beitrag“)</text:p>
       <text:p text:style-name="P5">Gemäß § 4 Abs. 9 des Fachhochschul-Studiengesetzes (BGBl. Nr. 340/1993 idgF und der Bundesministeriengesetz-Novelle 2007, BGBl. I Nr. 6/2007) gehören Studierende an Fachhochschul-Studiengängen der Österreichischen HochschülerInnenschaft (ÖH) gemäß Hochschülerinnen- und Hochschülerschaftsgesetz (HSG 1998) an. Daraus resultiert die Verpflichtung der Studentin oder des Studenten zur Entrichtung des ÖH-Beitrags. Dies gilt auch in Semestern mit DiplomandInnenstatus. Der Studierendenbeitrag kann jährlich durch die ÖH indexiert werden; die genaue Höhe des Studierendenbeitrags wird von der ÖH jährlich für das folgende Studienjahr bekannt gegeben.</text:p>
       <text:p text:style-name="P5">Die Einhebung des Betrags erfolgt durch die Fachhochschule. Der Erhalter überweist in Folge die eingezahlten Beträge der Studierenden ohne Abzüge an die ÖH. Die Entrichtung des Betrags ist Voraussetzung für die Zulassung zum Studium bzw. für dessen Fortsetzung.</text:p>
