@@ -38,6 +38,7 @@ echo "<?xml version='1.0' encoding='utf-8' ?>";
     <s:complexType name="LVPlanItem">
         <s:sequence>			
             <s:element minOccurs="0" maxOccurs="1" name="anmerkung" type="s:string"/>
+            <s:element minOccurs="0" maxOccurs="1" name="lehrform" type="s:string"/>
             <s:element minOccurs="0" maxOccurs="1" name="titel" type="s:string"/>
 			<s:element minOccurs="0" maxOccurs="1" name="studiengang_kz" type="s:string"/>
 			<s:element minOccurs="0" maxOccurs="1" name="semester" type="s:string"/>

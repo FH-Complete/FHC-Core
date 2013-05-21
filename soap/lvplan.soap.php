@@ -104,6 +104,12 @@ function getLVPlanFromUser($uid, $von, $bis, $authentifizierung)
 			$Object->semester = $le->semester;
 			$Object->institut = $le->fachbereich_kurzbz;
             $Object->lehrveranstaltung_id = $le->lehrveranstaltung_id; 
+            
+            $le_help = new lehreinheit(); 
+            if($le_help->load($le->lehreinheit_id))
+                $Object->lehrform = $le_help->lehrform_kurzbz; 
+            else
+                $Object->lehrform = '';
 		}
 
         if(isset($Object->lehrveranstaltung_id))
@@ -112,8 +118,11 @@ function getLVPlanFromUser($uid, $von, $bis, $authentifizierung)
             $Object->titel = $lv->bezeichnung;
         }
         else
+        {
             $Object->titel = $row->titel;
-        
+            
+        }
+        //$Object->lehrform = $row->lehrform; 
         $Object->anmerkung = $row->anmerkung;
 		$Object->stunde = $row->stunde;
 		$Object->datum = $row->datum;
