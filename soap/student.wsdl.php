@@ -50,6 +50,7 @@ echo "<?xml version='1.0' encoding='utf-8' ?>";
 
     <s:complexType name="Student">
         <s:element minOccurs="0" maxOccurs="1" name="studiengang_kz" type="s:string"/>
+        <s:element minOccurs="0" maxOccurs="1" name="person_id" type="s:string"/>
         <s:element minOccurs="0" maxOccurs="1" name="semester" type="s:string"/>
         <s:element minOccurs="0" maxOccurs="1" name="verband" type="s:string"/>
         <s:element minOccurs="0" maxOccurs="1" name="gruppe" type="s:string"/>
