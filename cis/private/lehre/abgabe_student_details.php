@@ -312,7 +312,7 @@ if($command=="update" && $error!=true)
 				    $htmlstr .= "</td></tr>\n";
 					$htmlstr .= "<tr><td width='30%'><b>".$p->t('abgabetool/kontrollierteSchlagwoerter').":*</b></td>
 								<td width='40%'><input  type='text' name='kontrollschlagwoerter'  id='kontrollschlagwoerter' value='".$kontrollschlagwoerter."' size='60' maxlength='150'></td>
-								<td  width='30%' align='left'><input type='button' name='SWD' value='    SWD    ' onclick='window.open(\"abgabe_student_swd.php\")'></td></tr>\n";
+								<td  width='30%' align='left'><input type='button' name='SWD' value='    SWD    ' onclick='window.open(\"swd.php\")'></td></tr>\n";
 					$htmlstr .= "<tr><td><b>".$p->t('abgabetool/deutscheSchlagwoerter').":</b></td>
 								<td><input  type='text' name='schlagwoerter' value='".$schlagwoerter."' size='60' maxlength='150'></td></tr>\n";
 					$htmlstr .= "<tr><td><b>".$p->t('abgabetool/englischeSchlagwoerter').":</b></td>
