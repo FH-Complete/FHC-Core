@@ -62,6 +62,7 @@ function getStudentFromUid($student_uid, $authentifizierung)
     $preStudent->getLastStatus($studentObj->prestudent_id);
     
     $student->studiengang_kz = $studentObj->studiengang_kz;
+    $student->person_id = $studentObj->person_id; 
     $student->semester = $studentObj->semester; 
     $student->verband = $studentObj->verband; 
     $student->gruppe = $studentObj->gruppe; 
@@ -108,6 +109,7 @@ function getStudentFromMatrikelnummer($matrikelnummer, $authentifizierung)
     $preStudent->getLastStatus($studentObj->prestudent_id);
     
     $student->studiengang_kz = $studentObj->studiengang_kz;
+    $student->person_id = $studentObj->person_id; 
     $student->semester = $studentObj->semester; 
     $student->verband = $studentObj->verband; 
     $student->gruppe = $studentObj->gruppe; 
@@ -162,6 +164,7 @@ function getStudentFromStudiengang($studiengang, $semester = null, $verband = nu
         $preStudent->getLastStatus($stud->prestudent_id);
         
         $student->studiengang_kz = $stud->studiengang_kz;
+        $student->person_id = $stud->person_id; 
         $student->semester = $stud->semester; 
         $student->verband = $stud->verband; 
         $student->gruppe = $stud->gruppe; 
