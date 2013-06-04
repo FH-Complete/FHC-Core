@@ -678,6 +678,11 @@ function MitarbeiterAuswahl()
 		document.getElementById('mitarbeiter-funktionen').setAttribute('src',url);
 	}
 	
+	// Selektierungsfunktion der Addons aufrufen
+	for(i in addon)
+	{
+		addon[i].selectMitarbeiter(person_id, uid)
+	}
 }
 
 // ****
