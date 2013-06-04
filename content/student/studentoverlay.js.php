@@ -1360,6 +1360,12 @@ function StudentAuswahl()
 			document.getElementById('student-funktionen').setAttribute('src',url);
 		}
 	}
+	
+	// Selektierungsfunktion der Addons aufrufen
+	for(i in addon)
+	{
+		addon[i].selectStudent(person_id, prestudent_id, uid)
+	}
 }
 
 // ****

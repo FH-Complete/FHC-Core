@@ -100,22 +100,23 @@ $rdf_url='http://www.technikum-wien.at/konto';
 if ($xmlformat=='rdf')
 {
 	
-?>
-
+echo '
 <RDF:RDF
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	xmlns:KONTO="<?php echo $rdf_url; ?>/rdf#"
->
+	xmlns:KONTO="'.$rdf_url.'/rdf#"
+>';
 
-<?php
 function drawrow($row)
 {
 	global $rdf_url, $datum;
+	
+	$stg = new studiengang($row->studiengang_kz);
 	echo "
   		<RDF:Description  id=\"".$row->buchungsnr."\"  about=\"".$rdf_url.'/'.$row->buchungsnr."\" >
 			<KONTO:buchungsnr><![CDATA[".$row->buchungsnr."]]></KONTO:buchungsnr>
 			<KONTO:person_id><![CDATA[".$row->person_id."]]></KONTO:person_id>
 			<KONTO:studiengang_kz><![CDATA[".$row->studiengang_kz."]]></KONTO:studiengang_kz>
+			<KONTO:studiengang_kuerzel><![CDATA[".$stg->kuerzel."]]></KONTO:studiengang_kuerzel>
 			<KONTO:studiensemester_kurzbz><![CDATA[".$row->studiensemester_kurzbz."]]></KONTO:studiensemester_kurzbz>
 			<KONTO:buchungsnr_verweis><![CDATA[".$row->buchungsnr_verweis."]]></KONTO:buchungsnr_verweis>
 			<KONTO:betrag><![CDATA[".$row->betrag."]]></KONTO:betrag>
@@ -171,14 +172,16 @@ else
 	$hier.="<RDF:li resource=\"".$rdf_url.'/'.$konto->buchungsnr.'" />';
 	drawrow($konto);
 }
-	$hier="
+$hier="
   	<RDF:Seq about=\"".$rdf_url."/liste\">".$hier."
   	</RDF:Seq>";
 
-	echo $hier;
-?>
+echo $hier;
+	
+echo '
 </RDF:RDF>
-<?php
+';
+
 } //endof xmlformat==rdf
 // ----------------------------------- XML --------------------------------------
 elseif ($xmlformat=='xml')
