@@ -2098,7 +2098,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
               <text:span text:style-name="Tabelleninhalt">www.technikum-wien.at</text:span>
             </text:p>
             <text:p text:style-name="P44">
-              <text:span text:style-name="Tabelleninhalt">www.fhr.ac.at</text:span>
+              <text:span text:style-name="Tabelleninhalt">www.aq.ac.at</text:span>
             </text:p>
             <text:p text:style-name="P44">
               <text:span text:style-name="Tabelleninhalt">www.bmwf.gv.at/home/academic_mobility/enic_naric_austria/</text:span>
