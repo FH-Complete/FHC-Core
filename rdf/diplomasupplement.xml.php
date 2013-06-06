@@ -249,14 +249,14 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		{
 			if($row1 = $db->db_fetch_object())
 			{
-				echo "		<beurteilung><![CDATA[$row1->bezeichnung]]></beurteilung>";
-				echo "		<beurteilung_english><![CDATA[$row1->bezeichnung_english]]></beurteilung_english>";
+				//echo "		<beurteilung><![CDATA[$row1->bezeichnung]]></beurteilung>";
+				//echo "		<beurteilung_english><![CDATA[$row1->bezeichnung_english]]></beurteilung_english>";
 				$akadgrad_id = $row1->akadgrad_id;
-			}else
-            {
-                echo "		<beurteilung>In diesem Curriculum nicht zutreffend.</beurteilung>";
-				echo "		<beurteilung_english>Not applicable within this curriculum.</beurteilung_english>";
-            }
+			}
+            
+            echo "		<beurteilung>In diesem Curriculum nicht zutreffend.</beurteilung>";
+            echo "		<beurteilung_english>Not applicable within this curriculum.</beurteilung_english>";
+            
 		}
 				
 		$qry = "SELECT * FROM lehre.tbl_akadgrad WHERE akadgrad_id=".$db->db_add_param($akadgrad_id);
