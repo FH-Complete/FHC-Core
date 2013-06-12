@@ -827,7 +827,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                             echo '<lv>
                                 <lehrform_kurzbz></lehrform_kurzbz>
                                 <benotungsdatum>'.$benotungsdatum_outgoing.'</benotungsdatum>
-                                <sws>'.sws.'</sws>
+                                <sws>'.$sws.'</sws>
                                 <semester></semester>
                                 <kurzbz>'.$lehrform_kurzbz_outgoing.'</kurzbz>
                                 <stsem></stsem>
