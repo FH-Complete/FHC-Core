@@ -698,7 +698,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                         if($row_praktikum = $db->db_fetch_object($result_praktikum))
                         {
 							$bezeichnung.= ' absolviert in: '.$row_praktikum->name; 
-							$bezeichnung_englisch .= ' written at: '.$row_praktikum->name; 
+							$bezeichnung_englisch .= ' at: '.$row_praktikum->name; 
                         }
                     }
                     
