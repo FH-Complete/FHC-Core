@@ -707,18 +707,19 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                     FROM lehre.tbl_projektarbeit 
                     JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
                     WHERE student_uid=".$db->db_add_param($uid_arr[$i])." 
-                    AND projekttyp_kurzbz in('Bachelor', 'Diplom') 
-                    ORDER BY beginn ASC, projektarbeit_id ASC;";
+                    AND projekttyp_kurzbz in('Bachelor', 'Diplom')
+                    AND lehrveranstaltung_id=".$db->db_add_param($row_stud->lehrveranstaltung_id)." 
+                    ORDER BY beginn DESC, projektarbeit_id DESC LIMIT 1;";
                     
                     if($result_thesis = $db->db_query($qry))
                     {
                         while($row_thesis = $db->db_fetch_object($result_thesis))
                         {
-                            if($row_thesis->lehrveranstaltung_id == $row_stud->lehrveranstaltung_id)
-                            {
+                            //if($row_thesis->lehrveranstaltung_id == $row_stud->lehrveranstaltung_id)
+                            //{
                                 $bezeichnung.= ": \"".$row_thesis->titel."\"";
                                 $bezeichnung_englisch.= ": \"".$row_thesis->titel."\""; 
-                            }
+                            //}
                         }
                     }
                     
