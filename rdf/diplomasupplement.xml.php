@@ -640,8 +640,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 //					echo " <lv>";
 					
 					// hole lehrform_kz von aktueller LV
-					$qry_lehrform = "SELECT distinct(lehrform_kurzbz) FROM
+					
+					/*$qry_lehrform = "SELECT distinct(lehrform_kurzbz) FROM
 					 lehre.tbl_lehreinheit WHERE studiensemester_kurzbz=".$db->db_add_param($row_stud->studiensemester_kurzbz)." and lehrveranstaltung_id = ".$db->db_add_param($row_stud->lehrveranstaltung_id)." 
+					 ORDER BY lehrform_kurzbz";*/  //Lehrform kommt nicht mehr von der Lehreinheit sondern von der Lehrveranstaltung
+										
+					$qry_lehrform = "SELECT distinct(lehrform_kurzbz) FROM
+					 lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id = ".$db->db_add_param($row_stud->lehrveranstaltung_id)."
 					 ORDER BY lehrform_kurzbz";
 					
 					$lehrform_kurzbz = '';
