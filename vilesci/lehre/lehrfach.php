@@ -240,7 +240,9 @@ echo '
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<link rel="stylesheet" href="../../skin/jquery.css" type="text/css"/>
 		<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
+		<link rel="stylesheet" href="../../skin/colorpicker.css" type="text/css"/>
 		<script type="text/javascript" src="../../include/js/jquery.js"></script>
+		<script type="text/javascript" src="../../include/js/colorpicker.js"></script>
 		<script type="text/javascript">
 		$(document).ready(function() 
 			{ 
@@ -249,7 +251,24 @@ echo '
 					sortList: [[2,0],[4,0],[0,0]],
 					widgets: ["zebra"]
 				}); 
-			}); 
+			
+				$("#farbe").ColorPicker(
+					{
+						onSubmit: function(hsb, hex, rgb, el) 
+						{
+							$(el).val(hex);
+							$(el).ColorPickerHide();
+						},
+						onBeforeShow: function () 
+						{
+							$(this).ColorPickerSetColor(this.value);
+						}
+					})
+				.bind("keyup", function()
+				{
+					$(this).ColorPickerSetColor(this.value);
+				});
+		});
 		</script>
 	</head>
 	<body>
@@ -327,7 +346,7 @@ if (isset($_GET['type']) && $_GET['type']=='edit')
 	}
 	echo "</SELECT></td></tr>";
 	echo '
-	<tr><td>Institut</td><td><SELECT name="fachbereich_kurzbz" onchange="document.getElementById(\'farbe\').value=this.options[this.selectedIndex].getAttribute(\'farbe\')">
+	<tr><td>Institut</td><td><SELECT name="fachbereich_kurzbz" '.($lf->farbe==""?'onchange="document.getElementById(\'farbe\').value=this.options[this.selectedIndex].getAttribute(\'farbe\')':'').'">
       			<option value="-1">- ausw&auml;hlen -</option>';
 	foreach($fachbereiche as $fb)
 	{
