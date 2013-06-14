@@ -719,7 +719,7 @@ if ($result_lv!=0)
 
 		//Lehrform
 		echo '<td style="white-space:nowrap;">';
-		echo '<SELECT id="lf'.$row->lehrveranstaltung_id.'">';
+		echo '<SELECT style="width:80px;" id="lf'.$row->lehrveranstaltung_id.'">';
 		echo '<option value="">--</option>';
 		foreach ($lf as $lehrform=>$lf_kz)
 		{
@@ -727,7 +727,7 @@ if ($result_lv!=0)
 				$selected='selected';
 			else
 				$selected='';
-			echo '<option value="'.$db->convert_html_chars($lehrform).'" '.$selected.'>'.$db->convert_html_chars($lf_kz['lehrform_kurzbz']).'</option>';
+			echo '<option value="'.$db->convert_html_chars($lehrform).'" '.$selected.'>'.$db->convert_html_chars($lf_kz['lehrform_kurzbz']).' '.$db->convert_html_chars($lf_kz['bezeichnung']).'</option>';
 		}
 		echo '</SELECT><input type="button" value="ok" id="lf'.$row->lehrveranstaltung_id.'" onclick="changelehrform(\''.$row->lehrveranstaltung_id.'\',$(\'#lf'.$row->lehrveranstaltung_id.'\').val())">';
 		echo '</td>';
