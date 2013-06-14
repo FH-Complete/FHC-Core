@@ -599,7 +599,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <text:p text:style-name="P27">7.4 Erlöschen</text:p>
       <text:p text:style-name="P5">Der Ausbildungsvertrag erlischt mit der Verleihung des akademischen Grades.</text:p>
       <text:p text:style-name="P27"/>
-	<xsl:if test="studiengangSprache = 'English' or (studiengang_kurzbz ='BEW' or studiengang_kurzbz='BWI' and orgform ='DL')">
+	<xsl:if test="studiengangSprache = 'English' or ((studiengang_kurzbz ='BEW' or studiengang_kurzbz='BWI') and orgform ='DL')">
       <text:list xml:id="list422793909" text:continue-list="list866389060" text:style-name="WW8Num7">
 		<text:list-item>
           <text:list>
