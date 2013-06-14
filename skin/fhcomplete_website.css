@@ -125,5 +125,23 @@ body
 		cursor:pointer;
 		display:block;
 	}
+	h1
+	{
+		font-size:14px;
+		font-family:Arial;
+		padding-left:50px;
+		padding-right:50px;
+		color:#D1D7DA;
+		text-align: justify;
+	}
+	h2
+	{
+		font-size:14px;
+		font-family:Arial;
+		padding-left:50px;
+		padding-right:50px;
+		color:#D1D7DA;
+		text-align: justify;
+	}
 	
 	
