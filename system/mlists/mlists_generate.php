@@ -409,19 +409,21 @@ $error_msg='';
 
 	// Studenten holen die nicht im Verteiler sind
 	echo '<BR>';
-	$sql_query="SELECT uid, 
-					(SELECT gruppe_kurzbz FROM public.tbl_gruppe 
+	$sql_query="SELECT uid, tbl_gruppe.gruppe_kurzbz
+FROM 
+	public.tbl_benutzerfunktion 
+	JOIN public.tbl_benutzer USING(uid)
+	JOIN public.tbl_studiengang USING(oe_kurzbz)
+	JOIN public.tbl_gruppe ON(tbl_gruppe.studiengang_kz=tbl_studiengang.studiengang_kz AND gruppe_kurzbz like '%_STDV')
+WHERE 
+	funktion_kurzbz='stdv' 
+	AND tbl_benutzer.aktiv AND 
+	(tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=now()) AND
+	(tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=now())
+	AND uid NOT in(Select uid from public.tbl_benutzergruppe JOIN public.tbl_gruppe USING(gruppe_kurzbz) 
 					WHERE studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang 
 											WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) 
-					AND gruppe_kurzbz like '%_STDV') as gruppe_kurzbz 
-				FROM public.tbl_benutzerfunktion JOIN public.tbl_benutzer USING(uid)
-				WHERE funktion_kurzbz='stdv' AND tbl_benutzer.aktiv AND 
-				(tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=now()) AND
-				(tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=now())
-				AND uid NOT in(Select uid from public.tbl_benutzergruppe JOIN public.tbl_gruppe USING(gruppe_kurzbz) 
-								WHERE studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang 
-														WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) 
-								AND gruppe_kurzbz Like '%_STDV')";
+					AND gruppe_kurzbz Like '%_STDV')";
 	if(!($result = $db->db_query($sql_query)))
 		$error_msg.=$db->db_last_error();
 	while($row = $db->db_fetch_object($result))
