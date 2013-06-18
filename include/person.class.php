@@ -304,14 +304,14 @@ class person extends basis_db
 			$this->errormsg = 'Aktiv ist ungueltig';
 			return false;
 		}
-		if(mb_strlen($this->insertvon)>16)
+		if(mb_strlen($this->insertvon)>32)
 		{
-			$this->errormsg = 'Insertvon darf nicht laenger als 16 Zeichen sein';
+			$this->errormsg = 'Insertvon darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
-		if(mb_strlen($this->updatevon)>16)
+		if(mb_strlen($this->updatevon)>32)
 		{
-			$this->errormsg = 'Updatevon darf nicht laenger als 16 Zeichen sein';
+			$this->errormsg = 'Updatevon darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
 		if($this->ext_id!='' && !is_numeric($this->ext_id))
@@ -336,7 +336,7 @@ class person extends basis_db
 		}
 		if($this->geschlecht!='m' && $this->geschlecht!='w' && $this->geschlecht!='u')
 		{
-			$this->errormsg = 'Geschlecht mu� w, m oder u sein!';
+			$this->errormsg = 'Geschlecht muss w, m oder u sein!';
 			return false;
 		}
 		
