@@ -20,11 +20,7 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-
 	require_once('../../../config/cis.config.inc.php');
-// ------------------------------------------------------------------------------------------
-//	Datenbankanbindung 
-// ------------------------------------------------------------------------------------------
 	require_once('../../../include/basis_db.class.php');			
     require_once('../../../include/functions.inc.php');
     require_once('../../../include/benutzerberechtigung.class.php');
@@ -68,6 +64,12 @@
 	if(isset($_POST['delete_file']))
 		$delete_file = $_POST['delete_file'];
 	
+	if($course_id!='' && !is_numeric($course_id))
+		die('Fehlerhafter Parameter');
+		
+	if($term_id!='' && !is_numeric($term_id))
+		die('Fehlerhafter Parameter');
+		
 	$rechte = new benutzerberechtigung();
 
 	$rechte->getBerechtigungen($user);
@@ -94,7 +96,7 @@
 	}
 	else
 	{
-		$sql_query = "SELECT student_uid FROM public.tbl_student WHERE student_uid='$user'";
+		$sql_query = "SELECT student_uid FROM public.tbl_student WHERE student_uid=".$db->db_add_param($user);
 		if($result_student = $db->db_query($sql_query))
 		{
 			$num_rows_student = $db->db_num_rows($result_student);
@@ -183,24 +185,18 @@ A:hover {
 }
 </style>
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
-</head>
 <base target="_self">
+</head>
 
-<body id="inhalt">
-
+<body>
+<h1><?php echo $p->t('upload/dateiUpload');?></h1>
 <table class="tabcontent">
-	<tr>
-		<td width="3%">&nbsp;</td>
-		<td width="97%"><table class="tabcontent"><tr><td>
-			<table cellSpacing="2" cellPadding="2" width="100%" border="0">
-			  <tr>
-				<td align="center" class="ContentHeader" colSpan="5" height="20"><b><font class="ContentHeader"><?php echo $p->t('upload/dateiUpload');?></font></b></td>
-			  </tr>
+
 			  <?php
 				if($islector)
 				{
 					//AND tbl_lehrveranstaltung.studiengang_kz!=0
-				   $sql_query = "SELECT DISTINCT tbl_studiengang.typ,UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz, tbl_studiengang.kurzbzlang, tbl_studiengang.studiengang_kz FROM public.tbl_studiengang, lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter WHERE tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz AND tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid='$user' AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>'' ORDER BY typ, kurzbz";
+				   $sql_query = "SELECT DISTINCT tbl_studiengang.typ,UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz, tbl_studiengang.kurzbzlang, tbl_studiengang.studiengang_kz FROM public.tbl_studiengang, lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter WHERE tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz AND tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid=".$db->db_add_param($user)." AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>'' ORDER BY typ, kurzbz";
 
 				   if(!$result_lector_dispatch = $db->db_query($sql_query))
 				   		die('Fehler beim Lesen aus der Datenbank');
@@ -209,7 +205,7 @@ A:hover {
 
 				   echo '<tr>';
 		            echo '<td align="middle" class="MarkLine" colSpan="5" height="49">';
-					  echo '<form accept-charset=\"UTF-8\" method="post" action="" enctype="multipart/form-data">';
+					  echo '<form accept-charset="UTF-8" method="post" action="" enctype="multipart/form-data">';
 
 					   if(!($num_rows_lector_dispatch > 0) && !$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('lehre') && !$rechte->isBerechtigt('assistenz'))
 					   {
@@ -389,7 +385,7 @@ A:hover {
 					   }
 
 					   //$sql_query = "SELECT DISTINCT ON(semester) semester FROM lehre.tbl_lehrfachzuteilung WHERE lektor_uid='$user' AND NOT(lehrfachzuteilung_kurzbz='') AND studiengang_kz='$course_id' ORDER BY semester";
-					   $sql_query = "SELECT DISTINCT semester FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehrveranstaltung WHERE tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND mitarbeiter_uid='$user' AND studiengang_kz='$course_id' AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>'' ORDER BY semester";
+					   $sql_query = "SELECT DISTINCT semester FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehrveranstaltung WHERE tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND mitarbeiter_uid=".$db->db_add_param($user)." AND studiengang_kz=".$db->db_add_param($course_id)." AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>'' ORDER BY semester";
 					   if(!$result_lector_dispatch = $db->db_query($sql_query))
 					   		die($p->t('global/fehlerBeimLesenAusDatenbank'));
 
@@ -411,7 +407,7 @@ A:hover {
 					   //Alle Semester mit admin oder lehre Rechten
 					   if($rechte->isBerechtigt('admin',$course_id) || $rechte->isBerechtigt('lehre',$course_id)|| $rechte->isBerechtigt('assistenz',$course_id))
 					   {
-					   		$sql_query= "SELECT max_semester FROM public.tbl_studiengang WHERE studiengang_kz=".$course_id;
+					   		$sql_query= "SELECT max_semester FROM public.tbl_studiengang WHERE studiengang_kz=".$db->db_add_param($course_id);
 							$result_studiengang_semester=$db->db_query($sql_query);
 							$row_studiengang_semester=$db->db_fetch_object($result_studiengang_semester);
 							for($i=1;$i<=$row_studiengang_semester->max_semester;$i++)
@@ -429,7 +425,7 @@ A:hover {
 
 					   		if(isset($arr[0]) && $arr[0]=='0') //Berechtigt fuer alle Fachbereiche = Alle Studiengaenge = Alle Semester
 							{
-								$sql_query="SELECT max_semester FROM public.tbl_studiengang WHERE studiengang_kz=".$course_id;
+								$sql_query="SELECT max_semester FROM public.tbl_studiengang WHERE studiengang_kz=".$db->db_add_param($course_id);
 								$result_studiengang_semester=$db->db_query($sql_query);
 								$row_studiengang_semester=$db->db_fetch_object($result_studiengang_semester);
 								for($i=1;$i<=$row_studiengang_semester->max_semester;$i++)
@@ -442,7 +438,7 @@ A:hover {
 								foreach ($arr as $elem)
 									$ids.=",'$elem'";
 
-								$sql_query = "SELECT distinct tbl_lehrveranstaltung.semester FROM lehre.tbl_lehrfach, lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit WHERE fachbereich_kurzbz in(".$ids.") AND tbl_lehrveranstaltung.studiengang_kz=$course_id AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>'' AND tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id";
+								$sql_query = "SELECT distinct tbl_lehrveranstaltung.semester FROM lehre.tbl_lehrfach, lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit WHERE fachbereich_kurzbz in(".$ids.") AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($course_id)." AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>'' AND tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id";
 								//echo $sql_query;
 								$result=$db->db_query($sql_query);
 								while($row = $db->db_fetch_object($result))
@@ -477,13 +473,13 @@ A:hover {
 						              lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehrveranstaltung
 						              WHERE tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
 						              tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-						              tbl_lehreinheitmitarbeiter.mitarbeiter_uid='$user' AND
-						              tbl_lehrveranstaltung.semester='$term_id' AND
-						              tbl_lehrveranstaltung.studiengang_kz='$course_id' AND tbl_lehrveranstaltung.lehre=true";
+						              tbl_lehreinheitmitarbeiter.mitarbeiter_uid=".$db->db_add_param($user)." AND
+						              tbl_lehrveranstaltung.semester=".$db->db_add_param($term_id)." AND
+						              tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($course_id)." AND tbl_lehrveranstaltung.lehre=true";
 						//Admin und Lehreberechtigung
 						if($rechte->isBerechtigt('admin',$course_id) || $rechte->isBerechtigt('lehre',$course_id) || $rechte->isBerechtigt('assistenz',$course_id))
 						{
-							$sql_query = "SELECT DISTINCT lehreverzeichnis AS kuerzel, bezeichnung FROM lehre.tbl_lehrveranstaltung WHERE studiengang_kz='$course_id' AND semester='$term_id' AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>''";
+							$sql_query = "SELECT DISTINCT lehreverzeichnis AS kuerzel, bezeichnung FROM lehre.tbl_lehrveranstaltung WHERE studiengang_kz=".$db->db_add_param($course_id)." AND semester=".$db->db_add_param($term_id)." AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>''";
 						}
 						//Fachbereichsberechtigung
 						if($rechte->isBerechtigt('lehre') || $rechte->isBerechtigt('admin') || $rechte->isBerechtigt('assistenz'))
@@ -496,7 +492,7 @@ A:hover {
 							                           FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach
 							                           WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 							                           tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
-							                           tbl_lehrveranstaltung.studiengang_kz='$course_id' AND tbl_lehrveranstaltung.semester='$term_id' AND fachbereich_kurzbz in ($ids) AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>''";
+							                           tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($course_id)." AND tbl_lehrveranstaltung.semester=".$db->db_add_param($term_id)." AND fachbereich_kurzbz in ($ids) AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>''";
 						}
 						$sql_query .= ' ORDER BY bezeichnung, kuerzel';
 						//LEHRFAECHER
@@ -555,7 +551,7 @@ A:hover {
 				else
 				{
 					//$sql_query = "SELECT DISTINCT ON(bz2, lehrevz) tbl_student.studiengang_kz AS id, kurzbzlang, lehrevz AS kuerzel, (tbl_lehrfach.bezeichnung || '; XX') AS bezeichnung, SUBSTRING(tbl_lehrfach.bezeichnung || '; XX', 1, CHAR_LENGTH(tbl_lehrfach.bezeichnung || '; XX') - 4) AS bz2 FROM tbl_lehrfach, public.tbl_studiengang, public.tbl_student WHERE tbl_student.studiengang_kz='$course_id' AND tbl_student.semester='$term_id' AND lehrevz='$short' AND tbl_student.uid='$user' AND tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz LIMIT 1";
-					$sql_query = "SELECT DISTINCT tbl_lehrveranstaltung.bezeichnung, lehreverzeichnis, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM public.tbl_student, lehre.tbl_lehrveranstaltung, public.tbl_studiengang WHERE lehreverzeichnis='$short' AND tbl_student.studiengang_kz='$course_id' AND tbl_student.semester='$term_id' AND  tbl_student.student_uid='$user' AND tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz AND tbl_lehrveranstaltung.studiengang_kz=tbl_student.studiengang_kz AND tbl_lehrveranstaltung.semester=tbl_student.semester AND tbl_lehrveranstaltung.lehre=true LIMIT 1";
+					$sql_query = "SELECT DISTINCT tbl_lehrveranstaltung.bezeichnung, lehreverzeichnis, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM public.tbl_student, lehre.tbl_lehrveranstaltung, public.tbl_studiengang WHERE lehreverzeichnis=".$db->db_add_param($short)." AND tbl_student.studiengang_kz=".$db->db_add_param($course_id)." AND tbl_student.semester=".$db->db_add_param($term_id)." AND  tbl_student.student_uid=".$db->db_add_param($user)." AND tbl_studiengang.studiengang_kz=tbl_student.studiengang_kz AND tbl_lehrveranstaltung.studiengang_kz=tbl_student.studiengang_kz AND tbl_lehrveranstaltung.semester=tbl_student.semester AND tbl_lehrveranstaltung.lehre=true LIMIT 1";
 
 					if(!$result_path_elements = $db->db_query($sql_query))
 						die('<p align="center"><strong>'.$p->t('upload/benutzerKonnteNichtZugeordnetWerden',array($user)).'</strong>!</p>');
@@ -566,7 +562,7 @@ A:hover {
 					if(!($num_rows_path_elements > 0))
 					{
 						// Pruefen ob dieser Kurs ein Wahlfach ist
-						$sql_query = "SELECT DISTINCT vw_student_lehrveranstaltung.bezeichnung, vw_student_lehrveranstaltung.lehreverzeichnis, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM campus.vw_student_lehrveranstaltung , public.tbl_studiengang WHERE vw_student_lehrveranstaltung.lehre=true AND vw_student_lehrveranstaltung.studiengang_kz='".addslashes($course_id)."' AND vw_student_lehrveranstaltung.semester='".addslashes($term_id)."'	AND vw_student_lehrveranstaltung.lehreverzeichnis='".addslashes($short)."' AND vw_student_lehrveranstaltung.uid='".addslashes($user)."'	AND tbl_studiengang.studiengang_kz=vw_student_lehrveranstaltung.studiengang_kz LIMIT 1; ";
+						$sql_query = "SELECT DISTINCT vw_student_lehrveranstaltung.bezeichnung, vw_student_lehrveranstaltung.lehreverzeichnis, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM campus.vw_student_lehrveranstaltung , public.tbl_studiengang WHERE vw_student_lehrveranstaltung.lehre=true AND vw_student_lehrveranstaltung.studiengang_kz=".$db->db_add_param($course_id)." AND vw_student_lehrveranstaltung.semester=".$db->db_add_param($term_id)." AND vw_student_lehrveranstaltung.lehreverzeichnis=".$db->db_add_param($short)." AND vw_student_lehrveranstaltung.uid=".$db->db_add_param($user)."	AND tbl_studiengang.studiengang_kz=vw_student_lehrveranstaltung.studiengang_kz LIMIT 1; ";
 						if(!$result_path_elements = $db->db_query($sql_query))
 							die('<p align="center"><strong>'.$p->t('upload/benutzerKonnteNichtZugeordnetWerden',array($user)).'</strong>!</p>');
 						if(!$result_path_elements)
@@ -598,6 +594,7 @@ A:hover {
 
 						  $numoffile = 5;
 
+						  // Upload von neuen Dateien
 						  if(isset($_POST['upload']) && $_POST['upload'] == "Upload")
 						  {
 						      for($i = 0; $i < $numoffile; $i++)
@@ -636,7 +633,7 @@ A:hover {
 													  }
 													  else
 													  {
-													  	  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl'))
+													  	  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl') && $file_name!='.htaccess')
 														  {
 														  	 if(copy($_FILES[$file]['tmp_name'], $uploadfile))
 														  	 {
@@ -659,7 +656,7 @@ A:hover {
 												  }
 												  else
 												  {
-												  	  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl'))
+												  	  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl') && $file_name!='.htaccess')
 													  {
 														  if(copy($_FILES[$file]['tmp_name'], $uploadfile))
 														  {
@@ -692,7 +689,7 @@ A:hover {
 														  }
 														  else
 														  {
-															  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl'))
+															  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl') && $file_name!='.htaccess')
 															  {
 															  	   if(copy($_FILES[$file]['tmp_name'], $uploadfile))
 															  	   {
@@ -715,7 +712,7 @@ A:hover {
 													  }
 													  else
 													  {
-													  	  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl'))
+													  	  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl') && $file_name!='.htaccess')
 														  {
 															  if(copy($_FILES[$file]['tmp_name'], $uploadfile))
 															  {
@@ -780,8 +777,7 @@ A:hover {
 							  }
 						  }
 
-						  echo "<div align=\"center\"><br></div>";
-
+						  echo '</td></tr>';
 						  for($i = 0; $i < $numoffile; $i++)
 						  {
 						    $j = $i + 1;
@@ -793,11 +789,14 @@ A:hover {
 						    echo "    <td align=\"left\" width=\"68%\">";
 							echo "      <input type=\"file\" name=\"userfile_$i\" size=\"30\">";
 						    echo "    </td>";
-						    echo "  </tr>";
+						    echo "  </tr>\n";
 						  }
+						  
+
 						?>
-                        <div align="center"><font face="Arial" size="2">&nbsp;<input type="checkbox" name="overwrite" value="overwrite">&nbsp;<?php echo $p->t('upload/dateienAutomatischUeberschreiben');?></font></div>
-                        </font></b></div></td>
+						<tr><td></td><td>
+                        <font face="Arial" size="2">&nbsp;<input type="checkbox" name="overwrite" value="overwrite">&nbsp;<?php echo $p->t('upload/dateienAutomatischUeberschreiben');?></font>                        
+                       </td>
                 </tr>
               </table>
               <?php
@@ -824,6 +823,7 @@ A:hover {
               <td align="middle" class="MarkLine" colSpan="5" height="24">
 				<p align="left">
 				<?php
+					// Neues Verzeichnis erstellen
 					if(isset($create_dir))
 					{
 						if(isset($new_dir_name_text) && $new_dir_name_text != "")
@@ -1036,12 +1036,14 @@ A:hover {
 
 							while($entry = $dest_dir->read())
 							{
+								unset($check_state);
 								if($entry != "." && $entry != ".." && @is_dir($dest_dir->path.'/'.$entry))
 								{
 									$dir_empty = false;
 									if(isset($_POST['_check_state_'.$dir_count]))
 										$check_state = $_POST['_check_state_'.$dir_count];
-
+									
+									
 									if(isset($check_state))
 									{
 										echo "<tr><td align=\"middle\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\">&nbsp;<input type=\"checkbox\" name=\"_check_state_$dir_count\" checked>&nbsp;</font>";
@@ -1308,16 +1310,16 @@ A:hover {
 								{
 									unset($check_state);
 									$null_file = false;
-									if(isset($_POST['_check_state_'.$file_count]))
-										$check_state = $_POST['_check_state_'.$file_count];
+									if(isset($_POST['_check_state_f'.$file_count]))
+										$check_state = $_POST['_check_state_f'.$file_count];
 
 									if(isset($check_state))
 									{
-										echo "<tr><td align=\"middle\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\">&nbsp;<input type=\"checkbox\" name=\"_check_state_$file_count\" checked>&nbsp;</font>";
+										echo "<tr><td align=\"middle\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\">&nbsp;<input type=\"checkbox\" name=\"_check_state_f$file_count\" checked>&nbsp;</font>";
 									}
 									else
 									{
-										echo "<tr><td align=\"middle\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\">&nbsp;<input type=\"checkbox\" name=\"_check_state_$file_count\">&nbsp;</font>";
+										echo "<tr><td align=\"middle\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\">&nbsp;<input type=\"checkbox\" name=\"_check_state_f$file_count\">&nbsp;</font>";
 									}
 									if(!isset($link_cut))
 										$link_cut='';
@@ -1339,7 +1341,7 @@ A:hover {
 										{
 											if(!@file_exists($dest_dir->path.'/'.$new_file_name_) && !@is_dir($dest_dir->path.'/'.$new_file_name_))
 											{
-												if(!stristr($new_file_name_, '.php') && !stristr($new_file_name_, '.cgi') && !stristr($new_file_name_, '.pl'))
+												if(!stristr($new_file_name_, '.php') && !stristr($new_file_name_, '.cgi') && !stristr($new_file_name_, '.pl') && $new_file_name_!='.htaccess')
 												{
 													rename($dest_dir->path.'/'.$entry, $dest_dir->path.'/'.$new_file_name_);
 
@@ -1377,8 +1379,16 @@ A:hover {
 										echo "</b></td><td align=\"middle\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\"><input type=\"submit\" name=\"rename_file\" value=\"".$p->t('global/umbenennen')."\">&nbsp;<input type=\"submit\" name=\"delete_file\" value=\"".$p->t('global/loeschen')."\" onClick=\"del=true;\"></font>";
 									}
 
-									$cur_filesize = round(filesize($dest_dir->path.'/'.$entry) / 1024);
-									$file_last_access = date("j F Y, H:i:s", filemtime($dest_dir->path.'/'.$entry));
+									if(!isset($delete_file) && !isset($b_refresh_files))
+									{
+										$cur_filesize = round(filesize($dest_dir->path.'/'.$entry) / 1024);
+										$file_last_access = date("j F Y, H:i:s", filemtime($dest_dir->path.'/'.$entry));
+									}
+									else
+									{
+										$cur_filesize=0;
+										$file_last_access='';
+									}
 
 									echo "</b></td><td align=\"middle\" class='MarkLine'><b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\">$cur_filesize</font>
 											</b></td><td align=\"middle\" height=\"20\" class='MarkLine'>
@@ -1438,7 +1448,7 @@ A:hover {
 							$total_filesize = 0;
 						}
 					?>
-				</tr>
+				
 				<tr>
 					<td align="middle" class="MarkLine" colSpan="5" height="20"><font face="Arial,Helvetica,sans-serif" size="2"><i><?php echo $p->t('upload/dateienInOrdnern',array($total_filecount,$dir_count,$total_filesize) );?></i></font></td>
 				</tr>
@@ -1462,10 +1472,6 @@ A:hover {
 					}
 
 				?>
-			</table></td></tr></table>
-		</td>
-	</tr>
-</table>
-
-</body>
+		</table>
+	</body>
 </html>
