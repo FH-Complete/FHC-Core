@@ -82,6 +82,7 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
 		<wsdl:part name="issue_severity_name" type="xsd:string"></wsdl:part>
 		<wsdl:part name="issue_status_id" type="xsd:string"></wsdl:part>
 		<wsdl:part name="issue_status_name" type="xsd:string"></wsdl:part>
+		<wsdl:part name="issue_reporter_id" type="xsd:string"></wsdl:part>
 		<wsdl:part name="issue_reporter_name" type="xsd:string"></wsdl:part>
 		<wsdl:part name="issue_reporter_real_name" type="xsd:string"></wsdl:part>
 		<wsdl:part name="issue_reporter_email" type="xsd:string"></wsdl:part>
