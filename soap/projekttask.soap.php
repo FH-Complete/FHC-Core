@@ -33,7 +33,7 @@ require_once('../include/datum.class.php');
 require_once('../include/functions.inc.php');
 require_once('../include/mantis.class.php');
 
-$SOAPServer = new SoapServer(APP_ROOT."/soap/projekttask.wsdl.php?".microtime());
+$SOAPServer = new SoapServer(APP_ROOT."/soap/projekttask.wsdl.php?".microtime(true));
 $SOAPServer->addFunction("saveProjekttask");
 $SOAPServer->addFunction("deleteProjekttask");
 $SOAPServer->addFunction("saveMantis");
@@ -148,8 +148,9 @@ function deleteProjekttask($username, $passwort, $projekttask_id)
 		return new SoapFault("Server", $projekttask->errormsg);
 }
 
-function saveMantis($projekttask_id, $mantis_id, $issue_summary, $issue_description, $issue_view_state_id, $issue_view_state_name, $issue_last_udpated, $issue_project_id, $issue_projekt_name, $issue_category, $issue_priority_id, $issue_priority_name, $issue_severity_id, $issue_severity_name, $issue_status_id, $issue_status_name, $issue_reporter_name, $issue_reporter_real_name, $issue_reporter_email, $issue_reproducibility_id, $issue_reproducibility_name, $issue_date_submitted, $issue_sponsorship_total, $issue_projection_id, $issue_projection_name, $issue_eta_id, $issue_eta_name, $issue_resolution_id, $issue_resolution_name, $issue_due_date, $issue_steps_to_reproduce, $issue_additional_information)
+function saveMantis($projekttask_id, $mantis_id, $issue_summary, $issue_description, $issue_view_state_id, $issue_view_state_name, $issue_last_udpated, $issue_project_id, $issue_projekt_name, $issue_category, $issue_priority_id, $issue_priority_name, $issue_severity_id, $issue_severity_name, $issue_status_id, $issue_status_name,$issue_reporter_id, $issue_reporter_name, $issue_reporter_real_name, $issue_reporter_email, $issue_reproducibility_id, $issue_reproducibility_name, $issue_date_submitted, $issue_sponsorship_total, $issue_projection_id, $issue_projection_name, $issue_eta_id, $issue_eta_name, $issue_resolution_id, $issue_resolution_name, $issue_due_date, $issue_steps_to_reproduce, $issue_additional_information)
 {
+	get_uid();
 	$mantis = new mantis();
 	
 	if($mantis_id!='')
@@ -164,6 +165,8 @@ function saveMantis($projekttask_id, $mantis_id, $issue_summary, $issue_descript
 		$mantis->issue_priority->id = $issue_priority_id;
 		$mantis->issue_steps_to_reproduce = $issue_steps_to_reproduce;
 		$mantis->issue_additional_information = $issue_additional_information;
+		$mantis->issue_reporter_name=$issue_reporter_name;
+		$mantis->issue_reporter_id=$issue_reporter_id;
 		
 		if($mantis->updateIssue())
 			return 'ok';

@@ -93,8 +93,9 @@ class mantis extends basis_db
 					'status'=>array('id'=>$this->issue_status->id),
 					'priority'=>array('id'=>$this->issue_priority->id),
 					'additional_information'=>$this->issue_additional_information,
+					'reporter'=>array('id'=>$this->issue_reporter_id),
 				);				
-				
+
 		$params=array('username' => MANTIS_USERNAME, 'password' => MANTIS_PASSWORT,'issueId' => $this->issue_id, $issue);
 		$result = $this->soapClient->__soapCall('mc_issue_update',$params);
 		return $result;
@@ -182,6 +183,7 @@ class mantis extends basis_db
 		try
 		{
 			$params=array('username' => MANTIS_USERNAME, 'password' => MANTIS_PASSWORT);
+			
 			$result = $this->soapClient->__soapCall('mc_projects_get_user_accessible',$params);
 
 			foreach($result as $row)
