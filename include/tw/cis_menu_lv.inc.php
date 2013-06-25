@@ -468,7 +468,7 @@
 			    	<strong>'.$p->t('lehre/moodle').'</strong><br>';
 		}
 	    if($is_lector)
-	    	echo '<a href="moodle_wartung.php?lvid='.$lvid.'&stsem='.$angezeigtes_stsem.'" class="Item">'.$p->t('lehre/moodleWartung').'</a>
+	    	echo '<a href="moodle_wartung_choice.php?lvid='.$lvid.'&stsem='.$angezeigtes_stsem.'" class="Item">'.$p->t('lehre/moodleWartung').'</a>
 	    		 <br /><a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/moodleHandbuch').'" class="Item" target="_blank">'.$p->t('lehre/moodleHandbuch').' [PDF]</a>';
 	}
 	else 

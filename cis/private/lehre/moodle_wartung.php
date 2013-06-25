@@ -354,7 +354,7 @@ else
 			if($art=='lv')
 				$art='le';
 		}
-	
+
 	echo '<b>'.$p->t('moodle/moodleKursAnlegen').': </b><br><br>
 			<form action="'.$_SERVER['PHP_SELF'].'?lvid='.$lvid.'&stsem='.$stsem.'" method="POST">
 			<input type="radio" '.$disable_lv.' name="art" value="lv" onclick="togglediv()" '.($art=='lv'?'checked':'').'>einen Moodle Kurs f&uuml;r die gesamte LV anlegen<br>
@@ -425,7 +425,7 @@ foreach ($moodle->result as $course)
 			$moodlecourse->load($course->mdl_course_id);
 			echo '<tr>';
 			echo '<td><a href="'.$moodle->getPfad($course->moodle_version).'course/view.php?id='.$course->mdl_course_id.'" class="Item" target="_blank">'.$moodlecourse->mdl_fullname.'</a></td>';
-			echo "<td nowrap><form action='".$_SERVER['PHP_SELF']."?lvid=$lvid&stsem=$stsem' method='POST' style='margin:0px'><input type='hidden' name='moodle_id' value='$course->moodle_id'><input type='checkbox' name='gruppen' ".($course->gruppen?'checked':'').">Gruppen übernehmen <input type='submit' value='".$p->t('global/ok')."' name='changegruppe'></form></td>";
+//			echo "<td nowrap><form action='".$_SERVER['PHP_SELF']."?lvid=$lvid&stsem=$stsem' method='POST' style='margin:0px'><input type='hidden' name='moodle_id' value='$course->moodle_id'><input type='checkbox' name='gruppen' ".($course->gruppen?'checked':'').">Gruppen übernehmen <input type='submit' value='".$p->t('global/ok')."' name='changegruppe'></form></td>";
 			echo '</tr>';
 			break;
 
@@ -433,7 +433,7 @@ foreach ($moodle->result as $course)
 			$moodlecourse = new moodle24_course();
 			$moodlecourse->load($course->mdl_course_id);
 			echo '<tr>';
-			echo '<td><a href="'.$moodle->getPfad($course->moodle_version).'course/view.php?id='.$course->mdl_course_id.'" class="Item" target="_blank">'.$moodlecourse->mdl_fullname.'</a></td>';
+			echo '<td><a href="'.$moodle->getPfad($course->moodle_version).'course/view.php?id='.$course->mdl_course_id.'" class="Item" target="_blank">'.$moodlecourse->mdl_fullname.'</a> (v2.4)</td>';
 			echo '</tr>';
 			break;
 
