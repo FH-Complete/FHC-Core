@@ -681,7 +681,8 @@ function MitarbeiterAuswahl()
 	// Selektierungsfunktion der Addons aufrufen
 	for(i in addon)
 	{
-		addon[i].selectMitarbeiter(person_id, uid)
+		if(typeof addon[i].selectMitarbeiter=='function')
+			addon[i].selectMitarbeiter(person_id, uid);
 	}
 }
 
