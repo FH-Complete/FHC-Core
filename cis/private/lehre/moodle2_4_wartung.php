@@ -34,6 +34,8 @@ require_once('../../../include/lehreinheitmitarbeiter.class.php');
 require_once('../../../include/studiengang.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/moodle.class.php');
+require_once('../../../include/moodle19_course.class.php');
+require_once('../../../include/moodle19_user.class.php');
 
 $sprache = getSprache(); 
 $p = new phrasen($sprache); 
@@ -95,13 +97,6 @@ function togglediv()
 </head>
 <body onload="togglediv()">
 <h1>'.$db->convert_html_chars($lv->bezeichnung).'&nbsp;('.$db->convert_html_chars($stsem).')</h1>
-<span style="color: red; font-weight: bold">
-MOODLE 2.4 - TESTBETRIEB<br>
-Alle Einstellungen auf dieser Seite betreffen Moodle 2.4<br>
-Zur Verwaltung der aktuellen Moodlekurse verwenden Sie <a href="moodle_wartung.php?lvid='.$lvid.'&stsem='.$stsem.'">diese Seite</a>
-</span>
-<br><br>
-<hr>
 <table width="100%">
 <tr>
 <td valign="top">';
@@ -303,7 +298,7 @@ else
 				$art='le';
 		}
 	
-	echo '<b>'.$p->t('moodle/moodleKursAnlegen').': </b><br><br>
+	echo '<b>'.$p->t('moodle/moodleKursAnlegen24').': </b><br><br>
 			<form action="'.$_SERVER['PHP_SELF'].'?lvid='.$lvid.'&stsem='.$stsem.'" method="POST">
 			<input type="radio" '.$disable_lv.' name="art" value="lv" onclick="togglediv()" '.($art=='lv'?'checked':'').'>einen Moodle Kurs f&uuml;r die gesamte LV anlegen<br>
 			<input type="radio" id="radiole" name="art" value="le" onclick="togglediv()" '.($art=='le'?'checked':'').'>einen Moodle Kurs für einzelne Lehreinheiten anlegen
@@ -374,7 +369,15 @@ foreach ($moodle->result as $course)
 			$mdlcourse->load($course->mdl_course_id);
 			echo '<tr>';
 			echo '<td><a href="'.$moodle->getPfad($course->moodle_version).'course/view.php?id='.$course->mdl_course_id.'" class="Item" target="_blank">'.$mdlcourse->mdl_fullname.'</a></td>';
-			echo "<td nowrap><form action='".$_SERVER['PHP_SELF']."?lvid=$lvid&stsem=$stsem' method='POST' style='margin:0px'><input type='hidden' name='moodle_id' value='$course->moodle_id'><input type='checkbox' name='gruppen' ".($course->gruppen?'checked':'').">Gruppen übernehmen <input type='submit' value='".$p->t('global/ok')."' name='changegruppe'></form></td>";
+//			echo "<td nowrap><form action='".$_SERVER['PHP_SELF']."?lvid=$lvid&stsem=$stsem' method='POST' style='margin:0px'><input type='hidden' name='moodle_id' value='$course->moodle_id'><input type='checkbox' name='gruppen' ".($course->gruppen?'checked':'').">Gruppen übernehmen <input type='submit' value='".$p->t('global/ok')."' name='changegruppe'></form></td>";
+			break;
+		case '1.9':
+			$moodlecourse = new moodle19_course();
+			$moodlecourse->load($course->mdl_course_id);
+			echo '<tr>';
+			echo '<td><a href="'.$moodle->getPfad($course->moodle_version).'course/view.php?id='.$course->mdl_course_id.'" class="Item" target="_blank">'.$moodlecourse->mdl_fullname.'</a> (v1.9)</td>';
+//			echo "<td nowrap><form action='".$_SERVER['PHP_SELF']."?lvid=$lvid&stsem=$stsem' method='POST' style='margin:0px'><input type='hidden' name='moodle_id' value='$course->moodle_id'><input type='checkbox' name='gruppen' ".($course->gruppen?'checked':'').">Gruppen übernehmen <input type='submit' value='".$p->t('global/ok')."' name='changegruppe'></form></td>";
+			echo '</tr>';
 			break;
 		default: 
 			echo '<tr><td>Moodle v'.$course->moodle_version.' - '.$course->mdl_course_id.'</td></tr>';
