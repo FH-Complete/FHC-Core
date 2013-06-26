@@ -479,18 +479,24 @@ class mitarbeiter extends benutzer
 	}
 
 	/**
-	 * Liefert die Mitarbeiter, die im angegebenen Intervall eine Zeitsperre eingetragen haben
+	 * Liefert die Mitarbeiter, die im angegebenen Intervall eine Zeitsperre eingetragen haben.
+	 * UID optional um nur einen bestimmten Mitarbeiter abzufragen.
 	 *
 	 * @param $von
 	 * @param $bis
+	 * @param $uid Optional
 	 * @return boolean
 	 */
-	public function getMitarbeiterZeitsperre($von,$bis)
+	public function getMitarbeiterZeitsperre($von,$bis,$uid=null)
 	{
 		$sql_query="SELECT DISTINCT nachname, vorname, uid,titelpre, titelpost, vornamen
 				FROM campus.vw_mitarbeiter JOIN campus.tbl_zeitsperre ON (uid=mitarbeiter_uid)
-				WHERE (".$this->db_add_param($von)."<=bisdatum AND ".$this->db_add_param($bis).">=bisdatum) OR (".$this->db_add_param($bis).">=vondatum AND ".$this->db_add_param($von)."<=vondatum) ORDER BY nachname;";
-	    
+				WHERE ((".$this->db_add_param($von)."<=bisdatum AND ".$this->db_add_param($bis).">=bisdatum) OR (".$this->db_add_param($bis).">=vondatum AND ".$this->db_add_param($von)."<=vondatum))";
+	    if($uid!=null)
+			$sql_query .= " AND mitarbeiter_uid=".$this->db_add_param($uid);
+		
+		$sql_query .= " ORDER BY nachname;";
+			
 		if(!$this->db_query($sql_query))
 		{
 			$this->errormsg=$this->db_last_error();
