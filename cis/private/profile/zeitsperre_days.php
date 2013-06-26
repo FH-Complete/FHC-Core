@@ -37,8 +37,22 @@ require_once('../../../include/phrasen.class.php');
 require_once('../../../include/sprache.class.php');
 
 $datum_obj = new datum();
+$sprache = getSprache();
+$p = new phrasen($sprache);
+$sprache_obj = new sprache();
+$sprache_obj->load($sprache);
+$sprache_index=$sprache_obj->index;
+$uid = get_uid();
+	
+if(!check_lektor($uid))
+die($p->t('global/keineBerechtigung'));
 
 $days=trim((isset($_REQUEST['days']) && is_numeric($_REQUEST['days'])?$_REQUEST['days']:14));
+
+if(isset($_REQUEST['lektor']))
+		$lektor=$_REQUEST['lektor'];
+	else
+		$lektor=null;
 	
 $datum_beginn=date('Y-m-d');
 $ts_beginn=$datum_obj->mktime_fromdate($datum_beginn);
@@ -47,13 +61,7 @@ $datum_ende=date('Y-m-d',$ts_ende);
 
 // Lektoren holen
 $ma=new mitarbeiter();
-$mitarbeiter=$ma->getMitarbeiterZeitsperre($datum_beginn,$datum_ende);
-
-$sprache = getSprache();
-$p = new phrasen($sprache);
-$sprache_obj = new sprache();
-$sprache_obj->load($sprache);
-$sprache_index=$sprache_obj->index;
+$mitarbeiter=$ma->getMitarbeiterZeitsperre($datum_beginn,$datum_ende,$lektor);
 
 echo '
 <html>
@@ -86,11 +94,33 @@ for ($ts=$ts_beginn;$ts<=$ts_ende; $ts+=$datum_obj->ts_day)
 }
 
 echo '</TR>';
-
 $zs=new zeitsperre();
-foreach ($mitarbeiter as $ma)
+if (!empty ($mitarbeiter))
 {
-	$zs->getzeitsperren($ma->uid);
+	foreach ($mitarbeiter as $ma)
+	{
+		$zs->getzeitsperren($ma->uid);
+		echo '<TR>';
+		echo "<td>$ma->nachname $ma->vorname</td>";
+		for ($ts=$ts_beginn;$ts<=$ts_ende; $ts+=$datum_obj->ts_day)
+		{
+			$tag=date('d',$ts);
+			$monat=date('M',$ts);
+			$wt=date('N',$ts);
+			if ($wt==6 || $wt==7)
+				$class='feiertag';
+			else
+				$class='';
+			$grund=$zs->getTyp($ts);
+			$erbk=$zs->getErreichbarkeit($ts);
+			echo "<td class='$class'>$grund<br>$erbk</td>";
+		}
+		echo '</TR>';
+	}
+}
+else
+{
+	$ma=new mitarbeiter($lektor);
 	echo '<TR>';
 	echo "<td>$ma->nachname $ma->vorname</td>";
 	for ($ts=$ts_beginn;$ts<=$ts_ende; $ts+=$datum_obj->ts_day)
@@ -102,9 +132,7 @@ foreach ($mitarbeiter as $ma)
 			$class='feiertag';
 		else
 			$class='';
-		$grund=$zs->getTyp($ts);
-		$erbk=$zs->getErreichbarkeit($ts);
-		echo "<td class='$class'>$grund<br>$erbk</td>";
+		echo "<td class='$class'>&nbsp;</td>";
 	}
 	echo '</TR>';
 }
