@@ -42,6 +42,7 @@ class akte extends basis_db
 	public $insertvon;
 	public $uid;	
 	public $ext_id;
+	public $dms_id;
 	
 	/**
 	 * Konstruktor
@@ -89,6 +90,7 @@ class akte extends basis_db
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->uid = $row->uid;
+				$this->dms_id = $row->dms_id;
 				return true;		
 			}
 			else 
@@ -171,7 +173,7 @@ class akte extends basis_db
 		{
 			//Neuen Datensatz anlegen	
 			$qry = "BEGIN;INSERT INTO public.tbl_akte (person_id, dokument_kurzbz, inhalt, mimetype, erstelltam, gedruckt, titel, 
-					bezeichnung, updateamum, updatevon, insertamum, insertvon, ext_id, uid) VALUES (".
+					bezeichnung, updateamum, updatevon, insertamum, insertvon, ext_id, uid, dms_id) VALUES (".
 			       $this->db_add_param($this->person_id, FHC_INTEGER).', '.
 			       $this->db_add_param($this->dokument_kurzbz).', '.
 			       $this->db_add_param($this->inhalt).', '.
@@ -185,7 +187,8 @@ class akte extends basis_db
 			       $this->db_add_param($this->insertamum).', '.
 			       $this->db_add_param($this->insertvon).', '.
 			       $this->db_add_param($this->ext_id).', '.
-			       $this->db_add_param($this->uid).');';
+			       $this->db_add_param($this->uid).','.
+			       $this->db_add_param($this->dms_id).');';
 			       
 		}
 		else 
@@ -203,7 +206,8 @@ class akte extends basis_db
 				  " updateamum=".$this->db_add_param($this->updateamum).",".
 				  " updatevon=".$this->db_add_param($this->updatevon).",".
 				  " ext_id=".$this->db_add_param($this->ext_id).",".
-				  " uid=".$this->db_add_param($this->uid).
+				  " uid=".$this->db_add_param($this->uid).",".
+				  " dms_id=".$this->db_add_param($this->dms_id, FHC_INTEGER).
 				  " WHERE akte_id=".$this->db_add_param($this->akte_id, FHC_INTEGER);
 		}
 		
@@ -281,6 +285,7 @@ class akte extends basis_db
 				$akten->insertamum = $row->insertamum;
 				$akten->insertvon = $row->insertvon;
 				$akten->uid = $row->uid;
+				$akten->dms_id = $row->dms_id;
 				
 				$this->result[] = $akten;
 			}
@@ -330,6 +335,7 @@ class akte extends basis_db
 				$akten->insertamum = $row->insertamum;
 				$akten->insertvon = $row->insertvon;
 				$akten->uid = $row->uid;
+				$akten->dms_id = $row->dms_id;
 				
 				$this->result[] = $akten;
 			}

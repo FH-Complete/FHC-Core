@@ -4045,6 +4045,19 @@ if(!@$db->db_query("SELECT content_id FROM public.tbl_ort LIMIT 1"))
         echo 'Spalte ContentID zu public.tbl_ort hinzugefuegt<br>';
 }
 
+// Akte FK zum DMS
+if(!@$db->db_query("SELECT dms_id FROM public.tbl_akte LIMIT 1"))
+{
+    $qry ="
+	ALTER TABLE public.tbl_akte ADD COLUMN dms_id integer;
+	ALTER TABLE public.tbl_akte ADD CONSTRAINT fk_dms_akte FOREIGN KEY(dms_id) REFERENCES campus.tbl_dms(dms_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+    ";
+    
+    if(!$db->db_query($qry))
+        echo '<strong>public.tbl_akte: '.$db->db_last_error().'</strong><br>';
+    else
+        echo 'Spalte dms_id zu public.tbl_akte hinzugefuegt<br>';
+}
 
 echo '<br>';
 
@@ -4155,7 +4168,7 @@ $tabellen=array(
 	"lehre.tbl_zeugnis"  => array("zeugnis_id","student_uid","zeugnis","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_zeugnisnote"  => array("lehrveranstaltung_id","student_uid","studiensemester_kurzbz","note","uebernahmedatum","benotungsdatum","bemerkung","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_adresse"  => array("adresse_id","person_id","name","strasse","plz","ort","gemeinde","nation","typ","heimatadresse","zustelladresse","firma_id","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id"),
+	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id","dms_id"),
 	"public.tbl_ampel"  => array("ampel_id","kurzbz","beschreibung","benutzer_select","deadline","vorlaufzeit","verfallszeit","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_ampel_benutzer_bestaetigt"  => array("ampel_benutzer_bestaetigt_id","ampel_id","uid","insertamum","insertvon"),
 	"public.tbl_aufmerksamdurch"  => array("aufmerksamdurch_kurzbz","beschreibung","ext_id"),
