@@ -259,7 +259,7 @@ class akte extends basis_db
 	{
 		$qry = "SELECT 
 					akte_id, person_id, dokument_kurzbz, mimetype, erstelltam, gedruckt, 
-					titel, bezeichnung, updateamum, insertamum, updatevon, insertvon, uid 
+					titel, bezeichnung, updateamum, insertamum, updatevon, insertvon, uid, dms_id
 				FROM public.tbl_akte WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 		if($dokument_kurzbz!=null)
 			$qry.=" AND dokument_kurzbz=".$this->db_add_param($dokument_kurzbz);
