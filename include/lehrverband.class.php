@@ -57,9 +57,9 @@ class lehrverband extends basis_db
 	{
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_lehrverband WHERE
 		            studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER)." AND
-		            semester=".$this->db_add_param($semester, FHC_INTEGER)." AND
-		            trim(verband)=".trim($this->db_add_param($verband))." AND
-		            trim(gruppe)=".trim($this->db_add_param($gruppe)).";";
+		            semester=".$this->db_add_param($semester, FHC_INTEGER, false)." AND
+		            trim(verband)=".$this->db_add_param(trim($verband), FHC_STRING, false)." AND
+		            trim(gruppe)=".$this->db_add_param(trim($gruppe), FHC_STRING, false).";";
 
 		if($this->db_query($qry))
 		{
