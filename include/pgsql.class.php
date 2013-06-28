@@ -230,7 +230,7 @@ class basis_db extends db
 			if($nullable)
 				return 'null';
 			else
-				return '';
+				return "''";
 		}
 
 		switch($type)
