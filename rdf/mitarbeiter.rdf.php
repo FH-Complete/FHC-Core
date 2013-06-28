@@ -162,32 +162,35 @@ if($lehrveranstaltung_id==null && $filter==null && $mitarbeiter_uid==null)
 			$stge=array_merge($stge, $bb->getStgKz('assistenz'));
 			$ma=$mitarbeiter->getMitarbeiterStg($lektor,$fixangestellt,$stge, 'lkt');
 			$laststg=-1;
-			foreach ($ma as $mitarbeiter)
+			if(count($ma)>0)
 			{
-				if($mitarbeiter->studiengang_kz!=$laststg)
+				foreach ($ma as $mitarbeiter)
 				{
-					if($laststg!=-1)
+					if($mitarbeiter->studiengang_kz!=$laststg)
 					{
-						$seq.="\n\t\t</RDF:Seq>\n\t</RDF:li>\n";
+						if($laststg!=-1)
+						{
+							$seq.="\n\t\t</RDF:Seq>\n\t</RDF:li>\n";
+						}
+						$desc.="\n\t\t<RDF:Description about=\"".$rdf_url.$mitarbeiter->studiengang_kz."\" >".
+								"\n\t\t\t<MITARBEITER:uid></MITARBEITER:uid>".
+								"\n\t\t\t<MITARBEITER:titelpre></MITARBEITER:titelpre>".
+								"\n\t\t\t<MITARBEITER:titelpost></MITARBEITER:titelpost>".
+								"\n\t\t\t<MITARBEITER:vornamen></MITARBEITER:vornamen>".
+								"\n\t\t\t<MITARBEITER:vorname></MITARBEITER:vorname>".
+								"\n\t\t\t<MITARBEITER:nachname></MITARBEITER:nachname>".
+								"\n\t\t\t<MITARBEITER:kurzbz>".$stg_arr[$mitarbeiter->studiengang_kz]."</MITARBEITER:kurzbz>".
+								"\n\t\t\t<MITARBEITER:studiengang_kz>$mitarbeiter->studiengang_kz</MITARBEITER:studiengang_kz>".
+								"\n\t\t</RDF:Description>\n";
+	
+						$seq.="\n\t<RDF:li>\n\t\t<RDF:Seq about=\"".$rdf_url.$mitarbeiter->studiengang_kz."\" >";
+	
+						$laststg = $mitarbeiter->studiengang_kz;
 					}
-					$desc.="\n\t\t<RDF:Description about=\"".$rdf_url.$mitarbeiter->studiengang_kz."\" >".
-							"\n\t\t\t<MITARBEITER:uid></MITARBEITER:uid>".
-							"\n\t\t\t<MITARBEITER:titelpre></MITARBEITER:titelpre>".
-							"\n\t\t\t<MITARBEITER:titelpost></MITARBEITER:titelpost>".
-							"\n\t\t\t<MITARBEITER:vornamen></MITARBEITER:vornamen>".
-							"\n\t\t\t<MITARBEITER:vorname></MITARBEITER:vorname>".
-							"\n\t\t\t<MITARBEITER:nachname></MITARBEITER:nachname>".
-							"\n\t\t\t<MITARBEITER:kurzbz>".$stg_arr[$mitarbeiter->studiengang_kz]."</MITARBEITER:kurzbz>".
-							"\n\t\t\t<MITARBEITER:studiengang_kz>$mitarbeiter->studiengang_kz</MITARBEITER:studiengang_kz>".
-							"\n\t\t</RDF:Description>\n";
-	
-					$seq.="\n\t<RDF:li>\n\t\t<RDF:Seq about=\"".$rdf_url.$mitarbeiter->studiengang_kz."\" >";
-	
-					$laststg = $mitarbeiter->studiengang_kz;
+					$seq.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$mitarbeiter->uid."\" />";
 				}
-				$seq.="\n\t\t\t<RDF:li resource=\"".$rdf_url.$mitarbeiter->uid."\" />";
+				$seq.="\n\t\t</RDF:Seq>\n\t</RDF:li>";
 			}
-			$seq.="\n\t\t</RDF:Seq>\n\t</RDF:li>";
 		}
 	}
 	echo $desc;
