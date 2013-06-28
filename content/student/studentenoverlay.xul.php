@@ -256,6 +256,10 @@ else
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#punkte2" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
+	    				<treecol id="student-treecol-rt_punkte3" label="RT_Punkte3" flex="1" hidden="true" persist="hidden, width, ordinal"
+	    					class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#punkte3" onclick="StudentTreeSort()"/>
+	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-dual" label="Dual" flex="1" hidden="true" persist="hidden, width, ordinal"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#dual_bezeichnung" onclick="StudentTreeSort()"/>
@@ -295,6 +299,7 @@ else
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#punkte" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#punkte1" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#punkte2" />
+										<treecell label="rdf:http://www.technikum-wien.at/student/rdf#punkte3" />
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#dual_bezeichnung" />
 	         						</treerow>
 	       						</treeitem>

@@ -379,7 +379,20 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       						<textbox id="student-prestudent-textbox-punkte1" disabled="true" maxlength="9" size="9" onchange="StudentReihungstestPunkteChange();" oninput="StudentReihungstestPunkteSum();"/>
       						<label value="Punkte2" control="student-prestudent-textbox-punkte2"/>
       						<textbox id="student-prestudent-textbox-punkte2" disabled="true" maxlength="9" size="9" onchange="StudentReihungstestPunkteChange();" oninput="StudentReihungstestPunkteSum();"/>
-      						<label value="Gesamtpunkte" control="student-prestudent-textbox-punkte"/>
+							<?php
+							// Das Eingebefeld fuer die 3. Reihungstestpunkte wird nur angezeigt, 
+							// wenn im dies im Config aktiviert wurde
+							if(defined('RT_PUNKTE3') && RT_PUNKTE3=='true')
+								$hidden='';
+							else
+								$hidden='hidden="true"';
+
+	      					echo '
+								<label value="Punkte3" control="student-prestudent-textbox-punkte3" '.$hidden.'/>
+    	  						<textbox id="student-prestudent-textbox-punkte3" disabled="true" maxlength="9" size="9" onchange="StudentReihungstestPunkteChange();" oninput="StudentReihungstestPunkteSum();" '.$hidden.'/>
+								';							
+							?>
+   	  						<label value="Gesamtpunkte" control="student-prestudent-textbox-punkte"/>
       						<textbox id="student-prestudent-textbox-punkte" disabled="true" maxlength="9" size="9" onchange="StudentReihungstestPunkteChange();"/>
       						</hbox>
     					</row>
