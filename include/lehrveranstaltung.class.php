@@ -432,7 +432,8 @@ class lehrveranstaltung extends basis_db
 	{
 		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung 
 				WHERE lehrveranstaltung_id IN(SELECT lehrveranstaltung_id FROM campus.vw_student_lehrveranstaltung 
-											  WHERE uid='".addslashes($student_uid)."')
+											  WHERE uid=".$this->db_add_param($student_uid).")
+						OR lehrveranstaltung_id IN(SELECT lehrveranstaltung_id FROM lehre.tbl_zeugnisnote WHERE student_uid=".$this->db_add_param($student_uid).")
 				ORDER BY semester, bezeichnung";
 		
 		//Datensaetze laden

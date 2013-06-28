@@ -44,10 +44,11 @@ class prestudent extends person
 	public $punkte; //rt_gesamtpunkte
 	public $rt_punkte1;
 	public $rt_punkte2;
-	public $bismelden;
+	public $rt_punkte3=0;
+	public $bismelden=true;
 	public $anmerkung;
 	public $ext_id_prestudent;
-	public $dual;
+	public $dual=false;
 	
 	public $status_kurzbz;
 	public $studiensemester_kurzbz;
@@ -90,7 +91,7 @@ class prestudent extends person
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_prestudent WHERE prestudent_id='$prestudent_id'";
+		$qry = "SELECT * FROM public.tbl_prestudent WHERE prestudent_id=".$this->db_add_param($prestudent_id);
 		
 		if($this->db_query($qry))
 		{
@@ -108,18 +109,19 @@ class prestudent extends person
 				$this->zgvmaort = $row->zgvmaort;
 				$this->zgvmadatum = $row->zgvmadatum;
 				$this->aufnahmeschluessel = $row->aufnahmeschluessel;
-				$this->facheinschlberuf = ($row->facheinschlberuf=='t'?true:false);
+				$this->facheinschlberuf = $this->db_parse_bool($row->facheinschlberuf);
 				$this->anmeldungreihungstest = $row->anmeldungreihungstest;
-				$this->reihungstestangetreten = ($row->reihungstestangetreten=='t'?true:false);
+				$this->reihungstestangetreten = $this->db_parse_bool($row->reihungstestangetreten);
 				$this->reihungstest_id = $row->reihungstest_id;
 				$this->punkte = $row->rt_gesamtpunkte;
 				$this->rt_punkte1 = $row->rt_punkte1;
 				$this->rt_punkte2 = $row->rt_punkte2;
-				$this->bismelden = ($row->bismelden=='t'?true:false);
+				$this->rt_punkte3 = $row->rt_punkte3;
+				$this->bismelden = $this->db_parse_bool($row->bismelden);
 				$this->person_id = $row->person_id;
 				$this->anmerkung = $row->anmerkung;
 				$this->ext_id_prestudent = $row->ext_id;
-				$this->dual = ($row->dual=='t'?true:false);
+				$this->dual = $this->db_parse_bool($row->dual);
 				$this->ausstellungsstaat = $row->ausstellungsstaat;
 				
 				if(!person::load($row->person_id))
@@ -129,13 +131,13 @@ class prestudent extends person
 			}
 			else 
 			{
-				$this->errormsg = "Kein Eintrag gefunden fuer $prestudent_id";
+				$this->errormsg = "Kein Prestudent Eintrag gefunden";
 				return false;
 			}				
 		}
 		else 
 		{
-			$this->errormsg = "Fehler beim Laden: $qry";
+			$this->errormsg = "Fehler beim Laden des Prestudenten";
 			return false;
 		}		
 	}
@@ -162,6 +164,12 @@ class prestudent extends person
 			$this->errormsg = 'Reihungstestpunkte2 darf nicht groesser als 9999.9999 sein';
 			return false;
 		}
+		if($this->rt_punkte3>9999.9999)
+		{
+			$this->errormsg = 'Reihungstestpunkte3 darf nicht groesser als 9999.9999 sein';
+			return false;
+		}
+
 		return true;
 	}
 	
@@ -183,66 +191,73 @@ class prestudent extends person
 		
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
-			$qry = 'BEGIN;INSERT INTO public.tbl_prestudent (aufmerksamdurch_kurzbz, person_id, studiengang_kz, berufstaetigkeit_code, ausbildungcode, zgv_code, zgvort, zgvdatum, zgvmas_code, zgvmaort, zgvmadatum, aufnahmeschluessel, facheinschlberuf, reihungstest_id, anmeldungreihungstest, reihungstestangetreten, rt_gesamtpunkte, rt_punkte1, rt_punkte2, bismelden, insertamum, insertvon, updateamum, updatevon, ext_id, anmerkung, dual, ausstellungsstaat) VALUES('.
-			       $this->addslashes($this->aufmerksamdurch_kurzbz).",".
-			       $this->addslashes($this->person_id).",".
-			       $this->addslashes($this->studiengang_kz).",".
-			       $this->addslashes($this->berufstaetigkeit_code).",".
-			       $this->addslashes($this->ausbildungcode).",".
-			       $this->addslashes($this->zgv_code).",".
-			       $this->addslashes($this->zgvort).",".
-			       $this->addslashes($this->zgvdatum).",".
-			       $this->addslashes($this->zgvmas_code).",".
-			       $this->addslashes($this->zgvmaort).",".
-			       $this->addslashes($this->zgvmadatum).",".
-			       $this->addslashes($this->aufnahmeschluessel).",".
-			       ($this->facheinschlberuf?'true':'false').",".
-			       $this->addslashes($this->reihungstest_id).",".
-			       $this->addslashes($this->anmeldungreihungstest).",".
-			       ($this->reihungstestangetreten?'true':'false').",".
-			       $this->addslashes($this->punkte).",".
-			       $this->addslashes($this->rt_punkte1).",".
-			       $this->addslashes($this->rt_punkte2).",".
-			       ($this->bismelden?'true':'false').",".
-			       $this->addslashes($this->insertamum).",".
-			       $this->addslashes($this->insertvon).",".
-			       $this->addslashes($this->updateamum).",".
-			       $this->addslashes($this->updatevon).",".
-			       $this->addslashes($this->ext_id_prestudent).",".
-			       $this->addslashes($this->anmerkung).",".
-			       ($this->dual?'true':'false').",".
-			       $this->addslashes($this->ausstellungsstaat).");";
+			$qry = 'BEGIN;INSERT INTO public.tbl_prestudent (aufmerksamdurch_kurzbz, person_id, 
+					studiengang_kz, berufstaetigkeit_code, ausbildungcode, zgv_code, zgvort, zgvdatum, 
+					zgvmas_code, zgvmaort, zgvmadatum, aufnahmeschluessel, facheinschlberuf, 
+					reihungstest_id, anmeldungreihungstest, reihungstestangetreten, rt_gesamtpunkte, 
+					rt_punkte1, rt_punkte2, rt_punkte3, bismelden, insertamum, insertvon, 
+					updateamum, updatevon, ext_id, anmerkung, dual, ausstellungsstaat) VALUES('.
+			       $this->db_add_param($this->aufmerksamdurch_kurzbz).",".
+			       $this->db_add_param($this->person_id).",".
+			       $this->db_add_param($this->studiengang_kz).",".
+			       $this->db_add_param($this->berufstaetigkeit_code).",".
+			       $this->db_add_param($this->ausbildungcode).",".
+			       $this->db_add_param($this->zgv_code).",".
+			       $this->db_add_param($this->zgvort).",".
+			       $this->db_add_param($this->zgvdatum).",".
+			       $this->db_add_param($this->zgvmas_code).",".
+			       $this->db_add_param($this->zgvmaort).",".
+			       $this->db_add_param($this->zgvmadatum).",".
+			       $this->db_add_param($this->aufnahmeschluessel).",".
+			       $this->db_add_param($this->facheinschlberuf, FHC_BOOLEAN).",".
+			       $this->db_add_param($this->reihungstest_id).",".
+			       $this->db_add_param($this->anmeldungreihungstest).",".
+			       $this->db_add_param($this->reihungstestangetreten, FHC_BOOLEAN).",".
+			       $this->db_add_param($this->punkte).",".
+			       $this->db_add_param($this->rt_punkte1).",".
+			       $this->db_add_param($this->rt_punkte2).",".
+			       $this->db_add_param($this->rt_punkte3).",".
+			       $this->db_add_param($this->bismelden, FHC_BOOLEAN).",".
+			       $this->db_add_param($this->insertamum).",".
+			       $this->db_add_param($this->insertvon).",".
+			       $this->db_add_param($this->updateamum).",".
+			       $this->db_add_param($this->updatevon).",".
+			       $this->db_add_param($this->ext_id_prestudent).",".
+			       $this->db_add_param($this->anmerkung).",".
+			       $this->db_add_param($this->dual, FHC_BOOLEAN).",".
+			       $this->db_add_param($this->ausstellungsstaat).");";
 		}
 		else
 		{
 			$qry = 'UPDATE public.tbl_prestudent SET'.
-			       ' aufmerksamdurch_kurzbz='.$this->addslashes($this->aufmerksamdurch_kurzbz).",".
-			       ' person_id='.$this->addslashes($this->person_id).",".
-			       ' studiengang_kz='.$this->addslashes($this->studiengang_kz).",".
-			       ' berufstaetigkeit_code='.$this->addslashes($this->berufstaetigkeit_code).",".
-			       ' ausbildungcode='.$this->addslashes($this->ausbildungcode).",".
-			       ' zgv_code='.$this->addslashes($this->zgv_code).",".
-			       ' zgvort='.$this->addslashes($this->zgvort).",".
-			       ' zgvdatum='.$this->addslashes($this->zgvdatum).",".
-			       ' zgvmas_code='.$this->addslashes($this->zgvmas_code).",".
-			       ' zgvmaort='.$this->addslashes($this->zgvmaort).",".
-			       ' zgvmadatum='.$this->addslashes($this->zgvmadatum).",".
-			       ' aufnahmeschluessel='.$this->addslashes($this->aufnahmeschluessel).",".
-			       ' facheinschlberuf='.($this->facheinschlberuf?'true':'false').",".
-			       ' reihungstest_id='.$this->addslashes($this->reihungstest_id).",".
-			       ' anmeldungreihungstest='.$this->addslashes($this->anmeldungreihungstest).",".
-			       ' reihungstestangetreten='.($this->reihungstestangetreten?'true':'false').",".
-			       ' rt_gesamtpunkte='.$this->addslashes($this->punkte).",".
-			       ' rt_punkte1='.$this->addslashes($this->rt_punkte1).",".
-			       ' rt_punkte2='.$this->addslashes($this->rt_punkte2).",".
-			       ' bismelden='.($this->bismelden?'true':'false').",".
-			       ' updateamum='.$this->addslashes($this->updateamum).",".
-			       ' updatevon='.$this->addslashes($this->updatevon).",".
-			       ' ext_id='.$this->addslashes($this->ext_id_prestudent).",".
-			       ' anmerkung='.$this->addslashes($this->anmerkung).",".
-			       ' dual='.($this->dual?'true':'false').",".
-				   ' ausstellungsstaat='.$this->addslashes($this->ausstellungsstaat).
-			       " WHERE prestudent_id='".addslashes($this->prestudent_id)."';";
+			       ' aufmerksamdurch_kurzbz='.$this->db_add_param($this->aufmerksamdurch_kurzbz).",".
+			       ' person_id='.$this->db_add_param($this->person_id).",".
+			       ' studiengang_kz='.$this->db_add_param($this->studiengang_kz).",".
+			       ' berufstaetigkeit_code='.$this->db_add_param($this->berufstaetigkeit_code).",".
+			       ' ausbildungcode='.$this->db_add_param($this->ausbildungcode).",".
+			       ' zgv_code='.$this->db_add_param($this->zgv_code).",".
+			       ' zgvort='.$this->db_add_param($this->zgvort).",".
+			       ' zgvdatum='.$this->db_add_param($this->zgvdatum).",".
+			       ' zgvmas_code='.$this->db_add_param($this->zgvmas_code).",".
+			       ' zgvmaort='.$this->db_add_param($this->zgvmaort).",".
+			       ' zgvmadatum='.$this->db_add_param($this->zgvmadatum).",".
+			       ' aufnahmeschluessel='.$this->db_add_param($this->aufnahmeschluessel).",".
+			       ' facheinschlberuf='.$this->db_add_param($this->facheinschlberuf, FHC_BOOLEAN).",".
+			       ' reihungstest_id='.$this->db_add_param($this->reihungstest_id).",".
+			       ' anmeldungreihungstest='.$this->db_add_param($this->anmeldungreihungstest).",".
+			       ' reihungstestangetreten='.$this->db_add_param($this->reihungstestangetreten, FHC_BOOLEAN).",".
+			       ' rt_gesamtpunkte='.$this->db_add_param($this->punkte).",".
+			       ' rt_punkte1='.$this->db_add_param($this->rt_punkte1).",".
+			       ' rt_punkte2='.$this->db_add_param($this->rt_punkte2).",".
+			       ' rt_punkte3='.$this->db_add_param($this->rt_punkte3).",".
+			       ' bismelden='.$this->db_add_param($this->bismelden, FHC_BOOLEAN).",".
+			       ' updateamum='.$this->db_add_param($this->updateamum).",".
+			       ' updatevon='.$this->db_add_param($this->updatevon).",".
+			       ' ext_id='.$this->db_add_param($this->ext_id_prestudent).",".
+			       ' anmerkung='.$this->db_add_param($this->anmerkung).",".
+			       ' dual='.$this->db_add_param($this->dual, FHC_BOOLEAN).",".
+				   ' ausstellungsstaat='.$this->db_add_param($this->ausstellungsstaat).
+			       " WHERE prestudent_id=".$this->db_add_param($this->prestudent_id).";";
 		}
 		
 		if($this->db_query($qry))
@@ -260,7 +275,7 @@ class prestudent extends person
 					}
 					else 
 					{
-						$this->errormsg = 'Fehler beim auslesen der Sequence';
+						$this->errormsg = 'Fehler beim Auslesen der Sequence';
 						$this->db_query('ROLLBACK;');
 						return false;
 					}						
@@ -277,7 +292,7 @@ class prestudent extends person
 		}
 		else 
 		{	
-			$this->errormsg = 'Fehler beim Speichern des Prestudent-Datensatzes:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern des Prestudent-Datensatzes';
 			return false;
 		}
 	}
@@ -324,7 +339,7 @@ class prestudent extends person
 			$ps->gebdatum = $row->gebdatum;
 			$ps->gebort = $row->gebort;
 			$ps->gebzeit = $row->gebzeit;
-			$ps->foto = $row->foto;
+			// $ps->foto = $row->foto;
 			$ps->anmerkungen = $row->anmerkungen;
 			$ps->homepage = $row->homepage;
 			$ps->svnr = $row->svnr;
@@ -332,7 +347,7 @@ class prestudent extends person
 			$ps->familienstand = $row->familienstand;
 			$ps->geschlecht = $row->geschlecht;
 			$ps->anzahlkinder = $row->anzahlkinder;
-			$ps->aktiv = $row->aktiv;
+			$ps->aktiv = $this->db_parse_bool($row->aktiv);
 			$ps->aufmerksamdurch_kurzbz = $row->aufmerksamdurch_kurzbz;
 			$ps->studiengang_kz = $row->studiengang_kz;
 			$ps->berufstaetigkeit_code = $row->berufstaetigkeit_code;
@@ -344,13 +359,13 @@ class prestudent extends person
 			$ps->zgvmaort = $row->zgvmaort;
 			$ps->zgvmadatum = $row->zgvmadatum;
 			$ps->aufnahmeschluessel = $row->aufnahmeschluessel;
-			$ps->facheinschlberuf = $row->facheinschlberuf;
+			$ps->facheinschlberuf = $this->db_parse_bool($row->facheinschlberuf);
 			$ps->anmeldungreihungstest = $row->anmeldungreihungstest;
-			$ps->reihungstestangetreten = $row->reihungstestangetreten;
+			$ps->reihungstestangetreten = $this->db_parse_bool($row->reihungstestangetreten);
 			$ps->punkte = $row->punkte;
 			$ps->rt_punkte1 = $row->rt_punkte1;
 			$ps->rt_punkte2 = $row->rt_punkte2;
-			$ps->bismelden = $row->bismelden;
+			$ps->bismelden = $this->db_parse_bool($row->bismelden);
 			$ps->rt_studiengang_kz = $row->rt_studiengang_kz;
 			$ps->rt_ort = $row->rt_ort;
 			$ps->rt_datum = $row->rt_datum;
@@ -377,13 +392,13 @@ class prestudent extends person
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id='$prestudent_id'";	
+		$qry = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);	
 		if($status_kurzbz!=null)
-			$qry.= " AND status_kurzbz='".addslashes($status_kurzbz)."'";
+			$qry.= " AND status_kurzbz=".$this->db_add_param($status_kurzbz);
 		if($studiensemester_kurzbz!=null)
-			$qry.= " AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+			$qry.= " AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 		if($ausbildungssemester!=null)
-			$qry.= " AND ausbildungssemester='".addslashes($ausbildungssemester)."'";
+			$qry.= " AND ausbildungssemester=".$this->db_add_param($ausbildungssemester);
 
 		if($order!='')
 			$qry.=" ORDER BY ".$order;
@@ -433,10 +448,10 @@ class prestudent extends person
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id='$prestudent_id'".
-			   " AND status_kurzbz='".addslashes($status_kurzbz)."'".
-			   " AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'".
-			   " AND ausbildungssemester='".addslashes($ausbildungssemester)."'";
+		$qry = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id=".$this->db_add_param($prestudent_id).
+			   " AND status_kurzbz=".$this->db_add_param($status_kurzbz).
+			   " AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz).
+			   " AND ausbildungssemester=".$this->db_add_param($ausbildungssemester);
 		
 		if($this->db_query($qry))
 		{
@@ -477,7 +492,7 @@ class prestudent extends person
 	{
 		$stsemqry='';
 		if(!is_null($studiensemester_kurzbz) && $studiensemester_kurzbz!='')
-			$stsemqry=" AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+			$stsemqry=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 		
 		$qry = "SELECT 
 					*, a.anmerkung, tbl_person.anmerkung as anmerkungen 
@@ -492,15 +507,15 @@ class prestudent extends person
 				WHERE a.rolle=tbl_prestudentstatus.status_kurzbz AND 
 					a.person_id=tbl_person.person_id AND
 					a.prestudent_id = tbl_prestudentstatus.prestudent_id AND
-					a.studiengang_kz='$studiengang_kz'";
+					a.studiengang_kz=".$this->db_add_param($studiengang_kz);
 						
 		if(!is_null($studiensemester_kurzbz) && $studiensemester_kurzbz!='')
-			$qry.=" AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+			$qry.=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 			
 		if($semester!=null)
-			$qry.=" AND ausbildungssemester='$semester'";
+			$qry.=" AND ausbildungssemester=".$this->db_add_param($semester);
 		if($orgform!=null && $orgform!='')
-			$qry.=" AND tbl_prestudentstatus.orgform_kurzbz='$orgform'";
+			$qry.=" AND tbl_prestudentstatus.orgform_kurzbz=".$this->db_add_param($orgform);
 		
 		switch ($typ)
 		{
@@ -535,7 +550,7 @@ class prestudent extends person
 				break;
 			case "prestudent":
 				if($studiensemester_kurzbz=='' || is_null($studiensemester_kurzbz))
-					$qry = "SELECT *, '' as status_kurzbz, '' as studiensemester_kurzbz, '' as ausbildungssemester, '' as datum, tbl_person.anmerkung as anmerkungen, '' as orgform_kurzbz FROM public.tbl_prestudent prestudent, public.tbl_person WHERE NOT EXISTS (select * from tbl_prestudentstatus WHERE prestudent_id=prestudent.prestudent_id) AND studiengang_kz='".addslashes($studiengang_kz)."' AND prestudent.person_id=tbl_person.person_id";
+					$qry = "SELECT *, '' as status_kurzbz, '' as studiensemester_kurzbz, '' as ausbildungssemester, '' as datum, tbl_person.anmerkung as anmerkungen, '' as orgform_kurzbz FROM public.tbl_prestudent prestudent, public.tbl_person WHERE NOT EXISTS (select * from tbl_prestudentstatus WHERE prestudent_id=prestudent.prestudent_id) AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER)." AND prestudent.person_id=tbl_person.person_id";
 				else 
 					$qry .= " AND a.rolle IN('Interessent', 'Bewerber', 'Aufgenommener', 'Wartender', 'Abgewiesener')";
 				break;
@@ -568,7 +583,7 @@ class prestudent extends person
 				$ps->gebdatum = $row->gebdatum;
 				$ps->gebort = $row->gebort;
 				$ps->gebzeit = $row->gebzeit;
-				$ps->foto = $row->foto;
+				//$ps->foto = $row->foto;
 				$ps->anmerkungen = $row->anmerkungen;
 				$ps->homepage = $row->homepage;
 				$ps->svnr = $row->svnr;
@@ -576,7 +591,7 @@ class prestudent extends person
 				$ps->familienstand = $row->familienstand;
 				$ps->geschlecht = $row->geschlecht;
 				$ps->anzahlkinder = $row->anzahlkinder;
-				$ps->aktiv = ($row->aktiv=='t'?true:false);
+				$ps->aktiv = $this->db_parse_bool($row->aktiv);
 				
 				$ps->prestudent_id = $row->prestudent_id;
 				$ps->aufmerksamdurch_kurzbz = $row->aufmerksamdurch_kurzbz;
@@ -591,16 +606,17 @@ class prestudent extends person
 				$ps->zgvmadatum = $row->zgvmadatum;
 				$ps->ausstellungsstaat = $row->ausstellungsstaat;
 				$ps->aufnahmeschluessel = $row->aufnahmeschluessel;
-				$ps->facheinschlberuf = ($row->facheinschlberuf=='t'?true:false);
+				$ps->facheinschlberuf = $this->db_parse_bool($row->facheinschlberuf);
 				$ps->anmeldungreihungstest = $row->anmeldungreihungstest;
-				$ps->reihungstestangetreten = ($row->reihungstestangetreten=='t'?true:false);
+				$ps->reihungstestangetreten = $this->db_parse_bool($row->reihungstestangetreten);
 				$ps->reihungstest_id = $row->reihungstest_id;
 				$ps->punkte = $row->rt_gesamtpunkte;
 				$ps->rt_punkte1 = $row->rt_punkte1;
 				$ps->rt_punkte2 = $row->rt_punkte2;
-				$ps->bismelden = ($row->bismelden=='t'?true:false);
+				$ps->rt_punkte3 = $row->rt_punkte3;
+				$ps->bismelden = $this->db_parse_bool($row->bismelden);
 				$ps->anmerkung = $row->anmerkung;
-				$ps->dual = ($row->dual=='t'?true:false);
+				$ps->dual = $this->db_parse_bool($row->dual);
 				
 				$ps->status_kurzbz = $row->status_kurzbz;
 				$ps->studiensemester_kurzbz = $row->studiensemester_kurzbz;
@@ -643,7 +659,9 @@ class prestudent extends person
 		}
 		
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_prestudent 
-				WHERE person_id='$person_id' AND studiengang_kz='$studiengang_kz'";
+				WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER)." 
+				AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
+
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -673,7 +691,7 @@ class prestudent extends person
 	}
 	
 	/**
-	 * Speichert die Prestudentrolle
+	 * Speichert den Prestudentstatus
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	public function save_rolle()
@@ -687,18 +705,20 @@ class prestudent extends person
 				return false;
 			}
 
-			$qry = 'INSERT INTO public.tbl_prestudentstatus (prestudent_id, status_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz) VALUES('.
-			       $this->addslashes($this->prestudent_id).",".
-			       $this->addslashes($this->status_kurzbz).",".
-			       $this->addslashes($this->studiensemester_kurzbz).",".
-			       $this->addslashes($this->ausbildungssemester).",".
-			       $this->addslashes($this->datum).",".
-			       $this->addslashes($this->insertamum).",".
-			       $this->addslashes($this->insertvon).",".
-			       $this->addslashes($this->updateamum).",".
-			       $this->addslashes($this->updatevon).",".
-			       $this->addslashes($this->ext_id_prestudent).",".
-			       $this->addslashes($this->orgform_kurzbz).");";
+			$qry = 'INSERT INTO public.tbl_prestudentstatus (prestudent_id, status_kurzbz, 
+					studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon, 
+					updateamum, updatevon, ext_id, orgform_kurzbz) VALUES('.
+			       $this->db_add_param($this->prestudent_id).",".
+			       $this->db_add_param($this->status_kurzbz).",".
+			       $this->db_add_param($this->studiensemester_kurzbz).",".
+			       $this->db_add_param($this->ausbildungssemester).",".
+			       $this->db_add_param($this->datum).",".
+			       $this->db_add_param($this->insertamum).",".
+			       $this->db_add_param($this->insertvon).",".
+			       $this->db_add_param($this->updateamum).",".
+			       $this->db_add_param($this->updatevon).",".
+			       $this->db_add_param($this->ext_id_prestudent).",".
+			       $this->db_add_param($this->orgform_kurzbz).");";
 		}
 		else
 		{			
@@ -717,13 +737,17 @@ class prestudent extends person
 				}
 			}
 			$qry = 'UPDATE public.tbl_prestudentstatus SET'.
-			       ' ausbildungssemester='.$this->addslashes($this->ausbildungssemester).",".
-			       ' studiensemester_kurzbz='.$this->addslashes($this->studiensemester_kurzbz).",".
-			       ' datum='.$this->addslashes($this->datum).",".
-			       ' updateamum='.$this->addslashes($this->updateamum).",".
-			       ' updatevon='.$this->addslashes($this->updatevon).",".
-			       ' orgform_kurzbz='.$this->addslashes($this->orgform_kurzbz).
-			       " WHERE prestudent_id='".addslashes($this->prestudent_id)."' AND status_kurzbz='".addslashes($this->status_kurzbz)."' AND studiensemester_kurzbz='".addslashes($this->studiensemester_old)."' AND ausbildungssemester='".addslashes($this->ausbildungssemester_old)."';";
+			       ' ausbildungssemester='.$this->db_add_param($this->ausbildungssemester).",".
+			       ' studiensemester_kurzbz='.$this->db_add_param($this->studiensemester_kurzbz).",".
+			       ' datum='.$this->db_add_param($this->datum).",".
+			       ' updateamum='.$this->db_add_param($this->updateamum).",".
+			       ' updatevon='.$this->db_add_param($this->updatevon).",".
+			       ' orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).
+			       " WHERE 
+						prestudent_id=".$this->db_add_param($this->prestudent_id, FHC_INTEGER, false)." 
+						AND status_kurzbz=".$this->db_add_param($this->status_kurzbz, FHC_STRING, false)."
+						AND studiensemester_kurzbz=".$this->db_add_param($this->studiensemester_old, FHC_STRING, false)."
+						AND ausbildungssemester=".$this->db_add_param($this->ausbildungssemester_old, FHC_STRING, false).";";
 		}
 		
 		if($this->db_query($qry))
@@ -733,16 +757,17 @@ class prestudent extends person
 		}
 		else 
 		{	
-			$this->errormsg = 'Fehler beim Speichern der Prestudentrolle:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern des Prestudentstatus';
 			return false;
 		}
 	}
 	
 	/**
-	 * Loescht eine Rolle
+	 * Loescht einen Prestudentstatus
 	 * @param $prestudent_id
 	 *        $status_kurzbz
 	 *        $studiensemester_kurzbz
+	 *		  $ausbildungssemester
 	 * @return true wenn ok, false wenn Fehler
 	 */
 	public function delete_rolle($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester)
@@ -753,7 +778,13 @@ class prestudent extends person
 			return false;
 		}
 
-		$qry = "DELETE FROM public.tbl_prestudentstatus WHERE prestudent_id='$prestudent_id' AND status_kurzbz='".addslashes($status_kurzbz)."' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND ausbildungssemester='".addslashes($ausbildungssemester)."'";
+		$qry = "DELETE FROM public.tbl_prestudentstatus 
+				WHERE 
+					prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER)."
+					AND status_kurzbz=".$this->db_add_param($status_kurzbz)."
+					AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+					AND ausbildungssemester=".$this->db_add_param($ausbildungssemester);
+
 		if($this->load_rolle($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester))
 		{
 			$this->db_query('BEGIN;');
@@ -766,17 +797,17 @@ class prestudent extends person
 			$log->sql = $qry;
 			$log->sqlundo = 'INSERT INTO public.tbl_prestudentstatus(prestudent_id, status_kurzbz, studiensemester_kurzbz,'.
 							' ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz) VALUES('.
-							$this->addslashes($this->prestudent_id).','.
-							$this->addslashes($this->status_kurzbz).','.
-							$this->addslashes($this->studiensemester_kurzbz).','.
-							$this->addslashes($this->ausbildungssemester).','.
-							$this->addslashes($this->datum).','.
-							$this->addslashes($this->insertamum).','.
-							$this->addslashes($this->insertvon).','.
-							$this->addslashes($this->updateamum).','.
-							$this->addslashes($this->updatevon).','.
-							$this->addslashes($this->ext_id_prestudent).','.
-							$this->addslashes($this->orgform_kurzbz).');';
+							$this->db_add_param($this->prestudent_id).','.
+							$this->db_add_param($this->status_kurzbz).','.
+							$this->db_add_param($this->studiensemester_kurzbz).','.
+							$this->db_add_param($this->ausbildungssemester).','.
+							$this->db_add_param($this->datum).','.
+							$this->db_add_param($this->insertamum).','.
+							$this->db_add_param($this->insertvon).','.
+							$this->db_add_param($this->updateamum).','.
+							$this->db_add_param($this->updatevon).','.
+							$this->db_add_param($this->ext_id_prestudent).','.
+							$this->db_add_param($this->orgform_kurzbz).');';
 			if($log->save(true))
 			{
 						
@@ -820,13 +851,13 @@ class prestudent extends person
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id='$prestudent_id'";
+		$qry = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);
 
 		if($studiensemester_kurzbz!='')
-			$qry.=" AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
-			
+			$qry.=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+		
 		if($status_kurzbz !='')
-			$qry.= " AND status_kurzbz ='".addslashes($status_kurzbz)."'";
+			$qry.= " AND status_kurzbz =".$this->db_add_param($status_kurzbz);
 		
 		$qry.=" ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1";
 		if($this->db_query($qry))
@@ -872,10 +903,11 @@ class prestudent extends person
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id='$prestudent_id' and status_kurzbz = ".$this->addslashes($status_kurzbz);
-
-
-		$qry.=" ORDER BY datum ASC, insertamum ASC, ext_id ASC LIMIT 1";
+		$qry = "SELECT * FROM public.tbl_prestudentstatus 
+				WHERE 
+					prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER)." 
+					AND status_kurzbz = ".$this->db_add_param($status_kurzbz)."
+				ORDER BY datum ASC, insertamum ASC, ext_id ASC LIMIT 1";
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -917,7 +949,7 @@ class prestudent extends person
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_prestudent WHERE person_id='$person_id'";
+		$qry = "SELECT * FROM public.tbl_prestudent WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 		{
@@ -937,18 +969,19 @@ class prestudent extends person
 				$obj->zgvmaort = $row->zgvmaort;
 				$obj->zgvmadatum = $row->zgvmadatum;
 				$obj->aufnahmeschluessel = $row->aufnahmeschluessel;
-				$obj->facheinschlberuf = ($row->facheinschlberuf=='t'?true:false);
+				$obj->facheinschlberuf = $this->db_parse_bool($row->facheinschlberuf);
 				$obj->anmeldungreihungstest = $row->anmeldungreihungstest;
-				$obj->reihungstestangetreten = ($row->reihungstestangetreten=='t'?true:false);
+				$obj->reihungstestangetreten = $this->db_parse_bool($row->reihungstestangetreten);
 				$obj->reihungstest_id = $row->reihungstest_id;
 				$obj->punkte = $row->rt_gesamtpunkte;
 				$obj->rt_punkte1 = $row->rt_punkte1;
 				$obj->rt_punkte2 = $row->rt_punkte2;
-				$obj->bismelden = ($row->bismelden=='t'?true:false);
+				$obj->rt_punkte3 = $row->rt_punkte3;
+				$obj->bismelden = $this->db_parse_bool($row->bismelden);
 				$obj->person_id = $row->person_id;
 				$obj->anmerkung = $row->anmerkung;
 				$obj->ext_id_prestudent = $row->ext_id;
-				$obj->dual = ($row->dual=='t'?true:false);
+				$obj->dual = $this->db_parse_bool($row->dual);
 				$obj->ausstellungsstaat = $row->ausstellungsstaat;
 				
 				$this->result[] = $obj;
@@ -957,7 +990,7 @@ class prestudent extends person
 		}
 		else 
 		{
-			$this->errormsg = "Fehler beim Laden: $qry";
+			$this->errormsg = "Fehler beim Laden";
 			return false;
 		}
 	}

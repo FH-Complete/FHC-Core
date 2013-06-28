@@ -931,6 +931,7 @@ function StudentAuswahl()
 	punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
 	punkte1 = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte1" ));
 	punkte2 = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte2" ));
+	punkte3 = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte3" ));
 	bismelden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bismelden" ));
 	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkungpre" ));
 	dual = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#dual" ));
@@ -959,6 +960,7 @@ function StudentAuswahl()
 	document.getElementById('student-prestudent-textbox-punkte').value=punkte;
 	document.getElementById('student-prestudent-textbox-punkte1').value=punkte1;
 	document.getElementById('student-prestudent-textbox-punkte2').value=punkte2;
+	document.getElementById('student-prestudent-textbox-punkte3').value=punkte3;
 
 	if(bismelden=='true')
 		document.getElementById('student-prestudent-checkbox-bismelden').checked=true;
@@ -1364,7 +1366,8 @@ function StudentAuswahl()
 	// Selektierungsfunktion der Addons aufrufen
 	for(i in addon)
 	{
-		addon[i].selectStudent(person_id, prestudent_id, uid)
+		if(typeof addon[i].selectStudent == 'function')
+			addon[i].selectStudent(person_id, prestudent_id, uid);
 	}
 }
 
@@ -1391,6 +1394,7 @@ function StudentPrestudentDisableFields(val)
 	document.getElementById('student-prestudent-textbox-punkte').disabled=val;
 	document.getElementById('student-prestudent-textbox-punkte1').disabled=val;
 	document.getElementById('student-prestudent-textbox-punkte2').disabled=val;
+	document.getElementById('student-prestudent-textbox-punkte3').disabled=val;
 	document.getElementById('student-prestudent-checkbox-bismelden').disabled=val;
 	document.getElementById('student-prestudent-checkbox-dual').disabled=val;
 	document.getElementById('student-prestudent-button-anmeldungreihungstest-heute').disabled=val;
@@ -1441,6 +1445,7 @@ function StudentPrestudentSave()
 	punkte = document.getElementById('student-prestudent-textbox-punkte').value;
 	punkte1 = document.getElementById('student-prestudent-textbox-punkte1').value;
 	punkte2 = document.getElementById('student-prestudent-textbox-punkte2').value;
+	punkte3 = document.getElementById('student-prestudent-textbox-punkte3').value;
 	bismelden = document.getElementById('student-prestudent-checkbox-bismelden').checked;
 	dual = document.getElementById('student-prestudent-checkbox-dual').checked;
 	person_id = document.getElementById('student-prestudent-textbox-person_id').value;
@@ -1494,6 +1499,7 @@ function StudentPrestudentSave()
 	req.add('punkte', punkte);
 	req.add('punkte1', punkte1);
 	req.add('punkte2', punkte2);
+	req.add('punkte3', punkte3);
 	req.add('bismelden', bismelden);
 	req.add('dual', dual);
 	req.add('person_id', person_id);
@@ -1683,6 +1689,8 @@ function StudentReihungstestPunkteSum()
 {
 	punkte1 = document.getElementById('student-prestudent-textbox-punkte1').value;
 	punkte2 = document.getElementById('student-prestudent-textbox-punkte2').value;
+	punkte3 = document.getElementById('student-prestudent-textbox-punkte3').value;
+
 	if(punkte1=='')
 	{
 		punkte1=0;
@@ -1693,8 +1701,14 @@ function StudentReihungstestPunkteSum()
 		punkte2=0;
 		document.getElementById('student-prestudent-textbox-punkte2').value=0;
 	}
+	if(punkte3=='')
+	{
+		punkte3=0;
+		document.getElementById('student-prestudent-textbox-punkte3').value=0;
+
+	}
 	
-	document.getElementById('student-prestudent-textbox-punkte').value=parseFloat(punkte1)+parseFloat(punkte2);
+	document.getElementById('student-prestudent-textbox-punkte').value=parseFloat(punkte1)+parseFloat(punkte2)+parseFloat(punkte3);
 }
 
 // ****

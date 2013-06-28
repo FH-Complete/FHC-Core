@@ -457,6 +457,7 @@ if(!$error)
 				$prestudent->punkte = str_replace(',','.',$_POST['punkte']);
 				$prestudent->rt_punkte1 = str_replace(',','.',$_POST['punkte1']);
 				$prestudent->rt_punkte2 = str_replace(',','.',$_POST['punkte2']);
+				$prestudent->rt_punkte3 = str_replace(',','.',$_POST['punkte3']);
 				$prestudent->bismelden = ($_POST['bismelden']=='true'?true:false);
 				$prestudent->dual = ($_POST['dual']=='true'?true:false);
 				$prestudent->anmerkung = $_POST['anmerkung'];
@@ -633,7 +634,7 @@ if(!$error)
 													$lehrverband->verband = '';
 													$lehrverband->gruppe = '';
 													$lehrverband->aktiv = true;
-													$lehrverband->bezeichnung = 'AbUnterbrecher/Incoming';
+													$lehrverband->bezeichnung = 'Ab-Unterbrecher';
 													
 													$lehrverband->save(true);
 												}
