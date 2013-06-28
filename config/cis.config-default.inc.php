@@ -62,9 +62,21 @@ define('CIS_EXT_MENU',true);
 // Legt fest ob bei den Zeitsperren der Bereich fuer die Resturlaubstage angezeigt wird
 define('URLAUB_TOOLS',true);
 
+// Authentifizierungsmethode 
+// Moegliche Werte: 
+// auth_mixed    - htaccess mit LDAP (Default)
+// auth_session  - Sessions mit LDAP (Testbetrieb)
+define("AUTH_SYSTEM", "auth_mixed");
+
 // LDAP_SERVER: Adresse des LDAP Servers
 define("LDAP_SERVER","www.technikum-wien.at");
 define("LDAP_BASE_DN","ou=People, dc=technikum-wien, dc=at");
+//User fuer LDAP BIND falls Authentifizierung noetig
+define("LDAP_BIND_USER",null);
+//Passwort fuer LDAP BIND falls Authentifzierung noetig
+define("LDAP_BIND_PASSWORD",null);
+//LDAP Attribut in dem der Username steht nach dem gesucht wird
+define("LDAP_USER_SEARCH_FILTER","uid");
 // Attribut fuer Zutrittskartennummer im LDAP
 define("LDAP_CARD_NUMBER","twHitagCardNumber");
 // Attribut fuer Zutrittskartennummer2 im LDAP

@@ -1350,6 +1350,9 @@ class content extends basis_db
 	 */
 	public function loadArray($ids, $sprache, $sichtbar=null)
 	{
+		if(count($ids)==0)
+			return false;
+
 		$qry='';
 		foreach($ids as $id)
 		{

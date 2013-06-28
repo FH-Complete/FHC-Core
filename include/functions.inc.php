@@ -20,49 +20,43 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/authentication.class.php');
 require_once('betriebsmittelperson.class.php'); 
 
 // Auth: Benutzer des Webportals
+/**
+ * DEPRECATED - Use Authentication Class
+ */
 function get_uid()
 {
-	if(isset($_SERVER['REMOTE_USER']))
-	{
-		return mb_strtolower(trim($_SERVER['REMOTE_USER']));
-	}
-	else
-	{
-		if(isset($_SESSION['user']))
-			return mb_strtolower($_SESSION['user']);
-		else
-			return manual_basic_auth();
-	}
-	// fuer Testzwecke
-	//return 'oesi';
-	//return 'pam';
+	$auth = new authentication();
+	return $auth->getUser();
 }
+
+/**
+ * DEPRECATED - Use Authentication Class
+ */
 function is_user_logged_in()
 {
-	if(isset($_SERVER['PHP_AUTH_USER']) && checkldapuser($_SERVER['PHP_AUTH_USER'],$_SERVER['PHP_AUTH_PW']))
-		return true;
-	else
-		return false;
+	$auth = new authentication();
+	return $auth->isUserLoggedIn();
 }
+/**
+ * DEPRECATED - Use Authentication Class
+ */
 function get_original_uid()
 {
-	if(isset($_SERVER['REMOTE_USER']))
-		return mb_strtolower(trim($_SERVER['REMOTE_USER']));
-	else
-	{
-		if(isset($_SESSION['user_original']))
-			return $_SESSION['user_original'];
-	}
+	$auth = new authentication();
+	return $auth->getOriginalUser();
 }
 
-
+/**
+ * DEPRECATED - Use Authentication Class
+ */
 function login_as_user($uid)
 {
-	$_SESSION['user']=$uid;
-	return true;
+	$auth = new authentication();
+	return $auth->loginAsUser($uid);
 }
 
 function crlf()
@@ -266,13 +260,16 @@ function jump_week($datum, $wochen)
 	return $datum;
 }
 
+/**
+ * DEPRECATED - Use Variable Class
+ */
 function loadVariables($user)
 {
 	$db = new basis_db();
 	
 	$error_msg='';
 	$num_rows=0;
-	$sql_query="SELECT * FROM public.tbl_variable WHERE uid='$user'";
+	$sql_query="SELECT * FROM public.tbl_variable WHERE uid=".$db->db_add_param($user);
 	if(!$db->db_query($sql_query))
 		$error_msg.=$db->db_last_error().'<BR>'.$sql_query;
 	else
@@ -376,9 +373,9 @@ function getStudiensemesterFromDatum($datum, $naechstes=true)
 	$qry = "SELECT studiensemester_kurzbz FROM public.tbl_studiensemester WHERE";
 
 	if($naechstes)
-		$qry.= " ende>'".addslashes($datum)."' ORDER BY ende ASC ";
+		$qry.= " ende>".$db->db_add_param($datum)." ORDER BY ende ASC ";
 	else
-		$qry.= " start<'".addslashes($datum)."' ORDER BY ende DESC ";
+		$qry.= " start<".$db->db_add_param($datum)." ORDER BY ende DESC ";
 
 	$qry.= "LIMIT 1";
 
@@ -422,61 +419,13 @@ function getUidFromCardNumber($number)
 
 }
 
-// ****************************************************************
-// * Prueft ob im LDAP ein User mit diesem Passwort existiert
-// ****************************************************************
+/**
+ * DEPRECATED
+ */
 function checkldapuser($username,$password)
 {
-	if($connect=@ldap_connect(LDAP_SERVER))
-	{
-	    // bind to ldap connection
-	    if(($bind=@ldap_bind($connect)) == false)
-	    {
-			print "bind:__FAILED__<br>\n";
-			return false;
-	    }
-
-	    // search for user
-	    if (($res_id = ldap_search( $connect, LDAP_BASE_DN, "uid=$username")) == false)
-	    {
-			print "failure: search in LDAP-tree failed<br>";
-			return false;
-	    }
-
-	    if (ldap_count_entries($connect, $res_id) != 1)
-	    {
-			print "failure: username not found<br>\n";
-			return false;
-	    }
-
-	    if (( $entry_id = ldap_first_entry($connect, $res_id))== false)
-	    {
-			print "failur: entry of searchresult couln't be fetched<br>\n";
-			return false;
-	    }
-
-		if (( $user_dn = ldap_get_dn($connect, $entry_id)) == false)
-		{
-			print "failure: user-dn coulnd't be fetched<br>\n";          
-			return false;
-	    }
-
-	    /* Authentifizierung des User */
-	    if (($link_id = @ldap_bind($connect, $user_dn, $password)) == false)
-	    {
-			return false;
-	    }
-
-	    @ldap_close($connect);
-		return true;
-	}
-	else
-	{
-		// no conection to ldap server
-		echo "no connection to '$ldap_server'<br>\n";
-	}
-	@ldap_close($connect);
-	return(false);
+	$auth = new authentication();
+	return $auth->checkpassword($username, $password);
 }
 
 /**
@@ -825,17 +774,8 @@ function check_filename($filename)
  */
 function manual_basic_auth()
 {
-	if(!(isset($_SERVER['PHP_AUTH_USER']) && checkldapuser($_SERVER['PHP_AUTH_USER'],$_SERVER['PHP_AUTH_PW'])))
-	{
-		header('WWW-Authenticate: Basic realm="Technikum-Wien"');
-    	header('HTTP/1.0 401 Unauthorized');
-    	echo "Ihre Zugangsdaten sind ungueltig!";
-    	exit;
-	}
-	else
-	{
-		return mb_strtolower($_SERVER['PHP_AUTH_USER']);
-	}
+	$auth = new authentication();
+	return $auth->RequireLogin();
 }
 
 /**
