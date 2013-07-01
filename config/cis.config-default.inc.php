@@ -67,6 +67,8 @@ define('URLAUB_TOOLS',true);
 // auth_mixed    - htaccess mit LDAP (Default)
 // auth_session  - Sessions mit LDAP (Testbetrieb)
 define("AUTH_SYSTEM", "auth_mixed");
+// Gibt den Namen fuer die htaccess Authentifizierung an (muss mit dem Attribut AuthName im htaccess uebereinstimmen)
+define("AUTH_NAME","Technikum-Wien");
 
 // LDAP_SERVER: Adresse des LDAP Servers
 define("LDAP_SERVER","www.technikum-wien.at");

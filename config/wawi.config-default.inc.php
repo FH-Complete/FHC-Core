@@ -40,7 +40,9 @@ define('DOMAIN','technikum-wien.at');
 // auth_mixed    - htaccess mit LDAP (Default)
 // auth_session  - Sessions mit LDAP (Testbetrieb)
 define("AUTH_SYSTEM", "auth_mixed");
-
+// Gibt den Namen fuer die htaccess Authentifizierung an (muss mit dem Attribut AuthName im htaccess uebereinstimmen)
+define("AUTH_NAME","Technikum-Wien");
+	
 //LDAP_SERVER: Speichert die Adresse des LDAP Servers
 define("LDAP_SERVER","ldap.technikum-wien.at");
 define("LDAP_BASE_DN","ou=People, dc=technikum-wien, dc=at");
