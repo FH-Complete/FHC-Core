@@ -111,7 +111,7 @@ class authentication extends auth
 	{
 		if(!(isset($_SERVER['PHP_AUTH_USER']) && $this->checkpassword($_SERVER['PHP_AUTH_USER'],$_SERVER['PHP_AUTH_PW'])))
 		{
-			header('WWW-Authenticate: Basic realm="FHComplete"');
+			header('WWW-Authenticate: Basic realm="'.AUTH_NAME.'"');
 			header('HTTP/1.0 401 Unauthorized');
 			echo "Ihre Zugangsdaten sind ungueltig!";
 			exit;
