@@ -78,7 +78,7 @@ $rechte->getBerechtigungen($user);
 	
 	$(document).ready(function() 
 	{ 
-		$('#divupload').hide();
+		//$('#divupload').hide();
 		jQuery('ul.sf-menu').superfish({speed:'fast', delay:200});
 	});
 	
