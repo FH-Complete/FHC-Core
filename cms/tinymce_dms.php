@@ -246,6 +246,7 @@ if($importFile != '')
 if(isset($_POST['fileupload']))
 {
 	$dms_id = $_POST['dms_id'];
+	$beschreibung = $_POST['beschreibung'];
 	$ext = pathinfo($_FILES['userfile']['name'], PATHINFO_EXTENSION); 
 	$filename = uniqid();
 	$filename.=".".$ext; 
@@ -281,6 +282,7 @@ if(isset($_POST['fileupload']))
     	$dms->mimetype=$_FILES['userfile']['type'];
     	$dms->filename = $filename;
     	$dms->name = $_FILES['userfile']['name'];
+    	$dms->beschreibung = $beschreibung;
     	    	
     	if($dms->save(true))
     	{
@@ -309,11 +311,14 @@ if(isset($_POST['action']) && $_POST['action']=='rename')
 	$name = $_POST['dateiname'];
 	$dms_id = $_POST['dms_id'];
 	$version = $_POST['version'];
+	$beschreibung = $_POST['beschreibung'];
 	
 	$dms = new dms();
 	if($dms->load($dms_id, $version))
 	{
 		$dms->name = $name;
+		$dms->beschreibung = $beschreibung;
+		
 		if($dms->save(false))
 			echo '<span class="ok">Dateiname wurde erfolgreich geändert</span>';
 		else
@@ -474,7 +479,16 @@ else
 			<form action="'.$_SERVER['PHP_SELF'].'" method="POST" enctype="multipart/form-data">
 				<input type="hidden" name="kategorie_kurzbz" id="kategorie_kurzbz" value="'.$kategorie_kurzbz.'">
 				<input type="hidden" name="dms_id" id="dms_id" value="">
-				<input type="file" name="userfile">
+				<table>
+				<tr>
+					<td>Beschreibung</td>
+					<td><textarea name="beschreibung"></textarea></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><input type="file" name="userfile"></td>
+				</tr>
+				</table>
 				<input type="hidden" name="projekt_kurzbz" value="'.$projekt_kurzbz.'">
 				<input type="hidden" name="projektphase_id" value="'.$projektphase_id.'">
 				<input type="submit" name="fileupload" value="Upload">
@@ -697,6 +711,7 @@ function drawFilesList($rows)
 		}
 		echo'</td><td>';
 		
+		
 		//Upload einer neuen Version
 		echo '<ul class="sf-menu">
 				<li><a href="id://'.$row->dms_id.'/Erweitert" style="font-size:small">Erweitert</a>
@@ -710,8 +725,9 @@ function drawFilesList($rows)
                     </ul>
 				</li>
 			  </ul>';
-		echo '</td>
-		</tr>';
+		echo '</td>';
+		echo '<td>'.$dms->convert_html_chars($row->beschreibung).'</td>';
+		echo '</tr>';
 		
 	}
 	echo '	
@@ -732,7 +748,16 @@ function drawRenameForm($dms_id, $version)
 	if($dms->load($dms_id, $version))
 	{
 		echo '<form action="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$kategorie_kurzbz.'" method="POST">
-		Dateiname: <input type="text" size="40" name="dateiname" value="'.htmlentities($dms->name).'">
+		<table>
+		<tr>
+			<td>Dateiname:</td>
+			<td><input type="text" size="40" name="dateiname" value="'.$dms->convert_html_chars($dms->name).'"></td>
+		</tr>
+		<tr>
+			<td>Beschreibung:</td>
+			<td><textarea name="beschreibung">'.$dms->convert_html_chars($dms->beschreibung).'</textarea></td>
+		</tr>
+		</table>
 		<input type="hidden" name="action" value="rename">
 		<input type="hidden" name="dms_id" value="'.$dms_id.'">
 		<input type="hidden" name="version" value="'.$version.'">
