@@ -526,7 +526,7 @@ if($aktion == 'suche')
 		echo "</tr>\n";		
 		echo "<tr>\n";
 		echo "<td> Firma: </td>\n";
-		echo "<td> <input id='firmenname' name='firmenname' size='32' maxlength='30' value=''  >\n";
+		echo "<td> <input id='firmenname' name='firmenname' size='32' value=''  >\n";
 		echo "<SELECT name='filter_firma' id='firma' style='width: 256px;'>\n"; 
 		echo "<option value=''>-- OE auswählen --</option>\n";
 		echo "</SELECT>\n";
@@ -747,7 +747,7 @@ elseif($aktion == 'new')
 	echo "</tr>\n";
 	echo "<tr>\n";
 	echo "<td>Firma:</td>\n";
-	echo "<td> <input id='firmenname' name='firmenname' size='32' maxlength='30' value=''  ></td>\n";
+	echo "<td> <input id='firmenname' name='firmenname' size='32' value=''  ></td>\n";
 	echo "<td> <input type ='hidden' id='firma_id' name='firma_id' size='10' maxlength='30' value=''  ></td>\n";
 	echo "</tr>\n";
 	echo "<tr>\n"; 
