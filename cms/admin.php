@@ -726,8 +726,9 @@ echo '</td><td valign="top">';
 //Editieren
 if(!is_null($content_id) && $content_id!='')
 {
-	echo '<h2>Content ID: '.$content_id.' | Version:'.$version.' | Sprache:'.$sprache.'</h2>';
 	$content = new content();
+	$content->getContent($content_id, $sprache, $version);
+	echo '<h2>Content ID: '.$content_id.' | Version: '.$version.' | Sprache: '.$sprache.' | Titel: '.$content->titel.'</h2>';
 	$oe = $content->getOrganisationseinheit($content_id);
 	if(!in_array($oe, $berechtigte_oe))
 		die('Sie haben keine Berechtigung fuer diesen Eintrag');
