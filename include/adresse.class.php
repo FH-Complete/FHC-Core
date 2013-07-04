@@ -319,7 +319,7 @@ class adresse extends basis_db
 		      	' zustelladresse='.$this->db_add_param($this->zustelladresse, FHC_BOOLEAN, false).' '.
 		      	'WHERE adresse_id='.$this->db_add_param($this->adresse_id, FHC_INTEGER, false).';';
 		}
-		
+        
 		if($this->db_query($qry))
 		{
 			if($this->new)
