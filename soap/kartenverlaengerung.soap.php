@@ -86,7 +86,8 @@ function getNumber($cardNr)
     $studSemester->load($aktSemester); 
     $datum = new datum(); 
     
-    $objArray = array('datum'=>'Gueltig bis/valid thru '.$datum->formatDatum($studSemester->ende, 'd.m.Y'), 'errorMessage'=>'');  
+    //$objArray = array('datum'=>'Gueltig bis/valid thru '.$datum->formatDatum($studSemester->ende, 'd.m.Y'), 'errorMessage'=>'');  
+    $objArray = array('datum'=>'Gueltig fuer/valid for '.$studSemester->studiensemester_kurzbz, 'errorMessage'=>'');  
     return $objArray;  
     
 }
