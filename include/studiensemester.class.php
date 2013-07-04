@@ -623,5 +623,38 @@ class studiensemester extends basis_db
 			return false;
 		}
 	}
+    
+    /**
+     * untersucht das übergebene datum in welchem semester es sich befindet
+     * @param type $datum
+     * @return boolean 
+     */
+    public function getSemesterFromDatum($datum)
+    {
+        if($datum == '')
+        {
+            $this->errormsg = "Ungueltiges Datum übergeben"; 
+            return false; 
+        }
+        $qry = "SELECT * FROM public.tbl_studiensemester WHERE start <=".$this->db_add_param($datum, FHC_STRING)." AND ende >= ".$this->db_add_param($datum).';'; 
+        
+        if($result = $this->db_query($qry))
+        {
+            if($row = $this->db_fetch_object())
+            {
+                return $row->studiensemester_kurzbz; 
+            }
+            else
+            {
+                $this->errormsg = "Es wurde kein passendes Studiensemester gefunden"; 
+                return false; 
+            }
+        }
+        else
+        {
+            $this->errormsg = "Fehler bei der Abfrage aufgetreten."; 
+            return false; 
+        }
+    }
 }
 ?>
