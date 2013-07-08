@@ -165,7 +165,7 @@ $outp.= " Studiengang: <SELECT name='filter_stg_kz'>";
 $count_fb = count($rechte->getFbKz());
 if($count_fb>0)
 	$outp.= '<option value="" >-- Alle --</option>';
-$s['']->max_sem=8;
+@$s['']->max_sem=8;
 $s['']->kurzbz='';
 
 foreach ($studiengang as $stg)
@@ -183,7 +183,7 @@ foreach ($studiengang as $stg)
 		$outp.= '<option value="'.$stg->studiengang_kz.'" '.$selected.'>'.$stg->kuerzel.'</option>';
 	}
 	
-	$s[$stg->studiengang_kz]->max_sem=$stg->max_semester;
+	@$s[$stg->studiengang_kz]->max_sem=$stg->max_semester;
 	$s[$stg->studiengang_kz]->kurzbz=$stg->kuerzel;
 }
 $outp.="</SELECT>";

@@ -287,7 +287,7 @@ foreach ($studiengang as $stg)
 {
 	$outp.="<OPTION onclick=\"window.location.href = '".$_SERVER['PHP_SELF']."?stg_kz=$stg->studiengang_kz&semester=$semester&semesterv=$semesterv&studiensemester_kurzbz=$studiensemester_kurzbz&studiensemester_kurzbz_akt=$studiensemester_kurzbz_akt&studiensemester_kurzbz_zk=$studiensemester_kurzbz_zk'\" ".($stg->studiengang_kz==$stg_kz?'selected':'').">$stg->kurzbzlang ($stg->kuerzel) - $stg->bezeichnung</OPTION>";
 	//$outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg->studiengang_kz.'&semester='.$semester.'">'.$stg->kuerzel.'</A> - ';
-	$s[$stg->studiengang_kz]->max_sem=$stg->max_semester;
+	@$s[$stg->studiengang_kz]->max_sem=$stg->max_semester;
 	$s[$stg->studiengang_kz]->kurzbz=$stg->kurzbzlang;
 }
 $outp.='</SELECT>';
