@@ -1618,7 +1618,7 @@ class wochenplan extends basis_db
 			$raumtypalt[$i]=$row->raumtypalternativ;
 			if ($row->gruppe_kurzbz!=null && $row->gruppe_kurzbz!='')
 				$gruppe[$i]=$row->gruppe_kurzbz;
-			$lehrverband[$i]->stg_kz=$row->studiengang_kz;
+			@$lehrverband[$i]->stg_kz=$row->studiengang_kz;
 			$lehrverband[$i]->sem=$row->semester;
 			$lehrverband[$i]->ver=$row->verband;
 			$lehrverband[$i]->grp=$row->gruppe;
@@ -1762,7 +1762,7 @@ class wochenplan extends basis_db
 		for ($t=1;$t<=TAGE_PRO_WOCHE;$t++)
 			for ($s=$min_stunde;$s<=$max_stunde;$s++)
 			{
-				$raster[$t][$s]->ort=array();
+				@$raster[$t][$s]->ort=array();
 				$raster[$t][$s]->kollision=false;
 			}
 		do
@@ -1774,7 +1774,7 @@ class wochenplan extends basis_db
 				{
 					if (isset($raster[$t][$s]))
 						unset($raster[$t][$s]);
-					$raster[$t][$s]->ort=array();
+					@$raster[$t][$s]->ort=array();
 					$raster[$t][$s]->kollision=false;
 				}
 			}
@@ -1887,7 +1887,7 @@ class wochenplan extends basis_db
 					else
 					{
 						// Wenn sich die Verplanung mit der Blockung nicht mehr ausgeht, dann keine Raeume vorschlagen
-						$this->std_plan[$t][$s][0]->frei_orte=array();
+						@$this->std_plan[$t][$s][0]->frei_orte=array();
 					}
 				}
 			}
