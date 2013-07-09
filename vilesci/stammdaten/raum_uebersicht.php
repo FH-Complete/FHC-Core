@@ -267,7 +267,7 @@ function changeboolean(ort_kurzbz, name)
 
 <body class="background_main">
 <h2>R&auml;ume &Uuml;bersicht</h2>
-
+<a href="raum_details.php" target="detail_raum">Neuer Raum </a>
 
 
 <?php 

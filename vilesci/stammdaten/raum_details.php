@@ -137,7 +137,10 @@
 		$neu = "false";
 	}
 		
-	$htmlstr .= "<br><div class='kopf'>Raum <b>".$ort_kurzbz."</b></div>\n";
+    if($ort_kurzbz != '')
+        $htmlstr .= "<br><div class='kopf'>Raum <b>".$ort_kurzbz."</b></div>\n";
+    else
+        $htmlstr .="<br><div class='kopf'>Neuer Raum</div>\n"; 
 	$htmlstr .= "<form action='raum_details.php' method='POST' name='raumform'>\n";
 	$htmlstr .= "<table class='detail'>\n";
 
