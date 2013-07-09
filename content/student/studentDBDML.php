@@ -2648,7 +2648,7 @@ if(!$error)
 							}
 							else
 							{
-								$zeungisnote->new = false;
+								@$zeungisnote->new = false;
 							}
 						}
 						else
