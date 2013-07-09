@@ -106,7 +106,7 @@ else
 $s=array();
 foreach ($studiengang as $stg)
 {
-	$s[$stg->studiengang_kz]->max_sem=$stg->max_semester;
+	@$s[$stg->studiengang_kz]->max_sem=$stg->max_semester;
 	$s[$stg->studiengang_kz]->kurzbz=$stg->kurzbzlang;
 	$outp.= '<A href="lv_wartung.php?stg_kz='.$stg->studiengang_kz.'&semester='.$semester.'&max='.$stg->max_semester.'">'.$stg->kurzbzlang.' ('.strtoupper($stg->typ.$stg->kurzbz).') </A>  -  ';
 
