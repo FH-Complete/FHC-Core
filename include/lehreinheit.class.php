@@ -875,7 +875,7 @@ class lehreinheit extends basis_db
                                         $this->db_add_param($row->raumtyp).",".
                                         $this->db_add_param($row->raumtypalternativ).",".
                                         $this->db_add_param($row->sprache).",".
-                                        $this->db_add_param($row->lehre, FHC_BOOLEAN).",".
+                                        $this->db_add_param($this->db_parse_bool($row->lehre, FHC_BOOLEAN)).",".
 										$this->db_add_param($row->anmerkung).",".
                                         $this->db_add_param($row->unr, FHC_INTEGER).",".
                                         $this->db_add_param($row->lvnr, FHC_INTEGER).",".
