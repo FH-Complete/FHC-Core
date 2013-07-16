@@ -230,10 +230,10 @@ class lehrverband extends basis_db
 				   " aktiv=".$this->db_add_param($this->aktiv, FHC_BOOLEAN).", ".
 				   " bezeichnung=".$this->db_add_param($this->bezeichnung).",".
 				   " orgform_kurzbz=".$this->db_add_param($this->orgform_kurzbz).
-				   " WHERE studiengang_kz=".db_add_param($this->studiengang_kz, FHC_INTEGER).
-				   " AND semester=".db_add_param($this->semester, FHC_INTEGER).
-				   " AND verband=".db_add_param($this->verband).
-				   " AND gruppe=".db_add_param($this->gruppe).";";
+				   " WHERE studiengang_kz=".$this->db_add_param($this->studiengang_kz, FHC_INTEGER).
+				   " AND semester=".$this->db_add_param($this->semester, FHC_INTEGER).
+				   " AND verband=".$this->db_add_param($this->verband).
+				   " AND gruppe=".$this->db_add_param($this->gruppe).";";
 		}
 
 		if($this->db_query($qry))
