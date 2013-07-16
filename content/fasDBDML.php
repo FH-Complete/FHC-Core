@@ -531,7 +531,8 @@ if(!$error)
 			}
 			else
 			{
-				$qry = "UPDATE public.tbl_person SET foto=null WHERE person_id=".$db->db_add_param($_POST['person_id']);
+				$qry = "UPDATE public.tbl_person SET foto=null WHERE person_id=".$db->db_add_param($_POST['person_id']).";";
+				$qry.= "DELETE FROM public.tbl_person_fotostatus where fotostatus_kurzbz='akzeptiert' AND person_id=".$db->db_add_param($_POST['person_id']);
 				if($db->db_query($qry))
 				{
 					$qry = "DELETE FROM public.tbl_akte WHERE person_id=".$db->db_add_param($_POST['person_id'])." AND dokument_kurzbz='Lichtbil'";
