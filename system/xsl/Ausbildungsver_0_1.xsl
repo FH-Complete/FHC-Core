@@ -382,9 +382,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       </text:p>
       <text:p text:style-name="P7">Personenkennzeichen:<text:tab/><xsl:value-of select="matrikelnr"/></text:p>
       <text:p text:style-name="P11"/>
-      <text:p text:style-name="P4">(kurz „Studentin“ bzw. „Student“ genannt) andererseits. </text:p>
-      <text:p text:style-name="P2"/>
-      <text:p text:style-name="P4">im Rahmen des <xsl:value-of select="studiengang_typ"/> Studienganges „<xsl:value-of select="studiengang"/>“, StgKz <xsl:value-of select="studiengang_kz"/>, in der Organisationsform eines 
+      <text:p text:style-name="P4">(kurz „Studentin“ bzw. „Student“ genannt) andererseits im Rahmen des <xsl:value-of select="studiengang_typ"/> Studienganges „<xsl:value-of select="studiengang"/>“, StgKz <xsl:value-of select="studiengang_kz"/>, in der Organisationsform eines 
 	<xsl:choose>
 		<xsl:when test="orgform = 'BB'" >
 			berufsbegleitenden Studiums.
