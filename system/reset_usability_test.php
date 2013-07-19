@@ -1,6 +1,6 @@
 <?php
 /**
- * Resettet den Usability Test auf der FHComplete Demoseite
+ * Resettet den Usability Test auf der CIS-Redesign Seite
  */
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/basis_db.class.php');
@@ -13,9 +13,19 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 </head>
 <body>
 <h2>Reset Usability Test</h2>
+<p>
+<ul>
+	<li>Foto löschen</li>
+	<li>Fotostati löschen</li>
+	<li>Daten aus Urlaubstool löschen und Demodaten eintragen</li>
+	<li>Newseinträge löschen</li>
+</ul>
+</p>
 <form action="'.$_SERVER['PHP_SELF'].'" method="POST">
 <input type="submit" name="reset" value="Reset starten">
-</form>
+</form>';
+
+/**  echo '
 <br />
 <br />
 <h2>Abgabetool</h2>
@@ -31,33 +41,41 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <input type="hidden" value="student3" name="uid">
 <input type="submit" name="reset_abgabe" value="Projektabgaben von Student3 resetten">
 </form>
-';
+';  */
 
 if(isset($_POST['reset']))
 {
-	echo '<br />Resetting Usability Test ... ';
+	/*echo '	<font color="green"><ul>
+			<li>Foto gelöscht</li>
+			<li>Fotostati gelöscht</li>
+			<li>Daten aus Urlaubstool gelöscht</li>
+			</ul></font> ';*/
 	$db = new basis_db();
 	
 	$qry = "
-	delete from public.tbl_konto where person_id in (6008,5821,22186,18441,17461,12749,21728,21297,17905,21768,1671,18572,16215,17469,1211,7938,16678,22731,15892,15732,15299,18396,752,5859,16370,18749,15812,23369);
-	delete from public.tbl_konto where person_id=2656 and betrag='363.36';
-	update lehre.tbl_lehrveranstaltung set sort=NULL where studiengang_kz=10002 and semester=2;
-	delete from lehre.tbl_lehreinheitmitarbeiter where lehreinheit_id=26208;
-	delete from lehre.tbl_lehreinheitgruppe where lehreinheit_id=26260;
-	INSERT INTO lehre.tbl_lehreinheitgruppe (lehreinheitgruppe_id, lehreinheit_id, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id) VALUES ('23100', '26260', '10001', '1', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-	delete from public.tbl_prestudentstatus where prestudent_id=(select prestudent_id from public.tbl_prestudent where person_id=4095 and studiengang_kz=10001); delete from public.tbl_prestudent where person_id=4095 and studiengang_kz=10001;
-	delete from public.tbl_prestudentstatus where prestudent_id=(select prestudent_id from public.tbl_prestudent where person_id=(select person_id from public.tbl_person where nachname='Midler'));
-	delete from public.tbl_prestudent where person_id=(select person_id from public.tbl_person where nachname='Midler');
-	delete from public.tbl_adresse where person_id=(select person_id from public.tbl_person where nachname='Midler');
-	delete from public.tbl_person where nachname='Midler';
-	";	
+	delete from public.tbl_person_fotostatus where person_id in (30566,453);
+	delete from public.tbl_ampel_benutzer_bestaetigt where uid in ('gl1','if10b066');
+	update public.tbl_person set foto=NULL, foto_sperre=FALSE where person_id in (30566,453);
+	
+	
+	delete from campus.tbl_zeitsperre where mitarbeiter_uid='gl1';
+	INSERT INTO campus.tbl_zeitsperre (zeitsperretyp_kurzbz,mitarbeiter_uid,bezeichnung,vondatum,vonstunde,bisdatum,bisstunde,vertretung_uid,updateamum,updatevon,insertamum,insertvon,erreichbarkeit_kurzbz,freigabeamum,freigabevon) VALUES ('Urlaub', 'gl1', 'Urlaub', '2013-05-01', NULL, '2013-05-03', NULL, NULL,NULL,NULL, now(), 'gl1',NULL,now(), 'kindlm');
+	INSERT INTO campus.tbl_zeitsperre (zeitsperretyp_kurzbz,mitarbeiter_uid,bezeichnung,vondatum,vonstunde,bisdatum,bisstunde,vertretung_uid,updateamum,updatevon,insertamum,insertvon,erreichbarkeit_kurzbz,freigabeamum,freigabevon) VALUES ('Urlaub', 'gl1', 'Urlaub', '2013-05-06', NULL, '2013-05-10', NULL, NULL,NULL,NULL, now(), 'gl1',NULL,now(), 'kindlm');
+	INSERT INTO campus.tbl_zeitsperre (zeitsperretyp_kurzbz,mitarbeiter_uid,bezeichnung,vondatum,vonstunde,bisdatum,bisstunde,vertretung_uid,updateamum,updatevon,insertamum,insertvon,erreichbarkeit_kurzbz,freigabeamum,freigabevon) VALUES ('Urlaub', 'gl1', 'Urlaub', '2013-07-22', NULL, '2013-07-26', NULL, NULL,NULL,NULL, now(), 'gl1',NULL,now(), 'kindlm');
+	INSERT INTO campus.tbl_zeitsperre (zeitsperretyp_kurzbz,mitarbeiter_uid,bezeichnung,vondatum,vonstunde,bisdatum,bisstunde,vertretung_uid,updateamum,updatevon,insertamum,insertvon,erreichbarkeit_kurzbz,freigabeamum,freigabevon) VALUES ('Urlaub', 'gl1', 'Urlaub', '2013-07-29', NULL, '2013-08-02', NULL, NULL,NULL,NULL, now(), 'gl1',NULL,now(), 'kindlm');
+	
+	delete from campus.tbl_news where insertvon='gl1';
+	delete from campus.tbl_contentsprache where insertvon='gl1';
+	delete from campus.tbl_content where insertvon='gl1';	
+	";
+		
 	
 	if($db->db_query($qry))
-		echo '<font color="green">done</font>';
+		echo '<font color="green">ERFOLGREICH BEENDET</font>';
 	else
-		echo '<font color="red">error</font>'.$db->db_last_error();
+		echo '<font color="red">ERROR</font>'.$db->db_last_error();
 }
-if(isset($_POST['reset_abgabe']))
+/* if(isset($_POST['reset_abgabe']))
 {
 	$uid=$_POST['uid'];
 	echo '<br />Resetting Abgabetool '.$uid.'...';
@@ -78,5 +96,5 @@ if(isset($_POST['reset_abgabe']))
 		echo '<font color="green">done</font>';
 	else
 		echo '<font color="red">error</font>'.$db->db_last_error();
-}
+}*/
 ?>

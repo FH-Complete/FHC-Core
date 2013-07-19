@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:fo="http://www.w3.org/1999/XSL/Format"
 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:template match="/">
@@ -6,12 +5,15 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 		<head>
 			<link rel="stylesheet" href="../skin/style.css.php" type="text/css"  />
 			<title>News</title>
+			<script type="text/javascript" src="../include/js/flexcroll.js"></script>
+			<link href="../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />			
 		</head>
 		<body>
-			<table class="tabcontent">
+		<div class="flexcroll" style="outline: none;">
+			<h1>News</h1>
+			<table class="cmstable" cellspacing="0" cellpadding="0">
 			<tr>
-				<td valign="top">
-	    			<h1>News</h1>
+				<td class="cmscontent" rowspan="2" valign="top">
 					<div id="news">
 						<xsl:choose>
 							<xsl:when test="content/news">
@@ -24,13 +26,20 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					</div>
 				</td>
 				<xsl:if test="content/stg_extras" >
-					<td></td>
-					<td class="tdvertical" valign="top" width="20%">
+					<td class="menubox">					
+						<xsl:apply-templates select="content/stg_extras/cis_ext_menu" />
+					</td>
+				</xsl:if>
+			</tr>
+			<tr>
+				<xsl:if test="content/stg_extras" >
+					<td class="teambox" style="width: 20%;">
 						<xsl:apply-templates select="content/stg_extras" />
 					</td>
 				</xsl:if>
 			</tr>
 			</table>
+		</div>
 		</body>
 		</html>	
 	</xsl:template>
@@ -65,75 +74,74 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 		<br />
 	</xsl:template>
 	<xsl:template match="stg_extras">
-			<h2><b><xsl:value-of select="stg_header" /></b></h2>
+			<!-- <h1><xsl:value-of select="stg_header" /></h1>-->
 			<font face='Arial, Helvetica, sans-serif' size='2'>
-			<br />
-			<xsl:value-of select="stg_ltg_name" /><br />
+			
+			<h2><xsl:value-of select="stg_ltg_name" /></h2>
 			<xsl:apply-templates select="stg_ltg" />
-			<br />
+			
 			<xsl:if test="gf_ltg">
-				<xsl:value-of select="gf_ltg_name" /><br />
+				<h2><xsl:value-of select="gf_ltg_name" /></h2>
 				<xsl:apply-templates select="gf_ltg" />
-				<br />
+				
 			</xsl:if>
 			<xsl:if test="stv_ltg">
-				<xsl:value-of select="stv_ltg_name" /><br />
+				<h2><xsl:value-of select="stv_ltg_name" /></h2>
 				<xsl:apply-templates select="stv_ltg" />
-				<br />
+				
 			</xsl:if>
 			<xsl:if test="ass">
-				<xsl:value-of select="ass_name" /><br />
+				<h2><xsl:value-of select="ass_name" /></h2>
 				<xsl:apply-templates select="ass" />
-				<br />
+				
 			</xsl:if>
 			<xsl:value-of select="zusatzinfo" disable-output-escaping="yes"/>
 			<xsl:if test="stdv">
-				<br />
-				<xsl:value-of select="stdv_name" /><br />
+				
+				<h2><xsl:value-of select="stdv_name" /></h2>
 				<xsl:apply-templates select="stdv" />
-				<br />
+				
 			</xsl:if>
-			<xsl:apply-templates select="cis_ext_menu" />
 			</font>
 	</xsl:template>
 
 	<xsl:template match="stg_ltg">
-			<b><xsl:value-of select="name" /></b><br />
-			<xsl:variable name="mail" select="email"></xsl:variable>
-			<a href="mailto:{$mail}"><xsl:value-of select="email" /></a><br />
-			Tel.:<xsl:value-of select="telefon" />
-			<br />
+			<xsl:variable name="mailname" select="email"></xsl:variable>
+			<p><a href="mailto:{$mailname}"><xsl:value-of select="name" /></a><br />			
+			T: <xsl:value-of select="telefon" /><br />
+			E: <xsl:variable name="mail" select="email"></xsl:variable>
+			<a href="mailto:{$mail}"><xsl:value-of select="email" /></a></p>
 	</xsl:template>
 	<xsl:template match="gf_ltg">
-			<b><xsl:value-of select="name" /></b><br />
-			<xsl:variable name="mail" select="email"></xsl:variable>
-			<a href="mailto:{$mail}"><xsl:value-of select="email" /></a><br />
-			Tel.:<xsl:value-of select="telefon" />
-			<br />
+			<xsl:variable name="mailname" select="email"></xsl:variable>
+			<p><a href="mailto:{$mailname}"><xsl:value-of select="name" /></a><br />			
+			T: <xsl:value-of select="telefon" /><br />
+			E: <xsl:variable name="mail" select="email"></xsl:variable>
+			<a href="mailto:{$mail}"><xsl:value-of select="email" /></a></p>
 	</xsl:template>
 	<xsl:template match="stv_ltg">
-			<b><xsl:value-of select="name" /></b><br />
-			<xsl:variable name="mail" select="email"></xsl:variable>
-			<a href="mailto:{$mail}"><xsl:value-of select="email" /></a><br />
-			Tel.:<xsl:value-of select="telefon" />
-			<br />
+			<xsl:variable name="mailname" select="email"></xsl:variable>
+			<p><a href="mailto:{$mailname}"><xsl:value-of select="name" /></a><br />			
+			T: <xsl:value-of select="telefon" /><br />
+			E: <xsl:variable name="mail" select="email"></xsl:variable>
+			<a href="mailto:{$mail}"><xsl:value-of select="email" /></a></p>
 	</xsl:template>
 	<xsl:template match="ass">
-			<b><xsl:value-of select="name" /></b><br />
-			<xsl:variable name="mail" select="email"></xsl:variable>
-			<a href="mailto:{$mail}"><xsl:value-of select="email" /></a><br />
-			Tel.:<xsl:value-of select="telefon" />
-			<br />
+			<xsl:variable name="mailname" select="email"></xsl:variable>
+			<p><a href="mailto:{$mailname}"><xsl:value-of select="name" /></a><br />			
+			T: <xsl:value-of select="telefon" /><br />
+			E: <xsl:variable name="mail" select="email"></xsl:variable>
+			<a href="mailto:{$mail}"><xsl:value-of select="email" /></a></p>
 	</xsl:template>
 	<xsl:template match="stdv">
 			<xsl:variable name="mail" select="email"></xsl:variable>
-			<a href="mailto:{$mail}"><xsl:value-of select="name" /></a><br />
+			<a href="mailto:{$mail}"><xsl:value-of select="name" /></a><br/>
 	</xsl:template>
 	<xsl:template match="cis_ext_menu">
 			<xsl:variable name="kurzbz" select="kurzbz"></xsl:variable>
 			<xsl:variable name="kurzbzlang" select="kurzbzlang"></xsl:variable>
-			<img src="../skin/images/seperator.gif" /><xsl:text> </xsl:text><a href="../documents/{kurzbz}/lehrziele/" class="Item" target="_blank"><xsl:value-of select="lehrziele_name" /></a><br />
-			<img src="../skin/images/seperator.gif" /><xsl:text> </xsl:text><a href="../documents/{kurzbz}/download/" class="Item" target="_blank"><xsl:value-of select="download_name" /></a><br />
-			<img src="../skin/images/seperator.gif" /><xsl:text> </xsl:text><a href="news://news.technikum-wien.at/{kurzbzlang}" class="Item" target="_blank"><xsl:value-of select="newsgroup_name" /></a><br />
+			<p><xsl:text> </xsl:text><a href="../documents/{kurzbz}/lehrziele/" class="Item" target="_blank"><xsl:value-of select="lehrziele_name" /></a></p>
+			<p><xsl:text> </xsl:text><a href="../documents/{kurzbz}/download/" class="Item" target="_blank"><xsl:value-of select="download_name" /></a></p>
+			<p><xsl:text> </xsl:text><a href="news://news.technikum-wien.at/{kurzbzlang}" class="Item" target="_blank"><xsl:value-of select="newsgroup_name" /></a></p>
 	</xsl:template>
 </xsl:stylesheet >
