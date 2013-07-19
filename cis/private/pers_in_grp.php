@@ -49,20 +49,39 @@ echo '
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
+	<script type="text/javascript" src="../../include/js/jquery.js"></script>
+	<script type="text/javascript">	
+	$(document).ready(function() 
+		{ 
+		    $("#table").tablesorter(
+			{
+				sortList: [[0,0]],
+				widgets: [\'zebra\'],
+			}); 
+		} 
+	);
+	</script>
 	<title>'.$p->t('mailverteiler/personenImVerteiler').'</title>
 </head>
-<body id="inhalt">
+<body id="inhalt">';
 
-	<table class="tabcontent">
+	$qry = "SELECT uid, vorname, nachname FROM campus.vw_benutzer JOIN tbl_benutzergruppe USING (uid) WHERE gruppe_kurzbz='".addslashes($_GET['grp'])."' AND (studiensemester_kurzbz IS NULL OR studiensemester_kurzbz='".addslashes($stsem)."') ORDER BY nachname, vorname";
+	if($result=$db->db_query($qry))
+	{
+		echo '<p>'.$row=$db->db_num_rows($result).' '.$p->t('mailverteiler/personen');
+	}
+	
+	echo'<table class="tablesorter" id="table">
+		<thead>
 		<tr>
-			<td class="ContentHeader"><font class="ContentHeader">'.$p->t('global/nachname').'</font></td>
-			<td class="ContentHeader"><font class="ContentHeader">'.$p->t('global/vorname').'</font></td>
-			<td class="ContentHeader"><font class="ContentHeader">'.$p->t('global/mail').'</font></td>
-		</tr>';
+			<th>'.$p->t('global/nachname').'</th>
+			<th>'.$p->t('global/vorname').'</th>
+			<th>'.$p->t('global/mail').'</th>
+		</tr></thead><tbody>';
 
 
  		  //$sql_query = "SELECT vornamen AS vn,nachname AS nn,a.uid as uid FROM public.tbl_personmailgrp AS a, public.tbl_person AS b WHERE a.uid=b.uid AND a.mailgrp_kurzbz='$grp' ORDER BY nachname";
-	  $qry = "SELECT uid, vorname, nachname FROM campus.vw_benutzer JOIN tbl_benutzergruppe USING (uid) WHERE gruppe_kurzbz='".addslashes($_GET['grp'])."' AND (studiensemester_kurzbz IS NULL OR studiensemester_kurzbz='".addslashes($stsem)."') ORDER BY nachname, vorname";
 	  if($result=$db->db_query($qry))
 	  {
 	  	while($row = $db->db_fetch_object($result))
@@ -75,7 +94,7 @@ echo '
 		}
 	  }
 echo '
-		</table>
+		</tbody></table>
 	</body>
 </html>';
 ?>
