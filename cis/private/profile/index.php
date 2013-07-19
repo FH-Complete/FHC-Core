@@ -130,6 +130,8 @@ echo '
 	<title>'.$p->t('profil/profil').'</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
+	<link href="../../../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />
+	<script src="../../../include/js/flexcroll.js" type="text/javascript" ></script>
 	<script type="text/javascript" src="../../../include/js/jquery.js"></script>
 	<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
 	<script language="JavaScript" type="text/javascript">
@@ -157,6 +159,7 @@ echo '
 </head>
 
 <body>
+<div class="flexcroll" style="outline: none;">
 	<h1>'.$p->t('profil/profil').'</h1>
 ';
 		
@@ -179,34 +182,28 @@ if(!$user->bnaktiv)
 }
 
 echo '
-<table class="tabcontent">
+<table class="cmstable" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td class="cmscontent" rowspan="3" valign="top">
+	<table width="100%">
 	<tr>
-  		<td colspan="2" class="MarkLine" width="60%" height="100" valign="top">
-   		<table width="100%">
-   			<tr>
-   				<td>
-   		<P><br>
-		'.$p->t('global/username').': '.$user->uid.'<br>
-		'.$p->t('global/titel').': '.$user->titelpre.' <br>
-  		'.$p->t('global/vorname').': '.$user->vorname.'  '.$user->vornamen.'<br>
-   		'.$p->t('global/nachname').': '.$user->nachname.'<br>
-  		'.$p->t('global/postnomen').': '.$user->titelpost.'<br>';
-		
-if(!$ansicht)
-{
-	echo '	'.$p->t('global/geburtsdatum').': '.$datum_obj->formatDatum($user->gebdatum,'d.m.Y')."<br>
-	".$p->t('global/geburtsort').": $user->gebort<br>";
-        		
-}  
-echo '
-	</P>
-    </td>
-      		<td align="right">';
+  		<td valign="top" width="10%" nowrap style="padding-right:10px;">';
+  		
 //Foto anzeigen
-
-echo '<br>';
-if(!($ansicht && $user->foto_sperre))
-	echo '<img id="personimage" src="../../public/bild.php?src=person&person_id='.$user->person_id.'" alt="'.$user->person_id.'" height="100px" width="75px">';
+$benutzer = new benutzer();
+$benutzer->load($uid);
+$person = new person();
+$person->load($benutzer->person_id);
+if($person->foto!='')
+{
+	if(!($ansicht && $user->foto_sperre))
+		echo '<img id="personimage" src="../../public/bild.php?src=person&person_id='.$user->person_id.'" alt="'.$user->person_id.'" height="100px" width="75px">';
+	else
+		echo '<img id="personimage" src="../../../skin/images/profilbild_dummy.jpg" alt="Dummy Picture" height="100px" width="75px">';
+}
+else 
+	echo '<img id="personimage" src="../../../skin/images/profilbild_dummy.jpg" alt="Dummy Picture" height="100px" width="75px">';
 
 if(!$ansicht)
 {
@@ -226,77 +223,53 @@ if(!$ansicht)
 		echo '<br><a href="'.$_SERVER['PHP_SELF'].'?action=foto_sperre" title="'.$p->t('profil/infotextSperre').'">'.$p->t('profil/fotosperren').'</a>';
 }
 	
-echo '</td></tr></table>';
-echo '
-	<P>
-    <b>'.$p->t('profil/email').'</b><br>
-    '.$p->t('profil/intern').': <a class="Item" href="mailto:'.$user->uid.'@'.DOMAIN.'">'.$user->uid.'@'.DOMAIN.'</a><br>';
+echo '</td><td width="30%">';
 
-if($user->alias!='' && (!isset($user->studiengang_kz) || !in_array($user->studiengang_kz,$noalias)))
+echo '
+		<b>'.($type=="student"?$p->t("profil/student"):$p->t('profil/mitarbeiter')).'</b><br><br>
+		'.$p->t('global/username').': '.$user->uid.'<br>
+		'.$p->t('global/titel').': '.$user->titelpre.' <br>
+  		'.$p->t('global/vorname').': '.$user->vorname.'  '.$user->vornamen.'<br>
+   		'.$p->t('global/nachname').': '.$user->nachname.'<br>
+  		'.$p->t('global/postnomen').': '.$user->titelpost.'<br>';
+		
+if(!$ansicht)
 {
-	echo $p->t('profil/alias').": <a class='Item' href='mailto:$user->alias@".DOMAIN."'>$user->alias@".DOMAIN."</a>";
+	echo '	'.$p->t('global/geburtsdatum').': '.$datum_obj->formatDatum($user->gebdatum,'d.m.Y')."<br>
+	".$p->t('global/geburtsort').": $user->gebort<br>";
+        		
 }
-
-echo '</P>';
-if($user->homepage!='')
-	echo "<P><b>".$p->t('profil/homepage')."</b><br><a href='$user->homepage' target='_blank'>$user->homepage</a></p>";
-echo '<p>';
-echo '
-	</p>
-    <br>
-    </td>
-    <td rowspan="2" valign="top">';
-      			
-echo '<P>';
 $studiengang = new studiengang();
 if ($type=='student')
 {	
 	$studiengang->load($user->studiengang_kz);
 	
-	echo "
-	<b>".$p->t('profil/student')."</b><br><br>
+	echo "<br>
 	".$p->t('global/studiengang').": $studiengang->bezeichnung<br>
-	".$p->t('global/semester').": $user->semester<br>
-	".$p->t('global/verband').": $user->verband<br>
-	".$p->t('global/gruppe').": $user->gruppe<br>
+	".$p->t('global/semester').": $user->semester <a href='#' onClick='javascript:window.open(\"../stud_in_grp.php?kz=$user->studiengang_kz&sem=$user->semester\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\");return false;'>".$p->t('benotungstool/liste')."</a><br>
+	".$p->t('global/verband').": $user->verband ".($user->verband!=' '?"<a href='#' onClick='javascript:window.open(\"../stud_in_grp.php?kz=$user->studiengang_kz&sem=$user->semester&verband=$user->verband\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\");return false;'>".$p->t('benotungstool/liste')."</a>":"")."<br>
+	".$p->t('global/gruppe').": $user->gruppe ".($user->gruppe!=' '?"<a href='#' onClick='javascript:window.open(\"../stud_in_grp.php?kz=$user->studiengang_kz&sem=$user->semester&verband=$user->verband&grp=$user->gruppe\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\");return false;'>".$p->t('benotungstool/liste')."</a>":"")."<br>
 	".$p->t('profil/martrikelnummer').": $user->matrikelnr<br />";
-   		
-    if(!$ansicht)
-    {
-    	echo "
-	   		<br />
-	   		<A class='Item' href='../lehre/notenliste.php'>".$p->t('profil/leistungsbeurteilung')."</a><br />";
-    }
 }
 		
 if ($type=='mitarbeiter')
 {
-	echo "
-		<P>
-		<b>".$p->t('profil/mitarbeiter')."</b><br><br>
+	echo "<br>
 	".$p->t('profil/kurzzeichen').": $user->kurzbz<BR>";
-		
-						
+				
 	if($user->telefonklappe!='')
+	{
 		echo $p->t('profil/telefonTw').": $vorwahl - $user->telefonklappe<BR>";
+		echo $p->t('profil/faxTw').": $vorwahl - 99 $user->telefonklappe<BR>";
+	}
 	if ($user->ort_kurzbz!='')
 		echo $p->t('profil/buero').': '.$user->ort_kurzbz.'<br>';
-		
-	echo '<br>';
-		
-	if(!$ansicht)
-	{
-		echo '
-			<A class="Item" href="zeitwunsch.php?uid='.$user->uid.'">'.$p->t('profil/zeitwuensche').'</A><BR>
-			<A class="Item" href="lva_liste.php?uid='.$user->uid.'">'.$p->t('lvaliste/lehrveranstaltungen').'</A><br>
-			<A class="Item" href="freebusy.php">'.$p->t('freebusy/titel').'</A>';
-	}
-}
-		
+}  
+echo '</td>';
+echo '<td valign="top">';
 if(!$ansicht)
-{
-	
-	echo '<br><br><b>'.$p->t('profil/fhausweisStatus').'</b><br>';
+{	
+	echo '<b>'.$p->t('profil/fhausweisStatus').'</b><br>';
 	$bm = new betriebsmittel();
 	if($bm->zutrittskarteAusgegeben($user->uid))
 	{
@@ -311,7 +284,7 @@ if(!$ansicht)
 			switch($fs->fotostatus_kurzbz)
 			{
 				case 'abgewiesen':
-					echo '<br>'.$p->t('profil/ladenSieBitteEinGueltigesFotoHoch');
+					echo '<br><div style="color:red;">'.$p->t('profil/ladenSieBitteEinGueltigesFotoHoch').'</div>';
 					break;
 				case 'hochgeladen':
 					echo '<br>'.$p->t('profil/fotoWurdeNochNichtAkzeptiert');
@@ -329,7 +302,7 @@ if(!$ansicht)
 					break;
 					
 				default:
-					echo '<br>'.$p->t('profil/ladenSieBitteEinGueltigesFotoHoch');
+					echo '<br><div style="color:red;">'.$p->t('profil/ladenSieBitteEinGueltigesFotoHoch').'</div>';
 					break;
 			}
 		}
@@ -340,6 +313,47 @@ if(!$ansicht)
 	}
 	echo '<br><br>';
 }
+echo '<b>'.$p->t('profil/email').'</b><br><br>
+    '.$p->t('profil/intern').': <a href="mailto:'.$user->uid.'@'.DOMAIN.'">'.$user->uid.'@'.DOMAIN.'</a><br>';
+
+if($user->alias!='' && (!isset($user->studiengang_kz) || !in_array($user->studiengang_kz,$noalias)))
+{
+	echo $p->t('profil/alias').": <a class='Item' href='mailto:$user->alias@".DOMAIN."'>$user->alias@".DOMAIN."</a>";
+}
+
+if($user->homepage!='')
+	echo "<br><br><b>".$p->t('profil/homepage')."</b><br><br><a href='$user->homepage' target='_blank'>$user->homepage</a>";
+echo '</tr></table><br>';
+
+$mail = MAIL_ADMIN;
+		if(!isset($user->studiengang_kz) || $user->studiengang_kz=='')
+		{
+			$user->studiengang_kz = 0;
+		}
+		
+		//Wenn eine Assistentin fuer diesen Studiengang eingetragen ist,
+		//dann werden die aenderungswuesche an diese Adresse gesendet
+		if($studiengang->email!='')
+			$mail = $studiengang->email;
+		else
+			$mail = MAIL_ADMIN;
+		
+		if($user->studiengang_kz=='0')
+			$mail = MAIL_GST;
+			
+if(!$ansicht)
+		{
+			echo "
+			".$p->t('profil/solltenDatenNichtStimmen')." <a class='Item' href=\"mailto:$mail?subject=Datenkorrektur&body=Die%20Profildaten%20fuer%20User%20'$user->uid'%20sind%20nicht%20korrekt.%0D
+			Hier die richtigen Daten:%0DNachname:%20$user->nachname%0DVorname:%20$user->vorname%0DGeburtsdatum:%20$user->gebdatum
+			%0DGeburtsort:%20$user->gebort%0DTitelPre:%20$user->titelpre%0DTitelPost:%20$user->titelpost
+			%0D%0D***%0DPlatz fuer weitere (nicht angefuehrte Daten)%0D***\">".$p->t('profil/zustaendigeAssistenz')."</a><br><br>";
+		}
+		
+echo '<table width="100%">
+    <tr>
+    <td valign="top">';
+
 	//Funktionen
 	$qry = "SELECT 
 				*, tbl_benutzerfunktion.oe_kurzbz as oe_kurzbz, tbl_organisationseinheit.bezeichnung as oe_bezeichnung,
@@ -361,7 +375,7 @@ if(!$ansicht)
 
 			while($row_funktion = $db->db_fetch_object($result_funktion))
 			{
-				echo "<tr><td>$row_funktion->bf_bezeichnung</td><td nowrap>".$row_funktion->organisationseinheittyp_kurzbz.' '.$row_funktion->oe_bezeichnung."</td><td>$row_funktion->semester</td><td>$row_funktion->fachbereich_kurzbz</td></tr>";
+				echo "<tr><td>".$row_funktion->beschreibung.($row_funktion->bf_bezeichnung!=$row_funktion->beschreibung && $row_funktion->bf_bezeichnung!=''?' - '.$row_funktion->bf_bezeichnung:'')."</td><td nowrap>".$row_funktion->organisationseinheittyp_kurzbz.' '.$row_funktion->oe_bezeichnung."</td><td>$row_funktion->semester</td><td>$row_funktion->fachbereich_kurzbz</td></tr>";
 			}
 			echo '</tbody></table><br>';
 		}
@@ -410,14 +424,36 @@ if(!$ansicht)
 	    }
 	}
     
-	echo "</P>";
 		
 	echo '	
     	</td>
   	</tr>
-  	<TR>
-    	<TD colspan="2" valign="top">
-     		<P><B>'.$p->t('mailverteiler/mailverteiler').'</B><BR><BR>
+  	</table>
+  	</td>';
+	echo '<td class="menubox">';
+	if ($type=='student')
+	{		
+	    if(!$ansicht)
+	    {
+	    	echo "<p><A class='Item' href='../lehre/notenliste.php'>".$p->t('profil/leistungsbeurteilung')."</a></p>";
+	    }
+	}
+	if ($type=='mitarbeiter')
+	{
+		if(!$ansicht)
+		{
+			echo '<p><A href="zeitwunsch.php?uid='.$user->uid.'">'.$p->t('profil/zeitwuensche').'</A></p>
+				<p><A  href="lva_liste.php?uid='.$user->uid.'">'.$p->t('lvaliste/lehrveranstaltungen').'</A></p>
+				<p><A href="freebusy.php">'.$p->t('freebusy/titel').'</A></p>';
+		}
+		if($uid!=get_uid())
+			echo '<p><A href="zeitsperre_days.php?days=30&lektor='.$user->uid.'">'.$p->t('profil/zeitsperrenVon').' '.$user->nachname.'</A></p>';
+	}
+	echo '<p><a href="../../../cms/content.php?content_id='.$p->t("dms_link/lvPlanFAQ").'" target="_blank">'.$p->t('global/hilfe').'</a></p></td>';
+	echo'</tr>
+		<tr>
+		<td class="teambox" style="width: 20%;">
+		<B>'.$p->t('mailverteiler/mailverteiler').'</B><BR><BR>
     	';
 	//Mailverteiler
 	if(!$ansicht)
@@ -430,63 +466,30 @@ if(!$ansicht)
   	for($i=0;$i<$nr_mg;$i++)
 	{
 		$row=$db->db_fetch_object($erg_mg,$i);
-		echo '<TR><TD><A class="Item" href="mailto:'.strtolower(trim($row->gruppe_kurzbz)).'@'.DOMAIN.'">'.strtolower($row->gruppe_kurzbz).'&nbsp;</TD>';
+		echo '<TR><TD><A href="mailto:'.strtolower(trim($row->gruppe_kurzbz)).'@'.DOMAIN.'">'.strtolower($row->gruppe_kurzbz).'&nbsp;</TD>';
     	echo "<TD>&nbsp;$row->beschreibung</TD></TR>";
 	}
 	
 	if (isset($user->matrikelnr))
 	{
-		echo '<TR><TD><A class="Item" href="mailto:'.strtolower(trim($studiengang->kuerzel)).'_std@'.DOMAIN.'">'.strtolower($studiengang->kuerzel).'_std&nbsp;</TD>';
+		echo '<TR><TD><A href="mailto:'.strtolower(trim($studiengang->kuerzel)).'_std@'.DOMAIN.'">'.strtolower($studiengang->kuerzel).'_std&nbsp;</TD>';
     	echo "<TD>&nbsp;".$p->t('profil/alleStudentenVon')." $studiengang->kuerzel</TD></TR>";
-		echo '<TR><TD><A class="Item" href="mailto:'.strtolower(trim($studiengang->kuerzel)).trim($user->semester).'@'.DOMAIN.'">'.strtolower($studiengang->kuerzel).$user->semester.'&nbsp;</TD>';
+		echo '<TR><TD><A href="mailto:'.strtolower(trim($studiengang->kuerzel)).trim($user->semester).'@'.DOMAIN.'">'.strtolower($studiengang->kuerzel).$user->semester.'&nbsp;</TD>';
    		echo "<TD>&nbsp;".$p->t('profil/alleStudentenVon')." $studiengang->kuerzel $user->semester</TD></TR>";
-		echo '<TR><TD><A class="Item" href="mailto:'.strtolower(trim($studiengang->kuerzel)).trim($user->semester).strtolower(trim($user->verband)).'@'.DOMAIN.'">'.strtolower($studiengang->kuerzel).$user->semester.strtolower($user->verband).'&nbsp;</TD>';
+		echo '<TR><TD><A href="mailto:'.strtolower(trim($studiengang->kuerzel)).trim($user->semester).strtolower(trim($user->verband)).'@'.DOMAIN.'">'.strtolower($studiengang->kuerzel).$user->semester.strtolower($user->verband).'&nbsp;</TD>';
    		echo "<TD>&nbsp;".$p->t('profil/alleStudentenVon')." $studiengang->kuerzel $user->semester$user->verband</TD></TR>";
    		if(trim($user->gruppe)!='')
    		{
-			echo '<TR><TD><A class="Item" href="mailto:'.strtolower(trim($studiengang->kuerzel)).trim($user->semester).strtolower(trim($user->verband)).trim($user->gruppe).'@'.DOMAIN.'">'.strtolower($studiengang->kuerzel).$user->semester.strtolower($user->verband).$user->gruppe.'&nbsp;</TD>';
+			echo '<TR><TD><A href="mailto:'.strtolower(trim($studiengang->kuerzel)).trim($user->semester).strtolower(trim($user->verband)).trim($user->gruppe).'@'.DOMAIN.'">'.strtolower($studiengang->kuerzel).$user->semester.strtolower($user->verband).$user->gruppe.'&nbsp;</TD>';
    			echo "<TD>&nbsp;".$p->t('profil/alleStudentenVon')." $studiengang->kuerzel $user->semester$user->verband$user->gruppe</TD><TD></TD></TR>";
    		}
 	}
-	echo '</table>';
-	
-		$mail = MAIL_ADMIN;
-		if(!isset($user->studiengang_kz) || $user->studiengang_kz=='')
-		{
-			$user->studiengang_kz = 0;
-		}
-		
-		//Wenn eine Assistentin fuer diesen Studiengang eingetragen ist,
-		//dann werden die aenderungswuesche an diese Adresse gesendet
-		if($studiengang->email!='')
-			$mail = $studiengang->email;
-		else
-			$mail = MAIL_ADMIN;
-		
-		if($user->studiengang_kz=='0')
-			$mail = MAIL_GST;
-
-		
-			
-		if(!$ansicht)
-		{
-			echo "
-			<br><br>
-			".$p->t('profil/solltenDatenNichtStimmen')." <a class='Item' href=\"mailto:$mail?subject=Datenkorrektur&body=Die%20Profildaten%20fuer%20User%20'$user->uid'%20sind%20nicht%20korrekt.%0D
-			Hier die richtigen Daten:%0DNachname:%20$user->nachname%0DVorname:%20$user->vorname%0DGeburtsdatum:%20$user->gebdatum
-			%0DGeburtsort:%20$user->gebort%0DTitelPre:%20$user->titelpre%0DTitelPost:%20$user->titelpost
-			%0D%0D***%0DPlatz fuer weitere (nicht angefuehrte Daten)%0D***\">".$p->t('profil/zustaendigeAssistenz')."</a>";
-		
-		}
-	echo '
-       	</P>
-    	</TD>
-  	</TR>
-  	';
-	echo '
-			</table>
-			<BR>';
-
+	echo '	</table>
+			</td>
+			</tr>
+			</tbody>
+			</table>';
 ?>
+</div>
 </body>
 </html>

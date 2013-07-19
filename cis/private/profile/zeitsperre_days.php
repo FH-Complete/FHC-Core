@@ -69,12 +69,16 @@ echo '
 	<title>'.$p->t('zeitsperre/zeitsperren').'</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
+	<link href="../../../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="../../../include/js/flexcroll.js"></script>
 </head>
 
 <body>
+<div class="flexcroll" style="outline: none;">
 	<H1>'.$p->t('zeitsperre/zeitsperren').'</H1>
-
-	<H3>'.$p->t('zeitsperre/zeitsperreVonBis',array($datum_beginn, $datum_ende)).'</H3>
+ 
+	<form action="'.$_SERVER['PHP_SELF'].'" method="GET">'.$p->t('zeitsperre/anzahlTage').' <input type="text" name="days" size="2" maxlength="2" value="'.$days.'"><input type="hidden" name="lektor" value="'.$lektor.'"><input type="submit" value="Go"></form>
+	<H2>'.$p->t('zeitsperre/zeitsperreVonBis',array($datum_beginn, $datum_ende)).'</H2>
 	<TABLE id="zeitsperren">
     <TR>';
     	
@@ -138,6 +142,6 @@ else
 }
 
 echo '  </TABLE>
-	</body>
+	</div></body>
 </html>';
 ?>

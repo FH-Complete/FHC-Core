@@ -43,6 +43,9 @@ require_once('../../../include/sprache.class.php');
 	$sprache_index=$sprache_obj->index;
 	
 	$uid = get_uid();
+	
+	if(!check_lektor($uid))
+	die($p->t('global/keineBerechtigung'));
 
 	if(isset($_GET['lektor']))
 		$lektor=$_GET['lektor'];
@@ -74,11 +77,15 @@ require_once('../../../include/sprache.class.php');
 		$stg_kz=$_GET['stg_kz'];
 		$stge[]=$stg_kz;
 	}
+	
+	$days=trim((isset($_REQUEST['days']) && is_numeric($_REQUEST['days'])?$_REQUEST['days']:14));
 
 	// Link fuer den Export
 	$export_link='zeitsperre_export.php?';
 	$export_param='';
 	
+	if(!is_null($days))
+		$export_param.=($export_param!=''?'&':'')."days=$days";
 	if(!is_null($organisationseinheit))
 		$export_param.=($export_param!=''?'&':'')."organisationseinheit=$organisationseinheit";
 	else
@@ -99,8 +106,6 @@ require_once('../../../include/sprache.class.php');
 	//Datumsbereich ermitteln
 	$datum_obj = new datum();
 
-	$days=trim((isset($_REQUEST['days']) && is_numeric($_REQUEST['days'])?$_REQUEST['days']:14));
-
 	$dTmpAktuellerMontag=date("Y-m-d",strtotime(date('Y')."W".date('W')."1")); // Montag der Aktuellen Woche
 	$dTmpAktuellesDatum=explode("-",$dTmpAktuellerMontag);
 	$dTmpMontagPlus=date("Y-m-d", mktime(0,0,0,date($dTmpAktuellesDatum[1]),date($dTmpAktuellesDatum[2])+$days,date($dTmpAktuellesDatum[0])));
@@ -120,10 +125,15 @@ require_once('../../../include/sprache.class.php');
 	}
 	else
 	{
-		if (is_null($funktion))
-			$mitarbeiter=$ma->getMitarbeiter($lektor,$fix);
+		if (!is_null($lektor))
+			$mitarbeiter=$lektor;
 		else
-			$mitarbeiter=$ma->getMitarbeiterStg(true,null,$stge,$funktion);
+		{						
+			if (is_null($funktion))
+				$mitarbeiter=$ma->getMitarbeiter($lektor,$fix);
+			else
+				$mitarbeiter=$ma->getMitarbeiterStg(true,null,$stge,$funktion);
+		}
 	}
 
 echo '
@@ -132,8 +142,11 @@ echo '
 	<title>'.$p->t('zeitsperre/zeitsperren').'</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
+	<link href="../../../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />
+	<script src="../../../include/js/flexcroll.js" type="text/javascript" ></script>
 </head>
 <body>
+<div class="flexcroll" style="outline: none;">
 	<h1>'.$p->t('zeitsperre/zeitsperren').'</h1>
 
 	<H3>'.$p->T('zeitsperre/zeitsperreVonBis',array($datum_beginn, $datum_ende)).'</H3>';
@@ -159,6 +172,7 @@ echo '
 				}
 			}
 			echo '</SELECT><input style="display:none;" type="Text" name="days" value="'.$days.'"><input type="submit" value="'.$p->t('global/anzeigen').'"></FORM>';
+			echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">'.$p->t('zeitsperre/anzahlTage').' <input type="text" name="days" size="2" maxlength="2" value="'.$days.'"><input type="hidden" name="organisationseinheit" value="'.$organisationseinheit.'"><input type="submit" value="Go"></form>';
 			echo '<br>';
 		}
 	echo '
@@ -212,5 +226,6 @@ echo '
 	?>
 
   </TABLE>
+</div>
 </body>
 </html>
