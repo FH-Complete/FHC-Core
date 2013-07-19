@@ -54,13 +54,7 @@ td.keyboardFunkTasteON {
 
 
 	/* Knopf Blau */
-	b.blau_rtop, b.blau_rbottom{display:block;background-color: transparent;}
-	b.blau_rtop b, b.blau_rbottom b{display:block;height: 1px; overflow: hidden; background-color: #0085D0;}
-	b.blau_r1{margin: 0 5px}
-	b.blau_r2{margin: 0 3px}
-	b.blau_r3{margin: 0 2px}
-	b.blau_rtop b.blau_r4, b.blau_rbottom b.blau_r4{margin: 0 1px;height: 2px}
-	span.blau_mitteText{ text-align:center;font-size: large;color: #000; background-color: #0085D0;width:100%;display:block;}
+	span.blau_mitteText{text-align:center; font-size: x-large; color: #000; background-color: #A5AFB6; width:97%; display:block; padding: 3px;}}
 
 
 -->
@@ -576,17 +570,11 @@ td.keyboardFunkTasteON {
 	</tr>
 </table>
 <!-- Weiter Knopf -->
-<div class="weiter" align="right"  onclick="setEnterFeld();">
-	<div style="text-align:right;border:0;height:10%;width:20%;">
-			<b class="blau_rtop">
-				  <b class="blau_r1"></b> <b class="blau_r2"></b> <b class="blau_r3"></b> <b class="blau_r4"></b>
-				</b>		
+<div class="weiter" align="right" style="padding-top: 5px;" onclick="setEnterFeld();">
+	<div style="text-align:right;border:0;height:10%;width:20%;">		
 				<span class="blau_mitteText">
 					&nbsp;weiter&nbsp;
-				</span>	
-			<b class="blau_rbottom">
-				  <b class="blau_r4"></b><b class="blau_r3"></b> <b class="blau_r2"></b> <b class="blau_r1"></b>
-			</b>							
+				</span>							
 	</div>
 </div>
 </body>
