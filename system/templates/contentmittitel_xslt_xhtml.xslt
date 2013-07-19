@@ -17,8 +17,11 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 				{
 					var col=0;
 					var sort=0;
+					var no_sort=1;
 					var classes = $(this).attr("class");
 					var class_arr = classes.split(" ");
+					var headersobj={};
+					
 					for(i in class_arr)
 					{
 						if(class_arr[i].indexOf("tablesorter_col_")!=-1)
@@ -29,12 +32,18 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						{
 							 sort = class_arr[i].substr(17);
 						}
+						if(class_arr[i].indexOf("tablesorter_no_sort_")!=-1)
+						{
+							 no_sort = class_arr[i].substr(20);
+							 headersobj[no_sort]={sorter:false};
+						}
 					}
 
 					$(this).tablesorter(
 					{
 						sortList: [[col,sort]],
-						widgets: ["zebra"]
+						widgets: ["zebra"],
+						headers: headersobj
 					}); 
 				});
 			}); 
