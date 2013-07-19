@@ -363,6 +363,78 @@ cellSeparator (default value: "|")
 			}
 			break;
 			
+		// Lektor,Student - FHTW Suche im LV-Plan
+		case 'lektor_student':
+		 	$person_id=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+			if (is_null($person_id) || $person_id=='')
+				exit('person_id wurde nicht übergeben!');
+			
+			$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($person_id))));
+			$pWhere=" aktiv ";
+			if ($person_id)
+			{
+				$pWhere.="	and (UPPER(trim(uid)) like '%".$matchcode."%'  ";
+				$pWhere.="	or UPPER(trim(to_char(person_id,'999999999'))) like '%".$matchcode."%' ";
+				$pWhere.="	or	UPPER(trim(nachname)) like '%".addslashes($matchcode)."%'  ";
+				$pWhere.="	or	UPPER(trim(vorname)) like '%".addslashes($matchcode)."%'  ";
+				$pWhere.="	or	UPPER(trim(nachname || ' ' || vorname)) like '%".addslashes($matchcode)."%'  ";
+				$pWhere.="	or	UPPER(trim(vorname || ' ' || nachname)) like '%".addslashes($matchcode)."%' ) ";
+			}		
+			/*if (!empty($oe_kurzbz))
+			{	
+				$pSql="SELECT vw_benutzer.uid,vw_benutzer.person_id,vw_benutzer.aktiv,uid,person_id,titelpre,anrede,vorname,nachname,vornamen,titelpost,funktion_kurzbz 
+					FROM public.tbl_benutzerfunktion JOIN campus.vw_benutzer USING(uid) 
+					where ". $pWhere ."
+					and (funktion_kurzbz='oezuordnung') 
+					and	oe_kurzbz IN(
+						WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as 
+						(
+							SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit 
+							WHERE upper(trim(oe_kurzbz))=upper(trim('".addslashes($oe_kurzbz)."'))
+							UNION ALL
+							SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes 
+							WHERE o.oe_parent_kurzbz=oes.oe_kurzbz
+						)
+						SELECT oe_kurzbz
+						FROM oes
+						GROUP BY oe_kurzbz  limit 1)
+					ORDER BY nachname, vorname, funktion_kurzbz ";
+
+				$pArt='';
+				$pDistinct=true; 
+				$pFields='';
+				$pTable='';
+				$matchcode='';
+				$pWhere='';
+				$pOrder='';
+				$pLimit='';
+
+			}
+			else
+			{*/
+				$pArt='select';
+				$pDistinct=true; 
+				$pFields='uid,vorname,nachname,tbl_mitarbeiter.lektor,aktiv';
+				$pTable=' campus.vw_benutzer LEFT JOIN public.tbl_mitarbeiter ON (uid=mitarbeiter_uid)';
+				$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($person_id))));
+				$pOrder='lektor,nachname';
+				$pLimit='100';
+				$pSql='';
+			
+			if (!$oRresult=$db->SQL($pArt,$pDistinct,$pFields,$pTable,$pWhere,$pOrder,$pLimit,$pSql))
+				exit(' |'.$db->errormsg."\n");
+
+				
+			for ($i=0;$i<count($oRresult);$i++)
+			{
+				echo html_entity_decode($oRresult[$i]->uid).'|'
+									.trim($oRresult[$i]->uid).'&nbsp;'
+									.html_entity_decode($oRresult[$i]->vorname).' '.html_entity_decode($oRresult[$i]->nachname).' '
+									.html_entity_decode($oRresult[$i]->lektor)
+					."\n";
+			}
+			break;
+			
 	    default:
    	   		echo " Funktion $work fehlt! ";
 			break;
