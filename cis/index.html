@@ -1,12 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<title>CIS</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<script language="Javascript">
-	window.location.href='index.php';
-</script>
+	<title>CIS</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../skin/jquery.css" type="text/css">
+	<link href="../skin/style.css.php" rel="stylesheet" type="text/css">
+	<link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+	<script src="../include/js/jquery.js" type="text/javascript"></script>
 </head>
-<body>
-Sollten Sie nicht automatisch weitergeleitet werden, druecken sie bitte <a href="index.php">hier</a>
+<body class="main">
+<table width="100%" height="100%" cellspacing="0" cellpadding="0" border="0">
+	<tr>
+		<td class="rand"></td>
+		<td height="100%" width="100%" valign="bottom" class="boxshadow" style="position: fixed;">
+		<table height="100%" cellspacing="0" cellpadding="0" class="header">
+			<tr style="position:relative;" height="10%">
+				<td valign="top" align="left">
+				<img style="position:absolute; left:16px; top:3%; *top:18\%; z-index:5000; height:7%;" src="../skin/images/fhtw_logo.png" alt="fhtw_logo"/>
+				<img src="../skin/images/header_left.png" alt="header_links" style="position:absolute; left:0px; z-index:1; max-width:100%; height:15.8%;" />
+				<img src="../skin/images/header_right.png" alt="header_rechts" style="position:absolute; right:0px; z-index:2; max-width:100%; height:15.8%" />
+				</td>
+			</tr>
+			<tr>
+				<td align="center" valign="middle">					
+					<img src="../skin/images/cis_logo_400px.png" height="70px" />
+					<br><br><br>
+					<!--Herzlich Willkommen im Campus Informationssystem (CIS)-->
+					<br>
+					<br>
+					<form action="index_login.php?login=1" method="POST">
+					<input class="cis_login" type="submit" value="Login">
+					</form>
+				</td>
+			</tr>
+			<tr height="10%" >
+				<td align="center" valign="bottom">				
+					<div style="color:grey">Powered by <a href="http://fhcomplete.technikum-wien.at" target="blank">FH Complete 2.0</a></div>
+					<br><br>
+				</td>
+			</tr>
+		</table>
+		</td>
+		<td class="rand"></td>
+	</tr>
+</table>
 </body>
 </html>
