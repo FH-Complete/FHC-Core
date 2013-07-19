@@ -79,7 +79,7 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 			<tr>
 				<td width="81" class="tdwrap">'.$p->t('global/studiengang').': </td>
 				<td class="tdwrap">
-					<select name="course" onChange="MM_jumpMenu(\'self\',this,0)">';
+					<select name="course" onChange="MM_jumpMenu(\'self\',this,0)" style="width: 100px;">';
 
 		$stg_obj = new studiengang();
 		$stg_obj->getAll('typ, kurzbz');
@@ -102,12 +102,12 @@ class menu_addon_lehrveranstaltungen extends menu_addon
 			{
 				if(isset($studiengang_kz) AND $studiengang_kz == $row->studiengang_kz)
 				{
-					$this->block.= '<option value="?content_id='.$_GET['content_id'].'&studiengang_kz='.$row->studiengang_kz.'&semester='.$semester.'" selected>'.$row->kuerzel .' ('.$row->kurzbzlang.')</option>';
+					$this->block.= '<option value="?content_id='.$_GET['content_id'].'&studiengang_kz='.$row->studiengang_kz.'&semester='.$semester.'" selected>'.$row->kuerzel .' ('.$row->bezeichnung.')</option>';
 					$sel_kurzbzlang=$row->kurzbzlang;
 				}
 				else
 				{
-					$this->block.='<option value="?content_id='.$_GET['content_id'].'&studiengang_kz='.$row->studiengang_kz.'&semester='.$semester.'">'.$row->kuerzel .' ('.$row->kurzbzlang.')</option>';
+					$this->block.='<option value="?content_id='.$_GET['content_id'].'&studiengang_kz='.$row->studiengang_kz.'&semester='.$semester.'">'.$row->kuerzel .' ('.$row->bezeichnung.')</option>';
 				}
 				if(!isset($studiengang_kz))
 				{

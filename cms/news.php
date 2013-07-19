@@ -42,6 +42,7 @@ require_once('../include/studiengang.class.php');
 require_once('../include/mitarbeiter.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/phrasen.class.php');
+require_once('../include/student.class.php');
 
 $sprache = getSprache();
 
@@ -49,9 +50,28 @@ $datum_obj = new datum();
 //XML Content laden
 $content = new content();
 $db = new basis_db();
+$user = get_uid();
 
-$studiengang_kz = (isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:0);
-$semester = (isset($_GET['semester'])?$_GET['semester']:null);
+//Zum anzeigen der Studiengang-Details neben den News
+$student = new student();
+if($student->load($user))
+{
+	$stg_kz=$student->studiengang_kz;
+	$sem=$student->semester;
+	$ver=$student->verband;
+}
+else
+{
+	$stg_kz=0;
+	$sem=NULL;
+	$ver=NULL;
+}
+// Wenn Student Incoming ist, wird bei den Studiengang-Details der ECI-Studiengang angezeigt
+if($sem==0 && $ver=='I')
+	$stg_kz=10006;
+
+$studiengang_kz = (isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:$stg_kz);
+$semester = (isset($_GET['semester'])?$_GET['semester']:$sem);
 
 $infoscreen = isset($_GET['infoscreen']);
 $editable = isset($_GET['edit']);
@@ -87,7 +107,7 @@ foreach($news->result as $row)
 	//$xml .= $content->content;
 }
 
-if($studiengang_kz!=0 && !$editable && !$infoscreen && $studiengang_kz!=10006)
+if($studiengang_kz!=0 && !$editable && !$infoscreen) // && $studiengang_kz==10006 && !$semester)
 	$xml.=getStgContent($studiengang_kz, $semester, $sprache);
 
 if($studiengang_kz!=0)
@@ -146,7 +166,7 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 	//Studiengangsleitung
 	$stg_oe_obj = new studiengang();                
 	$stgl = $stg_oe_obj->getLeitung($studiengang_kz);
-    $xml.='<stg_header><![CDATA['.$p->t('global/studiengangsmanagement').']]></stg_header>';
+    //$xml.='<stg_header><![CDATA['.$p->t('global/studiengangsmanagement').']]></stg_header>';
 	$xml.='<stg_ltg_name><![CDATA['.$p->t('global/studiengangsleitung').']]></stg_ltg_name>';
 	if(count($stgl)>0)
     {
@@ -209,7 +229,7 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 		}
 	}
 		
-	//Studiengangsleiter Stellvertreter auselesen
+	//Studiengangsleiter Stellvertreter auslesen
 	$benutzerfkt = new benutzerfunktion();
 	$benutzerfkt->getBenutzerFunktionen('stvLtg', $studiengang->oe_kurzbz);
 	$xml.='<stv_ltg_name><![CDATA['.$p->t('global/stellvertreter').']]></stv_ltg_name>';
