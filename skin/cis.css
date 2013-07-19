@@ -186,7 +186,7 @@ td.MarkLine
 	background-color: #F2F2F2; 
 }
 
-td.Inaktiv  /*für Inaktive Items bei der Raumbeschreibung*/ {
+td.Inaktiv  /*fï¿½r Inaktive Items bei der Raumbeschreibung*/ {
   background-color: #F2F2F2; /*wie #EEEEEE; also grau fast weiss*/
   color: #CFCFCF;
 }
@@ -240,18 +240,20 @@ TABLE#zeitsperren TD
 /* Stundeplan */
 TABLE.stdplan
 {  
-	border: 1;
-	border-spacing: 0;
-	padding: 0px 0px 0px 0px;
-	font-size: small;
+	margin: 0px;
+	padding: 0px;	
+	width: 100%;
+	background-color: white;
+	vertical-align: top;
+	border-spacing:1;
 }
 TABLE.stdplan TH
 {
-	background-color: #DDDDDD;
+	background-color: #A5AFB6;
 }
 TABLE.stdplan TD
 {
-	background-color: #EEEEEE
+	background-color: #E9ECEE;
 }
 .row-even { --> liste1
  background-color:#f2f2f2;

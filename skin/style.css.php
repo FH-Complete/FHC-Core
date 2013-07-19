@@ -8,6 +8,9 @@
 	else
 		$path='../';
 	require ($path.'config/cis.config.inc.php');
+	
+	//die($_SERVER["HTTP_USER_AGENT"]);
+	
 	//setcookie('stylesheet', DEFAULT_STYLE);
 	//Name des Stylesheets darf nur buchstaben von A-Z enthalten (ohne umlaute)
 	if (isset($_COOKIE['stylesheet']) && preg_match('/^[a-zA-Z]+$/', $_COOKIE['stylesheet']))
@@ -23,6 +26,7 @@
 		else
 			$stylesheet=DEFAULT_STYLE;
 	}	
+	//$stylesheet="mobile";
 	//setcookie('stylesheet', DEFAULT_STYLE);
 	header("Content-Type: text/css");
 	//echo $_COOKIE['stylesheet'];
@@ -37,8 +41,9 @@ function jahresplan_check_mobile() {
     'Portable', 'Smartphone', 'SDA',
     'PDA', 'Handheld', 'Symbian',
     'WAP', 'Palm', 'Avantgo',
-    'cHTML', 'BlackBerry', 'Opera Mini',
-    'Nokia'
+    'cHTML', 'BlackBerry', 'Opera Mobi',
+	'Nokia','iPhone','iPad','Android','BlackBerry',
+  	'PlayBook','Kindle','Kindle Fire', 'Windows Phone'
   );
   // PrÃƒÂ¼fen der Browserkennung
   for ($i=0; $i<count($agents); $i++) {
