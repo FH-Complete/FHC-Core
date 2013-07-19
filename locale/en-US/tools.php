@@ -58,5 +58,12 @@ $this->phrasen['tools/keineDatenGefunden']='No data found';
 $this->phrasen['tools/suche']='Global Search';
 $this->phrasen['tools/content']='Content';
 $this->phrasen['tools/suchbegriff']='Search';
-
+$this->phrasen['tools/esWurdenMehrAlsXDokumenteGefunden']='Es wurden mehr als 40 Dokumente zu Ihrem Suchbegriff gefunden. Bitte spezifizieren Sie Ihre Suche.';
+$this->phrasen['tools/esWurdenMehrAlsXPersonenGefunden']='Es wurden mehr als 20 Personen zu Ihrem Suchbegriff gefunden. Bitte spezifizieren Sie Ihre Suche.';
+$this->phrasen['tools/esWurdenMehrAlsXInhalteGefunden']='Es wurden mehr als 20 Seiten zu Ihrem Suchbegriff gefunden. Bitte spezifizieren Sie Ihre Suche.';
+$this->phrasen['tools/aktuelleVersion']='Aktuelle Version';
+$this->phrasen['tools/telefonklappe']='Telefonklappe';
+$this->phrasen['tools/reservieren']='Reservieren';
+$this->phrasen['tools/maxPersonen']='Max. Personen';
+$this->phrasen['tools/esWurdenKeineErgebnisseGefunden']='Es wurden keine Ergebnisse gefunden.';
 ?>

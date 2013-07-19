@@ -1,7 +1,9 @@
 ﻿<?php
-$this->phrasen['mailverteiler/titel']='Communication - Mailing lists';
+$this->phrasen['mailverteiler/titel']='Mailing lists/Groups';
 $this->phrasen['mailverteiler/absatz1']='<strong><font class="error">Notice:&nbsp;</font></strong>These mailing lists may only be used for university-related purposes!';
 $this->phrasen['mailverteiler/absatz2']='<strong><font class="error">Info:&nbsp;</font></strong>Information regarding the <a class="Item" href="../cisdocs/Mailverteiler.pdf" target="_blank">authorization concept </a> for mailing lists, <a class="Item" href="../cisdocs/bedienung_mailverteiler.pdf" target="_blank"> instructions</a> for mailing lists';
+$this->phrasen['mailverteiler/berechtigungskonzept']='Authorization concept';
+$this->phrasen['mailverteiler/bedienungsanleitung']='Instruction';
 $this->phrasen['mailverteiler/absatz3']='<h3>To display the mailing list, please click on &nbsp;[&nbsp;<img src="../../skin/images/bullet_arrow_right.png" title="anzeigen" alt="anzeigen" border="0">&nbsp;]&nbsp;or to hide it, click on &nbsp;&nbsp;[&nbsp;<img src="../../skin/images/bullet_arrow_down.png" title="Ausblenden" alt="Ausblenden" border="0">&nbsp;]</h3>';
 $this->phrasen['mailverteiler/verteilerOeffnen']='Unlock mailing list';
 $this->phrasen['mailverteiler/anzeigen']='show';

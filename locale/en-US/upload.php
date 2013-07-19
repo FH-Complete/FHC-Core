@@ -35,4 +35,5 @@ $this->phrasen['upload/leeren']='clear';
 $this->phrasen['upload/studentenUploadverzeichnisLeeren']='Empty student upload directory';
 $this->phrasen['upload/esWurdeKeinPfadDefiniert']='A directory path has not been defined';
 $this->phrasen['upload/wollenSieUploadWirklichLeeren']='Do you really want to empty the upload the directory? This can not be undone';
+$this->phrasen['upload/umEinenOrdnerOderEineDatei']='Um einen Ordner oder eine Datei zu löschen oder umzubenennen, markieren Sie bitte die entsprechende Checkbox';
 ?>

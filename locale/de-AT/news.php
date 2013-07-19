@@ -6,7 +6,7 @@ $this->phrasen['news/verfasser']='Verfasser';
 $this->phrasen['news/betreff']='Betreff';
 $this->phrasen['news/text']='Text';
 
-$this->phrasen['news/sichtbarab']='Datum';
+$this->phrasen['news/sichtbarab']='Sichtbar ab';
 $this->phrasen['news/sichtbarbis']='Sichtbar bis';
 $this->phrasen['news/maximal30Tage']='(max. 30 Tage, optional)';
 

@@ -36,4 +36,5 @@ $this->phrasen['zeitsperre/monat']='Monat';
 $this->phrasen['zeitsperre/tag']='Tag';
 $this->phrasen['zeitsperre/urlaubBereitsEingetragen']='Es existiert bereits ein Urlaubseintrag im angegebenen Zeitraum.';
 $this->phrasen['zeitsperre/beschreibungSieheCisHandbuch']='Beschreibung siehe CIS-Handbuch';
+$this->phrasen['zeitsperre/anzahlTage']='Anzahl Tage';
 ?>
