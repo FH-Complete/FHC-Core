@@ -3,6 +3,10 @@ require_once('../config/cis.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/ampel.class.php');
 require_once('../include/datum.class.php');
+require_once('../include/phrasen.class.php');
+
+$sprache = getSprache();
+$p = new phrasen($sprache);
 
 if(is_user_logged_in())
 {
@@ -32,16 +36,25 @@ if(is_user_logged_in())
 			}
 		}
 	}
+	if($rot==0 && $gelb==0)
+		echo '<a href="private/tools/ampelverwaltung.php" target="content" title="'.$p->t("tools/ampelsystem").' '.$rot.' rote"><img src="../skin/images/doppelampel_grau.gif" alt=""></a>';
+//	if($rot>0 || $gelb>0)
+//	{
+//		echo '<td width="26px" height="26px" align="center"><a href="private/tools/ampelverwaltung.php" target="content" title="Red Alert"><img src="../skin/images/glocke_aktiv.gif" alt="glocke"></a></td>';
+//	}
 	if($rot>0 || $gelb>0)
 	{
-		echo '[';
-		if($rot>0)
-			echo '<a href="private/tools/ampelverwaltung.php" target="content" title="Red Alert"><img src="../skin/images/ampel_rot.gif" style="vertical-align: bottom;"> '.$rot.'</a>';
+		echo '';
+		if($rot>0 && $gelb==0)
+			//echo '<td width="26px" height="26px" align="center" style="background-image:url(../skin/images/glocke_aktiv.gif); background-repeat:no-repeat"><a href="private/tools/ampelverwaltung.php" target="content" title="Red Alert"><strong>'.$rot.'</strong></a></td>';
+			echo '<a href="private/tools/ampelverwaltung.php" target="content" title="'.$p->t("tools/ampelsystem").'"><img src="../skin/images/doppelampel_rot.gif" alt=""></a>';
 		if($rot>0 && $gelb>0)
-			echo ' | ';
-		if($gelb>0)
-			echo '<a href="private/tools/ampelverwaltung.php" target="content" title="Yellow Alert"><img src="../skin/images/ampel_gelb.png"  style="vertical-align: bottom;"> '.$gelb.'</a>';
-		echo ' ]';
+			//echo ' <td></td>';
+			echo '<a href="private/tools/ampelverwaltung.php" target="content" title="'.$p->t("tools/ampelsystem").'"><img src="../skin/images/doppelampel_rot_gelb.gif" alt=""></a>';
+		if($gelb>0 && $rot==0)
+			//echo '<td width="26px" height="26px" align="center" style="background-image:url(../skin/images/glocke_aktiv.gif); background-repeat:no-repeat"><a href="private/tools/ampelverwaltung.php" target="content" title="Yellow Alert"><strong>'.$gelb.'</strong></a></td>';
+			echo '<a href="private/tools/ampelverwaltung.php" target="content" title="'.$p->t("tools/ampelsystem").'"><img src="../skin/images/doppelampel_gelb.gif" alt=""></a>';
+		echo ' ';
 	}
 }
 else

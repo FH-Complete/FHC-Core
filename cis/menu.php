@@ -39,69 +39,60 @@ ob_start();
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link href="../skin/style.css.php" rel="stylesheet" type="text/css">
 <title>Menu</title>
-<script language="JavaScript" type="text/javascript">
-<!--
-	var __js_page_array = new Array();
-    function js_toggle_container(conid)
-    {
-		if (document.getElementById)
+<script type="text/javascript" src="../include/js/flexcroll.js"></script>
+<link href="../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />
+<script src="../include/js/jquery.js"></script>
+<script>
+function treemenu(obj) 
+{
+	if (!obj.length) return;
+	obj.find("ul.menu").each(function() 
+	{
+		if(!$(this).parent().find("a:first").hasClass("selected"))
 		{
-        	var block = "table-row";
-			if (navigator.appName.indexOf('Microsoft') > -1)
-				block = 'block';
-				
-			// Aktueller Anzeigemode ermitteln	
-            var status = __js_page_array[conid];
-            if (status == null)
+//			$(this).children(".menublock").each(function(){alert("a"+$(this).html())});
+
+	//		if(!$(this).children(".menublock"))
+				$(this).css("display", "none");
+		}
+	});
+
+	$("li:not(:has(ul))").find("a").addClass("leaf");
+	
+	obj.find("a").click(function(e) 
+	{
+		//e.preventDefault();
+		if($(this).hasClass("selected"))
+		{
+			$(this).removeClass("selected");
+			$(this).parent().find("ul.menu:first").slideUp(400);
+		}
+		else
+		{
+			$(this).parent().siblings().each(function()
 			{
-		 		if (document.getElementById && document.getElementById(conid)) 
-				{  
-					status=document.getElementById(conid).style.display;
-				} else if (document.all && document.all[conid]) {      
-					status=document.all[conid].style.display;
-		      	} else if (document.layers && document.layers[conid]) {                          
-				 	status=document.layers[conid].style.display;
-		        }							
-			}	
-			
-			// Anzeigen oder Ausblenden
-            if (status == 'none')
-            {
-		 		if (document.getElementById && document.getElementById(conid)) 
-				{  
-					document.getElementById(conid).style.display = 'block';
-				} else if (document.all && document.all[conid]) {      
-					document.all[conid].style.display='block';
-		      	} else if (document.layers && document.layers[conid]) {                          
-				 	document.layers[conid].style.display='block';
-		        }				
-            	__js_page_array[conid] = 'block';
-            }
-            else
-            {
-		 		if (document.getElementById && document.getElementById(conid)) 
-				{  
-					document.getElementById(conid).style.display = 'none';
-				} else if (document.all && document.all[conid]) {      
-					document.all[conid].style.display='none';
-		      	} else if (document.layers && document.layers[conid]) {                          
-				 	document.layers[conid].style.display='none';
-		        }				
-            	__js_page_array[conid] = 'none';
-            }
-            return false;
-     	}
-     	else
-     		return true;
-  	}
-//-->
+				$(this).find("a:first").removeClass("selected");
+				$(this).find("ul.menu:first").slideUp(400);
+			});
+			$(this).parent().find("ul.menu:first").slideDown(400);
+			if (!$(this).hasClass("leaf")) 
+			{
+				$(this).addClass("selected");
+			}
+		}
+		window.setTimeout(function(){fleXenv.updateScrollBars();},500);
+	});
+}
+$(document).ready(function() 
+{
+	treemenu($("#menu"));
+});
+	
 </script>
+
 </head>
 <body style="margin:0; padding:0">
-<table class="menue">
-	<tr>
-		<td>&nbsp;</td>
-	</tr>
+<div class="flexcroll">
 <?php
 		
 	if(isset($_GET['content_id']) && $_GET['content_id']!='')
@@ -109,21 +100,18 @@ ob_start();
 	else
 		$content_id=CIS_MENU_ENTRY_CONTENT;
 	
+	echo '<ul id="menu">';
 	if($content_id!=CIS_MENU_ENTRY_CONTENT)
 	{
-		echo '<tr>
-				<td class="tdwidth10" nowrap>&nbsp;</td>
-				<td><a class="HyperItem" href="?content_id='.CIS_MENU_ENTRY_CONTENT.'">&lt;&lt; '.$p->t('lvplan/home').'</a></td>
-				</tr>
-				<tr><td></td></tr>';
+		echo '<li><a href="?content_id='.CIS_MENU_ENTRY_CONTENT.'">&lt;&lt; '.$p->t('global/zurueck').'</a><br></li>';
 	}
 	require_once('../cms/menu.inc.php');
 	drawSubmenu($content_id);
 	
 	//Gepufferten Output ausgeben
 	ob_end_flush();
+	echo '</ul>';
 ?>
-</table>
-
+</div>
 </body>
 </html>
