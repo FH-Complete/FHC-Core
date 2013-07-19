@@ -2,16 +2,41 @@
 /* Allgemein */
 body
 {
-	background-color: White;
+	background-color: white;	
 	font-family: Arial, Helvetica, sans-serif;
-	font-size: 0.8em;
-}
-iframe
-{
+	font-size: 13px;
+	height: 100%;
+	width: 100%;
 	margin:0px;
 	border-width:0px;
 	border-style:none;
 	padding:0px;
+}
+body.main /* Workaround fuer Farbverlauf im IE statt ShadowBox */
+{
+	background-color: white;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	height: 100%;
+	width: 100%;
+	margin:0px;
+	border-width: 2px;
+	border-style: none;
+	padding:0px;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#cccccc',endColorstr='#ffffff');
+}
+html
+{
+	height: 100%;
+}
+iframe
+{
+	margin:0px;
+	padding:0px;
+	height: 100%;
+	
+	/* border-width:1px;
+	border-style:solid; */
 }
 textarea
 {
@@ -21,22 +46,36 @@ form
 {
 	font-family: Arial, Helvetica, sans-serif;
 }
+p
+{
+	margin-top: 0px;
+}
 hr
 {
 	color:#CCCCCC;
 	height:1px;
 }
-img
+li, ul
 {
-	border: 0;
+	list-style-image:url(images/square_blue.png);
+	padding-left: 0px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	margin-left: 6px;
 }
-@media screen {
+li.ui-menu-item
+{
+	list-style-image:none;
+}
+/* @media screen { */
 #menue
 {
-	top:70px;
-	width:19%;
-	height:86%;
-	z-index:1000;
+	bottom: 2%;
+	width: 17%;
+	height: 81%;
+	z-index: 1000;
+	padding: 0px;
+	margin: 0px;
 } 
 /*Alle au�er IE 6*/
 html>body #menue
@@ -46,51 +85,77 @@ html>body #menue
 
 #content
 {
-	width:80%;
-	height:85%;
-	left:20%;
+	bottom: 2%;
+	width:81%;
+	height:81%;
+	left:18%;
+	padding: 0px;
+	margin: 0px;
+}
+#content /* Hack für IE8 */
+{	
+	*width: 75\%;
+	*left: 21\%;
 }
 /*Alle au�er IE 6*/
 html>body #content
 {
 	position:absolute;
 }
-}
 
 /*   Druckausgabe */
-
-
-@media print {
-.home_logo
+@media print 
 {
-	display:none;
-}
-.header_line
-{
-display:none;
-}
-
-#menue
-{
-display:none;
-}
-#GlobalMenu
-{
-display:none;
-}
-
-#content
-{
-	width:800px;
-	height:900px;
-	left:0px;
-	overflow: hidden;
-}
+	
+	.home_logo
+	{
+		display:none;
+	}
+	/*.header_line
+	{
+		display:none;
+	}*/
+	
+	#menue
+	{
+		display:none;
+	}
+	#GlobalMenu
+	{
+		display:none;
+	}
+	
+	#content
+	{
+		width:800px;
+		height:900px;
+		left:0px;
+		overflow: hidden;
+	}
 
 }
 input.TextBox					
 {
 	background-color: White;
+}
+/* Such-Feld CIS-Suche */
+input.search					
+{
+	background-color: #E9ECEE;
+	border-width: 1px;
+	border-style:solid;
+	border-color: #A5AFB6;
+}
+/* Login-Button CIS-Seite */
+input.cis_login
+{
+	cursor: pointer;
+	color: #666666;
+	font-size: 20px;
+	border: 1px solid #A5AFB6;
+	background-color: #E9ECEE;
+	width: 150px;
+	height: 35px;
 }
 #GlobalMenu
 {
@@ -102,15 +167,8 @@ input.TextBox
 	background-image:url(styles/tw/TWLogo_klein.jpg);
 	width:170px;
 	height:53px;
+}
 
-}
-.header_line
-{
-	background-image:url(styles/tw/header_line.jpg);
-	background-repeat:repeat-x;
-	width:100%;
-	height:3px;
-}
 /*Vor IE/Mac verstecken \
 *html .header_line{
 	height:0.5px;
@@ -135,14 +193,16 @@ div.tip
 }
 
 /* Links */
-a
+a /*allgmeiner Link, Hauptmenuelinks*/
 {
-	color: #008381; text-decoration: none;
+	color: #0086CC; /*tw-blau*/
+	text-decoration: none;
 	cursor: pointer;
 }
-a:hover
+a:hover /*link ohne Item-Definition*/
 {
-	color: Black; text-decoration: none;
+	color: #0086CC; /*tw-blau*/ 
+	text-decoration: underline;
 }
 a.ItemTesttool
 {
@@ -155,50 +215,49 @@ a:hover.ItemTesttool
 	color: black;
 	line-height:25px;
 }
-a.HyperItem
+a.HyperItem /* ? */
 {
 	color: Black; text-decoration: none;
 	font-weight: bold;
 }
-a:hover.HyperItem
+a:hover.HyperItem /* ? */
 {
 	color: #008381; text-decoration: none;
 	font-weight: bold;
 }
-a[onClick]:hover.Item
+a[onClick]:hover.Item /* ? */
 {
 	color: Black; text-decoration: none;
 }
-a:hover.Item
+a:hover.Item /*allgemeine Links, Hauptmenuelink*/
+{
+	color: #0086CC; /*tw-blau*/ 
+	text-decoration: underline;
+}
+a.Item2 /* zB in den Lehrveranstaltungen (Buttons) verwendet bei den Lektoren */
 {
 	color: Black; text-decoration: none;
 }
-a.Item2 
-{
-	color: Black; text-decoration: none;
-}
-a:hover.Item2
+a:hover.Item2 /* zB in den Lehrveranstaltungen (Buttons) verwendet bei den Lektoren */
 {
 	color: #008381; text-decoration: none;
 }
-a.MenuItem
+a.MenuItem /* Hauptmenuelink zum aufklappen */
 {
-	color: #008381; text-decoration: none;
+	color: #0086CC; text-decoration: none;
 	font-weight: bold;
 }
-a:hover.MenuItem
+a:hover.MenuItem /* Hauptmenuelink zum aufklappen */
 {
-	color: Black; text-decoration: none;
+	color: #0086CC; /*tw-blau*/ 
+	text-decoration: none;
 	font-weight: bold;
 }
-A.hilfe 
-{ 
-	text-decoration:none;
-}
-A.hilfe:hover 
-{ 
-	text-decoration:none;
-	cursor:help;
+a:focus.MenuItem /* Hauptmenuelink zum aufklappen */
+{
+	color: #0086CC; /*tw-blau*/ 
+	text-decoration: none;
+	font-weight: bold;
 }
 A.stpl_detail 
 { 
@@ -226,19 +285,32 @@ a.head:hover
 /* Tables */
 TABLE
 {
-	font-size: 1em;
+	font-size: 13px;
 }
-
+TABLE.header
+{
+	width:100%;
+	height:100%;
+	/* background-image:url(../skin/images/header.png); */ 
+	/* background-repeat:no-repeat; */ 
+	background-color: white;
+}
+TABLE.cmstable /* Die Haupttable aller CMS-Contentseiten */
+{
+	margin: 0px;
+	padding: 0px;
+	border: none;
+	width: 100%;
+}
 TABLE.tabcontent
 {
 	margin: 0px;
 	padding: 0px;
 	border-style: none;
 	width: 100%;
-	/*
-	cellspacing: 0;
-	cellpadding: 0;
-	*/
+	background-color: white;
+	vertical-align: top;
+	border-spacing:0;
 }
 
 TABLE.menue
@@ -260,27 +332,35 @@ TABLE.tabcontent2
 	margin: 0px;
 	padding: 0px;
 	border-style: none;
-	/*
-	cellspacing: 0;
-	cellpadding: 0;
-	*/
 }
 TABLE.tabborder
 {
-	/*
-	cellspacing: 0;
-	cellpadding: 1;
-	*/
 	width: 100%;
 	/*border: 1px solid black; foo*/
 }
 TABLE#tabterm
 {
-	/*
-	cellpadding: 0;
-	cellspacing: 0;
-	*/
 	margin:auto;
+}
+td.rand /* Seitenraender des CIS */
+{
+	font-size: 11px;
+	padding-top: 0px;
+	padding-left: 6px;
+	width: 3%;
+	height: 100%;
+	vertical-align: middle;
+}
+td.boxshadow /* Farbverlauf im Hintergrund der CIS*/
+{
+	position: fixed;
+	vertical-align:top;
+	width:94%;
+	box-shadow: 0px 100px 0px 0px #FFFFFF, /* Unterer weisser Rand bei sehr kleinen Aufloesungen */
+				0px 0px 5px 5px #888, /* schmaler dunkler Schatten */
+				/*0px 300px 5px 5px #888, /* schmaler dunkler Schatten unten bei sehr kleinen Aufloesungen*/
+				20px 20px 70px 30px #DDDDDD, /* heller Verlauf rechts */
+				-20px 20px 70px 30px #DDDDDD; /* heller Verlauf links */
 }
 td.ContentHeader
 {
@@ -290,16 +370,13 @@ td.ContentHeader
 }
 td.ContentHeader2
 {
-	background-color: #CCCCCC; /*mittel-grau */
+	color: #0086CC; /*tw-blau */
 	font-weight: normal;
-	height: 19px; 
-
 }
 td.ContentHeader3					
 {
-	background-color: #CCCCCC; /*mittel-grau */
+	color: #0086CC;; /*tw-blau */
 	font-weight: bold;
-	height: 19px
 }
 td.MarkLine
 {
@@ -345,7 +422,8 @@ td:hover.ItemTesttool
 }
 td.tdwidth10
 {
-	width: 10px;
+	width: 5px;
+	/* width: 10px; */
 }
 td.tdwidth30
 {
@@ -364,11 +442,44 @@ td.tdborder
 td.tdwrap
 {
 	white-space: nowrap;
+	color: #0086CC;
 }
-
-td.tdvertical
+td.tdvertical /* Für Ausrichtung der Icons bei der LV-Übersicht */
 {
 	vertical-align: top;
+	padding: 10px 0 10px 0;
+	width: 33.33%;
+	/* height: 100px; */
+}
+td.menubox /* Navigationsboxen in den CIS-Contentseiten */
+{
+	width: 20%;
+	height: 100%;
+	background-color: #eeeeee;
+	border-width: 1px;
+	padding: 20px 15px 20px 15px;
+	vertical-align: middle;
+}
+td.menubox p
+{
+	line-height:10px;
+}
+td.cmscontent
+{
+	vertical-align: top;
+	padding-right: 25px;
+	padding-left: 0px;
+}
+td.teambox
+{
+	vertical-align: top;
+	padding-top: 20px;
+	height: 1000px; /* Damit die menubox im IE mit der richtigen höhe angezeigt wird */
+}
+tr.header
+{
+	position:relative;
+	height: 10%;
 }
 TR.liste
 {
@@ -391,10 +502,6 @@ TR.tryellow
 TABLE#zeitsperren
 {  
 	/*border: 1px solid black; foo*/
-	/*
-	cellspacing: 0;
-	cellpadding: 0;
-	*/
 	width:100%;
 }
 TABLE#zeitsperren TH
@@ -411,25 +518,27 @@ TABLE#zeitsperren TD.feiertag
 }
 TABLE#zeitsperren TD
 {
-	background-color: #EEEEEE /*grau fast wei�*/
+	background-color: #EEEEEE; /*grau fast wei�*/
 }
 
-/* Stundeplan */
+/* Stundenplan */
 TABLE.stdplan
 {  
-	/*border: 1px solid black; foo*/
-	/*
-	cellspacing: 0;
-	cellpadding: 0;
-	*/
+	margin: 0px;
+	padding: 0px;
+	/* border: 1px solid; */	
+	width: 100%;
+	background-color: white;
+	vertical-align: top;
+	border-spacing:1;
 }
 TABLE.stdplan TH
 {
-	background-color: #DDDDDD;
+	background-color: #A5AFB6;
 }
 TABLE.stdplan TD
 {
-	background-color: #EEEEEE
+	background-color: #E9ECEE;
 }
 .row-even { /*liste1*/
  background-color:#f2f2f2;
@@ -441,16 +550,55 @@ TABLE.stdplan TD
 
 
 /* Fonts */
-h1 
+/*h1 
 { 
 	color: #ffffff; 
-	background-color: #008381; /*gruen*/
+	background-color: #008381; /*gruen
 	font-weight: bold;
 	padding-top: 2px;
 	padding-bottom: 2px;
 	padding-left: 4px;
 	font-size: 1em;
+}*/
+/* h1 
+{ 
+	color: black; 
+	padding-top: 2px;
+	padding-bottom: 2px;
+	width:20%;
+	white-space:nowrap;
+	padding-left: 10px;
+	font-size: 20px;
+	letter-spacing: 2px;
+	border-bottom:solid 1px #0086CC;
+	font-weight:normal;
+} */
+h1
+{ 
+	color: black; 
+	padding: 0px;
+	padding-bottom: 20px;
+	/* padding-left: 10px; */
+	/* width:20%; */
+	margin:0px;
+	white-space:nowrap;
+	font-size: 20px;
+	/* letter-spacing: 2px;
+	border-bottom:solid 1px #0086CC;*/
+	font-weight:normal;
 }
+/* h1.news
+{ 
+	color: black; 
+	padding: 0px;
+	padding-bottom: 10px;
+	padding-left: 10px;
+	width:20%;
+	margin:0px;
+	white-space:nowrap;
+	font-size: 20px;
+	font-weight:normal;
+} */
 h1 td
 { 
 	color: #ffffff; 
@@ -466,19 +614,36 @@ h1 a:hover
 	text-decoration:none;
 }
 
-h2 
+/* h2 
 { 
 	font-size: 1em;
-	background-color: #CCCCCC; /*mittel-grau */
-	font-weight: normal;
+	background-color: #CCCCCC; */ /*mittel-grau */
+/* 	font-weight: normal;
 	height: 19px;
-	padding-top: 2px;
-	padding-left: 2px;
+	padding-top: 2px; */
+	/*padding-left: 2px;
 }
-h2 td
+/* h2 
+{ 
+	font-size: 16px;
+
+	padding-top: 2px;
+	letter-spacing: 2px;
+	padding-left: 10px;
+} */
+h2
+{ 
+	margin: 0px;
+	padding-top: 0px;
+	padding-bottom: 15px;
+	/* padding-left: 10px; */
+	font-weight: bold;
+	font-size: 15px;
+}
+/* h2 td
 { 
 	color: #ffffff; 
-	background-color: #00a4d2; /*hellblau*/
+	background-color: #00a4d2; /*hellblau
 }
 h2 a
 {
@@ -489,7 +654,7 @@ h2 a:hover
 	color: #ffffff;
 	text-decoration:none;
 }
-h3 
+/* h3 
 { 
 	font-weight: bold; 
 	color: #008E74; 
@@ -504,8 +669,23 @@ h4
 	font-variant: normal; 
 	text-transform: none; 
 	color: #008E74; 
-	/*cursor: hand; */
 	text-decoration: none; 
+} */
+h3 
+{ 
+	margin: 0px;
+	padding-top: 0px; /* 20px */
+	padding-bottom: 2px;
+	font-weight: bold;
+	font-size:13px;
+}
+h4 
+{ 	
+	margin: 0px;
+	padding: 0px;  
+	text-decoration: underline;
+	font-weight: normal;
+	font-size:13px; 
 }
 .error
 {
@@ -516,12 +696,12 @@ font.ContentHeader
 	color: #FFFFFF;
 }
 
-#news
+/* #news
 {
-}
-#news .news
+} */
+/* #news .news
 {
-	/*-moz-border-radius-topright: 20px;*/
+	-moz-border-radius-topright: 20px;
 	-moz-border-radius-topleft: 10px;
 	width: 100%;
 	border: 1px solid #E0E0E0;
@@ -532,11 +712,22 @@ font.ContentHeader
 	font-weight: bold;
 	padding: 0px 10px 0px 10px;
 	white-space: nowrap;
+} */
+#news .news
+{
+	width: 99%;
+	background-color: #A5AFB6; /* grauvariante A5AFB6 */
+}
+#news .news .titel table
+{
+	padding: 3px 10px 3px 10px;
+	color: #ffffff;
+	font-weight: 500;
 }
 #news .news .text
 {
-	background-color: #FCFCFC;
-	padding: 5px 10px 0px 10px;
+	background-color: #E9ECEE; /* grauvariante E9ECEE */
+	padding: 10px;
 }
 
 /* Margin von ersten und letzten P tag entfernen, da sonst
@@ -566,11 +757,45 @@ img
 {
 	border: 0;
 }
+img.lvplanbutton
+{
+	border:0;
+	vertical-align: bottom;
+}
 img#layout
 {
 	border: 1px solid #AAAAAA;
 }
-
+img.lv
+{
+	width: 40px;
+	height: 40px;
+	padding-bottom: 5px;
+}
+img.header_left
+{
+	position: absolute;
+	left: 0px;
+	z-index: 1;
+	max-width: 100%;
+	height: 16%;
+}
+img.header_right
+{
+	position: absolute;
+	right: 0px;
+	z-index: 2;
+	max-width: 100%;
+	height: 16%;
+}
+img.header_logo
+{
+	position: absolute;
+	left: 16px;
+	top: 3%;
+	z-index: 5000;
+	height: 7%;
+}
 /*Farben*/
 .grey
 {
@@ -715,3 +940,177 @@ option.inactive
 	cursor:pointer;
 	cursor:hand;
 }
+
+	
+/**** Menubox-Effekt am Seitenrand. Nettes Feature aber dzt. nicht sinnvoll einsetzbar ****
+	
+div.hoverbox div.preview div.hoverbox_inhalt
+{
+	display:none;
+}
+
+div.preview
+{
+	position:relative;
+}
+
+	
+div.hoverbox div.preview:hover div.hoverbox_inhalt
+{
+	display: block;
+	position: absolute;
+	top: -21px;
+	left: -158px;
+	z-index: 1;
+	border:1px;
+	border-color:grey;
+	background-color:white;
+}
+table.hoverbox
+{
+	
+	border:1px;
+	border-style:solid;
+	border-color:grey;
+}
+*/
+
+/**** Kalender-Jump-Effekt im LV-Plan ****/
+	
+div.hoverbox div.preview div.hoverbox_inhalt
+{
+	display:none;
+	vertical-align: top;
+}
+div.preview
+{
+	position: relative;
+	vertical-align: top;
+}
+div.hoverbox div.preview:hover div.hoverbox_inhalt
+{
+	display: block;
+	position: absolute;
+	top: 15px;
+	left: -190px;
+	z-index: 2;
+	border:1px;
+	border-color:grey;
+	background-color:white;
+}
+table.hoverbox
+{
+	border:1px;
+	border-style:solid;
+	border-color:grey;
+	padding: 5px;
+}
+
+/**** Gestaltung des Hauptmenues ****/
+ul.menu
+{
+	padding:0;
+	margin:0;
+	font-family:Arial, Helvetica, sans-serif;
+	color:#0086CC;
+	font-size:13px;
+	line-height:15px;
+	width:200px;
+	list-style-type:none;
+}
+/* #meine_lv
+{
+	padding: 0px;
+	margin: 0 0 0 0px;	
+	font-family:Arial, Helvetica, sans-serif;
+	color:#0086CC;
+	font-size:13px;
+	line-height:15px;
+	width:250px;
+	list-style-type:none;
+} 
+#meine_lv ul
+{	
+	font-family:Arial, Helvetica, sans-serif;
+	color:#0086CC;
+	font-size:13px;
+	line-height:15px;
+	width:250px;
+	list-style-type:none;
+} */
+#menu
+{
+	padding:0;
+	margin:0;
+	font-family:Arial, Helvetica, sans-serif;
+	color:#0086CC;
+	font-size:13px;
+	line-height:18px;
+	width:250px;
+	list-style-type:none;
+}
+#menu a 
+{
+	display:block;
+	padding:0 0 0 5px;
+	outline:none;
+	text-decoration:none;
+	/* border-top: solid 1px #689CC1;*/
+
+	/* background-image:url(../skin/images/icon-plus.png);
+	background-repeat:no-repeat;
+	background-position: center left; */
+}
+#menu li 
+{
+	margin:0 0 0 10px;
+	padding: 5px 0 0 0;
+	display:block;
+	border:1px solid #FFFFFF;
+}
+
+#menu a.selected 
+{
+	padding:0 0 0 5px;
+	/* font-weight: bold;
+	background-image:url(../skin/images/icon-minus.png);
+	background-repeat:no-repeat;
+	background-position: center left; */
+}
+/* #menu a:hover
+{
+	background-image:url(../skin/images/icon-minus.png);
+	background-repeat:no-repeat;
+	background-position: center left;
+	padding:0 0 0 15px;
+} */
+#menu a:hover
+{
+	text-decoration: underline;
+}
+#menu a.leaf 
+{
+	color: #616B71; /* 0086CC */
+	padding-left: 5px;
+	/* background-image:url(../skin/images/square_lightblue_small.png);
+	background-repeat:no-repeat;
+	background-position: center left 15px; */
+	
+	/* border-top: none;*/
+}
+/* #menu a.leaf:hover
+{
+	background-image:url(../skin/images/icon-plus.png);
+	background-image:url(../skin/images/square_blue_medium.png);
+	background-repeat:no-repeat;
+	background-position: center left 6px;
+} */
+
+
+
+/* #menu ul 
+{
+	padding:0;
+	margin:0;
+	list-style-type:none;
+} */

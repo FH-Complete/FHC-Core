@@ -1,0 +1,95 @@
+/* Scroll Bar Master Styling Starts Here */
+/* All comments can be freely removed from the css */
+div.flexcroll
+{
+	height:100%;
+	outline: none;
+}
+.flexcroll
+{
+	outline: none;
+}
+/*  scrollgeneric is used for corrective styling of elements, and should not be modified or removed */ 
+.scrollgeneric 
+{
+	line-height: 1px;
+	font-size: 1px;
+	position: absolute;
+	top: 0; left: 0;
+}
+.vscrollerbase 
+{
+	width:24px;
+}
+.vscrollerbar 
+{
+	background-image: url(images/scrollbar_up_down.png);
+	width: 18px;
+	/* following is the bit that allows us fixed height scrollbars */
+	height: 38px !important;
+	/* for fixed height, we force the vscrollerbar class with an !important decleration, and fleXcroll follows suit.*/
+
+	/* unfortunately, due to limitations of CSS, we cannot provide a color for the background when we are
+	using alpha images, thay have to be transparent.*/
+}
+
+/* * html .vscrollerbar {
+IE6 alpha png trick
+IE7 is not affected by this trick, as it perfectly handles the normal png
+filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(enabled=true, sizingMethod=crop src='scrollbar_up_down.png');
+background-image: none;
+} */
+.vscrollerbasebeg 
+{
+    top: 0px;
+    width: 18px;
+    background: url("images/scrollbase_top.png") no-repeat scroll transparent;
+}
+.vscrollerbaseend 
+{
+    width: 18px;
+    height: 12px;
+    background: url("images/scrollbase_bottom.png") no-repeat scroll transparent;
+}
+/* do not forget to give horizontal scrollbars some color properties even if you don't plan on using them */
+.hscrollerbase 
+{
+	height: 18px;
+}
+.hscrollerbar 
+{
+	background-image: url(images/scrollbar_left_right.png);
+	height:18px;
+	width: 38px !important;
+}
+.hscrollerbasebeg 
+{
+    top: 0px;
+    height: 18px;
+    background: url("images/scrollbase_left.png") no-repeat scroll transparent;
+}
+.hscrollerbaseend 
+{
+    width: 12px;
+    height: 18px;
+    background: url("images/scrollbase_right.png") no-repeat scroll transparent;
+}
+.vscrollerbar, .hscrollerbar 
+{
+	/* paddings of these elements will decide how far the scrollbar will stop in both ends, and are not actually
+	used for styling, and are set to 0 by the script, here we will set them the size of our faux arrows */
+	padding: 12px;
+	z-index: 2;
+}
+
+/* properties for scroller jog box (Stosspunkt der Scrollbar), just in case */
+/*  .scrollerjogbox {
+width: 30px;
+height: 22px;
+top: auto; left: auto;
+bottom: 0px; right: 0px;
+background: #698AAA;
+} */
+
+
+/* Scroll Bar Master Styling Ends Here */
