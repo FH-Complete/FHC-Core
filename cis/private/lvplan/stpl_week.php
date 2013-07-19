@@ -56,16 +56,22 @@ $uid=get_uid();
 		-->
 	</script>
 	<LINK rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
+	<link href="../../../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />
+	<script src="../../../include/js/flexcroll.js" type="text/javascript" ></script>
 </HEAD>
 
 <BODY id="inhalt">
-<H2><table class="tabcontent">
-	<tr>
-	<td>&nbsp;<a class="Item" href="index.php"><?php echo $p->t('lvplan/lehrveranstaltungsplan');?></a> &gt;&gt; <?php echo $p->t('lvplan/wochenplan');?></td>
-	<td align="right"><A href="../../../cms/content.php?content_id=<?php echo $p->t('dms_link/lvPlanFAQ');?>" class="hilfe" target="_blank">HELP&nbsp;</A></td>
-	</tr>
-	</table>
-</H2>
+<div class="flexcroll" style="outline: none;">
+<h1><?php echo $p->t('lvplan/wochenplan');?></h1>
+<table class="tabcontent">
+<tr>
+<td>
+<a href="index.php"><?php echo $p->t('lvplan/hauptmenue');?></a><br>
+<?php echo '<a href="../../../cms/content.php?content_id='.$p->t("dms_link/lvPlanFAQ").'" class="hilfe" target="_blank">'.$p->t("global/hilfe").'</a>'; ?>
+</td>
+</tr>
+</table>
+
 <?php
 /****************************************************************************
  * Script: 			stpl_week.php
@@ -304,7 +310,8 @@ $stdplan->draw_week($raumres,$uid);
 if (isset($count))
 	echo "Es wurde".($count!=1?'n':'')." $count Stunde".($count!=1?'n':'')." reserviert!<BR>";
 ?>
-<HR>
-<P><?php echo $p->t('lvplan/fehlerUndFeedback');?> <A class="Item" href="mailto:<?php echo MAIL_LVPLAN?>"><?php echo $p->t('lvplan/lvKoordinationsstelle');?></A>.</P>
+
+<P><br><?php echo $p->t('lvplan/fehlerUndFeedback');?> <A class="Item" href="mailto:<?php echo MAIL_LVPLAN?>"><?php echo $p->t('lvplan/lvKoordinationsstelle');?></A>.</P>
+</div>
 </BODY>
 </HTML>

@@ -46,6 +46,8 @@ echo '
 	<link rel="stylesheet" href="../../../skin/jquery.css" type="text/css"/>
 	<link rel="stylesheet" href="../../../skin/fhcomplete.css" type="text/css"/>
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
+	<link rel="stylesheet" href="../../../skin/flexcrollstyles.css" type="text/css" />
+	<script type="text/javascript" src="../../../include/js/flexcroll.js"></script> 
 	<script type="text/javascript" src="../../../include/js/jquery.js"></script>
 	<script language="Javascript">
 	
@@ -56,6 +58,8 @@ echo '
 			sortList: [[0,0]],
 			widgets: ["zebra"]
 		});
+		
+		$( "#datum" ).datepicker($.datepicker.regional["de"]);
 	}); 
 	
 	function checkdata()
@@ -87,18 +91,16 @@ echo '
 	}
 	</script>
 </head>
-<body id="inhalt">
-	<H1>
-		<a class="Item" href="index.php">'.$p->t('lvplan/lehrveranstaltungsplan').'</a>
-		&gt;&gt; '.$p->t('lvplan/raumsuche').'
-	</H1>
+<body>
+	<h1>'.$p->t('lvplan/raumsuche').'</h1>
+	<p><a href="index.php">'.$p->t('lvplan/lehrveranstaltungsplan').'</a></p>
 ';
 
 echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST" onsubmit="return checkdata()">
 		'.$p->t('global/datum').'* <input type="text" name="datum" id="datum" size="10" value="'.$datum.'">
 		'.$p->t('global/von').'* <input type="text" name="vonzeit" id="vonzeit" size="5" value="'.$vonzeit.'">
 		'.$p->t('global/bis').'* <input type="text" name="biszeit" id="biszeit" size="5" value="'.$biszeit.'">
-		'.$p->t('lvplan/raumtyp').': <SELECT name="raumtyp">
+		'.$p->t('lvplan/raumtyp').' <SELECT name="raumtyp" style="width: 100px;">
 		<OPTION value="">'.$p->t('global/alle').'</OPTION>';
 $raumtyp_obj = new raumtyp();
 $raumtyp_obj->getAll();
@@ -110,7 +112,7 @@ foreach ($raumtyp_obj->result as $row)
 	else 
 		$selected='';
 		
-	echo '<OPTION value="'.$row->raumtyp_kurzbz.'" '.$selected.'>'.$row->raumtyp_kurzbz.'</OPTION>';
+	echo '<OPTION value="'.$row->raumtyp_kurzbz.'" '.$selected.'>'.$row->beschreibung.'</OPTION>';
 }
 echo '	</SELECT>
 		'.$p->t('lvplan/anzahlPersonen').' <input type="text" size="3" name="anzahlpersonen" value="'.$anzahlpersonen.'">
@@ -168,7 +170,7 @@ if($sent)
 		{
 			echo '<br><table class="tablesorter" id="myTable" style="width: auto">
 			<thead>
-				<tr class="liste">
+				<tr>
 					<th>'.$p->t('lvplan/raum').'</th>
 					<th>'.$p->t('global/bezeichnung').'</th>
 					<th>'.$p->t('global/nummer').'</th>
@@ -182,7 +184,7 @@ if($sent)
 			foreach ($ort->result as $row)
 			{
 				$i++;
-				echo '<tr class="liste'.($i%2).'">';
+				echo '<tr>';
 				echo '<td><a href="'.RAUMINFO_PATH.$row->ort_kurzbz.'.html" class="Item" title="'.$p->t('lvplan/rauminfoAnzeigen').'">'.$row->ort_kurzbz.'</td>';
 				echo "<td>$row->bezeichnung</td>";
 				echo "<td>$row->planbezeichnung</td>";
@@ -195,4 +197,5 @@ if($sent)
 		}
 	}
 }
+echo '</body></html>';
 ?>
