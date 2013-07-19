@@ -56,21 +56,16 @@ function ip_increment($ip = "")
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
+<link href="../../../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="../../../include/js/flexcroll.js"></script>
 </head>
 
 <body onLoad="document.regMAC.txtMAC.focus();">
-<table class="tabcontent" id="inhalt">
+<div class="flexcroll" style="outline: none;">
+<h1><?php echo $p->t("notebookregister/titelNotebookRegistration");?></h1>
+<table class="cmstable" cellspacing="0" cellpadding="0">
   <tr>
-    <td class="tdwidth10">&nbsp;</td>
-    <td><table class="tabcontent">
-      <tr>
-        <td class="ContentHeader"><font class="ContentHeader">&nbsp;<?php echo $p->t("notebookregister/titelNotebookRegistration");?></font></td>
-      </tr>
-      <tr>
-        <td>&nbsp;</td>
-      </tr>
-	  <tr>
-	  	<td>
+    <td class="cmscontent" rowspan="3" valign="top">
 		    <?php
 
 			if (!$txtUID)
@@ -270,11 +265,20 @@ function ip_increment($ip = "")
 				}
 		  	}
 		  ?>
-		  <p><?php echo $p->t("notebookregister/notebook_absatz2");?></p></td>
-	  </tr>
-    </table></td>
-	<td class="tdwidth30">&nbsp;</td>
+		  <p><?php echo $p->t("notebookregister/notebook_absatz2");?></p>
+		</td>
+		<!--<td class="menubox">
+		<p><a href="content.php?content_id=">Links zu Unterpunkten</a></p>
+		</td>
+		</tr>
+		<tr>
+		<td class="teambox" style="width: 20%;">TEAM:<br /><br /><a href="mailto:">Titelpre Vorname Nachname Titelpost</a><br />Aufgaben, Verantwortlichkeiten, Expertisen<br />T: +43 1 333 40 77-DW<br />E: <a href="mailto:">aliasadresse@technikum-wien.at</a></td>
+		</tr>
+		<tr>
+		<td style="width: 20%;" valign="top">&nbsp;</td>
+	  	</tr>-->
   </tr>
 </table>
+</div>
 </body>
 </html>
