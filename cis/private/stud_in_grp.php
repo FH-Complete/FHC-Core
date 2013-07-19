@@ -31,6 +31,19 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
+		<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
+		<script type="text/javascript" src="../../include/js/jquery.js"></script>
+		<script type="text/javascript">	
+		$(document).ready(function() 
+			{ 
+			    $("#table").tablesorter(
+				{
+					sortList: [[0,0]],
+					widgets: [\'zebra\'],
+				}); 
+			} 
+		);
+		</script>
 	</head>
 	<title>'.$p->t('mailverteiler/personenImVerteiler').'</title>
 <body>';
@@ -41,15 +54,7 @@ if (!$db = new basis_db())
 if(!isset($_GET['kz']))
     die($p->t('global/fehlerBeiDerParameteruebergabe'));
 
-echo '
-	<table class="tabcontent">
-	      <tr>
-	        <td class="ContentHeader"><font class="ContentHeader">'.$p->t('global/nachname').'</font></td>
-	        <td class="ContentHeader"><font class="ContentHeader">'.$p->t('global/vorname').'</font></td>
-	        <td class="ContentHeader"><font class="ContentHeader">'.$p->t('global/mail').'</font></td>
-	      </tr>';
-
-if(isset($_GET['all']))
+    if(isset($_GET['all']))
 {
 	$qry = "SELECT vorname, nachname, uid FROM campus.vw_student WHERE aktiv=true AND studiengang_kz='".addslashes($_GET['kz'])."' AND semester<10 AND semester>0 ORDER BY nachname, vorname";
 }
@@ -68,6 +73,19 @@ else
 
 	$qry.= ' ORDER BY nachname, vorname';
 }
+if($result=$db->db_query($qry))
+{
+	echo '<p>'.$row=$db->db_num_rows($result).' '.$p->t('mailverteiler/personen');
+}
+echo '
+		<table class="tablesorter" id="table">
+		<thead>
+	      <tr>
+	        <th>'.$p->t('global/nachname').'</th>
+	        <th>'.$p->t('global/vorname').'</th>
+	        <th>'.$p->t('global/mail').'</th>
+	      </tr>
+	     </thead><tbody>';
 
 if($result=$db->db_query($qry))
 {
@@ -83,7 +101,7 @@ if($result=$db->db_query($qry))
 else
 	echo $p->t('global/fehlerBeimLesenAusDatenbank');
 
-echo '	</table>
+echo '	</tbody></table>
 	</body>
 </html>';
 ?>
