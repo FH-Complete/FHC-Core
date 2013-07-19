@@ -373,5 +373,39 @@ class dokument extends basis_db
 			return false;
 		}
 	}
+    
+    /**
+     * Liefert alle Dokumente die eine Person abzugeben hat
+     * ist notwendig um bei einer Bewerbung bei mehreren Studiengängen zu wissen was der Student im gesamten abzugeben hat
+     * @param $person_id 
+     */
+    public function getAllDokumenteForPerson($person_id)
+    {
+        $qry = "SELECT distinct(dokument_kurzbz), bezeichnung FROM public.tbl_dokumentstudiengang 
+            JOIN public.tbl_prestudent using (studiengang_kz) 
+            JOIN public.tbl_dokument using (dokument_kurzbz)
+            WHERE person_id =".$this->db_add_param($person_id, FHC_INTEGER).";";
+        
+        if($result = $this->db_query($qry))
+        {
+            while($row = $this->db_fetch_object($result))
+            {
+                $dok = new dokument(); 
+                $dok->dokument_kurzbz = $row->dokument_kurzbz; 
+                $dok->bezeichnung = $row->bezeichnung; 
+                
+                $this->result[] = $dok; 
+            }
+            return true; 
+        }
+        else
+        {
+            $this->errormsg="Fehler bei der Abfrage aufgetreten"; 
+            return false; 
+        }
+        
+    }
+    
+    
 }
 ?>
