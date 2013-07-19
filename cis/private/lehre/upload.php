@@ -815,8 +815,8 @@ A:hover {
 				</tr>
 				<tr>
 
-			  <td align="middle" class="ContentHeader2" colSpan="5" height="24">
-				<p align="left"><b>&nbsp;<?php echo $p->t('upload/neuesVerzeichnisErstellen');?>:</b></td>
+			  <td colSpan="5" height="24">
+				<p align="center"><br><b>&nbsp;<?php echo $p->t('upload/umEinenOrdnerOderEineDatei');?></b></p><br/></td>
 				</tr>
 				<tr>
 
@@ -913,7 +913,7 @@ A:hover {
 					}
 
 					echo "<b><font face=\"Arial,Helvetica,sans-serif\" color=\"#000000\" size=\"2\">&nbsp;".$p->t('upload/verzeichnisname').":&nbsp;";
-					echo "<input id='new_dir_name_text' type=\"text\" name=\"new_dir_name_text\" size=\"30\">&nbsp;<input type=\"submit\" value=\"".$p->t('upload/verzeichnisErstellen')."\" name=\"create_dir\" onclick='return checkvz(\"new_dir_name_text\")'>";
+					echo "<input id='new_dir_name_text' type=\"text\" name=\"new_dir_name_text\" size=\"30\">&nbsp;<input type=\"submit\" value=\"".$p->t('upload/neuesVerzeichnisErstellen')."\" name=\"create_dir\" onclick='return checkvz(\"new_dir_name_text\")'>";
 					echo "</font></b>";
 					echo "</td>";
 

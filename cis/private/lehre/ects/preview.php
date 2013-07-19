@@ -44,8 +44,11 @@ if (!$db = new basis_db())
 <title>ECTS - European Course Credit Transfer Systems (ECTS)</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../../skin/style.css.php" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="../../../../include/js/flexcroll.js"></script>
+<link href="../../../../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<div class="flexcroll" style="outline: none;">
 <table align="right">
 	<tr>
 		<td>
@@ -57,8 +60,7 @@ if (!$db = new basis_db())
 <table class="tabcontent" id="inhalt">
 
 <tr>
-<td class="tdvertical" width="3%">&nbsp;</td>
-<td class="tdvertical" width="94%"><div align="center">
+<td><div align="center">
 
 <?php
 	if(isset($_REQUEST['lv']))
@@ -311,10 +313,10 @@ if (!$db = new basis_db())
 		echo "<a name=\"de\"></a><br><br>
 		    <table class='tabcontent'>
 		    <tr>
-		       <td class=\"ContentHeader2\" align='center' valign='top'>
+		       <td align='center' valign='top'>
 
-		          <div style='font-size: medium; padding-top: 15px; padding-bottom: 15px;'>
-		          ".stripslashes($titel_de)."</div>
+		          <h1>
+		          ".stripslashes($titel_de)."</h1>
 
 		       </td>
 		    </tr>
@@ -401,50 +403,50 @@ if (!$db = new basis_db())
 
 	    if ($kurzbeschreibung_de)
 	    {
-			echo "<tr><td class=\"ContentHeader2\" align='left' valign='top'>Kurzbeschreibung</td></tr>";
-			echo "<tr><td><br />".stripslashes($kurzbeschreibung_de)."<br /><br /></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>Kurzbeschreibung</h2></td></tr>";
+			echo "<tr><td>".stripslashes($kurzbeschreibung_de)."<br /><br /></td></tr>";
 	    }
 
 	    if ($lehrziele_de)
 		{
-	     	echo "<tr><td class=\"ContentHeader2\" align='left' valign='top'>Kompetenzerwerb</td></tr>";
-	     	echo "<tr><td><br />".stripslashes($lehrziele_de)."<br /><br /></td></tr>";
+	     	echo "<tr><td align='left' valign='top'><h2>Kompetenzerwerb</h2></td></tr>";
+	     	echo "<tr><td>".stripslashes($lehrziele_de)."<br /><br /></td></tr>";
 		}
 
 	    if ($lehrinhalte_de)
 		{
-	     	echo "<tr><td class=\"ContentHeader2\" align='left' valign='top'>Lehrinhalte</td></tr>";
-	     	echo "<tr><td><br />".stripslashes($lehrinhalte_de)."<br /><br /></td></tr>";
+	     	echo "<tr><td align='left' valign='top'><h2>Lehrinhalte</h2></td></tr>";
+	     	echo "<tr><td>".stripslashes($lehrinhalte_de)."<br /><br /></td></tr>";
 		}
 
 	    if ($voraussetzungen_de)
 		{
-			echo "<tr><td class=\"ContentHeader2\" align='left' valign='top'>Vorkenntnisse</td></tr>";
-			echo "<tr><td><br />".stripslashes($voraussetzungen_de)."<br><br /></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>Vorkenntnisse</h2></td></tr>";
+			echo "<tr><td>".stripslashes($voraussetzungen_de)."<br><br /></td></tr>";
 		}
 
 	    if ($methodik_de)
 		{
-			echo "<tr><td class=\"ContentHeader2\" align='left' valign='top'>Methodik / Didaktik</td></tr>";
-			echo "<tr><td><br />".stripslashes($methodik_de)."<br><br /></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>Methodik / Didaktik</h2></td></tr>";
+			echo "<tr><td>".stripslashes($methodik_de)."<br><br /></td></tr>";
 		}
 
 	    if ($pruefungsordnung_de)
 	    {
-			echo "<tr><td class=\"ContentHeader2\" align='left' valign='top'>Leistungsbeurteilung</td></tr>";
-			echo "<tr><td><br />".stripslashes($pruefungsordnung_de)."<br /><br /></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>Leistungsbeurteilung</h2></td></tr>";
+			echo "<tr><td>".stripslashes($pruefungsordnung_de)."<br /><br /></td></tr>";
 	    }
 
 		if ($unterlagen_de)
 		{
-			echo "<tr><td class=\"ContentHeader2\" align='left' valign='top'>Literatur</td></tr>";
-			echo "<tr><td><br />".stripslashes($unterlagen_de)."<br /><br /></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>Literatur</h2></td></tr>";
+			echo "<tr><td>".stripslashes($unterlagen_de)."<br /><br /></td></tr>";
 		}
 
 		if ($anmerkungen_de)
 		{
-			echo "<tr><td class=\"ContentHeader2\" align='left' valign='top'>Anmerkungen</td></tr>";
-			echo "<tr><td><br />".stripslashes($anmerkungen_de)."&nbsp;<br /><br /></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>Anmerkungen</h2></td></tr>";
+			echo "<tr><td>".stripslashes($anmerkungen_de)."&nbsp;<br /><br /></td></tr>";
 		}
 
 		echo "</td></tr></table>";
@@ -456,10 +458,10 @@ if (!$db = new basis_db())
 		echo "<a name=\"en\"></a><br><br>";
 		echo "<table class='tabcontent'>
 				<tr>
-					<td class=\"ContentHeader2\" align='center' valign='top'>
-	                	<div style='font-size: medium; padding-top: 15px; padding-bottom: 15px;'>
+					<td align='center' valign='top'>
+	                	<h1>
 							".stripslashes($titel_en)."
-						</div>
+						</h1>
 					</td>
 				</tr>
 				<tr><td><br />";
@@ -548,50 +550,50 @@ if (!$db = new basis_db())
 
 	    if ($kurzbeschreibung_en)
 	    {
-			echo "<tr><td class=\"ContentHeader2\" align='left' valign='top'>Course Description</td></tr>";
-			echo "<tr><td><br />".stripslashes($kurzbeschreibung_en)."<br /><br /></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>Course Description</h2></td></tr>";
+			echo "<tr><td>".stripslashes($kurzbeschreibung_en)."<br /><br /></td></tr>";
 	    }
 
 		if ($lehrziele_en)
 		{
-			echo "<tr><td class=\"ContentHeader2\" align='left' valign='top'>Learning outcome</td></tr>";
-			echo "<tr><td><br />".stripslashes($lehrziele_en)."<br /><br /></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>Learning outcome</h2></td></tr>";
+			echo "<tr><td>".stripslashes($lehrziele_en)."<br /><br /></td></tr>";
 		}
 
 		if ($lehrinhalte_en)
 		{
-			echo "<tr><td class=\"ContentHeader2\" align='left' valign='top'>Course Contents</td></tr>";
-			echo "<tr><td><br />".stripslashes($lehrinhalte_en)."<br /><br /></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>Course Contents</h2></td></tr>";
+			echo "<tr><td>".stripslashes($lehrinhalte_en)."<br /><br /></td></tr>";
 		}
 
 		if ($voraussetzungen_en)
 		{
-			echo "<tr><td class=\"ContentHeader2\" align='left' valign='top'>Prerequisites</td></tr>";
-			echo "<tr><td><br />".stripslashes($voraussetzungen_en)."<br /><br /></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>Prerequisites</h2></td></tr>";
+			echo "<tr><td>".stripslashes($voraussetzungen_en)."<br /><br /></td></tr>";
 		}
 
 	    if ($methodik_en)
 		{
-			echo "<tr><td class=\"ContentHeader2\" align='left' valign='top'>Teaching Methods</td></tr>";
-			echo "<tr><td><br />".stripslashes($methodik_en)."<br><br /></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>Teaching Methods</h2></td></tr>";
+			echo "<tr><td>".stripslashes($methodik_en)."<br><br /></td></tr>";
 		}
 
 		if ($pruefungsordnung_en)
 		{
-			echo "<tr><td class=\"ContentHeader2\" align='left' valign='top'>Assessment Methods</td></tr>";
-			echo "<tr><td><br />".stripslashes($pruefungsordnung_en)."<br /><br /></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>Assessment Methods</h2></td></tr>";
+			echo "<tr><td>".stripslashes($pruefungsordnung_en)."<br /><br /></td></tr>";
 		}
 
 		if ($unterlagen_en)
 		{
-			echo "<tr><td class=\"ContentHeader2\" align='left' valign='top'>Recommended Reading and Material</td></tr>";
-			echo "<tr><td><br />".stripslashes($unterlagen_en)."<br /><br /></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>Recommended Reading and Material</h2></td></tr>";
+			echo "<tr><td>".stripslashes($unterlagen_en)."<br /><br /></td></tr>";
 		}
 
 		if ($anmerkungen_en)
 		{
-			echo "<tr><td class=\"ContentHeader2\" align='left' valign='top'>Comments</td></tr>";
-			echo "<tr><td><br />".stripslashes($anmerkungen_en)."&nbsp;<br /></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>Comments</h2></td></tr>";
+			echo "<tr><td>".stripslashes($anmerkungen_en)."&nbsp;<br /></td></tr>";
 		}
 	}
 
@@ -605,4 +607,5 @@ if (!$db = new basis_db())
 <td width="3%">&nbsp;</td>
 </tr>
 </table>
+</div>
 </body></html>
