@@ -259,10 +259,15 @@ class benutzer extends person
 		}
 	}
 	
-	public function search($searchItems)
+	/**
+	 * Sucht nach Benutzern. Limit optional.
+	 * 
+	 * @param $limit (optional)
+	 */
+	public function search($searchItems, $limit=null)
 	{
 		$qry = "SELECT * FROM (SELECT
-					distinct on (uid) vorname, nachname, uid, titelpre, titelpost,alias,
+					distinct on (uid) vorname, nachname, uid, mitarbeiter_uid, titelpre, titelpost,alias,
 					(SELECT UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz)
 					 FROM public.tbl_student JOIN public.tbl_studiengang USING(studiengang_kz)
 					 WHERE student_uid=tbl_benutzer.uid) as studiengang,
@@ -281,6 +286,7 @@ class benutzer extends person
 				FROM
 					public.tbl_person 
 					JOIN public.tbl_benutzer USING(person_id)
+					LEFT JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid)
 				WHERE
 					tbl_benutzer.aktiv
 					AND (";
@@ -288,12 +294,16 @@ class benutzer extends person
 		$qry.=" lower(vorname || ' ' || nachname) like lower('%".addslashes(implode(' ',$searchItems))."%')"; 
 		$qry.=" OR lower(nachname || ' ' || vorname) like lower('%".addslashes(implode(' ',$searchItems))."%')";
 		$qry.=" OR lower(uid) like lower('%".addslashes(implode(' ',$searchItems))."%')";
+		$qry.=" OR lower(telefonklappe) like lower('%".addslashes(implode(' ',$searchItems))."%')";
 		
 		foreach($searchItems as $value)
 		{
 			$qry.=" OR lower(uid) = lower(".$this->db_add_param($value).")"; 
 		}
 		$qry.=")) a ORDER BY nachname, vorname";
+		
+		if(!is_null($limit) && is_numeric($limit))
+			$qry.=" LIMIT ".$limit;
 		
 		if($result = $this->db_query($qry))
 		{
@@ -306,6 +316,7 @@ class benutzer extends person
 				$obj->nachname = $row->nachname;
 				$obj->titelpost = $row->titelpost;
 				$obj->uid = $row->uid;
+				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$obj->studiengang = $row->studiengang;
 				$obj->studiengang_kz = $row->studiengang_kz;
 				$obj->telefonklappe = $row->klappe;

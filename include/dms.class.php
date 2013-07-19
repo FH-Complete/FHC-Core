@@ -667,6 +667,55 @@ class dms extends basis_db
 		}
 	}
 	
+/**
+	 * Sucht nach Dokumenten (nur Spalte Beschreibung) mit der aktuellsten Version.
+	 * Optional kann die Anzahl an Suchergebnissen übergeben werden.
+	 *
+	 * @param suchstring
+	 * @param limit (optional)
+	 */
+	public function searchLastVersion($suchstring, $limit=null)
+	{
+		$qry = "SELECT * FROM campus.tbl_dms  JOIN campus.tbl_dms_version USING(dms_id)
+				WHERE 1=1 ";
+				foreach($suchstring as $value)
+				$qry.=" AND (lower(beschreibung::text) like lower('%".$this->db_escape($value)."%')
+						OR lower (beschreibung::text) like lower ('%".$this->db_escape(htmlentities($value,ENT_NOQUOTES,'UTF-8'))."%'))";
+			$qry.= "AND version=(SELECT MAX(version) FROM campus.tbl_dms_version where dms_id=tbl_dms.dms_id)";			
+			
+		if(!is_null($limit) && is_numeric($limit))
+			$qry.=" LIMIT ".$limit;
+			
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new dms();
+				
+				$obj->dms_id = $row->dms_id;
+				$obj->version = $row->version; 
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->dokument_kurzbz = $row->dokument_kurzbz;
+				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
+				$obj->filename = $row->filename;
+				$obj->mimetype = $row->mimetype;
+				$obj->name = $row->name;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->letzterzugriff = $row->letzterzugriff;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				
+				$this->result[] = $obj;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
 	/**
 	 * 
 	 * lädt alle Versionen zu einer übergebenen ID

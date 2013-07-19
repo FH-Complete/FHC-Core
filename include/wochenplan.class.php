@@ -38,7 +38,7 @@ require_once(dirname(__FILE__).'/datum.class.php');
 require_once(dirname(__FILE__).'/zeitsperre.class.php');
 require_once(dirname(__FILE__).'/phrasen.class.php'); 
 require_once(dirname(__FILE__).'/globals.inc.php'); 
-require_once(dirname(__FILE__).'/sprache.class.php'); 
+require_once(dirname(__FILE__).'/sprache.class.php');
 
 class wochenplan extends basis_db
 {
@@ -407,9 +407,11 @@ class wochenplan extends basis_db
 		$sprache = getSprache(); 
 		$p=new phrasen($sprache); 
 		
-		echo '<TABLE width="100%" bgcolor="#EEEEEE" border="0" cellspacing="0">'.$this->crlf;
+		//$datum=mktime();
+		
+		echo '<TABLE width="100%" border="0" cellspacing="0">'.$this->crlf;
 		echo '	<TR>'.$this->crlf;
-		echo '		<TD valign="bottom">'.$this->crlf;
+		echo '		<TD style="padding-bottom: 5px;" valign="top">'.$this->crlf;
 		echo '			<P valign="top">';
 		if ($this->type=='student' || $this->type=='lektor')
 			echo '<strong>Person: </strong>'.$this->pers_titelpre.' '.$this->pers_vorname.' '.$this->pers_nachname.' '.$this->pers_titelpost.' - '.$this->pers_uid.'<br>';
@@ -424,9 +426,11 @@ class wochenplan extends basis_db
 			$this->link.='&stg_kz='.$this->stg_kz.'&sem='.$this->sem.'&ver='.$this->ver.'&grp='.$this->grp;
 		}
 		if ($this->type=='ort')
-			echo '<strong>'.$p->t('lvplan/raum').': </strong>'.(1==1 || is_file(RAUMINFO_PATH.trim($this->ort_kurzbz).'.html')?'<a href="'.RAUMINFO_PATH.trim($this->ort_kurzbz).'.html" target="_blank">'.$this->ort_kurzbz.'</a>':$this->ort_kurzbz).' - '.$this->ort_bezeichnung.' - '.($this->ort_max_person!=''?'( '.$this->ort_max_person.' Personen )':'').'<br>'.$this->ort_ausstattung.'<br>';
+			echo '<strong>'.$p->t('lvplan/raum').': </strong>'.(1==1 || is_file(RAUMINFO_PATH.trim($this->ort_kurzbz).'.html')?'<a href="'.RAUMINFO_PATH.trim($this->ort_kurzbz).'.html" target="_blank">'.$this->ort_kurzbz.'</a>':$this->ort_kurzbz).' - '.$this->ort_bezeichnung.' - '.($this->ort_max_person!=''?'( '.$this->ort_max_person.' Personen )':'').'<br>'.$this->ort_ausstattung;
 		echo '</P>'.$this->crlf;
-		echo '			<div valign="bottom" align="center">'.$this->crlf;
+		echo '			<table class="stdplan" style="width: auto; margin: auto;" valign="bottom" align="center">';
+		//echo '			<tr><td colspan="2" class="stdplan" style="padding:3px;" align="center">'.$p->t('lvplan/semesterplaene').'</td></tr>';
+		echo '			<tr><td  style="padding:3px 15px 0px 15px; margin: 0,0,20px,0;" align="center">'.$this->crlf;
 
 		//Kalender
 		$this->kal_link.='&pers_uid='.$this->pers_uid.'&ort_kurzbz='.$this->ort_kurzbz.'&stg_kz='.$this->stg_kz.'&sem='.$this->sem.'&ver='.$this->ver.'&grp='.$this->grp.'&gruppe_kurzbz='.$this->gruppe_kurzbz;
@@ -435,27 +439,30 @@ class wochenplan extends basis_db
 		$kal_link_ss=$this->kal_link.'&begin='.$this->studiensemester_next->start.'&ende='.$this->studiensemester_next->ende;
 		//echo '				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>'.$p->t('global/kalender').':&nbsp;&nbsp;&nbsp;</strong>'.$this->crlf;
 		echo 				$this->crlf;
-		echo '				'.$p->t('lvplan/uebersicht').':&nbsp;<A href="'.$kal_link_ws.'&format=html" target="_blank" title="HTML">'.$this->studiensemester_now->name.'</A>&nbsp;'.$this->crlf;
-		echo '				<A href="'.$kal_link_ws.'&format=html" target="_blank" title="HTML"><IMG src="../../../skin/images/html.png" height="36" alt="HTML" border="0"></A>'.$this->crlf;
-		echo '				<A href="'.$kal_link_ws.'&format=csv" title="CSV"><IMG src="../../../skin/images/csv.png" height="36" alt="CSV" border="0"></A>'.$this->crlf;
-		echo '				<A href="'.$kal_link_ws.'&format=csv&target=outlook" title="CSV-Outlook"><IMG src="../../../skin/images/outlook.png" height="36" alt="CSV-Outlook" border="0"></A>'.$this->crlf;
-		echo '				<A href="'.$kal_link_ws.'&format=ical&version=1&target=ical" title="iCal Version 1.0"><IMG src="../../../skin/images/ical1.0.png" height="36" alt="vCal Version 1.0" border="0"></A>'.$this->crlf;
-		echo '				<A href="'.$kal_link_ws.'&format=ical&version=2&target=ical" title="iCal Version 2.0"><IMG src="../../../skin/images/ical2.0.png" height="36" alt="vCal Version 2.0" border="0"></A>'.$this->crlf;
-		echo '				&nbsp;&nbsp;&nbsp;&nbsp;'.$p->t('lvplan/uebersicht').':&nbsp;<A href="'.$kal_link_ss.'&format=html" target="_blank" title="HTML">'.$this->studiensemester_next->name.'</A>&nbsp;'.$this->crlf;
-		echo '				<A href="'.$kal_link_ss.'&format=html" target="_blank" title="HTML"><IMG src="../../../skin/images/html.png" height="36" alt="HTML" border="0"></A>'.$this->crlf;
-		echo '				<A href="'.$kal_link_ss.'&format=csv" title="CSV"><IMG src="../../../skin/images/csv.png" height="36" alt="CSV" border="0"></A>'.$this->crlf;
-		echo '				<A href="'.$kal_link_ss.'&format=csv&target=outlook" title="CSV-Outlook"><IMG src="../../../skin/images/outlook.png" height="36" alt="CSV-Outlook" border="0"></A>'.$this->crlf;
-		echo '				<A href="'.$kal_link_ss.'&format=ical&version=1&target=ical" title="iCal Version 1.0"><IMG src="../../../skin/images/ical1.0.png" height="36" alt="iCal Version 1.0" border="0"></A>'.$this->crlf;
-		echo '				<A href="'.$kal_link_ss.'&format=ical&version=2&target=ical" title="iCal Version 2.0"><IMG src="../../../skin/images/ical2.0.png" height="36" alt="iCal Version 2.0" border="0"></A>'.$this->crlf;
-		echo '			</div>'.$this->crlf;
+		//echo '				'.$p->t('lvplan/uebersicht').':&nbsp;<A href="'.$kal_link_ws.'&format=html" target="_blank" title="HTML">'.$this->studiensemester_now->name.'</A>&nbsp;'.$this->crlf;
+		echo				$this->studiensemester_now->name.'<br>'.$this->crlf;
+		echo '				<A href="'.$kal_link_ws.'&format=html" target="_blank" title="HTML"><IMG src="../../../skin/images/html.png" height="30" alt="HTML" border="0"></A>'.$this->crlf;
+		echo '				<A href="'.$kal_link_ws.'&format=csv" title="CSV"><IMG src="../../../skin/images/csv.png" height="30" alt="CSV" border="0"></A>'.$this->crlf;
+		echo '				<A href="'.$kal_link_ws.'&format=csv&target=outlook" title="CSV-Outlook"><IMG src="../../../skin/images/outlook.png" height="30" alt="CSV-Outlook" border="0"></A>'.$this->crlf;
+		echo '				<A href="'.$kal_link_ws.'&format=ical&version=1&target=ical" title="iCal Version 1.0"><IMG src="../../../skin/images/ical1.0.png" height="30" alt="vCal Version 1.0" border="0"></A>'.$this->crlf;
+		echo '				<A href="'.$kal_link_ws.'&format=ical&version=2&target=ical" title="iCal Version 2.0"><IMG src="../../../skin/images/ical2.0.png" height="30" alt="vCal Version 2.0" border="0"></A>'.$this->crlf;
+		echo '				</td><td class="stdplan" style="padding:8px;" align="center">'.$p->t('lvplan/semesterplaene').'</td><td style="padding:3px 15px 0px 15px;" align="center">';
+		//echo '				&nbsp;&nbsp;&nbsp;&nbsp;'.$p->t('lvplan/uebersicht').':&nbsp;<A href="'.$kal_link_ss.'&format=html" target="_blank" title="HTML">'.$this->studiensemester_next->name.'</A>&nbsp;'.$this->crlf;
+		echo '				<span style="color:#999">'.$this->studiensemester_next->name.'</span><br>'.$this->crlf;
+		echo '				<A href="'.$kal_link_ss.'&format=html" target="_blank" title="HTML"><IMG src="../../../skin/images/html_light.png" height="30" alt="HTML" border="0"></A>'.$this->crlf;
+		echo '				<A href="'.$kal_link_ss.'&format=csv" title="CSV"><IMG src="../../../skin/images/csv_light.png" height="30" alt="CSV" border="0"></A>'.$this->crlf;
+		echo '				<A href="'.$kal_link_ss.'&format=csv&target=outlook" title="CSV-Outlook"><IMG src="../../../skin/images/outlook_light.png" height="30" alt="CSV-Outlook" border="0"></A>'.$this->crlf;
+		echo '				<A href="'.$kal_link_ss.'&format=ical&version=1&target=ical" title="iCal Version 1.0"><IMG src="../../../skin/images/ical1.0_light.png" height="30" alt="iCal Version 1.0" border="0"></A>'.$this->crlf;
+		echo '				<A href="'.$kal_link_ss.'&format=ical&version=2&target=ical" title="iCal Version 2.0"><IMG src="../../../skin/images/ical2.0_light.png" height="30" alt="iCal Version 2.0" border="0"></A>'.$this->crlf;
+		echo '			</td></tr></table>'.$this->crlf;
 		echo '		</TD>'.$this->crlf;
 
     	// Kalenderjump
-		echo '		<TD align="right" valign="top">'.$this->crlf;
-		jahreskalenderjump($this->link);
-		echo '		</TD>'.$this->crlf;
+		//echo '		<TD align="right" valign="top">'.$this->crlf;
+		//jahreskalenderjump($this->link);
+		//echo '		</TD>'.$this->crlf;
 		echo '	</TR>'.$this->crlf;
-		echo '</TABLE><HR>'.$this->crlf.$this->crlf;
+		echo '</TABLE>'.$this->crlf.$this->crlf;
 
 		// Jump Wochenweise
 		if ($this->type=='verband')
@@ -494,8 +501,8 @@ class wochenplan extends basis_db
 			//$datum=mktime($this->datum[hours], $this->datum[minutes], $this->datum[seconds], $this->datum[mon], $this->datum[mday], $this->datum[year]);
 			if (isset($prev_ort))
 			{
-				echo '		<a href="stpl_week.php?type='.$this->type.'&datum='.$this->datum.'&ort_kurzbz='.$prev_ort->ort_kurzbz.'">'.$this->crlf;
-				echo '			<img src="../../../skin/images/left.gif" border="0" title="'.$prev_ort->ort_kurzbz.'" />'.$this->crlf;
+				echo '		<a style="text-decoration:none" href="stpl_week.php?type='.$this->type.'&datum='.$this->datum.'&ort_kurzbz='.$prev_ort->ort_kurzbz.'">'.$this->crlf;
+				echo '		&nbsp;&nbsp;<img class="lvplanbutton" src="../../../skin/images/left_lvplan.png" title="'.$prev_ort->ort_kurzbz.'" />&nbsp;&nbsp;'.$this->crlf;
 				echo '		</a>'.$this->crlf;
 			}
 			echo "		<SELECT name=\"select\" onChange=\"MM_jumpMenu('self',this,0)\" class=\"xxxs_black\">".$this->crlf;
@@ -510,37 +517,46 @@ class wochenplan extends basis_db
 			echo '		</SELECT>'.$this->crlf;
 			if (isset($next_ort))
 			{
-				echo '		<a href="stpl_week.php?type='.$this->type.'&datum='.$this->datum.'&ort_kurzbz='.$next_ort->ort_kurzbz.'">'.$this->crlf;
-				echo '			<img src="../../../skin/images/right.gif" border="0" title="'.$next_ort->ort_kurzbz.'">'.$this->crlf;
+				echo '		<a style="text-decoration:none" href="stpl_week.php?type='.$this->type.'&datum='.$this->datum.'&ort_kurzbz='.$next_ort->ort_kurzbz.'">'.$this->crlf;
+				echo '		&nbsp;&nbsp;<img class="lvplanbutton" src="../../../skin/images/right_lvplan.png" title="'.$next_ort->ort_kurzbz.'">&nbsp;&nbsp;'.$this->crlf;
 				echo '		</a>'.$this->crlf;
 			}
 			echo '	</p>';
 			$link_parameter='&ort_kurzbz='.$this->ort_kurzbz;
 		}
-		echo '	<p align="center">';
+		echo '	<p style="color:grey; font-size:17px; vertical-align:center; margin-bottom:0px;" align="center">';
 		// 4 Wochen zurueck
-		echo '		<a href="stpl_week.php?type='.$this->type.$link_parameter.'&datum='.$this->datum_prev4week.'">'.$this->crlf;
-		echo '			<img src="../../../skin/images/moreleft.gif" border="0" title="4 Wochen zurueck">'.$this->crlf;
-		echo '		</a>';
+		echo '<a style="text-decoration:none" href="stpl_week.php?type='.$this->type;
+		echo $link_parameter;
+		echo '&datum='.$this->datum_prev4week.'">'.$this->crlf;
+		echo '<img class="lvplanbutton" src="../../../skin/images/moreleft_lvplan.png" title="'.$p->t('lvplan/vierWochenZurueck').'">'.$this->crlf;
+		echo '</a>';
 		// 1 Woche zurueck
-		echo '<a href="stpl_week.php?type='.$this->type;
+		echo '<a style="text-decoration:none" href="stpl_week.php?type='.$this->type;
 		echo $link_parameter;
 		echo '&datum='.$this->datum_prevweek;
-		echo '"><img src="../../../skin/images/left.gif" border="0"></a> KW '.$this->kalenderwoche;
+		echo '">&nbsp;&nbsp;<img class="lvplanbutton" src="../../../skin/images/left_lvplan.png" title="'.$p->t('lvplan/eineWocheZurueck').'">&nbsp;&nbsp;</a>';
+		// Aktuelle KW
+		echo '<a style="text-decoration:none" href="stpl_week.php?type='.$this->type;
+		echo $link_parameter;
+		echo '" title="Aktuelle KW">'.$p->t('eventkalender/kw').' '.$this->kalenderwoche;
+		echo '</a>';
 		// 1 Woche nach vor
-		echo '<a href="stpl_week.php?type='.$this->type;
+		echo '<a style="text-decoration:none" href="stpl_week.php?type='.$this->type;
 		echo $link_parameter;
 		echo '&datum='.$this->datum_nextweek;
-		echo '"><img src="../../../skin/images/right.gif" border="0"></a>';
+		echo '">&nbsp;&nbsp;<img class="lvplanbutton" src="../../../skin/images/right_lvplan.png" title="'.$p->t('lvplan/eineWocheVor').'">&nbsp;&nbsp;</a>';
 		// 4 Wochen nach vor
-		echo '<a href="stpl_week.php?type='.$this->type;
+		echo '<a style="text-decoration:none" href="stpl_week.php?type='.$this->type;
 		echo $link_parameter;
 		echo '&datum='.$this->datum_next4week;
-		echo '"><img src="../../../skin/images/moreright.gif" border="0"></a>';
+		echo '"><img class="lvplanbutton" src="../../../skin/images/moreright_lvplan.png" title="'.$p->t('lvplan/vierWochenVor').'"></a>';
         echo '</p>';
+        //Kalenderjump mit Hoverbox
+        jahreskalenderjump_hoverbox($this->link);
         return true;
 	}
-
+	
 	/**
 	 * Zeichnen der Stundenplanwoche in HTML
 	 */
@@ -565,7 +581,7 @@ class wochenplan extends basis_db
 			echo '<form name="reserve" method="post" action="stpl_week.php">'.$this->crlf;
 
 		//Tabelle zeichnen
-		echo '	<table class="stdplan" width="100%" border="1" cellpadding="0" cellspacing="0" name="Stundenplantabelle" align="center">'.$this->crlf;
+		echo '	<table class="stdplan" width="100%" border="0" cellpadding="1" cellspacing="1" name="Stundenplantabelle" align="center">'.$this->crlf;
 		// Kopfzeile darstellen
 	  	echo '<thead><tr>'.$this->crlf;
 		echo '			<th align="right">'.$p->t('global/stunde').'&nbsp;<br>'.$p->t('global/beginn').'&nbsp;<br>'.$p->t('global/ende').'&nbsp;</th>'.$this->crlf;
@@ -737,7 +753,7 @@ class wochenplan extends basis_db
 				}
 				else
 				{
-					echo '				<td align="center"><br>';
+					echo '				<td valign="center" align="center">';
 					$datum_res_lektor_start_m = date('Y-m-d', $datum_res_lektor_start);
 					$datum_res_lektor_ende_m = date('Y-m-d', $datum_res_lektor_ende);
 					$datum_m = date('Y-m-d',$datum);
@@ -752,7 +768,7 @@ class wochenplan extends basis_db
 		echo '	</tbody></table>'.$this->crlf;
 		if ($raumres && $this->type=='ort' && ($datum>=$datum_now && $datum>=$datum_res_lektor_start && $datum_mon<=$datum_res_lektor_ende))
 		{
-			echo '<table><tr>';
+			echo '<table><tr><br>';
 			echo '	<td>'.$p->t('global/titel').':</td><td><input onchange="if (this.value.length>0 && document.getElementById(\'beschreibung\').value.length<1) {document.getElementById(\'beschreibung\').value=document.getElementById(\'titel\').value;document.getElementById(\'beschreibung\').focus();};" type="text" id="titel"  name="titel" size="10" maxlength="10" value="" /></td> '.$this->crlf;
 			echo '	<td>'.$p->t('global/beschreibung').':</td><td colspan="6"> <input onchange="if (this.value.length<1 && document.getElementById(\'titel\').value.length>0) {alert(\'Achtung! Speichern nur mit Beschreibung moeglich!\');this.focus();};" type="text" id="beschreibung" name="beschreibung" size="20" maxlength="32" value=""  /> </td>'.$this->crlf;
 			
@@ -2253,28 +2269,34 @@ class wochenplan extends basis_db
 	}		
 }
 
-function jahreskalenderjump($link)
+function jahreskalenderjump_hoverbox($link)	//Mit Hoverbox Effekt
 {
 	$sprache = getSprache(); 
 	$p=new phrasen($sprache); 
-	
 	$crlf=crlf();
 	$datum=mktime();
 	$woche=kalenderwoche($datum);
-	$datum=montag($datum);
-	echo '			<SMALL><CENTER><B>'.$p->t('lvplan/springeZuKw').'</B><BR><SMALL>'.$crlf;
-	for ($anz=1;$anz<26;$anz++)
+	$wochenmontag=montag($datum);
+	
+	echo '<table align="center"><tr valign="top"><td>
+	<div class="hoverbox">
+		<div class="preview">
+			<img src="../../../skin/images/down_lvplan.png" border="0"/>
+			<div class="hoverbox_inhalt">
+				<table class="hoverbox"><tr>'.$crlf;
+	for ($anz=1;$anz<25;$anz++)
 	{
 		$linknew=$link.'&datum='.$datum;
 		if ($woche==53)
 			$woche=1;
-		echo '			<A HREF="'.$linknew.'">'.$woche.'</A>'.$crlf;
-		if ($anz%5==0)
-			echo '			<br>'.$crlf;
+		echo '			<td style="padding: 3px;" align="center"><A HREF="'.$linknew.'"><nobr>KW '.$woche.'</nobr><br>'.date('d.m', $wochenmontag).'</A></td>'.$crlf;
+		if ($anz%8==0)
+			echo '			</tr><tr align="center">'.$crlf;
 		$datum+=60*60*24*7;
 		$woche++;
+		$wochenmontag+=60*60*24*7;
 	}
-	echo '			</SMALL></CENTER></SMALL>'.$crlf;
+	echo '			</tr></table></div></div></div></tr></td></table>'.$crlf;
 }
-
+	
 ?>

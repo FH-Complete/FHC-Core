@@ -119,6 +119,42 @@ class service extends basis_db
 		}
 	}
 	
+	/**
+	 * Sucht ein Service
+	 * 
+	 * @param $suchstring
+	 */
+	public function search($suchstring)
+	{	
+		$qry = "SELECT * FROM public.tbl_service WHERE 1=1 ";	
+		foreach($suchstring as $value)
+			$qry.="AND (lower(beschreibung::text) like lower('%".$this->db_escape($value)."%')
+					OR lower(beschreibung::text) like lower('%".$this->db_escape(htmlentities($value,ENT_NOQUOTES,'UTF-8'))."%'))";
+		$qry.=" ORDER BY oe_kurzbz, bezeichnung";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new service();
+					
+				$obj->service_id = $row->service_id;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->ext_id = $row->ext_id;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+					
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg='Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
 	public function getServicesOrganisationseinheit($oe_kurzbz)
 	{	
 		$qry = 'SELECT 
