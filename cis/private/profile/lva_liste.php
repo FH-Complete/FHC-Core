@@ -30,6 +30,7 @@ require_once('../../../include/person.class.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../include/mail.class.php');
 require_once('../../../include/phrasen.class.php');
+require_once('../../../include/studiensemester.class.php');
 
 	if (!$db = new basis_db())
       die('Fehler beim Oeffnen der Datenbankverbindung');
@@ -37,6 +38,7 @@ require_once('../../../include/phrasen.class.php');
 	$adress=MAIL_ADMIN;
 
 	$user=get_uid();
+	$studiensemester = new studiensemester();
 
 	if (isset($_GET['uid']))
 		$uid=$_GET['uid'];
@@ -44,9 +46,11 @@ require_once('../../../include/phrasen.class.php');
 		$uid = $user;
 	if (isset($_GET['stdsem']))
 		$stdsem=$_GET['stdsem'];
+	else 
+		$stdsem=$studiensemester->getakt();
 
-	//Studiensemester abfragen.
-	$sql_query='SELECT * FROM public.tbl_studiensemester WHERE ende>=now() ORDER BY start';
+	//Studiensemester abfragen. Letzten 5, aktuelles und naechstes.
+	$sql_query='SELECT * FROM public.tbl_studiensemester WHERE (start<=(now()::date+240) AND ende>=(now()::date-900)) ORDER BY start';
 	$result_stdsem=$db->db_query($sql_query);
 	$num_rows_stdsem=$db->db_num_rows($result_stdsem);
 	if (!isset($stdsem))
@@ -74,6 +78,8 @@ require_once('../../../include/phrasen.class.php');
 			tbl_lehrfach.bezeichnung as lehrfach_bez,
 			tbl_lehreinheitmitarbeiter.semesterstunden as semesterstunden,
 			tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung,
+			tbl_lehreinheit.anmerkung as le_anmerkung,
+			tbl_lehreinheit.lehrform_kurzbz as le_lehrform_kurzbz,
 			(SELECT kurzbz FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid) as lektor
 		FROM 
 		lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) 
@@ -91,12 +97,33 @@ require_once('../../../include/phrasen.class.php');
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>'.$p->t('lvaliste/titel').'</title>
 		<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
+		<link rel="stylesheet" href="../../../skin/jquery.css" type="text/css"/>
+		<script type="text/javascript" src="../../../include/js/jquery.js"></script>
+		<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
 		<script language="Javascript">
 		<!--
 		function printhelp()
 		{
 			alert("'.$p->t('lvaliste/hilfeText').'");
 		}
+		$(document).ready(function() 
+		{ 
+			$("#t1").tablesorter(
+			{
+				sortList: [[4,0],[5,0],[2,0]],
+				widgets: ["zebra"]
+			}); 
+			$("#t2").tablesorter(
+			{
+				sortList: [[0,0],[1,0],[3,0]],
+				widgets: ["zebra"]
+			}); 
+			$("#t3").tablesorter(
+			{
+				sortList: [[0,0],[1,0],[3,0]],
+				widgets: ["zebra"]
+			}); 
+		});
 		-->
 		</script>
 	</head>
@@ -106,7 +133,10 @@ require_once('../../../include/phrasen.class.php');
 	for ($i=0;$i<$num_rows_stdsem;$i++)
 	{
 		$row=$db->db_fetch_object($result_stdsem);
-		echo '<A class="Item" href="lva_liste.php?uid='.$uid.'&stdsem='.$row->studiensemester_kurzbz.'">'.$row->studiensemester_kurzbz.'</A> - ';
+		if ($stdsem==$row->studiensemester_kurzbz)
+			echo '<strong><A class="Item" style="text-decoration: underline;" href="lva_liste.php?uid='.$uid.'&stdsem='.$row->studiensemester_kurzbz.'">'.$row->studiensemester_kurzbz.'</A></strong> - ';
+		else
+			echo '<A class="Item" href="lva_liste.php?uid='.$uid.'&stdsem='.$row->studiensemester_kurzbz.'">'.$row->studiensemester_kurzbz.'</A> - ';
 	}
 	echo '</td><td align="right">';
 	echo '<a href="#" onclick="printhelp()" class="Item">'.$p->t('lvaliste/hilfeAnzeigen').'</a>';
@@ -116,12 +146,12 @@ require_once('../../../include/phrasen.class.php');
 		
 		echo '<h3>'.$p->t('lvaliste/lehrveranstaltungen').'</h3>';
 		echo '
-		<table border="0">
-			<tr class="liste">
+		<table class="tablesorter" id="t1">
+			<thead>
+			<tr>
 				<th>'.$p->t('lvaliste/lehrfach').'</th>
 				<th>'.$p->t('lvaliste/lehrform').'</th>
-				<th>'.$p->t('lvaliste/lvBezeichnung').'</th>
-				<th>'.$p->t('lvaliste/lehrfachBezeichnung').'</th>
+				<th>'.$p->t('lvaliste/lvBezeichnung').'</th>				
 				<th>'.$p->t('lvaliste/lektor').'</th>
 				<th>'.$p->t('lvaliste/studiengang').'</th>
 				<th>'.$p->t('lvaliste/semester').'</th>
@@ -132,23 +162,26 @@ require_once('../../../include/phrasen.class.php');
 				<th>'.$p->t('lvaliste/wochenrythmus').'</th>
 				<th>'.$p->t('lvaliste/stunden').'</th>
 				<th>'.$p->t('lvaliste/kalenderwoche').'</th>
-				<th>'.$p->t('lvaliste/anmerkung').'</th>
-			</tr>';
+				<!--<th>'.$p->t('lvaliste/anmerkung').'</th> Lektoren sollen die Anmerkung dzt. nicht sehen, da nur für intern gedacht-->
+			</tr>
+			</thead><tbody>';
 		$stg_obj = new studiengang();
 		$stg_obj->getAll();
 		
 		for ($i=0; $i<$num_rows; $i++)
 		{
-			$zeile=$i % 2;
 			$row=$db->db_fetch_object($result);
 
-			echo '<tr class="liste'.$zeile.'">';
+			echo '<tr>';
 			echo '<td>'.$row->lehrfach.'</td>';
-			echo '<td>'.$row->lehrform_kurzbz.'</td>';	
-			echo '<td>'.$row->lv_bezeichnung.'</td>';			
-			echo '<td>'.$row->lehrfach_bez.'</td>';
+			echo '<td>'.$row->le_lehrform_kurzbz.'</td>';	
+			//echo '<td>'.$row->lv_bezeichnung.'</td>';
+			if ($row->lehrfach_bez!=$row->lv_bezeichnung)			
+				echo '<td>'.$row->lv_bezeichnung.' ('.$p->t('lvaliste/lehrfach').': '.$row->lehrfach_bez.')</td>';
+			else 
+				echo '<td>'.$row->lv_bezeichnung.'</td>';
 			echo '<td>'.$row->lektor.'</td>';
-			echo '<td>'.$row->stg_kurzbz.'</td>';
+			echo '<td><a href="mailto:'.$row->email.'">'.$row->stg_kurzbz.'</a></td>';
 			echo '<td>'.$row->semester.'</td>';
 			
 			$qry ="SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='".addslashes($row->lehreinheit_id)."'";
@@ -170,9 +203,10 @@ require_once('../../../include/phrasen.class.php');
 			echo '<td>'.$row->wochenrythmus.'</td>';
 			echo '<td>'.$row->semesterstunden.'</td>';
 			echo '<td>'.$row->start_kw.'</td>';
-			echo '<td>'.$row->anmerkung.'</td>';
+			//echo '<td>'.$row->le_anmerkung.'</td>'; Lektoren sollen die Anmerkung dzt. nicht sehen, da nur für intern gedacht
 			echo '</tr>';
 		}
+		echo '</tbody>';
 		echo '</table>';
 	}
 	else
@@ -186,14 +220,16 @@ require_once('../../../include/phrasen.class.php');
 	$qry = "SELECT 
 				tbl_lehrveranstaltung.bezeichnung, tbl_projektarbeit.titel, 
 				(SELECT nachname || ' ' || vorname FROM public.tbl_benutzer JOIN public.tbl_person USING(person_id) 
-				 WHERE uid=student_uid) as student, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester
+				 WHERE uid=student_uid) as student, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester,
+				 tbl_studiengang.email
 			FROM 
-				lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektarbeit, lehre.tbl_projektbetreuer
+				lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektarbeit, lehre.tbl_projektbetreuer, public.tbl_studiengang
 			WHERE
 				tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND
 				tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
 				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stdsem)."' AND
 				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
+				tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz AND
 				tbl_projektbetreuer.person_id='".addslashes($mitarbeiter->person_id)."'";
 	
 	$stg_obj = new studiengang();
@@ -204,29 +240,26 @@ require_once('../../../include/phrasen.class.php');
 		if($db->db_num_rows($result)>0)
 		{
 			echo '<H3>'.$p->t('lvaliste/betreuungen').'</H3>';
-			echo '<table>';
-			echo '<tr class="liste">';
+			echo '<table class="tablesorter" id="t2">';
+			echo '<thead><tr>';
 			echo '<th>'.$p->t('lvaliste/studiengang').'</th>';
 			echo '<th>'.$p->t('lvaliste/semester').'</th>';
 			echo '<th>'.$p->t('lvaliste/lvBezeichnung').'</th>';
 			echo '<th>'.$p->t('lvaliste/student').'</th>';
 			echo '<th>'.$p->t('lvaliste/titelProjektarbeit').'</th>';
-			echo '</tr>';
-			$i=0;
+			echo '</tr></thead><tbody>';
 			while($row = $db->db_fetch_object($result))
 			{
-				echo '<tr class="liste'.($i%2).'">';
-				
-				echo '<td>'.$stg_obj->kuerzel_arr[$row->studiengang_kz].'</td>';
+				echo '<tr>';				
+				echo '<td><a href="mailto:'.$row->email.'">'.$stg_obj->kuerzel_arr[$row->studiengang_kz].'</a></td>';
 				echo '<td>'.$row->semester.'</td>';
 				echo '<td>'.$row->bezeichnung.'</td>';
 				echo '<td>'.$row->student.'</td>';
 				echo '<td>'.$row->titel.'</td>';
 				
 				echo '</tr>';
-				$i++;
 			}
-			echo '</table>';
+			echo '</tbody></table>';
 		}
 	}
 	
@@ -236,11 +269,13 @@ require_once('../../../include/phrasen.class.php');
 	$qry = "SELECT 
 				distinct
 				tbl_lehrveranstaltung.studiengang_kz, tbl_lehrfach.fachbereich_kurzbz, tbl_lehrveranstaltung.bezeichnung, 
-				tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.semester,tbl_lehrveranstaltung.koordinator
+				tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.semester,tbl_lehrveranstaltung.koordinator,
+				tbl_studiengang.email
 			FROM 
 				lehre.tbl_lehrveranstaltung, 
 				lehre.tbl_lehreinheit,
-				lehre.tbl_lehrfach
+				lehre.tbl_lehrfach,
+				public.tbl_studiengang
 			WHERE
 				tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
@@ -252,7 +287,8 @@ require_once('../../../include/phrasen.class.php');
 									 										  WHERE funktion_kurzbz='fbk' AND uid='".addslashes($uid)."' 
 														  					and ( tbl_benutzerfunktion.datum_bis is null or now() between tbl_benutzerfunktion.datum_von and tbl_benutzerfunktion.datum_bis )
 																			))
-				 )
+				 ) AND
+				 tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz
 				 order by tbl_lehrveranstaltung.studiengang_kz,tbl_lehrveranstaltung.semester ,tbl_lehrveranstaltung.bezeichnung
 				 ";
 				 
@@ -262,15 +298,14 @@ require_once('../../../include/phrasen.class.php');
 		if($db->db_num_rows($result)>0)
 		{
 			echo '<H3>'.$p->t('lvaliste/koordination').'</H3>';
-			echo '<table>';
-			echo '<tr class="liste">';
+			echo '<table class="tablesorter" id="t3">';
+			echo '<thead><tr>';
 			echo '<th>'.$p->t('lvaliste/studiengang').'</th>';
 			echo '<th>'.$p->t('lvaliste/semester').'</th>';
 			echo '<th>'.$p->t('lvaliste/institut').'</th>';
 			echo '<th>'.$p->t('lvaliste/lvBezeichnung').'</th>';
 			echo '<th>'.$p->t('lvaliste/lektor').'</th>';
-			echo '</tr>';
-			$i=0;
+			echo '</tr></thead><tbody>';
 			while($row = $db->db_fetch_object($result))
 			{
 				//Fachbereichskoordinatoren holen
@@ -298,19 +333,18 @@ require_once('../../../include/phrasen.class.php');
 					}
 				}
 					
-				echo '<tr valign="top" class="liste'.($i%2).'">';
-					echo '<td>'.$stg_obj->kuerzel_arr[$row->studiengang_kz].'</td>';
+				echo '<tr>';
+					echo '<td><a href="mailto:'.$row->email.'">'.$stg_obj->kuerzel_arr[$row->studiengang_kz].'</a></td>';
 					echo '<td>'.$row->semester.'</td>';
 					echo '<td>'.$row->fachbereich_kurzbz.'</td>';
 					echo '<td>'.$row->bezeichnung.'</td>';
 					echo '<td>'.$lektoren.'</td>';
 				echo '</tr>';
-				$i++;
 			}
-			echo '</table>';
+			echo '</tbody></table>';
 		}
 	}
-echo '<BR>'.$p->t('lvaliste/fehlerAnStudiengang').'<BR>';
+echo '<BR>'.$p->t('lvaliste/fehlerAnStudiengang').'<BR><BR><BR>';
 ?>
 </body>
 </html>

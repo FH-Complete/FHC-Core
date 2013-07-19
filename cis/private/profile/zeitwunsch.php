@@ -114,6 +114,8 @@ if(!$person->load($uid))
 		<title><?php echo $p->t('zeitwunsch/zeitwunsch');?></title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
+		<link href="../../../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />
+		<script src="../../../include/js/flexcroll.js" type="text/javascript" ></script>
 		<script type="text/javascript">
 		// Pruefen ob nur die erlaubten Werte verwendet wurden
 		function checkvalues()
@@ -142,14 +144,11 @@ if(!$person->load($uid))
 	</head>
 
 	<body>
-	<table class="tabcontent">
-	  <tr>
-	    <td class="tdwidth10">&nbsp;</td>
-	
+	<div class="flexcroll" style="outline: none;">
+	<table>
+	  <tr>	
 	    <td>
-	    <table class="tabcontent">
-	      <tr>
-			<td class="ContentHeader" width="95%"><font class="ContentHeader">&nbsp;<?php echo $p->t('zeitwunsch/zeitwunsch');?></font></td>
+	    <h1><?php echo $p->t('zeitwunsch/zeitwunsch');?></h1>
 <!--Auskommentiert von Kindl, da sich der Hilfetext nicht vom Anleitungtext auf der Seite unterscheidet	
 				<td class="ContentHeader" align="right">
 				<A onclick="window.open('zeitwunsch_help.php','Hilfe', 'height=320,width=480,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');" class="hilfe" target="_blank">
@@ -158,10 +157,8 @@ if(!$person->load($uid))
 				</font>
 				</A>
 			</td>-->
-		  </tr>
-		</table>
 		<?php
-			echo "<H3>".$p->t('zeitwunsch/zeitwunschVon')." $person->titelpre $person->vorname $person->nachname $person->titelpost<br/></H3>";
+			echo "<h2>".$p->t('zeitwunsch/zeitwunschVon')." $person->titelpre $person->vorname $person->nachname $person->titelpost<br/></h2>";
 			echo $p->t('zeitwunsch/tragenSieInDiesesNormwochenraster')."<br/><br/>";
 			echo '<FORM name="zeitwunsch" method="post" action="zeitwunsch.php?type=save" onsubmit="return checkvalues()">
   				<TABLE>
@@ -198,7 +195,7 @@ if(!$person->load($uid))
 			}
 			
 			echo '
-			</TABLE>
+			</TABLE><br>
 			<INPUT type="hidden" name="uid" value="'.$uid.'">
 			<INPUT type="submit" name="Abschicken" value="'.$p->t('global/speichern').'">
 			';
@@ -215,7 +212,7 @@ if(!$person->load($uid))
 			echo $p->t('zeitwunsch/formularZumEintragenDerZeitsperren', array($href));
 			?>
 			</a>
-			<H3><?php echo $p->t('zeitwunsch/erklärung');?>:</H3>
+			<h3><?php echo $p->t('zeitwunsch/erklärung');?>:</h3>
 			<P><?php echo $p->t('zeitwunsch/kontrollierenSieIhreZeitwuensche');?>!<BR><BR>
 			</P>
 			<TABLE align=center>
@@ -256,10 +253,9 @@ if(!$person->load($uid))
 			    <TD>&nbsp;&nbsp;<?php echo $p->t('zeitwunsch/hierAufGarKeinenFall');?></TD>
 			  </TR>
 			</TABLE>
-			<P>&nbsp;</P>
-			<H3><?php echo $p->t('zeitwunsch/folgendePunkteSindZuBeachten');?>:</H3>
+			<h2><?php echo $p->t('zeitwunsch/folgendePunkteSindZuBeachten');?>:</h2>
 			<OL>
-			  <LI> <?php echo $p->t('zeitwunsch/verwendenSieDenWertNur');?></LI>
+			  <LI><?php echo $p->t('zeitwunsch/verwendenSieDenWertNur');?></LI>
 			  <LI><?php echo $p->t('zeitwunsch/sperrenSieNurTermine');?></LI>
 			  <LI><?php echo $p->t('zeitwunsch/esSolltenFuerJedeStunde');?></LI>
 			</OL>
@@ -267,5 +263,6 @@ if(!$person->load($uid))
 			</td>
 		</tr>
 	</table>
+	</div>
 	</body>
 </html>

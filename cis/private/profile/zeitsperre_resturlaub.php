@@ -78,6 +78,8 @@ $num_rows_stunde=$db->db_num_rows($result_stunde);
 <title><?php echo $p->t('zeitsperre/zeitsperre');?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
+<link href="../../../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />
+<script src="../../../include/js/flexcroll.js" type="text/javascript" ></script>
 <script language="Javascript">
 function conf_del()
 {
@@ -156,6 +158,7 @@ function checkdatum()
 </head>
 
 <body id="inhalt">
+<div class="flexcroll" style="outline: none;">
 <!--<H2><table class="tabcontent">
 	<tr>
 	<td>
@@ -166,15 +169,10 @@ function checkdatum()
 	</tr>
 	</table>
 </H2>-->
-<table class="tabcontent" id="inhalt">
+<table id="inhalt">
   <tr>
-    <td class="tdwidth10">&nbsp;</td>
     <td>
-    <table class="tabcontent">
-      <tr>
-		<td class="ContentHeader"><font class="ContentHeader">&nbsp;<?php echo $p->t('zeitsperre/zeitsperren');?></font></td>
-	  </tr>
-	</table>
+	<h1><?php echo $p->t('zeitsperre/zeitsperren');?></h1>
 	<br>
 
 <!-- ************* ZEITSPERREN *****************-->
@@ -639,5 +637,6 @@ echo '</table>';
 
 ?>
 </td></tr></table>
+</div>
 <body>
 </html>
