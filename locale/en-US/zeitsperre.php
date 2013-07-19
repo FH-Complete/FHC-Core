@@ -36,4 +36,5 @@ $this->phrasen['zeitsperre/monat']='Month';
 $this->phrasen['zeitsperre/tag']='Day';
 $this->phrasen['zeitsperre/urlaubBereitsEingetragen']='A vacation entry already exists in the specified period.';
 $this->phrasen['zeitsperre/beschreibungSieheCisHandbuch']='For description see CIS-manual';
+$this->phrasen['zeitsperre/anzahlTage']='Number of days';
 ?>

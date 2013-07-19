@@ -1,13 +1,13 @@
 <?php
 $this->phrasen['lvaliste/titel']='Lehrveranstaltungsübersicht';
-$this->phrasen['lvaliste/hilfeText']='Erklärung\n\nStg-Sem: Studiengang-Semester\nGruppen: Teilnehmende Studentengruppen\nBlock: blockung (1->Einzelstunden; 2->Doppelstunden; ...)\nWR: Wochenrhythmus (1->jede Woche; 2->jede 2. Woche; ...)\nStd: gesamte Semesterstunden\nKW: Kalenderwoche in der die Lehrveranstaltung startet';
+$this->phrasen['lvaliste/hilfeText']='Erklärung\n\nStg-Sem: Studiengang-Semester\nGruppen: Teilnehmende Gruppen\nBlock: Blockung (1->Einzelstunden; 2->Doppelstunden; ...)\nWR: Wochenrhythmus (1->jede Woche; 2->jede 2. Woche; ...)\nStd: gesamte Semesterstunden\nKW: Kalenderwoche in der die Lehrveranstaltung startet';
 $this->phrasen['lvaliste/hilfeAnzeigen']='Hilfe anzeigen';
 
 $this->phrasen['lvaliste/lehrfach']='Lehrfach';
 $this->phrasen['lvaliste/lehrform']='Lehrform';
 $this->phrasen['lvaliste/lvBezeichnung']='LV Bezeichnung';
 $this->phrasen['lvaliste/lehrfachBezeichnung']='Lehrfach Bezeichnung';
-$this->phrasen['lvaliste/lektor']='Lektor';
+$this->phrasen['lvaliste/lektor']='LektorIn';
 $this->phrasen['lvaliste/studiengang']='Stg';
 $this->phrasen['lvaliste/semester']='Sem';
 $this->phrasen['lvaliste/gruppen']='Gruppen';
@@ -18,7 +18,7 @@ $this->phrasen['lvaliste/wochenrythmus']='WR';
 $this->phrasen['lvaliste/stunden']='Std';
 $this->phrasen['lvaliste/kalenderwoche']='KW';
 $this->phrasen['lvaliste/anmerkung']='Anmerkung';
-$this->phrasen['lvaliste/student']='Student';
+$this->phrasen['lvaliste/student']='StudentIn';
 $this->phrasen['lvaliste/titelProjektarbeit']='Titel der Projektarbeit';
 $this->phrasen['lvaliste/institut']='Institut';
 

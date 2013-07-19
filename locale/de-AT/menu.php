@@ -6,5 +6,5 @@ $this->phrasen['menu/fixelektoren']='Fixe Lektoren';
 $this->phrasen['menu/organisationseinheit']='Organisationseinheit';
 $this->phrasen['menu/lektoren']='Lektoren';
 $this->phrasen['menu/urlaubAlle']='Alle';
-
+$this->phrasen['menu/suchePersonOrtDokumentInhalt']='Suche Person / Ort / Dokument / Inhalt';
 ?>
