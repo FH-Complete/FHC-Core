@@ -89,6 +89,8 @@ if (isset($_GET["handbuch"])){
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
+	<script type="text/javascript" src="../../../include/js/flexcroll.js"></script>
+	<link href="../../../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />
 	<style type="text/css">
 	.transparent {
 	    filter:alpha(opacity=90);
@@ -109,6 +111,7 @@ if (isset($_GET["handbuch"])){
 	</script>   
 </head>
 <body>
+<div class="flexcroll" style="outline: none;">
 <div id="semplanhelp" style="position:absolute; top:200px; left:200px; width:500px; height:250px; background-color:#cccccc; visibility:hidden; border-style:solid; border-width:1px; border-color:#333333;" class="transparent">
 <table width="100%">
 <tr><td valign="top"><h2>&nbsp;Erstellung des Semesterplanes</h2></td><td align="right" valign="top"><a href="#" onclick="hideSemPlanHelp();">X</a>&nbsp;</td></tr>
@@ -130,7 +133,7 @@ if (isset($_GET["handbuch"])){
 <table class="tabcontent" height="100%" id="inhalt">
 	<tr>
 		<td class="tdwidth10">&nbsp;</td>
-		<td class="ContentHeader"><font class="ContentHeader">&nbsp;
+		<td><h1>
 		<?php
 		echo $lv_obj->bezeichnung_arr[$sprache].' '.$lv_obj->lehrform_kurzbz.' / '.$kurzbz.'-'.$semester.' '.$lv_obj->orgform_kurzbz;
 
@@ -143,10 +146,10 @@ if (isset($_GET["handbuch"])){
 			$angezeigtes_stsem = $stsem->getNearest($semester);
 						
 	    echo "&nbsp;($angezeigtes_stsem)";
-	    echo '</font></td>
+	    echo '</h1></td>
               </tr>
               <tr>
-              <td class="tdvertical">&nbsp;</td>
+              <td>&nbsp;</td>
               <td>';
 
 	    $qry = "SELECT * FROM (SELECT distinct on(uid) vorname, nachname, tbl_benutzer.uid as uid, 
@@ -187,7 +190,7 @@ if (isset($_GET["handbuch"])){
 						$style='style="font-weight: bold"';
 					else 
 						$style='';
-					echo '<a class="Item2" href="mailto:'.$row_lector->uid.'@'.DOMAIN.'" '.$style.'>'.$row_lector->vorname.' '.$row_lector->nachname.'</a>';
+					echo '<a href="mailto:'.$row_lector->uid.'@'.DOMAIN.'" '.$style.'>'.$row_lector->vorname.' '.$row_lector->nachname.'</a>';
 					if($i!=$num_rows_result)
 						echo ', ';
 				}
@@ -218,12 +221,12 @@ if (isset($_GET["handbuch"])){
 		?></td>
 	</tr>
 	<tr>
-		<td class="tdvertical">&nbsp;</td>
-		<td class="tdvertical">&nbsp;</td>
+		<td >&nbsp;</td>
+		<td >&nbsp;</td>
 	</tr>
 	<tr>
-		<td class="tdvertical">&nbsp;</td>
-		<td class="tdvertical">
+		<td >&nbsp;</td>
+		<td >
 		<?php
 		require_once('../../../include/'.EXT_FKT_PATH.'/cis_menu_lv.inc.php');
 		?>
@@ -231,5 +234,6 @@ if (isset($_GET["handbuch"])){
 		<td class="tdwidth30">&nbsp;</td>
 	</tr>
 </table>
+</div>
 </body>
 </html>

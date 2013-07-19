@@ -77,7 +77,6 @@ $error = '';
 if(!check_student($user))
 {
 	$error .= $p->t('tools/mussAlsStudentEingeloggtSein');
-	echo $error;
 }
 else
 {
