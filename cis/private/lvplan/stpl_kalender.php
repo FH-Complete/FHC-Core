@@ -163,7 +163,8 @@ else
 	echo '<head>';
 	echo '<title>'.$p->t('global/kalender').'</title>';
 	echo '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">';
-	echo '<link rel="stylesheet" href="../../../skin/cis.css" type="text/css">';
+	echo '<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">';
+	echo '<link rel="stylesheet" media="print" href="../../../skin/cis.css" type="text/css">';
 	echo '<link rel="stylesheet" type="text/css" media="print" href="../../../skin/print.css" />';
 	echo '</head>';
 	echo '<body id="inhalt">';
