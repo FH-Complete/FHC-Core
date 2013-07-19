@@ -24,6 +24,7 @@
  */
 
 require_once(dirname(__FILE__).'/../../include/basis_db.class.php');
+require_once(dirname(__FILE__).'/../../include/functions.inc.php');
 
 class menu_addon extends basis_db
 {
@@ -79,14 +80,15 @@ class menu_addon extends basis_db
 		$content = $includeparams['content'];
 		
 		if($this->link)
-			DrawLink($this->linkitem['link'],$this->linkitem['target'],$this->linkitem['name'],$this->linkitem['content_id']);
-		echo '
-			<table class="tabcontent" id="Content'.$content->content_id.'" style="display: '.($content->menu_open?'visible':'none').'"><tr><td>';
+			($content->menu_open?(DrawLink($this->linkitem['link'],$this->linkitem['target'],$this->linkitem['name'],$this->linkitem['content_id'])):'');
+			//Wenn Option "Menü öffen" angeklickt ist, erschein die Überschrift, sonst nicht -> Ist eine Pfusch-Lösung. Was kann man sonst machen damit Überschrift "Meine LV" nicht angezeigt wird?
+		//echo '
+			//<table class="tabcontent" id="Content'.$content->content_id.'" style="display: '.($content->menu_open?'visible':'none').'"><tr><td>';
 		
 		$this->outputBlock();
 		$this->outputItems();
 		
-		echo '</td></tr></table>';
+		//echo '</td></tr></table>';
 	}
 	
 	/**
@@ -95,13 +97,20 @@ class menu_addon extends basis_db
 	 */
 	public function outputItems()
 	{
+		$user = get_uid();
+		$is_lector=check_lektor($user);
+		
+		$sprache = getSprache(); 
+		$p=new phrasen($sprache);
+		
 		if(count($this->items)>0)
 		{
-			echo '<ul style="margin-top: 0px; margin-bottom: 0px;">';
+			echo '<ul>';
+			
 			foreach($this->items as $row)
 			{
-				echo '<li>
-					<a class="Item2" title="'.$row['title'].'" href="'.$row['link'].'" target="'.$row['target'].'">'.$row['name'].'</a>
+				echo '<li style="margin:0px;">
+					<a class="item2 " title="'.$row['title'].'" href="'.$row['link'].'" target="'.$row['target'].'">'.$row['name'].'</a>
 					</li>';
 			}
 			echo '</ul>';

@@ -115,34 +115,24 @@ function drawEntry($item)
 
 	if(isset($childsobject[$item->content_id]) && count($childsobject[$item->content_id])>0)
 	{
+		echo "\n<li>";
 		// Eintrag hat Untermenue -> Aufklappbar machen
-		echo '
-		<tr>
-			<td class="tdwidth10" nowrap>&nbsp;</td>
-			<td class="tdwrap">';
 		if($item->template_kurzbz=='include')
 			IncludeMenuAddon($item);
 		elseif($item->template_kurzbz=='redirect')
 			Redirect($item, $item->content_id);
 		else
-			DrawLink(APP_ROOT.'cms/content.php?content_id='.$item->content_id,'content',$item->titel, $item->content_id);
-			
-		echo '
-			<table class="menue" id="Content'.$item->content_id.'" style="display: '.($item->menu_open?'visible':'none').'">';
-			
+			DrawLink(APP_ROOT.'cms/content.php?content_id='.$item->content_id,'content',$item->titel, $item->content_id, $item->menu_open);
+
+		echo "\n<ul class=\"menu\">";
 		drawSubmenu1($item->content_id);
-		echo '
-				</table>
-			</td>
-		</tr>';
+		echo "\n</ul>";
+		echo "\n</li>";
 	}
 	else
 	{
 		// Normaler Eintrag ohne Untermenue
-		echo '
-		<tr>
-		  	<td class="tdwidth10" nowrap>&nbsp;</td>
-			<td class="tdwrap">';
+		echo "\n<li>";
 		if($item->template_kurzbz=='include')
 			IncludeMenuAddon($item);
 		elseif($item->template_kurzbz=='redirect')
@@ -150,9 +140,7 @@ function drawEntry($item)
 		else
 			DrawLink(APP_ROOT.'cms/content.php?content_id='.$item->content_id,'content',$item->titel);
 			
-		echo '
-			</td>
-		</tr>';
+		echo "</li>";
 	}
 }
 
@@ -163,18 +151,16 @@ function drawEntry($item)
  * @param $name Anzeigename
  * @param $content_id Wenn die Content_id uebergeben wird, oeffnet der Klick das Submenu
  */
-function DrawLink($link, $target, $name, $content_id=null)
+function DrawLink($link, $target, $name, $content_id=null, $open=null)
 {
 	if($target=='')
 		$target='content';
 	
-	if(!is_null($content_id))
-		$class = 'class="MenuItem" onClick="js_toggle_container(\'Content'.$content_id.'\');"';
+	if($open)
+		$class='class="selected"';
 	else
-		$class='class="Item"';
-	
-	echo '<a '.$class.' href="'.$link.'" target="'.$target.'"><img src="../skin/images/menu_item.gif" alt="menu item" width="7" height="9">&nbsp;'.$name.'</a>';
-		
+		$class='';
+	echo '<a '.$class.' href="'.$link.'" target="'.$target.'" title="'.$name.'">'.$name.'</a>';
 }
 
 /**
@@ -212,7 +198,7 @@ function Redirect($content, $content_id_Submenu=null)
 	else
 		$target='';
 		
-	DrawLink($url, $target, $content->titel, $content_id_Submenu);
+	DrawLink($url, $target, $content->titel, $content_id_Submenu, $content->menu_open);
 }
 
 /**
