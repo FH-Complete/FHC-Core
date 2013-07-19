@@ -373,20 +373,27 @@ class ort extends basis_db
 	}
 	
 	/**
-	 * Sucht nach einem Ort
+	 * Sucht nach einem Ort. Wenn aktiv-parameter true, dann nur aktive. Wenn lehre-parameter true, dann nur lehre
 	 * @return true wenn ok, false im Fehlerfall
+	 * 
+	 * @param aktiv (optional)
+	 * @param lehre (optional)
 	 */
-	public function filter($filter)
+	public function filter($filter, $aktiv=false, $lehre=false)
 	{
 		$qry = "
 			SELECT 
 				* 
 			FROM
 				public.tbl_ort 
-			WHERE 
+			WHERE (
 				lower(ort_kurzbz) like '%".$this->db_escape(mb_strtolower($filter))."%'
-				OR lower(bezeichnung) like '%".$this->db_escape(mb_strtolower($filter))."%'
-			ORDER BY ort_kurzbz;";
+				OR lower(bezeichnung) like '%".$this->db_escape(mb_strtolower($filter))."%')";
+			if ($aktiv==true)
+				$qry.= " AND aktiv=true";
+			if ($lehre==true)
+				$qry.= " AND lehre=true";
+			$qry.= " ORDER BY ort_kurzbz;";
 
 		if(!$this->db_query($qry))
 		{
@@ -412,7 +419,7 @@ class ort extends basis_db
 			$ort_obj->stockwerk			= $row->stockwerk;
 			$ort_obj->standort_id		= $row->standort_id;
 			$ort_obj->telefonklappe		= $row->telefonklappe;
-			$ort_obj->content_id		= $row->content_id;
+			//$ort_obj->content_id		= $row->content_id;
 
 			$this->result[] = $ort_obj;
 		}

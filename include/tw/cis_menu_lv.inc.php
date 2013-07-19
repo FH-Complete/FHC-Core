@@ -31,7 +31,7 @@
 		<?php
 
 		//Lehrveranstaltungsinformation
-		   echo "<img src=\"../../../skin/images/button_i.jpg\" width=\"67\" height=\"45\"><br><strong>".$p->t('lehre/lehrveranstaltungsinformation')."</strong><br>";
+		   echo "<img class=\"lv\" src=\"../../../skin/images/button_lvinfo.png\"><strong><br>".$p->t('lehre/lehrveranstaltungsinformation')."</strong><br>";
 		   $qry = "SELECT * FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id='".addslashes($lvid)."' AND genehmigt=true AND sprache='German' AND aktiv=true";
 		   $need_br=false;
 
@@ -62,7 +62,7 @@
 		   }
 		?>
 
-    <p>&nbsp;</p>
+    
 		</td>
 	    <td class="tdvertical" align="center">
 		  <?php
@@ -122,13 +122,13 @@
 			if(isset($dir_empty) && $dir_empty == false)
 			{
 				echo '<a href="'.$dest_dir->path.'/" target="_blank">';
-				echo '<img src="../../../skin/images/button_semplan.jpg" width="67" height="45"><br>';
+				echo '<img class="lv" src="../../../skin/images/button_semplan.png"><br>';
 				echo '<strong>'.$p->t('lehre/semesterplan').'</strong>';
 				echo '</a>';
 			}
 			else
 			{
-				echo '<img src="../../../skin/images/button_semplan.jpg" width="67" height="45"><br>';
+				echo '<img class="lv" src="../../../skin/images/button_semplan.png"><br>';
 				echo '<strong>'.$p->t('lehre/semesterplan').'</strong>';
 			}
 
@@ -149,7 +149,7 @@
 
 
 	    ?>
-		  <p>&nbsp;</p>
+		  
 		</td>
 		<td class="tdvertical" align="center">
 		<?php
@@ -199,13 +199,13 @@
 			if(isset($dir_empty) && $dir_empty == false)
 			{
 				echo '<a href="'.$dest_dir->path.'/" target="_blank" class="Item">';
-				echo '<img src="../../../skin/images/button_dl.jpg" width="67" height="45"><br>';
+				echo '<img class="lv" src="../../../skin/images/button_download.png"><br>';
 				echo '<strong>'.$p->t('lehre/download').'</strong>';
 				echo '</a>';
 			}
 			else
 			{
-				echo '<img src="../../../skin/images/button_dl.jpg" width="67" height="45"><br>';
+				echo '<img class="lv" src="../../../skin/images/button_download.png"><br>';
 				echo '<strong>'.$p->t('lehre/download').'</strong>';
 			}
 			
@@ -224,7 +224,7 @@
 					echo $p->t('lehre/ziparchiv');
 			}
 	    ?>
-	      <p>&nbsp;</p>
+	      
 	    </td>
 	    <td>
 	    </td>
@@ -234,7 +234,7 @@
   <td class="tdvertical" align="center">
 
   <?php
-    echo '<img src="../../../skin/images/button_lb.jpg" width="67" height="45"><br>';
+    echo '<img class="lv" src="../../../skin/images/button_listen.png"><br>';
   	if($is_lector)
   	{
 		//Anwesenheitsliste
@@ -296,7 +296,7 @@
 	}
    ?>
 
-  <p>&nbsp;</p>
+  
 	  </td>
 	  <td class="tdvertical" align="center">
 		<?php
@@ -304,22 +304,22 @@
 		if($studiengang_kz!='0')
 		{
 			echo '<a href="news://news.technikum-wien.at/'.mb_strtolower($stg_obj->kurzbzlang).'.'.$semester.'sem.'.mb_strtolower($short_short_name).'" class="Item">
-					<img src="../../../skin/images/button_ng.jpg" width="67" height="45"><br>
+					<img class="lv" src="../../../skin/images/button_newsgroups.png"><br>
 					<strong>'.$p->t('lehre/newsgroups').'</strong>
 				</a>';
 		}
 		?>
-		<p>&nbsp;</p>
+		
 		</td>
 		
 		
 		  <td class="tdvertical" align="center">
 		<?php
 		//FEEDBACK
-		echo '<a href="feedback.php?lvid='.$lvid.'" target="_blank" class="Item"><img border="0" src="../../../skin/images/button_fb.jpg" width="67" height="45"><br><strong>'.$p->t('lehre/feedback').'</strong></a>';
+		echo '<a href="feedback.php?lvid='.$lvid.'" target="_blank" class="Item"><img class="lv" src="../../../skin/images/button_feedback.png"><br><strong>'.$p->t('lehre/feedback').'</strong></a>';
 		?>
 
-		<p>&nbsp;</p>
+		
 		</td>
 	</tr>
 	<tr>
@@ -368,7 +368,7 @@
 				$studiensem = '';
 		
 				echo '<a href="benotungstool/verwaltung.php?lvid='.$lvid.$studiensem.'" class="Item">
-	    			<img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
+	    			<img class="lv" src="../../../skin/images/button_kreuzerltool.png"><br>
 	    			<strong>'.$p->t('lehre/kreuzerltool').'</strong></a><br>
 	    			<a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/benotungstoolHandbuch').'" class="Item" target="_blank">'.$p->t('lehre/benotungstoolHandbuch').' [PDF]</a>';
 		} 
@@ -380,7 +380,7 @@
 				$studiensem = '';
 
 			echo '<a href="benotungstool/studentenansicht.php?lvid='.$lvid.$studiensem.'" class="Item">
-	    			<img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
+	    			<img class="lv" src="../../../skin/images/button_kreuzerltool.png"><br>
 	    			<strong>'.$p->t('lehre/kreuzerltool').'</strong></a>';
 	
 		}
@@ -390,14 +390,14 @@
 		if($is_lector)
 		{
 			echo '<a href="#" onclick="alert(\''.$p->t('lehre/kreuzerltoolMitMoodleInfo').'\');" class="Item">
-	    			<img src="../../../skin/images/button_kt.jpg" width="67" height="45"><br>
+	    			<img class="lv" src="../../../skin/images/button_kreuzerltool.png"><br>
 	    			<strong>'.$p->t('lehre/kreuzerltool').'</strong></a><br>
 	    			<a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/benotungstoolHandbuch').'" class="Item" target="_blank">'.$p->t('lehre/benotungstoolHandbuch').' [PDF]</a>';
 		}
 	}
 	
 	echo' 
-    <p>&nbsp;</p>
+    
 	</td>
 	<td class="tdvertical" align="center">
 	';
@@ -458,29 +458,28 @@
 				else 
 					$link = "moodle_choice.php?lvid=$lvid&stsem=$angezeigtes_stsem";
 			}
-			echo '<a href="'.$link.'" target="_blank" class="Item" >
-			    	<img src="../../../skin/images/button_moodle.jpg" width="68" height="45"><br>
+			echo '<a href="'.$link.'" target="_blank">
+			    	<img class="lv" src="../../../skin/images/button_moodle.png"><br>
 			    	<strong>'.$p->t('lehre/moodle').'</strong></a><br>';
 		}
 		else 
 		{
-			echo '<img src="../../../skin/images/button_moodle.jpg" width="68" height="45"><br>
+			echo '<img class="lv" src="../../../skin/images/button_moodle.png"><br>
 			    	<strong>'.$p->t('lehre/moodle').'</strong><br>';
 		}
 	    if($is_lector)
-	    	echo '<a href="moodle_wartung_choice.php?lvid='.$lvid.'&stsem='.$angezeigtes_stsem.'" class="Item">'.$p->t('lehre/moodleWartung').'</a>
-	    		 <br /><a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/moodleHandbuch').'" class="Item" target="_blank">'.$p->t('lehre/moodleHandbuch').' [PDF]</a>';
-	}
+			echo '	<a href="moodle_wartung_choice.php?lvid='.$lvid.'&stsem='.$angezeigtes_stsem.'" class="Item">'.$p->t('lehre/moodleWartung').'</a>
+	    			<br /><a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/moodleHandbuch').'" class="Item" target="_blank">'.$p->t('lehre/moodleHandbuch').' [PDF]</a>';
 	else 
 	{
 		if($is_lector)
-			echo '<a href="#" onclick="alert(\''.$p->t('lehre/moodleMitKreuzerltoolInfo').'\'); return false"  class="Item" >
-			    	<img src="../../../skin/images/button_moodle.jpg" width="68" height="45"><br>
+			echo '<a href="#" onclick="alert(\''.$p->t('lehre/moodleMitKreuzerltoolInfo').'\'); return false">
+			    	<img class="lv" src="../../../skin/images/button_moodle.png"><br>
 			    	<strong>'.$p->t('lehre/moodle').'</strong></a><br>';
 	}
 	
 	echo '
-    <p>&nbsp;</p>
+    
 	</td>';
 	
 	//Gesamtnote
@@ -488,9 +487,9 @@
 	{
 		echo '<td class="tdvertical" align="center">';
 		echo '<a href="benotungstool/lvgesamtnoteverwalten.php?lvid='.$lvid.'&stsem='.$angezeigtes_stsem.'" class="Item" >
-    		<img src="../../../skin/images/button_endnote.jpg" width="68" height="45"><br>
+    		<img class="lv" src="../../../skin/images/button_endnote.png"><br>
     		<strong>'.$p->t('lehre/gesamtnote').'</strong></a><br>';
-		echo '<p>&nbsp;</p>
+		echo '
 			</td>';
 	}
 	
@@ -556,14 +555,14 @@
 		if($islector == true)
 		{
 			echo "<a href=\"lector_choice.php?lvid=$lvid\" target=\"_blank\">";
-			echo "<img src=\"../../../skin/images/button_ul.jpg\" width=\"67\" height=\"45\"><br>
+			echo "<img class=\"lv\" src=\"../../../skin/images/button_studiupload.png\"><br>
 				  <strong>".$p->t('lehre/studentenAbgabe')."</strong>
 				  </a>";
 		}
 		else
 		{
 			echo "<a href=\"upload.php?course_id=$studiengang_kz&term_id=$semester&short=$short\" target=\"_blank\">";
-			echo "<img src=\"../../../skin/images/button_ul.jpg\" width=\"67\" height=\"45\"><br>
+			echo "<img class=\"lv\" src=\"../../../skin/images/button_studiupload.png\"><br>
 				  <strong>".$p->t('lehre/studentenAbgabe')."</strong>
 				  </a>";
 		}
@@ -581,19 +580,20 @@
 
 		if($islector == true)
 		{
-			echo "<img src=\"../../../skin/images/button_ul.jpg\" width=\"67\" height=\"45\"><br>
+			echo "<img class=\"lv\" src=\"../../../skin/images/button_studiupload.png\"><br>
 				  <strong>".$p->t('lehre/studentenAbgabe')."</strong>";
 		}
 		else
 		{
 			echo "<a href=\"upload.php?course_id=$studiengang_kz&term_id=$semester&short=$short\" target=\"_blank\">";
-			echo "<img src=\"../../../skin/images/button_ul.jpg\" width=\"67\" height=\"45\"><br>
+			echo "<img class=\"lv\" src=\"../../../skin/images/button_studiupload.png\"><br>
 				  <strong>".$p->t('lehre/studentenAbgabe')."</strong>
 				  </a>";
 		}
 	}
-	echo '<p>&nbsp;</p>
-		</td>';
+	echo '</td>';
+	
+	// Email an Studierende
 	
 	$mailto='mailto:';
 	$qry = 'SELECT 
@@ -632,8 +632,10 @@
 		echo '</tr><tr>';
 	}
 	echo '<td class="tdvertical" align="center">';
-	echo '<a href="'.$mailto.'" '.$nomail.'><img border="0" src="../../../skin/images/button_fb.jpg" width="67" height="45"><br><strong>'.$p->t('lehre/mail').'</strong></a>';
+	echo '<a href="'.$mailto.'" '.$nomail.'><img class="lv" src="../../../skin/images/button_feedback.png"><br><strong>'.$p->t('lehre/mail').'</strong></a>';
 	echo '</td>';
+	
+	//Anzeigen von zus�tzlichen Lehre-Tools
 	
 	$lehretools = new lehre_tools();
 	if($lehretools->getTools($lvid, $angezeigtes_stsem))
@@ -647,7 +649,7 @@
 				echo '<td class="tdvertical" align="center">';
 				echo '<a href="'.$row->basis_url.'" target="_blank">';
 				if($row->logo_dms_id!='')
-					echo '<img src="../../../cms/dms.php?id='.$row->logo_dms_id.'" width="67" height="45"><br>';
+					echo '<img class="lv" src="../../../cms/dms.php?id='.$row->logo_dms_id.'"><br>';
 									
 				echo ' <strong>'.$row->bezeichnung[$sprache].'</strong>';
 				

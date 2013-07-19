@@ -779,7 +779,7 @@ class content extends basis_db
 	}
 	
 	/**
-	 * Laedt alle Content Eintraege die keine Childs von anderen Contenteintraegen sind
+	 * Laedt alle aktuellen News, die aelter als zwei Monate sind
 	 * @return boolean
 	 */
 	public function getNews()
@@ -1264,11 +1264,12 @@ class content extends basis_db
 	}
 	
 	/**
-	 * Durchsucht den Content
+	 * Durchsucht den Content. Limit optional.
 	 * 
 	 * @param array $searchItems
+	 * @param $limit (optional)
 	 */
-	public function search($searchItems)
+	public function search($searchItems, $limit=null)
 	{
 		$qry = "SELECT 
 					distinct on(content_id) *
@@ -1283,6 +1284,9 @@ class content extends basis_db
 			$qry.=" AND (lower(content::text) like lower('%".$this->db_escape($value)."%')
 					OR lower(content::text) like lower('%".$this->db_escape(htmlentities($value,ENT_NOQUOTES,'UTF-8'))."%'))";
 		$qry.=" ORDER BY content_id DESC";
+		
+		if(!is_null($limit) && is_numeric($limit))
+			$qry.=" LIMIT ".$limit;
 		
 		if($result = $this->db_query($qry))
 		{

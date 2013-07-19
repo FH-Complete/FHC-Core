@@ -623,9 +623,39 @@ class studiensemester extends basis_db
 			return false;
 		}
 	}
-    
+	/**
+	 * Liefert den UNIX Timestamp (Beginn,Ende) eines Studiensemesters
+	 * 
+	 * @param $studiensemester_kurzbz
+	 * @return Beginn und Ende eines Studiensemesters als Timestamp
+	 */
+	public function getTimestamp($studiensemester_kurzbz)
+	{
+		$qry = "SELECT start,ende,studiensemester_kurzbz FROM public.tbl_studiensemester
+				WHERE studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."";
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->begin->start=mktime(0,0,0,mb_substr($row->start,5,2),mb_substr($row->start,8,2),mb_substr($row->start,0,4));
+				$this->ende->ende=mktime(0,0,0,mb_substr($row->ende,5,2),mb_substr($row->ende,8,2),mb_substr($row->ende,0,4));
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Es wurde kein Studiensemester gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Ermitteln des Studiensemesters';
+			return false;
+		}
+	} 
     /**
-     * untersucht das übergebene datum in welchem semester es sich befindet
+     * untersucht das �bergebene datum in welchem semester es sich befindet
      * @param type $datum
      * @return boolean 
      */
@@ -633,7 +663,7 @@ class studiensemester extends basis_db
     {
         if($datum == '')
         {
-            $this->errormsg = "Ungueltiges Datum übergeben"; 
+            $this->errormsg = "Ungueltiges Datum �bergeben"; 
             return false; 
         }
         $qry = "SELECT * FROM public.tbl_studiensemester WHERE start <=".$this->db_add_param($datum, FHC_STRING)." AND ende >= ".$this->db_add_param($datum).';'; 

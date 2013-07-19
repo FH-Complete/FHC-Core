@@ -81,7 +81,7 @@ class news extends basis_db
 				$qry.=" AND fachbereich_kurzbz='".addslashes(trim($fachbereich_kurzbz))."'";
 		}
 				
-		if(trim($studiengang_kz)=='0' || trim($studiengang_kz)=='10006')
+		if(trim($studiengang_kz)=='0')
 			$qry.=" AND studiengang_kz='".$studiengang_kz."' ".(trim($semester)!=''?(trim($semester)=='0'?' AND semester=0':''):' AND semester is null');
 		elseif(trim($studiengang_kz)=='')
 			$qry.='';
