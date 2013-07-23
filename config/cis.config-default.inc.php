@@ -141,10 +141,8 @@ define('MAIL_INTERNATIONAL_OUTGOING', 'invalid@technikum-wien.at');
 // ***** MOODLE *****
 // Moodle verwenden Ja/Nein
 define('MOODLE',true);
-// Pfad zum Moodle
-define('MOODLE_PATH','http://www.technikum-wien.at/moodle/');
-// Connection String fuer Moodle Datenbank (nur Posgresql)
-define("CONN_STRING_MOODLE","host=localhost dbname=bla user=bla password=bla");
+// Webservice TOKEN fuer Moodle 2.4
+define('MOODLE_TOKEN24','');
 
 // ***** OPUS *****
 // Angaben fuer OPUS Schnittstelle
