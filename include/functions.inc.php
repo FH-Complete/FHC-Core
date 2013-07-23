@@ -201,7 +201,7 @@ function kalenderwoche($datum)
 {
 	//$woche=date("W",mktime($date[hours],$date[minutes],$date[seconds],$date[mon],$date[mday],$date[year]));
 	if (!date("w",$datum))
-		$datum+=86400;
+		$datum=strtotime("+1 day",$datum);
 	//echo date("l j.m.Y - W",$datum);
 	$woche=date("W",$datum);
 	//if ($woche==53)
@@ -219,10 +219,16 @@ function montag($datum)
 	$wt=date("w",$datum);
 	// Sonntag?
 	if (!$wt)
-		$wt++;
-	if($wt!=1)
-		$datum-=86400*($wt-1);
-
+	{
+		// Wenn es ein Sonntag ist, auf Montag springen
+		$datum=strtotime('+1 day',$datum);
+	}
+	else
+	{
+	
+		if($wt!=1)
+			$datum-=86400*($wt-1);
+	}
 	return $datum;
 }
 
