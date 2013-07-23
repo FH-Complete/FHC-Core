@@ -470,6 +470,7 @@
 	    if($is_lector)
 			echo '	<a href="moodle_wartung_choice.php?lvid='.$lvid.'&stsem='.$angezeigtes_stsem.'" class="Item">'.$p->t('lehre/moodleWartung').'</a>
 	    			<br /><a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/moodleHandbuch').'" class="Item" target="_blank">'.$p->t('lehre/moodleHandbuch').' [PDF]</a>';
+	}
 	else 
 	{
 		if($is_lector)
@@ -635,7 +636,7 @@
 	echo '<a href="'.$mailto.'" '.$nomail.'><img class="lv" src="../../../skin/images/button_feedback.png"><br><strong>'.$p->t('lehre/mail').'</strong></a>';
 	echo '</td>';
 	
-	//Anzeigen von zus�tzlichen Lehre-Tools
+	//Anzeigen von zusaetzlichen Lehre-Tools
 	
 	$lehretools = new lehre_tools();
 	if($lehretools->getTools($lvid, $angezeigtes_stsem))
