@@ -637,8 +637,12 @@ class studiensemester extends basis_db
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
-			{
+			{	
+				if(!isset($this->begin))
+					$this->begin=new stdclass();
 				$this->begin->start=mktime(0,0,0,mb_substr($row->start,5,2),mb_substr($row->start,8,2),mb_substr($row->start,0,4));
+				if(!isset($this->ende))
+					$this->ende=new stdclass();
 				$this->ende->ende=mktime(0,0,0,mb_substr($row->ende,5,2),mb_substr($row->ende,8,2),mb_substr($row->ende,0,4));
 				return true;
 			}
