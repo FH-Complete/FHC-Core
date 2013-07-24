@@ -51,17 +51,20 @@ class fotostatus extends basis_db
 	public function akzeptiert($person_id)
 	{
 		$qry = "SELECT 
-					* 
+					fotostatus_kurzbz
 				FROM 
 					public.tbl_person_fotostatus 
 				WHERE 
 					person_id=".$this->db_add_param($person_id)."
-					AND fotostatus_kurzbz='akzeptiert'";
+				ORDER BY datum desc, person_fotostatus_id desc limit 1";
 		if($result = $this->db_query($qry))
 		{
-			if($this->db_num_rows($result)>0)
+			if($row = $this->db_fetch_object($result))
 			{
-				return true;
+				if($row->fotostatus_kurzbz=='akzeptiert')
+					return true;
+				else
+					return false;
 			}
 			else
 			{
