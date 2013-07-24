@@ -64,12 +64,13 @@
 	if(isset($_POST['delete_file']))
 		$delete_file = $_POST['delete_file'];
 	
+	/*
 	if($course_id!='' && !is_numeric($course_id))
 		die('Fehlerhafter Parameter');
 		
 	if($term_id!='' && !is_numeric($term_id))
 		die('Fehlerhafter Parameter');
-		
+	*/
 	$rechte = new benutzerberechtigung();
 
 	$rechte->getBerechtigungen($user);
