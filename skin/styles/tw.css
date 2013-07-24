@@ -364,7 +364,7 @@ td.boxshadow /* Farbverlauf im Hintergrund der CIS*/
 }
 td.ContentHeader
 {
-	background-color: #008381; /*gr�n*/
+	background-color: #A5AFB6; /*#DCE4EF;*/
 	font-weight: bold;
 	height: 19px;
 }
@@ -694,7 +694,7 @@ h4
 }
 font.ContentHeader
 {
-	color: #FFFFFF;
+	/*color: #FFFFFF;*/
 }
 
 /* #news

@@ -38,7 +38,7 @@ echo '
 <head>
 	<title>Termin&uuml;bersicht</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<link href="../../../skin/vilesci.css" rel="stylesheet" type="text/css">
+	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link href="../../../skin/tablesort.css" rel="stylesheet" type="text/css"/>
 	
 	<script type="text/javascript" src="../../../include/js/jquery.js"></script> 

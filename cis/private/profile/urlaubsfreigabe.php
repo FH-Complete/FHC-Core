@@ -63,17 +63,8 @@ echo '<html>
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </head>
 
-<body id="inhalt">
-<table class="tabcontent" id="inhalt">
-  <tr>
-    <td class="tdwidth10">&nbsp;</td>
-    <td>
-    <table class="tabcontent">
-      <tr>
-		<td class="ContentHeader"><font class="ContentHeader">&nbsp;Urlaubsfreigabe</font></td>
-	  </tr>
-	</table>
-	<br>
+<body>
+<h1>Urlaubsfreigabe</h1>
 ';
 //Untergebene holen
 $mitarbeiter = new mitarbeiter();
@@ -314,9 +305,6 @@ for($i=0;$i<12;$i++)
 }
 echo '</tr></table>
 
-	</td>
-	</tr>
-	</table>
 </body>
 </html>';
 ?>

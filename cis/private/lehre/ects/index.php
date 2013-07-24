@@ -68,7 +68,7 @@ if (!$db = new basis_db())
 -->
 </script>
 </head>
-<body id="inhalt">
+<body style="padding: 10px">
 <?php
 	function Cut($string)
 	{
@@ -428,9 +428,7 @@ if (!$db = new basis_db())
 	$stg_obj->load($stg);
 
 	//Kopfzeile hinausschreiben und $output ausgeben
-	echo "<table class='tabcontent'><tr><td width='3%'>&nbsp;</td><td>";
-	echo "<table class='tabcontent'><tr>";
-	echo "<td class='ContentHeader'><font class='ContentHeader'>&nbsp;".$p->t('courseInformation/lvInfoSemester',array($stg_obj->kuerzel, $sem))."</font></td></tr></table>";
+	echo "<h1>&nbsp;".$p->t('courseInformation/lvInfoSemester',array($stg_obj->kuerzel, $sem))."</h1>";
 	echo $output;
 
 	if(isset($lv) && isset($stg) && isset($sem)) // Wenn oben alles Ausgewaehlt wurde

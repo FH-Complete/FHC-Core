@@ -142,10 +142,19 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 	<html>
 	<head>
 		<title>'.$p->t('abgabetool/ueberschrift').'</title>
-		<link rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
-		<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
+		<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-		<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
+		<style>
+		table.detail
+		{
+		    border-style:solid;
+		    border-color:#777777;
+		    border-width:1px;
+		    width:100%;
+		    padding:2px;
+		
+		}
+		</style>
 		<script type="text/javascript">
 			function checkEid()
 			{
@@ -159,7 +168,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 		</script>
 		
 	</head>
-	<body class="Background_main"  style="background-color:#eeeeee;">';
+	<body>';
 $datum_obj = new datum();
 $error='';
 $neu = (isset($_GET['neu'])?true:false);
@@ -274,7 +283,7 @@ if($command=="update" && $error!=true)
 						WHERE paabgabe_id='".$paabgabe_id."'";
 					$result=$db->db_query($qry);*/
 
-					echo '<h3>'.$p->t('abgabetool/abgabeStudentenbereich').' - '.$p->t('abgabetool/abgabeZusatzdaten').'</h3>';
+					echo '<h2>'.$p->t('abgabetool/abgabeStudentenbereich').' - '.$p->t('abgabetool/abgabeZusatzdaten').'</h2>';
 					$qry_zd="SELECT * FROM lehre.tbl_projektarbeit WHERE projektarbeit_id='".addslashes($projektarbeit_id)."'";
 					$result_zd=@$db->db_query($qry_zd);
 					$row_zd=@$db->db_fetch_object($result_zd);
@@ -403,7 +412,7 @@ if($uid==-1||$projektarbeit_id==-1||$titel==-1)
 
 if($command!="add")
 {
-	echo '<h3>'.$p->t('abgabetool/abgabeStudentenbereich').'</h3>';
+	echo '<h2>'.$p->t('abgabetool/abgabeStudentenbereich').'</h2>';
 
 	//Einlesen der Termine
 	$qry="";	

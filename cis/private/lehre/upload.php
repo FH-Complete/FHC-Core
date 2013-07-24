@@ -172,25 +172,12 @@
 	}
 </script>
 
-<style type=text/css>A:link {
-	color: black; text-decoration: none
-}
-A:visited {
-	color: black; text-decoration: none
-}
-A:active {
-	color: black; text-decoration: none
-}
-A:hover {
-	color: red; text-decoration: none
-}
-</style>
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <base target="_self">
 </head>
 
 <body>
-<h1><?php echo $p->t('upload/dateiUpload');?></h1>
+
 <table class="tabcontent">
 
 			  <?php
@@ -582,7 +569,8 @@ A:hover {
 			  ?>
 			  <tr>
               <td align="center" colSpan="5" height="36">
-                <table class="tabcontent">
+              <center>
+                <table>
                   <tr>
                     <td><div align="center"><b><font face="Arial" size="2">
                         <?php
@@ -778,7 +766,7 @@ A:hover {
 							  }
 						  }
 
-						  echo '</td></tr>';
+						  echo '</td><td>&nbsp;</td></tr>';
 						  for($i = 0; $i < $numoffile; $i++)
 						  {
 						    $j = $i + 1;
@@ -795,11 +783,11 @@ A:hover {
 						  
 
 						?>
-						<tr><td></td><td>
+						<tr><td>&nbsp;</td><td>
                         <font face="Arial" size="2">&nbsp;<input type="checkbox" name="overwrite" value="overwrite">&nbsp;<?php echo $p->t('upload/dateienAutomatischUeberschreiben');?></font>                        
                        </td>
                 </tr>
-              </table>
+              </table></center>
               <?php
                   echo "<table class='tabcontent'>";
                   echo "  <tr>";

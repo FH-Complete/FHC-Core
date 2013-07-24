@@ -99,7 +99,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 	<head>
 		<title>'.$p->t('abgabetool/abgabeZusatzdaten').'</title>
-		<link rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
+		<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 		<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 		<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
