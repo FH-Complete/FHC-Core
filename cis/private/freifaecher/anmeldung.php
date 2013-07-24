@@ -52,20 +52,10 @@ $stsem = $stsem_obj->getaktorNext();
 	</head>
 
 	<body>
-	<table class="tabcontent" id="inhalt">
-		<tr>
-	    <td class="tdwidth10">&nbsp;</td>
-	    <td><table class="tabcontent">
-	    	<tr>
-	      	<td class="ContentHeader"><font class="ContentHeader">&nbsp;<?php echo $p->t('freifach/freifaecherAnmeldung');?></font></td>
-	    	</tr>
-	    	<tr>
-	      	<td>&nbsp;</td>
-	    	</tr>
-	    	<tr>
-		    	<td>
-		    	<?php echo $p->t('freifach/markierenFreifachFuerAnmeldung');?>:
-		    	<br />
+	<h1><?php echo $p->t('freifach/freifaecherAnmeldung');?></h1>
+	    	
+		<?php echo $p->t('freifach/markierenFreifachFuerAnmeldung');?>:
+	   	<br />
 <?php
 //Wenn das Formular abgeschickt wurde
 if(isset($_POST['submit']))
@@ -154,8 +144,7 @@ else
 	die($p->t('freifach/fehlerBeimAuslesenFreifach'));
 }
 ?>
-				</td>
-			</tr>
+				
 			<table>
 			<tr>
 				<td>&nbsp;
@@ -167,8 +156,6 @@ else
 			</tr>-->
 			</table>
 			</table>
-		</td>
-	</tr>
-	</table>
+
 </body>
 </html>

@@ -153,17 +153,9 @@ function ask() {
 }
 </script>
 </head>
-<body>
-<table class="tabcontent" id="inhalt">
-  <tr>
-    <td width="3%">&nbsp;</td>
-    <td>
-    	<table class="tabcontent">
-	      <tr>
-	        <td class="ContentHeader"><font class="ContentHeader">&nbsp;<?php echo $p->t('courseInformation/lvInfoFreigabe');?></font></td>
-	      </tr>
-		  <tr>
-			   <td>
+<body style="padding:10px">
+<h1><?php echo $p->t('courseInformation/lvInfoFreigabe');?></h1>
+	      
 			      <table class="tabcontent">
 			         <tr>
 			               <td width="85%">
@@ -179,9 +171,7 @@ function ask() {
 							</td>
 			          </tr>
 			       </table>
-			   </td>
-		  </tr>
-		</table>
+			
 
        <?php
        //DropDown Menues zur Auswahl von Studiengang und Semester anzeigen
@@ -314,8 +304,6 @@ function ask() {
 		      </td>
 		    </tr>
 	    </table>
-	</td>
-   </tr>
-</table>
+	
 </body>
 </html>

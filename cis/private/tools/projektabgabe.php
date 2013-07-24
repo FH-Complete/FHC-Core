@@ -91,24 +91,24 @@ if($aktion!='zip')
 		<title>'.$p->t('abgabetool/projektabgabeUebersicht').'</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
-		<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
-		<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
+		<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
 		<script src="../../../include/js/jquery.js" type="text/javascript"></script>
 		<script src="../../../include/js/jquery-ui.js" type="text/javascript"></script>
 		<script src="../../../include/js/jquery.autocomplete.js" type="text/javascript"></script>
-		<script src="../../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script>	
+		<script src="../../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script>
+		<script language="JavaScript" type="text/javascript">
+		$(document).ready(function() 
+		{ 
+			$("#t1").tablesorter(
+			{
+				sortList: [[5,0]],
+				widgets: ["zebra"]
+			}); 		
+		});
+		</script>
 	</head>
-	<body class="background_main">
-	<table class="tabcontent">
-	  <tr>
-	    <td class="tdwidth10">&nbsp;</td>
-	    <td>
-	    	<table class="tabcontent">
-		      <tr>
-		        <td class="ContentHeader"><font class="ContentHeader">'.$p->t('abgabetool/projektabgabeUebersicht').'</font></td>
-		      </tr>
-		    </table>
-		    <br>';
+	<body>
+	<H1>'.$p->t('abgabetool/projektabgabeUebersicht').'</H1>';
 	
 	$s = new studiengang();
 	$s->loadArray($rechte->getStgKz($berechtigung_kurzbz),'typ,kurzbz');
@@ -245,15 +245,15 @@ if(isset($_REQUEST['ok']) || (isset($_REQUEST['aktion']) && $_REQUEST['aktion']=
 		}
 		else
 		{
-			$htmlstr .= "<table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe' border=1>\n";
-			$htmlstr .= "<thead><tr class='liste'>\n";
+			$htmlstr .= "<table id='t1' class='tablesorter'>\n";
+			$htmlstr .= "<thead><tr>\n";
 			$htmlstr .= "<th>".$p->t('global/download')."</th>
 						<th>".$p->t('abgabetool/termin')."</th>
 						<th>".$p->t('abgabetool/abgabetyp')."</th>
-						<th class='table-sortable:default'>".$p->t('global/uid')."</th>
-						<th class='table-sortable:default'>".$p->t('global/vorname')."</th>
-						<th class='table-sortable:alphanumeric'>".$p->t('global/nachname')."</th>";
-			$htmlstr .= "<th class='table-sortable:default'>".$p->t('abgabetool/typ')."</th>
+						<th>".$p->t('global/uid')."</th>
+						<th>".$p->t('global/vorname')."</th>
+						<th>".$p->t('global/nachname')."</th>";
+			$htmlstr .= "<th>".$p->t('abgabetool/typ')."</th>
 						<th>".$p->t('abgabetool/titel')."</th>";
 			$htmlstr .= "</tr></thead><tbody>\n";
 			$i = 0;
@@ -300,7 +300,7 @@ if(isset($_REQUEST['ok']) || (isset($_REQUEST['aktion']) && $_REQUEST['aktion']=
 if($zipfile=='')
 {
 	echo $htmlstr;
-	echo "</td></tr></table></body></html>";
+	echo "</body></html>";
 }
 else
 {

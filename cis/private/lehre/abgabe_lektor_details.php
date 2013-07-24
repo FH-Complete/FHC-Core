@@ -106,10 +106,9 @@ echo '
 <html>
 	<head>
 		<title>'.$p->t('abgabetool/abgabetool').'</title>
-		<link rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
-		<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
+		<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">		
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-		<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
+
 		<script language="Javascript">
 			function confdel()
 			{
@@ -117,7 +116,7 @@ echo '
 			}
 		</script>
 	</head>
-<body class="Background_main"  style="background-color:#eeeeee;">
+<body>
 <h3>'.$p->t('abgabetool/abgabeLektorenbereich').'</h3>';
 
 // Speichern eines Termines

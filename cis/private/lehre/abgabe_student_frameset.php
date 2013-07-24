@@ -32,10 +32,10 @@ else
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 </head>
 
-<frameset rows="200,*">
+<frameset rows="200,*" frameborder="1" border="1" framespacing="1">
 <?php
-	echo '<frame src="abgabe_student.php'.($uid!=''?'?uid='.$uid:'').'" id="uebersicht" name="uebersicht" frameborder="0" />';
-	echo '<frame src="abgabe_student_details.php'.($uid!=''?'?uid='.$uid:'').'" id="as_detail" name="as_detail" frameborder="0" />';
+	echo '<frame src="abgabe_student.php'.($uid!=''?'?uid='.$uid:'').'" id="uebersicht" name="uebersicht"/>';
+	echo '<frame src="abgabe_student_details.php'.($uid!=''?'?uid='.$uid:'').'" id="as_detail" name="as_detail"/>';
 ?>
 	<noframes>
 		<body bgcolor="#FFFFFF">

@@ -36,17 +36,9 @@ $p= new phrasen($sprache);
 <title><?php echo $p->t('courseInformation/terminologie');?></title>
 
 </head>
-<body>
-<table class="tabcontent" id="inhalt">
-  <tr>
-    <td width="3%">&nbsp;</td>
-    <td>
-    	<table class="tabcontent">
-	      <tr>
-	        <td class="ContentHeader"><font class="ContentHeader">&nbsp;<?php echo $p->t('courseInformatoin/lvInfoTerminologie')?></font></td>
-	      </tr>
-		  <tr>
-			   <td>
+<body style="padding: 10px">
+<h1><?php echo $p->t('courseInformatoin/lvInfoTerminologie')?></h1>
+
 			      <table class="tabcontent">
 			         <tr>
 			               <td width="85%">
@@ -62,10 +54,6 @@ $p= new phrasen($sprache);
 							</td>
 			          </tr>
 			      </table>
-			   </td>
-		  </tr>
-	        <tr>
-                   <td>
 
      <table id="tabterm" border="1">
 
@@ -929,5 +917,5 @@ $p= new phrasen($sprache);
 	
 	<!-- end neu 26.12.2009 seq -->
 </table>
-</td></tr></table></td></tr></table>
+</td></tr></table>
 </body></html>

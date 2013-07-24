@@ -48,20 +48,9 @@ $user = get_uid();
 	</head>
 
 	<body>
-	<table class="tabcontent" id="inhalt">
-		<tr>
-	    <td class="tdwidth10">&nbsp;</td>
-	    <td><table class="tabcontent">
-	    	<tr>
-	      	<td class="ContentHeader"><font class="ContentHeader">&nbsp;<?php echo $p->t('freifach/freifaecherAnmeldungsuebersicht');?></font></td>
-	    	</tr>
-	    	<tr>
-	      	<td>&nbsp;</td>
-	    	</tr>
-	    	<tr>
-		    	<td>
-		    	<?php echo $p->t('freifach/bitteFreifachAuswaehlen');?>
-		    	<br />
+	<h1><?php echo $p->t('freifach/freifaecherAnmeldungsuebersicht');?></h1>
+	<?php echo $p->t('freifach/bitteFreifachAuswaehlen');?>
+	<br />
 <?php
 $lvid = trim(isset($_POST['lvid'])?$_POST['lvid']:'');
 
@@ -169,8 +158,6 @@ if($lvid!='')
 				</td>
 			</tr>
 			</table>
-		</td>
-	</tr>
-	</table>
+		
 </body>
 </html>

@@ -71,17 +71,17 @@ if(!$erg=$db->db_query($sql_query))
 else
 {
 	$htmlstr .= "<form name='multitermin' action='abgabe_lektor_multitermin.php' title='Serientermin' target='al_detail' method='POST'>";
-	$htmlstr .= "<table id='t1' class='liste table-autosort:4 table-stripeclass:alternate table-autostripe'>\n";
+	$htmlstr .= "<table id='t1' class='tablesorter' width='100%'>\n";
 	$htmlstr .= "<thead><tr class='liste'>\n";
-	$htmlstr .= "<th></th><th class='table-sortable:default'>".$p->t('global/uid').' / '.$p->t('global/personenkz')."</th>
+	$htmlstr .= "<th></th><th>".$p->t('global/uid').' / '.$p->t('global/personenkz')."</th>
 				<th>".$p->t('global/mail')."</th>
-				<th class='table-sortable:default'>".$p->t('global/vorname')."</th>
-				<th class='table-sortable:alphanumeric'>".$p->t('global/nachname')."</th>";
-	$htmlstr .= "<th class='table-sortable:alphanumeric'>".$p->t('abgabetool/typ')."</th>
-				<th class='table-sortable:alphanumeric'>".$p->t('lvplan/stg')."</th>
-				<th class='table-sortable:alphanumeric'>".$p->t('lvplan/sem')."</th>
+				<th>".$p->t('global/vorname')."</th>
+				<th>".$p->t('global/nachname')."</th>";
+	$htmlstr .= "<th>".$p->t('abgabetool/typ')."</th>
+				<th>".$p->t('lvplan/stg')."</th>
+				<th>".$p->t('lvplan/sem')."</th>
 				<th>".$p->t('abgabetool/titel')."</th>
-				<th class='table-sortable:alphanumeric'>".$p->t('abgabetool/betreuerart')."</th>";
+				<th>".$p->t('abgabetool/betreuerart')."</th>";
 	$htmlstr .= "</tr></thead><tbody>\n";
 	$i = 0;
 	while($row=$db->db_fetch_object($erg))
@@ -110,9 +110,9 @@ echo '
 	<head>
 		<title>'.$p->t('abgabetool/abgabetool').'</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<link rel="stylesheet" href="../../../skin/vilesci.css" type="text/css">
-		<link rel="stylesheet" href="../../../include/js/tablesort/table.css" type="text/css">
-		<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
+		<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
+		<script type="text/javascript" src="../../../include/js/jquery.js"></script>
+		<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
 		<script language="JavaScript" type="text/javascript">
 		function confdel()
 		{
@@ -120,12 +120,22 @@ echo '
 				return true;
 			return false;
 		}
+		
+		$(document).ready(function() 
+		{ 
+			$("#t1").tablesorter(
+			{
+				sortList: [[4,0]],
+				widgets: ["zebra"]
+			}); 
+			
+		});
 		</script>
 	</head>
 
-<body class="background_main">';
+<body>';
 
-echo "<h2><div style='float: left'>".$p->t('abgabetool/ueberschrift')." ($getuid) </div><div style='text-align:right'><a href='../../../cms/dms.php?id=".$p->t('dms_link/abgabetoolLektorHandbuch')."' target='_blank'><img src='../../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0>&nbsp;".$p->t('global/handbuch')."</a></div></h2>";
+echo "<h1><div style='float: left'>".$p->t('abgabetool/ueberschrift')." ($getuid) </div><div style='text-align:right'><a href='../../../cms/dms.php?id=".$p->t('dms_link/abgabetoolLektorHandbuch')."' target='_blank'><img src='../../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0>&nbsp;".$p->t('global/handbuch')."</a></div></h1>";
 
 echo $htmlstr;
 
