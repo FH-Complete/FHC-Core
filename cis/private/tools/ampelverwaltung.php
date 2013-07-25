@@ -44,7 +44,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 	{ 
 	    $("#myTable").tablesorter(
 		{
-			sortList: [[2,0]],
+			sortList: [[0,1],[3,0]],
 			widgets: [\'zebra\']
 		}); 
 	});
@@ -100,10 +100,10 @@ echo '
 <table id="myTable" class="tablesorter">
 	<thead>
 		<tr>
-			<th>'.$p->t('tools/ampelStatus').'</th>
+			<th></th>
+			<th>'.$p->t('tools/ampelErledigt').'</th>
 			<th>'.$p->t('tools/ampelBeschreibung').'</th>
-			<th>'.$p->t('tools/ampelDeadline').'</th>
-			<th>'.$p->t('tools/ampelAktion').'</th>
+			<th>'.$p->t('tools/ampelDeadline').'</th>			
 		</tr>
 	</thead>
 	<tbody>
@@ -131,19 +131,29 @@ foreach($ampel->result as $row)
 	switch($ampelstatus)
 	{
 		case 'rot':
-			$status= '<img src="../../../skin/images/ampel_rot.png">';
+			$status= '<img name="C" src="../../../skin/images/ampel_rot.png" >';
 			break;
 		case 'gelb':
-			$status= '<img src="../../../skin/images/ampel_gelb.png">';
+			$status= '<img name="B" src="../../../skin/images/ampel_gelb.png" >';
 			break;
 		case 'gruen':
-			$status= '<img src="../../../skin/images/ampel_gruen.png">';
+			$status= '<img name="A" src="../../../skin/images/ampel_gruen.png" >';
 			break;
 		default:
-			$status= '<img src="../../../skin/images/true.png" height="15px">';
+			$status= '<img name="A" src="../../../skin/images/ampel_gruen.png" >';
 			break;
 	}
 	echo $status;
+	
+	echo '<td align="center">';
+	if(!$bestaetigt)
+		//echo '<a href="'.$_SERVER['PHP_SELF'].'?ampel_id='.$row->ampel_id.'&type=bestaetigen">'.$p->t('tools/ampelBestaetigen').'</a>';
+		echo '<a href="'.$_SERVER['PHP_SELF'].'?ampel_id='.$row->ampel_id.'&type=bestaetigen" style="text-decoration: none"><input type="button" value="'.$p->t('tools/ampelErledigt').'"></a>';
+	else
+		//echo $p->t('tools/ampelBestaetigt');
+		//echo '<img src="../../../skin/images/true.png" height="15px">';
+		echo '';
+	echo '</td>';
 	
 	echo '</td>';
 	$beschreibung = $row->beschreibung[$sprache];
@@ -151,13 +161,6 @@ foreach($ampel->result as $row)
 		$beschreibung = $row->beschreibung[DEFAULT_LANGUAGE];
 	echo '<td>'.$beschreibung.'</td>';
 	echo '<td>'.$datum_obj->formatDatum($row->deadline,'d.m.Y').'</td>';
-	
-	echo '<td>';
-	if(!$bestaetigt)
-		echo '<a href="'.$_SERVER['PHP_SELF'].'?ampel_id='.$row->ampel_id.'&type=bestaetigen">'.$p->t('tools/ampelBestaetigen').'</a>';
-	else
-		echo $p->t('tools/ampelBestaetigt');
-	echo '</td>';
 	
 //	echo "<td>".date('d.m.Y',$ts_now)."</td>";
 //	echo "<td align=\"center\">".date('d.m.Y',$ts_vorlaufzeit)."</td>";

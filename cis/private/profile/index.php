@@ -345,9 +345,9 @@ if(!$ansicht)
 		{
 			echo "
 			".$p->t('profil/solltenDatenNichtStimmen')." <a class='Item' href=\"mailto:$mail?subject=Datenkorrektur&body=Die%20Profildaten%20fuer%20User%20'$user->uid'%20sind%20nicht%20korrekt.%0D
-			Hier die richtigen Daten:%0DNachname:%20$user->nachname%0DVorname:%20$user->vorname%0DGeburtsdatum:%20$user->gebdatum
-			%0DGeburtsort:%20$user->gebort%0DTitelPre:%20$user->titelpre%0DTitelPost:%20$user->titelpost
-			%0D%0D***%0DPlatz fuer weitere (nicht angefuehrte Daten)%0D***\">".$p->t('profil/zustaendigeAssistenz')."</a><br><br>";
+			Hier die richtigen Daten:%0A%0ANachname:%20$user->nachname%0AVorname:%20$user->vorname%0AGeburtsdatum:%20$user->gebdatum
+			%0AGeburtsort:%20$user->gebort%0ATitelPre:%20$user->titelpre%0ATitelPost:%20$user->titelpost
+			%0A%0A***%0DPlatz fuer weitere (nicht angefuehrte Daten)%0D***\">".$p->t('profil/zustaendigeAssistenz')."</a><br><br>";
 		}
 		
 echo '<table width="100%">
@@ -410,10 +410,15 @@ if(!$ansicht)
 		             	&& $bm->betriebsmittelstatus_kurzbz<>'vorhanden')
 		           	{
 		          		continue;
-		           	}		                	
-					echo "<tr'>
+		           	}
+		           	$mailtext_inventar = "	".$p->t('mail/profilBetriebsmittelKorrektur')."?subject=Korrektur%20des%20Inventars%20".$oBetriebsmittelperson->result[$i]->inventarnummer."
+		           							&body=Folgende%20Aenderung%20hat%20sich%20ergeben:%0A%0A
+		          							Inventar:%20".$oBetriebsmittelperson->result[$i]->inventarnummer."%20(".$oBetriebsmittelperson->result[$i]->beschreibung.")%0A%0A
+		          							Status:%20ausgeschieden%20%2F%20falsche%20Zuordnung%20%2F%20falsche%20Angaben%0A
+		          							Details:%20%0A\"";
+					echo "<tr>
 		      				<td>".$oBetriebsmittelperson->result[$i]->betriebsmitteltyp.' '.$oBetriebsmittelperson->result[$i]->beschreibung.(isset($oBetriebsmittelperson->result[$i]->verwendung)?' ('.$oBetriebsmittelperson->result[$i]->verwendung.')':'')."</td>
-		      				<td>".$oBetriebsmittelperson->result[$i]->nummer.' '.$oBetriebsmittelperson->result[$i]->inventarnummer."</td>
+		      				<td>".$oBetriebsmittelperson->result[$i]->nummer.' <a href="mailto:'.$mailtext_inventar.'>'.$oBetriebsmittelperson->result[$i]->inventarnummer."</a></td>
 		      				<td>".$datum_obj->formatDatum($oBetriebsmittelperson->result[$i]->ausgegebenam,'d.m.Y')."</td>
 		      			</tr>";
 		                	
@@ -437,6 +442,7 @@ if(!$ansicht)
 	    {
 	    	echo "<p><A class='Item' href='../lehre/notenliste.php'>".$p->t('profil/leistungsbeurteilung')."</a></p>";
 	    }
+	    echo '<p><A href="../lvplan/stpl_week.php?pers_uid='.$user->uid.'&type=student">'.$p->t('profil/lvplanVon').' '.$user->nachname.'</A></p>';
 	}
 	if ($type=='mitarbeiter')
 	{
@@ -447,7 +453,10 @@ if(!$ansicht)
 				<p><A href="freebusy.php">'.$p->t('freebusy/titel').'</A></p>';
 		}
 		if($uid!=get_uid())
+		{
 			echo '<p><A href="zeitsperre_days.php?days=30&lektor='.$user->uid.'">'.$p->t('profil/zeitsperrenVon').' '.$user->nachname.'</A></p>';
+			echo '<p><A href="../lvplan/stpl_week.php?pers_uid='.$user->uid.'">'.$p->t('profil/lvplanVon').' '.$user->nachname.'</A></p>';
+		}
 	}
 	echo '<p><a href="../../../cms/content.php?content_id='.$p->t("dms_link/lvPlanFAQ").'" target="_blank">'.$p->t('global/hilfe').'</a></p></td>';
 	echo'</tr>
