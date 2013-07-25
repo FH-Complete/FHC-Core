@@ -344,12 +344,12 @@ echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
 				<td width="30%">
 					<table>
 						<tr>
-							<td>'.$p->t('news/sichtbarab').'</td>
+							<td nowrap>'.$p->t('news/sichtbarab').'</td>
 							<td><input type="text" name="datum" size="10" value="'.($news->datum!=''?$datum_obj->formatDatum($news->datum,'d.m.Y'):date('d.m.Y')).'"></td>
 						</tr>
 						<tr>
-							<td>'.$p->t('news/sichtbarbis').'</td>
-							<td><input type="text" name="datum_bis" size="10" value="'.$datum_obj->formatDatum($news->datum_bis,'d.m.Y').'"> '.$p->t('news/maximal30Tage').'</td>
+							<td valign="top" nowrap>'.$p->t('news/sichtbarbis').'</td>
+							<td><input type="text" name="datum_bis" size="10" value="'.$datum_obj->formatDatum($news->datum_bis,'d.m.Y').'"><br>'.$p->t('news/maximal30Tage').'</td>
 						</tr>
 					</table>
 				</td>
