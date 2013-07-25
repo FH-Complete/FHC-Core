@@ -44,17 +44,18 @@ require_once('../../../include/studiensemester.class.php');
 		$uid=$_GET['uid'];
 	else
 		$uid = $user;
+		
 	if (isset($_GET['stdsem']))
 		$stdsem=$_GET['stdsem'];
-	else 
-		$stdsem=$studiensemester->getakt();
+	else
+		$stdsem=$studiensemester->getaktorNext();
 
 	//Studiensemester abfragen. Letzten 5, aktuelles und naechstes.
 	$sql_query='SELECT * FROM public.tbl_studiensemester WHERE (start<=(now()::date+240) AND ende>=(now()::date-900)) ORDER BY start';
 	$result_stdsem=$db->db_query($sql_query);
 	$num_rows_stdsem=$db->db_num_rows($result_stdsem);
-	if (!isset($stdsem))
-		$stdsem=$db->db_result($result_stdsem,0,"studiensemester_kurzbz");
+	//if (!isset($stdsem))
+		//$stdsem=$db->db_result($result_stdsem,0,"studiensemester_kurzbz");
 
 	$p = new phrasen(getSprache());
 /*
@@ -140,7 +141,7 @@ require_once('../../../include/studiensemester.class.php');
 	}
 	echo '</td><td align="right">';
 	echo '<a href="#" onclick="printhelp()" class="Item">'.$p->t('lvaliste/hilfeAnzeigen').'</a>';
-	echo '</td></tr></table>';
+	echo '</td></tr></table><br>';
 	if ($num_rows>0)
 	{
 		
@@ -161,9 +162,9 @@ require_once('../../../include/studiensemester.class.php');
 				<th>'.$p->t('lvaliste/blockung').'</th>
 				<th>'.$p->t('lvaliste/wochenrythmus').'</th>
 				<th>'.$p->t('lvaliste/stunden').'</th>
-				<th>'.$p->t('lvaliste/kalenderwoche').'</th>
-				<!--<th>'.$p->t('lvaliste/anmerkung').'</th> Lektoren sollen die Anmerkung dzt. nicht sehen, da nur für intern gedacht-->
-			</tr>
+				<th>'.$p->t('lvaliste/kalenderwoche').'</th>';
+				//<th>'.$p->t('lvaliste/anmerkung').'</th> Lektoren sollen die Anmerkung dzt. nicht sehen, da nur für intern gedacht
+			echo '</tr>
 			</thead><tbody>';
 		$stg_obj = new studiengang();
 		$stg_obj->getAll();
@@ -175,7 +176,6 @@ require_once('../../../include/studiensemester.class.php');
 			echo '<tr>';
 			echo '<td>'.$row->lehrfach.'</td>';
 			echo '<td>'.$row->le_lehrform_kurzbz.'</td>';	
-			//echo '<td>'.$row->lv_bezeichnung.'</td>';
 			if ($row->lehrfach_bez!=$row->lv_bezeichnung)			
 				echo '<td>'.$row->lv_bezeichnung.' ('.$p->t('lvaliste/lehrfach').': '.$row->lehrfach_bez.')</td>';
 			else 
