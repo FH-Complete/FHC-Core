@@ -1281,8 +1281,21 @@ class content extends basis_db
 					AND aktiv=true
 					AND template_kurzbz IN('contentmittitel','contentohnetitel','redirect')";
 		foreach($searchItems as $value)
-			$qry.=" AND (lower(content::text) like lower('%".$this->db_escape($value)."%')
-					OR lower(content::text) like lower('%".$this->db_escape(htmlentities($value,ENT_NOQUOTES,'UTF-8'))."%'))";
+			$qry.=" AND 
+						(template_kurzbz IN('contentmittitel','contentohnetitel')
+							AND
+							(
+							     lower(content::text) like lower('%".$this->db_escape($value)."%') 
+							     OR lower(content::text) like lower('%".$this->db_escape(htmlentities($value,ENT_NOQUOTES,'UTF-8'))."%')
+							)
+						OR template_kurzbz IN('redirect')
+							AND
+							(
+							    lower(titel::text) like lower('%".$this->db_escape($value)."%') 
+					     		OR lower(titel::text) like lower('%".$this->db_escape(htmlentities($value,ENT_NOQUOTES,'UTF-8'))."%')
+							)
+						)
+					";
 		$qry.=" ORDER BY content_id DESC";
 		
 		if(!is_null($limit) && is_numeric($limit))

@@ -146,6 +146,14 @@ input.search
 	border-style:solid;
 	border-color: #A5AFB6;
 }
+#globalsearch					
+{
+	background-color: #E9ECEE;
+	border-width: 1px;
+	border-style:solid;
+	border-color: #A5AFB6;
+	height: 25px;
+}
 /* Login-Button CIS-Seite */
 input.cis_login
 {

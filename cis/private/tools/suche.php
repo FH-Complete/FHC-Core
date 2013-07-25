@@ -63,7 +63,7 @@ echo '<form action="',$_SERVER['PHP_SELF'],'" name="searchform" method="GET">
 if($search=='')
 	exit;
 
-$searchItems = explode(' ',$search);
+$searchItems = explode(' ',TRIM($search));
 
 $searchPerson = searchPerson($searchItems);
 $searchOrt = searchOrt($search);
@@ -82,14 +82,14 @@ function searchPerson($searchItems)
 	
 	if(count($bn->result)>0)
 	{
-		echo '<h2>',$p->t('global/personen'),'</h2>';
+		echo '<h2 style="padding-bottom: 10px;">',$p->t('global/personen'),'</h2>';
 		echo '
 		<script type="text/javascript">	
 		$(document).ready(function() 
 			{ 
 			    $("#personentable").tablesorter(
 				{
-					sortList: [[2,0],[1,0]],
+					sortList: [[3,0],[1,0],[0,0]],
 					widgets: [\'zebra\'],
 					headers: {8:{sorter:false}}
 				}); 
@@ -103,11 +103,10 @@ function searchPerson($searchItems)
 		echo '<table class="tablesorter" id="personentable">
 			<thead>
 				<tr>
-					<th>',$p->t('global/titel'),'</th>
 					<th>',$p->t('global/vorname'),'</th>
 					<th>',$p->t('global/nachname'),'</th>
-					<th>',$p->t('global/titel'),'</th>
 					<th>',$p->t('global/studiengang'),'</th>
+					<th>',$p->t('freebusy/typ'),'</th>
 					<th>',$p->t('global/telefonnummer'),'</th>
 					<th>',$p->t('lvplan/raum'),'</th>
 					<th>',$p->t('global/mail'),'</th>	
@@ -119,11 +118,12 @@ function searchPerson($searchItems)
 		foreach($bn->result as $row)
 		{
 			echo '<tr>';
-			echo '<td>',$row->titelpre,'</td>';
+			//echo '<td>',$row->titelpre,'</td>';
 			echo '<td>',$row->vorname,'</td>';
-			echo '<td><a href="../profile/index.php?uid=',$row->uid,'">',$row->nachname,'</a></td>';
-			echo '<td>',$row->titelpost,'</td>';
+			echo '<td><a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a></td>';
+			//echo '<td>',$row->titelpost,'</td>';
 			echo '<td>',$row->studiengang,'</td>';
+			echo '<td>',($row->mitarbeiter_uid==NULL?'StudentIn':'MitarbeiterIn'),'</td>';
 			echo '<td>',$row->telefonklappe,'</td>';
 			echo '<td>',$row->raum,'</td>';
 			if($row->alias!='' && !in_array($row->studiengang_kz, $noalias))
@@ -135,7 +135,7 @@ function searchPerson($searchItems)
 			echo '</tr>';
 			echo "\n";
 		}
-		echo '</tbody></table>';
+		echo '</tbody></table><br>';
 		return true;
 	}	
 	else 
@@ -157,7 +157,7 @@ function searchOrt($search)
 	
 	if(count($ort->result)>0)
 	{
-		echo '<h2>',$p->t('lvplan/ort'),'</h2>';
+		echo '<h2 style="padding-bottom: 10px;">',$p->t('lvplan/ort'),'</h2>';
 		echo '
 		<script type="text/javascript">	
 		$(document).ready(function() 
@@ -179,7 +179,9 @@ function searchOrt($search)
 					<th>',$p->t('tools/maxPersonen'),'</th>
 					<th>',$p->t('tools/telefonklappe'),'</th>';
 					if ($raumres)
-					echo '<th>',$p->t('tools/reservieren'),'</th>';
+						echo '<th>',$p->t('tools/reservieren'),'</th>';
+					else 
+						echo '<th>',$p->t('lvplan/lvPlan'),'</th>';
 				echo '</tr>
 			</thead>
 			<tbody>';
@@ -191,13 +193,15 @@ function searchOrt($search)
 			echo '<td>',$row->max_person,'</td>';
 			echo '<td>',$row->telefonklappe,'</td>';
 			if ($raumres)
-				echo '<td><a href="../../../cis/private/lvplan/stpl_week.php?type=ort&ort_kurzbz='.$row->ort_kurzbz.'">Reservieren</a></td>';
+				echo '<td><a href="../../../cis/private/lvplan/stpl_week.php?type=ort&ort_kurzbz='.$row->ort_kurzbz.'">'.$p->t('tools/reservieren').'</a></td>';
+			else 
+				echo '<td><a href="../../../cis/private/lvplan/stpl_week.php?type=ort&ort_kurzbz='.$row->ort_kurzbz.'">'.$p->t('lvplan/lvPlan').'</a></td>';
 			//else 
 			//	echo '<td></td>';
 			echo '</tr>';
 			echo "\n";
 		}
-		echo '</tbody></table>';
+		echo '</tbody></table><br>';
 		return true;
 	}
 	else 
@@ -227,7 +231,7 @@ function searchDms($searchItems)
 	
 	if(count($dms->result)>0)
 	{
-		echo '<h2>'.$p->t("tools/dokumente").'</h2>';
+		echo '<h2 style="padding-bottom: 10px;">'.$p->t("tools/dokumente").'</h2>';
 		echo '
 		<script type="text/javascript">	
 		$(document).ready(function() 
@@ -266,7 +270,7 @@ function searchDms($searchItems)
 			echo '</tr>';
 			echo "\n";
 		}
-		echo '</tbody></table>';
+		echo '</tbody></table><br>';
 		return true;
 	}
 	else 
@@ -280,7 +284,7 @@ function searchContent($searchItems)
 
 	if(count($cms->result)>0)
 	{
-		echo '<h2>',$p->t('tools/content'),'</h2>';
+		echo '<h2 style="padding-bottom: 10px;">',$p->t('tools/content'),'</h2>';
 		if(count($cms->result)>20)
 		{
 			echo '<p style="color:red;">'.$p->t("tools/esWurdenMehrAlsXInhalteGefunden").'</p>';

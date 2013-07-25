@@ -152,8 +152,12 @@ function loadampel()
 {
 	$('#ampel').load('ampel.php?'+gettimestamp());
 }
+function warnung_redesign()
+{
+	alert ('Die CIS-Seite wird derzeit an das neue Design angepasst. \nManche Funktionen sind möglicherweise inaktiv.');
+}
 </script>
-<body class="main" onload="loadampel()">
+<body class="main" onload="warnung_redesign(), loadampel()">
 <table width="100%" height="100%" cellspacing="0" cellpadding="0" border="0">
 <tr>
 <td class="rand"></td>
@@ -165,40 +169,26 @@ function loadampel()
 		<img class="header_left" src="../skin/images/header_left.png" alt="header_links">
 		<img class="header_right" src="../skin/images/header_right.png" alt="header_rechts">	   	 	
 	   	 	<table width="100%" height="100%" style="position:relative; top:10px; z-index:4" cellpadding="0">
-	   	 	<!--<tr valign="top" height="33%">
-		   	 	<td colspan="2" align="right" style="padding-right: 10px;">
-		   	 		<?php	  
-						$sprache = new sprache();
-						$sprache->getAll(true);
-						foreach($sprache->result as $row)
-						{
-							echo ' &nbsp;&nbsp;<a href="#'.$row->sprache.'" title="'.$row->sprache.'" onclick="changeSprache(\''.$row->sprache.'\'); return false;">'.$row->sprache.'</a>';
-					}?>
-				</td>
-		   	 		<!--<?php //require_once('../include/'.EXT_FKT_PATH.'/cis_menu_global.inc.php'); ?>
-		   	  </tr>-->
 		   	  <tr height="50%">
 		   	    <td width="20%" align="center">&nbsp;
 		        </td>
 		         <td align="center">
 					<form name="searchform" action="private/tools/suche.php" method="GET" target="content" style="display:inline">				
-		        	<input class="search" type="search" size="45" name="search" placeholder=" <?php echo $p->t('menu/suchePersonOrtDokumentInhalt');?> ..."/>
+		        	<input id="globalsearch" type="search" size="55" name="search" placeholder=" <?php echo $p->t('menu/suchePersonOrtDokumentInhalt');?> ..."/>
 		        	<img src="../skin/images/search.png" height="14px" onclick="document.searchform.submit()" class="suchicon"/>
 		        	</form>
 		        </td>
-		         <td width="20%" align="right" style="padding-right: 10px;">
-					<?php	  
-						$sprache = new sprache();
-						$sprache->getAll(true);
-						foreach($sprache->result as $row)
-						{
-							echo ' &nbsp;&nbsp;<a href="#'.$row->sprache.'" title="'.$row->sprache.'" onclick="changeSprache(\''.$row->sprache.'\'); return false;">'.$row->sprache.'</a>';
-					}?>
+		         <td width="20%" align="right" valign="top" style="padding-right: 10px;">
+			          <span style="vertical-align:top;" id="ampel"></span>&nbsp;&nbsp;<span style="color: #A5AFB6">|</span>
+						<?php	  
+							$sprache = new sprache();
+							$sprache->getAll(true);
+							foreach($sprache->result as $row)
+							{
+								echo ' &nbsp;&nbsp;<a href="#'.$row->sprache.'" title="'.$row->sprache.'" onclick="changeSprache(\''.$row->sprache.'\'); return false;">'.$row->sprache.'</a>';
+						}?>
 		        </td>
 		   	  </tr>
-		   	  <tr height="50%" valign="top">
-		   	    <td colspan="3" width="100%" align="center" id="ampel"></td>
-	   	      </tr>
 	   	    </table>
 	   	</td>
 	   	</tr>
