@@ -194,11 +194,8 @@ else
 
 
 //Kopfzeile
-echo '<table class="tabcontent" height="100%">';
-echo ' <tr>';
-echo '<td class="tdwidth10">&nbsp;</td>';
-echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;'.$p->t('benotungstool/benotungstool');
-echo '</font></td><td  class="ContentHeader" align="right"><font class="ContentHeader">'."\n";
+echo '<table width="100%"><tr><td><h1>'.$p->t('benotungstool/benotungstool');
+echo '</h1></td><td align="right">'."\n";
 
 //Studiensemester laden
 $stsem_obj = new studiensemester();
@@ -297,7 +294,7 @@ else
 	echo $p->t('benotungstool/fehlerBeimAuslesen');
 }
 echo $stsem_content;
-echo '</font></td><tr></table>';
+echo '</td><tr></table>';
 echo '<table width="100%"><tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
 echo "<td>\n";
