@@ -562,11 +562,9 @@ else
 $htmlOutput='';
 	
 //Kopfzeile
-echo '<table class="tabcontent" height="100%">';
-echo ' <tr>';
-		echo '<td class="tdwidth10">&nbsp;</td>';
-		echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;'.$p->t('benotungstool/gesamtnote').'</font></td>';
-		echo '<td  class="ContentHeader" align="right"><font class="ContentHeader">';
+echo '
+<table width="100%"><tr><td>
+<h1>&nbsp;'.$p->t('benotungstool/gesamtnote').'</h1></td><td align="right">';
 
 //Studiensemester laden
 $stsem_obj = new studiensemester();
@@ -603,7 +601,7 @@ if(!$rechte->isBerechtigt('admin',0) &&
 	}
 }
 echo $stsem_content;
-echo '</font></td><tr></table>';
+echo '</td></tr></table>';
 
 echo '<table width="100%"><tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
@@ -811,15 +809,18 @@ echo '<table>';
 
 			$moodle24_course_bezeichung=array();
 
-			// Bezeichnungen der Moodlekurse laden
-			foreach($moodle24->result as $obj)
+			if(count($moodle24->result)>0)
 			{
-				if(!isset($moodle24_course_bezeichnung))
+				// Bezeichnungen der Moodlekurse laden
+				foreach($moodle24->result as $obj)
 				{
-					$moodle24course = new moodle24_course();
-					$moodle24course->load($obj->mdl_course_id);
-
-					$moodle24_course_bezeichung[$obj->mdl_course_id]=$moodle24course->mdl_shortname;
+					if(!isset($moodle24_course_bezeichnung))
+					{
+						$moodle24course = new moodle24_course();
+						$moodle24course->load($obj->mdl_course_id);
+	
+						$moodle24_course_bezeichung[$obj->mdl_course_id]=$moodle24course->mdl_shortname;
+					}
 				}
 			}
 		}
