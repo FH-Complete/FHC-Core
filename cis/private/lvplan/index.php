@@ -230,7 +230,7 @@ $(document).ready(function()
 			</td>
 			<td valign="top">
 			<?php
-			echo "<input class='search' placeholder='Name eingeben' type='text' id='benutzer' size='32' value=''>";
+			echo "<input class='search' placeholder='".$p->t('lvplan/nameEingeben')."' type='text' id='benutzer' size='32' value=''>";
 			echo "<input type='hidden' id='mitarbeiter_uid' name='pers_uid'>";
 			echo "<input type='hidden' id='uid' name='type' value='student'>";			
 			echo "<input type='submit' value='Go' onclick='return checkSetBenutzer();'>";

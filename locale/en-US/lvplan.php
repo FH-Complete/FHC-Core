@@ -73,4 +73,5 @@ $this->phrasen['lvplan/semesterplanLaden']='Semesterplan laden';
 $this->phrasen['lvplan/bitteEinenStudiengangAuswaehlen']='Bitte einen Studiengang auswählen';
 $this->phrasen['lvplan/bitteEinStudiensemesterAuswaehlen']='Bitte ein Studiensemester auswählen';
 $this->phrasen['lvplan/bitteEinenLektorAuswaehlen']='Bitte eineN LektorIn/StudentIn auswählen';
+$this->phrasen['lvplan/nameEingeben']='Enter name';
 ?>
