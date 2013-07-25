@@ -1,6 +1,6 @@
 <?php
 $this->phrasen['lvplan/lehrveranstaltungsplan']='Lehrveranstaltungsplan'; 
-$this->phrasen['lvplan/persoenlicherLvPlan']='Ihr persönlicher Lehrveranstaltungsplan'; 
+$this->phrasen['lvplan/persoenlicherLvPlan']='Mein persönlicher Lehrveranstaltungsplan'; 
 $this->phrasen['lvplan/stammdatenKontrollieren']='Hier können Sie Ihre Stammdaten kontrollieren'; 
 $this->phrasen['lvplan/profil']='PROFIL'; 
 $this->phrasen['lvplan/saalplan']='Saalplan'; 
