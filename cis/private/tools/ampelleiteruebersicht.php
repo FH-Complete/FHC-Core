@@ -48,7 +48,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 	{ 
 	    $("#myTable").tablesorter(
 		{
-			sortList: [[5,0]],
+			sortList: [[0,1],[1,0],[2,0]],
 			widgets: [\'zebra\']
 		}); 
 	});
@@ -134,20 +134,29 @@ echo '</SELECT>';
 echo '<input type="submit" value="OK" />';
 echo '</form><br>';
 
-
+if(!isset($_POST['ampel_id']))
+{
+	echo $p->t('tools/waehlenSieEineOEoderAmpel');
+	exit;
+}
 $oe_arr = $oe_kurzbz!=''?array($oe_kurzbz):$oes;	
 //echo 'OE: '.$oe_kurzbz.' Ampel:'.$ampel_id;
 $ampel = new ampel();
 if(!$ampel->loadAmpelMitarbeiter($oe_arr, $ampel_id))
 	die('Fehler:'.$ampel->errormsg);
 
+if($ampel_id!='')
+{
+	$ampel_aktuell = new ampel($ampel_id);
+	echo $ampel_aktuell->beschreibung[$sprache];
+}
 
 echo '
 <table id="myTable" class="tablesorter">
 	<thead>
 		<tr>
 			<th>'.$p->t('tools/ampelStatus').'</th>
-			<th>'.$p->t('tools/ampelBeschreibung').'</th>
+			<th>'.$p->t('tools/ampelKurzbz').'</th>
 			<th>'.$p->t('tools/ampelMitarbeiter').'</th>
 			<th>'.$p->t('global/organisationseinheit').'</th>
 			<th>'.$p->t('tools/ampelBestaetigtAm').'</th>
@@ -187,24 +196,24 @@ foreach($ampel->result as $row)
 	switch($ampelstatus)
 	{
 		case 'rot':
-			$status= '<img src="../../../skin/images/ampel_rot.png">';
+			$status= '<img name="C" src="../../../skin/images/ampel_rot.png">';
 			break;
 		case 'gelb':
-			$status= '<img src="../../../skin/images/ampel_gelb.png">';
+			$status= '<img name="B" src="../../../skin/images/ampel_gelb.png">';
 			break;
 		case 'gruen':
-			$status= '<img src="../../../skin/images/ampel_gruen.png">';
+			$status= '<img name="B" src="../../../skin/images/ampel_gruen.png">';
 			break;
 		default:
-			$status= '<img src="../../../skin/images/true.png" height="15px">';
+			$status= '<img name="A" src="../../../skin/images/ampel_gruen.png">';
 			break;
 	}
 	echo $status;
 	
 	echo '</td>';
-	$beschreibung = $row->beschreibung[$sprache];
-	if($beschreibung=='' && isset($row->beschreibung[DEFAULT_LANGUAGE]))
-		$beschreibung = $row->beschreibung[DEFAULT_LANGUAGE];
+	$beschreibung = $row->kurzbz;
+	//if($beschreibung=='' && isset($row->beschreibung[DEFAULT_LANGUAGE]))
+		//$beschreibung = $row->beschreibung[DEFAULT_LANGUAGE];
 	echo '<td>'.$beschreibung.'</td>';
 	
 	$name = $row->titelpre.' '.$row->vorname.' '.$row->nachname.' '.$row->titelpost;

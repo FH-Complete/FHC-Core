@@ -22,10 +22,38 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/ampel.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/phrasen.class.php');
+require_once('../../../include/benutzerfunktion.class.php');
+require_once('../../../include/organisationseinheit.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
 $user = get_uid();
 $sprache = getSprache();
 $p = new phrasen($sprache);
+
+//Leiter OEs holen
+$benutzerfunktion = new benutzerfunktion();
+$benutzerfunktion->getBenutzerFunktionen('Leitung', '', '', $user);
+
+$organisationseinheit = new organisationseinheit();
+
+$oes=array();
+foreach ($benutzerfunktion->result as $row)
+{
+	$oe = $organisationseinheit->getChilds($row->oe_kurzbz);
+	$oes = array_merge($oe, $oes);
+}
+
+//Berechtigungs OEs holen
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+if($rechte->isBerechtigt('basis/ampeluebersicht'))
+{
+	$oes_berechtigung = $rechte->getOEkurzbz('basis/ampeluebersicht');
+	$oes = array_merge($oes_berechtigung, $oes);
+}
+
+array_unique($oes);
+
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
         "http://www.w3.org/TR/html4/strict.dtd">
@@ -51,8 +79,12 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 	</script>
 </head>
 <body>
-<h1>',$p->t('tools/ampelsystem'),'</h1>
-',$p->t('tools/dasAmpelsystemIstEinErinnerungsystem'),'.';
+<h1>',$p->t('tools/ampelsystem'),'</h1>';
+
+if(count($oes)!=0)
+	echo '<p><a href="ampelleiteruebersicht.php">'.($p->t('tools/uebersichtLeitung')).'</a></p>';
+	
+echo '<p>'.$p->t('tools/dasAmpelsystemIstEinErinnerungsystem').'</p>';
 
 
 $datum_obj = new datum();

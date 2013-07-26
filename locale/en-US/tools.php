@@ -34,6 +34,7 @@ $this->phrasen['tools/nichtZugeteilt']='You have not been assigned to this notif
 $this->phrasen['tools/ampelNichtGefunden']='The specified notification could not be found';
 $this->phrasen['tools/ampelStatus']='Status';
 $this->phrasen['tools/ampelBeschreibung']='Description';
+$this->phrasen['tools/ampelKurzbz']='Short Term';
 $this->phrasen['tools/ampelDeadline']='Deadline';
 $this->phrasen['tools/ampelAktion']='Action';
 $this->phrasen['tools/ampelErledigt']='Done';
@@ -44,6 +45,8 @@ $this->phrasen['tools/ampelRestdauer']='Remaining Days';
 $this->phrasen['tools/ampelBestaetigtAm']='Confirmed on';
 $this->phrasen['tools/ampelBereitsBestaetigt']='This notification has already been confirmed';
 $this->phrasen['tools/dasAmpelsystemIstEinErinnerungsystem']='The notification system is a REMINDER and CONFIRMATION SYSTEM that is provided to remind you of outstanding tasks. <br/>The system does NOT check if the task has actually been completed. For more information, please refer to the CIS Manual.';
+$this->phrasen['tools/waehlenSieEineOEoderAmpel']='Bitte wählen Sie ein Organisationseinheit und/oder eine Ampel aus dem Dropdown';
+$this->phrasen['tools/uebersichtLeitung']='Ampel-Übersicht für LeiterInnen';
 
 //Software fuer Lehre -> Softgrid
 $this->phrasen['tools/applikationsliste']='List of Applications';
