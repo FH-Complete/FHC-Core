@@ -152,12 +152,8 @@ function loadampel()
 {
 	$('#ampel').load('ampel.php?'+gettimestamp());
 }
-function warnung_redesign()
-{
-	alert ('Die CIS-Seite wird derzeit an das neue Design angepasst. \nManche Funktionen sind möglicherweise inaktiv.');
-}
 </script>
-<body class="main" onload="warnung_redesign(), loadampel()">
+<body class="main" onload="loadampel()">
 <table width="100%" height="100%" cellspacing="0" cellpadding="0" border="0">
 <tr>
 <td class="rand"></td>
