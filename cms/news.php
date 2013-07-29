@@ -50,30 +50,35 @@ $datum_obj = new datum();
 //XML Content laden
 $content = new content();
 $db = new basis_db();
-$user = get_uid();
 
-//Zum anzeigen der Studiengang-Details neben den News
-$student = new student();
-if($student->load($user))
+$infoscreen = isset($_GET['infoscreen']);
+
+if(!$infoscreen)
 {
-	$stg_kz=$student->studiengang_kz;
-	$sem=$student->semester;
-	$ver=$student->verband;
+	$user = get_uid();
+	
+	//Zum anzeigen der Studiengang-Details neben den News
+	$student = new student();
+	if($student->load($user))
+	{
+		$stg_kz=$student->studiengang_kz;
+		$sem=$student->semester;
+		$ver=$student->verband;
+	}
+	else
+	{
+		$stg_kz=0;
+		$sem=NULL;
+		$ver=NULL;
+	}
+	// Wenn Student Incoming ist, wird bei den Studiengang-Details der ECI-Studiengang angezeigt
+	if($sem==0 && $ver=='I')
+		$stg_kz=10006;
 }
-else
-{
-	$stg_kz=0;
-	$sem=NULL;
-	$ver=NULL;
-}
-// Wenn Student Incoming ist, wird bei den Studiengang-Details der ECI-Studiengang angezeigt
-if($sem==0 && $ver=='I')
-	$stg_kz=10006;
 
 $studiengang_kz = (isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:$stg_kz);
 $semester = (isset($_GET['semester'])?$_GET['semester']:$sem);
 
-$infoscreen = isset($_GET['infoscreen']);
 $editable = isset($_GET['edit']);
 $news = new news();
 $all=false;
