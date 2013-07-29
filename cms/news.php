@@ -75,7 +75,12 @@ if(!$infoscreen)
 	if($sem==0 && $ver=='I')
 		$stg_kz=10006;
 }
-
+else
+{
+		$stg_kz=0;
+		$sem=NULL;
+		$ver=NULL;
+}
 $studiengang_kz = (isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:$stg_kz);
 $semester = (isset($_GET['semester'])?$_GET['semester']:$sem);
 
