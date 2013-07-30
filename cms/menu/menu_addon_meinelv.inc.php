@@ -104,7 +104,11 @@ class menu_addon_meinelv extends menu_addon
 				
 				if($result = $this->db_query($qry))
 				{
-					echo '<li style="margin-left:6px;"><a title="LV-Uebersicht" href="../cis/private/profile/lva_liste.php" target="content">'.$p->t("lvaliste/titel").'</a></li>';
+					$this->items[] = array('title'=>$p->t("lvaliste/titel"),
+							'target'=>'content',
+							 'link'=>'private/profile/lva_liste.php',
+							 'name'=>$p->t("lvaliste/titel"));
+
 					while($row = $this->db_fetch_object($result))
 					{
 						$lv_obj = new lehrveranstaltung();
