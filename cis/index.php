@@ -157,7 +157,7 @@ function loadampel()
 <table width="100%" height="100%" cellspacing="0" cellpadding="0" border="0">
 <tr>
 <td class="rand"></td>
-<td class="boxshadow" height="100%">
+<td class="boxshadow">
 	<table cellspacing="0" cellpadding="0" class="header">
 		<tr class="header">
 		<td valign="top" align="left">
@@ -168,7 +168,7 @@ function loadampel()
 		   	  <tr height="50%">
 		   	    <td width="20%" align="center">&nbsp;
 		        </td>
-		         <td align="center">
+		         <td valign="top" align="center">
 					<form name="searchform" action="private/tools/suche.php" method="GET" target="content" style="display:inline">				
 		        	<input id="globalsearch" type="search" size="55" name="search" placeholder=" <?php echo $p->t('menu/suchePersonOrtDokumentInhalt');?> ..."/>
 		        	<img src="../skin/images/search.png" height="14px" onclick="document.searchform.submit()" class="suchicon"/>
