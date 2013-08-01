@@ -105,7 +105,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					tbl_studiengang.bezeichnung, tbl_studiengang.english, tbl_studentlehrverband.semester, 
 					tbl_person.vorname, tbl_person.vornamen, tbl_person.nachname,tbl_person.gebdatum,tbl_person.titelpre, 
 					tbl_person.titelpost, tbl_person.anrede, tbl_studiensemester.bezeichnung as sembezeichnung, 
-					tbl_studiensemester.studiensemester_kurzbz as stsem, tbl_student.prestudent_id 
+					tbl_studiensemester.studiensemester_kurzbz as stsem, tbl_student.prestudent_id, tbl_studiengang.max_semester 
 				FROM tbl_person, tbl_student, tbl_studiengang, tbl_benutzer, tbl_studentlehrverband, tbl_studiensemester 
 				WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz 
 				AND tbl_student.student_uid = tbl_benutzer.uid AND tbl_benutzer.person_id = tbl_person.person_id 
@@ -195,7 +195,34 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$projektarbeit[$row_proj->lehrveranstaltung_id]['note']=$row_proj->note;
 			}
 		}
-				
+		
+		// Wenn es das letzte Semesterzeugnis ist, wird zusaetzlich die Abschlusspruefung geliefert
+		if($row->semester==$row->max_semester)
+		{
+
+			$qry_abschlusspruefung = "SELECT 
+											tbl_abschlusspruefung.datum, 
+											tbl_abschlusspruefung.pruefungstyp_kurzbz,
+											tbl_abschlussbeurteilung.bezeichnung, 
+											tbl_abschlussbeurteilung.bezeichnung_english											
+									FROM 
+										lehre.tbl_abschlusspruefung 
+										LEFT JOIN lehre.tbl_abschlussbeurteilung USING(abschlussbeurteilung_kurzbz) 
+									WHERE 
+										tbl_abschlusspruefung.student_uid=".$db->db_add_param($uid_arr[$i])."
+									ORDER BY datum DESC LIMIT 1";
+			if($result_abschlusspruefung = $db->db_query($qry_abschlusspruefung))
+			{
+				if($row_abschlusspruefung = $db->db_fetch_object($result_abschlusspruefung))
+				{
+					$xml .= "		<abschlusspruefung_typ>".$row_abschlusspruefung->pruefungstyp_kurzbz."</abschlusspruefung_typ>";
+					$xml .= "		<abschlusspruefung_datum>".$datum->formatDatum($row_abschlusspruefung->datum,'d.m.Y')."</abschlusspruefung_datum>";
+					$xml .= "		<abschlusspruefung_note>".$row_abschlusspruefung->bezeichnung."</abschlusspruefung_note>";
+					$xml .= "		<abschlusspruefung_note_english>".$row_abschlusspruefung->bezeichnung_english."</abschlusspruefung_note_english>";
+				}
+			}
+		}
+		
 		$obj = new zeugnisnote();
 		
 		$obj->getZeugnisnoten($lehrveranstaltung_id=null, $uid_arr[$i], $studiensemester_kurzbz);

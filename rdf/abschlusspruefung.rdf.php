@@ -110,6 +110,8 @@ if($db->db_query($qry))
 		$betreuer_2 = '';
 		$themenbereich_2 = '';
 		$note = '';
+		$note2='';
+		$datum_projekt2='';
 		
 		if($result_proj = $db->db_query($qry))
 		{			
@@ -133,6 +135,8 @@ if($db->db_query($qry))
 							$betreuer_2 = $row_bet->titelpre.' '.$row_bet->vorname.' '.$row_bet->nachname.' '.$row_bet->titelpost;
 
 				$themenbereich_2 = $row_proj->themenbereich;
+				$note2 = (isset($note_arr[$row_proj->note])?$note_arr[$row_proj->note]:$row_proj->note);
+				$datum_projekt2 = $datum_obj->convertISODate($row_proj->ende);
 			}
 		}
 		
@@ -223,8 +227,10 @@ if($db->db_query($qry))
 		<betreuer><![CDATA['.$betreuer.']]></betreuer>
 		<betreuer_2><![CDATA['.$betreuer_2.']]></betreuer_2>
 		<note><![CDATA['.$note.']]></note>
+		<note2><![CDATA['.$note2.']]></note2>
 		<notekommpruef><![CDATA['.$row->note.']]></notekommpruef>
 		<datum_projekt><![CDATA['.$datum_projekt.']]></datum_projekt>
+		<datum_projekt2><![CDATA['.$datum_projekt.']]></datum_projekt2>
 		<ort_datum><![CDATA['.date('d.m.Y').']]></ort_datum>';
 		
 	 	echo "\n\t</pruefung>";
