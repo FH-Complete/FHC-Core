@@ -94,6 +94,14 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
         $prestudent = new prestudent(); 
         $prestudent->getFirstStatus($row->prestudent_id, 'Student');
         $semesterNumberStart = $prestudent->ausbildungssemester; 
+        
+        
+        //ECTS-Punkte die bei Quereinsteigern angerechnet werden
+        if($semesterNumberStart>1)
+        {
+        	$angerechneteECTS=($semesterNumberStart-1)*30; // 30 ECTS pro Semester
+        	echo '		<angerechnete_ects_quereinstieg>'.$angerechneteECTS.'</angerechnete_ects_quereinstieg>';
+        }        
         echo '      <start_semester>'.substr($prestudent->studiensemester_kurzbz,2,6).'</start_semester>';
         echo '      <start_semester_number>'.$prestudent->ausbildungssemester.'</start_semester_number>';
         $prestudent->getLastStatus($row->prestudent_id, null);
@@ -304,11 +312,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		}
         
         // Wenn keine zusätzlichen Angaben -> "nicht zutreffend" anzeigen
+        /*
         if(!$praktikum && !$auslandssemester)
         {
             echo "<praktikum>Nicht zutreffend</praktikum>";
             echo "<auslandssemester>Not applicable</auslandssemester>";
         }
+        */
         
 		$stg_oe_obj = new studiengang($row->studiengang_kz);
 		$stgleiter = $stg_oe_obj->getLeitung($row->studiengang_kz);
@@ -321,18 +331,21 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		
 		echo "		<stgl>$stgl</stgl>";
 		
-        
+        $abschlussbeurteilung='';
         // Hole Datum der Sponsion -> wenn keine vorhanden nimm aktuelles datum
-        $qry = "SELECT sponsion FROM lehre.tbl_abschlusspruefung JOIN lehre.tbl_abschlussbeurteilung USING(abschlussbeurteilung_kurzbz) WHERE student_uid='".$uid_arr[$i]."' ORDER BY datum DESC LIMIT 1";
+        $qry = "SELECT sponsion, tbl_abschlussbeurteilung.bezeichnung_english,datum FROM lehre.tbl_abschlusspruefung JOIN lehre.tbl_abschlussbeurteilung USING(abschlussbeurteilung_kurzbz) WHERE student_uid='".$uid_arr[$i]."' ORDER BY datum DESC LIMIT 1";
         $sponsion_datum = date('d.m.Y');
         if($db->db_query($qry))
         {
             if($row1= $db->db_fetch_object())
             {
-                $sponsion_datum = $datum->formatDatum($row1->sponsion, 'd.m.Y'); 
+                $sponsion_datum = $datum->formatDatum($row1->sponsion, 'd.m.Y');
+                $abschlusspruefungsdatum = $datum->formatDatum($row1->datum, 'd.m.Y');  
+                $abschlussbeurteilung = $row1->bezeichnung_english;
             }
         }
-        
+        echo "		<abschlussbeurteilung>$abschlussbeurteilung</abschlussbeurteilung>";
+        echo "		<abschlusspruefungsdatum>$abschlusspruefungsdatum</abschlusspruefungsdatum>";
         echo "      <sponsion_datum>$sponsion_datum</sponsion_datum>";
         
 		$qry = "SELECT telefonklappe FROM public.tbl_mitarbeiter JOIN tbl_benutzerfunktion ON(uid=mitarbeiter_uid) WHERE funktion_kurzbz='ass' AND oe_kurzbz=".$db->db_add_param($stg_oe_obj->oe_kurzbz);
