@@ -412,7 +412,7 @@ class studiengang extends basis_db
 				'testtool_sprachwahl='.$this->db_add_param($this->testtool_sprachwahl, FHC_BOOLEAN).', '.
 				'studienplaetze='.$this->db_add_param($this->studienplaetze).', '.
 				'lgartcode='.$this->db_add_param($this->lgartcode).', '.
-				'mischform='.$this->db_add_param($this->mischform, FHC_INTEGER).' '.
+				'mischform='.$this->db_add_param($this->mischform, FHC_BOOLEAN).' '.
 				'WHERE studiengang_kz='.$this->db_add_param($this->studiengang_kz, FHC_INTEGER, false).';';
 		}
 
