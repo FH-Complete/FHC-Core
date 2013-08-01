@@ -2796,16 +2796,16 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
          <table:table-column table:style-name="Table16.A" table:number-columns-repeated="2" />
          <table:table-row>
             <table:table-cell table:style-name="Table16.A1" table:number-columns-spanned="2" office:value-type="string">
-               <text:p text:style-name="Table_20_Contents">Final Examination</text:p>
+               <text:p text:style-name="P68">Final Examination</text:p>
             </table:table-cell>
             <table:covered-table-cell />
          </table:table-row>
          <table:table-row>
             <table:table-cell table:style-name="Table16.A2" office:value-type="string">
-               <text:p text:style-name="Table_20_Contents"><xsl:value-of select="studiengang_typ"/>'s Examination on <xsl:value-of select="abschlusspruefungsdatum" /></text:p>
+               <text:p text:style-name="P70"><xsl:value-of select="studiengang_typ"/>'s Examination on <xsl:value-of select="abschlusspruefungsdatum" /></text:p>
             </table:table-cell>
             <table:table-cell table:style-name="Table16.B2" office:value-type="string">
-               <text:p text:style-name="Table_20_Contents"><xsl:value-of select="abschlussbeurteilung" /></text:p>
+               <text:p text:style-name="P70"><xsl:value-of select="abschlussbeurteilung" /></text:p>
             </table:table-cell>
          </table:table-row>
       </table:table>
