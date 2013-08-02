@@ -62,6 +62,13 @@ echo '<form action="',$_SERVER['PHP_SELF'],'" name="searchform" method="GET">
 
 if($search=='')
 	exit;
+	
+//Easter Egg
+if(($search=='the answer to life the universe and everything') || ($search=='answer to life the universe and everything'))
+{
+	echo '<table width="100%"><tr><td align="center"><br><br><br><p style="align:center; font-size: 2000%;"><strong>42</strong></p></td></tr></table>';
+	exit;
+}
 
 $searchItems = explode(' ',TRIM($search));
 
@@ -263,7 +270,7 @@ function searchDms($searchItems)
 		{
 			echo '<tr>';
 			if(array_key_exists($row->mimetype,$mimetypes))
-				echo '<td width="20px" height="20px" style="vertical-align:middle;"><img src="../../../skin/images/'.$mimetypes[$row->mimetype].'" style="height: 20px; vertical-align:middle;"></td><td height="20px" style="vertical-align:middle;"><a href="../../../cms/dms.php?id='.$row->dms_id.'">',$row->beschreibung,'</a></td>';
+				echo '<td width="20px" height="20px" style="vertical-align:middle;"><img src="../../../skin/images/'.$mimetypes[$row->mimetype].'" style="height: 20px; vertical-align:middle;"></td><td height="20px" style="vertical-align:middle;"><a href="../../../cms/dms.php?id='.$row->dms_id.'" title="'.$row->name.'">',$row->beschreibung,'</a></td>';
 			else
 				echo '<td width="20px" height="20px" style="vertical-align:middle;"><img src="../../../skin/images/blank.gif" style="height: 18px; vertical-align:middle;"></td><td height="20px" style="vertical-align:middle;"><a href="../../../cms/dms.php?id='.$row->dms_id.'">',$row->beschreibung,'</a></td>';
 			echo '<td style="vertical-align:middle;">',$row->version,'</td>';
