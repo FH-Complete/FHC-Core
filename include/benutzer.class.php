@@ -267,7 +267,7 @@ class benutzer extends person
 	public function search($searchItems, $limit=null)
 	{
 		$qry = "SELECT * FROM (SELECT
-					distinct on (uid) vorname, nachname, uid, mitarbeiter_uid, titelpre, titelpost,alias,
+					distinct on (uid) vorname, nachname, uid, mitarbeiter_uid, titelpre, titelpost, lektor, fixangestellt, alias,
 					(SELECT UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz)
 					 FROM public.tbl_student JOIN public.tbl_studiengang USING(studiengang_kz)
 					 WHERE student_uid=tbl_benutzer.uid) as studiengang,
@@ -322,6 +322,8 @@ class benutzer extends person
 				$obj->telefonklappe = $row->klappe;
 				$obj->raum = $row->raum;
 				$obj->alias = $row->alias;
+				$obj->lektor = $row->lektor;
+				$obj->fixangestellt = $row->fixangestellt;
 				
 				$this->result[] = $obj;
 			}
