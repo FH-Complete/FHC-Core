@@ -1,10 +1,10 @@
 <?php
-$this->phrasen['menu/zeitsperren']='Zeitsperren';
-$this->phrasen['menu/resturlaub']='Resturlaub';
-$this->phrasen['menu/fixangestellte']='Fixangestellte';
-$this->phrasen['menu/fixelektoren']='Fixe Lektoren';
-$this->phrasen['menu/organisationseinheit']='Organisationseinheit';
+$this->phrasen['menu/zeitsperren']='Aktuelle Zeitsperren<br>im Überblick';
+$this->phrasen['menu/resturlaub']='Resturlaubstage';
+$this->phrasen['menu/fixangestellte']='Zeitsperren aller Fixangestellten';
+$this->phrasen['menu/fixelektoren']='Zeitsperren aller fixen LektorInnen';
+$this->phrasen['menu/organisationseinheit']='Zeitsperren nach Organisationseinheit';
 $this->phrasen['menu/lektoren']='Lektoren';
 $this->phrasen['menu/urlaubAlle']='Alle';
-$this->phrasen['menu/suchePersonOrtDokumentInhalt']='Suche Person / Ort / Dokument / Inhalt';
+$this->phrasen['menu/suchePersonOrtDokumentInhalt']='Suche Person / Ort / Dokument / Inhalt / Durchwahl';
 ?>
