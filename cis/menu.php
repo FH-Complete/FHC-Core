@@ -41,8 +41,8 @@ ob_start();
 <title>Menu</title>
 <script type="text/javascript" src="../include/js/flexcroll.js"></script>
 <link href="../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />
-<script src="../include/js/jquery.js"></script>
-<script>
+<script type="text/javascript" src="../include/js/jquery.js"></script>
+<script type="text/javascript">
 function treemenu(obj) 
 {
 	if (!obj.length) return;
