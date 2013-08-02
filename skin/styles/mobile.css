@@ -33,10 +33,12 @@ iframe
 {
 	margin:0px;
 	padding:0px;
-	height: 80%;
+	height: 100%;
+	top: 15%;
 	
-	/* border-width:1px;
-	border-style:solid; */
+	border-width:1px;
+	border-style:solid;
+	border-color: #A5AFB6;
 }
 textarea
 {
@@ -55,7 +57,21 @@ hr
 	color:#CCCCCC;
 	height:1px;
 }
-li, ul
+ul
+{
+	padding-left: 0px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	margin-left: 6px;
+}
+ol
+{
+	padding-left: 13px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	margin-left: 6px;
+}
+ul li
 {
 	list-style-image:url(images/square_blue.png);
 	padding-left: 0px;
@@ -67,17 +83,15 @@ li.ui-menu-item
 {
 	list-style-image:none;
 }
-/* @media screen { */
 #menue
 {
-
+	/* bottom: 2%; */
 	width: 17%;
-	height: 42%;
-	z-index: 1000;
+	height: 81%;
+	z-index: 10;
 	padding: 0px;
 	margin: 0px;
 } 
-/*Alle au�er IE 6*/
 html>body #menue
 {
 	position:absolute;
@@ -85,15 +99,19 @@ html>body #menue
 
 #content
 {
-	height: 42%;
-
+	/* bottom: 2%; */
 	width:81%;
+	height:81%;
 	left:18%;
+	z-index: 10;
 	padding: 0px;
 	margin: 0px;
 }
-
-/*Alle au�er IE 6*/
+#content /* Hack für IE8 */
+{	
+	*width: 75\%;
+	*left: 21\%;
+}
 html>body #content
 {
 	position:absolute;
@@ -102,7 +120,6 @@ html>body #content
 /*   Druckausgabe */
 @media print 
 {
-	
 	.home_logo
 	{
 		display:none;
@@ -128,7 +145,6 @@ html>body #content
 		left:0px;
 		overflow: hidden;
 	}
-
 }
 input.TextBox					
 {
@@ -141,6 +157,14 @@ input.search
 	border-width: 1px;
 	border-style:solid;
 	border-color: #A5AFB6;
+}
+#globalsearch					
+{
+	background-color: #E9ECEE;
+	border-width: 1px;
+	border-style:solid;
+	border-color: #A5AFB6;
+	height: 25px;
 }
 /* Login-Button CIS-Seite */
 input.cis_login
@@ -164,16 +188,8 @@ input.cis_login
 	width:170px;
 	height:53px;
 }
-
-/*Vor IE/Mac verstecken \
-*html .header_line{
-	height:0.5px;
-}
-*/
-/* Vor IE/Mac verstecken*/
 div.tip
 {
-
 	position: absolute;
 	display: none;
 	width: 300px;
@@ -188,7 +204,9 @@ div.tip
 	vertical-align:middle;
 }
 
-/* Links */
+/* 
+==== Links ==== 
+*/
 a /*allgmeiner Link, Hauptmenuelinks*/
 {
 	color: #0086CC; /*tw-blau*/
@@ -255,15 +273,6 @@ a:focus.MenuItem /* Hauptmenuelink zum aufklappen */
 	text-decoration: none;
 	font-weight: bold;
 }
-A.hilfe 
-{ 
-	text-decoration:none;
-}
-A.hilfe:hover 
-{ 
-	text-decoration:none;
-	cursor:help;
-}
 A.stpl_detail 
 { 
 	font-size:x-small; 
@@ -287,7 +296,9 @@ a.head:hover
 }
 
 
-/* Tables */
+/* 
+==== Tables ====
+*/
 TABLE
 {
 	font-size: 13px;
@@ -299,6 +310,14 @@ TABLE.header
 	/* background-image:url(../skin/images/header.png); */ 
 	/* background-repeat:no-repeat; */ 
 	background-color: white;
+	position: relative;
+}
+TABLE.header_content
+{
+	height: 13%; 
+	width: 100%;
+	position: absolute; 
+	z-index:4;	
 }
 TABLE.cmstable /* Die Haupttable aller CMS-Contentseiten */
 {
@@ -317,7 +336,6 @@ TABLE.tabcontent
 	vertical-align: top;
 	border-spacing:0;
 }
-
 TABLE.menue
 {
 	margin: 0px;
@@ -325,13 +343,11 @@ TABLE.menue
 	border-style: none;
 	width: 100%;
 }
-
 TABLE.menue TD
 {
 	padding-bottom: 2px;
 	padding-top: 2px;
 }
-
 TABLE.tabcontent2
 {
 	margin: 0px;
@@ -353,13 +369,18 @@ td.rand /* Seitenraender des CIS */
 }
 td.boxshadow /* Farbverlauf im Hintergrund der CIS*/
 {
-	position: fixed;
-	vertical-align:top;
-	width:100%;
+	position: relative;
+	width:94%;
+	height: 100%;
+	box-shadow: 0px 100px 0px 0px #FFFFFF, /* Unterer weisser Rand bei sehr kleinen Aufloesungen */
+				0px 0px 5px 5px #888, /* schmaler dunkler Schatten */
+				/*0px 300px 5px 5px #888, /* schmaler dunkler Schatten unten bei sehr kleinen Aufloesungen*/
+				20px 20px 70px 30px #DDDDDD, /* heller Verlauf rechts */
+				-20px 20px 70px 30px #DDDDDD; /* heller Verlauf links */
 }
 td.ContentHeader
 {
-	background-color: #008381; /*gr�n*/
+	background-color: #A5AFB6; /*#DCE4EF;*/
 	font-weight: bold;
 	height: 19px;
 }
@@ -449,17 +470,14 @@ td.tdvertical /* Für Ausrichtung der Icons bei der LV-Übersicht */
 td.menubox /* Navigationsboxen in den CIS-Contentseiten */
 {
 	width: 20%;
+	height: 10px;
 	background-color: #eeeeee;
-	border-width: 1px;
-	padding-left: 15px;
-	padding-bottom: 20px;
-	padding-top: 20px;
-	height: 100%;
+	padding: 20px 15px 20px 15px;
 	vertical-align: middle;
 }
 td.menubox p
 {
-	line-height:10px;
+	line-height: 110%;
 }
 td.cmscontent
 {
@@ -471,10 +489,11 @@ td.teambox
 {
 	vertical-align: top;
 	padding-top: 20px;
+	/* height: 1000px; */ /* Damit die menubox im IE mit der richtigen höhe angezeigt wird */
 }
 tr.header
 {
-	height: 10%;
+	position: relative;
 }
 TR.liste
 {
@@ -516,7 +535,10 @@ TABLE#zeitsperren TD
 	background-color: #EEEEEE; /*grau fast wei�*/
 }
 
-/* Stundenplan */
+/* 
+==== Stundenplan ==== 
+*/
+
 TABLE.stdplan
 {  
 	margin: 0px;
@@ -543,31 +565,10 @@ TABLE.stdplan TD
   background-color:#ffffff;
 }
 
+/* 
+==== Fonts ====
+*/
 
-/* Fonts */
-/*h1 
-{ 
-	color: #ffffff; 
-	background-color: #008381; /*gruen
-	font-weight: bold;
-	padding-top: 2px;
-	padding-bottom: 2px;
-	padding-left: 4px;
-	font-size: 1em;
-}*/
-/* h1 
-{ 
-	color: black; 
-	padding-top: 2px;
-	padding-bottom: 2px;
-	width:20%;
-	white-space:nowrap;
-	padding-left: 10px;
-	font-size: 20px;
-	letter-spacing: 2px;
-	border-bottom:solid 1px #0086CC;
-	font-weight:normal;
-} */
 h1
 { 
 	color: black; 
@@ -582,94 +583,24 @@ h1
 	border-bottom:solid 1px #0086CC;*/
 	font-weight:normal;
 }
-/* h1.news
-{ 
-	color: black; 
-	padding: 0px;
-	padding-bottom: 10px;
-	padding-left: 10px;
-	width:20%;
-	margin:0px;
-	white-space:nowrap;
-	font-size: 20px;
-	font-weight:normal;
-} */
 h1 td
 { 
 	color: #ffffff; 
 	background-color: #009e84;
 }
-h1 a
-{
-	color: #dddddd;
-}
-h1 a:hover
-{
-	color: #ffffff;
-	text-decoration:none;
-}
-
-/* h2 
-{ 
-	font-size: 1em;
-	background-color: #CCCCCC; */ /*mittel-grau */
-/* 	font-weight: normal;
-	height: 19px;
-	padding-top: 2px; */
-	/*padding-left: 2px;
-}
-/* h2 
-{ 
-	font-size: 16px;
-
-	padding-top: 2px;
-	letter-spacing: 2px;
-	padding-left: 10px;
-} */
 h2
 { 
 	margin: 0px;
 	padding-top: 0px;
-	padding-bottom: 20px;
+	padding-bottom: 15px;
 	/* padding-left: 10px; */
 	font-weight: bold;
 	font-size: 15px;
 }
-/* h2 td
-{ 
-	color: #ffffff; 
-	background-color: #00a4d2; /*hellblau
-}
-h2 a
-{
-	color: #dddddd; 
-}
-h2 a:hover
-{
-	color: #ffffff;
-	text-decoration:none;
-}
-/* h3 
-{ 
-	font-weight: bold; 
-	color: #008E74; 
-	font-size: 1em;
-}
-h4 
-{ 
-	font-size: 0.8em;
-	font-style: normal; 
-	line-height: normal; 
-	font-weight: bold; 
-	font-variant: normal; 
-	text-transform: none; 
-	color: #008E74; 
-	text-decoration: none; 
-} */
 h3 
 { 
 	margin: 0px;
-	padding-top: 20px;
+	padding-top: 0px; /* 20px */
 	padding-bottom: 2px;
 	font-weight: bold;
 	font-size:13px;
@@ -686,28 +617,6 @@ h4
 {
 	color: #ff0000;
 }
-font.ContentHeader
-{
-	color: #FFFFFF;
-}
-
-/* #news
-{
-} */
-/* #news .news
-{
-	-moz-border-radius-topright: 20px;
-	-moz-border-radius-topleft: 10px;
-	width: 100%;
-	border: 1px solid #E0E0E0;
-	background-color: #F0F0F0;	
-}
-#news .news .titel table
-{
-	font-weight: bold;
-	padding: 0px 10px 0px 10px;
-	white-space: nowrap;
-} */
 #news .news
 {
 	width: 99%;
@@ -737,7 +646,9 @@ font.ContentHeader
 	margin-bottom:0px;
 }
 
-/* Images */
+/* 
+==== Images ====
+*/
 img.testtoolfrage
 {
 	max-width:400px;
@@ -781,9 +692,12 @@ img.header_logo
 	left: 16px;
 	top: 3%;
 	z-index: 5000;
-	height: 7%;
+	height: 5%;
 }
-/*Farben*/
+/*
+==== Farben ====
+*/
+
 .grey
 {
 	color: #999999;
@@ -816,13 +730,10 @@ img.header_logo
 {
 	background-color: #CCFFCC;
 }
-
-
 .studentnote
 {
 	font-weight:bold;
 }
-
 .benotungstool_tabs
 {
 	border-top: 1px solid gray;
@@ -843,32 +754,6 @@ img.header_logo
 	border-top: 1px solid gray;
 	border-bottom: 1px solid gray;
 }
-
-/*aussortiert*/
-
-
-/*font.headline					
-{
-	color: #008381; 
-	text-decoration: none;
-	font-weight: bold;
-
-	font-size: 20px;
-	line-height: 24px;
-	color: #003399;
-	margin-bottom: 0px;
-	margin-top: 0px;
-	
-}*/
-
-/*font.subline					
-{
-	font-size: 17px;
-	line-height: 20px;
-	color: #003399;
-	margin-bottom: 0px;
-	margin-top: 0px;
-}*/
 .error
 {
 	color: #ff0000;
@@ -927,10 +812,98 @@ option.inactive
 	cursor:pointer;
 	cursor:hand;
 }
+	
+/* 
+==== Kalender-Jump-Effekt im LV-Plan ====
+*/
+div.hoverbox div.preview div.hoverbox_inhalt
+{
+	display:none;
+	vertical-align: top;
+}
+div.preview
+{
+	position: relative;
+	vertical-align: top;
+}
+div.hoverbox div.preview:hover div.hoverbox_inhalt
+{
+	display: block;
+	position: absolute;
+	top: 15px;
+	left: -190px;
+	z-index: 2;
+	border:1px;
+	border-color:grey;
+	background-color:white;
+}
+table.hoverbox
+{
+	border:1px;
+	border-style:solid;
+	border-color:grey;
+	padding: 5px;
+}
 
-	
-/**** Menubox-Effekt am Seitenrand. Nettes Feature aber dzt. nicht sinnvoll einsetzbar ****
-	
+/*
+==== Gestaltung des Hauptmenues ====
+*/
+
+ul.menu
+{
+	padding:0;
+	margin:0;
+	font-family:Arial, Helvetica, sans-serif;
+	color:#0086CC;
+	font-size:13px;
+	line-height:15px;
+	width:200px;
+	list-style-type:none;
+}
+#menu
+{
+	padding:0;
+	margin:0;
+	font-family:Arial, Helvetica, sans-serif;
+	color:#0086CC;
+	font-size:13px;
+	line-height:18px;
+	width:150%;
+	list-style-type:none;
+}
+#menu a 
+{
+	display:block;
+	padding:0 0 0 5px;
+	outline:none;
+	text-decoration:none;
+}
+#menu li 
+{
+	margin:0 0 0 10px;
+	padding: 5px 0 0 0;
+	display:block;
+	border:1px solid #FFFFFF;
+}
+#menu a.selected 
+{
+	padding:0 0 0 5px;
+}
+#menu a:hover
+{
+	text-decoration: underline;
+}
+#menu a.leaf 
+{
+	color: #616B71;
+	padding-left: 5px;
+}
+
+/*
+==== Menubox-Effekt am Seitenrand. Nettes Feature aber dzt. nicht sinnvoll einsetzbar ====
+*/
+
+/*
 div.hoverbox div.preview div.hoverbox_inhalt
 {
 	display:none;
@@ -961,143 +934,3 @@ table.hoverbox
 	border-color:grey;
 }
 */
-
-/**** Kalender-Jump-Effekt im LV-Plan ****/
-	
-div.hoverbox div.preview div.hoverbox_inhalt
-{
-	display:none;
-	vertical-align: top;
-}
-div.preview
-{
-	position: relative;
-	vertical-align: top;
-}
-div.hoverbox div.preview:hover div.hoverbox_inhalt
-{
-	display: block;
-	position: absolute;
-	top: 15px;
-	left: -190px;
-	z-index: 2;
-	border:1px;
-	border-color:grey;
-	background-color:white;
-}
-table.hoverbox
-{
-	border:1px;
-	border-style:solid;
-	border-color:grey;
-	padding: 5px;
-}
-
-/**** Gestaltung des Hauptmenues ****/
-ul.menu
-{
-	padding:0;
-	margin:0;
-	font-family:Arial, Helvetica, sans-serif;
-	color:#0086CC;
-	font-size:13px;
-	line-height:15px;
-	width:200px;
-	list-style-type:none;
-}
-/* #meine_lv
-{
-	padding: 0px;
-	margin: 0 0 0 0px;	
-	font-family:Arial, Helvetica, sans-serif;
-	color:#0086CC;
-	font-size:13px;
-	line-height:15px;
-	width:250px;
-	list-style-type:none;
-} 
-#meine_lv ul
-{	
-	font-family:Arial, Helvetica, sans-serif;
-	color:#0086CC;
-	font-size:13px;
-	line-height:15px;
-	width:250px;
-	list-style-type:none;
-} */
-#menu
-{
-	padding:0;
-	margin:0;
-	font-family:Arial, Helvetica, sans-serif;
-	color:#0086CC;
-	font-size:13px;
-	line-height:18px;
-	width:250px;
-	list-style-type:none;
-}
-#menu a 
-{
-	display:block;
-	padding:0 0 0 5px;
-	outline:none;
-	text-decoration:none;
-	/* border-top: solid 1px #689CC1;*/
-
-	/* background-image:url(../skin/images/icon-plus.png);
-	background-repeat:no-repeat;
-	background-position: center left; */
-}
-#menu li 
-{
-	margin:0 0 0 10px;
-	padding: 5px 0 0 0;
-	display:block;
-	border:1px solid #FFFFFF;
-}
-
-#menu a.selected 
-{
-	padding:0 0 0 5px;
-	/* font-weight: bold;
-	background-image:url(../skin/images/icon-minus.png);
-	background-repeat:no-repeat;
-	background-position: center left; */
-}
-/* #menu a:hover
-{
-	background-image:url(../skin/images/icon-minus.png);
-	background-repeat:no-repeat;
-	background-position: center left;
-	padding:0 0 0 15px;
-} */
-#menu a:hover
-{
-	text-decoration: underline;
-}
-#menu a.leaf 
-{
-	color: #616B71; /* 0086CC */
-	padding-left: 5px;
-	/* background-image:url(../skin/images/square_lightblue_small.png);
-	background-repeat:no-repeat;
-	background-position: center left 15px; */
-	
-	/* border-top: none;*/
-}
-/* #menu a.leaf:hover
-{
-	background-image:url(../skin/images/icon-plus.png);
-	background-image:url(../skin/images/square_blue_medium.png);
-	background-repeat:no-repeat;
-	background-position: center left 6px;
-} */
-
-
-
-/* #menu ul 
-{
-	padding:0;
-	margin:0;
-	list-style-type:none;
-} */

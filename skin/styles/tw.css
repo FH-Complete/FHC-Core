@@ -86,7 +86,7 @@ li.ui-menu-item
 	bottom: 2%;
 	width: 17%;
 	height: 81%;
-	z-index: 1000;
+	z-index: 10;
 	padding: 0px;
 	margin: 0px;
 } 
@@ -100,6 +100,7 @@ html>body #menue
 	bottom: 2%;
 	width:81%;
 	height:81%;
+	z-index: 10;
 	left:18%;
 	padding: 0px;
 	margin: 0px;
@@ -309,6 +310,13 @@ TABLE.header
 	background-color: white;
 	position: relative;
 }
+TABLE.header_content
+{
+	height: 13%; 
+	width: 100%;
+	position: absolute; 
+	z-index:4;	
+}
 TABLE.cmstable /* Die Haupttable aller CMS-Contentseiten */
 {
 	margin: 0px;
@@ -485,10 +493,6 @@ td.teambox
 	vertical-align: top;
 	padding-top: 20px;
 	/* height: 1000px; */ /* Damit die menubox im IE mit der richtigen höhe angezeigt wird */
-}
-tr.header
-{
-	position: relative;
 }
 TR.liste
 {
@@ -809,6 +813,7 @@ option.inactive
 .suchicon
 {
 	margin:0px;
+	height: 14px;
 }
 .suchicon:hover
 {
