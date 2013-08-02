@@ -120,6 +120,7 @@ $db = new basis_db();
 ?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
+	<meta http-equiv="X-UA-Compatible" content="IE=9"/> 
 	<title>CIS - <?php echo CAMPUS_NAME; ?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<link rel="stylesheet" href="../skin/jquery.css" type="text/css">
@@ -159,22 +160,22 @@ function loadampel()
 <td class="rand"></td>
 <td class="boxshadow">
 	<table cellspacing="0" cellpadding="0" class="header">
-		<tr class="header">
+		<tr>
 		<td valign="top" align="left">
 		<a href="index.php"><img class="header_logo" src="../skin/images/fhtw_logo.png" alt="fhtw_logo"></a>
 		<img class="header_left" src="../skin/images/header_left.png" alt="header_links">
 		<img class="header_right" src="../skin/images/header_right.png" alt="header_rechts">	   	 	
-	   	 	<table width="100%" height="100%" style="position:relative; top:10px; z-index:4" cellpadding="0">
-		   	  <tr height="50%">
+	   	 	<table class="header_content" cellpadding="0">
+		   	  <tr>
 		   	    <td width="20%" align="center">&nbsp;
 		        </td>
-		         <td valign="top" align="center">
+		         <td valign="middle" align="center">
 					<form name="searchform" action="private/tools/suche.php" method="GET" target="content" style="display:inline">				
 		        	<input id="globalsearch" type="search" size="55" name="search" placeholder=" <?php echo $p->t('menu/suchePersonOrtDokumentInhalt');?> ..."/>
-		        	<img src="../skin/images/search.png" height="14px" onclick="document.searchform.submit()" class="suchicon"/>
+		        	<img src="../skin/images/search.png" onclick="document.searchform.submit()" class="suchicon"/>
 		        	</form>
 		        </td>
-		         <td width="20%" align="right" valign="top" style="padding-right: 10px;">
+		         <td align="right" valign="top" style="width: 20%; padding-right: 10px; padding-top: 10px;">
 			          <span style="vertical-align:top;" id="ampel"></span>&nbsp;&nbsp;<span style="color: #A5AFB6">|</span>
 						<?php	  
 							$sprache = new sprache();
@@ -193,7 +194,7 @@ function loadampel()
 			<iframe id="menue" src="<?php echo $db->convert_html_chars($menu); ?>" name="menu" frameborder="0">
 				No iFrames
 			</iframe>
-			<iframe id="content" src="<?php echo $db->convert_html_chars($content); ?>" name="content" frameborder="0";>
+			<iframe id="content" src="<?php echo $db->convert_html_chars($content); ?>" name="content" frameborder="0">
 				No iFrames
 			</iframe>
 			</td>
@@ -201,6 +202,7 @@ function loadampel()
 	</table>
 </td>
 <td class="rand">
+	<?php /*echo'
 	<!--  Menubox-Effekt am Seitenrand. Nettes Feature aber dzt. nicht sinnvoll einsetzbar
 	<div class="hoverbox">
 		<div class="preview">
@@ -230,7 +232,8 @@ function loadampel()
 				</table>				
 			</div>
 		</div>
-	</div>-->
+	</div>-->';*/
+	?>
 </td>
 </tr>
 </table>
