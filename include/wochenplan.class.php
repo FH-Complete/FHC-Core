@@ -267,7 +267,7 @@ class wochenplan extends basis_db
 		// Studiengangsdaten ermitteln
 		if ($this->type=='student' || $this->type=='verband')
 		{
-			$sql_query="SELECT bezeichnung, kurzbz, kurzbzlang, typ FROM public.tbl_studiengang WHERE studiengang_kz=".$this->db_add_param($this->stg_kz);
+			$sql_query="SELECT bezeichnung, kurzbz, kurzbzlang, typ, UPPER(typ||kurzbz) AS kuerzel FROM public.tbl_studiengang WHERE studiengang_kz=".$this->db_add_param($this->stg_kz);
 			//echo $sql_query;
 			if(!($this->db_query($sql_query)))
 				die($this->db_last_error());
@@ -276,6 +276,7 @@ class wochenplan extends basis_db
 				$this->stg_bez = $row->bezeichnung;
 				$this->stg_kurzbz = $row->typ.$row->kurzbz;
 				$this->stg_kurzbzlang = $row->kurzbzlang;
+				$this->stg_kuerzel = $row->kuerzel;
 			}
 		}
 
@@ -417,7 +418,7 @@ class wochenplan extends basis_db
 			echo '<strong>Person: </strong>'.$this->pers_titelpre.' '.$this->pers_vorname.' '.$this->pers_nachname.' '.$this->pers_titelpost.' - '.$this->pers_uid.'<br>';
 		if ($this->type=='student' || $this->type=='verband')
 		{
-			echo '<strong>'.$p->t('global/studiengang').': </strong>'.$this->stg_kurzbzlang.' - '.$this->stg_bez.'<br>';
+			echo '<strong>'.$p->t('global/studiengang').': </strong>'.$this->stg_kuerzel.' - '.$this->stg_bez.'<br>';
 			echo $p->t('global/semester').': '.$this->sem.'<br>';
 			if ($this->ver!='0' && $this->ver!='' && $this->ver!=null)
 				echo $p->t('global/verband').': '.$this->ver.'<br>';
@@ -2296,7 +2297,7 @@ function jahreskalenderjump_hoverbox($link)	//Mit Hoverbox Effekt
 		$woche++;
 		$wochenmontag+=60*60*24*7;
 	}
-	echo '			</tr></table></div></div></div></tr></td></table>'.$crlf;
+	echo '			</tr></table></div></div></div></td></tr></table>'.$crlf;
 }
 	
 ?>
