@@ -160,7 +160,7 @@ function DrawLink($link, $target, $name, $content_id=null, $open=null)
 		$class='class="selected"';
 	else
 		$class='';
-	echo '<a '.$class.' href="'.$link.'" target="'.$target.'" title="'.$name.'">'.$name.'</a>';
+	echo '<a '.$class.' href="'.$link.'" target="'.$target.'" title="'.htmlspecialchars($name).'">'.htmlspecialchars($name).'</a>';
 }
 
 /**
