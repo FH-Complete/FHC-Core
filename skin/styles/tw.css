@@ -317,6 +317,17 @@ TABLE.header_content
 	position: absolute; 
 	z-index:4;	
 }
+/* Firefox Hack, da er den absolute-Wert der position als einziger nicht richtig dargestellt hat*/
+@-moz-document url-prefix()
+{
+    TABLE.header_content 
+    {
+        height: 13%; 
+		width: 100%;
+		position: relative; 
+		z-index:4;
+    }
+}
 TABLE.cmstable /* Die Haupttable aller CMS-Contentseiten */
 {
 	margin: 0px;
