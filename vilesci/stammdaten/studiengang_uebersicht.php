@@ -55,9 +55,9 @@ require_once('../../include/benutzerberechtigung.class.php');
         die($sg->errormsg);
     
     //$htmlstr = "<table class='liste sortable'>\n";
-    $htmlstr = "<form name='formular'><input type='hidden' name='check' value=''></form><table id='t1' class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>\n";
-	$htmlstr .= "   <thead><tr class='liste'>\n";
-    $htmlstr .= "       <th class='table-sortable:numeric' onmouseup='document.formular.check.value=0'>Kz</th><th class='table-sortable:default'>Kurzbz</th><th class='table-sortable:default'>KurzbzLang</th> <th class='table-sortable:default'>Typ</th><th class='table-sortable:alphanumeric'>Bezeichnung</th><th>Aktiv</th><th class='table-sortable:default'>Email</th>";
+    $htmlstr = "<form name='formular'><input type='hidden' name='check' value=''></form><table class=\"tablesorter\" id=\"t1\">\n";
+	$htmlstr .= "   <thead><tr>\n";
+    $htmlstr .= "       <th onmouseup='document.formular.check.value=0'>Kz</th><th>Kurzbz</th><th>KurzbzLang</th> <th>Typ</th><th>Bezeichnung</th><th>Aktiv</th><th>Email</th>";
     $htmlstr .= "   </tr></thead><tbody>\n";
     $i = 0;
     foreach ($sg->result as $stg)
@@ -91,16 +91,26 @@ require_once('../../include/benutzerberechtigung.class.php');
 <title>Studieng&auml;nge Uebersicht</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
+<script type="text/javascript" src="../../include/js/jquery.js"></script>
 <script language="JavaScript" type="text/javascript">
+$(document).ready(function() 
+	{ 
+	    $("#t1").tablesorter(
+		{
+			sortList: [[2,0]],
+			widgets: ["zebra"],
+			headers: {5:{sorter:false}}
+		}); 
+	} 
+);
+
 function confdel()
 {
 	if(confirm("Diesen Datensatz wirklick loeschen?"))
 	  	return true;
 	return false;
 }
-
 
 </script>
 
