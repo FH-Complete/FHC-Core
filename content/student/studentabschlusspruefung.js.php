@@ -640,6 +640,10 @@ function StudentAbschlusspruefungPrintPruefungsprotokollMultiple(lang)
 			xsl='PrProtokollBakk';
 		if(lang=='en')
 			xsl='PrProtBakkEng';
+		if(lang=='de2')
+			xsl='PrProtBA';
+		if(lang=='en2')
+			xsl='PrProtBAEng';
 	}
 	else
 	{
@@ -647,6 +651,10 @@ function StudentAbschlusspruefungPrintPruefungsprotokollMultiple(lang)
 			xsl='PrProtokollDipl';
 		if(lang=='en')
 			xsl='PrProtDiplEng';
+		if(lang=='de2')
+			xsl='PrProtMA';
+		if(lang=='en2')
+			xsl='PrProtMAEng';
 	}
 	var tree = document.getElementById('student-tree');
 
@@ -672,7 +680,7 @@ function StudentAbschlusspruefungPrintPruefungsprotokollMultiple(lang)
 	}
 	var stg_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
 
-	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid='+uids+'&xsl_stg_kz='+stg_kz,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid='+uids+'&xsl_stg_kz='+stg_kz+'&output=pdf','Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****

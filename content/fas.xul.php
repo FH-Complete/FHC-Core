@@ -131,6 +131,8 @@ foreach($addon_obj->result as $addon)
   <command id="menu-dokumente-zutrittskarte:command" oncommand="PrintZutrittskarte();"/>
   <command id="menu-dokumente-pruefungsprotokoll:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple('de');"/>
   <command id="menu-dokumente-pruefungsprotokoll_englisch:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple('en');"/>
+  <command id="menu-dokumente-pruefungsprotokoll2:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple('de2');"/>
+  <command id="menu-dokumente-pruefungsprotokoll2_englisch:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple('en2');"/>
   <command id="menu-dokumente-pruefungszeugnis:command" oncommand="StudentAbschlusspruefungPrintPruefungszeugnisMultiple('deutsch');"/>
   <command id="menu-dokumente-pruefungszeugnis_englisch:command" oncommand="StudentAbschlusspruefungPrintPruefungszeugnisMultiple('englisch');"/>
   <command id="menu-dokumente-urkunde_deutsch:command" oncommand="StudentAbschlusspruefungPrintUrkundeMultiple('deutsch')"/>
@@ -647,6 +649,18 @@ foreach($addon_obj->result as $addon)
                label     = "&menu-dokumente-pruefungsprotokoll_englisch.label;"
                command   =  "menu-dokumente-pruefungsprotokoll_englisch:command"
                accesskey = "&menu-dokumente-pruefungsprotokoll_englisch.accesskey;"/>
+            <menuitem
+               id        =  "menu-dokumente-pruefungsprotokoll2"
+               key       =  "menu-dokumente-pruefungsprotokoll2:key"
+               label     = "&menu-dokumente-pruefungsprotokoll2.label;"
+               command   =  "menu-dokumente-pruefungsprotokoll2:command"
+               accesskey = "&menu-dokumente-pruefungsprotokoll2.accesskey;"/>
+            <menuitem
+               id        =  "menu-dokumente-pruefungsprotokoll2_englisch"
+               key       =  "menu-dokumente-pruefungsprotokoll2_englisch:key"
+               label     = "&menu-dokumente-pruefungsprotokoll2_englisch.label;"
+               command   =  "menu-dokumente-pruefungsprotokoll2_englisch:command"
+               accesskey = "&menu-dokumente-pruefungsprotokoll2_englisch.accesskey;"/>
 			<menuitem
                id        =  "menu-dokumente-pruefungszeugnis"
                key       =  "menu-dokumente-pruefungszeugnis:key"

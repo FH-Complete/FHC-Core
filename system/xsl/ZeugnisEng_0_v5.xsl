@@ -207,7 +207,7 @@
 												<xsl:text> Bachelor's Examination on </xsl:text>
 											</xsl:if>
 											<xsl:if test="abschlusspruefung_typ='Diplom'" >
-												<xsl:text> Master's Examination on '</xsl:text>
+												<xsl:text> Master's Examination on </xsl:text>
 											</xsl:if>
 											<xsl:value-of select="abschlusspruefung_datum" />
 										</fo:block>
