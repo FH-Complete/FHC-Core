@@ -447,13 +447,21 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           <table:covered-table-cell/>
           <table:covered-table-cell/>
         </table:table-row>
-         </table:table>
+      </table:table>
       <text:p text:style-name="P19"/>
       <text:p text:style-name="P2"><xsl:value-of select="titelpre" /><xsl:text> </xsl:text><xsl:value-of select="vorname" /><xsl:text> </xsl:text><xsl:value-of select="nachname" /><xsl:text> </xsl:text><xsl:value-of select="titelpost" /></text:p>
       <text:p text:style-name="P1">Personenkennzeichen: <xsl:value-of select="matrikelnr" /></text:p>
       <text:p text:style-name="P19"/>
       
       <table:table table:name="Tabelle1" table:style-name="Tabelle1">
+        <table:table-column table:style-name="Tabelle1.A"/>
+        <table:table-column table:style-name="Tabelle1.B"/>
+        <table:table-column table:style-name="Tabelle1.C"/>
+        <table:table-column table:style-name="Tabelle1.D"/>
+        <table:table-column table:style-name="Tabelle1.A" table:number-columns-repeated="2"/>
+        <table:table-column table:style-name="Tabelle1.G"/>
+        <table:table-column table:style-name="Tabelle1.H"/>
+
         <table:table-row table:style-name="Tabelle1.1">
           <table:table-cell table:style-name="Tabelle1.A1" table:number-columns-spanned="8" office:value-type="string">
             <text:p text:style-name="P5">Fragen zur Eröffnung des Prüfungsgesprächs</text:p>
@@ -497,6 +505,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             <text:p text:style-name="P5"><draw:custom-shape text:anchor-type="char" draw:z-index="3" draw:name="Rechteck 4" draw:style-name="gr1" draw:text-style-name="P22" svg:width="0.445cm" svg:height="0.445cm" svg:x="8.925cm" svg:y="0.074cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>(+) bestanden</text:p>
             <text:p text:style-name="P5"><draw:custom-shape text:anchor-type="char" draw:z-index="4" draw:name="Rechteck 7" draw:style-name="gr1" draw:text-style-name="P22" svg:width="0.445cm" svg:height="0.445cm" svg:x="8.925cm" svg:y="0.051cm"><text:p/><draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/></draw:custom-shape>(-) nicht bestanden</text:p>
           </table:table-cell>
+          <table:covered-table-cell/>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
