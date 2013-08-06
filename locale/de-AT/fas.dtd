@@ -251,11 +251,17 @@
 <!ENTITY menu-dokumente-zutrittskarte.label	"Zutrittskarte">
 <!ENTITY menu-dokumente-zutrittskarte.accesskey	"Z">
 
-<!ENTITY menu-dokumente-pruefungsprotokoll.label		"Prüfungsprotokoll">
+<!ENTITY menu-dokumente-pruefungsprotokoll.label		"Prüfungsprotokoll 1 (Alte Version)">
 <!ENTITY menu-dokumente-pruefungsprotokoll.accesskey	"P">
 
-<!ENTITY menu-dokumente-pruefungsprotokoll_englisch.label		"Prüfungsprotokoll Englisch">
+<!ENTITY menu-dokumente-pruefungsprotokoll_englisch.label		"Prüfungsprotokoll Englisch 1 (Alte Version)">
 <!ENTITY menu-dokumente-pruefungsprotokoll_englisch.accesskey	"P">
+
+<!ENTITY menu-dokumente-pruefungsprotokoll2.label		"Prüfungsprotokoll 2 (Neue Version)">
+<!ENTITY menu-dokumente-pruefungsprotokoll2.accesskey	"P">
+
+<!ENTITY menu-dokumente-pruefungsprotokoll2_englisch.label		"Prüfungsprotokoll Englisch 2 (Neue Version)">
+<!ENTITY menu-dokumente-pruefungsprotokoll2_englisch.accesskey	"P">
 
 <!ENTITY menu-dokumente-pruefungszeugnis.label		"Prüfungszeugnis">
 <!ENTITY menu-dokumente-pruefungszeugnis.accesskey	"Z">
