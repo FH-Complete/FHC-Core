@@ -90,10 +90,19 @@ if(!$is_lector)
 	     	else
 	     		return true;
 	  	}
+
+		function container_visible(conid)
+		{
+			if(__js_page_array[conid] == 'visible')
+				return true;
+			else
+				return false;
+		}
+
 		function show_layer(x)
 		{
 	 		if (document.getElementById && document.getElementById(x)) 
-			{  
+			{
 				document.getElementById(x).style.visibility = 'visible';
 				document.getElementById(x).style.display = 'inline';
 			} else if (document.all && document.all[x]) {      
@@ -103,13 +112,16 @@ if(!$is_lector)
 		           	 document.layers[x].visibility = 'show';
 				 document.layers[x].style.display='inline';
 		          }
-	
 		}
 	
 		function hide_layer(x)
 		{
+			var conid=x.substring(4);
+			if(container_visible(conid))
+				js_toggle_container(conid);
+				
 			if (document.getElementById && document.getElementById(x)) 
-			{                       
+			{
 			   	document.getElementById(x).style.visibility = 'hidden';
 				document.getElementById(x).style.display = 'none';
 	       	} else if (document.all && document.all[x]) {                                
@@ -206,7 +218,7 @@ if(!$is_lector)
 		
 		foreach($stg_obj->result as $row)
 		{
-		    // Kopfzeile hinausschreiben
+		    // Kopfzeile hinausschreiben (hide-Tabelle -> nur Kopfzeile)
 		    echo "<table class='tabcontent2' id='hide".$row->kuerzel."' >";
 		    echo '<tr onClick="hide_layer(\'hide'.$row->kuerzel.'\');show_layer(\'show'.$row->kuerzel.'\');">';
 		  	echo "   <td height=\"18\" width=\"420\" class=\"ContentHeader2\" style='vertical-align: bottom;'><img height='9px' src='../../skin/images/right_lvplan.png' title='".$p->t('mailverteiler/anzeigen')."' alt='".$p->t('mailverteiler/anzeigen')."' border='0'>&nbsp;";
@@ -217,7 +229,7 @@ if(!$is_lector)
 			echo "   </tr>";
 			echo "</table>";
 
-		    // Kopfzeile hinausschreiben
+		    // Kopfzeile hinausschreiben (show-Tabelle -> Kopfzeile mit Inhalt)
 		    echo "<table class='tabcontent2' style='display:none;' id='show".$row->kuerzel."'>";
 		    echo '<tr  onClick="show_layer(\'hide'.$row->kuerzel.'\');hide_layer(\'show'.$row->kuerzel.'\');">';
 		
@@ -226,7 +238,7 @@ if(!$is_lector)
 		    echo "   <td width=\"23\" class=\"ContentHeader2\">&nbsp;</td>";
 		    echo "   <td width=\"300\" class=\"ContentHeader2\">&nbsp;</td>";
 			echo "   <td width=\"100\" class=\"ContentHeader2\" align=\"right\"><a href=\"mailverteiler.php#\">top&nbsp;</a></td>";
-			echo "   </tr>";
+			echo "   </tr>";			
 
 			// Verteiler Normal
 			$grp_obj = new gruppe();
@@ -404,8 +416,10 @@ if(!$is_lector)
   	if(isset($_GET['kbzl']) && $_GET['kbzl']!='')
   	{
   	   echo "<script language='javascript'>
-  	              js_toggle_container('".$db->convert_html_chars($_GET['kbzl'])."');
+	              show_layer('show".$db->convert_html_chars($_GET['kbzl'])."');
+	              hide_layer('hide".$db->convert_html_chars($_GET['kbzl'])."');
   	         </script>";
-    }
+//  	              js_toggle_container('".$db->convert_html_chars($_GET['kbzl'])."');
+			 }
 ?>
 </td></tr></table></body></html>
