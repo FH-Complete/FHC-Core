@@ -91,6 +91,7 @@ class authentication extends auth
 			/* Authentifizierung des User */
 			if (($link_id = @ldap_bind($connect, $user_dn, $passwort)) == false)
 			{
+				$this->errormsg='LDAP Bind fehlgeschlagen: '.ldap_error($connect);
 				return false;
 			}
 
