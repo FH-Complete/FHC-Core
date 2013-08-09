@@ -80,7 +80,7 @@ class cronjob extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * FROM system.tbl_cronjob WHERE cronjob_id='".addslashes($cronjob_id)."'";
+		$qry = "SELECT * FROM system.tbl_cronjob WHERE cronjob_id=".$this->db_add_param($cronjob_id, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 		{
@@ -92,15 +92,15 @@ class cronjob extends basis_db
 				$this->beschreibung = $row->beschreibung;
 				$this->file = $row->file;
 				$this->last_execute = $row->last_execute;
-				$this->aktiv = ($row->aktiv=='t'?true:false);
-				$this->running = ($row->running=='t'?true:false);
+				$this->aktiv = $this->db_parse_bool($row->aktiv);
+				$this->running = $this->db_parse_bool($row->running);
 				$this->jahr = $row->jahr;
 				$this->monat = $row->monat;
 				$this->tag = $row->tag;
 				$this->wochentag = $row->wochentag;
 				$this->stunde = $row->stunde;
 				$this->minute = $row->minute;
-				$this->standalone = ($row->standalone=='t'?true:false);
+				$this->standalone = $this->db_parse_bool($row->standalone);
 				$this->reihenfolge = $row->reihenfolge;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
@@ -186,26 +186,26 @@ class cronjob extends basis_db
 			$qry = 'BEGIN;INSERT INTO system.tbl_cronjob (server_kurzbz, titel, beschreibung, file, last_execute, aktiv,
 					running, jahr, monat, tag, wochentag, stunde, minute, standalone, reihenfolge, updateamum, updatevon, 
 					insertamum, insertvon, variablen) VALUES('.
-			       $this->addslashes($this->server_kurzbz).', '.
-			       $this->addslashes($this->titel).', '.
-			       $this->addslashes($this->beschreibung).', '.
-			       $this->addslashes($this->file).', '.
-			       $this->addslashes($this->last_execute).', '.
-			       ($this->aktiv?'true':'false').', '.
-			       ($this->running?'true':'false').', '.
-			       $this->addslashes($this->jahr).', '.
-			       $this->addslashes($this->monat).', '.
-			       $this->addslashes($this->tag).', '.
-			       $this->addslashes($this->wochentag).', '.
-			       $this->addslashes($this->stunde).', '.
-			       $this->addslashes($this->minute).', '.
-				   ($this->standalone?'true':'false').', '.
-			       $this->addslashes($this->reihenfolge).', '.
-			       $this->addslashes($this->updateamum).', '.
-			       $this->addslashes($this->updatevon).', '.
-			       $this->addslashes($this->insertamum).', '.
-			       $this->addslashes($this->insertvon).','.
-			       $this->addslashes($this->variablen).');';
+			       $this->db_add_param($this->server_kurzbz).', '.
+			       $this->db_add_param($this->titel).', '.
+			       $this->db_add_param($this->beschreibung).', '.
+			       $this->db_add_param($this->file).', '.
+			       $this->db_add_param($this->last_execute).', '.
+			       $this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
+			       $this->db_add_param($this->running, FHC_BOOLEAN).', '.
+			       $this->db_add_param($this->jahr).', '.
+			       $this->db_add_param($this->monat).', '.
+			       $this->db_add_param($this->tag).', '.
+			       $this->db_add_param($this->wochentag).', '.
+			       $this->db_add_param($this->stunde).', '.
+			       $this->db_add_param($this->minute).', '.
+				   $this->db_add_param($this->standalone, FHC_BOOLEAN).', '.
+			       $this->db_add_param($this->reihenfolge).', '.
+			       $this->db_add_param($this->updateamum).', '.
+			       $this->db_add_param($this->updatevon).', '.
+			       $this->db_add_param($this->insertamum).', '.
+			       $this->db_add_param($this->insertvon).','.
+			       $this->db_add_param($this->variablen).');';
 		}
 		else
 		{
@@ -219,25 +219,25 @@ class cronjob extends basis_db
 			}
 			
 			$qry='UPDATE system.tbl_cronjob SET '.
-			'server_kurzbz='.$this->addslashes($this->server_kurzbz).', '.
-			'titel='.$this->addslashes($this->titel).', '.
- 			'beschreibung='.$this->addslashes($this->beschreibung).', '.
- 			'file='.$this->addslashes($this->file).', '.
- 			'last_execute='.$this->addslashes($this->last_execute).', '.
- 			'aktiv='.($this->aktiv?'true':'false').', '.
- 			'running='.($this->running?'true':'false').', '.
- 			'jahr='.$this->addslashes($this->jahr).', '.
- 			'monat='.$this->addslashes($this->monat).', '.
- 			'tag='.$this->addslashes($this->tag).', '.
- 			'wochentag='.$this->addslashes($this->wochentag).', '.
- 			'stunde='.$this->addslashes($this->stunde).', '.
- 			'minute='.$this->addslashes($this->minute).', '.
- 			'standalone='.($this->standalone?'true':'false').', '.
- 			'reihenfolge='.$this->addslashes($this->reihenfolge).', '.
- 			'variablen='.$this->addslashes($this->variablen).','.
- 			'updateamum='.$this->addslashes($this->updateamum).','.
- 			'updatevon='.$this->addslashes($this->updatevon).' '.
- 			'WHERE cronjob_id='.$this->addslashes($this->cronjob_id).';';
+			'server_kurzbz='.$this->db_add_param($this->server_kurzbz).', '.
+			'titel='.$this->db_add_param($this->titel).', '.
+ 			'beschreibung='.$this->db_add_param($this->beschreibung).', '.
+ 			'file='.$this->db_add_param($this->file).', '.
+ 			'last_execute='.$this->db_add_param($this->last_execute).', '.
+ 			'aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
+ 			'running='.$this->db_add_param($this->running, FHC_BOOLEAN).', '.
+ 			'jahr='.$this->db_add_param($this->jahr).', '.
+ 			'monat='.$this->db_add_param($this->monat).', '.
+ 			'tag='.$this->db_add_param($this->tag).', '.
+ 			'wochentag='.$this->db_add_param($this->wochentag).', '.
+ 			'stunde='.$this->db_add_param($this->stunde).', '.
+ 			'minute='.$this->db_add_param($this->minute).', '.
+ 			'standalone='.$this->db_add_param($this->standalone, FHC_BOOLEAN).', '.
+ 			'reihenfolge='.$this->db_add_param($this->reihenfolge).', '.
+ 			'variablen='.$this->db_add_param($this->variablen).','.
+ 			'updateamum='.$this->db_add_param($this->updateamum).','.
+ 			'updatevon='.$this->db_add_param($this->updatevon).' '.
+ 			'WHERE cronjob_id='.$this->db_add_param($this->cronjob_id, FHC_INTEGER).';';
 		}
 
 		if($this->db_query($qry))
@@ -290,7 +290,7 @@ class cronjob extends basis_db
 			return false;
 		}
 		
-		$qry = "DELETE FROM system.tbl_cronjob WHERE cronjob_id='".addslashes($cronjob_id)."'";
+		$qry = "DELETE FROM system.tbl_cronjob WHERE cronjob_id=".$this->db_add_param($cronjob_id, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 			return true;
@@ -312,7 +312,7 @@ class cronjob extends basis_db
 	{
 		$qry = "SELECT * FROM system.tbl_cronjob WHERE 1=1";
 		if($server!=null)
-			$qry.=" AND server_kurzbz='".addslashes($server)."'";
+			$qry.=" AND server_kurzbz=".$this->db_add_param($server);
 		if ($aktiv)
 			$qry.=' AND aktiv=true';
 
@@ -335,15 +335,15 @@ class cronjob extends basis_db
 			$obj->beschreibung = $row->beschreibung;
 			$obj->file = $row->file;
 			$obj->last_execute = $row->last_execute;
-			$obj->aktiv = ($row->aktiv=='t'?true:false);
-			$obj->running = ($row->running=='t'?true:false);
+			$obj->aktiv = $this->db_parse_bool($row->aktiv);
+			$obj->running = $this->db_parse_bool($row->running);
 			$obj->jahr = $row->jahr;
 			$obj->monat = $row->monat;
 			$obj->tag = $row->tag;
 			$obj->wochentag = $row->wochentag;
 			$obj->stunde = $row->stunde;
 			$obj->minute = $row->minute;
-			$obj->standalone = ($row->standalone=='t'?true:false);
+			$obj->standalone = $this->db_parse_bool($row->standalone);
 			$obj->reihenfolge = $row->reihenfolge;
 			$obj->updateamum = $row->updateamum;
 			$obj->updatevon = $row->updatevon;

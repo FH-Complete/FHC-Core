@@ -34,7 +34,7 @@ $datum = new datum();
 $cj = new cronjob();
 if(!$cj->getAll(SERVER_NAME,'reihenfolge',true))
 	die('Fehler beim Laden der Cronjobs');
-	
+
 foreach ($cj->result as $cronjob)
 {
 	$timestamp = $cronjob->getNextExecutionTime();
@@ -43,11 +43,11 @@ foreach ($cj->result as $cronjob)
 		//Starten des Jobs
 		if($cronjob->execute())
 		{
-			echo date('d.m.Y H:i:s').' '.$cronjob->titel.'('.$cronjob->cronjob_id.') executed<br>';
+			echo date('d.m.Y H:i:s').' '.$cronjob->titel.'('.$cronjob->cronjob_id.') executed<br>'."\n";
 		}
 		else 
 		{
-			echo date('d.m.Y H:i:s').' '.$cronjob->titel.'('.$cronjob->cronjob_id.') <b>failed</b><br>';
+			echo date('d.m.Y H:i:s').' '.$cronjob->titel.'('.$cronjob->cronjob_id.') <b>failed</b><br>'."\n";
 		}
 	}
 }
