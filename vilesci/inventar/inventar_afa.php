@@ -217,9 +217,11 @@
 		<title>Inventar - AfA</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-		<link rel="stylesheet" href="../../include/js/jquery.css" rel="stylesheet" type="text/css">
+<!--		<link rel="stylesheet" href="../../include/js/jquery.css" rel="stylesheet" type="text/css"> -->
+		<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>	
+		<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>	
 
-		<script src="../../include/js/jquery.js" type="text/javascript"></script>
+<!--		<script src="../../include/js/jquery.js" type="text/javascript"></script> -->
 				
 		<script type="text/javascript">
 			var ajxFile = "<?php echo $_SERVER["PHP_SELF"];  ?>";
@@ -285,7 +287,8 @@
 		<table class="navbar">
 			<tr>
 				<td><label for="inventarnummer">Inv.nr.</label>&nbsp;
-					<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1500);}" id="inventarnummer" name="inventarnummer" type="text" size="10" maxlength="30" value="<?php echo $inventarnummer;?>" />&nbsp;
+<!--					<input onchange="if (this.value.length>0) {setTimeout('document.sendform.submit()',1500);}" id="inventarnummer" name="inventarnummer" type="text" size="10" maxlength="30" value="<?php echo $inventarnummer;?>" />&nbsp; -->
+					<input id="inventarnummer" name="inventarnummer" type="text" size="10" maxlength="30" value="<?php echo $inventarnummer;?>" />&nbsp;
 					<script type="text/javascript">
 						function selectItem(li) 
 						{
@@ -293,7 +296,24 @@
 						}
 						$(document).ready(function() 
 						{
-							  $('#inventarnummer').autocomplete('inventar_autocomplete.php', 
+							$('#inventarnummer').autocomplete({
+								source: "inventar_autocomplete.php?work=inventarnummer",
+								minLength:2,
+								response: function(event, ui)
+								{
+									//Value und Label fuer die Anzeige setzen
+									for(i in ui.content)
+									{
+										ui.content[i].value=ui.content[i].inventarnummer;
+										ui.content[i].label=ui.content[i].inventarnummer+" "+ui.content[i].beschreibung;
+									}
+								},
+								select: function(event, ui)
+								{
+									ui.item.value=ui.item.inventarnummer;
+								}
+							});
+							/*  $('#inventarnummer').autocomplete('inventar_autocomplete.php', 
 							  {
 								minChars:2,
 								scroll: true, 
@@ -305,7 +325,7 @@
 											,'afa':$("#afa").val()
 											,'betriebsmitteltyp':$("#betriebsmitteltyp").val()
 											 }
-							  });
+							  }); */
 					  });
 					</script>
 				</td>
@@ -316,7 +336,24 @@
 						   return false;
 						}
 						$(document).ready(function() {
-							  $('#seriennummer').autocomplete('inventar_autocomplete.php', {
+							$('#seriennummer').autocomplete({
+								source: "inventar_autocomplete.php?work=seriennummer",
+								minLength:4,
+								response: function(event, ui)
+								{
+									//Value und Label fuer die Anzeige setzen
+									for(i in ui.content)
+									{
+										ui.content[i].value=ui.content[i].seriennummer;
+										ui.content[i].label=ui.content[i].seriennummer+' '+ui.content[i].beschreibung;
+									}
+								},
+								select: function(event, ui)
+								{
+									ui.item.value=ui.item.seriennummer;
+								}
+							});
+							/*  $('#seriennummer').autocomplete('inventar_autocomplete.php', {
 								minChars:4,
 								matchSubset:1,matchContains:1,
 								width:900,
@@ -327,7 +364,7 @@
 											,'afa':$("#afa").val()
 											,'betriebsmitteltyp':$("#betriebsmitteltyp").val()
 											 }
-							  });
+							  }); */
 					  });
 					</script>
 				</td>
@@ -341,7 +378,24 @@
 						}
 						
 						$(document).ready(function() {
-							  $('#ort_kurzbz').autocomplete('inventar_autocomplete.php', {
+							$('#ort_kurzbz').autocomplete({
+								source: "inventar_autocomplete.php?work=inventar_ort",
+								minLength:2,
+								response: function(event, ui)
+								{
+									//Value und Label fuer die Anzeige setzen
+									for(i in ui.content)
+									{
+										ui.content[i].value=ui.content[i].ort_kurzbz;
+										ui.content[i].label=ui.content[i].ort_kurzbz+" "+ui.content[i].bezeichnung;
+									}
+								},
+								select: function(event, ui)
+								{
+									ui.item.value=ui.item.ort_kurzbz;
+								}
+							});
+							 /* $('#ort_kurzbz').autocomplete('inventar_autocomplete.php', {
 								minChars:2,
 								matchSubset:1,matchContains:1,
 								width:300,
@@ -352,7 +406,7 @@
 											,'afa':$("#afa").val()
 											,'betriebsmitteltyp':$("#betriebsmitteltyp").val()
 											,'betriebsmittelstatus_kurzbz':$("#betriebsmittelstatus_kurzbz").val() }
-							  });
+							  }); */
 					  });
 						</script>
 				</td>
@@ -410,7 +464,24 @@
 						}
 						
 						$(document).ready(function() {
-							  $('#bestellnr').autocomplete('inventar_autocomplete.php', {
+							$('#bestellnr').autocomplete({
+								source: "inventar_autocomplete.php?work=wawi_bestellnr",
+								minLength:5,
+								response: function(event, ui)
+								{
+									//Value und Label fuer die Anzeige setzen
+									for(i in ui.content)
+									{
+										ui.content[i].value=ui.content[i].bestell_nr;
+										ui.content[i].label=ui.content[i].bestell_nr+' '+ui.content[i].insertamum+' '+ui.content[i].titel+' '+ui.content[i].bemerkung;
+									}
+								},
+								select: function(event, ui)
+								{
+									ui.item.value=ui.item.bestell_nr;
+								}
+							});
+							/*  $('#bestellnr').autocomplete('inventar_autocomplete.php', {
 								minChars:5,
 								matchSubset:1,matchContains:1,
 								width:500,
@@ -418,7 +489,7 @@
 								onItemSelect:selectItem,
 								formatItem:formatItem,
 								extraParams:{'work':'wawi_bestellnr'}
-							  });
+							  }); */
 					  });
 					</script>
 				</td>
@@ -432,7 +503,24 @@
 							}
 						
 							$(document).ready(function() {
-								  $('#bestellung_id').autocomplete('inventar_autocomplete.php', {
+								$('#bestellung_id').autocomplete({
+									source: "inventar_autocomplete.php?work=wawi_bestellung_id",
+									minLength:2,
+									response: function(event, ui)
+									{
+										//Value und Label fuer die Anzeige setzen
+										for(i in ui.content)
+										{
+											ui.content[i].value=ui.content[i].bestellung_id;
+											ui.content[i].label=ui.content[i].bestellung_id+', '+ui.content[i].insertamum+', '+ui.content[i].bestell_nr+', '+ui.content[i].titel+', '+ui.content[i].bemerkung;
+										}
+									},
+									select: function(event, ui)
+									{
+										ui.item.value=ui.item.bestellung_id;
+									}
+								});
+								/*  $('#bestellung_id').autocomplete('inventar_autocomplete.php', {
 									minChars:3,
 									matchSubset:1,matchContains:1,
 									width:500,
@@ -440,7 +528,7 @@
 									onItemSelect:selectItem,
 									formatItem:formatItem,
 									extraParams:{'work':'wawi_bestellung_id'}
-								  });
+								  }); */
 						  });
 						</script>
 				</td>
@@ -452,7 +540,24 @@
 							}
 							
 							$(document).ready(function() {
-								  $('#firma_id').autocomplete('inventar_autocomplete.php', {
+								$('#firma_id').autocomplete({
+									source: "inventar_autocomplete.php?work=wawi_firma_search",
+									minLength:4,
+									response: function(event, ui)
+									{
+										//Value und Label fuer die Anzeige setzen
+										for(i in ui.content)
+										{
+											ui.content[i].value=ui.content[i].firma_id;
+											ui.content[i].label=ui.content[i].firma_id+' '+ui.content[i].name;
+										}
+									},
+									select: function(event, ui)
+									{
+										ui.item.value=ui.item.firma_id;
+									}
+								});
+								/*  $('#firma_id').autocomplete('inventar_autocomplete.php', {
 									minChars:4,
 									matchSubset:1,matchContains:1,
 									width:500,
@@ -460,7 +565,7 @@
 									onItemSelect:selectItem,
 									formatItem:formatItem,
 									extraParams:{'work':'wawi_firma_search'}
-								  });
+								  }); */
 						  });
 						</script>				
 				</td>
@@ -471,7 +576,24 @@
 						}
 						
 						$(document).ready(function() {
-							  $('#hersteller').autocomplete('inventar_autocomplete.php', {
+							$('#hersteller').autocomplete({
+								source: "inventar_autocomplete.php?work=hersteller",
+								minLength:4,
+								response: function(event, ui)
+								{
+									//Value und Label fuer die Anzeige setzen
+									for(i in ui.content)
+									{
+										ui.content[i].value=ui.content[i].hersteller;
+										ui.content[i].label=ui.content[i].hersteller;
+									}
+								},
+								select: function(event, ui)
+								{
+									ui.item.value=ui.item.hersteller;
+								}
+							});
+							/*  $('#hersteller').autocomplete('inventar_autocomplete.php', {
 								minChars:4,
 								matchSubset:1,matchContains:1,
 								width:400,
@@ -479,7 +601,7 @@
 								onItemSelect:selectItem,
 								formatItem:formatItem,
 								extraParams:{'work':'hersteller' }
-							  });
+							  }); */
 					  });
 					</script>
 				</td>

@@ -106,7 +106,7 @@
 	{
 		// SerienNummer - Inventarnummern suche
 		case 'seriennummer':
-		 	$seriennummer=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+		 	$seriennummer=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
 			if (is_null($seriennummer) || $seriennummer=='')
 				exit();
 			$pArt='select';
@@ -120,13 +120,21 @@
 			$pSql='';
 			if (!$oRresult=$db->SQL($pArt,$pDistinct,$pFields,$pTable,$pWhere,$pOrder,$pLimit,$pSql))
 				exit(' |'.$db->errormsg."\n");
+			
+			$result=array();
 			for ($i=0;$i<count($oRresult);$i++)
-				echo html_entity_decode($oRresult[$i]->seriennummer).'|'. (is_null($oRresult[$i]->beschreibung) || empty($oRresult[$i]->beschreibung) || $oRresult[$i]->beschreibung=='NULL' || $oRresult[$i]->beschreibung=='null'?'':html_entity_decode($oRresult[$i]->beschreibung))."\n";
+			{
+				$item['seriennummer']=html_entity_decode($oRresult[$i]->seriennummer);
+				$item['beschreibung']=is_null($oRresult[$i]->beschreibung) || empty($oRresult[$i]->beschreibung) || $oRresult[$i]->beschreibung=='NULL' || $oRresult[$i]->beschreibung=='null'?'':html_entity_decode($oRresult[$i]->beschreibung);
+				$result[]=$item;
+//				echo html_entity_decode($oRresult[$i]->seriennummer).'|'. (is_null($oRresult[$i]->beschreibung) || empty($oRresult[$i]->beschreibung) || $oRresult[$i]->beschreibung=='NULL' || $oRresult[$i]->beschreibung=='null'?'':html_entity_decode($oRresult[$i]->beschreibung))."\n";
+			}
+			echo json_encode($result);
 			break;
 
 		// Hersteller
 		case 'hersteller':
-		 	$hersteller=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+		 	$hersteller=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
 			if (is_null($hersteller) || $hersteller=='')
 				exit();
 			$pArt='select';
@@ -140,8 +148,15 @@
 			$pSql='';
 			if (!$oRresult=$db->SQL($pArt,$pDistinct,$pFields,$pTable,$pWhere,$pOrder,$pLimit,$pSql))
 				exit(' |'.$db->errormsg."\n");
+
+			$result=array();
 			for ($i=0;$i<count($oRresult);$i++)
-				echo html_entity_decode($oRresult[$i]->hersteller).'|'. ''."\n";
+			{
+				$item['hersteller']=html_entity_decode($oRresult[$i]->hersteller);
+				$result[]=$item;
+//				echo html_entity_decode($oRresult[$i]->hersteller).'|'. ''."\n";
+			}
+			echo json_encode($result);
 			break;
 
 		// Bestellung
@@ -166,7 +181,7 @@
 
 		// Betriebsmittel Inventarnummer
 		case 'inventarnummer':
-		 	$inventarnummer=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+		 	$inventarnummer=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
 			if (is_null($inventarnummer) || $inventarnummer=='')
 				exit();
 			$pArt='select';
@@ -180,13 +195,21 @@
 			$pSql='';
 			if (!$oRresult=$db->SQL($pArt,$pDistinct,$pFields,$pTable,$pWhere,$pOrder,$pLimit,$pSql))
 				exit(' |'.$db->errormsg."\n");
+
+			$result=array();
 			for ($i=0;$i<count($oRresult);$i++)
-				echo html_entity_decode($oRresult[$i]->inventarnummer).'|'. (is_null($oRresult[$i]->beschreibung) || empty($oRresult[$i]->beschreibung) || $oRresult[$i]->beschreibung=='NULL' || $oRresult[$i]->beschreibung=='null'?'':html_entity_decode(mb_str_replace("\n","",$oRresult[$i]->beschreibung)))."\n";
+			{
+				$item['inventarnummer']=html_entity_decode($oRresult[$i]->inventarnummer);
+				$item['beschreibung']=is_null($oRresult[$i]->beschreibung) || empty($oRresult[$i]->beschreibung) || $oRresult[$i]->beschreibung=='NULL' || $oRresult[$i]->beschreibung=='null'?'':html_entity_decode(mb_str_replace("\n","",$oRresult[$i]->beschreibung));
+				$result[]=$item;
+//				echo html_entity_decode($oRresult[$i]->inventarnummer).'|'. (is_null($oRresult[$i]->beschreibung) || empty($oRresult[$i]->beschreibung) || $oRresult[$i]->beschreibung=='NULL' || $oRresult[$i]->beschreibung=='null'?'':html_entity_decode(mb_str_replace("\n","",$oRresult[$i]->beschreibung)))."\n";
+			}
+			echo json_encode($result);
 			break;
 
 		// Ort - Inventarorte suche
 		case 'inventar_ort':
-		 	$ort_kurzbz=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+		 	$ort_kurzbz=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
 			if (is_null($ort_kurzbz) || $ort_kurzbz=='')
 				exit();
 			$pArt='select';
@@ -200,18 +223,25 @@
 			$pSql='';
 			if (!$oRresult=$db->SQL($pArt,$pDistinct,$pFields,$pTable,$pWhere,$pOrder,$pLimit,$pSql))
 				exit(' |'.$db->errormsg."\n");
+
+			$result=array();
 			for ($i=0;$i<count($oRresult);$i++)
 			{
-				echo html_entity_decode($oRresult[$i]->ort_kurzbz).'|'
+				$item['ort_kurzbz']=html_entity_decode($oRresult[$i]->ort_kurzbz);
+				$item['bezeichnung']=is_null($oRresult[$i]->bezeichnung) || empty($oRresult[$i]->bezeichnung) || $oRresult[$i]->bezeichnung=='NULL' || $oRresult[$i]->bezeichnung=='null'?'':html_entity_decode($oRresult[$i]->bezeichnung);
+				$item['aktiv']=$oRresult[$i]->aktiv==true || $oRresult[$i]->aktiv=='t'?true:false;
+				$result[]=$item;
+/*				echo html_entity_decode($oRresult[$i]->ort_kurzbz).'|'
 								.(is_null($oRresult[$i]->bezeichnung) || empty($oRresult[$i]->bezeichnung) || $oRresult[$i]->bezeichnung=='NULL' || $oRresult[$i]->bezeichnung=='null'?'':html_entity_decode($oRresult[$i]->bezeichnung))
 								.($oRresult[$i]->aktiv==true || $oRresult[$i]->aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />')
-								."\n";
-			}		
+								."\n"; */
+			}
+			echo json_encode($result);
 			break;
 
 		// Ort - FH Technikum suche
 		case 'ort':
-		 	$ort_kurzbz=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+		 	$ort_kurzbz=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
 			if (is_null($ort_kurzbz) || $ort_kurzbz=='')
 				exit();
 			$pArt='select';
@@ -225,18 +255,26 @@
 			$pSql='';
 			if (!$oRresult=$db->SQL($pArt,$pDistinct,$pFields,$pTable,$pWhere,$pOrder,$pLimit,$pSql))
 				exit(' |'.$db->errormsg."\n");
+
+			$result=array();
 			for ($i=0;$i<count($oRresult);$i++)
 			{
-					echo html_entity_decode($oRresult[$i]->ort_kurzbz).'|'
+				$item['ort_kurzbz']=html_entity_decode($oRresult[$i]->ort_kurzbz);
+				$item['bezeichnung']=is_null($oRresult[$i]->bezeichnung) || empty($oRresult[$i]->bezeichnung) || $oRresult[$i]->bezeichnung=='NULL' || $oRresult[$i]->bezeichnung=='null'?'':html_entity_decode($oRresult[$i]->bezeichnung);
+				$item['aktiv']=$oRresult[$i]->aktiv==true || $oRresult[$i]->aktiv=='t'?true:false;
+				$result[]=$item;
+
+/*					echo html_entity_decode($oRresult[$i]->ort_kurzbz).'|'
 								.(is_null($oRresult[$i]->bezeichnung) || empty($oRresult[$i]->bezeichnung) || $oRresult[$i]->bezeichnung=='NULL' || $oRresult[$i]->bezeichnung=='null'?'':html_entity_decode($oRresult[$i]->bezeichnung) )
 								.($oRresult[$i]->aktiv==true || $oRresult[$i]->aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />')
-								."\n";
+								."\n"; */
 			}
+			echo json_encode($result);
 			break;
 			
 		// Person - FH Technikum suche
 		case 'person':
-		 	$person_id=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+		 	$person_id=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
 			if (is_null($person_id) || $person_id=='')
 				exit();
 			
@@ -295,26 +333,37 @@
 			if (!$oRresult=$db->SQL($pArt,$pDistinct,$pFields,$pTable,$pWhere,$pOrder,$pLimit,$pSql))
 				exit(' |'.$db->errormsg."\n");
 
-				
+			$result=array();
 			for ($i=0;$i<count($oRresult);$i++)
 			{
-				echo html_entity_decode($oRresult[$i]->person_id).'|'
+				$item['person_id']=html_entity_decode($oRresult[$i]->person_id);
+				$item['anrede']=trim($oRresult[$i]->anrede);
+				$item['titelpre']=html_entity_decode($oRresult[$i]->titelpre);
+				$item['vorname']=html_entity_decode($oRresult[$i]->vorname);
+				$item['nachname']=html_entity_decode($oRresult[$i]->nachname);
+				$item['funktion']=html_entity_decode($oRresult[$i]->funktion_kurzbz);
+				$item['aktiv']=$oRresult[$i]->aktiv;
+				$result[]=$item;
+/*				echo html_entity_decode($oRresult[$i]->person_id).'|'
 									.trim($oRresult[$i]->anrede).'&nbsp;'.($oRresult[$i]->titelpre?html_entity_decode($oRresult[$i]->titelpre).'&nbsp;':'')
 									.html_entity_decode($oRresult[$i]->vorname).' '.html_entity_decode($oRresult[$i]->nachname).($oRresult[$i]->funktion_kurzbz?html_entity_decode($oRresult[$i]->funktion_kurzbz).'&nbsp;':'') 
 									.($oRresult[$i]->aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />')
-					."\n";
+					."\n"; */
 			}
+			echo json_encode($result);
 			break;
 
 		// Organisation -  suche
 		case 'organisationseinheit':
-		 	$oe_kurzbz=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+		 	$oe_kurzbz=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
 			if (is_null($oe_kurzbz) || $oe_kurzbz=='')
 				exit();
 
 			$oOrganisationseinheit->result=array();
 			if (!$oOrganisationseinheit->getAll())
 				exit($oOrganisationseinheit->errormsg."\n");
+			
+			$result=array();
 			for ($i=0;$i<count($oOrganisationseinheit->result);$i++)
 			{
 				if ($aktiv && ($oOrganisationseinheit->result[$i]->aktiv==false || $oOrganisationseinheit->result[$i]->aktiv=='f'))
@@ -325,46 +374,71 @@
 				|| stristr($oOrganisationseinheit->result[$i]->bezeichnung,$oe_kurzbz)
 				|| stristr($oOrganisationseinheit->result[$i]->oe_parent_kurzbz,$oe_kurzbz)
 				|| stristr($oOrganisationseinheit->result[$i]->organisationseinheittyp_kurzbz,$oe_kurzbz) )
-					echo html_entity_decode($oOrganisationseinheit->result[$i]->oe_kurzbz).'|'
+				{
+					$item['oe_kurzbz']=html_entity_decode($oOrganisationseinheit->result[$i]->oe_kurzbz);
+					$item['bezeichnung']=html_entity_decode($oOrganisationseinheit->result[$i]->bezeichnung);
+					$item['organisationseinheittyp']=html_entity_decode($oOrganisationseinheit->result[$i]->organisationseinheittyp_kurzbz);
+					$result[]=$item;
+/*					echo html_entity_decode($oOrganisationseinheit->result[$i]->oe_kurzbz).'|'
 					.'&nbsp;'
 					.(is_null($oOrganisationseinheit->result[$i]->bezeichnung) || empty($oOrganisationseinheit->result[$i]->bezeichnung) || $oOrganisationseinheit->result[$i]->bezeichnung=='NULL' || $oOrganisationseinheit->result[$i]->bezeichnung=='null'?'':html_entity_decode($oOrganisationseinheit->result[$i]->bezeichnung) )
 					.'&nbsp;'
 					.(is_null($oOrganisationseinheit->result[$i]->organisationseinheittyp_kurzbz) || empty($oOrganisationseinheit->result[$i]->organisationseinheittyp_kurzbz) || $oOrganisationseinheit->result[$i]->organisationseinheittyp_kurzbz=='NULL' || $oOrganisationseinheit->result[$i]->organisationseinheittyp_kurzbz=='null'?'':html_entity_decode($oOrganisationseinheit->result[$i]->organisationseinheittyp_kurzbz) )
 
 					.($oOrganisationseinheit->result[$i]->aktiv==true || $oOrganisationseinheit->result[$i]->aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />')
-					."\n";
+					."\n"; */
+				}
 			}
+			echo json_encode($result);
 			break;
 
 		// Bestellung
 		case 'wawi_bestellnr':
-		 	$filter=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+		 	$filter=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
 			if (is_null($filter) || $filter=='')
 				exit();
 			$bestellung = new wawi_bestellung();
 
 			if ($bestellung->getAllSearch($filter, '', '', '', '', '', '', '', '', '', '', ''))
 			{
+				$result=array();
 				foreach($bestellung->result as $row)
-					echo html_entity_decode($row->bestell_nr).'|'.html_entity_decode($bestellung->insertamum).',  '.html_entity_decode($row->bestell_nr).', '.html_entity_decode($row->titel).' '.html_entity_decode($row->bemerkung)."\n";
+				{
+					$item['bestell_nr']=html_entity_decode($row->bestell_nr);
+					$item['insertamum']=html_entity_decode($bestellung->insertamum);
+					$item['titel']=html_entity_decode($row->titel);
+					$item['bemerkung']=html_entity_decode($row->bemerkung);
+					$result[]=$item;
+//					echo html_entity_decode($row->bestell_nr).'|'.html_entity_decode($bestellung->insertamum).',  '.html_entity_decode($row->bestell_nr).', '.html_entity_decode($row->titel).' '.html_entity_decode($row->bemerkung)."\n";
+				}
+				echo json_encode($result);
 			}
 			else
 				exit($bestellung->errormsg."\n");
 
 			break;
-			break;
 
 		// Bestellung ID
 		case 'wawi_bestellung_id':
-		 	$filter=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+		 	$filter=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
 			if (is_null($filter) || $filter=='')
 				exit();
 			$bestellung = new wawi_bestellung();
 
 			if ($bestellung->getBestellung($filter))
 			{
+				$result=array();
 				foreach($bestellung->result as $row)
-					echo html_entity_decode($row->bestellung_id).'|'.html_entity_decode($bestellung->insertamum).',  '.html_entity_decode($row->bestell_nr).', '.html_entity_decode($row->titel).' '.html_entity_decode($row->bemerkung)."\n";
+				{
+					$item['bestellung_id']=html_entity_decode($row->bestellung_id);
+					$item['insertamum']=html_entity_decode($bestellung->insertamum);
+					$item['bestell_nr']=html_entity_decode($row->bestell_nr);
+					$item['titel']=html_entity_decode($row->titel);
+					$item['bemerkung']=html_entity_decode($row->bemerkung);
+					$result[]=$item;
+//					echo html_entity_decode($row->bestellung_id).'|'.html_entity_decode($bestellung->insertamum).',  '.html_entity_decode($row->bestell_nr).', '.html_entity_decode($row->titel).' '.html_entity_decode($row->bemerkung)."\n";
+				}
+				echo json_encode($result);
 			}
 			else
 				exit($bestellung->errormsg."\n");
@@ -374,28 +448,45 @@
 
 		// Bestelldetail ID
 		case 'wawi_bestelldetail_id':
-		 	$filter=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+		 	$filter=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
 			if (is_null($bestellung_id) || $bestellung_id=='' || is_null($filter) || $filter=='')
 				exit();
 			
 			$bestelldetail = new wawi_bestelldetail();
 			$bestelldetail->getAllDetailsFromBestellung($bestellung_id, $filter);
 			
+			$result=array();
 			foreach($bestelldetail->result as $row)
-				echo html_entity_decode($row->bestelldetail_id).'|'.', '.html_entity_decode($row->beschreibung).',  '.html_entity_decode($row->artikelnummer).' Preis VE '.html_entity_decode(number_format($row->preisprove,2)).', Menge '.html_entity_decode($row->menge)."\n";
+			{
+				$item['bestelldetail_id']=html_entity_decode($row->bestelldetail_id);
+				$item['beschreibung']=html_entity_decode($row->beschreibung);
+				$item['artikelnummer']=html_entity_decode($row->artikelnummer);
+				$item['preisprove']=html_entity_decode(number_format($row->preisprove,2));
+				$item['menge']=html_entity_decode($row->menge);
+				$result[]=$item;
+//				echo html_entity_decode($row->bestelldetail_id).'|'.', '.html_entity_decode($row->beschreibung).',  '.html_entity_decode($row->artikelnummer).' Preis VE '.html_entity_decode(number_format($row->preisprove,2)).', Menge '.html_entity_decode($row->menge)."\n";
+			}
+			echo json_encode($result);
 			break;
 			
 		
 		// Firmen Search
 		case 'wawi_firma_search':
-		 	$firma_search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+		 	$firma_search=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
 			if (is_null($firma_search) ||$firma_search=='')
 				exit();
 			$firma = new firma();
 			$firma->searchFirma($firma_search);
-			foreach($firma->result as $row)
-				echo html_entity_decode($row->firma_id).'|'.', '.html_entity_decode($row->name)."\n";
 			
+			$result=array();
+			foreach($firma->result as $row)
+			{
+				$item['firma_id']=html_entity_decode($row->firma_id);
+				$item['name']=html_entity_decode($row->name);
+				$result[]=$item;
+//				echo html_entity_decode($row->firma_id).'|'.', '.html_entity_decode($row->name)."\n";
+			}
+			echo json_encode($result);
 			break;
 
 	    default:
