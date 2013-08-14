@@ -605,6 +605,8 @@ class betriebsmittel extends basis_db
 				$this->leasing_bis = $row->leasing_bis;
 				$this->inventuramum = $row->inventuramum;
 				$this->inventurvon = $row->inventurvon;
+                $this->anschaffungsdatum = $row->anschaffungsdatum; 
+                $this->anschaffungswert = $row->anschaffungswert; 
 				
 				return true;
 			}
