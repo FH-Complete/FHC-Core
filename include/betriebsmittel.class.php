@@ -135,6 +135,8 @@ class betriebsmittel extends basis_db
 				$this->breite = $row->breite;
 				$this->tiefe = $row->tiefe;
 				$this->nummer2 = $row->nummer2;
+                $this->anschaffungsdatum = $row->anschaffungsdatum;
+                $this->anschaffungswert = $row->anschaffungswert; 
 				
 				return true;
 			}
@@ -198,6 +200,8 @@ class betriebsmittel extends basis_db
 				$bm->leasing_bis = $row->leasing_bis;
 				$bm->inventuramum = $row->inventuramum;
 				$bm->inventurvon = $row->inventurvon;
+                $bm->anschaffungswert = $row->anschaffungswert; 
+                $bm->anschaffungsdatum = $row->anschaffungsdatum; 
 
 				$this->result[] = $bm;
 			}
@@ -442,6 +446,8 @@ class betriebsmittel extends basis_db
 				$bm->inventuramum = $row->inventuramum;
 				$bm->inventurvon = $row->inventurvon;
 				$bm->nummer2 = $row->nummer2;
+                $bm->anschaffungsdatum = $row->anschaffungsdatum; 
+                $bm->anschaffungswert = $row->anschaffungswert; 
 
 				$this->result[] = $bm;
 			}
@@ -496,6 +502,8 @@ class betriebsmittel extends basis_db
 				$bm->inventuramum = $row->inventuramum;
 				$bm->inventurvon = $row->inventurvon;
 				$bm->nummer2 = $row->nummer2;
+                $bm->anschaffungsdatum = $row->anschaffungsdatum; 
+                $bm->anschaffungswert = $row->anschaffungswert; 
 				
 				$this->result[] = $bm;
 			}
@@ -552,6 +560,8 @@ class betriebsmittel extends basis_db
 				$obj->inventuramum = $row->inventuramum;
 				$obj->inventurvon = $row->inventurvon;
 				$obj->nummer2 = $row->nummer2;
+                $obj->anschaffungsdatum = $row->anschaffungsdatum; 
+                $obj->anschaffungswert = $row->anschaffungswert; 
 				
 				$this->result[] = $obj;
 			}
@@ -768,6 +778,8 @@ class betriebsmittel extends basis_db
 				$this->leasing_bis = $row->leasing_bis;
 				$this->inventuramum = $row->inventuramum;
 				$this->inventurvon = $row->inventurvon;
+                $this->anschaffungsdatum = $row->anschaffungsdatum; 
+                $this->anschaffungswert = $row->anschaffungswert; 
 				
 				return $this->result=$row;
 			}
