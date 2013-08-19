@@ -1474,7 +1474,7 @@ class wochenplan extends basis_db
 		{
 			for ($s=$min_stunde;$s<=$max_stunde;$s++)
 			{
-				$raster[$t][$s]->ort=array();
+				@$raster[$t][$s]->ort=array();
 				$raster[$t][$s]->kollision=false;
 			}
 		}
