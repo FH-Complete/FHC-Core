@@ -258,7 +258,7 @@ $menu=array
 			'phpPgAdmin'=>array('name'=>'phpPgAdmin', 'link'=>'https://vilesci.technikum-wien.at/phppgadmin/index.php', 'target'=>'_blank'),
 			'phpMyAdmin'=>array('name'=>'phpMyAdmin', 'link'=>'https://vilesci.technikum-wien.at/phpmyadmin/index.php', 'target'=>'_blank'),
 			'SiPassDB'=>array('name'=>'SiPass Datenbank', 'link'=>'admin/sipassdb.php', 'target'=>'main'),
-			'ServerTests'=>array('name'=>'Server-Tests', 'link'=>'admin/test/index.html', 'target'=>'main'),
+			'ServerTests'=>array('name'=>'Server-Tests', 'link'=>'admin/test/index.php', 'target'=>'main'),
 			'htaccessGenerator'=>array('name'=>'.htaccess-Generator', 'link'=>'admin/htaccess/access.php', 'target'=>'main'),
 		),
 		'Hilfe'=>	array
