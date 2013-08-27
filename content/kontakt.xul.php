@@ -238,7 +238,7 @@ $uid = get_uid();
 <?php 
 $recht = new benutzerberechtigung(); 
 $recht->getBerechtigungen($uid);
-if($recht->isberechtigt('mitarbeiter/bankdaten'))
+if($recht->isberechtigt('mitarbeiter/bankdaten') || $recht->isberechtigt('student/bankdaten'))
 echo '
 	<groupbox id="kontakt-groupbox-bankverbindung">
 		<caption label="Bankverbindungen" />
