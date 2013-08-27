@@ -37,7 +37,7 @@ require_once('../include/benutzerberechtigung.class.php');
 $uid = get_uid(); 
 $recht = new benutzerberechtigung(); 
 $recht->getBerechtigungen($uid);
-if(!$recht->isberechtigt('mitarbeiter/bankdaten'))
+if(!$recht->isberechtigt('mitarbeiter/bankdaten') && !$recht->isBerechtigt('student/bankdaten'))
     die('Sie haben keine Berechtigung');
 
 if(isset($_GET['person_id']))

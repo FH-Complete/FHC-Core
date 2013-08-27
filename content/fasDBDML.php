@@ -282,7 +282,7 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='bankverbindungsave') // ***** BANKVERBINDUNG ***** //
 	{
-		if(!$rechte->isberechtigt('mitarbeiter/bankdaten'))
+		if(!$rechte->isberechtigt('mitarbeiter/bankdaten') && !$rechte->isberechtigt('student/bankdaten'))
 		{
 			$return = false;
 			$errormsg = 'Keine Berechtigung';
@@ -333,7 +333,7 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='bankverbindungdelete')
 	{
-		if(!$rechte->isberechtigt('mitarbeiter/bankdaten'))
+		if(!$rechte->isberechtigt('mitarbeiter/bankdaten') && !$rechte->isberechtigt('student/bankdaten'))
 		{
 			$return = false;
 			$errormsg = 'Keine Berechtigung';
