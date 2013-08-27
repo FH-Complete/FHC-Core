@@ -73,7 +73,7 @@ if(isset($_GET['src']) && $_GET['src']=='person' && isset($_GET['person_id'])  &
 		}
 	}
 }
-		
+	
 //die bilder werden, sofern es funktioniert, in jpg umgewandelt da es sonst zu fehlern beim erstellen
 //von pdfs kommen kann.
 $im = @imagecreatefromstring(base64_decode($cTmpHEX));
