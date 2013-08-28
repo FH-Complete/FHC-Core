@@ -29,6 +29,7 @@ require_once('../../include/benutzer.class.php');
 require_once('../../include/reservierung.class.php'); 
 require_once('../../include/stunde.class.php');
 require_once('../../include/stundenplan.class.php');
+require_once('../../include/mitarbeiter.class.php'); 
 
 header("Content-Type: text/html; charset=utf-8");
 
@@ -110,9 +111,16 @@ if(isset ($_POST['save']))
     }
     
     if($error)
+    {
         $message.= "<span class='error'>".$p->t('global/fehlerBeimSpeichernDerDaten')."</span><br>"; 
+    }
     else
+    {
+        // email an ersteller senden
+        sendBenachrichtigung($coodle_id);
+            
     	$saveOk=true;
+    }
 }
 
 // endgültige auswahl des termins speichern
@@ -441,6 +449,39 @@ echo '
 </html>
 
 <?php 
+
+/**
+ * Sendet eine Email an den Ersteller der Umfrage
+ * @param type $ersteller 
+ */
+function sendBenachrichtigung($coodle_id)
+{
+    $coodle_send = new coodle(); 
+    if(!$coodle_send->load($coodle_id))
+    {
+        die("Fehler beim senden aufgetreten");
+    }
+    
+    $email = '';
+    $mitarbeiter = new mitarbeiter(); 
+    $mitarbeiter->load($coodle_send->ersteller_uid); 
+    $person = new person(); 
+    $person->load($mitarbeiter->person_id); 
+    if($person->geschlecht == 'w')
+        $email.= 'Sehr geehrte Frau '.$person->vorname.' '.$person->nachname."!<br><br>";
+    else
+        $email.="Sehr geehrter Herr ".$person->vorname.' '.$person->nachname."!<br><br>";
+    
+    $email.="Ein Termin Ihrer Coodle-Umfrage wurde ausgewählt<br><a href='".APP_ROOT."cis/private/coodle/uebersicht.php'>Link zu Ihrer Coodle Übersicht</a><br><br>Mit freundlichen Grüßen <br><br>
+        Fachhochschule Technikum Wien<br>
+        Höchstädtplatz 6<br>
+        1200 Wien"; 
+    
+    $mail = new mail($coodle_send->ersteller_uid.'@'.DOMAIN, 'no-reply', 'Coodle Unmfrage', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
+	$mail->setHTMLContent($email); 
+	if(!$mail->send())
+		die("Fehler beim senden des Mails aufgetreten");	
+}
 
 /**
  * Funktion sendet den ausgewählten Termin an alle Ressourcen aus der übergebenen Coodleumfrage
