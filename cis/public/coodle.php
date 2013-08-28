@@ -467,10 +467,17 @@ function sendBenachrichtigung($coodle_id)
     $mitarbeiter->load($coodle_send->ersteller_uid); 
     $person = new person(); 
     $person->load($mitarbeiter->person_id); 
+    
+    $name = ''; 
+    $name.= ($person->titelpre != '')?$person->titelpre.' ':'';
+    $name.= $person->vorname.' '.$person->nachname; 
+    $name.= ($person->titelpost != '')?' '.$person->titelpost:'';
+    
+    
     if($person->geschlecht == 'w')
-        $email.= 'Sehr geehrte Frau '.$person->vorname.' '.$person->nachname."!<br><br>";
+        $email.= 'Sehr geehrte Frau '.$name."!<br><br>";
     else
-        $email.="Sehr geehrter Herr ".$person->vorname.' '.$person->nachname."!<br><br>";
+        $email.="Sehr geehrter Herr ".$name."!<br><br>";
     
     $email.="Ein Termin Ihrer Coodle-Umfrage wurde ausgewählt<br><a href='".APP_ROOT."cis/private/coodle/uebersicht.php'>Link zu Ihrer Coodle Übersicht</a><br><br>Mit freundlichen Grüßen <br><br>
         Fachhochschule Technikum Wien<br>
