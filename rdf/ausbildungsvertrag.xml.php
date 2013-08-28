@@ -77,6 +77,7 @@ foreach($uid_arr as $uid)
 			$studiengang = new studiengang();
 			$studiengang->load($student->studiengang_kz);
 			
+            $svnr = ($student->svnr == '')?'Ersatzkennzeichen: '.$student->ersatzkennzeichen:$student->svnr; 
 			
 			echo "\t\t<quote>1</quote>\n"; 
 			echo "\t\t<anrede>".$student->anrede."</anrede>\n";
@@ -86,7 +87,7 @@ foreach($uid_arr as $uid)
 			echo "\t\t<titelpre>".$student->titelpre."</titelpre>\n";
 			echo "\t\t<titelpost>".$student->titelpost."</titelpost>\n";
 			echo "\t\t<gebdatum>".$gebdatum."</gebdatum>\n";
-			echo "\t\t<svnr>".$student->svnr."</svnr>\n";
+			echo "\t\t<svnr>".$svnr."</svnr>\n";
 			echo "\t\t<matrikelnr>".trim($student->matrikelnr)."</matrikelnr>\n";
 			echo "\t\t<studiengang>".$studiengang->bezeichnung."</studiengang>\n";
 			echo "\t\t<studiengang_englisch>".$studiengang->english."</studiengang_englisch>\n";
