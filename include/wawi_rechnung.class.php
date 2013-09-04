@@ -180,7 +180,9 @@ class wawi_rechnung extends basis_db
 			$qry.= ' AND tbl_bestellung.kostenstelle_id = '.$this->db_add_param($kostenstelle_id);
 
 		if ($bestellnummer != '')	
-			$qry.= ' AND UPPER(tbl_bestellung.bestell_nr) = UPPER('.$this->db_add_param($bestellnummer).')';
+//			$qry.= ' AND UPPER(tbl_bestellung.bestell_nr) = UPPER('.$this->db_add_param($bestellnummer).')';
+//			$qry.= " AND (UPPER(bestellung.bestell_nr) LIKE UPPER('%".$this->db_escape($bestellnr)."%') OR UPPER(betriebsmittel.inventarnummer) LIKE UPPER('%".$this->db_escape($bestellnr)."%'))"; 
+			$qry.= " AND UPPER(tbl_bestellung.bestell_nr) LIKE UPPER('%".$this->db_escape($bestellnummer)."%')";
 		
 		if ($betrag != '')
 			$qry.= ' AND ('.$this->db_add_param($betrag).' = (SELECT sum(betrag) FROM wawi.tbl_rechnungsbetrag WHERE rechnung_id=tbl_rechnung.rechnung_id)
