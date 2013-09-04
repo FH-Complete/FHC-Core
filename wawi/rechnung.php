@@ -63,7 +63,9 @@ if(isset($_POST['getBetragRow']) && isset($_POST['id']))
 	<link rel="stylesheet" href="../skin/fhcomplete.css" type="text/css">	
 	<link rel="stylesheet" href="../skin/wawi.css" type="text/css">
 
-	<script type="text/javascript" src="../include/js/jquery.js"></script> 
+	<script type="text/javascript" src="../include/js/jquery1.9.min.js"></script>	
+	<link rel="stylesheet" type="text/css" href="../skin/jquery-ui-1.9.2.custom.min.css"/>	
+<!--	<script type="text/javascript" src="../include/js/jquery.js"></script>  -->
 			
 	<script type="text/javascript">
 	function loadFirma(id)
@@ -90,7 +92,7 @@ if(isset($_POST['getBetragRow']) && isset($_POST['id']))
 			<?php
 			if($aktion=='suche' && !isset($_POST['submit']))
 			{
-				echo "
+/*				echo "
 				  $('#firmenname').autocomplete('wawi_autocomplete.php', 
 				  {
 					minChars:2,
@@ -100,8 +102,29 @@ if(isset($_POST['getBetragRow']) && isset($_POST['id']))
 					extraParams:{'work':'wawi_firma_search'	}
 				  }).result(function(event, item) {
 					  $('#firma_id').val(item[1]);
+				  }); */
+				echo "
+				  $('#firmenname').autocomplete({
+					source: \"wawi_autocomplete.php?work=wawi_firma_search\",
+					minLength:2,
+					response: function(event, ui)
+					{
+						//Value und Label fuer die Anzeige setzen
+						for(i in ui.content)
+						{
+							ui.content[i].value=ui.content[i].firma_id;
+							ui.content[i].label=ui.content[i].gesperrt+ui.content[i].name;
+							if(ui.content[i].kurzbz!='')
+								ui.content[i].label+=' ('+ui.content[i].kurzbz+')';
+							ui.content[i].label+=' '+ui.content[i].firma_id;
+						}
+					},
+					select: function(event, ui)
+					{
+						ui.item.value=ui.item.firma_id;
+					}
+					
 				  });
-				  
 				  $( \"#rechnungsdatum_von\" ).datepicker($.datepicker.regional['de']);	  		  
 				  $( \"#rechnungsdatum_bis\" ).datepicker($.datepicker.regional['de']);
 				  $( \"#buchungsdatum_von\" ).datepicker($.datepicker.regional['de']);

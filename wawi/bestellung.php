@@ -351,7 +351,10 @@ if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 	<link rel="stylesheet" href="../skin/jquery.css" type="text/css"/>
 	<link rel="stylesheet" href="../skin/fhcomplete.css" type="text/css"/>
 	<link rel="stylesheet" href="../skin/wawi.css" type="text/css"/>
-	<script type="text/javascript" src="../include/js/jquery.js"></script> 
+<!--	<script type="text/javascript" src="../include/js/jquery.js"></script> -->
+	<script type="text/javascript" src="../include/js/jquery1.9.min.js"></script>	
+	<link rel="stylesheet" type="text/css" href="../skin/jquery-ui-1.9.2.custom.min.css"/>	
+	
 	<script type="text/javascript">
 	function conf_del()
 	{
@@ -413,7 +416,25 @@ if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 	          return false;
 	        });
         
-	    $('#mitarbeiter_name').autocomplete('wawi_autocomplete.php', 
+		$('#mitarbeiter_name').autocomplete({
+			source: "wawi_autocomplete.php?work=wawi_mitarbeiter_search",
+			minLength:2,
+			response: function(event, ui)
+			{
+				//Value und Label fuer die Anzeige setzen
+				for(i in ui.content)
+				{
+					ui.content[i].value=ui.content[i].uid;
+					ui.content[i].label=ui.content[i].vorname+' '+ui.content[i].nachname+' ('+ui.content[i].uid+')';
+				}
+			},
+			select: function(event, ui)
+			{
+				ui.item.value=ui.item.uid;
+			}
+		});
+		
+/*	    $('#mitarbeiter_name').autocomplete('wawi_autocomplete.php', 
 	  		  	{
 	  			minChars:2,
 	  			matchSubset:1,matchContains:1,
@@ -421,11 +442,32 @@ if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 	  			formatItem:formatItem,
 	  			extraParams:{'work':'wawi_mitarbeiter_search'	
 		  		}
-	  	  }).result(function(event, item) {
+	  	}).result(function(event, item) {
 	  		  $('#mitarbeiter_uid').val(item[1]);
-	  	  });
+	  	}); */
 	  	  
-	    $('#firmenname').autocomplete('wawi_autocomplete.php', 
+		$('#firmenname').autocomplete({
+			source: "wawi_autocomplete.php?work=wawi_firma_search",
+			minLength:2,
+			response: function(event, ui)
+			{
+				//Value und Label fuer die Anzeige setzen
+				for(i in ui.content)
+				{
+					ui.content[i].value=ui.content[i].firma_id;
+					ui.content[i].label=ui.content[i].gesperrt+ui.content[i].name;
+					if(ui.content[i].kurzbz!='')
+						ui.content[i].label+=' ('+ui.content[i].kurzbz+')';
+					ui.content[i].label+=' '+ui.content[i].firma_id;
+				}
+			},
+			select: function(event, ui)
+			{
+				ui.item.value=ui.item.firma_id;
+			}
+		});
+
+/*	    $('#firmenname').autocomplete('wawi_autocomplete.php', 
 	  		  	{
 	  			minChars:2,
 	  			matchSubset:1,matchContains:1,
@@ -435,9 +477,27 @@ if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 		  		}
 	  	  }).result(function(event, item) {
 	  		  $('#firma_id').val(item[1]);
-	  	  });	  		  
+	  	  }); */
 	  	  
-	    $('#besteller').autocomplete('wawi_autocomplete.php', 
+		$('#besteller').autocomplete({
+			source: "wawi_autocomplete.php?work=wawi_mitarbeiter_search",
+			minLength:2,
+			response: function(event, ui)
+			{
+				//Value und Label fuer die Anzeige setzen
+				for(i in ui.content)
+				{
+					ui.content[i].value=ui.content[i].uid;
+					ui.content[i].label=ui.content[i].vorname+' '+ui.content[i].nachname+' ('+ui.content[i].uid+')';
+				}
+			},
+			select: function(event, ui)
+			{
+				ui.item.value=ui.item.uid;
+			}
+		});
+
+/*	    $('#besteller').autocomplete('wawi_autocomplete.php', 
 	  		  	{
 	  			minChars:2,
 	  			matchSubset:1,matchContains:1,
@@ -447,7 +507,7 @@ if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 		  		}
 	  	  }).result(function(event, item) {
 	  		  $('#besteller_uid').val(item[1]);
-	  	  });
+	  	  }); */
 	}); 
 	</script>
 </head>
@@ -577,16 +637,35 @@ if($aktion == 'suche')
 		echo "</tr>\n";
 		
 		echo "<script type='text/javascript'>
-			    $('#tag').autocomplete('wawi_autocomplete.php', 
-	  		  	{
+			    $('#tag').autocomplete({
+				source: 'wawi_autocomplete.php?work=tags', 
 	  			minChars:2,
-	  			matchSubset:1,matchContains:1,
-	  			width:500,
-	  			formatItem:formatItemTag,
-	  			extraParams:{'work':'tags'	
-		  		}
-	  	  	})
-			</script>"; 
+				response:function(event,ui)
+				{
+					for(i in ui.content)
+					{
+						ui.content[i].value=ui.content[i].tag;
+						ui.content[i].label=ui.content[i].tag;
+					}
+		  		},
+				select: function(event, ui)
+				{
+					ui.item.value=ui.item.tag;
+				}
+	  	  	});
+			</script>";
+
+/*		echo "<script type='text/javascript'>
+			$('#tag').autocomplete('wawi_autocomplete.php', 
+			{
+			minChars:2,
+			matchSubset:1,matchContains:1,
+			width:500,
+			formatItem:formatItemTag,
+			extraParams:{'work':'tags'	
+			}
+		})
+		</script>"; */
 		
 		
 		echo "<tr>\n"; 
@@ -1407,22 +1486,22 @@ if($_GET['method']=='update')
 	echo "	<td>Erstellt am:</td>\n"; 
 	echo "	<td><span name='erstellt' title ='".$bestellung->insertvon."' >".$date->formatDatum($bestellung->insertamum, 'd.m.Y')."</span></td>\n";
 	echo "	<td>Liefertermin: <input type='text' name ='liefertermin'  size='16' maxlength='16' value='".$bestellung->liefertermin."'></td>\n";
-	echo "</tr>\n"; 
-	echo "<tr>\n"; 	
+	echo "</tr>\n";
+	echo "<tr>\n";
 	echo "	<td>Firma: </td>\n";
 	echo "	<td><input type='text' name='firmenname' id='firmenname' size='60' maxlength='256' value ='".$firma->name."'>\n";
 	echo "	<input type='hidden' name='firma_id' id='firma_id' size='5' maxlength='7' value ='".$bestellung->firma_id."'></td>\n";
 	echo "	<td>Kontaktperson:</td><td> <input type='text' name='besteller' id='besteller' size='30' maxlength='256' value ='".$besteller_vorname.' '.$besteller_nachname."'>\n";
 	echo "  <td>";
 	// wenn user projekt zugeordnet ist -> Projekt Drop Down anzeigen
-	$ProjektUser = new projekt(); 
+	$ProjektUser = new projekt();
 	$ProjektUser->getProjektFromBestellung($bestellung->bestellung_id);
 	$Bestellung_Projekt = false; // Projekt DropDown aus allen Projekten von eingeloggten User und dem der Bestellung -> true wenn Projekt aus Bestellung in User Projekten enthalten ist
 	if($projektZugeordnet == true)
 	{	
 		echo " Projekt:";
-		echo "  <SELECT name='filter_projekt' id='filter_projekt' style='width: 230px;'>\n"; 
-		echo "   <option value=''>-- Kein Projekt ausgewählt --</option>";  
+		echo "  <SELECT name='filter_projekt' id='filter_projekt' style='width: 230px;'>\n";
+		echo "   <option value=''>-- Kein Projekt ausgewählt --</option>";
 		// Projekte vom User
 		foreach ($projekt->result as $userProjekts)
 		{
@@ -1430,7 +1509,7 @@ if($_GET['method']=='update')
 			if($ProjektUser->projekt_kurzbz == $userProjekts->projekt_kurzbz)
 			{
 				$selected = 'selected';
-				$Bestellung_Projekt = true; 
+				$Bestellung_Projekt = true;
 			}
 				echo "    <option value='".$userProjekts->projekt_kurzbz."' $selected>".$userProjekts->titel."</option>";
 		}
@@ -1440,10 +1519,10 @@ if($_GET['method']=='update')
 		echo "</select>";
 	}
 	
-	echo "	<input type='hidden' name='besteller_uid' id='besteller_uid' size='5' maxlength='7' value ='".$bestellung->besteller_uid."'></td>\n"; 
+	echo "	<input type='hidden' name='besteller_uid' id='besteller_uid' size='5' maxlength='7' value ='".$bestellung->besteller_uid."'></td>\n";
 	echo "</td>";
-	echo "</tr>\n"; 
-	echo "<tr>\n"; 	
+	echo "</tr>\n";
+	echo "<tr>\n";
 	$disabled = '';
 	if($status->isStatiVorhanden($bestellung->bestellung_id, 'Bestellung') || $status->isStatiVorhanden($bestellung->bestellung_id, 'Storno') || $status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt'))
 		$disabled = 'disabled'; 
@@ -1461,7 +1540,7 @@ if($_GET['method']=='update')
 			$kst_vorhanden = true; 
 		}
 		echo "<option value=".$ks->kostenstelle_id." $selected>".$ks->bezeichnung."(".mb_strtoupper($ks->kurzbz).") - ".mb_strtoupper($ks->oe_kurzbz)."</option>\n";
-	}	
+	}
 	// wenn user nicht auf kst berechtigt ist, trotzdem anzeigen zum freigeben 
 	if(!$kst_vorhanden)	
 		echo "<option value='".$bestellung->kostenstelle_id."' selected >".$kostenstelle->bezeichnung."(".mb_strtoupper($kostenstelle->kurzbz).") - ".mb_strtoupper($kostenstelle->oe_kurzbz)."</option>\n";	
@@ -1477,11 +1556,11 @@ if($_GET['method']=='update')
 		$standort_lieferadresse->load($standorte->adresse_id); 
 		
 		if($standort_lieferadresse->adresse_id == $bestellung->lieferadresse)
-		{	
+		{
 			$selected ='selected';	
 		}
 		echo "<option value='".$standort_lieferadresse->adresse_id."' ". $selected.">".$standorte->kurzbz.' - '.$standort_lieferadresse->strasse.', '.$standort_lieferadresse->plz.' '.$standort_lieferadresse->ort."</option>\n";
-	}		
+	}
 	echo "</select></td></tr>\n"; 
 	echo "<tr>\n"; 	
 	echo "	<td>Konto: </td>\n";
@@ -1587,7 +1666,26 @@ if($_GET['method']=='update')
 	$tag_help = $bestell_tag->GetStringTags();
 	echo "<td><input type='text' id='tags' name='tags' size='32' value='".$tag_help."'>\n";		
 
-	echo '	<script type="text/javascript">
+	echo "<script type='text/javascript'>
+			$('#tags').autocomplete({
+			source: 'wawi_autocomplete.php?work=tags', 
+			minChars:1,
+			response:function(event,ui)
+			{
+				for(i in ui.content)
+				{
+					ui.content[i].value=ui.content[i].tag;
+					ui.content[i].label=ui.content[i].tag;
+				}
+			},
+			select: function(event, ui)
+			{
+				ui.item.value=ui.item.tag;
+			}
+		});
+		</script>";
+
+/*	echo '	<script type="text/javascript">
 				$("#tags").autocomplete("wawi_autocomplete.php", 
 				{
 					minChars:1,
@@ -1598,7 +1696,7 @@ if($_GET['method']=='update')
 					formatItem:formatItemTag,
 					extraParams:{"work":"tags", "bestell_id":"'.$bestellung->bestellung_id.'"}
 				});
-			</script>';
+			</script>'; */
 	echo "</td>\n"; 
 	echo "<td>Freigabe:</td>\n";
 	echo "<td colspan =2>";
@@ -2394,7 +2492,30 @@ function getDetailRow($i, $bestelldetail_id='', $sort='', $menge='', $ve='', $be
 	$detail_tag = new tags(); 
 	$detail_tag->GetTagsByBestelldetail($bestelldetail_id);
 	$help = $detail_tag->GetStringTags(); 
-	echo "	<script type='text/javascript'>
+
+	echo "<script type='text/javascript'>
+		$(document).ready(function()
+		{
+			$('#detail_tag_'+$i).autocomplete({
+			source: 'wawi_autocomplete.php?work=detail_tags', 
+			minChars:1,
+			response:function(event,ui)
+			{
+				for(i in ui.content)
+				{
+					ui.content[i].value=ui.content[i].tag;
+					ui.content[i].label=ui.content[i].tag;
+				}
+			},
+			select: function(event, ui)
+			{
+				ui.item.value=ui.item.tag;
+			}
+		});
+	});
+	</script>";
+	
+/*	echo "	<script type='text/javascript'>
 			$(document).ready(function()
 			{	
 				$('#detail_tag_'+$i).autocomplete('wawi_autocomplete.php', 
@@ -2407,7 +2528,8 @@ function getDetailRow($i, $bestelldetail_id='', $sort='', $menge='', $ve='', $be
 					extraParams:{'work':'detail_tags', 'detail_id':'.$bestelldetail_id.'}
 				});
 			});
-			</script>";
+			</script>"; */
+			
 	echo "<td><input type='text' size='10' name='detail_tag_$i' id='detail_tag_$i' value='$help' ></td>"; 
 	echo "<td><input type='hidden' size='20' name='bestelldetailid_$i' id='bestelldetailid_$i' value='$bestelldetail_id'></td>";
 	echo "<td><input type='hidden' size='3' name='sort_$i' id='sort_$i' maxlength='2' value='$sort'></td>\n";
