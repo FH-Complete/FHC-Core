@@ -63,12 +63,14 @@
 	{			
 			// Firmen Search
 		case 'wawi_firma_search':
-		 	$firma_search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+		 	$firma_search=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
 			if (is_null($firma_search) ||$firma_search=='')
 				exit();	
 			$sFirma = new firma();
 			if (!$sFirma->getAll($firma_search))
 				exit($sFirma->errormsg."\n");
+			
+			$result=array();
 			for ($i=0;$i<count($sFirma->result);$i++)
 			{
 				$standort = new standort();
@@ -77,46 +79,72 @@
 					$kurzbz = $standort->result[0]->kurzbz;
 				else
 					$kurzbz = '';
-				
-				echo html_entity_decode(($sFirma->result[$i]->gesperrt?'!!GESPERRT!! ':'').$sFirma->result[$i]->name).($kurzbz!=''?' ('.$kurzbz.')':'').'|'.html_entity_decode($sFirma->result[$i]->firma_id)."\n";
+				$item['gesperrt']=html_entity_decode($sFirma->result[$i]->gesperrt?'!!GESPERRT!! ':'');
+				$item['name']=html_entity_decode($sFirma->result[$i]->name);
+				$item['kurzbz']=$kurzbz;
+				$item['firma_id']=html_entity_decode($sFirma->result[$i]->firma_id);
+				$result[]=$item;
+//				echo html_entity_decode(($sFirma->result[$i]->gesperrt?'!!GESPERRT!! ':'').$sFirma->result[$i]->name).($kurzbz!=''?' ('.$kurzbz.')':'').'|'.html_entity_decode($sFirma->result[$i]->firma_id)."\n";
 			}
+			echo json_encode($result);
 			break;
 			
 			// Bestellung Tags
 		case 'tags':
 		//	$bestell_id = $_REQUEST['bestell_id'];
-			$tag_search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+			$tag_search=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
 		//	if (is_null($bestell_id) || $tag_search=='')
 			//	exit();	
 			$tags = new tags(); 
 			if (!$tags->getAll())
 				exit($tags->errormsg."\n");
+			
+			$result=array();
 			for ($i=0;$i<count($tags->result);$i++)
-				echo html_entity_decode($tags->result[$i]->tag)."\n";
+			{
+				$item['tag']=$tags->result[$i]->tag;
+				$result[]=$item;
+//				echo html_entity_decode($tags->result[$i]->tag)."\n";
+			}
+			echo json_encode($result);
 			break;
 			
 			// Bestelldetail Tags
 		case 'detail_tags':
 		//	$detail = $_REQUEST['detail_id'];
-			$tag_search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+			$tag_search=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
 			//if (is_null($detail) || $tag_search=='')
 			//	exit();	
 			$tags = new tags(); 
 			if (!$tags->getAll())
 				exit($tags->errormsg."\n");
+			$result=array();
 			for ($i=0;$i<count($tags->result);$i++)
-				echo html_entity_decode($tags->result[$i]->tag)."\n";
+			{
+				$item['tag']=$tags->result[$i]->tag;
+				$result[]=$item;
+//				echo html_entity_decode($tags->result[$i]->tag)."\n";
+			}
+			echo json_encode($result);
 			break;
 		
 		case 'wawi_mitarbeiter_search':
-		 	$search=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+		 	$search=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
 			if (is_null($search) ||$search=='')
 				exit();	
 			$ma = new mitarbeiter();
 			$ma->search($search);
 	
+			$result=array();
 			foreach($ma->result as $row)
-				echo html_entity_decode($row->vorname).' '.html_entity_decode($row->nachname).'|'.html_entity_decode($row->uid)."\n";
+			{
+				$item['vorname']=html_entity_decode($row->vorname);
+				$item['nachname']=html_entity_decode($row->nachname);
+				$item['uid']=html_entity_decode($row->uid);
+				$result[]=$item;
+			//	echo html_entity_decode($row->vorname).' '.html_entity_decode($row->nachname).'|'.html_entity_decode($row->uid)."\n";
+			}
+			echo json_encode($result);
 			break;
 	}
 	exit();
