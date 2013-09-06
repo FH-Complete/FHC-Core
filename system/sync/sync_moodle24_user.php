@@ -37,6 +37,11 @@ $message='';
 $message_lkt='';
 $lektoren=array();
 
+//ini_set('soap.wsdl_cache_enabled',0);
+//ini_set('soap.wsdl_cache_ttl',0);
+
+echo "Start um ".date('Y-m-d H:i:s');
+
 //nur Synchronisieren wenn ein aktuelles Studiensemester existiert damit keine 
 //Probleme durch die Vorrueckung entstehen
 $stsem = new studiensemester();
@@ -51,6 +56,10 @@ if($stsem_kurzbz=$stsem->getakt())
 		while($row = $db->db_fetch_object($result))
 		{
 			$course = new moodle24_course();
+			echo 'Sync fuer kurs '.$row->mdl_course_id.'<br>';
+			flush();
+			ob_flush();
+			
 			if($course->load($row->mdl_course_id))
 			{
 				$message_lkt='';
@@ -73,7 +82,11 @@ if($stsem_kurzbz=$stsem->getakt())
 					$message.="\nFehler: $mdluser->errormsg";
 					$fehler++;
 				}
+				echo $mdluser->log;
+				flush();
+				ob_flush();
 				
+				echo "<br><br>--studenten--";
 				//Studenten
 				$mdluser = new moodle24_user();
 				if($mdluser->sync_studenten($row->mdl_course_id))
@@ -92,6 +105,9 @@ if($stsem_kurzbz=$stsem->getakt())
 					$fehler++;
 				}
 				
+				echo $mdluser->log;
+				flush();
+				ob_flush();
 				foreach ($mitarbeiter as $uid)
 				{
 					if(!isset($lektoren[$uid]))
@@ -154,4 +170,5 @@ if($stsem_kurzbz=$stsem->getakt())
 }
 else 
 	echo "Kein aktuelles Studiensemester vorhanden->kein Syncro";
+echo "Ende um ".date('Y-m-d H:i:s');
 ?>
