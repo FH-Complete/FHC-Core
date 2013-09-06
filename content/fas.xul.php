@@ -661,13 +661,13 @@ foreach($addon_obj->result as $addon)
                label     = "&menu-dokumente-pruefungsprotokoll2_englisch.label;"
                command   =  "menu-dokumente-pruefungsprotokoll2_englisch:command"
                accesskey = "&menu-dokumente-pruefungsprotokoll2_englisch.accesskey;"/>
-			<menuitem
+			<menuitem hidden="true"
                id        =  "menu-dokumente-pruefungszeugnis"
                key       =  "menu-dokumente-pruefungszeugnis:key"
                label     = "&menu-dokumente-pruefungszeugnis.label;"
                command   =  "menu-dokumente-pruefungszeugnis:command"
                accesskey = "&menu-dokumente-pruefungszeugnis.accesskey;"/>
-               <menuitem
+               <menuitem hidden="true"
                id        =  "menu-dokumente-pruefungszeugnis_englisch"
                key       =  "menu-dokumente-pruefungszeugnis_englisch:key"
                label     = "&menu-dokumente-pruefungszeugnis_englisch.label;"

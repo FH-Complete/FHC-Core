@@ -194,6 +194,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <style:paragraph-properties fo:line-height="150%"/>
       <style:text-properties style:font-name="Arial" fo:font-size="3pt" fo:language="de" fo:country="AT" style:font-size-asian="3pt" style:font-name-complex="Arial" style:font-size-complex="3pt"/>
     </style:style>
+    <style:style style:name="P23" style:family="paragraph" style:parent-style-name="Standard">
+      <style:paragraph-properties fo:break-before="page" />
+    </style:style>
     <style:style style:name="T1" style:family="text">
       <style:text-properties fo:language="de" fo:country="AT" style:font-name-complex="Arial"/>
     </style:style>
@@ -451,7 +454,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             <text:p text:style-name="P12"/>
             <text:p text:style-name="P12"/>
             <text:p text:style-name="P12"/>
-            <text:p text:style-name="P12"/>
           </table:table-cell>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
@@ -468,7 +470,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             <text:p text:style-name="P12"/>
             <text:p text:style-name="P12"/>
             <text:p text:style-name="P12"/>
-            <text:p text:style-name="P12"/>
           </table:table-cell>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
@@ -480,7 +481,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           <table:covered-table-cell/>
         </table:table-row>
          </table:table>
-      <text:p text:style-name="P19"/>
+      <text:p text:style-name="P23"> </text:p>
       <text:p text:style-name="P19"><xsl:value-of select="titelpre" /><xsl:text> </xsl:text><xsl:value-of select="vorname" /><xsl:text> </xsl:text><xsl:value-of select="nachname" /><xsl:text> </xsl:text><xsl:value-of select="titelpost" /></text:p>
       <text:p text:style-name="P18">Personenkennzeichen: <xsl:value-of select="matrikelnr" /></text:p>
       <text:p text:style-name="P19"/>

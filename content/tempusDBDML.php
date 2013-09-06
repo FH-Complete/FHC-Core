@@ -169,86 +169,113 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='deletestundenplaneintrag')
 	{
-		//Loescht einen Eintrag aus der Stundenplantabelle
-		loadVariables(get_uid());
-		if(isset($_POST['stundenplan_id']) && is_numeric($_POST['stundenplan_id']))
+		if(!$rechte->isBerechtigt('lv-plan', null, 'suid') && !$rechte->isBerechtigt('admin', null, 'suid') )
 		{
-			$stundenplan = new stundenplan($db_stpl_table);
-			if($stundenplan->delete($_POST['stundenplan_id']))
+			$return = false;
+			$error = true;
+			$errormsg = 'keine Berechtigung';
+		}
+		else
+		{
+			//Loescht einen Eintrag aus der Stundenplantabelle
+			loadVariables(get_uid());
+			if(isset($_POST['stundenplan_id']) && is_numeric($_POST['stundenplan_id']))
 			{
-				$return = true;
+				$stundenplan = new stundenplan($db_stpl_table);
+				if($stundenplan->delete($_POST['stundenplan_id']))
+				{
+					$return = true;
+				}
+				else 
+				{
+					$errormsg='Fehler beim Loeschen: '.$stundenplan->errormsg;
+					$return = false;
+					$data = '';
+				}
 			}
 			else 
 			{
-				$errormsg='Fehler beim Loeschen: '.$stundenplan->errormsg;
 				$return = false;
-				$data = '';
+				$errormsg = 'ID ist ungueltig';
 			}
-		}
-		else 
-		{
-			$return = false;
-			$errormsg = 'ID ist ungueltig';
 		}
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='deletereservierung')
 	{
-		//Loescht eine Reservierung
-		if(isset($_POST['reservierung_id']) && is_numeric($_POST['reservierung_id']))
+		if(!$rechte->isBerechtigt('lv-plan', null, 'suid') && !$rechte->isBerechtigt('admin', null, 'suid') )
 		{
-			$reservierung = new reservierung();
-			if($reservierung->delete($_POST['reservierung_id']))
+			$return = false;
+			$error = true;
+			$errormsg = 'keine Berechtigung';
+		}
+		else
+		{
+			//Loescht eine Reservierung
+			if(isset($_POST['reservierung_id']) && is_numeric($_POST['reservierung_id']))
 			{
-				$return = true;
+				$reservierung = new reservierung();
+				if($reservierung->delete($_POST['reservierung_id']))
+				{
+					$return = true;
+				}
+				else 
+				{
+					$errormsg='Fehler beim Loeschen: '.$reservierung->errormsg;
+					$return = false;
+					$data = '';
+				}
 			}
 			else 
 			{
-				$errormsg='Fehler beim Loeschen: '.$reservierung->errormsg;
 				$return = false;
-				$data = '';
+				$errormsg = 'ID ist ungueltig';
 			}
-		}
-		else 
-		{
-			$return = false;
-			$errormsg = 'ID ist ungueltig';
 		}
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='savestundenplaneintrag')
 	{
-		loadVariables(get_uid());
-		$stundenplan = new stundenplan($db_stpl_table);
-		if($stundenplan->load($_POST['stundenplan_id']))
+		if(!$rechte->isBerechtigt('lv-plan', null, 'suid') && !$rechte->isBerechtigt('admin', null, 'suid') )
 		{
-			$stundenplan->unr = $_POST['unr'];
-			$stundenplan->verband = $_POST['verband'];
-			$stundenplan->gruppe = $_POST['gruppe'];
-			$stundenplan->gruppe_kurzbz = $_POST['gruppe_kurzbz'];
-			$stundenplan->ort_kurzbz = $_POST['ort_kurzbz'];
-			$stundenplan->datum = $_POST['datum'];
-			$stundenplan->stunde = $_POST['stunde'];
-			$stundenplan->titel = htmlspecialchars_decode($_POST['titel']);
-			$stundenplan->anmerkung = htmlspecialchars_decode($_POST['anmerkung']);
-			$stundenplan->fix = ($_POST['fix']=='true'?true:false);
-			$stundenplan->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
-			$stundenplan->updateamum = date('Y-m-d H:i:s');
-			$stundenplan->updatevon = get_uid();
-			$stundenplan->semester = $_POST['semester'];
-			
-			if($stundenplan->save(false))
+			$return = false;
+			$error = true;
+			$errormsg = 'keine Berechtigung';
+		}
+		else
+		{
+			loadVariables(get_uid());
+			$stundenplan = new stundenplan($db_stpl_table);
+			if($stundenplan->load($_POST['stundenplan_id']))
 			{
-				$return = true;
+				$stundenplan->unr = $_POST['unr'];
+				$stundenplan->verband = $_POST['verband'];
+				$stundenplan->gruppe = $_POST['gruppe'];
+				$stundenplan->gruppe_kurzbz = $_POST['gruppe_kurzbz'];
+				$stundenplan->ort_kurzbz = $_POST['ort_kurzbz'];
+				$stundenplan->datum = $_POST['datum'];
+				$stundenplan->stunde = $_POST['stunde'];
+				$stundenplan->titel = htmlspecialchars_decode($_POST['titel']);
+				$stundenplan->anmerkung = htmlspecialchars_decode($_POST['anmerkung']);
+				$stundenplan->fix = ($_POST['fix']=='true'?true:false);
+				$stundenplan->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
+				$stundenplan->updateamum = date('Y-m-d H:i:s');
+				$stundenplan->updatevon = get_uid();
+				$stundenplan->semester = $_POST['semester'];
+				
+				if($stundenplan->save(false))
+				{
+					$return = true;
+				}
+				else 
+				{
+					$return = false;
+					$errormsg = 'Fehler beim Speichern der Daten:'.$stundenplan->errormsg;
+				}
 			}
 			else 
 			{
+				$errormsg = 'Fehler beim Laden: '.$stundenplan->errormsg;
 				$return = false;
-				$errormsg = 'Fehler beim Speichern der Daten:'.$stundenplan->errormsg;
 			}
-		}
-		else 
-		{
-			$errormsg = 'Fehler beim Laden: '.$stundenplan->errormsg;
-			$return = false;
 		}
 	}
 	else

@@ -680,7 +680,13 @@ function StudentAbschlusspruefungPrintPruefungsprotokollMultiple(lang)
 	}
 	var stg_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
 
-	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid='+uids+'&xsl_stg_kz='+stg_kz+'&output=pdf','Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	//Uebergangsloesung bis zur fertigstellung der dokumente
+	if(xsl=='PrProtMAEng')
+		window.open('<?php echo APP_ROOT; ?>/content/Record_of_Master_Examination.pdf');
+	else if(xsl=='PrProtBAEng')
+		window.open('<?php echo APP_ROOT; ?>/content/Record_of_Bachelor_Examination.pdf');
+	else		
+		window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid='+uids+'&xsl_stg_kz='+stg_kz+'&output=pdf','Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
