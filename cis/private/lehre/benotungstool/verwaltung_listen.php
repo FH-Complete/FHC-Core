@@ -196,11 +196,11 @@ if (isset($_POST["schluessel"]) && $_POST["schluessel"]=='Speichern')
 	}
 }
 //Kopfzeile
-echo '<table class="tabcontent" height="100%">';
+echo '<table class="tabcontent">';
 echo ' <tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
-echo '<td class="ContentHeader"><font class="ContentHeader">&nbsp;'.$p->t('benotungstool/benotungstool');
-echo '</font></td><td  class="ContentHeader" align="right">'."\n";
+echo '<td><h1>'.$p->t('benotungstool/benotungstool');
+echo '</h1></td><td align="right">'."\n";
 
 //Studiensemester laden
 $stsem_obj = new studiensemester();
@@ -308,7 +308,7 @@ echo '</td><tr></table>';
 echo '<table width="100%"><tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
 echo "<td>\n";
-echo "<b>".$lv_obj->bezeichnung_arr[$sprache]."</b><br>";
+echo "<h2>".$lv_obj->bezeichnung_arr[$sprache]."</h2>";
 
 if($lehreinheit_id=='')
 	die($p->t('benotungstool/esGibtKeineLehreinheiten'));
