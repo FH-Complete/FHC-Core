@@ -43,6 +43,7 @@ require_once('../include/mitarbeiter.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/phrasen.class.php');
 require_once('../include/student.class.php');
+require_once('../include/benutzer.class.php');
 
 $sprache = getSprache();
 
@@ -188,7 +189,13 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 		    
 			if(isset($row_course_leader) && $row_course_leader->uid != "")
 			{
-				$xml.='<email><![CDATA['.$row_course_leader->uid.'@'.DOMAIN.']]></email>';
+				$alias = new benutzer();
+				$alias->load($uid);
+				if($alias->alias!='')
+					$xml.='<email><![CDATA['.$alias->alias.'@'.DOMAIN.']]></email>';
+				else
+					$xml.='<email><![CDATA['.$row_course_leader->uid.'@'.DOMAIN.']]></email>';
+				$xml.='<uid><![CDATA['.$row_course_leader->uid.']]></uid>';
 			}		
 		
 		  	if(isset($row_course_leader) && $row_course_leader->telefonklappe != "")
@@ -222,7 +229,13 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 			$xml.='<gf_ltg>';
 			
 			$xml.='<name><![CDATA['.$ma->titelpre.' '.$ma->vorname.' '.$ma->nachname.' '.$ma->titelpost.']]></name>';
-			$xml.='<email><![CDATA['.$ma->uid.'@'.DOMAIN.']]></email>';
+			$alias = new benutzer();
+			$alias->load($ma->uid);
+			if($alias->alias!='')
+				$xml.='<email><![CDATA['.$alias->alias.'@'.DOMAIN.']]></email>';
+			else 
+				$xml.='<email><![CDATA['.$ma->uid.'@'.DOMAIN.']]></email>';
+			$xml.='<uid><![CDATA['.$ma->uid.']]></uid>';
 			
 			if($ma->telefonklappe != '')
 			{
@@ -253,7 +266,13 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 			$xml.='<stv_ltg>';
 			
 			$xml.='<name><![CDATA['.$ma->titelpre.' '.$ma->vorname.' '.$ma->nachname.' '.$ma->titelpost.']]></name>';
-			$xml.='<email><![CDATA['.$ma->uid.'@'.DOMAIN.']]></email>';
+			$alias = new benutzer();
+			$alias->load($ma->uid);
+			if($alias->alias!='')
+				$xml.='<email><![CDATA['.$alias->alias.'@'.DOMAIN.']]></email>';
+			else 
+				$xml.='<email><![CDATA['.$ma->uid.'@'.DOMAIN.']]></email>';
+			$xml.='<uid><![CDATA['.$ma->uid.']]></uid>';
 			
 			if($ma->telefonklappe != '')
 			{
@@ -284,7 +303,13 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 			$xml.='<ass>';
 			
 			$xml.='<name><![CDATA['.$ma->titelpre.' '.$ma->vorname.' '.$ma->nachname.' '.$ma->titelpost.']]></name>';
-			$xml.='<email><![CDATA['.$ma->uid.'@'.DOMAIN.']]></email>';
+			$alias = new benutzer();
+			$alias->load($ma->uid);
+			if($alias->alias!='')
+				$xml.='<email><![CDATA['.$alias->alias.'@'.DOMAIN.']]></email>';
+			else 
+				$xml.='<email><![CDATA['.$ma->uid.'@'.DOMAIN.']]></email>';
+			$xml.='<uid><![CDATA['.$ma->uid.']]></uid>';
 			
 			if($ma->telefonklappe != '')
 			{

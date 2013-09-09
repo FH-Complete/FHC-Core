@@ -106,29 +106,29 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	</xsl:template>
 
 	<xsl:template match="stg_ltg">
-			<xsl:variable name="mailname" select="email"></xsl:variable>
-			<p><a href="mailto:{$mailname}"><xsl:value-of select="name" /></a><br />			
+			<xsl:variable name="uid" select="uid"></xsl:variable>
+			<p><a href="../cis/private/profile/index.php?uid={$uid}"><xsl:value-of select="name" /></a><br />			
 			T: <xsl:value-of select="telefon" /><br />
 			E: <xsl:variable name="mail" select="email"></xsl:variable>
 			<a href="mailto:{$mail}"><xsl:value-of select="email" /></a></p>
 	</xsl:template>
 	<xsl:template match="gf_ltg">
-			<xsl:variable name="mailname" select="email"></xsl:variable>
-			<p><a href="mailto:{$mailname}"><xsl:value-of select="name" /></a><br />			
+			<xsl:variable name="uid" select="uid"></xsl:variable>
+			<p><a href="../cis/private/profile/index.php?uid={$uid}"><xsl:value-of select="name" /></a><br />			
 			T: <xsl:value-of select="telefon" /><br />
 			E: <xsl:variable name="mail" select="email"></xsl:variable>
 			<a href="mailto:{$mail}"><xsl:value-of select="email" /></a></p>
 	</xsl:template>
 	<xsl:template match="stv_ltg">
-			<xsl:variable name="mailname" select="email"></xsl:variable>
-			<p><a href="mailto:{$mailname}"><xsl:value-of select="name" /></a><br />			
+			<xsl:variable name="uid" select="uid"></xsl:variable>
+			<p><a href="../cis/private/profile/index.php?uid={$uid}"><xsl:value-of select="name" /></a><br />			
 			T: <xsl:value-of select="telefon" /><br />
 			E: <xsl:variable name="mail" select="email"></xsl:variable>
 			<a href="mailto:{$mail}"><xsl:value-of select="email" /></a></p>
 	</xsl:template>
 	<xsl:template match="ass">
-			<xsl:variable name="mailname" select="email"></xsl:variable>
-			<p><a href="mailto:{$mailname}"><xsl:value-of select="name" /></a><br />			
+			<xsl:variable name="uid" select="uid"></xsl:variable>
+			<p><a href="../cis/private/profile/index.php?uid={$uid}"><xsl:value-of select="name" /></a><br />			
 			T: <xsl:value-of select="telefon" /><br />
 			E: <xsl:variable name="mail" select="email"></xsl:variable>
 			<a href="mailto:{$mail}"><xsl:value-of select="email" /></a></p>
