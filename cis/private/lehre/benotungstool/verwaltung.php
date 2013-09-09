@@ -161,7 +161,7 @@ $copy_content = '';
 $copy_dropdown = '';
 
 //Kopfzeile
-echo '<table width="100%"><tr><td><h1>&nbsp;'.$p->t('benotungstool/benotungstool');
+echo '<table width="100%"><tr><td><h1>'.$p->t('benotungstool/benotungstool');
 echo '</h1></td><td align="right">'."\n";
 
 //Studiensemester laden
@@ -276,7 +276,7 @@ echo '<table width="100%"><tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
 echo "<td>\n";
 
-echo "<b>".$lv_obj->bezeichnung_arr[$sprache]."</b><br>";
+echo "<h2>".$lv_obj->bezeichnung_arr[$sprache]."</h2>";
 
 if($lehreinheit_id=='')
 	die($p->t('benotungstool/esGibtKeineLehreinheiten'));
