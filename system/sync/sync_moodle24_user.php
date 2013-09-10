@@ -40,7 +40,7 @@ $lektoren=array();
 //ini_set('soap.wsdl_cache_enabled',0);
 //ini_set('soap.wsdl_cache_ttl',0);
 
-echo "Start um ".date('Y-m-d H:i:s');
+echo "-- Start ".date('Y-m-d H:i:s')."--";
 
 //nur Synchronisieren wenn ein aktuelles Studiensemester existiert damit keine 
 //Probleme durch die Vorrueckung entstehen
@@ -55,26 +55,27 @@ if($stsem_kurzbz=$stsem->getakt())
 	{
 		while($row = $db->db_fetch_object($result))
 		{
-			$course = new moodle24_course();
-			echo 'Sync fuer kurs '.$row->mdl_course_id.'<br>';
+			echo "<br>\nSync fuer Kurs $row->mdl_course_id";
 			flush();
-			ob_flush();
-			
+
+			$course = new moodle24_course();
 			if($course->load($row->mdl_course_id))
 			{
 				$message_lkt='';
 				//Lektoren
 				$mdluser = new moodle24_user();
 				$mitarbeiter = $mdluser->getMitarbeiter($row->mdl_course_id);
-				
+
+				echo "<br>\n-- Mitarbeiter --";
+				flush();
 				if($mdluser->sync_lektoren($row->mdl_course_id))
 				{
 					$sync_lektoren_gesamt+=$mdluser->sync_create;
 					$group_updates+=$mdluser->group_update;
 					if($mdluser->sync_create>0 || $mdluser->group_update>0)
 					{
-						$message.="\nKurs: $course->mdl_fullname ($course->mdl_shortname):\n".$mdluser->log."\n";
-						$message_lkt.="\nKurs: $course->mdl_fullname ($course->mdl_shortname):\n".$mdluser->log_public."\n";
+						$message.="\nKurs: $course->mdl_fullname ($course->mdl_shortname) $course->mdl_course_id:\n".$mdluser->log."\n";
+						$message_lkt.="\nKurs: $course->mdl_fullname ($course->mdl_shortname) $course->mdl_course_id:\n".$mdluser->log_public."\n";
 					}
 				}
 				else 
@@ -83,10 +84,9 @@ if($stsem_kurzbz=$stsem->getakt())
 					$fehler++;
 				}
 				echo $mdluser->log;
+				echo "<br>\n-- Studenten --";
 				flush();
-				ob_flush();
-				
-				echo "<br><br>--studenten--";
+
 				//Studenten
 				$mdluser = new moodle24_user();
 				if($mdluser->sync_studenten($row->mdl_course_id))
@@ -107,7 +107,6 @@ if($stsem_kurzbz=$stsem->getakt())
 				
 				echo $mdluser->log;
 				flush();
-				ob_flush();
 				foreach ($mitarbeiter as $uid)
 				{
 					if(!isset($lektoren[$uid]))
@@ -121,7 +120,7 @@ if($stsem_kurzbz=$stsem->getakt())
 				$fehler++;
 			}
 		}
-		
+		/*
 		if($sync_lektoren_gesamt>0 || $sync_studenten_gesamt>0 || $fehler>0 || $group_updates>0)
 		{
 			//Mail an die Lektoren
@@ -161,7 +160,7 @@ if($stsem_kurzbz=$stsem->getakt())
 		else 
 		{
 			echo 'Alle Zuteilungen sind auf dem neuesten Stand';
-		}
+		}*/
 	}
 	else 
 	{
@@ -170,5 +169,5 @@ if($stsem_kurzbz=$stsem->getakt())
 }
 else 
 	echo "Kein aktuelles Studiensemester vorhanden->kein Syncro";
-echo "Ende um ".date('Y-m-d H:i:s');
+echo "-- Ende ".date('d.m.Y H:i:s')." --";
 ?>

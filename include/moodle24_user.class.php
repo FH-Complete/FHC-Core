@@ -170,35 +170,37 @@ class moodle24_user extends basis_db
 		{			
 			while($row_ma = $this->db_fetch_object($result_ma))
 			{
-				//MoodleID des Users holen bzw ggf neu anlegen
-				if(!$this->loaduser($row_ma->mitarbeiter_uid))
-				{
-					//User anlegen
-					if(!$this->createUser($row_ma->mitarbeiter_uid))
-					{
-						$this->errormsg = "Fehler beim Anlegen des Users $row_ma->mitarbeiter_uid: $this->errormsg";
-						return false;
-					}
-					else 
-						$this->errormsg = '';
-				}
-				
-				if($mitarbeiter!='')
-					$mitarbeiter.=',';
-				$mitarbeiter.=$this->mdl_user_id;
-				
+
 				$user_zugeteilt=false;
 				foreach($enrolled_users as $user)
 				{
-					if($user['id']==$this->mdl_user_id)
+					if($user['username']==$row_ma->mitarbeiter_uid)
 					{
 						$user_zugeteilt=true;
 						break;
 					}
 				}
-
+				
 				if(!$user_zugeteilt)
 				{
+
+					//MoodleID des Users holen bzw ggf neu anlegen
+					if(!$this->loaduser($row_ma->mitarbeiter_uid))
+					{
+						//User anlegen
+						if(!$this->createUser($row_ma->mitarbeiter_uid))
+						{
+							$this->errormsg = "Fehler beim Anlegen des Users $row_ma->mitarbeiter_uid: $this->errormsg";
+							return false;
+						}
+						else 
+							$this->errormsg = '';
+					}
+				
+					if($mitarbeiter!='')
+						$mitarbeiter.=',';
+					$mitarbeiter.=$this->mdl_user_id;
+
 					//Mitarbeiter ist noch nicht zugeteilt.
 					$data = new stdClass();
 					$data->roleid=3; // 3=Lektor
@@ -231,6 +233,11 @@ class moodle24_user extends basis_db
 	 */
 	public function sync_studenten($mdl_course_id)
 	{
+		$vorhandenegruppen=array();
+		$this->gruppenzuordnungen=array();
+		$groupmembertoadd = array();
+		$userstoenroll=array();
+
 		//Studentengruppen laden die zu diesem Kurs zugeteilt sind
 		$qry = "SELECT 
 					studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, tbl_moodle.studiensemester_kurzbz, tbl_moodle.gruppen
@@ -258,6 +265,8 @@ class moodle24_user extends basis_db
 		{			
 			while($row_std = $this->db_fetch_object($result_std))
 			{
+				$this->mdl_user_id='';
+
 				//Schauen ob fuer diesen Kurs die Gruppen mitgesynct werden sollen
 				$gruppensync = $this->db_parse_bool($row_std->gruppen);
 				
@@ -302,68 +311,81 @@ class moodle24_user extends basis_db
 				{
 					while($row_user = $this->db_fetch_object($result_user))
 					{
-						//MoodleID des Users holen bzw ggf neu anlegen
-						if(!$this->loaduser($row_user->student_uid))
-						{
-							//User anlegen
-							if(!$this->createUser($row_user->student_uid))
-							{
-								$this->errormsg = "Fehler beim Anlegen des Users $row_user->student_uid: $this->errormsg";
-								return false;
-							}
-							else 
-								$this->errormsg = '';
-						}
-						
-						if($studenten!='')
-							$studenten.=',';
-						$studenten.=$this->mdl_user_id;
-						
+
 						//Nachschauen ob dieser Student bereits zugeteilt ist
 
 						$user_zugeteilt=false;
 						foreach($enrolled_users as $user)
 						{
-							if($user['id']==$this->mdl_user_id)
+							if($user['username']==$row_user->student_uid)
 							{
 								$user_zugeteilt=true;
+								$this->mdl_user_id=$user['id'];
 								break;
 							}
 						}
 
 						if(!$user_zugeteilt)
 						{
+
+							//MoodleID des Users holen bzw ggf neu anlegen
+							if(!$this->loaduser($row_user->student_uid))
+							{
+								//User anlegen
+								if(!$this->createUser($row_user->student_uid))
+								{
+									$this->errormsg = "Fehler beim Anlegen des Users $row_user->student_uid: $this->errormsg";
+									return false;
+								}
+								else 
+									$this->errormsg = '';
+							}
+						
+							if($studenten!='')
+								$studenten.=',';
+							$studenten.=$this->mdl_user_id;
+						
+
 							//Student ist noch nicht zugeteilt.
 							
 							$data = new stdClass();
 							$data->roleid=5; // 5=Teilnehmer/Student
 							$data->userid=$this->mdl_user_id;
 							$data->courseid=$mdl_course_id;
-							$client->enrol_manual_enrol_users(array($data));
+
+							$userstoenroll[]=$data;
 
 							$this->log.="\nStudentIn $row_user->student_uid wurde zum Kurs hinzugefügt";
 							$this->log_public.="\nStudentIn $row_user->student_uid wurde zum Kurs hinzugefügt";
 							$this->sync_create++;
 						}
+
 						//Gruppenzuteilung
 						if($gruppensync)
 						{
-							//Schauen ob die Gruppe vorhanden ist
-							if(!$groupid = $this->getGroup($mdl_course_id, $gruppenbezeichnung))
+							if(!array_search($gruppenbezeichnung, $vorhandenegruppen))
 							{
-								//wenn nicht dann anlegen
-								if(!$groupid = $this->createGroup($mdl_course_id, $gruppenbezeichnung))
-									continue;
-								$this->group_update++;
-								$this->log.="\nes wurde eine neue Gruppe angelgt: $gruppenbezeichnung";
-								$this->log_public.="\nes wurde eine neue Gruppe angelgt: $gruppenbezeichnung";
+								//Schauen ob die Gruppe vorhanden ist
+								if(!$groupid = $this->getGroup($mdl_course_id, $gruppenbezeichnung))
+								{
+									//wenn nicht dann anlegen
+									if(!$groupid = $this->createGroup($mdl_course_id, $gruppenbezeichnung))
+										continue;
+									$this->group_update++;
+									$this->log.="\nes wurde eine neue Gruppe angelgt: $gruppenbezeichnung";
+									$this->log_public.="\nes wurde eine neue Gruppe angelgt: $gruppenbezeichnung";
+								}
+								$vorhandenegruppen[]=$gruppenbezeichnung;
 							}
-							
+
+							//if($this->mdl_user_id=='')
+							//	$this->loaduser($row_user->student_uid);
 							//Schauen ob eine Zuteilung zu dieser Gruppe vorhanden ist
 							if(!$this->getGroupMember($groupid, $this->mdl_user_id))
 							{
 								//wenn nicht dann zuteilen
-								$this->createGroupMember($groupid, $this->mdl_user_id);
+								$groupmembertoadd[] = array('groupid'=>$groupid,'userid'=>$this->mdl_user_id);
+								//$this->createGroupMember($groupid, $this->mdl_user_id);
 								$this->group_update++;
 								$this->log.="\nStudentIn $row_user->student_uid wurde der Gruppe $gruppenbezeichnung zugeordnet";
 								$this->log_public.="\nStudentIn $row_user->student_uid wurde der Gruppe $gruppenbezeichnung zugeordnet";
@@ -372,7 +394,12 @@ class moodle24_user extends basis_db
 					}
 				}
 			}
-			
+			if(count($userstoenroll)>0)
+				$client->enrol_manual_enrol_users($userstoenroll);
+
+			if(count($groupmembertoadd)>0)
+				$client->core_group_add_group_members($groupmembertoadd);
+				
 			return true;
 		}
 		else 
@@ -391,12 +418,18 @@ class moodle24_user extends basis_db
 	 */
 	public function getGroupMember($groupid, $userid)
 	{
-		$client = new SoapClient($this->serverurl); 
-		$response = $client->core_group_get_group_members(array($groupid));
+		if(!isset($this->gruppenzuordnungen[$groupid]))
+		{
+			$client = new SoapClient($this->serverurl); 
+			$response = $client->core_group_get_group_members(array($groupid));
 
-		if(isset($response[0]['userids']))
+			if(isset($response[0]['userids']))
+			{
+				$this->gruppenzuordnungen[$groupid]=$response[0]['userids'];
+			}
+		}
 
-		foreach($response[0]['userids'] as $id)
+		foreach($this->gruppenzuordnungen[$groupid] as $id)
 		{
 			if($id==$userid)
 				return true;
