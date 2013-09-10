@@ -332,7 +332,7 @@ $htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
 $htmlstr .= "<input type='submit' name='note' value='".$p->t('abgabetool/benoten')."'></form></td>";
 if($betreuerart!="Zweitbegutachter")
 {
-	$htmlstr .= "<td width=10% align=center><form action='https://www1.ephorus.de/' title='ephorus' target='_blank' method='GET'>";
+	$htmlstr .= "<td width=10% align=center><form action='https://www1.ephorus.com/' title='ephorus' target='_blank' method='GET'>";
 	$htmlstr .= "<input type='submit' name='ephorus' value='".$p->t('abgabetool/plagiatspruefung')."'></form></td></tr>";
 }
 else 
