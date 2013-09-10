@@ -190,6 +190,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
     <style:style style:name="P22" style:family="paragraph">
       <style:paragraph-properties style:writing-mode="lr-tb"/>
     </style:style>
+    <style:style style:name="P23" style:family="paragraph" style:parent-style-name="Standard">
+      <style:paragraph-properties fo:break-before="page" />
+    </style:style>
     <style:style style:name="T1" style:family="text">
       <style:text-properties fo:language="de" fo:country="AT" style:font-name-complex="Arial"/>
     </style:style>
@@ -436,8 +439,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             <text:p text:style-name="P8"/>
             <text:p text:style-name="P8"/>
             <text:p text:style-name="P8"/>
-            <text:p text:style-name="P8"/>
-            <text:p text:style-name="P8"/>
           </table:table-cell>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
@@ -448,7 +449,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           <table:covered-table-cell/>
         </table:table-row>
       </table:table>
-      <text:p text:style-name="P19"/>
+        <text:p text:style-name="P23"> </text:p>
       <text:p text:style-name="P2"><xsl:value-of select="titelpre" /><xsl:text> </xsl:text><xsl:value-of select="vorname" /><xsl:text> </xsl:text><xsl:value-of select="nachname" /><xsl:text> </xsl:text><xsl:value-of select="titelpost" /></text:p>
       <text:p text:style-name="P1">Personenkennzeichen: <xsl:value-of select="matrikelnr" /></text:p>
       <text:p text:style-name="P19"/>
