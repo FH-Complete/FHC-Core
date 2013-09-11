@@ -70,9 +70,13 @@ if ($firma->getFirmenTypen())
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 	<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-	<script src="../../include/js/jquery.js" type="text/javascript"></script>
-	<script src="../../include/js/jquery-ui.js" type="text/javascript"></script>
-	<script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script>
+<!--        <script src="../../include/js/jquery.js" type="text/javascript"></script> -->
+<!--	<script src="../../include/js/jquery-ui.js" type="text/javascript"></script> -->
+<!--	<script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script> -->
+        
+	<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>
+        
 	<style type="text/css">
 	<!--
 	
