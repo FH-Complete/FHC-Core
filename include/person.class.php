@@ -144,7 +144,7 @@ class person extends basis_db
 			return false;
 		}
 	}
-	
+        
 	/**
 	 * 
 	 * Löscht den Datensatz mit der übergebenen person_id
@@ -790,5 +790,5 @@ class person extends basis_db
 		return true; 
 	}
 	
-}
+    }
 ?>
