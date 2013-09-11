@@ -120,7 +120,7 @@ if($stsem_kurzbz=$stsem->getakt())
 				$fehler++;
 			}
 		}
-		/*
+		
 		if($sync_lektoren_gesamt>0 || $sync_studenten_gesamt>0 || $fehler>0 || $group_updates>0)
 		{
 			//Mail an die Lektoren
@@ -160,7 +160,7 @@ if($stsem_kurzbz=$stsem->getakt())
 		else 
 		{
 			echo 'Alle Zuteilungen sind auf dem neuesten Stand';
-		}*/
+		}
 	}
 	else 
 	{
