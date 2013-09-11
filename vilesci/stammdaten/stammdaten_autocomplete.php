@@ -269,7 +269,7 @@ cellSeparator (default value: "|")
 			break;
 
 		case 'tags':
-			$tag=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+			$tag=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
 			
 		 	$pWhere=" upper(tag) like upper('%".addslashes($tag)."%')";
 			
@@ -286,14 +286,20 @@ cellSeparator (default value: "|")
 			
 			if(is_array($result))
 			{
-				for ($i=0;$i<count($result);$i++)
-					echo html_entity_decode($result[$i]->tag)."\n";			
+                            $json=array();
+                            for ($i=0;$i<count($result);$i++)
+                            {
+                                $item['tag']=$result[$i]->tag;
+                                $json[]=$item;
+                                //echo html_entity_decode($result[$i]->tag)."\n";
+                            }
+                            echo json_encode($json);
 			}
 			break;
 			
 		// Person - FH Technikum suche
 		case 'person':
-		 	$person_id=trim((isset($_REQUEST['q']) ? $_REQUEST['q']:''));
+		 	$person_id=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
 			if (is_null($person_id) || $person_id=='')
 				exit('person_id wurde nicht übergeben!');
 			
@@ -352,15 +358,24 @@ cellSeparator (default value: "|")
 			if (!$oRresult=$db->SQL($pArt,$pDistinct,$pFields,$pTable,$pWhere,$pOrder,$pLimit,$pSql))
 				exit(' |'.$db->errormsg."\n");
 
-				
+			$json=array();
 			for ($i=0;$i<count($oRresult);$i++)
 			{
-				echo html_entity_decode($oRresult[$i]->person_id).'|'
+                            $item['anrede']=trim($oRresult[$i]->anrede);
+                            $item['titelpre']=$oRresult[$i]->titelpre?html_entity_decode($oRresult[$i]->titelpre).' ':'';
+                            $item['vorname']=html_entity_decode($oRresult[$i]->vorname);
+                            $item['nachname']=html_entity_decode($oRresult[$i]->nachname);
+                            $item['funktion_kurzbz']=$oRresult[$i]->funktion_kurzbz?html_entity_decode($oRresult[$i]->funktion_kurzbz).' ':'';
+                            $item['aktiv']=$oRresult[$i]->aktiv==true || $oRresult[$i]->aktiv=='t'?true:false;
+                            $item['uid']=$oRresult[$i]->uid;
+                            $json[]=$item;
+/*				echo html_entity_decode($oRresult[$i]->person_id).'|'
 									.trim($oRresult[$i]->anrede).'&nbsp;'.($oRresult[$i]->titelpre?html_entity_decode($oRresult[$i]->titelpre).'&nbsp;':'')
 									.html_entity_decode($oRresult[$i]->vorname).' '.html_entity_decode($oRresult[$i]->nachname).($oRresult[$i]->funktion_kurzbz?html_entity_decode($oRresult[$i]->funktion_kurzbz).'&nbsp;':'') 
 									.($oRresult[$i]->aktiv==true || $oRresult[$i]->aktiv=='t'?'&nbsp;<img src="../../skin/images/tick.png" alt="aktiv" />':'&nbsp;<img src="../../skin/images/cross.png" alt="nicht aktiv" />')
-					."\n";
+					."\n"; */
 			}
+                        echo json_encode($json);
 			break;
 			
 		// Lektor,Student - FHTW Suche im LV-Plan

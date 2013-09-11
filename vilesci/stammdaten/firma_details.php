@@ -147,15 +147,18 @@ if(isset($_GET['deletetag']))
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/styles/jquery.css" type="text/css">
-	<link rel="stylesheet" href="../../skin/styles/jquery-ui.css" type="text/css">
+<!--	<link rel="stylesheet" href="../../skin/styles/jquery-ui.css" type="text/css"> -->
 	
 	<script src="../../include/js/mailcheck.js" type="text/javascript"></script>
 	<script src="../../include/js/datecheck.js" type="text/javascript"></script>
-	<script src="../../include/js/jquery.js" type="text/javascript"></script>
-	<script src="../../include/js/jquery-ui.js" type="text/javascript"></script>
-	<script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script>	
+<!--	<script src="../../include/js/jquery.js" type="text/javascript"></script> -->
+<!--	<script src="../../include/js/jquery-ui.js" type="text/javascript"></script> -->
+<!--	<script src="../../include/js/jquery.autocomplete.min.js" type="text/javascript"></script> -->
 	
-	<script type="text/javascript" language="JavaScript1.2">
+	<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>
+
+<script type="text/javascript" language="JavaScript1.2">
 		function confdel()
 		{
 			if(confirm("Diesen Datensatz wirklich loeschen?"))
@@ -326,7 +329,7 @@ function getFirmadetail($firma_id, $adresstyp_arr, $user, $neu)
 		$htmlstr.="</tr>";
 		$htmlstr.="<tr>";
 		$htmlstr.="<td title='Trennung mehrerer Tags durch ;'>Tags:</td><td><input type='text' id='tags' name='tags' size='32'>";
-		$htmlstr.="<script type='text/javascript' language='JavaScript1.2'>
+		/* $htmlstr.="<script type='text/javascript' language='JavaScript1.2'>
 					$('#tags').autocomplete('stammdaten_autocomplete.php', 
 					{
 						minChars:1,
@@ -336,7 +339,28 @@ function getFirmadetail($firma_id, $adresstyp_arr, $user, $neu)
 						multipleSeparator: '; ',
 						extraParams:{'work':'tags'}
 					});
-				</script>";
+				</script>"; */
+		$htmlstr.="<script type='text/javascript'>
+                            $(document).ready(function()
+                            {
+                                $('#tags').autocomplete({
+                                    source: 'stammdaten_autocomplete.php?work=tags', 
+                                    minLength:1,
+                                    response: function(event, ui)
+                                    {
+                                        for(i in ui.content)
+                                        {
+                                            ui.content[i].value=ui.content[i].tag;
+                                            ui.content[i].label=ui.content[i].tag;
+                                        }
+                                    },
+                                    select: function(event, ui)
+                                    {
+                                        ui.item.value=ui.item.tag;
+                                    }
+				});
+                            });
+                           </script>";
 		$htmlstr.="</td>";
 		$htmlstr.="<td>&nbsp;</td>";	
 		$htmlstr.="<td colspan='9'>";
