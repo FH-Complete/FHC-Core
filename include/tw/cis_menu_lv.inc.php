@@ -301,7 +301,7 @@
 	  <td class="tdvertical" align="center">
 		<?php
 		//Keine Newsgroups fuer Studiengang '0' (Freifaecher) anzeigen
-		if($studiengang_kz!='0')
+		if($studiengang_kz!='0' && CIS_LEHRVERANSTALTUNG_NEWSGROUPS_ANZEIGEN)
 		{
 			echo '<a href="news://news.technikum-wien.at/'.mb_strtolower($stg_obj->kurzbzlang).'.'.$semester.'sem.'.mb_strtolower($short_short_name).'" class="Item">
 					<img class="lv" src="../../../skin/images/button_newsgroups.png"><br>
@@ -316,7 +316,10 @@
 		  <td class="tdvertical" align="center">
 		<?php
 		//FEEDBACK
-		echo '<a href="feedback.php?lvid='.$lvid.'" target="_blank" class="Item"><img class="lv" src="../../../skin/images/button_feedback.png"><br><strong>'.$p->t('lehre/feedback').'</strong></a>';
+                if(CIS_LEHRVERANSTALTUNG_FEEDBACK_ANZEIGEN)
+                {
+                    echo '<a href="feedback.php?lvid='.$lvid.'" target="_blank" class="Item"><img class="lv" src="../../../skin/images/button_feedback.png"><br><strong>'.$p->t('lehre/feedback').'</strong></a>';
+                }
 		?>
 
 		
