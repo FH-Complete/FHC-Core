@@ -20,6 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
+require_once('../../config/global.config.inc.php');
 require_once('../../config/vilesci.config.inc.php');
 
 ?>
@@ -514,11 +515,11 @@ function LeDetailReset()
 	document.getElementById('lehrveranstaltung-detail-textbox-wochenrythmus').value='';
 	document.getElementById('lehrveranstaltung-detail-textbox-startkw').value='';
 	document.getElementById('lehrveranstaltung-detail-textbox-anmerkung').value='';
-	document.getElementById('lehrveranstaltung-detail-menulist-sprache').value='German';
-	document.getElementById('lehrveranstaltung-detail-menulist-raumtyp').value='Dummy';
-	document.getElementById('lehrveranstaltung-detail-menulist-raumtypalternativ').value='Dummy';
+	document.getElementById('lehrveranstaltung-detail-menulist-sprache').value='<?php echo DEFAULT_LEHREINHEIT_SPRACHE; ?>';
+	document.getElementById('lehrveranstaltung-detail-menulist-raumtyp').value='<?php echo DEFAULT_LEHREINHEIT_RAUMTYP; ?>';
+	document.getElementById('lehrveranstaltung-detail-menulist-raumtypalternativ').value='<?php echo DEFAULT_LEHREINHEIT_RAUMTYP_ALTERNATIV; ?>';
 	document.getElementById('lehrveranstaltung-detail-menulist-studiensemester').value=getStudiensemester();
-	document.getElementById('lehrveranstaltung-detail-menulist-lehrform').value='UE';
+	document.getElementById('lehrveranstaltung-detail-menulist-lehrform').value='<?php echo DEFAULT_LEHREINHEIT_LEHRFORM; ?>';
 	document.getElementById('lehrveranstaltung-detail-textbox-lehreinheit_id').value='';
 
 	//mitarbeiterlehreinheit tree leeren

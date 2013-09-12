@@ -28,6 +28,8 @@
  * @brief  			Klasse zm Berechnen und Anzeigen des Stundenplans.
  * Abhaengig:	 	von functions.inc.php
  *****************************************************************************/
+
+require_once(dirname(__FILE__).'/../config/global.config.inc.php');
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/lehrstunde.class.php');
 require_once(dirname(__FILE__).'/ferien.class.php');
@@ -1281,6 +1283,10 @@ class wochenplan extends basis_db
 							echo $lkt;
 						if ($this->type!='ort')
 							echo $orte;
+                                                
+                                                if(LVPLAN_ANMERKUNG_ANZEIGEN)
+                                                    echo $anmerkung;
+                                                
 						echo $blink_aus;
 						
 						echo '</label>';
