@@ -171,7 +171,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$semester = $row->semester;
 		
 		$xml .= "		<studiengang_art>".$bezeichnung."</studiengang_art>";
-		$xml .= "		<studiengang_kz>".sprintf('%04s', $row->studiengang_kz)."</studiengang_kz>";
+		$xml .= "		<studiengang_kz>".sprintf('%04s', abs($row->studiengang_kz))."</studiengang_kz>";
 		$xml .= "\n		<anrede>".$row->anrede."</anrede>";
 		$xml .= "\n		<vorname>".$row->vorname."</vorname>";
 		$xml .= "		<nachname>".$row->nachname."</nachname>";
