@@ -166,7 +166,7 @@ function draw_content_liste($row)
 			<STUDENT:status><![CDATA['.$status.']]></STUDENT:status>
     		<STUDENT:anmerkungen>'.($row->anmerkungen==''?'&#xA0;':'<![CDATA['.$row->anmerkungen.']]>').'</STUDENT:anmerkungen>
     		<STUDENT:anmerkungpre>'.($row->anmerkung==''?'&#xA0;':'<![CDATA['.$row->anmerkung.']]>').'</STUDENT:anmerkungpre>
-    		<STUDENT:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz>
+    		<STUDENT:studiengang_kz><![CDATA['.abs($row->studiengang_kz).']]></STUDENT:studiengang_kz>
 			<STUDENT:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></STUDENT:studiengang>
 			<STUDENT:orgform><![CDATA['.$orgform.']]></STUDENT:orgform>
 			<STUDENT:aufmerksamdurch_kurzbz><![CDATA['.$row->aufmerksamdurch_kurzbz.']]></STUDENT:aufmerksamdurch_kurzbz>
@@ -255,7 +255,7 @@ function draw_prestudent($row)
 	echo '
 			<STUDENT:prestudent_id><![CDATA['.$row->prestudent_id.']]></STUDENT:prestudent_id>
     		<STUDENT:studiengang_kz_prestudent><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz_prestudent>
-			<STUDENT:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz>
+			<STUDENT:studiengang_kz><![CDATA['.abs($row->studiengang_kz).']]></STUDENT:studiengang_kz>
 			<STUDENT:aufmerksamdurch_kurzbz><![CDATA['.$row->aufmerksamdurch_kurzbz.']]></STUDENT:aufmerksamdurch_kurzbz>
 			<STUDENT:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></STUDENT:studiengang>
 			<STUDENT:berufstaetigkeit_code><![CDATA['.$row->berufstaetigkeit_code.']]></STUDENT:berufstaetigkeit_code>
@@ -666,7 +666,7 @@ else
 				<semester><![CDATA['.$semester.']]></semester>
 				<verband><![CDATA['.$student->verband.']]></verband>
 				<gruppe><![CDATA['.$student->gruppe.']]></gruppe>
-				<studiengang_kz><![CDATA['.sprintf("%04d",$student->studiengang_kz).']]></studiengang_kz>
+				<studiengang_kz><![CDATA['.sprintf("%04d",abs($student->studiengang_kz)).']]></studiengang_kz>
 				<studiengang_bezeichnung><![CDATA['.$studiengang->bezeichnung.']]></studiengang_bezeichnung>
 				<studiengang_art><![CDATA['.$typ.']]></studiengang_art>
 				<anrede><![CDATA['.$student->anrede.']]></anrede>
