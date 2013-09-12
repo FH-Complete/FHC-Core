@@ -169,12 +169,12 @@ $(document).ready(function()
 				if (ui.item.mitarbeiter_uid=='')
 				{
 					$("#mitarbeiter_uid").val(ui.item.uid);
-					document.getElementById("uid").disabled=false;
+					$("#uid").val("student");
 				}
 				else
 				{
 					$("#mitarbeiter_uid").val(ui.item.uid);
-					document.getElementById("uid").disabled=true;
+					$("#uid").val("lektor");
 				}
 			}
 			});
