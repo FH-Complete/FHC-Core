@@ -452,10 +452,13 @@ if(!$ansicht)
 				<p><A  href="lva_liste.php?uid='.$user->uid.'">'.$p->t('lvaliste/lehrveranstaltungen').'</A></p>
 				<p><A href="freebusy.php">'.$p->t('freebusy/titel').'</A></p>';
 		}
-		if($uid!=get_uid())
+		if(check_lektor(get_uid()))
 		{
 			echo '<p><A href="zeitsperre_days.php?days=30&lektor='.$user->uid.'">'.$p->t('profil/zeitsperrenVon').' '.$user->nachname.'</A></p>';
-			echo '<p><A href="../lvplan/stpl_week.php?pers_uid='.$user->uid.'">'.$p->t('profil/lvplanVon').' '.$user->nachname.'</A></p>';
+		}
+		if($uid!=get_uid())
+		{
+			echo '<p><A href="../lvplan/stpl_week.php?pers_uid='.$user->uid.'&type=lektor">'.$p->t('profil/lvplanVon').' '.$user->nachname.'</A></p>';
 		}
 	}
 	echo '<p><a href="../../../cms/content.php?content_id='.$p->t("dms_link/lvPlanFAQ").'" target="_blank">'.$p->t('global/hilfe').'</a></p></td>';
