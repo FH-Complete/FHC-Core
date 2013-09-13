@@ -58,7 +58,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
   					<rows>
     					<row>
       						<label value="UID" control="mitarbeiter-detail-textbox-uid"/>
-      						<hbox><textbox id="mitarbeiter-detail-textbox-uid" disabled="true" maxlength="16" size="16" oninput="MitarbeiterDetailValueChange()"/></hbox>
+      						<hbox><textbox id="mitarbeiter-detail-textbox-uid" disabled="true" maxlength="32" size="16" oninput="MitarbeiterDetailValueChange()"/></hbox>
       						<spacer />
       						<spacer />
       						<label value="Aktiv" control="mitarbeiter-detail-checkbox-aktiv"/>
