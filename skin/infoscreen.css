@@ -1,6 +1,6 @@
 @charset "utf-8";
 /* Allgemein */
-body,p,div
+body,div
 {
 	background-color: White;
 	font-family: Arial;
@@ -8,34 +8,56 @@ body,p,div
 	font-size: 16px;
 	overflow:hidden;
 	text-decoration: none;
+	margin:0; 
+	padding:0; 
+	height:100%;
+}
+html
+{ 
+	margin:0; 
+	padding:0; 
+	height:100%; 
+}
+iframe 
+{ 
+	margin:0; 
+	padding:0; 
+	height:100%;
+	display:block; 
+	width:100%; 
+	border:none;
 }
 hr
 {
 	color:#CCCCCC;
 	height:1px;
 }
+p
+{
+	margin-top: 0px;
+}
 
 /* Links */
 a
 {
-	color: #008381; 
+	color: #0086CC; 
 	text-decoration: none;
 	cursor: pointer;
 }
 a:hover
 {
-	color: Black; 
-	text-decoration: none;
+	color: #0086CC; 
+	text-decoration: underline;
 }
 a[onClick]:hover.Item
 {
-	color: Black; 
-	text-decoration: none;
+	color: #0086CC; 
+	text-decoration: #0086CC;
 }
 a:hover.Item
 {
-	color: Black; 
-	text-decoration: none;
+	color: #0086CC; 
+	text-decoration: #0086CC;
 }
 a.hilfe 
 { 
@@ -76,95 +98,82 @@ td.tdwidth_right
 }
 
 /* Fonts */
-font.ContentHeader
-{
-	color: #FFFFFF;
-	font-size: 28px;
+
+h1
+{ 
+	color: black; 
+	padding: 20px 0 20px 0;
+	text-align: center;
+	/* padding-left: 10px; */
+	/* width:20%; */
+	margin:0px;
+	white-space:nowrap;
+	font-size: 35px;
+	/* letter-spacing: 2px;
+	border-bottom:solid 1px #0086CC;*/
+	font-weight:normal;
 }
-/* Formatierung der Überschriften */
-address,pre /* Adresse, Rohdaten */
-{
-	font-weight: normal;
-	font-style: normal;
-	font-size: 16px;
-	text-decoration: none;
-	font-family: Arial;
-	voice-family: inherit;
-}
-h1 /* Überschrift 1 */
+h1 td
 { 
 	color: #ffffff; 
-	background-color: #008381; /*gruen*/
-	font-weight: bold;
-	padding-top: 2px;
-	padding-bottom: 2px;
-	padding-left: 4px;
-	font-size: 1.8em;
-	text-align: center;
+	background-color: #009e84;
 }
-h2 /* Überschrift 2 */
+h2
 { 
-	font-size: 16px;
-	background-color: #CCCCCC; /*mittel-grau */
-	font-weight: normal;
-	height: 19px;
-	padding-top: 2px;
-	padding-left: 2px;
-}
-h3 /* Überschrift 3 */
-{ 
-	font-weight: bold; 
-	color: #000000; 
-	font-size: 16px;
-}
-h4 /* Überschrift 4 */
-{ 
-	font-size: 16px;
-	font-style: normal; 
-	line-height: normal; 
-	font-weight: normal; 
-	font-variant: normal; 
-	text-transform: none; 
-	color: #0086CB; /* tw-blau */
-	text-decoration: none; 
-}
-h5, h6 /* Überschrift 5,6 - Werden nicht speziell formatiert, sondern dem normalen Text angepasst */
-{
-	font-weight: normal;
-	font-style: normal;
-	font-size: 16px;
-	text-decoration: none;
-	font-family: Arial;
-	voice-family: inherit;
 	margin: 0px;
+	padding-top: 0px;
+	padding-bottom: 15px;
+	/* padding-left: 10px; */
+	font-weight: bold;
+	font-size: 15px;
+}
+h3 
+{ 
+	margin: 0px;
+	padding-top: 0px; /* 20px */
+	padding-bottom: 2px;
+	font-weight: bold;
+	font-size:13px;
+}
+h4 
+{ 	
+	margin: 0px;
+	padding: 0px;  
+	text-decoration: underline;
+	font-weight: normal;
+	font-size:13px; 
+}
+#news
+{
+	padding: 100px 30px 0 30px;
+	margin-left: 100px;
+	margin-right: 100px;
+	margin-top: -100px;
+	box-shadow: 0px 100px 0px 0px #FFFFFF, /* Unterer weisser Rand bei sehr kleinen Aufloesungen */
+				0px 0px 5px 5px #888, /* schmaler dunkler Schatten */
+				20px 20px 70px 30px #DDDDDD, /* heller Verlauf rechts */
+				-20px 20px 70px 30px #DDDDDD; /* heller Verlauf links */
 }
 #news .news
 {
-	-moz-border-radius-topleft: 10px;
 	width: 100%;
-	border: 1px solid #C6C6C6;
-	background-color: #F0F0F0;
-}
-#news .news .titel
-{
-	-moz-border-radius-topleft: 6px;
-	font-weight: bold;
-	font-size: 18px;
-	padding: 0px 10px 0px 10px;
-	white-space: nowrap;
-	background-color: #C6C6C6;
+	background-color: #A5AFB6; /* grauvariante A5AFB6 */
 }
 #news .news .titel table
 {
-	font-weight: bold;
-	padding: 0px 10px 0px 10px;
-	white-space: nowrap;
+	padding: 3px 10px 3px 10px;
+	color: #ffffff;
+	font-weight: 500;
+	font-size: 20px;
+	background-color: #A5AFB6; /* grauvariante A5AFB6 */
 }
 #news .news .text
 {
-	background-color: #FCFCFC;
-	padding: 5px 10px 5px 10px;
+	background-color: #E9ECEE; /* grauvariante E9ECEE */
+	padding: 10px;
+	font-size: 20px;
 }
+
 /* Margin von ersten und letzten P tag entfernen, da sonst
    breite Raender entstehen koenne*/
 #news .news .text p:first-child
