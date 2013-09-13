@@ -138,7 +138,7 @@ function searchPerson($searchItems)
 			else
 				$mail = $row->uid.'@'.DOMAIN;
 			echo '<td><a href="mailto:',$mail,'">',$mail,'</a></td>';
-			echo '<td><a href="../../../cis/private/lvplan/stpl_week.php?pers_uid='.$row->uid.($row->mitarbeiter_uid==NULL?'&type=student':'').'">'.$p->t('lvplan/lvPlan').'</a></td>';
+			echo '<td><a href="../../../cis/private/lvplan/stpl_week.php?pers_uid='.$row->uid.($row->mitarbeiter_uid==NULL?'&type=student':'&type=lektor').'">'.$p->t('lvplan/lvPlan').'</a></td>';
 			echo '</tr>';
 			echo "\n";
 		}
