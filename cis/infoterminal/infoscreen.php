@@ -103,7 +103,7 @@ var speed=1 <!--Zeilensprung in px. Wert aendern um Geschwindigkeit zu steuern. 
 var currentpos=0,alt=1,curpos1=0,curpos2=-1
 function initialize()
 	{
-	//startit()
+	startit()
 	}
 	
 function scrollwindow()
@@ -147,7 +147,7 @@ function scrolldown()
 {
 	contentframe = document.getElementById('content').contentWindow;
 	contentframe.scrollBy(0,1)
-	window.setTimeout('scrolldown()',100);
+	window.setTimeout('scrolldown()',50);
 }
 window.onload=scrolldown;
 </script>
@@ -156,20 +156,6 @@ window.onload=scrolldown;
 
 echo '
 	<title>Infoscreen</title>
-	<style type="text/css">
-	html, body, div, iframe 
-	{ 
-		margin:0; 
-		padding:0; 
-		height:100%; 
-	}
-	iframe 
-	{ 
-		display:block; 
-		width:80%; 
-		border:none;
-	}
-  </style>
 </head>
 <body>';
 echo '<!-- Last content:'.$lastinfoscreencontent.' Infoscreen-ID:'.$infoscreen_id.' IP:'.$ip.'-->';
