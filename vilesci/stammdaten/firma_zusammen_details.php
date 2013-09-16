@@ -1019,6 +1019,8 @@ function getFirmaUndStandorte($firma_id_geloescht,$firma_id_bleibt)
 
 			// Personen zum Standort
 			$personfunktion_obj = new person();
+			if(!isset($geloescht->personen[$i]))
+				$geloescht->personen[$i]=new stdclass();
 			$geloescht->personen[$i]->personfunktion=array();
 			if($geloescht->standorte[$i]->standort_id && $personfunktion_obj->load_personfunktion($geloescht->standorte[$i]->standort_id,'',$geloescht->firma_id))
 			{
@@ -1060,11 +1062,15 @@ function getFirmaUndStandorte($firma_id_geloescht,$firma_id_bleibt)
 			$bleibt->standorte[$i]->kontakt=array();
 			if($bleibt->standorte[$i]->standort_id && $kontakt_obj->load_standort($bleibt->standorte[$i]->standort_id))
 			{
+				if(!isset($bleibt->standorte[$i]))
+					$bleibt->standorte[$i] = new stdClass();
 				$bleibt->standorte[$i]->kontakt=$kontakt_obj;
 			}
 			
 			// Personen zum Standort
 			$personfunktion_obj = new person();
+			if(!isset($bleibt->personen[$i]))
+				$bleibt->personen[$i]=new stdClass();
 			$bleibt->personen[$i]->personfunktion=array();
 			if($bleibt->standorte[$i]->standort_id && $personfunktion_obj->load_personfunktion($bleibt->standorte[$i]->standort_id,'',$bleibt->firma_id))
 			{
