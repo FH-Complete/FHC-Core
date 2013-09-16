@@ -127,6 +127,7 @@ if($result = $db->db_query($qry))
 {
 	$zeile=3;
 	$gesamtkosten = 0;
+	$gesamtstunden = 0;
 	$liste=array();
 	
 	while($row = $db->db_fetch_object($result))
@@ -195,10 +196,12 @@ if($result = $db->db_query($qry))
 		
 		//Kosten zu den Gesamtkosten hinzurechnen
 		$gesamtkosten = $gesamtkosten + $row['gesamtkosten'];
+		$gesamtstunden = $gesamtstunden + $row['gesamtstunden'];
 		$zeile++;
 	}
 	
-	//Gesamtkosten anzeigen
+	//Gesamtkosten und Gesamtstunden anzeigen
+	$worksheet->writeNumber($zeile,6,$gesamtstunden, $format_bold);
 	$worksheet->writeNumber($zeile,7,$gesamtkosten, $format_number_bold);
 }
 	
