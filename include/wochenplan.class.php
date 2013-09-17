@@ -41,6 +41,7 @@ require_once(dirname(__FILE__).'/zeitsperre.class.php');
 require_once(dirname(__FILE__).'/phrasen.class.php'); 
 require_once(dirname(__FILE__).'/globals.inc.php'); 
 require_once(dirname(__FILE__).'/sprache.class.php');
+require_once(dirname(__FILE__).'/../config/global.config.inc.php');
 
 class wochenplan extends basis_db
 {
@@ -752,6 +753,9 @@ class wochenplan extends basis_db
 						echo $lkt;
 					if ($this->type!='ort')
 						echo $this->std_plan[$i][$j][0]->ort;
+					if(LVPLAN_ANMERKUNG_ANZEIGEN)
+						echo $this->convert_html_chars($anmerkung);
+					
 					echo '</A></DIV>'.$blink_aus.'</td>'.$this->crlf;
 				}
 				else
@@ -1284,8 +1288,8 @@ class wochenplan extends basis_db
 						if ($this->type!='ort')
 							echo $orte;
                                                 
-                                                if(LVPLAN_ANMERKUNG_ANZEIGEN)
-                                                    echo $anmerkung;
+						if(LVPLAN_ANMERKUNG_ANZEIGEN)
+							echo $anmerkung;
                                                 
 						echo $blink_aus;
 						
