@@ -48,7 +48,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 								
 					\n<fo:block-container font-size="7pt" position="absolute" top="62mm" left="21mm">
 					<fo:block font-size="7pt">\n
-						Abs.: Fachhochschule Technikum Wien, Höchstädtplatz 5, A-1200 Wien
+						Abs.: Fachhochschule Technikum Wien, Höchstädtplatz 6, A-1200 Wien
 					</fo:block>
 					</fo:block-container>
 					
@@ -180,7 +180,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					</fo:table-body>
 				</fo:table>
 				<fo:block text-align="center" font-size="7pt">
-				Fachhochschule Technikum\nWien\nHöchstädtplatz 5\nA-1200 Wien\nZVR-Nr.: 074476526\nDVR-Nr.: 0928381
+				Fachhochschule Technikum\nWien\nHöchstädtplatz 6\nA-1200 Wien\nZVR-Nr.: 074476526\nDVR-Nr.: 0928381
 				</fo:block>
 			</fo:flow>
 		</fo:page-sequence>
