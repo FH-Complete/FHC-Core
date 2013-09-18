@@ -164,7 +164,7 @@ class moodle24_user extends basis_db
 		$mitarbeiter='';
 
 		$client = new SoapClient($this->serverurl); 
-		$enrolled_users = $client->core_enrol_get_enrolled_users($mdl_course_id,array());
+		$enrolled_users = $client->core_enrol_get_enrolled_users($mdl_course_id,array(array('name'=>'userfields','value'=>'id,username')));
 
 		if($result_ma = $this->db_query($qry))
 		{			
@@ -207,6 +207,7 @@ class moodle24_user extends basis_db
 					$data->userid=$this->mdl_user_id;
 					$data->courseid=$mdl_course_id;
 
+					$client = new SoapClient($this->serverurl); 
 					$client->enrol_manual_enrol_users(array($data));
 
 					$this->log.="\nLektorIn $this->mdl_user_firstname $this->mdl_user_lastname wurde zum Kurs hinzugefügt";
@@ -259,7 +260,7 @@ class moodle24_user extends basis_db
 		$studenten='';
 
 		$client = new SoapClient($this->serverurl); 
-		$enrolled_users = $client->core_enrol_get_enrolled_users($mdl_course_id, array());
+		$enrolled_users = $client->core_enrol_get_enrolled_users($mdl_course_id, array(array('name'=>'userfields','value'=>'id,username')));
 
 		if($result_std = $this->db_query($qry))
 		{			
@@ -395,10 +396,16 @@ class moodle24_user extends basis_db
 				}
 			}
 			if(count($userstoenroll)>0)
+			{
+				$client = new SoapClient($this->serverurl); 
 				$client->enrol_manual_enrol_users($userstoenroll);
+			}
 
 			if(count($groupmembertoadd)>0)
+			{
+				$client = new SoapClient($this->serverurl); 
 				$client->core_group_add_group_members($groupmembertoadd);
+			}
 				
 			return true;
 		}
