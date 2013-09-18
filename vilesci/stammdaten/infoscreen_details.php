@@ -147,7 +147,7 @@ $datum_obj = new datum();
 		<table>
 		<tr>
 			<td>InfoscreenID</td>
-			<td><input type="text" size="5" name="infoscreen_id" value="',$db->convert_html_chars($infoscreen->infoscreen_id),'" /> (Wenn keine ID eingetragen wird, gilt der Eintrag für alle Infoscreens)</td>
+			<td><input type="text" size="5" name="infoscreen_id" value="',($action=='new'?$infoscreen_id:$db->convert_html_chars($infoscreen->infoscreen_id)),'" /> (Wenn keine ID eingetragen wird, gilt der Eintrag für alle Infoscreens)</td>
 		</tr>
 		<tr>
 			<td>Content ID</td>
@@ -155,11 +155,11 @@ $datum_obj = new datum();
 		</tr>
 		<tr>
 			<td>Gültig von</td>
-			<td><input type="text" size="18" name="gueltigvon" value="',$db->convert_html_chars($datum_obj->formatDatum($infoscreen->gueltigvon,'d.m.Y H:i:s')),'" /> ( Format: ',date('d.m.Y H:i:s'),' )</td>
+			<td><input type="text" id="gueltigvon" size="18" name="gueltigvon" value="',$db->convert_html_chars($datum_obj->formatDatum($infoscreen->gueltigvon,'d.m.Y H:i:s')),'" /> <input type="button" value="Jetzt" onclick="document.getElementById(\'gueltigvon\').value=\''.date('d.m.Y H:i:s').'\';" /> ( Format: ',date('d.m.Y H:i:s'),' )</td>
 		</tr>
 		<tr>
 			<td>Gültig bis</td>
-			<td><input type="text" size="18" name="gueltigbis" value="',$db->convert_html_chars($datum_obj->formatDatum($infoscreen->gueltigbis,'d.m.Y H:i:s')),'" /> ( Format: ',date('d.m.Y H:i:s'),' )</td>
+			<td><input type="text" id="gueltigbis" size="18" name="gueltigbis" value="',$db->convert_html_chars($datum_obj->formatDatum($infoscreen->gueltigbis,'d.m.Y H:i:s')),'" /> <input type="button" value="Jetzt" onclick="document.getElementById(\'gueltigbis\').value=\''.date('d.m.Y H:i:s').'\';" /> ( Format: ',date('d.m.Y H:i:s'),' )</td>
 		</tr>
 		<tr>
 			<td>Refreshzeit</td>
