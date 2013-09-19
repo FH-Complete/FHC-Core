@@ -122,6 +122,7 @@ if(isset($_POST['getBetragRow']) && isset($_POST['id']))
 					select: function(event, ui)
 					{
 						ui.item.value=ui.item.firma_id;
+						$('#firma_id').val(ui.item.firma_id);
 					}
 					
 				  });
