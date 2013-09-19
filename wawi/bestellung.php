@@ -431,6 +431,7 @@ if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 			select: function(event, ui)
 			{
 				ui.item.value=ui.item.uid;
+				$('#mitarbeiter_uid').val(ui.item.uid);
 			}
 		});
 		
@@ -463,7 +464,8 @@ if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 			},
 			select: function(event, ui)
 			{
-				ui.item.value=ui.item.firma_id;
+				ui.item.value=ui.item.name;
+				$('#firma_id').val(ui.item.firma_id);
 			}
 		});
 
@@ -494,6 +496,7 @@ if(isset($_POST['deleteBtnStorno']) && isset($_POST['id']))
 			select: function(event, ui)
 			{
 				ui.item.value=ui.item.uid;
+				$('#besteller_uid').val(ui.item.uid);
 			}
 		});
 
