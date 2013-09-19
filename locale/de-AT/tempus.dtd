@@ -84,3 +84,7 @@
 <!ENTITY menu-extras-rescheck.key		"R">
 <!ENTITY menu-extras-rescheck.label		"Kollisionspruefung mit Reservierungen">
 <!ENTITY menu-extras-rescheck.accesskey	"R">
+
+<!ENTITY menu-extras-synclvplan.key			"S">
+<!ENTITY menu-extras-synclvplan.label		"LVPlan Synchronisierung">
+<!ENTITY menu-extras-synclvplan.accesskey	"S">

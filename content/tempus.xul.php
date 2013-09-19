@@ -54,6 +54,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-extras-kollisionstudent:command" oncommand="KollisionStudentShow();"/>
   <command id="menu-extras-lvplanwartung:command" oncommand="LVPlanWartungShow();"/>
   <command id="menu-extras-rescheck:command" oncommand="ResCheckShow();"/>
+  <command id="menu-extras-synclvplan:command" oncommand="SyncLVPlan();"/>
   <command id="menu-help-about:command" oncommand="OpenAboutDialog()"/>
   <command id="menu-help-todo:command" oncommand="HelpOpenToDo();"/>
   <command id="menu-help-manual:command" oncommand="OpenManualTempus();"/>
@@ -218,6 +219,12 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                label     = "&menu-extras-rescheck.label;"
                command   =  "menu-extras-rescheck:command"
                accesskey = "&menu-extras-rescheck.accesskey;"/>
+            <menuitem
+               id        =  "menu-extras-synclvplan"
+               key       =  "menu-extras-synclvplan:key"
+               label     = "&menu-extras-synclvplan.label;"
+               command   =  "menu-extras-synclvplan:command"
+               accesskey = "&menu-extras-synclvplan.accesskey;"/>
           </menupopup>
     </menu>
     <menu id="menu-help" label="&menu-help.label;" accesskey="&menu-help.accesskey;">
