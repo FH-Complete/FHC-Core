@@ -483,6 +483,13 @@ function ResCheckShow()
 {
 	window.open('<?php echo APP_ROOT;?>vilesci/lehre/check/res_check.php', 'KollisionReservierung');
 }
+// ****
+// * Zeigt das Fenster zur Kollisionspruefung mit Reservierungen
+// ****
+function SyncLVPlan()
+{
+	window.open('<?php echo APP_ROOT;?>vilesci/lehre/lvplan_custom_sync.php', 'LVPlan Sync');
+}
 
 // ****
 // * Oeffnet das Handbuch
