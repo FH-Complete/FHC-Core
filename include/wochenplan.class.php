@@ -41,7 +41,6 @@ require_once(dirname(__FILE__).'/zeitsperre.class.php');
 require_once(dirname(__FILE__).'/phrasen.class.php'); 
 require_once(dirname(__FILE__).'/globals.inc.php'); 
 require_once(dirname(__FILE__).'/sprache.class.php');
-require_once(dirname(__FILE__).'/../config/global.config.inc.php');
 
 class wochenplan extends basis_db
 {
@@ -564,7 +563,7 @@ class wochenplan extends basis_db
 	/**
 	 * Zeichnen der Stundenplanwoche in HTML
 	 */
-	public function draw_week($raumres, $user_uid='')
+	public function draw_week($raumres, $user_uid='', $gruppieren=true)
 	{
 		global $tagbez;
 		$sprache = getSprache(); 
@@ -628,7 +627,9 @@ class wochenplan extends basis_db
 						unset($lehrverband);
 					if (isset($lehrfach))
 						unset($lehrfach);
-					$reservierung=false;		
+					if(isset($anmerkung))
+						unset($anmerkung);
+					$reservierung=false;
 					foreach ($this->std_plan[$i][$j] as $lehrstunde)
 					{
 					
@@ -642,7 +643,7 @@ class wochenplan extends basis_db
 							$studiengang = new studiengang(); 
 							$studiengang->load($lehrstunde->stg_kz);
 							$typ = $studiengang->typ; 
-						}						
+						}
 						
 						$lvb=$typ.$lehrstunde->stg.'-'.$lehrstunde->sem;
 						$stg = $lehrstunde->stg_kz;
@@ -661,102 +662,210 @@ class wochenplan extends basis_db
 							$lf.='-'.$lehrstunde->lehrform;
 						$lehrfach[]=$lf;
 						$titel=$lehrstunde->titel;
-						$anmerkung=$lehrstunde->anmerkung;
+						$anmerkung[]=$lehrstunde->anmerkung;
 						if (!$reservierung)
 							$reservierung=$lehrstunde->reservierung;
 					}
 
-					// Unterrichtsnummer (Kollision?)
-					$unr=array_unique($unr);
-					$kollision+=count($unr);
-
-					// Lektoren
-					if ($this->type!='lektor')
+					if($gruppieren)
 					{
-						$lektor=array_unique($lektor);
-						sort($lektor);
-						$lkt='';
-						foreach ($lektor as $l)
-							$lkt.=$l.'<BR />';
+						// Unterrichtsnummer (Kollision?)
+						$unr=array_unique($unr);
+						$kollision+=count($unr);
+
+						// Lektoren
+						if ($this->type!='lektor')
+						{
+							$lektor=array_unique($lektor);
+							sort($lektor);
+							$lkt='';
+							foreach ($lektor as $l)
+								$lkt.='<BR />'.$l;
+						}
+						else
+							$lkt='<BR />'.$lektor[0];
+						//echo $lkt;
+
+						// Lehrverband
+						if ($this->type!='verband')
+						{
+							$lehrverband=array_unique($lehrverband);
+							sort($lehrverband);
+							$lvb='';
+							foreach ($lehrverband as $l)
+								$lvb.='<BR />'.$l;
+						}
+						else
+							$lvb='<BR />'.$lehrverband[0];
+
+						// Lehrfach
+						if ($this->type=='verband')
+						{
+							$lehrfach=array_unique($lehrfach);
+							sort($lehrfach);
+							$lf='';
+							foreach ($lehrfach as $l)
+								$lf.=$l.'<BR />';
+						}
+						else
+							$lf=$lehrfach[0].'<BR />';
+
+						if(LVPLAN_ANMERKUNG_ANZEIGEN)
+						{
+							$anmerkung=array_unique($anmerkung);
+							sort($anmerkung);
+							$anm='';
+							foreach ($anmerkung as $a)
+								$anm.='<BR />'.$a;
+						}
+							
+						// Blinken oder nicht ?
+						if ($kollision)
+						{
+							$blink_ein='<blink>'.$kollision;
+							$blink_aus='</blink>';
+						}
+						else
+						{
+							$blink_ein='';
+							$blink_aus='';
+						}
+
+						// Ausgabe einer Stunde im Raster (HTML)
+						echo '				<td nowrap ';
+						if (isset($this->std_plan[$i][$j][0]->farbe))
+							echo 'style="background-color: #'.$this->std_plan[$i][$j][0]->farbe.';"';
+						echo '>'.$blink_ein.'<DIV align="center">';
+						// Link zu Details setzten
+						echo '<A class="stpl_detail" onClick="window.open(';
+						echo "'stpl_detail.php";
+						echo '?type='.$this->type.'&datum='.date("Y-m-d",$datum).'&stunde='.$j;
+						echo '&pers_uid='.$this->pers_uid;
+						echo '&stg_kz='.$this->stg_kz;
+						echo '&sem='.$this->sem;
+						echo '&ver='.$this->ver;
+						echo '&grp='.$this->grp;
+						echo '&ort_kurzbz='.$this->std_plan[$i][$j][0]->ort;		//.'">'
+						echo "','Details', 'height=320,width=550,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=no,toolbar=no,location=no,menubar=no,dependent=yes');return false;";
+						echo '" title="'.$this->convert_html_chars($titel).'" ';
+						echo ' href="#">';
+
+						// Ausgabe
+						//echo $lf;
+						echo mb_substr($lf, 0,-strlen('<BR />'));
+
+						if($titel!='' && !$reservierung)
+						{
+							echo '<img src="../../../skin/images/sticky.png" tooltip="'.$this->convert_html_chars($titel).'"/>';
+						}
+						//echo '<BR />';
+						if ($this->type=='ort' || $this->type=='lektor' || $this->type=='verband')
+							echo $lvb;
+						if ($this->type!='lektor')
+							echo $lkt;
+						if ($this->type!='ort')
+							echo '<BR />'.$this->std_plan[$i][$j][0]->ort;
+						if (LVPLAN_ANMERKUNG_ANZEIGEN)
+						{
+							echo $anm;
+/*							$anmerkung=array_unique($anmerkung);
+							foreach($anmerkung as $anm)
+								if($anm!='')
+									echo '<BR />'.$anm;
+							echo '<BR />anm'; */
+						}
+						echo '</A></DIV>'.$blink_aus.'</td>'.$this->crlf;
 					}
 					else
-						$lkt=$lektor[0].'<BR />';
-					//echo $lkt;
-
-					// Lehrverband
-					if ($this->type!='verband')
 					{
-						$lehrverband=array_unique($lehrverband);
-						sort($lehrverband);
-						$lvb='';
-						foreach ($lehrverband as $l)
-							$lvb.=$l.'<BR />';
-					}
-					else
-						$lvb=$lehrverband[0].'<BR />';
+						// mehrere Einheiten innerhalb einer Stunde sollen getrennt aufgelistet werden
+						$uEinheiten=array();
+						for($n=0;$n<count($unr);$n++)
+						{
+							$unrIndex=searchForId($unr[$n], $uEinheiten);
+							if($unrIndex===FALSE)
+							{
+								/*
+								if($unr[$n]=='51561')
+								{
+									echo "<br><br>N=$n";
+									echo "unr:".$unr[$n];
+									echo "Data:".print_r($uEinheiten,true);
+									echo "<br><br>";
+								}*/
+								$unrIndex=count($uEinheiten);
+								$uEinheiten[$unrIndex]['unr']=$unr[$n];
+								$uEinheiten[$unrIndex]['lehrfach']=$lehrfach[$n];
+								if (isset($this->std_plan[$i][$j][$n]->farbe))
+									$uEinheiten[$unrIndex]['farbe']=$this->std_plan[$i][$j][$n]->farbe;
+							}
+							$uEinheiten[$unrIndex]['ort'][]=$this->std_plan[$i][$j][$n]->ort;
+							$uEinheiten[$unrIndex]['lehrverband'][]=$lehrverband[$n];
+							$uEinheiten[$unrIndex]['anmerkung'][]=$anmerkung[$n];
+							$uEinheiten[$unrIndex]['lektor'][]=$lektor[$n];
+						}
+						
+						// Ausgabe einer Stunde im Raster (HTML)
+						echo '				<td nowrap valign="top">';
+//						for($n=0;$n<count($uEinheiten);$n++)
+						foreach($uEinheiten as $key=>$uEinheit)
+						{
+							echo '<DIV align="center" ';
+							if (isset($uEinheit['farbe']))
+								echo 'style="background-color: #'.$uEinheit['farbe'].'; margin-bottom: 3px;"';
+							echo '>';
+							
+							// Link zu Details setzten
+							echo '<A class="stpl_detail" onClick="window.open(';
+							echo "'stpl_detail.php";
+							echo '?type='.$this->type.'&datum='.date("Y-m-d",$datum).'&stunde='.$j;
+							echo '&pers_uid='.$this->pers_uid;
+							echo '&stg_kz='.$this->stg_kz;
+							echo '&sem='.$this->sem;
+							echo '&ver='.$this->ver;
+							echo '&grp='.$this->grp;
+							echo '&ort_kurzbz='.$uEinheit['ort'];		//.'">'
+							echo "','Details', 'height=320,width=550,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=no,toolbar=no,location=no,menubar=no,dependent=yes');return false;";
+							echo '" title="'.$this->convert_html_chars($titel).'" ';
+							echo ' href="#">';
 
-					// Lehrfach
-					if ($this->type=='verband')
-					{
-						$lehrfach=array_unique($lehrfach);
-						sort($lehrfach);
-						$lf='';
-						foreach ($lehrfach as $l)
-							$lf.=$l.'<BR />';
-					}
-					else
-						$lf=$lehrfach[0].'<BR />';
+							// Ausgabe
+							//echo $lf;
+							echo $uEinheit['lehrfach'];
 
-					// Blinken oder nicht ?
-					if ($kollision)
-					{
-						$blink_ein='<blink>'.$kollision;
-						$blink_aus='</blink>';
+							if($titel!='' && !$reservierung)
+							{
+								echo '<img src="../../../skin/images/sticky.png" tooltip="'.$this->convert_html_chars($titel).'"/>';
+							}
+							echo '<BR />';
+							if ($this->type=='ort' || $this->type=='lektor' || $this->type=='verband')
+							{
+								$uEinheit['lehrverband']=array_unique($uEinheit['lehrverband']);
+								foreach($uEinheit['lehrverband'] as $ueLehrverband)
+									echo $ueLehrverband."<BR />";
+							}
+							if ($this->type!='lektor')
+							{
+								$uEinheit['lektor']=array_unique($uEinheit['lektor']);
+								foreach($uEinheit['lektor'] as $ueLektor)
+									echo $ueLektor."<BR />";
+							}
+							if ($this->type!='ort')
+							{
+								$uEinheit['ort']=array_unique($uEinheit['ort']);
+								foreach($uEinheit['ort'] as $ueOrt)
+									echo $ueOrt."<BR />";
+							}
+							if(LVPLAN_ANMERKUNG_ANZEIGEN)
+							{
+								$uEinheit['anmerkung']=array_unique($uEinheit['anmerkung']);
+								foreach($uEinheit['anmerkung'] as $ueAnmerkung)
+									echo $ueAnmerkung."<BR />";
+							}
+							echo '</A></DIV>';
+						}
+						echo '</td>'.$this->crlf;
 					}
-					else
-					{
-						$blink_ein='';
-						$blink_aus='';
-					}
-
-					// Ausgabe einer Stunde im Raster (HTML)
-					echo '				<td nowrap ';
-					if (isset($this->std_plan[$i][$j][0]->farbe))
-						echo 'style="background-color: #'.$this->std_plan[$i][$j][0]->farbe.';"';
-					echo '>'.$blink_ein.'<DIV align="center">';
-					// Link zu Details setzten
-					echo '<A class="stpl_detail" onClick="window.open(';
-					echo "'stpl_detail.php";
-					echo '?type='.$this->type.'&datum='.date("Y-m-d",$datum).'&stunde='.$j;
-					echo '&pers_uid='.$this->pers_uid;
-					echo '&stg_kz='.$this->stg_kz;
-					echo '&sem='.$this->sem;
-					echo '&ver='.$this->ver;
-					echo '&grp='.$this->grp;
-					echo '&ort_kurzbz='.$this->std_plan[$i][$j][0]->ort;		//.'">'
-					echo "','Details', 'height=320,width=550,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=no,toolbar=no,location=no,menubar=no,dependent=yes');";
-					echo '" title="'.$this->convert_html_chars($titel).'" ';
-					echo ' href="#">';
-
-					// Ausgabe
-					//echo $lf;
-					echo mb_substr($lf, 0,-strlen('<BR />'));
-					
-					if($titel!='' && !$reservierung)
-					{
-						echo '<img src="../../../skin/images/sticky.png" tooltip="'.$this->convert_html_chars($titel).'"/>';
-					}
-					echo '<BR />';
-					if ($this->type=='ort' || $this->type=='lektor')
-						echo $lvb;
-					if ($this->type!='lektor')
-						echo $lkt;
-					if ($this->type!='ort')
-						echo $this->std_plan[$i][$j][0]->ort;
-					if(LVPLAN_ANMERKUNG_ANZEIGEN)
-						echo $this->convert_html_chars($anmerkung);
-					
-					echo '</A></DIV>'.$blink_aus.'</td>'.$this->crlf;
 				}
 				else
 				{
@@ -1287,10 +1396,10 @@ class wochenplan extends basis_db
 							echo $lkt;
 						if ($this->type!='ort')
 							echo $orte;
-                                                
+
 						if(LVPLAN_ANMERKUNG_ANZEIGEN)
 							echo $anmerkung;
-                                                
+						
 						echo $blink_aus;
 						
 						echo '</label>';
@@ -2161,7 +2270,7 @@ class wochenplan extends basis_db
 							//"Betreff","Beginnt am","Beginnt um","Endet am","Endet um","Ganztaegiges Ereignis","Erinnerung Ein/Aus","Erinnerung am","Erinnerung um","Besprechungsplanung","Erforderliche Teilnehmer","Optionale Teilnehmer","Besprechungsressourcen","Abrechnungsinformationen","Beschreibung",
 							//"Kategorien","Ort","Prioritaet","Privat","Reisekilometer","Vertraulichkeit","Zeitspanne zeigen als"
 							echo $this->crlf.'"'.$this->std_plan[$i][$j][$idx]->lehrfach.(isset($this->std_plan[$i][$j][$idx]->lehrform) && $this->std_plan[$i][$j][$idx]->lehrform!=''?'-'.$this->std_plan[$i][$j][$idx]->lehrform:'').($lvb!=''?' - '.$lvb:'').'","'.$start_date.'","'.$start_time.'","'.$end_date.'","'.$end_time.'","Aus","Aus",,,,,,,,"Stundenplan';
-							echo $this->crlf.$this->std_plan[$i][$j][$idx]->lehrfach.$this->crlf.$this->std_plan[$i][$j][$idx]->lektor.$this->crlf.$lvb.$this->crlf.$this->std_plan[$i][$j][$idx]->ort.'","StundenplanFH","'.$this->std_plan[$i][$j][$idx]->ort.'","Normal","Aus",,"Normal","2"';
+							echo $this->crlf.$this->std_plan[$i][$j][$idx]->lehrfach.$this->crlf.$this->std_plan[$i][$j][$idx]->lektor.$this->crlf.$lvb.$this->crlf.$this->std_plan[$i][$j][$idx]->ort.(LVPLAN_ANMERKUNG_ANZEIGEN?$this->crlf.$this->std_plan[$i][$j][$idx]->anmerkung:'').'","StundenplanFH","'.$this->std_plan[$i][$j][$idx]->ort.'","Normal","Aus",,"Normal","2"';
 						}
 						elseif ($target=='ical')
 						{
@@ -2178,7 +2287,7 @@ class wochenplan extends basis_db
 							echo $this->crlf.'BEGIN:VEVENT'.$this->crlf
 								.'UID:'.'FH'.$lvb.$this->std_plan[$i][$j][$idx]->ort.$this->std_plan[$i][$j][$idx]->lektor.$lehrfach[$idx].$start_date_time_ical.$this->crlf
 								.'SUMMARY:'.$lehrfach[$idx].'  '.$this->std_plan[$i][$j][$idx]->ort.' - '.$lvb.$this->crlf
-								.'DESCRIPTION:'.$lehrfach[$idx].'\n'.$this->std_plan[$i][$j][$idx]->lektor.'\n'.$lvb.'\n'.$this->std_plan[$i][$j][$idx]->ort.$this->crlf
+								.'DESCRIPTION:'.$lehrfach[$idx].'\n'.$this->std_plan[$i][$j][$idx]->lektor.'\n'.$lvb.'\n'.$this->std_plan[$i][$j][$idx]->ort.(LVPLAN_ANMERKUNG_ANZEIGEN?'\n'.$this->std_plan[$i][$j][$idx]->anmerkung:'').$this->crlf
 								.'LOCATION:'.$this->std_plan[$i][$j][$idx]->ort.$this->crlf
 								.'CATEGORIES:'.$lvplan_kategorie.$this->crlf
 								.'DTSTART;TZID=Europe/Vienna:'.$start_date_time_ical.$this->crlf
@@ -2234,7 +2343,7 @@ class wochenplan extends basis_db
 						else
 						{
 							echo $this->crlf.'"'.$lehrfach[$idx].'","'.$lvplan_kategorie.'","'.$this->std_plan[$i][$j][$idx]->ort.'","Stundenplan'.$this->crlf.$this->std_plan[$i][$j][$idx]->lehrfach.$this->crlf;
-							echo $this->std_plan[$i][$j][$idx]->lektor.$this->crlf.$lvb.$this->crlf.$this->std_plan[$i][$j][$idx]->ort.'","Stundenplan",';
+							echo $this->std_plan[$i][$j][$idx]->lektor.$this->crlf.$lvb.$this->crlf.$this->std_plan[$i][$j][$idx]->ort.(LVPLAN_ANMERKUNG_ANZEIGEN?$this->crlf.$this->std_plan[$i][$j][$idx]->anmerkung:'').'","Stundenplan",';
 							echo '"'.$start_date.'","'.$start_time.'","'.$end_date.'","'.$end_time.'",,,,,';
 						}
 					}
@@ -2309,5 +2418,17 @@ function jahreskalenderjump_hoverbox($link)	//Mit Hoverbox Effekt
 	}
 	echo '			</tr></table></div></div></div></td></tr></table>'.$crlf;
 }
-	
+
+function searchForId($id, $array) 
+{
+   foreach ($array as $key => $val) 
+   {
+       if ($val['unr'] == $id) 
+	   {
+           return $key;
+       }
+   }
+   return false;
+}
+
 ?>
