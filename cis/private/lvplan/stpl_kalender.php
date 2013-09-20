@@ -282,7 +282,7 @@ while($begin<$ende)
 		$style='style="padding-top: 10px;" class="page-break-after"';
 
 		echo '<div '.$style.'>';
-		$stdplan->draw_week(false);
+		$stdplan->draw_week(false,'',false);
 		echo '</div>';
 	}
 }
