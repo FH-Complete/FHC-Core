@@ -311,6 +311,7 @@
 								select: function(event, ui)
 								{
 									ui.item.value=ui.item.inventarnummer;
+									setTimeout('document.sendform.submit()',1500);
 								}
 							});
 							/*  $('#inventarnummer').autocomplete('inventar_autocomplete.php', 
@@ -864,30 +865,51 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 				<input style="display:none" name="inventarnummer" value="'.$resBetriebsmittel->inventarnummer.'" >
 				<input style="display:none" name="betriebsmittel_id" value="'.$resBetriebsmittel->betriebsmittel_id.'" >
 				<input style="display:none" name="bestellung_id" value="'.$resBetriebsmittel->bestellung_id.'" >
-				<input onchange="setTimeout(\'document.sendform1.submit()\',1500);" id="bestelldetail_id"   name="bestelldetail_id" size="6" maxlength="41"  value="'.$resBetriebsmittel->bestelldetail_id.'" >
+				<input id="bestelldetail_id"   name="bestelldetail_id" size="6" maxlength="41"  value="'.$resBetriebsmittel->bestelldetail_id.'" >
 					<script type="text/javascript">
 							function selectItem(li) {
 							   return false;
 							}
 							
 							$(document).ready(function() {
-								  $(\'#bestelldetail_id\').autocomplete(\'inventar_autocomplete.php\', {
-									minChars:1,
-									matchSubset:1,matchContains:1,
-									width:500,
-									cacheLength:0,
-									onItemSelect:selectItem,
-									formatItem:formatItem,
-									extraParams:{\'work\':\'wawi_bestelldetail_id\'
-												,\'bestellung_id\':\''.$resBetriebsmittel->bestellung_id.'\'
+								$("#bestelldetail_id").autocomplete({
+									source: "inventar_autocomplete.php?work=wawi_bestelldetail_id&bestellung_id='.$resBetriebsmittel->bestellung_id.'",
+									minLength:1,
+									response: function(event, ui)
+									{
+										//Value und Label fuer die Anzeige setzen
+										for(i in ui.content)
+										{
+											ui.content[i].value=ui.content[i].bestelldetail_id;
+											ui.content[i].label=ui.content[i].bestelldetail_id+\', \'+ui.content[i].beschreibung+\' \'+ui.content[i].artikelnummer+\' Preis VE \'+ui.content[i].preisprove+\', Menge \'+ui.content[i].menge;
 										}
-								  });
+									},
+									select: function(event, ui)
+									{
+										ui.item.value=ui.item.bestelldetail_id;
+									}
+								});
 						  });
 					</script>
 			</td>
 		</form>
 		';
-	}	
+		/*	<input onchange="setTimeout(\'document.sendform1.submit()\',1500);" id="bestelldetail_id"   name="bestelldetail_id" size="6" maxlength="41"  value="'.$resBetriebsmittel->bestelldetail_id.'" >
+			$(document).ready(function() {
+				  $(\'#bestelldetail_id\').autocomplete(\'inventar_autocomplete.php\', {
+					minChars:1,
+					matchSubset:1,matchContains:1,
+					width:500,
+					cacheLength:0,
+					onItemSelect:selectItem,
+					formatItem:formatItem,
+					extraParams:{\'work\':\'wawi_bestelldetail_id\'
+								,\'bestellung_id\':\''.$resBetriebsmittel->bestellung_id.'\'
+						}
+				  });
+		  });
+		 */
+	}
 	else
 		$htmlstring.='<td>'.$resBetriebsmittel->bestelldetail_id.'</td>';
 

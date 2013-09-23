@@ -993,14 +993,14 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 			<td id="bcTarget'.$pos.'"><img border="0"  src="../../skin/images/printer.png" alt="Etik"></td>
 				<script type="text/javascript">			
 				   $(document).ready(function()
-				   {  
+				   {
 					   	$("td#bcTarget'.$pos.'").click(function(event)
-						{ 
+						{
 							var PrintWin=window.open("etiketten.php?inventarnummer='. urlencode($resultBetriebsmittel[$pos]->inventarnummer).'","Etik","copyhistory=no,directories=no,location=no,dependent=yes,toolbar=no,status=no,menubar=no,resizable=yes,scrollbars=yes,width=400,height=300,left=20, top=20"); 
 							if (PrintWin) 
 							{
 								PrintWin.focus();
-							}	
+							}
 					   });
 				});
 				</script>';
@@ -1085,22 +1085,44 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 					<input style="display:none" name="inventarnummer" value="'.$resBetriebsmittel->inventarnummer.'" >
 					<input style="display:none" name="betriebsmittel_id" value="'.$resBetriebsmittel->betriebsmittel_id.'" >
 					<input style="display:none" name="bestelldetail_id" value="'.$resBetriebsmittel->bestelldetail_id.'" >						
-					<input onchange="setTimeout(\'document.sendform0.submit()\',1500);" id="bestellung_ids" name="bestellung_id" size="6" maxlength="41"  value="'.$resBetriebsmittel->bestellung_id.'" >
+					<input id="bestellung_ids" name="bestellung_id" size="6" maxlength="41"  value="'.$resBetriebsmittel->bestellung_id.'" >
 					<script type="text/javascript">
 						$(document).ready(function() 
 						{
-							  $("#bestellung_ids").autocomplete("inventar_autocomplete.php", 
-							  {
-								minChars:4,
-								matchSubset:1,matchContains:1,
-								width:500,
-								formatItem:formatItem,
-								extraParams:{"work":"wawi_bestellung_id"}
+							  $("#bestellung_ids").autocomplete({
+							    source:"inventar_autocomplete.php?work=wawi_bestellung_id",
+								minLength:2,
+								response: function(event, ui)
+								{
+									for(i in ui.content)
+									{
+										ui.content[i].value=ui.content[i].bestellung_id;
+										ui.content[i].label=ui.content[i].bestellung_id+\', \'+ui.content[i].insertamum+\', \'+ui.content[i].bestell_nr+\', \'+ui.content[i].titel+\', \'+ui.content[i].bemerkung;
+									}
+								},
+								select: function(event, ui)
+								{
+									ui.item.value=ui.item.bestellung_id;
+								}
 							  });
 					  });
 					</script>
 				</td>
 			</form>';
+		/*
+			<input onchange="setTimeout(\'document.sendform0.submit()\',1500);" id="bestellung_ids" name="bestellung_id" size="6" maxlength="41"  value="'.$resBetriebsmittel->bestellung_id.'" >
+			$(document).ready(function() 
+			{
+				  $("#bestellung_ids").autocomplete("inventar_autocomplete.php", 
+				  {
+					minChars:4,
+					matchSubset:1,matchContains:1,
+					width:500,
+					formatItem:formatItem,
+					extraParams:{"work":"wawi_bestellung_id"}
+				  });
+			});
+		*/
 		else		
 			$htmlstring.='<td><a href="../../wawi/bestellung.php?method=update&amp;id='.$resBetriebsmittel->bestellung_id.'">'.$resBetriebsmittel->bestellung_id.'</a></td>';
 
@@ -1112,8 +1134,34 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 					<input style="display:none" name="inventarnummer" value="'.$resBetriebsmittel->inventarnummer.'" >
 					<input style="display:none" name="betriebsmittel_id" value="'.$resBetriebsmittel->betriebsmittel_id.'" >
 					<input style="display:none" name="bestellung_id" value="'.$resBetriebsmittel->bestellung_id.'" >
-					<input onchange="setTimeout(\'document.sendform1.submit()\',1500);" id="bestelldetail_ids"   name="bestelldetail_id" size="6" maxlength="41"  value="'.$resBetriebsmittel->bestelldetail_id.'" >
+					<input id="bestelldetail_ids"   name="bestelldetail_id" size="6" maxlength="41"  value="'.$resBetriebsmittel->bestelldetail_id.'" >
 					<script type="text/javascript">
+						$(document).ready(function() 
+						{
+							$("#bestelldetail_ids").autocomplete({
+								source: "inventar_autocomplete.php?work=wawi_bestelldetail_id&bestellung_id='.$resBetriebsmittel->bestellung_id.'",
+								minLength:1,
+								response: function(event, ui)
+								{
+									//Value und Label fuer die Anzeige setzen
+									for(i in ui.content)
+									{
+										ui.content[i].value=ui.content[i].bestelldetail_id;
+										ui.content[i].label=ui.content[i].bestelldetail_id+\', \'+ui.content[i].beschreibung+\' \'+ui.content[i].artikelnummer+\' Preis VE \'+ui.content[i].preisprove+\', Menge \'+ui.content[i].menge;
+									}
+								},
+								select: function(event, ui)
+								{
+									ui.item.value=ui.item.bestelldetail_id;
+								}
+							});
+					  });
+					</script>
+				</td>
+			</form>';
+
+			//<input onchange="setTimeout(\'document.sendform1.submit()\',1500);" id="bestelldetail_ids"   name="bestelldetail_id" size="6" maxlength="41"  value="'.$resBetriebsmittel->bestelldetail_id.'" >
+				/*
 						$(document).ready(function() 
 						{
 							  $("#bestelldetail_ids").autocomplete("inventar_autocomplete.php", 
@@ -1128,9 +1176,7 @@ function output_inventarposition($debug=false,$resultBetriebsmittel=null,$result
 											}
 							  });
 					  });
-					</script>
-				</td>
-			</form>';
+			 */
 		else
 			$htmlstring.='<td>'.$resBetriebsmittel->bestelldetail_id.'</td>';
 

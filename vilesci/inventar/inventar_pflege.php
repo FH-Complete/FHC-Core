@@ -474,21 +474,30 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 									$(document).ready(function() 
 									{
 										$('#bestelldetail_id').autocomplete({
-											source: "inventar_autocomplete.php?work=wawi_bestelldetail_id",
+											source: function(request, response) 
+											{
+												$.ajax({
+													url: "inventar_autocomplete.php",
+													datatype:"json",
+													data: {
+														term: request.term,
+														work: 'wawi_bestelldetail_id',
+														bestellung_id: $('#bestellung_id').val()
+													},
+													success: function(data)
+													{
+														data=eval(data);
+														 response($.map(data, function(item) 
+														 {
+															return {
+																value:item.bestelldetail_id,
+																label:item.bestelldetail_id+', '+item.beschreibung+' '+item.artikelnummer+' Preis VE '+item.preisprove+', Menge '+item.menge
+															}
+														}))
+													}
+												});
+											},											
 											minLength:1,
-											response: function(event, ui)
-											{
-												//Value und Label fuer die Anzeige setzen
-												for(i in ui.content)
-												{
-													ui.content[i].value=ui.content[i].bestelldetail_id;
-													ui.content[i].label=ui.content[i].bestelldetail_id+', '+ui.content[i].beschreibung+' '+ui.content[i].artikelnummer+' Preis VE '+ui.content[i].preisprove+', Menge '+ui.content[i].menge;
-												}
-											},
-											select: function(event, ui)
-											{
-												ui.item.value=ui.item.bestelldetail_id;
-											}
 										});
 /*										  $('#bestelldetail_id').autocomplete('inventar_autocomplete.php', 
 										  {
@@ -1227,21 +1236,31 @@ for ($pos=0;$pos<$anzahl;$pos++)
 													$(document).ready(function() 
 													{
 														$('#bestelldetail_id_array<?php echo $pos; ?>').autocomplete({
-															source: "inventar_autocomplete.php?work=wawi_bestelldetail_id",
+															source: function(request, response) 
+															{
+																$.ajax({
+																	url: "inventar_autocomplete.php",
+																	datatype:"json",
+																	data: {
+																		term: request.term,
+																		work: 'wawi_bestelldetail_id',
+																		bestellung_id: $('#bestellung_id_array<?php echo $pos; ?>').val()
+																	},
+																	success: function(data)
+																	{
+																		data=eval(data);
+																		 response($.map(data, function(item) 
+																		 {
+																			return {
+																				value:item.bestelldetail_id,
+																				label:item.bestelldetail_id+', '+item.beschreibung+' '+item.artikelnummer+' Preis VE '+item.preisprove+', Menge '+item.menge
+
+																			}
+																		}))
+																	}
+																});
+															},											
 															minLength:1,
-															response: function(event, ui)
-															{
-																//Value und Label fuer die Anzeige setzen
-																for(i in ui.content)
-																{
-																	ui.content[i].value=ui.content[i].bestelldetail_id;
-																	ui.content[i].label=ui.content[i].bestelldetail_id+', '+ui.content[i].beschreibung+' '+ui.content[i].artikelnummer+' Preis VE '+ui.content[i].preisprove+', Menge '+ui.content[i].menge;
-																}
-															},
-															select: function(event, ui)
-															{
-																ui.item.value=ui.item.bestelldetail_id;
-															}
 														});
 /*														  $('#bestelldetail_id_array<?php echo $pos; ?>').autocomplete('inventar_autocomplete.php', 
 														  {
