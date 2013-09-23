@@ -450,7 +450,10 @@
 		case 'wawi_bestelldetail_id':
 		 	$filter=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
 			if (is_null($bestellung_id) || $bestellung_id=='' || is_null($filter) || $filter=='')
+			{
+				echo "bestellung_id oder filter ist leer";
 				exit();
+			}
 			
 			$bestelldetail = new wawi_bestelldetail();
 			$bestelldetail->getAllDetailsFromBestellung($bestellung_id, $filter);
