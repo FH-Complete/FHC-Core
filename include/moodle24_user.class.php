@@ -470,13 +470,20 @@ class moodle24_user extends basis_db
 	 */
 	public function getGroup($mdl_course_id, $gruppenbezeichnung)
 	{
-		$client = new SoapClient($this->serverurl); 
-		$response = $client->core_group_get_course_groups($mdl_course_id);
-
-		foreach($response as $row)
-		{
-			if($row['name']==$gruppenbezeichnung)
-				return $row['id'];
+		$client = @new SoapClient($this->serverurl);
+		try
+		{ 
+			$response = $client->core_group_get_course_groups($mdl_course_id);
+			foreach($response as $row)
+			{
+				if($row['name']==$gruppenbezeichnung)
+					return $row['id'];
+			}
+		}
+		catch (SoapFault $E) 
+		{ 
+    		$this->log.="Fehler beim Laden der Gruppe $mdl_course_id, $gruppenbezeichnung: ".$E->faultstring;
+    		return false;
 		}
 
 		$this->errormsg = "Gruppe wurde nicht gefunden $gruppenbezeichnung";
