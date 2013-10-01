@@ -77,6 +77,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	   					</hbox>
 					</row>
 					<row>
+						<label value="ScrumSprintID" control="textbox-projekttask-detail-scrumsprint_id"/>
+						<hbox>
+	   						<textbox id="textbox-projekttask-detail-scrumsprint_id" size="5" maxlength="5" disabled="true"/>
+	   						<spacer />
+	   					</hbox>
+					</row>
+					<row>
 						<label value="MantisID" control="textbox-projekttask-detail-mantis_id"/>
 						<hbox>
 	   						<textbox id="textbox-projekttask-detail-mantis_id" size="5" maxlength="5" disabled="true"/>

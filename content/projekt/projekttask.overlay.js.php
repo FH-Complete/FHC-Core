@@ -302,6 +302,7 @@ function TaskDetailReset()
 	document.getElementById('textbox-projekttask-detail-beschreibung').value='';
 	document.getElementById('textbox-projekttask-detail-aufwand').value='';
 	document.getElementById('textbox-projekttask-detail-mantis_id').value='';
+	document.getElementById('textbox-projekttask-detail-scrumsprint_id').value='';
 	MenulistSelectItemOnValue('textbox-projekttask-detail-ressource', '');
 	document.getElementById('textbox-projekttask-detail-ende').value='';
 }
@@ -317,6 +318,7 @@ function TaskDisableFields(val)
 	document.getElementById('textbox-projekttask-detail-beschreibung').disabled=val;
 	document.getElementById('textbox-projekttask-detail-aufwand').disabled=val;
 	document.getElementById('textbox-projekttask-detail-mantis_id').disabled=val;
+	document.getElementById('textbox-projekttask-detail-scrumsprint_id').disabled=val;
 	document.getElementById('textbox-projekttask-detail-ressource').disabled=val;
 	document.getElementById('textbox-projekttask-detail-ende').disabled=val;
 	document.getElementById('button-projekttask-detail-speichern').disabled=val;
@@ -335,6 +337,7 @@ function saveProjekttaskDetail()
 	beschreibung = document.getElementById('textbox-projekttask-detail-beschreibung').value;
 	aufwand = document.getElementById('textbox-projekttask-detail-aufwand').value;
 	mantis_id = document.getElementById('textbox-projekttask-detail-mantis_id').value;
+	scrumsprint_id = document.getElementById('textbox-projekttask-detail-scrumsprint_id').value;
 	ressource_id = MenulistGetSelectedValue('textbox-projekttask-detail-ressource'); 	
 	ende = document.getElementById('textbox-projekttask-detail-ende').iso;
 	
@@ -351,6 +354,7 @@ function saveProjekttaskDetail()
 		task.appendChild(new SOAPObject("beschreibung")).val(beschreibung);
 		task.appendChild(new SOAPObject("aufwand")).val(aufwand);
 		task.appendChild(new SOAPObject("mantis_id")).val(mantis_id);
+		task.appendChild(new SOAPObject("scrumsprint_id")).val(scrumsprint_id);
 		task.appendChild(new SOAPObject("user")).val(getUsername());
 		task.appendChild(new SOAPObject("ressource_id")).val(ressource_id);
 		task.appendChild(new SOAPObject("ende")).val(ende);
@@ -448,6 +452,7 @@ function onselectProjekttask()
 	var beschreibung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#beschreibung" ));
 	var aufwand=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aufwand" ));
 	var mantis_id=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#mantis_id" ));
+	var scrumsprint_id=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#scrumsprint_id" ));
 	var ressource_id=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ressource_id" ));
 	var ende=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ende" ));
 	
@@ -461,6 +466,7 @@ function onselectProjekttask()
 	document.getElementById('textbox-projekttask-detail-beschreibung').value=beschreibung;
 	document.getElementById('textbox-projekttask-detail-aufwand').value=aufwand;
 	document.getElementById('textbox-projekttask-detail-mantis_id').value=mantis_id;
+	document.getElementById('textbox-projekttask-detail-scrumsprint_id').value=scrumsprint_id;
 	MenulistSelectItemOnValue('textbox-projekttask-detail-ressource', ressource_id);
 	//document.getElementById('textbox-projekttask-detail-ressource').value=ressource_id;
 	

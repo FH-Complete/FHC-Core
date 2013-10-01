@@ -86,6 +86,7 @@ function saveProjekttask($username, $passwort, $task)
 	$projekttask->beschreibung = $task->beschreibung;
 	$projekttask->aufwand = $task->aufwand;
 	$projekttask->mantis_id = $task->mantis_id;
+	$projekttask->scrumsprint_id = $task->scrumsprint_id;
 	$projekttask->updatevon = $task->user;
 	$projekttask->ende = $task->ende; 
 	$projekttask->ressource_id = $task->ressource_id; 

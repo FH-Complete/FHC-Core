@@ -105,6 +105,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/mantisdetail.overlay.xul.p
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projekttask/rdf#mantis_id" />
 				<splitter class="tree-splitter"/>
+				<treecol id="projekttask-treecol-scrumsprint_id" label="ScrumSprintID" flex="2" hidden="false" persist="hidden, width, ordinal"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/projekttask/rdf#scrumsprint_id" />
+				<splitter class="tree-splitter"/>
 				<treecol id="projekttask-treecol-ende" label="Ende" flex="2" hidden="false" persist="hidden, width, ordinal"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projekttask/rdf#ende" />
@@ -129,6 +133,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/mantisdetail.overlay.xul.p
 							<treecell label="rdf:http://www.technikum-wien.at/projekttask/rdf#beschreibung"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projekttask/rdf#aufwand"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projekttask/rdf#mantis_id"/>
+							<treecell label="rdf:http://www.technikum-wien.at/projekttask/rdf#scrumsprint_id"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projekttask/rdf#ende"/>
 							<treecell label="rdf:http://www.technikum-wien.at/projekttask/rdf#ressource_bezeichnung"/>							
 							<treecell label="erledigt" value="rdf:http://www.technikum-wien.at/projekttask/rdf#erledigt"/>
