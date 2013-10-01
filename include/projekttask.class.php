@@ -36,6 +36,7 @@ class projekttask extends basis_db
 	public $beschreibung;	// string
 	public $aufwand;	    // string
 	public $mantis_id;	    // integer
+	public $scrumsprint_id; // bigint
 	public $insertamum;	    // timestamp
 	public $insertvon;	    // string
 	public $updateamum;	    // timestamp
@@ -83,6 +84,7 @@ class projekttask extends basis_db
 				$this->beschreibung = $row->beschreibung;
 				$this->aufwand = $row->aufwand;
 				$this->mantis_id = $row->mantis_id;
+				$this->scrumsprint_id = $row->scrumsprint_id;
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
@@ -131,6 +133,7 @@ class projekttask extends basis_db
 				$obj->beschreibung = $row->beschreibung;
 				$obj->aufwand = $row->aufwand;
 				$obj->mantis_id = $row->mantis_id;
+				$obj->scrumsprint_id = $row->scrumsprint_id;
 				//$obj->beginn = $row->beginn;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
@@ -196,6 +199,7 @@ class projekttask extends basis_db
 				$obj->beschreibung = $row->beschreibung;
 				$obj->aufwand = $row->aufwand;
 				$obj->mantis_id = $row->mantis_id;
+				$obj->scrumsprint_id = $row->scrumsprint_id;
 				//$obj->beginn = $row->beginn;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
@@ -285,13 +289,14 @@ class projekttask extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 
-			$qry='BEGIN; INSERT INTO fue.tbl_projekttask (projektphase_id, bezeichnung, beschreibung, aufwand, mantis_id, projekttask_fk, ende, ressource_id, erledigt, insertamum, 
+			$qry='BEGIN; INSERT INTO fue.tbl_projekttask (projektphase_id, bezeichnung, beschreibung, aufwand, mantis_id, scrumsprint_id, projekttask_fk, ende, ressource_id, erledigt, insertamum, 
 				insertvon, updateamum, updatevon) VALUES('.
 			     $this->addslashes($this->projektphase_id).', '.
 			     $this->addslashes($this->bezeichnung).', '.
 			     $this->addslashes($this->beschreibung).', '.
 			     $this->addslashes($this->aufwand).', '.
 			     $this->addslashes($this->mantis_id).','.
+			     $this->addslashes($this->scrumsprint_id).','.
 			     $this->addslashes($this->projekttask_fk).','.
 			     $this->addslashes($this->ende).','.
 			     $this->addslashes($this->ressource_id).','.
@@ -309,6 +314,7 @@ class projekttask extends basis_db
 				'beschreibung='.$this->addslashes($this->beschreibung).', '.
 				'aufwand='.$this->addslashes($this->aufwand).', '.
 				'mantis_id='.$this->addslashes($this->mantis_id).', '.
+				'scrumsprint_id='.$this->addslashes($this->scrumsprint_id).', '.
 				'projekttask_fk='.$this->addslashes($this->projekttask_fk).', '.
 				'ende='.$this->addslashes($this->ende).', '.
 				'ressource_id='.$this->addslashes($this->ressource_id).', '.
