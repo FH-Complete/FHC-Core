@@ -192,23 +192,28 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		echo "	<aufteilungen_1>\n";
 		$anzAufteilungen = sizeof($aufteilung->result); 	
 		$i = 0;	
+		$aufteilbreak=false;
 		foreach($aufteilung->result as $aufteilung_row)
 		{
-			if($i==15)
+			if($i==15 && !$aufteilbreak)
 			{
+				$aufteilbreak=true;
 				echo '</aufteilungen_1>';
 				echo '<aufteilungen_2>';
 			}
 			
-			$studiengang->getStudiengangFromOe($aufteilung_row->oe_kurzbz); 
-			// Diplomstudiengänge nicht laden
-			if($studiengang->typ !='d' && $aufteilung_row->oe_kurzbz !='Infrastruktur' && $aufteilung_row->oe_kurzbz != 'etw' && $aufteilung_row->oe_kurzbz != 'eas')
-			{
-				echo "		<aufteilung>\n";
-				echo "			<oe><![CDATA[".strtoupper($aufteilung_row->oe_kurzbz)."]]></oe>\n"; 
-				echo "			<prozent><![CDATA[$aufteilung_row->anteil]]></prozent>\n"; 
-				echo "		</aufteilung>\n"; 
-				$i++; 
+			// Aufteilung nur auf Studiengaenge
+			if($studiengang->getStudiengangFromOe($aufteilung_row->oe_kurzbz))
+			{ 
+				// Diplomstudiengänge nicht laden, Dummy Studiengaenge (stgkz>10000) nicht laden, Studiengang EAS (Ausserordentliche) nicht laden
+				if($studiengang->typ !='d' && $studiengang->studiengang_kz>0 && $studiengang->studiengang_kz<10000 && $aufteilung_row->oe_kurzbz!='eas')
+				{
+					echo "		<aufteilung>\n";
+					echo "			<oe><![CDATA[".strtoupper($aufteilung_row->oe_kurzbz)."]]></oe>\n"; 
+					echo "			<prozent><![CDATA[$aufteilung_row->anteil]]></prozent>\n"; 
+					echo "		</aufteilung>\n"; 
+					$i++; 
+				}
 			}
 		}
 		if($i>15)
