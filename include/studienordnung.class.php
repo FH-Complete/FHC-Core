@@ -25,40 +25,51 @@
 
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
-class studienplatz extends basis_db
+class studienordnung extends basis_db
 {
-	private $new=true;					// boolean
-	private $result;				// DB-Result
-	public $studienordnung = array();	// Objekte
+	private $new = true;			// boolean
+	public $result = array();	// Objekte
 
 	//Tabellenspalten
-	private $studienordnung_id;		// integer (PK)
-	private $studiengang_kz;		// integer (FK Studiengang)
-	private $version; 				// varchar (256)
-	private $bezeichnung;			// varchar (512)
-	private $ects;					// numeric (5,2)
-	private $gueltigvon;            // varchar (FK Studiensemester)
-	private $gueltigbis;            // varchar (FK Studiensemester)
-	private $studiengangbezeichnung;	// varchar (256)
-	private $studiengangbezeichnung_english;	// varchar (256)
-	private $studiengangkurzbzlang;// varchar (256)
-	private $akadgrad_id;			// integer (FK akadgrad)
-	private $max_semester;			// smallint
-	private $updateamum;			// timestamp
-	private $updatevon;				// varchar
-	private $insertamum;      		// timestamp
-	private $insertvon;      		// varchar
+	protected $studienordnung_id;		// integer (PK)
+	protected $studiengang_kz;		// integer (FK Studiengang)
+	protected $version; 				// varchar (256)
+	protected $bezeichnung;			// varchar (512)
+	protected $ects;					// numeric (5,2)
+	protected $gueltigvon;            // varchar (FK Studiensemester)
+	protected $gueltigbis;            // varchar (FK Studiensemester)
+	protected $studiengangbezeichnung;	// varchar (256)
+	protected $studiengangbezeichnung_english;	// varchar (256)
+	protected $studiengangkurzbzlang;// varchar (256)
+	protected $akadgrad_id;			// integer (FK akadgrad)
+	protected $max_semester;			// smallint
+	protected $updateamum;			// timestamp
+	protected $updatevon;				// varchar
+	protected $insertamum;      		// timestamp
+	protected $insertvon;      		// varchar
 
 	/**
 	 * Konstruktor
 	 * @param $studienordnung_id ID des Studienplatz der geladen werden soll (Default=null)
 	 */
-	public function __construct($studienordnung_id=null)
+	public function __construct()
 	{
 		parent::__construct();
 		
-		if(!is_null($studienordnung_id))
-			$this->loadStudienordnung($studienordnung_id);
+	}
+	
+	public function __set($name,$value)
+	{
+		switch ($name)
+		{
+			case 'test':
+				if ($value=='test')
+					throw new Exception('UnitTest: "Studiengang_KZ could not be set!"');
+				$this->$name=$value;
+				break;
+			default:
+				$this->$name=$value;
+		}
 	}
 
 	/**
@@ -117,7 +128,7 @@ class studienplatz extends basis_db
 	 * @param $pers_id ID der Person zu der die Adressen geladen werden sollen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function loadStudienordnungSTG($studiengang_kz,studiensemester=null, semester=null)
+	public function loadStudienordnungSTG($studiengang_kz,$studiensemester=null, $semester=null)
 	{
 		//Pruefen ob studienordnung_id eine gueltige Zahl ist
 		if(!is_numeric($studiengang_kz) || $studiengang_kz == '')
@@ -126,9 +137,14 @@ class studienplatz extends basis_db
 			return false;
 		}
 
+		// Query vorbereiten
+		$qry = 'SELECT * FROM lehre.tbl_studienordnung JOIN lehre.tbl_studienordnung_semester USING (studienordnung_id) WHERE studiengang_kz='.$this->db_add_param($studiengang_kz, FHC_INTEGER, false);
+		if (!is_null($studiensemester))
+			$qry.=" AND studiensemester_kurzb='".$this->db_add_param($studiensemester, FHC_STRING,false);
+		if (!is_null($semester))
+			$qry.=" AND semester='".$this->db_add_param($semester, FHC_INTEGER,false);
+		
 		//Lesen der Daten aus der Datenbank
-		$qry = "SELECT * FROM lehre.tbl_studienordnung WHERE studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER, false);
-
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
