@@ -27,29 +27,68 @@ require_once(dirname(__FILE__).'/../../config/system.config.inc.php');
 require_once(dirname(__FILE__).'/../../include/studienordnung.class.php');
 $errormsg='';
 
-$studienordnung=new studienordnung();
-try 
+class ut_studienordnung //extends PHPUnit_Framework_TestCase
 {
-	$studienordnung->studiengang_kz=0;
-	$studienordnung->version='bla';
+	protected $studienordnung;
+ 
+    public function setUp()
+    {
+        $this->studienordnung=new studienordnung();
+    }
+	
+	public function testAttributes()
+	{
+		try 
+		{
+			//$studienordnung->test='test';
+			$this->studienordnung->studiengang_kz='0';
+			//$this->assertEquals(0, $this->studienordnung->studiengang_kz);
+			$this->studienordnung->version='bla';
+			$this->studienordnung->bezeichnung='bla';
+			$this->studienordnung->ects='3.2';
+			$this->studienordnung->gueltigvon='WS2012';
+			$this->studienordnung->gueltigbis='SS2014';
+			$this->studienordnung->studiengangbezeichnung='Unit Test';
+			$this->studienordnung->studiengangbezeichnung_englisch='Unit Test English';
+			$this->studienordnung->studiengangkurzbzlang='UnitTest';
+			$this->studienordnung->akadgrad_id='0';
+			$this->studienordnung->max_semester='6';
+			//$this->studienordnung->validate();
+			//
+		}
+		catch (Exception $exc)
+		{
+			$errormsg.=$exc->getMessage().$this->studienordnung->errormsg;
+			return;
+		}
+	}
+	
+	public function testSaveStudienordnungInsert()
+    {
+        try 
+        {
+           $this->studienordnung->save();
+        }
+		catch (Exception $exc) 
+		{
+			$errormsg.=$exc->getMessage().$this->studienordnung->errormsg;
+			return;
+        }
+ 
+        $this->fail();
+    }
 }
-catch (Exception $exc)
-{
-	$errormsg=$exc->getMessage()'.$studienordnung->errormsg;
-	die($errormsg);
-}
-/*	private $version; 				// varchar (256)
-	private $bezeichnung;			// varchar (512)
-	private $ects;					// numeric (5,2)
-	private $gueltigvon;            // varchar (FK Studiensemester)
-	private $gueltigbis;            // varchar (FK Studiensemester)
-	private $studiengangbezeichnung;	// varchar (256)
-	private $studiengangbezeichnung_english;	// varchar (256)
-	private $studiengangkurzbzlang;// varchar (256)
-	private $akadgrad_id;			// integer (FK akadgrad)
-	private $max_semester;			// smallint
+/*	
+	
 */
-echo 'OK<BR>';
+$obj=new ut_studienordnung();
+$obj->setUp();
+$obj->testAttributes();
+$obj->testSaveStudienordnungInsert();
+if ($errormsg=='')
+	echo 'OK<BR>';
+else
+	echo $errormsg
 ?>
 
 
