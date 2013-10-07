@@ -39,7 +39,7 @@ class studienordnung extends basis_db
 	protected $gueltigvon;            // varchar (FK Studiensemester)
 	protected $gueltigbis;            // varchar (FK Studiensemester)
 	protected $studiengangbezeichnung;	// varchar (256)
-	protected $studiengangbezeichnung_english;	// varchar (256)
+	protected $studiengangbezeichnung_englisch;	// varchar (256)
 	protected $studiengangkurzbzlang;// varchar (256)
 	protected $akadgrad_id;			// integer (FK akadgrad)
 	protected $max_semester;			// smallint
@@ -64,7 +64,12 @@ class studienordnung extends basis_db
 		{
 			case 'test':
 				if ($value=='test')
-					throw new Exception('UnitTest: "Studiengang_KZ could not be set!"');
+					throw new Exception('UnitTest: "This is a test!"');
+				$this->$name=$value;
+				break;
+			case 'studiengang_kz':
+				if (!is_numeric($value))
+					throw new Exception('Attribute studiengang_kz mus be numeric!"');
 				$this->$name=$value;
 				break;
 			default:
@@ -72,6 +77,18 @@ class studienordnung extends basis_db
 		}
 	}
 
+	public function __get($name)
+	{
+		switch ($name)
+		{
+			case 'test':
+				throw new Exception('UnitTest: "This is a test!"');
+				break;
+			default:
+				return $this->$name;
+		}
+	}
+	
 	/**
 	 * Laedt die Studienordnung mit der ID $studienordnung_id
 	 * @param  $adress_id ID der zu ladenden Adresse
@@ -87,7 +104,7 @@ class studienordnung extends basis_db
 		}
 
 		//Daten aus der Datenbank lesen
-		$qry = "SELECT * FROM lehre.tbl_adresse WHERE studienordnung_id=".$this->db_add_param($studienordnung_id, FHC_INTEGER, false);
+		$qry = "SELECT * FROM lehre.tbl_studienordnung WHERE studienordnung_id=".$this->db_add_param($studienordnung_id, FHC_INTEGER, false);
 
 		if(!$this->db_query($qry))
 		{
@@ -186,7 +203,7 @@ class studienordnung extends basis_db
 	 */
 	protected function validate()
 	{
-		//Zahlenfelder pruefen
+		/*//Zahlenfelder pruefen
 		if(!is_numeric($this->person_id) && $this->person_id!='')
 		{
 			$this->errormsg='person_id enthaelt ungueltige Zeichen';
@@ -223,7 +240,7 @@ class studienordnung extends basis_db
 			$this->errormsg = 'Gemeinde darf nicht länger als 255 Zeichen sein';
 			return false;
 		}
-
+*/
 		$this->errormsg = '';
 		return true;
 	}
@@ -242,23 +259,22 @@ class studienordnung extends basis_db
 
 		if($this->new)
 		{
+			echo $this->studiengang_kz;
 			//Neuen Datensatz einfuegen
-			$qry='BEGIN;INSERT INTO public.tbl_adresse (person_id, name, strasse, plz, typ, ort, nation, insertamum, insertvon,
-			     gemeinde, heimatadresse, zustelladresse, firma_id, updateamum, updatevon, ext_id) VALUES('.
-			      $this->db_add_param($this->person_id, FHC_INTEGER).', '.
-			      $this->db_add_param($this->name).', '.
-			      $this->db_add_param($this->strasse).', '.
-			      $this->db_add_param($this->plz).', '.
-			      $this->db_add_param(trim($this->typ)).', '.
-			      $this->db_add_param($this->ort).', '.
-			      $this->db_add_param($this->nation).', now(), '.
-			      $this->db_add_param($this->insertvon).', '.
-			      $this->db_add_param($this->gemeinde).', '.
-			      $this->db_add_param($this->heimatadresse,FHC_BOOLEAN, false).', '.
-			      $this->db_add_param($this->zustelladresse,FHC_BOOLEAN, false).', '.
-			      $this->db_add_param($this->firma_id, FHC_INTEGER).', now(), '.
-			      $this->db_add_param($this->updatevon).', '.
-			      $this->db_add_param($this->ext_id, FHC_INTEGER).');';
+			$qry='BEGIN;INSERT INTO lehre.tbl_studienordnung (studiengang_kz, version, bezeichnung, ects, gueltigvon, gueltigbis, studiengangbezeichnung, studiengangbezeichnung_englisch, studiengangkurzbzlang, akadgrad_id, max_semester, insertamum, insertvon) VALUES ('.
+			      $this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
+			      $this->db_add_param($this->version).', '.
+			      $this->db_add_param($this->bezeichnung).', '.
+			      $this->db_add_param($this->ects).', '.
+			      $this->db_add_param($this->gueltigvon).', '.
+			      $this->db_add_param($this->gueltigbis).', '.
+			      $this->db_add_param($this->studiengangbezeichnung).', '.
+			      $this->db_add_param($this->studiengangbezeichnung_englisch).', '.
+			      $this->db_add_param($this->studiengangkurzbzlang).', '.
+			      $this->db_add_param($this->akadgrad_id,FHC_INTEGER).', '.
+			      $this->db_add_param($this->max_semester,FHC_INTEGER).', now(), '.
+			      $this->db_add_param($this->insertvon).');';
+			echo $qry;
 		}
 		else
 		{
@@ -268,21 +284,21 @@ class studienordnung extends basis_db
 				$this->errormsg = 'studienordnung_id muss eine gueltige Zahl sein';
 				return false;
 			}
-			$qry='UPDATE public.tbl_adresse SET'.
-				' person_id='.$this->db_add_param($this->person_id, FHC_INTEGER).', '.
-				' name='.$this->db_add_param($this->name).', '.
-				' strasse='.$this->db_add_param($this->strasse).', '.
-				' plz='.$this->db_add_param($this->plz).', '.
-		      	' typ='.$this->db_add_param(trim($this->typ)).', '.
-		      	' ort='.$this->db_add_param($this->ort).', '.
-		      	' nation='.$this->db_add_param($this->nation).', '.
-		      	' gemeinde='.$this->db_add_param($this->gemeinde).', '.
-		      	' firma_id='.$this->db_add_param($this->firma_id, FHC_INTEGER).','.
+			$qry='UPDATE public.tbl_studienordnung SET'.
+				' studiengang_kz='.$this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
+				' version='.$this->db_add_param($this->version).', '.
+				' bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
+				' ects='.$this->db_add_param($this->ects).', '.
+		      	' gueltigvon='.$this->db_add_param(trim($this->gueltigvon)).', '.
+		      	' gueltigbis='.$this->db_add_param($this->gueltigbis).', '.
+		      	' studiengangbezeichnung='.$this->db_add_param($this->studiengangbezeichnung).', '.
+		      	' studiengangbezeichnung_englisch='.$this->db_add_param($this->studiengangbezeichnung_englisch).', '.
+		      	' studiengangkurzbzlang='.$this->db_add_param($this->studiengangkurzbzlang, FHC_INTEGER).','.
+		      	' akadgrad_id='.$this->db_add_param($this->akadgrad_id, FHC_BOOLEAN, false).', '.
+		      	' max_semester='.$this->db_add_param($this->max_semester, FHC_BOOLEAN, false).' '.
 		      	' updateamum= now(), '.
 		      	' updatevon='.$this->db_add_param($this->updatevon).', '.
-		      	' heimatadresse='.$this->db_add_param($this->heimatadresse, FHC_BOOLEAN, false).', '.
-		      	' zustelladresse='.$this->db_add_param($this->zustelladresse, FHC_BOOLEAN, false).' '.
-		      	'WHERE studienordnung_id='.$this->db_add_param($this->studienordnung_id, FHC_INTEGER, false).';';
+		      	' WHERE studienordnung_id='.$this->db_add_param($this->studienordnung_id, FHC_INTEGER, false).';';
 		}
         
 		if($this->db_query($qry))
@@ -290,7 +306,7 @@ class studienordnung extends basis_db
 			if($this->new)
 			{
 				//naechste ID aus der Sequence holen
-				$qry="SELECT currval('public.tbl_adresse_studienordnung_id_seq') as id;";
+				$qry="SELECT currval('public.tbl_studienordnung_id_seq') as id;";
 				if($this->db_query($qry))
 				{
 					if($row = $this->db_fetch_object())
@@ -337,7 +353,7 @@ class studienordnung extends basis_db
 		}
 
 		//loeschen des Datensatzes
-		$qry="DELETE FROM public.tbl_adresse WHERE studienordnung_id=".$this->db_add_param($studienordnung_id, FHC_INTEGER, false).";";
+		$qry="DELETE FROM public.tbl_studienordnung WHERE studienordnung_id=".$this->db_add_param($studienordnung_id, FHC_INTEGER, false).";";
 
 		if($this->db_query($qry))
 		{
