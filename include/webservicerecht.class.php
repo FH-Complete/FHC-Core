@@ -117,7 +117,8 @@ class webservicerecht extends basis_db
         
         for($i = 0; $i<sizeof($attributArray); $i++)
         {
-            $helpObject->$attributArray[$i] = $object->$attributArray[$i];
+        	if(isset($object->$attributArray[$i]))
+            	$helpObject->$attributArray[$i] = $object->$attributArray[$i];
         }
 
         return $helpObject; 
