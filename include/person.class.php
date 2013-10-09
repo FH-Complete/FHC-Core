@@ -731,6 +731,37 @@ class person extends basis_db
 			return false;
 		}
 	}
+    
+    	/**
+	 * 
+	 * Überprüft den übergebenen Zugangscode und retuniert die aktuelle incoming_id
+	 * @param $zugangscode
+	 */
+	public function checkZugangscodePerson($zugangscode)
+	{
+		$qry ="
+			SELECT 
+				person_id 
+			FROM 
+				public.tbl_person 
+			WHERE 
+				zugangscode=".$this->db_add_param($zugangscode).';';
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				return $row->person_id; 
+			}
+			else
+				return false; 
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
+			return false;
+		}
+	}
 
 	/**
 	 * 
