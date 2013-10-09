@@ -508,6 +508,60 @@ if($result = $db->db_query("SELECT character_maximum_length FROM information_sch
 	}
 }
 
+// tbl_akte wird nachgereicht und anmerkung hinzufügen
+if(!$result = @$db->db_query("SELECT nachgereicht FROM public.tbl_akte LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_akte ADD COLUMN nachgereicht boolean DEFAULT false;
+            ALTER TABLE public.tbl_akte ADD COLUMN anmerkung varchar(128)";
+			
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_akte: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'public.tbl_akte: Spalte nachgereicht hinzugefuegt!<br>
+            public.tbl_akte: Spalte anmerkung hinzugefuegt!<br>';
+}
+
+// bis.tbl_zgvdoktor anlegen
+if(!$result = @$db->db_query("SELECT zgvdoktor_code FROM bis.tbl_zgvdoktor LIMIT 1"))
+{
+	$qry = "CREATE TABLE bis.tbl_zgvdoktor
+			(
+				zgvdoktor_code integer NOT NULL,
+				zgvdoktor_bez varchar(64),
+				zgvdoktor_kurzbz varchar(16)
+			);
+
+		ALTER TABLE bis.tbl_zgvdoktor ADD CONSTRAINT pk_zgvdoktor PRIMARY KEY (zgvdoktor_code);
+
+		GRANT SELECT ON bis.tbl_zgvdoktor TO web;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON bis.tbl_zgvdoktor TO vilesci;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_zgvdoktor: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' bis.tbl_zgvdoktor: Tabelle hinzugefügt<br>';
+}
+
+// prestudent zgvdoktor hinzufügen
+if(!$result = @$db->db_query("SELECT zgvdoktor_code from public.tbl_prestudent LIMIT 1;"))
+{
+    $qry = "ALTER TABLE public.tbl_prestudent ADD COLUMN zgvdoktor_code integer; 
+            ALTER TABLE public.tbl_prestudent ADD COLUMN zgvdoktorort varchar(64);
+            ALTER TABLE public.tbl_prestudent ADD COLUMN zgvdoktordatum date;
+            
+            
+            ALTER TABLE public.tbl_prestudent ADD CONSTRAINT fk_zgvdoktor_code FOREIGN KEY (zgvdoktor_code) REFERENCES bis.tbl_zgvdoktor(zgvdoktor_code) ON DELETE RESTRICT ON UPDATE CASCADE;
+            ";
+    
+    if(!$db->db_query($qry))
+		echo '<strong>public.tbl_prestudent: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'public.tbl_prestudent: Spalte zgvdoktor_code hinzugefuegt<br>
+            public.tbl_prestudent: Spalte zgvdoktorort hinzugefuegt<br>
+            public.tbl_prestudent: Spalte zgvdoktordatum hinzugefuegt<br>';
+}
+
 echo '<br>';
 
 $tabellen=array(
@@ -532,6 +586,7 @@ $tabellen=array(
 	"bis.tbl_zgv"  => array("zgv_code","zgv_bez","zgv_kurzbz"),
 	"bis.tbl_zgvmaster"  => array("zgvmas_code","zgvmas_bez","zgvmas_kurzbz"),
 	"bis.tbl_zweck"  => array("zweck_code","kurzbz","bezeichnung"),
+    "bis.tbl_zgvdoktor" => array("zgvdoktor_code", "zgvdoktor_bez", "zgvdoktor_kurzbz"),
 	"campus.tbl_abgabe"  => array("abgabe_id","abgabedatei","abgabezeit","anmerkung"),
 	"campus.tbl_beispiel"  => array("beispiel_id","uebung_id","nummer","bezeichnung","punkte","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_benutzerlvstudiensemester"  => array("uid","studiensemester_kurzbz","lehrveranstaltung_id"),
@@ -630,7 +685,7 @@ $tabellen=array(
 	"lehre.tbl_zeugnis"  => array("zeugnis_id","student_uid","zeugnis","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_zeugnisnote"  => array("lehrveranstaltung_id","student_uid","studiensemester_kurzbz","note","uebernahmedatum","benotungsdatum","bemerkung","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_adresse"  => array("adresse_id","person_id","name","strasse","plz","ort","gemeinde","nation","typ","heimatadresse","zustelladresse","firma_id","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id","dms_id"),
+	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id","dms_id","nachgereicht","anmerkung"),
 	"public.tbl_ampel"  => array("ampel_id","kurzbz","beschreibung","benutzer_select","deadline","vorlaufzeit","verfallszeit","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_ampel_benutzer_bestaetigt"  => array("ampel_benutzer_bestaetigt_id","ampel_id","uid","insertamum","insertvon"),
 	"public.tbl_aufmerksamdurch"  => array("aufmerksamdurch_kurzbz","beschreibung","ext_id"),
@@ -679,7 +734,7 @@ $tabellen=array(
 	"public.tbl_preoutgoing_lehrveranstaltung" => array("preoutgoing_lehrveranstaltung_id","preoutgoing_id","bezeichnung","ects","endversion","insertamum","insertvon","updateamum","updatevon","wochenstunden","unitcode"),
 	"public.tbl_preoutgoing_preoutgoing_status" => array("status_id","preoutgoing_status_kurzbz","preoutgoing_id","datum","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preoutgoing_status" => array("preoutgoing_status_kurzbz","bezeichnung"),
-	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat","rt_punkte3"),
+	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat","rt_punkte3", "zgvdoktor_code", "zgvdoktorort", "zgvdoktordatum"),
 	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung"),
 	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet"),
