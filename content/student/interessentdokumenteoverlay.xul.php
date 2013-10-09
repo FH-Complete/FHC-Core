@@ -43,7 +43,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		<caption label="Noch nicht abgegeben"/>
 		<tree id="interessent-dokumente-tree-nichtabgegeben" seltype="multi" hidecolumnpicker="false" flex="1"
 				datasources="rdf:null" ref="http://www.technikum-wien.at/dokument/liste"
-				flags="dont-build-content"
+				ondblclick="ShowDokument()"
+                flags="dont-build-content"
 				enableColumnDrag="true"
 				style="margin:10px;"
 		>

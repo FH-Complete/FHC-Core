@@ -1,0 +1,994 @@
+<?php
+
+/* Copyright (C) 2012 FH Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Karl Burkhart 	<burkhart@technikum-wien.at>
+ */
+
+require_once('../../config/cis.config.inc.php'); 
+
+session_cache_limiter('none'); //muss gesetzt werden sonst funktioniert der Download mit IE8 nicht
+session_start();
+if (!isset($_SESSION['bewerbung/user']) || $_SESSION['bewerbung/user']=='') 
+{
+    $_SESSION['request_uri']=$_SERVER['REQUEST_URI'];
+
+    header('Location: registration.php?method=allgemein');
+    exit;
+}
+
+require_once('../../include/nation.class.php'); 
+require_once('../../include/person.class.php'); 
+require_once('../../include/datum.class.php'); 
+require_once('../../include/kontakt.class.php'); 
+require_once('../../include/adresse.class.php'); 
+require_once('../../include/prestudent.class.php');
+require_once('../../include/studiengang.class.php'); 
+require_once('../../include/zgv.class.php'); 
+require_once('../../include/akte.class.php'); 
+require_once('../../include/dms.class.php'); 
+require_once('../../include/dokument.class.php'); 
+require_once('../../include/akte.class.php');
+require_once('../../include/mail.class.php'); 
+require_once('../../include/studiensemester.class.php'); 
+
+$person_id = $_SESSION['bewerbung/personId'];
+$akte_id = isset($_GET['akte_id'])?$_GET['akte_id']:'';
+$method=isset($_GET['method'])?$_GET['method']:'';
+$datum = new datum(); 
+$person = new person(); 
+if(!$person->load($person_id))
+    die('Konnte Person nicht laden'); 
+
+$message = '&nbsp;'; 
+
+if($method=='delete')
+{
+    $akte= new akte(); 
+    if(!$akte->load($akte_id))
+    {
+        $message = "Ungueltige akte_id übergeben";
+    }
+    else
+    {
+        $dms_id = $akte->dms_id;
+        $dms = new dms(); 
+        
+        if($akte->delete($akte_id))
+        {
+            if(!$dms->deleteDms($dms_id))
+                $message = "Konnte DMS Eintrag nicht löschen"; 
+            else
+                $message = "Erfolgreich gelöscht"; 
+        }
+        else
+        {
+            $message="Konnte Akte nicht Löschen"; 
+        }
+    }
+    
+}
+
+if(isset($_POST['btn_bewerbung_abschicken']))
+{
+   // Mail an zuständige Assistenz schicken
+    $pr_id = isset($_POST['prestudent_id'])?$_POST['prestudent_id']:''; 
+    
+    $studiensemester = new studiensemester(); 
+    $std_semester = $studiensemester->getakt();    
+    
+    if($pr_id != '')
+    {
+        // Status Bewerber anlegen
+        $prestudent_status = new prestudent(); 
+        $prestudent_status->load($pr_id); 
+        
+        // check ob es status schon gibt
+        if(!$prestudent_status->load_rolle($pr_id, 'Bewerber', $std_semester, '0'))
+        {
+            $prestudent_status->status_kurzbz = 'Bewerber'; 
+            $prestudent_status->studiensemester_kurzbz = $std_semester; 
+            $prestudent_status->ausbildungssemester = '0'; 
+            $prestudent_status->datum = date("Y-m-d H:i:s"); 
+            $prestudent_status->insertamum = date("Y-m-d H:i:s"); 
+            $prestudent_status->insertvon = ''; 
+            $prestudent_status->updateamum = date("Y-m-d H:i:s"); 
+            $prestudent_status->updatevon = ''; 
+            $prestudent_status->new = true; 
+            if(!$prestudent_status->save_rolle())
+                die('Fehler beim anlegen der Rolle'); 
+        }
+        
+        if(sendBewerbung($pr_id))
+            die('Sie haben sich erfolgreich beworben. Die zuständige Assistenz wird sich in den nächsten Tagen bei Ihnen melden.'); 
+        else
+            die ('Es ist ein Fehler beim versenden der Bewerbung aufgetreten. Bitte wenden Sie sich an unseren Support.'); 
+    }
+    
+    
+}
+
+if(isset($_POST['submit_nachgereicht']))
+{   
+    $akte = new akte; 
+    
+    // gibt es schon einen eintrag?
+    if(isset($_POST['akte_id']))
+    {
+        // Update
+    }
+    else
+    {
+        // Insert
+        $akte->dokument_kurzbz = $_POST['dok_kurzbz'];
+        $akte->person_id = $person_id;
+        $akte->erstelltam = date('Y-m-d H:i:s');
+        $akte->gedruckt = false;
+        $akte->titel = ''; 
+        $akte->anmerkung = $_POST['txt_anmerkung'];
+        $akte->updateamum = date('Y-m-d H:i:s');
+        $akte->insertamum = date('Y-m-d H:i:s');
+        $akte->uid = '';
+        $akte->new = true; 
+        $akte->nachgereicht = (isset($_POST['check_nachgereicht']))?true:false; 
+        if(!$akte->save())
+            echo"Fehler beim Speichern aufgetreten ".$akte->errormsg; 
+    }
+
+}
+
+// gibt an welcher Tab gerade aktiv ist
+$active = isset($_GET['active'])?$_GET['active']:0; 
+
+// Persönliche Daten speichern
+if(isset($_POST['btn_person']))
+{
+    $person->titelpre = $_POST['titel_pre'];
+    $person->vorname = $_POST ['vorname'];
+    $person->nachname = $_POST['nachname'];
+    $person->titelpost = $_POST['titel_post'];
+    $person->gebdatum = $datum->formatDatum($_POST['geburtsdatum'], 'Y-m-d');
+    $person->staatsbuergerschaft = $_POST['staatsbuergerschaft']; 
+    $person->geschlecht = $_POST['geschlecht']; 
+    $person->svnr = $_POST['svnr']; 
+    
+    $person->new = false; 
+    if(!$person->save())
+        $message=('Fehler beim Speichern der Person aufgetreten'); 
+}
+
+// Kontaktdaten speichern
+if(isset($_POST['btn_kontakt']))
+{
+    $kontakt = new kontakt(); 
+    $kontakt->load_persKontakttyp($person->person_id, 'email'); 
+    // gibt es schon kontakte von user
+    if(count($kontakt->result)>0)
+    {
+        // Es gibt bereits einen Emailkontakt
+        $kontakt_id = $kontakt->result[0]->kontakt_id;
+        
+        if($_POST['email'] == '')
+        {
+            // löschen
+            $kontakt->delete($kontakt_id); 
+        }
+        
+        $kontakt->person_id = $person->person_id; 
+        $kontakt->kontakt_id = $kontakt_id; 
+        $kontakt->zustellung = true; 
+        $kontakt->kontakttyp = 'email';
+        $kontakt->kontakt = $_POST['email'];
+        $kontakt->new = false; 
+        
+        $kontakt->save(); 
+    }
+    else
+    {
+        // neuen Kontakt anlegen
+        $kontakt->person_id = $person->person_id; 
+        $kontakt->zustellung = true; 
+        $kontakt->kontakttyp = 'email';
+        $kontakt->kontakt = $_POST['email']; 
+        $kontakt->new = true; 
+        
+        $kontakt->save(); 
+    }
+    
+    // Adresse Speichern
+    if($_POST['strasse']!='' && $_POST['plz']!='' && $_POST['ort']!='')
+    {
+        $adresse = new adresse(); 
+        $adresse->load_pers($person->person_id);
+        if(count($adresse->result)>0)
+        {
+            // gibt es schon eine adresse, wird die erste adresse genommen und upgedatet
+            $adresse_help = new adresse(); 
+            $adresse_help->load($adresse->result[0]->adresse_id); 
+
+            // gibt schon eine Adresse
+            $adresse_help->strasse = $_POST['strasse']; 
+            $adresse_help->plz = $_POST['plz'];
+            $adresse_help->ort = $_POST['ort']; 
+            $adresse_help->nation = $_POST['nation']; 
+            $adresse_help->updateamum = date('Y-m-d H:i:s'); 
+            $adresse_help->new = false; 
+            if(!$adresse_help->save())
+                die($adresse_help->errormsg); 
+
+        }
+        else
+        {
+            // adresse neu anlegen
+            $adresse->strasse = $_POST['strasse']; 
+            $adresse->plz = $_POST['plz'];
+            $adresse->ort = $_POST['ort']; 
+            $adresse->nation = $_POST['nation']; 
+            $adresse->insertamum = date('Y-m-d H:i:s'); 
+            $adresse->updateamum = date('Y-m-d H:i:s'); 
+            $adresse->person_id = $person->person_id; 
+            $adresse->zustelladresse = true; 
+            $adresse->heimatadresse = true; 
+            $adresse->new = true; 
+            if(!$adresse->save())
+                die('Fehler beim Anlegen der Adresse aufgetreten'); 
+
+        }
+    }
+}
+
+if(isset($_POST['btn_zgv']))
+{
+    // Zugangsvoraussetzungen speichern
+    $prestudent = new prestudent(); 
+    if(!$prestudent->load($_POST['prestudent']))
+        die('Prestudent konnte nicht geladen werden'); 
+    
+    $prestudent->new = false; 
+    $prestudent->zgv_code = $_POST['zgv']; 
+    $prestudent->zgvort = $_POST['zgv_ort']; 
+    $prestudent->zgvdatum = $datum->formatDatum($_POST['zgv_datum'], 'Y-m-d');
+    $prestudent->zgvmas_code = $_POST['zgv_master']; 
+    $prestudent->zgvmaort = $_POST['zgv_master_ort']; 
+    $prestudent->zgvmadatum = $datum->formatDatum($_POST['zgv_master_datum'], 'Y-m-d');
+    $prestudent->updateamum = date('Y-m-d H:i:s'); 
+    
+    if(!$prestudent->save())
+        die('Fehler beim Speichern des Prestudenten aufgetaucht.'); 
+}
+
+
+// Abfrage ob ein Punkt schon vollständig ist
+ if($person->vorname != '' && $person->nachname != '' && $person->gebdatum != '' && $person->staatsbuergerschaft != '' && $person->geschlecht != '')
+ {
+     $status_person = true; 
+     $status_person_text = '<span id="success">vollständig</span>';
+ }
+ else
+ {
+     $status_person = false; 
+     $status_person_text = '<span id="error">unvollständig</span>';
+ }
+ 
+$kontakt = new kontakt(); 
+$kontakt->load_persKontakttyp($person->person_id, 'email'); 
+$adresse = new adresse(); 
+$adresse->load_pers($person->person_id);
+if(count($kontakt->result)>0 && count($adresse->result)>0)
+{
+    $status_kontakt = true; 
+    $status_kontakt_text = '<span id="success">vollständig</span>';
+}
+else
+{
+    $status_kontakt = false; 
+    $status_kontakt_text = '<span id="error">unvollständig</span>';
+}
+
+$prestudent = new prestudent(); 
+if(!$prestudent->getPrestudenten($person->person_id))
+    die('Fehler beim laden des Prestudenten');
+
+$zgv_auswahl = false; 
+
+// Überprüfe ZGV pro Prestudent
+foreach($prestudent->result as $pre)
+{
+    if($pre->zgv_code != '' || $pre->zgvmas_code != '' || $pre->zgvdoktor_code != '')
+        $zgv_auswahl = true; 
+}
+
+
+if(!$zgv_auswahl)
+{
+    $status_zgv = false; 
+    $status_zgv_text = '<span id="error">unvollständig</span>';
+}
+else
+{
+    $status_zgv = true; 
+    $status_zgv_text = '<span id="success">vollständig</span>'; 
+}
+
+$dokument_help = new dokument(); 
+$dokument_help->getAllDokumenteForPerson($person_id);
+$akte_person= new akte(); 
+$akte_person->getAkten($person_id);
+
+$missing = false; 
+$help_array = array(); 
+
+foreach($akte_person->result as $akte)
+{
+    $help_array[] = $akte->dokument_kurzbz;
+}
+
+foreach($dokument_help->result as $dok)
+{
+    if(!in_array($dok->dokument_kurzbz, $help_array))
+    {
+        $missing = true; 
+    }
+}
+
+if($missing)
+{
+    $status_dokumente = false; 
+    $status_dokumente_text = '<span id="error">unvollständig</span>';
+}
+else
+{
+    $status_dokumente = true; 
+    $status_dokumente_text = '<span id="success">vollständig</span>';
+}
+
+?>
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Bewerbung für einen Studiengang</title>
+<link rel="stylesheet" href="../../skin/styles/jquery-ui-1.10.3.custom.css" />
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+<script type="text/javascript" src="../../include/js/jquery.idTabs.min.js"></script>
+<script>
+$(function() {
+
+$( "#tabs" ).tabs({ collapsible: true });
+activeTab(<?php echo $active;?>);
+$( "#tabs" ).tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
+$( "#tabs li" ).removeClass( "ui-corner-top" ).addClass( "ui-corner-left" );
+});
+
+function activeTab(tab_nr)
+{
+    $( "#tabs" ).tabs({ active: tab_nr });
+}
+
+function checkPerson()
+{
+    if($("#nachname").val() == '')
+    {
+        alert("Ungültiger Nachname!"); 
+        return false; 
+    }
+    if($("#vorname").val() == '')
+    {
+        alert("Ungültiger Vorname!"); 
+        return false; 
+    }
+    
+    if($("#staatsbuergerschaft").val() == '')
+    {
+        alert("Bitte Staatsbürgerschaft auswählen");
+        return false; 
+    }
+
+    if($("#gebdatum").val() != '')
+    {
+        var patt1=new RegExp("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4})");
+        if(!patt1.test($("#gebdatum").val()))
+        {
+            alert("Ungültiges Geburtsdatum!");
+            return false; 
+        }
+    }
+
+    if($("#svnr").val() != '')
+    {
+        if($("#svnr").val().length != '10')
+        {
+            alert("Ungültiger Sozialversicherungsnummer!"); 
+            return false; 
+        }
+    }
+
+    return true; 
+    
+}
+</script>
+
+<style>
+    
+.idTabs {
+	position:absolute;
+	float:left;
+	width:100%;
+	padding:0 0 1.75em 1em;
+	margin:0;
+	list-style:none;
+	line-height:1em;
+}
+
+.idTabs LI {
+	float:left;
+	margin:0;
+	padding:0;
+}
+
+.idTabs A {
+	display:block;
+	color:#444;
+	text-decoration:none;
+	font-weight:bold;
+	background:#FFF;
+	margin:0;
+	padding:0.25em 1em;
+	border-left:1px solid #fff;
+	border-top:1px solid #fff;
+	border-right:1px solid #fff;
+}
+.idTabs A:hover{
+	display:block;
+	color:#FFF;
+	text-decoration:none;
+	font-weight:bold;
+	background:grey;
+	margin:0;
+	padding:0.25em 1em;
+	border-left:1px solid #fff;
+	border-top:1px solid #fff;
+	border-right:1px solid #aaa;
+}
+    
+.idTabs .selected
+{
+	display:block;
+	color:#FFF;
+	text-decoration:none;
+	font-weight:bold;
+	background:grey;
+	margin:0;
+	padding:0.25em 1em;
+	border-left:1px solid #fff;
+	border-top:1px solid #fff;
+	border-right:1px solid #aaa;
+}
+
+.ui-tabs-vertical { width: 60em; }
+.ui-tabs-vertical .ui-tabs-nav { padding: .2em .1em .2em .2em; float: left; width: 15em; }
+.ui-tabs-vertical .ui-tabs-nav li { clear: left; width: 100%; border-bottom-width: 0px !important; border-right-width: 0 !important; margin: 0 -1px .2em 0; }
+.ui-tabs-vertical .ui-tabs-nav li a { display:block; }
+.ui-tabs-vertical .ui-tabs-nav li.ui-tabs-active { padding-bottom: 0; padding-right: .1em; border-right-width: 1px; border-right-width: 1px; }
+.ui-tabs-vertical .ui-tabs-panel { padding: 1em; float: right; width: 40em;}
+#tabs {border: none}
+#error
+{
+    color:red;
+    font-size:14px;
+    padding-left:38px; 
+}
+
+#success
+{
+    color:green;
+    font-size:14px; 
+    padding-left:38px; 
+    
+}
+
+
+#zgv_menu ul li {
+display:inline;
+padding: 5px;
+    font-family: sans-serif, Helvetica, Arial;
+    font-size: 15px;
+
+}
+</style>
+
+</head>
+<body>
+<div id="tabs">
+    
+    <ul>
+        <li><a href="#tabs-1">>|1| Allgemein <br> </a></li>
+        <li><a href="#tabs-2">>|2| Persönliche Daten <br> <?php echo $status_person_text;?></a></li>
+        <li><a href="#tabs-3">>|3| Zugangsvoraussetzungen<br> <?php echo $status_zgv_text; ?></a></li>
+        <li><a href="#tabs-4">>|4| Kontaktinformationen <br> <?php echo $status_kontakt_text;?></a></li>
+        <li><a href="#tabs-5">>|5| Dokumente <br> <?php echo $status_dokumente_text;?></a></li>
+        <li><a href="#tabs-6">>|6| Bewerbung abschicken <br> </a></li>
+    </ul>
+
+<div id="tabs-1">
+<h2>Allgemein</h2>
+<p>Wir freuen uns dass Sie sich für einen oder mehrere unserer Studiengänge bewerben. <br><br>
+    Bitte füllen Sie das Formular vollständig aus und schicken Sie es danach ab.<br><br>
+    <b>Bewerbungsmodus:</b><br>
+    <p style="text-align:justify;">Füllen Sie alle Punkte aus. Sind alle Werte vollständig eingetragen, können Sie unter "Bewerbung abschicken" Ihre Bewerbung and die zuständige Assistenz schicken.<br>
+    Diese wird sich in den nächsten Tagen bei Ihnen melden.</p>
+    <br><br>
+    <p><b>Aktuelle Bewerbungen: </b></p>
+    <?php
+    
+     // Zeige Stati der aktuellen Bewerbungen an
+        $prestudent = new prestudent(); 
+        if(!$prestudent->getPrestudenten($person_id))
+            die('Konnte Prestudenten nicht laden'); 
+        
+        
+        echo "<table border = '1' width = '100%'>
+                <tr>
+                    <th>Studiengang</th>
+                    <th>Status</th>
+                    <th>Datum</th>
+                    <th>Aktion</th>
+                </tr>"; 
+        foreach($prestudent->result as $row)
+        {
+            $stg = new studiengang(); 
+            if(!$stg->load($row->studiengang_kz))
+                die('Konnte Studiengang nicht laden'); 
+            
+            $prestudent_status = new prestudent(); 
+            $prestatus_help= ($prestudent_status->getLastStatus($row->prestudent_id))?$prestudent_status->status_kurzbz:'Noch kein Status vorhanden'; 
+            
+            echo "<tr>
+                    <td>".$stg->bezeichnung."</td>
+                    <td>".$prestatus_help."</td>
+                    <td>".$datum->formatDatum($prestudent_status->datum, 'd.m.Y')."</td>
+                    <td></td>
+                </tr>";
+        }
+        
+        echo "</table>"; 
+    
+    ?>
+    
+    <br>
+    <button class='btn_weiter' type='button' onclick='activeTab(1);'>Weiter</button></p>
+</div>
+<div id="tabs-2">
+<h2>Persönliche Daten</h2>
+<?php
+
+    $nation = new nation(); 
+    $nation->getAll($ohnesperre = true); 
+    $titelpre = ($person->titelpre != '')?$person->titelpre:'';
+    $vorname = ($person->vorname != '')?$person->vorname:'';
+    $nachname = ($person->nachname != '')?$person->nachname:'';
+    $titelpost = ($person->titelpost != '')?$person->titelpost:'';
+    $geburtstag = ($person->gebdatum != '')?$datum->formatDatum($person->gebdatum, 'd.m.Y'):'';
+    $svnr = ($person->svnr != '')?$person->svnr:'';
+    
+    echo "
+    <form method='POST' action='".$_SERVER['PHP_SELF']."?active=1'>
+        <table border='0' >
+            <tr>
+                <td>Titel vorgestellt: </td><td><input type='text' name='titel_pre' id='titel_pre' value='".$titelpre."'></td>
+            </tr>
+            <tr>
+                <td>Vorname*: </td><td><input type='text' name='vorname' id='vorname' value='".$vorname."'></td>
+            </tr>
+            <tr>
+                <td>Nachname*: </td><td><input type='text' name='nachname' id='nachname' value='".$nachname."'></td>
+            </tr>
+            <tr>
+                <td>Titel nachgestellt: </td><td><input type='text' name='titel_post' id='titel_post' value='".$titelpost."'></td>
+            </tr>
+            <tr>
+                <td>Geburtsdatum* (dd.mm.yyyy): </td><td><input type='text' id='gebdatum' name='geburtsdatum' value='".$geburtstag."'></td>
+            </tr>
+            <tr>
+                <td>Sozialversicherungsnr.: </td><td><input type='text' name='svnr' id='svnr' value='".$svnr."'></td>
+            </tr>
+            <tr>
+                <td>Staatsbürgerschaft*: </td>
+                <td><Select name='staatsbuergerschaft' id='staatsbuergerschaft'>
+                    <option value=''>-- Bitte auswählen -- </option>";
+            $selected = '';
+        foreach($nation->nation as $nat)
+        {
+            $selected = ($person->staatsbuergerschaft == $nat->code)?'selected':'';
+            echo "<option value='".$nat->code."' ".$selected.">".$nat->kurztext."</option>"; 
+        }
+
+        echo "</select></td>
+            </tr>
+            <tr>";
+        $geschl_m = ($person->geschlecht == 'm')?'checked':'';
+        $geschl_w = ($person->geschlecht == 'w')?'checked':'';
+        echo"<td>Geschlecht*: </td><td>m: <input type='radio' name='geschlecht' value='m' ".$geschl_m."> w: <input type='radio' name='geschlecht' value='w' ".$geschl_w."></td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+            </tr>            
+            <tr>
+                <td><input type='submit' value='Speichern' name='btn_person' onclick='return checkPerson();'> &nbsp;<button class='btn_weiter' type='button' onclick='activeTab(2);'>Weiter</button></td>
+            </t>
+        </table>
+    </form>";
+    ?>
+</div>
+<div id="tabs-3">
+<h2>Zugangsvoraussetzungen</h2>
+<?php
+$studiengang = new studiengang(); 
+    $prestudent = new prestudent(); 
+    if(!$prestudent->getPrestudenten($person->person_id))
+        die('Fehler beim laden des Prestudenten');
+    ?>
+
+<div id="zgv_menu">
+<ul class="idTabs"> 
+    <?php
+    $studiengang = new studiengang(); 
+    $prestudent = new prestudent(); 
+    if(!$prestudent->getPrestudenten($person->person_id))
+        die('Fehler beim laden des Prestudenten');
+    
+    // Zeige Studiengänge pro Prestudent an
+    foreach($prestudent->result as $pre)
+    {
+        if(!$studiengang->load($pre->studiengang_kz))
+            die('Konnte Studiengang nicht laden'); 
+        
+        echo "<li><a href='#".$pre->prestudent_id."'>".$studiengang->bezeichnung."</a></li>";
+    }
+   ?> 
+</ul> 
+</div>
+<?php
+    foreach($prestudent->result as $pre)
+    {
+        if(!$studiengang->load($pre->studiengang_kz))
+            die('Konnte Studiengang nicht laden'); 
+        
+        echo "<div id='".$pre->prestudent_id."'>";
+        
+        $prestudent = new prestudent(); 
+        if(!$prestudent->load($pre->prestudent_id))
+            die('Konnte prestudenten nicht laden'); 
+        
+        $zgv = $prestudent->zgv_code; 
+        $zgv_ort = $prestudent->zgvort;        
+        $zgv_datum = $datum->formatDatum($prestudent->zgvdatum, 'd.m.Y'); 
+        $zgvmaster = $prestudent->zgvmas_code;
+        $zgvmaster_ort = $prestudent->zgvmaort;
+        $zgvmaster_datum = $datum->formatDatum($prestudent->zgvmadatum, 'd.m.Y'); 
+        $zgvdoktor = $prestudent->zgvdoktor_code; 
+        $zgvdoktor_ort = $prestudent->zgvdoktorort; 
+        $zgvdoktor_datum = $datum->formatDatum($prestudent->zgvdoktordatum, 'd.m.Y'); 
+        
+        echo "<br><br><br><br>
+        <form method='POST' action='".$_SERVER['PHP_SELF']."?active=2'>
+            <table border='0'>
+                <tr>
+                    <td>Zugangsvoraussetzung: </td>
+                    <td><select name='zgv'><option value=''>-- Bitte auswählen --</option>";
+                    
+        $zgv_help = new zgv(); 
+        if(!$zgv_help->getAll())
+            die('Konnte die ZGV nicht laden'); 
+        
+        foreach($zgv_help->result as $row)
+        {
+            $selected = ($zgv == $row->zgv_code)?'selected':'';
+            echo '<option value="'.$row->zgv_code.'" '.$selected.'>'.$row->zgv_bez.'</option>';
+        }
+    
+        echo"   </select></td>
+                </tr>
+                <tr>
+                    <td>Abgelegt in (Ort): </td><td><input type='text' name='zgv_ort' value='".$zgv_ort."'></td>
+                </tr>
+                <tr>
+                    <td>Abgelegt am (Datum, dd.mm.yyyy): </td><td><input type='text' name='zgv_datum' value='".$zgv_datum."'></td>
+                </tr>
+                <tr>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td>Zugangsvoraussetzung Master (wenn verfügbar): </td><td><select name='zgv_master'><option value=''>-- Bitte auswählen --</option>";
+        
+        $zgv_help_master = new zgv(); 
+        if(!$zgv_help_master->getAllMaster())
+            die('Konnte die ZGV nicht laden'); 
+        
+        foreach($zgv_help_master->result as $row)
+        {
+            $selected = ($zgvmaster == $row->zgvmas_code)?'selected':'';
+            echo '<option value="'.$row->zgvmas_code.'" '.$selected.'>'.$row->zgvmas_bez.'</option>';
+        }
+        
+        echo "      </select></td>
+                </tr>
+                <tr>
+                    <td>Abgelegt in (Ort): </td><td><input type='text' name='zgv_master_ort' value='".$zgvmaster_ort."'></td>
+                </tr>
+                <tr>
+                    <td>Abgelegt am (Datum, dd.mm.yyyy): </td><td><input type='text' name='zgv_master_datum' value='".$zgvmaster_datum."'></td>
+                </tr>
+                <tr>
+                    <td><input type='hidden' name='prestudent' value='$prestudent->prestudent_id'>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td>Zugangsvoraussetzung Doktorat (wenn verfügbar)</td><td><select name='zgv_doktor'><option value=''>-- Bitte auswählen --</option>";
+            
+        $zgv_help_doktor = new zgv(); 
+   //     if(!$zgv_help_doktor->getAllDoktor())
+   //         die($zgv_help_doktor->errormsg); 
+        
+        foreach($zgv_help_doktor->result as $row_doktor)
+        {
+            $selected = ($zgvdoktor == $row_doktor->zgvdoktor_code)?'selected':'';
+            echo '<option> value="'.$row_doktor->zgvdoktor_code.'" '.$selected.'>'.$row_doktor->zgvdoktor_bez.'</option>';
+        }
+        
+        echo"</select></td><td></td>
+            </tr>
+            <tr>
+                <td>Abgelegt in (Ort): </td><td><input type='text' name='zgv_doktor_ort' value='".$zgvdoktor_ort."'></td>
+            </tr>
+            <tr>
+                <td>Abgelegt am (Datum, dd.mm.yyyy): </td><td><input type='text' name='zgv_doktor_datum' value='".$zgvdoktor_datum."'></td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td colspan='2'>&nbsp;<input type='submit' value='Speichern' name='btn_zgv'> &nbsp;<button class='btn_weiter' type='button' onclick='activeTab(3);'>Weiter</button></td>
+            </tr>   
+                
+    
+        </table></form> 
+                </div>";
+    }
+?>
+</div>
+    <div id="tabs-4">
+<h2>Kontaktinformationen</h2>
+<?php
+    $nation = new nation(); 
+    $nation->getAll($ohnesperre=true); 
+   
+    $kontakt = new kontakt(); 
+    $kontakt->load_persKontakttyp($person->person_id, 'email'); 
+    $email = isset($kontakt->result[0]->kontakt)?$kontakt->result[0]->kontakt:'';
+   
+    $adresse = new adresse(); 
+    $adresse->load_pers($person->person_id); 
+    $strasse = isset($adresse->result[0]->strasse)?$adresse->result[0]->strasse:'';
+    $plz = isset($adresse->result[0]->plz)?$adresse->result[0]->plz:'';
+    $ort = isset($adresse->result[0]->ort)?$adresse->result[0]->ort:'';
+    $adr_nation = isset($adresse->result[0]->nation)?$adresse->result[0]->nation:'';
+   
+     echo "
+    <form method='POST' action='".$_SERVER['PHP_SELF']."?active=3'>
+        <table border='0'>
+                <td>Email*: </td><td><input type='text' name='email' value='".$email."' size='32'></td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>Straße*: </td><td><input type='text' name='strasse' value='".$strasse."'></td>
+            </tr>
+            <tr>
+                <td>Postleitzahl*: </td><td><input type='text' name='plz' value='".$plz."'></td>
+            </tr>
+            <tr>
+                <td>Ort*: </td><td><input type='text' name='ort' value='".$ort."'></td>
+            </tr>
+             <tr>
+                <td>Nation*: </td>
+                <td><Select name='nation'><option>--Bitte auswählen --</option>";
+        $selected = '';
+        foreach($nation->nation as $nat)
+        {
+            $selected = ($adr_nation == $nat->code)?'selected':''; 
+            echo "<option value='".$nat->code."' ".$selected.">".$nat->kurztext."</option>"; 
+        }
+
+        echo "</select></td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+            </tr>    
+            <tr>
+                <td>&nbsp;</td>
+            </tr>                
+            <tr>
+                <td colspan='2'><input type='submit' value='Speichern' name='btn_kontakt'> &nbsp;<button class='btn_weiter' type='button' onclick='activeTab(4);'>Weiter</button></td>
+            </t>
+        </table>
+    </form>";
+    ?>
+</div>
+    <div id="tabs-5">
+    <h2>Dokumente</h2>
+    <p>Bitte laden Sie alle vorhandenen Dokumente, die für Ihre Bewerbung relevant sind, über folgenden Link hoch:</p>
+    <?php
+    echo '<a href="'.APP_ROOT.'cis/public/dms_akteupload.php?person_id='.$person_id.'" onclick="FensterOeffnen(this.href); return false;">Dokumente Upload</a>';
+    ?>
+    <p>Dokumente zum Uploaden:</p>
+    <?php
+    $dokumente_person = new dokument(); 
+    $dokumente_person->getAllDokumenteForPerson($person_id); 
+    
+    echo '<table border="1" width="130%">
+        
+            <tr><th width="50%">Name</th><th width="10%">Status</th><th width="10%">Aktion</th><th width ="80%"></th>&nbsp;</tr>';
+    
+    foreach($dokumente_person->result as $dok)
+    {
+        $akte = new akte; 
+        $akte->getAkten($person_id, $dok->dokument_kurzbz); 
+        
+        if(count($akte->result)>0)
+        {
+             $akte_id = isset($akte->result[0]->akte_id)?$akte->result[0]->akte_id:''; 
+            
+            // check ob status "wird nachgereicht"
+            if($akte->result[0]->nachgereicht == true)
+            {
+                // wird nachgereicht
+                 $status = '<img title="wird nachgereicht" src="'.APP_ROOT.'skin/images/hourglass.png" width="20px">'; 
+                 $nachgereicht_help = 'checked';
+                 $div = "<form method='POST' action='".$_SERVER['PHP_SELF']."?active=4'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:true;'>".$akte->result[0]->anmerkung."</span>";
+            }
+            else
+            {
+                // abgegeben
+                $status = '<img title="abgegeben" src="'.APP_ROOT.'skin/images/check_black.png" width="20px">'; 
+                $nachgereicht_help = '';
+                $div = "<form method='POST' action='".$_SERVER['PHP_SELF']."&active=4'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:none;'>wird nachgereicht:<input type='checkbox' name='check_nachgereicht' ".$nachgereicht_help."><input type='text' size='15' name='txt_anmerkung'><input type='submit' value='OK' name='submit_nachgereicht'></span><input type='hidden' name='dok_kurzbz' value='".$dok->dokument_kurzbz."'><input type='hidden' name='akte_id' value='".$akte_id."'></form>";
+            }
+            
+            $aktion = '<a href="'.$_SERVER['PHP_SELF'].'?method=delete&akte_id='.$akte_id.'&active=4"><img title="löschen" src="'.APP_ROOT.'skin/images/delete.png" width="20px"></a>'; 
+        }
+        else
+        {
+            // Dokument fehlt noch
+            $status = '<img title="offen" src="'.APP_ROOT.'skin/images/upload.png" width="20px">';
+            $aktion = '<img src="'.APP_ROOT.'skin/images/delete.png" width="20px" title="löschen"> <a href="'.APP_ROOT.'cis/public/dms_akteupload.php?person_id='.$person_id.'&dokumenttyp='.$dok->dokument_kurzbz.'" onclick="FensterOeffnen(this.href); return false;"><img src="'.APP_ROOT.'skin/images/upload.png" width="20px" title="upload"></a><a href="#" onclick="toggleDiv(\'nachgereicht_'.$dok->dokument_kurzbz.'\');"><img src="'.APP_ROOT.'skin/images/hourglass.png" width="20px" title="wird nachgereicht"></a>';
+            $div = "<form method='POST' action='".$_SERVER['PHP_SELF']."?active=4'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:none;'>wird nachgereicht:<input type='checkbox' name='check_nachgereicht'><input type='text' size='15' name='txt_anmerkung'><input type='submit' value='OK' name='submit_nachgereicht'></span><input type='hidden' name='dok_kurzbz' value='".$dok->dokument_kurzbz."'></form>";
+            
+        }
+
+        echo "<tr><td valign='top'>".$dok->bezeichnung."</td><td valign='top' align='center'>".$status."</td><td valign='top'>".$aktion."</td><td valign='top'>".$div."</td></tr>";
+    }
+    echo '</table>
+            <br>
+        <table>
+            <tr>
+                <td>Status:</td><td></td>
+            </tr>
+            <tr>
+                <td><img title="offen" src="'.APP_ROOT.'skin/images/upload.png" width="20px"></td><td>Dokument noch nicht abgegeben (offen)</td>
+            </tr>
+            <tr>
+                <td><img title="offen" src="'.APP_ROOT.'skin/images/check_black.png" width="20px"></td><td>Dokument wurde abgegeben aber noch nicht überprüft</td>
+            </tr>
+            <tr>
+                <td><img title="offen" src="'.APP_ROOT.'skin/images/hourglass.png" width="20px"></td><td>Dokument wird nachgereicht </td>
+            </tr>
+            <tr>
+                <td><img title="offen" src="'.APP_ROOT.'skin/images/true_green.png" width="20px"></td><td>Dokument wurde bereits überprüft</td>
+            </tr>
+        </table>
+
+';
+    echo '<br>'.$message; 
+    ?>
+    </div>
+    
+    <div id="tabs-6">
+    <h2>Bewerbung abschicken</h2>
+    <p>Haben Sie alle Daten korrekt ausgefüllt bzw. alle Dokumente auf das System hochgeladen, können Sie Ihre Bewerbung abschicken.<br>
+        Die jeweilige Studiengangsassistenz wird sich in den folgenden Tagen, bezüglich der Bewerbung, bei Ihnen Melden.
+        <br><br>Bitte überprüfen Sie nochmals Ihre Daten.<br>
+        Um Ihre Bewerbung jetzt abzuschließen klicken auf folgenden Link:</p><br><br>
+    <?php
+                
+    $disabled = 'disabled'; 
+    if($status_person == true && $status_zgv== true && $status_kontakt == true && $status_dokumente == true)
+        $disabled = ''; 
+    
+    $prestudent_help= new prestudent(); 
+    $prestudent_help->getPrestudenten($person->person_id); 
+    $stg = new studiengang(); 
+    
+    
+    foreach($prestudent_help->result as $prest)
+    {
+        $stg->load($prest->studiengang_kz); 
+        echo "<br>Bewerbung abschicken für ".$stg->bezeichnung.'<br>'; 
+        
+        echo '
+            <form method="POST" action="'.$_SERVER['PHP_SELF'].'">
+                <input type="submit" value="Bewerbung abschicken ('.$stg->kurzbzlang.')" name="btn_bewerbung_abschicken" '.$disabled.'>
+                <input type="hidden" name="prestudent_id" value="'.$prest->prestudent_id.'">
+            </form>'; 
+    }           
+            
+    ?>
+</div>
+    
+    
+    
+    <script type="text/javascript">
+	
+	function FensterOeffnen(adresse) 
+	{
+		MeinFenster = window.open(adresse, "Info", "width=700,height=200");
+  		MeinFenster.focus();
+	}
+    
+    function toggleDiv(div)
+    {
+        $('#'+div).toggle();
+    }
+    </script>
+</body>
+</html>
+
+<?php 
+
+// sendet eine Email an die Assistenz dass die Bewerbung abgeschlossen ist
+function sendBewerbung($prestudent_id)
+{
+    global $person_id; 
+    
+    $person = new person(); 
+    $person->load($person_id); 
+    
+    $prestudent = new prestudent(); 
+    if(!$prestudent->load($prestudent_id))
+        die('Konnte Prestudent nicht laden'); 
+    
+    $studiengang = new studiengang(); 
+    if(!$studiengang->load($prestudent->studiengang_kz))
+        die('Konnte Studiengang nicht laden'); 
+    
+    $email = 'Es hat sich ein Student für Ihren Studiengang beworben. <br>';
+    $email.= 'Name: '.$person->vorname.' '.$person->nachname.'<br>';
+    $email.= 'Studiengang: '.$studiengang->bezeichnung.'<br><br>';
+    $email.= 'Für mehr Details, verwenden Sie die Personenansicht im FAS.'; 
+    
+    $mail = new mail($studiengang->email, 'no-reply', 'Bewerbung '.$person->vorname.' '.$person->nachname, 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
+	$mail->setHTMLContent($email); 
+	if(!$mail->send())
+		return false; 
+	else
+		return true; 
+    
+}
+
+?>
