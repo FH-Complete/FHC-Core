@@ -346,6 +346,21 @@ function InteressentDokumenteNichtAbgegebenTreeSort()
 	window.setTimeout("InteressentDokumentNichtAbgegebenTreeSelect()",10);
 }
 
+function ShowDokument()
+{
+    var i;
+	var tree=document.getElementById('interessent-dokumente-tree-nichtabgegeben');
+	if(tree.currentIndex>=0)
+		i = tree.currentIndex;
+	else
+		i = 0;
+	col = tree.columns ? tree.columns["interessent-dokumente-tree-nichtabgegeben-dokument_kurzbz"] : "interessent-dokumente-tree-abgegeben-nichtdokument_kurzbz";
+	InteressentDokumentTreeNichtAbgegebenSelectID = tree.view.getCellText(i,col);
+    person_id = document.getElementById('student-prestudent-textbox-person_id').value
+    
+    window.open("<?php echo APP_ROOT; ?>content/akte.php?person_id="+person_id+"&dokument_kurzbz="+InteressentDokumentTreeNichtAbgegebenSelectID,"","chrome, status=no, width=500, height=350, centerscreen, resizable");
+}
+
 function InteressentDokumenteFilter()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
