@@ -43,6 +43,8 @@ class akte extends basis_db
 	public $uid;	
 	public $ext_id;
 	public $dms_id;
+    public $nachgereicht; 
+    public $anmerkung; 
 	
 	/**
 	 * Konstruktor
@@ -91,6 +93,8 @@ class akte extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->uid = $row->uid;
 				$this->dms_id = $row->dms_id;
+                $this->anmerkung = $row->anmerkung; 
+                $this->nachgereicht = $this->db_parse_bool($row->nachgereicht); 
 				return true;		
 			}
 			else 
@@ -173,7 +177,7 @@ class akte extends basis_db
 		{
 			//Neuen Datensatz anlegen	
 			$qry = "BEGIN;INSERT INTO public.tbl_akte (person_id, dokument_kurzbz, inhalt, mimetype, erstelltam, gedruckt, titel, 
-					bezeichnung, updateamum, updatevon, insertamum, insertvon, ext_id, uid, dms_id) VALUES (".
+					bezeichnung, updateamum, updatevon, insertamum, insertvon, ext_id, uid, dms_id, nachgereicht, anmerkung ) VALUES (".
 			       $this->db_add_param($this->person_id, FHC_INTEGER).', '.
 			       $this->db_add_param($this->dokument_kurzbz).', '.
 			       $this->db_add_param($this->inhalt).', '.
@@ -188,7 +192,9 @@ class akte extends basis_db
 			       $this->db_add_param($this->insertvon).', '.
 			       $this->db_add_param($this->ext_id).', '.
 			       $this->db_add_param($this->uid).','.
-			       $this->db_add_param($this->dms_id).');';
+                    $this->db_add_param($this->dms_id, FHC_INTEGER).','.
+                    $this->db_add_param($this->nachgereicht, FHC_BOOLEAN).','.
+			       $this->db_add_param($this->anmerkung).');';
 			       
 		}
 		else 
@@ -207,7 +213,9 @@ class akte extends basis_db
 				  " updatevon=".$this->db_add_param($this->updatevon).",".
 				  " ext_id=".$this->db_add_param($this->ext_id).",".
 				  " uid=".$this->db_add_param($this->uid).",".
-				  " dms_id=".$this->db_add_param($this->dms_id, FHC_INTEGER).
+                  " dms_id=".$this->db_add_param($this->dms_id, FHC_INTEGER).",".
+                  " nachgereicht=".$this->db_add_param($this->nachgereicht, FHC_BOOLEAN).",".
+				  " anmerkung=".$this->db_add_param($this->anmerkung).
 				  " WHERE akte_id=".$this->db_add_param($this->akte_id, FHC_INTEGER);
 		}
 		
@@ -259,7 +267,7 @@ class akte extends basis_db
 	{
 		$qry = "SELECT 
 					akte_id, person_id, dokument_kurzbz, mimetype, erstelltam, gedruckt, 
-					titel, bezeichnung, updateamum, insertamum, updatevon, insertvon, uid, dms_id
+					titel, bezeichnung, updateamum, insertamum, updatevon, insertvon, uid, dms_id, anmerkung, nachgereicht
 				FROM public.tbl_akte WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 		if($dokument_kurzbz!=null)
 			$qry.=" AND dokument_kurzbz=".$this->db_add_param($dokument_kurzbz);
@@ -286,6 +294,8 @@ class akte extends basis_db
 				$akten->insertvon = $row->insertvon;
 				$akten->uid = $row->uid;
 				$akten->dms_id = $row->dms_id;
+                $akten->nachgereicht = $this->db_parse_bool($row->nachgereicht); 
+                $akten->anmerkung = $row->anmerkung; 
 				
 				$this->result[] = $akten;
 			}
@@ -336,6 +346,8 @@ class akte extends basis_db
 				$akten->insertvon = $row->insertvon;
 				$akten->uid = $row->uid;
 				$akten->dms_id = $row->dms_id;
+                $akten->nachgereicht = $this->db_parse_bool($row->nachgereicht); 
+                $akten->anmerkung = $row->anmerkung; 
 				
 				$this->result[] = $akten;
 			}
