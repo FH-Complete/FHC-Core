@@ -32,6 +32,10 @@ class zgv extends basis_db
     public $zgvmas_bez; 
     public $zgvmas_kurzbz; 
     
+    public $zgvdoktor_code; 
+    public $zgvdoktor_bez; 
+    public $zgvdoktor_kurzbz; 
+    
     public $result = array(); 
     
     public function __construct($zgv_code=null)
@@ -123,6 +127,31 @@ class zgv extends basis_db
         else 
         {
             $this->errormsg = 'Fehler bei der Abfrage aufgetreten'; 
+            return false; 
+        }
+    }
+    
+    public function getAllDoktor()
+    {
+        $qry="SELECT * FROM bis.tbl_zgvdoktor;";
+        
+        if($result = $this->db_query($qry))
+        {
+            while($row= $this->db_fetch_object($result))
+            {
+                $zgv_doktor = new zgv(); 
+                
+                $zgv_doktor->zgvdoktor_code = $row->zgvdoktor_code;
+                $zgv_doktor->zgvdoktor_bez = $row->zgvdoktor_bez; 
+                $zgv_doktor->zgvdoktor_kurzbz = $row->zgvdoktor_kurzbz; 
+                
+                $this->result[] = $zgv_doktor; 
+            }
+            
+        }
+        else
+        {
+            $this->erromsg = "Fehler bei der Abfrage aufgetreten"; 
             return false; 
         }
     }

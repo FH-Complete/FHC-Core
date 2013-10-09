@@ -49,7 +49,10 @@ class prestudent extends person
 	public $anmerkung;
 	public $ext_id_prestudent;
 	public $dual=false;
-	
+    public $zgvdoktor_code; 
+    public $zgvdoktorort; 
+    public $zgvdoktordatum; 
+    
 	public $status_kurzbz;
 	public $studiensemester_kurzbz;
 	public $ausbildungssemester;
@@ -123,6 +126,9 @@ class prestudent extends person
 				$this->ext_id_prestudent = $row->ext_id;
 				$this->dual = $this->db_parse_bool($row->dual);
 				$this->ausstellungsstaat = $row->ausstellungsstaat;
+                $this->zgvdoktor_code = $row->zgvdoktor_code; 
+                $this->zgvdoktorort = $row->zgvdoktorort; 
+                $this->zgvdoktordatum = $row->zgvdoktordatum; 
 				
 				if(!person::load($row->person_id))
 					return false;
@@ -949,7 +955,7 @@ class prestudent extends person
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_prestudent WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
+		$qry = "SELECT * FROM public.tbl_prestudent WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER)." ORDER BY prestudent_id";
 		
 		if($this->db_query($qry))
 		{
@@ -983,6 +989,9 @@ class prestudent extends person
 				$obj->ext_id_prestudent = $row->ext_id;
 				$obj->dual = $this->db_parse_bool($row->dual);
 				$obj->ausstellungsstaat = $row->ausstellungsstaat;
+                $obj->zgvdoktor_code = $row->zgvdoktor_code; 
+                $obj->zgvdoktorort = $row->zgvdoktorort; 
+                $obj->zgvdoktordatum = $row->zgvdoktordatum; 
 				
 				$this->result[] = $obj;
 			}
