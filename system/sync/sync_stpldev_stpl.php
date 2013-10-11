@@ -37,11 +37,6 @@ echo '<html>
 </head>
 <body>';
 
-// Startvariablen setzen
-$adress='fas_sync@technikum-wien.at';
-//$adress_stpl='pam@technikum-wien.at';
-$adress_stpl='lvplan@technikum-wien.at';
-
 if (isset($_GET['sendmail']))
 {
 	if ($_GET['sendmail']=='true')
@@ -241,7 +236,7 @@ else
 				if (!isset($message[$row->uid]->isneu))
 				{
 					$message[$row->uid]->isneu=true;
-					$message[$row->uid]->mailadress=$row->uid.'@technikum-wien.at';
+					$message[$row->uid]->mailadress=$row->uid.'@'.DOMAIN;
 					$message[$row->uid]->message_begin=$message_begin.'<BR>';
 					$message[$row->uid]->message='<font style="color:green"><strong>Neue Stunden:</strong></font><BR>
 						<TABLE><TR><TH>Ort</TH><TH>Verband</TH><TH>Lektor</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
@@ -263,7 +258,7 @@ else
 				if (!isset($message[$student]->isneu))
 				{
 					$message[$student]->isneu=true;
-					$message[$student]->mailadress=$student.'@technikum-wien.at';
+					$message[$student]->mailadress=$student.'@'.DOMAIN;
 					$message[$student]->message_begin=$message_begin.'<BR>';
 					$message[$student]->message='<font style="color:green"><strong>Neue Stunden:</strong></font><BR>
 							<TABLE><TR><TH>Ort</TH><TH>Verband</TH><TH>Lektor</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
@@ -326,7 +321,7 @@ else
 				if (!isset($message[$row->uid]->isalt))
 				{
 					$message[$row->uid]->isalt=true;
-					$message[$row->uid]->mailadress=$row->uid.'@technikum-wien.at';
+					$message[$row->uid]->mailadress=$row->uid.'@'.DOMAIN;
 					$message[$row->uid]->message_begin=$message_begin.'<BR>';
 					$message[$row->uid]->message.='<font style="color:#FFA100"><strong>Gel&ouml;schte Stunden:</strong></font><BR>
 						<TABLE><TR><TH>Ort</TH><TH>Verband</TH><TH>Lektor</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
@@ -348,7 +343,7 @@ else
 				if (!isset($message[$student]->isalt))
 				{
 					$message[$student]->isalt=true;
-					$message[$student]->mailadress=$student.'@technikum-wien.at';
+					$message[$student]->mailadress=$student.'@'.DOMAIN;
 					$message[$student]->message_begin=$message_begin.'<BR>';
 					$message[$student]->message.='<font style="color:#FFA100"><strong>Gel&ouml;schte Stunden:</strong></font><BR>
 							<TABLE><TR><TH>Ort</TH><TH>Verband</TH><TH>Lektor</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
@@ -475,7 +470,7 @@ else
 				if (!isset($message[$row->uid]->isset))
 				{
 					$message[$row->uid]->isset=true;
-					$message[$row->uid]->mailadress=$row->uid.'@technikum-wien.at';
+					$message[$row->uid]->mailadress=$row->uid.'@'.DOMAIN;
 					$message[$row->uid]->message_begin=$message_begin.'<BR>';
 					$message[$row->uid]->message.='<font style="color:blue"><strong>Ge&auml;nderte Stunden:</strong></font><BR>
 						<TABLE><TR><TH>Status</TH><TH>Ort</TH><TH>Verband</TH><TH>Lektor</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
@@ -517,7 +512,7 @@ else
 					if (!isset($message[$row->old_uid]->isset))
 					{
 						$message[$row->old_uid]->isset=true;
-						$message[$row->old_uid]->mailadress=$row->old_uid.'@technikum-wien.at';
+						$message[$row->old_uid]->mailadress=$row->old_uid.'@'.DOMAIN;
 						$message[$row->old_uid]->message_begin=$message_begin.'<BR>';
 						$message[$row->old_uid]->message.='<font style="color:blue"><strong>Ge&auml;nderte Stunden:</strong></font><BR>
 							<TABLE><TR><TH>Status</TH><TH>Ort</TH><TH>Verband</TH><TH>Lektor</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
@@ -558,7 +553,7 @@ else
 				if (!isset($message[$student]->isset))
 				{
 					$message[$student]->isset=true;
-					$message[$student]->mailadress=$student.'@technikum-wien.at';
+					$message[$student]->mailadress=$student.'@'.DOMAIN;
 					$message[$student]->message_begin=$message_begin.'<BR>';
 					$message[$student]->message.='<font style="color:blue"><strong>Ge&auml;nderte Stunden:</strong></font><BR>
 							<TABLE><TR><TH>Status</TH><TH>Ort</TH><TH>Verband</TH><TH>Lektor</TH><TH>Datum</TH><TH>Std (Beginnzeit)</TH><TH>Lehrfach</TH><TH>Info</TH></TR>';
