@@ -1192,7 +1192,7 @@ class wawi_bestellung extends basis_db
 		if ($akt_mon<9)
 			$akt_year--;
 		$akt_year=substr($akt_year,2,2);
-		
+		$kostenstelle_kz = mb_strtoupper($kostenstelle_kz); 
 		$kuerzel = $kurzzeichen.$akt_year.$kostenstelle_kz.'___'; 
 		$qry = "SELECT max(substr(bestell_nr,length(bestell_nr)-2)) FROM wawi.tbl_bestellung 
 		WHERE wawi.tbl_bestellung.bestell_nr LIKE ".$this->db_add_param($kuerzel).";";
@@ -1209,9 +1209,7 @@ class wawi_bestellung extends basis_db
 			$this->errormsg ="Fehler bei der Datenbankabfrage aufgetreten"; 
 			return false; 
 		}
-			
-		$kostenstelle_kz = mb_strtoupper($kostenstelle_kz); 
-	
+					
 		$bnum=sprintf("%s%s%s%s",$kurzzeichen,$akt_year,$kostenstelle_kz,$bnum);
 		return $bnum;
 	}
