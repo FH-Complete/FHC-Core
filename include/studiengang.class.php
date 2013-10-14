@@ -73,11 +73,12 @@ class studiengang extends basis_db
 		if(!is_null($studiengang_kz))
 			$this->load($studiengang_kz);
 		
-		$this->studiengang_typ_arr["b"] = "Bachelor";
+		$this->getAllTypes();
+/*		$this->studiengang_typ_arr["b"] = "Bachelor";
 		$this->studiengang_typ_arr["d"] = "Diplom";
 		$this->studiengang_typ_arr["m"] = "Master";
 		$this->studiengang_typ_arr["l"] = "LLL";
-		$this->studiengang_typ_arr["e"] = "Erhalter";
+		$this->studiengang_typ_arr["e"] = "Erhalter"; */
 	}
 
 	/**
@@ -212,6 +213,23 @@ class studiengang extends basis_db
 		return true;
 	}
 	
+	/**
+	 * Laedt alle Studientypen in das Attribut studiengang_typ_array
+	 */
+	public function getAllTypes()
+	{
+		$qry='SELECT * FROM public.tbl_studiengangstyp';
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$this->studiengang_typ_arr[$row->typ]=$row->typ.' - '.$row->bezeichnung;
+			}
+		}
+		else
+			$this->errormsg = 'Fehler beim Laden der Studiengangstypen';
+	}
+
 	/**
 	 * Laedt die Studiengaenge die als Array uebergeben werden
 	 * @param $stgs Array mit den Kennzahlen
