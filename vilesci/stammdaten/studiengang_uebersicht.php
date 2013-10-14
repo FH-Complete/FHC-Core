@@ -55,10 +55,13 @@ require_once('../../include/benutzerberechtigung.class.php');
         die($sg->errormsg);
     
     //$htmlstr = "<table class='liste sortable'>\n";
-    $htmlstr = "<form name='formular'><input type='hidden' name='check' value=''></form><table class=\"tablesorter\" id=\"t1\">\n";
-	$htmlstr .= "   <thead><tr>\n";
-    $htmlstr .= "       <th onmouseup='document.formular.check.value=0'>Kz</th><th>Kurzbz</th><th>KurzbzLang</th> <th>Typ</th><th>Bezeichnung</th><th>Aktiv</th><th>Email</th>";
-    $htmlstr .= "   </tr></thead><tbody>\n";
+	$htmlstr = '';
+	$htmlstr .= '<input type="button" value="Neu" onClick="parent.detail_studiengang.location=\'studiengang_details.php\'">
+		<form name="formular"><input type="hidden" name="check" value=""></form><table class="tablesorter" id="t1">
+		<thead><tr>
+			<th onmouseup="document.formular.check.value=0">Kz</th><th>Kurzbz</th><th>KurzbzLang</th> <th>Typ</th><th>Bezeichnung</th><th>Aktiv</th><th>Email</th>
+		</tr></thead><tbody>
+		';
     $i = 0;
     foreach ($sg->result as $stg)
     {
