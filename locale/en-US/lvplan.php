@@ -78,4 +78,6 @@ $this->phrasen['lvplan/semesterplaene']='Overview';
 $this->phrasen['lvplan/hauptmenue']='Main Menu';
 $this->phrasen['lvplan/nameEingeben']='Enter name';
 $this->phrasen['lvplan/aktuelleKW']='Current calendar week';
+$this->phrasen['lvplan/rauminformationenAnzeigen']='Show room information';
+$this->phrasen['lvplan/personen']='persons';
 ?>
