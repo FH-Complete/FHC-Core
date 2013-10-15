@@ -72,7 +72,7 @@
 
 
 
-<body  style="background-color:#eeeeee;">
+<body class="left_nav">
 <!--
 <div class="logo" style="background-color:#FFFFFF;"  onclick="self.location.href='index.php'">
 		<img border="0" src="../skin/images/vilesci_logo.png" alt="VileSci (FASonline)" width="239px" title="VileSci" >

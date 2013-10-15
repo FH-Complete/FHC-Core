@@ -45,8 +45,8 @@ $this->phrasen['tools/ampelRestdauer']='Remaining Days';
 $this->phrasen['tools/ampelBestaetigtAm']='Confirmed on';
 $this->phrasen['tools/ampelBereitsBestaetigt']='This notification has already been confirmed';
 $this->phrasen['tools/dasAmpelsystemIstEinErinnerungsystem']='The notification system is a REMINDER and CONFIRMATION SYSTEM that is provided to remind you of outstanding tasks. <br/>The system does NOT check if the task has actually been completed. For more information, please refer to the CIS Manual.';
-$this->phrasen['tools/waehlenSieEineOEoderAmpel']='Bitte wählen Sie ein Organisationseinheit und/oder eine Ampel aus dem Dropdown';
-$this->phrasen['tools/uebersichtLeitung']='Ampel-Übersicht für LeiterInnen';
+$this->phrasen['tools/waehlenSieEineOEoderAmpel']='Please select an organizational unit and/or a notification from the drop down menu.';
+$this->phrasen['tools/uebersichtLeitung']='Overview of notifications for Heads of Departments';
 
 //Software fuer Lehre -> Softgrid
 $this->phrasen['tools/applikationsliste']='List of Applications';
@@ -62,12 +62,12 @@ $this->phrasen['tools/keineDatenGefunden']='No data found';
 $this->phrasen['tools/suche']='Global Search';
 $this->phrasen['tools/content']='Content';
 $this->phrasen['tools/suchbegriff']='Search';
-$this->phrasen['tools/esWurdenMehrAlsXDokumenteGefunden']='Es wurden mehr als 40 Dokumente zu Ihrem Suchbegriff gefunden. Bitte spezifizieren Sie Ihre Suche.';
-$this->phrasen['tools/esWurdenMehrAlsXPersonenGefunden']='Es wurden mehr als 20 Personen zu Ihrem Suchbegriff gefunden. Bitte spezifizieren Sie Ihre Suche.';
-$this->phrasen['tools/esWurdenMehrAlsXInhalteGefunden']='Es wurden mehr als 20 Seiten zu Ihrem Suchbegriff gefunden. Bitte spezifizieren Sie Ihre Suche.';
-$this->phrasen['tools/aktuelleVersion']='Aktuelle Version';
-$this->phrasen['tools/telefonklappe']='Telefonklappe';
-$this->phrasen['tools/reservieren']='Reservieren';
-$this->phrasen['tools/maxPersonen']='Max. Personen';
-$this->phrasen['tools/esWurdenKeineErgebnisseGefunden']='Es wurden keine Ergebnisse gefunden.';
+$this->phrasen['tools/esWurdenMehrAlsXDokumenteGefunden']='Your search returned more than 40 documents. Please specify your search term.';
+$this->phrasen['tools/esWurdenMehrAlsXPersonenGefunden']='Your search returned more than 20 people. Please specify your search term.';
+$this->phrasen['tools/esWurdenMehrAlsXInhalteGefunden']='Your search returned more than 20 documents. Please specify your search term.';
+$this->phrasen['tools/aktuelleVersion']='Current Version';
+$this->phrasen['tools/telefonklappe']='Extension';
+$this->phrasen['tools/reservieren']='Reserve room';
+$this->phrasen['tools/maxPersonen']='Max. # of people';
+$this->phrasen['tools/esWurdenKeineErgebnisseGefunden']='Your search did not return any results.';
 ?>

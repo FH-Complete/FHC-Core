@@ -635,8 +635,12 @@ class dms extends basis_db
 		$qry = "SELECT * FROM campus.tbl_dms  JOIN campus.tbl_dms_version USING(dms_id)
 				WHERE lower(name) like lower('%".addslashes($suchstring)."%')
 				OR lower(beschreibung) like lower('%".addslashes($suchstring)."%')
-				;";
+				";
+		if (is_numeric($suchstring))
+			$qry.= "OR dms_id = ".addslashes($suchstring)."";
 
+			$qry.=";";
+		
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))

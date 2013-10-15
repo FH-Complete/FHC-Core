@@ -134,7 +134,7 @@ if (isset($_GET["handbuch"])){
 <table class="tabcontent" height="100%" id="inhalt">
 	<tr>
 		<td class="tdwidth10">&nbsp;</td>
-		<td><h1>
+		<td style="vertical-align:top; height: 10px"><h1>
 		<?php
 		echo $lv_obj->bezeichnung_arr[$sprache].' '.$lv_obj->lehrform_kurzbz.' / '.$kurzbz.'-'.$semester.' '.$lv_obj->orgform_kurzbz;
 
@@ -151,7 +151,7 @@ if (isset($_GET["handbuch"])){
               </tr>
               <tr>
               <td>&nbsp;</td>
-              <td>';
+              <td style="vertical-align:top; height: 10px">';
 
 	    $qry = "SELECT * FROM (SELECT distinct on(uid) vorname, nachname, tbl_benutzer.uid as uid, 
 	    			CASE WHEN lehrfunktion_kurzbz='LV-Leitung' THEN true ELSE false END as lvleiter 
@@ -223,11 +223,11 @@ if (isset($_GET["handbuch"])){
 	</tr>
 	<tr>
 		<td >&nbsp;</td>
-		<td >&nbsp;</td>
+		<td style="vertical-align:top; height: 10px">&nbsp;</td>
 	</tr>
 	<tr>
 		<td >&nbsp;</td>
-		<td >
+		<td style="vertical-align:top;">
 		<?php
 		require_once('../../../include/'.EXT_FKT_PATH.'/cis_menu_lv.inc.php');
 		?>

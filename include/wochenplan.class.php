@@ -542,7 +542,7 @@ class wochenplan extends basis_db
 		// Aktuelle KW
 		echo '<a style="text-decoration:none" href="stpl_week.php?type='.$this->type;
 		echo $link_parameter;
-		echo '" title="Aktuelle KW">'.$p->t('eventkalender/kw').' '.$this->kalenderwoche;
+		echo '" title="'.$p->t('lvplan/aktuelleKW').'">'.$p->t('eventkalender/kw').' '.$this->kalenderwoche;
 		echo '</a>';
 		// 1 Woche nach vor
 		echo '<a style="text-decoration:none" href="stpl_week.php?type='.$this->type;

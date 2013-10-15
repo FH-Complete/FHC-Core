@@ -901,7 +901,7 @@ else
 	//Uebung neu anlegen
 	if(!isset($_POST['uebung_neu']))
 	{
-		$thema = "Uebung ".($anzahl<9?'0'.($anzahl+1):($anzahl+1));
+		$thema = $p->t('benotungstool/uebung')." ".($anzahl<9?'0'.($anzahl+1):($anzahl+1));
 		$anzahlderbeispiele = 10;
 		$punkteprobeispiel = 1;
 		$freigabevon = date('d.m.Y H:i');

@@ -9,7 +9,13 @@ body
 	font-size: medium;	
 	/*IE hack end*/
 }
-
+body.left_nav
+{
+	background-color: #eeeeee;
+	background-image: url(images/vilesci_farbverlauf.png);
+	background-repeat: repeat-x;
+	background-position: top;
+}
 table.menue
 {
 
@@ -273,8 +279,8 @@ img
 
 div.logo
 {
-	/* background-color: #006095; */
-	background-image: url(images/vilesci_farbverlauf.png);
+	background-color: #cecf9c;
+	background-image: url(images/vilesci_farbverlauf_top.png);
 	background-repeat: repeat-x;
 	margin:	0;
 	padding: 0;
@@ -305,7 +311,7 @@ table.error td {
 
 table.navbar
 {
-	background-color: #E6E6CC;
+	background-color: red;
 }
 table.logo
 {
@@ -439,12 +445,12 @@ a:hover
 }
 a.toplink, a.toplink:visited, a.toplink:active
 {
-	color: #006095;
+	color: #747C82;
 	text-decoration: none;
 }
 a.toplink:hover
 {
-	color: #cc0000;
+	color: #0086CC;
 	text-decoration: none;
 }
 a.navlink:link
