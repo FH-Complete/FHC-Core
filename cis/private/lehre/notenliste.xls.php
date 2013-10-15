@@ -102,6 +102,7 @@
 	
 	// sending HTTP headers
 	$workbook->send("Notenliste". "_" . date("d_m_Y") . ".xls");
+	$workbook->setCustomColor (15,192,192,192); //Setzen der HG-Farbe Hellgrau
 
 	// Creating a worksheet
 	$worksheet =& $workbook->addWorksheet("Notenliste");
@@ -110,6 +111,15 @@
 
 	$format_bold =& $workbook->addFormat();
 	$format_bold->setBold();
+	
+	$format_highlight =& $workbook->addFormat();
+	$format_highlight->setFgColor(15);
+	$format_highlight->setBorder(1);
+	$format_highlight->setBorderColor('white');
+	
+	$format_border_bottom =& $workbook->addFormat();
+	$format_border_bottom ->setBottom(2);
+	$format_border_bottom->setBold();
 
 	$format_title =& $workbook->addFormat();
 	$format_title->setBold();
@@ -121,7 +131,7 @@
 
 	$lvobj = new lehrveranstaltung($lvid);
 		
-	$worksheet->write(0,0,"Notenliste ".$lvobj->bezeichnung);
+	$worksheet->write(0,0,"Notenliste ".$lvobj->bezeichnung,$format_bold);
 	
 	$stg_obj = new studiengang($stg);
 	
@@ -166,18 +176,18 @@
 	{
 		while($row=$db->db_fetch_object($result))
 		{
-			$worksheet->write($lines,0,"$row->vorname $row->nachname");
+			$worksheet->write($lines,1,"$row->vorname $row->nachname");
 			$lines++;
 		}
 	}
 
 	//Studenten holen
 	$lines++;
-	$worksheet->write($lines,1,"Familiennname");
-	$worksheet->write($lines,2,"Vorname");
-	$worksheet->write($lines,3,"Gruppe");
-	$worksheet->write($lines,4,"Kennzeichen");
-	$worksheet->write($lines,5,"Note");
+	$worksheet->write($lines,1,"Familiennname",$format_border_bottom);
+	$worksheet->write($lines,2,"Vorname",$format_border_bottom);
+	$worksheet->write($lines,3,"Gruppe",$format_border_bottom);
+	$worksheet->write($lines,4,"Kennzeichen",$format_border_bottom);
+	$worksheet->write($lines,5,"Note",$format_border_bottom);
 $stsem_obj = new studiensemester();
 $stsem_obj->load($stsem);
 $stsemdatumvon = $stsem_obj->start;
@@ -232,8 +242,8 @@ $qry = "SELECT
 					$worksheet->write($lines,1,$elem->nachname.$inc);
 					$worksheet->write($lines,2,$elem->vorname);
 					$worksheet->write($lines,3,$elem->semester.$elem->verband.$elem->gruppe);
-					$worksheet->write($lines,4,'="'.trim($elem->matrikelnr).'"');
-					$worksheet->write($lines,5,$note);
+					$worksheet->write($lines,4,'="'.trim($elem->matrikelnr).'"',$format_highlight);
+					$worksheet->write($lines,5,$note,$format_highlight);
 					$i++;
 					$lines++;
 	   			}
@@ -242,10 +252,13 @@ $qry = "SELECT
 	}
 	
 	//Notenschluessel
-	$worksheet->write(++$lines,0,'Notenschlüssel: 1-Sehr Gut, 2-Gut, 3-Befriedigend, 4-Genügend,');
-	$worksheet->write(++$lines,0,'5-Nicht Genügend, 6-Angerechnet, 7-nicht beurteilt,');
-	$worksheet->write(++$lines,0,'8-teilgenommen, 9-noch nicht eingetragen, 10-bestanden,');
-	$worksheet->write(++$lines,0,'11-approbiert, 12-erfolgreich absolviert, 13-nicht erfolgreich absolviert, 14-nicht bestanden, 16-Mit Erfolg teilgenommen');	
+	$worksheet->write(++$lines,0,'Notenschlüssel: 1 (Sehr Gut), 2 (Gut), 3 (Befriedigend), 4 (Genügend),');
+	$worksheet->write(++$lines,0,'5 (Nicht Genügend), 7 (nicht beurteilt), 10 (bestanden)');
+	//$worksheet->write(++$lines,0,'8-teilgenommen, 9-noch nicht eingetragen, 10-bestanden,');
+	$worksheet->write(++$lines,0,'14 (nicht bestanden), 16 (Mit Erfolg teilgenommen)');		
+	$worksheet->writeBlank(++$lines,0,0);
+	$worksheet->writeBlank(++$lines,0,$format_highlight);
+	$worksheet->write($lines,1,'...Kopieren Sie diese Zellen in den Zwischenspeicher, um damit die Import-Spalte des Gesamtnotenformulars zu befüllen');
 	$lines++;
 	$worksheet->write(++$lines,0,'(i)  ... Incoming');	
 	$worksheet->write(++$lines,0,'(o)  ... Outgoing');

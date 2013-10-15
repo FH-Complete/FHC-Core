@@ -639,6 +639,16 @@
 	echo '<a href="'.$mailto.'" '.$nomail.'><img class="lv" src="../../../skin/images/button_feedback.png"><br><strong>'.$p->t('lehre/mail').'</strong></a>';
 	echo '</td>';
 	
+	//Pinboard
+	
+	echo '<td class="tdvertical" align="center">';
+	echo '<img class="lv" src="../../../skin/images/button_pinboard.png"><br>';	
+	echo "<b>".$p->t('lehre/pinboard')."</b></a><br>";
+	echo "<a href='../../../cms/news.php?studiengang_kz=$studiengang_kz&semester=$semester' class='Item'>".$p->t('global/anzeigen')."</a>";	
+	if($is_lector)
+		echo "<br><a href='../../../cms/newsverwaltung.php?studiengang_kz=$studiengang_kz&semester=$semester' class='Item'>".$p->t('profil/adminstration')."</a>";
+	echo '</td>';
+	
 	//Anzeigen von zusaetzlichen Lehre-Tools
 	
 	$lehretools = new lehre_tools();

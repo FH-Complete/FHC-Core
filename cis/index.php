@@ -162,9 +162,9 @@ function loadampel()
 	<table cellspacing="0" cellpadding="0" class="header">
 		<tr>
 		<td valign="top" align="left">
-		<a href="index.php"><img class="header_logo" src="../skin/images/fhtw_logo.png" alt="fhtw_logo"></a>
+		<a href="index.php"><img class="header_logo" src="../skin/images/logo.png" alt="logo"></a>
 		<img class="header_left" src="../skin/images/header_left.png" alt="header_links">
-		<img class="header_right" src="../skin/images/header_right.png" alt="header_rechts">	   	 	
+		<img class="header_right" src="../skin/images/header_right.png" alt="header_rechts">   	 	
 	   	 	<table class="header_content" cellpadding="0">
 		   	  <tr>
 		   	    <td width="20%" align="center">&nbsp;
@@ -176,7 +176,7 @@ function loadampel()
 		        	</form>
 		        </td>
 		         <td align="right" valign="top" style="width: 20%; padding-right: 10px; padding-top: 10px;">
-			          <span style="vertical-align:top;" id="ampel"></span>&nbsp;&nbsp;<span style="color: #A5AFB6">|</span>
+			          <nobr><span style="vertical-align:top;" id="ampel"></span>&nbsp;&nbsp;<span style="color: #A5AFB6">|</span>&nbsp;&nbsp;<a href="private/lvplan/stpl_week.php?pers_uid=<?php echo $user; ?>" target="_blank">LV-Plan</a>&nbsp;&nbsp;<span style="color: #A5AFB6">|</span>
 						<?php	  
 							$sprache = new sprache();
 							$sprache->getAll(true);
@@ -184,9 +184,11 @@ function loadampel()
 							{
 								echo ' &nbsp;&nbsp;<a href="#'.$row->sprache.'" title="'.$row->sprache.'" onclick="changeSprache(\''.$row->sprache.'\'); return false;">'.$row->sprache.'</a>';
 						}?>
+					</nobr>
 		        </td>
 		   	  </tr>
 	   	    </table>
+	   	    
 	   	</td>
 	   	</tr>
 	   	<tr>

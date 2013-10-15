@@ -488,7 +488,6 @@ td.teambox
 {
 	vertical-align: top;
 	padding-top: 20px;
-	/* height: 1000px; */ /* Damit die menubox im IE mit der richtigen höhe angezeigt wird */
 }
 TR.liste
 {
@@ -696,6 +695,12 @@ img.header_logo
 	top: 3%;
 	z-index: 5000;
 	height: 7%;
+}
+img.screenshot_boxshadow
+{
+	border: 1px solid grey; 
+	box-shadow: 0px 0px 5px 5px #888888; 
+	margin-left: 10px;
 }
 /*
 ==== Farben ====

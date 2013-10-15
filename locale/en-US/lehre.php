@@ -33,4 +33,6 @@ $this->phrasen['lehre/studentenAbgabe']='Student Uploads';
 $this->phrasen['lehre/mail']='E-Mail to students';
 $this->phrasen['lehre/keinMailverteiler']='There is no e-mail distribution list for the group(s) %s! The students in these groups will not receive an e-mail.';
 
+$this->phrasen['lehre/pinboard']='Pinboard';
+
 ?>
