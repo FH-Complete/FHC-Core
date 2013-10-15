@@ -242,7 +242,7 @@ class wochenplan extends basis_db
 		//ortdaten ermitteln
 		if ($this->type=='ort')
 		{
-			$sql_query="SELECT bezeichnung, ort_kurzbz, planbezeichnung, ausstattung, max_person FROM public.tbl_ort WHERE ort_kurzbz=".$this->db_add_param($this->ort_kurzbz);
+			$sql_query="SELECT bezeichnung, ort_kurzbz, planbezeichnung, ausstattung, max_person, content_id FROM public.tbl_ort WHERE ort_kurzbz=".$this->db_add_param($this->ort_kurzbz);
 			//echo $sql_query;
 			if (!$this->db_query($sql_query))
 			{
@@ -257,6 +257,7 @@ class wochenplan extends basis_db
 				$this->ort_planbezeichnung = $row->planbezeichnung;
 				$this->ort_ausstattung = $row->ausstattung;
 				$this->ort_max_person = $row->max_person;
+				$this->ort_content_id = $row->content_id;
 				$this->link.='&ort_kurzbz='.$this->ort_kurzbz;	//Link erweitern
 			}
 			else
@@ -429,7 +430,7 @@ class wochenplan extends basis_db
 			$this->link.='&stg_kz='.$this->stg_kz.'&sem='.$this->sem.'&ver='.$this->ver.'&grp='.$this->grp;
 		}
 		if ($this->type=='ort')
-			echo '<strong>'.$p->t('lvplan/raum').': </strong>'.(1==1 || is_file(RAUMINFO_PATH.trim($this->ort_kurzbz).'.html')?'<a href="'.RAUMINFO_PATH.trim($this->ort_kurzbz).'.html" target="_blank">'.$this->ort_kurzbz.'</a>':$this->ort_kurzbz).' - '.$this->ort_bezeichnung.' - '.($this->ort_max_person!=''?'( '.$this->ort_max_person.' Personen )':'').'<br>'.$this->ort_ausstattung;
+			echo '<strong>'.$p->t('lvplan/raum').': </strong>'.$this->ort_kurzbz.' - '.$this->ort_bezeichnung.' - '.($this->ort_max_person!=''?'( '.$this->ort_max_person.' '.$p->t('lvplan/personen').' )':'').($this->ort_content_id!=''?' - <a href="../../../cms/content.php?content_id='.$this->ort_content_id.'" target="_self">'.$p->t('lvplan/rauminformationenAnzeigen').'</a>':'').'<br>'.$this->ort_ausstattung;
 		echo '</P>'.$this->crlf;
 		echo '			<table class="stdplan" style="width: auto; margin: auto;" valign="bottom" align="center">';
 		//echo '			<tr><td colspan="2" class="stdplan" style="padding:3px;" align="center">'.$p->t('lvplan/semesterplaene').'</td></tr>';
