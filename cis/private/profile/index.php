@@ -36,6 +36,7 @@ require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/student.class.php');
 require_once('../../../include/kontakt.class.php');
 require_once('../../../include/fotostatus.class.php');
+require_once('../../../include/addon.class.php'); 
 
 $sprache = getSprache(); 
 $p=new phrasen($sprache);
@@ -461,6 +462,24 @@ if(!$ansicht)
 			echo '<p><A href="../lvplan/stpl_week.php?pers_uid='.$user->uid.'&type=lektor">'.$p->t('profil/lvplanVon').' '.$user->nachname.'</A></p>';
 		}
 	}
+        //Überprüfung ob Addon vorhanden ist
+        $addon = new addon();         
+        foreach($addon->aktive_addons as $ad)
+        {
+            // checken ob es file profil_array.php gibt
+            if(file_exists(DOC_ROOT.'/addons/'.$ad.'/cis/profil_array.php'))
+            {
+                include(DOC_ROOT.'/addons/'.$ad.'/cis/profil_array.php');
+                // Wenn Mitarbeiter count == 0
+                if(count($menu >0))
+                {
+                    foreach($menu as $entry)
+                    {
+                        echo "<p><a href=".APP_ROOT."addons/".$ad."/cis/".$entry['link']." target=".$entry['target'].">".$entry['name']."</a></p>"; 
+                    }
+                }
+            }
+        }
 	echo '<p><a href="../../../cms/content.php?content_id='.$p->t("dms_link/lvPlanFAQ").'" target="_blank">'.$p->t('global/hilfe').'</a></p></td>';
 	echo'</tr>
 		<tr>
