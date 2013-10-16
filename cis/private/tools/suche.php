@@ -129,10 +129,10 @@ function searchPerson($searchItems)
 			echo '<td>',$row->vorname,'</td>';
 			echo '<td><a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a></td>';
 			//echo '<td>',$row->titelpost,'</td>';
-			echo '<td>',$row->studiengang,'</td>';
+			echo '<td>',($row->studiengang!=''?$row->studiengang:'-'),'</td>';
 			echo '<td>',($row->mitarbeiter_uid==NULL?'StudentIn':'MitarbeiterIn'),'</td>';
-			echo '<td>',$row->telefonklappe,'</td>';
-			echo '<td>',$row->raum,'</td>';
+			echo '<td>',($row->telefonklappe!=''?$row->telefonklappe:'-'),'</td>';
+			echo '<td>',($row->raum!=''?$row->raum:'-'),'</td>';
 			if($row->alias!='' && !in_array($row->studiengang_kz, $noalias))
 				$mail = $row->alias.'@'.DOMAIN;
 			else
