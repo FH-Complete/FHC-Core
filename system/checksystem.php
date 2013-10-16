@@ -379,6 +379,8 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_studiengangstyp LIMIT 1;"
 
 		GRANT SELECT ON public.tbl_studiengangstyp TO web;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_studiengangstyp TO vilesci;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_studiengangstyp TO admin;
+		GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_studiengangstyp TO wawi;
 
 		INSERT INTO public.tbl_studiengangstyp(typ) SELECT distinct typ FROM public.tbl_studiengang;
 		ALTER TABLE public.tbl_studiengang ADD CONSTRAINT fk_studiengang_studiengangstyp FOREIGN KEY (typ) REFERENCES public.tbl_studiengangstyp (typ) ON DELETE RESTRICT ON UPDATE CASCADE;
