@@ -25,6 +25,7 @@ class gruppe extends basis_db
 {
 	public $new;      				// boolean
 	public $result = array(); 		// gruppen Objekt
+	public $gruppe_kurbzNeu;		// Variable für geänderte Gruppen Kurzbez.
 
 	//Tabellenspalten
 	public $gruppe_kurzbz;			// varchar(16)
@@ -32,7 +33,7 @@ class gruppe extends basis_db
 	public $bezeichnung;			// varchar(32)
 	public $semester;				// smallint
 	public $sort;					// smallint
-	public $lehre=true;				//boolean
+	public $lehre=true;				// boolean
 	public $mailgrp;				// boolean
 	public $beschreibung;			// varchar(128)
 	public $generiert;				// boolean
@@ -416,8 +417,11 @@ class gruppe extends basis_db
 			       ' updateamum='.$this->db_add_param($this->updateamum).','.
 			       ' updatevon='.$this->db_add_param($this->updatevon).','.
 			       ' orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).', '.
-				   ' gesperrt='.$this->db_add_param($this->gesperrt, FHC_BOOLEAN).' '.
-			       " WHERE gruppe_kurzbz=".$this->db_add_param($this->gruppe_kurzbz).";";
+				   ' gesperrt='.$this->db_add_param($this->gesperrt, FHC_BOOLEAN).' ';
+					if($this->gruppe_kurbzNeu != null) {
+						$qry.=', gruppe_kurzbz='.$this->db_add_param($this->gruppe_kurbzNeu).' ';
+					}
+			       $qry.=" WHERE gruppe_kurzbz=".$this->db_add_param($this->gruppe_kurzbz).";";
 		}
 
 		if($this->db_query($qry))

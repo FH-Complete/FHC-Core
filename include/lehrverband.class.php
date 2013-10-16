@@ -16,8 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
+ *			Stefan Puraner <puraner@technikum-wien.at>
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
@@ -190,6 +191,81 @@ class lehrverband extends basis_db
 				$this->result[] = $lv_obj;
 			}
 			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Lesen der Lehrverbaende '.$qry;
+			return false;
+		}
+	}
+	
+	public function getSemesterFromStudiengang($studiengang_kz, $where)
+	{
+		$qry = 'SELECT semester, aktiv FROM public.tbl_lehrverband WHERE studiengang_kz='.$this->db_add_param($studiengang_kz, FHC_INTEGER)." AND verband=' ' ".$where;
+		$qry .= ' GROUP BY semester, aktiv ORDER BY semester;';
+		
+		if($this->db_query($qry))
+		{
+			$lv_obj = array();
+			while($row = $this->db_fetch_object())
+			{
+				$sem = array();
+				$sem["aktiv"] = $row->aktiv;
+				$sem["semester"] = $row->semester;
+				array_push($lv_obj, $sem);
+			}
+			return $lv_obj;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Lesen der Semester '.$qry;
+			return false;
+		}
+	}
+	
+	public function getVerbandFromSemester($studiengang_kz, $semester, $where)
+	{
+		$qry = 'SELECT verband, aktiv, bezeichnung FROM public.tbl_lehrverband WHERE studiengang_kz='.$this->db_add_param($studiengang_kz, FHC_INTEGER).' AND semester='.$this->db_add_param($semester, FHC_INTEGER)." AND gruppe=' ' ".$where;
+		$qry .= ' GROUP BY verband, aktiv, bezeichnung ORDER BY verband;';
+		
+		if($this->db_query($qry))
+		{
+			$lv_obj = array();
+			while($row = $this->db_fetch_object())
+			{
+				$verb = array();
+				$verb["verband"] = $row->verband;
+				$verb["aktiv"] = $row->aktiv;
+				$verb["bezeichnung"] = $row->bezeichnung;
+				array_push($lv_obj, $verb);
+			}
+			return $lv_obj;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Lesen der Lehrverbaende '.$qry;
+			return false;
+		}
+	}
+	
+	public function getGruppeFromVerband($studiengang_kz, $semester, $verband, $where)
+	{
+		$qry = 'SELECT gruppe, bezeichnung, aktiv FROM public.tbl_lehrverband WHERE studiengang_kz='.$this->db_add_param($studiengang_kz, FHC_INTEGER).' AND semester='.$this->db_add_param($semester, FHC_INTEGER).' AND verband='.$this->db_add_param($verband, FHC_STRING).$where;
+		$qry .= ' GROUP BY gruppe, bezeichnung, aktiv ORDER BY gruppe;';
+		if($this->db_query($qry))
+		{
+			
+			$lv_obj = array();
+			
+			while($row = $this->db_fetch_object())
+			{
+				$grp = array();
+				$grp["bezeichnung"] = $row->bezeichnung;
+				$grp["gruppe"] = $row->gruppe;
+				$grp["aktiv"] = $row->aktiv;
+				array_push($lv_obj, $grp);
+			}
+			return $lv_obj;
 		}
 		else
 		{
