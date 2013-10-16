@@ -77,6 +77,8 @@ $berechtigte_oe = $rechte->getOEkurzbz('basis/cms')
         theme_advanced_toolbar_align : "center",
         theme_advanced_statusbar_location : "bottom",
         theme_advanced_resizing : true,
+        theme_advanced_styles : "Contenttabelle=cmstable;Hauptcontent=cmscontent;Menuebox=menubox;Teambox=teambox;Schatteneffekt Grafiken=screenshot_boxshadow;Tablesorter=tablesorter tablesorter_col_0 tablesorter_sort_0",
+        advimage_update_dimensions_onchange : false,
         force_br_newlines : true,
         force_p_newlines : false,
         forced_root_block : '',
