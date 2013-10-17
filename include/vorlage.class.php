@@ -81,7 +81,14 @@ class vorlage extends basis_db
 			{
 				$qry.=" AND version=".$this->db_add_param($version, FHC_INTEGER);
 			}
-			$qry .=" ORDER BY studiengang_kz DESC, version DESC LIMIT 1;";
+			if($studiengang_kz<0) //Damit bei negativer studiengang_kz richtiges Ergebnis kommt
+			{
+				$qry .=" ORDER BY studiengang_kz ASC, version DESC LIMIT 1;";
+			}
+			else
+			{
+				$qry .=" ORDER BY studiengang_kz DESC, version DESC LIMIT 1;";
+			}
 		}
 		else
 		{
