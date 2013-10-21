@@ -196,7 +196,7 @@
 		$htmlstr .= "		</select></td>\n";
 		$htmlstr .= "		<td>Lehrform</td>";
 		$htmlstr .= "		<td><select name='lehrform'>\n";
-		$htmlstr .= "				<option value='NULL'></option>";
+		$htmlstr .= "				<option value=''></option>";
 		foreach ($lehrform_arr as $lehrform)
 		{
 			if ($lv->lehrform_kurzbz == $lehrform)
