@@ -194,9 +194,9 @@ class basis_db extends db
 	public function db_null_value($var, $qoute=true)
 	{
 		if($qoute)
-			return ($var!=''?$this->db_qoute($var):'null');
+			return ($var!==''?$this->db_qoute($var):'null');
 		else
-			return ($var!=''?$var:'null');		
+			return ($var!==''?$var:'null');	
 	}
 
 	/**
@@ -225,7 +225,7 @@ class basis_db extends db
 	 */
 	public function db_add_param($var, $type=FHC_STRING, $nullable=true)
 	{
-		if($var=='' && $type!=FHC_BOOLEAN)
+		if($var==='' && $type!=FHC_BOOLEAN)
 		{
 			if($nullable)
 				return 'null';
@@ -237,8 +237,8 @@ class basis_db extends db
 		{
 			case FHC_INTEGER: 
 				$var = $this->db_escape($var);
-				if(!is_numeric($var))
-					die('Invalid Integer Parameter detected');
+				if(!is_numeric($var) && $var!=='')
+					die('Invalid Integer Parameter detected:'.$var);
 				$var = $this->db_null_value($var, false);
 				break;
 
@@ -276,6 +276,21 @@ class basis_db extends db
 		else
 			die('Invalid DB Boolean. Wrong DB-Engine?');
 	}
-
+	
+	/**
+	 * Bereitet ein Array von Elementen auf, damit es in der IN-Klausel eines 
+	 * Select Befehls verwendet werden kann.
+	 */
+	public function db_implode4SQL($array)
+	{
+		$string = '';
+		foreach($array as $row)
+		{
+			if($string!='')
+				$string.=',';
+			$string.=$this->db_add_param($row);
+		}
+		return $string;
+	}
 }
 ?>
