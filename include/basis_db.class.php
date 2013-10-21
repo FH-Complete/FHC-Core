@@ -61,6 +61,7 @@ abstract class db extends basis
 	abstract function db_qoute($var);
 	abstract function db_add_param($var, $type=FHC_STRING, $nullable=true);
 	abstract function db_parse_bool($var);
+	abstract function db_implode4SQL($var);
 
 	
 	/**

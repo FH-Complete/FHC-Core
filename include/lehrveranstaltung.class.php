@@ -24,8 +24,6 @@ require_once(dirname(__FILE__).'/functions.inc.php');
 
 class lehrveranstaltung extends basis_db
 {
-	public $conn;					// resource DB-Handle
-	public $errormsg;				// string
 	public $new;					// boolean
 	public $lehrveranstaltungen = array();	//  lehrveranstaltung Objekt
 
@@ -60,7 +58,13 @@ class lehrveranstaltung extends basis_db
 	public $bezeichnung_english;	// varchar(256)
 	public $orgform_kurzbz;
 	public $bezeichnung_arr = array();
-	
+
+	public $studienplan_lehrveranstaltung_id;
+	public $studienplan_lehrveranstaltung_id_parent;
+	public $stpllv_pflicht=true;
+	public $stpllv_koordinator;
+	public $stpllv_semester;
+
 	/**
 	 * Konstruktor
 	 * @param $lehrveranstaltung_id ID der zu ladenden Lehrveranstaltung
@@ -85,7 +89,7 @@ class lehrveranstaltung extends basis_db
 			$this->errormsg = 'Lehrveranstaltung_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='$lehrveranstaltung_id';";
+		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
 
 		if(!$this->db_query($qry))
 		{
@@ -104,9 +108,9 @@ class lehrveranstaltung extends basis_db
 			$this->ects=$row->ects;
 			$this->semesterstunden=$row->semesterstunden;
 			$this->anmerkung=$row->anmerkung;
-			$this->lehre=($row->lehre=='t'?true:false);
+			$this->lehre=$this->db_parse_bool($row->lehre);
 			$this->lehreverzeichnis=$row->lehreverzeichnis;
-			$this->aktiv=($row->aktiv=='t'?true:false);
+			$this->aktiv=$this->db_parse_bool($row->aktiv);
 			$this->ext_id=$row->ext_id;
 			$this->insertamum=$row->insertamum;
 			$this->insertvon=$row->insertvon;
@@ -119,8 +123,8 @@ class lehrveranstaltung extends basis_db
 			$this->sprache=$row->sprache;
 			$this->sort=$row->sort;
 			$this->incoming=$row->incoming;
-			$this->zeugnis=($row->zeugnis=='t'?true:false);
-			$this->projektarbeit=($row->projektarbeit=='t'?true:false);
+			$this->zeugnis=$this->db_parse_bool($row->zeugnis);
+			$this->projektarbeit=$this->db_parse_bool($row->projektarbeit);
 			$this->koordinator=$row->koordinator;
 			$this->bezeichnung_english = $row->bezeichnung_english;
 			$this->orgform_kurzbz = $row->orgform_kurzbz;
@@ -161,9 +165,9 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->ects=$row->ects;
 			$lv_obj->semesterstunden=$row->semesterstunden;
 			$lv_obj->anmerkung=$row->anmerkung;
-			$lv_obj->lehre=($row->lehre=='t'?true:false);
+			$lv_obj->lehre=$this->db_parse_bool($row->lehre);
 			$lv_obj->lehreverzeichnis=$row->lehreverzeichnis;
-			$lv_obj->aktiv=($row->aktiv=='t'?true:false);
+			$lv_obj->aktiv=$this->db_parse_bool($row->aktiv);
 			$lv_obj->ext_id=$row->ext_id;
 			$lv_obj->insertamum=$row->insertamum;
 			$lv_obj->insertvon=$row->insertvon;
@@ -176,8 +180,8 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->sprache=$row->sprache;
 			$lv_obj->sort=$row->sort;
 			$lv_obj->incoming=$row->incoming;
-			$lv_obj->zeugnis=($row->zeugnis=='t'?true:false);
-			$lv_obj->projektarbeit=($row->projektarbeit=='t'?true:false);
+			$lv_obj->zeugnis=$this->db_parse_bool($row->zeugnis);
+			$lv_obj->projektarbeit=$this->db_parse_bool($row->projektarbeit);
 			$lv_obj->koordinator=$row->koordinator;
 			$lv_obj->bezeichnung_english = $row->bezeichnung_english;
 			$lv_obj->orgform_kurzbz = $row->orgform_kurzbz;
@@ -224,16 +228,16 @@ class lehrveranstaltung extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung where studiengang_kz='".addslashes($studiengang_kz)."' ";
+		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung where studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
 
 		//Select Befehl zusammenbauen
 		if(!is_null($lehreverzeichnis))
-			$qry .= " AND lehreverzeichnis='$lehreverzeichnis'";
+			$qry .= " AND lehreverzeichnis=".$this->db_add_param($lehreverzeichnis);
 		else
 			$qry .= " AND lehreverzeichnis<>'' ";
 					
 		if(!is_null($semester) && $semester!='')
-			$qry .= " AND semester='$semester'";
+			$qry .= " AND semester=".$this->db_add_param($semester, FHC_INTEGER);
 		else
 			$qry .= " AND semester is not null ";
 					
@@ -273,9 +277,9 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->ects=$row->ects;
 			$lv_obj->semesterstunden=$row->semesterstunden;
 			$lv_obj->anmerkung=$row->anmerkung;
-			$lv_obj->lehre=($row->lehre=='t'?true:false);
+			$lv_obj->lehre=$this->db_parse_bool($row->lehre);
 			$lv_obj->lehreverzeichnis=$row->lehreverzeichnis;
-			$lv_obj->aktiv=($row->aktiv=='t'?true:false);
+			$lv_obj->aktiv=$this->db_parse_bool($row->aktiv);
 			$lv_obj->ext_id=$row->ext_id;
 			$lv_obj->insertamum=$row->insertamum;
 			$lv_obj->insertvon=$row->insertvon;
@@ -288,8 +292,8 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->sprache=$row->sprache;
 			$lv_obj->sort=$row->sort;
 			$lv_obj->incoming=$row->incoming;
-			$lv_obj->zeugnis=($row->zeugnis=='t'?true:false);
-			$lv_obj->projektarbeit=($row->projektarbeit=='t'?true:false);
+			$lv_obj->zeugnis=$this->db_parse_bool($row->zeugnis);
+			$lv_obj->projektarbeit=$this->db_parse_bool($row->projektarbeit);
 			$lv_obj->koordinator=$row->koordinator;
 			$lv_obj->bezeichnung_english = $row->bezeichnung_english;
 			$lv_obj->orgform_kurzbz = $row->orgform_kurzbz;
@@ -315,7 +319,7 @@ class lehrveranstaltung extends basis_db
 	{
 		//Variablen pruefen
 
-		if(!is_numeric($studiengang_kz) || $studiengang_kz=='')
+		if(!is_numeric($studiengang_kz) || $studiengang_kz==='')
 		{
 			$this->errormsg = 'studiengang_kz muss eine gueltige Zahl sein';
 			return false;
@@ -336,21 +340,21 @@ class lehrveranstaltung extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT distinct lehre.tbl_lehrveranstaltung.*, tbl_lehreinheit.studiensemester_kurzbz FROM lehre.tbl_lehrveranstaltung,lehre.tbl_lehreinheit  where tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id and studiengang_kz='".addslashes($studiengang_kz)."' ";
+		$qry = "SELECT distinct lehre.tbl_lehrveranstaltung.*, tbl_lehreinheit.studiensemester_kurzbz FROM lehre.tbl_lehrveranstaltung,lehre.tbl_lehreinheit  where tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id and studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
 
 		//Select Befehl zusammenbauen
 		if(!is_null($lehreverzeichnis))
-			$qry .= " AND lehreverzeichnis='$lehreverzeichnis'";
+			$qry .= " AND lehreverzeichnis=".$this->db_add_param($lehreverzeichnis);
 		else
 			$qry .= " AND lehreverzeichnis<>'' ";
 					
 		if(!is_null($semester) && $semester!='')
-			$qry .= " AND semester='$semester'";
+			$qry .= " AND semester=".$this->db_add_param($semester);
 		else
 			$qry .= " AND semester is not null ";
 
 		if(!is_null($studiensemester_kurzbz) && $studiensemester_kurzbz!='')
-			$qry .= " AND tbl_lehreinheit.studiensemester_kurzbz='$studiensemester_kurzbz'";
+			$qry .= " AND tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 
 			
 		if(!is_null($lehre))
@@ -389,9 +393,9 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->ects=$row->ects;
 			$lv_obj->semesterstunden=$row->semesterstunden;
 			$lv_obj->anmerkung=$row->anmerkung;
-			$lv_obj->lehre=($row->lehre=='t'?true:false);
+			$lv_obj->lehre=$this->db_parse_bool($row->lehre);
 			$lv_obj->lehreverzeichnis=$row->lehreverzeichnis;
-			$lv_obj->aktiv=($row->aktiv=='t'?true:false);
+			$lv_obj->aktiv=$this->db_parse_bool($row->aktiv);
 			$lv_obj->ext_id=$row->ext_id;
 			$lv_obj->insertamum=$row->insertamum;
 			$lv_obj->insertvon=$row->insertvon;
@@ -404,8 +408,8 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->sprache=$row->sprache;
 			$lv_obj->sort=$row->sort;
 			$lv_obj->incoming=$row->incoming;
-			$lv_obj->zeugnis=($row->zeugnis=='t'?true:false);
-			$lv_obj->projektarbeit=($row->projektarbeit=='t'?true:false);
+			$lv_obj->zeugnis=$this->db_parse_bool($row->zeugnis);
+			$lv_obj->projektarbeit=$this->db_parse_bool($row->projektarbeit);
 			$lv_obj->koordinator=$row->koordinator;
 			$lv_obj->bezeichnung_english = $row->bezeichnung_english;
 			$lv_obj->orgform_kurzbz = $row->orgform_kurzbz;
@@ -455,9 +459,9 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->ects=$row->ects;
 			$lv_obj->semesterstunden=$row->semesterstunden;
 			$lv_obj->anmerkung=$row->anmerkung;
-			$lv_obj->lehre=($row->lehre=='t'?true:false);
+			$lv_obj->lehre=$this->db_parse_bool($row->lehre);
 			$lv_obj->lehreverzeichnis=$row->lehreverzeichnis;
-			$lv_obj->aktiv=($row->aktiv=='t'?true:false);
+			$lv_obj->aktiv=$this->db_parse_bool($row->aktiv);
 			$lv_obj->ext_id=$row->ext_id;
 			$lv_obj->insertamum=$row->insertamum;
 			$lv_obj->insertvon=$row->insertvon;
@@ -470,8 +474,8 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->sprache=$row->sprache;
 			$lv_obj->sort=$row->sort;
 			$lv_obj->incoming=$row->incoming;
-			$lv_obj->zeugnis=($row->zeugnis=='t'?true:false);
-			$lv_obj->projektarbeit=($row->projektarbeit=='t'?true:false);
+			$lv_obj->zeugnis=$this->db_parse_bool($row->zeugnis);
+			$lv_obj->projektarbeit=$this->db_parse_bool($row->projektarbeit);
 			$lv_obj->koordinator=$row->koordinator;
 			$lv_obj->bezeichnung_english = $row->bezeichnung_english;
 			$lv_obj->orgform_kurzbz = $row->orgform_kurzbz;
@@ -582,37 +586,34 @@ class lehrveranstaltung extends basis_db
 			$qry = 'BEGIN; INSERT INTO lehre.tbl_lehrveranstaltung (studiengang_kz, bezeichnung, kurzbz, lehrform_kurzbz,
 				semester, ects, semesterstunden,  anmerkung, lehre, lehreverzeichnis, aktiv, ext_id, insertamum,
 				insertvon, planfaktor, planlektoren, planpersonalkosten, plankostenprolektor, updateamum, updatevon, sort,zeugnis, projektarbeit, sprache, koordinator, bezeichnung_english, orgform_kurzbz,incoming) VALUES ('.
-				$this->addslashes($this->studiengang_kz).', '.
-				$this->addslashes($this->bezeichnung).', '.
-				$this->addslashes($this->kurzbz).', ';
-			if ($this->lehrform_kurzbz=='NULL')
-				$qry.= 'NULL, ';
-			else
-				$qry.= $this->addslashes($this->lehrform_kurzbz).', ';
-			$qry.= $this->addslashes($this->semester).', '.
-				$this->addslashes($this->ects).', '.
-				$this->addslashes($this->semesterstunden).', '.
-				$this->addslashes($this->anmerkung).', '.
-				($this->lehre?'true':'false').','.
-				$this->addslashes($this->lehreverzeichnis).', '.
-				($this->aktiv?'true':'false').', '.
-				$this->addslashes($this->ext_id).', '.
-				$this->addslashes($this->insertamum).', '.
-				$this->addslashes($this->insertvon).', '.
-				$this->addslashes($this->planfaktor).', '.
-				$this->addslashes($this->planlektoren).', '.
-				$this->addslashes($this->planpersonalkosten).', '.
-				$this->addslashes($this->plankostenprolektor).', '.
-				$this->addslashes($this->updateamum).', '.
-				$this->addslashes($this->updatevon).','.
-				$this->addslashes($this->sort).','.
-				($this->zeugnis?'true':'false').','.
-				($this->projektarbeit?'true':'false').','.
-				$this->addslashes($this->sprache).','.
-				$this->addslashes($this->koordinator).','.
-				$this->addslashes($this->bezeichnung_english).','.
-				$this->addslashes($this->orgform_kurzbz).','.
-				$this->addslashes($this->incoming).');';
+				$this->db_add_param($this->studiengang_kz).', '.
+				$this->db_add_param($this->bezeichnung).', '.
+				$this->db_add_param($this->kurzbz).', '.
+				$this->db_add_param($this->lehrform_kurzbz).', '.
+				$this->db_add_param($this->semester).', '.
+				$this->db_add_param($this->ects).', '.
+				$this->db_add_param($this->semesterstunden).', '.
+				$this->db_add_param($this->anmerkung).', '.
+				$this->db_add_param($this->lehre, FHC_BOOLEAN).','.
+				$this->db_add_param($this->lehreverzeichnis).', '.
+				$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
+				$this->db_add_param($this->ext_id).', '.
+				$this->db_add_param($this->insertamum).', '.
+				$this->db_add_param($this->insertvon).', '.
+				$this->db_add_param($this->planfaktor).', '.
+				$this->db_add_param($this->planlektoren).', '.
+				$this->db_add_param($this->planpersonalkosten).', '.
+				$this->db_add_param($this->plankostenprolektor).', '.
+				$this->db_add_param($this->updateamum).', '.
+				$this->db_add_param($this->updatevon).','.
+				$this->db_add_param($this->sort).','.
+				$this->db_add_param($this->zeugnis, FHC_BOOLEAN).','.
+				$this->db_add_param($this->projektarbeit, FHC_BOOLEAN).','.
+				$this->db_add_param($this->sprache).','.
+				$this->db_add_param($this->koordinator).','.
+				$this->db_add_param($this->bezeichnung_english).','.
+				$this->db_add_param($this->orgform_kurzbz).','.
+				$this->db_add_param($this->incoming).');';
 		}
 		else
 		{
@@ -626,40 +627,33 @@ class lehrveranstaltung extends basis_db
 			}
 
 			$qry = 'UPDATE lehre.tbl_lehrveranstaltung SET '.
-				//'lehrveranstaltung_id= '.$this->addslashes($this->lehrveranstaltung_id) .', '.
-				'studiengang_kz='.$this->addslashes($this->studiengang_kz) .', '.
-				'bezeichnung='.$this->addslashes($this->bezeichnung) .', '.
-				'kurzbz='.$this->addslashes($this->kurzbz) .', '.
-				'lehrform_kurzbz=';
-			if ($this->lehrform_kurzbz=='NULL')
-				$qry.= 'NULL, ';
-			else
-				$qry.=$this->addslashes($this->lehrform_kurzbz) .', ';
-			$qry.= 'semester='.$this->addslashes($this->semester) .', '.
-				'ects='.$this->addslashes($this->ects) .', '.
-				'semesterstunden='.$this->addslashes($this->semesterstunden) .', '.
-				'anmerkung='.$this->addslashes($this->anmerkung) .', '.
-				'lehre='.($this->lehre?'true':'false') .', '.
-				'lehreverzeichnis='.$this->addslashes($this->lehreverzeichnis) .', '.
-				'aktiv='.($this->aktiv?'true':'false') .', '.
-				'ext_id='.$this->addslashes($this->ext_id) .', '.
-				'insertamum='.$this->addslashes($this->insertamum) .', '.
-				'insertvon='.$this->addslashes($this->insertvon) .', '.
-				'planfaktor='.$this->addslashes($this->planfaktor) .', '.
-				'planlektoren='.$this->addslashes($this->planlektoren) .', '.
-				'planpersonalkosten='.$this->addslashes($this->planpersonalkosten) .', '.
-				'plankostenprolektor='.$this->addslashes($this->plankostenprolektor) .', '.
-				'updateamum='.$this->addslashes($this->updateamum) .','.
-				'updatevon='.$this->addslashes($this->updatevon) .','.
-				'sort='.$this->addslashes($this->sort) .','.
-				'incoming='.$this->addslashes($this->incoming).','.
-				'zeugnis='.($this->zeugnis?'true':'false').','.
-				'projektarbeit='.($this->projektarbeit?'true':'false').','.
-				'koordinator='.$this->addslashes($this->koordinator).','.
-				'sprache='.$this->addslashes($this->sprache).','.
-				'bezeichnung_english='.$this->addslashes($this->bezeichnung_english).','.
-				'orgform_kurzbz='.$this->addslashes($this->orgform_kurzbz).' '.
-				'WHERE lehrveranstaltung_id = '.$this->addslashes($this->lehrveranstaltung_id).';';
+				'studiengang_kz='.$this->db_add_param($this->studiengang_kz, FHC_INTEGER) .', '.
+				'bezeichnung='.$this->db_add_param($this->bezeichnung) .', '.
+				'kurzbz='.$this->db_add_param($this->kurzbz) .', '.
+				'lehrform_kurzbz='.$this->db_add_param($this->lehrform_kurzbz) .', '.
+				'semester='.$this->db_add_param($this->semester, FHC_INTEGER) .', '.
+				'ects='.$this->db_add_param($this->ects) .', '.
+				'semesterstunden='.$this->db_add_param($this->semesterstunden, FHC_INTEGER) .', '.
+				'anmerkung='.$this->db_add_param($this->anmerkung) .', '.
+				'lehre='.$this->db_add_param($this->lehre, FHC_BOOLEAN) .', '.
+				'lehreverzeichnis='.$this->db_add_param($this->lehreverzeichnis) .', '.
+				'aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN) .', '.
+				'ext_id='.$this->db_add_param($this->ext_id) .', '.
+				'planfaktor='.$this->db_add_param($this->planfaktor) .', '.
+				'planlektoren='.$this->db_add_param($this->planlektoren) .', '.
+				'planpersonalkosten='.$this->db_add_param($this->planpersonalkosten) .', '.
+				'plankostenprolektor='.$this->db_add_param($this->plankostenprolektor) .', '.
+				'updateamum='.$this->db_add_param($this->updateamum) .','.
+				'updatevon='.$this->db_add_param($this->updatevon) .','.
+				'sort='.$this->db_add_param($this->sort) .','.
+				'incoming='.$this->db_add_param($this->incoming).','.
+				'zeugnis='.$this->db_add_param($this->zeugnis, FHC_BOOLEAN).','.
+				'projektarbeit='.$this->db_add_param($this->projektarbeit, FHC_BOOLEAN).','.
+				'koordinator='.$this->db_add_param($this->koordinator).','.
+				'sprache='.$this->db_add_param($this->sprache).','.
+				'bezeichnung_english='.$this->db_add_param($this->bezeichnung_english).','.
+				'orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).' '.
+				'WHERE lehrveranstaltung_id = '.$this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER, false).';';
 		}
 
 		if($this->db_query($qry))
@@ -715,12 +709,12 @@ class lehrveranstaltung extends basis_db
 
 		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter WHERE ";
 		if($studiengang_kz!=0)
-			$qry.="tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."' AND ";
+			$qry.="tbl_lehrveranstaltung.studiengang_kz=".$this->db_add_param($studiengang_kz)." AND ";
 
 		$qry.= "tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id AND
 				tbl_lehreinheitmitarbeiter.lehreinheit_id = tbl_lehreinheit.lehreinheit_id AND
-				tbl_lehreinheit.studiensemester_kurzbz = '".addslashes($studiensemester_kurzbz)."' AND
-				tbl_lehreinheitmitarbeiter.mitarbeiter_uid='".addslashes($uid)."';";
+				tbl_lehreinheit.studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz)." AND
+				tbl_lehreinheitmitarbeiter.mitarbeiter_uid=".$this->db_add_param($uid).";";
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -736,9 +730,9 @@ class lehrveranstaltung extends basis_db
 				$lv_obj->ects=$row->ects;
 				$lv_obj->semesterstunden=$row->semesterstunden;
 				$lv_obj->anmerkung=$row->anmerkung;
-				$lv_obj->lehre=($row->lehre=='t'?true:false);
+				$lv_obj->lehre=$this->db_parse_bool($row->lehre);
 				$lv_obj->lehreverzeichnis=$row->lehreverzeichnis;
-				$lv_obj->aktiv=($row->aktiv=='t'?true:false);
+				$lv_obj->aktiv=$this->db_parse_bool($row->aktiv);
 				$lv_obj->ext_id=$row->ext_id;
 				$lv_obj->insertamum=$row->insertamum;
 				$lv_obj->insertvon=$row->insertvon;
@@ -751,8 +745,8 @@ class lehrveranstaltung extends basis_db
 				$lv_obj->sprache=$row->sprache;
 				$lv_obj->sort=$row->sort;
 				$lv_obj->incoming=$row->incoming;
-				$lv_obj->zeugnis=($row->zeugnis=='t'?true:false);
-				$lv_obj->projektarbeit=($row->projektarbeit=='t'?true:false);
+				$lv_obj->zeugnis= $this->db_parse_bool($row->zeugnis);
+				$lv_obj->projektarbeit=$this->db_parse_bool($row->projektarbeit);
 				$lv_obj->zeugnis=$row->koordinator;
 				$lv_obj->bezeichnung_english = $row->bezeichnung_english;
 				$lv_obj->orgform_kurzbz = $row->orgform_kurzbz;
@@ -833,8 +827,8 @@ class lehrveranstaltung extends basis_db
 				$l->insertvon = $row->insertvon;
 				$l->sort = $row->sort;
 				$l->incoming = $row->incoming;
-				$l->zeugnis = ($row->zeugnis=='t'?true:false);
-				$l->projektarbeit = ($row->projektarbeit=='t'?true:false);
+				$l->zeugnis = $this->db_parse_bool($row->zeugnis);
+				$l->projektarbeit = $this->db_parse_bool($row->projektarbeit);
 				$l->koordinator = $row->koordinator;
 				$l->bezeichnung_english = $row->bezeichnung_english;
 				$l->orgform_kurzbz = $row->orgform_kurzbz;
@@ -903,7 +897,7 @@ class lehrveranstaltung extends basis_db
 		if(count($ids)==0)
 			return true;
 		
-		$ids = "'".implode("','",$ids)."'";
+		$ids = $this->db_implode4SQL($ids);
 						
 		$qry = 'SELECT * FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id in('.$ids.')';
 		$qry .=" ORDER BY bezeichnung";
@@ -927,9 +921,9 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->ects=$row->ects;
 			$lv_obj->semesterstunden=$row->semesterstunden;
 			$lv_obj->anmerkung=$row->anmerkung;
-			$lv_obj->lehre=($row->lehre=='t'?true:false);
+			$lv_obj->lehre=$this->db_parse_bool($row->lehre);
 			$lv_obj->lehreverzeichnis=$row->lehreverzeichnis;
-			$lv_obj->aktiv=($row->aktiv=='t'?true:false);
+			$lv_obj->aktiv=$this->db_parse_bool($row->aktiv);
 			$lv_obj->ext_id=$row->ext_id;
 			$lv_obj->insertamum=$row->insertamum;
 			$lv_obj->insertvon=$row->insertvon;
@@ -942,8 +936,8 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->sprache=$row->sprache;
 			$lv_obj->sort=$row->sort;
 			$lv_obj->incoming=$row->incoming;
-			$lv_obj->zeugnis=($row->zeugnis=='t'?true:false);
-			$lv_obj->projektarbeit=($row->projektarbeit=='t'?true:false);
+			$lv_obj->zeugnis=$this->db_parse_bool($row->zeugnis);
+			$lv_obj->projektarbeit=$this->db_parse_bool($row->projektarbeit);
 			$lv_obj->koordinator=$row->koordinator;
 			$lv_obj->bezeichnung_english = $row->bezeichnung_english;
 			$lv_obj->orgform_kurzbz = $row->orgform_kurzbz;
@@ -958,5 +952,212 @@ class lehrveranstaltung extends basis_db
 
 		return true;
 	}
+
+	/**
+	 * Laedt alle Lehrveranstaltungen eines Studienplans
+	 * 
+	 * @param $studienplan_id ID des Studienplans
+	 * @param $semeser Semester optional
+	 * @return boolean true wenn ok, false im Fehlerfall
+	 */
+	public function loadLehrveranstaltungStudienplan($studienplan_id, $semester=null)
+	{
+		if(!is_numeric($studienplan_id) || $studienplan_id==='')
+		{
+			$this->errormsg='StudienplanID ist ungueltig';
+			return false;
+		}
+
+		$qry = "SELECT 
+					tbl_lehrveranstaltung.*,
+					tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id,
+					tbl_studienplan_lehrveranstaltung.semester as stpllv_semester,
+					tbl_studienplan_lehrveranstaltung.pflicht as stpllv_pflicht,
+					tbl_studienplan_lehrveranstaltung.koordinator as stpllv_koordinator,
+					tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent
+				FROM 
+					lehre.tbl_lehrveranstaltung
+					JOIN lehre.tbl_studienplan_lehrveranstaltung USING(lehrveranstaltung_id)
+				WHERE
+					tbl_studienplan_lehrveranstaltung.studienplan_id=".$this->db_add_param($studienplan_id, FHC_INTEGER);
+		if(!is_null($semester))
+		{
+			$qry.=" AND tbl_studienplan_lehrveranstaltung.semester=".$this->db_add_param($semester, FHC_INTEGER);
+		}
+		$qry.=" ORDER BY sort";
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new lehrveranstaltung();
+				
+				$obj->lehrveranstaltung_id=$row->lehrveranstaltung_id;
+				$obj->studiengang_kz=$row->studiengang_kz;
+				$obj->bezeichnung=$row->bezeichnung;
+				$obj->kurzbz=$row->kurzbz;
+				$obj->lehrform_kurzbz=$row->lehrform_kurzbz;
+				$obj->semester=$row->semester;
+				$obj->ects=$row->ects;
+				$obj->semesterstunden=$row->semesterstunden;
+				$obj->anmerkung=$row->anmerkung;
+				$obj->lehre=$this->db_parse_bool($row->lehre);
+				$obj->lehreverzeichnis=$row->lehreverzeichnis;
+				$obj->aktiv=$this->db_parse_bool($row->aktiv);
+				$obj->ext_id=$row->ext_id;
+				$obj->insertamum=$row->insertamum;
+				$obj->insertvon=$row->insertvon;
+				$obj->planfaktor=$row->planfaktor;
+				$obj->planlektoren=$row->planlektoren;
+				$obj->planpersonalkosten=$row->planpersonalkosten;
+				$obj->plankostenprolektor=$row->plankostenprolektor;
+				$obj->updateamum=$row->updateamum;
+				$obj->updatevon=$row->updatevon;
+				$obj->sprache=$row->sprache;
+				$obj->sort=$row->sort;
+				$obj->incoming=$row->incoming;
+				$obj->zeugnis=$this->db_parse_bool($row->zeugnis);
+				$obj->projektarbeit=$this->db_parse_bool($row->projektarbeit);
+				$obj->koordinator=$row->koordinator;
+				$obj->bezeichnung_english = $row->bezeichnung_english;
+				$obj->orgform_kurzbz = $row->orgform_kurzbz;
+
+				$obj->bezeichnung_arr['German']=$row->bezeichnung;
+				$obj->bezeichnung_arr['English']=$row->bezeichnung_english;
+				if($obj->bezeichnung_arr['English']=='')
+					$obj->bezeichnung_arr['English']=$obj->bezeichnung_arr['German'];
+			
+				$obj->stpllv_semester = $row->stpllv_semester;
+				$obj->stpllv_pflicht = $this->db_parse_bool($row->stpllv_pflicht);
+				$obj->stpllv_koordinator = $row->stpllv_koordinator;
+				$obj->studienplan_lehrveranstaltung_id = $row->studienplan_lehrveranstaltung_id;
+				$obj->studienplan_lehrveranstaltung_id_parent = $row->studienplan_lehrveranstaltung_id_parent;
+				$obj->new=false;
+
+				$this->lehrveranstaltungen[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Liefert die Lehrveranstaltungen als verschachtelten Tree
+	 */
+	public function getLehrveranstaltungTree()
+	{
+		$tree=array();
+		foreach($this->lehrveranstaltungen as $row)
+		{
+			if($row->studienplan_lehrveranstaltung_id_parent=='')
+			{
+				$tree[$row->studienplan_lehrveranstaltung_id]=$row;
+				$tree[$row->studienplan_lehrveranstaltung_id]->childs = $this->getLehrveranstaltungTreeChilds($row->studienplan_lehrveranstaltung_id);
+			}
+		}
+		return $tree;
+	}
+
+	/**
+	 * Generiert die Subtrees des Lehrveranstaltungstrees
+	 */
+	protected function getLehrveranstaltungTreeChilds($studienplan_lehrveranstaltung_id)
+	{
+		$childs = array();
+		foreach($this->lehrveranstaltungen as $row)
+		{
+			if($row->studienplan_lehrveranstaltung_id_parent===$studienplan_lehrveranstaltung_id)
+			{
+				$childs[$row->studienplan_lehrveranstaltung_id]=$row;
+				$childs[$row->studienplan_lehrveranstaltung_id]->childs = $this->getLehrveranstaltungTreeChilds($row->studienplan_lehrveranstaltung_id);
+			}
+		}
+		return $childs;
+	}
+
+	/**
+	 * Speichert die Zuordnung einer Lehrveranstaltung zu einem Studienplan
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function saveStudienplanLehrveranstaltung()
+	{
+
+		if($this->new)
+		{
+			//Neuen Datensatz einfuegen
+			$qry='BEGIN;INSERT INTO lehre.tbl_studienplan_lehrveranstaltung (studienplan_id, lehrveranstaltung_id,
+				semester,studienplan_lehrveranstaltung_id_parent,pflicht, koordinator,
+				insertamum, insertvon) VALUES ('.
+			      $this->db_add_param($this->studienplan_id, FHC_INTEGER).', '.
+			      $this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER).', '.
+			      $this->db_add_param($this->stpllv_semester, FHC_INTEGER).', '.
+			      $this->db_add_param($this->studienplan_lehrveranstaltung_id_parent, FHC_INTEGER).', '.
+			      $this->db_add_param($this->stpllv_pflicht, FHC_BOOLEAN).', '.
+			      $this->db_add_param($this->stpllv_koordinator).', '.
+			      'now(), '.
+			      $this->db_add_param($this->insertvon).');';
+		}
+		else
+		{
+			//Pruefen ob studienplan_id eine gueltige Zahl ist
+			if(!is_numeric($this->studienplan_lehrveranstaltung_id))
+			{
+				$this->errormsg = 'studienplan_lehrveranstaltung_id muss eine gueltige Zahl sein';
+				return false;
+			}
+			$qry='UPDATE lehre.tbl_studienplan_lehrveranstaltung SET'.
+				' studienplan_id='.$this->db_add_param($this->studienplan_id, FHC_INTEGER).', '.
+				' lehrveranstaltung_id='.$this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER).', '.
+				' semester='.$this->db_add_param($this->stpllv_semester, FHC_INTEGER).', '.
+				' studienplan_lehrveranstaltung_id_parent='.$this->db_add_param($this->studienplan_lehrveranstaltung_id_parent, FHC_INTEGER).', '.
+		      	' pflicht='.$this->db_add_param($this->stpllv_pflicht, FHC_BOOLEAN).', '.
+		      	' sprache='.$this->db_add_param($this->sprache).', '.
+		      	' koordinator='.$this->db_add_param($this->stpllv_koordinator).', '.
+		      	' updateamum= now(), '.
+		      	' updatevon='.$this->db_add_param($this->updatevon).' '.
+		      	' WHERE studienplan_lehrveranstaltung_id='.$this->db_add_param($this->studienplan_lehrveranstaltung_id, FHC_INTEGER, false).';';
+		}
+        
+		if($this->db_query($qry))
+		{
+			if($this->new)
+			{
+				//naechste ID aus der Sequence holen
+				$qry="SELECT currval('lehre.seq_studienplan_studienplan_lehrveranstaltung_id') as id;";
+				if($this->db_query($qry))
+				{
+					if($row = $this->db_fetch_object())
+					{
+						$this->studienplan_lehrveranstaltung_id = $row->id;
+						$this->db_query('COMMIT');
+					}
+					else
+					{
+						$this->db_query('ROLLBACK');
+						$this->errormsg = "Fehler beim Auslesen der Sequence";
+						return false;
+					}
+				}
+				else
+				{
+					$this->db_query('ROLLBACK');
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
+					return false;
+				}
+			}
+
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
+			return false;
+		}
+		return $this->studienplan_lehrveranstaltung_id;
+	}
+
 }
 ?>
