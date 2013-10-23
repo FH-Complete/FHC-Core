@@ -89,7 +89,7 @@ class lehrveranstaltung extends basis_db
 			$this->errormsg = 'Lehrveranstaltung_id muss eine gueltige Zahl sein';
 			return false;
 		}
-		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
+		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
 
 		if(!$this->db_query($qry))
 		{
