@@ -28,18 +28,27 @@ require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/student.class.php');
 require_once('../../include/gruppe.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 $user=get_uid();
 
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+if(!$rechte->isBerechtigt('lehre/gruppe:begrenzt',null,'s'))
+	die('Sie haben keine Berechtigung für diese Seite');
+	
 $kurzbz=(isset($_GET['kurzbz'])?$_GET['kurzbz']:(isset($_POST['kurzbz'])?$_POST['kurzbz']:''));
 if(empty($kurzbz))
 	die('Gruppe wurde nicht &uuml;bergeben <a href="javascript:history.back()">Zur&uuml;ck</a>');
 		
 if (isset($_POST['new']))
 {
+	if(!$rechte->isBerechtigt('lehre/gruppe',null,'sui'))
+		die('Sie haben keine Berechtigung für diese Seite');
+	
 	$e=new benutzergruppe();
 	$e->new=true;
 	$e->gruppe_kurzbz=$kurzbz;
@@ -53,6 +62,9 @@ if (isset($_POST['new']))
 }
 else if (isset($_GET['type']) && $_GET['type']=='delete')
 {
+	if(!$rechte->isBerechtigt('lehre/gruppe',null,'suid'))
+		die('Sie haben keine Berechtigung für diese Seite');
+	
 	$e=new benutzergruppe();
 	$e->delete($_GET['uid'], $kurzbz);
 }
@@ -62,13 +74,17 @@ if(!$gruppe->load($kurzbz))
 		die('Gruppe wurde nicht gefunden:'+$kurzbz);
 
 ?>
+<!DOCTYPE html>
 <html>
 <head>
 <title>Gruppen Details</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+<link rel="stylesheet" href="../../skin/jquery.css" type="text/css">
+<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css">
+<link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
+<script type="text/javascript" src="../../include/js/jquery1.9.min.js" ></script>
 </head>
 <body>
 <H2>Gruppe <?php echo $kurzbz ?></H2>
@@ -77,48 +93,67 @@ if(!$gruppe->load($kurzbz))
 echo "<a href='einheit_menu.php?studiengang_kz=$gruppe->studiengang_kz'>Zurück zur &Uuml;bersicht</a><br><br>";
 
 if(!$gruppe->generiert)
-{
+{	
 	echo '
 	<FORM name="newpers" method="post" action="einheit_det.php">
-	  <INPUT type="hidden" name="type" value="new">
-
-  	<SELECT name="uid">';
-
-	$qry = "SELECT * FROM campus.vw_benutzer ORDER BY nachname, vorname";
-
-	$result = $db->db_query($qry);
-
-	for ($i=0;$row = $db->db_fetch_object($result);$i++)
-	{
-		echo "<option value=\"".$row->uid."\">".$row->nachname." ".$row->vorname." - ".$row->uid."</option>";
-	}
-
-	echo '
-	  </SELECT>
-	  <INPUT type="hidden" name="kurzbz" value="'.$kurzbz.'">
+	  Name: <INPUT type="hidden" name="type" value="new">
+		<input type="text" name="uid" id="uid"/>
+		<script type="text/javascript">
+		$(document).ready(function() 
+		{
+			$("#uid").autocomplete({
+				source: "einheit_autocomplete.php?work=searchUser",
+				minLength:3,
+				response: function(event, ui)
+				{
+					//Value und Label fuer die Anzeige setzen
+					for(i in ui.content)
+					{
+						ui.content[i].value=ui.content[i].uid;
+						ui.content[i].label=ui.content[i].uid+" - "+ui.content[i].vorname+" "+ui.content[i].nachname;
+					}
+				},
+				select: function(event, ui)
+				{
+					ui.item.value=ui.item.uid;
+				}
+			});
+		});
+		</script>
+		 <INPUT type="hidden" name="kurzbz" value="'.$kurzbz.'">
 	  <INPUT type="submit" name="new" value="Hinzuf&uuml;gen">
 	</FORM>
-	<HR>';
+	<HR>
+		';
 }
-	$qry = "SELECT * FROM public.tbl_benutzergruppe JOIN public.tbl_benutzer USING(uid) JOIN public.tbl_person USING(person_id) WHERE".
-	       " tbl_benutzergruppe.gruppe_kurzbz='".addslashes($kurzbz)."'".
-	       " ORDER BY nachname, vorname";
 
-	if($result = $db->db_query($qry))
+	$gruppe = new gruppe();
+	
+	if($gruppe->loadUser($kurzbz))
 	{
-		$num_rows=$db->db_num_rows($result);
+		$num_rows=count($gruppe->result);
 		echo "Anzahl: $num_rows";
-		echo "<table class='liste table-autosort:2 table-stripeclass:alternate table-autostripe'>
+		echo '<script>
+		$(document).ready(function() 
+		{
+			$("#usertabelle").tablesorter(
+			{
+				sortList: [[2,0]],
+				widgets: ["zebra"]
+			}); 
+		});
+		</script>';
+		echo '<table id="usertabelle" class="tablesorter">
 				<thead>
-				<tr class='liste'>
+				<tr>
 					<th>UID</th>
 					<th>Vornamen</th>
 					<th>Nachname</th>
 				</tr>
 				</thead>
-				<tbody>";
+				<tbody>';
 
-		for ($j=0; $row = $db->db_fetch_object($result);$j++)
+		foreach($gruppe->result as $row)
 		{
 			echo "<tr>";
 		    echo "<td>".$row->uid."</td>";

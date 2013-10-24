@@ -1,0 +1,3 @@
+Symlink anlegen um die offene LVPlan URL zu ermoeglichen:
+
+ln -s ../cis/private/lvplan/stpl_kalender.php google.php

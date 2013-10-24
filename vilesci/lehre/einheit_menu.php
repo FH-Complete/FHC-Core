@@ -37,7 +37,7 @@ if (isset($_GET['studiengang_kz']))
 else if(isset($_POST['studiengang_kz']))
 	$studiengang_kz = $_POST['studiengang_kz'];	
 else
-	$studiengang_kz='0';
+	$studiengang_kz='';
 	
 if (isset($_GET['sem']))
 
@@ -55,6 +55,9 @@ $uid = get_uid();
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
+if(!$rechte->isBerechtigt('lehre/gruppe'))
+	die('Sie haben keine Berechtigung fuer diese Seite');
+	
 ?>
 <html>
 	<head>
@@ -116,8 +119,7 @@ function printDropDown()
 	
 	foreach($stud->result as $row)
 	{
-		if($rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') || 
-		   $rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid'))
+		if($rechte->isBerechtigt('lehre/gruppe', $row->oe_kurzbz, 'suid'))
 		{
 			if($studiengang_kz=='')
 				$studiengang_kz=$row->studiengang_kz;
@@ -126,7 +128,7 @@ function printDropDown()
 		}
 	}
 	
-	echo '</SELECT>';
+	echo '</SELECT><input type="submit" value="Anzeigen" />';
 	echo '</form>';
 }
 function doSave()
@@ -158,6 +160,7 @@ function doSave()
 	$e->generiert=isset($_POST['generiert']);
 	$e->aktiv=isset($_POST['aktiv']);
 	$e->gesperrt = isset($_POST['gesperrt']);
+	$e->zutrittssystem = isset($_POST['zutrittssystem']);
 	$e->sort=$_POST['sort'];
 	$e->content_visible=isset($_POST['content_visible']);
 	
@@ -222,6 +225,7 @@ function doEdit($kurzbz,$new=false)
 			<tr><td><i>Aktiv</i></td><td><input type='checkbox' name='aktiv' <?php echo ($e->aktiv?'checked':'');?>>
 			<tr><td><i>ContentVisible</i></td><td><input type='checkbox' name='content_visible' <?php echo ($e->content_visible?'checked':'');?>>
 			<tr><td><i>Gesperrt</i></td><td><input type='checkbox' name='gesperrt' <?php echo ($e->gesperrt?'checked':'');?>>
+			<tr><td><i>Zutrittssystem</i></td><td><input type='checkbox' name='zutrittssystem' <?php echo ($e->zutrittssystem?'checked':'');?>>
 			<tr>
 				<td><i>Sort</i></td><td><input type='text' name='sort' maxlength="4" value="<?php echo $e->sort;?>">
 				</td>

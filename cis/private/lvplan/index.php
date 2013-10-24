@@ -190,6 +190,7 @@ $(document).ready(function()
 <tr>
 <td class="cmscontent" rowspan="3" valign="top">
 
+	<table><tr><td valign="top"  width="30%">
 	<?php
 		if (isset($uid))
 			echo '<h2>'.$titelpre.' '.$vornamen." ".$nachname.' '.$titelpost.'</h2>';
@@ -197,7 +198,23 @@ $(document).ready(function()
 			echo $p->t('lvplan/nichtVorhanden').' '.$p->t('lvplan/bitteWendenSieSichAn').'<A href="mailto:'.MAIL_ADMIN.'">Admin</A>!';
 	?>
   	<a class="Item" href="stpl_week.php?pers_uid=<?php echo $uid; ?>"><?php echo $p->t("lvplan/persoenlicherLvPlan");?></a>
-	<BR><BR>
+	</td><td>&nbsp;</td><td valign="top">	
+	<?php
+	echo' 
+	<h2>'.$p->t('lvplan/persoenlichenAbonnieren').'</h2>
+	<div>	
+	<a class="Item" href="../../../cms/content.php?content_id='.$p->t('dms_link/lvplanSyncFAQ').'" target="_blank">'.$p->t('lvplan/anleitungLVPlanSync').'</a>
+	<br>';
+
+	echo '<ul>';
+	$caldavurl = APP_ROOT.'webdav/lvplan.php/calendars/'.$uid.'/LVPlan-'.$uid;
+  	echo '<li><a class="Item" href="'.$caldavurl.'">'.$p->t('lvplan/caldavURL').'</a></li>';
+  	echo '<li><a class="Item" href="'.APP_ROOT.'webdav/lvplan.php/principals/'.$uid.'">'.$p->t('lvplan/caldavURLMac').'</a></li>';
+  	echo '<li><a class="Item" href="'.APP_ROOT.'webdav/google.php?cal='.encryptData($uid,LVPLAN_CYPHER_KEY).'">'.$p->t('lvplan/googleURL').'</a></li>';
+  	echo '</ul>';
+  	echo '	</div>';
+  	?>
+  	</td></tr></table>
 	<FORM name="Auswahl" action="stpl_week.php">
 		<table class="tabcontent">
 		<tr>
