@@ -20,6 +20,7 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  *          Manfred Kindl <manfred.kindl@technikum-wien.at>
+ *          Alexander Nimmervoll <alexander.nimmervoll@technikum-wien.at>
  */
  
 require_once('../../../config/cis.config.inc.php');
