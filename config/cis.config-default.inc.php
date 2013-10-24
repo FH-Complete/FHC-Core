@@ -114,6 +114,9 @@ define('TAGE_PRO_WOCHE','7');
 // Kalenderkategorie beim Export des LVPlans
 define('LVPLAN_KATEGORIE', 'StundenplanTW');
 
+// Key zum Verschluesseln des LV-Plan Google Links
+define('LVPLAN_CYPHER_KEY',pack('H*', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'));
+
 // Default Stylesheet
 define('DEFAULT_STYLE','tw');
 // Layout Wechsel im CIS moeglich?

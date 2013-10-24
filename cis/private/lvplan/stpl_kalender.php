@@ -29,12 +29,12 @@
  * Update: 			10.9.2005 von Christian Paminger
  *****************************************************************************/
 
-require_once('../../../config/cis.config.inc.php');
-require_once('../../../include/functions.inc.php');
-require_once('../../../include/wochenplan.class.php');
-require_once('../../../include/datum.class.php');
-require_once('../../../include/studiensemester.class.php');
-require_once('../../../include/phrasen.class.php'); 
+require_once(dirname(__FILE__).'/../../../config/cis.config.inc.php');
+require_once(dirname(__FILE__).'/../../../include/functions.inc.php');
+require_once(dirname(__FILE__).'/../../../include/wochenplan.class.php');
+require_once(dirname(__FILE__).'/../../../include/datum.class.php');
+require_once(dirname(__FILE__).'/../../../include/studiensemester.class.php');
+require_once(dirname(__FILE__).'/../../../include/phrasen.class.php'); 
 
 if(!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
@@ -74,8 +74,33 @@ $version=(isset($_GET['version'])?$_GET['version']:2);
 $target=(isset($_GET['target'])?$_GET['target']:null);
 
 $stsem=(isset($_GET['stsem'])?$_GET['stsem']:'');
-// UID bestimmen
-$uid = get_uid();
+
+
+if(isset($_GET["cal"]))
+{
+	// Nicht authentifizierter Zugriff per Codierter UID
+	// fuer Abonnierung im Google ueber /webdav/google.php
+	$cal = $_GET["cal"];
+	$uid=decryptData($cal,LVPLAN_CYPHER_KEY);
+	//Wenn der Key manuell geaendert wird koennen Fehlerhaft kodierte Zeichen 
+	//entstehen und fuehren zu DB fehlern deshalb werden falsch kodierte uids hier aussortiert
+	if(!check_utf8($uid))
+		die('Fehlerhafter Parameter');
+	
+	//Pruefen ob dieser Benutzer auch wirklich existiert
+	$benutzer = new benutzer();
+	if(!$benutzer->load($uid))
+		die('Ungueltiger Benutzername');
+		
+	//Output-Format wird auf ical geaendert
+	$target='ical';
+	$format='ical';
+}
+else
+{
+	// UID bestimmen
+	$uid = get_uid();
+}
 
 // Beginn Ende setzen
 if(!isset($begin))

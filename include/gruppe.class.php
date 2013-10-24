@@ -45,7 +45,8 @@ class gruppe extends basis_db
 	public $insertamum;				// timestamp
 	public $insertvon;				// varchar(16)
 	public $orgform_kurzbz;
-	public $gesperrt=false;			// boolean
+	public $gesperrt=false;		// boolean
+	public $zutrittssystem=false;	// boolean
 
 	/**
 	 * Konstruktor - Laedt optional eine Gruppe
@@ -138,6 +139,7 @@ class gruppe extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->orgform_kurzbz = $row->orgform_kurzbz;
 				$this->gesperrt = $this->db_parse_bool($row->gesperrt);
+				$this->zutrittssystem = $this->db_parse_bool($row->zutrittssystem);
 				return true;
 			}
 			else
@@ -186,6 +188,7 @@ class gruppe extends basis_db
 				$grp_obj->insertvon = $row->insertvon;
 				$grp_obj->orgform_kurzbz = $row->orgform_kurzbz;
 				$grp_obj->gesperrt = $this->db_parse_bool($row->gesperrt);
+				$grp_obj->zutrittssystem = $this->db_parse_bool($row->zutrittssystem);
 
 				$this->result[] = $grp_obj;
 			}
@@ -273,6 +276,7 @@ class gruppe extends basis_db
 				$grp_obj->insertvon = $row->insertvon;
 				$grp_obj->orgform_kurzbz = $row->orgform_kurzbz;
 				$grp_obj->gesperrt = $this->db_parse_bool($row->gesperrt);
+				$grp_obj->zutrittsssystem = $this->db_parse_bool($row->zutrittssystem);
 
 				$this->result[] = $grp_obj;
 			}
@@ -380,7 +384,7 @@ class gruppe extends basis_db
 			
 			$qry = 'INSERT INTO public.tbl_gruppe (gruppe_kurzbz, studiengang_kz, bezeichnung, semester, sort,
 			                                mailgrp, beschreibung, sichtbar, generiert, aktiv, lehre, content_visible,
-			                                updateamum, updatevon, insertamum, insertvon, orgform_kurzbz, gesperrt)
+			                                updateamum, updatevon, insertamum, insertvon, orgform_kurzbz, gesperrt,zutrittssystem)
 			        VALUES('.$this->db_add_param($kurzbz).','.
 					$this->db_add_param($this->studiengang_kz).','.
 					$this->db_add_param($this->bezeichnung).','.
@@ -398,7 +402,8 @@ class gruppe extends basis_db
 					$this->db_add_param($this->insertamum).','.
 					$this->db_add_param($this->insertvon).','.
 					$this->db_add_param($this->orgform_kurzbz).','.
-					$this->db_add_param($this->gesperrt, FHC_BOOLEAN).');';
+					$this->db_add_param($this->gesperrt, FHC_BOOLEAN).','.
+					$this->db_add_param($this->zutrittssystem, FHC_BOOLEAN).');';
 		}
 		else
 		{
@@ -417,7 +422,8 @@ class gruppe extends basis_db
 			       ' updateamum='.$this->db_add_param($this->updateamum).','.
 			       ' updatevon='.$this->db_add_param($this->updatevon).','.
 			       ' orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).', '.
-				   ' gesperrt='.$this->db_add_param($this->gesperrt, FHC_BOOLEAN).' ';
+				   ' gesperrt='.$this->db_add_param($this->gesperrt, FHC_BOOLEAN).', '.
+				   ' zutrittssystem='.$this->db_add_param($this->zutrittssystem, FHC_BOOLEAN).' ';
 					if($this->gruppe_kurbzNeu != null) {
 						$qry.=', gruppe_kurzbz='.$this->db_add_param($this->gruppe_kurbzNeu).' ';
 					}
@@ -432,6 +438,97 @@ class gruppe extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim Speichern der Gruppe';
+			return false;
+		}
+	}
+	
+	/**
+	 * Laedt die User dieser Gruppe
+	 * 
+	 * @param $gruppe_kurzbz
+	 */
+	public function loadUser($gruppe_kurzbz)
+	{
+		$qry = "SELECT 
+					tbl_benutzer.uid, tbl_person.vorname, tbl_person.nachname
+				FROM 
+					public.tbl_benutzergruppe 
+					JOIN public.tbl_benutzer USING(uid) 
+					JOIN public.tbl_person USING(person_id) 
+				WHERE
+					tbl_benutzergruppe.gruppe_kurzbz=".$this->db_add_param($gruppe_kurzbz)."
+	       		ORDER BY nachname, vorname";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new gruppe();
+				
+				$obj->uid = $row->uid;
+				$obj->vorname = $row->vorname;
+				$obj->nachname = $row->nachname;
+				
+				$this->result[]=$obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}		
+	}
+	
+	/**
+	 * Laedt alle Zutrittsgruppen in denen sich der Benutzer befindet
+	 *
+	 * @param $user UID des Benutzers
+	 */
+	public function loadZutrittsgruppen($user)
+	{
+		$qry = "SELECT 
+					* 
+				FROM 
+					public.tbl_benutzergruppe 
+					JOIN public.tbl_gruppe USING(gruppe_kurzbz)
+				WHERE
+					tbl_gruppe.zutrittssystem=true
+					AND tbl_benutzergruppe.uid=".$this->db_add_param($user);
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$grp_obj = new gruppe();
+				
+				$grp_obj->gruppe_kurzbz = $row->gruppe_kurzbz;
+				$grp_obj->studiengang_kz = $row->studiengang_kz;
+				$grp_obj->bezeichnung = $row->bezeichnung;
+				$grp_obj->semester = $row->semester;
+				$grp_obj->sort = $row->sort;
+				$grp_obj->mailgrp = $this->db_parse_bool($row->mailgrp);
+				$grp_obj->lehre = $this->db_parse_bool($row->lehre);
+				$grp_obj->beschreibung = $row->beschreibung;
+				$grp_obj->sichtbar = $this->db_parse_bool($row->sichtbar);
+				$grp_obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$grp_obj->content_visible = $this->db_parse_bool($row->content_visible);
+				$grp_obj->generiert = $this->db_parse_bool($row->generiert);
+				$grp_obj->updateamum = $row->updateamum;
+				$grp_obj->updatevon = $row->updatevon;
+				$grp_obj->insertamum = $row->insertamum;
+				$grp_obj->insertvon = $row->insertvon;
+				$grp_obj->orgform_kurzbz = $row->orgform_kurzbz;
+				$grp_obj->gesperrt = $this->db_parse_bool($row->gesperrt);
+				$grp_obj->zutrittssystem = $this->db_parse_bool($row->zutrittssystem);
+
+				$this->result[] = $grp_obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
