@@ -778,7 +778,7 @@ class mitarbeiter extends benutzer
 	 * Nachname, Vorname, UID $filter enthaelt
 	 * @param $filter
 	 */
-	public function search($filter)
+	public function search($filter, $limit=null)
 	{
 		$qry = "SELECT vorname, nachname, titelpre, titelpost, kurzbz, vornamen, uid
 			FROM campus.vw_mitarbeiter 
@@ -789,6 +789,10 @@ class mitarbeiter extends benutzer
 				OR lower(vorname || ' ' || nachname) like lower('%".$this->db_escape($filter)."%')
 				OR lower(nachname || ' ' || vorname) like lower('%".$this->db_escape($filter)."%')
 			ORDER BY nachname, vorname";
+
+		if(!is_null($limit) && is_numeric($limit))
+			$qry.=" LIMIT ".$limit;
+
 		//echo $qry;
 		if($this->db_query($qry))
 		{
