@@ -27,5 +27,6 @@ $this->phrasen['lvaliste/keineDatensaetze']='Für dieses Studiensemester sind ke
 $this->phrasen['lvaliste/lehrveranstaltungen']='Lehrveranstaltungen';
 $this->phrasen['lvaliste/betreuungen']='Betreuungen';
 $this->phrasen['lvaliste/koordination']='Koordination';
+$this->phrasen['lvaliste/gesamtnote']='Noten eintragen';
 
 ?>

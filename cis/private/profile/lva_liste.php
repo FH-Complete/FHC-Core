@@ -81,7 +81,8 @@ require_once('../../../include/studiensemester.class.php');
 			tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung,
 			tbl_lehreinheit.anmerkung as le_anmerkung,
 			tbl_lehreinheit.lehrform_kurzbz as le_lehrform_kurzbz,
-			(SELECT kurzbz FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid) as lektor
+			(SELECT kurzbz FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid) as lektor,
+			tbl_lehrveranstaltung.lehrveranstaltung_id
 		FROM 
 		lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) 
 		JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
@@ -150,6 +151,7 @@ require_once('../../../include/studiensemester.class.php');
 		<table class="tablesorter" id="t1">
 			<thead>
 			<tr>
+				<th>'.$p->t('lvaliste/gesamtnote').'</th>
 				<th>'.$p->t('lvaliste/lehrfach').'</th>
 				<th>'.$p->t('lvaliste/lehrform').'</th>
 				<th>'.$p->t('lvaliste/lvBezeichnung').'</th>				
@@ -164,6 +166,7 @@ require_once('../../../include/studiensemester.class.php');
 				<th>'.$p->t('lvaliste/stunden').'</th>
 				<th>'.$p->t('lvaliste/kalenderwoche').'</th>';
 				//<th>'.$p->t('lvaliste/anmerkung').'</th> Lektoren sollen die Anmerkung dzt. nicht sehen, da nur für intern gedacht
+
 			echo '</tr>
 			</thead><tbody>';
 		$stg_obj = new studiengang();
@@ -174,6 +177,7 @@ require_once('../../../include/studiensemester.class.php');
 			$row=$db->db_fetch_object($result);
 
 			echo '<tr>';
+			echo '<td nowrap><a href="../lehre/benotungstool/lvgesamtnoteverwalten.php?lvid='.$row->lehrveranstaltung_id.'&stsem='.$stdsem.'">'.$p->t('lvaliste/gesamtnote').'</a></td>';
 			echo '<td>'.$row->lehrfach.'</td>';
 			echo '<td>'.$row->le_lehrform_kurzbz.'</td>';	
 			if ($row->lehrfach_bez!=$row->lv_bezeichnung)			
@@ -204,6 +208,7 @@ require_once('../../../include/studiensemester.class.php');
 			echo '<td>'.$row->semesterstunden.'</td>';
 			echo '<td>'.$row->start_kw.'</td>';
 			//echo '<td>'.$row->le_anmerkung.'</td>'; Lektoren sollen die Anmerkung dzt. nicht sehen, da nur für intern gedacht
+
 			echo '</tr>';
 		}
 		echo '</tbody>';
