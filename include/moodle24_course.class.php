@@ -26,6 +26,8 @@
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/moodle.class.php');
+require_once(dirname(__FILE__).'/datum.class.php');
+require_once(dirname(__FILE__).'/studiensemester.class.php');
 
 class moodle24_course extends basis_db
 {
@@ -260,6 +262,11 @@ class moodle24_course extends basis_db
 		$data->shortname=$this->mdl_shortname;
 		$data->categoryid=$id_sem;
 		$data->format='topics';
+
+		$stsem = new studiensemester();
+		$stsem->load($this->studiensemester_kurzbz);
+		$datum_obj = new datum();
+		$data->startdate=$datum_obj->mktime_fromdate($stsem->start);
 
 		$response = $client->core_course_create_courses(array($data));
 		if(isset($response[0]))
@@ -569,27 +576,33 @@ class moodle24_course extends basis_db
 
 		while($row_moodle = $this->db_fetch_object($result_moodle))
 		{
-			$client = new SoapClient($this->serverurl); 
-			$response = $client->fhcomplete_get_course_grades($row_moodle->mdl_course_id);
-
-			if (count($response)>0) 	
+			try
 			{
+				$client = new SoapClient($this->serverurl); 
+				$response = $client->fhcomplete_get_course_grades($row_moodle->mdl_course_id);
 
-				foreach($response as $row)
+				if (count($response)>0) 	
 				{
-					if($row['note']!='-')
+
+					foreach($response as $row)
 					{
-						$userobj = new stdClass();
-						$userobj->mdl_course_id = $row_moodle->mdl_course_id;
-						$userobj->vorname = $row['vorname'];
-						$userobj->nachname = $row['nachname'];
-						$userobj->idnummer = $row['idnummer'];
-						$userobj->uid = $row['username'];
-						$userobj->note = $row['note'];
-						$this->result[]=$userobj;
-					}
-				}	
+						if($row['note']!='-')
+						{
+							$userobj = new stdClass();
+							$userobj->mdl_course_id = $row_moodle->mdl_course_id;
+							$userobj->vorname = $row['vorname'];
+							$userobj->nachname = $row['nachname'];
+							$userobj->idnummer = $row['idnummer'];
+							$userobj->uid = $row['username'];
+							$userobj->note = $row['note'];
+							$this->result[]=$userobj;
+						}
+					}	
+				}
 			}
+			catch(SoapFault $e)
+			{}
+
 		}
 		return true;
 	}

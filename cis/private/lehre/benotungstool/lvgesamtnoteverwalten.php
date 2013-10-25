@@ -941,7 +941,7 @@ echo '<table>';
 						$moodle_course->errormsg=trim($moodle_course->errormsg);
 						if(!$errorshown && !empty($moodle_course->errormsg) )
 						{
-							echo '<br><b>'.$moodle_course->errormsg.'</b><br>';
+							//echo '<br><b>'.$moodle_course->errormsg.'</b><br>';
 							$errorshown=true;
 						}
 					}

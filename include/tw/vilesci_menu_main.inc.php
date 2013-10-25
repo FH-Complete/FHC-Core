@@ -77,12 +77,13 @@ $menu=array
 		
 		'Moodle'=>array
 		(
-			'name'=>'Moodle', 'permissions'=>array('admin','lv-plan','support'),
+			'name'=>'Moodle', 'permissions'=>array('admin','lv-plan','support','basis/moodle'),
 			'Kursverwaltung'=>array('name'=>'Kurs entfernen', 'link'=>'moodle/kurs_verwaltung.php', 'target'=>'main'),
 			'Account'=>array('name'=>'Account', 'link'=>'moodle/account_verwaltung.php', 'target'=>'main'),
 			'Zuteilung Verwalten'=>array('name'=>'Zuteilung Verwalten', 'link'=>'moodle/zuteilung_verwaltung.php', 'target'=>'main'),
 			'Account24'=>array('name'=>'Account Moodle 2.4', 'link'=>'moodle/account_verwaltung24.php', 'target'=>'main'),
             'Kursverwaltung24'=>array('name'=>'Kurs entfernen 2.4', 'link'=>'moodle/kurs_verwaltung24.php', 'target'=>'main'),
+            'Rollenzuteilung24'=>array('name'=>'Rollenzuteilung 2.4', 'link'=>'moodle/rollenzuteilung24.php', 'target'=>'main'),
 		),
 				
 		

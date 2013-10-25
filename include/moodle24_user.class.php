@@ -615,4 +615,36 @@ class moodle24_user extends basis_db
 		
 		return true;
 	}
+
+	/**
+	 * Teilt einen User zu mehreren Moodle Kursen gleichzeitig zu
+	 * @param $uid UID des Users
+	 * @param $mdl_course_id_array Array mit MoodleKursIDs
+	 * @param $role_id Moodle Rolle
+	 */
+	public function MassEnroll($uid, $mdl_course_id_array, $role_id)
+	{
+		//MoodleID des Users holen
+		if(!$this->loaduser($uid))
+		{
+			$this->errormsg = "Fehler beim Laden des Users $uid: $this->errormsg";
+			return false;				
+		}
+
+		$param=array();
+
+		foreach($mdl_course_id_array as $mdl_course_id)
+		{
+			$data = new stdClass();
+			$data->roleid=$role_id;
+			$data->userid=$this->mdl_user_id;
+			$data->courseid=$mdl_course_id;
+
+			$param[]=$data;
+		}
+		$client = new SoapClient($this->serverurl); 
+		$client->enrol_manual_enrol_users($param);
+
+		return true;
+	}
 }
