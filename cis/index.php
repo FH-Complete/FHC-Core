@@ -176,7 +176,7 @@ function loadampel()
 		        	</form>
 		        </td>
 		         <td align="right" valign="top" style="width: 20%; padding-right: 10px; padding-top: 10px;">
-			          <nobr><span style="vertical-align:top;" id="ampel"></span>&nbsp;&nbsp;<span style="color: #A5AFB6">|</span>&nbsp;&nbsp;<a href="private/lvplan/stpl_week.php?pers_uid=<?php echo $user; ?>" target="_blank">LV-Plan</a>&nbsp;&nbsp;<span style="color: #A5AFB6">|</span>
+			          <nobr><span style="vertical-align:top;" id="ampel"></span><a href="private/lvplan/stpl_week.php?pers_uid=<?php echo $user; ?>" target="_blank"><?php echo $p->t('lvplan/lvPlan'); ?></a>&nbsp;&nbsp;<span style="color: #A5AFB6">|</span>
 						<?php	  
 							$sprache = new sprache();
 							$sprache->getAll(true);
