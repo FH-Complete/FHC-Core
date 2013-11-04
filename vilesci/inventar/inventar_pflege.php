@@ -451,6 +451,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 											select: function(event, ui)
 											{
 												ui.item.value=ui.item.bestellung_id;
+												setTimeout('document.sendform.submit()',1300);
 											}
 										});
 /*										  $('#bestellung_id').autocomplete('inventar_autocomplete.php', 
@@ -493,7 +494,8 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 																value:item.bestelldetail_id,
 																label:item.bestelldetail_id+', '+item.beschreibung+' '+item.artikelnummer+' Preis VE '+item.preisprove+', Menge '+item.menge
 															}
-														}))
+														}));
+														setTimeout('document.sendform.submit()',1300);
 													}
 												});
 											},											
@@ -595,6 +597,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 											select: function(event, ui)
 											{
 												ui.item.value=ui.item.ort_kurzbz;
+												setTimeout('document.sendform.submit()',1300);
 											}
 										});
 
@@ -646,6 +649,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 											select: function(event, ui)
 											{
 												ui.item.value=ui.item.oe_kurzbz;
+												setTimeout('document.sendform.submit()',1300);
 											}
 										});
 										
@@ -715,12 +719,23 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 												for(i in ui.content)
 												{
 													ui.content[i].value=ui.content[i].person_id;
-													ui.content[i].label=ui.content[i].person_id+' '+ui.content[i].anrede+' '+ui.content[i].titelpre+' '+ui.content[i].vorname+' '+ui.content[i].nachname+' '+ui.content[i].funktion;
+													ddlabel = ui.content[i].person_id+' '+ui.content[i].anrede+' '+ui.content[i].titelpre+' '+ui.content[i].vorname+' '+ui.content[i].nachname+' '+ui.content[i].funktion;
+													if(ui.content[i].aktiv=='t')
+													{
+														ddlabel=ddlabel+'(Aktiv)';
+													}
+													else
+													{
+														ddlabel=ddlabel+'(Inaktiv)';
+													}
+													ui.content[i].label=ddlabel; 
+													//ui.content[i].label=ui.content[i].person_id+' '+ui.content[i].anrede+' '+ui.content[i].titelpre+' '+ui.content[i].vorname+' '+ui.content[i].nachname+' '+ui.content[i].funktion;
 												}
 											},
 											select: function(event, ui)
 											{
 												ui.item.value=ui.item.person_id;
+												setTimeout('document.sendform.submit()',1300);
 											}
 										});
 /*										  $('#person_id').autocomplete('inventar_autocomplete.php', 
@@ -1450,7 +1465,17 @@ for ($pos=0;$pos<$anzahl;$pos++)
 														for(i in ui.content)
 														{
 															ui.content[i].value=ui.content[i].person_id;
-															ui.content[i].label=ui.content[i].person_id+' '+ui.content[i].anrede+' '+ui.content[i].titelpre+' '+ui.content[i].vorname+' '+ui.content[i].nachname+' '+ui.content[i].funktion;
+															//ui.content[i].label=ui.content[i].person_id+' '+ui.content[i].anrede+' '+ui.content[i].titelpre+' '+ui.content[i].vorname+' '+ui.content[i].nachname+' '+ui.content[i].funktion;
+															ddlabel = ui.content[i].person_id+' '+ui.content[i].anrede+' '+ui.content[i].titelpre+' '+ui.content[i].vorname+' '+ui.content[i].nachname+' '+ui.content[i].funktion;
+															if(ui.content[i].aktiv=='t')
+															{
+																ddlabel=ddlabel+'(Aktiv)';
+															}
+															else
+															{
+																ddlabel=ddlabel+'(Inaktiv)';
+															}
+															ui.content[i].label=ddlabel; 
 														}
 													},
 													select: function(event, ui)

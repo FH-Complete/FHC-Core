@@ -292,7 +292,7 @@
 			}
 			if (!empty($oe_kurzbz))
 			{	
-				$pSql="SELECT vw_benutzer.uid,vw_benutzer.person_id,vw_benutzer.aktiv,uid,person_id,titelpre,anrede,vorname,nachname,vornamen,titelpost,funktion_kurzbz 
+				$pSql="SELECT distinct vw_benutzer.person_id,vw_benutzer.aktiv,uid,person_id,titelpre,anrede,vorname,nachname,vornamen,titelpost,funktion_kurzbz 
 					FROM public.tbl_benutzerfunktion JOIN campus.vw_benutzer USING(uid) 
 					where ". $pWhere ."
 					and (funktion_kurzbz='oezuordnung') 
@@ -323,7 +323,7 @@
 			{
 				$pArt='select';
 				$pDistinct=true; 
-				$pFields='uid,person_id,titelpre,anrede,vorname,nachname,vornamen,aktiv,\'\' as funktion_kurzbz';
+				$pFields='person_id,titelpre,anrede,vorname,nachname,vornamen,aktiv,\'\' as funktion_kurzbz';
 				$pTable=' campus.vw_benutzer ';
 				$matchcode=mb_strtoupper(addslashes(str_replace(array('*','%',',',';',"'",'"',' '),'%',trim($person_id))));
 				$pOrder='nachname';
