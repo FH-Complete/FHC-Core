@@ -482,6 +482,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
         echo "<studiensemester>";
 		for($start = $semesterNumberStart; $start <= $semesterNumberEnd; $start++)
 		{
+            $semester_ects = 0; 
 			//$thesis_beschreibung = '';
 			echo "<semesters>"; 
 			
@@ -567,6 +568,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                         $arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['note'] = $row_stud->anmerkung; 
                         $arrayLvAusbildungssemester[$row_stud->lehrveranstaltung_id]['sort'] = $row_stud->sort; 
                         $ects_total += $row_stud->ects; 
+                        $semester_ects +=$row_stud->ects; 
                     }
                     else
                     {
@@ -857,11 +859,12 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                                 <note>'.$note_outgoing.'</note>
                                 <lv_id></lv_id>
                             </lv>';
+
                             $ects_total +=$row_outgoing->ects;
                         }
                     }
                 }
-                
+                echo '<ects_gesamt>'.$semester_ects.'</ects_gesamt>';
 				echo "</semesters>";
 			}
             echo "</studiensemester>";
