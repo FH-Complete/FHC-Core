@@ -508,7 +508,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			<caption label="Status" />
 					<tree id="student-prestudent-tree-rolle" seltype="single" hidecolumnpicker="false" flex="1"
 							datasources="rdf:null" ref="http://www.technikum-wien.at/prestudentrolle/liste"
-							style="margin-left:10px;margin-right:10px;margin-bottom:5px;" height="100px" enableColumnDrag="true"
+							style="margin-left:10px;margin-right:10px;margin-bottom:5px;" height="200px" enableColumnDrag="true"
 							flags="dont-build-content"
 							context="student-prestudent-rolle-tree-popup"
 							ondblclick="StudentRolleBearbeiten()"
