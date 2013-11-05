@@ -227,6 +227,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		
 		$obj->getZeugnisnoten($lehrveranstaltung_id=null, $uid_arr[$i], $studiensemester_kurzbz);
 
+        $ects_gesamt = 0; 
 		foreach ($obj->result as $row)	
 		{
 			if($row->zeugnis)
@@ -364,6 +365,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					else 	
 						$ectspunkte=number_format($row->ects,2);
 				}
+                $ects_gesamt+=$ectspunkte; 
+                
 				$xml .= "				<ects>".$ectspunkte."</ects>";
 				$xml .= "				<lv_lehrform_kurzbz>".$row->lv_lehrform_kurzbz."</lv_lehrform_kurzbz>";
 				if($auslandssemester)
@@ -376,6 +379,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$xml .= "			</unterrichtsfach>";
 			}
 		}
+        $xml .= "<ects_gesamt>".$ects_gesamt."</ects_gesamt>"; 
 		$xml .= $xml_fussnote;
 		$xml .= "	</zeugnis>";
 	}
