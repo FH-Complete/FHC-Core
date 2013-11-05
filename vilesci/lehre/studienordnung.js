@@ -25,7 +25,12 @@ var lehrveranstaltungen='';
 
 function loadError(xhr, textStatus, errorThrown)
 {
-	alert('Fehler beim Laden der Daten. ErrorNr:'+xhr.status);
+	if(xhr.status==200)
+	{
+		alert('Fehler:'+xhr.responseText);
+	}
+	else
+		alert('Fehler beim Laden der Daten. ErrorNr:'+xhr.status);
 }
 
 function drawHeader(text)
@@ -209,5 +214,70 @@ function neuerStudienplan()
 {
 	drawHeader('Neuer Studienplan');
 	$("#data").load('studienordnung.inc.php?method=neuerStudienplan&studiengang_kz='+studiengang_kz);
+}
+
+function saveStudienordnung()
+{
+	bezeichnung = $("#bezeichnung").val();
+	version = $("#version").val();
+	gueltigvon = $("#gueltigvon option:selected").val();
+	gueltigbis = $("#gueltigbis option:selected").val();
+	ects = $("#ects").val();
+	studiengangbezeichnung = $("#studiengangbezeichnung").val();
+	studiengangbezeichnungenglisch = $("#studiengangbezeichnungenglisch").val();
+	studiengangkurzbzlang = $("#studiengangkurzbzlang").val();
+	studienordnung_id = $("#studienordnung_id").val();
+	akadgrad_id = $("#akadgrad_id").val();
+
+	if(studienordnung_id!='')
+	{
+		loaddata = {
+			"method": "loadStudienordnung",
+			"parameter_0": studienordnung_id
+		};
+	}
+	else
+		loaddata={};
+
+	savedata = {
+	"bezeichnung": bezeichnung,
+	"version":version,
+	"gueltigvon":gueltigvon,
+	"gueltigbis":gueltigbis,
+	"ects":ects,
+	"studiengangbezeichnung":studiengangbezeichnung,
+	"studiengangbezeichnungenglisch":studiengangbezeichnungenglisch,
+	"studiengangkurzbzlang":studiengangkurzbzlang,
+	"akadgrad_id":akadgrad_id,
+	"studiengang_kz":studiengang_kz
+	};
+
+	
+	$.ajax(
+	{
+		dataType: "json",
+		url: "../../soap/fhcomplete.php",
+		type: "POST",
+		data: {
+				"typ": "json",
+				"class": "studienordnung",
+				"method": "save",
+				"loaddata": JSON.stringify(loaddata),
+				"savedata": JSON.stringify(savedata),
+			},
+		success: StudienordnungSaved,
+		error: loadError
+	});
+}
+function StudienordnungSaved()
+{
+	if(data.error=='true')
+	{
+		alert('Fehler:'+data.errormsg);
+	}
+	else
+	{
+		loadStudienordnung();
+	}
 }
 

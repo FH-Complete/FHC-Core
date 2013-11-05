@@ -29,7 +29,7 @@ require_once('../../include/functions.inc.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/organisationsform.class.php');
 require_once('../../include/sprache.class.php');
-
+require_once('../../include/akadgrad.class.php');
 
 $uid = get_uid();
 $db = new basis_db();
@@ -54,6 +54,7 @@ switch($method)
 			die('Studiengang ist ungültig');
 
 		echo '
+		<input type="hidden" id="studienordnung_id" />
 		<table>
 			<tr>
 				<td>Bezeichnung:</td>
@@ -78,7 +79,7 @@ switch($method)
 			</tr>
 			<tr>
 				<td>Gültig bis:</td>
-				<td><select id="gueltigvon">
+				<td><select id="gueltigbis">
 				<option value="" >-- keine Auswahl --</option>';
 		foreach($studiensemester->studiensemester as $row)
 		{
@@ -102,6 +103,20 @@ switch($method)
 			<tr>
 				<td>Kurzbezeichnung des Studiengangs:</td>
 				<td><input type="text" id="studiengangkurzbzlang" maxlength="8" size="8" value="'.$studiengang->kurzbzlang.'" /></td>
+			</tr>
+			<tr>
+				<td>Akademischer Grad</td>
+				<td>
+					<select id="akadgrad_id">
+					';
+		$akadgrad = new akadgrad();
+		$akadgrad->getAll();
+		foreach($akadgrad->result as $row)
+		{
+			echo '<option value="'.$row->akadgrad_id.'">'.$row->akadgrad_kurzbz.'</option>';
+		}
+		echo '
+					</select>
 			</tr>
 			<tr>
 				<td></td>
