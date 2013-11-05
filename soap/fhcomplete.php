@@ -59,7 +59,54 @@ if(!$wsrecht->isUserAuthorized($uid, $method))
 
 // Funktion aufrufen
 $obj = new $class();
-if(call_user_func_array(array($obj, $method), $parameter))
+$error=false;
+
+
+// Bei Save Funktionen werden alle Parameter zugewiesen
+if(mb_stristr($method,'save'))
+{
+	$loaddata=json_decode($_REQUEST['loaddata'], true);
+	$savedata=json_decode($_REQUEST['savedata'], true);
+
+	if(isset($loaddata['method']))
+	{
+		if(!$wsrecht->isUserAuthorized($uid, $loaddata['method']))
+			die('keine Berechtigung');
+
+		// Bearbeiten
+		$loadparameter=array();
+		for($i=0;$i<20;$i++)
+		{
+			$name = 'parameter_'.$i;
+			if(isset($loaddata[$name]))
+				$loadparameter[]=$loaddata[$name];
+			else
+				break;
+		}
+
+		if(!call_user_func_array(array($obj, $loaddata['method']), $loadparameter))
+		{
+			$error=true;
+		}
+	}
+	else
+	{
+		// Neu
+		$obj->insertvon = $uid;
+		$obj->insertamum = date('Y-m-d H:i:s');
+	}
+
+	if(!$error)
+	{
+		// Attribute zuweisen zum Speichern
+		foreach($savedata as $key=>$value)
+		{
+			$obj->$key=$value;
+		}
+	}
+}
+
+if(!$error && call_user_func_array(array($obj, $method), $parameter))
 {
 	$data['result']=$obj->cleanResult();
 	$data['error']='false';

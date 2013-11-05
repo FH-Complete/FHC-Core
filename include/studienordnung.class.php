@@ -200,7 +200,7 @@ class studienordnung extends basis_db
 	protected function validate()
 	{
 		//Zahlenfelder pruefen
-		if(!is_numeric($this->studiengang_kz) && $this->studiengang_kz!=='')
+		if(!is_numeric($this->studiengang_kz) && $this->studiengang_kz!='')
 		{
 			$this->errormsg='studiengang_kz enthaelt ungueltige Zeichen';
 			return false;

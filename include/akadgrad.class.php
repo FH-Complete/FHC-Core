@@ -84,5 +84,36 @@ class akadgrad extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Laedt alle Eintraege
+	 */
+	public function getAll()
+	{
+		//laden des Datensatzes
+		$qry = "SELECT * FROM lehre.tbl_akadgrad";
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new akadgrad();
+
+				$obj->akadgrad_id = $row->akadgrad_id;
+				$obj->akadgrad_kurzbz = $row->akadgrad_kurzbz;
+				$obj->studiengang_kz = $row->studiengang_kz;
+				$obj->titel = $row->titel;
+				$obj->geschlecht = $row->geschlecht;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei der Datenbankabfrage';
+			return false;
+		}
+	}
 }
 ?>
