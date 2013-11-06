@@ -61,6 +61,8 @@ class studiengang extends basis_db
 	public $mischform;	// boolean
 	public $projektarbeit_note_anzeige; // boolean
 	public $bezeichnung_arr = array();
+    
+    public $beschreibung; 
 	
 	/**
 	 * Konstruktor
@@ -566,5 +568,27 @@ class studiengang extends basis_db
 			return false; 
 		}
 	}
+    
+    public function getStudiengangTyp($typ)
+    {
+        $qry = "SELECT * FROM public.tbl_studiengangstyp WHERE typ =".$this->db_add_param($typ,FHC_STRING).";"; 
+        
+        if($result = $this->db_query($qry))
+        {
+            if($row = $this->db_fetch_object($result))
+            {
+                $this->typ = $row->typ; 
+                $this->bezeichnung = $row->bezeichnung; 
+                $this->beschreibung = $row->beschreibung; 
+            }
+            
+            return true; 
+        }
+        else 
+        {
+            $this->errormsg = "Fehler bei der Abfrage aufgetreten"; 
+            return false; 
+        }
+    }
 }
 ?>

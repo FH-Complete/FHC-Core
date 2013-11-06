@@ -597,12 +597,14 @@ else
 		{
 			$student = new student();
 			$student->load($uid);
-
+            
 			$studiengang = new studiengang();
 			$studiengang->load($student->studiengang_kz);
-
-			$typ='';
-			switch($studiengang->typ)
+            
+            $stg_typ = new studiengang(); 
+            $stg_typ->getStudiengangTyp($studiengang->typ); 
+			$typ=$stg_typ->bezeichnung;
+	/*		switch($studiengang->typ)
 			{
 				case 'd':	$typ = 'FH-Diplom-Studiengang';
 							break;
@@ -612,7 +614,7 @@ else
 							break;
 				default:	$typ = 'FH-Studiengang';
 			}
-
+*/
 			$qry = "SELECT * FROM campus.vw_benutzer JOIN public.tbl_benutzerfunktion USING(uid) WHERE funktion_kurzbz='rek'";
 			$rektor = '';
 			if($db->db_query($qry))
@@ -669,6 +671,7 @@ else
 				<studiengang_kz><![CDATA['.sprintf("%04d",abs($student->studiengang_kz)).']]></studiengang_kz>
 				<studiengang_bezeichnung><![CDATA['.$studiengang->bezeichnung.']]></studiengang_bezeichnung>
 				<studiengang_art><![CDATA['.$typ.']]></studiengang_art>
+                <studiengang_typ><![CDATA['.$studiengang->typ.']]></studiengang_typ>
 				<anrede><![CDATA['.$student->anrede.']]></anrede>
 				<svnr><![CDATA['.$student->svnr.']]></svnr>
 				<ersatzkennzeichen><![CDATA['.$student->ersatzkennzeichen.']]></ersatzkennzeichen>
