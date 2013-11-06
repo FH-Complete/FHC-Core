@@ -44,6 +44,7 @@ require_once('../include/datum.class.php');
 require_once('../include/phrasen.class.php');
 require_once('../include/student.class.php');
 require_once('../include/benutzer.class.php');
+require_once('../include/ort.class.php');
 
 $sprache = getSprache();
 
@@ -211,6 +212,12 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 												
 				$xml.= '<telefon><![CDATA['.$hauptnummer.' - '.$row_course_leader->telefonklappe.']]></telefon>';
 			}
+		    if(isset($row_course_leader) && $row_course_leader->ort_kurzbz != "")
+			{
+				$ort = new ort();
+				$ort->load($row_course_leader->ort_kurzbz);
+				$xml.='<ort><![CDATA['.$ort->planbezeichnung.']]></ort>';
+			}
 			$xml.='</stg_ltg>';
 	    }
     }
@@ -246,6 +253,12 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 					$hauptnummer = $kontakt->kontakt;
 				}
 				$xml.= '<telefon><![CDATA['.$hauptnummer.' - '.$ma->telefonklappe.']]></telefon>';
+			}
+			if($ma->ort_kurzbz != "")
+			{
+				$ort = new ort();
+				$ort->load($ma->ort_kurzbz);
+				$xml.='<ort><![CDATA['.$ort->planbezeichnung.']]></ort>';
 			}
 			
 			$xml.='</gf_ltg>';
@@ -284,6 +297,12 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 				}
 				$xml.= '<telefon><![CDATA['.$hauptnummer.' - '.$ma->telefonklappe.']]></telefon>';
 			}
+			if($ma->ort_kurzbz != "")
+			{
+				$ort = new ort();
+				$ort->load($ma->ort_kurzbz);
+				$xml.='<ort><![CDATA['.$ort->planbezeichnung.']]></ort>';
+			}
 			
 			$xml.='</stv_ltg>';
 		}
@@ -320,6 +339,12 @@ function getStgContent($studiengang_kz, $semester, $sprache)
 					$hauptnummer = $kontakt->kontakt;
 				}
 				$xml.= '<telefon><![CDATA['.$hauptnummer.' - '.$ma->telefonklappe.']]></telefon>';
+			}
+			if($ma->ort_kurzbz != "")
+			{
+				$ort = new ort();
+				$ort->load($ma->ort_kurzbz);
+				$xml.='<ort><![CDATA['.$ort->planbezeichnung.']]></ort>';
 			}
 			
 			$xml.='</ass>';

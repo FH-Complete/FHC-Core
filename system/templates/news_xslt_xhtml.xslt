@@ -4,12 +4,9 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 		<html>
 		<head>
 			<link rel="stylesheet" href="../skin/style.css.php" type="text/css"  />
-			<title>News</title>
-			<script type="text/javascript" src="../include/js/flexcroll.js"></script>
-			<link href="../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />			
+			<title>News</title>			
 		</head>
 		<body>
-		<div class="flexcroll" style="outline: none;">
 			<h1>News</h1>
 			<table class="cmstable" cellspacing="0" cellpadding="0">
 			<tr>
@@ -39,7 +36,6 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 				</xsl:if>
 			</tr>
 			</table>
-		</div>
 		</body>
 		</html>	
 	</xsl:template>
@@ -109,6 +105,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 			<xsl:variable name="uid" select="uid"></xsl:variable>
 			<p><a href="../cis/private/profile/index.php?uid={$uid}"><xsl:value-of select="name" /></a><br />			
 			T: <xsl:value-of select="telefon" /><br />
+			R: <xsl:value-of select="ort" /><br />
 			E: <xsl:variable name="mail" select="email"></xsl:variable>
 			<a href="mailto:{$mail}"><xsl:value-of select="email" /></a></p>
 	</xsl:template>
@@ -116,6 +113,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 			<xsl:variable name="uid" select="uid"></xsl:variable>
 			<p><a href="../cis/private/profile/index.php?uid={$uid}"><xsl:value-of select="name" /></a><br />			
 			T: <xsl:value-of select="telefon" /><br />
+			R: <xsl:value-of select="ort" /><br />
 			E: <xsl:variable name="mail" select="email"></xsl:variable>
 			<a href="mailto:{$mail}"><xsl:value-of select="email" /></a></p>
 	</xsl:template>
@@ -123,6 +121,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 			<xsl:variable name="uid" select="uid"></xsl:variable>
 			<p><a href="../cis/private/profile/index.php?uid={$uid}"><xsl:value-of select="name" /></a><br />			
 			T: <xsl:value-of select="telefon" /><br />
+			R: <xsl:value-of select="ort" /><br />
 			E: <xsl:variable name="mail" select="email"></xsl:variable>
 			<a href="mailto:{$mail}"><xsl:value-of select="email" /></a></p>
 	</xsl:template>
@@ -130,6 +129,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 			<xsl:variable name="uid" select="uid"></xsl:variable>
 			<p><a href="../cis/private/profile/index.php?uid={$uid}"><xsl:value-of select="name" /></a><br />			
 			T: <xsl:value-of select="telefon" /><br />
+			R: <xsl:value-of select="ort" /><br />
 			E: <xsl:variable name="mail" select="email"></xsl:variable>
 			<a href="mailto:{$mail}"><xsl:value-of select="email" /></a></p>
 	</xsl:template>
