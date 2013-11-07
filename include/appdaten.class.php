@@ -1,6 +1,6 @@
 <?php
 /*
- * studienplan.class.php
+ * appdaten.class.php
  * 
  * Copyright 2013 fhcomplete.org
  * 
@@ -62,6 +62,48 @@ class appdaten extends basis_db
 		return $this->$name;
 	}
 	
+	/**
+	 * Laden von Appdaten
+	 * @param appdaten_id ID des Datensatzes, der geladen werden soll
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load($appdaten_id)
+	{
+		if(!is_numeric($appdaten_id))
+		{
+			$this->errormsg = 'Appdaten_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		$qry = "SELECT * FROM system.tbl_appdaten WHERE appdaten_id=".$this->db_add_param($appdaten);
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->appdaten_id=$row->appdaten_id;
+				$this->uid=$row->uid;
+				$this->app=$row->app;
+				$this->appversion=$row->appversion;
+				$this->version=$row->version;
+				$this->bezeichnung=$row->bezeichnung;
+				$this->daten=$row->daten;
+				$this->freigabe=$this->db_parse_bool($row->freigabe);
+				$this->insertamum=$row->insertamum;
+				$this->insertvon=$row->insertvon;
+				$this->updatenamum=$row->updateamum;
+				$this->updatevon=$row->updatenvon;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Datensatz konnte nicht geladen werden';
+			return false;
+		}
+
+		return true;
+	}
+
 	/**
 	 * Prueft die Variablen auf Gueltigkeit
 	 * @return true wenn ok, false im Fehlerfall
