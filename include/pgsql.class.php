@@ -96,6 +96,24 @@ class basis_db extends db
 		}			
 	}
 	
+	public function db_fetch_assoc($result = null, $i=null)
+	{
+		if(is_null($result))
+		{
+			if(is_null($i))
+				return pg_fetch_assoc($this->db_result);
+			else 
+				return pg_fetch_assoc($this->db_result, $i);
+		}
+		else 
+		{
+			if(is_null($i))
+				return pg_fetch_row($result);
+			else 
+				return pg_fetch_row($result, $i);
+		}			
+	}
+	
 	public function db_result($result = null, $i,$item)
 	{
 		if(is_null($result))
