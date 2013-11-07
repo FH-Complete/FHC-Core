@@ -37,9 +37,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <!-- Zeugnis Overlay -->
 <vbox id="student-zeugnis" style="overflow:auto; margin:0px;" flex="1">
 <popupset>
-	<popup id="student-zeugnis-tree-popup">
+	<menupopup id="student-zeugnis-tree-popup">
 		<menuitem label="Entfernen" oncommand="StudentAkteDel();" id="student-zeugnis-tree-popup-aktedel" hidden="false"/>
-	</popup>
+	</menupopup>
 </popupset>
 <hbox>
 	<groupbox id="student-zeugnis-groupbox" flex="1">
@@ -93,6 +93,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	<vbox>
 		<spacer flex="1"/>
 		<button id="student-zeugnis-button-archivieren" label="aktuelles Zeugnis archivieren" disabled="false" oncommand="StudentZeugnisArchivieren()"/>
+		<button id="student-zeugnis-button-archivieren-englisch" label="aktuelles Zeugnis archivieren (englisch)" disabled="false" oncommand="StudentZeugnisArchivieren('eng')"/>
 		<spacer flex="1"/>
 	</vbox>
 </hbox>

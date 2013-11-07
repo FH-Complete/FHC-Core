@@ -40,17 +40,20 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <!-- Abschlusspruefung DETAILS -->
 <vbox id="student-abschlusspruefung" style="overflow:auto;margin:10px;" flex="1">
 <popupset>
-	<popup id="student-abschlusspruefung-tree-popup">
+	<menupopup id="student-abschlusspruefung-tree-popup">
 		<menuitem label="Entfernen" oncommand="StudentAbschlusspruefungLoeschen();" id="student-abschlusspruefung-tree-popup-delete" hidden="false"/>
 		<menu id="student-abschlusspruefung-tree-popup-dokumente" label="Dokumente">
 	      <menupopup id="menu-file-popup">
-	        <menuitem label="Pruefungsprotokoll" oncommand="StudentAbschlusspruefungPrintPruefungsprotokoll()"/>
+	        <menuitem label="Pruefungsprotokoll (Alte Version)" oncommand="StudentAbschlusspruefungPrintPruefungsprotokoll('de')"/>
+	        <menuitem label="Pruefungsprotokoll Englisch (Alte Version)" oncommand="StudentAbschlusspruefungPrintPruefungsprotokoll('en')"/>
+	        <menuitem label="Pruefungsprotokoll 2 (Neue Version)" oncommand="StudentAbschlusspruefungPrintPruefungsprotokoll('de2')"/>
+	        <menuitem label="Pruefungsprotokoll Englisch 2 (Neue Version)" oncommand="StudentAbschlusspruefungPrintPruefungsprotokoll('en2')"/>
 	        <menuitem label="Pruefungszeugnis" oncommand="StudentAbschlusspruefungPrintPruefungszeugnis()"/>
 	        <menuitem label="Urkunde" oncommand="StudentAbschlusspruefungPrintUrkunde('deutsch')"/>
 	        <menuitem label="Urkunde Englisch" oncommand="StudentAbschlusspruefungPrintUrkunde('englisch')"/>
 	      </menupopup>
 	    </menu>
-	</popup>
+	</menupopup>
 </popupset>
 	<hbox>
 		<tree id="student-abschlusspruefung-tree" seltype="single" hidecolumnpicker="false" flex="1"

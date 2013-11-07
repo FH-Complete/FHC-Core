@@ -34,6 +34,8 @@ require_once('../include/xslfo2pdf/xslfo2pdf.php');
 require_once('../include/fop.class.php');
 require_once('../include/akte.class.php');
 require_once('../include/vorlage.class.php');
+require_once('../include/student.class.php');
+require_once('../include/prestudent.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -354,6 +356,13 @@ else
 	$uid = $_REQUEST["uid"];
 	$ss = $_REQUEST["ss"];
 	$heute = date('Y-m-d');
+	
+	$student=new student();
+	$student->load($uid);
+	$prestudent=new prestudent();
+	$prestudent->getLastStatus($student->prestudent_id,$ss);
+	$semester=$prestudent->ausbildungssemester;
+	
 	$query = "SELECT 
 				tbl_studiengang.studiengang_kz, tbl_studentlehrverband.semester, tbl_studiengang.typ, 
 				tbl_studiengang.kurzbz, tbl_person.person_id FROM tbl_person, tbl_benutzer, 
@@ -364,14 +373,25 @@ else
 				AND tbl_studentlehrverband.studiengang_kz = tbl_studiengang.studiengang_kz 
 				AND tbl_studentlehrverband.student_uid = '".addslashes($uid)."' 
 				AND tbl_studentlehrverband.studiensemester_kurzbz = '".addslashes($ss)."'";
+/*	$query = "SELECT 
+				tbl_studiengang.studiengang_kz, tbl_prestudentstatus.ausbildungssemester as semester, tbl_studiengang.typ, 
+				tbl_studiengang.kurzbz, tbl_person.person_id FROM tbl_person, tbl_benutzer, 
+				tbl_studentlehrverband, tbl_prestudentstatus, tbl_studiengang 
+			WHERE 
+				tbl_prestutendstatus.prestudent_id = 
+				tbl_studentlehrverband.student_uid = tbl_benutzer.uid 
+				AND tbl_benutzer.person_id = tbl_person.person_id 
+				AND tbl_studentlehrverband.studiengang_kz = tbl_studiengang.studiengang_kz 
+				AND tbl_studentlehrverband.student_uid = '".addslashes($uid)."' 
+				AND tbl_studentlehrverband.studiensemester_kurzbz = '".addslashes($ss)."'"; */
 
 	if($result = $db->db_query($query))
 	{
 		if($row = $db->db_fetch_object($result))
 		{
 			$person_id = $row->person_id;
-			$titel = "Zeugnis_".strtoupper($row->typ).strtoupper($row->kurzbz)."_".$row->semester;
-			$bezeichnung = "Zeugnis ".strtoupper($row->typ).strtoupper($row->kurzbz)." ".$row->semester.". Semester";
+			$titel = $xsl."_".strtoupper($row->typ).strtoupper($row->kurzbz)."_".$semester;
+			$bezeichnung = $xsl." ".strtoupper($row->typ).strtoupper($row->kurzbz)." ".$semester.". Semester";
 			$studiengang_kz = $row->studiengang_kz;
 		}
 		else
