@@ -2683,8 +2683,10 @@ function StudentAkteDisableFields(val)
 // * Startet das Script zum Archivieren des Zeugnisses und
 // * Refresht dann den Tree
 // ****
-function StudentZeugnisArchivieren()
+function StudentZeugnisArchivieren(lang)
 {
+	lang = lang || 'ger';
+	
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-tree');
 
@@ -2711,7 +2713,12 @@ function StudentZeugnisArchivieren()
   		{
   			uid = getTreeCellText(tree, 'student-treecol-uid', v);
   			
-  			url = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl=Zeugnis&xml=zeugnis.rdf.php&uid='+uid+'&ss='+stsem+'&archive=1';
+			var xsl_vorlage;
+			if(lang=='eng')
+				xsl_vorlage = 'ZeugnisEng';
+			else
+				xsl_vorlage = 'Zeugnis';
+  			url = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl='+xsl_vorlage+'&xml=zeugnis.rdf.php&uid='+uid+'&ss='+stsem+'&archive=1';
 
 			var req = new phpRequest(url,'','');
 		

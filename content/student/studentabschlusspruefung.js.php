@@ -656,6 +656,7 @@ function StudentAbschlusspruefungPrintPruefungsprotokollMultiple(lang)
 		if(lang=='en2')
 			xsl='PrProtMAEng';
 	}
+	
 	var tree = document.getElementById('student-tree');
 
 	if (tree.currentIndex==-1)
@@ -681,19 +682,21 @@ function StudentAbschlusspruefungPrintPruefungsprotokollMultiple(lang)
 	var stg_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
 
 	//Uebergangsloesung bis zur fertigstellung der dokumente
-	if(xsl=='PrProtMAEng')
-		window.open('<?php echo APP_ROOT; ?>/content/Record_of_Master_Examination.pdf');
-	else if(xsl=='PrProtBAEng')
-		window.open('<?php echo APP_ROOT; ?>/content/Record_of_Bachelor_Examination.pdf');
-	else		
+//	if(xsl=='PrProtMAEng')
+//		window.open('<?php echo APP_ROOT; ?>/content/Record_of_Master_Examination.pdf');
+//	else if(xsl=='PrProtBAEng')
+//		window.open('<?php echo APP_ROOT; ?>/content/Record_of_Bachelor_Examination.pdf');
+//	else		
 		window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid='+uids+'&xsl_stg_kz='+stg_kz+'&output=pdf','Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
 // * Druckt das Pruefungsprotokoll fuer eine bestimmte Abschlusspruefung
 // ****
-function StudentAbschlusspruefungPrintPruefungsprotokoll()
+function StudentAbschlusspruefungPrintPruefungsprotokoll(lang)
 {
+	if(lang=='')
+		lang='de';
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-abschlusspruefung-tree');
 
@@ -709,12 +712,36 @@ function StudentAbschlusspruefungPrintPruefungsprotokoll()
 
 	var stg_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
 
+	
 	if(pruefungstyp_kurzbz=='Bachelor')
-		xsl='PrProtokollBakk';
+	{
+		if(lang=='de')
+			xsl='PrProtokollBakk';
+		if(lang=='en')
+			xsl='PrProtBakkEng';
+		if(lang=='de2')
+			xsl='PrProtBA';
+		if(lang=='en2')
+			xsl='PrProtBAEng';
+	}			
 	else
-		xsl='PrProtokollDipl';
-
-	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&abschlusspruefung_id='+abschlusspruefung_id+'&xsl_stg_kz='+stg_kz,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	{
+		if(lang=='de')
+			xsl='PrProtokollDipl';
+		if(lang=='en')
+			xsl='PrProtDiplEng';
+		if(lang=='de2')
+			xsl='PrProtMA';
+		if(lang=='en2')
+			xsl='PrProtMAEng';
+	}
+	//Uebergangsloesung bis zur fertigstellung der dokumente
+//	if(xsl=='PrProtMAEng')
+//		window.open('<?php echo APP_ROOT; ?>/content/Record_of_Master_Examination.pdf');
+//	else if(xsl=='PrProtBAEng')
+//		window.open('<?php echo APP_ROOT; ?>/content/Record_of_Bachelor_Examination.pdf');
+//	else		
+		window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&abschlusspruefung_id='+abschlusspruefung_id+'&xsl_stg_kz='+stg_kz+'&output=pdf','Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
