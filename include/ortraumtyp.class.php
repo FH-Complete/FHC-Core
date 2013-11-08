@@ -27,8 +27,8 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class ortraumtyp extends basis_db
 {
-	public $new;     			// boolean
-	public $result = array(); 	// fachbereich Objekt
+	public $new;     		// boolean
+	public $result = array();
 
 	//Tabellenspalten
 	public $ort_kurzbz;		// string
@@ -37,8 +37,8 @@ class ortraumtyp extends basis_db
 
 	/**
 	 * Konstruktor
-	 * @param $conn Connection zur DB
-	 *        $ort_kurzbz und hierarchie ID des zu ladenden OrtRaumtyps
+	 * @param $ort_kurzbz 
+	 * @param $hierarchie
 	 */
 	public function __construct($ort_kurzbz=null, $hierarchie=0)
 	{
@@ -77,7 +77,8 @@ class ortraumtyp extends basis_db
 
 	/**
 	 * Laedt einen OrtRaumtyp
-	 * @param $ortraumtyp, hierarchie ID des zu ladenden OrtRaumtyps
+	 * @param $ortraumtyp
+	 * @param $hierarchie
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	public function load($ort_kurzbz, $hierarchie)
@@ -88,7 +89,13 @@ class ortraumtyp extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM public.tbl_ortraumtyp WHERE ort_kurzbz = '".addslashes($ort_kurzbz)."' AND hierarchie = '".addslashes($hierarchie)."';";
+		$qry = "SELECT 
+					* 
+				FROM 
+					public.tbl_ortraumtyp 
+				WHERE 
+					ort_kurzbz = ".$this->db_add_param($ort_kurzbz)." 
+					AND hierarchie = ".$this->db_add_param($hierarchie).";";
 
 		if(!$this->db_query($qry))
 		{
@@ -152,9 +159,9 @@ class ortraumtyp extends basis_db
 			}
 			//Neuen Datensatz anlegen
 			$qry = 'INSERT INTO public.tbl_ortraumtyp (ort_kurzbz, hierarchie, raumtyp_kurzbz) VALUES ('.
-				$this->addslashes($this->ort_kurzbz).', '.
-				$this->addslashes($this->hierarchie).', '.
-				$this->addslashes($this->raumtyp_kurzbz).');';
+				$this->db_add_param($this->ort_kurzbz).', '.
+				$this->db_add_param($this->hierarchie).', '.
+				$this->db_add_param($this->raumtyp_kurzbz).');';
 
 		}
 		else
@@ -169,8 +176,8 @@ class ortraumtyp extends basis_db
 			}
 
 			$qry = 'UPDATE public.tbl_ortraumtyp SET '.
-				'raumtyp_kurzbz='.$this->addslashes($this->raumtyp_kurzbz).' '.
-				'WHERE ort_kurzbz = '.$this->addslashes($this->ort_kurzbz).' AND hierarchie = '.$this->addslashes($this->hierarchie).';';
+				'raumtyp_kurzbz='.$this->db_add_param($this->raumtyp_kurzbz).' '.
+				'WHERE ort_kurzbz = '.$this->db_add_param($this->ort_kurzbz).' AND hierarchie = '.$this->db_add_param($this->hierarchie).';';
 		}
 
 		if($this->db_query($qry))
@@ -228,6 +235,27 @@ class ortraumtyp extends basis_db
 		}
 
 		return true;
+	}
+
+	/**
+	 * Loescht eine Zuordnung
+	 * @param $ort_kurzbz
+	 * @param $raumtyp_kurzbz
+	 */
+	public function delete($ort_kurzbz, $raumtyp_kurzbz)
+	{
+		$qry = "DELETE FROM public.tbl_ortraumtyp 
+			WHERE ort_kurzbz=".$this->db_add_param($ort_kurzbz)."
+			AND raumtyp_kurzbz=".$this->db_add_param($raumtyp_kurzbz).";";
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Löschen';
+			return false;
+		}
 	}
 }
 ?>

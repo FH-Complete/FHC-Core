@@ -28,7 +28,7 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 class raumtyp extends basis_db
 {
 	public $new;     			//  boolean
-	public $result = array(); 	//  fachbereich Objekt
+	public $result = array(); 	//  raumtyp Objekt
 
 	//Tabellenspalten
 	public $beschreibung;		//  string
@@ -37,7 +37,7 @@ class raumtyp extends basis_db
 
 	/**
 	 * Konstruktor
-	 * @param $ort_kurzbz und hierarchie ID des zu ladenden Raumtyps
+	 * @param $raumtyp_kurzbz des zu ladenden Raumtyps
 	 */
 	public function __construct($raumtyp_kurzbz=null)
 	{
@@ -87,7 +87,7 @@ class raumtyp extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM public.tbl_raumtyp WHERE raumtyp_kurzbz = '".addslashes($raumtyp_kurzbz)."';";
+		$qry = "SELECT * FROM public.tbl_raumtyp WHERE raumtyp_kurzbz=".$this->db_add_param($raumtyp_kurzbz).";";
 
 		if(!$this->db_query($qry))
 		{
@@ -156,16 +156,16 @@ class raumtyp extends basis_db
 			}
 			//Neuen Datensatz anlegen
 			$qry = 'INSERT INTO public.tbl_raumtyp (beschreibung, raumtyp_kurzbz) VALUES ('.
-				$this->addslashes($this->beschreibung).', '.
-				$this->addslashes($this->raumtyp_kurzbz).');';
+				$this->db_add_param($this->beschreibung).', '.
+				$this->db_add_param($this->raumtyp_kurzbz).');';
 
 		}
 		else
 		{
 			//bestehenden Datensatz akualisieren
 			$qry = 'UPDATE public.tbl_raumtyp SET '.
-				'beschreibung='.$this->addslashes($this->beschreibung).' '.
-				'WHERE raumtyp_kurzbz = '.$this->addslashes($this->ort_kurzbz).';';
+				'beschreibung='.$this->db_add_param($this->beschreibung).' '.
+				'WHERE raumtyp_kurzbz = '.$this->db_add_param($this->ort_kurzbz).';';
 		}
 
 		if($this->db_query($qry))

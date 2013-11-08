@@ -32,29 +32,28 @@ class ort extends basis_db
 
 	//Tabellenspalten
 	public $ort_kurzbz;		// string
-	public $bezeichnung;		// string
-	public $planbezeichnung;	// string
+	public $bezeichnung;	// string
+	public $planbezeichnung;// string
 	public $max_person;		// integer
-	public $lehre;				// boolean
-	public $reservieren;		// boolean
-	public $aktiv;				// boolean
-	public $lageplan;			// oid
-	public $dislozierung;		// smallint
+	public $lehre;			// boolean
+	public $reservieren;	// boolean
+	public $aktiv;			// boolean
+	public $lageplan;		// text
+	public $dislozierung;	// smallint
 	public $kosten;			// numeric(8,2)
-	public $ausstattung;
-	public $stockwerk;			// integer
+	public $ausstattung;	// text
+	public $stockwerk;		// integer
 	public $standort_id; 	// varchar(16)
-	public $telefonklappe;		// varchar(8)
+	public $telefonklappe;	// varchar(8)
 	public $updateamum;		// timestamp without timezone
 	public $updatevon;		// varchar(32)
 	public $insertamum;		// timestamp without timezone
 	public $insertvon;		// varchar(32)
-	public $content_id;
+	public $content_id;		// integer
 
 	/**
 	 * Konstruktor
-	 * @param $conn Connection zur DB
-	 *        $ort_kurzbz Kurzbz des zu ladenden Ortes
+	 * @param $ort_kurzbz Kurzbz des zu ladenden Ortes
 	 */
 	public function __construct($ort_kurzbz=null)
 	{
@@ -207,7 +206,7 @@ class ort extends basis_db
 		{
 			//Neuen Datensatz anlegen
 			$qry = 'INSERT INTO public.tbl_ort (ort_kurzbz, bezeichnung, planbezeichnung, max_person, aktiv, lehre, reservieren, lageplan,
-				dislozierung, kosten, stockwerk, standort_id, telefonklappe, insertamum, insertvon, updateamum, updatevon, content_id) VALUES ('.
+				dislozierung, kosten, stockwerk, standort_id, telefonklappe, insertamum, insertvon, updateamum, updatevon, content_id,ausstattung) VALUES ('.
 				$this->db_add_param($this->ort_kurzbz).', '.
 				$this->db_add_param($this->bezeichnung).', '.
 				$this->db_add_param($this->planbezeichnung).', '.
@@ -225,7 +224,8 @@ class ort extends basis_db
 				$this->db_add_param($this->insertvon).','.
 				$this->db_add_param($this->updateamum).','.
 				$this->db_add_param($this->updatevon).','.
-				$this->db_add_param($this->content_id).');';
+				$this->db_add_param($this->content_id).','.
+				$this->db_add_param($this->ausstattung).');';
 		}
 		else
 		{
@@ -235,6 +235,7 @@ class ort extends basis_db
 				'bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
 				'planbezeichnung='.$this->db_add_param($this->planbezeichnung).', '.
 				'max_person='.$this->db_add_param($this->max_person).', '.
+				'ausstattung='.$this->db_add_param($this->ausstattung).','.
 				'aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN) .', '.
 				'lehre='.$this->db_add_param($this->lehre, FHC_BOOLEAN) .', '.
 				'reservieren='.$this->db_add_param($this->reservieren, FHC_BOOLEAN) .', '.
