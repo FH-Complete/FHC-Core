@@ -33,109 +33,67 @@ $user = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-if(!$rechte->isBerechtigt('basis/ort'))
+if(!$rechte->isBerechtigt('basis/ort', null, 'suid'))
 	die('Sie haben keine Rechte fuer diese Seite');
-
-if($rechte->isBerechtigt('basis/ort', 'suid'))
-	$write_admin=true;
 
 // Speichern der Daten
 if(isset($_POST['ort_kurzbz']))
 {
 	// Die Aenderungen werden per Ajax Request durchgefuehrt,
 	// daher wird nach dem Speichern mittels exit beendet
-	if($write_admin)
-	{
-		//Lehre Feld setzen
-		if(isset($_POST['lehre']))
-		{
-			$lv_obj = new ort();
-			if($lv_obj->load($_POST['ort_kurzbz']))
-			{
-				$lv_obj->lehre=($_POST['lehre']=='true'?false:true);
-				$lv_obj->updateamum = date('Y-m-d H:i:s');
-				$lv_obj->updatevon = $user;
-				if($lv_obj->save(false))
-					exit('true');
-				else 
-					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
-			}
-			else 
-				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
-		}
-		
-		//Reservieren Feld setzen
-		if(isset($_POST['reservieren']))
-		{
-			$lv_obj = new ort();
-			if($lv_obj->load($_POST['ort_kurzbz']))
-			{
-				$lv_obj->reservieren=($_POST['reservieren']=='true'?false:true);
-				$lv_obj->updateamum = date('Y-m-d H:i:s');
-				$lv_obj->updatevon = $user;
-				if($lv_obj->save(false))
-					exit('true');
-				else 
-					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
-			}
-			else 
-				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
-		}
-		
-		//Aktiv Feld setzen
-		if(isset($_POST['aktiv']))
-		{
-			$lv_obj = new ort();
-			if($lv_obj->load($_POST['ort_kurzbz']))
-			{
-				$lv_obj->aktiv=($_POST['aktiv']=='true'?false:true);
-				$lv_obj->updateamum = date('Y-m-d H:i:s');
-				$lv_obj->updatevon = $user;
-				if($lv_obj->save(false))
-					exit('true');
-				else 
-					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
-			}
-			else 
-				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
-		}
-	}
-}
 
-if (isset($_GET["toggle"]))
-{
-	if(!$rechte->isBerechtigt('basis/ort', null, 'suid'))
-		die('Sie haben keine Berechtigung fuer diese Aktion');
-
-	if ($_GET["rlehre"] != "" && $_GET["rlehre"] != NULL)
+	//Lehre Feld setzen
+	if(isset($_POST['lehre']))
 	{
-		$rlehre = $_GET["rlehre"];
-		$sg_update = new ort();
-		$qry = "UPDATE public.tbl_ort SET lehre = NOT lehre WHERE ort_kurzbz='".$rlehre."';";
-		if(!$db->db_query($qry))
+		$lv_obj = new ort();
+		if($lv_obj->load($_POST['ort_kurzbz']))
 		{
-			die('Fehler beim Speichern des Datensatzes');
-		}	
+			$lv_obj->lehre=($_POST['lehre']=='true'?false:true);
+			$lv_obj->updateamum = date('Y-m-d H:i:s');
+			$lv_obj->updatevon = $user;
+			if($lv_obj->save(false))
+				exit('true');
+			else 
+				exit('Fehler beim Speichern:'.$lv_obj->errormsg);
+		}
+		else 
+			exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
 	}
-	if ($_GET["rres"] != "" && $_GET["rres"] != NULL)
+	
+	//Reservieren Feld setzen
+	if(isset($_POST['reservieren']))
 	{
-		$rres = $_GET["rres"];
-		$sg_update = new ort();
-		$qry = "UPDATE public.tbl_ort SET reservieren = NOT reservieren WHERE ort_kurzbz='".$rres."';";
-		if(!$db->db_query($qry))
+		$lv_obj = new ort();
+		if($lv_obj->load($_POST['ort_kurzbz']))
 		{
-			die('Fehler beim Speichern des Datensatzes');
-		}	
+			$lv_obj->reservieren=($_POST['reservieren']=='true'?false:true);
+			$lv_obj->updateamum = date('Y-m-d H:i:s');
+			$lv_obj->updatevon = $user;
+			if($lv_obj->save(false))
+				exit('true');
+			else 
+				exit('Fehler beim Speichern:'.$lv_obj->errormsg);
+		}
+		else 
+			exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
 	}
-	if ($_GET["raktiv"] != "" && $_GET["raktiv"] != NULL)
+	
+	//Aktiv Feld setzen
+	if(isset($_POST['aktiv']))
 	{
-		$raktiv = $_GET["raktiv"];
-		$sg_update = new ort();
-		$qry = "UPDATE public.tbl_ort SET aktiv = NOT aktiv WHERE ort_kurzbz='".$raktiv."';";
-		if(!$db->db_query($qry))
+		$lv_obj = new ort();
+		if($lv_obj->load($_POST['ort_kurzbz']))
 		{
-			die('Fehler beim Speichern des Datensatzes');
-		}	
+			$lv_obj->aktiv=($_POST['aktiv']=='true'?false:true);
+			$lv_obj->updateamum = date('Y-m-d H:i:s');
+			$lv_obj->updatevon = $user;
+			if($lv_obj->save(false))
+				exit('true');
+			else 
+				exit('Fehler beim Speichern:'.$lv_obj->errormsg);
+		}
+		else 
+			exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
 	}
 }
 
@@ -143,10 +101,12 @@ $sg = new ort();
 if (!$sg->getAll())
     die($sg->errormsg);
 
-//$htmlstr = "<table class='liste sortable'>\n";
-$htmlstr = "<form name='formular'><input type='hidden' name='check' value=''></form><table class='tablesorter' id='t1'>\n";
-$htmlstr .= "   <thead><tr>\n";
-$htmlstr .= "    <th onmouseup='document.formular.check.value=0'>Kurzbezeichnung</th>
+$htmlstr = "
+<table class='tablesorter' id='t1'>
+<thead>
+	<tr>
+		<th></th>
+		<th>Kurzbezeichnung</th>
 		<th>Bezeichnung</th>
 		<th>Planbezeichnung</th>
 		<th>Max. Person</th>
@@ -154,19 +114,21 @@ $htmlstr .= "    <th onmouseup='document.formular.check.value=0'>Kurzbezeichnung
 		<th>Reservieren</th>
 		<th>Aktiv</th>
 		<th>Kosten</th>
-		<th>Stockwerk</th>";
-$htmlstr .= "   </tr></thead><tbody>\n";
-$i = 0;
+		<th>Stockwerk</th>
+   </tr>
+</thead>
+<tbody>\n";
+
 foreach ($sg->result as $twraum)
 {
-    //$htmlstr .= "   <tr class='liste". ($i%2) ."'>\n";
 	$htmlstr .= "   <tr>\n";
+	$htmlstr .= '		<td><a href="raum_details.php?type=raumtyp&ort_kurzbz='.$twraum->ort_kurzbz.'" target="detail_raum" title="Raumtyp zuteilen" ><img src="../../skin/images/entitlement-pot.png" height="20px"/></a></td>';
 	$htmlstr .= "       <td><a href='raum_details.php?ort_kurzbz=".$twraum->ort_kurzbz."' target='detail_raum'>".$twraum->ort_kurzbz."</a></td>\n";
 	$htmlstr .= "       <td>".$twraum->bezeichnung."</td>\n";
 	$htmlstr .= "       <td>".$twraum->planbezeichnung."</td>\n";
 	$htmlstr .= "       <td>".$twraum->max_person."</td>\n";
 	
-	// Lehre bollean setzen
+	// Lehre boolean setzen
 	
 	$htmlstr .= "       <div style='display: none'>".$db->convert_html_chars($twraum->lehre)."</div> <td align='center'><a href='#Lehre' onclick='changeboolean(\"".$twraum->ort_kurzbz."\",\"lehre\"); return false'>";
 	$htmlstr .= "       <input type='hidden' id='lehre".$twraum->ort_kurzbz."' value='".($twraum->lehre=="t"?"true":"false")."'>";
@@ -189,8 +151,8 @@ foreach ($sg->result as $twraum)
 	
 	$htmlstr .= "       <td>".$twraum->kosten."</td>\n";
 	$htmlstr .= "       <td>".$twraum->stockwerk."</td>\n";
+
 	$htmlstr .= "   </tr>\n";
-	$i++;
 }
 $htmlstr .= "</tbody></table>\n";
 
@@ -198,83 +160,69 @@ $htmlstr .= "</tbody></table>\n";
 ?>
 <html>
 <head>
-<title>R&auml;ume &Uuml;bersicht</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<!--<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>-->
-<script type="text/javascript" src="../../include/js/jquery.js"></script>
-<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
-<style>
-table.tablesorter tbody td
-{
-	margin: 0;
-	padding: 0;
-	vertical-align: middle;
-}
-</style>
-<script language="JavaScript" type="text/javascript">
-$(document).ready(function() 
-		{ 
-			$("#t1").tablesorter(
-			{
-				sortList: [[2,0]],
-				widgets: ["zebra"]
-			}); 
-		});
-		
-function confdel()
-{
-	if(confirm("Diesen Datensatz wirklick loeschen?"))
-	  return true;
-	return false;
-}
-
-function changeboolean(ort_kurzbz, name)
-{
-	value=document.getElementById(name+ort_kurzbz).value;
-	
-	var dataObj = {};
-	dataObj["ort_kurzbz"]=ort_kurzbz;
-	dataObj[name]=value;
-
-	$.ajax({
-		type:"POST",
-		url:"raum_uebersicht.php", 
-		data:dataObj,
-		success: function(data) 
+	<title>R&auml;ume &Uuml;bersicht</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+	<script type="text/javascript" src="../../include/js/jquery.js"></script>
+	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
+	<style>
+	table.tablesorter tbody td
+	{
+		margin: 0;
+		padding: 0;
+		vertical-align: middle;
+	}
+	</style>
+	<script language="JavaScript" type="text/javascript">
+	$(document).ready(function() 
+	{ 
+		$("#t1").tablesorter(
 		{
-			if(data=="true")
-			{
-				//Image und Value aendern
-				if(value=="true")
-					value="false";
-				else
-					value="true";
-				document.getElementById(name+ort_kurzbz).value=value;
-				document.getElementById(name+"img"+ort_kurzbz).src="../../skin/images/"+value+".png";
-			}
-			else 
-				alert("ERROR:"+data)
-		},
-		error: function() { alert("error"); }
+			sortList: [[3,0]],
+			widgets: ["zebra"]
+		}); 
 	});
-}
+		
+	function changeboolean(ort_kurzbz, name)
+	{
+		value=document.getElementById(name+ort_kurzbz).value;
+	
+		var dataObj = {};
+		dataObj["ort_kurzbz"]=ort_kurzbz;
+		dataObj[name]=value;
 
-</script>
+		$.ajax({
+			type:"POST",
+			url:"raum_uebersicht.php", 
+			data:dataObj,
+			success: function(data) 
+			{
+				if(data=="true")
+				{
+					//Image und Value aendern
+					if(value=="true")
+						value="false";
+					else
+						value="true";
+					document.getElementById(name+ort_kurzbz).value=value;
+					document.getElementById(name+"img"+ort_kurzbz).src="../../skin/images/"+value+".png";
+				}
+				else 
+					alert("ERROR:"+data)
+			},
+			error: function() { alert("error"); }
+		});
+	}
 
+	</script>
 </head>
-
-<body class="background_main">
+<body>
 <h2>R&auml;ume &Uuml;bersicht</h2>
 <a href="raum_details.php" target="detail_raum">Neuer Raum </a>
-
 
 <?php 
     echo $htmlstr;
 ?>
-
-
 
 </body>
 </html>
