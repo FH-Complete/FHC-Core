@@ -19,18 +19,11 @@
 
 $(document).ready(function() {
 	var stdkz = $('select[name=studiengang_kz]').val();
-	if (admin)
-	{
-		var where = " ";
-	}
-	else
-	{
-		var where = " AND aktiv=true";
-	}
+
 	$.ajax({
 		type: "POST",
 		url: "lvbgruppenverwaltungTree.php",
-		data: {studiengang_kz: stdkz, where: where}
+		data: {studiengang_kz: stdkz}
 	}).done(function(data) {
 		if (data === "No Data available!")
 		{
