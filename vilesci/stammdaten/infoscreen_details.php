@@ -104,7 +104,6 @@ $datum_obj = new datum();
 			$infoscreen->insertvon = $user;
 		}
 		
-		$infoscreen->infoscreen_id = $my_infoscreen_id;
 		$infoscreen->content_id = $content_id;
 		$infoscreen->gueltigvon = $datum_obj->formatDatum($gueltigvon,'Y-m-d H:i:s');
 		$infoscreen->gueltigbis = $datum_obj->formatDatum($gueltigbis,'Y-m-d H:i:s');
@@ -112,10 +111,16 @@ $datum_obj = new datum();
 		$infoscreen->updateamum = date('Y-m-d H:i:s');
 		$infoscreen->updatevon = $user;
 		
-		if(!$infoscreen->saveContent())
-			echo '<span class="error">',$db->convert_html_chars($infoscreen->errormsg),'</span>';
-		else
-			echo '<span class="ok">Daten erfolgreich gespeichert</span>';		
+		$infoscreen_ids=explode(',',$my_infoscreen_id);
+		foreach($infoscreen_ids as $is_id)
+		{
+			$infoscreen->infoscreen_id = $is_id;
+		
+			if(!$infoscreen->saveContent())
+				echo '<span class="error">Fehler bei Infoscreen '.$is_id.': '.$db->convert_html_chars($infoscreen->errormsg).'</span><br>';
+			else
+				echo '<span class="ok">Daten erfolgreich gespeichert für Infoscreen '.$is_id.'</span><br>';		
+		}
 	}
 	if($action=='delete')
 	{
