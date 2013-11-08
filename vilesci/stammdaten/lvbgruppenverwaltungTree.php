@@ -30,15 +30,13 @@ require_once('../../include/benutzerberechtigung.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-?>
-<?php
+
 if (isset($_POST['studiengang_kz']) && is_numeric($_POST['studiengang_kz']))
 	$studiengang_kz = $_POST['studiengang_kz'];
 else
 	$studiengang_kz = '';
 
 $user = get_uid();
-$where = $_POST["where"];
 
 $studiengang = new studiengang();
 $studiengang->load($studiengang_kz);
@@ -51,8 +49,9 @@ else
 	$admin = false;
 
 $lehrverband = new lehrverband();
+
 //Semester des Studiengangs laden und ausgeben
-$semResult = $lehrverband->getSemesterFromStudiengang($studiengang_kz, $where);
+$semResult = $lehrverband->getSemesterFromStudiengang($studiengang_kz, !$admin);
 if ($semResult != false) {
 	echo "<ul>";
 	foreach ($semResult as $s) {
@@ -66,7 +65,7 @@ if ($semResult != false) {
 					</a>";
 
 		//Verbände des Semesters holen und ausgeben
-		$verbandResult = $lehrverband->getVerbandFromSemester($studiengang_kz, $s["semester"], $where);
+		$verbandResult = $lehrverband->getVerbandFromSemester($studiengang_kz, $s["semester"], !$admin);
 		if ($verbandResult != false) {
 			echo "<ul>";
 			foreach ($verbandResult as $v) {
@@ -80,7 +79,7 @@ if ($semResult != false) {
 									Verband " . $verb . ($v["bezeichnung"] != '' ? " (" . $v["bezeichnung"] . ")" : '' ) . "
 								</a>";
 					//Gruppen des Verbandes holen und ausgeben
-					$grpResult = $lehrverband->getGruppeFromVerband($studiengang_kz, $s["semester"], $v["verband"], $where);
+					$grpResult = $lehrverband->getGruppeFromVerband($studiengang_kz, $s["semester"], $v["verband"], !$admin);
 					if ($grpResult != null) {
 						echo "<ul>";
 						foreach ($grpResult as $g) {

@@ -63,7 +63,7 @@ if (!$db = new basis_db())
 			.detailsDiv {
 				background-color: #E0E0E0;
 				position: fixed;
-				top: 10em;
+				top: 5em;
 				float: left;
 			}
 			
@@ -74,7 +74,7 @@ if (!$db = new basis_db())
 		</style>
 
 	</head>
-	<body class="background_main">
+	<body>
 		<h2>Gruppen - Verwaltung</h2>
 
 		<?php

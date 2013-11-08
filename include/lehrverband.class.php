@@ -73,7 +73,7 @@ class lehrverband extends basis_db
 			}
 			else
 			{
-				$this->errormsg = 'Fehler bei Abfrage: '.$qry;
+				$this->errormsg = 'Fehler bei Abfrage';
 				return false;
 			}
 		}
@@ -199,9 +199,13 @@ class lehrverband extends basis_db
 		}
 	}
 	
-	public function getSemesterFromStudiengang($studiengang_kz, $where)
+	public function getSemesterFromStudiengang($studiengang_kz, $aktiv=false)
 	{
-		$qry = 'SELECT semester, aktiv FROM public.tbl_lehrverband WHERE studiengang_kz='.$this->db_add_param($studiengang_kz, FHC_INTEGER)." AND verband=' ' ".$where;
+		$qry = 'SELECT semester, aktiv FROM public.tbl_lehrverband WHERE studiengang_kz='.$this->db_add_param($studiengang_kz, FHC_INTEGER)." AND verband=' ' ";
+
+		if($aktiv)
+			$qry.= ' AND aktiv=true';
+
 		$qry .= ' GROUP BY semester, aktiv ORDER BY semester;';
 		
 		if($this->db_query($qry))
@@ -223,9 +227,11 @@ class lehrverband extends basis_db
 		}
 	}
 	
-	public function getVerbandFromSemester($studiengang_kz, $semester, $where)
+	public function getVerbandFromSemester($studiengang_kz, $semester, $aktiv=false)
 	{
-		$qry = 'SELECT verband, aktiv, bezeichnung FROM public.tbl_lehrverband WHERE studiengang_kz='.$this->db_add_param($studiengang_kz, FHC_INTEGER).' AND semester='.$this->db_add_param($semester, FHC_INTEGER)." AND gruppe=' ' ".$where;
+		$qry = 'SELECT verband, aktiv, bezeichnung FROM public.tbl_lehrverband WHERE studiengang_kz='.$this->db_add_param($studiengang_kz, FHC_INTEGER).' AND semester='.$this->db_add_param($semester, FHC_INTEGER)." AND gruppe=' ' ";
+		if($aktiv)
+			$qry.=' AND aktiv=true';
 		$qry .= ' GROUP BY verband, aktiv, bezeichnung ORDER BY verband;';
 		
 		if($this->db_query($qry))
@@ -248,9 +254,13 @@ class lehrverband extends basis_db
 		}
 	}
 	
-	public function getGruppeFromVerband($studiengang_kz, $semester, $verband, $where)
+	public function getGruppeFromVerband($studiengang_kz, $semester, $verband, $aktiv=false)
 	{
-		$qry = 'SELECT gruppe, bezeichnung, aktiv FROM public.tbl_lehrverband WHERE studiengang_kz='.$this->db_add_param($studiengang_kz, FHC_INTEGER).' AND semester='.$this->db_add_param($semester, FHC_INTEGER).' AND verband='.$this->db_add_param($verband, FHC_STRING).$where;
+		$qry = 'SELECT gruppe, bezeichnung, aktiv FROM public.tbl_lehrverband WHERE studiengang_kz='.$this->db_add_param($studiengang_kz, FHC_INTEGER).' AND semester='.$this->db_add_param($semester, FHC_INTEGER).' AND verband='.$this->db_add_param($verband, FHC_STRING);
+		if($aktiv)
+		{
+			$qry.=' AND aktiv=true';
+		}
 		$qry .= ' GROUP BY gruppe, bezeichnung, aktiv ORDER BY gruppe;';
 		if($this->db_query($qry))
 		{
