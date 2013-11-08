@@ -57,7 +57,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						            <fo:table-row line-height="25pt">
 										<fo:table-cell border-align="right" border-width="0.2mm" border-style="solid" >
 										<fo:block line-height="12pt" font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="center">
-											<xsl:value-of select="matrikelnummer" />
+											<xsl:value-of select="svnr" />
 										</fo:block>
 									</fo:table-cell>
 								</fo:table-row>      
@@ -127,7 +127,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					<fo:block-container position="absolute" top="226pt" left="445pt" height="30pt">
 						<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="8pt"> 
 							<fo:inline vertical-align="super">
-								Personenkennzeichen
+								SV-Nummer
 							</fo:inline>
 						</fo:block>
 					</fo:block-container>
@@ -139,7 +139,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						            <fo:table-row line-height="25pt">
 										<fo:table-cell border-align="right" border-width="0.2mm" border-style="solid" >
 										<fo:block line-height="12pt" font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="center">
-											<xsl:value-of select="matrikelnummer" />
+											<xsl:value-of select="svnr" />
 										</fo:block>
 									</fo:table-cell>
 								</fo:table-row>      
@@ -210,7 +210,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					<fo:block-container position="absolute" top="376pt" left="445pt" height="30pt">
 						<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="8pt"> 
 							<fo:inline vertical-align="super">
-								Personenkennzeichen
+								SV-Nummer
 							</fo:inline>
 						</fo:block>
 					</fo:block-container>
@@ -222,7 +222,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						            <fo:table-row line-height="25pt">
 										<fo:table-cell border-align="right" border-width="0.2mm" border-style="solid" >
 										<fo:block line-height="12pt" font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="center">
-											<xsl:value-of select="matrikelnummer" />
+											<xsl:value-of select="svnr" />
 										</fo:block>
 									</fo:table-cell>
 								</fo:table-row>      
@@ -293,7 +293,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					<fo:block-container position="absolute" top="526pt" left="445pt" height="30pt">
 						<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="8pt"> 
 							<fo:inline vertical-align="super">
-								Personenkennzeichen
+								SV-Nummer
 							</fo:inline>
 						</fo:block>
 					</fo:block-container>
@@ -305,7 +305,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						            <fo:table-row line-height="25pt">
 										<fo:table-cell border-align="right" border-width="0.2mm" border-style="solid" >
 										<fo:block line-height="12pt" font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="center">
-											<xsl:value-of select="matrikelnummer" />
+											<xsl:value-of select="svnr" />
 										</fo:block>
 									</fo:table-cell>
 								</fo:table-row>      
@@ -377,7 +377,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 					<fo:block-container position="absolute" top="676pt" left="445pt" height="30pt">
 						<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="8pt"> 
 							<fo:inline vertical-align="super">
-								Personenkennzeichen
+								SV-Nummer
 							</fo:inline>
 						</fo:block>
 					</fo:block-container>
@@ -389,7 +389,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						            <fo:table-row line-height="25pt">
 										<fo:table-cell border-align="right" border-width="0.2mm" border-style="solid" >
 										<fo:block line-height="12pt" font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="center">
-											<xsl:value-of select="matrikelnummer" />
+											<xsl:value-of select="svnr" />
 										</fo:block>
 									</fo:table-cell>
 								</fo:table-row>      
