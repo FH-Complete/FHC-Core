@@ -76,7 +76,12 @@ function showFarbcodes()
 $trenner = new variable();
 $trenner->loadVariables($getuid);
 	
-$sql_query = "SELECT * 
+$sql_query = "SELECT *, 
+			(SELECT orgform_kurzbz
+			FROM tbl_prestudentstatus
+			WHERE prestudent_id=(Select prestudent_id from tbl_student where student_uid=xy.uid limit 1)
+			ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1
+			) as organisationsform
 			FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) public.tbl_studiengang.bezeichnung as stgbez,tbl_projekttyp.bezeichnung AS prjbez,* FROM lehre.tbl_projektarbeit  
 			LEFT JOIN public.tbl_benutzer on(uid=student_uid) 
 			LEFT JOIN public.tbl_person on(tbl_benutzer.person_id=tbl_person.person_id)
@@ -99,13 +104,15 @@ else
 {
 	//$htmlstr .= "<form name='formular'><input type='hidden' name='check' value=''></form>";
 	$htmlstr .= "<form name='multitermin' action='abgabe_assistenz_multitermin.php' title='Serientermin' target='al_detail' method='POST'>";
-	$htmlstr .= "<table id='t1' class='liste table-autosort:5 table-stripeclass:alternate table-autostripe'>\n";
+	//$htmlstr .= "<table id='t1' class='liste table-autosort:5 table-stripeclass:alternate table-autostripe'>\n";
+	$htmlstr .= "<table id='t1' class='tablesorter'>\n";
 	$htmlstr .= "<thead><tr class='liste'>\n";
 	$htmlstr .= "<th></th><th class='table-sortable:default'>UID</th>
 				<th>Email</th>
 				<th class='table-sortable:default'>Sem.</th>
 				<th class='table-sortable:default'>Vorname</th>
-				<th class='table-sortable:alphanumeric'>Nachname</th>";
+				<th class='table-sortable:alphanumeric'>Nachname</th>
+				<th class='table-sortable:default'>Orgform</th>";
 	$htmlstr .= "<th class='table-sortable:default'>Typ</th>
 				<th>Titel</th>
 				<th class='table-sortable:alphanumeric'>1.Begutachter(in)</th>
@@ -253,6 +260,7 @@ else
 		$htmlstr .= "       <td>".$row->studiensemester_kurzbz."</td>\n";
 		$htmlstr .= "       <td>".$row->vorname."</td>\n";
 		$htmlstr .= "       <td>".$row->nachname."</td>\n";
+		$htmlstr .= "       <td>".$row->organisationsform."</td>\n";
 		$htmlstr .= "       <td>".$row->prjbez."</td>\n";
 		$htmlstr .= "       <td>".$row->titel."</td>\n";
 		
@@ -300,9 +308,22 @@ else
 <title>Abgabesystem_Assistenzsicht</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+<!-- <link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css"> -->
+<!-- <script src="../../include/js/tablesort/table.js" type="text/javascript"></script> -->
+<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
+<script type="text/javascript" src="../../include/js/jquery.js"></script> 
 <script language="JavaScript" type="text/javascript">
+	
+$(document).ready(function() 
+	{ 
+	    $("#t1").tablesorter(
+		{
+			sortList: [[5,0]],
+			widgets: ['zebra']
+		}); 
+	} 
+);
+
 function confdel()
 {
 	if(confirm("Diesen Datensatz wirklick loeschen?"))
