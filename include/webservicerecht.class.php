@@ -23,17 +23,18 @@ require_once(dirname(__FILE__).'/benutzerberechtigung.class.php');
 
 class webservicerecht extends basis_db
 {
-	public $webservicerecht_id;		// Serial
-	public $berechtigung_kurzbz;	// FK varchar(32)
-	public $methode;				// varchar(64)
+	public $webservicerecht_id;	// Serial
+	public $berechtigung_kurzbz;// FK varchar(32)
+	public $methode;			// varchar(256)
 	public $attribut;			// varchar(256)
-	public $insertamum;			// text
-	public $insertvon;			// timestampt
-	public $updateamum;			// varchar(32)
-    public $updatevon;			// timestampt
+	public $insertamum;			// timestamp
+	public $insertvon;			// varchar(32)
+	public $updateamum;			// timestamp
+    public $updatevon;			// varchar(32)
+	public $klasse;				// varchar(256)
 
 	public $new;					// boolean
-	public $result = array(); 		// webservicelog object array
+	public $result = array(); 		// webservicerecht object array
 	
 	/**
 	 * Konstruktor - Laedt optional einen DS
@@ -53,8 +54,9 @@ class webservicerecht extends basis_db
      * 
      * @param $user
      * @param $methode 
+	 * @param $klasse
      */
-    public function isUserAuthorized($user, $methode)
+    public function isUserAuthorized($user, $methode, $klasse=null)
     {
         $berechtigung = new benutzerberechtigung(); 
         $berechtigung->getBerechtigungen($user);
@@ -68,7 +70,10 @@ class webservicerecht extends basis_db
         }
         
         $qry = "SELECT 1 from system.tbl_webservicerecht where methode = ".$this->db_add_param($methode)." 
-            AND berechtigung_kurzbz IN (".$this->implode4SQL($berechtigungArray).');';
+            AND berechtigung_kurzbz IN (".$this->implode4SQL($berechtigungArray).')';
+
+		if(!is_null($klasse))
+			$qry.=" AND klasse=".$this->db_add_param($klasse);
         
         if($result = $this->db_query($qry))
 		{
@@ -113,7 +118,7 @@ class webservicerecht extends basis_db
             }
         }
        
-        $helpObject = new foobar(); 
+        $helpObject = new stdClass(); 
         
         for($i = 0; $i<sizeof($attributArray); $i++)
         {
@@ -124,4 +129,3 @@ class webservicerecht extends basis_db
         return $helpObject; 
     }
 }
-class foobar{};
