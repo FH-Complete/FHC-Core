@@ -216,7 +216,7 @@ if ($type == 'edit') {
 			<tr>
 				<td>OrgForm</td>
 				<td>";
-					echo "	<SELECT name='orgform_kurzbz'>";
+					echo "	<SELECT name='orgform_kurzbz' id='orgform_kurzbz'>";
 					echo "		<OPTION value=''>-- keine Auswahl --</OPTION>";
 					$qry_orgform = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz NOT IN ('VBB', 'ZGS') ORDER BY orgform_kurzbz";
 					if ($result_orgform = $db->db_query($qry_orgform)) {
