@@ -172,6 +172,7 @@ function newSpezGroup(id) {
 ;
 function saveGroup(studiengang_kz, semester, verband, gruppe, type) {
 	var bezeichnung = $("#newBez").val();
+	var orgform = $("#orgform_kurzbz").val();
 	if(admin)
 	{
 		if (document.getElementById("aktiv").checked)
@@ -182,7 +183,7 @@ function saveGroup(studiengang_kz, semester, verband, gruppe, type) {
 	$.ajax({
 		type: "POST",
 		url: "lvbgruppenverwaltungDetail.php",
-		data: {studiengang_kz: studiengang_kz, semester: semester, verband: verband, gruppe: gruppe, type: type, bezeichnung: bezeichnung, aktiv: aktiv}
+		data: {studiengang_kz: studiengang_kz, semester: semester, verband: verband, gruppe: gruppe, type: type, bezeichnung: bezeichnung, aktiv: aktiv, orgform_kurzbz: orgform}
 	}).done(function(data) {
 		loadTree();
 		$("#ajaxData").html("<div class='detailsDiv'>"+data+"</div>");
@@ -222,7 +223,7 @@ function saveSpzGroup(studiengang_kz, kurzBz, type) {
 		url: "lvbgruppenverwaltungDetail.php",
 		data: {studiengang_kz: studiengang_kz, gruppe_kurzbz: kurzBz, bezeichnung: bezeichnung, kurzBzNeu: kurzBzNeu,
 			beschreibung: beschreibung, sichtbar: sichtbar, lehre: lehre, aktiv: aktiv, sort: sort, mailgrp: mailgrp,
-			generiert: generiert, orgForm: orgForm, type: type}
+			generiert: generiert, orgform_kurzbz: orgForm, type: type}
 	}).done(function(data) {
 		loadTree();
 		$("#ajaxData").html("<div class='detailsDiv'>"+data+"</div>");
