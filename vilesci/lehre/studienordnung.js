@@ -102,10 +102,10 @@ function drawStudienordnungen(data)
 	$('#studienordnung').html(obj);
 }
 
-function loadStudienplanSTO(studienordnung_id,bezeichnung)
+function loadStudienplanSTO(neue_studienordnung_id,bezeichnung)
 {
 	studienordnung_bezeichnung=bezeichnung;
-	studienordnung_id=studienordnung_id;
+	studienordnung_id=neue_studienordnung_id;
 	drawHeader();
 	$.ajax(
 	{
@@ -226,14 +226,14 @@ function saveStudienordnung()
 	studiengangbezeichnung = $("#studiengangbezeichnung").val();
 	studiengangbezeichnungenglisch = $("#studiengangbezeichnungenglisch").val();
 	studiengangkurzbzlang = $("#studiengangkurzbzlang").val();
-	studienordnung_id = $("#studienordnung_id").val();
+	mystudienordnung_id = $("#studienordnung_id").val();
 	akadgrad_id = $("#akadgrad_id").val();
 
-	if(studienordnung_id!='')
+	if(mystudienordnung_id!='')
 	{
 		loaddata = {
 			"method": "loadStudienordnung",
-			"parameter_0": studienordnung_id
+			"parameter_0": mystudienordnung_id
 		};
 	}
 	else
@@ -278,6 +278,69 @@ function StudienordnungSaved()
 	else
 	{
 		loadStudienordnung();
+	}
+}
+
+function saveStudienplan()
+{
+	bezeichnung = $("#bezeichnung").val();
+	version = $("#version").val();
+	orgform_kurzbz = $("#orgform_kurzbz option:selected").val();
+	sprache = $("#sprache option:selected").val();
+	regelstudiendauer = $("#regelstudiendauer").val();
+	semesterwochen = $("#semesterwochen").val();
+	testtool_sprachwahl = $("#testtool_sprachwahl").prop("checked");
+	aktiv = $("#aktiv").prop("checked");
+	mystudienplan_id = $("#studienplan_id").val();
+
+	if(mystudienplan_id!='')
+	{
+		loaddata = {
+			"method": "loadStudienplan",
+			"parameter_0": mystudienplan_id
+		};
+	}
+	else
+		loaddata={};
+
+	savedata = {
+	"bezeichnung": bezeichnung,
+	"version":version,
+	"orgform_kurzbz":orgform_kurzbz,
+	"sprache":sprache,
+	"regelstudiendauer":regelstudiendauer,
+	"semesterwochen":semesterwochen,
+	"testtool_sprachwahl":testtool_sprachwahl,
+	"aktiv":aktiv,
+	"studienordnung_id":studienordnung_id
+	};
+
+	
+	$.ajax(
+	{
+		dataType: "json",
+		url: "../../soap/fhcomplete.php",
+		type: "POST",
+		data: {
+				"typ": "json",
+				"class": "studienplan",
+				"method": "save",
+				"loaddata": JSON.stringify(loaddata),
+				"savedata": JSON.stringify(savedata),
+			},
+		success: StudienplanSaved,
+		error: loadError
+	});
+}
+function StudienplanSaved(data)
+{
+	if(data.error=='true')
+	{
+		alert('Fehler:'+data.errormsg);
+	}
+	else
+	{
+		loadStudienplanSTO(studienordnung_id,studienordnung_bezeichnung);
 	}
 }
 

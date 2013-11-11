@@ -52,9 +52,8 @@ require_once('../include/'.$class.'.class.php');
 // Berechtigung pruefen
 $uid = get_uid();
 
-// TODO Klasse pruefen und nicht nur die Methode
 $wsrecht = new webservicerecht();
-if(!$wsrecht->isUserAuthorized($uid, $method))
+if(!$wsrecht->isUserAuthorized($uid, $method, $class))
 	die('Sie haben keine Berechtigung fuer diesen Vorgang');
 
 // Funktion aufrufen

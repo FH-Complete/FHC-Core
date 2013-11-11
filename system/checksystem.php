@@ -575,6 +575,17 @@ if(!$result = @$db->db_query("SELECT zutrittssystem from public.tbl_gruppe LIMIT
 		echo 'public.tbl_gruppe: Spalte zutrittssystem hinzugefuegt';
 }
 
+// tbl_webservicerecht neue Spalte klasse
+if(!$result = @$db->db_query("SELECT klasse from system.tbl_webservicerecht LIMIT 1;"))
+{
+    $qry = "ALTER TABLE system.tbl_webservicerecht ADD COLUMN klasse varchar(256);";
+    
+    if(!$db->db_query($qry))
+		echo '<strong>system.tbl_webservicerecht: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'system.tbl_webservicerecht: Spalte klasse hinzugefügt';
+}
+
 echo '<br>';
 
 $tabellen=array(
@@ -784,7 +795,7 @@ $tabellen=array(
 	"system.tbl_rolle"  => array("rolle_kurzbz","beschreibung"),
 	"system.tbl_rolleberechtigung"  => array("berechtigung_kurzbz","rolle_kurzbz","art"),
 	"system.tbl_webservicelog"  => array("webservicelog_id","webservicetyp_kurzbz","request_id","beschreibung","request_data","execute_time","execute_user"),
-	"system.tbl_webservicerecht" => array("webservicerecht_id","berechtigung_kurzbz","methode","attribut","insertamum","insertvon","updateamum","updatevon"),
+	"system.tbl_webservicerecht" => array("webservicerecht_id","berechtigung_kurzbz","methode","attribut","insertamum","insertvon","updateamum","updatevon","klasse"),
 	"system.tbl_webservicetyp"  => array("webservicetyp_kurzbz","beschreibung"),
 	"system.tbl_server"  => array("server_kurzbz","beschreibung"),
 	"wawi.tbl_betriebsmittelperson"  => array("betriebsmittelperson_id","betriebsmittel_id","person_id", "anmerkung", "kaution", "ausgegebenam", "retouram","insertamum", "insertvon","updateamum", "updatevon","ext_id","uid"),

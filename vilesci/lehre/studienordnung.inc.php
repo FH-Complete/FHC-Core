@@ -138,6 +138,7 @@ switch($method)
 			die('Studiengang ist ungültig');
 
 		echo '
+		<input type="hidden" id="studienplan_id" />
 		<table>
 			<tr>
 				<td>Bezeichnung:</td>
@@ -176,6 +177,18 @@ switch($method)
 		}
 		echo '
 				</select></td>
+			<tr>
+				<td>Semesterwochen:</td>
+				<td><input type="text" id="semesterwochen" maxlength="2" size="2" value="15"/></td>
+			</tr>
+			<tr>
+				<td>Testtool Sprachwahl:</td>
+				<td><input type="checkbox" id="testtool_sprachwahl" checked="checked"/></td>
+			</tr>
+			<tr>
+				<td>Aktiv:</td>
+				<td><input type="checkbox" id="aktiv" checked="checked"/></td>
+			</tr>
 			<tr>
 				<td></td>
 				<td><input type="button" value="Anlegen" onclick="saveStudienplan()" /></td>
