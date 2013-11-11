@@ -130,7 +130,7 @@ class appdaten extends basis_db
 		}
 		if(mb_strlen($this->appversion)>20)
 		{
-			$this->errormsg = 'Orgform_kurzbz darf nicht laenger als 20 Zeichen sein';
+			$this->errormsg = 'Appversion darf nicht laenger als 20 Zeichen sein';
 			return false;
 		}
 		if(mb_strlen($this->bezeichnung)>512)
