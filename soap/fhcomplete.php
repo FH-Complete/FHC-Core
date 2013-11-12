@@ -39,7 +39,16 @@ $parameter=array();
 for($i=0;$i<100;$i++)
 {
 	if(isset($_REQUEST['parameter_'.$i]))
-		$parameter[]=$_REQUEST['parameter_'.$i];
+	{
+		if($_REQUEST['parameter_'.$i]=="true")
+				$parameter[]=true;
+		elseif($_REQUEST['parameter_'.$i]=="false")
+				$parameter[]=false;
+		elseif($_REQUEST['parameter_'.$i]=="null")
+				$parameter[]=null;
+		else
+			$parameter[]=$_REQUEST['parameter_'.$i];
+	}		
 	else
 		break;
 }
@@ -69,6 +78,7 @@ if(mb_stristr($method,'save'))
 
 	if(isset($loaddata['method']))
 	{
+		var_dump($loaddata);
 		if(!$wsrecht->isUserAuthorized($uid, $loaddata['method']))
 			die('keine Berechtigung');
 
@@ -97,6 +107,7 @@ if(mb_stristr($method,'save'))
 
 	if(!$error)
 	{
+		var_dump($savedata);
 		// Attribute zuweisen zum Speichern
 		foreach($savedata as $key=>$value)
 		{
@@ -106,7 +117,7 @@ if(mb_stristr($method,'save'))
 }
 
 if(!$error && call_user_func_array(array($obj, $method), $parameter))
-{
+{	
 	$data['result']=$obj->cleanResult();
 	$data['error']='false';
 	$data['errormsg']='';

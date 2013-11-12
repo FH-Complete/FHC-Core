@@ -45,6 +45,16 @@ class studienplan extends basis_db
 	protected $updatevon;				// varchar
 	protected $insertamum;				// timestamp
 	protected $insertvon;				// varchar
+	
+	//Tabellenspalten für Zwischentabelle tbl_studienplan_lehrveranstaltung
+	protected $studienplan_lehrveranstaltung_id;		//integer
+	protected $lehrveranstaltung_id;					//integer
+	protected $semester;								//smallint
+	protected $studienplan_lehrveranstaltung_id_parent;	//integer
+	protected $pflicht;									//boolean
+	protected $koordinator;								//varchar(32)
+
+
 
 	/**
 	 * Konstruktor
@@ -369,6 +379,12 @@ class studienplan extends basis_db
 				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
+				$obj->studienplan_lehrveranstaltung_id = $row->studienplan_lehrveranstaltung_id;
+				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$obj->semester = $row->semester;
+				$obj->studienplan_lehrveranstaltung_id_parent = $row->studienplan_lehrveranstaltung_id_parent;
+				$obj->pflicht = $row->pflicht;
+				$obj->koordinator = $row->koordinator;	
 				$data[]=$obj;
 			}
 		}
@@ -389,9 +405,179 @@ class studienplan extends basis_db
 			$obj->updatevon = $this->updatevon;
 			$obj->insertamum = $this->insertamum;
 			$obj->insertvon = $this->insertvon;
+			$obj->studienplan_lehrveranstaltung_id = $this->studienplan_lehrveranstaltung_id;
+			$obj->lehrveranstaltung_id = $this->lehrveranstaltung_id;
+			$obj->semester = $this->semester;
+			$obj->studienplan_lehrveranstaltung_id_parent = $this->studienplan_lehrveranstaltung_id_parent;
+			$obj->pflicht = $this->pflicht;
+			$obj->koordinator = $this->koordinator;
 			$data[]=$obj;
 		}
 		return $data;
+	}
+	
+	/**
+	 * Prüft ob eine Lehrveranstaltung im Studienplan enthalten ist
+	 * @return true wenn ja, sonst false
+	 */
+	public function containsLehrveranstaltung($studienplan_id, $lehrveranstaltung_id)
+		{
+		if (!is_numeric($studienplan_id) || $studienplan_id === '')
+		{
+			$this->errormsg = 'StudienplanID ist ungueltig';
+			return false;
+		}
+		if (!is_numeric($lehrveranstaltung_id) || $lehrveranstaltung_id === '')
+		{
+			$this->errormsg = 'LehrveranstaltungID ist ungueltig';
+			return false;
+		}
+
+		$qry = "SELECT 
+					studienplan_lehrveranstaltung_id,
+					semester as stpllv_semester,
+					pflicht as stpllv_pflicht,
+					koordinator as stpllv_koordinator,
+					studienplan_lehrveranstaltung_id_parent
+				FROM 
+					lehre.tbl_studienplan_lehrveranstaltung
+				WHERE
+					studienplan_id=" . $this->db_add_param($studienplan_id, FHC_INTEGER).
+					" AND lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER).";";
+	
+		if (!$this->db_query($qry))
+		{
+			$this->errormsg = 'Datensatz konnte nicht geladen werden';
+			return false;
+		}
+		if($this->db_num_rows()!=0)
+		{
+			return true;
+		} 
+		else
+		{
+			return false;
+		}
+	}
+	
+	/**
+	 * Lädt eine Lehrveranstaltung eines Studienplans aus der
+	 * Zwischentabelle tbl_studienplan_lehrveranstaltung
+	 * @param Studienplan ID
+	 * @param Lehrveranstaltung ID
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function loadLehrveranstaltungStudienplanByLvId($studienplan_id, $lehrveranstaltung_id){
+		if($this->containsLehrveranstaltung($studienplan_id, $lehrveranstaltung_id))
+		{
+			if (!is_numeric($studienplan_id) || $studienplan_id === '') {
+				$this->errormsg = 'StudienplanID ist ungueltig';
+				return false;
+			}
+			if (!is_numeric($lehrveranstaltung_id) || $lehrveranstaltung_id === '') {
+				$this->errormsg = 'LehrveranstaltungID ist ungueltig';
+				return false;
+			}
+
+			$qry = "SELECT 
+						tbl_lehrveranstaltung.*,
+						tbl_studienplan_lehrveranstaltung.studienplan_id,
+						tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id,
+						tbl_studienplan_lehrveranstaltung.semester as stpllv_semester,
+						tbl_studienplan_lehrveranstaltung.pflicht as stpllv_pflicht,
+						tbl_studienplan_lehrveranstaltung.koordinator as stpllv_koordinator,
+						tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent
+					FROM 
+						lehre.tbl_lehrveranstaltung
+						JOIN lehre.tbl_studienplan_lehrveranstaltung USING(lehrveranstaltung_id)
+					WHERE
+						tbl_studienplan_lehrveranstaltung.studienplan_id=" . $this->db_add_param($studienplan_id, FHC_INTEGER).
+						" AND tbl_lehrveranstaltung.lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER).";";
+
+			if (!$this->db_query($qry)) {
+				$this->errormsg = 'Datensatz konnte nicht geladen werden';
+				return false;
+			}
+
+			if ($row = $this->db_fetch_object()) {
+				$this->studienplan_id = $row->studienplan_id;
+				$this->stpllv_semester = $row->stpllv_semester;
+				$this->stpllv_pflicht = $this->db_parse_bool($row->stpllv_pflicht);
+				$this->stpllv_koordinator = $row->stpllv_koordinator;
+				$this->studienplan_lehrveranstaltung_id = $row->studienplan_lehrveranstaltung_id;
+				$this->studienplan_lehrveranstaltung_id_parent = $row->studienplan_lehrveranstaltung_id_parent;
+				$this->new = false;
+			}
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	/**
+	 * Speichert die Zuordnung einer Lehrveranstaltung zu einem Studienplan
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function saveStudienplanLehrveranstaltung() {
+
+		if ($this->new) {
+			//Neuen Datensatz einfuegen
+			$qry = 'BEGIN;INSERT INTO lehre.tbl_studienplan_lehrveranstaltung (studienplan_id, lehrveranstaltung_id,
+				semester,studienplan_lehrveranstaltung_id_parent,pflicht, koordinator,
+				insertamum, insertvon) VALUES (' .
+					$this->db_add_param($this->studienplan_id, FHC_INTEGER) . ', ' .
+					$this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER) . ', ' .
+					$this->db_add_param($this->stpllv_semester, FHC_INTEGER) . ', ' .
+					$this->db_add_param($this->studienplan_lehrveranstaltung_id_parent, FHC_INTEGER) . ', ' .
+					$this->db_add_param($this->stpllv_pflicht, FHC_BOOLEAN) . ', ' .
+					$this->db_add_param($this->stpllv_koordinator) . ', ' .
+					'now(), ' .
+					$this->db_add_param($this->insertvon) . ');';
+		} else {
+			//Pruefen ob studienplan_id eine gueltige Zahl ist
+			if (!is_numeric($this->studienplan_lehrveranstaltung_id)) {
+				$this->errormsg = 'studienplan_lehrveranstaltung_id muss eine gueltige Zahl sein';
+				return false;
+			}
+			$qry = 'UPDATE lehre.tbl_studienplan_lehrveranstaltung SET' .
+					' studienplan_id=' . $this->db_add_param($this->studienplan_id, FHC_INTEGER) . ', ' .
+					' lehrveranstaltung_id=' . $this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER) . ', ' .
+					' semester=' . $this->db_add_param($this->stpllv_semester, FHC_INTEGER) . ', ' .
+					' studienplan_lehrveranstaltung_id_parent=' . $this->db_add_param($this->studienplan_lehrveranstaltung_id_parent, FHC_INTEGER) . ', ' .
+					' pflicht=' . $this->db_add_param($this->stpllv_pflicht, FHC_BOOLEAN) . ', ' .
+					//TODO sprache in Tabelle nicht vorhanden' sprache=' . $this->db_add_param($this->sprache) . ', ' .
+					' koordinator=' . $this->db_add_param($this->stpllv_koordinator) . ', ' .
+					' updateamum= now(), ' .
+					' updatevon=' . $this->db_add_param($this->updatevon) . ' ' .
+					' WHERE studienplan_lehrveranstaltung_id=' . $this->db_add_param($this->studienplan_lehrveranstaltung_id, FHC_INTEGER, false) . ';';
+		}
+
+		if ($this->db_query($qry)) {
+			if ($this->new) {
+				//naechste ID aus der Sequence holen
+				$qry = "SELECT currval('lehre.seq_studienplan_studienplan_lehrveranstaltung_id') as id;";
+				if ($this->db_query($qry)) {
+					if ($row = $this->db_fetch_object()) {
+						$this->studienplan_lehrveranstaltung_id = $row->id;
+						$this->db_query('COMMIT');
+					} else {
+						$this->db_query('ROLLBACK');
+						$this->errormsg = "Fehler beim Auslesen der Sequence";
+						return false;
+					}
+				} else {
+					$this->db_query('ROLLBACK');
+					$this->errormsg = 'Fehler beim Auslesen der Sequence';
+					return false;
+				}
+			}
+		} else {
+			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
+			return false;
+		}
+		return $this->studienplan_lehrveranstaltung_id;
 	}
 }
 ?>

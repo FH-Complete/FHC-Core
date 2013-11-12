@@ -26,6 +26,7 @@ require_once('../../include/studienplan.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/functions.inc.php');
+require_once('../../include/lehrveranstaltung.class.php');
 
 
 $uid = get_uid();
@@ -44,27 +45,54 @@ echo '<!DOCTYPE html>
 	<link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css" />
 	<link rel="stylesheet" href="../../skin/fhcomplete.css" />
 	<link rel="stylesheet" href="../../skin/vilesci.css" />
+	<link rel="stylesheet" href="../../include/js/treeGrid/css/jquery.treegrid.css">
+	
 	<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
+	<script>var jqUi = jQuery.noConflict(true);</script>
+	<script type="text/javascript" src="../../include/js/jstree/_lib/jquery.js"></script>
+	<!-- Script zum erstellen des Trees-->
+	<script type="text/javascript" src="../../include/js/jstree/jquery.jstree.js"></script>
+	
+	<script type="text/javascript" src="../../include/js/treeGrid/jstreegrid.js"></script>
+	
+	
 	<script src="studienordnung.js" type="text/javascript"></script>
-
 	<script type="text/javascript">
 	$(function() 
 	{
-		$( "#menueLinks" ).accordion({
+		jqUi( "#menueLinks" ).accordion({
 			heightStyle: "content",
 			header: "h3",
 			collapsible: true
 		});
-		$( "#menueRechts" ).accordion({
-			heightStyle: "content",
-			header: "h3",
-			collapsible: true
-		});
+//		jqUi( "#menueRechts" ).accordion({
+//			heightStyle: "content",
+//			header: "h2",
+//			collapsible: true
+//		});
+
+';
+echo "
+		jqUi('#menueRechts').addClass('ui-accordion ui-accordion-icons ui-widget ui-helper-reset')
+		.find('h2')
+		  .addClass('ui-accordion-header ui-helper-reset ui-state-default ui-corner-top ui-corner-bottom')
+		  .hover(function() { $(this).toggleClass('ui-state-hover'); })
+		  .prepend('<span class=\"ui-icon ui-icon-triangle-1-e\"></span>')
+		  .click(function() {
+			$(this)
+			  .toggleClass('ui-accordion-header-active ui-state-active ui-state-default ui-corner-bottom')
+			  .find('> .ui-icon').toggleClass('ui-icon-triangle-1-e ui-icon-triangle-1-s').end()
+			  .next().toggleClass('ui-accordion-content-active').slideToggle();
+			return false;
+		  })
+		  .next()
+			.addClass('ui-accordion-content  ui-helper-reset ui-widget-content ui-corner-bottom')
+			.hide();
 
 	});
 	</script>
 </head>
-<body>';
+<body>";
 if(!$rechte->isBerechtigt('lehre/studienordnung'))
 	die('Sie haben keine Berechtigung für diese Seite');
 $studiengang = new studiengang();
@@ -116,17 +144,50 @@ echo '
 			<div id="header">
 			&nbsp;
 			</div>
-			<div id="data" >
+			<div id="data" style="min-height: 10px;">
 			&nbsp;
+			</div>
+			<div id="jsonData">
+				
 			</div>
 	</td>
 	<td valign="top" width="20%">
-		<div id="menueRechts">
-			<h3>Lehrveranstaltungen</h3>
+		<div id="menueRechts" style="width: 420px;">
+			<h2><a href=#>Filter</a></h2>
 			<div style="margin:0px;padding:5px;">
-				<p id="lehrveranstaltung" style="margin:0;padding:0;">
-				Bitte wählen Sie zuerst einen Studienplan aus!
-				</p>
+				<div id="lehrveranstaltung" style="margin:0;padding:0; width: 400px;">
+				Bitte wählen Sie zuerst einen Studienplan aus!';
+//	var_dump($studiengang_kz);
+//	$lv = new lehrveranstaltung();
+//	$lv->load_lva($studiengang_kz, null, null, TRUE, TRUE);
+//	$sem = $lv->lehrveranstaltungen[1]->semester;
+//	echo "<ul>";
+//	echo "<li>Semester ".$row->lehrveranstaltungen[1]->semester."</li><ul>";
+//	foreach($lv->lehrveranstaltungen as $row)
+//	{
+//		if($sem==$row->semester)
+//		{
+//			echo "<li>".$row->bezeichnung."</li>";
+//		}
+//		else
+//		{
+//			echo "</ul><li>".$row->semester."</li>";
+//			echo "<ul><li>".$row->bezeichnung."</li>";
+//		}
+//		
+//	}
+//	echo "</ul></ul>";
+
+echo'
+				</div>
+			</div>
+			<h2>Lehrveranstaltungen</h2>
+			<div style="margin:0px;padding:5px;">
+				<div id="filteredLVs" style="width: 400px;">
+					<div id="lvListe">
+						Keine Einträge gefunden!
+					</div>
+				</div>
 			</div>
 		</div>
 	</td>

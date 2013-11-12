@@ -43,7 +43,7 @@ function drawHeader(text)
 		if(studienordnung_bezeichnung!='')
 			text=text+' <b>&gt;</b> '+studienordnung_bezeichnung;
 		if(studienplan_bezeichnung!='')
-			text=text+' <b>&gt;</b> '+studienplan_bezeichnung;
+			text=text+' <b>&gt;</b> '+studienplan_bezeichnung + " Beispieldaten";
 
 
 		text=text+'</h2>';
@@ -86,7 +86,7 @@ function StudienordnungLoaded(data)
 	else
 	{
 		drawStudienordnungen(data.result);
-		$( "#menueLinks" ).accordion("option","active",1);
+		jqUi( "#menueLinks" ).accordion("option","active",1);
 	}
 }
 
@@ -131,7 +131,7 @@ function StudienplanSTOLoaded(data)
 	else
 	{
 		drawStudienplan(data.result);
-		$( "#menueLinks" ).accordion("option","active",2);
+		jqUi( "#menueLinks" ).accordion("option","active",2);
 	}
 }
 
@@ -157,14 +157,195 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung)
 		dataType: "json",
 		url: "../../soap/lehrveranstaltung.json.php",
 		data: {
-				"method":	"loadLehrveranstaltungStudienplan",
+				"typ": "json",
+				"class": "lehrveranstaltung",
+				"method":	"getLvTree",
+//				"parameter_0": 100, //for debugging
 				"studienplan_id": studienplan_id
 			},
-		success: LehrveranstaltungSTPLLoaded,
 		error: loadError
-	});
+	}).success(function(data)
+	{
+		if(data.result[0].lehrveranstaltung_id !== null)
+		{
+			$("#data").jstree({
+				ui: {
+					"select_limit": -1,
+					"select_multiple_modifier": "ctrl"
+				},
+				json_data: { 
+					data: data.result
+				},
+				crrm: {
+					move: {
+						"always_copy": "multitree",
+						"check_move": function(m) {
+							//alert(m.o[0].id);
+//							alert($("#data").jstree._get_parent(m.o));
+//							if(jQuery.jstree._reference("#data")._get_children(m.np).find("li[id="+m.o[0].id+"]"))
+//							{
+//								//alert(jQuery.jstree._reference("#data")._get_children(m.np).find("li[id="+m.o[0].id+"]"));
+//								return true;
+//							}
+//							else
+//							{
+//								return false;
+//							}
+//							return (m.ot === m.rt) || !m.rt.get_container().find("li[id="+m.o[0].id+"]").length;
+							//console.log(m.rt._get_children(m.np).find("li[id="+m.o[0].id+"]").length+" "+m.np[0].id);
+							//console.log(m.np.children().find("li[id="+m.o[0].id+"]").length);
+							if(m.np.children().find("li[id="+m.o[0].id+"]").length !== 0)
+							{
+								return false;
+							}
+							return true;
+						 }
+					}
+				},
+				dnd: {
+					"drag_check": function(data){
+						return {
+							after: true,
+							before: true,
+							inside: true
+						}
+					}
+				},
+				grid: {
+					columns: [
+						{width: 300, header: "Lehrveranstaltung", value: "bezeichnung", source: "metadata"},
+						{width: 50, header: "ECTS", value: "ects", source: "metadata"},
+						{width: 120, header: "Semesterstunden", value: "semesterstunden", source: "metadata"}
+					],
+					resizable: true
+				},
+				types: {
+					"types" :  {
+						"valid_children" : ["semester", "lv"],
+						"lv" : {
+							icon : {
+								//image : "test.jpg"
+							},
+							max_children: 0
+						},
+						"semester" : {
+							"valid_children" : ["lv"]
+						},
+						"default" : {
+							"valid_children" : [ "default" ]
+						}
+					}
+				},
+				sort : function(a, b){
+					return this._get_node(a).attr("rel") > this._get_node(b).attr("rel");
+				},
+				plugins: ["themes", "ui", "dnd", "grid", "json_data", "crrm", "types", "sort"]
+			}).bind("move_node.jstree", function(event, data)
+			{
+				saveJsondataFromTree("copy_"+data.rslt.o[0].id, studienplan_id);
+				var root = data.inst.get_container_ul();
+				var nodes = root[0].childNodes;
+				for(var i=0; i<nodes.length; i++)
+				{
+					if(nodes[i].getAttribute("rel") !== "lv"){
+						writeEctsSum(nodes[i]);
+					}
+					
+				}
+				hideAllTreeColumns();
+			}).bind("loaded.jstree", function(event, data)
+			{
+				var root = data.inst.get_container_ul();
+				var nodes = root[0].childNodes;
+				for(var i=0; i<nodes.length; i++)
+				{
+					if(nodes[i].getAttribute("rel") !== "lv"){
+						writeEctsSum(nodes[i]);
+					}
+					
+				}
+			}).bind("open_node.jstree", function(event, data)
+			{
+				var root = data.inst.get_container_ul();
+				var nodes = root[0].childNodes;
+				for(var i=0; i<nodes.length; i++)
+				{
+					if(nodes[i].getAttribute("rel") !== "lv"){
+						writeEctsSum(nodes[i]);
+					}
+				}
+			});
+		}
+		else
+		{
+			$('#data').addClass("jstree-drop");
+			$('#data').css("border", "1px solid black");
+			
+			$('#data').jstree({
+                "json_data": {
+                    "data" : [ ]
+                },
+                crrm: {
+					move: {
+						"always_copy": "multitree"
+					}
+				},
+				dnd: {
+					"drag_check": function(data){
+						return {
+							after: true,
+							before: true,
+							inside: true
+						};
+					}
+				},
+				grid: {
+					columns: [
+						{width: 300, header: "Lehrveranstaltung", value: "bezeichnung", source: "metadata"},
+						{width: 80, header: "Semester", value: "semester", source: "metadata"},
+						{width: 50, header: "ECTS", value: "ects", source: "metadata"},
+						{width: 120, header: "Semesterstunden", value: "semesterstunden", source: "metadata"}
+					],
+					resizable: true
+				},
+                "plugins": ["themes", "json_data", "ui", "crrm", "dnd", "grid"]
+            }).bind("move_node.jstree", function (e, data) {
+				saveJsondataFromTree("copy_"+data.rslt.o[0].id, studienplan_id);
+				writeEctsSum(data.rslt.np);
+				hideAllTreeColumns();
+            });
+		}
+		
+		$("#lehrveranstaltung").html("<h3>Organisationseinheit</h3><div id='oeDiv'></div>");
+		$.ajax(
+		{
+			dataType: "json",
+			url: "../../soap/fhcomplete.php",
+			data: {
+					"typ": "json",
+					"class": "organisationseinheit",
+					"method": "getAll",
+				},
+			error: loadError
+		}).success(function(data)
+		{
+			var html = "<div><select id='oeDropdown' onchange='loadFilteredLehrveranstaltungen();'>";
+			for(i in data.result)
+			{
+				if(data.result[i].aktiv===true)
+				{
+					html+="<option>"+data.result[i].bezeichnung+"</option>";
+				}
+			}
+			html+="</select></div>";
+			$("#oeDiv").html(html);
+			loadLehrtypen();
+		});
+	})
 }
 
+
+//LehrveranstaltungSTPLLoaded nicht in Verwendung
 function LehrveranstaltungSTPLLoaded(data)
 {
 	if(data.error=='true')
@@ -175,9 +356,33 @@ function LehrveranstaltungSTPLLoaded(data)
 	{
 		lehrveranstaltungen = data.result;
 		drawLehrveranstaltung(data.result);
-		$( "#menueRechts" ).accordion("option","active",0);
+		jqUi( "#menueRechts" ).accordion("option","active",1);
 		//drawLehrveranstaltungGrid();
-		$("#lehrveranstaltung").html("<h2>Organisationseinheit</h2><h2>Lehrtyp</h2>");
+		$("#lehrveranstaltung").html("<h3>Organisationseinheit</h3><div id='oeDiv'></div><h3>Lehrtyp</h3><div id='lehrtypenDiv'></div>");
+		$.ajax(
+		{
+			dataType: "json",
+			url: "../../soap/fhcomplete.php",
+			data: {
+					"typ": "json",
+					"class": "organisationseinheit",
+					"method": "getAll",
+				},
+			error: loadError
+		}).success(function(data)
+		{
+			var html = "<select id='oeDropdown'>";
+			for(i in data.result)
+			{
+				if(data.result[i].aktiv===true)
+				{
+					html+="<option>"+data.result[i].bezeichnung+"</option>";
+				}
+				
+			}
+			html+="</select>";
+			$("#oeDiv").html(html);
+		});
 	}
 }
 
@@ -216,6 +421,216 @@ function neuerStudienplan()
 	$("#data").load('studienordnung.inc.php?method=neuerStudienplan&studiengang_kz='+studiengang_kz);
 }
 
+/*
+* Funktion zum Laden des Baumes der 
+* gefilterten LVs
+* */
+function loadFilteredLehrveranstaltungen()
+{
+	$.ajax(
+	{
+		dataType: "json",
+		url: "../../soap/fhcomplete.php",
+		data: {
+				"typ": "json",
+				"class": "lehrveranstaltung",
+				"method":	"load_lva",
+				"parameter_0": studiengang_kz,						//Studiengangskennzahl
+				"parameter_1": $("#semesterDropdown").val(),		//Semester
+				"parameter_2": "null",								//Lehrverzeichnis
+				"parameter_3": true,								//Lehre
+				"parameter_4": true,								//Aktiv
+				"parameter_5": "bezeichnung",						//Sortierung
+				"parameter_6": $("#oeDropdown").val(),				//Organisationseinheit KurzBz
+				"parameter_7": $("#lehrtypDropdown").val()			//Lehrtyp KurzBz
+			},
+		error: loadError
+	}).success(function(data)
+	{
+		if(data.result[0].lehrveranstaltung_id!==null)
+		{
+			
+			if($("#lvListe").length === 0)
+			{
+				$("#filteredLVs").html("<h3>Lehrveranstaltungen</h3><div id='lvListe'></div>");
+			}
+			$("#lvListe").jstree({
+				ui: {
+					"select_limit": -1,
+					"select_multiple_modifier": "ctrl"
+				},
+				json_data: { 
+					data: data.result
+				},
+				crrm: {
+					move: {
+						"check_move" : function(m)
+						{
+							return false;
+						},
+						"always_copy": "multitree"
+					}
+				},
+				grid: {
+					columns: [
+						{width: 325, header: "Lehrveranstaltung", value: "bezeichnung", source: "metadata"},
+						{width: 50, header: "ECTS", value: "ects", source: "metadata"},
+						{width: 80, header: "Semester", value: "semester", source: "metadata"},
+						{width: 120, header: "Semesterstunden", value: "semesterstunden", source: "metadata"}
+					],
+					resizable: true
+				},
+				plugins: ["themes", "ui", "dnd", "grid", "json_data", "crrm", "types"]
+			}).bind("loaded.jstree", function(event, data) 
+			{
+				hideAllTreeColumns();
+			});
+		} else {
+			$("#filteredLVs .jstree-grid-wrapper").remove();
+			if($("#lvListe").length !== 0)
+			{
+				$("#lvListe").remove();
+			}
+			$("h3:contains('Lehrveranstaltungen')").remove();
+			$("#filteredLVs").append("<div id='lvListe'>Keine Einträge gefunden!</div>");
+		}
+	});
+}
+
+/*
+* Funktion zum Laden der Daten für
+* das Dropdownfeld zum Filtern nach Lehrtyp
+*/
+function loadLehrtypen()
+{
+	$.ajax(
+	{
+		dataType: "json",
+		url: "../../soap/fhcomplete.php",
+		data: {
+				"typ": "json",
+				"class": "lehrtyp",
+				"method": "getAll"
+			},
+		error: loadError
+	}).success(function(data)
+	{
+		if($("#lehrtypenDiv").length === 0)
+		{
+			$("#lehrveranstaltung").append("<h3>Lehrtyp</h3><div id='lehrtypenDiv'></div>");
+		}
+		var html = "<select id='lehrtypDropdown' onchange='loadFilteredLehrveranstaltungen();'>";
+		for(i in data.result)
+		{
+			html+="<option value='"+data.result[i].lehrtyp_kurzbz+"'>"+data.result[i].bezeichnung+"</option>";
+		}
+		html+="</select>";
+		$("#lehrtypenDiv").html(html);
+		loadSemester();
+	});
+}
+
+/*
+* Funktion zum Laden der Daten für
+* das Dropdownfeld zum Filtern nach Semester
+*/
+function loadSemester()
+{
+	$.ajax(
+	{
+		dataType: "json",
+		url: "../../soap/studienplan.json.php",
+		data: {
+				"method": "getSemesterFromStudiengang",
+				"studiengang_kz": studiengang_kz
+			},
+		error: loadError
+	}).success(function(data)
+	{
+		if($("#semesterListe").length === 0)
+		{
+			$("#lehrveranstaltung").append("<h3>Semester</h3><div id='semesterListe'></div>");
+		}
+		var html = "<select id='semesterDropdown' onchange='loadFilteredLehrveranstaltungen();'>";
+		html += "<option value='null'>Alle Semester</option>";
+		for(i in data.result)
+		{
+			html+="<option value='"+data.result[i]+"'>"+data.result[i]+". Semester</option>";
+		}
+		html+="</select>";
+		$("#semesterListe").html(html);
+		loadFilteredLehrveranstaltungen();
+	});
+}
+
+/*
+* Funktion zum Verstecken der Spalten im Baum der
+* gefilterten LV-Liste
+ */
+function hideAllTreeColumns()
+{
+	var headers = $("#filteredLVs .jstree-grid-header-cell");
+	var separators = $("#filteredLVs .jstree-grid-separator");
+	//separators[0].style.display = "none";
+	for(var j=2; j<headers.length; j++)
+	{
+		headers[j].style.display = "none";
+		separators[j].style.display = "none";
+		var divs = $("#filteredLVs .jstree-grid-col-" + j);
+		for (var i = 0; i < divs.length; i++)
+		{
+			divs[i].style.display = "none";	
+		}
+	}
+}
+
+function saveJsondataFromTree(data, studienplan_id)
+{
+	var jsonData = $("#data").jstree("get_json", $("#"+data));
+	var jsonString = JSON.stringify(jsonData);
+	//alert(JSON.stringify(jsonString));
+	loaddata = {
+		"method" : "loadLehrveranstaltungStudienplanByLvId",
+		"parameter_0" : studienplan_id,
+		"parameter_1" : jsonData[0]["metadata"]["lehrveranstaltung_id"]
+	};
+	//alert(JSON.stringify(loaddata));
+	
+	savedata = {
+		"studienplan_id": studienplan_id,
+		"lehrveranstaltung_id" : jsonData[0]["metadata"]["lehrveranstaltung_id"],
+		"stpllv_semester": jsonData[0]["metadata"]["semester"],
+		"studienplan_lehrveranstaltung_id_parent": "",
+		"stpllv_pflicht": true
+	};
+	
+//	$.ajax(
+//	{	
+//		dataType: "json",
+//		url: "../../soap/fhcomplete.php",
+//		type: "POST",
+//		data: {
+//			"typ": "json",
+//			"class": "studienplan",
+//			"method": "saveStudienplanLehrveranstaltung",
+//			"loaddata": JSON.stringify(loaddata),
+//			"savedata": JSON.stringify(savedata),
+//		}
+//	}).success(function(d)
+//	{
+//		alert(d);
+////		if(d.error !== "bereits vorhanden")
+////		{
+////			$("#jsonData").html(d);
+////		} 
+////		else 
+////		{
+////			alert("Lehrveranstaltung ist bereits im Studiengang enthalten!");
+////			$("#data").jstree("remove", $("#"+data));
+////		}
+//	});
+}
+
 function saveStudienordnung()
 {
 	bezeichnung = $("#bezeichnung").val();
@@ -240,16 +655,16 @@ function saveStudienordnung()
 		loaddata={};
 
 	savedata = {
-	"bezeichnung": bezeichnung,
-	"version":version,
-	"gueltigvon":gueltigvon,
-	"gueltigbis":gueltigbis,
-	"ects":ects,
-	"studiengangbezeichnung":studiengangbezeichnung,
-	"studiengangbezeichnungenglisch":studiengangbezeichnungenglisch,
-	"studiengangkurzbzlang":studiengangkurzbzlang,
-	"akadgrad_id":akadgrad_id,
-	"studiengang_kz":studiengang_kz
+		"bezeichnung": bezeichnung,
+		"version":version,
+		"gueltigvon":gueltigvon,
+		"gueltigbis":gueltigbis,
+		"ects":ects,
+		"studiengangbezeichnung":studiengangbezeichnung,
+		"studiengangbezeichnungenglisch":studiengangbezeichnungenglisch,
+		"studiengangkurzbzlang":studiengangkurzbzlang,
+		"akadgrad_id":akadgrad_id,
+		"studiengang_kz":studiengang_kz
 	};
 
 	
@@ -344,3 +759,19 @@ function StudienplanSaved(data)
 	}
 }
 
+function writeEctsSum(parent){
+	//alert(parent);
+	//console.log($("#data").jstree("get_children", parent));
+	var cells = $(parent).find(".jstree-grid-col-1");
+	var sum = 0;
+	//console.log(cells);
+	for(var i=1; i<cells.length; i++)
+	{
+		if(!isNaN(parseFloat(cells[i].childNodes[0].innerHTML)))
+		{
+			sum+=parseFloat(cells[i].childNodes[0].innerHTML);
+		}
+		//console.log(sum);
+	}
+	cells[0].childNodes[0].innerHTML = "<b>"+sum+"</b>";
+}

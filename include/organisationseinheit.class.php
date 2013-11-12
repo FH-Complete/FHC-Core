@@ -461,5 +461,31 @@ class organisationseinheit extends basis_db
 		
 		return false;		
 	}
+	
+	public function cleanResult(){
+		$data = array();
+		if(count($this->result)>0){
+			foreach($this->result as $oeEinheit){
+				$obj = new stdClass();
+				$obj->oe_kurzbz = $oeEinheit->oe_kurzbz;
+				$obj->oe_parent_kurzbz = $oeEinheit->oe_parent_kurzbz;
+				$obj->bezeichnung = $oeEinheit->bezeichnung;
+				$obj->organisationseinheittyp_kurzbz = $oeEinheit->organisationseinheittyp_kurzbz;
+				$obj->aktiv = $oeEinheit->aktiv;
+				$obj->mailverteiler = $oeEinheit->mailverteiler;
+				$data[]=$obj;
+			}
+		} else {
+			$obj = new stdClass();
+			$obj->oe_kurzbz = $this->oe_kurzbz;
+				$obj->oe_parent_kurzbz = $this->oe_parent_kurzbz;
+				$obj->bezeichnung = $this->bezeichnung;
+				$obj->organisationseinheittyp_kurzbz = $this->organisationseinheittyp_kurzbz;
+				$obj->aktiv = $this->aktiv;
+				$obj->mailverteiler = $this->mailverteiler;
+			$data[]=$obj;
+		}
+		return $data;
+	}
 }
 ?>
