@@ -36,6 +36,21 @@ switch($method)
 			$data['errormsg']=$studienplan->errormsg;
 		}
 		break;
+	case 'getSemesterFromStudiengang':
+		$studiengang_kz = $_REQUEST['studiengang_kz'];
+		$studiengang = new studiengang();
+		if(($result = $studiengang->getSemesterFromStudiengang($studiengang_kz)))
+		{
+			$data["result"]=$result;
+			$data['error']='false';
+			$data['errormsg']='';
+		}
+		else
+		{
+			$data['error']='true';
+			$data['errormsg']=$studiengang->errormsg;
+		}
+		break;
 	default:
 		break;
 }

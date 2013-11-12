@@ -54,6 +54,36 @@ switch($method)
 			$data['errormsg']=$lehrveranstaltung->errormsg;
 		}
 		break;
+	case 'getSemesterFromStudiengang':
+		$studiengang_kz = $_REQUEST['studiengang_kz'];
+		$lehrveranstaltung = new lehrveranstaltung();
+		if(($result = $lehrveranstaltung->getSemesterFromStudiengang($studiengang_kz)))
+		{
+			$data["result"]=$result;
+			$data['error']='false';
+			$data['errormsg']='';
+		}
+		else
+		{
+			$data['error']='true';
+			$data['errormsg']=$lehrveranstaltung->errormsg;
+		}
+		break;
+	case 'getLvTree':
+		$studienplan_id = $_REQUEST['studienplan_id'];
+		$lehrveranstaltung = new lehrveranstaltung();
+		if(($result = $lehrveranstaltung->getLvTree($studienplan_id)))
+		{
+			$data["result"]=$result;
+			$data['error']='false';
+			$data['errormsg']='';
+		}
+		else
+		{
+			$data['error']='true';
+			$data['errormsg']=$lehrveranstaltung->errormsg;
+		}
+		break;
 	default:
 		break;
 }

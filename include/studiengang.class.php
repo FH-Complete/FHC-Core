@@ -568,6 +568,25 @@ class studiengang extends basis_db
 			return false; 
 		}
 	}
+	
+		
+	/**
+	 * @return Array mit allen Semestern des Studienganges
+	 */
+	public function getSemesterFromStudiengang($studiengang_kz)
+	{
+		$qry = "SELECT DISTINCT semester from lehre.tbl_lehrveranstaltung where studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER)." order by semester asc;";
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = 'Datensatz konnte nicht geladen werden';
+			return false;
+		}
+		$result = array();
+		while ($row = $this->db_fetch_object()) {
+			$result[]= $row->semester;
+		}
+		return $result;
+	}
     
     public function getStudiengangTyp($typ)
     {
