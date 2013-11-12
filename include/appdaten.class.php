@@ -241,7 +241,7 @@ class appdaten extends basis_db
 	public function delete($appdaten_id)
 	{
 		//Pruefen ob appdaten_id eine gueltige Zahl ist
-		if(!is_numeric($appdaten_id) || $appdaten === '')
+		if(!is_numeric($appdaten_id) || $appdaten_id === '')
 		{
 			$this->errormsg = 'appdaten_id muss eine gültige Zahl sein'."\n";
 			return false;
