@@ -180,7 +180,7 @@ class appdaten extends basis_db
 			//Pruefen ob appdaten_id eine gueltige Zahl ist
 			if(!is_numeric($this->appdaten_id))
 			{
-				$this->errormsg = 'studienplan_id muss eine gueltige Zahl sein';
+				$this->errormsg = 'appdaten_id muss eine gueltige Zahl sein';
 				return false;
 			}
 			$qry='UPDATE system.tbl_appdaten SET'.
