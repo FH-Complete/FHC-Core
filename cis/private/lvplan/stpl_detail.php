@@ -236,7 +236,7 @@ if ($num_rows_stpl>0)
 	    <tr class="liste'.($i%2).'">
 	        <td>'.$unr.'</td>
 	        <td><A class="Item" href="mailto:'.$pers_email.'">'.$titelpre.' '.$pers_vorname.' '.$pers_nachname.' '.$titelpost.'</A></td>
-	        <td  title="'.$ort->bezeichnung.'">'.(!empty($ortkurzbz)?'<a href="'.RAUMINFO_PATH.trim($ortkurzbz).'.html" target="_blank">'.$ortkurzbz.'</a>':$ortkurzbz).'</td>
+	        <td  title="'.$ort->bezeichnung.'">'.(!empty($ortkurzbz)?($ort->content_id!=''?'<a href="../../../cms/content.php?content_id='.$ort->content_id.'" target="_self" onClick="window.resizeTo(1200,880)">'.$ortkurzbz.'</a>':$ortkurzbz):$ortkurzbz).'</td>
 	        <td>'.$lehrfachkurzbz.'</td>
 	        <td>'.$bezeichnung.'</td>
 	       	<td title="'.$stgkurzbz.$semester.mb_strtolower($verband).$gruppe.'">
