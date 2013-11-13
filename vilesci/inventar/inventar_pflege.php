@@ -451,7 +451,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 											select: function(event, ui)
 											{
 												ui.item.value=ui.item.bestellung_id;
-												setTimeout('document.sendform.submit()',1300);
+												setTimeout('document.sendform.submit()',300);
 											}
 										});
 /*										  $('#bestellung_id').autocomplete('inventar_autocomplete.php', 
@@ -495,11 +495,16 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 																label:item.bestelldetail_id+', '+item.beschreibung+' '+item.artikelnummer+' Preis VE '+item.preisprove+', Menge '+item.menge
 															}
 														}));
-														setTimeout('document.sendform.submit()',1300);
 													}
 												});
 											},											
 											minLength:1,
+											select: function(event, ui)
+											{
+												$('#bestelldetail_id').val(ui.item.value);
+												setTimeout('document.sendform.submit()',300);
+											}
+
 										});
 /*										  $('#bestelldetail_id').autocomplete('inventar_autocomplete.php', 
 										  {
@@ -597,7 +602,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 											select: function(event, ui)
 											{
 												ui.item.value=ui.item.ort_kurzbz;
-												setTimeout('document.sendform.submit()',1300);
+												setTimeout('document.sendform.submit()',300);
 											}
 										});
 
@@ -649,7 +654,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 											select: function(event, ui)
 											{
 												ui.item.value=ui.item.oe_kurzbz;
-												setTimeout('document.sendform.submit()',1300);
+												setTimeout('document.sendform.submit()',300);
 											}
 										});
 										
@@ -735,7 +740,7 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 											select: function(event, ui)
 											{
 												ui.item.value=ui.item.person_id;
-												setTimeout('document.sendform.submit()',1300);
+												setTimeout('document.sendform.submit()',300);
 											}
 										});
 /*										  $('#person_id').autocomplete('inventar_autocomplete.php', 
