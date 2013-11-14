@@ -693,7 +693,8 @@ if ($result_lv!=0)
 		  <th title='Soll diese Lehrveranstaltung bei Diplom-/Bachelorarbeit ausgewaehlt werden koennen?'>BA/DA</th>
 		  <th>Koordinator</th>
 		  <th>LV-Info</th>
-		  <th>Lehrfach</th>\n";
+		  <th>Lehrfach</th>
+		  <th>kompatible LV</th>";
 	echo "</tr></thead>";
 	echo "<tbody>";
 	for($i=0;$i<$num_rows;$i++)
@@ -845,6 +846,7 @@ if ($result_lv!=0)
 		else		
 			echo $db->convert_html_chars($row->lehrveranstaltung_id);
 		echo '</td>';
+		echo '<td><a href="lehrveranstaltung_kompatibel.php?lehrveranstaltung_id='.$row->lehrveranstaltung_id.'" target="lv_detail">anzeigen</a></td>';
 		echo "</tr>\n";
 	}
 }
