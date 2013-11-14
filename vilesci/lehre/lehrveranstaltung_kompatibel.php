@@ -132,8 +132,15 @@ if (!$db = new basis_db())
 					}
 			}).success(function(data)
 			{
+				if(data.error === "true")
+				{
+					alert(data.errormsg);
+				}
 				var iframe = parent.document.getElementById("lv_detail");
 				iframe.src = "lehrveranstaltung_kompatibel.php?lehrveranstaltung_id="+lehrveranstaltung_id;
+			}).error(function(data)
+			{
+				alert(data.responseText);
 			});
 		}
 		
@@ -153,8 +160,15 @@ if (!$db = new basis_db())
 					}
 			}).success(function(data)
 			{
+				if(data.error === "true")
+				{
+					alert(data.errormsg);
+				}
 				var iframe = parent.document.getElementById("lv_detail");
 				iframe.src = "lehrveranstaltung_kompatibel.php?lehrveranstaltung_id="+lehrveranstaltung_id;
+			}).error(function(data)
+			{
+				alert(data.responseText);
 			});
 		}
 	</script>
