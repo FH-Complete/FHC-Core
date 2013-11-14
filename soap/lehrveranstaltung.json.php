@@ -27,6 +27,7 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/lehrveranstaltung.class.php');
 require_once('../include/benutzerberechtigung.class.php');
+require_once('../include/webservicerecht.class.php');
 
 $uid = get_uid();
 
@@ -85,6 +86,10 @@ switch($method)
 		}
 		break;
 	case 'saveKompatibleLehrveranstaltung':
+		$wsrecht = new webservicerecht();
+		if(!$wsrecht->isUserAuthorized($uid, $method))
+			die('Sie haben keine Berechtigung fuer diesen Vorgang');
+		
 		$lv_id = $_REQUEST['lehrveranstaltung_id'];
 		$lv_id_kompatibel = $_REQUEST['lehrveranstaltung_id_kompatibel'];
 		$lehrveranstaltung = new lehrveranstaltung();
@@ -101,6 +106,10 @@ switch($method)
 		}
 		break;
 	case 'deleteKompatibleLehrveranstaltung':
+		$wsrecht = new webservicerecht();
+		if(!$wsrecht->isUserAuthorized($uid, $method))
+			die('Sie haben keine Berechtigung fuer diesen Vorgang');
+		
 		$lv_id = $_REQUEST['lehrveranstaltung_id'];
 		$lv_id_kompatibel = $_REQUEST['lehrveranstaltung_id_kompatibel'];
 		$lehrveranstaltung = new lehrveranstaltung();
