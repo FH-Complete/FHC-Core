@@ -227,7 +227,8 @@ $studiengang->getAll("kurzbzlang");
 
 //Studiengang Dropdown
 echo "<div style='padding-top: 1em;'>";
-echo "<form action='javascript:saveKompatibleLv(\"".$lehrveranstaltung_id."\")' method='POST'>Studiengang: <select id='stgDropdown' onload='javascript:loadSemester();' onchange='javascript:loadSemester();'>";
+echo "<form action='javascript:saveKompatibleLv(\"".$lehrveranstaltung_id."\")' method='POST'>
+	<b>Studiengang: </b><select id='stgDropdown' style='margin-right: 1em;' onload='javascript:loadSemester();' onchange='javascript:loadSemester();'>";
 foreach($studiengang->result as $stg)
 {
 	echo "<option value=".$stg->studiengang_kz.">".$stg->kuerzel." - ".$stg->kurzbzlang."</option>";
@@ -235,11 +236,11 @@ foreach($studiengang->result as $stg)
 echo "</select>";
 
 //Semester Dropdown
-echo "Semester: <select id='semDropdown' onchange='javascript:loadLehrveranstaltungen()'>";
+echo "<b>Semester: </b><select id='semDropdown' style='margin-right: 1em;' onchange='javascript:loadLehrveranstaltungen()'>";
 echo "</select>";
 
 //Lehrveranstaltung Dropdown
-echo "Lehrveranstaltungen: <select id='lvDropdown' onchange=''>";
+echo "<b>Lehrveranstaltungen: </b><select id='lvDropdown' onchange=''>";
 echo "</select>";
 
 //Submit Button
