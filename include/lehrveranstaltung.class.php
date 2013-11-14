@@ -197,7 +197,7 @@ class lehrveranstaltung extends basis_db {
 	public function load_lva($studiengang_kz, $semester = null, $lehreverzeichnis = null, $lehre = null, $aktiv = null, $sort = null, $oe_kurzbz=null, $lehrtyp=null) {
 		//Variablen pruefen
 		if($semester == "null")
-				$semester = null;
+			$semester = null;
 		
 		if($lehreverzeichnis == "null")
 			$lehreverzeichnis = null;
@@ -1106,8 +1106,10 @@ class lehrveranstaltung extends basis_db {
 		return $values;
 	}
 	
-	public function getLvTree($studienplan_id){
+	public function getLvTree($studienplan_id)
+	{
 		$values = array();
+		//TODO Anzahl der Semester laden; Quelle ?
 		for($i = 1; $i<=6; $i++)
 		{
 			$data = new stdClass();
@@ -1122,6 +1124,82 @@ class lehrveranstaltung extends basis_db {
 			array_push($values, $data);
 		}
 		return $values;
+	}
+	
+	public function loadLVkompatibel($lehrveranstaltung_id)
+	{
+		if (!is_numeric($lehrveranstaltung_id)) {
+			$this->errormsg = 'Lehrveranstaltung_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = "SELECT lehrveranstaltung_id_kompatibel FROM lehre.tbl_lehrveranstaltung_kompatibel 
+			WHERE lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER).";";
+		
+		if($this->db_query($qry))
+		{
+			$data = array();
+			while($row = $this->db_fetch_object())
+			{
+				$data[] = $row->lehrveranstaltung_id_kompatibel;
+			}
+			return $data;
+		}
+	}
+	
+	public function saveKompatibleLehrveranstaltung($lehrveranstaltung_id, $lehrveranstaltung_id_kompatibel)
+	{
+		$qry = 'SELECT * FROM lehre.tbl_lehrveranstaltung_kompatibel WHERE 
+			lehrveranstaltung_id='.$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER).' AND 
+			lehrveranstaltung_id_kompatibel='.$this->db_add_param($lehrveranstaltung_id_kompatibel, FHC_INTEGER).';';
+		
+		if($this->db_query($qry))
+		{
+			if(!$this->db_fetch_object())
+			{
+				$qry = 'INSERT INTO lehre.tbl_lehrveranstaltung_kompatibel (lehrveranstaltung_id, lehrveranstaltung_id_kompatibel)
+				VALUES ('.$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER).', '.
+						$this->db_add_param($lehrveranstaltung_id_kompatibel, FHC_INTEGER).');';
+
+				if($this->db_query($qry))
+				{
+					return true;
+				} 
+				else 
+				{
+					$this->errormsg = 'Fehler beim Speichern des Datensatzes';
+					return false;
+				}
+			}
+			else
+			{
+				$this->errormsg = 'Lehrveranstaltung bereits vorhanden';
+				return false;
+			}
+
+		} 
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
+			return false;
+		}
+	}
+	
+	public function deleteKompatibleLehrveranstaltung($lehrveranstaltung_id, $lehrveranstaltung_id_kompatibel)
+	{
+		$qry = 'DELETE FROM lehre.tbl_lehrveranstaltung_kompatibel WHERE 
+			lehrveranstaltung_id='.$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER).' AND 
+			lehrveranstaltung_id_kompatibel='.$this->db_add_param($lehrveranstaltung_id_kompatibel, FHC_INTEGER).';';
+		
+		if($this->db_query($qry))
+		{
+			return true;
+		} 
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
+			return false;
+		}
 	}
 }
 ?>

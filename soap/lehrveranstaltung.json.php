@@ -84,6 +84,38 @@ switch($method)
 			$data['errormsg']=$lehrveranstaltung->errormsg;
 		}
 		break;
+	case 'saveKompatibleLehrveranstaltung':
+		$lv_id = $_REQUEST['lehrveranstaltung_id'];
+		$lv_id_kompatibel = $_REQUEST['lehrveranstaltung_id_kompatibel'];
+		$lehrveranstaltung = new lehrveranstaltung();
+		if(($result = $lehrveranstaltung->saveKompatibleLehrveranstaltung($lv_id, $lv_id_kompatibel)))
+		{
+			$data["result"]=$result;
+			$data['error']='false';
+			$data['errormsg']='';
+		}
+		else
+		{
+			$data['error']='true';
+			$data['errormsg']=$lehrveranstaltung->errormsg;
+		}
+		break;
+	case 'deleteKompatibleLehrveranstaltung':
+		$lv_id = $_REQUEST['lehrveranstaltung_id'];
+		$lv_id_kompatibel = $_REQUEST['lehrveranstaltung_id_kompatibel'];
+		$lehrveranstaltung = new lehrveranstaltung();
+		if(($result = $lehrveranstaltung->deleteKompatibleLehrveranstaltung($lv_id, $lv_id_kompatibel)))
+		{
+			$data["result"]=$result;
+			$data['error']='false';
+			$data['errormsg']='';
+		}
+		else
+		{
+			$data['error']='true';
+			$data['errormsg']=$lehrveranstaltung->errormsg;
+		}
+		break;
 	default:
 		break;
 }
