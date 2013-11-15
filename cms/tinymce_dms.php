@@ -482,7 +482,7 @@ else
 				<table>
 				<tr>
 					<td>Beschreibung</td>
-					<td><textarea name="beschreibung"></textarea></td>
+					<td><textarea name="beschreibung" rows="2" cols="80"></textarea></td>
 				</tr>
 				<tr>
 					<td></td>
@@ -726,6 +726,7 @@ function drawFilesList($rows)
 				</li>
 			  </ul>';
 		echo '</td>';
+		echo '<td>id:'.$row->dms_id.'</td>';
 		echo '<td>'.$dms->convert_html_chars($row->beschreibung).'</td>';
 		echo '</tr>';
 		
