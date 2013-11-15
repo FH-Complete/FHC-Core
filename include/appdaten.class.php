@@ -75,7 +75,7 @@ class appdaten extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM system.tbl_appdaten WHERE appdaten_id=".$this->db_add_param($appdaten_id);
+		$qry = "SELECT * FROM system.tbl_appdaten WHERE appdaten_id=".$this->db_add_param($appdaten_id, FHC_INTEGER, false);
 
 		if($this->db_query($qry))
 		{
