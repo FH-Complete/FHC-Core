@@ -586,6 +586,18 @@ if(!$result = @$db->db_query("SELECT klasse from system.tbl_webservicerecht LIMI
 		echo 'system.tbl_webservicerecht: Spalte klasse hinzugefügt';
 }
 
+// tbl_note neue Spalte Positiv
+if(!$result = @$db->db_query("SELECT positiv from lehre.tbl_note LIMIT 1;"))
+{
+    $qry = "ALTER TABLE lehre.tbl_note ADD COLUMN positiv boolean NOT NULL DEFAULT true;
+		UPDATE lehre.tbl_note SET positiv=false WHERE note in(0,5,7,9,13,14,15)";
+    
+    if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_note: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'lehre.tbl_note: Spalte positiv hinzugefügt';
+}
+
 echo '<br>';
 
 $tabellen=array(
@@ -691,7 +703,7 @@ $tabellen=array(
 	"lehre.tbl_lvregeltyp" => array("lvregeltyp_kurzbz","bezeichnung"),
 	"lehre.tbl_moodle"  => array("lehrveranstaltung_id","lehreinheit_id","moodle_id","mdl_course_id","studiensemester_kurzbz","gruppen","insertamum","insertvon","moodle_version"),
 	"lehre.tbl_moodle_version"  => array("moodle_version","bezeichnung","pfad"),
-	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe"),
+	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe","positiv"),
 	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","titel_english","seitenanzahl","abgabedatum","kontrollschlagwoerter","schlagwoerter","schlagwoerter_en","abstract", "abstract_en", "sprache"),
 	"lehre.tbl_projektbetreuer"  => array("person_id","projektarbeit_id","betreuerart_kurzbz","note","faktor","name","punkte","stunden","stundensatz","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_projekttyp"  => array("projekttyp_kurzbz","bezeichnung"),

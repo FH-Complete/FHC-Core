@@ -143,19 +143,31 @@ class studienordnung extends basis_db
 			return false;
 		}
 
-		$qry = 'SELECT 
-					* 
-				FROM 
-					lehre.tbl_studienordnung 
-					LEFT JOIN lehre.tbl_studienordnung_semester USING (studienordnung_id) 
-				WHERE 
-					studiengang_kz='.$this->db_add_param($studiengang_kz, FHC_INTEGER, false);
+		if(is_null($studiensemester_kurzbz))
+		{
+			$qry = 'SELECT 
+						* 
+					FROM 
+						lehre.tbl_studienordnung 
+					WHERE 
+						studiengang_kz='.$this->db_add_param($studiengang_kz, FHC_INTEGER, false);
+		}
+		else
+		{
+			$qry = 'SELECT 
+						* 
+					FROM 
+						lehre.tbl_studienordnung 
+						LEFT JOIN lehre.tbl_studienordnung_semester USING (studienordnung_id) 
+					WHERE 
+						studiengang_kz='.$this->db_add_param($studiengang_kz, FHC_INTEGER, false);
 
-		if (!is_null($studiensemester_kurzbz))
-			$qry.=" AND studiensemester_kurzb=".$this->db_add_param($studiensemester_kurzbz, FHC_STRING,false);
-		if (!is_null($semester))
-			$qry.=" AND semester=".$this->db_add_param($semester, FHC_INTEGER,false);
-		
+			if (!is_null($studiensemester_kurzbz))
+				$qry.=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz, FHC_STRING,false);
+			if (!is_null($semester))
+				$qry.=" AND semester=".$this->db_add_param($semester, FHC_INTEGER,false);
+		}
+
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
@@ -184,10 +196,12 @@ class studienordnung extends basis_db
 			$obj->insertvon			= $row->insertvon;
 			$obj->new				= false;
 
-			$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
-			$obj->semester = $row->semester;
-			$obj->studienordnung_semester_id = $row->studienordnung_semester_id;
-
+			if(!is_null($studiensemester_kurzbz))
+			{
+				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$obj->semester = $row->semester;
+				$obj->studienordnung_semester_id = $row->studienordnung_semester_id;
+			}
 			$this->result[] = $obj;
 		}
 		return true;

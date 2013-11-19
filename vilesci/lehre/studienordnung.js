@@ -101,7 +101,7 @@ function drawStudienordnungen(data)
 
 	for(i in data)
 	{
-		obj=obj+'<li><a href="#Load" onclick="loadStudienplanSTO('+data[i].studienordnung_id+',\''+data[i].bezeichnung+'\');return false;">'+data[i].bezeichnung+'</a></li>';		
+		obj=obj+'<li><a href="#Load'+data[i].studienordnung_id+'" onclick="loadStudienplanSTO('+data[i].studienordnung_id+',\''+data[i].bezeichnung+'\');return false;">'+data[i].bezeichnung+'</a></li>';		
 	}
 	obj=obj+'</ul>';
 	$('#studienordnung').html(obj);

@@ -579,5 +579,45 @@ class studienplan extends basis_db
 		}
 		return $this->studienplan_lehrveranstaltung_id;
 	}
+
+	/**
+	 * Laedt einen StudienplanLehrveranstaltung Eintrag
+	 *
+	 * @param $studienplan_lehrveranstaltung_id ID der Zuordnung
+	 */
+	public function loadStudienplanLehrveranstaltung($studienplan_lehrveranstaltung_id)
+	{
+		$qry = "SELECT * FROM lehre.tbl_studienplan_lehrveranstaltung WHERE studienplan_lehrveranstaltung_id=".$this->db_add_param($studienplan_lehrveranstaltung_id);
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				$this->studienplan_lehrveranstaltung_id = $row->studienplan_lehrveranstaltung_id;
+				$this->semester = $row->semester;
+				$this->pflicht = $this->db_parse_bool($row->pflicht);
+				$this->studienplan_id = $row->studienplan_id;
+				$this->koordinator = $row->koordinator;
+				$this->studienplan_lehrveranstaltung_id_parent = $row->studienplan_lehrveranstaltung_id_parent;
+				$this->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->new=false;
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Laden der Daten';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>
