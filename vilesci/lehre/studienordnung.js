@@ -508,8 +508,8 @@ function loadFilteredLehrveranstaltungen()
 				"parameter_0": studiengang_kz,						//Studiengangskennzahl
 				"parameter_1": $("#semesterDropdown").val(),		//Semester
 				"parameter_2": "null",								//Lehrverzeichnis
-				"parameter_3": "null",								//Lehre
-				"parameter_4": true,								//Aktiv
+				"parameter_3": "null",								//Lehre // sollte TRUE sein
+				"parameter_4": "null",								//Aktiv // sollte TRUE sein
 				"parameter_5": "bezeichnung",						//Sortierung
 				"parameter_6": $("#oeDropdown option:selected").val(),				//Organisationseinheit KurzBz
 				"parameter_7": $("#lehrtypDropdown").val()			//Lehrtyp KurzBz
