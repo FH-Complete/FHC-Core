@@ -402,7 +402,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung)
 			{
 				if(data.result[i].aktiv===true)
 				{
-					html+="<option>"+data.result[i].bezeichnung+"</option>";
+					html+='<option value="'+data.result[i].oe_kurzbz+'">'+data.result[i].bezeichnung+'</option>';
 				}
 			}
 			html+="</select></div>";
@@ -444,7 +444,7 @@ function LehrveranstaltungSTPLLoaded(data)
 			{
 				if(data.result[i].aktiv===true)
 				{
-					html+="<option>"+data.result[i].bezeichnung+"</option>";
+					html+='<option value="'+data.result[i].oe_kurzbz+'">'+data.result[i].bezeichnung+' - '+data.result[i].oe_kurzbz+'</option>';
 				}
 				
 			}
@@ -511,7 +511,7 @@ function loadFilteredLehrveranstaltungen()
 				"parameter_3": true,								//Lehre
 				"parameter_4": true,								//Aktiv
 				"parameter_5": "bezeichnung",						//Sortierung
-				"parameter_6": $("#oeDropdown").val(),				//Organisationseinheit KurzBz
+				"parameter_6": $("#oeDropdown option:selected").val(),				//Organisationseinheit KurzBz
 				"parameter_7": $("#lehrtypDropdown").val()			//Lehrtyp KurzBz
 			},
 		error: loadError
@@ -592,7 +592,7 @@ function loadLehrtypen()
 		var html = "<select id='lehrtypDropdown' onchange='loadFilteredLehrveranstaltungen();'>";
 		for(i in data.result)
 		{
-			html+="<option value='"+data.result[i].lehrtyp_kurzbz+"'>"+data.result[i].bezeichnung+"</option>";
+			html+='<option value="'+data.result[i].lehrtyp_kurzbz+'">'+data.result[i].bezeichnung+'</option>';
 		}
 		html+="</select>";
 		$("#lehrtypenDiv").html(html);
