@@ -630,6 +630,8 @@ class wochenplan extends basis_db
 						unset($lehrfach);
 					if(isset($anmerkung))
 						unset($anmerkung);
+					if(isset($titel_arr))
+						unset($titel_arr);
 					$reservierung=false;
 					foreach ($this->std_plan[$i][$j] as $lehrstunde)
 					{
@@ -663,6 +665,7 @@ class wochenplan extends basis_db
 							$lf.='-'.$lehrstunde->lehrform;
 						$lehrfach[]=$lf;
 						$titel=$lehrstunde->titel;
+						$titel_arr[]=$lehrstunde->titel;
 						$anmerkung[]=$lehrstunde->anmerkung;
 						if (!$reservierung)
 							$reservierung=$lehrstunde->reservierung;
@@ -804,6 +807,7 @@ class wochenplan extends basis_db
 							$uEinheiten[$unrIndex]['lehrverband'][]=$lehrverband[$n];
 							$uEinheiten[$unrIndex]['anmerkung'][]=$anmerkung[$n];
 							$uEinheiten[$unrIndex]['lektor'][]=$lektor[$n];
+							$uEinheiten[$unrIndex]['titel'][]=$titel_arr[$n];
 						}
 						
 						// Ausgabe einer Stunde im Raster (HTML)
@@ -827,16 +831,16 @@ class wochenplan extends basis_db
 							echo '&grp='.$this->grp;
 							echo '&ort_kurzbz='.$uEinheit['ort'][0];		//.'">'
 							echo "','Details', 'height=320,width=550,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=no,toolbar=no,location=no,menubar=no,dependent=yes');return false;";
-							echo '" title="'.$this->convert_html_chars($titel).'" ';
+							echo '" title="'.$this->convert_html_chars($uEinheit['titel'][0]).'" ';
 							echo ' href="#">';
 
 							// Ausgabe
 							//echo $lf;
 							echo $uEinheit['lehrfach'];
 
-							if($titel!='' && !$reservierung)
+							if($uEinheit['titel'][0]!='' && !$reservierung)
 							{
-								echo '<img src="../../../skin/images/sticky.png" tooltip="'.$this->convert_html_chars($titel).'"/>';
+								echo '<img src="../../../skin/images/sticky.png" tooltip="'.$this->convert_html_chars($uEinheit['titel'][0]).'"/>';
 							}
 							echo '<BR />';
 							if ($this->type=='ort' || $this->type=='lektor' || $this->type=='verband')
