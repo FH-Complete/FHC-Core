@@ -31,6 +31,8 @@ if (!$db = new basis_db())
 $error_log='';
 $error_log1='';
 $error_log_all="";
+$mitarbeiter_data=array();
+$mitarbeiter_gesamt=array();
 $stgart='';
 $fehler='';
 $v='';
@@ -84,7 +86,7 @@ $qry="
 	WHERE 
 		bismelden 
 		AND personalnummer>0 
-		AND (tbl_bisverwendung.ende is NULL OR tbl_bisverwendung.ende>'$bisprevious')
+		AND (tbl_bisverwendung.ende is NULL OR tbl_bisverwendung.ende>".$db->db_add_param($bisprevious).")
 	ORDER BY uid, nachname,vorname
 	";
 
@@ -98,9 +100,11 @@ if($result = $db->db_query($qry))
    <PersonalMeldung>";
 	while($row = $db->db_fetch_object($result))
 	{
+		$mitarbeiter_data=array();
+		
 		$error_person = false;
 		$person_content='';
-		$qryet="SELECT * FROM bis.tbl_entwicklungsteam WHERE mitarbeiter_uid='".$row->mitarbeiter_uid."';";
+		$qryet="SELECT * FROM bis.tbl_entwicklungsteam WHERE mitarbeiter_uid=".$db->db_add_param($row->mitarbeiter_uid).";";
 		if($resultet=$db->db_query($qryet))
 		{
 			while($rowet=$db->db_fetch_object($resultet))
@@ -122,13 +126,18 @@ if($result = $db->db_query($qry))
 		{
 				$error_log.=($error_log!=''?', ':'')."HoechsteAbgeschlosseneAusbildung ('".$row->ausbildungcode."')";
 		}
+		$mitarbeiter_data['uid']=$row->uid;
+		$mitarbeiter_data['personalnummer']=sprintf("%015s",$row->personalnummer);
+		$mitarbeiter_data['vorname']=$row->vorname;
+		$mitarbeiter_data['nachname']=$row->nachname;
+		
 		$person_content.="
      <Person>
       <PersonalNummer>".sprintf("%015s",$row->personalnummer)."</PersonalNummer>
       <GeburtsDatum>".date("dmY", $datumobj->mktime_fromdate($row->gebdatum))."</GeburtsDatum>
       <Geschlecht>".strtoupper($row->geschlecht)."</Geschlecht>
       <HoechsteAbgeschlosseneAusbildung>".$row->ausbildungcode."</HoechsteAbgeschlosseneAusbildung>";
-		$qryvw="SELECT * FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid='".addslashes($row->mitarbeiter_uid)."' AND habilitation=true;";
+		$qryvw="SELECT * FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid=".$db->db_add_param($row->mitarbeiter_uid)." AND habilitation=true;";
 		if($resultvw=$db->db_query($qryvw))
 		{
 			if($db->db_num_rows($resultvw)>0)
@@ -142,11 +151,12 @@ if($result = $db->db_query($qry))
        <Habilitation>N</Habilitation>";
 			}
 		}
-		$qryvw="SELECT * FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid='".addslashes($row->mitarbeiter_uid)."' AND (ende is null OR ende>'$bisprevious') AND (beginn<'$bisdatum' OR beginn is null);";
+		$qryvw="SELECT * FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid=".$db->db_add_param($row->mitarbeiter_uid)." AND (ende is null OR ende>".$db->db_add_param($bisprevious).") AND (beginn<".$db->db_add_param($bisdatum)." OR beginn is null);";
 		if($resultvw=$db->db_query($qryvw))
 		{
 			if($db->db_num_rows($resultvw)>0)
 			{
+				$verwendung_data=array();
 				while($rowvw=$db->db_fetch_object($resultvw))
 				{
 					if($rowvw->ba1code=='' || $rowvw->ba1code==NULL)
@@ -177,22 +187,23 @@ if($result = $db->db_query($qry))
 					{
 						$frei++;
 					}
+					$key = $rowvw->ba1code.'/'.$rowvw->ba2code.'/'.$rowvw->beschausmasscode.'/'.$rowvw->verwendung_code;
+					$verwendung_data[$key]['ba1code']=$rowvw->ba1code;
+					$verwendung_data[$key]['ba2code']=$rowvw->ba2code;
+					$verwendung_data[$key]['beschausmasscode']=$rowvw->beschausmasscode;
+					$verwendung_data[$key]['verwendung_code']=$rowvw->verwendung_code;
 					
-					$person_content.="
-       <Verwendung>
-              <BeschaeftigungsArt1>".$rowvw->ba1code."</BeschaeftigungsArt1>
-              <BeschaeftigungsArt2>".$rowvw->ba2code."</BeschaeftigungsArt2>
-              <BeschaeftigungsAusmass>".$rowvw->beschausmasscode."</BeschaeftigungsAusmass>
-              <VerwendungsCode>".$rowvw->verwendung_code."</VerwendungsCode>";
+					
+					
 					//Studiengangsleiter
 					$qryslt="SELECT 
 								tbl_benutzerfunktion.*, tbl_studiengang.studiengang_kz 
 							FROM public.tbl_benutzerfunktion JOIN public.tbl_studiengang USING(oe_kurzbz) 
 							WHERE 
-								uid='".addslashes($row->mitarbeiter_uid)."' 
+								uid=".$db->db_add_param($row->mitarbeiter_uid)." 
 								AND funktion_kurzbz='Leitung' 
-								AND (datum_von<'$bisdatum' OR datum_von is null) 
-								AND (datum_bis>'$bisprevious' OR datum_bis is NULL)
+								AND (datum_von<".$db->db_add_param($bisdatum)." OR datum_von is null) 
+								AND (datum_bis>".$db->db_add_param($bisprevious)." OR datum_bis is NULL)
 								AND studiengang_kz<10000;";
 					if($resultslt=$db->db_query($qryslt))
 					{
@@ -204,15 +215,12 @@ if($result = $db->db_query($qry))
 							}
 							if(!in_array($rowslt->studiengang_kz, $nichtmelden))
 							{
-							$person_content.="
-	                     <StgLeitung>
-	                          <StgKz>".sprintf("%04s",$rowslt->studiengang_kz)."</StgKz>
-	                     </StgLeitung>";
+								$verwendung_data[$key]['stgltg'][]=$rowslt->studiengang_kz;
 							}
 						}
 					}
 					//Funktionen
-					$qryfkt="SELECT * FROM bis.tbl_bisfunktion WHERE bisverwendung_id='".$rowvw->bisverwendung_id."' AND studiengang_kz>0 AND studiengang_kz<10000;";
+					$qryfkt="SELECT * FROM bis.tbl_bisfunktion WHERE bisverwendung_id=".$db->db_add_param($rowvw->bisverwendung_id)." AND studiengang_kz>0 AND studiengang_kz<10000;";
 					if($resultfkt=$db->db_query($qryfkt))
 					{
 						while($rowfkt=$db->db_fetch_object($resultfkt))
@@ -240,52 +248,101 @@ if($result = $db->db_query($qry))
 										$error_log.=($error_log!=''?', ':'')."BesondereQualifikationCode ('".$eteam[$rowfkt->studiengang_kz]."')";
 								}
 							}
-							$person_content.="
-	                    <Funktion>
-	                       <StgKz>".sprintf("%04s",$rowfkt->studiengang_kz)."</StgKz>
-	                       <SWS>".$rowfkt->sws."</SWS>";
-							if($rowvw->hauptberuflich=='t')
-							{
-								$person_content.="
-	                       <Hauptberuflich>J</Hauptberuflich>";
-							}
-							else
-							{
-								$person_content.="
-	                       <Hauptberuflich>N</Hauptberuflich>
-	                       <HauptberufCode>".$rowvw->hauptberufcode."</HauptberufCode>";
-							}
-							if(isset($eteam[$rowfkt->studiengang_kz]))
-							{
-								$person_content.="
-	                       <Entwicklungsteam>J</Entwicklungsteam>
-	                       <BesondereQualifikationCode>".$eteam[$rowfkt->studiengang_kz]."</BesondereQualifikationCode>";
-							}
-							else
-							{
-								$person_content.="
-	                       <Entwicklungsteam>N</Entwicklungsteam>";
-							}
-						$person_content.="
-	                    </Funktion>";
+							
+							$verwendung_data[$key]['fkt'][] = array(
+								'stgkz'=>$rowfkt->studiengang_kz,
+								'sws'=>$rowfkt->sws,
+								'hauptberuflich'=>$rowvw->hauptberuflich,
+								'hauptberufcode'=>$rowvw->hauptberufcode);
 						}
 					}
+				}
+				
+				//Verwendungen ausgeben
+				foreach($verwendung_data as $row_verwendung)
+				{
 					$person_content.="
+       <Verwendung>
+              <BeschaeftigungsArt1>".$row_verwendung['ba1code']."</BeschaeftigungsArt1>
+              <BeschaeftigungsArt2>".$row_verwendung['ba2code']."</BeschaeftigungsArt2>
+              <BeschaeftigungsAusmass>".$row_verwendung['beschausmasscode']."</BeschaeftigungsAusmass>
+              <VerwendungsCode>".$row_verwendung['verwendung_code']."</VerwendungsCode>";
+					
+					if(isset($row_verwendung['stgltg']))
+					{
+						foreach($row_verwendung['stgltg'] as $row_stgl)
+						{
+							$person_content.="
+		                     <StgLeitung>
+		                          <StgKz>".sprintf("%04s",$row_stgl)."</StgKz>
+		                     </StgLeitung>";
+						}
+					}
+					if(isset($row_verwendung['fkt']))
+					{
+						foreach($row_verwendung['fkt'] as $row_fkt)
+						{
+							$person_content.="
+		                    <Funktion>
+		                       <StgKz>".sprintf("%04s",$row_fkt['stgkz'])."</StgKz>
+		                       <SWS>".$row_fkt['sws']."</SWS>";
+								if($row_fkt['hauptberuflich']=='t')
+								{
+									$person_content.="
+		                       <Hauptberuflich>J</Hauptberuflich>";
+								}
+								else
+								{
+									$person_content.="
+		                       <Hauptberuflich>N</Hauptberuflich>
+		                       <HauptberufCode>".$row_fkt['hauptberufcode']."</HauptberufCode>";
+								}
+								if(isset($eteam[$row_fkt['stgkz']]))
+								{
+									$person_content.="
+		                       <Entwicklungsteam>J</Entwicklungsteam>
+		                       <BesondereQualifikationCode>".$eteam[$row_fkt['stgkz']]."</BesondereQualifikationCode>";
+								}
+								else
+								{
+									$person_content.="
+		                       <Entwicklungsteam>N</Entwicklungsteam>";
+								}
+							$person_content.="
+		                    </Funktion>";
+						}	
+					}
+						$person_content.="
        </Verwendung>";
 				}
+				
 			}
 			else 
 			{
-				//Keine Verwendung
-				$v.="<br><u>$row->mitarbeiter_uid</u> hat keine Verwendung und wird ausgelassen<br>";
-				$error_person = true;
-			}
-		}
+				$qry_count="SELECT 1 FROM bis.tbl_bisverwendung WHERE mitarbeiter_uid=".$db->db_add_param($row->mitarbeiter_uid);
+				if($result_count=$db->db_query($qry_count))
+				{
+					if($db->db_num_rows($result_count)==0)
+					{
+						//Keine Verwendung
+						$v.="<u>$row->mitarbeiter_uid</u> hat keine Verwendung und wird ausgelassen<br>";
+						$error_person = true;
+					}
+					else
+					{
+						//Keine Verwendung im Meldezeitraum
+						//$v.="<u>$row->mitarbeiter_uid</u> hat keine Verwendung und wird ausgelassen<br>";
+						$error_person = true;
+					}
+				}
+			}		}
 		$mitarbeiterzahl++;
 			$person_content.="
      </Person>";
 		if($error_log!='' || $error_log1!='')
 		{
+			if($error_person)
+				$v.='<span style="color:gray;" >';
 			$v.="<u>Bei Mitarbeiter (PersNr, UID, Vorname, Nachname) '".$row->personalnummer."','".$row->mitarbeiter_uid."', '".$row->nachname."', '".$row->vorname."': </u>\n";
 			if($error_log!='')
 			{
@@ -294,11 +351,16 @@ if($result = $db->db_query($qry))
 			$zaehl++;
 			$v.="\n";
 			$error_log='';
+			if($error_person)
+				$v.='</span>';
 		}
 		else 
 		{
 			if(!$error_person)
+			{
 				$datei.=$person_content;
+				$mitarbeiter_gesamt[]=$mitarbeiter_data;
+			}
 		}
 	}
 	$datei.="
@@ -322,5 +384,28 @@ $dateiausgabe=fopen($ddd,'w');
 fwrite($dateiausgabe,$datei);
 fclose($dateiausgabe);
 
+echo '<h2>Folgende Personen werden gemeldet</h2>
+Anzahl:'.count($mitarbeiter_gesamt).'
+<table>
+<thead>
+	<tr>
+		<th>UID</th>
+		<th>Vorname</th>
+		<th>Nachname</th>
+		<th>Personalnummer</th>
+	</tr>
+</thead>
+<tbody>';
+
+foreach($mitarbeiter_gesamt as $row)
+{
+	echo '<tr>';
+	echo '<td>'.$row['uid'].'</td>';
+	echo '<td>'.$row['vorname'].'</td>';
+	echo '<td>'.$row['nachname'].'</td>';
+	echo '<td>'.$row['personalnummer'].'</td>';
+	echo '</tr>';
+}
+echo '</tbody></table><br>';
 echo "<a href=$ddd>XML-Datei f&uuml;r Mitarbeiter-BIS-Meldung</a><br><br>";
 ?>
