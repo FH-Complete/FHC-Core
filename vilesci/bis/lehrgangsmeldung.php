@@ -465,7 +465,8 @@ if($result = $db->db_query($qry))
 	          <HeimatGemeinde>".$gemeinde."</HeimatGemeinde>
 	          <HeimatNation>".$nation."</HeimatNation>
 	          <ZugangCode>".$row->zgv_code."</ZugangCode>
-	          <ZugangDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvdatum))."</ZugangDatum>";
+	          <ZugangDatum>".date("dmY", $datumobj->mktime_fromdate($row->zgvdatum))."</ZugangDatum>
+	          <Ausstellungsstaat>".$row->ausstellungsstaat."</Ausstellungsstaat>";
 				
 				if($stgart==2)
 				{
@@ -493,6 +494,11 @@ if($result = $db->db_query($qry))
 				}
 				
 				if($aktstatus=='Absolvent')
+				{
+					$datei.="
+	          <BeendigungsDatum>".date("dmY", $datumobj->mktime_fromdate($aktstatus_datum))."</BeendigungsDatum>";
+				}
+				if($aktstatus=='Abbrecher')
 				{
 					$datei.="
 	          <BeendigungsDatum>".date("dmY", $datumobj->mktime_fromdate($aktstatus_datum))."</BeendigungsDatum>";
