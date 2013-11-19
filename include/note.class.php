@@ -36,6 +36,7 @@ class note extends basis_db
 	public $bezeichnung;		// varchar(32)
 	public $anmerkung;			// varchar(256)
 	public $farbe;
+	public $positiv=true;		// boolean
 
 	/**
 	 * Konstruktor
@@ -76,6 +77,7 @@ class note extends basis_db
 				$this->bezeichnung = $row->bezeichnung;
 				$this->anmerkung = $row->anmerkung;
 				$this->farbe = $row->farbe;
+				$this->positiv = $this->db_parse_bool($row->positiv);
 				return true;
 			}
 			else
@@ -122,18 +124,20 @@ class note extends basis_db
 		if($new)
 		{
 			//Neuen Datensatz einfuegen
-			$qry='INSERT INTO lehre.tbl_note (note, bezeichnung, anmerkung) VALUES('.
-			     $this->addslashes($this->note).', '.
-			     $this->addslashes($this->bezeichnung).', '.
-			     $this->addslashes($this->anmerkung).');';
+			$qry='INSERT INTO lehre.tbl_note (note, bezeichnung, anmerkung, positiv) VALUES('.
+			     $this->db_add_param($this->note).', '.
+			     $this->db_add_param($this->bezeichnung).', '.
+			     $this->db_add_param($this->anmerkung).', '.
+				 $this->db_add_param($this->positiv, FHC_BOOLEAN).');';
 		}
 		else
 		{
 			$qry='UPDATE lehre.tbl_note SET '.
-				'note='.$this->addslashes($this->note).', '.
-				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
-				'anmerkung='.$this->addslashes($this->anmerkung).', '.
-				'WHERE note='.$this->addslashes($this->note).';';
+				'note='.$this->db_add_param($this->note).', '.
+				'bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
+				'anmerkung='.$this->db_add_param($this->anmerkung).', '.
+				'positiv='.$this->db_add_param($this->positiv, FHC_BOOLEAN).' '.
+				'WHERE note='.$this->db_add_param($this->note).';';
 		}
 
 		if($this->db_query($qry))
@@ -165,6 +169,7 @@ class note extends basis_db
 				$n->bezeichnung = $row->bezeichnung;
 				$n->anmerkung = $row->anmerkung;
 				$n->farbe = $row->farbe;
+				$n->positiv = $this->db_parse_bool($row->positiv);
 
 				$this->result[] = $n;
 			}

@@ -57,6 +57,8 @@ echo '<!DOCTYPE html>
 	
 	
 	<script src="studienordnung.js" type="text/javascript"></script>
+	<script src="studienordnung_lvregel.js" type="text/javascript"></script>
+
 	<script type="text/javascript">
 	$(function() 
 	{
@@ -90,7 +92,19 @@ echo "
 			.hide();
 
 	});
+	var user='".$uid."';
 	</script>
+	<style>
+	html,body {
+		margin:0;
+		padding:0;
+	}
+	.newLVRegel
+	{
+		background-color: #F99F9F;
+	}
+
+	</style>
 </head>
 <body>";
 if(!$rechte->isBerechtigt('lehre/studienordnung'))
@@ -139,6 +153,7 @@ echo '
 					</p>
 				</div>
 			</div>
+			<input type="button" onclick="LVRegelnloadRegeln(1)" value="LVRegelnloadRegeln(1)" />
 	</td>
 	<td valign="top">	
 			<div id="header">
@@ -195,6 +210,18 @@ echo'
 	</td>
 	</tr>
 </table>
+<script>
+$(function() 
+	{
+		jqUi(\'#LVREGELDetailsDialog\').dialog(
+		{
+			autoOpen: false,
+			minWidth: 650,
+			title: "Lehrveranstaltungsregeln"
+		});
+	});
+</script>
+<div id="LVREGELDetailsDialog">Details</div>
 ';
 
 echo '

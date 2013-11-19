@@ -63,7 +63,7 @@ $uid = get_uid();
 
 $wsrecht = new webservicerecht();
 if(!$wsrecht->isUserAuthorized($uid, $method, $class))
-	die('Sie haben keine Berechtigung fuer diesen Vorgang');
+	die('Sie haben keine Berechtigung fuer diesen Vorgang:'.$class.'->'.$method);
 
 // Funktion aufrufen
 $obj = new $class();
@@ -78,7 +78,6 @@ if(mb_stristr($method,'save'))
 
 	if(isset($loaddata['method']))
 	{
-		var_dump($loaddata);
 		if(!$wsrecht->isUserAuthorized($uid, $loaddata['method']))
 			die('keine Berechtigung');
 
@@ -107,7 +106,6 @@ if(mb_stristr($method,'save'))
 
 	if(!$error)
 	{
-		var_dump($savedata);
 		// Attribute zuweisen zum Speichern
 		foreach($savedata as $key=>$value)
 		{
@@ -116,9 +114,10 @@ if(mb_stristr($method,'save'))
 	}
 }
 
-if(!$error && call_user_func_array(array($obj, $method), $parameter))
+if(!$error && ($return = call_user_func_array(array($obj, $method), $parameter)))
 {	
 	$data['result']=$obj->cleanResult();
+	$data['return']=$return;
 	$data['error']='false';
 	$data['errormsg']='';
 }
