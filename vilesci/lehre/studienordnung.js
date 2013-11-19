@@ -54,6 +54,8 @@ function drawHeader(text)
 }
 function loadStudienordnung()
 {
+	$(".jstree-grid-header").hide();
+	$(".jstree-grid-wrapper").hide();
 	studiengang_kz = $('#studiengang').val();
 	studiengang_bezeichnung = $( "#studiengang option:selected" ).text();
 	studienordnung_id='';
@@ -72,8 +74,11 @@ function loadStudienordnung()
 				"method":	"loadStudienordnungSTG",
 				"parameter_0": studiengang_kz
 			},
-		success: StudienordnungLoaded,
 		error: loadError
+	}).success(function(data)
+	{
+		StudienordnungLoaded(data);
+		hideStplDetails();
 	});
 }
 
@@ -104,6 +109,8 @@ function drawStudienordnungen(data)
 
 function loadStudienplanSTO(neue_studienordnung_id,bezeichnung)
 {
+	$(".jstree-grid-header").hide();
+	$(".jstree-grid-wrapper").hide();
 	studienordnung_bezeichnung=bezeichnung;
 	studienordnung_id=neue_studienordnung_id;
 	drawHeader();
@@ -117,8 +124,29 @@ function loadStudienplanSTO(neue_studienordnung_id,bezeichnung)
 				"method":	"loadStudienplanSTO",
 				"parameter_0": studienordnung_id
 			},
-		success: StudienplanSTOLoaded,
 		error: loadError
+	}).success(function(data)
+	{
+		StudienplanSTOLoaded(data)
+		semesterStoZuordnung();
+	});
+	$.ajax({
+		dataType: "json",
+		url: "../../soap/fhcomplete.php",
+		data: {
+			"typ" : "json",
+			"class": "studienordnung",
+			"method": "loadStudienordnung",
+			"parameter_0": studienordnung_id
+		},
+		error: loadError
+	}).success(function(data){
+		if(data.result.length === 1)
+		{
+			var html = "";
+			html += data.result[0]
+		}
+//		console.log(data);
 	});
 }
 
@@ -193,11 +221,32 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung)
 //							}
 //							return (m.ot === m.rt) || !m.rt.get_container().find("li[id="+m.o[0].id+"]").length;
 							//console.log(m.rt._get_children(m.np).find("li[id="+m.o[0].id+"]").length+" "+m.np[0].id);
-							//console.log(m.np.children().find("li[id="+m.o[0].id+"]").length);
-							if(m.np.children().find("li[id="+m.o[0].id+"]").length !== 0)
+//							console.log(m.np.children().find("ul > li[id="+m.o[0].id+"]").length);
+//							if(m.np.children("ul").find("ul > li[id="+m.o[0].id+"]").length !== 0)
+//							console.log(m.np.attr("id"));
+//							console.log("Länge: "+m.np.children().find("li[id="+m.o[0].id+"]").length);
+
+							if(m.np.children().find("li[id="+m.o[0].id+"]").length !== 0 && m.np.attr("id") !== "data")
 							{
 								return false;
 							}
+//							console.log(m.r.siblings().length);
+//							var s = m.r.siblings().length;
+//							var err = false;
+//							for(var i=0; i<s; i++)
+//							{
+//								//console.log(m.r.siblings().get(i).id);
+////								console.log(m.r.siblings().get(i).id);
+////								console.log("copy_"+m.o[0].id);
+//								if(m.r.siblings().get(i).id === "copy_"+m.o[0].id)
+//								{
+//									//console.log(m.r.siblings().find("li[id="+m.o[0].id+"]").length);
+//									err = true;
+//								}
+//							}
+////							console.log(err);
+//							if(err) return false;
+////							console.log(m.r.siblings().get("#copy_"+m.o[0].id));
 							return true;
 						 }
 					}
@@ -221,7 +270,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung)
 				},
 				types: {
 					"types" :  {
-						"valid_children" : ["semester", "lv"],
+//						"valid_children" : ["semester", "lv", "default"],
 						"lv" : {
 							icon : {
 								//image : "test.jpg"
@@ -229,17 +278,33 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung)
 							max_children: 0
 						},
 						"semester" : {
-							"valid_children" : ["lv"]
+//							"valid_children" : ["lv"]
 						},
 						"default" : {
-							"valid_children" : [ "default" ]
+//							"valid_children" : [ "default", "lv"]
 						}
 					}
 				},
 				sort : function(a, b){
 					return this._get_node(a).attr("rel") > this._get_node(b).attr("rel");
 				},
-				plugins: ["themes", "ui", "dnd", "grid", "json_data", "crrm", "types", "sort"]
+				contextmenu: {
+					"items" : function($node) {
+						return {
+							"Delete" : {
+								"label" : "delete",
+								"action": function(obj){
+									var conf = confirm("Wollen Sie das Objekt wirklich löschen?");
+									if(conf)
+									{
+										this.remove(obj);
+									}
+								}
+							}
+						}
+					}
+				},
+				plugins: ["themes", "ui", "dnd", "grid", "json_data", "crrm", "types", "sort", "contextmenu"]
 			}).bind("move_node.jstree", function(event, data)
 			{
 				saveJsondataFromTree("copy_"+data.rslt.o[0].id, studienplan_id);
@@ -253,6 +318,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung)
 					
 				}
 				hideAllTreeColumns();
+				writeOverallSum(nodes);
 			}).bind("loaded.jstree", function(event, data)
 			{
 				var root = data.inst.get_container_ul();
@@ -264,6 +330,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung)
 					}
 					
 				}
+				writeOverallSum(nodes);
 			}).bind("open_node.jstree", function(event, data)
 			{
 				var root = data.inst.get_container_ul();
@@ -274,6 +341,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung)
 						writeEctsSum(nodes[i]);
 					}
 				}
+				writeOverallSum(nodes);
 			});
 		}
 		else
@@ -411,12 +479,14 @@ function getLehrveranstaltungSub(data)
 
 function neueStudienordnung()
 {
+	hideStplDetails();
 	drawHeader('Neue Studienordnung');
 	$("#data").load('studienordnung.inc.php?method=neueStudienordnung&studiengang_kz='+studiengang_kz);
 }
 
 function neuerStudienplan()
 {
+	hideStplDetails();
 	drawHeader('Neuer Studienplan');
 	$("#data").load('studienordnung.inc.php?method=neuerStudienplan&studiengang_kz='+studiengang_kz);
 }
@@ -774,4 +844,51 @@ function writeEctsSum(parent){
 		//console.log(sum);
 	}
 	cells[0].childNodes[0].innerHTML = "<b>"+sum+"</b>";
+}
+
+function writeOverallSum(root){
+//	console.log(root);
+	var cells = $(root).find(".jstree-grid-col-1");
+	var sum = 0;
+	//console.log(cells);
+	for(var i=1; i<cells.length; i++)
+	{
+		if(!isNaN(parseFloat(cells[i].childNodes[0].innerHTML)))
+		{
+			sum+=parseFloat(cells[i].childNodes[0].innerHTML);
+		}
+		//console.log(sum);
+	}
+	$("#stplDetails").html("ECTS-Summe: <b>"+sum+"</b>");
+	$("#stplDetails").show();
+}
+
+function hideStplDetails()
+{
+	$("#stplDetails").hide();
+}
+
+function semesterStoZuordnung()
+{
+	hideStplDetails();
+	drawHeader('Neue Semester Zuordnung');
+	$("#data").load('studienordnung.inc.php?method=semesterStoZuordnung&studienordnung_id='+studienordnung_id);
+}
+
+function saveSemesterStoZuordnung(sem)
+{
+	var cells = $("#"+sem).find("input[type=checkbox]");
+	
+	var semester = new Array();
+	var semesterKurzbz = "";
+	for(var i = 0; i < cells.length; i++)
+	{
+//		semesterChecked.push(cells[i].checked);
+		console.log(cells);
+		semester[cells[i].getAttribute("semester")] = cells[i].checked;
+	}
+	console.log(semester);
+//	$.ajax({
+//		
+//	})
 }

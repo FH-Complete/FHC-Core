@@ -197,6 +197,54 @@ switch($method)
 		</table>
 		';
 		break;
+	case 'semesterStoZuordnung':
+		$studienordnung_id = $_GET["studienordnung_id"];
+		$studiensemester_kurzbz = isset($_GET["studiensemester_kurzbz"]) ? $_GET["studiensemester_kurzbz"] : "";
+		$semester = isset($_GET["semester"]) ? $_GET["semester"] : "";
+		
+		$studienordnung = new studienordnung();
+		$studienordnung->loadStudienordnung($studienordnung_id);
+		
+		$studiengang = new studiengang();
+		$ausbildungssemester = $studiengang->getSemesterFromStudiengang($studienordnung->studiengang_kz);
+		
+		$studiensemester = new studiensemester();
+		$studiensemester->getAll();
+		echo '
+			<table width="100%" rules="rows">
+				<thead>
+					<tr>
+						<th>Studiensemester</th>
+						';
+						for($i = 0; $i<count($ausbildungssemester); $i++)
+						{
+							echo "<th>".$ausbildungssemester[$i].". Semester</th>";
+						}
+					echo '<th>&nbsp;</th>';
+		echo '</tr>
+				</thead>
+				<tbody>
+				';
+				$length = count($studiensemester->studiensemester)-1;
+				for($i = $length; $i>0; $i--)
+				{
+					echo '
+						<tr id="'.$studiensemester->studiensemester[$i]->studiensemester_kurzbz.'">
+							<td align="center">'.$studiensemester->studiensemester[$i]->studiensemester_kurzbz.'</td>
+						';
+						foreach($ausbildungssemester as $sem)
+						{
+							echo '<td align="center"><input type="checkbox" semester='.$sem.'></td>';
+						}
+					echo '
+						<td><input style="margin: 0.5em 0 0.5em 0" type="button" value="Zuordnen" onclick="javascript:saveSemesterStoZuordnung(\''.$studiensemester->studiensemester[$i]->studiensemester_kurzbz.'\');"></td>
+						</tr>
+						';
+				}
+		echo '</tbody>
+			</table>
+			';
+		break;
 	default:
 		echo 'Unknown Method'.$method;
 		break;

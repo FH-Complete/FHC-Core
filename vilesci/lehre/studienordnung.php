@@ -144,10 +144,12 @@ echo '
 			<div id="header">
 			&nbsp;
 			</div>
-			<div id="data" style="min-height: 10px;">
-			&nbsp;
+			<div id="treeWrapper">
+				<div id="data" style="min-height: 10px;">
+					&nbsp;
+				</div>
 			</div>
-			<div id="jsonData">
+			<div id="stplDetails" style="padding-top: 1.0em">
 				
 			</div>
 	</td>
