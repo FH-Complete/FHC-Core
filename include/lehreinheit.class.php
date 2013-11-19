@@ -827,7 +827,7 @@ class lehreinheit extends basis_db
                                         $this->db_add_param($row->stundensatz).",".
                                         $this->db_add_param($row->faktor).",".
 										$this->db_add_param($row->anmerkung).",".
-                                        $this->db_add_param($row->bismelden, FHC_BOOLEAN).",".
+                                        $this->db_add_param($this->db_parse_bool($row->bismelden), FHC_BOOLEAN).",".
                                         $this->db_add_param($row->updateamum).",".
                                         $this->db_add_param($row->updatevon).",".
                                         $this->db_add_param($row->insertamum).",".
