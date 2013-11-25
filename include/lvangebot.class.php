@@ -75,7 +75,7 @@ class lvangebot extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM lehre.tbl_lvangebot WHERE lvangebot_id=".$this->db_add_param($lvangebot_id);
+		$qry = "SELECT * FROM lehre.tbl_lvangebot WHERE lvangebot_id=".$this->db_add_param($lvangebot_id, FHC_INTEGER, false);
 
 		if($this->db_query($qry))
 		{
@@ -92,7 +92,7 @@ class lvangebot extends basis_db
 				$this->insertamum=$row->insertamum;
 				$this->insertvon=$row->insertvon;
 				$this->updatenamum=$row->updateamum;
-				$this->updatevon=$row->updatenvon;
+				$this->updatevon=$row->updatevon;
 			}
 		}
 		else
@@ -105,15 +105,62 @@ class lvangebot extends basis_db
 	}
 
 	/**
+	 * Laden aller Einträge von LV-Angebot, die zu einer bestimmten LV gehören
+	 * @param lv_id ID der LV, dessen Angebote geladen werden sollen
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getAllFromLvId($lv_id)
+	{
+		if(!is_numeric($lv_id))
+		{
+			$this->errormsg='lv_id muss eine gültige Zahl sein!';
+			return false;
+		}
+		
+		$qry='SELECT tbl_lvangebot.* FROM lehre.tbl_lvangebot, public.tbl_studiensemester as stsem
+			WHERE tbl_lvangebot.studiensemester_kurzbz=stsem.studiensemester_kurzbz
+			AND lehrveranstaltung_id='.$this->db_add_param($lv_id, FHC_INTEGER, false).
+			'ORDER BY stsem.start';
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$lvangebot=new lvangebot();
+				$lvangebot->lvangebot_id=$row->lvangebot_id;
+				$lvangebot->lehrveranstaltung_id=$row->lehrveranstaltung_id;
+				$lvangebot->studiensemester_kurzbz=$row->studiensemester_kurzbz;
+				$lvangebot->gruppe_kurzbz=$row->gruppe_kurzbz;
+				$lvangebot->incomingplaetze=$row->incomingplaetze;
+				$lvangebot->gesamtplaetze=$row->gesamtplaetze;
+				$lvangebot->anmeldefenster_start=$row->anmeldefenster_start;
+				$lvangebot->anmeldefenster_ende=$row->anmeldefenster_ende;
+				$lvangebot->insertamum=$row->insertamum;
+				$lvangebot->insertvon=$row->insertvon;
+				$lvangebot->updatenamum=$row->updateamum;
+				$lvangebot->updatevon=$row->updatevon;
+				
+				$this->result[]=$lvangebot;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Datensätze konnten nicht geladen werden';
+			return false;
+		}
+		return true;
+	}
+	
+	/**
 	 * Prueft die Variablen auf Gueltigkeit
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	protected function validate()
 	{
 		//Zahlenfelder pruefen
-		if(!is_numeric($this->lehrveranstaltung_id) && $this->lehrveranstaltung_id!=='')
+		if(!is_numeric($this->lehrveranstaltung_id))
 		{
-			$this->errormsg='lehrveranstaltung_id enthaelt ungueltige Zeichen';
+			$this->errormsg='lehrveranstaltung_id ist ungueltig';
 			return false;
 		}
 		if(!is_numeric($this->incomingplaetze) && $this->incomingplaetze!=='')
@@ -127,6 +174,12 @@ class lvangebot extends basis_db
 			return false;
 		}
 
+		//not null prüfen
+		if($this->studiensemester_kurzbz=='')
+		{
+			$this->errormsg='studiensemester_kurzbz ist leer';
+		}
+		
 		//Gesamtlaenge pruefen
 		if(mb_strlen($this->studiensemester_kurzbz)>32)
 		{
@@ -138,7 +191,7 @@ class lvangebot extends basis_db
 			$this->errormsg = 'Gruppe darf nicht länger als 32 Zeichen sein';
 			return false;
 		}
-
+				
 		$this->errormsg = '';
 		return true;
 	}
@@ -155,6 +208,20 @@ class lvangebot extends basis_db
 
 		if($this->new)
 		{
+			//prüfen, ob Datensatz schon vorhanden
+			$qry='SELECT studiensemester_kurzbz
+				FROM lehre.tbl_lvangebot
+				WHERE studiensemester_kurzbz='.$this->db_add_param($this->studiensemester_kurzbz).'
+				AND lehrveranstaltung_id='.$this->db_add_param($this->lehrveranstaltung_id);
+			if($this->db_query($qry))
+			{
+				if($row=$this->db_fetch_object())
+				{
+					$this->errormsg = 'Eintrag für '.$this->studiensemester_kurzbz.' existiert bereits';
+					return false;
+				}
+			}
+			
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO lehre.tbl_lvangebot (lehrveranstaltung_id, studiensemester_kurzbz,
 				gruppe_kurzbz, incomingplaetze, gesamtplaetze, anmeldefenster_start, anmeldefenster_ende,
@@ -167,7 +234,6 @@ class lvangebot extends basis_db
 				$this->db_add_param($this->gesamtplaetze, FHC_INTEGER).', '.
 				$this->db_add_param($this->anmeldefenster_start).', '.
 				$this->db_add_param($this->anmeldefenster_ende).', '.
-				$this->db_add_param($this->freigabe, FHC_BOOLEAN).', '.
 				'now(), '.
 				$this->db_add_param($this->insertvon).');';
 		}
@@ -239,12 +305,12 @@ class lvangebot extends basis_db
 		//Pruefen ob lvangebot_id eine gueltige Zahl ist
 		if(!is_numeric($lvangebot_id) || $lvangebot_id === '')
 		{
-			$this->errormsg = 'lvangebot_id muss eine gültige Zahl sein'."\n";
+			$this->errormsg = 'lvangebot_id muss eine gültige Zahl sein';
 			return false;
 		}
 
 		//loeschen des Datensatzes
-		$qry="DELETE FROM lehre.tbl_lvangebot WHERE lvangebot_id=".$this->db_add_param($lvangebot_id, FHC_INTEGER, false).";";
+		$qry="DELETE FROM lehre.tbl_lvangebot WHERE lvangebot_id=".$this->db_add_param($lvangebot_id, FHC_INTEGER);
 
 		if($this->db_query($qry))
 		{
@@ -252,7 +318,7 @@ class lvangebot extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Löschen der Daten'."\n";
+			$this->errormsg = 'Fehler beim Löschen von Eintrag '.$lvangebot_id;
 			return false;
 		}
 	}
