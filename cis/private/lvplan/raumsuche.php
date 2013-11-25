@@ -185,7 +185,7 @@ if($sent)
 			{
 				$i++;
 				echo '<tr>';
-				echo '<td><a href="'.RAUMINFO_PATH.$row->ort_kurzbz.'.html" class="Item" title="'.$p->t('lvplan/rauminfoAnzeigen').'">'.$row->ort_kurzbz.'</td>';
+				echo '<td>'.($row->content_id!=''?'<a href="../../../cms/content.php?content_id='.$row->content_id.'" title="'.$p->t('lvplan/rauminfoAnzeigen').'" target="_blank" onClick="window.resizeTo(1200,880)">'.$row->ort_kurzbz.'</a>':$row->ort_kurzbz).'</td>';
 				echo "<td>$row->bezeichnung</td>";
 				echo "<td>$row->planbezeichnung</td>";
 				echo "<td>$row->max_person</td>";
