@@ -25,10 +25,12 @@
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/student.class.php');
+require_once(dirname(__FILE__).'/prestudent.class.php');
+require_once(dirname(__FILE__).'/studiensemester.class.php');
 
 class lvregel extends basis_db
 {
-	protected $new=true;				// boolean
+	protected $new=true;		// boolean
 	public $result = array();	// Result Objekt
 
 	//Tabellenspalten
@@ -46,6 +48,9 @@ class lvregel extends basis_db
 
 	protected $lvregeltyp_arr=array();
 	protected $bezeichnung;	//varchar(256)
+
+	protected $lehrveranstaltung_bezeichnung;
+	protected $cache;
 
 	/**
 	 * Konstruktor
@@ -333,7 +338,7 @@ class lvregel extends basis_db
 	public function loadLVRegeln($studienplan_lehrveranstaltung_id)
 	{
 		$qry = 'SELECT 
-					* 
+					*, (SELECT bezeichnung FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=tbl_lvregel.lehrveranstaltung_id) as lvbezeichnung 
 				FROM 
 					lehre.tbl_lvregel 
 				WHERE 
@@ -357,6 +362,7 @@ class lvregel extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updatevon = $row->updatevon;
 				$obj->updateamum = $row->updateamum;
+				$obj->lehrveranstaltung_bezeichnung = $row->lvbezeichnung;
 
 				$this->result[] = $obj;
 			}
@@ -371,6 +377,8 @@ class lvregel extends basis_db
 
 	/**
 	 * Liefert die Lehrveranstaltungen als verschachtelten Tree
+	 * @param $studienplan_lehrveranstaltung_id
+	 * @return Array mit den verschachtelten Regeln
 	 */
 	public function getLVRegelTree($studienplan_lehrveranstaltung_id)
 	{
@@ -390,7 +398,9 @@ class lvregel extends basis_db
 	}
 
 	/**
-	 * Generiert die Subtrees des Lehrveranstaltungstrees
+	 * Generiert rekursiv die Subtrees des Lehrveranstaltungstrees
+	 * @param $lvregel_id Regel ID des Teilbaumes
+	 * @param Array mit den Subtree Elementen des Regelbaumes
 	 */
 	protected function getLVRegelTreeChilds($lvregel_id)
 	{
@@ -406,6 +416,9 @@ class lvregel extends basis_db
 		return $childs;
 	}
 
+	/**
+	 * Erstellt ein Array aus dem Result Objekt für die Webservice Verwendung 
+	 */
 	public function cleanResult()
 	{
 		$data = array();
@@ -430,6 +443,7 @@ class lvregel extends basis_db
 
 				$obj->lvregeltyp_kurzbz = $row->lvregeltyp_kurzbz;
 				$obj->bezeichnung = $row->bezeichnung;
+				$obj->lehrveranstaltung_bezeichnung = $row->lehrveranstaltung_bezeichnung;
 				$data[]=$obj;
 			}
 		}
@@ -451,33 +465,39 @@ class lvregel extends basis_db
 
 			$obj->lvregeltyp_kurzbz = $this->lvregeltyp_kurzbz;
 			$obj->bezeichnung = $this->bezeichnung;
-
+			$obj->lehrveranstaltung_bezeichnung = $this->lehrveranstaltung_bezeichnung;
 			$data[]=$obj;
 		}
 		return $data;
 	}
 
 	/**
-	 * Prüft ob sich eine Studierender zu einer Lehrveranstaltung anmelden darf
+	 * Prüft ob sich ein Student zu einer Lehrveranstaltung anmelden darf
 	 * @param $uid UID des Studierenden
 	 * @param $studienplan_lehrveranstaltung_id ID der Lehrveranstaltungszuordnung
 	 */
-	public function isZugangsberechtigt($uid, $studienplan_lehrveranstaltung_id)
+	public function isZugangsberechtigt($uid, $studienplan_lehrveranstaltung_id, $studiensemester_kurzbz=null)
 	{
 		$this->debug('Teste Zugangsberechtigung für '.$uid);
 		if($result = $this->getLVRegelTree($studienplan_lehrveranstaltung_id))
 		{
-			return $this->TestRegeln($uid, $result);
+			return $this->TestRegeln($uid, $result, $studiensemester_kurzbz);
 		}
 	}
 
-	public function TestRegeln($uid, $regel_obj)
+	/**
+	 * Prueft die Regeln fuer einen Studierenden
+	 * @param $uid UID des Studierenden
+	 * @param $regel_obj Regel Baum
+	 * @param $studiensemester_kurzbz Studiensemester das geprueft werden soll
+	 */
+	public function TestRegeln($uid, $regel_obj, $studiensemester_kurzbz=null)
 	{
 		$retval=true;
 		foreach($regel_obj as $regel)
 		{
 			$this->debug('<br>');
-			$testval = $this->Test($uid, $regel);
+			$testval = $this->Test($uid, $regel, $studiensemester_kurzbz);
 			$retval = $this->Compare($regel[0]->operator, $retval, $testval);
 			$this->debug(' - RETVAL:'.($retval?'TRUE':'FALSE'));
 		}
@@ -485,6 +505,13 @@ class lvregel extends basis_db
 		return $retval;
 	}
 
+	/**
+	 * Vergleicht die Regeln untereinander anhand des Operators
+	 * @param $operator Operator der Regel
+	 * @param $retval Boolean Wert der Ausgangsregel
+	 * @param $testval Boolean Wert der Vergleichsregel
+	 * @return Boolean Ergebnis des Vergleichs
+	 */
 	public function Compare($operator, $retval, $testval)
 	{
 		switch($operator)
@@ -508,7 +535,13 @@ class lvregel extends basis_db
 		return $retval;
 	}
 
-	public function Test($uid, $regel_obj)
+	/**
+	 * Testet die Regel für einen Studenten
+	 * @param $uid User
+	 * @param $regel_obj
+	 * @param $studiensemester_kurzbz
+	 */
+	public function Test($uid, $regel_obj, $studiensemester_kurzbz=null)
 	{
 		$regel = $regel_obj[0];
 
@@ -517,20 +550,43 @@ class lvregel extends basis_db
 		switch($regel->lvregeltyp_kurzbz)
 		{
 			case 'ausbsemmin':
+				/* Prueft ob das Ausbildungssemester das mindestens erforderlich ist 
+					um die Lehrveranstaltung zu besuchen */
+				
 				$this->debug('Regeltyp ausbsemmin');
 
-				$student = new student();
-				$student->load($uid);
-
-				if($student->semester>=$regel->parameter)
+				// Wenn das Studiensemester nicht gesetzt ist, wird das aktuelle verwendet
+				if($studiensemester_kurzbz=='')
 				{
-					$this->debug('StudSem: '.$student->semester.' >= RegelParam: '.$regel->parameter);
+					$studiensemester = new studiensemester();
+					$studiensemester_kurzbz = $studiensemester->getaktorNext();
+				}
+
+				// Ausbildungssemester wird nur beim 1. durchlauf ermittelt
+				if(!isset($this->cache[$uid]) && !isset($this->cache[$uid][$studiensemester_kurzbz]))
+				{
+					$student = new student();
+					$student->load($uid);
+				
+					// Ausbildungssemester aus dem Status holen
+					$prestudent = new prestudent();
+					if($prestudent->getLastStatus($student->prestudent_id, $studiensemester_kurzbz))
+					{
+						$this->cache[$uid][$studiensemester_kurzbz]=$prestudent->semester;
+					}
+				}
+				$ausbildungssemester = $this->cache[$uid][$studiensemester_kurzbz];
+
+				// Vergleichen des Ausbildungssemesters mit dem RegelParameter
+				if($ausbildungssemester>=$regel->parameter)
+				{
+					$this->debug('StudSem: '.$ausbildungssemester.' >= RegelParam: '.$regel->parameter);
 					$this->debug('TRUE');
 					$retval = true;
 				}
 				else
 				{
-					$this->debug('StudSem: '.$student->semester.' >= RegelParam: '.$regel->parameter);
+					$this->debug('StudSem: '.$ausbildungssemester.' >= RegelParam: '.$regel->parameter);
 					$this->debug('FALSE');
 					$retval = false;
 				}
@@ -576,6 +632,8 @@ class lvregel extends basis_db
 				// Eventuell in Addons nach Regeltypen suchen
 				break;
 		}
+
+		// Subregeln dieser LVRegel pruefen
 		if(isset($regel_obj['childs']) && count($regel_obj['childs'])>0)
 		{
 			$this->debug('<br> - Subregel '.$regel->lvregel_id.' -');
