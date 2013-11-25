@@ -262,6 +262,7 @@ if ($num_rows_repl>0)
     echo '<table class="stdplan">';
     echo '<tr><th>'.$p->t('global/titel').'</th><th>'.$p->t('lvplan/ort').'</th><th>'.$p->t('global/person').'</th><th>'.$p->t('global/beschreibung').'</th></tr>';
     $i=0;
+    $ort = new ort();
     while($row = $db->db_fetch_object($erg_repl))
     {
     	$i++;
@@ -273,10 +274,11 @@ if ($num_rows_repl>0)
    		$pers_nachname=$row->nachname;
     	$pers_email=$row->uid.'@'.DOMAIN;
     	$beschreibung=$row->beschreibung;
+    	$ort->load($ortkurzbz);
     	
         echo '<tr class="liste'.($i%2).'">';
         echo '<td >'.$titel.'</td>';
-        echo '<td>'.(!empty($ortkurzbz)?'<a href="'.RAUMINFO_PATH.trim($ortkurzbz).'.html" target="_blank">'.$ortkurzbz.'</a>':$ortkurzbz).'</td>';
+        echo '<td>'.(!empty($ortkurzbz)?($ort->content_id!=''?'<a href="../../../cms/content.php?content_id='.$ort->content_id.'" target="_self" onClick="window.resizeTo(1200,880)">'.$ortkurzbz.'</a>':$ortkurzbz):$ortkurzbz).'</td>';
         echo '<td  ><A href="mailto:'.$pers_email.'">'.$titelpre.' '.$pers_vorname.' '.$pers_nachname.' '.$titelpost.'</A></td>';
         echo '<td >'.$beschreibung.'</td></tr>';
     }
