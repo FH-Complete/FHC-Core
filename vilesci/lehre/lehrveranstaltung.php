@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2006 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -680,7 +680,7 @@ if ($result_lv!=0)
 		  <th>Kurzbz</th>
 		  <th>Bezeichnung</th>
 		  <th>Lehrform</th>
-		  <th>Stg</th>
+		  <th>Stg</th>\n
 		  <th>Orgform</th>
 		  <th title='Semesterstunden'>SS</th>
 		  <th>ECTS</th>
@@ -694,7 +694,9 @@ if ($result_lv!=0)
 		  <th>Koordinator</th>
 		  <th>LV-Info</th>
 		  <th>Lehrfach</th>
+		  <th>LV-Angebot</th>
 		  <th>kompatible LV</th>";
+
 	echo "</tr></thead>";
 	echo "<tbody>";
 	for($i=0;$i<$num_rows;$i++)
@@ -703,7 +705,7 @@ if ($result_lv!=0)
 		echo "<tr>";
 		//ID
 		echo "<td align='right'>";
-		if($write_admin)		
+		if($write_admin)
 			echo '<a href="lehrveranstaltung_details.php?lv_id='.$db->convert_html_chars($row->lehrveranstaltung_id).'" target="lv_detail">'.$db->convert_html_chars($row->lehrveranstaltung_id).'</a>';
 		else		
 			echo $db->convert_html_chars($row->lehrveranstaltung_id);
@@ -831,8 +833,8 @@ if ($result_lv!=0)
 			echo 'vorhanden';
 		echo '</td>';
 		//Lehrfach anlegen
-		echo "<td nowrap>";
-		if($write_admin)		
+		echo '<td nowrap>';
+		if($write_admin)
 			echo '<a href="lehrfach.php?neu
 			&filter_stg_kz='.$db->convert_html_chars($row->studiengang_kz).'
 			&filter_semester='.$db->convert_html_chars($row->semester).'
@@ -845,7 +847,12 @@ if ($result_lv!=0)
 			&sprache='.$db->convert_html_chars($row->sprache).'" target="_parent" method="post">LF Neu</a>';
 		else		
 			echo $db->convert_html_chars($row->lehrveranstaltung_id);
-		echo '</td>';
+		
+		echo '</td>
+			<td nowrap>
+				<a href="lehrveranstaltung_lvangebot.php?lehrveranstaltung_id='.$db->convert_html_chars($row->lehrveranstaltung_id).'" target="lv_detail">LV-Angebot</a>
+			</td>';
+		
 		echo '<td><a href="lehrveranstaltung_kompatibel.php?lehrveranstaltung_id='.$row->lehrveranstaltung_id.'" target="lv_detail">anzeigen</a></td>';
 		echo "</tr>\n";
 	}
