@@ -556,7 +556,7 @@ class studienplan extends basis_db
 					' updateamum= now(), ' .
 					' updatevon=' . $this->db_add_param($this->updatevon) . ' ' .
 					' WHERE studienplan_lehrveranstaltung_id=' . $this->db_add_param($this->studienplan_lehrveranstaltung_id, FHC_INTEGER, false) . ';';
-		}
+			}
 
 		if ($this->db_query($qry)) {
 			if ($this->new) {
