@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2009 Technikum-Wien
+/* Copyright (C) 2009 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -19,6 +19,7 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
  *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
+ * 			Stefan Puraner	<puraner@technikum-wien.at>
  */
 /**
  * Klasse Organisationseinheit
@@ -57,7 +58,10 @@ class organisationseinheit extends basis_db
 			$this->load($oe_kurzbz);
 	}
 
-
+	/**
+	 * Liefert alle Organisationseinheiten
+	 * @return true wenn ok, false im Fehlerfall
+	 */
 	public function getAll()
 	{
 		$qry = "SELECT * FROM public.tbl_organisationseinheit ORDER BY organisationseinheittyp_kurzbz, oe_kurzbz";
@@ -462,6 +466,9 @@ class organisationseinheit extends basis_db
 		return false;		
 	}
 	
+	/**
+	 * Baut die Datenstruktur für senden als JSON Objekt auf
+	 */
 	public function cleanResult(){
 		$data = array();
 		if(count($this->result)>0){

@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ * 			Stefan Puraner	<puraner@technikum-wien.at>
  */
 header( 'Expires:  -1' );
 header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
@@ -72,8 +73,9 @@ switch($method)
 		break;
 	case 'getLvTree':
 		$studienplan_id = $_REQUEST['studienplan_id'];
+		$semester = $_REQUEST['semester'];
 		$lehrveranstaltung = new lehrveranstaltung();
-		if(($result = $lehrveranstaltung->getLvTree($studienplan_id)))
+		if(($result = $lehrveranstaltung->getLvTree($studienplan_id, $semester)))
 		{
 			$data["result"]=$result;
 			$data['error']='false';

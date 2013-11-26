@@ -388,6 +388,9 @@ class studienordnung extends basis_db
 		}
 	}
 
+	/**
+	 * Baut die Datenstruktur für senden als JSON Objekt auf
+	 */
 	public function cleanResult()
 	{
 		$data = array();
