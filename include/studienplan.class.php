@@ -2,8 +2,8 @@
 /*
  * studienplan.class.php
  * 
- * Copyright 2013 fhcomplete.org
- * 
+ * Copyright 2013 fhcomplete.org 
+* 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -21,6 +21,7 @@
  * 
  *
  * Authors: Andreas Österreicher <andreas.oesterreicher@technikum-wien.at>
+ * 			Stefan Puraner	<puraner@technikum-wien.at>
  */
 
 require_once(dirname(__FILE__).'/basis_db.class.php');
@@ -356,6 +357,9 @@ class studienplan extends basis_db
 		}
 	}
 
+	/**
+	 * Baut die Datenstruktur für senden als JSON Objekt auf
+	 */
 	public function cleanResult()
 	{
 		$data = array();
@@ -616,6 +620,34 @@ class studienplan extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Löscht eine Lehrveranstaltung aus dem Studienplan
+	 * @param $studienplan_lehrveranstaltung_id ID der LV in der Zwischentabelle
+	 * @return boolean
+	 */
+	public function deleteStudienplanLehrveranstaltung($studienplan_lehrveranstaltung_id)
+	{
+		//Pruefen ob studienplan_lehrveranstaltung_id eine gueltige Zahl ist
+		if(!is_numeric($studienplan_lehrveranstaltung_id) || $studienplan_lehrveranstaltung_id === '')
+		{
+			$this->errormsg = 'studienplan_lehrveranstaltung_id muss eine gültige Zahl sein'."\n";
+			return false;
+		}
+		
+		$qry = "DELETE from lehre.tbl_studienplan_lehrveranstaltung 
+			WHERE studienplan_lehrveranstaltung_id=".$this->db_add_param($studienplan_lehrveranstaltung_id, FHC_INTEGER).";";
+		
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Löschen der Daten'."\n";
 			return false;
 		}
 	}

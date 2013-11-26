@@ -19,6 +19,7 @@
  * 
  *
  * Authors: Andreas Österreicher <andreas.oesterreicher@technikum-wien.at>
+ * 			Stefan Puraner	<puraner@technikum-wien.at>
  */
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/studienordnung.class.php');
@@ -88,8 +89,8 @@ echo "
 			return false;
 		  })
 		  .next()
-			.addClass('ui-accordion-content  ui-helper-reset ui-widget-content ui-corner-bottom')
-			.hide();
+			.addClass('ui-accordion-content  ui-helper-reset ui-widget-content ui-corner-bottom');
+			//.hide();
 
 	});
 	var user='".$uid."';
@@ -164,9 +165,7 @@ echo '
 					&nbsp;
 				</div>
 			</div>
-			<div id="stplDetails" style="padding-top: 1.0em">
-				
-			</div>
+			<div id="jsonData"></div>
 	</td>
 	<td valign="top" width="20%">
 		<div id="menueRechts" style="width: 420px;">

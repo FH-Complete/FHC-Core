@@ -1,6 +1,5 @@
 <?php
-
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2013 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -54,6 +53,9 @@ class lehrtyp extends basis_db {
 		return true;
 	}
 	
+	/**
+	 * Baut die Datenstruktur für senden als JSON Objekt auf
+	 */
 	public function cleanResult()
 	{
 		$data = array();
