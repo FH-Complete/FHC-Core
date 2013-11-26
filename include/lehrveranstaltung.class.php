@@ -919,8 +919,6 @@ class lehrveranstaltung extends basis_db
 			$qry.=" AND tbl_studienplan_lehrveranstaltung.semester=" . $this->db_add_param($semester, FHC_INTEGER);
 		}
 		$qry.=" ORDER BY semester, sort";
-//		echo $qry;
-//		var_dump($qry);
 		$this->lehrveranstaltungen = array();
 		if ($result = $this->db_query($qry)) {
 			while ($row = $this->db_fetch_object($result)) {
@@ -971,7 +969,6 @@ class lehrveranstaltung extends basis_db
 
 				$this->lehrveranstaltungen[] = $obj;
 			}
-//			var_dump($this->lehrveranstaltungen);
 			return true;
 		}
 		else {
@@ -1097,6 +1094,7 @@ class lehrveranstaltung extends basis_db
 				$data->attr = array();
 				$data->attr["id"]=$lv->lehrveranstaltung_id;
 				$data->attr["rel"] = $lv->lehrtyp_kurzbz;
+				$data->attr["studienplan_lehrveranstaltung_id"] = $lv->studienplan_lehrveranstaltung_id;
 				$values[] = $data;
 			}
 		}

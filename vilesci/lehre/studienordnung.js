@@ -45,7 +45,7 @@ function drawHeader(text)
 		if(studienordnung_bezeichnung!='')
 			text=text+' <b>&gt;</b> '+studienordnung_bezeichnung;
 		if(studienplan_bezeichnung!='')
-			text=text+' <b>&gt;</b> '+studienplan_bezeichnung + " Beispieldaten";
+			text=text+' <b>&gt;</b> '+studienplan_bezeichnung;
 
 
 		text=text+'</h2>';
@@ -274,7 +274,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung)
 									"action": function(obj){
 										if(obj.children().find("li").length === 0)
 										{
-											var conf = confirm("Wollen Sie das \""+this.get_text(obj)+"\" wirklich löschen?");
+											var conf = confirm("Wollen Sie \""+this.get_text(obj)+"\" wirklich aus diesem Studienplan löschen?");
 											if(conf)
 											{
 												this.remove(obj);
@@ -283,7 +283,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung)
 										}
 										else
 										{
-											alert("Element darf keine Elemente beinhalten!");
+											alert("Da zu löschende Element darf keine Elemente beinhalten!");
 										}
 									}
 								}
@@ -311,6 +311,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung)
 			{
 				var root = data.inst.get_container_ul();
 				var nodes = root[0].childNodes;
+//				console.log(nodes);
 				for(var i=0; i<nodes.length; i++)
 				{
 					if(nodes[i].getAttribute("rel") !== "lv"){
@@ -321,15 +322,17 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung)
 				writeOverallSum(nodes);
 			}).bind("open_node.jstree", function(event, data)
 			{
-				var root = data.inst.get_container_ul();
-				var nodes = root[0].childNodes;
+//				console.log(data);
+				var root = data.inst.get_container_ul()[0].childNodes;
+				var nodes = $("#"+data.args[0].attr("id"));
+//				console.log(nodes);
 				for(var i=0; i<nodes.length; i++)
 				{
 					if(nodes[i].getAttribute("rel") !== "lv"){
 						writeEctsSum(nodes[i]);
 					}
 				}
-				writeOverallSum(nodes);
+				writeOverallSum(root);
 			});
 		}
 		else
@@ -691,21 +694,25 @@ function hideAllTreeColumns()
 
 function saveJsondataFromTree(data, studienplan_id)
 {
-	var jsonData = $("#treeData").jstree("get_json", $("#"+data));
+	console.log(data);
+	var jsonData = $("#treeData").jstree("get_json", $("#treeData").find("li[id="+data+"]"));
 	var copy = false;
+//	console.log("jsonData");
+//	console.log(jsonData);
 	if(jsonData.length !== 1)
 	{
 		jsonData = $("#treeData").jstree("get_json", $("#copy_"+data));
 		copy = true;
 	}
 	var jsonString = JSON.stringify(jsonData);
-
+	console.log("jsonData");
+	console.log(jsonData);
 	loaddata = {
 		"method" : "loadLehrveranstaltungStudienplanByLvId",
 		"parameter_0" : studienplan_id,
 		"parameter_1" : jsonData[0]["metadata"]["lehrveranstaltung_id"]
 	};
-
+	console.log(copy+" "+jsonData[0]["metadata"]["lehrveranstaltung_id"]);
 	var node;
 	if(copy)
 	{
@@ -716,19 +723,19 @@ function saveJsondataFromTree(data, studienplan_id)
 		node = $("#"+jsonData[0]["metadata"]["lehrveranstaltung_id"]);
 	}
 
-	var lvParent = "";
-	if(node.length > 2)
-	{
-		lvParent = node;
-	}
-
+//	var lvParent = "";
+//	if(node.length > 2)
+//	{
+//		lvParent = node;
+//	}
+//	console.log(node.parent().parent());
 	savedata = {
 		"studienplan_id": studienplan_id,
 		"lehrveranstaltung_id" : jsonData[0]["metadata"]["lehrveranstaltung_id"],
-		"stpllv_semester": node.closest("li[rel=semester]").attr("id"),
+		"semester": node.closest("li[rel=semester]").attr("id"),
 		"studienplan_lehrveranstaltung_id_parent": node.parent().parent().attr("studienplan_lehrveranstaltung_id"),
 		//TODO parent richtig auslesen
-		"stpllv_pflicht": true
+		"pflicht": true
 	};
 	
 	$.ajax(
@@ -908,16 +915,33 @@ function StudienplanSaved(data)
 
 function writeEctsSum(parent)
 {
-	var cells = $(parent).find(".jstree-grid-col-1");
-	var sum = 0;
-	for(var i=1; i<cells.length; i++)
+//	console.log($(parent).children("li").length);
+//	console.log($(parent).children("ul").children());
+	for(var i=0; i<$(parent).children("ul").children().length; i++)
 	{
-		if(!isNaN(parseFloat(cells[i].childNodes[0].innerHTML)))
+//		console.log($(parent).children("ul").children().length);
+		if($(parent).children("ul").children().length > 0)
 		{
-			sum+=parseFloat(cells[i].childNodes[0].innerHTML);
-		}
+			writeEctsSum($(parent).children("ul").children()[i]);
+		}	
 	}
-	cells[0].childNodes[0].innerHTML = "<b>"+sum+"</b>";
+//	console.log($(parent).attr("rel"));
+	if($(parent).attr("rel") !== "lv")
+	{
+		var cells = $(parent).find(".jstree-grid-col-1");
+	//	console.log(cells);
+		var sum = 0;
+		for(var j=1; j<cells.length; j++)
+		{
+			if(!isNaN(parseFloat(cells[j].childNodes[0].innerHTML)))
+			{
+				sum+=parseFloat(cells[j].childNodes[0].innerHTML);
+//				console.log(sum);
+			}
+		}
+		cells[0].childNodes[0].innerHTML = "<b>"+sum+"</b>";
+	//	console.log(cells[0].childNodes[0]);
+	}
 }
 
 function writeOverallSum(root)
