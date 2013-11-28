@@ -68,11 +68,6 @@ echo '<!DOCTYPE html>
 			header: "h3",
 			collapsible: true
 		});
-//		jqUi( "#menueRechts" ).accordion({
-//			heightStyle: "content",
-//			header: "h2",
-//			collapsible: true
-//		});
 
 ';
 echo "
@@ -110,8 +105,9 @@ echo "
 <body>";
 if(!$rechte->isBerechtigt('lehre/studienordnung'))
 	die('Sie haben keine Berechtigung für diese Seite');
+$stg_arr = $rechte->getStgKz('lehre/studienordnung');
 $studiengang = new studiengang();
-$studiengang->getAll('typ,kurzbz');
+$studiengang->loadArray($stg_arr,'typ,kurzbz');
 
 echo '
 <table style="width:100%">
@@ -121,13 +117,11 @@ echo '
 				<h3>Studiengang</h3>
 				<div style="margin:0px;padding:5px;">
 					<p>
-					<select id="studiengang" name="studiengang_kz" onchange="loadStudienordnung()">';
+					<select id="studiengang" name="studiengang_kz" onchange="loadStudienordnung()">
+<option value="">-- Bitte auswählen --</option>';
 
 foreach($studiengang->result as $row)
 {
-	if($studiengang_kz=='')
-		$studiengang_kz=$row->studiengang_kz;
-
 	if($studiengang_kz==$row->studiengang_kz)
 		$selected='selected';
 	else
@@ -137,6 +131,7 @@ foreach($studiengang->result as $row)
 }
 echo '
 					</select>
+					<br><input type="button" value="Daten laden" onclick="loadStudienordnung()" style="margin-top: 5px" />
 					</p>
 				</div>
 				<h3>Studienordnung</h3>
@@ -154,7 +149,6 @@ echo '
 					</p>
 				</div>
 			</div>
-			<input type="button" onclick="LVRegelnloadRegeln(1)" value="LVRegelnloadRegeln(1)" />
 	</td>
 	<td valign="top">	
 			<div id="header">
@@ -166,6 +160,32 @@ echo '
 				</div>
 			</div>
 			<div id="jsonData"></div>
+			
+			<!-- Tabs -->
+			<script>
+			$(function() 
+			{
+				jqUi( "#tabs" ).tabs();
+				$( "#tabs" ).hide();
+			});
+			</script>
+			<div id="tabs">
+				<ul>
+					<li><a href="#tab-lehrveranstaltungdetail">LV Details</a></li>
+					<li><a href="#tab-regel">Regeln</a></li>
+					<li><a href="#tab-kompatibel">Kompatibilität</a></li>
+				</ul>
+				<div id="tab-lehrveranstaltungdetail">
+					<p>Klicken Sie auf eine Lehrveranstaltung um die Details anzuzeigen</p>
+				</div>
+				<div id="tab-regel">
+					<p>Klicken Sie auf eine Lehrveranstaltung um dei Regeln anzuzeigen</p>
+				</div>
+				<div id="tab-kompatibel">
+					<p>Kompatibilität</p>
+				</div>
+			</div>
+			<!-- Tabs ende -->
 	</td>
 	<td valign="top" width="20%">
 		<div id="menueRechts" style="width: 420px;">
@@ -173,27 +193,6 @@ echo '
 			<div style="margin:0px;padding:5px;">
 				<div id="lehrveranstaltung" style="margin:0;padding:0; width: 400px;">
 				Bitte wählen Sie zuerst einen Studienplan aus!';
-//	var_dump($studiengang_kz);
-//	$lv = new lehrveranstaltung();
-//	$lv->load_lva($studiengang_kz, null, null, TRUE, TRUE);
-//	$sem = $lv->lehrveranstaltungen[1]->semester;
-//	echo "<ul>";
-//	echo "<li>Semester ".$row->lehrveranstaltungen[1]->semester."</li><ul>";
-//	foreach($lv->lehrveranstaltungen as $row)
-//	{
-//		if($sem==$row->semester)
-//		{
-//			echo "<li>".$row->bezeichnung."</li>";
-//		}
-//		else
-//		{
-//			echo "</ul><li>".$row->semester."</li>";
-//			echo "<ul><li>".$row->bezeichnung."</li>";
-//		}
-//		
-//	}
-//	echo "</ul></ul>";
-
 echo'
 				</div>
 			</div>
@@ -209,18 +208,6 @@ echo'
 	</td>
 	</tr>
 </table>
-<script>
-$(function() 
-	{
-		jqUi(\'#LVREGELDetailsDialog\').dialog(
-		{
-			autoOpen: false,
-			minWidth: 650,
-			title: "Lehrveranstaltungsregeln"
-		});
-	});
-</script>
-<div id="LVREGELDetailsDialog">Details</div>
 ';
 
 echo '

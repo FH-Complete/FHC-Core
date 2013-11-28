@@ -425,7 +425,7 @@ class studienplan extends basis_db
 	 * @return true wenn ja, sonst false
 	 */
 	public function containsLehrveranstaltung($studienplan_id, $lehrveranstaltung_id)
-		{
+	{
 		if (!is_numeric($studienplan_id) || $studienplan_id === '')
 		{
 			$this->errormsg = 'StudienplanID ist ungueltig';
@@ -437,16 +437,10 @@ class studienplan extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT 
-					studienplan_lehrveranstaltung_id,
-					semester as stpllv_semester,
-					pflicht as stpllv_pflicht,
-					koordinator as stpllv_koordinator,
-					studienplan_lehrveranstaltung_id_parent
-				FROM 
+		$qry = "SELECT 1 FROM 
 					lehre.tbl_studienplan_lehrveranstaltung
 				WHERE
-					studienplan_id=" . $this->db_add_param($studienplan_id, FHC_INTEGER).
+					studienplan_id=".$this->db_add_param($studienplan_id, FHC_INTEGER).
 					" AND lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER).";";
 	
 		if (!$this->db_query($qry))
@@ -533,10 +527,10 @@ class studienplan extends basis_db
 				insertamum, insertvon) VALUES (' .
 					$this->db_add_param($this->studienplan_id, FHC_INTEGER) . ', ' .
 					$this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER) . ', ' .
-					$this->db_add_param($this->stpllv_semester, FHC_INTEGER) . ', ' .
+					$this->db_add_param($this->semester, FHC_INTEGER) . ', ' .
 					$this->db_add_param($this->studienplan_lehrveranstaltung_id_parent, FHC_INTEGER) . ', ' .
-					$this->db_add_param($this->stpllv_pflicht, FHC_BOOLEAN) . ', ' .
-					$this->db_add_param($this->stpllv_koordinator) . ', ' .
+					$this->db_add_param($this->pflicht, FHC_BOOLEAN) . ', ' .
+					$this->db_add_param($this->koordinator) . ', ' .
 					'now(), ' .
 					$this->db_add_param($this->insertvon) . ');';
 		} else {
@@ -548,11 +542,11 @@ class studienplan extends basis_db
 			$qry = 'UPDATE lehre.tbl_studienplan_lehrveranstaltung SET' .
 					' studienplan_id=' . $this->db_add_param($this->studienplan_id, FHC_INTEGER) . ', ' .
 					' lehrveranstaltung_id=' . $this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER) . ', ' .
-					' semester=' . $this->db_add_param($this->stpllv_semester, FHC_INTEGER) . ', ' .
+					' semester=' . $this->db_add_param($this->semester, FHC_INTEGER) . ', ' .
 					' studienplan_lehrveranstaltung_id_parent=' . $this->db_add_param($this->studienplan_lehrveranstaltung_id_parent, FHC_INTEGER) . ', ' .
-					' pflicht=' . $this->db_add_param($this->stpllv_pflicht, FHC_BOOLEAN) . ', ' .
+					' pflicht=' . $this->db_add_param($this->pflicht, FHC_BOOLEAN) . ', ' .
 					//TODO sprache in Tabelle nicht vorhanden' sprache=' . $this->db_add_param($this->sprache) . ', ' .
-					' koordinator=' . $this->db_add_param($this->stpllv_koordinator) . ', ' .
+					' koordinator=' . $this->db_add_param($this->koordinator) . ', ' .
 					' updateamum= now(), ' .
 					' updatevon=' . $this->db_add_param($this->updatevon) . ' ' .
 					' WHERE studienplan_lehrveranstaltung_id=' . $this->db_add_param($this->studienplan_lehrveranstaltung_id, FHC_INTEGER, false) . ';';
