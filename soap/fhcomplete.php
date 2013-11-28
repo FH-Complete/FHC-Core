@@ -124,6 +124,7 @@ if(!$error && ($return = call_user_func_array(array($obj, $method), $parameter))
 else
 {
 	$data['result']='';
+	$data['return']=$return;
 	$data['error']='true';
 	$data['errormsg']=$obj->errormsg;
 }

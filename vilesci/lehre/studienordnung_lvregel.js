@@ -1,4 +1,4 @@
-var LVREGEL_lvRegelTypen=''; // Array mit den Regeltypen
+var LVREGEL_lvRegelTypen=new Array(); // Array mit den Regeltypen
 var LVREGELnewcounter=0; // Counter fuer neue Regeln
 var LVREGELStudienplanLehrveranstaltungID=''; // ID der ausgewaehlten Lehrveranstaltungszuordnung
 var LVREGELLehrveranstaltungAutocompleteArray=new Array(); // Enthaelt die IDs der Input Felder die zu Autocomplete Feldern werden sollen
@@ -9,29 +9,32 @@ function LVRegelnloadRegeln(studienplan_lehrveranstaltung_id)
 {
 	LVREGELStudienplanLehrveranstaltungID=studienplan_lehrveranstaltung_id;
 
-	// Laden der Regeltypen
-	$.ajax(
+	if(LVREGEL_lvRegelTypen.length==0)
 	{
-		dataType: "json",
-		url: "../../soap/fhcomplete.php",
-		async: false,
-		data: {
-				"typ": "json",
-				"class": "lvregel",
-				"method":	"loadLVRegelTypen"
+		// Laden der Regeltypen
+		$.ajax(
+		{
+			dataType: "json",
+			url: "../../soap/fhcomplete.php",
+			async: false,
+			data: {
+					"typ": "json",
+					"class": "lvregel",
+					"method":	"loadLVRegelTypen"
+				},
+			success: function(data) {
+				if(data.error=='false')
+				{
+					LVREGEL_lvRegelTypen=data.result;
+				}
+				else
+				{
+					alert('RegelTypen konnten nicht geladen werden:'+data.errormsg);
+				}
 			},
-		success: function(data) {
-			if(data.error=='false')
-			{
-				LVREGEL_lvRegelTypen=data.result;
-			}
-			else
-			{
-				alert('RegelTypen konnten nicht geladen werden:'+data.errormsg);
-			}
-		},
-		error: loadError
-	});
+			error: loadError
+		});
+	}
 
 	// Laden der Regeln
 	$.ajax(
@@ -45,7 +48,7 @@ function LVRegelnloadRegeln(studienplan_lehrveranstaltung_id)
 				"parameter_0": studienplan_lehrveranstaltung_id
 			},
 		success: function (data) {
-			if(data.error=='true')
+			if(data.error=='true' && data.errormsg!=null)
 				alert('Fehler:'+data.errormsg);
 			else
 				drawLVRegeln(data.return);
@@ -59,9 +62,8 @@ function LVRegelnloadRegeln(studienplan_lehrveranstaltung_id)
  */
 function drawLVRegeln(data)
 {
-	$('#LVREGELDetailsDialog').html(getChilds(data));
+	$('#tab-regel').html(getChilds(data));
 	LVRegelAddAutocomplete();
-	jqUi("#LVREGELDetailsDialog").dialog( "open" );
 }
 
 /**
