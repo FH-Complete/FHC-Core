@@ -25,6 +25,7 @@ require_once('../../include/fachbereich.class.php');
 require_once('../../include/lvinfo.class.php');
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/organisationsform.class.php');
+require_once ('../../include/organisationseinheit.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');?>
@@ -90,6 +91,67 @@ if (!$db = new basis_db())
 		{
 			var studiengang_kz = $("#stgDropdown").val();
 			var semester = $("#semDropdown").val();
+			var oe_kurzbz = $("#oeDropdown").val();
+			console.log(oe_kurzbz);
+			if(oe_kurzbz === "null")
+			{
+				$.ajax(
+				{
+					dataType: "json",
+					url: "../../soap/fhcomplete.php",
+					type: "POST",
+					data: {
+							"typ": "json",
+							"class": "lehrveranstaltung",
+							"method": "load_lva",
+							"parameter_0": studiengang_kz,
+							"parameter_1": semester,
+							"parameter_2": "null",
+							"parameter_3": "null",
+							"parameter_4": "true"
+						},
+				}).success(function(data)
+				{
+					var html = "";
+					data.result.forEach(function(option)
+					{
+						html+="<option value='"+ option.metadata.lehrveranstaltung_id +"'>"+ option.data +"</option>"
+					})
+					$("#lvDropdown").html(html);
+				});
+			}
+			else
+			{
+				$.ajax(
+				{
+					dataType: "json",
+					url: "../../soap/fhcomplete.php",
+					type: "POST",
+					data: {
+							"typ": "json",
+							"class": "lehrveranstaltung",
+							"method": "load_lva_oe",
+							"parameter_0": oe_kurzbz,
+							"parameter_1": true,
+							"parameter_2": "null",
+							"parameter_3": "bezeichnung"
+						},
+				}).success(function(data)
+				{
+					console.log(data);
+					var html = "";
+					data.result.forEach(function(option)
+					{
+						html+="<option value='"+ option.metadata.lehrveranstaltung_id +"'>"+ option.data +"</option>"
+					})
+					$("#lvDropdown").html(html);
+				});
+			}
+			
+		}
+		
+		function loadOrganisationseinheiten()
+		{
 			$.ajax(
 			{
 				dataType: "json",
@@ -232,6 +294,16 @@ echo "<form action='javascript:saveKompatibleLv(\"".$lehrveranstaltung_id."\")' 
 foreach($studiengang->result as $stg)
 {
 	echo "<option value=".$stg->studiengang_kz.">".$stg->kuerzel." - ".$stg->kurzbzlang."</option>";
+}
+echo "</select>";
+
+//OE-Dropdown
+$organisationseinheit = new organisationseinheit();
+$organisationseinheit->getAll();
+echo "<b>OE: </b><select id='oeDropdown' style='margin-right: 1em;' onload='javascript:loadSemester();' onchange='javascript:loadSemester();'><option value='null'>-- Keine --</option>";
+foreach($organisationseinheit->result as $oe)
+{
+	echo "<option value=".$oe->oe_kurzbz.">".$oe->bezeichnung."</option>";
 }
 echo "</select>";
 
