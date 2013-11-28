@@ -1270,7 +1270,7 @@ class lehrveranstaltung extends basis_db
 	 * @param $lehrveranstaltung_id ID der Lehrveranstaltung
 	 * @param $lehrveranstaltung_id ID der kompatiblen Lehrveranstaltung
 	 */
-	public function deleteKompatibleLehrveranstaltung($lehrveranstaltung_id, $lehrveranstaltung_id)
+	public function deleteKompatibleLehrveranstaltung($lehrveranstaltung_id, $lehrveranstaltung_id_kompatibel)
 	{
 		$qry = 'DELETE FROM lehre.tbl_lehrveranstaltung_kompatibel WHERE 
 			lehrveranstaltung_id='.$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER).' AND 
@@ -1293,7 +1293,7 @@ class lehrveranstaltung extends basis_db
 	 * @param $aktiv optional, true wenn nur aktive LVs
 	 * @param $lehrtyp optional, gewünschter Lehrtyp
 	 */
-	public function load_lva_oe($oe_kurzbz, $aktiv=null, $lehrtyp=null)
+	public function load_lva_oe($oe_kurzbz, $aktiv=null, $lehrtyp=null, $sort=null)
 	{
 		
 		if (is_null($oe_kurzbz)) {
@@ -1315,8 +1315,8 @@ class lehrveranstaltung extends basis_db
 		if(!is_null($lehrtyp))
 			$qry .= " AND lehrtyp_kurzbz='".$lehrtyp."'";
 
-//		if ($sort == "bezeichnung")
-//			$qry .= " ORDER BY bezeichnung";
+		if ($sort == "bezeichnung")
+			$qry .= " ORDER BY bezeichnung";
 //		elseif (is_null($sort) || empty($sort))
 //			$qry .= " ORDER BY semester, bezeichnung";
 //		else
@@ -1361,6 +1361,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->koordinator = $row->koordinator;
 			$lv_obj->bezeichnung_english = $row->bezeichnung_english;
 			$lv_obj->orgform_kurzbz = $row->orgform_kurzbz;
+			$lv_obj->lehrtyp_kurzbz = $row->lehrtyp_kurzbz;
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;

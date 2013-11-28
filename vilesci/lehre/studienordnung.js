@@ -248,8 +248,8 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung)
 				dnd: {
 					"drag_check": function(data){
 						return {
-							after: true,
-							before: true,
+							after: false,
+							before: false,
 							inside: true
 						}
 					}
@@ -269,16 +269,16 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung)
 							icon : {
 								image : "../../include/js/jstree/icons/lehrveranstaltung.png"
 							},
-							max_children: 0
+//							max_children: 0
 						},
 						"semester" : {
-							"valid_children" : ["lv", "lf", "modul"]
+//							"valid_children" : ["lv", "lf", "modul"]
 						},
 						"modul" : {
 							icon : {
 								image : "../../include/js/jstree/icons/modul.png"
 							},
-							"valid_children" : ["lv"]
+//							"valid_children" : ["lv"]
 						},
 						"lf" : {
 							//TODO valid_children
@@ -327,7 +327,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung)
 				var nodes = root[0].childNodes;
 				for(var i=0; i<nodes.length; i++)
 				{
-					if(nodes[i].getAttribute("rel") !== "lv"){
+					if(nodes[i].getAttribute("rel") === "semester"){
 						writeEctsSum(nodes[i]);
 					}
 					
@@ -341,7 +341,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung)
 //				console.log(nodes);
 				for(var i=0; i<nodes.length; i++)
 				{
-					if(nodes[i].getAttribute("rel") !== "lv"){
+					if(nodes[i].getAttribute("rel") === "semester"){
 						writeEctsSum(nodes[i]);
 					}
 					
@@ -356,7 +356,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung)
 
 					for(var i=0; i<nodes.length; i++)
 					{
-						if(nodes[i].getAttribute("rel") !== "lv"){
+						if(nodes[i].getAttribute("rel") === "semester"){
 							writeEctsSum(nodes[i]);
 						}
 					}
@@ -367,6 +367,10 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung)
 				// Bei einem Klick auf eine LV werden die Details geladen
 				stpllvid = data.rslt.obj.attr("studienplan_lehrveranstaltung_id");
 				lvid = data.rslt.obj.attr("id");
+				if(lvid.substring(0,5)==="copy_")
+				{
+					lvid = lvid.substring(5);
+				}
 
 				// Lehrveranstaltungsdetails laden
 				LoadLVDetails(lvid, stpllvid);
@@ -432,7 +436,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung)
 			error: loadError
 		}).success(function(data)
 		{
-			var html = "<div><select id='oeDropdown' style='max-width: 200px' onchange='loadFilteredLehrveranstaltungen();'><option value=''>-- Alle --</option>";
+			var html = "<div><select id='oeDropdown' style='max-width: 200px' onchange='loadFilteredLehrveranstaltungen();'><option value=''>-- Keine --</option>";
 			for(i in data.result)
 			{
 				if(data.result[i].aktiv===true)
@@ -504,8 +508,8 @@ function loadFilteredLehrveranstaltungen()
 {
 	if($("#oeDropdown option:selected").val() === "")
 	{
-		$.ajax(
-		{
+		$.ajax(	
+	{
 			dataType: "json",
 			url: "../../soap/fhcomplete.php",
 			data: {
@@ -791,6 +795,10 @@ function saveJsondataFromTree(nodeId, studienplan_id, studienplan_lehrveranstalt
 
 	var lehrveranstaltung_id = jsonData[0]["metadata"]["lehrveranstaltung_id"];
 	var semester = node.closest("li[rel=semester]").attr("id");
+	if(semester === undefined)
+	{
+		semester = 0;
+	}
 
 	var parent_id ='';
 	if(node.parent().parent().attr("studienplan_lehrveranstaltung_id"))
@@ -1018,7 +1026,7 @@ function writeEctsSum(parent)
 		}	
 	}
 //	console.log($(parent).attr("rel"));
-	if($(parent).attr("rel") !== "lv")
+	if($(parent).attr("rel") === "semester")
 	{
 		var cells = $(parent).find(".jstree-grid-col-1");
 	//	console.log(cells);
