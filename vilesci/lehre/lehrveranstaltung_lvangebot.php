@@ -148,15 +148,15 @@
 	$lvangebot->getAllFromLvId($lv_id);
 	foreach($lvangebot->result as $lvang)
 	{
-		if($lvangebot->lvangebot_id==$lvang->lvangebot_id)
+/*		if($lvangebot->lvangebot_id==$lvang->lvangebot_id)
 		{
 			$bstart='<b>';$bende='</b>';
 		}
 		else
 		{
 			$bstart='';$bende='';
-		}
-		$htmlstr .= $bstart.'<tr>
+		} */
+		$htmlstr .= '<tr>
 			<td>'.$lvang->studiensemester_kurzbz.'</td>
 			<td>'.$lvang->incomingplaetze.'</td>
 			<td>'.$lvang->gesamtplaetze.'</td>
@@ -164,7 +164,7 @@
 			<td>'.$datum_obj->formatDatum($lvang->anmeldefenster_ende,'d.m.Y').'</td>
 			<td><a href='.$_SERVER["PHP_SELF"].'?action=edit&lvangebot_id='.$lvang->lvangebot_id.'>Edit</a></td>
 			<td><a href='.$_SERVER["PHP_SELF"].'?action=delete&lvangebot_id='.$lvang->lvangebot_id.' onclick="return confdel()">Delete</a></td>
-			</tr>'.$bende;
+			</tr>';
 	}
 	$htmlstr .= '</table>
 				<input type="submit" name="neu" value="Neu" />
