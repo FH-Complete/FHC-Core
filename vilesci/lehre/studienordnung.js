@@ -432,6 +432,8 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung)
 					"typ": "json",
 					"class": "organisationseinheit",
 					"method": "getAll",
+					"parameter_0":true,
+					"parameter_1":true
 				},
 			error: loadError
 		}).success(function(data)
@@ -441,7 +443,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung)
 			{
 				if(data.result[i].aktiv===true)
 				{
-					html+='<option value="'+data.result[i].oe_kurzbz+'">'+data.result[i].bezeichnung+'</option>';
+					html+='<option value="'+data.result[i].oe_kurzbz+'">'+data.result[i].organisationseinheittyp_kurzbz+' '+data.result[i].bezeichnung+'</option>';
 				}
 			}
 			html+="</select></div>";

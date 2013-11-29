@@ -355,6 +355,10 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_lehrtyp LIMIT 1;"))
 
 		ALTER TABLE lehre.tbl_lehrtyp ADD CONSTRAINT pk_lehrtyp PRIMARY KEY (lehrtyp_kurzbz);
 
+		INSERT INTO lehre.tbl_lehrtyp(lehrtyp_kurzbz, bezeichnung) VALUES('lv','Lehrveranstaltung');
+		INSERT INTO lehre.tbl_lehrtyp(lehrtyp_kurzbz, bezeichnung) VALUES('modul','Modul');
+		INSERT INTO lehre.tbl_lehrtyp(lehrtyp_kurzbz, bezeichnung) VALUES('lf','Lehrfach');
+
 		GRANT SELECT ON lehre.tbl_lehrtyp TO web;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_lehrtyp TO vilesci;
 	";
@@ -598,6 +602,21 @@ if(!$result = @$db->db_query("SELECT positiv from lehre.tbl_note LIMIT 1;"))
 		echo 'lehre.tbl_note: Spalte positiv hinzugefügt';
 }
 
+// tbl_organisationseinheit neue Spalte lehre
+if(!$result = @$db->db_query("SELECT lehre FROM public.tbl_organisationseinheit LIMIT 1;"))
+{
+    $qry = "ALTER TABLE public.tbl_organisationseinheit ADD COLUMN lehre boolean NOT NULL DEFAULT true;
+		UPDATE public.tbl_organisationseinheit SET lehre=false WHERE 
+		NOT EXISTS(SELECT 1 FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_organisationseinheit.oe_kurzbz)
+		AND
+		NOT EXISTS(SELECT 1 FROM public.tbl_fachbereich WHERE oe_kurzbz=tbl_organisationseinheit.oe_kurzbz)";
+    
+    if(!$db->db_query($qry))
+		echo '<strong>public.tbl_organisationseinheit: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'public.tbl_organisationseinheit: Spalte lehre hinzugefügt';
+}
+
 echo '<br>';
 
 $tabellen=array(
@@ -756,7 +775,7 @@ $tabellen=array(
 	"public.tbl_notizzuordnung"  => array("notizzuordnung_id","notiz_id","projekt_kurzbz","projektphase_id","projekttask_id","uid","person_id","prestudent_id","bestellung_id"),
 	"public.tbl_ort"  => array("ort_kurzbz","bezeichnung","planbezeichnung","max_person","lehre","reservieren","aktiv","lageplan","dislozierung","kosten","ausstattung","updateamum","updatevon","insertamum","insertvon","ext_id","stockwerk","standort_id","telefonklappe","content_id"),
 	"public.tbl_ortraumtyp"  => array("ort_kurzbz","hierarchie","raumtyp_kurzbz"),
-	"public.tbl_organisationseinheit" => array("oe_kurzbz", "oe_parent_kurzbz", "bezeichnung","organisationseinheittyp_kurzbz", "aktiv","mailverteiler","freigabegrenze","kurzzeichen"),
+	"public.tbl_organisationseinheit" => array("oe_kurzbz", "oe_parent_kurzbz", "bezeichnung","organisationseinheittyp_kurzbz", "aktiv","mailverteiler","freigabegrenze","kurzzeichen","lehre"),
 	"public.tbl_organisationseinheittyp" => array("organisationseinheittyp_kurzbz", "bezeichnung", "beschreibung"),
 	"public.tbl_person"  => array("person_id","staatsbuergerschaft","geburtsnation","sprache","anrede","titelpost","titelpre","nachname","vorname","vornamen","gebdatum","gebort","gebzeit","foto","anmerkung","homepage","svnr","ersatzkennzeichen","familienstand","geschlecht","anzahlkinder","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","bundesland_code","kompetenzen","kurzbeschreibung","zugangscode", "foto_sperre"),
 	"public.tbl_person_fotostatus"  => array("person_fotostatus_id","person_id","fotostatus_kurzbz","datum","insertamum","insertvon","updateamum","updatevon"),

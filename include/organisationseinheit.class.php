@@ -39,8 +39,9 @@ class organisationseinheit extends basis_db
 	public $oe_parent_kurzbz;
 	public $bezeichnung;
 	public $organisationseinheittyp_kurzbz;
-	public $aktiv;
-	public $mailverteiler;
+	public $aktiv=true;
+	public $lehre=true;
+	public $mailverteiler=false;
 	
 	public $oe_kurzbz_orig;
 	public $beschreibung;
@@ -62,9 +63,17 @@ class organisationseinheit extends basis_db
 	 * Liefert alle Organisationseinheiten
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getAll()
+	public function getAll($aktiv=null, $lehre=null)
 	{
-		$qry = "SELECT * FROM public.tbl_organisationseinheit ORDER BY organisationseinheittyp_kurzbz, oe_kurzbz";
+		$qry = "SELECT * FROM public.tbl_organisationseinheit WHERE 1=1";
+
+		if(!is_null($aktiv))
+			$qry.=" AND aktiv=".$this->db_add_param($aktiv, FHC_BOOLEAN);
+
+		if(!is_null($lehre))		
+			$qry.=" AND lehre=".$this->db_add_param($lehre, FHC_BOOLEAN);
+
+		$qry .=" ORDER BY organisationseinheittyp_kurzbz, oe_kurzbz";
 		
 		if($this->db_query($qry))
 		{
@@ -76,8 +85,9 @@ class organisationseinheit extends basis_db
 				$obj->oe_parent_kurzbz = $row->oe_parent_kurzbz;
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
-				$obj->aktiv = ($row->aktiv=='t'?true:false);
-				$obj->mailverteiler = ($row->mailverteiler=='t'?true:false);
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$obj->mailverteiler = $this->db_parse_bool($row->mailverteiler);
+				$obj->lehre = $this->db_parse_bool($row->lehre);
 				
 				$this->result[] = $obj;
 			}
@@ -103,7 +113,7 @@ class organisationseinheit extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM public.tbl_organisationseinheit WHERE oe_kurzbz = '$oe_kurzbz';";
+		$qry = "SELECT * FROM public.tbl_organisationseinheit WHERE oe_kurzbz=".$this->db_add_param($oe_kurzbz).";";
 
 		if(!$this->db_query($qry))
 		{
@@ -117,8 +127,9 @@ class organisationseinheit extends basis_db
 			$this->bezeichnung = $row->bezeichnung;
 			$this->oe_parent_kurzbz = $row->oe_parent_kurzbz;
 			$this->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
-			$this->aktiv = ($row->aktiv=='t'?true:false);
-			$this->mailverteiler = ($row->mailverteiler=='t'?true:false);
+			$this->aktiv = $this->db_parse_bool($row->aktiv);
+			$this->mailverteiler = $this->db_parse_bool($row->mailverteiler);
+			$this->lehre = $this->db_parse_bool($row->lehre);
 		}
 		else
 		{
@@ -148,8 +159,9 @@ class organisationseinheit extends basis_db
 				$obj->oe_parent_kurzbz = $row->oe_parent_kurzbz;
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
-				$obj->aktiv = ($row->aktiv=='t'?true:false);
-				$obj->mailverteiler = ($row->mailverteiler=='t'?true:false);
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$obj->mailverteiler = $this->db_parse_bool($row->mailverteiler);
+				$obj->lehre = $this->db_parse_bool($row->lehre);
 				
 				$this->result[] = $obj;
 			}
@@ -261,13 +273,14 @@ class organisationseinheit extends basis_db
 		{
 			//Neu anlegen
 			$qry = 'INSERT INTO public.tbl_organisationseinheit(oe_kurzbz, oe_parent_kurzbz, bezeichnung, 
-																organisationseinheittyp_kurzbz, aktiv, mailverteiler) VALUES('.
-					$this->addslashes($this->oe_kurzbz).','.
-					$this->addslashes($this->oe_parent_kurzbz).','.
-					$this->addslashes($this->bezeichnung).','.
-					$this->addslasheS($this->organisationseinheittyp_kurzbz).','.
-					($this->aktiv?'true':'false').','.
-					($this->mailverteiler?'true':'false').');';
+																organisationseinheittyp_kurzbz, aktiv, mailverteiler, lehre) VALUES('.
+					$this->db_add_param($this->oe_kurzbz).','.
+					$this->db_add_param($this->oe_parent_kurzbz).','.
+					$this->db_add_param($this->bezeichnung).','.
+					$this->db_add_param($this->organisationseinheittyp_kurzbz).','.
+					$this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
+					$this->db_add_param($this->mailverteiler, FHC_BOOLEAN).','.
+					$this->db_add_param($this->lehre, FHC_BOOLEAN).');';
 		}
 		else 
 		{
@@ -283,13 +296,14 @@ class organisationseinheit extends basis_db
 			}
 			
 			$qry = 'UPDATE public.tbl_organisationseinheit SET '.
-					' oe_kurzbz='.$this->addslashes($this->oe_kurzbz).','.
-					' oe_parent_kurzbz='.$this->addslashes($this->oe_parent_kurzbz).','.
-					' bezeichnung='.$this->addslashes($this->bezeichnung).','.
-					' organisationseinheittyp_kurzbz='.$this->addslashes($this->organisationseinheittyp_kurzbz).','.
-					' aktiv='.($this->aktiv?'true':'false').','.
-					' mailverteiler='.($this->mailverteiler?'true':'false').
-					" WHERE oe_kurzbz='".addslashes($this->oe_kurzbz_orig)."';";
+					' oe_kurzbz='.$this->db_add_param($this->oe_kurzbz).','.
+					' oe_parent_kurzbz='.$this->db_add_param($this->oe_parent_kurzbz).','.
+					' bezeichnung='.$this->db_add_param($this->bezeichnung).','.
+					' organisationseinheittyp_kurzbz='.$this->db_add_param($this->organisationseinheittyp_kurzbz).','.
+					' aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).','.
+					' mailverteiler='.$this->db_add_param($this->mailverteiler, FHC_BOOLEAN).','.
+					' lehre='.$this->db_add_param($this->lehre, FHC_BOOLEAN).
+					" WHERE oe_kurzbz=".$this->db_add_param($this->oe_kurzbz_orig, FHC_STRING, false).";";
 		}
 		
 		if($this->db_query($qry))
@@ -345,7 +359,7 @@ class organisationseinheit extends basis_db
 		if(count($kurzbzs)==0)
 			return true;
 		
-		$kurzbzs = "'".implode("','",$kurzbzs)."'";
+		$kurzbzs = $this->db_implode4SQL($kurzbzs);
 						
 		$qry = 'SELECT * FROM public.tbl_organisationseinheit WHERE oe_kurzbz in('.$kurzbzs.')';
 		if ($aktiv)
@@ -368,8 +382,9 @@ class organisationseinheit extends basis_db
 			$obj->oe_parent_kurzbz = $row->oe_parent_kurzbz;
 			$obj->bezeichnung = $row->bezeichnung;
 			$obj->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
-			$obj->aktiv = ($row->aktiv=='t'?true:false);
-			$obj->mailverteiler = ($row->mailverteiler=='t'?true:false);
+			$obj->aktiv = $this->db_parse_bool($row->aktiv);
+			$obj->mailverteiler = $this->db_parse_bool($row->mailverteiler);
+			$obj->lehre = $this->db_parse_bool($row->lehre);
 			
 			$this->result[] = $obj;
 		}
@@ -406,7 +421,7 @@ class organisationseinheit extends basis_db
 		$qry="WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as 
 		(
 			SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit 
-			WHERE oe_kurzbz='".addslashes($oe_kurzbz)."' and aktiv = true 
+			WHERE oe_kurzbz=".$this->db_add_param($oe_kurzbz)." and aktiv = true 
 			UNION ALL
 			SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes 
 			WHERE o.oe_kurzbz=oes.oe_parent_kurzbz and aktiv = true
@@ -469,10 +484,13 @@ class organisationseinheit extends basis_db
 	/**
 	 * Baut die Datenstruktur für senden als JSON Objekt auf
 	 */
-	public function cleanResult(){
+	public function cleanResult()
+	{
 		$data = array();
-		if(count($this->result)>0){
-			foreach($this->result as $oeEinheit){
+		if(count($this->result)>0)
+		{
+			foreach($this->result as $oeEinheit)
+			{
 				$obj = new stdClass();
 				$obj->oe_kurzbz = $oeEinheit->oe_kurzbz;
 				$obj->oe_parent_kurzbz = $oeEinheit->oe_parent_kurzbz;
@@ -480,16 +498,20 @@ class organisationseinheit extends basis_db
 				$obj->organisationseinheittyp_kurzbz = $oeEinheit->organisationseinheittyp_kurzbz;
 				$obj->aktiv = $oeEinheit->aktiv;
 				$obj->mailverteiler = $oeEinheit->mailverteiler;
+				$obj->lehre = $oeEinheit->lehre;
 				$data[]=$obj;
 			}
-		} else {
+		} 
+		else 
+		{
 			$obj = new stdClass();
 			$obj->oe_kurzbz = $this->oe_kurzbz;
-				$obj->oe_parent_kurzbz = $this->oe_parent_kurzbz;
-				$obj->bezeichnung = $this->bezeichnung;
-				$obj->organisationseinheittyp_kurzbz = $this->organisationseinheittyp_kurzbz;
-				$obj->aktiv = $this->aktiv;
-				$obj->mailverteiler = $this->mailverteiler;
+			$obj->oe_parent_kurzbz = $this->oe_parent_kurzbz;
+			$obj->bezeichnung = $this->bezeichnung;
+			$obj->organisationseinheittyp_kurzbz = $this->organisationseinheittyp_kurzbz;
+			$obj->aktiv = $this->aktiv;
+			$obj->mailverteiler = $this->mailverteiler;
+			$obj->lehre = $this->lehre;
 			$data[]=$obj;
 		}
 		return $data;
