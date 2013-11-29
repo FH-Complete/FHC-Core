@@ -78,7 +78,7 @@ var LvTreeListener =
 		//ohne dem setTimeout
 	    window.setTimeout(LvTreeSelectLehreinheit,10);
 		// Progressmeter stoppen
-		//document.getElementById('statusbar-progressmeter').setAttribute('mode','determined');
+		document.getElementById('statusbar-progressmeter').setAttribute('mode','determined');
 	}
 };
 

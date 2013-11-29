@@ -481,6 +481,7 @@ function onFachbereichSelect(event)
 		var kurzbz=tree.view.getCellText(idx,col);
 	}
 	// Lehrveranstaltung
+    document.getElementById('statusbar-progressmeter').setAttribute('mode','undetermined');
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	try
 	{

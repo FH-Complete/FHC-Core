@@ -398,11 +398,14 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 					</RDF:li>
 					';
 		}
-		//Semester schliessen
-		$orgform_sequence[$stg_kz].='
-						</RDF:Seq><!--SemesterUnten-->
-					</RDF:li>
-					';
+		if($sem!='')
+		{
+			//Semester schliessen
+			$orgform_sequence[$stg_kz].='
+							</RDF:Seq><!--SemesterUnten-->
+						</RDF:li>
+						';
+		}
 	}
 	//Orgform schliessen
 	$orgform_sequence[$stg_kz].='

@@ -169,12 +169,12 @@ class rdf
 	{
 		if(is_null($id))
 		{
-			$this->rdf_text.='<RDF:Seq about="'.$this->rdf_url.'">'."\n";
+			$this->rdf_text.="\n\t\t".'<RDF:Seq about="'.$this->rdf_url.'">'."\n";
 			foreach ($this->sequence as $id)
 			{
 				$this->createRDFSequence($id);
 			}
-			$this->rdf_text.='</RDF:Seq>'."\n";
+			$this->rdf_text.="\n\t\t".'</RDF:Seq>'."\n";
 		}
 		else
 		{
