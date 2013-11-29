@@ -138,7 +138,8 @@ if(isset($_POST['save']))
 		$oe->organisationseinheittyp_kurzbz = $_POST['organisationseinheittyp_kurzbz'];
 		$oe->aktiv = isset($_POST['aktiv']);
 		$oe->mailverteiler = isset($_POST['mailverteiler']);
-		
+		$oe->lehre = isset($_POST['lehre']);
+
 		if($oe->save($new))
 		{
 			echo '<br><b>Daten erfolgreich gespeichert</b>';
@@ -221,6 +222,9 @@ if(isset($_GET['action']) && ($_GET['action']=='edit' || $_GET['action']=='neu')
 			</tr>
 			<tr>
 				<td>Mailverteiler</td><td><input type="checkbox" name="mailverteiler" '.($oe->mailverteiler?'checked':'').'></td>
+			</tr>
+			<tr>
+				<td>Lehre</td><td><input type="checkbox" name="lehre" '.($oe->lehre?'checked':'').'></td>
 			</tr>
 			<tr>
 				<td>&nbsp;</td><td><input type="submit" name="save" value="Speichern" /></td>
