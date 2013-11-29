@@ -108,7 +108,8 @@ function drawStudienordnungen(data)
 
 	for(i in data)
 	{
-		obj=obj+'<li><a href="#Load'+data[i].studienordnung_id+'" onclick="loadStudienplanSTO('+data[i].studienordnung_id+',\''+data[i].bezeichnung+'\',\''+data[i].max_semester+'\');return false;">'+data[i].bezeichnung+'</a></li>';		
+		obj=obj+'<li><a href="#Load'+data[i].studienordnung_id+'" onclick="loadStudienplanSTO('+data[i].studienordnung_id+',\''+data[i].bezeichnung+'\',\''+data[i].max_semester+'\');return false;">'+data[i].bezeichnung+'</a>'
+				+' <a href="#Edit'+data[i].studienordnung_id+'" onclick="editStudienordnung('+data[i].studienordnung_id+');return false;"><img title="edit" src="../../skin/images/edit.png"></a></li>';
 	}
 	obj=obj+'</ul>';
 	$('#studienordnung').html(obj);
@@ -175,7 +176,8 @@ function drawStudienplan(data)
 
 	for(i in data)
 	{
-		obj=obj+'<li><a href="#Load'+data[i].studienplan_id+'" onclick="loadLehrveranstaltungSTPL('+data[i].studienplan_id+',\''+data[i].bezeichnung+' '+data[i].orgform_kurzbz+'\');return false;">'+data[i].bezeichnung+' '+data[i].orgform_kurzbz+'</a></li>';
+		obj=obj+'<li><a href="#Load'+data[i].studienplan_id+'" onclick="loadLehrveranstaltungSTPL('+data[i].studienplan_id+',\''+data[i].bezeichnung+' '+data[i].orgform_kurzbz+'\');return false;">'+data[i].bezeichnung+' '+data[i].orgform_kurzbz+'</a>'
+		+' <a href="#Edit'+data[i].studienplan_id+'" onclick="editStudienplan('+data[i].studienplan_id+');return false;"><img title="edit" src="../../skin/images/edit.png"></a></li>';
 	}
 	obj=obj+'</ul>';
 	$('#studienplan').html(obj);
@@ -500,6 +502,26 @@ function neuerStudienplan()
 	$("#tabs").hide();
 	drawHeader('Neuer Studienplan');
 	$("#data").load('studienordnung.inc.php?method=neuerStudienplan&studiengang_kz='+studiengang_kz);
+}
+
+/**
+ * Laedt die Daten um eine Studienordnung zu editieren
+ */
+function editStudienordnung(studienordnung_id)
+{
+	hideStplDetails();
+	drawHeader('Studienordnung bearbeiten');
+	$("#data").load('studienordnung.inc.php?method=neueStudienordnung&studiengang_kz='+studiengang_kz+'&studienordnung_id='+studienordnung_id);
+}
+
+/**
+ * Laedt die Daten um einen Studienplan zu editieren
+ */
+function editStudienplan(studienplan_id)
+{
+	hideStplDetails();
+	drawHeader('Studienplan bearbeiten');
+	$("#data").load('studienordnung.inc.php?method=neuerStudienplan&studiengang_kz='+studiengang_kz+'&studienplan_id='+studienplan_id);
 }
 
 /*
