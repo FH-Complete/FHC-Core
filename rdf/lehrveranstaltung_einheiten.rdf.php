@@ -19,25 +19,20 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-/*
- * Created on 02.12.2004
- *
- */
-// header fuer no cache
 header("Cache-Control: no-cache, must-revalidate");
 header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
-// content type setzen
 header("Content-type: application/xhtml+xml");
-// xml
-echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-// DAO
+
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/lehrveranstaltung.class.php');
 require_once('../include/lehreinheit.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/functions.inc.php');
+require_once('../include/rdf.class.php');
+require_once('../include/studienordnung.class.php');
+require_once('../include/studienplan.class.php');
 
 $user = get_uid();
 
@@ -61,71 +56,160 @@ foreach ($stg_obj->result as $row)
 	$stg_arr[$row->studiengang_kz]=$row->kuerzel;
 }
 
+$db = new basis_db();
+
 // LVAs holen
 $lvaDAO=new lehrveranstaltung();
 if($uid!='' && $stg_kz!=-1) // Alle LVs eines Mitarbeiters
 {
-	//$lvaDAO->loadLVAfromMitarbeiter($stg_kz, $uid, $semester_aktuell);
-	$qry = "SELECT distinct on(lehrveranstaltung_id) * FROM campus.vw_lehreinheit WHERE
-	        studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
-	        mitarbeiter_uid='".addslashes($uid)."'";
-	if($stg_kz!='') //$stg_kz!='0'
-		$qry .=" AND studiengang_kz='".addslashes($stg_kz)."'";
-
+	$qry = "SELECT 
+				distinct on(lehrveranstaltung_id) * ,'' as studienplan_id, '' as studienplan_bezeichnung
+			FROM
+				campus.vw_lehreinheit 
+			WHERE
+		        studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
+				AND mitarbeiter_uid=".$db->db_add_param($uid);
+	if($stg_kz!='')
+		$qry .=" AND studiengang_kz=".$db->db_add_param($stg_kz);
 }
 elseif($fachbereich_kurzbz!='') // Alle LVs eines Fachbereiches
 {
-	$qry = "SELECT distinct on(lehrveranstaltung_id) * FROM campus.vw_lehreinheit WHERE
-	        studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
-	        fachbereich_kurzbz='".addslashes($fachbereich_kurzbz)."'";
+	// LVs lt Studienplan
+	$qry="
+		SELECT
+			distinct on (lehrveranstaltung_id)
+			tbl_lehrveranstaltung.studiengang_kz as lv_studiengang_kz, tbl_lehrveranstaltung.semester as lv_semester,
+			tbl_lehrveranstaltung.kurzbz as lv_kurzbz, tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung, tbl_lehrveranstaltung.ects as lv_ects,
+			tbl_lehrveranstaltung.lehreverzeichnis as lv_lehreverzeichnis, tbl_lehrveranstaltung.planfaktor as lv_planfaktor,
+			tbl_lehrveranstaltung.planlektoren as lv_planlektoren, tbl_lehrveranstaltung.planpersonalkosten as lv_planpersonalkosten,
+			tbl_lehrveranstaltung.plankostenprolektor as lv_plankostenprolektor, tbl_lehrveranstaltung.orgform_kurzbz as lv_orgform_kurzbz,
+			tbl_lehrveranstaltung.lehrveranstaltung_id,
+			tbl_lehrveranstaltung.lehrform_kurzbz as lehrform_kurzbz, 
+			tbl_lehrveranstaltung.lehrform_kurzbz as lv_lehrform_kurzbz,
+			tbl_lehrveranstaltung.bezeichnung_english as lv_bezeichnung_english,
+			tbl_lehrveranstaltung.studiengang_kz, tbl_studienplan_lehrveranstaltung.semester, tbl_lehrveranstaltung.anmerkung, tbl_lehrveranstaltung.sprache, tbl_lehrveranstaltung.semesterstunden,
+			tbl_lehrveranstaltung.lehre, tbl_lehrveranstaltung.aktiv, 
+			tbl_studienplan.studienplan_id::text, tbl_studienplan.bezeichnung as studienplan_bezeichnung, tbl_lehrveranstaltung.lehrtyp_kurzbz
+		FROM
+			lehre.tbl_lehrveranstaltung
+			JOIN lehre.tbl_studienplan_lehrveranstaltung USING(lehrveranstaltung_id)
+			JOIN lehre.tbl_studienplan USING(studienplan_id)
+			JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+			JOIN lehre.tbl_studienordnung_semester USING(studienordnung_id)
+		WHERE
+			tbl_lehrveranstaltung.oe_kurzbz=(Select oe_kurzbz from public.tbl_fachbereich where fachbereich_kurzbz=".$db->db_add_param($fachbereich_kurzbz).")
+			AND tbl_studienordnung_semester.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell);
+
+	$qry .= " UNION 
+		SELECT 
+				distinct on(lehrveranstaltung_id) 
+				lv_studiengang_kz, lv_semester, lv_kurzbz, lv_bezeichnung, lv_ects,
+				lv_lehreverzeichnis, lv_planfaktor, lv_planlektoren, lv_planpersonalkosten,
+				lv_plankostenprolektor, lv_orgform_kurzbz, lehrveranstaltung_id,
+				lehrform_kurzbz, lv_lehrform_kurzbz, lv_bezeichnung_english, studiengang_kz, semester, anmerkung, sprache, semesterstunden,
+				lehre, aktiv,
+				'' as studienplan_id, '' as studienplan_bezeichnung, 
+				(SELECT lehrtyp_kurzbz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=vw_lehreinheit.lehrveranstaltung_id) as lehrtyp_kurzbz
+			FROM 
+				campus.vw_lehreinheit
+			WHERE
+	        	studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
+				AND fachbereich_kurzbz=".$db->db_add_param($fachbereich_kurzbz);
 	if($uid!='')
-		$qry.=" AND mitarbeiter_uid='".addslashes($uid)."'";
+		$qry.=" AND mitarbeiter_uid=".$db->db_add_param($uid);
+
+	$qry.=" AND lehrveranstaltung_id NOT IN (SELECT lehrveranstaltung_id
+		FROM
+			lehre.tbl_lehrveranstaltung
+			JOIN lehre.tbl_studienplan_lehrveranstaltung USING(lehrveranstaltung_id)
+			JOIN lehre.tbl_studienplan USING(studienplan_id)
+			JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+			JOIN lehre.tbl_studienordnung_semester USING(studienordnung_id)
+		WHERE
+			tbl_lehrveranstaltung.oe_kurzbz=(Select oe_kurzbz from public.tbl_fachbereich where fachbereich_kurzbz=".$db->db_add_param($fachbereich_kurzbz).")
+			AND tbl_studienordnung_semester.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell).")";
+
+
+
 }
 else
 {
-	$qry = "SELECT lehrveranstaltung_id, kurzbz as lv_kurzbz, bezeichnung as lv_bezeichnung, bezeichnung_english as lv_bezeichnung_english, studiengang_kz, semester, sprache,
-				ects as lv_ects, semesterstunden, anmerkung, lehre, lehreverzeichnis as lv_lehreverzeichnis, aktiv,
+	if($sem=='')
+		$sem=null;
+	if($orgform=='')
+		$orgform=null;
+	$stp_ids=array();
+	$sto_obj = new studienordnung();
+	if($sto_obj->loadStudienordnungSTG($stg_kz, $semester_aktuell, $sem))
+	{
+		foreach($sto_obj->result as $row_sto)
+		{
+			$stp_obj = new studienplan();
+			if($stp_obj->loadStudienplanSTO($row_sto->studienordnung_id, $orgform))
+			{
+				foreach($stp_obj->result as $row_stp)
+				{
+					$stp_ids[]=$row_stp->studienplan_id;
+				}
+			}
+		}
+	}
+	else
+		echo "FAILED:".$sto_obj->errormsg;
+	$qry='';
+	if(count($stp_ids)>0)
+	{
+		// Alle Lehrveranstaltungen die lt Studienplan zugeordnet sind
+		$qry.= "SELECT lehrveranstaltung_id, kurzbz as lv_kurzbz, tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung, bezeichnung_english as lv_bezeichnung_english, studiengang_kz, 
+				tbl_studienplan_lehrveranstaltung.semester, tbl_lehrveranstaltung.sprache,
+				ects as lv_ects, semesterstunden, anmerkung, lehre, lehreverzeichnis as lv_lehreverzeichnis, tbl_lehrveranstaltung.aktiv,
 				planfaktor as lv_planfaktor, planlektoren as lv_planlektoren, planpersonalkosten as lv_planpersonalkosten,
-				plankostenprolektor as lv_plankostenprolektor, lehrform_kurzbz as lv_lehrform_kurzbz, tbl_lehrveranstaltung.orgform_kurzbz
-			FROM lehre.tbl_lehrveranstaltung
-			WHERE aktiv ";
-	if($stg_kz!='')
-		$qry.=" AND	studiengang_kz='".addslashes($stg_kz)."'";
-	if($sem!='')
-		$qry.=" AND semester='".addslashes($sem)."'";
-	if($orgform!='')
-		$qry.=" AND (orgform_kurzbz='".addslashes($orgform)."' OR orgform_kurzbz is null)";
+				plankostenprolektor as lv_plankostenprolektor, lehrform_kurzbz as lv_lehrform_kurzbz, tbl_lehrveranstaltung.orgform_kurzbz,
+				tbl_studienplan_lehrveranstaltung.studienplan_id::text as studienplan_id, tbl_studienplan.bezeichnung as studienplan_bezeichnung, tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent::text,
+				tbl_lehrveranstaltung.lehrtyp_kurzbz
+			FROM 
+				lehre.tbl_lehrveranstaltung
+				JOIN lehre.tbl_studienplan_lehrveranstaltung USING(lehrveranstaltung_id)
+				JOIN lehre.tbl_studienplan USING(studienplan_id)
+			WHERE studienplan_id in (".$db->db_implode4SQL($stp_ids).")";
+		if($sem!='')
+			$qry.=" AND tbl_studienplan_lehrveranstaltung.semester=".$db->db_add_param($sem);
+		$qry.=" UNION ";
+	}
 
-	$qry.=" UNION SELECT DISTINCT lehrveranstaltung_id, kurzbz as lv_kurzbz, bezeichnung as lv_bezeichnung, bezeichnung_english as lv_bezeichnung_english, studiengang_kz,
+	// Zusaetzliche alle LVs die eine Lehreinheit zugeordnet haben
+	$qry.="SELECT DISTINCT on(lehrveranstaltung_id) lehrveranstaltung_id, kurzbz as lv_kurzbz, bezeichnung as lv_bezeichnung, bezeichnung_english as lv_bezeichnung_english, studiengang_kz,
 				semester, tbl_lehrveranstaltung.sprache, ects as lv_ects, semesterstunden, tbl_lehrveranstaltung.anmerkung,
 				tbl_lehrveranstaltung.lehre, lehreverzeichnis as lv_lehreverzeichnis, aktiv, planfaktor as lv_planfaktor,
 				planlektoren as lv_planlektoren, planpersonalkosten as lv_planpersonalkosten,
-				plankostenprolektor as lv_plankostenprolektor, tbl_lehrveranstaltung.lehrform_kurzbz as lv_lehrform_kurzbz, tbl_lehrveranstaltung.orgform_kurzbz
+				plankostenprolektor as lv_plankostenprolektor, tbl_lehrveranstaltung.lehrform_kurzbz as lv_lehrform_kurzbz, tbl_lehrveranstaltung.orgform_kurzbz,
+				'' as studienplan_id, '' as studienplan_bezeichnung, '' as studienplan_lehrveranstaltung_id_parent,
+				tbl_lehrveranstaltung.lehrtyp_kurzbz
 			FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING (lehrveranstaltung_id)
-			WHERE NOT aktiv ";
+			WHERE 1=1";
 	if($stg_kz!='')
-		$qry.=" AND studiengang_kz='".addslashes($stg_kz)."'";
+		$qry.=" AND studiengang_kz=".$db->db_add_param($stg_kz);
 
-	$qry.=" AND studiensemester_kurzbz='".addslashes($semester_aktuell)."'";
+	$qry.=" AND studiensemester_kurzbz=".$db->db_add_param($semester_aktuell);
 	if($sem!='')
-		$qry.=" AND semester='".addslashes($sem)."'";
+		$qry.=" AND semester=".$db->db_add_param($sem);
 	if($orgform!='')
-		$qry.=" AND (orgform_kurzbz='".addslashes($orgform)."' OR orgform_kurzbz is null)";
+		$qry.=" AND (orgform_kurzbz=".$db->db_add_param($orgform)." OR orgform_kurzbz is null)";
+	if(count($stp_ids)>0)
+	{
+		// Ohne die vom Studienplan, da diese sonst doppelt sind
+		$qry.=" AND NOT EXISTS (SELECT 1 FROM lehre.tbl_studienplan_lehrveranstaltung where studienplan_id in (".$db->db_implode4SQL($stp_ids).")
+								AND lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id)";
+	}
+	//$qry = 'SELECT distinct on(lehrveranstaltung_id) * FROM ('.$qry.' ORDER BY studienplan_id DESC) a';
 }
-
-$rdf_url='http://www.technikum-wien.at/lehrveranstaltung_einheiten';
-$db = new basis_db();
-
+//die($qry);
 if(!$result = $db->db_query($qry))
 	die($db->db_last_error().'<BR>'.$qry);
-?>
 
-<RDF:RDF
-	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	xmlns:LVA="<?php echo $rdf_url; ?>/rdf#"
->
 
-<?php
+$oRdf = new rdf('LVA','http://www.technikum-wien.at/lehrveranstaltung_einheiten');
+$oRdf->sendHeader();
 
 	//foreach ($lvaDAO->lehrveranstaltungen as $row_lva)
 	while($row_lva = $db->db_fetch_object($result))
@@ -138,7 +222,7 @@ if(!$result = $db->db_query($qry))
 						FROM
 							lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach, public.tbl_benutzerfunktion, public.tbl_studiensemester, public.tbl_studiengang
 						WHERE
-							tbl_lehrveranstaltung.lehrveranstaltung_id='$row_lva->lehrveranstaltung_id' AND
+							tbl_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($row_lva->lehrveranstaltung_id)." AND
 							tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 							tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
 							tbl_lehrfach.fachbereich_kurzbz=tbl_benutzerfunktion.fachbereich_kurzbz AND
@@ -161,44 +245,54 @@ if(!$result = $db->db_query($qry))
 		if($fbk!='')
 			$fbk='Koordinator: '.$fbk;
 
-		//Lehrveranstaltung
-		echo "
-		<RDF:Description  id=\"".$row_lva->lehrveranstaltung_id."\"  about=\"".$rdf_url.'/'.$row_lva->lehrveranstaltung_id."\" >
-			<LVA:lehrveranstaltung_id>".$row_lva->lehrveranstaltung_id."</LVA:lehrveranstaltung_id>
-			<LVA:kurzbz><![CDATA[".$row_lva->lv_kurzbz."]]></LVA:kurzbz>
-			<LVA:bezeichnung><![CDATA[".$row_lva->lv_bezeichnung."]]></LVA:bezeichnung>
-			<LVA:bezeichnung_english><![CDATA[".$row_lva->lv_bezeichnung_english."]]></LVA:bezeichnung_english>
-			<LVA:studiengang_kz>".$row_lva->studiengang_kz."</LVA:studiengang_kz>
-			<LVA:studiengang>".$stg_arr[$row_lva->studiengang_kz]."</LVA:studiengang>
-			<LVA:semester>".$row_lva->semester."</LVA:semester>
-			<LVA:sprache><![CDATA[".$row_lva->sprache."]]></LVA:sprache>
-			<LVA:ects>".$row_lva->lv_ects."</LVA:ects>
-			<LVA:semesterstunden>".$row_lva->semesterstunden."</LVA:semesterstunden>
-			<LVA:planstunden><![CDATA[]]></LVA:planstunden>
-			<LVA:anmerkung><![CDATA[".$row_lva->anmerkung."]]></LVA:anmerkung>
-			<LVA:lehre>".($row_lva->lehre=='t'?'Ja':'Nein')."</LVA:lehre>
-			<LVA:lehreverzeichnis><![CDATA[".$row_lva->lv_lehreverzeichnis."]]></LVA:lehreverzeichnis>
-			<LVA:aktiv>".($row_lva->aktiv=='t'?'Ja':'Nein')."</LVA:aktiv>
-			<LVA:planfaktor>".$row_lva->lv_planfaktor."</LVA:planfaktor>
-			<LVA:planlektoren>".$row_lva->lv_planlektoren."</LVA:planlektoren>
-			<LVA:planpersonalkosten>".$row_lva->lv_planpersonalkosten."</LVA:planpersonalkosten>
-			<LVA:plankostenprolektor>".$row_lva->lv_plankostenprolektor."</LVA:plankostenprolektor>
-			<LVA:orgform_kurzbz>".(isset($row_lva->orgform_kurzbz)?$row_lva->orgform_kurzbz:'')."</LVA:orgform_kurzbz>
+		$i=$oRdf->newObjekt($row_lva->lehrveranstaltung_id);
+		$oRdf->obj[$i]->setAttribut('lehrveranstaltung_id',$row_lva->lehrveranstaltung_id);
+		$oRdf->obj[$i]->setAttribut('kurzbz',$row_lva->lv_kurzbz);
+		$oRdf->obj[$i]->setAttribut('bezeichnung',$row_lva->lv_bezeichnung);
+		$oRdf->obj[$i]->setAttribut('bezeichnung_english',$row_lva->lv_bezeichnung_english);
+		$oRdf->obj[$i]->setAttribut('studiengang_kz',$row_lva->studiengang_kz);
+		$oRdf->obj[$i]->setAttribut('studiengang',$stg_arr[$row_lva->studiengang_kz]);
+		$oRdf->obj[$i]->setAttribut('semester',$row_lva->semester);
+		$oRdf->obj[$i]->setAttribut('sprache',$row_lva->sprache);
+		$oRdf->obj[$i]->setAttribut('ects',$row_lva->lv_ects);
+		$oRdf->obj[$i]->setAttribut('semesterstunden',$row_lva->semesterstunden);
+		$oRdf->obj[$i]->setAttribut('planstunden','');
+		$oRdf->obj[$i]->setAttribut('anmerkung',$row_lva->anmerkung);
+		$oRdf->obj[$i]->setAttribut('lehre',($row_lva->lehre=='t'?'Ja':'Nein'));
+		$oRdf->obj[$i]->setAttribut('lehreverzeichnis',$row_lva->lv_lehreverzeichnis);
+		$oRdf->obj[$i]->setAttribut('aktiv',($row_lva->aktiv=='t'?'Ja':'Nein'));
+		$oRdf->obj[$i]->setAttribut('planfaktor',$row_lva->lv_planfaktor);
+		$oRdf->obj[$i]->setAttribut('planlektoren',$row_lva->lv_planlektoren);
+		$oRdf->obj[$i]->setAttribut('planpersonalkosten',$row_lva->lv_planpersonalkosten);
+		$oRdf->obj[$i]->setAttribut('plankostenprolektor',$row_lva->lv_plankostenprolektor);
+		$oRdf->obj[$i]->setAttribut('orgform_kurzbz',(isset($row_lva->orgform_kurzbz)?$row_lva->orgform_kurzbz:''));
+		$oRdf->obj[$i]->setAttribut('studienplan_id',$row_lva->studienplan_id);
+		$oRdf->obj[$i]->setAttribut('studienplan_bezeichnung',$row_lva->studienplan_bezeichnung);
+		$oRdf->obj[$i]->setAttribut('lehrtyp_kurzbz',$row_lva->lehrtyp_kurzbz);
 
-			<LVA:lehreinheit_id></LVA:lehreinheit_id>
-			<LVA:lehrform_kurzbz>$row_lva->lv_lehrform_kurzbz</LVA:lehrform_kurzbz>
-			<LVA:stundenblockung></LVA:stundenblockung>
-			<LVA:wochenrythmus></LVA:wochenrythmus>
-			<LVA:startkw></LVA:startkw>
-			<LVA:raumtyp></LVA:raumtyp>
-			<LVA:raumtypalternativ></LVA:raumtypalternativ>
-			<LVA:gruppen></LVA:gruppen>
-			<LVA:lektoren>$fbk</LVA:lektoren>
-			<LVA:fachbereich></LVA:fachbereich>
-		</RDF:Description>";
-		$hier.="
-      	<RDF:li>
-      		<RDF:Seq about=\"".$rdf_url.'/'.$row_lva->lehrveranstaltung_id."\" >";
+		$oRdf->obj[$i]->setAttribut('lehreinheit_id','');
+		$oRdf->obj[$i]->setAttribut('lehrform_kurzbz',$row_lva->lv_lehrform_kurzbz);
+		$oRdf->obj[$i]->setAttribut('stundenblockung','');
+		$oRdf->obj[$i]->setAttribut('wochenrythmus','');
+		$oRdf->obj[$i]->setAttribut('startkw','');
+		$oRdf->obj[$i]->setAttribut('raumtyp','');
+		$oRdf->obj[$i]->setAttribut('raumtypalternativ','');
+		$oRdf->obj[$i]->setAttribut('gruppen','');
+		$oRdf->obj[$i]->setAttribut('lektoren',$fbk);
+		$oRdf->obj[$i]->setAttribut('fachbereich','');
+
+		if(isset($row_lva->studienplan_lehrveranstaltung_id_parent) && $row_lva->studienplan_lehrveranstaltung_id_parent!='')
+		{
+
+			// Wenn ein Parent vorhanden ist, wird er diesem untergeordnet
+			$stpllv = new studienplan();
+			if($stpllv->loadStudienplanLehrveranstaltung($row_lva->studienplan_lehrveranstaltung_id_parent))
+			{
+				$oRdf->addSequence($row_lva->lehrveranstaltung_id, $stpllv->lehrveranstaltung_id);
+			}
+		}
+		else
+			$oRdf->addSequence($row_lva->lehrveranstaltung_id);
 
 		//zugehoerige LE holen
 		$le = new lehreinheit();
@@ -241,62 +335,51 @@ if(!$result = $db->db_query($qry))
 			if($result_fb = $db->db_query($qry))
 				if($row_fb = $db->db_fetch_object($result_fb))
 					$fachbereich = $row_fb->bezeichnung;
-			
-			echo "
-      		<RDF:Description  id=\"".$row_le->lehreinheit_id."\"  about=\"".$rdf_url.'/'.$row_lva->lehrveranstaltung_id."/$row_le->lehreinheit_id\" >
-				<LVA:lehrveranstaltung_id>".$row_lva->lehrveranstaltung_id."</LVA:lehrveranstaltung_id>
-				<LVA:kurzbz><![CDATA[".$row_lf->kurzbz."]]></LVA:kurzbz>
-				<LVA:bezeichnung><![CDATA[".$row_lf->bezeichnung."]]></LVA:bezeichnung>
-				<LVA:bezeichnung_englisch><![CDATA[]]></LVA:bezeichnung_englisch>
-				<LVA:studiengang_kz>".$row_lva->studiengang_kz."</LVA:studiengang_kz>
-				<LVA:studiengang>".$stg_arr[$row_lva->studiengang_kz]."</LVA:studiengang>
-				<LVA:semester>".$row_lva->semester."</LVA:semester>
-				<LVA:sprache><![CDATA[".$row_le->sprache."]]></LVA:sprache>
-				<LVA:ects></LVA:ects>
-				<LVA:semesterstunden><![CDATA[".$semesterstunden."]]></LVA:semesterstunden>
-				<LVA:planstunden><![CDATA[".$planstunden."]]></LVA:planstunden>
-				<LVA:anmerkung><![CDATA[".$row_le->anmerkung."]]></LVA:anmerkung>
-				<LVA:lehre>".($row_le->lehre?'Ja':'Nein')."</LVA:lehre>
-				<LVA:lehreverzeichnis></LVA:lehreverzeichnis>
-				<LVA:aktiv></LVA:aktiv>
-				<LVA:planfaktor></LVA:planfaktor>
-				<LVA:planlektoren></LVA:planlektoren>
-				<LVA:planpersonalkosten></LVA:planpersonalkosten>
-				<LVA:plankostenprolektor></LVA:plankostenprolektor>
-				<LVA:orgform_kurzbz></LVA:orgform_kurzbz>
 
-				<LVA:lehreinheit_id>$row_le->lehreinheit_id</LVA:lehreinheit_id>
-				<LVA:studiensemester_kurzbz>$row_le->studiensemester_kurzbz</LVA:studiensemester_kurzbz>
-				<LVA:lehrfach_id>$row_le->lehrfach_id</LVA:lehrfach_id>
-				<LVA:lehrform_kurzbz>$row_le->lehrform_kurzbz</LVA:lehrform_kurzbz>
-				<LVA:stundenblockung>$row_le->stundenblockung</LVA:stundenblockung>
-				<LVA:wochenrythmus>$row_le->wochenrythmus</LVA:wochenrythmus>
-				<LVA:startkw>$row_le->start_kw</LVA:startkw>
-				<LVA:raumtyp>$row_le->raumtyp</LVA:raumtyp>
-				<LVA:raumtypalternativ>$row_le->raumtypalternativ</LVA:raumtypalternativ>
-				<LVA:anmerkung><![CDATA[$row_le->anmerkung]]></LVA:anmerkung>
-				<LVA:unr>$row_le->unr</LVA:unr>
-				<LVA:lvnr>$row_le->lvnr</LVA:lvnr>
-				<LVA:gruppen><![CDATA[$grp]]></LVA:gruppen>
-				<LVA:lektoren><![CDATA[".$lkt."]]></LVA:lektoren>
-				<LVA:fachbereich><![CDATA[".$fachbereich."]]></LVA:fachbereich>
-      		</RDF:Description>";
 
-			$hier.="
-			<RDF:li resource=\"".$rdf_url.'/'.$row_lva->lehrveranstaltung_id.'/'.$row_le->lehreinheit_id."\" />";
+			$i=$oRdf->newObjekt($row_lva->lehrveranstaltung_id.'/'.$row_le->lehreinheit_id);
+			$oRdf->obj[$i]->setAttribut('lehrveranstaltung_id',$row_lva->lehrveranstaltung_id);
+			$oRdf->obj[$i]->setAttribut('kurzbz',$row_lf->kurzbz);
+			$oRdf->obj[$i]->setAttribut('bezeichnung',$row_lf->bezeichnung);
+			$oRdf->obj[$i]->setAttribut('bezeichnung_english','');
+			$oRdf->obj[$i]->setAttribut('studiengang_kz',$row_lva->studiengang_kz);
+			$oRdf->obj[$i]->setAttribut('studiengang',$stg_arr[$row_lva->studiengang_kz]);
+			$oRdf->obj[$i]->setAttribut('semester',$row_lva->semester);
+			$oRdf->obj[$i]->setAttribut('sprache',$row_le->sprache);
+			$oRdf->obj[$i]->setAttribut('ects','');
+			$oRdf->obj[$i]->setAttribut('semesterstunden',$semesterstunden);
+			$oRdf->obj[$i]->setAttribut('planstunden',$planstunden);
+			$oRdf->obj[$i]->setAttribut('anmerkung',$row_le->anmerkung);
+			$oRdf->obj[$i]->setAttribut('lehre',($row_le->lehre=='t'?'Ja':'Nein'));
+			$oRdf->obj[$i]->setAttribut('lehreverzeichnis','');
+			$oRdf->obj[$i]->setAttribut('aktiv','');
+			$oRdf->obj[$i]->setAttribut('planfaktor','');
+			$oRdf->obj[$i]->setAttribut('planlektoren','');
+			$oRdf->obj[$i]->setAttribut('planpersonalkosten','');
+			$oRdf->obj[$i]->setAttribut('plankostenprolektor','');
+			$oRdf->obj[$i]->setAttribut('orgform_kurzbz','');
+
+			$oRdf->obj[$i]->setAttribut('lehreinheit_id',$row_le->lehreinheit_id);
+			$oRdf->obj[$i]->setAttribut('studiensemester_kurzbz',$row_le->studiensemester_kurzbz);
+			$oRdf->obj[$i]->setAttribut('lehrfach_id',$row_le->lehrfach_id);
+			$oRdf->obj[$i]->setAttribut('lehrform_kurzbz',$row_le->lehrform_kurzbz);
+			$oRdf->obj[$i]->setAttribut('stundenblockung',$row_le->stundenblockung);
+			$oRdf->obj[$i]->setAttribut('wochenrythmus',$row_le->wochenrythmus);
+			$oRdf->obj[$i]->setAttribut('startkw',$row_le->start_kw);
+			$oRdf->obj[$i]->setAttribut('raumtyp',$row_le->raumtyp);
+			$oRdf->obj[$i]->setAttribut('raumtypalternativ',$row_le->raumtypalternativ);
+			$oRdf->obj[$i]->setAttribut('anmerkung',$row_le->anmerkung);
+			$oRdf->obj[$i]->setAttribut('unr',$row_le->unr);
+			$oRdf->obj[$i]->setAttribut('lvnr',$row_le->lvnr);
+			$oRdf->obj[$i]->setAttribut('gruppen',$grp);
+			$oRdf->obj[$i]->setAttribut('lektoren',$lkt);
+			$oRdf->obj[$i]->setAttribut('fachbereich',$fachbereich);
+
+			$oRdf->addSequence($row_lva->lehrveranstaltung_id.'/'.$row_le->lehreinheit_id,$row_lva->lehrveranstaltung_id);
+
 		}
-		//<RDF:li resource=\"".$rdf_url.'/'.$row_lva->lehrveranstaltung_id."\" />
-		$hier.="
-      		</RDF:Seq>
-      	</RDF:li>";
 	}
 
-	$hier="
-  	<RDF:Seq about=\"".$rdf_url."/liste\">".$hier."
-  	</RDF:Seq>";
 
-	echo $hier;
+$oRdf->sendRdfText();
 ?>
-
-
-</RDF:RDF>
