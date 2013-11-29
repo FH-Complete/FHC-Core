@@ -66,7 +66,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 		<!-- ************* -->
 		<!-- Bem.: style="visibility:collapse" versteckt eine Spalte -->
 		<tree id="lehrveranstaltung-tree" seltype="single" hidecolumnpicker="false" flex="1"
-				datasources="rdf:null" ref="http://www.technikum-wien.at/lehrveranstaltung_einheiten/liste"
+				datasources="rdf:null" ref="http://www.technikum-wien.at/lehrveranstaltung_einheiten"
 				style="margin:0px;" enableColumnDrag="true"
 				onselect="LeAuswahl(this);"
  				persist="height"
@@ -166,13 +166,25 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehreinheit_id"/>
 				<splitter class="tree-splitter"/>
+				<treecol id="lehrveranstaltung-treecol-studienplan_id" label="studienplan_id" flex="1" hidden="true" persist="hidden, width, ordinal"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#studienplan_id"/>
+				<splitter class="tree-splitter"/>
+				<treecol id="lehrveranstaltung-treecol-studienplan_bezeichnung" label="Studienplan" flex="1" hidden="true" persist="hidden, width, ordinal"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#studienplan_bezeichnung"/>
+				<splitter class="tree-splitter"/>
+				<treecol id="lehrveranstaltung-treecol-lehrtyp_kurzbz" label="Lehrtyp" flex="1" hidden="true" persist="hidden, width, ordinal"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrtyp_kurzbz"/>
+				<splitter class="tree-splitter"/>
 			</treecols>
 
 			<template>
 				<treechildren flex="1" >
    					<treeitem uri="rdf:*">
-						<treerow dbID="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrveranstaltung_id" >
-							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#kurzbz"/>
+						<treerow properties="lehrveranstaltung_rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrtyp_kurzbz" dbID="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrveranstaltung_id" >
+							<treecell src="../skin/images/rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrtyp_kurzbz^.png" label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#kurzbz"/>
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#bezeichnung"/>
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#bezeichnung_english"/>
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#sprache"/>
@@ -195,6 +207,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#orgform_kurzbz"/>
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrveranstaltung_id"  />
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehreinheit_id"/>
+							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#studienplan_id"/>
+							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#studienplan_bezeichnung"/>
+							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrtyp_kurzbz"/>
 						</treerow>
 					</treeitem>
 				</treechildren>

@@ -77,3 +77,28 @@ treechildren::-moz-tree-row(odd, selected) { background-color: #FFFFAA; }
 treechildren::-moz-tree-row(even, selected) { background-color: #FFFFAA; }
 treechildren::-moz-tree-cell-text(selected) { color: #000000; }
 treechildren::-moz-tree-cell-text(odd, selected) { color: #000000; }
+
+
+/* Lehrveranstaltung */
+treechildren::-moz-tree-row(lehrveranstaltung_lv)
+{
+	background-color: #FFFFFF;
+}
+
+/* Modul */
+treechildren::-moz-tree-row(lehrveranstaltung_modul)
+{
+	background-color: #EEEEEE;
+}
+
+/* Lehrfach */
+treechildren::-moz-tree-row(lehrveranstaltung_lf)
+{
+
+}
+
+/* Lehreinheit */
+treechildren::-moz-tree-row(lehrveranstaltung_)
+{
+	background-color: #EDF5FF;
+}
