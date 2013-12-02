@@ -191,7 +191,13 @@ class lvangebot extends basis_db
 			$this->errormsg = 'Gruppe darf nicht länger als 32 Zeichen sein';
 			return false;
 		}
-				
+		
+		//Anmeldefenster Start und Ende prüfen
+		if($this->anmeldefenster_start>$this->anmeldefenster_ende)
+		{
+			$this->errormsg = 'Anmeldefenster: Ende liegt vor Start';
+			return false;
+		}
 		$this->errormsg = '';
 		return true;
 	}
