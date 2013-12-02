@@ -899,5 +899,173 @@ if (!$result=@$db->db_query($sql_query))
 							echo 'Attribut '.$fulltablename.'.<strong>'.$fieldnameDB.'</strong> existiert in der DB, aber nicht in diesem Skript!<BR>';
 					}
 		}
+
+// ******** Berechtigungen Prüfen ************/
+echo '<h2>Berechtigungen pruefen</h2>';
+$berechtigung_kurzbz=0;
+$beschreibung=1;
+$berechtigungen = array(
+	array('admin','Super User Rechte'),
+	array('assistenz','Assistenz'),
+	array('basis/addon','Addons verwalten'),
+	array('basis/ampel','Ampeln Administrieren'),
+	array('basis/ampeluebersicht','Ampel Übersicht für Leiter'),
+	array('basis/berechtigung','Berechtigungsverwaltung'),
+	array('basis/betriebsmittel','Betriebsmittel'),
+	array('basis/cms','CMS Administration'),
+	array('basis/cms_review','CMS Review Berechtigung (nur für admin Reviewer! Normale Reviewer bekommen Benutzerfunktion review)'),
+	array('basis/cms_sperrfreigabe','Berechtigung zum Freigeben von gesperrtem Content'),
+	array('basis/cronjob','Cronjobverwaltung'),
+	array('basis/dms','DMS Download'),
+	array('basis/fhausweis','Verwaltungstools für FH Ausweis – Kartentausch, Bildpruefung, Druck'),
+	array('basis/firma','Firmenverwaltung'),
+	array('basis/firma:begrenzt','Firmenverwaltung'),
+	array('basis/infoscreen','Infoscreenverwaltung'),
+	array('basis/moodle','basis/moodle'),
+	array('basis/news','Newsverwaltung'),
+	array('basis/notiz','Notizen'),
+	array('basis/organisationseinheit','Organisationseinheiten Verwalten'),
+	array('basis/ort','Raum-/Ortverwaltung'),
+	array('basis/person','Personen Zusammenlegen, Stg-Wiederholer anlegen, etc'),
+	array('basis/service','Services Administrieren (SLAs)'),
+	array('basis/statistik','Statistiken Administrieren'),
+	array('basis/studiengang','Studiengangsverwaltung'),
+	array('basis/testtool','Administrationseite, Gebiete löschen/zurücksetzen'),
+	array('basis/variable','Variablenverwaltung'),
+	array('inout/incoming','Incomingverwaltung'),
+	array('inout/outgoing','Outgoingverwaltung'),
+	array('inout/uebersicht','Verbandsanzeige fuer Incoming/Outgoing im FAS'),
+	array('lehre','Berechtigung fuer CIS-Seite'),
+	array('lehre/abgabetool','Projektabgabetool, Studentenansicht'),
+	array('lehre/abgabetool:download','Download von Projektarbeitsabgaben'),
+	array('lehre/freifach','Freifachverwaltung'),
+	array('lehre/lehrfach','Lehrfachverwaltung'),
+	array('lehre/lehrfach:begrenzt','Lehrfachverwaltung - nur aktiv aenderbar, nur aktive LF werden angezeigt'),
+	array('lehre/lehrveranstaltung','Lehrveranstaltungsverwaltung'),
+	array('lehre/lehrveranstaltung:begrenzt','nur die Felder Lehre, Sort, Zeugnis, BA/DA, FBK und LVInfo dürfen geändert werden (eventuelle Aufteilung in einzelne Berechtigungen??)'),
+	array('lehre/lvplan','Tempus'),
+	array('lehre/reihungstest','Reihungstestverwaltung'),
+	array('lehre/reservierung','erweiterte Reservierung inkl. Lektorauswahl, Stg, Sem und Gruppe'),
+	array('lehre/reservierung:begrenzt','normale Raumreservierung im CIS'),
+	array('lehre/studienordnung','Studienordnung'),
+	array('lehre/vorrueckung','Lehreinheitenvorrückung'),
+	array('lv-plan','Stundenplan'),
+	array('mitarbeiter','FAS Mitarbeitermodul'),
+	array('mitarbeiter/bankdaten','Bankdaten für Mitarbeiter und Studierende anzeigen'),
+	array('mitarbeiter/stammdaten','Stammdaten der Mitarbeiter'),
+	array('mitarbeiter/urlaube','Mit diesem Recht werden im CIS die Urlaube von allen Mitarbeiter sichtbar'),
+	array('mitarbeiter/zeitsperre','Zeitsperren- und Urlaubsverwaltung'),
+	array('news','News eintragen'),
+	array('planner','Planner Verwaltung'),
+	array('preinteressent','Verwaltung der Preinteressenten'),
+	array('raumres','Raumreservierung'),
+	array('soap/lv','Recht für LV Webservice'),
+	array('soap/lvplan','Recht für LV-Plan Webservice'),
+	array('soap/mitarbeiter','Recht für Mitarbeiter-Webservice'),
+	array('soap/ort','Recht für Ort Webservice'),
+	array('soap/student','Recht für Student Webservice'),
+	array('soap/studienordnung','Recht für Studienordnung Webservice'),
+	array('student/bankdaten','Bankdaten des Studenten'),
+	array('student/dokumente','Wenn SUID dann dürfen Dokumente auch wieder entfernt werden'),
+	array('student/stammdaten','Stammdaten der Studenten'),
+	array('student/vorrueckung','Studentenvorrückung'),
+	array('system/developer','Anzeige zusätzlicher Developerinfos'),
+	array('system/loginasuser','Berechtigung zum Einloggen als anderer User'),
+	array('user','Normale User ohne besonere Rechte'),
+	array('veranstaltung','Berechtigungen fuer Veranstaltungen wie Jahresplan'),
+	array('wawi/berichte','Alle Berichte anzeigen'),
+	array('wawi/bestellung','Bestellungen verwalten'),
+	array('wawi/bestellung_advanced','Bestellungen editieren nach dem Abschicken'),
+	array('wawi/budget','Budgeteingabe'),
+	array('wawi/delete_advanced','Loeschen von freigegebenen Bestellungen'),
+	array('wawi/firma','Firmenverwaltung abgespeckt'),
+	array('wawi/freigabe','Bestellungen freigeben, entweder oe_kurzbz oder kostenstelle_id muss gesetzt sein'),
+	array('wawi/freigabe_advanced','Berechtigung zum Freigeben von ALLEN Bestellungen'),
+	array('wawi/inventar','Inventar Administration'),
+	array('wawi/inventar:begrenzt','Inventarverwaltung'),
+	array('wawi/konto','Kontoverwaltung'),
+	array('wawi/kostenstelle','Kostenstellenverwaltung'),
+	array('wawi/rechnung','Rechnungen verwalten'),
+	array('wawi/rechnung_freigeben','Rechnungen Freigeben (bei Gutschriften)'),
+	array('wawi/rechnung_transfer','Rechnungen - Eintragen des TransferDatums'),
+	array('wawi/storno','Bestellung stornieren')
+);
+
+foreach($berechtigungen as $row)
+{
+	$qry = "SELECT * FROM system.tbl_berechtigung
+			WHERE berechtigung_kurzbz=".$db->db_add_param($row[$berechtigung_kurzbz]);
+
+	if($result = $db->db_query($qry))
+	{
+		if($db->db_num_rows($result)==0)
+		{
+			// Nicht vorhanden -> anlegen
+			$qry_insert="INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES(".
+				$db->db_add_param($row[$berechtigung_kurzbz]).','.
+				$db->db_add_param($row[$beschreibung]).');';
+
+			if($db->db_query($qry_insert))
+				echo '<br>'.$row[$berechtigung_kurzbz].'/'.$row[$beschreibung].' hinzugefügt';
+			else
+				echo '<br><span class="error">Fehler: '.$row[$berechtigung_kurzbz].'/'.$row[$beschreibung].' hinzufügen nicht möglich</span>';
+		}
+	}
+}
+// ******** Pruefen ob die Webservice Berechtigungen alle gesetzt sind **********
+
+echo '<h2>Webservice Berechtigungen pruefen</h2>';
+
+// berechtigung_kurzbz,methode,klasse
+$berechtigung_kurzbz=0;
+$methode=1;
+$klasse=2;
+$webservicerecht = array(
+	array('soap/studienordnung','load_lva_oe','lehrveranstaltung'),
+	array('soap/studienordnung','load','lehrveranstaltung'),
+	array('soap/studienordnung','deleteStudienplanLehrveranstaltung','studienplan'),
+	array('soap/studienordnung','containsLehrveranstaltung','studienplan'),
+	array('soap/studienordnung','loadLehrveranstaltungStudienplanByLvId','studienplan'),
+	array('soap/studienordnung','saveStudienplanLehrveranstaltung','studienplan'),
+	array('soap/studienordnung','loadStudienordnung','studienordnung'),
+	array('soap/studienordnung','delete','lvregel'),
+	array('soap/studienordnung','save','lvregel'),
+	array('soap/studienordnung','load','lvregel'),
+	array('soap/studienordnung','loadLVRegelTypen','lvregel'),
+	array('soap/studienordnung','load_lva','lehrveranstaltung'),
+	array('soap/studienordnung','getAll','lehrtyp'),
+	array('soap/studienordnung','getAll','organisationseinheit'),
+	array('soap/studienordnung','getLVRegelTree','lvregel'),
+	array('soap/studienordnung','save','studienplan'),
+	array('soap/studienordnung','save','studienordnung'),
+	array('soap/studienordnung','loadStudienplanSTO','studienplan'),
+	array('soap/studienordnung','loadStudienordnungSTG','studienordnung')
+);
+
+foreach($webservicerecht as $row)
+{
+	$qry = "SELECT * FROM system.tbl_webservicerecht 
+			WHERE berechtigung_kurzbz=".$db->db_add_param($row[$berechtigung_kurzbz])."
+			AND methode=".$db->db_add_param($row[$methode])."
+			AND klasse=".$db->db_add_param($row[$klasse]);
+
+	if($result = $db->db_query($qry))
+	{
+		if($db->db_num_rows($result)==0)
+		{
+			// Nicht vorhanden -> anlegen
+			$qry_insert="INSERT INTO system.tbl_webservicerecht (berechtigung_kurzbz, methode, insertamum, insertvon, klasse) VALUES(".
+				$db->db_add_param($row[$berechtigung_kurzbz]).','.
+				$db->db_add_param($row[$methode]).','.
+				"now(),'checksystem',".
+				$db->db_add_param($row[$klasse]).');';
+
+			if($db->db_query($qry_insert))
+				echo '<br>'.$row[$berechtigung_kurzbz].'/'.$row[$methode].'->'.$row[$klasse].' hinzugefügt';
+			else
+				echo '<br><span class="error">Fehler: '.$row[$berechtigung_kurzbz].'/'.$row[$methode].'->'.$row[$klasse].' hinzufügen nicht möglich</span>';
+		}
+	}
+}
+
 echo '</body></html>';
-?>
