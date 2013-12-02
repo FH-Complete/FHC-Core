@@ -509,7 +509,7 @@ function neuerStudienplan()
  */
 function editStudienordnung(studienordnung_id)
 {
-	hideStplDetails();
+	$("#tabs").hide();
 	drawHeader('Studienordnung bearbeiten');
 	$("#data").load('studienordnung.inc.php?method=neueStudienordnung&studiengang_kz='+studiengang_kz+'&studienordnung_id='+studienordnung_id);
 }
@@ -519,7 +519,7 @@ function editStudienordnung(studienordnung_id)
  */
 function editStudienplan(studienplan_id)
 {
-	hideStplDetails();
+	$("#tabs").hide();
 	drawHeader('Studienplan bearbeiten');
 	$("#data").load('studienordnung.inc.php?method=neuerStudienplan&studiengang_kz='+studiengang_kz+'&studienplan_id='+studienplan_id);
 }
