@@ -115,7 +115,7 @@ switch($method)
 			</tr>
 			<tr>
 				<td>Studiengangsbezeichnung:</td>
-				<td><input type="text" id="studiengangbezeichnung" maxlength="256" value="'.($new?$studiengang->bezeichnung:$studienordnung->bezeichnung).'" /></td>
+				<td><input type="text" id="studiengangbezeichnung" maxlength="256" value="'.($new?$studiengang->bezeichnung:$studienordnung->studiengangbezeichnung).'" /></td>
 			</tr>
 			<tr>
 				<td>Studiengangsbezeichnung Englisch:</td>
