@@ -945,7 +945,7 @@ function saveStudienordnung()
 		"gueltigbis":gueltigbis,
 		"ects":ects,
 		"studiengangbezeichnung":studiengangbezeichnung,
-		"studiengangbezeichnungenglisch":studiengangbezeichnungenglisch,
+		"studiengangbezeichnung_englisch":studiengangbezeichnungenglisch,
 		"studiengangkurzbzlang":studiengangkurzbzlang,
 		"akadgrad_id":akadgrad_id,
 		"studiengang_kz":studiengang_kz
