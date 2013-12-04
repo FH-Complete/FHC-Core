@@ -58,12 +58,13 @@ if (!$db = new basis_db())
 				var html = "";
 				data.result.forEach(function(option)
 				{
-					html+="<option value='"+ option +"'>Semester "+ option +"</option>"
-				})
+					html+="<option value='"+ option +"'>Semester "+ option +"</option>";
+				});
 				$("#semDropdown").html(html);
 				loadLehrveranstaltungen();
 			});
-		})
+		});
+		
 		function loadSemester()
 		{
 			var studiengang_kz = $("#stgDropdown").val();
@@ -80,8 +81,8 @@ if (!$db = new basis_db())
 				var html = "";
 				data.result.forEach(function(option)
 				{
-					html+="<option value='"+ option +"'>Semester "+ option +"</option>"
-				})
+					html+="<option value='"+ option +"'>Semester "+ option +"</option>";
+				});
 				$("#semDropdown").html(html);
 				loadLehrveranstaltungen();
 			});
@@ -109,14 +110,14 @@ if (!$db = new basis_db())
 							"parameter_2": "null",
 							"parameter_3": "null",
 							"parameter_4": "true"
-						},
+						}
 				}).success(function(data)
 				{
 					var html = "";
 					data.result.forEach(function(option)
 					{
-						html+="<option value='"+ option.metadata.lehrveranstaltung_id +"'>"+ option.data +"</option>"
-					})
+						html+="<option value='"+ option.metadata.lehrveranstaltung_id +"'>"+ option.data +"</option>";
+					});
 					$("#lvDropdown").html(html);
 				});
 			}
@@ -135,15 +136,15 @@ if (!$db = new basis_db())
 							"parameter_1": true,
 							"parameter_2": "null",
 							"parameter_3": "bezeichnung"
-						},
+						}
 				}).success(function(data)
 				{
 					console.log(data);
 					var html = "";
 					data.result.forEach(function(option)
 					{
-						html+="<option value='"+ option.metadata.lehrveranstaltung_id +"'>"+ option.data +"</option>"
-					})
+						html+="<option value='"+ option.metadata.lehrveranstaltung_id +"'>"+ option.data +"</option>";
+					});
 					$("#lvDropdown").html(html);
 				});
 			}
@@ -166,14 +167,14 @@ if (!$db = new basis_db())
 						"parameter_2": "null",
 						"parameter_3": "null",
 						"parameter_4": "true"
-					},
+					}
 			}).success(function(data)
 			{
 				var html = "";
 				data.result.forEach(function(option)
 				{
-					html+="<option value='"+ option.metadata.lehrveranstaltung_id +"'>"+ option.data +"</option>"
-				})
+					html+="<option value='"+ option.metadata.lehrveranstaltung_id +"'>"+ option.data +"</option>";
+				});
 				$("#lvDropdown").html(html);
 			});
 		}
