@@ -23,7 +23,6 @@ var studienordnung_id='';
 var studienordnung_bezeichnung='';
 var studienplan_id='';
 var lehrveranstaltungen='';
-var max_semester = 0;
 
 function loadError(xhr, textStatus, errorThrown)
 {
@@ -86,6 +85,7 @@ function loadStudienordnung()
 		error: loadError
 	}).success(function(data)
 	{
+		console.log(data);
 		if(data.error=='true')
 		{
 			alert('Fehler:'+data.errormsg);
@@ -108,8 +108,11 @@ function drawStudienordnungen(data)
 
 	for(i in data)
 	{
-		obj=obj+'<li><a href="#Load'+data[i].studienordnung_id+'" onclick="loadStudienplanSTO('+data[i].studienordnung_id+',\''+data[i].bezeichnung+'\',\''+data[i].max_semester+'\');return false;">'+data[i].bezeichnung+'</a>'
+		if(data[i].studienordnung_id !== null)
+		{
+			obj=obj+'<li><a href="#Load'+data[i].studienordnung_id+'" onclick="loadStudienplanSTO('+data[i].studienordnung_id+',\''+data[i].bezeichnung+'\');return false;">'+data[i].bezeichnung+'</a>'
 				+' <a href="#Edit'+data[i].studienordnung_id+'" onclick="editStudienordnung('+data[i].studienordnung_id+');return false;"><img title="edit" src="../../skin/images/edit.png"></a></li>';
+		}
 	}
 	obj=obj+'</ul>';
 	$('#studienordnung').html(obj);
@@ -118,9 +121,8 @@ function drawStudienordnungen(data)
 /**
  * Laedt die Studienplaene zu einer Studienordnung
  */
-function loadStudienplanSTO(neue_studienordnung_id,bezeichnung, maxSemester)
+function loadStudienplanSTO(neue_studienordnung_id,bezeichnung)
 {
-	max_semester = maxSemester;
 	studienordnung_bezeichnung=bezeichnung;
 	studienordnung_id=neue_studienordnung_id;
 	drawHeader();
@@ -137,6 +139,7 @@ function loadStudienplanSTO(neue_studienordnung_id,bezeichnung, maxSemester)
 		error: loadError
 	}).success(function(data)
 	{
+		console.log(data);
 		if(data.error=='true')
 		{
 			alert('Fehler:'+data.errormsg);
@@ -162,7 +165,7 @@ function loadStudienplanSTO(neue_studienordnung_id,bezeichnung, maxSemester)
 		if(data.result.length === 1)
 		{
 			var html = "";
-			html += data.result[0]
+			html += data.result[0];
 		}
 	});
 }
@@ -176,7 +179,7 @@ function drawStudienplan(data)
 
 	for(i in data)
 	{
-		obj=obj+'<li><a href="#Load'+data[i].studienplan_id+'" onclick="loadLehrveranstaltungSTPL('+data[i].studienplan_id+',\''+data[i].bezeichnung+' '+data[i].orgform_kurzbz+'\');return false;">'+data[i].bezeichnung+' '+data[i].orgform_kurzbz+'</a>'
+		obj=obj+'<li><a href="#Load'+data[i].studienplan_id+'" onclick="loadLehrveranstaltungSTPL('+data[i].studienplan_id+',\''+data[i].bezeichnung+' '+data[i].orgform_kurzbz+'\',\''+data[i].regelstudiendauer+'\');return false;">'+data[i].bezeichnung+' '+data[i].orgform_kurzbz+'</a>'
 		+' <a href="#Edit'+data[i].studienplan_id+'" onclick="editStudienplan('+data[i].studienplan_id+');return false;"><img title="edit" src="../../skin/images/edit.png"></a></li>';
 	}
 	obj=obj+'</ul>';
@@ -186,9 +189,9 @@ function drawStudienplan(data)
 /**
  * Laedt die Lehrveranstaltungen eines Studienplanes
  */
-function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung)
+function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 {
-	studienplan_id=studienplan_id;
+	//studienplan_id = studienplan_id;
 	studienplan_bezeichnung=bezeichnung;
 	drawHeader();
 	$.ajax(
@@ -266,24 +269,20 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung)
 				},
 				types: {
 					"types" :  {
-//						"valid_children" : ["semester", "lv", "default"],
 						"lv" : {
 							icon : {
 								image : "../../include/js/jstree/icons/lehrveranstaltung.png"
 							},
-//							max_children: 0
 						},
 						"semester" : {
-//							"valid_children" : ["lv", "lf", "modul"]
+
 						},
 						"modul" : {
 							icon : {
 								image : "../../include/js/jstree/icons/modul.png"
 							},
-//							"valid_children" : ["lv"]
 						},
 						"lf" : {
-							//TODO valid_children
 						}
 					}
 				},
@@ -378,11 +377,11 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung)
 				LoadLVDetails(lvid, stpllvid);
 
 				// Regeln laden
-				if(stpllvid!=undefined)
+				if(stpllvid!==undefined)
 					LVRegelnloadRegeln(stpllvid);
 
 				// Kompatibilitaet laden
-				// TODO
+				//TODO Kompatibilität
 			});
 	/*	}
 		else

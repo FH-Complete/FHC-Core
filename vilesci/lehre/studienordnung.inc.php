@@ -254,14 +254,13 @@ switch($method)
 		break;
 	case 'semesterStoZuordnung':
 		$studienordnung_id = $_GET["studienordnung_id"];
-		$studiensemester_kurzbz = isset($_GET["studiensemester_kurzbz"]) ? $_GET["studiensemester_kurzbz"] : "";
-		$semester = isset($_GET["semester"]) ? $_GET["semester"] : "";
+//		$studiensemester_kurzbz = isset($_GET["studiensemester_kurzbz"]) ? $_GET["studiensemester_kurzbz"] : "";
+//		$semester = isset($_GET["semester"]) ? $_GET["semester"] : "";
 				
 		$studienordnung = new studienordnung();
 		$studienordnung->loadStudienordnung($studienordnung_id);
 		
 		$studienSemesterResult = $studienordnung->loadStudiensemesterFromStudienordnung($studienordnung_id);
-		$data = array();
 		foreach ($studienSemesterResult as $studienSem)
 		{
 			$obj = new stdClass();

@@ -69,8 +69,9 @@ function drawLVRegeln(data)
 /**
  * Erstellt den Regelbaum
  */
-function getChilds(data, parent='')
+function getChilds(data, parent)
 {
+	parent = (typeof parent === "undefined") ? "" : parent;
 	var obj = '';
 	obj = obj+'<ul id="lvregel_ul'+parent+'">';
 
@@ -108,7 +109,7 @@ function LVRegelAddAutocomplete()
 					datatype:"json",
 					data: {
 						term: request.term,
-						work: 'searchlehrveranstaltung',
+						work: 'searchlehrveranstaltung'
 					},
 					success: function(data)
 					{
@@ -118,7 +119,7 @@ function LVRegelAddAutocomplete()
 							return {
 								value:item.lehrveranstaltung_id,
 								label:item.bezeichnung+' '+item.studiengang_kurzbzlang+' '+item.semester+'. Semester ('+item.lehrveranstaltung_id+')'
-							}
+							};
 						}));
 					}
 				});
@@ -329,7 +330,7 @@ function saveRegel(id)
 				"class": "lvregel",
 				"method": "save",
 				"loaddata": JSON.stringify(loaddata),
-				"savedata": JSON.stringify(savedata),
+				"savedata": JSON.stringify(savedata)
 			},
 		success: function(data) {
 			if(data.error=='true')

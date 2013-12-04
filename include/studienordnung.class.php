@@ -641,7 +641,7 @@ class studienordnung extends basis_db
 		$studiensemester->getTimestamp($studiensemester_kurzbz);
 		
 		$semGueltigVon = $studiensemester->begin->start;
-		$semGueltigBis = $studiensemester->ende->ende;
+		//$semGueltigBis = $studiensemester->ende->ende;
 		
 		$studiensemester = new studiensemester();
 		$studiensemester->getTimestamp($this->gueltigvon);
@@ -652,7 +652,6 @@ class studienordnung extends basis_db
 		{
 			$studiensemester = new studiensemester();
 			$studiensemester->getTimestamp($this->gueltigbis);
-
 			$stoGueltigBis = $studiensemester->ende->ende;
 		}
 		else
@@ -663,7 +662,6 @@ class studienordnung extends basis_db
 		{
 			return true;
 		}
-		
 		return false;
 	}
 }

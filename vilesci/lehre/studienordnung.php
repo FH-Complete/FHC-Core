@@ -56,9 +56,8 @@ echo '<!DOCTYPE html>
 	
 	<script type="text/javascript" src="../../include/js/treeGrid/jstreegrid.js"></script>
 	
-	
-	<script src="studienordnung.js" type="text/javascript"></script>
 	<script src="studienordnung_lvregel.js" type="text/javascript"></script>
+	<script src="studienordnung.js" type="text/javascript"></script>
 
 	<script type="text/javascript">
 	$(function() 
