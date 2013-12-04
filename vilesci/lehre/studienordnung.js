@@ -146,7 +146,7 @@ function loadStudienplanSTO(neue_studienordnung_id,bezeichnung, maxSemester)
 			drawStudienplan(data.result);
 			jqUi( "#menueLinks" ).accordion("option","active",2);
 		}
-		//semesterStoZuordnung();
+		semesterStoZuordnung();
 	});
 	$.ajax({
 		dataType: "json",
@@ -1100,17 +1100,63 @@ function semesterStoZuordnung()
 /**
  * Speichert die Studienordnung/Semester zuordnung
  */
-function saveSemesterStoZuordnung(sem)
+function saveSemesterStoZuordnung()
 {
-	var cells = $("#"+sem).find("input[type=checkbox]");
-	
+	var sem = $("#studiensemester").val();
+	var cells = $("#studiensemester").parents().closest("tr").find("input[type=checkbox]");
 	var semester = new Array();
 	var semesterKurzbz = "";
+	
 	for(var i = 0; i < cells.length; i++)
 	{
-		semester[cells[i].getAttribute("semester")] = cells[i].checked;
+		//semester[cells[i].getAttribute("semester")] = cells[i].checked;
+		semester.push(cells[i].checked);
 	}
-//	$.ajax({
-//		
-//	})
+	
+	var studiensemester = $("#studiensemester").val();
+	for(var j=0; j<semester.length; j++)
+	{
+		if(semester[j] === true)
+		{
+			$.ajax({
+				dataType: "json",
+				url: "../../soap/studienordnung.json.php",
+				type: "POST",
+				data: {
+					"method": "saveSemesterZuordnung",
+					"studienordnung_id": studienordnung_id,
+					"studiensemester_kurzbz" : studiensemester,
+					"ausbildungssemester": j+1
+				}
+			}).success(function(data)
+			{
+				if(data.error === "true")
+				{
+					alert(data.errormsg);
+				}
+				semesterStoZuordnung();
+			});
+		}
+	}
+}
+
+function deleteSemesterZuordnung(ausbildungssemester_kurzbz)
+{
+	var row = $("#row_"+ausbildungssemester_kurzbz);
+	
+	$.ajax({
+		dataType: "json",
+		url: "../../soap/fhcomplete.php",
+		type: "POST",
+		data: {
+			"typ":"json",
+			"class" : "studienordnung",
+			"method": "deleteSemesterZuordnung",
+			"parameter_0": studienordnung_id,
+			"parameter_1" : ausbildungssemester_kurzbz
+		}
+	}).success(function(data)
+	{
+		semesterStoZuordnung();
+	});
 }
