@@ -95,7 +95,7 @@ echo '<body>
                 foreach($studiengang->result as $stud)
                 {
                     // 10007 -> EVU Studiengang
-                    if($stud->studiengang_kz < '10000' || $stud->studiengang_kz == '10007')
+                    if($stud->studiengang_kz < '10000' || $stud->studiengang_kz == '10007' || $stud->studiengang_kz=='10004')
                         echo '<option value='.$stud->studiengang_kz.' '.($studiengang_kz==$stud->studiengang_kz?'selected':'').'>'.mb_strtoupper($stud->oe_kurzbz).' | '.mb_strtoupper($stud->kurzbzlang).'</option>';
                 }
 echo'           </select></td>
@@ -190,7 +190,7 @@ if(isset($_REQUEST['btn_submitStudent']))
     
     foreach($studentenArray as $stud)
     {
-		if($stud->studiengang_kz>10000  && $stud->studiengang_kz !='10007')
+		if($stud->studiengang_kz>10000  && $stud->studiengang_kz !='10007'  && $stud->studiengang_kz!='10004')
 			continue;
 
         // Wenn letzter Status nich Student ist -> nicht anzeigen
