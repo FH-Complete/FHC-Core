@@ -144,7 +144,7 @@ switch($method)
 					</select>
 			</tr>
 			<tr>
-				<td></td>
+				<td><span id="submsg" style="color:green; visibility:hidden;">Daten gespeichert</span></td>
 				<td><input type="button" value="Speichern" onclick="saveStudienordnung()"/></td>
 			</tr>
 
@@ -245,7 +245,7 @@ switch($method)
 				<td><input type="checkbox" id="aktiv"'.($new?' checked="checked"':$checked).'/></td>
 			</tr>
 			<tr>
-				<td></td>
+				<td><span id="submsg" style="color:green; visibility:hidden;">Daten gespeichert</span></td>
 				<td><input type="button" value="Speichern" onclick="saveStudienplan()" /></td>
 			</tr>
 

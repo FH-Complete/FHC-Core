@@ -967,7 +967,11 @@ function saveStudienordnung()
 			if(data.error=='true')
 				alert('Fehler:'+data.errormsg);
 			else
+			{
+				$("#submsg").css("visibility", "visible");
+				window.setTimeout(function(){$("#submsg").css("visibility", "hidden");}, 1500);
 				loadStudienordnung();
+			}
 		},
 		error: loadError
 	});
@@ -1027,7 +1031,11 @@ function saveStudienplan()
 			if(data.error=='true')
 				alert('Fehler:'+data.errormsg);
 			else
+			{
+				$("#submsg").css("visibility", "visible");
+				window.setTimeout(function(){$("#submsg").css("visibility", "hidden");}, 1500);
 				loadStudienplanSTO(studienordnung_id,studienordnung_bezeichnung);	
+			}
 		},
 		error: loadError
 	});
