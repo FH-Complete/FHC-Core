@@ -28,6 +28,7 @@ require_once('../../include/fachbereich.class.php');
 require_once('../../include/lvinfo.class.php');
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/organisationsform.class.php');
+//require_once('../../include/organisationseinheit.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -77,6 +78,13 @@ if(isset($_REQUEST['fachbereich_kurzbz']))
 }
 else 
 	$fachbereich_kurzbz = '';
+
+if (isset($_REQUEST['oe_kurzbz']))
+{
+	$oe_kurzbz = $_REQUEST['oe_kurzbz'];
+}
+else
+	$oe_kurzbz='';
 
 //Wenn kein Fachbereich und kein Studiengang gewaehlt wurde
 //dann wird der Studiengang auf 0 gesetzt da sonst die zu ladende liste zu lang wird
@@ -280,6 +288,24 @@ if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
 		}
 	
+		//Lehrtyp Speichern
+		if(isset($_POST['lt']))
+		{
+			$lv_obj = new lehrveranstaltung();
+			if($lv_obj->load($_POST['lvid']))
+			{
+				$lv_obj->lehrtyp_kurzbz=$_POST['lt'];
+				$lv_obj->updateamum = date('Y-m-d H:i:s');
+				$lv_obj->updatevon = $user;
+				if($lv_obj->save(false))
+					exit('true');
+				else 
+					exit('Fehler beim Speichern:'.$lv_obj->errormsg);
+			}
+			else 
+				exit('Fehler beim Laden der LV:'.$lv_obj->errormsg);
+		}
+	
 		//Projektarbeit Feld setzen
 		if(isset($_POST['projektarbeit']))
 		{
@@ -322,7 +348,26 @@ if($result = $db->db_query($qry))
 	}
 }
 
+//Lehrtypen holen
+$qry = "
+SELECT
+	lehrtyp_kurzbz,
+	bezeichnung
+FROM
+	lehre.tbl_lehrtyp ORDER BY lehrtyp_kurzbz";
+
+$lt = array();
+if($result = $db->db_query($qry))
+{
+	while($row = $db->db_fetch_object($result))
+	{
+		$lt[$row->lehrtyp_kurzbz]['lehrtyp_kurzbz']=$row->lehrtyp_kurzbz;
+		$lt[$row->lehrtyp_kurzbz]['bezeichnung']=$row->bezeichnung;
+	}
+}
+
 //Fachbereichskoordinatoren holen
+$fb_kurzbz='';
 if($stg_kz!='')
 {
 	$where = "oe_kurzbz=(SELECT oe_kurzbz FROM public.tbl_studiengang 
@@ -330,9 +375,17 @@ if($stg_kz!='')
 	$where2="studiengang_kz=".$db->db_add_param($stg_kz, FHC_INTEGER);
 	$tables='lehre.tbl_lehrveranstaltung';
 }
-else 
+else
 {
-	$where = "fachbereich_kurzbz=".$db->db_add_param($fachbereich_kurzbz);
+	if($fachbereich_kurzbz != '')
+		$fb_kurzbz=$fachbereich_kurzbz;
+	else
+	{
+		$fachb=new fachbereich();
+		$fachb->loadOE($oe_kurzbz);
+		$fb_kurzbz=$fachb->fachbereich_kurzbz;
+	}
+	$where = "fachbereich_kurzbz=".$db->db_add_param($fb_kurzbz);
 	$where2 = $where." AND 
 	          tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND 
 	          tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id";
@@ -381,19 +434,21 @@ else
 	$aktiv='';
 }
 
-if($fachbereich_kurzbz !='')
+if($fb_kurzbz !='')
 	$sql_query="SELECT distinct tbl_lehrveranstaltung.* 
 	FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach WHERE
 	tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 	tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
-	tbl_lehrfach.fachbereich_kurzbz=".$db->db_add_param($fachbereich_kurzbz);
+	tbl_lehrfach.fachbereich_kurzbz=".$db->db_add_param($fb_kurzbz);
 else
 	$sql_query="SELECT * FROM lehre.tbl_lehrveranstaltung WHERE true";
 
 if($stg_kz!='')
 	$sql_query.= " AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($stg_kz, FHC_INTEGER);
-
-$sql_query.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester, FHC_INTEGER)." $aktiv ORDER BY tbl_lehrveranstaltung.bezeichnung";
+//if($oe_kurzbz!='')
+//	$sql_query.= " AND tbl_lehrveranstaltung.oe_kurzbz=".$db->db_add_param($oe_kurzbz);
+if($semester != -1)
+	$sql_query.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester, FHC_INTEGER)." $aktiv ORDER BY tbl_lehrveranstaltung.bezeichnung";
 
 if(!$result_lv = $db->db_query($sql_query))
 	die("Lehrveranstaltung not found!");
@@ -424,7 +479,7 @@ $s['']->max_sem=9;
 $outp.='</SELECT>';
 
 //Semester DropDown
-$outp.= ' Semester <SELECT name="semester">';
+$outp.= ' Semester <SELECT name="semester"><option value="-1">--Alle--</option>';
 for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
 	$outp.="<OPTION value='$i' ".($i==$semester?'selected':'').">$i</OPTION>";
 $outp.='</SELECT>';
@@ -461,8 +516,24 @@ $outp.= '</SELECT>';
 {
 	$isaktiv='aktiv';
 }*/
-$outp.= '<input type="submit" value="Anzeigen">';
-$outp .="</form>";
+
+	$outp.= ' <input type="submit" value="Anzeigen">';
+
+//Organisationseinheit Dropdown
+	$outp.= '<br>Organisationseinheit <select name="oe_kurzbz" id="select_oe_kurzbz"><option value="">-- Alle --</option>';
+	$oe=new organisationseinheit();
+	$oe->getAll();
+	foreach($oe->result as $row)
+	{
+		if($oe_kurzbz==$row->oe_kurzbz)
+			$selected='selected';
+		else
+			$selected='';
+		$outp.= '<option value="'.$db->convert_html_chars($row->oe_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung).'</option>';
+	}
+	$outp.= '</select>';
+
+	$outp.= '</form>';
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
@@ -488,9 +559,11 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 			var isaktiv="'.$isaktiv.'";
 			function checksubmit()
 			{		
-				if(document.getElementById("select_stg_kz").value==\'\' && document.getElementById("select_fachbereich_kurzbz").value==\'\')
+				if(document.getElementById("select_stg_kz").value==\'\' 
+					&& document.getElementById("select_fachbereich_kurzbz").value==\'\'
+					&& document.getElementById("select_oe_kurzbz").value==\'\')
 				{
-					alert("Studiengang und Institut dürfen nicht gleichzeitig auf \'Alle\' gesetzt sein");
+					alert("Die Felder Studiengang, Institut und Organisationseinheit dürfen nicht gleichzeitig auf \'Alle\' gesetzt sein");
 					return false;
 				}
 				else
@@ -599,6 +672,27 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 				});
 			}
 
+			function changelehrtyp(lvid, lt)
+			{
+				$.ajax({
+					type:"POST",
+					url:"lehrveranstaltung.php", 
+					data:{ "lvid": lvid, "lt": lt },
+					success: function(data) 
+					{ 
+						if(data!="true")
+							alert("ERROR:"+data)
+						else
+						{
+							$("#lt"+lvid).css("background-color", "lightgreen");
+							window.setTimeout(function(){$("#lt"+lvid).css("background-color", "");}, 500);
+						}
+
+					},
+					error: function() { alert("error"); }
+				});
+			}
+			
 			function copylvinfo(lvid, source_id)
 			{
 				$.ajax({
@@ -653,7 +747,22 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 	</head>
 	<body class="Background_main">
 	';
-echo "<H2>Lehrveranstaltung Verwaltung (".$db->convert_html_chars((isset($s[$stg_kz]->kurzbz)?$s[$stg_kz]->kurzbz:$fachbereich_kurzbz)." - ".$semester).")</H2>";
+
+if(isset($s[$stg_kz]->kurzbz))
+	$header=$s[$stg_kz]->kurzbz;
+else if($fachbereich_kurzbz!='')
+	$header=$fachbereich_kurzbz;
+else
+{
+	$oe=new organisationseinheit();
+	$oe->load($oe_kurzbz);
+	$header=$oe->organisationseinheittyp_kurzbz.' '.$oe->bezeichnung;
+}
+$header .= ' - ';
+if($semester!='-1')
+	$header .= $semester;
+
+echo "<H2>Lehrveranstaltung Verwaltung (".$db->convert_html_chars($header).")</H2>";
 echo $messages;
 echo '<table width="100%"><tr><td>';
 echo $outp;
@@ -680,6 +789,7 @@ if ($result_lv!=0)
 		  <th>Kurzbz</th>
 		  <th>Bezeichnung</th>
 		  <th>Lehrform</th>
+		  <th>Lehrtyp</th>
 		  <th>Stg</th>\n
 		  <th>Orgform</th>
 		  <th title='Semesterstunden'>SS</th>
@@ -735,6 +845,21 @@ if ($result_lv!=0)
 		echo '</SELECT><input type="button" value="ok" id="lf'.$row->lehrveranstaltung_id.'" onclick="changelehrform(\''.$row->lehrveranstaltung_id.'\',$(\'#lf'.$row->lehrveranstaltung_id.'\').val())">';
 		echo '</td>';
 		
+		//Lehrtyp
+		echo '<td style="white-space:nowrap;">';
+		echo '<SELECT id="lt'.$row->lehrveranstaltung_id.'">';
+		echo '<option value="">--</option>';
+		foreach ($lt as $lehrtyp=>$lt_kz)
+		{
+			if($lehrtyp==$row->lehrtyp_kurzbz)
+				$selected='selected';
+			else
+				$selected='';
+			echo '<option value="'.$db->convert_html_chars($lehrtyp).'" '.$selected.'>'.$db->convert_html_chars($lt_kz['bezeichnung']).'</option>';
+		}
+		echo '</SELECT><input type="button" value="ok" id="lf'.$row->lehrveranstaltung_id.'" onclick="changelehrtyp(\''.$row->lehrveranstaltung_id.'\',$(\'#lt'.$row->lehrveranstaltung_id.'\').val())">';
+		echo '</td>';
+
 		//Studiengang
 		echo '<td>'.$db->convert_html_chars($s[$row->studiengang_kz]->kurzbz).'</td>';
 		//Organisationsform
