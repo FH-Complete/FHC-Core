@@ -174,6 +174,46 @@ class fachbereich extends basis_db
 	}
 	
 	/**
+	 * Laedt einen Fachbereich ueber eine OE
+	 * @param $oe_kurzbz OE des zu ladenden Fachbereiches
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function loadOE($oe_kurzbz)
+	{
+		if($oe_kurzbz == '')
+		{
+			$this->errormsg = 'oe_kurzbz ungueltig!';
+			return false;
+		}
+
+		$qry = "SELECT * FROM public.tbl_fachbereich WHERE oe_kurzbz = ".$this->db_add_param($oe_kurzbz).";";
+
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
+			return false;
+		}
+
+		if($row = $this->db_fetch_object())
+		{
+			$this->fachbereich_kurzbz 	= $row->fachbereich_kurzbz;
+			$this->bezeichnung = $row->bezeichnung;
+			$this->farbe = $row->farbe;
+			$this->studiengang_kz = $row->studiengang_kz;
+			$this->ext_id = $row->ext_id;
+			$this->aktiv = $this->db_parse_bool($row->aktiv);
+			$this->oe_kurzbz = $row->oe_kurzbz;
+		}
+		else
+		{
+			$this->errormsg = 'Datensatz nicht gefunden';
+			return false;
+		}
+
+		return true;
+	}
+	
+	/**
 	 * Prueft die Gueltigkeit der Variablen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
