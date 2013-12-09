@@ -178,7 +178,7 @@ echo '
 					<p>Klicken Sie auf eine Lehrveranstaltung um die Details anzuzeigen</p>
 				</div>
 				<div id="tab-regel">
-					<p>Klicken Sie auf eine Lehrveranstaltung um dei Regeln anzuzeigen</p>
+					<p>Klicken Sie auf eine Lehrveranstaltung um die Regeln anzuzeigen</p>
 				</div>
 				<div id="tab-kompatibel">
 					<p>Kompatibilität</p>

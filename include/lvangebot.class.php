@@ -328,5 +328,51 @@ class lvangebot extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Laedt das LV-Angebot eines gesammten Studienplanes
+	 * @param $studienplan_id ID des Studienplanes
+	 */
+	public function getLVAngebotFromStudienplan($studienplan_id, $studiensemester_arr=null)
+	{
+		$qry = "SELECT 
+					* 
+				FROM 
+					lehre.tbl_studienplan_lehrveranstaltung
+					JOIN lehre.tbl_lvangebot USING(lehrveranstaltung_id)
+				WHERE
+					tbl_studienplan_lehrveranstaltung.studienplan_id=".$this->db_add_param($studienplan_id);
+
+		if(!is_null($studiensemester_arr))
+			$qry.=" AND tbl_lvangebot.studiensemester_kurzbz IN(".$this->implode4SQL($studiensemester_arr).")";
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$lvangebot=new lvangebot();
+				$lvangebot->lvangebot_id=$row->lvangebot_id;
+				$lvangebot->lehrveranstaltung_id=$row->lehrveranstaltung_id;
+				$lvangebot->studiensemester_kurzbz=$row->studiensemester_kurzbz;
+				$lvangebot->gruppe_kurzbz=$row->gruppe_kurzbz;
+				$lvangebot->incomingplaetze=$row->incomingplaetze;
+				$lvangebot->gesamtplaetze=$row->gesamtplaetze;
+				$lvangebot->anmeldefenster_start=$row->anmeldefenster_start;
+				$lvangebot->anmeldefenster_ende=$row->anmeldefenster_ende;
+				$lvangebot->insertamum=$row->insertamum;
+				$lvangebot->insertvon=$row->insertvon;
+				$lvangebot->updatenamum=$row->updateamum;
+				$lvangebot->updatevon=$row->updatevon;
+				
+				$this->result[]=$lvangebot;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Datensätze konnten nicht geladen werden';
+			return false;
+		}
+		return true;	
+	}
 }
 ?>

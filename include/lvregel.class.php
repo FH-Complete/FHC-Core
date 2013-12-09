@@ -483,6 +483,7 @@ class lvregel extends basis_db
 		{
 			return $this->TestRegeln($uid, $result, $studiensemester_kurzbz);
 		}
+		return true;
 	}
 
 	/**
@@ -572,7 +573,7 @@ class lvregel extends basis_db
 					$prestudent = new prestudent();
 					if($prestudent->getLastStatus($student->prestudent_id, $studiensemester_kurzbz))
 					{
-						$this->cache[$uid][$studiensemester_kurzbz]=$prestudent->semester;
+						$this->cache[$uid][$studiensemester_kurzbz]=$prestudent->ausbildungssemester;
 					}
 				}
 				$ausbildungssemester = $this->cache[$uid][$studiensemester_kurzbz];
@@ -645,9 +646,40 @@ class lvregel extends basis_db
 		return $retval;
 	}
 
+	/**
+	 * Prueft ob eine minimale Semesteranforderung für diese Lehrveranstaltungszuordnung benötigt wird
+	 * @param $studienplan_lehrveranstaltung_id
+	 * @param $semester
+	 * @return boolean
+	 */
+	public function checkSemester($studienplan_lehrveranstaltung_id, $semester)
+	{
+		$qry = "SELECT 
+					1
+				FROM 
+					lehre.tbl_lvregel 
+				WHERE 
+					studienplan_lehrveranstaltung_id=".$this->db_add_param($studienplan_lehrveranstaltung_id)." 
+					AND lvregeltyp_kurzbz='ausbsemmin'
+					AND parameter::integer>".$this->db_add_param($semester, FHC_INTEGER);
+
+		if($result = $this->db_query($qry))
+		{
+			if($this->db_num_rows($result)>0)
+				return false;
+			else
+				return true;
+		}
+		else
+		{
+			$this->errormsg='Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
 	public function debug($msg)
 	{
-		echo ' '.$msg;
+		//echo ' '.$msg;
 	}
 }
 ?>

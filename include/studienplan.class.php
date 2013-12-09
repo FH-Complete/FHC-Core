@@ -645,5 +645,40 @@ class studienplan extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Holt den aktiven Studienplan eines Studiensemester / Ausbildungssemesters
+	 * @param studiensemester_kurzbz
+	 * @param $ausbuldungssemester
+	 * @param $orgform_kurzbz
+	 */
+	function getStudienplan($studiengang_kz, $studiensemester_kurzbz, $ausbildungssemester, $orgform_kurzbz)
+	{
+		$qry = "SELECT 
+					tbl_studienplan.studienplan_id
+				FROM 
+					lehre.tbl_studienplan 
+					JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+					JOIN lehre.tbl_studienordnung_semester USING(studienordnung_id)
+				WHERE 
+					tbl_studienplan.aktiv
+					AND tbl_studienordnung.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER)."
+					AND tbl_studienordnung_semester.studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz)."
+					AND tbl_studienordnung_semester.semester=".$this->db_add_param($ausbildungssemester);
+
+		if($orgform_kurzbz!='')
+		{
+			$qry.=" AND orgform_kurzbz=".$this->db_add_param($orgform_kurzbz);
+		}
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				return $row->studienplan_id;
+			}
+		}
+	}
+
 }
 ?>
