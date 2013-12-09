@@ -160,7 +160,47 @@ class datum
 			return false;
 	}
 	
+	public function DateDiff($datum1, $datum2)
+	{
+		$datetime1 = new DateTime($datum1);
+		$datetime2 = new DateTime($datum2);
+		$interval = $datetime1->diff($datetime2);
+		return $interval->format('%R%d');
+	}
 
+	/**
+	 * Prueft ob ein Datum / Datum und Uhrzeit zwischen 2 anderen liegt
+	 * Unterstuetzt auch offenes (leeres) Start und Ende Datum
+	 *
+	 * @param $start Startdatum
+	 * @param $ende Endedatum
+	 * @param $datum Datum das geprueft wird
+	 * @return true wenn dazwischen sonst false
+	 */
+	public function between($start, $ende, $datum)
+	{
+		$datestart = new DateTime($start);
+		$dateende = new DateTime($ende);
+		$dateref = new DateTime($datum);
+
+		// Start und Ende nicht gesetzt
+		if($start=='' && $ende=='')
+			return true;
+
+		// Start nicht gesetzt; Ende gesetzt
+		if($start=='' && $ende!='' && $dateende>=$dateref)
+			return true;
+
+		// Ende nicht gesetzt; Start gesetzt		
+		if($ende=='' && $start!='' && $datestart<=$dateref)
+			return true;
+
+		// Start und Ende gesetzt
+		if($ende!='' && $start!='' && $datestart<=$dateref && $dateende>=$dateref)
+			return true;
+
+		return false;
+	}
 	
 #------------------------------------------------------------------------------------------------
 	/**
