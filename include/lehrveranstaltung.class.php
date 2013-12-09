@@ -64,7 +64,6 @@ class lehrveranstaltung extends basis_db
 	public $semesterwochen;	// smallint
 	public $lvnr;	// varchar(32)
 	public $bezeichnung_arr = array();
-	public $lehrtyp_kurzbz; //varchar(32)
 
 	public $studienplan_lehrveranstaltung_id;
 	public $studienplan_lehrveranstaltung_id_parent;
