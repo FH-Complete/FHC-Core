@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2006 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -24,6 +24,7 @@
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/lehrveranstaltung.class.php');
 	require_once('../../include/studiengang.class.php');
+	require_once('../../include/lehrtyp.class.php');
 
 	if (!$db = new basis_db())
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -85,6 +86,12 @@
 		$lv->zeugnis = isset($_POST['zeugnis']);
 		$lv->projektarbeit = isset($_POST['projektarbeit']);
 		$lv->orgform_kurzbz = $_POST['orgform_kurzbz'];
+		$lv->lehrtyp_kurzbz = $_POST['lehrtyp_kurzbz'];
+		$lv->oe_kurzbz = $_POST['oe_kurzbz'];
+		$lv->raumtyp_kurzbz = $_POST['raumtyp_kurzbz'];
+		$lv->anzahlsemester = $_POST['anzahlsemester'];
+		$lv->semesterwochen = $_POST['semesterwochen'];
+		$lv->lvnr = $_POST['lvnr'];
 
 		if(!$lv->save())
 			$errorstr = "Fehler beim Speichern der Daten: $lv->errormsg";
@@ -122,6 +129,15 @@
 		}
 	}
 
+	$qry = "SELECT * FROM lehre.tbl_lehrtyp ORDER BY lehrtyp_kurzbz";
+	if($result = $db->db_query($qry))
+	{
+		while($row = $db->db_fetch_object($result))
+		{
+			$lehrtyp_arr[] = $row->lehrtyp_kurzbz;
+		}
+	}
+
 	if (isset($_REQUEST['lv_id']) || isset($_REQUEST['neu']))
 	{
 		//wenn ein Fehler beim Speichern auftritt, dann sollen die alten Daten nochmals
@@ -134,120 +150,134 @@
 			{
 				$lvid = $_REQUEST['lv_id'];
 				if (!$lv->load($lvid))
-					$htmlstr .= "<br><div class='kopf'>Lehrveranstaltung <b>".$lvid."</b> existiert nicht</div>";
+					$htmlstr .= '<br><div class="kopf">Lehrveranstaltung <b>'.$lvid.'</b> existiert nicht</div>';
 			}
 		}
 
-		$htmlstr .= "<br><div class='kopf'>Lehrveranstaltung</div>\n";
-		$htmlstr .= "<form action='lehrveranstaltung_details.php' method='POST'>\n";
-		$htmlstr .= "<input type='hidden' name='lv_id' value='".$lv->lehrveranstaltung_id."'>\n";
+		$htmlstr .= '
+		<br><div class="kopf">Lehrveranstaltung</div>
+		<form action="lehrveranstaltung_details.php" method="POST">
+		<input type="hidden" name="lv_id" value="'.$lv->lehrveranstaltung_id.'">
 
-		$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
-		$htmlstr .= "<tr></tr>\n";
+		<table class="detail" style="padding-top:10px;">
+		<tr></tr>
 
-		$htmlstr .= "	<tr>\n";
-		$htmlstr .= "		<td>Kurzbz</td>";
-		$htmlstr .= "		<td><input type='text' name='kurzbz' value='$lv->kurzbz'\n</td>";
-		$htmlstr .= "		<td>Bezeichnung</td>";
-		$htmlstr .= "		<td colspan='3'><input type='text' name='bezeichnung' value='".htmlentities($lv->bezeichnung, ENT_QUOTES, 'UTF-8')."' size='60' maxlength='128'></td>\n";
-
-		$htmlstr .= "</tr>";
-		$htmlstr .= "<tr>";
-		$htmlstr .= "		<td>Sprache</td>";
-		$htmlstr .= "		<td><select name='sprache'>\n";
+		<tr>
+			<td>Kurzbz</td>
+			<td><input type="text" name="kurzbz" value="'.$lv->kurzbz.'" /></td>
+			<td>Bezeichnung</td>
+			<td colspan=3><input type="text" name="bezeichnung" value="'.htmlentities($lv->bezeichnung, ENT_QUOTES, 'UTF-8').'" size="60" maxlength="128"></td>
+		</tr>
+		<tr>
+			<td>Sprache</td>
+			<td><select name="sprache">';
 
 		foreach ($sprache_arr as $sprache)
 		{
 			if ($lv->sprache == $sprache)
-				$sel = " selected";
+				$sel = ' selected';
 			else
-				$sel = "";
-			$htmlstr .= "				<option value='".$sprache."' ".$sel.">".$sprache."</option>";
+				$sel = '';
+			$htmlstr .= '<option value="'.$sprache.'" '.$sel.'>'.$sprache.'</option>';
 		}
-		$htmlstr .= "		</select></td>\n";
-		$htmlstr .= "		<td>Bezeichnung English</td>";
-		$htmlstr .= "		<td colspan='3'><input type='text' name='bezeichnung_english' value='".htmlentities($lv->bezeichnung_english, ENT_QUOTES, 'UTF-8')."' size='60' maxlength='256'></td>\n";
-
-		$htmlstr .= "</tr>";
-		$htmlstr .= "<tr>";
-		$htmlstr .= "		<td>Studiengang</td>";
-		$htmlstr .= "		<td><select name='studiengang_kz'>\n";
+		$htmlstr .= '</select></td>
+			<td>Bezeichnung English</td>
+			<td colspan=3><input type="text" name="bezeichnung_english" value="'.htmlentities($lv->bezeichnung_english, ENT_QUOTES, 'UTF-8').'" size="60" maxlength="256"></td>
+		</tr><tr>
+			<td>Studiengang</td>
+			<td><select name="studiengang_kz">';
 
 		foreach ($stg_arr as $stg_key=>$stg_kurzbz)
 		{
 			if (($stg_kz!='-1' && $stg_kz==$stg_key) || ($lv->studiengang_kz!='' && $lv->studiengang_kz == $stg_key ))
-				$sel = " selected";
+				$sel = ' selected';
 			else
-				$sel = "";
-			$htmlstr .= "				<option value='".$stg_key."' ".$sel.">".$stg_kurzbz."</option>";
+				$sel = '';
+			$htmlstr .= '<option value="'.$stg_key.'" '.$sel.'>'.$stg_kurzbz.'</option>';
 		}
-		$htmlstr .= "		</select></td>\n";
-		$htmlstr .= "		<td>Semester</td>";
-		$htmlstr .= "		<td><select name='semester'>\n";
+		
+		$htmlstr .= '</select></td>
+			<td>Semester</td>
+			<td><select name="semester">';
 
 		for ($i = 0; $i < 10; $i++)
 		{
 			if (($semester!='-1' && $semester==$i) || $lv->semester == $i)
-				$sel = " selected";
+				$sel = ' selected';
 			else
-				$sel = "";
-			$htmlstr .= "				<option value='".$i."' ".$sel.">".$i."</option>";
+				$sel = '';
+			$htmlstr .= '<option value="'.$i.'" '.$sel.'>'.$i.'</option>';
 		}
-		$htmlstr .= "		</select></td>\n";
-		$htmlstr .= "		<td>Lehrform</td>";
-		$htmlstr .= "		<td><select name='lehrform'>\n";
-		$htmlstr .= "				<option value=''></option>";
+		
+		$htmlstr .= '</select></td>
+			<td>Lehrform</td>
+			<td><select name="lehrform"><option value="">-- keine Auswahl --</option>';
+
 		foreach ($lehrform_arr as $lehrform)
 		{
 			if ($lv->lehrform_kurzbz == $lehrform)
-				$sel = " selected";
+				$sel = ' selected';
 			else
-				$sel = "";
-			$htmlstr .= "				<option value='".$lehrform."' ".$sel.">".$lehrform."</option>";
+				$sel = '';
+			$htmlstr .= '<option value="'.$lehrform.'" '.$sel.'>'.$lehrform.'</option>';
 		}
-		$htmlstr .= "		</select></td>\n";
-
+		$htmlstr .= '
+			</select></td>
+		</tr><tr>
+			<td>ECTS</td>
+			<td><input type="text" name="ects" value="'.$lv->ects.'" maxlength="5"></td>
+			<td>Semesterstunden</td>
+			<td><input type="text" name="semesterstunden" value="'.$lv->semesterstunden.'" maxlength="3"></td>
+			<td>Lehrtyp</td>
+			<td><select name="lehrtyp_kurzbz"><option value="">-- keine Auswahl --</option>';
 		
-		$htmlstr .= "	</tr><tr>\n";
+		$lehrtyp_arr=new lehrtyp();
+		$lehrtyp_arr->getAll();
+		foreach ($lehrtyp_arr->result as $lehrtyp)
+		{
+			if ($lv->lehrtyp_kurzbz == $lehrtyp->lehrtyp_kurzbz)
+				$sel = ' selected';
+			else
+				$sel = '';
+			$htmlstr .= '<option value="'.$lehrtyp->lehrtyp_kurzbz.'" '.$sel.'>'.$lehrtyp->bezeichnung.'</option>';
+		}
+		$htmlstr .= '</select></td>
+		</tr>';
 
-		$htmlstr .= "	<td>ECTS</td>";
-		$htmlstr .= "	<td><input type='text' name='ects' value='$lv->ects' maxlength='5'></td>";
-		$htmlstr .= "	<td>Semesterstunden</td>";
-		$htmlstr .= "	<td><input type='text' name='semesterstunden' value='$lv->semesterstunden' maxlength='3'></td>";
-		$htmlstr .= "	<td>Anmerkung</td>";
-		$htmlstr .= "	<td><input type='text' name='anmerkung' value='$lv->anmerkung' maxlength='64'></td>";
-		$htmlstr .= "	</tr><tr>\n";
+		$htmlstr .= '<tr>
+			<td>Sort</td>
+			<td><input type="text" name="sort" value="'.$lv->sort.'" maxlength="2"></td>
+			<td>Lehreverzeichnis</td>
+			<td><input type="text" name="lehreverzeichnis" value="'.$lv->lehreverzeichnis.'" maxlength="16"></td>
+			<td>Anmerkung</td>
+			<td><input type="text" name="anmerkung" value="'.$lv->anmerkung.'" maxlength="64"></td>
+		</tr>';
 
-		$htmlstr .= "	<td>Sort</td>";
-		$htmlstr .= "	<td><input type='text' name='sort' value='$lv->sort' maxlength='2'></td>";
-		$htmlstr .= "	<td>Lehreverzeichnis</td>";
-		$htmlstr .= "	<td><input type='text' name='lehreverzeichnis' value='$lv->lehreverzeichnis' maxlength='16'></td>";
-		//$htmlstr .= "	<td>Planfaktor</td>";
-		//$htmlstr .= "	<td><input type='text' name='planfaktor' value='$lv->planfaktor' maxlength='3'></td>";
-		$htmlstr .= "	</tr><tr>\n";
+		$htmlstr .= '<tr>
+			<td>Planlektoren</td>
+			<td><input type="text" name="planlektoren" value="'.$lv->planlektoren.'" maxlength="2"></td>
+			<td>Planpersonalkosten</td>
+			<td><input type="text" name="planpersonalkosten" value="'.$lv->planpersonalkosten.'" maxlength="7"></td>
+			<td>Plankostenprolektor</td>
+			<td><input type="text" name="plankostenprolektor" value="'.$lv->plankostenprolektor.'" maxlength="6"></td>
+		</tr>';
 
-		$htmlstr .= "	<td>Planlektoren</td>";
-		$htmlstr .= "	<td><input type='text' name='planlektoren' value='$lv->planlektoren' maxlength='2'></td>";
-		$htmlstr .= "	<td>Planpersonalkosten</td>";
-		$htmlstr .= "	<td><input type='text' name='planpersonalkosten' value='$lv->planpersonalkosten' maxlength='7'></td>";
-		$htmlstr .= "	<td>Plankostenprolektor</td>";
-		$htmlstr .= "	<td><input type='text' name='plankostenprolektor' value='$lv->plankostenprolektor' maxlength='6'></td>";
-		$htmlstr .= "	</tr><tr>\n";
+		$htmlstr .= '<tr>
+			<td>Lehre</td>
+			<td><input type="checkbox" name="lehre" '.($lv->lehre?'checked':'').'></td>
+			<td>Aktiv</td>
+			<td><input type="checkbox" name="aktiv" '.($lv->aktiv?'checked':'').'></td>
+			<td>Zeugnis</td>
+			<td><input type="checkbox" name="zeugnis" '.($lv->zeugnis?'checked':'').'></td>
+		</tr>';
 
-		$htmlstr .= "	<td>Lehre</td>";
-		$htmlstr .= "	<td><input type='checkbox' name='lehre' ".($lv->lehre?'checked':'')."></td>";
-		$htmlstr .= "	<td>Aktiv</td>";
-		$htmlstr .= "	<td><input type='checkbox' name='aktiv' ".($lv->aktiv?'checked':'')."></td>";
-		$htmlstr .= "	<td>Zeugnis</td>";
-		$htmlstr .= "	<td><input type='checkbox' name='zeugnis' ".($lv->zeugnis?'checked':'')."></td>";
-		$htmlstr .= "	</tr><tr>\n";
-
-		$htmlstr .= "	<td>Projektarbeit</td>";
-		$htmlstr .= "	<td><input type='checkbox' name='projektarbeit' ".($lv->projektarbeit?'checked':'')."></td>";
-		$htmlstr .= "	<td>Organisationsform</td>";
-		$htmlstr .= "	<td>";
-		$htmlstr .= "	<SELECT name='orgform_kurzbz'>";
-		$htmlstr .= "		<OPTION value=''>-- keine Auswahl --</OPTION>";
+		$htmlstr .= '<tr>
+			<td>Projektarbeit</td>
+			<td><input type="checkbox" name="projektarbeit" '.($lv->projektarbeit?'checked':'').'></td>
+			<td>Organisationsform</td>
+			<td>
+			<SELECT name="orgform_kurzbz"><OPTION value="">-- keine Auswahl --</OPTION>';
+		
 		$qry_orgform = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz NOT IN ('VBB', 'ZGS') ORDER BY orgform_kurzbz";
 		if($result_orgform = $db->db_query($qry_orgform))
 		{
@@ -258,29 +288,67 @@
 				else 
 					$selected='';
 					
-				$htmlstr .= "		<OPTION value='$row_orgform->orgform_kurzbz' $selected>$row_orgform->bezeichnung</OPTION>";
+				$htmlstr .= '<OPTION value="'.$row_orgform->orgform_kurzbz.'" '.$selected.'>'.$row_orgform->bezeichnung.'</OPTION>';
 			}
 		}
-		$htmlstr .= "</SELECT>";
-		$htmlstr .= "	</td>";
-		//$htmlstr .= "	<td></td>";
-		$htmlstr .= "	<td>Incomingpl&auml;tze</td>";
-		$htmlstr .= "	<td><input type='text' name='incoming' value='$lv->incoming' maxlength='2'></td>";
-		$htmlstr .= "	</tr><tr>\n";
-		$htmlstr .= "	<td></td>";
-		$htmlstr .= "	<td></td>";
-		$htmlstr .= "	<td></td>";
-		$htmlstr .= "	<td></td>";
-		$htmlstr .= "	<td></td>";
-		$htmlstr .= "	<td><input type='submit' value='Speichern' name='schick'></td>";
-
-		$htmlstr .= "	</tr>\n";
-		$htmlstr .= "</table>\n";
-		$htmlstr .= "<br>\n";
-		$htmlstr .= "</form>\n";
-
+		$htmlstr .= '</SELECT></td>
+			<td>Incomingpl&auml;tze</td>
+			<td><input type="text" name="incoming" size="2" value="'.$lv->incoming.'" maxlength="2"></td>
+		</tr><tr>
+			<td>LVNR</td>
+			<td><input type="text" name="lvnr" value="'.$lv->lvnr.'" /></td>
+			<td>Organisationseinheit</td>
+			<td><select name="oe_kurzbz"><option value="">--keine Auswahl --</option>';
+		
+		$qry = "SELECT * FROM public.tbl_organisationseinheit ORDER BY organisationseinheittyp_kurzbz, oe_kurzbz";
+		if($result = $db->db_query($qry))
+		{
+			while($row = $db->db_fetch_object($result))
+			{
+				if($row->oe_kurzbz==$lv->oe_kurzbz)
+					$selected='selected';
+				else 
+					$selected='';
+				$htmlstr .= '<option value="'.$row->oe_kurzbz.'" '.$selected.'>'.$row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung.'</option>';
+			}
+		}
+		$htmlstr .= '</select></td>
+			<td>Anzahl Semester</td>
+			<td><input type="text" name="anzahlsemester" size="2" value="'.$lv->anzahlsemester.'" /></td>
+		</tr><tr>
+			<td></td>
+			<td></td>
+			<td>Raumtyp</td>
+			<td><select name="raumtyp_kurzbz"><option value="">-- keine Auswahl--</option>';
+		$qry = "SELECT * FROM public.tbl_raumtyp ORDER BY raumtyp_kurzbz";
+		if($result = $db->db_query($qry))
+		{
+			while($row = $db->db_fetch_object($result))
+			{
+				if($row->raumtyp_kurzbz==$lv->raumtyp_kurzbz)
+					$selected='selected';
+				else 
+					$selected='';
+				$htmlstr .= '<option value="'.$row->raumtyp_kurzbz.'" '.$selected.'>'.$row->raumtyp_kurzbz.'</option>';
+			}
+		}
+		$htmlstr .= '</select></td>
+			<td>Semesterwochen</td>
+			<td><input type="text" name="semesterwochen" size="2" value="'.$lv->semesterwochen.'" /></td>
+		</tr><tr>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td><input type="submit" value="Speichern" name="schick"></td>
+		</tr>
+		</table>
+		</form>';
 	}
-	$htmlstr .= "<div class='inserterror'>".$errorstr."</div>\n";
+	$htmlstr .= '
+		<div class="inserterror">'.$errorstr.'</div>';
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
