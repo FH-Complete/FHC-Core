@@ -194,9 +194,9 @@ class studienplan extends basis_db
 			return false;
 		}
 
-		if(!is_numeric($this->regelstudiendauer) && $this->regelstudiendauer!=='')
+		if(!is_numeric($this->regelstudiendauer))
 		{
-			$this->errormsg='regelstudiendauer enthaelt ungueltige Zeichen';
+			$this->errormsg='regelstudiendauer enthaelt ungueltige Zeichen oder ist leer';
 			return false;
 		}
 		if(!is_numeric($this->semesterwochen) && $this->semesterwochen!=='')
