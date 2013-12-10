@@ -179,8 +179,11 @@ function drawStudienplan(data)
 
 	for(i in data)
 	{
-		obj=obj+'<li><a href="#Load'+data[i].studienplan_id+'" onclick="loadLehrveranstaltungSTPL('+data[i].studienplan_id+',\''+data[i].bezeichnung+' '+data[i].orgform_kurzbz+'\',\''+data[i].regelstudiendauer+'\');return false;">'+data[i].bezeichnung+' '+data[i].orgform_kurzbz+'</a>'
-		+' <a href="#Edit'+data[i].studienplan_id+'" onclick="editStudienplan('+data[i].studienplan_id+');return false;"><img title="edit" src="../../skin/images/edit.png"></a></li>';
+		if(data[i].studienplan_id !== null)
+		{
+			obj=obj+'<li><a href="#Load'+data[i].studienplan_id+'" onclick="loadLehrveranstaltungSTPL('+data[i].studienplan_id+',\''+data[i].bezeichnung+' '+data[i].orgform_kurzbz+'\',\''+data[i].regelstudiendauer+'\');return false;">'+data[i].bezeichnung+'</a>'
+			+' <a href="#Edit'+data[i].studienplan_id+'" onclick="editStudienplan('+data[i].studienplan_id+');return false;"><img title="edit" src="../../skin/images/edit.png"></a></li>';
+		}
 	}
 	obj=obj+'</ul>';
 	$('#studienplan').html(obj);
@@ -381,7 +384,8 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 					LVRegelnloadRegeln(stpllvid);
 
 				// Kompatibilitaet laden
-				//TODO Kompatibilität
+				if(lvid!==undefined)
+					loadLVKompatibilitaet(lvid);
 			});
 	/*	}
 		else
@@ -482,6 +486,34 @@ function LoadLVDetails(lvid, stpllvid)
 		$("#tab-lehrveranstaltungdetail").html(html);
 	});	
 }
+
+/**
+ * Laedt kompatible LVs zur ausgewaehlten Lehrveranstaltung
+ */
+function loadLVKompatibilitaet(lvid)
+{
+	$.ajax(
+	{
+		dataType: "html",
+		url: "lehrveranstaltung_kompatibel.php",
+		type: "GET",
+		data: {
+				"lehrveranstaltung_id":lvid
+			},
+		error: loadError
+	}).success(function(data)
+	{
+		//console.log(data);
+//		lvdata = data.result[0]
+//		var html = "Bezeichnung: "+lvdata.bezeichnung;
+//		html+="<br>Kurzbezeichnung: "+lvdata.kurzbz;
+//		html+="<br>ID: "+lvdata.lehrveranstaltung_id;
+//		html+="<br>ECTS: "+lvdata.ects;
+//		html+="<br>Semesterstunden: "+lvdata.semesterstunden;
+		$("#tab-kompatibel").html(data);
+	});	
+}
+
 
 /**
  * Laedt die Daten um eine neue Studienordnung zu erstellen
@@ -1107,63 +1139,110 @@ function semesterStoZuordnung()
 /**
  * Speichert die Studienordnung/Semester zuordnung
  */
-function saveSemesterStoZuordnung()
+function saveSemesterStoZuordnung(studiensemester, ausbildungssemester)
 {
-	var sem = $("#studiensemester").val();
-	var cells = $("#studiensemester").parents().closest("tr").find("input[type=checkbox]");
-	var semester = new Array();
-	var semesterKurzbz = "";
-	
-	for(var i = 0; i < cells.length; i++)
+	if(studiensemester == undefined &&  ausbildungssemester == undefined)
 	{
-		//semester[cells[i].getAttribute("semester")] = cells[i].checked;
-		semester.push(cells[i].checked);
-	}
-	
-	var studiensemester = $("#studiensemester").val();
-	for(var j=0; j<semester.length; j++)
-	{
-		if(semester[j] === true)
+		var sem = $("#studiensemester").val();
+		var cells = $("#studiensemester").parents().closest("tr").find("input[type=checkbox]");
+		var semester = new Array();
+		var semesterKurzbz = "";
+
+		for(var i = 0; i < cells.length; i++)
 		{
-			$.ajax({
-				dataType: "json",
-				url: "../../soap/studienordnung.json.php",
-				type: "POST",
-				data: {
-					"method": "saveSemesterZuordnung",
-					"studienordnung_id": studienordnung_id,
-					"studiensemester_kurzbz" : studiensemester,
-					"ausbildungssemester": j+1
-				}
-			}).success(function(data)
+			//semester[cells[i].getAttribute("semester")] = cells[i].checked;
+			semester.push(cells[i].checked);
+		}
+
+		var studiensemester = $("#studiensemester").val();
+		for(var j=0; j<semester.length; j++)
+		{
+			if(semester[j] === true)
 			{
-				if(data.error === "true")
+				$.ajax({
+					dataType: "json",
+					url: "../../soap/studienordnung.json.php",
+					type: "POST",
+					data: {
+						"method": "saveSemesterZuordnung",
+						"studienordnung_id": studienordnung_id,
+						"studiensemester_kurzbz" : studiensemester,
+						"ausbildungssemester": j+1
+					}
+				}).success(function(data)
 				{
-					alert(data.errormsg);
-				}
-				semesterStoZuordnung();
-			});
+					if(data.error === "true")
+					{
+						alert(data.errormsg);
+					}
+					semesterStoZuordnung();
+				});
+			}
 		}
 	}
+	else
+	{
+		$.ajax({
+			dataType: "json",
+			url: "../../soap/studienordnung.json.php",
+			type: "POST",
+			data: {
+				"method": "saveSemesterZuordnung",
+				"studienordnung_id": studienordnung_id,
+				"studiensemester_kurzbz" : studiensemester,
+				"ausbildungssemester": ausbildungssemester
+			}
+		}).success(function(data)
+		{
+			if(data.error === "true")
+			{
+				alert(data.errormsg);
+			}
+			semesterStoZuordnung();
+		});
+	}
+	
 }
 
-function deleteSemesterZuordnung(ausbildungssemester_kurzbz)
+function deleteSemesterZuordnung(ausbildungssemester_kurzbz, studiensemester)
 {
-	var row = $("#row_"+ausbildungssemester_kurzbz);
-	
-	$.ajax({
-		dataType: "json",
-		url: "../../soap/fhcomplete.php",
-		type: "POST",
-		data: {
-			"typ":"json",
-			"class" : "studienordnung",
-			"method": "deleteSemesterZuordnung",
-			"parameter_0": studienordnung_id,
-			"parameter_1" : ausbildungssemester_kurzbz
-		}
-	}).success(function(data)
+	if(studiensemester == undefined)
 	{
-		semesterStoZuordnung();
-	});
+		var row = $("#row_"+ausbildungssemester_kurzbz);
+		$.ajax({
+			dataType: "json",
+			url: "../../soap/fhcomplete.php",
+			type: "POST",
+			data: {
+				"typ":"json",
+				"class" : "studienordnung",
+				"method": "deleteSemesterZuordnung",
+				"parameter_0": studienordnung_id,
+				"parameter_1" : ausbildungssemester_kurzbz
+			}
+		}).success(function(data)
+		{
+			semesterStoZuordnung();
+		});
+	}
+	else
+	{
+		$.ajax({
+			dataType: "json",
+			url: "../../soap/fhcomplete.php",
+			type: "POST",
+			data: {
+				"typ":"json",
+				"class" : "studienordnung",
+				"method": "deleteSemesterZuordnung",
+				"parameter_0": studienordnung_id,
+				"parameter_1" : ausbildungssemester_kurzbz,
+				"parameter_2" : studiensemester
+			}
+		}).success(function(data)
+		{
+			semesterStoZuordnung();
+		});
+	}
+	
 }
