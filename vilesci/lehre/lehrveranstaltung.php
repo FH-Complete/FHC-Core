@@ -978,7 +978,7 @@ if ($result_lv!=0)
 				<a href="lehrveranstaltung_lvangebot.php?lehrveranstaltung_id='.$db->convert_html_chars($row->lehrveranstaltung_id).'" target="lv_detail">LV-Angebot</a>
 			</td>';
 		
-		echo '<td><a href="lehrveranstaltung_kompatibel.php?lehrveranstaltung_id='.$row->lehrveranstaltung_id.'" target="lv_detail">anzeigen</a></td>';
+		echo '<td><a href="lehrveranstaltung_kompatibel.php?lehrveranstaltung_id='.$row->lehrveranstaltung_id.'&type=edit" target="lv_detail">anzeigen</a></td>';
 		echo "</tr>\n";
 	}
 }
