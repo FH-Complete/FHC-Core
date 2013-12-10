@@ -1061,7 +1061,7 @@ $webservicerecht = array(
 	array('soap/studienordnung','save','studienordnung'),
 	array('soap/studienordnung','loadStudienplanSTO','studienplan'),
 	array('soap/studienordnung','loadStudienordnungSTG','studienordnung'),
-	array('soap/studienordnung','loadStudienplan','studienplan')
+	array('soap/studienordnung','loadStudienplan','studienplan'),
 	array('soap/studienordnung','saveSemesterZuordnung','studienordnung'),
 	array('soap/studienordnung','deleteSemesterZuordnung','studienordnung')
 );
