@@ -270,7 +270,9 @@ switch($method)
 		}
 		
 		$studiengang = new studiengang();
-		$ausbildungssemester = $studiengang->getSemesterFromStudiengang($studienordnung->studiengang_kz);		
+		$studiengang->load($studienordnung->studiengang_kz);
+//		$ausbildungssemester = $studiengang->getSemesterFromStudiengang($studienordnung->studiengang_kz)
+		$ausbildungssemester = $studiengang->max_semester;
 			
 		$studiensemester = new studiensemester();
 		$studiensemester->getAll();
@@ -280,9 +282,9 @@ switch($method)
 					<tr>
 						<th style="font-size: 1.1em;">Studiensemester</th>
 						';
-						for($i = 0; $i<count($ausbildungssemester); $i++)
+						for($i = 1; $i<=$ausbildungssemester; $i++)
 						{
-							echo '<th style="font-size: 1.1em">'.$ausbildungssemester[$i].". Semester</th>";
+							echo '<th style="font-size: 1.1em">'.$i.". Semester</th>";
 						}
 					echo '<th>&nbsp;</th>';
 		echo '</tr>
@@ -294,15 +296,15 @@ switch($method)
 			foreach($ausbildungssemesterResult as $row)
 			{
 				echo '<tr id="row_'.$row->studiensemester.'" style="font-size: 1em !important;"><td style="font-size: 1em; padding: 0.5em 0.5em 0.5em 0.5em;" align="center">'.$row->studiensemester.'</td>';
-				for($i = 0; $i<count($ausbildungssemester); $i++)
+				for($i = 1; $i<=$ausbildungssemester; $i++)
 				{
-					if(in_array($ausbildungssemester[$i], $row->ausbildungssemester))
+					if(in_array($i, $row->ausbildungssemester))
 					{
-						echo '<td style="font-size: 1.2em; color: green;" align="center"><a href="#" onclick="javascript:deleteSemesterZuordnung(\''.$row->studiensemester.'\',\''.$ausbildungssemester[$i].'\')"><img id='.$row->studiensemester.$ausbildungssemester[$i].' width="30px" src="../../skin/images/true.png"></a></td>';
+						echo '<td style="font-size: 1.2em; color: green;" align="center"><a href="#" onclick="javascript:deleteSemesterZuordnung(\''.$row->studiensemester.'\',\''.$i.'\')"><img id='.$row->studiensemester.$i.' width="30px" src="../../skin/images/true.png"></a></td>';
 					}
 					else
 					{
-						echo '<td style="font-size: 1em; color: red;" align="center"><a href="#" onclick="javascript:saveSemesterStoZuordnung(\''.$row->studiensemester.'\', \''.$ausbildungssemester[$i].'\');"><img width="20px" src="../../skin/images/false.png"></a></td>';
+						echo '<td style="font-size: 1em; color: red;" align="center"><a href="#" onclick="javascript:saveSemesterStoZuordnung(\''.$row->studiensemester.'\', \''.$i.'\');"><img width="20px" src="../../skin/images/false.png"></a></td>';
 					}
 				}
 				echo '<td><a href="#" onclick="javascript:deleteSemesterZuordnung(\''.$row->studiensemester.'\');">Löschen</a></td></tr>';
@@ -316,9 +318,9 @@ switch($method)
 					echo '<option value='.$studiensemester->studiensemester[$i]->studiensemester_kurzbz.'>'.$studiensemester->studiensemester[$i]->studiensemester_kurzbz.'</option>';
 				}
 		echo '</select></td>';
-		foreach($ausbildungssemester as $sem)
+		for($j=1; $j<=$ausbildungssemester; $j++)
 		{
-			echo '<td align="center"><input type="checkbox" semester='.$sem.'></td>';
+			echo '<td align="center"><input type="checkbox" semester='.$j.'></td>';
 		}
 		echo '
 			<td><input style="margin: 0.5em 0 0.5em 0" type="button" value="Zuordnen" onclick="javascript:saveSemesterStoZuordnung();"></td>

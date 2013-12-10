@@ -92,8 +92,9 @@ function loadStudienordnung()
 		}
 		else
 		{
+			$("#studienplan").html("Bitte wählen Sie zuerst eine Studienordnung aus!");
 			drawStudienordnungen(data.result);
-			jqUi( "#menueLinks" ).accordion("option","active",1);
+			//jqUi( "#menueLinks" ).accordion("option","active",1);
 		}
 	});
 }
@@ -115,6 +116,8 @@ function drawStudienordnungen(data)
 		}
 	}
 	obj=obj+'</ul>';
+	$("#data").empty();
+	$("#tabs").hide();
 	$('#studienordnung').html(obj);
 }
 
@@ -147,7 +150,7 @@ function loadStudienplanSTO(neue_studienordnung_id,bezeichnung)
 		else
 		{
 			drawStudienplan(data.result);
-			jqUi( "#menueLinks" ).accordion("option","active",2);
+			//jqUi( "#menueLinks" ).accordion("option","active",2);
 		}
 		semesterStoZuordnung();
 	});
@@ -181,11 +184,12 @@ function drawStudienplan(data)
 	{
 		if(data[i].studienplan_id !== null)
 		{
-			obj=obj+'<li><a href="#Load'+data[i].studienplan_id+'" onclick="loadLehrveranstaltungSTPL('+data[i].studienplan_id+',\''+data[i].bezeichnung+' '+data[i].orgform_kurzbz+'\',\''+data[i].regelstudiendauer+'\');return false;">'+data[i].bezeichnung+'</a>'
+			obj=obj+'<li><a href="#Load'+data[i].studienplan_id+'" onclick="loadLehrveranstaltungSTPL('+data[i].studienplan_id+',\''+data[i].bezeichnung+'\',\''+data[i].regelstudiendauer+'\');return false;">'+data[i].bezeichnung+'</a>'
 			+' <a href="#Edit'+data[i].studienplan_id+'" onclick="editStudienplan('+data[i].studienplan_id+');return false;"><img title="edit" src="../../skin/images/edit.png"></a></li>';
 		}
 	}
 	obj=obj+'</ul>';
+	$("#tabs").hide();
 	$('#studienplan').html(obj);
 }
 
@@ -227,7 +231,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 			treeData.push(object);
 		}
 */
-		$("#data").html("<div id='treeData'></div>")
+		$("#data").html("<div id='treeData'></div>");
 	//	if(data.result[0].lehrveranstaltung_id !== null)
 	//	{
 			// Anzeigen des Trees mit den Lehrveranstaltungen
@@ -243,14 +247,19 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 					move: {
 						"always_copy": "multitree",
 						"check_move": function(m) {
+							if(m.r.attr("rel")==="semester" && (m.p === "inside" || m.p === "before"))
+							{
+								console.log("test");
+								return true;
+							}
 
-//							if(m.np.children().find("li[id="+m.o[0].id+"]").length !== 0 && m.np.attr("id") !== "data")
-//							{
-//								
-//								return false;
-//							}
-							return true;
-						 }
+							if(m.p === "inside" || m.p === "last")
+							{
+								return true;
+							}
+
+							return false;
+						}
 					}
 				},
 				dnd: {
@@ -377,8 +386,15 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 				}
 
 				// Lehrveranstaltungsdetails laden
-				LoadLVDetails(lvid, stpllvid);
-
+				if(data.rslt.obj.attr("rel") !== "semester")
+				{
+					LoadLVDetails(lvid, stpllvid);
+				}
+				else
+				{
+					$("#tab-lehrveranstaltungdetail").html("<p>Klicken Sie auf eine Lehrveranstaltung um die Details anzuzeigen</p>");
+				}
+				
 				// Regeln laden
 				if(stpllvid!==undefined)
 					LVRegelnloadRegeln(stpllvid);
@@ -892,7 +908,7 @@ function saveJsondataFromTree(nodeId, studienplan_id, studienplan_lehrveranstalt
 	if(studienplan_lehrveranstaltung_id=='' && neu==false)
 	{
 		alert("Die Lehrveranstaltung ist bereits in diesem Studienplan vorhanden!");
-		$("#treeData").jstree("remove", $("#"+nodeId));
+		$("#treeData").jstree("remove", $("#copy_"+nodeId));
 		return;
 	}
 	
