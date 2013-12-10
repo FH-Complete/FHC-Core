@@ -35,12 +35,12 @@ if (!$db = new basis_db())
 <head>
 	<title>Lehrveranstaltung Verwaltung</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
+<!--	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-	<link rel="stylesheet" href="../../skin/jquery.css" type="text/css"/>
+	<link rel="stylesheet" href="../../skin/jquery.css" type="text/css"/>-->
 	<!--<script type="text/javascript" src="../../include/js/jquery.js"></script>-->
 	<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
-	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
+	<!--<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>-->
 	<script>
 		$(document).ready(function loadSemester()
 		{
@@ -93,7 +93,7 @@ if (!$db = new basis_db())
 			var studiengang_kz = $("#stgDropdown").val();
 			var semester = $("#semDropdown").val();
 			var oe_kurzbz = $("#oeDropdown").val();
-			console.log(oe_kurzbz);
+//			console.log(oe_kurzbz);
 			if(oe_kurzbz === "null")
 			{
 				$.ajax(
@@ -139,7 +139,7 @@ if (!$db = new basis_db())
 						}
 				}).success(function(data)
 				{
-					console.log(data);
+//					console.log(data);
 					var html = "";
 					data.result.forEach(function(option)
 					{
@@ -199,6 +199,7 @@ if (!$db = new basis_db())
 				{
 					alert(data.errormsg);
 				}
+				loadLVKompatibilitaet(lehrveranstaltung_id);
 				var iframe = parent.document.getElementById("lv_detail");
 				iframe.src = "lehrveranstaltung_kompatibel.php?lehrveranstaltung_id="+lehrveranstaltung_id;
 			}).error(function(data)
@@ -227,6 +228,7 @@ if (!$db = new basis_db())
 				{
 					alert(data.errormsg);
 				}
+				loadLVKompatibilitaet(lehrveranstaltung_id);
 				var iframe = parent.document.getElementById("lv_detail");
 				iframe.src = "lehrveranstaltung_kompatibel.php?lehrveranstaltung_id="+lehrveranstaltung_id;
 			}).error(function(data)
@@ -244,6 +246,7 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
 $lehrveranstaltung_id = $_GET["lehrveranstaltung_id"];
+$type = isset($_GET["type"]) ? $_GET["type"] : "";
 $lv = new lehrveranstaltung();
 
 $kompatibleLvs = $lv->loadLVkompatibel($lehrveranstaltung_id);
@@ -258,9 +261,10 @@ if(count($kompatibleLvs)>0)
 			<th class="header">Kurzbezeichnung</th>
 			<th class="header">Bezeichnung</th>
 			<th class="header">ECTS</th>
-			<th class="header">Studiengang</th>
-			<th class="header">Löschen</th>
-		</tr>
+			<th class="header">Studiengang</th>';
+			if($type == "edit")
+				echo '<th class="header">Löschen</th>';
+		echo '</tr>
 	</thead>
 	<tbody>';
 	foreach($kompatibleLvs as $lvId)
@@ -273,9 +277,16 @@ if(count($kompatibleLvs)>0)
 				<td>".$lv->kurzbz."</td>
 				<td>".$lv->bezeichnung."</td>
 				<td>".$lv->ects."</td>
-				<td>".$studiengang->bezeichnung."</td>
-				<td><a href='#' onclick='javascript:deleteKompatibleLv(\"".$lehrveranstaltung_id."\",\"".$lv->lehrveranstaltung_id."\")'><img height='20' src='../../skin/images/false.png'></a></td>
-			</tr>";
+				<td>".$studiengang->bezeichnung."</td>";
+				if($type == "edit")
+				{
+					echo "<td><a href='#' onclick='javascript:deleteKompatibleLv(\"".$lehrveranstaltung_id."\",\"".$lv->lehrveranstaltung_id."\")'><img height='20' src='../../skin/images/false.png'></a></td>";
+				}
+				else 
+				{
+					echo "<td>&nbsp;</td>";
+				}
+			echo "</tr>";
 	}
 	echo "</tbody>
 		</table>";
@@ -285,41 +296,44 @@ if(count($kompatibleLvs)>0)
 	echo "Keine kompatiblen Lehrveranstaltungen vorhanden.</br>";
 }
 
-$studiengang = new studiengang();
-$studiengang->getAll("kurzbzlang");
-
-//Studiengang Dropdown
-echo "<div style='padding-top: 1em;'>";
-echo "<form action='javascript:saveKompatibleLv(\"".$lehrveranstaltung_id."\")' method='POST'>
-	<b>Studiengang: </b><select id='stgDropdown' style='margin-right: 1em;' onload='javascript:loadSemester();' onchange='javascript:loadSemester();'>";
-foreach($studiengang->result as $stg)
+if($type == "edit")
 {
-	echo "<option value=".$stg->studiengang_kz.">".$stg->kuerzel." - ".$stg->kurzbzlang."</option>";
+	$studiengang = new studiengang();
+	$studiengang->getAll("kurzbzlang");
+
+	//Studiengang Dropdown
+	echo "<div style='padding-top: 1em;'>";
+	echo "<form action='javascript:saveKompatibleLv(\"".$lehrveranstaltung_id."\")' method='POST'>
+		<b>Studiengang: </b><select id='stgDropdown' style='margin-right: 1em;' onload='javascript:loadSemester();' onchange='javascript:loadSemester();'>";
+	foreach($studiengang->result as $stg)
+	{
+		echo "<option value=".$stg->studiengang_kz.">".$stg->kuerzel." - ".$stg->kurzbzlang."</option>";
+	}
+	echo "</select>";
+
+	//OE-Dropdown
+	$organisationseinheit = new organisationseinheit();
+	$organisationseinheit->getAll(true, true);
+	echo "<b>OE: </b><select id='oeDropdown' style='margin-right: 1em;' onload='javascript:loadSemester();' onchange='javascript:loadSemester();'><option value='null'>-- Keine --</option>";
+	foreach($organisationseinheit->result as $oe)
+	{
+		echo "<option value=".$oe->oe_kurzbz.">".$oe->organisationseinheittyp_kurzbz." ".$oe->bezeichnung."</option>";
+	}
+	echo "</select>";
+
+	//Semester Dropdown
+	echo "<b>Semester: </b><select id='semDropdown' style='margin-right: 1em;' onchange='javascript:loadLehrveranstaltungen()'>";
+	echo "</select>";
+
+	//Lehrveranstaltung Dropdown
+	echo "<b>Lehrveranstaltungen: </b><select id='lvDropdown' onchange=''>";
+	echo "</select>";
+
+	//Submit Button
+	echo "<input type='submit' value='hinzufügen'>";
+	echo "</form>";
+	echo "</div>";
 }
-echo "</select>";
-
-//OE-Dropdown
-$organisationseinheit = new organisationseinheit();
-$organisationseinheit->getAll();
-echo "<b>OE: </b><select id='oeDropdown' style='margin-right: 1em;' onload='javascript:loadSemester();' onchange='javascript:loadSemester();'><option value='null'>-- Keine --</option>";
-foreach($organisationseinheit->result as $oe)
-{
-	echo "<option value=".$oe->oe_kurzbz.">".$oe->bezeichnung."</option>";
-}
-echo "</select>";
-
-//Semester Dropdown
-echo "<b>Semester: </b><select id='semDropdown' style='margin-right: 1em;' onchange='javascript:loadLehrveranstaltungen()'>";
-echo "</select>";
-
-//Lehrveranstaltung Dropdown
-echo "<b>Lehrveranstaltungen: </b><select id='lvDropdown' onchange=''>";
-echo "</select>";
-
-//Submit Button
-echo "<input type='submit' value='hinzufügen'>";
-echo "</form>";
-echo "</div>";
 echo "</body>
 	</html>";
 
