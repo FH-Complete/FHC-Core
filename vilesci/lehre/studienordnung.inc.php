@@ -298,11 +298,11 @@ switch($method)
 				{
 					if(in_array($ausbildungssemester[$i], $row->ausbildungssemester))
 					{
-						echo '<td style="font-size: 1.2em; color: green;" align="center"><img width="30px" src="../../skin/images/true.png"></td>';
+						echo '<td style="font-size: 1.2em; color: green;" align="center"><a href="#" onclick="javascript:deleteSemesterZuordnung(\''.$row->studiensemester.'\',\''.$ausbildungssemester[$i].'\')"><img id='.$row->studiensemester.$ausbildungssemester[$i].' width="30px" src="../../skin/images/true.png"></a></td>';
 					}
 					else
 					{
-						echo '<td style="font-size: 1em; color: red;" align="center"><img width="20px" src="../../skin/images/false.png"></td>';
+						echo '<td style="font-size: 1em; color: red;" align="center"><a href="#" onclick="javascript:saveSemesterStoZuordnung(\''.$row->studiensemester.'\', \''.$ausbildungssemester[$i].'\');"><img width="20px" src="../../skin/images/false.png"></a></td>';
 					}
 				}
 				echo '<td><a href="#" onclick="javascript:deleteSemesterZuordnung(\''.$row->studiensemester.'\');">Löschen</a></td></tr>';

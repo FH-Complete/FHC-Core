@@ -606,7 +606,7 @@ class studienordnung extends basis_db
 		return $data;
 	}
 	
-	public function deleteSemesterZuordnung($studienordnung_id, $studiensemester_kurzbz)
+	public function deleteSemesterZuordnung($studienordnung_id, $studiensemester_kurzbz, $studiensemester=NULL)
 	{
 		if(!is_numeric($studienordnung_id))
 		{
@@ -622,7 +622,11 @@ class studienordnung extends basis_db
 		
 		$qry = 'DELETE FROM lehre.tbl_studienordnung_semester 
 					WHERE studienordnung_id='.$this->db_add_param($studienordnung_id).' AND 
-						studiensemester_kurzbz='.$this->db_add_param($studiensemester_kurzbz).';';
+						studiensemester_kurzbz='.$this->db_add_param($studiensemester_kurzbz).'';
+		if($studiensemester !== null)
+			$qry.=' AND semester='.$this->db_add_param ($studiensemester).'';
+		
+		$qry.=';';
 		
 		if($this->db_query($qry))
 		{
