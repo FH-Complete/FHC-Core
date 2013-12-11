@@ -268,7 +268,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 							after: false,
 							before: false,
 							inside: true
-						}
+						};
 					}
 				},
 				grid: {
@@ -284,7 +284,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 						"lv" : {
 							icon : {
 								image : "../../include/js/jstree/icons/lehrveranstaltung.png"
-							},
+							}
 						},
 						"semester" : {
 
@@ -292,7 +292,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 						"modul" : {
 							icon : {
 								image : "../../include/js/jstree/icons/modul.png"
-							},
+							}
 						},
 						"lf" : {
 						}
@@ -704,19 +704,19 @@ function showLVTree(data)
 							"lv" : {
 								icon : {
 									image : "../../include/js/jstree/icons/lehrveranstaltung.png"
-								},
+								}
 	//							max_children: 0
 							},
 							"modul" : {
 								icon : {
 									image : "../../include/js/jstree/icons/modul.png"
-								},
+								}
 							},
 							"lf" : {
 								icon : {
 									//image : "../../include/js/jstree/icons/lehrveranstaltung.png"
-								},
-							},
+								}
+							}
 						}
 					},
 					grid: {
@@ -930,7 +930,7 @@ function saveJsondataFromTree(nodeId, studienplan_id, studienplan_lehrveranstalt
 			"class": "studienplan",
 			"method": "saveStudienplanLehrveranstaltung",
 			"loaddata": JSON.stringify(loaddata),
-			"savedata": JSON.stringify(savedata),
+			"savedata": JSON.stringify(savedata)
 		}
 	}).success(function(d)
 	{
@@ -1073,7 +1073,7 @@ function saveStudienplan()
 				"class": "studienplan",
 				"method": "save",
 				"loaddata": JSON.stringify(loaddata),
-				"savedata": JSON.stringify(savedata),
+				"savedata": JSON.stringify(savedata)
 			},
 		success: function(data){
 			if(data.error=='true')

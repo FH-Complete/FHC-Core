@@ -246,8 +246,8 @@ class lehrveranstaltung extends basis_db
 		//Select Befehl zusammenbauen
 		if (!is_null($lehreverzeichnis))
 			$qry .= " AND lehreverzeichnis=" . $this->db_add_param($lehreverzeichnis);
-		else
-			$qry .= " AND lehreverzeichnis<>'' ";
+//		else
+//			$qry .= " AND lehreverzeichnis<>'' ";
 
 		if (!is_null($semester) && $semester != '')
 			$qry .= " AND semester=" . $this->db_add_param($semester, FHC_INTEGER);
