@@ -21,31 +21,46 @@
  * 
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>
+ *          Werner Masik <werner@gefi.at>
  */
-
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class studienplatz extends basis_db
 {
-	private $new;					// boolean
-	private $result;				// DB-Result
-	public $studienplatz = array();	// Objekt
+	/** @var $new boolean */
+	private $new;			
+	/** @var DB-Result */
+	private $result;
+	/** @var object */
+	public $studienplatz = array();	
 
 	//Tabellenspalten
-	private $studienplatz_id;		// integer
-	private $studiengang_kz;		// integer
-	private $orgform_kurzbz; 		// varchar
-	private $studiensemester;		// varchar
-	private $gpz;					// integer
-	private $npz;            		// integer
-	private $updateamum;			// timestamp
-	private $updatevon;				// varchar
-	private $insertamum;      		// timestamp
-	private $insertvon;      		// varchar
+	/** @var integer */
+	private $studienplatz_id;		
+	/** @var integer */
+	private $studiengang_kz;	
+	/** @var string */
+	private $orgform_kurzbz; 	
+	/** @var string */
+	private $studiensemester_kurzbz;
+	/** @var integer */
+	private $ausbildungssemester;  
+	/** @var integer */
+	private $gpz;					
+	/** @var integer */
+	private $npz;            		
+	/** @var timestamp */
+	private $updateamum;			
+	/** @var string */
+	private $studienplatz_id;		
+	/** @var timestamp */
+	private $insertamum;      		
+	/** @var string */
+	private $insertvon;      	
 
 	/**
 	 * Konstruktor
-	 * @param $studienplatz_id ID des Studienplatz der geladen werden soll (Default=null)
+	 * @param integer ID des Studienplatz der geladen werden soll (Default=null)
 	 */
 	public function __construct($studienplatz_id=null)
 	{
@@ -56,21 +71,21 @@ class studienplatz extends basis_db
 	}
 
 	/**
-	 * Laedt die Adresse mit der ID $studienplatz_id
-	 * @param  $adress_id ID der zu ladenden Adresse
-	 * @return true wenn ok, false im Fehlerfall
+	 * Laedt einzelnen Studienplatz der ID $studienplatz_id
+	 * @param integer $studienplatz_id ID des zu ladenden Studienplatzes
+	 * @return boolean Description true wenn ok, false im Fehlerfall
 	 */
 	public function loadStudienplatz($studienplatz_id)
 	{
 		//Pruefen ob adress_id eine gueltige Zahl ist
 		if(!is_numeric($studienplatz_id) || $studienplatz_id == '')
 		{
-			$this->errormsg = 'Adresse_id muss eine Zahl sein';
+			$this->errormsg = 'studienplatz_id muss eine Zahl sein';
 			return false;
 		}
 
 		//Daten aus der Datenbank lesen
-		$qry = "SELECT * FROM public.tbl_adresse WHERE studienplatz_id=".$this->db_add_param($studienplatz_id, FHC_INTEGER, false);
+		$qry = "SELECT * FROM lehre.tbl_studienplatz WHERE studienplatz_id=".$this->db_add_param($studienplatz_id, FHC_INTEGER, false);
 
 		if(!$this->db_query($qry))
 		{
@@ -80,22 +95,7 @@ class studienplatz extends basis_db
 
 		if($row = $this->db_fetch_object())
 		{
-			$this->adresse_id		= $row->adresse_id;
-			$this->heimatadresse 	= $this->db_parse_bool($row->heimatadresse);
-			$this->zustelladresse	= $this->db_parse_bool($row->zustelladresse);
-			$this->gemeinde			= $row->gemeinde;
-			$this->name				= $row->name;
-			$this->nation			= $row->nation;
-			$this->ort				= $row->ort;
-			$this->person_id		= $row->person_id;
-			$this->plz				= $row->plz;
-			$this->strasse			= $row->strasse;
-			$this->typ				= $row->typ;
-			$this->updateamum		= $row->updateamum;
-			$this->updatevon		= $row->updatevon;
-			$this->insertamum		= $row->insertamum;
-			$this->insertvon		= $row->insertvon;
-			$this->firma_id			= $row->firma_id;
+			$this->mapRow($this, $row);
 		}
 		else
 		{
@@ -107,22 +107,43 @@ class studienplatz extends basis_db
 	}
 
 	/**
-	 * Laedt alle Adressen zu der Person die uebergeben wird
-	 * @param $pers_id ID der Person zu der die Adressen geladen werden sollen
+	 * Helper
+	 * @param type $target
+	 * @param type $row
+	 */
+	private function mapRow($target,$row) {		
+		$target->studienplatz_id	= $row->studienplatz_id;
+		$target->studiengang_kz 	= $row->studiengang_kz;
+		$target->orgform_kurzbz	= $row->orgform_kurzbz;
+		$target->studiensemester_kurzbz	= $row->studiensemester_kurzbz;
+		$target->ausbildungssemester	= $row->ausbildungssemester;
+		$target->gpz			= $row->gpz;
+		$target->npz			= $row->npz;			
+		$target->updateamum		= $row->updateamum;
+		$target->updatevon		= $row->updatevon;
+		$target->insertamum		= $row->insertamum;
+		$target->insertvon		= $row->insertvon;
+	}
+	
+	/**
+	 * Laedt alle Studienplaetze zu einem Studiengang und Semester
+	 * @param integer $studiengang_kz 
+	 * @param string$ studiensemester_kurzbz
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load_pers($pers_id)
+	public function load_studiengang_studiensemester($studiengang_kz, $studiensemester_kurzbz)
 	{
-		//Pruefen ob pers_id eine gueltige Zahl ist
-		if(!is_numeric($pers_id) || $pers_id == '')
+		//Pruefen ob $studiengang_kz eine gueltige Zahl ist
+		if(!is_numeric($studiengang_kz) || $studiengang_kz == '')
 		{
-			$this->errormsg = 'person_id muss eine gültige Zahl sein';
+			$this->errormsg = '$studiengang_kz muss eine gültige Zahl sein';
 			return false;
 		}
 
 		//Lesen der Daten aus der Datenbank
-		$qry = "SELECT * FROM public.tbl_adresse WHERE person_id=".$this->db_add_param($pers_id, FHC_INTEGER, false);
-
+		$qry = "SELECT * FROM lehre.tbl_studienplatz WHERE studienplatz_id=".
+				$this->db_add_param($studienplatz_id, FHC_INTEGER, false).
+				" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz, FHC_STRING, false);
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
@@ -131,128 +152,53 @@ class studienplatz extends basis_db
 
 		while($row = $this->db_fetch_object())
 		{
-			$adr_obj = new adresse();
-
-			$adr_obj->adresse_id      = $row->adresse_id;
-			$adr_obj->heimatadresse   = $this->db_parse_bool($row->heimatadresse);
-			$adr_obj->gemeinde        = $row->gemeinde;
-			$adr_obj->name            = $row->name;
-			$adr_obj->nation          = $row->nation;
-			$adr_obj->ort             = $row->ort;
-			$adr_obj->person_id       = $row->person_id;
-			$adr_obj->plz             = $row->plz;
-			$adr_obj->strasse         = $row->strasse;
-			$adr_obj->typ             = $row->typ;
-			$adr_obj->firma_id		  = $row->firma_id;
-			$adr_obj->updateamum      = $row->updateamum;
-			$adr_obj->updatevon       = $row->updatevon;
-			$adr_obj->insertamum      = $row->insertamum;
-			$adr_obj->insertvon       = $row->insertvon;
-			$adr_obj->zustelladresse  = $this->db_parse_bool($row->zustelladresse);
-
-			$this->result[] = $adr_obj;
+			$this->result[] = $this->mapRow(new studienplatz(), $row);
 		}
 		return true;
 	}
 	
-	/**
-	 * Laedt alle Adressen zu der Firma die uebergeben wird
-	 * 
-	 * ACHTUNG: Diese Funktion wird nur mehr fuer Lehrauftraege benoetigt.
-	 * Die Adresse zu einer Firma wird nun ueber die Tabelle Standort hergestellt!
-	 * 
-	 * @deprec  2.0
-	 * @param $firma_id ID der Firma zu der die Adressen geladen werden sollen
-	 * @return true wenn ok, false im Fehlerfall
-	 */
-	public function load_firma($firma_id)
-	{
-		//Pruefen ob pers_id eine gueltige Zahl ist
-		if(!is_numeric($firma_id) || $firma_id == '')
-		{
-			$this->errormsg = 'firma_id muss eine gültige Zahl sein';
-			return false;
-		}
-
-		//Lesen der Daten aus der Datenbank
-		$qry = "SELECT * FROM public.tbl_adresse WHERE firma_id=".$this->db_add_param($firma_id, FHC_INTEGER, false);
-
-		if(!$this->db_query($qry))
-		{
-			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
-			return false;
-		}
-
-		while($row = $this->db_fetch_object())
-		{
-			$adr_obj = new adresse();
-
-			$adr_obj->adresse_id      = $row->adresse_id;
-			$adr_obj->heimatadresse   = $this->db_parse_bool($row->heimatadresse);
-			$adr_obj->gemeinde        = $row->gemeinde;
-			$adr_obj->name            = $row->name;
-			$adr_obj->nation          = $row->nation;
-			$adr_obj->ort             = $row->ort;
-			$adr_obj->person_id       = $row->person_id;
-			$adr_obj->plz             = $row->plz;
-			$adr_obj->strasse         = $row->strasse;
-			$adr_obj->typ             = $row->typ;
-			$adr_obj->firma_id		  = $row->firma_id;
-			$adr_obj->updateamum      = $row->updateamum;
-			$adr_obj->updatevon       = $row->updatevon;
-			$adr_obj->insertamum      = $row->insertamum;
-			$adr_obj->insertvon       = $row->insertvon;
-			$adr_obj->zustelladresse  = $this->db_parse_bool($row->zustelladresse);
-
-			$this->result[] = $adr_obj;
-		}
-		return true;
-	}
+	
 
 	/**
 	 * Prueft die Variablen auf Gueltigkeit
-	 * @return true wenn ok, false im Fehlerfall
+	 * @return boolean true wenn ok, false im Fehlerfall
 	 */
 	protected function validate()
 	{
-		//Zahlenfelder pruefen
-		if(!is_numeric($this->person_id) && $this->person_id!='')
+		if(!is_numeric($this->studienplatz_id) && $this->studienplatz_id!='')
 		{
-			$this->errormsg='person_id enthaelt ungueltige Zeichen';
+			$this->errormsg='studienplatz_id enthaelt ungueltige Zeichen';
 			return false;
 		}
-		//Gesamtlaenge pruefen
-		if(mb_strlen($this->name)>255)
+		if(!is_numeric($this->studiengang_kz) && $this->studiengang_kz!='')
 		{
-			$this->errormsg = 'Name darf nicht länger als 255 Zeichen sein';
+			$this->errormsg='studiengang_kz enthaelt ungueltige Zeichen';
+			return false;
+		}	
+		if(mb_strlen($this->orgform_kurzbz)>3)
+		{
+			$this->errormsg = 'orgform_kurzbz darf nicht länger als 3 Zeichen sein';
 			return false;
 		}
-		if(mb_strlen($this->strasse)>255)
+		if(mb_strlen($this->studiensemester_kurzbz)>16)
 		{
-			$this->errormsg = 'Strasse darf nicht länger als 255 Zeichen sein';
+			$this->errormsg = 'studiensemester_kurzbz darf nicht länger als 16 Zeichen sein';
 			return false;
 		}
-		if(mb_strlen($this->plz)>10)
+		if(!is_numeric($this->ausbildungssemester) && $this->ausbildungssemester!='')
 		{
-			$this->errormsg = 'Plz darf nicht länger als 10 Zeichen sein';
+			$this->errormsg='ausbildungssemester enthaelt ungueltige Zeichen';
 			return false;
 		}
-		if(mb_strlen($this->ort)>255)
+		if(!is_numeric($this->gpz) && $this->gpz!='')
 		{
-			$this->errormsg = 'Ort darf nicht länger als 255 Zeichen sein';
+			$this->errormsg='gpz enthaelt ungueltige Zeichen';
+			return false;
+		}if(!is_numeric($this->npz) && $this->npz!='')
+		{
+			$this->errormsg='npz enthaelt ungueltige Zeichen';
 			return false;
 		}
-		if(mb_strlen($this->nation)>3)
-		{
-			$this->errormsg = 'Nation darf nicht länger als 3 Zeichen sein';
-			return false;
-		}
-		if(mb_strlen($this->gemeinde)>255)
-		{
-			$this->errormsg = 'Gemeinde darf nicht länger als 255 Zeichen sein';
-			return false;
-		}
-
 		$this->errormsg = '';
 		return true;
 	}
@@ -261,7 +207,7 @@ class studienplatz extends basis_db
 	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
 	 * andernfalls wird der Datensatz mit der ID in $adresse_id aktualisiert
-	 * @return true wenn ok, false im Fehlerfall
+	 * @return boolean true wenn ok, false im Fehlerfall
 	 */
 	public function save()
 	{
@@ -272,46 +218,40 @@ class studienplatz extends basis_db
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
-			$qry='BEGIN;INSERT INTO public.tbl_adresse (person_id, name, strasse, plz, typ, ort, nation, insertamum, insertvon,
-			     gemeinde, heimatadresse, zustelladresse, firma_id, updateamum, updatevon, ext_id) VALUES('.
-			      $this->db_add_param($this->person_id, FHC_INTEGER).', '.
-			      $this->db_add_param($this->name).', '.
-			      $this->db_add_param($this->strasse).', '.
-			      $this->db_add_param($this->plz).', '.
-			      $this->db_add_param(trim($this->typ)).', '.
-			      $this->db_add_param($this->ort).', '.
-			      $this->db_add_param($this->nation).', now(), '.
+			$qry='BEGIN;INSERT INTO lehre.tbl_studienplatz (studienplatz_id, '.
+				 'studiengang_kz, orgform_kurzbz, studiensemester_kurzbz, '.
+				 'ausbildungssemester, gpz, npz, insertamum, insertvon, '.
+			     'updateamum, updatevon) VALUES('.
+			      $this->db_add_param($this->studienplatz_id, FHC_INTEGER).', '.
+			      $this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
+			      $this->db_add_param($this->orgform_kurzbz).', '.
+			      $this->db_add_param($this->studiensemester_kurzbz).', '.			     
+			      $this->db_add_param($this->ausbildungssemester, FHC_INTEGER).', '.
+			      $this->db_add_param($this->gpz, FHC_INTEGER).', '.
+				  $this->db_add_param($this->npz, FHC_INTEGER).', '.
+				  'now(), '.
 			      $this->db_add_param($this->insertvon).', '.
-			      $this->db_add_param($this->gemeinde).', '.
-			      $this->db_add_param($this->heimatadresse,FHC_BOOLEAN, false).', '.
-			      $this->db_add_param($this->zustelladresse,FHC_BOOLEAN, false).', '.
-			      $this->db_add_param($this->firma_id, FHC_INTEGER).', now(), '.
-			      $this->db_add_param($this->updatevon).', '.
-			      $this->db_add_param($this->ext_id, FHC_INTEGER).');';
+			      'now(), '.
+			      $this->db_add_param($this->updatevon).');';
 		}
 		else
 		{
-			//Pruefen ob adresse_id eine gueltige Zahl ist
-			if(!is_numeric($this->adresse_id))
+			//Pruefen ob studienplatz_id eine gueltige Zahl ist
+			if(!is_numeric($this->studienplatz_id))
 			{
-				$this->errormsg = 'adresse_id muss eine gueltige Zahl sein';
+				$this->errormsg = 'studienplatz_id muss eine gueltige Zahl sein';
 				return false;
 			}
-			$qry='UPDATE public.tbl_adresse SET'.
-				' person_id='.$this->db_add_param($this->person_id, FHC_INTEGER).', '.
-				' name='.$this->db_add_param($this->name).', '.
-				' strasse='.$this->db_add_param($this->strasse).', '.
-				' plz='.$this->db_add_param($this->plz).', '.
-		      	' typ='.$this->db_add_param(trim($this->typ)).', '.
-		      	' ort='.$this->db_add_param($this->ort).', '.
-		      	' nation='.$this->db_add_param($this->nation).', '.
-		      	' gemeinde='.$this->db_add_param($this->gemeinde).', '.
-		      	' firma_id='.$this->db_add_param($this->firma_id, FHC_INTEGER).','.
+			$qry='UPDATE lehre.tbl_studienplatz SET'.				
+				' studiengang_kz='.$this->db_add_param($this->studiengang_kz).', '.
+				' orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).', '.
+				' studiensemester_kurzbz='.$this->db_add_param($this->studiensemester_kurzbz).', '.
+		      	' ausbildungssemester='.$this->db_add_param($this->ausbildungssemester).', '.
+		      	' gpz='.$this->db_add_param($this->gpz).', '.
+		      	' npz='.$this->db_add_param($this->npz).', '.		     
 		      	' updateamum= now(), '.
-		      	' updatevon='.$this->db_add_param($this->updatevon).', '.
-		      	' heimatadresse='.$this->db_add_param($this->heimatadresse, FHC_BOOLEAN, false).', '.
-		      	' zustelladresse='.$this->db_add_param($this->zustelladresse, FHC_BOOLEAN, false).' '.
-		      	'WHERE adresse_id='.$this->db_add_param($this->adresse_id, FHC_INTEGER, false).';';
+		      	' updatevon='.$this->db_add_param($this->updatevon).', '.		      	
+		      	'WHERE studienplatz_id='.$this->db_add_param($this->studienplatz_id, FHC_INTEGER, false).';';
 		}
         
 		if($this->db_query($qry))
@@ -319,12 +259,12 @@ class studienplatz extends basis_db
 			if($this->new)
 			{
 				//naechste ID aus der Sequence holen
-				$qry="SELECT currval('public.tbl_adresse_adresse_id_seq') as id;";
+				$qry="SELECT currval('lehre.seq_studienplatz_studienplatz_id') as id;";
 				if($this->db_query($qry))
 				{
 					if($row = $this->db_fetch_object())
 					{
-						$this->adresse_id = $row->id;
+						$this->studienplatz_id = $row->id;
 						$this->db_query('COMMIT');
 					}
 					else
@@ -345,28 +285,28 @@ class studienplatz extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern des Adress-Datensatzes';
+			$this->errormsg = 'Fehler beim Speichern des Studienplatz-Datensatzes';
 			return false;
 		}
-		return $this->adresse_id;
+		return $this->studienplatz_id;
 	}
 
 	/**
 	 * Loescht den Datenensatz mit der ID die uebergeben wird
-	 * @param $adresse_id ID die geloescht werden soll
+	 * @param $studienplatz_id ID die geloescht werden soll
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function delete($adresse_id)
+	public function delete($studienplatz_id)
 	{
-		//Pruefen ob adresse_id eine gueltige Zahl ist
-		if(!is_numeric($adresse_id) || $adresse_id == '')
+		//Pruefen ob studienplatz_id eine gueltige Zahl ist
+		if(!is_numeric($studienplatz_id) || $studienplatz_id == '')
 		{
-			$this->errormsg = 'adresse_id muss eine gültige Zahl sein'."\n";
+			$this->errormsg = 'studienplatz_id muss eine gültige Zahl sein'."\n";
 			return false;
 		}
 
 		//loeschen des Datensatzes
-		$qry="DELETE FROM public.tbl_adresse WHERE adresse_id=".$this->db_add_param($adresse_id, FHC_INTEGER, false).";";
+		$qry="DELETE FROM lehre.tbl_studienplatz WHERE studienplatz_id=".$this->db_add_param($studienplatz_id, FHC_INTEGER, false).";";
 
 		if($this->db_query($qry))
 		{
