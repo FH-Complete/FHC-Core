@@ -575,7 +575,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           <text:p text:style-name="P40">Verletzung der Verpflichtung, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen anzubieten (siehe Pkt. 6.2.7);</text:p>
         </text:list-item>
         <text:list-item>
-          <text:p text:style-name="P40">Verletzung der Geheimhaltungspflicht (siehe Pkt. 6.2.8.); </text:p>
+          <text:p text:style-name="P40">Verletzung der Geheimhaltungspflicht (siehe Pkt. 6.2.9); </text:p>
         </text:list-item>
         <text:list-item>
           <text:p text:style-name="P40">strafgerichtlicher Verurteilung (wobei die Art des Deliktes und der Grad der Schuld berücksichtigt werden);</text:p>
