@@ -73,7 +73,7 @@ $datum_obj = new datum();
 	if(!$infoscreen->load($infoscreen_id))
 		die($infoscreen->errormsg);
 		
-	echo '<h2>Details von Infoscreen ',$infoscreen_id,' - ',$infoscreen->bezeichnung.'</h2>';
+	echo '<h2>Details von Infoscreen ',$infoscreen_id,' - ',$infoscreen->bezeichnung.' - ',$infoscreen->beschreibung.'</h2>';
 		
 	echo '
 	<div style="text-align:right">
@@ -183,6 +183,7 @@ $datum_obj = new datum();
 	echo '<table class="tablesorter" id="myTable">
 			<thead>
 			<tr>
+				<th>Status</th>
 				<th>ID</th>
 				<th>InfoscreenID</th>
 				<th>ContentID</th>
@@ -217,6 +218,7 @@ $datum_obj = new datum();
 			$zukunft=false;
 		
 		echo '<tr '.($aktiv==true?'':'style="color:grey"').'>';
+		echo '<td width="10px" align="center">'.($aktiv==false?($zukunft==true?'<img title="2 gelb" src="../../skin/images/ampel_gelb.png" alt="ampel_gelb">':'<img title="3 rot" src="../../skin/images/ampel_rot.png" alt="ampel_rot">'):'<img title="1 gruen" src="../../skin/images/ampel_gruen.png" alt="ampel_gruen">').'</td>';
 		echo '<td>',$db->convert_html_chars($row->infoscreen_content_id),'</td>';
 		echo '<td>',$db->convert_html_chars($row->infoscreen_id),'</td>';
 		echo '<td>',$db->convert_html_chars($row->content_id),'</td>';
