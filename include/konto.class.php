@@ -57,6 +57,7 @@ class konto extends basis_db
 	public $standardbetrag;
 	public $standardtext;
 	public $aktiv;
+	public $credit_points;
 
 	/**
 	 * Konstruktor
@@ -83,7 +84,7 @@ class konto extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT tbl_konto.*, anrede, titelpost, titelpre, nachname, vorname, vornamen
+		$qry = "SELECT tbl_konto.*, anrede, titelpost, titelpre, nachname, vorname, vornamen, credit_points
 			FROM public.tbl_konto JOIN public.tbl_person USING (person_id) WHERE buchungsnr='$buchungsnr'";
 
 		if($this->db_query($qry))
@@ -111,6 +112,7 @@ class konto extends basis_db
 				$this->nachname = $row->nachname;
 				$this->vorname = $row->vorname;
 				$this->vornamen = $row->vornamen;
+				$this->credit_points = $row->credit_points;
 				return true;
 			}
 			else
@@ -186,7 +188,7 @@ class konto extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 
-			$qry='BEGIN;INSERT INTO public.tbl_konto (person_id, studiengang_kz, studiensemester_kurzbz, buchungsnr_verweis, betrag, buchungsdatum, buchungstext, mahnspanne, buchungstyp_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id) VALUES('.
+			$qry='BEGIN;INSERT INTO public.tbl_konto (person_id, studiengang_kz, studiensemester_kurzbz, buchungsnr_verweis, betrag, buchungsdatum, buchungstext, mahnspanne, buchungstyp_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id, credit_points) VALUES('.
 			     $this->addslashes($this->person_id).', '.
 			     $this->addslashes($this->studiengang_kz).', '.
 			     $this->addslashes($this->studiensemester_kurzbz).', '.
@@ -200,7 +202,8 @@ class konto extends basis_db
 			     $this->addslashes($this->updatevon).', '.
 			     $this->addslashes($this->insertamum).', '.
 			     $this->addslashes($this->insertvon).', '.
-			     $this->addslashes($this->ext_id).');';
+			     $this->addslashes($this->ext_id).', '.
+				 $this->addslashes($this->credit_points).');';
 		}
 		else
 		{
@@ -220,6 +223,7 @@ class konto extends basis_db
 				   ' insertamum='.$this->addslashes($this->insertamum).','.
 				   ' insertvon='.$this->addslashes($this->insertvon).','.
 				   ' ext_id='.$this->addslashes($this->ext_id).
+				   ' credit_points='.$this->addslashes($this->credit_points).
 				   " WHERE buchungsnr='".addslashes($this->buchungsnr)."';";
 
 		}
