@@ -109,7 +109,7 @@ class lvangebot extends basis_db
 	 * @param lv_id ID der LV, dessen Angebote geladen werden sollen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getAllFromLvId($lv_id)
+	public function getAllFromLvId($lv_id, $studiensemester_kurzbz=null)
 	{
 		if(!is_numeric($lv_id))
 		{
@@ -117,10 +117,15 @@ class lvangebot extends basis_db
 			return false;
 		}
 		
-		$qry='SELECT tbl_lvangebot.* FROM lehre.tbl_lvangebot, public.tbl_studiensemester as stsem
-			WHERE tbl_lvangebot.studiensemester_kurzbz=stsem.studiensemester_kurzbz
-			AND lehrveranstaltung_id='.$this->db_add_param($lv_id, FHC_INTEGER, false).
-			'ORDER BY stsem.start';
+		$qry='SELECT 
+				tbl_lvangebot.* 
+			FROM 
+				lehre.tbl_lvangebot
+				JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
+			WHERE lehrveranstaltung_id='.$this->db_add_param($lv_id, FHC_INTEGER, false);
+		if(!is_null($studiensemester_kurzbz))
+			$qry.=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+		$qry.=	' ORDER BY start';
 		
 		if($this->db_query($qry))
 		{
@@ -333,10 +338,10 @@ class lvangebot extends basis_db
 	 * Laedt das LV-Angebot eines gesammten Studienplanes
 	 * @param $studienplan_id ID des Studienplanes
 	 */
-	public function getLVAngebotFromStudienplan($studienplan_id, $studiensemester_arr=null)
+	public function getLVAngebotFromStudienplan($studienplan_id, $studiensemester_arr=null, $kompatible=false)
 	{
 		$qry = "SELECT 
-					* 
+					tbl_lvangebot.*
 				FROM 
 					lehre.tbl_studienplan_lehrveranstaltung
 					JOIN lehre.tbl_lvangebot USING(lehrveranstaltung_id)
@@ -345,6 +350,23 @@ class lvangebot extends basis_db
 
 		if(!is_null($studiensemester_arr))
 			$qry.=" AND tbl_lvangebot.studiensemester_kurzbz IN(".$this->implode4SQL($studiensemester_arr).")";
+
+		if($kompatible)
+		{
+			$qry.=" UNION 
+				SELECT 
+					tbl_lvangebot.*
+				FROM 
+					lehre.tbl_studienplan_lehrveranstaltung
+					JOIN lehre.tbl_lehrveranstaltung_kompatibel USING(lehrveranstaltung_id)
+					JOIN lehre.tbl_lvangebot ON (tbl_lvangebot.lehrveranstaltung_id=tbl_lehrveranstaltung_kompatibel.lehrveranstaltung_id_kompatibel)
+				WHERE
+					tbl_studienplan_lehrveranstaltung.studienplan_id=".$this->db_add_param($studienplan_id);
+
+			if(!is_null($studiensemester_arr))
+				$qry.=" AND tbl_lvangebot.studiensemester_kurzbz IN(".$this->implode4SQL($studiensemester_arr).")";
+
+		}
 
 		if($this->db_query($qry))
 		{
@@ -373,6 +395,58 @@ class lvangebot extends basis_db
 			return false;
 		}
 		return true;	
+	}
+
+	/**
+	 * Prueft ob eine Anmeldung zu dieser Lehrveranstaltung derzeit moeglich ist
+	 */
+	public function AnmeldungMoeglich()
+	{
+		$datum_obj = new datum();
+		if($this->gruppe_kurzbz!='')
+		{
+			if($datum_obj->between($this->anmeldefenster_start, $this->anmeldefenster_ende, date('Y-m-d H:i:s')))
+			{
+				if($this->gesamtplaetze!='')
+				{
+					// Gesamtplaetze pruefen
+					$qry = "SELECT 
+								count(*) as anzahl
+							FROM 
+								public.tbl_benutzergruppe 
+							WHERE 
+								gruppe_kurzbz=".$this->db_add_param($this->gruppe)." 
+								AND studiensemester_kurzbz=".$this->db_add_param($this->studiensemester_kurzbz);
+					if($result = $this->db_query($qry))
+					{
+						if($row = $this->db_fetch_object($result))
+						{
+							if($row->anzahl<$this->gesamtplaetze)
+							{
+								return true;
+							}
+							else
+							{
+								$this->errormsg = 'Es sind bereits alle Plätze für diese Lehrveranstaltung belegt';
+								return false;
+							}
+						}
+					}
+				}
+				else
+					return true;
+			}
+			else
+			{
+				$this->errormsg = 'Eine Anmeldung zu dieser Lehrveranstaltung ist derzeit nicht moeglich';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Es ist derzeit noch keine Gruppe für die Anmeldung zugeteilt';
+			return false;
+		}
 	}
 }
 ?>

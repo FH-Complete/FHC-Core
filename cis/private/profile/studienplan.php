@@ -38,23 +38,7 @@ require_once('../../../include/datum.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/note.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
-
-echo '<!DOCTYPE html>
-<html>
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>Studienplan</title>
-	<link rel="stylesheet" href="../../../skin/fhcomplete.css" />
-	<link rel="stylesheet" href="../../../skin/style.css.php" />
-	<style>
-	.empfehlung 
-	{
-		background-color: #FFCECE;
-	}
-	</style>
-</head>
-<body>
-';
+require_once('../../../include/benutzergruppe.class.php');
 
 $uid = get_uid();
 
@@ -68,6 +52,125 @@ if(isset($_GET['uid']))
 		die('Keine Berechtigung für UID übergabe');
 }
 $p = new phrasen(getSprache());
+$datum_obj = new datum();
+$db = new basis_db();
+
+if(isset($_GET['getAnmeldung']))
+{
+	$lehrveranstaltung_id=$_GET['lehrveranstaltung_id'];
+	$stsem = $_GET['stsem'];
+
+	echo $p->t('studienplan/LehrveranstalungWaehlen').'
+		<form action="'.$_SERVER['PHP_SELF'].'?uid='.$db->convert_html_chars($uid).'" method="POST">
+		<input type="hidden" name="action" value="anmeldung" />
+		<input type="hidden" name="stsem" value="'.$db->convert_html_chars($stsem).'" />';
+	$lehrveranstaltung = new lehrveranstaltung();
+	if($kompatibel = $lehrveranstaltung->loadLVkompatibel($lehrveranstaltung_id))
+	{
+		$anzahl=0;
+		foreach($kompatibel as $lvid)
+		{
+			$lvangebot = new  lvangebot();
+			$lvangebot->getAllFromLvId($lvid, $stsem);
+			if(isset($lvangebot->result[0]))
+			{
+				$lv = new lehrveranstaltung();
+				$lv->load($lvid);
+
+				$angebot = $lvangebot->result[0];
+				if($angebot->AnmeldungMoeglich())
+				{
+					$anzahl++;
+					// LV wird angeboten und Anmeldefenster ist offen
+
+					$bngruppe = new benutzergruppe();
+					if(!$bngruppe->load($uid, $lvangebot->result[0]->gruppe_kurzbz, $stsem))
+						echo '<br><input type="radio" value="'.$lvid.'" name="lv"/>'.$lv->bezeichnung;
+					else
+					{
+						// Bereits angemeldet
+						echo '<br><input type="radio" disabled="true" value="'.$lvid.'" name="lv" /><span class="ok">'.$lv->bezeichnung.'</span> - Bereits angemeldet';
+					}
+				}
+				else
+				{
+					// LV wird angeboten, Anmeldefenster ist aber nicht offen
+					echo '<br><input type="radio" disabled="true" value="'.$lvid.'" name="lv" /><span style="color:gray;">'.$lv->bezeichnung.' - '.$angebot->errormsg.'</span>';
+				}
+			}
+		}
+	}
+	if($anzahl>0)
+		echo '<br><br><input type="submit" value="Anmelden" /></form>';
+	else
+		echo '<br><br>'.$p->t('studienplan/AnmeldungDerzeitNichtMoeglich');
+	exit();
+}
+echo '<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Studienplan</title>
+	<link rel="stylesheet" href="../../../skin/fhcomplete.css" />
+	<link rel="stylesheet" href="../../../skin/style.css.php" />
+	<link rel="stylesheet" href="../../../skin/jquery.css" />
+	<link rel="stylesheet" href="../../../skin/jquery-ui-1.9.2.custom.min.css" />
+	<script type="text/javascript" src="../../../include/js/jquery1.9.min.js"></script>
+
+	<script type="text/javascript">
+	$(document).ready(function() {
+		$("#dialog").dialog({ autoOpen: false });
+	});
+
+	function OpenAnmeldung(lehrveranstaltung_id, stsem)
+	{
+		$("#dialog").load("studienplan.php?getAnmeldung=true&lehrveranstaltung_id="+lehrveranstaltung_id+"&stsem="+stsem+"&uid='.$db->convert_html_chars($uid).'");
+		$("#dialog").dialog("open");
+	}
+	</script>
+</head>
+<body>
+<div id="dialog" title="Anmeldung">Anmeldung</div>
+';
+
+if(isset($_POST['action']) && $_POST['action']=='anmeldung')
+{
+	$lehrveranstaltung_id = $_POST['lv'];
+	$stsem = $_POST['stsem'];
+
+	$lvangebot = new lvangebot();
+	$lvangebot->getAllFromLvId($lehrveranstaltung_id, $stsem);
+
+	if(isset($lvangebot->result[0]))
+	{
+		if($lvangebot->result[0]->AnmeldungMoeglich())
+		{
+			// Benutzer einschreiben
+			//echo "Anmeldung zur LV: ".$_POST['lv'].$_POST['stsem'];
+			$bngruppe = new benutzergruppe();
+
+			if(!$bngruppe->load($uid, $lvangebot->result[0]->gruppe_kurzbz, $stsem))
+			{
+				$bngruppe->uid = $uid;
+				$bngruppe->gruppe_kurzbz = $lvangebot->result[0]->gruppe_kurzbz;
+				$bngruppe->studiensemester_kurzbz = $stsem;
+				$bngruppe->new=true;
+				if($bngruppe->save())
+				{
+					echo '<span class="ok">Sie wurden erfolgreich in die Lehrveranstaltung eingeschrieben</span>';
+				}
+			}
+			else
+			{
+				echo '<span class="error">Sie sind bereits zu dieser Lehrveranstaltung angemeldet'.$uid.'/'.$lvangebot->result[0]->gruppe_kurzbz.'/'.$stsem.' '.$bngruppe->errormsg.'</span>';
+			}
+		}
+		else
+			echo $lvangebot->result[0]->errormsg;
+	}
+	else
+		echo 'Keine Anmeldung moeglich';
+}
 
 $db = new basis_db();
 $datum_obj = new datum();
@@ -83,8 +186,10 @@ $studiensemester_start = $prestudent->studiensemester_kurzbz;
 $ausbildungssemester_start = $prestudent->ausbildungssemester;
 $orgform_kurzbz = $prestudent->orgform_kurzbz;
 
+$prestudent->getLastStatus($student->prestudent_id, 'Student');
+$studienplan_id = $prestudent->studienplan_id;
+
 $studienplan = new studienplan();
-$studienplan_id = $studienplan->getStudienplan($student->studiengang_kz, $studiensemester_start, $ausbildungssemester_start, $orgform_kurzbz);
 $studienplan->loadStudienplan($studienplan_id);
 
 // Studienplan laden
@@ -124,7 +229,7 @@ foreach($note->result as $row_note)
 // LV Angebot holen
 $lvangebot_arr  = array();
 $lvangebot = new lvangebot();
-$lvangebot->getLVAngebotFromStudienplan($studienplan_id, $stsem_arr);
+$lvangebot->getLVAngebotFromStudienplan($studienplan_id, $stsem_arr,true);
 foreach($lvangebot->result as $row_lvangebot)
 	$lvangebot_arr[$row_lvangebot->lehrveranstaltung_id][$row_lvangebot->studiensemester_kurzbz]=$row_lvangebot;
 
@@ -135,7 +240,7 @@ $lv->loadLehrveranstaltungStudienplan($studienplan_id);
 foreach($lv->lehrveranstaltungen as $row_lva)
 	$lv_arr[$row_lva->lehrveranstaltung_id]=$row_lva;
 
-echo '<h1>'.$p->t('studienplan/studienplan').": $studienplan->bezeichnung ($studienplan_id) - $student->vorname $student->nachname</h1>";
+echo '<h1>'.$p->t('studienplan/studienplan').": $studienplan->bezeichnung ($studienplan_id) - $student->vorname $student->nachname ( $student->uid )</h1>";
 
 echo '<table style="border: 1px solid black">
 	<thead>
@@ -163,15 +268,31 @@ function drawTree($tree, $depth)
 
 	foreach($tree as $row_tree)
 	{
-		echo '<tr>';
+		echo "\n<tr>";
 		echo '<td>';
 
 		// Einrückung für Subtree
 		for($i=0;$i<$depth;$i++)
 			echo '&nbsp;&nbsp;&nbsp;&nbsp;';
 
+		$lvkompatibel = new lehrveranstaltung();
+		$lvkompatibel_arr = $lvkompatibel->loadLVkompatibel($row_tree->lehrveranstaltung_id);
+		$lvkompatibel_arr[]=$row_tree->lehrveranstaltung_id;
+
+		$lvregel = new lvregel();
+		if($lvregel->exists($row_tree->studienplan_lehrveranstaltung_id))
+		{
+			if($lvregel->isAbgeschlossen($uid, $row_tree->studienplan_lehrveranstaltung_id))
+				echo '<span class="ok">';
+			else
+				echo '<span class="error">';
+		}
+		else
+			echo '<span>';
+
 		// Bezeichnung der Lehrveranstaltung
 		echo $row_tree->bezeichnung;
+		echo '</span>';
 		echo '</td>';
 		
 		// ECTS Punkte
@@ -190,6 +311,7 @@ function drawTree($tree, $depth)
 				if($note_pruef_arr[$note]->positiv)
 					$positiv=true;
 			}
+
 			if($positiv)
 				echo '<span class="ok">'.$p->t('studienplan/abgeschlossen').'</span>';
 			else
@@ -197,7 +319,10 @@ function drawTree($tree, $depth)
 		}
 		else
 		{
-			echo '<span>'.$p->t('studienplan/offen').'</span>';
+			if(!$row_tree->stpllv_pflicht)
+				echo '<span>'.$p->t('studienplan/optional').'</span>';
+			else
+				echo '<span>'.$p->t('studienplan/offen').'</span>';
 		}
 		echo '</td>';
 
@@ -228,56 +353,83 @@ function drawTree($tree, $depth)
 			}
 			else
 			{
-				// Angebot der LV pruefen
-				if(isset($lvangebot_arr[$row_tree->lehrveranstaltung_id])
-				&& isset($lvangebot_arr[$row_tree->lehrveranstaltung_id][$stsem]))
-				{				
-					// LV findet statt
-					$angebot = $lvangebot_arr[$row_tree->lehrveranstaltung_id][$stsem];
+				// Angebot der LV und der Kompatiblen pruefen
+				$anmeldungmoeglich=false;
+				$angemeldet=false;
+				$semesterlock=false;
+				$regelerfuellt=true;
+				$anmeldeinformation='';
+				$angebot_vorhanden=false;
 
-					// Pruefen ob eine Anmeldung möglich ist
-					$anmeldungmoeglich=true;
+				// Regeln Pruefen
+				$lvregel = new lvregel();
 
-					// Anmelde Zeitfenster pruefen
-					if(!$datum_obj->between($angebot->anmeldefenster_start, $angebot->anmeldefenster_ende, date('Y-m-d H:i:s')))
-					{
-						$anmeldeinformation=$p->t('studienplan/anmeldungvonbis',array($datum_obj->formatDatum($angebot->anmeldefenster_start,'d.m.Y H:i'),$datum_obj->formatDatum($angebot->anmeldefenster_ende,'d.m.Y H:i')));
-						$anmeldungmoeglich=false;
-					}
-				
-					if($anmeldungmoeglich)
-					{
-						// Regeln Pruefen
-						$lvregel = new lvregel();
-
-						// Pruefen ob Semestersperre vorhanden ist
-						if(!$lvregel->checkSemester($row_tree->studienplan_lehrveranstaltung_id, $semester))
-						{
-							echo '<img src="../../../skin/images/lock.png" title="'.$p->t('studienplan/anmeldunggesperrt').'">';
-						}
-						else
-						{
-							if($lvregel->isZugangsberechtigt($uid, $row_tree->studienplan_lehrveranstaltung_id, $stsem))
-							{
-								echo '<a href="lv_anmeldung.php">'.$p->t('studienplan/anmelden').'</a>';
-							}
-							else
-							{
-								// LV wird angeboten, Regeln für Anmeldung nicht erfüllt
-								echo '<span title="'.$p->t('studienplan/regelnichterfuellt').'">X</span>';
-							}
-						}
-					}
-					else
-					{
-						// LV wird angeboten - Anmeldung aber noch nicht moeglich
-						echo '<span title="'.$anmeldeinformation.'">X</a>';
-					}
+				// Pruefen ob Semestersperre vorhanden ist
+				if(!$lvregel->checkSemester($row_tree->studienplan_lehrveranstaltung_id, $semester))
+				{
+					$semesterlock=true;
 				}
 				else
 				{
-					// LV wird in diesem Studiensemester nicht angeboten
-					echo '-';
+					if(!$lvregel->isZugangsberechtigt($uid, $row_tree->studienplan_lehrveranstaltung_id, $stsem))
+					{
+						$regelerfuellt=false;
+					}
+				}
+
+				foreach($lvkompatibel_arr as $row_lvid)
+				{
+					// Angebot der LV pruefen
+					if(isset($lvangebot_arr[$row_lvid])
+					&& isset($lvangebot_arr[$row_lvid][$stsem]))
+					{				
+						$angebot_vorhanden=true;
+						// LV findet statt
+						$angebot = $lvangebot_arr[$row_lvid][$stsem];
+
+						if($angebot->gruppe_kurzbz!='')
+						{
+							// Pruefen ob bereits angemeldet
+							$bngruppe = new benutzergruppe();
+							if($bngruppe->load($uid, $angebot->gruppe_kurzbz, $stsem))
+							{
+								// Bereits angemeldet
+								$angemeldet=true;
+							}
+						}
+
+						// Pruefen ob eine Anmeldung möglich ist
+						if($angebot->AnmeldungMoeglich())
+						{
+							if(!$angemeldet)
+								$anmeldungmoeglich=true;
+						}
+						else
+							$anmeldeinformation.=$angebot->errormsg;
+					}
+				}
+
+				if($semesterlock)
+				{
+					echo '<img src="../../../skin/images/lock.png" title="'.$p->t('studienplan/anmeldunggesperrt').'">';
+				}
+				else
+				{
+					if($angebot_vorhanden)
+					{
+						if($anmeldungmoeglich)		
+							echo '<a href="#" onclick="OpenAnmeldung(\''.$row_tree->lehrveranstaltung_id.'\',\''.$stsem.'\'); return false;">'.$p->t('studienplan/anmelden').'</a>';
+						else
+							echo '<span title="'.$anmeldeinformation.'">X</a>';
+
+						if(!$regelerfuellt)
+							echo '<span title="'.$p->t('studienplan/regelnichterfuellt').'">X</span>';
+					}
+					else
+					{
+						// LV wird nicht angeboten
+						echo '-';
+					}
 				}
 			}
 			echo '</td>';

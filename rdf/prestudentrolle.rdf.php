@@ -72,6 +72,7 @@ $ps->getPrestudentRolle($prestudent_id, $status_kurzbz, $studiensemester_kurzbz,
 
 foreach($ps->result as $row)
 {
+
 	echo '
 	  <RDF:li>
       	<RDF:Description  id="'.$row->prestudent_id.'/'.$row->status_kurzbz.'/'.$row->studiensemester_kurzbz.'/'.$row->ausbildungssemester.'"  about="'.$rdf_url.'/'.$row->prestudent_id.'/'.$row->status_kurzbz.'/'.$row->studiensemester_kurzbz.'/'.$row->ausbildungssemester.'" >
@@ -82,6 +83,8 @@ foreach($ps->result as $row)
         	<ROLLE:datum><![CDATA['.$datum->convertISODate($row->datum).']]></ROLLE:datum>
         	<ROLLE:datum_iso><![CDATA['.$row->datum.']]></ROLLE:datum_iso>
         	<ROLLE:orgform_kurzbz><![CDATA['.$row->orgform_kurzbz.']]></ROLLE:orgform_kurzbz>
+        	<ROLLE:studienplan_id><![CDATA['.$row->studienplan_id.']]></ROLLE:studienplan_id>
+        	<ROLLE:studienplan_bezeichnung><![CDATA['.$row->studienplan_bezeichnung.']]></ROLLE:studienplan_bezeichnung>
       	</RDF:Description>
       </RDF:li>
 	';

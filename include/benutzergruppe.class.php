@@ -74,7 +74,7 @@ class benutzergruppe extends basis_db
 			}
 			else 
 			{
-				$this->errormsg = 'Es wurde keine Datensatz gefunden';
+				$this->errormsg = 'Es wurde kein Datensatz gefunden';
 				return false;				
 			}
 		}

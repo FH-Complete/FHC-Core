@@ -597,6 +597,7 @@ if(!$error)
 									$prestd_neu->datum = date('Y-m-d');
 									$prestd_neu->ausbildungssemester = $sem;
 									$prestd_neu->orgform_kurzbz = $prestd->orgform_kurzbz;
+									$prestd_neu->studienplan_id = $prestd->studienplan_id;
 									$prestd_neu->insertamum = date('Y-m-d H:i:s');
 									$prestd_neu->insertvon = $user;
 									$prestd_neu->new = true;
@@ -875,6 +876,7 @@ if(!$error)
 						$rolle->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
 						$rolle->datum = $_POST['datum'];
 						$rolle->orgform_kurzbz = $_POST['orgform_kurzbz'];
+						$rolle->studienplan_id = $_POST['studienplan_id'];
 						
 						if($rolle->save_rolle())
 							$return = true;
@@ -1040,6 +1042,7 @@ if(!$error)
 																	$rolle->studiensemester_kurzbz = $hlp->result[0]->studiensemester_kurzbz;
 																	$rolle->ausbildungssemester = $hlp->result[0]->ausbildungssemester;
 																	$rolle->orgform_kurzbz = $hlp->result[0]->orgform_kurzbz;
+																	$rolle->studienplan_id = $hlp->result[0]->studienplan_id;
 																	$rolle->datum = date('Y-m-d');
 																	$rolle->insertamum = date('Y-m-d H:i:s');
 																	$rolle->insertvon = $user;

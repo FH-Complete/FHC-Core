@@ -538,6 +538,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#prestudent_id" />
 							<splitter class="tree-splitter"/>
+							<treecol id="student-prestudent-tree-rolle-studienplan_id" label="StudienplanID" flex="2" hidden="true" persist="hidden, width, ordinal"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#studienplan_id" />
+							<splitter class="tree-splitter"/>
+							<treecol id="student-prestudent-tree-rolle-studienplan_bezeichnung" label="Studienplan" flex="2" hidden="true" persist="hidden, width, ordinal"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#studienplan_bezeichnung" />
+							<splitter class="tree-splitter"/>
 						</treecols>
 			
 						<template>
@@ -551,6 +559,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#datum"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#orgform_kurzbz"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#prestudent_id"/>
+											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#studienplan_id"/>
+											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#studienplan_bezeichnung"/>
 										</treerow>
 									</treeitem>
 								</treechildren>

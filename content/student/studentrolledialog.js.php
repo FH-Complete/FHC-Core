@@ -56,6 +56,7 @@ function StudentRolleInit(prestudent_id, status_kurzbz, studiensemester_kurzbz, 
 		//RDF parsen	
 		datum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#datum" ));
 		orgform_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#orgform_kurzbz" ));
+		studienplan_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studienplan_id" ));
 		neu = false;
 	}
 	else
@@ -72,6 +73,7 @@ function StudentRolleInit(prestudent_id, status_kurzbz, studiensemester_kurzbz, 
 		ausbildungssemester='1';
 		datum = '<?php echo date('d.m.Y') ?>';
 		orgform_kurzbz='';
+		studienplan_id='';
 	}		
 	
 	document.getElementById('student-rolle-textbox-prestudent_id').value=prestudent_id;
@@ -80,6 +82,7 @@ function StudentRolleInit(prestudent_id, status_kurzbz, studiensemester_kurzbz, 
 	document.getElementById('student-rolle-menulist-ausbildungssemester').value=ausbildungssemester;
 	document.getElementById('student-rolle-datum-datum').value=datum;
 	document.getElementById('student-rolle-menulist-orgform_kurzbz').value=orgform_kurzbz;
+	MenulistSelectItemOnValue('student-rolle-menulist-studienplan', studienplan_id);
 }
 
 // ****

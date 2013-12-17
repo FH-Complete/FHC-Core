@@ -3,6 +3,7 @@ $this->phrasen['studienplan/studienplan']='Studienplan';
 $this->phrasen['studienplan/ects']='ECTS';
 $this->phrasen['studienplan/status']='Status';
 $this->phrasen['studienplan/offen']='offen';
+$this->phrasen['studienplan/optional']='optional';
 $this->phrasen['studienplan/abgeschlossen']='abgeschlossen';
 $this->phrasen['studienplan/negativ']='negativ';
 $this->phrasen['studienplan/anmelden']='anmelden';
@@ -13,4 +14,7 @@ $this->phrasen['studienplan/legende']='Legende';
 $this->phrasen['studienplan/legendeLVwirdAngeboten']='Lehrveranstaltung wird in diesem Semester angeboten';
 $this->phrasen['studienplan/legendeLock']='Lehrveranstaltung für dieses Semester gesperrt';
 $this->phrasen['studienplan/legendeEmpfehlung']='Empfehlung';
+$this->phrasen['studienplan/LehrveranstalungWaehlen']='Bitte wählen Sie die Lehrveranstaltung zu der Sie sich anmelden möchten:';
+$this->phrasen['studienplan/AnmeldungDerzeitNichtMoeglich']='Derzeit sind noch keine Anmeldungen moeglich';
 ?>
+

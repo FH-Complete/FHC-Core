@@ -29,6 +29,7 @@ header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/person.class.php');
 require_once('../../include/prestudent.class.php');
+require_once('../../include/studienplan.class.php');
 
 echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 
@@ -101,6 +102,7 @@ $db = new basis_db();
 							<menuitem value="Student" label="Student"/>
 							<menuitem value="Unterbrecher" label="Unterbrecher"/>
 							<menuitem value="Diplomand" label="Diplomand"/>
+							<menuitem value="Incoming" label="Incoming"/>
 						</menupopup>
 					</menulist>
 				</row>
@@ -124,7 +126,7 @@ $db = new basis_db();
 						<menupopup>
 						<?php
 							$maxsem=10;
-							$qry = "SELECT max(semester) as maxsem FROM public.tbl_lehrverband WHERE studiengang_kz=(SELECT studiengang_kz FROM public.tbl_prestudent WHERE prestudent_id='".addslashes($prestudent_id)."')";
+							$qry = "SELECT max(semester) as maxsem FROM public.tbl_lehrverband WHERE studiengang_kz=(SELECT studiengang_kz FROM public.tbl_prestudent WHERE prestudent_id=".$db->db_add_param($prestudent_id).")";
 							if($result = $db->db_query($qry))
 							{
 								if($row = $db->db_fetch_object($result))
@@ -171,11 +173,28 @@ $db = new basis_db();
 					<label value="Datum" control="student-rolle-datum-datum"/>
 					<box class='Datum' id="student-rolle-datum-datum" />
 				</row>
+				<row>
+					<label value="Studienplan" control="student-rolle-menulist-studienplan"/>
+					<menulist id="student-rolle-menulist-studienplan" >
+						<menupopup>
+						<menuitem value="" label="-- keine Auswahl --"/>
+						<?php
+						$studienplan = new studienplan();
+						$studienplan->getStudienplaene($prestudent->studiengang_kz);
+
+						foreach($studienplan->result as $row)
+						{
+								echo '<menuitem value="'.$row->studienplan_id.'" label="'.$row->bezeichnung.' ('.$row->version.' /'.$row->studienplan_id.')'.($row->aktiv?'AKTIV':'').'"/>';
+						}
+						?>
+						</menupopup>
+					</menulist>
+				</row>
 			</rows>
 	</grid>
 	<hbox>
 		<spacer flex="1" />
-		<button id="student-rolel-button-speichern" oncommand="StudentRolleSpeichern()" label="Speichern" />
+		<button id="student-rolle-button-speichern" oncommand="StudentRolleSpeichern()" label="Speichern" />
 	</hbox>
 </groupbox>
 </vbox>
