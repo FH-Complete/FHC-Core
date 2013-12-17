@@ -264,6 +264,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 											</template>
 										</menulist>
 									</row>
+									<row>
+										<label value="Credit Points" control="student-konto-textbox-credit_points"/>
+										<hbox>
+					      					<textbox id="student-konto-textbox-credit_points" disabled="true" maxlength="9" size="9"/>
+					      					<spacer flex="1" />			
+					      				</hbox>
+									</row>
 								</rows>
 							</grid>
 							<hbox>

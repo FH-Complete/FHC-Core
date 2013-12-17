@@ -58,6 +58,15 @@ echo '<!DOCTYPE html>
 	
 	<script src="studienordnung_lvregel.js" type="text/javascript"></script>
 	<script src="studienordnung.js" type="text/javascript"></script>
+	<style type="text/css">
+		.col_ects {
+			//width: auto;
+		}
+		
+		.header_ects {
+			//width: auto !important;
+		}
+	</style>
 
 	<script type="text/javascript">
 	$(function() 
@@ -168,7 +177,7 @@ echo '
 			&nbsp;
 			</div>
 			<div id="treeWrapper">
-				<div id="data" style="min-height: 10px;">
+				<div id="data" style="min-height: 10px; min-width: 800px;">
 					&nbsp;
 				</div>
 			</div>
@@ -195,7 +204,7 @@ echo '
 					<p>Klicken Sie auf eine Lehrveranstaltung um die Regeln anzuzeigen</p>
 				</div>
 				<div id="tab-kompatibel">
-					<p>Kompatibilität</p>
+					<p>Klicken Sie auf eine Lehrveranstaltung um die kompatiblen Lehrveranstaltungen anzuzeigen</p>
 				</div>
 			</div>
 			<!-- Tabs ende -->

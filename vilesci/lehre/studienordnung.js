@@ -85,7 +85,7 @@ function loadStudienordnung()
 		error: loadError
 	}).success(function(data)
 	{
-		console.log(data);
+//		console.log(data);
 		if(data.error=='true')
 		{
 			alert('Fehler:'+data.errormsg);
@@ -142,7 +142,7 @@ function loadStudienplanSTO(neue_studienordnung_id,bezeichnung)
 		error: loadError
 	}).success(function(data)
 	{
-		console.log(data);
+//		console.log(data);
 		if(data.error=='true')
 		{
 			alert('Fehler:'+data.errormsg);
@@ -249,7 +249,6 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 						"check_move": function(m) {
 							if(m.r.attr("rel")==="semester" && (m.p === "inside" || m.p === "before"))
 							{
-								console.log("test");
 								return true;
 							}
 
@@ -273,9 +272,9 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 				},
 				grid: {
 					columns: [
-						{width: 300, header: "Lehrveranstaltung", value: "bezeichnung", source: "metadata"},
-						{width: 50, header: "ECTS", value: "ects", source: "metadata"},
-						{width: 120, header: "Semesterstunden", value: "semesterstunden", source: "metadata"}
+						{width: 300, header: "Lehrveranstaltung", value: "bezeichnung", source: "metadata", headerClass: "header_lv"},
+						{width: 50, header: "ECTS", value: "ects", source: "metadata", wideCellClass: "col_ects", headerClass: "header_ects"},
+						{width: 120, header: "Semesterstunden", value: "semesterstunden", source: "metadata", cellClass: "col_semesterstunden"}
 					],
 					resizable: true
 				},
@@ -349,6 +348,17 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 				writeOverallSum(nodes);
 			}).bind("loaded.jstree", function(event, data)
 			{
+//				$(".col_ects").css("width", "5%");
+//				$(".header_ects").css("width", "5%");
+//				$(".col_ects").css("min-width", "50px");
+//				$(".header_ects").css("min-width", "50px");
+//				
+//				$("#data").find(".jstree-grid-col-0").each(function(index){
+//					$(this).css("width", "40%");
+////					console.log(this);
+//				});
+//				$(".header_lv").css("width", "40%");
+				
 				var root = data.inst.get_container_ul();
 				var nodes = root[0].childNodes;
 //				console.log(nodes);
@@ -396,12 +406,26 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 				}
 				
 				// Regeln laden
-				if(stpllvid!==undefined)
-					LVRegelnloadRegeln(stpllvid);
-
+				if(data.rslt.obj.attr("rel") !== "semester")
+				{
+					if(stpllvid!==undefined)
+						LVRegelnloadRegeln(stpllvid);
+				}
+				else
+				{
+					$("#tab-regel").html("<p>Klicken Sie auf eine Lehrveranstaltung um die Regeln anzuzeigen</p>");
+				}
+				
 				// Kompatibilitaet laden
-				if(lvid!==undefined)
-					loadLVKompatibilitaet(lvid);
+				if(data.rslt.obj.attr("rel") !== "semester")
+				{
+					if(lvid!==undefined)
+						loadLVKompatibilitaet(lvid);
+				}
+				else
+				{
+					$("#tab-kompatibel").html("<p>Klicken Sie auf eine Lehrveranstaltung um die kompatiblen Lehrveranstaltungen anzuzeigen</p>");
+				}
 			});
 	/*	}
 		else
@@ -493,7 +517,7 @@ function LoadLVDetails(lvid, stpllvid)
 		error: loadError
 	}).success(function(data)
 	{
-		lvdata = data.result[0]
+		lvdata = data.result[0];
 		var html = "Bezeichnung: "+lvdata.bezeichnung;
 		html+="<br>Kurzbezeichnung: "+lvdata.kurzbz;
 		html+="<br>ID: "+lvdata.lehrveranstaltung_id;
@@ -955,7 +979,7 @@ function deleteLehrveranstaltungFromStudienplan(lehrveranstaltung_studienplan_id
 		}
 	}).success(function(data)
 	{
-		console.log(data);
+//		console.log(data);
 	});
 }
 
@@ -1094,32 +1118,25 @@ function saveStudienplan()
  */
 function writeEctsSum(parent)
 {
-//	console.log($(parent).children("li").length);
-//	console.log($(parent).children("ul").children());
 	for(var i=0; i<$(parent).children("ul").children().length; i++)
 	{
-//		console.log($(parent).children("ul").children().length);
 		if($(parent).children("ul").children().length > 0)
 		{
 			writeEctsSum($(parent).children("ul").children()[i]);
 		}	
 	}
-//	console.log($(parent).attr("rel"));
 	if($(parent).attr("rel") === "semester")
 	{
 		var cells = $(parent).find(".jstree-grid-col-1");
-	//	console.log(cells);
 		var sum = 0;
 		for(var j=1; j<cells.length; j++)
 		{
 			if(!isNaN(parseFloat(cells[j].childNodes[0].innerHTML)))
 			{
 				sum+=parseFloat(cells[j].childNodes[0].innerHTML);
-//				console.log(sum);
 			}
 		}
 		cells[0].childNodes[0].innerHTML = "<b>"+sum+"</b>";
-	//	console.log(cells[0].childNodes[0]);
 	}
 }
 
