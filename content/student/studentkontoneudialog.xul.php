@@ -65,6 +65,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 					        		      label="rdf:http://www.technikum-wien.at/buchungstyp/rdf#beschreibung"
 					        		      standardbetrag="rdf:http://www.technikum-wien.at/buchungstyp/rdf#standardbetrag"
 					        		      standardtext="rdf:http://www.technikum-wien.at/buchungstyp/rdf#standardtext"
+										  credit_points="rdf:http://www.technikum-wien.at/buchungstyp/rdf#credit_points"
 								  		  uri="rdf:*"/>
 								</menupopup>
 							</rule>
@@ -109,6 +110,13 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 								</menupopup>
 						</template>
 					</menulist>
+				</row>
+				<row>
+					<label value="Credit Points" control="student-konto-neu-textbox-credit_points"/>
+					<hbox>
+						<textbox id="student-konto-neu-textbox-credit_points" maxlength="9" size="9" value='0.00'/>
+						<spacer flex="1" />			
+      				</hbox>
 				</row>
 			</rows>
 	</grid>

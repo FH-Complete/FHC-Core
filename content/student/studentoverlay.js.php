@@ -2048,6 +2048,7 @@ function StudentKontoAuswahl()
 	buchungstext = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#buchungstext" ));
 	mahnspanne = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#mahnspanne" ));
 	buchungstyp_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#buchungstyp_kurzbz" ));
+	credit_points = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#credit_points" ));
 
 	document.getElementById('student-konto-textbox-betrag').value=betrag;
 	document.getElementById('student-konto-textbox-buchungsdatum').value=buchungsdatum;
@@ -2057,6 +2058,7 @@ function StudentKontoAuswahl()
 	document.getElementById('student-konto-textbox-buchungsnr').value=buchungsnr;
 	document.getElementById('student-konto-menulist-studiensemester').value=studiensemester_kurzbz;
 	document.getElementById('student-konto-menulist-studiengang_kz').value=studiengang_kz;
+	document.getElementById('student-konto-textbox-credit_points').value=credit_points;
 }
 
 // ****
@@ -2267,6 +2269,7 @@ function StudentKontoDetailDisableFields(val)
 	document.getElementById('student-konto-textbox-buchungsdatum').disabled=val;
 	document.getElementById('student-konto-textbox-buchungstext').disabled=val;
 	document.getElementById('student-konto-textbox-mahnspanne').disabled=val;
+	document.getElementById('student-konto-textbox-credit_points').disabled=val;
 	document.getElementById('student-konto-menulist-buchungstyp').disabled=val;
 	document.getElementById('student-konto-menulist-studiensemester').disabled=val;
 	document.getElementById('student-konto-menulist-studiengang_kz').disabled=val;
@@ -2288,6 +2291,7 @@ function StudentKontoDetailSpeichern()
 	buchungsnr = document.getElementById('student-konto-textbox-buchungsnr').value;
 	studiensemester_kurzbz = document.getElementById('student-konto-menulist-studiensemester').value;
 	studiengang_kz = document.getElementById('student-konto-menulist-studiengang_kz').value;
+	credit_points = document.getElementById('student-konto-textbox-credit_points').value;
 	
 	if(buchungsdatum!='' && !CheckDatum(buchungsdatum))
 	{
@@ -2307,6 +2311,7 @@ function StudentKontoDetailSpeichern()
 	req.add('buchungsnr', buchungsnr);
 	req.add('studiensemester_kurzbz', studiensemester_kurzbz);
 	req.add('studiengang_kz', studiengang_kz);
+	req.add('credit_points', credit_points);
 
 	var response = req.executePOST();
 
@@ -2454,6 +2459,7 @@ function StudentKontoNeuSpeichern(dialog, person_ids, studiengang_kz)
 	mahnspanne = dialog.getElementById('student-konto-neu-textbox-mahnspanne').value;
 	buchungstyp_kurzbz = dialog.getElementById('student-konto-neu-menulist-buchungstyp').value;
 	studiensemester_kurzbz = dialog.getElementById('student-konto-neu-menulist-studiensemester').value;
+	credit_points = dialog.getElementById('student-konto-neu-textbox-credit_points').value;
 	
 	if(buchungsdatum!='' && !CheckDatum(buchungsdatum))
 	{
@@ -2471,6 +2477,7 @@ function StudentKontoNeuSpeichern(dialog, person_ids, studiengang_kz)
 	req.add('mahnspanne', mahnspanne);
 	req.add('buchungstyp_kurzbz', buchungstyp_kurzbz);
 	req.add('studiensemester_kurzbz', studiensemester_kurzbz);
+	req.add('credit_points', credit_points);
 
 	var response = req.executePOST();
 

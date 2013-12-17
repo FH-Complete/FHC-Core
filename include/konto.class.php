@@ -222,7 +222,7 @@ class konto extends basis_db
 				   ' updatevon='.$this->addslashes($this->updatevon).','.
 				   ' insertamum='.$this->addslashes($this->insertamum).','.
 				   ' insertvon='.$this->addslashes($this->insertvon).','.
-				   ' ext_id='.$this->addslashes($this->ext_id).
+				   ' ext_id='.$this->addslashes($this->ext_id).','.
 				   ' credit_points='.$this->addslashes($this->credit_points).
 				   " WHERE buchungsnr='".addslashes($this->buchungsnr)."';";
 
@@ -415,6 +415,7 @@ class konto extends basis_db
 				$typ->beschreibung = $row->beschreibung;
 				$typ->standardbetrag = $row->standardbetrag;
 				$typ->standardtext = $row->standardtext;
+				$typ->credit_points = $row->credit_points;
 				$typ->aktiv = ($row->aktiv=='t'?true:false);
 
 				$this->result[] = $typ;
