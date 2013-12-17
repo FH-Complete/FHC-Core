@@ -465,7 +465,8 @@ class studienplan extends basis_db
 	 * @param Lehrveranstaltung ID
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function loadLehrveranstaltungStudienplanByLvId($studienplan_id, $lehrveranstaltung_id){
+	public function loadLehrveranstaltungStudienplanByLvId($studienplan_id, $lehrveranstaltung_id)
+	{
 		if($this->containsLehrveranstaltung($studienplan_id, $lehrveranstaltung_id))
 		{
 			if (!is_numeric($studienplan_id) || $studienplan_id === '') {
@@ -492,12 +493,14 @@ class studienplan extends basis_db
 						tbl_studienplan_lehrveranstaltung.studienplan_id=" . $this->db_add_param($studienplan_id, FHC_INTEGER).
 						" AND tbl_lehrveranstaltung.lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER).";";
 
-			if (!$this->db_query($qry)) {
+			if (!$this->db_query($qry)) 
+			{
 				$this->errormsg = 'Datensatz konnte nicht geladen werden';
 				return false;
 			}
 
-			if ($row = $this->db_fetch_object()) {
+			if ($row = $this->db_fetch_object()) 
+			{
 				$this->studienplan_id = $row->studienplan_id;
 				$this->stpllv_semester = $row->stpllv_semester;
 				$this->stpllv_pflicht = $this->db_parse_bool($row->stpllv_pflicht);
@@ -518,9 +521,11 @@ class studienplan extends basis_db
 	 * Speichert die Zuordnung einer Lehrveranstaltung zu einem Studienplan
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function saveStudienplanLehrveranstaltung() {
+	public function saveStudienplanLehrveranstaltung() 
+	{
 
-		if ($this->new) {
+		if ($this->new) 
+		{
 			//Neuen Datensatz einfuegen
 			$qry = 'BEGIN;INSERT INTO lehre.tbl_studienplan_lehrveranstaltung (studienplan_id, lehrveranstaltung_id,
 				semester,studienplan_lehrveranstaltung_id_parent,pflicht, koordinator,
@@ -533,45 +538,58 @@ class studienplan extends basis_db
 					$this->db_add_param($this->koordinator) . ', ' .
 					'now(), ' .
 					$this->db_add_param($this->insertvon) . ');';
-		} else {
+		} 
+		else 
+		{
 			//Pruefen ob studienplan_id eine gueltige Zahl ist
-			if (!is_numeric($this->studienplan_lehrveranstaltung_id)) {
+			if (!is_numeric($this->studienplan_lehrveranstaltung_id)) 
+			{
 				$this->errormsg = 'studienplan_lehrveranstaltung_id muss eine gueltige Zahl sein';
 				return false;
 			}
+
 			$qry = 'UPDATE lehre.tbl_studienplan_lehrveranstaltung SET' .
 					' studienplan_id=' . $this->db_add_param($this->studienplan_id, FHC_INTEGER) . ', ' .
 					' lehrveranstaltung_id=' . $this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER) . ', ' .
 					' semester=' . $this->db_add_param($this->semester, FHC_INTEGER) . ', ' .
 					' studienplan_lehrveranstaltung_id_parent=' . $this->db_add_param($this->studienplan_lehrveranstaltung_id_parent, FHC_INTEGER) . ', ' .
 					' pflicht=' . $this->db_add_param($this->pflicht, FHC_BOOLEAN) . ', ' .
-					//TODO sprache in Tabelle nicht vorhanden' sprache=' . $this->db_add_param($this->sprache) . ', ' .
 					' koordinator=' . $this->db_add_param($this->koordinator) . ', ' .
 					' updateamum= now(), ' .
 					' updatevon=' . $this->db_add_param($this->updatevon) . ' ' .
 					' WHERE studienplan_lehrveranstaltung_id=' . $this->db_add_param($this->studienplan_lehrveranstaltung_id, FHC_INTEGER, false) . ';';
 			}
 
-		if ($this->db_query($qry)) {
-			if ($this->new) {
+		if ($this->db_query($qry)) 
+		{
+			if ($this->new) 
+			{
 				//naechste ID aus der Sequence holen
 				$qry = "SELECT currval('lehre.seq_studienplan_studienplan_lehrveranstaltung_id') as id;";
-				if ($this->db_query($qry)) {
-					if ($row = $this->db_fetch_object()) {
+				if ($this->db_query($qry)) 
+				{
+					if ($row = $this->db_fetch_object()) 
+					{
 						$this->studienplan_lehrveranstaltung_id = $row->id;
 						$this->db_query('COMMIT');
-					} else {
+					}
+					else 
+					{
 						$this->db_query('ROLLBACK');
 						$this->errormsg = "Fehler beim Auslesen der Sequence";
 						return false;
 					}
-				} else {
+				}
+				else 
+				{
 					$this->db_query('ROLLBACK');
 					$this->errormsg = 'Fehler beim Auslesen der Sequence';
 					return false;
 				}
 			}
-		} else {
+		}
+		else 
+		{
 			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
 			return false;
 		}
@@ -680,5 +698,46 @@ class studienplan extends basis_db
 		}
 	}
 
+	/**
+	 * Holt alle Studienplaene eines Studienganges
+	 * @param $studiengang_kz
+	 */
+	function getStudienplaene($studiengang_kz)
+	{
+		$qry = "SELECT 
+					distinct tbl_studienplan.*
+				FROM 
+					lehre.tbl_studienplan 
+					JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+				WHERE 
+					tbl_studienordnung.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new studienplan();
+
+				$obj->studienplan_id = $row->studienplan_id;
+				$obj->studienordnung_id = $row->studienordnung_id;
+				$obj->orgform_kurzbz = $row->orgform_kurzbz;
+				$obj->version = $row->version;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->regelstudiendauer = $row->regelstudiendauer;
+				$obj->sprache = $row->sprache;
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$obj->semesterwochen = $row->semesterwochen;
+				$obj->testtool_sprachwahl = $this->db_parse_bool($row->testtool_sprachwahl);
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->new=false;
+
+				$this->result[] = $obj;
+			}
+			return true;			
+		}
+	}
 }
 ?>

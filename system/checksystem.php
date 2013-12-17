@@ -650,6 +650,18 @@ if(!$result = @$db->db_query("SELECT credit_points FROM public.tbl_konto LIMIT 1
 		echo 'public.tbl_konto / tbl_buchungstyp: Spalte credit_points hinzugefügt';
 }
 
+// studienplan_id in Tabelle prestudentstatus
+if(!$result = @$db->db_query("SELECT studienplan_id FROM public.tbl_prestudentstatus LIMIT 1;"))
+{
+    $qry = "ALTER TABLE public.tbl_prestudentstatus ADD COLUMN studienplan_id bigint;
+			ALTER TABLE public.tbl_prestudentstatus ADD CONSTRAINT fk_studienplan_prestudentstatus FOREIGN KEY (studienplan_id) REFERENCES lehre.tbl_studienplan(studienplan_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+			";
+    
+    if(!$db->db_query($qry))
+		echo '<strong>public.tbl_prestudentstatus: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'public.tbl_prestudentstatus: Spalte studienplan_id hinzugefügt';
+}
 
 echo '<br><br><br>';
 
@@ -824,7 +836,7 @@ $tabellen=array(
 	"public.tbl_preoutgoing_preoutgoing_status" => array("status_id","preoutgoing_status_kurzbz","preoutgoing_id","datum","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preoutgoing_status" => array("preoutgoing_status_kurzbz","bezeichnung"),
 	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat","rt_punkte3", "zgvdoktor_code", "zgvdoktorort", "zgvdoktordatum"),
-	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id"),
+	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id","studienplan_id"),
 	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung"),
 	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet"),
 	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id"),

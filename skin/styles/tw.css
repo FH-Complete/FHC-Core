@@ -908,6 +908,12 @@ ul.menu
 	padding-left: 5px;
 }
 
+/* Empfehlung im Studienplan */
+.empfehlung 
+{
+	background-color: #FFCECE;
+}
+
 /*
 ==== Menubox-Effekt am Seitenrand. Nettes Feature aber dzt. nicht sinnvoll einsetzbar ====
 */

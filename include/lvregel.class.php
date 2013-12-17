@@ -27,6 +27,8 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/student.class.php');
 require_once(dirname(__FILE__).'/prestudent.class.php');
 require_once(dirname(__FILE__).'/studiensemester.class.php');
+require_once(dirname(__FILE__).'/studienplan.class.php');
+require_once(dirname(__FILE__).'/lehrveranstaltung.class.php');
 
 class lvregel extends basis_db
 {
@@ -51,6 +53,8 @@ class lvregel extends basis_db
 
 	protected $lehrveranstaltung_bezeichnung;
 	protected $cache;
+
+	private $debug_level=0;
 
 	/**
 	 * Konstruktor
@@ -478,10 +482,10 @@ class lvregel extends basis_db
 	 */
 	public function isZugangsberechtigt($uid, $studienplan_lehrveranstaltung_id, $studiensemester_kurzbz=null)
 	{
-		$this->debug('Teste Zugangsberechtigung für '.$uid);
+		$this->debug('Teste Zugangsberechtigung für '.$uid,2);
 		if($result = $this->getLVRegelTree($studienplan_lehrveranstaltung_id))
 		{
-			return $this->TestRegeln($uid, $result, $studiensemester_kurzbz);
+				return $this->TestRegeln($uid, $result, $studiensemester_kurzbz);
 		}
 		return true;
 	}
@@ -492,18 +496,37 @@ class lvregel extends basis_db
 	 * @param $regel_obj Regel Baum
 	 * @param $studiensemester_kurzbz Studiensemester das geprueft werden soll
 	 */
-	public function TestRegeln($uid, $regel_obj, $studiensemester_kurzbz=null)
+	public function TestRegeln($uid, $regel_obj, $studiensemester_kurzbz=null, $retval=true)
 	{
-		$retval=true;
+		$ects=0;
 		foreach($regel_obj as $regel)
 		{
-			$this->debug('<br>');
-			$testval = $this->Test($uid, $regel, $studiensemester_kurzbz);
+
+			list($testval,$ects_tmp) = $this->Test($uid, $regel, $studiensemester_kurzbz, $retval);
 			$retval = $this->Compare($regel[0]->operator, $retval, $testval);
-			$this->debug(' - RETVAL:'.($retval?'TRUE':'FALSE'));
+			
+			if($regel[0]->operator=='x' && $ects==0 && $ects_tmp>0)
+			{
+				// Bei XOR nur hinzufügen wenn noch keine vorhanden
+				$this->debug('<br>Anrechnung von '.$ects_tmp.' ECTS Punkten aufgrund des XOR',3);
+				$ects+=$ects_tmp;
+			}
+			elseif(($regel[0]->operator=='u' || $regel[0]->operator=='o') && $ects_tmp>0)
+			{
+				// Bei AND und OR immer hinzufuegen
+				$this->debug('<br>Anrechnung von '.$ects_tmp.' ECTS Punkten aufgrund des AND/OR',3);
+				$ects+=$ects_tmp;
+			}
+			else
+			{
+				$this->debug('<br>keine Anrechnung von ECTS Punkten für diesen Eintrag',3);
+			}
+				
+			$this->debug('<br>Zwischenergebnis :'.($retval?'TRUE':'FALSE'),5);
+			$this->debug('ECTS:'.$ects,5);
 		}
 
-		return $retval;
+		return array($retval,$ects);
 	}
 
 	/**
@@ -518,19 +541,19 @@ class lvregel extends basis_db
 		switch($operator)
 		{
 			case 'u':
-				$this->debug(($retval?'T':'F').' && '.($testval?'T':'F'));
+				$this->debug(($retval?'T':'F').' && '.($testval?'T':'F'),5);
 				$retval=($retval && $testval);
-				$this->debug('='.($retval?'T':'F'));
+				$this->debug('='.($retval?'T':'F'),5);
 				break;
 			case 'o':
-				$this->debug(($retval?'T':'F').' || '.($testval?'T':'F'));
+				$this->debug(($retval?'T':'F').' || '.($testval?'T':'F'),5);
 				$retval=($retval || $testval);
-				$this->debug('='.($retval?'T':'F'));
+				$this->debug('='.($retval?'T':'F'),5);
 				break;
 			case 'x':
-				$this->debug(($retval?'T':'F').' XOR '.($testval?'T':'F'));
+				$this->debug(($retval?'T':'F').' XOR '.($testval?'T':'F'),5);
 				$retval=($retval xor $testval);
-				$this->debug('='.($retval?'T':'F'));
+				$this->debug('='.($retval?'T':'F'),5);
 				break;
 		}
 		return $retval;
@@ -542,11 +565,11 @@ class lvregel extends basis_db
 	 * @param $regel_obj
 	 * @param $studiensemester_kurzbz
 	 */
-	public function Test($uid, $regel_obj, $studiensemester_kurzbz=null)
+	public function Test($uid, $regel_obj, $studiensemester_kurzbz=null, $retvalglobal)
 	{
 		$regel = $regel_obj[0];
-
-		$this->debug('Teste Regel '.$regel->lvregel_id);
+		$ects=0;
+		$this->debug('<br><b>Teste Regel '.$regel->lvregel_id.'</b>',2);
 
 		switch($regel->lvregeltyp_kurzbz)
 		{
@@ -554,7 +577,7 @@ class lvregel extends basis_db
 				/* Prueft ob das Ausbildungssemester das mindestens erforderlich ist 
 					um die Lehrveranstaltung zu besuchen */
 				
-				$this->debug('Regeltyp ausbsemmin');
+				$this->debug('Regeltyp ausbsemmin',2);
 
 				// Wenn das Studiensemester nicht gesetzt ist, wird das aktuelle verwendet
 				if($studiensemester_kurzbz=='')
@@ -581,13 +604,13 @@ class lvregel extends basis_db
 				// Vergleichen des Ausbildungssemesters mit dem RegelParameter
 				if($ausbildungssemester>=$regel->parameter)
 				{
-					$this->debug('StudSem: '.$ausbildungssemester.' >= RegelParam: '.$regel->parameter);
+					$this->debug('StudSem: '.$ausbildungssemester.' >= RegelParam: '.$regel->parameter,4);
 					$this->debug('TRUE');
 					$retval = true;
 				}
 				else
 				{
-					$this->debug('StudSem: '.$ausbildungssemester.' >= RegelParam: '.$regel->parameter);
+					$this->debug('StudSem: '.$ausbildungssemester.' >= RegelParam: '.$regel->parameter,4);
 					$this->debug('FALSE');
 					$retval = false;
 				}
@@ -595,12 +618,13 @@ class lvregel extends basis_db
 
 
 			case 'lvpositiv':
-				$this->debug('Regeltyp lvpositiv');
+				$this->debug('Regeltyp lvpositiv:'.$regel->lehrveranstaltung_id,3);
 				$qry = "SELECT 
-							* 
+							tbl_lehrveranstaltung.ects, tbl_zeugnisnote.note
 						FROM 
 							lehre.tbl_zeugnisnote 
 							JOIN lehre.tbl_note USING(note) 
+							JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 						WHERE 
 							tbl_note.positiv 
 							AND student_uid=".$this->db_add_param($uid)."
@@ -610,20 +634,20 @@ class lvregel extends basis_db
 				{
 					if($row = $this->db_fetch_object($result))
 					{
-						$this->debug('Positive Note gefunden:'.$row->note);
-						$this->debug('TRUE');
+						$ects=$row->ects;
+						$this->debug('Positive Note gefunden:'.$row->note,3);
+						$this->debug('ECTS:'.$ects,3);
 						$retval = true;
 					}
 					else
 					{
-						$this->debug('Keine positive Note');
-						$this->debug('FALSE');
+						$this->debug('Keine positive Note',3);
 						$retval = false;
 					}
 				}
 				else
 				{
-					$this->debug('Fehler bei Abfrage');
+					$this->debug('Fehler bei Abfrage',1);
 					$this->errormsg = 'Fehler bei Abfrage';	
 					$retval = false;
 				}
@@ -637,13 +661,26 @@ class lvregel extends basis_db
 		// Subregeln dieser LVRegel pruefen
 		if(isset($regel_obj['childs']) && count($regel_obj['childs'])>0)
 		{
-			$this->debug('<br> - Subregel '.$regel->lvregel_id.' -');
-			$testval = $this->TestRegeln($uid, $regel_obj['childs']);
+			$this->debug('<br> == <b>Subregel:'.$regel->lvregel_id.'</b> Start ==',2);
+			list($testval,$ects_tmp) = $this->TestRegeln($uid, $regel_obj['childs'],null, $retval);
 			$retval = $this->Compare($regel->operator, $retval, $testval);
-			$this->debug('<br> - Subregel '.$regel->lvregel_id.' Ende-');
+
+/*
+			if($regel->operator=='x' && $ects==0 && $ects_tmp>0)
+			{
+				$this->debug('<br>Aufgrund des XOR Vergleichs werden '.$ects_tmp.' ECTS dazugerechnet');
+				$ects+=$ects_tmp;
+			}
+			if(($regel->operator=='u' || $regel->operator=='o'))
+			{
+				$this->debug('<br>Aufgrund des AND / OR Operators werden '.$ects_tmp.' ECTS dazugerechnet');
+				$ects+=$ects_tmp;
+			}
+*/
+			$this->debug('<br> == <b>Subregel '.$regel->lvregel_id.'</b> Ende ==<br>',2);
 		}
 
-		return $retval;
+		return array($retval,$ects);
 	}
 
 	/**
@@ -677,9 +714,43 @@ class lvregel extends basis_db
 		}
 	}
 
-	public function debug($msg)
+	/**
+	 * Prüft ob das Modul für den Studierenden abgeschlossen ist
+	 * @param $uid UID des Studierenden
+	 * @param $studienplan_lehrveranstaltung_id ID der Lehrveranstaltungszuordnung
+	 */
+	public function isAbgeschlossen($uid, $studienplan_lehrveranstaltung_id)
 	{
-		//echo ' '.$msg;
+		$this->debug('Teste Abschluss für '.$uid,2);
+		$ects=0;
+		$retval=true;
+
+		if($result = $this->getLVRegelTree($studienplan_lehrveranstaltung_id))
+		{
+			list($retval, $ects) = $this->TestRegeln($uid, $result, null);
+		}
+		else
+		{
+			// Keine Regeln vorhanden
+			return true;
+		}
+		$stpllv = new studienplan();
+		$stpllv->loadStudienplanLehrveranstaltung($studienplan_lehrveranstaltung_id);
+
+		$lv = new lehrveranstaltung();
+		$lv->load($stpllv->lehrveranstaltung_id);
+
+		$this->debug('Abgeschlossen:'.$retval.' ECTS:'.$ects,1);
+		if($ects>=$lv->ects && $retval)
+			return true;
+		else
+			return false;
+	}
+
+	public function debug($msg, $debug_level=1)
+	{
+		if($debug_level<=$this->debug_level)
+			echo ' '.$msg;
 	}
 }
 ?>

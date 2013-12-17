@@ -62,6 +62,8 @@ class prestudent extends person
 	public $updateamum;
 	public $updatevon;
 	public $orgform_kurzbz;
+	public $studienplan_id;
+	public $studienplan_bezeichnung;
 	
 	public $studiensemester_old='';
 	public $ausbildungssemester_old='';
@@ -398,7 +400,12 @@ class prestudent extends person
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);	
+		$qry = "SELECT 
+					tbl_prestudentstatus.*, tbl_studienplan.bezeichnung as studienplan_bezeichnung
+				FROM public.tbl_prestudentstatus 
+					LEFT JOIN lehre.tbl_studienplan USING(studienplan_id)
+				WHERE 
+					prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);	
 		if($status_kurzbz!=null)
 			$qry.= " AND status_kurzbz=".$this->db_add_param($status_kurzbz);
 		if($studiensemester_kurzbz!=null)
@@ -425,7 +432,8 @@ class prestudent extends person
 				$rolle->updateamum = $row->updateamum;
 				$rolle->updatevon = $row->updatevon;
 				$rolle->orgform_kurzbz = $row->orgform_kurzbz;
-				
+				$rolle->studienplan_id = $row->studienplan_id;
+				$rolle->studienplan_bezeichnung = $row->studienplan_bezeichnung;
 				$this->result[] = $rolle;
 			}
 			return true;
@@ -474,6 +482,8 @@ class prestudent extends person
 				$this->updatevon = $row->updatevon;
 				$this->ext_id_prestudent = $row->ext_id;
 				$this->orgform_kurzbz = $row->orgform_kurzbz;
+				$this->studienplan_id = $row->studienplan_id;
+
 				return true;
 			}
 			else 
@@ -713,7 +723,7 @@ class prestudent extends person
 
 			$qry = 'INSERT INTO public.tbl_prestudentstatus (prestudent_id, status_kurzbz, 
 					studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon, 
-					updateamum, updatevon, ext_id, orgform_kurzbz) VALUES('.
+					updateamum, updatevon, ext_id, orgform_kurzbz, studienplan_id) VALUES('.
 			       $this->db_add_param($this->prestudent_id).",".
 			       $this->db_add_param($this->status_kurzbz).",".
 			       $this->db_add_param($this->studiensemester_kurzbz).",".
@@ -724,7 +734,8 @@ class prestudent extends person
 			       $this->db_add_param($this->updateamum).",".
 			       $this->db_add_param($this->updatevon).",".
 			       $this->db_add_param($this->ext_id_prestudent).",".
-			       $this->db_add_param($this->orgform_kurzbz).");";
+			       $this->db_add_param($this->orgform_kurzbz).",".
+				   $this->db_add_param($this->studienplan_id,FHC_INTEGER).");";
 		}
 		else
 		{			
@@ -748,6 +759,7 @@ class prestudent extends person
 			       ' datum='.$this->db_add_param($this->datum).",".
 			       ' updateamum='.$this->db_add_param($this->updateamum).",".
 			       ' updatevon='.$this->db_add_param($this->updatevon).",".
+				   ' studienplan_id='.$this->db_add_param($this->studienplan_id, FHC_INTEGER).",".
 			       ' orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).
 			       " WHERE 
 						prestudent_id=".$this->db_add_param($this->prestudent_id, FHC_INTEGER, false)." 
@@ -802,7 +814,7 @@ class prestudent extends person
 			$log->mitarbeiter_uid = get_uid();
 			$log->sql = $qry;
 			$log->sqlundo = 'INSERT INTO public.tbl_prestudentstatus(prestudent_id, status_kurzbz, studiensemester_kurzbz,'.
-							' ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz) VALUES('.
+							' ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz, studienplan_id) VALUES('.
 							$this->db_add_param($this->prestudent_id).','.
 							$this->db_add_param($this->status_kurzbz).','.
 							$this->db_add_param($this->studiensemester_kurzbz).','.
@@ -813,7 +825,8 @@ class prestudent extends person
 							$this->db_add_param($this->updateamum).','.
 							$this->db_add_param($this->updatevon).','.
 							$this->db_add_param($this->ext_id_prestudent).','.
-							$this->db_add_param($this->orgform_kurzbz).');';
+							$this->db_add_param($this->orgform_kurzbz).','.
+							$this->db_add_param($this->studienplan_id, FHC_INTEGER).');';
 			if($log->save(true))
 			{
 						
@@ -880,6 +893,7 @@ class prestudent extends person
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->orgform_kurzbz = $row->orgform_kurzbz;
+				$this->studienplan_id = $row->studienplan_id;
 				return true;	
 			}
 			else 
@@ -928,6 +942,7 @@ class prestudent extends person
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->orgform_kurzbz = $row->orgform_kurzbz;
+				$this->studienplan_id = $row->studienplan_id;
 				return true;	
 			}
 			else 

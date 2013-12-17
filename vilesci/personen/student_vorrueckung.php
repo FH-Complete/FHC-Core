@@ -260,10 +260,10 @@ if (isset($_POST['vorr']))
 				if($db->db_num_rows($db->db_query($qry_chk))<1)
 				{
 					//Eintragen des neuen Status
-					$sql.="INSERT INTO tbl_prestudentstatus (prestudent_id, status_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz)
+					$sql.="INSERT INTO tbl_prestudentstatus (prestudent_id, status_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz, studienplan_id)
 					VALUES (".$db->db_add_param($row->prestudent_id).", ".$db->db_add_param($row_status->status_kurzbz).", ".$db->db_add_param($next_ss).",
 						".$db->db_add_param($ausbildungssemester).", now(), now(), ".$db->db_add_param($user).",
-					NULL, NULL, NULL, ".$db->db_add_param($row_status->orgform_kurzbz).");";
+					NULL, NULL, NULL, ".$db->db_add_param($row_status->orgform_kurzbz).",".$db->db_add_param($row_status->studienplan_id).");";
 				}
 				if($sql!='')
 				{
