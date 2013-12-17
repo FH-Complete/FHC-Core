@@ -66,6 +66,7 @@ foreach ($typ->result as $row)
             <TYP:beschreibung><![CDATA[<?php echo $row->beschreibung ?>]]></TYP:beschreibung>
             <TYP:standardbetrag><![CDATA[<?php echo ($row->standardbetrag!=''?$row->standardbetrag:'-0.00'); ?>]]></TYP:standardbetrag>
             <TYP:standardtext><![CDATA[<?php echo $row->standardtext; ?>]]></TYP:standardtext>
+			<TYP:credit_points><![CDATA[<?php echo $row->credit_points; ?>]]></TYP:credit_points>
             <TYP:aktiv><![CDATA[<?php echo ($row->aktiv?'true':'false'); ?>]]></TYP:aktiv>
          </RDF:Description>
       </RDF:li>

@@ -108,6 +108,7 @@ function StudentKontoNeuDefaultBetrag()
 	var typmenulist = document.getElementById('student-konto-neu-menulist-buchungstyp');
 	var betrag = typmenulist.selectedItem.getAttribute('standardbetrag');
 	var text = typmenulist.selectedItem.getAttribute('standardtext');
+	var credit_points = typmenulist.selectedItem.getAttribute('credit_points');
 	if(betrag=='')
 		betrag='-0.00';
 		
@@ -117,4 +118,7 @@ function StudentKontoNeuDefaultBetrag()
 		
 	if(document.getElementById('student-konto-neu-textbox-buchungstext').value=='')
 		document.getElementById('student-konto-neu-textbox-buchungstext').value=text;
+		
+	if(document.getElementById('student-konto-neu-textbox-credit_points').value=='0.00')
+		document.getElementById('student-konto-neu-textbox-credit_points').value=credit_points;
 }
