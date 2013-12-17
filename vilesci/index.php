@@ -4,7 +4,7 @@
 	<title>VileSci</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<link rel="stylesheet" href="../skin/vilesci.css" type="text/css" />
-	<link rel="shortcut icon" href="Vilesci.ico" type="image/x-icon">
+	<link rel="shortcut icon" href="../skin/images/Vilesci.ico" type="image/x-icon">
 </head>
 <!--<frameset rows="55px,*" frameborder="0" framespacing="0" border="0">
   	<frame src="top.php" id="top" name="top" frameborder="0" scrolling="No"/>
