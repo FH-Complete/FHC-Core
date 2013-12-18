@@ -84,15 +84,27 @@ treechildren::-moz-tree-row(lehrveranstaltung_lv)
 {
 	background-color: #FFFFFF;
 }
+treechildren::-moz-tree-row(lehrveranstaltung_lv, selected)
+{
+	background-color: #FFFFAA;
+}
 
 /* Modul */
 treechildren::-moz-tree-row(lehrveranstaltung_modul)
 {
 	background-color: #EEEEEE;
 }
+treechildren::-moz-tree-row(lehrveranstaltung_modul, selected)
+{
+	background-color: #FFFFAA;
+}
 
 /* Lehrfach */
 treechildren::-moz-tree-row(lehrveranstaltung_lf)
+{
+
+}
+treechildren::-moz-tree-row(lehrveranstaltung_lf, selected)
 {
 
 }
@@ -101,4 +113,8 @@ treechildren::-moz-tree-row(lehrveranstaltung_lf)
 treechildren::-moz-tree-row(lehrveranstaltung_)
 {
 	background-color: #EDF5FF;
+}
+treechildren::-moz-tree-row(lehrveranstaltung_, selected)
+{
+	background-color: #FFFFAA;
 }
