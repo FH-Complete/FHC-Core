@@ -48,8 +48,8 @@ if(isset($_GET['uid']))
 	$rechte->getBerechtigungen($uid);
 	if($rechte->isBerechtigt('admin'))
 		$uid=$_GET['uid'];
-	else
-		die('Keine Berechtigung für UID übergabe');
+//	else
+//		die('Keine Berechtigung für UID übergabe');
 }
 $p = new phrasen(getSprache());
 $datum_obj = new datum();
@@ -65,9 +65,10 @@ if(isset($_GET['getAnmeldung']))
 		<input type="hidden" name="action" value="anmeldung" />
 		<input type="hidden" name="stsem" value="'.$db->convert_html_chars($stsem).'" />';
 	$lehrveranstaltung = new lehrveranstaltung();
+	$anzahl=0;
 	if($kompatibel = $lehrveranstaltung->loadLVkompatibel($lehrveranstaltung_id))
 	{
-		$anzahl=0;
+
 		foreach($kompatibel as $lvid)
 		{
 			$lvangebot = new  lvangebot();
