@@ -415,7 +415,7 @@ class lvangebot extends basis_db
 							FROM 
 								public.tbl_benutzergruppe 
 							WHERE 
-								gruppe_kurzbz=".$this->db_add_param($this->gruppe)." 
+								gruppe_kurzbz=".$this->db_add_param($this->gruppe_kurzbz)." 
 								AND studiensemester_kurzbz=".$this->db_add_param($this->studiensemester_kurzbz);
 					if($result = $this->db_query($qry))
 					{
