@@ -1244,8 +1244,9 @@ class lehrveranstaltung extends basis_db
 				$obj->semesterstunden = $lv->semesterstunden;
 				$data->metadata = $obj;
 				$data->attr = array();
-				$data->attr["id"]=$lv->lehrveranstaltung_id;
+				$data->attr["id"]=$lv->studienplan_lehrveranstaltung_id;
 				$data->attr["rel"] = $lv->lehrtyp_kurzbz;
+				$data->attr["lvID"] = $lv->lehrveranstaltung_id;
 				$data->attr["studienplan_lehrveranstaltung_id"] = $lv->studienplan_lehrveranstaltung_id;
 				$data->children = array();
 				if(count($lv->childs) > 0)
