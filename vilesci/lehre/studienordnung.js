@@ -389,11 +389,15 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 			{
 				// Bei einem Klick auf eine LV werden die Details geladen
 				stpllvid = data.rslt.obj.attr("studienplan_lehrveranstaltung_id");
-				lvid = data.rslt.obj.attr("id");
-				if(lvid.substring(0,5)==="copy_")
+				lvid = data.rslt.obj.attr("lvID");
+				if(lvid !== undefined)
 				{
-					lvid = lvid.substring(5);
+					if(lvid.substring(0,5)==="copy_")
+					{
+						lvid = lvid.substring(5);
+					}
 				}
+				
 
 				// Lehrveranstaltungsdetails laden
 				if(data.rslt.obj.attr("rel") !== "semester")
@@ -752,7 +756,7 @@ function showLVTree(data)
 						],
 						resizable: true
 					},
-					plugins: ["themes", "ui", "dnd", "grid", "json_data", "crrm", "types"]
+					plugins: ["themes", "ui", "dnd", "grid", "json_data", "crrm", "types", "sort"]
 				}).bind("loaded.jstree", function(event, data) 
 				{
 					hideAllTreeColumns();
@@ -865,13 +869,13 @@ function saveJsondataFromTree(nodeId, studienplan_id, studienplan_lehrveranstalt
 {
 	var jsonData = $("#treeData").jstree("get_json", $("#treeData").find("li[id="+nodeId+"]"));
 	var copy = false;
-
+	
+	
 	if(jsonData.length !== 1)
 	{
 		jsonData = $("#treeData").jstree("get_json", $("#copy_"+nodeId));
 		copy = true;
 	}
-
 	loaddata = {
 		"method" : "loadLehrveranstaltungStudienplanByLvId",
 		"parameter_0" : studienplan_id,
@@ -885,9 +889,9 @@ function saveJsondataFromTree(nodeId, studienplan_id, studienplan_lehrveranstalt
 	}
 	else
 	{
-		node = $("#"+jsonData[0]["metadata"]["lehrveranstaltung_id"]);
+		node = $("#"+studienplan_lehrveranstaltung_id);
 	}
-
+	
 	var lehrveranstaltung_id = jsonData[0]["metadata"]["lehrveranstaltung_id"];
 	var semester = node.closest("li[rel=semester]").attr("id");
 	if(semester === undefined)
@@ -899,29 +903,31 @@ function saveJsondataFromTree(nodeId, studienplan_id, studienplan_lehrveranstalt
 	if(node.parent().parent().attr("studienplan_lehrveranstaltung_id"))
 		parent_id = node.parent().parent().attr("studienplan_lehrveranstaltung_id");
 
-	var neu ='';
-
+	var neu = true;
+	
+	if(studienplan_lehrveranstaltung_id !== undefined)
+		neu = false;
 	// Pruefen ob diese Zuordnung bereits vorhanden ist
-	$.ajax(
-	{	
-		dataType: "json",
-		url: "../../soap/fhcomplete.php",
-		type: "POST",
-		async: false,
-		data: {
-			"typ": "json",
-			"class": "studienplan",
-			"method": "containsLehrveranstaltung",
-			"parameter_0": studienplan_id,
-			"parameter_1": lehrveranstaltung_id
-		}
-	}).success(function(data)
-	{
-		if(data.return==false)
-			neu = true;
-		else
-			neu = false;
-	});
+//	$.ajax(
+//	{	
+//		dataType: "json",
+//		url: "../../soap/fhcomplete.php",
+//		type: "POST",
+//		async: false,
+//		data: {
+//			"typ": "json",
+//			"class": "studienplan",
+//			"method": "containsLehrveranstaltung",
+//			"parameter_0": studienplan_id,
+//			"parameter_1": lehrveranstaltung_id
+//		}
+//	}).success(function(data)
+//	{
+//		if(data.return==false)
+//			neu = true;
+//		else
+//			neu = false;
+//	});
 
 	// Bei neuen Eintraegen kein Load noetig
 	if(neu)
@@ -929,12 +935,13 @@ function saveJsondataFromTree(nodeId, studienplan_id, studienplan_lehrveranstalt
 
 	// Wenn der Eintrag keine Verschiebung im Tree ist, und die Lehrveranstaltung bereits im
 	// Studienplan vorhanden ist -> Abbruch
-	if(studienplan_lehrveranstaltung_id=='' && neu==false)
-	{
-		alert("Die Lehrveranstaltung ist bereits in diesem Studienplan vorhanden!");
-		$("#treeData").jstree("remove", $("#copy_"+nodeId));
-		return;
-	}
+	
+//	if(studienplan_lehrveranstaltung_id=='' && neu==false)
+//	{
+//		alert("Die Lehrveranstaltung ist bereits in diesem Studienplan vorhanden!");
+//		$("#treeData").jstree("remove", $("#copy_"+nodeId));
+//		return;
+//	}
 	
 	savedata = {
 		"studienplan_id": studienplan_id,
