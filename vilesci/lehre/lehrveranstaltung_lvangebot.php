@@ -110,7 +110,7 @@
 
 			$lvangebot->lehrveranstaltung_id=$_POST['lehrveranstaltung_id'];
 			$lvangebot->studiensemester_kurzbz=$_POST['studiensemester_kurzbz'];
-			//$lvangebot->gruppe_kurzbz=$_POST['gruppe_kurzbz'];
+			$lvangebot->gruppe_kurzbz=$_POST['gruppe_kurzbz'];
 			$lvangebot->incomingplaetze=$_POST['incomingplaetze'];
 			$lvangebot->gesamtplaetze=$_POST['gesamtplaetze'];
 			$lvangebot->anmeldefenster_start=$datum_obj->formatDatum($_POST['anmeldefenster_start'], 'Y-m-d');
@@ -135,6 +135,7 @@
 					<thead>
 						<tr>
 							<th>Studiensemester</th>
+							<th>Gruppe</th>
 							<th title="Incomingplätze">Inc</th>
 							<th title="Gesamtplätze">Ges</th>
 							<th>Anmeldefenster Start</th>
@@ -158,6 +159,7 @@
 		} */
 		$htmlstr .= '<tr>
 			<td>'.$lvang->studiensemester_kurzbz.'</td>
+			<td>'.$lvang->gruppe_kurzbz.'</td>
 			<td>'.$lvang->incomingplaetze.'</td>
 			<td>'.$lvang->gesamtplaetze.'</td>
 			<td>'.$datum_obj->formatDatum($lvang->anmeldefenster_start,'d.m.Y').'</td>
@@ -195,6 +197,10 @@
 			$htmlstr .= '<input type="hidden" name="studiensemester_kurzbz" value="'.$lvangebot->studiensemester_kurzbz.'" />';
 		$htmlstr .= '			</td>
 								</tr>
+								<tr><td>Gruppe</td>
+								<td>
+									<input type="text" name="gruppe_kurzbz" id="gruppe_kurzbz" onchange="submitable()" value="'.$lvangebot->gruppe_kurzbz.'"/>
+								</td></tr>
 								<tr><td>Incomingplätze</td>
 								<td>
 									<input type="text" name="incomingplaetze" onchange="submitable()" value="'.$lvangebot->incomingplaetze.'"/>
@@ -245,7 +251,26 @@
 			$("#t1").tablesorter(
 			{
 				widgets: ["zebra"]
-			}); 
+			});
+
+		$('#gruppe_kurzbz').autocomplete({
+			source: "lvangebot_autocomplete.php",
+			minLength:1,
+			response: function(event, ui)
+			{
+				//Value und Label fuer die Anzeige setzen
+				for(i in ui.content)
+				{
+					ui.content[i].value=ui.content[i].gruppe_kurzbz;
+					ui.content[i].label=ui.content[i].gruppe_kurzbz;
+				}
+			},
+			select: function(event, ui)
+			{
+				ui.item.value=ui.item.gruppe_kurzbz;
+			}
+		});
+			
 		}); 
 		
 		function submitable()
