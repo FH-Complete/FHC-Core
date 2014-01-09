@@ -71,16 +71,14 @@
 </head>
 
 <body>
-<table class="tabcontent" id="inhalt">
+<table id="inhalt">
   <tr>
-    <td class="tdwidth10">&nbsp;</td>
-    <td><table class="tabcontent">
+    <td><table>
       <tr>
-        <td class="ContentHeader" width="70%"><font class="ContentHeader">&nbsp;<?php echo $p->t('lehre/anwesenheitsUndNotenlisten');?></font></td>
+        <td><h1><?php echo $p->t('lehre/anwesenheitsUndNotenlisten');?></h1></td>
       </tr>
 	  <tr>
 	  	<td>
-	  	<br />
 
 	  	<?php
 	if($error==0)
@@ -189,33 +187,36 @@
 	  	else
 	  	{
 		  	if($aw_content!='')
-				$aw_content = "<table border='0'><tr class='liste'><td><b>".$p->t('anwesenheitsliste/anwesenheitslisten')."</b></td></tr>".$aw_content."</table>";
+				$aw_content = "<table border='0' cellspacing='0'><tr><td><h3>".$p->t('anwesenheitsliste/anwesenheitslisten')."</h3></td></tr>".$aw_content."</table>";
 		  	else
 		  		$aw_content = $p->t('anwesenheitsliste/keineStudentenVorhanden');
 		  	
 		  	if($awbild_content!='')
-				$awbild_content = "<table border='0'><tr class='liste'><td><b>".$p->t('anwesenheitsliste/anwesenheitslistenMitBildern')."</b></td></tr>".$awbild_content."</table>";
+				$awbild_content = "<table border='0' cellspacing='0'><tr><td><h3>".$p->t('anwesenheitsliste/anwesenheitslistenMitBildern')."</h3></td></tr>".$awbild_content."</table>";
 		  	else
 		  		$awbild_content = $p->t('anwesenheitsliste/keineStudentenVorhanden');
 
 		  	if($nt_content!='')
-				$nt_content = "<table border='0'><tr class='liste'><td><b>".$p->t('anwesenheitsliste/notenlisten')."</b></td></tr>".$nt_content."</table>";
+				$nt_content = "<table border='0' cellspacing='0'><tr><td><h3>".$p->t('anwesenheitsliste/notenlisten')."</h3></td></tr>".$nt_content."</table>";
 		  	else
 		  		$nt_content = $p->t('anwesenheitsliste/keineStudentenVorhanden');
 		  	echo $p->t('anwesenheitsliste/erstellenDerListeKlicken');
 		  	echo "<br /><br/>";
-		  	echo "<table>
+		  	echo "<table cellpadding='0' cellspacing='0'>
 		  		
 		  		<tr>
 		  		   <td>$aw_content</td>
+		  		   <td width='15'>&nbsp;</td>
 		  		   <td>$nt_content</td>
 		  		</tr>
 		  		<tr>
+		  			<td>&nbsp;</td>
 		  			<td>&nbsp;</td>
 		  			<td></td>
 		  		</tr>
 		  		<tr>
 		  			<td>$awbild_content</td>
+		  			<td>&nbsp;</td>
 		  			<td></td>
 		  		</tr>
 		  		</table>";
