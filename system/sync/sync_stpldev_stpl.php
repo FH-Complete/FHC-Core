@@ -108,7 +108,10 @@ function getStudentsFromGroup($studiengang_kz, $semester, $verband, $gruppe, $gr
 					distinct student_uid
 				FROM
 					public.tbl_studentlehrverband
+				LEFT JOIN
+					public.tbl_benutzer ON (uid=student_uid)
 				WHERE
+					tbl_benutzer.aktiv=true AND
 					studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
 					studiengang_kz = '".addslashes($studiengang_kz)."' AND
 					semester = '".addslashes($semester)."'";
@@ -127,9 +130,12 @@ function getStudentsFromGroup($studiengang_kz, $semester, $verband, $gruppe, $gr
 					distinct uid as student_uid
 				FROM
 					public.tbl_benutzergruppe
+				LEFT JOIN
+					public.tbl_benutzer USING (uid)
 				WHERE
 					gruppe_kurzbz='".addslashes($gruppe_kurzbz)."' AND
-					studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'
+					studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
+					tbl_benutzer.aktiv=true
 				";
 
 	}
