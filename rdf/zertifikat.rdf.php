@@ -96,7 +96,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	//Daten holen
 
 	$lqry = "SELECT 
-				tbl_person.* 
+				tbl_person.titelpre, tbl_person.vorname, tbl_person.nachname, tbl_person.titelpost 
 			FROM 
 				public.tbl_benutzer JOIN public.tbl_person using (person_id) 
 			WHERE 
@@ -107,9 +107,15 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 										lehre.tbl_lehreinheit JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
 									WHERE 
 										tbl_lehreinheitmitarbeiter.lehreinheit_id = tbl_lehreinheit.lehreinheit_id AND
-										tbl_lehrveranstaltung.lehrveranstaltung_id = '".addslashes($lehrveranstaltung_id)."' AND
-										tbl_lehreinheit.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'
+										tbl_lehrveranstaltung.lehrveranstaltung_id = ".$db->db_add_param($lehrveranstaltung_id)." AND
+										tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
 									ORDER BY tbl_lehrfunktion.standardfaktor desc limit 1)";
+	
+	$leiter_titel = '';
+	$leiter_vorname = '';
+	$leiter_nachname = '';
+	$leiter_titelpost = '';
+	
 	if($db->db_query($lqry))
 	{
 		if ($lrow = $db->db_fetch_object())
@@ -119,11 +125,11 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			$leiter_nachname = $lrow->nachname;	
 			$leiter_titelpost = $lrow->titelpost;	
 		}		
-	}	
-	
+	}
+		
 	$qry = "SELECT wochen FROM public.tbl_semesterwochen 
 						WHERE (studiengang_kz, semester) in (SELECT studiengang_kz, semester 
-						FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id).")";
+						FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER).")";
 	$wochen = 15;
 	if($result_wochen = $db->db_query($qry))
 	{
@@ -132,7 +138,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			$wochen = $row_wochen->wochen;
 		}
 	}
-	$lvqry = "SELECT * from lehre.tbl_lehrveranstaltung where lehrveranstaltung_id = '".addslashes($lehrveranstaltung_id)."'";
+	$lvqry = "SELECT * from lehre.tbl_lehrveranstaltung where lehrveranstaltung_id = ".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
 	
 	if($db->db_query($lvqry))
 	{
@@ -140,12 +146,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		{
 			$sws = $lvrow->semesterstunden/$wochen;
 			$ects = $lvrow->ects;
-			$lvbezeichnung = $lvrow->bezeichnung;			
+			$lvbezeichnung = $lvrow->bezeichnung;
+			$lvstg = $lvrow->studiengang_kz;			
 		}		
 	}
 	
 	$lehrinhalte = '';
-	$infoqry = "SELECT * FROM campus.tbl_lvinfo WHERE sprache='German' AND lehrveranstaltung_id = '".addslashes($lehrveranstaltung_id)."'";
+	$infoqry = "SELECT * FROM campus.tbl_lvinfo WHERE sprache='German' AND lehrveranstaltung_id = ".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
 	if($db->db_query($infoqry))
 	{
 		if ($inforow = $db->db_fetch_object())
@@ -170,7 +177,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$studiengang_typ='';
 		$xml_fussnote='';
 		
-		$query = "SELECT tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.typ, tbl_studiengang.bezeichnung, tbl_person.vorname, tbl_person.nachname,tbl_person.gebdatum,tbl_person.titelpre, tbl_person.titelpost FROM tbl_person, tbl_student, tbl_studiengang, tbl_benutzer WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz and tbl_student.student_uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id and tbl_student.student_uid = '".$uid_arr[$i]."'";
+		$query = "SELECT tbl_student.matrikelnr, tbl_student.studiengang_kz, tbl_studiengang.typ, tbl_studiengang.bezeichnung, tbl_person.vorname, tbl_person.nachname,tbl_person.gebdatum,tbl_person.titelpre, tbl_person.titelpost, tbl_person.geschlecht FROM tbl_person, tbl_student, tbl_studiengang, tbl_benutzer WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz and tbl_student.student_uid = tbl_benutzer.uid and tbl_benutzer.person_id = tbl_person.person_id and tbl_student.student_uid = '".$uid_arr[$i]."'";
 
 		if($db->db_query($query))
 		{
@@ -189,16 +196,17 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		}
 		
 		$xml .= "\n	<zertifikat>";
-		$xml .= "		<studiensemester>".$studiensemester->bezeichnung."</studiensemester>";
+		$xml .= "\n		<studiensemester>".$studiensemester->bezeichnung."</studiensemester>";
 		$xml .= "\n		<vorname>".$row->vorname."</vorname>";
-		$xml .= "		<nachname>".$row->nachname."</nachname>";
-		$xml .= "		<name>".trim($row->titelpre.' '.$row->vorname.' '.mb_strtoupper($row->nachname).($row->titelpost!=''?', '.$row->titelpost:''))."</name>";
+		$xml .= "\n		<nachname>".$row->nachname."</nachname>";
+		$xml .= "\n		<name>".trim($row->titelpre.' '.$row->vorname.' '.mb_strtoupper($row->nachname).($row->titelpost!=''?', '.$row->titelpost:''))."</name>";
 		$gebdatum = date('d.m.Y',strtotime($row->gebdatum));
-		$xml .= "		<gebdatum>".$gebdatum."</gebdatum>";
-		$xml .= "		<matrikelnr>".$row->matrikelnr."</matrikelnr>";
-		$xml .= "		<studiengangsleiter>".$stgl."</studiengangsleiter>";
+		$xml .= "\n		<gebdatum>".$gebdatum."</gebdatum>";
+		$xml .= "\n		<geschlecht>".$row->geschlecht."</geschlecht>";
+		$xml .= "\n		<matrikelnr>".$row->matrikelnr."</matrikelnr>";
+		$xml .= "\n		<studiengangsleiter>".$stgl."</studiengangsleiter>";
 		$datum_aktuell = date('d.m.Y');
-		$xml .= "		<ort_datum>Wien, am ".$datum_aktuell."</ort_datum>";
+		$xml .= "\n		<ort_datum>Wien, am ".$datum_aktuell."</ort_datum>";
 		
 		
 		$obj = new zeugnisnote();
@@ -215,6 +223,12 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			$note_bezeichnung = "";
 		}		
 		$note2=$note;
+		
+		$stg = new studiengang();
+		$stg->load($lvstg);
+		$xml .= "				<lv_studiengang_bezeichnung>".$stg->bezeichnung."</lv_studiengang_bezeichnung>";
+		$xml .= "				<lv_studiengang_typ>".$stg->typ."</lv_studiengang_typ>";
+		$xml .= "				<lv_studiengang_kennzahl>".sprintf('%04s',$lvstg)."</lv_studiengang_kennzahl>";
 
 		$xml .= "				<bezeichnung><![CDATA[".$lvbezeichnung."]]></bezeichnung>";
 		$xml .= "				<note>".$note."</note>";
