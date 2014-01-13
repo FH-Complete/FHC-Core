@@ -72,6 +72,79 @@ if(isset($_REQUEST['AuswahlGebiet']))
 {
 	$gebiet_id = $_REQUEST['AuswahlGebiet'];
 	
+	$gebietdetails = new gebiet();
+	$gebietdetails->load($gebiet_id);
+	
+	if ($gebietdetails)
+	{
+		echo '
+		<table>
+		<tr>
+			<td align="right">Gebiet:</td>
+			<td>'.$gebietdetails->bezeichnung.'</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td align="right">Beschreibung:</td>
+			<td>'.($gebietdetails->beschreibung!=''?$gebietdetails->beschreibung:'-').'</td>
+		</tr>
+		<tr>
+			<td align="right">Zeit:</td>
+			<td>'.$gebietdetails->zeit.'</td>
+		</tr>
+		<tr>
+			<td align="right">Multipleresponse:</td>
+			<td>'.($gebietdetails->multipleresponse==true?'Ja':'Nein').'</td>
+		</tr>
+		<tr>
+			<td align="right">Gestellte Fragen:</td>
+			<td>'.$gebietdetails->maxfragen.'</td>
+		</tr>
+		<tr>
+			<td align="right">Zufallsfrage:</td>
+			<td>'.($gebietdetails->zufallfrage==true?'Ja':'Nein').'</td>
+		</tr>
+		<tr>
+			<td align="right">Zufallsvorschlag:</td>
+			<td>'.($gebietdetails->zufallvorschlag==true?'Ja':'Nein').'</td>
+		</tr>';
+		if ($gebietdetails->level_start!='')
+		{
+			echo'
+			<tr>
+				<td align="right">Startlevel:</td>
+				<td>'.$gebietdetails->level_start.'</td>
+			</tr>
+			<tr>
+				<td align="right">Höheres Level nach:</td>
+				<td>'.$gebietdetails->level_sprung_auf.' Fragen</td>
+			</tr>
+			<tr>
+				<td align="right">Niedrigeres Level nach:</td>
+				<td>'.$gebietdetails->level_sprung_ab.' Fragen</td>
+			</tr>
+			<tr>
+				<td align="right">Levelgleichverteilung:</td>
+				<td>'.($gebietdetails->levelgleichverteilung==true?'Ja':'Nein').'</td>
+			</tr>';
+		}
+		echo'
+		<tr>
+			<td align="right">Maximalpunkte:</td>
+			<td>'.$gebietdetails->maxpunkte.'</td>
+		</tr>
+		<tr>
+			<td align="right">Antworten pro Zeile:</td>
+			<td>'.$gebietdetails->antwortenprozeile.'</td>
+		</tr>
+		
+		
+		</table><br><hr>';
+	}
+	
 	$frage = new frage(); 
 	$frage->getFragenGebiet($gebiet_id);
 	
@@ -79,28 +152,29 @@ if(isset($_REQUEST['AuswahlGebiet']))
 	{
 		$sprachevorschlag = new vorschlag(); 
 		$spracheFrage = new frage();
-		echo "&lt;NR:".$fragen->nummer."&gt; "; 
-		// FRAGE anzeigen
 		$spracheFrage->getFrageSprache($fragen->frage_id, $sprache);
+		
+		echo "<b>&lt;NR:".$fragen->nummer."&gt;</b><br> ";
+		//Sound einbinden
+		if($spracheFrage->audio!='')
+		{
+			echo '
+			<script language="JavaScript" src="../audio-player/audio-player.js"></script>
+			<object type="application/x-shockwave-flash" data="../audio-player/player.swf" id="audioplayer1" height="24" width="290">
+			<param name="movie" value="audio_player/player.swf" />
+			<param name="FlashVars" value="playerID=audioplayer1&amp;soundFile=../sound.php%3Fsrc%3Dfrage%26frage_id%3D'.$spracheFrage->frage_id.'%26sprache%3D'.$sprache.'" />
+			<param name="quality" value="high" />
+			<param name="menu" value="false" />
+			<param name="wmode" value="transparent" />
+			</object>';
+		} 
+		// FRAGE anzeigen
 		echo "$spracheFrage->text<br/><br/>\n"; 
 		
 		// Bild einbinden wenn vorhanden
 		if($spracheFrage->bild!='')
 				echo "<img class='testtoolfrage' src='../bild.php?src=frage&amp;frage_id=$spracheFrage->frage_id&amp;sprache=".$sprache."' /><br/><br/>\n";
 				
-			//Sound einbinden
-		if($spracheFrage->audio!='')
-		{
-			echo '
-			<script language="JavaScript" src="audio-player/audio-player.js"></script>
-			<object type="application/x-shockwave-flash" data="audio-player/player.swf" id="audioplayer1" height="24" width="290">
-			<param name="movie" value="audio_player/player.swf" />
-			<param name="FlashVars" value="playerID=audioplayer1&amp;soundFile=../sound.php%3Fsrc%3Dfrage%26frage_id%3D'.$sprachefrage->frage_id.'%26sprache%3D'.$sprache.'" />
-			<param name="quality" value="high" />
-			<param name="menu" value="false" />
-			<param name="wmode" value="transparent" />
-			</object>';
-		}
 		echo"<br><table>"; 
 		
 		// ANTWORTEN anzeigen
@@ -112,7 +186,7 @@ if(isset($_REQUEST['AuswahlGebiet']))
 			$vorschlag->loadVorschlagSprache($vor->vorschlag_id, $sprache);
 			
 			if($vorschlag->bild =='')
-				echo '<tr><td>'.$vorschlag->text.'</td><td style="text-align:right">'.$vor->punkte.'</td></tr>';
+				echo '<tr><td align="right"><b>'.$vor->punkte.'</b></td><td style="border-left:1px solid;">&nbsp;'.$vorschlag->text.'</td></tr>';
 			if($vorschlag->bild!='')
 			{
 				// zeilenumbruch nach 4 bilder
@@ -126,8 +200,8 @@ if(isset($_REQUEST['AuswahlGebiet']))
 			if($vorschlag->audio!='')
 			{
 				echo '
-				<script language="JavaScript" src="audio-player/audio-player.js"></script>
-				<object type="application/x-shockwave-flash" data="audio-player/player.swf" id="audioplayer1" height="24" width="290">
+				<script language="JavaScript" src="../audio-player/audio-player.js"></script>
+				<object type="application/x-shockwave-flash" data="../audio-player/player.swf" id="audioplayer1" height="24" width="290">
 				<param name="movie" value="audio_player/player.swf" />
 				<param name="FlashVars" value="playerID=audioplayer1&amp;soundFile=../sound.php%3Fsrc%3Dvorschlag%26vorschlag_id%3D'.$vorschlag->vorschlag_id.'%26sprache%3D'.$_SESSION['sprache'].'" />
 				<param name="quality" value="high" />
