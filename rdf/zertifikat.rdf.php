@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2006 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -216,7 +216,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		{
 			$note = $note_arr[$obj->note];
 			$note_bezeichnung = $note_bezeichnung_arr[$obj->note];
-		}		
+		}
 		else
 		{
 			$note = "";

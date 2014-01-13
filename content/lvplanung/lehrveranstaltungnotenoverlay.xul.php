@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2006 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -38,10 +38,10 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 <!-- Zeugnis Overlay -->
 <vbox id="lehrveranstaltung-noten" style="margin:0px;" flex="1">
 <popupset>
-	<popup id="lehrveranstaltung-noten-tree-popup">
+	<menupopup id="lehrveranstaltung-noten-tree-popup">
 		<menuitem label="Entfernen" oncommand="LehrveranstaltungNotenDelete();" id="lehrveranstaltung-noten-tree-popup-delete" hidden="false"/>
 		<menuitem label="Freifaecher-Zertifikat erstellen" oncommand="LehrveranstaltungFFZertifikatPrint();" id="lehrveranstaltung-noten-tree-popup-ffzertifikat" hidden="false"/>
-	</popup>
+	</menupopup>
 </popupset>
 <hbox flex="1" style="margin-top: 10px;">
 	<vbox flex="1">

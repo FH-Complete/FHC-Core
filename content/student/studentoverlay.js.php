@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2006 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -344,6 +344,32 @@ function StudentTreeKeyPress(event)
 }
 
 // ****************** FUNKTIONEN ************************** //
+
+// ****
+// * Erstellt das Zertifikat fuer die Freifaecher
+// ****
+function StudentFFZertifikatPrint()
+{
+//	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-noten-tree');
+			
+	col = tree.columns ? tree.columns["student-noten-tree-student_uid"] : "student-noten-tree-student_uid";
+	uid = tree.view.getCellText(tree.currentIndex,col);
+	
+	col = tree.columns ? tree.columns["student-noten-tree-lehrveranstaltung_id"] : "student-noten-tree-lehrveranstaltung_id";
+	lvid = tree.view.getCellText(tree.currentIndex,col);
+	
+	col = tree.columns ? tree.columns["student-noten-tree-studiensemester_kurzbz"] : "student-noten-tree-studiensemester_kurzbz";
+	stsem = tree.view.getCellText(tree.currentIndex,col);
+
+	col = tree.columns ? tree.columns["student-noten-tree-studiengang_kz"] : "student-noten-tree-studiengang_kz";
+	stg_kz = tree.view.getCellText(tree.currentIndex,col);
+
+	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat.rdf.php&xsl=Zertifikat&stg_kz='+stg_kz+'&uid=;'+uid+'&ss='+stsem+'&lvid='+lvid+'&'+gettimestamp();
+	
+//	alert('url: '+url);
+	window.location.href = url;
+}
 
 // ****
 // * Asynchroner (Nicht blockierender) Refresh des StudentenTrees
@@ -1865,6 +1891,7 @@ function StudentPrintInskriptionsbestaetigung()
 		{
 			uid = getTreeCellText(tree, 'student-treecol-uid', v);
 			paramList += ';'+uid;
+			stg_kz = getTreeCellText(tree, 'student-treecol-studiengang_kz', v);
 			anzahl = anzahl+1;
 		}
 	}
@@ -1877,7 +1904,7 @@ function StudentPrintInskriptionsbestaetigung()
 	}
 	
 	if(anzahl>0)
-		window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=student.rdf.php&xsl=Inskription&uid='+paramList+'&ss='+stsem,'Inskriptionsbestaetigung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+		window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=student.rdf.php&xsl=Inskription&stg_kz='+stg_kz+'&uid='+paramList+'&ss='+stsem,'Inskriptionsbestaetigung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 	else
 		alert('Bitte einen Studenten auswaehlen');
 }
@@ -4290,7 +4317,7 @@ function StudentCreateDiplSupplement()
 }
 
 // ****
-// * Erstellt das Diploma Supplement fuer einen oder mehrere Studenten
+// * Erstellt den Ausbildungsvertrag fuer einen oder mehrere Studenten
 // ****
 function StudentPrintAusbildungsvertrag()
 {

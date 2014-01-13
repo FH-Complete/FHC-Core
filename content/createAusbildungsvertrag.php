@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2006 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -37,7 +37,6 @@ require_once('../include/vorlage.class.php');
 
 $user = get_uid();
 $db = new basis_db();
-loadVariables($user);
 
 function clean_string($string)
  {
@@ -85,11 +84,11 @@ else
 	else
 		if(isset($_GET['uid']) && $_GET['uid']!='')
 		{
-			if(strstr(';',$_GET['uid']))
+			if(strstr($_GET['uid'],';'))
 				$uids = explode(';',$_GET['uid']);
 			else 
 				$uids = $_GET['uid'];
-			//var_dump($uids);
+
 			$qry = "SELECT student_uid, studiengang_kz FROM public.tbl_student WHERE student_uid='".addslashes($uids[1])."'";
 			if($result_std = $db->db_query($qry))
 				if($db->db_num_rows($result_std)==1)
@@ -142,6 +141,7 @@ else
 }
 
 $xsl_content = $vorlage->text;
+loadVariables($user);
 
 if (!isset($_REQUEST["archive"]))
 { 
