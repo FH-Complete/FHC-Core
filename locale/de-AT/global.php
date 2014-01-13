@@ -10,6 +10,7 @@ $this->phrasen['global/lehrveranstaltung']='Lehrveranstaltung';
 $this->phrasen['global/lehreinheit']='Lehreinheit';
 $this->phrasen['global/organisationseinheit']='Organisationseinheit';
 $this->phrasen['global/fhtw']='Fachhochschule Technikum Wien';
+$this->phrasen['global/fhTechnikumWien']='FH Technikum Wien';
 
 $this->phrasen['global/studiengangsmanagement']='Studiengangsmanagement';
 $this->phrasen['global/geschaeftsfuehrendeltg']='geschäftsf. Leitung';
