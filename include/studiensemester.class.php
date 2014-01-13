@@ -172,7 +172,7 @@ class studiensemester extends basis_db
 
 	/**
 	 * Liefert ein Studiensemester mit Startdatum vom naechstgelegenen Studiensemester und
-	 * dem Startdatum vom folgeden Studiensemester als Endedatum
+	 * dem Startdatum vom folgenden Studiensemester als Endedatum
 	 * 
 	 * @return boolean
 	 */
@@ -345,6 +345,51 @@ class studiensemester extends basis_db
 		}
 
 		return true;
+	}
+	
+	/**
+	 * Liefert die naechsten Studiensemester bis zum eingestellten Limit
+	 * 
+	 * @param $art Wenn art=WS dann wird das naechste Wintersemester geliefert
+	 *             Wenn art=SS dann wird das naechste Sommersemester geliefert
+	 *        $limit Wie viele kommende Studiensemester sollen geliefert werden?
+	 *     			 Wenn leer, dann 1.
+	 * @return true wenn ok, sonst false
+	 */
+	public function getFutureStudiensemester($art='', $limit=NULL)
+	{
+		$qry = "SELECT * FROM public.tbl_studiensemester WHERE start>now() ";
+
+		if($art!='')
+			$qry.= " AND substring(studiensemester_kurzbz from 1 for 2)=".$this->db_add_param($art);
+
+		$qry.=" ORDER BY start";
+		
+		if(!is_null($limit) && is_numeric($limit))
+			$qry.=" LIMIT ".$limit;
+		else 
+			$qry.=" LIMIT 1";
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$stsem_obj = new studiensemester();
+				
+				$stsem_obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$stsem_obj->start = $row->start;
+				$stsem_obj->ende = $row->ende;
+				$stsem_obj->bezeichnung = $row->bezeichnung;
+				
+				$this->studiensemester[] = $stsem_obj;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Lesen des Studiensemesters';
+			return false;
+		}
 	}
 
 	/**
