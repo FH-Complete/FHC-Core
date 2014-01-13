@@ -17,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Karl Burkhart 	<burkhart@technikum-wien.at>
+ * 			Manfred Kindl 	<kindlm@technikum-wien.at>
  */
 
 require_once('../../config/cis.config.inc.php'); 
@@ -358,14 +359,14 @@ else
 
 ?>
 
-<!doctype html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <title>Bewerbung für einen Studiengang</title>
 <link rel="stylesheet" href="../../skin/styles/jquery-ui-1.10.3.custom.css" />
-<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+<script src="../../include/js/jquery1.9.min.js"></script>
+<script src="../../include/js/jquery-ui1.10.3.js"></script>
 <script type="text/javascript" src="../../include/js/jquery.idTabs.min.js"></script>
 <script>
 $(function() {
