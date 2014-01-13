@@ -17,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Karl Burkhart 	<burkhart@technikum-wien.at>
+ * 			Manfred Kindl 	<kindlm@technikum-wien.at>
  */
 
 require_once '../../config/cis.config.inc.php';
@@ -30,6 +31,7 @@ require_once '../../include/preinteressent.class.php';
 require_once '../../include/kontakt.class.php'; 
 require_once '../../include/studiensemester.class.php'; 
 require_once '../../include/datum.class.php'; 
+require_once('../../include/sprache.class.php');
 
 require_once '../../include/securimage/securimage.php';
 
@@ -37,13 +39,26 @@ if(isset($_GET['lang']))
 	setSprache($_GET['lang']);
 
 $method = isset($_GET['method'])?$_GET['method']:'';
-$message = "&nbsp";
-$sprache = getSprache(); 
-$p=new phrasen($sprache); 
+$message = "";
 $datum = new datum(); 
 
-$studiensemester = new studiensemester(); 
-$std_semester = $studiensemester->getakt();
+//$studiensemester = new studiensemester(); 
+//$std_semester = $studiensemester->getakt();
+
+if(isset($_GET['sprache']))
+{
+	$sprache = new sprache();
+	if($sprache->load($_GET['sprache']))
+	{
+		setSprache($_GET['sprache']);
+	}
+	else
+		setSprache(DEFAULT_LANGUAGE);
+}
+
+$sprache = getSprache(); 
+$p = new phrasen($sprache); 
+$db = new basis_db();
 
 // Login gestartet
 if (isset($_POST['userid'])) 
@@ -54,7 +69,7 @@ if (isset($_POST['userid']))
 	session_start();
 	$person_id=$person->checkZugangscodePerson(trim($login)); 
 	
-	//Zugangscode wird  überprüft
+	//Zugangscode wird überprüft
 	if($person_id != false)
 	{
 		$_SESSION['bewerbung/user'] = $login;
@@ -67,11 +82,12 @@ if (isset($_POST['userid']))
 	}
 	else
 	{
-		$message= "<span id='error' style='color:red;'>".$p->t('incoming/ungueltigerbenutzer')."</span>";
+		$message= "<script type=\"text/javascript\">alert('".$p->t('bewerbung/zugangsdatenFalsch')."')</script>";
 	}
 }
 
 ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 	<head>
 		<title>Registration für Studiengänge</title>
@@ -80,7 +96,53 @@ if (isset($_POST['userid']))
 		<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 		<link href="../../include/js/tablesort/table.css" rel="stylesheet" type="text/css">
 	</head>
-	<body>
+	<script type="text/javascript">
+	function changeSprache(sprache)
+	{
+		method = '<?php echo $db->convert_html_chars($method);?>';
+		
+		window.location.href="registration.php?sprache="+sprache+"&method="+method;
+	}
+    function checkRegistration()
+    {
+    	if(document.RegistrationLoginForm.vorname.value == "")
+        {
+            alert("<?php echo $p->t('bewerbung/bitteVornameAngeben')?>");
+            return false; 
+        }
+    	if(document.RegistrationLoginForm.nachname.value == "")
+        {
+            alert("<?php echo $p->t('bewerbung/bitteNachnameAngeben')?>");
+            return false; 
+        }
+    	if(document.RegistrationLoginForm.geb_datum.value == "")
+        {
+            alert("<?php echo $p->t('bewerbung/bitteGeburtsdatumEintragen')?>");
+            return false; 
+        }
+        if((document.getElementById('geschlechtm').checked == false)&&(document.getElementById('geschlechtw').checked == false))
+        {
+            alert("<?php echo $p->t('bewerbung/bitteGeschlechtWaehlen')?>");
+            return false; 
+        }
+        if(document.RegistrationLoginForm.email.value == "")
+        {
+            alert("<?php echo $p->t('bewerbung/bitteEmailAngeben')?>");
+            return false; 
+        }
+        if(document.RegistrationLoginForm.studiensemester_kurzbz.value == "")
+        {
+            alert("<?php echo $p->t('bewerbung/bitteStudienbeginnWaehlen')?>");
+            return false; 
+        }
+        return true; 
+    }
+	</script>
+	<body class="main">
+	<table width="100%" height="100%" cellspacing="0" cellpadding="0" border="0">
+	<tr>
+	<td class="rand"></td>
+	<td class="boxshadow" valign="top" style="padding:10px; background-color: white;">
     <?php 
     
     /**
@@ -98,15 +160,18 @@ if (isset($_POST['userid']))
         $geschlecht = isset($_REQUEST['geschlecht'])?$_REQUEST['geschlecht']:''; 
         $email = isset($_REQUEST['email'])?$_REQUEST['email']:''; 
         $studiengaenge = isset($_REQUEST['studiengaenge'])?$_REQUEST['studiengaenge']:array();
-        
+        $std_semester = isset($_REQUEST['studiensemester_kurzbz'])?$_REQUEST['studiensemester_kurzbz']:''; 
         $stg_auswahl = isset($_REQUEST['stg'])?$_REQUEST['stg']:'';
+        
         
         $securimage = new Securimage(); 
         if(isset($_POST['submit']))
-        {
-            // Sicherheitscode wurde falsch eingegeben
+        {        	
+        	// Sicherheitscode wurde falsch eingegeben
             if ($securimage->check($_POST['captcha_code']) == false) 
-                $message = '<span class="error">Der eingegebene Sicherheitscode war falsch.</span><br />';
+                $message = '<span class="error">'.$p->t('bewerbung/sicherheitscodeFalsch').'</span><br />';
+            elseif (count($studiengaenge)==0)
+            	$message = '<span class="error">'.$p->t('bewerbung/bitteStudienrichtungWaehlen').'</span><br />';
             else
             {
                 // Person anlegen
@@ -118,6 +183,7 @@ if (isset($_POST['userid']))
                 $geschlecht = $_REQUEST['geschlecht']; 
                 $email = $_REQUEST['email']; 
                 $zugangscode = uniqid(); 
+                $std_semester = $_REQUEST['studiensemester_kurzbz']; 
 
                 $person->nachname = $nachname; 
                 $person->vorname = $vorname; 
@@ -168,7 +234,7 @@ if (isset($_POST['userid']))
                         $prestudent_status->load($prestudent->prestudent_id); 
                         $prestudent_status->status_kurzbz = 'Interessent'; 
                         $prestudent_status->studiensemester_kurzbz = $std_semester; 
-                        $prestudent_status->ausbildungssemester = '0'; 
+                        $prestudent_status->ausbildungssemester = '1'; 
                         $prestudent_status->datum = date("Y-m-d H:m:s"); 
                         $prestudent_status->insertamum = date("Y-m-d H:m:s"); 
                         $prestudent_status->insertvon = ''; 
@@ -221,98 +287,103 @@ if (isset($_POST['userid']))
         // User sieht Registrationsmaske
         echo '		<table width="100%" border="0">
             <tr>
-                <td align="left"><a href="'.$_SERVER['PHP_SELF'].'">Login</a> &gt; Registration </td>
+                <td align="left"><a href="'.$_SERVER['PHP_SELF'].'">'.$p->t('bewerbung/login').'</a> &gt; '.$p->t('bewerbung/registration').' </td>
+                <td align="right" width="10px"><select style="text-align: right; color: #0086CC; border: 0;" name="select">';
+                    $sprache2 = new sprache();
+					$sprache2->getAll(true);
+					foreach($sprache2->result as $row)
+					{
+						echo ' <option onclick="changeSprache(\''.$row->sprache.'\'); return false;" '.($row->sprache==$sprache?'selected':'').'>'.($row->bezeichnung_arr[getSprache()]).'&nbsp;&nbsp;</option>';
+					}
+        echo '	</select></td>
             </tr>
         </table>';
         echo $message.'	
             <form action="'.$_SERVER['PHP_SELF'].'?method=registration" method="POST" name="RegistrationLoginForm">
-			<table border = "0" align="" style="margin-top:4%;margin-left:15%">
+			<table border="0" align="" style="margin-top:4%;margin-left:15%">
+	            <tr>
+	            	<td colspan="3"><p>'.$p->t('bewerbung/einleitungstext').'</p><br><br></td>
+	            </tr>
 				<tr>
-                    <td width="250px">Code (falls vorhanden):</td>
-                    <td><input type="text" size="30" value="Zugangscode" name ="userid" onfocus="this.value=\'\';">&nbsp; <input type="submit" value="Login"></td>
+                    <td width="250px" align="right">'.$p->t('bewerbung/zugangscode').' '.$p->t('bewerbung/fallsVorhanden').':&nbsp;</td>
+                    <td><input type="text" class="input_bewerbung" size="30" style="color: #888;" value="&nbsp;'.$p->t('bewerbung/zugangscode').'" name="userid" onfocus="this.value=\'\';this.style.color=\'black\'">&nbsp; <input type="submit" value="'.$p->t('bewerbung/login').'"></td>
                 </tr>
                 <tr>
                     <td>&nbsp;</td>
                 </tr>
             </table>
-                <form action="'.$_SERVER['PHP_SELF'].'?method=registration" method="POST" name="RegistrationForm">
            <table border = "0" align="" style="margin-left:15%">
                 <tr>
-					<td width="250px">'.$p->t('global/vorname').'</td>
-					<td><input type="text" size="40" maxlength="32" name="vorname" value="'.$vorname.'"></td>
+					<td width="250px" align="right">'.$p->t('global/vorname').':&nbsp;</td>
+					<td><input type="text" class="input_bewerbung" size="40" maxlength="32" name="vorname" value="'.$vorname.'"></td>
 				</tr>
 				<tr>
-					<td>'.$p->t('global/nachname').'</td>
-					<td><input type="text" size="40" maxlength="64" name="nachname" value="'.$nachname.'"></td>
+					<td align="right">'.$p->t('global/nachname').':&nbsp;</td>
+					<td><input type="text" class="input_bewerbung" size="40" maxlength="64" name="nachname" value="'.$nachname.'"></td>
 				</tr>
 				<tr>
-					<td>'.$p->t('global/geburtsdatum').'</td>
-					<td><input type="text" size="20" name="geb_datum" value="'.$geb_datum.'" onfocus="this.value=""\"; > (dd.mm.yyyy)</td>
+					<td align="right">'.$p->t('global/geburtsdatum').':&nbsp;</td>
+					<td><input type="datetime" class="input_bewerbung" size="20" name="geb_datum" value="'.$geb_datum.'"> (dd.mm.yyyy)</td>
 				</tr>
                 <tr>
-					<td>'.$p->t('global/geschlecht').'</td>
+					<td align="right">'.$p->t('global/geschlecht').':&nbsp;</td>
 					<td>';
             $checked = ($geschlecht =='m')?'checked':'';
-            echo'       <input type="radio" name="geschlecht" value="m" '.$checked.'> '.$p->t('global/mann');
+            echo'       <input type="radio" name="geschlecht" id="geschlechtm" value="m" '.$checked.'> '.$p->t('global/mann');
             $checked= ($geschlecht == 'w')?'checked':''; 
-            echo'       <input type="radio" name="geschlecht" value="w" '.$checked.'> '.$p->t('global/frau').'
+            echo'       <input type="radio" name="geschlecht" id="geschlechtw" value="w" '.$checked.'> '.$p->t('global/frau').'
 	    			</td>
-				</tr>	
+				</tr>			
+				<tr>
+					<td align="right">'.$p->t('global/emailAdresse').':&nbsp;</td>
+					<td><input type="email" class="input_bewerbung" size="40" maxlength="128" name="email" id="email" value="'.$email.'"></td>
+				</tr>
+				<tr>
+					<td align="right">'.$p->t('bewerbung/geplanterStudienbeginn').':&nbsp;</td>
+					<td><select id="studiensemester_kurzbz" name="studiensemester_kurzbz">
+					<option value="">'.$p->t('bewerbung/bitteWaehlen').'</option>';
+                    $stsem = new studiensemester();
+					$stsem->getFutureStudiensemester('WS',2);
+					
+					foreach($stsem->studiensemester as $row)
+					{
+						echo ' <option value="'.$row->studiensemester_kurzbz.'" '.($std_semester==$row->studiensemester_kurzbz?'selected':'').'>'.$row->bezeichnung.'</option>';
+					}
+        	echo '	</select></td>
+				</tr>
 				<tr>
 					<td>&nbsp;</td>
-				</tr>		
-				<tr>
-					<td>E-Mail</td>
-					<td><input type="email" size="40" maxlength="128" name="email" id="email" value="'.$email.'"></td>
 				</tr>	
 				<tr>
-					<td>'.$p->t('global/studienrichtung').':</td>
-                    <td></td>
-                    <td></td>
-                </tr>';
+					<td valign="top" align="right">'.$p->t('bewerbung/studienrichtung').':&nbsp;</td>
+                    <td><table cellpadding="1" cellspacing="0" style="border-spacing:0;">';
                     $stg = new studiengang(); 
-                    $stg->getAll();
+                    $stg->getAll('typ,bezeichnung',true);
                     
                     foreach($stg->result as $result)
                     {
                         $checked = '';
+                        $typ = new studiengang(); 
+                        $typ->getStudiengangTyp($result->typ);
                         if(in_array($result->studiengang_kz, $studiengaenge) || $result->studiengang_kz == $stg_auswahl)
                             $checked = 'checked';
-                        echo '<tr><td></td><td>'.$result->bezeichnung.':</td><td><input type="checkbox" name="studiengaenge[]" value="'.$result->studiengang_kz.'" '.$checked.'></td></tr>';
+                        echo '<tr><td></td><td valign="middle"><input type="checkbox" name="studiengaenge[]" value="'.$result->studiengang_kz.'" '.$checked.'>&nbsp;&nbsp;<b>'.$typ->bezeichnung.'</b>&nbsp;'.$result->bezeichnung.'</td></tr>';
                     }
-      echo'
+      echo'		</table></tr>
                 <tr>
-                    <td><img id="captcha" src="'.APP_ROOT.'include/securimage/securimage_show.php" alt="CAPTCHA Image" /></td>
-                    <td><input type="text" name="captcha_code" size="10" maxlength="6" />';?>
+                    <td align="center"><img id="captcha" src="'.APP_ROOT.'include/securimage/securimage_show.php" alt="CAPTCHA Image" style="border:1px solid;" /><br>
+                    <a href="#" onclick="document.getElementById(\'captcha\').src = "'.APP_ROOT.'include/securimage/securimage_show.php?" + Math.random(); return false">'.$p->t('bewerbung/andereGrafik').'</a></td>
+                    <td>'.$p->t('bewerbung/captcha').'<br><input type="text" name="captcha_code" size="10" maxlength="6" />';?>
                     
-
-                <a href="#" onclick="document.getElementById('captcha').src = '<?php echo APP_ROOT;?>include/securimage/securimage_show.php?' + Math.random(); return false">[ Anderer Code ]</a>
      <?php           
         echo'       </td>
                 </tr>
 				<tr>
-					<td colspan="2" align = "center"><input type="submit" name="submit" value="Registration" onclick="return checkRegistration()"></td>		
+					<td colspan="2" align="center"><input type="submit" name="submit" value="'.$p->t('bewerbung/registrieren').'" onclick="return checkRegistration()"></td>		
 				</tr>
 				<tr><td><input type="hidden" name="zugangscode" value="'.uniqid().'"></td></tr>	
 			</table>
-		</form>
-	
-        <script type="text/javascript">
-            function checkRegistration()
-            {
-                if(document.RegistrationForm.nachname.value == "")
-                {
-                    alert("Kein Nachname angegeben.");
-                    return false; 
-                }
-                if(document.RegistrationForm.email.value == "")
-                {
-                    alert("Keine E-Mail Adresse angegeben.");
-                    return false; 
-                }
-                return true; 
-            }
-        </script>';
+		</form>';
     }
     else
     {
@@ -321,16 +392,24 @@ if (isset($_POST['userid']))
          */
         echo '<table width="100%" border="0">
                 <tr>
-                    <td align="left"></td>
+                    <td align="right" width="10px"><select style="text-align: right; color: #0086CC; border: 0;" name="select">';
+                    $sprache2 = new sprache();
+					$sprache2->getAll(true);
+					foreach($sprache2->result as $row)
+					{
+						echo ' <option onclick="changeSprache(\''.$row->sprache.'\'); return false;" '.($row->sprache==$sprache?'selected':'').'>'.($row->bezeichnung_arr[getSprache()]).'&nbsp;&nbsp;</option>';
+					}
+        echo '	</select></td>
                 </tr>
-            </table>    
+            </table>';
+        echo $message.'  
             <form action ="'.$_SERVER['PHP_SELF'].'" method="POST">
-            <table border ="0" width ="100%" height="40%">
-                <tr height="50%">
-                    <td align ="center" valign="center"><h3>'.$p->t('ktu/welcome').'</h3><span style="font-size:1.2em"></span></td>
+            <table border="0" width="100%">
+                <tr>
+                    <td align="center" valign="center" style="padding-top: 80px;"><h1>'.$p->t('bewerbung/welcome').'</h1><span style="font-size:1.2em"></span></td>
                 </tr>
                 <tr >
-                    <td align="center" valign="bottom"> <img src="../../skin/styles/ktu/KTULogo.jpg"></td>
+                    <td align="center" valign="bottom" style="padding-top: 80px;padding-bottom: 80px;""> <img src="../../skin/styles/'.DEFAULT_STYLE.'/logo.png" style="max-width: 400px; max-height: 400px; overflow: hidden;"></td>
                 </tr>
             </table>
             <table border ="0" width ="100%">
@@ -338,13 +417,13 @@ if (isset($_POST['userid']))
                     <td>&nbsp;</td>
                 </tr>
                 <tr>
-                    <td align="center"><a href="'.$_SERVER['PHP_SELF'].'?method=registration">'.$p->t('incoming/registration').'</a></td>
+                    <td align="center">'.$p->t('bewerbung/registrierenOderZugangscode').'</td>
                 </tr>
                 <tr>
                     <td>&nbsp;</td>
                 </tr>
                 <tr>
-                    <td align="center"><input type="text" size="30" value="UserID" name ="userid" onfocus="this.value=\'\';"></td>
+                    <td align="center"><input class="input_bewerbung" type="text" size="30" style="color: #888;" value="&nbsp;'.$p->t('bewerbung/zugangscode').'" name="userid" onfocus="this.value=\'\';this.style.color=\'black\'"></td>
                 </tr>
                 <tr>
                     <td>&nbsp;</td>
@@ -364,26 +443,25 @@ if (isset($_POST['userid']))
             </table>
             </form>';
             }
-	echo '</body>
+	echo '</td>
+<td class="rand">
+</td>
+</tr>
+</table>
+</body>
 </html>';
     
 function sendMail($zugangscode, $email)
 {
 	global $p, $vorname, $nachname; 
    
-	$mail = new mail($email, 'no-reply', 'Registration', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
-	$text = 'Sehr geehrteR Herr/Frau '.$vorname.' '.$nachname.'.<br><br>
-        Vielen Dank für Ihr Interesse an einem Studiengang der Katholisch Theologischen Universität Linz. <br> 
-        Um sich für einen Studiengang zu bewerben verwenden Sie bitte folgenden Link und Zugangscode: <br><br>
-        <a href="ktu.technikum-wien.at/cis/public/registration.php">Link zur Bewerbung</a><br>
-        Zugangscode: '.$zugangscode.' <br><br>
-        Mit freundlichen Grüßen, <br>
-        KTU Linz';
+	$mail = new mail($email, 'no-reply', $p->t('bewerbung/registration'), $p->t('bewerbung/mailtextHtml'));
+	$text = $p->t('bewerbung/mailtext',array($vorname, $nachname, $zugangscode));
     $mail->setHTMLContent($text); 
 	if(!$mail->send())
-		$msg= '<span class="error">Fehler beim Senden des Mails</span><br /><a href='.$_SERVER['PHP_SELF'].'?method=registration>Zurück zur Anmeldung</a>';
+		$msg= '<span class="error">'.$p->t('bewerbung/fehlerBeimSenden').'</span><br /><a href='.$_SERVER['PHP_SELF'].'?method=registration>'.$p->t('bewerbung/zurueckZurAnmeldung').'</a>';
 	else
-		$msg= $p->t('global/emailgesendetan')." $email!<br><a href=".$_SERVER['PHP_SELF'].">Zurück zur Anmeldung</a>";
+		$msg= $p->t('global/emailgesendetan')." $email!<br><a href=".$_SERVER['PHP_SELF'].">".$p->t('bewerbung/zurueckZurAnmeldung')."</a>";
 	
     // sende Nachricht an Assistenz 
 
