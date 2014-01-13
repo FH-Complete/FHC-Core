@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2006 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -47,9 +47,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 	<!-- ************************ -->
 	<vbox id="LehrveranstaltungEditor" flex="1" uid="" stg_kz="">
 	<popupset>
-		<popup id="lehrveranstaltung-tree-popup">
+		<menupopup id="lehrveranstaltung-tree-popup">
 			<menuitem label="Entfernen" oncommand="LeDelete();" id="lehrveranstaltung-tree-popup-entf" disabled="false"/>
-		</popup>
+		</menupopup>
 	</popupset>
 		<toolbox>
 			<toolbar id="lehrveranstaltung-nav-toolbar">

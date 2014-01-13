@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2006 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -38,9 +38,10 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 <!-- Zeugnis Overlay -->
 <vbox id="student-noten" style="overflow:auto;margin:0px;" flex="1">
 <popupset>
-	<popup id="student-noten-tree-popup">
+	<menupopup id="student-noten-tree-popup">
 		<menuitem label="Entfernen" oncommand="StudentNotenDelete();" id="student-noten-tree-popup-delete" hidden="false"/>
-	</popup>
+		<menuitem label="Zertifikat erstellen" oncommand="StudentFFZertifikatPrint();" id="lehrveranstaltung-noten-tree-popup-ffzertifikat" hidden="false"/>
+	</menupopup>
 </popupset>
 <hbox flex="1" style="margin-top: 10px;">
 	<vbox flex="1">
@@ -96,6 +97,10 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang" />
 			<splitter class="tree-splitter"/>
+			<treecol id="student-noten-tree-studiengang_kz" label="Studiengang_kz" flex="1" hidden="true" persist="hidden, width, ordinal"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang_kz" />
+			<splitter class="tree-splitter"/>
 			<treecol id="student-noten-tree-studiengang_lv" label="StudiengangLV" flex="2" hidden="true" persist="hidden, width, ordinal"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang_lv" />
@@ -124,6 +129,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#student_uid"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#lehrveranstaltung_id"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang"/>
+						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang_kz"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang_lv"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#lehrveranstaltung_lehrform"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#lehrveranstaltung_kurzbz"/>

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2006 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -42,6 +42,7 @@ require_once('../include/datum.class.php');
 require_once('../include/studiensemester.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/studiengang.class.php');
+require_once('../include/lehrveranstaltung.class.php');
 
 // *********** Funktionen *************************
 function convdate($date)
@@ -653,6 +654,24 @@ else
 				}
 			}
 
+			//für ao. Studierende wird die StgKz der Lehrveranstaltungen benötigt, die sie besuchen
+			$lv_studiengang_kz='';
+			$lv_studiengang_bezeichnung='';
+			$lv_studiengang_typ='';
+
+			$lv=new lehrveranstaltung();
+			$lv->load_lva_student($student->uid);
+			if(count($lv->lehrveranstaltungen)>0)
+			{
+				$lv_studiengang_kz=$lv->lehrveranstaltungen[0]->studiengang_kz;
+				$lv_studiengang=new studiengang();
+				$lv_studiengang->load($lv_studiengang_kz);
+				$lv_studiengang_bezeichnung=$lv_studiengang->bezeichnung;
+				$lv_studiengang_typ=$lv_studiengang->typ;
+	            $stg_typ->getStudiengangTyp($lv_studiengang->typ); 
+				$lv_studiengang_art=$stg_typ->bezeichnung;
+			}
+			
 			echo '
 			<student>
 				<uid><![CDATA['.$student->uid.']]></uid>
@@ -672,6 +691,10 @@ else
 				<studiengang_bezeichnung><![CDATA['.$studiengang->bezeichnung.']]></studiengang_bezeichnung>
 				<studiengang_art><![CDATA['.$typ.']]></studiengang_art>
                 <studiengang_typ><![CDATA['.$studiengang->typ.']]></studiengang_typ>
+				<lv_studiengang_kz><![CDATA['.sprintf("%04d",abs($lv_studiengang_kz)).']]></lv_studiengang_kz>
+				<lv_studiengang_bezeichnung><![CDATA['.$lv_studiengang_bezeichnung.']]></lv_studiengang_bezeichnung>
+                <lv_studiengang_typ><![CDATA['.$lv_studiengang_typ.']]></lv_studiengang_typ>
+				<lv_studiengang_art><![CDATA['.$lv_studiengang_art.']]></lv_studiengang_art>
 				<anrede><![CDATA['.$student->anrede.']]></anrede>
 				<svnr><![CDATA['.$student->svnr.']]></svnr>
 				<ersatzkennzeichen><![CDATA['.$student->ersatzkennzeichen.']]></ersatzkennzeichen>
