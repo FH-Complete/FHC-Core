@@ -489,114 +489,6 @@ class projektphase extends basis_db
 	}
 	
 	/**
-	 * Laedt alle Projektarbeiten eines Studenten
-	 * @param student_uid
-	 * @return true wenn ok, false wenn Fehler
-	 */
-	public function getProjektarbeit($student_uid)
-	{
-		$qry = "SELECT * FROM lehre.tbl_projektarbeit WHERE student_uid='".addslashes($student_uid)."'";
-		
-		if($this->db_query($qry))
-		{
-			while($row = $this->db_fetch_object())
-			{
-				$obj = new projektarbeit();
-				
-				$obj->projekt_kurzbz = $row->projekt_kurzbz;
-				$obj->projekttyp_kurzbz = $row->projekttyp_kurzbz;
-				$obj->titel = $row->titel;
-				$obj->titel_english = $row->titel_english;
-				$obj->lehreinheit_id = $row->lehreinheit_id;
-				$obj->student_uid = $row->student_uid;
-				$obj->firma_id = $row->firma_id;
-				$obj->note = $row->note;
-				$obj->punkte = $row->punkte;
-				$obj->beginn = $row->beginn;
-				$obj->ende = $row->ende;
-				$obj->faktor = $row->faktor;
-				$obj->freigegeben = ($row->freigegeben=='t'?true:false);
-				$obj->gesperrtbis = $row->gesperrtbis;
-				$obj->stundensatz = $row->stundensatz;
-				$obj->gesamtstunden = $row->gesamtstunden;
-				$obj->themenbereich = $row->themenbereich;
-				$obj->anmerkung = $row->anmerkung;
-				$obj->ext_id = $row->ext_id;
-				$obj->insertamum = $row->insertamum;
-				$obj->insertvon = $row->insertvon;
-				$obj->updateamum = $row->updateamum;
-				$obj->updatevon = $row->updatevon;
-				
-				$this->result[] = $obj;
-			}
-			return true;
-		}
-		else 
-		{
-			$this->errormsg = 'Fehler beim Laden der Daten';
-			return false;
-		}
-	}
-	
-	/**
-	 * Laedt alle Projektarbeiten eines Studienganges/Studiensemesters
-	 * @param studiengang_kz, studiensemester_kurzbz
-	 * @return true wenn ok, false wenn Fehler
-	 */
-	public function getProjektarbeitStudiensemester($studiengang_kz, $studiensemester_kurzbz)
-	{
-		$qry = "SELECT 
-					tbl_projektarbeit.* 
-				FROM 
-					lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung
-				WHERE 
-					tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
-					tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
-					tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."' AND
-					tbl_lehreinheit.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
-		
-		if($this->db_query($qry))
-		{
-			while($row = $this->db_fetch_object())
-			{
-				$obj = new projektarbeit();
-				
-				$obj->projekt_kurzbz = $row->projekt_kurzbz;
-				$obj->projekttyp_kurzbz = $row->projekttyp_kurzbz;
-				$obj->titel = $row->titel;
-				$obj->titel_english = $row->titel_english;
-				$obj->lehreinheit_id = $row->lehreinheit_id;
-				$obj->student_uid = $row->student_uid;
-				$obj->firma_id = $row->firma_id;
-				$obj->note = $row->note;
-				$obj->punkte = $row->punkte;
-				$obj->beginn = $row->beginn;
-				$obj->ende = $row->ende;
-				$obj->faktor = $row->faktor;
-				$obj->freigegeben = ($row->freigegeben=='t'?true:false);
-				$obj->gesperrtbis = $row->gesperrtbis;
-				$obj->stundensatz = $row->stundensatz;
-				$obj->gesamtstunden = $row->gesamtstunden;
-				$obj->themenbereich = $row->themenbereich;
-				$obj->anmerkung = $row->anmerkung;
-				$obj->ext_id = $row->ext_id;
-				$obj->insertamum = $row->insertamum;
-				$obj->insertvon = $row->insertvon;
-				$obj->updateamum = $row->updateamum;
-				$obj->updatevon = $row->updatevon;
-				
-				$this->result[] = $obj;
-			}
-			return true;
-		}
-		else 
-		{
-			$this->errormsg = 'Fehler beim Laden der Daten';
-			return false;
-		}
-	}
-	
-	/**
 	 * 
 	 * gibt den Fortschritt der Phase in Prozent zurück --> Phasen die auf die übergebene Phase zeigen werden berücksichtigt
 	 * @param $projektphase_id
@@ -638,7 +530,19 @@ class projektphase extends basis_db
 		return sprintf("%01.2f", $ergebnis); 
 	}
 	
-
+	/**
+	 * Überprüft ob alle Tasks einer Phase erledigt sind
+	 */
+	public function isPhaseErledigt($phase_id)
+	{
+		$task = new projekttask(); 
+		
+		$task->getProjekttasks($phase_id,null,'offen'); 
+		if(count($task->result)==0)
+			return true; 
+		else
+			return false; 
+	}
 	
 }
 ?>
