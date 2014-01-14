@@ -822,8 +822,16 @@ function getProjektGantt()
 				}
 			}
 		
+			$style = ''; 
+			
+			$pr_phase = new projektphase(); 
+			$ende_phase = $phase->ende; 
+			$date_now = date('Y-m-d', time()); 
+			// check ob phase in vergangenheit liegt und noch nicht abgeschlossen ist -> markieren	
+			if(!$pr_phase->isPhaseErledigt($phase->projektphase_id) && $date_now > $ende_phase)
+				$style = 'style ="stroke:pink;stroke-width:10;"'; 
 			// zeichne balken
-			echo '<rect x="'.$x.'" y="'.($startY+10+$i*50).'" width ="'.$width.'" height ="30" fill="'.$phase->farbe.'" stroke="black" />';
+			echo '<rect x="'.$x.'" y="'.($startY+10+$i*50).'" width ="'.$width.'" height ="30" fill="'.$phase->farbe.'" stroke="black" '.$style.'/>';
 			echo'<text x="'.($startX-10).'" y="'.($startY+30+$i*50).'" style="font-size:15px" text-anchor="end">'.$phase->bezeichnung.'</text>';
 			$i++;
 		}
@@ -981,7 +989,17 @@ function getProjektGantt()
 			}
 		
 			// zeichne balken
-			echo '<rect x="'.$x.'" y="'.($startY+10+$i*50).'" width ="'.$width.'" height ="30" fill="'.$phase->farbe.'" stroke="black" />';
+			
+			$style = ''; 
+			
+			$pr_phase = new projektphase(); 
+			$ende_phase = $phase->ende; 
+			$date_now = date('Y-m-d', time()); 
+			// check ob phase in vergangenheit liegt und noch nicht abgeschlossen ist -> markieren	
+			if(!$pr_phase->isPhaseErledigt($phase->projektphase_id) && $date_now > $ende_phase)
+				$style = 'style ="stroke:pink;stroke-width:10;"'; 
+			
+			echo '<rect x="'.$x.'" y="'.($startY+10+$i*50).'" width ="'.$width.'" height ="30" fill="'.$phase->farbe.'" stroke="black" '.$style.' />';
 			echo'<text x="'.($startX-10).'" y="'.($startY+30+$i*50).'" style="font-size:15px" text-anchor="end">'.$phase->bezeichnung.'</text>';
 			$i++;
 		}
