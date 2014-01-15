@@ -160,6 +160,11 @@ class datum
 			return false;
 	}
 	
+	/**
+	 * Zieht ein Datum von einem anderen ab, und gibt die differenz in Tagen zurueck (mit Vorzeichen)
+	 * @param $datum1
+	 * @param $datum2
+	 */
 	public function DateDiff($datum1, $datum2)
 	{
 		$datetime1 = new DateTime($datum1);
