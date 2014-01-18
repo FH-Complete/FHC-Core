@@ -13,7 +13,7 @@ SET escape_string_warning = off;
 -- Name: fhcomplete30; Type: COMMENT; Schema: -; Owner: oesi
 --
 
-COMMENT ON DATABASE fhcomplete30 IS 'FHComplete3.0 Start Dump';
+COMMENT ON DATABASE fhcomplete IS 'FH-Complete 3.0';
 
 
 --
@@ -23,7 +23,7 @@ COMMENT ON DATABASE fhcomplete30 IS 'FHComplete3.0 Start Dump';
 CREATE SCHEMA bis;
 
 
-ALTER SCHEMA bis OWNER TO postgres;
+ALTER SCHEMA bis OWNER TO fhcomplete;
 
 --
 -- Name: campus; Type: SCHEMA; Schema: -; Owner: postgres
@@ -32,7 +32,7 @@ ALTER SCHEMA bis OWNER TO postgres;
 CREATE SCHEMA campus;
 
 
-ALTER SCHEMA campus OWNER TO postgres;
+ALTER SCHEMA campus OWNER TO fhcomplete;
 
 --
 -- Name: fue; Type: SCHEMA; Schema: -; Owner: postgres
@@ -41,7 +41,7 @@ ALTER SCHEMA campus OWNER TO postgres;
 CREATE SCHEMA fue;
 
 
-ALTER SCHEMA fue OWNER TO postgres;
+ALTER SCHEMA fue OWNER TO fhcomplete;
 
 --
 -- Name: kommune; Type: SCHEMA; Schema: -; Owner: postgres
@@ -50,7 +50,7 @@ ALTER SCHEMA fue OWNER TO postgres;
 CREATE SCHEMA kommune;
 
 
-ALTER SCHEMA kommune OWNER TO postgres;
+ALTER SCHEMA kommune OWNER TO fhcomplete;
 
 --
 -- Name: lehre; Type: SCHEMA; Schema: -; Owner: postgres
@@ -59,7 +59,7 @@ ALTER SCHEMA kommune OWNER TO postgres;
 CREATE SCHEMA lehre;
 
 
-ALTER SCHEMA lehre OWNER TO postgres;
+ALTER SCHEMA lehre OWNER TO fhcomplete;
 
 --
 -- Name: sync; Type: SCHEMA; Schema: -; Owner: postgres
@@ -68,7 +68,7 @@ ALTER SCHEMA lehre OWNER TO postgres;
 CREATE SCHEMA sync;
 
 
-ALTER SCHEMA sync OWNER TO postgres;
+ALTER SCHEMA sync OWNER TO fhcomplete;
 
 --
 -- Name: SCHEMA sync; Type: COMMENT; Schema: -; Owner: postgres
@@ -84,7 +84,7 @@ COMMENT ON SCHEMA sync IS 'Schema zum Synchronisieren von Daten';
 CREATE SCHEMA system;
 
 
-ALTER SCHEMA system OWNER TO postgres;
+ALTER SCHEMA system OWNER TO fhcomplete;
 
 --
 -- Name: testtool; Type: SCHEMA; Schema: -; Owner: postgres
@@ -93,7 +93,7 @@ ALTER SCHEMA system OWNER TO postgres;
 CREATE SCHEMA testtool;
 
 
-ALTER SCHEMA testtool OWNER TO postgres;
+ALTER SCHEMA testtool OWNER TO fhcomplete;
 
 --
 -- Name: wawi; Type: SCHEMA; Schema: -; Owner: postgres
@@ -102,7 +102,7 @@ ALTER SCHEMA testtool OWNER TO postgres;
 CREATE SCHEMA wawi;
 
 
-ALTER SCHEMA wawi OWNER TO postgres;
+ALTER SCHEMA wawi OWNER TO fhcomplete;
 
 --
 -- Name: plpgsql; Type: PROCEDURAL LANGUAGE; Schema: -; Owner: postgres
@@ -111,7 +111,7 @@ ALTER SCHEMA wawi OWNER TO postgres;
 CREATE PROCEDURAL LANGUAGE plpgsql;
 
 
-ALTER PROCEDURAL LANGUAGE plpgsql OWNER TO postgres;
+ALTER PROCEDURAL LANGUAGE plpgsql OWNER TO fhcomplete;
 
 SET search_path = public, pg_catalog;
 
@@ -125,7 +125,7 @@ CREATE TYPE dblink_pkey_results AS (
 );
 
 
-ALTER TYPE public.dblink_pkey_results OWNER TO postgres;
+ALTER TYPE public.dblink_pkey_results OWNER TO fhcomplete;
 
 --
 -- Name: get_rolle_prestudent(integer, character varying); Type: FUNCTION; Schema: public; Owner: postgres
@@ -157,7 +157,7 @@ CREATE FUNCTION get_rolle_prestudent(integer, character varying) RETURNS charact
                         $_$;
 
 
-ALTER FUNCTION public.get_rolle_prestudent(integer, character varying) OWNER TO postgres;
+ALTER FUNCTION public.get_rolle_prestudent(integer, character varying) OWNER TO fhcomplete;
 
 --
 -- Name: plpgsql_call_handler(); Type: FUNCTION; Schema: public; Owner: postgres
@@ -168,7 +168,7 @@ CREATE FUNCTION plpgsql_call_handler() RETURNS language_handler
     AS '$libdir/plpgsql', 'plpgsql_call_handler';
 
 
-ALTER FUNCTION public.plpgsql_call_handler() OWNER TO postgres;
+ALTER FUNCTION public.plpgsql_call_handler() OWNER TO fhcomplete;
 
 SET search_path = bis, pg_catalog;
 
@@ -187,7 +187,7 @@ CREATE TABLE tbl_ausbildung (
 );
 
 
-ALTER TABLE bis.tbl_ausbildung OWNER TO postgres;
+ALTER TABLE bis.tbl_ausbildung OWNER TO fhcomplete;
 
 --
 -- Name: tbl_berufstaetigkeit; Type: TABLE; Schema: bis; Owner: postgres; Tablespace: 
@@ -200,7 +200,7 @@ CREATE TABLE tbl_berufstaetigkeit (
 );
 
 
-ALTER TABLE bis.tbl_berufstaetigkeit OWNER TO postgres;
+ALTER TABLE bis.tbl_berufstaetigkeit OWNER TO fhcomplete;
 
 --
 -- Name: tbl_beschaeftigungsart1; Type: TABLE; Schema: bis; Owner: postgres; Tablespace: 
@@ -213,7 +213,7 @@ CREATE TABLE tbl_beschaeftigungsart1 (
 );
 
 
-ALTER TABLE bis.tbl_beschaeftigungsart1 OWNER TO postgres;
+ALTER TABLE bis.tbl_beschaeftigungsart1 OWNER TO fhcomplete;
 
 --
 -- Name: tbl_beschaeftigungsart2; Type: TABLE; Schema: bis; Owner: postgres; Tablespace: 
@@ -225,7 +225,7 @@ CREATE TABLE tbl_beschaeftigungsart2 (
 );
 
 
-ALTER TABLE bis.tbl_beschaeftigungsart2 OWNER TO postgres;
+ALTER TABLE bis.tbl_beschaeftigungsart2 OWNER TO fhcomplete;
 
 --
 -- Name: tbl_beschaeftigungsausmass; Type: TABLE; Schema: bis; Owner: postgres; Tablespace: 
@@ -239,7 +239,7 @@ CREATE TABLE tbl_beschaeftigungsausmass (
 );
 
 
-ALTER TABLE bis.tbl_beschaeftigungsausmass OWNER TO postgres;
+ALTER TABLE bis.tbl_beschaeftigungsausmass OWNER TO fhcomplete;
 
 --
 -- Name: tbl_besqual; Type: TABLE; Schema: bis; Owner: postgres; Tablespace: 
@@ -251,7 +251,7 @@ CREATE TABLE tbl_besqual (
 );
 
 
-ALTER TABLE bis.tbl_besqual OWNER TO postgres;
+ALTER TABLE bis.tbl_besqual OWNER TO fhcomplete;
 
 --
 -- Name: tbl_bisfunktion; Type: TABLE; Schema: bis; Owner: postgres; Tablespace: 
@@ -269,7 +269,7 @@ CREATE TABLE tbl_bisfunktion (
 );
 
 
-ALTER TABLE bis.tbl_bisfunktion OWNER TO postgres;
+ALTER TABLE bis.tbl_bisfunktion OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_bisfunktion.sws; Type: COMMENT; Schema: bis; Owner: postgres
@@ -301,7 +301,7 @@ CREATE TABLE tbl_bisio (
 );
 
 
-ALTER TABLE bis.tbl_bisio OWNER TO postgres;
+ALTER TABLE bis.tbl_bisio OWNER TO fhcomplete;
 
 --
 -- Name: tbl_bisio_bisio_id_seq; Type: SEQUENCE; Schema: bis; Owner: postgres
@@ -315,7 +315,7 @@ CREATE SEQUENCE tbl_bisio_bisio_id_seq
     CACHE 1;
 
 
-ALTER TABLE bis.tbl_bisio_bisio_id_seq OWNER TO postgres;
+ALTER TABLE bis.tbl_bisio_bisio_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_bisio_bisio_id_seq; Type: SEQUENCE OWNED BY; Schema: bis; Owner: postgres
@@ -356,7 +356,7 @@ CREATE TABLE tbl_bisverwendung (
 );
 
 
-ALTER TABLE bis.tbl_bisverwendung OWNER TO postgres;
+ALTER TABLE bis.tbl_bisverwendung OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_bisverwendung.hauptberuflich; Type: COMMENT; Schema: bis; Owner: postgres
@@ -384,7 +384,7 @@ CREATE SEQUENCE tbl_bisverwendung_bisverwendung_id_seq
     CACHE 1;
 
 
-ALTER TABLE bis.tbl_bisverwendung_bisverwendung_id_seq OWNER TO postgres;
+ALTER TABLE bis.tbl_bisverwendung_bisverwendung_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_bisverwendung_bisverwendung_id_seq; Type: SEQUENCE OWNED BY; Schema: bis; Owner: postgres
@@ -411,7 +411,7 @@ CREATE TABLE tbl_bundesland (
 );
 
 
-ALTER TABLE bis.tbl_bundesland OWNER TO postgres;
+ALTER TABLE bis.tbl_bundesland OWNER TO fhcomplete;
 
 --
 -- Name: tbl_entwicklungsteam; Type: TABLE; Schema: bis; Owner: postgres; Tablespace: 
@@ -431,7 +431,7 @@ CREATE TABLE tbl_entwicklungsteam (
 );
 
 
-ALTER TABLE bis.tbl_entwicklungsteam OWNER TO postgres;
+ALTER TABLE bis.tbl_entwicklungsteam OWNER TO fhcomplete;
 
 --
 -- Name: tbl_gemeinde; Type: TABLE; Schema: bis; Owner: postgres; Tablespace: 
@@ -449,7 +449,7 @@ CREATE TABLE tbl_gemeinde (
 );
 
 
-ALTER TABLE bis.tbl_gemeinde OWNER TO postgres;
+ALTER TABLE bis.tbl_gemeinde OWNER TO fhcomplete;
 
 --
 -- Name: tbl_gemeinde_gemeinde_id_seq; Type: SEQUENCE; Schema: bis; Owner: postgres
@@ -463,7 +463,7 @@ CREATE SEQUENCE tbl_gemeinde_gemeinde_id_seq
     CACHE 1;
 
 
-ALTER TABLE bis.tbl_gemeinde_gemeinde_id_seq OWNER TO postgres;
+ALTER TABLE bis.tbl_gemeinde_gemeinde_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_gemeinde_gemeinde_id_seq; Type: SEQUENCE OWNED BY; Schema: bis; Owner: postgres
@@ -489,7 +489,7 @@ CREATE TABLE tbl_hauptberuf (
 );
 
 
-ALTER TABLE bis.tbl_hauptberuf OWNER TO postgres;
+ALTER TABLE bis.tbl_hauptberuf OWNER TO fhcomplete;
 
 --
 -- Name: tbl_lgartcode; Type: TABLE; Schema: bis; Owner: postgres; Tablespace: 
@@ -503,7 +503,7 @@ CREATE TABLE tbl_lgartcode (
 );
 
 
-ALTER TABLE bis.tbl_lgartcode OWNER TO postgres;
+ALTER TABLE bis.tbl_lgartcode OWNER TO fhcomplete;
 
 --
 -- Name: tbl_mobilitaetsprogramm; Type: TABLE; Schema: bis; Owner: postgres; Tablespace: 
@@ -518,7 +518,7 @@ CREATE TABLE tbl_mobilitaetsprogramm (
 );
 
 
-ALTER TABLE bis.tbl_mobilitaetsprogramm OWNER TO postgres;
+ALTER TABLE bis.tbl_mobilitaetsprogramm OWNER TO fhcomplete;
 
 --
 -- Name: tbl_nation; Type: TABLE; Schema: bis; Owner: postgres; Tablespace: 
@@ -537,7 +537,7 @@ CREATE TABLE tbl_nation (
 );
 
 
-ALTER TABLE bis.tbl_nation OWNER TO postgres;
+ALTER TABLE bis.tbl_nation OWNER TO fhcomplete;
 
 --
 -- Name: tbl_orgform; Type: TABLE; Schema: bis; Owner: postgres; Tablespace: 
@@ -551,7 +551,7 @@ CREATE TABLE tbl_orgform (
 );
 
 
-ALTER TABLE bis.tbl_orgform OWNER TO postgres;
+ALTER TABLE bis.tbl_orgform OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_orgform.rolle; Type: COMMENT; Schema: bis; Owner: postgres
@@ -570,7 +570,7 @@ CREATE TABLE tbl_verwendung (
 );
 
 
-ALTER TABLE bis.tbl_verwendung OWNER TO postgres;
+ALTER TABLE bis.tbl_verwendung OWNER TO fhcomplete;
 
 --
 -- Name: tbl_zgv; Type: TABLE; Schema: bis; Owner: postgres; Tablespace: 
@@ -583,7 +583,7 @@ CREATE TABLE tbl_zgv (
 );
 
 
-ALTER TABLE bis.tbl_zgv OWNER TO postgres;
+ALTER TABLE bis.tbl_zgv OWNER TO fhcomplete;
 
 --
 -- Name: tbl_zgvmaster; Type: TABLE; Schema: bis; Owner: postgres; Tablespace: 
@@ -596,7 +596,7 @@ CREATE TABLE tbl_zgvmaster (
 );
 
 
-ALTER TABLE bis.tbl_zgvmaster OWNER TO postgres;
+ALTER TABLE bis.tbl_zgvmaster OWNER TO fhcomplete;
 
 --
 -- Name: tbl_zweck; Type: TABLE; Schema: bis; Owner: postgres; Tablespace: 
@@ -609,7 +609,7 @@ CREATE TABLE tbl_zweck (
 );
 
 
-ALTER TABLE bis.tbl_zweck OWNER TO postgres;
+ALTER TABLE bis.tbl_zweck OWNER TO fhcomplete;
 
 SET search_path = campus, pg_catalog;
 
@@ -625,7 +625,7 @@ CREATE SEQUENCE seq_content_content_id
     CACHE 1;
 
 
-ALTER TABLE campus.seq_content_content_id OWNER TO postgres;
+ALTER TABLE campus.seq_content_content_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_content_content_id; Type: SEQUENCE SET; Schema: campus; Owner: postgres
@@ -646,7 +646,7 @@ CREATE SEQUENCE seq_contentchild
     CACHE 1;
 
 
-ALTER TABLE campus.seq_contentchild OWNER TO postgres;
+ALTER TABLE campus.seq_contentchild OWNER TO fhcomplete;
 
 --
 -- Name: seq_contentchild; Type: SEQUENCE SET; Schema: campus; Owner: postgres
@@ -667,7 +667,7 @@ CREATE SEQUENCE seq_contentlog_contentlog_id
     CACHE 1;
 
 
-ALTER TABLE campus.seq_contentlog_contentlog_id OWNER TO postgres;
+ALTER TABLE campus.seq_contentlog_contentlog_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_contentlog_contentlog_id; Type: SEQUENCE SET; Schema: campus; Owner: postgres
@@ -688,7 +688,7 @@ CREATE SEQUENCE seq_contentsprache
     CACHE 1;
 
 
-ALTER TABLE campus.seq_contentsprache OWNER TO postgres;
+ALTER TABLE campus.seq_contentsprache OWNER TO fhcomplete;
 
 --
 -- Name: seq_contentsprache; Type: SEQUENCE SET; Schema: campus; Owner: postgres
@@ -709,7 +709,7 @@ CREATE SEQUENCE seq_coodle_coodle_id
     CACHE 1;
 
 
-ALTER TABLE campus.seq_coodle_coodle_id OWNER TO postgres;
+ALTER TABLE campus.seq_coodle_coodle_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_coodle_coodle_id; Type: SEQUENCE SET; Schema: campus; Owner: postgres
@@ -730,7 +730,7 @@ CREATE SEQUENCE seq_coodle_ressource_coodle_ressource_id
     CACHE 1;
 
 
-ALTER TABLE campus.seq_coodle_ressource_coodle_ressource_id OWNER TO postgres;
+ALTER TABLE campus.seq_coodle_ressource_coodle_ressource_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_coodle_ressource_coodle_ressource_id; Type: SEQUENCE SET; Schema: campus; Owner: postgres
@@ -751,7 +751,7 @@ CREATE SEQUENCE seq_coodle_termin_coodle_termin_id
     CACHE 1;
 
 
-ALTER TABLE campus.seq_coodle_termin_coodle_termin_id OWNER TO postgres;
+ALTER TABLE campus.seq_coodle_termin_coodle_termin_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_coodle_termin_coodle_termin_id; Type: SEQUENCE SET; Schema: campus; Owner: postgres
@@ -772,7 +772,7 @@ CREATE SEQUENCE seq_dms_dms_id
     CACHE 1;
 
 
-ALTER TABLE campus.seq_dms_dms_id OWNER TO postgres;
+ALTER TABLE campus.seq_dms_dms_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_dms_dms_id; Type: SEQUENCE SET; Schema: campus; Owner: postgres
@@ -793,7 +793,7 @@ CREATE SEQUENCE seq_freebusy_freebusy_id
     CACHE 1;
 
 
-ALTER TABLE campus.seq_freebusy_freebusy_id OWNER TO postgres;
+ALTER TABLE campus.seq_freebusy_freebusy_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_freebusy_freebusy_id; Type: SEQUENCE SET; Schema: campus; Owner: postgres
@@ -814,7 +814,7 @@ CREATE SEQUENCE seq_infoscreen_content_infoscreen_content_id
     CACHE 1;
 
 
-ALTER TABLE campus.seq_infoscreen_content_infoscreen_content_id OWNER TO postgres;
+ALTER TABLE campus.seq_infoscreen_content_infoscreen_content_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_infoscreen_content_infoscreen_content_id; Type: SEQUENCE SET; Schema: campus; Owner: postgres
@@ -835,7 +835,7 @@ CREATE SEQUENCE seq_infoscreen_infoscreen_id
     CACHE 1;
 
 
-ALTER TABLE campus.seq_infoscreen_infoscreen_id OWNER TO postgres;
+ALTER TABLE campus.seq_infoscreen_infoscreen_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_infoscreen_infoscreen_id; Type: SEQUENCE SET; Schema: campus; Owner: postgres
@@ -856,7 +856,7 @@ CREATE SEQUENCE seq_lehre_tools_lehre_tools_id
     CACHE 1;
 
 
-ALTER TABLE campus.seq_lehre_tools_lehre_tools_id OWNER TO postgres;
+ALTER TABLE campus.seq_lehre_tools_lehre_tools_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_lehre_tools_lehre_tools_id; Type: SEQUENCE SET; Schema: campus; Owner: postgres
@@ -877,7 +877,7 @@ CREATE TABLE tbl_abgabe (
 );
 
 
-ALTER TABLE campus.tbl_abgabe OWNER TO postgres;
+ALTER TABLE campus.tbl_abgabe OWNER TO fhcomplete;
 
 --
 -- Name: tbl_abgabe_abgabe_id_seq; Type: SEQUENCE; Schema: campus; Owner: postgres
@@ -891,7 +891,7 @@ CREATE SEQUENCE tbl_abgabe_abgabe_id_seq
     CACHE 1;
 
 
-ALTER TABLE campus.tbl_abgabe_abgabe_id_seq OWNER TO postgres;
+ALTER TABLE campus.tbl_abgabe_abgabe_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_abgabe_abgabe_id_seq; Type: SEQUENCE OWNED BY; Schema: campus; Owner: postgres
@@ -924,7 +924,7 @@ CREATE TABLE tbl_beispiel (
 );
 
 
-ALTER TABLE campus.tbl_beispiel OWNER TO postgres;
+ALTER TABLE campus.tbl_beispiel OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_beispiel.nummer; Type: COMMENT; Schema: campus; Owner: postgres
@@ -945,7 +945,7 @@ CREATE SEQUENCE tbl_beispiel_beispiel_id_seq
     CACHE 1;
 
 
-ALTER TABLE campus.tbl_beispiel_beispiel_id_seq OWNER TO postgres;
+ALTER TABLE campus.tbl_beispiel_beispiel_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_beispiel_beispiel_id_seq; Type: SEQUENCE OWNED BY; Schema: campus; Owner: postgres
@@ -972,7 +972,7 @@ CREATE TABLE tbl_benutzerlvstudiensemester (
 );
 
 
-ALTER TABLE campus.tbl_benutzerlvstudiensemester OWNER TO postgres;
+ALTER TABLE campus.tbl_benutzerlvstudiensemester OWNER TO fhcomplete;
 
 --
 -- Name: TABLE tbl_benutzerlvstudiensemester; Type: COMMENT; Schema: campus; Owner: postgres
@@ -999,7 +999,7 @@ CREATE TABLE tbl_content (
 );
 
 
-ALTER TABLE campus.tbl_content OWNER TO postgres;
+ALTER TABLE campus.tbl_content OWNER TO fhcomplete;
 
 --
 -- Name: tbl_contentchild; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1017,7 +1017,7 @@ CREATE TABLE tbl_contentchild (
 );
 
 
-ALTER TABLE campus.tbl_contentchild OWNER TO postgres;
+ALTER TABLE campus.tbl_contentchild OWNER TO fhcomplete;
 
 --
 -- Name: tbl_contentgruppe; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1031,7 +1031,7 @@ CREATE TABLE tbl_contentgruppe (
 );
 
 
-ALTER TABLE campus.tbl_contentgruppe OWNER TO postgres;
+ALTER TABLE campus.tbl_contentgruppe OWNER TO fhcomplete;
 
 --
 -- Name: tbl_contentlog; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1046,7 +1046,7 @@ CREATE TABLE tbl_contentlog (
 );
 
 
-ALTER TABLE campus.tbl_contentlog OWNER TO postgres;
+ALTER TABLE campus.tbl_contentlog OWNER TO fhcomplete;
 
 --
 -- Name: tbl_contentsprache; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1070,7 +1070,7 @@ CREATE TABLE tbl_contentsprache (
 );
 
 
-ALTER TABLE campus.tbl_contentsprache OWNER TO postgres;
+ALTER TABLE campus.tbl_contentsprache OWNER TO fhcomplete;
 
 --
 -- Name: tbl_coodle; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1091,7 +1091,7 @@ CREATE TABLE tbl_coodle (
 );
 
 
-ALTER TABLE campus.tbl_coodle OWNER TO postgres;
+ALTER TABLE campus.tbl_coodle OWNER TO fhcomplete;
 
 --
 -- Name: tbl_coodle_ressource; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1112,7 +1112,7 @@ CREATE TABLE tbl_coodle_ressource (
 );
 
 
-ALTER TABLE campus.tbl_coodle_ressource OWNER TO postgres;
+ALTER TABLE campus.tbl_coodle_ressource OWNER TO fhcomplete;
 
 --
 -- Name: tbl_coodle_ressource_termin; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1126,7 +1126,7 @@ CREATE TABLE tbl_coodle_ressource_termin (
 );
 
 
-ALTER TABLE campus.tbl_coodle_ressource_termin OWNER TO postgres;
+ALTER TABLE campus.tbl_coodle_ressource_termin OWNER TO fhcomplete;
 
 --
 -- Name: tbl_coodle_status; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1138,7 +1138,7 @@ CREATE TABLE tbl_coodle_status (
 );
 
 
-ALTER TABLE campus.tbl_coodle_status OWNER TO postgres;
+ALTER TABLE campus.tbl_coodle_status OWNER TO fhcomplete;
 
 --
 -- Name: tbl_coodle_termin; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1153,7 +1153,7 @@ CREATE TABLE tbl_coodle_termin (
 );
 
 
-ALTER TABLE campus.tbl_coodle_termin OWNER TO postgres;
+ALTER TABLE campus.tbl_coodle_termin OWNER TO fhcomplete;
 
 --
 -- Name: tbl_dms; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1167,7 +1167,7 @@ CREATE TABLE tbl_dms (
 );
 
 
-ALTER TABLE campus.tbl_dms OWNER TO postgres;
+ALTER TABLE campus.tbl_dms OWNER TO fhcomplete;
 
 --
 -- Name: tbl_dms_kategorie; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1181,7 +1181,7 @@ CREATE TABLE tbl_dms_kategorie (
 );
 
 
-ALTER TABLE campus.tbl_dms_kategorie OWNER TO postgres;
+ALTER TABLE campus.tbl_dms_kategorie OWNER TO fhcomplete;
 
 --
 -- Name: tbl_dms_kategorie_gruppe; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1195,7 +1195,7 @@ CREATE TABLE tbl_dms_kategorie_gruppe (
 );
 
 
-ALTER TABLE campus.tbl_dms_kategorie_gruppe OWNER TO postgres;
+ALTER TABLE campus.tbl_dms_kategorie_gruppe OWNER TO fhcomplete;
 
 --
 -- Name: tbl_dms_version; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1216,7 +1216,7 @@ CREATE TABLE tbl_dms_version (
 );
 
 
-ALTER TABLE campus.tbl_dms_version OWNER TO postgres;
+ALTER TABLE campus.tbl_dms_version OWNER TO fhcomplete;
 
 --
 -- Name: tbl_erreichbarkeit; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1229,7 +1229,7 @@ CREATE TABLE tbl_erreichbarkeit (
 );
 
 
-ALTER TABLE campus.tbl_erreichbarkeit OWNER TO postgres;
+ALTER TABLE campus.tbl_erreichbarkeit OWNER TO fhcomplete;
 
 --
 -- Name: tbl_feedback; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1249,7 +1249,7 @@ CREATE TABLE tbl_feedback (
 );
 
 
-ALTER TABLE campus.tbl_feedback OWNER TO postgres;
+ALTER TABLE campus.tbl_feedback OWNER TO fhcomplete;
 
 --
 -- Name: tbl_feedback_feedback_id_seq; Type: SEQUENCE; Schema: campus; Owner: postgres
@@ -1263,7 +1263,7 @@ CREATE SEQUENCE tbl_feedback_feedback_id_seq
     CACHE 1;
 
 
-ALTER TABLE campus.tbl_feedback_feedback_id_seq OWNER TO postgres;
+ALTER TABLE campus.tbl_feedback_feedback_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_feedback_feedback_id_seq; Type: SEQUENCE OWNED BY; Schema: campus; Owner: postgres
@@ -1297,7 +1297,7 @@ CREATE TABLE tbl_freebusy (
 );
 
 
-ALTER TABLE campus.tbl_freebusy OWNER TO postgres;
+ALTER TABLE campus.tbl_freebusy OWNER TO fhcomplete;
 
 --
 -- Name: tbl_freebusytyp; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1311,7 +1311,7 @@ CREATE TABLE tbl_freebusytyp (
 );
 
 
-ALTER TABLE campus.tbl_freebusytyp OWNER TO postgres;
+ALTER TABLE campus.tbl_freebusytyp OWNER TO fhcomplete;
 
 --
 -- Name: tbl_infoscreen; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1325,7 +1325,7 @@ CREATE TABLE tbl_infoscreen (
 );
 
 
-ALTER TABLE campus.tbl_infoscreen OWNER TO postgres;
+ALTER TABLE campus.tbl_infoscreen OWNER TO fhcomplete;
 
 --
 -- Name: tbl_infoscreen_content; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1345,7 +1345,7 @@ CREATE TABLE tbl_infoscreen_content (
 );
 
 
-ALTER TABLE campus.tbl_infoscreen_content OWNER TO postgres;
+ALTER TABLE campus.tbl_infoscreen_content OWNER TO fhcomplete;
 
 --
 -- Name: tbl_legesamtnote; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1363,7 +1363,7 @@ CREATE TABLE tbl_legesamtnote (
 );
 
 
-ALTER TABLE campus.tbl_legesamtnote OWNER TO postgres;
+ALTER TABLE campus.tbl_legesamtnote OWNER TO fhcomplete;
 
 --
 -- Name: tbl_lehre_tools; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1378,7 +1378,7 @@ CREATE TABLE tbl_lehre_tools (
 );
 
 
-ALTER TABLE campus.tbl_lehre_tools OWNER TO postgres;
+ALTER TABLE campus.tbl_lehre_tools OWNER TO fhcomplete;
 
 --
 -- Name: tbl_lehre_tools_organisationseinheit; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1391,7 +1391,7 @@ CREATE TABLE tbl_lehre_tools_organisationseinheit (
 );
 
 
-ALTER TABLE campus.tbl_lehre_tools_organisationseinheit OWNER TO postgres;
+ALTER TABLE campus.tbl_lehre_tools_organisationseinheit OWNER TO fhcomplete;
 
 --
 -- Name: tbl_lvgesamtnote; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1414,7 +1414,7 @@ CREATE TABLE tbl_lvgesamtnote (
 );
 
 
-ALTER TABLE campus.tbl_lvgesamtnote OWNER TO postgres;
+ALTER TABLE campus.tbl_lvgesamtnote OWNER TO fhcomplete;
 
 --
 -- Name: tbl_lvinfo; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1441,7 +1441,7 @@ CREATE TABLE tbl_lvinfo (
 );
 
 
-ALTER TABLE campus.tbl_lvinfo OWNER TO postgres;
+ALTER TABLE campus.tbl_lvinfo OWNER TO fhcomplete;
 
 --
 -- Name: tbl_news; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1466,7 +1466,7 @@ CREATE TABLE tbl_news (
 );
 
 
-ALTER TABLE campus.tbl_news OWNER TO postgres;
+ALTER TABLE campus.tbl_news OWNER TO fhcomplete;
 
 --
 -- Name: TABLE tbl_news; Type: COMMENT; Schema: campus; Owner: postgres
@@ -1491,7 +1491,7 @@ CREATE SEQUENCE tbl_news_news_id_seq
     CACHE 1;
 
 
-ALTER TABLE campus.tbl_news_news_id_seq OWNER TO postgres;
+ALTER TABLE campus.tbl_news_news_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_news_news_id_seq; Type: SEQUENCE OWNED BY; Schema: campus; Owner: postgres
@@ -1518,7 +1518,7 @@ CREATE TABLE tbl_notenschluessel (
 );
 
 
-ALTER TABLE campus.tbl_notenschluessel OWNER TO postgres;
+ALTER TABLE campus.tbl_notenschluessel OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_notenschluessel.punkte; Type: COMMENT; Schema: campus; Owner: postgres
@@ -1538,7 +1538,7 @@ CREATE TABLE tbl_notenschluesseluebung (
 );
 
 
-ALTER TABLE campus.tbl_notenschluesseluebung OWNER TO postgres;
+ALTER TABLE campus.tbl_notenschluesseluebung OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_notenschluesseluebung.punkte; Type: COMMENT; Schema: campus; Owner: postgres
@@ -1566,7 +1566,7 @@ CREATE TABLE tbl_paabgabe (
 );
 
 
-ALTER TABLE campus.tbl_paabgabe OWNER TO postgres;
+ALTER TABLE campus.tbl_paabgabe OWNER TO fhcomplete;
 
 --
 -- Name: tbl_paabgabe_paabgabe_id_seq; Type: SEQUENCE; Schema: campus; Owner: postgres
@@ -1580,7 +1580,7 @@ CREATE SEQUENCE tbl_paabgabe_paabgabe_id_seq
     CACHE 1;
 
 
-ALTER TABLE campus.tbl_paabgabe_paabgabe_id_seq OWNER TO postgres;
+ALTER TABLE campus.tbl_paabgabe_paabgabe_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_paabgabe_paabgabe_id_seq; Type: SEQUENCE OWNED BY; Schema: campus; Owner: postgres
@@ -1606,7 +1606,7 @@ CREATE TABLE tbl_paabgabetyp (
 );
 
 
-ALTER TABLE campus.tbl_paabgabetyp OWNER TO postgres;
+ALTER TABLE campus.tbl_paabgabetyp OWNER TO fhcomplete;
 
 --
 -- Name: tbl_reservierung; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1631,7 +1631,7 @@ CREATE TABLE tbl_reservierung (
 );
 
 
-ALTER TABLE campus.tbl_reservierung OWNER TO postgres;
+ALTER TABLE campus.tbl_reservierung OWNER TO fhcomplete;
 
 --
 -- Name: tbl_reservierung_reservierung_id_seq; Type: SEQUENCE; Schema: campus; Owner: postgres
@@ -1645,7 +1645,7 @@ CREATE SEQUENCE tbl_reservierung_reservierung_id_seq
     CACHE 1;
 
 
-ALTER TABLE campus.tbl_reservierung_reservierung_id_seq OWNER TO postgres;
+ALTER TABLE campus.tbl_reservierung_reservierung_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_reservierung_reservierung_id_seq; Type: SEQUENCE OWNED BY; Schema: campus; Owner: postgres
@@ -1678,7 +1678,7 @@ CREATE TABLE tbl_resturlaub (
 );
 
 
-ALTER TABLE campus.tbl_resturlaub OWNER TO postgres;
+ALTER TABLE campus.tbl_resturlaub OWNER TO fhcomplete;
 
 --
 -- Name: tbl_studentbeispiel; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1696,7 +1696,7 @@ CREATE TABLE tbl_studentbeispiel (
 );
 
 
-ALTER TABLE campus.tbl_studentbeispiel OWNER TO postgres;
+ALTER TABLE campus.tbl_studentbeispiel OWNER TO fhcomplete;
 
 --
 -- Name: tbl_studentuebung; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1719,7 +1719,7 @@ CREATE TABLE tbl_studentuebung (
 );
 
 
-ALTER TABLE campus.tbl_studentuebung OWNER TO postgres;
+ALTER TABLE campus.tbl_studentuebung OWNER TO fhcomplete;
 
 --
 -- Name: tbl_template; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1734,7 +1734,7 @@ CREATE TABLE tbl_template (
 );
 
 
-ALTER TABLE campus.tbl_template OWNER TO postgres;
+ALTER TABLE campus.tbl_template OWNER TO fhcomplete;
 
 --
 -- Name: tbl_uebung; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1766,7 +1766,7 @@ CREATE TABLE tbl_uebung (
 );
 
 
-ALTER TABLE campus.tbl_uebung OWNER TO postgres;
+ALTER TABLE campus.tbl_uebung OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_uebung.statistik; Type: COMMENT; Schema: campus; Owner: postgres
@@ -1808,7 +1808,7 @@ CREATE SEQUENCE tbl_uebung_uebung_id_seq
     CACHE 1;
 
 
-ALTER TABLE campus.tbl_uebung_uebung_id_seq OWNER TO postgres;
+ALTER TABLE campus.tbl_uebung_uebung_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_uebung_uebung_id_seq; Type: SEQUENCE OWNED BY; Schema: campus; Owner: postgres
@@ -1845,7 +1845,7 @@ CREATE TABLE tbl_veranstaltung (
 );
 
 
-ALTER TABLE campus.tbl_veranstaltung OWNER TO postgres;
+ALTER TABLE campus.tbl_veranstaltung OWNER TO fhcomplete;
 
 --
 -- Name: tbl_veranstaltung_veranstaltung_id_seq; Type: SEQUENCE; Schema: campus; Owner: postgres
@@ -1859,7 +1859,7 @@ CREATE SEQUENCE tbl_veranstaltung_veranstaltung_id_seq
     CACHE 1;
 
 
-ALTER TABLE campus.tbl_veranstaltung_veranstaltung_id_seq OWNER TO postgres;
+ALTER TABLE campus.tbl_veranstaltung_veranstaltung_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_veranstaltung_veranstaltung_id_seq; Type: SEQUENCE OWNED BY; Schema: campus; Owner: postgres
@@ -1887,7 +1887,7 @@ CREATE TABLE tbl_veranstaltungskategorie (
 );
 
 
-ALTER TABLE campus.tbl_veranstaltungskategorie OWNER TO postgres;
+ALTER TABLE campus.tbl_veranstaltungskategorie OWNER TO fhcomplete;
 
 --
 -- Name: tbl_zeitaufzeichnung; Type: TABLE; Schema: campus; Owner: postgres; Tablespace: 
@@ -1913,7 +1913,7 @@ CREATE TABLE tbl_zeitaufzeichnung (
 );
 
 
-ALTER TABLE campus.tbl_zeitaufzeichnung OWNER TO postgres;
+ALTER TABLE campus.tbl_zeitaufzeichnung OWNER TO fhcomplete;
 
 --
 -- Name: tbl_zeitaufzeichnung_zeitaufzeichnung_id_seq; Type: SEQUENCE; Schema: campus; Owner: postgres
@@ -1927,7 +1927,7 @@ CREATE SEQUENCE tbl_zeitaufzeichnung_zeitaufzeichnung_id_seq
     CACHE 1;
 
 
-ALTER TABLE campus.tbl_zeitaufzeichnung_zeitaufzeichnung_id_seq OWNER TO postgres;
+ALTER TABLE campus.tbl_zeitaufzeichnung_zeitaufzeichnung_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_zeitaufzeichnung_zeitaufzeichnung_id_seq; Type: SEQUENCE OWNED BY; Schema: campus; Owner: postgres
@@ -1967,7 +1967,7 @@ CREATE TABLE tbl_zeitsperre (
 );
 
 
-ALTER TABLE campus.tbl_zeitsperre OWNER TO postgres;
+ALTER TABLE campus.tbl_zeitsperre OWNER TO fhcomplete;
 
 --
 -- Name: tbl_zeitsperre_zeitsperre_id_seq; Type: SEQUENCE; Schema: campus; Owner: postgres
@@ -1981,7 +1981,7 @@ CREATE SEQUENCE tbl_zeitsperre_zeitsperre_id_seq
     CACHE 1;
 
 
-ALTER TABLE campus.tbl_zeitsperre_zeitsperre_id_seq OWNER TO postgres;
+ALTER TABLE campus.tbl_zeitsperre_zeitsperre_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_zeitsperre_zeitsperre_id_seq; Type: SEQUENCE OWNED BY; Schema: campus; Owner: postgres
@@ -2008,7 +2008,7 @@ CREATE TABLE tbl_zeitsperretyp (
 );
 
 
-ALTER TABLE campus.tbl_zeitsperretyp OWNER TO postgres;
+ALTER TABLE campus.tbl_zeitsperretyp OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_zeitsperretyp.farbe; Type: COMMENT; Schema: campus; Owner: postgres
@@ -2033,7 +2033,7 @@ CREATE TABLE tbl_zeitwunsch (
 );
 
 
-ALTER TABLE campus.tbl_zeitwunsch OWNER TO postgres;
+ALTER TABLE campus.tbl_zeitwunsch OWNER TO fhcomplete;
 
 --
 -- Name: TABLE tbl_zeitwunsch; Type: COMMENT; Schema: campus; Owner: postgres
@@ -2063,7 +2063,7 @@ CREATE TABLE tbl_benutzer (
 );
 
 
-ALTER TABLE public.tbl_benutzer OWNER TO postgres;
+ALTER TABLE public.tbl_benutzer OWNER TO fhcomplete;
 
 --
 -- Name: TABLE tbl_benutzer; Type: COMMENT; Schema: public; Owner: postgres
@@ -2113,7 +2113,7 @@ CREATE TABLE tbl_person (
 );
 
 
-ALTER TABLE public.tbl_person OWNER TO postgres;
+ALTER TABLE public.tbl_person OWNER TO fhcomplete;
 
 --
 -- Name: TABLE tbl_person; Type: COMMENT; Schema: public; Owner: postgres
@@ -2160,7 +2160,7 @@ CREATE VIEW vw_benutzer AS
     SELECT tbl_benutzer.person_id, tbl_benutzer.uid, tbl_benutzer.alias, tbl_person.geburtsnation, tbl_person.sprache, tbl_person.anrede, tbl_person.titelpost, tbl_person.titelpre, tbl_person.nachname, tbl_person.vorname, tbl_person.vornamen, tbl_person.gebdatum, tbl_person.gebort, tbl_person.gebzeit, tbl_person.foto, tbl_person.geschlecht, tbl_person.anmerkung, tbl_person.homepage, tbl_person.svnr, tbl_person.ersatzkennzeichen, tbl_person.familienstand, tbl_person.anzahlkinder, tbl_benutzer.aktiv, tbl_benutzer.insertamum, tbl_benutzer.insertvon, tbl_benutzer.updateamum, tbl_benutzer.updatevon, tbl_benutzer.ext_id FROM (public.tbl_benutzer JOIN public.tbl_person USING (person_id));
 
 
-ALTER TABLE campus.vw_benutzer OWNER TO postgres;
+ALTER TABLE campus.vw_benutzer OWNER TO fhcomplete;
 
 SET search_path = lehre, pg_catalog;
 
@@ -2195,7 +2195,7 @@ CREATE TABLE tbl_lehreinheit (
 );
 
 
-ALTER TABLE lehre.tbl_lehreinheit OWNER TO postgres;
+ALTER TABLE lehre.tbl_lehreinheit OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_lehreinheit.stundenblockung; Type: COMMENT; Schema: lehre; Owner: postgres
@@ -2259,7 +2259,7 @@ CREATE TABLE tbl_lehreinheitgruppe (
 );
 
 
-ALTER TABLE lehre.tbl_lehreinheitgruppe OWNER TO postgres;
+ALTER TABLE lehre.tbl_lehreinheitgruppe OWNER TO fhcomplete;
 
 --
 -- Name: tbl_lehreinheitmitarbeiter; Type: TABLE; Schema: lehre; Owner: postgres; Tablespace: 
@@ -2284,7 +2284,7 @@ CREATE TABLE tbl_lehreinheitmitarbeiter (
 );
 
 
-ALTER TABLE lehre.tbl_lehreinheitmitarbeiter OWNER TO postgres;
+ALTER TABLE lehre.tbl_lehreinheitmitarbeiter OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_lehreinheitmitarbeiter.planstunden; Type: COMMENT; Schema: lehre; Owner: postgres
@@ -2322,7 +2322,7 @@ CREATE TABLE tbl_lehrfach (
 );
 
 
-ALTER TABLE lehre.tbl_lehrfach OWNER TO postgres;
+ALTER TABLE lehre.tbl_lehrfach OWNER TO fhcomplete;
 
 --
 -- Name: TABLE tbl_lehrfach; Type: COMMENT; Schema: lehre; Owner: postgres
@@ -2368,7 +2368,7 @@ CREATE TABLE tbl_lehrveranstaltung (
 );
 
 
-ALTER TABLE lehre.tbl_lehrveranstaltung OWNER TO postgres;
+ALTER TABLE lehre.tbl_lehrveranstaltung OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_lehrveranstaltung.sprache; Type: COMMENT; Schema: lehre; Owner: postgres
@@ -2418,7 +2418,7 @@ CREATE TABLE tbl_mitarbeiter (
 );
 
 
-ALTER TABLE public.tbl_mitarbeiter OWNER TO postgres;
+ALTER TABLE public.tbl_mitarbeiter OWNER TO fhcomplete;
 
 --
 -- Name: TABLE tbl_mitarbeiter; Type: COMMENT; Schema: public; Owner: postgres
@@ -2470,7 +2470,7 @@ CREATE TABLE tbl_studiengang (
 );
 
 
-ALTER TABLE public.tbl_studiengang OWNER TO postgres;
+ALTER TABLE public.tbl_studiengang OWNER TO fhcomplete;
 
 --
 -- Name: TABLE tbl_studiengang; Type: COMMENT; Schema: public; Owner: postgres
@@ -2524,7 +2524,7 @@ CREATE VIEW vw_lehreinheit AS
     SELECT tbl_lehrveranstaltung.studiengang_kz AS lv_studiengang_kz, tbl_lehrveranstaltung.semester AS lv_semester, tbl_lehrveranstaltung.kurzbz AS lv_kurzbz, tbl_lehrveranstaltung.bezeichnung AS lv_bezeichnung, tbl_lehrveranstaltung.ects AS lv_ects, tbl_lehrveranstaltung.lehreverzeichnis AS lv_lehreverzeichnis, tbl_lehrveranstaltung.planfaktor AS lv_planfaktor, tbl_lehrveranstaltung.planlektoren AS lv_planlektoren, tbl_lehrveranstaltung.planpersonalkosten AS lv_planpersonalkosten, tbl_lehrveranstaltung.plankostenprolektor AS lv_plankostenprolektor, tbl_lehrveranstaltung.orgform_kurzbz AS lv_orgform_kurzbz, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrveranstaltung_id, tbl_lehreinheit.studiensemester_kurzbz, tbl_lehreinheit.lehrform_kurzbz, tbl_lehreinheit.stundenblockung, tbl_lehreinheit.wochenrythmus, tbl_lehreinheit.start_kw, tbl_lehreinheit.raumtyp, tbl_lehreinheit.raumtypalternativ, tbl_lehreinheit.lehre, tbl_lehreinheit.unr, tbl_lehreinheit.lvnr, tbl_lehreinheitmitarbeiter.lehrfunktion_kurzbz, tbl_lehreinheit.insertamum, tbl_lehreinheit.insertvon, tbl_lehreinheit.updateamum, tbl_lehreinheit.updatevon, tbl_lehreinheit.lehrfach_id, tbl_lehrfach.fachbereich_kurzbz, tbl_lehrfach.kurzbz AS lehrfach, tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe, tbl_lehrveranstaltung.aktiv, tbl_lehrfach.sprache, tbl_lehreinheitmitarbeiter.mitarbeiter_uid, tbl_lehreinheitmitarbeiter.semesterstunden, tbl_lehrveranstaltung.semesterstunden AS lv_semesterstunden, tbl_lehreinheitmitarbeiter.planstunden, tbl_lehreinheitmitarbeiter.stundensatz, tbl_lehreinheitmitarbeiter.faktor, tbl_lehreinheit.anmerkung, tbl_mitarbeiter.kurzbz AS lektor, tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester, tbl_lehreinheitgruppe.verband, tbl_lehreinheitgruppe.gruppe, tbl_lehreinheitgruppe.gruppe_kurzbz, tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.kurzbzlang AS stg_kurzbzlang, tbl_studiengang.bezeichnung AS stg_bez, tbl_studiengang.typ AS stg_typ, tbl_lehreinheitmitarbeiter.anmerkung AS anmerkunglektor, tbl_lehrveranstaltung.lehrform_kurzbz AS lv_lehrform_kurzbz, tbl_lehrveranstaltung.bezeichnung_english AS lv_bezeichnung_english FROM ((((((lehre.tbl_lehreinheit JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)) JOIN lehre.tbl_lehrfach USING (lehrfach_id)) JOIN lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id)) JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid)) JOIN lehre.tbl_lehreinheitgruppe USING (lehreinheit_id)) JOIN public.tbl_studiengang ON ((tbl_lehreinheitgruppe.studiengang_kz = tbl_studiengang.studiengang_kz)));
 
 
-ALTER TABLE campus.vw_lehreinheit OWNER TO postgres;
+ALTER TABLE campus.vw_lehreinheit OWNER TO fhcomplete;
 
 --
 -- Name: vw_mitarbeiter; Type: VIEW; Schema: campus; Owner: postgres
@@ -2534,7 +2534,7 @@ CREATE VIEW vw_mitarbeiter AS
     SELECT tbl_benutzer.uid, tbl_mitarbeiter.ausbildungcode, tbl_mitarbeiter.personalnummer, tbl_mitarbeiter.kurzbz, tbl_mitarbeiter.lektor, tbl_mitarbeiter.fixangestellt, tbl_mitarbeiter.telefonklappe, tbl_benutzer.person_id, tbl_benutzer.alias, tbl_person.geburtsnation, tbl_person.sprache, tbl_person.anrede, tbl_person.titelpost, tbl_person.titelpre, tbl_person.nachname, tbl_person.vorname, tbl_person.vornamen, tbl_person.gebdatum, tbl_person.gebort, tbl_person.gebzeit, tbl_person.foto, tbl_mitarbeiter.anmerkung, tbl_person.homepage, tbl_person.svnr, tbl_person.ersatzkennzeichen, tbl_person.geschlecht, tbl_person.familienstand, tbl_person.anzahlkinder, tbl_mitarbeiter.ort_kurzbz, tbl_benutzer.aktiv, tbl_mitarbeiter.bismelden, tbl_mitarbeiter.standort_id, tbl_mitarbeiter.updateamum, tbl_mitarbeiter.updatevon, tbl_mitarbeiter.insertamum, tbl_mitarbeiter.insertvon, tbl_mitarbeiter.ext_id FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON (((tbl_mitarbeiter.mitarbeiter_uid)::text = (tbl_benutzer.uid)::text))) JOIN public.tbl_person USING (person_id));
 
 
-ALTER TABLE campus.vw_mitarbeiter OWNER TO postgres;
+ALTER TABLE campus.vw_mitarbeiter OWNER TO fhcomplete;
 
 SET search_path = public, pg_catalog;
 
@@ -2550,7 +2550,7 @@ CREATE SEQUENCE seq_gruppe_gid
     CACHE 1;
 
 
-ALTER TABLE public.seq_gruppe_gid OWNER TO postgres;
+ALTER TABLE public.seq_gruppe_gid OWNER TO fhcomplete;
 
 --
 -- Name: seq_gruppe_gid; Type: SEQUENCE SET; Schema: public; Owner: postgres
@@ -2575,7 +2575,7 @@ CREATE TABLE tbl_benutzergruppe (
 );
 
 
-ALTER TABLE public.tbl_benutzergruppe OWNER TO postgres;
+ALTER TABLE public.tbl_benutzergruppe OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_benutzergruppe.studiensemester_kurzbz; Type: COMMENT; Schema: public; Owner: postgres
@@ -2612,7 +2612,7 @@ CREATE TABLE tbl_gruppe (
 );
 
 
-ALTER TABLE public.tbl_gruppe OWNER TO postgres;
+ALTER TABLE public.tbl_gruppe OWNER TO fhcomplete;
 
 --
 -- Name: TABLE tbl_gruppe; Type: COMMENT; Schema: public; Owner: postgres
@@ -2631,7 +2631,7 @@ CREATE VIEW vw_persongruppe AS
     SELECT tbl_benutzer.uid, tbl_benutzergruppe.gruppe_kurzbz, tbl_gruppe.studiengang_kz, tbl_person.nachname, tbl_person.vorname, tbl_person.vornamen, tbl_person.person_id, tbl_person.gebdatum, tbl_person.titelpost, tbl_person.titelpre, tbl_person.staatsbuergerschaft, tbl_person.geburtsnation, tbl_person.sprache, tbl_person.anrede, tbl_person.gebort, tbl_person.gebzeit, tbl_person.foto, tbl_person.homepage, tbl_person.svnr, tbl_person.ersatzkennzeichen, tbl_person.familienstand, tbl_person.geschlecht, tbl_person.anzahlkinder, tbl_benutzer.alias, tbl_person.anmerkung, tbl_person.aktiv AS aktivperson, tbl_gruppe.mailgrp, tbl_gruppe.sichtbar, tbl_benutzer.aktiv AS aktivbenutzer, tbl_gruppe.semester, tbl_gruppe.bezeichnung, tbl_gruppe.beschreibung, tbl_gruppe.generiert, tbl_gruppe.aktiv AS aktivgruppe, tbl_gruppe.sort, tbl_benutzergruppe.updateamum, tbl_benutzergruppe.updatevon, tbl_benutzergruppe.insertamum, tbl_benutzergruppe.insertvon FROM (((public.tbl_person JOIN public.tbl_benutzer USING (person_id)) JOIN public.tbl_benutzergruppe USING (uid)) JOIN public.tbl_gruppe USING (gruppe_kurzbz));
 
 
-ALTER TABLE campus.vw_persongruppe OWNER TO postgres;
+ALTER TABLE campus.vw_persongruppe OWNER TO fhcomplete;
 
 --
 -- Name: vw_reservierung; Type: VIEW; Schema: campus; Owner: postgres
@@ -2641,7 +2641,7 @@ CREATE VIEW vw_reservierung AS
     SELECT tbl_reservierung.reservierung_id, tbl_reservierung.ort_kurzbz, tbl_reservierung.studiengang_kz, tbl_reservierung.uid, tbl_reservierung.stunde, tbl_reservierung.datum, tbl_reservierung.titel, tbl_reservierung.beschreibung, tbl_reservierung.semester, tbl_reservierung.verband, tbl_reservierung.gruppe, tbl_reservierung.gruppe_kurzbz, tbl_studiengang.kurzbz AS stg_kurzbz, tbl_reservierung.insertamum, tbl_reservierung.insertvon FROM (tbl_reservierung JOIN public.tbl_studiengang USING (studiengang_kz));
 
 
-ALTER TABLE campus.vw_reservierung OWNER TO postgres;
+ALTER TABLE campus.vw_reservierung OWNER TO fhcomplete;
 
 SET search_path = public, pg_catalog;
 
@@ -2665,7 +2665,7 @@ CREATE TABLE tbl_student (
 );
 
 
-ALTER TABLE public.tbl_student OWNER TO postgres;
+ALTER TABLE public.tbl_student OWNER TO fhcomplete;
 
 --
 -- Name: TABLE tbl_student; Type: COMMENT; Schema: public; Owner: postgres
@@ -2684,7 +2684,7 @@ CREATE VIEW vw_student AS
     SELECT tbl_benutzer.uid, tbl_student.matrikelnr, tbl_student.prestudent_id, tbl_student.studiengang_kz, tbl_student.semester, tbl_student.verband, tbl_student.gruppe, tbl_benutzer.person_id, tbl_benutzer.alias, tbl_person.geburtsnation, tbl_person.sprache, tbl_person.anrede, tbl_person.titelpost, tbl_person.titelpre, tbl_person.nachname, tbl_person.vorname, tbl_person.vornamen, tbl_person.gebdatum, tbl_person.gebort, tbl_person.gebzeit, tbl_person.foto, tbl_person.anmerkung, tbl_person.homepage, tbl_person.svnr, tbl_person.ersatzkennzeichen, tbl_person.geschlecht, tbl_person.familienstand, tbl_person.anzahlkinder, tbl_benutzer.aktiv, tbl_student.updateamum, tbl_student.updatevon, tbl_student.insertamum, tbl_student.insertvon, tbl_student.ext_id, tbl_benutzer.updateaktivam, tbl_benutzer.updateaktivvon FROM ((public.tbl_student JOIN public.tbl_benutzer ON (((tbl_student.student_uid)::text = (tbl_benutzer.uid)::text))) JOIN public.tbl_person USING (person_id));
 
 
-ALTER TABLE campus.vw_student OWNER TO postgres;
+ALTER TABLE campus.vw_student OWNER TO fhcomplete;
 
 SET search_path = public, pg_catalog;
 
@@ -2707,7 +2707,7 @@ CREATE TABLE tbl_studentlehrverband (
 );
 
 
-ALTER TABLE public.tbl_studentlehrverband OWNER TO postgres;
+ALTER TABLE public.tbl_studentlehrverband OWNER TO fhcomplete;
 
 SET search_path = campus, pg_catalog;
 
@@ -2719,7 +2719,7 @@ CREATE VIEW vw_student_lehrveranstaltung AS
     SELECT tbl_benutzergruppe.uid, tbl_lehrveranstaltung.zeugnis, tbl_lehrveranstaltung.sort, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.kurzbz, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.bezeichnung_english, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.sprache, tbl_lehrveranstaltung.ects, tbl_lehrveranstaltung.semesterstunden, tbl_lehrveranstaltung.anmerkung, tbl_lehrveranstaltung.lehre, tbl_lehrveranstaltung.lehreverzeichnis, tbl_lehrveranstaltung.aktiv, tbl_lehrveranstaltung.planfaktor, tbl_lehrveranstaltung.planlektoren, tbl_lehrveranstaltung.planpersonalkosten, tbl_lehrveranstaltung.plankostenprolektor, tbl_lehrveranstaltung.updateamum, tbl_lehrveranstaltung.updatevon, tbl_lehrveranstaltung.insertamum, tbl_lehrveranstaltung.insertvon, tbl_lehrveranstaltung.ext_id, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.studiensemester_kurzbz, tbl_lehreinheit.lehrfach_id, tbl_lehreinheit.lehrform_kurzbz, tbl_lehreinheit.stundenblockung, tbl_lehreinheit.wochenrythmus, tbl_lehreinheit.start_kw, tbl_lehreinheit.raumtyp, tbl_lehreinheit.raumtypalternativ, tbl_lehrveranstaltung.lehrform_kurzbz AS lv_lehrform_kurzbz FROM lehre.tbl_lehreinheitgruppe, public.tbl_benutzergruppe, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung WHERE (((((tbl_lehreinheitgruppe.gruppe_kurzbz)::text = (tbl_benutzergruppe.gruppe_kurzbz)::text) AND (tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id)) AND (tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id)) AND ((tbl_lehreinheit.studiensemester_kurzbz)::text = (tbl_benutzergruppe.studiensemester_kurzbz)::text)) UNION SELECT tbl_studentlehrverband.student_uid AS uid, tbl_lehrveranstaltung.zeugnis, tbl_lehrveranstaltung.sort, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.kurzbz, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.bezeichnung_english, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.sprache, tbl_lehrveranstaltung.ects, tbl_lehrveranstaltung.semesterstunden, tbl_lehrveranstaltung.anmerkung, tbl_lehrveranstaltung.lehre, tbl_lehrveranstaltung.lehreverzeichnis, tbl_lehrveranstaltung.aktiv, tbl_lehrveranstaltung.planfaktor, tbl_lehrveranstaltung.planlektoren, tbl_lehrveranstaltung.planpersonalkosten, tbl_lehrveranstaltung.plankostenprolektor, tbl_lehrveranstaltung.updateamum, tbl_lehrveranstaltung.updatevon, tbl_lehrveranstaltung.insertamum, tbl_lehrveranstaltung.insertvon, tbl_lehrveranstaltung.ext_id, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.studiensemester_kurzbz, tbl_lehreinheit.lehrfach_id, tbl_lehreinheit.lehrform_kurzbz, tbl_lehreinheit.stundenblockung, tbl_lehreinheit.wochenrythmus, tbl_lehreinheit.start_kw, tbl_lehreinheit.raumtyp, tbl_lehreinheit.raumtypalternativ, tbl_lehrveranstaltung.lehrform_kurzbz AS lv_lehrform_kurzbz FROM lehre.tbl_lehreinheitgruppe, public.tbl_studentlehrverband, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung WHERE (((((((tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id) AND ((tbl_lehreinheit.studiensemester_kurzbz)::text = (tbl_studentlehrverband.studiensemester_kurzbz)::text)) AND (tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id)) AND (tbl_studentlehrverband.studiengang_kz = tbl_lehreinheitgruppe.studiengang_kz)) AND (tbl_studentlehrverband.semester = tbl_lehreinheitgruppe.semester)) AND ((btrim((tbl_studentlehrverband.verband)::text) = btrim((tbl_lehreinheitgruppe.verband)::text)) OR (((tbl_lehreinheitgruppe.verband IS NULL) OR (btrim((tbl_lehreinheitgruppe.verband)::text) = ''::text)) AND (tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL)))) AND ((btrim((tbl_studentlehrverband.gruppe)::text) = btrim((tbl_lehreinheitgruppe.gruppe)::text)) OR (((tbl_lehreinheitgruppe.gruppe IS NULL) OR (btrim((tbl_lehreinheitgruppe.gruppe)::text) = ''::text)) AND (tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL))));
 
 
-ALTER TABLE campus.vw_student_lehrveranstaltung OWNER TO postgres;
+ALTER TABLE campus.vw_student_lehrveranstaltung OWNER TO fhcomplete;
 
 SET search_path = lehre, pg_catalog;
 
@@ -2750,7 +2750,7 @@ CREATE TABLE tbl_stundenplan (
 );
 
 
-ALTER TABLE lehre.tbl_stundenplan OWNER TO postgres;
+ALTER TABLE lehre.tbl_stundenplan OWNER TO fhcomplete;
 
 --
 -- Name: TABLE tbl_stundenplan; Type: COMMENT; Schema: lehre; Owner: postgres
@@ -2776,7 +2776,7 @@ CREATE VIEW vw_stundenplan AS
     SELECT tbl_stundenplan.stundenplan_id, tbl_stundenplan.unr, tbl_stundenplan.mitarbeiter_uid AS uid, tbl_stundenplan.lehreinheit_id, tbl_lehreinheit.lehrfach_id, tbl_stundenplan.datum, tbl_stundenplan.stunde, tbl_stundenplan.ort_kurzbz, tbl_stundenplan.studiengang_kz, tbl_stundenplan.semester, tbl_stundenplan.verband, tbl_stundenplan.gruppe, tbl_stundenplan.gruppe_kurzbz, tbl_stundenplan.titel, tbl_stundenplan.anmerkung, tbl_stundenplan.fix, tbl_lehreinheit.lehrveranstaltung_id, tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.kurzbzlang AS stg_kurzbzlang, tbl_studiengang.bezeichnung AS stg_bezeichnung, tbl_studiengang.typ AS stg_typ, tbl_lehrfach.fachbereich_kurzbz, tbl_lehrfach.kurzbz AS lehrfach, tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe, tbl_lehreinheit.lehrform_kurzbz AS lehrform, tbl_mitarbeiter.kurzbz AS lektor, tbl_stundenplan.updateamum, tbl_stundenplan.updatevon, tbl_stundenplan.insertamum, tbl_stundenplan.insertvon FROM ((((lehre.tbl_stundenplan JOIN public.tbl_studiengang USING (studiengang_kz)) JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)) JOIN lehre.tbl_lehrfach USING (lehrfach_id)) JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid));
 
 
-ALTER TABLE campus.vw_stundenplan OWNER TO postgres;
+ALTER TABLE campus.vw_stundenplan OWNER TO fhcomplete;
 
 SET search_path = fue, pg_catalog;
 
@@ -2792,7 +2792,7 @@ CREATE SEQUENCE seq_projekt_dokument_projekt_dokument_id
     CACHE 1;
 
 
-ALTER TABLE fue.seq_projekt_dokument_projekt_dokument_id OWNER TO postgres;
+ALTER TABLE fue.seq_projekt_dokument_projekt_dokument_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_projekt_dokument_projekt_dokument_id; Type: SEQUENCE SET; Schema: fue; Owner: postgres
@@ -2813,7 +2813,7 @@ CREATE SEQUENCE seq_projekt_ressource_projekt_ressource_id
     CACHE 1;
 
 
-ALTER TABLE fue.seq_projekt_ressource_projekt_ressource_id OWNER TO postgres;
+ALTER TABLE fue.seq_projekt_ressource_projekt_ressource_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_projekt_ressource_projekt_ressource_id; Type: SEQUENCE SET; Schema: fue; Owner: postgres
@@ -2834,7 +2834,7 @@ CREATE SEQUENCE seq_projektphase_projektphase_id
     CACHE 1;
 
 
-ALTER TABLE fue.seq_projektphase_projektphase_id OWNER TO postgres;
+ALTER TABLE fue.seq_projektphase_projektphase_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_projektphase_projektphase_id; Type: SEQUENCE SET; Schema: fue; Owner: postgres
@@ -2855,7 +2855,7 @@ CREATE SEQUENCE seq_projekttask_projekttask_id
     CACHE 1;
 
 
-ALTER TABLE fue.seq_projekttask_projekttask_id OWNER TO postgres;
+ALTER TABLE fue.seq_projekttask_projekttask_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_projekttask_projekttask_id; Type: SEQUENCE SET; Schema: fue; Owner: postgres
@@ -2876,7 +2876,7 @@ CREATE SEQUENCE seq_ressource_ressource_id
     CACHE 1;
 
 
-ALTER TABLE fue.seq_ressource_ressource_id OWNER TO postgres;
+ALTER TABLE fue.seq_ressource_ressource_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_ressource_ressource_id; Type: SEQUENCE SET; Schema: fue; Owner: postgres
@@ -2895,7 +2895,7 @@ CREATE TABLE tbl_aktivitaet (
 );
 
 
-ALTER TABLE fue.tbl_aktivitaet OWNER TO postgres;
+ALTER TABLE fue.tbl_aktivitaet OWNER TO fhcomplete;
 
 --
 -- Name: tbl_projekt; Type: TABLE; Schema: fue; Owner: postgres; Tablespace: 
@@ -2914,7 +2914,7 @@ CREATE TABLE tbl_projekt (
 );
 
 
-ALTER TABLE fue.tbl_projekt OWNER TO postgres;
+ALTER TABLE fue.tbl_projekt OWNER TO fhcomplete;
 
 --
 -- Name: tbl_projekt_dokument; Type: TABLE; Schema: fue; Owner: postgres; Tablespace: 
@@ -2928,7 +2928,7 @@ CREATE TABLE tbl_projekt_dokument (
 );
 
 
-ALTER TABLE fue.tbl_projekt_dokument OWNER TO postgres;
+ALTER TABLE fue.tbl_projekt_dokument OWNER TO fhcomplete;
 
 --
 -- Name: tbl_projekt_ressource; Type: TABLE; Schema: fue; Owner: postgres; Tablespace: 
@@ -2944,7 +2944,7 @@ CREATE TABLE tbl_projekt_ressource (
 );
 
 
-ALTER TABLE fue.tbl_projekt_ressource OWNER TO postgres;
+ALTER TABLE fue.tbl_projekt_ressource OWNER TO fhcomplete;
 
 --
 -- Name: tbl_projektphase; Type: TABLE; Schema: fue; Owner: postgres; Tablespace: 
@@ -2968,7 +2968,7 @@ CREATE TABLE tbl_projektphase (
 );
 
 
-ALTER TABLE fue.tbl_projektphase OWNER TO postgres;
+ALTER TABLE fue.tbl_projektphase OWNER TO fhcomplete;
 
 --
 -- Name: tbl_projekttask; Type: TABLE; Schema: fue; Owner: postgres; Tablespace: 
@@ -2992,7 +2992,7 @@ CREATE TABLE tbl_projekttask (
 );
 
 
-ALTER TABLE fue.tbl_projekttask OWNER TO postgres;
+ALTER TABLE fue.tbl_projekttask OWNER TO fhcomplete;
 
 --
 -- Name: tbl_ressource; Type: TABLE; Schema: fue; Owner: postgres; Tablespace: 
@@ -3013,7 +3013,7 @@ CREATE TABLE tbl_ressource (
 );
 
 
-ALTER TABLE fue.tbl_ressource OWNER TO postgres;
+ALTER TABLE fue.tbl_ressource OWNER TO fhcomplete;
 
 SET search_path = kommune, pg_catalog;
 
@@ -3039,7 +3039,7 @@ CREATE TABLE tbl_match (
 );
 
 
-ALTER TABLE kommune.tbl_match OWNER TO postgres;
+ALTER TABLE kommune.tbl_match OWNER TO fhcomplete;
 
 --
 -- Name: tbl_match_match_id_seq; Type: SEQUENCE; Schema: kommune; Owner: postgres
@@ -3053,7 +3053,7 @@ CREATE SEQUENCE tbl_match_match_id_seq
     CACHE 1;
 
 
-ALTER TABLE kommune.tbl_match_match_id_seq OWNER TO postgres;
+ALTER TABLE kommune.tbl_match_match_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_match_match_id_seq; Type: SEQUENCE OWNED BY; Schema: kommune; Owner: postgres
@@ -3081,7 +3081,7 @@ CREATE TABLE tbl_team (
 );
 
 
-ALTER TABLE kommune.tbl_team OWNER TO postgres;
+ALTER TABLE kommune.tbl_team OWNER TO fhcomplete;
 
 --
 -- Name: tbl_teambenutzer; Type: TABLE; Schema: kommune; Owner: postgres; Tablespace: 
@@ -3093,7 +3093,7 @@ CREATE TABLE tbl_teambenutzer (
 );
 
 
-ALTER TABLE kommune.tbl_teambenutzer OWNER TO postgres;
+ALTER TABLE kommune.tbl_teambenutzer OWNER TO fhcomplete;
 
 --
 -- Name: tbl_wettbewerb; Type: TABLE; Schema: kommune; Owner: postgres; Tablespace: 
@@ -3110,7 +3110,7 @@ CREATE TABLE tbl_wettbewerb (
 );
 
 
-ALTER TABLE kommune.tbl_wettbewerb OWNER TO postgres;
+ALTER TABLE kommune.tbl_wettbewerb OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_wettbewerb.uid; Type: COMMENT; Schema: kommune; Owner: postgres
@@ -3131,7 +3131,7 @@ CREATE TABLE tbl_wettbewerbteam (
 );
 
 
-ALTER TABLE kommune.tbl_wettbewerbteam OWNER TO postgres;
+ALTER TABLE kommune.tbl_wettbewerbteam OWNER TO fhcomplete;
 
 --
 -- Name: tbl_wettbewerbtyp; Type: TABLE; Schema: kommune; Owner: postgres; Tablespace: 
@@ -3144,7 +3144,7 @@ CREATE TABLE tbl_wettbewerbtyp (
 );
 
 
-ALTER TABLE kommune.tbl_wettbewerbtyp OWNER TO postgres;
+ALTER TABLE kommune.tbl_wettbewerbtyp OWNER TO fhcomplete;
 
 SET search_path = lehre, pg_catalog;
 
@@ -3159,7 +3159,7 @@ CREATE TABLE tbl_abschlussbeurteilung (
 );
 
 
-ALTER TABLE lehre.tbl_abschlussbeurteilung OWNER TO postgres;
+ALTER TABLE lehre.tbl_abschlussbeurteilung OWNER TO fhcomplete;
 
 --
 -- Name: tbl_abschlusspruefung; Type: TABLE; Schema: lehre; Owner: postgres; Tablespace: 
@@ -3187,7 +3187,7 @@ CREATE TABLE tbl_abschlusspruefung (
 );
 
 
-ALTER TABLE lehre.tbl_abschlusspruefung OWNER TO postgres;
+ALTER TABLE lehre.tbl_abschlusspruefung OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_abschlusspruefung.note; Type: COMMENT; Schema: lehre; Owner: postgres
@@ -3208,7 +3208,7 @@ CREATE SEQUENCE tbl_abschlusspruefung_abschlusspruefung_id
     CACHE 1;
 
 
-ALTER TABLE lehre.tbl_abschlusspruefung_abschlusspruefung_id OWNER TO postgres;
+ALTER TABLE lehre.tbl_abschlusspruefung_abschlusspruefung_id OWNER TO fhcomplete;
 
 --
 -- Name: tbl_abschlusspruefung_abschlusspruefung_id; Type: SEQUENCE SET; Schema: lehre; Owner: postgres
@@ -3230,7 +3230,7 @@ CREATE TABLE tbl_akadgrad (
 );
 
 
-ALTER TABLE lehre.tbl_akadgrad OWNER TO postgres;
+ALTER TABLE lehre.tbl_akadgrad OWNER TO fhcomplete;
 
 --
 -- Name: tbl_akadgrad_akadgrad_id_seq; Type: SEQUENCE; Schema: lehre; Owner: postgres
@@ -3244,7 +3244,7 @@ CREATE SEQUENCE tbl_akadgrad_akadgrad_id_seq
     CACHE 1;
 
 
-ALTER TABLE lehre.tbl_akadgrad_akadgrad_id_seq OWNER TO postgres;
+ALTER TABLE lehre.tbl_akadgrad_akadgrad_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_akadgrad_akadgrad_id_seq; Type: SEQUENCE OWNED BY; Schema: lehre; Owner: postgres
@@ -3270,7 +3270,7 @@ CREATE TABLE tbl_betreuerart (
 );
 
 
-ALTER TABLE lehre.tbl_betreuerart OWNER TO postgres;
+ALTER TABLE lehre.tbl_betreuerart OWNER TO fhcomplete;
 
 --
 -- Name: tbl_ferien; Type: TABLE; Schema: lehre; Owner: postgres; Tablespace: 
@@ -3284,7 +3284,7 @@ CREATE TABLE tbl_ferien (
 );
 
 
-ALTER TABLE lehre.tbl_ferien OWNER TO postgres;
+ALTER TABLE lehre.tbl_ferien OWNER TO fhcomplete;
 
 --
 -- Name: tbl_lehreinheit_lehreinheit_id_seq; Type: SEQUENCE; Schema: lehre; Owner: postgres
@@ -3298,7 +3298,7 @@ CREATE SEQUENCE tbl_lehreinheit_lehreinheit_id_seq
     CACHE 1;
 
 
-ALTER TABLE lehre.tbl_lehreinheit_lehreinheit_id_seq OWNER TO postgres;
+ALTER TABLE lehre.tbl_lehreinheit_lehreinheit_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_lehreinheit_lehreinheit_id_seq; Type: SEQUENCE OWNED BY; Schema: lehre; Owner: postgres
@@ -3326,7 +3326,7 @@ CREATE SEQUENCE tbl_lehreinheitgruppe_lehreinheitgruppe_id_seq
     CACHE 1;
 
 
-ALTER TABLE lehre.tbl_lehreinheitgruppe_lehreinheitgruppe_id_seq OWNER TO postgres;
+ALTER TABLE lehre.tbl_lehreinheitgruppe_lehreinheitgruppe_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_lehreinheitgruppe_lehreinheitgruppe_id_seq; Type: SEQUENCE OWNED BY; Schema: lehre; Owner: postgres
@@ -3354,7 +3354,7 @@ CREATE SEQUENCE tbl_lehrfach_lehrfach_id_seq
     CACHE 1;
 
 
-ALTER TABLE lehre.tbl_lehrfach_lehrfach_id_seq OWNER TO postgres;
+ALTER TABLE lehre.tbl_lehrfach_lehrfach_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_lehrfach_lehrfach_id_seq; Type: SEQUENCE OWNED BY; Schema: lehre; Owner: postgres
@@ -3381,7 +3381,7 @@ CREATE TABLE tbl_lehrform (
 );
 
 
-ALTER TABLE lehre.tbl_lehrform OWNER TO postgres;
+ALTER TABLE lehre.tbl_lehrform OWNER TO fhcomplete;
 
 --
 -- Name: tbl_lehrfunktion; Type: TABLE; Schema: lehre; Owner: postgres; Tablespace: 
@@ -3395,7 +3395,7 @@ CREATE TABLE tbl_lehrfunktion (
 );
 
 
-ALTER TABLE lehre.tbl_lehrfunktion OWNER TO postgres;
+ALTER TABLE lehre.tbl_lehrfunktion OWNER TO fhcomplete;
 
 --
 -- Name: tbl_lehrmittel; Type: TABLE; Schema: lehre; Owner: postgres; Tablespace: 
@@ -3408,7 +3408,7 @@ CREATE TABLE tbl_lehrmittel (
 );
 
 
-ALTER TABLE lehre.tbl_lehrmittel OWNER TO postgres;
+ALTER TABLE lehre.tbl_lehrmittel OWNER TO fhcomplete;
 
 --
 -- Name: tbl_lehrveranstaltung_lehrveranstaltung_id_seq; Type: SEQUENCE; Schema: lehre; Owner: postgres
@@ -3422,7 +3422,7 @@ CREATE SEQUENCE tbl_lehrveranstaltung_lehrveranstaltung_id_seq
     CACHE 1;
 
 
-ALTER TABLE lehre.tbl_lehrveranstaltung_lehrveranstaltung_id_seq OWNER TO postgres;
+ALTER TABLE lehre.tbl_lehrveranstaltung_lehrveranstaltung_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_lehrveranstaltung_lehrveranstaltung_id_seq; Type: SEQUENCE OWNED BY; Schema: lehre; Owner: postgres
@@ -3455,7 +3455,7 @@ CREATE TABLE tbl_moodle (
 );
 
 
-ALTER TABLE lehre.tbl_moodle OWNER TO postgres;
+ALTER TABLE lehre.tbl_moodle OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_moodle.gruppen; Type: COMMENT; Schema: lehre; Owner: postgres
@@ -3476,7 +3476,7 @@ CREATE SEQUENCE tbl_moodle_moodle_id_seq
     CACHE 1;
 
 
-ALTER TABLE lehre.tbl_moodle_moodle_id_seq OWNER TO postgres;
+ALTER TABLE lehre.tbl_moodle_moodle_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_moodle_moodle_id_seq; Type: SEQUENCE OWNED BY; Schema: lehre; Owner: postgres
@@ -3503,7 +3503,7 @@ CREATE TABLE tbl_moodle_version (
 );
 
 
-ALTER TABLE lehre.tbl_moodle_version OWNER TO postgres;
+ALTER TABLE lehre.tbl_moodle_version OWNER TO fhcomplete;
 
 --
 -- Name: tbl_note; Type: TABLE; Schema: lehre; Owner: postgres; Tablespace: 
@@ -3517,7 +3517,7 @@ CREATE TABLE tbl_note (
 );
 
 
-ALTER TABLE lehre.tbl_note OWNER TO postgres;
+ALTER TABLE lehre.tbl_note OWNER TO fhcomplete;
 
 --
 -- Name: tbl_projektarbeit; Type: TABLE; Schema: lehre; Owner: postgres; Tablespace: 
@@ -3558,7 +3558,7 @@ CREATE TABLE tbl_projektarbeit (
 );
 
 
-ALTER TABLE lehre.tbl_projektarbeit OWNER TO postgres;
+ALTER TABLE lehre.tbl_projektarbeit OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_projektarbeit.titel_english; Type: COMMENT; Schema: lehre; Owner: postgres
@@ -3579,7 +3579,7 @@ CREATE SEQUENCE tbl_projektarbeit_projektarbeit_id_seq
     CACHE 1;
 
 
-ALTER TABLE lehre.tbl_projektarbeit_projektarbeit_id_seq OWNER TO postgres;
+ALTER TABLE lehre.tbl_projektarbeit_projektarbeit_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_projektarbeit_projektarbeit_id_seq; Type: SEQUENCE OWNED BY; Schema: lehre; Owner: postgres
@@ -3617,7 +3617,7 @@ CREATE TABLE tbl_projektbetreuer (
 );
 
 
-ALTER TABLE lehre.tbl_projektbetreuer OWNER TO postgres;
+ALTER TABLE lehre.tbl_projektbetreuer OWNER TO fhcomplete;
 
 --
 -- Name: tbl_projekttyp; Type: TABLE; Schema: lehre; Owner: postgres; Tablespace: 
@@ -3629,7 +3629,7 @@ CREATE TABLE tbl_projekttyp (
 );
 
 
-ALTER TABLE lehre.tbl_projekttyp OWNER TO postgres;
+ALTER TABLE lehre.tbl_projekttyp OWNER TO fhcomplete;
 
 --
 -- Name: tbl_pruefung; Type: TABLE; Schema: lehre; Owner: postgres; Tablespace: 
@@ -3652,7 +3652,7 @@ CREATE TABLE tbl_pruefung (
 );
 
 
-ALTER TABLE lehre.tbl_pruefung OWNER TO postgres;
+ALTER TABLE lehre.tbl_pruefung OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_pruefung.mitarbeiter_uid; Type: COMMENT; Schema: lehre; Owner: postgres
@@ -3673,7 +3673,7 @@ CREATE SEQUENCE tbl_pruefung_pruefung_id_seq
     CACHE 1;
 
 
-ALTER TABLE lehre.tbl_pruefung_pruefung_id_seq OWNER TO postgres;
+ALTER TABLE lehre.tbl_pruefung_pruefung_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_pruefung_pruefung_id_seq; Type: SEQUENCE OWNED BY; Schema: lehre; Owner: postgres
@@ -3700,7 +3700,7 @@ CREATE TABLE tbl_pruefungstyp (
 );
 
 
-ALTER TABLE lehre.tbl_pruefungstyp OWNER TO postgres;
+ALTER TABLE lehre.tbl_pruefungstyp OWNER TO fhcomplete;
 
 --
 -- Name: tbl_stunde; Type: TABLE; Schema: lehre; Owner: postgres; Tablespace: 
@@ -3713,7 +3713,7 @@ CREATE TABLE tbl_stunde (
 );
 
 
-ALTER TABLE lehre.tbl_stunde OWNER TO postgres;
+ALTER TABLE lehre.tbl_stunde OWNER TO fhcomplete;
 
 --
 -- Name: TABLE tbl_stunde; Type: COMMENT; Schema: lehre; Owner: postgres
@@ -3748,7 +3748,7 @@ CREATE SEQUENCE tbl_stundenplan_stundenplan_id_seq
     CACHE 1;
 
 
-ALTER TABLE lehre.tbl_stundenplan_stundenplan_id_seq OWNER TO postgres;
+ALTER TABLE lehre.tbl_stundenplan_stundenplan_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_stundenplan_stundenplan_id_seq; Type: SEQUENCE OWNED BY; Schema: lehre; Owner: postgres
@@ -3791,7 +3791,7 @@ CREATE TABLE tbl_stundenplandev (
 );
 
 
-ALTER TABLE lehre.tbl_stundenplandev OWNER TO postgres;
+ALTER TABLE lehre.tbl_stundenplandev OWNER TO fhcomplete;
 
 --
 -- Name: TABLE tbl_stundenplandev; Type: COMMENT; Schema: lehre; Owner: postgres
@@ -3819,7 +3819,7 @@ CREATE SEQUENCE tbl_stundenplandev_stundenplandev_id_seq
     CACHE 1;
 
 
-ALTER TABLE lehre.tbl_stundenplandev_stundenplandev_id_seq OWNER TO postgres;
+ALTER TABLE lehre.tbl_stundenplandev_stundenplandev_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_stundenplandev_stundenplandev_id_seq; Type: SEQUENCE OWNED BY; Schema: lehre; Owner: postgres
@@ -3850,7 +3850,7 @@ CREATE TABLE tbl_zeitfenster (
 );
 
 
-ALTER TABLE lehre.tbl_zeitfenster OWNER TO postgres;
+ALTER TABLE lehre.tbl_zeitfenster OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_zeitfenster.wochentag; Type: COMMENT; Schema: lehre; Owner: postgres
@@ -3891,7 +3891,7 @@ CREATE TABLE tbl_zeugnis (
 );
 
 
-ALTER TABLE lehre.tbl_zeugnis OWNER TO postgres;
+ALTER TABLE lehre.tbl_zeugnis OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_zeugnis.zeugnis; Type: COMMENT; Schema: lehre; Owner: postgres
@@ -3912,7 +3912,7 @@ CREATE SEQUENCE tbl_zeugnis_zeugnis_id_seq
     CACHE 1;
 
 
-ALTER TABLE lehre.tbl_zeugnis_zeugnis_id_seq OWNER TO postgres;
+ALTER TABLE lehre.tbl_zeugnis_zeugnis_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_zeugnis_zeugnis_id_seq; Type: SEQUENCE OWNED BY; Schema: lehre; Owner: postgres
@@ -3948,7 +3948,7 @@ CREATE TABLE tbl_zeugnisnote (
 );
 
 
-ALTER TABLE lehre.tbl_zeugnisnote OWNER TO postgres;
+ALTER TABLE lehre.tbl_zeugnisnote OWNER TO fhcomplete;
 
 --
 -- Name: vw_lva_stundenplan; Type: VIEW; Schema: lehre; Owner: postgres
@@ -3958,7 +3958,7 @@ CREATE VIEW vw_lva_stundenplan AS
     SELECT le.lehreinheit_id, le.unr, le.lvnr, tbl_lehrfach.fachbereich_kurzbz, le.lehrfach_id, tbl_lehrfach.kurzbz AS lehrfach, tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe AS lehrfach_farbe, le.lehrform_kurzbz AS lehrform, lema.mitarbeiter_uid AS lektor_uid, ma.kurzbz AS lektor, tbl_studiengang.studiengang_kz, tbl_studiengang.kurzbz AS studiengang, lvb.semester, lvb.verband, lvb.gruppe, lvb.gruppe_kurzbz, le.raumtyp, le.raumtypalternativ, le.stundenblockung, le.wochenrythmus, lema.semesterstunden, lema.planstunden, le.start_kw, le.anmerkung, le.studiensemester_kurzbz, (SELECT count(*) AS count FROM tbl_stundenplan WHERE ((((((((tbl_stundenplan.mitarbeiter_uid)::text = (lema.mitarbeiter_uid)::text) AND (tbl_stundenplan.studiengang_kz = lvb.studiengang_kz)) AND (tbl_stundenplan.semester = lvb.semester)) AND ((tbl_stundenplan.verband = lvb.verband) OR (((tbl_stundenplan.verband IS NULL) OR (tbl_stundenplan.verband = ''::bpchar)) AND (lvb.verband IS NULL)))) AND ((tbl_stundenplan.gruppe = lvb.gruppe) OR (((tbl_stundenplan.gruppe IS NULL) OR (tbl_stundenplan.gruppe = ''::bpchar)) AND (lvb.gruppe IS NULL)))) AND (((tbl_stundenplan.gruppe_kurzbz)::text = (lvb.gruppe_kurzbz)::text) OR ((tbl_stundenplan.gruppe_kurzbz IS NULL) AND (lvb.gruppe_kurzbz IS NULL)))) AND (tbl_stundenplan.lehreinheit_id = lvb.lehreinheit_id))) AS verplant FROM (((((tbl_lehreinheit le JOIN tbl_lehreinheitgruppe lvb USING (lehreinheit_id)) JOIN tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)) JOIN public.tbl_studiengang USING (studiengang_kz)) JOIN tbl_lehrfach USING (lehrfach_id)) JOIN public.tbl_mitarbeiter ma USING (mitarbeiter_uid));
 
 
-ALTER TABLE lehre.vw_lva_stundenplan OWNER TO postgres;
+ALTER TABLE lehre.vw_lva_stundenplan OWNER TO fhcomplete;
 
 --
 -- Name: vw_lva_stundenplandev; Type: VIEW; Schema: lehre; Owner: postgres
@@ -3968,7 +3968,7 @@ CREATE VIEW vw_lva_stundenplandev AS
     SELECT le.lehreinheit_id, le.unr, le.lvnr, tbl_lehrfach.fachbereich_kurzbz, le.lehrfach_id, tbl_lehrfach.kurzbz AS lehrfach, tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe AS lehrfach_farbe, le.lehrform_kurzbz AS lehrform, lema.mitarbeiter_uid AS lektor_uid, tbl_mitarbeiter.kurzbz AS lektor, tbl_studiengang.studiengang_kz, upper((((tbl_studiengang.typ)::character varying)::text || (tbl_studiengang.kurzbz)::text)) AS studiengang, lvb.semester, lvb.verband, lvb.gruppe, lvb.gruppe_kurzbz, le.raumtyp, le.raumtypalternativ, le.stundenblockung, le.wochenrythmus, lema.semesterstunden, lema.planstunden, le.start_kw, le.anmerkung, le.studiensemester_kurzbz, (SELECT count(*) AS count FROM tbl_stundenplandev WHERE ((((((((tbl_stundenplandev.mitarbeiter_uid)::text = (lema.mitarbeiter_uid)::text) AND (tbl_stundenplandev.studiengang_kz = lvb.studiengang_kz)) AND (tbl_stundenplandev.semester = lvb.semester)) AND ((tbl_stundenplandev.verband = lvb.verband) OR (((tbl_stundenplandev.verband IS NULL) OR (tbl_stundenplandev.verband = ''::bpchar)) AND (lvb.verband IS NULL)))) AND ((tbl_stundenplandev.gruppe = lvb.gruppe) OR (((tbl_stundenplandev.gruppe IS NULL) OR (tbl_stundenplandev.gruppe = ''::bpchar)) AND (lvb.gruppe IS NULL)))) AND (((tbl_stundenplandev.gruppe_kurzbz)::text = (lvb.gruppe_kurzbz)::text) OR ((tbl_stundenplandev.gruppe_kurzbz IS NULL) AND (lvb.gruppe_kurzbz IS NULL)))) AND (tbl_stundenplandev.lehreinheit_id = lvb.lehreinheit_id))) AS verplant FROM (((((tbl_lehreinheit le JOIN tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)) JOIN tbl_lehreinheitgruppe lvb USING (lehreinheit_id)) JOIN public.tbl_studiengang ON ((lvb.studiengang_kz = tbl_studiengang.studiengang_kz))) JOIN tbl_lehrfach USING (lehrfach_id)) JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid));
 
 
-ALTER TABLE lehre.vw_lva_stundenplandev OWNER TO postgres;
+ALTER TABLE lehre.vw_lva_stundenplandev OWNER TO fhcomplete;
 
 --
 -- Name: vw_reservierung; Type: VIEW; Schema: lehre; Owner: postgres
@@ -3978,7 +3978,7 @@ CREATE VIEW vw_reservierung AS
     SELECT tbl_reservierung.reservierung_id, tbl_reservierung.ort_kurzbz, tbl_reservierung.studiengang_kz, tbl_reservierung.uid, tbl_reservierung.stunde, tbl_reservierung.datum, tbl_reservierung.titel, tbl_reservierung.beschreibung, tbl_reservierung.semester, tbl_reservierung.verband, tbl_reservierung.gruppe, tbl_reservierung.gruppe_kurzbz, tbl_studiengang.kurzbz AS stg_kurzbz FROM (campus.tbl_reservierung JOIN public.tbl_studiengang USING (studiengang_kz));
 
 
-ALTER TABLE lehre.vw_reservierung OWNER TO postgres;
+ALTER TABLE lehre.vw_reservierung OWNER TO fhcomplete;
 
 --
 -- Name: vw_stundenplan; Type: VIEW; Schema: lehre; Owner: postgres
@@ -3988,7 +3988,7 @@ CREATE VIEW vw_stundenplan AS
     SELECT tbl_stundenplan.stundenplan_id, tbl_stundenplan.unr, tbl_stundenplan.mitarbeiter_uid AS uid, tbl_stundenplan.lehreinheit_id, tbl_lehreinheit.lehrfach_id, tbl_stundenplan.datum, tbl_stundenplan.stunde, tbl_stundenplan.ort_kurzbz, tbl_stundenplan.studiengang_kz, tbl_stundenplan.semester, tbl_stundenplan.verband, tbl_stundenplan.gruppe, tbl_stundenplan.gruppe_kurzbz, tbl_stundenplan.titel, tbl_stundenplan.anmerkung, tbl_stundenplan.fix, tbl_lehreinheit.lehrveranstaltung_id, tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.kurzbzlang AS stg_kurzbzlang, tbl_studiengang.bezeichnung AS stg_bezeichnung, tbl_studiengang.typ AS stg_typ, tbl_lehrfach.fachbereich_kurzbz, tbl_lehrfach.kurzbz AS lehrfach, tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe, tbl_lehreinheit.lehrform_kurzbz AS lehrform, tbl_mitarbeiter.kurzbz AS lektor, tbl_stundenplan.updateamum, tbl_stundenplan.updatevon, tbl_stundenplan.insertamum, tbl_stundenplan.insertvon, tbl_lehreinheit.anmerkung AS anmerkung_lehreinheit FROM ((((tbl_stundenplan JOIN public.tbl_studiengang USING (studiengang_kz)) JOIN tbl_lehreinheit USING (lehreinheit_id)) JOIN tbl_lehrfach USING (lehrfach_id)) JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid));
 
 
-ALTER TABLE lehre.vw_stundenplan OWNER TO postgres;
+ALTER TABLE lehre.vw_stundenplan OWNER TO fhcomplete;
 
 --
 -- Name: vw_stundenplandev; Type: VIEW; Schema: lehre; Owner: postgres
@@ -3998,7 +3998,7 @@ CREATE VIEW vw_stundenplandev AS
     SELECT tbl_stundenplandev.stundenplandev_id, tbl_stundenplandev.unr, tbl_stundenplandev.mitarbeiter_uid AS uid, tbl_stundenplandev.lehreinheit_id, tbl_lehreinheit.lehrfach_id, tbl_stundenplandev.datum, tbl_stundenplandev.stunde, tbl_stundenplandev.ort_kurzbz, tbl_stundenplandev.studiengang_kz, tbl_stundenplandev.semester, tbl_stundenplandev.verband, tbl_stundenplandev.gruppe, tbl_stundenplandev.gruppe_kurzbz, tbl_stundenplandev.titel, tbl_stundenplandev.anmerkung, tbl_stundenplandev.fix, tbl_lehreinheit.lehrveranstaltung_id, tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.kurzbzlang AS stg_kurzbzlang, tbl_studiengang.bezeichnung AS stg_bezeichnung, tbl_studiengang.typ AS stg_typ, tbl_lehrfach.fachbereich_kurzbz, tbl_lehrfach.kurzbz AS lehrfach, tbl_lehrfach.bezeichnung AS lehrfach_bez, tbl_lehrfach.farbe, tbl_lehreinheit.lehrform_kurzbz AS lehrform, tbl_mitarbeiter.kurzbz AS lektor, tbl_stundenplandev.updateamum, tbl_stundenplandev.updatevon, tbl_stundenplandev.insertamum, tbl_stundenplandev.insertvon, tbl_lehreinheit.anmerkung AS anmerkung_lehreinheit FROM ((((tbl_stundenplandev JOIN public.tbl_studiengang USING (studiengang_kz)) JOIN tbl_lehreinheit USING (lehreinheit_id)) JOIN tbl_lehrfach USING (lehrfach_id)) JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid));
 
 
-ALTER TABLE lehre.vw_stundenplandev OWNER TO postgres;
+ALTER TABLE lehre.vw_stundenplandev OWNER TO fhcomplete;
 
 SET search_path = public, pg_catalog;
 
@@ -4015,7 +4015,7 @@ CREATE TABLE tbl_studiensemester (
 );
 
 
-ALTER TABLE public.tbl_studiensemester OWNER TO postgres;
+ALTER TABLE public.tbl_studiensemester OWNER TO fhcomplete;
 
 SET search_path = lehre, pg_catalog;
 
@@ -4027,7 +4027,7 @@ CREATE VIEW vw_stundenplandev_student_unr AS
     SELECT sub_stpl_uid.unr, sub_stpl_uid.datum, sub_stpl_uid.stunde, sub_stpl_uid.student_uid FROM (SELECT stpl.unr, stpl.datum, stpl.stunde, tbl_benutzergruppe.uid AS student_uid FROM (tbl_stundenplandev stpl JOIN public.tbl_benutzergruppe USING (gruppe_kurzbz)) WHERE ((tbl_benutzergruppe.studiensemester_kurzbz)::text = ((SELECT tbl_studiensemester.studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ((stpl.datum <= tbl_studiensemester.ende) AND (stpl.datum >= tbl_studiensemester.start))))::text) GROUP BY stpl.unr, stpl.datum, stpl.stunde, tbl_benutzergruppe.uid UNION SELECT stpl.unr, stpl.datum, stpl.stunde, tbl_studentlehrverband.student_uid FROM (tbl_stundenplandev stpl JOIN public.tbl_studentlehrverband ON ((((((stpl.gruppe_kurzbz IS NULL) AND (stpl.studiengang_kz = tbl_studentlehrverband.studiengang_kz)) AND (stpl.semester = tbl_studentlehrverband.semester)) AND ((stpl.verband = tbl_studentlehrverband.verband) OR ((stpl.verband = ' '::bpchar) AND (stpl.verband <> tbl_studentlehrverband.verband)))) AND ((stpl.gruppe = tbl_studentlehrverband.gruppe) OR ((stpl.gruppe = ' '::bpchar) AND (stpl.gruppe <> tbl_studentlehrverband.gruppe)))))) WHERE ((tbl_studentlehrverband.studiensemester_kurzbz)::text = ((SELECT tbl_studiensemester.studiensemester_kurzbz FROM public.tbl_studiensemester WHERE ((stpl.datum <= tbl_studiensemester.ende) AND (stpl.datum >= tbl_studiensemester.start))))::text) GROUP BY stpl.unr, stpl.datum, stpl.stunde, tbl_studentlehrverband.student_uid) sub_stpl_uid GROUP BY sub_stpl_uid.unr, sub_stpl_uid.datum, sub_stpl_uid.stunde, sub_stpl_uid.student_uid;
 
 
-ALTER TABLE lehre.vw_stundenplandev_student_unr OWNER TO postgres;
+ALTER TABLE lehre.vw_stundenplandev_student_unr OWNER TO fhcomplete;
 
 SET search_path = public, pg_catalog;
 
@@ -4043,7 +4043,7 @@ CREATE SEQUENCE seq_ampel_ampel_id
     CACHE 1;
 
 
-ALTER TABLE public.seq_ampel_ampel_id OWNER TO postgres;
+ALTER TABLE public.seq_ampel_ampel_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_ampel_ampel_id; Type: SEQUENCE SET; Schema: public; Owner: postgres
@@ -4064,7 +4064,7 @@ CREATE SEQUENCE seq_ampel_benutzer_bestaetigt_ampel_benutzer_bestaetigt_id
     CACHE 1;
 
 
-ALTER TABLE public.seq_ampel_benutzer_bestaetigt_ampel_benutzer_bestaetigt_id OWNER TO postgres;
+ALTER TABLE public.seq_ampel_benutzer_bestaetigt_ampel_benutzer_bestaetigt_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_ampel_benutzer_bestaetigt_ampel_benutzer_bestaetigt_id; Type: SEQUENCE SET; Schema: public; Owner: postgres
@@ -4085,7 +4085,7 @@ CREATE SEQUENCE seq_notiz_notiz_id
     CACHE 1;
 
 
-ALTER TABLE public.seq_notiz_notiz_id OWNER TO postgres;
+ALTER TABLE public.seq_notiz_notiz_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_notiz_notiz_id; Type: SEQUENCE SET; Schema: public; Owner: postgres
@@ -4106,7 +4106,7 @@ CREATE SEQUENCE seq_notizzuordnung_notizzuordnung_id
     CACHE 1;
 
 
-ALTER TABLE public.seq_notizzuordnung_notizzuordnung_id OWNER TO postgres;
+ALTER TABLE public.seq_notizzuordnung_notizzuordnung_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_notizzuordnung_notizzuordnung_id; Type: SEQUENCE SET; Schema: public; Owner: postgres
@@ -4127,7 +4127,7 @@ CREATE SEQUENCE seq_person_fotostatus_person_fotostatus_id
     CACHE 1;
 
 
-ALTER TABLE public.seq_person_fotostatus_person_fotostatus_id OWNER TO postgres;
+ALTER TABLE public.seq_person_fotostatus_person_fotostatus_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_person_fotostatus_person_fotostatus_id; Type: SEQUENCE SET; Schema: public; Owner: postgres
@@ -4148,7 +4148,7 @@ CREATE SEQUENCE seq_preincoming_preincoming_id
     CACHE 1;
 
 
-ALTER TABLE public.seq_preincoming_preincoming_id OWNER TO postgres;
+ALTER TABLE public.seq_preincoming_preincoming_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_preincoming_preincoming_id; Type: SEQUENCE SET; Schema: public; Owner: postgres
@@ -4169,7 +4169,7 @@ CREATE SEQUENCE seq_preoutgoing_firma_preoutgoing_firma_id
     CACHE 1;
 
 
-ALTER TABLE public.seq_preoutgoing_firma_preoutgoing_firma_id OWNER TO postgres;
+ALTER TABLE public.seq_preoutgoing_firma_preoutgoing_firma_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_preoutgoing_firma_preoutgoing_firma_id; Type: SEQUENCE SET; Schema: public; Owner: postgres
@@ -4190,7 +4190,7 @@ CREATE SEQUENCE seq_preoutgoing_lehrveranstaltung_preoutgoing_lehrveranstaltung
     CACHE 1;
 
 
-ALTER TABLE public.seq_preoutgoing_lehrveranstaltung_preoutgoing_lehrveranstaltung OWNER TO postgres;
+ALTER TABLE public.seq_preoutgoing_lehrveranstaltung_preoutgoing_lehrveranstaltung OWNER TO fhcomplete;
 
 --
 -- Name: seq_preoutgoing_lehrveranstaltung_preoutgoing_lehrveranstaltung; Type: SEQUENCE SET; Schema: public; Owner: postgres
@@ -4211,7 +4211,7 @@ CREATE SEQUENCE seq_preoutgoing_preoutgoing_id
     CACHE 1;
 
 
-ALTER TABLE public.seq_preoutgoing_preoutgoing_id OWNER TO postgres;
+ALTER TABLE public.seq_preoutgoing_preoutgoing_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_preoutgoing_preoutgoing_id; Type: SEQUENCE SET; Schema: public; Owner: postgres
@@ -4232,7 +4232,7 @@ CREATE SEQUENCE seq_preoutgoing_preoutgoing_status_status_id
     CACHE 1;
 
 
-ALTER TABLE public.seq_preoutgoing_preoutgoing_status_status_id OWNER TO postgres;
+ALTER TABLE public.seq_preoutgoing_preoutgoing_status_status_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_preoutgoing_preoutgoing_status_status_id; Type: SEQUENCE SET; Schema: public; Owner: postgres
@@ -4253,7 +4253,7 @@ CREATE SEQUENCE seq_service_service_id
     CACHE 1;
 
 
-ALTER TABLE public.seq_service_service_id OWNER TO postgres;
+ALTER TABLE public.seq_service_service_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_service_service_id; Type: SEQUENCE SET; Schema: public; Owner: postgres
@@ -4274,7 +4274,7 @@ CREATE SEQUENCE seq_vorlagestudiengang_vorlagestudiengang_id
     CACHE 1;
 
 
-ALTER TABLE public.seq_vorlagestudiengang_vorlagestudiengang_id OWNER TO postgres;
+ALTER TABLE public.seq_vorlagestudiengang_vorlagestudiengang_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_vorlagestudiengang_vorlagestudiengang_id; Type: SEQUENCE SET; Schema: public; Owner: postgres
@@ -4308,7 +4308,7 @@ CREATE TABLE tbl_adresse (
 );
 
 
-ALTER TABLE public.tbl_adresse OWNER TO postgres;
+ALTER TABLE public.tbl_adresse OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_adresse.typ; Type: COMMENT; Schema: public; Owner: postgres
@@ -4329,7 +4329,7 @@ CREATE SEQUENCE tbl_adresse_adresse_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.tbl_adresse_adresse_id_seq OWNER TO postgres;
+ALTER TABLE public.tbl_adresse_adresse_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_adresse_adresse_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -4369,7 +4369,7 @@ CREATE TABLE tbl_akte (
 );
 
 
-ALTER TABLE public.tbl_akte OWNER TO postgres;
+ALTER TABLE public.tbl_akte OWNER TO fhcomplete;
 
 --
 -- Name: tbl_akte_akte_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -4383,7 +4383,7 @@ CREATE SEQUENCE tbl_akte_akte_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.tbl_akte_akte_id_seq OWNER TO postgres;
+ALTER TABLE public.tbl_akte_akte_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_akte_akte_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -4418,7 +4418,7 @@ CREATE TABLE tbl_ampel (
 );
 
 
-ALTER TABLE public.tbl_ampel OWNER TO postgres;
+ALTER TABLE public.tbl_ampel OWNER TO fhcomplete;
 
 --
 -- Name: tbl_ampel_benutzer_bestaetigt; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -4433,7 +4433,7 @@ CREATE TABLE tbl_ampel_benutzer_bestaetigt (
 );
 
 
-ALTER TABLE public.tbl_ampel_benutzer_bestaetigt OWNER TO postgres;
+ALTER TABLE public.tbl_ampel_benutzer_bestaetigt OWNER TO fhcomplete;
 
 --
 -- Name: tbl_aufmerksamdurch; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -4446,7 +4446,7 @@ CREATE TABLE tbl_aufmerksamdurch (
 );
 
 
-ALTER TABLE public.tbl_aufmerksamdurch OWNER TO postgres;
+ALTER TABLE public.tbl_aufmerksamdurch OWNER TO fhcomplete;
 
 --
 -- Name: tbl_aufnahmeschluessel; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -4457,7 +4457,7 @@ CREATE TABLE tbl_aufnahmeschluessel (
 );
 
 
-ALTER TABLE public.tbl_aufnahmeschluessel OWNER TO postgres;
+ALTER TABLE public.tbl_aufnahmeschluessel OWNER TO fhcomplete;
 
 --
 -- Name: tbl_bankverbindung; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -4482,7 +4482,7 @@ CREATE TABLE tbl_bankverbindung (
 );
 
 
-ALTER TABLE public.tbl_bankverbindung OWNER TO postgres;
+ALTER TABLE public.tbl_bankverbindung OWNER TO fhcomplete;
 
 --
 -- Name: tbl_bankverbindung_bankverbindung_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -4496,7 +4496,7 @@ CREATE SEQUENCE tbl_bankverbindung_bankverbindung_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.tbl_bankverbindung_bankverbindung_id_seq OWNER TO postgres;
+ALTER TABLE public.tbl_bankverbindung_bankverbindung_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_bankverbindung_bankverbindung_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -4534,7 +4534,7 @@ CREATE TABLE tbl_benutzerfunktion (
 );
 
 
-ALTER TABLE public.tbl_benutzerfunktion OWNER TO postgres;
+ALTER TABLE public.tbl_benutzerfunktion OWNER TO fhcomplete;
 
 --
 -- Name: TABLE tbl_benutzerfunktion; Type: COMMENT; Schema: public; Owner: postgres
@@ -4555,7 +4555,7 @@ CREATE SEQUENCE tbl_benutzerfunktion_benutzerfunktion_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.tbl_benutzerfunktion_benutzerfunktion_id_seq OWNER TO postgres;
+ALTER TABLE public.tbl_benutzerfunktion_benutzerfunktion_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_benutzerfunktion_benutzerfunktion_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -4584,7 +4584,7 @@ CREATE TABLE tbl_buchungstyp (
 );
 
 
-ALTER TABLE public.tbl_buchungstyp OWNER TO postgres;
+ALTER TABLE public.tbl_buchungstyp OWNER TO fhcomplete;
 
 --
 -- Name: tbl_dokument; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -4597,7 +4597,7 @@ CREATE TABLE tbl_dokument (
 );
 
 
-ALTER TABLE public.tbl_dokument OWNER TO postgres;
+ALTER TABLE public.tbl_dokument OWNER TO fhcomplete;
 
 --
 -- Name: tbl_dokumentprestudent; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -4616,7 +4616,7 @@ CREATE TABLE tbl_dokumentprestudent (
 );
 
 
-ALTER TABLE public.tbl_dokumentprestudent OWNER TO postgres;
+ALTER TABLE public.tbl_dokumentprestudent OWNER TO fhcomplete;
 
 --
 -- Name: tbl_dokumentstudiengang; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -4629,7 +4629,7 @@ CREATE TABLE tbl_dokumentstudiengang (
 );
 
 
-ALTER TABLE public.tbl_dokumentstudiengang OWNER TO postgres;
+ALTER TABLE public.tbl_dokumentstudiengang OWNER TO fhcomplete;
 
 --
 -- Name: tbl_erhalter; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -4645,7 +4645,7 @@ CREATE TABLE tbl_erhalter (
 );
 
 
-ALTER TABLE public.tbl_erhalter OWNER TO postgres;
+ALTER TABLE public.tbl_erhalter OWNER TO fhcomplete;
 
 --
 -- Name: tbl_fachbereich; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -4662,7 +4662,7 @@ CREATE TABLE tbl_fachbereich (
 );
 
 
-ALTER TABLE public.tbl_fachbereich OWNER TO postgres;
+ALTER TABLE public.tbl_fachbereich OWNER TO fhcomplete;
 
 --
 -- Name: tbl_firma; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -4686,7 +4686,7 @@ CREATE TABLE tbl_firma (
 );
 
 
-ALTER TABLE public.tbl_firma OWNER TO postgres;
+ALTER TABLE public.tbl_firma OWNER TO fhcomplete;
 
 --
 -- Name: tbl_firma_firma_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -4700,7 +4700,7 @@ CREATE SEQUENCE tbl_firma_firma_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.tbl_firma_firma_id_seq OWNER TO postgres;
+ALTER TABLE public.tbl_firma_firma_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_firma_firma_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -4726,7 +4726,7 @@ CREATE TABLE tbl_firma_mobilitaetsprogramm (
 );
 
 
-ALTER TABLE public.tbl_firma_mobilitaetsprogramm OWNER TO postgres;
+ALTER TABLE public.tbl_firma_mobilitaetsprogramm OWNER TO fhcomplete;
 
 --
 -- Name: tbl_firma_organisationseinheit; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -4746,7 +4746,7 @@ CREATE TABLE tbl_firma_organisationseinheit (
 );
 
 
-ALTER TABLE public.tbl_firma_organisationseinheit OWNER TO postgres;
+ALTER TABLE public.tbl_firma_organisationseinheit OWNER TO fhcomplete;
 
 --
 -- Name: tbl_firma_organisationseinhei_firma_organisationseinheit_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -4760,7 +4760,7 @@ CREATE SEQUENCE tbl_firma_organisationseinhei_firma_organisationseinheit_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.tbl_firma_organisationseinhei_firma_organisationseinheit_id_seq OWNER TO postgres;
+ALTER TABLE public.tbl_firma_organisationseinhei_firma_organisationseinheit_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_firma_organisationseinhei_firma_organisationseinheit_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -4788,7 +4788,7 @@ CREATE TABLE tbl_firmatag (
 );
 
 
-ALTER TABLE public.tbl_firmatag OWNER TO postgres;
+ALTER TABLE public.tbl_firmatag OWNER TO fhcomplete;
 
 --
 -- Name: tbl_firmentyp; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -4800,7 +4800,7 @@ CREATE TABLE tbl_firmentyp (
 );
 
 
-ALTER TABLE public.tbl_firmentyp OWNER TO postgres;
+ALTER TABLE public.tbl_firmentyp OWNER TO fhcomplete;
 
 --
 -- Name: tbl_fotostatus; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -4812,7 +4812,7 @@ CREATE TABLE tbl_fotostatus (
 );
 
 
-ALTER TABLE public.tbl_fotostatus OWNER TO postgres;
+ALTER TABLE public.tbl_fotostatus OWNER TO fhcomplete;
 
 --
 -- Name: tbl_funktion; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -4827,7 +4827,7 @@ CREATE TABLE tbl_funktion (
 );
 
 
-ALTER TABLE public.tbl_funktion OWNER TO postgres;
+ALTER TABLE public.tbl_funktion OWNER TO fhcomplete;
 
 --
 -- Name: tbl_geschaeftsjahr; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -4841,7 +4841,7 @@ CREATE TABLE tbl_geschaeftsjahr (
 );
 
 
-ALTER TABLE public.tbl_geschaeftsjahr OWNER TO postgres;
+ALTER TABLE public.tbl_geschaeftsjahr OWNER TO fhcomplete;
 
 --
 -- Name: tbl_kontakt; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -4863,7 +4863,7 @@ CREATE TABLE tbl_kontakt (
 );
 
 
-ALTER TABLE public.tbl_kontakt OWNER TO postgres;
+ALTER TABLE public.tbl_kontakt OWNER TO fhcomplete;
 
 --
 -- Name: tbl_kontakt_kontakt_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -4877,7 +4877,7 @@ CREATE SEQUENCE tbl_kontakt_kontakt_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.tbl_kontakt_kontakt_id_seq OWNER TO postgres;
+ALTER TABLE public.tbl_kontakt_kontakt_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_kontakt_kontakt_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -4903,7 +4903,7 @@ CREATE TABLE tbl_kontaktmedium (
 );
 
 
-ALTER TABLE public.tbl_kontaktmedium OWNER TO postgres;
+ALTER TABLE public.tbl_kontaktmedium OWNER TO fhcomplete;
 
 --
 -- Name: tbl_kontakttyp; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -4915,7 +4915,7 @@ CREATE TABLE tbl_kontakttyp (
 );
 
 
-ALTER TABLE public.tbl_kontakttyp OWNER TO postgres;
+ALTER TABLE public.tbl_kontakttyp OWNER TO fhcomplete;
 
 --
 -- Name: tbl_konto; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -4940,7 +4940,7 @@ CREATE TABLE tbl_konto (
 );
 
 
-ALTER TABLE public.tbl_konto OWNER TO postgres;
+ALTER TABLE public.tbl_konto OWNER TO fhcomplete;
 
 --
 -- Name: tbl_konto_buchungsnr_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -4954,7 +4954,7 @@ CREATE SEQUENCE tbl_konto_buchungsnr_seq
     CACHE 1;
 
 
-ALTER TABLE public.tbl_konto_buchungsnr_seq OWNER TO postgres;
+ALTER TABLE public.tbl_konto_buchungsnr_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_konto_buchungsnr_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -4987,7 +4987,7 @@ CREATE TABLE tbl_lehrverband (
 );
 
 
-ALTER TABLE public.tbl_lehrverband OWNER TO postgres;
+ALTER TABLE public.tbl_lehrverband OWNER TO fhcomplete;
 
 --
 -- Name: tbl_log; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -5003,7 +5003,7 @@ CREATE TABLE tbl_log (
 );
 
 
-ALTER TABLE public.tbl_log OWNER TO postgres;
+ALTER TABLE public.tbl_log OWNER TO fhcomplete;
 
 --
 -- Name: tbl_log_log_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -5017,7 +5017,7 @@ CREATE SEQUENCE tbl_log_log_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.tbl_log_log_id_seq OWNER TO postgres;
+ALTER TABLE public.tbl_log_log_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_log_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -5045,7 +5045,7 @@ CREATE SEQUENCE tbl_mitarbeiter_personalnummer_seq
     CACHE 1;
 
 
-ALTER TABLE public.tbl_mitarbeiter_personalnummer_seq OWNER TO postgres;
+ALTER TABLE public.tbl_mitarbeiter_personalnummer_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_mitarbeiter_personalnummer_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -5081,7 +5081,7 @@ CREATE TABLE tbl_notiz (
 );
 
 
-ALTER TABLE public.tbl_notiz OWNER TO postgres;
+ALTER TABLE public.tbl_notiz OWNER TO fhcomplete;
 
 --
 -- Name: tbl_notizzuordnung; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -5100,7 +5100,7 @@ CREATE TABLE tbl_notizzuordnung (
 );
 
 
-ALTER TABLE public.tbl_notizzuordnung OWNER TO postgres;
+ALTER TABLE public.tbl_notizzuordnung OWNER TO fhcomplete;
 
 --
 -- Name: tbl_organisationseinheit; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -5118,7 +5118,7 @@ CREATE TABLE tbl_organisationseinheit (
 );
 
 
-ALTER TABLE public.tbl_organisationseinheit OWNER TO postgres;
+ALTER TABLE public.tbl_organisationseinheit OWNER TO fhcomplete;
 
 --
 -- Name: tbl_organisationseinheittyp; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -5131,7 +5131,7 @@ CREATE TABLE tbl_organisationseinheittyp (
 );
 
 
-ALTER TABLE public.tbl_organisationseinheittyp OWNER TO postgres;
+ALTER TABLE public.tbl_organisationseinheittyp OWNER TO fhcomplete;
 
 --
 -- Name: tbl_ort; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -5161,7 +5161,7 @@ CREATE TABLE tbl_ort (
 );
 
 
-ALTER TABLE public.tbl_ort OWNER TO postgres;
+ALTER TABLE public.tbl_ort OWNER TO fhcomplete;
 
 --
 -- Name: TABLE tbl_ort; Type: COMMENT; Schema: public; Owner: postgres
@@ -5209,7 +5209,7 @@ CREATE TABLE tbl_ortraumtyp (
 );
 
 
-ALTER TABLE public.tbl_ortraumtyp OWNER TO postgres;
+ALTER TABLE public.tbl_ortraumtyp OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_ortraumtyp.hierarchie; Type: COMMENT; Schema: public; Owner: postgres
@@ -5234,7 +5234,7 @@ CREATE TABLE tbl_person_fotostatus (
 );
 
 
-ALTER TABLE public.tbl_person_fotostatus OWNER TO postgres;
+ALTER TABLE public.tbl_person_fotostatus OWNER TO fhcomplete;
 
 --
 -- Name: tbl_person_person_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -5248,7 +5248,7 @@ CREATE SEQUENCE tbl_person_person_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.tbl_person_person_id_seq OWNER TO postgres;
+ALTER TABLE public.tbl_person_person_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_person_person_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -5276,7 +5276,7 @@ CREATE SEQUENCE tbl_personfunktionstandort_personfunktionstandort_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.tbl_personfunktionstandort_personfunktionstandort_id_seq OWNER TO postgres;
+ALTER TABLE public.tbl_personfunktionstandort_personfunktionstandort_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_personfunktionstandort_personfunktionstandort_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
@@ -5299,7 +5299,7 @@ CREATE TABLE tbl_personfunktionstandort (
 );
 
 
-ALTER TABLE public.tbl_personfunktionstandort OWNER TO postgres;
+ALTER TABLE public.tbl_personfunktionstandort OWNER TO fhcomplete;
 
 --
 -- Name: tbl_preincoming; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -5346,7 +5346,7 @@ CREATE TABLE tbl_preincoming (
 );
 
 
-ALTER TABLE public.tbl_preincoming OWNER TO postgres;
+ALTER TABLE public.tbl_preincoming OWNER TO fhcomplete;
 
 --
 -- Name: tbl_preincoming_lehrveranstaltung; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -5360,7 +5360,7 @@ CREATE TABLE tbl_preincoming_lehrveranstaltung (
 );
 
 
-ALTER TABLE public.tbl_preincoming_lehrveranstaltung OWNER TO postgres;
+ALTER TABLE public.tbl_preincoming_lehrveranstaltung OWNER TO fhcomplete;
 
 --
 -- Name: tbl_preinteressent; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -5386,7 +5386,7 @@ CREATE TABLE tbl_preinteressent (
 );
 
 
-ALTER TABLE public.tbl_preinteressent OWNER TO postgres;
+ALTER TABLE public.tbl_preinteressent OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_preinteressent.firma_id; Type: COMMENT; Schema: public; Owner: postgres
@@ -5414,7 +5414,7 @@ CREATE SEQUENCE tbl_preinteressent_preinteressent_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.tbl_preinteressent_preinteressent_id_seq OWNER TO postgres;
+ALTER TABLE public.tbl_preinteressent_preinteressent_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_preinteressent_preinteressent_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -5447,7 +5447,7 @@ CREATE TABLE tbl_preinteressentstudiengang (
 );
 
 
-ALTER TABLE public.tbl_preinteressentstudiengang OWNER TO postgres;
+ALTER TABLE public.tbl_preinteressentstudiengang OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_preinteressentstudiengang.prioritaet; Type: COMMENT; Schema: public; Owner: postgres
@@ -5489,7 +5489,7 @@ CREATE TABLE tbl_preoutgoing (
 );
 
 
-ALTER TABLE public.tbl_preoutgoing OWNER TO postgres;
+ALTER TABLE public.tbl_preoutgoing OWNER TO fhcomplete;
 
 --
 -- Name: tbl_preoutgoing_firma; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -5505,7 +5505,7 @@ CREATE TABLE tbl_preoutgoing_firma (
 );
 
 
-ALTER TABLE public.tbl_preoutgoing_firma OWNER TO postgres;
+ALTER TABLE public.tbl_preoutgoing_firma OWNER TO fhcomplete;
 
 --
 -- Name: tbl_preoutgoing_lehrveranstaltung; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -5526,7 +5526,7 @@ CREATE TABLE tbl_preoutgoing_lehrveranstaltung (
 );
 
 
-ALTER TABLE public.tbl_preoutgoing_lehrveranstaltung OWNER TO postgres;
+ALTER TABLE public.tbl_preoutgoing_lehrveranstaltung OWNER TO fhcomplete;
 
 --
 -- Name: tbl_preoutgoing_preoutgoing_status; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -5544,7 +5544,7 @@ CREATE TABLE tbl_preoutgoing_preoutgoing_status (
 );
 
 
-ALTER TABLE public.tbl_preoutgoing_preoutgoing_status OWNER TO postgres;
+ALTER TABLE public.tbl_preoutgoing_preoutgoing_status OWNER TO fhcomplete;
 
 --
 -- Name: tbl_preoutgoing_status; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -5556,7 +5556,7 @@ CREATE TABLE tbl_preoutgoing_status (
 );
 
 
-ALTER TABLE public.tbl_preoutgoing_status OWNER TO postgres;
+ALTER TABLE public.tbl_preoutgoing_status OWNER TO fhcomplete;
 
 --
 -- Name: tbl_prestudent; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -5596,7 +5596,7 @@ CREATE TABLE tbl_prestudent (
 );
 
 
-ALTER TABLE public.tbl_prestudent OWNER TO postgres;
+ALTER TABLE public.tbl_prestudent OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_prestudent.ausbildungcode; Type: COMMENT; Schema: public; Owner: postgres
@@ -5624,7 +5624,7 @@ CREATE SEQUENCE tbl_prestudent_prestudent_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.tbl_prestudent_prestudent_id_seq OWNER TO postgres;
+ALTER TABLE public.tbl_prestudent_prestudent_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_prestudent_prestudent_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -5659,7 +5659,7 @@ CREATE TABLE tbl_prestudentstatus (
 );
 
 
-ALTER TABLE public.tbl_prestudentstatus OWNER TO postgres;
+ALTER TABLE public.tbl_prestudentstatus OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_prestudentstatus.studiensemester_kurzbz; Type: COMMENT; Schema: public; Owner: postgres
@@ -5678,7 +5678,7 @@ CREATE TABLE tbl_raumtyp (
 );
 
 
-ALTER TABLE public.tbl_raumtyp OWNER TO postgres;
+ALTER TABLE public.tbl_raumtyp OWNER TO fhcomplete;
 
 --
 -- Name: tbl_reihungstest; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -5700,7 +5700,7 @@ CREATE TABLE tbl_reihungstest (
 );
 
 
-ALTER TABLE public.tbl_reihungstest OWNER TO postgres;
+ALTER TABLE public.tbl_reihungstest OWNER TO fhcomplete;
 
 --
 -- Name: tbl_reihungstest_reihungstest_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -5714,7 +5714,7 @@ CREATE SEQUENCE tbl_reihungstest_reihungstest_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.tbl_reihungstest_reihungstest_id_seq OWNER TO postgres;
+ALTER TABLE public.tbl_reihungstest_reihungstest_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_reihungstest_reihungstest_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -5741,7 +5741,7 @@ CREATE TABLE tbl_semesterwochen (
 );
 
 
-ALTER TABLE public.tbl_semesterwochen OWNER TO postgres;
+ALTER TABLE public.tbl_semesterwochen OWNER TO fhcomplete;
 
 --
 -- Name: tbl_service; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -5757,7 +5757,7 @@ CREATE TABLE tbl_service (
 );
 
 
-ALTER TABLE public.tbl_service OWNER TO postgres;
+ALTER TABLE public.tbl_service OWNER TO fhcomplete;
 
 --
 -- Name: tbl_sprache; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -5773,7 +5773,7 @@ CREATE TABLE tbl_sprache (
 );
 
 
-ALTER TABLE public.tbl_sprache OWNER TO postgres;
+ALTER TABLE public.tbl_sprache OWNER TO fhcomplete;
 
 --
 -- Name: tbl_standort_standort_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -5787,7 +5787,7 @@ CREATE SEQUENCE tbl_standort_standort_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.tbl_standort_standort_id_seq OWNER TO postgres;
+ALTER TABLE public.tbl_standort_standort_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_standort_standort_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
@@ -5814,7 +5814,7 @@ CREATE TABLE tbl_standort (
 );
 
 
-ALTER TABLE public.tbl_standort OWNER TO postgres;
+ALTER TABLE public.tbl_standort OWNER TO fhcomplete;
 
 --
 -- Name: tbl_statistik; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -5837,7 +5837,7 @@ CREATE TABLE tbl_statistik (
 );
 
 
-ALTER TABLE public.tbl_statistik OWNER TO postgres;
+ALTER TABLE public.tbl_statistik OWNER TO fhcomplete;
 
 --
 -- Name: tbl_status; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -5851,7 +5851,7 @@ CREATE TABLE tbl_status (
 );
 
 
-ALTER TABLE public.tbl_status OWNER TO postgres;
+ALTER TABLE public.tbl_status OWNER TO fhcomplete;
 
 --
 -- Name: tbl_tag; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -5862,7 +5862,7 @@ CREATE TABLE tbl_tag (
 );
 
 
-ALTER TABLE public.tbl_tag OWNER TO postgres;
+ALTER TABLE public.tbl_tag OWNER TO fhcomplete;
 
 --
 -- Name: tbl_variable; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -5875,7 +5875,7 @@ CREATE TABLE tbl_variable (
 );
 
 
-ALTER TABLE public.tbl_variable OWNER TO postgres;
+ALTER TABLE public.tbl_variable OWNER TO fhcomplete;
 
 --
 -- Name: tbl_vorlage; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -5889,7 +5889,7 @@ CREATE TABLE tbl_vorlage (
 );
 
 
-ALTER TABLE public.tbl_vorlage OWNER TO postgres;
+ALTER TABLE public.tbl_vorlage OWNER TO fhcomplete;
 
 --
 -- Name: tbl_vorlagestudiengang; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
@@ -5905,7 +5905,7 @@ CREATE TABLE tbl_vorlagestudiengang (
 );
 
 
-ALTER TABLE public.tbl_vorlagestudiengang OWNER TO postgres;
+ALTER TABLE public.tbl_vorlagestudiengang OWNER TO fhcomplete;
 
 SET search_path = wawi, pg_catalog;
 
@@ -5921,7 +5921,7 @@ CREATE SEQUENCE seq_betriebsmittelperson_betriebsmittelperson_id
     CACHE 1;
 
 
-ALTER TABLE wawi.seq_betriebsmittelperson_betriebsmittelperson_id OWNER TO postgres;
+ALTER TABLE wawi.seq_betriebsmittelperson_betriebsmittelperson_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_betriebsmittelperson_betriebsmittelperson_id; Type: SEQUENCE SET; Schema: wawi; Owner: postgres
@@ -5967,7 +5967,7 @@ CREATE TABLE tbl_betriebsmittel (
 );
 
 
-ALTER TABLE wawi.tbl_betriebsmittel OWNER TO postgres;
+ALTER TABLE wawi.tbl_betriebsmittel OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_betriebsmittel.nummer; Type: COMMENT; Schema: wawi; Owner: postgres
@@ -6011,7 +6011,7 @@ CREATE TABLE tbl_betriebsmittelperson (
 );
 
 
-ALTER TABLE wawi.tbl_betriebsmittelperson OWNER TO postgres;
+ALTER TABLE wawi.tbl_betriebsmittelperson OWNER TO fhcomplete;
 
 SET search_path = public, pg_catalog;
 
@@ -6023,7 +6023,7 @@ CREATE VIEW vw_betriebsmittelperson AS
     SELECT tbl_betriebsmittelperson.betriebsmittelperson_id, tbl_betriebsmittelperson.betriebsmittel_id, tbl_betriebsmittelperson.person_id, tbl_betriebsmittelperson.anmerkung, tbl_betriebsmittelperson.kaution, tbl_betriebsmittelperson.ausgegebenam, tbl_betriebsmittelperson.retouram, tbl_betriebsmittelperson.insertamum, tbl_betriebsmittelperson.insertvon, tbl_betriebsmittelperson.updateamum, tbl_betriebsmittelperson.updatevon, tbl_betriebsmittelperson.ext_id, tbl_betriebsmittel.beschreibung, tbl_betriebsmittel.betriebsmitteltyp, tbl_betriebsmittel.nummer, tbl_betriebsmittel.inventarnummer AS nummerintern, tbl_betriebsmittel.reservieren, tbl_betriebsmittel.ort_kurzbz, tbl_person.staatsbuergerschaft, tbl_person.geburtsnation, tbl_person.sprache, tbl_person.anrede, tbl_person.titelpost, tbl_person.titelpre, tbl_person.nachname, tbl_person.vorname, tbl_person.vornamen, tbl_person.gebdatum, tbl_person.gebort, tbl_person.gebzeit, tbl_person.foto, tbl_person.anmerkung AS anmerkungen, tbl_person.homepage, tbl_person.svnr, tbl_person.ersatzkennzeichen, tbl_person.familienstand, tbl_person.geschlecht, tbl_person.anzahlkinder, tbl_person.aktiv, tbl_benutzer.uid, tbl_benutzer.aktiv AS benutzer_aktiv, tbl_benutzer.alias FROM (((wawi.tbl_betriebsmittelperson JOIN wawi.tbl_betriebsmittel USING (betriebsmittel_id)) JOIN tbl_person USING (person_id)) LEFT JOIN tbl_benutzer USING (person_id));
 
 
-ALTER TABLE public.vw_betriebsmittelperson OWNER TO postgres;
+ALTER TABLE public.vw_betriebsmittelperson OWNER TO fhcomplete;
 
 --
 -- Name: vw_gruppen; Type: VIEW; Schema: public; Owner: postgres
@@ -6033,7 +6033,7 @@ CREATE VIEW vw_gruppen AS
     SELECT tbl_gruppe.gid, tbl_gruppe.gruppe_kurzbz, tbl_benutzergruppe.uid, tbl_gruppe.mailgrp, tbl_gruppe.beschreibung, tbl_gruppe.studiengang_kz, tbl_gruppe.semester, tbl_benutzergruppe.studiensemester_kurzbz, NULL::bpchar AS verband, NULL::bpchar AS gruppe FROM (tbl_gruppe LEFT JOIN tbl_benutzergruppe USING (gruppe_kurzbz)) UNION SELECT tbl_lehrverband.gid, upper(btrim(((((SELECT ((tbl_studiengang.typ)::text || (tbl_studiengang.kurzbz)::text) FROM tbl_studiengang WHERE (tbl_studiengang.studiengang_kz = tbl_lehrverband.studiengang_kz)) || tbl_lehrverband.semester) || (tbl_lehrverband.verband)::text) || (tbl_lehrverband.gruppe)::text))) AS gruppe_kurzbz, tbl_studentlehrverband.student_uid AS uid, true AS mailgrp, tbl_lehrverband.bezeichnung AS beschreibung, tbl_lehrverband.studiengang_kz, tbl_lehrverband.semester, tbl_studentlehrverband.studiensemester_kurzbz, tbl_lehrverband.verband, tbl_lehrverband.gruppe FROM (tbl_lehrverband LEFT JOIN tbl_studentlehrverband USING (studiengang_kz, semester)) WHERE (((((tbl_lehrverband.verband = tbl_studentlehrverband.verband) OR (tbl_lehrverband.verband IS NULL)) OR (btrim((tbl_lehrverband.verband)::text) = ''::text)) OR (tbl_studentlehrverband.verband IS NULL)) AND ((((tbl_lehrverband.gruppe = tbl_studentlehrverband.gruppe) OR (tbl_lehrverband.gruppe IS NULL)) OR (btrim((tbl_lehrverband.gruppe)::text) = ''::text)) OR (tbl_studentlehrverband.gruppe IS NULL)));
 
 
-ALTER TABLE public.vw_gruppen OWNER TO postgres;
+ALTER TABLE public.vw_gruppen OWNER TO fhcomplete;
 
 --
 -- Name: vw_prestudent; Type: VIEW; Schema: public; Owner: postgres
@@ -6043,7 +6043,7 @@ CREATE VIEW vw_prestudent AS
     SELECT tbl_prestudent.prestudent_id, tbl_person.person_id, tbl_prestudent.reihungstest_id, tbl_person.staatsbuergerschaft, tbl_person.geburtsnation, tbl_person.sprache, tbl_person.anrede, tbl_person.titelpost, tbl_person.titelpre, tbl_person.nachname, tbl_person.vorname, tbl_person.vornamen, tbl_person.gebdatum, tbl_person.gebort, tbl_person.gebzeit, tbl_person.foto, tbl_person.anmerkung AS anmerkungen, tbl_person.homepage, tbl_person.svnr, tbl_person.ersatzkennzeichen, tbl_person.familienstand, tbl_person.geschlecht, tbl_person.anzahlkinder, tbl_person.aktiv, tbl_prestudent.aufmerksamdurch_kurzbz, tbl_prestudent.studiengang_kz, tbl_prestudent.berufstaetigkeit_code, tbl_prestudent.ausbildungcode, tbl_prestudent.zgv_code, tbl_prestudent.zgvort, tbl_prestudent.zgvdatum, tbl_prestudent.zgvmas_code, tbl_prestudent.zgvmaort, tbl_prestudent.zgvmadatum, tbl_prestudent.aufnahmeschluessel, tbl_prestudent.facheinschlberuf, tbl_prestudent.anmeldungreihungstest, tbl_prestudent.reihungstestangetreten, tbl_prestudent.rt_gesamtpunkte AS punkte, tbl_prestudent.rt_punkte1, tbl_prestudent.rt_punkte2, tbl_prestudent.bismelden, tbl_reihungstest.studiengang_kz AS rt_studiengang_kz, tbl_reihungstest.ort_kurzbz AS rt_ort, tbl_reihungstest.datum AS rt_datum, tbl_reihungstest.uhrzeit AS rt_uhrzeit, tbl_prestudent.updateamum, tbl_prestudent.updatevon, tbl_prestudent.insertamum, tbl_prestudent.insertvon, tbl_prestudent.ext_id FROM ((tbl_person JOIN tbl_prestudent USING (person_id)) JOIN tbl_reihungstest USING (reihungstest_id));
 
 
-ALTER TABLE public.vw_prestudent OWNER TO postgres;
+ALTER TABLE public.vw_prestudent OWNER TO fhcomplete;
 
 --
 -- Name: vw_studiensemester; Type: VIEW; Schema: public; Owner: postgres
@@ -6053,7 +6053,7 @@ CREATE VIEW vw_studiensemester AS
     SELECT tbl_studiensemester.studiensemester_kurzbz, tbl_studiensemester.start, tbl_studiensemester.ende, tbl_studiensemester.ext_id, (@ (tbl_studiensemester.start - (now())::date)) AS delta FROM tbl_studiensemester UNION SELECT tbl_studiensemester.studiensemester_kurzbz, tbl_studiensemester.start, tbl_studiensemester.ende, tbl_studiensemester.ext_id, (@ ((now())::date - tbl_studiensemester.ende)) AS delta FROM tbl_studiensemester;
 
 
-ALTER TABLE public.vw_studiensemester OWNER TO postgres;
+ALTER TABLE public.vw_studiensemester OWNER TO fhcomplete;
 
 SET search_path = system, pg_catalog;
 
@@ -6069,7 +6069,7 @@ CREATE SEQUENCE seq_webservicelog_webservicelog_id
     CACHE 1;
 
 
-ALTER TABLE system.seq_webservicelog_webservicelog_id OWNER TO postgres;
+ALTER TABLE system.seq_webservicelog_webservicelog_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_webservicelog_webservicelog_id; Type: SEQUENCE SET; Schema: system; Owner: postgres
@@ -6090,7 +6090,7 @@ CREATE SEQUENCE seq_webservicerecht_webservicerecht_id
     CACHE 1;
 
 
-ALTER TABLE system.seq_webservicerecht_webservicerecht_id OWNER TO postgres;
+ALTER TABLE system.seq_webservicerecht_webservicerecht_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_webservicerecht_webservicerecht_id; Type: SEQUENCE SET; Schema: system; Owner: postgres
@@ -6123,7 +6123,7 @@ CREATE TABLE tbl_benutzerrolle (
 );
 
 
-ALTER TABLE system.tbl_benutzerrolle OWNER TO postgres;
+ALTER TABLE system.tbl_benutzerrolle OWNER TO fhcomplete;
 
 --
 -- Name: tbl_benutzerrolle_benutzerberechtigung_id_seq; Type: SEQUENCE; Schema: system; Owner: postgres
@@ -6137,7 +6137,7 @@ CREATE SEQUENCE tbl_benutzerrolle_benutzerberechtigung_id_seq
     CACHE 1;
 
 
-ALTER TABLE system.tbl_benutzerrolle_benutzerberechtigung_id_seq OWNER TO postgres;
+ALTER TABLE system.tbl_benutzerrolle_benutzerberechtigung_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_benutzerrolle_benutzerberechtigung_id_seq; Type: SEQUENCE OWNED BY; Schema: system; Owner: postgres
@@ -6163,7 +6163,7 @@ CREATE TABLE tbl_berechtigung (
 );
 
 
-ALTER TABLE system.tbl_berechtigung OWNER TO postgres;
+ALTER TABLE system.tbl_berechtigung OWNER TO fhcomplete;
 
 --
 -- Name: tbl_cronjob; Type: TABLE; Schema: system; Owner: postgres; Tablespace: 
@@ -6194,7 +6194,7 @@ CREATE TABLE tbl_cronjob (
 );
 
 
-ALTER TABLE system.tbl_cronjob OWNER TO postgres;
+ALTER TABLE system.tbl_cronjob OWNER TO fhcomplete;
 
 --
 -- Name: tbl_cronjob_cronjob_id_seq; Type: SEQUENCE; Schema: system; Owner: postgres
@@ -6208,7 +6208,7 @@ CREATE SEQUENCE tbl_cronjob_cronjob_id_seq
     CACHE 1;
 
 
-ALTER TABLE system.tbl_cronjob_cronjob_id_seq OWNER TO postgres;
+ALTER TABLE system.tbl_cronjob_cronjob_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_cronjob_cronjob_id_seq; Type: SEQUENCE OWNED BY; Schema: system; Owner: postgres
@@ -6234,7 +6234,7 @@ CREATE TABLE tbl_rolle (
 );
 
 
-ALTER TABLE system.tbl_rolle OWNER TO postgres;
+ALTER TABLE system.tbl_rolle OWNER TO fhcomplete;
 
 --
 -- Name: tbl_rolleberechtigung; Type: TABLE; Schema: system; Owner: postgres; Tablespace: 
@@ -6247,7 +6247,7 @@ CREATE TABLE tbl_rolleberechtigung (
 );
 
 
-ALTER TABLE system.tbl_rolleberechtigung OWNER TO postgres;
+ALTER TABLE system.tbl_rolleberechtigung OWNER TO fhcomplete;
 
 --
 -- Name: tbl_server; Type: TABLE; Schema: system; Owner: postgres; Tablespace: 
@@ -6259,7 +6259,7 @@ CREATE TABLE tbl_server (
 );
 
 
-ALTER TABLE system.tbl_server OWNER TO postgres;
+ALTER TABLE system.tbl_server OWNER TO fhcomplete;
 
 --
 -- Name: tbl_webservicelog; Type: TABLE; Schema: system; Owner: postgres; Tablespace: 
@@ -6276,7 +6276,7 @@ CREATE TABLE tbl_webservicelog (
 );
 
 
-ALTER TABLE system.tbl_webservicelog OWNER TO postgres;
+ALTER TABLE system.tbl_webservicelog OWNER TO fhcomplete;
 
 --
 -- Name: tbl_webservicerecht; Type: TABLE; Schema: system; Owner: postgres; Tablespace: 
@@ -6294,7 +6294,7 @@ CREATE TABLE tbl_webservicerecht (
 );
 
 
-ALTER TABLE system.tbl_webservicerecht OWNER TO postgres;
+ALTER TABLE system.tbl_webservicerecht OWNER TO fhcomplete;
 
 --
 -- Name: tbl_webservicetyp; Type: TABLE; Schema: system; Owner: postgres; Tablespace: 
@@ -6306,7 +6306,7 @@ CREATE TABLE tbl_webservicetyp (
 );
 
 
-ALTER TABLE system.tbl_webservicetyp OWNER TO postgres;
+ALTER TABLE system.tbl_webservicetyp OWNER TO fhcomplete;
 
 SET search_path = testtool, pg_catalog;
 
@@ -6328,7 +6328,7 @@ CREATE TABLE tbl_ablauf (
 );
 
 
-ALTER TABLE testtool.tbl_ablauf OWNER TO postgres;
+ALTER TABLE testtool.tbl_ablauf OWNER TO fhcomplete;
 
 --
 -- Name: TABLE tbl_ablauf; Type: COMMENT; Schema: testtool; Owner: postgres
@@ -6363,7 +6363,7 @@ CREATE SEQUENCE tbl_ablauf_ablauf_id_seq
     CACHE 1;
 
 
-ALTER TABLE testtool.tbl_ablauf_ablauf_id_seq OWNER TO postgres;
+ALTER TABLE testtool.tbl_ablauf_ablauf_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_ablauf_ablauf_id_seq; Type: SEQUENCE OWNED BY; Schema: testtool; Owner: postgres
@@ -6390,7 +6390,7 @@ CREATE TABLE tbl_antwort (
 );
 
 
-ALTER TABLE testtool.tbl_antwort OWNER TO postgres;
+ALTER TABLE testtool.tbl_antwort OWNER TO fhcomplete;
 
 --
 -- Name: TABLE tbl_antwort; Type: COMMENT; Schema: testtool; Owner: postgres
@@ -6411,7 +6411,7 @@ CREATE SEQUENCE tbl_antwort_antwort_id_seq
     CACHE 1;
 
 
-ALTER TABLE testtool.tbl_antwort_antwort_id_seq OWNER TO postgres;
+ALTER TABLE testtool.tbl_antwort_antwort_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_antwort_antwort_id_seq; Type: SEQUENCE OWNED BY; Schema: testtool; Owner: postgres
@@ -6446,7 +6446,7 @@ CREATE TABLE tbl_frage (
 );
 
 
-ALTER TABLE testtool.tbl_frage OWNER TO postgres;
+ALTER TABLE testtool.tbl_frage OWNER TO fhcomplete;
 
 --
 -- Name: TABLE tbl_frage; Type: COMMENT; Schema: testtool; Owner: postgres
@@ -6488,7 +6488,7 @@ CREATE SEQUENCE tbl_frage_frage_id_seq
     CACHE 1;
 
 
-ALTER TABLE testtool.tbl_frage_frage_id_seq OWNER TO postgres;
+ALTER TABLE testtool.tbl_frage_frage_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_frage_frage_id_seq; Type: SEQUENCE OWNED BY; Schema: testtool; Owner: postgres
@@ -6521,7 +6521,7 @@ CREATE TABLE tbl_frage_sprache (
 );
 
 
-ALTER TABLE testtool.tbl_frage_sprache OWNER TO postgres;
+ALTER TABLE testtool.tbl_frage_sprache OWNER TO fhcomplete;
 
 --
 -- Name: tbl_gebiet; Type: TABLE; Schema: testtool; Owner: postgres; Tablespace: 
@@ -6551,7 +6551,7 @@ CREATE TABLE tbl_gebiet (
 );
 
 
-ALTER TABLE testtool.tbl_gebiet OWNER TO postgres;
+ALTER TABLE testtool.tbl_gebiet OWNER TO fhcomplete;
 
 --
 -- Name: TABLE tbl_gebiet; Type: COMMENT; Schema: testtool; Owner: postgres
@@ -6650,7 +6650,7 @@ CREATE SEQUENCE tbl_gebiet_gebiet_id_seq
     CACHE 1;
 
 
-ALTER TABLE testtool.tbl_gebiet_gebiet_id_seq OWNER TO postgres;
+ALTER TABLE testtool.tbl_gebiet_gebiet_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_gebiet_gebiet_id_seq; Type: SEQUENCE OWNED BY; Schema: testtool; Owner: postgres
@@ -6676,7 +6676,7 @@ CREATE TABLE tbl_kategorie (
 );
 
 
-ALTER TABLE testtool.tbl_kategorie OWNER TO postgres;
+ALTER TABLE testtool.tbl_kategorie OWNER TO fhcomplete;
 
 --
 -- Name: tbl_kriterien; Type: TABLE; Schema: testtool; Owner: postgres; Tablespace: 
@@ -6690,7 +6690,7 @@ CREATE TABLE tbl_kriterien (
 );
 
 
-ALTER TABLE testtool.tbl_kriterien OWNER TO postgres;
+ALTER TABLE testtool.tbl_kriterien OWNER TO fhcomplete;
 
 --
 -- Name: tbl_pruefling; Type: TABLE; Schema: testtool; Owner: postgres; Tablespace: 
@@ -6706,7 +6706,7 @@ CREATE TABLE tbl_pruefling (
 );
 
 
-ALTER TABLE testtool.tbl_pruefling OWNER TO postgres;
+ALTER TABLE testtool.tbl_pruefling OWNER TO fhcomplete;
 
 --
 -- Name: TABLE tbl_pruefling; Type: COMMENT; Schema: testtool; Owner: postgres
@@ -6743,7 +6743,7 @@ CREATE TABLE tbl_pruefling_frage (
 );
 
 
-ALTER TABLE testtool.tbl_pruefling_frage OWNER TO postgres;
+ALTER TABLE testtool.tbl_pruefling_frage OWNER TO fhcomplete;
 
 --
 -- Name: tbl_pruefling_frage_prueflingfrage_id_seq; Type: SEQUENCE; Schema: testtool; Owner: postgres
@@ -6757,7 +6757,7 @@ CREATE SEQUENCE tbl_pruefling_frage_prueflingfrage_id_seq
     CACHE 1;
 
 
-ALTER TABLE testtool.tbl_pruefling_frage_prueflingfrage_id_seq OWNER TO postgres;
+ALTER TABLE testtool.tbl_pruefling_frage_prueflingfrage_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_pruefling_frage_prueflingfrage_id_seq; Type: SEQUENCE OWNED BY; Schema: testtool; Owner: postgres
@@ -6785,7 +6785,7 @@ CREATE SEQUENCE tbl_pruefling_pruefling_id_seq
     CACHE 1;
 
 
-ALTER TABLE testtool.tbl_pruefling_pruefling_id_seq OWNER TO postgres;
+ALTER TABLE testtool.tbl_pruefling_pruefling_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_pruefling_pruefling_id_seq; Type: SEQUENCE OWNED BY; Schema: testtool; Owner: postgres
@@ -6817,7 +6817,7 @@ CREATE TABLE tbl_vorschlag (
 );
 
 
-ALTER TABLE testtool.tbl_vorschlag OWNER TO postgres;
+ALTER TABLE testtool.tbl_vorschlag OWNER TO fhcomplete;
 
 --
 -- Name: TABLE tbl_vorschlag; Type: COMMENT; Schema: testtool; Owner: postgres
@@ -6850,7 +6850,7 @@ CREATE TABLE tbl_vorschlag_sprache (
 );
 
 
-ALTER TABLE testtool.tbl_vorschlag_sprache OWNER TO postgres;
+ALTER TABLE testtool.tbl_vorschlag_sprache OWNER TO fhcomplete;
 
 --
 -- Name: tbl_vorschlag_vorschlag_id_seq; Type: SEQUENCE; Schema: testtool; Owner: postgres
@@ -6864,7 +6864,7 @@ CREATE SEQUENCE tbl_vorschlag_vorschlag_id_seq
     CACHE 1;
 
 
-ALTER TABLE testtool.tbl_vorschlag_vorschlag_id_seq OWNER TO postgres;
+ALTER TABLE testtool.tbl_vorschlag_vorschlag_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_vorschlag_vorschlag_id_seq; Type: SEQUENCE OWNED BY; Schema: testtool; Owner: postgres
@@ -6888,7 +6888,7 @@ CREATE VIEW vw_ablauf AS
     SELECT tbl_ablauf.studiengang_kz, tbl_ablauf.gebiet_id, tbl_ablauf.reihung, tbl_ablauf.gewicht, tbl_ablauf.semester, tbl_studiengang.kurzbzlang AS stg_kurzbz, tbl_studiengang.bezeichnung AS stg_bez, tbl_gebiet.kurzbz AS gebiet_kurzbz, tbl_gebiet.bezeichnung AS gebiet_bez FROM ((tbl_ablauf JOIN tbl_gebiet USING (gebiet_id)) JOIN public.tbl_studiengang USING (studiengang_kz));
 
 
-ALTER TABLE testtool.vw_ablauf OWNER TO postgres;
+ALTER TABLE testtool.vw_ablauf OWNER TO fhcomplete;
 
 --
 -- Name: vw_auswertung; Type: VIEW; Schema: testtool; Owner: postgres
@@ -6898,7 +6898,7 @@ CREATE VIEW vw_auswertung AS
     SELECT tbl_gebiet.gebiet_id, tbl_gebiet.bezeichnung AS gebiet, tbl_gebiet.maxpunkte, tbl_pruefling.pruefling_id, tbl_pruefling.prestudent_id, tbl_person.vorname, tbl_person.nachname, tbl_person.gebdatum, tbl_person.geschlecht, tbl_pruefling.semester, upper((((tbl_studiengang.typ)::character varying(1))::text || (tbl_studiengang.kurzbz)::text)) AS stg_kurzbz, tbl_studiengang.bezeichnung AS stg_bez, tbl_pruefling.registriert, tbl_pruefling.idnachweis, (SELECT sum(tbl_vorschlag.punkte) AS sum FROM ((tbl_vorschlag JOIN tbl_antwort USING (vorschlag_id)) JOIN tbl_frage USING (frage_id)) WHERE ((tbl_antwort.pruefling_id = tbl_pruefling.pruefling_id) AND (tbl_frage.gebiet_id = tbl_gebiet.gebiet_id))) AS punkte, tbl_prestudent.reihungstest_id, tbl_ablauf.gewicht FROM (((((tbl_pruefling JOIN tbl_ablauf ON (((tbl_ablauf.studiengang_kz = tbl_pruefling.studiengang_kz) AND (tbl_ablauf.semester = tbl_pruefling.semester)))) JOIN tbl_gebiet USING (gebiet_id)) JOIN public.tbl_prestudent USING (prestudent_id)) JOIN public.tbl_person USING (person_id)) JOIN public.tbl_studiengang ON ((tbl_prestudent.studiengang_kz = tbl_studiengang.studiengang_kz))) WHERE (NOT (tbl_ablauf.gebiet_id IN (SELECT tbl_kategorie.gebiet_id FROM tbl_kategorie)));
 
 
-ALTER TABLE testtool.vw_auswertung OWNER TO postgres;
+ALTER TABLE testtool.vw_auswertung OWNER TO fhcomplete;
 
 --
 -- Name: vw_auswertung_ablauf; Type: VIEW; Schema: testtool; Owner: postgres
@@ -6908,7 +6908,7 @@ CREATE VIEW vw_auswertung_ablauf AS
     SELECT tbl_gebiet.gebiet_id, tbl_gebiet.bezeichnung AS gebiet, tbl_ablauf.reihung, tbl_gebiet.maxpunkte, tbl_pruefling.pruefling_id, tbl_pruefling.prestudent_id, tbl_person.vorname, tbl_person.nachname, tbl_person.gebdatum, tbl_person.geschlecht, tbl_pruefling.semester, upper((((tbl_studiengang.typ)::character varying(1))::text || (tbl_studiengang.kurzbz)::text)) AS stg_kurzbz, tbl_studiengang.bezeichnung AS stg_bez, tbl_pruefling.registriert, tbl_pruefling.idnachweis, (SELECT sum(tbl_vorschlag.punkte) AS sum FROM ((tbl_vorschlag JOIN tbl_antwort USING (vorschlag_id)) JOIN tbl_frage USING (frage_id)) WHERE ((tbl_antwort.pruefling_id = tbl_pruefling.pruefling_id) AND (tbl_frage.gebiet_id = tbl_gebiet.gebiet_id))) AS punkte, tbl_prestudent.reihungstest_id, tbl_ablauf.gewicht FROM (((((tbl_pruefling JOIN tbl_ablauf ON ((tbl_ablauf.studiengang_kz = tbl_pruefling.studiengang_kz))) JOIN tbl_gebiet USING (gebiet_id)) JOIN public.tbl_prestudent USING (prestudent_id)) JOIN public.tbl_person USING (person_id)) JOIN public.tbl_studiengang ON ((tbl_prestudent.studiengang_kz = tbl_studiengang.studiengang_kz))) WHERE (NOT (tbl_ablauf.gebiet_id IN (SELECT tbl_kategorie.gebiet_id FROM tbl_kategorie)));
 
 
-ALTER TABLE testtool.vw_auswertung_ablauf OWNER TO postgres;
+ALTER TABLE testtool.vw_auswertung_ablauf OWNER TO fhcomplete;
 
 --
 -- Name: vw_auswertung_kategorie; Type: VIEW; Schema: testtool; Owner: postgres
@@ -6918,7 +6918,7 @@ CREATE VIEW vw_auswertung_kategorie AS
     SELECT tbl_kategorie.kategorie_kurzbz, tbl_person.vorname, tbl_person.nachname, tbl_person.gebdatum, tbl_person.geschlecht, tbl_prestudent.prestudent_id, tbl_prestudent.reihungstest_id, tbl_gebiet.gebiet_id, upper((((tbl_studiengang.typ)::character varying(1))::text || (tbl_studiengang.kurzbz)::text)) AS stg_kurzbz, tbl_studiengang.bezeichnung AS stg_bez, tbl_pruefling.registriert, tbl_pruefling.idnachweis, tbl_pruefling.semester, tbl_pruefling.pruefling_id, (SELECT sum(tbl_vorschlag.punkte) AS sum FROM ((tbl_vorschlag JOIN tbl_antwort USING (vorschlag_id)) JOIN tbl_frage USING (frage_id)) WHERE (((tbl_antwort.pruefling_id = tbl_pruefling.pruefling_id) AND (tbl_frage.gebiet_id = tbl_gebiet.gebiet_id)) AND ((tbl_frage.kategorie_kurzbz)::text = (tbl_kategorie.kategorie_kurzbz)::text))) AS punkte FROM ((((((tbl_pruefling JOIN tbl_ablauf ON (((tbl_ablauf.studiengang_kz = tbl_pruefling.studiengang_kz) AND (tbl_ablauf.semester = tbl_pruefling.semester)))) JOIN tbl_gebiet USING (gebiet_id)) JOIN tbl_kategorie USING (gebiet_id)) JOIN public.tbl_prestudent USING (prestudent_id)) JOIN public.tbl_person USING (person_id)) JOIN public.tbl_studiengang ON ((tbl_prestudent.studiengang_kz = tbl_studiengang.studiengang_kz)));
 
 
-ALTER TABLE testtool.vw_auswertung_kategorie OWNER TO postgres;
+ALTER TABLE testtool.vw_auswertung_kategorie OWNER TO fhcomplete;
 
 --
 -- Name: vw_auswertung_kategorie_semester; Type: VIEW; Schema: testtool; Owner: postgres
@@ -6928,7 +6928,7 @@ CREATE VIEW vw_auswertung_kategorie_semester AS
     SELECT tbl_kategorie.kategorie_kurzbz, tbl_person.vorname, tbl_person.nachname, tbl_person.gebdatum, tbl_person.geschlecht, tbl_prestudent.prestudent_id, tbl_prestudent.reihungstest_id, tbl_gebiet.gebiet_id, upper((((tbl_studiengang.typ)::character varying(1))::text || (tbl_studiengang.kurzbz)::text)) AS stg_kurzbz, tbl_studiengang.bezeichnung AS stg_bez, tbl_pruefling.registriert, tbl_pruefling.idnachweis, tbl_pruefling.semester, tbl_pruefling.pruefling_id, (SELECT sum(tbl_vorschlag.punkte) AS sum FROM ((tbl_vorschlag JOIN tbl_antwort USING (vorschlag_id)) JOIN tbl_frage USING (frage_id)) WHERE (((tbl_antwort.pruefling_id = tbl_pruefling.pruefling_id) AND (tbl_frage.gebiet_id = tbl_gebiet.gebiet_id)) AND ((tbl_frage.kategorie_kurzbz)::text = (tbl_kategorie.kategorie_kurzbz)::text))) AS punkte FROM ((((((tbl_pruefling JOIN tbl_ablauf ON ((tbl_ablauf.studiengang_kz = tbl_pruefling.studiengang_kz))) JOIN tbl_gebiet USING (gebiet_id)) JOIN tbl_kategorie USING (gebiet_id)) JOIN public.tbl_prestudent USING (prestudent_id)) JOIN public.tbl_person USING (person_id)) JOIN public.tbl_studiengang ON ((tbl_prestudent.studiengang_kz = tbl_studiengang.studiengang_kz)));
 
 
-ALTER TABLE testtool.vw_auswertung_kategorie_semester OWNER TO postgres;
+ALTER TABLE testtool.vw_auswertung_kategorie_semester OWNER TO fhcomplete;
 
 --
 -- Name: vw_pruefling; Type: VIEW; Schema: testtool; Owner: postgres
@@ -6938,7 +6938,7 @@ CREATE VIEW vw_pruefling AS
     SELECT tbl_pruefling.prestudent_id, tbl_pruefling.pruefling_id, tbl_pruefling.studiengang_kz, tbl_person.nachname, tbl_person.vorname, tbl_person.gebdatum, tbl_person.geschlecht, tbl_pruefling.idnachweis, tbl_pruefling.registriert, tbl_studiengang.kurzbz AS stg_kurzbz, tbl_studiengang.bezeichnung AS stg_bez FROM (((tbl_pruefling JOIN public.tbl_studiengang USING (studiengang_kz)) JOIN public.tbl_prestudent USING (prestudent_id)) JOIN public.tbl_person USING (person_id));
 
 
-ALTER TABLE testtool.vw_pruefling OWNER TO postgres;
+ALTER TABLE testtool.vw_pruefling OWNER TO fhcomplete;
 
 SET search_path = wawi, pg_catalog;
 
@@ -6954,7 +6954,7 @@ CREATE SEQUENCE seq_aufteilung_aufteilung_id
     CACHE 1;
 
 
-ALTER TABLE wawi.seq_aufteilung_aufteilung_id OWNER TO postgres;
+ALTER TABLE wawi.seq_aufteilung_aufteilung_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_aufteilung_aufteilung_id; Type: SEQUENCE SET; Schema: wawi; Owner: postgres
@@ -6975,7 +6975,7 @@ CREATE SEQUENCE seq_aufteilung_default_aufteilung_id
     CACHE 1;
 
 
-ALTER TABLE wawi.seq_aufteilung_default_aufteilung_id OWNER TO postgres;
+ALTER TABLE wawi.seq_aufteilung_default_aufteilung_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_aufteilung_default_aufteilung_id; Type: SEQUENCE SET; Schema: wawi; Owner: postgres
@@ -6996,7 +6996,7 @@ CREATE SEQUENCE seq_bestelldetail_bestelldetail_id
     CACHE 1;
 
 
-ALTER TABLE wawi.seq_bestelldetail_bestelldetail_id OWNER TO postgres;
+ALTER TABLE wawi.seq_bestelldetail_bestelldetail_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_bestelldetail_bestelldetail_id; Type: SEQUENCE SET; Schema: wawi; Owner: postgres
@@ -7017,7 +7017,7 @@ CREATE SEQUENCE seq_bestellung_bestellstatus_bestellung_bestellstatus_id
     CACHE 1;
 
 
-ALTER TABLE wawi.seq_bestellung_bestellstatus_bestellung_bestellstatus_id OWNER TO postgres;
+ALTER TABLE wawi.seq_bestellung_bestellstatus_bestellung_bestellstatus_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_bestellung_bestellstatus_bestellung_bestellstatus_id; Type: SEQUENCE SET; Schema: wawi; Owner: postgres
@@ -7038,7 +7038,7 @@ CREATE SEQUENCE seq_bestellung_bestellung_id
     CACHE 1;
 
 
-ALTER TABLE wawi.seq_bestellung_bestellung_id OWNER TO postgres;
+ALTER TABLE wawi.seq_bestellung_bestellung_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_bestellung_bestellung_id; Type: SEQUENCE SET; Schema: wawi; Owner: postgres
@@ -7059,7 +7059,7 @@ CREATE SEQUENCE seq_konto_konto_id
     CACHE 1;
 
 
-ALTER TABLE wawi.seq_konto_konto_id OWNER TO postgres;
+ALTER TABLE wawi.seq_konto_konto_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_konto_konto_id; Type: SEQUENCE SET; Schema: wawi; Owner: postgres
@@ -7080,7 +7080,7 @@ CREATE SEQUENCE seq_kostenstelle_kostenstelle_id
     CACHE 1;
 
 
-ALTER TABLE wawi.seq_kostenstelle_kostenstelle_id OWNER TO postgres;
+ALTER TABLE wawi.seq_kostenstelle_kostenstelle_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_kostenstelle_kostenstelle_id; Type: SEQUENCE SET; Schema: wawi; Owner: postgres
@@ -7101,7 +7101,7 @@ CREATE SEQUENCE seq_rechnung_rechnung_id
     CACHE 1;
 
 
-ALTER TABLE wawi.seq_rechnung_rechnung_id OWNER TO postgres;
+ALTER TABLE wawi.seq_rechnung_rechnung_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_rechnung_rechnung_id; Type: SEQUENCE SET; Schema: wawi; Owner: postgres
@@ -7122,7 +7122,7 @@ CREATE SEQUENCE seq_rechnungsbetrag_rechnungsbetrag_id
     CACHE 1;
 
 
-ALTER TABLE wawi.seq_rechnungsbetrag_rechnungsbetrag_id OWNER TO postgres;
+ALTER TABLE wawi.seq_rechnungsbetrag_rechnungsbetrag_id OWNER TO fhcomplete;
 
 --
 -- Name: seq_rechnungsbetrag_rechnungsbetrag_id; Type: SEQUENCE SET; Schema: wawi; Owner: postgres
@@ -7147,7 +7147,7 @@ CREATE TABLE tbl_aufteilung (
 );
 
 
-ALTER TABLE wawi.tbl_aufteilung OWNER TO postgres;
+ALTER TABLE wawi.tbl_aufteilung OWNER TO fhcomplete;
 
 --
 -- Name: tbl_aufteilung_default; Type: TABLE; Schema: wawi; Owner: postgres; Tablespace: 
@@ -7165,7 +7165,7 @@ CREATE TABLE tbl_aufteilung_default (
 );
 
 
-ALTER TABLE wawi.tbl_aufteilung_default OWNER TO postgres;
+ALTER TABLE wawi.tbl_aufteilung_default OWNER TO fhcomplete;
 
 --
 -- Name: tbl_bestelldetail; Type: TABLE; Schema: wawi; Owner: postgres; Tablespace: 
@@ -7191,7 +7191,7 @@ CREATE TABLE tbl_bestelldetail (
 );
 
 
-ALTER TABLE wawi.tbl_bestelldetail OWNER TO postgres;
+ALTER TABLE wawi.tbl_bestelldetail OWNER TO fhcomplete;
 
 --
 -- Name: tbl_bestelldetailtag; Type: TABLE; Schema: wawi; Owner: postgres; Tablespace: 
@@ -7205,7 +7205,7 @@ CREATE TABLE tbl_bestelldetailtag (
 );
 
 
-ALTER TABLE wawi.tbl_bestelldetailtag OWNER TO postgres;
+ALTER TABLE wawi.tbl_bestelldetailtag OWNER TO fhcomplete;
 
 --
 -- Name: tbl_bestellstatus; Type: TABLE; Schema: wawi; Owner: postgres; Tablespace: 
@@ -7217,7 +7217,7 @@ CREATE TABLE tbl_bestellstatus (
 );
 
 
-ALTER TABLE wawi.tbl_bestellstatus OWNER TO postgres;
+ALTER TABLE wawi.tbl_bestellstatus OWNER TO fhcomplete;
 
 --
 -- Name: tbl_bestellung; Type: TABLE; Schema: wawi; Owner: postgres; Tablespace: 
@@ -7245,7 +7245,7 @@ CREATE TABLE tbl_bestellung (
 );
 
 
-ALTER TABLE wawi.tbl_bestellung OWNER TO postgres;
+ALTER TABLE wawi.tbl_bestellung OWNER TO fhcomplete;
 
 --
 -- Name: tbl_bestellung_bestellstatus; Type: TABLE; Schema: wawi; Owner: postgres; Tablespace: 
@@ -7265,7 +7265,7 @@ CREATE TABLE tbl_bestellung_bestellstatus (
 );
 
 
-ALTER TABLE wawi.tbl_bestellung_bestellstatus OWNER TO postgres;
+ALTER TABLE wawi.tbl_bestellung_bestellstatus OWNER TO fhcomplete;
 
 --
 -- Name: tbl_bestellungtag; Type: TABLE; Schema: wawi; Owner: postgres; Tablespace: 
@@ -7279,7 +7279,7 @@ CREATE TABLE tbl_bestellungtag (
 );
 
 
-ALTER TABLE wawi.tbl_bestellungtag OWNER TO postgres;
+ALTER TABLE wawi.tbl_bestellungtag OWNER TO fhcomplete;
 
 --
 -- Name: tbl_betriebsmittel_betriebsmittelstatus; Type: TABLE; Schema: wawi; Owner: postgres; Tablespace: 
@@ -7298,7 +7298,7 @@ CREATE TABLE tbl_betriebsmittel_betriebsmittelstatus (
 );
 
 
-ALTER TABLE wawi.tbl_betriebsmittel_betriebsmittelstatus OWNER TO postgres;
+ALTER TABLE wawi.tbl_betriebsmittel_betriebsmittelstatus OWNER TO fhcomplete;
 
 --
 -- Name: tbl_betriebsmittel_betriebsmi_betriebsmittelbetriebsmittels_seq; Type: SEQUENCE; Schema: wawi; Owner: postgres
@@ -7312,7 +7312,7 @@ CREATE SEQUENCE tbl_betriebsmittel_betriebsmi_betriebsmittelbetriebsmittels_seq
     CACHE 1;
 
 
-ALTER TABLE wawi.tbl_betriebsmittel_betriebsmi_betriebsmittelbetriebsmittels_seq OWNER TO postgres;
+ALTER TABLE wawi.tbl_betriebsmittel_betriebsmi_betriebsmittelbetriebsmittels_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_betriebsmittel_betriebsmi_betriebsmittelbetriebsmittels_seq; Type: SEQUENCE OWNED BY; Schema: wawi; Owner: postgres
@@ -7340,7 +7340,7 @@ CREATE SEQUENCE tbl_betriebsmittel_betriebsmittel_id_seq
     CACHE 1;
 
 
-ALTER TABLE wawi.tbl_betriebsmittel_betriebsmittel_id_seq OWNER TO postgres;
+ALTER TABLE wawi.tbl_betriebsmittel_betriebsmittel_id_seq OWNER TO fhcomplete;
 
 --
 -- Name: tbl_betriebsmittel_betriebsmittel_id_seq; Type: SEQUENCE OWNED BY; Schema: wawi; Owner: postgres
@@ -7366,7 +7366,7 @@ CREATE TABLE tbl_betriebsmittelstatus (
 );
 
 
-ALTER TABLE wawi.tbl_betriebsmittelstatus OWNER TO postgres;
+ALTER TABLE wawi.tbl_betriebsmittelstatus OWNER TO fhcomplete;
 
 --
 -- Name: tbl_betriebsmitteltyp; Type: TABLE; Schema: wawi; Owner: postgres; Tablespace: 
@@ -7382,7 +7382,7 @@ CREATE TABLE tbl_betriebsmitteltyp (
 );
 
 
-ALTER TABLE wawi.tbl_betriebsmitteltyp OWNER TO postgres;
+ALTER TABLE wawi.tbl_betriebsmitteltyp OWNER TO fhcomplete;
 
 --
 -- Name: COLUMN tbl_betriebsmitteltyp.typ_code; Type: COMMENT; Schema: wawi; Owner: postgres
@@ -7402,7 +7402,7 @@ CREATE TABLE tbl_budget (
 );
 
 
-ALTER TABLE wawi.tbl_budget OWNER TO postgres;
+ALTER TABLE wawi.tbl_budget OWNER TO fhcomplete;
 
 --
 -- Name: tbl_konto; Type: TABLE; Schema: wawi; Owner: postgres; Tablespace: 
@@ -7421,7 +7421,7 @@ CREATE TABLE tbl_konto (
 );
 
 
-ALTER TABLE wawi.tbl_konto OWNER TO postgres;
+ALTER TABLE wawi.tbl_konto OWNER TO fhcomplete;
 
 --
 -- Name: tbl_konto_kostenstelle; Type: TABLE; Schema: wawi; Owner: postgres; Tablespace: 
@@ -7435,7 +7435,7 @@ CREATE TABLE tbl_konto_kostenstelle (
 );
 
 
-ALTER TABLE wawi.tbl_konto_kostenstelle OWNER TO postgres;
+ALTER TABLE wawi.tbl_konto_kostenstelle OWNER TO fhcomplete;
 
 --
 -- Name: tbl_kostenstelle; Type: TABLE; Schema: wawi; Owner: postgres; Tablespace: 
@@ -7458,7 +7458,7 @@ CREATE TABLE tbl_kostenstelle (
 );
 
 
-ALTER TABLE wawi.tbl_kostenstelle OWNER TO postgres;
+ALTER TABLE wawi.tbl_kostenstelle OWNER TO fhcomplete;
 
 --
 -- Name: tbl_projekt_bestellung; Type: TABLE; Schema: wawi; Owner: postgres; Tablespace: 
@@ -7471,7 +7471,7 @@ CREATE TABLE tbl_projekt_bestellung (
 );
 
 
-ALTER TABLE wawi.tbl_projekt_bestellung OWNER TO postgres;
+ALTER TABLE wawi.tbl_projekt_bestellung OWNER TO fhcomplete;
 
 --
 -- Name: tbl_rechnung; Type: TABLE; Schema: wawi; Owner: postgres; Tablespace: 
@@ -7496,7 +7496,7 @@ CREATE TABLE tbl_rechnung (
 );
 
 
-ALTER TABLE wawi.tbl_rechnung OWNER TO postgres;
+ALTER TABLE wawi.tbl_rechnung OWNER TO fhcomplete;
 
 --
 -- Name: tbl_rechnungsbetrag; Type: TABLE; Schema: wawi; Owner: postgres; Tablespace: 
@@ -7512,7 +7512,7 @@ CREATE TABLE tbl_rechnungsbetrag (
 );
 
 
-ALTER TABLE wawi.tbl_rechnungsbetrag OWNER TO postgres;
+ALTER TABLE wawi.tbl_rechnungsbetrag OWNER TO fhcomplete;
 
 --
 -- Name: tbl_rechnungstyp; Type: TABLE; Schema: wawi; Owner: postgres; Tablespace: 
@@ -7525,7 +7525,7 @@ CREATE TABLE tbl_rechnungstyp (
 );
 
 
-ALTER TABLE wawi.tbl_rechnungstyp OWNER TO postgres;
+ALTER TABLE wawi.tbl_rechnungstyp OWNER TO fhcomplete;
 
 --
 -- Name: tbl_zahlungstyp; Type: TABLE; Schema: wawi; Owner: postgres; Tablespace: 
@@ -7537,7 +7537,7 @@ CREATE TABLE tbl_zahlungstyp (
 );
 
 
-ALTER TABLE wawi.tbl_zahlungstyp OWNER TO postgres;
+ALTER TABLE wawi.tbl_zahlungstyp OWNER TO fhcomplete;
 
 SET search_path = bis, pg_catalog;
 
@@ -42301,7 +42301,7 @@ ALTER TABLE ONLY tbl_betriebsmittelperson
 
 REVOKE ALL ON SCHEMA bis FROM PUBLIC;
 REVOKE ALL ON SCHEMA bis FROM postgres;
-GRANT ALL ON SCHEMA bis TO postgres;
+GRANT ALL ON SCHEMA bis TO fhcomplete;
 GRANT USAGE ON SCHEMA bis TO web;
 GRANT ALL ON SCHEMA bis TO admin;
 GRANT USAGE ON SCHEMA bis TO wawi;
@@ -42314,7 +42314,7 @@ GRANT ALL ON SCHEMA bis TO vilesci;
 
 REVOKE ALL ON SCHEMA campus FROM PUBLIC;
 REVOKE ALL ON SCHEMA campus FROM postgres;
-GRANT ALL ON SCHEMA campus TO postgres;
+GRANT ALL ON SCHEMA campus TO fhcomplete;
 GRANT USAGE ON SCHEMA campus TO web;
 GRANT ALL ON SCHEMA campus TO admin;
 GRANT USAGE ON SCHEMA campus TO wawi;
@@ -42327,7 +42327,7 @@ GRANT ALL ON SCHEMA campus TO vilesci;
 
 REVOKE ALL ON SCHEMA fue FROM PUBLIC;
 REVOKE ALL ON SCHEMA fue FROM postgres;
-GRANT ALL ON SCHEMA fue TO postgres;
+GRANT ALL ON SCHEMA fue TO fhcomplete;
 GRANT USAGE ON SCHEMA fue TO web;
 GRANT ALL ON SCHEMA fue TO admin;
 GRANT USAGE ON SCHEMA fue TO wawi;
@@ -42340,7 +42340,7 @@ GRANT ALL ON SCHEMA fue TO vilesci;
 
 REVOKE ALL ON SCHEMA kommune FROM PUBLIC;
 REVOKE ALL ON SCHEMA kommune FROM postgres;
-GRANT ALL ON SCHEMA kommune TO postgres;
+GRANT ALL ON SCHEMA kommune TO fhcomplete;
 GRANT USAGE ON SCHEMA kommune TO web;
 GRANT ALL ON SCHEMA kommune TO admin;
 GRANT ALL ON SCHEMA kommune TO vilesci;
@@ -42352,7 +42352,7 @@ GRANT ALL ON SCHEMA kommune TO vilesci;
 
 REVOKE ALL ON SCHEMA lehre FROM PUBLIC;
 REVOKE ALL ON SCHEMA lehre FROM postgres;
-GRANT ALL ON SCHEMA lehre TO postgres;
+GRANT ALL ON SCHEMA lehre TO fhcomplete;
 GRANT USAGE ON SCHEMA lehre TO web;
 GRANT ALL ON SCHEMA lehre TO admin;
 GRANT ALL ON SCHEMA lehre TO vilesci;
@@ -42376,7 +42376,7 @@ GRANT ALL ON SCHEMA public TO vilesci;
 
 REVOKE ALL ON SCHEMA sync FROM PUBLIC;
 REVOKE ALL ON SCHEMA sync FROM postgres;
-GRANT ALL ON SCHEMA sync TO postgres;
+GRANT ALL ON SCHEMA sync TO fhcomplete;
 GRANT ALL ON SCHEMA sync TO admin;
 GRANT ALL ON SCHEMA sync TO vilesci;
 
@@ -42387,7 +42387,7 @@ GRANT ALL ON SCHEMA sync TO vilesci;
 
 REVOKE ALL ON SCHEMA system FROM PUBLIC;
 REVOKE ALL ON SCHEMA system FROM postgres;
-GRANT ALL ON SCHEMA system TO postgres;
+GRANT ALL ON SCHEMA system TO fhcomplete;
 GRANT USAGE ON SCHEMA system TO web;
 GRANT USAGE ON SCHEMA system TO admin;
 GRANT USAGE ON SCHEMA system TO wawi;
@@ -42400,7 +42400,7 @@ GRANT USAGE ON SCHEMA system TO vilesci;
 
 REVOKE ALL ON SCHEMA testtool FROM PUBLIC;
 REVOKE ALL ON SCHEMA testtool FROM postgres;
-GRANT ALL ON SCHEMA testtool TO postgres;
+GRANT ALL ON SCHEMA testtool TO fhcomplete;
 GRANT USAGE ON SCHEMA testtool TO web;
 GRANT USAGE ON SCHEMA testtool TO admin;
 GRANT USAGE ON SCHEMA testtool TO vilesci;
@@ -42412,11 +42412,11 @@ GRANT USAGE ON SCHEMA testtool TO vilesci;
 
 REVOKE ALL ON SCHEMA wawi FROM PUBLIC;
 REVOKE ALL ON SCHEMA wawi FROM postgres;
-GRANT ALL ON SCHEMA wawi TO postgres;
+GRANT ALL ON SCHEMA wawi TO fhcomplete;
 GRANT USAGE ON SCHEMA wawi TO web;
 GRANT USAGE ON SCHEMA wawi TO admin;
 GRANT USAGE ON SCHEMA wawi TO wawi;
-GRANT USAGE ON SCHEMA wawi TO pam;
+GRANT USAGE ON SCHEMA wawi TO fhcomplete;
 GRANT USAGE ON SCHEMA wawi TO vilesci;
 
 
@@ -42428,7 +42428,7 @@ SET search_path = bis, pg_catalog;
 
 REVOKE ALL ON TABLE tbl_ausbildung FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_ausbildung FROM postgres;
-GRANT ALL ON TABLE tbl_ausbildung TO postgres;
+GRANT ALL ON TABLE tbl_ausbildung TO fhcomplete;
 GRANT SELECT ON TABLE tbl_ausbildung TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_ausbildung TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_ausbildung TO vilesci;
@@ -42440,7 +42440,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_ausbildung TO vilesci;
 
 REVOKE ALL ON TABLE tbl_berufstaetigkeit FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_berufstaetigkeit FROM postgres;
-GRANT ALL ON TABLE tbl_berufstaetigkeit TO postgres;
+GRANT ALL ON TABLE tbl_berufstaetigkeit TO fhcomplete;
 GRANT SELECT ON TABLE tbl_berufstaetigkeit TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_berufstaetigkeit TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_berufstaetigkeit TO vilesci;
@@ -42452,7 +42452,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_berufstaetigkeit TO vilesci;
 
 REVOKE ALL ON TABLE tbl_beschaeftigungsart1 FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_beschaeftigungsart1 FROM postgres;
-GRANT ALL ON TABLE tbl_beschaeftigungsart1 TO postgres;
+GRANT ALL ON TABLE tbl_beschaeftigungsart1 TO fhcomplete;
 GRANT SELECT ON TABLE tbl_beschaeftigungsart1 TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_beschaeftigungsart1 TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_beschaeftigungsart1 TO vilesci;
@@ -42464,7 +42464,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_beschaeftigungsart1 TO vilesci;
 
 REVOKE ALL ON TABLE tbl_beschaeftigungsart2 FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_beschaeftigungsart2 FROM postgres;
-GRANT ALL ON TABLE tbl_beschaeftigungsart2 TO postgres;
+GRANT ALL ON TABLE tbl_beschaeftigungsart2 TO fhcomplete;
 GRANT SELECT ON TABLE tbl_beschaeftigungsart2 TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_beschaeftigungsart2 TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_beschaeftigungsart2 TO vilesci;
@@ -42476,7 +42476,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_beschaeftigungsart2 TO vilesci;
 
 REVOKE ALL ON TABLE tbl_beschaeftigungsausmass FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_beschaeftigungsausmass FROM postgres;
-GRANT ALL ON TABLE tbl_beschaeftigungsausmass TO postgres;
+GRANT ALL ON TABLE tbl_beschaeftigungsausmass TO fhcomplete;
 GRANT SELECT ON TABLE tbl_beschaeftigungsausmass TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_beschaeftigungsausmass TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_beschaeftigungsausmass TO vilesci;
@@ -42488,7 +42488,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_beschaeftigungsausmass TO vilesci
 
 REVOKE ALL ON TABLE tbl_besqual FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_besqual FROM postgres;
-GRANT ALL ON TABLE tbl_besqual TO postgres;
+GRANT ALL ON TABLE tbl_besqual TO fhcomplete;
 GRANT SELECT ON TABLE tbl_besqual TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_besqual TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_besqual TO vilesci;
@@ -42500,7 +42500,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_besqual TO vilesci;
 
 REVOKE ALL ON TABLE tbl_bisfunktion FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_bisfunktion FROM postgres;
-GRANT ALL ON TABLE tbl_bisfunktion TO postgres;
+GRANT ALL ON TABLE tbl_bisfunktion TO fhcomplete;
 GRANT SELECT ON TABLE tbl_bisfunktion TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bisfunktion TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bisfunktion TO vilesci;
@@ -42512,7 +42512,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bisfunktion TO vilesci;
 
 REVOKE ALL ON TABLE tbl_bisio FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_bisio FROM postgres;
-GRANT ALL ON TABLE tbl_bisio TO postgres;
+GRANT ALL ON TABLE tbl_bisio TO fhcomplete;
 GRANT SELECT ON TABLE tbl_bisio TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bisio TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bisio TO vilesci;
@@ -42524,7 +42524,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bisio TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_bisio_bisio_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_bisio_bisio_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_bisio_bisio_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_bisio_bisio_id_seq TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_bisio_bisio_id_seq TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_bisio_bisio_id_seq TO vilesci;
 
@@ -42535,7 +42535,7 @@ GRANT SELECT,UPDATE ON SEQUENCE tbl_bisio_bisio_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_bisverwendung FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_bisverwendung FROM postgres;
-GRANT ALL ON TABLE tbl_bisverwendung TO postgres;
+GRANT ALL ON TABLE tbl_bisverwendung TO fhcomplete;
 GRANT SELECT ON TABLE tbl_bisverwendung TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bisverwendung TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bisverwendung TO vilesci;
@@ -42547,7 +42547,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bisverwendung TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_bisverwendung_bisverwendung_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_bisverwendung_bisverwendung_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_bisverwendung_bisverwendung_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_bisverwendung_bisverwendung_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_bisverwendung_bisverwendung_id_seq TO admin;
 GRANT ALL ON SEQUENCE tbl_bisverwendung_bisverwendung_id_seq TO vilesci;
 
@@ -42558,7 +42558,7 @@ GRANT ALL ON SEQUENCE tbl_bisverwendung_bisverwendung_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_bundesland FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_bundesland FROM postgres;
-GRANT ALL ON TABLE tbl_bundesland TO postgres;
+GRANT ALL ON TABLE tbl_bundesland TO fhcomplete;
 GRANT SELECT ON TABLE tbl_bundesland TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bundesland TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bundesland TO vilesci;
@@ -42570,7 +42570,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bundesland TO vilesci;
 
 REVOKE ALL ON TABLE tbl_entwicklungsteam FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_entwicklungsteam FROM postgres;
-GRANT ALL ON TABLE tbl_entwicklungsteam TO postgres;
+GRANT ALL ON TABLE tbl_entwicklungsteam TO fhcomplete;
 GRANT SELECT ON TABLE tbl_entwicklungsteam TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_entwicklungsteam TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_entwicklungsteam TO vilesci;
@@ -42582,7 +42582,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_entwicklungsteam TO vilesci;
 
 REVOKE ALL ON TABLE tbl_gemeinde FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_gemeinde FROM postgres;
-GRANT ALL ON TABLE tbl_gemeinde TO postgres;
+GRANT ALL ON TABLE tbl_gemeinde TO fhcomplete;
 GRANT SELECT ON TABLE tbl_gemeinde TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_gemeinde TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_gemeinde TO vilesci;
@@ -42594,7 +42594,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_gemeinde TO vilesci;
 
 REVOKE ALL ON TABLE tbl_hauptberuf FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_hauptberuf FROM postgres;
-GRANT ALL ON TABLE tbl_hauptberuf TO postgres;
+GRANT ALL ON TABLE tbl_hauptberuf TO fhcomplete;
 GRANT SELECT ON TABLE tbl_hauptberuf TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_hauptberuf TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_hauptberuf TO vilesci;
@@ -42606,7 +42606,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_hauptberuf TO vilesci;
 
 REVOKE ALL ON TABLE tbl_lgartcode FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_lgartcode FROM postgres;
-GRANT ALL ON TABLE tbl_lgartcode TO postgres;
+GRANT ALL ON TABLE tbl_lgartcode TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lgartcode TO admin;
 GRANT SELECT ON TABLE tbl_lgartcode TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lgartcode TO vilesci;
@@ -42618,7 +42618,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lgartcode TO vilesci;
 
 REVOKE ALL ON TABLE tbl_mobilitaetsprogramm FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_mobilitaetsprogramm FROM postgres;
-GRANT ALL ON TABLE tbl_mobilitaetsprogramm TO postgres;
+GRANT ALL ON TABLE tbl_mobilitaetsprogramm TO fhcomplete;
 GRANT SELECT ON TABLE tbl_mobilitaetsprogramm TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_mobilitaetsprogramm TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_mobilitaetsprogramm TO vilesci;
@@ -42630,7 +42630,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_mobilitaetsprogramm TO vilesci;
 
 REVOKE ALL ON TABLE tbl_nation FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_nation FROM postgres;
-GRANT ALL ON TABLE tbl_nation TO postgres;
+GRANT ALL ON TABLE tbl_nation TO fhcomplete;
 GRANT SELECT ON TABLE tbl_nation TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_nation TO admin;
 GRANT SELECT ON TABLE tbl_nation TO wawi;
@@ -42643,7 +42643,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_nation TO vilesci;
 
 REVOKE ALL ON TABLE tbl_orgform FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_orgform FROM postgres;
-GRANT ALL ON TABLE tbl_orgform TO postgres;
+GRANT ALL ON TABLE tbl_orgform TO fhcomplete;
 GRANT SELECT ON TABLE tbl_orgform TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_orgform TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_orgform TO vilesci;
@@ -42655,7 +42655,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_orgform TO vilesci;
 
 REVOKE ALL ON TABLE tbl_verwendung FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_verwendung FROM postgres;
-GRANT ALL ON TABLE tbl_verwendung TO postgres;
+GRANT ALL ON TABLE tbl_verwendung TO fhcomplete;
 GRANT SELECT ON TABLE tbl_verwendung TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_verwendung TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_verwendung TO vilesci;
@@ -42667,7 +42667,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_verwendung TO vilesci;
 
 REVOKE ALL ON TABLE tbl_zgv FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_zgv FROM postgres;
-GRANT ALL ON TABLE tbl_zgv TO postgres;
+GRANT ALL ON TABLE tbl_zgv TO fhcomplete;
 GRANT SELECT ON TABLE tbl_zgv TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zgv TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zgv TO vilesci;
@@ -42679,7 +42679,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zgv TO vilesci;
 
 REVOKE ALL ON TABLE tbl_zgvmaster FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_zgvmaster FROM postgres;
-GRANT ALL ON TABLE tbl_zgvmaster TO postgres;
+GRANT ALL ON TABLE tbl_zgvmaster TO fhcomplete;
 GRANT SELECT ON TABLE tbl_zgvmaster TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zgvmaster TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zgvmaster TO vilesci;
@@ -42691,7 +42691,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zgvmaster TO vilesci;
 
 REVOKE ALL ON TABLE tbl_zweck FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_zweck FROM postgres;
-GRANT ALL ON TABLE tbl_zweck TO postgres;
+GRANT ALL ON TABLE tbl_zweck TO fhcomplete;
 GRANT SELECT ON TABLE tbl_zweck TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zweck TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zweck TO vilesci;
@@ -42705,7 +42705,7 @@ SET search_path = campus, pg_catalog;
 
 REVOKE ALL ON SEQUENCE seq_content_content_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_content_content_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_content_content_id TO postgres;
+GRANT ALL ON SEQUENCE seq_content_content_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_content_content_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_content_content_id TO web;
 GRANT SELECT,UPDATE ON SEQUENCE seq_content_content_id TO vilesci;
@@ -42717,7 +42717,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_content_content_id TO vilesci;
 
 REVOKE ALL ON SEQUENCE seq_contentchild FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_contentchild FROM postgres;
-GRANT ALL ON SEQUENCE seq_contentchild TO postgres;
+GRANT ALL ON SEQUENCE seq_contentchild TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_contentchild TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_contentchild TO web;
 GRANT SELECT,UPDATE ON SEQUENCE seq_contentchild TO vilesci;
@@ -42729,7 +42729,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_contentchild TO vilesci;
 
 REVOKE ALL ON SEQUENCE seq_contentlog_contentlog_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_contentlog_contentlog_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_contentlog_contentlog_id TO postgres;
+GRANT ALL ON SEQUENCE seq_contentlog_contentlog_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_contentlog_contentlog_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_contentlog_contentlog_id TO web;
 GRANT SELECT,UPDATE ON SEQUENCE seq_contentlog_contentlog_id TO vilesci;
@@ -42741,7 +42741,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_contentlog_contentlog_id TO vilesci;
 
 REVOKE ALL ON SEQUENCE seq_contentsprache FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_contentsprache FROM postgres;
-GRANT ALL ON SEQUENCE seq_contentsprache TO postgres;
+GRANT ALL ON SEQUENCE seq_contentsprache TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_contentsprache TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_contentsprache TO web;
 GRANT SELECT,UPDATE ON SEQUENCE seq_contentsprache TO vilesci;
@@ -42753,7 +42753,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_contentsprache TO vilesci;
 
 REVOKE ALL ON SEQUENCE seq_coodle_coodle_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_coodle_coodle_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_coodle_coodle_id TO postgres;
+GRANT ALL ON SEQUENCE seq_coodle_coodle_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_coodle_coodle_id TO web;
 GRANT SELECT,UPDATE ON SEQUENCE seq_coodle_coodle_id TO vilesci;
 
@@ -42764,7 +42764,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_coodle_coodle_id TO vilesci;
 
 REVOKE ALL ON SEQUENCE seq_coodle_ressource_coodle_ressource_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_coodle_ressource_coodle_ressource_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_coodle_ressource_coodle_ressource_id TO postgres;
+GRANT ALL ON SEQUENCE seq_coodle_ressource_coodle_ressource_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_coodle_ressource_coodle_ressource_id TO web;
 GRANT SELECT,UPDATE ON SEQUENCE seq_coodle_ressource_coodle_ressource_id TO vilesci;
 
@@ -42775,7 +42775,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_coodle_ressource_coodle_ressource_id TO vile
 
 REVOKE ALL ON SEQUENCE seq_coodle_termin_coodle_termin_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_coodle_termin_coodle_termin_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_coodle_termin_coodle_termin_id TO postgres;
+GRANT ALL ON SEQUENCE seq_coodle_termin_coodle_termin_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_coodle_termin_coodle_termin_id TO web;
 GRANT SELECT,UPDATE ON SEQUENCE seq_coodle_termin_coodle_termin_id TO vilesci;
 
@@ -42786,7 +42786,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_coodle_termin_coodle_termin_id TO vilesci;
 
 REVOKE ALL ON SEQUENCE seq_dms_dms_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_dms_dms_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_dms_dms_id TO postgres;
+GRANT ALL ON SEQUENCE seq_dms_dms_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_dms_dms_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_dms_dms_id TO web;
 GRANT SELECT,UPDATE ON SEQUENCE seq_dms_dms_id TO vilesci;
@@ -42798,7 +42798,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_dms_dms_id TO vilesci;
 
 REVOKE ALL ON SEQUENCE seq_freebusy_freebusy_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_freebusy_freebusy_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_freebusy_freebusy_id TO postgres;
+GRANT ALL ON SEQUENCE seq_freebusy_freebusy_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_freebusy_freebusy_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_freebusy_freebusy_id TO web;
 GRANT SELECT,UPDATE ON SEQUENCE seq_freebusy_freebusy_id TO vilesci;
@@ -42810,7 +42810,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_freebusy_freebusy_id TO vilesci;
 
 REVOKE ALL ON SEQUENCE seq_infoscreen_content_infoscreen_content_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_infoscreen_content_infoscreen_content_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_infoscreen_content_infoscreen_content_id TO postgres;
+GRANT ALL ON SEQUENCE seq_infoscreen_content_infoscreen_content_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_infoscreen_content_infoscreen_content_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_infoscreen_content_infoscreen_content_id TO vilesci;
 
@@ -42821,7 +42821,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_infoscreen_content_infoscreen_content_id TO 
 
 REVOKE ALL ON SEQUENCE seq_infoscreen_infoscreen_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_infoscreen_infoscreen_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_infoscreen_infoscreen_id TO postgres;
+GRANT ALL ON SEQUENCE seq_infoscreen_infoscreen_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_infoscreen_infoscreen_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_infoscreen_infoscreen_id TO vilesci;
 
@@ -42832,7 +42832,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_infoscreen_infoscreen_id TO vilesci;
 
 REVOKE ALL ON SEQUENCE seq_lehre_tools_lehre_tools_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_lehre_tools_lehre_tools_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_lehre_tools_lehre_tools_id TO postgres;
+GRANT ALL ON SEQUENCE seq_lehre_tools_lehre_tools_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_lehre_tools_lehre_tools_id TO web;
 GRANT SELECT,UPDATE ON SEQUENCE seq_lehre_tools_lehre_tools_id TO vilesci;
 
@@ -42843,7 +42843,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_lehre_tools_lehre_tools_id TO vilesci;
 
 REVOKE ALL ON TABLE tbl_abgabe FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_abgabe FROM postgres;
-GRANT ALL ON TABLE tbl_abgabe TO postgres;
+GRANT ALL ON TABLE tbl_abgabe TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_abgabe TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_abgabe TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_abgabe TO vilesci;
@@ -42855,7 +42855,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_abgabe TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_abgabe_abgabe_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_abgabe_abgabe_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_abgabe_abgabe_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_abgabe_abgabe_id_seq TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_abgabe_abgabe_id_seq TO web;
 GRANT ALL ON SEQUENCE tbl_abgabe_abgabe_id_seq TO admin;
 GRANT ALL ON SEQUENCE tbl_abgabe_abgabe_id_seq TO vilesci;
@@ -42867,7 +42867,7 @@ GRANT ALL ON SEQUENCE tbl_abgabe_abgabe_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_beispiel FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_beispiel FROM postgres;
-GRANT ALL ON TABLE tbl_beispiel TO postgres;
+GRANT ALL ON TABLE tbl_beispiel TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_beispiel TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_beispiel TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_beispiel TO vilesci;
@@ -42879,7 +42879,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_beispiel TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_beispiel_beispiel_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_beispiel_beispiel_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_beispiel_beispiel_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_beispiel_beispiel_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_beispiel_beispiel_id_seq TO web;
 GRANT ALL ON SEQUENCE tbl_beispiel_beispiel_id_seq TO admin;
 GRANT ALL ON SEQUENCE tbl_beispiel_beispiel_id_seq TO vilesci;
@@ -42891,7 +42891,7 @@ GRANT ALL ON SEQUENCE tbl_beispiel_beispiel_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_benutzerlvstudiensemester FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_benutzerlvstudiensemester FROM postgres;
-GRANT ALL ON TABLE tbl_benutzerlvstudiensemester TO postgres;
+GRANT ALL ON TABLE tbl_benutzerlvstudiensemester TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_benutzerlvstudiensemester TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_benutzerlvstudiensemester TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_benutzerlvstudiensemester TO vilesci;
@@ -42903,7 +42903,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_benutzerlvstudiensemester TO vile
 
 REVOKE ALL ON TABLE tbl_content FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_content FROM postgres;
-GRANT ALL ON TABLE tbl_content TO postgres;
+GRANT ALL ON TABLE tbl_content TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_content TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_content TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_content TO vilesci;
@@ -42915,7 +42915,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_content TO vilesci;
 
 REVOKE ALL ON TABLE tbl_contentchild FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_contentchild FROM postgres;
-GRANT ALL ON TABLE tbl_contentchild TO postgres;
+GRANT ALL ON TABLE tbl_contentchild TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_contentchild TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_contentchild TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_contentchild TO vilesci;
@@ -42927,7 +42927,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_contentchild TO vilesci;
 
 REVOKE ALL ON TABLE tbl_contentgruppe FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_contentgruppe FROM postgres;
-GRANT ALL ON TABLE tbl_contentgruppe TO postgres;
+GRANT ALL ON TABLE tbl_contentgruppe TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_contentgruppe TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_contentgruppe TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_contentgruppe TO vilesci;
@@ -42939,7 +42939,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_contentgruppe TO vilesci;
 
 REVOKE ALL ON TABLE tbl_contentlog FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_contentlog FROM postgres;
-GRANT ALL ON TABLE tbl_contentlog TO postgres;
+GRANT ALL ON TABLE tbl_contentlog TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_contentlog TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_contentlog TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_contentlog TO vilesci;
@@ -42951,7 +42951,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_contentlog TO vilesci;
 
 REVOKE ALL ON TABLE tbl_contentsprache FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_contentsprache FROM postgres;
-GRANT ALL ON TABLE tbl_contentsprache TO postgres;
+GRANT ALL ON TABLE tbl_contentsprache TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_contentsprache TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_contentsprache TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_contentsprache TO vilesci;
@@ -42963,7 +42963,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_contentsprache TO vilesci;
 
 REVOKE ALL ON TABLE tbl_coodle FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_coodle FROM postgres;
-GRANT ALL ON TABLE tbl_coodle TO postgres;
+GRANT ALL ON TABLE tbl_coodle TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_coodle TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_coodle TO vilesci;
 
@@ -42974,7 +42974,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_coodle TO vilesci;
 
 REVOKE ALL ON TABLE tbl_coodle_ressource FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_coodle_ressource FROM postgres;
-GRANT ALL ON TABLE tbl_coodle_ressource TO postgres;
+GRANT ALL ON TABLE tbl_coodle_ressource TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_coodle_ressource TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_coodle_ressource TO vilesci;
 
@@ -42985,7 +42985,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_coodle_ressource TO vilesci;
 
 REVOKE ALL ON TABLE tbl_coodle_ressource_termin FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_coodle_ressource_termin FROM postgres;
-GRANT ALL ON TABLE tbl_coodle_ressource_termin TO postgres;
+GRANT ALL ON TABLE tbl_coodle_ressource_termin TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_coodle_ressource_termin TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_coodle_ressource_termin TO vilesci;
 
@@ -42996,7 +42996,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_coodle_ressource_termin TO vilesc
 
 REVOKE ALL ON TABLE tbl_coodle_status FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_coodle_status FROM postgres;
-GRANT ALL ON TABLE tbl_coodle_status TO postgres;
+GRANT ALL ON TABLE tbl_coodle_status TO fhcomplete;
 GRANT SELECT ON TABLE tbl_coodle_status TO web;
 GRANT SELECT ON TABLE tbl_coodle_status TO vilesci;
 
@@ -43007,7 +43007,7 @@ GRANT SELECT ON TABLE tbl_coodle_status TO vilesci;
 
 REVOKE ALL ON TABLE tbl_coodle_termin FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_coodle_termin FROM postgres;
-GRANT ALL ON TABLE tbl_coodle_termin TO postgres;
+GRANT ALL ON TABLE tbl_coodle_termin TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_coodle_termin TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_coodle_termin TO vilesci;
 
@@ -43018,7 +43018,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_coodle_termin TO vilesci;
 
 REVOKE ALL ON TABLE tbl_dms FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_dms FROM postgres;
-GRANT ALL ON TABLE tbl_dms TO postgres;
+GRANT ALL ON TABLE tbl_dms TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_dms TO vilesci;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_dms TO web;
 
@@ -43029,7 +43029,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_dms TO web;
 
 REVOKE ALL ON TABLE tbl_dms_kategorie FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_dms_kategorie FROM postgres;
-GRANT ALL ON TABLE tbl_dms_kategorie TO postgres;
+GRANT ALL ON TABLE tbl_dms_kategorie TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_dms_kategorie TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_dms_kategorie TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_dms_kategorie TO vilesci;
@@ -43041,7 +43041,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_dms_kategorie TO vilesci;
 
 REVOKE ALL ON TABLE tbl_dms_kategorie_gruppe FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_dms_kategorie_gruppe FROM postgres;
-GRANT ALL ON TABLE tbl_dms_kategorie_gruppe TO postgres;
+GRANT ALL ON TABLE tbl_dms_kategorie_gruppe TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_dms_kategorie_gruppe TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_dms_kategorie_gruppe TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_dms_kategorie_gruppe TO vilesci;
@@ -43053,7 +43053,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_dms_kategorie_gruppe TO vilesci;
 
 REVOKE ALL ON TABLE tbl_dms_version FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_dms_version FROM postgres;
-GRANT ALL ON TABLE tbl_dms_version TO postgres;
+GRANT ALL ON TABLE tbl_dms_version TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_dms_version TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_dms_version TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_dms_version TO vilesci;
@@ -43065,7 +43065,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_dms_version TO vilesci;
 
 REVOKE ALL ON TABLE tbl_erreichbarkeit FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_erreichbarkeit FROM postgres;
-GRANT ALL ON TABLE tbl_erreichbarkeit TO postgres;
+GRANT ALL ON TABLE tbl_erreichbarkeit TO fhcomplete;
 GRANT SELECT ON TABLE tbl_erreichbarkeit TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_erreichbarkeit TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_erreichbarkeit TO vilesci;
@@ -43077,7 +43077,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_erreichbarkeit TO vilesci;
 
 REVOKE ALL ON TABLE tbl_feedback FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_feedback FROM postgres;
-GRANT ALL ON TABLE tbl_feedback TO postgres;
+GRANT ALL ON TABLE tbl_feedback TO fhcomplete;
 GRANT SELECT,INSERT ON TABLE tbl_feedback TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_feedback TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_feedback TO vilesci;
@@ -43089,7 +43089,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_feedback TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_feedback_feedback_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_feedback_feedback_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_feedback_feedback_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_feedback_feedback_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_feedback_feedback_id_seq TO web;
 GRANT ALL ON SEQUENCE tbl_feedback_feedback_id_seq TO admin;
 GRANT ALL ON SEQUENCE tbl_feedback_feedback_id_seq TO vilesci;
@@ -43101,7 +43101,7 @@ GRANT ALL ON SEQUENCE tbl_feedback_feedback_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_freebusy FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_freebusy FROM postgres;
-GRANT ALL ON TABLE tbl_freebusy TO postgres;
+GRANT ALL ON TABLE tbl_freebusy TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_freebusy TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_freebusy TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_freebusy TO vilesci;
@@ -43113,7 +43113,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_freebusy TO vilesci;
 
 REVOKE ALL ON TABLE tbl_freebusytyp FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_freebusytyp FROM postgres;
-GRANT ALL ON TABLE tbl_freebusytyp TO postgres;
+GRANT ALL ON TABLE tbl_freebusytyp TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_freebusytyp TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_freebusytyp TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_freebusytyp TO vilesci;
@@ -43125,7 +43125,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_freebusytyp TO vilesci;
 
 REVOKE ALL ON TABLE tbl_infoscreen FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_infoscreen FROM postgres;
-GRANT ALL ON TABLE tbl_infoscreen TO postgres;
+GRANT ALL ON TABLE tbl_infoscreen TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_infoscreen TO admin;
 GRANT SELECT ON TABLE tbl_infoscreen TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_infoscreen TO vilesci;
@@ -43137,7 +43137,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_infoscreen TO vilesci;
 
 REVOKE ALL ON TABLE tbl_infoscreen_content FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_infoscreen_content FROM postgres;
-GRANT ALL ON TABLE tbl_infoscreen_content TO postgres;
+GRANT ALL ON TABLE tbl_infoscreen_content TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_infoscreen_content TO admin;
 GRANT SELECT ON TABLE tbl_infoscreen_content TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_infoscreen_content TO vilesci;
@@ -43149,7 +43149,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_infoscreen_content TO vilesci;
 
 REVOKE ALL ON TABLE tbl_legesamtnote FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_legesamtnote FROM postgres;
-GRANT ALL ON TABLE tbl_legesamtnote TO postgres;
+GRANT ALL ON TABLE tbl_legesamtnote TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_legesamtnote TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_legesamtnote TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_legesamtnote TO vilesci;
@@ -43161,7 +43161,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_legesamtnote TO vilesci;
 
 REVOKE ALL ON TABLE tbl_lehre_tools FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_lehre_tools FROM postgres;
-GRANT ALL ON TABLE tbl_lehre_tools TO postgres;
+GRANT ALL ON TABLE tbl_lehre_tools TO fhcomplete;
 GRANT SELECT ON TABLE tbl_lehre_tools TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehre_tools TO vilesci;
 
@@ -43172,7 +43172,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehre_tools TO vilesci;
 
 REVOKE ALL ON TABLE tbl_lehre_tools_organisationseinheit FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_lehre_tools_organisationseinheit FROM postgres;
-GRANT ALL ON TABLE tbl_lehre_tools_organisationseinheit TO postgres;
+GRANT ALL ON TABLE tbl_lehre_tools_organisationseinheit TO fhcomplete;
 GRANT SELECT ON TABLE tbl_lehre_tools_organisationseinheit TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehre_tools_organisationseinheit TO vilesci;
 
@@ -43183,7 +43183,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehre_tools_organisationseinheit 
 
 REVOKE ALL ON TABLE tbl_lvgesamtnote FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_lvgesamtnote FROM postgres;
-GRANT ALL ON TABLE tbl_lvgesamtnote TO postgres;
+GRANT ALL ON TABLE tbl_lvgesamtnote TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lvgesamtnote TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lvgesamtnote TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lvgesamtnote TO vilesci;
@@ -43195,7 +43195,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lvgesamtnote TO vilesci;
 
 REVOKE ALL ON TABLE tbl_lvinfo FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_lvinfo FROM postgres;
-GRANT ALL ON TABLE tbl_lvinfo TO postgres;
+GRANT ALL ON TABLE tbl_lvinfo TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lvinfo TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lvinfo TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lvinfo TO vilesci;
@@ -43207,7 +43207,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lvinfo TO vilesci;
 
 REVOKE ALL ON TABLE tbl_news FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_news FROM postgres;
-GRANT ALL ON TABLE tbl_news TO postgres;
+GRANT ALL ON TABLE tbl_news TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_news TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_news TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_news TO vilesci;
@@ -43219,7 +43219,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_news TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_news_news_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_news_news_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_news_news_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_news_news_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_news_news_id_seq TO web;
 GRANT ALL ON SEQUENCE tbl_news_news_id_seq TO admin;
 GRANT ALL ON SEQUENCE tbl_news_news_id_seq TO vilesci;
@@ -43231,7 +43231,7 @@ GRANT ALL ON SEQUENCE tbl_news_news_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_notenschluessel FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_notenschluessel FROM postgres;
-GRANT ALL ON TABLE tbl_notenschluessel TO postgres;
+GRANT ALL ON TABLE tbl_notenschluessel TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_notenschluessel TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_notenschluessel TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_notenschluessel TO vilesci;
@@ -43243,7 +43243,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_notenschluessel TO vilesci;
 
 REVOKE ALL ON TABLE tbl_notenschluesseluebung FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_notenschluesseluebung FROM postgres;
-GRANT ALL ON TABLE tbl_notenschluesseluebung TO postgres;
+GRANT ALL ON TABLE tbl_notenschluesseluebung TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_notenschluesseluebung TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_notenschluesseluebung TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_notenschluesseluebung TO vilesci;
@@ -43255,7 +43255,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_notenschluesseluebung TO vilesci;
 
 REVOKE ALL ON TABLE tbl_paabgabe FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_paabgabe FROM postgres;
-GRANT ALL ON TABLE tbl_paabgabe TO postgres;
+GRANT ALL ON TABLE tbl_paabgabe TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_paabgabe TO vilesci;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_paabgabe TO web;
 
@@ -43266,7 +43266,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_paabgabe TO web;
 
 REVOKE ALL ON SEQUENCE tbl_paabgabe_paabgabe_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_paabgabe_paabgabe_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_paabgabe_paabgabe_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_paabgabe_paabgabe_id_seq TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_paabgabe_paabgabe_id_seq TO vilesci;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_paabgabe_paabgabe_id_seq TO web;
 
@@ -43277,7 +43277,7 @@ GRANT SELECT,UPDATE ON SEQUENCE tbl_paabgabe_paabgabe_id_seq TO web;
 
 REVOKE ALL ON TABLE tbl_paabgabetyp FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_paabgabetyp FROM postgres;
-GRANT ALL ON TABLE tbl_paabgabetyp TO postgres;
+GRANT ALL ON TABLE tbl_paabgabetyp TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_paabgabetyp TO vilesci;
 GRANT SELECT ON TABLE tbl_paabgabetyp TO web;
 
@@ -43288,7 +43288,7 @@ GRANT SELECT ON TABLE tbl_paabgabetyp TO web;
 
 REVOKE ALL ON TABLE tbl_reservierung FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_reservierung FROM postgres;
-GRANT ALL ON TABLE tbl_reservierung TO postgres;
+GRANT ALL ON TABLE tbl_reservierung TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_reservierung TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_reservierung TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_reservierung TO vilesci;
@@ -43300,7 +43300,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_reservierung TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_reservierung_reservierung_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_reservierung_reservierung_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_reservierung_reservierung_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_reservierung_reservierung_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_reservierung_reservierung_id_seq TO web;
 GRANT ALL ON SEQUENCE tbl_reservierung_reservierung_id_seq TO admin;
 GRANT ALL ON SEQUENCE tbl_reservierung_reservierung_id_seq TO vilesci;
@@ -43312,7 +43312,7 @@ GRANT ALL ON SEQUENCE tbl_reservierung_reservierung_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_resturlaub FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_resturlaub FROM postgres;
-GRANT ALL ON TABLE tbl_resturlaub TO postgres;
+GRANT ALL ON TABLE tbl_resturlaub TO fhcomplete;
 GRANT SELECT,INSERT,UPDATE ON TABLE tbl_resturlaub TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_resturlaub TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_resturlaub TO vilesci;
@@ -43324,7 +43324,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_resturlaub TO vilesci;
 
 REVOKE ALL ON TABLE tbl_studentbeispiel FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_studentbeispiel FROM postgres;
-GRANT ALL ON TABLE tbl_studentbeispiel TO postgres;
+GRANT ALL ON TABLE tbl_studentbeispiel TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_studentbeispiel TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_studentbeispiel TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_studentbeispiel TO vilesci;
@@ -43336,7 +43336,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_studentbeispiel TO vilesci;
 
 REVOKE ALL ON TABLE tbl_studentuebung FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_studentuebung FROM postgres;
-GRANT ALL ON TABLE tbl_studentuebung TO postgres;
+GRANT ALL ON TABLE tbl_studentuebung TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_studentuebung TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_studentuebung TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_studentuebung TO vilesci;
@@ -43348,7 +43348,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_studentuebung TO vilesci;
 
 REVOKE ALL ON TABLE tbl_template FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_template FROM postgres;
-GRANT ALL ON TABLE tbl_template TO postgres;
+GRANT ALL ON TABLE tbl_template TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_template TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_template TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_template TO vilesci;
@@ -43360,7 +43360,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_template TO vilesci;
 
 REVOKE ALL ON TABLE tbl_uebung FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_uebung FROM postgres;
-GRANT ALL ON TABLE tbl_uebung TO postgres;
+GRANT ALL ON TABLE tbl_uebung TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_uebung TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_uebung TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_uebung TO vilesci;
@@ -43372,7 +43372,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_uebung TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_uebung_uebung_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_uebung_uebung_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_uebung_uebung_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_uebung_uebung_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_uebung_uebung_id_seq TO web;
 GRANT ALL ON SEQUENCE tbl_uebung_uebung_id_seq TO admin;
 GRANT ALL ON SEQUENCE tbl_uebung_uebung_id_seq TO vilesci;
@@ -43384,7 +43384,7 @@ GRANT ALL ON SEQUENCE tbl_uebung_uebung_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_veranstaltung FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_veranstaltung FROM postgres;
-GRANT ALL ON TABLE tbl_veranstaltung TO postgres;
+GRANT ALL ON TABLE tbl_veranstaltung TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_veranstaltung TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_veranstaltung TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_veranstaltung TO vilesci;
@@ -43396,7 +43396,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_veranstaltung TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_veranstaltung_veranstaltung_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_veranstaltung_veranstaltung_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_veranstaltung_veranstaltung_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_veranstaltung_veranstaltung_id_seq TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_veranstaltung_veranstaltung_id_seq TO web;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_veranstaltung_veranstaltung_id_seq TO vilesci;
 
@@ -43407,7 +43407,7 @@ GRANT SELECT,UPDATE ON SEQUENCE tbl_veranstaltung_veranstaltung_id_seq TO vilesc
 
 REVOKE ALL ON TABLE tbl_veranstaltungskategorie FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_veranstaltungskategorie FROM postgres;
-GRANT ALL ON TABLE tbl_veranstaltungskategorie TO postgres;
+GRANT ALL ON TABLE tbl_veranstaltungskategorie TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_veranstaltungskategorie TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_veranstaltungskategorie TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_veranstaltungskategorie TO vilesci;
@@ -43419,7 +43419,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_veranstaltungskategorie TO vilesc
 
 REVOKE ALL ON TABLE tbl_zeitaufzeichnung FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_zeitaufzeichnung FROM postgres;
-GRANT ALL ON TABLE tbl_zeitaufzeichnung TO postgres;
+GRANT ALL ON TABLE tbl_zeitaufzeichnung TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zeitaufzeichnung TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zeitaufzeichnung TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zeitaufzeichnung TO vilesci;
@@ -43431,7 +43431,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zeitaufzeichnung TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_zeitaufzeichnung_zeitaufzeichnung_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_zeitaufzeichnung_zeitaufzeichnung_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_zeitaufzeichnung_zeitaufzeichnung_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_zeitaufzeichnung_zeitaufzeichnung_id_seq TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_zeitaufzeichnung_zeitaufzeichnung_id_seq TO web;
 
 
@@ -43441,7 +43441,7 @@ GRANT SELECT,UPDATE ON SEQUENCE tbl_zeitaufzeichnung_zeitaufzeichnung_id_seq TO 
 
 REVOKE ALL ON TABLE tbl_zeitsperre FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_zeitsperre FROM postgres;
-GRANT ALL ON TABLE tbl_zeitsperre TO postgres;
+GRANT ALL ON TABLE tbl_zeitsperre TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zeitsperre TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zeitsperre TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zeitsperre TO vilesci;
@@ -43453,7 +43453,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zeitsperre TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_zeitsperre_zeitsperre_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_zeitsperre_zeitsperre_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_zeitsperre_zeitsperre_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_zeitsperre_zeitsperre_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_zeitsperre_zeitsperre_id_seq TO web;
 GRANT ALL ON SEQUENCE tbl_zeitsperre_zeitsperre_id_seq TO admin;
 GRANT ALL ON SEQUENCE tbl_zeitsperre_zeitsperre_id_seq TO vilesci;
@@ -43465,7 +43465,7 @@ GRANT ALL ON SEQUENCE tbl_zeitsperre_zeitsperre_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_zeitsperretyp FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_zeitsperretyp FROM postgres;
-GRANT ALL ON TABLE tbl_zeitsperretyp TO postgres;
+GRANT ALL ON TABLE tbl_zeitsperretyp TO fhcomplete;
 GRANT SELECT ON TABLE tbl_zeitsperretyp TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zeitsperretyp TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zeitsperretyp TO vilesci;
@@ -43477,7 +43477,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zeitsperretyp TO vilesci;
 
 REVOKE ALL ON TABLE tbl_zeitwunsch FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_zeitwunsch FROM postgres;
-GRANT ALL ON TABLE tbl_zeitwunsch TO postgres;
+GRANT ALL ON TABLE tbl_zeitwunsch TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zeitwunsch TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zeitwunsch TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zeitwunsch TO vilesci;
@@ -43491,7 +43491,7 @@ SET search_path = public, pg_catalog;
 
 REVOKE ALL ON TABLE tbl_benutzer FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_benutzer FROM postgres;
-GRANT ALL ON TABLE tbl_benutzer TO postgres;
+GRANT ALL ON TABLE tbl_benutzer TO fhcomplete;
 GRANT SELECT ON TABLE tbl_benutzer TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_benutzer TO admin;
 GRANT SELECT ON TABLE tbl_benutzer TO wawi;
@@ -43504,7 +43504,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_benutzer TO vilesci;
 
 REVOKE ALL ON TABLE tbl_person FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_person FROM postgres;
-GRANT ALL ON TABLE tbl_person TO postgres;
+GRANT ALL ON TABLE tbl_person TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_person TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_person TO admin;
 GRANT SELECT,INSERT,UPDATE ON TABLE tbl_person TO wawi;
@@ -43519,7 +43519,7 @@ SET search_path = campus, pg_catalog;
 
 REVOKE ALL ON TABLE vw_benutzer FROM PUBLIC;
 REVOKE ALL ON TABLE vw_benutzer FROM postgres;
-GRANT ALL ON TABLE vw_benutzer TO postgres;
+GRANT ALL ON TABLE vw_benutzer TO fhcomplete;
 GRANT SELECT ON TABLE vw_benutzer TO admin;
 GRANT SELECT ON TABLE vw_benutzer TO web;
 GRANT SELECT ON TABLE vw_benutzer TO vilesci;
@@ -43533,7 +43533,7 @@ SET search_path = lehre, pg_catalog;
 
 REVOKE ALL ON TABLE tbl_lehreinheit FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_lehreinheit FROM postgres;
-GRANT ALL ON TABLE tbl_lehreinheit TO postgres;
+GRANT ALL ON TABLE tbl_lehreinheit TO fhcomplete;
 GRANT SELECT ON TABLE tbl_lehreinheit TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehreinheit TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehreinheit TO vilesci;
@@ -43545,7 +43545,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehreinheit TO vilesci;
 
 REVOKE ALL ON TABLE tbl_lehreinheitgruppe FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_lehreinheitgruppe FROM postgres;
-GRANT ALL ON TABLE tbl_lehreinheitgruppe TO postgres;
+GRANT ALL ON TABLE tbl_lehreinheitgruppe TO fhcomplete;
 GRANT SELECT ON TABLE tbl_lehreinheitgruppe TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehreinheitgruppe TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehreinheitgruppe TO vilesci;
@@ -43557,7 +43557,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehreinheitgruppe TO vilesci;
 
 REVOKE ALL ON TABLE tbl_lehreinheitmitarbeiter FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_lehreinheitmitarbeiter FROM postgres;
-GRANT ALL ON TABLE tbl_lehreinheitmitarbeiter TO postgres;
+GRANT ALL ON TABLE tbl_lehreinheitmitarbeiter TO fhcomplete;
 GRANT SELECT ON TABLE tbl_lehreinheitmitarbeiter TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehreinheitmitarbeiter TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehreinheitmitarbeiter TO vilesci;
@@ -43569,7 +43569,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehreinheitmitarbeiter TO vilesci
 
 REVOKE ALL ON TABLE tbl_lehrfach FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_lehrfach FROM postgres;
-GRANT ALL ON TABLE tbl_lehrfach TO postgres;
+GRANT ALL ON TABLE tbl_lehrfach TO fhcomplete;
 GRANT SELECT ON TABLE tbl_lehrfach TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehrfach TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehrfach TO vilesci;
@@ -43581,7 +43581,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehrfach TO vilesci;
 
 REVOKE ALL ON TABLE tbl_lehrveranstaltung FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_lehrveranstaltung FROM postgres;
-GRANT ALL ON TABLE tbl_lehrveranstaltung TO postgres;
+GRANT ALL ON TABLE tbl_lehrveranstaltung TO fhcomplete;
 GRANT SELECT ON TABLE tbl_lehrveranstaltung TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehrveranstaltung TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehrveranstaltung TO vilesci;
@@ -43595,7 +43595,7 @@ SET search_path = public, pg_catalog;
 
 REVOKE ALL ON TABLE tbl_mitarbeiter FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_mitarbeiter FROM postgres;
-GRANT ALL ON TABLE tbl_mitarbeiter TO postgres;
+GRANT ALL ON TABLE tbl_mitarbeiter TO fhcomplete;
 GRANT SELECT ON TABLE tbl_mitarbeiter TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_mitarbeiter TO admin;
 GRANT SELECT ON TABLE tbl_mitarbeiter TO wawi;
@@ -43608,7 +43608,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_mitarbeiter TO vilesci;
 
 REVOKE ALL ON TABLE tbl_studiengang FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_studiengang FROM postgres;
-GRANT ALL ON TABLE tbl_studiengang TO postgres;
+GRANT ALL ON TABLE tbl_studiengang TO fhcomplete;
 GRANT SELECT ON TABLE tbl_studiengang TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_studiengang TO admin;
 GRANT SELECT ON TABLE tbl_studiengang TO wawi;
@@ -43623,7 +43623,7 @@ SET search_path = campus, pg_catalog;
 
 REVOKE ALL ON TABLE vw_lehreinheit FROM PUBLIC;
 REVOKE ALL ON TABLE vw_lehreinheit FROM postgres;
-GRANT ALL ON TABLE vw_lehreinheit TO postgres;
+GRANT ALL ON TABLE vw_lehreinheit TO fhcomplete;
 GRANT SELECT ON TABLE vw_lehreinheit TO web;
 GRANT SELECT ON TABLE vw_lehreinheit TO admin;
 GRANT SELECT ON TABLE vw_lehreinheit TO vilesci;
@@ -43635,7 +43635,7 @@ GRANT SELECT ON TABLE vw_lehreinheit TO vilesci;
 
 REVOKE ALL ON TABLE vw_mitarbeiter FROM PUBLIC;
 REVOKE ALL ON TABLE vw_mitarbeiter FROM postgres;
-GRANT ALL ON TABLE vw_mitarbeiter TO postgres;
+GRANT ALL ON TABLE vw_mitarbeiter TO fhcomplete;
 GRANT SELECT ON TABLE vw_mitarbeiter TO admin;
 GRANT SELECT ON TABLE vw_mitarbeiter TO web;
 GRANT SELECT ON TABLE vw_mitarbeiter TO wawi;
@@ -43650,7 +43650,7 @@ SET search_path = public, pg_catalog;
 
 REVOKE ALL ON SEQUENCE seq_gruppe_gid FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_gruppe_gid FROM postgres;
-GRANT ALL ON SEQUENCE seq_gruppe_gid TO postgres;
+GRANT ALL ON SEQUENCE seq_gruppe_gid TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_gruppe_gid TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_gruppe_gid TO web;
 GRANT SELECT,UPDATE ON SEQUENCE seq_gruppe_gid TO vilesci;
@@ -43662,7 +43662,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_gruppe_gid TO vilesci;
 
 REVOKE ALL ON TABLE tbl_benutzergruppe FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_benutzergruppe FROM postgres;
-GRANT ALL ON TABLE tbl_benutzergruppe TO postgres;
+GRANT ALL ON TABLE tbl_benutzergruppe TO fhcomplete;
 GRANT SELECT ON TABLE tbl_benutzergruppe TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_benutzergruppe TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_benutzergruppe TO vilesci;
@@ -43674,7 +43674,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_benutzergruppe TO vilesci;
 
 REVOKE ALL ON TABLE tbl_gruppe FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_gruppe FROM postgres;
-GRANT ALL ON TABLE tbl_gruppe TO postgres;
+GRANT ALL ON TABLE tbl_gruppe TO fhcomplete;
 GRANT SELECT ON TABLE tbl_gruppe TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_gruppe TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_gruppe TO vilesci;
@@ -43688,7 +43688,7 @@ SET search_path = campus, pg_catalog;
 
 REVOKE ALL ON TABLE vw_persongruppe FROM PUBLIC;
 REVOKE ALL ON TABLE vw_persongruppe FROM postgres;
-GRANT ALL ON TABLE vw_persongruppe TO postgres;
+GRANT ALL ON TABLE vw_persongruppe TO fhcomplete;
 GRANT SELECT ON TABLE vw_persongruppe TO admin;
 GRANT SELECT ON TABLE vw_persongruppe TO web;
 GRANT SELECT ON TABLE vw_persongruppe TO vilesci;
@@ -43700,7 +43700,7 @@ GRANT SELECT ON TABLE vw_persongruppe TO vilesci;
 
 REVOKE ALL ON TABLE vw_reservierung FROM PUBLIC;
 REVOKE ALL ON TABLE vw_reservierung FROM postgres;
-GRANT ALL ON TABLE vw_reservierung TO postgres;
+GRANT ALL ON TABLE vw_reservierung TO fhcomplete;
 GRANT SELECT ON TABLE vw_reservierung TO admin;
 GRANT SELECT ON TABLE vw_reservierung TO web;
 
@@ -43713,7 +43713,7 @@ SET search_path = public, pg_catalog;
 
 REVOKE ALL ON TABLE tbl_student FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_student FROM postgres;
-GRANT ALL ON TABLE tbl_student TO postgres;
+GRANT ALL ON TABLE tbl_student TO fhcomplete;
 GRANT SELECT ON TABLE tbl_student TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_student TO admin;
 GRANT SELECT ON TABLE tbl_student TO wawi;
@@ -43728,7 +43728,7 @@ SET search_path = campus, pg_catalog;
 
 REVOKE ALL ON TABLE vw_student FROM PUBLIC;
 REVOKE ALL ON TABLE vw_student FROM postgres;
-GRANT ALL ON TABLE vw_student TO postgres;
+GRANT ALL ON TABLE vw_student TO fhcomplete;
 GRANT SELECT ON TABLE vw_student TO admin;
 GRANT SELECT ON TABLE vw_student TO web;
 GRANT SELECT ON TABLE vw_student TO vilesci;
@@ -43742,7 +43742,7 @@ SET search_path = public, pg_catalog;
 
 REVOKE ALL ON TABLE tbl_studentlehrverband FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_studentlehrverband FROM postgres;
-GRANT ALL ON TABLE tbl_studentlehrverband TO postgres;
+GRANT ALL ON TABLE tbl_studentlehrverband TO fhcomplete;
 GRANT SELECT ON TABLE tbl_studentlehrverband TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_studentlehrverband TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_studentlehrverband TO vilesci;
@@ -43756,7 +43756,7 @@ SET search_path = campus, pg_catalog;
 
 REVOKE ALL ON TABLE vw_student_lehrveranstaltung FROM PUBLIC;
 REVOKE ALL ON TABLE vw_student_lehrveranstaltung FROM postgres;
-GRANT ALL ON TABLE vw_student_lehrveranstaltung TO postgres;
+GRANT ALL ON TABLE vw_student_lehrveranstaltung TO fhcomplete;
 GRANT SELECT ON TABLE vw_student_lehrveranstaltung TO web;
 GRANT SELECT ON TABLE vw_student_lehrveranstaltung TO admin;
 GRANT SELECT ON TABLE vw_student_lehrveranstaltung TO vilesci;
@@ -43770,7 +43770,7 @@ SET search_path = lehre, pg_catalog;
 
 REVOKE ALL ON TABLE tbl_stundenplan FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_stundenplan FROM postgres;
-GRANT ALL ON TABLE tbl_stundenplan TO postgres;
+GRANT ALL ON TABLE tbl_stundenplan TO fhcomplete;
 GRANT SELECT ON TABLE tbl_stundenplan TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_stundenplan TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_stundenplan TO vilesci;
@@ -43784,7 +43784,7 @@ SET search_path = campus, pg_catalog;
 
 REVOKE ALL ON TABLE vw_stundenplan FROM PUBLIC;
 REVOKE ALL ON TABLE vw_stundenplan FROM postgres;
-GRANT ALL ON TABLE vw_stundenplan TO postgres;
+GRANT ALL ON TABLE vw_stundenplan TO fhcomplete;
 GRANT SELECT ON TABLE vw_stundenplan TO web;
 GRANT SELECT ON TABLE vw_stundenplan TO admin;
 
@@ -43797,7 +43797,7 @@ SET search_path = fue, pg_catalog;
 
 REVOKE ALL ON SEQUENCE seq_projekt_dokument_projekt_dokument_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_projekt_dokument_projekt_dokument_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_projekt_dokument_projekt_dokument_id TO postgres;
+GRANT ALL ON SEQUENCE seq_projekt_dokument_projekt_dokument_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_projekt_dokument_projekt_dokument_id TO vilesci;
 GRANT SELECT,UPDATE ON SEQUENCE seq_projekt_dokument_projekt_dokument_id TO web;
 
@@ -43808,7 +43808,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_projekt_dokument_projekt_dokument_id TO web;
 
 REVOKE ALL ON SEQUENCE seq_projekt_ressource_projekt_ressource_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_projekt_ressource_projekt_ressource_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_projekt_ressource_projekt_ressource_id TO postgres;
+GRANT ALL ON SEQUENCE seq_projekt_ressource_projekt_ressource_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_projekt_ressource_projekt_ressource_id TO web;
 GRANT SELECT,UPDATE ON SEQUENCE seq_projekt_ressource_projekt_ressource_id TO vilesci;
 
@@ -43819,7 +43819,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_projekt_ressource_projekt_ressource_id TO vi
 
 REVOKE ALL ON SEQUENCE seq_projektphase_projektphase_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_projektphase_projektphase_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_projektphase_projektphase_id TO postgres;
+GRANT ALL ON SEQUENCE seq_projektphase_projektphase_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_projektphase_projektphase_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_projektphase_projektphase_id TO vilesci;
 
@@ -43830,7 +43830,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_projektphase_projektphase_id TO vilesci;
 
 REVOKE ALL ON SEQUENCE seq_projekttask_projekttask_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_projekttask_projekttask_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_projekttask_projekttask_id TO postgres;
+GRANT ALL ON SEQUENCE seq_projekttask_projekttask_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_projekttask_projekttask_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_projekttask_projekttask_id TO vilesci;
 
@@ -43841,7 +43841,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_projekttask_projekttask_id TO vilesci;
 
 REVOKE ALL ON SEQUENCE seq_ressource_ressource_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_ressource_ressource_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_ressource_ressource_id TO postgres;
+GRANT ALL ON SEQUENCE seq_ressource_ressource_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_ressource_ressource_id TO web;
 GRANT SELECT,UPDATE ON SEQUENCE seq_ressource_ressource_id TO vilesci;
 
@@ -43852,7 +43852,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_ressource_ressource_id TO vilesci;
 
 REVOKE ALL ON TABLE tbl_aktivitaet FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_aktivitaet FROM postgres;
-GRANT ALL ON TABLE tbl_aktivitaet TO postgres;
+GRANT ALL ON TABLE tbl_aktivitaet TO fhcomplete;
 GRANT SELECT ON TABLE tbl_aktivitaet TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_aktivitaet TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_aktivitaet TO vilesci;
@@ -43864,7 +43864,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_aktivitaet TO vilesci;
 
 REVOKE ALL ON TABLE tbl_projekt FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_projekt FROM postgres;
-GRANT ALL ON TABLE tbl_projekt TO postgres;
+GRANT ALL ON TABLE tbl_projekt TO fhcomplete;
 GRANT SELECT ON TABLE tbl_projekt TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projekt TO admin;
 GRANT SELECT ON TABLE tbl_projekt TO wawi;
@@ -43877,7 +43877,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projekt TO vilesci;
 
 REVOKE ALL ON TABLE tbl_projekt_dokument FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_projekt_dokument FROM postgres;
-GRANT ALL ON TABLE tbl_projekt_dokument TO postgres;
+GRANT ALL ON TABLE tbl_projekt_dokument TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projekt_dokument TO vilesci;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projekt_dokument TO web;
 
@@ -43888,7 +43888,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projekt_dokument TO web;
 
 REVOKE ALL ON TABLE tbl_projekt_ressource FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_projekt_ressource FROM postgres;
-GRANT ALL ON TABLE tbl_projekt_ressource TO postgres;
+GRANT ALL ON TABLE tbl_projekt_ressource TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projekt_ressource TO vilesci;
 GRANT SELECT ON TABLE tbl_projekt_ressource TO web;
 GRANT SELECT ON TABLE tbl_projekt_ressource TO wawi;
@@ -43900,7 +43900,7 @@ GRANT SELECT ON TABLE tbl_projekt_ressource TO wawi;
 
 REVOKE ALL ON TABLE tbl_projektphase FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_projektphase FROM postgres;
-GRANT ALL ON TABLE tbl_projektphase TO postgres;
+GRANT ALL ON TABLE tbl_projektphase TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projektphase TO admin;
 GRANT SELECT ON TABLE tbl_projektphase TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projektphase TO vilesci;
@@ -43912,7 +43912,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projektphase TO vilesci;
 
 REVOKE ALL ON TABLE tbl_projekttask FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_projekttask FROM postgres;
-GRANT ALL ON TABLE tbl_projekttask TO postgres;
+GRANT ALL ON TABLE tbl_projekttask TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projekttask TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projekttask TO vilesci;
 
@@ -43923,7 +43923,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projekttask TO vilesci;
 
 REVOKE ALL ON TABLE tbl_ressource FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_ressource FROM postgres;
-GRANT ALL ON TABLE tbl_ressource TO postgres;
+GRANT ALL ON TABLE tbl_ressource TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_ressource TO vilesci;
 GRANT SELECT ON TABLE tbl_ressource TO web;
 GRANT SELECT ON TABLE tbl_ressource TO wawi;
@@ -43937,7 +43937,7 @@ SET search_path = kommune, pg_catalog;
 
 REVOKE ALL ON TABLE tbl_match FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_match FROM postgres;
-GRANT ALL ON TABLE tbl_match TO postgres;
+GRANT ALL ON TABLE tbl_match TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_match TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_match TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_match TO vilesci;
@@ -43949,7 +43949,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_match TO vilesci;
 
 REVOKE ALL ON TABLE tbl_team FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_team FROM postgres;
-GRANT ALL ON TABLE tbl_team TO postgres;
+GRANT ALL ON TABLE tbl_team TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_team TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_team TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_team TO vilesci;
@@ -43961,7 +43961,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_team TO vilesci;
 
 REVOKE ALL ON TABLE tbl_teambenutzer FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_teambenutzer FROM postgres;
-GRANT ALL ON TABLE tbl_teambenutzer TO postgres;
+GRANT ALL ON TABLE tbl_teambenutzer TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_teambenutzer TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_teambenutzer TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_teambenutzer TO vilesci;
@@ -43973,7 +43973,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_teambenutzer TO vilesci;
 
 REVOKE ALL ON TABLE tbl_wettbewerb FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_wettbewerb FROM postgres;
-GRANT ALL ON TABLE tbl_wettbewerb TO postgres;
+GRANT ALL ON TABLE tbl_wettbewerb TO fhcomplete;
 GRANT SELECT ON TABLE tbl_wettbewerb TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_wettbewerb TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_wettbewerb TO vilesci;
@@ -43985,7 +43985,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_wettbewerb TO vilesci;
 
 REVOKE ALL ON TABLE tbl_wettbewerbteam FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_wettbewerbteam FROM postgres;
-GRANT ALL ON TABLE tbl_wettbewerbteam TO postgres;
+GRANT ALL ON TABLE tbl_wettbewerbteam TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_wettbewerbteam TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_wettbewerbteam TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_wettbewerbteam TO vilesci;
@@ -43997,7 +43997,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_wettbewerbteam TO vilesci;
 
 REVOKE ALL ON TABLE tbl_wettbewerbtyp FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_wettbewerbtyp FROM postgres;
-GRANT ALL ON TABLE tbl_wettbewerbtyp TO postgres;
+GRANT ALL ON TABLE tbl_wettbewerbtyp TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_wettbewerbtyp TO admin;
 GRANT SELECT,INSERT,UPDATE ON TABLE tbl_wettbewerbtyp TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_wettbewerbtyp TO vilesci;
@@ -44011,7 +44011,7 @@ SET search_path = lehre, pg_catalog;
 
 REVOKE ALL ON TABLE tbl_abschlussbeurteilung FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_abschlussbeurteilung FROM postgres;
-GRANT ALL ON TABLE tbl_abschlussbeurteilung TO postgres;
+GRANT ALL ON TABLE tbl_abschlussbeurteilung TO fhcomplete;
 GRANT SELECT ON TABLE tbl_abschlussbeurteilung TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_abschlussbeurteilung TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_abschlussbeurteilung TO vilesci;
@@ -44023,7 +44023,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_abschlussbeurteilung TO vilesci;
 
 REVOKE ALL ON TABLE tbl_abschlusspruefung FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_abschlusspruefung FROM postgres;
-GRANT ALL ON TABLE tbl_abschlusspruefung TO postgres;
+GRANT ALL ON TABLE tbl_abschlusspruefung TO fhcomplete;
 GRANT SELECT ON TABLE tbl_abschlusspruefung TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_abschlusspruefung TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_abschlusspruefung TO vilesci;
@@ -44035,7 +44035,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_abschlusspruefung TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_abschlusspruefung_abschlusspruefung_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_abschlusspruefung_abschlusspruefung_id FROM postgres;
-GRANT ALL ON SEQUENCE tbl_abschlusspruefung_abschlusspruefung_id TO postgres;
+GRANT ALL ON SEQUENCE tbl_abschlusspruefung_abschlusspruefung_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_abschlusspruefung_abschlusspruefung_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_abschlusspruefung_abschlusspruefung_id TO vilesci;
 
@@ -44046,7 +44046,7 @@ GRANT SELECT,UPDATE ON SEQUENCE tbl_abschlusspruefung_abschlusspruefung_id TO vi
 
 REVOKE ALL ON TABLE tbl_akadgrad FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_akadgrad FROM postgres;
-GRANT ALL ON TABLE tbl_akadgrad TO postgres;
+GRANT ALL ON TABLE tbl_akadgrad TO fhcomplete;
 GRANT SELECT ON TABLE tbl_akadgrad TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_akadgrad TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_akadgrad TO vilesci;
@@ -44058,7 +44058,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_akadgrad TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_akadgrad_akadgrad_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_akadgrad_akadgrad_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_akadgrad_akadgrad_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_akadgrad_akadgrad_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_akadgrad_akadgrad_id_seq TO admin;
 GRANT ALL ON SEQUENCE tbl_akadgrad_akadgrad_id_seq TO vilesci;
 
@@ -44069,7 +44069,7 @@ GRANT ALL ON SEQUENCE tbl_akadgrad_akadgrad_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_betreuerart FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_betreuerart FROM postgres;
-GRANT ALL ON TABLE tbl_betreuerart TO postgres;
+GRANT ALL ON TABLE tbl_betreuerart TO fhcomplete;
 GRANT SELECT ON TABLE tbl_betreuerart TO web;
 GRANT SELECT ON TABLE tbl_betreuerart TO admin;
 GRANT SELECT ON TABLE tbl_betreuerart TO vilesci;
@@ -44081,7 +44081,7 @@ GRANT SELECT ON TABLE tbl_betreuerart TO vilesci;
 
 REVOKE ALL ON TABLE tbl_ferien FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_ferien FROM postgres;
-GRANT ALL ON TABLE tbl_ferien TO postgres;
+GRANT ALL ON TABLE tbl_ferien TO fhcomplete;
 GRANT SELECT ON TABLE tbl_ferien TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_ferien TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_ferien TO vilesci;
@@ -44093,7 +44093,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_ferien TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_lehreinheit_lehreinheit_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_lehreinheit_lehreinheit_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_lehreinheit_lehreinheit_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_lehreinheit_lehreinheit_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_lehreinheit_lehreinheit_id_seq TO admin;
 GRANT ALL ON SEQUENCE tbl_lehreinheit_lehreinheit_id_seq TO vilesci;
 
@@ -44104,7 +44104,7 @@ GRANT ALL ON SEQUENCE tbl_lehreinheit_lehreinheit_id_seq TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_lehreinheitgruppe_lehreinheitgruppe_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_lehreinheitgruppe_lehreinheitgruppe_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_lehreinheitgruppe_lehreinheitgruppe_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_lehreinheitgruppe_lehreinheitgruppe_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_lehreinheitgruppe_lehreinheitgruppe_id_seq TO admin;
 GRANT ALL ON SEQUENCE tbl_lehreinheitgruppe_lehreinheitgruppe_id_seq TO vilesci;
 
@@ -44115,7 +44115,7 @@ GRANT ALL ON SEQUENCE tbl_lehreinheitgruppe_lehreinheitgruppe_id_seq TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_lehrfach_lehrfach_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_lehrfach_lehrfach_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_lehrfach_lehrfach_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_lehrfach_lehrfach_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_lehrfach_lehrfach_id_seq TO admin;
 GRANT ALL ON SEQUENCE tbl_lehrfach_lehrfach_id_seq TO vilesci;
 
@@ -44126,7 +44126,7 @@ GRANT ALL ON SEQUENCE tbl_lehrfach_lehrfach_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_lehrform FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_lehrform FROM postgres;
-GRANT ALL ON TABLE tbl_lehrform TO postgres;
+GRANT ALL ON TABLE tbl_lehrform TO fhcomplete;
 GRANT SELECT ON TABLE tbl_lehrform TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehrform TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehrform TO vilesci;
@@ -44138,7 +44138,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehrform TO vilesci;
 
 REVOKE ALL ON TABLE tbl_lehrfunktion FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_lehrfunktion FROM postgres;
-GRANT ALL ON TABLE tbl_lehrfunktion TO postgres;
+GRANT ALL ON TABLE tbl_lehrfunktion TO fhcomplete;
 GRANT SELECT ON TABLE tbl_lehrfunktion TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehrfunktion TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehrfunktion TO vilesci;
@@ -44150,7 +44150,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehrfunktion TO vilesci;
 
 REVOKE ALL ON TABLE tbl_lehrmittel FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_lehrmittel FROM postgres;
-GRANT ALL ON TABLE tbl_lehrmittel TO postgres;
+GRANT ALL ON TABLE tbl_lehrmittel TO fhcomplete;
 GRANT SELECT ON TABLE tbl_lehrmittel TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehrmittel TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehrmittel TO vilesci;
@@ -44162,7 +44162,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehrmittel TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_lehrveranstaltung_lehrveranstaltung_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_lehrveranstaltung_lehrveranstaltung_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_lehrveranstaltung_lehrveranstaltung_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_lehrveranstaltung_lehrveranstaltung_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_lehrveranstaltung_lehrveranstaltung_id_seq TO admin;
 GRANT ALL ON SEQUENCE tbl_lehrveranstaltung_lehrveranstaltung_id_seq TO vilesci;
 
@@ -44173,7 +44173,7 @@ GRANT ALL ON SEQUENCE tbl_lehrveranstaltung_lehrveranstaltung_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_moodle FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_moodle FROM postgres;
-GRANT ALL ON TABLE tbl_moodle TO postgres;
+GRANT ALL ON TABLE tbl_moodle TO fhcomplete;
 GRANT SELECT,INSERT,UPDATE ON TABLE tbl_moodle TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_moodle TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_moodle TO vilesci;
@@ -44185,7 +44185,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_moodle TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_moodle_moodle_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_moodle_moodle_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_moodle_moodle_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_moodle_moodle_id_seq TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_moodle_moodle_id_seq TO web;
 
 
@@ -44195,7 +44195,7 @@ GRANT SELECT,UPDATE ON SEQUENCE tbl_moodle_moodle_id_seq TO web;
 
 REVOKE ALL ON TABLE tbl_moodle_version FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_moodle_version FROM postgres;
-GRANT ALL ON TABLE tbl_moodle_version TO postgres;
+GRANT ALL ON TABLE tbl_moodle_version TO fhcomplete;
 GRANT SELECT ON TABLE tbl_moodle_version TO vilesci;
 GRANT SELECT ON TABLE tbl_moodle_version TO web;
 
@@ -44206,7 +44206,7 @@ GRANT SELECT ON TABLE tbl_moodle_version TO web;
 
 REVOKE ALL ON TABLE tbl_note FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_note FROM postgres;
-GRANT ALL ON TABLE tbl_note TO postgres;
+GRANT ALL ON TABLE tbl_note TO fhcomplete;
 GRANT SELECT ON TABLE tbl_note TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_note TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_note TO vilesci;
@@ -44218,7 +44218,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_note TO vilesci;
 
 REVOKE ALL ON TABLE tbl_projektarbeit FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_projektarbeit FROM postgres;
-GRANT ALL ON TABLE tbl_projektarbeit TO postgres;
+GRANT ALL ON TABLE tbl_projektarbeit TO fhcomplete;
 GRANT SELECT,INSERT,UPDATE ON TABLE tbl_projektarbeit TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projektarbeit TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projektarbeit TO vilesci;
@@ -44230,7 +44230,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projektarbeit TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_projektarbeit_projektarbeit_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_projektarbeit_projektarbeit_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_projektarbeit_projektarbeit_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_projektarbeit_projektarbeit_id_seq TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_projektarbeit_projektarbeit_id_seq TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_projektarbeit_projektarbeit_id_seq TO vilesci;
 
@@ -44241,7 +44241,7 @@ GRANT SELECT,UPDATE ON SEQUENCE tbl_projektarbeit_projektarbeit_id_seq TO vilesc
 
 REVOKE ALL ON TABLE tbl_projektbetreuer FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_projektbetreuer FROM postgres;
-GRANT ALL ON TABLE tbl_projektbetreuer TO postgres;
+GRANT ALL ON TABLE tbl_projektbetreuer TO fhcomplete;
 GRANT SELECT ON TABLE tbl_projektbetreuer TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projektbetreuer TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projektbetreuer TO vilesci;
@@ -44253,7 +44253,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projektbetreuer TO vilesci;
 
 REVOKE ALL ON TABLE tbl_projekttyp FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_projekttyp FROM postgres;
-GRANT ALL ON TABLE tbl_projekttyp TO postgres;
+GRANT ALL ON TABLE tbl_projekttyp TO fhcomplete;
 GRANT SELECT ON TABLE tbl_projekttyp TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projekttyp TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projekttyp TO vilesci;
@@ -44265,7 +44265,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projekttyp TO vilesci;
 
 REVOKE ALL ON TABLE tbl_pruefung FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_pruefung FROM postgres;
-GRANT ALL ON TABLE tbl_pruefung TO postgres;
+GRANT ALL ON TABLE tbl_pruefung TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_pruefung TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_pruefung TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_pruefung TO vilesci;
@@ -44277,7 +44277,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_pruefung TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_pruefung_pruefung_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_pruefung_pruefung_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_pruefung_pruefung_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_pruefung_pruefung_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_pruefung_pruefung_id_seq TO web;
 GRANT ALL ON SEQUENCE tbl_pruefung_pruefung_id_seq TO admin;
 GRANT ALL ON SEQUENCE tbl_pruefung_pruefung_id_seq TO vilesci;
@@ -44289,7 +44289,7 @@ GRANT ALL ON SEQUENCE tbl_pruefung_pruefung_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_pruefungstyp FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_pruefungstyp FROM postgres;
-GRANT ALL ON TABLE tbl_pruefungstyp TO postgres;
+GRANT ALL ON TABLE tbl_pruefungstyp TO fhcomplete;
 GRANT SELECT ON TABLE tbl_pruefungstyp TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_pruefungstyp TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_pruefungstyp TO vilesci;
@@ -44301,7 +44301,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_pruefungstyp TO vilesci;
 
 REVOKE ALL ON TABLE tbl_stunde FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_stunde FROM postgres;
-GRANT ALL ON TABLE tbl_stunde TO postgres;
+GRANT ALL ON TABLE tbl_stunde TO fhcomplete;
 GRANT SELECT ON TABLE tbl_stunde TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_stunde TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_stunde TO vilesci;
@@ -44313,7 +44313,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_stunde TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_stundenplan_stundenplan_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_stundenplan_stundenplan_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_stundenplan_stundenplan_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_stundenplan_stundenplan_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_stundenplan_stundenplan_id_seq TO admin;
 GRANT ALL ON SEQUENCE tbl_stundenplan_stundenplan_id_seq TO vilesci;
 
@@ -44324,7 +44324,7 @@ GRANT ALL ON SEQUENCE tbl_stundenplan_stundenplan_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_stundenplandev FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_stundenplandev FROM postgres;
-GRANT ALL ON TABLE tbl_stundenplandev TO postgres;
+GRANT ALL ON TABLE tbl_stundenplandev TO fhcomplete;
 GRANT SELECT ON TABLE tbl_stundenplandev TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_stundenplandev TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_stundenplandev TO vilesci;
@@ -44336,7 +44336,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_stundenplandev TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_stundenplandev_stundenplandev_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_stundenplandev_stundenplandev_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_stundenplandev_stundenplandev_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_stundenplandev_stundenplandev_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_stundenplandev_stundenplandev_id_seq TO admin;
 GRANT ALL ON SEQUENCE tbl_stundenplandev_stundenplandev_id_seq TO vilesci;
 
@@ -44347,7 +44347,7 @@ GRANT ALL ON SEQUENCE tbl_stundenplandev_stundenplandev_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_zeitfenster FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_zeitfenster FROM postgres;
-GRANT ALL ON TABLE tbl_zeitfenster TO postgres;
+GRANT ALL ON TABLE tbl_zeitfenster TO fhcomplete;
 GRANT SELECT ON TABLE tbl_zeitfenster TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zeitfenster TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zeitfenster TO vilesci;
@@ -44359,7 +44359,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zeitfenster TO vilesci;
 
 REVOKE ALL ON TABLE tbl_zeugnis FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_zeugnis FROM postgres;
-GRANT ALL ON TABLE tbl_zeugnis TO postgres;
+GRANT ALL ON TABLE tbl_zeugnis TO fhcomplete;
 GRANT SELECT ON TABLE tbl_zeugnis TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zeugnis TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zeugnis TO vilesci;
@@ -44371,7 +44371,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zeugnis TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_zeugnis_zeugnis_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_zeugnis_zeugnis_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_zeugnis_zeugnis_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_zeugnis_zeugnis_id_seq TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_zeugnis_zeugnis_id_seq TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_zeugnis_zeugnis_id_seq TO vilesci;
 
@@ -44382,7 +44382,7 @@ GRANT SELECT,UPDATE ON SEQUENCE tbl_zeugnis_zeugnis_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_zeugnisnote FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_zeugnisnote FROM postgres;
-GRANT ALL ON TABLE tbl_zeugnisnote TO postgres;
+GRANT ALL ON TABLE tbl_zeugnisnote TO fhcomplete;
 GRANT SELECT ON TABLE tbl_zeugnisnote TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zeugnisnote TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zeugnisnote TO vilesci;
@@ -44394,7 +44394,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zeugnisnote TO vilesci;
 
 REVOKE ALL ON TABLE vw_lva_stundenplan FROM PUBLIC;
 REVOKE ALL ON TABLE vw_lva_stundenplan FROM postgres;
-GRANT ALL ON TABLE vw_lva_stundenplan TO postgres;
+GRANT ALL ON TABLE vw_lva_stundenplan TO fhcomplete;
 GRANT SELECT ON TABLE vw_lva_stundenplan TO web;
 GRANT SELECT ON TABLE vw_lva_stundenplan TO admin;
 GRANT SELECT ON TABLE vw_lva_stundenplan TO vilesci;
@@ -44406,7 +44406,7 @@ GRANT SELECT ON TABLE vw_lva_stundenplan TO vilesci;
 
 REVOKE ALL ON TABLE vw_lva_stundenplandev FROM PUBLIC;
 REVOKE ALL ON TABLE vw_lva_stundenplandev FROM postgres;
-GRANT ALL ON TABLE vw_lva_stundenplandev TO postgres;
+GRANT ALL ON TABLE vw_lva_stundenplandev TO fhcomplete;
 GRANT SELECT ON TABLE vw_lva_stundenplandev TO web;
 GRANT SELECT ON TABLE vw_lva_stundenplandev TO admin;
 GRANT SELECT ON TABLE vw_lva_stundenplandev TO vilesci;
@@ -44418,7 +44418,7 @@ GRANT SELECT ON TABLE vw_lva_stundenplandev TO vilesci;
 
 REVOKE ALL ON TABLE vw_reservierung FROM PUBLIC;
 REVOKE ALL ON TABLE vw_reservierung FROM postgres;
-GRANT ALL ON TABLE vw_reservierung TO postgres;
+GRANT ALL ON TABLE vw_reservierung TO fhcomplete;
 GRANT SELECT ON TABLE vw_reservierung TO admin;
 GRANT SELECT ON TABLE vw_reservierung TO web;
 GRANT SELECT ON TABLE vw_reservierung TO vilesci;
@@ -44430,7 +44430,7 @@ GRANT SELECT ON TABLE vw_reservierung TO vilesci;
 
 REVOKE ALL ON TABLE vw_stundenplan FROM PUBLIC;
 REVOKE ALL ON TABLE vw_stundenplan FROM postgres;
-GRANT ALL ON TABLE vw_stundenplan TO postgres;
+GRANT ALL ON TABLE vw_stundenplan TO fhcomplete;
 GRANT SELECT ON TABLE vw_stundenplan TO web;
 GRANT SELECT ON TABLE vw_stundenplan TO admin;
 GRANT SELECT ON TABLE vw_stundenplan TO vilesci;
@@ -44442,7 +44442,7 @@ GRANT SELECT ON TABLE vw_stundenplan TO vilesci;
 
 REVOKE ALL ON TABLE vw_stundenplandev FROM PUBLIC;
 REVOKE ALL ON TABLE vw_stundenplandev FROM postgres;
-GRANT ALL ON TABLE vw_stundenplandev TO postgres;
+GRANT ALL ON TABLE vw_stundenplandev TO fhcomplete;
 GRANT SELECT ON TABLE vw_stundenplandev TO web;
 GRANT SELECT ON TABLE vw_stundenplandev TO admin;
 GRANT SELECT ON TABLE vw_stundenplandev TO vilesci;
@@ -44456,7 +44456,7 @@ SET search_path = public, pg_catalog;
 
 REVOKE ALL ON TABLE tbl_studiensemester FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_studiensemester FROM postgres;
-GRANT ALL ON TABLE tbl_studiensemester TO postgres;
+GRANT ALL ON TABLE tbl_studiensemester TO fhcomplete;
 GRANT SELECT ON TABLE tbl_studiensemester TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_studiensemester TO admin;
 GRANT SELECT ON TABLE tbl_studiensemester TO wawi;
@@ -44471,7 +44471,7 @@ SET search_path = lehre, pg_catalog;
 
 REVOKE ALL ON TABLE vw_stundenplandev_student_unr FROM PUBLIC;
 REVOKE ALL ON TABLE vw_stundenplandev_student_unr FROM postgres;
-GRANT ALL ON TABLE vw_stundenplandev_student_unr TO postgres;
+GRANT ALL ON TABLE vw_stundenplandev_student_unr TO fhcomplete;
 GRANT SELECT ON TABLE vw_stundenplandev_student_unr TO admin;
 GRANT SELECT ON TABLE vw_stundenplandev_student_unr TO web;
 GRANT SELECT ON TABLE vw_stundenplandev_student_unr TO vilesci;
@@ -44485,7 +44485,7 @@ SET search_path = public, pg_catalog;
 
 REVOKE ALL ON SEQUENCE seq_ampel_ampel_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_ampel_ampel_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_ampel_ampel_id TO postgres;
+GRANT ALL ON SEQUENCE seq_ampel_ampel_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_ampel_ampel_id TO web;
 GRANT SELECT,UPDATE ON SEQUENCE seq_ampel_ampel_id TO vilesci;
 
@@ -44496,7 +44496,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_ampel_ampel_id TO vilesci;
 
 REVOKE ALL ON SEQUENCE seq_ampel_benutzer_bestaetigt_ampel_benutzer_bestaetigt_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_ampel_benutzer_bestaetigt_ampel_benutzer_bestaetigt_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_ampel_benutzer_bestaetigt_ampel_benutzer_bestaetigt_id TO postgres;
+GRANT ALL ON SEQUENCE seq_ampel_benutzer_bestaetigt_ampel_benutzer_bestaetigt_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_ampel_benutzer_bestaetigt_ampel_benutzer_bestaetigt_id TO web;
 GRANT SELECT,UPDATE ON SEQUENCE seq_ampel_benutzer_bestaetigt_ampel_benutzer_bestaetigt_id TO vilesci;
 
@@ -44507,7 +44507,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_ampel_benutzer_bestaetigt_ampel_benutzer_bes
 
 REVOKE ALL ON SEQUENCE seq_notiz_notiz_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_notiz_notiz_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_notiz_notiz_id TO postgres;
+GRANT ALL ON SEQUENCE seq_notiz_notiz_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_notiz_notiz_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_notiz_notiz_id TO vilesci;
 
@@ -44518,7 +44518,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_notiz_notiz_id TO vilesci;
 
 REVOKE ALL ON SEQUENCE seq_notizzuordnung_notizzuordnung_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_notizzuordnung_notizzuordnung_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_notizzuordnung_notizzuordnung_id TO postgres;
+GRANT ALL ON SEQUENCE seq_notizzuordnung_notizzuordnung_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_notizzuordnung_notizzuordnung_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_notizzuordnung_notizzuordnung_id TO vilesci;
 
@@ -44529,7 +44529,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_notizzuordnung_notizzuordnung_id TO vilesci;
 
 REVOKE ALL ON SEQUENCE seq_person_fotostatus_person_fotostatus_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_person_fotostatus_person_fotostatus_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_person_fotostatus_person_fotostatus_id TO postgres;
+GRANT ALL ON SEQUENCE seq_person_fotostatus_person_fotostatus_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_person_fotostatus_person_fotostatus_id TO web;
 GRANT SELECT,UPDATE ON SEQUENCE seq_person_fotostatus_person_fotostatus_id TO vilesci;
 
@@ -44540,7 +44540,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_person_fotostatus_person_fotostatus_id TO vi
 
 REVOKE ALL ON SEQUENCE seq_preincoming_preincoming_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_preincoming_preincoming_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_preincoming_preincoming_id TO postgres;
+GRANT ALL ON SEQUENCE seq_preincoming_preincoming_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_preincoming_preincoming_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_preincoming_preincoming_id TO web;
 GRANT SELECT,UPDATE ON SEQUENCE seq_preincoming_preincoming_id TO vilesci;
@@ -44552,7 +44552,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_preincoming_preincoming_id TO vilesci;
 
 REVOKE ALL ON SEQUENCE seq_preoutgoing_firma_preoutgoing_firma_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_preoutgoing_firma_preoutgoing_firma_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_preoutgoing_firma_preoutgoing_firma_id TO postgres;
+GRANT ALL ON SEQUENCE seq_preoutgoing_firma_preoutgoing_firma_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_preoutgoing_firma_preoutgoing_firma_id TO web;
 GRANT SELECT,UPDATE ON SEQUENCE seq_preoutgoing_firma_preoutgoing_firma_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_preoutgoing_firma_preoutgoing_firma_id TO vilesci;
@@ -44564,7 +44564,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_preoutgoing_firma_preoutgoing_firma_id TO vi
 
 REVOKE ALL ON SEQUENCE seq_preoutgoing_lehrveranstaltung_preoutgoing_lehrveranstaltung FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_preoutgoing_lehrveranstaltung_preoutgoing_lehrveranstaltung FROM postgres;
-GRANT ALL ON SEQUENCE seq_preoutgoing_lehrveranstaltung_preoutgoing_lehrveranstaltung TO postgres;
+GRANT ALL ON SEQUENCE seq_preoutgoing_lehrveranstaltung_preoutgoing_lehrveranstaltung TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_preoutgoing_lehrveranstaltung_preoutgoing_lehrveranstaltung TO web;
 GRANT SELECT,UPDATE ON SEQUENCE seq_preoutgoing_lehrveranstaltung_preoutgoing_lehrveranstaltung TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_preoutgoing_lehrveranstaltung_preoutgoing_lehrveranstaltung TO vilesci;
@@ -44576,7 +44576,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_preoutgoing_lehrveranstaltung_preoutgoing_le
 
 REVOKE ALL ON SEQUENCE seq_preoutgoing_preoutgoing_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_preoutgoing_preoutgoing_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_preoutgoing_preoutgoing_id TO postgres;
+GRANT ALL ON SEQUENCE seq_preoutgoing_preoutgoing_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_preoutgoing_preoutgoing_id TO web;
 GRANT SELECT,UPDATE ON SEQUENCE seq_preoutgoing_preoutgoing_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_preoutgoing_preoutgoing_id TO vilesci;
@@ -44588,7 +44588,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_preoutgoing_preoutgoing_id TO vilesci;
 
 REVOKE ALL ON SEQUENCE seq_preoutgoing_preoutgoing_status_status_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_preoutgoing_preoutgoing_status_status_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_preoutgoing_preoutgoing_status_status_id TO postgres;
+GRANT ALL ON SEQUENCE seq_preoutgoing_preoutgoing_status_status_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_preoutgoing_preoutgoing_status_status_id TO web;
 GRANT SELECT,UPDATE ON SEQUENCE seq_preoutgoing_preoutgoing_status_status_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_preoutgoing_preoutgoing_status_status_id TO vilesci;
@@ -44600,7 +44600,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_preoutgoing_preoutgoing_status_status_id TO 
 
 REVOKE ALL ON SEQUENCE seq_service_service_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_service_service_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_service_service_id TO postgres;
+GRANT ALL ON SEQUENCE seq_service_service_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_service_service_id TO vilesci;
 
 
@@ -44610,7 +44610,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_service_service_id TO vilesci;
 
 REVOKE ALL ON TABLE tbl_adresse FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_adresse FROM postgres;
-GRANT ALL ON TABLE tbl_adresse TO postgres;
+GRANT ALL ON TABLE tbl_adresse TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_adresse TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_adresse TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_adresse TO wawi;
@@ -44623,7 +44623,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_adresse TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_adresse_adresse_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_adresse_adresse_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_adresse_adresse_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_adresse_adresse_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_adresse_adresse_id_seq TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_adresse_adresse_id_seq TO wawi;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_adresse_adresse_id_seq TO web;
@@ -44636,7 +44636,7 @@ GRANT ALL ON SEQUENCE tbl_adresse_adresse_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_akte FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_akte FROM postgres;
-GRANT ALL ON TABLE tbl_akte TO postgres;
+GRANT ALL ON TABLE tbl_akte TO fhcomplete;
 GRANT SELECT,INSERT,UPDATE ON TABLE tbl_akte TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_akte TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_akte TO vilesci;
@@ -44648,7 +44648,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_akte TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_akte_akte_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_akte_akte_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_akte_akte_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_akte_akte_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_akte_akte_id_seq TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_akte_akte_id_seq TO web;
 GRANT ALL ON SEQUENCE tbl_akte_akte_id_seq TO vilesci;
@@ -44660,7 +44660,7 @@ GRANT ALL ON SEQUENCE tbl_akte_akte_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_ampel FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_ampel FROM postgres;
-GRANT ALL ON TABLE tbl_ampel TO postgres;
+GRANT ALL ON TABLE tbl_ampel TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_ampel TO vilesci;
 GRANT SELECT ON TABLE tbl_ampel TO web;
 
@@ -44671,7 +44671,7 @@ GRANT SELECT ON TABLE tbl_ampel TO web;
 
 REVOKE ALL ON TABLE tbl_ampel_benutzer_bestaetigt FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_ampel_benutzer_bestaetigt FROM postgres;
-GRANT ALL ON TABLE tbl_ampel_benutzer_bestaetigt TO postgres;
+GRANT ALL ON TABLE tbl_ampel_benutzer_bestaetigt TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_ampel_benutzer_bestaetigt TO vilesci;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_ampel_benutzer_bestaetigt TO web;
 
@@ -44682,7 +44682,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_ampel_benutzer_bestaetigt TO web;
 
 REVOKE ALL ON TABLE tbl_aufmerksamdurch FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_aufmerksamdurch FROM postgres;
-GRANT ALL ON TABLE tbl_aufmerksamdurch TO postgres;
+GRANT ALL ON TABLE tbl_aufmerksamdurch TO fhcomplete;
 GRANT SELECT ON TABLE tbl_aufmerksamdurch TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_aufmerksamdurch TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_aufmerksamdurch TO vilesci;
@@ -44694,7 +44694,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_aufmerksamdurch TO vilesci;
 
 REVOKE ALL ON TABLE tbl_aufnahmeschluessel FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_aufnahmeschluessel FROM postgres;
-GRANT ALL ON TABLE tbl_aufnahmeschluessel TO postgres;
+GRANT ALL ON TABLE tbl_aufnahmeschluessel TO fhcomplete;
 GRANT SELECT ON TABLE tbl_aufnahmeschluessel TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_aufnahmeschluessel TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_aufnahmeschluessel TO vilesci;
@@ -44706,7 +44706,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_aufnahmeschluessel TO vilesci;
 
 REVOKE ALL ON TABLE tbl_bankverbindung FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_bankverbindung FROM postgres;
-GRANT ALL ON TABLE tbl_bankverbindung TO postgres;
+GRANT ALL ON TABLE tbl_bankverbindung TO fhcomplete;
 GRANT SELECT ON TABLE tbl_bankverbindung TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bankverbindung TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bankverbindung TO vilesci;
@@ -44718,7 +44718,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bankverbindung TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_bankverbindung_bankverbindung_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_bankverbindung_bankverbindung_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_bankverbindung_bankverbindung_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_bankverbindung_bankverbindung_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_bankverbindung_bankverbindung_id_seq TO admin;
 GRANT ALL ON SEQUENCE tbl_bankverbindung_bankverbindung_id_seq TO vilesci;
 
@@ -44729,7 +44729,7 @@ GRANT ALL ON SEQUENCE tbl_bankverbindung_bankverbindung_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_benutzerfunktion FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_benutzerfunktion FROM postgres;
-GRANT ALL ON TABLE tbl_benutzerfunktion TO postgres;
+GRANT ALL ON TABLE tbl_benutzerfunktion TO fhcomplete;
 GRANT SELECT ON TABLE tbl_benutzerfunktion TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_benutzerfunktion TO admin;
 GRANT SELECT ON TABLE tbl_benutzerfunktion TO wawi;
@@ -44742,7 +44742,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_benutzerfunktion TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_benutzerfunktion_benutzerfunktion_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_benutzerfunktion_benutzerfunktion_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_benutzerfunktion_benutzerfunktion_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_benutzerfunktion_benutzerfunktion_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_benutzerfunktion_benutzerfunktion_id_seq TO admin;
 GRANT ALL ON SEQUENCE tbl_benutzerfunktion_benutzerfunktion_id_seq TO vilesci;
 
@@ -44753,7 +44753,7 @@ GRANT ALL ON SEQUENCE tbl_benutzerfunktion_benutzerfunktion_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_buchungstyp FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_buchungstyp FROM postgres;
-GRANT ALL ON TABLE tbl_buchungstyp TO postgres;
+GRANT ALL ON TABLE tbl_buchungstyp TO fhcomplete;
 GRANT SELECT ON TABLE tbl_buchungstyp TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_buchungstyp TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_buchungstyp TO vilesci;
@@ -44765,7 +44765,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_buchungstyp TO vilesci;
 
 REVOKE ALL ON TABLE tbl_dokument FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_dokument FROM postgres;
-GRANT ALL ON TABLE tbl_dokument TO postgres;
+GRANT ALL ON TABLE tbl_dokument TO fhcomplete;
 GRANT SELECT ON TABLE tbl_dokument TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_dokument TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_dokument TO vilesci;
@@ -44777,7 +44777,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_dokument TO vilesci;
 
 REVOKE ALL ON TABLE tbl_dokumentprestudent FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_dokumentprestudent FROM postgres;
-GRANT ALL ON TABLE tbl_dokumentprestudent TO postgres;
+GRANT ALL ON TABLE tbl_dokumentprestudent TO fhcomplete;
 GRANT SELECT ON TABLE tbl_dokumentprestudent TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_dokumentprestudent TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_dokumentprestudent TO vilesci;
@@ -44789,7 +44789,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_dokumentprestudent TO vilesci;
 
 REVOKE ALL ON TABLE tbl_dokumentstudiengang FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_dokumentstudiengang FROM postgres;
-GRANT ALL ON TABLE tbl_dokumentstudiengang TO postgres;
+GRANT ALL ON TABLE tbl_dokumentstudiengang TO fhcomplete;
 GRANT SELECT ON TABLE tbl_dokumentstudiengang TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_dokumentstudiengang TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_dokumentstudiengang TO vilesci;
@@ -44801,7 +44801,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_dokumentstudiengang TO vilesci;
 
 REVOKE ALL ON TABLE tbl_erhalter FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_erhalter FROM postgres;
-GRANT ALL ON TABLE tbl_erhalter TO postgres;
+GRANT ALL ON TABLE tbl_erhalter TO fhcomplete;
 GRANT SELECT ON TABLE tbl_erhalter TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_erhalter TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_erhalter TO vilesci;
@@ -44813,7 +44813,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_erhalter TO vilesci;
 
 REVOKE ALL ON TABLE tbl_fachbereich FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_fachbereich FROM postgres;
-GRANT ALL ON TABLE tbl_fachbereich TO postgres;
+GRANT ALL ON TABLE tbl_fachbereich TO fhcomplete;
 GRANT SELECT ON TABLE tbl_fachbereich TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_fachbereich TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_fachbereich TO vilesci;
@@ -44825,7 +44825,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_fachbereich TO vilesci;
 
 REVOKE ALL ON TABLE tbl_firma FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_firma FROM postgres;
-GRANT ALL ON TABLE tbl_firma TO postgres;
+GRANT ALL ON TABLE tbl_firma TO fhcomplete;
 GRANT SELECT ON TABLE tbl_firma TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_firma TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_firma TO wawi;
@@ -44838,7 +44838,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_firma TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_firma_firma_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_firma_firma_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_firma_firma_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_firma_firma_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_firma_firma_id_seq TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_firma_firma_id_seq TO wawi;
 GRANT ALL ON SEQUENCE tbl_firma_firma_id_seq TO vilesci;
@@ -44850,7 +44850,7 @@ GRANT ALL ON SEQUENCE tbl_firma_firma_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_firma_mobilitaetsprogramm FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_firma_mobilitaetsprogramm FROM postgres;
-GRANT ALL ON TABLE tbl_firma_mobilitaetsprogramm TO postgres;
+GRANT ALL ON TABLE tbl_firma_mobilitaetsprogramm TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_firma_mobilitaetsprogramm TO admin;
 GRANT SELECT ON TABLE tbl_firma_mobilitaetsprogramm TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_firma_mobilitaetsprogramm TO vilesci;
@@ -44862,7 +44862,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_firma_mobilitaetsprogramm TO vile
 
 REVOKE ALL ON TABLE tbl_firma_organisationseinheit FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_firma_organisationseinheit FROM postgres;
-GRANT ALL ON TABLE tbl_firma_organisationseinheit TO postgres;
+GRANT ALL ON TABLE tbl_firma_organisationseinheit TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_firma_organisationseinheit TO admin;
 GRANT SELECT ON TABLE tbl_firma_organisationseinheit TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_firma_organisationseinheit TO wawi;
@@ -44875,7 +44875,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_firma_organisationseinheit TO vil
 
 REVOKE ALL ON SEQUENCE tbl_firma_organisationseinhei_firma_organisationseinheit_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_firma_organisationseinhei_firma_organisationseinheit_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_firma_organisationseinhei_firma_organisationseinheit_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_firma_organisationseinhei_firma_organisationseinheit_id_seq TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_firma_organisationseinhei_firma_organisationseinheit_id_seq TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_firma_organisationseinhei_firma_organisationseinheit_id_seq TO web;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_firma_organisationseinhei_firma_organisationseinheit_id_seq TO wawi;
@@ -44888,7 +44888,7 @@ GRANT SELECT,UPDATE ON SEQUENCE tbl_firma_organisationseinhei_firma_organisation
 
 REVOKE ALL ON TABLE tbl_firmatag FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_firmatag FROM postgres;
-GRANT ALL ON TABLE tbl_firmatag TO postgres;
+GRANT ALL ON TABLE tbl_firmatag TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_firmatag TO admin;
 GRANT SELECT ON TABLE tbl_firmatag TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_firmatag TO wawi;
@@ -44901,7 +44901,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_firmatag TO vilesci;
 
 REVOKE ALL ON TABLE tbl_firmentyp FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_firmentyp FROM postgres;
-GRANT ALL ON TABLE tbl_firmentyp TO postgres;
+GRANT ALL ON TABLE tbl_firmentyp TO fhcomplete;
 GRANT SELECT ON TABLE tbl_firmentyp TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_firmentyp TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_firmentyp TO vilesci;
@@ -44913,7 +44913,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_firmentyp TO vilesci;
 
 REVOKE ALL ON TABLE tbl_fotostatus FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_fotostatus FROM postgres;
-GRANT ALL ON TABLE tbl_fotostatus TO postgres;
+GRANT ALL ON TABLE tbl_fotostatus TO fhcomplete;
 GRANT SELECT ON TABLE tbl_fotostatus TO web;
 GRANT SELECT ON TABLE tbl_fotostatus TO vilesci;
 
@@ -44924,7 +44924,7 @@ GRANT SELECT ON TABLE tbl_fotostatus TO vilesci;
 
 REVOKE ALL ON TABLE tbl_funktion FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_funktion FROM postgres;
-GRANT ALL ON TABLE tbl_funktion TO postgres;
+GRANT ALL ON TABLE tbl_funktion TO fhcomplete;
 GRANT SELECT ON TABLE tbl_funktion TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_funktion TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_funktion TO vilesci;
@@ -44936,7 +44936,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_funktion TO vilesci;
 
 REVOKE ALL ON TABLE tbl_geschaeftsjahr FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_geschaeftsjahr FROM postgres;
-GRANT ALL ON TABLE tbl_geschaeftsjahr TO postgres;
+GRANT ALL ON TABLE tbl_geschaeftsjahr TO fhcomplete;
 GRANT SELECT ON TABLE tbl_geschaeftsjahr TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_geschaeftsjahr TO vilesci;
 GRANT SELECT ON TABLE tbl_geschaeftsjahr TO wawi;
@@ -44948,7 +44948,7 @@ GRANT SELECT ON TABLE tbl_geschaeftsjahr TO wawi;
 
 REVOKE ALL ON TABLE tbl_kontakt FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_kontakt FROM postgres;
-GRANT ALL ON TABLE tbl_kontakt TO postgres;
+GRANT ALL ON TABLE tbl_kontakt TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_kontakt TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_kontakt TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_kontakt TO wawi;
@@ -44961,7 +44961,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_kontakt TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_kontakt_kontakt_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_kontakt_kontakt_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_kontakt_kontakt_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_kontakt_kontakt_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_kontakt_kontakt_id_seq TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_kontakt_kontakt_id_seq TO wawi;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_kontakt_kontakt_id_seq TO web;
@@ -44974,7 +44974,7 @@ GRANT ALL ON SEQUENCE tbl_kontakt_kontakt_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_kontaktmedium FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_kontaktmedium FROM postgres;
-GRANT ALL ON TABLE tbl_kontaktmedium TO postgres;
+GRANT ALL ON TABLE tbl_kontaktmedium TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_kontaktmedium TO admin;
 GRANT SELECT ON TABLE tbl_kontaktmedium TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_kontaktmedium TO vilesci;
@@ -44986,7 +44986,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_kontaktmedium TO vilesci;
 
 REVOKE ALL ON TABLE tbl_kontakttyp FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_kontakttyp FROM postgres;
-GRANT ALL ON TABLE tbl_kontakttyp TO postgres;
+GRANT ALL ON TABLE tbl_kontakttyp TO fhcomplete;
 GRANT SELECT ON TABLE tbl_kontakttyp TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_kontakttyp TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_kontakttyp TO vilesci;
@@ -44998,7 +44998,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_kontakttyp TO vilesci;
 
 REVOKE ALL ON TABLE tbl_konto FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_konto FROM postgres;
-GRANT ALL ON TABLE tbl_konto TO postgres;
+GRANT ALL ON TABLE tbl_konto TO fhcomplete;
 GRANT SELECT ON TABLE tbl_konto TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_konto TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_konto TO vilesci;
@@ -45010,7 +45010,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_konto TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_konto_buchungsnr_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_konto_buchungsnr_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_konto_buchungsnr_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_konto_buchungsnr_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_konto_buchungsnr_seq TO admin;
 GRANT ALL ON SEQUENCE tbl_konto_buchungsnr_seq TO vilesci;
 
@@ -45021,7 +45021,7 @@ GRANT ALL ON SEQUENCE tbl_konto_buchungsnr_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_lehrverband FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_lehrverband FROM postgres;
-GRANT ALL ON TABLE tbl_lehrverband TO postgres;
+GRANT ALL ON TABLE tbl_lehrverband TO fhcomplete;
 GRANT SELECT ON TABLE tbl_lehrverband TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehrverband TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehrverband TO vilesci;
@@ -45033,7 +45033,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_lehrverband TO vilesci;
 
 REVOKE ALL ON TABLE tbl_log FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_log FROM postgres;
-GRANT ALL ON TABLE tbl_log TO postgres;
+GRANT ALL ON TABLE tbl_log TO fhcomplete;
 GRANT SELECT ON TABLE tbl_log TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_log TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_log TO vilesci;
@@ -45045,7 +45045,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_log TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_log_log_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_log_log_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_log_log_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_log_log_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_log_log_id_seq TO web;
 GRANT ALL ON SEQUENCE tbl_log_log_id_seq TO admin;
 GRANT ALL ON SEQUENCE tbl_log_log_id_seq TO vilesci;
@@ -45057,7 +45057,7 @@ GRANT ALL ON SEQUENCE tbl_log_log_id_seq TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_mitarbeiter_personalnummer_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_mitarbeiter_personalnummer_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_mitarbeiter_personalnummer_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_mitarbeiter_personalnummer_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_mitarbeiter_personalnummer_seq TO admin;
 GRANT ALL ON SEQUENCE tbl_mitarbeiter_personalnummer_seq TO vilesci;
 
@@ -45068,7 +45068,7 @@ GRANT ALL ON SEQUENCE tbl_mitarbeiter_personalnummer_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_notiz FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_notiz FROM postgres;
-GRANT ALL ON TABLE tbl_notiz TO postgres;
+GRANT ALL ON TABLE tbl_notiz TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_notiz TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_notiz TO vilesci;
 
@@ -45079,7 +45079,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_notiz TO vilesci;
 
 REVOKE ALL ON TABLE tbl_notizzuordnung FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_notizzuordnung FROM postgres;
-GRANT ALL ON TABLE tbl_notizzuordnung TO postgres;
+GRANT ALL ON TABLE tbl_notizzuordnung TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_notizzuordnung TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_notizzuordnung TO vilesci;
 
@@ -45090,7 +45090,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_notizzuordnung TO vilesci;
 
 REVOKE ALL ON TABLE tbl_organisationseinheit FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_organisationseinheit FROM postgres;
-GRANT ALL ON TABLE tbl_organisationseinheit TO postgres;
+GRANT ALL ON TABLE tbl_organisationseinheit TO fhcomplete;
 GRANT SELECT ON TABLE tbl_organisationseinheit TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_organisationseinheit TO admin;
 GRANT SELECT ON TABLE tbl_organisationseinheit TO wawi;
@@ -45103,7 +45103,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_organisationseinheit TO vilesci;
 
 REVOKE ALL ON TABLE tbl_organisationseinheittyp FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_organisationseinheittyp FROM postgres;
-GRANT ALL ON TABLE tbl_organisationseinheittyp TO postgres;
+GRANT ALL ON TABLE tbl_organisationseinheittyp TO fhcomplete;
 GRANT SELECT ON TABLE tbl_organisationseinheittyp TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_organisationseinheittyp TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_organisationseinheittyp TO vilesci;
@@ -45115,7 +45115,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_organisationseinheittyp TO vilesc
 
 REVOKE ALL ON TABLE tbl_ort FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_ort FROM postgres;
-GRANT ALL ON TABLE tbl_ort TO postgres;
+GRANT ALL ON TABLE tbl_ort TO fhcomplete;
 GRANT SELECT ON TABLE tbl_ort TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_ort TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_ort TO vilesci;
@@ -45127,7 +45127,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_ort TO vilesci;
 
 REVOKE ALL ON TABLE tbl_ortraumtyp FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_ortraumtyp FROM postgres;
-GRANT ALL ON TABLE tbl_ortraumtyp TO postgres;
+GRANT ALL ON TABLE tbl_ortraumtyp TO fhcomplete;
 GRANT SELECT ON TABLE tbl_ortraumtyp TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_ortraumtyp TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_ortraumtyp TO vilesci;
@@ -45139,7 +45139,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_ortraumtyp TO vilesci;
 
 REVOKE ALL ON TABLE tbl_person_fotostatus FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_person_fotostatus FROM postgres;
-GRANT ALL ON TABLE tbl_person_fotostatus TO postgres;
+GRANT ALL ON TABLE tbl_person_fotostatus TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_person_fotostatus TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_person_fotostatus TO vilesci;
 
@@ -45150,7 +45150,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_person_fotostatus TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_person_person_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_person_person_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_person_person_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_person_person_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_person_person_id_seq TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_person_person_id_seq TO wawi;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_person_person_id_seq TO web;
@@ -45163,7 +45163,7 @@ GRANT ALL ON SEQUENCE tbl_person_person_id_seq TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_personfunktionstandort_personfunktionstandort_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_personfunktionstandort_personfunktionstandort_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_personfunktionstandort_personfunktionstandort_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_personfunktionstandort_personfunktionstandort_id_seq TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_personfunktionstandort_personfunktionstandort_id_seq TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_personfunktionstandort_personfunktionstandort_id_seq TO wawi;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_personfunktionstandort_personfunktionstandort_id_seq TO vilesci;
@@ -45175,7 +45175,7 @@ GRANT SELECT,UPDATE ON SEQUENCE tbl_personfunktionstandort_personfunktionstandor
 
 REVOKE ALL ON TABLE tbl_personfunktionstandort FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_personfunktionstandort FROM postgres;
-GRANT ALL ON TABLE tbl_personfunktionstandort TO postgres;
+GRANT ALL ON TABLE tbl_personfunktionstandort TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_personfunktionstandort TO admin;
 GRANT SELECT ON TABLE tbl_personfunktionstandort TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_personfunktionstandort TO wawi;
@@ -45188,7 +45188,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_personfunktionstandort TO vilesci
 
 REVOKE ALL ON TABLE tbl_preincoming FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_preincoming FROM postgres;
-GRANT ALL ON TABLE tbl_preincoming TO postgres;
+GRANT ALL ON TABLE tbl_preincoming TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preincoming TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preincoming TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preincoming TO vilesci;
@@ -45200,7 +45200,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preincoming TO vilesci;
 
 REVOKE ALL ON TABLE tbl_preincoming_lehrveranstaltung FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_preincoming_lehrveranstaltung FROM postgres;
-GRANT ALL ON TABLE tbl_preincoming_lehrveranstaltung TO postgres;
+GRANT ALL ON TABLE tbl_preincoming_lehrveranstaltung TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preincoming_lehrveranstaltung TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preincoming_lehrveranstaltung TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preincoming_lehrveranstaltung TO vilesci;
@@ -45212,7 +45212,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preincoming_lehrveranstaltung TO 
 
 REVOKE ALL ON TABLE tbl_preinteressent FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_preinteressent FROM postgres;
-GRANT ALL ON TABLE tbl_preinteressent TO postgres;
+GRANT ALL ON TABLE tbl_preinteressent TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preinteressent TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preinteressent TO vilesci;
 
@@ -45223,7 +45223,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preinteressent TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_preinteressent_preinteressent_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_preinteressent_preinteressent_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_preinteressent_preinteressent_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_preinteressent_preinteressent_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_preinteressent_preinteressent_id_seq TO admin;
 GRANT ALL ON SEQUENCE tbl_preinteressent_preinteressent_id_seq TO vilesci;
 
@@ -45234,7 +45234,7 @@ GRANT ALL ON SEQUENCE tbl_preinteressent_preinteressent_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_preinteressentstudiengang FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_preinteressentstudiengang FROM postgres;
-GRANT ALL ON TABLE tbl_preinteressentstudiengang TO postgres;
+GRANT ALL ON TABLE tbl_preinteressentstudiengang TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preinteressentstudiengang TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preinteressentstudiengang TO vilesci;
 
@@ -45245,7 +45245,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preinteressentstudiengang TO vile
 
 REVOKE ALL ON TABLE tbl_preoutgoing FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_preoutgoing FROM postgres;
-GRANT ALL ON TABLE tbl_preoutgoing TO postgres;
+GRANT ALL ON TABLE tbl_preoutgoing TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preoutgoing TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preoutgoing TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preoutgoing TO vilesci;
@@ -45257,7 +45257,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preoutgoing TO vilesci;
 
 REVOKE ALL ON TABLE tbl_preoutgoing_firma FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_preoutgoing_firma FROM postgres;
-GRANT ALL ON TABLE tbl_preoutgoing_firma TO postgres;
+GRANT ALL ON TABLE tbl_preoutgoing_firma TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preoutgoing_firma TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preoutgoing_firma TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preoutgoing_firma TO vilesci;
@@ -45269,7 +45269,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preoutgoing_firma TO vilesci;
 
 REVOKE ALL ON TABLE tbl_preoutgoing_lehrveranstaltung FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_preoutgoing_lehrveranstaltung FROM postgres;
-GRANT ALL ON TABLE tbl_preoutgoing_lehrveranstaltung TO postgres;
+GRANT ALL ON TABLE tbl_preoutgoing_lehrveranstaltung TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preoutgoing_lehrveranstaltung TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preoutgoing_lehrveranstaltung TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preoutgoing_lehrveranstaltung TO vilesci;
@@ -45281,7 +45281,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preoutgoing_lehrveranstaltung TO 
 
 REVOKE ALL ON TABLE tbl_preoutgoing_preoutgoing_status FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_preoutgoing_preoutgoing_status FROM postgres;
-GRANT ALL ON TABLE tbl_preoutgoing_preoutgoing_status TO postgres;
+GRANT ALL ON TABLE tbl_preoutgoing_preoutgoing_status TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preoutgoing_preoutgoing_status TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preoutgoing_preoutgoing_status TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preoutgoing_preoutgoing_status TO vilesci;
@@ -45293,7 +45293,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preoutgoing_preoutgoing_status TO
 
 REVOKE ALL ON TABLE tbl_preoutgoing_status FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_preoutgoing_status FROM postgres;
-GRANT ALL ON TABLE tbl_preoutgoing_status TO postgres;
+GRANT ALL ON TABLE tbl_preoutgoing_status TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preoutgoing_status TO admin;
 GRANT SELECT ON TABLE tbl_preoutgoing_status TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preoutgoing_status TO vilesci;
@@ -45305,7 +45305,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_preoutgoing_status TO vilesci;
 
 REVOKE ALL ON TABLE tbl_prestudent FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_prestudent FROM postgres;
-GRANT ALL ON TABLE tbl_prestudent TO postgres;
+GRANT ALL ON TABLE tbl_prestudent TO fhcomplete;
 GRANT SELECT ON TABLE tbl_prestudent TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_prestudent TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_prestudent TO vilesci;
@@ -45317,7 +45317,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_prestudent TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_prestudent_prestudent_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_prestudent_prestudent_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_prestudent_prestudent_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_prestudent_prestudent_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_prestudent_prestudent_id_seq TO admin;
 GRANT ALL ON SEQUENCE tbl_prestudent_prestudent_id_seq TO vilesci;
 
@@ -45328,7 +45328,7 @@ GRANT ALL ON SEQUENCE tbl_prestudent_prestudent_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_prestudentstatus FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_prestudentstatus FROM postgres;
-GRANT ALL ON TABLE tbl_prestudentstatus TO postgres;
+GRANT ALL ON TABLE tbl_prestudentstatus TO fhcomplete;
 GRANT SELECT ON TABLE tbl_prestudentstatus TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_prestudentstatus TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_prestudentstatus TO vilesci;
@@ -45340,7 +45340,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_prestudentstatus TO vilesci;
 
 REVOKE ALL ON TABLE tbl_raumtyp FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_raumtyp FROM postgres;
-GRANT ALL ON TABLE tbl_raumtyp TO postgres;
+GRANT ALL ON TABLE tbl_raumtyp TO fhcomplete;
 GRANT SELECT ON TABLE tbl_raumtyp TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_raumtyp TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_raumtyp TO vilesci;
@@ -45352,7 +45352,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_raumtyp TO vilesci;
 
 REVOKE ALL ON TABLE tbl_reihungstest FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_reihungstest FROM postgres;
-GRANT ALL ON TABLE tbl_reihungstest TO postgres;
+GRANT ALL ON TABLE tbl_reihungstest TO fhcomplete;
 GRANT SELECT ON TABLE tbl_reihungstest TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_reihungstest TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_reihungstest TO vilesci;
@@ -45364,7 +45364,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_reihungstest TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_reihungstest_reihungstest_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_reihungstest_reihungstest_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_reihungstest_reihungstest_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_reihungstest_reihungstest_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_reihungstest_reihungstest_id_seq TO admin;
 GRANT ALL ON SEQUENCE tbl_reihungstest_reihungstest_id_seq TO vilesci;
 
@@ -45375,7 +45375,7 @@ GRANT ALL ON SEQUENCE tbl_reihungstest_reihungstest_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_semesterwochen FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_semesterwochen FROM postgres;
-GRANT ALL ON TABLE tbl_semesterwochen TO postgres;
+GRANT ALL ON TABLE tbl_semesterwochen TO fhcomplete;
 GRANT SELECT ON TABLE tbl_semesterwochen TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_semesterwochen TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_semesterwochen TO vilesci;
@@ -45387,7 +45387,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_semesterwochen TO vilesci;
 
 REVOKE ALL ON TABLE tbl_service FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_service FROM postgres;
-GRANT ALL ON TABLE tbl_service TO postgres;
+GRANT ALL ON TABLE tbl_service TO fhcomplete;
 GRANT SELECT ON TABLE tbl_service TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_service TO vilesci;
 
@@ -45398,7 +45398,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_service TO vilesci;
 
 REVOKE ALL ON TABLE tbl_sprache FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_sprache FROM postgres;
-GRANT ALL ON TABLE tbl_sprache TO postgres;
+GRANT ALL ON TABLE tbl_sprache TO fhcomplete;
 GRANT SELECT ON TABLE tbl_sprache TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_sprache TO admin;
 GRANT SELECT ON TABLE tbl_sprache TO wawi;
@@ -45411,7 +45411,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_sprache TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_standort_standort_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_standort_standort_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_standort_standort_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_standort_standort_id_seq TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_standort_standort_id_seq TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_standort_standort_id_seq TO web;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_standort_standort_id_seq TO wawi;
@@ -45424,7 +45424,7 @@ GRANT SELECT,UPDATE ON SEQUENCE tbl_standort_standort_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_standort FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_standort FROM postgres;
-GRANT ALL ON TABLE tbl_standort TO postgres;
+GRANT ALL ON TABLE tbl_standort TO fhcomplete;
 GRANT SELECT ON TABLE tbl_standort TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_standort TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_standort TO wawi;
@@ -45437,7 +45437,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_standort TO vilesci;
 
 REVOKE ALL ON TABLE tbl_statistik FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_statistik FROM postgres;
-GRANT ALL ON TABLE tbl_statistik TO postgres;
+GRANT ALL ON TABLE tbl_statistik TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_statistik TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_statistik TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_statistik TO vilesci;
@@ -45449,7 +45449,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_statistik TO vilesci;
 
 REVOKE ALL ON TABLE tbl_status FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_status FROM postgres;
-GRANT ALL ON TABLE tbl_status TO postgres;
+GRANT ALL ON TABLE tbl_status TO fhcomplete;
 GRANT SELECT ON TABLE tbl_status TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_status TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_status TO vilesci;
@@ -45461,7 +45461,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_status TO vilesci;
 
 REVOKE ALL ON TABLE tbl_tag FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_tag FROM postgres;
-GRANT ALL ON TABLE tbl_tag TO postgres;
+GRANT ALL ON TABLE tbl_tag TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_tag TO admin;
 GRANT SELECT ON TABLE tbl_tag TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_tag TO wawi;
@@ -45474,7 +45474,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_tag TO vilesci;
 
 REVOKE ALL ON TABLE tbl_variable FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_variable FROM postgres;
-GRANT ALL ON TABLE tbl_variable TO postgres;
+GRANT ALL ON TABLE tbl_variable TO fhcomplete;
 GRANT SELECT ON TABLE tbl_variable TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_variable TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_variable TO vilesci;
@@ -45486,7 +45486,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_variable TO vilesci;
 
 REVOKE ALL ON TABLE tbl_vorlage FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_vorlage FROM postgres;
-GRANT ALL ON TABLE tbl_vorlage TO postgres;
+GRANT ALL ON TABLE tbl_vorlage TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_vorlage TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_vorlage TO vilesci;
 
@@ -45497,7 +45497,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_vorlage TO vilesci;
 
 REVOKE ALL ON TABLE tbl_vorlagestudiengang FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_vorlagestudiengang FROM postgres;
-GRANT ALL ON TABLE tbl_vorlagestudiengang TO postgres;
+GRANT ALL ON TABLE tbl_vorlagestudiengang TO fhcomplete;
 GRANT SELECT ON TABLE tbl_vorlagestudiengang TO web;
 GRANT SELECT,INSERT,UPDATE ON TABLE tbl_vorlagestudiengang TO admin;
 GRANT SELECT,INSERT,UPDATE ON TABLE tbl_vorlagestudiengang TO vilesci;
@@ -45511,7 +45511,7 @@ SET search_path = wawi, pg_catalog;
 
 REVOKE ALL ON SEQUENCE seq_betriebsmittelperson_betriebsmittelperson_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_betriebsmittelperson_betriebsmittelperson_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_betriebsmittelperson_betriebsmittelperson_id TO postgres;
+GRANT ALL ON SEQUENCE seq_betriebsmittelperson_betriebsmittelperson_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_betriebsmittelperson_betriebsmittelperson_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_betriebsmittelperson_betriebsmittelperson_id TO web;
 GRANT SELECT,UPDATE ON SEQUENCE seq_betriebsmittelperson_betriebsmittelperson_id TO vilesci;
@@ -45523,7 +45523,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_betriebsmittelperson_betriebsmittelperson_id
 
 REVOKE ALL ON TABLE tbl_betriebsmittel FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_betriebsmittel FROM postgres;
-GRANT ALL ON TABLE tbl_betriebsmittel TO postgres;
+GRANT ALL ON TABLE tbl_betriebsmittel TO fhcomplete;
 GRANT SELECT ON TABLE tbl_betriebsmittel TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_betriebsmittel TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_betriebsmittel TO vilesci;
@@ -45535,7 +45535,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_betriebsmittel TO vilesci;
 
 REVOKE ALL ON TABLE tbl_betriebsmittelperson FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_betriebsmittelperson FROM postgres;
-GRANT ALL ON TABLE tbl_betriebsmittelperson TO postgres;
+GRANT ALL ON TABLE tbl_betriebsmittelperson TO fhcomplete;
 GRANT SELECT ON TABLE tbl_betriebsmittelperson TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_betriebsmittelperson TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_betriebsmittelperson TO vilesci;
@@ -45549,7 +45549,7 @@ SET search_path = public, pg_catalog;
 
 REVOKE ALL ON TABLE vw_betriebsmittelperson FROM PUBLIC;
 REVOKE ALL ON TABLE vw_betriebsmittelperson FROM postgres;
-GRANT ALL ON TABLE vw_betriebsmittelperson TO postgres;
+GRANT ALL ON TABLE vw_betriebsmittelperson TO fhcomplete;
 GRANT SELECT ON TABLE vw_betriebsmittelperson TO web;
 GRANT SELECT ON TABLE vw_betriebsmittelperson TO admin;
 GRANT SELECT ON TABLE vw_betriebsmittelperson TO vilesci;
@@ -45561,7 +45561,7 @@ GRANT SELECT ON TABLE vw_betriebsmittelperson TO vilesci;
 
 REVOKE ALL ON TABLE vw_gruppen FROM PUBLIC;
 REVOKE ALL ON TABLE vw_gruppen FROM postgres;
-GRANT ALL ON TABLE vw_gruppen TO postgres;
+GRANT ALL ON TABLE vw_gruppen TO fhcomplete;
 GRANT SELECT ON TABLE vw_gruppen TO admin;
 GRANT SELECT ON TABLE vw_gruppen TO web;
 GRANT SELECT ON TABLE vw_gruppen TO vilesci;
@@ -45573,7 +45573,7 @@ GRANT SELECT ON TABLE vw_gruppen TO vilesci;
 
 REVOKE ALL ON TABLE vw_prestudent FROM PUBLIC;
 REVOKE ALL ON TABLE vw_prestudent FROM postgres;
-GRANT ALL ON TABLE vw_prestudent TO postgres;
+GRANT ALL ON TABLE vw_prestudent TO fhcomplete;
 GRANT SELECT ON TABLE vw_prestudent TO admin;
 GRANT SELECT ON TABLE vw_prestudent TO web;
 GRANT SELECT ON TABLE vw_prestudent TO vilesci;
@@ -45585,7 +45585,7 @@ GRANT SELECT ON TABLE vw_prestudent TO vilesci;
 
 REVOKE ALL ON TABLE vw_studiensemester FROM PUBLIC;
 REVOKE ALL ON TABLE vw_studiensemester FROM postgres;
-GRANT ALL ON TABLE vw_studiensemester TO postgres;
+GRANT ALL ON TABLE vw_studiensemester TO fhcomplete;
 GRANT SELECT ON TABLE vw_studiensemester TO web;
 GRANT SELECT ON TABLE vw_studiensemester TO admin;
 GRANT SELECT ON TABLE vw_studiensemester TO vilesci;
@@ -45599,7 +45599,7 @@ SET search_path = system, pg_catalog;
 
 REVOKE ALL ON SEQUENCE seq_webservicelog_webservicelog_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_webservicelog_webservicelog_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_webservicelog_webservicelog_id TO postgres;
+GRANT ALL ON SEQUENCE seq_webservicelog_webservicelog_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_webservicelog_webservicelog_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_webservicelog_webservicelog_id TO web;
 GRANT SELECT,UPDATE ON SEQUENCE seq_webservicelog_webservicelog_id TO vilesci;
@@ -45611,7 +45611,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_webservicelog_webservicelog_id TO vilesci;
 
 REVOKE ALL ON TABLE tbl_benutzerrolle FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_benutzerrolle FROM postgres;
-GRANT ALL ON TABLE tbl_benutzerrolle TO postgres;
+GRANT ALL ON TABLE tbl_benutzerrolle TO fhcomplete;
 GRANT SELECT ON TABLE tbl_benutzerrolle TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_benutzerrolle TO admin;
 GRANT SELECT ON TABLE tbl_benutzerrolle TO wawi;
@@ -45624,7 +45624,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_benutzerrolle TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_benutzerrolle_benutzerberechtigung_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_benutzerrolle_benutzerberechtigung_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_benutzerrolle_benutzerberechtigung_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_benutzerrolle_benutzerberechtigung_id_seq TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_benutzerrolle_benutzerberechtigung_id_seq TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_benutzerrolle_benutzerberechtigung_id_seq TO web;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_benutzerrolle_benutzerberechtigung_id_seq TO vilesci;
@@ -45636,7 +45636,7 @@ GRANT SELECT,UPDATE ON SEQUENCE tbl_benutzerrolle_benutzerberechtigung_id_seq TO
 
 REVOKE ALL ON TABLE tbl_berechtigung FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_berechtigung FROM postgres;
-GRANT ALL ON TABLE tbl_berechtigung TO postgres;
+GRANT ALL ON TABLE tbl_berechtigung TO fhcomplete;
 GRANT SELECT ON TABLE tbl_berechtigung TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_berechtigung TO admin;
 GRANT SELECT ON TABLE tbl_berechtigung TO wawi;
@@ -45649,7 +45649,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_berechtigung TO vilesci;
 
 REVOKE ALL ON TABLE tbl_cronjob FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_cronjob FROM postgres;
-GRANT ALL ON TABLE tbl_cronjob TO postgres;
+GRANT ALL ON TABLE tbl_cronjob TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_cronjob TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_cronjob TO vilesci;
 
@@ -45660,7 +45660,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_cronjob TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_cronjob_cronjob_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_cronjob_cronjob_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_cronjob_cronjob_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_cronjob_cronjob_id_seq TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_cronjob_cronjob_id_seq TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_cronjob_cronjob_id_seq TO vilesci;
 
@@ -45671,7 +45671,7 @@ GRANT SELECT,UPDATE ON SEQUENCE tbl_cronjob_cronjob_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_rolle FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_rolle FROM postgres;
-GRANT ALL ON TABLE tbl_rolle TO postgres;
+GRANT ALL ON TABLE tbl_rolle TO fhcomplete;
 GRANT SELECT ON TABLE tbl_rolle TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_rolle TO admin;
 GRANT SELECT ON TABLE tbl_rolle TO wawi;
@@ -45684,7 +45684,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_rolle TO vilesci;
 
 REVOKE ALL ON TABLE tbl_rolleberechtigung FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_rolleberechtigung FROM postgres;
-GRANT ALL ON TABLE tbl_rolleberechtigung TO postgres;
+GRANT ALL ON TABLE tbl_rolleberechtigung TO fhcomplete;
 GRANT SELECT ON TABLE tbl_rolleberechtigung TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_rolleberechtigung TO admin;
 GRANT SELECT ON TABLE tbl_rolleberechtigung TO wawi;
@@ -45697,7 +45697,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_rolleberechtigung TO vilesci;
 
 REVOKE ALL ON TABLE tbl_server FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_server FROM postgres;
-GRANT ALL ON TABLE tbl_server TO postgres;
+GRANT ALL ON TABLE tbl_server TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_server TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_server TO vilesci;
 
@@ -45708,7 +45708,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_server TO vilesci;
 
 REVOKE ALL ON TABLE tbl_webservicelog FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_webservicelog FROM postgres;
-GRANT ALL ON TABLE tbl_webservicelog TO postgres;
+GRANT ALL ON TABLE tbl_webservicelog TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_webservicelog TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_webservicelog TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_webservicelog TO vilesci;
@@ -45720,7 +45720,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_webservicelog TO vilesci;
 
 REVOKE ALL ON TABLE tbl_webservicerecht FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_webservicerecht FROM postgres;
-GRANT ALL ON TABLE tbl_webservicerecht TO postgres;
+GRANT ALL ON TABLE tbl_webservicerecht TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_webservicerecht TO admin;
 GRANT SELECT ON TABLE tbl_webservicerecht TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_webservicerecht TO vilesci;
@@ -45732,7 +45732,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_webservicerecht TO vilesci;
 
 REVOKE ALL ON TABLE tbl_webservicetyp FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_webservicetyp FROM postgres;
-GRANT ALL ON TABLE tbl_webservicetyp TO postgres;
+GRANT ALL ON TABLE tbl_webservicetyp TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_webservicetyp TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_webservicetyp TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_webservicetyp TO vilesci;
@@ -45746,7 +45746,7 @@ SET search_path = testtool, pg_catalog;
 
 REVOKE ALL ON TABLE tbl_ablauf FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_ablauf FROM postgres;
-GRANT ALL ON TABLE tbl_ablauf TO postgres;
+GRANT ALL ON TABLE tbl_ablauf TO fhcomplete;
 GRANT SELECT ON TABLE tbl_ablauf TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_ablauf TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_ablauf TO vilesci;
@@ -45758,7 +45758,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_ablauf TO vilesci;
 
 REVOKE ALL ON TABLE tbl_antwort FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_antwort FROM postgres;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_antwort TO postgres;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_antwort TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_antwort TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_antwort TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_antwort TO vilesci;
@@ -45770,7 +45770,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_antwort TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_antwort_antwort_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_antwort_antwort_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_antwort_antwort_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_antwort_antwort_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_antwort_antwort_id_seq TO web;
 
 
@@ -45780,7 +45780,7 @@ GRANT ALL ON SEQUENCE tbl_antwort_antwort_id_seq TO web;
 
 REVOKE ALL ON TABLE tbl_frage FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_frage FROM postgres;
-GRANT ALL ON TABLE tbl_frage TO postgres;
+GRANT ALL ON TABLE tbl_frage TO fhcomplete;
 GRANT SELECT,INSERT,UPDATE ON TABLE tbl_frage TO web;
 GRANT SELECT,INSERT,UPDATE ON TABLE tbl_frage TO admin;
 GRANT SELECT,INSERT,UPDATE ON TABLE tbl_frage TO vilesci;
@@ -45792,7 +45792,7 @@ GRANT SELECT,INSERT,UPDATE ON TABLE tbl_frage TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_frage_frage_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_frage_frage_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_frage_frage_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_frage_frage_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_frage_frage_id_seq TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_frage_frage_id_seq TO web;
 GRANT ALL ON SEQUENCE tbl_frage_frage_id_seq TO vilesci;
@@ -45804,7 +45804,7 @@ GRANT ALL ON SEQUENCE tbl_frage_frage_id_seq TO vilesci;
 
 REVOKE ALL ON TABLE tbl_frage_sprache FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_frage_sprache FROM postgres;
-GRANT ALL ON TABLE tbl_frage_sprache TO postgres;
+GRANT ALL ON TABLE tbl_frage_sprache TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_frage_sprache TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_frage_sprache TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_frage_sprache TO vilesci;
@@ -45816,7 +45816,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_frage_sprache TO vilesci;
 
 REVOKE ALL ON TABLE tbl_gebiet FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_gebiet FROM postgres;
-GRANT ALL ON TABLE tbl_gebiet TO postgres;
+GRANT ALL ON TABLE tbl_gebiet TO fhcomplete;
 GRANT SELECT,UPDATE ON TABLE tbl_gebiet TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_gebiet TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_gebiet TO vilesci;
@@ -45828,7 +45828,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_gebiet TO vilesci;
 
 REVOKE ALL ON TABLE tbl_kategorie FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_kategorie FROM postgres;
-GRANT ALL ON TABLE tbl_kategorie TO postgres;
+GRANT ALL ON TABLE tbl_kategorie TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_kategorie TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_kategorie TO vilesci;
 
@@ -45839,7 +45839,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_kategorie TO vilesci;
 
 REVOKE ALL ON TABLE tbl_kriterien FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_kriterien FROM postgres;
-GRANT ALL ON TABLE tbl_kriterien TO postgres;
+GRANT ALL ON TABLE tbl_kriterien TO fhcomplete;
 GRANT SELECT ON TABLE tbl_kriterien TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_kriterien TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_kriterien TO vilesci;
@@ -45851,7 +45851,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_kriterien TO vilesci;
 
 REVOKE ALL ON TABLE tbl_pruefling FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_pruefling FROM postgres;
-GRANT ALL ON TABLE tbl_pruefling TO postgres;
+GRANT ALL ON TABLE tbl_pruefling TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_pruefling TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_pruefling TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_pruefling TO vilesci;
@@ -45863,7 +45863,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_pruefling TO vilesci;
 
 REVOKE ALL ON TABLE tbl_pruefling_frage FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_pruefling_frage FROM postgres;
-GRANT ALL ON TABLE tbl_pruefling_frage TO postgres;
+GRANT ALL ON TABLE tbl_pruefling_frage TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_pruefling_frage TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_pruefling_frage TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_pruefling_frage TO vilesci;
@@ -45875,7 +45875,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_pruefling_frage TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_pruefling_frage_prueflingfrage_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_pruefling_frage_prueflingfrage_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_pruefling_frage_prueflingfrage_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_pruefling_frage_prueflingfrage_id_seq TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_pruefling_frage_prueflingfrage_id_seq TO web;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_pruefling_frage_prueflingfrage_id_seq TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_pruefling_frage_prueflingfrage_id_seq TO vilesci;
@@ -45887,7 +45887,7 @@ GRANT SELECT,UPDATE ON SEQUENCE tbl_pruefling_frage_prueflingfrage_id_seq TO vil
 
 REVOKE ALL ON SEQUENCE tbl_pruefling_pruefling_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_pruefling_pruefling_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_pruefling_pruefling_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_pruefling_pruefling_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_pruefling_pruefling_id_seq TO web;
 
 
@@ -45897,7 +45897,7 @@ GRANT ALL ON SEQUENCE tbl_pruefling_pruefling_id_seq TO web;
 
 REVOKE ALL ON TABLE tbl_vorschlag FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_vorschlag FROM postgres;
-GRANT ALL ON TABLE tbl_vorschlag TO postgres;
+GRANT ALL ON TABLE tbl_vorschlag TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_vorschlag TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_vorschlag TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_vorschlag TO vilesci;
@@ -45909,7 +45909,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_vorschlag TO vilesci;
 
 REVOKE ALL ON TABLE tbl_vorschlag_sprache FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_vorschlag_sprache FROM postgres;
-GRANT ALL ON TABLE tbl_vorschlag_sprache TO postgres;
+GRANT ALL ON TABLE tbl_vorschlag_sprache TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_vorschlag_sprache TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_vorschlag_sprache TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_vorschlag_sprache TO vilesci;
@@ -45921,7 +45921,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_vorschlag_sprache TO vilesci;
 
 REVOKE ALL ON SEQUENCE tbl_vorschlag_vorschlag_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_vorschlag_vorschlag_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_vorschlag_vorschlag_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_vorschlag_vorschlag_id_seq TO fhcomplete;
 GRANT ALL ON SEQUENCE tbl_vorschlag_vorschlag_id_seq TO web;
 
 
@@ -45931,7 +45931,7 @@ GRANT ALL ON SEQUENCE tbl_vorschlag_vorschlag_id_seq TO web;
 
 REVOKE ALL ON TABLE vw_ablauf FROM PUBLIC;
 REVOKE ALL ON TABLE vw_ablauf FROM postgres;
-GRANT ALL ON TABLE vw_ablauf TO postgres;
+GRANT ALL ON TABLE vw_ablauf TO fhcomplete;
 GRANT SELECT ON TABLE vw_ablauf TO web;
 
 
@@ -45941,7 +45941,7 @@ GRANT SELECT ON TABLE vw_ablauf TO web;
 
 REVOKE ALL ON TABLE vw_auswertung FROM PUBLIC;
 REVOKE ALL ON TABLE vw_auswertung FROM postgres;
-GRANT ALL ON TABLE vw_auswertung TO postgres;
+GRANT ALL ON TABLE vw_auswertung TO fhcomplete;
 GRANT SELECT ON TABLE vw_auswertung TO web;
 GRANT SELECT ON TABLE vw_auswertung TO admin;
 GRANT SELECT ON TABLE vw_auswertung TO vilesci;
@@ -45953,7 +45953,7 @@ GRANT SELECT ON TABLE vw_auswertung TO vilesci;
 
 REVOKE ALL ON TABLE vw_auswertung_ablauf FROM PUBLIC;
 REVOKE ALL ON TABLE vw_auswertung_ablauf FROM postgres;
-GRANT ALL ON TABLE vw_auswertung_ablauf TO postgres;
+GRANT ALL ON TABLE vw_auswertung_ablauf TO fhcomplete;
 GRANT SELECT ON TABLE vw_auswertung_ablauf TO web;
 GRANT SELECT ON TABLE vw_auswertung_ablauf TO admin;
 GRANT SELECT ON TABLE vw_auswertung_ablauf TO vilesci;
@@ -45965,7 +45965,7 @@ GRANT SELECT ON TABLE vw_auswertung_ablauf TO vilesci;
 
 REVOKE ALL ON TABLE vw_auswertung_kategorie FROM PUBLIC;
 REVOKE ALL ON TABLE vw_auswertung_kategorie FROM postgres;
-GRANT ALL ON TABLE vw_auswertung_kategorie TO postgres;
+GRANT ALL ON TABLE vw_auswertung_kategorie TO fhcomplete;
 GRANT SELECT ON TABLE vw_auswertung_kategorie TO web;
 GRANT SELECT ON TABLE vw_auswertung_kategorie TO admin;
 GRANT SELECT ON TABLE vw_auswertung_kategorie TO vilesci;
@@ -45977,7 +45977,7 @@ GRANT SELECT ON TABLE vw_auswertung_kategorie TO vilesci;
 
 REVOKE ALL ON TABLE vw_auswertung_kategorie_semester FROM PUBLIC;
 REVOKE ALL ON TABLE vw_auswertung_kategorie_semester FROM postgres;
-GRANT ALL ON TABLE vw_auswertung_kategorie_semester TO postgres;
+GRANT ALL ON TABLE vw_auswertung_kategorie_semester TO fhcomplete;
 GRANT SELECT ON TABLE vw_auswertung_kategorie_semester TO web;
 GRANT SELECT ON TABLE vw_auswertung_kategorie_semester TO vilesci;
 
@@ -45988,7 +45988,7 @@ GRANT SELECT ON TABLE vw_auswertung_kategorie_semester TO vilesci;
 
 REVOKE ALL ON TABLE vw_pruefling FROM PUBLIC;
 REVOKE ALL ON TABLE vw_pruefling FROM postgres;
-GRANT ALL ON TABLE vw_pruefling TO postgres;
+GRANT ALL ON TABLE vw_pruefling TO fhcomplete;
 GRANT SELECT ON TABLE vw_pruefling TO web;
 GRANT SELECT ON TABLE vw_pruefling TO admin;
 GRANT SELECT ON TABLE vw_pruefling TO vilesci;
@@ -46002,7 +46002,7 @@ SET search_path = wawi, pg_catalog;
 
 REVOKE ALL ON SEQUENCE seq_aufteilung_aufteilung_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_aufteilung_aufteilung_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_aufteilung_aufteilung_id TO postgres;
+GRANT ALL ON SEQUENCE seq_aufteilung_aufteilung_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_aufteilung_aufteilung_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_aufteilung_aufteilung_id TO wawi;
 GRANT SELECT,UPDATE ON SEQUENCE seq_aufteilung_aufteilung_id TO vilesci;
@@ -46014,7 +46014,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_aufteilung_aufteilung_id TO vilesci;
 
 REVOKE ALL ON SEQUENCE seq_aufteilung_default_aufteilung_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_aufteilung_default_aufteilung_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_aufteilung_default_aufteilung_id TO postgres;
+GRANT ALL ON SEQUENCE seq_aufteilung_default_aufteilung_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_aufteilung_default_aufteilung_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_aufteilung_default_aufteilung_id TO wawi;
 GRANT SELECT,UPDATE ON SEQUENCE seq_aufteilung_default_aufteilung_id TO vilesci;
@@ -46026,7 +46026,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_aufteilung_default_aufteilung_id TO vilesci;
 
 REVOKE ALL ON SEQUENCE seq_bestelldetail_bestelldetail_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_bestelldetail_bestelldetail_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_bestelldetail_bestelldetail_id TO postgres;
+GRANT ALL ON SEQUENCE seq_bestelldetail_bestelldetail_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_bestelldetail_bestelldetail_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_bestelldetail_bestelldetail_id TO wawi;
 GRANT SELECT,UPDATE ON SEQUENCE seq_bestelldetail_bestelldetail_id TO vilesci;
@@ -46038,7 +46038,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_bestelldetail_bestelldetail_id TO vilesci;
 
 REVOKE ALL ON SEQUENCE seq_bestellung_bestellstatus_bestellung_bestellstatus_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_bestellung_bestellstatus_bestellung_bestellstatus_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_bestellung_bestellstatus_bestellung_bestellstatus_id TO postgres;
+GRANT ALL ON SEQUENCE seq_bestellung_bestellstatus_bestellung_bestellstatus_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_bestellung_bestellstatus_bestellung_bestellstatus_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_bestellung_bestellstatus_bestellung_bestellstatus_id TO wawi;
 GRANT SELECT,UPDATE ON SEQUENCE seq_bestellung_bestellstatus_bestellung_bestellstatus_id TO vilesci;
@@ -46050,7 +46050,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_bestellung_bestellstatus_bestellung_bestells
 
 REVOKE ALL ON SEQUENCE seq_bestellung_bestellung_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_bestellung_bestellung_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_bestellung_bestellung_id TO postgres;
+GRANT ALL ON SEQUENCE seq_bestellung_bestellung_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_bestellung_bestellung_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_bestellung_bestellung_id TO wawi;
 GRANT SELECT,UPDATE ON SEQUENCE seq_bestellung_bestellung_id TO vilesci;
@@ -46062,7 +46062,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_bestellung_bestellung_id TO vilesci;
 
 REVOKE ALL ON SEQUENCE seq_konto_konto_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_konto_konto_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_konto_konto_id TO postgres;
+GRANT ALL ON SEQUENCE seq_konto_konto_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_konto_konto_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_konto_konto_id TO wawi;
 GRANT SELECT,UPDATE ON SEQUENCE seq_konto_konto_id TO vilesci;
@@ -46074,7 +46074,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_konto_konto_id TO vilesci;
 
 REVOKE ALL ON SEQUENCE seq_kostenstelle_kostenstelle_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_kostenstelle_kostenstelle_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_kostenstelle_kostenstelle_id TO postgres;
+GRANT ALL ON SEQUENCE seq_kostenstelle_kostenstelle_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_kostenstelle_kostenstelle_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_kostenstelle_kostenstelle_id TO wawi;
 GRANT SELECT,UPDATE ON SEQUENCE seq_kostenstelle_kostenstelle_id TO vilesci;
@@ -46086,7 +46086,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_kostenstelle_kostenstelle_id TO vilesci;
 
 REVOKE ALL ON SEQUENCE seq_rechnung_rechnung_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_rechnung_rechnung_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_rechnung_rechnung_id TO postgres;
+GRANT ALL ON SEQUENCE seq_rechnung_rechnung_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_rechnung_rechnung_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_rechnung_rechnung_id TO wawi;
 GRANT SELECT,UPDATE ON SEQUENCE seq_rechnung_rechnung_id TO vilesci;
@@ -46098,7 +46098,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_rechnung_rechnung_id TO vilesci;
 
 REVOKE ALL ON SEQUENCE seq_rechnungsbetrag_rechnungsbetrag_id FROM PUBLIC;
 REVOKE ALL ON SEQUENCE seq_rechnungsbetrag_rechnungsbetrag_id FROM postgres;
-GRANT ALL ON SEQUENCE seq_rechnungsbetrag_rechnungsbetrag_id TO postgres;
+GRANT ALL ON SEQUENCE seq_rechnungsbetrag_rechnungsbetrag_id TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE seq_rechnungsbetrag_rechnungsbetrag_id TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE seq_rechnungsbetrag_rechnungsbetrag_id TO wawi;
 GRANT SELECT,UPDATE ON SEQUENCE seq_rechnungsbetrag_rechnungsbetrag_id TO vilesci;
@@ -46110,7 +46110,7 @@ GRANT SELECT,UPDATE ON SEQUENCE seq_rechnungsbetrag_rechnungsbetrag_id TO vilesc
 
 REVOKE ALL ON TABLE tbl_aufteilung FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_aufteilung FROM postgres;
-GRANT ALL ON TABLE tbl_aufteilung TO postgres;
+GRANT ALL ON TABLE tbl_aufteilung TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_aufteilung TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_aufteilung TO wawi;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_aufteilung TO vilesci;
@@ -46122,7 +46122,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_aufteilung TO vilesci;
 
 REVOKE ALL ON TABLE tbl_aufteilung_default FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_aufteilung_default FROM postgres;
-GRANT ALL ON TABLE tbl_aufteilung_default TO postgres;
+GRANT ALL ON TABLE tbl_aufteilung_default TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_aufteilung_default TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_aufteilung_default TO wawi;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_aufteilung_default TO vilesci;
@@ -46134,7 +46134,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_aufteilung_default TO vilesci;
 
 REVOKE ALL ON TABLE tbl_bestelldetail FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_bestelldetail FROM postgres;
-GRANT ALL ON TABLE tbl_bestelldetail TO postgres;
+GRANT ALL ON TABLE tbl_bestelldetail TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bestelldetail TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bestelldetail TO wawi;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bestelldetail TO vilesci;
@@ -46146,7 +46146,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bestelldetail TO vilesci;
 
 REVOKE ALL ON TABLE tbl_bestelldetailtag FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_bestelldetailtag FROM postgres;
-GRANT ALL ON TABLE tbl_bestelldetailtag TO postgres;
+GRANT ALL ON TABLE tbl_bestelldetailtag TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bestelldetailtag TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bestelldetailtag TO wawi;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bestelldetailtag TO vilesci;
@@ -46158,7 +46158,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bestelldetailtag TO vilesci;
 
 REVOKE ALL ON TABLE tbl_bestellstatus FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_bestellstatus FROM postgres;
-GRANT ALL ON TABLE tbl_bestellstatus TO postgres;
+GRANT ALL ON TABLE tbl_bestellstatus TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bestellstatus TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bestellstatus TO wawi;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bestellstatus TO vilesci;
@@ -46170,7 +46170,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bestellstatus TO vilesci;
 
 REVOKE ALL ON TABLE tbl_bestellung FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_bestellung FROM postgres;
-GRANT ALL ON TABLE tbl_bestellung TO postgres;
+GRANT ALL ON TABLE tbl_bestellung TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bestellung TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bestellung TO wawi;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bestellung TO vilesci;
@@ -46182,7 +46182,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bestellung TO vilesci;
 
 REVOKE ALL ON TABLE tbl_bestellung_bestellstatus FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_bestellung_bestellstatus FROM postgres;
-GRANT ALL ON TABLE tbl_bestellung_bestellstatus TO postgres;
+GRANT ALL ON TABLE tbl_bestellung_bestellstatus TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bestellung_bestellstatus TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bestellung_bestellstatus TO wawi;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bestellung_bestellstatus TO vilesci;
@@ -46194,7 +46194,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bestellung_bestellstatus TO viles
 
 REVOKE ALL ON TABLE tbl_bestellungtag FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_bestellungtag FROM postgres;
-GRANT ALL ON TABLE tbl_bestellungtag TO postgres;
+GRANT ALL ON TABLE tbl_bestellungtag TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bestellungtag TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bestellungtag TO wawi;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bestellungtag TO vilesci;
@@ -46206,7 +46206,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_bestellungtag TO vilesci;
 
 REVOKE ALL ON TABLE tbl_betriebsmittel_betriebsmittelstatus FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_betriebsmittel_betriebsmittelstatus FROM postgres;
-GRANT ALL ON TABLE tbl_betriebsmittel_betriebsmittelstatus TO postgres;
+GRANT ALL ON TABLE tbl_betriebsmittel_betriebsmittelstatus TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_betriebsmittel_betriebsmittelstatus TO admin;
 GRANT SELECT ON TABLE tbl_betriebsmittel_betriebsmittelstatus TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_betriebsmittel_betriebsmittelstatus TO vilesci;
@@ -46218,7 +46218,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_betriebsmittel_betriebsmittelstat
 
 REVOKE ALL ON SEQUENCE tbl_betriebsmittel_betriebsmi_betriebsmittelbetriebsmittels_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_betriebsmittel_betriebsmi_betriebsmittelbetriebsmittels_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_betriebsmittel_betriebsmi_betriebsmittelbetriebsmittels_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_betriebsmittel_betriebsmi_betriebsmittelbetriebsmittels_seq TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_betriebsmittel_betriebsmi_betriebsmittelbetriebsmittels_seq TO web;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_betriebsmittel_betriebsmi_betriebsmittelbetriebsmittels_seq TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_betriebsmittel_betriebsmi_betriebsmittelbetriebsmittels_seq TO vilesci;
@@ -46230,7 +46230,7 @@ GRANT SELECT,UPDATE ON SEQUENCE tbl_betriebsmittel_betriebsmi_betriebsmittelbetr
 
 REVOKE ALL ON SEQUENCE tbl_betriebsmittel_betriebsmittel_id_seq FROM PUBLIC;
 REVOKE ALL ON SEQUENCE tbl_betriebsmittel_betriebsmittel_id_seq FROM postgres;
-GRANT ALL ON SEQUENCE tbl_betriebsmittel_betriebsmittel_id_seq TO postgres;
+GRANT ALL ON SEQUENCE tbl_betriebsmittel_betriebsmittel_id_seq TO fhcomplete;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_betriebsmittel_betriebsmittel_id_seq TO web;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_betriebsmittel_betriebsmittel_id_seq TO admin;
 GRANT SELECT,UPDATE ON SEQUENCE tbl_betriebsmittel_betriebsmittel_id_seq TO vilesci;
@@ -46242,7 +46242,7 @@ GRANT SELECT,UPDATE ON SEQUENCE tbl_betriebsmittel_betriebsmittel_id_seq TO vile
 
 REVOKE ALL ON TABLE tbl_betriebsmittelstatus FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_betriebsmittelstatus FROM postgres;
-GRANT ALL ON TABLE tbl_betriebsmittelstatus TO postgres;
+GRANT ALL ON TABLE tbl_betriebsmittelstatus TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_betriebsmittelstatus TO admin;
 GRANT SELECT ON TABLE tbl_betriebsmittelstatus TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_betriebsmittelstatus TO vilesci;
@@ -46254,7 +46254,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_betriebsmittelstatus TO vilesci;
 
 REVOKE ALL ON TABLE tbl_betriebsmitteltyp FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_betriebsmitteltyp FROM postgres;
-GRANT ALL ON TABLE tbl_betriebsmitteltyp TO postgres;
+GRANT ALL ON TABLE tbl_betriebsmitteltyp TO fhcomplete;
 GRANT SELECT ON TABLE tbl_betriebsmitteltyp TO web;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_betriebsmitteltyp TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_betriebsmitteltyp TO vilesci;
@@ -46266,7 +46266,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_betriebsmitteltyp TO vilesci;
 
 REVOKE ALL ON TABLE tbl_budget FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_budget FROM postgres;
-GRANT ALL ON TABLE tbl_budget TO postgres;
+GRANT ALL ON TABLE tbl_budget TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_budget TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_budget TO wawi;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_budget TO vilesci;
@@ -46278,7 +46278,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_budget TO vilesci;
 
 REVOKE ALL ON TABLE tbl_konto FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_konto FROM postgres;
-GRANT ALL ON TABLE tbl_konto TO postgres;
+GRANT ALL ON TABLE tbl_konto TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_konto TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_konto TO wawi;
 
@@ -46289,7 +46289,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_konto TO wawi;
 
 REVOKE ALL ON TABLE tbl_konto_kostenstelle FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_konto_kostenstelle FROM postgres;
-GRANT ALL ON TABLE tbl_konto_kostenstelle TO postgres;
+GRANT ALL ON TABLE tbl_konto_kostenstelle TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_konto_kostenstelle TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_konto_kostenstelle TO wawi;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_konto_kostenstelle TO vilesci;
@@ -46301,7 +46301,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_konto_kostenstelle TO vilesci;
 
 REVOKE ALL ON TABLE tbl_kostenstelle FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_kostenstelle FROM postgres;
-GRANT ALL ON TABLE tbl_kostenstelle TO postgres;
+GRANT ALL ON TABLE tbl_kostenstelle TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_kostenstelle TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_kostenstelle TO wawi;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_kostenstelle TO vilesci;
@@ -46313,7 +46313,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_kostenstelle TO vilesci;
 
 REVOKE ALL ON TABLE tbl_projekt_bestellung FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_projekt_bestellung FROM postgres;
-GRANT ALL ON TABLE tbl_projekt_bestellung TO postgres;
+GRANT ALL ON TABLE tbl_projekt_bestellung TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projekt_bestellung TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projekt_bestellung TO wawi;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projekt_bestellung TO vilesci;
@@ -46325,7 +46325,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_projekt_bestellung TO vilesci;
 
 REVOKE ALL ON TABLE tbl_rechnung FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_rechnung FROM postgres;
-GRANT ALL ON TABLE tbl_rechnung TO postgres;
+GRANT ALL ON TABLE tbl_rechnung TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_rechnung TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_rechnung TO wawi;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_rechnung TO vilesci;
@@ -46337,7 +46337,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_rechnung TO vilesci;
 
 REVOKE ALL ON TABLE tbl_rechnungsbetrag FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_rechnungsbetrag FROM postgres;
-GRANT ALL ON TABLE tbl_rechnungsbetrag TO postgres;
+GRANT ALL ON TABLE tbl_rechnungsbetrag TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_rechnungsbetrag TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_rechnungsbetrag TO wawi;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_rechnungsbetrag TO vilesci;
@@ -46349,7 +46349,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_rechnungsbetrag TO vilesci;
 
 REVOKE ALL ON TABLE tbl_rechnungstyp FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_rechnungstyp FROM postgres;
-GRANT ALL ON TABLE tbl_rechnungstyp TO postgres;
+GRANT ALL ON TABLE tbl_rechnungstyp TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_rechnungstyp TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_rechnungstyp TO wawi;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_rechnungstyp TO vilesci;
@@ -46361,7 +46361,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_rechnungstyp TO vilesci;
 
 REVOKE ALL ON TABLE tbl_zahlungstyp FROM PUBLIC;
 REVOKE ALL ON TABLE tbl_zahlungstyp FROM postgres;
-GRANT ALL ON TABLE tbl_zahlungstyp TO postgres;
+GRANT ALL ON TABLE tbl_zahlungstyp TO fhcomplete;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zahlungstyp TO admin;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zahlungstyp TO wawi;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE tbl_zahlungstyp TO vilesci;
