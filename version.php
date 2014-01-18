@@ -21,6 +21,6 @@
  **/
 
 // Version
-$fhcomplete_version = '2.2';
+$fhcomplete_version = '3.0';
 
 ?>
