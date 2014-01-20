@@ -28,7 +28,7 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 class studienplatz extends basis_db
 {
 	/** @var $new boolean */
-	private $new;			
+	private $new = true;		
 	/** @var DB-Result */
 	private $result;
 	/** @var object */
@@ -50,9 +50,9 @@ class studienplatz extends basis_db
 	/** @var integer */
 	private $npz;            		
 	/** @var timestamp */
-	private $updateamum;			
+	private $updateamum;	
 	/** @var string */
-	private $studienplatz_id;		
+	private $updatevon;		
 	/** @var timestamp */
 	private $insertamum;      		
 	/** @var string */
@@ -70,6 +70,29 @@ class studienplatz extends basis_db
 			$this->load($studienplatz_id);
 	}
 
+	public function __set($name,$value)
+	{
+		switch ($name)
+		{
+			case 'gpz':
+			case 'npz':
+			case 'ausbildungssemester':
+			case 'studienplatz_id':
+				if (!is_numeric($value))
+					throw new Exception("Attribute $name must be numeric!");
+				$this->$name=$value;
+				break;
+			default:
+				$this->$name=$value;
+		}
+	}
+
+	public function __get($name)
+	{
+		return $this->$name;
+	}
+	
+	
 	/**
 	 * Laedt einzelnen Studienplatz der ID $studienplatz_id
 	 * @param integer $studienplatz_id ID des zu ladenden Studienplatzes
@@ -218,11 +241,10 @@ class studienplatz extends basis_db
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
-			$qry='BEGIN;INSERT INTO lehre.tbl_studienplatz (studienplatz_id, '.
+			$qry='BEGIN;INSERT INTO lehre.tbl_studienplatz ('.
 				 'studiengang_kz, orgform_kurzbz, studiensemester_kurzbz, '.
 				 'ausbildungssemester, gpz, npz, insertamum, insertvon, '.
-			     'updateamum, updatevon) VALUES('.
-			      $this->db_add_param($this->studienplatz_id, FHC_INTEGER).', '.
+			     'updateamum, updatevon) VALUES('.			      
 			      $this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
 			      $this->db_add_param($this->orgform_kurzbz).', '.
 			      $this->db_add_param($this->studiensemester_kurzbz).', '.			     

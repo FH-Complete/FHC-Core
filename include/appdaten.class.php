@@ -21,6 +21,7 @@
  * 
  *
  * Authors: Martin Tatzber <tatzberm@technikum-wien.at
+ *          Werner Masik <werner@gefi.at>
  */
 
 require_once(dirname(__FILE__).'/basis_db.class.php');
@@ -62,10 +63,12 @@ class appdaten extends basis_db
 		return $this->$name;
 	}
 	
+
+	
 	/**
 	 * Laden von Appdaten
 	 * @param appdaten_id ID des Datensatzes, der geladen werden soll
-	 * @return true wenn ok, false im Fehlerfall
+	 * @return boolean true wenn ok, false im Fehlerfall
 	 */
 	public function load($appdaten_id)
 	{
@@ -81,18 +84,7 @@ class appdaten extends basis_db
 		{
 			if($row = $this->db_fetch_object())
 			{
-				$this->appdaten_id=$row->appdaten_id;
-				$this->uid=$row->uid;
-				$this->app=$row->app;
-				$this->appversion=$row->appversion;
-				$this->version=$row->version;
-				$this->bezeichnung=$row->bezeichnung;
-				$this->daten=$row->daten;
-				$this->freigabe=$this->db_parse_bool($row->freigabe);
-				$this->insertamum=$row->insertamum;
-				$this->insertvon=$row->insertvon;
-				$this->updatenamum=$row->updateamum;
-				$this->updatevon=$row->updatenvon;
+				$this->mapRow($this, $row);
 			}
 		}
 		else
@@ -105,17 +97,69 @@ class appdaten extends basis_db
 	}
 
 	/**
+	 * Laden aller Appdaten sortiert nach Bezeichnung und version
+	 * @param string app name
+	 * @return array mit appdaten
+	 */
+	public function getAllByApp($app)
+	{
+		$result = array();
+		$qry = "SELECT * FROM system.tbl_appdaten ".
+		       "WHERE app=".$this->db_add_param($app, FHC_STRING, false).' '.
+		       "ORDER BY bezeichnung,version";
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$appData = new appdaten();
+				$this->mapRow($appData, $row);		
+				$result[] = $appData;		
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Datensatz konnte nicht geladen werden';
+			return false;
+		}
+
+		return $result;
+		
+	}
+
+	/**
+	 * Helper
+	 * @param type $target
+	 * @param type $row
+	 */
+	private function mapRow($target,$row) {		
+		$target->appdaten_id=$row->appdaten_id;
+		$target->uid=$row->uid;
+		$target->app=$row->app;
+		$target->appversion=$row->appversion;
+		$target->version=$row->version;
+		$target->bezeichnung=$row->bezeichnung;
+		$target->daten=$row->daten;
+		$target->freigabe=$this->db_parse_bool($row->freigabe);
+		$target->insertamum=$row->insertamum;
+		$target->insertvon=$row->insertvon;
+		$target->updatenamum=$row->updateamum;
+		$target->updatevon=$row->updatevon;
+	}
+
+	/**
 	 * Prueft die Variablen auf Gueltigkeit
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	protected function validate()
 	{
 		//Zahlenfelder pruefen
+		/* version wird beim speichern automatisch gesetzt
 		if(!is_numeric($this->version) && $this->version!=='')
 		{
 			$this->errormsg='version enthaelt ungueltige Zeichen';
 			return false;
-		}
+		}*/
 
 		//Gesamtlaenge pruefen
 		if(mb_strlen($this->uid)>32)
@@ -152,18 +196,53 @@ class appdaten extends basis_db
 	
 	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank
+	 * @param neueVersion boolean default false; wenn gesetzt, dann
+	 * wird Versionsnummer auf aktuelles Maximum+1 gesetzt. (für 'Save As'
+	 * Funktion bzw. zum Anlegen komplett neuer Daten)
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function save()
+	public function save($neueVersion=false)
 	{
 		//Variablen pruefen
 		if(!$this->validate())
 			return false;
 
-		if($this->new)
+		if($this->new || $neueVersion)
 		{
+			
+			$this->db_query('BEGIN');
+
+			if ($neueVersion) {
+				// höchste Versionsnummer holen
+				$qry =  "SELECT max(version) as version ".
+					"FROM system.tbl_appdaten ".
+					"WHERE app=".$this->db_add_param($this->app, FHC_STRING, false).
+					"AND bezeichnung=".$this->db_add_param($this->bezeichnung, FHC_STRING, false);
+					
+				if($this->db_query($qry))
+				{
+					if($row = $this->db_fetch_object()) 
+					{
+						if ($row->version != null || !is_numeric($this->version)) 
+						{
+							$this->version = $row->version + 1;
+						}
+						else
+						{
+							$this->version = 1;
+						}
+					}
+					else
+					{
+						$this->db_query('ROLLBACK');
+						$this->errormsg = "Fehler beim Auslesen der Version";
+						return false;
+					}
+				}
+			}
+			
 			//Neuen Datensatz einfuegen
-			$qry='BEGIN;INSERT INTO system.tbl_appdaten (uid, app, appversion, version,
+			$qry='INSERT INTO system.tbl_appdaten (uid, app, appversion, version,
 				bezeichnung, daten, freigabe, insertamum, insertvon) VALUES ('.
 			      $this->db_add_param($this->uid).', '.
 			      $this->db_add_param($this->app).', '.

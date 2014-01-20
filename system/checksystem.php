@@ -427,7 +427,11 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_studienplatz LIMIT 1;"))
 				orgform_kurzbz varchar(3),
 				ausbildungssemester smallint,
 				gpz integer,
-				npz integer
+				npz integer,
+				insertamum timestamp,
+				insertvon varchar(32),
+				updateamum timestamp,
+				updatevon varchar(32)
 			);
 		
 		CREATE SEQUENCE lehre.seq_studienplatz_studienplatz_id
