@@ -200,6 +200,32 @@ class benutzer extends person
 		}
 	}
 	
+	
+	/**
+	 * Löscht den Benutzer mit der übergebenen uid. Da beim Speichern auch
+	 * eine Person angelegt wird, muss eventuell auch diese gelöscht werden. 
+	 * Das kann durch Aufruf der geerbten Methode {@link person::delete()}  
+	 * erledigt werden. Damit die Klasse Abwärtskombatibel bleibt, wurde die
+	 * Methode delete() absichtlich nicht überschrieben.
+	 * @param $uid
+	 */
+	public function deleteBenutzer($uid)
+	{		
+		$qry = "DELETE from public.tbl_benutzer where uid = ".$this->db_add_param($uid).";"; 
+		
+		if($this->db_query($qry))
+		{
+			return true; 
+		}
+		else
+		{
+			$this->errormsg = "Es ist ein Fehler beim Löschen des Benutzers aufgetreten"; 
+			return false; 
+		}
+	}
+	
+	
+	
 	/**
 	 * Prueft ob die UID bereits existiert
 	 * @param uid
