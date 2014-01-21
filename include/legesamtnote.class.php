@@ -179,13 +179,13 @@ class legesamtnote extends basis_db
 		else
 		{
 			$qry = 'UPDATE campus.tbl_legesamtnote SET'.
-			       ' student_uid='.$this->db_add_para($this->student_uid).','.
+			       ' student_uid='.$this->db_add_param($this->student_uid).','.
 			       ' lehreinheit_id ='.$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).','.
 			       ' note='.$this->db_add_param($this->note, FHC_INTEGER).','.
 			       ' benotungsdatum='.$this->db_add_param($this->benotungsdatum).','.
 			       ' updateamum='.$this->db_add_param($this->updateamum).','.
 			       ' updatevon='.$this->db_add_param($this->updatevon).
-			       " WHERE lehreinheit_id=".$this->db_add_param($this->lehreinheit_id, FHC_INTEGER)." AND student_uid = ".$this->db_add_param(student_uid).";";
+			       " WHERE lehreinheit_id=".$this->db_add_param($this->lehreinheit_id, FHC_INTEGER)." AND student_uid = ".$this->db_add_param($this->student_uid).";";
 		}
 
 		if($this->db_query($qry))
