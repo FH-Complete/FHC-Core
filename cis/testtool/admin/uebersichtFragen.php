@@ -154,7 +154,7 @@ if(isset($_REQUEST['AuswahlGebiet']))
 		$spracheFrage = new frage();
 		$spracheFrage->getFrageSprache($fragen->frage_id, $sprache);
 		
-		echo "<b>&lt;NR:".$fragen->nummer."&gt;</b><br> ";
+		echo "<b>&lt;NR:".$fragen->nummer.($fragen->level!=""?"&nbsp;&nbsp;Level: ".$fragen->level."":"").($fragen->demo=="t"?"&nbsp;&nbsp;Demo":"")."&gt;</b><br> ";
 		//Sound einbinden
 		if($spracheFrage->audio!='')
 		{
