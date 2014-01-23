@@ -44,15 +44,21 @@ echo '<!DOCTYPE html>
 </head>
 <body>
 	<h1>Moodle 2.4 User Sync</h1>
+	Auf dieser Seite können die Teilnehmer eines Moodle 2.4 Kurses aktualisiert werden.
+	Geben Sie dazu die ID des Moodle Kurses ein.<br><br>
 	<form method="POST" action="'.$_SERVER['PHP_SELF'].'">
 	<table>
 		<tr>
 			<td>Moodle Kurs ID:</td>
-			<td><input type="text" name="mdl_course_id" value="" /></td>
+			<td><input type="text" name="mdl_course_id" size="5" value="" /></td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
 		</tr>
 		<tr>
 			<td></td>
-			<td><input type="submit" value="User anlegen" name="sync" /></td>
+			<td><input type="submit" value="User Zuteilung aktualisieren" name="sync" /></td>
 		</tr>
 	</table>
 </form>
@@ -64,7 +70,6 @@ if(isset($_POST['sync']))
 		$mdl_course_id = $_POST['mdl_course_id'];
 		
 		$moodle = new moodle24_user();
-		
 		echo '<br><h2>Übertrage LektorInnen</h2><br>';
 		if($moodle->sync_lektoren($mdl_course_id))
 		{
@@ -73,6 +78,8 @@ if(isset($_POST['sync']))
 		else
 			echo 'Fehler bei der Zuteilung:'.$moodle->errormsg;
 		
+
+		$moodle = new moodle24_user();
 		echo '<br><h2>Übertrage Studierende</h2><br>';
 		if($moodle->sync_studenten($mdl_course_id))
 		{
