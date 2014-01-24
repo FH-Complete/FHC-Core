@@ -24,6 +24,7 @@
  * @create 2007-05-14
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/'.EXT_FKT_PATH.'/generateZahlungsreferenz.inc.php');
 
 class konto extends basis_db
 {
@@ -185,11 +186,15 @@ class konto extends basis_db
 
 		if($new==null)
 			$new = $this->new;
-
+	
 		if($new)
 		{
+			//Zahlungsreferenz generieren
+			//TODO Buchungscode
+			//$this->zahlungsreferenz = generateZahlungsreferenz($this->person_id, $this->studiengang_kz, "CODE");
+			//$this->zahlungsreferenz = "WTF";
+			
 			//Neuen Datensatz einfuegen
-
 			$qry='BEGIN;INSERT INTO public.tbl_konto (person_id, studiengang_kz, studiensemester_kurzbz, buchungsnr_verweis, betrag, buchungsdatum, buchungstext, mahnspanne, buchungstyp_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id, credit_points) VALUES('.
 			     $this->addslashes($this->person_id).', '.
 			     $this->addslashes($this->studiengang_kz).', '.
@@ -240,6 +245,14 @@ class konto extends basis_db
 						if($row = $this->db_fetch_object())
 						{
 							$this->buchungsnr = $row->id;
+							if(strlen($this->buchungsnr_verweis) == 0)
+							{
+								if(!$this->addZahlungsreferenz($this->buchungsnr))
+								{
+									$this->db_query("ROLLBACK;");
+									return false;
+								}
+							}
 							$this->db_query('COMMIT;');
 						}
 						else
@@ -608,6 +621,26 @@ class konto extends basis_db
 			$this->errormsg = 'Fehler bei der Abfrage aufgetreten';
 			return false; 
 		}
+	}
+	
+	private function addZahlungsreferenz($buchungsnr)
+	{
+		$this->zahlungsreferenz = generateZahlungsreferenz($this->studiengang_kz, $buchungsnr);
+		
+		$qry = "UPDATE public.tbl_konto "
+				. "SET zahlungsreferenz='".$this->zahlungsreferenz."' "
+				. "WHERE buchungsnr='".$buchungsnr."';";
+		
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim speichern der Zahlungsreferenz aufgetreten';
+			return false; 
+		}
+		
 	}
 }
 ?>
