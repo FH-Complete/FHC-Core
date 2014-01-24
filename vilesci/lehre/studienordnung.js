@@ -538,6 +538,33 @@ function loadLVKompatibilitaet(lvid)
 {
 	$.ajax(
 	{
+		dataType: "json",
+		url: "../../soap/fhcomplete.php",
+		data: {
+				"typ": "json",
+				"class": "lehrveranstaltung",
+				"method": "getLVkompatibel",
+				"parameter_0":lvid
+			},
+		error: loadError
+	}).success(function(data)
+	{
+		var html='';
+		for(i in data.result)
+		{
+			if(data.result[i].metadata)
+			{
+				lvdata = data.result[i].metadata;
+				html = html+'<br>'+lvdata.bezeichnung+' (Studiengang '+lvdata.studiengang_kz+', Semester '+lvdata.semester+')';
+			}
+		}
+		$("#tab-kompatibel").html(html);
+		
+	});	
+	
+	/*
+	$.ajax(
+	{
 		dataType: "html",
 		url: "lehrveranstaltung_kompatibel.php",
 		type: "GET",
@@ -555,7 +582,7 @@ function loadLVKompatibilitaet(lvid)
 //		html+="<br>ECTS: "+lvdata.ects;
 //		html+="<br>Semesterstunden: "+lvdata.semesterstunden;
 		$("#tab-kompatibel").html(data);
-	});	
+	});*/	
 }
 
 

@@ -1092,7 +1092,8 @@ $webservicerecht = array(
 	array('soap/studienordnung','loadStudienordnungSTG','studienordnung'),
 	array('soap/studienordnung','loadStudienplan','studienplan'),
 	array('soap/studienordnung','saveSemesterZuordnung','studienordnung'),
-	array('soap/studienordnung','deleteSemesterZuordnung','studienordnung')
+	array('soap/studienordnung','deleteSemesterZuordnung','studienordnung'),
+	array('soap/studienordnung','getLVkompatibel','lehrveranstaltung')
 );
 
 foreach($webservicerecht as $row)
