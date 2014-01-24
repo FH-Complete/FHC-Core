@@ -282,7 +282,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 					"types" :  {
 						"lv" : {
 							icon : {
-								image : "../../include/js/jstree/icons/lehrveranstaltung.png"
+								image : "../../skin/images/lv.png"
 							}
 						},
 						"semester" : {
@@ -290,7 +290,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 						},
 						"modul" : {
 							icon : {
-								image : "../../include/js/jstree/icons/modul.png"
+								image : "../../skin/images/modul.png"
 							}
 						},
 						"lf" : {
@@ -731,13 +731,13 @@ function showLVTree(data)
 	//						"valid_children" : ["semester", "lv", "default"],
 							"lv" : {
 								icon : {
-									image : "../../include/js/jstree/icons/lehrveranstaltung.png"
+									image : "../../skin/images/lv.png"
 								}
 	//							max_children: 0
 							},
 							"modul" : {
 								icon : {
-									image : "../../include/js/jstree/icons/modul.png"
+									image : "../../skin/images/modul.png"
 								}
 							},
 							"lf" : {
@@ -905,8 +905,9 @@ function saveJsondataFromTree(nodeId, studienplan_id, studienplan_lehrveranstalt
 
 	var neu = true;
 	
-	if(studienplan_lehrveranstaltung_id !== undefined)
+	if(studienplan_lehrveranstaltung_id !== undefined && studienplan_lehrveranstaltung_id!='')
 		neu = false;
+
 	// Pruefen ob diese Zuordnung bereits vorhanden ist
 //	$.ajax(
 //	{	
@@ -931,7 +932,9 @@ function saveJsondataFromTree(nodeId, studienplan_id, studienplan_lehrveranstalt
 
 	// Bei neuen Eintraegen kein Load noetig
 	if(neu)
+	{
 		loaddata='';
+	}
 
 	// Wenn der Eintrag keine Verschiebung im Tree ist, und die Lehrveranstaltung bereits im
 	// Studienplan vorhanden ist -> Abbruch
