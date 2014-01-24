@@ -58,6 +58,7 @@ class konto extends basis_db
 	public $standardtext;
 	public $aktiv;
 	public $credit_points;
+	public $zahlungsreferenz;
 
 	/**
 	 * Konstruktor
@@ -113,6 +114,7 @@ class konto extends basis_db
 				$this->vorname = $row->vorname;
 				$this->vornamen = $row->vornamen;
 				$this->credit_points = $row->credit_points;
+				$this->zahlungsreferenz = $row->zahlungsreferenz;
 				return true;
 			}
 			else
