@@ -118,7 +118,11 @@
 				//Auszahlung
 			}
 			else
-				echo $p->t('tools/offen');
+			{
+				echo '<a onclick="window.open(';
+				echo "'zahlungen_details.php?buchungsnr=".$row['parent']->buchungsnr."','Zahlungsdetails','height=320,width=550,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=no,toolbar=no,location=no,menubar=no,dependent=yes');return false;";
+				echo '" href="#">'.$p->t('tools/offen').'</a>';
+			}
 			echo '</td>';
 			echo '</tr>';
 		}
