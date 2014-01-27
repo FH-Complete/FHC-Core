@@ -306,7 +306,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 						{
 							return {
 								"Delete" : {
-									"label" : "delete",
+									"label" : "Eintrag entfernen",
 									"action": function(obj){
 										if(obj.children().find("li").length === 0)
 										{
@@ -904,9 +904,8 @@ function saveJsondataFromTree(nodeId, studienplan_id, studienplan_lehrveranstalt
 		copy = true;
 	}
 	loaddata = {
-		"method" : "loadLehrveranstaltungStudienplanByLvId",
-		"parameter_0" : studienplan_id,
-		"parameter_1" : jsonData[0]["metadata"]["lehrveranstaltung_id"]
+		"method" : "loadStudienplanLehrveranstaltung",
+		"parameter_0" : studienplan_lehrveranstaltung_id
 	};
 
 	var node;
@@ -995,11 +994,17 @@ function saveJsondataFromTree(nodeId, studienplan_id, studienplan_lehrveranstalt
 		}
 	}).success(function(d)
 	{
-		node.attr("studienplan_lehrveranstaltung_id", d.result[0].studienplan_lehrveranstaltung_id);
 		if(d.error=='false')
+		{
+			node.attr("studienplan_lehrveranstaltung_id", d.result[0].studienplan_lehrveranstaltung_id);
+			node.attr("id", d.result[0].studienplan_lehrveranstaltung_id);
 			$("#jsonData").html(d);
+		}
 		else
+		{
 			alert('Fehler:'+d.errormsg);
+			$("#treeData").jstree("remove", node);
+		}
 	});
 }
 

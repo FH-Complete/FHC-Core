@@ -1117,7 +1117,7 @@ $webservicerecht = array(
 	array('soap/studienordnung','load','lehrveranstaltung'),
 	array('soap/studienordnung','deleteStudienplanLehrveranstaltung','studienplan'),
 	array('soap/studienordnung','containsLehrveranstaltung','studienplan'),
-	array('soap/studienordnung','loadLehrveranstaltungStudienplanByLvId','studienplan'),
+	array('soap/studienordnung','loadStudienplanLehrveranstaltung','studienplan'),
 	array('soap/studienordnung','saveStudienplanLehrveranstaltung','studienplan'),
 	array('soap/studienordnung','loadStudienordnung','studienordnung'),
 	array('soap/studienordnung','delete','lvregel'),
