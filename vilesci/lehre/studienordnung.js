@@ -995,6 +995,7 @@ function saveJsondataFromTree(nodeId, studienplan_id, studienplan_lehrveranstalt
 		}
 	}).success(function(d)
 	{
+		node.attr("studienplan_lehrveranstaltung_id", d.result[0].studienplan_lehrveranstaltung_id);
 		if(d.error=='false')
 			$("#jsonData").html(d);
 		else
