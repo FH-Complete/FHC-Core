@@ -667,6 +667,48 @@ if(!$result = @$db->db_query("SELECT studienplan_id FROM public.tbl_prestudentst
 		echo 'public.tbl_prestudentstatus: Spalte studienplan_id hinzugefügt';
 }
 
+// studienplan_id in Tabelle prestudentstatus
+if(!$result = @$db->db_query("SELECT studienplan_id FROM public.tbl_prestudentstatus LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_prestudentstatus ADD COLUMN studienplan_id bigint;
+	ALTER TABLE public.tbl_prestudentstatus ADD CONSTRAINT fk_studienplan_prestudentstatus FOREIGN KEY (studienplan_id) REFERENCES lehre.tbl_studienplan(studienplan_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_prestudentstatus: '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'public.tbl_prestudentstatus: Spalte studienplan_id hinzugefügt';
+}
+
+// bestaetigtam und bestaetigtvon in Tabelle prestudentstatus fuer verlaengerung des Studiums
+if(!$result = @$db->db_query("SELECT bestaetigtam FROM public.tbl_prestudentstatus LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_prestudentstatus ADD COLUMN bestaetigtam date;
+	ALTER TABLE public.tbl_prestudentstatus ADD COLUMN bestaetigtvon varchar(32);
+	ALTER TABLE public.tbl_prestudentstatus ADD CONSTRAINT fk_benutzer_prestudentstatus_bestaetigt FOREIGN KEY (bestaetigtvon) REFERENCES public.tbl_benutzer(uid) ON DELETE RESTRICT ON UPDATE CASCADE;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_prestudentstatus: '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'public.tbl_prestudentstatus: Spalte bestaetigtam und bestaetigtvon hinzugefügt';
+}
+
+// oe_kurzbz in Tabelle public.tbl_bankverbindung fuer das Abbilden von Kontodaten von Studiengaengen 
+if(!$result = @$db->db_query("SELECT oe_kurzbz FROM public.tbl_bankverbindung LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_bankverbindung ADD COLUMN oe_kurzbz varchar(32);
+	ALTER TABLE public.tbl_bankverbindung ALTER COLUMN person_id DROP NOT NULL;
+	ALTER TABLE public.tbl_bankverbindung ADD CONSTRAINT fk_organisationseinheit_bankverbindung FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit(oe_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_bankverbindung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'public.tbl_bankverbindung: Spalte oe_kurzbz hinzugefügt';
+}
+
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -795,7 +837,7 @@ $tabellen=array(
 	"public.tbl_ampel_benutzer_bestaetigt"  => array("ampel_benutzer_bestaetigt_id","ampel_id","uid","insertamum","insertvon"),
 	"public.tbl_aufmerksamdurch"  => array("aufmerksamdurch_kurzbz","beschreibung","ext_id"),
 	"public.tbl_aufnahmeschluessel"  => array("aufnahmeschluessel"),
-	"public.tbl_bankverbindung"  => array("bankverbindung_id","person_id","name","anschrift","bic","blz","iban","kontonr","typ","verrechnung","updateamum","updatevon","insertamum","insertvon","ext_id"),
+	"public.tbl_bankverbindung"  => array("bankverbindung_id","person_id","name","anschrift","bic","blz","iban","kontonr","typ","verrechnung","updateamum","updatevon","insertamum","insertvon","ext_id","oe_kurzbz"),
 	"public.tbl_benutzer"  => array("uid","person_id","aktiv","alias","insertamum","insertvon","updateamum","updatevon","ext_id","updateaktivvon","updateaktivam"),
 	"public.tbl_benutzerfunktion"  => array("benutzerfunktion_id","fachbereich_kurzbz","uid","oe_kurzbz","funktion_kurzbz","semester", "datum_von","datum_bis", "updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung"),
 	"public.tbl_benutzergruppe"  => array("uid","gruppe_kurzbz","studiensemester_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
@@ -840,7 +882,7 @@ $tabellen=array(
 	"public.tbl_preoutgoing_preoutgoing_status" => array("status_id","preoutgoing_status_kurzbz","preoutgoing_id","datum","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preoutgoing_status" => array("preoutgoing_status_kurzbz","bezeichnung"),
 	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat","rt_punkte3", "zgvdoktor_code", "zgvdoktorort", "zgvdoktordatum"),
-	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id","studienplan_id"),
+	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id","studienplan_id","bestaetigtam","bestaetigtvon"),
 	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung"),
 	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet"),
 	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id"),
