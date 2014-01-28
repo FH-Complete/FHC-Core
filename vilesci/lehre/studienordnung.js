@@ -24,6 +24,10 @@ var studienordnung_bezeichnung='';
 var studienplan_id='';
 var lehrveranstaltungen='';
 
+var loadLehrveranstaltungSTPLStudienplan_id = '';
+var loadLehrveranstaltungSTPLBezeichnung = '';
+var loadLehrveranstaltungSTPLSemester = '';
+
 function loadError(xhr, textStatus, errorThrown)
 {
 	if(xhr.status==200)
@@ -198,6 +202,10 @@ function drawStudienplan(data)
  */
 function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 {
+	loadLehrveranstaltungSTPLStudienplan_id = studienplan_id;
+	loadLehrveranstaltungSTPLBezeichnung = bezeichnung;
+	loadLehrveranstaltungSTPLSemester = max_semester;
+
 	//studienplan_id = studienplan_id;
 	studienplan_bezeichnung=bezeichnung;
 	drawHeader();
@@ -991,10 +999,11 @@ function saveJsondataFromTree(nodeId, studienplan_id, studienplan_lehrveranstalt
 			"method": "saveStudienplanLehrveranstaltung",
 			"loaddata": JSON.stringify(loaddata),
 			"savedata": JSON.stringify(savedata)
-		}
+		},
+		error: TreeSaveError
 	}).success(function(d)
 	{
-		if(d.error=='false')
+		if(d.error!==undefined && d.error=='false')
 		{
 			node.attr("studienplan_lehrveranstaltung_id", d.result[0].studienplan_lehrveranstaltung_id);
 			node.attr("id", d.result[0].studienplan_lehrveranstaltung_id);
@@ -1006,6 +1015,22 @@ function saveJsondataFromTree(nodeId, studienplan_id, studienplan_lehrveranstalt
 			$("#treeData").jstree("remove", node);
 		}
 	});
+}
+
+/**
+ * Wird aufgerufen wenn ein Fehler beim Speichern der TreeZuteilung passiert
+ * Dabei wird der ganze Tree neu geladen
+ */
+function TreeSaveError(xhr, textStatus, errorThrown)
+{
+	if(xhr.status==200)
+	{
+		alert('Fehler:'+xhr.responseText);
+	}
+	else
+		alert('Fehler beim Laden der Daten. ErrorNr:'+xhr.status);
+
+	loadLehrveranstaltungSTPL(loadLehrveranstaltungSTPLStudienplan_id, loadLehrveranstaltungSTPLBezeichnung, loadLehrveranstaltungSTPLSemester);	
 }
 
 function deleteLehrveranstaltungFromStudienplan(lehrveranstaltung_studienplan_id)
