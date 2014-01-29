@@ -384,7 +384,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <text:p text:style-name="P11"/>
 	  <text:p text:style-name="P4">(kurz „ao. Studentin“ bzw. „ao. Student“ genannt) andererseits,</text:p>
       <text:p text:style-name="P11"/>
-	  <text:p text:style-name="P4">im Rahmen des außerordentlichen Studiums bzw. des Besuchs einzelner Lehrveranstaltungen des <xsl:value-of select="studiengang_typ"/> Studienganges „<xsl:value-of select="studiengang"/>“, StgKz <xsl:value-of select="studiengang_kz"/>, in der Organisationsform eines 
+	  <text:p text:style-name="P4">im Rahmen des außerordentlichen Studiums bzw. des Besuchs einzelner Lehrveranstaltungen des <xsl:value-of select="lv_studiengang_typ"/> Studienganges „<xsl:value-of select="lv_studiengang_bezeichnung"/>“, StgKz <xsl:value-of select="lv_studiengang_kz"/>, in der Organisationsform eines 
 	<xsl:choose>
 		<xsl:when test="orgform = 'BB'" >
 			berufsbegleitenden Studiums.
