@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2013 FH Technikum-Wien
+/* Copyright (C) 2013 FH fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -25,6 +25,7 @@ require_once('../include/studiengang.class.php');
 require_once('../include/student.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/adresse.class.php');
+require_once('../include/lehrveranstaltung.class.php');
 
 $uid_arr = (isset($_REQUEST['uid'])?$_REQUEST['uid']:null);
 
@@ -41,7 +42,7 @@ if($student_help->load($uid))
 {
     $studiengang = new studiengang();
     $studiengang->load($student_help->studiengang_kz);
-    switch($studiengang->typ)
+	switch($studiengang->typ)
     {
         case 'b':
             $studTyp = 'Bachelor'; 
@@ -105,7 +106,7 @@ foreach($uid_arr as $uid)
                 case 'b':
                     $studTyp = 'Bachelor'; 
                     $titel_kurzbz = 'BSc'; 
-                    break; 
+                    break;
                 case 'm': 
                     $studTyp = 'Master'; 
                     $titel_kurzbz ='MSc'; 
@@ -122,6 +123,29 @@ foreach($uid_arr as $uid)
 			echo "\t\t<studiengang_typ>".$studTyp."</studiengang_typ>\n";
 			echo "\t\t<studiengang_sprache>".$studiengang->sprache."</studiengang_sprache>\n";
 			echo "\t\t<studiengang_maxsemester>".$studiengang->max_semester."</studiengang_maxsemester>\n";
+			
+			//für ao. Studierende wird die StgKz der Lehrveranstaltungen benötigt, die sie besuchen
+			$lv_studiengang_kz='';
+			$lv_studiengang_bezeichnung='';
+			$lv_studiengang_typ='';
+
+			$stg_typ=new studiengang();
+			$lv=new lehrveranstaltung();
+			$lv->load_lva_student($student->uid);
+			if(count($lv->lehrveranstaltungen)>0)
+			{
+				$lv_studiengang_kz=$lv->lehrveranstaltungen[0]->studiengang_kz;
+				$lv_studiengang=new studiengang();
+				$lv_studiengang->load($lv_studiengang_kz);
+				$lv_studiengang_bezeichnung=$lv_studiengang->bezeichnung;
+	            $stg_typ->getStudiengangTyp($lv_studiengang->typ); 
+				$lv_studiengang_typ=$stg_typ->bezeichnung;
+			}
+			
+			echo "\t\t<lv_studiengang_kz>".sprintf('%04s', $lv_studiengang_kz)."</lv_studiengang_kz>";
+			echo "\t\t<lv_studiengang_typ>$lv_studiengang_typ</lv_studiengang_typ>";
+			echo "\t\t<lv_studiengang_bezeichnung>$lv_studiengang_bezeichnung</lv_studiengang_bezeichnung>";
+			
 			echo "\t\t<datum_aktuell>".$datum_aktuell."</datum_aktuell>\n";
 
 			$adresse = new adresse();

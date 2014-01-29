@@ -605,6 +605,7 @@ else
             $stg_typ = new studiengang(); 
             $stg_typ->getStudiengangTyp($studiengang->typ); 
 			$typ=$stg_typ->bezeichnung;
+			$typ="FH-$typ-Studiengang";
 	/*		switch($studiengang->typ)
 			{
 				case 'd':	$typ = 'FH-Diplom-Studiengang';

@@ -69,10 +69,17 @@
 							<xsl:text>Geburtsdatum: </xsl:text><xsl:value-of select="gebdatum" />
 						</fo:block>
 					</fo:block-container>		
-										
+
 					<fo:block-container position="absolute" top="147mm" left="24mm">
 						<fo:block content-width="160mm" line-height="12pt" font-family="sans-serif" font-size="10pt">
-							<xsl:text> Herr/Frau </xsl:text>
+							<xsl:choose>
+								<xsl:when test="geschlecht='m'">
+									<xsl:text> Herr </xsl:text>
+								</xsl:when>
+								<xsl:when test="geschlecht='w'">
+									<xsl:text> Frau </xsl:text>
+								</xsl:when>
+							</xsl:choose>
 							<xsl:value-of select="name" />
 							<xsl:text> hat im </xsl:text>
 							<xsl:value-of select="studiensemester" />
