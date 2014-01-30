@@ -17,7 +17,8 @@
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Karl Burkhart <karl.burkhart@technikum-wien.at>.
+ *          Karl Burkhart <karl.burkhart@technikum-wien.at> and
+ *          Manfred Kindl <manfred.kindl@technikum-wien.at>.
  */
 require_once('../config/cis.config.inc.php');
 require_once('../include/functions.inc.php');
@@ -38,11 +39,12 @@ $rechte->getBerechtigungen($user);
 	<link rel="stylesheet" href="../skin/superfish.css" type="text/css">
 	<link rel="stylesheet" href="../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../skin/style.css.php" type="text/css">
+	<link rel="stylesheet" href="../skin/tablesort.css" type="text/css"/>
 	<script type="text/javascript" src="../include/js/jquery.js"></script>
 	<script type="text/javascript" src="../include/js/superfish.js"></script>
 	<script type="text/javascript" src="../include/tiny_mce/tiny_mce_popup.js"></script>
 	<script type="text/javascript">
-        
+
     function conf_del()
 	{
 		return confirm('Möchten Sie das File wirklich löschen?');
@@ -286,7 +288,7 @@ if(isset($_POST['fileupload']))
     	    	
     	if($dms->save(true))
     	{
-    		echo 'File wurde erfolgreich hochgeladen. Filename:'.$filename.' ID:'.$dms->dms_id;
+    		echo '<span class="ok">File wurde erfolgreich hochgeladen.</span> <br>Filename:'.$filename.' <br>ID:'.$dms->dms_id;
     		$dms_id=$dms->dms_id;
     		
     		if($projekt_kurzbz!='' || $projektphase_id!='')
@@ -297,12 +299,12 @@ if(isset($_POST['fileupload']))
     	}    	
     	else
     	{
-    		echo 'Fehler beim Speichern der Daten';
+    		echo '<span class="error">Fehler beim Speichern der Daten</span>';
     	}
 	} 
 	else 
 	{
-	    echo 'Fehler beim Hochladen der Datei';
+	    echo '<span class="error">Fehler beim Hochladen der Datei</span>';
 	}
 }
 
@@ -398,7 +400,7 @@ elseif($renameId!='')
 }
 else 
 {
-	echo '<div align="left"><h1>Dokument Auswählen</div><div align="right"><a href="admin_dms.php" target="_blank">Administration</a></div>
+	echo '<div align="left"><h1>Dokument Auswählen</h1></div><div align="right"><a href="admin_dms.php" target="_blank">Administration</a></div>
 		<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
 			<input type="text" name="searchstring" value="'.$searchstring.'">
 			<input type="submit" value="Suchen">
@@ -449,7 +451,7 @@ else
 	}
 	</script>';
 	echo '</td>
-		<td valign="top" style="border-top: 1px solid lightblue; width: 100%;">';
+		<td valign="top" style="border-top: 1px solid lightblue;">';
 	//Dokumente der Ausgewaehlten Kategorie laden und Anzeigen
 	$dms = new dms();
 		
@@ -482,7 +484,7 @@ else
 				<table>
 				<tr>
 					<td>Beschreibung</td>
-					<td><textarea name="beschreibung" rows="2" cols="80"></textarea></td>
+					<td><textarea name="beschreibung" rows="2" cols="80" style="font-size: small;"></textarea></td>
 				</tr>
 				<tr>
 					<td></td>
@@ -493,7 +495,7 @@ else
 				<input type="hidden" name="projektphase_id" value="'.$projektphase_id.'">
 				<input type="submit" name="fileupload" value="Upload">
 				</form>
-				<h3>Files im Import Ordner</h3>';
+				<br>';
 				drawFilesFromImport(); 
 	echo'			
 			</div>';
@@ -573,7 +575,8 @@ function drawFilesFromImport()
 
 	if ($handle = opendir(IMPORT_PATH)) 
 	{
-		echo '<table> <form action ="'.$_SERVER['PHP_SELF'].'" method="POST" name="import" >'; 
+		echo '	<h3>Files im Import Ordner</h3>
+				<table> <form action ="'.$_SERVER['PHP_SELF'].'" method="POST" name="import" >'; 
 
 	    while (false !== ($file = readdir($handle))) 
 	    {
@@ -582,16 +585,10 @@ function drawFilesFromImport()
 	    		echo'
 	    		<tr>
 			    	<td><img src="../skin/images/blank.png" style="height: 15px">
-			       		<a> '.$file.'</a>
+			       		<span> '.$file.'</span>
 			       	</td>
 			        <td>
-			        	<ul class="sf-menu">
-							<li><a style="font-size:small">Erweitert</a>
-								<ul>
-									<li><a onclick="document.import.importFile.value=\''.$file.'\';document.import.submit();" style="font-size:small">Upload</a></li>
-								</ul>
-							</li>
-					 	</ul>
+			        	| <a onclick="document.import.importFile.value=\''.$file.'\';document.import.submit();" style="font-size:small">Upload</a>
 			        </td>
 		     	</tr>';  
 	    	}
@@ -602,7 +599,7 @@ function drawFilesFromImport()
 			<input type="hidden" name="kategorie_kurzbz" id="kategorie_kurzbz" value="'.$kategorie_kurzbz.'">
 			<input type="hidden" name="projekt_kurzbz" value="'.$projekt_kurzbz.'">
 			<input type="hidden" name="projektphase_id" value="'.$projektphase_id.'">
-		 </form></table>';  
+		 </form></table>';
 	    closedir($handle);
 	}
 }
@@ -675,42 +672,82 @@ function drawFilesList($rows)
 {
 	global $mimetypes, $suche;
 	$dms = new dms(); 
+	
+	if(count($rows)>0)
+	{
+		echo '
+		<script>
+		$(document).ready(function() 
+		{ 
+			$("#t2").tablesorter(
+			{';
+				if($suche == true)
+					echo 'sortList: [[4,0],[1,1]], headers: {3:{sorter:false}},';
+				else
+					echo 'sortList: [[0,0]], headers: {2:{sorter:false}},';
+					
+				echo'
+				widgets: ["zebra"]
+			});
+		});
+		</script>
+		';
+	}
+	
 	echo '
-			<table>
+			<table class="tablesorter" id="t2">
+			<thead>
+			<tr>
+			<th>Titel</th>
+			<th title="Version">V</th>';
+			if($suche == true)
+			{
+				echo '<th>Kategorie</th>';
+			}
+			echo'
+			<th>&nbsp;</th>
+			<th>ID</th>
+			<th>Beschreibung</th>
+			</tr>
+			</thead>
+			<tbody>
 		';
 
 	foreach($rows as $row)
 	{
 		echo '
 		<tr>
-			<td>';
+			<td style="padding: 1px;">';
 		if(array_key_exists($row->mimetype,$mimetypes))
-			echo '<img src="../skin/images/'.$mimetypes[$row->mimetype].'" style="height: 15px">';
+			echo '<img title="'.$row->name.'" src="../skin/images/'.$mimetypes[$row->mimetype].'" style="height: 15px">';
 		else
-			echo '<img src="../skin/images/blank.gif" style="height: 15px">';
+			echo '<img title="'.$row->name.'" src="../skin/images/blank.gif" style="height: 15px">';
 			
 		// wenn es noch höhere Versionen zu diesem Dokument gibt, wird dieses gekennzeichnet 
 		$newVersion = '';
 		$newerVersionAlert='';
 		if($dms->checkVersion($row->dms_id, $row->version))
 		{
-			$newVersion = '*';
+			$newVersion = '--';
 			$newerVersionAlert = 'alert(\'Achtung!! Es gibt eine neuere Version dieses Dokuments. Es wird die aktuellste eingefügt.\');';  	
 		}
 			
 		echo'
 				<a href="id://'.$row->dms_id.'/Auswahl" onclick="'.$newerVersionAlert.' FileBrowserDialog.mySubmit('.$row->dms_id.'); return false;" style="font-size: small" title="'.$row->beschreibung.'">
-				'.$row->name.' '.$newVersion.'</a>
+				'.$newVersion.' '.$row->name.'</a>
 			</td>';
-		
-		echo '<td>'; 
+		echo '<td style="padding: 1px;">';
+		echo $row->version;
+		echo '</td>';
+
 		// zeige bei suche auch kategorie an
 		if($suche == true)
 		{
+			echo '<td style="padding: 1px;">';
 			echo $row->kategorie_kurzbz;
+			echo '</td>';
 		}
-		echo'</td><td>';
-		
+		echo'<td style="padding: 1px;">';
 		
 		//Upload einer neuen Version
 		echo '<ul class="sf-menu">
@@ -726,13 +763,13 @@ function drawFilesList($rows)
 				</li>
 			  </ul>';
 		echo '</td>';
-		echo '<td>id:'.$row->dms_id.'</td>';
-		echo '<td>'.$dms->convert_html_chars($row->beschreibung).'</td>';
+		echo '<td style="padding: 1px;">'.$row->dms_id.'</td>';
+		echo '<td style="padding: 1px;">'.$dms->convert_html_chars($row->beschreibung).'</td>';
 		echo '</tr>';
 		
 	}
 	echo '	
-			</table>';
+			</tbody></table>';
 	$suche = false;
 }
 
@@ -756,7 +793,7 @@ function drawRenameForm($dms_id, $version)
 		</tr>
 		<tr>
 			<td>Beschreibung:</td>
-			<td><textarea name="beschreibung">'.$dms->convert_html_chars($dms->beschreibung).'</textarea></td>
+			<td><textarea name="beschreibung" rows="2" cols="80" style="font-size: small;">'.$dms->convert_html_chars($dms->beschreibung).'</textarea></td>
 		</tr>
 		</table>
 		<input type="hidden" name="action" value="rename">

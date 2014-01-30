@@ -27,5 +27,6 @@ $this->phrasen['lvaliste/keineDatensaetze']='No Entrys for this Semester!';
 $this->phrasen['lvaliste/lehrveranstaltungen']='Courses';
 $this->phrasen['lvaliste/betreuungen']='Supervisor';
 $this->phrasen['lvaliste/koordination']='Coordination';
-
+$this->phrasen['lvaliste/anzahl']='Number';
+$this->phrasen['lvaliste/summe']='Total';
 ?>
