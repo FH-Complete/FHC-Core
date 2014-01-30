@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2006 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -46,6 +46,7 @@ class bankverbindung extends basis_db
 	public $insertvon;			// bigint
 	public $updateamum;			// timestamp
 	public $updatevon;			// bigint
+	public $oe_kurzbz;			// string
 
 	/**
 	 * Konstruktor
@@ -93,6 +94,7 @@ class bankverbindung extends basis_db
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
+				$this->oe_kurzbz = $row->oe_kurzbz;
 				return true;
 			}
 			else 
@@ -174,7 +176,7 @@ class bankverbindung extends basis_db
 			//Neuen Datensatz einfuegen
 
 			$qry = 'BEGIN;INSERT INTO public.tbl_bankverbindung  (person_id, name, anschrift, blz, bic,
-			       kontonr, iban, typ, ext_id, verrechnung, insertamum, insertvon, updateamum, updatevon) VALUES('.
+			       kontonr, iban, typ, ext_id, oe_kurzbz, verrechnung, insertamum, insertvon, updateamum, updatevon) VALUES('.
 			       $this->db_add_param($this->person_id, FHC_INTEGER).', '.
 			       $this->db_add_param($this->name).', '.
 			       $this->db_add_param($this->anschrift).', '.
@@ -184,6 +186,7 @@ class bankverbindung extends basis_db
 			       $this->db_add_param($this->iban).', '.
 			       $this->db_add_param($this->typ).', '.
 			       $this->db_add_param($this->ext_id).', '.
+			       $this->db_add_param($this->oe_kurzbz).', '.
                    $this->db_add_param($this->verrechnung, FHC_BOOLEAN).',  now(), '.
 			       $this->db_add_param($this->insertvon).', now(), '.
 			       $this->db_add_param($this->updatevon).');';
@@ -210,6 +213,7 @@ class bankverbindung extends basis_db
  			'typ='.$this->db_add_param($this->typ).', '.
  			'verrechnung='.$this->db_add_param($this->verrechnung,FHC_BOOLEAN).', '.
  			'ext_id='.$this->db_add_param($this->ext_id).', '.
+ 			'oe_kurzbz='.$this->db_add_param($this->oe_kurzbz).', '.
  			'updateamum='.$this->db_add_param($this->updateamum).','.
  			'updatevon='.$this->db_add_param($this->updatevon).' '.
  			'WHERE bankverbindung_id='.$this->db_add_param($this->bankverbindung_id).';';
@@ -312,6 +316,7 @@ class bankverbindung extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->ext_id = $row->ext_id;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
 				
 				$this->result[] = $obj;
 			}
@@ -323,5 +328,54 @@ class bankverbindung extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Laedt die Bankverbindung einer Organisationseinheit
+	 * @param  $person_id
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function load_oe($oe_kurzbz)
+	{
+		if($oe_kurzbz==null || $oe_kurzbz=='')
+		{
+			$this->errormsg = 'keine oe_kurzbz uebergeben';
+			return false;
+		}
+		
+		$qry = "SELECT * FROM public.tbl_bankverbindung WHERE oe_kurzbz=".$this->db_add_param($oe_kurzbz);
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new bankverbindung();
+				
+				$obj->bankverbindung_id = $row->bankverbindung_id;
+				$obj->person_id = $row->person_id;
+				$obj->name = $row->name;
+				$obj->anschrift = $row->anschrift;
+				$obj->bic = $row->bic;
+				$obj->blz = $row->blz;
+				$obj->iban = $row->iban;
+				$obj->kontonr = $row->kontonr;
+				$obj->typ = $row->typ;
+				$obj->verrechnung = $this->db_parse_bool($row->verrechnung);
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->ext_id = $row->ext_id;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}	
 }
 ?>
