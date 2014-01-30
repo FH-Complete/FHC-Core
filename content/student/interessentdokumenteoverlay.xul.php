@@ -57,6 +57,18 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/dokument/rdf#dokument_kurzbz" onclick="InteressentDokumenteNichtAbgegebenTreeSort()"/>
 				<splitter class="tree-splitter"/>
+				<treecol id="interessent-dokumente-tree-nichtabgegeben-datum" label="Datum" flex="1" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/dokument/rdf#datum" onclick="InteressentDokumenteNichtAbgegebenTreeSort()"/>
+				<splitter class="tree-splitter"/>
+				<treecol id="interessent-dokumente-tree-nichtabgegeben-nachgereicht" label="Nachgereicht" flex="1" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/dokument/rdf#nachgereicht" onclick="InteressentDokumenteNichtAbgegebenTreeSort()"/>
+				<splitter class="tree-splitter"/>
+				<treecol id="interessent-dokumente-tree-nichtabgegeben-infotext" label="Infotext" flex="1" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/dokument/rdf#infotext" onclick="InteressentDokumenteNichtAbgegebenTreeSort()"/>
+				<splitter class="tree-splitter"/>
 			</treecols>
 		
 			<template>
@@ -66,6 +78,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<treerow>
 								<treecell label="rdf:http://www.technikum-wien.at/dokument/rdf#bezeichnung"   />
 								<treecell label="rdf:http://www.technikum-wien.at/dokument/rdf#dokument_kurzbz" />
+								<treecell label="rdf:http://www.technikum-wien.at/dokument/rdf#datum" />
+								<treecell label="rdf:http://www.technikum-wien.at/dokument/rdf#nachgereicht" />
+								<treecell label="rdf:http://www.technikum-wien.at/dokument/rdf#infotext" />
 							</treerow>
 						</treeitem>
 					</treechildren>
@@ -113,6 +128,18 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#prestudent_id" onclick="InteressentDokumenteAbgegebenTreeSort()"/>
 				<splitter class="tree-splitter"/>
+				<treecol id="interessent-dokumente-tree-abgegeben-datum" label="Datum" flex="1" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/dokument/rdf#datum" onclick="InteressentDokumenteNichtAbgegebenTreeSort()"/>
+				<splitter class="tree-splitter"/>
+				<treecol id="interessent-dokumente-tree-abgegeben-nachgereicht" label="Nachgereicht" flex="1" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/dokument/rdf#nachgereicht" onclick="InteressentDokumenteNichtAbgegebenTreeSort()"/>
+				<splitter class="tree-splitter"/>
+				<treecol id="interessent-dokumente-tree-abgegeben-infotext" label="Infotext" flex="1" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/dokument/rdf#infotext" onclick="InteressentDokumenteNichtAbgegebenTreeSort()"/>
+				<splitter class="tree-splitter"/>
 			</treecols>
 		
 			<template>
@@ -125,6 +152,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<treecell label="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#mitarbeiter_uid" />
 								<treecell label="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#dokument_kurzbz" />
 								<treecell label="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#prestudent_id" />
+								<treecell label="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#datum" />
+								<treecell label="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#nachgereicht" />
+								<treecell label="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#infotext" />
 							</treerow>
 						</treeitem>
 					</treechildren>

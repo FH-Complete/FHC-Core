@@ -207,8 +207,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<textbox id="mitarbeiter-detail-textbox-kurzbezeichnung"  class="pflichtfeld" size="10" maxlength="10" disabled="true" oninput="MitarbeiterDetailValueChange()"/>
 						<spacer />
 					</hbox>
-					<spacer />
-		    		<checkbox label="Lektor" id="mitarbeiter-detail-checkbox-lektor" checked="false" disabled="true" onchange="MitarbeiterDetailValueChange()"/>
+					<checkbox label="Lektor" id="mitarbeiter-detail-checkbox-lektor" checked="false" disabled="true" onchange="MitarbeiterDetailValueChange()"/>
+		    		<checkbox label="Kleriker" id="mitarbeiter-detail-checkbox-kleriker" checked="false" disabled="true" hidden="true" onchange="MitarbeiterDetailValueChange()"/>
 		    	</row>
 		    	<row>
 		    	    <label align="end" control="mitarbeiter-detail-textbox-stundensatz" value="Stundensatz"/>
@@ -218,8 +218,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	    				<textbox id="mitarbeiter-detail-textbox-telefonklappe" size="10" maxlength="10" disabled="true" oninput="MitarbeiterDetailValueChange()"/>
 	    				<spacer />
 	    			</hbox>
-					<spacer />
 					<checkbox label="Fixangestellt" id="mitarbeiter-detail-checkbox-fixangestellt" checked="false" disabled="true" onchange="MitarbeiterDetailValueChange()"/>		   			
+					<spacer />
 		    	</row>
 		    	<row>	    		
 				    <label align="end" control="mitarbeiter-detail-menulist-ort_kurzbz" value="Buero"/>
@@ -250,8 +250,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</menulist>
 						<spacer flex="1"/>
 					</vbox>
-					<spacer />
 					<checkbox label="Bismelden" id="mitarbeiter-detail-checkbox-bismelden" checked="false" disabled="true" onchange="MitarbeiterDetailValueChange()"/>
+					<spacer />
 		    	</row>
 		    	<row>
 		    		<label value="Anmerkung" control="mitarbeiter-detail-textbox-mitarbeiteranmerkung"/>
@@ -281,7 +281,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					</menulist>
 					<textbox id="mitarbeiter-detail-textbox-resturlaubstage" disabled="true" oninput="MitarbeiterDetailValueChange()" />
 					</vbox>
-		    	</row>
+		    	</row>	
 		  	</rows>
 		 </grid>
 		 <hbox class="style-groupbox">
@@ -290,6 +290,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		</groupbox>
 	</hbox>
 	<hbox>
+		
 		<spacer flex="1"/>
 		<button id="mitarbeiter-detail-button-speichern" disabled="true" label="Speichern" oncommand="MitarbeiterSave();"/>
 	</hbox>

@@ -104,6 +104,7 @@ if(!$error)
 			$mitarbeiter->alias = $_POST['alias'];
 			$mitarbeiter->updateamum = date('Y-m-d H:i:s');
 			$mitarbeiter->updatevon = $user;
+			$mitarbeiter->kleriker = ($_POST['kleriker'] == 'true'?true:false); 
 			
 			if($mitarbeiter->save())
 			{
