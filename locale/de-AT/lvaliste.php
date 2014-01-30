@@ -28,5 +28,6 @@ $this->phrasen['lvaliste/lehrveranstaltungen']='Lehrveranstaltungen';
 $this->phrasen['lvaliste/betreuungen']='Betreuungen';
 $this->phrasen['lvaliste/koordination']='Koordination';
 $this->phrasen['lvaliste/gesamtnote']='Noten eintragen';
-
+$this->phrasen['lvaliste/anzahl']='Anzahl';
+$this->phrasen['lvaliste/summe']='Summe';
 ?>

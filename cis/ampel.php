@@ -43,9 +43,9 @@ if(is_user_logged_in())
 	{
 		echo '';
 		if($rot>0 && $gelb==0)
-			echo '<a href="private/tools/ampelverwaltung.php" target="content" title="'.$p->t("tools/ampelsystem").'"><span style="color: red; text-decoration: blink;">'.$p->t("tools/ampelsystem").'</span></a>&nbsp;&nbsp;<span style="color: #A5AFB6">|</span>&nbsp;&nbsp;';
+			echo '<a href="private/tools/ampelverwaltung.php" target="content" title="'.$p->t("tools/ampelsystem").'"><span style="color: red;">'.$p->t("tools/ampelsystem").'</span></a>&nbsp;&nbsp;<span style="color: #A5AFB6">|</span>&nbsp;&nbsp;';
 		if($gelb>0 && $rot==0)
-			echo '<a href="private/tools/ampelverwaltung.php" target="content" title="'.$p->t("tools/ampelsystem").'"><span style="color: #0086CC; text-decoration: blink;">'.$p->t("tools/ampelsystem").'</span></a>&nbsp;&nbsp;<span style="color: #A5AFB6">|</span>&nbsp;&nbsp;';
+			echo '<a href="private/tools/ampelverwaltung.php" target="content" title="'.$p->t("tools/ampelsystem").'"><span style="color: orange;">'.$p->t("tools/ampelsystem").'</span></a>&nbsp;&nbsp;<span style="color: #A5AFB6">|</span>&nbsp;&nbsp;';
 		echo ' ';
 	}
 }

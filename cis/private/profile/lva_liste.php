@@ -147,6 +147,7 @@ require_once('../../../include/studiensemester.class.php');
 	{
 		
 		echo '<h3>'.$p->t('lvaliste/lehrveranstaltungen').'</h3>';
+		echo $p->t('lvaliste/anzahl').': '.$num_rows;
 		echo '
 		<table class="tablesorter" id="t1">
 			<thead>
@@ -171,6 +172,7 @@ require_once('../../../include/studiensemester.class.php');
 			</thead><tbody>';
 		$stg_obj = new studiengang();
 		$stg_obj->getAll();
+		$summe_std=0;
 		
 		for ($i=0; $i<$num_rows; $i++)
 		{
@@ -210,8 +212,27 @@ require_once('../../../include/studiensemester.class.php');
 			//echo '<td>'.$row->le_anmerkung.'</td>'; Lektoren sollen die Anmerkung dzt. nicht sehen, da nur für intern gedacht
 
 			echo '</tr>';
+			$summe_std+=$row->semesterstunden;
 		}
 		echo '</tbody>';
+		echo '<tfoot>';
+		echo '<tr>';
+		echo '<td>&nbsp;</td>';
+		echo '<td>&nbsp;</td>';
+		echo '<td>&nbsp;</td>';
+		echo '<td>&nbsp;</td>';
+		echo '<td>&nbsp;</td>';
+		echo '<td>&nbsp;</td>';
+		echo '<td>&nbsp;</td>';
+		echo '<td>&nbsp;</td>';
+		echo '<td>&nbsp;</td>';
+		echo '<td>&nbsp;</td>';
+		echo '<td>&nbsp;</td>';
+		echo '<td align="right"><b>'.$p->t('lvaliste/summe').'</b></td>';
+		echo '<th class="header">'.number_format($summe_std,2).'</th>';
+		echo '<td>&nbsp;</td>';
+		echo '</tr>';
+		echo '</tfoot>';
 		echo '</table>';
 	}
 	else
@@ -245,6 +266,7 @@ require_once('../../../include/studiensemester.class.php');
 		if($db->db_num_rows($result)>0)
 		{
 			echo '<H3>'.$p->t('lvaliste/betreuungen').'</H3>';
+			echo $p->t('lvaliste/anzahl').': '.$db->db_num_rows($result);
 			echo '<table class="tablesorter" id="t2">';
 			echo '<thead><tr>';
 			echo '<th>'.$p->t('lvaliste/studiengang').'</th>';
@@ -303,6 +325,7 @@ require_once('../../../include/studiensemester.class.php');
 		if($db->db_num_rows($result)>0)
 		{
 			echo '<H3>'.$p->t('lvaliste/koordination').'</H3>';
+			echo $p->t('lvaliste/anzahl').': '.$db->db_num_rows($result);
 			echo '<table class="tablesorter" id="t3">';
 			echo '<thead><tr>';
 			echo '<th>'.$p->t('lvaliste/studiengang').'</th>';

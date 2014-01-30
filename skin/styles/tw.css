@@ -133,8 +133,12 @@ input.TextBox
 {
 	background-color: White;
 }
+/* 
+==== Formularfelder und Buttons ==== 
+*/
+
 /* Such-Feld CIS-Suche */
-input.search					
+input.search input.text					
 {
 	background-color: #E9ECEE;
 	border-width: 1px;
@@ -149,16 +153,25 @@ input.search
 	border-color: #A5AFB6;
 	height: 25px;
 }
+/* Formularfelder Bewerberportal */
+input.input_bewerbung					
+{
+	background-color: #E9ECEE;
+	border-width: 1px;
+	border-style:solid;
+	border-color: #A5AFB6;
+	height: 20px;
+}
 /* Login-Button CIS-Seite */
 input.cis_login
 {
 	cursor: pointer;
 	color: #666666;
-	font-size: 20px;
 	border: 1px solid #A5AFB6;
 	background-color: #E9ECEE;
-	width: 150px;
-	height: 35px;
+	width: 150px; 
+	height: 35px; 
+	font-size: 20px;
 }
 #GlobalMenu
 {
@@ -700,6 +713,12 @@ img.screenshot_boxshadow
 {
 	border: 1px solid grey; 
 	box-shadow: 0px 0px 5px 5px #888888; 
+	margin-left: 10px;
+}
+a:hover img.screenshot_boxshadow
+{
+	border: 1px solid grey; 
+	box-shadow: 0px 0px 5px 5px #0086CC; 
 	margin-left: 10px;
 }
 /*

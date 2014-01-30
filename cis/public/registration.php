@@ -409,7 +409,7 @@ if (isset($_POST['userid']))
                     <td align="center" valign="center" style="padding-top: 80px;"><h1>'.$p->t('bewerbung/welcome').'</h1><span style="font-size:1.2em"></span></td>
                 </tr>
                 <tr >
-                    <td align="center" valign="bottom" style="padding-top: 80px;padding-bottom: 80px;""> <img src="../../skin/styles/'.DEFAULT_STYLE.'/logo.png" style="max-width: 400px; max-height: 400px; overflow: hidden;"></td>
+                    <td align="center" valign="bottom" style="padding-top: 80px;padding-bottom: 80px;"> <img src="../../skin/styles/'.DEFAULT_STYLE.'/logo.png" style="max-width: 400px; max-height: 400px; overflow: hidden;"></td>
                 </tr>
             </table>
             <table border ="0" width ="100%">
