@@ -431,6 +431,7 @@ function MitarbeiterDetailDisableFields(val)
 	document.getElementById('mitarbeiter-detail-textbox-alias').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-urlaubsanspruch').disabled=val;
 	document.getElementById('mitarbeiter-detail-textbox-resturlaubstage').disabled=val;
+	document.getElementById('mitarbeiter-detail-checkbox-kleriker').disabled=val;
 }
 
 function MitarbeiterAuswahl()
@@ -529,6 +530,7 @@ function MitarbeiterAuswahl()
 	alias=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#alias" ));
 	urlaubstageprojahr=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#urlaubstageprojahr" ));
 	resturlaubstage=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#resturlaubstage" ));
+	kleriker=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#kleriker" ));
 	
 	//Daten den Feldern zuweisen
 
@@ -580,6 +582,12 @@ function MitarbeiterAuswahl()
 		document.getElementById('mitarbeiter-detail-checkbox-bismelden').checked=true;
 	else
 		document.getElementById('mitarbeiter-detail-checkbox-bismelden').checked=false;
+		
+	if(kleriker=='Ja')
+		document.getElementById('mitarbeiter-detail-checkbox-kleriker').checked=true;
+	else
+		document.getElementById('mitarbeiter-detail-checkbox-kleriker').checked=false;		
+		
 	document.getElementById('mitarbeiter-detail-menulist-ausbildung').value=ausbildung;
 	document.getElementById('mitarbeiter-detail-textbox-mitarbeiteranmerkung').value=anmerkung;
 	document.getElementById('mitarbeiter-detail-menulist-ort_kurzbz').value=ort_kurzbz;
@@ -780,6 +788,7 @@ function MitarbeiterSave()
 	ort_kurzbz = document.getElementById('mitarbeiter-detail-menulist-ort_kurzbz').value;
 	standort_id = document.getElementById('mitarbeiter-detail-menulist-standort').value;
 	alias = document.getElementById('mitarbeiter-detail-textbox-alias').value;
+	kleriker = document.getElementById('mitarbeiter-detail-checkbox-kleriker').checked;
 	
 	urlaubsanspruch = document.getElementById('mitarbeiter-detail-textbox-urlaubsanspruch').value;
 	resturlaubstage = document.getElementById('mitarbeiter-detail-textbox-resturlaubstage').value;
@@ -829,6 +838,7 @@ function MitarbeiterSave()
 	req.add('alias', alias);
 	req.add('urlaubsanspruch', urlaubsanspruch);
 	req.add('resturlaubstage', resturlaubstage);
+	req.add('kleriker', kleriker);
 	
 	var response = req.executePOST();
 

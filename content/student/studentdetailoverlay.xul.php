@@ -114,9 +114,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										</menupopup>
 								</template>
 							</menulist>
-							<spacer />
-							<spacer />						
-							
+							<label value="Matrikelnummer" control="student-detail-textbox-matr_nr"/>
+      						<hbox><textbox id="student-detail-textbox-matr_nr" disabled="true" maxlength="10" size="15"/></hbox>
 							<label value="Sprache" control="student-detail-menulist-sprache" />
 							<menulist id="student-detail-menulist-sprache" disabled="true"
 							          datasources="<?php echo APP_ROOT ?>rdf/sprache.rdf.php" flex="1"

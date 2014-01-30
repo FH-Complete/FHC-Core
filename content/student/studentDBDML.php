@@ -204,6 +204,7 @@ if(!$error)
 				$student->gebzeit = $_POST['geburtszeit'];
 				$student->anmerkungen = $_POST['anmerkung'];
 				$student->homepage = $_POST['homepage'];
+				$student->matr_nr = $_POST['matr_nr']; 
 				$student->svnr = $_POST['svnr'];
 				$student->ersatzkennzeichen = $_POST['ersatzkennzeichen'];
 				$student->familienstand = $_POST['familienstand'];
@@ -362,6 +363,7 @@ if(!$error)
 				$person->staatsbuergerschaft = $_POST['staatsbuergerschaft'];
 				$person->geburtsnation = $_POST['geburtsnation'];
 				$person->sprache = $_POST['sprache'];
+				$person->matr_nr = $_POST['matr_nr']; 
 				$person->updateamum = date('Y-m-d H:i:s');
 				$person->updatevon = $user;
 

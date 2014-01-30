@@ -546,6 +546,7 @@ function StudentDetailReset()
 	document.getElementById('student-detail-menulist-geburtsnation').value='A';
 	document.getElementById('student-detail-menulist-sprache').value='German';
 	document.getElementById('student-detail-textbox-matrikelnummer').value='';
+	document.getElementById('student-detail-textbox-matr_nr').value=''; 
 	document.getElementById('student-detail-image').src='';
 }
 
@@ -585,6 +586,7 @@ function StudentDetailDisableFields(val)
 	document.getElementById('student-detail-textbox-gruppe').disabled=val;
 	document.getElementById('student-detail-textbox-alias').disabled=val;
 	document.getElementById('student-detail-button-save').disabled=val;
+	document.getElementById('student-detail-textbox-matr_nr').disabled=val; 
 }
 
 // ****
@@ -621,6 +623,7 @@ function StudentDetailSave()
 	verband = document.getElementById('student-detail-textbox-verband').value;
 	gruppe = document.getElementById('student-detail-textbox-gruppe').value;
 	alias = document.getElementById('student-detail-textbox-alias').value;
+	matr_nr = document.getElementById('student-detail-textbox-matr_nr').value; 
 
 	//Wenn es noch kein Student ist, dann wird die Studiengang_kz vom Prestudent genommen
 	if(studiengang_kz=='')
@@ -677,6 +680,7 @@ function StudentDetailSave()
 	req.add('verband', verband);
 	req.add('gruppe', gruppe);
 	req.add('alias', alias);
+	req.add('matr_nr',matr_nr); 
 
 	var response = req.executePOST();
 
@@ -892,6 +896,7 @@ function StudentAuswahl()
 	prestudent_id=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#prestudent_id" ));
 	status=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#status" ));
 	alias=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#alias" ));
+	matr_nr=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#matr_nr" ));
 	
 	//Bei Incoming wird das Menue zur Statusaenderung deaktiviert
 	if(status=='Incoming')
@@ -935,6 +940,7 @@ function StudentAuswahl()
 	document.getElementById('student-detail-textbox-gruppe').value=gruppe;
 	document.getElementById('student-detail-textbox-person_id').value = person_id;
 	document.getElementById('student-detail-textbox-alias').value=alias;
+	document.getElementById('student-detail-textbox-matr_nr').value=matr_nr; 
 
 	//PreStudent Daten holen
 
