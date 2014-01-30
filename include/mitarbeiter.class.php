@@ -42,6 +42,7 @@ class mitarbeiter extends benutzer
 	public $stundensatz;
 	public $anmerkung;
 	public $bismelden;
+	public $kleriker; 
 	public $vorgesetzte=array();
 	public $untergebene=array();
 
@@ -88,6 +89,7 @@ class mitarbeiter extends benutzer
 				$this->anmerkung = $row->anmerkung;
 				$this->ext_id_mitarbeiter = $row->ext_id;
 				$this->bismelden = $this->db_parse_bool($row->bismelden);
+				$this->kleriker = $this->db_parse_bool($row->kleriker); 
 
 				$this->urlaubstageprojahr = $row->urlaubstageprojahr;
 				$this->resturlaubstage = $row->resturlaubstage;
@@ -252,7 +254,7 @@ class mitarbeiter extends benutzer
 			}
 			//Neuen Datensatz anlegen
 			$qry = "INSERT INTO public.tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, ort_kurzbz,
-			                    fixangestellt, standort_id, telefonklappe, anmerkung, stundensatz, updateamum, updatevon, insertamum, insertvon, ext_id, bismelden)
+			                    fixangestellt, standort_id, telefonklappe, anmerkung, stundensatz, updateamum, updatevon, insertamum, insertvon, ext_id, bismelden,kleriker)
 
 			        VALUES(".$this->db_add_param($this->uid).",".
 			 	 	$this->db_add_param($this->ausbildungcode, FHC_INTEGER).",".
@@ -270,7 +272,8 @@ class mitarbeiter extends benutzer
 					$this->db_add_param($this->insertamum).','.
 					$this->db_add_param($this->insertvon).', '.
 					$this->db_add_param($this->ext_id_mitarbeiter, FHC_INTEGER).','.
-					$this->db_add_param($this->bismelden, FHC_BOOLEAN).');';
+					$this->db_add_param($this->bismelden, FHC_BOOLEAN).','.
+					$this->db_add_param($this->kleriker, FHC_BOOLEAN).');';
 		}
 		else
 		{
@@ -282,6 +285,7 @@ class mitarbeiter extends benutzer
 			       ' lektor='.$this->db_add_param($this->lektor, FHC_BOOLEAN).','.
 			       ' fixangestellt='.$this->db_add_param($this->fixangestellt, FHC_BOOLEAN).','.
 			       ' bismelden='.$this->db_add_param($this->bismelden, FHC_BOOLEAN).','.
+				   ' kleriker='.$this->db_add_param($this->kleriker, FHC_BOOLEAN).','.
 			       ' standort_id='.$this->db_add_param($this->standort_id, FHC_INTEGER).','.
 			       ' telefonklappe='.$this->db_add_param($this->telefonklappe).','.
 			       ' ort_kurzbz='.$this->db_add_param($this->ort_kurzbz).','.

@@ -63,6 +63,7 @@ class person extends basis_db
 	public $kurzbeschreibung; 	// text
 	public $zugangscode = null; // varchar(32)
 	public $foto_sperre=false;	// boolean
+	public $matr_nr;			//varchar(32)
 
 	/**
 	 * Konstruktor - Uebergibt die Connection und laedt optional eine Person
@@ -88,7 +89,7 @@ class person extends basis_db
 			$qry = "SELECT person_id, sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen,
 				gebdatum, gebort, gebzeit, foto, anmerkung, homepage, svnr, ersatzkennzeichen,
 				familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon, ext_id,
-				geschlecht, staatsbuergerschaft, geburtsnation, kurzbeschreibung, zugangscode, foto_sperre
+				geschlecht, staatsbuergerschaft, geburtsnation, kurzbeschreibung, zugangscode, foto_sperre, matr_nr
 				FROM public.tbl_person WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 
 			if(!$this->db_query($qry))
@@ -129,6 +130,7 @@ class person extends basis_db
 				$this->kurzbeschreibung = $row->kurzbeschreibung;
 				$this->zugangscode = $row->zugangscode;
 				$this->foto_sperre = $this->db_parse_bool($row->foto_sperre);
+				$this->matr_nr = $row->matr_nr; 
 			}
 			else
 			{
@@ -240,6 +242,12 @@ class person extends basis_db
 		if(mb_strlen($this->svnr)>10)
 		{
 			$this->errormsg = 'SVNR darf nicht laenger als 10 Zeichen sein';
+			return false;
+		}
+		
+		if(mb_strlen($this->matr_nr)>32)
+		{
+			$this->errormsg = 'Matrikelnummer darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
 		
@@ -394,7 +402,7 @@ class person extends basis_db
 			$qry = 'INSERT INTO public.tbl_person (sprache, anrede, titelpost, titelpre, nachname, vorname, vornamen,
 			                    gebdatum, gebort, gebzeit, foto, anmerkung, homepage, svnr, ersatzkennzeichen,
 			                    familienstand, anzahlkinder, aktiv, insertamum, insertvon, updateamum, updatevon,
-			                    geschlecht, geburtsnation, staatsbuergerschaft, ext_id, kurzbeschreibung, zugangscode, foto_sperre)
+			                    geschlecht, geburtsnation, staatsbuergerschaft, ext_id, kurzbeschreibung, zugangscode, foto_sperre, matr_nr)
 			        VALUES('.$this->db_add_param($this->sprache).','.
 						$this->db_add_param($this->anrede).','.
 						$this->db_add_param($this->titelpost).','.
@@ -423,7 +431,8 @@ class person extends basis_db
 				        $this->db_add_param($this->ext_id).','.
 				        $this->db_add_param($this->kurzbeschreibung).','.
 				        $this->db_add_param($this->zugangscode).','.
-				        $this->db_add_param($this->foto_sperre, FHC_BOOLEAN).');';
+				        $this->db_add_param($this->foto_sperre, FHC_BOOLEAN).','.
+						$this->db_add_param($this->matr_nr).');';
 		}
 		else
 		{
@@ -460,7 +469,8 @@ class person extends basis_db
 			       ' staatsbuergerschaft='.$this->db_add_param($this->staatsbuergerschaft).','.
 			       ' ext_id='.$this->db_add_param($this->ext_id).','.
 			       ' kurzbeschreibung='.$this->db_add_param($this->kurzbeschreibung).','.
-				   ' foto_sperre='.$this->db_add_param($this->foto_sperre, FHC_BOOLEAN).
+				   ' foto_sperre='.$this->db_add_param($this->foto_sperre, FHC_BOOLEAN).','.
+				   ' matr_nr ='.$this->db_add_param($this->matr_nr).
 			       ' WHERE person_id='.$this->person_id.';';
 		}
 
@@ -558,6 +568,7 @@ class person extends basis_db
 				$l->ext_id = $row->ext_id;
 				$l->kurzbeschreibung = $row->kurzbeschreibung;
 				$l->foto_sperre = $this->db_parse_bool($row->foto_sperre);
+				$l->matr_nr = $row->matr_nr; 
 				$this->personen[]=$l;
 			}
 		}
@@ -806,6 +817,7 @@ class person extends basis_db
 				$this->kurzbeschreibung = $row->kurzbeschreibung;
 				$this->zugangscode = $row->zugangscode;
 				$this->foto_sperre = $this->db_parse_bool($row->foto_sperre);
+				$this->matrikelnummer = $this->row->matrikelnummer; 
 			}
 			else
 			{
