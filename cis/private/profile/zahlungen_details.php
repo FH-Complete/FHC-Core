@@ -21,6 +21,9 @@
 	require_once('../../../config/cis.config.inc.php');
 //	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/konto.class.php');
+	require_once('../../../include/bankverbindung.class.php');
+	require_once('../../../include/studiengang.class.php');
+	
 	
 	if(isset($_GET['buchungsnr']))
 		$buchungsnr=$_GET['buchungsnr'];
@@ -29,7 +32,12 @@
 	
 	$konto=new konto();
 	$konto->load($buchungsnr);
-
+	
+	$studiengang=new studiengang();
+	$studiengang->load($konto->studiengang_kz);
+	$bankverbindung=new bankverbindung();
+	$bankverbindung->load_oe($studiengang->oe_kurzbz);
+	
 	$konto->getBuchungstyp();
 	$buchungstyp = array();	
 	foreach ($konto->result as $row)
@@ -54,13 +62,13 @@
 				<td>'.$konto->buchungstext.'</td>
 			</tr><tr>
 				<td>Empfänger</td>
-				<td>FHTW</td>
+ 				<td>FHTW</td>
 			</tr><tr>
 				<td>IBAN</td>
-				<td>AT99 1111 2222 3333 4444</td>
+				<td>'.$bankverbindung->result[0]->iban.'</td>
 			</tr><tr>
 				<td>BIC</td>
-				<td>ABCDEFGHIJK</td>
+				<td>'.$bankverbindung->result[0]->bic.'</td>
 			</tr><tr>
 				<td>Betrag</td>
 				<td>'.$konto->betrag.'</td>
@@ -69,4 +77,22 @@
 				<td>'.$konto->zahlungsreferenz.'</td>
 		</table>';
 	echo '</body></html>';	   	
+/*
+				<td>FHTW</td>
+			</tr><tr>
+				<td>IBAN</td>
+				<td>AT99 1111 2222 3333 4444</td>
+			</tr><tr>
+				<td>BIC</td>
+				<td>ABCDEFGHIJK</td>
+ */
+/*
+ 				<td>'.$bankverbindung->result[0]->name.'</td>
+			</tr><tr>
+				<td>IBAN</td>
+				<td>'.$bankverbindung->result[0]->iban.'</td>
+			</tr><tr>
+				<td>BIC</td>
+				<td>'.$bankverbindung->result[0]->blz.'</td>
+ */
 ?>
