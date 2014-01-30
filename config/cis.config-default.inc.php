@@ -72,6 +72,9 @@ define("AUTH_NAME","Technikum-Wien");
 
 // LDAP_SERVER: Adresse des LDAP Servers
 define("LDAP_SERVER","www.technikum-wien.at");
+// LDAP Master Server fuer Passwort Aenderungen
+define('LDAP_SERVER_MASTER',LDAP_SERVER);
+// LDAP BASIS DN fuer User
 define("LDAP_BASE_DN","ou=People, dc=technikum-wien, dc=at");
 //User fuer LDAP BIND falls Authentifizierung noetig
 define("LDAP_BIND_USER",null);
