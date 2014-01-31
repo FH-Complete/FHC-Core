@@ -19,10 +19,10 @@
  */
 
 	require_once('../../../config/cis.config.inc.php');
-//	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/konto.class.php');
 	require_once('../../../include/bankverbindung.class.php');
 	require_once('../../../include/studiengang.class.php');
+	require_once('../../../include/organisationseinheit.class.php');
 	
 	
 	if(isset($_GET['buchungsnr']))
@@ -37,6 +37,9 @@
 	$studiengang->load($konto->studiengang_kz);
 	$bankverbindung=new bankverbindung();
 	$bankverbindung->load_oe($studiengang->oe_kurzbz);
+
+	$oe=new organisationseinheit();
+	$oe->load($studiengang->oe_kurzbz);
 	
 	$konto->getBuchungstyp();
 	$buchungstyp = array();	
@@ -50,19 +53,42 @@
 				<title>Zahlungsdetails</title>
 				<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 				<link href="../../../skin/fhcomplete.css.php" rel="stylesheet" type="text/css">
+				<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
 			</head>
 			<body>';
 	
-	echo '<table class="tabcontent">
+	echo '<h1>Einzahlung für '.$konto->vorname.' '.$konto->nachname.'</h1>
+	<table class="tablesorter">
+		<thead>
+			<tr>
+				<th width="40%">Zahlungsinformationen</th>
+				<th width="60%"></th>
+			</tr>
+		</thead>
+		<tbody>
 			<tr>
 				<td>Buchungstyp</td>
 				<td>'.$buchungstyp[$konto->buchungstyp_kurzbz].'</td>
-			<tr>
+			</tr><tr>
 				<td>Buchungstext</td>
 				<td>'.$konto->buchungstext.'</td>
 			</tr><tr>
+				<td>Betrag</td>
+				<td>'.abs($konto->betrag).' €</td>
+			</tr>
+		</tbody>
+	</table>
+	<table class="tablesorter">
+		<thead>
+			<tr>
+				<th width="40%">Zahlung an</th>
+				<th width="60%"></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
 				<td>Empfänger</td>
- 				<td>FHTW</td>
+ 				<td>'.$oe->organisationseinheittyp_kurzbz.' '.$oe->bezeichnung.'</td>
 			</tr><tr>
 				<td>IBAN</td>
 				<td>'.$bankverbindung->result[0]->iban.'</td>
@@ -70,29 +96,10 @@
 				<td>BIC</td>
 				<td>'.$bankverbindung->result[0]->bic.'</td>
 			</tr><tr>
-				<td>Betrag</td>
-				<td>'.$konto->betrag.'</td>
-			</tr><tr>
 				<td>Zahlungsreferenz</td>
 				<td>'.$konto->zahlungsreferenz.'</td>
-		</table>';
-	echo '</body></html>';	   	
-/*
-				<td>FHTW</td>
-			</tr><tr>
-				<td>IBAN</td>
-				<td>AT99 1111 2222 3333 4444</td>
-			</tr><tr>
-				<td>BIC</td>
-				<td>ABCDEFGHIJK</td>
- */
-/*
- 				<td>'.$bankverbindung->result[0]->name.'</td>
-			</tr><tr>
-				<td>IBAN</td>
-				<td>'.$bankverbindung->result[0]->iban.'</td>
-			</tr><tr>
-				<td>BIC</td>
-				<td>'.$bankverbindung->result[0]->blz.'</td>
- */
+			</tr>
+		</tbody>
+	</table>
+</body></html>';	   	
 ?>
