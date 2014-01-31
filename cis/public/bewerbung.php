@@ -863,16 +863,29 @@ $studiengang = new studiengang();
                  $status = '<img title="wird nachgereicht" src="'.APP_ROOT.'skin/images/hourglass.png" width="20px">'; 
                  $nachgereicht_help = 'checked';
                  $div = "<form method='POST' action='".$_SERVER['PHP_SELF']."?active=4'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:true;'>".$akte->result[0]->anmerkung."</span>";
+				 $aktion = '<a href="'.$_SERVER['PHP_SELF'].'?method=delete&akte_id='.$akte_id.'&active=4"><img title="löschen" src="'.APP_ROOT.'skin/images/delete.png" width="20px"></a>'; 
             }
-            else
+            else 
             {
-                // abgegeben
-                $status = '<img title="abgegeben" src="'.APP_ROOT.'skin/images/check_black.png" width="20px">'; 
-                $nachgereicht_help = '';
-                $div = "<form method='POST' action='".$_SERVER['PHP_SELF']."&active=4'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:none;'>wird nachgereicht:<input type='checkbox' name='check_nachgereicht' ".$nachgereicht_help."><input type='text' size='15' name='txt_anmerkung'><input type='submit' value='OK' name='submit_nachgereicht'></span><input type='hidden' name='dok_kurzbz' value='".$dok->dokument_kurzbz."'><input type='hidden' name='akte_id' value='".$akte_id."'></form>";
+				$dokument = new dokument(); 
+				if($dokument->load($akte->result[0]->dokument_kurzbz,$prestudent->prestudent_id))
+				{
+					// Dokument wurde bereits überprüft
+					$status = '<img title="abgegeben" src="'.APP_ROOT.'skin/images/true_green.png" width="20px">'; 
+					$nachgereicht_help = '';
+					$div = "<form method='POST' action='".$_SERVER['PHP_SELF']."&active=4'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:none;'>wird nachgereicht:<input type='checkbox' name='check_nachgereicht' ".$nachgereicht_help."><input type='text' size='15' name='txt_anmerkung'><input type='submit' value='OK' name='submit_nachgereicht'></span><input type='hidden' name='dok_kurzbz' value='".$dok->dokument_kurzbz."'><input type='hidden' name='akte_id' value='".$akte_id."'></form>";
+					$aktion = ''; 
+				}
+				else
+				{
+					// Dokument hochgeladen ohne überprüfung der Assistenz
+					$status = '<img title="abgegeben" src="'.APP_ROOT.'skin/images/check_black.png" width="20px">'; 
+					$nachgereicht_help = '';
+					$div = "<form method='POST' action='".$_SERVER['PHP_SELF']."&active=4'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:none;'>wird nachgereicht:<input type='checkbox' name='check_nachgereicht' ".$nachgereicht_help."><input type='text' size='15' name='txt_anmerkung'><input type='submit' value='OK' name='submit_nachgereicht'></span><input type='hidden' name='dok_kurzbz' value='".$dok->dokument_kurzbz."'><input type='hidden' name='akte_id' value='".$akte_id."'></form>";
+					$aktion = '<a href="'.$_SERVER['PHP_SELF'].'?method=delete&akte_id='.$akte_id.'&active=4"><img title="löschen" src="'.APP_ROOT.'skin/images/delete.png" width="20px"></a>'; 
+	
+				}                
             }
-            
-            $aktion = '<a href="'.$_SERVER['PHP_SELF'].'?method=delete&akte_id='.$akte_id.'&active=4"><img title="löschen" src="'.APP_ROOT.'skin/images/delete.png" width="20px"></a>'; 
         }
         else
         {
