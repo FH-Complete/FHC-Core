@@ -163,6 +163,7 @@ function draw_row($mitarbeiter)
     		<MITARBEITER:updatevon><![CDATA['.$mitarbeiter->updatevon.']]></MITARBEITER:updatevon>
     		<MITARBEITER:resturlaubstage><![CDATA['.$mitarbeiter->resturlaubstage.']]></MITARBEITER:resturlaubstage>
     		<MITARBEITER:urlaubstageprojahr><![CDATA['.$mitarbeiter->urlaubstageprojahr.']]></MITARBEITER:urlaubstageprojahr>
+			<MITARBEITER:kleriker><![CDATA['.($mitarbeiter->kleriker?'Ja':'Nein').']]></MITARBEITER:kleriker>
       	</RDF:Description>
       </RDF:li>
 	';

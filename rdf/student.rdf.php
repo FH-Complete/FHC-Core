@@ -221,6 +221,7 @@ function draw_content($row)
     		<STUDENT:geburtsdatum_iso><![CDATA['.$row->gebdatum.']]></STUDENT:geburtsdatum_iso>
     		<STUDENT:homepage><![CDATA['.$row->homepage.']]></STUDENT:homepage>
     		<STUDENT:gebort><![CDATA['.$row->gebort.']]></STUDENT:gebort>
+			<STUDENT:matr_nr><![CDATA['.$row->matr_nr.']]></STUDENT:matr_nr>
     		<STUDENT:gebzeit><![CDATA['.$row->gebzeit.']]></STUDENT:gebzeit>
     		<STUDENT:anmerkungen>'.($row->anmerkungen==''?'&#xA0;':'<![CDATA['.$row->anmerkungen.']]>').'</STUDENT:anmerkungen>
     		<STUDENT:anrede><![CDATA['.$row->anrede.']]></STUDENT:anrede>
