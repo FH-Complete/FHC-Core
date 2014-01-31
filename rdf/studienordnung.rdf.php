@@ -44,6 +44,8 @@ if(isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
         echo '  <studiengang_kz><![CDATA['.$stg->studiengang_kz.']]></studiengang_kz>';
         echo '  <studiengang_kurzbz><![CDATA['.$stg->kurzbz.']]></studiengang_kurzbz>';
         echo '  <studiengang_typ><![CDATA['.$stg->typ.']]></studiengang_typ>';
+		echo '  <studiengang_kurzbzlang><![CDATA['.$stg->kurzbzlang.']]></studiengang_kurzbzlang>';
+		echo '  <studiengang_bezeichnung><![CDATA['.$stg->bezeichnung.']]></studiengang_bezeichnung>'; 
         echo '  <studienordnung>';
         echo '      <regelstudiendauer><![CDATA['.$stg->max_semester.']]></regelstudiendauer>';
         echo '      <bezeichnung><![CDATA['.$stg->bezeichnung.']]></bezeichnung>';
