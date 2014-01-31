@@ -32,10 +32,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/dokument.class.php');
 require_once('../include/datum.class.php');
+require_once('../include/akte.class.php'); 
+require_once('../include/prestudent.class.php'); 
 
 $rdf_url='http://www.technikum-wien.at/dokumentprestudent';
 	
-$datum = new datum();
+$date = new datum();
 
 if(isset($_GET['prestudent_id']))
 	if(is_numeric($_GET['prestudent_id']))
@@ -48,6 +50,10 @@ else
 $dok = new dokument();
 if(!$dok->getPrestudentDokumente($prestudent_id))
 	die($dok->errormsg);
+
+$prestudent = new prestudent(); 
+if(!$prestudent->load($prestudent_id))
+	die($prestudent->errormsg); 
 	
 echo '
 <RDF:RDF
@@ -60,15 +66,24 @@ echo '
 
 foreach ($dok->result as $row)
 {
+	
+	$akte = new akte(); 
+	$akte->getAkten($prestudent->person_id, $row->dokument_kurzbz); 
+	$datum=(isset($akte->result[0]->insertamum))?$date->formatDatum($akte->result[0]->insertamum, 'd.m.Y'):''; 
+	$nachgereicht = (isset($akte->result[0]->nachgereicht))?'ja':''; 
+	$info = (isset($akte->result[0]->anmerkung))?$akte->result[0]->anmerkung:''; 
+	
 	echo '
 	  <RDF:li>
 	      	<RDF:Description  id="'.$row->dokument_kurzbz.'/'.$row->prestudent_id.'"  about="'.$rdf_url.'/'.$row->dokument_kurzbz.'/'.$row->prestudent_id.'" >
 	        	<DOKUMENT:dokument_kurzbz><![CDATA['.$row->dokument_kurzbz.']]></DOKUMENT:dokument_kurzbz>
 	    		<DOKUMENT:prestudent_id><![CDATA['.$row->prestudent_id.']]></DOKUMENT:prestudent_id>
 	    		<DOKUMENT:mitarbeiter_uid><![CDATA['.$row->mitarbeiter_uid.']]></DOKUMENT:mitarbeiter_uid>
-	    		<DOKUMENT:datum><![CDATA['.$datum->convertISODate($row->datum).']]></DOKUMENT:datum>
+	    		<DOKUMENT:datum><![CDATA['.$date->convertISODate($row->datum).']]></DOKUMENT:datum>
 	    		<DOKUMENT:datum_iso><![CDATA['.$row->datum.']]></DOKUMENT:datum_iso>
 	    		<DOKUMENT:bezeichnung><![CDATA['.$row->bezeichnung.']]></DOKUMENT:bezeichnung>
+				<DOKUMENT:nachgereicht><![CDATA['.$nachgereicht.']]></DOKUMENT:nachgereicht>
+				<DOKUMENT:infotext><![CDATA['.$info.']]></DOKUMENT:infotext>
 	      	</RDF:Description>
 	  </RDF:li>
 	';
