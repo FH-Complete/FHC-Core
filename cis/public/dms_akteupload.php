@@ -162,6 +162,8 @@ if(isset($_POST['submitbild']))
 		$akte->updateamum = date('Y-m-d H:i:s');
 	//	$akte->updatevon = $user;
 		$akte->insertamum = date('Y-m-d H:i:s');
+		$akte->nachgereicht = false; 
+		$akte->anmerkung = ''; 
 	//	$akte->insertvon = $user;
 		$akte->uid = '';
                 $akte->dms_id = $dms_id;
