@@ -37,6 +37,7 @@ require_once('../../../include/student.class.php');
 require_once('../../../include/kontakt.class.php');
 require_once('../../../include/fotostatus.class.php');
 require_once('../../../include/addon.class.php'); 
+require_once('../../../include/gruppe.class.php');
 
 $sprache = getSprache(); 
 $p=new phrasen($sprache);
@@ -423,12 +424,40 @@ if(!$ansicht)
 		      				<td>".$datum_obj->formatDatum($oBetriebsmittelperson->result[$i]->ausgegebenam,'d.m.Y')."</td>
 		      			</tr>";
 		                	
-		            }
-		        }
-		    	echo '</tbody></table>';
-			}
-	    }
+	            }
+	        }
+	    	echo '</tbody></table>';
+		}
+    }
+
+	// Zutrittsgruppen
+	$gruppe = new gruppe();
+	$gruppe->loadZutrittsgruppen($uid);
+	if(count($gruppe->result)>0)
+	{
+		echo '<b>Zutrittsgruppen</b>
+		<table id="tableZutritt" class="tablesorter">
+		<thead>
+			<tr>
+				<th>
+				Zutritt
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+		';
+		
+		foreach($gruppe->result as $row)
+		{
+			echo '<tr>';
+			echo '<td>'.$row->bezeichnung.'</td>';
+			echo '</tr>';	
+		}
+		echo '</tbody>
+		</thead>
+		</table>';
 	}
+}
     
 		
 	echo '	

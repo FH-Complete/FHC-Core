@@ -166,6 +166,80 @@
 							</fo:table-row>
 						</fo:table-body>
 					</fo:table>
+					<fo:block font-size="7pt">\n</fo:block>
+					<xsl:if test="abschlusspruefung_typ">
+						<fo:table table-layout="fixed" border-collapse="collapse" border-width="0.2pt" border-style="solid">
+							<fo:table-column column-width="0mm"/>
+							<fo:table-column column-width="164.2mm"/>
+							<fo:table-body>
+								<fo:table-row line-height="19pt">
+									<fo:table-cell border-width="0mm" >
+									<fo:block font-size="9pt" font-weight="bold" >
+											<!-- wenn die erste Spalte eine Hintergrundfarbe hat, dann wird der Text von der Hintergrundfarbe ueberschrieben.
+											     Deshalb gibt es hier eine Dummy-Spalte. Ab der zweiten Spalte funktioniert es dann problemlos
+											     grauslich, funktioniert aber...
+											-->
+											</fo:block>
+									</fo:table-cell>
+									<fo:table-cell border-width="0.2mm" border-style="solid"  display-align="center"  background-color="#afb8bc" >
+										<fo:block font-size="9pt" font-weight="bold" content-width="162mm" vertical-align="center" font-family="arial">
+											Kommissionelle Abschlussprüfung
+											</fo:block>
+									</fo:table-cell>
+								</fo:table-row>
+							</fo:table-body>
+						</fo:table>
+						<fo:table table-layout="fixed" border-collapse="collapse" border-width="0.2pt" border-style="solid">
+							<fo:table-column column-width="0mm"/>
+							<fo:table-column column-width="103mm"/>
+							<fo:table-column column-width="60.8mm"/>
+							<fo:table-body>
+								<fo:table-row line-height="19pt">
+									<fo:table-cell border-width="0mm" >
+										<fo:block font-size="9pt" font-weight="bold" >
+											<!-- wenn die erste Spalte eine Hintergrundfarbe hat, dann wird der Text von der Hintergrundfarbe ueberschrieben.
+											     Deshalb gibt es hier eine Dummy-Spalte. Ab der zweiten Spalte funktioniert es dann problemlos
+											     grauslich, funktioniert aber...
+											-->
+											</fo:block>
+									</fo:table-cell>
+									<fo:table-cell border-width="0.2mm" border-style="solid"  display-align="center" >
+										<fo:block font-size="9pt" content-width="102mm" vertical-align="center" font-family="arial">
+											<xsl:if test="abschlusspruefung_typ='Bachelor'" >
+												<xsl:text> Bachelorprüfung</xsl:text>
+											</xsl:if>
+											<xsl:if test="abschlusspruefung_typ='Diplom'" >
+												<xsl:text> Masterprüfung</xsl:text>
+											</xsl:if>
+											<xsl:text> vom </xsl:text>
+											<xsl:value-of select="abschlusspruefung_datum" />
+										</fo:block>
+									</fo:table-cell>
+									<fo:table-cell border-width="0.2mm" border-style="solid"  display-align="center" >
+										<fo:block font-size="9pt" content-width="60mm" vertical-align="center" font-family="arial">
+											<xsl:text> </xsl:text><xsl:value-of select="abschlusspruefung_note" />
+										</fo:block>
+									</fo:table-cell>
+								</fo:table-row>
+							</fo:table-body>
+						</fo:table>
+						<fo:block font-size="7pt">\n</fo:block>
+						<fo:table>
+							<fo:table-column column-width="15mm"/>
+							<fo:table-column column-width="155mm"/>
+							<fo:table-body>
+								<fo:table-row>
+									<fo:table-cell>
+										<fo:block font-size="6pt" font-family="arial">Notenstufen: </fo:block>
+									</fo:table-cell>
+									<fo:table-cell>
+										<fo:block font-size="6pt" font-family="arial">mit ausgezeichnetem Erfolg bestanden, mit gutem Erfolg bestanden, bestanden</fo:block>
+									</fo:table-cell>
+								</fo:table-row>
+							</fo:table-body>
+						</fo:table>
+					</xsl:if>
+				</fo:block-container>
 				</fo:block-container>
 				<fo:block-container position="absolute" top="252mm" left="21.5mm">
 					<fo:table table-layout="fixed" border-collapse="collapse">
