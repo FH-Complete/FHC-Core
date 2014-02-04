@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2006 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -240,6 +240,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <popupset>
 	<menupopup id="student-prestudent-rolle-tree-popup">
 		<menuitem label="Bearbeiten" oncommand="StudentRolleBearbeiten();" id="student-prestudent-rolle-tree-popup-edit" hidden="false"/>
+		<menuitem label="Status bestaetigen" oncommand="StudentPrestudentRolleBestaetigen();" id="student-prestudent-rolle-tree-popup-approve" hidden="false"/>		
 		<menuitem label="Neuen Status hinzufuegen" oncommand="StudentRolleAdd();" id="student-prestudent-rolle-tree-popup-add" hidden="false"/>
 		<menuitem label="Entfernen" oncommand="StudentPrestudentRolleDelete();" id="student-prestudent-rolle-tree-popup-delete" hidden="false"/>		
 	</menupopup>
@@ -545,6 +546,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#studienplan_bezeichnung" />
 							<splitter class="tree-splitter"/>
+							<treecol id="student-prestudent-tree-rolle-bestaetigt_von" label="BestaetigtVon" flex="2" hidden="false" persist="hidden, width, ordinal"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#bestaetigt_von" />
+							<splitter class="tree-splitter"/>
+							<treecol id="student-prestudent-tree-rolle-bestaetigt_am" label="BestaetigtAm" flex="2" hidden="false" persist="hidden, width, ordinal"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#bestaetigt_Am" />
+							<splitter class="tree-splitter"/>
 						</treecols>
 			
 						<template>
@@ -560,6 +569,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#prestudent_id"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#studienplan_id"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#studienplan_bezeichnung"/>
+											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#bestaetigt_von"/>
+											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#bestaetigt_am"/>
 										</treerow>
 									</treeitem>
 								</treechildren>

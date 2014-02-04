@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2006 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -746,7 +746,7 @@ if(!$error)
 			}
 			else
 			{
-				$qry = "SELECT count(*) as anzahl FROM public.tbl_prestudentstatus WHERE prestudent_id='".addslashes($_POST['prestudent_id'])."'";
+				$qry = "SELECT count(*) as anzahl FROM public.tbl_prestudentstatus WHERE prestudent_id='".$db->db_add_param($_POST['prestudent_id'], FHC_INTEGER)."'";
 				if($result = $db->db_query($qry))
 				{
 					if($row = $db->db_fetch_object($result))
@@ -800,6 +800,47 @@ if(!$error)
 						$return = false;
 						$errormsg = $rolle->errormsg;
 					}
+				}
+			}
+		}
+		else
+		{
+			$return = false;
+			$errormsg = 'Fehlerhafte Parameteruebergabe';
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='bestaetigerolle')
+	{
+		//Bestaetigt eine Prestudentrolle
+		
+		if(isset($_POST['studiensemester_kurzbz']) && isset($_POST['status_kurzbz']) &&
+		   isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id']) &&
+		   isset($_POST['ausbildungssemester']) && is_numeric($_POST['ausbildungssemester']))
+		{
+			if(!$rechte->isBerechtigt('admin', $_POST['studiengang_kz'], 'suid') && !$rechte->isBerechtigt('assistenz', $_POST['studiengang_kz'], 'suid'))
+			{
+				$return = false;
+				$errormsg = 'keine Berechtigung';
+			}
+			else
+			{
+				$rolle = new prestudent();
+				if($rolle->load_rolle($_POST['prestudent_id'],$_POST['status_kurzbz'],$_POST['studiensemester_kurzbz'], $_POST['ausbildungssemester']))
+				{
+					if($rolle->bestaetige_rolle($_POST['prestudent_id'],$_POST['status_kurzbz'],$_POST['studiensemester_kurzbz'], $_POST['ausbildungssemester'],$user))
+					{
+						$return = true;
+					}
+					else
+					{
+						$return = false;
+						$errormsg = $rolle->errormsg;
+					}
+				}
+				else
+				{
+					$return = false;
+					$errormsg = $rolle->errormsg;
 				}
 			}
 		}

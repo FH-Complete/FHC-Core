@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2006 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -85,6 +85,8 @@ foreach($ps->result as $row)
         	<ROLLE:orgform_kurzbz><![CDATA['.$row->orgform_kurzbz.']]></ROLLE:orgform_kurzbz>
         	<ROLLE:studienplan_id><![CDATA['.$row->studienplan_id.']]></ROLLE:studienplan_id>
         	<ROLLE:studienplan_bezeichnung><![CDATA['.$row->studienplan_bezeichnung.']]></ROLLE:studienplan_bezeichnung>
+        	<ROLLE:bestaetigt_von><![CDATA['.$row->bestaetigtvon.']]></ROLLE:bestaetigt_von>
+        	<ROLLE:bestaetigt_am><![CDATA['.$datum->convertISODate($row->bestaetigtam).']]></ROLLE:bestaetigt_am>
       	</RDF:Description>
       </RDF:li>
 	';
