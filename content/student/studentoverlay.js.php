@@ -1613,6 +1613,55 @@ function StudentPrestudentRolleDelete()
 }
 
 // ****
+// * Bestaetigt einen Prestudentstatus
+// ****
+function StudentPrestudentRolleBestaetigen()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-prestudent-tree-rolle');
+
+	if (tree.currentIndex==-1) return;
+
+	//markierte Rolle holen
+	var status_kurzbz = getTreeCellText(tree, 'student-prestudent-tree-rolle-status_kurzbz', tree.currentIndex);
+	var studiensemester_kurzbz = getTreeCellText(tree, 'student-prestudent-tree-rolle-studiensemester_kurzbz', tree.currentIndex);
+	var prestudent_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-prestudent_id', tree.currentIndex);	
+	var ausbildungssemester = getTreeCellText(tree, 'student-prestudent-tree-rolle-ausbildungssemester', tree.currentIndex);
+
+	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+	if(confirm('Diesen Status bestaetigen?'))
+	{
+		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+		var req = new phpRequest(url,'','');
+
+		req.add('type', 'bestaetigerolle');
+
+		req.add('status_kurzbz', status_kurzbz);
+		req.add('prestudent_id', prestudent_id);
+		req.add('studiensemester_kurzbz', studiensemester_kurzbz);
+		req.add('ausbildungssemester', ausbildungssemester);
+		req.add('studiengang_kz', studiengang_kz);
+
+		var response = req.executePOST();
+
+		var val =  new ParseReturnValue(response)
+
+		if (!val.dbdml_return)
+		{
+			if(val.dbdml_errormsg=='')
+				alert(response)
+			else
+				alert(val.dbdml_errormsg)
+		}
+		else
+		{
+			StudentDetailRolleTreeDatasource.Refresh(false);
+			SetStatusBarText('Daten wurden geloescht');
+		}
+	}
+}
+
+// ****
 // * oeffnet den BearbeitenDialog fuer die Prestudentrollen
 // ****
 function StudentRolleBearbeiten()
