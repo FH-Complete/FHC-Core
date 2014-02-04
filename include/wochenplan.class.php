@@ -93,6 +93,7 @@ class wochenplan extends basis_db
 
 	public $wochenplan;
 	public $errormsg;
+	public $fachbereich_kurzbz;
 
 	/**
 	 * Konstruktor
@@ -108,7 +109,7 @@ class wochenplan extends basis_db
 		$this->kal_link='stpl_kalender.php?type='.$type;
 		// Timezone setzten
 		date_default_timezone_set('Europe/Vienna');
-		$this->datum=mktime();
+		$this->datum=time();
 		$this->init_stdplan();
 		$this->crlf=crlf();
 		
@@ -145,11 +146,11 @@ class wochenplan extends basis_db
 	 * @param $grp
 	 * @param $gruppe
 	 */
-	public function load_data($type, $uid, $ort_kurzbz=NULL, $studiengang_kz=NULL, $sem=NULL, $ver=NULL, $grp=NULL, $gruppe=NULL)
+	public function load_data($type, $uid, $ort_kurzbz=NULL, $studiengang_kz=NULL, $sem=NULL, $ver=NULL, $grp=NULL, $gruppe=NULL, $fachbereich_kurzbz=NULL)
 	{
 		// Parameter Checken
 		// Typ des Stundenplans
-		if ($type=='student' || $type=='lektor' || $type=='verband' || $type=='gruppe' || $type=='ort')
+		if ($type=='student' || $type=='lektor' || $type=='verband' || $type=='gruppe' || $type=='ort' || $type=='fachbereich')
 			$this->type=$type;
 		else
 		{
@@ -200,6 +201,16 @@ class wochenplan extends basis_db
 			$this->gruppe_kurzbz=$gruppe;
 
 
+		if($type=='fachbereich')
+		{
+			if(is_null($fachbereich_kurzbz))
+			{
+				$this->errormsg = 'Fachbereich nicht gesetzt';
+				return false;
+			}
+			$this->fachbereich_kurzbz=$fachbereich_kurzbz;
+			
+		}
 		// Zusaetzliche Daten ermitteln
 		//personendaten
 		if ($this->type=='student' || $this->type=='lektor')
@@ -345,7 +356,7 @@ class wochenplan extends basis_db
 
 		// Stundenplandaten ermittlen
 		$this->wochenplan=new lehrstunde();
-		$anz=$this->wochenplan->load_lehrstunden($this->type,$this->datum_begin,$this->datum_end,$this->pers_uid,$this->ort_kurzbz,$this->stg_kz,$this->sem,$this->ver,$this->grp,$this->gruppe_kurzbz, $stpl_view);
+		$anz=$this->wochenplan->load_lehrstunden($this->type,$this->datum_begin,$this->datum_end,$this->pers_uid,$this->ort_kurzbz,$this->stg_kz,$this->sem,$this->ver,$this->grp,$this->gruppe_kurzbz, $stpl_view, null,$this->fachbereich_kurzbz);
 		if ($anz<0)
 		{
 			$this->errormsg=$this->wochenplan->errormsg;
@@ -410,8 +421,6 @@ class wochenplan extends basis_db
 	{
 		$sprache = getSprache(); 
 		$p=new phrasen($sprache); 
-		
-		//$datum=mktime();
 		
 		echo '<TABLE width="100%" border="0" cellspacing="0">'.$this->crlf;
 		echo '	<TR>'.$this->crlf;
@@ -601,7 +610,7 @@ class wochenplan extends basis_db
 		}
 		echo '</tr></thead><tbody>'.$this->crlf;
 		// Von Montag bis Samstag
-		$datum_now=mktime();
+		$datum_now=time();
 		$datum_res_lektor_start=jump_day($datum_now,(RES_TAGE_LEKTOR_MIN)-1);
 		$datum_res_lektor_ende=$o_datum->mktime_fromdate(RES_TAGE_LEKTOR_BIS); //jump_day($datum_now,RES_TAGE_LEKTOR_MAX);
 		if (!date("w",$this->datum))
@@ -2399,7 +2408,7 @@ function jahreskalenderjump_hoverbox($link)	//Mit Hoverbox Effekt
 	$sprache = getSprache(); 
 	$p=new phrasen($sprache); 
 	$crlf=crlf();
-	$datum=mktime();
+	$datum=time();
 	$woche=kalenderwoche($datum);
 	$wochenmontag=montag($datum);
 	

@@ -131,6 +131,7 @@ function onJumpNow()
 	var grp=daten.getAttribute("grp");
 	var gruppe=daten.getAttribute("gruppe");
 	var ort=daten.getAttribute("ort");
+	var fachbereich_kurzbz=date.getAttribute("fachbereich_kurzbz");
 	var pers_uid=daten.getAttribute("pers_uid");
 
 	var d = new Date();
@@ -138,7 +139,7 @@ function onJumpNow()
     //Sekunden seit 1.1.1970
     datum = d.getTime()/1000;
 	//alert(datum);
-	var attributes="?type="+type+"&datum="+datum+"&ort="+encodeURIComponent(ort)+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
+	var attributes="?type="+type+"&datum="+datum+"&ort="+encodeURIComponent(ort)+"&pers_uid="+encodeURIComponent(pers_uid)+"&stg_kz="+encodeURIComponent(stg_kz)+"&sem="+encodeURIComponent(sem)+"&ver="+encodeURIComponent(ver)+"&grp="+encodeURIComponent(grp)+"&gruppe="+encodeURIComponent(gruppe)+"&fachbereich_kurzbz="+encodeURIComponent(fachbereich_kurzbz);
 	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 	url+=attributes;
 	if (url)
@@ -158,11 +159,12 @@ function onJumpDate(wochen)
 	var gruppe=daten.getAttribute("gruppe");
 	var ort=daten.getAttribute("ort");
 	var pers_uid=daten.getAttribute("pers_uid");
+	var fachbereich_kurzbz=daten.getAttribute("fachbereich_kurzbz");
 
 	// neues Datum berechnen. Eine Woche sind 604800 Sekunden.
 	datum+=(604800*wochen)+1;
 
-	var attributes="?type="+type+"&datum="+datum+"&ort="+encodeURIComponent(ort)+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
+	var attributes="?type="+type+"&datum="+datum+"&ort="+encodeURIComponent(ort)+"&pers_uid="+encodeURIComponent(pers_uid)+"&stg_kz="+encodeURIComponent(stg_kz)+"&sem="+encodeURIComponent(sem)+"&ver="+encodeURIComponent(ver)+"&grp="+encodeURIComponent(grp)+"&gruppe="+encodeURIComponent(gruppe)+"&fachbereich_kurzbz="+encodeURIComponent(fachbereich_kurzbz);
 	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 	url+=attributes;
 	if (url)
@@ -182,6 +184,7 @@ function onJumpDateRel(evt)
 	var gruppe=daten.getAttribute("gruppe");
 	var ort=daten.getAttribute("ort");
 	var pers_uid=daten.getAttribute("pers_uid");
+	var fachbereich_kurzbz=daten.getAttribute("fachbereich_kurzbz");
 	var kw=daten.getAttribute("kw");
 	var KWZiel=evt.target.getAttribute("kw");
 	var wochen=KWZiel-kw;
@@ -189,7 +192,7 @@ function onJumpDateRel(evt)
 	// neues Datum berechnen. Eine Woche sind 604800 Sekunden.
 	datum+=(604800*wochen)+1;
 
-	var attributes="?type="+type+"&datum="+datum+"&ort="+encodeURIComponent(ort)+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe;
+	var attributes="?type="+type+"&datum="+datum+"&ort="+encodeURIComponent(ort)+"&pers_uid="+encodeURIComponent(pers_uid)+"&stg_kz="+encodeURIComponent(stg_kz)+"&sem="+encodeURIComponent(sem)+"&ver="+encodeURIComponent(ver)+"&grp="+encodeURIComponent(grp)+"&gruppe="+encodeURIComponent(gruppe)+"&fachbereich_kurzbz="+encodeURIComponent(fachbereich_kurzbz);
 	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
 	url+=attributes;
 	if (url)
@@ -426,8 +429,9 @@ function onStplDetail(event)
 	var stunde=event.target.getAttribute("stunde");
 	var pers_uid=event.target.getAttribute("pers_uid");
 	var ort_kurzbz=event.target.getAttribute("ort_kurzbz");
+	var fachbereich_kurzbz=event.target.getAttribute("fachbereich_kurzbz");
 
-	var attributes="?type="+type+"&datum="+datum+"&stunde="+stunde+"&ort_kurzbz="+encodeURIComponent(ort_kurzbz)+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe+"&ort_kurzbz="+encodeURIComponent(ort_kurzbz);
+	var attributes="?type="+type+"&datum="+datum+"&stunde="+stunde+"&ort_kurzbz="+encodeURIComponent(ort_kurzbz)+"&pers_uid="+pers_uid+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe+"&ort_kurzbz="+encodeURIComponent(ort_kurzbz)+"&fachbereich_kurzbz="+encodeURIComponent(fachbereich_kurzbz);
 	//alert(attributes);
 	//debug('stpl-week-overlay onStplDetail Attribute:'+attributes);
 	attributes+=idList;

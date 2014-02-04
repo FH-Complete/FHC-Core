@@ -45,6 +45,8 @@ $fb_arr = array();
 foreach ($fachbereich->result as $row)
 	$fb_arr[$row->fachbereich_kurzbz]=$row->bezeichnung;
 
+$db = new basis_db();
+
 $qry = "
 SELECT * FROM (
 	SELECT
@@ -52,13 +54,15 @@ SELECT * FROM (
 	FROM
 		lehre.tbl_lehreinheit,
 		lehre.tbl_lehrveranstaltung,
-		lehre.tbl_lehrfach,
+		lehre.tbl_lehrveranstaltung as lehrfach,
+		public.tbl_fachbereich,
 		lehre.tbl_lehreinheitmitarbeiter
 	WHERE
 		tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id AND
-		tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stsem)."' AND
-		tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
+		tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stsem)." AND
+		tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id AND
 		tbl_lehreinheitmitarbeiter.semesterstunden<>0 AND
+		tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz AND
 		faktor<>0 AND
 		stundensatz<>0 AND
 		tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id
@@ -66,7 +70,7 @@ SELECT * FROM (
 	) as a JOIN public.tbl_studiengang USING(studiengang_kz)
 ORDER BY typ, tbl_studiengang.kurzbz, fachbereich_kurzbz
 ";
-$db = new basis_db();
+
 if(!$db->db_query($qry))
 	die('Fehler bei Datenbankabfrage');
 
@@ -96,7 +100,7 @@ WHERE
 	tbl_projektbetreuer.faktor<>0 AND
 	tbl_projektbetreuer.stunden<>0 AND
 	tbl_projektbetreuer.stundensatz<>0 AND
-	tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stsem)."'
+	tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stsem)."
 GROUP BY studiengang_kz";
 
 if(!$result = $db->db_query($qry))

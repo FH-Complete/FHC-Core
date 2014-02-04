@@ -489,7 +489,16 @@ if (!$db = new basis_db())
 		$stsem_obj = new studiensemester();
 		$stsem = $stsem_obj->getaktorNext();
 		//Namen der Lehrenden Auslesen
-		$qry = "SELECT * FROM campus.vw_mitarbeiter, lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lv' AND tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE lehrveranstaltung_id='$lv' ORDER BY ende DESC LIMIT 1) AND mitarbeiter_uid=uid";
+		$qry = "SELECT 
+					* 
+				FROM 
+					campus.vw_mitarbeiter, lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit 
+				WHERE 
+					lehrveranstaltung_id=".$db->db_add_param($lv, FHC_INTEGER)." 
+					AND tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id 
+					AND studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE lehrveranstaltung_id=".$db->db_add_param($lv)." ORDER BY ende DESC LIMIT 1) 
+					AND mitarbeiter_uid=uid";
+
 		echo "<tr><td class='tdvertical' nowrap><b>".$p->t('courseInformation/lehrendeLautLehrauftrag')."</b></td><td>&nbsp;</td><td nowrap>";
 		$helparray = array();
 		if($result=$db->db_query($qry))
@@ -514,16 +523,15 @@ if (!$db = new basis_db())
 	   				funktion_kurzbz='Leitung' AND 
 	   				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 					(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) AND
-	   				oe_kurzbz in (SELECT distinct oe_kurzbz 
+	   				oe_kurzbz in (SELECT distinct lehrfach.oe_kurzbz 
 									FROM 
 										lehre.tbl_lehreinheit 
-										JOIN lehre.tbl_lehrfach USING(lehrfach_id)
-										JOIN public.tbl_fachbereich USING(fachbereich_kurzbz)
+										JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
 									WHERE 
-										lehrveranstaltung_id='$lv' AND 
+										tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lv, FHC_INTEGER)." AND 
 										studiensemester_kurzbz=(SELECT studiensemester_kurzbz 
 																FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
-																WHERE tbl_lehreinheit.lehrveranstaltung_id='$lv' 
+																WHERE tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lv, FHC_INTEGER)."
 																ORDER BY ende DESC LIMIT 1
 																)	   											
 								  )";
@@ -542,18 +550,19 @@ if (!$db = new basis_db())
 	   //FB Koordinator auslesen
 		//$qry = "SELECT distinct vorname, nachname FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbk' AND studiengang_kz='$stg' AND fachbereich_kurzbz in (SELECT fachbereich_kurzbz FROM lehre.tbl_lehrfach, lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lv' AND tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND tbl_lehreinheit.studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) WHERE tbl_lehreinheit.lehrveranstaltung_id='$lv' ORDER BY ende DESC LIMIT 1))";
 	   $qry = "SELECT 
-				distinct titelpre, titelpost, vorname, nachname, tbl_lehrfach.fachbereich_kurzbz
+				distinct titelpre, titelpost, vorname, nachname, tbl_fachbereich.fachbereich_kurzbz
 			FROM
-				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach, public.tbl_benutzerfunktion, campus.vw_mitarbeiter
+				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_benutzerfunktion, campus.vw_mitarbeiter, public.tbl_fachbereich
 			WHERE
-				tbl_lehrveranstaltung.lehrveranstaltung_id='$lv' AND
+				tbl_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lv, FHC_INTEGER)." AND
 				tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
-				tbl_lehrfach.fachbereich_kurzbz=tbl_benutzerfunktion.fachbereich_kurzbz AND
+				tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND
+				tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz AND
+				tbl_fachbereich.fachbereich_kurzbz=tbl_benutzerfunktion.fachbereich_kurzbz AND
 				tbl_benutzerfunktion.funktion_kurzbz='fbk' AND 
 				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) AND
-				vw_mitarbeiter.uid=COALESCE(koordinator, tbl_benutzerfunktion.uid) AND
+				vw_mitarbeiter.uid=COALESCE(tbl_lehrveranstaltung.koordinator, tbl_benutzerfunktion.uid) AND
 				tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1)";
 	   
 		echo "<tr><td class='tdvertical'><b>".$p->t('courseInformation/institutskoordinator')."</b></td><td>&nbsp;</td><td>";

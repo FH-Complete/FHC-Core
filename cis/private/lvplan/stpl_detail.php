@@ -83,7 +83,7 @@ $stsem = getStudiensemesterFromDatum($datum);
 //Stundenplan
 $sql_query="
 SELECT 
-	campus.vw_stundenplan.*, tbl_lehrfach.bezeichnung, vw_mitarbeiter.titelpre, 
+	campus.vw_stundenplan.*, lehrfach.bezeichnung, vw_mitarbeiter.titelpre, 
 	vw_mitarbeiter.titelpost, vw_mitarbeiter.nachname, vw_mitarbeiter.vorname,
 	(SELECT 
 		count(*) 
@@ -104,7 +104,7 @@ SELECT
 	 	AND studiensemester_kurzbz=".$db->db_add_param($stsem).") as anzahl_grp
 FROM 
 	campus.vw_stundenplan 
-	JOIN lehre.tbl_lehrfach USING (lehrfach_id)
+	JOIN lehre.tbl_lehrveranstaltung as lehrfach ON (vw_stundenplan.lehrfach_id=lehrfach.lehrveranstaltung_id)
 	JOIN campus.vw_mitarbeiter USING (uid)
 WHERE 
 	datum=".$db->db_add_param($datum)." 

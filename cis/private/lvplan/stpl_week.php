@@ -278,7 +278,7 @@ if (isset($reserve) && $raumres)
 // Stundenplan erstellen
 $stdplan=new wochenplan($type);
 if (!isset($datum))
-	$datum=mktime();
+	$datum=time();
 
 // Benutzergruppe
 $stdplan->user=$user;

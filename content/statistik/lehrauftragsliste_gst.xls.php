@@ -75,7 +75,7 @@ $worksheet->write(2,++$i,"Familienname", $format_bold);
 $worksheet->write(2,++$i,"Fixangestellt", $format_bold);
 $worksheet->write(2,++$i,"Stunden", $format_bold);
 $worksheet->write(2,++$i,"Kosten", $format_bold);
-
+$db = new basis_db();
 //Daten holen
 $qry = "SELECT * FROM (
 		SELECT 
@@ -92,12 +92,12 @@ $qry = "SELECT * FROM (
 			tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid AND
 			tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
 			tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-			studiengang_kz='".addslashes($studiengang_kz)."' AND studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND 
+			studiengang_kz=".$db->db_add_param($studiengang_kz)." AND studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND 
 			tbl_lehreinheitmitarbeiter.semesterstunden<>0 AND tbl_lehreinheitmitarbeiter.semesterstunden is not null 
 			AND tbl_lehreinheitmitarbeiter.stundensatz<>0 AND tbl_lehreinheitmitarbeiter.faktor<>0 AND
 			EXISTS (SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=tbl_lehreinheit.lehreinheit_id)";
 if($semester!='')
-	$qry.=" AND semester='".addslashes($semester)."'";
+	$qry.=" AND semester=".$db->db_add_param($semester);
 
 //Projektsbetreuungen
 $qry.= " UNION 
@@ -114,15 +114,15 @@ $qry.= " UNION
 		 	tbl_benutzer.person_id=tbl_projektbetreuer.person_id AND
 		 	tbl_projektarbeit.projektarbeit_id = tbl_projektbetreuer.projektarbeit_id AND
 		 	tbl_projektarbeit.lehreinheit_id = tbl_lehreinheit.lehreinheit_id AND
-		 	tbl_lehreinheit.studiensemester_kurzbz = '".addslashes($semester_aktuell)."' AND 
+		 	tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($semester_aktuell)." AND 
 		 	tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
-		 	tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."' AND
+		 	tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND
 		 	tbl_person.person_id=tbl_projektbetreuer.person_id";
 if($semester!='')
-	$qry.=" AND tbl_lehrveranstaltung.semester='".addslashes($semester)."'";
+	$qry.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester, FHC_INTEGER);
 $qry.=") as foo";
 $qry.="	ORDER BY nachname, vorname, mitarbeiter_uid";
-$db = new basis_db();
+
 if($result = $db->db_query($qry))
 {
 	$zeile=3;
@@ -154,15 +154,15 @@ if($result = $db->db_query($qry))
 	foreach ($liste as $uid=>$arr)
 	{
 		$qry = "SELECT tbl_projektbetreuer.faktor, tbl_projektbetreuer.stunden, tbl_projektbetreuer.stundensatz
-	        FROM lehre.tbl_projektbetreuer, lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehrveranstaltung, 
+	        FROM lehre.tbl_projektbetreuer, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, 
 	               public.tbl_benutzer, lehre.tbl_projektarbeit, campus.vw_student 
-	        WHERE tbl_projektbetreuer.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid='$uid' AND 
+	        WHERE tbl_projektbetreuer.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid=".$db->db_add_param($uid)." AND 
 	              tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND student_uid=vw_student.uid
-	              AND tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
-	              tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
-	              tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."'";
+	              AND tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND
+	              tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
+	              tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
 		if($semester!='')
-			$qry.=" AND tbl_lehrveranstaltung.semester='".addslashes($semester)."'";
+			$qry.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester, FHC_INTEGER);
 		if($result = $db->db_query($qry))
 		{
 			while($row = $db->db_fetch_object($result))

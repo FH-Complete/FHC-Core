@@ -342,7 +342,7 @@ function LeNeu()
 	lehrfachmenulist.builder.rebuild();
 
 	//Url zusammenbauen
-	var url = '<?php echo APP_ROOT;?>rdf/lehrfach.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+'&'+gettimestamp();
+	var url = '<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?lehrveranstaltung_kompatibel_id='+lehrveranstaltung_id+'&'+gettimestamp();
 
 	//RDF holen
 	var newDs  = rdfService.GetDataSource(url);
@@ -794,7 +794,7 @@ function LeAuswahl()
 	lehrfachmenulist.builder.rebuild();
 
 	//Url zusammenbauen
-	var url = '<?php echo APP_ROOT;?>rdf/lehrfach.rdf.php?lehrveranstaltung_id='+lehrveranstaltung+'&lehrfach_id='+lehrfach+'&'+gettimestamp();
+	var url = '<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?lehrveranstaltung_kompatibel_id='+lehrveranstaltung+'&lehrfach_id='+lehrfach+'&'+gettimestamp();
 
 	//RDF holen
 	var newDs  = rdfService.GetDataSourceBlocking(url);

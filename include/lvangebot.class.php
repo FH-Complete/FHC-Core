@@ -198,7 +198,7 @@ class lvangebot extends basis_db
 		}
 		
 		//Anmeldefenster Start und Ende prüfen
-		if($this->anmeldefenster_start>$this->anmeldefenster_ende)
+		if($this->anmeldefenster_start!='' && $this->anmeldefenster_ende!='' && $this->anmeldefenster_start>$this->anmeldefenster_ende)
 		{
 			$this->errormsg = 'Anmeldefenster: Ende liegt vor Start';
 			return false;

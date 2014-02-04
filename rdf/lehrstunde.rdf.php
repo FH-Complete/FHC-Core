@@ -66,7 +66,7 @@ $uid=get_uid();
 if (isset($_GET['datum']))
 	$datum=$_GET['datum'];
 else
-	$datum=date('Y-m-d',(mktime()));
+	$datum=date('Y-m-d',(time()));
 
 if (isset($_GET['datum_bis']))
 	$datum_bis=$_GET['datum_bis'];

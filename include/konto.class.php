@@ -622,14 +622,61 @@ class konto extends basis_db
 			return false; 
 		}
 	}
+
+	/**
+	 * Liefert die CreditPoints die dem Studierenden noch zur Verfuegung stehen
+	 * falls dieser einschraenkungen eingetragen hat. Wenn keine Einschraenkung vorhanden ist,
+	 * wird false zurueckgeliefert
+	 * @return Anzahl der Verfuegbaren CreditPoints oder false falls unbeschraenkt
+	 */
+	public function getCreditPoints($uid, $studiensemester_kurzbz)
+	{
+		$qry = "SELECT sum(credit_points) as cp
+				FROM 
+					public.tbl_konto 
+					JOIN public.tbl_benutzer USING(person_id)
+				WHERE
+					uid=".$this->db_add_param($uid)." 
+					AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+					AND buchungsnr_verweis is not null
+					AND credit_points is not null";
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				$creditpoints = $row->cp;
+
+				if($creditpoints!='')
+				{
+					// Bereits verwendete CreditPoints ermitteln
+					$lehrveranstaltung = new lehrveranstaltung();
+					$verwendet = $lehrveranstaltung->getUsedECTS($uid, $studiensemester_kurzbz);
+					return ($creditpoints-($verwendet));
+				}
+				else
+					return false;
+			}
+			else
+			{
+				// keine Einschraenkung vorhanden
+				return false;
+			}
+		}
+		else
+		{	
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 	
 	private function addZahlungsreferenz($buchungsnr)
 	{
 		$this->zahlungsreferenz = generateZahlungsreferenz($this->studiengang_kz, $buchungsnr);
 		
-		$qry = "UPDATE public.tbl_konto "
-				. "SET zahlungsreferenz='".$this->zahlungsreferenz."' "
-				. "WHERE buchungsnr='".$buchungsnr."';";
+		$qry = "UPDATE public.tbl_konto ".
+				"SET zahlungsreferenz=".$db->db_add_param($this->zahlungsreferenz).
+				"WHERE buchungsnr=".$db->db_add_param($buchungsnr).";";
 		
 		if($this->db_query($qry))
 		{
@@ -642,5 +689,6 @@ class konto extends basis_db
 		}
 		
 	}
+
 }
 ?>

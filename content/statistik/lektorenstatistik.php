@@ -62,16 +62,17 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 	
 	echo "<h2>LektorInnenstatistik (Lehrauftrag ohne Betreuungen) $ws / $ss - ".$fachbereich->bezeichnung.'</h2>';
 	$qry = "SELECT distinct mitarbeiter_uid, anrede, nachname, vorname, titelpre, titelpost,
-			(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN campus.vw_mitarbeiter ON(uid=mitarbeiter_uid) WHERE studiensemester_kurzbz IN('".addslashes($ws)."','".addslashes($ss)."') AND fachbereich_kurzbz='".addslashes($fachbereich->fachbereich_kurzbz)."' AND fixangestellt AND geschlecht='m') a) AS fix_m,
-			(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN campus.vw_mitarbeiter ON(uid=mitarbeiter_uid) WHERE studiensemester_kurzbz IN('".addslashes($ws)."','".addslashes($ss)."') AND fachbereich_kurzbz='".addslashes($fachbereich->fachbereich_kurzbz)."' AND fixangestellt AND geschlecht='w') a) AS fix_w
+			(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id) JOIN public.tbl_fachbereich ON(lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz) JOIN campus.vw_mitarbeiter ON(uid=mitarbeiter_uid) WHERE studiensemester_kurzbz IN(".$db->db_add_param($ws).",".$db->db_add_param($ss).") AND fachbereich_kurzbz=".$db->db_add_param($fachbereich->fachbereich_kurzbz)." AND fixangestellt AND geschlecht='m') a) AS fix_m,
+			(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id) JOIN public.tbl_fachbereich ON(lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz) JOIN campus.vw_mitarbeiter ON(uid=mitarbeiter_uid) WHERE studiensemester_kurzbz IN(".$db->db_add_param($ws).",".$db->db_add_param($ss).") AND fachbereich_kurzbz=".$db->db_add_param($fachbereich->fachbereich_kurzbz)." AND fixangestellt AND geschlecht='w') a) AS fix_w
 			FROM lehre.tbl_lehreinheitmitarbeiter 
 				JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
-				JOIN lehre.tbl_lehrfach USING(lehrfach_id) 
+				JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id) 
+				JOIN public.tbl_fachbereich ON(lehrfach.oe_kurzbz=fachbereich.oe_kurzbz)
 				JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid)
 				JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid)
 				JOIN public.tbl_person USING(person_id)
-			WHERE studiensemester_kurzbz in('".addslashes($ws)."','".addslashes($ss)."') 
-				AND fachbereich_kurzbz='".addslashes($fachbereich->fachbereich_kurzbz)."' AND fixangestellt
+			WHERE studiensemester_kurzbz in(".$db->db_add_param($ws).",".$db->db_add_param($ss).") 
+				AND fachbereich_kurzbz=".$db->db_add_param($fachbereich->fachbereich_kurzbz)." AND fixangestellt
 			ORDER BY nachname, vorname";
 	
 	if($db->db_query($qry))
@@ -107,18 +108,19 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 		echo $ausgabe;
 	}
 	echo '</tbody></table>';
-	
+
 	$qry = "SELECT distinct mitarbeiter_uid, anrede, nachname, vorname, titelpre, titelpost,
-			(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN campus.vw_mitarbeiter ON(uid=mitarbeiter_uid) WHERE studiensemester_kurzbz IN('".addslashes($ws)."','".addslashes($ss)."') AND fachbereich_kurzbz='".addslashes($fachbereich->fachbereich_kurzbz)."' AND NOT fixangestellt AND geschlecht='m') a) AS not_fix_m,
-			(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN campus.vw_mitarbeiter ON(uid=mitarbeiter_uid) WHERE studiensemester_kurzbz IN('".addslashes($ws)."','".addslashes($ss)."') AND fachbereich_kurzbz='".addslashes($fachbereich->fachbereich_kurzbz)."' AND NOT fixangestellt AND geschlecht='w') a) AS not_fix_w
+			(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id) JOIN public.tbl_fachbereich ON(tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz) JOIN campus.vw_mitarbeiter ON(uid=mitarbeiter_uid) WHERE studiensemester_kurzbz IN(".$db->db_add_param($ws).",".$db->db_add_param($ss).") AND fachbereich_kurzbz=".$db->db_add_param($fachbereich->fachbereich_kurzbz)." AND NOT fixangestellt AND geschlecht='m') a) AS not_fix_m,
+			(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id) JOIN public.tbl_fachbereich ON(tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz) JOIN campus.vw_mitarbeiter ON(uid=mitarbeiter_uid) WHERE studiensemester_kurzbz IN(".$db->db_add_param($ws).",".$db->db_add_param($ss).") AND fachbereich_kurzbz=".$db->db_add_param($fachbereich->fachbereich_kurzbz)." AND NOT fixangestellt AND geschlecht='w') a) AS not_fix_w
 			FROM lehre.tbl_lehreinheitmitarbeiter 
 				JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
-				JOIN lehre.tbl_lehrfach USING(lehrfach_id) 
+				JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
+				JOIN public.tbl_fachbereich ON(tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz) 
 				JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid)
 				JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid)
 				JOIN public.tbl_person USING(person_id)
-			WHERE studiensemester_kurzbz in('".addslashes($ws)."','".addslashes($ss)."') 
-				AND fachbereich_kurzbz='".addslashes($fachbereich->fachbereich_kurzbz)."' AND NOT fixangestellt
+			WHERE studiensemester_kurzbz in(".$db->db_add_param($ws).",".$db->db_add_param($ss).") 
+				AND fachbereich_kurzbz=".$db->db_add_param($fachbereich->fachbereich_kurzbz)." AND NOT fixangestellt
 			ORDER BY nachname, vorname";
 		
 	if($db->db_query($qry))
@@ -226,12 +228,12 @@ else
 		
 		$qry = "SELECT 
 					bezeichnung, fachbereich_kurzbz,
-					(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN campus.vw_mitarbeiter ON(uid=mitarbeiter_uid) WHERE studiensemester_kurzbz IN('".addslashes($ws)."','".addslashes($ss)."') AND fachbereich_kurzbz=a.fachbereich_kurzbz AND fixangestellt AND geschlecht='m') a) AS fix_m,
-					(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN campus.vw_mitarbeiter ON(uid=mitarbeiter_uid) WHERE studiensemester_kurzbz IN('".addslashes($ws)."','".addslashes($ss)."') AND fachbereich_kurzbz=a.fachbereich_kurzbz AND fixangestellt AND geschlecht='w') a) AS fix_w,
-					(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN campus.vw_mitarbeiter ON(uid=mitarbeiter_uid) WHERE studiensemester_kurzbz IN('".addslashes($ws)."','".addslashes($ss)."') AND fachbereich_kurzbz=a.fachbereich_kurzbz AND NOT fixangestellt AND geschlecht='m') a) AS extern_m,
-					(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN campus.vw_mitarbeiter ON(uid=mitarbeiter_uid) WHERE studiensemester_kurzbz IN('".addslashes($ws)."','".addslashes($ss)."') AND fachbereich_kurzbz=a.fachbereich_kurzbz AND NOT fixangestellt AND geschlecht='w') a) AS extern_w,
-					(SELECT sum(semesterstunden) FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE studiensemester_kurzbz='".addslashes($ws)."' AND fachbereich_kurzbz=a.fachbereich_kurzbz AND faktor>0 AND stundensatz>0) AS ws,
-					(SELECT sum(semesterstunden) FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE studiensemester_kurzbz='".addslashes($ss)."' AND fachbereich_kurzbz=a.fachbereich_kurzbz AND faktor>0 AND stundensatz>0) AS ss
+					(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id) JOIN public.tbl_fachbereich ON(tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz) JOIN campus.vw_mitarbeiter ON(uid=mitarbeiter_uid) WHERE studiensemester_kurzbz IN(".$db->db_add_param($ws).",".$db->db_add_param($ss).") AND fachbereich_kurzbz=a.fachbereich_kurzbz AND fixangestellt AND geschlecht='m') a) AS fix_m,
+					(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id) JOIN public.tbl_fachbereich ON(tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz) JOIN campus.vw_mitarbeiter ON(uid=mitarbeiter_uid) WHERE studiensemester_kurzbz IN(".$db->db_add_param($ws).",".$db->db_add_param($ss).") AND fachbereich_kurzbz=a.fachbereich_kurzbz AND fixangestellt AND geschlecht='w') a) AS fix_w,
+					(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id) JOIN public.tbl_fachbereich ON(tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz) JOIN campus.vw_mitarbeiter ON(uid=mitarbeiter_uid) WHERE studiensemester_kurzbz IN(".$db->db_add_param($ws).",".$db->db_add_param($ss).") AND fachbereich_kurzbz=a.fachbereich_kurzbz AND NOT fixangestellt AND geschlecht='m') a) AS extern_m,
+					(SELECT count(*) FROM (SELECT distinct mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id) JOIN public.tbl_fachbereich ON(tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz) JOIN campus.vw_mitarbeiter ON(uid=mitarbeiter_uid) WHERE studiensemester_kurzbz IN(".$db->db_add_param($ws).",".$db->db_add_param($ss).") AND fachbereich_kurzbz=a.fachbereich_kurzbz AND NOT fixangestellt AND geschlecht='w') a) AS extern_w,
+					(SELECT sum(tbl_lehreinheitmitarbeiter.semesterstunden) FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id) JOIN public.tbl_fachbereich ON(lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz) WHERE studiensemester_kurzbz=".$db->db_add_param($ws)." AND fachbereich_kurzbz=a.fachbereich_kurzbz AND faktor>0 AND stundensatz>0) AS ws,
+					(SELECT sum(tbl_lehreinheitmitarbeiter.semesterstunden) FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id) JOIN public.tbl_fachbereich ON(lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz) WHERE studiensemester_kurzbz=".$db->db_add_param($ss)." AND fachbereich_kurzbz=a.fachbereich_kurzbz AND faktor>0 AND stundensatz>0) AS ss
 				FROM public.tbl_fachbereich a WHERE aktiv ORDER BY bezeichnung";
 		
 		if($db->db_query($qry))

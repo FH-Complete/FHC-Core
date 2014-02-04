@@ -63,6 +63,7 @@ class lehrveranstaltung extends basis_db
 	public $semesterwochen;	// smallint
 	public $lvnr;	// varchar(32)
 	public $bezeichnung_arr = array();
+	public $semester_alternativ; // smallint
 
 	public $studienplan_lehrveranstaltung_id;
 	public $studienplan_lehrveranstaltung_id_parent;
@@ -137,6 +138,7 @@ class lehrveranstaltung extends basis_db
 			$this->anzahlsemester = $row->anzahlsemester;
 			$this->semesterwochen = $row->semesterwochen;
 			$this->lvnr = $row->lvnr;
+			$this->semester_alternativ = $row->semester_alternativ;
 			
 			$this->bezeichnung_arr['German'] = $this->bezeichnung;
 			$this->bezeichnung_arr['English'] = $this->bezeichnung_english;
@@ -200,6 +202,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->anzahlsemester = $row->anzahlsemester;
 			$lv_obj->semesterwochen = $row->semesterwochen;
 			$lv_obj->lvnr = $row->lvnr;
+			$lv_obj->semester_alternativ = $row->semester_alternativ;
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -327,6 +330,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->anzahlsemester = $row->anzahlsemester;
 			$lv_obj->semesterwochen = $row->semesterwochen;
 			$lv_obj->lvnr = $row->lvnr;
+			$lv_obj->semester_alternativ = $row->semester_alternativ;
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -452,6 +456,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->anzahlsemester = $row->anzahlsemester;
 			$lv_obj->semesterwochen = $row->semesterwochen;
 			$lv_obj->lvnr = $row->lvnr;
+			$lv_obj->semester_alternativ = $row->semester_alternativ;
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -524,6 +529,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->anzahlsemester = $row->anzahlsemester;
 			$lv_obj->semesterwochen = $row->semesterwochen;
 			$lv_obj->lvnr = $row->lvnr;
+			$lv_obj->semester_alternativ = $row->semester_alternativ;
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -646,7 +652,7 @@ class lehrveranstaltung extends basis_db
 			$qry = 'BEGIN; INSERT INTO lehre.tbl_lehrveranstaltung (studiengang_kz, bezeichnung, kurzbz, lehrform_kurzbz,
 				semester, ects, semesterstunden,  anmerkung, lehre, lehreverzeichnis, aktiv, ext_id, insertamum,
 				insertvon, planfaktor, planlektoren, planpersonalkosten, plankostenprolektor, updateamum, updatevon, sort,
-				zeugnis, projektarbeit, sprache, koordinator, bezeichnung_english, orgform_kurzbz, incoming, lehrtyp_kurzbz, oe_kurzbz, raumtyp_kurzbz, anzahlsemester, semesterwochen, lvnr) VALUES (' .
+				zeugnis, projektarbeit, sprache, koordinator, bezeichnung_english, orgform_kurzbz, incoming, lehrtyp_kurzbz, oe_kurzbz, raumtyp_kurzbz, anzahlsemester, semesterwochen, lvnr, semester_alternativ) VALUES (' .
 					$this->db_add_param($this->studiengang_kz) . ', ' .
 					$this->db_add_param($this->bezeichnung) . ', ' .
 					$this->db_add_param($this->kurzbz) . ', ' .
@@ -680,7 +686,8 @@ class lehrveranstaltung extends basis_db
 					$this->db_add_param($this->raumtyp_kurzbz) . ',' .
 					$this->db_add_param($this->anzahlsemester) . ',' .
 					$this->db_add_param($this->semesterwochen) . ',' . 
-					$this->db_add_param($this->lvnr) . ');';
+					$this->db_add_param($this->lvnr) .','.
+					$this->db_add_param($this->semester_alternativ).');';
 		} 
 		else 
 		{
@@ -724,7 +731,8 @@ class lehrveranstaltung extends basis_db
 					'raumtyp_kurzbz=' . $this->db_add_param($this->raumtyp_kurzbz) . ',' .
 					'anzahlsemester=' . $this->db_add_param($this->anzahlsemester, FHC_INTEGER) . ',' .
 					'semesterwochen=' . $this->db_add_param($this->semesterwochen, FHC_INTEGER) . ',' .
-					'lvnr = ' . $this->db_add_param($this->lvnr) . ' ' .
+					'lvnr = ' . $this->db_add_param($this->lvnr) . ', ' .
+					'semester_alternativ = '.$this->db_add_param($this->semester_alternativ).' '.
 					'WHERE lehrveranstaltung_id = ' . $this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER, false) . ';';
 		}
 
@@ -828,6 +836,7 @@ class lehrveranstaltung extends basis_db
 				$lv_obj->anzahlsemester = $row->anzahlsemester;
 				$lv_obj->semesterwochen = $row->semesterwochen;
 				$lv_obj->lvnr = $row->lvnr;
+				$lv_obj->semester_alternativ = $row->semester_alternativ;
 
 				$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 				$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -916,6 +925,7 @@ class lehrveranstaltung extends basis_db
 				$l->anzahlsemester = $row->anzahlsemester;
 				$l->semesterwochen = $row->semesterwochen;
 				$l->lvnr = $row->lvnr;
+				$l->semester_alternativ = $row->semester_alternativ;
 
 				$l->bezeichnung_arr['German'] = $row->bezeichnung;
 				$l->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -1029,6 +1039,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->anzahlsemester = $row->anzahlsemester;
 			$lv_obj->semesterwochen = $row->semesterwochen;
 			$lv_obj->lvnr = $row->lvnr;
+			$lv_obj->semester_alternativ = $row->semester_alternativ;
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -1114,6 +1125,7 @@ class lehrveranstaltung extends basis_db
 				$obj->anzahlsemester = $row->anzahlsemester;
 				$obj->semesterwochen = $row->semesterwochen;
 				$obj->lvnr = $row->lvnr;
+				$obj->semester_alternativ = $row->semester_alternativ;
 
 				$obj->bezeichnung_arr['German'] = $row->bezeichnung;
 				$obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -1182,9 +1194,6 @@ class lehrveranstaltung extends basis_db
 		{
 			foreach ($this->lehrveranstaltungen as $lv)
 			{
-				$data = new stdClass();
-				$data->data = $lv->bezeichnung;
-
 				$obj = new stdClass();
 				$obj->lehrveranstaltung_id = $lv->lehrveranstaltung_id;
 				$obj->studiengang_kz = $lv->studiengang_kz;
@@ -1194,12 +1203,14 @@ class lehrveranstaltung extends basis_db
 				$obj->semester = $lv->semester;
 				$obj->ects = $lv->ects;
 				$obj->semesterstunden = $lv->semesterstunden;
-				$data->metadata = $obj;
-				$data->attr = array();
-				$data->attr["id"]=$lv->lehrveranstaltung_id;
-				$data->attr["rel"] = $lv->lehrtyp_kurzbz;
-				$data->attr["studienplan_lehrveranstaltung_id"] = $lv->studienplan_lehrveranstaltung_id;
-				$values[] = $data;
+				$obj->lehrtyp_kurzbz = $lv->lehrtyp_kurzbz;
+				$obj->studienplan_lehrveranstaltung_id = $lv->studienplan_lehrveranstaltung_id;
+				$obj->stpllv_semester = $lv->stpllv_semester;
+				$obj->stpllv_pflicht = $lv->stpllv_pflicht;
+				$obj->stpllv_koordinator = $lv->stpllv_koordinator;
+
+				$values[] = $obj;
+
 			}
 		}
 		else
@@ -1213,6 +1224,10 @@ class lehrveranstaltung extends basis_db
 			$obj->semester = $this->semester;
 			$obj->ects = $this->ects;
 			$obj->semesterstunden = $this->semesterstunden;
+			$obj->stpllv_semester = $this->stpllv_semester;
+			$obj->stpllv_pflicht = $this->stpllv_pflicht;
+			$obj->stpllv_koordinator = $this->stpllv_koordinator;
+
 			$values[] = $obj;
 		}
 		return $values;
@@ -1230,9 +1245,6 @@ class lehrveranstaltung extends basis_db
 		{
 			foreach ($tree as $lv)
 			{	
-				$data = new stdClass();
-				$data->data = $lv->bezeichnung;
-
 				$obj = new stdClass();
 				$obj->lehrveranstaltung_id = $lv->lehrveranstaltung_id;
 				$obj->studiengang_kz = $lv->studiengang_kz;
@@ -1242,18 +1254,19 @@ class lehrveranstaltung extends basis_db
 				$obj->semester = $lv->semester;
 				$obj->ects = $lv->ects;
 				$obj->semesterstunden = $lv->semesterstunden;
-				$data->metadata = $obj;
-				$data->attr = array();
-				$data->attr["id"]=$lv->studienplan_lehrveranstaltung_id;
-				$data->attr["rel"] = $lv->lehrtyp_kurzbz;
-				$data->attr["lvID"] = $lv->lehrveranstaltung_id;
-				$data->attr["studienplan_lehrveranstaltung_id"] = $lv->studienplan_lehrveranstaltung_id;
-				$data->children = array();
+				$obj->studienplan_lehrveranstaltung_id = $lv->studienplan_lehrveranstaltung_id;
+				$obj->lehrtyp_kurzbz = $lv->lehrtyp_kurzbz;
+				$obj->stpllv_semester = $lv->stpllv_semester;
+				$obj->stpllv_pflicht = $lv->stpllv_pflicht;
+				$obj->stpllv_koordinator = $lv->stpllv_koordinator;
+
+				$obj->children = array();
 				if(count($lv->childs) > 0)
 				{
-					$data->children = $this->cleanTreeResult($lv->childs);
+					$obj->children = $this->cleanTreeResult($lv->childs);
 				}
-				$values[] = $data;
+				$values[] = $obj;
+
 			}
 		}
 		else
@@ -1267,6 +1280,10 @@ class lehrveranstaltung extends basis_db
 			$obj->semester = $this->semester;
 			$obj->ects = $this->ects;
 			$obj->semesterstunden = $this->semesterstunden;
+			$obj->stpllv_semester = $this->stpllv_semester;
+			$obj->stpllv_pflicht = $this->stpllv_pflicht;
+			$obj->stpllv_koordinator = $this->stpllv_koordinator;
+
 			$values[] = $obj;
 		}
 		return $values;
@@ -1275,29 +1292,15 @@ class lehrveranstaltung extends basis_db
 	/**
 	 * Baut die Datenstruktur für jsTree in Studienordnung auf
 	 * @param $studienplan_id ID des Studienpland
-	 * @param $semester Maximale Anzahl an Semester
 	 */
-	public function getLvTree($studienplan_id, $semester)
+	public function getLvTree($studienplan_id)
 	{
 		$values = array();
-		//TODO Anzahl der Semester laden; Quelle ?
-		$this->loadLehrveranstaltungStudienplan($studienplan_id, 0);
+		$this->loadLehrveranstaltungStudienplan($studienplan_id);
 		$tree = $this->getLehrveranstaltungTree();
-		$data = $this->cleanTreeResult($tree);
-		array_push($values, $data);
-		for($i = 1; $i<=$semester; $i++)
-		{
-			$data = new stdClass();
-			$data->data = "Semester ".$i;
-			$data->attr = array();
-			$data->attr["id"] = $i;
-			$data->attr["rel"] = "semester";
-			$data->children = array();
-			$this->loadLehrveranstaltungStudienplan($studienplan_id, $i);
-			$tree = $this->getLehrveranstaltungTree();
-			$data->children = $this->cleanTreeResult($tree);
-			array_push($values, $data);
-		}
+		$values = $this->cleanTreeResult($tree);
+		unset($this->lehrveranstaltungen);
+		$this->lehrveranstaltungen=array();
 		return $values;
 	}
 	
@@ -1477,7 +1480,7 @@ class lehrveranstaltung extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung where oe_kurzbz=" . $this->db_add_param($oe_kurzbz, FHC_STRING);
+		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung WHERE oe_kurzbz=" . $this->db_add_param($oe_kurzbz, FHC_STRING);
 
 		//Select Befehl zusammenbauen
 		
@@ -1485,7 +1488,7 @@ class lehrveranstaltung extends basis_db
 			$qry .= " AND aktiv ";
 
 		if(!is_null($lehrtyp))
-			$qry .= " AND lehrtyp_kurzbz='".$lehrtyp."'";
+			$qry .= " AND lehrtyp_kurzbz=".$this->db_add_param($lehrtyp);
 
 		if (is_null($sort) || empty($sort))
 			$qry .= " ORDER BY semester, bezeichnung";
@@ -1534,6 +1537,8 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->bezeichnung_english = $row->bezeichnung_english;
 			$lv_obj->orgform_kurzbz = $row->orgform_kurzbz;
 			$lv_obj->lehrtyp_kurzbz = $row->lehrtyp_kurzbz;
+			$lv_obj->lvnr = $row->lvnr;
+			$lv_obj->semester_alternativ = $row->semester_alternativ;
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -1601,6 +1606,7 @@ class lehrveranstaltung extends basis_db
 				$lv_obj->anzahlsemester = $row->anzahlsemester;
 				$lv_obj->semesterwochen = $row->semesterwochen;
 				$lv_obj->lvnr = $row->lvnr;
+				$lv_obj->semester_alternativ = $row->semester_alternativ;
 
 				$lv_obj->studiengang_kurzbzlang = $row->studiengang_kurzbzlang;
 
@@ -1611,6 +1617,54 @@ class lehrveranstaltung extends basis_db
 		else
 		{
 			$this->errormsg='Fehler bei Datenbankabfrage';
+			return false;
+		}
+	}
+
+	/** 
+	 * Liefert die Anzahl der ECTS Punkte die ein Student in einem Studiensemester 
+	 * bereits verbraucht hat (fuer reduzierte Studiengebuehr)
+	 * @param $uid UID
+	 * @param $studiensemester_kurzbz
+	 * @return numeric - Anzahl der ECTS Punkte
+	 */
+	public function getUsedECTS($uid, $studiensemester_kurzbz)
+	{
+		$qry = "
+		SELECT sum(ects) as ectssumme FROM (
+			SELECT 
+				lehrveranstaltung_id, ects 
+			FROM 
+				campus.vw_student_lehrveranstaltung
+			WHERE		
+				uid=".$this->db_add_param($uid)."
+				AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+			UNION
+			SELECT 
+				lehrveranstaltung_id, ects
+			FROM
+				lehre.tbl_zeugnisnote
+				JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+			WHERE
+				student_uid=".$this->db_add_param($uid)."
+				AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+		) a";
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				return $row->ectssumme;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Ermitteln der ECTS Punkte';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Ermitteln der ECTS Punkte';
 			return false;
 		}
 	}

@@ -328,7 +328,7 @@
 								foreach ($arr as $elem)
 									$ids.=",'$elem'";
 
-								$sql_query = "SELECT distinct tbl_lehrveranstaltung.studiengang_kz, tbl_studiengang.kurzbzlang, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM lehre.tbl_lehrfach, public.tbl_studiengang, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung WHERE fachbereich_kurzbz in(".$ids.") AND tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND tbl_studiengang.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz AND tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>''";
+								$sql_query = "SELECT distinct tbl_lehrveranstaltung.studiengang_kz, tbl_studiengang.kurzbzlang, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kurzbz FROM lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_fachbereich, public.tbl_studiengang, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung WHERE fachbereich_kurzbz in(".$ids.") AND tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND tbl_studiengang.studiengang_kz=tbl_lehrveranstaltung.studiengang_kz AND lehrfach.lehrveranstaltung_id=tbl_lehreinheit.lehrfach_id AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>'' AND lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz";
 								$result_stg_kurzbzlang=$db->db_query($sql_query);
 								while($row = $db->db_fetch_object($result_stg_kurzbzlang))
 									if(!array_key_exists($row->studiengang_kz,$stg_arr))
@@ -426,7 +426,7 @@
 								foreach ($arr as $elem)
 									$ids.=",'$elem'";
 
-								$sql_query = "SELECT distinct tbl_lehrveranstaltung.semester FROM lehre.tbl_lehrfach, lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit WHERE fachbereich_kurzbz in(".$ids.") AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($course_id)." AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>'' AND tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id";
+								$sql_query = "SELECT distinct tbl_lehrveranstaltung.semester FROM lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_fachbereich, lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit WHERE fachbereich_kurzbz in(".$ids.") AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($course_id)." AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>'' AND tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz";
 								//echo $sql_query;
 								$result=$db->db_query($sql_query);
 								while($row = $db->db_fetch_object($result))
@@ -476,10 +476,11 @@
 							$ids="'-1'";
 								foreach ($arr as $elem)
 									$ids.=",'$elem'";
-							$sql_query = $sql_query . " UNION SELECT DISTINCT lehreverzeichnis AS kuerzel, tbl_lehrveranstaltung.bezeichnung
-							                           FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach
+							$sql_query = $sql_query . " UNION SELECT DISTINCT tbl_lehrveranstaltung.lehreverzeichnis AS kuerzel, tbl_lehrveranstaltung.bezeichnung
+							                           FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_fachbereich
 							                           WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-							                           tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
+							                           tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id AND
+													   tbl_fachbereich.oe_kurzbz = lehrfach.oe_kurzbz AND
 							                           tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($course_id)." AND tbl_lehrveranstaltung.semester=".$db->db_add_param($term_id)." AND fachbereich_kurzbz in ($ids) AND tbl_lehrveranstaltung.lehre=true AND tbl_lehrveranstaltung.lehreverzeichnis<>''";
 						}
 						$sql_query .= ' ORDER BY bezeichnung, kuerzel';

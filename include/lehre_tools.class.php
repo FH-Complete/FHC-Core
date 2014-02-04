@@ -124,11 +124,10 @@ class lehre_tools extends basis_db
 						OR
 						oe_kurzbz IN( 
 							SELECT 
-								tbl_fachbereich.oe_kurzbz
+								lehrfach.oe_kurzbz
 							FROM
 								lehre.tbl_lehreinheit
-								JOIN lehre.tbl_lehrfach USING(lehrfach_id)
-								JOIN public.tbl_fachbereich USING(fachbereich_kurzbz)
+								JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(lehrfach_id=lehrfach.lehrveranstaltung_id)
 							WHERE
 								tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
 								AND tbl_lehreinheit.lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id)."

@@ -26,11 +26,9 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 // content type setzen
 header("Content-type: application/xhtml+xml");
-// xml
-echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-// DAO
 require_once('../config/vilesci.config.inc.php');
-require_once('../include/lehrfach.class.php');
+
+echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
 if(isset($_GET['studiengang_kz']))
 {
@@ -86,7 +84,7 @@ echo '
 if(isset($_GET['lehrfach_id']) && is_numeric($_GET['lehrfach_id']))
 {
 	$lehrfach_id = $_GET['lehrfach_id'];
-	$where =" OR lehrfach_id=".$db->db_add_param($lehrfach_id);
+	$where =" OR lehrveranstaltung_id=".$db->db_add_param($lehrfach_id);
 }
 else 
 	$where = '';
@@ -95,14 +93,15 @@ else
 //denen sowohl das Lehrfach als auch der Fachbereich aktiv ist und
 //zusaetzlich das Lehrfach das uebergeben wurde
 $qry = "SELECT 
-			tbl_lehrfach.* 
+			tbl_lehrveranstaltung.*, tbl_fachbereich.fachbereich_kurzbz
 		FROM 
-			lehre.tbl_lehrfach JOIN public.tbl_fachbereich USING(fachbereich_kurzbz) 
-		WHERE tbl_lehrfach.aktiv AND tbl_fachbereich.aktiv";
+			lehre.tbl_lehrveranstaltung 
+			JOIN public.tbl_fachbereich USING(oe_kurzbz) 
+		WHERE tbl_lehrveranstaltung.aktiv AND tbl_fachbereich.aktiv";
 if($stg!='')
-	$qry.=" AND tbl_lehrfach.studiengang_kz=".$db->db_add_param($stg);
+	$qry.=" AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($stg);
 if($sem!='')
-	$qry.=" AND tbl_lehrfach.semester=".$db->db_add_param($sem);
+	$qry.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($sem);
 	
 $qry.=$where;
 $qry.=" ORDER BY bezeichnung";
@@ -112,8 +111,8 @@ if($db->db_query($qry))
 	{
 		echo '
       <RDF:li>
-         <RDF:Description  id="'.$lehrfach->lehrfach_id.'"  about="'.$rdf_url.'/'.$lehrfach->lehrfach_id.'" >
-            <LEHRFACH:lehrfach_id>'.$lehrfach->lehrfach_id.'</LEHRFACH:lehrfach_id>
+         <RDF:Description  id="'.$lehrfach->lehrveranstaltung_id.'"  about="'.$rdf_url.'/'.$lehrfach->lehrveranstaltung_id.'" >
+            <LEHRFACH:lehrfach_id>'.$lehrfach->lehrveranstaltung_id.'</LEHRFACH:lehrfach_id>
             <LEHRFACH:studiengang_kz>'.$lehrfach->studiengang_kz.'</LEHRFACH:studiengang_kz>
             <LEHRFACH:fachbereich_kurzbz><![CDATA['.$lehrfach->fachbereich_kurzbz.']]></LEHRFACH:fachbereich_kurzbz>
             <LEHRFACH:kurzbz><![CDATA['.$lehrfach->kurzbz.']]></LEHRFACH:kurzbz>

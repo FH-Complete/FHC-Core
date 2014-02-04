@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Stefan Puraner 	<puraner@technikum-wien.at >
+ *			Andreas Österreicher <andreas.oesterreicher@technikum-wien.at>
  */
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/studiengang.class.php');
@@ -25,44 +26,28 @@ require_once('../../include/fachbereich.class.php');
 require_once('../../include/lvinfo.class.php');
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/organisationsform.class.php');
-require_once ('../../include/organisationseinheit.class.php');
+require_once('../../include/organisationseinheit.class.php');
 
 if (!$db = new basis_db())
-	die('Es konnte keine Verbindung zum Server aufgebaut werden.');?>
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+?><!DOCTYPE html>
 <html>
 <head>
 	<title>Lehrveranstaltung Verwaltung</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<!--	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
+	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-	<link rel="stylesheet" href="../../skin/jquery.css" type="text/css"/>-->
-	<!--<script type="text/javascript" src="../../include/js/jquery.js"></script>-->
+	<link rel="stylesheet" href="../../skin/jquery.css" type="text/css"/>
 	<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
-	<!--<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>-->
+	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
 	<script>
-		$(document).ready(function loadSemester()
-		{
-			var studiengang_kz = $("#stgDropdown").val();
-			$.ajax(
+		$(document).ready(function () {
+			$("#t1").tablesorter(
 			{
-				dataType: "json",
-				url: "../../soap/studienplan.json.php",
-				data: {
-					"method": "getSemesterFromStudiengang",
-					"studiengang_kz": studiengang_kz
-				}
-			}).success(function(data)
-			{
-				var html = "";
-				data.result.forEach(function(option)
-				{
-					html+="<option value='"+ option +"'>Semester "+ option +"</option>";
-				});
-				$("#semDropdown").html(html);
-				loadLehrveranstaltungen();
+				widgets: ["zebra"]
 			});
+			loadSemester();
 		});
 		
 		function loadSemester()
@@ -93,7 +78,7 @@ if (!$db = new basis_db())
 			var studiengang_kz = $("#stgDropdown").val();
 			var semester = $("#semDropdown").val();
 			var oe_kurzbz = $("#oeDropdown").val();
-//			console.log(oe_kurzbz);
+
 			if(oe_kurzbz === "null")
 			{
 				$.ajax(
@@ -116,7 +101,7 @@ if (!$db = new basis_db())
 					var html = "";
 					data.result.forEach(function(option)
 					{
-						html+="<option value='"+ option.metadata.lehrveranstaltung_id +"'>"+ option.data +"</option>";
+						html+="<option value='"+ option.lehrveranstaltung_id +"'>"+ option.bezeichnung +"</option>";
 					});
 					$("#lvDropdown").html(html);
 				});
@@ -143,7 +128,7 @@ if (!$db = new basis_db())
 					var html = "";
 					data.result.forEach(function(option)
 					{
-						html+="<option value='"+ option.metadata.lehrveranstaltung_id +"'>"+ option.data +"</option>";
+						html+="<option value='"+ option.lehrveranstaltung_id +"'>"+ option.bezeichnung +"</option>";
 					});
 					$("#lvDropdown").html(html);
 				});
@@ -173,7 +158,7 @@ if (!$db = new basis_db())
 				var html = "";
 				data.result.forEach(function(option)
 				{
-					html+="<option value='"+ option.metadata.lehrveranstaltung_id +"'>"+ option.data +"</option>";
+					html+="<option value='"+ option.lehrveranstaltung_id +"'>"+ option.bezeichnung +"</option>";
 				});
 				$("#lvDropdown").html(html);
 			});
@@ -263,17 +248,18 @@ $lv = new lehrveranstaltung();
 
 $kompatibleLvs = $lv->loadLVkompatibel($lehrveranstaltung_id);
 //var_dump($kompatibleLvs);
-
+echo '<h3>Kompatible Lehrveranstaltungen</h3>';
 if(count($kompatibleLvs)>0)
 {
-	echo '<h3>Kompatible LVs</h3><table style="width: auto;" class="tablesorter" id="t2">
+	echo '<table style="width: auto;" class="tablesorter" id="t1">
 	<thead>
 		<tr>
-			<th class="header">ID</th>
-			<th class="header">Kurzbezeichnung</th>
-			<th class="header">Bezeichnung</th>
-			<th class="header">ECTS</th>
-			<th class="header">Studiengang</th>';
+			<th>ID</th>
+			<th>Kurzbezeichnung</th>
+			<th>Bezeichnung</th>
+			<th>ECTS</th>
+			<th>Studiengang</th>
+			<th>Organisationseiheit</th>';
 			if($type == "edit")
 				echo '<th class="header">Löschen</th>';
 		echo '</tr>
@@ -284,12 +270,15 @@ if(count($kompatibleLvs)>0)
 		$lv->load($lvId);
 		$studiengang = new studiengang();
 		$studiengang->load($lv->studiengang_kz);
+		$oe = new organisationseinheit();
+		$oe->load($lv->oe_kurzbz);
 		echo "<tr>
 				<td>".$lv->lehrveranstaltung_id."</td>
 				<td>".$lv->kurzbz."</td>
 				<td>".$lv->bezeichnung."</td>
 				<td>".$lv->ects."</td>
-				<td>".$studiengang->bezeichnung."</td>";
+				<td>".$studiengang->kuerzel."</td>
+				<td>".$oe->bezeichnung."</td>";
 				if($type == "edit")
 				{
 					echo "<td><a href='#' onclick='javascript:deleteKompatibleLv(\"".$lehrveranstaltung_id."\",\"".$lv->lehrveranstaltung_id."\")'><img height='20' src='../../skin/images/false.png'></a></td>";
@@ -305,7 +294,7 @@ if(count($kompatibleLvs)>0)
 }
  else 
 {
-	echo "Keine kompatiblen Lehrveranstaltungen vorhanden.</br>";
+	echo "Derzeit sind keine kompatiblen Lehrveranstaltungen eingetragen.</br>";
 }
 
 if($type == "edit")
@@ -316,33 +305,50 @@ if($type == "edit")
 	//Studiengang Dropdown
 	echo "<div style='padding-top: 1em;'>";
 	echo "<form action='javascript:saveKompatibleLv(\"".$lehrveranstaltung_id."\")' method='POST'>
-		<b>Studiengang: </b><select id='stgDropdown' style='margin-right: 1em;' onload='javascript:loadSemester();' onchange='javascript:loadSemester();'>";
+	<table>
+	<tr>
+		<td><b>Studiengang: </b></td>
+		<td><select id='stgDropdown' style='margin-right: 1em;' onload='javascript:loadSemester();' onchange='javascript:loadSemester();'>";
 	foreach($studiengang->result as $stg)
 	{
 		echo "<option value=".$stg->studiengang_kz.">".$stg->kuerzel." - ".$stg->kurzbzlang."</option>";
 	}
 	echo "</select>";
 
+	echo '</td>
+		<td><b>OE:</b></td>';
 	//OE-Dropdown
 	$organisationseinheit = new organisationseinheit();
 	$organisationseinheit->getAll(true, true);
-	echo "<b>OE: </b><select id='oeDropdown' style='margin-right: 1em;' onload='javascript:loadSemester();' onchange='javascript:loadSemester();'><option value='null'>-- Keine --</option>";
+	echo "<td><select id='oeDropdown' style='margin-right: 1em;' onload='javascript:loadSemester();' onchange='javascript:loadSemester();'><option value='null'>-- Keine --</option>";
 	foreach($organisationseinheit->result as $oe)
 	{
 		echo "<option value=".$oe->oe_kurzbz.">".$oe->organisationseinheittyp_kurzbz." ".$oe->bezeichnung."</option>";
 	}
-	echo "</select>";
+	echo "</select></td>
+	</tr>
+	<tr>
+		<td><b>Semester: </b></td>
+		<td>";
 
 	//Semester Dropdown
-	echo "<b>Semester: </b><select id='semDropdown' style='margin-right: 1em;' onchange='javascript:loadLehrveranstaltungen()'>";
-	echo "</select>";
+	echo "<select id='semDropdown' style='margin-right: 1em;' onchange='javascript:loadLehrveranstaltungen()'>";
+	echo "</select>
+		</td>
+	</tr>";
 
 	//Lehrveranstaltung Dropdown
-	echo "<b>Lehrveranstaltungen: </b><select id='lvDropdown' onchange=''>";
-	echo "</select>";
-
-	//Submit Button
-	echo "<input type='submit' value='hinzufügen'>";
+	echo "<tr>
+		<td><b>Lehrveranstaltungen: </b></td>
+		<td colspan='3'>
+			<select id='lvDropdown' onchange=''></select>
+		</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td><input type='submit' value='hinzufügen'></td>
+	</tr>
+	</table>";
 	echo "</form>";
 	echo "</div>";
 }

@@ -256,11 +256,13 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 		<tabs orient="horizontal">
 			<tab id="tab-verband" label="Verband" />
 			<tab id="tab-ort" label="Ort" />
+			<tab id="tab-fachbereich" label="Institut" onclick="ChangeTabsToLehrveranstaltung()"/>
 			<tab id="tab-lektor" label="Lektor" />
 		</tabs>
 		<tabpanels id="tabpanels-left" flex="1">
 			<tree id="tree-verband" />
 			<tree id="tree-ort" />
+			<vbox id="vbox-fachbereich" />
 			<tree id="tree-lektor" />
 		</tabpanels>
 	</tabbox>

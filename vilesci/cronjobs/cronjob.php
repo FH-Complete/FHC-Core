@@ -38,7 +38,7 @@ if(!$cj->getAll(SERVER_NAME,'reihenfolge',true))
 foreach ($cj->result as $cronjob)
 {
 	$timestamp = $cronjob->getNextExecutionTime();
-	if($timestamp && mktime()>=$timestamp)
+	if($timestamp && time()>=$timestamp)
 	{
 		//Starten des Jobs
 		if($cronjob->execute())

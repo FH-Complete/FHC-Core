@@ -66,8 +66,8 @@ $stg_obj->getAll('typ, kurzbz', false);
 
 $qry = "
 SELECT (SELECT nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) 
-		  WHERE uid=COALESCE(koordinator, (SELECT uid FROM public.tbl_benutzerfunktion 
-		  								  WHERE fachbereich_kurzbz=tbl_lehrfach.fachbereich_kurzbz AND 
+		  WHERE uid=COALESCE(tbl_lehrveranstaltung.koordinator, (SELECT uid FROM public.tbl_benutzerfunktion 
+		  								  WHERE fachbereich_kurzbz=tbl_fachbereich.fachbereich_kurzbz AND 
 		  								        tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) AND 
 		  								        funktion_kurzbz='fbk' AND
 		  								        (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
@@ -77,8 +77,8 @@ SELECT (SELECT nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(pe
 							)
 			) as koordinator,
 	(SELECT vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) 
-		  WHERE uid=COALESCE(koordinator, (SELECT uid FROM public.tbl_benutzerfunktion 
-		  								  WHERE fachbereich_kurzbz=tbl_lehrfach.fachbereich_kurzbz AND 
+		  WHERE uid=COALESCE(tbl_lehrveranstaltung.koordinator, (SELECT uid FROM public.tbl_benutzerfunktion 
+		  								  WHERE fachbereich_kurzbz=tbl_fachbereich.fachbereich_kurzbz AND 
 		  								        tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) AND 
 		  								        funktion_kurzbz='fbk' AND
 		  								        (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
@@ -88,8 +88,8 @@ SELECT (SELECT nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(pe
 							)
 			) as vorname,
 
-	tbl_lehrfach.bezeichnung as lf_bezeichnung, tbl_lehrveranstaltung.studiengang_kz,
-	tbl_lehrfach.fachbereich_kurzbz as fachbereich_kurzbz, tbl_lehreinheitmitarbeiter.mitarbeiter_uid, 
+	lehrfach.bezeichnung as lf_bezeichnung, tbl_lehrveranstaltung.studiengang_kz,
+	tbl_fachbereich.fachbereich_kurzbz as fachbereich_kurzbz, tbl_lehreinheitmitarbeiter.mitarbeiter_uid, 
 	tbl_lehrveranstaltung.semester as lv_semester, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheitmitarbeiter.faktor,
 	tbl_lehreinheitmitarbeiter.stundensatz, 
 	tbl_lehreinheitmitarbeiter.semesterstunden lemss, tbl_lehreinheitmitarbeiter.planstunden,
@@ -113,23 +113,24 @@ FROM
 	lehre.tbl_lehrveranstaltung 
 	JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) 
 	JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) 
-	JOIN lehre.tbl_lehrfach USING(lehrfach_id)
+	JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
+	JOIN public.tbl_fachbereich ON(lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz)
 WHERE 
-	tbl_lehreinheit.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";	
+	tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz);	
 
 #	,(SELECT lv_semesterstunden FROM campus.vw_lehreinheit WHERE lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id and lehreinheit_id=lehre.tbl_lehreinheit.lehreinheit_id and studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' LIMIT 1) as sws	
 	
 if($studiengang_kz!='')
-	$qry.=" AND tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."'";
+	$qry.=" AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
 	
 if($institut!='')
-	$qry.=" AND tbl_lehrfach.fachbereich_kurzbz='".addslashes($institut)."'";
+	$qry.=" AND tbl_fachbereich.fachbereich_kurzbz=".$db->db_add_param($institut);
 
 if($semester!='')
-	$qry.=" AND tbl_lehrveranstaltung.semester='".addslashes($semester)."'";
+	$qry.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester, FHC_INTEGER);
 	
 if($uid!='')
-	$qry.=" AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid='".addslashes($uid)."'";
+	$qry.=" AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid=".$db->db_add_param($uid);
 
 $qry.=" ORDER BY tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.bezeichnung";
 
@@ -255,7 +256,7 @@ if($result = $db->db_query($qry))
 		if($maxlength[$spalte]<mb_strlen($row->lv_semester))
 			$maxlength[$spalte]=mb_strlen($row->lv_semester);
 		
-		$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
+		$qry = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=".$db->db_add_param($row->lehreinheit_id, FHC_INTEGER);
 		$result_gruppe = $db->db_query($qry);
 		$gruppe = '';
 		while($row_gruppe = $db->db_fetch_object($result_gruppe))
@@ -349,8 +350,8 @@ if($result = $db->db_query($qry))
 	$qry = "SELECT
 				tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz, 
 				(SELECT nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) 
-		 		 WHERE uid=COALESCE(koordinator, (SELECT uid FROM public.tbl_benutzerfunktion 
-		  								  WHERE fachbereich_kurzbz=tbl_lehrfach.fachbereich_kurzbz AND 
+		 		 WHERE uid=COALESCE(tbl_lehrveranstaltung.koordinator, (SELECT uid FROM public.tbl_benutzerfunktion 
+		  								  WHERE fachbereich_kurzbz=tbl_fachbereich.fachbereich_kurzbz AND 
 		  								        tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) AND 
 		  								        funktion_kurzbz='fbk' AND 
 		  								        (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
@@ -360,8 +361,8 @@ if($result = $db->db_query($qry))
 							)
 				) as koordinator, 
 				(SELECT vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) 
-		 		 WHERE uid=COALESCE(koordinator, (SELECT uid FROM public.tbl_benutzerfunktion 
-		  								  WHERE fachbereich_kurzbz=tbl_lehrfach.fachbereich_kurzbz AND 
+		 		 WHERE uid=COALESCE(tbl_lehrveranstaltung.koordinator, (SELECT uid FROM public.tbl_benutzerfunktion 
+		  								  WHERE fachbereich_kurzbz=tbl_fachbereich.fachbereich_kurzbz AND 
 		  								        tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) AND 
 		  								        funktion_kurzbz='fbk' AND 
 		  								        (tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
@@ -369,19 +370,20 @@ if($result = $db->db_query($qry))
 											LIMIT 1
 		  								   )
 							)
-				) as koordinator_vorname, nachname, vorname, tbl_lehrfach.bezeichnung, 
+				) as koordinator_vorname, nachname, vorname, lehrfach.bezeichnung, 
 				tbl_lehrveranstaltung.semester, student_uid, stunden, tbl_projektbetreuer.stundensatz, 
 				tbl_projektbetreuer.faktor
 			FROM
 				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, 
-				lehre.tbl_projektbetreuer, public.tbl_person, lehre.tbl_lehrfach
+				lehre.tbl_projektbetreuer, public.tbl_person, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_fachbereich
 			WHERE
 				tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 				tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
 				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
-				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
+				tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND
+				lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz AND
 				tbl_person.person_id=tbl_projektbetreuer.person_id AND
-				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND
+				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND
 				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0
 				";
 
@@ -389,14 +391,14 @@ if($result = $db->db_query($qry))
 	if($uid!=='')
 	{
 		$mitarbeiter = new mitarbeiter($uid);
-		$qry.=" AND tbl_projektbetreuer.person_id='$mitarbeiter->person_id'";
+		$qry.=" AND tbl_projektbetreuer.person_id=".$db->db_add_param($mitarbeiter->person_id, FHC_INTEGER);
 	}
 
 	if($institut!='')
-		$qry.=" AND tbl_lehrfach.fachbereich_kurzbz='".addslashes($institut)."'";
+		$qry.=" AND tbl_fachbereich.fachbereich_kurzbz=".$db->db_add_param($institut);
 		
 	if($studiengang_kz!='')
-		$qry.=" AND tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."'";
+		$qry.=" AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
 		
 	if($result = $db->db_query($qry))
 	{

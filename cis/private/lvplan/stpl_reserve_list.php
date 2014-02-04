@@ -76,7 +76,7 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 	}
 
 	//Aktuelle Reservierungen abfragen.
-	$datum = mktime();
+	$datum = time();
 	$datum = date("Y-m-d",$datum);
 	
 	//EIGENE

@@ -204,9 +204,9 @@ if (isset($_GET["handbuch"])){
 	  		FROM 
 	  			lehre.tbl_lehrveranstaltung 
 	  			JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) 
-	  			JOIN lehre.tbl_lehrfach USING(lehrfach_id)
-	  			JOIN public.tbl_fachbereich USING(fachbereich_kurzbz) 
-	  		WHERE lehrveranstaltung_id='".addslashes($lvid)."'";
+	  			JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
+	  			JOIN public.tbl_fachbereich ON(tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz) 
+	  		WHERE tbl_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lvid)."'";
 
 	  if(isset($angezeigtes_stsem) && $angezeigtes_stsem!='')
 	  	$qry .= " AND studiensemester_kurzbz='".addslashes($angezeigtes_stsem)."'";
