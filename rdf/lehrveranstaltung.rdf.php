@@ -61,10 +61,25 @@ if(isset($_GET['uid']))
 else 
 	$student_uid=null;
 
+if(isset($_GET['lehrveranstaltung_kompatibel_id']))
+	$lehrveranstaltung_kompatibel_id = $_GET['lehrveranstaltung_kompatibel_id'];
+else
+	$lehrveranstaltung_kompatibel_id=null;
+
 $lehrveranstaltung=new lehrveranstaltung();
 
 if($student_uid!='')
 	$lehrveranstaltung->load_lva_student($student_uid);
+elseif($lehrveranstaltung_kompatibel_id!='')
+{
+	// Laedt die Lehrveranstaltung und alle die dazu kompatibel sind
+	$lvid_arr = $lehrveranstaltung->loadLVkompatibel($lehrveranstaltung_kompatibel_id);
+	$lvid_arr[]=$lehrveranstaltung_kompatibel_id;
+
+	if(isset($_GET['lehrfach_id']))
+		$lvid_arr[]=$_GET['lehrfach_id'];
+	$lehrveranstaltung->loadArray($lvid_arr);
+}
 else
 	$lehrveranstaltung->load_lva($stg_kz,$sem);
 
@@ -139,6 +154,7 @@ foreach ($lehrveranstaltung->lehrveranstaltungen as $row)
         		<LVA:plankostenprolektor><![CDATA['.$row->plankostenprolektor.']]></LVA:plankostenprolektor>
         		<LVA:lehrform_kurzbz><![CDATA['.$row->lehrform_kurzbz.']]></LVA:lehrform_kurzbz>
         		<LVA:orgform_kurzbz><![CDATA['.$row->orgform_kurzbz.']]></LVA:orgform_kurzbz>
+				<LVA:oe_kurzbz><![CDATA['.$row->oe_kurzbz.']]></LVA:oe_kurzbz>
       		</RDF:Description>
 		</RDF:li>';
 }

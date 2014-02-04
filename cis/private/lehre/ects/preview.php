@@ -201,13 +201,13 @@ if (!$db = new basis_db())
 	
 	//Zugeteilte Fachbereiche auslesen
 	$qry = "SELECT distinct tbl_fachbereich.bezeichnung as bezeichnung, tbl_fachbereich.fachbereich_kurzbz as fachbereich_kurzbz
-			FROM public.tbl_fachbereich, lehre.tbl_lehreinheit, lehre.tbl_lehrfach
+			FROM public.tbl_fachbereich, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach
 	      	WHERE tbl_lehreinheit.studiensemester_kurzbz=(
 	      		SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
-	      		WHERE tbl_lehreinheit.lehrveranstaltung_id='$lv' ORDER BY ende DESC LIMIT 1)
-	      	AND tbl_lehreinheit.lehrveranstaltung_id='$lv' AND
-	      	tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
-	      	tbl_fachbereich.fachbereich_kurzbz=tbl_lehrfach.fachbereich_kurzbz";
+	      		WHERE tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lv, FHC_INTEGER)." ORDER BY ende DESC LIMIT 1)
+	      	AND tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lv, FHC_INTEGER)." AND
+	      	tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND
+	      	tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz";
 
 	if(!$result=$db->db_query($qry))
 		die('Fehler beim Lesen aus der Datenbank');
@@ -218,7 +218,7 @@ if (!$db = new basis_db())
 
 	while($row=$db->db_fetch_object($result))
 	{
-		$fachbereiche .= ", '$row->fachbereich_kurzbz'";
+		$fachbereiche .= ", ".$db->db_add_param($row->fachbereich_kurzbz);
 		$fachbereich['kurzbz'][]=$row->fachbereich_kurzbz;
 		$fachbereich['bezeichnung'][]=$row->bezeichnung;
 	}
@@ -231,7 +231,7 @@ if (!$db = new basis_db())
 	$stg_kurzbzlang = $stg_hlp_obj->kurzbzlang;
 
 	//Lehrform auslesen
-	$qry = "Select distinct lehrform_kurzbz FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id='$lv' AND studiensemester_kurzbz='$stsem'";
+	$qry = "Select distinct lehrform_kurzbz FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id=".$db->db_add_param($lv, FHC_INTEGER)." AND studiensemester_kurzbz=".$db->db_add_param($stsem);
 	if(!$res = $db->db_query($qry))
 		die('Fehler beim Lesen aus der Datenbank');
 	//echo $fachbereiche;
@@ -261,17 +261,18 @@ if (!$db = new basis_db())
 	//Fachbereichskoordinatoren fuer alle FB ermitteln
 	//$qry="SELECT * FROM public.tbl_benutzerfunktion JOIN campus.vw_mitarbeiter USING(uid) WHERE funktion_kurzbz='fbk' AND studiengang_kz='$stg' AND fachbereich_kurzbz in($fachbereiche)";
 	$qry = "SELECT 
-				distinct vorname, nachname, tbl_lehrfach.fachbereich_kurzbz
+				distinct vorname, nachname, tbl_fachbereich.fachbereich_kurzbz
 			FROM
-				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach, public.tbl_benutzerfunktion, campus.vw_mitarbeiter
+				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_benutzerfunktion, campus.vw_mitarbeiter, public.tbl_fachbereich
 			WHERE
 				vw_mitarbeiter.aktiv AND
 				tbl_lehrveranstaltung.lehrveranstaltung_id='$lv' AND
 				tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
-				tbl_lehrfach.fachbereich_kurzbz=tbl_benutzerfunktion.fachbereich_kurzbz AND
+				tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND
+				lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz AND
+				tbl_fachbereich.fachbereich_kurzbz=tbl_benutzerfunktion.fachbereich_kurzbz AND
 				tbl_benutzerfunktion.funktion_kurzbz='fbk' AND 
-				vw_mitarbeiter.uid=COALESCE(koordinator, tbl_benutzerfunktion.uid) AND
+				vw_mitarbeiter.uid=COALESCE(tbl_lehrveranstaltung.koordinator, tbl_benutzerfunktion.uid) AND
 				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now()) AND
 				tbl_lehrveranstaltung.studiengang_kz=(SELECT studiengang_kz FROM public.tbl_studiengang WHERE oe_kurzbz=tbl_benutzerfunktion.oe_kurzbz LIMIT 1) ";
@@ -293,8 +294,8 @@ if (!$db = new basis_db())
 
 	//Namen der Lehrenden Auslesen
 	$qry = "SELECT distinct vorname, nachname FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, campus.vw_mitarbeiter
-			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lehrveranstaltung_id'
-			AND studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM public.tbl_studiensemester JOIN lehre.tbl_lehreinheit USING(studiensemester_kurzbz) WHERE tbl_lehreinheit.lehrveranstaltung_id='$lehrveranstaltung_id' ORDER BY ende DESC LIMIT 1)
+			WHERE tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER)."
+			AND studiensemester_kurzbz=(SELECT studiensemester_kurzbz FROM public.tbl_studiensemester JOIN lehre.tbl_lehreinheit USING(studiensemester_kurzbz) WHERE tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER)." ORDER BY ende DESC LIMIT 1)
 			AND tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id
 			AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid=uid";
 

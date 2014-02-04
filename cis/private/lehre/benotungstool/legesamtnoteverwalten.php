@@ -217,20 +217,28 @@ $stsem_content.= "</SELECT>\n";
 //Lehreinheiten laden
 if($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lv_obj->studiengang_kz) || $rechte->isBerechtigt('lehre',$lv_obj->studiengang_kz))
 {
-	$qry = "SELECT distinct tbl_lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehreinheitmitarbeiter
-			WHERE tbl_lehreinheit.lehrveranstaltung_id='".addslashes($lvid)."' AND
-			tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
-			tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-			tbl_lehreinheit.studiensemester_kurzbz = '".addslashes($stsem)."'";
+	$qry = "SELECT 
+				distinct lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz 
+			FROM 
+				lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, lehre.tbl_lehreinheitmitarbeiter
+			WHERE 
+				tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
+				tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id AND
+				tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
+				tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($stsem);
 }
 else
 {
-	$qry = "SELECT distinct tbl_lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehreinheitmitarbeiter
-			WHERE tbl_lehreinheit.lehrveranstaltung_id='".addslashes($lvid)."' AND
-			tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
-			tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-			tbl_lehreinheit.lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) WHERE mitarbeiter_uid='".addslashes($user)."') AND
-			tbl_lehreinheit.studiensemester_kurzbz = '".addslashes($stsem)."'";
+	$qry = "SELECT 
+				distinct lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz 
+			FROM 
+				lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, lehre.tbl_lehreinheitmitarbeiter
+			WHERE 
+				tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
+				tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id AND
+				tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
+				tbl_lehreinheit.lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) WHERE mitarbeiter_uid=".$db->db_add_param($user).") AND
+				tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($stsem);
 
 }
 if($result = $db->db_query($qry))
@@ -244,7 +252,7 @@ if($result = $db->db_query($qry))
 			if($lehreinheit_id=='')
 					$lehreinheit_id=$row->lehreinheit_id;
 			$selected = ($row->lehreinheit_id == $lehreinheit_id?'selected':'');
-			$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE lehreinheit_id='".addslashes($row->lehreinheit_id)."'";
+			$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE lehreinheit_id=".$db->db_add_param($row->lehreinheit_id, FHC_INTEGER);
 			if($result_lektoren = $db->db_query($qry_lektoren))
 			{
 				$lektoren = '( ';
@@ -260,7 +268,7 @@ if($result = $db->db_query($qry))
 				}
 				$lektoren .=')';
 			}
-			$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='".addslashes($row->lehreinheit_id)."'";
+			$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=".$db->db_add_param($row->lehreinheit_id, FHC_INTEGER);
 			if($result_gruppen = $db->db_query($qry_gruppen))
 			{
 				$gruppen = '';
@@ -408,7 +416,7 @@ echo "
 */
 
 // studentenquery		
-$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".addslashes($stsem)."' and lehreinheit_id = '".addslashes($lehreinheit_id)."' ORDER BY nachname, vorname";
+$qry_stud = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = ".$db->db_add_param($stsem)." and lehreinheit_id = ".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." ORDER BY nachname, vorname";
 
 if($result_stud = $db->db_query($qry_stud))
 {

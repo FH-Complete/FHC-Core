@@ -88,7 +88,7 @@ $qry = "SELECT
 			JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
 			JOIN public.tbl_studiengang USING(studiengang_kz)
 		WHERE 
-			tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stsem)."' AND
+			tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stsem)." AND
 			tbl_lehreinheitmitarbeiter.faktor is not null AND
 			tbl_lehreinheitmitarbeiter.faktor<>0 AND
 			tbl_lehreinheitmitarbeiter.stundensatz is not null AND
@@ -183,7 +183,7 @@ FROM
 	JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
 	JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
 WHERE 
-	studiensemester_kurzbz='".addslashes($stsem)."' AND 
+	studiensemester_kurzbz=".$db->db_add_param($stsem)." AND 
 	tbl_lehreinheitmitarbeiter.faktor is not null AND
 	tbl_lehreinheitmitarbeiter.faktor<>0 AND
 	tbl_lehreinheitmitarbeiter.stundensatz is not null AND

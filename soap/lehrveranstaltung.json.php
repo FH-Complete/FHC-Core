@@ -71,22 +71,6 @@ switch($method)
 			$data['errormsg']=$lehrveranstaltung->errormsg;
 		}
 		break;
-	case 'getLvTree':
-		$studienplan_id = $_REQUEST['studienplan_id'];
-		$semester = $_REQUEST['semester'];
-		$lehrveranstaltung = new lehrveranstaltung();
-		if(($result = $lehrveranstaltung->getLvTree($studienplan_id, $semester)))
-		{
-			$data["result"]=$result;
-			$data['error']='false';
-			$data['errormsg']='';
-		}
-		else
-		{
-			$data['error']='true';
-			$data['errormsg']=$lehrveranstaltung->errormsg;
-		}
-		break;
 	case 'saveKompatibleLehrveranstaltung':
 		$wsrecht = new webservicerecht();
 		if(!$wsrecht->isUserAuthorized($uid, $method))

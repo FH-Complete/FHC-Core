@@ -76,18 +76,20 @@ $qry = "SELECT
 			lehre.tbl_lehrveranstaltung,
 			public.tbl_benutzer,
 			public.tbl_person,
-			lehre.tbl_lehrfach
+			lehre.tbl_lehrveranstaltung as lehrfach,
+			public.tbl_fachbereich
 			WHERE 
 			tbl_benutzerfunktion.uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid AND
 			tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
 			tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-			tbl_benutzerfunktion.fachbereich_kurzbz='".addslashes($fachbereich_kurzbz)."' AND
+			tbl_benutzerfunktion.fachbereich_kurzbz=".$db->db_add_param($fachbereich_kurzbz)." AND
 			tbl_benutzerfunktion.funktion_kurzbz='fbk' AND
 			tbl_benutzerfunktion.uid=tbl_benutzer.uid AND
 			tbl_benutzer.person_id=tbl_person.person_id AND
-			tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND
-			tbl_lehrfach.fachbereich_kurzbz='".addslashes($fachbereich_kurzbz)."' AND
-			tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
+			lehrfach.lehrveranstaltung_id=tbl_lehreinheit.lehrfach_id AND
+			tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz AND
+			tbl_fachbereich.fachbereich_kurzbz=".$db->db_add_param($fachbereich_kurzbz)." AND
+			tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
 			(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 			(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
 		ORDER BY tbl_lehreinheit.lehreinheit_id, nachname, vorname

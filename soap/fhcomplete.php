@@ -73,6 +73,7 @@ $error=false;
 // Bei Save Funktionen werden alle Parameter zugewiesen
 if(mb_stristr($method,'save'))
 {
+
 	$loaddata=json_decode($_REQUEST['loaddata'], true);
 	$savedata=json_decode($_REQUEST['savedata'], true);
 
@@ -113,9 +114,9 @@ if(mb_stristr($method,'save'))
 		}
 	}
 }
-
+$return = '';
 if(!$error && ($return = call_user_func_array(array($obj, $method), $parameter)))
-{	
+{
 	$data['result']=$obj->cleanResult();
 	$data['return']=$return;
 	$data['error']='false';

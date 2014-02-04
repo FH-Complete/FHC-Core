@@ -92,6 +92,7 @@
 		$lv->anzahlsemester = $_POST['anzahlsemester'];
 		$lv->semesterwochen = $_POST['semesterwochen'];
 		$lv->lvnr = $_POST['lvnr'];
+		$lv->semester_alternativ = $_POST['semester_alternativ'];
 
 		if(!$lv->save())
 			$errorstr = "Fehler beim Speichern der Daten: $lv->errormsg";
@@ -298,7 +299,7 @@
 			<td>LVNR</td>
 			<td><input type="text" name="lvnr" value="'.$lv->lvnr.'" /></td>
 			<td>Organisationseinheit</td>
-			<td><select name="oe_kurzbz"><option value="">--keine Auswahl --</option>';
+			<td><select name="oe_kurzbz" ><option value="">--keine Auswahl --</option>';
 		
 		$qry = "SELECT * FROM public.tbl_organisationseinheit ORDER BY organisationseinheittyp_kurzbz, oe_kurzbz";
 		if($result = $db->db_query($qry))
@@ -316,8 +317,8 @@
 			<td>Anzahl Semester</td>
 			<td><input type="text" name="anzahlsemester" size="2" value="'.$lv->anzahlsemester.'" /></td>
 		</tr><tr>
-			<td></td>
-			<td></td>
+			<td>Semester alternativ</td>
+			<td><input type="text" size="3" name="semester_alternativ" value="'.$lv->semester_alternativ.'" /></td>
 			<td>Raumtyp</td>
 			<td><select name="raumtyp_kurzbz"><option value="">-- keine Auswahl--</option>';
 		$qry = "SELECT * FROM public.tbl_raumtyp ORDER BY raumtyp_kurzbz";

@@ -50,6 +50,7 @@ echo 'Lehrauftragslisten werden erstellt. Bitte warten!<BR>';
 flush();
 $workbook = new Spreadsheet_Excel_Writer($file);
 $workbook->setVersion(8);
+$db = new basis_db();
 //Studiengaenge ermitteln bei denen sich die lektorzuordnung innerhalb der letzten 31 Tage geaendert haben
 $qry_stg = "SELECT distinct studiengang_kz
 			FROM (
@@ -59,7 +60,7 @@ $qry_stg = "SELECT distinct studiengang_kz
 					lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
 					JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 				WHERE
-					lehre.tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
+					lehre.tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
 					tbl_lehreinheitmitarbeiter.semesterstunden<>0 AND
 					tbl_lehreinheitmitarbeiter.semesterstunden is not null AND
 					tbl_lehreinheitmitarbeiter.stundensatz<>0 AND
@@ -70,7 +71,7 @@ $qry_stg = "SELECT distinct studiengang_kz
 				FROM
 					lehre.tbl_projektbetreuer, lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung
 				WHERE
-					lehre.tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
+					lehre.tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
 					tbl_projektbetreuer.projektarbeit_id=tbl_projektarbeit.projektarbeit_id AND
 					tbl_projektarbeit.lehreinheit_id = tbl_lehreinheit.lehreinheit_id AND
 					tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id
@@ -81,7 +82,7 @@ $liste_gesamt = array();
 $gesamt =& $workbook->addWorksheet('Gesamt');
 $gesamt->setInputEncoding('utf-8');
 $gesamtsheet_row=1;
-$db = new basis_db();
+
 
 if($result_stg = $db->db_query($qry_stg))
 {
@@ -163,7 +164,7 @@ if($result_stg = $db->db_query($qry_stg))
 					tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid AND
 					tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
 					tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-					studiengang_kz='".addslashes($studiengang_kz)."' AND studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
+					studiengang_kz=".$db->db_add_param($studiengang_kz)." AND studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
 					tbl_lehreinheitmitarbeiter.semesterstunden<>0 AND tbl_lehreinheitmitarbeiter.semesterstunden is not null
 					AND tbl_lehreinheitmitarbeiter.stundensatz<>0 AND tbl_lehreinheitmitarbeiter.faktor<>0
 					AND EXISTS (SELECT lehreinheit_id FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=tbl_lehreinheit.lehreinheit_id)
@@ -215,9 +216,9 @@ if($result_stg = $db->db_query($qry_stg))
 						tbl_mitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND
 						tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
 						tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
-						tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
+						tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
 						tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
-						tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."' AND 
+						tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND 
 						NOT EXISTS (SELECT 
 										mitarbeiter_uid 
 									FROM 
@@ -225,14 +226,14 @@ if($result_stg = $db->db_query($qry_stg))
 									WHERE 
 										mitarbeiter_uid=tbl_benutzer.uid AND
 										tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND 
-										tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."' AND
+										tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND
 										tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 										tbl_lehreinheitmitarbeiter.semesterstunden<>0 AND
 										tbl_lehreinheitmitarbeiter.semesterstunden is not null AND
 										tbl_lehreinheitmitarbeiter.stundensatz<>0 AND
 										tbl_lehreinheitmitarbeiter.faktor<>0 AND
 										EXISTS (SELECT lehreinheit_id FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=tbl_lehreinheit.lehreinheit_id) AND
-										tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."');";
+										tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell).");";
 			
 			if($result = $db->db_query($qry))
 			{
@@ -259,13 +260,13 @@ if($result_stg = $db->db_query($qry_stg))
 			foreach ($liste as $uid=>$arr)
 			{
 				$qry = "SELECT tbl_projektbetreuer.faktor, tbl_projektbetreuer.stunden, tbl_projektbetreuer.stundensatz, CASE WHEN COALESCE(tbl_projektbetreuer.updateamum, tbl_projektbetreuer.insertamum)>now()-interval '31 days' THEN 't' ELSE 'f' END as geaendert
-			        FROM lehre.tbl_projektbetreuer, lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehrveranstaltung,
+			        FROM lehre.tbl_projektbetreuer, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung,
 			               public.tbl_benutzer, lehre.tbl_projektarbeit, campus.vw_student
-			        WHERE tbl_projektbetreuer.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid='".addslashes($uid)."' AND
+			        WHERE tbl_projektbetreuer.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid=".$db->db_add_param($uid)." AND
 			              tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND student_uid=vw_student.uid
-			              AND tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
-			              tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
-			              tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."'";
+			              AND tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND
+			              tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
+			              tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
 
 				if($result = $db->db_query($qry))
 				{
@@ -449,7 +450,7 @@ if($result_stg = $db->db_query($qry_stg))
 				JOIN lehre.tbl_projektarbeit USING (projektarbeit_id) 
 				JOIN lehre.tbl_lehreinheit USING (lehreinheit_id) 
 			WHERE 
-				studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
+				studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
 				stunden>0
 			GROUP BY 
 				studiensemester_kurzbz,person_id,nachname,vorname, titelpre
@@ -502,7 +503,7 @@ if($result_stg = $db->db_query($qry_stg))
     $fileatttype = "application/xls";
     $fileattname = "lehrauftragsliste_".date('Y_m_d').".xls";
 
-    $mail = new mail(MAIL_GST, 'vilesci@'.DOMAIN, $subject, $message);
+    $mail = new mail(MAIL_GST, 'noreply@'.DOMAIN, $subject, $message);
     $mail->addAttachmentBinary($file, $fileatttype, $fileattname);
     
     if($mail->send())

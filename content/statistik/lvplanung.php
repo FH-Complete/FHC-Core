@@ -98,23 +98,23 @@ if($studiengang_kz!='') //Liste nach Studiengang
 	$qry = "SELECT
 				tbl_lehrveranstaltung.kurzbz as kurzbz, tbl_lehrveranstaltung.bezeichnung as bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
 				tbl_lehrveranstaltung.ects as ects, tbl_lehrveranstaltung.semesterstunden as semesterstunden,
-				tbl_lehrfach.kurzbz as lf_kurzbz, tbl_lehrfach.bezeichnung as lf_bezeichnung, tbl_lehreinheit.lehreinheit_id as lehreinheit_id,
+				lehrfach.kurzbz as lf_kurzbz, lehrfach.bezeichnung as lf_bezeichnung, tbl_lehreinheit.lehreinheit_id as lehreinheit_id,
 				tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz, tbl_lehreinheitmitarbeiter.semesterstunden as lektor_semesterstunden,
 				tbl_lehreinheitmitarbeiter.stundensatz as lektor_stundensatz, tbl_lehreinheitmitarbeiter.faktor as lektor_faktor,
 				tbl_person.vorname, tbl_person.nachname, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester
 			FROM
 				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter,
-				lehre.tbl_lehrfach, public.tbl_benutzer, public.tbl_person
+				lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_benutzer, public.tbl_person
 			WHERE
 				tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-				tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND
+				lehrfach.lehrveranstaltung_id=tbl_lehreinheit.lehrfach_id AND
 				tbl_benutzer.uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid AND
 				tbl_person.person_id=tbl_benutzer.person_id AND
-				tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."' AND
-				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."'";
+				tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND
+				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell);
 	if($semester!='')
-		$qry.=" AND tbl_lehrveranstaltung.semester='".addslashes($semester)."'";
+		$qry.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester, FHC_INTEGER);
 	$qry.=" ORDER BY tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehreinheit.lehreinheit_id";
 }
 elseif($mitarbeiter_uid!='') // Liste nach Mitarbeiter
@@ -122,21 +122,21 @@ elseif($mitarbeiter_uid!='') // Liste nach Mitarbeiter
 $qry = "SELECT
 				tbl_lehrveranstaltung.kurzbz as kurzbz, tbl_lehrveranstaltung.bezeichnung as bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
 				tbl_lehrveranstaltung.ects as ects, tbl_lehrveranstaltung.semesterstunden as semesterstunden,
-				tbl_lehrfach.kurzbz as lf_kurzbz, tbl_lehrfach.bezeichnung as lf_bezeichnung, tbl_lehreinheit.lehreinheit_id as lehreinheit_id,
+				lehrfach.kurzbz as lf_kurzbz, lehrfach.bezeichnung as lf_bezeichnung, tbl_lehreinheit.lehreinheit_id as lehreinheit_id,
 				tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz, tbl_lehreinheitmitarbeiter.semesterstunden as lektor_semesterstunden,
 				tbl_lehreinheitmitarbeiter.stundensatz as lektor_stundensatz, tbl_lehreinheitmitarbeiter.faktor as lektor_faktor,
 				tbl_person.vorname, tbl_person.nachname, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester
 			FROM
 				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter,
-				lehre.tbl_lehrfach, public.tbl_benutzer, public.tbl_person
+				lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_benutzer, public.tbl_person
 			WHERE
 				tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-				tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND
+				lehrfach.lehrveranstaltung_id=tbl_lehreinheit.lehrfach_id AND
 				tbl_benutzer.uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid AND
 				tbl_person.person_id=tbl_benutzer.person_id AND
-				tbl_lehreinheitmitarbeiter.mitarbeiter_uid='".addslashes($mitarbeiter_uid)."' AND
-				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."'";
+				tbl_lehreinheitmitarbeiter.mitarbeiter_uid=".$db->db_add_param($mitarbeiter_uid)." AND
+				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell);
 	$qry.=" ORDER BY tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehreinheit.lehreinheit_id";
 }
 elseif($fachbereich_kurzbz!='') // Liste nach Fachbereich
@@ -144,21 +144,22 @@ elseif($fachbereich_kurzbz!='') // Liste nach Fachbereich
 $qry = "SELECT
 				tbl_lehrveranstaltung.kurzbz as kurzbz, tbl_lehrveranstaltung.bezeichnung as bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
 				tbl_lehrveranstaltung.ects as ects, tbl_lehrveranstaltung.semesterstunden as semesterstunden,
-				tbl_lehrfach.kurzbz as lf_kurzbz, tbl_lehrfach.bezeichnung as lf_bezeichnung, tbl_lehreinheit.lehreinheit_id as lehreinheit_id,
+				lehrfach.kurzbz as lf_kurzbz, lehrfach.bezeichnung as lf_bezeichnung, tbl_lehreinheit.lehreinheit_id as lehreinheit_id,
 				tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz, tbl_lehreinheitmitarbeiter.semesterstunden as lektor_semesterstunden,
 				tbl_lehreinheitmitarbeiter.stundensatz as lektor_stundensatz, tbl_lehreinheitmitarbeiter.faktor as lektor_faktor,
 				tbl_person.vorname, tbl_person.nachname, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester
 			FROM
 				lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter,
-				lehre.tbl_lehrfach, public.tbl_benutzer, public.tbl_person
+				lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_benutzer, public.tbl_person, public.tbl_fachbereich
 			WHERE
 				tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-				tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND
+				lehrfach.lehrveranstaltung_id=tbl_lehreinheit.lehrfach_id AND
 				tbl_benutzer.uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid AND
 				tbl_person.person_id=tbl_benutzer.person_id AND
-				tbl_lehrfach.fachbereich_kurzbz='".addslashes($fachbereich_kurzbz)."' AND
-				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."'";
+				tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz AND
+				tbl_fachbereich.fachbereich_kurzbz=".$db->db_add_param($fachbereich_kurzbz)." AND
+				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell);
 	$qry.=" ORDER BY tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehreinheit.lehreinheit_id";	
 }
 else 
@@ -218,7 +219,7 @@ if($result = $db->db_query($qry))
 		}
 
 		$gruppen='';
-		$qry_grp = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
+		$qry_grp = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=".$db->db_add_param($row->lehreinheit_id, FHC_INTEGER);
 		if($result_grp = $db->db_query($qry_grp))
 		{
 			while($row_grp = $db->db_fetch_object($result_grp))
@@ -268,13 +269,13 @@ if($studiengang_kz!='')
 				tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
 				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
 				tbl_person.person_id=tbl_projektbetreuer.person_id AND
-				tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."' AND
-				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
+				tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND
+				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
 				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0
 				";
 
 	if($semester!='')
-		$qry.=" AND tbl_lehrveranstaltung.semester='".addslashes($semester)."'";
+		$qry.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester, FHC_INTEGER);
 }
 elseif($mitarbeiter_uid!='')
 {
@@ -287,8 +288,8 @@ elseif($mitarbeiter_uid!='')
 				tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
 				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
 				tbl_person.person_id=tbl_projektbetreuer.person_id AND
-				tbl_projektbetreuer.person_id='".addslashes($mitarbeiter->person_id)."' AND
-				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
+				tbl_projektbetreuer.person_id=".$db->db_add_param($mitarbeiter->person_id, FHC_INTEGER)." AND
+				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
 				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0
 				";
 }
@@ -297,15 +298,16 @@ elseif($fachbereich_kurzbz!='')
 	$qry = "SELECT
 				*
 			FROM
-				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektbetreuer, public.tbl_person, lehre.tbl_lehrfach
+				lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_projektbetreuer, public.tbl_person, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_fachbereich
 			WHERE
 				tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 				tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
 				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
-				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
+				tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND
+				tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz AND
 				tbl_person.person_id=tbl_projektbetreuer.person_id AND
-				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
-				tbl_lehrfach.fachbereich_kurzbz='".addslashes($fachbereich_kurzbz)."' AND
+				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
+				tbl_fachbereich.fachbereich_kurzbz=".$db->db_add_param($fachbereich_kurzbz)." AND
 				(tbl_projektbetreuer.faktor*tbl_projektbetreuer.stundensatz*tbl_projektbetreuer.stunden)>0
 				";
 }

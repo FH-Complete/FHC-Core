@@ -71,6 +71,7 @@ if($uid!='' && $stg_kz!=-1) // Alle LVs eines Mitarbeiters
 				AND mitarbeiter_uid=".$db->db_add_param($uid);
 	if($stg_kz!='')
 		$qry .=" AND studiengang_kz=".$db->db_add_param($stg_kz);
+
 }
 elseif($fachbereich_kurzbz!='') // Alle LVs eines Fachbereiches
 {
@@ -218,14 +219,15 @@ $oRdf->sendHeader();
 		$qry_fbk = "SELECT kurzbz FROM public.tbl_mitarbeiter LEFT JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid) WHERE tbl_benutzer.aktiv AND mitarbeiter_uid =
 						(
 						SELECT 
-							COALESCE(koordinator, uid) as koordinator
+							COALESCE(tbl_lehrveranstaltung.koordinator, uid) as koordinator
 						FROM
-							lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach, public.tbl_benutzerfunktion, public.tbl_studiensemester, public.tbl_studiengang
+							lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_benutzerfunktion, public.tbl_studiensemester, public.tbl_studiengang, public.tbl_fachbereich
 						WHERE
 							tbl_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($row_lva->lehrveranstaltung_id)." AND
 							tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-							tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
-							tbl_lehrfach.fachbereich_kurzbz=tbl_benutzerfunktion.fachbereich_kurzbz AND
+							tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND
+							lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz AND
+							tbl_fachbereich.fachbereich_kurzbz=tbl_benutzerfunktion.fachbereich_kurzbz AND
 							tbl_benutzerfunktion.funktion_kurzbz='fbk' AND 
 							tbl_lehreinheit.studiensemester_kurzbz=tbl_studiensemester.studiensemester_kurzbz AND
 							tbl_benutzerfunktion.oe_kurzbz=tbl_studiengang.oe_kurzbz AND
@@ -303,7 +305,7 @@ $oRdf->sendHeader();
 		foreach ($le->lehreinheiten as $row_le)
 		{
 			//Lehrfach holen
-			$qry = "SELECT kurzbz, bezeichnung FROM lehre.tbl_lehrfach WHERE lehrfach_id='$row_le->lehrfach_id'";
+			$qry = "SELECT kurzbz, bezeichnung FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='$row_le->lehrfach_id'";
 			$result_lf = $db->db_query($qry);
 			$row_lf = $db->db_fetch_object($result_lf);
 
@@ -330,7 +332,7 @@ $oRdf->sendHeader();
 				$semesterstunden.=$row_lkt->semesterstunden.' ';
 				$planstunden.=$row_lkt->planstunden.' ';
 			}
-			$qry = "SELECT tbl_fachbereich.bezeichnung FROM public.tbl_fachbereich, lehre.tbl_lehrfach, lehre.tbl_lehreinheit WHERE tbl_fachbereich.fachbereich_kurzbz=tbl_lehrfach.fachbereich_kurzbz AND tbl_lehrfach.lehrfach_id=tbl_lehreinheit.lehrfach_id AND tbl_lehreinheit.lehreinheit_id='$row_le->lehreinheit_id'";
+			$qry = "SELECT tbl_fachbereich.bezeichnung FROM public.tbl_fachbereich, lehre.tbl_lehrveranstaltung as lehrfach, lehre.tbl_lehreinheit WHERE tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz AND lehrfach.lehrveranstaltung_id=tbl_lehreinheit.lehrfach_id AND tbl_lehreinheit.lehreinheit_id=".$db->db_add_param($row_le->lehreinheit_id, FHC_INTEGER);
 			$fachbereich='';
 			if($result_fb = $db->db_query($qry))
 				if($row_fb = $db->db_fetch_object($result_fb))

@@ -124,6 +124,11 @@ if (isset($_GET['semester_aktuell']))
 if (!isset($semester_aktuell) && $semesterplan)
 	$error_msg.='Studien-Semester ist nicht gesetzt!';
 
+if(isset($_GET['fachbereich_kurzbz']))
+	$fachbereich_kurzbz = $_GET['fachbereich_kurzbz'];
+else
+	$fachbereich_kurzbz=null;
+
 ?>
 
 <!DOCTYPE page SYSTEM "chrome://tempus/locale/de-AT/tempus.dtd">
@@ -565,7 +570,7 @@ $error_msg.=$kollision_msg;
 // Stundenplan erstellen
 $stdplan=new wochenplan($type);
 if (!isset($datum))
-	$datum=mktime();
+	$datum=time();
 if (!isset($semesterplan) || !$semesterplan)
 	$begin=$ende=$datum;
 else
@@ -587,7 +592,7 @@ $stdplan->user=$user;
 $stdplan->user_uid=$uid;
 
 // Zusaetzliche Daten laden
-if (! $stdplan->load_data($type,$pers_uid,$ort,$stg_kz,$sem,$ver,$grp,$gruppe) && $error_msg!='')
+if (! $stdplan->load_data($type,$pers_uid,$ort,$stg_kz,$sem,$ver,$grp,$gruppe,$fachbereich_kurzbz) && $error_msg!='')
 	$error_msg.=$stdplan->errormsg;
 
 // Stundenplan einer Woche laden

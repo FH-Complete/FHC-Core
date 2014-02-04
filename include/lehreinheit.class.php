@@ -211,7 +211,7 @@ class lehreinheit extends basis_db
 			$qry .= " AND lehreinheit_id IN ( SELECT lehreinheit_id FROM lehre.tbl_lehreinheitmitarbeiter WHERE mitarbeiter_uid=".$this->db_add_param($uid).")";
 
 		if($fachbereich_kurzbz!='')
-			$qry .= " AND lehrfach_id IN ( SELECT lehrfach_id FROM lehre.tbl_lehrfach WHERE fachbereich_kurzbz=".$this->db_add_param($fachbereich_kurzbz).")";
+			$qry .= " AND EXISTS ( SELECT 1 FROM lehre.tbl_lehrveranstaltung JOIN public.tbl_fachbereich USING(oe_kurzbz) WHERE fachbereich_kurzbz=".$this->db_add_param($fachbereich_kurzbz)." AND lehrveranstaltung_id=tbl_lehreinheit.lehrfach_id)";
 
 		$qry.= "ORDER BY lehreinheit_id;";
 		
@@ -679,17 +679,16 @@ class lehreinheit extends basis_db
 	}
 
 	/**
-	 * Rueckgabewert ist ein Array mit den Ergebnissen. Bei Fehler false und die
-	 * Fehlermeldung liegt in errormsg.
+	 * Laedt Lehreinheiten
 	 * Wenn der Parameter stg_kz NULL ist tritt gruppe_kurzbzb in Kraft.
 	 * @param string $gruppe_kurzbz    Einheit
 	 * @param string grp    Gruppe
 	 * @param string ver    Verband
 	 * @param integer sem    Semester
 	 * @param integer stg_kz    Kennzahl des Studiengangs
-	 * @return variabel Array mit LVA; <b>false</b> bei Fehler
+	 * @return boolean
 	 */
-	public function getLehreinheitLVPL($db_stpl_table,$studiensemester, $type, $stg_kz, $sem, $lektor, $ver=null, $grp=null, $gruppe=null, $order=null)
+	public function getLehreinheitLVPL($db_stpl_table,$studiensemester, $type, $stg_kz, $sem, $lektor, $ver=null, $grp=null, $gruppe=null, $order=null, $fachbereich_kurzbz=null)
 	{
 		$this->errormsg='';
 		$this->lehreinheiten=array();
@@ -701,24 +700,30 @@ class lehreinheit extends basis_db
 			$this->errormsg='Studiensemester ist nicht gesetzt!(lehreinheit.getLehreinheitLVPL)';
 			return false;
 		}
-		else $where=" studiensemester_kurzbz='$studiensemester'";
+		else $where=" studiensemester_kurzbz=".$this->db_add_param($studiensemester);
 
 		if ($type=='lektor')
-			$where.=" AND lektor_uid='$lektor'";
+			$where.=" AND lektor_uid=".$this->db_add_param($lektor);
 		elseif ($type=='gruppe')
-			$where.=" AND gruppe_kurzbz='$gruppe'";
+			$where.=" AND gruppe_kurzbz=".$this->db_add_param($gruppe);
 		elseif ($type=='verband')
 		{
-			$where.=" AND studiengang_kz='$stg_kz'";
+			$where.=" AND studiengang_kz=".$this->db_add_param($stg_kz);
 			if ($sem>0)
-				$where.=" AND semester=$sem";
+				$where.=" AND semester=".$this->db_add_param($sem);
 			if (mb_strlen($ver)>0 && $ver!=' ')
-				$where.=" AND verband='$ver'";
+				$where.=" AND verband=".$this->db_add_param($ver);
 			if (mb_strlen($grp)>0 && $grp!=' ')
-				$where.=" AND gruppe='$grp' ";
+				$where.=" AND gruppe=".$this->db_add_param($grp);
+		}
+		elseif($type=='fachbereich')
+		{
+			$where.=" AND fachbereich_kurzbz=".$this->db_add_param($fachbereich_kurzbz);
 		}
 		$sql_query='SELECT *, planstunden-verplant::smallint AS offenestunden
-			FROM lehre.'.$lva_stpl_view.' JOIN lehre.tbl_lehrform ON '.$lva_stpl_view.'.lehrform=tbl_lehrform.lehrform_kurzbz
+			FROM 
+				lehre.'.$lva_stpl_view.' 
+				JOIN lehre.tbl_lehrform ON '.$lva_stpl_view.'.lehrform=tbl_lehrform.lehrform_kurzbz
 			WHERE '.$where.' AND verplanen';
 		
 
@@ -871,7 +876,7 @@ class lehreinheit extends basis_db
                                         $this->db_add_param($row->lehrform_kurzbz).",".
                                         $this->db_add_param($row->stundenblockung, FHC_INTEGER).",".
 										$this->db_add_param($row->wochenrythmus, FHC_INTEGER).",".
-                                        $this->db_add_param($row->startkw, FHC_INTEGER).",".
+                                        $this->db_add_param($row->start_kw, FHC_INTEGER).",".
                                         $this->db_add_param($row->raumtyp).",".
                                         $this->db_add_param($row->raumtypalternativ).",".
                                         $this->db_add_param($row->sprache).",".
@@ -946,8 +951,9 @@ class lehreinheit extends basis_db
 					*, tbl_lehrveranstaltung.semester as lv_semester, tbl_lehrveranstaltung.studiengang_kz as lv_studiengang_kz 
 				FROM 
 					lehre.tbl_lehreinheit
-					JOIN lehre.tbl_lehrfach USING(lehrfach_id)
-					JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+					JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(lehrfach_id=lehrfach.lehrveranstaltung_id)
+					JOIN public.tbl_fachbereich USING(oe_kurzbz)
+					JOIN lehre.tbl_lehrveranstaltung ON(tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id)
 				WHERE
 					tbl_lehreinheit.lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER).';';
 

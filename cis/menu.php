@@ -80,7 +80,7 @@ function treemenu(obj)
 				$(this).addClass("selected");
 			}
 		}
-		window.setTimeout(function(){fleXenv.updateScrollBars();},500);
+		//window.setTimeout(function(){fleXenv.updateScrollBars();},500);
 	});
 }
 $(document).ready(function() 

@@ -1159,8 +1159,8 @@ $qry="SELECT *, tbl_lehreinheit.studiensemester_kurzbz, tbl_projektarbeit.studen
 	FROM lehre.tbl_projektarbeit 
 	JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
 	JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
-	JOIN lehre.tbl_lehrfach USING(lehrfach_id) 
-	JOIN public.tbl_fachbereich USING(fachbereich_kurzbz) 
+	JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id) 
+	JOIN public.tbl_fachbereich ON(lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz) 
 	LEFT JOIN lehre.tbl_zeugnisnote USING(lehrveranstaltung_id, studiensemester_kurzbz, student_uid)
 	WHERE ((tbl_projektarbeit.note>0 AND tbl_projektarbeit.note<5) OR (tbl_zeugnisnote.note>0 AND tbl_zeugnisnote.note<5)) AND projekttyp_kurzbz='Diplom'
 	AND to_char(tbl_projektarbeit.abgabedatum,'YYYYMMDD')>'".date('Ymd',mktime(0, 0, 0, date('m')-6, date('d'), date('Y')))."' 

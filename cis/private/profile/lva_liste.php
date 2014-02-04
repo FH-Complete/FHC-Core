@@ -75,8 +75,8 @@ require_once('../../../include/studiensemester.class.php');
 		SELECT 
 			*, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stg_kurzbz, 
 			tbl_lehrveranstaltung.semester as lv_semester,
-			tbl_lehrfach.kurzbz as lehrfach,
-			tbl_lehrfach.bezeichnung as lehrfach_bez,
+			lehrfach.kurzbz as lehrfach,
+			lehrfach.bezeichnung as lehrfach_bez,
 			tbl_lehreinheitmitarbeiter.semesterstunden as semesterstunden,
 			tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung,
 			tbl_lehreinheit.anmerkung as le_anmerkung,
@@ -87,8 +87,8 @@ require_once('../../../include/studiensemester.class.php');
 		lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) 
 		JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 		JOIN public.tbl_studiengang USING(studiengang_kz)
-		JOIN lehre.tbl_lehrfach USING(lehrfach_id)
-		WHERE studiensemester_kurzbz='".addslashes($stdsem)."' AND mitarbeiter_uid='".addslashes($uid)."'";
+		JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
+		WHERE studiensemester_kurzbz=".$db->db_add_param($stdsem)." AND mitarbeiter_uid=".$db->db_add_param($uid);
  	$sql_query.=" ORDER BY stg_kurzbz,lv_semester,lv_bezeichnung";
 	$result=$db->db_query($sql_query);
 	$num_rows=$db->db_num_rows($result);
@@ -253,10 +253,10 @@ require_once('../../../include/studiensemester.class.php');
 			WHERE
 				tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND
 				tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
-				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stdsem)."' AND
+				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stdsem)." AND
 				tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
 				tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz AND
-				tbl_projektbetreuer.person_id='".addslashes($mitarbeiter->person_id)."'";
+				tbl_projektbetreuer.person_id=".$db->db_add_param($mitarbeiter->person_id, FHC_INTEGER);
 	
 	$stg_obj = new studiengang();
 	$stg_obj->getAll();
@@ -295,23 +295,25 @@ require_once('../../../include/studiensemester.class.php');
 	
 	$qry = "SELECT 
 				distinct
-				tbl_lehrveranstaltung.studiengang_kz, tbl_lehrfach.fachbereich_kurzbz, tbl_lehrveranstaltung.bezeichnung, 
+				tbl_lehrveranstaltung.studiengang_kz, tbl_fachbereich.fachbereich_kurzbz, tbl_lehrveranstaltung.bezeichnung, 
 				tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_lehrveranstaltung.semester,tbl_lehrveranstaltung.koordinator,
 				tbl_studiengang.email
 			FROM 
 				lehre.tbl_lehrveranstaltung, 
 				lehre.tbl_lehreinheit,
-				lehre.tbl_lehrfach,
-				public.tbl_studiengang
+				lehre.tbl_lehrveranstaltung as lehrfach,
+				public.tbl_studiengang,
+				public.tbl_fachbereich
 			WHERE
 				tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-				tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
-				tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stdsem)."' AND
-				(tbl_lehrveranstaltung.koordinator='".addslashes($uid)."' 
+				tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id AND
+				tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz AND
+				tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stdsem)." AND
+				(tbl_lehrveranstaltung.koordinator=".$db->db_add_param($uid)."
 				OR 
 				 ( tbl_lehrveranstaltung.koordinator is null and (tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz) IN (SELECT studiengang_kz, fachbereich_kurzbz 
 				 																FROM public.tbl_benutzerfunktion JOIN public.tbl_studiengang USING(oe_kurzbz)
-									 										  WHERE funktion_kurzbz='fbk' AND uid='".addslashes($uid)."' 
+									 										  WHERE funktion_kurzbz='fbk' AND uid=".$db->db_add_param($uid)." 
 														  					and ( tbl_benutzerfunktion.datum_bis is null or now() between tbl_benutzerfunktion.datum_von and tbl_benutzerfunktion.datum_bis )
 																			))
 				 ) AND
@@ -346,10 +348,10 @@ require_once('../../../include/studiensemester.class.php');
 							lehre.tbl_lehreinheit
 						WHERE 
 							tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
-							tbl_lehreinheit.lehrveranstaltung_id='".addslashes($row->lehrveranstaltung_id)."' AND
+							tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($row->lehrveranstaltung_id, FHC_INTEGER)." AND
 							tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND
 							tbl_benutzer.person_id=tbl_person.person_id AND
-							tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stdsem)."'";
+							tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stdsem);
 				$lektoren='';
 				if($result_lkt = $db->db_query($qry))
 				{

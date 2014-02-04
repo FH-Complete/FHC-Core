@@ -113,7 +113,7 @@ if (isset($_GET["download"])){
 	$uebung_id = $_GET["uebung_id"];
 	$ueb = new uebung();
 	$ueb->load($uebung_id);
-	$filename = "/documents/benotungstool/angabe/".$ueb->angabedatei;
+	$filename = BENOTUNGSTOOL_PATH."angabe/".$ueb->angabedatei;
 	header('Content-Type: application/octet-stream');
 	header('Content-disposition: attachment; filename="'.$file.'"');
 	readfile($filename);
@@ -252,21 +252,21 @@ if($stsem=='')
 
 //Lehreinheiten laden zu denen der eingeloggte Student zugeteilt ist
 //Bei Lehrverbaenden werden auch die uebergeordneten geladen
-$qry = "SELECT distinct lehreinheit_id, kurzbz FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE lehreinheit_id IN(
+$qry = "SELECT distinct lehreinheit_id, lehrfach.kurzbz FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id) WHERE lehreinheit_id IN(
 		SELECT lehreinheit_id FROM public.tbl_benutzergruppe JOIN lehre.tbl_lehreinheitgruppe USING (gruppe_kurzbz)
-		WHERE tbl_benutzergruppe.uid='$user' AND
+		WHERE tbl_benutzergruppe.uid=".$db->db_add_param($user)." AND
 		tbl_lehreinheitgruppe.lehreinheit_id IN(
 			SELECT lehreinheit_id FROM lehre.tbl_lehreinheit JOIN campus.tbl_uebung USING(lehreinheit_id)
-			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND tbl_lehreinheit.studiensemester_kurzbz='$stsem')
+			WHERE tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stsem).")
 		UNION
 		SELECT 
 			lehreinheit_id 
 		FROM 
 			public.tbl_student, lehre.tbl_lehreinheitgruppe, public.tbl_studentlehrverband
 		WHERE 
-			tbl_student.student_uid='$user' AND
+			tbl_student.student_uid=".$db->db_add_param($user)." AND
 			tbl_studentlehrverband.student_uid=tbl_student.student_uid AND
-			tbl_studentlehrverband.studiensemester_kurzbz='$stsem' AND
+			tbl_studentlehrverband.studiensemester_kurzbz=".$db->db_add_param($stsem)." AND
 			tbl_student.studiengang_kz=tbl_lehreinheitgruppe.studiengang_kz AND
 			tbl_lehreinheitgruppe.gruppe_kurzbz is null AND
 			tbl_studentlehrverband.semester=tbl_lehreinheitgruppe.semester AND
@@ -298,7 +298,7 @@ $qry = "SELECT distinct lehreinheit_id, kurzbz FROM lehre.tbl_lehreinheit JOIN l
 			)
 			AND
 			tbl_lehreinheitgruppe.lehreinheit_id IN(SELECT lehreinheit_id FROM lehre.tbl_lehreinheit JOIN campus.tbl_uebung USING(lehreinheit_id)
-				WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND tbl_lehreinheit.studiensemester_kurzbz='$stsem'))";
+				WHERE tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stsem)."))";
 //echo $qry;
 if($result = $db->db_query($qry))
 {
@@ -312,7 +312,7 @@ if($result = $db->db_query($qry))
 				$lehreinheit_id=$row->lehreinheit_id;
 			$selected = ($row->lehreinheit_id == $lehreinheit_id?'selected':'');
 			//Beteiligte Mitarbeiter auslesen
-			$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN campus.vw_mitarbeiter ON(mitarbeiter_uid=uid) WHERE lehreinheit_id='$row->lehreinheit_id'";
+			$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN campus.vw_mitarbeiter ON(mitarbeiter_uid=uid) WHERE lehreinheit_id=".$db->db_add_param($row->lehreinheit_id, FHC_INTEGER);
 			if($result_lektoren = $db->db_query($qry_lektoren))
 			{
 				$lektoren = '( ';
@@ -329,7 +329,7 @@ if($result = $db->db_query($qry))
 
 				$lektoren .=')';
 			}
-			$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
+			$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=".$db->db_add_param($row->lehreinheit_id, FHC_INTEGER);
 			if($result_gruppen = $db->db_query($qry_gruppen))
 			{
 				$gruppen = '';
@@ -373,7 +373,7 @@ echo "<table width='100%'><tr><td><b>".$lv_obj->bezeichnung_arr[$sprache]."</b><
 if($lehreinheit_id=='')		
 	die($p->t('benotungstool/keineKreuzerllistenFuerDieseLehrveranstaltung'));
 
-$qry = "SELECT vorname, nachname FROM campus.vw_student WHERE uid='$user'";
+$qry = "SELECT vorname, nachname FROM campus.vw_student WHERE uid=".$db->db_add_param($user);
 $name='';
 if($result = $db->db_query($qry))
 	if($row = $db->db_fetch_object($result))
@@ -609,7 +609,7 @@ if (!isset($_GET["notenuebersicht"]))
 		if ($uebung_obj->beispiele)
 		{
 			
-			$qry_cnt = "SELECT count(*) as anzahl FROM campus.tbl_studentbeispiel WHERE beispiel_id IN (SELECT beispiel_id from campus.tbl_beispiel where uebung_id = $uebung_id) AND vorbereitet=true and student_uid = '$user'";
+			$qry_cnt = "SELECT count(*) as anzahl FROM campus.tbl_studentbeispiel WHERE beispiel_id IN (SELECT beispiel_id from campus.tbl_beispiel where uebung_id =".$db->db_add_param($uebung_id, FHC_INTEGER).") AND vorbereitet=true and student_uid = ".$db->db_add_param($user);
 				if($result_cnt = $db->db_query($qry_cnt))
 					if($row_cnt = $db->db_fetch_object($result_cnt))
 						$anzahl = $row_cnt->anzahl;
@@ -749,14 +749,14 @@ if (!isset($_GET["notenuebersicht"]))
 			echo "</td><td valign='top' algin='right'>";
 			
 			//Gesamtpunkte diese Kreuzerlliste
-			$qry = "SELECT sum(punkte) as punktegesamt FROM campus.tbl_beispiel WHERE uebung_id='$uebung_id'";
+			$qry = "SELECT sum(punkte) as punktegesamt FROM campus.tbl_beispiel WHERE uebung_id=".$db->db_add_param($uebung_id, FHC_INTEGER);
 			$punkte_gesamt=0;
 			if($result=$db->db_query($qry))
 				if($row = $db->db_fetch_object($result))
 					$punkte_gesamt = $row->punktegesamt;
 			
 			//Eingetragen diese Kreuzerlliste
-			$qry = "SELECT sum(punkte) as punkteeingetragen FROM campus.tbl_beispiel JOIN campus.tbl_studentbeispiel USING(beispiel_id) WHERE uebung_id='$uebung_id' AND student_uid='$user' AND vorbereitet=true";
+			$qry = "SELECT sum(punkte) as punkteeingetragen FROM campus.tbl_beispiel JOIN campus.tbl_studentbeispiel USING(beispiel_id) WHERE uebung_id=".$db->db_add_param($uebung_id, FHC_INTEGER)." AND student_uid=".$db->db_add_param($user)." AND vorbereitet=true";
 			$punkte_eingetragen=0;
 			if($result=$db->db_query($qry))
 				if($row = $db->db_fetch_object($result))
@@ -767,7 +767,7 @@ if (!isset($_GET["notenuebersicht"]))
 			$liste_id = $ueb_help->liste_id;
 			$qry = "SELECT sum(tbl_beispiel.punkte) as punktegesamt_alle FROM campus.tbl_beispiel, campus.tbl_uebung
 					WHERE tbl_uebung.uebung_id=tbl_beispiel.uebung_id AND
-					tbl_uebung.lehreinheit_id='$lehreinheit_id' and tbl_uebung.liste_id = '$liste_id'";
+					tbl_uebung.lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." and tbl_uebung.liste_id = ".$db->db_add_param($liste_id, FHC_INTEGER);
 			$punkte_gesamt_alle=0;
 			if($result=$db->db_query($qry))
 				if($row = $db->db_fetch_object($result))
@@ -777,9 +777,9 @@ if (!isset($_GET["notenuebersicht"]))
 			$qry = "SELECT sum(tbl_beispiel.punkte) as punkteeingetragen_alle FROM campus.tbl_beispiel, campus.tbl_studentbeispiel, campus.tbl_uebung
 					WHERE tbl_beispiel.beispiel_id = tbl_studentbeispiel.beispiel_id AND
 					tbl_uebung.uebung_id=tbl_beispiel.uebung_id AND
-					tbl_uebung.lehreinheit_id='$lehreinheit_id' AND
-					tbl_uebung.liste_id = '$liste_id' AND 
-					tbl_studentbeispiel.student_uid='$user' AND vorbereitet=true";
+					tbl_uebung.lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." AND
+					tbl_uebung.liste_id = ".$db->db_add_param($liste_id, FHC_INTEGER)." AND 
+					tbl_studentbeispiel.student_uid=".$db->db_add_param($user)." AND vorbereitet=true";
 			$punkte_eingetragen_alle=0;
 			if($result=$db->db_query($qry))
 				if($row = $db->db_fetch_object($result))
@@ -787,7 +787,7 @@ if (!isset($_GET["notenuebersicht"]))
 			
 			//Mitarbeitspunkte
 			$qry = "SELECT sum(mitarbeitspunkte) as mitarbeitspunkte FROM campus.tbl_studentuebung JOIN campus.tbl_uebung USING(uebung_id)
-					WHERE lehreinheit_id='$lehreinheit_id' AND student_uid='$user' AND liste_id = '$liste_id'";
+					WHERE lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER)." AND student_uid=".$db->db_add_param($user)." AND liste_id = ".$db->db_add_param($liste_id, FHC_INTEGER);
 			$mitarbeit_alle=0;
 			if($result=$db->db_query($qry))
 				if($row = $db->db_fetch_object($result))
@@ -795,7 +795,7 @@ if (!isset($_GET["notenuebersicht"]))
 			
 			//Mitarbeitspunkte
 			$qry = "SELECT mitarbeitspunkte FROM campus.tbl_studentuebung
-					WHERE uebung_id='$uebung_id' AND student_uid='$user'";
+					WHERE uebung_id=".$db->db_add_param($uebung_id, FHC_INTEGER)." AND student_uid=".$db->db_add_param($user);
 			$mitarbeit=0;
 			if($result=$db->db_query($qry))
 				if($row = $db->db_fetch_object($result))
@@ -875,7 +875,7 @@ if (!isset($_GET["notenuebersicht"]))
 					             </td>
 			          		</tr>';
 						$i=0;
-						$qry_cnt = "SELECT distinct student_uid FROM campus.tbl_studentbeispiel JOIN campus.tbl_beispiel USING(beispiel_id) WHERE uebung_id='$uebung_id' GROUP BY student_uid";
+						$qry_cnt = "SELECT distinct student_uid FROM campus.tbl_studentbeispiel JOIN campus.tbl_beispiel USING(beispiel_id) WHERE uebung_id=".$db->db_add_param($uebung_id)." GROUP BY student_uid";
 							if($result_cnt = $db->db_query($qry_cnt))
 									$gesamt=$db->db_num_rows($result_cnt);
 			
@@ -884,7 +884,7 @@ if (!isset($_GET["notenuebersicht"]))
 							$i++;
 							$solved = 0;
 							$psolved = 0;
-							$qry_cnt = "SELECT count(*) as anzahl FROM campus.tbl_studentbeispiel WHERE beispiel_id=$row->beispiel_id AND vorbereitet=true";
+							$qry_cnt = "SELECT count(*) as anzahl FROM campus.tbl_studentbeispiel WHERE beispiel_id=".$db->db_add_param($row->beispiel_id, FHC_INTEGER)." AND vorbereitet=true";
 							if($result_cnt = $db->db_query($qry_cnt))
 								if($row_cnt = $db->db_fetch_object($result_cnt))
 									$solved = $row_cnt->anzahl;
@@ -975,7 +975,7 @@ else
 		$vorname_arr = Array();
 		$nachname_arr = Array();
 				
-			$qry_stud_dd = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".$stsem."' and lehreinheit_id = '".$lehreinheit_id."'  ORDER BY nachname, vorname";			
+			$qry_stud_dd = "SELECT uid, vorname, nachname, matrikelnr FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = ".$db->db_add_param($stsem)." and lehreinheit_id = ".$db->db_add_param($lehreinheit_id, FHC_INTEGER)."  ORDER BY nachname, vorname";
             if($result_stud_dd = $db->db_query($qry_stud_dd))
 			{
 				$i=1;

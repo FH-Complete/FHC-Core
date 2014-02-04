@@ -28,7 +28,6 @@ require_once('../../include/fachbereich.class.php');
 require_once('../../include/lvinfo.class.php');
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/organisationsform.class.php');
-//require_once('../../include/organisationseinheit.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -388,8 +387,8 @@ else
 	$where = "fachbereich_kurzbz=".$db->db_add_param($fb_kurzbz);
 	$where2 = $where." AND 
 	          tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND 
-	          tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id";
-	$tables='lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach';
+	          tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz";
+	$tables='lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_fachbereich';
 }
 	
 $qry = "
@@ -402,7 +401,7 @@ FROM
 	campus.vw_mitarbeiter JOIN
 	(SELECT uid FROM public.tbl_benutzerfunktion WHERE funktion_kurzbz='fbk' AND $where
 	 UNION
-	 SELECT koordinator as uid FROM $tables WHERE $where2) as a USING(uid) ORDER BY nachname, vorname";
+	 SELECT tbl_lehrveranstaltung.koordinator as uid FROM $tables WHERE $where2) as a USING(uid) ORDER BY nachname, vorname";
 
 $fbk = array();
 if($result = $db->db_query($qry))
@@ -435,11 +434,16 @@ else
 }
 
 if($fb_kurzbz !='')
-	$sql_query="SELECT distinct tbl_lehrveranstaltung.* 
-	FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach WHERE
-	tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-	tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
-	tbl_lehrfach.fachbereich_kurzbz=".$db->db_add_param($fb_kurzbz);
+	$sql_query="
+	SELECT 
+		distinct tbl_lehrveranstaltung.* 
+	FROM 	
+		lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, public.tbl_fachbereich
+	WHERE
+		tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id 
+		AND	tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id 
+		AND lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz
+		AND	tbl_fachbereich.fachbereich_kurzbz=".$db->db_add_param($fb_kurzbz);
 else
 	$sql_query="SELECT * FROM lehre.tbl_lehrveranstaltung WHERE true";
 
@@ -450,8 +454,13 @@ if($stg_kz!='')
 if($semester != -1)
 	$sql_query.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester, FHC_INTEGER)." $aktiv ORDER BY tbl_lehrveranstaltung.bezeichnung";
 
-if(!$result_lv = $db->db_query($sql_query))
-	die("Lehrveranstaltung not found!");
+if($fb_kurzbz=='' && $stg_kz=='' && $semester=='0' && $oe_kurzbz=='')
+	$result_lv='';
+else
+{
+	if(!$result_lv = $db->db_query($sql_query))
+		die("Lehrveranstaltung not found!");
+}
 
 //Studiengang DropDown
 $outp='';
@@ -517,10 +526,8 @@ $outp.= '</SELECT>';
 	$isaktiv='aktiv';
 }*/
 
-	$outp.= ' <input type="submit" value="Anzeigen">';
-
-//Organisationseinheit Dropdown
-	$outp.= '<br>Organisationseinheit <select name="oe_kurzbz" id="select_oe_kurzbz"><option value="">-- Alle --</option>';
+	//Organisationseinheit Dropdown
+	$outp.= '<br>Organisationseinheit <select name="oe_kurzbz" style="width: 200px" id="select_oe_kurzbz"><option value="">-- Alle --</option>';
 	$oe=new organisationseinheit();
 	$oe->getAll();
 	foreach($oe->result as $row)
@@ -533,6 +540,7 @@ $outp.= '</SELECT>';
 	}
 	$outp.= '</select>';
 
+	$outp.= ' <input type="submit" value="Anzeigen">';
 	$outp.= '</form>';
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
@@ -542,9 +550,9 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-	<link rel="stylesheet" href="../../skin/jquery.css" type="text/css"/>
+	<link rel="stylesheet" href="../../skin/jquery.css" type="text/css">
 	<script type="text/javascript" src="../../include/js/jquery.js"></script>
-	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
+	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css">
 
 	<script type="text/javascript">
 		$(document).ready(function() 
@@ -803,7 +811,6 @@ if ($result_lv!=0)
 		  <th title='Soll diese Lehrveranstaltung bei Diplom-/Bachelorarbeit ausgewaehlt werden koennen?'>BA/DA</th>
 		  <th>Koordinator</th>
 		  <th>LV-Info</th>
-		  <th>Lehrfach</th>
 		  <th>LV-Angebot</th>
 		  <th>kompatible LV</th>";
 
@@ -957,28 +964,12 @@ if ($result_lv!=0)
 		else 
 			echo 'vorhanden';
 		echo '</td>';
-		//Lehrfach anlegen
-		echo '<td nowrap>';
-		if($write_admin)
-			echo '<a href="lehrfach.php?neu
-			&filter_stg_kz='.$db->convert_html_chars($row->studiengang_kz).'
-			&filter_semester='.$db->convert_html_chars($row->semester).'
-			&filter_fachbereich_kurzbz=&filter_aktiv=
-			&stg_kz='.$row->studiengang_kz.'
-			&kurzbz='.$db->convert_html_chars($row->kurzbz).'
-			&bezeichnung='.$db->convert_html_chars($row->bezeichnung).'
-			&semester='.$db->convert_html_chars($row->semester).'
-			&farbe=&fachbereich_kurzbz=Dummy
-			&sprache='.$db->convert_html_chars($row->sprache).'" target="_parent" method="post">LF Neu</a>';
-		else		
-			echo $db->convert_html_chars($row->lehrveranstaltung_id);
-		
-		echo '</td>
+		echo '
 			<td nowrap>
 				<a href="lehrveranstaltung_lvangebot.php?lehrveranstaltung_id='.$db->convert_html_chars($row->lehrveranstaltung_id).'" target="lv_detail">LV-Angebot</a>
 			</td>';
 		
-		echo '<td><a href="lehrveranstaltung_kompatibel.php?lehrveranstaltung_id='.$row->lehrveranstaltung_id.'&type=edit" target="lv_detail">anzeigen</a></td>';
+		echo '<td><a href="lehrveranstaltung_kompatibel.php?lehrveranstaltung_id='.$row->lehrveranstaltung_id.'&type=edit" target="lv_detail">Kompatible LV</a></td>';
 		echo "</tr>\n";
 	}
 }

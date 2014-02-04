@@ -95,7 +95,7 @@ $stsem = $stsem_obj->getaktorNext();
 		<td>
 			<?php
 				$is_berechtigt=false;
-				$qry = "SELECT distinct oe_kurzbz FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrfach USING(lehrfach_id) JOIN public.tbl_fachbereich USING(fachbereich_kurzbz) WHERE lehrveranstaltung_id='".addslashes($lvid)."'";
+				$qry = "SELECT distinct oe_kurzbz FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id) JOIN public.tbl_fachbereich USING(oe_kurzbz) WHERE tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER);
 				if($result = $db->db_query($qry))
 				{
 					while($row = $db->db_fetch_object($result))
@@ -113,9 +113,9 @@ $stsem = $stsem_obj->getaktorNext();
 					$is_berechtigt=true;
 
 				$sql_query = "SELECT DISTINCT vorname, nachname, uid FROM lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, campus.vw_mitarbeiter
-								WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND
+								WHERE tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
 								tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-								mitarbeiter_uid=uid AND uid='$user' ORDER BY nachname, vorname, uid";
+								mitarbeiter_uid=uid AND uid=".$db->db_add_param($user)." ORDER BY nachname, vorname, uid";
 								//studiensemester_kurzbz='$stsem' AND
 
 				if($result = $db->db_query($sql_query))

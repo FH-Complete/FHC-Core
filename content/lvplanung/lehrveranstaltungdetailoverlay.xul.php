@@ -95,11 +95,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		  			<label value="Lehrfach" />
 					<menulist id="lehrveranstaltung-detail-menulist-lehrfach" disabled="true"
 					          datasources="rdf:null" flex="1"
-					          ref="http://www.technikum-wien.at/lehrfach/liste"  >
+					          ref="http://www.technikum-wien.at/lehrveranstaltung/liste"  >
 						<template>
 							<menupopup>
-							<menuitem value="rdf:http://www.technikum-wien.at/lehrfach/rdf#lehrfach_id"
-						              label="rdf:http://www.technikum-wien.at/lehrfach/rdf#bezeichnung ( rdf:http://www.technikum-wien.at/lehrfach/rdf#fachbereich_kurzbz )"
+							<menuitem value="rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#lehrveranstaltung_id"
+						              label="rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#bezeichnung ( rdf:http://www.technikum-wien.at/lehrveranstaltung/rdf#oe_kurzbz )"
 									  uri="rdf:*"/>
 							</menupopup>
 						</template>

@@ -338,15 +338,15 @@ function drawLehrauftrag($uid)
 		}
 	}
 	$qry = "SELECT tbl_projektarbeit.projektarbeit_id, tbl_projektbetreuer.faktor, tbl_projektbetreuer.stunden, tbl_projektbetreuer.stundensatz, tbl_lehrveranstaltung.semester, 
-	               vorname, nachname, vw_student.studiengang_kz, projekttyp_kurzbz, tbl_lehrfach.fachbereich_kurzbz
-	        FROM lehre.tbl_projektbetreuer, lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehrveranstaltung, 
+	               vorname, nachname, vw_student.studiengang_kz, projekttyp_kurzbz, tbl_fachbereich.fachbereich_kurzbz
+	        FROM lehre.tbl_projektbetreuer, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, lehre.tbl_lehrveranstaltung, public.tbl_fachbereich,
 	               public.tbl_benutzer, lehre.tbl_projektarbeit, campus.vw_student 
-	        WHERE tbl_projektbetreuer.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid='$uid' AND 
-	              tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND student_uid=vw_student.uid
-	              AND tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND
-	              tbl_lehreinheit.studiensemester_kurzbz='$ss' AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id ";
+	        WHERE tbl_projektbetreuer.person_id=tbl_benutzer.person_id AND tbl_benutzer.uid=".$db->db_add_param($uid)." AND 
+	              tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND student_uid=vw_student.uid AND tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz
+	              AND tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND
+	              tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($ss)." AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id ";
 	if($studiengang_kz!='')
-		$qry.=" AND tbl_lehrveranstaltung.studiengang_kz='$studiengang_kz'";
+		$qry.=" AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
 	if($result = $db->db_query($qry))
 	{
 		while($row = $db->db_fetch_object($result))

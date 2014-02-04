@@ -44,10 +44,12 @@ require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/lehrstunde.class.php');
+require_once('../../include/lvangebot.class.php');
+require_once('../../include/gruppe.class.php');
 
 $user = get_uid();
 $db = new basis_db();
-error_reporting(0);
+//error_reporting(0);
 
 $return = false;
 $errormsg = 'unknown';
@@ -103,7 +105,7 @@ function LehrauftragAufFirma($mitarbeiter_uid)
 	
 	$qry_firma = "
 				SELECT * FROM campus.vw_mitarbeiter LEFT JOIN public.tbl_adresse USING(person_id) 
-				WHERE uid='".addslashes($mitarbeiter_uid)."'
+				WHERE uid=".$db->db_add_param($mitarbeiter_uid)."
 				ORDER BY zustelladresse DESC, firma_id LIMIT 1";
 	if($result_firma = $db->db_query($qry_firma))
 	{
@@ -143,11 +145,11 @@ function getStundenproInstitut($mitarbeiter_uid, $studiensemester_kurzbz)
 			FROM
 				lehre.tbl_lehreinheitmitarbeiter 
 				JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
-				JOIN lehre.tbl_lehrfach USING(lehrfach_id) 
-				JOIN public.tbl_fachbereich USING(fachbereich_kurzbz)
+				JOIN lehre.tbl_lehrveranstaltung as lehrfach (lehrfach_id=lehrveranstaltung_id)
+				JOIN public.tbl_fachbereich USING(oe_kurzbz)
 			WHERE
-				mitarbeiter_uid='$mitarbeiter_uid' AND
-				studiensemester_kurzbz='$studiensemester_kurzbz' AND
+				mitarbeiter_uid=".$db->db_add_param($mitarbeiter_uid)." AND
+				studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND
 				faktor>0 AND
 				stundensatz>0 AND
 				bismelden
@@ -169,10 +171,11 @@ if(!$error)
 	if(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_save')
 	{
 		//Lehreinheitmitarbeiter Zuteilung
-		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz
-				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach
+		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz,
+				(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz
+				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach
 				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
+				tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER);
 		if($result = $db->db_query($qry))
 		{
 			if($row = $db->db_fetch_object($result))
@@ -243,7 +246,7 @@ if(!$error)
 					{
 						//Update im Stundenplan
 						$stpl_table='lehre.'.TABLE_BEGIN.$db_stpl_table;
-						$qry = "UPDATE $stpl_table SET mitarbeiter_uid='$lem->mitarbeiter_uid' WHERE lehreinheit_id='$lem->lehreinheit_id' AND mitarbeiter_uid='$lem->mitarbeiter_uid_old'";
+						$qry = "UPDATE $stpl_table SET mitarbeiter_uid=".$db->db_add_param($lem->mitarbeiter_uid)." WHERE lehreinheit_id=".$db->db_add_param($lem->lehreinheit_id, FHC_INTEGER)." AND mitarbeiter_uid=".$db->db_add_param($lem->mitarbeiter_uid_old);
 						if($db->db_query($qry))
 						{
 							$error = false;
@@ -309,8 +312,8 @@ if(!$error)
 						$qry.="	FROM
 									lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 								WHERE
-									mitarbeiter_uid='$lem->mitarbeiter_uid' AND
-									studiensemester_kurzbz='$le->studiensemester_kurzbz' AND
+									mitarbeiter_uid=".$db->db_add_param($lem->mitarbeiter_uid)." AND
+									studiensemester_kurzbz=".$db->db_add_param($le->studiensemester_kurzbz)." AND
 									faktor>0 AND
 									stundensatz>0 AND
 									bismelden";
@@ -389,10 +392,11 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_add')
 	{
 		//neue Lehreinheitmitarbeiterzuteilung anlegen
-		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz
-				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach
+		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, 
+				(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz
+				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach
 				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
+				tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER);
 		if($db->db_query($qry))
 		{
 			if($row = $db->db_fetch_object())
@@ -442,8 +446,8 @@ if(!$error)
 
 				$fixangestellt=false;
 				//Stundensatz aus tbl_mitarbeiter holen
-				$qry = "SELECT stundensatz, fixangestellt FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='".addslashes($_POST['mitarbeiter_uid'])."'";
-				if($db->db_query($qry))
+				$qry = "SELECT stundensatz, fixangestellt FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=".$db->db_add_param($_POST['mitarbeiter_uid']);
+				if($result = $db->db_query($qry))
 				{
 					if($row = $db->db_fetch_object($result))
 					{
@@ -457,7 +461,7 @@ if(!$error)
 					{
 						$error=true;
 						$return=false;
-						$errormsg='Mitarbeiter '.addslashes($_POST['mitarbeiter_uid']).' wurde nicht gefunden';
+						$errormsg='Mitarbeiter '.$db->convert_html_chars($_POST['mitarbeiter_uid']).' wurde nicht gefunden';
 					}
 				}
 				else
@@ -480,8 +484,8 @@ if(!$error)
 							FROM
 								lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 							WHERE
-								mitarbeiter_uid='$lem->mitarbeiter_uid' AND
-								studiensemester_kurzbz='$le->studiensemester_kurzbz' AND
+								mitarbeiter_uid=".$db->db_add_param($lem->mitarbeiter_uid)." AND
+								studiensemester_kurzbz=".$db->db_add_param($le->studiensemester_kurzbz)." AND
 								faktor>0 AND
 								stundensatz>0 AND
 								bismelden";
@@ -494,7 +498,7 @@ if(!$error)
 							{
 								$return = false;
 								$error = true;
-								$errormsg = "ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden wurde ueberschritten!\n Daten wurden NICHT gespeichert!\n\n";									
+								$errormsg = "ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden wurde ueberschritten!\n Daten wurden NICHT gespeichert!\n\n";
 								$errormsg.=getStundenproInstitut($lem->mitarbeiter_uid, $le->studiensemester_kurzbz);
 							}
 							else
@@ -509,7 +513,7 @@ if(!$error)
 				if(!$error)
 				{
 					//Faktor und Semesterstunden aus tbl_lehrveranstaltung holen
-					$qry = "SELECT planfaktor, semesterstunden FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) WHERE lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."';";
+					$qry = "SELECT planfaktor, semesterstunden FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER).";";
 					if($db->db_query($qry))
 					{
 						if($row = $db->db_fetch_object())
@@ -571,10 +575,11 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_del')
 	{
-		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz
-				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach
+		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, 
+				(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz
+				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach
 				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
+				tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER);
 		if($db->db_query($qry))
 		{
 			if($row = $db->db_fetch_object())
@@ -610,9 +615,9 @@ if(!$error)
 			if(isset($_POST['lehreinheit_id']) && is_numeric($_POST['lehreinheit_id']) && isset($_POST['mitarbeiter_uid']))
 			{
 				//Wenn der Mitarbeiter im Stundenplan verplant ist, dann wird das Loeschen verhindert
-				$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev WHERE lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."' AND mitarbeiter_uid='".addslashes($_POST['mitarbeiter_uid'])."'
+				$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)." AND mitarbeiter_uid=".$db->db_add_param($_POST['mitarbeiter_uid'])."
 						UNION
-						SELECT stundenplan_id as id FROM lehre.tbl_stundenplan WHERE lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."' AND mitarbeiter_uid='".addslashes($_POST['mitarbeiter_uid'])."'";
+						SELECT stundenplan_id as id FROM lehre.tbl_stundenplan WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)." AND mitarbeiter_uid=".$db->db_add_param($_POST['mitarbeiter_uid']);
 				if($db->db_query($qry))
 				{
 					if($db->db_num_rows()>0)
@@ -649,10 +654,11 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_gruppe_del')
 	{
-		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz
-				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach
+		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, 
+				(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz
+				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach
 				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id=(SELECT lehreinheit_id FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id='".addslashes($_POST['lehreinheitgruppe_id'])."')";
+				tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND lehreinheit_id=(SELECT lehreinheit_id FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheitgruppe_id=".$db->db_add_param($_POST['lehreinheitgruppe_id'], FHC_INTEGER).")";
 		if($db->db_query($qry))
 		{
 			if($row = $db->db_fetch_object())
@@ -686,7 +692,7 @@ if(!$error)
 		{
 			//Pruefen ob bereits eine Kreuzerlliste vorhanden ist
 			$qry = "SELECT count(*) as anzahl FROM lehre.tbl_lehreinheitgruppe, lehre.tbl_lehreinheit, campus.tbl_uebung WHERE
-					tbl_lehreinheitgruppe.lehreinheitgruppe_id='".addslashes($_POST['lehreinheitgruppe_id'])."' AND
+					tbl_lehreinheitgruppe.lehreinheitgruppe_id=".$db->db_add_param($_POST['lehreinheitgruppe_id'], FHC_INTEGER)." AND
 					tbl_lehreinheitgruppe.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 					tbl_lehreinheit.lehreinheit_id=tbl_uebung.lehreinheit_id";
 			if($db->db_query($qry))
@@ -719,7 +725,7 @@ if(!$error)
 							 FROM 
 							 	lehre.tbl_lehreinheitgruppe 
 							WHERE 
-								lehreinheitgruppe_id='".addslashes($_POST['lehreinheitgruppe_id'])."'
+								lehreinheitgruppe_id=".$db->db_add_param($_POST['lehreinheitgruppe_id'], FHC_INTEGER)."
 							)
 						UNION
 						SELECT stundenplan_id as id FROM lehre.tbl_stundenplan 
@@ -730,7 +736,7 @@ if(!$error)
 							 FROM 
 							 	lehre.tbl_lehreinheitgruppe 
 							WHERE 
-								lehreinheitgruppe_id='".addslashes($_POST['lehreinheitgruppe_id'])."'
+								lehreinheitgruppe_id=".$db->db_add_param($_POST['lehreinheitgruppe_id'], FHC_INTEGER)."
 							)
 						";
 				if($db->db_query($qry))
@@ -777,10 +783,11 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_gruppe_add')
 	{
-		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz
-				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach
+		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz,
+				(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz
+				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach
 				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-				tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
+				tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER);
 		if($db->db_query($qry))
 		{
 			if($row = $db->db_fetch_object())
@@ -861,13 +868,13 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit')
 	{
 		//Lehreinheit anlegen/aktualisieren
-		if($_POST['lehreinheit_id']!='')
-			$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, fachbereich_kurzbz
-					FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrfach
+		if(isset($_POST['lehreinheit_id']) && $_POST['lehreinheit_id']!='')
+			$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, (SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz
+					FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach
 					WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-					tbl_lehreinheit.lehrfach_id=tbl_lehrfach.lehrfach_id AND lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
+					tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER);
 		else
-			$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='".addslashes($_POST['lehrveranstaltung'])."'";
+			$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=".$db->db_add_param($_POST['lehrveranstaltung'], FHC_INTEGER);
 
 		if($db->db_query($qry))
 		{
@@ -936,17 +943,26 @@ if(!$error)
 					$leDAO->lehrform_kurzbz=$_POST['lehrform'];
 					$leDAO->stundenblockung=$_POST['stundenblockung'];
 					$leDAO->wochenrythmus=$_POST['wochenrythmus'];
-					if (isset($_POST['start_kw'])) $leDAO->start_kw=$_POST['start_kw'];
+
+					if (isset($_POST['start_kw'])) 
+						$leDAO->start_kw=$_POST['start_kw'];
+
 					$leDAO->raumtyp=$_POST['raumtyp'];
 					$leDAO->raumtypalternativ=$_POST['raumtypalternativ'];
 					$leDAO->sprache=$_POST['sprache'];
-					if (isset($_POST['lehre'])) $leDAO->lehre=($_POST['lehre']=='true'?true:false);
-					if (isset($_POST['anmerkung'])) $leDAO->anmerkung=$_POST['anmerkung'];
+
+					if (isset($_POST['lehre'])) 
+						$leDAO->lehre=($_POST['lehre']=='true'?true:false);
+
+					if (isset($_POST['anmerkung'])) 
+						$leDAO->anmerkung=$_POST['anmerkung'];
+
 					$leDAO->lvnr=(isset($_POST['lvnr'])?$_POST['lvnr']:'');
 					$leDAO->unr=(isset($_POST['unr'])?$_POST['unr']:'');
 					if($leDAO->unr=='')
 					{
-						$leDAO->unr = $_POST['lehreinheit_id'];
+						if(isset($_POST['lehreinheit_id']))
+							$leDAO->unr = $_POST['lehreinheit_id'];
 					}
 					$leDAO->updateamum=date('Y-m-d H:i:s');
 					$leDAO->updatevon=$user;
@@ -967,6 +983,27 @@ if(!$error)
 					{
 						$data = $leDAO->lehreinheit_id;
 						$return = true;
+						if($_POST['do']=='create')
+						{
+							// Wenn ein LV-Angebot vorliegt, wird diese Gruppe automatisch zugeteilt
+							$lvangebot = new lvangebot();
+							$lvangebot->getAllFromLvId($leDAO->lehrveranstaltung_id, $leDAO->studiensemester_kurzbz);
+							if(isset($lvangebot->result[0]) && $lvangebot->result[0]->gruppe_kurzbz!='')
+							{
+								$gruppe = new gruppe();
+								$gruppe->load($lvangebot->result[0]->gruppe_kurzbz);
+
+								$leg = new lehreinheitgruppe();
+								$leg->lehreinheit_id = $leDAO->lehreinheit_id;
+								$leg->studiengang_kz = $gruppe->studiengang_kz;
+								$leg->semester = $gruppe->semester;
+								$leg->gruppe_kurzbz = $gruppe->gruppe_kurzbz;
+								$leg->insertamum = date('Y-m-d H:i:s');
+								$leg->insertvon = $user;
+								$leg->new = true;
+								$leg->save();
+							}
+						}
 					}
 					else
 					{
@@ -986,9 +1023,9 @@ if(!$error)
 				else
 				{
 					// Loeschen verhindern wenn diese Lehreinheit schon verplant ist
-					$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev WHERE lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'
+					$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)."
 							UNION
-							SELECT stundenplan_id as id FROM lehre.tbl_stundenplan WHERE lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
+							SELECT stundenplan_id as id FROM lehre.tbl_stundenplan WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER);
 					if($db->db_query($qry))
 					{
 						if($db->db_num_rows()>0)
@@ -999,7 +1036,7 @@ if(!$error)
 						else
 						{
 							//Loeschen verhindern wenn ein MoodleKurs existiert
-							$qry = "SELECT 1 FROM lehre.tbl_moodle WHERE lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
+							$qry = "SELECT 1 FROM lehre.tbl_moodle WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER);
 							if($db->db_query($qry))
 							{
 								if($db->db_num_rows()>0)

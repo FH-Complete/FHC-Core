@@ -161,7 +161,7 @@
 
 
 	// Variablen uebernehmen
-	$datum=(isset($_GET['datum'])?$_GET['datum']:(isset($_POST['datum'])?$_POST['datum']:mktime()));
+	$datum=(isset($_GET['datum'])?$_GET['datum']:(isset($_POST['datum'])?$_POST['datum']:time()));
 	$montag=montag($datum);
 	$letzterTag=mktime(0,0,0,date('m',$montag),date('d',$montag) + TAGE_PRO_WOCHE,date('Y',$montag));
 	$letzterTagAnzeige=mktime(0,0,0,date('m',$montag),date('d',$montag) + ( TAGE_PRO_WOCHE - 1),date('Y',$montag));
@@ -183,15 +183,16 @@
 	$objSS=new studiensemester();
 	$ss=$objSS->getaktorNext();
 	$objSS->load($ss);
-	$ss_begin=datum::mktime_fromdate($objSS->start);
-	$ss_ende=datum::mktime_fromdate($objSS->ende);
+	$datum_obj = new datum();
+	$ss_begin=$datum_obj->mktime_fromdate($objSS->start);
+	$ss_ende=$datum_obj->mktime_fromdate($objSS->ende);
 
 	
 	$sql_query=' select tbl_adresse.plz,tbl_adresse.name, sum(tbl_ort.max_person) as summe  ';
 	$sql_query.=' from  public.tbl_ort,public.tbl_standort, public.tbl_adresse ';
 	$sql_query.=" where tbl_standort.standort_id=tbl_ort.standort_id ";	
 	$sql_query.=" and tbl_adresse.adresse_id=tbl_standort.adresse_id ";	
-	$sql_query.=" and tbl_adresse.adresse_id='".$adresse_id."'";	
+	$sql_query.=" and tbl_adresse.adresse_id=".$db->db_add_param($adresse_id, FHC_INTEGER)." ";	
 	$sql_query.=" and tbl_ort.aktiv and tbl_ort.lehre ";
 	$sql_query.=" group by tbl_adresse.plz,tbl_adresse.name  ";
 	// Gibt es fuer das Datum und Stunde einen Stundenplaneintrag
@@ -211,7 +212,7 @@
 				&nbsp;&nbsp;&nbsp;<a class="Item" href="'.$_SERVER['PHP_SELF'].'?uid='.$uid.'&amp;datum='.$kwRet.'">&lt;&lt;</a> 
 				Wochenplan  &nbsp;<a class="Item" href="'.$_SERVER['PHP_SELF'].'?uid='.$uid.'&amp;datum='.$datum.'">Kw '.$kw.'</a>
 				&nbsp;<a class="Item" href="'.$_SERVER['PHP_SELF'].'?uid='.$uid.'&amp;datum='.$kwVor.'">&gt;&gt;</a>
-				&nbsp;&nbsp;&nbsp;<a class="Item" href="'.$_SERVER['PHP_SELF'].'?uid='.$uid.'&amp;datum='.mktime().'">Heute</a>
+				&nbsp;&nbsp;&nbsp;<a class="Item" href="'.$_SERVER['PHP_SELF'].'?uid='.$uid.'&amp;datum='.time().'">Heute</a>
 		</td></tr></table></H2>';
 
 		// Stundentafel abfragen
@@ -259,12 +260,12 @@
 					
 					$sql_query=' select distinct  vw_stundenplan.stg_bezeichnung as bezeichnung,vw_stundenplan.stg_kurzbzlang as kurzbzlang,vw_stundenplan.stg_kurzbz as kurzbz, vw_stundenplan.stundenplan_id,vw_stundenplan.lehrform, vw_stundenplan.gruppe, vw_stundenplan.gruppe_kurzbz, vw_stundenplan.unr,vw_stundenplan.verband,vw_stundenplan.ort_kurzbz,vw_stundenplan.lehreinheit_id,vw_stundenplan.studiengang_kz,vw_stundenplan.semester,tbl_ort.max_person,tbl_standort.adresse_id,tbl_adresse.plz,tbl_adresse.name  ';
 					$sql_query.=' from lehre.vw_stundenplan, public.tbl_ort,public.tbl_standort, public.tbl_adresse ';
-					$sql_query.=" where vw_stundenplan.datum='".date('Y-m-d',mktime(0,0,0,date('m',$montag),date('d',$montag) + $i,date('Y',$montag)))."' ";
-					$sql_query.=" and vw_stundenplan.stunde='".$row->stunde."' ";
+					$sql_query.=" where vw_stundenplan.datum=".$db->db_add_param(date('Y-m-d',mktime(0,0,0,date('m',$montag),date('d',$montag) + $i,date('Y',$montag))))." ";
+					$sql_query.=" and vw_stundenplan.stunde=".$db->db_add_param($row->stunde, FHC_INTEGER)." ";
 					$sql_query.=" and tbl_ort.ort_kurzbz=vw_stundenplan.ort_kurzbz ";
 					$sql_query.=" and tbl_standort.standort_id=tbl_ort.standort_id ";	
 					$sql_query.=" and tbl_adresse.adresse_id=tbl_standort.adresse_id ";	
-					$sql_query.=" and tbl_adresse.adresse_id='".$adresse_id."'";
+					$sql_query.=" and tbl_adresse.adresse_id=".$db->db_add_param($adresse_id, FHC_INTEGER)." ";
 					$sql_query.=" order by tbl_adresse.plz,vw_stundenplan.ort_kurzbz ";
 
 					// Gibt es fuer das Datum und Stunde einen Stundenplaneintrag
@@ -326,7 +327,7 @@
 								   $("img#img_'.$i.'_'.$k.'").click(function(event)
 								   {
 								   		$("div#infodetail").html("<table border=\"0\"><tr>'.$tooltip.'</tr></table>");
-						    	    	$("div#info").show("slow"); // div# langsam �ffnen
+						    	    	$("div#info").show("slow"); // div# langsam oeffnen
 		   							});
 								});
 						</script>';

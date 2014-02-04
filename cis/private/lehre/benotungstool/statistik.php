@@ -130,20 +130,28 @@ $stsem_content.= "</SELECT>\n";
 //Lehreinheiten laden
 if($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lv_obj->studiengang_kz) || $rechte->isBerechtigt('lehre',$lv_obj->studiengang_kz))
 {
-	$qry = "SELECT distinct tbl_lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehreinheitmitarbeiter
-			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND
-			tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
-			tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-			tbl_lehreinheit.studiensemester_kurzbz = '$stsem'";
+	$qry = "SELECT 
+				distinct lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz 
+			FROM 
+				lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, lehre.tbl_lehreinheitmitarbeiter
+			WHERE 
+				tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
+				tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id AND
+				tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
+				tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($stsem);
 }
 else
 {
-	$qry = "SELECT distinct tbl_lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehreinheitmitarbeiter
-			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND
-			tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
-			tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-			tbl_lehreinheit.lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) WHERE mitarbeiter_uid='$user') AND
-			tbl_lehreinheit.studiensemester_kurzbz = '$stsem'";
+	$qry = "SELECT 
+				distinct lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz 
+			FROM 
+				lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, lehre.tbl_lehreinheitmitarbeiter
+			WHERE 
+				tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
+				tbl_lehreinheit.lehrfach_id = lehrfach.lehrfach_id AND
+				tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
+				tbl_lehreinheit.lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) WHERE mitarbeiter_uid=".$db->db_add_param($user).") AND
+				tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($stsem);
 
 }
 
@@ -158,7 +166,7 @@ if($result = $db->db_query($qry))
 			if($lehreinheit_id=='')
 				$lehreinheit_id=$row->lehreinheit_id;
 			$selected = ($row->lehreinheit_id == $lehreinheit_id?'selected':'');
-			$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE lehreinheit_id='$row->lehreinheit_id'";
+			$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid) WHERE lehreinheit_id=".$db->db_add_param($row->lehreinheit_id, FHC_INTEGER);
 			if($result_lektoren = $db->db_query($qry_lektoren))
 			{
 				$lektoren = '( ';
@@ -175,7 +183,7 @@ if($result = $db->db_query($qry))
 
 				$lektoren .=')';
 			}
-			$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
+			$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=".$db->db_add_param($row->lehreinheit_id, FHC_INTEGER);
 			if($result_gruppen = $db->db_query($qry_gruppen))
 			{
 				$gruppen = '';
@@ -336,7 +344,7 @@ if(isset($uebung_id) && $uebung_id!='')
 		             </td>
           		</tr>';
 			$i=0;
-			$qry_cnt = "SELECT distinct student_uid FROM campus.tbl_studentbeispiel JOIN campus.tbl_beispiel USING(beispiel_id) WHERE uebung_id='$uebung_id' GROUP BY student_uid";
+			$qry_cnt = "SELECT distinct student_uid FROM campus.tbl_studentbeispiel JOIN campus.tbl_beispiel USING(beispiel_id) WHERE uebung_id=".$db->db_add_param($uebung_id, FHC_INTEGER)." GROUP BY student_uid";
 				if($result_cnt = $db->db_query($qry_cnt))
 						$gesamt=$db->db_num_rows($result_cnt);
 
@@ -345,7 +353,7 @@ if(isset($uebung_id) && $uebung_id!='')
 				$i++;
 				$solved = 0;
 				$psolved = 0;
-				$qry_cnt = "SELECT count(*) as anzahl FROM campus.tbl_studentbeispiel WHERE beispiel_id=$row->beispiel_id AND vorbereitet=true";
+				$qry_cnt = "SELECT count(*) as anzahl FROM campus.tbl_studentbeispiel WHERE beispiel_id=".$db->db_add_param($row->beispiel_id, FHC_INTEGER)." AND vorbereitet=true";
 				if($result_cnt = $db->db_query($qry_cnt))
 					if($row_cnt = $db->db_fetch_object($result_cnt))
 						$solved = $row_cnt->anzahl;

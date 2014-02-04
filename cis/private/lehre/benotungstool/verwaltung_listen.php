@@ -184,12 +184,12 @@ if (isset($_POST["schluessel"]) && $_POST["schluessel"]=='Speichern')
 	{
 		if (is_numeric($punkte_arr[$i]))
 		{
-			$qry = "select * from campus.tbl_notenschluesseluebung where uebung_id = '".$liste_id."' and note = '".$i."'";
+			$qry = "select * from campus.tbl_notenschluesseluebung where uebung_id = ".$db->db_add_param($liste_id, FHC_INTEGER)." and note = ".$db->db_add_param($i);
 			$result = $db->db_query($qry);
 			if($db->db_num_rows($result)>0)
-				$str = "update campus.tbl_notenschluesseluebung set punkte = '".$punkte_arr[$i]."' where uebung_id = '".$liste_id."' and note = '".$i."'";
+				$str = "update campus.tbl_notenschluesseluebung set punkte = ".$db->db_add_param($punkte_arr[$i])." where uebung_id = ".$db->db_add_param($liste_id, FHC_INTEGER)." and note = ".$db->db_add_param($i);
 			else
-				$str = "insert into campus.tbl_notenschluesseluebung (uebung_id, note, punkte) values ('".$liste_id."','".$i."','".$punkte_arr[$i]."')";
+				$str = "insert into campus.tbl_notenschluesseluebung (uebung_id, note, punkte) values (".$db->db_add_param($liste_id).",".$db->db_add_param($i).",".$db->db_add_param($punkte_arr[$i]).")";
 			if (!$db->db_query($str))
 				echo "<span class='error'>Daten konnten nicht gespeichert werden</span>";
 		}
@@ -223,20 +223,28 @@ $stsem_content.= "</SELECT>\n";
 //Lehreinheiten laden
 if($rechte->isBerechtigt('admin',0) || $rechte->isBerechtigt('admin',$lv_obj->studiengang_kz) || $rechte->isBerechtigt('lehre',$lv_obj->studiengang_kz))
 {
-	$qry = "SELECT distinct tbl_lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehreinheitmitarbeiter
-			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND
-			tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
-			tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-			tbl_lehreinheit.studiensemester_kurzbz = '$stsem'";
+	$qry = "SELECT 
+				distinct lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz 
+			FROM 
+				lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, lehre.tbl_lehreinheitmitarbeiter
+			WHERE 
+				tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
+				tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id AND
+				tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
+				tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($stsem);
 }
 else
 {
-	$qry = "SELECT distinct tbl_lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz FROM lehre.tbl_lehreinheit, lehre.tbl_lehrfach, lehre.tbl_lehreinheitmitarbeiter
-			WHERE tbl_lehreinheit.lehrveranstaltung_id='$lvid' AND
-			tbl_lehreinheit.lehrfach_id = tbl_lehrfach.lehrfach_id AND
-			tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-			tbl_lehreinheit.lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) WHERE mitarbeiter_uid='$user') AND
-			tbl_lehreinheit.studiensemester_kurzbz = '$stsem'";
+	$qry = "SELECT 
+				distinct lehrfach.kurzbz as lfbez, tbl_lehreinheit.lehreinheit_id, tbl_lehreinheit.lehrform_kurzbz as lehrform_kurzbz 
+			FROM 
+				lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, lehre.tbl_lehreinheitmitarbeiter
+			WHERE 
+				tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
+				tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id AND
+				tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
+				tbl_lehreinheit.lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) WHERE mitarbeiter_uid=".$db->db_add_param($user).") AND
+				tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($stsem);
 }
 
 if($result = $db->db_query($qry))
@@ -252,7 +260,7 @@ if($result = $db->db_query($qry))
 				$lehreinheit_id=$row->lehreinheit_id;
 			$selected = ($row->lehreinheit_id == $lehreinheit_id?'selected':'');
 			//Zugeteilte Lektoren
-			$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter using(mitarbeiter_uid) WHERE lehreinheit_id='$row->lehreinheit_id'";
+			$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter using(mitarbeiter_uid) WHERE lehreinheit_id=".$db->db_add_param($row->lehreinheit_id, FHC_INTEGER);
 			if($result_lektoren = $db->db_query($qry_lektoren))
 			{
 				$lektoren = '( ';
@@ -271,7 +279,7 @@ if($result = $db->db_query($qry))
 
 
 			//Zugeteilte Gruppen
-			$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row->lehreinheit_id'";
+			$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=".$db->db_add_param($row->lehreinheit_id, FHC_INTEGER);
 			if($result_gruppen = $db->db_query($qry_gruppen))
 			{
 				$gruppen = '';
@@ -982,7 +990,7 @@ else
 			if($lehreinheit_id!=$row_alle_lehreinheiten->lehreinheit_id)
 			{
 				//zugeteilte Lektoren holen
-				$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter using(mitarbeiter_uid) WHERE lehreinheit_id='$row_alle_lehreinheiten->lehreinheit_id'";
+				$qry_lektoren = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter using(mitarbeiter_uid) WHERE lehreinheit_id=".$db->db_add_param($row_alle_lehreinheiten->lehreinheit_id, FHC_INTEGER);
 				if($result_lektoren = $db->db_query($qry_lektoren))
 				{
 					$lektoren = '( ';
@@ -999,7 +1007,7 @@ else
 					$lektoren .=')';
 				}
 				//zugeteilte Gruppen holen
-				$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id='$row_alle_lehreinheiten->lehreinheit_id'";
+				$qry_gruppen = "SELECT * FROM lehre.tbl_lehreinheitgruppe WHERE lehreinheit_id=".$db->db_add_param($row_alle_lehreinheiten->lehreinheit_id,FHC_INTEGER);
 				if($result_gruppen = $db->db_query($qry_gruppen))
 				{
 					$gruppen = '';
@@ -1045,7 +1053,7 @@ else
 				//Falls ja wird diese nicht in der Combo angezeigt
 				foreach ($copy_le_content as $id=>$bezeichnung)
 				{
-					$qry = "SELECT uebung_id FROM campus.tbl_uebung WHERE lehreinheit_id='$id' AND bezeichnung='".addslashes($row->bezeichnung)."'";
+					$qry = "SELECT uebung_id FROM campus.tbl_uebung WHERE lehreinheit_id=".$db->db_add_param($id, FHC_INTEGER)." AND bezeichnung=".$db->db_add_param($row->bezeichnung);
 					//echo $qry;
 					if($result_vorhanden = $db->db_query($qry))
 					{
@@ -1139,7 +1147,7 @@ else
 	</form>
 	";
 		// notenschlüssel
-		$qry = "select * from campus.tbl_notenschluesseluebung where uebung_id = '$liste_id' order by note";
+		$qry = "select * from campus.tbl_notenschluesseluebung where uebung_id = ".$db->db_add_param($liste_id, FHC_INTEGER)." order by note";
 		if($result = $db->db_query($qry))
 		{
 			$notenschluessel = array();

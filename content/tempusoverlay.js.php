@@ -351,3 +351,113 @@ function parseRDFString(str, url)
 
   return memoryDS;
 }
+
+function onFachbereichSelect(event)
+{
+	var tree=document.getElementById('tree-fachbereich');
+	//Wenn nichts markiert wurde -> beenden
+	if(tree.currentIndex==-1)
+		return;
+
+	var row = { };
+    var col = { };
+    var child = { };
+
+    tree.treeBoxObject.getCellAt(event.pageX, event.pageY, row, col, child)
+
+    //Wenn es keine Row ist sondern ein Header oder Scrollbar dann abbrechen
+    if (!col.value)
+       	return false;
+
+    //Wenn eine andere row markiert ist als angeklickt wurde -> beenden.
+	//Dies kommt vor wenn ein Subtree geoeffnet wird
+	if(row.value!=tree.currentIndex)
+		return;
+
+	col = tree.columns ? tree.columns["fachbereich-treecol-kurzbz"] : "fachbereich-treecol-kurzbz";
+	var kurzbz=tree.view.getCellText(tree.currentIndex,col);
+
+	col = tree.columns ? tree.columns["fachbereich-treecol-uid"] : "fachbereich-treecol-uid";
+	var uid=tree.view.getCellText(tree.currentIndex,col);
+	
+	//Wenn auf einen Mitarbeiter geklickt wird, dann die kurzbz vom uebergeordneten
+	//Fachbereich holen
+	if(uid!='')
+	{
+		idx = tree.view.getParentIndex(tree.currentIndex);
+		col = tree.columns ? tree.columns["fachbereich-treecol-kurzbz"] : "fachbereich-treecol-kurzbz";
+		var kurzbz=tree.view.getCellText(idx,col);
+	}
+
+
+	//----
+	document.getElementById('tempus-lva-filter').value='';
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var contentFrame=document.getElementById('iframeTimeTableWeek');
+
+	var daten=window.TimeTableWeek.document.getElementById('TimeTableWeekData');
+	var datum=parseInt(daten.getAttribute("datum"));
+
+	var attributes="?type=fachbereich&fachbereich_kurzbz="+kurzbz+"&datum="+datum;
+	var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
+	url+=attributes+'&'+gettimestamp();
+	if (url)
+		contentFrame.setAttribute('src', url);
+		
+	// Semesterplan
+	var semesterplan=document.getElementById('tabpanels-main');
+	var panelIndex=semesterplan.getAttribute("selectedIndex");
+	if (panelIndex==1)
+	{
+		//alert (url);
+		var contentFrame=document.getElementById('iframeTimeTableSemester');
+		var url = "<?php echo APP_ROOT; ?>content/lvplanung/timetable-week.xul.php";
+		url+=attributes+"&semesterplan=true&"+gettimestamp();
+		if (url)
+			contentFrame.setAttribute('src', url);
+	}
+	
+	var order = LehrstundeGetSortOrder();
+	// LVAs
+	var vboxLehrveranstalungPlanung=document.getElementById('vboxLehrveranstalungPlanung');
+	vboxLehrveranstalungPlanung.setAttribute('datasources','../rdf/lehreinheit-lvplan.rdf.php?'+"type=fachbereich&fachbereich_kurzbz="+kurzbz+"&order="+order+"&"+gettimestamp());
+
+
+	// Lehrveranstaltung des Fachbereichs
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	try
+	{
+		//alert(stg_kz);
+		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?fachbereich_kurzbz='+kurzbz+'&'+gettimestamp();
+		var treeLV=document.getElementById('lehrveranstaltung-tree');
+
+		//Alte DS entfernen
+		var oldDatasources = treeLV.database.GetDataSources();
+		try
+		{
+			LvTreeDatasource.removeXMLSinkObserver(LvTreeSinkObserver);
+			treeLV.builder.removeListener(LvTreeListener);
+		}
+		catch(e)
+		{}
+		
+		while(oldDatasources.hasMoreElements())
+		{
+			treeLV.database.RemoveDataSource(oldDatasources.getNext());
+		}
+
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		LvTreeDatasource = rdfService.GetDataSource(url);
+		LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		treeLV.database.AddDataSource(LvTreeDatasource);
+		LvTreeDatasource.addXMLSinkObserver(LvTreeSinkObserver);
+		treeLV.builder.addListener(LvTreeListener);
+		document.getElementById('lehrveranstaltung-toolbar-lehrauftrag').hidden=false;
+	}
+	catch(e)
+	{
+		debug(e);
+	}
+}
+

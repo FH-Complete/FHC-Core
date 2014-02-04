@@ -70,7 +70,7 @@ else
 	$fb = $rechte->getFbKz();
 	if(count($fb)>0)
 	{
-		$where = " AND EXISTS (SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrfach USING(lehrfach_id) WHERE 
+		$where = " AND EXISTS (SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id) JOIN public.tbl_fachbereich ON(lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz) WHERE 
 								tbl_lehreinheit.studiensemester_kurzbz in(".$db->db_add_param($ws).",".$db->db_add_param($ss).") AND mitarbeiter_uid=tbl_mitarbeiter.mitarbeiter_uid AND
 								fachbereich_kurzbz IN(";
 		foreach ($fb as $fachbereich_kurzbz)
@@ -184,7 +184,8 @@ if($result = $db->db_query($qry))
 			lehre.tbl_lehreinheitmitarbeiter 
 			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
 			JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
-			JOIN lehre.tbl_lehrfach USING(lehrfach_id) 
+			JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id) 
+			JOIN public.tbl_fachbereich ON(lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz)
 		WHERE 
 			mitarbeiter_uid=".$db->db_add_param($row->mitarbeiter_uid)." 
 			AND studiensemester_kurzbz in(".$db->db_add_param($ss).", ".$db->db_add_param($ws).")";

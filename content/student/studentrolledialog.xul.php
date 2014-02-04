@@ -184,7 +184,7 @@ $db = new basis_db();
 
 						foreach($studienplan->result as $row)
 						{
-								echo '<menuitem value="'.$row->studienplan_id.'" label="'.$row->bezeichnung.' ('.$row->version.' /'.$row->studienplan_id.')'.($row->aktiv?'AKTIV':'').'"/>';
+							echo '<menuitem value="'.$row->studienplan_id.'" label="'.$db->convert_html_chars($row->bezeichnung.' ('.$row->studienplan_id.')').'"/>';
 						}
 						?>
 						</menupopup>

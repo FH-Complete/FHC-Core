@@ -232,7 +232,7 @@ class lehrstunde extends basis_db
 	 * @param gruppe_kurzbz
 	 *
 	 */
-	public function load_lehrstunden($type, $datum_von, $datum_bis, $uid, $ort_kurzbz=NULL, $studiengang_kz=NULL, $sem=NULL, $ver=NULL, $grp=NULL, $gruppe_kurzbz=NULL, $stpl_view='stundenplan', $idList=null)
+	public function load_lehrstunden($type, $datum_von, $datum_bis, $uid, $ort_kurzbz=NULL, $studiengang_kz=NULL, $sem=NULL, $ver=NULL, $grp=NULL, $gruppe_kurzbz=NULL, $stpl_view='stundenplan', $idList=null, $fachbereich_kurzbz=null)
 	{
 		$num_rows_einheit=0;
 		// Parameter Checken
@@ -339,6 +339,8 @@ class lehrstunde extends basis_db
 				$sql_query.=" AND ort_kurzbz='".addslashes($ort_kurzbz)."'";
 			elseif ($type=='gruppe')
 				$sql_query.=" AND gruppe_kurzbz='".addslashes($gruppe_kurzbz)."'";
+			elseif($type=='fachbereich')
+				$sql_query.=" AND fachbereich_kurzbz=".$this->db_add_param($fachbereich_kurzbz);
 			else
 			{
 				$sql_query.=" AND ( (studiengang_kz='".addslashes($studiengang_kz)."'";
@@ -376,7 +378,6 @@ class lehrstunde extends basis_db
 			$sql_query_stdplan.=' WHERE'.$sql_query;
 		}
 
-		//echo $sql_query_stdplan;
 		//Datenbankabfrage
 		if (!$this->db_query($sql_query_stdplan))
 		{
@@ -424,12 +425,12 @@ class lehrstunde extends basis_db
 		}
 
 		// Reservierungsdaten ermitteln
-		if ($type!='idList')
+		if ($type!='idList' && $type!='fachbereich')
 		{
 			// Datenbankabfrage generieren
 			$sql_query_reservierung='SELECT * FROM campus.vw_reservierung';
 			$sql_query_reservierung.=$sql_query;
-			//echo $sql_query_reservierung;
+
 			//Datenbankabfrage
 			if (!$this->db_query($sql_query_reservierung))
 			{
