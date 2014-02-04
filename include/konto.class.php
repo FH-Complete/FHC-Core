@@ -626,7 +626,8 @@ class konto extends basis_db
 	/**
 	 * Liefert die CreditPoints die dem Studierenden noch zur Verfuegung stehen
 	 * falls dieser einschraenkungen eingetragen hat. Wenn keine Einschraenkung vorhanden ist,
-	 * wird false zurueckgeliefert
+	 * wird false zurueckgeliefert. Es werden die Creditpoint der Belastungen herangezogen.
+	 * Die Gegenbuchung wird nicht beruecksichtigt.
 	 * @return Anzahl der Verfuegbaren CreditPoints oder false falls unbeschraenkt
 	 */
 	public function getCreditPoints($uid, $studiensemester_kurzbz)
@@ -638,7 +639,7 @@ class konto extends basis_db
 				WHERE
 					uid=".$this->db_add_param($uid)." 
 					AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
-					AND buchungsnr_verweis is not null
+					AND buchungsnr_verweis is null
 					AND credit_points is not null";
 
 		if($result = $this->db_query($qry))
