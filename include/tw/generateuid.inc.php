@@ -40,6 +40,8 @@ function generateUID($stgkzl,$jahr, $stgtyp, $matrikelnummer)
 		$nr = $nr+500;
 	elseif($art=='0' && $stgtyp=='m') //Incoming im Masterstudiengang
 		$nr = $nr+500;
+	elseif($art=='4' && $stgtyp=='l') // Lehrgangsteilnehmer im Sommersemester
+		$nr = $nr+500;
 
 
 	return mb_strtolower($stgkzl.$jahr.($art!='0'?$stgtyp:'x').$nr);
