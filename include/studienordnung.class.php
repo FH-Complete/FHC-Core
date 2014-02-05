@@ -44,7 +44,6 @@ class studienordnung extends basis_db
 	protected $studiengangbezeichnung_englisch;	// varchar (256)
 	protected $studiengangkurzbzlang;	// varchar (256)
 	protected $akadgrad_id;				// integer (FK akadgrad)
-	protected $max_semester;			// smallint
 	protected $updateamum;				// timestamp
 	protected $updatevon;				// varchar
 	protected $insertamum;				// timestamp
@@ -113,7 +112,6 @@ class studienordnung extends basis_db
 			$this->studiengangbezeichnung_englisch	= $row->studiengangbezeichnung_englisch;
 			$this->studiengangkurzbzlang	= $row->studiengangkurzbzlang;
 			$this->akadgrad_id		= $row->akadgrad_id;
-			$this->max_semester		= $row->max_semester;
 			$this->updateamum		= $row->updateamum;
 			$this->updatevon		= $row->updatevon;
 			$this->insertamum		= $row->insertamum;
@@ -190,7 +188,6 @@ class studienordnung extends basis_db
 			$obj->studiengangbezeichnung_englisch	= $row->studiengangbezeichnung_englisch;
 			$obj->studiengangkurzbzlang	= $row->studiengangkurzbzlang;
 			$obj->akadgrad_id		= $row->akadgrad_id;
-			$obj->max_semester		= $row->max_semester;
 			$obj->updateamum		= $row->updateamum;
 			$obj->updatevon			= $row->updatevon;
 			$obj->insertamum		= $row->insertamum;
@@ -285,7 +282,7 @@ class studienordnung extends basis_db
 		if($this->new)
 		{
 			//Neuen Datensatz einfuegen
-			$qry='BEGIN;INSERT INTO lehre.tbl_studienordnung (studiengang_kz, version, bezeichnung, ects, gueltigvon, gueltigbis, studiengangbezeichnung, studiengangbezeichnung_englisch, studiengangkurzbzlang, akadgrad_id, max_semester, insertamum, insertvon) VALUES ('.
+			$qry='BEGIN;INSERT INTO lehre.tbl_studienordnung (studiengang_kz, version, bezeichnung, ects, gueltigvon, gueltigbis, studiengangbezeichnung, studiengangbezeichnung_englisch, studiengangkurzbzlang, akadgrad_id, insertamum, insertvon) VALUES ('.
 			      $this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
 			      $this->db_add_param($this->version).', '.
 			      $this->db_add_param($this->bezeichnung).', '.
@@ -296,7 +293,7 @@ class studienordnung extends basis_db
 			      $this->db_add_param($this->studiengangbezeichnung_englisch).', '.
 			      $this->db_add_param($this->studiengangkurzbzlang).', '.
 			      $this->db_add_param($this->akadgrad_id,FHC_INTEGER).', '.
-			      $this->db_add_param($this->max_semester,FHC_INTEGER).', now(), '.
+			      ' now(), '.
 			      $this->db_add_param($this->insertvon).');';
 		}
 		else
@@ -318,7 +315,6 @@ class studienordnung extends basis_db
 		      	' studiengangbezeichnung_englisch='.$this->db_add_param($this->studiengangbezeichnung_englisch).', '.
 		      	' studiengangkurzbzlang='.$this->db_add_param($this->studiengangkurzbzlang).','.
 		      	' akadgrad_id='.$this->db_add_param($this->akadgrad_id, FHC_INTEGER).', '.
-		      	' max_semester='.$this->db_add_param($this->max_semester, FHC_INTEGER).', '.
 		      	' updateamum= now(), '.
 		      	' updatevon='.$this->db_add_param($this->updatevon).' '.
 		      	' WHERE studienordnung_id='.$this->db_add_param($this->studienordnung_id, FHC_INTEGER, false).';';
@@ -413,7 +409,6 @@ class studienordnung extends basis_db
 				$obj->studiengangbezeichnung_englisch	= $row->studiengangbezeichnung_englisch;
 				$obj->studiengangkurzbzlang	= $row->studiengangkurzbzlang;
 				$obj->akadgrad_id		= $row->akadgrad_id;
-				$obj->max_semester		= $row->max_semester;
 				$obj->updateamum		= $row->updateamum;
 				$obj->updatevon		= $row->updatevon;
 				$obj->insertamum		= $row->insertamum;
@@ -437,7 +432,6 @@ class studienordnung extends basis_db
 			$obj->studiengangbezeichnung_englisch	= $this->studiengangbezeichnung_englisch;
 			$obj->studiengangkurzbzlang	= $this->studiengangkurzbzlang;
 			$obj->akadgrad_id		= $this->akadgrad_id;
-			$obj->max_semester		= $this->max_semester;
 			$obj->updateamum		= $this->updateamum;
 			$obj->updatevon		= $this->updatevon;
 			$obj->insertamum		= $this->insertamum;

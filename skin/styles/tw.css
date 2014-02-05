@@ -930,7 +930,11 @@ ul.menu
 /* Empfehlung im Studienplan */
 .empfehlung 
 {
-	background-color: #FFCECE;
+	border: 3px solid green;
+}
+.angebot
+{
+	border: 3px solid #edd400;
 }
 
 /*

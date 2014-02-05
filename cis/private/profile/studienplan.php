@@ -75,6 +75,8 @@ if(isset($_GET['getAnmeldung']))
 	// Die Anmeldung ist zur Lehrveranstaltung selbst und zu den dazu kompatiblen Lehrveranstaltungen moeglich
 	if($kompatibel = $lehrveranstaltung->loadLVkompatibel($lehrveranstaltung_id))
 	{
+		$kompatibel[]=$lehrveranstaltung_id;
+		$kompatibel = array_unique($kompatibel);
 		foreach($kompatibel as $lvid)
 		{
 			$lvangebot = new  lvangebot();
@@ -110,11 +112,11 @@ if(isset($_GET['getAnmeldung']))
 						echo '<br><input type="radio" disabled="true" value="'.$lvid.'" name="lv" /><span class="ok">'.$lv->bezeichnung.'</span><img src="../../../skin/images/information.png" title="'.$p->t('studienplan/bereitsAngemeldet').'"/>';
 					}
 				}
-				else
+/*				else
 				{
-					// LV wird angeboten, Anmeldefenster ist aber nicht offen
+					// LV wird angeboten, Anmeldefenster ist aber nicht offen oder keine Gruppe zugeteilt
 					echo '<br><input type="radio" disabled="true" value="'.$lvid.'" name="lv" /><span style="color:gray;">'.$lv->bezeichnung.'</span><img src="../../../skin/images/information.png" title="'.$angebot->errormsg.'" />';
-				}
+				}*/
 			}
 		}
 	}
@@ -363,26 +365,25 @@ function drawTree($tree, $depth)
 		foreach($stsem_arr as $key=>$stsem)
 		{
 			$semester=$key+1;
-
-			$empfehlung="";
+			
+			$tdclass=array();
 			//Empfehlung holen
 			if(isset($lv_arr[$row_tree->lehrveranstaltung_id]))
 			{
 				$empfohlenesSemester = $lv_arr[$row_tree->lehrveranstaltung_id]->semester;
 				if($semester==$empfohlenesSemester)
-					$empfehlung='class="empfehlung"';
+					$tdclass[]='empfehlung';
 			}
 
-			echo '<td align="center" '.$empfehlung.'>';
-
+			$tdinhalt='';
 
 			// Ist bereits eine Note für diese LV in diesem Stsem vorhanden?
 			if(isset($noten_arr[$row_tree->lehrveranstaltung_id][$stsem]))
 			{
 				if($note_pruef_arr[$noten_arr[$row_tree->lehrveranstaltung_id][$stsem]]->positiv)
-					echo '<span class="ok">'.$note_pruef_arr[$noten_arr[$row_tree->lehrveranstaltung_id][$stsem]]->anmerkung.'</span>';
+					$tdinhalt .= '<span class="ok">'.$note_pruef_arr[$noten_arr[$row_tree->lehrveranstaltung_id][$stsem]]->anmerkung.'</span>';
 				else
-					echo '<span class="error">'.$note_pruef_arr[$noten_arr[$row_tree->lehrveranstaltung_id][$stsem]]->anmerkung.'</span>';
+					$tdinhalt .= '<span class="error">'.$note_pruef_arr[$noten_arr[$row_tree->lehrveranstaltung_id][$stsem]]->anmerkung.'</span>';
 			}
 			else
 			{
@@ -444,34 +445,38 @@ function drawTree($tree, $depth)
 
 				if($semesterlock)
 				{
-					echo '<img src="../../../skin/images/lock.png" title="'.$p->t('studienplan/anmeldunggesperrt').'">';
+					$tdinhalt.= '<img src="../../../skin/images/not-available.png" title="'.$p->t('studienplan/anmeldunggesperrt').'">';
 				}
 				else
 				{
 					if($angebot_vorhanden)
 					{
+						$tdclass[]='angebot';
 						if($angemeldet)
 						{
-							echo '<img src="../../../skin/images/ok.png" height="12px" title="angemeldet" />';
+							$tdinhalt.= '<a href="#" onclick="OpenAnmeldung(\''.$row_tree->lehrveranstaltung_id.'\',\''.$stsem.'\'); return false;"><img src="../../../skin/images/ok.png" height="12px" title="angemeldet" /></a>';
 						}
 						else
 						{
 							if($anmeldungmoeglich)		
-								echo '<a href="#" onclick="OpenAnmeldung(\''.$row_tree->lehrveranstaltung_id.'\',\''.$stsem.'\'); return false;"><img src="../../../skin/images/plus.png" title="'.$p->t('studienplan/anmelden').'" height="15px" /></a>';
+								$tdinhalt.= '<a href="#" onclick="OpenAnmeldung(\''.$row_tree->lehrveranstaltung_id.'\',\''.$stsem.'\'); return false;"><img src="../../../skin/images/plus.png" title="'.$p->t('studienplan/anmelden').'" height="15px" /></a>';
 							else
-								echo '<span title="'.$anmeldeinformation.'">X</a>';
+								$tdinhalt.= '<span title="'.$anmeldeinformation.'">-</a>';
 
 							if(!$regelerfuellt)
-								echo '<span title="'.$p->t('studienplan/regelnichterfuellt').'">X</span>';
+								$tdinhalt.= '<span title="'.$p->t('studienplan/regelnichterfuellt').'">X</span>';
 						}
 					}
 					else
 					{
 						// LV wird nicht angeboten
-						echo '-';
+						$tdinhalt.= '-';
 					}
 				}
 			}
+			$class=implode(',',$tdclass);
+			echo '<td align="center" class="'.$class.'">';
+			echo $tdinhalt;
 			echo '</td>';
 		}
 		echo '</tr>';
@@ -489,11 +494,15 @@ echo '<br><br>'.$p->t('studienplan/legende').':<br>
 	<td>'.$p->t('studienplan/legendeEmpfehlung').'</td>
 </tr>
 <tr>
-	<td>X</td>
+	<td></td>
+	<td></td>
+</tr>
+<tr>
+	<td><span class="angebot">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
 	<td>'.$p->t('studienplan/legendeLVwirdAngeboten').'</td>
 </tr>
 <tr>
-	<td><img src="../../../skin/images/lock.png"></td>
+	<td align="center"><img src="../../../skin/images/not-available.png"></td>
 	<td>'.$p->t('studienplan/legendeLock').'</td>
 </tr>
 </table>

@@ -71,6 +71,10 @@ $lv_obj->load($lv_id);
 $stg_obj = new studiengang();
 $stg_obj->load($lv_obj->studiengang_kz);
 $oe_studiengang = $stg_obj->oe_kurzbz;
+
+if(!$rechte->isBerechtigt('lehre/lehrveranstaltung', $oe_studiengang, 's'))
+	die('Sie haben keine Berechtigung fuer diese Seite');
+
 if($rechte->isBerechtigt('lehre/lehrveranstaltung', $oe_studiengang, 'suid'))
 	$write_admin=true;
 	
