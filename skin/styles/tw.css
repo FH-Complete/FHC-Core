@@ -927,14 +927,17 @@ ul.menu
 	padding-left: 5px;
 }
 
+
+/* LV Angebot im Studienplan */
+.angebot
+{
+	border: 3px solid #edd400;
+}
+
 /* Empfehlung im Studienplan */
 .empfehlung 
 {
 	border: 3px solid green;
-}
-.angebot
-{
-	border: 3px solid #edd400;
 }
 
 /*

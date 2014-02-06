@@ -314,20 +314,18 @@ function drawTree($tree, $depth)
 		$lvkompatibel_arr = $lvkompatibel->loadLVkompatibel($row_tree->lehrveranstaltung_id);
 		$lvkompatibel_arr[]=$row_tree->lehrveranstaltung_id;
 
+		$abgeschlossen=false;
 		$lvregel = new lvregel();
 		if($lvregel->exists($row_tree->studienplan_lehrveranstaltung_id))
 		{
 			if($lvregel->isAbgeschlossen($uid, $row_tree->studienplan_lehrveranstaltung_id))
-				echo '<span class="ok">';
+				$abgeschlossen=true;
 			else
-				echo '<span class="error">';
+				$abgeschlossen=false;
 		}
-		else
-			echo '<span>';
 
 		// Bezeichnung der Lehrveranstaltung
 		echo $row_tree->bezeichnung;
-		echo '</span>';
 		echo '</td>';
 		
 		// ECTS Punkte
@@ -354,7 +352,9 @@ function drawTree($tree, $depth)
 		}
 		else
 		{
-			if(!$row_tree->stpllv_pflicht)
+			if($abgeschlossen)
+				echo '<span>'.$p->t('studienplan/regelabgeschlossen'),'</span>';
+			elseif(!$row_tree->stpllv_pflicht)
 				echo '<span>'.$p->t('studienplan/optional').'</span>';
 			else
 				echo '<span>'.$p->t('studienplan/offen').'</span>';
@@ -474,7 +474,7 @@ function drawTree($tree, $depth)
 					}
 				}
 			}
-			$class=implode(',',$tdclass);
+			$class=implode(' ',$tdclass);
 			echo '<td align="center" class="'.$class.'">';
 			echo $tdinhalt;
 			echo '</td>';

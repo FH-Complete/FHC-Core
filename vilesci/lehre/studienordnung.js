@@ -116,7 +116,7 @@ function loadStudienordnung()
  */
 function drawStudienordnungen(data)
 {
-	var obj='<a href="#Neu" onclick="neueStudienordnung();return false;">Neue Studienordnung</a><ul>';
+	var obj='<a href="#Neu" onclick="neueStudienordnung();return false;">Neue Studienordnung</a><ul style="padding-left: 15px">';
 
 	for(i in data)
 	{
@@ -188,7 +188,7 @@ function loadStudienplanSTO(neue_studienordnung_id,bezeichnung)
  */
 function drawStudienplan(data)
 {
-	var obj='<a href="#Neu" onclick="neuerStudienplan();return false;">Neuer Studienplan</a><ul>';
+	var obj='<a href="#Neu" onclick="neuerStudienplan();return false;">Neuer Studienplan</a><ul  style="padding-left: 15px">';
 
 	for(i in data)
 	{
@@ -286,7 +286,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 
 			var obj = {
 			"data":sem+'. Semester',
-			"attr":{"id":sem,"rel":"semester"},
+			"attr":{"id":"Semester"+sem,"rel":"semester","semester":sem},
 			"children":children
 			};
 			treeData.push(obj);
@@ -595,11 +595,12 @@ function loadLVKompatibilitaet(lvid)
 		var html='';
 		for(i in data.result)
 		{
-			if(data.result[i].metadata)
+			if(data.result[i])
 			{
-				lvdata = data.result[i].metadata;
-				html = html+'<br>'+lvdata.bezeichnung+' (Studiengang '+lvdata.studiengang_kz+', Semester '+lvdata.semester+')';
+				lvdata = data.result[i];
+				html = html+'<br>'+lvdata.kurzbz+' - '+lvdata.bezeichnung+' (Studiengang '+lvdata.studiengang_kz+', Semester '+lvdata.semester+')';
 			}
+			html = html+'<br><br><a href="lehrveranstaltung_kompatibel.php?lehrveranstaltung_id='+lvid+'&type=edit" target="_blank">kompatible Lehrveranstaltungen hinzufügen</a>';
 		}
 		$("#tab-kompatibel").html(html);
 		
@@ -878,10 +879,11 @@ function hideAllTreeColumns()
  */
 function saveJsondataFromTree(nodeId, studienplan_id, studienplan_lehrveranstaltung_id)
 {
+	var obj = $("#treeData").find("li[id="+nodeId+"]");
 	var jsonData = $("#treeData").jstree("get_json", $("#treeData").find("li[id="+nodeId+"]"));
+
 	var copy = false;
-	
-	
+
 	if(jsonData.length !== 1)
 	{
 		jsonData = $("#treeData").jstree("get_json", $("#copy_"+nodeId));
@@ -903,7 +905,9 @@ function saveJsondataFromTree(nodeId, studienplan_id, studienplan_lehrveranstalt
 	}
 	
 	var lehrveranstaltung_id = jsonData[0]["metadata"]["lehrveranstaltung_id"];
-	var semester = node.closest("li[rel=semester]").attr("id");
+	var semester = node.closest("li[rel=semester]").attr("semester");
+
+	// Wenn die Lehrveranstaltung ausserhalb des Semester platziert wird, werden diese ins 0er Semester gelegt
 	if(semester === undefined)
 	{
 		semester = 0;

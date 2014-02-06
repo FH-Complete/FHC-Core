@@ -22,5 +22,6 @@ $this->phrasen['studienplan/zuWenigCP']='Sie haben zu wenig Credit Points für e
 $this->phrasen['studienplan/reduzierteCP']='Für dieses Semester sind die verfügbaren ECTS Punkte reduziert. Noch verfügbare ECTS Punkte: %s';
 $this->phrasen['studienplan/einschreibungErfolgreich']='Sie wurden erfolgreich in die Lehrveranstaltung eingeschrieben';
 $this->phrasen['studienplan/AnmeldungNichtMoeglich']='Keine Anmeldung moeglich';
+$this->phrasen['studienplan/regelabgeschlossen']='abgeschlossen';
 ?>
 

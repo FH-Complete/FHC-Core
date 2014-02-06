@@ -203,14 +203,14 @@ function drawRegel(regel)
 
 	// Parameter
 	// Input Feld verstecken wenn der Typ LVpositiv ist
-	if(regel.lvregeltyp_kurzbz=='lvpositiv')
+	if(regel.lvregeltyp_kurzbz=='lvpositiv' || regel.lvregeltyp_kurzbz=='lvpositivabschluss')
 		var style='style="display:none"';
 	else
 		var style='';
 
 	val = val+'<input type="text" '+style+' size="1" id="lvregel_parameter'+regel.lvregel_id+'" value="'+ClearNull(regel.parameter)+'" />';
 
-	if(regel.lvregeltyp_kurzbz=='lvpositiv')
+	if(regel.lvregeltyp_kurzbz=='lvpositiv' || regel.lvregeltyp_kurzbz=='lvpositivabschluss')
 		var style='';
 	else
 		var style='style="display: none"';
@@ -220,7 +220,12 @@ function drawRegel(regel)
 	val = val+'<input type="hidden" size="4" id="lvregel_lehrveranstaltung_id'+regel.lvregel_id+'" value="'+ClearNull(regel.lehrveranstaltung_id)+'" />';
 
 	// Autocomplete Feld fuer Lehrveranstaltung
-	val = val+'<input type="text" size="12" id="lvregel_lehrveranstaltung_id_autocomplete'+regel.lvregel_id+'" value="'+ClearNull(regel.lehrveranstaltung_bezeichnung)+'" lvregel_id="'+regel.lvregel_id+'"/>';
+	var autocompletebezeichnung = ClearNull(regel.lehrveranstaltung_bezeichnung);
+	if(regel.lehrveranstaltung_bezeichnung==undefined)
+	{
+		autocompletebezeichnung='Lehrveranstaltungsname eingeben';
+	}
+	val = val+'<input type="text" size="12" id="lvregel_lehrveranstaltung_id_autocomplete'+regel.lvregel_id+'" value="'+autocompletebezeichnung+'" lvregel_id="'+regel.lvregel_id+'"/>';
 	if(regel.lehrveranstaltung_bezeichnung==null || regel.lehrveranstaltung_bezeichnung=='undefined' || regel.lehrveranstaltung_bezeichnung=='')
 		var lvbezeichnung = 'klicken um LV auszuwählen';
 	else
@@ -229,7 +234,7 @@ function drawRegel(regel)
 	val = val+' <a href="#" style="font-size: x-small" onclick="LVRegelShowAutocomplete(\''+regel.lvregel_id+'\',true);return false;" id="lvregel_lehrveranstaltung_span'+regel.lvregel_id+'">'+lvbezeichnung+'</a>';
 	// Die Autocomplete Funktionalitaet wird erst hinzugefuegt, wenn das Input Feld tatsaechlich existiert und
 	// bis dort hin zwischengespeichert
-	LVREGELLehrveranstaltungAutocompleteArray[LVREGELLehrveranstaltungAutocompleteArray.length]=regel.lvregel_id; // WORKING
+	LVREGELLehrveranstaltungAutocompleteArray[LVREGELLehrveranstaltungAutocompleteArray.length]=regel.lvregel_id;
 	val = val+'</span>';
 
 	// Speichern Button
@@ -256,7 +261,7 @@ function LVRegelTypChange(id)
 {
 	var typ = $('#lvregel_lvregeltyp'+id+' option:selected').val();
 
-	if(typ=='lvpositiv')
+	if(typ=='lvpositiv' || typ=='lvpositivabschluss')
 	{
 		$('#lvregel_lehrveranstaltung_data'+id).show();
 		$('#lvregel_parameter'+id).hide();

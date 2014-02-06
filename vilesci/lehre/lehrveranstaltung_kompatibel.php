@@ -245,10 +245,11 @@ $rechte->getBerechtigungen($user);
 $lehrveranstaltung_id = $_GET["lehrveranstaltung_id"];
 $type = isset($_GET["type"]) ? $_GET["type"] : "";
 $lv = new lehrveranstaltung();
+$lv->load($lehrveranstaltung_id);
 
+echo '<h3>Kompatible Lehrveranstaltungen - '.$lv->bezeichnung.'</h3>';
 $kompatibleLvs = $lv->loadLVkompatibel($lehrveranstaltung_id);
 //var_dump($kompatibleLvs);
-echo '<h3>Kompatible Lehrveranstaltungen</h3>';
 if(count($kompatibleLvs)>0)
 {
 	echo '<table style="width: auto;" class="tablesorter" id="t1">
