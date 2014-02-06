@@ -503,7 +503,6 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             <text:p text:style-name="P8"/>
             <text:p text:style-name="P8"/>
             <text:p text:style-name="P8"/>
-            <text:p text:style-name="P8"/>
           </table:table-cell>
           <table:covered-table-cell/>
           <table:covered-table-cell/>
