@@ -289,6 +289,10 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_lvregel LIMIT 1;"))
 		ALTER TABLE lehre.tbl_lvregel ADD CONSTRAINT fk_lvregel_lehrveranstaltung_lehrveranstaltung_id FOREIGN KEY (lehrveranstaltung_id) REFERENCES lehre.tbl_lehrveranstaltung (lehrveranstaltung_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 		ALTER TABLE lehre.tbl_lvregel ADD CONSTRAINT fk_lvregel_studienplan_lehrveranstaltung FOREIGN KEY (studienplan_lehrveranstaltung_id) REFERENCES lehre.tbl_studienplan_lehrveranstaltung (studienplan_lehrveranstaltung_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 
+		INSERT INTO lehre.tbl_lvregeltyp(lvregeltyp_kurzbz, bezeichnung) VALUES('ausbsemmin','Ausbildungssemester Min');
+		INSERT INTO lehre.tbl_lvregeltyp(lvregeltyp_kurzbz, bezeichnung) VALUES('lvpositiv','LV Positiv für Anmeldung');
+		INSERT INTO lehre.tbl_lvregeltyp(lvregeltyp_kurzbz, bezeichnung) VALUES('lvpositivabschluss','LV Positiv für Abschluss');
+
 		GRANT SELECT ON lehre.tbl_lvregel TO web;
 		GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_lvregel TO vilesci;
 		GRANT SELECT, UPDATE ON lehre.seq_lvregel_lvregel_id TO vilesci;

@@ -503,6 +503,7 @@ class lvregel extends basis_db
 		{
 
 			list($testval,$ects_tmp) = $this->Test($uid, $regel, $studiensemester_kurzbz, $retval);
+			$this->debug("<br>Compare ".$regel[0]->operator.", ".($retval?'T':'F').", ".($testval?'T':'F'),5);
 			$retval = $this->Compare($regel[0]->operator, $retval, $testval);
 			
 			if($regel[0]->operator=='x' && $ects==0 && $ects_tmp>0)
@@ -519,7 +520,7 @@ class lvregel extends basis_db
 			}
 			else
 			{
-				$this->debug('<br>keine Anrechnung von ECTS Punkten für diesen Eintrag',3);
+				$this->debug('<br>keine Anrechnung von ECTS Punkten für diesen Eintrag OP:'.$regel[0]->operator.' ECTS:'.$ects_tmp,3);
 			}
 				
 			$this->debug('<br>Zwischenergebnis :'.($retval?'TRUE':'FALSE'),5);
@@ -570,6 +571,7 @@ class lvregel extends basis_db
 		$regel = $regel_obj[0];
 		$ects=0;
 		$this->debug('<br><b>Teste Regel '.$regel->lvregel_id.'</b>',2);
+		$this->debug("<br>UID:$uid OP:$regel->operator STSEM:$studiensemester_kurzbz RETVAL:".($retvalglobal?'T':'F'),5);
 
 		switch($regel->lvregeltyp_kurzbz)
 		{
@@ -634,6 +636,40 @@ class lvregel extends basis_db
 				{
 					if($row = $this->db_fetch_object($result))
 					{
+						$this->debug('Positive Note gefunden:'.$row->note,3);
+						$retval = true;
+					}
+					else
+					{
+						$this->debug('Keine positive Note',3);
+						$retval = false;
+					}
+				}
+				else
+				{
+					$this->debug('Fehler bei Abfrage',1);
+					$this->errormsg = 'Fehler bei Abfrage';	
+					$retval = false;
+				}
+				break;
+
+			case 'lvpositivabschluss':
+				$this->debug('Regeltyp lvpositivabschluss:'.$regel->lehrveranstaltung_id,3);
+				$qry = "SELECT 
+							tbl_lehrveranstaltung.ects, tbl_zeugnisnote.note
+						FROM 
+							lehre.tbl_zeugnisnote 
+							JOIN lehre.tbl_note USING(note) 
+							JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+						WHERE 
+							tbl_note.positiv 
+							AND student_uid=".$this->db_add_param($uid)."
+							AND lehrveranstaltung_id=".$this->db_add_param($regel->lehrveranstaltung_id);
+
+				if($result = $this->db_query($qry))
+				{
+					if($row = $this->db_fetch_object($result))
+					{
 						$ects=$row->ects;
 						$this->debug('Positive Note gefunden:'.$row->note,3);
 						$this->debug('ECTS:'.$ects,3);
@@ -665,21 +701,22 @@ class lvregel extends basis_db
 			list($testval,$ects_tmp) = $this->TestRegeln($uid, $regel_obj['childs'],null, $retval);
 			$retval = $this->Compare($regel->operator, $retval, $testval);
 
-/*
-			if($regel->operator=='x' && $ects==0 && $ects_tmp>0)
+			if($testval)
 			{
-				$this->debug('<br>Aufgrund des XOR Vergleichs werden '.$ects_tmp.' ECTS dazugerechnet');
-				$ects+=$ects_tmp;
+				if($regel->operator=='x' && $ects==0 && $ects_tmp>0)
+				{
+					$this->debug('<br>Aufgrund des XOR Vergleichs werden '.$ects_tmp.' ECTS dazugerechnet');
+					$ects+=$ects_tmp;
+				}
+				if(($regel->operator=='u' || $regel->operator=='o'))
+				{
+					$this->debug('<br>Aufgrund des AND / OR Operators werden '.$ects_tmp.' ECTS dazugerechnet');
+					$ects+=$ects_tmp;
+				}
 			}
-			if(($regel->operator=='u' || $regel->operator=='o'))
-			{
-				$this->debug('<br>Aufgrund des AND / OR Operators werden '.$ects_tmp.' ECTS dazugerechnet');
-				$ects+=$ects_tmp;
-			}
-*/
 			$this->debug('<br> == <b>Subregel '.$regel->lvregel_id.'</b> Ende ==<br>',2);
 		}
-
+		$this->debug('<br> TEST Return Retval:'.($retval?'T':'F').' ECTS:'.$ects);
 		return array($retval,$ects);
 	}
 
@@ -741,7 +778,7 @@ class lvregel extends basis_db
 		$lv->load($stpllv->lehrveranstaltung_id);
 
 		$this->debug('Abgeschlossen:'.$retval.' ECTS:'.$ects,1);
-		if($ects>=$lv->ects && $retval)
+		if($ects>=$lv->ects)
 			return true;
 		else
 			return false;
