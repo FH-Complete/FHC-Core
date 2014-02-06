@@ -37,14 +37,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <!-- *************************** LEHREINHEIT DETAILS ************************* -->
 <vbox id="lehrveranstaltung-detail" style="margin:0px;" >
 	<popupset>
-		<popup id="lehrveranstaltung-detail-gruppe-tree-popup">
+		<menupopup id="lehrveranstaltung-detail-gruppe-tree-popup">
 			<menuitem label="Entfernen" oncommand="LeGruppeDel();" />
-		</popup>
+		</menupopup>
 	</popupset>
 	<popupset>
-		<popup id="lehrveranstaltung-lektor-tree-popup">
+		<menupopup id="lehrveranstaltung-lektor-tree-popup">
 			<menuitem label="Entfernen" oncommand="LeMitarbeiterDel();" />
-		</popup>
+		</menupopup>
 	</popupset>
 
 	<!-- Hidden Fields -->

@@ -279,11 +279,11 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiteroverlay.xul
 
 <vbox id="vbox-main">
 <popupset>
-		<popup id="fasoverlay-lektor-tree-popup">
+		<menupopup id="fasoverlay-lektor-tree-popup">
 			<menuitem label="Mail senden" oncommand="LektorFunktionMail();" />
 			<menuseparator />
 			<menuitem label="Entfernen" oncommand="LektorFunktionDel();" />			
-		</popup>
+		</menupopup>
 </popupset>
 	<tabbox id="tabbox-main" flex="3" orient="vertical">
 		<tabs id="main-content-tabs" orient="horizontal">

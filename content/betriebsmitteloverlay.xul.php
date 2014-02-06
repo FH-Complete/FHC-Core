@@ -63,9 +63,9 @@ else
 
 <vbox id="betriebsmittel" style="margin:0px;" flex="1">
 <popupset>
-	<popup id="betriebsmittel-tree-popup">
+	<menupopup id="betriebsmittel-tree-popup">
 		<menuitem label="Entfernen" oncommand="BetriebsmittelDelete();" id="betriebsmittel-tree-popup-delete" hidden="false"/>
-	</popup>
+	</menupopup>
 </popupset>
 <hbox flex="1">
 <grid id="betriebsmittel-grid-detail" style="overflow:auto;margin:4px;" flex="1">

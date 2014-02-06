@@ -46,10 +46,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterfunktionove
 <!-- **************** -->
 <vbox id="MitarbeiterEditor" persist="height">
 <popupset>
-	<popup id="mitarbeiter-tree-popup">
+	<menupopup id="mitarbeiter-tree-popup">
 		<menuitem label="EMail versenden" oncommand="MitarbeiterSendMail();" id="mitarbeiter-tree-popup-mail" hidden="false"/>
 		<menuitem label="Personendetails anzeigen" oncommand="MitarbeiterShowPersonendetails()" id="mitarbeiter-tree-popup-personendetails" hidden="false"/>
-	</popup>
+	</menupopup>
 </popupset>
 	<hbox>
 		<toolbox flex="1">
