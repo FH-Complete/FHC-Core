@@ -40,9 +40,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <!-- Projektarbeit DETAILS -->
 <vbox id="student-projektarbeit" style="overflow:auto;" flex="1">
 <popupset>
-	<popup id="student-projektarbeit-tree-popup">
+	<menupopup id="student-projektarbeit-tree-popup">
 		<menuitem label="Entfernen" oncommand="StudentProjektarbeitLoeschen();" id="student-projektarbeit-tree-popup-delete" hidden="false"/>
-	</popup>
+	</menupopup>
 </popupset>
 
 	<hbox>

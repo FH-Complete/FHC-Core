@@ -40,9 +40,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <!-- Dokumente Overlay -->
 <vbox id="student-gruppen" style="overflow:auto; margin:0px;" flex="1">
 <popupset>
-	<popup id="student-gruppe-tree-popup">
+	<menupopup id="student-gruppe-tree-popup">
 		<menuitem label="Entfernen" oncommand="StudentGruppeDelete();" id="student-gruppe-tree-popup-delete" hidden="false"/>		
-	</popup>
+	</menupopup>
 </popupset>
 <hbox flex="1">
 	<groupbox flex="1">

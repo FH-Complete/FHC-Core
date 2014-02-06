@@ -37,9 +37,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <!-- Pruefung Overlay -->
 <vbox id="student-pruefung" style="overflow:auto; margin:0px;" flex="1">
 <popupset>
-	<popup id="student-pruefung-tree-popup">
+	<menupopup id="student-pruefung-tree-popup">
 		<menuitem label="Entfernen" oncommand="StudentPruefungDelete();" id="student-pruefung-tree-popup-delete" hidden="false"/>
-	</popup>
+	</menupopup>
 </popupset>
 <hbox flex="1">
 <grid id="student-pruefung-grid-detail" style="margin:4px;" flex="1">

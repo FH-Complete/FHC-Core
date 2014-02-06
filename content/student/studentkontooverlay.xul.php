@@ -37,9 +37,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <!-- Zeugnis Overlay -->
 <vbox id="student-konto" style="overflow:auto;margin:0px;" flex="1">
 <popupset>
-	<popup id="student-konto-tree-popup">
+	<menupopup id="student-konto-tree-popup">
 		<menuitem label="Entfernen" oncommand="StudentKontoDelete();" id="student-konto-tree-popup-kontodel" hidden="false"/>
-	</popup>
+	</menupopup>
 </popupset>
 <hbox flex="1">
 <grid id="student-konto-grid-detail" style="margin:4px;" flex="1">

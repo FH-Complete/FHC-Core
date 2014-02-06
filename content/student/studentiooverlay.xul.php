@@ -37,9 +37,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <!-- Incomming/Outgoing DETAILS -->
 <vbox id="student-io" style="overflow:auto;margin:0px;" flex="1">
 <popupset>
-	<popup id="student-io-tree-popup">
+	<menupopup id="student-io-tree-popup">
 		<menuitem label="Entfernen" oncommand="StudentIODelete();" id="student-io-tree-popup-delete" hidden="false"/>
-	</popup>
+	</menupopup>
 </popupset>
 
 <hbox flex="1">
