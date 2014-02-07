@@ -535,6 +535,35 @@ class konto extends basis_db
 		}
 	}
     
+	/**
+	 * Überprüft, ob das Konto einer Person ausgeglichen ist, oder ob noch Zahlungen offen sind
+	 * @param $person_id ID der Person, die geprüft werden soll
+	 * @return true wenn ausgeglichen, false wenn Zahlungen offen, false mit errormsg wenn ein Fehler aufgetreten ist
+	 */
+    public function checkKontostand($person_id)
+	{
+		$qry="SELECT sum(betrag) as summe FROM public.tbl_konto WHERE person_id=".$this->db_add_param($person_id);
+		if($result=$this->db_query($qry))
+		{
+			if($row=$this->db_fetch_object())
+			{
+				if($row->summe>=0)
+					return true;
+				else
+					return false;
+			}
+			else
+			{
+				return false;
+				$this->errormsg="Fehler beim Holen der Daten";
+			}
+		}
+		else
+		{
+			return false;
+			$this->errormsg="Fehler bei der Datenbankabfrage";
+		}
+	}
     
     
     /**
@@ -546,7 +575,7 @@ class konto extends basis_db
 	{
 		$subqry = "SELECT tbl_konto.buchungsnr, tbl_konto.buchungsdatum, tbl_konto.buchungsnr_verweis, tbl_konto.studiensemester_kurzbz FROM public.tbl_konto, public.tbl_benutzer, public.tbl_student
 					WHERE 
-						tbl_benutzer.uid = '".addslashes($uid)."' 
+						tbl_benutzer.uid = '".$this->db_add_param($uid)."' 
 						AND tbl_benutzer.uid = tbl_student.student_uid
 						AND tbl_benutzer.person_id = tbl_konto.person_id 
 						AND tbl_konto.studiengang_kz=tbl_student.studiengang_kz
