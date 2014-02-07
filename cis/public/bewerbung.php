@@ -32,6 +32,11 @@ if (!isset($_SESSION['bewerbung/user']) || $_SESSION['bewerbung/user']=='')
     exit;
 }
 
+//require_once('../../include/functions.inc.php');
+require_once('../../include/konto.class.php');
+require_once('../../include/benutzer.class.php');
+require_once('../../include/phrasen.class.php');
+require_once('../../include/benutzerberechtigung.class.php'); 
 require_once('../../include/nation.class.php'); 
 require_once('../../include/person.class.php'); 
 require_once('../../include/datum.class.php'); 
@@ -40,7 +45,6 @@ require_once('../../include/adresse.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/studiengang.class.php'); 
 require_once('../../include/zgv.class.php'); 
-require_once('../../include/akte.class.php'); 
 require_once('../../include/dms.class.php'); 
 require_once('../../include/dokument.class.php'); 
 require_once('../../include/akte.class.php');
@@ -357,6 +361,26 @@ else
     $status_dokumente_text = '<span id="success">vollständig</span>';
 }
 
+$konto = new konto();
+if($konto->checkKontostand($person_id))
+{
+	$status_zahlungen = true;
+	$status_zahlungen_text = '<span id="success">vollständig</span>';
+}
+else
+{
+	if($konto->errormsg=='')
+	{
+		$status_zahlungen = false;
+	    $status_zahlungen_text = '<span id="error">unvollständig</span>';
+	}
+	else
+	{
+		$status_zahlungen = false;
+		$status_zahlungen_text = '<span id="error">Fehler: '.$konto->errormsg.'</span>';
+	}
+}
+
 ?>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -365,6 +389,7 @@ else
 <meta charset="utf-8" />
 <title>Bewerbung für einen Studiengang</title>
 <link rel="stylesheet" href="../../skin/styles/jquery-ui-1.10.3.custom.css" />
+<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 <script src="../../include/js/jquery1.9.min.js"></script>
 <script src="../../include/js/jquery-ui1.10.3.js"></script>
 <script type="text/javascript" src="../../include/js/jquery.idTabs.min.js"></script>
@@ -483,11 +508,11 @@ function checkPerson()
 }
 
 .ui-tabs-vertical { width: 60em; }
-.ui-tabs-vertical .ui-tabs-nav { padding: .2em .1em .2em .2em; float: left; width: 15em; }
+.ui-tabs-vertical .ui-tabs-nav { padding: .2em .1em .2em .2em; float: left; width: 20em; }
 .ui-tabs-vertical .ui-tabs-nav li { clear: left; width: 100%; border-bottom-width: 0px !important; border-right-width: 0 !important; margin: 0 -1px .2em 0; }
 .ui-tabs-vertical .ui-tabs-nav li a { display:block; }
 .ui-tabs-vertical .ui-tabs-nav li.ui-tabs-active { padding-bottom: 0; padding-right: .1em; border-right-width: 1px; border-right-width: 1px; }
-.ui-tabs-vertical .ui-tabs-panel { padding: 1em; float: right; width: 40em;}
+.ui-tabs-vertical .ui-tabs-panel { padding: 1em; float: left; width: 40em;}
 #tabs {border: none}
 #error
 {
@@ -516,17 +541,18 @@ padding: 5px;
 
 </head>
 <body>
-<div id="tabs">
-    
+<div id="tabs" style="width:auto">
+	<div id="tabs-0" style="width:100%">    
     <ul>
         <li><a href="#tabs-1">>|1| Allgemein <br> </a></li>
         <li><a href="#tabs-2">>|2| Persönliche Daten <br> <?php echo $status_person_text;?></a></li>
         <li><a href="#tabs-3">>|3| Zugangsvoraussetzungen<br> <?php echo $status_zgv_text; ?></a></li>
         <li><a href="#tabs-4">>|4| Kontaktinformationen <br> <?php echo $status_kontakt_text;?></a></li>
         <li><a href="#tabs-5">>|5| Dokumente <br> <?php echo $status_dokumente_text;?></a></li>
-        <li><a href="#tabs-6">>|6| Bewerbung abschicken <br> </a></li>
+        <li><a href="#tabs-6">>|6| Zahlungen <br> <?php echo $status_zahlungen_text;?></a></li>		
+        <li><a href="#tabs-7">>|7| Bewerbung abschicken <br> </a></li>
     </ul>
-
+	</div>
 <div id="tabs-1">
 <h2>Allgemein</h2>
 <p>Wir freuen uns dass Sie sich für einen oder mehrere unserer Studiengänge bewerben. <br><br>
@@ -632,7 +658,7 @@ padding: 5px;
             </tr>            
             <tr>
                 <td><input type='submit' value='Speichern' name='btn_person' onclick='return checkPerson();'> &nbsp;<button class='btn_weiter' type='button' onclick='activeTab(2);'>Weiter</button></td>
-            </t>
+            </tr>
         </table>
     </form>";
     ?>
@@ -923,7 +949,117 @@ $studiengang = new studiengang();
     ?>
     </div>
     
-    <div id="tabs-6">
+	<div id="tabs-6">
+	<?php
+//	$sprache = getSprache();
+	$sprache=DEFAULT_LANGUAGE;
+	$p = new phrasen($sprache);
+//	$uid=get_uid();
+	$datum_obj = new datum();
+	$studiengang = new studiengang();
+	$studiengang->getAll();
+	
+	$stg_arr = array();
+	foreach ($studiengang->result as $row)
+		$stg_arr[$row->studiengang_kz]=$row->kuerzel;
+	
+	//$benutzer = new benutzer();
+	//if(!$benutzer->load($uid))
+	//	die('Benutzer wurde nicht gefunden');
+	
+	echo '<h2>'.$p->t('tools/zahlungen').' - '.$person->vorname.' '.$person->nachname.'</h2>';
+		
+	$konto = new konto();
+	$konto->getBuchungstyp();
+	$buchungstyp = array();
+	
+	foreach ($konto->result as $row)
+		$buchungstyp[$row->buchungstyp_kurzbz]=$row->beschreibung;
+	
+	$konto = new konto();
+	$konto->getBuchungen($person_id);
+	if(count($konto->result)>0)
+	{
+		echo '<br><br><table>';
+		echo '<tr class="liste">';
+		echo '
+			<td>'.$p->t('global/datum').'</td>
+			<td>'.$p->t('tools/zahlungstyp').'</td>
+			<td>'.$p->t('lvplan/stg').'</td>
+			<td>'.$p->t('global/studiensemester').'</td>
+			<td>'.$p->t('tools/buchungstext').'</td>
+			<td>'.$p->t('tools/betrag').'</td>
+			<td>'.'Zahlungsinformation'.'</td>
+			<td>'.'Überweisung'.'</td>'; //TODO Phrase einfügen
+		echo '</tr>';
+//			<td>'.$p->t('tools/zahlungsbestaetigung').'</td>
+		$i=0;
+		foreach ($konto->result as $row)
+		{
+			$i++;
+			$betrag = $row['parent']->betrag;
+			
+			if(isset($row['childs']))
+			{
+				foreach ($row['childs'] as $row_child)
+				{
+					$betrag += $row_child->betrag;
+				}
+			}
+			
+			if($betrag<0)
+				$style='style="background-color: #FF8888;"';
+			elseif($betrag>0)
+				$style='style="background-color: #88DD88;"';
+			else 
+			{
+				$style='class="liste'.($i%2).'"';
+			}
+			
+			echo "<tr $style>";
+			echo '<td>'.date('d.m.Y',$datum_obj->mktime_fromdate($row['parent']->buchungsdatum)).'</td>';
+			echo '<td>'.$buchungstyp[$row['parent']->buchungstyp_kurzbz].'</td>';
+			echo '<td>'.$stg_arr[$row['parent']->studiengang_kz].'</td>';
+			echo '<td>'.$row['parent']->studiensemester_kurzbz.'</td>';
+			
+			echo '<td nowrap>'.$row['parent']->buchungstext.'</td>';
+			echo '<td align="right" nowrap>'.($betrag<0?'-':($betrag>0?'+':'')).sprintf('%.2f',abs($row['parent']->betrag)).' €</td>';
+			echo '<td align="center">';
+			if($betrag==0 && $row['parent']->betrag<0)
+				echo 'bezahlt';
+				//echo '<a href="pdfExport.php?xml=konto.rdf.php&xsl=Zahlung&uid='.$uid.'&buchungsnummern='.$row['parent']->buchungsnr.'" title="'.$p->t('tools/bestaetigungDrucken').'"><img src="../../skin/images/pdfpic.gif" alt="'.$p->t('tools/bestaetigungDrucken').'"></a>';
+			elseif($row['parent']->betrag>0)
+			{
+				//Auszahlung
+			}
+			else 
+			{
+			{
+				echo '<a onclick="window.open(';
+				echo "'zahlungen_details.php?buchungsnr=".$row['parent']->buchungsnr."','Zahlungsdetails','height=320,width=550,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=no,toolbar=no,location=no,menubar=no,dependent=yes');return false;";
+				echo '" href="#">'.$p->t('tools/offen').'</a>';
+			}
+				echo '</td>';
+				echo '<td align="center">';
+				echo '<a href="https://routing.eps.or.at/appl/epsSO/transinit/bankauswahl_prepare.html?lang=de
+							&amp;caiSO=%2BaDRiYhLjZXKuB19*CkCTIMQBN6sYSHmjNPQkIglglcYeFS98ZCVrvzVdGw5tF1Fzi
+							0JrGhL*WWFcSHu6PWY2FCY2BTH0umA-" target="_blank">
+							<img src="../../skin/images/eps-logo_full.gif" width="30" height="30" alt="EPS Überweisung"></a>';
+				echo '</td>';
+			}
+			echo '</tr>';
+		}
+		echo '</table>';
+	}
+	else 
+	{
+		echo $p->t('tools/keineZahlungenVorhanden');
+	}	
+	echo '</td></tr></table';
+	?>
+	</div>
+	
+    <div id="tabs-7">
     <h2>Bewerbung abschicken</h2>
     <p>Haben Sie alle Daten korrekt ausgefüllt bzw. alle Dokumente auf das System hochgeladen, können Sie Ihre Bewerbung abschicken.<br>
         Die jeweilige Studiengangsassistenz wird sich in den folgenden Tagen, bezüglich der Bewerbung, bei Ihnen Melden.
@@ -932,7 +1068,7 @@ $studiengang = new studiengang();
     <?php
                 
     $disabled = 'disabled'; 
-    if($status_person == true && $status_zgv== true && $status_kontakt == true && $status_dokumente == true)
+    if($status_person == true && $status_zgv== true && $status_kontakt == true && $status_dokumente == true && $status_zahlungen == true)
         $disabled = ''; 
     
     $prestudent_help= new prestudent(); 
@@ -954,7 +1090,7 @@ $studiengang = new studiengang();
             
     ?>
 </div>
-    
+</div>    
     
     
     <script type="text/javascript">
