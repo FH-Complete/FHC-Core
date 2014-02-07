@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2007 Technikum-Wien
+/* Copyright (C) 2007 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -196,42 +196,42 @@ class konto extends basis_db
 			
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO public.tbl_konto (person_id, studiengang_kz, studiensemester_kurzbz, buchungsnr_verweis, betrag, buchungsdatum, buchungstext, mahnspanne, buchungstyp_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id, credit_points) VALUES('.
-			     $this->addslashes($this->person_id).', '.
-			     $this->addslashes($this->studiengang_kz).', '.
-			     $this->addslashes($this->studiensemester_kurzbz).', '.
-			     $this->addslashes($this->buchungsnr_verweis).', '.
-			     $this->addslashes($this->betrag).', '.
-			     $this->addslashes($this->buchungsdatum).', '.
-			     $this->addslashes($this->buchungstext).', '.
-			     $this->addslashes($this->mahnspanne).', '.
-			     $this->addslashes($this->buchungstyp_kurzbz).', '.
-			     $this->addslashes($this->updateamum).', '.
-			     $this->addslashes($this->updatevon).', '.
-			     $this->addslashes($this->insertamum).', '.
-			     $this->addslashes($this->insertvon).', '.
-			     $this->addslashes($this->ext_id).', '.
-				 $this->addslashes($this->credit_points).');';
+			     $this->db_add_param($this->person_id, FHC_INTEGER).', '.
+			     $this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
+			     $this->db_add_param($this->studiensemester_kurzbz).', '.
+			     $this->db_add_param($this->buchungsnr_verweis, FHC_INTEGER).', '.
+			     $this->db_add_param($this->betrag).', '.
+			     $this->db_add_param($this->buchungsdatum).', '.
+			     $this->db_add_param($this->buchungstext).', '.
+			     $this->db_add_param($this->mahnspanne, FHC_INTEGER).', '.
+			     $this->db_add_param($this->buchungstyp_kurzbz).', '.
+			     $this->db_add_param($this->updateamum).', '.
+			     $this->db_add_param($this->updatevon).', '.
+			     $this->db_add_param($this->insertamum).', '.
+			     $this->db_add_param($this->insertvon).', '.
+			     $this->db_add_param($this->ext_id, FHC_INTEGER).', '.
+				 $this->db_add_param($this->credit_points).');';
 		}
 		else
 		{
 			//Updaten des bestehenden Datensatzes
 			$qry = 'UPDATE public.tbl_konto SET '.
-				   ' person_id='.$this->addslashes($this->person_id).','.
-				   ' studiengang_kz='.$this->addslashes($this->studiengang_kz).','.
-				   ' studiensemester_kurzbz='.$this->addslashes($this->studiensemester_kurzbz).','.
-				   ' buchungsnr_verweis='.$this->addslashes($this->buchungsnr_verweis).','.
-				   ' betrag='.$this->addslashes($this->betrag).','.
-				   ' buchungsdatum='.$this->addslashes($this->buchungsdatum).','.
-				   ' buchungstext='.$this->addslashes($this->buchungstext).','.
-				   ' mahnspanne='.$this->addslashes($this->mahnspanne).','.
-				   ' buchungstyp_kurzbz='.$this->addslashes($this->buchungstyp_kurzbz).','.
-				   ' updateamum='.$this->addslashes($this->updateamum).','.
-				   ' updatevon='.$this->addslashes($this->updatevon).','.
-				   ' insertamum='.$this->addslashes($this->insertamum).','.
-				   ' insertvon='.$this->addslashes($this->insertvon).','.
-				   ' ext_id='.$this->addslashes($this->ext_id).','.
-				   ' credit_points='.$this->addslashes($this->credit_points).
-				   " WHERE buchungsnr='".addslashes($this->buchungsnr)."';";
+				   ' person_id='.$this->db_add_param($this->person_id, FHC_INTEGER).','.
+				   ' studiengang_kz='.$this->db_add_param($this->studiengang_kz, FHC_INTEGER).','.
+				   ' studiensemester_kurzbz='.$this->db_add_param($this->studiensemester_kurzbz).','.
+				   ' buchungsnr_verweis='.$this->db_add_param($this->buchungsnr_verweis, FHC_INTEGER).','.
+				   ' betrag='.$this->db_add_param($this->betrag).','.
+				   ' buchungsdatum='.$this->db_add_param($this->buchungsdatum).','.
+				   ' buchungstext='.$this->db_add_param($this->buchungstext).','.
+				   ' mahnspanne='.$this->db_add_param($this->mahnspanne, FHC_INTEGER).','.
+				   ' buchungstyp_kurzbz='.$this->db_add_param($this->buchungstyp_kurzbz).','.
+				   ' updateamum='.$this->db_add_param($this->updateamum).','.
+				   ' updatevon='.$this->db_add_param($this->updatevon).','.
+				   ' insertamum='.$this->db_add_param($this->insertamum).','.
+				   ' insertvon='.$this->db_add_param($this->insertvon).','.
+				   ' ext_id='.$this->db_add_param($this->ext_id, FHC_INTEGER).','.
+				   ' credit_points='.$this->db_add_param($this->credit_points).
+				   " WHERE buchungsnr='".$this->db_add_param($this->buchungsnr, FHC_INTEGER)."';";
 
 		}
 
@@ -286,7 +286,7 @@ class konto extends basis_db
 	public function delete($buchungsnr)
 	{
 		//Pruefen ob Verweise auf diese Buchung Vorhanden sind
-		$qry = "SELECT count(*) as anzahl FROM public.tbl_konto WHERE buchungsnr_verweis='".addslashes($buchungsnr)."'";
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_konto WHERE buchungsnr_verweis='".$this->db_add_param($buchungsnr, FHC_INTEGER)."'";
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -299,7 +299,7 @@ class konto extends basis_db
 				else
 				{
 					//Wenn keine Verweise Vorhanden sind, dann die Buchung loeschen
-					$qry = "DELETE FROM public.tbl_konto WHERE buchungsnr='".addslashes($buchungsnr)."'";
+					$qry = "DELETE FROM public.tbl_konto WHERE buchungsnr='".$this->db_add_param($buchungsnr, FHC_INTEGER)."'";
 					if($this->db_query($qry))
 						return true;
 					else
@@ -337,7 +337,7 @@ class konto extends basis_db
 		}
 
 		if($studiengang_kz!='')
-			$stgwhere = " AND tbl_konto.studiengang_kz='".addslashes($studiengang_kz)."' ";
+			$stgwhere = " AND tbl_konto.studiengang_kz='".$this->db_add_param($studiengang_kz, FHC_INTEGER)."' ";
 		else
 			$stgwhere = '';
 
@@ -451,7 +451,7 @@ class konto extends basis_db
 	public function getDifferenz($buchungsnr)
 	{
 		$qry = "SELECT sum(betrag) as differenz FROM public.tbl_konto 
-				WHERE buchungsnr='".addslashes($buchungsnr)."' OR buchungsnr_verweis='".addslashes($buchungsnr)."'";
+				WHERE buchungsnr='".$this->db_add_param($buchungsnr, FHC_INTEGER)."' OR buchungsnr_verweis='".$this->db_add_param($buchungsnr, FHC_INTEGER)."'";
 
 		if($this->db_query($qry))
 		{
@@ -480,8 +480,8 @@ class konto extends basis_db
 	{
 		$subqry = "SELECT tbl_konto.buchungsnr, tbl_konto.buchungsdatum FROM public.tbl_konto, public.tbl_benutzer, public.tbl_student
 					WHERE 
-						tbl_konto.studiensemester_kurzbz = '".addslashes($stsem)."' 
-						AND tbl_benutzer.uid = '".addslashes($uid)."' 
+						tbl_konto.studiensemester_kurzbz = '".$this->db_add_param($stsem)."' 
+						AND tbl_benutzer.uid = '".$this->db_add_param($uid)."' 
 						AND tbl_benutzer.uid = tbl_student.student_uid
 						AND tbl_benutzer.person_id = tbl_konto.person_id 
 						AND tbl_konto.studiengang_kz=tbl_student.studiengang_kz
@@ -632,10 +632,10 @@ class konto extends basis_db
 	{
 		$qry = "select sum(betrag) as betrag from public.tbl_konto 
 				join public.tbl_benutzer benutzer using(person_id)
-				where uid='".addslashes($uid)."' and studiensemester_kurzbz = '".addslashes($stsem)."' 
+				where uid='".$this->db_add_param($uid)."' and studiensemester_kurzbz = '".$this->db_add_param($stsem)."' 
 				and buchungstyp_kurzbz = 'Studiengebuehr' and betrag > 0";
 		if($studiengang_kz!= null)
-		$qry.=" and studiengang_kz = '".addslashes($studiengang_kz)."';";
+		$qry.=" and studiengang_kz = '".$this->db_add_param($studiengang_kz, FHC_INTEGER)."';";
 		
 		if($this->db_query($qry))
 		{
