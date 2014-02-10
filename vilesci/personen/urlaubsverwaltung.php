@@ -63,12 +63,35 @@ echo '<html>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+		<link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
 		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+		<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>
 		<script language="Javascript">
 		function confdel(val)
 		{
 			return confirm("Wollen Sie diesen Eintrag wirklich loeschen: "+val);
 		}
+		$(document).ready(function() 
+		{
+			$("#ma_name").autocomplete({
+			source: "../../cis/private/tools/zeitaufzeichnung_autocomplete.php?autocomplete=kunde",
+			minLength:2,
+			response: function(event, ui)
+			{
+				//Value und Label fuer die Anzeige setzen
+				for(i in ui.content)
+				{
+					ui.content[i].value=ui.content[i].uid;
+					ui.content[i].label=ui.content[i].vorname+" "+ui.content[i].nachname+" ("+ui.content[i].uid+")";
+				}
+			},
+			select: function(event, ui)
+			{
+				//Ausgeaehlte Ressource zuweisen und Textfeld wieder leeren
+				$("#ma_name").val(ui.item.uid);
+			}
+			});
+		})
 		</script>
 	</head>
 	<body class="Background_main">
@@ -84,7 +107,8 @@ if(!$rechte->isBerechtigt('mitarbeiter/zeitsperre'))
 
 //Formular zur Eingabe der UID
 echo '<form  accept-charset="UTF-8" action="'.$_SERVER['PHP_SELF'].'" mehtod="GET">';
-echo 'Zeitsperren des Mitarbeiters mit der UID <input type="text" name="uid" value="'.$uid.'">';
+echo 'Zeitsperren des Mitarbeiters mit der UID <INPUT type="hidden" id="uid" name="uid" value="uid">
+		<input type="text" id="ma_name" name="uid" value="'.$uid.'">';
 echo '<input type="submit" name="submit" value="Anzeigen">';
 echo '</form>';
 
