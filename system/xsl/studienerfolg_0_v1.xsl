@@ -34,7 +34,7 @@
 					</fo:block-container>
 					
 					<fo:block-container position="absolute" top="26mm" left="15mm">
-						<fo:block font-size="12pt">Höchstädtplatz 5\nA-1200 Wien</fo:block>
+						<fo:block font-size="12pt">Höchstädtplatz 6\nA-1200 Wien</fo:block>
 						<fo:block font-size="6pt">ZVR-Nr.: 074476426, DVR-Nr.: 0928381</fo:block>
 					</fo:block-container>
 
