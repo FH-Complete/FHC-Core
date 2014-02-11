@@ -189,10 +189,6 @@ class konto extends basis_db
 	
 		if($new)
 		{
-			//Zahlungsreferenz generieren
-			//TODO Buchungscode
-			//$this->zahlungsreferenz = generateZahlungsreferenz($this->person_id, $this->studiengang_kz, "CODE");
-			//$this->zahlungsreferenz = "WTF";
 			
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO public.tbl_konto (person_id, studiengang_kz, studiensemester_kurzbz, buchungsnr_verweis, betrag, buchungsdatum, buchungstext, mahnspanne, buchungstyp_kurzbz, updateamum, updatevon, insertamum, insertvon, ext_id, credit_points) VALUES('.
@@ -245,6 +241,8 @@ class konto extends basis_db
 						if($row = $this->db_fetch_object())
 						{
 							$this->buchungsnr = $row->id;
+							
+							//Zahlungsreferenz generieren
 							if(strlen($this->buchungsnr_verweis) == 0)
 							{
 								if(!$this->addZahlungsreferenz($this->buchungsnr))
@@ -700,13 +698,18 @@ class konto extends basis_db
 		}
 	}
 	
+	/**
+	 * Fügt zur erstellten Buchung eine Zahlungsreferenz hinzu
+	 * @param $buchungsnr Die ID der erstellten Buchung in der Datenbank
+	 * @return boolean true im Erfolgsfall, ansonsten false
+	 */
 	private function addZahlungsreferenz($buchungsnr)
 	{
 		$this->zahlungsreferenz = generateZahlungsreferenz($this->studiengang_kz, $buchungsnr);
 		
 		$qry = "UPDATE public.tbl_konto ".
-				"SET zahlungsreferenz=".$db->db_add_param($this->zahlungsreferenz).
-				"WHERE buchungsnr=".$db->db_add_param($buchungsnr).";";
+				"SET zahlungsreferenz=".$this->db_add_param($this->zahlungsreferenz).
+				"WHERE buchungsnr=".$this->db_add_param($buchungsnr).";";
 		
 		if($this->db_query($qry))
 		{

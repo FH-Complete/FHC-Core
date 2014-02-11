@@ -692,7 +692,9 @@ function loadFilteredLehrveranstaltungen()
 					"method":	"load_lva_oe",
 					"parameter_0": $("#oeDropdown option:selected").val(),			//Organisationseinheit KurzBz
 					"parameter_1": "true",											//Aktiv // sollte TRUE sein
-					"parameter_2": $("#lehrtypDropdown option:selected").val()		//Lehrtyp KurzBz
+					"parameter_2": $("#lehrtypDropdown option:selected").val(),		//Lehrtyp KurzBz
+					"parameter_3": "null",											//optionale Sortierung
+					"parameter_4": $("#semesterDropdown option:selected").val()		//Semester
 				},
 			error: loadError
 		}).success(function(data)
@@ -721,7 +723,11 @@ function showLVTree(data)
 
 		if($("#lvListe").length === 0)
 		{
-			$("#filteredLVs").html("<h3>Lehrveranstaltungen</h3><div id='lvListe'></div>");
+			$("#filteredLVs").html("<h3></h3><div id='lvListe'></div>");
+		} 
+		else 
+		{
+			$("#filteredLVs").html("<h3>Daten werden geladen...</h3><div id='lvListe'></div>");
 		}
 		$("#lvListe").jstree({
 			ui: {
@@ -729,7 +735,8 @@ function showLVTree(data)
 				"select_multiple_modifier": "ctrl"
 			},
 			json_data: { 
-				data: TreeData
+				data: TreeData,
+				progressive_render : true
 			},
 			crrm: {
 				move: {
@@ -768,6 +775,8 @@ function showLVTree(data)
 			plugins: ["themes", "ui", "dnd", "grid", "json_data", "crrm", "types", "sort"]
 		}).bind("loaded.jstree", function(event, data) 
 		{
+			$("#loadingGif").remove();
+			$("h3:contains('Daten werden geladen...')").remove();
 			hideAllTreeColumns();
 		});
 	} 
@@ -778,7 +787,7 @@ function showLVTree(data)
 		{
 			$("#lvListe").remove();
 		}
-		$("h3:contains('Lehrveranstaltungen')").remove();
+		$("h3:contains('')").remove();
 		$("#filteredLVs").append("<div id='lvListe'>Keine Einträge gefunden!</div>");
 	}
 }
