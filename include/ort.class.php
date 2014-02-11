@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2006 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -50,6 +50,8 @@ class ort extends basis_db
 	public $insertamum;		// timestamp without timezone
 	public $insertvon;		// varchar(32)
 	public $content_id;		// integer
+	
+	public $ort_kurzbz_old;	// string
 
 	/**
 	 * Konstruktor
@@ -232,6 +234,7 @@ class ort extends basis_db
 			//bestehenden Datensatz akualisieren
 
 			$qry = 'UPDATE public.tbl_ort SET '.
+				'ort_kurzbz='.$this->db_add_param($this->ort_kurzbz).', '.
 				'bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
 				'planbezeichnung='.$this->db_add_param($this->planbezeichnung).', '.
 				'max_person='.$this->db_add_param($this->max_person).', '.
@@ -248,7 +251,7 @@ class ort extends basis_db
 				'updateamum='.$this->db_add_param($this->updateamum).', '.
 				'updatevon='.$this->db_add_param($this->updatevon).', '.
 				'content_id='.$this->db_add_param($this->content_id).' '.
-				'WHERE ort_kurzbz = '.$this->db_add_param($this->ort_kurzbz).';';
+				'WHERE ort_kurzbz = '.$this->db_add_param(($this->ort_kurzbz_old!='')?$this->ort_kurzbz_old:$this->ort_kurzbz).';';
 		}
 
 		if($this->db_query($qry))
