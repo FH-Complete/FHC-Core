@@ -54,7 +54,16 @@
 	$studiengang=new studiengang();
 	$studiengang->load($konto->studiengang_kz);
 	$bankverbindung=new bankverbindung();
-	$bankverbindung->load_oe($studiengang->oe_kurzbz);
+	if($bankverbindung->load_oe($studiengang->oe_kurzbz) && count($bankverbindung->result)>0)
+	{
+		$iban=$bankverbindung->result[0]->iban;
+		$bic=$bankverbindung->result[0]->bic;
+	}
+	else
+	{
+		$iban='';
+		$bic='';
+	}
 
 	$oe=new organisationseinheit();
 	$oe->load($studiengang->oe_kurzbz);
@@ -109,10 +118,10 @@
  				<td>'.$oe->organisationseinheittyp_kurzbz.' '.$oe->bezeichnung.'</td>
 			</tr><tr>
 				<td>IBAN</td>
-				<td>'.$bankverbindung->result[0]->iban.'</td>
+				<td>'.$iban.'</td>
 			</tr><tr>
 				<td>BIC</td>
-				<td>'.$bankverbindung->result[0]->bic.'</td>
+				<td>'.$bic.'</td>
 			</tr><tr>
 				<td>Zahlungsreferenz</td>
 				<td>'.$konto->zahlungsreferenz.'</td>
