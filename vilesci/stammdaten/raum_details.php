@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2006 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -62,6 +62,7 @@
 	$standort_id = '';
 	$telefonklappe = '';
 	$content_id='';
+	$ort_kurzbz_old = '';
 	
 	$neu = "true";
 	
@@ -82,7 +83,8 @@
 		$standort_id = $_POST["standort_id"];
 		$telefonklappe = $_POST["telefonklappe"];
 		$content_id = $_POST['content_id'];
-
+		$ort_kurzbz_old = $_POST["ort_kurzbz_old"];
+		
 		
 		$sg_update = new ort();
 		$sg_update->ort_kurzbz = $ort_kurzbz;
@@ -100,6 +102,7 @@
 		$sg_update->telefonklappe = $telefonklappe;
 		$sg_update->standort_id = $standort_id;
 		$sg_update->content_id = $content_id;
+		$sg_update->ort_kurzbz_old = $ort_kurzbz_old;
 
 		
 		if ($_POST["neu"] == "true")
@@ -208,15 +211,16 @@
 			{
 				if($row->hierarchie>$hierarchiemax)
 					$hierarchiemax=$row->hierarchie;
-				$htmlstr.= '<tr>';
-				$htmlstr.= '<td>'.$row->beschreibung.'</td>';
-				$htmlstr.= '<td>'.$row->raumtyp_kurzbz.'</td>';
-				$htmlstr.= '<td>'.$row->hierarchie.'</td>';
-				$htmlstr.= '<td><a href="raum_details.php?type=raumtyp&ort_kurzbz='.$ort_kurzbz.'&method=delete&raumtyp_kurzbz='.$row->raumtyp_kurzbz.'">Entfernen</a></td>';
-				$htmlstr.= '</tr>';
+				$htmlstr.= '
+					<tr>
+						<td>'.$row->beschreibung.'</td>
+						<td>'.$row->raumtyp_kurzbz.'</td>
+						<td>'.$row->hierarchie.'</td>
+						<td><a href="raum_details.php?type=raumtyp&ort_kurzbz='.$ort_kurzbz.'&method=delete&raumtyp_kurzbz='.$row->raumtyp_kurzbz.'">Entfernen</a></td>
+					</tr>';
 			}
-			$htmlstr.='</tbody></table>';
-			$htmlstr.='<form action="raum_details.php?type=raumtyp&ort_kurzbz='.$ort_kurzbz.'&method=add" method="POST">
+			$htmlstr.='</tbody></table>
+			<form action="raum_details.php?type=raumtyp&ort_kurzbz='.$ort_kurzbz.'&method=add" method="POST">
 			Raumtyp:<SELECT name="raumtyp_kurzbz">';
 
 			$raumtyp = new raumtyp();
@@ -242,44 +246,41 @@
 	else
 	{	
 		if($ort_kurzbz != '')
-		    $htmlstr .= "<br><div class='kopf'>Raum <b>".$ort_kurzbz."</b></div>\n";
+		    $htmlstr .= '<br><div class="kopf">Raum <b>'.$ort_kurzbz.'</b></div>';
 		else
-		    $htmlstr .="<br><div class='kopf'>Neuer Raum</div>\n"; 
-		$htmlstr .= "<form action='raum_details.php' method='POST' name='raumform'>\n";
-		$htmlstr .= "<table class='detail'>\n";
-
-
-		$htmlstr .= "	<tr><td colspan='3'>&nbsp;</tr>\n";
-		$htmlstr .= "	<tr>\n";
-
+		    $htmlstr .='<br><div class="kopf">Neuer Raum</div>'; 
+		$htmlstr .= '
+			<form action="raum_details.php" method="POST" name="raumform">
+				<table class="detail">
+					<tr><td colspan="3">&nbsp;</tr>
+					<tr>';
 		// erste Spalte start
-		$htmlstr .= "		<td valign='top'>\n";
-
-		$htmlstr .= "			<table>\n";
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td>Kurzbezeichnung</td>\n";
-		$htmlstr .= "					<td><input class='detail' type='text' name='ort_kurzbz' size='12' maxlength='16' value='".$ort_kurzbz."' onchange='submitable()'></td>\n";
-		$htmlstr .= "					<td>Bezeichnung</td>\n";
-		$htmlstr .= "					<td><input class='detail' type='text' name='bezeichnung' size='32' maxlength='64' value='".$bezeichnung."' onchange='submitable()'></td>\n";
-		$htmlstr .= "					<td>Planbezeichnung</td>\n";
-		$htmlstr .= " 					<td><input class='detail' type='text' name='planbezeichnung' size='12' maxlength='8' value='".$planbezeichnung."' onchange='submitable()'></td>\n";
-		$htmlstr .= "				</tr>\n";
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td>Max Person</td>\n";
-		$htmlstr .= "					<td><input class='detail' type='text' name='max_person' size='12' maxlength='8' value='".$max_person."' onchange='submitable()'></td>\n";
-		$htmlstr .= "					<td>Dislozierung</td>\n";
-		$htmlstr .= "					<td><input class='detail' type='text' name='dislozierung' size='16' maxlength='8' value='".$dislozierung."' onchange='submitable()'></td>\n";
-		$htmlstr .= "					<td>Kosten</td>\n";
-		$htmlstr .= "					<td><input class='detail' type='text' name='kosten' size='18' maxlength='16' value='".$kosten."' onchange='submitable()'></td>\n";
-		$htmlstr .= "				</tr>\n";
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td>Stockwerk</td>\n";
-		$htmlstr .= "					<td><input class='detail' type='text' name='stockwerk' size='8' maxlength='5' value='".$stockwerk."' onchange='submitable()'></td>\n";
-		$htmlstr .= "					<td>Standort</td>\n";
-		$htmlstr .= "					<td>";
-		$htmlstr .= "					<SELECT name='standort_id'>";
-		$htmlstr.="				<OPTION value=''>-- keine Auswahl --</OPTION>\n";
-
+		$htmlstr .= '
+			<td valign="top">
+				<table>
+					<tr>
+						<td>Kurzbezeichnung</td>
+						<td><input class="detail" type="text" name="ort_kurzbz" size="12" maxlength="16" value="'.$ort_kurzbz.'" onchange="submitable()"></td>
+						<td>Bezeichnung</td>
+						<td><input class="detail" type="text" name="bezeichnung" size="32" maxlength="64" value="'.$bezeichnung.'" onchange="submitable()"></td>
+						<td>Planbezeichnung</td>
+						<td><input class="detail" type="text" name="planbezeichnung" size="12" maxlength="8" value="'.$planbezeichnung.'" onchange="submitable()"></td>
+					</tr>
+					<tr>
+						<td>Max Person</td>
+						<td><input class="detail" type="text" name="max_person" size="12" maxlength="8" value="'.$max_person.'" onchange="submitable()"></td>
+						<td>Dislozierung</td>
+						<td><input class="detail" type="text" name="dislozierung" size="16" maxlength="8" value="'.$dislozierung.'" onchange="submitable()"></td>
+						<td>Kosten</td>
+						<td><input class="detail" type="text" name="kosten" size="18" maxlength="16" value="'.$kosten.'" onchange="submitable()"></td>
+					</tr>
+					<tr>
+						<td>Stockwerk</td>
+						<td><input class="detail" type="text" name="stockwerk" size="8" maxlength="5" value="'.$stockwerk.'" onchange="submitable()"></td>
+						<td>Standort</td>
+						<td>
+							<SELECT name="standort_id">
+								<OPTION value="">-- keine Auswahl --</OPTION>';
 		$standort = new standort();
 		if($standort->getStandorteWithTyp('Intern'))
 		{
@@ -290,18 +291,19 @@
 				else 
 					$selected='';
 			
-				$htmlstr.="<OPTION value='$row->standort_id' $selected>$row->kurzbz</OPTION>\n";
+				$htmlstr.='<OPTION value="'.$row->standort_id.'" '.$selected.'>'.$row->kurzbz.'</OPTION>';
 			}
 		}
 
-		$htmlstr .= "					</SELECT>";
-		$htmlstr .= "					</td>\n";
-		$htmlstr .= "					<td>Telefonklappe</td>\n";
-		$htmlstr .= "					<td><input class='detail' type='text' name='telefonklappe' size='3' maxlength='8' value='".$telefonklappe."' onchange='submitable()'></td>\n";
-		$htmlstr .= "				</tr>\n";
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td valign='top'>Lehre</td>\n";
-		$htmlstr .= " 					<td>\n";
+		$htmlstr .= '
+							</SELECT>
+						</td>
+						<td>Telefonklappe</td>
+						<td><input class="detail" type="text" name="telefonklappe" size="3" maxlength="8" value="'.$telefonklappe.'" onchange="submitable()"></td>
+					</tr>
+					<tr>
+						<td valign="top">Lehre</td>
+						<td>';
 		if($lehre == 't')
 		{
 			$chk1 = "checked";
@@ -310,51 +312,49 @@
 		{
 			$chk1 = '';
 		}
-		$htmlstr .= "					<input type='checkbox' name='lehre' value='t'".$chk1." onchange='submitable()'>";
-		$htmlstr .= " 					</td>\n";
-		$htmlstr .= "					<td valign='top'>Reservieren</td>\n";
-		$htmlstr .= " 					<td>\n";
+		$htmlstr .= '<input type="checkbox" name="lehre" value="t"'.$chk1.' onchange="submitable()"></td>
+						<td valign="top">Reservieren</td>
+						<td>';
 		if($reservieren == 't')
 		{
-			$chk2 = "checked";
+			$chk2 = 'checked';
 		}
 		else
 		{
 			$chk2 = '';
 		}
-		$htmlstr .= "					<input type='checkbox' name='reservieren' value='t'".$chk2." onchange='submitable()'>";
-		$htmlstr .= " 					</td>\n";
-		$htmlstr .= "					<td valign='top'>Aktiv</td>\n";
-		$htmlstr .= " 					<td>\n";
+		$htmlstr .= '<input type="checkbox" name="reservieren" value="t"'.$chk2.' onchange="submitable()"></td>
+						<td valign="top">Aktiv</td>
+						<td>';
 		if($aktiv == 't')
 		{
-			$chk3 = "checked";
+			$chk3 = 'checked';
 		}
 		else
 		{
 			$chk3 = '';
 		}
-		$htmlstr .= "					<input type='checkbox' name='aktiv' value='t'".$chk3." onchange='submitable()'>";
-		$htmlstr .= " 					</td>\n";
-		$htmlstr .= "				</tr>\n";
-		$htmlstr .= "				<tr>\n";
-		$htmlstr .= "					<td valign='top'>Lageplan</td>\n";
-		$htmlstr .= " 					<td><textarea name='lageplan' cols='37' rows='5' onchange='submitable()'>".$lageplan."</textarea></td>\n";
-		$htmlstr .= "					<td valign='top'>Ausstattung</td>\n";
-		$htmlstr .= " 					<td><textarea name='ausstattung' cols='37' rows='5' onchange='submitable()'>".$ausstattung."</textarea></td>\n";
-		$htmlstr .= "					<td valign='top'>ContentID</td>\n";
-		$htmlstr .= " 					<td valign='top'><input type='text' name='content_id' size='5' onchange='submitable()' value='".$content_id."' /></td>\n";
-		$htmlstr .= "				</tr>\n";
-		$htmlstr .= "</table>\n";
-		$htmlstr .= "<br>\n";
-		$htmlstr .= "<div align='right' id='sub'>\n";
-		$htmlstr .= "	<span id='submsg' style='color:red; visibility:hidden;'>Datensatz ge&auml;ndert!&nbsp;&nbsp;</span>\n";
-		$htmlstr .= "	<input type='hidden' name='neu' value='".$neu."'>";
-		$htmlstr .= "	<input type='submit' value='Speichern' name='schick'>\n";
-		$htmlstr .= "	<input type='button' value='Reset' onclick='unchanged()'>\n";
-		$htmlstr .= "</div>";
-		$htmlstr .= "</form>";
-		$htmlstr .= "<div class='inserterror'>".$errorstr."</div>";
+		$htmlstr .= '<input type="checkbox" name="aktiv" value="t"'.$chk3.' onchange="submitable()"></td>
+					</tr>
+					<tr>
+						<td valign="top">Lageplan</td>
+						<td><textarea name="lageplan" cols="37" rows="5" onchange="submitable()">'.$lageplan.'</textarea></td>
+						<td valign="top">Ausstattung</td>
+						<td><textarea name="ausstattung" cols="37" rows="5" onchange="submitable()">'.$ausstattung.'</textarea></td>
+						<td valign="top">ContentID</td>
+						<td valign="top"><input type="text" name="content_id" size="5" onchange="submitable()" value="'.$content_id.'" /></td>
+					</tr>
+				</table>
+				<br>
+				<input type="hidden" name="ort_kurzbz_old" value="'.$ort_kurzbz.'" />
+				<div align="right" id="sub">
+					<span id="submsg" style="color:red; visibility:hidden;">Datensatz ge&auml;ndert!&nbsp;&nbsp;</span>
+					<input type="hidden" name="neu" value="'.$neu.'">
+					<input type="submit" value="Speichern" name="schick">
+					<input type="button" value="Reset" onclick="unchanged()">
+				</div>
+			</form>
+			<div class="inserterror">'.$errorstr.'</div>';
 	}
 ?>
 <!DOCTYPE HTML>
