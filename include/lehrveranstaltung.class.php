@@ -1468,7 +1468,7 @@ class lehrveranstaltung extends basis_db
 	 * @param $aktiv optional, true wenn nur aktive LVs
 	 * @param $lehrtyp optional, gewünschter Lehrtyp
 	 */
-	public function load_lva_oe($oe_kurzbz, $aktiv=null, $lehrtyp=null, $sort=null)
+	public function load_lva_oe($oe_kurzbz, $aktiv=null, $lehrtyp=null, $sort=null, $semester=null)
 	{
 		
 		if (is_null($oe_kurzbz)) {
@@ -1489,6 +1489,9 @@ class lehrveranstaltung extends basis_db
 
 		if(!is_null($lehrtyp))
 			$qry .= " AND lehrtyp_kurzbz=".$this->db_add_param($lehrtyp);
+		
+		if(!is_null($semester))
+			$qry .= " AND semester=".$this->db_add_param ($semester);
 
 		if (is_null($sort) || empty($sort))
 			$qry .= " ORDER BY semester, bezeichnung";
