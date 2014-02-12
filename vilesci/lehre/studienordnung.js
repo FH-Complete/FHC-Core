@@ -308,8 +308,13 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 					move: {
 						"always_copy": "multitree",
 						"check_move": function(m) {
+							if(m.o.attr("rel")==="semester")
+							{
+								return false;
+							}
 							if(m.r.attr("rel")==="semester" && (m.p === "inside" || m.p === "before"))
 							{
+								console.log(m);
 								return true;
 							}
 
