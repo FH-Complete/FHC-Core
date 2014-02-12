@@ -1208,7 +1208,8 @@ class lehrveranstaltung extends basis_db
 				$obj->stpllv_semester = $lv->stpllv_semester;
 				$obj->stpllv_pflicht = $lv->stpllv_pflicht;
 				$obj->stpllv_koordinator = $lv->stpllv_koordinator;
-
+				$obj->lvnr = $lv->lvnr;
+				
 				$values[] = $obj;
 
 			}
@@ -1227,7 +1228,8 @@ class lehrveranstaltung extends basis_db
 			$obj->stpllv_semester = $this->stpllv_semester;
 			$obj->stpllv_pflicht = $this->stpllv_pflicht;
 			$obj->stpllv_koordinator = $this->stpllv_koordinator;
-
+			$obj->lvnr = $this->lvnr;
+			
 			$values[] = $obj;
 		}
 		return $values;
@@ -1259,7 +1261,8 @@ class lehrveranstaltung extends basis_db
 				$obj->stpllv_semester = $lv->stpllv_semester;
 				$obj->stpllv_pflicht = $lv->stpllv_pflicht;
 				$obj->stpllv_koordinator = $lv->stpllv_koordinator;
-
+				$obj->lvnr = $lv->lvnr;
+				
 				$obj->children = array();
 				if(count($lv->childs) > 0)
 				{
@@ -1283,6 +1286,7 @@ class lehrveranstaltung extends basis_db
 			$obj->stpllv_semester = $this->stpllv_semester;
 			$obj->stpllv_pflicht = $this->stpllv_pflicht;
 			$obj->stpllv_koordinator = $this->stpllv_koordinator;
+			$obj->lvnr = $this->lvnr;
 
 			$values[] = $obj;
 		}

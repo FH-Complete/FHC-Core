@@ -1005,19 +1005,6 @@ if(!$result = @$db->db_query("SELECT semester_alternativ FROM lehre.tbl_lehrvera
 		echo 'lehre.tbl_lehrveranstaltung: Spalte semester_alternativ hinzugefügt';
 }
 
-// studienplan_id in Tabelle prestudentstatus
-if(!$result = @$db->db_query("SELECT studienplan_id FROM public.tbl_prestudentstatus LIMIT 1;"))
-{
-	$qry = "ALTER TABLE public.tbl_prestudentstatus ADD COLUMN studienplan_id bigint;
-	ALTER TABLE public.tbl_prestudentstatus ADD CONSTRAINT fk_studienplan_prestudentstatus FOREIGN KEY (studienplan_id) REFERENCES lehre.tbl_studienplan(studienplan_id) ON DELETE RESTRICT ON UPDATE CASCADE;
-	";
-
-	if(!$db->db_query($qry))
-		echo '<strong>public.tbl_prestudentstatus: '.$db->db_last_error().'</strong><br>';
-	else
-		echo 'public.tbl_prestudentstatus: Spalte studienplan_id hinzugefügt';
-}
-
 // bestaetigtam und bestaetigtvon in Tabelle prestudentstatus fuer verlaengerung des Studiums
 if(!$result = @$db->db_query("SELECT bestaetigtam FROM public.tbl_prestudentstatus LIMIT 1;"))
 {

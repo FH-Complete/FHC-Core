@@ -217,7 +217,7 @@ function GenerateTreeChilds(data)
 	}
 	var obj = {
 	"data":data.bezeichnung,
-	"metadata":	{"lehrveranstaltung_id":data.lehrveranstaltung_id,"bezeichnung":data.bezeichnung,"ects":data.ects,"semesterstunden":data.semesterstunden},
+	"metadata":	{"lehrveranstaltung_id":data.lehrveranstaltung_id,"bezeichnung":data.bezeichnung,"ects":data.ects,"semesterstunden":data.semesterstunden,"lehrform_kurzbz":data.lehrform_kurzbz,"lvnr":data.lvnr},
 	"attr":{"id":data.studienplan_lehrveranstaltung_id,"rel":data.lehrtyp_kurzbz,"lvID":data.lehrveranstaltung_id,"studienplan_lehrveranstaltung_id":data.studienplan_lehrveranstaltung_id},
 	"children":children
 	};
@@ -335,7 +335,9 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 					columns: [
 						{width: 300, header: "Lehrveranstaltung", value: "bezeichnung", source: "metadata", headerClass: "header_lv"},
 						{width: 50, header: "ECTS", value: "ects", source: "metadata", wideCellClass: "col_ects", headerClass: "header_ects"},
-						{width: 120, header: "Semesterstunden", value: "semesterstunden", source: "metadata", cellClass: "col_semesterstunden"}
+						{width: 120, header: "Semesterstunden", value: "semesterstunden", source: "metadata", cellClass: "col_semesterstunden"},
+						{width: 120, header: "Lehrform", value: "lehrform_kurzbz", source: "metadata", cellClass: "col_lehrform"},
+						{width: 120, header: "LVNR", value: "lvnr", source: "metadata", cellClass: "col_lvnr"}
 					],
 					resizable: true
 				},
@@ -570,6 +572,8 @@ function LoadLVDetails(lvid, stpllvid)
 		html+="<br>ID: "+lvdata.lehrveranstaltung_id;
 		html+="<br>ECTS: "+lvdata.ects;
 		html+="<br>Semesterstunden: "+lvdata.semesterstunden;
+		html+="<br>LVNR: "+lvdata.lvnr;
+		html+="<br>Lehrform: "+lvdata.lehrform_kurzbz;
 		$("#tab-lehrveranstaltungdetail").html(html);
 	});	
 }
@@ -715,7 +719,7 @@ function showLVTree(data)
 			item = data.result[i];
 			var obj = {
 			"data":item.bezeichnung,
-			"metadata":	{"lehrveranstaltung_id":item.lehrveranstaltung_id,"bezeichnung":item.bezeichnung,"ects":item.ects,"semesterstunden":item.semesterstunden},
+			"metadata":	{"lehrveranstaltung_id":item.lehrveranstaltung_id,"bezeichnung":item.bezeichnung,"ects":item.ects,"semesterstunden":item.semesterstunden,"lvnr":item.lvnr,"lehrform_kurzbz":item.lehrform_kurzbz},
 			"attr":{"id":item.lehrveranstaltung_id,"rel":item.lehrtyp_kurzbz,"lvID":item.lehrveranstaltung_id,"studienplan_lehrveranstaltung_id":item.studienplanlehrveranstaltung_id},
 			};
 			TreeData.push(obj);
@@ -765,10 +769,11 @@ function showLVTree(data)
 			},
 			grid: {
 				columns: [
-					{width: 325, header: "Lehrveranstaltung", value: "bezeichnung", source: "metadata"},
+					{width: 260, header: "Lehrveranstaltung", value: "bezeichnung", source: "metadata"},
 					{width: 50, header: "ECTS", value: "ects", source: "metadata"},
+					{width: 80, header: "Lehrform", value: "lehrform_kurzbz", source: "metadata"},
 					{width: 80, header: "Semester", value: "semester", source: "metadata"},
-					{width: 120, header: "Semesterstunden", value: "semesterstunden", source: "metadata"}
+					{width: 120, header: "Semesterstunden", value: "semesterstunden", source: "metadata"},
 				],
 				resizable: true
 			},
@@ -868,7 +873,7 @@ function hideAllTreeColumns()
 	var headers = $("#filteredLVs .jstree-grid-header-cell");
 	var separators = $("#filteredLVs .jstree-grid-separator");
 	//separators[0].style.display = "none";
-	for(var j=2; j<headers.length; j++)
+	for(var j=3; j<headers.length; j++)
 	{
 		headers[j].style.display = "none";
 		separators[j].style.display = "none";
