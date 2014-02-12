@@ -110,5 +110,24 @@
 			</tr>
 		</tbody>
 	</table>
+	<table class="tablesorter">
+		<thead>
+			<tr>
+				<th width="40%">Zahlung anweisen</th>
+				<th width="60%"></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>EPS</td>
+ 				<td>
+				<a href="https://routing.eps.or.at/appl/epsSO/transinit/bankauswahl_prepare.html?lang=de
+							&amp;caiSO=%2BaDRiYhLjZXKuB19*CkCTIMQBN6sYSHmjNPQkIglglcYeFS98ZCVrvzVdGw5tF1Fzi
+							0JrGhL*WWFcSHu6PWY2FCY2BTH0umA-" target="_blank">
+							<img src="../../../skin/images/eps-logo_full.gif" width="30" height="30" alt="EPS Überweisung"></a>
+				</td>
+			</tr>
+		</tbody>
+	</table>
 </body></html>';	   	
 ?>
