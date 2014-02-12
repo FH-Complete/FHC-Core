@@ -314,7 +314,6 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 							}
 							if(m.r.attr("rel")==="semester" && (m.p === "inside" || m.p === "before"))
 							{
-								console.log(m);
 								return true;
 							}
 
