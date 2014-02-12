@@ -1185,7 +1185,7 @@ function writeOverallSum(root)
 	var cells = $(root).find(".jstree-grid-col-1");
 	var sum = 0;
 
-	for(var i=1; i<cells.length; i++)
+	for(var i=0; i<cells.length; i++)
 	{
 		if(!isNaN(parseFloat(cells[i].childNodes[0].innerHTML)))
 		{
