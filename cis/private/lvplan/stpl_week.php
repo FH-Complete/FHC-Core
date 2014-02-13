@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2009 Technikum-Wien
+/* Copyright (C) 2009 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -52,6 +52,18 @@ $uid=get_uid();
 	  		eval(targ+".location='"+selObj.options[selObj.selectedIndex].value+"'");
 	  		if (restore)
 	  			selObj.selectedIndex=0;
+		}
+		
+        function toggle_checkboxes(obj)
+        {
+			var f = obj.form;
+			var regExp = /reserve[1-7]_[1-9][1-6]?/;
+			for (var i = 0; i < f.elements.length; i++)
+			{
+				var e = f.elements[i];
+				if((e.name).match(regExp))
+					e.checked = f.check_all.checked;
+			}
 		}
 		-->
 	</script>
