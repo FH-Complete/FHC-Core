@@ -722,6 +722,49 @@ class konto extends basis_db
 		}
 		
 	}
+	
+	/**
+	 * Laedt eine Buchung anhand ihrer Zahlungsreferenz
+	 * @param $zahlungsreferenz
+	 */
+	public function loadFromZahlungsreferenz($zahlungsreferenz)
+	{
+		$qry = "SELECT * FROM public.tbl_konto WHERE zahlungsreferenz=".$this->db_add_param($zahlungsreferenz);
+		
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->buchungsnr = $row->buchungsnr;
+				$this->person_id = $row->person_id;
+				$this->studiengang_kz = $row->studiengang_kz;
+				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$this->buchungsnr_verweis = $row->buchungsnr_verweis;
+				$this->betrag = $row->betrag;
+				$this->buchungsdatum = $row->buchungsdatum;
+				$this->buchungstext = $row->buchungstext;
+				$this->mahnspanne = $row->mahnspanne;
+				$this->buchungstyp_kurzbz = $row->buchungstyp_kurzbz;
+				$this->updatamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->credit_points = $row->credit_points;
+				$this->zahlungsreferenz = $row->zahlungsreferenz;
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Datensatz wurde nicht gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 
 }
 ?>
