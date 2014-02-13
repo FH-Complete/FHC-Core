@@ -898,8 +898,9 @@ class wochenplan extends basis_db
 		echo '	</tbody></table>'.$this->crlf;
 		if ($raumres && $this->type=='ort' && ($datum>=$datum_now && $datum>=$datum_res_lektor_start && $datum_mon<=$datum_res_lektor_ende))
 		{
-			echo '<table><tr><td>alle auswählen:</td><td colspan="10"><input type="checkbox" name="check_all" onclick="toggle_checkboxes(this);" /></td></tr>
-				<tr><br>';
+			$check_all_checkbox='';
+
+			echo '<table><tr><br>';
 			echo '	<td>'.$p->t('global/titel').':</td><td><input onchange="if (this.value.length>0 && document.getElementById(\'beschreibung\').value.length<1) {document.getElementById(\'beschreibung\').value=document.getElementById(\'titel\').value;document.getElementById(\'beschreibung\').focus();};" type="text" id="titel"  name="titel" size="10" maxlength="10" value="" /></td> '.$this->crlf;
 			echo '	<td>'.$p->t('global/beschreibung').':</td><td colspan="6"> <input onchange="if (this.value.length<1 && document.getElementById(\'titel\').value.length>0) {alert(\'Achtung! Speichern nur mit Beschreibung moeglich!\');this.focus();};" type="text" id="beschreibung" name="beschreibung" size="20" maxlength="32" value=""  /> </td>'.$this->crlf;
 			
@@ -909,6 +910,7 @@ class wochenplan extends basis_db
 			//Pruefen ob die erweiterte Reservierungsrechte vorhanden sind
 			if($rechte->isBerechtigt('lehre/reservierung', null, 'sui'))
 			{
+				$check_all_checkbox='';
 				//Lektor
 				echo '<td>'.$p->t('lvplan/lektor').':</td>
 					  <td><SELECT name="user_uid">'.$this->crlf;
@@ -1010,6 +1012,8 @@ class wochenplan extends basis_db
 					}
 				}
 				echo '</SELECT></td>'.$this->crlf;
+				echo '<td><input type="checkbox" name="check_all" onclick="toggle_checkboxes(this);" /> alle auswählen</td>'.$this->crlf;
+				echo '</tr><tr>';
 				
 			}
 			else
