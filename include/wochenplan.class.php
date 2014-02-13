@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2007 Technikum-Wien
+/* Copyright (C) 2007 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -534,7 +534,7 @@ class wochenplan extends basis_db
 				echo '		&nbsp;&nbsp;<img class="lvplanbutton" src="../../../skin/images/right_lvplan.png" title="'.$next_ort->ort_kurzbz.'">&nbsp;&nbsp;'.$this->crlf;
 				echo '		</a>'.$this->crlf;
 			}
-			echo '	</p>';
+			echo '	</p></form>';
 			$link_parameter='&ort_kurzbz='.$this->ort_kurzbz;
 		}
 		echo '	<p style="color:grey; font-size:17px; vertical-align:center; margin-bottom:0px;" align="center">';
@@ -898,7 +898,8 @@ class wochenplan extends basis_db
 		echo '	</tbody></table>'.$this->crlf;
 		if ($raumres && $this->type=='ort' && ($datum>=$datum_now && $datum>=$datum_res_lektor_start && $datum_mon<=$datum_res_lektor_ende))
 		{
-			echo '<table><tr><br>';
+			echo '<table><tr><td>alle auswählen:</td><td colspan="10"><input type="checkbox" name="check_all" onclick="toggle_checkboxes(this);" /></td></tr>
+				<tr><br>';
 			echo '	<td>'.$p->t('global/titel').':</td><td><input onchange="if (this.value.length>0 && document.getElementById(\'beschreibung\').value.length<1) {document.getElementById(\'beschreibung\').value=document.getElementById(\'titel\').value;document.getElementById(\'beschreibung\').focus();};" type="text" id="titel"  name="titel" size="10" maxlength="10" value="" /></td> '.$this->crlf;
 			echo '	<td>'.$p->t('global/beschreibung').':</td><td colspan="6"> <input onchange="if (this.value.length<1 && document.getElementById(\'titel\').value.length>0) {alert(\'Achtung! Speichern nur mit Beschreibung moeglich!\');this.focus();};" type="text" id="beschreibung" name="beschreibung" size="20" maxlength="32" value=""  /> </td>'.$this->crlf;
 			
@@ -948,7 +949,7 @@ class wochenplan extends basis_db
 				//Semester
 				echo '<td>'.$p->t('global/semester').':</td>
 					<td>
-					<SELECT name="semester" />
+					<SELECT name="semester">
 						<OPTION value="">*</OPTION>
 						<OPTION value="1">1</OPTION>
 						<OPTION value="2">2</OPTION>
@@ -959,13 +960,13 @@ class wochenplan extends basis_db
 						<OPTION value="7">7</OPTION>
 						<OPTION value="8">8</OPTION>
 					</SELECT>
-					<td>
+					</td>
 					'.$this->crlf;
 				
 				//Verband
 				echo '<td>'.$p->t('global/verband').':</td>
 					<td>
-					<SELECT name="verband" />
+					<SELECT name="verband">
 						<OPTION value="">*</OPTION>
 						<OPTION value="A">A</OPTION>
 						<OPTION value="B">B</OPTION>
@@ -979,7 +980,7 @@ class wochenplan extends basis_db
 				//Gruppe
 				echo '<td>'.$p->t('global/gruppe').':</td>
 					<td>
-					<SELECT name="gruppe" />
+					<SELECT name="gruppe">
 						<OPTION value="">*</OPTION>
 						<OPTION value="1">1</OPTION>
 						<OPTION value="2">2</OPTION>
