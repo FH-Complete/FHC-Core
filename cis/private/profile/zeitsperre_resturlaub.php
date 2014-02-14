@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2006 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -274,11 +274,11 @@ if(isset($_GET['type']) && ($_GET['type']=='edit_sperre' || $_GET['type']=='new_
 		$zeitsperre->insertvon = $uid;
 	}
 
-	if(!$error && $zeitsperre->freigabeamum!='')
+/*	if(!$error && $zeitsperre->freigabeamum!='')
 	{
 		$error = true;
 		$error_msg.=$p->t('zeitsperre/urlaubKannNichtMehrEditiertWerden');
-	}
+	} */
 	if(!$error && $_POST['zeitsperretyp_kurzbz']=='Urlaub')
 	{
 		if($zeitsperre->zeitsperre_id!='')
@@ -417,10 +417,10 @@ if(count($zeit->result)>0)
 							<td>".(isset($row_vertretung->kurzbz)?$row_vertretung->kurzbz:'')."</td>
 							<td>".(isset($erreichbarkeit_arr[$row->erreichbarkeit])?$erreichbarkeit_arr[$row->erreichbarkeit]:'')."</td>
 							<td align='center'>".($row->freigabeamum!=''?'Ja':'')."</td>";
+		$content_table.="<td><a href='$PHP_SELF?type=edit&id=$row->zeitsperre_id' class='Item'>".$p->t('zeitsperre/edit')."</a></td>";
 		if($row->freigabeamum=='' || $row->zeitsperretyp_kurzbz!='Urlaub')
 		{
-			$content_table.="<td><a href='$PHP_SELF?type=edit&id=$row->zeitsperre_id' class='Item'>".$p->t('zeitsperre/edit')."</a></td>
-							 <td><a href='$PHP_SELF?type=delete_sperre&id=$row->zeitsperre_id' onclick='return conf_del()' class='Item'>".$p->t('zeitsperre/loeschen')."</a></td>";
+			$content_table.="\n<td><a href='$PHP_SELF?type=delete_sperre&id=$row->zeitsperre_id' onclick='return conf_del()' class='Item'>".$p->t('zeitsperre/loeschen')."</a></td>";
 		}
 		$content_table.="</tr>";
 	}
@@ -449,11 +449,25 @@ if(isset($_GET['type']) && $_GET['type']=='edit')
 		die("<span class='error'>".$p->t('global/fehlerBeiDerParameteruebergabe')."</span>");
 	}
 }
+
+if($zeitsperre->freigabeamum!='' && $zeitsperre->zeitsperretyp_kurzbz=='Urlaub')
+{
+	$readonly=' readonly="readonly"';	//für Textfelder
+	$disabled=' disabled';				//für select-options
+	$style=' style="border: 1px solid #999; color: #999;"';	//disabled-Optik
+}
+else
+{
+	$readonly='';
+	$disabled='';
+	$style='';
+}
+
 //formular zum editieren und neu anlegen der zeitsperren
 $content_form='';
 $content_form.= '<form method="POST" action="'.$action.'" onsubmit="return checkdatum()">';
 $content_form.= "<table>\n";
-$content_form.= '<tr><td>'.$p->t('zeitsperre/grund').'</td><td><SELECT name="zeitsperretyp_kurzbz">';
+$content_form.= '<tr><td>'.$p->t('zeitsperre/grund').'</td><td><SELECT name="zeitsperretyp_kurzbz"'.$style.'>';
 //dropdown fuer zeitsperretyp
 $qry = "SELECT * FROM campus.tbl_zeitsperretyp ORDER BY zeitsperretyp_kurzbz";
 if($result = $db->db_query($qry))
@@ -463,20 +477,20 @@ if($result = $db->db_query($qry))
 		if($zeitsperre->zeitsperretyp_kurzbz == $row->zeitsperretyp_kurzbz)
 			$content_form.= "<OPTION value='$row->zeitsperretyp_kurzbz' selected>$row->zeitsperretyp_kurzbz - $row->beschreibung</OPTION>";
 		else
-			$content_form.= "<OPTION value='$row->zeitsperretyp_kurzbz'>$row->zeitsperretyp_kurzbz - $row->beschreibung</OPTION>";
+			$content_form.= "<OPTION value='$row->zeitsperretyp_kurzbz'$disabled>$row->zeitsperretyp_kurzbz - $row->beschreibung</OPTION>";
 	}
 }
 $content_form.= '</SELECT>';
-$content_form.= '<tr><td>'.$p->t('global/bezeichnung').'</td><td><input type="text" name="bezeichnung" maxlength="32" value="'.$zeitsperre->bezeichnung.'"></td></tr>';
-$content_form.= '<tr><td>'.$p->t('global/von').'</td><td><input type="text" size="10" maxlength="10" name="vondatum" id="vondatum" value="'.($zeitsperre->vondatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->vondatum)):(!isset($_POST['vondatum'])?date('d.m.Y'):$_POST['vondatum'])).'"> ';
+$content_form.= '<tr><td>'.$p->t('global/bezeichnung').'</td><td><input'.$style.' type="text" name="bezeichnung" maxlength="32" value="'.$zeitsperre->bezeichnung.'"'.$readonly.'></td></tr>';
+$content_form.= '<tr><td>'.$p->t('global/von').'</td><td><input'.$style.' type="text" size="10" maxlength="10" name="vondatum" id="vondatum" value="'.($zeitsperre->vondatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->vondatum)):(!isset($_POST['vondatum'])?date('d.m.Y'):$_POST['vondatum'])).'"'.$readonly.'> ';
 //dropdown fuer vonstunde
 $content_form.= $p->t('zeitsperre/stundeInklusive');
 
-$content_form.= "<SELECT name='vonstunde'>\n";
+$content_form.= "<SELECT name='vonstunde'$style>\n";
 if($zeitsperre->vonstunde=='')
 	$content_form.= "<OPTION value='' selectd>*</OPTION>\n";
 else
-	$content_form.= "<OPTION value=''>*</OPTION>\n";
+	$content_form.= "<OPTION value=''$disabled>*</OPTION>\n";
 
 for($i=0;$i<$num_rows_stunde;$i++)
 {
@@ -485,20 +499,20 @@ for($i=0;$i<$num_rows_stunde;$i++)
 	if($zeitsperre->vonstunde==$row->stunde)
 		$content_form.= "<OPTION value='$row->stunde' selected>$row->stunde (".date('H:i',strtotime($row->beginn)).' - '.date('H:i',strtotime($row->ende))." Uhr)</OPTION>\n";
 	else
-		$content_form.= "<OPTION value='$row->stunde'>$row->stunde (".date('H:i',strtotime($row->beginn)).' - '.date('H:i',strtotime($row->ende))." Uhr)</OPTION>\n";
+		$content_form.= "<OPTION value='$row->stunde'$disabled>$row->stunde (".date('H:i',strtotime($row->beginn)).' - '.date('H:i',strtotime($row->ende))." Uhr)</OPTION>\n";
 }
 
 $content_form.= "</SELECT></td></tr>";
 
-$content_form.= '<tr><td>'.$p->t('global/bis').'</td><td><input type="text" size="10" maxlength="10" name="bisdatum" id="bisdatum" value="'.($zeitsperre->bisdatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->bisdatum)):(!isset($_POST['bisdatum'])?date('d.m.Y'):$_POST['bisdatum'])).'"> ';
+$content_form.= '<tr><td>'.$p->t('global/bis').'</td><td><input'.$style.' type="text" size="10" maxlength="10" name="bisdatum" id="bisdatum" value="'.($zeitsperre->bisdatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->bisdatum)):(!isset($_POST['bisdatum'])?date('d.m.Y'):$_POST['bisdatum'])).'"'.$readonly.'> ';
 //dropdown fuer bisstunde
 $content_form.= $p->t('zeitsperre/stundeInklusive');
-$content_form.= "<SELECT name='bisstunde'>\n";
+$content_form.= "<SELECT name='bisstunde'$style>\n";
 
 if($zeitsperre->bisstunde=='')
 	$content_form.= "<OPTION value='' selectd>*</OPTION>\n";
 else
-	$content_form.= "<OPTION value=''>*</OPTION>\n";
+	$content_form.= "<OPTION value=''$disabled>*</OPTION>\n";
 
 for($i=0;$i<$num_rows_stunde;$i++)
 {
@@ -506,7 +520,7 @@ for($i=0;$i<$num_rows_stunde;$i++)
 	if($zeitsperre->bisstunde==$row->stunde)
 		$content_form.= "<OPTION value='$row->stunde' selected>$row->stunde (".date('H:i',strtotime($row->beginn)).' - '.date('H:i',strtotime($row->ende))." Uhr)</OPTION>\n";
 	else
-		$content_form.= "<OPTION value='$row->stunde'>$row->stunde (".date('H:i',strtotime($row->beginn)).' - '.date('H:i',strtotime($row->ende))." Uhr)</OPTION>\n";
+		$content_form.= "<OPTION value='$row->stunde'$disabled>$row->stunde (".date('H:i',strtotime($row->beginn)).' - '.date('H:i',strtotime($row->ende))." Uhr)</OPTION>\n";
 }
 
 $content_form.= "</SELECT></td></tr>";
