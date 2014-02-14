@@ -132,31 +132,41 @@ class mantis extends basis_db
 			$result = $this->soapClient->__soapCall('mc_issue_get',$params);
 		
 			$this->issue_id = $result->id;			
+			$this->issue_view_state  = new stdclass();
 			$this->issue_view_state->id = $result->view_state->id;	
 			$this->issue_view_state->name = $result->view_state->name;		
 			$this->issue_last_updated = $result->last_updated; 		
+			$this->issue_project = new stdclass();
 			$this->issue_project->id = $result->project->id;			
 			$this->issue_project->name = $result->project->name;		
 			$this->issue_category = $result->category;		
+			$this->issue_priority = new stdclass();
 			$this->issue_priority->id = $result->priority->id;
 			$this->issue_priority->name = $result->priority->name;		
+			$this->issue_severity = new stdclass();
 			$this->issue_severity->id = $result->severity->id;		
 			$this->issue_severity->name = $result->severity->name;		
+			$this->issue_status = new stdclass();
 			$this->issue_status->id = $result->status->id;			
 			$this->issue_status->name = $result->status->name;			
+			$this->issue_reporter = new stdclass();
 			$this->issue_reporter->id = $result->reporter->id;			
 			$this->issue_reporter->name = $result->reporter->name;			
 			$this->issue_reporter->real_name = $result->reporter->real_name;			
 			$this->issue_reporter->email = $result->reporter->email;		
 			$this->issue_summary = $result->summary;		
+			$this->issue_reproducibility = new stdclass();
 			$this->issue_reproducibility->id = $result->reproducibility->id;
 			$this->issue_reproducibility->name = $result->reproducibility->name;	
 			$this->issue_date_submitted = $result->date_submitted;		
 			$this->issue_sponsorship_total = $result->sponsorship_total;	
+			$this->issue_projection = new stdclass();
 			$this->issue_projection->id = $result->projection->id;		
 			$this->issue_projection->name = $result->projection->name;		
+			$this->issue_eta = new stdclass();
 			$this->issue_eta->id = $result->eta->id;		
 			$this->issue_eta->name = $result->eta->name;
+			$this->issue_resolution = new stdclass();
 			$this->issue_resolution->id = $result->resolution->id;	
 			$this->issue_resolution->name = $result->resolution->name;	
 			$this->issue_description = $result->description;	
@@ -164,7 +174,7 @@ class mantis extends basis_db
 			$this->issue_due_date = $result->due_date;	
 			$this->issue_steps_to_reproduce = (isset($result->steps_to_reproduce)?$result->steps_to_reproduce:'');
 			$this->issue_additional_information = (isset($result->additional_information)?$result->additional_information:'');
-		
+			
 			return true;
 		} 
 		catch (SoapFault $fault) 
@@ -189,6 +199,7 @@ class mantis extends basis_db
 			foreach($result as $row)
 			{
 				$obj = new mantis();
+				$obj->issue_project = new stdclass();
 				$obj->issue_project->name = $row->name;
 				$obj->issue_project->id = $row->id;
 

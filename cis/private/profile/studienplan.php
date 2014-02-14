@@ -226,14 +226,40 @@ $lehrveranstaltung->loadLehrveranstaltungStudienplan($studienplan_id);
 $tree = $lehrveranstaltung->getLehrveranstaltungTree();
 
 
+/*
+ Vom Semesterstart des Studierenden ausgehend werden die Studiensemester geladen. 
+ Es werden mindestens so viele Studiensemester geladen wie die Regelstudiendauer des
+ Studienplanes angibt.
+*/
 // Angezeigte Studiensemester holen
 $stsem = new studiensemester();
 $stsem_arr[0]=$studiensemester_start;
 $studiensemester_prev=$studiensemester_start;
-for($i=1;$i<=$studienplan->regelstudiendauer;$i++)
+for($i=1;$i<$studienplan->regelstudiendauer;$i++)
 {
 	$stsem_arr[$i]=$stsem->getNextFrom($studiensemester_prev);
 	$studiensemester_prev=$stsem_arr[$i];
+}
+
+/*
+ Wenn Studierende ueber der Regelstudiendauer hinaus studierenen, wird das aktuelle Studiensemester
+ nicht angezeigt. Deshalb wird in solchen faellen immer bis zum aktuellen+2 Studiensemester geladen.
+*/
+$stsem_obj = new studiensemester();
+$aktornext = $stsem_obj->getaktorNext();
+$stsemToShow = $stsem_obj->jump($aktornext,2);
+
+if(!in_array($stsemToShow,$stsem_arr))
+{
+	for($i=count($stsem_arr);$i<50;$i++)
+	{
+		$stsem_arr[$i]=$stsem->getNextFrom($studiensemester_prev);
+		$studiensemester_prev=$stsem_arr[$i];
+		if($stsemToShow==$studiensemester_prev)
+		{
+			break;
+		}
+	}
 }
 
 // Noten des Studierenden holen
@@ -272,20 +298,20 @@ echo '<h1>'.$p->t('studienplan/studienplan').": $studienplan->bezeichnung ($stud
 
 echo '<table style="border: 1px solid black">
 	<thead>
-	<tr>
+	<tr valign="top">
 		<th>'.$p->t('global/lehrveranstaltung').'</th>
 		<th>'.$p->t('studienplan/ects').'</th>
 		<th>'.$p->t('studienplan/status').'</th>';
 
 foreach($stsem_arr as $stsem)
 {
-	echo '<th>'.$stsem;
+	echo '<th>';
 
+	echo $stsem;
 	$konto = new konto();
 	$cp = $konto->getCreditPoints($uid, $stsem);
 	if($cp!==false)
-		echo '<img src="../../../skin/images/information.png" title="'.$p->t('studienplan/reduzierteCP',array($cp)).'" />';
-
+		echo '<span  title="'.$p->t('studienplan/reduzierteCP',array($cp)).'" ><br><img src="../../../skin/images/information.png" alt="Information"/></span>';
 	echo '</th>';
 }
 echo '
@@ -454,12 +480,12 @@ function drawTree($tree, $depth)
 						$tdclass[]='angebot';
 						if($angemeldet)
 						{
-							$tdinhalt.= '<a href="#" onclick="OpenAnmeldung(\''.$row_tree->lehrveranstaltung_id.'\',\''.$stsem.'\'); return false;"><img src="../../../skin/images/ok.png" height="12px" title="angemeldet" /></a>';
+							$tdinhalt.= '<a href="#" onclick="OpenAnmeldung(\''.$row_tree->lehrveranstaltung_id.'\',\''.$stsem.'\'); return false;"><img src="../../../skin/images/anmelden.png" title="angemeldet" /></a>';
 						}
 						else
 						{
 							if($anmeldungmoeglich)		
-								$tdinhalt.= '<a href="#" onclick="OpenAnmeldung(\''.$row_tree->lehrveranstaltung_id.'\',\''.$stsem.'\'); return false;"><img src="../../../skin/images/plus.png" title="'.$p->t('studienplan/anmelden').'" height="15px" /></a>';
+								$tdinhalt.= '<a href="#" onclick="OpenAnmeldung(\''.$row_tree->lehrveranstaltung_id.'\',\''.$stsem.'\'); return false;"><img src="../../../skin/images/anmelden.png" title="'.$p->t('studienplan/anmelden').'" height="15px" /></a>';
 							else
 								$tdinhalt.= '<span title="'.$anmeldeinformation.'">-</a>';
 
@@ -500,6 +526,10 @@ echo '<br><br>'.$p->t('studienplan/legende').':<br>
 <tr>
 	<td><span class="angebot">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td>
 	<td>'.$p->t('studienplan/legendeLVwirdAngeboten').'</td>
+</tr>
+<tr>
+	<td align="center"><img src="../../../skin/images/anmelden.png"></td>
+	<td>'.$p->t('studienplan/Anmeldung').'</td>
 </tr>
 <tr>
 	<td align="center"><img src="../../../skin/images/not-available.png"></td>

@@ -773,7 +773,7 @@ function showLVTree(data)
 			},
 			grid: {
 				columns: [
-					{width: 260, header: "Lehrveranstaltung", value: "bezeichnung", source: "metadata"},
+					{width: 250, header: "Lehrveranstaltung", value: "bezeichnung", source: "metadata"},
 					{width: 50, header: "ECTS", value: "ects", source: "metadata"},
 					{width: 80, header: "Lehrform", value: "lehrform_kurzbz", source: "metadata"},
 					{width: 80, header: "Semester", value: "semester", source: "metadata"},
