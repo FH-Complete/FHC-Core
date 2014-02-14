@@ -85,7 +85,7 @@ else
 	$nachname=$db->db_result($result,0,'"nachname"');
 	$vornamen=$db->db_result($result,0,'"vorname"');
 }
-$sql_query="SELECT studiengang_kz, kurzbz, kurzbzlang, bezeichnung, typ FROM public.tbl_studiengang WHERE aktiv ORDER BY typ, kurzbz";
+$sql_query="SELECT studiengang_kz, kurzbz, kurzbzlang, bezeichnung, typ, english FROM public.tbl_studiengang WHERE aktiv ORDER BY typ, kurzbz";
 $result_stg=$db->db_query($sql_query);
 if(!$result_stg)
 	die ("Studiengang not found!");	
@@ -271,14 +271,14 @@ $(document).ready(function()
 				for ($i=0;$i<$num_rows;$i++)
 				{
 					$row=$db->db_fetch_object ($result_stg, $i);
-					echo '<option value="'.$row->studiengang_kz.'">'.strtoupper($row->typ.$row->kurzbz)." ( $row->kurzbzlang - $row->bezeichnung )</option>";
+					echo '<option value="'.$row->studiengang_kz.'">'.strtoupper($row->typ.$row->kurzbz).' ('.($sprache=='English' && $row->english!=''?$row->english:$row->bezeichnung).')</option>';
 				}
 				?>
 			</select>
 		</td>
 		<td valign="middle">
 			<select name="sem">
-			<option value="01"><?php echo $p->t('lvplan/sem');?></option>
+			<option value="0"><?php echo $p->t('lvplan/sem');?></option>
 			<option value="1">1</option>
 			<option value="2">2</option>
 			<option value="3">3</option>
@@ -334,7 +334,7 @@ $(document).ready(function()
 				for ($i=0;$i<$num_rows;$i++)
 				{
 					$row=$db->db_fetch_object ($result_stg, $i);
-					echo '<option value="'.$row->studiengang_kz.'">'.strtoupper($row->typ.$row->kurzbz)." ( $row->kurzbzlang - $row->bezeichnung )</option>";
+					echo '<option value="'.$row->studiengang_kz.'">'.strtoupper($row->typ.$row->kurzbz).' ('.($sprache=='English' && $row->english!=''?$row->english:$row->bezeichnung).')</option>';
 				}
 				?>
 			</select>

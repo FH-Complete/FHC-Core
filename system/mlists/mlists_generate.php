@@ -525,6 +525,98 @@ WHERE
 		$error_msg.=$db->db_last_error();
 	
 	
+	// ***************************
+	// TW_STD_M abgleichen. Alle maennlichen Studenten
+    flush();
+    setGeneriert('TW_STD_M');
+    echo 'TW_STD_M wird abgeglichen!<br>';
+
+    //Abbrecher bleiben noch 3 Wochen im Verteiler
+    //andere inaktive noch fuer 20 Wochen
+    //damit im CIS die Menuepunkte fuer Studierende richtig angezeigt werden    
+	$sql_query="DELETE FROM public.tbl_benutzergruppe 
+				WHERE UPPER(gruppe_kurzbz)='TW_STD_M'	
+				AND uid not in 
+					(SELECT uid FROM campus.vw_student WHERE aktiv AND geschlecht='m'
+					UNION
+					SELECT uid FROM campus.vw_student WHERE aktiv=false AND geschlecht='m' AND get_rolle_prestudent(vw_student.prestudent_id, null)='Abbrecher' AND updateaktivam>now()-'3 weeks'::interval
+					UNION
+					SELECT uid FROM campus.vw_student WHERE aktiv=false AND geschlecht='m' AND get_rolle_prestudent(vw_student.prestudent_id, null)!='Abbrecher' AND updateaktivam>now()-'20 weeks'::interval
+				)";
+	if($result = $db->db_query($sql_query))
+	{
+		echo $db->db_affected_rows($result).' Eintraege entfernt<br>';
+	}
+	else
+	{
+		$error_msg.=$db->db_last_error();
+	}
+	
+	// Studenten holen die nicht im Verteiler sind
+	$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, insertamum, insertvon) 
+				SELECT uid,'TW_STD_M',now(),'mlists_generate' 
+				FROM campus.vw_student 
+				WHERE (aktiv AND geschlecht='m'
+						OR 
+						(aktiv=false AND geschlecht='m' AND get_rolle_prestudent(vw_student.prestudent_id, null)='Abbrecher' AND updateaktivam>now()-'3 weeks'::interval)
+						OR
+						(aktiv=false AND geschlecht='m' AND get_rolle_prestudent(vw_student.prestudent_id, null)!='Abbrecher' AND updateaktivam>now()-'20 weeks'::interval))
+				AND uid NOT in(SELECT uid FROM public.tbl_benutzergruppe 
+								WHERE UPPER(gruppe_kurzbz)='TW_STD_M')";
+	if($result = $db->db_query($sql_query))
+	{
+		echo $db->db_affected_rows($result).' Eintraege hinzugefuegt<br>';
+	}
+	else
+		$error_msg.=$db->db_last_error();
+		
+		
+	// ***************************
+	// TW_STD_W abgleichen. Alle weiblichen Studentinnen
+    flush();
+    setGeneriert('TW_STD_W');
+    echo 'TW_STD_W wird abgeglichen!<br>';
+
+    //Abbrecher bleiben noch 3 Wochen im Verteiler
+    //andere inaktive noch fuer 20 Wochen
+    //damit im CIS die Menuepunkte fuer Studierende richtig angezeigt werden    
+	$sql_query="DELETE FROM public.tbl_benutzergruppe 
+				WHERE UPPER(gruppe_kurzbz)='TW_STD_W'	
+				AND uid not in 
+					(SELECT uid FROM campus.vw_student WHERE aktiv AND geschlecht='w'
+					UNION
+					SELECT uid FROM campus.vw_student WHERE aktiv=false AND geschlecht='w' AND get_rolle_prestudent(vw_student.prestudent_id, null)='Abbrecher' AND updateaktivam>now()-'3 weeks'::interval
+					UNION
+					SELECT uid FROM campus.vw_student WHERE aktiv=false AND geschlecht='w' AND get_rolle_prestudent(vw_student.prestudent_id, null)!='Abbrecher' AND updateaktivam>now()-'20 weeks'::interval
+				)";
+	if($result = $db->db_query($sql_query))
+	{
+		echo $db->db_affected_rows($result).' Eintraege entfernt<br>';
+	}
+	else
+	{
+		$error_msg.=$db->db_last_error();
+	}
+	
+	// Studenten holen die nicht im Verteiler sind
+	$sql_query="INSERT INTO public.tbl_benutzergruppe (uid, gruppe_kurzbz, insertamum, insertvon) 
+				SELECT uid,'TW_STD_W',now(),'mlists_generate' 
+				FROM campus.vw_student 
+				WHERE (aktiv AND geschlecht='w'
+						OR 
+						(aktiv=false AND geschlecht='w' AND get_rolle_prestudent(vw_student.prestudent_id, null)='Abbrecher' AND updateaktivam>now()-'3 weeks'::interval)
+						OR
+						(aktiv=false AND geschlecht='w' AND get_rolle_prestudent(vw_student.prestudent_id, null)!='Abbrecher' AND updateaktivam>now()-'20 weeks'::interval))
+				AND uid NOT in(SELECT uid FROM public.tbl_benutzergruppe 
+								WHERE UPPER(gruppe_kurzbz)='TW_STD_W')";
+	if($result = $db->db_query($sql_query))
+	{
+		echo $db->db_affected_rows($result).' Eintraege hinzugefuegt<br>';
+	}
+	else
+		$error_msg.=$db->db_last_error();
+		
+	
    	// **************************************************************
 	// Moodle - LektorenVerteiler abgleichen
 	$mlist_name='moodle_lkt';

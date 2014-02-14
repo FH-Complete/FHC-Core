@@ -35,6 +35,7 @@ require_once('../../../include/fachbereich.class.php');
 require_once('../../../include/organisationseinheit.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/sprache.class.php');
+require_once('../../../include/ferien.class.php');
 
 	$sprache = getSprache();
 	$p = new phrasen($sprache);
@@ -171,12 +172,17 @@ echo '
 					echo "<option value='$oe->oe_kurzbz' $selected>$oe->organisationseinheittyp_kurzbz $oe->bezeichnung</option>";
 				}
 			}
-			echo '</SELECT><input style="display:none;" type="Text" name="days" value="'.$days.'"><input type="submit" value="'.$p->t('global/anzeigen').'"></FORM>';
-			echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">'.$p->t('zeitsperre/anzahlTage').' <input type="text" name="days" size="2" maxlength="2" value="'.$days.'"><input type="hidden" name="organisationseinheit" value="'.$organisationseinheit.'"><input type="submit" value="Go"></form>';
+			echo '</SELECT>&nbsp;'.$p->t('zeitsperre/anzahlTage').'<input type="Text" name="days" size="2" maxlength="2" value="'.$days.'"><input type="submit" value="'.$p->t('global/anzeigen').'"></FORM>';
 			echo '<br>';
 		}
+		if($lektor)
+			echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">'.$p->t('zeitsperre/anzahlTage').' <input type="text" name="days" size="2" maxlength="2" value="'.$days.'"><input type="hidden" name="lektor" value="true"><input type="submit" value="Go"></form>';
+		elseif($fix)
+			echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">'.$p->t('zeitsperre/anzahlTage').' <input type="text" name="days" size="2" maxlength="2" value="'.$days.'"><input type="hidden" name="fix" value="true"><input type="submit" value="Go"></form>';
+		elseif(isset($_GET['funktion']) && isset($_GET['stg_kz']))
+			echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">'.$p->t('zeitsperre/anzahlTage').' <input type="text" name="days" size="2" maxlength="2" value="'.$days.'"><input type="hidden" name="funktion" value="'.$funktion.'"><input type="hidden" name="stg_kz" value="'.$stg_kz.'"><input type="submit" value="Go"></form>';
 	echo '
-	<a class="Item" href="'.$export_link.'">Excel</a>
+	<a class="Item" href="'.$export_link.'"><img src="../../../skin/images/xls_icon.png" alt="Icon Excel"> Excel Export</a><br>
 	<TABLE id="zeitsperren">
     <TR>';
     	
@@ -211,13 +217,27 @@ echo '
 					$tag=date('d',$ts);
 					$monat=date('M',$ts);
 					$wt=date('N',$ts);
+		
 					if ($wt==7 || $wt==6)
 						$class=' class="feiertag" ';
 					else
 						$class='';
 					$grund=$zs->getTyp($ts);
 					$erbk=$zs->getErreichbarkeit($ts);
-					echo '<td '.$class.' style="white-space: nowrap;">'.$grund.'<br>'.$erbk.'</td>';
+					$vertretung=$zs->getVertretung($ts);
+					echo '<td '.$class.' style="white-space: nowrap;">'.($grund!=''?'<span title="'.$p->t('zeitsperre/grund').'">'.substr($p->t('zeitsperre/grund'),0,1).'</span>: ':'').$grund;
+					echo '<br>'.($erbk!=''?'<span title="'.$p->t('urlaubstool/erreichbarkeit').'">'.substr($p->t('urlaubstool/erreichbarkeit'),0,1).': ':'').$erbk;
+					echo '<br>'.($erbk!=''?'<span title="'.$p->t('urlaubstool/vertretung').'">'.substr($p->t('urlaubstool/vertretung'),0,1).': ':'');
+					foreach ($vertretung as $vt)
+					{
+						if ($vt!='')
+						{
+							$ma_kurzbz = new mitarbeiter();
+							$ma_kurzbz->load($vt);
+							echo '<a href="index.php?uid='.$ma_kurzbz->uid.'">'.$ma_kurzbz->kurzbz.'</a>&nbsp;';
+						}
+					}
+					echo '</td>';
 				}
 				echo '</tr>';
 			}

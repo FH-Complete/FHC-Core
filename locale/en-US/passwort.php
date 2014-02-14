@@ -1,21 +1,21 @@
 <?php
-$this->phrasen['passwort/Title']='Password Change';
-$this->phrasen['passwort/PasswortAenderFuer']='Password Change for User %s %s ( %s )';
-$this->phrasen['passwort/InfotextPolicy']='Das Passwort muss zumindest 8 Zeichen enthalten, davon mindestens 1 Großbuchstabe,
-1 Kleinbuchstabe und eine Ziffer!<br><br>
-Das Passwort darf keine Leerzeichen und Umlaute enthalten!<br>
-Erlaubte Sonderzeichen sind: -$#[]{}!().,*:;_';
+$this->phrasen['passwort/Title']='Changing password';
+$this->phrasen['passwort/PasswortAenderFuer']='Changing password for User %s %s ( %s )';
+$this->phrasen['passwort/InfotextPolicy']='The password must contain at least 8 characters, 
+of which 1 must be upper case, 1 lower case and 1 a numeral.<br><br>
+The password may not include spaces or umlauts.<br>
+The following special characters are allowed: -$#[]{}!().,*:;_';
 
-$this->phrasen['passwort/AltesPasswort']='old Password';
-$this->phrasen['passwort/NeuesPasswort']='new Password';
-$this->phrasen['passwort/PasswortWiederholung']='new Password';
-$this->phrasen['passwort/PasswortAendern']='change Password';
-$this->phrasen['passwort/MinLaenge']='Das neue Passwort muss mindestens 8 Zeichen lang sein.';
-$this->phrasen['passwort/Grossbuchstabe']='Das neue Passwort muss mindestens einen Grossbuchstaben enthalten.';
-$this->phrasen['passwort/Kleinbuchstabe']='Das neue Passwort muss mindestens einen Kleinbuchstaben enthalten.';
-$this->phrasen['passwort/Ziffer']='Es muss mindestens eine Ziffer vorhanden sein.';
-$this->phrasen['passwort/Leerzeichen']='Es darf kein Leerzeichen im Passwort vorkommen.';
-$this->phrasen['passwort/Umlaute']='Es dürfen keine Umlaute verwendet werden.';
+$this->phrasen['passwort/AltesPasswort']='Old password';
+$this->phrasen['passwort/NeuesPasswort']='New password';
+$this->phrasen['passwort/PasswortWiederholung']='Repeat new password';
+$this->phrasen['passwort/PasswortAendern']='Change password';
+$this->phrasen['passwort/MinLaenge']='The new password must contain at least 8 characters.';
+$this->phrasen['passwort/Grossbuchstabe']='The new password must contain at least 1 upper case character.';
+$this->phrasen['passwort/Kleinbuchstabe']='The new password must contain at least 1 lower case character.';
+$this->phrasen['passwort/Ziffer']='The new password must contain at least 1 numeral character.';
+$this->phrasen['passwort/Leerzeichen']='The password may not include spaces.';
+$this->phrasen['passwort/Umlaute']='The password may not include umlauts.';
 $this->phrasen['passwort/Sonderzeichen']='Bitte verwenden Sie nur erlaubte Sonderzeichen';
 $this->phrasen['passwort/AenderungOK']='Das Passwort wurde erfolgreich geaendert';
 $this->phrasen['passwort/AenderungFehler']='Passwort Änderung fehlgeschlagen:%s';
