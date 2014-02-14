@@ -68,7 +68,7 @@ class zeitsperre extends basis_db
 	{
 		unset($this->result);
 		$this->result=array();
-		$qry = "SELECT tbl_zeitsperre.*, tbl_zeitsperretyp.*, tbl_erreichbarkeit.farbe  AS erreichbarkeit_farbe
+		$qry = "SELECT tbl_zeitsperre.*, tbl_zeitsperretyp.*, tbl_erreichbarkeit.farbe  AS erreichbarkeit_farbe, tbl_erreichbarkeit.beschreibung AS erreichbarkeit_beschreibung
 				FROM (campus.tbl_zeitsperre JOIN campus.tbl_zeitsperretyp USING (zeitsperretyp_kurzbz))
 					LEFT JOIN campus.tbl_erreichbarkeit USING (erreichbarkeit_kurzbz)
 				WHERE mitarbeiter_uid=".$this->db_add_param($uid);
@@ -105,6 +105,7 @@ class zeitsperre extends basis_db
 				$obj->erreichbarkeit = $row->erreichbarkeit_kurzbz;
 				$obj->erreichbarkeit_farbe = $row->erreichbarkeit_farbe;
 				$obj->erreichbarkeit_kurzbz = $row->erreichbarkeit_kurzbz;
+				$obj->erreichbarkeit_beschreibung = $row->erreichbarkeit_beschreibung;
 				$obj->vertretung_uid = $row->vertretung_uid;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
@@ -321,7 +322,7 @@ class zeitsperre extends basis_db
 			$ende=$datum_obj->mktime_fromdate($zs->bisdatum);
 
 			if ($datum>=$beginn && ((int)($datum/60/60/24)<=(int)($ende/60/60/24) || date('Y-m-d', $datum)==date('Y-m-d', $ende)))
-				$typ.=$zs->zeitsperretyp_kurzbz;
+				$typ.=$zs->zeitsperretyp_kurzbz.'&nbsp;&nbsp;';
 		}
 		return $typ;
 	}
@@ -339,9 +340,27 @@ class zeitsperre extends basis_db
 			$beginn=$datum_obj->mktime_fromdate($zs->vondatum);
 			$ende=$datum_obj->mktime_fromdate($zs->bisdatum);
 			if ($datum>=$beginn && ((int)($datum/60/60/24)<=(int)($ende/60/60/24) || date('Y-m-d', $datum)==date('Y-m-d', $ende)))
-				$erbk.=$zs->erreichbarkeit;
+				$erbk.=$zs->erreichbarkeit.'&nbsp;&nbsp;';
 		}
 		return $erbk;
+	}
+	
+	/**
+	 * Liefert die Vertretung der Zeitsperre
+	 * @return array wenn ok, false im Fehlerfall
+	 */
+	public function getVertretung($datum)
+	{
+		$datum_obj=new datum();
+		$vertretung[]='';
+		foreach ($this->result as $zs)
+		{
+			$beginn=$datum_obj->mktime_fromdate($zs->vondatum);
+			$ende=$datum_obj->mktime_fromdate($zs->bisdatum);			
+			if ($datum>=$beginn && ((int)($datum/60/60/24)<=(int)($ende/60/60/24) || date('Y-m-d', $datum)==date('Y-m-d', $ende)))
+				$vertretung[]=$zs->vertretung_uid;
+		}
+		return array_unique($vertretung);
 	}
 	
 	/**

@@ -281,7 +281,7 @@ class wochenplan extends basis_db
 		// Studiengangsdaten ermitteln
 		if ($this->type=='student' || $this->type=='verband')
 		{
-			$sql_query="SELECT bezeichnung, kurzbz, kurzbzlang, typ, UPPER(typ||kurzbz) AS kuerzel FROM public.tbl_studiengang WHERE studiengang_kz=".$this->db_add_param($this->stg_kz);
+			$sql_query="SELECT bezeichnung, kurzbz, kurzbzlang, typ, UPPER(typ||kurzbz) AS kuerzel, english FROM public.tbl_studiengang WHERE studiengang_kz=".$this->db_add_param($this->stg_kz);
 			//echo $sql_query;
 			if(!($this->db_query($sql_query)))
 				die($this->db_last_error());
@@ -291,6 +291,7 @@ class wochenplan extends basis_db
 				$this->stg_kurzbz = $row->typ.$row->kurzbz;
 				$this->stg_kurzbzlang = $row->kurzbzlang;
 				$this->stg_kuerzel = $row->kuerzel;
+				$this->stg_english = $row->english;
 			}
 		}
 
@@ -427,10 +428,10 @@ class wochenplan extends basis_db
 		echo '		<TD style="padding-bottom: 5px;" valign="top">'.$this->crlf;
 		echo '			<P valign="top">';
 		if ($this->type=='student' || $this->type=='lektor')
-			echo '<strong>Person: </strong>'.$this->pers_titelpre.' '.$this->pers_vorname.' '.$this->pers_nachname.' '.$this->pers_titelpost.' - '.$this->pers_uid.'<br>';
+			echo '<strong>'.$p->t('global/person').': </strong>'.$this->pers_titelpre.' '.$this->pers_vorname.' '.$this->pers_nachname.' '.$this->pers_titelpost.' - '.$this->pers_uid.'<br>';
 		if ($this->type=='student' || $this->type=='verband')
 		{
-			echo '<strong>'.$p->t('global/studiengang').': </strong>'.$this->stg_kuerzel.' - '.$this->stg_bez.'<br>';
+			echo '<strong>'.$p->t('global/studiengang').': </strong>'.$this->stg_kuerzel.' - '.($sprache=='English' && $this->stg_english!=''?$this->stg_english:$this->stg_bez).'<br>';
 			echo $p->t('global/semester').': '.$this->sem.'<br>';
 			if ($this->ver!='0' && $this->ver!='' && $this->ver!=null)
 				echo $p->t('global/verband').': '.$this->ver.'<br>';
