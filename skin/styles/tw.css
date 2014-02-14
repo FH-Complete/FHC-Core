@@ -931,13 +931,13 @@ ul.menu
 /* LV Angebot im Studienplan */
 .angebot
 {
-	border: 3px solid #edd400;
+	border: 1px solid #edd400;
 }
 
 /* Empfehlung im Studienplan */
 .empfehlung 
 {
-	border: 3px solid green;
+	border: 1px solid green;
 }
 
 /*
