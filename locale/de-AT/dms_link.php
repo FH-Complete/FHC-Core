@@ -12,6 +12,7 @@ $this->phrasen['dms_link/abgabetoolStudentHandbuch']='27'; //Abgabetool Handbuch
 $this->phrasen['dms_link/iconPDF']='46'; //PDF Icon
 $this->phrasen['dms_link/bedienungsanleitungMailverteiler']='1474'; //Bedienungsanleitung Mailverteiler
 $this->phrasen['dms_link/berechtigungskonzeptMailverteiler']='1475'; //Berechtigungskonzept Mailverteiler
+$this->phrasen['dms_link/handbuchUrlaubsverwaltung']='759'; //Handbuch Urlaubsverwaltung -> Leer lassen, falls es keines gibt
 
 // Content IDs (=Englisch)
 $this->phrasen['dms_link/lvPlanFAQ']='5877'; //Hilfe-Link aus dem LV-Plan in die LV-Plan FAQ auf der CIS (CMS-ID)

@@ -32,8 +32,10 @@ require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/zeitsperre.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/sprache.class.php');
+require_once('../../../include/phrasen.class.php');
 
 $sprache = getSprache();
+$p = new phrasen($sprache);
 $sprache_obj = new sprache();
 $sprache_obj->load($sprache);
 $sprache_index=$sprache_obj->index;
@@ -114,13 +116,16 @@ else
 }
 
 //EXPORT
-header("Content-type: application/vnd.ms-excel");
+header("Content-type: text/csv; charset=utf-9");
+header('Content-Encoding: UTF-8');
 header('Content-Disposition: attachment; filename="Zeitsperren.csv"');
 header("Expires: 0");
 header("Cache-Control: must-revalidate, post-check=0,pre-check=0");
 header("Pragma: public");
+//echo "\xEF\xBB\xBF"; // UTF-8 BOM
 
-echo '"Datum"'.$trenn;
+
+echo '"'.$p->t('global/datum').'"'.$trenn;
 for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
 {
 	$tag=date('d',$ts);
@@ -131,16 +136,20 @@ for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
 $zs=new zeitsperre();
 foreach ($mitarbeiter as $ma)
 {
-	$zs->getzeitsperren($ma->uid, false);
-	echo $crlf.'"'.$ma->nachname.' '.$ma->vorname.'"'.$trenn;
-	for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
+	if($ma->aktiv)
 	{
-		$tag=date('d',$ts);
-		$monat=date('M',$ts);
-		$wt=date('N',$ts);
-		$grund=$zs->getTyp($ts);
-		$erbk=$zs->getErreichbarkeit($ts);
-		echo '"'.$grund.' - '.$erbk.'"'.$trenn;
+		$zs->getzeitsperren($ma->uid, false);
+		echo $crlf.'"'.$ma->nachname.' '.$ma->vorname.'"'.$trenn;
+		for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
+		{
+			$tag=date('d',$ts);
+			$monat=date('M',$ts);
+			$wt=date('N',$ts);
+			$grund=$zs->getTyp($ts);
+			$erbk=$zs->getErreichbarkeit($ts);
+			$vertretung=$zs->getVertretung($ts);
+			echo '"'.html_entity_decode($grund).' - '.html_entity_decode($erbk).'"'.$trenn;
+		}
 	}
 }
 ?>
