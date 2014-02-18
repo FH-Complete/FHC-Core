@@ -23,4 +23,16 @@ $this->phrasen['urlaubstool/erreichbar']='erreichbar';
 $this->phrasen['urlaubstool/eintragungLoeschen']='Eintragung löschen';
 $this->phrasen['urlaubstool/freigegebenDurchAm']='Freigegeben durch %s am';
 $this->phrasen['urlaubstool/freigegebenDurch']='Freigegeben durch %s';
+$this->phrasen['urlaubstool/vertretungsmailWurdeVersandt']='Informationsmail zur Urlaubsvertretung wurde an %s versandt';
+$this->phrasen['urlaubstool/fehlerBeimSendenVertretungAufgetreten']='Fehler beim Senden des Informationsmails zur Urlaubsvertretung an %s';
+$this->phrasen['urlaubstool/keineVertretungEingetragen']='Sie haben keine Vertretung ausgewählt. Falls Sie eine Vertretung eintragen möchten, tun Sie dies bitte unter "Meine Zeitsperren".';
+$this->phrasen['urlaubstool/mailtextVertretung']=html_entity_decode('Dies ist eine automatische Mail zu Ihrer Information.&#13;%s %s hat neuen Urlaub eingetragen und Sie wurden als Vertretung angegeben.&#13;&#13;%s',ENT_COMPAT,'UTF-8');
+$this->phrasen['urlaubstool/diesIstEineAutomatischeMail']='Dies ist eine automatische Mail.';
+$this->phrasen['urlaubstool/xHatNeuenUrlaubEingetragen']='%s %s hat neuen Urlaub eingetragen';
+$this->phrasen['urlaubstool/von']='Von';
+$this->phrasen['urlaubstool/bis']='bis';
+$this->phrasen['urlaubstool/handbuchUrlaubserfassung']='Handbuch Urlaubserfassung';
+$this->phrasen['urlaubstool/meineZeitsperren']='Meine Zeitsperren';
+$this->phrasen['urlaubstool/sieKoennenDiesenUnterFolgenderAdresseFreigeben']='Sie können diesen unter folgender Adresse freigeben';
+$this->phrasen['urlaubstool/freigabeansuchenUrlaub']='Freigabeansuchen Urlaub';
 ?>

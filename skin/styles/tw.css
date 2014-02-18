@@ -781,10 +781,6 @@ a:hover img.screenshot_boxshadow
 	border-top: 1px solid gray;
 	border-bottom: 1px solid gray;
 }
-.error
-{
-	color: #ff0000;
-}
 .ok
 {
 	color: green;
