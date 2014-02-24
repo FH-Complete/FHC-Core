@@ -1033,6 +1033,171 @@ if(!$result = @$db->db_query("SELECT oe_kurzbz FROM public.tbl_bankverbindung LI
 		echo 'public.tbl_bankverbindung: Spalte oe_kurzbz hinzugefügt';
 }
 
+// Pruefungsverwaltung
+if(!$result = @$db->db_query("SELECT pruefung_id FROM campus.tbl_pruefung LIMIT 1;"))
+{
+	$qry = "
+	CREATE TABLE campus.tbl_pruefungsfenster
+	(
+		pruefungsfenster_id bigint NOT NULL,
+		studiensemester_kurzbz varchar(16),
+		oe_kurzbz varchar(32),
+		start date,
+		ende date
+	);
+	
+	CREATE SEQUENCE campus.seq_pruefungsfenster_pruefungsfenster_id
+		 INCREMENT BY 1
+		 NO MAXVALUE
+		 NO MINVALUE
+		 CACHE 1;
+
+	ALTER TABLE campus.tbl_pruefungsfenster ADD CONSTRAINT pk_pruefungsfenster PRIMARY KEY (pruefungsfenster_id);
+	ALTER TABLE campus.tbl_pruefungsfenster ALTER COLUMN pruefungsfenster_id SET DEFAULT nextval('campus.seq_pruefungsfenster_pruefungsfenster_id');
+
+	ALTER TABLE campus.tbl_pruefungsfenster ADD CONSTRAINT fk_pruefungsfenster_studiensemester_studiensemester_kurzbz FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester(studiensemester_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;
+
+	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_pruefungsfenster TO web;
+	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_pruefungsfenster TO vilesci;
+	GRANT SELECT, UPDATE ON campus.seq_pruefungsfenster_pruefungsfenster_id TO vilesci;
+	GRANT SELECT, UPDATE ON campus.seq_pruefungsfenster_pruefungsfenster_id TO web;
+		
+	CREATE TABLE campus.tbl_pruefung
+	(
+		pruefung_id bigint NOT NULL,
+		mitarbeiter_uid varchar(32),
+		studiensemester_kurzbz varchar(16),
+		pruefungsfenster_id bigint,
+		pruefungstyp_kurzbz varchar(16),
+		titel varchar(256),
+		beschreibung text,
+		methode varchar(64),
+		einzeln boolean NOT NULL DEFAULT false,
+		storniert boolean NOT NULL DEFAULT false,
+		insertvon varchar(32),
+		insertamum timestamp,
+		updatevon varchar(32),
+		updateamum timestamp
+	);
+		
+	CREATE SEQUENCE campus.seq_pruefung_pruefung_id
+		 INCREMENT BY 1
+		 NO MAXVALUE
+		 NO MINVALUE
+		 CACHE 1;
+
+	ALTER TABLE campus.tbl_pruefung ADD CONSTRAINT pk_pruefung PRIMARY KEY (pruefung_id);
+	ALTER TABLE campus.tbl_pruefung ALTER COLUMN pruefung_id SET DEFAULT nextval('campus.seq_pruefung_pruefung_id');
+
+	ALTER TABLE campus.tbl_pruefung ADD CONSTRAINT fk_pruefung_studiensemester_studiensemester_kurzbz FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester(studiensemester_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;
+	ALTER TABLE campus.tbl_pruefung ADD CONSTRAINT fk_pruefung_mitarbeiter_mitarbeiter_uid FOREIGN KEY (mitarbeiter_uid) REFERENCES public.tbl_mitarbeiter(mitarbeiter_uid) ON DELETE CASCADE ON UPDATE CASCADE;
+	ALTER TABLE campus.tbl_pruefung ADD CONSTRAINT fk_pruefung_pruefungsfenster_pruefungsfenster_id FOREIGN KEY (pruefungsfenster_id) REFERENCES campus.tbl_pruefungsfenster(pruefungsfenster_id) ON DELETE CASCADE ON UPDATE CASCADE;
+	ALTER TABLE campus.tbl_pruefung ADD CONSTRAINT fk_pruefung_pruefungstyp_pruefungstyp_kurzbz FOREIGN KEY (pruefungstyp_kurzbz) REFERENCES lehre.tbl_pruefungstyp(pruefungstyp_kurzbz) ON DELETE CASCADE ON UPDATE CASCADE;
+	
+	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_pruefung TO web;
+	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_pruefung TO vilesci;
+	GRANT SELECT, UPDATE ON campus.seq_pruefung_pruefung_id TO web;
+	GRANT SELECT, UPDATE ON campus.seq_pruefung_pruefung_id TO vilesci;
+	
+	CREATE TABLE campus.tbl_pruefungstermin
+	(
+		pruefungstermin_id bigint NOT NULL,
+		pruefung_id bigint NOT NULL,
+		von timestamp,
+		bis timestamp,
+		teilnehmer_max smallint,
+		teilnehmer_min smallint
+	);
+	
+	CREATE SEQUENCE campus.seq_pruefungstermin_pruefungstermin_id
+		 INCREMENT BY 1
+		 NO MAXVALUE
+		 NO MINVALUE
+		 CACHE 1;
+
+	ALTER TABLE campus.tbl_pruefungstermin ADD CONSTRAINT pk_pruefungstermin PRIMARY KEY (pruefungstermin_id);
+	ALTER TABLE campus.tbl_pruefungstermin ALTER COLUMN pruefungstermin_id SET DEFAULT nextval('campus.seq_pruefungstermin_pruefungstermin_id');
+	ALTER TABLE campus.tbl_pruefungstermin ADD CONSTRAINT fk_pruefungstermin_pruefung_pruefung_id FOREIGN KEY (pruefung_id) REFERENCES campus.tbl_pruefung(pruefung_id) ON DELETE CASCADE ON UPDATE CASCADE;
+	
+	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_pruefungstermin TO web;
+	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_pruefungstermin TO vilesci;
+	GRANT SELECT, UPDATE ON campus.seq_pruefungstermin_pruefungstermin_id TO web;
+	GRANT SELECT, UPDATE ON campus.seq_pruefungstermin_pruefungstermin_id TO vilesci;
+	
+	CREATE TABLE campus.tbl_lehrveranstaltung_pruefung
+	(
+		lehrveranstaltung_pruefung_id bigint NOT NULL,
+		lehrveranstaltung_id bigint NOT NULL,
+		pruefung_id bigint NOT NULL
+	);
+	
+	CREATE SEQUENCE campus.seq_lehrveranstaltung_pruefung_lehrveranstaltung_pruefung_id
+		 INCREMENT BY 1
+		 NO MAXVALUE
+		 NO MINVALUE
+		 CACHE 1;
+	
+	ALTER TABLE campus.tbl_lehrveranstaltung_pruefung ADD CONSTRAINT pk_lehrveranstaltung_pruefung PRIMARY KEY (lehrveranstaltung_pruefung_id);
+	ALTER TABLE campus.tbl_lehrveranstaltung_pruefung ALTER COLUMN lehrveranstaltung_pruefung_id SET DEFAULT nextval('campus.seq_lehrveranstaltung_pruefung_lehrveranstaltung_pruefung_id');
+	ALTER TABLE campus.tbl_lehrveranstaltung_pruefung ADD CONSTRAINT fk_lehrveranstaltung_pruefung_lehrveranstaltung_lehrveranstaltung_id FOREIGN KEY (lehrveranstaltung_id) REFERENCES lehre.tbl_lehrveranstaltung(lehrveranstaltung_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE campus.tbl_lehrveranstaltung_pruefung ADD CONSTRAINT fk_lehrveranstaltung_pruefung_pruefung_pruefung_id FOREIGN KEY (pruefung_id) REFERENCES campus.tbl_pruefung(pruefung_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_lehrveranstaltung_pruefung TO web;
+	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_lehrveranstaltung_pruefung TO vilesci;
+	GRANT SELECT, UPDATE ON campus.seq_lehrveranstaltung_pruefung_lehrveranstaltung_pruefung_id TO web;
+	GRANT SELECT, UPDATE ON campus.seq_lehrveranstaltung_pruefung_lehrveranstaltung_pruefung_id TO vilesci;
+	
+	CREATE TABLE campus.tbl_pruefungsstatus
+	(
+		status_kurzbz varchar(32) NOT NULL,
+		bezeichnung varchar(64)
+	);
+	
+	GRANT SELECT ON campus.tbl_lehrveranstaltung_pruefung TO web;
+	GRANT SELECT ON campus.tbl_lehrveranstaltung_pruefung TO vilesci;
+	
+	ALTER TABLE campus.tbl_pruefungsstatus ADD CONSTRAINT pk_pruefungsstatus PRIMARY KEY (status_kurzbz);
+	
+	INSERT INTO campus.tbl_pruefungsstatus (status_kurzbz, bezeichnung) VALUES('angemeldet','angemeldet');
+	INSERT INTO campus.tbl_pruefungsstatus (status_kurzbz, bezeichnung) VALUES('bestaetigt','bestaetigt');
+	INSERT INTO campus.tbl_pruefungsstatus (status_kurzbz, bezeichnung) VALUES('storniert','storniert');
+	
+	CREATE TABLE campus.tbl_pruefungsanmeldung
+	(
+		pruefungsanmeldung_id bigint NOT NULL,
+		uid varchar(32) NOT NULL,
+		pruefungstermin_id bigint NOT NULL,
+		lehrveranstaltung_id bigint NOT NULL,
+		status_kurzbz varchar(32),
+		wuensche text,
+		reihung smallint,
+		kommentar text
+	);
+	
+	CREATE SEQUENCE campus.seq_pruefungsanmeldung_pruefungsanmeldung_id
+		 INCREMENT BY 1
+		 NO MAXVALUE
+		 NO MINVALUE
+		 CACHE 1;
+	
+	ALTER TABLE campus.tbl_pruefungsanmeldung ADD CONSTRAINT pk_pruefungsanmeldung PRIMARY KEY (pruefungsanmeldung_id);
+	ALTER TABLE campus.tbl_pruefungsanmeldung ALTER COLUMN pruefungsanmeldung_id SET DEFAULT nextval('campus.seq_pruefungsanmeldung_pruefungsanmeldung_id');
+	ALTER TABLE campus.tbl_pruefungsanmeldung ADD CONSTRAINT fk_pruefungsanmeldung_benutzer_uid FOREIGN KEY (uid) REFERENCES public.tbl_benutzer(uid) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE campus.tbl_pruefungsanmeldung ADD CONSTRAINT fk_pruefungsanmeldung_lehrveranstaltung_lehrveranstaltung_id FOREIGN KEY (lehrveranstaltung_id) REFERENCES lehre.tbl_lehrveranstaltung(lehrveranstaltung_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE campus.tbl_pruefungsanmeldung ADD CONSTRAINT fk_pruefungsanmeldung_pruefungsstatus_status_kurzbz FOREIGN KEY (status_kurzbz) REFERENCES campus.tbl_pruefungsstatus(status_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	
+	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_pruefungsanmeldung TO web;
+	GRANT SELECT, UPDATE, INSERT, DELETE ON campus.tbl_pruefungsanmeldung TO vilesci;
+	GRANT SELECT, UPDATE ON campus.seq_pruefungsanmeldung_pruefungsanmeldung_id TO web;
+	GRANT SELECT, UPDATE ON campus.seq_pruefungsanmeldung_pruefungsanmeldung_id TO vilesci;
+
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>Pruefungen: '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'Tabellen fuer Pruefungsverwaltung hinzugefügt';
+}
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -1084,6 +1249,7 @@ $tabellen=array(
 	"campus.tbl_legesamtnote"  => array("student_uid","lehreinheit_id","note","benotungsdatum","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_lehre_tools" => array("lehre_tools_id","bezeichnung","kurzbz","basis_url","logo_dms_id"),
 	"campus.tbl_lehre_tools_organisationseinheit" => array("lehre_tools_id","oe_kurzbz","aktiv"),
+	"campus.tbl_lehrveranstaltung_pruefung" => array("lehrveranstaltung_pruefung_id","lehrveranstaltung_id","pruefung_id"),
 	"campus.tbl_lvgesamtnote"  => array("lehrveranstaltung_id","studiensemester_kurzbz","student_uid","note","mitarbeiter_uid","benotungsdatum","freigabedatum","freigabevon_uid","bemerkung","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_lvinfo"  => array("lehrveranstaltung_id","sprache","titel","lehrziele","lehrinhalte","methodik","voraussetzungen","unterlagen","pruefungsordnung","anmerkung","kurzbeschreibung","genehmigt","aktiv","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_news"  => array("news_id","uid","studiengang_kz","fachbereich_kurzbz","semester","betreff","text","datum","verfasser","updateamum","updatevon","insertamum","insertvon","datum_bis","content_id"),
@@ -1091,6 +1257,11 @@ $tabellen=array(
 	"campus.tbl_notenschluesseluebung"  => array("uebung_id","note","punkte"),
 	"campus.tbl_paabgabetyp"  => array("paabgabetyp_kurzbz","bezeichnung"),
 	"campus.tbl_paabgabe"  => array("paabgabe_id","projektarbeit_id","paabgabetyp_kurzbz","fixtermin","datum","kurzbz","abgabedatum", "insertvon","insertamum","updatevon","updateamum"),
+	"campus.tbl_pruefungsfenster" => array("pruefungsfenster_id","studiensemester_kurzbz","oe_kurzbz","start","ende"),
+	"campus.tbl_pruefung" => array("pruefung_id","mitarbeiter_uid","studiensemester_kurzbz","pruefungsfenster_id","pruefungstyp_kurzbz","titel","beschreibung","methode","einzeln","storniert","insertvon","insertamum","updatevon","updateamum"),
+	"campus.tbl_pruefungstermin" => array("pruefungstermin_id","pruefung_id","von","bis","teilnehmer_max","teilnehmer_min"),
+	"campus.tbl_pruefungsanmeldung" => array("pruefungsanmeldung_id","uid","pruefungstermin_id","lehrveranstaltung_id","status_kurzbz","wuensche","reihung","kommentar"),
+	"campus.tbl_pruefungsstatus" => array("status_kurzbz","bezeichnung"),
 	"campus.tbl_reservierung"  => array("reservierung_id","ort_kurzbz","studiengang_kz","uid","stunde","datum","titel","beschreibung","semester","verband","gruppe","gruppe_kurzbz","veranstaltung_id","insertamum","insertvon"),
 	"campus.tbl_resturlaub"  => array("mitarbeiter_uid","resturlaubstage","mehrarbeitsstunden","updateamum","updatevon","insertamum","insertvon","urlaubstageprojahr"),
 	"campus.tbl_studentbeispiel"  => array("student_uid","beispiel_id","vorbereitet","probleme","updateamum","updatevon","insertamum","insertvon"),
