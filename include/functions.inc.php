@@ -882,4 +882,19 @@ function decryptData($value,$key)
 	$decrypttext = mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, $crypttext, MCRYPT_MODE_ECB, $iv);
 	return trim($decrypttext);
 }
+
+function clearHtmlTags($text)
+{
+	$text=mb_str_replace('<br>','\n',$text);
+	$text=mb_str_replace('<br/>','\n',$text);
+	$text=mb_str_replace('<br />','\n',$text);
+
+	$text=mb_str_replace('<ul>\n','',$text);
+	$text=mb_str_replace('<ul>','',$text);
+	$text=mb_str_replace('</ul>','',$text);
+	$text=mb_str_replace('<li>','\n - ',$text);
+	$text=mb_str_replace('</li>','',$text);
+	
+	return $text;
+}
 ?>
