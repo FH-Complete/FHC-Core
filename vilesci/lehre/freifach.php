@@ -41,7 +41,7 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 if(!$rechte->isBerechtigt('lehre/freifach'))
 	die('Sie haben keine Berechtigung fuer diese Seite   <a href="javascript:history.back()">Zur&uuml;ck</a>');
-
+$zuteilung_vorhanden='';
 $stsem_obj = new studiensemester();
 if (isset($_REQUEST["stsem"]))
 	$stsem = $_REQUEST["stsem"];
@@ -82,15 +82,31 @@ if (isset($_REQUEST["grp_in"]) && $gruppe != "")
 			if (isset($_REQUEST["anmeldung_".$u->uid]))
 			{
 				$bg = new benutzergruppe();
-				$bg->uid = $u->uid;
-				$bg->gruppe_kurzbz = $gruppe;
-				$bg->updateamum = null;
-				$bg->updatevon=null;
-				$bg->insertamum = date('Y-m-d H:i:s');
-				$bg->insertvon = $user;
-				$bg->studiensemester_kurzbz = $stsem;
-				$bg->new = true;
-				$bg->save(true);
+				if($bg->load($u->uid, $gruppe))
+				{
+					$bg->delete($u->uid, $gruppe);
+					$bg->uid = $u->uid;
+					$bg->gruppe_kurzbz = $gruppe;
+					$bg->updateamum = null;
+					$bg->updatevon=null;
+					$bg->insertamum = date('Y-m-d H:i:s');
+					$bg->insertvon = $user;
+					$bg->studiensemester_kurzbz = $stsem;
+					$bg->new = true;
+					$bg->save(true);
+				}
+				else
+				{
+					$bg->uid = $u->uid;
+					$bg->gruppe_kurzbz = $gruppe;
+					$bg->updateamum = null;
+					$bg->updatevon=null;
+					$bg->insertamum = date('Y-m-d H:i:s');
+					$bg->insertvon = $user;
+					$bg->studiensemester_kurzbz = $stsem;
+					$bg->new = true;
+					$bg->save(true);
+				}		
 			}
 		}
 	}
@@ -122,6 +138,7 @@ if ($gruppe != "")
 	$gu = new benutzergruppe();
 	if ($gu->load_uids($gruppe, $stsem))
 	{
+		sort($gu->uids);
 		foreach ($gu->uids as $uidliste)
 		{
 			$spezgrp[] = $uidliste->uid;
@@ -153,7 +170,6 @@ function selectAll()
 			checkboxen[i].checked = false;
 	}
 }
-
 </script>
 </head>
 <body class="Background_main">
@@ -199,7 +215,7 @@ function selectAll()
 	echo "<select name='gruppe' onchange='document.auswahl.submit();'>";
 	echo "<option></option>";
 	$grp_obj = new gruppe();
-	if(!$grp_obj->getgruppe('0',$semester,null,true))
+	if(!$grp_obj->getgruppe('0',$semester,null,true,null,true,'gruppe_kurzbz'))
 		echo "$lv_obj->errormsg";
 
 	foreach($grp_obj->result AS $row)
@@ -235,13 +251,17 @@ function selectAll()
 			
 			foreach ($b->uids as $u)
 			{
+				$bg = new benutzergruppe();
+				$bg->load($u->uid, $gruppe);
+				if (($bg->load($u->uid, $gruppe) && $bg->studiensemester_kurzbz!=$stsem))
+						$zuteilung_vorhanden = '<span style="color:blue;"> - StudentIn ist dieser Gruppe im '.$bg->studiensemester_kurzbz.' zugewiesen</span>';
+				else
+					$zuteilung_vorhanden='';
 				if (in_array($u->uid, $spezgrp))
-					echo "<br><input type='checkbox' disabled>".$u->uid." - ".$u->nachname." ".$u->vorname." ".($u->status=='Absolvent'?'(<span style="color:red">'.$u->status.'</span>)':'('.$u->status.')');	
+					echo "<br><input type='checkbox' disabled>".$u->uid." - ".$u->nachname." ".$u->vorname." ".($u->status=='Absolvent'?'(<span style="color:red">'.$u->status.'</span>)':'('.$u->status.')').$zuteilung_vorhanden;	
 				else				
-					echo "<br><input type='checkbox' name='anmeldung_".$u->uid."'>".$u->uid." - ".$u->nachname." ".$u->vorname." ".($u->status=='Absolvent'?'(<span style="color:red">'.$u->status.'</span>)':'('.$u->status.')');
+					echo "<br><input type='checkbox' name='anmeldung_".$u->uid."'>".$u->uid." - ".$u->nachname." ".$u->vorname." ".($u->status=='Absolvent'?'(<span style="color:red">'.$u->status.'</span>)':'('.$u->status.')').$zuteilung_vorhanden;
 				$anz++;
-							
-				//echo "<br>".$u->uid;
 			}
 		}
 	}
