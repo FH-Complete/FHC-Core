@@ -236,9 +236,12 @@ class gruppe extends basis_db
 	 * @param $semester
 	 * @param $mailgrp
 	 * @param $sichtbar
+	 * @param $content_visible
+	 * @param $aktiv
+	 * @param $order Spalte nach der sortiert werden soll. Default='beschreibung'
 	 * @return boolean
 	 */
-	public function getgruppe($studiengang_kz=null, $semester=null, $mailgrp=null, $sichtbar=null, $content_visible=null)
+	public function getgruppe($studiengang_kz=null, $semester=null, $mailgrp=null, $sichtbar=null, $content_visible=null, $aktiv=null, $order=null)
 	{
 		$qry = 'SELECT * FROM public.tbl_gruppe WHERE 1=1';
 		if(!is_null($studiengang_kz) && $studiengang_kz!='')
@@ -251,7 +254,12 @@ class gruppe extends basis_db
 			$qry .= " AND sichtbar=".$this->db_add_param($sichtbar, FHC_BOOLEAN);
 		if(!is_null($content_visible))
 			$qry .= " AND content_visible=".$this->db_add_param($content_visible, FHC_BOOLEAN);
-		$qry.=" ORDER BY beschreibung";
+		if(!is_null($aktiv) && $aktiv!='')
+			$qry .= " AND aktiv=".$this->db_add_param($aktiv, FHC_BOOLEAN);
+		if(!is_null($order) && $order!='')
+			$qry .= " ORDER BY ".$order;
+		else
+			$qry.=" ORDER BY beschreibung";
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
