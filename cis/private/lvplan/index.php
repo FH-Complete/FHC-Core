@@ -213,7 +213,7 @@ $(document).ready(function()
 	$caldavurl = APP_ROOT.'webdav/lvplan.php/calendars/'.$uid.'/LVPlan-'.$uid;
   	echo '<li><a class="Item" href="'.$caldavurl.'">'.$p->t('lvplan/caldavURL').'</a></li>';
   	echo '<li><a class="Item" href="'.APP_ROOT.'webdav/lvplan.php/principals/'.$uid.'">'.$p->t('lvplan/caldavURLMac').'</a></li>';
-  	echo '<li><a class="Item" href="'.APP_ROOT.'webdav/google.php?cal='.encryptData($uid,LVPLAN_CYPHER_KEY).'">'.$p->t('lvplan/googleURL').'</a></li>';
+  	echo '<li><a class="Item" href="'.APP_ROOT.'webdav/google.php?cal='.encryptData($uid,LVPLAN_CYPHER_KEY).'&'.microtime(true).'">'.$p->t('lvplan/googleURL').'</a></li>';
   	echo '</ul>';
   	echo '	</div>';
   	?>
