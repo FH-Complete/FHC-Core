@@ -867,7 +867,7 @@ $studiengang = new studiengang();
     <p>Dokumente zum Uploaden:</p>
     <?php
     $dokumente_person = new dokument(); 
-    $dokumente_person->getAllDokumenteForPerson($person_id); 
+    $dokumente_person->getAllDokumenteForPerson($person_id, true); 
     
     echo '<table border="1" width="130%">
         
