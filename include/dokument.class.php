@@ -379,12 +379,17 @@ class dokument extends basis_db
      * ist notwendig um bei einer Bewerbung bei mehreren Studiengängen zu wissen was der Student im gesamten abzugeben hat
      * @param $person_id 
      */
-    public function getAllDokumenteForPerson($person_id)
+    public function getAllDokumenteForPerson($person_id, $onlinebewerbung= false)
     {
         $qry = "SELECT distinct(dokument_kurzbz), bezeichnung FROM public.tbl_dokumentstudiengang 
             JOIN public.tbl_prestudent using (studiengang_kz) 
             JOIN public.tbl_dokument using (dokument_kurzbz)
-            WHERE person_id =".$this->db_add_param($person_id, FHC_INTEGER).";";
+            WHERE person_id =".$this->db_add_param($person_id, FHC_INTEGER); 
+		
+		if($onlinebewerbung)
+			$qry.= " AND onlinebewerbung is true; "; 
+		else
+			$qry.=";";
         
         if($result = $this->db_query($qry))
         {
