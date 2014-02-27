@@ -526,11 +526,11 @@ if($xmlformat=='rdf')
 					FROM 
 						public.tbl_person JOIN tbl_prestudent USING (person_id) LEFT JOIN tbl_student using(prestudent_id) 
 					WHERE 
-						nachname||' '||vorname ~* '".addslashes($filter)."' OR 
-						vorname||' '||nachname ~* '".addslashes($filter)."' OR
-						student_uid ~* '".addslashes($filter)."' OR
-						matrikelnr = '".addslashes($filter)."' OR
-						svnr = '".addslashes($filter)."';";
+						lower(COALESCE(nachname,'') ||' '|| COALESCE(vorname,'')) ~* lower(".$db->db_add_param($filter).") OR 
+						lower(COALESCE(vorname,'') ||' '|| COALESCE(nachname,'')) ~* lower(".$db->db_add_param($filter).") OR
+						student_uid ~* ".$db->db_add_param($filter)." OR
+						matrikelnr = ".$db->db_add_param($filter)." OR
+						svnr = ".$db->db_add_param($filter).";";
 			if($db->db_query($qry))
 			{
 				while($row = $db->db_fetch_object())
