@@ -750,7 +750,7 @@ class mitarbeiter extends benutzer
 	 */
 	public function getMitarbeiterFilter($filter)
 	{
-		$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE nachname ~* ".$this->db_add_param($filter)." OR uid ~* ".$this->db_add_param($filter).';'; 
+		$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE lower(nachname) ~* lower(".$this->db_add_param($filter)." OR uid ~* ".$this->db_add_param($filter).');'; 
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -836,8 +836,8 @@ class mitarbeiter extends benutzer
 					distinct on(mitarbeiter_uid) *, tbl_benutzer.aktiv as aktiv, tbl_mitarbeiter.insertamum,
 					tbl_mitarbeiter.insertvon, tbl_mitarbeiter.updateamum, tbl_mitarbeiter.updatevon, tbl_person.svnr
 				FROM ((public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)) JOIN public.tbl_person USING(person_id))  LEFT JOIN campus.tbl_resturlaub USING(mitarbeiter_uid)
-				WHERE nachname||' '||vorname ~* ".$this->db_add_param($filter)." OR
-				      vorname||' '||nachname ~* ".$this->db_add_param($filter)." OR
+				WHERE lower(COALESCE(nachname,'') ||' '|| COALESCE(vorname,'')) ~* lower(".$this->db_add_param($filter).") OR
+				      lower(COALESCE(vorname,'') ||' '|| COALESCE(nachname,'')) ~* lower(".$this->db_add_param($filter).") OR
 				      uid ~* ".$this->db_add_param($filter)." ";
 		if(is_numeric($filter))
 			$qry.="OR personalnummer = ".$this->db_add_param($filter)." OR svnr = ".$this->db_add_param($filter).";";
