@@ -591,7 +591,7 @@ class wochenplan extends basis_db
 		$num_rows_stunde = $this->db_num_rows($result_stunde);
  
 		// Formularbeginn wenn Lektor
-		if ($this->user=='lektor' && $this->type=='ort')
+		if ($raumres && $this->type=='ort')
 			echo '<form name="reserve" method="post" action="stpl_week.php">'.$this->crlf;
 
 		//Tabelle zeichnen
