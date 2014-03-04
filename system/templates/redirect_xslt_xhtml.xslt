@@ -12,8 +12,9 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 		Sie werden automatisch weitergeleitet.
 		Sollte dies nicht der Fall sein, klicken sie bitte 
 		<xsl:variable name="url" select="url"></xsl:variable>
-		<a href="{url}">hier</a>
-
+		<a href="{url}" target="_blank">hier</a><br/><br/>
+		You will be redirected automatically. If not, please click  
+		<a href="{url}" target="_blank">here</a>
 		</body>
 		</html>	
 	</xsl:template>
