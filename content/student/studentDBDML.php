@@ -30,6 +30,7 @@
 // ****************************************
 
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../config/global.config.inc.php'); 
 require_once('../../include/'.EXT_FKT_PATH.'/generateuid.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
@@ -57,6 +58,8 @@ require_once('../../include/lehrverband.class.php');
 require_once('../../include/gruppe.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/pruefling.class.php');
+require_once('../../include/mail.class.php'); 
+require_once('../../include/kontakt.class.php'); 
 
 $user = get_uid();
 $db = new basis_db();
@@ -519,18 +522,23 @@ if(!$error)
 						}
 					}
 
-					if($_POST['status_kurzbz']=='Bewerber' && !$prestd->anmeldungreihungstest)
+					// Check ob Reihungstest berücksichtigt werden soll 
+					// kann in Config abgestellt werden
+					if(REIHUNGSTEST_CHECK)
 					{
-						$error = true;
-						$errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss das Reihungstestdatum gesetzt sein.";
-						$anzahl_fehler++;
-					}
-					
-					if($_POST['status_kurzbz']=='Bewerber' && !$prestd->reihungstestangetreten)
-					{
-						$error = true;
-						$errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss das Feld 'Zum Reihungstest angetreten' gesetzt sein.";
-						$anzahl_fehler++;
+						if($_POST['status_kurzbz']=='Bewerber' && !$prestd->anmeldungreihungstest)
+						{
+							$error = true;
+							$errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss das Reihungstestdatum gesetzt sein.";
+							$anzahl_fehler++;
+						}
+
+						if($_POST['status_kurzbz']=='Bewerber' && !$prestd->reihungstestangetreten)
+						{
+							$error = true;
+							$errormsg .= "\n $prestd->vorname $prestd->nachname: Um einen Interessenten zum Bewerber zu machen, muss das Feld 'Zum Reihungstest angetreten' gesetzt sein.";
+							$anzahl_fehler++;
+						}
 					}
 					
 					if($_POST['status_kurzbz']=='Bewerber' && $prestd->zgv_code=='')
@@ -551,6 +559,32 @@ if(!$error)
 					
 					if(!$error)
 					{
+						// wenn kein fehler und status bewerber und "email senden an bewerber" eingestellt ist
+						if($_POST['status_kurzbz']=='Bewerber' && SEND_BEWERBER_INFOMAIL)
+						{
+							// hole Email Adresse
+							$kontakt = new kontakt(); 
+							$kontakt->load_persKontakttyp($prestd->person_id, 'email'); 
+							
+							// Wenn zumindest eine Email Adresse gefunden wurde
+							if(count($kontakt->result)>0)
+							{
+								$email = "Sehr geehrter Frau/Herr ".$prestd->vorname." ".$prestd->nachname.",<br><br> "; 
+								
+								$email.= INFOMAIL_BEWERBER; 								
+								foreach($kontakt->result as $k)
+								{
+									$mail = new mail($k->kontakt, 'no-reply', 'Infomail', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
+									$mail->setHTMLContent($email); 
+									if(!$mail->send())
+									{
+										$errormsg= 'Fehler beim Senden des Mails!';
+										$anzahl_fehler++; 
+									}
+								}
+							}
+						}
+						
 						if($prestd->getLastStatus($prestudent_id))
 						{
 							if($_POST['status_kurzbz']=='Absolvent' || $_POST['status_kurzbz']=='Diplomand')
