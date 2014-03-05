@@ -1,0 +1,504 @@
+<?php
+
+/*
+ * Copyright 2014 fhcomplete.org
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301, USA.
+ * 
+ *
+ * Authors: Stefan Puraner	<puraner@technikum-wien.at>
+ */
+
+require_once(dirname(__FILE__) . '/basis_db.class.php');
+
+class pruefungCis extends basis_db
+{
+    public $new;
+    public $result = array();
+    
+    public $pruefung_id;                //bigint
+    public $mitarbeiter_uid;            //varchar(32)
+    public $studiensemester_kurzbz;     //varchar(16)
+    public $pruefungsfenster_id;        //bigint
+    public $pruefungstyp_kurzbz;        //varchar(16)
+    public $titel;                      //varchar(256)
+    public $beschreibung;               //beschreibung(text)
+    public $methode;                    //varchar(64)
+    public $einzeln;                    //boolean
+    public $storniert = false;          //boolean
+    public $insertvon;                  //varcahr(32)
+    public $insertamum;                 //timestamp without timezone
+    public $updatevon;                  //varcahr(32)
+    public $updateamum;                 //timestamp without timezone
+    
+    public $lehrveranstaltungen = array(); //Lehrveranstaltungen zur Prüfung
+    public $termine = array();             //Termine zur Prüfung
+    
+    /**
+     * Konstruktor
+     * @param pruefung_id ID der zu ladenden Prüfung
+     */
+    public function __construct($pruefung_id = null) 
+    {
+        parent::__construct();
+
+        if ($pruefung_id != null)
+            $this->load($pruefung_id);
+    }
+
+    public function __set($name, $value)
+    {
+        switch ($name) {
+            case 'pruefung_id':
+                if (!is_numeric($value))
+                    throw new Exception('Attribute pruefung_id must be numeric!"');
+                $this->$name = $value;
+                break;
+            case 'methode':
+                if(mb_strlen($value) > 64)
+                    throw new Exception('Attribute methode must not be longer than 64 characters!"');
+                $this->$name = $value;
+                break;
+            case 'titel':
+                if(mb_strlen($value) > 256)
+                    throw new Exception('Attribute methode must not be longer than 256 characters!"');
+                $this->$name = $value;
+                break;
+            default:
+                $this->$name = $value;
+        }
+    }
+
+    public function __get($name)
+    {
+        return $this->$name;
+    }
+    
+    public function validate()
+    {   
+        if(!is_numeric($this->pruefungsfenster_id) && $this->pruefungsfenster_id != null)
+        {
+            $this->errormsg = "pruefungsfenster_id muss eine gültige Zahl sein.";
+            return false;
+        }
+        
+        if(mb_strlen($this->mitarbeiter_uid) > 32)
+        {
+            $this->errormsg = "mitarbeiter_uid darf nicht länger als 32 Zeichen sein.";
+            return false;
+        }
+        
+        if(mb_strlen($this->studiensemester_kurzbz) > 16 && $this->studiensemester_kurzbz != null)
+        {
+            $this->errormsg = "studiensemester_kurzbz darf nicht länger als 16 Zeichen sein.";
+            return false;
+        }
+        
+        if(mb_strlen($this->pruefungstyp_kurzbz) > 16 && $this->pruefungstyp_kurzbz != null)
+        {
+            $this->errormsg = "pruefungstyp_kurzbz darf nicht länger als 16 Zeichen sein.";
+            return false;
+        }
+        
+        if(mb_strlen($this->titel) > 256)
+        {
+            $this->errormsg = "pruefungstyp_kurzbz darf nicht länger als 256 Zeichen sein.";
+            return false;
+        }
+        
+        if(mb_strlen($this->methode) > 64)
+        {
+            $this->errormsg = "methode darf nicht länger als 64 Zeichen sein.";
+            return false;
+        }
+        
+        return true;
+    }
+    
+    public function save($new = null)
+    {
+        if(!$this->validate())
+        {
+            return false;
+        }
+        else if($new)
+        {
+            $qry = 'BEGIN; INSERT INTO campus.tbl_pruefung (mitarbeiter_uid, studiensemester_kurzbz, pruefungsfenster_id, pruefungstyp_kurzbz, titel, beschreibung, methode, einzeln, storniert, insertvon, insertamum) '
+                    . 'VALUES ('.$this->db_add_param($this->mitarbeiter_uid).', '
+                    . $this->db_add_param($this->studiensemester_kurzbz).', '
+                    . $this->db_add_param($this->pruefungsfenster_id).', '
+                    . $this->db_add_param($this->pruefungstyp_kurzbz).', '
+                    . $this->db_add_param($this->titel).', '
+                    . $this->db_add_param($this->beschreibung).', '
+                    . $this->db_add_param($this->methode).', '
+                    . $this->db_add_param($this->einzeln, FHC_BOOLEAN).', '
+                    . $this->db_add_param($this->storniert, FHC_BOOLEAN).', '
+                    . $this->db_add_param($this->insertvon).', '
+                    . 'now()'
+                    . ');';
+        }
+        else
+        {
+            $qry = 'UPDATE campus.tbl_pruefung SET '
+                    . 'mitarbeiter_uid='.$this->db_add_param($this->mitarbeiter_uid).', '
+                    . 'studiensemester_kurzbz='.$this->db_add_param($this->studiensemester_kurzbz).', '
+                    . 'pruefungsfenster_id='.$this->db_add_param($this->pruefungsfenster_id).', '
+                    . 'pruefungstyp_kurzbz='.$this->db_add_param($this->pruefungstyp_kurzbz).', '
+                    . 'titel='.$this->db_add_param($this->titel).', '
+                    . 'beschreibung='.$this->db_add_param($this->titel).', '
+                    . 'methode='.$this->db_add_param($this->methode).', '
+                    . 'einzeln='.$this->db_add_param($this->einzeln,FHC_BOOLEAN).', '
+                    . 'storniert='.$this->db_add_param($this->storniert,FHC_BOOLEAN).', '
+                    . 'updatevon='.$this->db_add_param($this->updatevon).', '
+                    . 'updateamum=now() '
+                    . 'WHERE pruefung_id='.$this->db_add_param($this->pruefung_id).';';
+        }
+        
+        if($this->db_query($qry))
+        {
+            if ($new) 
+            {
+                $qry = "SELECT currval('campus.seq_pruefung_pruefung_id') as id";
+                if ($this->db_query($qry)) 
+                {
+                    if ($row = $this->db_fetch_object()) 
+                    {
+                        $this->pruefung_id = $row->id;
+                        foreach ($this->lehrveranstaltungen as $lv)
+                        {
+                            if(!$this->saveLehrveranstaltungPruefung($lv, $this->pruefung_id))
+                            {
+                                $this->errormsg = 'Fehler beim Speichern der Lehrveranstaltungen.';
+                                $this->db_query('ROLLBACK');
+                                return false;
+                            }
+                        }
+                        foreach ($this->termine as $termin)
+                        {
+                            if(!$this->saveTerminPruefung($this->pruefung_id, $termin->beginn, $termin->ende, $termin->max, $termin->min))
+                            {
+                                $this->errormsg = 'Fehler beim Speichern der Termine.';
+                                $this->db_query('ROLLBACK');
+                                return false;
+                            }
+                        }
+                        $this->db_query('COMMIT;');
+                        return true;
+                    } 
+                    else
+                    {
+                        $this->errormsg = 'Fehler beim Auslesen der Sequence';
+                        $this->db_query('ROLLBACK');
+                        return false;
+                    }
+                }
+                else 
+                {
+                    $this->errormsg = 'Fehler beim Auslesen der Sequence';
+                    $this->db_query('ROLLBACK');
+                    return false;
+                }
+            }
+            else
+            {
+                foreach ($this->termine as $termin)
+                {
+                    if(!$this->updateTerminPruefung($termin->pruefungstermin_id, $this->pruefung_id, $termin->beginn, $termin->ende, $termin->max, $termin->min))
+                    {
+                        $this->errormsg = 'Fehler beim ändern der Termine.ID'.$termin->pruefungstermin_id;
+                        $this->db_query('ROLLBACK');
+                        return false;
+                    }
+                }
+                foreach ($this->lehrveranstaltungen as $lv)
+                    {
+                        if(!$this->saveLehrveranstaltungPruefung($lv, $this->pruefung_id))
+                        {
+                            $this->errormsg = 'Fehler beim Speichern der Lehrveranstaltungen.';
+                            $this->db_query('ROLLBACK');
+                            return false;
+                        }
+                    }
+                $this->db_query('COMMIT;');
+                return true;
+            }
+            return true;
+        }
+        else
+        {
+                $this->db_query('ROLLBACK');
+                $this->errormsg = 'Prüfung konnte nicht gespeichert werden.';
+                return false;
+        }
+    }
+    
+    public function load($pruefung_id)
+    {
+        if(!is_numeric($pruefung_id))
+        {
+            $this->errormsg = "Prüfung ID ist keine gültige Zahl";
+            return false;
+        }
+        
+        $qry = 'SELECT * FROM campus.tbl_pruefung WHERE pruefung_id='.$this->db_add_param($pruefung_id).';';
+        
+        if(!$this->db_query($qry))
+        {
+            $this->errormsg = "Prüfung konnte nicht geladen werden";
+            return false;
+        } 
+        else
+        {
+            while($row = $this->db_fetch_object())
+            {
+                $this->pruefung_id = $row->pruefung_id;
+                $this->mitarbeiter_uid = $row->mitarbeiter_uid;
+                $this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+                $this->pruefungsfenster_id = $row->pruefungsfenster_id;
+                $this->pruefungstyp_kurzbz = $row->pruefungstyp_kurzbz;
+                $this->titel = $row->titel;
+                $this->beschreibung = $row->beschreibung;
+                $this->methode = $row->methode;
+                $this->einzeln = $this->db_parse_bool($row->einzeln);
+                $this->storniert = $this->db_parse_bool($row->storniert);
+            }
+            return true;
+        }
+    }
+    
+    public function getPruefungByMitarbeiter($uid, $studiensemester_kurzbz=null)
+    {
+        $qry = 'SELECT * FROM campus.tbl_pruefung '
+                . 'WHERE mitarbeiter_uid='.$this->db_add_param($uid);
+        if($studiensemester_kurzbz!=null)
+        {
+            $qry .= ' AND studiensemester_kurzbz='.$this->db_add_param($studiensemester_kurzbz).';';
+        }
+        else
+        {
+            $qry .= ';';
+        }
+                
+        
+        if(!$this->db_query($qry))
+        {
+            $this->errormsg = "Prüfungen konnten nicht geladen werden";
+            return false;
+        }
+        else
+        {
+            while($row = $this->db_fetch_object())
+            {
+                $obj = new pruefungCis();
+
+                $obj->pruefung_id = $row->pruefung_id;
+                $obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+                $obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+                $obj->pruefungsfenster_id = $row->pruefungsfenster_id;
+                $obj->pruefungstyp_kurzbz = $row->pruefungstyp_kurzbz;
+                $obj->titel = $row->titel;
+                $obj->beschreibung = $row->beschreibung;
+                $obj->methode = $row->methode;
+                $obj->einzeln = $this->db_parse_bool($row->einzeln);
+                $obj->storniert = $this->db_parse_bool($row->storniert);
+                $this->result[] = $obj;
+            }
+            return true;
+        }
+    }
+    
+    protected function saveLehrveranstaltungPruefung($lehrveranstaltung_id, $pruefung_id)
+    {
+        if(!is_numeric($lehrveranstaltung_id))
+        {
+            $this->errormsg = "Lehrveranstaltung ID muss eine gültige Zahl sein";
+            return false;
+        }
+        
+        if(!is_numeric($pruefung_id))
+        {
+            $this->errormsg = "Prüfung ID muss eine gültige Zahl sein";
+            return false;
+        }
+        
+        $qry = 'INSERT INTO campus.tbl_lehrveranstaltung_pruefung (lehrveranstaltung_id, pruefung_id) VALUES ('
+                .$this->db_add_param($lehrveranstaltung_id).', '
+                .$this->db_add_param($pruefung_id).');';
+        
+        if(!$this->db_query($qry))
+        {
+            $this->errormsg = "Lehrveranstaltungen konnten nicht gespeichert werden.";
+            return false;
+        }
+        return true;
+    }
+    
+    public function getLehrveranstaltungenByPruefung()
+    {
+        $qry = 'SELECT * FROM campus.tbl_lehrveranstaltung_pruefung WHERE pruefung_id='.$this->db_add_param($this->pruefung_id).';';
+        
+        if($this->db_query($qry))
+        {
+            while($row = $this->db_fetch_object())
+            {
+                $obj = new stdClass();
+                $obj->lehrveranstaltung_pruefung_id = $row->lehrveranstaltung_pruefung_id;
+                $obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+                $obj->pruefung_id = $row->pruefung_id;
+                array_push($this->lehrveranstaltungen, $obj);
+            }
+            return true;
+        }
+        else
+        {
+            $this->errormsg = "Zugehörige Lehrveranstaltungen konnten nicht geladen werden.";
+            return false;
+        }
+        
+    }
+
+    public function saveTerminPruefung($pruefung_id, $beginn, $ende, $max, $min)
+    {
+        if(!is_numeric($pruefung_id))
+        {
+            $this->errormsg = "Pruefung ID muss eine gültige Zahl sein";
+            return false;
+        }
+        
+        $qry = 'INSERT INTO campus.tbl_pruefungstermin (pruefung_id, von, bis, teilnehmer_max, teilnehmer_min) VALUES ('
+                . $this->db_add_param($pruefung_id).', '
+                . $this->db_add_param($beginn).', '
+                . $this->db_add_param($ende).', '
+                . $this->db_add_param($max).', '
+                . $this->db_add_param($min).');';
+        
+        if(!$this->db_query($qry))
+        {
+            $this->errormsg = "Termine konnten nicht gespeichert werden!";
+            return false;
+        }
+        return true;
+    }
+    
+    public function getTermineByPruefung()
+    {
+        $qry = 'SELECT * FROM campus.tbl_pruefungstermin WHERE pruefung_id='.$this->db_add_param($this->pruefung_id).';';
+        
+        if($this->db_query($qry))
+        {
+            while($row = $this->db_fetch_object())
+            {
+                $obj = new stdClass();
+                $obj->pruefungstermin_id = $row->pruefungstermin_id;
+                $obj->pruefung_id = $row->pruefung_id;
+                $obj->von = $row->von;
+                $obj->bis = $row->bis;
+                $obj->max = $row->teilnehmer_max;
+                $obj->min = $row->teilnehmer_min;
+                array_push($this->termine, $obj);
+            }
+            return true;
+        }
+        else
+        {
+            $this->errormsg = "Zugehörige Termine konnten nicht geladen werden.";
+            return false;
+        }
+        
+    }
+    
+    public function updateTerminPruefung($pruefungstermin_id, $pruefung_id, $beginn, $ende, $max, $min)
+    {
+        if(!is_numeric($pruefungstermin_id))
+        {
+            $this->errormsg = "Pruefungstermin ID muss eine gültige Zahl sein.";
+            return false;
+        }
+        
+        $qry = 'UPDATE campus.tbl_pruefungstermin SET '
+                . 'pruefung_id='.$this->db_add_param($pruefung_id).', '
+                . 'von='.$this->db_add_param($beginn).', '
+                . 'bis='.$this->db_add_param($ende).', '
+                . 'teilnehmer_max='.$this->db_add_param($max).', '
+                . 'teilnehmer_min='.$this->db_add_param($min).' '
+                . 'WHERE pruefungstermin_id='.$this->db_add_param($pruefungstermin_id).';';
+        
+        if(!$this->db_query($qry))
+        {
+            $this->errormsg = "Termin konnte nicht geändert werden.";
+            return false;
+        }
+        return true;
+    }
+    
+    public function pruefungStornieren($pruefung_id)
+    {
+        if(!is_numeric($pruefung_id))
+        {
+            $this->errormsg = "Pruefung ID muss eine gültige Zahl sein.";
+            return false;
+        }
+        
+        $qry = 'UPDATE campus.tbl_pruefung SET storniert=true WHERE pruefung_id='.$this->db_add_param($pruefung_id).';';
+        
+        if(!$this->db_query($qry))
+        {
+            $this->errormsg = "Prüfung konnte nicht storniert werden.";
+            return false;
+        }
+        return true;
+    }
+    
+    public function deleteLehrveranstaltungPruefung($lehrveranstaltung_id, $pruefung_id){
+        if(!is_numeric($lehrveranstaltung_id))
+        {
+            $this->errormsg = "Lehrveranstaltung ID muss eine gültige Zahl sein.";
+            return false;
+        }
+        if(!is_numeric($pruefung_id))
+        {
+            $this->errormsg = "Prüfung ID muss eine gültige Zahl sein.";
+            return false;
+        }
+        
+        $qry = 'DELETE FROM campus.tbl_lehrveranstaltung_pruefung WHERE lehrveranstaltung_id='.$this->db_add_param($lehrveranstaltung_id).' AND pruefung_id='.$this->db_add_param($pruefung_id).';';
+        
+        if(!$this->db_query($qry))
+        {
+            $this->errormsg = 'Lehrveranstaltung konnte nicht gelöscht werden.';
+            return false;
+        }
+        return true;
+    }
+    
+    public function deleteTerminPruefung($pruefungstermin_id)
+    {
+        if(!is_numeric($pruefungstermin_id))
+        {
+            $this->errormsg = "Pruefungstermin ID muss eine gültige Zahl sein.";
+            return false;
+        }
+        
+        $qry = 'DELETE FROM campus.tbl_pruefungstermin WHERE pruefungstermin_id='.$this->db_add_param($pruefungstermin_id).';';
+        
+        if(!$this->db_query($qry))
+        {
+            $this->errormsg = 'Termin konnte nicht gelöscht werden.';
+            return false;
+        }
+        return true;
+    }
+}
