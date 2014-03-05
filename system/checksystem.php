@@ -1542,6 +1542,8 @@ $berechtigungen = array(
 	array('lehre/lehrveranstaltung','Lehrveranstaltungsverwaltung'),
 	array('lehre/lehrveranstaltung:begrenzt','nur die Felder Lehre, Sort, Zeugnis, BA/DA, FBK und LVInfo dürfen geändert werden (eventuelle Aufteilung in einzelne Berechtigungen??)'),
 	array('lehre/lvplan','Tempus'),
+        array('lehre/pruefungstermin','Erlaubt es dem Benutzer eine Prüfung für ein Prüfungsfenster anzulegen'),
+        array('lehre/pruefungsfenster','Erlaubt dem Benutzer Prüfungsfenster anzulegen.'),
 	array('lehre/reihungstest','Reihungstestverwaltung'),
 	array('lehre/reservierung','erweiterte Reservierung inkl. Lektorauswahl, Stg, Sem und Gruppe'),
 	array('lehre/reservierung:begrenzt','normale Raumreservierung im CIS'),
@@ -1561,6 +1563,7 @@ $berechtigungen = array(
 	array('soap/lvplan','Recht für LV-Plan Webservice'),
 	array('soap/mitarbeiter','Recht für Mitarbeiter-Webservice'),
 	array('soap/ort','Recht für Ort Webservice'),
+        array('soap/pruefungsfenster','Recht für Pruefungsfenster Webservice'),
 	array('soap/student','Recht für Student Webservice'),
 	array('soap/studienordnung','Recht für Studienordnung Webservice'),
 	array('student/bankdaten','Bankdaten des Studenten'),
@@ -1642,7 +1645,8 @@ $webservicerecht = array(
 	array('soap/studienordnung','saveSemesterZuordnung','studienordnung'),
 	array('soap/studienordnung','deleteSemesterZuordnung','studienordnung'),
 	array('soap/studienordnung','getLVkompatibel','lehrveranstaltung'),
-	array('soap/studienordnung','getLvTree','lehrveranstaltung')
+	array('soap/studienordnung','getLvTree','lehrveranstaltung'),
+        array('soap/pruefungsfenster','getByStudiensemester','pruefungsfenster')
 );
 
 foreach($webservicerecht as $row)
