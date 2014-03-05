@@ -28,6 +28,7 @@
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/functions.inc.php');
 require_once(dirname(__FILE__).'/sprache.class.php');
+require_once(dirname(__FILE__).'/addon.class.php');
 
 class phrasen extends basis_db
 {
@@ -71,6 +72,19 @@ class phrasen extends basis_db
 		$filename = dirname(__FILE__).'/../locale/'.$sprache->locale.'/'.$module.'.php';
 		if(file_exists($filename))
 			include($filename);
+		
+
+		$addons = new addon();
+		
+		foreach($addons->aktive_addons as $addon)
+		{
+			$addon_locale_filename = dirname(__FILE__).'/../addons/'.$addon.'/locale/'.$sprache->locale.'/'.$module.'.php';
+
+			if(file_exists($addon_locale_filename))
+			{
+				include($addon_locale_filename);
+			}
+		}
 		$this->loadedModules[]=$module;
 	}
 	
