@@ -87,6 +87,10 @@ class pruefungCis extends basis_db
         return $this->$name;
     }
     
+    /**
+     * Prüft Attribute auf Ihre Richtigkeit
+     * @return boolean true, wenn alle Prüfungen positiv verlaufen, andernfalls false
+     */
     public function validate()
     {   
         if(!is_numeric($this->pruefungsfenster_id) && $this->pruefungsfenster_id != null)
@@ -128,6 +132,11 @@ class pruefungCis extends basis_db
         return true;
     }
     
+    /**
+     * speichert einen Prüfungs-Datensatz
+     * @param boolean $new gibt an ob es ich um einen neuen Datensatz (true) oder um ein update (false) handelt
+     * @return boolean true wenn ok; false im Fehlerfall
+     */
     public function save($new = null)
     {
         if(!$this->validate())
@@ -245,6 +254,11 @@ class pruefungCis extends basis_db
         }
     }
     
+    /**
+     * Lädt einen Datensatz aus der Datenbank
+     * @param integer $pruefung_id ID der zu ladenden Prüfung
+     * @return boolean true, wenn ok; false im Fehlerfall
+     */
     public function load($pruefung_id)
     {
         if(!is_numeric($pruefung_id))
@@ -279,6 +293,12 @@ class pruefungCis extends basis_db
         }
     }
     
+    /**
+     * Lädt alle Prüfungen zu einer UID
+     * @param String $uid UID deren Prüfungen geladen werden sollen
+     * @param String $studiensemester_kurzbz optional kann das Laden auf ein Studiensemester beschränkt werden
+     * @return boolean true, wenn ok; false, im Fehlerfall
+     */
     public function getPruefungByMitarbeiter($uid, $studiensemester_kurzbz=null)
     {
         $qry = 'SELECT * FROM campus.tbl_pruefung '
@@ -320,6 +340,12 @@ class pruefungCis extends basis_db
         }
     }
     
+    /**
+     * speichert die zugehörigen LVs zu einer Prüfung
+     * @param Integer $lehrveranstaltung_id ID einer Lehrveranstaltung
+     * @param Integer $pruefung_id ID einer Prüfung
+     * @return boolean true, wenn ok; false, im Fehlerfall
+     */
     protected function saveLehrveranstaltungPruefung($lehrveranstaltung_id, $pruefung_id)
     {
         if(!is_numeric($lehrveranstaltung_id))
@@ -346,6 +372,10 @@ class pruefungCis extends basis_db
         return true;
     }
     
+    /**
+     * lädt alle zum Objekt gehörenden Lehrveranstaltungen
+     * @return boolean true, wenn ok; false, im Fehlerfall
+     */
     public function getLehrveranstaltungenByPruefung()
     {
         $qry = 'SELECT * FROM campus.tbl_lehrveranstaltung_pruefung WHERE pruefung_id='.$this->db_add_param($this->pruefung_id).';';
@@ -370,6 +400,15 @@ class pruefungCis extends basis_db
         
     }
 
+    /**
+     * speichert einen Termin zu Prüfung
+     * @param integer $pruefung_id ID einer Prüfung
+     * @param type $beginn Datum und Uhrzeit vom Beginn einer Prüfung
+     * @param type $ende Datum und Uhrzeit vom Ende einer Prüfung
+     * @param type $max maximale Teilnehmerzahl
+     * @param type $min minimale Teilnehmerzahl
+     * @return boolean true, wenn ok; false im Fehlerfall
+     */
     public function saveTerminPruefung($pruefung_id, $beginn, $ende, $max, $min)
     {
         if(!is_numeric($pruefung_id))
@@ -393,6 +432,10 @@ class pruefungCis extends basis_db
         return true;
     }
     
+    /**
+     * Lädt alle Termine zum Prüfungs-Objekt
+     * @return boolean true, wenn ok; false, im Fehlerfall
+     */
     public function getTermineByPruefung()
     {
         $qry = 'SELECT * FROM campus.tbl_pruefungstermin WHERE pruefung_id='.$this->db_add_param($this->pruefung_id).';';
@@ -420,6 +463,16 @@ class pruefungCis extends basis_db
         
     }
     
+    /**
+     * ändert einen Termin zur Prüfung
+     * @param integer $pruefungstermin_id ID eines Prüfungstermins
+     * @param integer $pruefung_id ID einer Prüfung
+     * @param type $beginn Datum und Uhrzeit vom Beginn einer Prüfung
+     * @param type $ende Datum und Uhrzeit vom Ende einer Prüfung
+     * @param type $max maximale Teilnehmerzahl
+     * @param type $min minimale Teilnehmerzahl
+     * @return boolean true, wenn ok; false im Fehlerfall
+     */
     public function updateTerminPruefung($pruefungstermin_id, $pruefung_id, $beginn, $ende, $max, $min)
     {
         if(!is_numeric($pruefungstermin_id))
@@ -444,6 +497,11 @@ class pruefungCis extends basis_db
         return true;
     }
     
+    /**
+     * Setzt den Storniert-Status einer Prüfung auf True
+     * @param integer $pruefung_id ID einer Prüfung
+     * @return boolean true, wenn ok; false, im Fehlerfall
+     */
     public function pruefungStornieren($pruefung_id)
     {
         if(!is_numeric($pruefung_id))
@@ -462,6 +520,12 @@ class pruefungCis extends basis_db
         return true;
     }
     
+    /**
+     * löscht die Verknüpfung zwischen einer Lehrveranstaltung und einer Prüfung
+     * @param integer $lehrveranstaltung_id ID einer Lehrveranstaltung
+     * @param integer $pruefung_id ID einer Prüfung
+     * @return boolean true, wenn ok; false, im Fehlerfall
+     */
     public function deleteLehrveranstaltungPruefung($lehrveranstaltung_id, $pruefung_id){
         if(!is_numeric($lehrveranstaltung_id))
         {
@@ -484,6 +548,11 @@ class pruefungCis extends basis_db
         return true;
     }
     
+    /**
+     * löscht einen Prüfungstermin einer Prüfung
+     * @param integer $pruefungstermin_id ID eines Prüfungstermins
+     * @return boolean true, wenn ok; false, im Fehlerfall
+     */
     public function deleteTerminPruefung($pruefungstermin_id)
     {
         if(!is_numeric($pruefungstermin_id))
