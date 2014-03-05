@@ -1675,5 +1675,82 @@ class lehrveranstaltung extends basis_db
 			return false;
 		}
 	}
+        
+        /**
+         * lädt die Lehrveranstaltungen zum zugehörigen Mitarbeiter
+         * @param String $uid User ID des Mitarbeiters
+         * @param String $studiensemster_kurzbz Kurzbezeichnung des Studiensemesters
+         */
+        public function getLVByMitarbeiter($uid, $studiensemester_kurzbz = null)
+        {
+            $qry = 'SELECT DISTINCT tbl_lehrveranstaltung.* FROM lehre.tbl_lehrveranstaltung 
+                        JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) 
+                        JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) 
+                    WHERE 
+                        mitarbeiter_uid='.$this->db_add_param($uid);
+            
+            if($studiensemester_kurzbz != null)
+            {
+                $qry .= ' AND tbl_lehreinheit.studiensemester_kurzbz='.$this->db_add_param($studiensemester_kurzbz).';';
+            }
+            
+            if($this->db_query($qry))
+            {
+                while($row = $this->db_fetch_object())
+                {
+                    $lv_obj = new lehrveranstaltung();
+
+                        $lv_obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+                        $lv_obj->studiengang_kz = $row->studiengang_kz;
+                        $lv_obj->bezeichnung = $row->bezeichnung;
+                        $lv_obj->kurzbz = $row->kurzbz;
+                        $lv_obj->lehrform_kurzbz = $row->lehrform_kurzbz;
+                        $lv_obj->semester = $row->semester;
+                        $lv_obj->ects = $row->ects;
+                        $lv_obj->semesterstunden = $row->semesterstunden;
+                        $lv_obj->anmerkung = $row->anmerkung;
+                        $lv_obj->lehre = $this->db_parse_bool($row->lehre);
+                        $lv_obj->lehreverzeichnis = $row->lehreverzeichnis;
+                        $lv_obj->aktiv = $this->db_parse_bool($row->aktiv);
+                        $lv_obj->ext_id = $row->ext_id;
+                        $lv_obj->insertamum = $row->insertamum;
+                        $lv_obj->insertvon = $row->insertvon;
+                        $lv_obj->planfaktor = $row->planfaktor;
+                        $lv_obj->planlektoren = $row->planlektoren;
+                        $lv_obj->planpersonalkosten = $row->planpersonalkosten;
+                        $lv_obj->plankostenprolektor = $row->plankostenprolektor;
+                        $lv_obj->updateamum = $row->updateamum;
+                        $lv_obj->updatevon = $row->updatevon;
+                        $lv_obj->sprache = $row->sprache;
+                        $lv_obj->sort = $row->sort;
+                        $lv_obj->incoming = $row->incoming;
+                        $lv_obj->zeugnis = $this->db_parse_bool($row->zeugnis);
+                        $lv_obj->projektarbeit = $this->db_parse_bool($row->projektarbeit);
+                        $lv_obj->zeugnis = $row->koordinator;
+                        $lv_obj->bezeichnung_english = $row->bezeichnung_english;
+                        $lv_obj->orgform_kurzbz = $row->orgform_kurzbz;
+                        $lv_obj->lehrtyp_kurzbz = $row->lehrtyp_kurzbz;
+                        $lv_obj->oe_kurzbz = $row->oe_kurzbz;
+                        $lv_obj->raumtyp_kurzbz = $row->raumtyp_kurzbz;
+                        $lv_obj->anzahlsemester = $row->anzahlsemester;
+                        $lv_obj->semesterwochen = $row->semesterwochen;
+                        $lv_obj->lvnr = $row->lvnr;
+                        $lv_obj->semester_alternativ = $row->semester_alternativ;
+
+                        $lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
+                        $lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
+                        if ($lv_obj->bezeichnung_arr['English'] == '')
+                                $lv_obj->bezeichnung_arr['English'] = $lv_obj->bezeichnung_arr['German'];
+
+                        $this->lehrveranstaltungen[] = $lv_obj;
+                    }
+                    return true;
+            }
+            else
+            {
+                $this->errormsg = "Lehrveranstaltungen konnten nicht geladen werden.";
+            }
+
+        }
 }
 ?>
