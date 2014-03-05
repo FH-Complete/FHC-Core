@@ -28,6 +28,8 @@ require_once('../include/content.class.php');
 require_once('../include/phrasen.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/datum.class.php');
+require_once('../include/mail.class.php');
+require_once('../include/benutzerfunktion.class.php');
 
 $uid = get_uid();
 $sprache = getSprache();
@@ -220,6 +222,7 @@ if(isset($_POST['save']))
 {
 	$save_error=false;
 	$news_id = $_POST['news_id'];
+	$mail = false;
 	
 	$news = new news();
 	
@@ -234,6 +237,7 @@ if(isset($_POST['save']))
 		$news->uid = $uid;
 		$news->insertamum = date('Y-m-d H:i:s');
 		$news->insertvon = $uid;
+		$mail = true;
 	}
 	$news->studiengang_kz=$_POST['studiengang_kz'];
 	$news->semester = $_POST['semester'];
@@ -310,6 +314,48 @@ if(isset($_POST['save']))
 	if(!$save_error)
 	{
 		$message.= '<span class="ok">'.$p->t('global/erfolgreichgespeichert').'</span>';
+	}
+	
+	if ($mail && $_POST['studiengang_kz']=='0' && $_POST['semester']==NULL)
+	{
+		$oe = new studiengang();
+		$oe->load($_POST['studiengang_kz']);
+		$oe_translate = $oe->oe_kurzbz;
+		
+		$translate = new benutzerfunktion();
+		$translate->getBenutzerFunktionen('translate', $oe_translate);
+		
+		if(count($translate->result)==0)
+			$translate->getBenutzerFunktionen('translate');
+		$to='';
+		foreach($translate->result as $row)
+		{
+			if($to!='')
+				$to.=',';
+			$to .= $row->uid.'@'.DOMAIN;
+		}
+		if($to!='')
+		{
+			$from = 'no-reply@'.DOMAIN;
+			$subject = $p->t('news/neuerNewseintrag');
+			$text = $p->t('news/mailtext');
+			$texthtml = $p->t('news/mailtextHTML',array(APP_ROOT."cms/newsverwaltung.php?news_id=".$news_id,$content->titel,$_POST['text_'.DEFAULT_LANGUAGE])) ;
+		
+			$mail = new mail($to, $from, $subject, $text);
+			$mail->setHTMLContent($texthtml);
+			if($mail->send())
+			{
+				$message.='<br><span class="ok">'.$p->t('news/uebersetzungsanforderungGesendet',array($to)).'</span>';
+			}
+			else
+			{
+				$message.='<br><span class="error">'.$p->t('news/fehlerBeimSenden',array($to)).'</span>';
+			}
+		}
+		else
+		{
+			$message.='<br><span class="error">'.$p->t('news/keinUebersetzerVorhanden').'</span>';
+		}
 	}
 }
 

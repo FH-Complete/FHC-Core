@@ -22,4 +22,20 @@ $this->phrasen['news/uebersetzungenvorhanden']='Der Newseintrag existiert bereit
 $this->phrasen['news/allesemester']='Alle Semester';
 $this->phrasen['news/xsemester']='%s. Semester';
 $this->phrasen['news/keinSemester']='Kein Semester (allg. News)';
+
+$this->phrasen['news/neuerNewseintrag']='Neuer Newseintrag zur Übersetzung'; //Betreff von Infomail an Uebersetzer.
+$this->phrasen['news/mailtext']='Dies ist eine automatisch generierte E-Mail.
+
+Es wurde ein Newseintrag angelegt. Dieser kann nun übersetzt werden.
+(um den Link und Inhalt anzuzeigen müssen Sie in die HTML Ansicht wechseln)'; //Plaintext im Infomail an Uebersetzer.
+$this->phrasen['news/mailtextHTML']='Dies ist eine automatisch generierte E-Mail.<br><br>
+									Es wurde ein Newseintrag angelegt. Dieser kann nun übersetzt werden: <a href="%s">zum Eintrag</a>
+									<br><br><hr><br> 
+									%s<br>
+									<br>
+									<br>
+									%s'; //HTML-Text im Infomail an Uebersetzer.
+$this->phrasen['news/uebersetzungsanforderungGesendet']='Übersetzungsanforderung wurde an %s versendet';
+$this->phrasen['news/fehlerBeimSenden']='Fehler beim Senden des Mails an %s';
+$this->phrasen['news/keinUebersetzerVorhanden']='Es ist kein Übersetzer im System hinterlegt'; //Leerlassen, falls keine Info diesbezueglich gewuenscht ist
 ?>

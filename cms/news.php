@@ -73,9 +73,6 @@ if(!$infoscreen)
 		$sem=NULL;
 		$ver=NULL;
 	}
-	// Wenn Student Incoming ist, wird bei den Studiengang-Details der ECI-Studiengang angezeigt
-	if($sem==0 && $ver=='I')
-		$stg_kz=10006;
 }
 else
 {
@@ -85,7 +82,7 @@ else
 }
 $studiengang_kz = (isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:$stg_kz);
 $semester = (isset($_GET['semester'])?$_GET['semester']:$sem);
-
+$mischen = (isset($_GET['mischen'])?$_GET['mischen']:true);
 $editable = isset($_GET['edit']);
 $news = new news();
 $all=false;
@@ -94,7 +91,7 @@ $all=false;
 if($editable)
 	$all=true;
 	
-$news->getnews(MAXNEWSALTER, $studiengang_kz, $semester, $all, null, MAXNEWS);
+$news->getnews(MAXNEWSALTER, $studiengang_kz, $semester, $all, null, MAXNEWS, $mischen);
 
 $xml = '<?xml version="1.0" encoding="UTF-8"?><content>';
 

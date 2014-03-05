@@ -112,8 +112,8 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 		<title>PreInteressenten</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+		<script type="text/javascript" src="../../include/js/jquery.js"></script>
+		<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
 		<script language="Javascript">
 		<!--
 		function confdel()
@@ -129,6 +129,15 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 			//Meister IE braucht ein Timeout sonst sortiert er nicht
 			window.setTimeout("Table.sort(document.getElementById(\'mytab\'),\'asc\')",10);
 		}
+		$(document).ready(function() 
+			{ 
+				$("#mytab").tablesorter(
+				{
+					sortList: [[4,1]],
+					widgets: ["zebra"],
+					headers: {11:{sorter: false}}
+				}); 
+			}); 
 		-->
 		</script>
 	</head>
@@ -329,11 +338,14 @@ if($erfassungsdatum_bis!='' && !$datum_obj->formatDatum($erfassungsdatum_bis))
 if($erfassungsdatum_von!='' && !$datum_obj->formatDatum($erfassungsdatum_von))
 	die('Erf.von Datum ist ungueltig');	
 
-$preinteressent = new preinteressent();
-//if($filter=='')
-if($datum_obj->formatDatum($filter, 'Y-m-d', true))
-	$filter = $datum_obj->formatDatum($filter, 'Y-m-d', true);
-$preinteressent->loadPreinteressenten($studiengang_kz, ($studiensemester_kurzbz!='-1'?$studiensemester_kurzbz:null), $filter, $bool_nichtfreigegeben, $bool_uebernommen, $kontaktmedium, $bool_absage, $erfassungsdatum_von, $erfassungsdatum_bis, $bool_einverstaendnis, $bool_preinteressent);
+if(!empty ($_GET))
+{
+	$preinteressent = new preinteressent();
+	//if($filter=='')
+	if($datum_obj->formatDatum($filter, 'Y-m-d', true))
+		$filter = $datum_obj->formatDatum($filter, 'Y-m-d', true);
+	$preinteressent->loadPreinteressenten($studiengang_kz, ($studiensemester_kurzbz!='-1'?$studiensemester_kurzbz:null), $filter, $bool_nichtfreigegeben, $bool_uebernommen, $kontaktmedium, $bool_absage, $erfassungsdatum_von, $erfassungsdatum_bis, $bool_einverstaendnis, $bool_preinteressent);
+}
 /*else 
 {
 	//Falls im Filter-Feld ein Datum steht dann wird dieses umformatiert
@@ -355,119 +367,122 @@ function CutString($strVal, $limit)
 		return $strVal;
 	}
 }
-echo 'Anzahl: '.count($preinteressent->result);
+echo 'Anzahl: '.(!empty($_GET)?count($preinteressent->result):'0');
 echo '</div>'; // Fixiertes Div mit den Filtern
 echo '<br><br><br><br><br><br><br>';
 
-//TABELLE ANZEIGEN
-echo '<br>';	
-echo "<table id='mytab' class='liste table-autosort:4 table-stripeclass:alternate table-autostripe' style='font-size:15px;'>
-	<thead>
-		<tr>
-		<th class='table-sortable:numeric'>ID</th>
-		<th class='table-sortable:default'>Nachname</th>
-		<th class='table-sortable:default'>Vorname</th>
-		<th class='table-sortable:default'>StSem</th>
-		<th class='table-sortable:default'>Erf.datum</th>
-		<th class='table-sortable:default'>G</th>
-		<th class='table-sortable:default'>E-Mail</th>
-		<th class='table-sortable:default'>Status</th>
-		<th class='table-sortable:default'>Freigabe</th>
-		<th class='table-sortable:default'>&Uuml;bernahme</th>
-		<th class='table-sortable:default'>Anmerkung</th>
-		<th>Aktion</th>
-		</tr>
-	</thead>
-	<tbody>";
-
-foreach ($preinteressent->result as $row)
+if(!empty ($_GET))
 {
-	flush();
-	echo '<tr>';
-	$person = new person();
-	$person->load($row->person_id);
-	echo "<td>$person->person_id</td>";
-	echo "<td>$person->nachname</td>";
-	echo "<td>$person->vorname</td>";
-	//echo "<td>".$datum_obj->convertISODate($person->gebdatum)."</td>";
-	echo "<td>$row->studiensemester_kurzbz</td>";
-	echo "<td><span style='display: none'>$row->erfassungsdatum</span>".$datum_obj->formatDatum($row->erfassungsdatum,'d.m.Y')."</td>";
+	//TABELLE ANZEIGEN
+	echo '<br>';	
+	echo "<table id='mytab' class='tablesorter' style='font-size:15px;'>
+		<thead>
+			<tr>
+			<th>ID</th>
+			<th>Nachname</th>
+			<th>Vorname</th>
+			<th>StSem</th>
+			<th class=\"{sorter: 'date'}\">Erf.datum</th>
+			<th>G</th>
+			<th>E-Mail</th>
+			<th>Status</th>
+			<th>Freigabe</th>
+			<th>&Uuml;bernahme</th>
+			<th>Anmerkung</th>
+			<th>Aktion</th>
+			</tr>
+		</thead>
+		<tbody>";
 	
-	echo "<td>$person->geschlecht</td>";
-	//EMail
-	$qry = "SELECT kontakt FROM public.tbl_kontakt WHERE person_id='$person->person_id' AND kontakttyp='email' 
-			ORDER BY zustellung DESC LIMIT 1";
-	echo '<td>';
-	if($result_mail = $db->db_query($qry))
+	foreach ($preinteressent->result as $row)
 	{
-		if($row_mail = $db->db_fetch_object($result_mail))
-		{
-			echo '<a href="mailto:'.$row_mail->kontakt.'" class="Item">'.$row_mail->kontakt.'</a>';
-		}
-	}
-	echo '</td>';
-	
-	//Status
-	$status='';
-	$prestudent = new prestudent();
-	if($prestudent->getPrestudenten($row->person_id))
-	{
-		foreach ($prestudent->result as $prestd)
-		{
-			if($status!='')
-				$status.=', ';
-			$prestudent1 = new prestudent();
-			$prestudent1->getLastStatus($prestd->prestudent_id);
-			$status.= $prestudent1->status_kurzbz.' ('.$stg_obj->kuerzel_arr[$prestd->studiengang_kz].')';
-		}
-	}
-	if($status=='')
-		$status='Preinteressent';
-	
-	echo "<td>$status</td>";
-	
-	//Zuordnungen laden und freigegebene Eintraege farblich markieren
-	$freigaben = new preinteressent();
-	$freigaben->loadZuordnungen($row->preinteressent_id);
-	$freigabe='';
-	$uebernahme='';
-	foreach ($freigaben->result as $row_freigaben)
-	{
-		//auch jene als freigegeben anzeigen die schon im studiengang angelegt sind 
-		//obwohl der preinteressent nicht freigegeben wurde. (bewerbung direkt beim studiengang)
-		$qry = "SELECT prestudent_id FROM public.tbl_prestudent WHERE person_id='$row->person_id' AND studiengang_kz='$row_freigaben->studiengang_kz'";
-		$result_chkstg = $db->db_query($qry);
+		flush();
+		echo '<tr>';
+		$person = new person();
+		$person->load($row->person_id);
+		echo "<td>$person->person_id</td>";
+		echo "<td>$person->nachname</td>";
+		echo "<td>$person->vorname</td>";
+		//echo "<td>".$datum_obj->convertISODate($person->gebdatum)."</td>";
+		echo "<td>$row->studiensemester_kurzbz</td>";
+		echo "<td>".$datum_obj->formatDatum($row->erfassungsdatum,'d.m.Y')."</td>";
 		
-		if($row_freigaben->freigabedatum!='' || ($result_chkstg &&  $db->db_num_rows($result_chkstg)>0))
-			$freigabe.="<font color='#009900'>";
-		else 
-			$freigabe.="<font color='#FF0000'>";
-		$freigabe.=$stg_obj->kuerzel_arr[$row_freigaben->studiengang_kz]."($row_freigaben->prioritaet)";
-		$freigabe.='</font> ';
-		
-		if($row_freigaben->freigabedatum!='')
+		echo "<td>$person->geschlecht</td>";
+		//EMail
+		$qry = "SELECT kontakt FROM public.tbl_kontakt WHERE person_id='$person->person_id' AND kontakttyp='email' 
+				ORDER BY zustellung DESC LIMIT 1";
+		echo '<td>';
+		if($result_mail = $db->db_query($qry))
 		{
-			if($row_freigaben->uebernahmedatum!='')
-				$uebernahme.="<font color='#009900'>";
+			if($row_mail = $db->db_fetch_object($result_mail))
+			{
+				echo '<a href="mailto:'.$row_mail->kontakt.'" class="Item">'.$row_mail->kontakt.'</a>';
+			}
+		}
+		echo '</td>';
+		
+		//Status
+		$status='';
+		$prestudent = new prestudent();
+		if($prestudent->getPrestudenten($row->person_id))
+		{
+			foreach ($prestudent->result as $prestd)
+			{
+				if($status!='')
+					$status.=', ';
+				$prestudent1 = new prestudent();
+				$prestudent1->getLastStatus($prestd->prestudent_id);
+				$status.= $prestudent1->status_kurzbz.' ('.$stg_obj->kuerzel_arr[$prestd->studiengang_kz].')';
+			}
+		}
+		if($status=='')
+			$status='Preinteressent';
+		
+		echo "<td>$status</td>";
+		
+		//Zuordnungen laden und freigegebene Eintraege farblich markieren
+		$freigaben = new preinteressent();
+		$freigaben->loadZuordnungen($row->preinteressent_id);
+		$freigabe='';
+		$uebernahme='';
+		foreach ($freigaben->result as $row_freigaben)
+		{
+			//auch jene als freigegeben anzeigen die schon im studiengang angelegt sind 
+			//obwohl der preinteressent nicht freigegeben wurde. (bewerbung direkt beim studiengang)
+			$qry = "SELECT prestudent_id FROM public.tbl_prestudent WHERE person_id='$row->person_id' AND studiengang_kz='$row_freigaben->studiengang_kz'";
+			$result_chkstg = $db->db_query($qry);
+			
+			if($row_freigaben->freigabedatum!='' || ($result_chkstg &&  $db->db_num_rows($result_chkstg)>0))
+				$freigabe.="<font color='#009900'>";
 			else 
-				$uebernahme.="<font color='#FF0000'>";
-			$uebernahme.=$stg_obj->kuerzel_arr[$row_freigaben->studiengang_kz];
-			$uebernahme.='</font> ';
+				$freigabe.="<font color='#FF0000'>";
+			$freigabe.=$stg_obj->kuerzel_arr[$row_freigaben->studiengang_kz]."($row_freigaben->prioritaet)";
+			$freigabe.='</font> ';
+			
+			if($row_freigaben->freigabedatum!='')
+			{
+				if($row_freigaben->uebernahmedatum!='')
+					$uebernahme.="<font color='#009900'>";
+				else 
+					$uebernahme.="<font color='#FF0000'>";
+				$uebernahme.=$stg_obj->kuerzel_arr[$row_freigaben->studiengang_kz];
+				$uebernahme.='</font> ';
+			}
 		}
+		
+		echo "<td>$freigabe</td>";
+		echo "<td>$uebernahme</td>";
+		echo "<td title='".$row->anmerkung."'>".CutString($row->anmerkung, 20)."</td>";
+		echo '<td>';
+		echo " <input style='padding:0px;' type='button' onclick=\"window.open('personendetails.php?id=$row->person_id','_blank')\" value='Gesamtübersicht' title='Zeigt die Details dieser Person an'>";
+		echo " <input style='padding:0px;' type='button' onclick='parent.preinteressent_detail.location.href = \"preinteressent_detail.php?id=$row->preinteressent_id&selection=\"+parent.preinteressent_detail.selection; return false;' value='Bearbeiten' title='Zeigt die Details dieser Person an'>";
+		echo " <input style='padding:0px;' type='button' onclick=\"window.location.href='".$_SERVER['PHP_SELF']."?id=$row->preinteressent_id&action=freigabe&studiensemester_kurzbz=$studiensemester_kurzbz&studiengang_kz=$studiengang_kz&filter=$filter'\" value='Freigeben' title='Gibt alle Studiengänge mit der höchsten Priorität frei'>";
+		echo " <input style='padding:0px;' type='button' onclick=\"if(confdel()) {window.location.href='".$_SERVER['PHP_SELF']."?id=$row->preinteressent_id&action=loeschen&studiensemester_kurzbz=$studiensemester_kurzbz&studiengang_kz=$studiengang_kz&filter=$filter'}\" value='Löschen' title='Löscht diesen Preinteressenten'>";
+		echo '</td>';
+		echo '</tr>';
 	}
-	
-	echo "<td>$freigabe</td>";
-	echo "<td>$uebernahme</td>";
-	echo "<td title='".$row->anmerkung."'>".CutString($row->anmerkung, 20)."</td>";
-	echo '<td>';
-	echo " <input style='padding:0px;' type='button' onclick=\"window.open('personendetails.php?id=$row->person_id','_blank')\" value='Gesamtübersicht' title='Zeigt die Details dieser Person an'>";
-	echo " <input style='padding:0px;' type='button' onclick='parent.preinteressent_detail.location.href = \"preinteressent_detail.php?id=$row->preinteressent_id&selection=\"+parent.preinteressent_detail.selection; return false;' value='Bearbeiten' title='Zeigt die Details dieser Person an'>";
-	echo " <input style='padding:0px;' type='button' onclick=\"window.location.href='".$_SERVER['PHP_SELF']."?id=$row->preinteressent_id&action=freigabe&studiensemester_kurzbz=$studiensemester_kurzbz&studiengang_kz=$studiengang_kz&filter=$filter'\" value='Freigeben' title='Gibt alle Studiengänge mit der höchsten Priorität frei'>";
-	echo " <input style='padding:0px;' type='button' onclick=\"if(confdel()) {window.location.href='".$_SERVER['PHP_SELF']."?id=$row->preinteressent_id&action=loeschen&studiensemester_kurzbz=$studiensemester_kurzbz&studiengang_kz=$studiengang_kz&filter=$filter'}\" value='Löschen' title='Löscht diesen Preinteressenten'>";
-	echo '</td>';
-	echo '</tr>';
+	echo '</tbody></table><br>';
 }
-echo '</tbody></table><br>';
 
 echo '</body>';
 echo '</html>';

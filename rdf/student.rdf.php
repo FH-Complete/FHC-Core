@@ -167,7 +167,7 @@ function draw_content_liste($row)
 			<STUDENT:status><![CDATA['.$status.']]></STUDENT:status>
     		<STUDENT:anmerkungen>'.($row->anmerkungen==''?'&#xA0;':'<![CDATA['.$row->anmerkungen.']]>').'</STUDENT:anmerkungen>
     		<STUDENT:anmerkungpre>'.($row->anmerkung==''?'&#xA0;':'<![CDATA['.$row->anmerkung.']]>').'</STUDENT:anmerkungpre>
-    		<STUDENT:studiengang_kz><![CDATA['.abs($row->studiengang_kz).']]></STUDENT:studiengang_kz>
+    		<STUDENT:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz>
 			<STUDENT:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></STUDENT:studiengang>
 			<STUDENT:orgform><![CDATA['.$orgform.']]></STUDENT:orgform>
 			<STUDENT:aufmerksamdurch_kurzbz><![CDATA['.$row->aufmerksamdurch_kurzbz.']]></STUDENT:aufmerksamdurch_kurzbz>
@@ -221,7 +221,6 @@ function draw_content($row)
     		<STUDENT:geburtsdatum_iso><![CDATA['.$row->gebdatum.']]></STUDENT:geburtsdatum_iso>
     		<STUDENT:homepage><![CDATA['.$row->homepage.']]></STUDENT:homepage>
     		<STUDENT:gebort><![CDATA['.$row->gebort.']]></STUDENT:gebort>
-			<STUDENT:matr_nr><![CDATA['.$row->matr_nr.']]></STUDENT:matr_nr>
     		<STUDENT:gebzeit><![CDATA['.$row->gebzeit.']]></STUDENT:gebzeit>
     		<STUDENT:anmerkungen>'.($row->anmerkungen==''?'&#xA0;':'<![CDATA['.$row->anmerkungen.']]>').'</STUDENT:anmerkungen>
     		<STUDENT:anrede><![CDATA['.$row->anrede.']]></STUDENT:anrede>
@@ -257,7 +256,7 @@ function draw_prestudent($row)
 	echo '
 			<STUDENT:prestudent_id><![CDATA['.$row->prestudent_id.']]></STUDENT:prestudent_id>
     		<STUDENT:studiengang_kz_prestudent><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz_prestudent>
-			<STUDENT:studiengang_kz><![CDATA['.abs($row->studiengang_kz).']]></STUDENT:studiengang_kz>
+			<STUDENT:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz>
 			<STUDENT:aufmerksamdurch_kurzbz><![CDATA['.$row->aufmerksamdurch_kurzbz.']]></STUDENT:aufmerksamdurch_kurzbz>
 			<STUDENT:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></STUDENT:studiengang>
 			<STUDENT:berufstaetigkeit_code><![CDATA['.$row->berufstaetigkeit_code.']]></STUDENT:berufstaetigkeit_code>
@@ -526,11 +525,11 @@ if($xmlformat=='rdf')
 					FROM 
 						public.tbl_person JOIN tbl_prestudent USING (person_id) LEFT JOIN tbl_student using(prestudent_id) 
 					WHERE 
-						lower(COALESCE(nachname,'') ||' '|| COALESCE(vorname,'')) ~* lower(".$db->db_add_param($filter).") OR 
-						lower(COALESCE(vorname,'') ||' '|| COALESCE(nachname,'')) ~* lower(".$db->db_add_param($filter).") OR
-						student_uid ~* ".$db->db_add_param($filter)." OR
-						matrikelnr = ".$db->db_add_param($filter)." OR
-						svnr = ".$db->db_add_param($filter).";";
+						nachname||' '||vorname ~* '".addslashes($filter)."' OR 
+						vorname||' '||nachname ~* '".addslashes($filter)."' OR
+						student_uid ~* '".addslashes($filter)."' OR
+						matrikelnr = '".addslashes($filter)."' OR
+						svnr = '".addslashes($filter)."';";
 			if($db->db_query($qry))
 			{
 				while($row = $db->db_fetch_object())
@@ -599,15 +598,14 @@ else
 		{
 			$student = new student();
 			$student->load($uid);
-            
+
 			$studiengang = new studiengang();
 			$studiengang->load($student->studiengang_kz);
-            
-            $stg_typ = new studiengang(); 
-            $stg_typ->getStudiengangTyp($studiengang->typ); 
-			$typ=$stg_typ->bezeichnung;
-			$typ="FH-$typ-Studiengang";
-	/*		switch($studiengang->typ)
+
+//			$stg_typ = new studiengang(); 
+//			$stg_typ->getStudiengangTyp($studiengang->typ); 
+//			$typ=$stg_typ->bezeichnung;
+			switch($studiengang->typ)
 			{
 				case 'd':	$typ = 'FH-Diplom-Studiengang';
 							break;
@@ -617,7 +615,7 @@ else
 							break;
 				default:	$typ = 'FH-Studiengang';
 			}
-*/
+
 			$qry = "SELECT * FROM campus.vw_benutzer JOIN public.tbl_benutzerfunktion USING(uid) WHERE funktion_kurzbz='rek'";
 			$rektor = '';
 			if($db->db_query($qry))
@@ -656,11 +654,12 @@ else
 				}
 			}
 
-			//für ao. Studierende wird die StgKz der Lehrveranstaltungen benötigt, die sie besuchen
+			//für ao. Studierende wird der Studiengang der Lehrveranstaltungen benötigt, die sie besuchen
 			$lv_studiengang_kz='';
 			$lv_studiengang_bezeichnung='';
 			$lv_studiengang_typ='';
-
+			$lv_studiengang_art='';
+			
 			$lv=new lehrveranstaltung();
 			$lv->load_lva_student($student->uid);
 			if(count($lv->lehrveranstaltungen)>0)
@@ -670,8 +669,17 @@ else
 				$lv_studiengang->load($lv_studiengang_kz);
 				$lv_studiengang_bezeichnung=$lv_studiengang->bezeichnung;
 				$lv_studiengang_typ=$lv_studiengang->typ;
-	            $stg_typ->getStudiengangTyp($lv_studiengang->typ); 
-				$lv_studiengang_art=$stg_typ->bezeichnung;
+//	            $stg_typ->getStudiengangTyp($lv_studiengang->typ); 
+//				$lv_studiengang_art=$stg_typ->bezeichnung;
+				switch($lv_studiengang->typ)
+				{
+					case 'd':	$lv_studiengang_art = 'Diplom';
+								break;
+					case 'm':	$lv_studiengang_art = 'Master';
+								break;
+					case 'b':	$lv_studiengang_art = 'Bachelor';
+								break;
+				}
 			}
 			
 			echo '
