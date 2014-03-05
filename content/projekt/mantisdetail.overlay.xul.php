@@ -106,7 +106,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<row>
 					<label value="Schritte zur Reproduktion" control="textbox-projekttask-mantis-steps_to_reproduce"/>
    					<textbox id="textbox-projekttask-mantis-issue_steps_to_reproduce" multiline="true"/>
-   					
+					<label value="Tags" control="textbox-projekttask-mantis-issue_tags"/>
+					<vbox>
+						<textbox id="textbox-projekttask-mantis-issue_tags"/>
+						<spacer />
+   					</vbox>
 				</row>
 				<row>
 					<label value="Zusätzliche Informationen" control="textbox-projekttask-mantis-issue_additional_information"/>

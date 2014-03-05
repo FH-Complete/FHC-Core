@@ -46,7 +46,15 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
   		<wsdl:part name="message" type="xsd:string"></wsdl:part>
   	</wsdl:message>
   	
-  	<wsdl:message name="setErledigtRequest">
+  	<wsdl:message name="saveTagsForIssueRequest">
+		<wsdl:part name="mantis_id" type="xsd:string" minOccurs="0"></wsdl:part>
+		<wsdl:part name="issue_tags" type="xsd:string" minOccurs="0"></wsdl:part> 
+  	</wsdl:message>
+    <wsdl:message name="saveTagsForIssueResponse">
+  		<wsdl:part name="message" type="xsd:string"></wsdl:part>
+  	</wsdl:message>
+	
+	<wsdl:message name="setErledigtRequest">
   	  	<wsdl:part name="username" type="xsd:string" minOccurs="0"></wsdl:part>
 		<wsdl:part name="passwort" type="xsd:string" minOccurs="0"></wsdl:part>  
   		<wsdl:part name="projekttask_id" type="xsd:string"></wsdl:part>
@@ -123,6 +131,10 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
            <wsdl:input message="tns:setErledigtRequest"></wsdl:input>
            <wsdl:output message="tns:setErledigtResponse"></wsdl:output>        
        </wsdl:operation>
+		<wsdl:operation name="saveTagsForIssue">
+           <wsdl:input message="tns:saveTagsForIssueRequest"></wsdl:input>
+           <wsdl:output message="tns:saveTagsForIssueResponse"></wsdl:output>        
+       </wsdl:operation>
 	   <wsdl:operation name="changeProjektPhase">
            <wsdl:input message="tns:changeProjektPhaseRequest"></wsdl:input>
            <wsdl:output message="tns:changeProjektPhaseResponse"></wsdl:output>        
@@ -160,6 +172,15 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
        </wsdl:operation> 
          <wsdl:operation name="setErledigt">
            <soap:operation soapAction="<?php echo APP_ROOT."soap/setErledigt";?>" />
+           <wsdl:input> 
+               <soap:body use="encoded" namespace="http://localhost/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+           </wsdl:input>
+           <wsdl:output>
+               <soap:body use="encoded" namespace="http://localhost/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+           </wsdl:output>
+       </wsdl:operation> 
+		<wsdl:operation name="saveTagsForIssue">
+           <soap:operation soapAction="<?php echo APP_ROOT."soap/saveTagsForIssue";?>" />
            <wsdl:input> 
                <soap:body use="encoded" namespace="http://localhost/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
            </wsdl:input>
