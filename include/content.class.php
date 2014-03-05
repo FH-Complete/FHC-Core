@@ -1393,16 +1393,30 @@ class content extends basis_db
 					NOT EXISTS(SELECT * FROM campus.tbl_contentsprache 
 							WHERE 
 								content_id=".$this->db_add_param($id, FHC_INTEGER)." 
-								AND sprache=".$this->db_add_param($sprache).")))";
+								AND sprache=".$this->db_add_param($sprache);
+			$qry.=")))";
 			if($sichtbar)
 				$qry.=" AND sichtbar=true";
 			//Hoechste (sichtbare) Version
-			$qry.=" AND version=(SELECT max(version) FROM campus.tbl_contentsprache 
+			$qry.=" AND (version=(SELECT max(version) FROM campus.tbl_contentsprache 
 								WHERE content_id=".$this->db_add_param($id, FHC_INTEGER);
-			//." AND tbl_contentsprache.sprache=".$this->db_add_param($sprache);
+			$qry.=" AND tbl_contentsprache.sprache=".$this->db_add_param($sprache);
 			if($sichtbar)
 				$qry.=" AND sichtbar=true";
-			$qry.=")";
+			$qry.=")
+			OR
+			((SELECT max(version) FROM campus.tbl_contentsprache
+			WHERE content_id=".$this->db_add_param($id, FHC_INTEGER);
+			$qry.=" AND tbl_contentsprache.sprache=".$this->db_add_param($sprache);
+			if($sichtbar)
+				$qry.=" AND sichtbar=true";
+			$qry.=") is null
+			AND version = (SELECT max(version) FROM campus.tbl_contentsprache 
+								WHERE content_id=".$this->db_add_param($id, FHC_INTEGER);
+			$qry.=" AND tbl_contentsprache.sprache=".$this->db_add_param(DEFAULT_LANGUAGE);
+			if($sichtbar)
+				$qry.=" AND sichtbar=true";
+			$qry.=")))";
 		}	
 
 		if($result = $this->db_query($qry))
