@@ -200,17 +200,8 @@ class pruefungsfenster extends basis_db {
         return true;
     }
     
-
     /**
-     * prüft die Attribute dieser Klasse auf Gültigkeit
-     * @return true, wenn ok; false, im Fehlerfall
-     */
-    protected function validate() {
-        
-    }
-    
-    /**
-     * 
+     * Lädt alle Prüfungsfenster zu einem angegebenen Studiensemester
      * @param String $studiensemester_kurzbz Kurzbezeichnung des Studiensemesters
      * @param String $sort Spaltenname, nachdem sortiert werden soll
      * @return boolean true, wenn ok; false im Fehlerfall
@@ -281,6 +272,11 @@ class pruefungsfenster extends basis_db {
         return $data;
     }
     
+    /**
+     * prüft ob für ein Prüfungsfenster bereits Prüfungen angelegt sind
+     * @param integer $pruefungsfenster_id ID des Prüfungsfensters
+     * @return boolean true, wenn Prüfungsfenster vorhanden sind; false, wenn nicht und im Fehlerfall
+     */
     public function hasPruefungen($pruefungsfenster_id)
     {
         if(!is_numeric($pruefungsfenster_id))

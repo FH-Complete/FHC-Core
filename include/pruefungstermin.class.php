@@ -76,19 +76,6 @@ class pruefungstermin extends basis_db{
         
     }
     
-    public function save()
-    {
-        
-    }
-    
-    /**
-     * Lädt alle Prüfungstermine
-     */
-    public function getAll()
-    {
-        
-    }
-    
     /**
      * Lädt alle Prüfungstypen aus der Datenbank
      * @return Array/Boolean Ein Array mit den Daten, wenn ok; ansonsten false
