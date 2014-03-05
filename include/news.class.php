@@ -62,8 +62,14 @@ class news extends basis_db
 	 * Laedt alle News die nicht aelter
 	 * als $maxalter Tage sind
 	 * @param $maxalter
+	 * @param $studiengang_kz
+	 * @param $semester
+	 * @param $all Sollen alle Eintraege angezeigt werden
+	 * @param $fachbereich_kurzbz
+	 * @param $maxnews Limit
+	 * @param $mischen Sollen die allgemeinen News auch gemischt mit den anderen angezeigt werden
 	 */
-	public function getnews($maxalter, $studiengang_kz, $semester, $all=false, $fachbereich_kurzbz=null, $maxnews)
+	public function getnews($maxalter, $studiengang_kz, $semester, $all=false, $fachbereich_kurzbz=null, $maxnews, $mischen=true)
 	{
 		$qry = "SELECT * FROM campus.tbl_news WHERE true";
 		if(trim($maxalter)!='0')
@@ -86,8 +92,7 @@ class news extends basis_db
 		elseif(trim($studiengang_kz)=='')
 			$qry.='';
 		else
-			$qry.=" AND ((studiengang_kz='".trim($studiengang_kz)."' AND semester='".trim($semester)."') OR (studiengang_kz='".trim($studiengang_kz)."' AND semester=0) OR (studiengang_kz=0 AND semester='".trim($semester)."') OR (studiengang_kz=0 and semester is null))";
-			
+			$qry.=" AND ((studiengang_kz='".trim($studiengang_kz)."' AND semester='".trim($semester)."') OR (studiengang_kz='".trim($studiengang_kz)."' AND semester=0) OR (studiengang_kz=0 AND semester='".trim($semester)."') ".($mischen===true?"OR (studiengang_kz=0 and semester is null)":"").")";	
 		$qry.=' ORDER BY datum DESC';
 		if(trim($maxnews)!='0')
 			$qry.= " LIMIT ".trim($maxnews);

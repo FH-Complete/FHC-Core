@@ -15,7 +15,7 @@ $this->phrasen['dms_link/berechtigungskonzeptMailverteiler']='1475'; //Berechtig
 $this->phrasen['dms_link/handbuchUrlaubsverwaltung']='759'; //Handbuch Urlaubsverwaltung -> Leer lassen, falls es keines gibt
 
 // Content IDs (=Englisch)
-$this->phrasen['dms_link/lvPlanFAQ']='5877'; //Hilfe-Link aus dem LV-Plan in die LV-Plan FAQ auf der CIS (CMS-ID)
+$this->phrasen['dms_link/lvPlanFAQ']='6887'; //Hilfe-Link aus dem LV-Plan in die LV-Plan FAQ auf der CIS (CMS-ID)
 $this->phrasen['dms_link/veranstaltungsleitfaden']='133'; //Link zum Veranstaltungsleitfaden aus dem Eventkalender (CMS-ID)
 $this->phrasen['dms_link/bildRichtlinien']='6174'; //Link zu den Bild Richtlinen zB bei Bildupload im Profil (CMS-ID)
 $this->phrasen['dms_link/sicherheitAnDerFHTW']='6765'; //Link zum Hauptpunkt "Sicherheit an der FHTW" aus dem Ersthelfer-Skript
