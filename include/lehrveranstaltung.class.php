@@ -1752,5 +1752,40 @@ class lehrveranstaltung extends basis_db
             }
 
         }
+        
+        /**
+         * Lädt alle Studenten UIDs die die angegebenen LV besuchen (optional mit Studiensemester)
+         * @param integer $lehrveranstaltung_id ID der Lehrveranstaltung
+         * @param string $studiensemester_kurzbz Kurzbezeichnung des Studiensemesters
+         * @return boolean|array false, wenn eine Fehler auftritt; Array mit UIDs wenn erfolgreich
+         */
+        public function getStudentsOfLv($lehrveranstaltung_id, $studiensemester_kurzbz=null)
+        {
+            if(!is_numeric($lehrveranstaltung_id))
+            {
+                $this->errormsg = "Lehrveranstaltung ID muss eine gültige Zahl sein.";
+                return false;
+            }
+            
+            $qry = 'SELECT uid FROM campus.vw_student_lehrveranstaltung WHERE '
+                    . 'lehrveranstaltung_id='.$this->db_add_param($lehrveranstaltung_id);
+            
+            if(!is_null($studiensemester_kurzbz))
+            {
+                $qry .= ' AND studiensemester_kurzbz='.$this->db_add_param($studiensemester_kurzbz);
+            }
+            $qry .= ';';
+            
+            if($this->db_query($qry))
+            {
+                $result = array();
+                while($row = $this->db_fetch_object())
+                {
+                    array_push($result, $row->uid);
+                }
+                return $result;
+            }
+            return false;
+        }
 }
 ?>
