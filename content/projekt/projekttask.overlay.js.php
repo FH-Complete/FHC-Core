@@ -551,6 +551,7 @@ function onselectProjekttask()
 		var issue_projection_name=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#issue_projection_name" ));
 		var issue_eta_id=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#issue_eta_id" ));
 		var issue_eta_name=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#issue_eta_name" ));
+		var issue_tags_name=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#issue_tags_name" ));
 		var issue_resolution_id=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#issue_resolution_id" ));
 		var issue_resolution_name=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#issue_resolution_name" ));
 		var issue_due_date=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#issue_due_date" ));			 		 
@@ -592,6 +593,7 @@ function onselectProjekttask()
 		document.getElementById('textbox-projekttask-mantis-issue_due_date').value=issue_due_date;
 		document.getElementById('textbox-projekttask-mantis-issue_steps_to_reproduce').value=issue_steps_to_reproduce;
 		document.getElementById('textbox-projekttask-mantis-issue_additional_information').value=issue_additional_information;
+		document.getElementById('textbox-projekttask-mantis-issue_tags').value=issue_tags_name; 
 	}
 }
 
@@ -676,7 +678,8 @@ function saveProjekttaskMantis()
 	var issue_due_date=document.getElementById('textbox-projekttask-mantis-issue_due_date').value;
 	var issue_steps_to_reproduce=document.getElementById('textbox-projekttask-mantis-issue_steps_to_reproduce').value;
 	var issue_additional_information=document.getElementById('textbox-projekttask-mantis-issue_additional_information').value;
-
+	var issue_tags = document.getElementById('textbox-projekttask-mantis-issue_tags').value;
+	
 	var soapBody = new SOAPObject("saveMantis");
 	soapBody.appendChild(new SOAPObject("projekttask_id")).val(projekttask_id);
 	soapBody.appendChild(new SOAPObject("mantis_id")).val(mantis_id);
@@ -716,6 +719,20 @@ function saveProjekttaskMantis()
 
 	SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekttask.soap.php?"+gettimestamp();
 	SOAPClient.SendRequest(sr, clb_saveProjekttaskMantis);
+	
+	// Tags speichern
+	if(mantis_id != '')
+	{
+		var soapBody = new SOAPObject("saveTagsForIssue");
+		soapBody.appendChild(new SOAPObject("mantis_id")).val(mantis_id);
+		soapBody.appendChild(new SOAPObject("issue_tags")).val(issue_tags);	
+
+		var sr = new SOAPRequest("saveTagsForIssue",soapBody);
+
+		SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/projekttask.soap.php?"+gettimestamp();
+		SOAPClient.SendRequest(sr, clb_saveProjekttaskMantis);
+	}
+	
 }
 
 // ****

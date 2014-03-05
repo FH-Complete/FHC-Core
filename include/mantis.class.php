@@ -52,6 +52,7 @@ class mantis extends basis_db
 	public $issue_due_date;
 	public $issue_steps_to_reproduce;
 	public $issue_additional_information;
+	public $issue_tags; 
 	
 	public $soapClient;
 	public $errormsg;
@@ -80,6 +81,51 @@ class mantis extends basis_db
 		}
 	}
 
+	
+	/**
+	 * 
+	 * @param type $issue_tags
+	 * @return type
+	 */
+	public function setTags($issue_tags)
+	{
+		
+		$tags = array(); 
+		$tags_array = explode(',', $issue_tags);
+
+		// Hole alle Tags
+		$params_tags=array('username' => MANTIS_USERNAME, 'password' => MANTIS_PASSWORT, 'page_number'=>1, 'per_page'=>20);
+		$result_tags = $this->soapClient->__soapCall('mc_tag_get_all',$params_tags);
+		
+		
+		$test = array(); 
+		$test = $result_tags->results; 
+
+		
+		foreach($tags_array as $t)
+		{
+			$tags_help = new stdClass();
+			$tags_help->name = trim($t); 
+					
+			foreach($result_tags->results as $rt)
+			{
+
+				if($rt->name == $tags_help->name)
+				{
+					$tags_help->id = $rt->id; 
+				}
+
+			}
+			//$tags_help->id = 10; 
+			$tags[] = $tags_help; 
+		}
+		
+		$params=array('username' => MANTIS_USERNAME, 'password' => MANTIS_PASSWORT,'issue_id' =>$this->issue_id, $tags);
+		$result = $this->soapClient->__soapCall('mc_issue_set_tags',$params);
+		return $result;
+	}
+	
+	
 	/**
 	 * Ticket Update
 	 */
@@ -169,6 +215,21 @@ class mantis extends basis_db
 			$this->issue_resolution = new stdclass();
 			$this->issue_resolution->id = $result->resolution->id;	
 			$this->issue_resolution->name = $result->resolution->name;	
+			$this->issue_tags = new stdclass(); 
+			$anzTags = count($result->tags); 
+			$i = 1; 
+			foreach($result->tags as $r)
+			{
+				if($i == $anzTags)
+					$this->issue_tags->name.= $r->name; 
+				else
+					$this->issue_tags->name.=$r->name.','; 
+				
+				$i++; 
+			}
+			if($anzTags == 0)
+				$this->issue_tags->name = ''; 
+
 			$this->issue_description = $result->description;	
 			//$this->issue_attachments = $result->attachments;	
 			$this->issue_due_date = $result->due_date;	

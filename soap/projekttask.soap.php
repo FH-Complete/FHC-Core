@@ -39,6 +39,7 @@ $SOAPServer->addFunction("deleteProjekttask");
 $SOAPServer->addFunction("saveMantis");
 $SOAPServer->addFunction("setErledigt");
 $SOAPServer->addFunction("changeProjektPhase"); 
+$SOAPServer->addFunction("saveTagsForIssue"); 
 $SOAPServer->handle();
 
 // WSDL Chache auf aus
@@ -204,6 +205,26 @@ function saveMantis($projekttask_id, $mantis_id, $issue_summary, $issue_descript
 			return new SoapFault("Server", 'Fehler:'.$mantis->errormsg);
 	}
 }
+
+/**
+ * Setzt Tags für einen Eintrag
+ * @param type $mantis_id
+ * @param type $issue_tags
+ * @return string|\SoapFault
+ */
+function saveTagsForIssue($mantis_id, $issue_tags)
+{
+	//get_uid();
+	$mantis = new mantis();
+
+	$mantis->issue_id = $mantis_id;
+		
+	if($mantis->setTags($issue_tags))
+		return 'ok';
+	else
+		return new SoapFault("Server", $mantis->errormsg);
+}
+
 
 /**
  * 

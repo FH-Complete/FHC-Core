@@ -79,6 +79,7 @@ $mantis->getIssue($issue_id);
 		    <MANTIS:issue_projection_name><![CDATA[<?php echo $mantis->issue_projection->name;  ?>]]></MANTIS:issue_projection_name>
 		    <MANTIS:issue_eta_id><![CDATA[<?php echo $mantis->issue_eta->id;  ?>]]></MANTIS:issue_eta_id>
 		    <MANTIS:issue_eta_name><![CDATA[<?php echo $mantis->issue_eta->name;  ?>]]></MANTIS:issue_eta_name>
+			<MANTIS:issue_tags_name><![CDATA[<?php echo $mantis->issue_tags->name;  ?>]]></MANTIS:issue_tags_name>
 		    <MANTIS:issue_resolution_id><![CDATA[<?php echo $mantis->issue_resolution->id;  ?>]]></MANTIS:issue_resolution_id>
 		    <MANTIS:issue_resolution_name><![CDATA[<?php echo $mantis->issue_resolution->name;  ?>]]></MANTIS:issue_resolution_name>
 		    <MANTIS:issue_due_date><![CDATA[<?php echo $mantis->issue_due_date;  ?>]]></MANTIS:issue_due_date>
