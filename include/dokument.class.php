@@ -378,6 +378,7 @@ class dokument extends basis_db
      * Liefert alle Dokumente die eine Person abzugeben hat
      * ist notwendig um bei einer Bewerbung bei mehreren Studiengängen zu wissen was der Student im gesamten abzugeben hat
      * @param $person_id 
+	 * @param onlinebewerbung
      */
     public function getAllDokumenteForPerson($person_id, $onlinebewerbung= false)
     {
