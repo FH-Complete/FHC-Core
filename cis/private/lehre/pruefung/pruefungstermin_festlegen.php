@@ -583,6 +583,8 @@ foreach($pruefungen->result as $tempPrf)
                                             <th>Datum</th>
                                             <th>Von</th>
                                             <th>bis</th>
+                                            <th>min. Teilnehmer</th>
+                                            <th>max. Teilnehmer</th>
                                         </tr>
                                     </thead>
                                     <tbody id="prfTermin">
