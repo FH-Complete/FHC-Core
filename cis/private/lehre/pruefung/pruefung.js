@@ -69,6 +69,7 @@ function lehrveranstaltungDropdownhinzufuegen(element, isChanged)
 	if(!isChanged)
 	{
 		var newSelect = $("#lvDropdown1").clone();
+		newSelect.attr("onchange", "lehrveranstaltungDropdownhinzufuegen(this, false);");
 		var id = $("#lvDropdowns select").length+1;
 		newSelect.attr("id", "lvDropdown"+id);
 		element.setAttribute("onchange", "lehrveranstaltungDropdownhinzufuegen(this, true);");
