@@ -1033,8 +1033,8 @@ if(!$result = @$db->db_query("SELECT oe_kurzbz FROM public.tbl_bankverbindung LI
 		echo 'public.tbl_bankverbindung: Spalte oe_kurzbz hinzugefügt';
 }
 
-// dokument boolean onlinebewerbung
-if(!$result = @$db->db_query("Select onlinebewerbung from public.tbl_dokument LIMIT 1;"))
+// dokumentstudiengang boolean onlinebewerbung 
+if(!$result = @$db->db_query("Select onlinebewerbung from public.tbl_dokumentstudiengang LIMIT 1;"))
 {
 	$qry = "ALTER TABLE public.tbl_dokumentstudiengang ADD COLUMN onlinebewerbung boolean NOT NULL DEFAULT true; "; 
 	
@@ -1042,6 +1042,20 @@ if(!$result = @$db->db_query("Select onlinebewerbung from public.tbl_dokument LI
 		echo '<strong>public.tbl_dokumentstudiengang: '.$db->db_last_error().'</strong><br>';
 	else
 		echo 'public.tbl_dokumentstudiengang: Spalte onlinebewerbung hinzugefügt';
+}
+
+// Akte titel_intern und anmerkung_intern hinzufügen für Dokumentupload aus FAS
+if(!$result = @$db->db_query("SELECT titel_intern from public.tbl_akte LIMIT 1"))
+{
+	
+	$qry = "ALTER TABLE public.tbl_akte ADD COLUMN titel_intern varchar(64);
+			ALTER TABLE public.tbl_akte ADD COLUMN anmerkung_intern text; "; 
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_akte: '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'public.tbl_akte: Spalten titel_intern und anmerkung_intern hinzugefügt';
+			
 }
 
 // Pruefungsverwaltung
@@ -1338,7 +1352,7 @@ $tabellen=array(
 	"lehre.tbl_zeugnis"  => array("zeugnis_id","student_uid","zeugnis","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_zeugnisnote"  => array("lehrveranstaltung_id","student_uid","studiensemester_kurzbz","note","uebernahmedatum","benotungsdatum","bemerkung","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_adresse"  => array("adresse_id","person_id","name","strasse","plz","ort","gemeinde","nation","typ","heimatadresse","zustelladresse","firma_id","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id","dms_id","nachgereicht","anmerkung"),
+	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id","dms_id","nachgereicht","anmerkung","titel_intern","anmerkung_intern"),
 	"public.tbl_ampel"  => array("ampel_id","kurzbz","beschreibung","benutzer_select","deadline","vorlaufzeit","verfallszeit","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_ampel_benutzer_bestaetigt"  => array("ampel_benutzer_bestaetigt_id","ampel_id","uid","insertamum","insertvon"),
 	"public.tbl_aufmerksamdurch"  => array("aufmerksamdurch_kurzbz","beschreibung","ext_id"),
