@@ -108,9 +108,9 @@ class student extends benutzer
 	 */
 	protected function validate()
 	{
-		if(mb_strlen($this->uid)>16)
+		if(mb_strlen($this->uid)>32)
 		{
-			$this->errormsg = 'UID darf nicht laenger als 16 Zeichen sein';
+			$this->errormsg = 'UID darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
 		if($this->uid=='')
