@@ -59,7 +59,7 @@ $pruefungsfenster->getAll("start");
 $lehrveranstaltung = new lehrveranstaltung();
 //TODO
 $lehrveranstaltung->getLVByMitarbeiter($uid, $studiensemester->getSemesterFromDatum(date("Y-m-d")));
-$lehrveranstaltung->getLVByMitarbeiter("leutgeb", $studiensemester->getSemesterFromDatum(date("Y-m-d")));
+//$lehrveranstaltung->getLVByMitarbeiter("leutgeb", $studiensemester->getSemesterFromDatum(date("Y-m-d")));
 
 
 $pruefungstermin = new pruefungstermin();
@@ -190,9 +190,10 @@ if($_POST["method"] == "save")
                             foreach ($empfaenger as $e) {
                                 $mailto .= $e.'@'.DOMAIN.', ';
                             }
+                            //TODO Absender
                             $email = new mail($mailto, "unknown", "Prüfungstermin für ".$lv->bezeichnung, $text);
-                            var_dump($email);
-                            echo $email->send();
+//                            var_dump($email);
+                            $email->send();
                         }
                         
                         echo "Datensatz erfolgreich gespeichert!";
