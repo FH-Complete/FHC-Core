@@ -885,15 +885,22 @@ function decryptData($value,$key)
 
 function clearHtmlTags($text)
 {
+	$newline='
+		';
+	
 	$text=mb_str_replace('<br>','\n',$text);
 	$text=mb_str_replace('<br/>','\n',$text);
 	$text=mb_str_replace('<br />','\n',$text);
 
 	$text=mb_str_replace('<ul>\n','',$text);
 	$text=mb_str_replace('<ul>','',$text);
+	$text=mb_str_replace('\n</ul>','',$text);
 	$text=mb_str_replace('</ul>','',$text);
-	$text=mb_str_replace('<li>','\n - ',$text);
+	$text=mb_str_replace('<li>',$newline.' - ',$text);
 	$text=mb_str_replace('</li>','',$text);
+	
+	$text=mb_str_replace('</lI>','',$text);
+	$text=mb_str_replace('</li','',$text);
 	
 	return $text;
 }
