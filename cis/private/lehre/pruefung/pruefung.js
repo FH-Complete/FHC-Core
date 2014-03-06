@@ -45,6 +45,7 @@ function setDatePicker(ele)
 		});
 	});
 	$("#pruefungsfenster").attr("onchange", "setDatePicker()");
+	writePrfFensterDetails();
 }
 
 function terminHinzufuegen(inputTag)
@@ -131,6 +132,24 @@ function writePruefungsfenster(data)
 		}
 		
 	});
+	writePrfFensterDetails(data);
+}
+
+function writePrfFensterDetails(){
+	var id = $("#pruefungsfenster option:selected").val();
+//	console.log(data);
+	if(id !== null)
+	{
+		var start = $("#pruefungsfenster option:selected").attr("start");
+		var ende = $("#pruefungsfenster option:selected").attr("ende");
+		start = start.split('-');
+		ende = ende.split('-');
+		start = new Date(start[0], start[1]-1,start[2]);
+		ende = new Date(ende[0], ende[1]-1,ende[2]);
+		start = start.getDate()+"."+(start.getMonth()+1)+"."+start.getFullYear();
+		ende = ende.getDate()+"."+(ende.getMonth()+1)+"."+ende.getFullYear();
+		$("#prfFensterDetails").html("Beginn: "+start+"</br>Ende: "+ende);
+	}
 }
 
 

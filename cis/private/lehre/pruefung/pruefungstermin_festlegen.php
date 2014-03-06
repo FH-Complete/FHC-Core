@@ -529,6 +529,10 @@ foreach($pruefungen->result as $tempPrf)
                         </td>
                     </tr>
                     <tr>
+                        <td>Prüfungsfenster Details:</td>
+                        <td><div id="prfFensterDetails"></div></td>
+                    </tr>
+                    <tr>
                         <td>Prüfungstyp:</td>
                         <td>
                             <select name="pruefungsTyp">
