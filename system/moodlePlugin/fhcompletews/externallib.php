@@ -88,6 +88,7 @@ class local_fhcompletews_external extends external_api
 			if($grade_item->itemtype=='course')
 			{
 				$final_id=$key;
+				$finalitem = $grade_item;
 				break;
 			}
 		}
@@ -100,7 +101,7 @@ class local_fhcompletews_external extends external_api
 
 		// Liste mit allen Studierenden des Kurses durchlaufen
 		$geub = new grade_export_update_buffer();	 
-		$gui = new graded_users_iterator($export->course, $export->columns, $export->groupid);
+		$gui = new graded_users_iterator($export->course, array($final_id=>$finalitem), $export->groupid); //$export->columns
 
 		$gui->init();	
 		$kursgrad =array();
@@ -119,9 +120,11 @@ class local_fhcompletews_external extends external_api
 			{
 			  	$gradestr = $export->format_grade($userdata->grades[$final_id]);
 		     	$user_item['note']=$gradestr;
+
+				// nur zurueckliefern wenn eine Note gefunden wurde und diese nicht '-' ist
+				if($user_item['note']!='-')
+					$data[]=$user_item;
 			}
-			
-			$data[]=$user_item;
 		}
 	
 		$gui->close();

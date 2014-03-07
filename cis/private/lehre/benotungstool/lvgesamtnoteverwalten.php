@@ -93,8 +93,7 @@ $datum_obj = new datum();
 
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 $uid = (isset($_GET['uid'])?$_GET['uid']:'');
-?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+?><!DOCTYPE HTML>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -783,7 +782,7 @@ echo '<table>';
 					<tr>
 						<td class='td_datum'>".$p->t('global/datum')."</td>
 						<td class='td_note'>".$p->t('benotungstool/note')."</td>
-						</td></td>
+						<td></td>
 					</tr>
 					</table>
 				</td>
@@ -792,7 +791,7 @@ echo '<table>';
 					<tr>
 						<td class='td_datum'>".$p->t('global/datum')."</td>
 						<td class='td_note'>".$p->t('benotungstool/note')."</td>
-						</td></td>
+						<td></td>
 					</tr>
 					</table>
 				</td>
@@ -804,22 +803,25 @@ echo '<table>';
 
 		if($grade_from_moodle)
 		{
+			flush();
+			ob_flush();
+
 			$moodle24 = new moodle24_course();
 			$moodle24->loadNoten($lvid, $stsem);
 
-			$moodle24_course_bezeichung=array();
+			$moodle24_course_bezeichnung=array();
 
 			if(count($moodle24->result)>0)
 			{
 				// Bezeichnungen der Moodlekurse laden
 				foreach($moodle24->result as $obj)
 				{
-					if(!isset($moodle24_course_bezeichnung))
+					if(!isset($moodle24_course_bezeichnung[$obj->mdl_course_id]))
 					{
 						$moodle24course = new moodle24_course();
 						$moodle24course->load($obj->mdl_course_id);
-	
-						$moodle24_course_bezeichung[$obj->mdl_course_id]=$moodle24course->mdl_shortname;
+
+						$moodle24_course_bezeichnung[$obj->mdl_course_id]=$moodle24course->mdl_shortname;
 					}
 				}
 			}
@@ -960,10 +962,10 @@ echo '<table>';
 								else
 									$leneg = ' style="font-weight: bold;"';
 								$title="Moodle 2.4 KursID: ".$moodle24_noten->mdl_course_id.
-								"\nKursbezeichnung: ".$moodle24_course_bezeichung[$moodle24_noten->mdl_course_id].
+								"\nKursbezeichnung: ".$moodle24_course_bezeichnung[$moodle24_noten->mdl_course_id].
 								"\nUser: ".$moodle24_noten->uid.
 								"\nNote: $moodle24_noten->note";
-								$note_les_str .= "<br><span".$leneg.">".$moodle24_noten->note."</span><span  title='".$title."' style='font-size:10px'> (".$moodle24_course_bezeichung[$moodle24_noten->mdl_course_id].")</span> ";
+								$note_les_str .= "<br><span".$leneg.">".$moodle24_noten->note."</span><span  title='".$title."' style='font-size:10px'> (".$moodle24_course_bezeichnung[$moodle24_noten->mdl_course_id].")</span> ";
 
 							}
 						}
@@ -1067,7 +1069,7 @@ echo '<table>';
 						echo "<tr><td class='td_datum'>";
 						echo $pr_datum."</td><td class='td_note'>".$pr_note."</td><td>";
 						echo "<input type='button' name='anlegen' value='".$p->t('global/aendern')."' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"".$pr_datum."\",\"".$pr_note."\",\"".$pr_le_id."\")'>";					
-						echo "</td></tr>";
+						echo "<td></tr>";
 					}
 					echo "</table>";			
 					echo "</span>";
