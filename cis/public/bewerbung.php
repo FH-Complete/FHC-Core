@@ -1055,7 +1055,7 @@ $studiengang = new studiengang();
 	{
 		echo $p->t('tools/keineZahlungenVorhanden');
 	}	
-	echo '</td></tr></table';
+	//echo '</td></tr></table';
 	?>
 	</div>
 	

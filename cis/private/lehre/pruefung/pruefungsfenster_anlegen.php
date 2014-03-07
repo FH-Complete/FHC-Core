@@ -151,11 +151,12 @@ else if(isset($_POST["method"]) && $_POST["method"] == "update")
             {
 //                if ($datum->DateDiff($startDate, date("Y-m-d")) <= 0)
 //                {
+	            	$pruefungsfenster_id = $_POST["id"];
+	            	$pruefungsfenster = new pruefungsfenster();
+	            	$pruefungsfenster->load($pruefungsfenster_id);
+	            	
                     if(in_array($pruefungsfenster->oe_kurzbz, $oe))
-                    {
-                        $pruefungsfenster_id = $_POST["id"];
-                        $pruefungsfenster = new pruefungsfenster();
-                        $pruefungsfenster->load($pruefungsfenster_id);
+                    {                        
                         $pruefungsfenster->studiensemester_kurzbz = $studiensemester_selected;
                         $pruefungsfenster->oe_kurzbz = $oe_kurzbz;
                         $pruefungsfenster->start = $startDate;

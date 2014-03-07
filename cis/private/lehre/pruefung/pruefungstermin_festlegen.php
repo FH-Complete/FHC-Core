@@ -53,6 +53,7 @@ function compareLvIDs($a, $b)
 $studiensemester = new studiensemester();
 $studiensemester->getAll();
 
+$studiensemester_kurzbz=null;
 $pruefungsfenster = new pruefungsfenster();
 $pruefungsfenster->getAll("start");
 
@@ -65,7 +66,7 @@ $lehrveranstaltung->getLVByMitarbeiter($uid, $studiensemester->getSemesterFromDa
 $pruefungstermin = new pruefungstermin();
 $pruefungstypen = $pruefungstermin->getAllPruefungstypen();
 
-if($_POST["method"] == "save")
+if(isset($_POST["method"]) && $_POST["method"] == "save")
 {
     $studiensemester_kurzbz = isset($_POST["studiensemester"])?$_POST["studiensemester"]:null;
     $pruefungsfenster_id = isset($_POST["pruefungsfenster"])?$_POST["pruefungsfenster"]:null;
@@ -222,7 +223,7 @@ if($_POST["method"] == "save")
     }
     
 } 
-else if($_POST["method"] == "update")
+else if(isset($_POST["method"]) && $_POST["method"] == "update")
 {
     $studiensemester_kurzbz = isset($_POST["studiensemester"])?$_POST["studiensemester"]:null;
     $pruefungsfenster_id = isset($_POST["pruefungsfenster"])?$_POST["pruefungsfenster"]:null;
@@ -419,7 +420,7 @@ else if($_POST["method"] == "update")
     }
     
 }
-else if(isset ($_GET["method"]) && $_GET["action"] === "deleteTermin")
+else if(isset ($_GET["method"]) && isset ($_GET["action"]) && $_GET["action"] === "deleteTermin")
 {
     $pruefungstermin_id = $_GET["termin_id"];
     $pruefung_id = $_GET["id"];
@@ -428,7 +429,7 @@ else if(isset ($_GET["method"]) && $_GET["action"] === "deleteTermin")
     $pruefung->deleteTerminPruefung($pruefungstermin_id);
 }
 
-else if(isset ($_GET["method"]) && $_GET["action"] === "deleteLv")
+else if(isset ($_GET["method"]) && isset ($_GET["action"]) && $_GET["action"] === "deleteLv")
 {
     $lvId = $_GET["lvId"];
     $pruefung_id = $_GET["id"];
@@ -437,7 +438,7 @@ else if(isset ($_GET["method"]) && $_GET["action"] === "deleteLv")
     $pruefung->deleteLehrveranstaltungPruefung($lvId, $pruefung_id);
 }
 
-else if(isset ($_GET["action"]) && $_GET["action"] === "storno")
+else if(isset ($_GET["action"]) && isset ($_GET["action"]) && $_GET["action"] === "storno")
 {
     $pruefung_id = $_GET["id"];
     $pruefung = new pruefungCis();
