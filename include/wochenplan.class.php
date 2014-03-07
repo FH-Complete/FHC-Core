@@ -1056,10 +1056,10 @@ class wochenplan extends basis_db
 
 		// Kontext Menue
 		echo '<popupset>
-  				<popup id="stplPopupMenue">
+  				<menupopup id="stplPopupMenue">
 					<menuitem label="Raumvorschlag" oncommand="StplSearchRoom(document.popupNode);" />
     				<menuitem label="Entfernen" oncommand="TimeTableWeekMarkiere(document.popupNode);TimetableDeleteEntries()" />
-  				</popup>
+  				</menupopup>
 			</popupset>';
 
 		//Tabelle zeichnen
