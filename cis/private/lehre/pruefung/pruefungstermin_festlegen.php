@@ -57,10 +57,10 @@ $pruefungsfenster = new pruefungsfenster();
 $pruefungsfenster->getAll("start");
 
 $lehrveranstaltung = new lehrveranstaltung();
+
 //TODO
 $lehrveranstaltung->getLVByMitarbeiter($uid, $studiensemester->getSemesterFromDatum(date("Y-m-d")));
 //$lehrveranstaltung->getLVByMitarbeiter("leutgeb", $studiensemester->getSemesterFromDatum(date("Y-m-d")));
-
 
 $pruefungstermin = new pruefungstermin();
 $pruefungstypen = $pruefungstermin->getAllPruefungstypen();
@@ -174,27 +174,28 @@ if($_POST["method"] == "save")
                     }
                     if($pruefung->save(true))
                     {
-                        //TODO Absender und Inhalt fehlen
-                        foreach ($pruefung->lehrveranstaltungen as $lvId)
-                        {
-                            $lv = new lehrveranstaltung($lvId);
-                            $text = "Ein Prüfungstermin zu Ihrer Lehrveranstaltung ".$lv->bezeichnung." wurde angelegt.\n"
-                                    . "Die Prüfung kann am "
-                                    .date('d.m.Y', strtotime($pruefung->termine[0]->beginn))." "
-                                    . "in der Zeit von "
-                                    .date('H:i', strtotime($pruefung->termine[0]->beginn))." bis "
-                                    .date('H:i', strtotime($pruefung->termine[0]->ende))." abgelegt werden.";
-                            //$text = "test";
-                            $empfaenger = $lv->getStudentsOfLv($lvId, $pruefung->studiensemester_kurzbz);
-                            $mailto = "";
-                            foreach ($empfaenger as $e) {
-                                $mailto .= $e.'@'.DOMAIN.', ';
-                            }
-                            //TODO Absender
-                            $email = new mail($mailto, "unknown", "Prüfungstermin für ".$lv->bezeichnung, $text);
-//                            var_dump($email);
-                            $email->send();
-                        }
+                        //TODO Mail-Inhalt fehlt
+//                        foreach ($pruefung->lehrveranstaltungen as $lvId)
+//                        {
+//                            $lv = new lehrveranstaltung($lvId);
+//                            $text = "Ein Prüfungstermin zu Ihrer Lehrveranstaltung ".$lv->bezeichnung." wurde angelegt.\n"
+//                                    . "Die Prüfung kann am "
+//                                    .date('d.m.Y', strtotime($pruefung->termine[0]->beginn))." "
+//                                    . "in der Zeit von "
+//                                    .date('H:i', strtotime($pruefung->termine[0]->beginn))." bis "
+//                                    .date('H:i', strtotime($pruefung->termine[0]->ende))." abgelegt werden.";
+//                            //$text = "test";
+//                            $empfaenger = $lv->getStudentsOfLv($lvId, $pruefung->studiensemester_kurzbz);
+//                            $mailto = "";
+//                            foreach ($empfaenger as $e) {
+//                                $mailto .= $e.'@'.DOMAIN.', ';
+//                            }
+//
+//                            $email = new mail($mailto, "fhcomplete", "Prüfungstermin für ".$lv->bezeichnung, $text);
+//                            $email->setReplyTo($uid."@".DOMAIN);
+////                            var_dump($email);
+//                            $email->send();
+//                        }
                         
                         echo "Datensatz erfolgreich gespeichert!";
                     }
