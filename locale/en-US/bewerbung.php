@@ -3,7 +3,7 @@ $this->phrasen['bewerbung/welcome']='Welcome to the online application for degre
 $this->phrasen['bewerbung/registration']='Registration';
 $this->phrasen['bewerbung/registrieren']='Register';
 $this->phrasen['bewerbung/registrierenOderZugangscode']='<a href="'.$_SERVER['PHP_SELF'].'?method=registration">Register here</a> or enter access code';
-$this->phrasen['bewerbung/einleitungstext']='Für eine Bewerbung an der FH Technikum Wien füllen Sie bitte das Formular <u>vollständig</u> aus und klicken Sie anschließend auf "Registrieren". <br>
+$this->phrasen['bewerbung/einleitungstext']='Für eine Bewerbung füllen Sie bitte das Formular <u>vollständig</u> aus und klicken Sie anschließend auf "Registrieren". <br>
 												Danach haben Sie noch die Möglichkeit, weitere Daten einzugeben und Dokumente hochzuladen, bevor Sie Ihre Bewerbung abschicken.'; //noch zu übersetzen
 $this->phrasen['bewerbung/login']='Login';
 $this->phrasen['bewerbung/zugangscode']='Access Code';

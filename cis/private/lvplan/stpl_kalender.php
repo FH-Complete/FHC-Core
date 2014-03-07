@@ -111,17 +111,20 @@ if(!isset($begin))
 	else
 		$ss = $stsem;
 	$objSS->load($ss);
-	$begin = datum::mktime_fromdate($objSS->start);
-	
-	// Ein Monat vor ende des Studiensemester soll zusaetzlich das kommede angezeigt werden
 	$datum_obj = new datum();
-	if($datum_obj->DateDiff($objSS->ende, date('Y-m-d H:i:s'))<=30)
+	$begin = $datum_obj->mktime_fromdate($objSS->start);
+	
+	// Ein Monat vor ende des Studiensemester soll zusaetzlich das kommende angezeigt werden
+	$datum_obj = new datum();
+	$diff = $datum_obj->DateDiff($objSS->ende, date('Y-m-d H:i:s'));
+	
+	if($diff<=30 & $diff>0)
 	{
 		$objSS->getNextFrom($ss);
-		$ende = datum::mktime_fromdate($objSS->ende);
+		$ende = $datum_obj->mktime_fromdate($objSS->ende);
 	}
 	else
-		$ende = datum::mktime_fromdate($objSS->ende);
+		$ende = $datum_obj->mktime_fromdate($objSS->ende);
 }
 
 
