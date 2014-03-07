@@ -45,7 +45,6 @@ function setDatePicker(ele)
 		});
 	});
 	$("#pruefungsfenster").attr("onchange", "setDatePicker()");
-	writePrfFensterDetails();
 }
 
 function terminHinzufuegen(inputTag)
@@ -118,13 +117,21 @@ function writePruefungsfenster(data)
 	{
 		if(v.oe_kurzbz !== null)
 		{
+			var start = v.start;
+			var ende = v.ende;
+			start = start.split('-');
+			ende = ende.split('-');
+			start = new Date(start[0], start[1]-1,start[2]);
+			ende = new Date(ende[0], ende[1]-1,ende[2]);
+			start = start.getDate()+"."+(start.getMonth()+1)+"."+start.getFullYear();
+			ende = ende.getDate()+"."+(ende.getMonth()+1)+"."+ende.getFullYear();
 			if(v.pruefungsfenster_id === prfFensterId)
 			{
-				$("#pruefungsfenster").append("<option selected start='"+v.start+"' ende='"+v.ende+"' value='"+v.pruefungsfenster_id+"'>" + v.oe_kurzbz + "</option>");
+				$("#pruefungsfenster").append("<option selected start='"+v.start+"' ende='"+v.ende+"' value='"+v.pruefungsfenster_id+"'>" + v.oe_kurzbz +" ("+start+" - "+ende+")</option>");
 			}
 			else
 			{
-				$("#pruefungsfenster").append("<option start='"+v.start+"' ende='"+v.ende+"' value='"+v.pruefungsfenster_id+"'>" + v.oe_kurzbz + "</option>");	
+				$("#pruefungsfenster").append("<option start='"+v.start+"' ende='"+v.ende+"' value='"+v.pruefungsfenster_id+"'>" + v.oe_kurzbz +" ("+start+" - "+ende+")</option>");	
 			}
 		}
 		else
@@ -133,7 +140,6 @@ function writePruefungsfenster(data)
 		}
 		
 	});
-	writePrfFensterDetails(data);
 }
 
 function writePrfFensterDetails(){
