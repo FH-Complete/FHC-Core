@@ -99,6 +99,33 @@ class authentication extends auth
 		return(false);
 	}
 
+	/**
+	 * Prueft ob der User im LDAP angelegt ist
+	 * @param $username UID des Users
+	 * @return boolean true wenn vorhanden, sonst false
+	 */
+	public function UserExternalExists($username)
+	{
+		// Alle vorhandenen LDAP Server nacheinander durchlaufen
+		// bis einer passt.
+		foreach($this->ldap_config as $ldap)
+		{
+			$ldap_obj = new ldap();
+			// Verbindung zum Server
+			if($ldap_obj->connect($ldap['LDAP_SERVER'],$ldap['LDAP_PORT'],$ldap['LDAP_BIND_USER'],$ldap['LDAP_BIND_PASSWORD'],$ldap['LDAP_STARTTLS']))
+			{
+				// User suchen
+				if($userdn = $ldap_obj->GetUserDN($username, $ldap['LDAP_BASE_DN'],$ldap['LDAP_USER_SEARCH_FILTER']))
+				{
+					$ldap_obj->unbind();
+					return true;
+				}
+			}
+			$ldap_obj->unbind();
+		}
+		return false;
+	}
+
 	public function RequireLogin()
 	{
 		$_SESSION['request_uri']=$_SERVER['REQUEST_URI'];

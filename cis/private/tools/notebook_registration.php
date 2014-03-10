@@ -16,6 +16,7 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/File/SearchReplace.php');
 require_once('../../../include/File/Match.php');
 require_once('../../../include/phrasen.class.php'); 
+require_once('../../../include/authentication.class.php');
 
 $sprache = getSprache(); 
 $p=new phrasen($sprache); 
@@ -79,18 +80,12 @@ function ip_increment($ip = "")
 			}
 			else if ($txtUID && $txtPassword)
 			{
-				//$ldap_conn = @ConnectLDAP("pdc1.technikum-wien.at") or die("Der LDAP-Server ist nicht erreichbar.");
-				$ldap_conn = ldap_connect(LDAP_SERVER) or die($p->t("global/LDAPserverNichtErreichbar"));
-				$user_dn = "uid=$txtUID, ou=People, dc=technikum-wien, dc=at";
-
-				if(!@ldap_bind($ldap_conn, $user_dn, $txtPassword) === true)
-				{
-					$error = 2;
-				}
+				// Passwort pruefen
+				$auth = new authentication();
+				if($auth->checkpassword($txtUID, $txtPassword))
+					$error=0;
 				else
-				{
-					$error = 0;
-				}
+					$error=2;
 			}
 			else
 			{
@@ -102,7 +97,8 @@ function ip_increment($ip = "")
 			{
 				if(isset($txtMAC) && $txtMAC != "")
 				{
-					$sql_query = "SELECT DISTINCT vorname, nachname FROM campus.vw_benutzer WHERE uid='".addslashes($txtUID)."' LIMIT 1";
+					$sql_query = "SELECT DISTINCT vorname, nachname 
+					FROM campus.vw_benutzer WHERE uid=".$db->db_add_param($txtUID)." LIMIT 1";
 	
 					if($result = $db->db_query($sql_query))
 					{
@@ -237,14 +233,14 @@ function ip_increment($ip = "")
 			</table>
   	      </form>
 		  <?php
-		  //echo "error:".$error;
+
 		  	if ($error == 1)
 				echo '<h3>'.$p->t("notebookregister/passwortEingebenWennUIDgeaendert").'.</h3>';
 			else if ($error == 2)
 				echo '<h3>'.$p->t("notebookregister/passwortErneutEingeben").'.</h3>';
 			else if ($error == 3)
 				echo '<h3>'.$p->t("notebookregister/MACadresseBereitsVerwendet").'.</h3>';
-		//echo "result:".$mac_result;
+
 		  	if(isset($mac_result) && $mac_result!='')
 			{
 				if($mac_result == 0)
@@ -267,16 +263,6 @@ function ip_increment($ip = "")
 		  ?>
 		  <p><?php echo $p->t("notebookregister/notebook_absatz2");?></p>
 		</td>
-		<!--<td class="menubox">
-		<p><a href="content.php?content_id=">Links zu Unterpunkten</a></p>
-		</td>
-		</tr>
-		<tr>
-		<td class="teambox" style="width: 20%;">TEAM:<br /><br /><a href="mailto:">Titelpre Vorname Nachname Titelpost</a><br />Aufgaben, Verantwortlichkeiten, Expertisen<br />T: +43 1 333 40 77-DW<br />E: <a href="mailto:">aliasadresse@technikum-wien.at</a></td>
-		</tr>
-		<tr>
-		<td style="width: 20%;" valign="top">&nbsp;</td>
-	  	</tr>-->
   </tr>
 </table>
 </div>

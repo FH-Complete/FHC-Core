@@ -68,20 +68,41 @@ define('URLAUB_TOOLS',true);
 // auth_session  - Sessions mit LDAP (Testbetrieb)
 define("AUTH_SYSTEM", "auth_mixed");
 // Gibt den Namen fuer die htaccess Authentifizierung an (muss mit dem Attribut AuthName im htaccess uebereinstimmen)
-define("AUTH_NAME","Technikum-Wien");
+define("AUTH_NAME","FHComplete");
 
-// LDAP_SERVER: Adresse des LDAP Servers
-define("LDAP_SERVER","www.technikum-wien.at");
-// LDAP Master Server fuer Passwort Aenderungen
+/*
+ * LDAP Einstellungen
+ *
+ * LDAP_SERVER: LDAP Server URL inkl. ldap:// bzw ldaps://
+ * LDAP_PORT: LDAP Port (389 | 636)
+ * LDAP_STARTTLS: Starttls für Verschlüsselung starten (true | false)
+ * LDAP_BASE_DN: Basis DN der User (ou=People,dc=example,dc=com)
+ * LDAP_BIND_USER: DN des Users falls eine Authentifizierung am LDAP noetig ist oder null
+ * LDAP_BIND_PASSWORD: Passwort des Users falls eine Authentifizierung am LDAP noetig ist oder null
+ * LDAP_USER_SEARCH_FILTER: LDAP Attribut in dem der Username steht nach dem gesucht wird (uid | sAMAccountName)
+ */
+define('LDAP_SERVER','ldap://ldap.example.com');
+define('LDAP_PORT',389);
+define('LDAP_STARTTLS',true);
+define('LDAP_BASE_DN','ou=People,dc=example,dc=com');
+define('LDAP_BIND_USER',null);
+define('LDAP_BIND_PASSWORD',null);
+define('LDAP_USER_SEARCH_FILTER','uid');
+
+// 2. LDAP Server (zB wenn Mitarbeiter und Studierende auf 2 getrennten Servern liegen)
+/*
+define('LDAP2_SERVER','ldaps://dc1.example.com');
+define('LDAP2_PORT',636);
+define('LDAP2_STARTTLS',false);
+define('LDAP2_BASE_DN','ou=Mitarbeiter,dc=example,dc=com');
+define('LDAP2_BIND_USER','cn=fhcomplete,dc=example,dc=com');
+define('LDAP2_BIND_PASSWORD','Pa55w0rd');
+define('LDAP2_USER_SEARCH_FILTER','sAMAccountName');
+*/
+
+// LDAP MASTER SERVER fuer Passwort Aenderungen
 define('LDAP_SERVER_MASTER',LDAP_SERVER);
-// LDAP BASIS DN fuer User
-define("LDAP_BASE_DN","ou=People, dc=technikum-wien, dc=at");
-//User fuer LDAP BIND falls Authentifizierung noetig
-define("LDAP_BIND_USER",null);
-//Passwort fuer LDAP BIND falls Authentifzierung noetig
-define("LDAP_BIND_PASSWORD",null);
-//LDAP Attribut in dem der Username steht nach dem gesucht wird
-define("LDAP_USER_SEARCH_FILTER","uid");
+
 // Attribut fuer Zutrittskartennummer im LDAP
 define("LDAP_CARD_NUMBER","twHitagCardNumber");
 // Attribut fuer Zutrittskartennummer2 im LDAP

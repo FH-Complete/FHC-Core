@@ -23,10 +23,35 @@
  */
 
 require_once(dirname(__FILE__).'/basis.class.php');
+require_once(dirname(__FILE__).'/../addons/ldap/vilesci/ldap.class.php');
 
 class authentication extends auth
 {
+	public $ldap_config;
 
+	public function __construct()
+	{
+		$this->ldap_config[]=array('LDAP_SERVER'=>LDAP_SERVER,
+			'LDAP_PORT'=>LDAP_PORT,
+			'LDAP_STARTTLS'=>LDAP_STARTTLS,
+			'LDAP_BASE_DN'=>LDAP_BASE_DN,
+			'LDAP_BIND_USER'=>LDAP_BIND_USER,
+			'LDAP_BIND_PASSWORD'=>LDAP_BIND_PASSWORD,
+			'LDAP_USER_SEARCH_FILTER'=>LDAP_USER_SEARCH_FILTER);
+
+		// Wenn ein zweiter LDAP Server angegeben wurde, diesen mitaufnehmen
+		if(defined('LDAP2_SERVER'))
+		{
+			$this->ldap_config[]=array('LDAP_SERVER'=>LDAP2_SERVER,
+			'LDAP_PORT'=>LDAP2_PORT,
+			'LDAP_STARTTLS'=>LDAP2_STARTTLS,
+			'LDAP_BASE_DN'=>LDAP2_BASE_DN,
+			'LDAP_BIND_USER'=>LDAP2_BIND_USER,
+			'LDAP_BIND_PASSWORD'=>LDAP2_BIND_PASSWORD,
+			'LDAP_USER_SEARCH_FILTER'=>LDAP2_USER_SEARCH_FILTER);
+		}
+	}
+	
 	public function login($username)
 	{
 		// Nicht noetig da dies ueber htaccess gesteuert wird
@@ -48,62 +73,67 @@ class authentication extends auth
 		}
 	}
 
-	// derzeit checkldapuser in functions.inc.php bzw per htaccess
+	/**
+	 * Prueft ob Username und Passwort stimmen
+	 * @param $username UID des Users
+	 * @param $passwort Passwort des Users
+	 * @return boolean true wenn Passwort ok, false wenn falsch
+	 */
 	public function checkpassword($username, $passwort)
 	{
-		if($connect=ldap_connect(LDAP_SERVER))
+		// Alle vorhandenen LDAP Server nacheinander durchlaufen
+		// bis einer passt.
+		foreach($this->ldap_config as $ldap)
 		{
-			ldap_set_option($connect, LDAP_OPT_REFERRALS,0);
-			ldap_set_option($connect, LDAP_OPT_PROTOCOL_VERSION,3);
-
-			// bind to ldap connection
-			if(($bind=ldap_bind($connect, LDAP_BIND_USER, LDAP_BIND_PASSWORD)) == false)
+			$ldap_obj = new ldap();
+			// Verbindung zum Server
+			if($ldap_obj->connect($ldap['LDAP_SERVER'],$ldap['LDAP_PORT'],$ldap['LDAP_BIND_USER'],$ldap['LDAP_BIND_PASSWORD'],$ldap['LDAP_STARTTLS']))
 			{
-				$this->errormsg="LDAP BIND Fehlgeschlagen";
-				return false;
-			}
+				// DN des Users holen
+				if($userdn = $ldap_obj->GetUserDN($username, $ldap['LDAP_BASE_DN'],$ldap['LDAP_USER_SEARCH_FILTER']))
+				{
+					// Verbindung trennen
+					$ldap_obj->unbind();
 
-			// search for user
-			if (($res_id = ldap_search( $connect, LDAP_BASE_DN, LDAP_USER_SEARCH_FILTER."=$username")) == false)
-			{
-				$this->errorsmg="Suche in LDAP fehlgeschlagen";
-				return false;
+					// Verbindung mit DN des Users und dessen Passwort herstellen
+					if($ldap_obj->connect($ldap['LDAP_SERVER'],$ldap['LDAP_PORT'],$userdn,$passwort,$ldap['LDAP_STARTTLS']))
+					{
+						// Passwort und User OK
+						$ldap_obj->unbind();
+						return true;
+					}
+				}
 			}
-
-			if (ldap_count_entries($connect, $res_id) != 1)
-			{
-				$this->errormsg='Username wurde nicht oder oefter gefunden';
-				return false;
-			}
-
-			if (( $entry_id = ldap_first_entry($connect, $res_id))== false)
-			{
-				$this->errormsg='LDAP Fetch fehlgeschlagen';
-				return false;
-			}
-
-			if (( $user_dn = ldap_get_dn($connect, $entry_id)) == false)
-			{
-				$this->errormsg='LDAP user-dn fetched fehlgeschlagen';
-				return false;
-			}
-
-			/* Authentifizierung des User */
-			if (($link_id = @ldap_bind($connect, $user_dn, $passwort)) == false)
-			{
-				$this->errormsg='LDAP Bind fehlgeschlagen: '.ldap_error($connect);
-				return false;
-			}
-
-			ldap_close($connect);
-			return true;
 		}
-		else
+		// Kein Eintrag gefunden
+		return false;
+	}
+
+	/**
+	 * Prueft ob der User im LDAP angelegt ist
+	 * @param $username UID des Users
+	 * @return boolean true wenn vorhanden, sonst false
+	 */
+	public function UserExternalExists($username)
+	{
+		// Alle vorhandenen LDAP Server nacheinander durchlaufen
+		// bis einer passt.
+		foreach($this->ldap_config as $ldap)
 		{
-			$this->errormsg='Verbindung zum LDAP Server fehlgeschlagen';
+			$ldap_obj = new ldap();
+			// Verbindung zum Server
+			if($ldap_obj->connect($ldap['LDAP_SERVER'],$ldap['LDAP_PORT'],$ldap['LDAP_BIND_USER'],$ldap['LDAP_BIND_PASSWORD'],$ldap['LDAP_STARTTLS']))
+			{
+				// User suchen
+				if($userdn = $ldap_obj->GetUserDN($username, $ldap['LDAP_BASE_DN'],$ldap['LDAP_USER_SEARCH_FILTER']))
+				{
+					$ldap_obj->unbind();
+					return true;
+				}
+			}
+			$ldap_obj->unbind();
 		}
-		ldap_close($connect);
-		return(false);
+		return false;
 	}
 
 	// derzeit manual_basic_auth in functions.inc.php eventuell 
