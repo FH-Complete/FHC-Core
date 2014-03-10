@@ -68,6 +68,16 @@ class authentication extends auth
 			return false;
 	}
 
+	/**
+	 * Prueft ob der User extern (zB im LDAP) angelegt ist
+	 * @param $username UID des Users
+	 * @return boolean true wenn vorhanden, sonst false
+	 */
+	public function UserExternalExists($username)
+	{
+		return true;
+	}
+
 	// derzeit manual_basic_auth in functions.inc.php eventuell 
 	// direkt von getUser aus aufrufen wenn nicht authentifiziert
 	public function RequireLogin()

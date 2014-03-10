@@ -28,6 +28,7 @@ abstract class auth extends basis
 {
 	abstract function getUser();
 	abstract function checkpassword($username, $passwort);
+	abstract function UserExternalExists($username);
 	abstract function RequireLogin(); 
 	abstract function isUserLoggedIn();
 	abstract function getOriginalUser();

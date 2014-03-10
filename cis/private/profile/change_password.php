@@ -212,7 +212,7 @@ function change_password($passwort_alt, $passwort_neu, $uid)
 			$ldap = new ldap();
 
 			// Bind des User mit alten Passwort
-			if($ldap->connect('starttls', LDAP_SERVER_MASTER, $user_dn, $passwort_alt))
+			if($ldap->connect(LDAP_SERVER_MASTER,LDAP_PORT,$user_dn, $passwort_alt, LDAP_STARTTLS))
 			{
 				// Passwort verschlüsseln
 				//SSHA
