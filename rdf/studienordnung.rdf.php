@@ -52,9 +52,11 @@ if(isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		{
 			case 'b':
 				$titel_kurzbz='BSc';
+				$stg_art = 'Bachelor'; 
 				break;
 			case 'm':
 				$titel_kurzbz='MSc';
+				$stg_art = 'Master'; 
 				break;
 			default:
 				$titel_kurzbz='';
