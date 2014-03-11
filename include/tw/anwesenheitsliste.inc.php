@@ -33,7 +33,7 @@ $pdf->SetXY(30,40);
 $stgobj=new studiengang();
 $stgobj->load($stg);
 //Logo
-$pdf->Image("../../../skin/images/logo.jpg","430","55","120","35","jpg","");
+$pdf->Image("../../../skin/images/logo.jpg","418","45","","45","jpg","");
 //$pdf->Image("../../../skin/images/tw_logo_02.jpg","400","30","116","43","jpg","");
 
 $bezeichnung='';
@@ -120,7 +120,7 @@ $pdf->MultiCell(40,$lineheight,'',1,'L',0);
 $maxY=$pdf->GetY();
 $maxX=30;
 $pdf->SetXY($maxX,$maxY);
-$pdf->MultiCell(280,$lineheight,'Anzahl der abgehaltenen Stunden',1,'L',0);
+$pdf->MultiCell(280,$lineheight,'Anzahl der abgehaltenen Einheiten',1,'L',0);
 $maxX +=280;
 $pdf->SetXY($maxX,$maxY);
 $pdf->MultiCell(40,$lineheight,'',1,'L',0);
@@ -145,7 +145,7 @@ $pdf->SetFont('Arial','B',10);
 $maxY=$pdf->GetY();
 $maxX=30;
 $pdf->SetXY($maxX,$maxY);
-$pdf->MultiCell(520,$lineheight+2,'Lektoren',1,'L',1);
+$pdf->MultiCell(520,$lineheight+2,'LektorInnen',1,'L',1);
 
 //Schleife aller lektoren
 
@@ -199,7 +199,7 @@ $pdf->SetFont('Arial','B',10);
 $maxY=$pdf->GetY();
 $maxX=30;
 $pdf->SetXY($maxX,$maxY);
-$pdf->MultiCell(520,$lineheight+2,'Studenten',1,'L',1);
+$pdf->MultiCell(520,$lineheight+2,'Studierende',1,'L',1);
 
 $maxY=$pdf->GetY();
 $pdf->tablewidths = array(20,140,60,60,40,40,40,40,40,40); //Spaltenbreiten setzen
@@ -210,7 +210,7 @@ $aligns = array('R','L','C','C','L','L','L','L','L','L'); //Ausrichtung der Tabe
 
 $pdf->SetFont('Arial','',8);
 $pdf->SetXY(30,$maxY);
-$inhalt[]=array(' ','Hörer/Name','Kennzeichen','Gruppe','','','','','',''); //Spaltenueberschriften
+$inhalt[]=array(' ','HÃ¶rerIn/Name','Kennzeichen','Gruppe','','','','','',''); //Spaltenueberschriften
 
 //Studenten holen
 
@@ -222,7 +222,7 @@ $pdf->SetFont('Arial','',8);
 		$maxX +=20;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->SetFont('Arial','B',8);
-		$pdf->MultiCell(130,$lineheight,'Hörer/Name',1,'L',0);
+		$pdf->MultiCell(130,$lineheight,'HÃ¶rer/Name',1,'L',0);
 		$maxX +=130;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(65,$lineheight,'Kennzeichen',1,'C',0);
@@ -379,6 +379,6 @@ $maxY=$pdf->GetY();
 $maxX=30;
 $pdf->SetXY($maxX,$maxY);
 $pdf->SetFont('Arial','',8);
-$pdf->MultiCell(520,$lineheight,'Fehlt ein Student länger als 2 Wochen, bitte um einen deutlichen Vermerk auf der Anwesenheitsliste. Die Anwesenheitsliste bitte am Ende des Monats im Sekretariat abgeben! Bitte achten Sie darauf, dass Sie nur VOLLSTÄNDIG AUSGEFÜLLTE LISTEN abgeben!',0,'L',0);
+$pdf->MultiCell(520,$lineheight,'Fehlt ein/e Student/in lÃ¤nger als 2 Wochen, bitte um einen deutlichen Vermerk auf der Anwesenheitsliste. Die Anwesenheitsliste bitte am Ende des Monats im Sekretariat abgeben! Bitte achten Sie darauf, dass Sie nur VOLLSTï¿½NDIG AUSGEFï¿½LLTE LISTEN abgeben!',0,'L',0);
 $pdf->Output('anwesenheitsliste.pdf','I');
 ?>

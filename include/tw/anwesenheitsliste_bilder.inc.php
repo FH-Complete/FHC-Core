@@ -33,7 +33,7 @@ $pdf->SetXY(30,40);
 $stgobj=new studiengang();
 $stgobj->load($stg);
 //Logo
-$pdf->Image("../../../skin/images/logo.jpg","430","55","120","35","jpg","");
+$pdf->Image("../../../skin/images/logo.jpg","430","45","","45","jpg","");
 //$pdf->Image("../../../skin/images/tw_logo_02.jpg","400","30","116","43","jpg","");
 
 $bezeichnung='';
@@ -110,7 +110,7 @@ $pdf->SetFont('Arial','',8);
 		$maxX +=20;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->SetFont('Arial','B',8);
-		$pdf->MultiCell(130,$lineheight,'H�rer/Name',1,'L',0);
+		$pdf->MultiCell(130,$lineheight,'HörerIn/Name',1,'L',0);
 		$maxX +=130;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(65,$lineheight,'Kennzeichen',1,'C',0);
