@@ -123,7 +123,7 @@ if(isset($_POST["schick"]))
 			$gruppe = new gruppe();
 			$gruppe->gruppe_kurzbz=$gruppe_kurzbz;
 			$gruppe->studiengang_kz=$studiengang->studiengang_kz;
-			$gruppe->bezeichnung=$lehrveranstaltung_obj->bezeichnung;
+			$gruppe->bezeichnung=mb_substr($lehrveranstaltung_obj->bezeichnung,0,30);
 			$gruppe->semester=$lehrveranstaltung_obj->semester;
 			$gruppe->sort='';
 			$gruppe->mailgrp=false;
