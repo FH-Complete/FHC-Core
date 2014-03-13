@@ -126,8 +126,10 @@ loadVariables($user);
 	
 	$worksheet->write($zeile,++$i,"STUDIENGANG", $format_bold);
 	$maxlength[$i]=11;
-	$worksheet->write($zeile,++$i,"SEMESTER", $format_bold);
-	$maxlength[$i]=8;
+	$worksheet->write($zeile,++$i,"SEMESTER IM $studiensemester_kurzbz", $format_bold);
+	$maxlength[$i]=19;
+	$worksheet->write($zeile,++$i,"SEMESTER AKTUELL", $format_bold);
+	$maxlength[$i]=17;
 	$worksheet->write($zeile,++$i,"VERBAND", $format_bold);
 	$maxlength[$i]=7;
 	$worksheet->write($zeile,++$i,"GRUPPE", $format_bold);
@@ -337,12 +339,13 @@ loadVariables($user);
 		$worksheet->write($zeile,$i, $row->stgbez);
 		$i++;
 		
-		$qry = "SELECT * FROM public.tbl_studentlehrverband JOIN public.tbl_student USING(student_uid) WHERE prestudent_id='$row->prestudent_id' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+		$qry = "SELECT tbl_studentlehrverband.semester AS semester_studiensemester, tbl_student.semester AS semester_aktuell,* FROM public.tbl_studentlehrverband JOIN public.tbl_student USING(student_uid) WHERE prestudent_id='$row->prestudent_id' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
 		if($result_sem = $db->db_query($qry))
 		{
 			if($row_sem = $db->db_fetch_object($result_sem))
 			{
-				$semester = $row_sem->semester;
+				$semester_aktuell = $row_sem->semester_aktuell;
+				$semester_studiensemester = $row_sem->semester_studiensemester;
 				$verband = $row_sem->verband;
 				$gruppe = $row_sem->gruppe;
 			}
@@ -351,22 +354,31 @@ loadVariables($user);
 				$qry = "SELECT public.tbl_prestudentstatus.ausbildungssemester FROM public.tbl_prestudentstatus WHERE prestudent_id='$row->prestudent_id' AND (status_kurzbz='Interessent' OR status_kurzbz='Bewerber') ORDER BY datum DESC LIMIT 1";
 				if (($result_sem = $db->db_query($qry)) && ($row_sem = $db->db_fetch_object($result_sem)))
 				{
-					$semester = $row_sem->ausbildungssemester;
+					$semester_aktuell = $row_sem->ausbildungssemester;
 				}
 				else
 				{
-					$semester = '';
+					$semester_aktuell = '';
 					$verband = '';
 					$gruppe = '';
 				}		
 			}
 		}
-		//Semester		
-		if(isset($semester))
+		//Semester im eingestellten Studiensemester		
+		if(isset($semester_studiensemester))
 		{
-			if(mb_strlen($semester)>$maxlength[$i])
-				$maxlength[$i] = mb_strlen($semester);
-			$worksheet->write($zeile,$i, $semester);
+			if(mb_strlen($semester_studiensemester)>$maxlength[$i])
+				$maxlength[$i] = mb_strlen($semester_studiensemester);
+			$worksheet->write($zeile,$i, $semester_studiensemester);
+		}
+		$i++;
+		
+		//Semester aktuell		
+		if(isset($semester_aktuell))
+		{
+			if(mb_strlen($semester_aktuell)>$maxlength[$i])
+				$maxlength[$i] = mb_strlen($semester_aktuell);
+			$worksheet->write($zeile,$i, $semester_aktuell);
 		}
 		$i++;
 		
