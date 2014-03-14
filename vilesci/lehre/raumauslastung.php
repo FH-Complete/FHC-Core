@@ -61,7 +61,7 @@
 	$wochen=round(($ts_ende-$ts_beginn)/(60*60*24*7));
 
 	//Stundenplandaten holen
-	$sql_query="SELECT DISTINCT datum,stunde,ort_kurzbz, EXTRACT(DOW FROM datum) AS tag FROM lehre.tbl_stundenplan
+	$sql_query="SELECT DISTINCT datum,stunde,ort_kurzbz, EXTRACT(DOW FROM datum) AS tag, max_person FROM lehre.tbl_stundenplan JOIN public.tbl_ort USING (ort_kurzbz)
 					WHERE datum>='$datum_beginn' AND datum<='$datum_ende' AND stunde>=$stunde_beginn AND stunde<=$stunde_ende
 					ORDER BY ort_kurzbz";
 
@@ -72,6 +72,7 @@
 	while ($row=$db->db_fetch_object($result))
 	{
 		$raum[$row->ort_kurzbz]->ort=$row->ort_kurzbz;
+		$raum[$row->ort_kurzbz]->personen=$row->max_person;
 		if (!isset($raum[$row->ort_kurzbz]->last[$row->tag][$row->stunde]->anzahl))
 			$raum[$row->ort_kurzbz]->last[$row->tag][$row->stunde]->anzahl=1;
 		else
@@ -89,10 +90,10 @@
 
 <body>
 <form method="POST">
-	Beginn:<input name="datum_beginn" value="<?php echo $datum_beginn; ?>" size="8" />
-	Ende:<input name="datum_ende" value="<?php echo $datum_ende; ?>" size="8" />
+	Beginn:<input name="datum_beginn" value="<?php echo $datum_beginn; ?>" size="9" />
+	Ende:<input name="datum_ende" value="<?php echo $datum_ende; ?>" size="9" />
 	&nbsp;&nbsp;&nbsp;&nbsp;
-	Stunde -> von:<input name="stunde_beginn" value="<?php echo $stunde_beginn; ?>" size="2" />
+	Unterrichtseinheit von:<input name="stunde_beginn" value="<?php echo $stunde_beginn; ?>" size="2" />
 	bis:<input name="stunde_ende" value="<?php echo $stunde_ende; ?>" size="2" />
 	<input type="submit">
 </form>
@@ -101,7 +102,7 @@
 	<TR>
     <?php
     	$span=$stunde_ende-$stunde_beginn+1;
-	echo "<th rowspan='2'>Ort</th><th colspan='$span'>Montag</th><th colspan='$span'>Dienstag</th><th colspan='$span'>Mittwoch</th>
+	echo "<th rowspan='2'>Ort (Personen)</th><th colspan='$span'>Montag</th><th colspan='$span'>Dienstag</th><th colspan='$span'>Mittwoch</th>
 		<th colspan='$span'>Donnerstag</th><th colspan='$span'>Freitag</th><th colspan='$span'>Samstag</th>";
 	?>
     </TR>
@@ -119,7 +120,7 @@
 	$anz_colors=count($cfgStdBgcolor)-1;
 	foreach ($raum AS $ort)
 	{
-		echo '<TR><TD>'.$ort->ort.'</TD>';
+		echo '<TR><TD>'.$ort->ort.' ('.$ort->personen.')</TD>';
 	  	for ($t=1;$t<7;$t++)
 			for ($s=$stunde_beginn;$s<=$stunde_ende; $s++)
 			{

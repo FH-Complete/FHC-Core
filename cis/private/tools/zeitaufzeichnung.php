@@ -104,6 +104,22 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 			document.getElementById("bis").value=ret;
 		}
 		
+		function setvondatum()
+		{
+			var now = new Date();
+			var ret = "";
+			var monat = now.getMonth();
+			monat++;
+			ret = foo(now.getDate());
+			ret = ret + "." + foo(monat);
+			ret = ret + "." + now.getFullYear();
+			ret = ret + " " + foo(now.getHours());
+			ret = ret + ":" + foo(now.getMinutes());
+			//ret = ret + ":" + foo(now.getSeconds());
+				
+			document.getElementById("von").value=ret;
+		}
+		
 		function foo(val)
 		{
 			if(val<10)
@@ -284,6 +300,7 @@ if($projekt->getProjekteMitarbeiter($user))
 				<td><SELECT name="projekt" id="projekt">
 					<OPTION value="">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
 		
+		sort($projekt->result);
 		foreach($projekt->result as $row_projekt)
 		{
 			if($projekt_kurzbz == $row_projekt->projekt_kurzbz)
@@ -413,19 +430,16 @@ if($projekt->getProjekteMitarbeiter($user))
         }
         echo '
         <tr>
-            <td>Kunde</td>
-            <td><input type="text" id="kunde_name" value="'.$kunde_name.'"><input type ="hidden" id="kunde_uid" name="kunde_uid" value="'.$kunde_uid.'"> oder </td>
-        </tr>
-        <tr>
-            <td>Kunde Kartennummer(optional)</td>
-            <td><input type="text" id="kartennummer" name="kartennummer"></td>
+            <td>'.$p->t("zeitaufzeichnung/kunde").'</td>
+            <td colspan="3"><input type="text" id="kunde_name" value="'.$kunde_name.'" placeholder="'.$p->t("zeitaufzeichnung/nameEingeben").'"><input type ="hidden" id="kunde_uid" name="kunde_uid" value="'.$kunde_uid.'"> '.$p->t("zeitaufzeichnung/oderKartennummerOptional").' 
+            <input type="text" id="kartennummer" name="kartennummer" placeholder="'.$p->t("zeitaufzeichnung/kartennummer").'"></td>
         </tr>'; 
 		echo '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
 		//Start/Ende
 		echo '
 		<tr>
-			<td>'.$p->t("global/von").'</td><td><input type="text" id="von" name="von" value="'.$db->convert_html_chars($von).'"><input type="button" value="->"  onclick="uebernehmen()"></td>
-			<td>'.$p->t("global/bis").'</td><td><input type="text" id="bis" name="bis" value="'.$db->convert_html_chars($bis).'">&nbsp;&nbsp;<img src="../../../skin/images/refresh.png" onclick="setbisdatum()"></td>
+			<td>'.$p->t("global/von").'</td><td><input type="text" id="von" name="von" value="'.$db->convert_html_chars($von).'">&nbsp;<img style="vertical-align:bottom" src="../../../skin/images/aktualisieren.png" title="'.$p->t("zeitaufzeichnung/aktuelleZeitLaden").'" onclick="setvondatum()">&nbsp;&nbsp;<input type="button" value="->" title="'.$p->t("zeitaufzeichnung/alsEndzeitUebernehmen").'" onclick="uebernehmen()"></td>
+			<td>'.$p->t("global/bis").'</td><td><input type="text" id="bis" name="bis" value="'.$db->convert_html_chars($bis).'">&nbsp;<img style="vertical-align:bottom" src="../../../skin/images/aktualisieren.png" title="'.$p->t("zeitaufzeichnung/aktuelleZeitLaden").'" onclick="setbisdatum()"></td>
 		<tr>';
 		//Beschreibung
 		echo '<tr><td>'.$p->t("global/beschreibung").'</td><td colspan="3"><textarea name="beschreibung" cols="60">'.$db->convert_html_chars($beschreibung).'</textarea></td></tr>';
@@ -434,7 +448,10 @@ if($projekt->getProjekteMitarbeiter($user))
 		if($zeitaufzeichnung_id=='')
 			echo '<input type="submit" value="'.$p->t("global/speichern").'" name="save"></td></tr>';
 		else 
-			echo '<input type="submit" value="'.$p->t("global/aendern").'" name="edit"></td></tr>';
+		{
+			echo '<input type="submit" value="'.$p->t("global/aendern").'" name="edit">&nbsp;&nbsp;';
+			echo '<input type="submit" value="'.$p->t("zeitaufzeichnung/alsNeuenEintragSpeichern").'" name="save"></td></tr>';
+		}
 		echo '</table>';
 		echo '</form>';
         
