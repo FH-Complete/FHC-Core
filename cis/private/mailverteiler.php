@@ -388,6 +388,11 @@ if(!$is_lector)
 									$param .="&amp;grp=$row1->gruppe";
 						  			echo ' '.$p->t('global/gruppe')." $row1->gruppe";
 						  		}
+				  				if(trim($row1->bezeichnung)!='')
+						  		{
+									$param .="&amp;grp=$row1->bezeichnung";
+						  			echo ' ('.$row1->bezeichnung.')';
+						  		}
 					  			echo "</td>";
 					  			echo "  <td width='23'></td>";
 					  			echo "  <td width=\"200\"><a href='mailto:$strhelp@".DOMAIN."' class=\"Item\">$strhelp@".DOMAIN."</a></td>";
