@@ -18,4 +18,10 @@ $this->phrasen['zeitaufzeichnung/organisationseinheit1']='Organisationseinheit 1
 $this->phrasen['zeitaufzeichnung/organisationseinheit2']='Organisationseinheit 2';
 $this->phrasen['zeitaufzeichnung/service']='Service';
 $this->phrasen['zeitaufzeichnung/kunde']='Kunde';
+$this->phrasen['zeitaufzeichnung/alsNeuenEintragSpeichern']='Als neuen Eintrag speichern';
+$this->phrasen['zeitaufzeichnung/kartennummer']='Kartennummer';
+$this->phrasen['zeitaufzeichnung/oderKartennummerOptional']='oder Kartennummer (optional)';
+$this->phrasen['zeitaufzeichnung/nameEingeben']='Name eingeben';
+$this->phrasen['zeitaufzeichnung/aktuelleZeitLaden']='Aktuelle Zeit laden';
+$this->phrasen['zeitaufzeichnung/alsEndzeitUebernehmen']='Als Endzeit übernehmen';
 ?>
