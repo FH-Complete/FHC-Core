@@ -10,7 +10,7 @@
  * (at your option) any later version.
  * 
  * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * but WITHOUT ANY WARRANTY; without even the implied warranty oferr
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  * 
@@ -44,7 +44,7 @@ class studienplatz extends basis_db
 	/** @var string */
 	private $studiensemester_kurzbz;
 	/** @var integer */
-	private $ausbildungssemester;  
+	private $ausbildungssemester;  	
 	/** @var integer */
 	private $gpz;					
 	/** @var integer */
@@ -75,11 +75,11 @@ class studienplatz extends basis_db
 		switch ($name)
 		{
 			case 'gpz':
-			case 'npz':
-			case 'ausbildungssemester':
+			case 'npz': 
+            case 'ausbildungssemester':			
 			case 'studienplatz_id':
-				if (!is_numeric($value))
-					throw new Exception("Attribute $name must be numeric!");
+				if ($value != null && !is_numeric($value))
+					throw new Exception("Attribute $name must be numeric! ($value)");
 				$this->$name=$value;
 				break;
 			default:
@@ -146,15 +146,23 @@ class studienplatz extends basis_db
 		$target->updatevon		= $row->updatevon;
 		$target->insertamum		= $row->insertamum;
 		$target->insertvon		= $row->insertvon;
+        $target->new            = false;
 	}
 	
 	/**
-	 * Laedt alle Studienplaetze zu einem Studiengang und Semester
+	 * Laedt alle Studienplaetze zu einem Studiengang und Semester. Ergebnis
+	 * steht in result, wobei es nur einen Datensatz geben kann, wenn
+	 * keinAusbildungssemester = true ist.
 	 * @param integer $studiengang_kz 
-	 * @param string$ studiensemester_kurzbz
+	 * @param string studiensemester_kurzbz
+	 * @param string orgform_kurzbz
+	 * @param boolean Ausbildungssemester ist optional. Wenn true werden
+	 *  nur Datensätze geladen wo das Ausbildungssemester null ist. Wenn 
+	 *  false werden alle geladen wo ein Ausbildungssemester eingetragen 
+	 *  ist.
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load_studiengang_studiensemester($studiengang_kz, $studiensemester_kurzbz)
+	public function load_studiengang_studiensemester_orgform($studiengang_kz, $studiensemester_kurzbz, $orgform, $keinAusbildungssemester = true)
 	{
 		//Pruefen ob $studiengang_kz eine gueltige Zahl ist
 		if(!is_numeric($studiengang_kz) || $studiengang_kz == '')
@@ -164,19 +172,24 @@ class studienplatz extends basis_db
 		}
 
 		//Lesen der Daten aus der Datenbank
-		$qry = "SELECT * FROM lehre.tbl_studienplatz WHERE studienplatz_id=".
-				$this->db_add_param($studienplatz_id, FHC_INTEGER, false).
-				" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz, FHC_STRING, false);
-		if(!$this->db_query($qry))
-		{
-			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
+		$qry = "SELECT * FROM lehre.tbl_studienplatz WHERE studiengang_kz=".
+				$this->db_add_param($studiengang_kz, FHC_INTEGER, false).
+				" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz, FHC_STRING, false).
+				//" AND art=".$this->db_add_param($art, FHC_STRING, false).
+				" AND orgform_kurzbz=".$this->db_add_param($orgform, FHC_STRING, false).
+				" AND ausbildungssemester ".($keinAusbildungssemester ? 'is null':'is not null');
+        $this->result = array();
+        if(!$this->db_query($qry))
+		{			
 			return false;
 		}
 
 		while($row = $this->db_fetch_object())
 		{
-			$this->result[] = $this->mapRow(new studienplatz(), $row);
-		}
+            $rec = new studienplatz();
+            $this->mapRow($rec, $row);
+			$this->result[] = $rec;		
+        }
 		return true;
 	}
 	
@@ -249,6 +262,7 @@ class studienplatz extends basis_db
 			      $this->db_add_param($this->orgform_kurzbz).', '.
 			      $this->db_add_param($this->studiensemester_kurzbz).', '.			     
 			      $this->db_add_param($this->ausbildungssemester, FHC_INTEGER).', '.
+				  //$this->db_add_param($this->art).', '.			     
 			      $this->db_add_param($this->gpz, FHC_INTEGER).', '.
 				  $this->db_add_param($this->npz, FHC_INTEGER).', '.
 				  'now(), '.
@@ -269,11 +283,12 @@ class studienplatz extends basis_db
 				' orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).', '.
 				' studiensemester_kurzbz='.$this->db_add_param($this->studiensemester_kurzbz).', '.
 		      	' ausbildungssemester='.$this->db_add_param($this->ausbildungssemester).', '.
+				//' art='.$this->db_add_param($this->art).', '.
 		      	' gpz='.$this->db_add_param($this->gpz).', '.
 		      	' npz='.$this->db_add_param($this->npz).', '.		     
 		      	' updateamum= now(), '.
-		      	' updatevon='.$this->db_add_param($this->updatevon).', '.		      	
-		      	'WHERE studienplatz_id='.$this->db_add_param($this->studienplatz_id, FHC_INTEGER, false).';';
+		      	' updatevon='.$this->db_add_param($this->updatevon).		      	
+		      	' WHERE studienplatz_id='.$this->db_add_param($this->studienplatz_id, FHC_INTEGER, false).';';
 		}
         
 		if($this->db_query($qry))
@@ -306,8 +321,7 @@ class studienplatz extends basis_db
 
 		}
 		else
-		{
-			$this->errormsg = 'Fehler beim Speichern des Studienplatz-Datensatzes';
+		{			
 			return false;
 		}
 		return $this->studienplatz_id;
@@ -335,8 +349,7 @@ class studienplatz extends basis_db
 			return true;
 		}
 		else
-		{
-			$this->errormsg = 'Fehler beim Löschen der Daten'."\n";
+		{			
 			return false;
 		}
 	}
