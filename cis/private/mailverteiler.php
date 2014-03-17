@@ -390,7 +390,6 @@ if(!$is_lector)
 						  		}
 				  				if(trim($row1->bezeichnung)!='')
 						  		{
-									$param .="&amp;grp=$row1->bezeichnung";
 						  			echo ' ('.$row1->bezeichnung.')';
 						  		}
 					  			echo "</td>";
