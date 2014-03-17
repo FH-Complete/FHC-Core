@@ -97,6 +97,44 @@ class appdaten extends basis_db
 	}
 
 	/**
+	 * Appdaten nach bezeichnung und version laden
+	 * @param type $app
+	 * @param type $bezeichnung
+	 * @param type $version
+	 * @return boolean  true wenn keine Fehler, sonst false
+	 */
+	public function getByBezeichnungVersion($app, $bezeichnung, $version)
+	{
+		$this->new = false;
+		if(!is_numeric($version))
+		{
+			$this->errormsg = 'version muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		$qry = "SELECT * FROM system.tbl_appdaten "
+				. "WHERE "
+				. "app=".$this->db_add_param($app, FHC_STRING, false).' '
+				. "AND bezeichnung=".$this->db_add_param($bezeichnung, FHC_STRING, false).' '
+				. "AND version=".$this->db_add_param($version, FHC_INTEGER, false);
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->mapRow($this, $row);
+			}
+		}
+		else
+		{
+			return false;
+		}
+
+		return true;
+	}
+	
+	
+	/**
 	 * Laden aller Appdaten sortiert nach Bezeichnung und version
 	 * @param string app name
 	 * @return array mit appdaten
@@ -143,7 +181,7 @@ class appdaten extends basis_db
 		$target->freigabe=$this->db_parse_bool($row->freigabe);
 		$target->insertamum=$row->insertamum;
 		$target->insertvon=$row->insertvon;
-		$target->updatenamum=$row->updateamum;
+		$target->updateamum=$row->updateamum;
 		$target->updatevon=$row->updatevon;
 	}
 
@@ -336,6 +374,32 @@ class appdaten extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim Löschen der Daten'."\n";
+			return false;
+		}
+	}
+	
+	public function deleteByBezeichnungVersion($app, $bezeichnung, $version)
+	{
+		//Pruefen ob appdaten_id eine gueltige Zahl ist
+		if(!is_numeric($version) || $version === '')
+		{
+			$this->errormsg = 'Version muss eine gültige Zahl sein'."\n";
+			return false;
+		}
+
+		//loeschen des Datensatzes
+		$qry="DELETE FROM system.tbl_appdaten "
+			. "WHERE "
+			. "app=".$this->db_add_param($app, FHC_STRING, false).' '
+			. "AND bezeichnung=".$this->db_add_param($bezeichnung, FHC_STRING, false).' '
+			. "AND version=".$this->db_add_param($version, FHC_INTEGER, false);
+
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
 			return false;
 		}
 	}

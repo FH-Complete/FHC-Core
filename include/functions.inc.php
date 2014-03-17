@@ -904,4 +904,43 @@ function clearHtmlTags($text)
 	
 	return $text;
 }
+
+/**
+ * nächstes Semester erzeugen. Bsp incSemester('SS2014') liefert 'WS2014'
+ * @param string $semester z.B. SS2014
+ * @return string nächstes semester
+ */
+function incSemester($semester) 
+{	
+	$result = null;
+	$jahr = intval(substr($semester,2,4));
+	if (substr($semester,0,2) === 'SS') {
+		$result = 'WS';
+	} else {
+		$result = 'SS';
+		$jahr++;
+	}
+	$result = $result.$jahr;
+	return $result;
+}
+
+/**
+ * Liste mit Semestern erzeugen
+ * @param type $semester
+ * @param type $anzahlFolgesemester
+ * @return array Semesterliste
+ */
+function generateSemesterList($semester, $anzahlFolgesemester)
+{
+	$result[] = $semester;
+	$jahr = intval(substr($semester,2,4));
+	$currentSemester = $semester;
+	for ($index = 0; $index < $anzahlFolgesemester; $index++)
+	{
+		$currentSemester = incSemester($currentSemester);
+		$result[] = $currentSemester;
+	}
+	return $result;
+}
+
 ?>

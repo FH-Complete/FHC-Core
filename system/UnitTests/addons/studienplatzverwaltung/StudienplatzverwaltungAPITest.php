@@ -61,6 +61,27 @@ class StudienplatzverwaltungAPITest extends PHPUnit_Framework_TestCase
 		}
 	}
 	
+	
+	public function testParseBasisDaten() {
+		$api = StudienplatzverwaltungAPI::init();
+		$result = $api->parseBasisdatenUV('testfile.xml');
+		$this->assertTrue($result);
+	}
+	
+	public function testStudiengangSPVGetAll()
+	{
+		$studiengangSPV = new studiengangSPV();
+		$this->assertTrue($studiengangSPV->getAll('2013/14',2));
+	}
+		
+	public function testNewUV()
+	{
+		$api = StudienplatzverwaltungAPI::init();
+		$appdaten = $api->newUV('2013/14',2, $this->uid);
+		$this->assertNotNull($appdaten);
+	}
+	
+	
 	public function testGetMetadata() {		
 		$sj = '2013/14';
 		$this->assertNotEquals($this->createAppdaten($sj, $this->createDaten($sj)), false);

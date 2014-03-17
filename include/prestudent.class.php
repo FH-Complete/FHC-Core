@@ -1332,5 +1332,103 @@ class prestudent extends person
 			return false;
 		}
 	}
+	
+	/**
+	 * Anzahl der Abbrecher liefern.<br>
+	 * WM: Kopie von getBewerber() => @TODO: überprüfen!!!
+	 * @param type $studiensemester_kurzbz
+	 * @param type $studiengang_kz
+	 * @param type $orgform_kurzbz
+	 * @param type $ausbildungssemester
+	 * @return boolean
+	 */
+	public function getAnzAbbrecher($studiensemester_kurzbz, $studiengang_kz=null, $orgform_kurzbz=null, $ausbildungssemester=null)
+	{
+		$qry = "SELECT
+					count(*) as anzahl
+				FROM 
+					public.tbl_prestudent
+					JOIN public.tbl_prestudentstatus USING(prestudent_id)
+				WHERE
+					tbl_prestudentstatus.status_kurzbz='Abbrecher'
+					AND tbl_prestudentstatus.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+
+		if(!is_null($studiengang_kz))
+			$qry.=" AND tbl_prestudent.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
+
+		if(!is_null($orgform_kurzbz))
+			$qry.=" AND (tbl_prestudentstatus.orgform_kurzbz=".$this->db_add_param($orgform_kurzbz)." OR (tbl_prestudentstatus.orgform_kurzbz IS NULL AND EXISTS(SELECT 1 FROM public.tbl_studiengang WHERE studiengang_kz=tbl_prestudent.studiengang_kz AND orgform_kurzbz=".$this->db_add_param($orgform_kurzbz).")))";
+
+		if(!is_null($ausbildungssemester))
+			$qry.=" AND tbl_prestudentstatus.ausbildungssemester=".$this->db_add_param($ausbildungssemester);
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				return $row->anzahl;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Laden der Daten';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Anzahl der Studierenden liefern.<br>
+	 * WM: Kopie von getBewerber() => @TODO: überprüfen!!!
+	 * @param type $studiensemester_kurzbz
+	 * @param type $studiengang_kz
+	 * @param type $orgform_kurzbz
+	 * @param type $ausbildungssemester
+	 * @return boolean
+	 */
+	public function getAnzStudierende($studiensemester_kurzbz, $studiengang_kz=null, $orgform_kurzbz=null, $ausbildungssemester=null)
+	{
+		$qry = "SELECT
+					count(*) as anzahl
+				FROM 
+					public.tbl_prestudent
+					JOIN public.tbl_prestudentstatus USING(prestudent_id)
+				WHERE
+					tbl_prestudentstatus.status_kurzbz='Student'
+					AND tbl_prestudentstatus.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+
+		if(!is_null($studiengang_kz))
+			$qry.=" AND tbl_prestudent.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
+
+		if(!is_null($orgform_kurzbz))
+			$qry.=" AND (tbl_prestudentstatus.orgform_kurzbz=".$this->db_add_param($orgform_kurzbz)." OR (tbl_prestudentstatus.orgform_kurzbz IS NULL AND EXISTS(SELECT 1 FROM public.tbl_studiengang WHERE studiengang_kz=tbl_prestudent.studiengang_kz AND orgform_kurzbz=".$this->db_add_param($orgform_kurzbz).")))";
+
+		if(!is_null($ausbildungssemester))
+			$qry.=" AND tbl_prestudentstatus.ausbildungssemester=".$this->db_add_param($ausbildungssemester);
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				return $row->anzahl;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Laden der Daten';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	
 }
 ?>
