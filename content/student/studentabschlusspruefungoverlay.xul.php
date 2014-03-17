@@ -284,7 +284,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     		<row>
     			<vbox>
     				<label value="Datum" control="student-abschlusspruefung-datum-datum" />
-    				<label value="Sponsion" control="student-abschlusspruefung-datum-sponsion" />
+    				<label id="student-abschlusspruefung-datum-sponsion-label" value="Sponsion" control="student-abschlusspruefung-datum-sponsion" />
     			</vbox>
     			<vbox>
 					<box class="Datum" id="student-abschlusspruefung-datum-datum"  disabled="true"/>

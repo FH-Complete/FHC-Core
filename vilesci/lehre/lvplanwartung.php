@@ -164,8 +164,12 @@
 	{
 		$outp.="<OPTION onclick=\"window.location.href = '".$_SERVER['PHP_SELF']."?stg_kz=$stg->studiengang_kz&semester=$semester'\" ".($stg->studiengang_kz==$stg_kz?'selected':'').">$stg->kuerzel - $stg->bezeichnung</OPTION>";
 		//$outp.= '<A href="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg->studiengang_kz.'&sem='.$semester.'">'.$stg->kuerzel.'</A> - ';
-		$s[$stg->studiengang_kz]->max_sem=$stg->max_semester;
-		$s[$stg->studiengang_kz]->kurzbz=$stg->kurzbzlang;
+                $a = new stdClass();
+                $a->max_sem=$stg->max_semester;
+                $a->kurzbz=$stg->kurzbzlang;
+                $s[$stg->studiengang_kz]=$a;
+//		$s[$stg->studiengang_kz]->max_sem=$stg->max_semester;
+//		$s[$stg->studiengang_kz]->kurzbz=$stg->kurzbzlang;
 	}
 	$outp.='</SELECT>';
 	$outp.= '<BR> -- ';

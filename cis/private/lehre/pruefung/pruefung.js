@@ -159,8 +159,39 @@ function writePrfFensterDetails(){
 	}
 }
 
-
-
-
-
-
+function loadPruefungen()
+{
+//	var studiensemester_kurzbz = $("#studiensemester option:selected").val();
+	var student_uid = "if11b044";
+	$.ajax({
+		dataType: 'json',
+		url: "../../../../soap/fhcomplete.php",
+		data: {
+			typ: "json",
+			class: "lehrveranstaltung",
+			method: "load_lva_student",
+			parameter_0: student_uid	//IDs der beuschten LVs eines Studenten
+		},
+		error: loadError
+	}).success(function(data){
+		var lvIds = [];
+		data.result.forEach(function(e){
+			lvIds.push(e.lehrveranstaltung_id);
+		});
+		console.log(lvIds);
+		$.ajax({
+			dataType: 'json',
+			url: "./pruefungsanmeldung.json.php",
+			type: "POST",
+			data: {
+				method: "getPruefungByLv",
+				lvIds: lvIds	//IDs der beuschten LVs eines Studenten
+			},
+			error: loadError
+		}).success(function(data){
+			data.result.forEach(function(e){
+				$("#prfDetails").append(e.lehrveranstaltung_id+"</br>");
+			})
+		});	
+	});
+}

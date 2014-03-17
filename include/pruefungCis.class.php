@@ -570,4 +570,36 @@ class pruefungCis extends basis_db
         }
         return true;
     }
+    
+    public function getPruefungByLv($lehrveranstaltung_IDs = array())
+    {
+        if(empty($lehrveranstaltung_IDs))
+        {
+           $this->errormsg = "Keine Lehrveranstaltungen übergeben.</br>";
+           return false;
+        }
+        
+        $in = "";
+        foreach($lehrveranstaltung_IDs as $id)
+        {
+            $in.= $id.', ';
+        }
+        $in = substr($in, 0, -2);
+            
+        $qry = 'SELECT * FROM campus.tbl_lehrveranstaltung_pruefung WHERE lehrveranstaltung_id IN ('.$in.')';
+        
+        if($this->db_query($qry))
+        {
+            while($row = $this->db_fetch_object())
+            {
+                $obj = new stdClass();
+                $obj->lehrveranstaltung_pruefung_id = $row->lehrveranstaltung_pruefung_id;
+                $obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+                $obj->pruefung_id = $row->pruefung_id;
+                array_push($this->lehrveranstaltungen, $obj);
+            }
+            return true;
+        }
+        return false;
+    }
 }
