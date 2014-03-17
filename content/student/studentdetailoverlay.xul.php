@@ -524,7 +524,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<splitter class="tree-splitter"/>
 							<treecol id="student-prestudent-tree-rolle-ausbildungssemester" label="Semester" flex="2" hidden="false" persist="hidden, width, ordinal"
 								class="sortDirectionIndicator"
-								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#ausbildungssemester" />
+								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#ausbildungssemester" 
+                                                                sorthints="integer"/>
 							<splitter class="tree-splitter"/>
 							<treecol id="student-prestudent-tree-rolle-datum" label="Datum" flex="2" hidden="false" persist="hidden, width, ordinal"
 								class="sortDirectionIndicator"

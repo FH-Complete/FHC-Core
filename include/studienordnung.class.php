@@ -560,9 +560,9 @@ class studienordnung extends basis_db
 			return false;
 		}
 		
-		$qry = 'SELECT DISTINCT studiensemester_kurzbz
+		$qry = 'SELECT DISTINCT studiensemester_kurzbz, MAX(semester)
 					FROM lehre.tbl_studienordnung_semester 
-					WHERE studienordnung_id='.$this->db_add_param($studienordnung_id).';';
+					WHERE studienordnung_id='.$this->db_add_param($studienordnung_id).' GROUP BY studiensemester_kurzbz ORDER BY MAX(semester);';
 		
 		if(!$this->db_query($qry))
 		{

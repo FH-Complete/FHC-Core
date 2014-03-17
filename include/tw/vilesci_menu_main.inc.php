@@ -210,7 +210,7 @@ $menu=array
 		'Lehrfachpflege'=>array('name'=>'Lehrfachpflege', 'link'=>'lehre/lehrfach/lehrfachpflege.php', 'target'=>'main'),
 		'LehreinheitWartung'=>array('name'=>'Lehreinheitwartung', 'link'=>'stammdaten/le_wartung.php', 'target'=>'main'),
 		'lvverteilung'=>array('name'=>'LVVerteilung', 'link'=>'lehre/lv_verteilung/lv_verteilung.php', 'target'=>'main'),
-		'Kreuzerllistekopieren'=>array('name'=>'Kreuzerllisten kopieren', 'link'=>'https://cis.technikum-wien.at/cis/private/lehre/benotungstool/copy_uebung.php', 'target'=>'_blank'),
+		'Kreuzerllistekopieren'=>array('name'=>'Kreuzerllisten kopieren', 'link'=>CIS_ROOT.'cis/private/lehre/benotungstool/copy_uebung.php', 'target'=>'_blank'),
 		'LDAPCheck'=>array('name'=>'LDAPCheck', 'link'=>'personen/ldap_check.php', 'target'=>'main'),
 		'Firmenwartung'=>array('name'=>'Firmenwartung', 'link'=>'stammdaten/firma_zusammen_uebersicht.php', 'target'=>'main'),
 		'checkStudenten'=>array('name'=>'CheckStudenten', 'link'=>'../system/checkStudenten.php', 'target'=>'main'),
@@ -259,8 +259,8 @@ $menu=array
 		'Tools'=>	array
 		(
 			'name'=>'Tools', 'permissions'=>array('admin'),
-			'phpPgAdmin'=>array('name'=>'phpPgAdmin', 'link'=>'https://vilesci.technikum-wien.at/phppgadmin/index.php', 'target'=>'_blank'),
-			'phpMyAdmin'=>array('name'=>'phpMyAdmin', 'link'=>'https://vilesci.technikum-wien.at/phpmyadmin/index.php', 'target'=>'_blank'),
+			'phpPgAdmin'=>array('name'=>'phpPgAdmin', 'link'=>APP_ROOT.'phppgadmin/index.php', 'target'=>'_blank'),
+			'phpMyAdmin'=>array('name'=>'phpMyAdmin', 'link'=>APP_ROOT.'phpmyadmin/index.php', 'target'=>'_blank'),
 			'SiPassDB'=>array('name'=>'SiPass Datenbank', 'link'=>'admin/sipassdb.php', 'target'=>'main'),
 			'ServerTests'=>array('name'=>'Server-Tests', 'link'=>'admin/test/index.php', 'target'=>'main'),
 			'htaccessGenerator'=>array('name'=>'.htaccess-Generator', 'link'=>'admin/htaccess/access.php', 'target'=>'main'),
@@ -272,12 +272,12 @@ $menu=array
 			'ViReferenz'=>array('name'=>'VI-Kurzreferenz', 'link'=>'admin/VI-Kurzreferenz.html', 'target'=>'main'),
 		),
 		'Cronjobs'=>array('name'=>'Cronjobs', 'link'=>'stammdaten/cronjobverwaltung.php', 'target'=>'main','permissions'=>array('basis/cronjob')),
-	),
-	'SD-Tools'=>	array
-	(
-		'name'=>'SD-Tools', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support'), 'image'=>'vilesci_sdtools.png',
-		'link'=>'https://sdtools.technikum-wien.at', 'target'=>'_blank',
 	)
+//	'SD-Tools'=>	array
+//	(
+//		'name'=>'SD-Tools', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support'), 'image'=>'vilesci_sdtools.png',
+//		'link'=>'https://sdtools.technikum-wien.at', 'target'=>'_blank',
+//	)
 	
 );
 
