@@ -165,6 +165,8 @@ define('MAIL_INTERNATIONAL','invalid@technikum-wien.at');
 //Ansprechpartner fuer Outgoing
 define('MAIL_INTERNATIONAL_OUTGOING', 'invalid@technikum-wien.at');
 
+define('ANZAHL_PREINTERESSENT','5');
+
 // ***** MOODLE *****
 // Moodle verwenden Ja/Nein
 define('MOODLE',true);

@@ -1223,6 +1223,22 @@ if(!$result = @$db->db_query("SELECT pruefung_id FROM campus.tbl_pruefung LIMIT 
 	else
 		echo 'Tabellen fuer Pruefungsverwaltung hinzugefügt';
 }
+
+// Berechtigungen fuer web User erteilen
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_prestudentstatus' AND table_schema='public' AND grantee='web' AND privilege_type='UPDATE'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "GRANT SELECT, INSERT, UPDATE ON public.tbl_prestudentstatus TO web;";
+	
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_prestudentstatus: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_prestudentstatus: Schreibrechte fuer User web erteilt';
+	}		
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(

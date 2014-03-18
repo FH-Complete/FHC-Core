@@ -24,6 +24,7 @@
  * Vorrückung aller AKTIVEN Studenten.
  */
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../config/global.config.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/functions.inc.php');
@@ -211,21 +212,36 @@ if (isset($_POST['vorr']))
 			if($row_status=$db->db_fetch_object($result_status))
 			{
 				//Studenten im letzten Semester bleiben dort, wenn aktiv
-				if($row->semester_stlv>=$max[$stg_kz] || $row->semester_stlv==0)
+				
+				// Semester fuer Studentlehrverband
+				if(VORRUECKUNG_LEHRVERBAND_MAX_SEMESTER!='')
 				{
-					$s=$row->semester_stlv;
+					if($row->semester_stlv>=VORRUECKUNG_LEHRVERBAND_MAX_SEMESTER)
+						$s=$row->semester_stlv;
+					else
+						$s=$row->semester_stlv+1;
 				}
 				else
 				{
-					$s=$row->semester_stlv+1;
+					if($row->semester_stlv>=$max[$stg_kz] || $row->semester_stlv==0)
+						$s=$row->semester_stlv;
+					else
+						$s=$row->semester_stlv+1;
 				}
-				if($row_status->ausbildungssemester>=$max[$stg_kz] || $row_status->status_kurzbz=="Unterbrecher" || $row_status->status_kurzbz=="Incoming")
-				{
-					$ausbildungssemester=$row_status->ausbildungssemester;
-				}
+				
+				if(!VORRUECKUNG_STATUS_MAX_SEMESTER)
+					$ausbildungssemester=$row_status->ausbildungssemester+1;
 				else 
 				{
-					$ausbildungssemester=$row_status->ausbildungssemester+1;
+					// Semester fuer Status
+					if($row_status->ausbildungssemester>=$max[$stg_kz] || $row_status->status_kurzbz=="Unterbrecher" || $row_status->status_kurzbz=="Incoming")
+					{
+						$ausbildungssemester=$row_status->ausbildungssemester;
+					}
+					else 
+					{
+						$ausbildungssemester=$row_status->ausbildungssemester+1;
+					}
 				}
 				//Lehrverbandgruppe anlegen, wenn noch nicht vorhanden
 				$qry_lvb="SELECT * FROM public.tbl_lehrverband 
@@ -250,7 +266,7 @@ if (isset($_POST['vorr']))
 				if($db->db_num_rows($db->db_query($qry_chk))<1)
 				{
 					//Eintragen der neuen Gruppe
-					$sql="INSERT INTO tbl_studentlehrverband (student_uid, studiensemester_kurzbz, studiengang_kz, semester, verband, gruppe, updateamum, updatevon, insertamum, insertvon, ext_id) 
+					$sql="INSERT INTO public.tbl_studentlehrverband (student_uid, studiensemester_kurzbz, studiengang_kz, semester, verband, gruppe, updateamum, updatevon, insertamum, insertvon, ext_id) 
 						VALUES (".$db->db_add_param($row->student_uid).",".$db->db_add_param($next_ss).",".$db->db_add_param($row->studiengang_kz).",
 						".$db->db_add_param($s).",".$db->db_add_param($row->verband_stlv).",".$db->db_add_param($row->gruppe_stlv).",NULL,NULL,now(),".$db->db_add_param($user).",NULL);";
 				}
@@ -260,7 +276,7 @@ if (isset($_POST['vorr']))
 				if($db->db_num_rows($db->db_query($qry_chk))<1)
 				{
 					//Eintragen des neuen Status
-					$sql.="INSERT INTO tbl_prestudentstatus (prestudent_id, status_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz, studienplan_id)
+					$sql.="INSERT INTO public.tbl_prestudentstatus (prestudent_id, status_kurzbz, studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz, studienplan_id)
 					VALUES (".$db->db_add_param($row->prestudent_id).", ".$db->db_add_param($row_status->status_kurzbz).", ".$db->db_add_param($next_ss).",
 						".$db->db_add_param($ausbildungssemester).", now(), now(), ".$db->db_add_param($user).",
 					NULL, NULL, NULL, ".$db->db_add_param($row_status->orgform_kurzbz).",".$db->db_add_param($row_status->studienplan_id).");";
