@@ -74,7 +74,13 @@ $this->phrasen['incoming/heimatuniversitaet']='Sending Institution';
 $this->phrasen['incoming/fehlerBeimLoeschenDerLv']='An error occurred while deleting the course';
 $this->phrasen['incoming/nichtMehrAlsDreiUniversitaeten']='It is not possible to enter more than 3 universities';
 $this->phrasen['incoming/ungueltigeIdUebergeben']='Invalid ID provided';
-$this->phrasen['incoming/willkommenBeiOutgoingAnmeldung']='Welcome to the outgoing registration. In order to register as an outgoing, use the “Registration” button.';
+$this->phrasen['incoming/willkommenBeiOutgoingAnmeldung']='<p><b>Welcome to Outgoing Registrations. To apply as outgoing use the button "Registration".</b></p>
+<p>You may submit your application up to one semester before your planned semester abroad, but it must be submitted at least two months before the application deadline of the guest institution selected. The application deadline for exchange students is usually in April/May for the winter semester and in October/November for the summer semester.</p>
+<p>You have the following possibilities for a study visit abroad: Our European partner universities as part of the ERASMUS and CEEPUS mobility programs, our non-European partner institutions, other universities (free mover) and Summer Schools.</p>
+<p>You can study abroad and make use of a funding program for up to 12 months. At our partner universities you pay no tuition fees and the application process is supported by the Center for International Relations at the TW. A list of the partner institutions can be found on our homepage.</p>
+<p>On the following pages you can select the mobility program and the partner institution as well as entering the period of time you are planning for your study visit abroad. After we approve your registration you can enter further details and download the form for a Learning Agreement (important for the accreditation of your study abroad).</p>
+<p>Click on the button "Registration". Select the mobility program and the partner institution. Enter the data required and save your details. You will be informed via e-mail as to whether your selection has been approved. You can then discuss the application process with the Center for International Relations and enter further personal details. 
+You can upload documents and prepare the Learning Agreement for the semester abroad. Your application documents will be forwarded to the partner institution you wish to apply for by the Center for International Relations,</p>';
 $this->phrasen['incoming/programmAuswahl']='Program Selection';
 $this->phrasen['incoming/auswahlUniversitaeten']='University Selection';
 $this->phrasen['incoming/zeitraumVon']='Period from';
