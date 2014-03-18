@@ -148,6 +148,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiteroverlay.xul
 	seltype="multi" hidecolumnpicker="false" flex="1"
 	enableColumnDrag="true"
     ondraggesture="nsDragAndDrop.startDrag(event,mitarbeiterDDObserver);"
+	ondrop="nsDragAndDrop.drop(event,LektorFunktionDDObserver)"
 	ondragdrop="nsDragAndDrop.drop(event,LektorFunktionDDObserver)"
 	ondragover="nsDragAndDrop.dragOver(event,LektorFunktionDDObserver)"
 	ondragenter="nsDragAndDrop.dragEnter(event,LektorFunktionDDObserver)"
