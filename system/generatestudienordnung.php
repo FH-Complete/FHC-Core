@@ -38,18 +38,37 @@ $db = new basis_db();
 // Alle Studiengaenge durchlaufen
 foreach($studiengang->result as $rowstg)
 {
+	$qry = "SELECT 
+				studiensemester_kurzbz 
+			FROM 
+				lehre.tbl_lehrveranstaltung 
+				JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) 
+				JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
+			WHERE 
+				tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($rowstg->studiengang_kz, FHC_INTEGER)."
+			ORDER BY tbl_studiensemester.start LIMIT 1";
+
+	$stsem = 'WS2014';
+
+	if($result = $db->db_query($qry))
+	{
+		if($row = $db->db_fetch_object($result))
+		{
+			$stsem = $row->studiensemester_kurzbz;
+		}
+	}
+
 	// eine Neue Studienordnung anlegen
 	$studienordnung = new studienordnung();
 	$studienordnung->studiengang_kz=$rowstg->studiengang_kz;
-	$studienordnung->bezeichnung=$rowstg->kuerzel.'_V2';
-	$studienordnung->version='V2';
-	$studienordnung->ects=30;
-	$studienordnung->gueltigvon='WS2013';
+	$studienordnung->bezeichnung=sprintf('%04s',$rowstg->studiengang_kz).'-'.$rowstg->kuerzel.'-'.$stsem;
+	$studienordnung->version='01';
+	$studienordnung->ects=($rowstg->max_semester*30);
+	$studienordnung->gueltigvon=$stsem;
 	$studienordnung->gueltigbis='';
 	$studienordnung->studiengangbezeichnung = $rowstg->bezeichnung;
 	$studienordnung->studiengangbezeichnung_englisch = $rowstg->english;
 	$studienordnung->studiengangkurzbzlang = $rowstg->kurzbzlang;
-	$studienordnung->max_semester = $rowstg->max_semester;
 	$studienordnung->insertvon = 'generate';
 	$studienordnung->akadgrad_id=1;
 	if(!$studienordnung->save())
@@ -84,18 +103,60 @@ foreach($studiengang->result as $rowstg)
 	}
 }
 
+
+$qry = "SELECT * FROM public.tbl_studiensemester WHERE ende<now()";
+
+$stsem = array();
+if($result_stsem = $db->db_query($qry))
+{
+	while($row_stsem = $db->db_fetch_object($result_stsem))
+	{
+		$stsem[] = $row_stsem->studiensemester_kurzbz;
+	}
+}
+
+$qry="SELECT *, (Select max_semester FROM public.tbl_studiengang where studiengang_kz=a.studiengang_kz) as max_semester FROM lehre.tbl_studienordnung as a WHERE studienordnung_id=(Select max(studienordnung_id) FROM lehre.tbl_studienordnung WHERE studiengang_kz=a.studiengang_kz)";
+
+if($result_sto = $db->db_query($qry))
+{
+	while($row_sto = $db->db_fetch_object($result_sto))
+	{
+		echo $row_sto->bezeichnung.'<br>';
+		for($i=1;$i<$row_sto->max_semester;$i++)
+		{
+			$qry="INSERT INTO lehre.tbl_studienordnung_semester(studienordnung_id, semester, studiensemester_kurzbz)
+				VALUES(".$db->db_add_param($row_sto->studienordnung_id).','.$i.',';
+			foreach($stsem as $studiensemester)
+			{
+					$db->db_query($qry.$db->db_add_param($studiensemester).');');
+			}
+		}
+	}
+}
+
 function createStudienplan($orgform, $studienordnung_id, $rowstg)
 {
 	global $db;
 	$studienplan = new studienplan();
 	$studienplan->studienordnung_id = $studienordnung_id;
 	$studienplan->orgform_kurzbz=$orgform;
-	$studienplan->version = 'V2';
-	$studienplan->bezeichnung = $rowstg->kuerzel.'V2';
+	$studienplan->version = 'V1';
+	$studienplan->bezeichnung = $orgform;
 	$studienplan->regelstudiendauer = $rowstg->max_semester;
 	$studienplan->sprache = $rowstg->sprache;
 	$studienplan->aktiv = true;
-	$studienplan->semesterwochen = 15;
+
+	$wochen='15';
+	$qry = "SELECT wochen FROM public.tbl_semesterwochen WHERE studiengang_kz=".$db->db_add_param($rowstg->studiengang_kz)." LIMIT 1";
+	if($result = $db->db_query($qry))
+	{
+		if($row = $db->db_fetch_object($result))
+		{
+			$wochen = $row->wochen;
+		}
+	}
+	
+	$studienplan->semesterwochen = $wochen;
 	$studienplan->testtool_sprachwahl = true;//$db->db_parse_bool($rowstg->testtool_sprachwahl);
 	$studienplan->insertvon = 'generate';
 	if(!$studienplan->save())
@@ -112,13 +173,14 @@ function createStudienplan($orgform, $studienordnung_id, $rowstg)
 				lehre.tbl_lehrveranstaltung
 			WHERE
 				tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($rowstg->studiengang_kz)."
-				AND (orgform_kurzbz is null or orgform_kurzbz=".$db->db_add_param($orgform).')';				
+				AND (orgform_kurzbz is null or orgform_kurzbz=".$db->db_add_param($orgform).")
+				AND lehrtyp_kurzbz<>'lf'";
 
 	if($result = $db->db_query($qry))
 	{
 		while($row = $db->db_fetch_object($result))
 		{
-			$lehrveranstaltung = new lehrveranstaltung();
+			$lehrveranstaltung = new studienplan();
 			$lehrveranstaltung->new=true;
 			$lehrveranstaltung->studienplan_id=$studienplan_id;
 			$lehrveranstaltung->semester=$row->semester;
