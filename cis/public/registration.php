@@ -372,7 +372,7 @@ if (isset($_POST['userid']))
       echo'		</table></tr>
                 <tr>
                     <td align="center"><img id="captcha" src="'.APP_ROOT.'include/securimage/securimage_show.php" alt="CAPTCHA Image" style="border:1px solid;" /><br>
-                    <a href="#" onclick="document.getElementById(\'captcha\').src = "'.APP_ROOT.'include/securimage/securimage_show.php?" + Math.random(); return false">'.$p->t('bewerbung/andereGrafik').'</a></td>
+                    <a href="#" onclick="document.getElementById(\'captcha\').src = \''.APP_ROOT.'include/securimage/securimage_show.php?\' + Math.random(); return false">'.$p->t('bewerbung/andereGrafik').'</a></td>
                     <td>'.$p->t('bewerbung/captcha').'<br><input type="text" name="captcha_code" size="10" maxlength="6" />';?>
                     
      <?php           

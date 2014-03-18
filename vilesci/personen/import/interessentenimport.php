@@ -35,6 +35,7 @@ require_once('../../../include/benutzer.class.php');
 require_once('../../../include/student.class.php');
 require_once('../../../include/lehrverband.class.php');
 require_once('../../../include/nation.class.php');
+require_once('../../../include/studienplan.class.php');
 
 $db = new basis_db();
 $user=get_uid();
@@ -125,13 +126,50 @@ if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz'])
 	echo getOrtDropDown($_GET['plz'], $_GET['gemeinde']);
 	exit;
 }
-?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+function getStudienplanDropDown($studiengang_kz, $orgform_kurzbz='', $studienplan_id='')
+{
+	$db = new basis_db();
+
+	$content= '<SELECT id="studienplan_id" name="studienplan_id">
+	<OPTION value="">-- keine Auswahl --</OPTION>';
+	$studienplan = new studienplan();
+	$studienplan->getStudienplaene($studiengang_kz);
+	
+	foreach($studienplan->result as $row)
+	{
+		if($studienplan_id=='')
+			$studienplan_id=$row->studienplan_id;
+		
+		if($studienplan_id==$row->studienplan_id)
+			$selected='selected';
+		else
+			$selected='';
+		
+		if($row->aktiv)
+		{
+			if($orgform_kurzbz=='' || $row->orgform_kurzbz=='' || $row->orgform_kurzbz==$orgform_kurzbz)			
+				$content.="<option value='$row->studienplan_id' $selected>$row->bezeichnung</option>";
+		}
+	}
+
+	$content.= '</SELECT>';
+	return $content;
+}
+
+if(isset($_GET['type']) && $_GET['type']=='getstudienplancontent' && isset($_GET['studiengang_kz']) && isset($_GET['orgform_kurzbz']))
+{
+	header('Content-Type: text/html; charset=UTF-8');
+
+	echo getStudienplanDropDown($_GET['studiengang_kz'], $_GET['orgform_kurzbz']);
+	exit;
+}
+?><!DOCTYPE HTML>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../skin/styles/tw.css" rel="stylesheet" type="text/css">
-<script language="Javascript">
+<script type="text/Javascript">
 function disablefields(obj)
 {
 	if(obj.value==0)
@@ -326,6 +364,36 @@ function setOrtData()
         else alert("Request status:" + anfrage.status);
     }
 }	
+function loadStudienplanData()
+{
+	anfrage=null;
+	//Request erzeugen und die Note speichern
+	erzeugeAnfrage(); 
+    var jetzt = new Date();
+	var ts = jetzt.getTime();
+	var studiengang_kz = document.getElementById('studiengang_kz').value;
+	var orgform_kurzbz = document.getElementById('orgform_kurzbz').value;
+    var url= '<?php echo $_SERVER['PHP_SELF']."?type=getstudienplancontent"?>';
+    url += '&studiengang_kz='+encodeURIComponent(studiengang_kz)+"&orgform_kurzbz="+encodeURIComponent(orgform_kurzbz)+"&"+ts;
+    anfrage.open("GET", url, true);
+    anfrage.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    anfrage.onreadystatechange = setStudienplanData;
+    anfrage.send(null);
+}
+
+function setStudienplanData()
+{
+	if (anfrage.readyState == 4)
+	{
+		if (anfrage.status == 200) 
+		{
+			var resp = anfrage.responseText;
+            var ortdiv = document.getElementById('studienplandiv');
+			ortdiv.innerHTML = resp;
+        } 
+        else alert("Request status:" + anfrage.status);
+    }
+}
 </script>
 </head>
 <body>
@@ -410,6 +478,7 @@ $studiensemester_kurzbz = (isset($_REQUEST['studiensemester_kurzbz'])?$_REQUEST[
 $ausbildungssemester = (isset($_REQUEST['ausbildungssemester'])?$_REQUEST['ausbildungssemester']:'0');
 $incoming = (isset($_REQUEST['incoming'])?true:false);
 $orgform_kurzbz = (isset($_REQUEST['orgform_kurzbz'])?$_REQUEST['orgform_kurzbz']:'');
+$studienplan_id = (isset($_REQUEST['studienplan_id'])?$_REQUEST['studienplan_id']:'');
 //end Parameter
 $geburtsdatum_error=false;
 
@@ -782,6 +851,7 @@ if(isset($_POST['save']))
 		$rolle->studiensemester_kurzbz = $studiensemester_kurzbz;
 		$rolle->ausbildungssemester = $ausbildungssemester;
 		$rolle->orgform_kurzbz = $orgform_kurzbz;
+		$rolle->studienplan_id = $studienplan_id;
 		$rolle->datum = date('Y-m-d');
 		$rolle->insertamum = date('Y-m-d H:i:s');
 		$rolle->insertvon = $user;
@@ -1020,7 +1090,7 @@ echo '</SELECT>';
 echo '</td></tr>';
 echo '<tr><td>Ausbildungsart</td><td><input type="text" id="ausbildungsart" name="ausbildungsart" value="'.$ausbildungsart.'" /></td></tr>';
 echo '<tr><td>Anmerkungen</td><td><textarea id="anmerkung" name="anmerkungen">'.$anmerkungen.'</textarea></td></tr>';
-echo '<tr><td>Studiengang *</td><td><SELECT id="studiengang_kz" name="studiengang_kz">';
+echo '<tr><td>Studiengang *</td><td><SELECT id="studiengang_kz" name="studiengang_kz" onchange="loadStudienplanData()">';
 $stg_obj = new studiengang();
 $stg_obj->getAll('typ, kurzbz');
 foreach ($stg_obj->result as $row)
@@ -1042,7 +1112,7 @@ for ($i=1;$i<9;$i++)
 	echo '<OPTION value="'.$i.'" '.($i==$ausbildungssemester?'selected':'').'>'.$i.'. Semester</OPTION>';
 echo '</SELECT>';
 echo '</td></tr>';
-echo '<tr><td>OrgForm</td><td><SELECT name="orgform_kurzbz">';
+echo '<tr><td>OrgForm</td><td><SELECT id="orgform_kurzbz" name="orgform_kurzbz" onchange="loadStudienplanData()">';
 echo '<OPTION value="">-- keine Auswahl --</OPTION>';
 $qry = "SELECT orgform_kurzbz, bezeichnung FROM bis.tbl_orgform WHERE rolle ORDER BY bezeichnung";
 if($result = $db->db_query($qry))
@@ -1054,6 +1124,15 @@ if($result = $db->db_query($qry))
 }
 echo '</SELECT>';
 echo '</td></tr>';
+echo "\n";
+echo '<tr><td>Studienplan</td><td><div id="studienplandiv">';
+if($studiengang_kz!='')
+	echo getStudienplanDropDown($studiengang_kz, $orgform_kurzbz, $studienplan_id);
+else
+	echo '<font color="gray">Bitte zuerst einen Studiengang waehlen</font>';
+echo '</div></td>
+</tr>';
+
 echo '<tr><td>Incoming:</td><td><input type="checkbox" id="incoming" name="incoming" '.($incoming?'checked':'').' onclick="cmdIncoming()" /></td></tr>';
 echo '<tr><tr><td></td><td>';
 

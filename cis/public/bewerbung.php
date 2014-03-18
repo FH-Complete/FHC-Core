@@ -1,5 +1,4 @@
 <?php
-
 /* Copyright (C) 2012 FH Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,6 +49,7 @@ require_once('../../include/dokument.class.php');
 require_once('../../include/akte.class.php');
 require_once('../../include/mail.class.php'); 
 require_once('../../include/studiensemester.class.php'); 
+require_once('../../include/studienplan.class.php');
 
 $person_id = $_SESSION['bewerbung/personId'];
 $akte_id = isset($_GET['akte_id'])?$_GET['akte_id']:'';
@@ -70,6 +70,9 @@ if($method=='delete')
     }
     else
     {
+    	if($akte->person_id!=$person_id)
+    		die('Ungueltiger Zugriff');
+    	
         $dms_id = $akte->dms_id;
         $dms = new dms(); 
         
@@ -102,17 +105,21 @@ if(isset($_POST['btn_bewerbung_abschicken']))
         $prestudent_status = new prestudent(); 
         $prestudent_status->load($pr_id); 
         
+        $alterstatus = new prestudent();
+        $alterstatus->getLastStatus($pr_id);
+        
         // check ob es status schon gibt
-        if(!$prestudent_status->load_rolle($pr_id, 'Bewerber', $std_semester, '0'))
+        if(!$prestudent_status->load_rolle($pr_id, 'Bewerber', $std_semester, '1'))
         {
             $prestudent_status->status_kurzbz = 'Bewerber'; 
             $prestudent_status->studiensemester_kurzbz = $std_semester; 
-            $prestudent_status->ausbildungssemester = '0'; 
+            $prestudent_status->ausbildungssemester = '1'; 
             $prestudent_status->datum = date("Y-m-d H:i:s"); 
             $prestudent_status->insertamum = date("Y-m-d H:i:s"); 
             $prestudent_status->insertvon = ''; 
             $prestudent_status->updateamum = date("Y-m-d H:i:s"); 
             $prestudent_status->updatevon = ''; 
+            $prestudent_status->studienplan_id = $alterstatus->studienplan_id;
             $prestudent_status->new = true; 
             if(!$prestudent_status->save_rolle())
                 die('Fehler beim anlegen der Rolle'); 
@@ -192,15 +199,17 @@ if(isset($_POST['btn_kontakt']))
             // löschen
             $kontakt->delete($kontakt_id); 
         }
-        
-        $kontakt->person_id = $person->person_id; 
-        $kontakt->kontakt_id = $kontakt_id; 
-        $kontakt->zustellung = true; 
-        $kontakt->kontakttyp = 'email';
-        $kontakt->kontakt = $_POST['email'];
-        $kontakt->new = false; 
-        
-        $kontakt->save(); 
+        else 
+        {
+	        $kontakt->person_id = $person->person_id; 
+	        $kontakt->kontakt_id = $kontakt_id; 
+	        $kontakt->zustellung = true; 
+	        $kontakt->kontakttyp = 'email';
+	        $kontakt->kontakt = $_POST['email'];
+	        $kontakt->new = false; 
+	        
+	        $kontakt->save(); 
+        }
     }
     else
     {
@@ -274,6 +283,16 @@ if(isset($_POST['btn_zgv']))
     
     if(!$prestudent->save())
         die('Fehler beim Speichern des Prestudenten aufgetaucht.'); 
+    
+    // Studienplan Speichern
+    $prestudent_status = new prestudent();
+    
+    if($prestudent_status->getLastStatus($_POST['prestudent']))
+    {
+    	$prestudent_status->new = false;
+    	$prestudent_status->studienplan_id=$_POST['studienplan_id'];
+    	$prestudent_status->save_rolle();
+    }
 }
 
 
@@ -381,12 +400,10 @@ else
 	}
 }
 
-?>
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html lang="en">
+?><!DOCTYPE HTML>
+<html>
 <head>
-<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <title>Bewerbung für einen Studiengang</title>
 <link rel="stylesheet" href="../../skin/styles/jquery-ui-1.10.3.custom.css" />
 <link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
@@ -544,13 +561,13 @@ padding: 5px;
 <div id="tabs" style="width:auto">
 	<div id="tabs-0" style="width:100%">    
     <ul>
-        <li><a href="#tabs-1">>|1| Allgemein <br> </a></li>
-        <li><a href="#tabs-2">>|2| Persönliche Daten <br> <?php echo $status_person_text;?></a></li>
-        <li><a href="#tabs-3">>|3| Zugangsvoraussetzungen<br> <?php echo $status_zgv_text; ?></a></li>
-        <li><a href="#tabs-4">>|4| Kontaktinformationen <br> <?php echo $status_kontakt_text;?></a></li>
-        <li><a href="#tabs-5">>|5| Dokumente <br> <?php echo $status_dokumente_text;?></a></li>
-        <li><a href="#tabs-6">>|6| Zahlungen <br> <?php echo $status_zahlungen_text;?></a></li>		
-        <li><a href="#tabs-7">>|7| Bewerbung abschicken <br> </a></li>
+        <li><a href="#tabs-1">&gt;|1| Allgemein <br> </a></li>
+        <li><a href="#tabs-2">&gt;|2| Persönliche Daten <br> <?php echo $status_person_text;?></a></li>
+        <li><a href="#tabs-3">&gt;|3| Zugangsvoraussetzungen<br> <?php echo $status_zgv_text; ?></a></li>
+        <li><a href="#tabs-4">&gt;|4| Kontaktinformationen <br> <?php echo $status_kontakt_text;?></a></li>
+        <li><a href="#tabs-5">&gt;|5| Dokumente <br> <?php echo $status_dokumente_text;?></a></li>
+        <li><a href="#tabs-6">&gt;|6| Zahlungen <br> <?php echo $status_zahlungen_text;?></a></li>		
+        <li><a href="#tabs-7">&gt;|7| Bewerbung abschicken <br> </a></li>
     </ul>
 	</div>
 <div id="tabs-1">
@@ -599,7 +616,7 @@ padding: 5px;
     ?>
     
     <br>
-    <button class='btn_weiter' type='button' onclick='activeTab(1);'>Weiter</button></p>
+    <button class='btn_weiter' type='button' onclick='activeTab(1);'>Weiter</button>
 </div>
 <div id="tabs-2">
 <h2>Persönliche Daten</h2>
@@ -716,6 +733,32 @@ $studiengang = new studiengang();
         echo "<br><br><br><br>
         <form method='POST' action='".$_SERVER['PHP_SELF']."?active=2'>
             <table border='0'>
+            	<tr>
+            		<td>Studienplan:</td>
+            		<td><SELECT name='studienplan_id'>
+        <OPTION value=''>-- bitte Auswählen --</option>";
+        $studienplan = new studienplan();
+        $studienplan->getStudienplaene($prestudent->studiengang_kz);
+        
+        $prestudentstatus = new prestudent();
+        $prestudentstatus->getLastStatus($prestudent->prestudent_id);
+        foreach($studienplan->result as $row_studienplan)
+        {
+        	if($prestudentstatus->studienplan_id==$row_studienplan->studienplan_id)
+        		$selected='selected';
+        	else
+        		$selected='';
+        	if($row_studienplan->aktiv)
+        	{
+        		echo '<OPTION value="'.$row_studienplan->studienplan_id.'" '.$selected.'>'.$row_studienplan->bezeichnung.'</OPTION>';
+        	}
+        }
+		echo " 		</select></td>
+            	</tr>
+            	<tr>
+            		<td>&nbsp;</td>
+            		<td></td>
+            	</tr>
                 <tr>
                     <td>Zugangsvoraussetzung: </td>
                     <td><select name='zgv'><option value=''>-- Bitte auswählen --</option>";

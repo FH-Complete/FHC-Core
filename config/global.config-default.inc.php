@@ -15,6 +15,22 @@ define('LVPLAN_ANMERKUNG_ANZEIGEN',true);
 //Gruppieren zeitgleicher Lehreinheiten im LV-Plan
 define('LVPLAN_LEHREINHEITEN_GRUPPIEREN',true);
 
+/*
+ * VORRUECKUNG_LEHRVERBAND_MAX_SEMESTER
+ * leer: Studentlehrverband Semester wird bei der Vorrueckung normal weitergezaehlt bis zum max_semester des Studienganges
+ * Zahl: Studentlehrverband Semester wird bei der Vorrueckung maximal bis zur angegebenen Zahl erhoeht und bleibt dann in diesem Semester
+ * DEFAULT: ''
+ */
+define('VORRUECKUNG_LEHRVERBAND_MAX_SEMESTER','');
+
+/*
+ * VORRUECKUNG_STATUS_MAX_SEMESTER
+ * true: Semester im Status wird bei der Vorrueckung nicht hoeher als max_semester des Studienganges
+ * false: Semester zaehlt bei der Vorrueckung immer weiter hoch
+ * DEFAULT: true
+ */
+define('VORRUECKUNG_STATUS_MAX_SEMESTER',true);
+
 // Bei Statuswechsel auf Bewerber -> soll Reihungstest brücksichtigt werden
 define('REIHUNGSTEST_CHECK', true); 
 
