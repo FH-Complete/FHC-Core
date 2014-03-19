@@ -144,7 +144,6 @@ function writePruefungsfenster(data)
 
 function writePrfFensterDetails(){
 	var id = $("#pruefungsfenster option:selected").val();
-//	console.log(data);
 	if(id !== null)
 	{
 		var start = $("#pruefungsfenster option:selected").attr("start");
@@ -161,7 +160,7 @@ function writePrfFensterDetails(){
 
 function loadPruefungen()
 {
-//	var studiensemester_kurzbz = $("#studiensemester option:selected").val();
+	//TODO student_uid
 	var student_uid = "if11b044";
 	$.ajax({
 		dataType: 'json',
@@ -170,7 +169,7 @@ function loadPruefungen()
 			typ: "json",
 			class: "lehrveranstaltung",
 			method: "load_lva_student",
-			parameter_0: student_uid	//IDs der beuschten LVs eines Studenten
+			parameter_0: student_uid
 		},
 		error: loadError
 	}).success(function(data){
@@ -178,7 +177,6 @@ function loadPruefungen()
 		data.result.forEach(function(e){
 			lvIds.push(e.lehrveranstaltung_id);
 		});
-		console.log(lvIds);
 		$.ajax({
 			dataType: 'json',
 			url: "./pruefungsanmeldung.json.php",
@@ -190,8 +188,118 @@ function loadPruefungen()
 			error: loadError
 		}).success(function(data){
 			data.result.forEach(function(e){
-				$("#prfDetails").append(e.lehrveranstaltung_id+"</br>");
-			})
+				$("#pruefungen").append("<option value="+e.pruefung.pruefung_id+" lv="+e.lehrveranstaltung.lehrveranstaltung_id+">"+e.lehrveranstaltung.bezeichnung+"</option>");
+			});
 		});	
 	});
+}
+
+function loadTermine(pruefung_id)
+{
+	console.log(pruefung_id);
+	if($("#prfTermine").attr("disabled") === "disabled")
+	{
+		$("#prfTermine").attr("disabled", false);
+	}
+	if(pruefung_id!=="null" && pruefung_id!==null)
+	{
+		$.ajax({
+			dataType: 'json',
+			url: "./pruefungsanmeldung.json.php",
+			type: "POST",
+			data: {
+				method: "loadTermine",
+				pruefung_id: pruefung_id
+			},
+			error: loadError
+		}).success(function(data){
+			$("#prfTermine").html("<option>Termin auswählen</option>");
+			data.result.forEach(function(e){
+				var termin = e.von.split(" ");
+				termin = termin[0].split("-");
+				termin = new Date(termin[0], termin[1]-1,termin[2]);
+				termin = termin.getDate()+"."+(termin.getMonth()+1)+"."+termin.getFullYear();
+				$("#prfTermine").append("<option value="+e.pruefungstermin_id+">"+termin+"</option>");
+			});
+			
+		});
+	}
+	else
+	{
+		$("#prfTermine").html("<option>Zuerst Prüfung auswählen.</option>");
+	}
+}
+
+function showPruefungsDetails()
+{
+	var prfId = $("#pruefungen option:selected").val();
+	if(prfId!=="null")
+	{
+		$.ajax({
+			dataType: 'json',
+			url: "./pruefungsanmeldung.json.php",
+			type: "POST",
+			data: {
+				method: "loadPruefung",
+				pruefung_id: prfId
+			},
+			error: loadError
+		}).success(function(data){
+			var e = data.result[0];
+			loadTermine(e.pruefung_id);			
+			$("#prfTyp").html(e.pruefungstyp_kurzbz);
+			$("#prfMethode").html(e.methode);
+			$("#prfBeschreibung").html(e.beschreibung);
+			if(e.einzeln === true)
+			{
+				$("#prfDetails").append("<b>Einzelprüfung!</b>");
+			}
+		});	
+	}
+	else
+	{
+		$("#prfTermine").attr("disabled", true);
+		$("#prfTermine").html("<option>Zuerst Prüfung auswählen.</option>");
+		clearPrfDetails();
+	}
+}
+
+function saveAnmeldung()
+{
+	var lehrveranstaltung_id = $("#pruefungen option:selected").attr("lv");
+	var termin_id = $("#prfTermine option:selected").val();
+	var bemerkungen = $("#prfWuensche").val();
+	
+	$.ajax({
+		dataType: 'json',
+		url: "./pruefungsanmeldung.json.php",
+		type: "POST",
+		data: {
+			method: "saveAnmeldung",
+			termin_id: termin_id,
+			lehrveranstaltung_id: lehrveranstaltung_id,
+			bemerkung: bemerkungen
+		},
+		error: loadError
+	}).success(function(data){
+		$("#message").html(data.result);
+		resetForm();
+	});
+	
+}
+
+function clearPrfDetails()
+{
+	$("#prfTyp").empty();
+	$("#prfMethode").empty();
+	$("#prfBeschreibung").empty();
+}
+
+function resetForm()
+{
+	
+	$("form").find("input[type=text], textarea").val("");
+	$("form").find("select").val("null");
+	$("#prfTermine").attr("disabled", true);
+	clearPrfDetails();
 }
