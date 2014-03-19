@@ -26,6 +26,8 @@ require_once('../../../../config/cis.config.inc.php');
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/benutzerberechtigung.class.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
+require_once('../../../../include/konto.class.php');
+require_once('../../../../include/studiensemester.class.php');
 
 
 $uid = get_uid();
@@ -36,14 +38,12 @@ $rechte->getBerechtigungen($uid);
 //if(!$rechte->isBerechtigt('lehre/pruefungsanmeldung'))
 //	die('Sie haben keine Berechtigung für diese Seite');
 
-
+//TODO
 $lehrveranstaltung = new lehrveranstaltung();
 $lehrveranstaltung->load_lva_student("if11b044");
-//foreach ($lehrveranstaltung->lehrveranstaltungen as $lv)
-//{
-//    echo $lv->bezeichnung."</br>";
-//}
-//var_dump($lehrveranstaltung->lehrveranstaltungen[1]);
+
+$studiensemester = new studiensemester();
+$studiensemester->getAll();
 
 ?>
 <html>
@@ -58,12 +58,12 @@ $lehrveranstaltung->load_lva_student("if11b044");
         <link rel="stylesheet" href="../../../../skin/style.css.php">
         <link rel="stylesheet" href="../../../../skin/tablesort.css">
         <style type="text/css">
-            #prfDetails {
-                /*border: 1px solid black;*/
+            #pruefungen, #prfTermine {
+                max-width: 50%;
             }
             
-            #anmeldung {
-                width: 30%;
+            #details {
+                margin-left: 1.5em;
             }
             
             div {
@@ -83,10 +83,31 @@ $lehrveranstaltung->load_lva_student("if11b044");
             <form action="pruefungsanmeldung.php" method="POST">
                 <table>
                     <tr>
+                        <td>Studiensemester:</td>
+                        <td>
+                            <select id="studiensemester">
+                                <?php
+                                    foreach($studiensemester->studiensemester as $stdSem)
+                                    {
+                                        if($stdSem->studiensemester_kurzbz == $studiensemester->getakt())
+                                        {
+                                            echo '<option selected value='.$stdSem->studiensemester_kurzbz.'>'.$stdSem->studiensemester_kurzbz.'</option>';
+                                        } 
+                                        else
+                                        {
+                                            echo '<option value='.$stdSem->studiensemester_kurzbz.'>'.$stdSem->studiensemester_kurzbz.'</option>';  
+                                        }
+                                    }
+                                ?>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
                         <td>
                             Prüfung:
                         </td>
                         <td>
+                            <input id="uid" type="hidden" name="uid" value="<?php echo $uid;?>">
                             <select id="pruefungen" onChange="showPruefungsDetails();">
                                 <!--Prüfungen werden durch Js geladen-->
                                 <option value="null">Prüfung auswählen</option>
@@ -122,12 +143,13 @@ $lehrveranstaltung->load_lva_student("if11b044");
                 
             </div>
         </div>
-        <div>
+        <div id="details">
             <h1>Prüfungsdetails</h1>
             <div id="prfDetails">
                 <span>Typ: </span><span id="prfTyp"></span></br>
                 <span>Methode: </span><span id="prfMethode"></span></br>
                 <span>Beschreibung: </span><span id="prfBeschreibung"></span></br>
+                <span id="prfEinzeln"></span></br>
             </div>
         </div>
         <?php

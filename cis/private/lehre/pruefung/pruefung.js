@@ -161,6 +161,7 @@ function writePrfFensterDetails(){
 function loadPruefungen()
 {
 	//TODO student_uid
+	var student_uid = $("#uid").val();
 	var student_uid = "if11b044";
 	$.ajax({
 		dataType: 'json',
@@ -196,7 +197,6 @@ function loadPruefungen()
 
 function loadTermine(pruefung_id)
 {
-	console.log(pruefung_id);
 	if($("#prfTermine").attr("disabled") === "disabled")
 	{
 		$("#prfTermine").attr("disabled", false);
@@ -252,7 +252,11 @@ function showPruefungsDetails()
 			$("#prfBeschreibung").html(e.beschreibung);
 			if(e.einzeln === true)
 			{
-				$("#prfDetails").append("<b>Einzelprüfung!</b>");
+				$("#prfEinzeln").html("<b>Einzelprüfung!</b>");
+			}
+			else
+			{
+				$("#prfEinzeln").html("");
 			}
 		});	
 	}
@@ -269,6 +273,7 @@ function saveAnmeldung()
 	var lehrveranstaltung_id = $("#pruefungen option:selected").attr("lv");
 	var termin_id = $("#prfTermine option:selected").val();
 	var bemerkungen = $("#prfWuensche").val();
+	var studiensemester_kurzbz = $("#studiensemester").val();
 	
 	$.ajax({
 		dataType: 'json',
@@ -278,11 +283,19 @@ function saveAnmeldung()
 			method: "saveAnmeldung",
 			termin_id: termin_id,
 			lehrveranstaltung_id: lehrveranstaltung_id,
-			bemerkung: bemerkungen
+			bemerkung: bemerkungen,
+			studiensemester_kurzbz: studiensemester_kurzbz
 		},
 		error: loadError
 	}).success(function(data){
-		$("#message").html(data.result);
+		if(data.error === 'false')
+		{
+			$("#message").html(data.result);
+		}
+		else
+		{
+			$("#message").html(data.errormsg);
+		}
 		resetForm();
 	});
 	
@@ -293,13 +306,14 @@ function clearPrfDetails()
 	$("#prfTyp").empty();
 	$("#prfMethode").empty();
 	$("#prfBeschreibung").empty();
+	$("#prfEinzeln").empty();
 }
 
 function resetForm()
 {
-	
 	$("form").find("input[type=text], textarea").val("");
-	$("form").find("select").val("null");
+	$("#prfTermine").val("null");
+	$("#pruefungen").val("null");
 	$("#prfTermine").attr("disabled", true);
 	clearPrfDetails();
 }

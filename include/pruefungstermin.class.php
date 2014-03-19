@@ -74,6 +74,27 @@ class pruefungstermin extends basis_db{
             return false;
         }
         
+        $qry = 'SELECT * FROM campus.tbl_pruefungstermin WHERE pruefungstermin_id='.$this->db_add_param($pruefungstermin_id).';';
+        
+        if($this->db_query($qry))
+        {
+            if($row = $this->db_fetch_object())
+            {
+                $this->pruefungstermin_id = $row->pruefungstermin_id;
+                $this->pruefung_id = $row->pruefung_id;
+                $this->von = $row->von;
+                $this->bis = $row->bis;
+                $this->teilnehmer_max = $row->teilnehmer_max;
+                $this->teilnehmer_min = $row->teilnehmer_min;
+            }
+            return true;
+        }
+        else
+        {
+            $this->errormsg = 'Termin konnte nicht geladen werden.';
+            return false;
+        }
+        
     }
     
     /**
@@ -103,5 +124,21 @@ class pruefungstermin extends basis_db{
         }
         return $result;
         
+    }
+    
+    public function getNumberOfParticipants()
+    {
+        $qry = 'SELECT * FROM campus.tbl_pruefungsanmeldung WHERE pruefungstermin_id='.$this->db_add_param($this->pruefungstermin_id).';';
+        
+        if($this->db_query($qry))
+        {
+            return $this->db_num_rows();
+        }
+        else
+        {
+            $this->errormsg = 'Teilnehmeranzahl konnte nicht geladen werden.';
+            return false;
+        }
+        return false;
     }
 }

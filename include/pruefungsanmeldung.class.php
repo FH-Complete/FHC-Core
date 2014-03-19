@@ -109,4 +109,73 @@ class pruefungsanmeldung extends basis_db {
         }
     }
     
+    public function load($pruefungsanmeldung_id)
+    {
+        if(!is_numeric($pruefungsanmeldung_id))
+        {
+            $this->errormsg = "Anmeldung ID muss eine gültige Zahl sein";
+            return false;
+        }
+        
+        $qry = 'SELECT * FROM campus.tbl_pruefungsanmeldung WHERE pruefungsanmeldung_id='.$this->db_add_param($pruefungsanmeldung_id).';';
+        
+        if(!$this->db_query($qry))
+        {
+            $this->errormsg = 'Anmeldungsdaten konnten nicht geladen werden.';
+            return false;
+        }
+        else
+        {
+            if($row = $this->db_fetch_object())
+            {
+                $this->pruefungsanmeldung_id = $row->pruefunganmeldung_id;
+                $this->uid = $row->uid;
+                $this->pruefungstermin_id = $row->pruefungstermin_id;
+                $this->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+                $this->status_kurzbz = $row->status_kurzbz;
+                $this->wuensche = $row->wuensche;
+                $this->reihung = $row->reihung;
+                $this->kommentar = $row->kommentar;
+            }
+            return true;
+        }
+    }
+    
+    public function getAnmeldungenByStudent($uid, $studiensemester_kurbz=null, $status_kurzbz=null)
+    {
+        $qry = 'SELECT * FROM campus.tbl_pruefungsanmeldung pa '
+                . 'JOIN campus.tbl_pruefungstermin pt ON pa.pruefungstermin_id=pt.pruefungstermin_id '
+                . 'JOIN campus.tbl_pruefung p ON p.pruefung_id=pt.pruefung_id '
+                . 'WHERE uid='.$this->db_add_param($uid).';';
+        
+        if(!$this->db_query($qry))
+        {
+            $this->errormsg = 'Anmeldungen konnten nicht geladen werden.';
+            return false;
+        }
+        else
+        {
+            $anmeldungen = array();
+            while($row = $this->db_fetch_object())
+            {
+                $anmeldung = new stdClass();
+                $anmeldung->pruefungsanmeldung_id = $row->pruefungsanmeldung_id;
+                $anmeldung->uid = $row->uid;
+                $anmeldung->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+                $anmeldung->status_kurzbz = $row->status_kurzbz;
+                $anmeldung->pruefungstermin_id = $row->pruefungstermin_id;
+                $anmeldung->pruefung_id = $row->pruefung_id;
+                $anmeldung->von = $row->von;
+                $anmeldung->bis = $row->bis;
+                array_push($anmeldungen, $anmeldung);
+            }
+            return $anmeldungen;
+        }
+    }
+    
+    public function checkAnmeldung()
+    {
+        
+    }
+    
 }
