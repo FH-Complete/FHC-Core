@@ -276,7 +276,7 @@ class pruefungCis extends basis_db
         } 
         else
         {
-            while($row = $this->db_fetch_object())
+            if($row = $this->db_fetch_object())
             {
                 $this->pruefung_id = $row->pruefung_id;
                 $this->mitarbeiter_uid = $row->mitarbeiter_uid;
