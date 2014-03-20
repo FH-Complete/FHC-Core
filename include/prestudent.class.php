@@ -1290,7 +1290,8 @@ class prestudent extends person
 					JOIN public.tbl_prestudentstatus USING(prestudent_id)
 					JOIN public.tbl_studiengang USING(studiengang_kz)
 				WHERE
-					tbl_prestudentstatus.status_kurzbz='Interessent'";
+					bismelden=true
+					AND tbl_prestudentstatus.status_kurzbz='Interessent'";
 
 		if(!is_null($studiensemester_kurzbz))
 			$qry.="	AND tbl_prestudentstatus.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
@@ -1351,6 +1352,7 @@ class prestudent extends person
 					JOIN public.tbl_prestudentstatus USING(prestudent_id)
 				WHERE
 					tbl_prestudentstatus.status_kurzbz='Abbrecher'
+					AND bismelden=true
 					AND tbl_prestudentstatus.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 
 		if(!is_null($studiengang_kz))
@@ -1392,13 +1394,15 @@ class prestudent extends person
 	 */
 	public function getAnzStudierende($studiensemester_kurzbz, $studiengang_kz=null, $orgform_kurzbz=null, $ausbildungssemester=null)
 	{
-		$qry = "SELECT
-					count(*) as anzahl
+		$qry = "SELECT count(*) as anzahl FROM (
+				SELECT
+					distinct on(prestudent_id) prestudent_id
 				FROM 
 					public.tbl_prestudent
 					JOIN public.tbl_prestudentstatus USING(prestudent_id)
 				WHERE
-					tbl_prestudentstatus.status_kurzbz='Student'
+					tbl_prestudentstatus.status_kurzbz IN ('Student','Unterbrecher','Diplomand')
+					AND bismelden=true
 					AND tbl_prestudentstatus.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 
 		if(!is_null($studiengang_kz))
@@ -1409,6 +1413,8 @@ class prestudent extends person
 
 		if(!is_null($ausbildungssemester))
 			$qry.=" AND tbl_prestudentstatus.ausbildungssemester=".$this->db_add_param($ausbildungssemester);
+
+		$qry.=") as sub";
 
 		if($result = $this->db_query($qry))
 		{
