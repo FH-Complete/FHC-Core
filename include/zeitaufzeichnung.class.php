@@ -301,12 +301,15 @@ class zeitaufzeichnung extends basis_db
 	}
 	
 	/**
-	 * Laedt die Zeitaufzeichnung eines Users der letzten 40 Tage
+	 * Laedt die Zeitaufzeichnungen eines Users. Default: Die letzten 40 Tage
 	 * @param $user
+	 * @param $days deafult: 40 Tage
 	 */
-	public function getListeUser($user)
+	public function getListeUser($user, $days='40')
 	{		 
-		$where = "uid='$user' AND ende>(now() - INTERVAL '40 days')";
+		$where = "uid='$user'";
+		if ($days!='')
+		$where.= " AND ende>(now() - INTERVAL '".$days." days')";
 		
 	    $qry = "SELECT 
 	    			*, to_char ((ende-start),'HH24:MI') as diff, 
@@ -315,7 +318,7 @@ class zeitaufzeichnung extends basis_db
 	    			 WHERE $where ) as summe 	    
 	    		FROM campus.tbl_zeitaufzeichnung WHERE $where
 	    		ORDER BY start DESC";
-	    
+
 	    if($result = $this->db_query($qry))
 	    {
 	    	while($row = $this->db_fetch_object($result))
