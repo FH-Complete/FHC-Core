@@ -271,6 +271,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					      					<spacer flex="1" />			
 					      				</hbox>
 									</row>
+									<row>
+										<label value="Zahlungsreferenz" control="student-konto-textbox-zahlungsreferenz"/>
+										<hbox>
+					      					<textbox id="student-konto-textbox-zahlungsreferenz" disabled="true" maxlength="20" size="20"/>
+					      					<spacer flex="1" />			
+					      				</hbox>
+									</row>
 								</rows>
 							</grid>
 							<hbox>
