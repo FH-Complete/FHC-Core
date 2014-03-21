@@ -131,7 +131,7 @@ function onJumpNow()
 	var grp=daten.getAttribute("grp");
 	var gruppe=daten.getAttribute("gruppe");
 	var ort=daten.getAttribute("ort");
-	var fachbereich_kurzbz=date.getAttribute("fachbereich_kurzbz");
+	var fachbereich_kurzbz=daten.getAttribute("fachbereich_kurzbz");
 	var pers_uid=daten.getAttribute("pers_uid");
 
 	var d = new Date();
