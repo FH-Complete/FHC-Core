@@ -126,6 +126,7 @@ function drawrow($row)
 			<KONTO:mahnspanne><![CDATA[".$row->mahnspanne."]]></KONTO:mahnspanne>
 			<KONTO:buchungstyp_kurzbz><![CDATA[".$row->buchungstyp_kurzbz."]]></KONTO:buchungstyp_kurzbz>
 			<KONTO:credit_points><![CDATA[".$row->credit_points."]]></KONTO:credit_points>
+			<KONTO:zahlungsreferenz><![CDATA[".$row->zahlungsreferenz."]]></KONTO:zahlungsreferenz>
 			<KONTO:updateamum><![CDATA[".$row->updateamum."]]></KONTO:updateamum>
 			<KONTO:updatevon><![CDATA[".$row->updatevon."]]></KONTO:updatevon>
 			<KONTO:insertamum><![CDATA[".$row->insertamum."]]></KONTO:insertamum>
