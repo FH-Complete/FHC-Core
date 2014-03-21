@@ -83,6 +83,7 @@ else
 $studiengang_kz = (isset($_GET['studiengang_kz'])?$_GET['studiengang_kz']:$stg_kz);
 $semester = (isset($_GET['semester'])?$_GET['semester']:$sem);
 $mischen = (isset($_GET['mischen'])?$_GET['mischen']:true);
+$titel = (isset($_GET['titel'])?$_GET['titel']:'');
 $editable = isset($_GET['edit']);
 $news = new news();
 $all=false;
@@ -124,6 +125,11 @@ if($studiengang_kz!=0)
 	$stg_obj = new studiengang();
 	$stg_obj->load($studiengang_kz);
 	$xml.='<studiengang_bezeichnung>'.$stg_obj->bezeichnung.'</studiengang_bezeichnung>';
+}
+
+if($titel!='')
+{
+	$xml.='<news_titel>'.$titel.'</news_titel>';
 }
 
 $xml .= '</content>';

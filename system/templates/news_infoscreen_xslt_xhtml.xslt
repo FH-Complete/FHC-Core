@@ -10,7 +10,15 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 			<table class="tabcontent">
 			<tr>
 				<td valign="top">
-	    			<h1>News  <xsl:value-of select="content/studiengang_bezeichnung" /></h1>
+					<xsl:choose>
+						<xsl:when test="content/news_titel">
+							<h1>News  <xsl:value-of select="content/news_titel" /></h1>
+						</xsl:when>
+						<xsl:otherwise>
+							<h1>News  <xsl:value-of select="content/studiengang_bezeichnung" /></h1>
+						</xsl:otherwise>
+					</xsl:choose>
+	    			
 					<div id="news">
 						<xsl:choose>
 							<xsl:when test="content/news">
