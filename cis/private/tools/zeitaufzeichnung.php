@@ -40,6 +40,24 @@ $p=new phrasen($sprache);
 	
 if (!$db = new basis_db())
 	die($p->t("global/fehlerBeimOeffnenDerDatenbankverbindung"));
+	
+$user = get_uid();
+$datum = new datum();
+
+$zeitaufzeichnung_id = (isset($_GET['zeitaufzeichnung_id'])?$_GET['zeitaufzeichnung_id']:'');
+$projekt_kurzbz = (isset($_POST['projekt'])?$_POST['projekt']:'');
+$oe_kurzbz_1 = (isset($_POST['oe_kurzbz_1'])?$_POST['oe_kurzbz_1']:'');
+$oe_kurzbz_2 = (isset($_POST['oe_kurzbz_2'])?$_POST['oe_kurzbz_2']:'');
+$aktivitaet_kurzbz = (isset($_POST['aktivitaet'])?$_POST['aktivitaet']:'');
+$von = (isset($_POST['von'])?$_POST['von']:date('d.m.Y H:i'));
+$bis = (isset($_POST['bis'])?$_POST['bis']:date('d.m.Y H:i', mktime(date('H'), date('i')+10, 0, date('m'),date('d'),date('Y'))));
+$beschreibung = (isset($_POST['beschreibung'])?$_POST['beschreibung']:'');
+$service_id = (isset($_POST['service_id'])?$_POST['service_id']:'');
+$kunde_uid = (isset($_POST['kunde_uid'])?$_POST['kunde_uid']:'');
+$kartennummer = (isset($_POST['kartennummer'])?$_POST['kartennummer']:'');
+$filter = (isset($_GET['filter'])?$_GET['filter']:'foo');
+//$alle = (isset($_POST['alle'])?($_POST['alle']=='true'?true:false):false);
+$alle = (isset($_POST['alle'])?(isset($_POST['normal'])?false:true):false);
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -49,9 +67,9 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 		<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 		<link href="../../../skin/tablesort.css" rel="stylesheet" type="text/css"/>
 		<link href="../../../skin/jquery.css" rel="stylesheet" type="text/css"/>
-        <link rel="stylesheet" href="../../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
+        <link href="../../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet"  type="text/css">
 		<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
-        <script type="text/javascript" src="../../../include/js/jquery1.9.min.js"></script> 
+        <script src="../../../include/js/jquery1.9.min.js" type="text/javascript" ></script> 
 
         <script type="text/javascript">
 		$(document).ready(function() 
@@ -144,27 +162,51 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 		{
 			document.getElementById("bis").value=document.getElementById("von").value;
 		}
+
+		function checkdatum()
+		{
+			var Datum,Tag,Monat,Jahr,Stunde,Minute,vonDatum,bisDatum,diff;
+		
+			Datum=document.getElementById("von").value;
+		    Tag=Datum.substring(0,2); 
+		    Monat=Datum.substring(3,5);
+		    Jahr=Datum.substring(6,10);
+		    Stunde=Datum.substring(11,13);
+		    Minute=Datum.substring(14,16);
+		    vonDatum=Jahr+\'\'+Monat+\'\'+Tag+\'\'+Stunde+\'\'+Minute;
+		    
+		    Datum=document.getElementById("bis").value;
+		    Tag=Datum.substring(0,2); 
+		    Monat=Datum.substring(3,5);
+		    Jahr=Datum.substring(6,10);
+		    Stunde=Datum.substring(11,13);
+		    Minute=Datum.substring(14,16);
+		    bisDatum=Jahr+\'\'+Monat+\'\'+Tag+\'\'+Stunde+\'\'+Minute;
+		    diff=bisDatum-vonDatum;
+		    
+			if (bisDatum>vonDatum)  
+			{
+				if (diff>9999)  
+				{
+					alert("'.$p->t("zeitaufzeichnung/zeitraumAuffallendHoch").'");
+					document.getElementById("bis").focus();
+				  	return true;
+				}
+			}
+			else
+			{
+				alert("'.$p->t("zeitaufzeichnung/bisDatumKleinerAlsVonDatum").'");
+				document.getElementById("bis").focus();
+			  	return false;
+			}
+			return true;
+		}
 		</script>
 	</head>
 <body>
 ';
 
 echo '<h1>'.$p->t("zeitaufzeichnung/zeitaufzeichnung").'</h1>';
-
-$user = get_uid();
-$datum = new datum();
-
-$zeitaufzeichnung_id = (isset($_GET['zeitaufzeichnung_id'])?$_GET['zeitaufzeichnung_id']:'');
-$projekt_kurzbz = (isset($_POST['projekt'])?$_POST['projekt']:'');
-$oe_kurzbz_1 = (isset($_POST['oe_kurzbz_1'])?$_POST['oe_kurzbz_1']:'');
-$oe_kurzbz_2 = (isset($_POST['oe_kurzbz_2'])?$_POST['oe_kurzbz_2']:'');
-$aktivitaet_kurzbz = (isset($_POST['aktivitaet'])?$_POST['aktivitaet']:'');
-$von = (isset($_POST['von'])?$_POST['von']:date('d.m.Y H:i'));
-$bis = (isset($_POST['bis'])?$_POST['bis']:date('d.m.Y H:i', mktime(date('H'), date('i')+10, 0, date('m'),date('d'),date('Y'))));
-$beschreibung = (isset($_POST['beschreibung'])?$_POST['beschreibung']:'');
-$service_id = (isset($_POST['service_id'])?$_POST['service_id']:'');
-$kunde_uid = (isset($_POST['kunde_uid'])?$_POST['kunde_uid']:'');
-$kartennummer = (isset($_POST['kartennummer'])?$_POST['kartennummer']:'');
 
 // Wenn Kartennummer übergeben wurde dann hole uid von Karteninhaber
 if($kartennummer != '')
@@ -284,14 +326,16 @@ if($projekt->getProjekteMitarbeiter($user))
 					<td>".$p->t("zeitaufzeichnung/zeitaufzeichnungVon")." 
 						<b>".$db->convert_html_chars($bn->vorname)." ".$db->convert_html_chars($bn->nachname)."</b>
 					</td>
-		      		<td align='right'>
+				</tr>
+				<tr>
+		      		<td>
 		      			<a href='".$_SERVER['PHP_SELF']."' class='Item'>".$p->t("zeitaufzeichnung/neu")."</a>
 		      		</td>
 		      	</tr>
 		      </table>";
 		
 		//Formular
-		echo '<br><br><form action="'.$_SERVER['PHP_SELF'].'?zeitaufzeichnung_id='.$zeitaufzeichnung_id.'" method="POST">';
+		echo '<br><br><form action="'.$_SERVER['PHP_SELF'].'?zeitaufzeichnung_id='.$zeitaufzeichnung_id.'" method="POST" onsubmit="return checkdatum()">';
 		
 		echo '<table>';
 		//Projekt
@@ -303,14 +347,14 @@ if($projekt->getProjekteMitarbeiter($user))
 		sort($projekt->result);
 		foreach($projekt->result as $row_projekt)
 		{
-			if($projekt_kurzbz == $row_projekt->projekt_kurzbz)
+			if($projekt_kurzbz == $row_projekt->projekt_kurzbz || $filter == $row_projekt->projekt_kurzbz)
 				$selected = 'selected';
 			else 
 				$selected = '';
 			
 			echo '<option value="'.$db->convert_html_chars($row_projekt->projekt_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row_projekt->titel).'</option>';
 		}
-		echo '</SELECT><input type="button" value="Uebersicht" onclick="loaduebersicht();"></td>';
+		echo '</SELECT><input type="button" value="'.$p->t("zeitaufzeichnung/uebersicht").'" onclick="loaduebersicht();"></td>';
 		echo '</tr><tr>';
 		//OE_KURZBZ_1
 		echo '<td>'.$p->t("zeitaufzeichnung/organisationseinheit1").'</td>
@@ -438,8 +482,8 @@ if($projekt->getProjekteMitarbeiter($user))
 		//Start/Ende
 		echo '
 		<tr>
-			<td>'.$p->t("global/von").'</td><td><input type="text" id="von" name="von" value="'.$db->convert_html_chars($von).'">&nbsp;<img style="vertical-align:bottom" src="../../../skin/images/aktualisieren.png" title="'.$p->t("zeitaufzeichnung/aktuelleZeitLaden").'" onclick="setvondatum()">&nbsp;&nbsp;<input type="button" value="->" title="'.$p->t("zeitaufzeichnung/alsEndzeitUebernehmen").'" onclick="uebernehmen()"></td>
-			<td>'.$p->t("global/bis").'</td><td><input type="text" id="bis" name="bis" value="'.$db->convert_html_chars($bis).'">&nbsp;<img style="vertical-align:bottom" src="../../../skin/images/aktualisieren.png" title="'.$p->t("zeitaufzeichnung/aktuelleZeitLaden").'" onclick="setbisdatum()"></td>
+			<td>'.$p->t("global/von").'</td><td><input type="text" id="von" name="von" value="'.$db->convert_html_chars($von).'">&nbsp;<img style="vertical-align:bottom" src="../../../skin/images/timetable.png" title="'.$p->t("zeitaufzeichnung/aktuelleZeitLaden").'" onclick="setvondatum()">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="->" title="'.$p->t("zeitaufzeichnung/alsEndzeitUebernehmen").'" onclick="uebernehmen()"></td>
+			<td>'.$p->t("global/bis").'</td><td><input type="text" id="bis" name="bis" value="'.$db->convert_html_chars($bis).'">&nbsp;<img style="vertical-align:bottom" src="../../../skin/images/timetable.png" title="'.$p->t("zeitaufzeichnung/aktuelleZeitLaden").'" onclick="setbisdatum()"></td>
 		<tr>';
 		//Beschreibung
 		echo '<tr><td>'.$p->t("global/beschreibung").'</td><td colspan="3"><textarea name="beschreibung" cols="60">'.$db->convert_html_chars($beschreibung).'</textarea></td></tr>';
@@ -449,19 +493,28 @@ if($projekt->getProjekteMitarbeiter($user))
 			echo '<input type="submit" value="'.$p->t("global/speichern").'" name="save"></td></tr>';
 		else 
 		{
+			echo '<input type="hidden" value="" name="'.($alle===true?'alle':'').'">'; 
 			echo '<input type="submit" value="'.$p->t("global/aendern").'" name="edit">&nbsp;&nbsp;';
 			echo '<input type="submit" value="'.$p->t("zeitaufzeichnung/alsNeuenEintragSpeichern").'" name="save"></td></tr>';
 		}
-		echo '</table>';
+		//echo '<tr><td><input type="submit" value="Alle anzeigen" name="alle" ></td></tr>';
+		//echo '<tr><td><a href='.$_SERVER["PHP_SELF"].' class="Item">'.$p->t("zeitaufzeichnung/neu").'</a></td></tr>';
+		echo '</table>'; 
+		echo '<hr>';
+		echo '<input type="submit" value="Alle anzeigen" name="'.($alle===true?'normal':'alle').'">';       
+		//echo '<hr>';
 		echo '</form>';
-        
-		echo '<br><hr>';
 		
 		$za = new zeitaufzeichnung();
 	    if(isset($_GET['filter']))
 	    	$za->getListeProjekt($_GET['filter']);
 	    else
-	    	$za->getListeUser($user);
+	    {
+	    	if ($alle==true)
+	    		$za->getListeUser($user, '');
+	    	else 
+	    		$za->getListeUser($user);
+	    }
 	   
 		$summe=0;
 		
