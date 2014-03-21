@@ -352,12 +352,12 @@ if($command=="update" && $error!=true)
 			//E-Mail an 1.Begutachter
 			if($bid!='' && $bid!=NULL)
 			{
-				$qry_betr="SELECT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,  
+				$qry_betr="SELECT distinct trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,  
 					public.tbl_mitarbeiter.mitarbeiter_uid, anrede 
 					FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
-					LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
-					LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid) 
-					WHERE public.tbl_person.person_id='".addslashes($bid)."'";
+					JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
+					JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid) 
+					WHERE public.tbl_person.person_id=".$db->db_add_param($bid, FHC_INTEGER);
 				if(!$betr=$db->db_query($qry_betr))
 				{
 					echo "<font color=\"#FF0000\">".$p->t('global/fehlerBeimLesenAusDatenbank')."</font><br>&nbsp;";
@@ -366,7 +366,7 @@ if($command=="update" && $error!=true)
 				{
 					if($row_betr=$db->db_fetch_object($betr))
 					{
-						$qry_std="SELECT * FROM campus.vw_benutzer where uid='".addslashes($uid)."'";
+						$qry_std="SELECT * FROM campus.vw_benutzer where uid=".$db->db_add_param($uid);
 						if(!$result_std=$db->db_query($qry_std))
 						{
 							echo "<font color=\"#FF0000\">".$p->t('global/fehlerBeimLesenAusDatenbank')."</font><br>&nbsp;";
@@ -375,8 +375,8 @@ if($command=="update" && $error!=true)
 						{
 							$row_std=$db->db_fetch_object($result_std);
 							
-							$mail = new mail($row_betr->mitarbeiter_uid."@".DOMAIN, "vilesci@".DOMAIN, "Bachelor-/Diplomarbeitsbetreuung",
-							"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\n".($row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)." hat eine Abgabe vorgenommen.\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+							$mail = new mail($row_betr->mitarbeiter_uid."@".DOMAIN, "vilesci@".DOMAIN, "Bachelor-/Masterarbeitsbetreuung",
+							"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\n".($row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)." hat eine Abgabe vorgenommen.\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Masterarbeitsabgabesystem generiertes Info-Mail\nCis->Mein CIS->Projektarbeiten->Bachelor- und Masterarbeitsabgabe\n--------------------------------------------------------------------------");
 							$mail->setReplyTo($user."@".DOMAIN);
 							if(!$mail->send())
 							{
