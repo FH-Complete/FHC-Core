@@ -72,6 +72,40 @@ $error_msg='';
 	}
 	
    	// **************************************************************
+	// MitarbeiterInnenVerteiler abgleichen
+	$mlist_name='tw_ma';
+	setGeneriert($mlist_name);
+	// MitarbeiterInnen holen die nicht mehr in den Verteiler gehoeren
+	echo $mlist_name.' wird abgeglichen!<BR>';
+	flush();
+	$sql_query="SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('".addslashes($mlist_name)."') AND uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) WHERE aktiv AND personalnummer >=0)";
+	
+	if(!($result = $db->db_query($sql_query)))
+		$error_msg.=$db->db_last_error();
+
+	while($row = $db->db_fetch_object($result))
+	{
+     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name') AND uid='$row->uid'";
+		if(!$db->db_query($sql_query))
+			$error_msg.=$db->db_last_error().$sql_query;
+		echo '-';
+		flush();
+	}
+	// MitarbeiterInnen holen die nicht im Verteiler sind
+	echo '<BR>';
+	$sql_query="SELECT mitarbeiter_uid AS uid FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) WHERE aktiv AND personalnummer >=0 AND mitarbeiter_uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER('$mlist_name'))";
+	if(!($result = $db->db_query($sql_query)))
+		$error_msg.= $db->db_last_error();
+	while($row = $db->db_fetch_object($result))
+	{
+     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
+		if(!$db->db_query($sql_query))
+			$error_msg.=$db->db_last_error().$sql_query;
+		echo '-';
+		flush();
+	}
+	
+	// **************************************************************
 	// LektorenVerteiler abgleichen
 	$mlist_name='tw_lkt';
 	setGeneriert($mlist_name);
@@ -372,7 +406,8 @@ $error_msg='';
 		}
 		else
 			echo "<br>Fehler:$sql_query";
-
+		
+		setGeneriert($row->mlist_name);
      	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->mitarbeiter_uid','".strtoupper($row->mlist_name)."', now(), 'mlists_generate')";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
