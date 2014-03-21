@@ -24,4 +24,7 @@ $this->phrasen['zeitaufzeichnung/oderKartennummerOptional']='or number of card (
 $this->phrasen['zeitaufzeichnung/nameEingeben']='Enter name';
 $this->phrasen['zeitaufzeichnung/aktuelleZeitLaden']='Load current time';
 $this->phrasen['zeitaufzeichnung/alsEndzeitUebernehmen']='Transfer to endtime';
+$this->phrasen['zeitaufzeichnung/uebersicht']='Overview';
+$this->phrasen['zeitaufzeichnung/zeitraumAuffallendHoch']='Achtung, eingegebener Zeitraum ist auffallend hoch. \nDaten wurden gespeichert.';
+$this->phrasen['zeitaufzeichnung/bisDatumKleinerAlsVonDatum']='Das Bis-Datum darf nicht kleiner als das Von-Datum sein';
 ?>
