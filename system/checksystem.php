@@ -1239,6 +1239,19 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	}		
 }
 
+// Anmeldefrist fuer Pruefungstermine
+if(!$result = @$db->db_query("SELECT anmeldung_von FROM campus.tbl_pruefungstermin LIMIT 1"))
+{
+	$qry = "ALTER TABLE campus.tbl_pruefungstermin ADD COLUMN anmeldung_von date;
+		ALTER TABLE campus.tbl_pruefungstermin ADD COLUMN anmeldung_bis date;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_pruefungstermin: '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'campus.tbl_pruefungstermin: Spalte anmeldung_von und anmeldung_bis hinzugefügt';
+
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -1300,7 +1313,7 @@ $tabellen=array(
 	"campus.tbl_paabgabe"  => array("paabgabe_id","projektarbeit_id","paabgabetyp_kurzbz","fixtermin","datum","kurzbz","abgabedatum", "insertvon","insertamum","updatevon","updateamum"),
 	"campus.tbl_pruefungsfenster" => array("pruefungsfenster_id","studiensemester_kurzbz","oe_kurzbz","start","ende"),
 	"campus.tbl_pruefung" => array("pruefung_id","mitarbeiter_uid","studiensemester_kurzbz","pruefungsfenster_id","pruefungstyp_kurzbz","titel","beschreibung","methode","einzeln","storniert","insertvon","insertamum","updatevon","updateamum"),
-	"campus.tbl_pruefungstermin" => array("pruefungstermin_id","pruefung_id","von","bis","teilnehmer_max","teilnehmer_min"),
+	"campus.tbl_pruefungstermin" => array("pruefungstermin_id","pruefung_id","von","bis","teilnehmer_max","teilnehmer_min","anmeldung_von","anmeldung_bis"),
 	"campus.tbl_pruefungsanmeldung" => array("pruefungsanmeldung_id","uid","pruefungstermin_id","lehrveranstaltung_id","status_kurzbz","wuensche","reihung","kommentar"),
 	"campus.tbl_pruefungsstatus" => array("status_kurzbz","bezeichnung"),
 	"campus.tbl_reservierung"  => array("reservierung_id","ort_kurzbz","studiengang_kz","uid","stunde","datum","titel","beschreibung","semester","verband","gruppe","gruppe_kurzbz","veranstaltung_id","insertamum","insertvon"),
