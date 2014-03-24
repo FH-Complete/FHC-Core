@@ -351,8 +351,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       						</hbox>
       						<label value="Reihungstest" control="student-prestudent-menulist-reihungstest"/>
       						<hbox>
+<!--								          datasources="<?php echo APP_ROOT ?>rdf/reihungstest.rdf.php?optional=true" flex="1"-->
 	      						<menulist id="student-prestudent-menulist-reihungstest" disabled="true"
-								          datasources="<?php echo APP_ROOT ?>rdf/reihungstest.rdf.php?optional=true" flex="1"
+								          datasources="rdf:null" flex="1"
 							              ref="http://www.technikum-wien.at/reihungstest/alle" 
 							              oncommand="StudentReihungstestDropDownSelect()">
 									<template>

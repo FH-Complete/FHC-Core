@@ -290,5 +290,51 @@ class reihungstest extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Liefert die Reihungstests der Zukunft und einer bestimmten ID
+	 * Und sortiert diese so, dass die des uebergebenen Studienganges zuerst geliefert werden
+	 * @param $include_id
+	 * @param $studiengang_kz
+	 * @return true wenn ok, sonst false
+	 */
+	public function getZukuenftige($include_id, $studiengang_kz)
+	{
+		$qry = "SELECT *, '1' as sortierung,(SELECT upper(typ || kurzbz) FROM public.tbl_studiengang WHERE studiengang_kz=tbl_reihungstest.studiengang_kz) as stg FROM public.tbl_reihungstest WHERE datum>=now()-'1 days'::interval AND studiengang_kz=".$this->db_add_param($studiengang_kz)."
+			UNION 
+			SELECT *, '2' as sortierung,(SELECT upper(typ || kurzbz) FROM public.tbl_studiengang WHERE studiengang_kz=tbl_reihungstest.studiengang_kz) as stg FROM public.tbl_reihungstest WHERE datum>=now()-'1 days'::interval AND studiengang_kz!=".$this->db_add_param($studiengang_kz)."
+			UNION
+			SELECT *, '0' as sortierung,(SELECT upper(typ || kurzbz) FROM public.tbl_studiengang WHERE studiengang_kz=tbl_reihungstest.studiengang_kz) as stg FROM public.tbl_reihungstest WHERE reihungstest_id=".$this->db_add_param($include_id)."
+			ORDER BY sortierung, stg, datum";
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new reihungstest();
+				
+				$obj->reihungstest_id = $row->reihungstest_id;
+				$obj->studiengang_kz = $row->studiengang_kz;
+				$obj->ort_kurzbz = $row->ort_kurzbz;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->datum = $row->datum;
+				$obj->uhrzeit = $row->uhrzeit;
+				$obj->ext_id = $row->ext_id;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Reihungstests';
+			return false;
+		}
+	}
 }
 ?>
