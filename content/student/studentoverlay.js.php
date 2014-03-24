@@ -983,7 +983,7 @@ function StudentAuswahl()
 		document.getElementById('student-prestudent-checkbox-facheinschlberuf').checked=true;
 	else
 		document.getElementById('student-prestudent-checkbox-facheinschlberuf').checked=false;
-	document.getElementById('student-prestudent-menulist-reihungstest').value=reihungstest_id;
+
 	document.getElementById('student-prestudent-textbox-anmeldungreihungstest').value=anmeldungreihungstest;
 	if(reihungstestangetreten=='true')
 		document.getElementById('student-prestudent-checkbox-reihungstestangetreten').checked=true;
@@ -1037,6 +1037,25 @@ function StudentAuswahl()
 	StudentDetailRolleTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	rollentree.database.AddDataSource(StudentDetailRolleTreeDatasource);
 	StudentDetailRolleTreeDatasource.addXMLSinkObserver(StudentDetailRolleTreeSinkObserver);
+
+	// Reihungstest DropDown
+	var reihungstestmenulist = document.getElementById('student-prestudent-menulist-reihungstest');
+	var url="<?php echo APP_ROOT ?>rdf/reihungstest.rdf.php?optional=true&include_id="+reihungstest_id+"&studiengang_kz="+studiengang_kz_prestudent;
+	
+	//Alte DS entfernen
+	var oldDatasources = reihungstestmenulist.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		reihungstestmenulist.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	reihungstestmenulist.builder.rebuild();
+	
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var myDatasource = rdfService.GetDataSourceBlocking(url);
+	reihungstestmenulist.database.AddDataSource(myDatasource);
+	reihungstestmenulist.builder.rebuild();
+	document.getElementById('student-prestudent-menulist-reihungstest').value=reihungstest_id;
 	
 	if(uid=='')
 	{

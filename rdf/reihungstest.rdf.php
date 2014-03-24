@@ -69,7 +69,16 @@ foreach ($stg_obj->result as $row)
 	$stg[$row->studiengang_kz]=$row->kuerzel;
 
 $rt = new reihungstest();
-$rt->getAll();
+
+if(isset($_GET['include_id']) && isset($_GET['studiengang_kz']))
+{
+	$include_id=$_GET['include_id'];
+	$studiengang_kz=$_GET['studiengang_kz'];
+	$rt->getZukuenftige($include_id, $studiengang_kz);
+}
+else
+	$rt->getAll();
+
 foreach ($rt->result as $row)
 {
 ?>
