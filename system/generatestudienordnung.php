@@ -38,6 +38,7 @@ $db = new basis_db();
 // Alle Studiengaenge durchlaufen
 foreach($studiengang->result as $rowstg)
 {
+/*
 	$qry = "SELECT 
 				studiensemester_kurzbz 
 			FROM 
@@ -47,9 +48,9 @@ foreach($studiengang->result as $rowstg)
 			WHERE 
 				tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($rowstg->studiengang_kz, FHC_INTEGER)."
 			ORDER BY tbl_studiensemester.start LIMIT 1";
-
-	$stsem = 'WS2014';
-
+*/
+	$stsem = 'WS2013';
+/*
 	if($result = $db->db_query($qry))
 	{
 		if($row = $db->db_fetch_object($result))
@@ -57,7 +58,7 @@ foreach($studiengang->result as $rowstg)
 			$stsem = $row->studiensemester_kurzbz;
 		}
 	}
-
+*/
 	// eine Neue Studienordnung anlegen
 	$studienordnung = new studienordnung();
 	$studienordnung->studiengang_kz=$rowstg->studiengang_kz;
@@ -93,7 +94,8 @@ foreach($studiengang->result as $rowstg)
 		{
 			while($row = $db->db_fetch_object($result))
 			{
-				createStudienplan($row->orgform_kurzbz, $studienordnung_id, $rowstg);
+				if($row->orgform_kurzbz!='')
+					createStudienplan($row->orgform_kurzbz, $studienordnung_id, $rowstg);
 			}
 		}
 	}
@@ -103,8 +105,8 @@ foreach($studiengang->result as $rowstg)
 	}
 }
 
-
-$qry = "SELECT * FROM public.tbl_studiensemester WHERE ende<now()";
+/*
+$qry = "SELECT * FROM public.tbl_studiensemester WHERE begin<now()";
 
 $stsem = array();
 if($result_stsem = $db->db_query($qry))
@@ -114,7 +116,7 @@ if($result_stsem = $db->db_query($qry))
 		$stsem[] = $row_stsem->studiensemester_kurzbz;
 	}
 }
-
+*/
 $qry="SELECT *, (Select max_semester FROM public.tbl_studiengang where studiengang_kz=a.studiengang_kz) as max_semester FROM lehre.tbl_studienordnung as a WHERE studienordnung_id=(Select max(studienordnung_id) FROM lehre.tbl_studienordnung WHERE studiengang_kz=a.studiengang_kz)";
 
 if($result_sto = $db->db_query($qry))
@@ -122,13 +124,14 @@ if($result_sto = $db->db_query($qry))
 	while($row_sto = $db->db_fetch_object($result_sto))
 	{
 		echo $row_sto->bezeichnung.'<br>';
-		for($i=1;$i<$row_sto->max_semester;$i++)
+		for($i=1;$i<=$row_sto->max_semester;$i++)
 		{
 			$qry="INSERT INTO lehre.tbl_studienordnung_semester(studienordnung_id, semester, studiensemester_kurzbz)
 				VALUES(".$db->db_add_param($row_sto->studienordnung_id).','.$i.',';
-			foreach($stsem as $studiensemester)
+			$stsem_arr=array('WS2013','SS2014','WS2014');
+			foreach($stsem_arr as $studiensemester)
 			{
-					$db->db_query($qry.$db->db_add_param($studiensemester).');');
+				$db->db_query($qry.$db->db_add_param($studiensemester).');');
 			}
 		}
 	}
@@ -174,7 +177,8 @@ function createStudienplan($orgform, $studienordnung_id, $rowstg)
 			WHERE
 				tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($rowstg->studiengang_kz)."
 				AND (orgform_kurzbz is null or orgform_kurzbz=".$db->db_add_param($orgform).")
-				AND lehrtyp_kurzbz<>'lf'";
+				AND lehrtyp_kurzbz<>'lf'
+				AND tbl_lehrveranstaltung.aktiv";
 
 	if($result = $db->db_query($qry))
 	{
