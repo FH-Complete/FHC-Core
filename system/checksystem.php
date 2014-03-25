@@ -709,12 +709,11 @@ if(!$result = @$db->db_query("SELECT farbe FROM lehre.tbl_lehrveranstaltung LIMI
 	ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN old_lehrfach_id bigint;
 	
 	-- Alle Lehrfächer als Lehrveranstaltungen anlegen
-	-- TODO !!!! eventuell muessen nicht alle kopiert werden sondern koennen gleich zusammengelegt werden mit der LV
 	INSERT INTO lehre.tbl_lehrveranstaltung(kurzbz, bezeichnung, semester, sprache, 
-	oe_kurzbz, lehrtyp_kurzbz,aktiv, studiengang_kz, projektarbeit, old_lehrfach_id, farbe)
+	oe_kurzbz, lehrtyp_kurzbz,aktiv, studiengang_kz, projektarbeit, old_lehrfach_id, farbe, lehre)
 	SELECT kurzbz, bezeichnung, semester, sprache, 
 		(select oe_kurzbz from public.tbl_fachbereich where fachbereich_kurzbz=tbl_lehrfach.fachbereich_kurzbz),
-		'lf',aktiv, studiengang_kz, false, lehrfach_id, farbe
+		'lf',aktiv, studiengang_kz, false, lehrfach_id, farbe,false
 	FROM
 		lehre.tbl_lehrfach;
 
@@ -1252,6 +1251,20 @@ if(!$result = @$db->db_query("SELECT anmeldung_von FROM campus.tbl_pruefungsterm
 
 }
 
+// NOT NULL Constraint bei tbl_mitarbeiter.kleriker entfernt
+if($result = @$db->db_query("SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='tbl_mitarbeiter' AND column_name='kleriker' AND is_nullable='NO'"))
+{
+	if($db->db_num_rows($result)>0)
+	{
+		$qry = "ALTER TABLE public.tbl_mitarbeiter ALTER COLUMN kleriker DROP NOT NULL;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_mitarbeiter: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_mitarbeiter: Spalte Kleriker NOT NULL entfernt';
+	}
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -1585,8 +1598,8 @@ $berechtigungen = array(
 	array('lehre/lehrveranstaltung','Lehrveranstaltungsverwaltung'),
 	array('lehre/lehrveranstaltung:begrenzt','nur die Felder Lehre, Sort, Zeugnis, BA/DA, FBK und LVInfo dürfen geändert werden (eventuelle Aufteilung in einzelne Berechtigungen??)'),
 	array('lehre/lvplan','Tempus'),
-        array('lehre/pruefungstermin','Erlaubt es dem Benutzer eine Prüfung für ein Prüfungsfenster anzulegen'),
-        array('lehre/pruefungsfenster','Erlaubt dem Benutzer Prüfungsfenster anzulegen.'),
+	array('lehre/pruefungstermin','Erlaubt es dem Benutzer eine Prüfung für ein Prüfungsfenster anzulegen'),
+	array('lehre/pruefungsfenster','Erlaubt dem Benutzer Prüfungsfenster anzulegen.'),
 	array('lehre/reihungstest','Reihungstestverwaltung'),
 	array('lehre/reservierung','erweiterte Reservierung inkl. Lektorauswahl, Stg, Sem und Gruppe'),
 	array('lehre/reservierung:begrenzt','normale Raumreservierung im CIS'),
@@ -1606,7 +1619,7 @@ $berechtigungen = array(
 	array('soap/lvplan','Recht für LV-Plan Webservice'),
 	array('soap/mitarbeiter','Recht für Mitarbeiter-Webservice'),
 	array('soap/ort','Recht für Ort Webservice'),
-        array('soap/pruefungsfenster','Recht für Pruefungsfenster Webservice'),
+	array('soap/pruefungsfenster','Recht für Pruefungsfenster Webservice'),
 	array('soap/student','Recht für Student Webservice'),
 	array('soap/studienordnung','Recht für Studienordnung Webservice'),
 	array('student/bankdaten','Bankdaten des Studenten'),
@@ -1689,7 +1702,7 @@ $webservicerecht = array(
 	array('soap/studienordnung','deleteSemesterZuordnung','studienordnung'),
 	array('soap/studienordnung','getLVkompatibel','lehrveranstaltung'),
 	array('soap/studienordnung','getLvTree','lehrveranstaltung'),
-        array('soap/pruefungsfenster','getByStudiensemester','pruefungsfenster')
+	array('soap/pruefungsfenster','getByStudiensemester','pruefungsfenster')
 );
 
 foreach($webservicerecht as $row)
