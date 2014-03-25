@@ -521,7 +521,7 @@ if(isset($_POST['save']))
 		$mitarbeiter->personalnummer = $personalnummer;
 		$mitarbeiter->kurzbz = $kurzbz;
 		$mitarbeiter->lektor = $lektor;
-		$mtiarbeiter->aktiv = true;
+		$mitarbeiter->aktiv = true;
 		$mitarbeiter->fixangestellt = true;
 		$mitarbeiter->stundensatz = 0;
 		$mitarbeiter->bismelden = true;
