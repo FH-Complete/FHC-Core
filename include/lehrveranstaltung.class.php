@@ -64,6 +64,7 @@ class lehrveranstaltung extends basis_db
 	public $lvnr;	// varchar(32)
 	public $bezeichnung_arr = array();
 	public $semester_alternativ; // smallint
+	public $farbe;
 
 	public $studienplan_lehrveranstaltung_id;
 	public $studienplan_lehrveranstaltung_id_parent;
@@ -139,6 +140,7 @@ class lehrveranstaltung extends basis_db
 			$this->semesterwochen = $row->semesterwochen;
 			$this->lvnr = $row->lvnr;
 			$this->semester_alternativ = $row->semester_alternativ;
+			$this->farbe = $row->farbe;
 			
 			$this->bezeichnung_arr['German'] = $this->bezeichnung;
 			$this->bezeichnung_arr['English'] = $this->bezeichnung_english;
@@ -203,6 +205,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->semesterwochen = $row->semesterwochen;
 			$lv_obj->lvnr = $row->lvnr;
 			$lv_obj->semester_alternativ = $row->semester_alternativ;
+			$lv_obj->farbe = $row->farbe;
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -331,6 +334,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->semesterwochen = $row->semesterwochen;
 			$lv_obj->lvnr = $row->lvnr;
 			$lv_obj->semester_alternativ = $row->semester_alternativ;
+			$lv_obj->farbe = $row->farbe;
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -457,6 +461,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->semesterwochen = $row->semesterwochen;
 			$lv_obj->lvnr = $row->lvnr;
 			$lv_obj->semester_alternativ = $row->semester_alternativ;
+			$lv_obj->farbe = $row->farbe;
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -530,6 +535,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->semesterwochen = $row->semesterwochen;
 			$lv_obj->lvnr = $row->lvnr;
 			$lv_obj->semester_alternativ = $row->semester_alternativ;
+			$lv_obj->farbe = $row->farbe;
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -652,7 +658,7 @@ class lehrveranstaltung extends basis_db
 			$qry = 'BEGIN; INSERT INTO lehre.tbl_lehrveranstaltung (studiengang_kz, bezeichnung, kurzbz, lehrform_kurzbz,
 				semester, ects, semesterstunden,  anmerkung, lehre, lehreverzeichnis, aktiv, ext_id, insertamum,
 				insertvon, planfaktor, planlektoren, planpersonalkosten, plankostenprolektor, updateamum, updatevon, sort,
-				zeugnis, projektarbeit, sprache, koordinator, bezeichnung_english, orgform_kurzbz, incoming, lehrtyp_kurzbz, oe_kurzbz, raumtyp_kurzbz, anzahlsemester, semesterwochen, lvnr, semester_alternativ) VALUES (' .
+				zeugnis, projektarbeit, sprache, koordinator, bezeichnung_english, orgform_kurzbz, incoming, lehrtyp_kurzbz, oe_kurzbz, raumtyp_kurzbz, anzahlsemester, semesterwochen, lvnr, semester_alternativ, farbe) VALUES (' .
 					$this->db_add_param($this->studiengang_kz) . ', ' .
 					$this->db_add_param($this->bezeichnung) . ', ' .
 					$this->db_add_param($this->kurzbz) . ', ' .
@@ -687,7 +693,8 @@ class lehrveranstaltung extends basis_db
 					$this->db_add_param($this->anzahlsemester) . ',' .
 					$this->db_add_param($this->semesterwochen) . ',' . 
 					$this->db_add_param($this->lvnr) .','.
-					$this->db_add_param($this->semester_alternativ).');';
+					$this->db_add_param($this->semester_alternativ).','.
+					$this->db_add_param($this->farbe).');';
 		} 
 		else 
 		{
@@ -732,7 +739,8 @@ class lehrveranstaltung extends basis_db
 					'anzahlsemester=' . $this->db_add_param($this->anzahlsemester, FHC_INTEGER) . ',' .
 					'semesterwochen=' . $this->db_add_param($this->semesterwochen, FHC_INTEGER) . ',' .
 					'lvnr = ' . $this->db_add_param($this->lvnr) . ', ' .
-					'semester_alternativ = '.$this->db_add_param($this->semester_alternativ).' '.
+					'semester_alternativ = '.$this->db_add_param($this->semester_alternativ).', '.
+					'farbe = '.$this->db_add_param($this->farbe).' '.
 					'WHERE lehrveranstaltung_id = ' . $this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER, false) . ';';
 		}
 
@@ -837,6 +845,7 @@ class lehrveranstaltung extends basis_db
 				$lv_obj->semesterwochen = $row->semesterwochen;
 				$lv_obj->lvnr = $row->lvnr;
 				$lv_obj->semester_alternativ = $row->semester_alternativ;
+				$lv_obj->farbe = $row->farbe;
 
 				$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 				$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -926,6 +935,7 @@ class lehrveranstaltung extends basis_db
 				$l->semesterwochen = $row->semesterwochen;
 				$l->lvnr = $row->lvnr;
 				$l->semester_alternativ = $row->semester_alternativ;
+				$l->farbe = $row->farbe;
 
 				$l->bezeichnung_arr['German'] = $row->bezeichnung;
 				$l->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -1040,6 +1050,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->semesterwochen = $row->semesterwochen;
 			$lv_obj->lvnr = $row->lvnr;
 			$lv_obj->semester_alternativ = $row->semester_alternativ;
+			$lv_obj->farbe = $row->farbe;
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -1126,6 +1137,7 @@ class lehrveranstaltung extends basis_db
 				$obj->semesterwochen = $row->semesterwochen;
 				$obj->lvnr = $row->lvnr;
 				$obj->semester_alternativ = $row->semester_alternativ;
+				$obj->farbe = $row->farbe;
 
 				$obj->bezeichnung_arr['German'] = $row->bezeichnung;
 				$obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -1386,6 +1398,7 @@ class lehrveranstaltung extends basis_db
 				$lv_obj->bezeichnung_english = $row->bezeichnung_english;
 				$lv_obj->orgform_kurzbz = $row->orgform_kurzbz;
 				$lv_obj->lehrtyp_kurzbz = $row->lehrtyp_kurzbz;
+				$lv_obj->farbe = $row->farbe;
 	
 				$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 				$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -1547,6 +1560,7 @@ class lehrveranstaltung extends basis_db
 			$lv_obj->lehrtyp_kurzbz = $row->lehrtyp_kurzbz;
 			$lv_obj->lvnr = $row->lvnr;
 			$lv_obj->semester_alternativ = $row->semester_alternativ;
+			$lv_obj->farbe = $row->farbe;
 
 			$lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
 			$lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -1615,6 +1629,7 @@ class lehrveranstaltung extends basis_db
 				$lv_obj->semesterwochen = $row->semesterwochen;
 				$lv_obj->lvnr = $row->lvnr;
 				$lv_obj->semester_alternativ = $row->semester_alternativ;
+				$lv_obj->farbe = $row->farbe;
 
 				$lv_obj->studiengang_kurzbzlang = $row->studiengang_kurzbzlang;
 
@@ -1737,6 +1752,7 @@ class lehrveranstaltung extends basis_db
                         $lv_obj->semesterwochen = $row->semesterwochen;
                         $lv_obj->lvnr = $row->lvnr;
                         $lv_obj->semester_alternativ = $row->semester_alternativ;
+						$lv_obj->farbe = $row->farbe;
 
                         $lv_obj->bezeichnung_arr['German'] = $row->bezeichnung;
                         $lv_obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
