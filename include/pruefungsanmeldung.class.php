@@ -173,9 +173,26 @@ class pruefungsanmeldung extends basis_db {
         }
     }
     
-    public function checkAnmeldung()
+    public function delete($pruefungsanmeldung_id, $uid=null)
     {
-        
+        $qry = 'DELETE FROM campus.tbl_pruefungsanmeldung WHERE pruefungsanmeldung_id='.$this->db_add_param($pruefungsanmeldung_id);
+	
+	if(!is_null($uid))
+	{
+	    $qry .= ' AND uid='.$this->db_add_param($uid);
+	}
+	
+	$qry .= ' ;';
+	
+	if($this->db_query($qry))
+	{
+	    return true;
+	}
+	else
+	{
+	    $this->errormsg = 'Anmeldung konnte nicht gelöscht werden.';
+	    return false;
+	}
     }
     
 }

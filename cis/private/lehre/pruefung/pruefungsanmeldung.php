@@ -28,6 +28,7 @@ require_once('../../../../include/benutzerberechtigung.class.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/konto.class.php');
 require_once('../../../../include/studiensemester.class.php');
+require_once('../../../../include/student.class.php');
 
 
 $uid = get_uid();
@@ -35,15 +36,18 @@ $db = new basis_db();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
+
+//TODO Berechtigung
 //if(!$rechte->isBerechtigt('lehre/pruefungsanmeldung'))
 //	die('Sie haben keine Berechtigung für diese Seite');
 
-//TODO
 $lehrveranstaltung = new lehrveranstaltung();
-$lehrveranstaltung->load_lva_student("if11b044");
+$lehrveranstaltung->load_lva_student($uid);
 
 $studiensemester = new studiensemester();
 $studiensemester->getAll();
+
+$benutzer = new student($uid);
 
 ?>
 <html>
@@ -52,6 +56,7 @@ $studiensemester->getAll();
         <title>Prüfungsanmeldung</title>
         <script src="../../../../include/js/datecheck.js"></script>
         <script src="../../../../include/js/jquery1.9.min.js"></script>
+	<script src="../../../../include/js/jquery.tablesorter.min.js"></script>
         <script src="./pruefung.js"></script>
         <link rel="stylesheet" href="../../../../skin/jquery-ui-1.9.2.custom.min.css">
         <link rel="stylesheet" href="../../../../skin/fhcomplete.css">
@@ -59,101 +64,196 @@ $studiensemester->getAll();
         <link rel="stylesheet" href="../../../../skin/tablesort.css">
         <style type="text/css">
             #pruefungen, #prfTermine {
-                max-width: 50%;
+                width: 50%;
             }
             
             #details {
-                margin-left: 1.5em;
+		width: 50%;
+/*                margin-left: 1.5em;*/
             }
+	    
+	    #lvDetails, #prfDetails {
+		min-width: 40%;
+		margin-bottom: 1em;
+		margin-left: 1.5em;
+		float:left;
+		/*border: 1px solid black;*/
+	    }
+	    
+	    #prfDetails {
+		float:right;
+	    }
+	    
+	    #accordion {
+		width: 50%;
+		clear: left;
+		clear: right;
+	    }
+	    
+	    .titel {
+		font-weight: bold;
+	    }
+	    
+	    #message {
+		position: fixed;
+		bottom: 0px;
+		width: 100%;
+		height: 2em;
+		font-size: 1.5em;
+		font-weight: bold;
+	    }
             
-            div {
+/*            div {
                 float: left;
-            }
+            }*/
         </style>
         
     </head>
     <body>
         <script>
+	    var count = 0;
+	    $(document).ajaxSend(function(event, xhr, options){
+		count++;
+	     });
+	     
+	     $(document).ajaxComplete(function(event, xhr, settings){
+		count--;
+		//Wenn alle AJAX-Request fertig sind
+		if(count===0)
+		{
+		    $("#accordion").accordion({
+			header: "h2",
+			heightstyle: "content"
+		    });
+		    $("#accordion").attr("style", "visibility: visible;");
+		}
+	    });
+	     
             $(document).ready(function(){
-               loadPruefungen(); 
+		loadPruefungen();
+		loadPruefungenOfStudiengang();
+		loadPruefungenGesamt();
+		$("#saveDialog").dialog({
+		    modal: true,
+		    autoOpen: false,
+		    width: "400px"
+		});
             });
         </script>
-        <h1>Prüfungsanmeldung</h1>
-        <div id="anmeldung">
-            <form action="pruefungsanmeldung.php" method="POST">
-                <table>
-                    <tr>
-                        <td>Studiensemester:</td>
-                        <td>
-                            <select id="studiensemester">
-                                <?php
-                                    foreach($studiensemester->studiensemester as $stdSem)
-                                    {
-                                        if($stdSem->studiensemester_kurzbz == $studiensemester->getakt())
-                                        {
-                                            echo '<option selected value='.$stdSem->studiensemester_kurzbz.'>'.$stdSem->studiensemester_kurzbz.'</option>';
-                                        } 
-                                        else
-                                        {
-                                            echo '<option value='.$stdSem->studiensemester_kurzbz.'>'.$stdSem->studiensemester_kurzbz.'</option>';  
-                                        }
-                                    }
-                                ?>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            Prüfung:
-                        </td>
-                        <td>
-                            <input id="uid" type="hidden" name="uid" value="<?php echo $uid;?>">
-                            <select id="pruefungen" onChange="showPruefungsDetails();">
-                                <!--Prüfungen werden durch Js geladen-->
-                                <option value="null">Prüfung auswählen</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            Termin:
-                        </td>
-                        <td>
-                            <select id="prfTermine" disabled="true">
-                                <!-- verfügbare Termine werden durch JS geladen-->
-                                <option value="null">Zuerst Prüfung auswählen</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="vertical-align: top;">
-                            Bemerkungen:
-                        </td>
-                        <td>
-                            <textarea id="prfWuensche" rows="7" cols="20"></textarea>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td><input type="button" value="Anmelden" onclick="saveAnmeldung();"/></td>
-                    </tr>
-                </table> 
-            </form>
-            <div id="message">
-                
+        <h1>Prüfungsanmeldung für <?php echo $benutzer->vorname." ".$benutzer->nachname." (".$uid.")"; ?></h1>
+	<div id="details">
+	    <div id="lvDetails">
+		<h1>LV-Details</h1>
+                <span class="titel">Bezeichnung: </span><span id="lvBez"></span><br/>
+		<span class="titel">ECTS: </span><span id="lvEcts"></span><br/>
             </div>
-        </div>
-        <div id="details">
-            <h1>Prüfungsdetails</h1>
+            
             <div id="prfDetails">
-                <span>Typ: </span><span id="prfTyp"></span></br>
-                <span>Methode: </span><span id="prfMethode"></span></br>
-                <span>Beschreibung: </span><span id="prfBeschreibung"></span></br>
-                <span id="prfEinzeln"></span></br>
+		<h1>Prüfungsdetails</h1>
+                <span class="titel">Typ: </span><span id="prfTyp"></span><br/>
+                <span class="titel">Methode: </span><span id="prfMethode"></span><br/>
+                <span class="titel">Beschreibung: </span><span id="prfBeschreibung"></span><br/>
+                <span id="prfEinzeln"></span><br/>
             </div>
         </div>
-        <?php
-        // put your code here
-        ?>
+	<div id="message"></div>
+	<div id="accordion" style="visibility: hidden;">
+	    <h2>Besuchte Lehrveranstaltungen</h2>
+	    <div>
+		<table id="table1" class="tablesorter">
+		    <thead>
+			<tr>
+			    <th>Insitut</th>
+			    <th>Lehrveranstaltung</th>
+			    <th>Termin</th>
+			    <th>freie Plätze</th>
+			    <th>Frist</th>
+			    <th>&nbsp;</th>
+			</tr>
+		    </thead>
+		    <tbody id="pruefungen">
+
+		    </tbody>
+		</table> 
+	    </div>
+	    <h2>Lehrveranstaltungen von Studiengang</h2>
+	    <div>
+		<table id="table2" class="tablesorter">
+		    <thead>
+			<tr>
+			    <th>Insitut</th>
+			    <th>Lehrveranstaltung</th>
+			    <th>Termin</th>
+			    <th>freie Plätze</th>
+			    <th>Frist</th>
+			    <th>&nbsp;</th>
+			</tr>
+		    </thead>
+		    <tbody id="pruefungenStudiengang">
+
+		    </tbody>
+		</table>
+	    </div>
+	    <h2>Alle Lehrveranstaltungen</h2>
+	    <div>
+		<table id="table3" class="tablesorter">
+		    <thead>
+			<tr>
+			    <th>Insitut</th>
+			    <th>Lehrveranstaltung</th>
+			    <th>Termin</th>
+			    <th>freie Plätze</th>
+			    <th>Frist</th>
+			    <th>&nbsp;</th>
+			</tr>
+		    </thead>
+		    <tbody id="pruefungenGesamt">
+
+		    </tbody>
+		</table>
+	    </div>
+	</div>
+        <div id="saveDialog" title="Anmeldung speichern">
+	    <form id="saveAnmeldungForm">
+		<table id="neueAnmeldung">
+		    <tr>
+			<td>&nbsp;</td>
+			<td>
+			    <input type="hidden" id="lehrveranstaltungHidden" disabled="true">
+			    <input type="hidden" id="terminHidden" disabled="true">
+			    <!--<input type="hidden" id="studiensemesterHidden" value="<?php // echo $studiensemester->getakt(); ?>" disabled="true">-->
+			</td>
+		    </tr>
+		    <tr>
+			<td style="vertical-align: top; font-weight: bold;">Lehrveranstaltung: </td>
+			<td>
+			    <span id="lehrveranstaltung"></span>
+			</td>
+		    </tr>
+		    <tr>
+			<td style="vertical-align: top; font-weight: bold;">Von: </td>
+			<td>
+
+			    <span id="terminVon"></span>
+			</td>
+		    </tr>
+		    <tr>
+			<td style="vertical-align: top; font-weight: bold;">Bis: </td>
+			<td>
+			    <span type="text" id="terminBis" disabled="true"></span>
+			</td>
+		    </tr>
+		    <tr>
+			<td style="vertical-align: top; font-weight: bold;">Bemerkung: </td>
+			<td>
+			    <textarea id="anmeldungBemerkung" rows="10" cols="20"></textarea>
+			</td>
+		    </tr>
+		    <tr>
+			<td><input type="button" value="Anmelden" onclick="saveAnmeldung();"></td>
+		    </tr>
+		</table>
+	    </form>
+	</div>
     </body>
 </html>
