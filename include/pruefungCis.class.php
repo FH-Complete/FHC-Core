@@ -586,7 +586,7 @@ class pruefungCis extends basis_db
         }
         $in = substr($in, 0, -2);
             
-        $qry = 'SELECT * FROM campus.tbl_lehrveranstaltung_pruefung WHERE lehrveranstaltung_id IN ('.$in.')';
+        $qry = 'SELECT * FROM campus.tbl_lehrveranstaltung_pruefung WHERE lehrveranstaltung_id IN ('.$in.');';
         
         if($this->db_query($qry))
         {
@@ -601,5 +601,41 @@ class pruefungCis extends basis_db
             return true;
         }
         return false;
+    }
+    
+    public function getAll()
+    {
+	$qry = 'SELECT * FROM campus.tbl_lehrveranstaltung_pruefung;';
+        
+        if($this->db_query($qry))
+        {
+            while($row = $this->db_fetch_object())
+            {
+                $obj = new stdClass();
+                $obj->lehrveranstaltung_pruefung_id = $row->lehrveranstaltung_pruefung_id;
+                $obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+                $obj->pruefung_id = $row->pruefung_id;
+                array_push($this->lehrveranstaltungen, $obj);
+            }
+            return true;
+        }
+        return false;
+    }
+    
+    public function getLastOfReihung($pruefungstermin_id)
+    {
+	$qry = 'SELECT MAX(reihung) FROM campus.tbl_pruefungsanmeldung WHERE '
+		. 'pruefungstermin_id='.$this->db_add_param($pruefungstermin_id).';';
+	
+	if($this->db_query($qry))
+	{
+	    $row = $this->db_fetch_object();
+	    return $row->max;
+	}
+	else
+	{
+	    $this->errormsg = 'Reihung konnte nicht geladen werden.';
+            return false;
+	}
     }
 }

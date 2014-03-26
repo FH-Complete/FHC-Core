@@ -1228,6 +1228,7 @@ class lehrveranstaltung extends basis_db
 			$obj->stpllv_semester = $this->stpllv_semester;
 			$obj->stpllv_pflicht = $this->stpllv_pflicht;
 			$obj->stpllv_koordinator = $this->stpllv_koordinator;
+			$obj->oe_kurzbz = $this->oe_kurzbz;
 			$obj->lvnr = $this->lvnr;
 			
 			$values[] = $obj;
