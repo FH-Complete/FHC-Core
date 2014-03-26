@@ -18,7 +18,8 @@
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>
- *          Karl Burkhart <burkhart@technikum-wien.at>.
+ *          Karl Burkhart <burkhart@technikum-wien.at>
+ *          Manfred Kindl <kindlm@technikum.wien.at>.
  */
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
@@ -56,7 +57,6 @@ $service_id = (isset($_POST['service_id'])?$_POST['service_id']:'');
 $kunde_uid = (isset($_POST['kunde_uid'])?$_POST['kunde_uid']:'');
 $kartennummer = (isset($_POST['kartennummer'])?$_POST['kartennummer']:'');
 $filter = (isset($_GET['filter'])?$_GET['filter']:'foo');
-//$alle = (isset($_POST['alle'])?($_POST['alle']=='true'?true:false):false);
 $alle = (isset($_POST['alle'])?(isset($_POST['normal'])?false:true):false);
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -497,12 +497,9 @@ if($projekt->getProjekteMitarbeiter($user))
 			echo '<input type="submit" value="'.$p->t("global/aendern").'" name="edit">&nbsp;&nbsp;';
 			echo '<input type="submit" value="'.$p->t("zeitaufzeichnung/alsNeuenEintragSpeichern").'" name="save"></td></tr>';
 		}
-		//echo '<tr><td><input type="submit" value="Alle anzeigen" name="alle" ></td></tr>';
-		//echo '<tr><td><a href='.$_SERVER["PHP_SELF"].' class="Item">'.$p->t("zeitaufzeichnung/neu").'</a></td></tr>';
 		echo '</table>'; 
 		echo '<hr>';
 		echo '<input type="submit" value="Alle anzeigen" name="'.($alle===true?'normal':'alle').'">';       
-		//echo '<hr>';
 		echo '</form>';
 		
 		$za = new zeitaufzeichnung();

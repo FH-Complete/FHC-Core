@@ -36,6 +36,7 @@ require_once('../../../include/organisationseinheit.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/sprache.class.php');
 require_once('../../../include/ferien.class.php');
+require_once('../../../include/Excel/excel.php');
 
 	$sprache = getSprache();
 	$p = new phrasen($sprache);
@@ -82,7 +83,7 @@ require_once('../../../include/ferien.class.php');
 	$days=trim((isset($_REQUEST['days']) && is_numeric($_REQUEST['days'])?$_REQUEST['days']:14));
 
 	// Link fuer den Export
-	$export_link='zeitsperre_export.php?';
+	$export_link='zeitsperre.php?format=xls&';
 	$export_param='';
 	
 	if(!is_null($days))
@@ -103,7 +104,7 @@ require_once('../../../include/ferien.class.php');
 		
 	}
 	$export_link.=$export_param;
-	
+
 	//Datumsbereich ermitteln
 	$datum_obj = new datum();
 
@@ -137,57 +138,51 @@ require_once('../../../include/ferien.class.php');
 		}
 	}
 
-echo '
-<html>
-<head>
-	<title>'.$p->t('zeitsperre/zeitsperren').'</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
-	<link href="../../../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />
-	<script src="../../../include/js/flexcroll.js" type="text/javascript" ></script>
-</head>
-<body>
-<div class="flexcroll" style="outline: none;">
-	<h1>'.$p->t('zeitsperre/zeitsperren').'</h1>
+if(isset($_REQUEST['format']) && $_REQUEST['format']=='xls')
+{
+	// Creating a workbook
+	$workbook = new Spreadsheet_Excel_Writer();
 
-	<H3>'.$p->T('zeitsperre/zeitsperreVonBis',array($datum_beginn, $datum_ende)).'</H3>';
+	// sending HTTP headers
+	$workbook->send($p->t('zeitsperre/zeitsperren').".xls");
+	$workbook->setVersion(8);
+	// Creating a worksheet
+	$worksheet =& $workbook->addWorksheet($p->t('zeitsperre/zeitsperren'));
+	$worksheet->setInputEncoding('utf-8');
+	$worksheet->setZoom (85);
+	$worksheet->freezePanes(array(1, 0, 1, 0));
+	//Formate Definieren
+	$format_header =& $workbook->addFormat();
+	$format_header->setBold();
+	$format_header->setAlign("center");
+	$format_header->setVAlign('vcenter');
+	$format_header->setTextWrap();
 	
-		if(isset($_GET['organisationseinheit']))
-		{
-			echo '<br>';
-			echo '<FORM action="'.$_SERVER['PHP_SELF'].'" method="GET">'.$p->t('global/organisationseinheit').': <SELECT name="organisationseinheit">';
-			$oe_obj = new organisationseinheit();
-			$oe_obj->getAll();
+	$format_header_feiertag =& $workbook->addFormat();
+	$format_header_feiertag->setBold();
+	$format_header_feiertag->setAlign("center");
+	$format_header_feiertag->setVAlign('vcenter');
+	$format_header_feiertag->setFgColor('yellow');
+	$format_header_feiertag->setTextWrap();
+	
+	$format_namen =& $workbook->addFormat();
+	$format_namen->setVAlign('top');
+	
+	$format_legende =& $workbook->addFormat();
+	$format_legende->setBold();
+	$format_legende->setAlign("left");
+	$format_legende->setVAlign('vcenter');
+	
+	$format_mehrzeilig = &$workbook->addFormat(array('Align' => 'left')); 
+	$format_mehrzeilig->setVAlign('top');
+	$format_mehrzeilig->setTextWrap();
 
-			echo "<option value='' ".(is_null($organisationseinheit)?'selected':'').">-- ".$p->t('global/auswahl')." --</option>";
-			foreach ($oe_obj->result as $oe)
-			{
-				if($oe->aktiv)
-				{
-					if($oe->oe_kurzbz==$organisationseinheit)
-						$selected='selected';
-					else
-						$selected='';
-
-					echo "<option value='$oe->oe_kurzbz' $selected>$oe->organisationseinheittyp_kurzbz $oe->bezeichnung</option>";
-				}
-			}
-			echo '</SELECT>&nbsp;'.$p->t('zeitsperre/anzahlTage').'<input type="Text" name="days" size="2" maxlength="2" value="'.$days.'"><input type="submit" value="'.$p->t('global/anzeigen').'"></FORM>';
-			echo '<br>';
-		}
-		if($lektor)
-			echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">'.$p->t('zeitsperre/anzahlTage').' <input type="text" name="days" size="2" maxlength="2" value="'.$days.'"><input type="hidden" name="lektor" value="true"><input type="submit" value="Go"></form>';
-		elseif($fix)
-			echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">'.$p->t('zeitsperre/anzahlTage').' <input type="text" name="days" size="2" maxlength="2" value="'.$days.'"><input type="hidden" name="fix" value="true"><input type="submit" value="Go"></form>';
-		elseif(isset($_GET['funktion']) && isset($_GET['stg_kz']))
-			echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">'.$p->t('zeitsperre/anzahlTage').' <input type="text" name="days" size="2" maxlength="2" value="'.$days.'"><input type="hidden" name="funktion" value="'.$funktion.'"><input type="hidden" name="stg_kz" value="'.$stg_kz.'"><input type="submit" value="Go"></form>';
-	echo '
-	<a class="Item" href="'.$export_link.'"><img src="../../../skin/images/xls_icon.png" alt="Icon Excel"> Excel Export</a><br>
-	<TABLE id="zeitsperren">
-    <TR>';
-    	
-	  	echo '<th>'.$p->t('zeitsperre/monat').'<br>'.$p->t('zeitsperre/tag').'</th>';
-		for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
+	$spalte=0;
+	$zeile=0;
+	
+	$worksheet->write(0,$spalte,$p->t('global/datum'), $format_header);
+	$maxlength[0]=20;
+	for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
 		{
 			$tag=date('d',$ts);
 			$wt=date('N',$ts);
@@ -196,56 +191,167 @@ echo '
 				$class='feiertag';
 			else
 				$class='';
-			echo "<th class='$class'><div align=\"center\">".$tagbez[$sprache_index][$wt]."<br>$monat<br>$tag</div></th>";
+			$datum = $tagbez[$sprache_index][$wt]. "\n";
+			$datum .= $tag.' '.$monat;
+			$worksheet->write(0,++$spalte,$datum, ($class!=''?$format_header_feiertag:$format_header));
+			$maxlength[$spalte]=15;
 		}
-		?>
-	</TR>
 
-	<?php
+	$zeile=0;
+	$spalte=0;
 	$zs=new zeitsperre();
 	if(is_array($mitarbeiter))
 	{
 		foreach ($mitarbeiter as $ma)
 		{
 			if($ma->aktiv)
-			{
+			{	
+				$zeile++;
+				$spalte=0;
 				$zs->getzeitsperren($ma->uid, false);
-				echo '<tr>';
-				echo '<td valign="top">'.trim($ma->nachname).'&nbsp;'.trim($ma->vorname).'</td>';
+				$worksheet->write($zeile,$spalte,$ma->nachname.' '.$ma->vorname, $format_namen);
 				for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
 				{
-					$tag=date('d',$ts);
-					$monat=date('M',$ts);
 					$wt=date('N',$ts);
-		
-					if ($wt==7 || $wt==6)
-						$class=' class="feiertag" ';
-					else
-						$class='';
 					$grund=$zs->getTyp($ts);
-					$erbk=$zs->getErreichbarkeit($ts);
+					$erbk=html_entity_decode($zs->getErreichbarkeit($ts));
 					$vertretung=$zs->getVertretung($ts);
-					echo '<td '.$class.' style="white-space: nowrap;">'.($grund!=''?'<span title="'.$p->t('zeitsperre/grund').'">'.substr($p->t('zeitsperre/grund'),0,1).'</span>: ':'').$grund;
-					echo '<br>'.($erbk!=''?'<span title="'.$p->t('urlaubstool/erreichbarkeit').'">'.substr($p->t('urlaubstool/erreichbarkeit'),0,1).': ':'').$erbk;
-					echo '<br>'.($erbk!=''?'<span title="'.$p->t('urlaubstool/vertretung').'">'.substr($p->t('urlaubstool/vertretung'),0,1).': ':'');
+					$zelleninhalt = ($grund!=''?(($grund!=''?substr($p->t('zeitsperre/grund'),0,1).': ':'').$grund. "\n"):'');
+					$zelleninhalt .= ($erbk!=''?(($erbk!=''?substr($p->t('urlaubstool/erreichbarkeit'),0,1).': ':'').$erbk. "\n"):'');
+					$zelleninhalt .= ($erbk!=''?($erbk!=''?substr($p->t('urlaubstool/vertretung'),0,1).': ':''):''); 
+					$count = 0;
 					foreach ($vertretung as $vt)
 					{
 						if ($vt!='')
 						{
 							$ma_kurzbz = new mitarbeiter();
 							$ma_kurzbz->load($vt);
-							echo '<a href="index.php?uid='.$ma_kurzbz->uid.'">'.$ma_kurzbz->kurzbz.'</a>&nbsp;';
+							$zelleninhalt .= ($count!=0?', ':'').$ma_kurzbz->vorname.' '.$ma_kurzbz->nachname.' ('.$ma_kurzbz->telefonklappe.')';
+							$count++;
 						}
 					}
-					echo '</td>';
+					$worksheet->write($zeile,++$spalte,$zelleninhalt,$format_mehrzeilig);
 				}
-				echo '</tr>';
 			}
 		}
 	}
-	?>
+	++$zeile;
+	$worksheet->write(++$zeile,0,$p->t('zeitsperre/legendeGrund'), $format_legende);
+	$worksheet->write(++$zeile,0,$p->t('zeitsperre/legendeErreichbarkeit'), $format_legende);
+	$worksheet->write(++$zeile,0,$p->t('zeitsperre/legendeVertretung'), $format_legende);
+	$worksheet->write(++$zeile,0,$p->t('zeitsperre/legendeDurchwahl'), $format_legende);
+						
+	//Die Breite der Spalten setzen
+	foreach($maxlength as $i=>$breite)
+		$worksheet->setColumn($i, $i, $breite);
+	
+	$workbook->close();
+}
+else
+{	echo '
+	<html>
+	<head>
+		<title>'.$p->t('zeitsperre/zeitsperren').'</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
+	</head>
+	<body>
+		<h1>'.$p->t('zeitsperre/zeitsperren').'</h1>
+	
+		<H3>'.$p->T('zeitsperre/zeitsperreVonBis',array($datum_beginn, $datum_ende)).'</H3>';
+		
+			if(isset($_GET['organisationseinheit']))
+			{
+				echo '<br>';
+				echo '<FORM action="'.$_SERVER['PHP_SELF'].'" method="GET">'.$p->t('global/organisationseinheit').': <SELECT name="organisationseinheit">';
+				$oe_obj = new organisationseinheit();
+				$oe_obj->getAll();
+	
+				echo "<option value='' ".(is_null($organisationseinheit)?'selected':'').">-- ".$p->t('global/auswahl')." --</option>";
+				foreach ($oe_obj->result as $oe)
+				{
+					if($oe->aktiv)
+					{
+						if($oe->oe_kurzbz==$organisationseinheit)
+							$selected='selected';
+						else
+							$selected='';
+	
+						echo "<option value='$oe->oe_kurzbz' $selected>$oe->organisationseinheittyp_kurzbz $oe->bezeichnung</option>";
+					}
+				}
+				echo '</SELECT>&nbsp;'.$p->t('zeitsperre/anzahlTage').'<input type="Text" name="days" size="2" maxlength="2" value="'.$days.'"><input type="submit" value="'.$p->t('global/anzeigen').'"></FORM>';
+				echo '<br>';
+			}
+			if($lektor)
+				echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">'.$p->t('zeitsperre/anzahlTage').' <input type="text" name="days" size="2" maxlength="2" value="'.$days.'"><input type="hidden" name="lektor" value="true"><input type="submit" value="Go"></form>';
+			elseif($fix)
+				echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">'.$p->t('zeitsperre/anzahlTage').' <input type="text" name="days" size="2" maxlength="2" value="'.$days.'"><input type="hidden" name="fix" value="true"><input type="submit" value="Go"></form>';
+			elseif(isset($_GET['funktion']) && isset($_GET['stg_kz']))
+				echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">'.$p->t('zeitsperre/anzahlTage').' <input type="text" name="days" size="2" maxlength="2" value="'.$days.'"><input type="hidden" name="funktion" value="'.$funktion.'"><input type="hidden" name="stg_kz" value="'.$stg_kz.'"><input type="submit" value="Go"></form>';
+		echo '
+		<a href="'.$export_link.'"><img src="../../../skin/images/xls_icon.png" alt="Icon Excel"> Excel Export</a><br>
+		<TABLE id="zeitsperren">
+	    <TR>';
+	    	
+		  	echo '<th>'.$p->t('zeitsperre/monat').'<br>'.$p->t('zeitsperre/tag').'</th>';
+			for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
+			{
+				$tag=date('d',$ts);
+				$wt=date('N',$ts);
+				$monat=date('M',$ts);
+				if ($wt==7 || $wt==6)
+					$class='feiertag';
+				else
+					$class='';
+				echo "<th class='$class'><div align=\"center\">".$tagbez[$sprache_index][$wt]."<br>$monat<br>$tag</div></th>";
+			}
 
-  </TABLE>
-</div>
-</body>
-</html>
+		echo '</TR>';
+	
+
+		$zs=new zeitsperre();
+		if(is_array($mitarbeiter))
+		{
+			foreach ($mitarbeiter as $ma)
+			{
+				if($ma->aktiv)
+				{
+					$zs->getzeitsperren($ma->uid, false);
+					echo '<tr>';
+					echo '<td valign="top">'.trim($ma->nachname).'&nbsp;'.trim($ma->vorname).'</td>';
+					for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
+					{
+						$tag=date('d',$ts);
+						$monat=date('M',$ts);
+						$wt=date('N',$ts);
+			
+						if ($wt==7 || $wt==6)
+							$class=' class="feiertag" ';
+						else
+							$class='';
+						$grund=$zs->getTyp($ts);
+						$erbk=$zs->getErreichbarkeit($ts);
+						$vertretung=$zs->getVertretung($ts);
+						echo '<td '.$class.' style="white-space: nowrap;">'.($grund!=''?'<span title="'.$p->t('zeitsperre/grund').'">'.substr($p->t('zeitsperre/grund'),0,1).'</span>: ':'').$grund;
+						echo '<br>'.($erbk!=''?'<span title="'.$p->t('urlaubstool/erreichbarkeit').'">'.substr($p->t('urlaubstool/erreichbarkeit'),0,1).'</span>: ':'').$erbk;
+						echo '<br>'.($erbk!=''?'<span title="'.$p->t('urlaubstool/vertretung').'">'.substr($p->t('urlaubstool/vertretung'),0,1).'</span>: ':'');
+						foreach ($vertretung as $vt)
+						{
+							if ($vt!='')
+							{
+								$ma_kurzbz = new mitarbeiter();
+								$ma_kurzbz->load($vt);
+								echo '<a href="index.php?uid='.$ma_kurzbz->uid.'">'.$ma_kurzbz->kurzbz.'</a>&nbsp;';
+							}
+						}
+						echo '</td>';
+					}
+					echo '</tr>';
+				}
+			}
+		}
+	
+	  echo '</TABLE></body></html>';
+}
+?>

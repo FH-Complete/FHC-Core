@@ -23,4 +23,16 @@ $this->phrasen['urlaubstool/erreichbar']='reachable';
 $this->phrasen['urlaubstool/eintragungLoeschen']='Delete entries';
 $this->phrasen['urlaubstool/freigegebenDurchAm']='Approved by %s at';
 $this->phrasen['urlaubstool/freigegebenDurchAm']='Approved by %s';
+$this->phrasen['urlaubstool/vertretungsmailWurdeVersandt']='Informationsmail zur Urlaubsvertretung wurde an %s versandt'; //Übersetzen
+$this->phrasen['urlaubstool/fehlerBeimSendenVertretungAufgetreten']='Fehler beim Senden des Informationsmails zur Urlaubsvertretung an %s'; //Übersetzen
+$this->phrasen['urlaubstool/keineVertretungEingetragen']='You have not chosen a substitute. If you wish to nominate a substitute please do this under "My planned absences".';
+$this->phrasen['urlaubstool/mailtextVertretung']=html_entity_decode('Dies ist eine automatische Mail zu Ihrer Information.&#13;%s %s hat neuen Urlaub eingetragen und Sie wurden als Vertretung angegeben.&#13;&#13;%s',ENT_COMPAT,'UTF-8'); //Nur übersetzen, wenn die eMail in der eingestellten Sprache versandt werden soll
+$this->phrasen['urlaubstool/diesIstEineAutomatischeMail']='Dies ist eine automatische Mail.'; //Nur übersetzen, wenn die eMail in der eingestellten Sprache versandt werden soll
+$this->phrasen['urlaubstool/xHatNeuenUrlaubEingetragen']='%s %s hat neuen Urlaub eingetragen'; //Nur übersetzen, wenn die eMail in der eingestellten Sprache versandt werden soll
+$this->phrasen['urlaubstool/von']='Von'; //Nur übersetzen, wenn die eMail in der eingestellten Sprache versandt werden soll
+$this->phrasen['urlaubstool/bis']='bis'; //Nur übersetzen, wenn die eMail in der eingestellten Sprache versandt werden soll
+$this->phrasen['urlaubstool/handbuchUrlaubserfassung']='Handbuch Urlaubserfassung';
+$this->phrasen['urlaubstool/meineZeitsperren']='My Planned Absences';
+$this->phrasen['urlaubstool/sieKoennenDiesenUnterFolgenderAdresseFreigeben']='Sie können diesen unter folgender Adresse freigeben'; //Nur übersetzen, wenn die eMail in der eingestellten Sprache versandt werden soll
+$this->phrasen['urlaubstool/freigabeansuchenUrlaub']='Freigabeansuchen Urlaub'; //Nur übersetzen, wenn die eMail in der eingestellten Sprache versandt werden soll
 ?>

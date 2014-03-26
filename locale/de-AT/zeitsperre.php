@@ -37,4 +37,8 @@ $this->phrasen['zeitsperre/tag']='Tag';
 $this->phrasen['zeitsperre/urlaubBereitsEingetragen']='Es existiert bereits ein Urlaubseintrag im angegebenen Zeitraum.';
 $this->phrasen['zeitsperre/beschreibungSieheCisHandbuch']='Beschreibung siehe CIS-Handbuch';
 $this->phrasen['zeitsperre/anzahlTage']='Anzahl Tage';
+$this->phrasen['zeitsperre/legendeGrund']='G...Grund';
+$this->phrasen['zeitsperre/legendeErreichbarkeit']='E...Erreichbarkeit (n=nicht erreichbar, t=telefonisch, e=eMail, et=eMail oder telefonisch)';
+$this->phrasen['zeitsperre/legendeVertretung']='V...Vertretung';
+$this->phrasen['zeitsperre/legendeDurchwahl']='(123)...Durchwahl';
 ?>
