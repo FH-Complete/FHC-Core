@@ -79,6 +79,11 @@ class menu_addon_zeitsperren extends menu_addon
 								   'link'  => 'private/profile/zeitsperre.php?organisationseinheit=',
 								   'name'  => $p->t('menu/organisationseinheit')
 								  );
+				$this->items[] = array('title' => $p->t('menu/assistenz'),
+								   'target'=> 'content',
+								   'link'  => 'private/profile/zeitsperre.php?funktion=ass',
+								   'name'  => $p->t('menu/assistenz')
+								  );
 			}
 			
 			$stg_obj = new studiengang();

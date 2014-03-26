@@ -134,7 +134,7 @@ require_once('../../../include/Excel/excel.php');
 			if (is_null($funktion))
 				$mitarbeiter=$ma->getMitarbeiter($lektor,$fix);
 			else
-				$mitarbeiter=$ma->getMitarbeiterStg(true,null,$stge,$funktion);
+				$mitarbeiter=$ma->getMitarbeiterStg(false,null,$stge,$funktion,'nachname,vorname');
 		}
 	}
 
@@ -199,39 +199,44 @@ if(isset($_REQUEST['format']) && $_REQUEST['format']=='xls')
 
 	$zeile=0;
 	$spalte=0;
+	$uid='';
 	$zs=new zeitsperre();
 	if(is_array($mitarbeiter))
 	{
 		foreach ($mitarbeiter as $ma)
 		{
-			if($ma->aktiv)
-			{	
-				$zeile++;
-				$spalte=0;
-				$zs->getzeitsperren($ma->uid, false);
-				$worksheet->write($zeile,$spalte,$ma->nachname.' '.$ma->vorname, $format_namen);
-				for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
-				{
-					$wt=date('N',$ts);
-					$grund=$zs->getTyp($ts);
-					$erbk=html_entity_decode($zs->getErreichbarkeit($ts));
-					$vertretung=$zs->getVertretung($ts);
-					$zelleninhalt = ($grund!=''?(($grund!=''?substr($p->t('zeitsperre/grund'),0,1).': ':'').$grund. "\n"):'');
-					$zelleninhalt .= ($erbk!=''?(($erbk!=''?substr($p->t('urlaubstool/erreichbarkeit'),0,1).': ':'').$erbk. "\n"):'');
-					$zelleninhalt .= ($erbk!=''?($erbk!=''?substr($p->t('urlaubstool/vertretung'),0,1).': ':''):''); 
-					$count = 0;
-					foreach ($vertretung as $vt)
+			if ($ma->uid!=$uid) //Um doppelte Eintraege rauszufiltern
+			{
+				if($ma->aktiv)
+				{	
+					$zeile++;
+					$spalte=0;
+					$zs->getzeitsperren($ma->uid, false);
+					$worksheet->write($zeile,$spalte,$ma->nachname.' '.$ma->vorname, $format_namen);
+					for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
 					{
-						if ($vt!='')
+						$wt=date('N',$ts);
+						$grund=$zs->getTyp($ts);
+						$erbk=html_entity_decode($zs->getErreichbarkeit($ts));
+						$vertretung=$zs->getVertretung($ts);
+						$zelleninhalt = ($grund!=''?(($grund!=''?substr($p->t('zeitsperre/grund'),0,1).': ':'').$grund. "\n"):'');
+						$zelleninhalt .= ($erbk!=''?(($erbk!=''?substr($p->t('urlaubstool/erreichbarkeit'),0,1).': ':'').$erbk. "\n"):'');
+						$zelleninhalt .= ($erbk!=''?($erbk!=''?substr($p->t('urlaubstool/vertretung'),0,1).': ':''):''); 
+						$count = 0;
+						foreach ($vertretung as $vt)
 						{
-							$ma_kurzbz = new mitarbeiter();
-							$ma_kurzbz->load($vt);
-							$zelleninhalt .= ($count!=0?', ':'').$ma_kurzbz->vorname.' '.$ma_kurzbz->nachname.' ('.$ma_kurzbz->telefonklappe.')';
-							$count++;
+							if ($vt!='')
+							{
+								$ma_kurzbz = new mitarbeiter();
+								$ma_kurzbz->load($vt);
+								$zelleninhalt .= ($count!=0?', ':'').$ma_kurzbz->vorname.' '.$ma_kurzbz->nachname.' ('.$ma_kurzbz->telefonklappe.')';
+								$count++;
+							}
 						}
+						$worksheet->write($zeile,++$spalte,$zelleninhalt,$format_mehrzeilig);
 					}
-					$worksheet->write($zeile,++$spalte,$zelleninhalt,$format_mehrzeilig);
 				}
+				$uid=$ma->uid;
 			}
 		}
 	}
@@ -309,46 +314,50 @@ else
 
 		echo '</TR>';
 	
-
+		$uid='';
 		$zs=new zeitsperre();
 		if(is_array($mitarbeiter))
 		{
 			foreach ($mitarbeiter as $ma)
 			{
-				if($ma->aktiv)
+				if ($ma->uid!=$uid) //Um doppelte Eintraege rauszufiltern
 				{
-					$zs->getzeitsperren($ma->uid, false);
-					echo '<tr>';
-					echo '<td valign="top">'.trim($ma->nachname).'&nbsp;'.trim($ma->vorname).'</td>';
-					for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
+					if($ma->aktiv)
 					{
-						$tag=date('d',$ts);
-						$monat=date('M',$ts);
-						$wt=date('N',$ts);
-			
-						if ($wt==7 || $wt==6)
-							$class=' class="feiertag" ';
-						else
-							$class='';
-						$grund=$zs->getTyp($ts);
-						$erbk=$zs->getErreichbarkeit($ts);
-						$vertretung=$zs->getVertretung($ts);
-						echo '<td '.$class.' style="white-space: nowrap;">'.($grund!=''?'<span title="'.$p->t('zeitsperre/grund').'">'.substr($p->t('zeitsperre/grund'),0,1).'</span>: ':'').$grund;
-						echo '<br>'.($erbk!=''?'<span title="'.$p->t('urlaubstool/erreichbarkeit').'">'.substr($p->t('urlaubstool/erreichbarkeit'),0,1).'</span>: ':'').$erbk;
-						echo '<br>'.($erbk!=''?'<span title="'.$p->t('urlaubstool/vertretung').'">'.substr($p->t('urlaubstool/vertretung'),0,1).'</span>: ':'');
-						foreach ($vertretung as $vt)
+						$zs->getzeitsperren($ma->uid, false);
+						echo '<tr>';
+						echo '<td valign="top">'.trim($ma->nachname).'&nbsp;'.trim($ma->vorname).'</td>';
+						for ($ts=$ts_beginn;$ts<$ts_ende; $ts+=$datum_obj->ts_day)
 						{
-							if ($vt!='')
+							$tag=date('d',$ts);
+							$monat=date('M',$ts);
+							$wt=date('N',$ts);
+				
+							if ($wt==7 || $wt==6)
+								$class=' class="feiertag" ';
+							else
+								$class='';
+							$grund=$zs->getTyp($ts);
+							$erbk=$zs->getErreichbarkeit($ts);
+							$vertretung=$zs->getVertretung($ts);
+							echo '<td '.$class.' style="white-space: nowrap;">'.($grund!=''?'<span title="'.$p->t('zeitsperre/grund').'">'.substr($p->t('zeitsperre/grund'),0,1).'</span>: ':'').$grund;
+							echo '<br>'.($erbk!=''?'<span title="'.$p->t('urlaubstool/erreichbarkeit').'">'.substr($p->t('urlaubstool/erreichbarkeit'),0,1).'</span>: ':'').$erbk;
+							echo '<br>'.($erbk!=''?'<span title="'.$p->t('urlaubstool/vertretung').'">'.substr($p->t('urlaubstool/vertretung'),0,1).'</span>: ':'');
+							foreach ($vertretung as $vt)
 							{
-								$ma_kurzbz = new mitarbeiter();
-								$ma_kurzbz->load($vt);
-								echo '<a href="index.php?uid='.$ma_kurzbz->uid.'">'.$ma_kurzbz->kurzbz.'</a>&nbsp;';
+								if ($vt!='')
+								{
+									$ma_kurzbz = new mitarbeiter();
+									$ma_kurzbz->load($vt);
+									echo '<a href="index.php?uid='.$ma_kurzbz->uid.'">'.$ma_kurzbz->kurzbz.'</a>&nbsp;';
+								}
 							}
+							echo '</td>';
 						}
-						echo '</td>';
+						echo '</tr>';
 					}
-					echo '</tr>';
-				}
+					$uid=$ma->uid;
+			}
 			}
 		}
 	
