@@ -69,12 +69,9 @@ echo '
 	<title>'.$p->t('zeitsperre/zeitsperren').'</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
-	<link href="../../../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />
-	<script type="text/javascript" src="../../../include/js/flexcroll.js"></script>
 </head>
 
 <body>
-<div class="flexcroll" style="outline: none;">
 	<H1>'.$p->t('zeitsperre/zeitsperren').'</H1>
  
 	<form action="'.$_SERVER['PHP_SELF'].'" method="GET">'.$p->t('zeitsperre/anzahlTage').' <input type="text" name="days" size="2" maxlength="2" value="'.$days.'"><input type="hidden" name="lektor" value="'.$lektor.'"><input type="submit" value="Go"></form>
@@ -117,7 +114,19 @@ if (!empty ($mitarbeiter))
 				$class='';
 			$grund=$zs->getTyp($ts);
 			$erbk=$zs->getErreichbarkeit($ts);
-			echo "<td class='$class'>$grund<br>$erbk</td>";
+			$vertretung=$zs->getVertretung($ts);
+			echo '<td '.$class.' style="white-space: nowrap;">'.($grund!=''?'<span title="'.$p->t('zeitsperre/grund').'">'.substr($p->t('zeitsperre/grund'),0,1).'</span>: ':'').$grund;
+			echo '<br>'.($erbk!=''?'<span title="'.$p->t('urlaubstool/erreichbarkeit').'">'.substr($p->t('urlaubstool/erreichbarkeit'),0,1).'</span>: ':'').$erbk;
+			echo '<br>'.($erbk!=''?'<span title="'.$p->t('urlaubstool/vertretung').'">'.substr($p->t('urlaubstool/vertretung'),0,1).'</span>: ':'');
+			foreach ($vertretung as $vt)
+			{
+				if ($vt!='')
+				{
+					$ma_kurzbz = new mitarbeiter();
+					$ma_kurzbz->load($vt);
+					echo '<a href="index.php?uid='.$ma_kurzbz->uid.'">'.$ma_kurzbz->kurzbz.'</a>&nbsp;';
+				}
+			}
 		}
 		echo '</TR>';
 	}
@@ -142,6 +151,6 @@ else
 }
 
 echo '  </TABLE>
-	</div></body>
+	</body>
 </html>';
 ?>
