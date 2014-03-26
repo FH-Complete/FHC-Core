@@ -396,7 +396,7 @@ class mitarbeiter extends benutzer
 	 * @param $fkt_kurzbz
 	 * @return boolean
 	 */
-	public function getMitarbeiterStg($lektor=true,$fixangestellt, $stge, $fkt_kurzbz)
+	public function getMitarbeiterStg($lektor=true,$fixangestellt, $stge, $fkt_kurzbz, $order='studiengang_kz, nachname, vorname, kurzbz')
 	{
 		$sql_query='SELECT DISTINCT campus.vw_mitarbeiter.*, studiengang_kz FROM campus.vw_mitarbeiter
 					JOIN public.tbl_benutzerfunktion USING (uid) JOIN public.tbl_studiengang USING(oe_kurzbz)
@@ -435,7 +435,7 @@ class mitarbeiter extends benutzer
 			if($in!='')
 				$sql_query.=' AND studiengang_kz in (-1'.$in.')';
 		}
-	    $sql_query.=' ORDER BY studiengang_kz, nachname, vorname, kurzbz;';
+	    $sql_query.=' ORDER BY '.$order.';';
 	    //echo $sql_query;
 	
 		if(!$this->db_query($sql_query))
