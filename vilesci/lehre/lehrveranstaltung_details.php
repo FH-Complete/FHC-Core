@@ -93,6 +93,7 @@
 		$lv->semesterwochen = $_POST['semesterwochen'];
 		$lv->lvnr = $_POST['lvnr'];
 		$lv->semester_alternativ = $_POST['semester_alternativ'];
+		$lv->farbe = $_POST['farbe'];
 
 		if(!$lv->save())
 			$errorstr = "Fehler beim Speichern der Daten: $lv->errormsg";
@@ -336,7 +337,17 @@
 		$htmlstr .= '</select></td>
 			<td>Semesterwochen</td>
 			<td><input type="text" name="semesterwochen" size="2" value="'.$lv->semesterwochen.'" /></td>
-		</tr><tr>
+		</tr>
+		<tr>
+			<td>Farbe</td>
+			<td><input type="text" name="farbe" size="6" value="'.$lv->farbe.'" /></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
 			<td></td>
 			<td></td>
 			<td></td>
