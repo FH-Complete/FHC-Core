@@ -81,7 +81,7 @@ class menu_addon_zeitsperren extends menu_addon
 								  );
 				$this->items[] = array('title' => $p->t('menu/assistenz'),
 								   'target'=> 'content',
-								   'link'  => 'private/profile/zeitsperre.php?funktion=ass',
+								   'link'  => 'private/profile/zeitsperre.php?funktion=ass&stg_kz=',
 								   'name'  => $p->t('menu/assistenz')
 								  );
 			}
