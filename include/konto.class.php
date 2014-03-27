@@ -284,7 +284,7 @@ class konto extends basis_db
 	public function delete($buchungsnr)
 	{
 		//Pruefen ob Verweise auf diese Buchung Vorhanden sind
-		$qry = "SELECT count(*) as anzahl FROM public.tbl_konto WHERE buchungsnr_verweis='".$this->db_add_param($buchungsnr, FHC_INTEGER)."'";
+		$qry = "SELECT count(*) as anzahl FROM public.tbl_konto WHERE buchungsnr_verweis=".$this->db_add_param($buchungsnr, FHC_INTEGER);
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -297,7 +297,7 @@ class konto extends basis_db
 				else
 				{
 					//Wenn keine Verweise Vorhanden sind, dann die Buchung loeschen
-					$qry = "DELETE FROM public.tbl_konto WHERE buchungsnr='".$this->db_add_param($buchungsnr, FHC_INTEGER)."'";
+					$qry = "DELETE FROM public.tbl_konto WHERE buchungsnr=".$this->db_add_param($buchungsnr, FHC_INTEGER);
 					if($this->db_query($qry))
 						return true;
 					else
@@ -335,7 +335,7 @@ class konto extends basis_db
 		}
 
 		if($studiengang_kz!='')
-			$stgwhere = " AND tbl_konto.studiengang_kz='".$this->db_add_param($studiengang_kz, FHC_INTEGER)."' ";
+			$stgwhere = " AND tbl_konto.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER)." ";
 		else
 			$stgwhere = '';
 
@@ -449,7 +449,7 @@ class konto extends basis_db
 	public function getDifferenz($buchungsnr)
 	{
 		$qry = "SELECT sum(betrag) as differenz FROM public.tbl_konto 
-				WHERE buchungsnr='".$this->db_add_param($buchungsnr, FHC_INTEGER)."' OR buchungsnr_verweis='".$this->db_add_param($buchungsnr, FHC_INTEGER)."'";
+				WHERE buchungsnr=".$this->db_add_param($buchungsnr, FHC_INTEGER)." OR buchungsnr_verweis=".$this->db_add_param($buchungsnr, FHC_INTEGER);
 
 		if($this->db_query($qry))
 		{
@@ -478,8 +478,8 @@ class konto extends basis_db
 	{
 		$subqry = "SELECT tbl_konto.buchungsnr, tbl_konto.buchungsdatum FROM public.tbl_konto, public.tbl_benutzer, public.tbl_student
 					WHERE 
-						tbl_konto.studiensemester_kurzbz = '".$this->db_add_param($stsem)."' 
-						AND tbl_benutzer.uid = '".$this->db_add_param($uid)."' 
+						tbl_konto.studiensemester_kurzbz = ".$this->db_add_param($stsem)." 
+						AND tbl_benutzer.uid = ".$this->db_add_param($uid)." 
 						AND tbl_benutzer.uid = tbl_student.student_uid
 						AND tbl_benutzer.person_id = tbl_konto.person_id 
 						AND tbl_konto.studiengang_kz=tbl_student.studiengang_kz
@@ -573,7 +573,7 @@ class konto extends basis_db
 	{
 		$subqry = "SELECT tbl_konto.buchungsnr, tbl_konto.buchungsdatum, tbl_konto.buchungsnr_verweis, tbl_konto.studiensemester_kurzbz FROM public.tbl_konto, public.tbl_benutzer, public.tbl_student
 					WHERE 
-						tbl_benutzer.uid = '".$this->db_add_param($uid)."' 
+						tbl_benutzer.uid = ".$this->db_add_param($uid)."
 						AND tbl_benutzer.uid = tbl_student.student_uid
 						AND tbl_benutzer.person_id = tbl_konto.person_id 
 						AND tbl_konto.studiengang_kz=tbl_student.studiengang_kz
@@ -630,10 +630,10 @@ class konto extends basis_db
 	{
 		$qry = "select sum(betrag) as betrag from public.tbl_konto 
 				join public.tbl_benutzer benutzer using(person_id)
-				where uid='".$this->db_add_param($uid)."' and studiensemester_kurzbz = '".$this->db_add_param($stsem)."' 
+				where uid=".$this->db_add_param($uid)." and studiensemester_kurzbz = ".$this->db_add_param($stsem)." 
 				and buchungstyp_kurzbz = 'Studiengebuehr' and betrag > 0";
 		if($studiengang_kz!= null)
-		$qry.=" and studiengang_kz = '".$this->db_add_param($studiengang_kz, FHC_INTEGER)."';";
+		$qry.=" and studiengang_kz = ".$this->db_add_param($studiengang_kz, FHC_INTEGER).";";
 		
 		if($this->db_query($qry))
 		{
