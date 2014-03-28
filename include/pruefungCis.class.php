@@ -571,20 +571,34 @@ class pruefungCis extends basis_db
         return true;
     }
     
-    public function getPruefungByLv($lehrveranstaltung_IDs = array())
+    /**
+     * Lädt alle Prüfungen zur angebenen Lehrveranstaltung
+     * @param String|Array $lehrveranstaltung_IDs einzelne ID einer Lehrveranstaltung oder ein Array von IDs
+     * @return boolean true, wenn ok; false, im Fehlerfall
+     */
+    public function getPruefungByLv($lehrveranstaltung_IDs)
     {
         if(empty($lehrveranstaltung_IDs))
         {
            $this->errormsg = "Keine Lehrveranstaltungen übergeben.</br>";
            return false;
         }
+	
+	$in = "";
+        if (is_array($lehrveranstaltung_IDs))
+	{
+	    foreach($lehrveranstaltung_IDs as $id)
+	    {
+		$in.= $id.', ';
+	    }
+	    $in = substr($in, 0, -2);
+	}
+	else
+	{
+	    $in = $lehrveranstaltung_IDs;
+	}
         
-        $in = "";
-        foreach($lehrveranstaltung_IDs as $id)
-        {
-            $in.= $id.', ';
-        }
-        $in = substr($in, 0, -2);
+        
             
         $qry = 'SELECT * FROM campus.tbl_lehrveranstaltung_pruefung WHERE lehrveranstaltung_id IN ('.$in.');';
         
@@ -603,6 +617,10 @@ class pruefungCis extends basis_db
         return false;
     }
     
+    /**
+     * Lädt alle Prüfung-Lehrveranstaltung Kombinationen
+     * @return boolean true, wenn ok; false, im Fehlerfall
+     */
     public function getAll()
     {
 	$qry = 'SELECT * FROM campus.tbl_lehrveranstaltung_pruefung;';
@@ -622,6 +640,11 @@ class pruefungCis extends basis_db
         return false;
     }
     
+    /**
+     * Lädt den Wert des letzten Studenten in der Anmeldereihung
+     * @param type $pruefungstermin_id Id eines Prüfungstermines
+     * @return boolean|integer Wert des Letzten in der Reihung oder false, wenn ein Fehler auftritt 
+     */
     public function getLastOfReihung($pruefungstermin_id)
     {
 	$qry = 'SELECT MAX(reihung) FROM campus.tbl_pruefungsanmeldung WHERE '

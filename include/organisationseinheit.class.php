@@ -517,6 +517,11 @@ class organisationseinheit extends basis_db
 		return $data;
 	}
 	
+	/**
+	 * Lädt Organisationseinheiten nach ihrem Typ
+	 * @param type $oetyp_kurzbz
+	 * @return boolean true, wenn ok; false, im Fehlerfall
+	 */
 	public function getByTyp($oetyp_kurzbz)
 	{
 	    $qry = 'SELECT * FROM public.tbl_organisationseinheit WHERE organisationseinheittyp_kurzbz='.$this->db_add_param($oetyp_kurzbz).';';

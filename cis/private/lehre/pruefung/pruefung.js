@@ -17,6 +17,12 @@
  * Authors:		Stefan Puraner	<puraner@technikum-wien.at>
  */
 
+var progressBarCount = 0;
+
+/**
+ * Liest GET Variablen einer URL aus
+ * @returns {String|value|Element.value|document@arr;all.value}
+ */
 function getUrlVars() {
     var vars = {};
     var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
@@ -25,6 +31,11 @@ function getUrlVars() {
     return vars;
 }
 
+/**
+ * Initialisiert den Datepicker
+ * @param {type} ele
+ * @returns {undefined}
+ */
 function setDatePicker(ele)
 {
 	var start = $("#pruefungsfenster option:selected").attr("start");
@@ -41,6 +52,11 @@ function setDatePicker(ele)
 	$("#pruefungsfenster").attr("onchange", "setDatePicker()");
 }
 
+/**
+ * Fügt ein neunes Formularfeld für einen zusätzlichen Termin hinzu
+ * @param {type} inputTag
+ * @returns {undefined}
+ */
 function terminHinzufuegen(inputTag)
 {
 	inputTag = (inputTag===undefined ? "" : inputTag);
@@ -49,6 +65,12 @@ function terminHinzufuegen(inputTag)
 	setDatePicker();
 }
 
+/**
+ * Fügt ein neues Dropdownfeld zur Auswahl der Lehrveranstaltung hinzu
+ * @param {type} element
+ * @param {type} isChanged
+ * @returns {undefined}
+ */
 function lehrveranstaltungDropdownhinzufuegen(element, isChanged)
 {
 	if(!isChanged)
@@ -75,6 +97,10 @@ function loadError(xhr, textStatus, errorThrown)
 		alert('Fehler beim Laden der Daten. ErrorNr:'+xhr.status);
 }
 
+/**
+ * Lädt die Prüfungstenster eines Studiensemesters
+ * @returns {undefined}
+ */
 function loadPruefungsfenster()
 {
 	var studiensemester_kurzbz = $("#studiensemester option:selected").val();
@@ -94,6 +120,11 @@ function loadPruefungsfenster()
 	});
 }
 
+/**
+ * Schreibt die Daten des geladenen Prüfungsfensters
+ * @param {type} data
+ * @returns {undefined}
+ */
 function writePruefungsfenster(data)
 {
 	var prfFensterId = getUrlVars()["prfFensterId"];
@@ -128,22 +159,30 @@ function writePruefungsfenster(data)
 	});
 }
 
-function writePrfFensterDetails(){
-	var id = $("#pruefungsfenster option:selected").val();
-	if(id !== null)
-	{
-		var start = $("#pruefungsfenster option:selected").attr("start");
-		var ende = $("#pruefungsfenster option:selected").attr("ende");
-		start = start.split('-');
-		ende = ende.split('-');
-		start = new Date(start[0], start[1]-1,start[2]);
-		ende = new Date(ende[0], ende[1]-1,ende[2]);
-		start = start.getDate()+"."+(start.getMonth()+1)+"."+start.getFullYear();
-		ende = ende.getDate()+"."+(ende.getMonth()+1)+"."+ende.getFullYear();
-		$("#prfFensterDetails").html("Beginn: "+start+"</br>Ende: "+ende);
-	}
-}
+/**
+ * 
+ * @returns {undefined}
+ */
+//function writePrfFensterDetails(){
+//	var id = $("#pruefungsfenster option:selected").val();
+//	if(id !== null)
+//	{
+//		var start = $("#pruefungsfenster option:selected").attr("start");
+//		var ende = $("#pruefungsfenster option:selected").attr("ende");
+//		start = start.split('-');
+//		ende = ende.split('-');
+//		start = new Date(start[0], start[1]-1,start[2]);
+//		ende = new Date(ende[0], ende[1]-1,ende[2]);
+//		start = start.getDate()+"."+(start.getMonth()+1)+"."+start.getFullYear();
+//		ende = ende.getDate()+"."+(ende.getMonth()+1)+"."+ende.getFullYear();
+//		$("#prfFensterDetails").html("Beginn: "+start+"</br>Ende: "+ende);
+//	}
+//}
 
+/**
+ * Lädt alle Prüfungen eines Studenten zu deren LVs er angemeldet ist
+ * @returns {undefined}
+ */
 function loadPruefungen()
 {
 	$.ajax({
@@ -172,6 +211,10 @@ function loadPruefungen()
 	});
 }
 
+/**
+ * Lädt alle Prüfungen eines Studienganges
+ * @returns {undefined}
+ */
 function loadPruefungenOfStudiengang()
 {
 	$.ajax({
@@ -199,6 +242,10 @@ function loadPruefungenOfStudiengang()
 	});	
 }
 
+/**
+ * Lädt alle Prüfungen
+ * @returns {undefined}
+ */
 function loadPruefungenGesamt()
 {
 	$.ajax({
@@ -220,6 +267,12 @@ function loadPruefungenGesamt()
 	
 }
 
+/**
+ * Schreibt die Daten der Prüfungen in eine Tabelle
+ * @param {type} e Daten der Prüfungen
+ * @param {type} data Daten der Anmeldungen
+ * @returns {String}
+ */
 function writePruefungsTable(e, data)
 {
 	var row = "";
@@ -266,6 +319,12 @@ function writePruefungsTable(e, data)
 	return row;
 }
 
+/**
+ * Lädt die Details zu einer Prüfung
+ * @param {type} prfId ID einer Prüfung
+ * @param {type} lvId ID einer Lehrveranstaltung
+ * @returns {undefined}
+ */
 function showPruefungsDetails(prfId, lvId)
 {
 	var prfId = prfId;
@@ -318,6 +377,15 @@ function showPruefungsDetails(prfId, lvId)
 	}
 }
 
+/**
+ * Öffnet einen Dialog zur Anmeldung zu einer Prüfung
+ * @param {type} lehrveranstaltung_id ID einer Lehrveransaltung
+ * @param {type} termin_id ID des Prüfungstermines
+ * @param {type} lvBezeichnung Bezeichnung der Lehrveranstaltung
+ * @param {type} terminVon Beginn der Prüfung
+ * @param {type} terminBis Ende der Prüfung
+ * @returns {undefined}
+ */
 function openDialog(lehrveranstaltung_id, termin_id, lvBezeichnung, terminVon, terminBis)
 {
 	$("#lehrveranstaltungHidden").val(lehrveranstaltung_id);
@@ -344,6 +412,12 @@ function openDialog(lehrveranstaltung_id, termin_id, lvBezeichnung, terminVon, t
 	$("#saveDialog").dialog("open");
 }
 
+/**
+ * speichert eine Prüfungsanmeldung
+ * @param {type} lehrveranstaltung_id ID der Lehrveranstaltung
+ * @param {type} termin_id ID des Prüfungstermines
+ * @returns {undefined}
+ */
 function saveAnmeldung(lehrveranstaltung_id, termin_id)
 {
 	var lehrveranstaltung_id = $("#lehrveranstaltungHidden").val();
@@ -366,19 +440,21 @@ function saveAnmeldung(lehrveranstaltung_id, termin_id)
 	}).success(function(data){
 		if(data.error === 'false')
 		{
-			$("#message").html(data.result);
-			$("#message").effect("highlight", {
-				duration: 4000,
-				color: "green"
-			});
+			messageBox("message", data.result, "green", "highlight", 4000);
+//			$("#message").html(data.result);
+//			$("#message").effect("highlight", {
+//				duration: 4000,
+//				color: "green"
+//			});
 		}
 		else
 		{
-			$("#message").html(data.errormsg);
-			$("#message").effect("highlight", {
-				duration: 4000,
-				color: "red"
-			});
+			messageBox("message", data.errormsg, "red", "highlight", 4000);
+//			$("#message").html(data.errormsg);
+//			$("#message").effect("highlight", {
+//				duration: 4000,
+//				color: "red"
+//			});
 		}
 		resetForm();
 	}).complete(function(event, xhr, settings){
@@ -387,6 +463,11 @@ function saveAnmeldung(lehrveranstaltung_id, termin_id)
 	});
 }
 
+/**
+ * storniert eine Prüfungsanmeldung
+ * @param {type} pruefungsanmeldung_id ID einer Prüfungsanmeldung
+ * @returns {undefined}
+ */
 function stornoAnmeldung(pruefungsanmeldung_id)
 {	
 	if(confirm("Anmeldung wirklich stornieren?"))
@@ -403,19 +484,21 @@ function stornoAnmeldung(pruefungsanmeldung_id)
 		}).success(function(data){
 			if(data.error === 'false')
 			{
-				$("#message").html(data.result);
-				$("#message").effect("highlight", {
-					duration: 4000,
-					color: "green"
-				});
+				messageBox("message", data.result, "green", "highlight", 4000);
+//				$("#message").html(data.result);
+//				$("#message").effect("highlight", {
+//					duration: 4000,
+//					color: "green"
+//				});
 			}
 			else
 			{
-				$("#message").html(data.errormsg);
-				$("#message").effect("highlight", {
-					duration: 4000,
-					color: "red"
-				});
+				messageBox("message", data.errormsg, "red", "highlight", 4000);
+//				$("#message").html(data.errormsg);
+//				$("#message").effect("highlight", {
+//					duration: 4000,
+//					color: "red"
+//				});
 			}
 		}).complete(function(event, xhr, settings){
 			refresh();
@@ -423,6 +506,10 @@ function stornoAnmeldung(pruefungsanmeldung_id)
 	}
 }
 
+/**
+ * Leer das DIV-Element der Prüfungsdetails
+ * @returns {undefined}
+ */
 function clearPrfDetails()
 {
 	$("#prfTyp").empty();
@@ -431,12 +518,21 @@ function clearPrfDetails()
 	$("#prfEinzeln").empty();
 }
 
+/**
+ * Setzt ein Formular auf den Urzustand zurück
+ * @returns {undefined}
+ */
 function resetForm()
 {
 	$("form").find("input[type=text], textarea").val("");
 	clearPrfDetails();
 }
 
+/**
+ * Initialisiert den tablesorter für eine Tabelle
+ * @param {type} tableId ID eines "table"-Elements
+ * @returns {undefined}
+ */
 function setTablesorter(tableId)
 {
 	if($("#"+tableId)[0].hasInitialized !== true)
@@ -454,6 +550,10 @@ function setTablesorter(tableId)
 	}
 }
 
+/**
+ * Leert die Daten eines table-bodys
+ * @returns {undefined}
+ */
 function clearAccordion()
 {
 	$("#accordion tbody").each(function(i, v){
@@ -461,10 +561,365 @@ function clearAccordion()
 	});
 }
 
+/**
+ * Lädt die Seite der Prüfungsanmeldung neu
+ * @returns {undefined}
+ */
 function refresh()
 {
 	clearAccordion();
 	loadPruefungen();
 	loadPruefungenOfStudiengang();
 	loadPruefungenGesamt();
+}
+
+/**
+ * Lädt alle Prüfungen eines Mitarbeiters
+ * @returns {undefined}
+ */
+function loadPruefungenMitarbeiter()
+{
+	$.ajax({
+		dataType: 'json',
+		url: "./pruefungsanmeldung.json.php",
+		type: "POST",
+		data: {
+			method: "getPruefungMitarbeiter"
+		},
+		error: loadError
+	}).success(function(data){
+		if(data.error === 'false')
+		{
+			var liste = "";
+			data.result.forEach(function(e){
+				liste += "<li>"+e.bezeichnung+"<ul>";
+				e.pruefung.termine.forEach(function(d){
+					liste += "<li> <a onclick='showAnmeldungen(\""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung_id+"\");'>"+convertDateTime(d.von)+"</a></li>";
+				})
+				liste += "</li></ul>";
+			});
+			$("#pruefungenListe").append(liste);
+		}
+		else
+		{
+			$("#pruefungenListe").html(data.errormsg);
+		}
+	});
+}
+
+/**
+ * Konvertiert einen String im Fromat JJJJ-MM-TT hh:mm:ss zu DD.MM.JJJJ oder HH:MM
+ * @param {String} string Format: JJJJ-MM-TT hh:mm:ss
+ * @param {String} type spezifiziet die Ausgabe ("time"|"date")
+ * @returns {String} Format: date: DD.MM.JJJJ; time: HH:MM
+ */
+function convertDateTime(string, type)
+{
+	switch (type)
+	{
+		case 'date':
+			string = string.split(' ');
+			string = string[0].split('-');
+			string = new Date(string[0], string[1]-1,string[2]);
+			string = string.getDate()+"."+(string.getMonth()+1)+"."+string.getFullYear();
+			break;
+		case 'time':
+			string = string.split(' ');
+			string = string[1].split(':');
+			string = string[0]+":"+string[1];
+			break;
+		default:
+			string = string.split(' ');
+			string = string[0].split('-');
+			string = new Date(string[0], string[1]-1,string[2]);
+			string = string.getDate()+"."+(string.getMonth()+1)+"."+string.getFullYear();
+			break;
+	}
+	return string;
+}
+
+/**
+ * Lädt die Anmeldungen zu einer Prüfung
+ * @param {type} pruefungstermin_id ID des Prüfungstermins
+ * @param {type} lehrveranstaltung_id ID der Lehrveranstaltung
+ * @returns {undefined}
+ */
+function showAnmeldungen(pruefungstermin_id, lehrveranstaltung_id)
+{
+	$.ajax({
+		dataType: 'json',
+		url: "./pruefungsanmeldung.json.php",
+		type: "POST",
+		data: {
+			method: "getAnmeldungenTermin",
+			pruefungstermin_id: pruefungstermin_id,
+			lehrveranstaltung_id: lehrveranstaltung_id
+		},
+		error: loadError
+	}).success(function(data){
+		if(data.error === 'false')
+		{
+			var terminId = data.result[0].pruefungstermin_id;
+			var lehrveranstaltung_id = data.result[0].lehrveranstaltung_id;
+			var liste = "<ul id='sortable'>";
+			var count = 0;
+			data.result.forEach(function(d){
+				count++;
+				switch(d.status_kurzbz)
+				{
+					case 'angemeldet':
+						liste += "<li class='ui-state-default' id='"+d.student.uid+"'><span class='ui-icon ui-icon-arrowthick-2-n-s'></span><a>"+d.student.vorname+" "+d.student.nachname+"</a>";
+						liste += "<div style='width: 5%; text-align: right;'>"+count+"</div><div style='text-align: center; width: 20%;'><input type='button' value='Bestätigen' onclick='anmeldungBestaetigen(\""+d.pruefungsanmeldung_id+"\", \""+terminId+"\", \""+lehrveranstaltung_id+"\");'></div>";
+						if(d.wuensche !== null)
+						{
+							liste += "<div class='anmerkungInfo'><a href='#' title='Anmerkung des Studenten:</br>"+d.wuensche+"'><img style='width: 20px;' src='../../../../skin/images/button_lvinfo.png'></a></div>";
+						}
+						liste += "</li>";
+						break;
+					case 'bestaetigt':
+						liste += "<li class='ui-state-default' id='"+d.student.uid+"'><span class='ui-icon ui-icon-arrowthick-2-n-s'></span><a>"+d.student.vorname+" "+d.student.nachname+"</a>";
+						liste += "<div style='width: 5%; text-align: right;'>"+count+"</div><div style='text-align: center; width: 20%;'>bestätigt</div>";
+						if(d.wuensche !== null)
+						{
+							liste += "<div class='anmerkungInfo'><a href='#' title='Anmerkung des Studenten:</br>"+d.wuensche+"'><img style='width: 20px;' src='../../../../skin/images/button_lvinfo.png'></a></div>";
+						}
+						
+						break;
+					default:
+						break;
+				}
+				
+			});
+			liste += "</ul>";
+			$("#reihungSpeichernButton").html("<input type='button' value='Reihung speichern' onclick='saveReihung(\""+terminId+"\", \""+lehrveranstaltung_id+"\");'>");
+			$("#anmeldeDaten").html(liste);
+			$(document).tooltip({
+				position: {
+					at: "right center",
+					my: "left+15 center"
+				}
+			});
+		}
+		else
+		{
+//			$("#message").html(data.errormsg);
+			messageBox("message", data.errormsg, "red", "highlight", 4000);
+		}
+	}).complete(function(event, xhr, settings){
+		$("#sortable").sortable();
+		$("#sortable").disableSelection();
+	});
+}
+
+/**
+ * speichert die Reihung der Studenten einer Prüfungsanmeldung
+ * @param {type} terminId ID des Prüfungstermines
+ * @param {type} lehrveranstaltung_id ID der Lehrveranstaltung
+ * @returns {undefined}
+ */
+function saveReihung(terminId, lehrveranstaltung_id)
+{	
+	var reihung = [];
+	$("#anmeldeDaten ul").children().each(function(i, v){
+		var anmeldung = new Object();
+		anmeldung.terminId = terminId;
+		anmeldung.lehrveranstaltung_id = lehrveranstaltung_id;
+		anmeldung.reihung = (i+1);
+		anmeldung.uid = v.id;
+		reihung.push(anmeldung);
+	});
+	$.ajax({
+		dataType: 'json',
+		url: "./pruefungsanmeldung.json.php",
+		type: "POST",
+		data: {
+			method: "saveReihung",
+			reihung: reihung
+		},
+		error: loadError
+	}).success(function(data){
+		if(data.error === 'false' && data.result === true)
+		{
+			messageBox("message", "Reihung erfolgreich geändert.", "green", "highlight", 4000);
+		}
+		else
+		{
+			messageBox("message", data.errormsg, "red", "highlight", 4000);
+		}
+	}).complete(function(){
+		showAnmeldungen(terminId, lehrveranstaltung_id);
+	});
+}
+
+/**
+ * Ändert den Status einer Anmeldung auf "bestätigt"
+ * @param {type} pruefungsanmeldung_id ID der Prüfungsanmeldung
+ * @param {type} termin_id ID des Prüfungstermines
+ * @param {type} lehrveranstaltung_id ID der Lehrveranstaltung
+ * @returns {undefined}
+ */
+function anmeldungBestaetigen(pruefungsanmeldung_id, termin_id, lehrveranstaltung_id)
+{
+	$.ajax({
+		dataType: 'json',
+		url: "./pruefungsanmeldung.json.php",
+		type: "POST",
+		data: {
+			method: "anmeldungBestaetigen",
+			pruefungsanmeldung_id: pruefungsanmeldung_id
+		},
+		error: loadError
+	}).success(function(data){
+		if(data.error === 'false' && data.result === true)
+		{
+			if(termin_id !== 'undefined' && lehrveranstaltung_id !== 'undefined')
+			{
+				showAnmeldungen(termin_id, lehrveranstaltung_id);
+			}
+		}
+		else
+		{
+			messageBox("message", data.errormsg, "red", "highlight", 4000);
+		}
+	});
+}
+
+/**
+ * Anzeige eines DIVs zur Darstellung von Fehlermeldungen, etc.
+ * @param {type} divId ID des DIVs in dem die Meldung dargestellt werden soll
+ * @param {type} data Daten die angezeigt werden sollen
+ * @param {type} color Hintergrundfarbe des DIVs
+ * @param {type} effect Anzeigeeffekt (siehe jQuery UI)
+ * @param {type} duration Dauer des Effektes
+ * @returns {undefined}
+ */
+function messageBox(divId, data, color, effect, duration)
+{
+	$("#"+divId).html(data);
+	$("#"+divId).effect(effect, {
+		duration: duration,
+		color: color
+	});
+	$("#"+divId).hide("blind",{ 
+		duration: 4000,
+		queue: false
+	});
+}
+
+/**
+ * Lädt alle Studiengänge
+ * @returns {undefined}
+ */
+function loadStudiengaenge()
+{
+//	$("body").append("<div class='modalOverlay'></div>");
+	$.ajax({
+		dataType: 'json',
+		url: "./pruefungsanmeldung.json.php",
+		type: "POST",
+		data: {
+			method: "getStudiengaenge"
+		},
+		error: loadError
+	}).success(function(data){
+		$("#stgListe").empty();
+		if(data.error === 'false')
+		{
+			var liste = "";
+			data.result.forEach(function(e){
+				progressBarCount++;
+			});
+//			$("#progressbar").progressbar({
+//				value: 0,
+//				max: progressBarCount
+//			}).bind('progressbarchange', function(event, ui) {
+//				var selector = "#" + this.id + " > div";
+//				var value = this.getAttribute( "aria-valuenow" );
+//				
+//				if (value < (progressBarCount / 6)){
+//					$(selector).css({ 'background': 'Red' });
+//				} else if (value < (progressBarCount / 3)){
+//					$(selector).css({ 'background': 'Orange' });
+//				} else if (value < (progressBarCount / 1.5)){
+//					$(selector).css({ 'background': 'Yellow' });
+//				} else{
+//					$(selector).css({ 'background': 'LightGreen' });
+//				}
+//			});
+			
+			data.result.forEach(function(e){
+				var kuerzel = e.typ+e.kurzbz
+				liste += "<li id='stg"+e.studiengang_kz+"'><span class='studiengang'><a href='#' onclick='loadPruefungStudiengang(\""+e.studiengang_kz+"\");'>"+e.bezeichnung+" ("+kuerzel.toUpperCase()+")</a></span></li>";
+//				loadPruefungStudiengang(e.studiengang_kz);
+			});
+			$("#stgListe").append(liste);
+		}
+		else
+		{
+			messageBox("message", data.errormsg, "red", "highlight", 4000);
+		}
+	}).complete(function(event, xhr, settings){
+		
+	});
+}
+
+/**
+ * Lädt alle Prüfungen zu einem Studiengang
+ * @param {type} studiengang_kz Studiengangskennzahl
+ * @returns {undefined}
+ */
+function loadPruefungStudiengang(studiengang_kz)
+{
+	var progressBarStep = 100/progressBarCount;
+	$.ajax({
+		dataType: 'json',
+		url: "./pruefungsanmeldung.json.php",
+		type: "POST",
+		data: {
+			method: "getPruefungenStudiengang",
+			studiengang_kz: studiengang_kz
+		},
+		error: loadError
+	}).success(function(data){
+		console.log(data);
+		if(data.error === 'false')
+		{
+			$("#pruefungenListe").empty();
+			if(data.result.length > 0)
+			{
+				var liste = "";
+				data.result.forEach(function(e){
+					liste += "<ul><li>"+e.bezeichnung+"<ul>";
+					e.pruefung.termine.forEach(function(d){
+						liste += "<li> <a onclick='showAnmeldungen(\""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung_id+"\");'>"+convertDateTime(d.von)+" "+convertDateTime(d.von, "time")+" - "+convertDateTime(d.bis, "time")+"</a></li>";
+					})
+					liste += "</li></ul></ul>";
+				});
+//				$("#stg"+studiengang_kz).append(liste);
+				$("#pruefungenListe").append(liste);
+			}
+			else
+			{
+				$("#pruefungenListe").html("Keine Prüfungen vorhanden.");
+			}
+		}
+		else
+		{
+			messageBox("message", data.errormsg, "red", "highlight", 4000);
+		}
+	}).complete(function(event, xhr, settings){
+//		var value = $("#progressbar").progressbar("option", "value");
+//		$("#progressbar").progressbar({
+//			value: (value += 1)
+//		});
+//		if(value === progressBarCount)
+//		{
+//			$(".modalOverlay").remove();
+//			$("#progressbar").hide();
+////			
+////			var width = $("#prfWrapper").width();
+////			$("#prfWrapper").width(width+40);
+////			$("#anmWrapper").css("left", width+80+"px");
+//		}
+	});
 }
