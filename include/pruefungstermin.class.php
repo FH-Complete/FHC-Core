@@ -126,6 +126,10 @@ class pruefungstermin extends basis_db{
         
     }
     
+    /**
+     * Lädt die Anzahl der Anmeldungen zu eine Prüfung
+     * @return boolean|integer Anzahl der Teilnehmer; false, wenn Fehler
+     */
     public function getNumberOfParticipants()
     {
         $qry = 'SELECT * FROM campus.tbl_pruefungsanmeldung WHERE pruefungstermin_id='.$this->db_add_param($this->pruefungstermin_id).';';
