@@ -409,13 +409,3 @@ function deleteRegel(id)
 	});
 }
 
-/**
- * Entfernt Null Werte
- */
-function ClearNull(value)
-{
-	if(value===null)
-		return '';
-	else
-		return value;
-}
