@@ -122,6 +122,10 @@ echo "
 	{
 		background-color: #F99F9F;
 	}
+	#filteredLVs > div.jstree-grid-wrapper
+	{
+		width: 600px;
+	}
 
 	</style>
 </head>
@@ -219,8 +223,8 @@ echo'
 				</div>
 			</div>
 			<h2>Lehrveranstaltungen</h2>
-			<div style="margin:0px;padding:5px;">
-				<div id="filteredLVs" style="width: 400px; max-height:500px; overflow: auto;">
+			<div style="margin:0px;padding:5px;max-width:400px;">
+				<div id="filteredLVs" style="width:400px; max-height:500px; overflow:auto;">
 					<div id="lvListe">
 						Keine Einträge gefunden!
 					</div>
