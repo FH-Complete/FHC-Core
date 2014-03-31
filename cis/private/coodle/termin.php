@@ -123,7 +123,11 @@ if(isset($_POST['action']) && $_POST['action']=='start')
 				}
 				$anrede = trim($anrede);
 				$sign = $p->t('mail/signatur');
-				
+				$von = $uid.'@'.DOMAIN;
+				$benutzer = new benutzer();
+				$benutzer->load($uid);
+				if ($benutzer->alias!='')
+					$von = $benutzer->alias.'@'.DOMAIN;
 				
 				$html=$anrede.'!<br><br>
 					Sie wurden zu einer Terminumfrage zum Thema "'.$db->convert_html_chars($coodle->titel).'" eingeladen.
@@ -136,7 +140,7 @@ if(isset($_POST['action']) && $_POST['action']=='start')
 					Bitte folgen Sie dem Link um Ihre Terminwünsche bekannt zu geben:\n
 					$link\n\n$sign";
 				
-				$mail = new mail($email, 'no-reply@'.DOMAIN,'Termineinladung - '.$coodle->titel, $text);
+				$mail = new mail($email, $von,'Termineinladung - '.$coodle->titel, $text);
 				$mail->setHTMLContent($html);
 				if($mail->send())
 				{

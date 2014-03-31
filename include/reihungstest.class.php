@@ -255,11 +255,15 @@ class reihungstest extends basis_db
 	 * Liefert die Reihungstests eines Studienganges
 	 *
 	 * @param $studiengang_kz
+	 * @param $order (optional)
 	 * @return true wenn ok, sonst false
 	 */
-	public function getReihungstest($studiengang_kz)
+	public function getReihungstest($studiengang_kz,$order=null)
 	{
 		$qry = "SELECT * FROM public.tbl_reihungstest WHERE studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER, false);
+		
+		if ($order!=null)
+			$qry .=" ORDER BY ".$order.";";
 		
 		if($this->db_query($qry))
 		{
