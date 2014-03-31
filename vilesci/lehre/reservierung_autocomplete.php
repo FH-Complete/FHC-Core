@@ -46,4 +46,25 @@ if(isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete']=='ort')
 	}
 	exit;
 }
+if(isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete']=='ort_aktiv')
+{
+	$search=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
+	if (is_null($search) ||$search=='')
+		exit();	
+    
+    $ort_auswahl = new ort(); 
+
+	if($ort_auswahl->filter($search,true))
+	{
+		$result_obj = array();
+		foreach($ort_auswahl->result as $row)
+		{
+			$item['ort_kurzbz']=html_entity_decode($row->ort_kurzbz);
+			$item['planbezeichnung']=html_entity_decode($row->planbezeichnung);
+			$result_obj[]=$item;
+		}
+		echo json_encode($result_obj);
+	}
+	exit;
+}
 ?>

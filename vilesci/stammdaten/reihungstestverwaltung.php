@@ -19,6 +19,7 @@
  *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
+ *          Manfred Kindl		< manfred.kindl@technikum-wien.at >
  */
 /**
  * Reihungstestverwaltung
@@ -200,9 +201,44 @@
 				<head>
 					<title>Reihungstest</title>
 					<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-					<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+					<!--<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">-->
 					<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-					<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+					<!--<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>-->
+					<script type="text/javascript" src="../../include/js/jquery.js"></script>
+					<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
+					<link href="../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
+					<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script> 
+					<script type="text/javascript">
+					$(document).ready(function() 
+						{ 
+						    $( "#datepicker_datum" ).datepicker($.datepicker.regional[\'de\']);
+					
+						    $("#ort").autocomplete({
+								source: "../lehre/reservierung_autocomplete.php?autocomplete=ort_aktiv",
+								minLength:2,
+								response: function(event, ui)
+								{
+									//Value und Label fuer die Anzeige setzen
+									for(i in ui.content)
+									{
+										ui.content[i].value=ui.content[i].ort_kurzbz;
+										ui.content[i].label=ui.content[i].ort_kurzbz;
+									}
+								},
+								select: function(event, ui)
+								{
+									//Ausgeaehlte Ressource zuweisen und Textfeld wieder leeren
+									$("#ort_kurzbz").val(ui.item.uid);
+								}
+								});
+								
+							$("#t1").tablesorter(
+							{
+								sortList: [[3,0]],
+								widgets: ["zebra"]
+							}); 
+						});
+					</script>
 				</head>
 				<body class="Background_main">
 				<h2>Reihungstest - Verwaltung</h2>';
@@ -237,7 +273,7 @@
 			}
 			if($_POST['uhrzeit']!='' && !$datum_obj->checkUhrzeit($_POST['uhrzeit']))
 			{
-				echo '<span class="input_error">Uhrzeit ist ungueltig. Die Uhrzeit muss im Format HH:MM:SS angegeben werden!<br></span>';
+				echo '<span class="input_error">Uhrzeit ist ungueltig. Die Uhrzeit muss im Format HH:MM angegeben werden!<br></span>';
 				$error = true;
 			}
 			
@@ -352,7 +388,7 @@
 		if($stg_kz==-1)
 			$reihungstest->getAll(date('Y').'-01-01'); //Alle Reihungstests ab diesem Jahr laden
 		else
-			$reihungstest->getReihungstest($stg_kz);
+			$reihungstest->getReihungstest($stg_kz,'datum DESC,uhrzeit DESC');
 		
 		echo "<SELECT name='reihungstest' id='reihungstest' onchange='window.location.href=this.value'>";
 		foreach ($reihungstest->result as $row) 
@@ -361,10 +397,12 @@
 			//	$reihungstest_id=$row->reihungstest_id;
 			if($row->reihungstest_id==$reihungstest_id)
 				$selected='selected';
+			elseif ($selected=='' && $reihungstest_id=='' && $row->datum==date('Y-m-d'))
+				$selected='selected';
 			else
 				$selected='';
 				
-			echo '<OPTION value="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&reihungstest_id='.$row->reihungstest_id.'" '.$selected.'>'.$db->convert_html_chars($row->datum.' '.$row->uhrzeit.' '.$studiengang->kuerzel_arr[$row->studiengang_kz].' '.$row->ort_kurzbz.' '.$row->anmerkung).'</OPTION>';
+			echo '<OPTION value="'.$_SERVER['PHP_SELF'].'?stg_kz='.$stg_kz.'&reihungstest_id='.$row->reihungstest_id.'" '.$selected.'>'.$db->convert_html_chars($row->datum.' '.$datum_obj->formatDatum($row->uhrzeit,'H:i').' '.$studiengang->kuerzel_arr[$row->studiengang_kz].' '.$row->ort_kurzbz.' '.$row->anmerkung).'</OPTION>';
 			echo "\n";
 		}
 		echo '</SELECT>';
@@ -373,8 +411,9 @@
 		echo "<td align='right'>";
 		if($rechte->isBerechtigt('basis/testtool', null, 'suid'))
 		{
-			echo '<a href="reihungstest_administration.php">Administration</a>';
+			echo '<a href="reihungstest_administration.php">Administration</a><br>';
 		}
+		echo '<a href="../../cis/testtool/admin/auswertung.php?'.($reihungstest_id!=''?"reihungstest=$reihungstest_id":'').'" target="_blank">Auswertung</a>';
 		echo "</td></tr></table><br>";
 		
 		if($reihungstest_id=='')
@@ -419,36 +458,15 @@
 			else 
 				$selected = '';
 			
-			echo "<OPTION value='$row->studiengang_kz' $selected>".$db->convert_html_chars($row->kuerzel)."</OPTION>\n";
+			echo "<OPTION value='$row->studiengang_kz' $selected>".$db->convert_html_chars($row->kuerzel)." (".$db->convert_html_chars($row->bezeichnung).")</OPTION>\n";
 		}
 		echo "</SELECT></TD></TR>";
-		
-		//Ort DropDown
-		echo "<tr><td>Ort</td><td><SELECT name='ort_kurzbz'>";
-		
-		if($reihungstest->ort_kurzbz=='')
-			$selected = 'selected';
-		else 
-			$selected = '';
-		echo "<OPTION value='' $selected>-- keine Auswahl --</OPTION>";	
-		
-		$ort = new ort();
-		$ort->getAll();
-		
-		foreach ($ort->result as $row) 
-		{
-			if($row->ort_kurzbz==$reihungstest->ort_kurzbz)
-				$selected='selected';
-			else 
-				$selected='';
-			
-			echo "<OPTION value='$row->ort_kurzbz' $selected>".$db->convert_html_chars($row->ort_kurzbz)."</OPTION>\n";
-		}
-		echo '</SELECT></td></tr>';
-		echo '<tr><td>Anmerkung</td><td><input type="text" name="anmerkung" value="'.$db->convert_html_chars($reihungstest->anmerkung).'"></td></tr>';
-		echo '<tr><td>Datum</td><td><input type="text" name="datum" value="'.$datum_obj->convertISODate($reihungstest->datum).'"></td></tr>';
-		echo '<tr><td>Uhrzeit</td><td><input type="text" name="uhrzeit" value="'.$db->convert_html_chars($reihungstest->uhrzeit).'"> (Format: HH:MM:SS)</td></tr>';
-		echo '<tr><td>Freigeschaltet</td><td><input type="checkbox" name="freigeschaltet" '.($reihungstest->freigeschaltet?'checked="checked"':'').'></td></tr>';
+
+		echo '<tr><td>Ort</td><td><input id="ort" type="text" name="ort_kurzbz" placeholder="Ort eingeben" value="'.$db->convert_html_chars($reihungstest->ort_kurzbz).'"></td></tr>';
+		echo '<tr><td>Anmerkung</td><td><input type="text" size="64" maxlength="64" name="anmerkung" value="'.$db->convert_html_chars($reihungstest->anmerkung).'"> (max. 64 Zeichen)</td></tr>';
+		echo '<tr><td>Datum</td><td><input id="datepicker_datum" type="text" name="datum" value="'.$datum_obj->convertISODate($reihungstest->datum).'"></td></tr>';
+		echo '<tr><td>Uhrzeit</td><td><input type="text" name="uhrzeit" value="'.$db->convert_html_chars($datum_obj->formatDatum($reihungstest->uhrzeit,'H:i')).'"> (Format: HH:MM)</td></tr>';
+		echo '<tr><td>Freigeschaltet</td><td><input type="checkbox" name="freigeschaltet" '.($reihungstest->freigeschaltet?'checked="checked"':'').'> (Kurz vor Testbeginn aktivieren)</td></tr>';
 		if(!$neu)
 			$val = 'Änderung Speichern';
 		else 
@@ -463,7 +481,7 @@
 		if($reihungstest_id!='')
 		{
 			echo '<table width="100%"><tr><td>';
-			echo "<a href='".$_SERVER['PHP_SELF']."?reihungstest_id=$reihungstest_id&excel=true'>Excel Export</a>";
+			echo "<a href='".$_SERVER['PHP_SELF']."?reihungstest_id=$reihungstest_id&excel=true'><img src='../../skin/images/xls_icon.png' alt='Excel Icon'> Excel Export</a>";
 			echo '</td><td align="right">';
 			echo "<a href='".$_SERVER['PHP_SELF']."?reihungstest_id=$reihungstest_id&type=saveallrtpunkte'>alle Punkte ins FAS &uuml;bertragen</a>";
 			echo '</td></tr></table>';
@@ -478,22 +496,22 @@
 			$mailto = '';
 			if($result = $db->db_query($qry))
 			{
-				echo 'Anzahl: '.$db->db_num_rows($result);
+				echo '<span style="font-size: 9pt">Anzahl: '.$db->db_num_rows($result).'</span>';
 				$pruefling = new pruefling();
 				
-				echo "<table class='liste table-autosort:3 table-stripeclass:alternate table-autostripe'>
+				echo "<table class='tablesorter' id='t1'>
 						<thead>
 						<tr class='liste'>
-							<th class='table-sortable:default' title='PrestudentID'>ID</th>
-							<th class='table-sortable:default'>Vorname</th>
-							<th class='table-sortable:default'>Nachname</th>
-							<th class='table-sortable:default'>Studiengang</th>
-							<th class='table-sortable:default'>Einstiegssemester</th>
-							<th class='table-sortable:default'>Geburtsdatum</th>
-							<th class='table-sortable:default'>EMail</th>
-							<th class='table-sortable:default'>bereits absolvierte RTs</th>
-							<th class='table-sortable:default'>Ergebnis</th>
-							<th class='table-sortable:default'>FAS</th>
+							<th title='PrestudentID'>ID</th>
+							<th>Vorname</th>
+							<th>Nachname</th>
+							<th>Studiengang</th>
+							<th>Einstiegssemester</th>
+							<th>Geburtsdatum</th>
+							<th>EMail</th>
+							<th>bereits absolvierte RTs</th>
+							<th>Ergebnis</th>
+							<th>FAS</th>
 						</tr>
 						</thead>
 						<tbody>";
@@ -524,7 +542,7 @@
 							<td>'.$db->convert_html_chars($row->ausbildungssemester).'</td>
 							<td>'.$db->convert_html_chars($datum_obj->convertISODate($row->gebdatum)).'</td>
 							<td><a href="mailto:'.$db->convert_html_chars($row->email).'">'.$db->convert_html_chars($row->email).'</a></td>
-							<td>'.$db->convert_html_chars($rt_in_anderen_stg).'</td>
+							<td>'.$rt_in_anderen_stg.'</td>
 							<td align="right">'.($rtergebnis==0?'-':number_format($rtergebnis,2,'.','')).'</td>
 							<td align="right">'.($rtergebnis!=0 && $row->rt_punkte1==''?'<a href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&stg_kz='.$stg_kz.'&type=savertpunkte&prestudent_id='.$row->prestudent_id.'&rtpunkte='.$rtergebnis.'" >&uuml;bertragen</a>':$row->rt_punkte1).'</td>
 						</tr>';
@@ -532,7 +550,7 @@
 					$mailto.= ($mailto!=''?',':'').$row->email;
 				}
 				echo "</tbody></table>";
-				echo "<br><a href='mailto:?bcc=$mailto'>Mail an alle senden</a>";
+				echo "<span style='font-size: 9pt'><a href='mailto:?bcc=$mailto'>Mail an alle senden</a></span>";
 			}
 		}
 		echo '
