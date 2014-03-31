@@ -39,6 +39,7 @@ class dokument extends basis_db
 	public $insertamum;
 	public $insertvon;
 	public $ext_id;
+	public $onlinebewerbung; 
 	
 	/**
 	 * Konstruktor - Laedt optional ein Dokument
@@ -285,6 +286,7 @@ class dokument extends basis_db
 				$dok = new dokument();
 				$dok->dokument_kurzbz = $row->dokument_kurzbz;
 				$dok->bezeichnung = $row->bezeichnung;
+				$dok->onlinebewerbung = $this->db_parse_bool($row->onlinebewerbung); 
 				$this->result[] = $dok;
 			}
 			return true;

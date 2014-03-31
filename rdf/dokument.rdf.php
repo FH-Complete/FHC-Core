@@ -75,27 +75,97 @@ $date = new datum();
 
 <?php
 
+// Alle dokumenttypen die der Student abzugeben hat vom Studiengang
 foreach ($dok->result as $row)
 {
 	$akte = new akte(); 
 	$akte->getAkten($prestudent->person_id, $row->dokument_kurzbz); 
-	$datum=(isset($akte->result[0]->insertamum))?$date->formatDatum($akte->result[0]->insertamum, 'd.m.Y'):''; 
-	$nachgereicht = (isset($akte->result[0]->nachgereicht))?'ja':''; 
-	$info = (isset($akte->result[0]->anmerkung))?$akte->result[0]->anmerkung:''; 
+	// Schleife für alle Akten -> wenn akte draufhängt id in rdf -> akte_id anhängen
 	
-	?>
-  <RDF:li>
-      	<RDF:Description  id="<?php echo $row->dokument_kurzbz; ?>"  about="<?php echo $rdf_url.'/'.$row->dokument_kurzbz; ?>" >
-        	<DOKUMENT:dokument_kurzbz><![CDATA[<?php echo $row->dokument_kurzbz  ?>]]></DOKUMENT:dokument_kurzbz>
-    		<DOKUMENT:bezeichnung><![CDATA[<?php echo $row->bezeichnung  ?>]]></DOKUMENT:bezeichnung>
-			<DOKUMENT:datum><?php echo $datum; ?></DOKUMENT:datum>
-			<DOKUMENT:nachgereicht><?php echo $nachgereicht; ?></DOKUMENT:nachgereicht>
-			<DOKUMENT:infotext><?php echo $info; ?></DOKUMENT:infotext>
-      	</RDF:Description>
-  </RDF:li>
-	  <?php
+	$onlinebewerbung = ($row->onlinebewerbung)?'ja':'nein'; 
+	// Wenn Akten vorhanden anzeigen
+	if(count($akte->result) != 0)
+	{
+	
+		foreach($akte->result as $a)
+		{
+
+			$datum=(isset($a->insertamum))?$date->formatDatum($a->insertamum, 'd.m.Y'):''; 
+			$nachgereicht = (isset($a->nachgereicht))?'ja':''; 
+			$info = (isset($a->anmerkung))?$akte->result[0]->anmerkung:''; 
+			$vorhanden = (isset($a->dms_id))?'ja':'nein'; 
+
+
+			echo 	'
+			  <RDF:li>
+					<RDF:Description  id="'.$row->dokument_kurzbz.'/'.$a->akte_id.'"  about="'.$rdf_url.'/'.$row->dokument_kurzbz.'/'.$a->akte_id.'" >
+						<DOKUMENT:dokument_kurzbz><![CDATA['.$row->dokument_kurzbz.']]></DOKUMENT:dokument_kurzbz>
+						<DOKUMENT:bezeichnung><![CDATA['.$row->bezeichnung.']]></DOKUMENT:bezeichnung>
+						<DOKUMENT:datum><![CDATA['.$datum.']]></DOKUMENT:datum>
+						<DOKUMENT:nachgereicht><![CDATA['.$nachgereicht.']]></DOKUMENT:nachgereicht>
+						<DOKUMENT:infotext><![CDATA['.$info.']]></DOKUMENT:infotext>
+						<DOKUMENT:vorhanden><![CDATA['.$vorhanden.']]></DOKUMENT:vorhanden>
+						<DOKUMENT:akte_id><![CDATA['.$a->akte_id.']]></DOKUMENT:akte_id>
+						<DOKUMENT:titel_intern><![CDATA['.$a->titel_intern.']]></DOKUMENT:titel_intern>
+						<DOKUMENT:anmerkung_intern><![CDATA['.$a->anmerkung_intern.']]></DOKUMENT:anmerkung_intern>
+						<DOKUMENT:onlinebewerbung><![CDATA['.$onlinebewerbung.']]></DOKUMENT:onlinebewerbung>
+					</RDF:Description>
+			  </RDF:li>
+				  ';
+		}
+	}
+	else // Wenn keine Akten vorhanden sind -> Abzugebende anzeigen
+	{
+			echo 	'
+			  <RDF:li>
+					<RDF:Description  id="'.$row->dokument_kurzbz.'"  about="'.$rdf_url.'/'.$row->dokument_kurzbz.'" >
+						<DOKUMENT:dokument_kurzbz><![CDATA['.$row->dokument_kurzbz.']]></DOKUMENT:dokument_kurzbz>
+						<DOKUMENT:bezeichnung><![CDATA['.$row->bezeichnung.']]></DOKUMENT:bezeichnung>
+						<DOKUMENT:datum></DOKUMENT:datum>
+						<DOKUMENT:nachgereicht></DOKUMENT:nachgereicht>
+						<DOKUMENT:infotext></DOKUMENT:infotext>
+						<DOKUMENT:vorhanden><![CDATA[nein]]></DOKUMENT:vorhanden>
+						<DOKUMENT:akte_id></DOKUMENT:akte_id>
+						<DOKUMENT:titel_intern></DOKUMENT:titel_intern>
+						<DOKUMENT:anmerkung_intern></DOKUMENT:anmerkung_intern>
+						<DOKUMENT:onlinebewerbung><![CDATA['.$onlinebewerbung.']]></DOKUMENT:onlinebewerbung>
+					</RDF:Description>
+			  </RDF:li>
+				  ';
+	}
 }
 
+// Alle Akten/Dokumente holen die Upgeloaded wurden ohne die vom Studiengang und Zeugnisse
+$akte = new akte(); 
+if(!$akte->getAkten($prestudent->person_id, null, $prestudent->studiengang_kz, $prestudent->prestudent_id))
+	die('fehler'); 
+
+foreach($akte->result as $a)
+{
+
+	$datum=(isset($a->insertamum))?$date->formatDatum($a->insertamum, 'd.m.Y'):''; 
+	$nachgereicht = (isset($a->nachgereicht))?'ja':''; 
+	$info = (isset($a->anmerkung))?$akte->result[0]->anmerkung:''; 
+	$vorhanden = (isset($a->dms_id))?'ja':'nein'; 
+
+
+	echo 	'
+	  <RDF:li>
+			<RDF:Description  id="'.$a->dokument_kurzbz.'/'.$a->akte_id.'"  about="'.$rdf_url.'/'.$a->dokument_kurzbz.'/'.$a->akte_id.'" >
+				<DOKUMENT:dokument_kurzbz><![CDATA['.$a->dokument_kurzbz.']]></DOKUMENT:dokument_kurzbz>
+				<DOKUMENT:bezeichnung><![CDATA['.$a->bezeichnung.']]></DOKUMENT:bezeichnung>
+				<DOKUMENT:datum>'.$datum.'</DOKUMENT:datum>
+				<DOKUMENT:nachgereicht>'.$nachgereicht.'</DOKUMENT:nachgereicht>
+				<DOKUMENT:infotext>'.$info.'</DOKUMENT:infotext>
+				<DOKUMENT:vorhanden>'.$vorhanden.'</DOKUMENT:vorhanden>
+				<DOKUMENT:akte_id>'.$a->akte_id.'</DOKUMENT:akte_id>
+				<DOKUMENT:titel_intern><![CDATA['.$a->titel_intern.']]></DOKUMENT:titel_intern>
+				<DOKUMENT:anmerkung_intern><![CDATA['.$a->anmerkung_intern.']]></DOKUMENT:anmerkung_intern>
+				<DOKUMENT:onlinebewerbung><![CDATA[nein]]></DOKUMENT:onlinebewerbung>
+			</RDF:Description>
+	  </RDF:li>
+		  ';
+}
 ?>
 
   </RDF:Seq>

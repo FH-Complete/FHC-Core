@@ -36,6 +36,46 @@ if(isset($_GET['id']) && is_numeric($_GET['id']))
 	echo base64_decode($akte->inhalt);
 }
 
+if(isset($_GET['akte_id']) && is_numeric($_GET['akte_id']))
+{
+	$akte = new akte(); 
+	if(!$akte->load($_GET['akte_id']))
+		die('Fehler beim Laden der Akte'); 
+	
+	$dms = new dms(); 
+	if(!$dms->load($akte->dms_id))
+		die('Kein Dokument vorhanden'); 
+	
+	$filename=DMS_PATH.$dms->filename; 
+    
+    
+    if(!isset($_GET['notimeupdate']))
+        $dms->touch($dms->dms_id, $dms->version);
+
+    if(file_exists($filename))
+    {
+        if($handle = fopen($filename,"r"))
+        {
+            if($dms->mimetype=='')
+                $dms->mimetype='application/octetstream';
+
+            header('Content-type: '.$dms->mimetype);
+            header('Content-Disposition: inline; filename="'.$dms->name.'"');
+            header('Content-Length: ' .filesize($filename));
+
+            while (!feof($handle)) 
+            {
+                echo fread($handle, 8192);
+            }
+            fclose($handle);
+        }
+        else
+            echo 'Fehler: Datei konnte nicht geoeffnet werden';
+    }
+    else
+        echo 'Die Datei existiert nicht';
+	
+}
 
 if(isset($_GET['person_id']) && isset($_GET['dokument_kurzbz']))
 {

@@ -354,11 +354,37 @@ function ShowDokument()
 		i = tree.currentIndex;
 	else
 		i = 0;
-	col = tree.columns ? tree.columns["interessent-dokumente-tree-nichtabgegeben-dokument_kurzbz"] : "interessent-dokumente-tree-abgegeben-nichtdokument_kurzbz";
-	InteressentDokumentTreeNichtAbgegebenSelectID = tree.view.getCellText(i,col);
-    person_id = document.getElementById('student-prestudent-textbox-person_id').value
+		
+	col = tree.columns ? tree.columns["interessent-dokumente-tree-nichtabgegeben-akte_id"] : "interessent-dokumente-tree-nichtabgegeben-akte_id";
+	var akte_id=tree.view.getCellText(tree.currentIndex,col);
     
-    window.open("<?php echo APP_ROOT; ?>content/akte.php?person_id="+person_id+"&dokument_kurzbz="+InteressentDokumentTreeNichtAbgegebenSelectID,"","chrome, status=no, width=500, height=350, centerscreen, resizable");
+    window.open("<?php echo APP_ROOT; ?>content/akte.php?akte_id="+akte_id,"","chrome, status=no, width=500, height=350, centerscreen, resizable");
+}
+function ShowDokumentAbgegeben()
+{
+    var i;
+	var tree=document.getElementById('interessent-dokumente-tree-abgegeben');
+	if(tree.currentIndex>=0)
+		i = tree.currentIndex;
+	else
+		i = 0;
+		
+	col = tree.columns ? tree.columns["interessent-dokumente-tree-abgegeben-akte_id"] : "interessent-dokumente-tree-abgegeben-akte_id";
+	var akte_id=tree.view.getCellText(tree.currentIndex,col);
+    
+    window.open("<?php echo APP_ROOT; ?>content/akte.php?akte_id="+akte_id,"","chrome, status=no, width=500, height=350, centerscreen, resizable");
+}
+
+
+function InteressentDokumenteUpload()
+{
+	person_id = document.getElementById('student-prestudent-textbox-person_id').value
+	if(person_id != '')
+	{
+		window.open("<?php echo APP_ROOT; ?>content/akteupload.php?person_id="+person_id ,"","chrome, status=no, width=500, height=350, centerscreen, resizable");
+	}
+	else
+		alert("kein Student ausgewählt"); 
 }
 
 function InteressentDokumenteFilter()

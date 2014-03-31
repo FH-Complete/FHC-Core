@@ -69,24 +69,51 @@ foreach ($dok->result as $row)
 	
 	$akte = new akte(); 
 	$akte->getAkten($prestudent->person_id, $row->dokument_kurzbz); 
-	$datum=(isset($akte->result[0]->insertamum))?$date->formatDatum($akte->result[0]->insertamum, 'd.m.Y'):''; 
-	$nachgereicht = (isset($akte->result[0]->nachgereicht))?'ja':''; 
-	$info = (isset($akte->result[0]->anmerkung))?$akte->result[0]->anmerkung:''; 
 	
-	echo '
-	  <RDF:li>
-	      	<RDF:Description  id="'.$row->dokument_kurzbz.'/'.$row->prestudent_id.'"  about="'.$rdf_url.'/'.$row->dokument_kurzbz.'/'.$row->prestudent_id.'" >
-	        	<DOKUMENT:dokument_kurzbz><![CDATA['.$row->dokument_kurzbz.']]></DOKUMENT:dokument_kurzbz>
-	    		<DOKUMENT:prestudent_id><![CDATA['.$row->prestudent_id.']]></DOKUMENT:prestudent_id>
-	    		<DOKUMENT:mitarbeiter_uid><![CDATA['.$row->mitarbeiter_uid.']]></DOKUMENT:mitarbeiter_uid>
-	    		<DOKUMENT:datum><![CDATA['.$date->convertISODate($row->datum).']]></DOKUMENT:datum>
-	    		<DOKUMENT:datum_iso><![CDATA['.$row->datum.']]></DOKUMENT:datum_iso>
-	    		<DOKUMENT:bezeichnung><![CDATA['.$row->bezeichnung.']]></DOKUMENT:bezeichnung>
-				<DOKUMENT:nachgereicht><![CDATA['.$nachgereicht.']]></DOKUMENT:nachgereicht>
-				<DOKUMENT:infotext><![CDATA['.$info.']]></DOKUMENT:infotext>
-	      	</RDF:Description>
-	  </RDF:li>
-	';
+	if(count($akte->result) != 0)
+	{
+		foreach($akte->result as $a)
+		{
+			$datum=(isset($a->insertamum))?$date->formatDatum($a->insertamum, 'd.m.Y'):''; 
+			$nachgereicht = (isset($a->nachgereicht))?'ja':''; 
+			$info = (isset($a->anmerkung))?$a->anmerkung:''; 
+			$vorhanden = (isset($a->dms_id))?'ja':'nein'; 
+
+				echo 	'
+				  <RDF:li>
+						<RDF:Description  id="'.$row->dokument_kurzbz.'/'.$a->akte_id.'"  about="'.$rdf_url.'/'.$row->dokument_kurzbz.'/'.$a->akte_id.'" >
+							<DOKUMENT:dokument_kurzbz><![CDATA['.$row->dokument_kurzbz.']]></DOKUMENT:dokument_kurzbz>
+							<DOKUMENT:bezeichnung><![CDATA['.$row->bezeichnung.']]></DOKUMENT:bezeichnung>
+							<DOKUMENT:datum>'.$datum.'</DOKUMENT:datum>
+							<DOKUMENT:nachgereicht>'.$nachgereicht.'</DOKUMENT:nachgereicht>
+							<DOKUMENT:infotext>'.$info.'</DOKUMENT:infotext>
+							<DOKUMENT:vorhanden>'.$vorhanden.'</DOKUMENT:vorhanden>
+							<DOKUMENT:akte_id>'.$a->akte_id.'</DOKUMENT:akte_id>
+							<DOKUMENT:titel_intern><![CDATA['.$a->titel_intern.']]></DOKUMENT:titel_intern>
+							<DOKUMENT:anmerkung_intern><![CDATA['.$a->anmerkung_intern.']]></DOKUMENT:anmerkung_intern>
+						</RDF:Description>
+				  </RDF:li>
+					  ';
+		}
+	}
+	else // Wenn keine Akten vorhanden sind -> Abzugebende anzeigen
+	{
+			echo 	'
+			  <RDF:li>
+					<RDF:Description  id="'.$row->dokument_kurzbz.'"  about="'.$rdf_url.'/'.$row->dokument_kurzbz.'" >
+						<DOKUMENT:dokument_kurzbz><![CDATA['.$row->dokument_kurzbz.']]></DOKUMENT:dokument_kurzbz>
+						<DOKUMENT:bezeichnung><![CDATA['.$row->bezeichnung.']]></DOKUMENT:bezeichnung>
+						<DOKUMENT:datum></DOKUMENT:datum>
+						<DOKUMENT:nachgereicht></DOKUMENT:nachgereicht>
+						<DOKUMENT:infotext></DOKUMENT:infotext>
+						<DOKUMENT:vorhanden><![CDATA[nein]]></DOKUMENT:vorhanden>
+						<DOKUMENT:akte_id></DOKUMENT:akte_id>
+						<DOKUMENT:titel_intern></DOKUMENT:titel_intern>
+						<DOKUMENT:anmerkung_intern></DOKUMENT:anmerkung_intern>
+					</RDF:Description>
+			  </RDF:li>
+				  ';
+	}
 }
 
 ?>

@@ -45,6 +45,8 @@ class akte extends basis_db
 	public $dms_id;
     public $nachgereicht; 
     public $anmerkung; 
+	public $titel_intern; 
+	public $anmerkung_intern; 
 	
 	/**
 	 * Konstruktor
@@ -95,6 +97,8 @@ class akte extends basis_db
 				$this->dms_id = $row->dms_id;
                 $this->anmerkung = $row->anmerkung; 
                 $this->nachgereicht = $this->db_parse_bool($row->nachgereicht); 
+				$this->titel_intern = $row->titel_intern; 
+				$this->anmerkung_intern = $row->anmerkung_intern; 
 				return true;		
 			}
 			else 
@@ -177,7 +181,7 @@ class akte extends basis_db
 		{
 			//Neuen Datensatz anlegen	
 			$qry = "BEGIN;INSERT INTO public.tbl_akte (person_id, dokument_kurzbz, inhalt, mimetype, erstelltam, gedruckt, titel, 
-					bezeichnung, updateamum, updatevon, insertamum, insertvon, ext_id, uid, dms_id, nachgereicht, anmerkung ) VALUES (".
+					bezeichnung, updateamum, updatevon, insertamum, insertvon, ext_id, uid, dms_id, nachgereicht, anmerkung, titel_intern, anmerkung_intern ) VALUES (".
 			       $this->db_add_param($this->person_id, FHC_INTEGER).', '.
 			       $this->db_add_param($this->dokument_kurzbz).', '.
 			       $this->db_add_param($this->inhalt).', '.
@@ -194,7 +198,9 @@ class akte extends basis_db
 			       $this->db_add_param($this->uid).','.
                     $this->db_add_param($this->dms_id, FHC_INTEGER).','.
                     $this->db_add_param($this->nachgereicht, FHC_BOOLEAN).','.
-			       $this->db_add_param($this->anmerkung).');';
+					$this->db_add_param($this->anmerkung).','.
+					$this->db_add_param($this->titel_intern).','.
+			       $this->db_add_param($this->anmerkung_intern).');';
 			       
 		}
 		else 
@@ -215,7 +221,9 @@ class akte extends basis_db
 				  " uid=".$this->db_add_param($this->uid).",".
                   " dms_id=".$this->db_add_param($this->dms_id, FHC_INTEGER).",".
                   " nachgereicht=".$this->db_add_param($this->nachgereicht, FHC_BOOLEAN).",".
-				  " anmerkung=".$this->db_add_param($this->anmerkung).
+					" anmerkung=".$this->db_add_param($this->anmerkung).",".
+					" titel_intern=".$this->db_add_param($this->titel_intern).",".
+				  " anmerkung_intern=".$this->db_add_param($this->anmerkung_intern).
 				  " WHERE akte_id=".$this->db_add_param($this->akte_id, FHC_INTEGER);
 		}
 		
@@ -261,18 +269,28 @@ class akte extends basis_db
 	 *
 	 * @param $person_id
 	 * @param $dokument_kurzbz
+	 * @param $stg_kz -> wenn gesetzt werden  nur alle akten angezeigt die ZUSÄTLICH zum Studiengang abgegeben worden sind ohne Zeugnis
+	 * @param $prestudent_id -> gesetzt wenn auch stg_kz gesetzt ist. Um sicherzugehen dass akten die er schon für seinen studiengang abgegeben hat, 
+	 * nicht mehr angezeigt werden
 	 * @return true wenn ok, sonst false
 	 */
-	public function getAkten($person_id, $dokument_kurzbz=null)
+	public function getAkten($person_id, $dokument_kurzbz=null, $stg_kz = null, $prestudent_id= null)
 	{
 		$qry = "SELECT 
-					akte_id, person_id, dokument_kurzbz, mimetype, erstelltam, gedruckt, 
+					akte_id, person_id, dokument_kurzbz, mimetype, erstelltam, gedruckt, titel_intern, anmerkung_intern,
 					titel, bezeichnung, updateamum, insertamum, updatevon, insertvon, uid, dms_id, anmerkung, nachgereicht
 				FROM public.tbl_akte WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 		if($dokument_kurzbz!=null)
 			$qry.=" AND dokument_kurzbz=".$this->db_add_param($dokument_kurzbz);
-		$qry.=" ORDER BY erstelltam";
+		if($stg_kz != null && $prestudent_id != null)
+			$qry.=" AND dokument_kurzbz not in (SELECT dokument_kurzbz FROM public.tbl_dokument JOIN public.tbl_dokumentstudiengang USING(dokument_kurzbz) 
+				WHERE studiengang_kz= ".$this->db_add_param($stg_kz).") AND dokument_kurzbz NOT IN ('Zeugnis') AND dokument_kurzbz NOT IN 
+				(SELECT dokument_kurzbz FROM public.tbl_dokumentprestudent JOIN public.tbl_dokument USING(dokument_kurzbz) 
+				WHERE prestudent_id=".$this->db_add_param($prestudent_id).")";
 		
+		$qry.=" ORDER BY erstelltam";
+
+		$this->errormsg = $qry; 
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -296,6 +314,8 @@ class akte extends basis_db
 				$akten->dms_id = $row->dms_id;
                 $akten->nachgereicht = $this->db_parse_bool($row->nachgereicht); 
                 $akten->anmerkung = $row->anmerkung; 
+				$akten->titel_intern = $row->titel_intern; 
+				$akten->anmerkung_intern = $row->anmerkung_intern; 
 				
 				$this->result[] = $akten;
 			}
@@ -348,6 +368,8 @@ class akte extends basis_db
 				$akten->dms_id = $row->dms_id;
                 $akten->nachgereicht = $this->db_parse_bool($row->nachgereicht); 
                 $akten->anmerkung = $row->anmerkung; 
+				$akten->titel_intern = $row->titel_intern; 
+				$akten->anmerkung_intern = $row->anmerkung_inter; 
 				
 				$this->result[] = $akten;
 			}
@@ -357,7 +379,7 @@ class akte extends basis_db
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
-		}			
+		}
 	}
     
 }
