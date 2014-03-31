@@ -152,6 +152,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-semester-overlay.xu
 	seltype="multi" hidecolumnpicker="false" flex="1"
 	enableColumnDrag="true"
     ondraggesture="nsDragAndDrop.startDrag(event,mitarbeiterDDObserver);"
+    ondrop="nsDragAndDrop.drop(event,LektorFunktionDDObserver)"
 	ondragdrop="nsDragAndDrop.drop(event,LektorFunktionDDObserver)"
 	ondragover="nsDragAndDrop.dragOver(event,LektorFunktionDDObserver)"
 	ondragenter="nsDragAndDrop.dragEnter(event,LektorFunktionDDObserver)"
@@ -193,11 +194,11 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-semester-overlay.xu
 
 <vbox id="vbox-main">
 <popupset>
-		<popup id="fasoverlay-lektor-tree-popup">
+		<menupopup id="fasoverlay-lektor-tree-popup">
 			<menuitem label="Mail senden" oncommand="LektorFunktionMail();" />
 			<menuseparator />
 			<menuitem label="Entfernen" oncommand="LektorFunktionDel();" />			
-		</popup>
+		</menupopup>
 </popupset>
 	<tabbox id="tabbox-main" flex="3" orient="vertical">
 		<tabs orient="horizontal">
