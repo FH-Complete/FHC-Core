@@ -46,6 +46,10 @@ $rechte->getBerechtigungen($uid);
         <link rel="stylesheet" href="../../../../skin/tablesort.css">
 	<link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
 	<style type="text/css">
+	    body {
+		padding: 10px 0 0 10px;
+	    }
+	    
 	    #stgWrapper {
 		position: absolute;
 		height: 80%;
@@ -72,7 +76,7 @@ $rechte->getBerechtigungen($uid);
 		position: absolute;
 		height: 80%;
 		width: 300px;
-		left: 500px;
+		left: 510px;
 		padding: 1.8em 1.5em 1.8em 1em;
 		border-radius: 25px;
 		/*border: 1px solid black;*/
@@ -91,9 +95,9 @@ $rechte->getBerechtigungen($uid);
 	    }
 	    
 	    #anmWrapper {
-		position: fixed;
-		top: 45px;
-		left: 850px;
+		position: absolute;
+		/*top: 45px;*/
+		left: 860px;
 		width: 500px;
 		height: 80%;
 		padding: 1.8em 1.5em 1.8em 1em;
