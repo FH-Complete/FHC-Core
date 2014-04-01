@@ -100,7 +100,15 @@ class pruefungsanmeldung extends basis_db {
         }
         else
         {
-            //UPDATE
+            $qry = 'UPDATE campus.tbl_pruefungsanmeldung SET '
+		    . 'uid='.$this->db_add_param($this->uid).', '
+		    . 'pruefungstermin_id='.$this->db_add_param($this->pruefungstermin_id).', '
+		    . 'lehrveranstaltung_id='.$this->db_add_param($this->lehrveranstaltung_id).', '
+		    . 'status_kurzbz='.$this->db_add_param($this->status_kurzbz).', '
+		    . 'wuensche='.$this->db_add_param($this->wuensche).', '
+		    . 'reihung='.$this->db_add_param($this->reihung).', '
+		    . 'kommentar='.$this->db_add_param($this->kommentar)
+		    . ' WHERE pruefungsanmeldung_id='.$this->db_add_param($this->pruefungsanmeldung_id).';';
         }
         
         if ($this->db_query($qry))
@@ -138,7 +146,7 @@ class pruefungsanmeldung extends basis_db {
         {
             if($row = $this->db_fetch_object())
             {
-                $this->pruefungsanmeldung_id = $row->pruefunganmeldung_id;
+                $this->pruefungsanmeldung_id = $row->pruefungsanmeldung_id;
                 $this->uid = $row->uid;
                 $this->pruefungstermin_id = $row->pruefungstermin_id;
                 $this->lehrveranstaltung_id = $row->lehrveranstaltung_id;

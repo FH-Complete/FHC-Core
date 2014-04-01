@@ -597,9 +597,7 @@ class pruefungCis extends basis_db
 	{
 	    $in = $lehrveranstaltung_IDs;
 	}
-        
-        
-            
+	
         $qry = 'SELECT * FROM campus.tbl_lehrveranstaltung_pruefung WHERE lehrveranstaltung_id IN ('.$in.');';
         
         if($this->db_query($qry))
