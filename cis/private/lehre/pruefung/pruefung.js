@@ -829,9 +829,9 @@ function loadPruefungStudiengang(studiengang_kz)
 				var liste = "";
 				data.result.forEach(function(e){
 					liste += "<ul><li>"+e.bezeichnung+"<ul>";
-					e.pruefung.termine.forEach(function(d){
+					e.pruefung[0].termine.forEach(function(d){
 						liste += "<li> <a onclick='showAnmeldungen(\""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung_id+"\");'>"+convertDateTime(d.von)+" "+convertDateTime(d.von, "time")+" - "+convertDateTime(d.bis, "time")+"</a></li>";
-					})
+					});
 					liste += "</li></ul></ul>";
 				});
 				$("#pruefungenListe").append(liste);

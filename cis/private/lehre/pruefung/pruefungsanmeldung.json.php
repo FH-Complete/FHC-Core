@@ -5,7 +5,7 @@ header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 header( 'Pragma: no-cache' );
 header('Content-Type: text/html;charset=UTF-8');
 
-require_once('../../../../config/vilesci.config.inc.php');
+require_once('../../../../config/cis.config.inc.php');
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/pruefungCis.class.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
@@ -611,11 +611,16 @@ function getPruefungenStudiengang()
     {
 	$pruefung = new pruefungCis();
 	$pruefung->getPruefungByLv($lv->lehrveranstaltung_id);
-	if($pruefung->lehrveranstaltungen[0]->pruefung_id !== null)
+	if((!empty($pruefung->lehrveranstaltungen)))
 	{
-	    $pruefung->load($pruefung->lehrveranstaltungen[0]->pruefung_id);
+	    $lv->pruefung = array();
+	    foreach ($pruefung->lehrveranstaltungen as $prf)
+	    {
+	    $pruefung->load($prf->pruefung_id);
 	    $pruefung->getTermineByPruefung();
-	    $lv->pruefung = $pruefung;
+	    array_push($lv->pruefung, $pruefung);
+	    
+	    }
 	    array_push($result, $lv);
 	}
     }
