@@ -31,6 +31,10 @@ $db = new basis_db();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
+//TODO Berechtigung
+//if(!$rechte->isBerechtigt('lehre/pruefungsanmeldung'))
+//	die('Sie haben keine Berechtigung für diese Seite');
+
 ?>
 <html>
     <head>
@@ -75,7 +79,7 @@ $rechte->getBerechtigungen($uid);
 	    #prfWrapper {
 		position: absolute;
 		height: 80%;
-		width: 300px;
+		width: 200px;
 		left: 510px;
 		padding: 1.8em 1.5em 1.8em 1em;
 		border-radius: 25px;
@@ -97,8 +101,8 @@ $rechte->getBerechtigungen($uid);
 	    #anmWrapper {
 		position: absolute;
 		/*top: 45px;*/
-		left: 860px;
-		width: 500px;
+		left: 760px;
+		width: 400px;
 		height: 80%;
 		padding: 1.8em 1.5em 1.8em 1em;
 		border-radius: 25px;
@@ -133,7 +137,7 @@ $rechte->getBerechtigungen($uid);
 	    }
 	    #sortable li { 
 		margin: 0 3px 3px 3px; 
-		padding: 0.4em; 
+		padding: 0.2em 0.4em 0.4em; 
 		padding-left: 1.5em; 
 		font-size: 1.4em; 
 		height: 18px;
@@ -161,6 +165,7 @@ $rechte->getBerechtigungen($uid);
 	    #sortable li div {
 		float: right;
 		margin-left: 5px;
+		font-size: 0.8em;
 	    }
 	    
 	    .anmerkungInfo {
@@ -224,6 +229,12 @@ $rechte->getBerechtigungen($uid);
 		</div>
 		<div id="reihungSpeichernButton">
 
+		</div>
+		<div id="kommentar">
+		    
+		</div>
+		<div id="kommentarSpeichernButton">
+		    
 		</div>
 	    </div>
 	</div>

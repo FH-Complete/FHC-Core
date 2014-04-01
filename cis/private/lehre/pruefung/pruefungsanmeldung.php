@@ -85,7 +85,7 @@ $benutzer = new student($uid);
 	    }
 	    
 	    #accordion {
-		width: 50%;
+		width: 80%;
 		clear: left;
 		clear: right;
 	    }
