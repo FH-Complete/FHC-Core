@@ -70,6 +70,9 @@ switch($method)
 	case 'getPruefungenStudiengang':
 	    $data = getPruefungenStudiengang();
 	    break;
+	case 'saveKommentar':
+	    $data = saveKommentar();
+	    break;
 	default:
 	    break;
 }
@@ -619,6 +622,27 @@ function getPruefungenStudiengang()
     $data['result']=$result;
     $data['error']='false';
     $data['errormsg']='';
+    return $data;
+}
+
+function saveKommentar()
+{
+    $kommentar = $_REQUEST["kommentar"];
+    $pruefungsanmeldung_id = $_REQUEST["pruefungsanmeldung_id"];
+    
+    $pruefungsanmeldung = new pruefungsanmeldung($pruefungsanmeldung_id);
+    $pruefungsanmeldung->kommentar = $kommentar;
+    if($pruefungsanmeldung->save())
+    {	
+	$data['result']=true;
+	$data['error']='false';
+	$data['errormsg']='';
+    }
+    else
+    {
+	$data['error']='true';
+	$data['errormsg']=$pruefungsanmeldung->errormsg;
+    }
     return $data;
 }
 ?>
