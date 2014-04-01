@@ -306,6 +306,15 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 		// DIV fuer den Tree neu anlegen damit der alte Tree vollstaendig entfernt wird
 		$("#data").html("<div id='treeData'></div>");
 
+		function searchTree(element, matchingId)
+		{
+			if(($("#"+element.attr("id")).find("[lvid='"+matchingId+"']").attr("id") !== undefined) || ($("#"+element.attr("id")).attr("lvid") === matchingId))
+			{
+				return true;
+			}
+			return false;
+		}
+
 		// Anzeigen des Trees mit den Lehrveranstaltungen
 		$("#treeData").jstree({
 				ui: {
@@ -319,6 +328,20 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 					move: {
 						"always_copy": "multitree",
 						"check_move": function(m) {
+							if(m.ot === m.rt)
+							{
+								if(searchTree(m.r, m.o.attr("lvid")) === true)
+								{
+									return false;
+								}
+							}
+							else
+							{
+								if(searchTree(m.r, m.o.attr("id")) === true)
+								{
+									return false;
+								}
+							}
 							if(m.o.attr("rel")==="semester")
 							{
 								return false;
@@ -413,47 +436,43 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 				plugins: ["themes", "ui", "dnd", "grid", "json_data", "crrm", "types", "sort", "contextmenu"]
 			}).bind("move_node.jstree", function(event, data)
 			{
-				// Verschieben eines Eintrages
-
-				// Studienplan_lehrveranstaltung_id ermitteln	
-				var studienplan_lehrveranstaltung_id='';
-				if(data.rslt.o[0].attributes.studienplan_lehrveranstaltung_id)
-					studienplan_lehrveranstaltung_id=data.rslt.o[0].attributes.studienplan_lehrveranstaltung_id.value;
-
-				// Aenderung speichern
-				saveJsondataFromTree(data.rslt.o[0].id, studienplan_id, studienplan_lehrveranstaltung_id);
-
-				// ECTS Summen neu berechnen				
-				var root = data.inst.get_container_ul();
-				var nodes = root[0].childNodes;
-				for(var i=0; i<nodes.length; i++)
+				if(searchTree(data.rslt.r, data.rslt.o.attr("id")))
 				{
-					if(nodes[i].getAttribute("rel") === "semester")
-					{
-						writeEctsSum(nodes[i]);
-					}
-					
+					$("#treeData").jstree("remove", "#"+data.rslt.oc.attr("id"));
+					alert("Lehrveranstaltung bereits vorhanden");
 				}
-				hideAllTreeColumns();
-				writeOverallSum(nodes);
+				else
+				{
+					// Verschieben eines Eintrages
+
+					// Studienplan_lehrveranstaltung_id ermitteln	
+					var studienplan_lehrveranstaltung_id='';
+					if(data.rslt.o[0].attributes.studienplan_lehrveranstaltung_id)
+						studienplan_lehrveranstaltung_id=data.rslt.o[0].attributes.studienplan_lehrveranstaltung_id.value;
+
+					// Aenderung speichern
+					saveJsondataFromTree(data.rslt.o[0].id, studienplan_id, studienplan_lehrveranstaltung_id);
+
+					// ECTS Summen neu berechnen				
+					var root = data.inst.get_container_ul();
+					var nodes = root[0].childNodes;
+					for(var i=0; i<nodes.length; i++)
+					{
+						if(nodes[i].getAttribute("rel") === "semester")
+						{
+							writeEctsSum(nodes[i]);
+						}
+
+					}
+					hideAllTreeColumns();
+					writeOverallSum(nodes);
+				}
 			}).bind("loaded.jstree", function(event, data)
 			{
 				// Wenn der Tree geladen wird, die ECTS Summen der einzelnen Semester berechnen
-
-//				$(".col_ects").css("width", "5%");
-//				$(".header_ects").css("width", "5%");
-//				$(".col_ects").css("min-width", "50px");
-//				$(".header_ects").css("min-width", "50px");
-//				
-//				$("#data").find(".jstree-grid-col-0").each(function(index){
-//					$(this).css("width", "40%");
-////					console.log(this);
-//				});
-//				$(".header_lv").css("width", "40%");
 				
 				var root = data.inst.get_container_ul();
 				var nodes = root[0].childNodes;
-//				console.log(nodes);
 				for(var i=0; i<nodes.length; i++)
 				{
 					if(nodes[i].getAttribute("rel") === "semester"){
