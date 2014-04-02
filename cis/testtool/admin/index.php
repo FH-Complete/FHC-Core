@@ -672,12 +672,12 @@ if($frage_id!='')
 	//Wenn ein Bild vorhanden ist, dann anzeigen
 	if($frage->bild!='')
 	{
-		echo "\n<tr><td width='400' height='300'><img src='../bild.php?src=frage&amp;frage_id=$frage->frage_id&amp;sprache=$sprache' width='400' height='300' />";
+		echo "\n<tr><td width='400' height='300'><img src='../bild.php?src=frage&amp;frage_id=$frage->frage_id&amp;sprache=$sprache' width='400' />";
 	}
 	else
 	{
 		//echo "\n<tr><td align='center' width='400' height='300' style='background: #DDDDDD;'>Kein Bild vorhanden\n";
-		echo "\n<tr><td align='center' width='400' height='300' style='background: #DDDDDD;'>\n";
+		echo "\n<tr><td align='center' width='400' style='background: #DDDDDD;'>\n";
 		if($frage->audio=='')
 			echo "Kein Bild vorhanden\n";
 	}
@@ -823,7 +823,7 @@ if($frage_id!='')
 					  else
 					   echo "<td align='right' style='color:#FF8204'>$vs->punkte";
 					  echo "</td><td>$vs->text</td>
-					  <td><img src='../bild.php?src=vorschlag&amp;vorschlag_id=$vs->vorschlag_id&amp;sprache=$sprache' /></td>			
+					  <td>".($vs->bild!=''?"<img src='../bild.php?src=vorschlag&amp;vorschlag_id=$vs->vorschlag_id&amp;sprache=$sprache' height='24' onmouseover='height=200' onmouseout='height=24'/>":"")."</td>			
 					  <td>";
 			$a[] = $vs->punkte;
 			if($vs->audio!='')
@@ -847,7 +847,7 @@ if($frage_id!='')
 		}
 		
 		echo '<tr><td>Summe:</td><td align="left">'.number_format(array_sum($a),2, ".", "").'&nbsp;&nbsp;</td></tr>';
-		echo '</table>';
+		echo '</table><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>';
 	}
 }
 

@@ -28,9 +28,17 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/studiengang.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/Excel/excel.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
+
+$user = get_uid();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('lehre/reihungstest'))
+	die('Sie haben keine Berechtigung fuer diese Seite');
 
 function sortByField($multArray,$sortField,$desc=true)
 {
