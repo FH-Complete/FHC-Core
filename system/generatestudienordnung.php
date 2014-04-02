@@ -95,13 +95,13 @@ foreach($studiengang->result as $rowstg)
 			while($row = $db->db_fetch_object($result))
 			{
 				if($row->orgform_kurzbz!='')
-					createStudienplan($row->orgform_kurzbz, $studienordnung_id, $rowstg);
+					createStudienplan($row->orgform_kurzbz, $studienordnung_id, $rowstg, $studienordnung->bezeichnung);
 			}
 		}
 	}
 	else
 	{
-		createStudienplan($rowstg->orgform_kurzbz, $studienordnung_id, $rowstg);
+		createStudienplan($rowstg->orgform_kurzbz, $studienordnung_id, $rowstg, $studienordnung->bezeichnung);
 	}
 }
 
@@ -137,14 +137,14 @@ if($result_sto = $db->db_query($qry))
 	}
 }
 
-function createStudienplan($orgform, $studienordnung_id, $rowstg)
+function createStudienplan($orgform, $studienordnung_id, $rowstg, $studienordnungbezeichnung)
 {
 	global $db;
 	$studienplan = new studienplan();
 	$studienplan->studienordnung_id = $studienordnung_id;
 	$studienplan->orgform_kurzbz=$orgform;
 	$studienplan->version = 'V1';
-	$studienplan->bezeichnung = $orgform;
+	$studienplan->bezeichnung = $studienordnungbezeichnung.'-'.$orgform;
 	$studienplan->regelstudiendauer = $rowstg->max_semester;
 	$studienplan->sprache = $rowstg->sprache;
 	$studienplan->aktiv = true;
