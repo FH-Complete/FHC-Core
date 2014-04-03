@@ -1270,6 +1270,10 @@ class prestudent extends person
 		}
 	}
 
+	
+	
+	
+	
 	/**
 	 * Liefert ein Array mit den Interessentenzahlen
 	 * @param $studiensemester_kurzbz (optional)
@@ -1296,6 +1300,122 @@ class prestudent extends person
 		if(!is_null($studiensemester_kurzbz))
 			$qry.="	AND tbl_prestudentstatus.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 
+		$this->result = array();
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				// Studiensemester
+				if(!isset($this->result[$row->studiensemester_kurzbz]['anzahl']))
+					$this->result[$row->studiensemester_kurzbz]['anzahl']=0;
+
+				$this->result[$row->studiensemester_kurzbz]['anzahl']++;
+
+				// Studiengang
+				if(!isset($this->result[$row->studiensemester_kurzbz][$row->studiengang_kz]['anzahl']))
+					$this->result[$row->studiensemester_kurzbz][$row->studiengang_kz]['anzahl']=0;
+
+				$this->result[$row->studiensemester_kurzbz][$row->studiengang_kz]['anzahl']++;
+				
+				// Orgform
+				if(!isset($this->result[$row->studiensemester_kurzbz][$row->studiengang_kz][$row->orgform_kurzbz]['anzahl']))
+					$this->result[$row->studiensemester_kurzbz][$row->studiengang_kz][$row->orgform_kurzbz]['anzahl']=0;
+
+				$this->result[$row->studiensemester_kurzbz][$row->studiengang_kz][$row->orgform_kurzbz]['anzahl']++;
+
+				// Ausbildungssemester
+				if(!isset($this->result[$row->studiensemester_kurzbz][$row->studiengang_kz][$row->orgform_kurzbz][$row->ausbildungssemester]['anzahl']))
+					$this->result[$row->studiensemester_kurzbz][$row->studiengang_kz][$row->orgform_kurzbz][$row->ausbildungssemester]['anzahl']=0;
+
+				$this->result[$row->studiensemester_kurzbz][$row->studiengang_kz][$row->orgform_kurzbz][$row->ausbildungssemester]['anzahl']++;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	
+	public function listAnzAbbrecher($studiensemester_kurzbz=null)
+	{
+		$qry = "SELECT
+					tbl_prestudentstatus.studiensemester_kurzbz, 
+					tbl_prestudent.studiengang_kz,
+					tbl_prestudentstatus.ausbildungssemester,
+					COALESCE(tbl_prestudentstatus.orgform_kurzbz, tbl_studiengang.orgform_kurzbz) as orgform_kurzbz
+				FROM 
+					public.tbl_prestudent
+					JOIN public.tbl_prestudentstatus USING(prestudent_id)
+					JOIN public.tbl_studiengang USING(studiengang_kz)
+				WHERE
+					tbl_prestudentstatus.status_kurzbz='Abbrecher'
+					AND bismelden=true";
+
+		if(!is_null($studiensemester_kurzbz))
+			$qry.=" AND tbl_prestudentstatus.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+
+		$this->result = array();
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				// Studiensemester
+				if(!isset($this->result[$row->studiensemester_kurzbz]['anzahl']))
+					$this->result[$row->studiensemester_kurzbz]['anzahl']=0;
+
+				$this->result[$row->studiensemester_kurzbz]['anzahl']++;
+
+				// Studiengang
+				if(!isset($this->result[$row->studiensemester_kurzbz][$row->studiengang_kz]['anzahl']))
+					$this->result[$row->studiensemester_kurzbz][$row->studiengang_kz]['anzahl']=0;
+
+				$this->result[$row->studiensemester_kurzbz][$row->studiengang_kz]['anzahl']++;
+				
+				// Orgform
+				if(!isset($this->result[$row->studiensemester_kurzbz][$row->studiengang_kz][$row->orgform_kurzbz]['anzahl']))
+					$this->result[$row->studiensemester_kurzbz][$row->studiengang_kz][$row->orgform_kurzbz]['anzahl']=0;
+
+				$this->result[$row->studiensemester_kurzbz][$row->studiengang_kz][$row->orgform_kurzbz]['anzahl']++;
+
+				// Ausbildungssemester
+				if(!isset($this->result[$row->studiensemester_kurzbz][$row->studiengang_kz][$row->orgform_kurzbz][$row->ausbildungssemester]['anzahl']))
+					$this->result[$row->studiensemester_kurzbz][$row->studiengang_kz][$row->orgform_kurzbz][$row->ausbildungssemester]['anzahl']=0;
+
+				$this->result[$row->studiensemester_kurzbz][$row->studiengang_kz][$row->orgform_kurzbz][$row->ausbildungssemester]['anzahl']++;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	public function listAnzStudierende($studiensemester_kurzbz=null)
+	{
+		$qry = "SELECT
+					distinct on(prestudent_id) prestudent_id,
+					tbl_prestudentstatus.studiensemester_kurzbz, 
+					tbl_prestudent.studiengang_kz,
+					tbl_prestudentstatus.ausbildungssemester,
+					COALESCE(tbl_prestudentstatus.orgform_kurzbz, tbl_studiengang.orgform_kurzbz) as orgform_kurzbz
+				FROM 
+					public.tbl_prestudent
+					JOIN public.tbl_prestudentstatus USING(prestudent_id)
+					JOIN public.tbl_studiengang USING(studiengang_kz)
+				WHERE
+					tbl_prestudentstatus.status_kurzbz IN ('Student','Unterbrecher','Diplomand')
+					AND bismelden=true";
+
+		if(!is_null($studiensemester_kurzbz))
+			$qry.=" AND tbl_prestudentstatus.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+
+		
+		
 		$this->result = array();
 		if($result = $this->db_query($qry))
 		{
