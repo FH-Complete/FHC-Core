@@ -306,13 +306,30 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 		// DIV fuer den Tree neu anlegen damit der alte Tree vollstaendig entfernt wird
 		$("#data").html("<div id='treeData'></div>");
 
-		function searchTree(element, matchingId)
+		function searchChildren(element, matchingId)
 		{
 			if(($("#"+element.attr("id")).find("[lvid='"+matchingId+"']").attr("id") !== undefined) || ($("#"+element.attr("id")).attr("lvid") === matchingId))
 			{
 				return true;
-			}
+			}		
 			return false;
+		}
+
+		function searchParents(element, matchingId)
+		{
+			if((element.parent().parent().attr("lvid") === matchingId) || (element.attr("lvid") === matchingId))
+			{
+				return true;
+			}
+			else
+			{
+				if(element.parent().parent().attr("lvid") !== undefined)
+				{
+					if(searchParents(element.parent().parent(), matchingId))
+						return true;
+				}
+				return false;
+			}
 		}
 
 		// Anzeigen des Trees mit den Lehrveranstaltungen
@@ -328,20 +345,22 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 					move: {
 						"always_copy": "multitree",
 						"check_move": function(m) {
+							var text;
 							if(m.ot === m.rt)
 							{
-								if(searchTree(m.r, m.o.attr("lvid")) === true)
+								if((searchChildren(m.r, m.o.attr("lvid")) === true) || (searchParents(m.r, m.o.attr("lvid")) === true))
 								{
 									return false;
 								}
 							}
 							else
 							{
-								if(searchTree(m.r, m.o.attr("id")) === true)
+								if((searchChildren(m.r, m.o.attr("id")) === true) || (searchParents(m.r, m.o.attr("id")) === true))
 								{
 									return false;
 								}
 							}
+							
 							if(m.o.attr("rel")==="semester")
 							{
 								return false;
@@ -350,7 +369,6 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 							{
 								return true;
 							}
-
 							if(m.p === "inside" || m.p === "last")
 							{
 								return true;
@@ -436,13 +454,13 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 				plugins: ["themes", "ui", "dnd", "grid", "json_data", "crrm", "types", "sort", "contextmenu"]
 			}).bind("move_node.jstree", function(event, data)
 			{
-				if(searchTree(data.rslt.r, data.rslt.o.attr("id")))
-				{
-					$("#treeData").jstree("remove", "#"+data.rslt.oc.attr("id"));
-					alert("Lehrveranstaltung bereits vorhanden");
-				}
-				else
-				{
+//				if(searchTree(data.rslt.r, data.rslt.o.attr("id")))
+//				{
+//					$("#treeData").jstree("remove", "#"+data.rslt.oc.attr("id"));
+//					alert("Lehrveranstaltung bereits vorhanden");
+//				}
+//				else
+//				{
 					// Verschieben eines Eintrages
 
 					// Studienplan_lehrveranstaltung_id ermitteln	
@@ -466,7 +484,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 					}
 					hideAllTreeColumns();
 					writeOverallSum(nodes);
-				}
+//				}
 			}).bind("loaded.jstree", function(event, data)
 			{
 				// Wenn der Tree geladen wird, die ECTS Summen der einzelnen Semester berechnen
