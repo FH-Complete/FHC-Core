@@ -103,7 +103,7 @@ function getPruefungByLv($aktStudiensemester = null, $uid = null)
     if($pruefung->getPruefungByLv($lehrveranstaltungen))
     {
 	$pruefungen = array();
-	foreach($pruefung->lehrveranstaltungen as $lv)
+	foreach($pruefung->lehrveranstaltungen as $key=>$lv)
 	{
 	    $lehrveranstaltung = new lehrveranstaltung($lv->lehrveranstaltung_id);
 	    $lehrveranstaltung = $lehrveranstaltung->cleanResult();
@@ -614,12 +614,18 @@ function getPruefungenStudiengang()
 	if((!empty($pruefung->lehrveranstaltungen)))
 	{
 	    $lv->pruefung = array();
-	    foreach ($pruefung->lehrveranstaltungen as $prf)
+	    foreach ($pruefung->lehrveranstaltungen as $key=>$prf)
 	    {
-	    $pruefung->load($prf->pruefung_id);
-	    $pruefung->getTermineByPruefung();
-	    array_push($lv->pruefung, $pruefung);
-	    
+		$pruefung->load($prf->pruefung_id);
+		if($pruefung->storniert === true)
+		{
+		    unset($pruefung->lehrveranstaltungen[$key]);
+		}
+		else
+		{
+		    $pruefung->getTermineByPruefung();
+		    array_push($lv->pruefung, $pruefung);
+		}
 	    }
 	    array_push($result, $lv);
 	}

@@ -424,11 +424,11 @@ function saveAnmeldung(lehrveranstaltung_id, termin_id)
 	}).success(function(data){
 		if(data.error === 'false')
 		{
-			messageBox("message", data.result, "green", "highlight", 4000);
+			messageBox("message", data.result, "green", "highlight", 1000);
 		}
 		else
 		{
-			messageBox("message", data.errormsg, "red", "highlight", 4000);
+			messageBox("message", data.errormsg, "red", "highlight", 1000);
 		}
 		resetForm();
 	}).complete(function(event, xhr, settings){
@@ -458,11 +458,11 @@ function stornoAnmeldung(pruefungsanmeldung_id)
 		}).success(function(data){
 			if(data.error === 'false')
 			{
-				messageBox("message", data.result, "green", "highlight", 4000);
+				messageBox("message", data.result, "green", "highlight", 1000);
 			}
 			else
 			{
-				messageBox("message", data.errormsg, "red", "highlight", 4000);
+				messageBox("message", data.errormsg, "red", "highlight", 1000);
 			}
 		}).complete(function(event, xhr, settings){
 			refresh();
@@ -669,7 +669,7 @@ function showAnmeldungen(pruefungstermin_id, lehrveranstaltung_id)
 		}
 		else
 		{
-			messageBox("message", data.errormsg, "red", "highlight", 4000);
+			messageBox("message", data.errormsg, "red", "highlight", 1000);
 		}
 	}).complete(function(event, xhr, settings){
 		$("#sortable").sortable();
@@ -706,11 +706,11 @@ function saveReihung(terminId, lehrveranstaltung_id)
 	}).success(function(data){
 		if(data.error === 'false' && data.result === true)
 		{
-			messageBox("message", "Reihung erfolgreich geändert.", "green", "highlight", 4000);
+			messageBox("message", "Reihung erfolgreich geändert.", "green", "highlight", 1000);
 		}
 		else
 		{
-			messageBox("message", data.errormsg, "red", "highlight", 4000);
+			messageBox("message", data.errormsg, "red", "highlight", 1000);
 		}
 	}).complete(function(){
 		showAnmeldungen(terminId, lehrveranstaltung_id);
@@ -745,7 +745,7 @@ function anmeldungBestaetigen(pruefungsanmeldung_id, termin_id, lehrveranstaltun
 		}
 		else
 		{
-			messageBox("message", data.errormsg, "red", "highlight", 4000);
+			messageBox("message", data.errormsg, "red", "highlight", 1000);
 		}
 	});
 }
@@ -765,11 +765,7 @@ function messageBox(divId, data, color, effect, duration)
 	$("#"+divId).effect(effect, {
 		duration: duration,
 		color: color
-	});
-	$("#"+divId).hide("blind",{ 
-		duration: 4000,
-		queue: false
-	});
+	}).delay(200).hide("clip", "fast");
 }
 
 /**
@@ -799,7 +795,7 @@ function loadStudiengaenge()
 		}
 		else
 		{
-			messageBox("message", data.errormsg, "red", "highlight", 4000);
+			messageBox("message", data.errormsg, "red", "highlight", 1000);
 		}
 	});
 }
@@ -843,7 +839,7 @@ function loadPruefungStudiengang(studiengang_kz)
 		}
 		else
 		{
-			messageBox("message", data.errormsg, "red", "highlight", 4000);
+			messageBox("message", data.errormsg, "red", "highlight", 1000);
 		}
 	});
 }
@@ -870,7 +866,7 @@ function saveKommentar(pruefungsanmeldung_id, termin_id, lehrveranstaltung_id)
 		},
 		error: loadError
 	}).success(function(data){
-		messageBox("message", "Kommentar erfolgreich gespeichert.", "green", "highlight", 4000);
+		messageBox("message", "Kommentar erfolgreich gespeichert.", "green", "highlight", 1000);
 	}).complete(function(){
 		showAnmeldungen(termin_id, lehrveranstaltung_id);
 	});
