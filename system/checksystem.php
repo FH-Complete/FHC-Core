@@ -1608,6 +1608,7 @@ $berechtigungen = array(
 	array('lv-plan','Stundenplan'),
 	array('mitarbeiter','FAS Mitarbeitermodul'),
 	array('mitarbeiter/bankdaten','Bankdaten für Mitarbeiter und Studierende anzeigen'),
+	array('mitarbeiter/personalnummer','Editieren der Personalnummer im FAS'),
 	array('mitarbeiter/stammdaten','Stammdaten der Mitarbeiter'),
 	array('mitarbeiter/urlaube','Mit diesem Recht werden im CIS die Urlaube von allen Mitarbeiter sichtbar'),
 	array('mitarbeiter/zeitsperre','Zeitsperren- und Urlaubsverwaltung'),
