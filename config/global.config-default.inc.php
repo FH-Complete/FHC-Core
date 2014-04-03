@@ -58,7 +58,4 @@ Sekretariat KTU
 Bethlehemstraße 20
 4020 Linz'); 
 
-//Personalnummer editierbar in FAS
-define('PERSONALNUMMER_EDITABLE', false);
-
 ?>
