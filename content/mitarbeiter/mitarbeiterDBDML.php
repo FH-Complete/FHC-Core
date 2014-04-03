@@ -106,11 +106,10 @@ if(!$error)
 			$mitarbeiter->updateamum = date('Y-m-d H:i:s');
 			$mitarbeiter->updatevon = $user;
 			$mitarbeiter->kleriker = ($_POST['kleriker'] == 'true'?true:false);
-			if(PERSONALNUMMER_EDITABLE === true)
+			if($rechte->isBerechtigt('mitarbeiter/personalnummer'))
 			{
 			    $mitarbeiter->personalnummer = $_POST['personalnummer'];
 			}
-			
 			if($mitarbeiter->save())
 			{
 				$resturlaub = new resturlaub();
