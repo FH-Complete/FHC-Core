@@ -30,6 +30,7 @@
 // ****************************************
 
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../config/global.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/log.class.php');
@@ -104,7 +105,11 @@ if(!$error)
 			$mitarbeiter->alias = $_POST['alias'];
 			$mitarbeiter->updateamum = date('Y-m-d H:i:s');
 			$mitarbeiter->updatevon = $user;
-			$mitarbeiter->kleriker = ($_POST['kleriker'] == 'true'?true:false); 
+			$mitarbeiter->kleriker = ($_POST['kleriker'] == 'true'?true:false);
+			if(PERSONALNUMMER_EDITABLE === true)
+			{
+			    $mitarbeiter->personalnummer = $_POST['personalnummer'];
+			}
 			
 			if($mitarbeiter->save())
 			{

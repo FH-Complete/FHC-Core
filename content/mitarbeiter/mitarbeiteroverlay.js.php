@@ -777,6 +777,7 @@ function MitarbeiterSave()
 	person_id = document.getElementById('mitarbeiter-detail-textbox-person_id').value;
 	
 	//Mitarbeiterdaten
+	personalnummer = document.getElementById('mitarbeiter-detail-textbox-personalnummer').value;
 	kurzbezeichnung = document.getElementById('mitarbeiter-detail-textbox-kurzbezeichnung').value;
 	stundensatz = document.getElementById('mitarbeiter-detail-textbox-stundensatz').value;
 	telefonklappe = document.getElementById('mitarbeiter-detail-textbox-telefonklappe').value;
@@ -839,6 +840,7 @@ function MitarbeiterSave()
 	req.add('urlaubsanspruch', urlaubsanspruch);
 	req.add('resturlaubstage', resturlaubstage);
 	req.add('kleriker', kleriker);
+	req.add('personalnummer', personalnummer);
 	
 	var response = req.executePOST();
 
