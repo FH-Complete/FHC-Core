@@ -75,7 +75,7 @@ foreach ($dok->result as $row)
 		foreach($akte->result as $a)
 		{
 			$datum=(isset($a->insertamum))?$date->formatDatum($a->insertamum, 'd.m.Y'):''; 
-			$nachgereicht = (isset($a->nachgereicht))?'ja':''; 
+			$nachgereicht = (isset($a->nachgereicht) && $a->nachgereicht)?'ja':''; 
 			$info = (isset($a->anmerkung))?$a->anmerkung:''; 
 			$vorhanden = (isset($a->dms_id))?'ja':'nein'; 
 

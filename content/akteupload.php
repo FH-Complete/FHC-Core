@@ -20,7 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 
-// Oberflaeche zur Aenderung von Beispielen und Upload von Bildern
+// Oberflaeche zum Upload von Dokumenten aus dem FAS
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/person.class.php');
@@ -218,11 +218,5 @@ else
 }
 ?>
 
-<script type="text/javascript">
-function disableTitle(dis)
-{
-	document.getElementById('titel_intern').disabled = dis;
-}
-</script>
 </body>
 </html>
