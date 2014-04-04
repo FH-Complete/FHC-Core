@@ -1276,7 +1276,7 @@ if(!$result = @$db->db_query("SELECT aktivierungscode FROM public.tbl_benutzer L
 		echo 'public.tbl_benutzer: Spalte aktivierungscode hinzugefuegt';
 }
 
-// Diverse neue Indexe
+// Diverse neue Indizes
 if($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_lehrveranstaltung_studiengang'"))
 {
 	if($db->db_num_rows($result)==0)
@@ -1297,7 +1297,89 @@ if($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_lehrverans
 		if(!$db->db_query($qry))
 			echo '<strong>Indizes: '.$db->db_last_error().'</strong><br>';
 		else
-			echo 'Diverse Indexe fuer Studienpan und Lehrveranstaltung hinzugefuegt';
+			echo 'Diverse Indizes fuer Studienpan und Lehrveranstaltung hinzugefuegt';
+	}
+}
+
+// Distinct im Count: Planstunden zaehlen nur mehr einmal, wenn zum gleichen Zeitpunkt mehrere Einheiten verplant werden
+if($result = @$db->db_query("SELECT view_definition FROM information_schema.views WHERE table_schema='lehre' AND table_name='vw_lva_stundenplan'"))
+{
+	if ($row = $db->db_fetch_object($result))
+	{
+		if($row->view_definition!="SELECT le.lehreinheit_id, le.unr, le.lvnr, (SELECT tbl_fachbereich.fachbereich_kurzbz FROM tbl_fachbereich WHERE ((tbl_fachbereich.oe_kurzbz)::text = (lehrfach.oe_kurzbz)::text)) AS fachbereich_kurzbz, le.lehrfach_id, lehrfach.kurzbz AS lehrfach, lehrfach.bezeichnung AS lehrfach_bez, lehrfach.farbe AS lehrfach_farbe, le.lehrform_kurzbz AS lehrform, lema.mitarbeiter_uid AS lektor_uid, ma.kurzbz AS lektor, tbl_studiengang.studiengang_kz, tbl_studiengang.kurzbz AS studiengang, lvb.semester, lvb.verband, lvb.gruppe, lvb.gruppe_kurzbz, le.raumtyp, le.raumtypalternativ, le.stundenblockung, le.wochenrythmus, lema.semesterstunden, lema.planstunden, le.start_kw, le.anmerkung, le.studiensemester_kurzbz, (SELECT count(DISTINCT ROW(tbl_stundenplan.datum, tbl_stundenplan.stunde, tbl_stundenplan.mitarbeiter_uid, tbl_stundenplan.studiengang_kz, tbl_stundenplan.semester, tbl_stundenplan.verband, tbl_stundenplan.gruppe, tbl_stundenplan.gruppe_kurzbz, tbl_stundenplan.lehreinheit_id, tbl_stundenplan.unr)) AS count FROM lehre.tbl_stundenplan WHERE ((((((((tbl_stundenplan.mitarbeiter_uid)::text = (lema.mitarbeiter_uid)::text) AND (tbl_stundenplan.studiengang_kz = lvb.studiengang_kz)) AND (tbl_stundenplan.semester = lvb.semester)) AND ((tbl_stundenplan.verband = lvb.verband) OR (((tbl_stundenplan.verband IS NULL) OR (tbl_stundenplan.verband = ''::bpchar)) AND (lvb.verband IS NULL)))) AND ((tbl_stundenplan.gruppe = lvb.gruppe) OR (((tbl_stundenplan.gruppe IS NULL) OR (tbl_stundenplan.gruppe = ''::bpchar)) AND (lvb.gruppe IS NULL)))) AND (((tbl_stundenplan.gruppe_kurzbz)::text = (lvb.gruppe_kurzbz)::text) OR ((tbl_stundenplan.gruppe_kurzbz IS NULL) AND (lvb.gruppe_kurzbz IS NULL)))) AND (tbl_stundenplan.lehreinheit_id = lvb.lehreinheit_id))) AS verplant FROM (((((lehre.tbl_lehreinheit le JOIN lehre.tbl_lehreinheitgruppe lvb USING (lehreinheit_id)) JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)) JOIN tbl_studiengang USING (studiengang_kz)) JOIN lehre.tbl_lehrveranstaltung lehrfach ON ((le.lehrfach_id = lehrfach.lehrveranstaltung_id))) JOIN tbl_mitarbeiter ma USING (mitarbeiter_uid));")
+		{
+			$qry = "
+			DROP VIEW lehre.vw_lva_stundenplan;
+			CREATE OR REPLACE VIEW lehre.vw_lva_stundenplan AS
+			SELECT 
+				le.lehreinheit_id, le.unr, le.lvnr, 
+				(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz, 
+				le.lehrfach_id AS lehrfach_id, lehrfach.kurzbz AS lehrfach, lehrfach.bezeichnung AS lehrfach_bez, 
+				lehrfach.farbe AS lehrfach_farbe, le.lehrform_kurzbz AS lehrform, lema.mitarbeiter_uid AS lektor_uid, 
+				ma.kurzbz AS lektor, tbl_studiengang.studiengang_kz, tbl_studiengang.kurzbz AS studiengang, 
+				lvb.semester, lvb.verband, lvb.gruppe, lvb.gruppe_kurzbz, le.raumtyp, le.raumtypalternativ, 
+				le.stundenblockung, le.wochenrythmus, lema.semesterstunden, lema.planstunden, le.start_kw, le.anmerkung, 
+				le.studiensemester_kurzbz, 
+				( SELECT count (distinct (datum,stunde,mitarbeiter_uid,studiengang_kz,semester,verband,gruppe,gruppe_kurzbz,lehreinheit_id,unr)) AS count
+				       FROM lehre.tbl_stundenplan
+				      WHERE tbl_stundenplan.mitarbeiter_uid::text = lema.mitarbeiter_uid::text AND tbl_stundenplan.studiengang_kz = lvb.studiengang_kz AND tbl_stundenplan.semester = lvb.semester AND (tbl_stundenplan.verband = lvb.verband OR (tbl_stundenplan.verband IS NULL OR tbl_stundenplan.verband = ''::bpchar) AND lvb.verband IS NULL) AND (tbl_stundenplan.gruppe = lvb.gruppe OR (tbl_stundenplan.gruppe IS NULL OR tbl_stundenplan.gruppe = ''::bpchar) AND lvb.gruppe IS NULL) AND (tbl_stundenplan.gruppe_kurzbz::text = lvb.gruppe_kurzbz::text OR tbl_stundenplan.gruppe_kurzbz IS NULL AND lvb.gruppe_kurzbz IS NULL) AND tbl_stundenplan.lehreinheit_id = lvb.lehreinheit_id) AS verplant
+			FROM lehre.tbl_lehreinheit le
+			   JOIN lehre.tbl_lehreinheitgruppe lvb USING (lehreinheit_id)
+			   JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)
+			   JOIN public.tbl_studiengang USING (studiengang_kz)
+			   JOIN lehre.tbl_lehrveranstaltung as lehrfach ON (le.lehrfach_id=lehrfach.lehrveranstaltung_id)
+			   JOIN public.tbl_mitarbeiter ma USING (mitarbeiter_uid);
+			GRANT SELECT ON lehre.vw_lva_stundenplan TO admin;
+			GRANT SELECT ON lehre.vw_lva_stundenplan TO vilesci;
+			GRANT SELECT ON lehre.vw_lva_stundenplan TO web;
+			";
+
+			if(!$db->db_query($qry))
+				echo '<strong>vw_lva_stundenplan: '.$db->db_last_error().'</strong><br>';
+			else
+				echo 'vw_lva_stundenplan: Planstunden zum selben Zeitpunkt zaehlen nur mehr einmal<br/>';
+		}
+	}
+}
+
+// Distinct im Count: Planstunden zaehlen nur mehr einmal, wenn zum gleichen Zeitpunkt mehrere Einheiten verplant werden
+if($result = @$db->db_query("SELECT view_definition FROM information_schema.views WHERE table_schema='lehre' AND table_name='vw_lva_stundenplandev'"))
+{
+	if ($row = $db->db_fetch_object($result))
+	{
+		if($row->view_definition!="SELECT le.lehreinheit_id, le.unr, le.lvnr, (SELECT tbl_fachbereich.fachbereich_kurzbz FROM tbl_fachbereich WHERE ((tbl_fachbereich.oe_kurzbz)::text = (lehrfach.oe_kurzbz)::text)) AS fachbereich_kurzbz, le.lehrfach_id, lehrfach.kurzbz AS lehrfach, lehrfach.bezeichnung AS lehrfach_bez, lehrfach.farbe AS lehrfach_farbe, le.lehrform_kurzbz AS lehrform, lema.mitarbeiter_uid AS lektor_uid, tbl_mitarbeiter.kurzbz AS lektor, tbl_studiengang.studiengang_kz, upper((((tbl_studiengang.typ)::character varying)::text || (tbl_studiengang.kurzbz)::text)) AS studiengang, lvb.semester, lvb.verband, lvb.gruppe, lvb.gruppe_kurzbz, le.raumtyp, le.raumtypalternativ, le.stundenblockung, le.wochenrythmus, lema.semesterstunden, lema.planstunden, le.start_kw, le.anmerkung, le.studiensemester_kurzbz, (SELECT count(DISTINCT ROW(tbl_stundenplandev.datum, tbl_stundenplandev.stunde, tbl_stundenplandev.mitarbeiter_uid, tbl_stundenplandev.studiengang_kz, tbl_stundenplandev.semester, tbl_stundenplandev.verband, tbl_stundenplandev.gruppe, tbl_stundenplandev.gruppe_kurzbz, tbl_stundenplandev.lehreinheit_id, tbl_stundenplandev.unr)) AS count FROM lehre.tbl_stundenplandev WHERE ((((((((tbl_stundenplandev.mitarbeiter_uid)::text = (lema.mitarbeiter_uid)::text) AND (tbl_stundenplandev.studiengang_kz = lvb.studiengang_kz)) AND (tbl_stundenplandev.semester = lvb.semester)) AND ((tbl_stundenplandev.verband = lvb.verband) OR (((tbl_stundenplandev.verband IS NULL) OR (tbl_stundenplandev.verband = ''::bpchar)) AND (lvb.verband IS NULL)))) AND ((tbl_stundenplandev.gruppe = lvb.gruppe) OR (((tbl_stundenplandev.gruppe IS NULL) OR (tbl_stundenplandev.gruppe = ''::bpchar)) AND (lvb.gruppe IS NULL)))) AND (((tbl_stundenplandev.gruppe_kurzbz)::text = (lvb.gruppe_kurzbz)::text) OR ((tbl_stundenplandev.gruppe_kurzbz IS NULL) AND (lvb.gruppe_kurzbz IS NULL)))) AND (tbl_stundenplandev.lehreinheit_id = lvb.lehreinheit_id))) AS verplant FROM (((((lehre.tbl_lehreinheit le JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)) JOIN lehre.tbl_lehreinheitgruppe lvb USING (lehreinheit_id)) JOIN tbl_studiengang ON ((lvb.studiengang_kz = tbl_studiengang.studiengang_kz))) JOIN lehre.tbl_lehrveranstaltung lehrfach ON ((le.lehrfach_id = lehrfach.lehrveranstaltung_id))) JOIN tbl_mitarbeiter USING (mitarbeiter_uid));")
+		{
+			$qry = "
+			DROP VIEW lehre.vw_lva_stundenplandev;
+			CREATE OR REPLACE VIEW lehre.vw_lva_stundenplandev AS
+			SELECT 
+				le.lehreinheit_id, le.unr, le.lvnr, 
+				(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz, 
+				le.lehrfach_id AS lehrfach_id, lehrfach.kurzbz AS lehrfach, lehrfach.bezeichnung AS lehrfach_bez, 
+				lehrfach.farbe AS lehrfach_farbe, le.lehrform_kurzbz AS lehrform, lema.mitarbeiter_uid AS lektor_uid, 
+				tbl_mitarbeiter.kurzbz AS lektor, tbl_studiengang.studiengang_kz, upper(tbl_studiengang.typ::character varying::text || tbl_studiengang.kurzbz::text) AS studiengang, 
+				lvb.semester, lvb.verband, lvb.gruppe, lvb.gruppe_kurzbz, le.raumtyp, le.raumtypalternativ, 
+				le.stundenblockung, le.wochenrythmus, lema.semesterstunden, lema.planstunden, le.start_kw, 
+				le.anmerkung, le.studiensemester_kurzbz, 
+				( SELECT count (distinct (datum,stunde,mitarbeiter_uid,studiengang_kz,semester,verband,gruppe,gruppe_kurzbz,lehreinheit_id,unr)) AS count
+				       FROM lehre.tbl_stundenplandev
+				      WHERE tbl_stundenplandev.mitarbeiter_uid::text = lema.mitarbeiter_uid::text AND tbl_stundenplandev.studiengang_kz = lvb.studiengang_kz AND tbl_stundenplandev.semester = lvb.semester AND (tbl_stundenplandev.verband = lvb.verband OR (tbl_stundenplandev.verband IS NULL OR tbl_stundenplandev.verband = ''::bpchar) AND lvb.verband IS NULL) AND (tbl_stundenplandev.gruppe = lvb.gruppe OR (tbl_stundenplandev.gruppe IS NULL OR tbl_stundenplandev.gruppe = ''::bpchar) AND lvb.gruppe IS NULL) AND (tbl_stundenplandev.gruppe_kurzbz::text = lvb.gruppe_kurzbz::text OR tbl_stundenplandev.gruppe_kurzbz IS NULL AND lvb.gruppe_kurzbz IS NULL) AND tbl_stundenplandev.lehreinheit_id = lvb.lehreinheit_id) AS verplant
+			FROM lehre.tbl_lehreinheit le
+			   JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)
+			   JOIN lehre.tbl_lehreinheitgruppe lvb USING (lehreinheit_id)
+			   JOIN public.tbl_studiengang ON lvb.studiengang_kz = tbl_studiengang.studiengang_kz
+			   JOIN lehre.tbl_lehrveranstaltung as lehrfach ON (le.lehrfach_id=lehrfach.lehrveranstaltung_id)
+			   JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid);
+			GRANT SELECT ON lehre.vw_lva_stundenplandev TO admin;
+			GRANT SELECT ON lehre.vw_lva_stundenplandev TO vilesci;
+			GRANT SELECT ON lehre.vw_lva_stundenplandev TO web;
+			";
+	
+			if(!$db->db_query($qry))
+				echo '<strong>vw_lva_stundenplandev: '.$db->db_last_error().'</strong><br>';
+			else
+				echo 'vw_lva_stundenplandev: Planstunden zum selben Zeitpunkt zaehlen nur mehr einmal<br/>';
+		}
 	}
 }
 
