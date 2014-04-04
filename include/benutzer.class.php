@@ -28,6 +28,7 @@ class benutzer extends person
 	public $bnaktiv=true;	// boolean
 	public $alias;			// varchar(256)
 	public $bn_ext_id;
+	public $aktivierungscode;
 	public $result = array();
 		
 	/**
@@ -57,6 +58,8 @@ class benutzer extends person
 				$this->uid = $row->uid;
 				$this->bnaktiv = $this->db_parse_bool($row->aktiv);
 				$this->alias = $row->alias;
+				$this->aktivierungscode = $row->aktivierungscode;
+
 				if(!person::load($row->person_id))
 					return false;
 				else 
@@ -152,7 +155,7 @@ class benutzer extends person
 		
 		if($new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
-			$qry = 'INSERT INTO public.tbl_benutzer (uid, aktiv, alias, person_id, insertamum, insertvon, updateamum, updatevon, ext_id) VALUES('.
+			$qry = 'INSERT INTO public.tbl_benutzer (uid, aktiv, alias, person_id, insertamum, insertvon, updateamum, updatevon, ext_id, aktivierungscode) VALUES('.
 			       $this->db_add_param($this->uid).",".
 			       $this->db_add_param($this->bnaktiv,FHC_BOOLEAN).",".
 			       $this->db_add_param($this->alias).",".
@@ -161,7 +164,8 @@ class benutzer extends person
 			       $this->db_add_param($this->insertvon).",".
 			       $this->db_add_param($this->updateamum).",".
 			       $this->db_add_param($this->updatevon).",".
-			       $this->db_add_param($this->bn_ext_id).");";
+			       $this->db_add_param($this->bn_ext_id).",".
+				   $this->db_add_param($this->aktivierungscode).");";
 		}
 		else
 		{			
@@ -401,6 +405,22 @@ class benutzer extends person
 		else
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Entfernt den Aktivierungscode eines Users
+	 * @param $username
+	 */	
+	public function DeleteAktivierungscode($username)
+	{
+		$qry = "UPDATE public.tbl_benutzer SET aktivierungscode=null WHERE uid=".$db->db_add_param($username);
+		if($this->db_query($qry))
+			return true;
+		else
+		{
+			$this->errormsg = 'Fehler beim Loeschen des Aktivierungscodes';
 			return false;
 		}
 	}

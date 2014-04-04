@@ -1265,6 +1265,42 @@ if($result = @$db->db_query("SELECT 1 FROM information_schema.columns WHERE tabl
 	}
 }
 
+// aktivierungscode in tbl_benutzer
+if(!$result = @$db->db_query("SELECT aktivierungscode FROM public.tbl_benutzer LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_benutzer ADD COLUMN aktivierungscode varchar(64);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_benutzer: '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'public.tbl_benutzer: Spalte aktivierungscode hinzugefuegt';
+}
+
+// Diverse neue Indexe
+if($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_lehrveranstaltung_studiengang'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+	$qry = "
+	DROP INDEX idx_lehreinheit_lehrfach_id;
+	CREATE INDEX idx_lehrveranstaltung_studiengang ON lehre.tbl_lehrveranstaltung USING btree (studiengang_kz);
+	CREATE INDEX idx_lehrveranstaltung_semester ON lehre.tbl_lehrveranstaltung USING btree (semester);
+	CREATE INDEX idx_lehreinheit_lehrveranstaltung_id ON lehre.tbl_lehreinheit USING btree (lehrveranstaltung_id);
+	CREATE INDEX idx_studienplan_studienordnung_id ON lehre.tbl_studienplan USING btree (studienordnung_id);
+	CREATE INDEX idx_studienplan_lehrveranstaltung_lehrveranstaltung_id ON lehre.tbl_studienplan_lehrveranstaltung USING btree (lehrveranstaltung_id);
+	CREATE INDEX idx_studienplan_lehrveranstaltung_stpllvid ON lehre.tbl_studienplan_lehrveranstaltung USING btree (studienplan_id, lehrveranstaltung_id);
+	CREATE INDEX idx_studienplan_lehrveranstaltung_studienplan_id ON lehre.tbl_studienplan_lehrveranstaltung USING btree (studienplan_id);
+	CREATE INDEX idx_studienplan_lehrveranstaltung_parent_id ON lehre.tbl_studienplan_lehrveranstaltung USING btree (studienplan_lehrveranstaltung_id_parent);
+	CREATE INDEX idx_lehreinheit_lehrfach_id ON lehre.tbl_lehreinheit USING btree (lehrfach_id)
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>Indizes: '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'Diverse Indexe fuer Studienpan und Lehrveranstaltung hinzugefuegt';
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -1400,7 +1436,7 @@ $tabellen=array(
 	"public.tbl_aufmerksamdurch"  => array("aufmerksamdurch_kurzbz","beschreibung","ext_id"),
 	"public.tbl_aufnahmeschluessel"  => array("aufnahmeschluessel"),
 	"public.tbl_bankverbindung"  => array("bankverbindung_id","person_id","name","anschrift","bic","blz","iban","kontonr","typ","verrechnung","updateamum","updatevon","insertamum","insertvon","ext_id","oe_kurzbz"),
-	"public.tbl_benutzer"  => array("uid","person_id","aktiv","alias","insertamum","insertvon","updateamum","updatevon","ext_id","updateaktivvon","updateaktivam"),
+	"public.tbl_benutzer"  => array("uid","person_id","aktiv","alias","insertamum","insertvon","updateamum","updatevon","ext_id","updateaktivvon","updateaktivam","aktivierungscode"),
 	"public.tbl_benutzerfunktion"  => array("benutzerfunktion_id","fachbereich_kurzbz","uid","oe_kurzbz","funktion_kurzbz","semester", "datum_von","datum_bis", "updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung"),
 	"public.tbl_benutzergruppe"  => array("uid","gruppe_kurzbz","studiensemester_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_buchungstyp"  => array("buchungstyp_kurzbz","beschreibung","standardbetrag","standardtext","aktiv","credit_points"),

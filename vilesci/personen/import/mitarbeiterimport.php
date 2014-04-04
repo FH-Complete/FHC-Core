@@ -500,6 +500,7 @@ if(isset($_POST['save']))
 		$benutzer->alias = $alias;
 		$benutzer->insertamum=date('Y-m-d H:i:s');
 		$benutzer->insertvon = $user;
+		$benutzer->aktivierungscode = generateActivationKey();
 
 		if($benutzer->save(true,false))
 		{

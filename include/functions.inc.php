@@ -943,4 +943,16 @@ function generateSemesterList($semester, $anzahlFolgesemester)
 	return $result;
 }
 
+/**
+ * Generiert einen Aktivierungscode
+ */
+function generateActivationKey()
+{
+	$keyvalues=array('0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F');
+	$key='';
+	for($i=0;$i<32;$i++)
+		$key.=$keyvalues[mt_rand(0,15)];
+
+	return md5(encryptData(uniqid(mt_rand(), true),$key));
+}
 ?>

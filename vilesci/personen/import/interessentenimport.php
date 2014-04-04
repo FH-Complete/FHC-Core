@@ -472,6 +472,9 @@ $anmerkungen = (isset($_REQUEST['anmerkungen'])?$_REQUEST['anmerkungen']:'');
 $studiengang_kz = (isset($_REQUEST['studiengang_kz'])?$_REQUEST['studiengang_kz']:'');
 if($studiengang_kz=='' && isset($_GET['studiengang_kz']))
 	$studiengang_kz = $_GET['studiengang_kz'];
+if($studiengang_kz=='undefined')
+	$studiengang_kz='';
+
 $person_id = (isset($_REQUEST['person_id'])?$_REQUEST['person_id']:'');
 $ueberschreiben = (isset($_REQUEST['ueberschreiben'])?$_REQUEST['ueberschreiben']:'');
 $studiensemester_kurzbz = (isset($_REQUEST['studiensemester_kurzbz'])?$_REQUEST['studiensemester_kurzbz']:'');
@@ -885,6 +888,7 @@ if(isset($_POST['save']))
 		$benutzer->uid = $uid;
 		$benutzer->person_id = $person->person_id;
 		$benutzer->aktiv = true;
+		$benutzer->aktivierungscode = generateActivationKey();
 		
 		$nachname_clean = mb_strtolower(convertProblemChars($person->nachname));
 		$vorname_clean = mb_strtolower(convertProblemChars($person->vorname));
