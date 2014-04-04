@@ -83,7 +83,11 @@
 		foreach ($konto->result as $row)
 		{
 			$i++;
+
+			if(!isset($row['parent']))
+				continue;
 			$betrag = $row['parent']->betrag;
+
 			
 			if(isset($row['childs']))
 			{
