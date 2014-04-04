@@ -26,6 +26,7 @@
  * Uebersichtsmails werden an LV-Planung und Administration geschickt
  */
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../config/global.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/mail.class.php');
@@ -193,7 +194,7 @@ else
 		//echo '.';flush();
 		$sql_query='INSERT INTO lehre.tbl_stundenplan
 			(stundenplan_id,unr,mitarbeiter_uid,datum,stunde,ort_kurzbz,studiengang_kz,semester,verband,gruppe,
-			gruppe_kurzbz,titel,fix,updateamum,updatevon,insertamum,insertvon,lehreinheit_id) VALUES'; //spalte anmerkung entfent vom kindlm am 16.03.2012 da nicht relevant fuer tbl_stundenplan und nur fuer intern gedacht
+			gruppe_kurzbz,titel,'.(LVPLAN_ANMERKUNG_ANZEIGEN?'anmerkung,':'').'fix,updateamum,updatevon,insertamum,insertvon,lehreinheit_id) VALUES'; //spalte anmerkung nur syncen, wenn im Config aktiv
 		$sql_query.="($row->stundenplandev_id,$row->unr,'$row->uid','$row->datum',$row->stunde,'$row->ort_kurzbz',
 			$row->studiengang_kz,$row->semester";
 		if ($row->verband==null)
@@ -208,8 +209,9 @@ else
 			$sql_query.=',NULL';
 		else
 			$sql_query.=",'$row->gruppe_kurzbz'";
-		//$sql_query.=",'$row->titel','$row->anmerkung'"; --> anmerkung auskommentiert vom kindlm am 16.03.2012 da nicht relevant fuer tbl_stundenplan und nur fuer intern gedacht
 		$sql_query.=",'$row->titel'";
+		if (LVPLAN_ANMERKUNG_ANZEIGEN) //spalte anmerkung nur syncen, wenn im Config aktiv
+			$sql_query.=",'$row->anmerkung'";
 		if ($row->fix=='t')
 			$sql_query.=',TRUE';
 		else
