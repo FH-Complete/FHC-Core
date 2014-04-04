@@ -91,7 +91,7 @@ foreach ($dok->result as $row)
 		{
 
 			$datum=(isset($a->insertamum))?$date->formatDatum($a->insertamum, 'd.m.Y'):''; 
-			$nachgereicht = (isset($a->nachgereicht))?'ja':''; 
+			$nachgereicht = (isset($a->nachgereicht) && $a->nachgereicht)?'ja':''; 
 			$info = (isset($a->anmerkung))?$akte->result[0]->anmerkung:''; 
 			$vorhanden = (isset($a->dms_id))?'ja':'nein'; 
 
@@ -144,16 +144,18 @@ foreach($akte->result as $a)
 {
 
 	$datum=(isset($a->insertamum))?$date->formatDatum($a->insertamum, 'd.m.Y'):''; 
-	$nachgereicht = (isset($a->nachgereicht))?'ja':''; 
+	$nachgereicht = (isset($a->nachgereicht) && $a->nachgereicht)?'ja':''; 
 	$info = (isset($a->anmerkung))?$akte->result[0]->anmerkung:''; 
 	$vorhanden = (isset($a->dms_id))?'ja':'nein'; 
-
+	$dokument_kurzbz = $a->dokument_kurzbz; 
+	$dokument = new dokument(); 
+	$dokument->loadDokumenttyp($dokument_kurzbz); 
 
 	echo 	'
 	  <RDF:li>
 			<RDF:Description  id="'.$a->dokument_kurzbz.'/'.$a->akte_id.'"  about="'.$rdf_url.'/'.$a->dokument_kurzbz.'/'.$a->akte_id.'" >
 				<DOKUMENT:dokument_kurzbz><![CDATA['.$a->dokument_kurzbz.']]></DOKUMENT:dokument_kurzbz>
-				<DOKUMENT:bezeichnung><![CDATA['.$a->bezeichnung.']]></DOKUMENT:bezeichnung>
+				<DOKUMENT:bezeichnung><![CDATA['.$dokument->bezeichnung.']]></DOKUMENT:bezeichnung>
 				<DOKUMENT:datum>'.$datum.'</DOKUMENT:datum>
 				<DOKUMENT:nachgereicht>'.$nachgereicht.'</DOKUMENT:nachgereicht>
 				<DOKUMENT:infotext>'.$info.'</DOKUMENT:infotext>
