@@ -1061,6 +1061,7 @@ if(!$error)
 														$benutzer->uid = $uid;
 														$benutzer->person_id = $prestd->person_id;
 														$benutzer->aktiv = true;
+														$benutzer->aktivierungscode = generateActivationKey();
 				
 														$nachname_clean = mb_strtolower(convertProblemChars($prestd->nachname));
 														$vorname_clean = mb_strtolower(convertProblemChars($prestd->vorname));

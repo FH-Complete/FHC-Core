@@ -22,5 +22,9 @@ $this->phrasen['passwort/AenderungFehler']='Passwort Änderung fehlgeschlagen:%s
 $this->phrasen['passwort/NichtUebereinstimmend']='Passwörter stimmen nicht überein';
 $this->phrasen['passwort/NoHttps']='ACHTUNG - Sie verwenden eine unverschlüsselte Verbindung. Sie sollten Ihr Passwort nur über eine verschlüsselte Verbindung ändern.';
 $this->phrasen['passwort/ZuHttpsWechseln']='Jetzt zu verschlüsselter Verbindung wechseln';
+$this->phrasen['passwort/CaptchaEingabe']='Tippen Sie die angezeigten<br>Zeichen in das untere Feld.';
+$this->phrasen['passwort/ReloadCaptcha']='Ich kann das Bild nicht lesen - neu laden';
+$this->phrasen['passwort/PasswortWaehlen']='Bitte wählen Sie ein Passwort für Ihren Account';
+$this->phrasen['passwort/AccountAktivierung']='Account Aktivierung';
 
 ?>

@@ -31,7 +31,7 @@ class rdf
 	public $xml_header='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';	// string
 	public $xml_ns;				// string
 	protected $rdf_url;  		// string
-	protected static $rdf_text;
+	protected $rdf_text;
 	protected static $nl="\n";
 	protected static $tb="\t";
 
