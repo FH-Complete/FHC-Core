@@ -98,19 +98,39 @@
 			<tr>
 				<td>Empfänger</td>
  				<td>'.$oe->organisationseinheittyp_kurzbz.' '.$oe->bezeichnung.'</td>
-			</tr><tr>
+			</tr>';
+if($iban!='')
+{
+	echo '
+			<tr>
 				<td>IBAN</td>
 				<td>'.$iban.'</td>
-			</tr><tr>
+			</tr>';
+}
+if($bic!='')
+{
+	echo '
+			<tr>
 				<td>BIC</td>
 				<td>'.$bic.'</td>
-			</tr><tr>
+			</tr>';
+}
+if($konto->zahlungsreferenz!='')
+{
+	echo '
+			<tr>
 				<td>Zahlungsreferenz</td>
 				<td>'.$konto->zahlungsreferenz.'</td>
-			</tr>
+			</tr>';
+}
+
+echo '
 		</tbody>
 	</table>
-	<table class="tablesorter">
+</body></html>';
+
+/* EPS Beispiel
+ <table class="tablesorter">
 		<thead>
 			<tr>
 				<th width="40%">Zahlung anweisen</th>
@@ -129,5 +149,6 @@
 			</tr>
 		</tbody>
 	</table>
-</body></html>';	   	
+*/
+ 
 ?>
