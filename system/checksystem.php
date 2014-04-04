@@ -1282,23 +1282,23 @@ if($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_lehrverans
 	if($db->db_num_rows($result)==0)
 	{
 
-	$qry = "
-	DROP INDEX idx_lehreinheit_lehrfach_id;
-	CREATE INDEX idx_lehrveranstaltung_studiengang ON lehre.tbl_lehrveranstaltung USING btree (studiengang_kz);
-	CREATE INDEX idx_lehrveranstaltung_semester ON lehre.tbl_lehrveranstaltung USING btree (semester);
-	CREATE INDEX idx_lehreinheit_lehrveranstaltung_id ON lehre.tbl_lehreinheit USING btree (lehrveranstaltung_id);
-	CREATE INDEX idx_studienplan_studienordnung_id ON lehre.tbl_studienplan USING btree (studienordnung_id);
-	CREATE INDEX idx_studienplan_lehrveranstaltung_lehrveranstaltung_id ON lehre.tbl_studienplan_lehrveranstaltung USING btree (lehrveranstaltung_id);
-	CREATE INDEX idx_studienplan_lehrveranstaltung_stpllvid ON lehre.tbl_studienplan_lehrveranstaltung USING btree (studienplan_id, lehrveranstaltung_id);
-	CREATE INDEX idx_studienplan_lehrveranstaltung_studienplan_id ON lehre.tbl_studienplan_lehrveranstaltung USING btree (studienplan_id);
-	CREATE INDEX idx_studienplan_lehrveranstaltung_parent_id ON lehre.tbl_studienplan_lehrveranstaltung USING btree (studienplan_lehrveranstaltung_id_parent);
-	CREATE INDEX idx_lehreinheit_lehrfach_id ON lehre.tbl_lehreinheit USING btree (lehrfach_id)
-	";
-
-	if(!$db->db_query($qry))
-		echo '<strong>Indizes: '.$db->db_last_error().'</strong><br>';
-	else
-		echo 'Diverse Indexe fuer Studienpan und Lehrveranstaltung hinzugefuegt';
+		$qry = "
+		CREATE INDEX idx_lehrveranstaltung_studiengang ON lehre.tbl_lehrveranstaltung USING btree (studiengang_kz);
+		CREATE INDEX idx_lehrveranstaltung_semester ON lehre.tbl_lehrveranstaltung USING btree (semester);
+		CREATE INDEX idx_lehreinheit_lehrveranstaltung_id ON lehre.tbl_lehreinheit USING btree (lehrveranstaltung_id);
+		CREATE INDEX idx_studienplan_studienordnung_id ON lehre.tbl_studienplan USING btree (studienordnung_id);
+		CREATE INDEX idx_studienplan_lehrveranstaltung_lehrveranstaltung_id ON lehre.tbl_studienplan_lehrveranstaltung USING btree (lehrveranstaltung_id);
+		CREATE INDEX idx_studienplan_lehrveranstaltung_stpllvid ON lehre.tbl_studienplan_lehrveranstaltung USING btree (studienplan_id, lehrveranstaltung_id);
+		CREATE INDEX idx_studienplan_lehrveranstaltung_studienplan_id ON lehre.tbl_studienplan_lehrveranstaltung USING btree (studienplan_id);
+		CREATE INDEX idx_studienplan_lehrveranstaltung_parent_id ON lehre.tbl_studienplan_lehrveranstaltung USING btree (studienplan_lehrveranstaltung_id_parent);
+		CREATE INDEX idx_lehreinheit_lehrfach_idLV ON lehre.tbl_lehreinheit USING btree (lehrfach_id)
+		";
+	
+		if(!$db->db_query($qry))
+			echo '<strong>Indizes: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'Diverse Indexe fuer Studienpan und Lehrveranstaltung hinzugefuegt';
+	}
 }
 
 echo '<br><br><br>';
@@ -1769,3 +1769,4 @@ foreach($webservicerecht as $row)
 }
 
 echo '</body></html>';
+?>
