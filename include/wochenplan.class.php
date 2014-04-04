@@ -730,7 +730,10 @@ class wochenplan extends basis_db
 							sort($anmerkung);
 							$anm='';
 							foreach ($anmerkung as $a)
-								$anm.='<BR />'.$a;
+								if ($a!='')
+									$anm.='<BR />'.$a;
+								else
+									$anm='';
 						}
 							
 						// Blinken oder nicht ?
@@ -875,7 +878,8 @@ class wochenplan extends basis_db
 							{
 								$uEinheit['anmerkung']=array_unique($uEinheit['anmerkung']);
 								foreach($uEinheit['anmerkung'] as $ueAnmerkung)
-									echo $ueAnmerkung."<BR />";
+									if ($ueAnmerkung!='')
+										echo $ueAnmerkung."<BR />";
 							}
 							echo '</A></DIV>';
 						}

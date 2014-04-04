@@ -660,7 +660,7 @@ class lehreinheit extends basis_db
 			// Datenbank INSERT
 			$sql_query="INSERT INTO $stpl_table
 				(unr,mitarbeiter_uid,datum,	stunde,	ort_kurzbz,lehreinheit_id,studiengang_kz,semester,verband,
-				gruppe,	gruppe_kurzbz,	titel, anmerkung, updatevon)
+				gruppe,	gruppe_kurzbz,	titel, updatevon)
 				VALUES ($this->unr,'".$this->mitarbeiter_uid[$i]."','$datum',$stunde,
 				'$ort',$this->lehreinheit_id, ".$this->studiengang_kz[$i].",".$this->semester[$i].",
 				'".$this->verband[$i]."','".$this->gruppe[$i]."'";
@@ -668,7 +668,7 @@ class lehreinheit extends basis_db
 				$sql_query.=',NULL';
 			else
 				$sql_query.=",'".$this->gruppe_kurzbz[$i]."'";
-			$sql_query.=",'".$this->titel[$i]."','$this->anmerkung','$user')";
+			$sql_query.=",'".$this->titel[$i]."','$user')";
 			if (!$this->db_query($sql_query))
 			{
 				$this->errormsg=$this->db_last_error();

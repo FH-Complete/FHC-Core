@@ -408,7 +408,7 @@ else
 <link rel="stylesheet" href="../../skin/styles/jquery-ui-1.10.3.custom.css" />
 <link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 <script src="../../include/js/jquery1.9.min.js"></script>
-<script src="../../include/js/jquery-ui1.10.3.js"></script>
+
 <script type="text/javascript" src="../../include/js/jquery.idTabs.min.js"></script>
 <script>
 $(function() {

@@ -715,6 +715,7 @@ else
 				<studiensemester_aktuell><![CDATA['.$stsem->studiensemester_kurzbz.']]></studiensemester_aktuell>
 				<studienbeginn_aktuell><![CDATA['.$datum_obj->convertISODate($stsem->start).']]></studienbeginn_aktuell>
 				<tagesdatum><![CDATA['.date('d.m.Y').']]></tagesdatum>
+				<max_semester><![CDATA['.$studiengang->max_semester.']]></max_semester>
 	    	</student>';
 		}
 	}
