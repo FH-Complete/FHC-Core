@@ -333,9 +333,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								   class="sortDirectionIndicator"
 									sort="rdf:http://www.technikum-wien.at/projektbetreuer/rdf#note"/>
 								<splitter class="tree-splitter"/>
-								<treecol id="student-projektbetreuer-tree-faktor" label="Faktor" flex="2" hidden="false"
+								<treecol id="student-projektbetreuer-tree-faktor" label="Faktor" flex="2" ignoreincolumnpicker="true" hidden="true"
 									class="sortDirectionIndicator"
-									sort="rdf:http://www.technikum-wien.at/projektbetreuer/rdf#faktor" />
+									sort="rdf:http://www.technikum-wien.at/projektbetreuer/rdf#faktor" /><!-- Faktor wird nicht mehr benoetigt und deshalb ausgeblendet -->
 								<splitter class="tree-splitter"/>
 								<treecol id="student-projektbetreuer-tree-punkte" label="Punkte" flex="2" hidden="false"
 									class="sortDirectionIndicator"
@@ -462,7 +462,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<label value="Stundensatz" control="student-projektbetreuer-textbox-stundensatz"/>
 								<textbox id="student-projektbetreuer-textbox-stundensatz" disabled="true" maxlength="5"/>
 							</row>
-							<row>
+							<row hidden="true"><!-- Faktor wird nicht mehr benoetigt -->
 								<label value="Faktor" control="student-projektbetreuer-textbox-faktor"/>
 								<textbox id="student-projektbetreuer-textbox-faktor" disabled="true" maxlength="3"/>
 							</row>
