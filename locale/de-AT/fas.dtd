@@ -291,6 +291,10 @@
 <!ENTITY menu-extras-lvverwaltung.label		"Lehrveranstaltungsverwaltung">
 <!ENTITY menu-extras-lvverwaltung.accesskey	"L">
 
+<!ENTITY menu-extras-studienordnung.key		"S">
+<!ENTITY menu-extras-studienordnung.label		"Studienordnung">
+<!ENTITY menu-extras-studienordnung.accesskey	"S">
+
 <!ENTITY menu-extras-projektarbeitsbenotung.key			"P">
 <!ENTITY menu-extras-projektarbeitsbenotung.label		"Projektarbeitsbenotung">
 <!ENTITY menu-extras-projektarbeitsbenotung.accesskey	"P">

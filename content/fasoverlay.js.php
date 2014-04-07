@@ -1152,6 +1152,14 @@ function ExtrasShowFirmenverwaltung()
 }
 
 // ****
+// * Zeigt HTML Seite zum Bearbeiten der Studienordnung an
+// ****
+function ExtrasShowStudienordnung()
+{
+	window.open('<?php echo APP_ROOT ?>vilesci/lehre/studienordnung.php','Studienordnung','');
+}
+
+// ****
 // * Zeigt HTML Seite zum Eintragen von Projektarbeitsnoten an
 // ****
 function ExtrasShowProjektarbeitsBenotung()
