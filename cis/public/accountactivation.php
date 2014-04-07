@@ -35,6 +35,7 @@ if(isset($_GET['sprache']))
 		setSprache(DEFAULT_LANGUAGE);
 }
 
+$erfolgreichaktiviert=false;
 $sprache = getSprache(); 
 
 $p = new phrasen($sprache);
@@ -63,7 +64,7 @@ if(isset($_POST['submit']))
 		if($benutzer->load($username))
 		{
 			// Aktivierungscode pruefen
-			if($benutzer->aktivierungscode==$code)
+			if($benutzer->aktivierungscode==$code && $code!='')
 			{
 				$passwort = $_POST['passwort'];
 				$passwort2 = $_POST['passwort2'];
@@ -80,6 +81,9 @@ if(isset($_POST['submit']))
 							// Code entfernen
 							$benutzer = new benutzer();
 							$benutzer->DeleteAktivierungscode($username);
+
+							// Account aktiviert
+							$erfolgreichaktiviert=true;
 						}
 					}
 				}
@@ -125,77 +129,89 @@ echo '<!doctype html>
 <td class="rand"></td>
 <td class="boxshadow" align="center" valign="top"><br><br>';
 
-echo '		<table width="100%" border="0">
-    <tr>
-        <td align="left"></td>
-        <td align="right" width="10px">
-		<select style="text-align: right; color: #0086CC; border: 0;" name="select">';
-            $sprache2 = new sprache();
-			$sprache2->getAll(true);
-			foreach($sprache2->result as $row)
-			{
-				echo ' <option onclick="changeSprache(\''.$row->sprache.'\'); return false;" '.($row->sprache==$sprache?'selected':'').'>'.($row->bezeichnung_arr[getSprache()]).'&nbsp;&nbsp;</option>';
-			}
-echo '	</select></td>
-    </tr>
-</table>';
 
-echo '
-<h1>'.$p->t('passwort/AccountAktivierung').'</h1>
-'.$p->t('passwort/PasswortWaehlen').'<br>'.
-$p->t('passwort/InfotextPolicy').'
-<br><br>';
-if(!isset($_SERVER['HTTPS']) || (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='off'))
+if($erfolgreichaktiviert)
 {
+	echo '<br><br><h1>Ihr Account wurde erfolgreich aktiviert</h1><br><br>
+	<a href="'.APP_ROOT.'">&gt;&gt; Weiter zum Login</a>';
+}
+else
+{
+	echo '		<table width="100%" border="0">
+		<tr>
+		    <td align="left"></td>
+		    <td align="right" width="10px">
+			<select style="text-align: right; color: #0086CC; border: 0;" name="select">';
+		        $sprache2 = new sprache();
+				$sprache2->getAll(true);
+				foreach($sprache2->result as $row)
+				{
+					echo ' <option onclick="changeSprache(\''.$row->sprache.'\'); return false;" '.($row->sprache==$sprache?'selected':'').'>'.($row->bezeichnung_arr[getSprache()]).'&nbsp;&nbsp;</option>';
+				}
+	echo '	</select></td>
+		</tr>
+	</table>';
+
+	echo '
+	<h1>'.$p->t('passwort/AccountAktivierung').'</h1>
+	'.$p->t('passwort/PasswortWaehlen').'<br>'.
+	$p->t('passwort/InfotextPolicy').'
+	<br><br>';
+	if(!isset($_SERVER['HTTPS']) || (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='off'))
+	{
 	
-	$httpspath = str_replace('http://','https://',APP_ROOT).'cis/public/accountactivation.php';
-	echo '<div style="border: 2px solid red; text-align:center">'.$p->t('passwort/NoHttps').'<br>
-	<a href="'.$httpspath.'">'.$p->t('passwort/ZuHttpsWechseln').'</a></div><br>';
+		$httpspath = str_replace('http://','https://',APP_ROOT).'cis/public/accountactivation.php';
+		echo '<div style="border: 2px solid red; text-align:center">'.$p->t('passwort/NoHttps').'<br>
+		<a href="'.$httpspath.'">'.$p->t('passwort/ZuHttpsWechseln').'</a></div><br>';
+	}
+
+	echo '<br>
+	<span class="error">'.$errormsg.'</span>
+	<br>
+	<form method="POST">
+	<table>
+	<tr>
+		<td>Username</td>
+		<td><input type="text" name="username" value="'.$db->convert_html_chars($username).'"/></td>
+	</tr>
+	<tr>
+		<td>Code</td>
+		<td><input type="text" size="32" name="code" value="'.$db->convert_html_chars($code).'"/></td>
+	</tr>
+	<tr>
+		<td>'.$p->t('passwort/NeuesPasswort').'</td>
+		<td><input type="password" name="passwort" /></td>
+	</tr>
+	<tr>
+		<td>'.$p->t('passwort/PasswortWiederholung').'</td>
+		<td><input type="password" name="passwort2" /></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td valign="top">
+			'.$p->t('passwort/CaptchaEingabe').'
+			<br>
+			<a href="#" onclick="document.getElementById(\'captcha\').src = \'../../include/securimage/securimage_show.php?\'+Math.random(); return false">'.$p->t('passwort/ReloadCaptcha').'</a>
+		</td>
+		<td>
+			<img id="captcha" src="../../include/securimage/securimage_show.php" alt="CAPTCHA Image" style="border:1px solid;" />
+			<br>
+			<input type="text" name="captcha_code" size="10" maxlength="6" />
+		</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td><input type="submit" name="submit" value="Absenden" /></td>
+	</tr>
+	</table>
+	</form>';
 }
 
-echo '<br>
-<span class="error">'.$errormsg.'</span>
-<br>
-<form method="POST">
-<table>
-<tr>
-	<td>Username</td>
-	<td><input type="text" name="username" value="'.$db->convert_html_chars($username).'"/></td>
-</tr>
-<tr>
-	<td>Code</td>
-	<td><input type="text" size="32" name="code" value="'.$db->convert_html_chars($code).'"/></td>
-</tr>
-<tr>
-	<td>'.$p->t('passwort/NeuesPasswort').'</td>
-	<td><input type="password" name="passwort" /></td>
-</tr>
-<tr>
-	<td>'.$p->t('passwort/PasswortWiederholung').'</td>
-	<td><input type="password" name="passwort2" /></td>
-</tr>
-<tr>
-	<td></td>
-	<td>&nbsp;</td>
-</tr>
-<tr>
-	<td valign="top">
-		'.$p->t('passwort/CaptchaEingabe').'
-		<br>
-		<a href="#" onclick="document.getElementById(\'captcha\').src = \'../../include/securimage/securimage_show.php?\'+Math.random(); return false">'.$p->t('passwort/ReloadCaptcha').'</a>
-	</td>
-	<td>
-		<img id="captcha" src="../../include/securimage/securimage_show.php" alt="CAPTCHA Image" style="border:1px solid;" />
-		<br>
-		<input type="text" name="captcha_code" size="10" maxlength="6" />
-	</td>
-</tr>
-<tr>
-	<td></td>
-	<td><input type="submit" name="submit" value="Absenden" /></td>
-</tr>
-</table>
-</form>
+echo '
+</td>
 <td class="rand">
 </td>
 </tr>
