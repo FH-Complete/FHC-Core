@@ -26,7 +26,7 @@ require_once('../include/functions.inc.php');
 require_once('../include/person.class.php');
 require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/akte.class.php');
-require_once ('../include/dokument.class.php');
+require_once('../include/dokument.class.php');
 require_once('../include/dms.class.php'); 
 require_once('../include/phrasen.class.php'); 
 
@@ -129,7 +129,7 @@ if(isset($_POST['submitbild']))
 		$dokument->loadDokumenttyp($_REQUEST['dokumenttyp']);
 
 		$extension = end(explode(".",strtolower($_FILES['file']['name'])));
-		$titel = '';
+		$titel = $_REQUEST['dokumenttyp'];
 		
 		// da nur 32 zeichen gespeichert werden dürfen, muss anhand vom typ gekürzt werden
 		if($_REQUEST['dokumenttyp']=='Lebenslf')
@@ -142,10 +142,10 @@ if(isset($_POST['submitbild']))
 			$titel = $p->t('incoming/zeugnis').".".$extension;			
 		if($_REQUEST['dokumenttyp']=='Lichtbil')
 			$titel = $p->t('incoming/lichtbild').".".$extension;					
-			
+		// alle auf 32
 			
 		$akte->dokument_kurzbz = $_REQUEST['dokumenttyp'];
-                $akte->bezeichnung = $_FILES['file']['name']; 
+        $akte->bezeichnung = substr($_FILES['file']['name'],0,32); // auf 32
 		$akte->person_id = $_GET['person_id'];
 		//$akte->inhalt = base64_encode($content);
 		$akte->mimetype = $_FILES['file']['type'];
