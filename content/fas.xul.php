@@ -141,6 +141,7 @@ foreach($addon_obj->result as $addon)
   <command id="menu-extras-reihungstest:command" oncommand="ExtrasShowReihungstest();"/>
   <command id="menu-extras-firma:command" oncommand="ExtrasShowFirmenverwaltung();"/>
   <command id="menu-extras-lvverwaltung:command" oncommand="ExtrasShowLVverwaltung();"/>
+  <command id="menu-extras-studienordnung:command" oncommand="ExtrasShowStudienordnung();"/>
   <command id="menu-extras-projektarbeitsbenotung:command" oncommand="ExtrasShowProjektarbeitsBenotung();"/>
   <command id="menu-extras-gruppenverwaltung:command" oncommand="ExtrasShowGruppenverwaltung();"/>
   <command id="menu-extras-lehrfachverwaltung:command" oncommand="ExtrasShowLehrfachverwaltung();"/>
@@ -718,6 +719,12 @@ foreach($addon_obj->result as $addon)
                label     = "&menu-extras-lvverwaltung.label;"
                command   =  "menu-extras-lvverwaltung:command"
                accesskey = "&menu-extras-lvverwaltung.accesskey;"/>
+            <menuitem
+               id        =  "menu-extras-studienordnung"
+               key       =  "menu-extras-studienordnung:key"
+               label     = "&menu-extras-studienordnung.label;"
+               command   =  "menu-extras-studienordnung:command"
+               accesskey = "&menu-extras-studienordnung.accesskey;"/>
              <menuitem
                id        =  "menu-extras-projektarbeitsabgaben"
                key       =  "menu-extras-projektarbeitsabgaben:key"
