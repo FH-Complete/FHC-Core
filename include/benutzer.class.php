@@ -415,7 +415,7 @@ class benutzer extends person
 	 */	
 	public function DeleteAktivierungscode($username)
 	{
-		$qry = "UPDATE public.tbl_benutzer SET aktivierungscode=null WHERE uid=".$db->db_add_param($username);
+		$qry = "UPDATE public.tbl_benutzer SET aktivierungscode=null WHERE uid=".$this->db_add_param($username);
 		if($this->db_query($qry))
 			return true;
 		else

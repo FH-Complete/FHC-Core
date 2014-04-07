@@ -21,6 +21,7 @@
  * Funktionen zum Pruefen der Passwort Policy und setzen des Passworts
  */
 require_once(dirname(__FILE__).'/../addon.class.php');
+require_once(dirname(__FILE__).'/../Crypt_CHAP-1.5.0/CHAP.php');
 
 // die aktiven Addons werden durchsucht, ob eines davon eine eigene UID Generierung vorsieht
 // falls ja, wird die Version des Addons genommen, ansonsten die Default Generierung
