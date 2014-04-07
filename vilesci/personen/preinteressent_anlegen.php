@@ -32,6 +32,7 @@ require_once('../../include/studiensemester.class.php');
 require_once('../../include/preinteressent.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/nation.class.php');
+require_once('../../include/sprache.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -334,8 +335,12 @@ $titel = (isset($_REQUEST['titel'])?$_REQUEST['titel']:'');
 $titelpost = (isset($_REQUEST['titelpost'])?$_REQUEST['titelpost']:'');
 $nachname = (isset($_REQUEST['nachname'])?$_REQUEST['nachname']:'');
 $vorname = (isset($_REQUEST['vorname'])?$_REQUEST['vorname']:'');
+$vornamen = (isset($_REQUEST['vornamen'])?$_REQUEST['vornamen']:'');
 $geschlecht = (isset($_REQUEST['geschlecht'])?$_REQUEST['geschlecht']:'');
 $geburtsdatum = (isset($_REQUEST['geburtsdatum'])?$_REQUEST['geburtsdatum']:'');
+$geburtsnation = (isset($_REQUEST['geburtsnation'])?$_REQUEST['geburtsnation']:'A');
+$gebort = (isset($_REQUEST['gebort'])?$_REQUEST['gebort']:'');
+$sprache = (isset($_REQUEST['sprache'])?$_REQUEST['sprache']:'German');
 $nation = (isset($_REQUEST['nation'])?$_REQUEST['nation']:'A');
 $adresse = (isset($_REQUEST['adresse'])?$_REQUEST['adresse']:'');
 $adresse_nation = (isset($_REQUEST['adresse_nation'])?$_REQUEST['adresse_nation']:'A');
@@ -366,6 +371,8 @@ $person_id = (isset($_REQUEST['person_id'])?$_REQUEST['person_id']:'');
 $svnr = (isset($_REQUEST['svnr'])?$_REQUEST['svnr']:'');
 $ersatzkennzeichen = (isset($_REQUEST['ersatzkennzeichen'])?$_REQUEST['ersatzkennzeichen']:'');
 $ueberschreiben = (isset($_REQUEST['ueberschreiben'])?$_REQUEST['ueberschreiben']:'');
+
+$anmerkung_preint = (isset($_REQUEST['anmerkung_preint'])?$_REQUEST['anmerkung_preint']:'');
 
 $stsem = new studiensemester();
 $stsem->getNextStudiensemester('WS');
@@ -401,6 +408,7 @@ if(isset($_POST['save']))
 		$person->titelpre = $titel;
 		$person->nachname = $nachname;
 		$person->vorname = $vorname;
+		$person->vornamen = $vornamen;
 		$person->titelpost = $titelpost;
 		$person->geschlecht = $geschlecht;
 		$person->gebdatum = $datum_obj->formatDatum($geburtsdatum,'Y-m-d');
@@ -411,7 +419,10 @@ if(isset($_POST['save']))
 		$person->insertamum = date('Y-m-d H:i:s');
 		$person->insertvon = $user;
         $person->zugangscode= uniqid();
-		
+		$person->geburtsnation = $geburtsnation;
+		$person->sprache = $sprache;
+		$person->gebort = $gebort;
+        
 		if($person->save())
 		{
 			$error=false;
@@ -572,6 +583,7 @@ if(isset($_POST['save']))
 		$preinteressent->firma_id = $schule;
 		$preinteressent->insertamum = date('Y-m-d H:i:s');
 		$preinteressent->insertvon = $user;
+		$preinteressent->anmerkung = $anmerkung_preint;
 		
 		if(!$preinteressent->save(true))
 		{
@@ -652,6 +664,7 @@ if($geburtsdatum!='')
 <?php
 echo '<tr><td>Titel(Pre)</td><td><input type="text" id="titel" name="titel" maxlength="64" value="'.$titel.'" /></td></tr>';
 echo '<tr><td>Vorname</td><td><input type="text" id="vorname" maxlength="32" name="vorname" value="'.$vorname.'" /></td></tr>';
+echo '<tr><td>Vornamen</td><td><input type="text" id="vornamen" maxlength="32" name="vornamen" value="'.$vornamen.'" /></td></tr>';
 echo '<tr><td>Nachname *</td><td><input type="text" maxlength="64" id="nachname" name="nachname" value="'.$nachname.'" /></td></tr>';
 echo '<tr><td>Titel(Post)</td><td><input type="text" id="titelpost" name="titelpost" maxlength="64" value="'.$titelpost.'" /></td></tr>';
 echo '<tr><td>Geschlecht *</td><td><SELECT id="geschlecht" name="geschlecht">';
@@ -674,11 +687,42 @@ if($result = $db->db_query($qry))
 		echo "<option value='$row->nation_code' $selected>$row->kurztext</option>";
 	}
 }
-echo '</SELECT';
+echo '</SELECT>';
 echo '</td></tr>';
 echo '<tr><td>SVNR</td><td><input type="text" id="svnr" size="10" maxlength="10" name="svnr" value="'.$svnr.'" onblur="GeburtsdatumEintragen()" /></td></tr>';
 echo '<tr><td>Ersatzkennzeichen</td><td><input type="text" id="ersatzkennzeichen" size="10" maxlength="10" name="ersatzkennzeichen" value="'.$ersatzkennzeichen.'" /></td></tr>';
 echo '<tr><td>Geburtsdatum</td><td><input type="text" id="geburtsdatum" size="10" maxlength="10" name="geburtsdatum" value="'.$geburtsdatum.'" /> (Format dd.mm.JJJJ)</td></tr>';
+echo '<tr><td>Geburtsort</td><td><input type="text" id="gebort" size="30" maxlength="255" name="gebort" value="'.$gebort.'" /></td></tr>';
+echo '<tr><td>Geburtsnation</td><td><SELECT name="geburtsnation">';
+$qry = "SELECT nation_code, kurztext FROM bis.tbl_nation ORDER BY kurztext";
+if($result = $db->db_query($qry))
+{
+	while($row = $db->db_fetch_object($result))
+	{
+		if($row->nation_code==$geburtsnation)
+			$selected='selected';
+		else
+			$selected='';
+
+		echo "<option value='$row->nation_code' $selected>$row->kurztext</option>";
+	}
+}
+echo '</SELECT>';
+echo '</td></tr>';
+echo '<tr><td>Sprache</td><td><SELECT name="sprache">';
+$sprache_obj = new sprache();
+$sprache_obj->getAll();
+foreach($sprache_obj->result as $row)
+{
+	if($row->sprache==$sprache)
+		$selected='selected';
+	else
+		$selected='';
+
+	echo "<option value='$row->sprache' $selected>".$row->bezeichnung_arr['German']."</option>";
+}
+echo '</SELECT>';
+echo '</td></tr>';
 echo '<tr><td colspan="2"><fieldset><legend>Adresse</legend><table>';
 echo '<tr><td>Nation</td><td><SELECT name="adresse_nation" id="adresse_nation" onchange="loadGemeindeData()">';
 $nation =  new nation();
@@ -780,6 +824,7 @@ if($result = $db->db_query($qry))
 }
 echo '</SELECT></td></tr>';
 echo '</tr><td>Schule ID:</td><td><input type="text" size="3" name="schule_id" id="schule_id" value="'.$schule.'" onkeyup="checkschulid(this.value)"></td></tr>';
+echo '</tr><td>Anmerkung:</td><td><textarea name="anmerkung_preint" id="anmerkung_preint" cols="40" rows="3">'.$anmerkung_preint.'</textarea></td></tr>';
 echo '<tr><td></td><td>';
 if(($vorname!='' && $geburtsdatum=='' && $nachname=='') 
    || ($vorname=='' && $geburtsdatum=='' && $nachname!='') 
