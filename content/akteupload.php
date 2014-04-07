@@ -28,6 +28,7 @@ require_once('../include/benutzerberechtigung.class.php');
 require_once('../include/akte.class.php');
 require_once ('../include/dokument.class.php');
 require_once('../include/dms.class.php'); 
+require_once('../include/phrasen.class.php'); 
 
 header("Content-Type: text/html; charset=utf-8");
 
@@ -35,7 +36,7 @@ $PHP_SELF = $_SERVER['PHP_SELF'];
 echo "<html><body>";
 
 $user = get_uid();
-
+$p = new phrasen(); 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz') && !$rechte->isBerechtigt('mitarbeiter'))
