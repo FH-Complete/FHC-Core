@@ -52,9 +52,9 @@ switch($method)
 	case 'stornoAnmeldung':
 	    $data = stornoAnmeldung($uid);
 	    break;
-	case 'getPruefungMitarbeiter':
-	    $data = getPruefungMitarbeiter($uid);
-	    break;
+//	case 'getPruefungMitarbeiter':
+//	    $data = getPruefungMitarbeiter($uid);
+//	    break;
 	case 'getAnmeldungenTermin':
 	    $data = getAnmeldungenTermin();
 	    break;
@@ -90,7 +90,6 @@ echo json_encode($data);
 function getPruefungByLv($aktStudiensemester = null, $uid = null)
 {
     $lehrveranstaltungen = new lehrveranstaltung();
-    //TODO
     $lehrveranstaltungen->load_lva_student($uid);
     $lvIds = array();
     foreach($lehrveranstaltungen->lehrveranstaltungen as $lvs)
@@ -234,10 +233,18 @@ function loadPruefung()
     {
 	$temp = array();
 	$pruefung->getLehrveranstaltungenByPruefung();
+	$pruefung->getTermineByPruefung();
+	$studiengang = new studiengang();
 	foreach($pruefung->lehrveranstaltungen as $lv)
 	{
 	    $lehrveranstaltung = new lehrveranstaltung($lv->lehrveranstaltung_id);
 	    $lehrveranstaltung = $lehrveranstaltung->cleanResult();
+	    $studiengang->load($lehrveranstaltung[0]->studiengang_kz);
+	    $stg = new stdClass();
+	    $stg->bezeichnung = $studiengang->bezeichnung;
+	    $stg->studiengang_kz = $studiengang->studiengang_kz;
+	    $stg->kurzbzlang = $studiengang->kurzbzlang;
+	    $lehrveranstaltung[0]->studiengang = $stg;
 	    $prf = new stdClass();
 	    $prf->lehrveranstaltung = $lehrveranstaltung[0];
 	    $prf->pruefung = $pruefung;
@@ -445,42 +452,41 @@ function stornoAnmeldung($uid = null)
  * @param type $uid UID des Lektors/Mitarbeiters
  * @return Array
  */
-function getPruefungMitarbeiter($uid = null)
-{
-    $lehrveranstaltung = new lehrveranstaltung();
-    if($uid !== null)
-    {
-	//TODO UID
-	$lehrveranstaltung->getLVByMitarbeiter($uid);
-//	$lehrveranstaltung->getLVByMitarbeiter("neubauer");
-	$result = array();
-	foreach($lehrveranstaltung->lehrveranstaltungen as $lv)
-	{
-	    $pruefung = new pruefungCis();
-	    $pruefung->getPruefungByLv($lv->lehrveranstaltung_id);
-	    if($pruefung->lehrveranstaltungen[0]->pruefung_id !== null)
-	    {
-		$pruefung->load($pruefung->lehrveranstaltungen[0]->pruefung_id);
-		$pruefung->getTermineByPruefung();
-		$lv->pruefung = $pruefung;
-		array_push($result, $lv);
-	    }
-	}
-    }
-
-    if(!empty($result))
-    {
-	$data['result']=$result;
-	$data['error']='false';
-	$data['errormsg']='';
-    }
-    else
-    {
-	$data['error']='true';
-	$data['errormsg']="Keine Prüfungen vorhanden.";
-    }
-    return $data;
-}
+//function getPruefungMitarbeiter($uid = null)
+//{
+//    $lehrveranstaltung = new lehrveranstaltung();
+//    if($uid !== null)
+//    {
+//	$lehrveranstaltung->getLVByMitarbeiter($uid);
+////	$lehrveranstaltung->getLVByMitarbeiter("neubauer");
+//	$result = array();
+//	foreach($lehrveranstaltung->lehrveranstaltungen as $lv)
+//	{
+//	    $pruefung = new pruefungCis();
+//	    $pruefung->getPruefungByLv($lv->lehrveranstaltung_id);
+//	    if($pruefung->lehrveranstaltungen[0]->pruefung_id !== null)
+//	    {
+//		$pruefung->load($pruefung->lehrveranstaltungen[0]->pruefung_id);
+//		$pruefung->getTermineByPruefung();
+//		$lv->pruefung = $pruefung;
+//		array_push($result, $lv);
+//	    }
+//	}
+//    }
+//
+//    if(!empty($result))
+//    {
+//	$data['result']=$result;
+//	$data['error']='false';
+//	$data['errormsg']='';
+//    }
+//    else
+//    {
+//	$data['error']='true';
+//	$data['errormsg']="Keine Prüfungen vorhanden.";
+//    }
+//    return $data;
+//}
 
 /**
  * Lädt alle Anmeldungen zu einem Prüfungstermin
