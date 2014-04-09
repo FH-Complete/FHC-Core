@@ -167,7 +167,7 @@ class pruefungCis extends basis_db
                     . 'pruefungsfenster_id='.$this->db_add_param($this->pruefungsfenster_id).', '
                     . 'pruefungstyp_kurzbz='.$this->db_add_param($this->pruefungstyp_kurzbz).', '
                     . 'titel='.$this->db_add_param($this->titel).', '
-                    . 'beschreibung='.$this->db_add_param($this->titel).', '
+                    . 'beschreibung='.$this->db_add_param($this->beschreibung).', '
                     . 'methode='.$this->db_add_param($this->methode).', '
                     . 'einzeln='.$this->db_add_param($this->einzeln,FHC_BOOLEAN).', '
                     . 'storniert='.$this->db_add_param($this->storniert,FHC_BOOLEAN).', '
@@ -223,15 +223,18 @@ class pruefungCis extends basis_db
             }
             else
             {
-                foreach ($this->termine as $termin)
-                {
-                    if(!$this->updateTerminPruefung($termin->pruefungstermin_id, $this->pruefung_id, $termin->beginn, $termin->ende, $termin->max, $termin->min))
-                    {
-                        $this->errormsg = 'Fehler beim ändern der Termine.ID'.$termin->pruefungstermin_id;
-                        $this->db_query('ROLLBACK');
-                        return false;
-                    }
-                }
+		if($this->termine !== NULL)
+		{
+		    foreach ($this->termine as $termin)
+		    {
+			if(!$this->updateTerminPruefung($termin->pruefungstermin_id, $this->pruefung_id, $termin->beginn, $termin->ende, $termin->max, $termin->min))
+			{
+			    $this->errormsg = 'Fehler beim ändern der Termine.ID'.$termin->pruefungstermin_id;
+			    $this->db_query('ROLLBACK');
+			    return false;
+			}
+		    }
+		}
                 foreach ($this->lehrveranstaltungen as $lv)
                     {
                         if(!$this->saveLehrveranstaltungPruefung($lv, $this->pruefung_id))
@@ -299,19 +302,19 @@ class pruefungCis extends basis_db
      * @param String $studiensemester_kurzbz optional kann das Laden auf ein Studiensemester beschränkt werden
      * @return boolean true, wenn ok; false, im Fehlerfall
      */
-    public function getPruefungByMitarbeiter($uid, $studiensemester_kurzbz=null)
+    public function getPruefungByMitarbeiter($uid, $studiensemester_kurzbz=null, $order=null)
     {
         $qry = 'SELECT * FROM campus.tbl_pruefung '
                 . 'WHERE mitarbeiter_uid='.$this->db_add_param($uid);
         if($studiensemester_kurzbz!=null)
         {
-            $qry .= ' AND studiensemester_kurzbz='.$this->db_add_param($studiensemester_kurzbz).';';
+            $qry .= ' AND studiensemester_kurzbz='.$this->db_add_param($studiensemester_kurzbz);
         }
-        else
+        if(!is_null($order))
         {
-            $qry .= ';';
+            $qry .= ' ORDER BY '.$order;
         }
-                
+        $qry .= ';';        
         
         if(!$this->db_query($qry))
         {
@@ -636,6 +639,44 @@ class pruefungCis extends basis_db
             return true;
         }
         return false;
+    }
+    
+    public function getAllPruefungen($mitarbeiter_uid = NULL)
+    {
+	$qry = 'SELECT * FROM campus.tbl_pruefung';
+        
+	if(!is_null($mitarbeiter_uid))
+	{
+	    $qry .= ' WHERE mitarbeiter_uid='.$this->db_add_param($mitarbeiter_uid);
+	}
+	
+	$qry .= ';';
+	
+        if(!$this->db_query($qry))
+        {
+            $this->errormsg = "Prüfungen konnten nicht geladen werden";
+            return false;
+        }
+        else
+        {
+            while($row = $this->db_fetch_object())
+            {
+                $obj = new pruefungCis();
+
+                $obj->pruefung_id = $row->pruefung_id;
+                $obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+                $obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+                $obj->pruefungsfenster_id = $row->pruefungsfenster_id;
+                $obj->pruefungstyp_kurzbz = $row->pruefungstyp_kurzbz;
+                $obj->titel = $row->titel;
+                $obj->beschreibung = $row->beschreibung;
+                $obj->methode = $row->methode;
+                $obj->einzeln = $this->db_parse_bool($row->einzeln);
+                $obj->storniert = $this->db_parse_bool($row->storniert);
+                $this->result[] = $obj;
+            }
+            return true;
+        }
     }
     
     /**

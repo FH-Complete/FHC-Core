@@ -101,9 +101,15 @@ class pruefungstermin extends basis_db{
      * Lädt alle Prüfungstypen aus der Datenbank
      * @return Array/Boolean Ein Array mit den Daten, wenn ok; ansonsten false
      */
-    public function getAllPruefungstypen()
+    public function getAllPruefungstypen($abschluss = null)
     {
-        $qry = 'SELECT * FROM lehre.tbl_pruefungstyp;';
+        $qry = 'SELECT * FROM lehre.tbl_pruefungstyp';
+	
+	if(!is_null($abschluss))
+	{
+	    $qry .= ' WHERE abschluss='.$this->db_add_param($abschluss);
+	}
+	$qry .=';';
         
         if($this->db_query($qry))
         {
