@@ -1041,12 +1041,12 @@ function savePruefungstermin()
 		error = true;
 		markMissingFormEntry("methode");
 	}
-	//TODO Kommentar entfernen
-//	if(lehrveranstaltungen.length === 0)
-//	{
-//		error = true;
-//		markMissingFormEntry("lvDropdowns");
-//	}
+
+	if(lehrveranstaltungen.length === 0)
+	{
+		error = true;
+		markMissingFormEntry("lvDropdowns");
+	}
 
 	
 	if(error)
@@ -1288,7 +1288,6 @@ function resetTermine()
 function updatePruefung(prfId)
 {
 	$("#modalOverlay").addClass("modalOverlay");
-	//TODO Terminkollisionen überprüfen
 	unmarkMissingFormEntry();
 	var studiensemester_kurzbz = $("#studiensemester").val();
 	var pruefungsfenster_id = $("#pruefungsfenster").val();

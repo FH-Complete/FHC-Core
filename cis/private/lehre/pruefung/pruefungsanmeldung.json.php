@@ -98,7 +98,6 @@ function getPruefungByLv($aktStudiensemester = null, $uid = null)
     }
     $lehrveranstaltungen=$lvIds;
     $pruefung = new pruefungCis();
-    //TODO nur Prüfungen des aktuellen Studiensemesters
     if($pruefung->getPruefungByLv($lehrveranstaltungen))
     {
 	$pruefungen = array();
@@ -168,7 +167,6 @@ function getPruefungByLvFromStudiengang($aktStudiensemester = null, $uid = null)
     }
     $lehrveranstaltungen=$lvIds;
     $pruefung = new pruefungCis();
-    //TODO nur Prüfungen des aktuellen Studiensemesters
     if($pruefung->getPruefungByLv($lehrveranstaltungen))
     {
 	$pruefungen = array();
@@ -371,7 +369,6 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 function getAllPruefungen($aktStudiensemester = null, $uid = null)
 {
     $pruefung = new pruefungCis();
-    //TODO Prüfungen des aktuellen Studiensemesters???
     if($pruefung->getAll())
     {
 	$pruefungen = array();
