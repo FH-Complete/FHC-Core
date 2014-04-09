@@ -89,9 +89,6 @@ if(!$rechte->isBerechtigt('lehre/pruefungstermin'))
         <script>
             $(document).ready(function() {
 		var isFormHidden = true;
-		loadPruefungstypen("false");
-		loadStudiensemester();
-		loadAllPruefungen();
 		$("#lektor").autocomplete({
 		    source: "lektor_autocomplete.php?autocomplete=lektor",
 		    minLength:2,
@@ -122,6 +119,9 @@ if(!$rechte->isBerechtigt('lehre/pruefungstermin'))
 			    isFormHidden = false;
 			    $("#prfVerwaltung form").slideToggle("slow");
 			}
+			loadAllPruefungen();
+			loadPruefungstypen("false");
+			loadStudiensemester();
 			loadAllPruefungen();
 		    }
 		});
