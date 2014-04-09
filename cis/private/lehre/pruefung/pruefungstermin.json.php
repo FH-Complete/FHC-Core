@@ -49,7 +49,15 @@ switch($method)
 	$einzeln = (isset($_POST["einzeln"]) && $_POST["einzeln"] ==="true")?true:false;
 	$lehrveranstaltungen = isset($_POST["lehrveranstaltungen"]) ? $_POST["lehrveranstaltungen"] : null;
 	$termine = isset($_POST["termine"])?$_POST["termine"]:null;
-	$data = savePruefungstermin($uid, $studiensemester_kurzbz, $pruefungsfenster_id, $pruefungstyp_kurzbz, $titel, $beschreibung, $methode, $einzeln, $lehrveranstaltungen, $termine);
+	if($rechte->isBerechtigt('lehre/pruefungsterminAll'))
+	{
+	    $mitarbeiter_uid = $_REQUEST["mitarbeiter_uid"];
+	}
+	else
+	{
+	    $mitarbeiter_uid = $uid;
+	}
+	$data = savePruefungstermin($mitarbeiter_uid, $studiensemester_kurzbz, $pruefungsfenster_id, $pruefungstyp_kurzbz, $titel, $beschreibung, $methode, $einzeln, $lehrveranstaltungen, $termine);
 	break;
     case 'getLehrveranstaltungenByMitarbeiter':
 	$mitarbeiter_uid = $_POST["mitarbeiter_uid"];
@@ -68,7 +76,15 @@ switch($method)
 	$lehrveranstaltungen = isset($_POST["lehrveranstaltungen"]) ? $_POST["lehrveranstaltungen"] : null;
 	$termine = isset($_POST["termine"])?$_POST["termine"]:null;
 	$termineNeu = isset($_POST["termineNeu"])?$_POST["termineNeu"]:null;
-	$data = updatePruefungstermin($uid, $pruefung_id, $studiensemester_kurzbz, $pruefungsfenster_id, $pruefungstyp_kurzbz, $titel, $beschreibung, $methode, $einzeln, $lehrveranstaltungen, $termine, $termineNeu);
+	if($rechte->isBerechtigt('lehre/pruefungsterminAll'))
+	{
+	    $mitarbeiter_uid = $_REQUEST["mitarbeiter_uid"];
+	}
+	else
+	{
+	    $mitarbeiter_uid = $uid;
+	}
+	$data = updatePruefungstermin($mitarbeiter_uid, $pruefung_id, $studiensemester_kurzbz, $pruefungsfenster_id, $pruefungstyp_kurzbz, $titel, $beschreibung, $methode, $einzeln, $lehrveranstaltungen, $termine, $termineNeu);
 	break;
     case 'deleteLehrveranstaltungFromPruefung':
 	$lvId = $_POST["lehrveranstaltung_id"];

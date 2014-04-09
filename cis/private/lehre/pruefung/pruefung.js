@@ -976,6 +976,7 @@ function savePruefungstermin()
 	var termine = [];
 	var lehrveranstaltungen = [];
 	var error = false;
+	var mitarbeiter_uid = $("#mitarbeiter_uid").val();
 	$("#prfTermin tr").each(function(i,v){
 		var termin = {};
 		$(v).find("input").each(function(j, w){
@@ -1001,6 +1002,13 @@ function savePruefungstermin()
 		{
 			error = true;
 			markMissingFormEntry($(v).attr("id"));
+		}
+		if(!checkMinMaxTeilnehmer(termin.min, termin.max))
+		{
+			error = true;
+			console.log("termin"+(i+1)+"min");
+			markMissingFormEntry("termin"+(i+1)+"min");
+			markMissingFormEntry("termin"+(i+1)+"max");
 		}
 		termine.push(termin);
 	});
@@ -1069,7 +1077,8 @@ function savePruefungstermin()
 				methode: methode,
 				einzeln: einzeln,
 				termine: termine,
-				lehrveranstaltungen: lehrveranstaltungen
+				lehrveranstaltungen: lehrveranstaltungen,
+				mitarbeiter_uid: mitarbeiter_uid
 			},
 			error: loadError
 		}).success(function(data){
@@ -1299,6 +1308,7 @@ function updatePruefung(prfId)
 	var termine = [];
 	var termineNeu = [];
 	var lehrveranstaltungen = [];
+	var mitarbeiter_uid = $("#mitarbeiter_uid").val();
 	
 	$('#prfTermin tr').has("span").each(function(i,v){
 		var termin = {};
@@ -1419,7 +1429,8 @@ function updatePruefung(prfId)
 				einzeln: einzeln,
 				termine: termine,
 				termineNeu: termineNeu,
-				lehrveranstaltungen: lehrveranstaltungen
+				lehrveranstaltungen: lehrveranstaltungen,
+				mitarbeiter_uid: mitarbeiter_uid
 			},
 			error: loadError
 		}).success(function(data){
@@ -1609,4 +1620,44 @@ function resetPruefungsverwaltung()
 	resetLehrveranstaltungen();
 	resetTermine();
 	$("#modalOverlay").removeClass("modalOverlay");
+}
+
+function checkMinMaxTeilnehmer(min, max)
+{
+//	console.log(isNum(min));
+//	console.log(isNum(max));
+	console.log(parseInt(min));
+	min = parseInt(min);
+	max = parseInt(max);
+	console.log(min+max);
+	if(((min !== null) && (max !== null)) && ((min !== "") && (max !== "")))
+	{
+		console.log(0);
+		if(max < min)
+		{
+			console.log(1);
+			return false;
+		}
+		if(max < 0)
+		{
+			console.log(2);
+			return false;
+		}
+		if(min < 0)
+		{
+			console.log(3);
+			return false;
+		}
+		if(isNaN(min))
+		{
+			console.log(4);
+			return false;
+		}
+		if(isNaN(max))
+		{
+			console.log(5);
+			return false;
+		}
+	}
+	return true;
 }
