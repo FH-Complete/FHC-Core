@@ -1732,6 +1732,7 @@ $berechtigungen = array(
 	array('lehre/lehrveranstaltung:begrenzt','nur die Felder Lehre, Sort, Zeugnis, BA/DA, FBK und LVInfo dürfen geändert werden (eventuelle Aufteilung in einzelne Berechtigungen??)'),
 	array('lehre/lvplan','Tempus'),
 	array('lehre/pruefungstermin','Erlaubt es dem Benutzer eine Prüfung für ein Prüfungsfenster anzulegen'),
+	array('lehre/pruefungsterminAll','Recht für jeden Lektor eine Prüfung anzulegen'),
 	array('lehre/pruefungsfenster','Erlaubt dem Benutzer Prüfungsfenster anzulegen.'),
 	array('lehre/reihungstest','Reihungstestverwaltung'),
 	array('lehre/reservierung','erweiterte Reservierung inkl. Lektorauswahl, Stg, Sem und Gruppe'),
