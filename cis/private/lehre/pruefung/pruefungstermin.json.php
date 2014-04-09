@@ -449,7 +449,6 @@ function deleteTermin($pruefung_id, $pruefungstermin_id)
 
 function getAllPruefungen($mitarbeiter_uid)
 {
-    //TODO Prüfungen des aktuellen Studiensemesters???
     $pruefung = new pruefungCis();
     if($pruefung->getAllPruefungen($mitarbeiter_uid))
     {
