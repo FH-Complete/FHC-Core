@@ -743,12 +743,12 @@ foreach($addon_obj->result as $addon)
                label     = "&menu-extras-gruppenverwaltung.label;"
                command   =  "menu-extras-gruppenverwaltung:command"
                accesskey = "&menu-extras-gruppenverwaltung.accesskey;"/>
-             <menuitem
+<!--         <menuitem
                id        =  "menu-extras-lehrfachverwaltung"
                key       =  "menu-extras-lehrfachverwaltung:key"
                label     = "&menu-extras-lehrfachverwaltung.label;"
                command   =  "menu-extras-lehrfachverwaltung:command"
-               accesskey = "&menu-extras-lehrfachverwaltung.accesskey;"/>
+               accesskey = "&menu-extras-lehrfachverwaltung.accesskey;"/> -->
              <menuitem
                id        =  "menu-extras-lektorenzuordnunginstitute"
                key       =  "menu-extras-lektorenzuordnunginstitute:key"
