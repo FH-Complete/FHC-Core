@@ -35,7 +35,7 @@ $menu=array
 		'Lehrfach'=>array('name'=>'Lehrfach', 'link'=>'lehre/lehrfach.php', 'target'=>'main'),
 		/* Lerrzeile */'Verplanungsuebersicht1'=>array('name'=>'', 'link'=>'lehre/check/verplanungsuebersicht.php', 'target'=>'main'),
 		'Verplanungsuebersicht'=>array('name'=>'Verplanungsübersicht', 'link'=>'lehre/check/verplanungsuebersicht.php', 'target'=>'main'),
-		'Reihungstest'=>array('name'=>'Reihungstest', 'link'=>'stammdaten/reihungstestverwaltung.php', 'target'=>'main','permissions'=>array('reihungstest')),
+		'Reihungstest'=>array('name'=>'Reihungstest', 'link'=>'stammdaten/reihungstestverwaltung.php', 'target'=>'main','permissions'=>array('admin','assistenz')),
 		'LV-Planung'=>array
 		(
 			'name'=>'LV-Planung', 'permissions'=>array('admin','lv-plan','support'),
@@ -272,12 +272,12 @@ $menu=array
 			'ViReferenz'=>array('name'=>'VI-Kurzreferenz', 'link'=>'admin/VI-Kurzreferenz.html', 'target'=>'main'),
 		),
 		'Cronjobs'=>array('name'=>'Cronjobs', 'link'=>'stammdaten/cronjobverwaltung.php', 'target'=>'main','permissions'=>array('basis/cronjob')),
-	),
-	'SD-Tools'=>	array
-	(
-		'name'=>'SD-Tools', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('sdTools'), 'image'=>'vilesci_sdtools.png',
-		'link'=>'https://sdtools.technikum-wien.at', 'target'=>'_blank',
 	)
+//	'SD-Tools'=>	array
+//	(
+//		'name'=>'SD-Tools', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support'), 'image'=>'vilesci_sdtools.png',
+//		'link'=>'https://sdtools.technikum-wien.at', 'target'=>'_blank',
+//	)
 	
 );
 
