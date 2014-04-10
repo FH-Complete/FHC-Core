@@ -1769,6 +1769,8 @@ $berechtigungen = array(
 	array('planner','Planner Verwaltung'),
 	array('preinteressent','Verwaltung der Preinteressenten'),
 	array('raumres','Raumreservierung'),
+	array('reihungstest','Recht für Anzeige des Reihungstests im Vilesci'),
+	array('sdTools','Recht für Anzeige der SD-Tools im Vilesci'),
 	array('soap/lv','Recht für LV Webservice'),
 	array('soap/lvplan','Recht für LV-Plan Webservice'),
 	array('soap/mitarbeiter','Recht für Mitarbeiter-Webservice'),
