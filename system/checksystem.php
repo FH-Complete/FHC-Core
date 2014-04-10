@@ -1238,6 +1238,25 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	}		
 }
 
+// Berechtigungen fuer web User erteilen
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_preinteressent' AND table_schema='public' AND grantee='web' AND privilege_type='UPDATE'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "GRANT SELECT, INSERT, UPDATE ON public.tbl_preinteressent TO web;
+		GRANT SELECT, UPDATE ON public.tbl_preinteressent_preinteressent_id_seq TO web;
+		GRANT SELECT, INSERT, UPDATE ON public.tbl_preinteressentstudiengang TO web;
+		GRANT SELECT, INSERT, UPDATE ON public.tbl_prestudent TO web;
+		GRANT SELECT, UPDATE ON public.tbl_prestudent_prestudent_id_seq TO web;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_preinteressent: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_preinteressent: Schreibrechte fuer User web erteilt';
+	}
+}
+
 // Anmeldefrist fuer Pruefungstermine
 if(!$result = @$db->db_query("SELECT anmeldung_von FROM campus.tbl_pruefungstermin LIMIT 1"))
 {
