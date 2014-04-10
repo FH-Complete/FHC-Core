@@ -1213,6 +1213,7 @@ function loadPruefungsDetails(prfId)
 					var copy = $("#lvDropdown1").clone();
 					$("#lvDropdowns").empty();
 					$("#lvDropdowns").html(copy);
+					$("#lvDropdowns").append("<br/>");
 					var result = data.result[0];
 					$("#titel").val(result.pruefung.titel);
 					$("#beschreibung").val(result.pruefung.beschreibung);
@@ -1225,7 +1226,15 @@ function loadPruefungsDetails(prfId)
 					terminHinzufuegen("span");
 					data.result.forEach(function(d){
 						i++;
-						var lv = "<span value='"+d.lehrveranstaltung.lehrveranstaltung_id+"'>"+d.lehrveranstaltung.studiengang.kurzbzlang+" | <b>"+d.lehrveranstaltung.bezeichnung+"</b> ("+d.lehrveranstaltung.lehrform_kurzbz+")</span><a href='#' onclick='deleteLehrveranstaltungFromPruefung(\""+d.lehrveranstaltung.lehrveranstaltung_id+"\", \""+d.pruefung.pruefung_id+"\");'> löschen</a></br>";
+						var lv = "";
+						if(d.lehrveranstaltung !== undefined)
+						{
+							lv = "<span value='"+d.lehrveranstaltung.lehrveranstaltung_id+"'>"+d.lehrveranstaltung.studiengang.kurzbzlang+" | <b>"+d.lehrveranstaltung.bezeichnung+"</b> ("+d.lehrveranstaltung.lehrform_kurzbz+")</span><a href='#' onclick='deleteLehrveranstaltungFromPruefung(\""+d.lehrveranstaltung.lehrveranstaltung_id+"\", \""+d.pruefung.pruefung_id+"\");'> löschen</a></br>";
+						}
+						else
+						{
+							lv = "<span>Keine Lehrveranstaltungen vorhanden.</span></br>";
+						}
 						$("#lvDropdowns").children().first().before(lv);
 						var j = 0;
 						d.pruefung.termine.forEach(function(t){
@@ -1278,9 +1287,13 @@ function loadPruefungsDetails(prfId)
 
 function resetLehrveranstaltungen()
 {
+	$("#lvDropdown1").attr("onchange", "lehrveranstaltungDropdownhinzufuegen(this, false);")
 	$("#lvDropdowns").children().each(function(i,v){
 		$("#lvDropdown"+(i+2)).next().remove();
 		$("#lvDropdown"+(i+2)).remove();
+	});
+	$("#lvDropdown1").prevAll().each(function(i,v){
+		$(v).remove();
 	});
 }
 
@@ -1470,7 +1483,7 @@ function deleteLehrveranstaltungFromPruefung(lvId, pruefung_id)
 		}
 	}).complete(function(){
 		loadPruefungsDetails(pruefung_id);
-		loadAllPruefungen();
+//		loadAllPruefungen();
 	});
 }
 
@@ -1620,6 +1633,7 @@ function resetPruefungsverwaltung()
 	resetLehrveranstaltungen();
 	resetTermine();
 	$("#modalOverlay").removeClass("modalOverlay");
+	$("#buttonSave").attr("onclick", "savePruefungstermin();");
 }
 
 function checkMinMaxTeilnehmer(min, max)

@@ -233,22 +233,30 @@ function loadPruefung()
 	$pruefung->getLehrveranstaltungenByPruefung();
 	$pruefung->getTermineByPruefung();
 	$studiengang = new studiengang();
-	foreach($pruefung->lehrveranstaltungen as $lv)
+	if(!empty($pruefung->lehrveranstaltungen))
 	{
-	    $lehrveranstaltung = new lehrveranstaltung($lv->lehrveranstaltung_id);
-	    $lehrveranstaltung = $lehrveranstaltung->cleanResult();
-	    $studiengang->load($lehrveranstaltung[0]->studiengang_kz);
-	    $stg = new stdClass();
-	    $stg->bezeichnung = $studiengang->bezeichnung;
-	    $stg->studiengang_kz = $studiengang->studiengang_kz;
-	    $stg->kurzbzlang = $studiengang->kurzbzlang;
-	    $lehrveranstaltung[0]->studiengang = $stg;
+	    foreach($pruefung->lehrveranstaltungen as $lv)
+	    {
+		$lehrveranstaltung = new lehrveranstaltung($lv->lehrveranstaltung_id);
+		$lehrveranstaltung = $lehrveranstaltung->cleanResult();
+		$studiengang->load($lehrveranstaltung[0]->studiengang_kz);
+		$stg = new stdClass();
+		$stg->bezeichnung = $studiengang->bezeichnung;
+		$stg->studiengang_kz = $studiengang->studiengang_kz;
+		$stg->kurzbzlang = $studiengang->kurzbzlang;
+		$lehrveranstaltung[0]->studiengang = $stg;
+		$prf = new stdClass();
+		$prf->lehrveranstaltung = $lehrveranstaltung[0];
+		$prf->pruefung = $pruefung;
+		array_push($temp, $prf);
+	    }
+	}
+	else
+	{
 	    $prf = new stdClass();
-	    $prf->lehrveranstaltung = $lehrveranstaltung[0];
 	    $prf->pruefung = $pruefung;
 	    array_push($temp, $prf);
 	}
-
 	$data['result'] = array();
 	$data['result'] = $temp;
 	$data['error']='false';
