@@ -750,7 +750,7 @@ class mitarbeiter extends benutzer
 	 */
 	public function getMitarbeiterFilter($filter)
 	{
-		$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE lower(nachname) ~* lower(".$this->db_add_param($filter)." OR uid ~* ".$this->db_add_param($filter).');'; 
+		$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE lower(nachname) ~* lower(".$this->db_add_param($filter).") OR uid ~* ".$this->db_add_param($filter).';'; 
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
