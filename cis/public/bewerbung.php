@@ -1032,8 +1032,8 @@ $studiengang = new studiengang();
 			<td>'.$p->t('global/studiensemester').'</td>
 			<td>'.$p->t('tools/buchungstext').'</td>
 			<td>'.$p->t('tools/betrag').'</td>
-			<td>'.'Zahlungsinformation'.'</td>
-			<td>'.'Überweisung'.'</td>'; //TODO Phrase einfügen
+			<td>'.'Zahlungsinformation'.'</td>';
+			//<td>'.'Überweisung'.'</td>'; //TODO Phrase einfügen
 		echo '</tr>';
 //			<td>'.$p->t('tools/zahlungsbestaetigung').'</td>
 		$i=0;
@@ -1083,12 +1083,16 @@ $studiengang = new studiengang();
 				echo '" href="#">'.$p->t('tools/offen').'</a>';
 			}
 				echo '</td>';
+				/*
 				echo '<td align="center">';
 				echo '<a href="https://routing.eps.or.at/appl/epsSO/transinit/bankauswahl_prepare.html?lang=de
 							&amp;caiSO=%2BaDRiYhLjZXKuB19*CkCTIMQBN6sYSHmjNPQkIglglcYeFS98ZCVrvzVdGw5tF1Fzi
 							0JrGhL*WWFcSHu6PWY2FCY2BTH0umA-" target="_blank">
 							<img src="../../skin/images/eps-logo_full.gif" width="30" height="30" alt="EPS Überweisung"></a>';
+
 				echo '</td>';
+				*/
+
 			}
 			echo '</tr>';
 		}
