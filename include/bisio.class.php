@@ -135,7 +135,7 @@ class bisio extends basis_db
 			return false;
 		}
 		
-		if(mb_strlen($this->student_uid)>16)
+		if(mb_strlen($this->student_uid)>32)
 		{
 			$this->errormsg = 'Student_UID ist ungueltig';
 			return false;
