@@ -549,6 +549,41 @@ class lehrveranstaltung extends basis_db
 	}
 
 	/**
+	 * Zaehlt alle Lehrveranstaltungen einer Organisationsform in einem Studiengang
+	 * @param $studiengang_kz
+	 * @param $orgform_kurzbz
+	 * @return false im Fehlerfall, ansonsten das Ergebnis
+	 */
+	public function count_lva_orgform($studiengang_kz, $orgform_kurzbz=null)
+	{
+		if(!is_numeric($studiengang_kz) || $studiengang_kz=='')
+		{
+			$this->errormsg = 'studiengang_kz muss eine gueltige Zahl sein';
+			return false;
+		}
+/*
+		if(is_null($orgform_kurzbz) || $orgform_kurzbz=='')
+		{
+			$this->errormsg = 'keine orgform_kurzbz uebergeben';
+			return false;
+		}*/
+
+		$qry='SELECT count(*) as count FROM lehre.tbl_lehrveranstaltung
+			WHERE studiengang_kz='.$studiengang_kz.' AND orgform_kurzbz'.(is_null($orgform_kurzbz)?' is null':"='".$orgform_kurzbz."'");
+		//echo $qry;
+		$return=array();
+		if($db_result=$this->db_query($qry))
+		{
+			if($row=$this->db_fetch_object($db_result))
+			{
+				return $row->count;
+			}
+		}
+		$this->errormsg = 'Fehler bei der Datenbankabfrage';
+		return false;
+	}
+
+	/**
 	 * Prueft die Gueltigkeit der Variablen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
@@ -1804,5 +1839,64 @@ class lehrveranstaltung extends basis_db
             }
             return false;
         }
+
+	/**
+	 * 
+	 * @param type $lv_id
+	 * @param type $semester -> Ausbildungssemester
+	 * @return boolean
+	 */
+	public function getALVS($lv_id, $semester)
+	{
+		
+		if($semester=='')
+		{
+			$this->errormsg = "Kein Semester übergeben"; 
+			return false; 
+		}
+		
+		$ss = ($semester%2==0)?'SS':'WS'; 
+		
+		$qry_ss = "SELECT studiensemester_kurzbz, start, ende 
+				FROM public.tbl_studiensemester 
+				WHERE substring(studiensemester_kurzbz from 1 for 2)='$ss' 
+				AND start < now() ORDER BY start DESC LIMIT 1";
+		
+		if(!$result = $this->db_query($qry_ss))
+		{
+			$this->errormsg = "Fehler bei der Abfrage aufgetreten"; 
+			return false; 
+		}
+		
+		if(!$row= $this->db_fetch_object($result))
+		{
+			$this->errormsg = "Kein Semester gefunden"; 
+			return false; 
+			
+		}
+			
+			$qry_alvs = "SELECT sum(lm.semesterstunden) as alvs
+				FROM lehre.tbl_lehrveranstaltung 
+				JOIN lehre.tbl_lehreinheit USING (lehrveranstaltung_id) 
+				JOIN lehre.tbl_lehreinheitmitarbeiter lm USING (lehreinheit_id)
+				WHERE lehrveranstaltung_id = ".$this->db_add_param($lv_id, FHC_STRING)." 
+				AND studiensemester_kurzbz = ".$this->db_add_param($row->studiensemester_kurzbz).";";
+			
+		if(!$result_alvs=$this->db_query($qry_alvs))
+		{
+			$this->errormsg = "Fehler bei der Abfrage aufgetreten"; 
+			return false; 
+		}
+		
+		if($row_alvs = $this->db_fetch_object($result_alvs))
+		{
+			return $row_alvs->alvs; 
+		}
+		else
+		{
+			$this->errormsg = $qry_alvs; 
+			return false; 
+		}
+	}
 }
 ?>
