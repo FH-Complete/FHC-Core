@@ -124,8 +124,21 @@ if(isset($_GET['type']) && $_GET['type']=='getortcontent' && isset($_GET['plz'])
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link href="../../../skin/cis.css" rel="stylesheet" type="text/css">
-<script language="Javascript">
+<link href="../../../skin/styles/tw.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="../../../include/js/jquery.js"></script>
+<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css">
+<script type="text/Javascript">
+
+$(document).ready(function() 
+{ 
+	$('#t1').tablesorter(
+	{
+		sortList: [[1,0],[2,0],[4,0]],
+		widgets: ['zebra'],
+		headers: {0: {sorter: false},8: {sorter: false},9: {sorter: false}} 
+	}); 
+});
+
 function disablefields(obj)
 {
 	if(obj.value==0)
@@ -138,6 +151,7 @@ function disablefields(obj)
 	document.getElementById('titelpost').disabled=val;
 	document.getElementById('nachname').disabled=val;
 	document.getElementById('vorname').disabled=val;
+	document.getElementById('vornamen').disabled=val;
 	document.getElementById('geschlecht').disabled=val;
 	document.getElementById('geburtsdatum').disabled=val;
 	document.getElementById('svnr').disabled=val;
@@ -174,6 +188,21 @@ function GeburtsdatumEintragen()
 		
 		gebdat.value='19'+jahr+'-'+monat+'-'+tag;
 	}
+}
+
+function checkInput1()
+{
+	if(document.getElementById('nachname').value=='')
+	{
+		alert('Nachname muss eingetragen werden');
+		return false;
+	}
+	if(document.getElementById('geburtsdatum').value=='')
+	{
+		alert('Geburtsdatum muss eingetragen werden');
+		return false;
+	}
+	return true;
 }
 
 // **************************************
@@ -313,7 +342,7 @@ function GeschlechtChange()
 </script>
 </head>
 <body>
-<h1>Mitarbeiter Anlegen</h1>
+<h1>MitarbeiterIn anlegen</h1>
 <?php
 //Berechtigung pruefen
 $rechte = new benutzerberechtigung();
@@ -331,6 +360,7 @@ $titel = (isset($_POST['titel'])?$_POST['titel']:'');
 $titelpost = (isset($_POST['titelpost'])?$_POST['titelpost']:'');
 $nachname = (isset($_POST['nachname'])?$_POST['nachname']:'');
 $vorname = (isset($_POST['vorname'])?$_POST['vorname']:'');
+$vornamen = (isset($_POST['vornamen'])?$_POST['vornamen']:'');
 $geschlecht = (isset($_POST['geschlecht'])?$_POST['geschlecht']:'');
 $geburtsdatum = (isset($_POST['geburtsdatum'])?$_POST['geburtsdatum']:'');
 $adresse = (isset($_POST['adresse'])?$_POST['adresse']:'');
@@ -393,6 +423,7 @@ if(isset($_POST['save']))
 		{
 			$geburtsdatum = $person->gebdatum;
 			$vorname = $person->vorname;
+			$vornamen = $person->vornamen;
 			$nachname = $person->nachname;
 			$svnr = $person->svnr;
 			$ersatzkennzeichen = $person->ersatzkennzeichen;
@@ -408,6 +439,7 @@ if(isset($_POST['save']))
 		$person->titelpre = $titel;
 		$person->nachname = $nachname;
 		$person->vorname = $vorname;
+		$person->vornamen = $vornamen;
 		$person->titelpost = $titelpost;
 		$person->geschlecht = $geschlecht;
 		$person->gebdatum = $datum_obj->formatDatum($geburtsdatum,'Y-m-d');
@@ -666,7 +698,7 @@ if(isset($_POST['save']))
 	if(!$error)
 	{
 		$db->db_query('COMMIT');
-		die("<b>Mitarbeiter $vorname $nachname wurde erfolgreich angelegt</b><br><br><a href='mitarbeiterimport.php'>Neue Person Anlegen</a><br>");
+		die("<b>MitarbeiterIn $vorname $vornamen $nachname wurde erfolgreich angelegt</b><br><br><a href='mitarbeiterimport.php'>Neue Person anlegen</a><br>");
 	}
 	else
 	{
@@ -698,8 +730,12 @@ if($geburtsdatum!='')
 	if($geburtsdatum_error)
 		echo "Format des Geburtsdatums ist ungueltig!";
 }
+if(($vorname=='' && $nachname=='') || $geburtsdatum_error || $geburtsdatum=='')
+	echo "<form method='POST' onsubmit='return checkInput1();'>";
+else 
+	echo "<form method='POST'>";
 ?>
-<form method='POST'>
+<!-- <form method='POST'>-->
 <table width="100%">
 
 <tr>
@@ -710,6 +746,7 @@ if($geburtsdatum!='')
 echo '<tr><td>Anrede</td><td><input type="text" id="anrede" name="anrede" maxlength="16" value="'.$anrede.'" onblur="AnredeChange()"/></td></tr>';
 echo '<tr><td>Titel(Pre)</td><td><input type="text" id="titel" name="titel" maxlength="64" value="'.$titel.'" /></td></tr>';
 echo '<tr><td>Vorname</td><td><input type="text" id="vorname" maxlength="32" name="vorname" value="'.$vorname.'" /></td></tr>';
+echo '<tr><td>Weitere Vornamen</td><td><input type="text" id="vornamen" maxlength="32" name="vornamen" value="'.$vornamen.'" /></td></tr>';
 echo '<tr><td>Nachname *</td><td><input type="text" maxlength="64" id="nachname" name="nachname" value="'.$nachname.'" /></td></tr>';
 echo '<tr><td>Titel(Post)</td><td><input type="text" id="titelpost" name="titelpost" maxlength="64" value="'.$titelpost.'" /></td></tr>';
 echo '<tr><td>Geschlecht *</td><td><SELECT id="geschlecht" name="geschlecht" onchange="GeschlechtChange()">';
@@ -720,7 +757,7 @@ echo '</SELECT>';
 echo '</td></tr>';
 echo '<tr><td>SVNR</td><td><input type="text" id="svnr" size="10" maxlength="10" name="svnr" value="'.$svnr.'" onblur="GeburtsdatumEintragen()" /></td></tr>';
 echo '<tr><td>Ersatzkennzeichen</td><td><input type="text" id="ersatzkennzeichen" size="10" maxlength="10" name="ersatzkennzeichen" value="'.$ersatzkennzeichen.'" /></td></tr>';
-echo '<tr><td>Geburtsdatum *</td><td><input type="text" id="geburtsdatum" size="10" maxlength="10" name="geburtsdatum" value="'.$geburtsdatum.'" /> (Format: dd.mm.JJJJ)</td></tr>';
+echo '<tr><td>Geburtsdatum *</td><td><input type="text" id="geburtsdatum" size="10" maxlength="10" name="geburtsdatum" value="'.$geburtsdatum.'" /> (Format: TT.MM.JJJJ)</td></tr>';
 echo '<tr><td colspan="2"><fieldset><legend>Adresse</legend><table>';
 echo '<tr><td>Nation</td><td><SELECT name="adresse_nation" id="adresse_nation" onchange="loadGemeindeData()">';
 $nation =  new nation();
@@ -827,7 +864,8 @@ if($where!='')
 	
 	if($result = $db->db_query($qry))
 	{
-		echo '<table><tr><th></th><th>Nachname</th><th>Vorname</th><th>GebDatum</th><th>SVNR</th><th>Geschlecht</th><th>Adresse</th><th>Status</th><th>Details</th></tr>';
+		echo '<table style="margin-top: 0px" class="tablesorter" id="t1"><thead><tr><th></th><th>Nachname</th><th>Vorname</th><th>Weitere<br/>Vornamen</th><th>GebDatum</th><th>SVNR</th><th>Geschlecht</th><th>Adresse</th><th>Status</th><th>Details</th></tr></thead>';
+		echo '<tfoot><tr><td style="padding: 4px"><input type="radio" name="person_id" value="0" checked onclick="disablefields(this)"></td><td style="padding: 4px" colspan="3">Neue Person anlegen</td></tr></tfoot><tbody>';
 		while($row = $db->db_fetch_object($result))
 		{
 			$status = '';
@@ -844,7 +882,7 @@ if($where!='')
 				}
 			}
 			$status = mb_substr($status, 0, mb_strlen($status)-2);
-			echo '<tr valign="top"><td><input type="radio" name="person_id" value="'.$row->person_id.'" onclick="disablefields(this)"></td><td>'."$row->nachname</td><td>$row->vorname</td><td>$row->gebdatum</td><td>$row->svnr</td><td>".($row->geschlecht=='m'?'männlich':'weiblich')."</td><td>";
+			echo '<tr valign="top"><td><input type="radio" name="person_id" value="'.$row->person_id.'" onclick="disablefields(this)"></td><td>'."$row->nachname</td><td>$row->vorname</td><td>$row->vornamen</td><td>$row->gebdatum</td><td>$row->svnr</td><td>".($row->geschlecht=='m'?'männlich':'weiblich')."</td><td>";
 			$qry_adr = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id'";
 			if($result_adr = $db->db_query($qry_adr))
 				while($row_adr=$db->db_fetch_object($result_adr))
@@ -854,7 +892,7 @@ if($where!='')
 			echo '<td><a href="../personendetails.php?id='.$row->person_id.'" target="_blank">Details</a></td>';
 			echo '</tr>';
 		}
-		echo '<tr><td><input type="radio" name="person_id" value="0" checked onclick="disablefields(this)"></td><td>Neue Person anlegen</td></tr>';
+		echo '</tbody>';
 		echo '</table>';
 	}
 }

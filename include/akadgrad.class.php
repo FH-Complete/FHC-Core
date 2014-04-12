@@ -115,5 +115,53 @@ class akadgrad extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Liefert den Akademischen Grad eines Studenten gemaess Studienordnung
+	 * @param student_uid
+	 */
+	public function getAkadgradStudent($student_uid)
+	{
+		//laden des Datensatzes
+		$qry = "SELECT * 
+				FROM 
+					lehre.tbl_akadgrad WHERE akadgrad_id = 
+					(
+						SELECT akadgrad_id 
+						FROM lehre.tbl_studienplan 
+							JOIN lehre.tbl_studienordnung USING (studienordnung_id) 
+							WHERE studienplan_id = 
+							(
+								SELECT studienplan_id 
+								FROM public.tbl_student 
+									JOIN public.tbl_prestudentstatus USING (prestudent_id) 
+									WHERE student_uid='ew13b001' 
+									ORDER BY tbl_prestudentstatus.datum DESC, tbl_prestudentstatus.insertamum DESC LIMIT 1
+							)
+					)";
+		
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->akadgrad_id = $row->akadgrad_id;
+				$this->akadgrad_kurzbz = $row->akadgrad_kurzbz;
+				$this->studiengang_kz = $row->studiengang_kz;
+				$this->titel = $row->titel;
+				$this->geschlecht = $row->geschlecht;
+				return true;
+			}
+			else 
+			{
+				$this->errormsg = 'Fehler bei der Datenbankabfrage';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei der Datenbankabfrage';
+			return false;
+		}
+	}
 }
 ?>

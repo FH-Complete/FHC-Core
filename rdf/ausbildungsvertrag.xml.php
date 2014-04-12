@@ -26,6 +26,9 @@ require_once('../include/student.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/adresse.class.php');
 require_once('../include/lehrveranstaltung.class.php');
+require_once('../include/akadgrad.class.php');
+require_once('../include/studiensemester.class.php');
+require_once('../include/nation.class.php');
 
 $uid_arr = (isset($_REQUEST['uid'])?$_REQUEST['uid']:null);
 
@@ -77,6 +80,8 @@ foreach($uid_arr as $uid)
 			$gebdatum = date('d.m.Y',strtotime($student->gebdatum));
 			$studiengang = new studiengang();
 			$studiengang->load($student->studiengang_kz);
+			$staatsbuergerschaft = new nation();
+			$staatsbuergerschaft->load($student->staatsbuergerschaft);
 			
             $svnr = ($student->svnr == '')?'Ersatzkennzeichen: '.$student->ersatzkennzeichen:$student->svnr; 
 			
@@ -88,6 +93,8 @@ foreach($uid_arr as $uid)
 			echo "\t\t<titelpre>".$student->titelpre."</titelpre>\n";
 			echo "\t\t<titelpost>".$student->titelpost."</titelpost>\n";
 			echo "\t\t<gebdatum>".$gebdatum."</gebdatum>\n";
+			echo "\t\t<gebort>".$student->gebort."</gebort>\n";
+			echo "\t\t<staatsbuergerschaft>".$staatsbuergerschaft->langtext."</staatsbuergerschaft>\n";
 			echo "\t\t<svnr>".$svnr."</svnr>\n";
 			echo "\t\t<matrikelnr>".trim($student->matrikelnr)."</matrikelnr>\n";
 			echo "\t\t<studiengang>".$studiengang->bezeichnung."</studiengang>\n";
@@ -96,10 +103,23 @@ foreach($uid_arr as $uid)
 			echo "\t\t<studiengang_kz>".sprintf('%04s', $studiengang->studiengang_kz)."</studiengang_kz>\n";
             echo "\t\t<studiengangSprache>".$studiengang->sprache."</studiengangSprache>"; 
             
+            echo "\t\t<aktuellesJahr>".date('Y')."</aktuellesJahr>"; 
+            
             // check ob Quereinsteiger
             $prestudent = new prestudent(); 
             $ausbildungssemester = ($prestudent->getFirstStatus($student->prestudent_id, 'Student'))?$prestudent->ausbildungssemester:'';           
             echo "\t\t<semesterStudent>".$ausbildungssemester."</semesterStudent>";
+            
+            $studiensemester_beginn = new studiensemester();
+            $studienbeginn = ($prestudent->getFirstStatus($student->prestudent_id, 'Student'))?$prestudent->studiensemester_kurzbz:'';
+            $studiensemester_beginn->load($studienbeginn);
+            
+            echo "\t\t<studiensemester_beginn>".$studiensemester_beginn->bezeichnung."</studiensemester_beginn>";
+            
+            $studiensemester_endedatum = new studiensemester();
+            $studiensemester_endedatum->load($studiensemester_endedatum->getaktorNext(1));
+            
+            echo "\t\t<studiensemester_endedatum>".date('d.m.Y',strtotime($studiensemester_endedatum->ende))."</studiensemester_endedatum>";
             
             switch($studiengang->typ)
             {
@@ -123,6 +143,12 @@ foreach($uid_arr as $uid)
 			echo "\t\t<studiengang_typ>".$studTyp."</studiengang_typ>\n";
 			echo "\t\t<studiengang_sprache>".$studiengang->sprache."</studiengang_sprache>\n";
 			echo "\t\t<studiengang_maxsemester>".$studiengang->max_semester."</studiengang_maxsemester>\n";
+			echo "\t\t<studiengang_anzahljahre>".($studiengang->max_semester/2)."</studiengang_anzahljahre>\n";
+			
+			$akadgrad = new akadgrad();
+			$akadgrad->getAkadgradStudent($student->uid);
+			
+			echo "\t\t<akadgrad>".$akadgrad->akadgrad_kurzbz."</akadgrad>\n";
 			
 			//für ao. Studierende wird die StgKz der Lehrveranstaltungen benötigt, die sie besuchen
 			$lv_studiengang_kz='';
@@ -157,6 +183,7 @@ foreach($uid_arr as $uid)
 				{
 					echo "\t\t<strasse>".$row_adresse->strasse."</strasse>\n";
 					echo "\t\t<plz>".$row_adresse->plz." ".$row_adresse->ort."</plz>\n";
+					echo "\t\t<nation>".$row_adresse->nation."</nation>\n";
 					break;
 				}
 			}
