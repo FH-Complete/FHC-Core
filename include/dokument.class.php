@@ -334,7 +334,7 @@ class dokument extends basis_db
 	 */
 	public function getAllDokumente()
 	{
-		$qry = "SELECT * FROM public.tbl_dokument;";
+		$qry = "SELECT * FROM public.tbl_dokument ORDER BY bezeichnung;";
 		
 		if($this->db_query($qry))
 		{

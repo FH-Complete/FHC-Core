@@ -180,15 +180,26 @@ if(isset($_POST['submitbild']))
 if(isset($_GET['person_id']))
 {
 	$dokument = new dokument(); 
-	$dokument->getAllDokumente(); 
-	echo "	<form method='POST' enctype='multipart/form-data' action='$PHP_SELF?person_id=".$_GET['person_id']."'>
+	$dokument->getAllDokumente();
+
+	echo "	<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'>
+			<html>
+			<head>
+				<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+				<link href='../skin/style.css.php' rel='stylesheet' type='text/css'>
+				<link rel='stylesheet' href='../skin/jquery.css' type='text/css'/>
+			</head>			
+			<body style='padding:10px;'>
+			<h1>Upload Dokumente</h1>
+			<form method='POST' enctype='multipart/form-data' action='$PHP_SELF?person_id=".$_GET['person_id']."'>
 			<table>
 				<tr>
-					<td>Dokument: <input type='file' name='file' />
-					<input type='submit' name='submitbild' value='Upload' /></td>
+					<td align='right'>Dokument:</td>
+					<td><input size='45' type='file' name='file' /></td>
 				</tr>
 				<tr>
-					<td>Typ: <SELECT name='dokumenttyp'>";
+					<td align='right'>Typ:</td>
+					<td><SELECT style='width:300px' name='dokumenttyp'>";
 			
 				foreach ($dokument->result as $dok)
 				{
@@ -197,21 +208,18 @@ if(isset($_GET['person_id']))
 					echo '<option value="'.$dok->dokument_kurzbz.'" onclick="'.$onclick.'">'.$dok->bezeichnung."</option>\n";
 				}
 				
-	echo "	</td></tr></table>
-		<table>
-			<tr>
-				<td>Titel: </td><td><input type='text' name='titel_intern' id='titel_intern' length='35' ></td>
+	echo "	<tr>
+				<td align='right'>Titel:</td><td><input size='45' maxlength='32' type='text' name='titel_intern' id='titel_intern' length='35' ></td>
 			</tr>
 			<tr> 
-				<td>Anmerkung: </td><td><input type='text' name='anmerkung_intern' id='anmerkung_intern' length='35' ></td>
-			</form>
-		</td></tr>
+				<td align='right'>Anmerkung:</td><td><input size='45' maxlength='128' type='text' name='anmerkung_intern' id='anmerkung_intern' length='35' ></td>
+			</tr>
 			<tr>
 				<td><input type='hidden' name='kategorie_kurzbz' id='kategorie_kurzbz' value='Akte'>
-				<td><input type='hidden' name='fileupload' id='fileupload'></td>
+				<input type='hidden' name='fileupload' id='fileupload'></td>
 				<td><input type='submit' name='submitbild' value='Upload'></td>
 
-			</tr>";
+			</tr></table></form></body></html>";
 }
 else
 {
