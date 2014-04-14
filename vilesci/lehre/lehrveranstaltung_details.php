@@ -94,7 +94,7 @@
 		$lv->lvnr = $_POST['lvnr'];
 		$lv->semester_alternativ = $_POST['semester_alternativ'];
 		$lv->farbe = $_POST['farbe'];
-
+		var_dump($lv);
 		if(!$lv->save())
 			$errorstr = "Fehler beim Speichern der Daten: $lv->errormsg";
 		else
@@ -165,9 +165,9 @@
 		<tr></tr>
 
 		<tr>
-			<td>Kurzbz</td>
-			<td><input type="text" name="kurzbz" value="'.$lv->kurzbz.'" /></td>
-			<td>Bezeichnung</td>
+			<td>Kurzbz*</td>
+			<td><input type="text" name="kurzbz" onchange="copyToLehreVz();" value="'.$lv->kurzbz.'" /></td>
+			<td>Bezeichnung*</td>
 			<td colspan=3><input type="text" name="bezeichnung" value="'.htmlentities($lv->bezeichnung, ENT_QUOTES, 'UTF-8').'" size="60" maxlength="128"></td>
 		</tr>
 		<tr>
@@ -212,7 +212,7 @@
 		}
 		
 		$htmlstr .= '</select></td>
-			<td>Lehrform</td>
+			<td>Lehrform*</td>
 			<td><select name="lehrform"><option value="">-- keine Auswahl --</option>';
 
 		foreach ($lehrform_arr as $lehrform)
@@ -230,7 +230,7 @@
 			<td><input type="text" name="ects" value="'.$lv->ects.'" maxlength="5"></td>
 			<td>Semesterstunden</td>
 			<td><input type="text" name="semesterstunden" value="'.$lv->semesterstunden.'" maxlength="3"></td>
-			<td>Lehrtyp</td>
+			<td>Lehrtyp*</td>
 			<td><select name="lehrtyp_kurzbz"><option value="">-- keine Auswahl --</option>';
 		
 		$lehrtyp_arr=new lehrtyp();
@@ -249,8 +249,8 @@
 		$htmlstr .= '<tr>
 			<td>Sort</td>
 			<td><input type="text" name="sort" value="'.$lv->sort.'" maxlength="2"></td>
-			<td>Lehreverzeichnis</td>
-			<td><input type="text" name="lehreverzeichnis" value="'.$lv->lehreverzeichnis.'" maxlength="16"></td>
+			<td>Lehreverzeichnis*</td>
+			<td><input type="text" onchange="checkInput(this);" name="lehreverzeichnis" value="'.$lv->lehreverzeichnis.'" maxlength="16"></td>
 			<td>Anmerkung</td>
 			<td><input type="text" name="anmerkung" value="'.$lv->anmerkung.'" maxlength="64"></td>
 		</tr>';
@@ -278,7 +278,7 @@
 			<td><input type="checkbox" name="projektarbeit" '.($lv->projektarbeit?'checked':'').'></td>
 			<td>Organisationsform</td>
 			<td>
-			<SELECT name="orgform_kurzbz"><OPTION value="">-- keine Auswahl --</OPTION>';
+			<SELECT name="orgform_kurzbz" onchange="copyToLehreVz();"><OPTION value="">-- keine Auswahl --</OPTION>';
 		
 		$qry_orgform = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz NOT IN ('VBB', 'ZGS') ORDER BY orgform_kurzbz";
 		if($result_orgform = $db->db_query($qry_orgform))
@@ -370,6 +370,88 @@
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 	<script type="text/javascript" src="../../include/js/mailcheck.js"></script>
 	<script type="text/javascript" src="../../include/js/datecheck.js"></script>
+	<script type="text/javascript" src="../../include/js/jquery.js"></script>
+	<script>
+	    function copyToLehreVz()
+	    {
+		var kurzbz = $('input[name="kurzbz"]').val();
+		kurzbz = kurzbz.replace(/\ä/g, "ae")
+			.replace(/\ö/g, "oe")
+			.replace(/\ü/g, "ue")
+			.replace(/\ß/g, "sz")
+			.replace(/\Ä/g, "ae")
+			.replace(/\Ö/g, "oe")
+			.replace(/\Ü/g, "ue")
+			.replace(/[^a-z_\s]/gi, "");
+		var orgform = ($('select[name="orgform_kurzbz"]').val() === "") ? "" : "_"+$('select[name="orgform_kurzbz"]').val();
+		var string = (kurzbz+orgform).toLowerCase();;
+		$("input[name=\'lehreverzeichnis\']").val(string);
+	    }
+	    function checkInput(ele)
+	    {
+		var string = ele.value;
+		string.split("_");
+		string = string.replace(/\ä/g, "ae")
+			.replace(/\ö/g, "oe")
+			.replace(/\ü/g, "ue")
+			.replace(/\ß/g, "sz")
+			.replace(/\Ä/g, "ae")
+			.replace(/\Ö/g, "oe")
+			.replace(/\Ü/g, "ue")
+			.replace(/[^a-z_\s]/gi, "");
+		ele.value = string;
+	    }
+	    $(document).ready(function()
+	    {
+		if($("form").size() !== 0)
+		{
+		    $("form").submit(function(e){
+			$(this).append('<input type="hidden" name="schick" value="" /> ');
+			$(".missingFormData").each(function(i,v){
+			   $(v).removeClass("missingFormData"); 
+			});
+			var self = this;
+			e.preventDefault();
+			var error = false;
+			if($('input[name="kurzbz"]').val() === "")
+			{
+			    error = true;
+			    $('input[name="kurzbz"]').addClass("missingFormData");
+			}
+			if($('input[name="bezeichnung"]').val() === "")
+			{
+			    error = true;
+			    $('input[name="bezeichnung"]').addClass("missingFormData");
+			}
+			if($('select[name="lehrform"]').val() === "")
+			{
+			    error = true;
+			    $('select[name="lehrform"]').addClass("missingFormData");
+			}
+			if($('select[name="lehrtyp_kurzbz"]').val() === "")
+			{
+			    error = true;
+			    $('select[name="lehrtyp_kurzbz"]').addClass("missingFormData");
+			}
+			if($('input[name="lehreverzeichnis"]').val() === "")
+			{
+			    error = true;
+			    $('input[name="lehreverzeichnis"]').addClass("missingFormData");
+			}
+			if(!error)
+			{
+			    self.submit();
+			}
+		    });
+		}
+	    });
+	</script>
+	<style type="text/css">
+	    .missingFormData {
+		border: 2px solid red;
+		outline: 2px solid red;
+	    }
+	</style>
 </head>
 <body style="background-color:#eeeeee;">
 
