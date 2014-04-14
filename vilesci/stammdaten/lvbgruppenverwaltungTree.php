@@ -108,7 +108,7 @@ if ($semResult != false) {
 										<input type='hidden' name='studiengang_kz' value='".$studiengang_kz."' />
 										<input type='hidden' name='semester' value='".$sem."' />
 										<input type='hidden' name='verband' value='".$verb."' />
-										<input type='text' maxlength='1' size='1' name='gruppe_neu'/>
+										<input type='text' maxlength='1' size='1' placeholder='1' name='gruppe_neu'/>
 										<input type='submit' value='Gruppe anlegen'/>
 									</form>
 								</a></li>";
@@ -126,7 +126,7 @@ if ($semResult != false) {
 								<input type='hidden' name='type' value='neu'>
 								<input type='hidden' name='studiengang_kz' value='".$studiengang_kz."' />
 								<input type='hidden' name='semester' value='".$sem."' />
-								<input type='text' maxlength='1' size='1' name='verband_neu'/>
+								<input type='text' maxlength='1' size='1' placeholder='A' name='verband_neu'/>
 								<input type='submit' value='Verband anlegen'/>
 							</form>
 						</a>
@@ -176,7 +176,7 @@ if ($semResult != false) {
 					<form id='newDataForm".$studiengang_kz."' method='POST' action='javascript:newSemester(\"".$studiengang_kz."\");'>
 						<input type='hidden' name='type' value='neu'>
 						<input type='hidden' name='studiengang_kz' value='".$studiengang_kz."' />
-						<input type='text' maxlength='2' size='2' name='semester_neu'/>
+						<input type='text' maxlength='2' size='2' placeholder='10' name='semester_neu'/>
 						<input type='submit' value='Semester anlegen'/>
 					</form>
 				</a>
