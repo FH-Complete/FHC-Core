@@ -750,7 +750,20 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 					error: function() { alert("error"); }
 				});
 			}
-			
+			function checkInput(ele)
+			{
+			    var string = ele.value;
+			    string.split("_");
+			    string = string.replace(/\ä/g, "ae")
+				    .replace(/\ö/g, "oe")
+				    .replace(/\ü/g, "ue")
+				    .replace(/\ß/g, "sz")
+				    .replace(/\Ä/g, "ae")
+				    .replace(/\Ö/g, "oe")
+				    .replace(/\Ü/g, "ue")
+				    .replace(/[^a-z_\s]/gi, "");
+			    ele.value = string;
+			}
 		</script>
 	</head>
 	<body class="Background_main">
@@ -888,7 +901,7 @@ if ($result_lv!=0)
 		echo '<td  style="white-space:nowrap;">';
 		if($write_admin)
 		{
-			echo '<input type="text" id="lehrevz'.$row->lehrveranstaltung_id.'" value="'.$db->convert_html_chars($row->lehreverzeichnis).'" size="4" name="lehrevz">
+			echo '<input type="text" id="lehrevz'.$row->lehrveranstaltung_id.'" onkeyup="checkInput(this);" value="'.$db->convert_html_chars($row->lehreverzeichnis).'" size="4" name="lehrevz">
 			<input type="button" id="lehrevzok'.$row->lehrveranstaltung_id.'" value="ok" onclick="changelehrevz(\''.$row->lehrveranstaltung_id.'\',document.getElementById(\'lehrevz'.$row->lehrveranstaltung_id.'\').value);">';
 		}
 		else
