@@ -20,9 +20,17 @@
 
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
+require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/studienplan.class.php');
 require_once('../../include/prestudent.class.php');
+
+$user = get_uid();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('assistenz', null, 'suid'))
+	die('keine Berechtigung für diese Seite!');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
