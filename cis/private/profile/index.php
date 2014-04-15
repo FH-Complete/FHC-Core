@@ -509,8 +509,12 @@ if(!$ansicht)
                 }
             }
         }
-	echo '<p><a href="../../../cms/content.php?content_id='.$p->t("dms_link/lvPlanFAQ").'" target="_blank">'.$p->t('global/hilfe').'</a></p></td>';
-	echo'</tr>
+	
+    //Überprüfung ob Hilfe-Link vorhanden
+    if ($p->t("dms_link/profilhilfe")!='')
+        echo '<p><a href="../../../cms/content.php?content_id='.$p->t("dms_link/profilhilfe").'" target="_blank">'.$p->t('global/hilfe').'</a></p>';
+        
+	echo'</td></tr>
 		<tr>
 		<td class="teambox" style="width: 20%;">
 		<B>'.$p->t('mailverteiler/mailverteiler').'</B><BR><BR>

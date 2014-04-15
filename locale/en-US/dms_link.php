@@ -20,4 +20,5 @@ $this->phrasen['dms_link/veranstaltungsleitfaden']='133'; //Link zum Veranstaltu
 $this->phrasen['dms_link/bildRichtlinien']='6174'; //Link zu den Bild Richtlinen zB bei Bildupload im Profil (CMS-ID)
 $this->phrasen['dms_link/sicherheitAnDerFHTW']='6765'; //Link zum Hauptpunkt "Sicherheit an der FHTW" aus dem Ersthelfer-Skript
 $this->phrasen['dms_link/lvplanSyncFAQ']='7188'; //Link zur Anleitung zur Kalender Abbonierung
+$this->phrasen['dms_link/profilhilfe']=''; //Hilfe-Link aus dem Profil
 ?>
