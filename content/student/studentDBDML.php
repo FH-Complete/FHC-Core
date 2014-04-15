@@ -2737,7 +2737,7 @@ if(!$error)
 						else
 						{
 							$zeugnisnote->new = true;
-							$zeugnisntoe->insertamum = date('Y-m-d H:i:s');
+							$zeugnisnote->insertamum = date('Y-m-d H:i:s');
 							$zeugnisnote->insertvon = $user;
 						}
 
