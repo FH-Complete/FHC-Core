@@ -1608,6 +1608,156 @@ class lehrveranstaltung extends basis_db
 	}
 	
 	/**
+	 * Loescht eine Lehrveranstaltung
+	 * @param $lvid
+	 * @return true wenn ok, false wenn Fehler
+	 */
+/*	public function delete_lva($lvid)
+	{
+		if(!is_numeric($lvid))
+		{
+			$this->errormsg = 'lvid ist ungueltig';
+			return false;
+		}
+
+		$qry = "DELETE FROM public.tbl_lehrveranstaltung 
+				WHERE lehrveranstaltung_id=".$this->db_add_param($lvid, FHC_INTEGER);
+
+		if($this->load($lvid))
+		{
+			$this->db_query('BEGIN;');
+			
+			$log = new log();
+			
+			$log->executetime = date('Y-m-d H:i:s');
+			$log->beschreibung = 'Loeschen der Lehrveranstaltung '.$lvid;
+			$log->mitarbeiter_uid = get_uid();
+			$log->sql = $qry;
+			$log->sqlundo = 'INSERT INTO lehre.tbl_lehrveranstaltung (studiengang_kz, bezeichnung, kurzbz, lehrform_kurzbz,
+				semester, ects, semesterstunden,  anmerkung, lehre, lehreverzeichnis, aktiv, ext_id, insertamum,
+				insertvon, planfaktor, planlektoren, planpersonalkosten, plankostenprolektor, updateamum, updatevon, sort,
+				zeugnis, projektarbeit, sprache, koordinator, bezeichnung_english, orgform_kurzbz, incoming, lehrtyp_kurzbz, oe_kurzbz, raumtyp_kurzbz, anzahlsemester, semesterwochen, lvnr, semester_alternativ, farbe) VALUES (' .
+					$this->db_add_param($this->studiengang_kz) . ', ' .
+					$this->db_add_param($this->bezeichnung) . ', ' .
+					$this->db_add_param($this->kurzbz) . ', ' .
+					$this->db_add_param($this->lehrform_kurzbz) . ', ' .
+					$this->db_add_param($this->semester) . ', ' .
+					$this->db_add_param($this->ects) . ', ' .
+					$this->db_add_param($this->semesterstunden) . ', ' .
+					$this->db_add_param($this->anmerkung) . ', ' .
+					$this->db_add_param($this->lehre, FHC_BOOLEAN) . ',' .
+					$this->db_add_param($this->lehreverzeichnis) . ', ' .
+					$this->db_add_param($this->aktiv, FHC_BOOLEAN) . ', ' .
+					$this->db_add_param($this->ext_id) . ', ' .
+					$this->db_add_param($this->insertamum) . ', ' .
+					$this->db_add_param($this->insertvon) . ', ' .
+					$this->db_add_param($this->planfaktor) . ', ' .
+					$this->db_add_param($this->planlektoren) . ', ' .
+					$this->db_add_param($this->planpersonalkosten) . ', ' .
+					$this->db_add_param($this->plankostenprolektor) . ', ' .
+					$this->db_add_param($this->updateamum) . ', ' .
+					$this->db_add_param($this->updatevon) . ',' .
+					$this->db_add_param($this->sort) . ',' .
+					$this->db_add_param($this->zeugnis, FHC_BOOLEAN) . ',' .
+					$this->db_add_param($this->projektarbeit, FHC_BOOLEAN) . ',' .
+					$this->db_add_param($this->sprache) . ',' .
+					$this->db_add_param($this->koordinator) . ',' .
+					$this->db_add_param($this->bezeichnung_english) . ',' .
+					$this->db_add_param($this->orgform_kurzbz) . ',' .
+					$this->db_add_param($this->incoming) . ',' .
+					$this->db_add_param($this->lehrtyp_kurzbz) . ',' .
+					$this->db_add_param($this->oe_kurzbz) . ',' .
+					$this->db_add_param($this->raumtyp_kurzbz) . ',' .
+					$this->db_add_param($this->anzahlsemester) . ',' .
+					$this->db_add_param($this->semesterwochen) . ',' . 
+					$this->db_add_param($this->lvnr) .','.
+					$this->db_add_param($this->semester_alternativ).','.
+					$this->db_add_param($this->farbe).');';
+
+			if($log->save(true))
+			{
+						
+				if($this->db_query($qry))
+				{
+					$this->db_query('COMMIT');
+					return true;
+				}
+				else 
+				{
+					$this->db_query('ROLLBACK');
+					$this->errormsg = 'Fehler beim Loeschen der Daten';
+					return false;
+				}
+			}
+			else 
+			{
+				$this->db_query('ROLLBACK');
+				$this->errormsg = 'Fehler beim Speichern des Log-Eintrages';
+				return false;
+			}
+		}
+		else 
+		{
+			return false;
+		}			
+	} */
+
+	/**
+	 * Loescht den Datenensatz mit der ID die uebergeben wird
+	 * @param $lvid ID die geloescht werden soll
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function delete($lvid)
+	{
+		//Pruefen ob adresse_id eine gueltige Zahl ist
+		if(!is_numeric($lvid) || $lvid == '')
+		{
+			$this->errormsg = 'lvid muss eine gültige Zahl sein'."\n";
+			return false;
+		}
+
+		$qry = "SELECT count(*) as anzahl FROM lehre.tbl_lehreinheit
+			WHERE lehrveranstaltung_id=".$this->db_add_param($lvid, FHC_INTEGER)."
+			OR lehrfach_id=".$this->db_add_param($lvid, FHC_INTEGER);
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				if($row->anzahl>0)
+				{
+					$this->errormsg = 'Zu dieser Lehrveranstaltung existieren Lehreinheiten oder Lehrfächer in der Datenbank. Sie kann daher nicht gelöscht werden.';
+					return false;
+				}
+				else
+				{
+					//loeschen des Datensatzes
+					$qry="DELETE FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=".$this->db_add_param($lvid, FHC_INTEGER, false);
+
+					if($this->db_query($qry))
+					{
+						return true;
+					}
+					else
+					{
+						$this->errormsg = 'Fehler beim Löschen der Daten'."\n";
+						return false;
+					}
+				}
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Abfragen zugewiesener Lehreinheiten'."\n";
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Abfragen zugewiesener Lehreinheiten'."\n";
+			return false;
+		}
+	}
+
+	/**
 	 * Sucht nach Lehrveranstaltungen
 	 * @param $filter Suchfilter
 	 */
