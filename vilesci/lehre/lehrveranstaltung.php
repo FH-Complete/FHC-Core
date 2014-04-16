@@ -122,7 +122,28 @@ else
 		$isaktiv='';
 	else
 		$isaktiv='true';
-		
+
+// Löschen der Daten
+if(isset($_GET['delete_lvid']))
+{
+	if($write_admin)
+	{
+		$lvid=$_GET['delete_lvid'];
+		$lehrveranstaltung=new lehrveranstaltung();
+		if($lehrveranstaltung->load($lvid))
+		{
+			if(!$lehrveranstaltung->delete($lvid))
+				echo $lehrveranstaltung->errormsg;
+		}
+		else
+		{
+			echo 'Fehler beim Laden der Lehrveranstaltung: '.$lehrveranstaltung->errormsg."\n";
+		}
+	}
+	else
+		echo "Keine Berechtigung, um Lehrveranstaltung zu löschen!\n";
+}
+
 // Speichern der Daten
 if(isset($_POST['lvid']) && is_numeric($_POST['lvid']))
 {
@@ -764,6 +785,11 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 				    .replace(/[^a-z_\s]/gi, "");
 			    ele.value = string;
 			}
+			function conf_del()
+			{
+				return confirm("Diese Lehrveranstaltung wirklich löschen?");
+			}
+			
 		</script>
 	</head>
 	<body class="Background_main">
@@ -823,9 +849,14 @@ if ($result_lv!=0)
 		  <th>Zeugnis</th>
 		  <th title='Soll diese Lehrveranstaltung bei Diplom-/Bachelorarbeit ausgewaehlt werden koennen?'>BA/DA</th>
 		  <th>Koordinator</th>
-		  <th>LV-Info</th>
-		  <th>LV-Angebot</th>
-		  <th>kompatible LV</th>";
+		  <th>LV-Info</th>\n";
+		  
+		  if($write_admin)
+		  {
+			  echo "<th>LV-Angebot</th>
+			  <th>kompatible LV</th>
+			  <th>Aktion</th>";
+		  }
 
 	echo "</tr></thead>";
 	echo "<tbody>";
@@ -977,13 +1008,17 @@ if ($result_lv!=0)
 		else 
 			echo 'vorhanden';
 		echo '</td>';
-		echo '
-			<td nowrap>
-				<a href="lehrveranstaltung_lvangebot.php?lehrveranstaltung_id='.$db->convert_html_chars($row->lehrveranstaltung_id).'" target="lv_detail">LV-Angebot</a>
-			</td>';
-		
-		echo '<td><a href="lehrveranstaltung_kompatibel.php?lehrveranstaltung_id='.$row->lehrveranstaltung_id.'&type=edit" target="lv_detail">Kompatible LV</a></td>';
-		echo "</tr>\n";
+		if($write_admin)
+		{
+			echo '
+				<td nowrap>
+					<a href="lehrveranstaltung_lvangebot.php?lehrveranstaltung_id='.$db->convert_html_chars($row->lehrveranstaltung_id).'" target="lv_detail">LV-Angebot</a>
+				</td>';
+
+			echo '<td><a href="lehrveranstaltung_kompatibel.php?lehrveranstaltung_id='.$row->lehrveranstaltung_id.'&type=edit" target="lv_detail">Kompatible LV</a></td>';
+			echo '<td><a href="'.$_SERVER['PHP_SELF'].'?delete_lvid='.$row->lehrveranstaltung_id.'&stg_kz='.$stg_kz.'&semester='.$semester.'&fachbereich_kurzbz='.$oe_fachbereich.'&isaktiv='.$isaktiv.'&oe_kurzbz='.$oe_kurzbz.'" onclick="return conf_del()">löschen</a></td>';
+			echo "</tr>\n";
+		}
 	}
 }
 else

@@ -246,6 +246,13 @@ $lehrveranstaltung_id = $_GET["lehrveranstaltung_id"];
 $type = isset($_GET["type"]) ? $_GET["type"] : "";
 $lv = new lehrveranstaltung();
 $lv->load($lehrveranstaltung_id);
+$stg_obj = new studiengang();
+$stg_obj->load($lv->studiengang_kz);
+$oe_studiengang = $stg_obj->oe_kurzbz;
+
+if(!$rechte->isBerechtigt('lehre/lehrveranstaltung', $oe_studiengang, 'suid'))
+	die('Sie haben keine Berechtigung fuer diese Seite');
+
 
 echo '<h3>Kompatible Lehrveranstaltungen - '.$lv->bezeichnung.'</h3>';
 $kompatibleLvs = $lv->loadLVkompatibel($lehrveranstaltung_id);
