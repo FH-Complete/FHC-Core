@@ -299,6 +299,7 @@ echo '<h1>'.$p->t('studienplan/studienplan').": $studienplan->bezeichnung ($stud
 echo '<table style="border: 1px solid black">
 	<thead>
 	<tr valign="top">
+		<th></th>
 		<th>'.$p->t('global/lehrveranstaltung').'</th>
 		<th>'.$p->t('studienplan/ects').'</th>
 		<th>'.$p->t('studienplan/status').'</th>';
@@ -330,6 +331,7 @@ function drawTree($tree, $depth)
 	foreach($tree as $row_tree)
 	{
 		echo "\n<tr>";
+		echo '<td>'.$row_tree->kurzbz.'</td>';
 		echo '<td>';
 
 		// Einrückung für Subtree
