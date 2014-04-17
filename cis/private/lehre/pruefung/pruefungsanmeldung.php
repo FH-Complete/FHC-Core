@@ -36,11 +36,6 @@ $db = new basis_db();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
-
-//TODO Berechtigung
-//if(!$rechte->isBerechtigt('lehre/pruefungsanmeldung'))
-//	die('Sie haben keine Berechtigung für diese Seite');
-
 $lehrveranstaltung = new lehrveranstaltung();
 $lehrveranstaltung->load_lva_student($uid);
 
@@ -221,7 +216,6 @@ $benutzer = new student($uid);
 			<td>
 			    <input type="hidden" id="lehrveranstaltungHidden" disabled="true">
 			    <input type="hidden" id="terminHidden" disabled="true">
-			    <!--<input type="hidden" id="studiensemesterHidden" value="<?php // echo $studiensemester->getakt(); ?>" disabled="true">-->
 			</td>
 		    </tr>
 		    <tr>

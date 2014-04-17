@@ -52,9 +52,6 @@ switch($method)
 	case 'stornoAnmeldung':
 	    $data = stornoAnmeldung($uid);
 	    break;
-//	case 'getPruefungMitarbeiter':
-//	    $data = getPruefungMitarbeiter($uid);
-//	    break;
 	case 'getAnmeldungenTermin':
 	    $data = getAnmeldungenTermin();
 	    break;
@@ -312,14 +309,10 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 	$anmeldung->uid = $uid;
 	$anmeldung->reihung = $reihung+1;
 	$anmeldung->status_kurzbz = "angemeldet";
-
-//                $studiensemester_kurbz = $_REQUEST['studiensemester_kurzbz'];
-
 	$lehrveranstaltung = new lehrveranstaltung($_REQUEST["lehrveranstaltung_id"]);
 
 	$konto = new konto();
 	$creditpoints = $konto->getCreditPoints($uid, $aktStudiensemester);
-//		$creditpoints = 1.5;
 	if($creditpoints !== false)
 	{
 	    if($creditpoints < $lehrveranstaltung->ects)
@@ -452,46 +445,7 @@ function stornoAnmeldung($uid = null)
     return $data;
 }
 
-/**
- * Lädt alle Prüfungen eines Lektors/Mitarbeiters
- * @param type $uid UID des Lektors/Mitarbeiters
- * @return Array
- */
-//function getPruefungMitarbeiter($uid = null)
-//{
-//    $lehrveranstaltung = new lehrveranstaltung();
-//    if($uid !== null)
-//    {
-//	$lehrveranstaltung->getLVByMitarbeiter($uid);
-////	$lehrveranstaltung->getLVByMitarbeiter("neubauer");
-//	$result = array();
-//	foreach($lehrveranstaltung->lehrveranstaltungen as $lv)
-//	{
-//	    $pruefung = new pruefungCis();
-//	    $pruefung->getPruefungByLv($lv->lehrveranstaltung_id);
-//	    if($pruefung->lehrveranstaltungen[0]->pruefung_id !== null)
-//	    {
-//		$pruefung->load($pruefung->lehrveranstaltungen[0]->pruefung_id);
-//		$pruefung->getTermineByPruefung();
-//		$lv->pruefung = $pruefung;
-//		array_push($result, $lv);
-//	    }
-//	}
-//    }
-//
-//    if(!empty($result))
-//    {
-//	$data['result']=$result;
-//	$data['error']='false';
-//	$data['errormsg']='';
-//    }
-//    else
-//    {
-//	$data['error']='true';
-//	$data['errormsg']="Keine Prüfungen vorhanden.";
-//    }
-//    return $data;
-//}
+
 
 /**
  * Lädt alle Anmeldungen zu einem Prüfungstermin

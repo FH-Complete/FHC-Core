@@ -35,9 +35,6 @@ $db = new basis_db();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
-/**
- * TODO 
- */
 if(!$rechte->isBerechtigt('lehre/pruefungsfenster'))
 	die('Sie haben keine Berechtigung für diese Seite');
 

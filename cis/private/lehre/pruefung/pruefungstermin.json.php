@@ -49,7 +49,7 @@ switch($method)
 	$einzeln = (isset($_POST["einzeln"]) && $_POST["einzeln"] ==="true")?true:false;
 	$lehrveranstaltungen = isset($_POST["lehrveranstaltungen"]) ? $_POST["lehrveranstaltungen"] : null;
 	$termine = isset($_POST["termine"])?$_POST["termine"]:null;
-	if($rechte->isBerechtigt('lehre/pruefungsterminAll'))
+	if($rechte->isBerechtigt('lehre/pruefungsterminAdmin'))
 	{
 	    $mitarbeiter_uid = $_REQUEST["mitarbeiter_uid"];
 	}
@@ -76,7 +76,7 @@ switch($method)
 	$lehrveranstaltungen = isset($_POST["lehrveranstaltungen"]) ? $_POST["lehrveranstaltungen"] : null;
 	$termine = isset($_POST["termine"])?$_POST["termine"]:null;
 	$termineNeu = isset($_POST["termineNeu"])?$_POST["termineNeu"]:null;
-	if($rechte->isBerechtigt('lehre/pruefungsterminAll'))
+	if($rechte->isBerechtigt('lehre/pruefungsterminAdmin'))
 	{
 	    $mitarbeiter_uid = $_REQUEST["mitarbeiter_uid"];
 	}
@@ -101,7 +101,7 @@ switch($method)
 	$data = deleteTermin($pruefung_id, $pruefungstermin_id);
 	break;
     case 'getAllPruefungen':
-	if($rechte->isBerechtigt('lehre/pruefungsterminAll'))
+	if($rechte->isBerechtigt('lehre/pruefungsterminAdmin'))
 	{
 	    $data = getAllPruefungen($_REQUEST["uid"]);
 	}
@@ -116,7 +116,11 @@ switch($method)
 echo json_encode($data);
 
 
-
+/**
+ * Lädt alle Prüfungstypen aus der Datenbank
+ * @param boolean $abschluss Gibt an ob Prüfungstypen einer Abschlussprüfunge geladen werden sollen oder nicht
+ * @return Array
+ */
 function loadPruefungstypen($abschluss)
 {
     $pruefungstermin = new pruefungstermin();
@@ -135,6 +139,11 @@ function loadPruefungstypen($abschluss)
     return $data;
 }
 
+/**
+ * Lädt alle Studiensemester aus der Datenbank
+ * @param String $aktStudiensemester das Aktuelle Studiensemester
+ * @return Array
+ */
 function loadStudiensemester($aktStudiensemester = null)
 {
     $studiensemester = new studiensemester();
@@ -156,6 +165,11 @@ function loadStudiensemester($aktStudiensemester = null)
     return $data;
 }
 
+/**
+ * Lädt alle Prüfungsfenster eines Studiensemesters
+ * @param String $studiensemester_kurzbz Kurzbezeichnung des Studiensemesters
+ * @return Array
+ */
 function getPruefungsfensterByStudiensemester($studiensemester_kurzbz)
 {
     $pruefungsfenster = new pruefungsfenster();
@@ -173,6 +187,20 @@ function getPruefungsfensterByStudiensemester($studiensemester_kurzbz)
     return $data;
 }
 
+/**
+ * Speichet einen Prüfungstermin
+ * @param int $uid UID des Lektors
+ * @param String $studiensemester_kurzbz Kurzbezeichnung des Studiensemesters
+ * @param int $pruefungsfenster_id ID des Prüfungsfensters
+ * @param String $pruefungstyp_kurzbz Kurzbezeichnung des Prüfungstyps
+ * @param String $titel Titel der Prüfung
+ * @param String $beschreibung Beschreibung zur Prüfung
+ * @param String $methode Methode der Prüfung
+ * @param boolen $einzeln TRUE, wenn Einzelprüfung
+ * @param Array $lehrveranstaltungen Lehrveranstaltungen zur Prüfung
+ * @param Array $termine Termine zur Prüfung
+ * @return Array
+ */
 function savePruefungstermin($uid, $studiensemester_kurzbz, $pruefungsfenster_id, $pruefungstyp_kurzbz, $titel, $beschreibung, $methode, $einzeln, $lehrveranstaltungen, $termine)
 {
     if($lehrveranstaltungen === null)
@@ -268,6 +296,12 @@ function savePruefungstermin($uid, $studiensemester_kurzbz, $pruefungsfenster_id
     return $data;
 }
 
+/**
+ * Lädt alle Lehrveranstaltungen eines Mitarbeiters
+ * @param int $mitarbeiter_uid UID des Mitarbeiters
+ * @param String $studiensemester_kurzbz Kurzbezeichnung des Studiensemesters
+ * @return Array
+ */
 function getLehrveranstaltungenByMitarbeiter($mitarbeiter_uid, $studiensemester_kurzbz)
 {
     $lehrveranstaltung = new lehrveranstaltung();
@@ -291,6 +325,21 @@ function getLehrveranstaltungenByMitarbeiter($mitarbeiter_uid, $studiensemester_
     return $data;
 }
 
+/**
+ * Speichet einen Prüfungstermin
+ * @param int $uid UID des Lektors
+ * @param String $studiensemester_kurzbz Kurzbezeichnung des Studiensemesters
+ * @param int $pruefungsfenster_id ID des Prüfungsfensters
+ * @param String $pruefungstyp_kurzbz Kurzbezeichnung des Prüfungstyps
+ * @param String $titel Titel der Prüfung
+ * @param String $beschreibung Beschreibung zur Prüfung
+ * @param String $methode Methode der Prüfung
+ * @param boolen $einzeln TRUE, wenn Einzelprüfung
+ * @param Array $lehrveranstaltungen Lehrveranstaltungen zur Prüfung
+ * @param Array $termine Termine zur Prüfung (bestehende)
+ * @param type $termineNeu Neu hinzugefügte Termine
+ * @return Array
+ */
 function updatePruefungstermin($uid, $pruefung_id, $studiensemester_kurzbz, $pruefungsfenster_id, $pruefungstyp_kurzbz, $titel, $beschreibung, $methode, $einzeln, $lehrveranstaltungen, $termine, $termineNeu)
 {
     $pruefungsfenster = new pruefungsfenster();
@@ -370,11 +419,6 @@ function updatePruefungstermin($uid, $pruefung_id, $studiensemester_kurzbz, $pru
 	$pruefung->termine = $termineArray;
     }
     
-
-    
-    
-    
-    
     $pruefung->mitarbeiter_uid = $uid;
     $pruefung->studiensemester_kurzbz = $studiensemester_kurzbz;
     $pruefung->pruefungsfenster_id = $pruefungsfenster_id;
@@ -410,6 +454,12 @@ function updatePruefungstermin($uid, $pruefung_id, $studiensemester_kurzbz, $pru
     return $data;
 }
 
+/**
+ * Löscht Lehrveranstaltungen von einer Prüfung
+ * @param int $lvId ID der Lehrveranstaltung
+ * @param int $pruefung_id ID der Prüfung
+ * @return Array
+ */
 function deleteLehrveranstaltungFromPruefung($lvId, $pruefung_id)
 {
     $pruefung = new pruefungCis();
@@ -428,6 +478,11 @@ function deleteLehrveranstaltungFromPruefung($lvId, $pruefung_id)
     return $data;
 }
 
+/**
+ * Storniert eine Prüfung
+ * @param int $pruefung_id ID der Prüfung
+ * @return Array
+ */
 function stornoPruefung($pruefung_id)
 {
     $pruefung = new pruefungCis();
@@ -445,6 +500,12 @@ function stornoPruefung($pruefung_id)
     return $data;
 }
 
+/**
+ * Löscht einen Termin einer Prüfung
+ * @param int $pruefung_id ID der Prüfung
+ * @param int $pruefungstermin_id ID des Termins
+ * @return Array
+ */
 function deleteTermin($pruefung_id, $pruefungstermin_id)
 {
     $pruefung = new pruefungCis();
@@ -463,6 +524,11 @@ function deleteTermin($pruefung_id, $pruefungstermin_id)
     return $data;
 }
 
+/**
+ * Lädt alle Prüfungen eines Mitarbeiters
+ * @param String $mitarbeiter_uid UID des Mitarbeiters
+ * @return Array
+ */
 function getAllPruefungen($mitarbeiter_uid)
 {
     $pruefung = new pruefungCis();
@@ -491,6 +557,12 @@ function getAllPruefungen($mitarbeiter_uid)
     return $data;
 }
 
+/**
+ * Überprüft ob das angegebene Datum innerhalb eines Prüfungsfensters ist
+ * @param int $pruefungsfenster_id ID des Prüfungsfensters
+ * @param String $datum
+ * @return boolean
+ */
 function checkTerminPruefungsfenster($pruefungsfenster_id, $datum)
 {
     $pruefungsfenster = new pruefungsfenster($pruefungsfenster_id);
@@ -502,6 +574,13 @@ function checkTerminPruefungsfenster($pruefungsfenster_id, $datum)
     return false;
 }
 
+/**
+ * Überprüft ob es eine Kollision zu anderen Prüfungen des Mitarbeiters gibt
+ * @param String $uid UID des Mitarbeiters
+ * @param String $beginn Beginn des Termins
+ * @param String $ende Ende des Termins
+ * @return boolean
+ */
 function checkCollision($uid, $beginn, $ende)
 {
     $collision = false;
