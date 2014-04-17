@@ -31,9 +31,8 @@ $db = new basis_db();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
-//TODO Berechtigung
-//if(!$rechte->isBerechtigt('lehre/pruefungsanmeldung'))
-//	die('Sie haben keine Berechtigung für diese Seite');
+if(!$rechte->isBerechtigt('lehre/pruefungsanmeldungAdmin'))
+	die('Sie haben keine Berechtigung für diese Seite');
 
 ?>
 <html>
@@ -201,7 +200,6 @@ $rechte->getBerechtigungen($uid);
 	<script>
 	    $(document).ready(function(){
 		loadStudiengaenge();
-//		loadPruefungenMitarbeiter();
 	    });
 	</script>
 	<h1>Anmeldungen Verwalten</h1>

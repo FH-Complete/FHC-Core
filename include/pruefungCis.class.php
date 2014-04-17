@@ -641,6 +641,11 @@ class pruefungCis extends basis_db
         return false;
     }
     
+    /**
+     * Lädt alle Prüfungen
+     * @param String $mitarbeiter_uid UID des Mitarbeiters (optional)
+     * @return boolean
+     */
     public function getAllPruefungen($mitarbeiter_uid = NULL)
     {
 	$qry = 'SELECT * FROM campus.tbl_pruefung';

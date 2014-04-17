@@ -132,7 +132,7 @@ if(!$rechte->isBerechtigt('lehre/pruefungstermin'))
 	    <table>
 		<tr>
 		    <?php
-			if(!$rechte->isBerechtigt('lehre/pruefungsterminAll'))
+			if(!$rechte->isBerechtigt('lehre/pruefungsterminAdmin'))
 			{
 			    echo '<input id="mitarbeiter_uid" type="hidden" value="'.$uid.'"/>
 			    <script>
