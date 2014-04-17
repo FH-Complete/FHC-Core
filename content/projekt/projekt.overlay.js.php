@@ -70,21 +70,24 @@ var listenerTreeProjekt =
 // ****
 function ProjektTreeRefresh()
 {
-	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	if(datasourceTreeProjekt!=undefined)
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
-	//markierte Lehreinheit global speichern damit diese LE nach dem
-	//refresh wieder markiert werden kann.
-	var tree = document.getElementById('tree-projekt');
-		
-	try
-	{
-		ProjektSelectKurzbz = getTreeCellText(tree, "treecol-projekt-projekt_kurzbz", tree.currentIndex);
+		//markierte Lehreinheit global speichern damit diese LE nach dem
+		//refresh wieder markiert werden kann.
+		var tree = document.getElementById('tree-projekt');
+
+		try
+		{
+			ProjektSelectKurzbz = getTreeCellText(tree, "treecol-projekt-projekt_kurzbz", tree.currentIndex);
+		}
+		catch(e)
+		{
+			ProjektSelectKurzbz=null;
+		}
+		datasourceTreeProjekt.Refresh(false); //non blocking
 	}
-	catch(e)
-	{
-		ProjektSelectKurzbz=null;
-	}
-	datasourceTreeProjekt.Refresh(false); //non blocking
 }
 
 // ****
