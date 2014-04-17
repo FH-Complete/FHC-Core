@@ -306,10 +306,21 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 		// DIV fuer den Tree neu anlegen damit der alte Tree vollstaendig entfernt wird
 		$("#data").html("<div id='treeData'></div>");
 
-		function searchChildren(element, matchingId)
+		function searchChildren(element, matchingId, original)
 		{
-			if(($("#"+element.attr("id")).find("[lvid='"+matchingId+"']").attr("id") !== undefined) || ($("#"+element.attr("id")).attr("lvid") === matchingId))
+			var found = false;
+			$("#"+element.attr("id")+" ul").first().children().each(function(i,v){
+				if($(v).attr("lvid") === original.attr("id"))
+				{
+					found = true;
+				}
+			});
+			if((found) || ($("#"+element.attr("id")).attr("lvid") === matchingId))
 			{
+				if(($("#"+element.attr("id")).find("[lvid='"+matchingId+"']").attr("id") === original.attr("id")) || ($("#"+element.attr("id")).attr("id") === original.attr("id")))
+				{
+					return false;
+				}
 				return true;
 			}		
 			return false;
@@ -348,14 +359,14 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 							var text;
 							if(m.ot === m.rt)
 							{
-								if((searchChildren(m.r, m.o.attr("lvid")) === true) || (searchParents(m.r, m.o.attr("lvid")) === true))
+								if((searchChildren(m.r, m.o.attr("lvid"), m.o) === true) || (searchParents(m.r, m.o.attr("lvid")) === true))
 								{
 									return false;
 								}
 							}
 							else
 							{
-								if((searchChildren(m.r, m.o.attr("id")) === true) || (searchParents(m.r, m.o.attr("id")) === true))
+								if((searchChildren(m.r, m.o.attr("id"), m.o) === true) || (searchParents(m.r, m.o.attr("id")) === true))
 								{
 									return false;
 								}
