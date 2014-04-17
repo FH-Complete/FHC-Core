@@ -2085,5 +2085,26 @@ class lehrveranstaltung extends basis_db
             }
             return false;
         }
+	
+	public function lehreverzeichnisExists($lehreverzeichnis)
+	{
+	    $qry = 'SELECT * FROM lehre.tbl_lehrveranstaltung WHERE lehreverzeichnis='.$this->db_add_param($lehreverzeichnis);
+	    $qry .= ';';
+	    
+	    if($this->db_query($qry))
+	    {
+		if($this->db_num_rows() > 0)
+		{
+		    return true;
+		}
+		return false;
+	    }
+	    else
+	    {
+		$this->errormsg = "Fehler beim Laden der Daten";
+		return false;
+	    }
+	}
+	
 }
 ?>
