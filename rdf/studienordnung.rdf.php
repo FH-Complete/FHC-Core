@@ -150,11 +150,14 @@ if(isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				default:
 					$orgform_kurzbz_lang=$orgform_kurzbz;
 			}
+			
+			$ects_gesamt = ($objStg->max_semester)*30; 
 
 			echo '  	<orgform>';
 			echo '      	<orgform_kurzbz><![CDATA['.$orgform_kurzbz.']]></orgform_kurzbz>';
 			echo '      	<orgform_kurzbz_lang><![CDATA['.$orgform_kurzbz_lang.']]></orgform_kurzbz_lang>';
 			echo '			<regelstudiendauer><![CDATA['.$objStg->max_semester.']]></regelstudiendauer>';
+			echo '			<ects_gesamt><![CDATA['.$ects_gesamt.']]></ects_gesamt>';
 			echo '          <studienplaetze><![CDATA['.$objStg->studienplaetze.']]></studienplaetze>';
 
 			// ************ Lehrveranstaltungen ***************
