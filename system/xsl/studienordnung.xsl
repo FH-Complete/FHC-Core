@@ -166,7 +166,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
        <style:table-column-properties style:column-width="1.367cm" />
     </style:style>
 	<style:style style:name="Matrix.1" style:family="table-row">
-       <style:table-row-properties fo:background-color="#8fd2ff" fo:keep-together="auto" />
+       <style:table-row-properties fo:background-color="#d3d3d3" fo:keep-together="auto" />
     </style:style>
     <style:style style:name="Matrix.2" style:family="table-row">
        <style:table-row-properties fo:background-color="#99ffcc" fo:keep-together="auto" />
@@ -208,12 +208,12 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
          <style:table-column-properties style:column-width="1.483cm" />
       </style:style>
       <style:style style:name="Tabelle1.1" style:family="table-row">
-         <style:table-row-properties fo:background-color="#83caff">
+         <style:table-row-properties fo:background-color="#d3d3d3">
             <style:background-image />
          </style:table-row-properties>
       </style:style>
       <style:style style:name="Tabelle1.A1" style:family="table-cell">
-         <style:table-cell-properties style:vertical-align="middle" fo:background-color="#83caff" fo:padding="0.049cm" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="0.5pt solid #00000a" fo:border-bottom="0.5pt solid #00000a">
+         <style:table-cell-properties style:vertical-align="middle" fo:background-color="#d3d3d3" fo:padding="0.049cm" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="0.5pt solid #00000a" fo:border-bottom="0.5pt solid #00000a">
             <style:background-image />
          </style:table-cell-properties>
       </style:style>
@@ -774,22 +774,22 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
          <style:table-cell-properties style:vertical-align="middle" fo:padding-left="0cm" fo:padding-right="0.049cm" fo:padding-top="0cm" fo:padding-bottom="0.049cm" fo:border-left="none" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a" />
       </style:style>
       <style:style style:name="Tabelle1.A33" style:family="table-cell">
-         <style:table-cell-properties style:vertical-align="middle" fo:background-color="#83caff" fo:padding="0.049cm" fo:border="0.5pt solid #00000a">
+         <style:table-cell-properties style:vertical-align="middle" fo:background-color="#d3d3d3" fo:padding="0.049cm" fo:border="0.5pt solid #00000a">
             <style:background-image />
          </style:table-cell-properties>
       </style:style>
       <style:style style:name="Tabelle1.B33" style:family="table-cell">
-         <style:table-cell-properties style:vertical-align="middle" fo:background-color="#83caff" fo:padding-left="0cm" fo:padding-right="0.049cm" fo:padding-top="0.049cm" fo:padding-bottom="0.049cm" fo:border-left="none" fo:border-right="0.5pt solid #00000a" fo:border-top="0.5pt solid #00000a" fo:border-bottom="0.5pt solid #00000a">
+         <style:table-cell-properties style:vertical-align="middle" fo:background-color="#d3d3d3" fo:padding-left="0cm" fo:padding-right="0.049cm" fo:padding-top="0.049cm" fo:padding-bottom="0.049cm" fo:border-left="none" fo:border-right="0.5pt solid #00000a" fo:border-top="0.5pt solid #00000a" fo:border-bottom="0.5pt solid #00000a">
             <style:background-image />
          </style:table-cell-properties>
       </style:style>
       <style:style style:name="Tabelle1.A34" style:family="table-cell">
-         <style:table-cell-properties style:vertical-align="middle" fo:background-color="#83caff" fo:padding-left="0.049cm" fo:padding-right="0.049cm" fo:padding-top="0cm" fo:padding-bottom="0.049cm" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a">
+         <style:table-cell-properties style:vertical-align="middle" fo:background-color="#d3d3d3" fo:padding-left="0.049cm" fo:padding-right="0.049cm" fo:padding-top="0cm" fo:padding-bottom="0.049cm" fo:border-left="0.5pt solid #00000a" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a">
             <style:background-image />
          </style:table-cell-properties>
       </style:style>
       <style:style style:name="Tabelle1.B34" style:family="table-cell">
-         <style:table-cell-properties style:vertical-align="middle" fo:background-color="#83caff" fo:padding-left="0cm" fo:padding-right="0.049cm" fo:padding-top="0cm" fo:padding-bottom="0.049cm" fo:border-left="none" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a">
+         <style:table-cell-properties style:vertical-align="middle" fo:background-color="#d3d3d3" fo:padding-left="0cm" fo:padding-right="0.049cm" fo:padding-top="0cm" fo:padding-bottom="0.049cm" fo:border-left="none" fo:border-right="0.5pt solid #00000a" fo:border-top="none" fo:border-bottom="0.5pt solid #00000a">
             <style:background-image />
          </style:table-cell-properties>
       </style:style>
@@ -1259,6 +1259,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
     <style:style style:name="T2" style:family="text">
       <style:text-properties officeooo:rsid="001f0000"/>
     </style:style>
+    <style:style style:name="yellow" style:family="paragraph" style:parent-style-name="Standard">
+      <style:text-properties style:font-name="Arial" fo:font-size="11pt" fo:background-color="#ffff00" style:font-size-asian="11pt" style:font-size-complex="11pt"/>
+    </style:style>
     <style:style style:name="T3" style:family="text"/>
     <style:style style:name="fr1" style:family="graphic" style:parent-style-name="Frame">
       <style:graphic-properties style:wrap="dynamic" style:number-wrapped-paragraphs="1" style:vertical-pos="from-top" style:vertical-rel="paragraph" style:horizontal-pos="right" style:horizontal-rel="page-content" fo:background-color="#ffffff" style:background-transparency="100%" style:writing-mode="lr-tb" draw:wrap-influence-on-position="once-successive">
@@ -1544,6 +1547,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           <text:h text:style-name="P11" text:outline-level="1"><text:bookmark-start text:name="__RefHeading__359_971256360"/>Eckdaten<text:bookmark-end text:name="__RefHeading__359_971256360"/></text:h>
         </text:list-item>
       </text:list>
+      <text:p text:style-name="yellow">[Bitte die Angaben kontrollieren und erforderlichenfalls korrigieren.]</text:p>
 	  <text:list xml:id="list6862182980785781816" text:style-name="L2">
 		<text:list-item><text:p text:style-name="P3">Studiengangskennzahl: <xsl:value-of select="studiengang_kz"/></text:p></text:list-item>
 		<text:list-item><text:p text:style-name="P7">Studiengangsbezeichnung: <xsl:value-of select="studiengang_bezeichnung"/></text:p></text:list-item>
@@ -1561,25 +1565,28 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           <text:h text:style-name="P11" text:outline-level="1"><text:bookmark-start text:name="__RefHeading__15785_1435587267"/>Zugangsvoraussetzungen<text:bookmark-end text:name="__RefHeading__15785_1435587267"/></text:h>
         </text:list-item>
 	  </text:list>
+          <text:p text:style-name="yellow">[Beschreibung der Zugangsvoraussetzungen gemäß aktuellem Antrag (vgl. Kapitel „Zugangsvoraussetzung“). Erforderlichenfalls bitte zwischenzeitliche Aktualisierungen integrieren.]</text:p>
       <text:p text:style-name="Standard"/>
       <text:list xml:id="list233823232037713" text:continue-numbering="true" text:style-name="Numbering_20_1">
         <text:list-item>
           <text:h text:style-name="P11" text:outline-level="1"><text:bookmark-start text:name="__RefHeading__15787_1435587267"/>Aufnahmeverfahren<text:bookmark-end text:name="__RefHeading__15787_1435587267"/></text:h>
         </text:list-item>
       </text:list>
+      <text:p text:style-name="yellow">[Beschreibung des Aufnahmeverfahrens gemäß aktuellem Antrag (vgl. Kapitel „Aufnahmeordnung“, Unterkapitel „Aufnahmeverfahren“). Erforderlichenfalls bitte zwischenzeitliche Aktualisierungen integrieren.]</text:p>
       <text:p text:style-name="Standard"/>
       <text:list xml:id="list233821599912460" text:continue-numbering="true" text:style-name="Numbering_20_1">
         <text:list-item>
           <text:h text:style-name="P11" text:outline-level="1"><text:bookmark-start text:name="__RefHeading__15777_1435587267"/>Berufliche Tätigkeitsfelder<text:bookmark-end text:name="__RefHeading__15777_1435587267"/></text:h>
 		</text:list-item>
 	  </text:list>
-	  <text:p text:style-name="P18">An dieser Stelle sind die beruflichen Tätigkeitsfelder des Studiengangs aufzuzeigen.</text:p>
+	  <text:p text:style-name="yellow">[Beschreibung der beruflichen Tätigkeitsfelder gemäß aktuellem Antrag (vgl. Kapitel „Berufliche Tätigkeitsfelder und Qualifikationsprofil“). Erforderlichenfalls bitte zwischenzeitliche Aktualisierungen integrieren.]</text:p>
       <text:p text:style-name="Standard"/>
 	  <text:list xml:id="list140455441160016" text:continue-numbering="true" text:style-name="Numbering_20_1">
 		<text:list-item>
           <text:h text:style-name="P11" text:outline-level="1"><text:bookmark-start text:name="__RefHeading__15779_1435587267"/>Qualifikationsziele (Lernergebnisse des Studienganges)<text:bookmark-end text:name="__RefHeading__15779_1435587267"/></text:h>
         </text:list-item>
 	  </text:list>
+           <text:p text:style-name="yellow">[Beschreibung der Qualifikationsziele bzw. Lernergebnisse des Studiengangs gemäß aktuellem Antrag (vgl. Kapitel „Berufliche Tätigkeitsfelder und Qualifikationsprofil“). Erforderlichenfalls bitte zwischenzeitliche Aktualisierungen integrieren.]</text:p>
       <text:p text:style-name="Standard"/>
 	  <text:list xml:id="list105303509167461" text:continue-numbering="true" text:style-name="Numbering_20_1">
         <text:list-item>
@@ -1605,34 +1612,66 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 		  </text:list>
         </text:list-item>
       </text:list>
-      <text:h text:style-name="P24" text:outline-level="3"><text:tab/>Studienorganisatorische Punkte</text:h>
+      
+      
+       <text:list xml:id="list233822041148163" text:continue-list="list233821599912460" text:style-name="Numbering_20_1">
+        <text:list-item>
+          <text:list>
+            <text:list-item>
+              <text:list>
+                <text:list-item>
+                  <text:h text:style-name="P23" text:outline-level="3"><text:bookmark-start text:name="__RefHeading__361_971256360"/>Studienorganisatorische Punkte<text:bookmark-end text:name="__RefHeading__361_971256360"/></text:h>
+                </text:list-item>
+              </text:list>
+            </text:list-item>
+          </text:list>
+        </text:list-item>
+      </text:list>
+      
+      
       <text:list xml:id="list8309596791993483161" text:style-name="L1">
         <text:list-item>
           <text:p text:style-name="P7">Regelstudiendauer: <xsl:value-of select="regelstudiendauer"/></text:p>
+          <text:p text:style-name="yellow">[Bitte prüfen.]</text:p>
+        </text:list-item>
+        <text:list-item>
+          <text:p text:style-name="P7">ECTS: <xsl:value-of select="ects_gesamt"/></text:p>
+          <text:p text:style-name="yellow">[Bitte prüfen.]</text:p>
         </text:list-item>
         <text:list-item>
           <text:p text:style-name="P7">Sprache: </text:p>
-          <text:p text:style-name="P7">[Angabe der Unterrichtssprache (Deutsch oder Englisch). Gegebenenfalls Angabe, ob einzelne Lehrveranstaltungen oder Prüfungen in einer anderen Sprache durchgeführt werden.]</text:p>
+          <text:p text:style-name="yellow">[Angabe der Unterrichtssprache (Deutsch oder Englisch). Gegebenenfalls Angabe, ob – abgesehen von den expliziten Sprachen-Lehrveranstaltungen - einzelne Lehrveranstaltungen oder Prüfungen in einer anderen Sprache durchgeführt werden. Eine Auflistung der Lehrveranstaltungen ist nicht erforderlich.]</text:p>
         </text:list-item>
         <text:list-item>
           <text:p text:style-name="P7">Auslandssemester: </text:p>
-          <text:p text:style-name="P7">[Angabe, ob ein verpflichtendes oder optionales Auslandssemester vorgesehen ist und in welchem Semester bzw. welchen Semestern es absolvierbar ist. Erforderlichenfalls weitere zentrale Informationen zum Auslandssemester anführen.]</text:p>
+          <text:p text:style-name="yellow">[Angabe, ob ein verpflichtendes oder optionales Auslandssemester vorgesehen ist und in welchem Semester bzw. welchen Semestern es absolvierbar ist. Erforderlichenfalls weitere zentrale Informationen zum Auslandssemester anführen.]</text:p>
         </text:list-item>
         <text:list-item>
           <text:p text:style-name="P7">Berufspraktikum:</text:p>
-          <text:p text:style-name="P7">[Im Normalfall nur bei Bachelorstudiengängen relevant bzw. falls nicht relevant, löschen. Angabe des Semesters, der Dauer in Wochen und des Umfangs (ECTS) des Berufspraktikums.]</text:p>
+          <text:p text:style-name="yellow">[Im Normalfall nur bei Bachelorstudiengängen relevant bzw. falls nicht relevant, löschen. Angabe des Semesters, der Dauer in Wochen und des Umfangs (ECTS) des Berufspraktikums.]</text:p>
         </text:list-item>
         <text:list-item>
           <text:p text:style-name="P7">Einteilung des Studienjahres: </text:p>
-          <text:p text:style-name="P7">[Angaben zu Beginn und Ende sowie zur Zahl der Lehrveranstaltungswochen von Winter- und Sommersemester; Angaben zu Beginn und Ende sowie zur Zahl der lehrveranstaltungsfreien Wochen während des Winter- und Sommersemesters sowie zwischen Winter- und Sommersemester.]</text:p>
+          <text:p text:style-name="yellow">[Studienjahr (12 Monate): Beginn, Ende</text:p>
+          <text:p text:style-name="yellow">WS: Beginn, Ende, Wochenanzahl, Zahl der Lehrveranstaltungswochen </text:p>
+          <text:p text:style-name="yellow">Ferien während WS: jeweils Beginn, Ende, Wochenanzahl </text:p> 
+          <text:p text:style-name="yellow">LV-freie Zeit zwischen WS und SS / Semesterferien: Beginn, Ende, Wochenanzahl </text:p>
+          <text:p text:style-name="yellow">SS: Beginn, Ende, Wochenanzahl, Zahl der Lehrveranstaltungswochen </text:p>
+          <text:p text:style-name="yellow">LV-freie Zeit zwischen SS und WS / Sommerferien: Beginn, Ende, Wochenanzahl </text:p>
+          <text:p text:style-name="yellow">Angabe der Tage, an denen üblicherweise Lehrveranstaltungen stattfinden.]</text:p>
         </text:list-item>
         <text:list-item>
           <text:p text:style-name="P7">Gemeinsames Studienprogramm: </text:p>
-          <text:p text:style-name="P7">[Angaben dazu nur falls zutreffend bzw. falls nicht zutreffend, löschen. Angaben zu folgenden Themen: „Art des gemeinsamen Studienprogramms“ (joint-degree / multiple-degree / double-degree program); „Angaben zum akademischen Grad“;  „Angaben zur Partnerinstitution/en“ inklusive Hinweis auf die bestehende Vereinbarung mit der/den Partnerinstitution/en, in der die Details geregelt sind.]</text:p>
+          <text:p text:style-name="yellow">[Angaben dazu nur falls zutreffend bzw. falls nicht zutreffend, löschen. Angaben zu folgenden Themen: „Art des gemeinsamen Studienprogramms“ (joint-degree / multiple-degree / double-degree program); „Angaben zum akademischen Grad“; „Angaben zur Partnerinstitution/en“ inklusive Hinweis auf die bestehende Vereinbarung mit der/den Partnerinstitution/en, in der die Details geregelt sind.]</text:p>
+        </text:list-item>
+        <text:list-item>
+          <text:p text:style-name="P7">Erläuterungen zum Studienplan: </text:p>
+          <text:p text:style-name="yellow">[Angaben dazu nur falls zutreffend bzw. falls nicht zutreffend, löschen. Angaben zu folgenden Themen: „Art des gemeinsamen Studienprogramms“ (joint-degree / multiple-degree / double-degree program); „Angaben zum akademischen Grad“; „Angaben zur Partnerinstitution/en“ inklusive Hinweis auf die bestehende Vereinbarung mit der/den Partnerinstitution/en, in der die Details geregelt sind.]</text:p>
         </text:list-item>
       </text:list>
       <text:p text:style-name="Standard"/>
-      <text:list xml:id="list233822041148163" text:continue-list="list233821599912460" text:style-name="Numbering_20_1">
+      
+      <text:list xml:id="list233822041148100" text:continue-list="list233822041148163" text:style-name="Numbering_20_1">
         <text:list-item>
           <text:list>
             <text:list-item>
@@ -1645,10 +1684,28 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           </text:list>
         </text:list-item>
       </text:list>
-	  <text:p text:style-name="P7">[Die Studienplanmatrix ist eine Liste der Lehrveranstaltungen eines Studiengangs gruppiert nach Semestern und nach Modulen. Pro Lehrveranstaltung sind die Lehrform, die SWS, die LVS, die Anzahl der Gruppen, die ALVS und die ECTS anzugeben. Die Summenbildung erfolgt je Modul, je Semester und über alle Semester. Wahlpflichtmodule und -lehrveranstaltungen werden separat unterhalb des entsprechenden Semesters angegeben. Nachfolgend findet sich zunächst ein schematisches Beispiel für eine Studienplanmatrix.</text:p>
-	  <text:p text:style-name="P7"/>
-	  <text:p text:style-name="P7">Unterhalb des Schemas finden Sie die aus dem FAS generierte Lehrveranstaltungsliste im Hinblick auf das Studienjahr 2014/15. Die Spalten „LVS“, „Gruppen“, „ALVS“ und „ECTS“ sind aus dem FAS generiert. Bitte kontrollieren Sie die Werte und aktualisieren Sie diese gegebenenfalls. Die SWS sind bitte händisch einzutragen. Bringen Sie die aktualisierte und ergänzte Liste anschließend in das für die Studienplanmatrix vorgesehene Schema.]</text:p>
-      <text:p text:style-name="P7"/>
+	  <text:p text:style-name="yellow">[Die Studienplanmatrix stellt die Pflicht-Lehrveranstaltungen eines Studiengangs gruppiert nach Semestern und nach Modulen dar. Pro Lehrveranstaltung sind die Lehrform, die SWS, die LVS, die Anzahl der Gruppen, die ALVS und die ECTS anzugeben. Die Summenbildung erfolgt je Modul, je Semester und über alle Semester. Wahlpflichtmodule und -lehrveranstaltungen werden separat unterhalb des entsprechenden Semesters dargestellt. Nachfolgend findet sich zunächst ein schematisches Beispiel für eine Studienplanmatrix.</text:p> 
+          <text:p text:style-name="yellow">Definitionen:</text:p>
+          
+	 <text:list xml:id="list8309596791993483100" text:style-name="L1">
+            <text:list-item>
+              <text:p text:style-name="yellow">SWS: Semesterwochenstunden</text:p>
+            </text:list-item>
+            <text:list-item>
+              <text:p text:style-name="yellow">LVS: Lehrveranstaltungsstunden bzw. Lehrveranstaltungseinheiten.</text:p>
+            </text:list-item>
+            <text:list-item>
+              <text:p text:style-name="yellow">Gruppen: Anzahl der Gruppen, in der die Lehrveranstaltung durchgeführt wird. Werden Teile einer Lehrveranstaltung mit unterschiedlich vielen Gruppen durchgeführt, so kann sich daraus ein Wert mit Kommastellen ergeben (Findet beispielsweise der eine Teil einer Lehrveranstaltung ohne Gruppenteilung und der andere Teil in zwei Gruppen statt, so kann sich daraus der Gruppenfaktor 1,5 ergeben.)</text:p>
+            </text:list-item>
+            <text:list-item>
+              <text:p text:style-name="yellow">ALVS: Aufwand an Lehrveranstaltungsstunden aus Sicht des Studiengangs. Entspricht meist den FAS „Semesterstunden“.</text:p>
+            </text:list-item>
+            <text:list-item>
+              <text:p text:style-name="yellow">ECTS: Von den Studierenden zu leistender Aufwand in ECTS credits.]</text:p>
+            </text:list-item>                            
+         </text:list>
+         <text:p text:style-name="P7"></text:p>
+         
          <table:table table:name="Tabelle1" table:style-name="Tabelle1">
             <table:table-column table:style-name="Tabelle1.A" />
             <table:table-column table:style-name="Tabelle1.B" />
@@ -3339,8 +3396,8 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             </table:table-row>
          </table:table>
     <text:p text:style-name="Standard"/>
+    <text:p text:style-name="yellow">[Nachfolgend finden Sie die aus dem FAS generierte Liste der aktiven Lehrveranstaltungen. Die Spalten „LVS“, „ALVS“ und „ECTS“ sind aus dem FAS generiert. Bitte kontrollieren bzw. aktualisieren Sie die vorhandenen Werte inklusive der LV-Bezeichnungen im Hinblick auf das Studienjahr 2014/15 und ergänzen Sie die Werte für die SWS und die Gruppen. Gruppieren Sie die Lehrveranstaltungen zu Modulen, indem Sie jeweils eine Zeile für das Modul einfügen, so wie im Schema dargestellt. Zuletzt bilden Sie die Summen je Modul, je Semester und über alle Semester.]</text:p>
     <text:p text:style-name="Standard"/>
-
 	<xsl:apply-templates select="semester" mode="matrix" />
     <text:p text:style-name="Standard"/>
 		<text:list xml:id="list233823045617055" text:continue-list="list233822041148163" text:style-name="Numbering_20_1">
@@ -3356,8 +3413,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			  </text:list>
 			</text:list-item>
 		  </text:list>
-        <text:p text:style-name="P7">[Bitte die Modulgrafik ergänzen; vgl. dazu die Modulgrafiken in den Beispiel-Studienordnungen.]</text:p>
+        <text:p text:style-name="yellow">[Bitte fügen Sie die Modulgrafik gemäß aktuellem Antrag ein (vgl. Kapitel „Grafische Darstellung der Module“). Erforderlichenfalls zwischenzeitliche Aktualisierungen integrieren.]</text:p>
         <text:p text:style-name="Standard"/>
+        <!--
+        
         <text:list xml:id="list105303525162521" text:continue-list="list233823045617055" text:continue-numbering="true" text:style-name="Numbering_20_1">
             <text:list-item>
                <text:list>
@@ -3427,7 +3486,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                </table:table-cell>
             </table:table-row>
           </table:table>
-		<xsl:apply-templates select="semester" mode="beschreibung"/>
+		<xsl:apply-templates select="semester" mode="beschreibung"/>-->
 </xsl:template>
 
 <xsl:template match="semester" mode="matrix">
