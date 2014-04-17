@@ -79,7 +79,7 @@ function showTeilnehmer(pruefungstermin_id, lehrveranstaltung_id, lehrveranstalt
 	$("#modalOverlay").addClass("modalOverlay");
 	$("#anmeldeDaten").empty();
 	$("#anmeldungen").children("h2").text("Bewertungen zu "+lehrveranstaltung+" ("+datum+")");
-	var noten = "<select onchange='markAsUnsaved(this);'>";
+	var noten = "<select onchange='markAsUnsaved(this);'><option value='null'>Keine Auswahl</option>";
 	$.ajax({
 		dataType: 'json',
 		url: "./pruefungsbewertung.json.php",
@@ -166,6 +166,11 @@ function saveBeurteilung(ele, datum, pruefungsanmeldung_id, pruefung_id, lehrver
 	var student_uid = $(ele).parent().attr("id");
 	var mitarbeiter_uid = $("#mitarbeiter_uid").val();
 	var note = $(ele).parent().find("select").val();
+	if((note === "null") || (note===null))
+	{
+		messageBox("message", "Keine Note ausgewählt.", "red", "highlight", 1000);
+		return false;
+	}
 	var anmerkung = "";
 	
 	$.ajax({
@@ -205,7 +210,11 @@ function updateBeurteilung(ele, pruefung_id)
 	var mitarbeiter_uid = $("#mitarbeiter_uid").val();
 	var note = $(ele).parent().find("select").val();
 	var anmerkung = "";
-	
+	if((note === "null") || (note===null))
+	{
+		messageBox("message", "Keine Note ausgewählt.", "red", "highlight", 1000);
+		return false;
+	}
 	$.ajax({
 		dataType: 'json',
 		url: "./pruefungsbewertung.json.php",
