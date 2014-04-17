@@ -40,11 +40,11 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/ressource.overlay.xul.php"
 	    <toolbarbutton id="toolbarbutton-projektmenue-del" label="Loeschen" oncommand="ProjektDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Projekt löschen"/>
 	    -->
 	    <toolbarbutton id="toolbarbutton-projektmenue-refresh" label="Aktualisieren" oncommand="ProjektmenueRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
-        <toolbarbutton anonid="toolbarbutton-projektmenue-filter" label="Filter" type="menu">							
+        <toolbarbutton anonid="toolbarbutton-projektmenue-filter" label="Filter" type="menu">
             <menupopup>
-                <menuitem label="Alle Projekte Anzeigen" type="radio" name="filterProjekt" checked="true" oncommand="ProjektmenueRefresh()" tooltiptext="Alle Projekte anzeigen"/>
-                <menuitem label="nur aktuelle und kommende Projekte anzeigen" type="radio" name="filterProjekt" oncommand="ProjektmenueRefreshAktuellKommende()" tooltiptext="nur aktuelle und kommende Projekte anzeigen"/>
-                <menuitem label="nur aktuelle Projekte anzeigen" type="radio" name="filterProjekt" oncommand="ProjektmenueRefreshAktuell()" tooltiptext="nur aktuelle Projekte anzeigen"/>
+                <menuitem label="Alle Projekte Anzeigen" type="radio" name="filterProjekt" checked="true" oncommand="ProjektmenueRefresh('alle')" tooltiptext="Alle Projekte anzeigen"/>
+                <menuitem label="nur aktuelle und kommende Projekte anzeigen" type="radio" name="filterProjekt" oncommand="ProjektmenueRefresh('kommende')" tooltiptext="nur aktuelle und kommende Projekte anzeigen"/>
+                <menuitem label="nur aktuelle Projekte anzeigen" type="radio" name="filterProjekt" oncommand="ProjektmenueRefresh('aktuell')" tooltiptext="nur aktuelle Projekte anzeigen"/>
             </menupopup>
         </toolbarbutton>
 	</toolbar>
