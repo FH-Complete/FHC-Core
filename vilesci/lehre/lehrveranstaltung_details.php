@@ -94,14 +94,20 @@
 		$lv->lvnr = $_POST['lvnr'];
 		$lv->semester_alternativ = $_POST['semester_alternativ'];
 		$lv->farbe = $_POST['farbe'];
-		var_dump($lv);
 		if(!$lv->save())
 			$errorstr = "Fehler beim Speichern der Daten: $lv->errormsg";
 		else
 		{
 			$reloadstr .= "<script type='text/javascript'>\n";
 			$reloadstr .= "	parent.uebersicht.location.href='lehrveranstaltung.php?stg_kz=$lv->studiengang_kz&semester=$lv->semester&isaktiv='+parent.uebersicht.isaktiv;";
-			$reloadstr .= " window.location.href='".$_SERVER['PHP_SELF']."?stg_kz=$lv->studiengang_kz&semester=$lv->semester&neu=true';";
+			if($lv->lehreverzeichnisExists($lv->lehreverzeichnis) && ($lv->new === true))
+			{
+			    $reloadstr .= " window.location.href='".$_SERVER['PHP_SELF']."?stg_kz=$lv->studiengang_kz&semester=$lv->semester&neu=true&lehrevzExists=true&update=false';";
+			}
+			else
+			{
+			    $reloadstr .= " window.location.href='".$_SERVER['PHP_SELF']."?stg_kz=$lv->studiengang_kz&semester=$lv->semester&neu=true';";
+			}
 			$reloadstr .= "</script>\n";
 		}
 	}
@@ -155,7 +161,10 @@
 					$htmlstr .= '<br><div class="kopf">Lehrveranstaltung <b>'.$lvid.'</b> existiert nicht</div>';
 			}
 		}
-
+		if(isset($_REQUEST['lehrevzExists']) && ($_REQUEST['lehrevzExists'] === "true") && isset($_REQUEST['update']) && ($_REQUEST['update'] === "false"))
+		{
+		    $htmlstr .= '<br/><br/><span>Hinweis: Lehreverzeichnis existiert bereits.</span>';
+		}
 		$htmlstr .= '
 		<br><div class="kopf">Lehrveranstaltung</div>
 		<form action="lehrveranstaltung_details.php" method="POST">
