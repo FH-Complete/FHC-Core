@@ -1417,6 +1417,18 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	}		
 }
 
+// pruefungsanmeldung_id in lehre.tbl_pruefung
+if(!$result = @$db->db_query("SELECT pruefungsanmeldung_id FROM lehre.tbl_pruefung LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_pruefung ADD COLUMN pruefungsanmeldung_id bigint; "
+		. "ALTER TABLE lehre.tbl_pruefung ADD CONSTRAINT fk_pruefung_pruefungsanmeldung_id FOREIGN KEY (pruefungsanmelung_id) REFERENCES campus.tbl_pruefungsanmeldung (pruefungsnameldung_id) ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_pruefung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'lehre.tbl_pruefung: Spalte pruefungsanmeldung_id hinzugefuegt';
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -1532,7 +1544,7 @@ $tabellen=array(
 	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","titel_english","seitenanzahl","abgabedatum","kontrollschlagwoerter","schlagwoerter","schlagwoerter_en","abstract", "abstract_en", "sprache"),
 	"lehre.tbl_projektbetreuer"  => array("person_id","projektarbeit_id","betreuerart_kurzbz","note","faktor","name","punkte","stunden","stundensatz","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_projekttyp"  => array("projekttyp_kurzbz","bezeichnung"),
-	"lehre.tbl_pruefung"  => array("pruefung_id","lehreinheit_id","student_uid","mitarbeiter_uid","note","pruefungstyp_kurzbz","datum","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id"),
+	"lehre.tbl_pruefung"  => array("pruefung_id","lehreinheit_id","student_uid","mitarbeiter_uid","note","pruefungstyp_kurzbz","datum","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","pruefungsanmeldung_id"),
 	"lehre.tbl_pruefungstyp"  => array("pruefungstyp_kurzbz","beschreibung","abschluss"),
 	"lehre.tbl_studienordnung"  => array("studienordnung_id","studiengang_kz","version","gueltigvon","gueltigbis","bezeichnung","ects","studiengangbezeichnung","studiengangbezeichnung_englisch","studiengangkurzbzlang","akadgrad_id","insertamum","insertvon","updateamum","updatevon"),
 	"lehre.tbl_studienordnung_semester"  => array("studienordnung_semester_id","studienordnung_id","studiensemester_kurzbz","semester"),
