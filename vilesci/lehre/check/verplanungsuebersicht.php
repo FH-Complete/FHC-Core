@@ -246,13 +246,19 @@ foreach($stg->result as $row_stg)
 }
 $content.= '</table>';
 //Prozent der gesamten verplanten Lehreinheiten berechnen und anzeigen
-$prozent = round($gesamt_verplant*100/$gesamt,2);
+if($gesamt==0)
+	$prozent=0;
+else
+	$prozent = round($gesamt_verplant*100/$gesamt,2);
 echo "<br><hr>\n<table><tr><td><b>Lehreinheiten:</b> (".$gesamt_verplant.'/'.$gesamt.')</td><td width="20px"></td><td>';
 echo drawprogress($prozent);
 echo "</td></tr><tr><td>";
 //Prozent der gesamten verplanten Stunden berechnen und anzeigen
 $gesamt_ps_verplant = ($gesamt_ps-$gesamt_ps_offen);
-$prozent = round($gesamt_ps_verplant*100/$gesamt_ps,2);
+if($gesamt_ps==0)
+	$prozent=0;
+else
+	$prozent = round($gesamt_ps_verplant*100/$gesamt_ps,2);
 echo "<b>Stunden:</b> (".$gesamt_ps_verplant.'/'.$gesamt_ps.')</td><td width="20px"></td><td>';
 echo drawprogress($prozent);
 
