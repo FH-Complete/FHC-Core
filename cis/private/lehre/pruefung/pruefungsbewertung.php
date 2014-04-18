@@ -39,8 +39,11 @@ $db = new basis_db();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
-if(!$rechte->isBerechtigt('lehre/pruefungsbeurteilung'))
-	die('Sie haben keine Berechtigung für diese Seite');
+$studiensemester = new studiensemester();
+$pruefung = new pruefungCis();
+$pruefung->getPruefungByMitarbeiter($uid, $studiensemester->getakt());
+if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungAdmin'))
+    die('Sie haben keine Berechtigung für diese Seite');
 
 ?>
 <html>

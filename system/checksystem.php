@@ -1765,7 +1765,6 @@ $berechtigungen = array(
 	array('lehre/pruefungsanmeldungAdmin','Erlaubt die Verwaltung der Prüfungsanmeldungen.'),
 	array('lehre/pruefungsbeurteilung','Erlaubt dem Benutzer Beurteilungen zu Prüfungen einzutragen.'),
 	array('lehre/pruefungsbeurteilungAdmin','Erlaubt dem Benutzer für alle Prüfungen Beurteilungen einzutragen.'),
-	array('lehre/pruefungstermin','Erlaubt es dem Benutzer eine Prüfung für ein Prüfungsfenster anzulegen'),
 	array('lehre/pruefungsterminAdmin','Recht für jeden Lektor eine Prüfung anzulegen'),
 	array('lehre/pruefungsfenster','Erlaubt dem Benutzer Prüfungsfenster anzulegen.'),
 	array('lehre/reihungstest','Reihungstestverwaltung'),
