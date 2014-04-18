@@ -771,6 +771,7 @@ function loadStudiengaenge()
 		},
 		error: loadError
 	}).success(function(data){
+		console.log(data);
 		$("#stgListe").empty();
 		if(data.error === 'false')
 		{

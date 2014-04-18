@@ -39,8 +39,11 @@ $db = new basis_db();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
-if(!$rechte->isBerechtigt('lehre/pruefungstermin'))
-	die('Sie haben keine Berechtigung für diese Seite');
+$studiensemester = new studiensemester();
+$lehrveranstaltung = new lehrveranstaltung();
+$lehrveranstaltung->loadLVAfromMitarbeiter(0, $uid, $studiensemester->getakt());
+if(empty($lehrveranstaltung->lehrveranstaltungen) && !$rechte->isBerechtigt('lehre/pruefungsterminAdmin'))
+    die('Sie haben keine Berechtigung für diese Seite');
 
 ?>
 <html>

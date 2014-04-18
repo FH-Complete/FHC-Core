@@ -25,14 +25,19 @@
 require_once('../../../../config/cis.config.inc.php');
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/benutzerberechtigung.class.php');
+require_once('../../../../include/pruefungCis.class.php');
+require_once('../../../../include/studiensemester.class.php');
 
 $uid = get_uid();
 $db = new basis_db();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
-if(!$rechte->isBerechtigt('lehre/pruefungsanmeldungAdmin'))
-	die('Sie haben keine Berechtigung für diese Seite');
+$studiensemester = new studiensemester();
+$pruefung = new pruefungCis();
+$pruefung->getPruefungByMitarbeiter($uid, $studiensemester->getakt());
+if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungAdmin'))
+    die('Sie haben keine Berechtigung für diese Seite');
 
 ?>
 <html>
