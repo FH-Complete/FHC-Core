@@ -735,5 +735,18 @@ class studiensemester extends basis_db
             return false; 
         }
     }
+    
+    /**
+     * Liefert das dazupassende Studiensemester im Studienjahr 
+     * @param $studiensemester_kurzbz
+     * @return $studiensemester_kurzbz
+     */
+    public function getStudienjahrStudiensemester($studiensemester_kurzbz)
+    {
+    	if(mb_substr($studiensemester_kurzbz,0,2)=='WS')
+    		return $this->getNextFrom($studiensemester_kurzbz);
+    	else
+    		return $this->getPreviousFrom($studiensemester_kurzbz);
+    }
 }
 ?>

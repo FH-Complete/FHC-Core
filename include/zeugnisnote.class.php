@@ -338,5 +338,123 @@ class zeugnisnote extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Laedt die Noten Studienjahr
+	 * @param $lehrveranstaltung_id
+	 *        $student_uid
+	 *        $studiensemester_kurzbz
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getZeugnisnotenStudienplan($student_uid, $studiensemester_arr, $studienplan_id)
+	{
+	
+		$stsem = $this->db_implode4SQL($studiensemester_arr);
+		
+		/*
+		 * Alle Lehrveranstaltungen holen zu denen eine Note eingetragen ist und alle zu denen der Studierende zugeteilt ist.
+		 * Danach wird im Studienplan gesucht und eventuell darbueberliegenden Module zusaetzlich geladen
+		 */
+		$qry = "
+		WITH RECURSIVE data(lvid, studienplan_lehrveranstaltung_id, studienplan_lehrveranstaltung_id_parent) as 
+		(
+			SELECT 
+			vw_student_lehrveranstaltung.lehrveranstaltung_id,
+			tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id,
+			tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent
+			FROM
+			(
+				campus.vw_student_lehrveranstaltung LEFT JOIN lehre.tbl_zeugnisnote
+					ON(uid=student_uid
+						AND vw_student_lehrveranstaltung.studiensemester_kurzbz=tbl_zeugnisnote.studiensemester_kurzbz
+						AND vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id
+					)
+			) 
+			LEFT JOIN lehre.tbl_note USING(note)
+			LEFT JOIN lehre.tbl_studienplan_lehrveranstaltung ON(vw_student_lehrveranstaltung.lehrveranstaltung_id=tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id)
+			WHERE 
+				uid=".$this->db_add_param($student_uid)."
+				AND vw_student_lehrveranstaltung.studiensemester_kurzbz IN(".$stsem.")
+				AND tbl_studienplan_lehrveranstaltung.studienplan_id=".$this->db_add_param($studienplan_id, FHC_INTEGER)."
+			UNION
+			SELECT lehre.tbl_lehrveranstaltung.lehrveranstaltung_id,
+				tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id,
+				tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent
+			FROM
+				lehre.tbl_zeugnisnote
+				JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
+				JOIN lehre.tbl_note USING(note)
+				LEFT JOIN lehre.tbl_studienplan_lehrveranstaltung USING(lehrveranstaltung_id)
+			WHERE 
+				student_uid=".$this->db_add_param($student_uid)."
+				AND studiensemester_kurzbz IN(".$stsem.") 
+				AND tbl_studienplan_lehrveranstaltung.studienplan_id=".$this->db_add_param($studienplan_id, FHC_INTEGER)."
+		
+			UNION ALL		
+			SELECT stpllv.lehrveranstaltung_id, stpllv.studienplan_lehrveranstaltung_id, stpllv.studienplan_lehrveranstaltung_id_parent
+			FROM lehre.tbl_studienplan_lehrveranstaltung stpllv, data
+			WHERE stpllv.studienplan_lehrveranstaltung_id=data.studienplan_lehrveranstaltung_id_parent
+		)
+		SELECT 
+			tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id,
+			tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent, tbl_studienplan_lehrveranstaltung.semester,
+			tbl_lehrveranstaltung.lehrveranstaltung_id,tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung, tbl_lehrveranstaltung.bezeichnung_english as lehrveranstaltung_bezeichnung_english,
+			tbl_lehrveranstaltung.semesterstunden, tbl_lehrveranstaltung.ects, tbl_lehrveranstaltung.sort, tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.zeugnis,
+			tbl_lehrveranstaltung.lehrform_kurzbz as lv_lehrform_kurzbz,
+			tbl_zeugnisnote.studiensemester_kurzbz, tbl_zeugnisnote.uebernahmedatum, tbl_zeugnisnote.benotungsdatum,
+			tbl_zeugnisnote.note, tbl_zeugnisnote.updateamum, tbl_zeugnisnote.updatevon, tbl_zeugnisnote.insertamum, tbl_zeugnisnote.insertvon,
+			tbl_note.bezeichnung as note_bezeichnung, tbl_zeugnisnote.bemerkung, tbl_lehrveranstaltung.lvnr
+		FROM 
+			lehre.tbl_lehrveranstaltung 
+			LEFT JOIN lehre.tbl_zeugnisnote ON(tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND student_uid=".$this->db_add_param($student_uid).")
+			LEFT JOIN lehre.tbl_studienplan_lehrveranstaltung ON(tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id AND tbl_studienplan_lehrveranstaltung.studienplan_id=".$this->db_add_param($studienplan_id).")
+			LEFT JOIN lehre.tbl_note USING(note)
+		WHERE 
+			(tbl_zeugnisnote.studiensemester_kurzbz IN(".$stsem.") OR tbl_zeugnisnote.studiensemester_kurzbz is null)
+			AND tbl_lehrveranstaltung.lehrveranstaltung_id in(SELECT lvid FROM data)
+		ORDER BY studienplan_lehrveranstaltung_id_parent desc, studienplan_lehrveranstaltung_id
+		";
+	
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new zeugnisnote();
+			
+				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$obj->student_uid = $student_uid;
+				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$obj->note = $row->note;
+				$obj->uebernahmedatum = $row->uebernahmedatum;
+				$obj->benotungsdatum = $row->benotungsdatum;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->note_bezeichnung = $row->note_bezeichnung;
+				$obj->lehrveranstaltung_bezeichnung = $row->lehrveranstaltung_bezeichnung;
+				$obj->lehrveranstaltung_bezeichnung_english = $row->lehrveranstaltung_bezeichnung_english;
+				$obj->bemerkung = $row->bemerkung;
+				$obj->semesterstunden = $row->semesterstunden;
+				$obj->ects = $row->ects;
+				$obj->sort = $row->sort;
+				$obj->studiengang_kz = $row->studiengang_kz;
+				$obj->zeugnis = $this->db_parse_bool($row->zeugnis);
+				$obj->lv_lehrform_kurzbz = $row->lv_lehrform_kurzbz;
+				$obj->lehrveranstaltung_lvnr = $row->lvnr;
+				$obj->studienplan_lehrveranstaltung_id = $row->studienplan_lehrveranstaltung_id;
+				$obj->studienplan_lehrveranstaltung_id_parent = $row->studienplan_lehrveranstaltung_id_parent;
+				$obj->studienplan_lehrveranstaltung_semester = $row->semester;
+			
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>
