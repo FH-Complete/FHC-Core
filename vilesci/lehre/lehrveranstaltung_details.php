@@ -343,14 +343,14 @@
 					$selected='';
 				$htmlstr .= '<option value="'.$row->raumtyp_kurzbz.'" '.$selected.'>'.$row->raumtyp_kurzbz.'</option>';
 			}
-		}
+		}//#'.$lv->farbe.'
 		$htmlstr .= '</select></td>
 			<td>Semesterwochen</td>
 			<td><input type="text" name="semesterwochen" size="2" value="'.$lv->semesterwochen.'" /></td>
 		</tr>
 		<tr>
 			<td>Farbe</td>
-			<td><input type="text" name="farbe" size="6" value="'.$lv->farbe.'" /></td>
+			<td><input id="farbe" type="text" name="farbe" size="6" value="'.$lv->farbe.'" onchange="document.getElementById(\'farbevorschau\').style.backgroundColor=this.value"/>&nbsp<span id="farbevorschau" style="background-color: #'.$lv->farbe.'; border: 1px solid #999999; cursor: default;" >&nbsp&nbsp&nbsp&nbsp</span></td>
 			<td></td>
 			<td></td>
 			<td></td>
@@ -378,9 +378,11 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>Lehrveranstaltung - Details</title>
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+	<link rel="stylesheet" href="../../skin/colorpicker.css" type="text/css"/>
 	<script type="text/javascript" src="../../include/js/mailcheck.js"></script>
 	<script type="text/javascript" src="../../include/js/datecheck.js"></script>
 	<script type="text/javascript" src="../../include/js/jquery.js"></script>
+	<script type="text/javascript" src="../../include/js/colorpicker.js"></script>
 	<script>
 	    function copyToLehreVz()
 	    {
@@ -411,49 +413,71 @@
 			.replace(/[^a-z_\s]/gi, "");
 		ele.value = string;
 	    }
+	    function getFarbe()
+	    {
+			document.getElementById("farbe").value
+	    }
 	    $(document).ready(function()
 	    {
-		if($("form").size() !== 0)
-		{
-		    $("form").submit(function(e){
-			$(this).append('<input type="hidden" name="schick" value="" /> ');
-			$(".missingFormData").each(function(i,v){
-			   $(v).removeClass("missingFormData"); 
+			if($("form").size() !== 0)
+			{
+			    $("form").submit(function(e){
+				$(this).append('<input type="hidden" name="schick" value="" /> ');
+				$(".missingFormData").each(function(i,v){
+				   $(v).removeClass("missingFormData"); 
+				});
+				var self = this;
+				e.preventDefault();
+				var error = false;
+				if($('input[name="kurzbz"]').val() === "")
+				{
+				    error = true;
+				    $('input[name="kurzbz"]').addClass("missingFormData");
+				}
+				if($('input[name="bezeichnung"]').val() === "")
+				{
+				    error = true;
+				    $('input[name="bezeichnung"]').addClass("missingFormData");
+				}
+				if($('select[name="lehrform"]').val() === "")
+				{
+				    error = true;
+				    $('select[name="lehrform"]').addClass("missingFormData");
+				}
+				if($('select[name="lehrtyp_kurzbz"]').val() === "")
+				{
+				    error = true;
+				    $('select[name="lehrtyp_kurzbz"]').addClass("missingFormData");
+				}
+				if($('input[name="lehreverzeichnis"]').val() === "")
+				{
+				    error = true;
+				    $('input[name="lehreverzeichnis"]').addClass("missingFormData");
+				}
+				if(!error)
+				{
+				    self.submit();
+				}
+			    });
+			}
+
+			$("#farbe").ColorPicker(
+				{
+					onSubmit: function(hsb, hex, rgb, el) 
+					{
+						$(el).val(hex);
+						$(el).ColorPickerHide();
+						document.getElementById("farbevorschau").style.backgroundColor=hex;
+					},
+					onBeforeShow: function () 
+					{
+						$(this).ColorPickerSetColor(this.value);
+					}
+				})
+			.bind("keyup", function()
+			{
+				$(this).ColorPickerSetColor(this.value);
 			});
-			var self = this;
-			e.preventDefault();
-			var error = false;
-			if($('input[name="kurzbz"]').val() === "")
-			{
-			    error = true;
-			    $('input[name="kurzbz"]').addClass("missingFormData");
-			}
-			if($('input[name="bezeichnung"]').val() === "")
-			{
-			    error = true;
-			    $('input[name="bezeichnung"]').addClass("missingFormData");
-			}
-			if($('select[name="lehrform"]').val() === "")
-			{
-			    error = true;
-			    $('select[name="lehrform"]').addClass("missingFormData");
-			}
-			if($('select[name="lehrtyp_kurzbz"]').val() === "")
-			{
-			    error = true;
-			    $('select[name="lehrtyp_kurzbz"]').addClass("missingFormData");
-			}
-			if($('input[name="lehreverzeichnis"]').val() === "")
-			{
-			    error = true;
-			    $('input[name="lehreverzeichnis"]').addClass("missingFormData");
-			}
-			if(!error)
-			{
-			    self.submit();
-			}
-		    });
-		}
 	    });
 	</script>
 	<style type="text/css">
