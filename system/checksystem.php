@@ -1421,7 +1421,7 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 if(!$result = @$db->db_query("SELECT pruefungsanmeldung_id FROM lehre.tbl_pruefung LIMIT 1"))
 {
 	$qry = "ALTER TABLE lehre.tbl_pruefung ADD COLUMN pruefungsanmeldung_id bigint; "
-		. "ALTER TABLE lehre.tbl_pruefung ADD CONSTRAINT fk_pruefung_pruefungsanmeldung_id FOREIGN KEY (pruefungsanmelung_id) REFERENCES campus.tbl_pruefungsanmeldung (pruefungsanmeldung_id) ON DELETE RESTRICT ON UPDATE CASCADE;";
+		. "ALTER TABLE lehre.tbl_pruefung ADD CONSTRAINT fk_pruefung_pruefungsanmeldung_id FOREIGN KEY (pruefungsanmeldung_id) REFERENCES campus.tbl_pruefungsanmeldung (pruefungsanmeldung_id) ON DELETE RESTRICT ON UPDATE CASCADE;";
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_pruefung: '.$db->db_last_error().'</strong><br>';
