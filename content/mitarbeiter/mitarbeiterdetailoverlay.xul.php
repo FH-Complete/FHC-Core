@@ -280,7 +280,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</template>
 					</menulist>
 					<textbox id="mitarbeiter-detail-textbox-resturlaubstage" disabled="true" oninput="MitarbeiterDetailValueChange()" />
-					</vbox>
+				</vbox>
 		    	</row>	
 		  	</rows>
 		 </grid>
