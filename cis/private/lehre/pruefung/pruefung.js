@@ -622,12 +622,13 @@ function writeAnmeldungen(data)
 		var liste = "<ul id='sortable'>";
 		var count = 0;
 		data.result.forEach(function(d){
-
 			count++;
+			var vorname = d.student.vorname !== "null" ? d.student.vorname : "";
+			var nachname = d.student.nachname !== "null" ? d.student.nachname : "";
 			switch(d.status_kurzbz)
 			{
 				case 'angemeldet':
-					liste += "<li class='ui-state-default' id='"+d.student.uid+"'><span class='ui-icon ui-icon-arrowthick-2-n-s'></span><a href='#' onclick='showKommentar(\""+d.student.vorname+"\",\""+d.student.nachname+"\", \""+d.pruefungsanmeldung_id+"\", \""+d.kommentar+"\", \""+terminId+"\", \""+lehrveranstaltung_id+"\");'>"+d.student.vorname+" "+d.student.nachname+"</a>";
+					liste += "<li class='ui-state-default' id='"+d.student.uid+"'><span class='ui-icon ui-icon-arrowthick-2-n-s'></span><a href='#' onclick='showKommentar(\""+vorname+"\",\""+nachname+"\", \""+d.pruefungsanmeldung_id+"\", \""+d.kommentar+"\", \""+terminId+"\", \""+lehrveranstaltung_id+"\");'>"+vorname+" "+nachname+"</a>";
 					liste += "<div style='width: 3%; text-align: right;'>"+count+"</div><div style='text-align: center; width: 25%;'><input style='vertical-align: top;' type='button' value='Bestätigen' onclick='anmeldungBestaetigen(\""+d.pruefungsanmeldung_id+"\", \""+terminId+"\", \""+lehrveranstaltung_id+"\");'></div>";
 					if(d.wuensche !== null)
 					{
@@ -636,7 +637,7 @@ function writeAnmeldungen(data)
 					liste += "</li>";
 					break;
 				case 'bestaetigt':
-					liste += "<li class='ui-state-default' id='"+d.student.uid+"'><span class='ui-icon ui-icon-arrowthick-2-n-s'></span><a href='#' onclick='showKommentar(\""+d.student.vorname+"\",\""+d.student.nachname+"\", \""+d.pruefungsanmeldung_id+"\", \""+d.kommentar+"\", \""+terminId+"\", \""+lehrveranstaltung_id+"\");'>"+d.student.vorname+" "+d.student.nachname+"</a>";
+					liste += "<li class='ui-state-default' id='"+d.student.uid+"'><span class='ui-icon ui-icon-arrowthick-2-n-s'></span><a href='#' onclick='showKommentar(\""+vorname+"\",\""+nachname+"\", \""+d.pruefungsanmeldung_id+"\", \""+d.kommentar+"\", \""+terminId+"\", \""+lehrveranstaltung_id+"\");'>"+vorname+" "+nachname+"</a>";
 					liste += "<div style='width: 2%; text-align: right;'>"+count+"</div><div style='text-align: center; width: 20%;'>bestätigt</div>";
 					if(d.wuensche !== null)
 					{
@@ -661,6 +662,10 @@ function writeAnmeldungen(data)
 	}
 	else
 	{
+		$("#anmeldeDaten").empty();
+		$("#reihungSpeichernButton").empty();
+		$("#kommentar").empty();
+		$("#kommentarSpeichernButton").empty();
 		messageBox("message", data.errormsg, "red", "highlight", 1000);
 	}
 }
