@@ -106,7 +106,7 @@ if(empty($lehrveranstaltung->lehrveranstaltungen) && !$rechte->isBerechtigt('leh
 		    },
 		    select: function(event, ui)
 		    {
-			//Ausgeaehlte Ressource zuweisen und Textfeld wieder leeren
+			//Ausgewaehlte Ressource zuweisen und Textfeld wieder leeren
 			if (ui.item.mitarbeiter_uid=='')
 			{
 			    $("#mitarbeiter_uid").val(ui.item.uid);
@@ -122,7 +122,7 @@ if(empty($lehrveranstaltung->lehrveranstaltungen) && !$rechte->isBerechtigt('leh
 			    isFormHidden = false;
 			    $("#prfVerwaltung form").slideToggle("slow");
 			}
-			loadAllPruefungen();
+//			loadAllPruefungen();
 			loadPruefungstypen("false");
 			loadStudiensemester();
 			loadAllPruefungen();
@@ -141,6 +141,9 @@ if(empty($lehrveranstaltung->lehrveranstaltungen) && !$rechte->isBerechtigt('leh
 			    <script>
 				$(document).ready(function() {
 				    $("#prfVerwaltung form").attr("style", "display: block");
+				    loadPruefungstypen("false");
+				    loadStudiensemester();
+				    loadAllPruefungen();
 				});
 			    </script>';
 			}
