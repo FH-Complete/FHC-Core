@@ -144,30 +144,6 @@ function generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz)
 	}
 }
 
-// ***
-function clean_string($string)
- {
- 	$trans = array("ä" => "ae",
- 				   "Ä" => "Ae",
- 				   "ö" => "oe",
- 				   "Ö" => "Oe",
- 				   "ü" => "ue",
- 				   "Ü" => "Ue",
- 				   "á" => "a",
- 				   "à" => "a",
- 				   "é" => "e",
- 				   "è" => "e",
- 				   "ó" => "o",
- 				   "ò" => "o",
- 				   "í" => "i",
- 				   "ì" => "i",
- 				   "ù" => "u",
- 				   "ú" => "u",
- 				   "ß" => "ss");
-	$string = strtr($string, $trans);
-    return ereg_replace("[^a-zA-Z0-9]", "", $string);
-    //[:space:]
- }
 
 if(!$error)
 {

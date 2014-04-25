@@ -406,7 +406,7 @@ class zeugnisnote extends basis_db
 			tbl_note.bezeichnung as note_bezeichnung, tbl_zeugnisnote.bemerkung, tbl_lehrveranstaltung.lvnr
 		FROM 
 			lehre.tbl_lehrveranstaltung 
-			LEFT JOIN lehre.tbl_zeugnisnote ON(tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND student_uid=".$this->db_add_param($student_uid).")
+			LEFT JOIN lehre.tbl_zeugnisnote ON(tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.student_uid=".$this->db_add_param($student_uid)." AND tbl_zeugnisnote.studiensemester_kurzbz IN(".$stsem."))
 			LEFT JOIN lehre.tbl_studienplan_lehrveranstaltung ON(tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id AND tbl_studienplan_lehrveranstaltung.studienplan_id=".$this->db_add_param($studienplan_id).")
 			LEFT JOIN lehre.tbl_note USING(note)
 		WHERE 

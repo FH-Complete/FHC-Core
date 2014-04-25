@@ -41,6 +41,64 @@ echo '<H2>DB-Updates!</H2>';
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
+// **************** Spalte scrumsprint_id Tabelle fue.tbl_projekttask
+if(!$result = @$db->db_query("SELECT scrumsprint_id FROM fue.tbl_projekttask LIMIT 1;"))
+{
+	$qry = 'ALTER TABLE fue.tbl_projekttask ADD COLUMN scrumsprint_id bigint;
+			CREATE TABLE fue.tbl_scrumteam
+			(
+			  scrumteam_kurzbz character varying(16) NOT NULL,
+			  bezeichnung character varying(256),
+			  punkteprosprint integer DEFAULT 160,
+			  tasksprosprint integer DEFAULT 15,
+			  gruppe_kurzbz character varying(32),
+			  CONSTRAINT tbl_scrumteam_pkey PRIMARY KEY (scrumteam_kurzbz)
+			)
+			WITH (
+			  OIDS=FALSE
+			);
+			CREATE TABLE fue.tbl_scrumsprint
+			(
+
+			  scrumsprint_id serial NOT NULL,
+			  scrumteam_kurzbz character varying(16) NOT NULL,
+			  sprint_kurzbz character varying(32),
+			  sprintstart date,
+			  sprintende date,
+			  insertamum Timestamp DEFAULT now(),
+			  insertvon Character varying(32),
+			  updateamum Timestamp DEFAULT now(),
+			  updatevon Character varying(32),
+			  CONSTRAINT tbl_scrumsprint_pkey PRIMARY KEY (scrumsprint_id),
+			  CONSTRAINT fk_scrumsprint_scrumteam FOREIGN KEY (scrumteam_kurzbz)
+				  REFERENCES fue.tbl_scrumteam (scrumteam_kurzbz) MATCH SIMPLE
+				  ON UPDATE CASCADE ON DELETE RESTRICT,
+			  CONSTRAINT uk_scrumteam_sprintkurzbz UNIQUE (scrumteam_kurzbz, sprint_kurzbz)
+			)
+			WITH (
+			  OIDS=FALSE
+			);
+			ALTER TABLE fue.tbl_projekttask
+			  ADD CONSTRAINT fk_projekttask_scrumsprint FOREIGN KEY (scrumsprint_id)
+				  REFERENCES fue.tbl_scrumsprint (scrumsprint_id) MATCH SIMPLE
+				  ON UPDATE CASCADE ON DELETE RESTRICT;
+			';
+	if(!$db->db_query($qry))
+		echo '<strong>fue.tbl_projekttask: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' fue.tbl_projekttask: Spalte scrumsprint_id hinzugefuegt!<br>';
+}
+
+// tbl_gruppe neues attribut zutrittssystem
+if(!$result = @$db->db_query("SELECT zutrittssystem from public.tbl_gruppe LIMIT 1;"))
+{
+    $qry = "ALTER TABLE public.tbl_gruppe ADD COLUMN zutrittssystem boolean NOT NULL DEFAULT false;";
+    
+    if(!$db->db_query($qry))
+		echo '<strong>public.tbl_gruppe: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'public.tbl_gruppe: Spalte zutrittssystem hinzugefuegt';
+}
 
 // ** Studiengangsverwaltung
 // Tabelle Studienordnung
@@ -1427,6 +1485,23 @@ if(!$result = @$db->db_query("SELECT pruefungsanmeldung_id FROM lehre.tbl_pruefu
 		echo '<strong>lehre.tbl_pruefung: '.$db->db_last_error().'</strong><br>';
 	else
 		echo 'lehre.tbl_pruefung: Spalte pruefungsanmeldung_id hinzugefuegt';
+}
+
+// Indizes für Tabelle Reservierung
+if($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_reservierung_datum'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "CREATE INDEX idx_reservierung_datum ON campus.tbl_reservierung USING btree (datum);
+				CREATE INDEX idx_reservierung_ort ON campus.tbl_reservierung USING btree (ort_kurzbz);
+				CREATE INDEX idx_reservierung_stunde ON campus.tbl_reservierung USING btree (stunde);";
+	
+		if(!$db->db_query($qry))
+			echo '<strong>Indizes: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'Diverse Indizes fuer Tabelle Reservierung hinzugefügt';
+	}
 }
 
 echo '<br><br><br>';

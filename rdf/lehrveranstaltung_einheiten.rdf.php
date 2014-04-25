@@ -207,7 +207,7 @@ else
 	{
 		// Ohne die vom Studienplan, da diese sonst doppelt sind
 		$qry.=" AND NOT EXISTS (SELECT 1 FROM lehre.tbl_studienplan_lehrveranstaltung where studienplan_id in (".$db->db_implode4SQL($stp_ids).")
-								AND lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id)";
+								AND lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND tbl_lehrveranstaltung.aktiv)";
 	}
 	//$qry = 'SELECT distinct on(lehrveranstaltung_id) * FROM ('.$qry.' ORDER BY studienplan_id DESC) a';
 }
