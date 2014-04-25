@@ -976,7 +976,7 @@ function MitarbeiterSendMail()
   			if(treeMitarbeiter.view.getCellText(v,col).length>1)
   			{
   				if(mailempfaenger!='')
-					mailempfaenger=mailempfaenger+'<?php echo $variable->variable->emailadressentrennzeichen; ?>'+treeMitarbeiter.view.getCellText(v,col)+'@technikum-wien.at';
+					mailempfaenger=mailempfaenger+'<?php echo $variable->variable->emailadressentrennzeichen; ?>'+treeMitarbeiter.view.getCellText(v,col)+'@<?php echo DOMAIN; ?>';
 				else
 					mailempfaenger='mailto:'+treeMitarbeiter.view.getCellText(v,col)+'@<?php echo DOMAIN; ?>';
   			}
