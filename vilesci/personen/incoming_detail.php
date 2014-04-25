@@ -336,13 +336,14 @@ if($method!='')
 						$benutzer->uid = $uid;
 						$benutzer->person_id = $inc->person_id;
 						$benutzer->aktiv = true;
+						$benutzer->aktivierungscode=generateActivationKey();
 						
 						$nachname_clean = mb_strtolower(convertProblemChars($person->nachname));
 						$vorname_clean = mb_strtolower(convertProblemChars($person->vorname));
 						$nachname_clean = str_replace(' ','_', $nachname_clean);
 						$vorname_clean = str_replace(' ','_', $vorname_clean);
 						
-						$qry_alias = "SELECT * FROM public.tbl_benutzer WHERE alias=LOWER('".$vorname_clean.".".$nachname_clean."')";
+						$qry_alias = "SELECT * FROM public.tbl_benutzer WHERE alias=LOWER(".$db->db_add_param($vorname_clean.".".$nachname_clean).")";
 						$result_alias = $db->db_query($qry_alias);
 						if($db->db_num_rows($result_alias)==0)								
 							$benutzer->alias =$vorname_clean.'.'.$nachname_clean;
@@ -1125,7 +1126,7 @@ function generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz)
 	
 	$matrikelnummer = sprintf("%02d",$jahr).$art.sprintf("%04d",$studiengang_kz);
 	
-	$qry = "SELECT matrikelnr FROM public.tbl_student WHERE matrikelnr LIKE '$matrikelnummer%' ORDER BY matrikelnr DESC LIMIT 1";
+	$qry = "SELECT matrikelnr FROM public.tbl_student WHERE matrikelnr LIKE '".$db->db_escape($matrikelnummer)."%' ORDER BY matrikelnr DESC LIMIT 1";
 	
 	if($db->db_query($qry))
 	{
@@ -1144,30 +1145,4 @@ function generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz)
 		return false;
 	}
 }
-
-function clean_string($string)
- {
- 	$trans = array("ä" => "ae",
- 				   "Ä" => "Ae",
- 				   "ö" => "oe",
- 				   "Ö" => "Oe",
- 				   "ü" => "ue",
- 				   "Ü" => "Ue",
- 				   "á" => "a",
- 				   "à" => "a",
- 				   "é" => "e",
- 				   "è" => "e",
- 				   "ó" => "o",
- 				   "ò" => "o",
- 				   "í" => "i",
- 				   "ì" => "i",
- 				   "ù" => "u",
- 				   "ú" => "u",
- 				   "ß" => "ss");
-	$string = strtr($string, $trans);
-    return ereg_replace("[^a-zA-Z0-9]", "", $string);
-    //[:space:]
- }
- 
-
 ?>

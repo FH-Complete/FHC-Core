@@ -62,8 +62,8 @@ $db = new basis_db();
 	// Studienjahr ermitteln
 	if(isset($_GET['ss']))
 		$studiensemester_kurzbz = $_GET['ss'];
-	else 
-		$studiensemester_kurzbz = $semester_aktuell;
+	else
+		die('Parameter SS fehlt');
 	
 	$studiensemester = new studiensemester();
 	$studiensemester_kurzbz2 = $studiensemester->getStudienjahrStudiensemester($studiensemester_kurzbz);
@@ -109,8 +109,8 @@ $db = new basis_db();
 
 		$student_studienjahr = round($ausbildungssemester/2);
 		
-		$jahr1=mb_substr($studiensemester_kurzbz,1);
-		$jahr2=mb_substr($studiensemester_kurzbz2,1);
+		$jahr1=mb_substr($studiensemester_kurzbz,2);
+		$jahr2=mb_substr($studiensemester_kurzbz2,2);
 		$studienjahr = ($jahr1>$jahr2?$jahr2.'/'.$jahr1:$jahr1.'/'.$jahr2); 
 		
 		$studiengang = new studiengang();
@@ -218,11 +218,20 @@ function getLVRow($obj)
 	
 		$wochen = $studienplan->semesterwochen;
 	
+		$stsem_kurz = mb_substr($row->studiensemester_kurzbz,0,2);
+		if($stsem_kurz=='')
+		{
+			// Das Studiensemester kommt aus der Note, wenn keine Note vorhanden ist,
+			// wird SS und WS aufgrund der Semesterzuteilung der LV ermittelt
+			// TODO passt nicht wenn studiengang im Sommersemester startet
+			$stsem_kurz= ($row->studienplan_lehrveranstaltung_semester%2==0?'SS':'WS');
+		}
+
 		$xml .= "\n			<unterrichtsfach>";
 		$xml .= "\n				<bezeichnung><![CDATA[".$bezeichnung."]]></bezeichnung>";
 		$xml .= "\n				<bezeichnung_englisch><![CDATA[".$bezeichnung_englisch."]]></bezeichnung_englisch>";
 		$xml .= "\n				<lvnr>".$row->lehrveranstaltung_lvnr."</lvnr>";
-		$xml .= "\n				<stsem_kurz><![CDATA[".mb_substr($row->studiensemester_kurzbz,0,2)."]]></stsem_kurz>";
+		$xml .= "\n				<stsem_kurz><![CDATA[".$stsem_kurz."]]></stsem_kurz>";
 		$xml .= "\n				<semester><![CDATA[".$row->studienplan_lehrveranstaltung_semester."]]></semester>";
 		$xml .= "\n				<note>".$note."</note>";
 		$xml .= "\n				<positiv>".($note_arr[$row->note]['positiv']?'Ja':'Nein')."</positiv>";

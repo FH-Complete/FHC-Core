@@ -21,7 +21,7 @@
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/authentication.class.php');
-require_once('betriebsmittelperson.class.php'); 
+require_once(dirname(__FILE__).'/betriebsmittelperson.class.php'); 
 
 // Auth: Benutzer des Webportals
 /**
@@ -109,31 +109,6 @@ function check_lektor($uid)
 	if($db->db_query($sql_query))
 	{
 		$num_rows=$db->db_num_rows();
-		// Wenn kein ergebnis return 0 sonst ID
-		if ($num_rows>0)
-		{
-			$row = $db->db_fetch_object();
-			return $row->mitarbeiter_uid;
-		}
-		else
-			return 0;
-	}
-	else 
-		return 0;
-}
-
-function check_lektor_lehreinheit($uid, $lehreinheit_id)
-{
-	$db = new basis_db();
-	
-	// uid von View 'Lektor' holen
-	$sql_query="SELECT mitarbeiter_uid FROM lehre.tbl_lehreinheitmitarbeiter 
-				WHERE mitarbeiter_uid='".addslashes($uid)."' AND lehreinheit_id = '".addslashes($lehreinheit_id)."'";
-	//echo $sql_query;
-	if($db->db_query($sql_query))
-	{
-		
-		$num_rows = $db->db_num_rows();
 		// Wenn kein ergebnis return 0 sonst ID
 		if ($num_rows>0)
 		{

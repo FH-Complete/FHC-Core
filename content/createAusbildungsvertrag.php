@@ -38,31 +38,6 @@ require_once('../include/vorlage.class.php');
 $user = get_uid();
 $db = new basis_db();
 
-function clean_string($string)
- {
- 	$trans = array("ä" => "ae",
- 				   "Ä" => "Ae",
- 				   "ö" => "oe",
- 				   "Ö" => "Oe",
- 				   "ü" => "ue",
- 				   "Ü" => "Ue",
- 				   "á" => "a",
- 				   "à" => "a",
- 				   "é" => "e",
- 				   "è" => "e",
- 				   "ó" => "o",
- 				   "ò" => "o",
- 				   "í" => "i",
- 				   "ì" => "i",
- 				   "ù" => "u",
- 				   "ú" => "u",
- 				   "ß" => "ss");
- 				   
-	$string = strtr($string, $trans);
-    return mb_ereg_replace("[^a-zA-Z0-9]", "", $string);
-    //[:space:]
- }
-
 //Parameter holen
 if(isset($_GET['xml']))
 	$xml=$_GET['xml'];

@@ -274,6 +274,31 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       </style:paragraph-properties>
       <style:text-properties style:font-name="Arial" fo:font-size="8pt" fo:font-weight="bold" style:font-size-asian="8pt" style:font-weight-asian="bold" style:font-size-complex="8pt" style:font-weight-complex="bold"/>
     </style:style>
+    <style:style style:name="PLegend" style:family="paragraph" style:parent-style-name="Standard">
+      <style:paragraph-properties fo:text-align="start" style:justify-single-word="false" fo:keep-with-next="always"/>
+      <style:text-properties style:font-name="Arial" fo:font-size="5.5pt" fo:font-weight="bold" style:font-size-asian="5.5pt" style:font-weight-asian="bold" style:font-size-complex="5.5pt" style:font-weight-complex="bold"/>
+    </style:style>
+    <style:style style:name="PLegendEmpty" style:family="paragraph" style:parent-style-name="Standard">
+      <style:paragraph-properties fo:text-align="start" style:justify-single-word="false" fo:keep-with-next="always"/>
+      <style:text-properties style:font-name="Arial" fo:font-size="6pt" fo:font-weight="normal" style:font-size-asian="6pt" style:font-weight-asian="normal" style:font-size-complex="6pt" style:font-weight-complex="normal"/>
+    </style:style>
+    <style:style style:name="PDatumOrt" style:family="paragraph" style:parent-style-name="Standard">
+      <style:paragraph-properties fo:text-align="start" style:justify-single-word="false" fo:keep-with-next="always"/>
+      <style:text-properties style:font-name="Arial" fo:font-size="10pt" fo:font-weight="bold" style:font-size-asian="10pt" style:font-weight-asian="bold" style:font-size-complex="10pt" style:font-weight-complex="bold"/>
+    </style:style>
+    <style:style style:name="PTabEmpty" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+      <style:paragraph-properties fo:text-align="start" style:justify-single-word="false" fo:keep-with-next="always"/>
+      <style:text-properties style:font-name="Arial" fo:font-size="12pt" style:font-size-asian="10.5pt" style:font-size-complex="12pt"/>
+    </style:style>
+    <style:style style:name="PTabStgl" style:family="paragraph" style:parent-style-name="Standard">
+      <style:paragraph-properties fo:text-align="center" style:justify-single-word="false" fo:keep-with-next="always"/>
+      <style:text-properties style:font-name="Arial" fo:font-size="10pt" fo:font-weight="bold" style:font-size-asian="10pt" style:font-weight-asian="bold" style:font-size-complex="10pt" style:font-weight-complex="bold"/>
+    </style:style>
+    <style:style style:name="PTabStglUnten" style:family="paragraph" style:parent-style-name="Standard">
+      <style:paragraph-properties fo:text-align="center" style:justify-single-word="false" fo:keep-with-next="always"/>
+      <style:text-properties style:font-name="Arial" fo:font-size="8pt" fo:font-weight="bold" style:font-size-asian="8pt" style:font-weight-asian="bold" style:font-size-complex="8pt" style:font-weight-complex="bold"/>
+    </style:style>
+
   </office:automatic-styles>
   <office:body>
 <xsl:apply-templates select="zeugnis"/>
@@ -372,58 +397,36 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       </table:table>
       <text:p text:style-name="P3"/>
       <text:p text:style-name="P3"/>
-      <text:p text:style-name="P10">Legende: WS=Wintersemester, SS=Sommersemester, SWS=Semesterwochenstunden, LV-Art=Lehrveranstaltungsart, VO=Vorlesung, UE=Übung, BP=Praktikum, SE=Seminar, EX=Exkursion, PT=Projekt, AWPF=Wahlpflichtfach, RU=Rechenübung, ILV=integr. LV, LB=Laborübung, PS=Proseminar, WK=Workshop, WA=Wiss. Arbeit, WP=Wirtschaftspraktikum, MT=Managementtechniken, MODUL=gemeinsame Bewertung mehrerer Lehrveranstaltungen mit einer Modulnote</text:p>
-      <text:p text:style-name="P10"/>
-      <text:p text:style-name="P10">1 SWS=15 Lehrveranstaltungsstunden, m.E.tg.=mit Erfolg teilgenommen, o.E.tg.=ohne Erfolg teilgenommen</text:p>
-      <text:p text:style-name="P10">Nationale Beurteilung: 1=Sehr Gut, 2=Gut, 3=Befriedigend, 4=Genügend, 5=Nicht Genügend</text:p>
-      <text:p text:style-name="P10">Internationale Beurteilung (ECTS Notenskala): A/B=Sehr Gut, C=Gut, D=Befriedigend, E=Genügend, F=Nicht Genügend</text:p>
-      <text:p text:style-name="P9"/>
-      <text:p text:style-name="P9"/>
-      <text:p text:style-name="P4">Pinkafeld, am <xsl:value-of select="datum_aktuell"/></text:p>
+      <text:p text:style-name="PLegend"><text:soft-page-break/>Legende: WS=Wintersemester, SS=Sommersemester, SWS=Semesterwochenstunden, LV-Art=Lehrveranstaltungsart, VO=Vorlesung, UE=Übung, BP=Praktikum, SE=Seminar, EX=Exkursion, PT=Projekt, AWPF=Wahlpflichtfach, RU=Rechenübung, ILV=integr. LV, LB=Laborübung, PS=Proseminar, WK=Workshop, WA=Wiss. Arbeit, WP=Wirtschaftspraktikum, MT=Managementtechniken, MODUL=gemeinsame Bewertung mehrerer Lehrveranstaltungen mit einer Modulnote</text:p>
+      <text:p text:style-name="PLegend"/>
+      <text:p text:style-name="PLegend">1 SWS=15 Lehrveranstaltungsstunden, m.E.tg.=mit Erfolg teilgenommen, o.E.tg.=ohne Erfolg teilgenommen</text:p>
+      <text:p text:style-name="PLegend">Nationale Beurteilung: 1=Sehr Gut, 2=Gut, 3=Befriedigend, 4=Genügend, 5=Nicht Genügend</text:p>
+      <text:p text:style-name="PLegend">Internationale Beurteilung (ECTS Notenskala): A/B=Sehr Gut, C=Gut, D=Befriedigend, E=Genügend, F=Nicht Genügend</text:p>
+      <text:p text:style-name="PLegendEmpty"/>
+      <text:p text:style-name="PLegendEmpty"/>
+      <text:p text:style-name="PDatumOrt">Pinkafeld, am <xsl:value-of select="datum_aktuell"/></text:p>
       <table:table table:name="Tabelle2" table:style-name="Tabelle2">
         <table:table-column table:style-name="Tabelle2.A"/>
         <table:table-column table:style-name="Tabelle2.B"/>
+		<text:soft-page-break/>
         <table:table-row>
           <table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
-            <text:p text:style-name="P13"/>
+            <text:p text:style-name="PTabEmpty"/>
           </table:table-cell>
           <table:table-cell table:style-name="Tabelle2.B1" office:value-type="string">
-            <text:p text:style-name="P5"><xsl:value-of select="studiengangsleiter"/></text:p>
+            <text:p text:style-name="PTabStgl"><xsl:value-of select="studiengangsleiter"/></text:p>
           </table:table-cell>
         </table:table-row>
         <table:table-row>
           <table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
-            <text:p text:style-name="P13"/>
+            <text:p text:style-name="PTabEmpty"/>
           </table:table-cell>
           <table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
-            <text:p text:style-name="P8">Leitung Fachhochschul-Studiengang</text:p>
+            <text:p text:style-name="PTabStglUnten">Leitung Fachhochschul-Studiengang</text:p>
           </table:table-cell>
         </table:table-row>
       </table:table>
-      <text:p text:style-name="P7"/>
-      <text:p text:style-name="P7">
-        <text:tab/>
-        <text:tab/>
-        <text:tab/>
-        <text:tab/>
-        <text:tab/>
-        <text:tab/>
-        <text:tab/>
-        <text:tab/>
-        <text:tab/>
-      </text:p>
-      <text:p text:style-name="P7">
-        <text:tab/>
-        <text:tab/>
-        <text:tab/>
-        <text:tab/>
-        <text:tab/>
-        <text:tab/>
-        <text:tab/>
-        <text:tab/>
-        <text:tab/>
-        <text:tab/>
-      </text:p>
+      <text:p text:style-name="PLegendEmpty"/>
     </office:text>
 </xsl:template>
 

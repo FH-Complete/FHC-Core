@@ -205,7 +205,22 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         <text:p text:style-name="MP1"/>
         <text:p text:style-name="MP1"/>
         <text:p text:style-name="MP1">Erfolgsnachweis</text:p>
-        <text:p text:style-name="MP2">Fachhochschul-Masterstudiengang <xsl:value-of select="studiengang" /></text:p>
+        <text:p text:style-name="MP2">
+			<xsl:choose>
+				<xsl:when test="studiengang_typ='b'" >
+					Fachhochschul-Bachelorstudiengang
+				</xsl:when>
+				<xsl:when test="studiengang_typ='m'" >
+					Fachhochschul-Masterstudiengang
+				</xsl:when>
+				<xsl:otherwise>
+					Fachhochschul-Studiengang
+				</xsl:otherwise>
+			</xsl:choose>
+
+			<xsl:value-of select="studiengang" />
+
+			</text:p>
         <text:p text:style-name="MP2"/>
         <text:p text:style-name="MP3">Studienjahr <xsl:value-of select="studienjahr" /></text:p>
         <text:p text:style-name="MP4"/>

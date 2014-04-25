@@ -19,11 +19,11 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-/* Erstellt einen Lehrauftrag im PDF Format
- *
+/* Erstellt diverse Dokumente
+ * 
  * Erstellt ein XML File Transformiert dieses mit
  * Hilfe der XSL-FO Vorlage aus der DB und generiert
- * daraus ein PDF (xslfo2pdf)
+ * daraus ein PDF mittels xslfo2pdf bzw unoconv
  */
 session_cache_limiter('none'); //muss gesetzt werden sonst funktioniert der Download mit IE8 nicht
 session_start();
@@ -36,35 +36,13 @@ require_once('../include/akte.class.php');
 require_once('../include/vorlage.class.php');
 require_once('../include/student.class.php');
 require_once('../include/prestudent.class.php');
+require_once('../include/variable.class.php');
 
 $user = get_uid();
 $db = new basis_db();
-loadVariables($user);
 
-function clean_string($string)
- {
- 	$trans = array("ä" => "ae",
- 				   "Ä" => "Ae",
- 				   "ö" => "oe",
- 				   "Ö" => "Oe",
- 				   "ü" => "ue",
- 				   "Ü" => "Ue",
- 				   "á" => "a",
- 				   "à" => "a",
- 				   "é" => "e",
- 				   "è" => "e",
- 				   "ó" => "o",
- 				   "ò" => "o",
- 				   "í" => "i",
- 				   "ì" => "i",
- 				   "ù" => "u",
- 				   "ú" => "u",
- 				   "ß" => "ss");
- 				   
-	$string = strtr($string, $trans);
-    return mb_ereg_replace("[^a-zA-Z0-9]", "", $string);
-    //[:space:]
- }
+$variable_obj = new variable();
+$variable_obj->loadVariables($user);
 
 //Parameter holen
 if(isset($_GET['xml']))
@@ -76,29 +54,35 @@ if(isset($_GET['xsl']))
 else
 	die('Fehlerhafte Parameteruebergabe');
 
+// Studiengang ermitteln dessen Vorlage verwendet werden soll
 $xsl_stg_kz=0;
-if(isset($_GET['xsl_stg_kz']))
+// Direkte uebergabe des Studienganges dessen Vorlage verwendet werden soll
+if(isset($_GET['xsl_stg_kz'])) 
 	$xsl_stg_kz=$_GET['xsl_stg_kz'];
 else
+{
+	// Wenn eine Studiengangskennzahl uebergeben wird, wird die Vorlage dieses Studiengangs verwendet
 	if(isset($_GET['stg_kz']))
 		$xsl_stg_kz=$_GET['stg_kz'];
 	else
+	{
+		// Werden UIDs uebergeben, wird die Vorlage des Studiengangs genommen 
+		// in dem der 1. Studierende in der Liste ist
 		if(isset($_GET['uid']) && $_GET['uid']!='')
 		{
 			if(strstr(';',$_GET['uid']))
 				$uids = explode(';',$_GET['uid']);
 			else 
 				$uids = $_GET['uid'];
-			//var_dump($uids);
-			$qry = "SELECT student_uid, studiengang_kz FROM public.tbl_student WHERE student_uid='".addslashes($uids[1])."'";
-			if($result_std = $db->db_query($qry))
-				if($db->db_num_rows($result_std)==1)
-				{
-					$row_std = $db->db_fetch_object($result_std);
-					$xsl_stg_kz=$row_std->studiengang_kz;
-				}
-		}
 
+			$student_obj = new student();
+			if($student_obj->load($uids[1]))
+			{
+				$xsl_stg_kz=$student_obj->studiengang_kz;
+			}
+		}
+	}
+}
 if(isset($_GET['xsl_oe_kurzbz']))
 	$xsl_oe_kurzbz=$_GET['xsl_oe_kurzbz'];
 else
@@ -107,33 +91,31 @@ else
 //Parameter setzen
 $params='?xmlformat=xml';
 if(isset($_GET['uid']))
-	$params.='&uid='.$_GET['uid'];
-if(isseT($_GET['stg_kz']))
-	$params.='&stg_kz='.$_GET['stg_kz']; 
-if(isset($_GET['person_id']))
-	$params.='&person_id='.$_GET['person_id'];
-if(isset($_GET['id']))
-	$params.='&id='.$_GET['id'];
-if(isset($_GET['prestudent_id']))
-	$params.='&prestudent_id='.$_GET['prestudent_id'];
-if(isset($_GET['buchungsnummern']))
-	$params.='&buchungsnummern='.$_GET['buchungsnummern'];
+	$params.='&uid='.urlencode($_GET['uid']);
 if(isset($_GET['stg_kz']))
-	$params.='&stg_kz='.$_GET['stg_kz'];
+	$params.='&stg_kz='.urlencode($_GET['stg_kz']); 
+if(isset($_GET['person_id']))
+	$params.='&person_id='.urlencode($_GET['person_id']);
+if(isset($_GET['id']))
+	$params.='&id='.urlencode($_GET['id']);
+if(isset($_GET['prestudent_id']))
+	$params.='&prestudent_id='.urlencode($_GET['prestudent_id']);
+if(isset($_GET['buchungsnummern']))
+	$params.='&buchungsnummern='.urlencode($_GET['buchungsnummern']);
 if(isset($_GET['ss']))
-	$params.='&ss='.$_GET['ss'];
+	$params.='&ss='.urlencode($_GET['ss']);
 if(isset($_GET['abschlusspruefung_id']))
-	$params.='&abschlusspruefung_id='.$_GET['abschlusspruefung_id'];
+	$params.='&abschlusspruefung_id='.urlencode($_GET['abschlusspruefung_id']);
 if(isset($_GET['typ']))
-	$params.='&typ='.$_GET['typ'];
+	$params.='&typ='.urlencode($_GET['typ']);
 if(isset($_GET['all']))
-	$params.='&all='.$_GET['all'];
+	$params.='&all='.urlencode($_GET['all']);
 if(isset($_GET['preoutgoing_id']))
-    $params.='&preoutgoing_id='.$_GET['preoutgoing_id'];
+    $params.='&preoutgoing_id='.urlencode($_GET['preoutgoing_id']);
 if(isset($_GET["lvid"]))
-	$params.='&lvid='.$_GET["lvid"];
+	$params.='&lvid='.urlencode($_GET["lvid"]);
 if(isset($_GET['projekt_kurzbz']))
-	$params.='&projekt_kurzbz='.$_GET['projekt_kurzbz'];
+	$params.='&projekt_kurzbz='.urlencode($_GET['projekt_kurzbz']);
 if(isset($_GET['version']) && is_numeric($_GET['version']))
 	$version = $_GET['version'];
 else 
@@ -141,11 +123,13 @@ else
 
 $output = (isset($_GET['output'])?$_GET['output']:'odt');
 
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+//Berechtigung pruefen
 if($xsl=='AccountInfo')
 {
 	$isberechtigt = false;
-	$rechte = new benutzerberechtigung();
-	$rechte->getBerechtigungen($user);
 
 	$uids = explode(';',$_GET['uid']);
 	foreach ($uids as $uid)
@@ -189,10 +173,41 @@ if($xsl=='AccountInfo')
 		exit;
 	}
 }
+elseif(in_array($xsl,array('Zertifikat','Diplomurkunde','Diplomzeugnis','Bakkurkunde','BakkurkundeEng','Bakkzeugnis',
+'PrProtokollBakk','PrProtokollDipl','Lehrauftrag','DiplomurkundeEng','Zeugnis','ZeugnisEng','StudienerfolgEng',
+'Sammelzeugnis','PrProtDiplEng','PrProtBakkEng','BakkzeugnisEng','DiplomzeugnisEng','statusbericht','Uebernahme',
+'DiplSupplement','Zutrittskarte','Projektbeschr','Ausbildungsver','AusbildStatus','PrProtBA','PrProtMA',
+'PrProtBAEng','PrProtMAEng','Studienordnung','Erfolgsnachweis','ErfolgsnwHead')))
+{
+	if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz'))
+	{
+		echo 'Sie haben keine Berechtigung dieses Dokument zu erstellen';
+		exit;
+	}
+}
+elseif(in_array($xsl,array('Inskription','Studienerfolg','OutgoingLearning','OutgoingChangeL','LearningAgree','Zahlung')))
+{
+	if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz'))
+	{
+		echo 'Sie haben keine Berechtigung dieses Dokument zu erstellen';
+		exit;
+	}
+}
+elseif($xsl=='Bestellung')
+{
+	if(!$rechte->isBerechtigt('wawi/bestellung'))
+	{
+		echo 'Sie haben keine Berechtigung dieses Dokument zu erstellen';
+		exit;
+	}
+}
+else
+{
+	echo 'unbekanntes Dokument oder keine Berechtigung';
+	exit;
+}
 
-//Berechtigung pruefen
-$rechte = new benutzerberechtigung();
-$rechte->getBerechtigungen($user);
+
 
 $xml_url=XML_ROOT.$xml.$params;
 
@@ -215,18 +230,6 @@ else
 
 	$vorlage->getAktuelleVorlage($xsl_stg_kz, $xsl, $version);
 }
-//$qry = "SELECT text FROM public.tbl_vorlagestudiengang WHERE (studiengang_kz=0";
-//if($xsl_stg_kz!='')
-//$qry.=" OR studiengang_kz='".addslashes($xsl_stg_kz)."'";
-//$qry.=") AND vorlage_kurzbz='$xsl'";
-//if(isset($version) && $version!='')
-//	$qry.=" AND version='$version'"; 
-//$qry.=" ORDER BY studiengang_kz DESC, version DESC LIMIT 1";
-//echo $qry;
-//if(!$result = $db->db_query($qry))
-//	die('Fehler beim Laden der Vorlage'.$db->db_last_error());
-//if(!$row = $db->db_fetch_object($result))
-//	die('Vorlage wurde nicht gefunden'.$qry);
 
 $xsl_content = $vorlage->text;
 
@@ -237,15 +240,10 @@ $nachname='';
 if(isset($_GET['uid']) && $_GET['uid']!='')
 {
 	$uid = str_replace(';','',$_GET['uid']);
-	$qry = "SELECT nachname FROM campus.vw_benutzer WHERE uid='".addslashes($uid)."'";
+	$benutzer_obj = new benutzer();
+	if($benutzer_obj->load($uid))
+		$nachname = '_'.convertProblemChars($benutzer_obj->nachname);
 
-	if($result = $db->db_query($qry))
-	{
-		if($row = $db->db_fetch_object($result))
-		{
-			$nachname = '_'.clean_string($row->nachname);
-		}
-	}
 }
 $filename=$xsl.$nachname;
 
@@ -281,12 +279,35 @@ if (!isset($_REQUEST["archive"]))
 		mkdir($tempfolder);
 		chdir($tempfolder);
 		file_put_contents('content.xml', $buffer);
-        
+
+		// Wenn ein Style XSL uebergeben wurde wird ein zweites XML File erstellt mit den
+		// Styleanweisungen und ebenfalls zum Zip hinzugefuegt        
+		if(isset($_GET['style_xsl']))
+		{
+			$style_xsl=$_GET['style_xsl'];
+			$style_vorlage = new vorlage();
+			$style_vorlage->getAktuelleVorlage($xsl_stg_kz, $style_xsl, $version);
+	        $style_xsl_doc = new DOMDocument;
+			if(!$style_xsl_doc->loadXML($style_vorlage->text))
+				die('unable to load xsl');
+		    
+			// Configure the transformer
+			$style_proc = new XSLTProcessor;
+			$style_proc->importStyleSheet($style_xsl_doc); // attach the xsl rules
+		
+			$stylebuffer = $style_proc->transformToXml($xml_doc);
+
+			file_put_contents('styles.xml', $stylebuffer);
+		}
+
 		$zipfile = DOC_ROOT.'system/vorlage_zip/'.$vorlage->vorlage_kurzbz.'.'.$endung;
 		$tempname_zip = 'out.zip';
 		if(copy($zipfile, $tempname_zip))
 		{
 			exec("zip $tempname_zip content.xml");
+			if(isset($_GET['style_xsl']))
+				exec("zip $tempname_zip styles.xml");
+
 			clearstatcache(); 
             if($output == 'pdf')
             {
@@ -307,7 +328,17 @@ if (!isset($_REQUEST["archive"]))
                 header('Content-Disposition: attachment; filename="'.$vorlage->vorlage_kurzbz.'.'.$endung.'"');
                 header('Content-Length: '.$fsize); 
            } 
-            
+           else if($output =='doc')
+           {
+                $tempPdfName = $vorlage->vorlage_kurzbz.'.doc';
+                exec("unoconv -e IsSkipEmptyPages=false --stdout -f doc $tempname_zip > $tempPdfName");
+                
+                $fsize = filesize($tempPdfName); 
+                $handle = fopen($tempPdfName,'r');
+                header('Content-type: application/vnd.ms-word');
+                header('Content-Disposition: attachment; filename="'.$tempPdfName.'"');
+                header('Content-Length: '.$fsize); 
+           }
 		    while (!feof($handle)) 
 		    {
 			  	echo fread($handle, 8192);
@@ -315,8 +346,10 @@ if (!isset($_REQUEST["archive"]))
 			fclose($handle);
 
 			unlink('content.xml');
+			if(isset($_GET['style_xsl']))
+				unlink('styles.xml');
 			unlink($tempname_zip);
-            if($output=='pdf')
+            if($output=='pdf' || $output=='doc')
                 unlink($tempPdfName);
 			rmdir($tempfolder);
 		}
@@ -373,19 +406,8 @@ else
 				tbl_studentlehrverband.student_uid = tbl_benutzer.uid 
 				AND tbl_benutzer.person_id = tbl_person.person_id 
 				AND tbl_studentlehrverband.studiengang_kz = tbl_studiengang.studiengang_kz 
-				AND tbl_studentlehrverband.student_uid = '".addslashes($uid)."' 
-				AND tbl_studentlehrverband.studiensemester_kurzbz = '".addslashes($ss)."'";
-/*	$query = "SELECT 
-				tbl_studiengang.studiengang_kz, tbl_prestudentstatus.ausbildungssemester as semester, tbl_studiengang.typ, 
-				tbl_studiengang.kurzbz, tbl_person.person_id FROM tbl_person, tbl_benutzer, 
-				tbl_studentlehrverband, tbl_prestudentstatus, tbl_studiengang 
-			WHERE 
-				tbl_prestutendstatus.prestudent_id = 
-				tbl_studentlehrverband.student_uid = tbl_benutzer.uid 
-				AND tbl_benutzer.person_id = tbl_person.person_id 
-				AND tbl_studentlehrverband.studiengang_kz = tbl_studiengang.studiengang_kz 
-				AND tbl_studentlehrverband.student_uid = '".addslashes($uid)."' 
-				AND tbl_studentlehrverband.studiensemester_kurzbz = '".addslashes($ss)."'"; */
+				AND tbl_studentlehrverband.student_uid = ".$db->db_add_param($uid)." 
+				AND tbl_studentlehrverband.studiensemester_kurzbz = ".$db->db_add_param($ss);
 
 	if($result = $db->db_query($query))
 	{

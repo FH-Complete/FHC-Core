@@ -75,12 +75,25 @@ class studiengang extends basis_db
 		if(!is_null($studiengang_kz))
 			$this->load($studiengang_kz);
 		
-		$this->getAllTypes();
+		//$this->getAllTypes();
 /*		$this->studiengang_typ_arr["b"] = "Bachelor";
 		$this->studiengang_typ_arr["d"] = "Diplom";
 		$this->studiengang_typ_arr["m"] = "Master";
 		$this->studiengang_typ_arr["l"] = "LLL";
 		$this->studiengang_typ_arr["e"] = "Erhalter"; */
+	}
+
+	public function __get($value)
+	{
+		switch($value)
+		{
+			case 'studiengang_typ_arr':
+				if(count($this->studiengang_typ_arr)==0)
+				{
+					$this->getAllTypes();
+				}
+		}
+		return $this->$value;
 	}
 
 	/**
