@@ -1,6 +1,10 @@
 AuthBasicProvider ldap
-AuthName "FHComplete"
+AuthName "Technikum-Wien"
 AuthType Basic
-AuthBasicAuthoritative On
-AuthLDAPURL "ldap://localhost:389/ou=People,dc=oesi,dc=org?cn"
-Require valid-user
+AuthBasicAuthoritative Off
+AuthLDAPURL "ldap://ldap.technikum-wien.at:389/ou=People,dc=technikum-wien,dc=at?uid?one?objectclass=posixAccount"
+#AuthLDAPURL "ldap://ldap.technikum-wien.at:389/ou=People,dc=technikum,dc=at?uid?sub?(objectClass=*)"
+AuthLDAPGroupAttributeIsDN Off
+AuthLDAPGroupAttribute memberuid
+Require ldap-group cn=fhadmin,ou=Group,dc=technikum-wien,dc=at
+require ldap-group cn=hadesadm,ou=Group,dc=technikum-wien,dc=at
