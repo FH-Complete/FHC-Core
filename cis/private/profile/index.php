@@ -479,8 +479,7 @@ if(!$ansicht)
 		if(!$ansicht)
 		{
 			echo '<p><A href="zeitwunsch.php?uid='.$user->uid.'">'.$p->t('profil/zeitwuensche').'</A></p>
-				<p><A  href="lva_liste.php?uid='.$user->uid.'">'.$p->t('lvaliste/lehrveranstaltungen').'</A></p>
-				<p><A href="freebusy.php">'.$p->t('freebusy/titel').'</A></p>';
+				<p><A  href="lva_liste.php?uid='.$user->uid.'">'.$p->t('lvaliste/lehrveranstaltungen').'</A></p>';
 		}
 		if(check_lektor(get_uid()))
 		{
