@@ -126,9 +126,10 @@ if(isset($_POST['btn_bewerbung_abschicken']))
         }
         
         if(sendBewerbung($pr_id))
-            die('Sie haben sich erfolgreich beworben. Die zuständige Assistenz wird sich in den nächsten Tagen bei Ihnen melden.'); 
+			echo "<script type='text/javascript'>alert('Sie haben sich erfolgreich beworben. Die zuständige Assistenz wird sich in den nächsten Tagen bei Ihnen melden.');</script>";
         else
-            die ('Es ist ein Fehler beim versenden der Bewerbung aufgetreten. Bitte wenden Sie sich an unseren Support.'); 
+			echo "<script type='text/javascript'>alert('Es ist ein Fehler beim versenden der Bewerbung aufgetreten. Bitte versuchen Sie es nocheinmal');</script>";
+
     }
     
     
