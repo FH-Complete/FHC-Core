@@ -1,5 +1,5 @@
 <?php
-$this->phrasen['bewerbung/welcome']='Willkommen bei der Online Bewerbung für Studiengänge der '.CAMPUS_NAME;
+$this->phrasen['bewerbung/welcome']='Willkommen bei der Online Bewerbung';
 $this->phrasen['bewerbung/registration']='Registration';
 $this->phrasen['bewerbung/registrieren']='Registrieren';
 $this->phrasen['bewerbung/registrierenOderZugangscode']='<a href="'.$_SERVER['PHP_SELF'].'?method=registration">Hier registrieren</a> oder Zugangscode eingeben';
