@@ -43,6 +43,7 @@ class pruefungCis extends basis_db
     public $insertamum;                 //timestamp without timezone
     public $updatevon;                  //varcahr(32)
     public $updateamum;                 //timestamp without timezone
+    public $pruefungsintervall;		//smallint
     
     public $lehrveranstaltungen = array(); //Lehrveranstaltungen zur Prüfung
     public $termine = array();             //Termine zur Prüfung
@@ -145,7 +146,7 @@ class pruefungCis extends basis_db
         }
         else if($new)
         {
-            $qry = 'BEGIN; INSERT INTO campus.tbl_pruefung (mitarbeiter_uid, studiensemester_kurzbz, pruefungsfenster_id, pruefungstyp_kurzbz, titel, beschreibung, methode, einzeln, storniert, insertvon, insertamum) '
+            $qry = 'BEGIN; INSERT INTO campus.tbl_pruefung (mitarbeiter_uid, studiensemester_kurzbz, pruefungsfenster_id, pruefungstyp_kurzbz, titel, beschreibung, methode, einzeln, storniert, insertvon, insertamum, pruefungsintervall) '
                     . 'VALUES ('.$this->db_add_param($this->mitarbeiter_uid).', '
                     . $this->db_add_param($this->studiensemester_kurzbz).', '
                     . $this->db_add_param($this->pruefungsfenster_id).', '
@@ -156,7 +157,8 @@ class pruefungCis extends basis_db
                     . $this->db_add_param($this->einzeln, FHC_BOOLEAN).', '
                     . $this->db_add_param($this->storniert, FHC_BOOLEAN).', '
                     . $this->db_add_param($this->insertvon).', '
-                    . 'now()'
+                    . 'now(), '
+		    . $this->db_add_param($this->pruefungsintervall).''
                     . ');';
         }
         else
@@ -172,7 +174,8 @@ class pruefungCis extends basis_db
                     . 'einzeln='.$this->db_add_param($this->einzeln,FHC_BOOLEAN).', '
                     . 'storniert='.$this->db_add_param($this->storniert,FHC_BOOLEAN).', '
                     . 'updatevon='.$this->db_add_param($this->updatevon).', '
-                    . 'updateamum=now() '
+                    . 'updateamum=now(), '
+		    . 'pruefungsintervall='.$this->db_add_param($this->pruefungsintervall).' '
                     . 'WHERE pruefung_id='.$this->db_add_param($this->pruefung_id).';';
         }
         
@@ -291,6 +294,7 @@ class pruefungCis extends basis_db
                 $this->methode = $row->methode;
                 $this->einzeln = $this->db_parse_bool($row->einzeln);
                 $this->storniert = $this->db_parse_bool($row->storniert);
+		$this->pruefungsintervall = $row->pruefungsintervall;
             }
             return true;
         }
@@ -337,6 +341,7 @@ class pruefungCis extends basis_db
                 $obj->methode = $row->methode;
                 $obj->einzeln = $this->db_parse_bool($row->einzeln);
                 $obj->storniert = $this->db_parse_bool($row->storniert);
+		$this->pruefungsintervall = $row->pruefungsintervall;
                 $this->result[] = $obj;
             }
             return true;
@@ -678,6 +683,7 @@ class pruefungCis extends basis_db
                 $obj->methode = $row->methode;
                 $obj->einzeln = $this->db_parse_bool($row->einzeln);
                 $obj->storniert = $this->db_parse_bool($row->storniert);
+		$this->pruefungsintervall = $row->pruefungsintervall;
                 $this->result[] = $obj;
             }
             return true;

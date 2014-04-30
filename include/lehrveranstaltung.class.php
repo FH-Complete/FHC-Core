@@ -481,12 +481,14 @@ class lehrveranstaltung extends basis_db
 	 * @param $student_uid
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function load_lva_student($student_uid) 
+	public function load_lva_student($student_uid, $studiensemester_kurzbz=NULL) 
 	{
 		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung 
 				WHERE lehrveranstaltung_id IN(SELECT lehrveranstaltung_id FROM campus.vw_student_lehrveranstaltung 
-											  WHERE uid=" . $this->db_add_param($student_uid) . ")
-						OR lehrveranstaltung_id IN(SELECT lehrveranstaltung_id FROM lehre.tbl_zeugnisnote WHERE student_uid=" . $this->db_add_param($student_uid) . ")
+											  WHERE uid=" . $this->db_add_param($student_uid);
+		if($studiensemester_kurzbz !== NULL)
+		    $qry .= " AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+		$qry .= ") OR lehrveranstaltung_id IN(SELECT lehrveranstaltung_id FROM lehre.tbl_zeugnisnote WHERE student_uid=" . $this->db_add_param($student_uid) . ")
 				ORDER BY semester, bezeichnung";
 
 		//Datensaetze laden

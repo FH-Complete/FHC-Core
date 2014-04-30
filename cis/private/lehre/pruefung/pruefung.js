@@ -196,7 +196,7 @@ function loadPruefungen()
 			data.result.pruefungen.forEach(function(e){
 				if(e.pruefung.storniert === false)
 				{
-					var table = writePruefungsTable(e, data);
+					var table = writePruefungsTable(e, data, true);
 					$("#pruefungen").append(table);
 				}
 			});
@@ -230,7 +230,7 @@ function loadPruefungenOfStudiengang()
 			data.result.pruefungen.forEach(function(e){
 				if(e.pruefung.storniert === false)
 				{
-					var table = writePruefungsTable(e, data);
+					var table = writePruefungsTable(e, data, true);
 					$("#pruefungenStudiengang").append(table);
 				}
 			});
@@ -262,7 +262,7 @@ function loadPruefungenGesamt()
 		data.result.pruefungen.forEach(function(e){
 			if(e.pruefung.storniert === false)
 			{
-				var table = writePruefungsTable(e, data);
+				var table = writePruefungsTable(e, data, false);
 				$("#pruefungenGesamt").append(table);
 			}
 		});
@@ -277,27 +277,13 @@ function loadPruefungenGesamt()
  * @param {type} data Daten der Anmeldungen
  * @returns {String}
  */
-function writePruefungsTable(e, data)
+function writePruefungsTable(e, data, anmeldung)
 {
 	var row = "";
 	var teilnehmer = "";
 	var button = "";
-	row += "<tr><td>"+e.organisationseinheit+"</td><td style='cursor: pointer;' onclick='showPruefungsDetails(\""+e.pruefung.pruefung_id+"\",\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\");'>"+e.lehrveranstaltung[0].bezeichnung+"</td><td>";
+	row += "<tr><td>"+e.organisationseinheit+"</td><td style='cursor: pointer; text-decoration: underline;' onclick='showPruefungsDetails(\""+e.pruefung.pruefung_id+"\",\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\");'>"+e.lehrveranstaltung[0].bezeichnung+"</td><td>";
 	e.pruefung.termine.forEach(function(d){
-		var termin = d.von.split(" ");
-		termin = termin[0].split("-");
-		termin = new Date(termin[0], termin[1]-1,termin[2]);
-		termin = termin.getDate()+"."+(termin.getMonth()+1)+"."+termin.getFullYear();
-		row += termin+"</br>";
-
-		if(d.max === null)
-		{
-			teilnehmer += "unbegrenzt</br>";
-		}
-		else
-		{
-			teilnehmer += (d.max - d.teilnehmer)+"/"+d.max+"</br>";
-		}					
 		var storno = false;
 		var anmeldung_id = null;
 		data.result.anmeldungen.forEach(function(anmeldung){
@@ -307,18 +293,44 @@ function writePruefungsTable(e, data)
 				anmeldung_id= anmeldung.pruefungsanmeldung_id;
 			}
 		});
-		if(storno)
+		var termin = d.von.split(" ");
+		termin = termin[0].split("-");
+		termin = new Date(termin[0], termin[1]-1,termin[2]);
+		var frist = termin;
+		termin = termin.getDate()+"."+(termin.getMonth()+1)+"."+termin.getFullYear();
+		frist = frist.getTime();
+		frist = frist - (3*24*60*60*1000);
+		frist = new Date(frist);
+		frist = frist.getDate()+"."+(frist.getMonth()+1)+"."+frist.getFullYear();
+		if(anmeldung || e.lehrveranstaltung[0].angemeldet)
 		{
-			button += "<input type='button' value='Stornieren' onclick='stornoAnmeldung(\""+anmeldung_id+"\");'></br>";
+			if(storno)
+			{
+				button = "<p><span style='display: inline-block; width: 155px;'>Stornieren (bis "+frist+"): </span><input style='width: 90px;' type='button' value='"+termin+"' onclick='stornoAnmeldung(\""+anmeldung_id+"\");'></br>";
+			}
+			else
+			{
+				button = "<p><span style='display: inline-block; width: 155px;'>Anmelden (bis "+frist+"): </span><input style='width: 90px;' type='button' value='"+termin+"' onclick='openDialog(\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\", \""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung[0].bezeichnung+"\", \""+d.von+"\", \""+d.bis+"\");'></p>";
+
+			}
 		}
 		else
 		{
-			button += "<input type='button' value='zur Anmeldung' onclick='openDialog(\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\", \""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung[0].bezeichnung+"\", \""+d.von+"\", \""+d.bis+"\");'></br>";
-
+			button = "<p><span style='display: inline-block; width: 155px;'>Anmelden (bis "+frist+"): </span><input style='width: 90px;' type='button' value='"+termin+"' onclick='openAnmeldung(\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\", \""+e.pruefung.studiensemester_kurzbz+"\");'></p>";
 		}
+		
+		row += button;
+
+		if(d.max === null)
+		{
+			teilnehmer += "unbegrenzt</br>";
+		}
+		else
+		{
+			teilnehmer += "<p><span style='line-height: 24px'>"+(d.max - d.teilnehmer)+"/"+d.max+"</span></p>";
+		}					
 	});
 	row += "<td>"+teilnehmer+"</td>";
-	row += "</td><td></td><td>"+button+"</td></tr>";
 	return row;
 }
 
@@ -354,10 +366,14 @@ function showPruefungsDetails(prfId, lvId)
 					if(p.einzeln === true)
 					{
 						$("#prfEinzeln").html("<b>Einzelprüfung!</b>");
+						$("#prfIntervall").html(p.pruefungsintervall+" min");
+						$("#prfIntervall").prev().css("visibility", "visible");
 					}
 					else
 					{
 						$("#prfEinzeln").html("");
+						$("#prfIntervall").html("");
+						$("#prfIntervall").prev().css("visibility", "hidden");
 					}
 					$("#lvBez").html(l.bezeichnung);
 					if(l.ects !== null)
@@ -629,7 +645,7 @@ function writeAnmeldungen(data)
 			{
 				case 'angemeldet':
 					liste += "<li class='ui-state-default' id='"+d.student.uid+"'><span class='ui-icon ui-icon-arrowthick-2-n-s'></span><a href='#' onclick='showKommentar(\""+vorname+"\",\""+nachname+"\", \""+d.pruefungsanmeldung_id+"\", \""+d.kommentar+"\", \""+terminId+"\", \""+lehrveranstaltung_id+"\");'>"+vorname+" "+nachname+"</a>";
-					liste += "<div style='width: 3%; text-align: right;'>"+count+"</div><div style='text-align: center; width: 25%;'><input style='vertical-align: top;' type='button' value='Bestätigen' onclick='anmeldungBestaetigen(\""+d.pruefungsanmeldung_id+"\", \""+terminId+"\", \""+lehrveranstaltung_id+"\");'></div>";
+					liste += "<div style='width: 3%; text-align: right;'>"+count+"</div><div style='text-align: center; width: 25%;'><input style='vertical-align: top; height: 24px;' type='button' value='Bestätigen' onclick='anmeldungBestaetigen(\""+d.pruefungsanmeldung_id+"\", \""+terminId+"\", \""+lehrveranstaltung_id+"\");'></div>";
 					if(d.wuensche !== null)
 					{
 						liste += "<div class='anmerkungInfo'><a href='#' title='Anmerkung des Studenten:</br>"+d.wuensche+"'><img style='width: 20px;' src='../../../../skin/images/button_lvinfo.png'></a></div>";
@@ -638,7 +654,7 @@ function writeAnmeldungen(data)
 					break;
 				case 'bestaetigt':
 					liste += "<li class='ui-state-default' id='"+d.student.uid+"'><span class='ui-icon ui-icon-arrowthick-2-n-s'></span><a href='#' onclick='showKommentar(\""+vorname+"\",\""+nachname+"\", \""+d.pruefungsanmeldung_id+"\", \""+d.kommentar+"\", \""+terminId+"\", \""+lehrveranstaltung_id+"\");'>"+vorname+" "+nachname+"</a>";
-					liste += "<div style='width: 2%; text-align: right;'>"+count+"</div><div style='text-align: center; width: 20%;'>bestätigt</div>";
+					liste += "<div style='width: 2%; text-align: right;'>"+count+"</div><div style='text-align: center; width: 20%;'><a href='#' title='Satusänderung von: "+d.statusupdatevon+"'>bestätigt</a></div>";
 					if(d.wuensche !== null)
 					{
 						liste += "<div class='anmerkungInfo'><a href='#' title='Anmerkung des Studenten:</br>"+d.wuensche+"'><img style='width: 20px;' src='../../../../skin/images/button_lvinfo.png'></a></div>";
@@ -996,6 +1012,7 @@ function savePruefungstermin()
 	var lehrveranstaltungen = [];
 	var error = false;
 	var mitarbeiter_uid = $("#mitarbeiter_uid").val();
+	var pruefungsintervall = $("#pruefungsintervall").val();
 	$("#prfTermin tr").each(function(i,v){
 		var termin = {};
 		$(v).find("input").each(function(j, w){
@@ -1027,6 +1044,19 @@ function savePruefungstermin()
 			error = true;
 			markMissingFormEntry("termin"+(i+1)+"min");
 			markMissingFormEntry("termin"+(i+1)+"max");
+		}
+		if(einzeln)
+		{
+			if(!checkPruefungsintervall(pruefungsintervall, termin))
+			{
+				error = true;
+				markMissingFormEntry("pruefungsintervall");
+				markMissingFormEntry($(v).attr("id"));
+			}
+		}
+		else
+		{
+			pruefungsintervall = false;
 		}
 		termine.push(termin);
 	});
@@ -1095,7 +1125,8 @@ function savePruefungstermin()
 				einzeln: einzeln,
 				termine: termine,
 				lehrveranstaltungen: lehrveranstaltungen,
-				mitarbeiter_uid: mitarbeiter_uid
+				mitarbeiter_uid: mitarbeiter_uid,
+				pruefungsintervall: pruefungsintervall
 			},
 			error: loadError
 		}).success(function(data){
@@ -1299,6 +1330,8 @@ function loadPruefungsDetails(prfId)
 					if(result.pruefung.einzeln)
 					{
 						$("#einzeln").prop("checked", "checked");
+						$("#pruefungsintervall").parent().parent().css("visibility", "visible");
+						$("#pruefungsintervall").val(result.pruefung.pruefungsintervall);
 					}
 					else
 					{
@@ -1363,12 +1396,13 @@ function updatePruefung(prfId)
 	var titel = $("#titel").val();
 	var beschreibung = $("#beschreibung").val();
 	var methode = $("#methode").val();
-	var einzeln = $("#einzeln").val();
+	var einzeln = $("#einzeln").prop("checked");
 	var termine = [];
 	var termineNeu = [];
 	var lehrveranstaltungen = [];
 	var mitarbeiter_uid = $("#mitarbeiter_uid").val();
-	
+	var pruefungsintervall = $("#pruefungsintervall").val();
+	var error = false;
 	$('#prfTermin tr').has("span").each(function(i,v){
 		var termin = {};
 		$(v).find("span").each(function(j, w){
@@ -1398,6 +1432,15 @@ function updatePruefung(prfId)
 			error = true;
 			markMissingFormEntry($(v).attr("id"));
 		}
+		if(einzeln)
+		{
+			if(!checkPruefungsintervall(pruefungsintervall, termin))
+			{
+				error = true;
+				markMissingFormEntry("pruefungsintervall");
+				markMissingFormEntry($(v).attr("id"));
+			}
+		}
 		termine.push(termin);
 	});
 	
@@ -1422,9 +1465,23 @@ function updatePruefung(prfId)
 					break;
 			}
 		});
+		if(!checkTermin(termin))
+		{
+			error = true;
+			markMissingFormEntry($(v).attr("id"));
+		}
+		if(einzeln)
+		{
+			if(!checkPruefungsintervall(pruefungsintervall, termin))
+			{
+				error = true;
+				markMissingFormEntry("pruefungsintervall");
+				markMissingFormEntry($(v).attr("id"));
+			}
+		}
 		termineNeu.push(termin);
 	});
-	var error = false;
+	
 	$("#lvDropdowns select").each(function(i,v){
 		if($(v).val() !== "null")
 			lehrveranstaltungen.push($(v).val());
@@ -1489,7 +1546,8 @@ function updatePruefung(prfId)
 				termine: termine,
 				termineNeu: termineNeu,
 				lehrveranstaltungen: lehrveranstaltungen,
-				mitarbeiter_uid: mitarbeiter_uid
+				mitarbeiter_uid: mitarbeiter_uid,
+				pruefungsintervall: pruefungsintervall
 			},
 			error: loadError
 		}).success(function(data){
@@ -1683,6 +1741,20 @@ function checkTermin(termin)
 	return true;
 }
 
+function checkPruefungsintervall(intervall, termin)
+{
+	var beginn = stringToDate(termin.datum, termin.beginn);
+	var ende = stringToDate(termin.datum, termin.ende);
+	var maxTeilnehmer = ((ende - beginn) / 1000 / 60 / intervall);
+	console.log(maxTeilnehmer);
+	console.log(termin.max);
+	if(maxTeilnehmer < termin.max)
+	{
+		return false;
+	}
+	return true;
+}
+
 /**
  * Formatiert eine Datum von String in eine Date-Objekt
  * @param {string} datum Ein Datum als String im Format "DD.MM.YYYY"
@@ -1711,6 +1783,9 @@ function resetPruefungsverwaltung()
 	$("#methode").val("");
 	resetLehrveranstaltungen();
 	resetTermine();
+	$("#pruefungsintervall").val("15");
+	$("#einzeln").removeAttr("checked");
+	$("#pruefungsintervall").closest("tr").css("visibility", "hidden");
 	$("#modalOverlay").removeClass("modalOverlay");
 	$("#buttonSave").attr("onclick", "savePruefungstermin();");
 }

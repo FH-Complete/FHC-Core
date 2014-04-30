@@ -35,7 +35,9 @@ class pruefungsanmeldung extends basis_db {
     public $status_kurzbz;              //varchar(32)
     public $wuensche;                   //text
     public $reihung;                    //smallint
-    public $kommentar;                       //text
+    public $kommentar;                  //text
+    public $statusupdatevon;		//varchar(32)
+    public $statusupdateamum;		//timestamp
     
     /**
      * Konstruktor
@@ -154,6 +156,8 @@ class pruefungsanmeldung extends basis_db {
                 $this->wuensche = $row->wuensche;
                 $this->reihung = $row->reihung;
                 $this->kommentar = $row->kommentar;
+		$this->statusupdateamum = $row->statusupdateamum;
+		$this->statusupdatevon = $row->statusupdatevon;
             }
             return true;
         }
@@ -195,6 +199,8 @@ class pruefungsanmeldung extends basis_db {
 		$anmeldung->reihung = $row->reihung;
 		$anmeldung->wuensche = $row->wuensche;
 		$anmeldung->kommentar = $row->kommentar;
+		$anmeldung->statusupdateamum = $row->statusupdateamum;
+		$anmeldung->statusupdatevon = $row->statusupdatevon;
                 array_push($anmeldungen, $anmeldung);
             }
             return $anmeldungen;
@@ -245,6 +251,8 @@ class pruefungsanmeldung extends basis_db {
 		$anmeldung->reihung = $row->reihung;
 		$anmeldung->wuensche = $row->wuensche;
 		$anmeldung->kommentar = $row->kommentar;
+		$anmeldung->statusupdateamum = $row->statusupdateamum;
+		$anmeldung->statusupdatevon = $row->statusupdatevon;
                 array_push($anmeldungen, $anmeldung);
             }
             return $anmeldungen;
@@ -324,9 +332,12 @@ class pruefungsanmeldung extends basis_db {
      * @param type $status Status auf den geändert werden soll
      * @return boolean true, wenn ok; false, im Fehlerfall
      */
-    public function changeState($pruefungsanmeldung_id, $status)
+    public function changeState($pruefungsanmeldung_id, $status, $user)
     {
-	$qry = 'UPDATE campus.tbl_pruefungsanmeldung SET status_kurzbz='.$this->db_add_param($status).''
+	$qry = 'UPDATE campus.tbl_pruefungsanmeldung SET '
+		. 'status_kurzbz='.$this->db_add_param($status).', '
+		. 'statusupdatevon='.$this->db_add_param($user).', '
+		. 'statusupdateamum=NOW() '
 		. ' WHERE pruefungsanmeldung_id='.$this->db_add_param($pruefungsanmeldung_id).';';
 	
 	if(!$this->db_query($qry))

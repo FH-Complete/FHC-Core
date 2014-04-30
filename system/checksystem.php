@@ -1487,6 +1487,39 @@ if(!$result = @$db->db_query("SELECT pruefungsanmeldung_id FROM lehre.tbl_pruefu
 		echo 'lehre.tbl_pruefung: Spalte pruefungsanmeldung_id hinzugefuegt';
 }
 
+// pruefungsintervall in campus.tbl_pruefung
+if(!$result = @$db->db_query("SELECT pruefungsintervall FROM campus.tbl_pruefung LIMIT 1"))
+{
+	$qry = "ALTER TABLE campus.tbl_pruefung ADD COLUMN pruefungsintervall smallint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_pruefung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'campus.tbl_pruefung: Spalte pruefungsintervall hinzugefuegt';
+}
+
+// statusupdatevon in campus.tbl_pruefungsanmeldung
+if(!$result = @$db->db_query("SELECT statusupdatevon FROM campus.tbl_pruefungsanmeldung LIMIT 1"))
+{
+	$qry = "ALTER TABLE campus.tbl_pruefungsanmeldung ADD COLUMN statusupdatevon varcahr(32);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_pruefungsanmeldung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'campus.tbl_pruefungsanmeldung: Spalte statusupdatevon hinzugefuegt';
+}
+
+// statusupdateamum in campus.tbl_pruefungsanmeldung
+if(!$result = @$db->db_query("SELECT statusupdateamum FROM campus.tbl_pruefungsanmeldung LIMIT 1"))
+{
+	$qry = "ALTER TABLE campus.tbl_pruefungsanmeldung ADD COLUMN statusupdateamum timestamp;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_pruefungsanmeldung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'campus.tbl_pruefungsanmeldung: Spalte statusupdateamum hinzugefuegt';
+}
+
 // Indizes für Tabelle Reservierung
 if($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_reservierung_datum'"))
 {
