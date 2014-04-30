@@ -49,6 +49,11 @@ switch($method)
 	$einzeln = (isset($_POST["einzeln"]) && $_POST["einzeln"] ==="true")?true:false;
 	$lehrveranstaltungen = isset($_POST["lehrveranstaltungen"]) ? $_POST["lehrveranstaltungen"] : null;
 	$termine = isset($_POST["termine"])?$_POST["termine"]:null;
+	$pruefungsintervall = NULL;
+	if(isset($_REQUEST["pruefungsintervall"]) && ($_REQUEST["pruefungsintervall"] !== "false"))
+	{
+	    $pruefungsintervall = $_REQUEST["pruefungsintervall"];
+	}
 	if($rechte->isBerechtigt('lehre/pruefungsterminAdmin'))
 	{
 	    $mitarbeiter_uid = $_REQUEST["mitarbeiter_uid"];
@@ -57,7 +62,7 @@ switch($method)
 	{
 	    $mitarbeiter_uid = $uid;
 	}
-	$data = savePruefungstermin($mitarbeiter_uid, $studiensemester_kurzbz, $pruefungsfenster_id, $pruefungstyp_kurzbz, $titel, $beschreibung, $methode, $einzeln, $lehrveranstaltungen, $termine);
+	$data = savePruefungstermin($mitarbeiter_uid, $studiensemester_kurzbz, $pruefungsfenster_id, $pruefungstyp_kurzbz, $titel, $beschreibung, $methode, $einzeln, $lehrveranstaltungen, $termine, $pruefungsintervall);
 	break;
     case 'getLehrveranstaltungenByMitarbeiter':
 	$mitarbeiter_uid = $_POST["mitarbeiter_uid"];
@@ -76,6 +81,11 @@ switch($method)
 	$lehrveranstaltungen = isset($_POST["lehrveranstaltungen"]) ? $_POST["lehrveranstaltungen"] : null;
 	$termine = isset($_POST["termine"])?$_POST["termine"]:null;
 	$termineNeu = isset($_POST["termineNeu"])?$_POST["termineNeu"]:null;
+	$pruefungsintervall = NULL;
+	if((isset($_REQUEST["pruefungsintervall"]) && $_REQUEST["pruefungsintervall"] !== false))
+	{
+	    $pruefungsintervall = $_REQUEST["pruefungsintervall"];
+	}
 	if($rechte->isBerechtigt('lehre/pruefungsterminAdmin'))
 	{
 	    $mitarbeiter_uid = $_REQUEST["mitarbeiter_uid"];
@@ -84,7 +94,7 @@ switch($method)
 	{
 	    $mitarbeiter_uid = $uid;
 	}
-	$data = updatePruefungstermin($mitarbeiter_uid, $pruefung_id, $studiensemester_kurzbz, $pruefungsfenster_id, $pruefungstyp_kurzbz, $titel, $beschreibung, $methode, $einzeln, $lehrveranstaltungen, $termine, $termineNeu);
+	$data = updatePruefungstermin($mitarbeiter_uid, $pruefung_id, $studiensemester_kurzbz, $pruefungsfenster_id, $pruefungstyp_kurzbz, $titel, $beschreibung, $methode, $einzeln, $lehrveranstaltungen, $termine, $termineNeu, $pruefungsintervall);
 	break;
     case 'deleteLehrveranstaltungFromPruefung':
 	$lvId = $_POST["lehrveranstaltung_id"];
@@ -201,7 +211,7 @@ function getPruefungsfensterByStudiensemester($studiensemester_kurzbz)
  * @param Array $termine Termine zur Prüfung
  * @return Array
  */
-function savePruefungstermin($uid, $studiensemester_kurzbz, $pruefungsfenster_id, $pruefungstyp_kurzbz, $titel, $beschreibung, $methode, $einzeln, $lehrveranstaltungen, $termine)
+function savePruefungstermin($uid, $studiensemester_kurzbz, $pruefungsfenster_id, $pruefungstyp_kurzbz, $titel, $beschreibung, $methode, $einzeln, $lehrveranstaltungen, $termine, $pruefungsintervall)
 {
     if($lehrveranstaltungen === null)
     {
@@ -219,8 +229,8 @@ function savePruefungstermin($uid, $studiensemester_kurzbz, $pruefungsfenster_id
 	$termin->max = $t["max"];
 	$termin->beginn = date('Y-m-d H:i', strtotime($date." ".$beginn));
 	$termin->ende = date('Y-m-d H:i', strtotime($date." ".$ende));
-	if(checkTerminPruefungsfenster($pruefungsfenster_id, $date))
-	{
+//	if(checkTerminPruefungsfenster($pruefungsfenster_id, $date))
+//	{
 	    if(!(checkCollision($uid, $termin->beginn, $termin->ende)))
 	    {
 		array_push($termineArray, $termin);
@@ -231,13 +241,13 @@ function savePruefungstermin($uid, $studiensemester_kurzbz, $pruefungsfenster_id
 		$data['errormsg']="Kollision mit anderem Termin.";
 		return $data;
 	    }
-	}
-	else
-	{
-	    $data['error']='true';
-	    $data['errormsg']="Termin ist nicht innerhalb des Prüfungsfensters.";
-	    return $data;
-	}
+//	}
+//	else
+//	{
+//	    $data['error']='true';
+//	    $data['errormsg']="Termin ist nicht innerhalb des Prüfungsfensters.";
+//	    return $data;
+//	}
     }    
 
     $pruefung = new pruefungCis();
@@ -250,7 +260,8 @@ function savePruefungstermin($uid, $studiensemester_kurzbz, $pruefungsfenster_id
     $pruefung->beschreibung = $beschreibung;
     $pruefung->methode = $methode;
     $pruefung->einzeln = $einzeln;
-    $pruefung->insertvon = $uid;
+    $pruefung->insertvon = get_uid();
+    $pruefung->pruefungsintervall = $pruefungsintervall;
 
     foreach ($lehrveranstaltungen as $lv) {
 	if($lv != "null")
@@ -340,7 +351,7 @@ function getLehrveranstaltungenByMitarbeiter($mitarbeiter_uid, $studiensemester_
  * @param type $termineNeu Neu hinzugefügte Termine
  * @return Array
  */
-function updatePruefungstermin($uid, $pruefung_id, $studiensemester_kurzbz, $pruefungsfenster_id, $pruefungstyp_kurzbz, $titel, $beschreibung, $methode, $einzeln, $lehrveranstaltungen, $termine, $termineNeu)
+function updatePruefungstermin($uid, $pruefung_id, $studiensemester_kurzbz, $pruefungsfenster_id, $pruefungstyp_kurzbz, $titel, $beschreibung, $methode, $einzeln, $lehrveranstaltungen, $termine, $termineNeu, $pruefungsintervall)
 {
     $pruefungsfenster = new pruefungsfenster();
     $pruefungsfenster->load($pruefungsfenster_id);
@@ -361,8 +372,8 @@ function updatePruefungstermin($uid, $pruefung_id, $studiensemester_kurzbz, $pru
 	    $termin->max = $t["max"];
 	    $termin->beginn = date('Y-m-d H:i', strtotime($date." ".$beginn));
 	    $termin->ende = date('Y-m-d H:i', strtotime($date." ".$ende));
-	    if(checkTerminPruefungsfenster($pruefungsfenster_id, $date))
-	    {
+//	    if(checkTerminPruefungsfenster($pruefungsfenster_id, $date))
+//	    {
 		if(!(checkCollision($uid, $termin->beginn, $termin->ende)))
 		{
 		    array_push($termineNeuArray, $termin);
@@ -373,13 +384,13 @@ function updatePruefungstermin($uid, $pruefung_id, $studiensemester_kurzbz, $pru
 		    $data['errormsg']="Kollision mit anderem Termin.";
 		    return $data;
 		}
-	    }
-	    else
-	    {
-		$data['error']='true';
-		$data['errormsg']="Termin ist nicht innerhalb des Prüfungsfensters.";
-		return $data;
-	    }
+//	    }
+//	    else
+//	    {
+//		$data['error']='true';
+//		$data['errormsg']="Termin ist nicht innerhalb des Prüfungsfensters.";
+//		return $data;
+//	    }
 	}
 	foreach ($termineNeuArray as $t)
 	{
@@ -401,16 +412,16 @@ function updatePruefungstermin($uid, $pruefung_id, $studiensemester_kurzbz, $pru
 	    $termin->max = ($t["max"] === "null") ? NULL : $t["max"];
 	    $termin->beginn = date('Y-m-d H:i', strtotime($date." ".$beginn));
 	    $termin->ende = date('Y-m-d H:i', strtotime($date." ".$ende));
-	    if(checkTerminPruefungsfenster($pruefungsfenster_id, $date))
-	    {
-		array_push($termineArray, $termin);
-	    }
-	    else
-	    {
-		$data['error']='true';
-		$data['errormsg']="Termin ist nicht innerhalb des Prüfungsfensters.";
-		return $data;
-	    }
+//	    if(checkTerminPruefungsfenster($pruefungsfenster_id, $date))
+//	    {
+//		array_push($termineArray, $termin);
+//	    }
+//	    else
+//	    {
+//		$data['error']='true';
+//		$data['errormsg']="Termin ist nicht innerhalb des Prüfungsfensters.";
+//		return $data;
+//	    }
 	}
 	foreach($termineArray as $key=>$t)
 	{
@@ -427,7 +438,8 @@ function updatePruefungstermin($uid, $pruefung_id, $studiensemester_kurzbz, $pru
     $pruefung->beschreibung = $beschreibung;
     $pruefung->methode = $methode;
     $pruefung->einzeln = $einzeln;
-    $pruefung->updatevon = $uid;
+    $pruefung->updatevon = get_uid();
+    $pruefung->pruefungsintervall = $pruefungsintervall;
     if($lehrveranstaltungen !== null)
     {
 	foreach ($lehrveranstaltungen as $lv)

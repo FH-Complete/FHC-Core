@@ -91,6 +91,16 @@ if(empty($lehrveranstaltung->lehrveranstaltungen) && !$rechte->isBerechtigt('leh
     <body>
         <script>
             $(document).ready(function() {
+		$("#einzeln").bind("change", function(){
+		    if($("#einzeln").prop("checked") === true)
+		    {
+			$("#pruefungsintervall").closest("tr").css("visibility", "visible");
+		    }
+		    else
+		    {
+			$("#pruefungsintervall").closest("tr").css("visibility", "hidden");
+		    }
+		});
 		var isFormHidden = true;
 		$("#lektor").autocomplete({
 		    source: "lektor_autocomplete.php?autocomplete=lektor",
@@ -123,9 +133,10 @@ if(empty($lehrveranstaltung->lehrveranstaltungen) && !$rechte->isBerechtigt('leh
 			    $("#prfVerwaltung form").slideToggle("slow");
 			}
 //			loadAllPruefungen();
-			loadPruefungstypen("false");
-			loadStudiensemester();
-			loadAllPruefungen();
+			resetPruefungsverwaltung();
+//			loadPruefungstypen("false");
+//			loadStudiensemester();
+//			loadAllPruefungen();
 		    }
 		});
            });
@@ -204,6 +215,16 @@ if(empty($lehrveranstaltung->lehrveranstaltungen) && !$rechte->isBerechtigt('leh
                         <td>Einzelprüfung:</td>
                         <td><input id='einzeln' type="checkbox" name="einzelpruefung"></td>
                     </tr>
+		    <tr  style="visibility:hidden;">
+			<td>Prüfungsintervall:</td>
+			<td>
+			    <select id="pruefungsintervall">
+				<option value="15">15</option>
+				<option value="20">20</option>
+				<option value="30">30</option>
+			    </select>
+			</td>
+		    </tr>
                     <tr>
                         <td style="vertical-align: top;">Lehrveranstaltungen:</td>
                         <td>

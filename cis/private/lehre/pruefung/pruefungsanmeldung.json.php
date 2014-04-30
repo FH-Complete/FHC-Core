@@ -59,13 +59,14 @@ switch($method)
 	    $data = saveReihung();
 	    break;
 	case 'anmeldungBestaetigen':
-	    $data = anmeldungBestaetigen();
+	    $data = anmeldungBestaetigen($uid);
 	    break;
 	case 'getStudiengaenge':
 	    $data = getStudiengaenge();
 	    break;
 	case 'getPruefungenStudiengang':
-	    $data = getPruefungenStudiengang();
+	    $studiensemester = new studiensemester();
+	    $data = getPruefungenStudiengang($uid, $studiensemester->getakt());
 	    break;
 	case 'saveKommentar':
 	    $data = saveKommentar();
@@ -87,7 +88,7 @@ echo json_encode($data);
 function getPruefungByLv($aktStudiensemester = null, $uid = null)
 {
     $lehrveranstaltungen = new lehrveranstaltung();
-    $lehrveranstaltungen->load_lva_student($uid);
+    $lehrveranstaltungen->load_lva_student($uid, $aktStudiensemester);
     $lvIds = array();
     foreach($lehrveranstaltungen->lehrveranstaltungen as $lvs)
     {
@@ -155,6 +156,13 @@ function getPruefungByLv($aktStudiensemester = null, $uid = null)
 function getPruefungByLvFromStudiengang($aktStudiensemester = null, $uid = null)
 {
     $lehrveranstaltungen = new lehrveranstaltung();
+    $lv_angemeldet = new lehrveranstaltung();
+    $lv_angemeldet->load_lva_student($uid, $aktStudiensemester);
+    $lvIds_angemeldet = array();
+    foreach($lv_angemeldet->lehrveranstaltungen as $lv)
+    {
+	array_push($lvIds_angemeldet, $lv->lehrveranstaltung_id);
+    }
     $student = new student($uid);
     $lehrveranstaltungen->load_lva($student->studiengang_kz);
     $lvIds = array();
@@ -167,10 +175,18 @@ function getPruefungByLvFromStudiengang($aktStudiensemester = null, $uid = null)
     if($pruefung->getPruefungByLv($lehrveranstaltungen))
     {
 	$pruefungen = array();
-	foreach($pruefung->lehrveranstaltungen as $lv)
+	foreach($pruefung->lehrveranstaltungen as $key=>$lv)
 	{
 	    $lehrveranstaltung = new lehrveranstaltung($lv->lehrveranstaltung_id);
 	    $lehrveranstaltung = $lehrveranstaltung->cleanResult();
+	    if(in_array($lehrveranstaltung[0]->lehrveranstaltung_id, $lvIds_angemeldet))
+	    {
+		$lehrveranstaltung[0]->angemeldet = true;
+	    }
+	    else
+	    {
+		$lehrveranstaltung[0]->angemeldet = false;
+	    }
 	    $lehreinheit = new lehreinheit();
 	    $lehreinheit->load_lehreinheiten($lehrveranstaltung[0]->lehrveranstaltung_id, $aktStudiensemester);
 	    $lehreinheiten = $lehreinheit->lehreinheiten;
@@ -513,12 +529,12 @@ function saveReihung()
  * Ändert den Status einer Prüfungsanmeldung auf "bestaetigt"
  * @return Array
  */
-function anmeldungBestaetigen()
+function anmeldungBestaetigen($uid)
 {
     $pruefungsanmeldung_id = $_REQUEST["pruefungsanmeldung_id"];
     $status = "bestaetigt";
     $anmeldung = new pruefungsanmeldung();
-    if($anmeldung->changeState($pruefungsanmeldung_id, $status))
+    if($anmeldung->changeState($pruefungsanmeldung_id, $status, $uid))
     {
 	$data['result']=true;
 	$data['error']='false';
@@ -567,7 +583,7 @@ function getStudiengaenge()
  * Lädt alle Prüfungen eines Studienganges
  * @return Array
  */
-function getPruefungenStudiengang()
+function getPruefungenStudiengang($uid, $aktStudiensemester)
 {
     $lehrveranstaltung = new lehrveranstaltung();
     $lehrveranstaltung->load_lva($_REQUEST["studiengang_kz"], null, null, true, true);

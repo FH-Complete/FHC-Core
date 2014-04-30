@@ -174,7 +174,7 @@ if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungA
 	    
 	    .anmerkungInfo {
 		text-align: right;
-		width: 5%;
+		width: 10%;
 	    }
 	    
 	    #progressbar {

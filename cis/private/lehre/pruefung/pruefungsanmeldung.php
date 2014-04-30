@@ -36,12 +36,6 @@ $db = new basis_db();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
-$lehrveranstaltung = new lehrveranstaltung();
-$lehrveranstaltung->load_lva_student($uid);
-
-$studiensemester = new studiensemester();
-$studiensemester->getAll();
-
 $benutzer = new student($uid);
 
 ?>
@@ -80,7 +74,7 @@ $benutzer = new student($uid);
 	    }
 	    
 	    #accordion {
-		width: 80%;
+		width: 60%;
 		clear: left;
 		clear: right;
 	    }
@@ -98,6 +92,22 @@ $benutzer = new student($uid);
 		font-weight: bold;
 	    }
             
+	    .columnheader1 {
+		width: 30%;
+	    }
+	    .columnheader2 {
+		width: 30%;
+	    }
+	    .columnheader3 {
+		width: 30%;
+	    }
+	    .columnheader4 {
+		width: 5%;
+	    }
+	    
+	    #accordion p {
+		margin: 0;
+	    }
 /*            div {
                 float: left;
             }*/
@@ -118,7 +128,7 @@ $benutzer = new student($uid);
 		{
 		    $("#accordion").accordion({
 			header: "h2",
-			heightstyle: "content"
+			autoHeight: false
 		    });
 		    $("#accordion").attr("style", "visibility: visible;");
 		}
@@ -133,7 +143,17 @@ $benutzer = new student($uid);
 		    autoOpen: false,
 		    width: "400px"
 		});
+		$("#dialog").dialog({ autoOpen: false });
             });
+	    <?php
+	     echo '
+		function openAnmeldung(lehrveranstaltung_id, stsem)
+		{
+			$("#dialog").load("../../profile/studienplan.php?getAnmeldung=true&lehrveranstaltung_id="+lehrveranstaltung_id+"&stsem="+stsem+"&uid='.$db->convert_html_chars($uid).'");
+			$("#dialog").dialog("open");
+		}'
+	    ;
+	    ?>
         </script>
         <h1>Prüfungsanmeldung für <?php echo $benutzer->vorname." ".$benutzer->nachname." (".$uid.")"; ?></h1>
 	<div id="details">
@@ -149,6 +169,7 @@ $benutzer = new student($uid);
                 <span class="titel">Methode: </span><span id="prfMethode"></span><br/>
                 <span class="titel">Beschreibung: </span><span id="prfBeschreibung"></span><br/>
                 <span id="prfEinzeln"></span><br/>
+		<span class="titel" style="visibility: hidden;">Intervall: </span><span id="prfIntervall"></span><br/>
             </div>
         </div>
 	<div id="message"></div>
@@ -158,12 +179,10 @@ $benutzer = new student($uid);
 		<table id="table1" class="tablesorter">
 		    <thead>
 			<tr>
-			    <th>Insitut</th>
-			    <th>Lehrveranstaltung</th>
-			    <th>Termin</th>
-			    <th>freie Plätze</th>
-			    <th>Frist</th>
-			    <th>&nbsp;</th>
+			    <th class="columnheader1">Insitut</th>
+			    <th class="columnheader2">Lehrveranstaltung</th>
+			    <th class="columnheader3">Termin</th>
+			    <th class="columnheader4">freie Plätze</th>
 			</tr>
 		    </thead>
 		    <tbody id="pruefungen">
@@ -176,12 +195,10 @@ $benutzer = new student($uid);
 		<table id="table2" class="tablesorter">
 		    <thead>
 			<tr>
-			    <th>Insitut</th>
-			    <th>Lehrveranstaltung</th>
-			    <th>Termin</th>
-			    <th>freie Plätze</th>
-			    <th>Frist</th>
-			    <th>&nbsp;</th>
+			    <th class="columnheader1">Insitut</th>
+			    <th class="columnheader2">Lehrveranstaltung</th>
+			    <th class="columnheader3">Termin</th>
+			    <th class="columnheader4">freie Plätze</th>
 			</tr>
 		    </thead>
 		    <tbody id="pruefungenStudiengang">
@@ -194,12 +211,10 @@ $benutzer = new student($uid);
 		<table id="table3" class="tablesorter">
 		    <thead>
 			<tr>
-			    <th>Insitut</th>
-			    <th>Lehrveranstaltung</th>
-			    <th>Termin</th>
-			    <th>freie Plätze</th>
-			    <th>Frist</th>
-			    <th>&nbsp;</th>
+			    <th class="columnheader1">Insitut</th>
+			    <th class="columnheader2">Lehrveranstaltung</th>
+			    <th class="columnheader3">Termin</th>
+			    <th class="columnheader4">freie Plätze</th>
 			</tr>
 		    </thead>
 		    <tbody id="pruefungenGesamt">
@@ -248,6 +263,8 @@ $benutzer = new student($uid);
 		    </tr>
 		</table>
 	    </form>
+	</div>
+	<div id="dialog">
 	</div>
     </body>
 </html>
