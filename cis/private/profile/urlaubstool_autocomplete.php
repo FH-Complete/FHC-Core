@@ -21,7 +21,8 @@
 
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/basis_db.class.php');
-require_once('../../../include/mitarbeiter.class.php'); 
+require_once('../../../include/mitarbeiter.class.php');
+require_once('../../../include/benutzer.class.php'); 
 	
 if (!$db = new basis_db())
     die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -39,10 +40,15 @@ if(isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete']=='mitarbeiter')
 		$result_obj = array();
 		foreach($mitarbeiter_zeit->result as $row)
 		{
-			$item['vorname']=html_entity_decode($row->vorname);
-			$item['nachname']=html_entity_decode($row->nachname);
-			$item['uid']=html_entity_decode($row->uid);
-			$result_obj[]=$item;
+			$aktiv = new benutzer();
+			$aktiv->load($row->uid);
+			if ($aktiv->bnaktiv==true)
+			{
+				$item['vorname']=html_entity_decode($row->vorname);
+				$item['nachname']=html_entity_decode($row->nachname);
+				$item['uid']=html_entity_decode($row->uid);
+				$result_obj[]=$item;
+			}
 		}
 		echo json_encode($result_obj);
 	}
