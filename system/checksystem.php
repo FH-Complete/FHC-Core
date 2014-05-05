@@ -1469,9 +1469,9 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 		$qry = "GRANT UPDATE ON public.tbl_benutzer TO web;";
 	
 		if(!$db->db_query($qry))
-			echo '<strong>public.tbl_benutzer: '.$db->db_last_error().'</strong><br>';
+			echo '<br><strong>public.tbl_benutzer: '.$db->db_last_error().'</strong><br>';
 		else
-			echo 'public.tbl_benutzer: Update rechte fuer User web erteilt';
+			echo '<br>public.tbl_benutzer: Update rechte fuer User web erteilt';
 	}		
 }
 
@@ -1482,9 +1482,9 @@ if(!$result = @$db->db_query("SELECT pruefungsanmeldung_id FROM lehre.tbl_pruefu
 		. "ALTER TABLE lehre.tbl_pruefung ADD CONSTRAINT fk_pruefung_pruefungsanmeldung_id FOREIGN KEY (pruefungsanmeldung_id) REFERENCES campus.tbl_pruefungsanmeldung (pruefungsanmeldung_id) ON DELETE RESTRICT ON UPDATE CASCADE;";
 
 	if(!$db->db_query($qry))
-		echo '<strong>lehre.tbl_pruefung: '.$db->db_last_error().'</strong><br>';
+		echo '<br><strong>lehre.tbl_pruefung: '.$db->db_last_error().'</strong><br>';
 	else
-		echo 'lehre.tbl_pruefung: Spalte pruefungsanmeldung_id hinzugefuegt';
+		echo '<br>lehre.tbl_pruefung: Spalte pruefungsanmeldung_id hinzugefuegt';
 }
 
 // pruefungsintervall in campus.tbl_pruefung
@@ -1531,11 +1531,96 @@ if($result = $db->db_query("SELECT * FROM pg_class WHERE relname='idx_reservieru
 				CREATE INDEX idx_reservierung_stunde ON campus.tbl_reservierung USING btree (stunde);";
 	
 		if(!$db->db_query($qry))
-			echo '<strong>Indizes: '.$db->db_last_error().'</strong><br>';
+			echo '<br><strong>Indizes: '.$db->db_last_error().'</strong><br>';
 		else
-			echo 'Diverse Indizes fuer Tabelle Reservierung hinzugefügt';
+			echo '<br>Diverse Indizes fuer Tabelle Reservierung hinzugefügt';
 	}
 }
+
+// vw_student erweitern
+if(!$result = @$db->db_query("SELECT aktivierungscode FROM campus.vw_student"))
+{
+	$qry = "CREATE OR REPLACE VIEW campus.vw_student AS
+		SELECT 
+			tbl_benutzer.uid, tbl_student.matrikelnr, tbl_student.prestudent_id, tbl_student.studiengang_kz, tbl_student.semester, 
+			tbl_student.verband, tbl_student.gruppe, tbl_benutzer.person_id, tbl_benutzer.alias, tbl_person.geburtsnation, tbl_person.sprache, 
+			tbl_person.anrede, tbl_person.titelpost, tbl_person.titelpre, tbl_person.nachname, tbl_person.vorname, tbl_person.vornamen, tbl_person.gebdatum, 
+			tbl_person.gebort, tbl_person.gebzeit, tbl_person.foto, tbl_person.anmerkung, tbl_person.homepage, tbl_person.svnr, tbl_person.ersatzkennzeichen, 
+			tbl_person.geschlecht, tbl_person.familienstand, tbl_person.anzahlkinder, tbl_benutzer.aktiv, tbl_student.updateamum, tbl_student.updatevon, 
+			tbl_student.insertamum, tbl_student.insertvon, tbl_student.ext_id, tbl_benutzer.updateaktivam, tbl_benutzer.updateaktivvon,
+			tbl_benutzer.aktivierungscode, 
+			(SELECT kontakt FROM public.tbl_kontakt WHERE person_id=tbl_person.person_id AND kontakttyp='email' ORDER BY zustellung desc Limit 1) as email_privat
+		FROM 
+			public.tbl_student
+			JOIN public.tbl_benutzer ON tbl_student.student_uid::text = tbl_benutzer.uid::text
+			JOIN public.tbl_person USING (person_id);";
+
+	if(!$db->db_query($qry))
+		echo '<br><strong>campus.vw_student: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>campus.vw_student: Neue Spalten aktivierungscode und email_privat zur View hinzugefuegt';
+}
+
+// vw_mitarbeiter erweitern
+if(!$result = @$db->db_query("SELECT aktivierungscode FROM campus.vw_mitarbeiter"))
+{
+	$qry = "CREATE OR REPLACE VIEW campus.vw_mitarbeiter AS
+	SELECT tbl_benutzer.uid, tbl_mitarbeiter.ausbildungcode, tbl_mitarbeiter.personalnummer, tbl_mitarbeiter.kurzbz, tbl_mitarbeiter.lektor, 
+			tbl_mitarbeiter.fixangestellt, tbl_mitarbeiter.telefonklappe, tbl_benutzer.person_id, tbl_benutzer.alias, tbl_person.geburtsnation, 
+			tbl_person.sprache, tbl_person.anrede, tbl_person.titelpost, tbl_person.titelpre, tbl_person.nachname, tbl_person.vorname, tbl_person.vornamen,
+			tbl_person.gebdatum, tbl_person.gebort, tbl_person.gebzeit, tbl_person.foto, tbl_mitarbeiter.anmerkung, tbl_person.homepage, tbl_person.svnr, 
+			tbl_person.ersatzkennzeichen, tbl_person.geschlecht, tbl_person.familienstand, tbl_person.anzahlkinder, tbl_mitarbeiter.ort_kurzbz, tbl_benutzer.aktiv, 
+			tbl_mitarbeiter.bismelden, tbl_mitarbeiter.standort_id, tbl_mitarbeiter.updateamum, tbl_mitarbeiter.updatevon, tbl_mitarbeiter.insertamum, 
+			tbl_mitarbeiter.insertvon, tbl_mitarbeiter.ext_id, tbl_benutzer.aktivierungscode,
+			(SELECT kontakt FROM public.tbl_kontakt WHERE person_id=tbl_person.person_id AND kontakttyp='email' ORDER BY zustellung desc Limit 1) as email_privat
+			
+	FROM public.tbl_mitarbeiter
+	JOIN public.tbl_benutzer ON tbl_mitarbeiter.mitarbeiter_uid::text = tbl_benutzer.uid::text
+	JOIN public.tbl_person USING (person_id);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>campus.vw_mitarbeiter: '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'campus.vw_mitarbeiter: Neue Spalten aktivierungscode und email_privat zur View hinzugefuegt';
+}
+// Ampel boolean email
+if(!$result = @$db->db_query("SELECT email FROM public.tbl_ampel"))
+{
+	$qry = "ALTER TABLE public.tbl_ampel ADD COLUMN email boolean DEFAULT false NOT NULL";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_ampel: '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'public.tbl_ampel: Neue Spalte email hinzugefügt';
+}
+
+// Fehlender Foreign Key
+if($result = @$db->db_query("SELECT * FROM information_schema.table_constraints WHERE constraint_name='fk_pruefungsanmeldung_pruefungstermin_id'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = 'ALTER TABLE campus.tbl_pruefungsanmeldung ADD CONSTRAINT fk_pruefungsanmeldung_pruefungstermin_id FOREIGN KEY (pruefungstermin_id) REFERENCES campus.tbl_pruefungstermin(pruefungstermin_id) ON DELETE RESTRICT ON UPDATE CASCADE;';
+		
+	
+		if(!$db->db_query($qry))
+			echo '<strong>campus.tbl_pruefungsanmeldung: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'campus.tbl_pruefungsanmeldung: Fehlenden Foreign Key zu Pruefungstermin hinzugefügt';
+	}
+}
+// Ampel boolean email
+if(!$result = @$db->db_query("SELECT ort_kurzbz FROM campus.tbl_pruefungstermin"))
+{
+	$qry = "ALTER TABLE campus.tbl_pruefungstermin ADD COLUMN ort_kurzbz varchar(16);
+	ALTER TABLE campus.tbl_pruefungstermin ADD CONSTRAINT fk_pruefungstermin_ort_ort_kurzbz FOREIGN KEY (ort_kurzbz) REFERENCES public.tbl_ort(ort_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_pruefungstermin: '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'campus.tbl_pruefungstermin: Neue Spalte ort_kurzbz hinzugefügt';
+}
+
+
 
 echo '<br><br><br>';
 
@@ -1598,7 +1683,7 @@ $tabellen=array(
 	"campus.tbl_paabgabe"  => array("paabgabe_id","projektarbeit_id","paabgabetyp_kurzbz","fixtermin","datum","kurzbz","abgabedatum", "insertvon","insertamum","updatevon","updateamum"),
 	"campus.tbl_pruefungsfenster" => array("pruefungsfenster_id","studiensemester_kurzbz","oe_kurzbz","start","ende"),
 	"campus.tbl_pruefung" => array("pruefung_id","mitarbeiter_uid","studiensemester_kurzbz","pruefungsfenster_id","pruefungstyp_kurzbz","titel","beschreibung","methode","einzeln","storniert","insertvon","insertamum","updatevon","updateamum"),
-	"campus.tbl_pruefungstermin" => array("pruefungstermin_id","pruefung_id","von","bis","teilnehmer_max","teilnehmer_min","anmeldung_von","anmeldung_bis"),
+	"campus.tbl_pruefungstermin" => array("pruefungstermin_id","pruefung_id","von","bis","teilnehmer_max","teilnehmer_min","anmeldung_von","anmeldung_bis","ort_kurzbz"),
 	"campus.tbl_pruefungsanmeldung" => array("pruefungsanmeldung_id","uid","pruefungstermin_id","lehrveranstaltung_id","status_kurzbz","wuensche","reihung","kommentar"),
 	"campus.tbl_pruefungsstatus" => array("status_kurzbz","bezeichnung"),
 	"campus.tbl_reservierung"  => array("reservierung_id","ort_kurzbz","studiengang_kz","uid","stunde","datum","titel","beschreibung","semester","verband","gruppe","gruppe_kurzbz","veranstaltung_id","insertamum","insertvon"),
@@ -1667,7 +1752,7 @@ $tabellen=array(
 	"lehre.tbl_zeugnisnote"  => array("lehrveranstaltung_id","student_uid","studiensemester_kurzbz","note","uebernahmedatum","benotungsdatum","bemerkung","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_adresse"  => array("adresse_id","person_id","name","strasse","plz","ort","gemeinde","nation","typ","heimatadresse","zustelladresse","firma_id","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id","dms_id","nachgereicht","anmerkung","titel_intern","anmerkung_intern"),
-	"public.tbl_ampel"  => array("ampel_id","kurzbz","beschreibung","benutzer_select","deadline","vorlaufzeit","verfallszeit","insertamum","insertvon","updateamum","updatevon"),
+	"public.tbl_ampel"  => array("ampel_id","kurzbz","beschreibung","benutzer_select","deadline","vorlaufzeit","verfallszeit","insertamum","insertvon","updateamum","updatevon","email"),
 	"public.tbl_ampel_benutzer_bestaetigt"  => array("ampel_benutzer_bestaetigt_id","ampel_id","uid","insertamum","insertvon"),
 	"public.tbl_aufmerksamdurch"  => array("aufmerksamdurch_kurzbz","beschreibung","ext_id"),
 	"public.tbl_aufnahmeschluessel"  => array("aufnahmeschluessel"),
