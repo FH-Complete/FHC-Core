@@ -90,9 +90,35 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//DE" "http://www
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 		<link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
-
-		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-		<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script> 
+		<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
+		<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
+		<script type="text/javascript">
+		$(document).ready(function() 
+			{ 
+				$("#t1").tablesorter(
+					{
+						sortList: [[1,0],[3,0]],
+						widgets: ["zebra"]
+					}); 
+				$("#t2").tablesorter(
+					{
+						sortList: [[6,0],[5,0]],
+						widgets: ["zebra"]
+					}); 
+				$("#t3").tablesorter(
+					{
+						sortList: [[0,0],[1,0],[3,0]],
+						widgets: ["zebra"]
+					}); 
+				$("#t4").tablesorter(
+					{
+						sortList: [[2,0],[3,0]],
+						widgets: ["zebra"],
+						headers: {5:{sorter:false}}
+					}); 
+			});
+		</script>
+		
 	</head>
 	<body class="Background_main">
 	<h2>Reihungstest - Administration</h2>';
@@ -133,7 +159,7 @@ if(isset($_GET['action']) && $_GET['action']=='showreihungstests')
 	
 	if($result = $db->db_query($qry))
 	{
-		echo '<table class="liste table-stripeclass:alternate table-autostripe">
+		echo '<table id="t1" class="tablesorter">
 				<thead>
 					<tr>
 						<th>Kurzbz</th>
@@ -171,24 +197,46 @@ $ps->getPrestudentRT($datum,true);
 if ($ps->num_rows==0)
 	$ps->getPrestudentRT($datum);
 	
-echo '<hr><br>Antworten eines Gebietes einer Person löschen<br>';
-echo '<form action="'.$_SERVER['PHP_SELF'].'" method="post" onsubmit="return confirm(\'Antworten dieses Gebietes wirklich löschen?\')">
-		Person: <SELECT name="prestudent">';
+echo '<hr><br>Antworten eines Prüflings löschen<br>';
+echo '<form name="teilgebiet_loeschen" action="'.$_SERVER['PHP_SELF'].'" method="POST">
+		Prüfling: <SELECT name="prestudent" onchange="document.teilgebiet_loeschen.submit();">';
+echo '<OPTION value="">-- Name auswählen --</OPTION>';
 foreach($ps->result as $prestd)
 {
+	$stg = new studiengang();
+	$stg->load($prestd->studiengang_kz);
 	if(isset($_POST['prestudent']) && $_POST['prestudent']==$prestd->prestudent_id)
 		$selected='selected';
 	else
 		$selected='';
 	
-	echo '<OPTION value="'.$prestd->prestudent_id.'" '.$selected.'>'.$prestd->nachname.' '.$prestd->vorname.'; ID='.$prestd->prestudent_id.'; '.$prestd->gebdatum."</OPTION>\n";
+	echo '<OPTION value="'.$prestd->prestudent_id.'" '.$selected.'>'.$prestd->nachname.' '.$prestd->vorname.', '.(strtoupper($stg->typ.$stg->kurzbz)).'; ID='.$prestd->prestudent_id.'; '.$prestd->gebdatum."</OPTION>\n";
 }
 echo '</SELECT>';
 
-$qry = "SELECT * FROM testtool.tbl_gebiet ORDER BY bezeichnung";
+if(isset($_POST['prestudent']) && is_numeric($_POST['prestudent']))
+	$prestudent_id = $_POST['prestudent'];
+else 
+	$prestudent_id = '';
+
+if ($prestudent_id!='')
+{
+	$qry = "SELECT DISTINCT(tbl_gebiet.gebiet_id),tbl_gebiet.bezeichnung,tbl_gebiet.kurzbz FROM testtool.tbl_gebiet 
+			JOIN testtool.tbl_ablauf USING (gebiet_id)
+			JOIN public.tbl_prestudent USING (studiengang_kz)
+			WHERE tbl_prestudent.prestudent_id = ".$prestudent_id."
+			ORDER BY bezeichnung";
+}
+else
+{
+	$qry = "SELECT * FROM testtool.tbl_gebiet ORDER BY bezeichnung";
+}
+
 if($result = $db->db_query($qry))
 {
-	echo 'Gebiet: <SELECT name="gebiet">';
+	echo ' Gebiet: <SELECT name="gebiet">';
+	echo '<OPTION value="">-- Gebiet auswählen --</OPTION>';
+	echo '<OPTION value="alle">-- Alle Gebiete --</OPTION>';
 	while($row = $db->db_fetch_object($result))
 	{
 		if(isset($_POST['gebiet']) && $_POST['gebiet']==$row->gebiet_id)
@@ -201,7 +249,7 @@ if($result = $db->db_query($qry))
 	echo '</SELECT>';
 }
 
-echo '<input type="submit" value="Teilgebiet l&ouml;schen" name="deleteteilgebiet">&nbsp;&nbsp;&nbsp;&nbsp;';
+echo '<input type="submit" value="Dieses Teilgebiet l&ouml;schen" name="deleteteilgebiet" onclick="return confirm(\'Antworten dieses Gebietes wirklich löschen?\')">&nbsp;&nbsp;&nbsp;&nbsp;';
 if(isset($_POST['deleteteilgebiet']))
 {
 	if(isset($_POST['prestudent']) && isset($_POST['gebiet']) && 
@@ -226,13 +274,15 @@ if(isset($_POST['deleteteilgebiet']))
 		else 
 			echo '<b>Fehler beim Löschen der Daten</b>';
 	}
+	else 
+		echo '<span class="error">Wählen Sie bitte ein Gebiet, dessen Antworten Sie löschen wollen</span>';
 }
 
-echo '<input type="submit" value="! Alle Teilgebiete l&ouml;schen !" name="delete_all"></form>';
+echo '<input type="submit" value="! Alle Teilgebiete l&ouml;schen !" name="delete_all" onclick="return confirm(\'Wollen Sie wirklich ALLE Antworten des Prüflings löschen?\')"></form>';
 if(isset($_POST['delete_all']))
 {
 	if(isset($_POST['prestudent']) && isset($_POST['gebiet']) && 
-	   is_numeric($_POST['prestudent']) && is_numeric($_POST['gebiet']))
+	   is_numeric($_POST['prestudent']) && ($_POST['gebiet'])=='alle')
 	{
 		$pruefling = new pruefling();
 		$pruefling->getPruefling($_POST['prestudent']);
@@ -250,6 +300,8 @@ if(isset($_POST['delete_all']))
 		else 
 			echo '<b>Fehler beim Löschen der Daten</b>';
 	}
+	else 
+		echo '<span class="error">Um alle Antworten eines Prüflings zu löschen, wählen Sie im DropDown bitte "Alle Gebiete" aus</span>';
 }
 
 // Testergebnisse anzeigen
@@ -271,7 +323,7 @@ if(isset($_POST['testergebnisanzeigen']) && isset($_POST['prestudent_id']))
 				ORDER BY kurzbz,tbl_pruefling_frage.begintime,nummer";
 		if($result = $db->db_query($qry))
 		{
-			echo '<table class="liste table-stripeclass:alternate table-autostripe">
+			echo '<table id="t2" class="tablesorter">
 					<thead>
 					<tr>
 						<th>Nachname</th>
@@ -358,7 +410,7 @@ echo '</SELECT>
 ';
 
 // Hinzufuegen von Personen zum RT
-echo '<hr><br>Personen zum RT hinzufuegen';
+echo '<hr><br>Personen zum RT hinzufügen';
 
 $rt = new reihungstest();
 $rt->getAll(date('Y-m-d'));
@@ -370,11 +422,13 @@ Person <input id="prestudent_name" name="prestudent_name" size="32" maxlength="3
 ';
 foreach($rt->result as $row)
 {
+	$stg = new studiengang();
+	$stg->load($row->studiengang_kz);
 	if($row->datum==date('Y-m-d'))
 		$selected='selected';
 	else
 		$selected='';
-	echo '<OPTION value="'.$row->reihungstest_id.'" '.$selected.'>'.$row->datum.' '.$row->uhrzeit.' '.$row->anmerkung.'</OPTION>';
+	echo '<OPTION value="'.$row->reihungstest_id.'" '.$selected.'>'.$row->datum.' '.$row->uhrzeit.' '.(strtoupper($stg->typ.$stg->kurzbz)).' '.$row->ort_kurzbz.' '.$row->anmerkung.'</OPTION>';
 }
 echo '</SELECT>
 <input type="submit" value="zuteilen" name="personzuteilen">
@@ -483,27 +537,24 @@ if ($studiengang_kz!=1 && $num_rows!=0)
 	if($result = $db->db_query($qry))
 	{
 		$num_rows=$db->db_num_rows($result);
-		echo "<table class='liste table-stripeclass:alternate table-autostripe' border='0' style='width:auto'>
-		
-			<tbody style='width:auto; padding-left:10px'>";
-		
-		echo "<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>STG</th>
-		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>SEM</th>
-		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>KZ</th>
-		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>NR</th>
-		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Gebiet_id</th>
-		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Bezeichnung</th>
-		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Zeit</th>
-		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'><div title='Multiple Response' style='cursor:help'>MR</div></th>
-		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Maxfragen</th>
-		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'><div title='Zufallsfrage' style='cursor:help'>ZFF</div></th>
-		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'><div title='Zufallsvorschlag' style='cursor:help'>ZFV</div></th>
-		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Level-Start</th>
-		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Level auf</th>
-		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Level ab</th>
-		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'><div title='Levelgleichverteilung' style='cursor:help'>LGV</div></th>
-		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'>Maxpunkte</th>
-		<th style='padding-left:5px; padding-right:5px' class='table-sortable:default'><div title='Antwortenprozeile' style='cursor:help'>AWPZ</div></th>\n";
+		echo "<table id='t3' class='tablesorter'><thead><tr>";		
+		echo "	<th>STG</th>
+				<th>SEM</th>
+				<th>KZ</th>
+				<th>NR</th>
+				<th>Gebiet_id</th>
+				<th>Bezeichnung</th>
+				<th>Zeit</th>
+				<th><div title='Multiple Response' style='cursor:help'>MR</div></th>
+				<th>Maxfragen</th>
+				<th><div title='Zufallsfrage' style='cursor:help'>ZFF</div></th>
+				<th><div title='Zufallsvorschlag' style='cursor:help'>ZFV</div></th>
+				<th>Level-Start</th>
+				<th>Level auf</th>
+				<th>Level ab</th>
+				<th><div title='Levelgleichverteilung' style='cursor:help'>LGV</div></th>
+				<th>Maxpunkte</th>
+				<th><div title='Antwortenprozeile' style='cursor:help'>AWPZ</div></th>\n";
 		echo "</tr></thead>";
 		echo "<tbody>";
 		for($i=0;$i<$num_rows;$i++)
@@ -538,6 +589,8 @@ if ($studiengang_kz!=1 && $num_rows!=0)
 		   <td align='center'>$row->antwortenprozeile</td>";
 		   echo "</tr>\n";
 		}
+		echo "</tbody>";
+		echo "<tfooter>";
 		echo "<tr>";
 		echo "<td></td>";
 		echo "<td></td>";
@@ -557,11 +610,11 @@ if ($studiengang_kz!=1 && $num_rows!=0)
 		echo "<td></td>";
 		echo "<td></td>";
 		echo "</tr>\n";
+		echo "</tfooter></table>";
 	}
 	else
 		echo "Kein Eintrag gefunden!";
-
-	echo "</tbody></table>";
+		
 	if ($persoenlichkeit)
 		echo "<div style='font-size:smaller'>*Das Gebiet Persönlichkeit ist mit 60 Minuten eingestellt, kann aber in der Regel in 15-20 Minuten bearbeitet werden.</div>";
 	
@@ -588,23 +641,24 @@ if(isset($_GET['action']) && $_GET['action']=='sperren')
 	}
 }
 
-$qry = "SELECT * FROM public.tbl_reihungstest WHERE freigeschaltet ORDER BY datum";
+$qry = "SELECT tbl_reihungstest.*,UPPER(tbl_studiengang.typ||tbl_studiengang.kurzbz)AS studiengang FROM public.tbl_reihungstest 
+		JOIN public.tbl_studiengang USING(studiengang_kz) WHERE freigeschaltet ORDER BY datum";
 
 if($result = $db->db_query($qry))
 {
-	echo '<table class="liste">';
-	echo '<tr>
+	echo '<table id="t4" class="tablesorter">';
+	echo '<thead><tr>
 			<th>Stg</th>
 			<th>Ort</th>
 			<th>Datum</th>
 			<th>Uhrzeit</th>
 			<th>Anmerkung</th>
 			<th>Action</th>
-		</tr>';
+		</tr></thead><tbody>';
 	while($row = $db->db_fetch_object($result))
 	{
 		echo '<tr>';
-		echo '<td>'.$row->studiengang_kz.'</td>';
+		echo '<td>'.$row->studiengang.'</td>';
 		echo '<td>'.$row->ort_kurzbz.'</td>';
 		echo '<td>'.$row->datum.'</td>';
 		echo '<td>'.$row->uhrzeit.'</td>';
@@ -612,7 +666,7 @@ if($result = $db->db_query($qry))
 		echo '<td><a href="'.$_SERVER['PHP_SELF'].'?action=sperren&reihungstest_id='.$row->reihungstest_id.'">Sperren</a></td>';
 		echo '</tr>';
 	}
-	echo '</table>';
+	echo '</tbody></table>';
 }
 
 	
