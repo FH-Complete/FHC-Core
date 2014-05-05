@@ -33,7 +33,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/lehreinheit.class.php');
 require_once('../include/lehreinheitgruppe.class.php');
-require_once('../include/lehrfach.class.php');
+require_once('../include/lehrveranstaltung.class.php');
 
 $lehreinheit_id = (isset($_GET['lehreinheit_id'])?$_GET['lehreinheit_id']:'');
 $lehrveranstaltung_id = (isset($_GET['lehrveranstaltung_id'])?$_GET['lehrveranstaltung_id']:'');
@@ -130,7 +130,7 @@ function draw_row($row)
 		if($row_std = $db->db_fetch_object())
 			$anzahl_studenten = $row_std->anz;
 	
-	$lehrfach = new lehrfach();
+	$lehrfach = new lehrveranstaltung();
 	$lehrfach->load($row->lehrfach_id);
 	
 	echo '
