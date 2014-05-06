@@ -459,6 +459,9 @@ class pruefungCis extends basis_db
                 $obj->bis = $row->bis;
                 $obj->max = $row->teilnehmer_max;
                 $obj->min = $row->teilnehmer_min;
+		$obj->anmeldung_von= $row->anmeldung_von;
+                $obj->anmeldung_bis = $row->anmeldung_bis;
+		$obj->ort_kurzbz = $row->ort_kurzbz;
                 array_push($this->termine, $obj);
             }
             return true;
@@ -495,7 +498,7 @@ class pruefungCis extends basis_db
                 . 'bis='.$this->db_add_param($ende).', '
                 . 'teilnehmer_max='.$this->db_add_param($max).', '
                 . 'teilnehmer_min='.$this->db_add_param($min).' '
-                . 'WHERE pruefungstermin_id='.$this->db_add_param($pruefungstermin_id).';';
+		. 'WHERE pruefungstermin_id='.$this->db_add_param($pruefungstermin_id).';';
         
         if(!$this->db_query($qry))
         {
