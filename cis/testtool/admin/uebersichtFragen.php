@@ -21,6 +21,8 @@ require_once("../../../config/cis.config.inc.php");
 require_once("../../../include/gebiet.class.php");
 require_once("../../../include/frage.class.php");
 require_once("../../../include/vorschlag.class.php");
+require_once('../../../include/functions.inc.php');
+require_once("../../../include/benutzerberechtigung.class.php");
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de">
@@ -31,6 +33,13 @@ require_once("../../../include/vorschlag.class.php");
 </head>
 <body>
 <?php 
+$user = get_uid();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('basis/testtool', null, 's'))
+	die('<span class="error">Sie haben keine Berechtigung für diese Seite</span>');
+
 $gebiet = new gebiet(); 
 $gebiet->getAll(); 
 $sprache = (isset($_REQUEST['Sprache'])?$_REQUEST['Sprache']:'German');
