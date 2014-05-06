@@ -215,7 +215,7 @@ function validateRequest($parameter)
 		return false; 
 	}
 	
-	if(mb_strlen($parameter->Matrikelnummer) >15  || $parameter->Matrikelnummer == '' || !is_numeric($parameter->Matrikelnummer))
+	if(mb_strlen($parameter->Matrikelnummer) >15  || $parameter->Matrikelnummer == '')
 	{
 		$fehler = '9';
 		return false; 
