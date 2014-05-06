@@ -34,6 +34,9 @@ class pruefungstermin extends basis_db{
     public $bis;                    //timestamp without timezone
     public $teilnehmer_max;         //smallint
     public $teilnehmer_min;         //smallint
+    public $anmeldung_von;	    //date
+    public $anmeldung_bis;	    //date
+    public $ort_kurzbz;		    //varchar(16)
     
     /**
      * Konstruktor
@@ -86,6 +89,9 @@ class pruefungstermin extends basis_db{
                 $this->bis = $row->bis;
                 $this->teilnehmer_max = $row->teilnehmer_max;
                 $this->teilnehmer_min = $row->teilnehmer_min;
+		$this->anmeldung_von= $row->anmeldung_von;
+                $this->anmeldung_bis = $row->anmeldung_bis;
+		$this->ort_kurzbz = $row->ort_kurzbz;
             }
             return true;
         }
@@ -150,5 +156,33 @@ class pruefungstermin extends basis_db{
             return false;
         }
         return false;
+    }
+    
+    public function save($new = false)
+    {
+	if($new)
+	{
+	    
+	}
+	else
+	{
+	    $qry = 'UPDATE campus.tbl_pruefungstermin SET '
+		    . 'pruefung_id='.$this->db_add_param($this->pruefung_id).', '
+		    . 'von='.$this->db_add_param($this->von).', '
+		    . 'bis='.$this->db_add_param($this->bis).', '
+		    . 'teilnehmer_max='.$this->db_add_param($this->teilnehmer_max).', '
+		    . 'teilnehmer_min='.$this->db_add_param($this->teilnehmer_min).', '
+		    . 'anmeldung_von='.$this->db_add_param($this->anmeldung_von).', '
+		    . 'anmeldung_bis='.$this->db_add_param($this->anmeldung_bis).', '
+		    . 'ort_kurzbz='.$this->db_add_param($this->ort_kurzbz).' '
+		    . 'WHERE pruefungstermin_id='.$this->db_add_param($this->pruefungstermin_id).';';
+	}
+	
+	if($this->db_query($qry))
+	{
+	    return true;
+	}
+	
+	return false;
     }
 }

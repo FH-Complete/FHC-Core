@@ -300,9 +300,15 @@ function writePruefungsTable(e, data, anmeldung)
 		termin = termin.getDate()+"."+(termin.getMonth()+1)+"."+termin.getFullYear();
 		frist = frist.getTime();
 		frist = frist - (3*24*60*60*1000);
-		frist = new Date(frist);
-		frist = frist.getDate()+"."+(frist.getMonth()+1)+"."+frist.getFullYear();
-		if(anmeldung || e.lehrveranstaltung[0].angemeldet)
+		var fristDate = new Date(frist);
+		frist = fristDate.getDate()+"."+(fristDate.getMonth()+1)+"."+fristDate.getFullYear();
+
+		if(fristDate < new Date())
+		{
+			if(!storno)
+				button = "<p><span style='display: inline-block; width: 155px;'>Frist abgelaufen</span></br>";
+		}
+		else if(anmeldung || e.lehrveranstaltung[0].angemeldet)
 		{
 			if(storno)
 			{
@@ -631,13 +637,16 @@ function showAnmeldungen(pruefungstermin_id, lehrveranstaltung_id)
 
 function writeAnmeldungen(data)
 {
+	console.log(data);
 	if(data.error === 'false')
 	{
-		var terminId = data.result[0].pruefungstermin_id;
-		var lehrveranstaltung_id = data.result[0].lehrveranstaltung_id;
+		var terminId = data.result.anmeldungen[0].pruefungstermin_id;
+		var pruefung_id = data.result.anmeldungen[0].pruefung_id;
+		var lehrveranstaltung_id = data.result.anmeldungen[0].lehrveranstaltung_id;
+		var ort_kurzbz = data.result.ort_kurzbz;
 		var liste = "<ul id='sortable'>";
 		var count = 0;
-		data.result.forEach(function(d){
+		data.result.anmeldungen.forEach(function(d){
 			count++;
 			var vorname = d.student.vorname !== "null" ? d.student.vorname : "";
 			var nachname = d.student.nachname !== "null" ? d.student.nachname : "";
@@ -669,6 +678,15 @@ function writeAnmeldungen(data)
 		liste += "</ul>";
 		$("#reihungSpeichernButton").html("<input type='button' value='Reihung speichern' onclick='saveReihung(\""+terminId+"\", \""+lehrveranstaltung_id+"\");'>");
 		$("#anmeldeDaten").html(liste);
+		if(ort_kurzbz !== null)
+		{
+			$("#raumLink").html("<span>Prüfungsraum: </span>"+ort_kurzbz);
+		} 
+		else
+		{
+			$("#raumLink").html("<a href='#' onclick='openRaumDialog(\""+terminId+"\", \""+lehrveranstaltung_id+"\");'>Prüfungsort</a>");
+		}
+		
 		$(document).tooltip({
 			position: {
 				at: "right center",
@@ -682,8 +700,17 @@ function writeAnmeldungen(data)
 		$("#reihungSpeichernButton").empty();
 		$("#kommentar").empty();
 		$("#kommentarSpeichernButton").empty();
+		$("#raumLink").empty();
 		messageBox("message", data.errormsg, "red", "highlight", 1000);
 	}
+}
+
+function openRaumDialog(terminId, lehrveranstaltung_id)
+{
+	getRaeume(terminId);
+	$("#raum").html('<h2>Prüfungsraum</h2><input onChange="changeStateOfRaumDropdown();" type="checkbox" /><span> im Büro</span></br><span style="font-weight: bold;">Raum: </span><select id="raeumeDropdown"></select>');
+	$("#raumSpeichernButton").html("<input type='button' value='Raum speichern' onclick='saveRaum(\""+terminId+"\", \""+lehrveranstaltung_id+"\");'/>");
+	$("#raumDialog").dialog("open");
 }
 
 /**
@@ -827,6 +854,7 @@ function loadPruefungStudiengang(studiengang_kz)
 		},
 		error: loadError
 	}).success(function(data){
+		console.log(data);
 		if(data.error === 'false')
 		{
 			$("#pruefungenListe").empty();
@@ -1824,4 +1852,68 @@ function checkMinMaxTeilnehmer(min, max)
 		}
 	}
 	return true;
+}
+
+function changeStateOfRaumDropdown()
+{
+	console.log($("#raum input[type=checkbox]").prop("checked"));
+	if($("#raum input[type=checkbox]").prop("checked") === true)
+	{
+		$("#raeumeDropdown").css("visibility", "hidden");
+		$("#raeumeDropdown").prev().css("visibility", "hidden");
+	}
+	else
+	{
+		$("#raeumeDropdown").css("visibility", "visible");
+		$("#raeumeDropdown").prev().css("visibility", "visible");
+	}
+}
+
+function saveRaum(terminId, lehrveranstaltung_id)
+{
+	var ort_kurzbz;
+	if($("#raum input[type=checkbox]").prop("checked") === true)
+	{
+		ort_kurzbz = "buero";
+	}
+	else
+	{
+		ort_kurzbz = $("#raeumeDropdown").val();
+	}
+	$.ajax({
+		dataType: 'json',
+		url: "./pruefungsanmeldung.json.php",
+		type: "POST",
+		data: {
+			method: "saveRaum",
+			ort_kurzbz: ort_kurzbz,
+			terminId: terminId
+		},
+		error: loadError
+	}).success(function(data){
+		console.log(data);
+		$("#raumDialog").dialog("close");
+		showAnmeldungen(terminId, lehrveranstaltung_id);
+	});
+}
+
+function getRaeume(terminId)
+{
+	$.ajax({
+		dataType: 'json',
+		url: "./pruefungsanmeldung.json.php",
+		type: "POST",
+		data: {
+			method: "getAllFreieRaeume",
+			terminId: terminId
+		},
+		error: loadError
+	}).success(function(data){
+		console.log(data);
+		var liste = "";
+		data.result.forEach(function(d){
+			liste += "<option value="+d.ort_kurzbz+">"+d.ort_kurzbz+"</option>"
+		});
+		$("#raeumeDropdown").html(liste);
+	});
 }

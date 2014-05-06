@@ -120,8 +120,12 @@ if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungA
 		overflow-x: hidden;
 	    }
 	    
-	    #anmeldungen > div, h2 {
+	    #anmeldungen > * {
 		padding: 0.5em;
+	    }
+	    
+	    #raum > * {
+		margin-bottom: 0.5em;
 	    }
 	    
 	    #message {
@@ -199,12 +203,18 @@ if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungA
 		font-size: 1em;
 		font-weight: bold;
 	    }
+	    
 	</style>
     </head>
     <body>
 	<script>
 	    $(document).ready(function(){
 		loadStudiengaenge();
+		$("#raumDialog").dialog({
+		    modal: true,
+		    autoOpen: false,
+		    width: "400px"
+		});
 	    });
 	</script>
 	<h1>Anmeldungen Verwalten</h1>
@@ -238,6 +248,17 @@ if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungA
 		</div>
 		<div id="kommentarSpeichernButton">
 		    
+		</div>
+		<div id="raumLink">
+		    
+		</div>
+		<div id="raumDialog">
+		    <div id="raum">
+		    
+		    </div>
+		    <div id="raumSpeichernButton">
+
+		    </div>
 		</div>
 	    </div>
 	</div>

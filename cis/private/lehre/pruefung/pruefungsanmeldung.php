@@ -107,10 +107,8 @@ $benutzer = new student($uid);
 	    
 	    #accordion p {
 		margin: 0;
+		height: 24px;
 	    }
-/*            div {
-                float: left;
-            }*/
         </style>
         
     </head>

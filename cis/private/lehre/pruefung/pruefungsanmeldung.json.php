@@ -18,6 +18,11 @@ require_once('../../../../include/student.class.php');
 require_once('../../../../include/studiensemester.class.php');
 require_once('../../../../include/lehreinheit.class.php');
 require_once('../../../../include/studiengang.class.php');
+require_once('../../../../include/ort.class.php');
+require_once('../../../../include/stunde.class.php');
+require_once('../../../../include/reservierung.class.php');
+require_once('../../../../include/mitarbeiter.class.php');
+
 
 $uid = get_uid();
 
@@ -70,6 +75,15 @@ switch($method)
 	    break;
 	case 'saveKommentar':
 	    $data = saveKommentar();
+	    break;
+	case 'getAllFreieRaeume':
+	    $terminId = $_REQUEST["terminId"];
+	    $data = getAllFreieRaeume($terminId);
+	    break;
+	case 'saveRaum':
+	    $terminId = $_REQUEST["terminId"];
+	    $ort_kurzbz = $_REQUEST["ort_kurzbz"];
+	    $data = saveRaum($terminId, $ort_kurzbz, $uid);
 	    break;
 	default:
 	    break;
@@ -471,9 +485,10 @@ function getAnmeldungenTermin()
 {
     $lehrveranstaltung_id = $_REQUEST["lehrveranstaltung_id"];
     $pruefungstermin_id = $_REQUEST["pruefungstermin_id"];
+    $pruefungstermin = new pruefungstermin($pruefungstermin_id);
     $pruefungsanmeldung = new pruefungsanmeldung();
-    $anmeldungen = $pruefungsanmeldung->getAnmeldungenByTermin($pruefungstermin_id, $lehrveranstaltung_id);
-    foreach($anmeldungen as $a)
+    $pruefungstermin->anmeldungen = $pruefungsanmeldung->getAnmeldungenByTermin($pruefungstermin_id, $lehrveranstaltung_id);
+    foreach($pruefungstermin->anmeldungen as $a)
     {
 	$student = new student($a->uid);
 	$temp = new stdClass();
@@ -482,9 +497,9 @@ function getAnmeldungenTermin()
 	$temp->uid = $student->uid;
 	$a->student = $temp;
     }
-    if(!empty($anmeldungen))
+    if(!empty($pruefungstermin->anmeldungen))
     {
-	$data['result']=$anmeldungen;
+	$data['result']=$pruefungstermin;
 	$data['error']='false';
 	$data['errormsg']='';
     }
@@ -617,6 +632,10 @@ function getPruefungenStudiengang($uid, $aktStudiensemester)
     return $data;
 }
 
+/**
+ * 
+ * @return typespeichert ein Kommentar zu einer Prüfungsanmeldung
+ */
 function saveKommentar()
 {
     $kommentar = $_REQUEST["kommentar"];
@@ -634,6 +653,131 @@ function saveKommentar()
     {
 	$data['error']='true';
 	$data['errormsg']=$pruefungsanmeldung->errormsg;
+    }
+    return $data;
+}
+
+/**
+ * liefert alle freien Räume für einen Prüfungstermin
+ */
+function getAllFreieRaeume($terminId)
+{
+    $pruefungstermin = new pruefungstermin();
+    $pruefungstermin->load($terminId);
+    $ort = new ort();
+    $datum_von = explode(" ", $pruefungstermin->von);
+    $datum_bis = explode(" ", $pruefungstermin->bis);
+    $teilnehmer = $pruefungstermin->getNumberOfParticipants();
+    $teilnehmer = $teilnehmer !== false ? $teilnehmer : 0;
+    if($ort->search($datum_von[0], $datum_von[1], $datum_bis[1], null, $teilnehmer, true))
+    {	
+	usort($ort->result, "compareRaeume");
+	$data['result']=$ort->result;
+	$data['error']='false';
+	$data['errormsg']='';
+    }
+    else
+    {
+	$data['error']='true';
+	$data['errormsg']=$ort->errormsg;
+    }
+    return $data;
+}
+
+/**
+ * vergleicht die Kurzbezeichnungen von 2 Räumen
+ * @param $a Ort-Objekt
+ * @param $b Ort-Objekt
+ * @return $a < $b Wert < 0; $a > $b Wert > 0; $a = $b Wert 0
+ */
+function compareRaeume($a, $b)
+{
+    return strcmp($a->ort_kurzbz, $b->ort_kurzbz);
+}
+
+function saveRaum($terminId, $ort_kurzbz, $uid)
+{
+    $pruefungstermin = new pruefungstermin($terminId);
+    $stunde = new stunde();
+    $datum_von = explode(" ", $pruefungstermin->von);
+    $datum_bis = explode(" ", $pruefungstermin->bis);
+    $stunden = $stunde->getStunden($datum_von[1], $datum_bis[1]);
+    $reservierung = new reservierung();
+    $reserviert = false;
+    foreach($stunden as $h)
+    {
+	if($reservierung->isReserviert($ort_kurzbz, $datum_von[0], $h))
+	    $reserviert = true;
+    }
+    if(!$reserviert)
+    {	
+	$pruefung = new pruefungCis($pruefungstermin->pruefung_id);
+	$mitarbeiter = new mitarbeiter($pruefung->mitarbeiter_uid);
+	if($ort_kurzbz === "buero")
+	{
+	    $pruefungstermin->ort_kurzbz = $ort_kurzbz;
+	    if($pruefungstermin->save(false))
+	    {
+		$data['result']="reserviert";
+		$data['error']='false';
+		$data['errormsg']='';
+	    }
+	    else
+	    {
+		$data['error']='true';
+		$data['errormsg']=$pruefungstermin->errormsg;
+	    }
+	}
+	else
+	{
+	    $reservierung->studiengang_kz = "0";
+	    $reservierung->ort_kurzbz = $ort_kurzbz;
+	    $reservierung->uid = $pruefung->mitarbeiter_uid;
+	    $reservierung->datum = $datum_von[0];
+	    $reservierung->titel = $pruefung->titel;
+	    if(strlen($pruefung->titel) > 10)
+	    {
+		$reservierung->titel = "Prüfung";
+	    }
+	    $reservierung->beschreibung = "Prüfung";
+	    $reservierung->insertamum = date('Y-m-d G:i:s');
+	    $reservierung->insertvon = $uid;
+	    $reservierungError = false;
+	    
+	    foreach($stunden as $h)
+	    {
+		$reservierung->stunde = $h;
+		if(!$reservierung->save(true))
+		{
+		    $reservierungError = true;
+		}
+	    }
+	    if(!$reservierungError)
+	    {	
+		$pruefungstermin->ort_kurzbz = $reservierung->ort_kurzbz;
+		if($pruefungstermin->save(false))
+		{
+		    $data['result']="reserviert";
+		    $data['error']='false';
+		    $data['errormsg']='';
+		}
+		else
+		{
+		    $data['error']='true';
+		    $data['errormsg']=$pruefungstermin->errormsg;
+		}
+	    }
+	    else
+	    {
+		$data['error']='true';
+		$data['errormsg']=$reservierung->errormsg;
+	    }
+	}
+    }
+    else
+    {
+	$data['error']='true';
+	$data['errormsg']="Reservierung nicht möglich.";
     }
     return $data;
 }
