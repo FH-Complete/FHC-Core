@@ -96,7 +96,7 @@ function verifyData($parameters)
 		
 		// Überprüfe PLZ
 		$adresse = new adresse(); 
-		$adresse->load_pers($benutzer->Person_id); 
+		$adresse->load_pers($benutzer->person_id); 
 		
 		$foundAdr = false; 
 		foreach($adresse->result as $adr)
