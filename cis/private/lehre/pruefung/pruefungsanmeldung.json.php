@@ -715,7 +715,7 @@ function saveRaum($terminId, $ort_kurzbz, $uid)
 	$mitarbeiter = new mitarbeiter($pruefung->mitarbeiter_uid);
 	if($ort_kurzbz === "buero")
 	{
-	    $pruefungstermin->ort_kurzbz = $ort_kurzbz;
+	    $pruefungstermin->ort_kurzbz = $mitarbeiter->ort_kurzbz;
 	    if($pruefungstermin->save(false))
 	    {
 		$data['result']="reserviert";
