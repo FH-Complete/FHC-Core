@@ -637,7 +637,6 @@ function showAnmeldungen(pruefungstermin_id, lehrveranstaltung_id)
 
 function writeAnmeldungen(data)
 {
-	console.log(data);
 	if(data.error === 'false')
 	{
 		var terminId = data.result.anmeldungen[0].pruefungstermin_id;
@@ -819,7 +818,6 @@ function loadStudiengaenge()
 		},
 		error: loadError
 	}).success(function(data){
-		console.log(data);
 		$("#stgListe").empty();
 		if(data.error === 'false')
 		{
@@ -854,7 +852,6 @@ function loadPruefungStudiengang(studiengang_kz)
 		},
 		error: loadError
 	}).success(function(data){
-		console.log(data);
 		if(data.error === 'false')
 		{
 			$("#pruefungenListe").empty();
@@ -1748,13 +1745,14 @@ function loadAllPruefungen()
 
 /**
  * Prüft die Daten eines Termins auf deren Richtigkeit
- * Prüft ob die Beginnzeit vor der Endzeit liegt und ob beide Daten in der Zukunft liegen.
+ * Prüft ob die Beginnzeit vor der Endzeit liegt und ob beide Daten mindestens 14 Tage in der Zukunft liegen.
  * @param {Object} termin Object mit den Attributen datum (DD.MM.YYYY), beginn (HH:mm) und ende (HH:mm)
  * @returns {Boolean} TRUE, wenn die Daten korrekt sind, ansonsten FALSE
  */
 function checkTermin(termin)
 {
-	var aktTime = new Date();
+	var heute = new Date();
+	var aktTime = new Date(heute.getTime() + (14*24*60*60*1000));
 	var vonTime = stringToDate(termin.datum, termin.beginn);
 	var bisTime = stringToDate(termin.datum, termin.ende);
 	
@@ -1774,8 +1772,6 @@ function checkPruefungsintervall(intervall, termin)
 	var beginn = stringToDate(termin.datum, termin.beginn);
 	var ende = stringToDate(termin.datum, termin.ende);
 	var maxTeilnehmer = ((ende - beginn) / 1000 / 60 / intervall);
-	console.log(maxTeilnehmer);
-	console.log(termin.max);
 	if(maxTeilnehmer < termin.max)
 	{
 		return false;
@@ -1856,7 +1852,6 @@ function checkMinMaxTeilnehmer(min, max)
 
 function changeStateOfRaumDropdown()
 {
-	console.log($("#raum input[type=checkbox]").prop("checked"));
 	if($("#raum input[type=checkbox]").prop("checked") === true)
 	{
 		$("#raeumeDropdown").css("visibility", "hidden");
@@ -1891,7 +1886,6 @@ function saveRaum(terminId, lehrveranstaltung_id)
 		},
 		error: loadError
 	}).success(function(data){
-		console.log(data);
 		$("#raumDialog").dialog("close");
 		showAnmeldungen(terminId, lehrveranstaltung_id);
 	});
@@ -1909,7 +1903,6 @@ function getRaeume(terminId)
 		},
 		error: loadError
 	}).success(function(data){
-		console.log(data);
 		var liste = "";
 		data.result.forEach(function(d){
 			liste += "<option value="+d.ort_kurzbz+">"+d.ort_kurzbz+"</option>"
