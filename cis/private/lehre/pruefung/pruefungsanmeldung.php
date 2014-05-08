@@ -69,9 +69,9 @@ $benutzer = new student($uid);
 		/*border: 1px solid black;*/
 	    }
 	    
-	    #prfDetails {
+/*	    #prfDetails {
 		float:right;
-	    }
+	    }*/
 	    
 	    #accordion {
 		width: 60%;
@@ -142,6 +142,18 @@ $benutzer = new student($uid);
 		    width: "400px"
 		});
 		$("#dialog").dialog({ autoOpen: false });
+		
+		$("#details").dialog({
+		    modal: true,
+		    autoOpen: false,
+		    width: "400px"
+		});
+		$(document).tooltip({
+		    position: {
+			    at: "right center",
+			    my: "left+15 center"
+		    }
+		});
             });
 	    <?php
 	     echo '
@@ -154,7 +166,7 @@ $benutzer = new student($uid);
 	    ?>
         </script>
         <h1>Prüfungsanmeldung für <?php echo $benutzer->vorname." ".$benutzer->nachname." (".$uid.")"; ?></h1>
-	<div id="details">
+	<div id="details" title="Details">
 	    <div id="lvDetails">
 		<h1>LV-Details</h1>
                 <span class="titel">Bezeichnung: </span><span id="lvBez"></span><br/>
