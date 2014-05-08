@@ -73,53 +73,52 @@ if(isset($_GET['getAnmeldung']))
 	$anzahl=0;
 
 	// Die Anmeldung ist zur Lehrveranstaltung selbst und zu den dazu kompatiblen Lehrveranstaltungen moeglich
-	if($kompatibel = $lehrveranstaltung->loadLVkompatibel($lehrveranstaltung_id))
+	$kompatibel = $lehrveranstaltung->loadLVkompatibel($lehrveranstaltung_id);
+	
+	$kompatibel[]=$lehrveranstaltung_id;
+	$kompatibel = array_unique($kompatibel);
+	foreach($kompatibel as $lvid)
 	{
-		$kompatibel[]=$lehrveranstaltung_id;
-		$kompatibel = array_unique($kompatibel);
-		foreach($kompatibel as $lvid)
+		$lvangebot = new  lvangebot();
+		$lvangebot->getAllFromLvId($lvid, $stsem);
+		if(isset($lvangebot->result[0]))
 		{
-			$lvangebot = new  lvangebot();
-			$lvangebot->getAllFromLvId($lvid, $stsem);
-			if(isset($lvangebot->result[0]))
+			$lv = new lehrveranstaltung();
+			$lv->load($lvid);
+
+			$angebot = $lvangebot->result[0];
+			if($angebot->AnmeldungMoeglich())
 			{
-				$lv = new lehrveranstaltung();
-				$lv->load($lvid);
+				$anzahl++;
+				// LV wird angeboten und Anmeldefenster ist offen
 
-				$angebot = $lvangebot->result[0];
-				if($angebot->AnmeldungMoeglich())
+				$bngruppe = new benutzergruppe();
+				if(!$bngruppe->load($uid, $lvangebot->result[0]->gruppe_kurzbz, $stsem))
 				{
-					$anzahl++;
-					// LV wird angeboten und Anmeldefenster ist offen
+					// User ist noch nicht angemeldet
+					//Pruefen ob genug Credit Points zur Verfuegung stehen zur Anmeldung
 
-					$bngruppe = new benutzergruppe();
-					if(!$bngruppe->load($uid, $lvangebot->result[0]->gruppe_kurzbz, $stsem))
-					{
-						// User ist noch nicht angemeldet
-
-						//Pruefen ob genug Credit Points zur Verfuegung stehen zur Anmeldung
-
-						$konto = new konto();
-						$cp = $konto->getCreditPoints($uid, $stsem);
-						if($cp===false || $cp>=$lv->ects)
-							echo '<br><input type="radio" value="'.$lvid.'" name="lv"/>'.$lv->bezeichnung;
-						else
-							echo '<br><input type="radio" disabled="true" value="'.$lvid.'" name="lv" /><span style="color:gray;">'.$lv->bezeichnung.'</span><img src="../../../skin/images/information.png" title="'.$p->t('studienplan/zuWenigCP').'" />';
-					}
+					$konto = new konto();
+					$cp = $konto->getCreditPoints($uid, $stsem);
+					if($cp===false || $cp>=$lv->ects)
+						echo '<br><input type="radio" value="'.$lvid.'" name="lv"/>'.$lv->bezeichnung;
 					else
-					{
-						// Bereits angemeldet
-						echo '<br><input type="radio" disabled="true" value="'.$lvid.'" name="lv" /><span class="ok">'.$lv->bezeichnung.'</span><img src="../../../skin/images/information.png" title="'.$p->t('studienplan/bereitsAngemeldet').'"/>';
-					}
+						echo '<br><input type="radio" disabled="true" value="'.$lvid.'" name="lv" /><span style="color:gray;">'.$lv->bezeichnung.'</span><img src="../../../skin/images/information.png" title="'.$p->t('studienplan/zuWenigCP').'" />';
 				}
-/*				else
+				else
 				{
-					// LV wird angeboten, Anmeldefenster ist aber nicht offen oder keine Gruppe zugeteilt
-					echo '<br><input type="radio" disabled="true" value="'.$lvid.'" name="lv" /><span style="color:gray;">'.$lv->bezeichnung.'</span><img src="../../../skin/images/information.png" title="'.$angebot->errormsg.'" />';
-				}*/
+					// Bereits angemeldet
+					echo '<br><input type="radio" disabled="true" value="'.$lvid.'" name="lv" /><span class="ok">'.$lv->bezeichnung.'</span><img src="../../../skin/images/information.png" title="'.$p->t('studienplan/bereitsAngemeldet').'"/>';
+				}
 			}
+/*			else
+			{
+				// LV wird angeboten, Anmeldefenster ist aber nicht offen oder keine Gruppe zugeteilt
+				echo '<br><input type="radio" disabled="true" value="'.$lvid.'" name="lv" /><span style="color:gray;">'.$lv->bezeichnung.'</span><img src="../../../skin/images/information.png" title="'.$angebot->errormsg.'" />';
+			}*/
 		}
 	}
+	
 	if($anzahl>0)
 		echo '<br><br><input type="submit" value="'.$p->t('studienplan/anmelden').'" /></form>';
 	else
