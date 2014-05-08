@@ -312,17 +312,19 @@ function writePruefungsTable(e, data, anmeldung)
 		{
 			if(storno)
 			{
-				button = "<p><span style='display: inline-block; width: 155px;'>Stornieren (bis "+frist+"): </span><input style='width: 90px;' type='button' value='"+termin+"' onclick='stornoAnmeldung(\""+anmeldung_id+"\");'></br>";
+				//button = "<p><span style='display: inline-block; width: 155px;'>Stornieren (bis "+frist+"): </span><input style='width: 90px;' type='button' value='"+termin+"' onclick='stornoAnmeldung(\""+anmeldung_id+"\");'></br>";
+				button = "<p><a href='#' title='Stornieren möglich bis "+frist+"'><input style='width: 90px;' type='button' value='"+termin+"' onclick='stornoAnmeldung(\""+anmeldung_id+"\");'></a></p>";
+
 			}
 			else
 			{
-				button = "<p><span style='display: inline-block; width: 155px;'>Anmelden (bis "+frist+"): </span><input style='width: 90px;' type='button' value='"+termin+"' onclick='openDialog(\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\", \""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung[0].bezeichnung+"\", \""+d.von+"\", \""+d.bis+"\");'></p>";
-
+				//button = "<p><span style='display: inline-block; width: 155px;'>Anmelden (bis "+frist+"): </span><input style='width: 90px;' type='button' value='"+termin+"' onclick='openDialog(\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\", \""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung[0].bezeichnung+"\", \""+d.von+"\", \""+d.bis+"\");'></p>";
+				button = "<p><a href='#' title='Anmeldung möglich bis "+frist+"';><input style='width: 90px; background-color: green;' type='button' value='"+termin+"' onclick='openDialog(\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\", \""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung[0].bezeichnung+"\", \""+d.von+"\", \""+d.bis+"\");'></a></p>";
 			}
 		}
 		else
 		{
-			button = "<p><span style='display: inline-block; width: 155px;'>Anmelden (bis "+frist+"): </span><input style='width: 90px;' type='button' value='"+termin+"' onclick='openAnmeldung(\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\", \""+e.pruefung.studiensemester_kurzbz+"\");'></p>";
+			button = "<p><input style='width: 180px;' type='button' value='zur LV-Anmeldung' onclick='openAnmeldung(\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\", \""+e.pruefung.studiensemester_kurzbz+"\");'></p>";
 		}
 		
 		row += button;
@@ -392,6 +394,7 @@ function showPruefungsDetails(prfId, lvId)
 					}
 				}
 			});	
+			$("#details").dialog("open");
 		});
 	}
 	else
