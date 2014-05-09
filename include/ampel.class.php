@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 20011 FH Technikum-Wien
+/* Copyright (C) 2011 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -37,6 +37,7 @@ class ampel extends basis_db
 	public $deadline;		// date
 	public $vorlaufzeit;	// smallint
 	public $verfallszeit;	// smallint
+	public $email;			// boolean
 	public $insertamum;		// timestamp
 	public $insertvon;		// varchar(32)
 	public $updateamum;		// timestamp
@@ -87,6 +88,7 @@ class ampel extends basis_db
 				$this->deadline = $row->deadline;
 				$this->vorlaufzeit = $row->vorlaufzeit;
 				$this->verfallszeit = $row->verfallszeit;
+				$this->email = $row->email;
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
@@ -109,13 +111,20 @@ class ampel extends basis_db
 	
 	/**
 	 * Laedt alle vorhandenen Ampeln
+	 * @param aktiv lade nur aktive Ampeln
 	 */
-	public function getAll()
+	public function getAll($aktiv=false)
 	{
 		$sprache = new sprache();
 		$beschreibung = $sprache->getSprachQuery('beschreibung');
 		
-		$qry = "SELECT *,".$beschreibung." FROM public.tbl_ampel ORDER BY deadline";
+		$qry = "SELECT *,".$beschreibung." FROM public.tbl_ampel";
+		if($aktiv)
+		{
+			$qry .= " WHERE (NOW()>(deadline-(vorlaufzeit || ' days')::interval)::date)";
+			$qry .= " AND (NOW()<(deadline+(verfallszeit || ' days')::interval)::date)";
+		}
+		$qry .= " ORDER BY deadline";
 		
 		if($result = $this->db_query($qry))
 		{
@@ -130,6 +139,7 @@ class ampel extends basis_db
 				$obj->deadline = $row->deadline;
 				$obj->vorlaufzeit = $row->vorlaufzeit;
 				$obj->verfallszeit = $row->verfallszeit;
+				$obj->email = $this->db_parse_bool($row->email);
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 					
@@ -243,6 +253,7 @@ class ampel extends basis_db
 					$obj->deadline = $row->deadline;
 					$obj->vorlaufzeit = $row->vorlaufzeit;
 					$obj->verfallszeit = $row->verfallszeit;
+					$obj->email = $row->email;
 					$obj->insertamum = $row->insertamum;
 					$obj->insertvon = $row->insertvon;
 					
@@ -306,7 +317,7 @@ class ampel extends basis_db
 			}
 			
 			$qry.=" benutzer_select, deadline, 
-					vorlaufzeit, verfallszeit, insertamum, insertvon , updateamum, updatevon) VALUES(".
+					vorlaufzeit, verfallszeit, email, insertamum, insertvon , updateamum, updatevon) VALUES(".
 					$this->db_add_param($this->kurzbz).',';
 			reset($this->beschreibung);
 			foreach($this->beschreibung as $key=>$value)
@@ -316,6 +327,7 @@ class ampel extends basis_db
 					$this->db_add_param($this->deadline).','.
 					$this->db_add_param($this->vorlaufzeit).','.
 					$this->db_add_param($this->verfallszeit).','.
+					$this->db_add_param($this->email, FHC_BOOLEAN).','.
 					$this->db_add_param($this->insertamum).','.
 					$this->db_add_param($this->insertvon).','.
 					$this->db_add_param($this->updateamum).','.
@@ -336,6 +348,7 @@ class ampel extends basis_db
 					' deadline = '.$this->db_add_param($this->deadline).','.
 					' vorlaufzeit = '.$this->db_add_param($this->vorlaufzeit).','.
 					' verfallszeit = '.$this->db_add_param($this->verfallszeit).','.
+					' email = '.$this->db_add_param($this->email, FHC_BOOLEAN).','.
 					' updateamum ='.$this->db_add_param($this->updateamum).','.
 					' updatevon ='.$this->db_add_param($this->updatevon).
 					' WHERE ampel_id='.$this->db_add_param($this->ampel_id, FHC_INTEGER).';';					
@@ -486,6 +499,7 @@ class ampel extends basis_db
 						$obj->deadline = $row->deadline;
 						$obj->vorlaufzeit = $row->vorlaufzeit;
 						$obj->verfallszeit = $row->verfallszeit;
+						$obj->email = $row->email;
 						$obj->insertamum = $row->insertamum;
 						$obj->insertvon = $row->insertvon;
 						
