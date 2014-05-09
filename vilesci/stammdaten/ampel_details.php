@@ -68,6 +68,7 @@ $datum_obj = new datum();
 		$deadline = (isset($_POST['deadline'])?$_POST['deadline']:die('Deadline fehlt'));
 		$vorlaufzeit = (isset($_POST['vorlaufzeit'])?$_POST['vorlaufzeit']:die('Vorlaufzeit fehlt'));
 		$verfallszeit = (isset($_POST['verfallszeit'])?$_POST['verfallszeit']:die('verfallszeit fehlt'));
+		$email = isset($_POST['email']);
 		$new = (isset($_POST['new'])?$_POST['new']:'true');
 		if($new=='true')
 		{
@@ -89,6 +90,7 @@ $datum_obj = new datum();
 		$ampel->deadline = $datum_obj->formatDatum($deadline,'Y-m-d');
 		$ampel->vorlaufzeit = $vorlaufzeit;
 		$ampel->verfallszeit = $verfallszeit;
+		$ampel->email = $email;
 		$ampel->updateamum = date('Y-m-d H:i:s');
 		$ampel->updatevon = $user;
 		
@@ -133,46 +135,53 @@ $datum_obj = new datum();
 			break;
 	}
 	
-	echo '<form action="'.$_SERVER['PHP_SELF'].'?action=save" method="POST">';
-	echo '<input type="hidden" name="new" value="'.htmlspecialchars($new).'">';
-	echo '<input type="hidden" name="ampel_id" value="'.htmlspecialchars($ampel->ampel_id).'">';
-	echo '<table>';
-	echo '<tr>';
-	echo '   <td>Kurzbz</td>';	
-	echo '   <td><input type="text" name="kurzbz" size="30" maxlength="64" value="'.htmlspecialchars($ampel->kurzbz).'"></td>';
-	echo '	 <td></td>';
-	echo '   <td>Deadline</td>';
-	echo '   <td><input type="text" name="deadline" size="10" maxlength="10" value="'.htmlspecialchars($datum_obj->formatDatum($ampel->deadline,'d.m.Y')).'"></td>';
-	echo '</tr>';
-	echo '<tr valign="top">';
-	echo '   <td rowspan="2">Benutzer Select</td>';
-	echo '   <td rowspan="2"><textarea name="benutzer_select" cols="60" rows="5">'.htmlspecialchars($ampel->benutzer_select).'</textarea></td>';
-	echo '   <td></td>';
-	echo '   <td valign="middle">Vorlaufzeit (in Tagen)</td>';
-	echo '   <td valign="middle"><input type="text" name="vorlaufzeit" size="4" maxlength="4" value="'.htmlspecialchars($ampel->vorlaufzeit).'"></td>';
-	echo '</tr>';
-	echo '<tr valign="top">';
-	echo '   <td></td>';
-	echo '   <td>Verfallszeit (in Tagen)</td>';
-	echo '   <td><input type="text" name="verfallszeit" size="4" maxlength="4" value="'.htmlspecialchars($ampel->verfallszeit).'"></td>';
-	echo '</tr>';
+	echo '<form action="'.$_SERVER['PHP_SELF'].'?action=save" method="POST">
+		<input type="hidden" name="new" value="'.htmlspecialchars($new).'">
+		<input type="hidden" name="ampel_id" value="'.htmlspecialchars($ampel->ampel_id).'">
+		<table>
+			<tr>
+				<td>Kurzbz</td>
+				<td><input type="text" name="kurzbz" size="30" maxlength="64" value="'.htmlspecialchars($ampel->kurzbz).'"></td>
+				<td></td>
+				<td>Deadline</td>
+				<td><input type="text" name="deadline" size="10" maxlength="10" value="'.htmlspecialchars($datum_obj->formatDatum($ampel->deadline,'d.m.Y')).'"></td>
+			</tr>
+			<tr valign="top">
+				<td rowspan="3">Benutzer Select</td>
+				<td rowspan="3"><textarea name="benutzer_select" cols="60" rows="5">'.htmlspecialchars($ampel->benutzer_select).'</textarea></td>
+				<td></td>
+				<td valign="middle">Vorlaufzeit (in Tagen)</td>
+				<td valign="middle"><input type="text" name="vorlaufzeit" size="4" maxlength="4" value="'.htmlspecialchars($ampel->vorlaufzeit).'"></td>
+			</tr>
+			<tr valign="top">
+				<td></td>
+				<td>Verfallszeit (in Tagen)</td>
+				<td><input type="text" name="verfallszeit" size="4" maxlength="4" value="'.htmlspecialchars($ampel->verfallszeit).'"></td>
+			</tr>
+			<tr valign="top">
+				<td></td>
+				<td>Erinnerung per Email</td>
+				<td><input type="checkbox" name="email" '.($db->db_parse_bool($ampel->email)?'checked':'').'></td>
+			</tr>';
 	
 	$sprache = new sprache();
 	$sprache->getAll();
 	foreach($sprache->result as $lang)
 	{
-		echo '<tr valign="top">';
-		echo '   <td>Beschreibung '.$lang->sprache.'</td>';
-		echo '   <td><textarea name="beschreibung'.$lang->sprache.'" cols="60" rows="5">'.htmlspecialchars((isset($ampel->beschreibung[$lang->sprache])?$ampel->beschreibung[$lang->sprache]:'')).'</textarea></td>';
-		echo '   <td></td>';
-		echo '</tr>';
+		echo '
+			<tr valign="top">
+				<td>Beschreibung '.$lang->sprache.'</td>
+				<td><textarea name="beschreibung'.$lang->sprache.'" cols="60" rows="5">'.htmlspecialchars((isset($ampel->beschreibung[$lang->sprache])?$ampel->beschreibung[$lang->sprache]:'')).'</textarea></td>
+				<td></td>
+			</tr>';
 	}
-	echo '<tr valign="bottom">';
-	echo '   <td></td>';
-	echo '   <td></td>';
-	echo '   <td><input type="submit" value="Speichern" name="save"></td>';
-	echo '</table>';
-	echo '</form>';
+	echo '
+		<tr valign="bottom">
+			<td></td>
+			<td></td>
+			<td><input type="submit" value="Speichern" name="save"></td>
+		</tr>
+	</table></form>';
 	
 	echo '</fieldset>';
 ?>
