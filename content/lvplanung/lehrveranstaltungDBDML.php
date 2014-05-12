@@ -141,11 +141,11 @@ function getStundenproInstitut($mitarbeiter_uid, $studiensemester_kurzbz)
 	$ret="Der Lektor ist in folgenden Instituten zugeteilt:\n";
 	
 	//Liste mit den Stunden in den jeweiligen Instituten anzeigen
-	$qry = "SELECT sum(semesterstunden) as summe, tbl_fachbereich.bezeichnung
+	$qry = "SELECT sum(tbl_lehreinheitmitarbeiter.semesterstunden) as summe, tbl_fachbereich.bezeichnung
 			FROM
 				lehre.tbl_lehreinheitmitarbeiter 
 				JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
-				JOIN lehre.tbl_lehrveranstaltung as lehrfach (lehrfach_id=lehrveranstaltung_id)
+				JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(lehrfach_id=lehrfach.lehrveranstaltung_id)
 				JOIN public.tbl_fachbereich USING(oe_kurzbz)
 			WHERE
 				mitarbeiter_uid=".$db->db_add_param($mitarbeiter_uid)." AND
@@ -472,6 +472,13 @@ if(!$error)
 				}
 				
 				$maxstunden=9999;
+				
+				if($fixangestellt)
+					$max_stunden = WARN_SEMESTERSTD_FIX;
+				else
+				{
+					$max_stunden = WARN_SEMESTERSTD_FREI;
+				}
 				//Bei freien Lektoren muss geprueft werden ob die Stundengrenze erreicht wurde
 				if(!$fixangestellt && !LehrauftragAufFirma($lem->mitarbeiter_uid))
 				{
