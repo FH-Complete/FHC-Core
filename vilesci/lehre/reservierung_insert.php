@@ -38,7 +38,7 @@
 	$uid=get_uid();
 	$datum_obj = new datum();
 
-	$sql_query="SELECT studiengang_kz, UPPER(oe_kurzbz) AS oe_kurzbz, bezeichnung FROM public.tbl_studiengang WHERE studiengang_kz>=0 ORDER BY oe_kurzbz";
+	$sql_query="SELECT studiengang_kz, UPPER(oe_kurzbz) AS oe_kurzbz, bezeichnung FROM public.tbl_studiengang WHERE aktiv ORDER BY oe_kurzbz";
 	//echo $sql_query."<br>";
 	$result_stg=$db->db_query($sql_query);
 	if(!$result_stg)
@@ -77,6 +77,9 @@
 	$rechte =  new benutzerberechtigung();
 	$rechte->getBerechtigungen($uid);
 	
+	if(!$rechte->isBerechtigt('lehre/reservierung', null, 'sui'))
+		die('<span class="error">Sie haben keine Berechtigung für diese Seite</span>');
+		
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
@@ -271,7 +274,7 @@ $(document).ready(function()
 </form>
 <?php
 
-if($rechte->isBerechtigt('admin'))
+if($rechte->isBerechtigt('lehre/reservierung', null, 'sui'))
 {
 	if ($type=="save")
 	{
