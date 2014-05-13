@@ -514,7 +514,7 @@ class lehreinheit extends basis_db
 		if ($anzahl==0)
 		{
 			//Gruppen / Verbaende pruefen
-			$sql_query="SELECT $stpl_id, studiengang_kz, semester, verband, gruppe_kurzbz, stunde FROM $stpl_table
+			$sql_query="SELECT $stpl_id, studiengang_kz, semester, verband, gruppe_kurzbz, stunde, gruppe FROM $stpl_table
 					WHERE datum='".addslashes($datum)."' AND stunde='".addslashes($stunde)."'";
 			if (is_numeric($this->unr))
 				$sql_query.=" AND unr!='".addslashes($this->unr)."' AND (1=2 ";
