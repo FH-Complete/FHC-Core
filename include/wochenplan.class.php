@@ -1258,8 +1258,8 @@ class wochenplan extends basis_db
 													$kollision++;
 									}
 						}
-					}					
-						
+					}
+					
 					// Kollision anzeigen?
 					if ($ignore_kollision)
 						$kollision=0;
@@ -1282,6 +1282,8 @@ class wochenplan extends basis_db
 						$paramList='';
 						$z=0;
 						$reservierung=false;
+						if(isset($raumcheck))
+							unset($raumcheck);
 						foreach ($this->std_plan[$i][$j] as $lehrstunde)
 						{
 							if ($lehrstunde->unr==$unr)
@@ -1320,6 +1322,11 @@ class wochenplan extends basis_db
 								$titel=htmlspecialchars($lehrstunde->titel);
 								$anmerkung=htmlspecialchars($lehrstunde->anmerkung);
 							}
+							
+							if(isset($raumcheck[$lehrstunde->ort]) && $raumcheck[$lehrstunde->ort]!=$lehrstunde->unr)
+								$kollision++;
+							else
+								$raumcheck[$lehrstunde->ort]=$lehrstunde->unr;
 						}
 						// Lektoren
 						//if ($this->type!='lektor')
@@ -1347,6 +1354,7 @@ class wochenplan extends basis_db
 
 						// Ort
 						//if ($this->type=='verband')
+						
 						$ort=array_unique($ort);
 						sort($ort);
 						$orte='';
