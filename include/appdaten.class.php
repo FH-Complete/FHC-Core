@@ -39,7 +39,7 @@ class appdaten extends basis_db
 	protected $version;					// smallint
 	protected $bezeichnung;				// varchar(512)
 	protected $daten;					// text
-	protected $freigabe;				// boolean
+	protected $freigabe = false;		// boolean
 	protected $updateamum;				// timestamp
 	protected $updatevon;				// varchar
 	protected $insertamum;				// timestamp
@@ -104,8 +104,7 @@ class appdaten extends basis_db
 	 * @return boolean  true wenn keine Fehler, sonst false
 	 */
 	public function getByBezeichnungVersion($app, $bezeichnung, $version)
-	{
-		$this->new = false;
+	{		
 		if(!is_numeric($version))
 		{
 			$this->errormsg = 'version muss eine gueltige Zahl sein';
@@ -116,6 +115,7 @@ class appdaten extends basis_db
 				. "WHERE "
 				. "app=".$this->db_add_param($app, FHC_STRING, false).' '
 				. "AND bezeichnung=".$this->db_add_param($bezeichnung, FHC_STRING, false).' '
+				. "AND bezeichnung<>'setup' "	
 				. "AND version=".$this->db_add_param($version, FHC_INTEGER, false);
 
 		if($this->db_query($qry))
@@ -123,6 +123,54 @@ class appdaten extends basis_db
 			if($row = $this->db_fetch_object())
 			{
 				$this->mapRow($this, $row);
+				$this->new = false;
+			}
+			else 
+			{
+				$this->new = true;
+			}
+		}
+		else
+		{
+			return false;
+		}
+
+		return true;
+	}
+	
+	/**
+	 * Setup Appdaten nach UID laden. Unterscheidet sich von den normalen
+	 * Appdaten nur dadurch, dass die Bezeichnung auf 'setup' fixiert ist.
+	 * @param type $app
+	 * @param type $bezeichnung
+	 * @param type $uid
+	 * @return boolean
+	 */
+	public function getSetupByUid($app, $uid)
+	{
+		
+		if($uid == null || $uid === "")
+		{
+			$this->errormsg = 'uid darf nicht null sein';
+			return false;
+		}
+
+		$qry = "SELECT * FROM system.tbl_appdaten "
+				. "WHERE "
+				. "app=".$this->db_add_param($app, FHC_STRING, false).' '
+				. "AND bezeichnung='setup' "				
+				. "AND uid=".$this->db_add_param($uid, FHC_STRING, false);
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->mapRow($this, $row);
+				$this->new = false;
+			}
+			else 
+			{
+				$this->new = true;
 			}
 		}
 		else
@@ -144,6 +192,7 @@ class appdaten extends basis_db
 		$result = array();
 		$qry = "SELECT * FROM system.tbl_appdaten ".
 		       "WHERE app=".$this->db_add_param($app, FHC_STRING, false).' '.
+				"AND bezeichnung<>'setup' ".
 		       "ORDER BY bezeichnung,version";
 
 		if($this->db_query($qry))
@@ -315,7 +364,7 @@ class appdaten extends basis_db
         
 		if($this->db_query($qry))
 		{
-			if($this->new)
+			if($this->new || $neueVersion)
 			{
 				//naechste ID aus der Sequence holen
 				$qry="SELECT currval('system.seq_appdaten_appdaten_id') as id;";
