@@ -37,15 +37,7 @@
 	
 	$berechtigung=new benutzerberechtigung();
 	$berechtigung->getBerechtigungen($uid);
-	if (!($berechtigung->isBerechtigt('admin') || 
-		  $berechtigung->isBerechtigt('support') || 
-		  $berechtigung->isBerechtigt('preinteressent') || 
-		  $berechtigung->isBerechtigt('lehre') ||
-		  $berechtigung->isBerechtigt('basis/statistik') ||
-		  $berechtigung->isBerechtigt('basis/fhausweis') ||
-		  $berechtigung->isBerechtigt('wawi/inventar') ||
-		  $berechtigung->isBerechtigt('assistenz') ||    
-		  $berechtigung->isBerechtigt('lv-plan') ))
+	if (!($berechtigung->isBerechtigt('basis/vilesci', null, 's')))
 		die ('Keine Berechtigung!');
 	
 ?>

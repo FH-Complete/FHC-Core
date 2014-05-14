@@ -133,6 +133,7 @@ $menu=array
 			'name'=>'Benutzer','permissions'=>array('admin','lv-plan','support'),
 			'Funktionen'=>array('name'=>'Funktionen', 'link'=>'personen/funktion.php', 'target'=>'main'),
 			'Berechtigungen'=>array('name'=>'Berechtigungen', 'link'=>'stammdaten/benutzerberechtigung_frameset.html', 'target'=>'main','permissions'=>array('basis/berechtigung')),
+			'Rollen'=>array('name'=>'Rollen', 'link'=>'stammdaten/berechtigungrolle.php', 'target'=>'main','permissions'=>array('basis/berechtigung')),
 			'Variablen'=>array('name'=>'Variablen', 'link'=>'stammdaten/variablen_frameset.html', 'target'=>'main', 'target'=>'main','permissions'=>array('basis/variable')),
 		),
 		'Mitarbeiter'=>array
@@ -165,6 +166,7 @@ $menu=array
 		(
 			'name'=>'User', 'permissions'=>array('basis/variable','basis/berechtigung'),
 			'Berechtigungen'=>array('name'=>'Berechtigungen', 'link'=>'stammdaten/benutzerberechtigung_frameset.html', 'target'=>'main','permissions'=>array('basis/berechtigung')),
+			'Rollen'=>array('name'=>'Rollen', 'link'=>'stammdaten/berechtigungrolle.php', 'target'=>'main','permissions'=>array('basis/berechtigung')),
 			'Variablen'=>array('name'=>'Variablen', 'link'=>'stammdaten/variablen_frameset.html', 'target'=>'main', 'target'=>'main','permissions'=>array('basis/variable')),
 		),
 		/*'Kommunikation'=>array

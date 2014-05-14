@@ -300,7 +300,7 @@ class benutzerberechtigung extends basis_db
 			$this->errormsg = 'Entweder UID oder funktion_kurzbz muss uebergeben werden';
 			return false;
 		}
-		
+		$qry.= " ORDER BY rolle_kurzbz,berechtigung_kurzbz";
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())

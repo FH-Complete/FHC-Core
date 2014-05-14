@@ -113,8 +113,6 @@ $num_rows_lektor=$db->db_num_rows($result_lektor);*/
 <title>Lehrveranstaltungsplan</title>
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <link href="../../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
-<link href="../../../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />
-<script src="../../../include/js/flexcroll.js" type="text/javascript" ></script>
 <script src="../../../include/js/jquery1.9.min.js" type="text/javascript"></script>
 <script type="text/javascript" language="JavaScript">
 
@@ -184,7 +182,6 @@ $(document).ready(function()
 </head>
 
 <body id="inhalt">
-<div class="flexcroll" style="outline: none;">
 <h1><?php echo $p->t("lvplan/lehrveranstaltungsplan");?></h1>
 <table class="cmstable" cellspacing="0" cellpadding="0">
 <tbody>
@@ -409,6 +406,5 @@ $(document).ready(function()
 </tr>
 </tbody>
 </table>
-</div>
 </body>
 </html>

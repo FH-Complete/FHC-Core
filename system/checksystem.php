@@ -1943,6 +1943,7 @@ $berechtigungen = array(
 	array('basis/studiengang','Studiengangsverwaltung'),
 	array('basis/testtool','Administrationseite, Gebiete löschen/zurücksetzen'),
 	array('basis/variable','Variablenverwaltung'),
+	array('basis/vilesci','Grundrecht, um in VileSci irgendwelche Menüpunkte zu sehen'),
 	array('inout/incoming','Incomingverwaltung'),
 	array('inout/outgoing','Outgoingverwaltung'),
 	array('inout/uebersicht','Verbandsanzeige fuer Incoming/Outgoing im FAS'),
@@ -2029,6 +2030,33 @@ foreach($berechtigungen as $row)
 				echo '<br>'.$row[$berechtigung_kurzbz].'/'.$row[$beschreibung].' hinzugefügt';
 			else
 				echo '<br><span class="error">Fehler: '.$row[$berechtigung_kurzbz].'/'.$row[$beschreibung].' hinzufügen nicht möglich</span>';
+				
+			//Wenn das Recht basis/vilesci neu angelegt wurde, dann dieses Recht jedem geben, der bisher auch Zugriff auf Vilesci hatte.
+			if ($row[$berechtigung_kurzbz]=='basis/vilesci')
+			{
+				$qry_userrecht="SELECT DISTINCT uid, funktion_kurzbz 
+								FROM system.tbl_benutzerrolle 
+								LEFT JOIN public.tbl_benutzer USING (uid) 
+								WHERE berechtigung_kurzbz IN ('admin','support','preinteressent','lehre','basis/statistik','basis/fhausweis','wawi/inventar','assistenz','lv-plan') 
+								AND (tbl_benutzerrolle.ende>=now() OR tbl_benutzerrolle.ende IS NULL)
+								AND (tbl_benutzerrolle.start<=now() OR tbl_benutzerrolle.start IS NULL)
+								AND (tbl_benutzer.aktiv=true OR tbl_benutzerrolle.uid IS NULL) ORDER BY uid";
+				
+				if($result_insert_userrecht = $db->db_query($qry_userrecht))
+				{
+					while ($row_user=$db->db_fetch_object($result_insert_userrecht))
+					{
+						$qry_insert_userrecht="	INSERT INTO system.tbl_benutzerrolle (rolle_kurzbz, berechtigung_kurzbz, uid, funktion_kurzbz, oe_kurzbz, art, studiensemester_kurzbz, start, ende, negativ, updateamum, updatevon, insertamum, insertvon, kostenstelle_id)
+												VALUES (NULL, 'basis/vilesci', ".($row_user->funktion_kurzbz!=""?"NULL,".$db->db_add_param($row_user->funktion_kurzbz):$db->db_add_param($row_user->uid).",NULL").", NULL, 's', NULL, NULL, NULL, FALSE, NULL, NULL, now(), 'checksystem', NULL)";
+						
+						if($db->db_query($qry_insert_userrecht))
+							echo '<br>Recht "basis/vilesci" an '.$row_user->uid.' '.($row_user->funktion_kurzbz!=''?'Funktion '.$row_user->funktion_kurzbz:'').' vergeben';
+						else
+							echo '<br><span class="error">Fehler: Recht "basis/vilesci" konnte nicht an '.$row_user->uid.' '.($row_user->funktion_kurzbz!=''?'Funktion '.$row_user->funktion_kurzbz:'').' vergeben werden</span>';
+					}
+				}
+				
+			}
 		}
 	}
 }
