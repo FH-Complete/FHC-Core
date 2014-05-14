@@ -19,13 +19,15 @@
  *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
- *	    Stefan Puraner		< puraner@technikum-wien.at >
+ *		    Stefan Puraner		< puraner@technikum-wien.at >
+ *			Manfred Kindl		< manfred.kindl@technikum-wien.at >
  */
 	require_once('../../config/vilesci.config.inc.php');
 	require_once('../../include/functions.inc.php');
 	require_once('../../include/lehrveranstaltung.class.php');
 	require_once('../../include/studiengang.class.php');
 	require_once('../../include/lehrtyp.class.php');
+	require_once('../../include/benutzerberechtigung.class.php');
 
 	if (!$db = new basis_db())
 		die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -40,9 +42,17 @@
 	$stg_arr = array();
 	$sprache_arr = array();
 	$lehrform_arr = array();
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+	
+	if(!$rechte->isBerechtigt('lehre/lehrveranstaltung:begrenzt',null,'s'))
+		die('Sie haben keine Berechtigung fuer diese Seite');
 
 	if(isset($_POST["schick"]))
 	{
+		if(!$rechte->isBerechtigt('lehre/lehrveranstaltung',null,'sui'))
+			die('Sie haben keine Berechtigung fuer diese Aktion');
+			
 		$lv = new lehrveranstaltung();
 
 		if(isset($_POST['lv_id']) && $_POST['lv_id']!='')
@@ -321,7 +331,15 @@
 					$selected='selected';
 				else 
 					$selected='';
-				$htmlstr .= '<option value="'.$row->oe_kurzbz.'" '.$selected.'>'.$row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung.'</option>';
+					
+				if($row->aktiv=='f')
+				{
+					$htmlstr .= '<option value="'.$row->oe_kurzbz.'" '.$selected.' style="color: red;">'.$row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung.'</option>';
+				}
+				else 
+				{
+					$htmlstr .= '<option value="'.$row->oe_kurzbz.'" '.$selected.'>'.$row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung.'</option>';
+				}
 			}
 		}
 		$htmlstr .= '</select></td>

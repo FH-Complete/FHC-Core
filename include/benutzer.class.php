@@ -290,11 +290,12 @@ class benutzer extends person
 	}
 	
 	/**
-	 * Sucht nach Benutzern. Limit optional.
+	 * Sucht nach Benutzern. Limit optional. Aktiv optional.
 	 * 
 	 * @param $limit (optional)
+	 * @param $aktiv (optional). Default true. Wenn false werden nur inaktive benutzer geladen, wenn null dann alle
 	 */
-	public function search($searchItems, $limit=null)
+	public function search($searchItems, $limit=null, $aktiv=true)
 	{
 		$qry = "SELECT * FROM (SELECT
 					distinct on (uid) vorname, nachname, uid, mitarbeiter_uid, titelpre, titelpost, lektor, fixangestellt, alias,
@@ -317,9 +318,13 @@ class benutzer extends person
 					public.tbl_person 
 					JOIN public.tbl_benutzer USING(person_id)
 					LEFT JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid)
-				WHERE
-					tbl_benutzer.aktiv
-					AND (";
+				WHERE";
+				if(is_null($aktiv))
+					$qry.=" (";
+				elseif($aktiv==true)
+					$qry.=" tbl_benutzer.aktiv=true AND (";
+				elseif($aktiv==false)
+					$qry.=" tbl_benutzer.aktiv=false AND (";
 		
 		$qry.=" lower(vorname || ' ' || nachname) like lower('%".addslashes(implode(' ',$searchItems))."%')"; 
 		$qry.=" OR lower(nachname || ' ' || vorname) like lower('%".addslashes(implode(' ',$searchItems))."%')";

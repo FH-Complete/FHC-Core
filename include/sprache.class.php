@@ -50,7 +50,7 @@ class sprache extends basis_db
 
 	/**
 	 * 
-	 * Lädt die Sprache der 
+	 * Lädt die Sprache
 	 * @param $sprache die geladen werden soll
 	 * @return true bei Erfolg, false wenn ein Fehler aufgetreten ist
 	 */
