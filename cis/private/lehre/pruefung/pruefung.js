@@ -306,7 +306,9 @@ function writePruefungsTable(e, data, anmeldung)
 		if(fristDate < new Date())
 		{
 			if(!storno)
-				button = "<p><span style='display: inline-block; width: 155px;'>Frist abgelaufen</span></br>";
+				button = "<p><span style='display: inline-block; width: 155px;'>Anmeldefrist abgelaufen</span></br>";
+			else
+				button = "<p><span style='display: inline-block; width: 155px;'>Storno nicht mehr möglich.</span></br>";
 		}
 		else if(anmeldung || e.lehrveranstaltung[0].angemeldet)
 		{
