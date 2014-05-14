@@ -15,6 +15,13 @@ define('LVPLAN_ANMERKUNG_ANZEIGEN',true);
 //Gruppieren zeitgleicher Lehreinheiten im LV-Plan
 define('LVPLAN_LEHREINHEITEN_GRUPPIEREN',true);
 
+// Ende-Datum des LVPlan Syncs Format: 2014-02-01
+// Wenn leer wird jeweils bis Semesterende gesynct
+define('LVPLAN_SYNC_ENDE','');
+
+// Soll nach dem LVPlan Sync automatisch das Horde Sync angestoßen werden
+define('LVPLAN_HORDE_SYNC',false);
+
 /*
  * VORRUECKUNG_LEHRVERBAND_MAX_SEMESTER
  * leer: Studentlehrverband Semester wird bei der Vorrueckung normal weitergezaehlt bis zum max_semester des Studienganges

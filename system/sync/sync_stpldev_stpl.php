@@ -72,7 +72,9 @@ $ss->getNearestTillNext();
 $datum_begin=$ss->start;
 $datum_ende=$ss->ende;
 //$datum_begin='2012-08-03';
-$datum_ende='2013-02-02'; // $ss->ende
+//$datum_ende='2013-02-02'; // $ss->ende
+if(defined('LVPLAN_SYNC_ENDE') && LVPLAN_SYNC_ENDE!='')
+	$datum_ende=LVPLAN_SYNC_ENDE;
 
 $stgwhere = '';
 $stgwheredev = '';
@@ -243,6 +245,9 @@ else
 			{
 				if (!isset($message[$row->uid]->isneu))
 				{
+					if(!isset($message[$row->uid]))
+						$message[$row->uid] = new stdClass();
+
 					$message[$row->uid]->isneu=true;
 					$message[$row->uid]->mailadress=$row->uid.'@'.DOMAIN;
 					$message[$row->uid]->message_begin=$message_begin.'<BR>';
@@ -265,6 +270,9 @@ else
 			{
 				if (!isset($message[$student]->isneu))
 				{
+					if(!isset($message[$student]))
+						$message[$student] = new stdClass();
+
 					$message[$student]->isneu=true;
 					$message[$student]->mailadress=$student.'@'.DOMAIN;
 					$message[$student]->message_begin=$message_begin.'<BR>';
@@ -328,6 +336,9 @@ else
 			{
 				if (!isset($message[$row->uid]->isalt))
 				{
+					if(!isset($message[$row->uid]))
+						$message[$row->uid] = new stdClass();
+
 					$message[$row->uid]->isalt=true;
 					$message[$row->uid]->mailadress=$row->uid.'@'.DOMAIN;
 					$message[$row->uid]->message_begin=$message_begin.'<BR>';
@@ -350,6 +361,9 @@ else
 			{
 				if (!isset($message[$student]->isalt))
 				{
+					if(!isset($message[$student]))
+						$message[$student] = new stdClass();
+
 					$message[$student]->isalt=true;
 					$message[$student]->mailadress=$student.'@'.DOMAIN;
 					$message[$student]->message_begin=$message_begin.'<BR>';
@@ -477,6 +491,8 @@ else
 			{
 				if (!isset($message[$row->uid]->isset))
 				{
+					if(!isset($message[$row->uid]))
+						$message[$row->uid] = new stdClass();
 					$message[$row->uid]->isset=true;
 					$message[$row->uid]->mailadress=$row->uid.'@'.DOMAIN;
 					$message[$row->uid]->message_begin=$message_begin.'<BR>';
@@ -519,6 +535,9 @@ else
 				{
 					if (!isset($message[$row->old_uid]->isset))
 					{
+						if(!isset($message[$row->old_uid]))
+							$message[$row->old_uid] = new stdClass();
+
 						$message[$row->old_uid]->isset=true;
 						$message[$row->old_uid]->mailadress=$row->old_uid.'@'.DOMAIN;
 						$message[$row->old_uid]->message_begin=$message_begin.'<BR>';
@@ -560,6 +579,9 @@ else
 			{
 				if (!isset($message[$student]->isset))
 				{
+					if(!isset($message[$student]))
+						$message[$student] = new stdClass();
+
 					$message[$student]->isset=true;
 					$message[$student]->mailadress=$student.'@'.DOMAIN;
 					$message[$student]->message_begin=$message_begin.'<BR>';
@@ -621,52 +643,56 @@ if ($sendmail)
 		}
 	}
 }
-// Alle User bei denen sich der LVPlan veraendert hat
-// werden in ein File gesichert. Bei diesen Personen wird der LVPlan im Horde aktualisiert
-$users=array();
-foreach ($message as $uid=>$msg)
+
+if(defined('LVPLAN_HORDE_SYNC') && LVPLAN_HORDE_SYNC===true)
 {
-	$users[]=$uid;
-}
-
-$uidfile = DOC_ROOT.'../system/hordelvplansync/lvplanupdate.txt';
-
-// Letzte Durchlaufzeit des Scripts holen
-// anhand der Aenderungszeit des Textfiles mit den UIDs
-if(!$lastmod = filemtime($uidfile))
-	$lastmod=time()-86400; // Wenn die Zeit nicht ermittelt werden kann, werden die letzten 24 Std genommen
-
-// Zusaetzlich jene holen, bei denen sich die Reservierungen geaendert haben
-$qry = "SELECT * FROM campus.tbl_reservierung WHERE insertamum>'".date('Y-m-d H:i:s',$lastmod)."'";
-
-if($result = $db->db_query($qry))
-{
-	while($row = $db->db_fetch_object($result))
+	// Alle User bei denen sich der LVPlan veraendert hat
+	// werden in ein File gesichert. Bei diesen Personen wird der LVPlan im Horde aktualisiert
+	$users=array();
+	foreach ($message as $uid=>$msg)
 	{
-		$users[] = $row->uid;
-		//Wenn fuer eine Gruppe reserviert wurde, dann die Personen aus der Gruppe holen
-		if($row->semester!='' || $row->verband!='' || $row->gruppe!='' || $row->gruppe_kurzbz!='')
+		$users[]=$uid;
+	}
+
+	$uidfile = DOC_ROOT.'../system/hordelvplansync/lvplanupdate.txt';
+
+	// Letzte Durchlaufzeit des Scripts holen
+	// anhand der Aenderungszeit des Textfiles mit den UIDs
+	if(!$lastmod = filemtime($uidfile))
+		$lastmod=time()-86400; // Wenn die Zeit nicht ermittelt werden kann, werden die letzten 24 Std genommen
+
+	// Zusaetzlich jene holen, bei denen sich die Reservierungen geaendert haben
+	$qry = "SELECT * FROM campus.tbl_reservierung WHERE insertamum>'".date('Y-m-d H:i:s',$lastmod)."'";
+
+	if($result = $db->db_query($qry))
+	{
+		while($row = $db->db_fetch_object($result))
 		{
-			$studenten = getStudentsFromGroup($row->studiengang_kz, $row->semester, $row->verband, $row->gruppe, $row->gruppe_kurzbz, $ss->studiensemester_kurzbz);
-			$users = array_merge($users, $studenten);
+			$users[] = $row->uid;
+			//Wenn fuer eine Gruppe reserviert wurde, dann die Personen aus der Gruppe holen
+			if($row->semester!='' || $row->verband!='' || $row->gruppe!='' || $row->gruppe_kurzbz!='')
+			{
+				$studenten = getStudentsFromGroup($row->studiengang_kz, $row->semester, $row->verband, $row->gruppe, $row->gruppe_kurzbz, $ss->studiensemester_kurzbz);
+				$users = array_merge($users, $studenten);
+			}
 		}
 	}
-}
-// geaenderte User in Textfile schreiben
-$users = array_unique($users);
-if(count($users)>0)
-{
-	if($fp = fopen($uidfile, 'w'))
+	// geaenderte User in Textfile schreiben
+	$users = array_unique($users);
+	if(count($users)>0)
 	{
-		foreach($users as $uid)
+		if($fp = fopen($uidfile, 'w'))
 		{
-			fwrite($fp, $uid."\n");
-		}
-		fclose($fp);
+			foreach($users as $uid)
+			{
+				fwrite($fp, $uid."\n");
+			}
+			fclose($fp);
 
-		//Horde Syncro starten
-		chdir(DOC_ROOT.'../system/hordelvplansync/');
-		exec('php5 synchordelvplan.php lvplanupdate.txt >>/var/log/sync/synchordelvplan.log 2>&1');
+			//Horde Syncro starten
+			chdir(DOC_ROOT.'../system/hordelvplansync/');
+			exec('php5 synchordelvplan.php lvplanupdate.txt >>/var/log/sync/synchordelvplan.log 2>&1');
+		}
 	}
 }
 // Mail an Admin
