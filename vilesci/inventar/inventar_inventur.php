@@ -205,6 +205,27 @@ if(isset($_POST['updateliste']))
 		
 		$work='uebersicht';
 	}
+	else
+	{
+		// Verschiebung in einen anderen Raum
+		$ids = $_POST['bmid'];
+		foreach($ids as $id)
+		{
+			$bm_obj = new betriebsmittel();
+			if($bm_obj->load($id))
+			{
+				$bm_obj->ort_kurzbz=$_POST['work'];
+				if(!$bm_obj->save(false))
+					echo 'Fehler beim Speichern von ID:'.$id;
+			}
+			else
+			{
+				echo 'Fehler beim Laden von ID:'.$id;
+			}
+		}
+		
+		$work='uebersicht';
+	}
 }
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
@@ -487,7 +508,15 @@ elseif($work=='uebersicht')
 		echo '</table><br />';
 		echo '<SELECT name="work">
 				<OPTION value="dummy">Verschieben in DUMMY Raum</OPTION>
-				<OPTION value="ausscheiden">Status&auml;nderung - ausgeschieden</OPTION>
+				<OPTION value="ausscheiden">Status&auml;nderung - ausgeschieden</OPTION>';
+		
+		$ort = new ort();
+		$ort->getAll();
+		foreach($ort->result as $row_ort)
+		{
+			echo '<option value="'.$row_ort->ort_kurzbz.'">'.$row_ort->ort_kurzbz.'</option>';
+		}
+		echo '		
 			</SELECT>';
 		echo '<input type="hidden" name="ort_kurzbz" value="'.$ort_kurzbz.'" />';
 		echo '<input type="hidden" name="person_id" value="'.$person_id.'" />';
