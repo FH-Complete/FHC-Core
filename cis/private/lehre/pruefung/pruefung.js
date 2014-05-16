@@ -186,7 +186,8 @@ function loadPruefungen()
 		url: "./pruefungsanmeldung.json.php",
 		type: "POST",
 		data: {
-			method: "getPruefungByLv"
+			method: "getPruefungByLv",
+			studiensemester: $("#filter_studiensemester").val()
 		},
 		error: loadError
 	}).success(function(data){
@@ -221,7 +222,8 @@ function loadPruefungenOfStudiengang()
 		url: "./pruefungsanmeldung.json.php",
 		type: "POST",
 		data: {
-			method: "getPruefungByLvFromStudiengang"
+			method: "getPruefungByLvFromStudiengang",
+			studiensemester: $("#filter_studiensemester").val()
 		},
 		error: loadError
 	}).success(function(data){

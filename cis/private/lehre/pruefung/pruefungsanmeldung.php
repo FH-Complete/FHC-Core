@@ -38,6 +38,9 @@ $rechte->getBerechtigungen($uid);
 
 $benutzer = new student($uid);
 
+$studiensemester = new studiensemester();
+$studiensemester->getAll();
+
 ?>
 <html>
     <head>
@@ -166,6 +169,25 @@ $benutzer = new student($uid);
 	    ?>
         </script>
         <h1>Prüfungsanmeldung für <?php echo $benutzer->vorname." ".$benutzer->nachname." (".$uid.")"; ?></h1>
+	<?php
+	    echo '<h3>Filter</h3>';
+	    echo '<p>Studiensemester: ';
+	    echo '<select id="filter_studiensemester" onchange="refresh();">';
+	    $aktuellesSemester = $studiensemester->getakt();
+	    foreach($studiensemester->studiensemester as $sem)
+	    {
+		if($aktuellesSemester == $sem->studiensemester_kurzbz)
+		{
+		    echo '<option selected value="'.$sem->studiensemester_kurzbz.'">'.$sem->studiensemester_kurzbz.'</option>';
+		}
+		else
+		{
+		    echo '<option value="'.$sem->studiensemester_kurzbz.'">'.$sem->studiensemester_kurzbz.'</option>';
+		}
+	    }
+	    echo '</select></p>';
+	
+	?>
 	<div id="details" title="Details">
 	    <div id="lvDetails">
 		<h1>LV-Details</h1>
