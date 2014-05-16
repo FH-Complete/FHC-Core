@@ -37,10 +37,12 @@ $method = isset($_REQUEST['method'])?$_REQUEST['method']:'';
 switch($method)
 {
 	case 'getPruefungByLv':
-	    $data = getPruefungByLv($aktStudiensemester, $uid);
+	    $studiensemester = isset($_REQUEST['studiensemester']) ? $_REQUEST['studiensemester'] : NULL;
+	    $data = getPruefungByLv($studiensemester, $uid);
             break;
 	case 'getPruefungByLvFromStudiengang':
-	    $data = getPruefungByLvFromStudiengang($aktStudiensemester, $uid);
+	    $studiensemester = isset($_REQUEST['studiensemester']) ? $_REQUEST['studiensemester'] : NULL;
+	    $data = getPruefungByLvFromStudiengang($studiensemester, $uid);
             break;
         case 'loadPruefung':
             $data = loadPruefung();
@@ -204,20 +206,23 @@ function getPruefungByLvFromStudiengang($aktStudiensemester = null, $uid = null)
 	    $lehreinheit = new lehreinheit();
 	    $lehreinheit->load_lehreinheiten($lehrveranstaltung[0]->lehrveranstaltung_id, $aktStudiensemester);
 	    $lehreinheiten = $lehreinheit->lehreinheiten;
-	    $prf = new stdClass();
-	    $temp = new pruefungCis($lv->pruefung_id);
-	    $temp->getTermineByPruefung($lv->pruefung_id);
-	    for($i=0; $i < sizeof($temp->termine); $i++)
+	    if(!empty($lehreinheiten) && $lehreinheiten !== null)
 	    {
-		$termin = new pruefungstermin($temp->termine[$i]->pruefungstermin_id);
-		$temp->termine[$i]->teilnehmer = $termin->getNumberOfParticipants();
+		$prf = new stdClass();
+		$temp = new pruefungCis($lv->pruefung_id);
+		$temp->getTermineByPruefung($lv->pruefung_id);
+		for($i=0; $i < sizeof($temp->termine); $i++)
+		{
+		    $termin = new pruefungstermin($temp->termine[$i]->pruefungstermin_id);
+		    $temp->termine[$i]->teilnehmer = $termin->getNumberOfParticipants();
+		}
+		$prf->pruefung = $temp;
+		$prf->lehrveranstaltung = $lehrveranstaltung;
+		$lveranstaltung = new lehrveranstaltung($lehreinheiten[0]->lehrfach_id);
+		$oe = new organisationseinheit($lveranstaltung->oe_kurzbz);
+		$prf->organisationseinheit = $oe->bezeichnung;
+		array_push($pruefungen, $prf);
 	    }
-	    $prf->pruefung = $temp;
-	    $prf->lehrveranstaltung = $lehrveranstaltung;
-	    $lveranstaltung = new lehrveranstaltung($lehreinheiten[0]->lehrfach_id);
-	    $oe = new organisationseinheit($lveranstaltung->oe_kurzbz);
-	    $prf->organisationseinheit = $oe->bezeichnung;
-	    array_push($pruefungen, $prf);
 	}
 
 	$anmeldung = new pruefungsanmeldung();
