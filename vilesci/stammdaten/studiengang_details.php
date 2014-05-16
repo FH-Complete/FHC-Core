@@ -50,6 +50,7 @@ require_once('../../include/benutzerberechtigung.class.php');
 	$chk = '';
 
 	$sg_var = new studiengang();
+	$sg_var->getAllTypes();
 	$studiengang_typ_arr = $sg_var->studiengang_typ_arr;
 	
 	$studiengang_kz = '';
