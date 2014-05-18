@@ -782,7 +782,7 @@ class mitarbeiter extends benutzer
 	 * Nachname, Vorname, UID $filter enthaelt
 	 * @param $filter
 	 */
-	public function search($filter, $limit=null)
+	public function search($filter, $limit=null, $aktiv=true)
 	{
 		$qry = "SELECT vorname, nachname, titelpre, titelpost, kurzbz, vornamen, uid
 			FROM campus.vw_mitarbeiter 
