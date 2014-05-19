@@ -594,6 +594,7 @@ padding: 5px;
                     <th>Status</th>
                     <th>Datum</th>
                     <th>Aktion</th>
+					<th>Bewerbungsstatus</th>
                 </tr>"; 
         foreach($prestudent->result as $row)
         {
@@ -603,12 +604,13 @@ padding: 5px;
             
             $prestudent_status = new prestudent(); 
             $prestatus_help= ($prestudent_status->getLastStatus($row->prestudent_id))?$prestudent_status->status_kurzbz:'Noch kein Status vorhanden'; 
-            
+            $bewerberstatus =($prestudent_status->bestaetigtam != '' || $prestudent_status->bestaetigtvon != '')?'bestätigt':'noch nicht bestätigt'; 
             echo "<tr>
                     <td>".$stg->bezeichnung."</td>
                     <td>".$prestatus_help."</td>
                     <td>".$datum->formatDatum($prestudent_status->datum, 'd.m.Y')."</td>
                     <td></td>
+					<td>$bewerberstatus</td>
                 </tr>";
         }
         
