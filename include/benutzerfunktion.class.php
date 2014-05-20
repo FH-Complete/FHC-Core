@@ -391,5 +391,63 @@ class benutzerfunktion extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Lädt alle Benutzerfunktionen zu einer UID
+	 * @param type $uid UID des Mitarbeiters
+	 * @param type $funktion_kurzbz OPTIONAL Kurzbezeichnung der Funktion
+	 * @param type $startZeitraum OPTIONAL Start Zeitraum in dem die Funktion aktiv ist
+	 * @param type $endeZeitraum OPTIONAL Ende Zeitraum in dem die Funktion aktiv ist
+	 * @return boolean
+	 */
+	public function getBenutzerFunktionByUid($uid, $funktion_kurzbz=null, $startZeitraum=null, $endeZeitraum=null)
+	{
+	    $qry = "SELECT * FROM public.tbl_benutzerfunktion 
+			    WHERE uid=".$this->db_add_param($uid);
+	    if(!is_null($funktion_kurzbz))
+	    {
+		$qry .= ' AND funktion_kurzbz='.$this->db_add_param($funktion_kurzbz);
+	    }
+	    if(!is_null($startZeitraum))
+	    {
+		$qry .=' AND (datum_bis IS NULL OR datum_bis >'.$this->db_add_param($startZeitraum).")";
+	    }
+	    if(!is_null($endeZeitraum))
+	    {
+		$qry .=' AND datum_von <'.$this->db_add_param($endeZeitraum);
+	    }
+
+	    $qry .= ";";
+	    if($result = $this->db_query($qry))
+	    {
+		while($row = $this->db_fetch_object($result))
+		{
+		    $obj = new benutzerfunktion();
+
+		    $obj->benutzerfunktion_id = $row->benutzerfunktion_id;
+		    $obj->fachbereich_kurzbz = $row->fachbereich_kurzbz;
+		    $obj->uid = $row->uid;
+		    $obj->oe_kurzbz = $row->oe_kurzbz;
+		    $obj->funktion_kurzbz = $row->funktion_kurzbz;
+		    $obj->insertamum = $row->insertamum;
+		    $obj->insertvon = $row->insertvon;
+		    $obj->updateamum = $row->updateamum;
+		    $obj->updatevon = $row->updatevon;
+		    $obj->semester = $row->semester;
+		    $obj->datum_von = $row->datum_von;
+		    $obj->datum_bis = $row->datum_bis;
+		    $obj->bezeichnung = $row->bezeichnung;
+
+		    $this->result[] = $obj;
+
+		}
+		return true;
+	    }
+	    else
+	    {
+		$this->errormsg = 'Fehler beim Laden der Bentuzerfunktionen';
+		return false;
+	    }
+	}
 }
 ?>
