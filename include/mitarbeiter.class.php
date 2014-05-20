@@ -1111,5 +1111,73 @@ class mitarbeiter extends benutzer
             return false; 
         }
     }
+    
+    
+    /**
+     * Gibt alle Mitarbeiter während des Meldezeitraumes zurück
+     * @param type $meldungBeginn Start des Meldezeitraumes
+     * @param type $meldungEnde Ende des Meldezeitraumes
+     * @return boolean
+     */
+    public function getMitarbeiterforMeldung($meldungBeginn, $meldungEnde)
+    {
+
+	$qry='SELECT DISTINCT ON (UID) * 
+		FROM 
+			public.tbl_mitarbeiter 
+			JOIN public.tbl_benutzer ON(mitarbeiter_uid=uid)
+			JOIN public.tbl_person USING(person_id)
+			JOIN bis.tbl_bisverwendung USING(mitarbeiter_uid)
+			JOIN bis.tbl_beschaeftigungsausmass USING(beschausmasscode)
+		WHERE 
+			bismelden 
+			AND personalnummer>0 
+			AND (tbl_bisverwendung.ende is NULL OR tbl_bisverwendung.ende>'.$this->db_add_param($meldungBeginn).')
+		ORDER BY uid, nachname,vorname
+		';
+	
+	if($result = $this->db_query($qry))
+	{
+	    while($row = $this->db_fetch_object($result))
+	    {
+		$l=new mitarbeiter();
+		// Personendaten
+		$l->uid=$row->uid;
+		$l->titelpre=$row->titelpre;
+		$l->titelpost=$row->titelpost;
+		$l->vorname=$row->vorname;
+		$l->vornamen=$row->vornamen;
+		$l->nachname=$row->nachname;
+		$l->gebdatum=$row->gebdatum;
+		$l->gebort=$row->gebort;
+		$l->gebzeit=$row->gebzeit;
+		$l->geschlecht=$row->geschlecht;
+		//$l->foto=$row->foto;
+		$l->anmerkung=$row->anmerkung;
+		$l->aktiv= $this->db_parse_bool($row->aktiv);
+		$l->homepage=$row->homepage;
+		$l->updateamum=$row->updateamum;
+		$l->updatevon=$row->updatevon;
+		// Lektorendaten
+		$l->personalnummer=$row->personalnummer;
+		$l->kurzbz=$row->kurzbz;
+		$l->lektor= $this->db_parse_bool($row->lektor);
+		$l->fixangestellt= $this->db_parse_bool($row->fixangestellt);
+		$l->standort_id = $row->standort_id;
+		$l->telefonklappe=$row->telefonklappe;
+		$l->ausbildungcode=$row->ausbildungcode;
+		$l->ba1code=$row->ba1code;
+		$l->ba2code=$row->ba2code;
+		$l->verwendung_code=$row->verwendung_code;
+		$l->beschäftigungsausmass = $row->max;
+		$l->vertragsstunden = $row->vertragsstunden;
+
+		// Lektor in Array speichern
+		array_push($this->result, $l);
+	    }
+	    return true;
+	}
+	return false;
+    }
 }
 ?>
