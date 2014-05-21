@@ -1605,7 +1605,7 @@ if($result = @$db->db_query("SELECT * FROM information_schema.table_constraints 
 		if(!$db->db_query($qry))
 			echo '<strong>campus.tbl_pruefungsanmeldung: '.$db->db_last_error().'</strong><br>';
 		else
-			echo 'campus.tbl_pruefungsanmeldung: Fehlenden Foreign Key zu Pruefungstermin hinzugefügt';
+			echo '<br>campus.tbl_pruefungsanmeldung: Fehlenden Foreign Key zu Pruefungstermin hinzugefügt';
 	}
 }
 // Ampel boolean email
@@ -1617,9 +1617,61 @@ if(!$result = @$db->db_query("SELECT ort_kurzbz FROM campus.tbl_pruefungstermin"
 	if(!$db->db_query($qry))
 		echo '<strong>campus.tbl_pruefungstermin: '.$db->db_last_error().'</strong><br>';
 	else
-		echo 'campus.tbl_pruefungstermin: Neue Spalte ort_kurzbz hinzugefügt';
+		echo '<br>campus.tbl_pruefungstermin: Neue Spalte ort_kurzbz hinzugefügt';
 }
 
+// Aufwandstyp bei Projekten
+if(!$result = @$db->db_query("SELECT aufwandstyp_kurzbz FROM fue.tbl_projekt LIMIT 1"))
+{
+	$qry = "
+	CREATE TABLE fue.tbl_aufwandstyp
+	(
+		aufwandstyp_kurzbz varchar(32) NOT NULL,
+		bezeichnung varchar(255)
+	);
+	
+	ALTER TABLE fue.tbl_aufwandstyp ADD CONSTRAINT pk_aufwandstyp PRIMARY KEY (aufwandstyp_kurzbz);
+	INSERT INTO fue.tbl_aufwandstyp(aufwandstyp_kurzbz, bezeichnung) VALUES('schaetzpunkte','Schätzpunkte');
+	INSERT INTO fue.tbl_aufwandstyp(aufwandstyp_kurzbz, bezeichnung) VALUES('stunden','Stunden');
+	INSERT INTO fue.tbl_aufwandstyp(aufwandstyp_kurzbz, bezeichnung) VALUES('personentage','Personentage');
+	
+	ALTER TABLE fue.tbl_projekt ADD COLUMN aufwandstyp_kurzbz varchar(32);
+	ALTER TABLE fue.tbl_projekt ADD CONSTRAINT fk_projekt_aufwandstyp FOREIGN KEY (aufwandstyp_kurzbz) REFERENCES fue.tbl_aufwandstyp(aufwandstyp_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	UPDATE fue.tbl_projekt SET aufwandstyp_kurzbz='schaetzpunkte' WHERE aufwandstyp_kurzbz is null;
+	
+	ALTER TABLE fue.tbl_projekt_ressource ADD COLUMN aufwand smallint;
+	
+	GRANT SELECT on fue.tbl_aufwandstyp TO vilesci;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>fue.tbl_projekt: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>fue.tbl_projekt: aufwandstyp hinzugefuegt';
+}
+
+// Neue Spalten in Tabelle Lehrveranstaltung: SWS, LVS, ALVS, LVPS, LAS
+if(!$result = @$db->db_query("SELECT lvs FROM lehre.tbl_lehrveranstaltung LIMIT 1"))
+{
+	$qry = "
+		ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN sws numeric(5,2);
+		ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN lvs smallint;
+		ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN alvs smallint;
+		ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN lvps smallint;
+		ALTER TABLE lehre.tbl_lehrveranstaltung ADD COLUMN las smallint;
+		COMMENT ON COLUMN lehre.tbl_lehrveranstaltung.sws IS 'Semesterwochenstunden';
+		COMMENT ON COLUMN lehre.tbl_lehrveranstaltung.lvs IS 'Lehrveranstaltungsstunden';
+		COMMENT ON COLUMN lehre.tbl_lehrveranstaltung.alvs IS 'Angebotene Lehrveranstaltungsstunden';
+		COMMENT ON COLUMN lehre.tbl_lehrveranstaltung.lvps IS 'Lehrveranstaltungsplanstunden Summe';
+		COMMENT ON COLUMN lehre.tbl_lehrveranstaltung.las IS 'Lehrauftragsstunden Summe';
+		
+		UPDATE lehre.tbl_lehrveranstaltung SET las=semesterstunden;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_lehrveranstaltung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_lehrveranstaltung: neue Spalten sws, lvs,alvs,lvps,las hinzugefuegt';
+}
 
 
 echo '<br><br><br>';
@@ -1699,11 +1751,12 @@ $tabellen=array(
 	"campus.tbl_zeitsperretyp"  => array("zeitsperretyp_kurzbz","beschreibung","farbe"),
 	"campus.tbl_zeitwunsch"  => array("stunde","mitarbeiter_uid","tag","gewicht","updateamum","updatevon","insertamum","insertvon"),
 	"fue.tbl_aktivitaet"  => array("aktivitaet_kurzbz","beschreibung"),
-	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz","budget","farbe"),
+	"fue.tbl_aufwandstyp" => array("aufwandstyp_kurzbz","bezeichnung"),
+	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz","budget","farbe","aufwandstyp_kurzbz"),
 	"fue.tbl_projektphase"  => array("projektphase_id","projekt_kurzbz","projektphase_fk","bezeichnung","beschreibung","start","ende","budget","insertamum","insertvon","updateamum","updatevon","personentage","farbe"),
 	"fue.tbl_projekttask"  => array("projekttask_id","projektphase_id","bezeichnung","beschreibung","aufwand","mantis_id","insertamum","insertvon","updateamum","updatevon","projekttask_fk","erledigt","ende","ressource_id","scrumsprint_id"),
 	"fue.tbl_projekt_dokument"  => array("projekt_dokument_id","projektphase_id","projekt_kurzbz","dms_id"),
-	"fue.tbl_projekt_ressource"  => array("projekt_ressource_id","projekt_kurzbz","projektphase_id","ressource_id","funktion_kurzbz","beschreibung"),
+	"fue.tbl_projekt_ressource"  => array("projekt_ressource_id","projekt_kurzbz","projektphase_id","ressource_id","funktion_kurzbz","beschreibung","aufwand"),
 	"fue.tbl_ressource"  => array("ressource_id","student_uid","mitarbeiter_uid","betriebsmittel_id","firma_id","bezeichnung","beschreibung","insertamum","insertvon","updateamum","updatevon"),
 	"fue.tbl_scrumteam" => array("scrumteam_kurzbz","bezeichnung","punkteprosprint","tasksprosprint","gruppe_kurzbz"),
 	"fue.tbl_scrumsprint" => array("scrumsprint_id","scrumteam_kurzbz","sprint_kurzbz","sprintstart","sprintende","insertamum","insertvon","updateamum","updatevon"),
@@ -1726,7 +1779,7 @@ $tabellen=array(
 	"lehre.tbl_lehrfunktion"  => array("lehrfunktion_kurzbz","beschreibung","standardfaktor","sort"),
 	"lehre.tbl_lehrmittel" => array("lehrmittel_kurzbz","beschreibung","ort_kurzbz"),
 	"lehre.tbl_lehrtyp" => array("lehrtyp_kurzbz","bezeichnung"),
-	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english","orgform_kurzbz","incoming","lehrtyp_kurzbz","oe_kurzbz","raumtyp_kurzbz","anzahlsemester","semesterwochen","lvnr","farbe","semester_alternativ","old_lehrfach_id"),
+	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english","orgform_kurzbz","incoming","lehrtyp_kurzbz","oe_kurzbz","raumtyp_kurzbz","anzahlsemester","semesterwochen","lvnr","farbe","semester_alternativ","old_lehrfach_id","sws","lvs","alvs","lvps","las"),
 	"lehre.tbl_lehrveranstaltung_kompatibel" => array("lehrveranstaltung_id","lehrveranstaltung_id_kompatibel"),
 	"lehre.tbl_lvangebot" => array("lvangebot_id","lehrveranstaltung_id","studiensemester_kurzbz","gruppe_kurzbz","incomingplaetze","gesamtplaetze","anmeldefenster_start","anmeldefenster_ende","insertamum","insertvon","updateamum","updatevon"),
 	"lehre.tbl_lvregel" => array("lvregel_id","lvregeltyp_kurzbz","operator","parameter","lvregel_id_parent","lehrveranstaltung_id","studienplan_lehrveranstaltung_id","insertamum","insertvon","updateamum","updatevon"),
@@ -2038,6 +2091,15 @@ foreach($berechtigungen as $row)
 								FROM system.tbl_benutzerrolle 
 								LEFT JOIN public.tbl_benutzer USING (uid) 
 								WHERE berechtigung_kurzbz IN ('admin','support','preinteressent','lehre','basis/statistik','basis/fhausweis','wawi/inventar','assistenz','lv-plan') 
+								AND (tbl_benutzerrolle.ende>=now() OR tbl_benutzerrolle.ende IS NULL)
+								AND (tbl_benutzerrolle.start<=now() OR tbl_benutzerrolle.start IS NULL)
+								AND (tbl_benutzer.aktiv=true OR tbl_benutzerrolle.uid IS NULL)
+								UNION
+								SELECT DISTINCT uid, funktion_kurzbz 
+								FROM system.tbl_benutzerrolle 
+								JOIN system.tbl_rolleberechtigung USING(rolle_kurzbz)
+								LEFT JOIN public.tbl_benutzer USING (uid) 
+								WHERE tbl_rolleberechtigung.berechtigung_kurzbz IN ('admin','support','preinteressent','lehre','basis/statistik','basis/fhausweis','wawi/inventar','assistenz','lv-plan') 
 								AND (tbl_benutzerrolle.ende>=now() OR tbl_benutzerrolle.ende IS NULL)
 								AND (tbl_benutzerrolle.start<=now() OR tbl_benutzerrolle.start IS NULL)
 								AND (tbl_benutzer.aktiv=true OR tbl_benutzerrolle.uid IS NULL) ORDER BY uid";

@@ -105,13 +105,19 @@
 		$lv->lvnr = $_POST['lvnr'];
 		$lv->semester_alternativ = $_POST['semester_alternativ'];
 		$lv->farbe = $_POST['farbe'];
+		$lv->sws = mb_eregi_replace(',','.',$_POST['sws']);
+		$lv->lvs = $_POST['lvs'];
+		$lv->alvs = $_POST['alvs'];
+		$lv->lvps = $_POST['lvps'];
+		$lv->las = $_POST['las'];
+		
 		if(!$lv->save())
 			$errorstr = "Fehler beim Speichern der Daten: $lv->errormsg";
 		else
 		{
 			$reloadstr .= "<script type='text/javascript'>\n";
 			$reloadstr .= "	parent.uebersicht.location.href='lehrveranstaltung.php?stg_kz=$lv->studiengang_kz&semester=$lv->semester&isaktiv='+parent.uebersicht.isaktiv;";
-			if($lv->lehreverzeichnisExists($lv->lehreverzeichnis) && ($lv->new === true))
+			if($lv->lehreverzeichnisExists($lv->lehreverzeichnis, $lv->studiengang_kz, $lv->semester) && ($lv->new === true))
 			{
 			    $reloadstr .= " window.location.href='".$_SERVER['PHP_SELF']."?stg_kz=$lv->studiengang_kz&semester=$lv->semester&neu=true&lehrevzExists=true&update=false';";
 			}
@@ -320,7 +326,7 @@
 			<td>LVNR</td>
 			<td><input type="text" name="lvnr" value="'.$lv->lvnr.'" /></td>
 			<td>Organisationseinheit</td>
-			<td><select name="oe_kurzbz" ><option value="">--keine Auswahl --</option>';
+			<td colspan="3"><select name="oe_kurzbz" ><option value="">--keine Auswahl --</option>';
 		
 		$qry = "SELECT * FROM public.tbl_organisationseinheit ORDER BY organisationseinheittyp_kurzbz, oe_kurzbz";
 		if($result = $db->db_query($qry))
@@ -343,8 +349,6 @@
 			}
 		}
 		$htmlstr .= '</select></td>
-			<td>Anzahl Semester</td>
-			<td><input type="text" name="anzahlsemester" size="2" value="'.$lv->anzahlsemester.'" /></td>
 		</tr><tr>
 			<td>Semester alternativ</td>
 			<td><input type="text" size="3" name="semester_alternativ" value="'.$lv->semester_alternativ.'" /></td>
@@ -369,8 +373,26 @@
 		<tr>
 			<td>Farbe</td>
 			<td><input id="farbe" type="text" name="farbe" size="6" value="'.$lv->farbe.'" onchange="document.getElementById(\'farbevorschau\').style.backgroundColor=this.value"/>&nbsp<span id="farbevorschau" style="background-color: #'.$lv->farbe.'; border: 1px solid #999999; cursor: default;" >&nbsp&nbsp&nbsp&nbsp</span></td>
+			<td>Anzahl Semester</td>
+			<td><input type="text" name="anzahlsemester" size="2" value="'.$lv->anzahlsemester.'" /></td>
 			<td></td>
 			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>Semesterwochenstunden (SWS)</td>
+			<td><input id="sws" type="text" name="sws" size="3" value="'.$lv->sws.'"></td>
+			<td>Lehrveranstaltungsstunden (LVS)</td>
+			<td><input id="lvs" type="text" name="lvs" size="3" value="'.$lv->lvs.'"></td>
+			<td>Angebotene Lehrveranstaltungsstunden (ALVS)</td>
+			<td><input id="alvs" type="text" name="alvs" size="3" value="'.$lv->alvs.'"></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>LV-Plan Stunden Summe (LVPS)</td>
+			<td><input id="lvps" type="text" name="lvps" size="3" value="'.$lv->lvps.'"></td>
+			<td>Lehrauftragsstunden Summe (LAS)</td>
+			<td><input id="las" type="text" name="las" size="3" value="'.$lv->las.'"></td>
 			<td></td>
 			<td></td>
 			<td></td>
