@@ -28,7 +28,7 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class studienplan extends basis_db
 {
-	private $new = true;			// boolean
+	public $new = true;			// boolean
 	public $result = array();		// Objekte
 	
 	//Tabellenspalten
@@ -588,6 +588,45 @@ class studienplan extends basis_db
 				$this->errormsg = 'Fehler beim Laden der Daten';
 				return false;
 			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Laedt die Lehrveranstaltungszuordnungen zu einem Studienplan
+	 *
+	 * @param $studienplan_id ID des Studienplanes
+	 */
+	public function loadStudienplanLV($studienplan_id)
+	{
+		$qry = "SELECT * FROM lehre.tbl_studienplan_lehrveranstaltung WHERE studienplan_id=".$this->db_add_param($studienplan_id);
+	
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new studienplan();
+				
+				$obj->studienplan_lehrveranstaltung_id = $row->studienplan_lehrveranstaltung_id;
+				$obj->semester = $row->semester;
+				$obj->pflicht = $this->db_parse_bool($row->pflicht);
+				$obj->studienplan_id = $row->studienplan_id;
+				$obj->koordinator = $row->koordinator;
+				$obj->studienplan_lehrveranstaltung_id_parent = $row->studienplan_lehrveranstaltung_id_parent;
+				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->new=false;
+				
+				$this->result[] = $obj;
+			}
+			return true;
 		}
 		else
 		{
