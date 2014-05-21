@@ -19,24 +19,25 @@
  */
 
 require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/functions.inc.php');
 require_once('../../../include/basis_db.class.php');
-require_once('../../../include/mitarbeiter.class.php'); 
+require_once('../../../include/benutzer.class.php'); 
 	
 if (!$db = new basis_db())
     die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-
+$uid=get_uid();
 if(isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete']=='kunde')
 {
 	$search=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
 	if (is_null($search) ||$search=='')
 		exit();	
     
-    $mitarbeiter_zeit = new mitarbeiter(); 
-
-	if($mitarbeiter_zeit->search($search))
+    $benutzer = new benutzer();
+    
+	if($benutzer->search(array($search)))
 	{
 		$result_obj = array();
-		foreach($mitarbeiter_zeit->result as $row)
+		foreach($benutzer->result as $row)
 		{
 			$item['vorname']=html_entity_decode($row->vorname);
 			$item['nachname']=html_entity_decode($row->nachname);
