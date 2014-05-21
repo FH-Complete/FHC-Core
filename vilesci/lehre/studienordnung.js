@@ -134,7 +134,8 @@ function drawStudienordnungen(data)
 		if(data[i].studienordnung_id !== null)
 		{
 			obj=obj+'<li><a href="#Load'+data[i].studienordnung_id+'" onclick="loadStudienplanSTO('+data[i].studienordnung_id+',\''+data[i].bezeichnung+'\');return false;">'+data[i].bezeichnung+'</a>'
-				+' <a href="#Edit'+data[i].studienordnung_id+'" onclick="editStudienordnung('+data[i].studienordnung_id+');return false;"><img title="edit" src="../../skin/images/edit.png"></a></li>';
+				+' <a href="#Edit'+data[i].studienordnung_id+'" onclick="editStudienordnung('+data[i].studienordnung_id+');return false;"><img title="Bearbeiten" src="../../skin/images/edit.png"></a>'
+				+' <a href="#Copy'+data[i].studienordnung_id+'" onclick="copyStudienordnung('+data[i].studienordnung_id+');return false;"><img title="Studienordnung kopieren" src="../../skin/images/copy.png"></a></li>';
 		}
 	}
 	obj=obj+'</ul>';
@@ -1394,4 +1395,32 @@ function deleteSemesterZuordnung(ausbildungssemester_kurzbz, studiensemester)
 		});
 	}
 	
+}
+
+/**
+ * Kopiert eine Studienordnung
+ * @param studienordnung_id
+ */
+function copyStudienordnung(studienordnung_id)
+{
+	if(confirm("Wollen Sie diese Studienordnung wirklich kopieren?"))
+	{
+		$.ajax({
+			dataType: "json",
+			url: "../../soap/studienordnung.json.php",
+			type: "POST",
+			data: {
+				"method": "copyStudienordnung",
+				"studienordnung_id": studienordnung_id
+			},
+			error: loadError
+		}).success(function(data)
+		{
+			if(data.error === "true")
+			{
+				alert(data.errormsg);
+			}
+			loadStudienordnung();
+		});		
+	}
 }

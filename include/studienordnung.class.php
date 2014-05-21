@@ -29,7 +29,7 @@ require_once 'studiensemester.class.php';
 
 class studienordnung extends basis_db
 {
-	private $new = true;			// boolean
+	public $new = true;			// boolean
 	public $result = array();		// Objekte
 
 	//Tabellenspalten
