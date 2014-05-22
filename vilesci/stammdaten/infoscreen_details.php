@@ -48,16 +48,33 @@ $datum_obj = new datum();
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">	
 	<script type="text/javascript" src="../../include/js/jquery.js"></script> 
 	<script type="text/javascript">
-	
-		$(document).ready(function() 
-			{ 
-			    $("#myTable").tablesorter(
-				{
-					sortList: [[0,0]],
-					widgets: ['zebra']
-				}); 
-			} 
-		);
+	$(document).ready(function() 
+		{ 
+		    $("#myTable").tablesorter(
+			{
+				sortList: [[0,0],[5,0]],
+				widgets: ['zebra']
+			}); 
+		} 
+	);
+	function checkValue()
+	{
+		var zeit = document.getElementById("refreshzeit").value;
+		if (!isNaN(zeit))
+		{
+			if(zeit > 32767)
+			{
+				alert("Maximalwert für Refreshzeit ist 32767");
+				return false;
+			}
+			
+		}
+		else
+		{
+			alert("Wert für Refreshzeit ist ungültig");
+			return false;
+		}
+	};
 	</script>
 </head>
 <body>
@@ -112,14 +129,35 @@ $datum_obj = new datum();
 		$infoscreen->updatevon = $user;
 		
 		$infoscreen_ids=explode(',',$my_infoscreen_id);
+		if (count($infoscreen_ids)>1)
+		{
+			$infoscreen->new = true;
+			$infoscreen->insertamum = date('Y-m-d H:i:s');
+			$infoscreen->insertvon = $user;
+		}
+
+		$doppelt = false;
 		foreach($infoscreen_ids as $is_id)
 		{
 			$infoscreen->infoscreen_id = $is_id;
-		
+			
+			if ($doppelt==false)
+			{
+				if ($is_id==$infoscreen_id && $infoscreen_content_id!='')
+				{
+					$doppelt=true;
+					$infoscreen->new = false;
+				}
+			}
+			else
+				$doppelt=false;
+			
 			if(!$infoscreen->saveContent())
 				echo '<span class="error">Fehler bei Infoscreen '.$is_id.': '.$db->convert_html_chars($infoscreen->errormsg).'</span><br>';
 			else
-				echo '<span class="ok">Daten erfolgreich gespeichert für Infoscreen '.$is_id.'</span><br>';		
+				echo '<span class="ok">Daten erfolgreich gespeichert für Infoscreen '.$is_id.'</span><br>';
+				
+			$infoscreen->new = true;
 		}
 	}
 	if($action=='delete')
@@ -151,8 +189,8 @@ $datum_obj = new datum();
 		<input type="hidden" name="infoscreen_content_id" value="',$db->convert_html_chars($infoscreen->infoscreen_content_id),'">
 		<table>
 		<tr>
-			<td>InfoscreenID</td>
-			<td><input type="text" size="5" name="infoscreen_id" value="',($action=='new'?$infoscreen_id:$db->convert_html_chars($infoscreen->infoscreen_id)),'" /> (Wenn keine ID eingetragen wird, gilt der Eintrag für alle Infoscreens)</td>
+			<td>InfoscreenID(s)</td>
+			<td><input type="text" size="15" name="infoscreen_id" value="',($action=='new'?$infoscreen_id:$db->convert_html_chars($infoscreen->infoscreen_id)),'" /> (Kommagetrennt für mehrere, keine ID für alle Infoscreens)</td>
 		</tr>
 		<tr>
 			<td>Content ID</td>
@@ -168,11 +206,11 @@ $datum_obj = new datum();
 		</tr>
 		<tr>
 			<td>Refreshzeit</td>
-			<td><input type="text" size="18" name="refreshzeit" value="',$db->convert_html_chars($infoscreen->refreshzeit),'" /> Zeit wie lange die Seite angezeigt wird (in Sekunden)</td>
+			<td><input id="refreshzeit" type="text" size="18" name="refreshzeit" value="',$db->convert_html_chars($infoscreen->refreshzeit),'"/> Zeit, wie lange die Seite angezeigt wird (in Sekunden)</td>
 		</tr>
 		<tr>
 			<td></td>
-			<td><input type="submit" value="Speichern" /></td>
+			<td><input type="submit" value="Speichern" onclick="return checkValue();"/></td>
 		</tr>
 		</table>
 		</form>';
