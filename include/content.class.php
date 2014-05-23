@@ -97,8 +97,10 @@ class content extends basis_db
 				WHERE
 					tbl_content.content_id=".$this->db_add_param($content_id, FHC_INTEGER)."
 					AND tbl_contentsprache.sprache=".$this->db_add_param($sprache);
-		if($sichtbar)
+		if($sichtbar===true)
 			$qry.=" AND sichtbar=true";
+		elseif($sichtbar===false)
+			$qry.=" AND sichtbar=false";
 		if($version!='')
 			$qry.=" AND tbl_contentsprache.version=".$this->db_add_param(intval($version), FHC_INTEGER);
 		$qry.=" ORDER BY version DESC LIMIT 1";

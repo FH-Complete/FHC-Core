@@ -85,14 +85,22 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 	<link href="../skin/style.css.php" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="../skin/styles/jquery.css" type="text/css">
 	<link rel="stylesheet" href="../skin/styles/jquery-ui.css" type="text/css">
-	
+
 	<script src="../include/js/jquery.js" type="text/javascript"></script>
 	<script src="../include/js/jquery-ui.js" type="text/javascript"></script>
 	<script type="text/javascript" src="../include/tiny_mce/tiny_mce.js"></script>
 	
 	<title>'.$p->t('news/newsverwaltung').'</title>
 	<script type="text/javascript">
-
+	$(document).ready(function() 
+		{ 
+			$( ".datepicker_datum" ).datepicker({
+				 changeMonth: true,
+				 dateFormat: "dd.mm.yy",
+				 minDate: "getDate",
+				 maxDate: "+30d"
+				 });
+		});
 
 	tinyMCE.init
 	(
@@ -165,7 +173,7 @@ if(isset($_GET['action']) && $_GET['action']=='add_uebersetzung')
 	$content->getContent($news->content_id);
 	
 	$content->new = true;
-	$content->sichtbar=true;
+	$content->sichtbar=false;
 	$content->sprache=$_GET['lang'];
 	$content->insertvon = $uid;
 	$content->insertamum = date('Y-m-d H:i:s');
@@ -279,6 +287,11 @@ if(isset($_POST['save']))
 	foreach($sprachen as $lang)
 	{
 		$content = new content();
+		if (isset($_POST['sichtbar_'.$lang]))
+			$sichtbar = true;
+		else 
+			$sichtbar = false;
+
 		if(isset($_POST['contentsprache_id_'.$lang]) && $_POST['contentsprache_id_'.$lang]!='')
 		{
 			$content->loadContentSprache($_POST['contentsprache_id_'.$lang]);
@@ -288,7 +301,7 @@ if(isset($_POST['save']))
 		{
 			$content->insertamum = date('Y-m-d H:i:s');
 			$content->insertvon = $uid;
-			$content->sichtbar=true;
+			$content->sichtbar = $sichtbar;
 			$content->version=1;
 			$content->content_id=$news->content_id;
 			$content->new = true;
@@ -302,6 +315,7 @@ if(isset($_POST['save']))
 		$xml.='</news>';
 		
 		$content->content = $xml;
+		$content->sichtbar = $sichtbar;
 		$content->updateamum = date('Y-m-d H:i:s');
 		$content->updatevon = $uid;
 		$content->titel = $_POST['betreff_'.$lang];
@@ -310,6 +324,10 @@ if(isset($_POST['save']))
 			$message.= '<span class="error">'.$content->errormsg.'</span>';
 			$save_error=true;
 		}
+		if ($sichtbar == true)
+			$message.='<span class="ok">'.$p->t('news/eintragVeroeffentlicht',array($lang)).'</span><br/>';
+		else 
+			$message.='<span class="error">'.$p->t('news/eintragNochNichtVeroeffentlicht',array($lang)).'</span><br/>';
 	}
 	if(!$save_error)
 	{
@@ -391,18 +409,18 @@ echo '<form action="'.$_SERVER['PHP_SELF'].'" method="POST">
 					<table>
 						<tr>
 							<td nowrap>'.$p->t('news/sichtbarab').'</td>
-							<td><input type="text" name="datum" size="10" value="'.($news->datum!=''?$datum_obj->formatDatum($news->datum,'d.m.Y'):date('d.m.Y')).'"></td>
+							<td><input class="datepicker_datum" type="text" name="datum" size="10" value="'.($news->datum!=''?$datum_obj->formatDatum($news->datum,'d.m.Y'):date('d.m.Y')).'"></td>
 						</tr>
 						<tr>
 							<td valign="top" nowrap>'.$p->t('news/sichtbarbis').'</td>
-							<td><input type="text" name="datum_bis" size="10" value="'.$datum_obj->formatDatum($news->datum_bis,'d.m.Y').'"><br>'.$p->t('news/maximal30Tage').'</td>
+							<td><input class="datepicker_datum" type="text" name="datum_bis" size="10" value="'.$datum_obj->formatDatum($news->datum_bis,'d.m.Y').'">'.$p->t('news/maximal30Tage').'</td>
 						</tr>
 					</table>
 				</td>
 				<td>';
 
 //DropDown fuer Studiengang und Semester anzeigen
-if($studiengang_kz!='0')
+if($studiengang_kz!='')
 {
 	$studiengang = new studiengang();
 	$studiengang->getAll('typ, kurzbz', false);
@@ -418,7 +436,7 @@ if($studiengang_kz!='0')
 			$selected = 'selected';
 		else
 			$selected = '';
-		echo '<OPTION value="'.$row->studiengang_kz.'" '.$selected.'>'.$row->kuerzel.' ('.$row->kurzbzlang.')</OPTION>';
+		echo '<OPTION value="'.$row->studiengang_kz.'" '.$selected.'>'.$row->kuerzel.' ('.$row->bezeichnung.')</OPTION>';
 	}
 	echo '		</SELECT>
 				</td>
@@ -428,11 +446,11 @@ if($studiengang_kz!='0')
 			<td>'.$p->t('global/semester').'</td>
 			<td>
 			<SELECT name="semester">';
-	echo '<OPTION value="0">'.$p->t('news/allesemester').'</OPTION>';
+	echo '<OPTION value="">'.$p->t('news/allesemester').'</OPTION>';
 	
-	for($i=1;$i<=8;$i++)
+	for($i=0;$i<=8;$i++)
 	{
-		if($i==$semester)
+		if($semester!='' && $i==$semester)
 			$selected='selected';
 		else
 			$selected='';
@@ -481,6 +499,7 @@ foreach($sprachen as $lang)
 	$verfasser='';
 	$betreff='';
 	$text='';
+	$sichtbar='';
 	if($news->content_id!='')
 	{
 		$content->getContent($news->content_id, $lang, null, null, false);
@@ -497,6 +516,8 @@ foreach($sprachen as $lang)
 			$betreff = $xml_inhalt->getElementsByTagName('betreff')->item(0)->nodeValue;
 		if($xml_inhalt->getElementsByTagName('text')->item(0))
 			$text = $xml_inhalt->getElementsByTagName('text')->item(0)->nodeValue;
+			
+		$sichtbar = $content->sichtbar;
 	}
 	echo '<div id="'.$lang.'">';
 	echo '<input type="hidden" name="contentsprache_id_'.$lang.'" value="'.$content->contentsprache_id.'">';
@@ -512,6 +533,10 @@ foreach($sprachen as $lang)
 			<tr>
 				<td>'.$p->t('news/text').'</td>
 				<td><textarea name="text_'.$lang.'" rows="15" cols="80">'.$text.'</textarea></td>
+			</tr>
+			<tr>
+				<td>'.$p->t('news/veroeffentlichen').'</td>
+				<td><input type="checkbox" name="sichtbar_'.$lang.'" '.($sichtbar==true?'checked':'').'></td>
 			</tr>
 		</table>';
 	
@@ -570,7 +595,17 @@ echo '<script type="text/javascript">
 
 // Newseintraege Anzeigen
 echo '<hr>
-<iframe src="news.php?studiengang_kz='.$studiengang_kz.'&semester='.$semester.'&edit=true" style="width:99%; height:100%;position:absolute;">';
+<table style="width:100%;height:100%;vertical-align:top">
+<tr>
+	<td style="height:100%;" valign="top">
+		<h3>Nicht veröffentlicht</h3>
+		<iframe src="news.php?studiengang_kz='.$studiengang_kz.'&semester='.$semester.'&edit=true&sichtbar=false" style="width: 95%;height:100%;"></iframe>
+	</td>
+	<td valign="top">
+		<h3>Veröffentlicht</h3>
+		<iframe src="news.php?studiengang_kz='.$studiengang_kz.'&semester='.$semester.'&edit=true" style="width: 95%;height:100%;"></iframe>
+	</td>
+</tr></table>';
 echo '</body>
 </html>';
 ?>

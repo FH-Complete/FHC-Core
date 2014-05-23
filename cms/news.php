@@ -88,6 +88,11 @@ $editable = isset($_GET['edit']);
 $news = new news();
 $all=false;
 
+if(isset($_GET['sichtbar']) && ($_GET['sichtbar'])=="false")
+	$sichtbar = false;
+else 
+	$sichtbar = true;
+	
 //Im Editiermodus werden auch die zukuenftigen News angezeigt
 if($editable)
 	$all=true;
@@ -99,7 +104,7 @@ $xml = '<?xml version="1.0" encoding="UTF-8"?><content>';
 foreach($news->result as $row)
 {
 	$content = new content();
-	$content->getContent($row->content_id, $sprache,null, true, true);
+	$content->getContent($row->content_id, $sprache,null, $sichtbar, true);
 	
 	//das Datum des News Eintrages ist nicht im XML enthalten, es muss extra hinzugefuegt werden
 	$datum = '<datum><![CDATA['.$datum_obj->formatDatum($row->datum,'d.m.Y').']]></datum>';
