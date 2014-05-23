@@ -38,4 +38,7 @@ $this->phrasen['news/mailtextHTML']='Dies ist eine automatisch generierte E-Mail
 $this->phrasen['news/uebersetzungsanforderungGesendet']='Übersetzungsanforderung wurde an %s versendet';
 $this->phrasen['news/fehlerBeimSenden']='Fehler beim Senden des Mails an %s';
 $this->phrasen['news/keinUebersetzerVorhanden']='Es ist kein Übersetzer im System hinterlegt'; //Leerlassen, falls keine Info diesbezueglich gewuenscht ist
+$this->phrasen['news/eintragVeroeffentlicht']='Eintrag %s veröffentlicht';
+$this->phrasen['news/eintragNochNichtVeroeffentlicht']='Eintrag %s noch nicht veröffentlicht';
+$this->phrasen['news/veroeffentlichen']='Veröffentlichen';
 ?>
