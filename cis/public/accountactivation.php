@@ -141,12 +141,12 @@ else
 		<tr>
 		    <td align="left"></td>
 		    <td align="right" width="10px">
-			<select style="text-align: right; color: #0086CC; border: 0;" name="select">';
+			<select style="text-align: right; color: #0086CC; border: 0;" name="select" onchange="changeSprache(this.options[this.selectedIndex].value);">';
 		        $sprache2 = new sprache();
 				$sprache2->getAll(true);
 				foreach($sprache2->result as $row)
 				{
-					echo ' <option onclick="changeSprache(\''.$row->sprache.'\'); return false;" '.($row->sprache==$sprache?'selected':'').'>'.($row->bezeichnung_arr[getSprache()]).'&nbsp;&nbsp;</option>';
+					echo ' <option value="'.$row->sprache.'" '.($row->sprache==$sprache?'selected':'').'>'.($row->bezeichnung_arr[getSprache()]).'&nbsp;&nbsp;</option>';
 				}
 	echo '	</select></td>
 		</tr>
