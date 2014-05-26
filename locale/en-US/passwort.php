@@ -16,11 +16,14 @@ $this->phrasen['passwort/Kleinbuchstabe']='The new password must contain at leas
 $this->phrasen['passwort/Ziffer']='The new password must contain at least 1 numeral character.';
 $this->phrasen['passwort/Leerzeichen']='The password may not include spaces.';
 $this->phrasen['passwort/Umlaute']='The password may not include umlauts.';
-$this->phrasen['passwort/Sonderzeichen']='Bitte verwenden Sie nur erlaubte Sonderzeichen';
-$this->phrasen['passwort/AenderungOK']='Das Passwort wurde erfolgreich geaendert';
-$this->phrasen['passwort/AenderungFehler']='Passwort Änderung fehlgeschlagen:%s';
-$this->phrasen['passwort/NichtUebereinstimmend']='Passwörter stimmen nicht überein';
-$this->phrasen['passwort/NoHttps']='ACHTUNG - Sie verwenden eine unverschlüsselte Verbindung. Sie sollten Ihr Passwort nur über eine verschlüsselte Verbindung ändern.';
-$this->phrasen['passwort/ZuHttpsWechseln']='Jetzt zu verschlüsselter Verbindung wechseln';
-
+$this->phrasen['passwort/Sonderzeichen']='Please use only permitted special characters';
+$this->phrasen['passwort/AenderungOK']='Password successfully changed';
+$this->phrasen['passwort/AenderungFehler']='Error changing password:%s';
+$this->phrasen['passwort/NichtUebereinstimmend']='Passwords do not match';
+$this->phrasen['passwort/NoHttps']='ATTENTION - You are using an unecryptet connection. You should change your password only via an encrypted connection.';
+$this->phrasen['passwort/ZuHttpsWechseln']='Switch to encrypted connection';
+$this->phrasen['passwort/CaptchaEingabe']='Enter the characters in <br>the field below.';
+$this->phrasen['passwort/ReloadCaptcha']='Reload picture';
+$this->phrasen['passwort/PasswortWaehlen']='Please choose a password for your account';
+$this->phrasen['passwort/AccountAktivierung']='Account Activation';
 ?>
