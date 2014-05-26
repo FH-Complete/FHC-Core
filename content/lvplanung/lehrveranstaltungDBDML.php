@@ -726,9 +726,9 @@ if(!$error)
 			{
 				$qry = "SELECT stundenplandev_id as id FROM lehre.tbl_stundenplandev 
 						WHERE 
-							(lehreinheit_id, studiengang_kz, semester, trim(COALESCE(verband)), trim(COALESCE(gruppe)), trim(COALESCE(gruppe_kurzbz))) =
+							(lehreinheit_id, studiengang_kz, semester, trim(COALESCE(verband,'')), trim(COALESCE(gruppe,'')), trim(COALESCE(gruppe_kurzbz,''))) =
 							(SELECT 
-								lehreinheit_id, studiengang_kz, semester, trim(COALESCE(verband)), trim(COALESCE(gruppe)), trim(COALESCE(gruppe_kurzbz))
+								lehreinheit_id, studiengang_kz, semester, trim(COALESCE(verband,'')), trim(COALESCE(gruppe,'')), trim(COALESCE(gruppe_kurzbz,''))
 							 FROM 
 							 	lehre.tbl_lehreinheitgruppe 
 							WHERE 
