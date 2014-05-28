@@ -109,7 +109,7 @@ class ressource extends basis_db
 	 */
 	public function getAllRessourcen()
 	{
-		$qry = "SELECT * FROM fue.tbl_ressource order by ressource_id";
+		$qry = "SELECT * FROM fue.tbl_ressource order by bezeichnung";
 			
 		$this->result=array();
 			
@@ -425,7 +425,7 @@ class ressource extends basis_db
 	 * 
 	 * @param $datum
 	 */
-	public function getProjektRessourceDatum($datum)
+	public function getProjektRessourceDatum($datum, $endedatum)
 	{
 		$qry = "
 		SELECT 
@@ -438,7 +438,7 @@ class ressource extends basis_db
 			LEFT JOIN fue.tbl_projekt_ressource USING(ressource_id)
 			LEFT JOIN fue.tbl_projekt USING(projekt_kurzbz)
 		WHERE
-			(tbl_projekt.beginn<='".addslashes($datum)."' OR tbl_projekt.beginn is null) AND 
+			(tbl_projekt.beginn<='".addslashes($endedatum)."' OR tbl_projekt.beginn is null) AND 
 			(tbl_projekt.ende>='".addslashes($datum)."' OR tbl_projekt.ende is null)  ";
 		
 		if($result = $this->db_query($qry))
@@ -470,7 +470,7 @@ class ressource extends basis_db
 	 * 
 	 * @param $datum
 	 */
-	public function getProjektphaseRessourceDatum($datum)
+	public function getProjektphaseRessourceDatum($datum, $endedatum)
 	{
 		$qry = "
 		SELECT 
@@ -483,11 +483,10 @@ class ressource extends basis_db
 			LEFT JOIN fue.tbl_projekt_ressource USING(ressource_id)
 			LEFT JOIN fue.tbl_projektphase USING(projektphase_id)
 		WHERE
-			(tbl_projektphase.start<='".addslashes($datum)."' OR tbl_projektphase.start is null) AND 
+			(tbl_projektphase.start<='".addslashes($endedatum)."' OR tbl_projektphase.start is null) AND 
 			(tbl_projektphase.ende>='".addslashes($datum)."' OR tbl_projektphase.ende is null)  
 		ORDER BY tbl_ressource.bezeichnung";
 		
-		//echo $qry;
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))

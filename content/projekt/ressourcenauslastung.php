@@ -30,16 +30,18 @@ $ressource_arr = array();
 
 $datum_obj = new datum();
 $datum = date('Y-m-d',$timestamp);
+$endetimestamp = jump_week($timestamp,$showweeks);
+$endedatum = date('Y-m-d',$endetimestamp);
 
 if(isset($_GET['typ']) && $_GET['typ']=='projekt')
 {
-	$ressource->getProjektRessourceDatum($datum);
+	$ressource->getProjektRessourceDatum($datum, $endedatum);
 	$typ = 'projekt';
 	$anzahl_warnung = 6;
 }
 else
 {
-	$ressource->getProjektphaseRessourceDatum($datum);
+	$ressource->getProjektphaseRessourceDatum($datum, $endedatum);
 	$typ = 'phase';
 	$anzahl_warnung = 6;
 }
