@@ -425,7 +425,7 @@ class ressource extends basis_db
 	 * 
 	 * @param $datum
 	 */
-	public function getProjektRessoureDatum($datum)
+	public function getProjektRessourceDatum($datum)
 	{
 		$qry = "
 		SELECT 
@@ -470,7 +470,7 @@ class ressource extends basis_db
 	 * 
 	 * @param $datum
 	 */
-	public function getProjektphaseRessoureDatum($datum)
+	public function getProjektphaseRessourceDatum($datum)
 	{
 		$qry = "
 		SELECT 
@@ -484,8 +484,10 @@ class ressource extends basis_db
 			LEFT JOIN fue.tbl_projektphase USING(projektphase_id)
 		WHERE
 			(tbl_projektphase.start<='".addslashes($datum)."' OR tbl_projektphase.start is null) AND 
-			(tbl_projektphase.ende>='".addslashes($datum)."' OR tbl_projektphase.ende is null)  ";
+			(tbl_projektphase.ende>='".addslashes($datum)."' OR tbl_projektphase.ende is null)  
+		ORDER BY tbl_ressource.bezeichnung";
 		
+		//echo $qry;
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
