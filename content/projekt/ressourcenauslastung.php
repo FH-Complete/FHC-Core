@@ -23,7 +23,7 @@ require_once('../../include/ressource.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/projektphase.class.php');
 
-$showweeks=15;
+$showweeks=52;
 $timestamp = time();
 $ressource = new ressource();
 $ressource_arr = array();
@@ -33,15 +33,15 @@ $datum = date('Y-m-d',$timestamp);
 
 if(isset($_GET['typ']) && $_GET['typ']=='projekt')
 {
-	$ressource->getProjektRessoureDatum($datum);
+	$ressource->getProjektRessourceDatum($datum);
 	$typ = 'projekt';
 	$anzahl_warnung = 6;
 }
 else
 {
-	$ressource->getProjektphaseRessoureDatum($datum);
+	$ressource->getProjektphaseRessourceDatum($datum);
 	$typ = 'phase';
-	$anzahl_warnung = 3;
+	$anzahl_warnung = 6;
 }
 
 foreach($ressource->result as $row)
@@ -85,8 +85,9 @@ echo '</tr>';
 
 foreach($ressource_arr as $bezeichnung)
 {
-	echo '<tr>';
-	echo '<td>'.$bezeichnung.'</td>';
+	$showrow=false;
+	$htmlrow='<tr>';
+	$htmlrow.='<td>'.$bezeichnung.'</td>';
 	for($i=0;$i<$showweeks;$i++)
 	{
 		$timestamp_kw = jump_week($timestamp,$i);
@@ -100,7 +101,6 @@ foreach($ressource_arr as $bezeichnung)
 			$start = $datum_obj->mktime_fromdate($row->start);
 			$ende = $datum_obj->mktime_fromdate($row->ende);
 			if($row->bezeichnung == $bezeichnung 
-				
 				&& ($row->start=='' || $start<=$timestamp_kw)
 				&& ($row->ende=='' || $ende>=$timestamp_kw)
 				)
@@ -108,11 +108,13 @@ foreach($ressource_arr as $bezeichnung)
 				if($typ=='projekt' && $row->projekt_kurzbz!='')
 				{
 					$anzahl++;
+					$showrow=true;
 					$title .= $row->projekt_kurzbz.',';
 				}
 				elseif($typ=='phase' && $row->projektphase_id!='')
 				{
 					$anzahl++;
+					$showrow=true;
 					$phase = new projektphase();
 					$phase->load($row->projektphase_id);
 					$title .= $phase->bezeichnung.'('.$phase->projekt_kurzbz.'),';
@@ -121,14 +123,16 @@ foreach($ressource_arr as $bezeichnung)
 		}
 		$title = mb_substr($title,0,-1);
 		
-		echo '<td title="'.$title.'" align="center">';
+		$htmlrow.='<td title="'.$title.'" align="center">';
 		if($anzahl>=$anzahl_warnung)
-			echo '<span class="warning">'.$anzahl.'</span>';
+			$htmlrow.='<span class="warning">'.$anzahl.'</span>';
 		else
-			echo $anzahl;
-		echo '</td>';
+			$htmlrow.=$anzahl;
+		$htmlrow.='</td>';
 	}
-	echo '</tr>';
+	$htmlrow.='</tr>';
+	if ($showrow)
+		echo $htmlrow;
 }
 
 echo '
