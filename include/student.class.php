@@ -740,5 +740,34 @@ class student extends benutzer
             return false; 
         }
     }
+    
+    public function getStudentUidsForMeldung($studiensemester1, $studiensemester2, $studiensemester3, $zeitraumStart, $zeitraumEnde)
+    {
+	$qry = "SELECT DISTINCT ON(student_uid)* FROM public.tbl_student 
+		    JOIN public.tbl_benutzer ON(student_uid = uid) 
+		    JOIN public.tbl_person USING(person_id) 
+		    JOIN public.tbl_prestudent USING(prestudent_id) 
+		    JOIN public.tbl_prestudentstatus ps USING(prestudent_id) 
+		WHERE
+		    bismelden
+		    AND ps.studiensemester_kurzbz 
+			IN(".$this->db_add_param($studiensemester1).","
+			.$this->db_add_param($studiensemester2).","
+			.$this->db_add_param($studiensemester3).")
+		    AND ps.datum > ".$this->db_add_param($zeitraumStart)."
+		    AND ps.datum <= ".$this->db_add_param($zeitraumEnde)."
+		    AND ps.status_kurzbz IN('Student','Unterbrecher','Abbrecher','Absolvent');";
+	
+	if($result = $this->db_query($qry))
+	{
+	    $uids = array();
+	    while($row = $this->db_fetch_object($result))
+	    {
+		array_push($uids, $row->student_uid);
+	    }
+	    return $uids;
+	}
+	return false;
+    }
 }
 ?>
