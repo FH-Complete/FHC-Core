@@ -817,7 +817,7 @@ class person extends basis_db
 				$this->kurzbeschreibung = $row->kurzbeschreibung;
 				$this->zugangscode = $row->zugangscode;
 				$this->foto_sperre = $this->db_parse_bool($row->foto_sperre);
-				$this->matrikelnummer = $this->row->matrikelnummer; 
+				$this->matr_nr = $row->matr_nr; 
 			}
 			else
 			{
