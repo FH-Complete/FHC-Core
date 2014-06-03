@@ -68,6 +68,8 @@ function saveProjekt($username, $passwort, $projekt)
 	$projektNew->budget = $projekt->budget;
     $projektNew->farbe = $projekt->farbe;
 	$projektNew->oe_kurzbz = $projekt->oe_kurzbz;
+	$projektNew->aufwandstyp_kurzbz = $projekt->aufwandstyp_kurzbz;
+	
 	if($projekt->neu=='true')
 		$projektNew->new = true; 
 	else

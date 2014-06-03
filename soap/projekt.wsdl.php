@@ -30,6 +30,7 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
             <wsdl:part name="farbe" type="xsd:string"></wsdl:part>
        		<wsdl:part name="oe_kurzbz" type="xsd:string"></wsdl:part>
        		<wsdl:part name="neu" type="xsd:string"></wsdl:part>
+       		<wsdl:part name="aufwandstyp_kurzbz" type="xsd:string"></wsdl:part>
 		</xsd:all>
 	</xsd:complexType>
   	

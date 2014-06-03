@@ -73,6 +73,7 @@ function saveProjektRessource($username, $passwort, $projektRessource)
 	$ressource->ressource_id = $projektRessource->ressource_id;
 	$ressource->funktion_kurzbz = $projektRessource->funktion_kurzbz;
 	$ressource->beschreibung = $projektRessource->beschreibung;
+	$ressource->aufwand = $projektRessource->aufwand;
 
 	
 	if($ressource->saveProjektRessource())

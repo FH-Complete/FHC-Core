@@ -335,7 +335,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				
 				var notiz = new SOAPObject("notiz");
 				notiz.appendChild(new SOAPObject("notiz_id")).val(notiz_id);
-				notiz.appendChild(new SOAPObject("titel")).val(titel);
+				notiz.appendChild(new SOAPObject("titel")).cdataval(titel);
 				notiz.appendChild(new SOAPObject("text")).cdataval(text);
 				notiz.appendChild(new SOAPObject("verfasser_uid")).val(verfasser_uid);
 				notiz.appendChild(new SOAPObject("bearbeiter_uid")).val(bearbeiter_uid);

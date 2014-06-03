@@ -58,8 +58,33 @@ function treeProjektmenueSelect()
     //Projekte neu laden
 	try
 	{
-		// Wenn eine OE angeklickt wird, den Phase Projekte anzeigen
-		document.getElementById('tabs-planner-main').selectedItem=document.getElementById('tab-projekte');
+		// Wenn eine OE angeklickt wird, den Tab Projekte anzeigen
+		if(oe!='' && projekt_kurzbz=='' && projekt_phase_id=='')
+		{
+			// Wenn der Ressourceauslastung Tab geoeffnet ist
+			if(document.getElementById('tabs-planner-main').selectedItem==document.getElementById('tab-ressourceauslastung'))
+			{
+				// und dort der Projekttask Tab geoffnet ist, dann die Anzeige dort neu laden
+				if(document.getElementById('ressource-tabs').selectedItem==document.getElementById('tab-ressource-projekttask'))
+				{
+					reloadRessourceTasks();
+				}
+				if(document.getElementById('ressource-tabs').selectedItem==document.getElementById('tab-ressource-projektphase'))
+				{
+					// wenn der Phasen Karteireiter offen ist werden die Phasen dort neu geladen
+					reloadRessourcePhasen();
+				}
+			}
+			else 
+			{		
+				// Wenn der Tab Phase oder Tasks ausgewaehlt ist auf die Projekte wechseln
+				if(document.getElementById('tabs-planner-main').selectedItem==document.getElementById('tab-projektphase')
+				|| document.getElementById('tabs-planner-main').selectedItem==document.getElementById('tab-projekttask'))
+				{
+					document.getElementById('tabs-planner-main').selectedItem=document.getElementById('tab-projekte');
+				}
+			}
+		}
 
 		var datasource="<?php echo APP_ROOT; ?>rdf/projekt.rdf.php?oe="+oe+"&filter="+global_filter+"&"+gettimestamp();
 		var treeProjekt=document.getElementById('tree-projekt');
@@ -94,8 +119,32 @@ function treeProjektmenueSelect()
     // Projektphasen neu laden
 	if(projekt_kurzbz!='')
 	{
-		// Wenn eine Projekt angeklickt wird, den Phase Karteireiter anzeigen
-		document.getElementById('tabs-planner-main').selectedItem=document.getElementById('tab-projektphase');
+		// Wenn ein Projekt angeklickt wird, ggf Karteireiter wechseln
+		
+		// Wenn der Ressourceauslastung Tab geoeffnet ist
+		if(document.getElementById('tabs-planner-main').selectedItem==document.getElementById('tab-ressourceauslastung'))
+		{
+			// und dort der Projekttask Tab geoffnet ist, dann die Anzeige dort neu laden
+			if(document.getElementById('ressource-tabs').selectedItem==document.getElementById('tab-ressource-projekttask'))
+			{
+				reloadRessourceTasks();
+			}
+			if(document.getElementById('ressource-tabs').selectedItem==document.getElementById('tab-ressource-projektphase'))
+			{
+				// wenn der Phasen Karteireiter offen ist werden die Phasen dort neu geladen
+				reloadRessourcePhasen();
+			}
+		}
+		else 
+		{
+			// Wenn der Tab Projekte oder Tasks ausgewaehlt ist auf die Phasen wechseln
+			if(document.getElementById('tabs-planner-main').selectedItem==document.getElementById('tab-projekte')
+			|| document.getElementById('tabs-planner-main').selectedItem==document.getElementById('tab-projekttask'))
+			{
+				document.getElementById('tabs-planner-main').selectedItem=document.getElementById('tab-projektphase');
+			}
+		}
+			
 	    try
 		{
 			var datasources="<?php echo APP_ROOT; ?>rdf/projektphase.rdf.php?"+gettimestamp();
@@ -135,8 +184,12 @@ function treeProjektmenueSelect()
 	// Projekttasks neu laden
 	if(projekt_phase_id!='')
 	{
-		// Wenn eine Phase angeklickt wird, den Task Karteireiter anzeigen
-		document.getElementById('tabs-planner-main').selectedItem=document.getElementById('tab-projekttask');
+		// Wenn eine Phase angeklickt wird, den Task Karteireiter anzeigen wenn projekt oder phasen tab geoeffnet ist
+		if(document.getElementById('tabs-planner-main').selectedItem==document.getElementById('tab-projekte')
+		|| document.getElementById('tabs-planner-main').selectedItem==document.getElementById('tab-projektphase'))
+		{
+			document.getElementById('tabs-planner-main').selectedItem=document.getElementById('tab-projekttask');
+		}
 	    LoadTasks(projekt_phase_id); 
 	}
 	

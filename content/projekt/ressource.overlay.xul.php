@@ -43,7 +43,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 >
 
 	<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/phpRequest.js.php" />
-	<!-- <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/projekt/ressource.overlay.js.php" />-->
+	<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/projekt/ressource.overlay.js.php" />
 	<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/functions.js.php" />
 
 	<!-- ************************ -->
@@ -54,6 +54,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			<tabs orient="horizontal" id="ressource-tabs">
 				<tab id="tab-ressource-projekt" label="Projekte" />
 				<tab id="tab-ressource-projektphase" label="Projektphasen" />
+				<tab id="tab-ressource-projekttask" label="Projekttasks" />
 			</tabs>
 			<tabpanels id="tabpanels-ressource-main" flex="1">
 				<vbox>
@@ -68,12 +69,22 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<vbox>
 					<toolbox>
 						<toolbar>
-							<toolbarbutton id="toolbarbutton-ressource-projektphase-aktualisieren" label="Aktualisieren" oncommand="document.getElementById('iframe-ressource-projektphase').setAttribute('src','<?php echo APP_ROOT; ?>content/projekt/ressourcenauslastung.php?typ=phase&amp;'+gettimestamp());" image="../skin/images/refresh.png" tooltiptext="Neu laden"/>
-							<toolbarbutton id="toolbarbutton-ressource-projektphase-drucken" label="Drucken" oncommand="foo = window.open('<?php echo APP_ROOT; ?>content/projekt/ressourcenauslastung.php?typ=phase');foo.print();" image="../skin/images/drucken.png" tooltiptext="Drucken"/>
+							<toolbarbutton id="toolbarbutton-ressource-projektphase-aktualisieren" label="Aktualisieren" oncommand="reloadRessourcePhasen();" image="../skin/images/refresh.png" tooltiptext="Neu laden"/>
+							<toolbarbutton id="toolbarbutton-ressource-projektphase-drucken" label="Drucken" oncommand="RessourcePrintPhasen()" image="../skin/images/drucken.png" tooltiptext="Drucken"/>
 						</toolbar>
 					</toolbox>
 				
-					<iframe id="iframe-ressource-projektphase" flex="5" src="<?php echo APP_ROOT; ?>content/projekt/ressourcenauslastung.php?typ=phase" />
+					<iframe id="iframe-ressource-projektphase" flex="5" src="about:blank" />
+				</vbox>
+				<vbox>
+					<toolbox>
+						<toolbar>
+							<toolbarbutton id="toolbarbutton-ressource-projekttask-aktualisieren" label="Aktualisieren" oncommand="reloadRessourceTasks();" image="../skin/images/refresh.png" tooltiptext="Neu laden"/>
+							<toolbarbutton id="toolbarbutton-ressource-projektask-drucken" label="Drucken" oncommand="RessourcePrintTask()" image="../skin/images/drucken.png" tooltiptext="Drucken"/>
+						</toolbar>
+					</toolbox>
+				
+					<iframe id="iframe-ressource-projekttask" flex="5" src="about:blank" />
 				</vbox>
 			</tabpanels>
 		</tabbox>

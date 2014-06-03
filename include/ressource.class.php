@@ -43,7 +43,7 @@ class ressource extends basis_db
 	public $projektphase_id;
 	public $projekt_kurzbz;
 	public $funktion_kurzbz;
-
+	public $aufwand;
 
 	/**
 	 * Konstruktor
@@ -150,7 +150,7 @@ class ressource extends basis_db
 	 */
 	public function getProjectRessourcen($project_kurzbz)
 	{
-		$qry = "SELECT ressource.* FROM fue.tbl_ressource as ressource
+		$qry = "SELECT ressource.*, project.projekt_ressource_id, project.aufwand FROM fue.tbl_ressource as ressource
 		JOIN fue.tbl_projekt_ressource project ON(project.ressource_id = ressource.ressource_id) 
 		WHERE project.projekt_kurzbz ='".addslashes($project_kurzbz)."';";
 		
@@ -173,6 +173,9 @@ class ressource extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+				$obj->aufwand = $row->aufwand;
+				$obj->projekt_ressource_id= $row->projekt_ressource_id;
+				
 				$this->result[] = $obj;
 			}
 			//var_dump($this->result);
@@ -193,7 +196,7 @@ class ressource extends basis_db
 	 */
 	public function getPhaseRessourcen($projektphase_id)
 	{
-		$qry = "SELECT ressource.* FROM fue.tbl_ressource as ressource
+		$qry = "SELECT ressource.*, project.aufwand, project.projekt_ressource_id FROM fue.tbl_ressource as ressource
 		JOIN fue.tbl_projekt_ressource project ON(project.ressource_id = ressource.ressource_id) 
 		WHERE project.projektphase_id ='".addslashes($projektphase_id)."';";
 		
@@ -216,6 +219,8 @@ class ressource extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+				$obj->aufwand = $row->aufwand;
+				$obj->projekt_ressource_id = $row->projekt_ressource_id;
 				$this->result[] = $obj;
 			}
 			//var_dump($this->result);
@@ -243,12 +248,13 @@ class ressource extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN; INSERT INTO fue.tbl_projekt_ressource (projektphase_id, projekt_kurzbz, 
-				ressource_id, funktion_kurzbz, beschreibung) VALUES ('.
+				ressource_id, funktion_kurzbz, beschreibung, aufwand) VALUES ('.
 			     $this->addslashes($this->projektphase_id).', '.
 				 $this->addslashes($this->projekt_kurzbz).', '.
 			     $this->addslashes($this->ressource_id).', '.
 			     $this->addslashes($this->funktion_kurzbz).', '.
-			     $this->addslashes($this->beschreibung).'); ';
+			     $this->addslashes($this->beschreibung).', '.
+				 $this->addslashes($this->aufwand, FHC_INTEGER).'); ';
 		}
 		else
 		{
@@ -258,7 +264,8 @@ class ressource extends basis_db
 				'projekt_kurzbz='.$this->addslashes($this->projekt_kurzbz).', '.
 				'ressource_id='.$this->addslashes($this->ressource_id).', '.
 				'funktion_kurzbz='.$this->addslashes($this->funktion_kurzbz).', '.
-				'beschreibung='.$this->addslashes($this->beschreibung).' '.
+				'beschreibung='.$this->addslashes($this->beschreibung).', '.
+				'aufwand='.$this->addslashes($this->aufwand).' '.
 				'WHERE projekt_ressource_id='.$this->addslashes($this->projekt_ressource_id).';';
 		}
 		
@@ -435,11 +442,12 @@ class ressource extends basis_db
 			tbl_ressource.bezeichnung, tbl_ressource.beschreibung
 		FROM 
 			fue.tbl_ressource
-			LEFT JOIN fue.tbl_projekt_ressource USING(ressource_id)
-			LEFT JOIN fue.tbl_projekt USING(projekt_kurzbz)
+			JOIN fue.tbl_projekt_ressource USING(ressource_id)
+			JOIN fue.tbl_projekt USING(projekt_kurzbz)
 		WHERE
-			(tbl_projekt.beginn<='".addslashes($endedatum)."' OR tbl_projekt.beginn is null) AND 
-			(tbl_projekt.ende>='".addslashes($datum)."' OR tbl_projekt.ende is null)  ";
+			(tbl_projekt.beginn<=".$this->db_add_param($endedatum)." OR tbl_projekt.beginn is null) AND 
+			(tbl_projekt.ende>=".$this->db_add_param($datum)." OR tbl_projekt.ende is null) 
+		ORDER BY bezeichnung";
 		
 		if($result = $this->db_query($qry))
 		{
@@ -459,6 +467,7 @@ class ressource extends basis_db
 				$obj->firma_id = $row->firma_id;
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->beschreibung = $row->beschreibung;
+				$obj->aufwand = $row->aufwand;
 				
 				$this->result[] = $obj;
 			}
@@ -470,7 +479,7 @@ class ressource extends basis_db
 	 * 
 	 * @param $datum
 	 */
-	public function getProjektphaseRessourceDatum($datum, $endedatum)
+	public function getProjektphaseRessourceDatum($datum, $endedatum, $projekt_kurzbz=null)
 	{
 		$qry = "
 		SELECT 
@@ -480,12 +489,17 @@ class ressource extends basis_db
 			tbl_ressource.bezeichnung, tbl_ressource.beschreibung
 		FROM 
 			fue.tbl_ressource
-			LEFT JOIN fue.tbl_projekt_ressource USING(ressource_id)
-			LEFT JOIN fue.tbl_projektphase USING(projektphase_id)
+			JOIN fue.tbl_projekt_ressource USING(ressource_id)
+			JOIN fue.tbl_projektphase USING(projektphase_id)
 		WHERE
-			(tbl_projektphase.start<='".addslashes($endedatum)."' OR tbl_projektphase.start is null) AND 
-			(tbl_projektphase.ende>='".addslashes($datum)."' OR tbl_projektphase.ende is null)  
-		ORDER BY tbl_ressource.bezeichnung";
+			(tbl_projektphase.start<=".$this->db_add_param($endedatum)." OR tbl_projektphase.start is null) AND 
+			(tbl_projektphase.ende>=".$this->db_add_param($datum)." OR tbl_projektphase.ende is null)  
+		";
+		if(!is_null($projekt_kurzbz))
+		{
+			$qry.=" AND tbl_projektphase.projekt_kurzbz=".$this->db_add_param($projekt_kurzbz);
+		}
+		$qry.=" ORDER BY tbl_ressource.bezeichnung";
 		
 		if($result = $this->db_query($qry))
 		{
@@ -505,7 +519,68 @@ class ressource extends basis_db
 				$obj->firma_id = $row->firma_id;
 				$obj->bezeichnung = $row->bezeichnung;
 				$obj->beschreibung = $row->beschreibung;
+				$obj->aufwand = $row->aufwand;
 				
+				$this->result[] = $obj;
+			}
+		}
+		else
+		{
+			$this->errorsmg = 'Fehler beim Laden';
+			return false;
+		}
+	}
+	
+	/**
+	 * Liefert die Ressourcen aller Projektphasen die zu einem bestimmten Datum aktiv sind
+	 *
+	 * @param $datum
+	 * @param $endedatum
+	 * @param $projekt_kurzbz optional
+	 */
+	public function getTaskRessoureDatum($datum, $endedatum, $projekt_kurzbz=null)
+	{
+		$qry = "
+		SELECT
+		distinct
+		tbl_projekttask.*, tbl_projektphase.start, tbl_projekttask.ende,
+		tbl_ressource.student_uid, tbl_ressource.mitarbeiter_uid, tbl_ressource.betriebsmittel_id, tbl_ressource.firma_id,
+		tbl_ressource.bezeichnung, tbl_ressource.beschreibung
+		FROM
+		fue.tbl_ressource
+		LEFT JOIN fue.tbl_projekttask USING(ressource_id)
+		LEFT JOIN fue.tbl_projektphase USING(projektphase_id)
+		WHERE
+		(tbl_projektphase.start<=".$this->db_add_param($endedatum)." OR tbl_projektphase.start is null) AND
+		((tbl_projektphase.ende>=".$this->db_add_param($datum)." OR tbl_projektphase.ende is null)  AND
+		(tbl_projekttask.ende>=".$this->db_add_param($datum)." OR tbl_projekttask.ende is null))
+		";
+		
+		if(!is_null($projekt_kurzbz))
+		{
+			$qry.=" AND projekt_kurzbz=".$this->db_add_param($projekt_kurzbz);
+		}
+	
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new ressource();
+
+				$obj->projekttask_id = $row->projekttask_id;
+				$obj->projektphase_id = $row->projektphase_id;
+				$obj->start = $row->start;
+				$obj->ende = $row->ende;
+	
+				$obj->ressource_id = $row->ressource_id;
+				$obj->student_uid = $row->student_uid;
+				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$obj->betriebsmittel_id = $row->betriebsmittel_id;
+				$obj->firma_id = $row->firma_id;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->aufwand = $row->aufwand;
+	
 				$this->result[] = $obj;
 			}
 		}
