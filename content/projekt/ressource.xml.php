@@ -49,7 +49,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			<xul:tree anonid="tree-ressource"
 			seltype="single" hidecolumnpicker="false" flex="1"
 			datasources="rdf:null" ref="http://www.technikum-wien.at/ressource/liste"
-			ondblclick="document.getBindingParent(this).openNotiz(document.getBindingParent(this).value);"
+			ondblclick="document.getBindingParent(this).openRessource(document.getBindingParent(this).value);"
 			ondrop="nsDragAndDrop.drop(event,
 				{
 					getSupportedFlavours : function ()
@@ -157,6 +157,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			    <xul:treecol anonid="treecol-ressource-descriptioin" label="Anzeige" flex="5" hidden="false" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/ressource/rdf#description"  />
+				<xul:splitter class="tree-splitter"/>
+			    <xul:treecol anonid="treecol-ressource-aufwand" label="Aufwand" flex="2" hidden="false" persist="hidden width ordinal"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/notiz/rdf#aufwand" />
 			    <xul:splitter class="tree-splitter"/>
 			    <xul:treecol anonid="treecol-ressource-typ" label="Typ" flex="2" hidden="false" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
@@ -185,6 +189,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			    <xul:treecol anonid="treecol-ressource-firma_id" label="FirmaID" flex="2" hidden="true" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/ressource/rdf#firma_id" />
+					<xul:splitter class="tree-splitter"/>
+			    <xul:treecol anonid="treecol-ressource-projekt_ressource_id" label="ProjektRessourceID" flex="2" hidden="true" persist="hidden width ordinal"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/ressource/rdf#projekt_ressource_id" />
 			</xul:treecols>
 		
 			<xul:template>
@@ -194,6 +202,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			         <xul:treerow>
 			           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#bezeichnung"/>
 					   <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#rdf_description"/>
+					   <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#aufwand"/>
 			           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#typ"/>
 			           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#ressource_id"/>
 			           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#beschreibung"/>
@@ -201,6 +210,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#student_uid"/>
 			           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#betriebsmittel_id"/>
 			           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#firma_id"/>
+			           <treecell label="rdf:http://www.technikum-wien.at/ressource/rdf#projekt_ressource_id"/>
 			         </xul:treerow>
 			       </xul:treeitem>
 			      </xul:treechildren>
@@ -468,7 +478,91 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			]]>
 			</body>
 		</method>
-
+		<method name="openRessource">
+			<parameter name="id"/>
+			<body>
+			<![CDATA[
+				var projekt_kurzbz = this.getAttribute('projekt_kurzbz');
+				var projektphase_id = this.getAttribute('projektphase_id');
+				
+				
+				netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+				tree = document.getAnonymousElementByAttribute(this ,'anonid', 'tree-ressource');
+				var col = tree.columns.getColumnFor(document.getAnonymousElementByAttribute(this ,'anonid', 'treecol-ressource-aufwand'));
+				aufwand =  tree.view.getCellText(tree.currentIndex, col);
+				
+				var col = tree.columns.getColumnFor(document.getAnonymousElementByAttribute(this ,'anonid', 'treecol-ressource-projekt_ressource_id'));
+				var projekt_ressource_id =  tree.view.getCellText(tree.currentIndex, col);
+				
+				
+				var col = tree.columns.getColumnFor(document.getAnonymousElementByAttribute(this ,'anonid', 'treecol-ressource-beschreibung'));
+				var beschreibung =  tree.view.getCellText(tree.currentIndex, col);
+				
+			
+				if(projekt_ressource_id!='')
+				{
+					if(aufwand = prompt("Aufwand:",aufwand))
+					{
+						try
+						{
+							var soapBody = new SOAPObject("saveProjektRessource");						
+							var projektRessource = new SOAPObject("projektRessource");
+							
+						    projektRessource.appendChild(new SOAPObject("projekt_ressource_id")).val(projekt_ressource_id);
+						    
+						    if(projekt_kurzbz != '')
+						    {
+							    projektRessource.appendChild(new SOAPObject("projektphase_id")).val('');
+							    projektRessource.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
+						    }
+						    else if(projektphase_id != '')
+						    {
+							    projektRessource.appendChild(new SOAPObject("projektphase_id")).val(projektphase_id);
+							    projektRessource.appendChild(new SOAPObject("projekt_kurzbz")).val('');				    
+						    }
+						    projektRessource.appendChild(new SOAPObject("ressource_id")).val(id);
+						    projektRessource.appendChild(new SOAPObject("funktion_kurzbz")).val('');
+						    projektRessource.appendChild(new SOAPObject("beschreibung")).val(beschreibung);
+						    projektRessource.appendChild(new SOAPObject("aufwand")).val(aufwand);
+						    							
+							soapBody.appendChild(projektRessource);
+							
+						    var sr = new SOAPRequest("saveProjektRessource",soapBody);
+						    SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/ressource_projekt.soap.php?"+gettimestamp();
+						    
+						    function mycallb(obj) 
+						    {
+								  var me=obj;
+								  this.invoke=function (respObj) 
+								  {
+									    try
+										{
+											var id = respObj.Body[0].saveProjektRessourceResponse[0].message[0].Text;
+										}
+										catch(e)
+										{
+											var fehler = respObj.Body[0].Fault[0].faultstring[0].Text;
+											alert('Fehler: '+fehler);
+											return;
+										}
+										me.RefreshRessource();
+								  }
+							}
+							 
+							var cb=new mycallb(this);
+						    
+						    SOAPClient.SendRequest(sr,cb.invoke);
+						
+						}
+						catch(e)
+						{
+							debug("Ressource load failed with exception: "+e);
+						}
+					}
+				}
+			]]>
+			</body>
+		</method>
 		<constructor>
 			var projekt_kurzbz = this.getAttribute('projekt_kurzbz');
 			var projektphase_id = this.getAttribute('projektphase_id');

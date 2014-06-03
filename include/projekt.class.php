@@ -130,6 +130,7 @@ class projekt extends basis_db
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->budget = $row->budget;
                 $obj->farbe = $row->farbe;
+                $obj->aufwandstyp_kurzbz = $row->aufwandstyp_kurzbz;
 
 				$this->result[] = $obj;
 			}
@@ -211,6 +212,7 @@ class projekt extends basis_db
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->budget = $row->budget;
                 $obj->farbe = $row->farbe;
+                $obj->aufwandstyp_kurzbz = $row->aufwandstyp_kurzbz;
 
 				$this->result[] = $obj;
 			}
@@ -278,7 +280,7 @@ class projekt extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 
-			$qry='INSERT INTO fue.tbl_projekt (projekt_kurzbz, nummer, titel,beschreibung, beginn, ende, budget, farbe, oe_kurzbz) VALUES('.
+			$qry='INSERT INTO fue.tbl_projekt (projekt_kurzbz, nummer, titel,beschreibung, beginn, ende, budget, farbe, oe_kurzbz, aufwandstyp_kurzbz) VALUES('.
 		     $this->addslashes($this->projekt_kurzbz).', '.
 		     $this->addslashes($this->nummer).', '.
 		     $this->addslashes($this->titel).', '.
@@ -287,7 +289,8 @@ class projekt extends basis_db
 		     $this->addslashes($this->ende).', '.
 		     $this->addslashes($this->budget).', '.
              $this->addslashes($this->farbe).', '.
-		     $this->addslashes($this->oe_kurzbz).');';
+		     $this->addslashes($this->oe_kurzbz).','.
+		     $this->addslashes($this->aufwandstyp_kurzbz).');';
 		}
 		else
 		{
@@ -302,7 +305,8 @@ class projekt extends basis_db
 				'ende='.$this->addslashes($this->ende).', '.
 				'budget='.$this->addslashes($this->budget).', '.
                 'farbe='.$this->addslashes($this->farbe).', '.
-				'oe_kurzbz='.$this->addslashes($this->oe_kurzbz).' '.
+				'oe_kurzbz='.$this->addslashes($this->oe_kurzbz).', '.
+				'aufwandstyp_kurzbz='.$this->addslashes($this->aufwandstyp_kurzbz).' '.
 				'WHERE projekt_kurzbz='.$this->addslashes($this->projekt_kurzbz).';';
 		}
 		

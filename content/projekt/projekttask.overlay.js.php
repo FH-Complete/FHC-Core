@@ -350,8 +350,8 @@ function saveProjekttaskDetail()
 		var task = new SOAPObject("task");
 		task.appendChild(new SOAPObject("projekttask_id")).val(projekttask_id);
 		task.appendChild(new SOAPObject("projektphase_id")).val(projektphase_id);
-		task.appendChild(new SOAPObject("bezeichnung")).val(bezeichnung);
-		task.appendChild(new SOAPObject("beschreibung")).val(beschreibung);
+		task.appendChild(new SOAPObject("bezeichnung")).cdataval(bezeichnung);
+		task.appendChild(new SOAPObject("beschreibung")).cdataval(beschreibung);
 		task.appendChild(new SOAPObject("aufwand")).val(aufwand);
 		task.appendChild(new SOAPObject("mantis_id")).val(mantis_id);
 		task.appendChild(new SOAPObject("scrumsprint_id")).val(scrumsprint_id);

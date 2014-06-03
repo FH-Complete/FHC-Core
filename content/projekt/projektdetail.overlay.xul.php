@@ -122,6 +122,24 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	   						<spacer />
 	   					</hbox>
 					</row>
+					<row>
+						<label value="Aufwandstyp" control="textbox-projekt-detail-aufwandstyp"/>
+						<hbox>
+							<menulist id="menulist-projekt-detail-aufwandstyp"  disabled="true"
+									  xmlns:AUFWANDSTYP="http://www.technikum-wien.at/aufwandstyp/rdf#"
+							          datasources="<?php echo APP_ROOT;?>rdf/aufwandstyp.rdf.php"
+							          ref="http://www.technikum-wien.at/aufwandstyp" >
+								<template>
+									<menupopup >
+										<menuitem value="rdf:http://www.technikum-wien.at/aufwandstyp/rdf#aufwandstyp_kurzbz"
+							        		      label="rdf:http://www.technikum-wien.at/aufwandstyp/rdf#bezeichnung"
+										  		  uri="rdf:*"/>
+									</menupopup>
+								</template>
+							</menulist>
+							<spacer />
+						</hbox>
+					</row>
 				</rows>
 			</grid>
 			<hbox>

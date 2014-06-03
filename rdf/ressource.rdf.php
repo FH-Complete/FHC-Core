@@ -241,6 +241,8 @@ function draw_ressource($ressource)
 		<RESSOURCE:insertvon><![CDATA['.$ressource->insertvon.']]></RESSOURCE:insertvon>
 		<RESSOURCE:updateamum><![CDATA['.$ressource->updateamum.']]></RESSOURCE:updateamum>
 		<RESSOURCE:updatevon><![CDATA['.$ressource->updatevon.']]></RESSOURCE:updatevon>
+		<RESSOURCE:aufwand><![CDATA['.$ressource->aufwand.']]></RESSOURCE:aufwand>
+		<RESSOURCE:projekt_ressource_id><![CDATA['.$ressource->projekt_ressource_id.']]></RESSOURCE:projekt_ressource_id>
 		<RESSOURCE:rdf_description><![CDATA['.$RdfDescription.']]></RESSOURCE:rdf_description>
   	</RDF:Description>
   	';

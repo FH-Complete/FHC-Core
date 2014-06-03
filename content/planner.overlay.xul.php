@@ -108,7 +108,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/ressource.overlay.xul.php"
 			<tab id="tab-projektphase" label="Phasen" />
 			<tab id="tab-projekttask" label="Tasks" selected="true" />
 			<tab id="tab-dokumente" label="Dokumente" />
-			<tab id="tab-ressource" label="Ressourcen" />
+			<tab id="tab-ressourceauslastung" label="Ressourcen" />
 			<tab id="tab-bestellung" label="Bestellungen" />
 			<tab id="tab-ganttx" label="Gantt" />
 			<tab id="tab-notiz" label="Eigene Notizen" />

@@ -171,7 +171,7 @@ function getOeGanttZeitraum($beginn, $ende)
 		
 			// zeichne balken
 			echo '<rect x="'.$x.'" y="'.($startY+10+$i*50).'" width ="'.$width.'" height ="30" fill="'.$projekt->farbe.'" stroke="black" />';
-			echo'<text x="'.($startX-10).'" y="'.($startY+30+$i*50).'" style="font-size:15px" text-anchor="end">'.$projekt->titel.'</text>';
+			echo'<text x="'.($startX-10).'" y="'.($startY+30+$i*50).'" style="font-size:15px" text-anchor="end">'.htmlspecialchars($projekt->titel).'</text>';
             
             // Zeichne Phasen in Projektbalken
             $projektphasen = new projektphase(); 
@@ -365,7 +365,7 @@ function getOeGantt()
 		
 			// zeichne balken
 			echo '<rect x="'.$x.'" y="'.($startY+10+$i*50).'" width ="'.$width.'" height ="30" fill="'.$projekt->farbe.'" stroke="black" />';
-			echo'<text x="'.($startX-10).'" y="'.($startY+30+$i*50).'" style="font-size:15px" text-anchor="end">'.$projekt->titel.'</text>';
+			echo'<text x="'.($startX-10).'" y="'.($startY+30+$i*50).'" style="font-size:15px" text-anchor="end">'.htmlspecialchars($projekt->titel).'</text>';
             
             // Zeichne Phasen in Projektbalken
             $projektphasen = new projektphase(); 
@@ -420,7 +420,7 @@ function getOeGantt()
             
             $i++;
 		}
-		echo'<text x="10%" y="'.((($i+1)*50)+$startY).'" style="font-size:16px">Organisationseinheit: '.$projekt->oe_kurzbz.'</text>';
+		echo'<text x="10%" y="'.((($i+1)*50)+$startY).'" style="font-size:16px">Organisationseinheit: '.htmlspecialchars($projekt->oe_kurzbz).'</text>';
 		
 		echo '</svg>';
 	}
@@ -574,9 +574,9 @@ function getOeGantt()
 			}
 		
 			// zeichne balken
-			echo "test:".$test.$projekt->titel."jahr".$studienjahr;
+			//echo "test:".$test.$projekt->titel."jahr".$studienjahr;
 			echo '<rect x="'.$x.'" y="'.($startY+10+$i*50).'" width ="'.$width.'" height ="30" fill="'.$projekt->farbe.'" stroke="black" />';
-			echo'<text x="'.($startX-10).'" y="'.($startY+30+$i*50).'" style="font-size:15px" text-anchor="end">'.$projekt->titel.'</text>';
+			echo'<text x="'.($startX-10).'" y="'.($startY+30+$i*50).'" style="font-size:15px" text-anchor="end">'.htmlspecialchars($projekt->titel).'</text>';
             
             // Zeichne Phasen in Projektbalken
             $projektphasen = new projektphase(); 
@@ -832,10 +832,10 @@ function getProjektGantt()
 				$style = 'style ="stroke:pink;stroke-width:10;"'; 
 			// zeichne balken
 			echo '<rect x="'.$x.'" y="'.($startY+10+$i*50).'" width ="'.$width.'" height ="30" fill="'.$phase->farbe.'" stroke="black" '.$style.'/>';
-			echo'<text x="'.($startX-10).'" y="'.($startY+30+$i*50).'" style="font-size:15px" text-anchor="end">'.$phase->bezeichnung.'</text>';
+			echo'<text x="'.($startX-10).'" y="'.($startY+30+$i*50).'" style="font-size:15px" text-anchor="end">'.htmlspecialchars($phase->bezeichnung).'</text>';
 			$i++;
 		}
-		echo'<text x="10%" y="'.((($i+1)*50)+$startY).'" style="font-size:16px">Projekt: '.$projekt->titel.'</text>';
+		echo'<text x="10%" y="'.((($i+1)*50)+$startY).'" style="font-size:16px">Projekt: '.htmlspecialchars($projekt->titel).'</text>';
 		
 		echo '</svg>';
 	}
@@ -1000,11 +1000,11 @@ function getProjektGantt()
 				$style = 'style ="stroke:pink;stroke-width:10;"'; 
 			
 			echo '<rect x="'.$x.'" y="'.($startY+10+$i*50).'" width ="'.$width.'" height ="30" fill="'.$phase->farbe.'" stroke="black" '.$style.' />';
-			echo'<text x="'.($startX-10).'" y="'.($startY+30+$i*50).'" style="font-size:15px" text-anchor="end">'.$phase->bezeichnung.'</text>';
+			echo'<text x="'.($startX-10).'" y="'.($startY+30+$i*50).'" style="font-size:15px" text-anchor="end">'.htmlspecialchars($phase->bezeichnung).'</text>';
 			$i++;
 		}
 		
-		echo'<text x="10%" y="'.((($i+1)*50)+$startY).'" style="font-size:16px">Projekt: '.$projekt->titel.'</text>';
+		echo'<text x="10%" y="'.((($i+1)*50)+$startY).'" style="font-size:16px">Projekt: '.htmlspecialchars($projekt->titel).'</text>';
 		
 		// aktuelle KW markieren
 		$timestamp_now = time();

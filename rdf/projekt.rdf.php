@@ -60,15 +60,16 @@ for ($i=0;$i<count($projekt_obj->result);$i++)
 	$descr.='<RDF:Description RDF:about="'.$rdf_url.$projekt->projekt_kurzbz.'" >
 		<PROJEKT:projekt_kurzbz>'.$projekt->projekt_kurzbz.'</PROJEKT:projekt_kurzbz>
 		<PROJEKT:oe_kurzbz>'.$projekt->oe_kurzbz.'</PROJEKT:oe_kurzbz>
-		<PROJEKT:nummer>'.$projekt->nummer.'</PROJEKT:nummer>
-		<PROJEKT:titel>'.$projekt->titel.'</PROJEKT:titel>
-		<PROJEKT:beschreibung>'.$projekt->beschreibung.'</PROJEKT:beschreibung>
+		<PROJEKT:nummer><![CDATA['.$projekt->nummer.']]></PROJEKT:nummer>
+		<PROJEKT:titel><![CDATA['.$projekt->titel.']]></PROJEKT:titel>
+		<PROJEKT:beschreibung><![CDATA['.$projekt->beschreibung.']]></PROJEKT:beschreibung>
 		<PROJEKT:beginn_iso>'.$projekt->beginn.'</PROJEKT:beginn_iso>
 		<PROJEKT:beginn>'.$datum_obj->formatDatum($projekt->beginn,'d.m.Y').'</PROJEKT:beginn>
 		<PROJEKT:ende_iso>'.$projekt->ende.'</PROJEKT:ende_iso>
 		<PROJEKT:ende>'.$datum_obj->formatDatum($projekt->ende,'d.m.Y').'</PROJEKT:ende>
 		<PROJEKT:budget>'.$projekt->budget.'</PROJEKT:budget>
         <PROJEKT:farbe>'.$projekt->farbe.'</PROJEKT:farbe>
+        <PROJEKT:aufwandstyp_kurzbz>'.$projekt->aufwandstyp_kurzbz.'</PROJEKT:aufwandstyp_kurzbz>
 	</RDF:Description>'."\n";
 
 	$sequenz.='<RDF:li RDF:resource="'.$rdf_url.$projekt->projekt_kurzbz.'" />'."\n";

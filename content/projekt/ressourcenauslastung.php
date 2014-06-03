@@ -22,6 +22,7 @@ require_once('../../include/functions.inc.php');
 require_once('../../include/ressource.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/projektphase.class.php');
+require_once('../../include/projekttask.class.php');
 
 $showweeks=52;
 $timestamp = time();
@@ -33,18 +34,32 @@ $datum = date('Y-m-d',$timestamp);
 $endetimestamp = jump_week($timestamp,$showweeks);
 $endedatum = date('Y-m-d',$endetimestamp);
 
+if(isset($_GET['projekt_kurzbz']) && $_GET['projekt_kurzbz']!='')
+{
+	$projekt_kurzbz=$_GET['projekt_kurzbz'];
+}
+else
+	$projekt_kurzbz=null;
+
 if(isset($_GET['typ']) && $_GET['typ']=='projekt')
 {
 	$ressource->getProjektRessourceDatum($datum, $endedatum);
 	$typ = 'projekt';
 	$anzahl_warnung = 6;
 }
+elseif(isset($_GET['typ']) && $_GET['typ']=='task')
+{
+	$ressource->getTaskRessoureDatum($datum, $endedatum, $projekt_kurzbz);
+	$typ = 'task';
+	$anzahl_warnung = 6;
+}
 else
 {
-	$ressource->getProjektphaseRessourceDatum($datum, $endedatum);
+	$ressource->getProjektphaseRessourceDatum($datum, $endedatum, $projekt_kurzbz);
 	$typ = 'phase';
 	$anzahl_warnung = 6;
 }
+
 
 foreach($ressource->result as $row)
 	$ressource_arr[]=$row->bezeichnung;
@@ -76,7 +91,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 <body>
 <table>
 <tr>
-	<th>Ressource ('.$typ.')</th>';
+	<th>Ressource ('.$typ.(!is_null($projekt_kurzbz)?'/'.$projekt_kurzbz:'').')</th>';
 for($i=0;$i<$showweeks;$i++)
 {
 	$timestamp_kw = jump_week($timestamp,$i);
@@ -96,10 +111,10 @@ foreach($ressource_arr as $bezeichnung)
 		$anzahl=0;
 		$title='';
 		reset($ressource->result);
-		
+		$aufwandssumme=0;
 		foreach($ressource->result as $row)
 		{
-			
+			$beistrich=false;
 			$start = $datum_obj->mktime_fromdate($row->start);
 			$ende = $datum_obj->mktime_fromdate($row->ende);
 			if($row->bezeichnung == $bezeichnung 
@@ -110,8 +125,9 @@ foreach($ressource_arr as $bezeichnung)
 				if($typ=='projekt' && $row->projekt_kurzbz!='')
 				{
 					$anzahl++;
+					$title .= $row->projekt_kurzbz;
+					$beistrich=true;
 					$showrow=true;
-					$title .= $row->projekt_kurzbz.',';
 				}
 				elseif($typ=='phase' && $row->projektphase_id!='')
 				{
@@ -119,22 +135,42 @@ foreach($ressource_arr as $bezeichnung)
 					$showrow=true;
 					$phase = new projektphase();
 					$phase->load($row->projektphase_id);
-					$title .= $phase->bezeichnung.'('.$phase->projekt_kurzbz.'),';
+					$title .= $phase->bezeichnung.'('.$phase->projekt_kurzbz.')';
+					$beistrich=true;
 				}
+				elseif($typ=='task' && $row->projekttask_id!='')
+				{
+					$anzahl++;
+					$showrow=true;
+					$task = new projekttask();
+					$task->load($row->projekttask_id);
+					$title.=$task->bezeichnung;
+					$beistrich=true;
+				}
+				if($typ!='projekt' && $row->aufwand!='' && $row->aufwand!=0)
+				{
+					$title.='['.$row->aufwand.']';
+					$beistrich=true;
+					$aufwandssumme +=$row->aufwand;
+				}
+				if($beistrich)
+					$title.=', ';
 			}
+			
 		}
 		$title = mb_substr($title,0,-1);
 		
 		$htmlrow.='<td title="'.$title.'" align="center">';
 		if($anzahl>=$anzahl_warnung)
-			$htmlrow.='<span class="warning">'.$anzahl.'</span>';
+			$htmlrow.='<span class="warning">'.$anzahl.($typ!='projekt'?'/'.$aufwandssumme:'').'</span>';
 		else
-			$htmlrow.=$anzahl;
-		$htmlrow.='</td>';
+			$htmlrow.= $anzahl.($typ!='projekt'?'/'.$aufwandssumme:'');
+		$htmlrow.= '</td>';
 	}
 	$htmlrow.='</tr>';
 	if ($showrow)
 		echo $htmlrow;
+	ob_flush();
 }
 
 echo '

@@ -150,7 +150,7 @@ function onselectProjekt()
     var ende=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ende" ));
     var budget=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#budget" ));
     var farbe=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#farbe" ));
-    var personentage=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#personentage" ));
+    var aufwandstyp_kurzbz=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aufwandstyp_kurzbz" ));
     
     //Daten den Feldern zuweisen
 
@@ -165,6 +165,7 @@ function onselectProjekt()
     document.getElementById('textbox-projekt-detail-budget').value=budget;
     document.getElementById('textbox-projekt-detail-farbe').value=farbe;
     document.getElementById('checkbox-projekt-detail-neu').checked=false;
+    MenulistSelectItemOnValue('menulist-projekt-detail-aufwandstyp', aufwandstyp_kurzbz);
     
     
     //Notizen zu einem Projekt Laden
@@ -194,6 +195,7 @@ function saveProjektDetail()
 	budget = document.getElementById('textbox-projekt-detail-budget').value;
     farbe = document.getElementById('textbox-projekt-detail-farbe').value;
 	neu = document.getElementById('checkbox-projekt-detail-neu').checked;
+	aufwandstyp_kurzbz = MenulistGetSelectedValue('menulist-projekt-detail-aufwandstyp');
 	
 	var soapBody = new SOAPObject("saveProjekt");
 	//soapBody.appendChild(new SOAPObject("username")).val('joe');
@@ -202,13 +204,15 @@ function saveProjektDetail()
 	var projekt = new SOAPObject("projekt");
     projekt.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
     projekt.appendChild(new SOAPObject("oe_kurzbz")).val(oe_kurzbz);
-    projekt.appendChild(new SOAPObject("titel")).val(titel);
-    projekt.appendChild(new SOAPObject("nummer")).val(nummer);
-    projekt.appendChild(new SOAPObject("beschreibung")).val(beschreibung);
+    projekt.appendChild(new SOAPObject("titel")).cdataval(titel);
+    projekt.appendChild(new SOAPObject("nummer")).cdataval(nummer);
+    projekt.appendChild(new SOAPObject("beschreibung")).cdataval(beschreibung);
     projekt.appendChild(new SOAPObject("beginn")).val(beginn);
     projekt.appendChild(new SOAPObject("ende")).val(ende);
     projekt.appendChild(new SOAPObject("budget")).val(budget);
     projekt.appendChild(new SOAPObject("farbe")).val(farbe);
+    projekt.appendChild(new SOAPObject("aufwandstyp_kurzbz")).val(aufwandstyp_kurzbz);
+    
 	if(neu)
 		projekt.appendChild(new SOAPObject("neu")).val('true');
 	else	
@@ -347,6 +351,7 @@ function ProjektDisableFields(val)
 	document.getElementById('textbox-projekt-detail-budget').disabled=val;
     document.getElementById('textbox-projekt-detail-farbe').disabled=val;
 	document.getElementById('button-projekt-detail-speichern').disabled=val;
+	document.getElementById('menulist-projekt-detail-aufwandstyp').disabled=val;
 }
 
 

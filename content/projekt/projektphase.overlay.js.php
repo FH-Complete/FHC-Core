@@ -232,8 +232,8 @@ function saveProjektphaseDetail()
 	phase.appendChild(new SOAPObject("projektphase_id")).val(projektphase_id);
 	phase.appendChild(new SOAPObject("projektphase_fk")).val(projektphase_fk);
 	phase.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
-	phase.appendChild(new SOAPObject("bezeichnung")).val(bezeichnung);
-	phase.appendChild(new SOAPObject("beschreibung")).val(beschreibung);
+	phase.appendChild(new SOAPObject("bezeichnung")).cdataval(bezeichnung);
+	phase.appendChild(new SOAPObject("beschreibung")).cdataval(beschreibung);
 	phase.appendChild(new SOAPObject("start")).val(start);
 	phase.appendChild(new SOAPObject("ende")).val(ende);
 	phase.appendChild(new SOAPObject("budget")).val(budget);

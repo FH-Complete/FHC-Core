@@ -26,6 +26,7 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
 			<wsdl:part name="ressource_id" type="xsd:int"></wsdl:part>
 			<wsdl:part name="funktion_kurzbz" type="xsd:string"></wsdl:part>
 			<wsdl:part name="beschreibung" type="xsd:string"></wsdl:part>
+			<wsdl:part name="aufwand" type="xsd:string"></wsdl:part>
 		</xsd:all>
 	</xsd:complexType>
 
