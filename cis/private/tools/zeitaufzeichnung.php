@@ -315,8 +315,8 @@ $projekt = new projekt();
 
 if($projekt->getProjekteMitarbeiter($user))
 {
-	if(count($projekt->result)>0)
-	{
+	//if(count($projekt->result)>0)
+	//{
 		$bn = new benutzer();
 		if(!$bn->load($user))
 			die($p->t("zeitaufzeichnung/benutzerWurdeNichtGefunden",array($user)));
@@ -566,11 +566,13 @@ if($projekt->getProjekteMitarbeiter($user))
 		
 	    echo $p->t("zeitaufzeichnung/gesamtdauer").": ".$db->convert_html_chars($summe);
 		}
+	/* 
 	}
 	else 
 	{
 		echo $p->t("zeitaufzeichnung/sieSindDerzeitKeinenProjektenZugeordnet");
 	}
+	*/
 }
 else 
 {
