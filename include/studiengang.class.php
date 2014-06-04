@@ -54,7 +54,7 @@ class studiengang extends basis_db
 	public $oe_kurzbz;			// varchar(32)
 
 	public $kuerzel;	// = typ + kurzbz (Bsp: BBE)
-	public $studiengang_typ_arr = array(); 	// Array mit den Studiengangstypen
+	private $studiengang_typ_arr = array(); 	// Array mit den Studiengangstypen
 	public $kuerzel_arr = array();			// Array mit allen Kurzeln Index=studiengangs_kz
 	public $moodle;		// boolean
 	public $lgartcode;	//integer
