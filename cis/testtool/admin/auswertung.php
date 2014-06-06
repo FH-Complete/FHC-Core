@@ -725,12 +725,19 @@ else
 					<SELECT id="reihungstest" name="reihungstest">
 					<OPTION value="">-- keine Auswahl --</OPTION>';
 						$selected = '';
+						$select = false;
 						foreach($rtest as $rt)
 						{
-							if($rt->reihungstest_id==$reihungstest)
+							if($rt->reihungstest_id==$reihungstest && !$select)
+							{
 								$selected = 'selected';
-							elseif ($prestudent_id=='' && $selected=='' && $reihungstest=='' && $rt->datum==date('Y-m-d'))
+								$select = true;
+							}
+							elseif ($prestudent_id=='' && $reihungstest=='' && $rt->datum==date('Y-m-d') && !$select)
+							{
 								$selected = 'selected';
+								$select = true;
+							}
 							else 
 								$selected = '';
 								
