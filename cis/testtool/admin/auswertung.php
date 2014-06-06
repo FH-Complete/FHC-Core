@@ -722,11 +722,14 @@ else
 			<form method="POST">
 			<td style="white-space:nowrap; padding: 10px; background-color: #EEE">				
 				Reihungstest w&auml;hlen:&nbsp;
-					<SELECT name="reihungstest">
+					<SELECT id="reihungstest" name="reihungstest">
 					<OPTION value="">-- keine Auswahl --</OPTION>';
+						$selected = '';
 						foreach($rtest as $rt)
 						{
-							if(isset($reihungstest) && $rt->reihungstest_id==$reihungstest)
+							if($rt->reihungstest_id==$reihungstest)
+								$selected = 'selected';
+							elseif ($prestudent_id=='' && $selected=='' && $reihungstest=='' && $rt->datum==date('Y-m-d'))
 								$selected = 'selected';
 							else 
 								$selected = '';
@@ -764,7 +767,7 @@ else
 						echo ' von Datum: <INPUT class="datepicker_datum" type="text" name="datum_von" maxlength="10" size="10" value="'.$datum_von.'" />&nbsp;';
 						echo 'bis Datum: <INPUT class="datepicker_datum" type="text" name="datum_bis" maxlength="10" size="10" value="'.$datum_bis.'" /><br />';
 						echo '<hr style="color: #B3B3B3; background-color: #B3B3B3; border:none;">';
-						echo 'PrestudentIn: <INPUT id="prestudent" type="text" name="prestudent_id" size="50" value="'.$prestudent_id.'" placeholder="Name, UID oder Prestudent_id eingeben" onkeyup="document.getElementById(\'prestudent_id\').value=this.value"/><input type="hidden" id="prestudent_id" name="prestudent_id" value="'.$prestudent_id.'" />';
+						echo 'PrestudentIn: <INPUT id="prestudent" type="text" name="prestudent_id" size="50" value="'.$prestudent_id.'" placeholder="Name, UID oder Prestudent_id eingeben" onInput="document.getElementById(\'reihungstest\').value=\'\'" onkeyup="document.getElementById(\'prestudent_id\').value=this.value"/><input type="hidden" id="prestudent_id" name="prestudent_id" value="'.$prestudent_id.'" />';
 			echo '</td>
 			<td style="padding: 5px; background-color: #EEE";">
 				<INPUT type="submit" value="Auswerten" />
@@ -793,7 +796,7 @@ else
 		<td style="padding: 5px; background-color: #EEE";">
 		<a href="auswertung.php?studiengang='.$studiengang.'&semester='.$semester.'&datum_von='.$datum_von.'&datum_bis='.$datum_bis.'&prestudent_id='.$prestudent_id.'&reihungstest='.$reihungstest.'&format=xls"><img src="../../../skin/images/xls_icon.png" alt="Excel Icon"> Export</a>
 		</td></tr>
-	</table>';
+	</table><br />';
 	
 	if (isset($_REQUEST['reihungstest']))
 	{
