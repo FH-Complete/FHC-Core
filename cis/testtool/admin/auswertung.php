@@ -39,6 +39,48 @@ $rechte->getBerechtigungen($user);
 
 if(!$rechte->isBerechtigt('lehre/reihungstest'))
 	die('Sie haben keine Berechtigung fuer diese Seite');
+	
+if(isset($_REQUEST['autocomplete']) && $_REQUEST['autocomplete']=='prestudent')
+{
+	$search=trim((isset($_REQUEST['term']) ? $_REQUEST['term']:''));
+	if (is_null($search) ||$search=='')
+		exit();	
+	$qry = "SELECT 
+				nachname, vorname, prestudent_id, student_uid, 
+				UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) as stg, 
+				get_rolle_prestudent(prestudent_id, null) as status
+			FROM 
+				public.tbl_person 
+				JOIN public.tbl_prestudent USING(person_id)
+				JOIN public.tbl_studiengang USING(studiengang_kz)
+				LEFT JOIN public.tbl_student USING (prestudent_id)
+			WHERE
+				lower(nachname) like '%".$db->db_escape(mb_strtolower($search))."%' OR
+				lower(vorname) like '%".$db->db_escape(mb_strtolower($search))."%' OR
+				lower(nachname || ' ' || vorname) like '%".$db->db_escape(mb_strtolower($search))."%' OR
+				lower(vorname || ' ' || nachname) like '%".$db->db_escape(mb_strtolower($search))."%' OR
+				prestudent_id::text like '%".$db->db_escape(mb_strtolower($search))."%' OR
+				student_uid::text like '%".$db->db_escape(mb_strtolower($search))."%'
+				ORDER BY nachname,vorname,stg 
+				LIMIT 10
+			";
+	if($result = $db->db_query($qry))
+	{
+		$result_obj = array();
+		while($row = $db->db_fetch_object($result))
+		{
+			$item['vorname']=html_entity_decode($row->vorname);
+			$item['nachname']=html_entity_decode($row->nachname);
+			$item['stg']=html_entity_decode($row->stg);
+			$item['status']=html_entity_decode($row->status);
+			$item['prestudent_id']=html_entity_decode($row->prestudent_id);
+			$item['student_uid']=html_entity_decode($row->student_uid);
+			$result_obj[]=$item;
+		}
+		echo json_encode($result_obj);
+	}
+	exit;
+}
 
 function sortByField($multArray,$sortField,$desc=true)
 {
@@ -636,9 +678,40 @@ else
 	<html>
 	
 	<head>
-		<title>Testtool - Auswertung</title>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<link type="text/css" rel="stylesheet" href="../../../skin/style.css.php">
+	<title>Testtool - Auswertung</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link type="text/css" rel="stylesheet" href="../../../skin/style.css.php">
+	<link href="../../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
+	<script src="../../../include/js/jquery1.9.min.js" type="text/javascript"></script> 	
+	<script type="text/javascript">
+	$(document).ready(function() 
+		{ 
+		    $( ".datepicker_datum" ).datepicker({
+					 changeMonth: true,
+					 changeYear: true, 
+					 dateFormat: "dd.mm.yy",
+					 });
+	
+		    $("#prestudent").autocomplete({
+				source: "auswertung.php?autocomplete=prestudent",
+				minLength:2,
+				response: function(event, ui)
+				{
+					//Value und Label fuer die Anzeige setzen
+					for(i in ui.content)
+					{
+						ui.content[i].value=ui.content[i].nachname+" "+ui.content[i].vorname+" "+ui.content[i].stg+" "+ui.content[i].status+" "+ui.content[i].prestudent_id+" ("+ui.content[i].student_uid+")";
+						ui.content[i].label=ui.content[i].nachname+" "+ui.content[i].vorname+" "+ui.content[i].stg+" "+ui.content[i].status+" "+ui.content[i].prestudent_id+" ("+ui.content[i].student_uid+")";
+					}
+				},
+				select: function(event, ui)
+				{
+					//Ausgeaehlte Ressource zuweisen und Textfeld wieder leeren
+					$("#prestudent_id").val(ui.item.prestudent_id);
+				}
+			});
+		});
+	</script>
 	</head>
 	
 	<body>
@@ -689,9 +762,9 @@ else
 						}				
 						echo '</SELECT>';
 					
-						echo 'von Datum: <INPUT type="text" name="datum_von" maxlength="10" size="10" value="'.$datum_von.'" />&nbsp;';
-						echo 'bis Datum: <INPUT type="text" name="datum_bis" maxlength="10" size="10" value="'.$datum_bis.'" />';
-						echo '<br/>PrestudentID: <INPUT type="text" name="prestudent_id" maxlength="7" size="10" value="'.$prestudent_id.'" />';
+						echo ' von Datum: <INPUT class="datepicker_datum" type="text" name="datum_von" maxlength="10" size="10" value="'.$datum_von.'" />&nbsp;';
+						echo 'bis Datum: <INPUT class="datepicker_datum" type="text" name="datum_bis" maxlength="10" size="10" value="'.$datum_bis.'" />';
+						echo '<br/>PrestudentIn: <INPUT id="prestudent" type="text" name="prestudent_id" size="50" value="'.$prestudent_id.'" placeholder="Name, UID oder Prestudent_id eingeben" onkeyup="document.getElementById(\'prestudent_id\').value=this.value"/><input type="hidden" id="prestudent_id" name="prestudent_id" value="'.$prestudent_id.'" />';
 				echo '</form>
 			</td>
 			<td align="right">
