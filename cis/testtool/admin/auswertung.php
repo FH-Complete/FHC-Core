@@ -719,8 +719,8 @@ else
 	<h1>Auswertung Reihungstest</h1>
 	<table width="100%">
 		<tr>
-			<td>
-				<form method="POST">
+			<form method="POST">
+			<td style="white-space:nowrap; padding: 10px; background-color: #EEE">				
 				Reihungstest w&auml;hlen:&nbsp;
 					<SELECT name="reihungstest">
 					<OPTION value="">-- keine Auswahl --</OPTION>';
@@ -735,8 +735,7 @@ else
 						}
 						
 					echo '</SELECT>
-					<INPUT type="submit" value="Auswerten" />
-					<br />
+					<br /><hr style="color: #B3B3B3; background-color: #B3B3B3; border:none;">
 				Studiengang:
 					<SELECT name="studiengang">
 						<OPTION value="">Alle</OPTION>';
@@ -763,16 +762,18 @@ else
 						echo '</SELECT>';
 					
 						echo ' von Datum: <INPUT class="datepicker_datum" type="text" name="datum_von" maxlength="10" size="10" value="'.$datum_von.'" />&nbsp;';
-						echo 'bis Datum: <INPUT class="datepicker_datum" type="text" name="datum_bis" maxlength="10" size="10" value="'.$datum_bis.'" />';
-						echo '<br/>PrestudentIn: <INPUT id="prestudent" type="text" name="prestudent_id" size="50" value="'.$prestudent_id.'" placeholder="Name, UID oder Prestudent_id eingeben" onkeyup="document.getElementById(\'prestudent_id\').value=this.value"/><input type="hidden" id="prestudent_id" name="prestudent_id" value="'.$prestudent_id.'" />';
-				echo '</form>
-			</td>
-			<td align="right">
+						echo 'bis Datum: <INPUT class="datepicker_datum" type="text" name="datum_bis" maxlength="10" size="10" value="'.$datum_bis.'" /><br />';
+						echo '<hr style="color: #B3B3B3; background-color: #B3B3B3; border:none;">';
+						echo 'PrestudentIn: <INPUT id="prestudent" type="text" name="prestudent_id" size="50" value="'.$prestudent_id.'" placeholder="Name, UID oder Prestudent_id eingeben" onkeyup="document.getElementById(\'prestudent_id\').value=this.value"/><input type="hidden" id="prestudent_id" name="prestudent_id" value="'.$prestudent_id.'" />';
+			echo '</td>
+			<td style="padding: 5px; background-color: #EEE";">
+				<INPUT type="submit" value="Auswerten" />
+			</td></form>
+			<td style="white-space:nowrap; width: 100%; text-align: right;" align="right;">
 				<a href="auswertung_detail.php">Auswertung auf Fragenebene</a>
 			</td>
 		</tr>
-		<tr><td>';
-		//var_dump($stg_arr);
+		<tr><td style="padding: 5px;">';
 		echo 'Auswahl: <strong>';
 		if (isset ($_REQUEST['studiengang']) && $_REQUEST['studiengang']!='')
 			echo $stg_arr[$_REQUEST['studiengang']].' ';
@@ -789,9 +790,8 @@ else
 			
 		echo '</strong>';
 		echo '</td>
-		</tr>
-		<tr><td>
-		<a href="auswertung.php?studiengang='.$studiengang.'&semester='.$semester.'&datum_von='.$datum_von.'&datum_bis='.$datum_bis.'&prestudent_id='.$prestudent_id.'&reihungstest='.$reihungstest.'&format=xls"><img src="../../../skin/images/ExcelIcon.png" alt="Excel Icon"></a>
+		<td style="padding: 5px; background-color: #EEE";">
+		<a href="auswertung.php?studiengang='.$studiengang.'&semester='.$semester.'&datum_von='.$datum_von.'&datum_bis='.$datum_bis.'&prestudent_id='.$prestudent_id.'&reihungstest='.$reihungstest.'&format=xls"><img src="../../../skin/images/xls_icon.png" alt="Excel Icon"> Export</a>
 		</td></tr>
 	</table>';
 	
