@@ -484,7 +484,7 @@ function sendBenachrichtigung($coodle_id)
         Höchstädtplatz 6<br>
         1200 Wien"; 
     
-    $mail = new mail($coodle_send->ersteller_uid.'@'.DOMAIN, 'no-reply', 'Coodle Unmfrage', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
+    $mail = new mail($coodle_send->ersteller_uid.'@'.DOMAIN, 'no-reply', 'Coodle Umfrage', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
 	$mail->setHTMLContent($email); 
 	if(!$mail->send())
 		die("Fehler beim senden des Mails aufgetreten");	
