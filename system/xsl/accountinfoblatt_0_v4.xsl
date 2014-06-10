@@ -83,7 +83,13 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 								</fo:table-cell>
 								<fo:table-cell>
 									<fo:block font-weight="bold" font-family="sans-serif" font-size="12pt" content-width="130mm" text-align="left">
-										<xsl:value-of select="aktivierungscode" />
+										<xsl:choose>
+											<xsl:when test="aktivierungscode=''">Account wurde bereits aktiviert
+											</xsl:when>
+											<xsl:otherwise>
+											<xsl:value-of select="aktivierungscode" />
+											</xsl:otherwise>
+										</xsl:choose>										
 									</fo:block>
 								</fo:table-cell>
 							</fo:table-row>
