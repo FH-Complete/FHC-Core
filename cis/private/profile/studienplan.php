@@ -297,8 +297,7 @@ echo '<h1>'.$p->t('studienplan/studienplan').": $studienplan->bezeichnung ($stud
 
 echo '<table style="border: 1px solid black">
 	<thead>
-	<tr valign="top">
-		<th></th>
+	<tr style="border: 1px solid black" valign="top">
 		<th>'.$p->t('global/lehrveranstaltung').'</th>
 		<th>'.$p->t('studienplan/ects').'</th>
 		<th>'.$p->t('studienplan/status').'</th>';
@@ -329,9 +328,33 @@ function drawTree($tree, $depth)
 
 	foreach($tree as $row_tree)
 	{
-		echo "\n<tr>";
-		echo '<td>'.$row_tree->kurzbz.'</td>';
-		echo '<td>';
+		$style='';
+		if(!empty($row_tree->childs))
+		{
+			$bstart='<b>';$bende='</b>';
+			$style=' style="background-color:#EEEEEE"';
+		}
+		else
+		{
+			$bstart='';$bende='';
+		}
+
+		switch($row_tree->lehrtyp_kurzbz)
+		{
+			case 'modul':
+				$icon='<img src="../../../skin/images/modul.png"> ';
+				$style=' style="background-color:#CCCCCC"';
+				break;
+			case 'lv':
+				$icon='<img src="../../../skin/images/lv.png"> ';
+				break;
+			default:
+				$icon='';
+		}
+		
+
+		echo '<tr'.$style.'>
+			<td>'.$bstart;
 
 		// Einrückung für Subtree
 		for($i=0;$i<$depth;$i++)
@@ -352,8 +375,8 @@ function drawTree($tree, $depth)
 		}
 
 		// Bezeichnung der Lehrveranstaltung
-		echo $row_tree->bezeichnung;
-		echo '</td>';
+		echo $icon.$row_tree->kurzbz.' - '.$row_tree->bezeichnung;
+		echo $bende.'</td>';
 		
 		// ECTS Punkte
 		echo '<td>'.$row_tree->ects.'</td>';
@@ -509,7 +532,7 @@ function drawTree($tree, $depth)
 		echo '</tr>';
 		
 		// Wenn Subtree vorhanden, dann anzeigen
-		if(isset($row_tree->childs))
+		if(!empty($row_tree->childs))
 			drawTree($row_tree->childs, $depth+1);
 	}
 }
