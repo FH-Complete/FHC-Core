@@ -296,6 +296,7 @@ function writePruefungsTable(e, data, anmeldung)
 			}
 		});
 		var termin = d.von.split(" ");
+		var time = termin[1].substring(0,5);
 		termin = termin[0].split("-");
 		termin = new Date(termin[0], termin[1]-1,termin[2]);
 		var frist = termin;
@@ -317,13 +318,13 @@ function writePruefungsTable(e, data, anmeldung)
 			if(storno)
 			{
 				//button = "<p><span style='display: inline-block; width: 155px;'>Stornieren (bis "+frist+"): </span><input style='width: 90px;' type='button' value='"+termin+"' onclick='stornoAnmeldung(\""+anmeldung_id+"\");'></br>";
-				button = "<p><a href='#' title='Stornieren möglich bis "+frist+"'><input style='width: 90px;' type='button' value='"+termin+"' onclick='stornoAnmeldung(\""+anmeldung_id+"\");'></a></p>";
+				button = "<p><a href='#' title='Stornieren möglich bis "+frist+"'><input style='width: 140px;' type='button' value='"+termin+" "+time+"' onclick='stornoAnmeldung(\""+anmeldung_id+"\");'></a></p>";
 
 			}
 			else
 			{
 				//button = "<p><span style='display: inline-block; width: 155px;'>Anmelden (bis "+frist+"): </span><input style='width: 90px;' type='button' value='"+termin+"' onclick='openDialog(\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\", \""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung[0].bezeichnung+"\", \""+d.von+"\", \""+d.bis+"\");'></p>";
-				button = "<p><a href='#' title='Anmeldung möglich bis "+frist+"';><input style='width: 90px; background-color: green;' type='button' value='"+termin+"' onclick='openDialog(\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\", \""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung[0].bezeichnung+"\", \""+d.von+"\", \""+d.bis+"\");'></a></p>";
+				button = "<p><a href='#' title='Anmeldung möglich bis "+frist+"';><input style='width: 140px; background-color: green;' type='button' value='"+termin+" "+time+"' onclick='openDialog(\""+e.lehrveranstaltung[0].lehrveranstaltung_id+"\", \""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung[0].bezeichnung+"\", \""+d.von+"\", \""+d.bis+"\");'></a></p>";
 			}
 		}
 		else
