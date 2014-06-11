@@ -833,5 +833,19 @@ class person extends basis_db
 		return true; 
 	}
 	
+	public function checkSvnr($svnr)
+	{
+		$qry = "Select 1 from public.tbl_person where svnr =".$this->db_add_param($svnr).";"; 
+		
+		if($result = $this->db_query($qry))
+		{
+			if($this->db_num_rows($result)>0)
+				return true; 
+			else
+				return false; 
+		}
+	
+	}
+	
     }
 ?>

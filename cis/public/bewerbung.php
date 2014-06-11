@@ -50,6 +50,7 @@ require_once('../../include/akte.class.php');
 require_once('../../include/mail.class.php'); 
 require_once('../../include/studiensemester.class.php'); 
 require_once('../../include/studienplan.class.php');
+require_once('../../include/basis_db.class.php'); 
 
 $person_id = $_SESSION['bewerbung/personId'];
 $akte_id = isset($_GET['akte_id'])?$_GET['akte_id']:'';
@@ -178,10 +179,15 @@ if(isset($_POST['btn_person']))
     $person->staatsbuergerschaft = $_POST['staatsbuergerschaft']; 
     $person->geschlecht = $_POST['geschlecht']; 
     $person->svnr = $_POST['svnr']; 
-    
+	$person->gebort = $_POST['gebort']; 
+	$person->geburtsnation = $_POST['geburtsnation']; 
+ 	
     $person->new = false; 
     if(!$person->save())
         $message=('Fehler beim Speichern der Person aufgetreten'); 
+	
+	if($person->checkSvnr($person->svnr))
+		$message = "SVNR bereits vorhanden"; 
 }
 
 // Kontaktdaten speichern
@@ -223,7 +229,44 @@ if(isset($_POST['btn_kontakt']))
         
         $kontakt->save(); 
     }
-    
+	
+	$kontakt_t = new kontakt(); 
+    $kontakt_t->load_persKontakttyp($person->person_id, 'telefon'); 
+    // gibt es schon kontakte von user
+    if(count($kontakt_t->result)>0)
+    {
+        // Es gibt bereits einen Emailkontakt
+        $kontakt_id = $kontakt_t->result[0]->kontakt_id;
+        
+        if($_POST['telefonnummer'] == '')
+        {
+            // löschen
+            $kontakt_t->delete($kontakt_id); 
+        }
+        else 
+        {
+	        $kontakt_t->person_id = $person->person_id; 
+	        $kontakt_t->kontakt_id = $kontakt_id; 
+	        $kontakt_t->zustellung = true; 
+	        $kontakt_t->kontakttyp = 'telefon';
+	        $kontakt_t->kontakt = $_POST['telefonnummer'];
+	        $kontakt_t->new = false; 
+	        
+	        $kontakt_t->save(); 
+        }
+    }
+    else
+    {
+        // neuen Kontakt anlegen
+        $kontakt_t->person_id = $person->person_id; 
+        $kontakt_t->zustellung = true; 
+        $kontakt_t->kontakttyp = 'telefon';
+        $kontakt_t->kontakt = $_POST['telefonnummer']; 
+        $kontakt_t->new = true; 
+        
+        $kontakt_t->save(); 
+    }
+
     // Adresse Speichern
     if($_POST['strasse']!='' && $_POST['plz']!='' && $_POST['ort']!='')
     {
@@ -425,6 +468,41 @@ function activeTab(tab_nr)
     $( "#tabs" ).tabs({ active: tab_nr });
 }
 
+function checkKontakt()
+{
+	if($("#telefonnummer").val() == '')
+    {
+        alert("Telefonnummer darf nicht leer sein!"); 
+        return false; 
+    }
+	
+	if($("#email").val() == '')
+    {
+        alert("Email-Adresse darf nicht leer sein!"); 
+        return false; 
+    }
+	
+	if($("#strasse").val() == '')
+    {
+        alert("Strasse darf nicht leer sein!"); 
+        return false; 
+    }
+	
+	if($("#plz").val() == '')
+    {
+        alert("Postleitzahl darf nicht leer sein!"); 
+        return false; 
+    }
+	
+	if($("#ort").val() == '')
+    {
+        alert("Ort darf nicht leer sein!"); 
+        return false; 
+    }
+	
+	return true; 
+}
+
 function checkPerson()
 {
     if($("#nachname").val() == '')
@@ -453,14 +531,27 @@ function checkPerson()
             return false; 
         }
     }
-
-    if($("#svnr").val() != '')
+	
+	// Berechnung der Sozialversicherungsnummer wenn AT
+	if($("#staatsbuergerschaft").val() == 'A')
     {
-        if($("#svnr").val().length != '10')
+		if($("#svnr").val().length != '10')
         {
-            alert("Ungültiger Sozialversicherungsnummer!"); 
+            alert("Ungültige Sozialversicherungsnummer!"); 
             return false; 
         }
+		
+		var checksum = 0; 
+		var soz_nr = $("#svnr").val(); 
+		
+		checksum = (3*soz_nr[0])+(7*soz_nr[1])+(9*soz_nr[2])+(5*soz_nr[4])+(8*soz_nr[5])+(4*soz_nr[6])+(2*soz_nr[7])+(1*soz_nr[8])+(6*soz_nr[9])
+		checksum = checksum%11; 
+		
+		if(checksum != soz_nr[3])
+		{
+			alert("Ungültige Sozialversicherungsnummer!"); 
+			return false; 
+		}
     }
 
     return true; 
@@ -564,11 +655,11 @@ padding: 5px;
     <ul>
         <li><a href="#tabs-1">&gt;|1| Allgemein <br> </a></li>
         <li><a href="#tabs-2">&gt;|2| Persönliche Daten <br> <?php echo $status_person_text;?></a></li>
-        <li><a href="#tabs-3">&gt;|3| Zugangsvoraussetzungen<br> <?php echo $status_zgv_text; ?></a></li>
-        <li><a href="#tabs-4">&gt;|4| Kontaktinformationen <br> <?php echo $status_kontakt_text;?></a></li>
-        <li><a href="#tabs-5">&gt;|5| Dokumente <br> <?php echo $status_dokumente_text;?></a></li>
-        <li><a href="#tabs-6">&gt;|6| Zahlungen <br> <?php echo $status_zahlungen_text;?></a></li>		
-        <li><a href="#tabs-7">&gt;|7| Bewerbung abschicken <br> </a></li>
+        <!--<li><a href="#tabs-3">&gt;|3| Zugangsvoraussetzungen<br> <?php echo $status_zgv_text; ?></a></li>-->
+        <li><a href="#tabs-4">&gt;|3| Kontaktinformationen <br> <?php echo $status_kontakt_text;?></a></li>
+        <li><a href="#tabs-5">&gt;|4| Dokumente <br> <?php echo $status_dokumente_text;?></a></li>
+        <li><a href="#tabs-6">&gt;|5| Zahlungen <br> <?php echo $status_zahlungen_text;?></a></li>		
+        <li><a href="#tabs-7">&gt;|6| Bewerbung abschicken <br> </a></li>
     </ul>
 	</div>
 <div id="tabs-1">
@@ -632,6 +723,8 @@ padding: 5px;
     $nachname = ($person->nachname != '')?$person->nachname:'';
     $titelpost = ($person->titelpost != '')?$person->titelpost:'';
     $geburtstag = ($person->gebdatum != '')?$datum->formatDatum($person->gebdatum, 'd.m.Y'):'';
+	$gebort =  ($person->gebort != '')?$person->gebort:'';
+	
     $svnr = ($person->svnr != '')?$person->svnr:'';
     
     echo "
@@ -652,6 +745,22 @@ padding: 5px;
             <tr>
                 <td>Geburtsdatum* (dd.mm.yyyy): </td><td><input type='text' id='gebdatum' name='geburtsdatum' value='".$geburtstag."'></td>
             </tr>
+            <tr>
+                <td>Geburtsort: </td><td><input type='text' id='gebort' name='gebort' value='".$gebort."'></td>
+            </tr>			
+            <tr>
+                <td>Geburtsnation: </td>
+                <td><Select name='geburtsnation' id='geburtsnation'>
+                    <option value=''>-- Bitte auswählen -- </option>";
+            $selected = '';
+        foreach($nation->nation as $nat)
+        {
+            $selected = ($person->geburtsnation == $nat->code)?'selected':'';
+            echo "<option value='".$nat->code."' ".$selected.">".$nat->kurztext."</option>"; 
+        }
+
+        echo "</select></td>
+            </tr>			
             <tr>
                 <td>Sozialversicherungsnr.: </td><td><input type='text' name='svnr' id='svnr' value='".$svnr."'></td>
             </tr>
@@ -681,20 +790,24 @@ padding: 5px;
             </tr>
         </table>
     </form>";
+		echo $message; 
     ?>
 </div>
-<div id="tabs-3">
+	
+<!-- <div id="tabs-3">
 <h2>Zugangsvoraussetzungen</h2>
 <?php
+/**
 $studiengang = new studiengang(); 
     $prestudent = new prestudent(); 
     if(!$prestudent->getPrestudenten($person->person_id))
-        die('Fehler beim laden des Prestudenten');
+        die('Fehler beim laden des Prestudenten');*/
     ?>
 
 <div id="zgv_menu">
 <ul class="idTabs"> 
     <?php
+	/*
     $studiengang = new studiengang(); 
     $prestudent = new prestudent(); 
     if(!$prestudent->getPrestudenten($person->person_id))
@@ -707,12 +820,12 @@ $studiengang = new studiengang();
             die('Konnte Studiengang nicht laden'); 
         
         echo "<li><a href='#".$pre->prestudent_id."'>".$studiengang->bezeichnung."</a></li>";
-    }
+    }*/
    ?> 
 </ul> 
 </div>
 <?php
-    foreach($prestudent->result as $pre)
+  /*  foreach($prestudent->result as $pre)
     {
         if(!$studiengang->load($pre->studiengang_kz))
             die('Konnte Studiengang nicht laden'); 
@@ -842,9 +955,12 @@ $studiengang = new studiengang();
     
         </table></form> 
                 </div>";
-    }
+    }*/
 ?>
-</div>
+</div>-->
+	
+	
+	
     <div id="tabs-4">
 <h2>Kontaktinformationen</h2>
 <?php
@@ -854,30 +970,40 @@ $studiengang = new studiengang();
     $kontakt = new kontakt(); 
     $kontakt->load_persKontakttyp($person->person_id, 'email'); 
     $email = isset($kontakt->result[0]->kontakt)?$kontakt->result[0]->kontakt:'';
-   
+	
+	$kontakt_t = new kontakt();
+	$kontakt_t->load_persKontakttyp($person->person_id, 'telefon'); 
+    $telefon = isset($kontakt_t->result[0]->kontakt)?$kontakt_t->result[0]->kontakt:'';
+	
     $adresse = new adresse(); 
     $adresse->load_pers($person->person_id); 
     $strasse = isset($adresse->result[0]->strasse)?$adresse->result[0]->strasse:'';
     $plz = isset($adresse->result[0]->plz)?$adresse->result[0]->plz:'';
     $ort = isset($adresse->result[0]->ort)?$adresse->result[0]->ort:'';
     $adr_nation = isset($adresse->result[0]->nation)?$adresse->result[0]->nation:'';
+	
+	
    
      echo "
-    <form method='POST' action='".$_SERVER['PHP_SELF']."?active=3'>
+    <form method='POST' action='".$_SERVER['PHP_SELF']."?active=2'>
         <table border='0'>
-                <td>Email*: </td><td><input type='text' name='email' value='".$email."' size='32'></td>
+		<tr>
+                <td>Email*: </td><td><input type='text' name='email' id='email' value='".$email."' size='32'></td>
             </tr>
+			<tr>
+				<td>Telefonnummer*: </td><td><input type='text' name='telefonnummer' id='telefonnummer' value='".$telefon."' size='32'></td>
+			</tr>
             <tr>
                 <td>&nbsp;</td>
             </tr>
             <tr>
-                <td>Straße*: </td><td><input type='text' name='strasse' value='".$strasse."'></td>
+                <td>Straße*: </td><td><input type='text' name='strasse' id='strasse' value='".$strasse."'></td>
             </tr>
             <tr>
-                <td>Postleitzahl*: </td><td><input type='text' name='plz' value='".$plz."'></td>
+                <td>Postleitzahl*: </td><td><input type='text' name='plz' id='plz' value='".$plz."'></td>
             </tr>
             <tr>
-                <td>Ort*: </td><td><input type='text' name='ort' value='".$ort."'></td>
+                <td>Ort*: </td><td><input type='text' name='ort' id='ort' value='".$ort."'></td>
             </tr>
              <tr>
                 <td>Nation*: </td>
@@ -898,7 +1024,7 @@ $studiengang = new studiengang();
                 <td>&nbsp;</td>
             </tr>                
             <tr>
-                <td colspan='2'><input type='submit' value='Speichern' name='btn_kontakt'> &nbsp;<button class='btn_weiter' type='button' onclick='activeTab(4);'>Weiter</button></td>
+                <td colspan='2'><input type='submit' value='Speichern' name='btn_kontakt' onclick='return checkKontakt();'> &nbsp;<button class='btn_weiter' type='button' onclick='activeTab(4);'>Weiter</button></td>
             </t>
         </table>
     </form>";
@@ -917,7 +1043,7 @@ $studiengang = new studiengang();
     
     echo '<table border="1" width="130%">
         
-            <tr><th width="50%">Name</th><th width="10%">Status</th><th width="10%">Aktion</th><th width ="80%"></th>&nbsp;</tr>';
+            <tr><th width="50%">Name</th><th width="10%">Status</th><th width="10%">Aktion</th><th width ="80%"></th><th>Info</th>&nbsp;</tr>';
     
     foreach($dokumente_person->result as $dok)
     {
@@ -934,8 +1060,8 @@ $studiengang = new studiengang();
                 // wird nachgereicht
                  $status = '<img title="wird nachgereicht" src="'.APP_ROOT.'skin/images/hourglass.png" width="20px">'; 
                  $nachgereicht_help = 'checked';
-                 $div = "<form method='POST' action='".$_SERVER['PHP_SELF']."?active=4'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:true;'>".$akte->result[0]->anmerkung."</span>";
-				 $aktion = '<a href="'.$_SERVER['PHP_SELF'].'?method=delete&akte_id='.$akte_id.'&active=4"><img title="löschen" src="'.APP_ROOT.'skin/images/delete.png" width="20px"></a>'; 
+                 $div = "<form method='POST' action='".$_SERVER['PHP_SELF']."?active=3'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:true;'>".$akte->result[0]->anmerkung."</span>";
+				 $aktion = '<a href="'.$_SERVER['PHP_SELF'].'?method=delete&akte_id='.$akte_id.'&active=3"><img title="löschen" src="'.APP_ROOT.'skin/images/delete.png" width="20px"></a>'; 
             }
             else 
             {
@@ -945,7 +1071,7 @@ $studiengang = new studiengang();
 					// Dokument wurde bereits überprüft
 					$status = '<img title="abgegeben" src="'.APP_ROOT.'skin/images/true_green.png" width="20px">'; 
 					$nachgereicht_help = '';
-					$div = "<form method='POST' action='".$_SERVER['PHP_SELF']."&active=4'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:none;'>wird nachgereicht:<input type='checkbox' name='check_nachgereicht' ".$nachgereicht_help."><input type='text' size='15' name='txt_anmerkung'><input type='submit' value='OK' name='submit_nachgereicht'></span><input type='hidden' name='dok_kurzbz' value='".$dok->dokument_kurzbz."'><input type='hidden' name='akte_id' value='".$akte_id."'></form>";
+					$div = "<form method='POST' action='".$_SERVER['PHP_SELF']."&active=3'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:none;'>wird nachgereicht:<input type='checkbox' name='check_nachgereicht' ".$nachgereicht_help."><input type='text' size='15' name='txt_anmerkung'><input type='submit' value='OK' name='submit_nachgereicht'></span><input type='hidden' name='dok_kurzbz' value='".$dok->dokument_kurzbz."'><input type='hidden' name='akte_id' value='".$akte_id."'></form>";
 					$aktion = ''; 
 				}
 				else
@@ -953,8 +1079,8 @@ $studiengang = new studiengang();
 					// Dokument hochgeladen ohne überprüfung der Assistenz
 					$status = '<img title="abgegeben" src="'.APP_ROOT.'skin/images/check_black.png" width="20px">'; 
 					$nachgereicht_help = '';
-					$div = "<form method='POST' action='".$_SERVER['PHP_SELF']."&active=4'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:none;'>wird nachgereicht:<input type='checkbox' name='check_nachgereicht' ".$nachgereicht_help."><input type='text' size='15' name='txt_anmerkung'><input type='submit' value='OK' name='submit_nachgereicht'></span><input type='hidden' name='dok_kurzbz' value='".$dok->dokument_kurzbz."'><input type='hidden' name='akte_id' value='".$akte_id."'></form>";
-					$aktion = '<a href="'.$_SERVER['PHP_SELF'].'?method=delete&akte_id='.$akte_id.'&active=4"><img title="löschen" src="'.APP_ROOT.'skin/images/delete.png" width="20px"></a>'; 
+					$div = "<form method='POST' action='".$_SERVER['PHP_SELF']."&active=3'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:none;'>wird nachgereicht:<input type='checkbox' name='check_nachgereicht' ".$nachgereicht_help."><input type='text' size='15' name='txt_anmerkung'><input type='submit' value='OK' name='submit_nachgereicht'></span><input type='hidden' name='dok_kurzbz' value='".$dok->dokument_kurzbz."'><input type='hidden' name='akte_id' value='".$akte_id."'></form>";
+					$aktion = '<a href="'.$_SERVER['PHP_SELF'].'?method=delete&akte_id='.$akte_id.'&active=3"><img title="löschen" src="'.APP_ROOT.'skin/images/delete.png" width="20px"></a>'; 
 	
 				}                
             }
@@ -964,11 +1090,30 @@ $studiengang = new studiengang();
             // Dokument fehlt noch
             $status = '<img title="offen" src="'.APP_ROOT.'skin/images/upload.png" width="20px">';
             $aktion = '<img src="'.APP_ROOT.'skin/images/delete.png" width="20px" title="löschen"> <a href="'.APP_ROOT.'cis/public/dms_akteupload.php?person_id='.$person_id.'&dokumenttyp='.$dok->dokument_kurzbz.'" onclick="FensterOeffnen(this.href); return false;"><img src="'.APP_ROOT.'skin/images/upload.png" width="20px" title="upload"></a><a href="#" onclick="toggleDiv(\'nachgereicht_'.$dok->dokument_kurzbz.'\');"><img src="'.APP_ROOT.'skin/images/hourglass.png" width="20px" title="wird nachgereicht"></a>';
-            $div = "<form method='POST' action='".$_SERVER['PHP_SELF']."?active=4'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:none;'>wird nachgereicht:<input type='checkbox' name='check_nachgereicht'><input type='text' size='15' name='txt_anmerkung'><input type='submit' value='OK' name='submit_nachgereicht'></span><input type='hidden' name='dok_kurzbz' value='".$dok->dokument_kurzbz."'></form>";
+            $div = "<form method='POST' action='".$_SERVER['PHP_SELF']."?active=3'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:none;'>wird nachgereicht:<input type='checkbox' name='check_nachgereicht'><input type='text' size='15' name='txt_anmerkung'><input type='submit' value='OK' name='submit_nachgereicht'></span><input type='hidden' name='dok_kurzbz' value='".$dok->dokument_kurzbz."'></form>";
             
         }
 
-        echo "<tr><td valign='top'>".$dok->bezeichnung."</td><td valign='top' align='center'>".$status."</td><td valign='top'>".$aktion."</td><td valign='top'>".$div."</td></tr>";
+		$ben_stg = new basis_db();
+		$qry = "SELECT studiengang_kz FROM public.tbl_dokumentstudiengang 
+            JOIN public.tbl_prestudent using (studiengang_kz) 
+            JOIN public.tbl_dokument using (dokument_kurzbz)
+            WHERE dokument_kurzbz = ".$ben_stg->db_add_param($dok->dokument_kurzbz)." and person_id =".$ben_stg->db_add_param($person_id, FHC_INTEGER);
+		
+		$ben = "Benötigt für: \n";
+		if($result = $ben_stg->db_query($qry))
+		{
+			while($row = $ben_stg->db_fetch_object($result))
+			{
+				$stg = new studiengang(); 
+				$stg->load($row->studiengang_kz); 
+				
+				$ben .= $stg->bezeichnung."\n"; 
+			}
+		}
+		
+		
+        echo "<tr><td valign='top'>".$dok->bezeichnung."</td><td valign='top' align='center'>".$status."</td><td valign='top'>".$aktion."</td><td valign='top'>".$div."</td><td><img src='".APP_ROOT."skin/images/info.png' width='20px' title='".$ben."'></td></tr>";
     }
     echo '</table>
             <br>
@@ -1118,7 +1263,7 @@ $studiengang = new studiengang();
     <?php
                 
     $disabled = 'disabled'; 
-    if($status_person == true && $status_zgv== true && $status_kontakt == true && $status_dokumente == true && $status_zahlungen == true)
+    if($status_person == true && $status_kontakt == true && $status_dokumente == true && $status_zahlungen == true)
         $disabled = ''; 
     
     $prestudent_help= new prestudent(); 
