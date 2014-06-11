@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2012 FH Technikum-Wien
+/* Copyright (C) 2012 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -23,6 +23,10 @@ require_once('../../include/functions.inc.php');
 require_once('../../include/variable.class.php');
 require_once('../../include/studiensemester.class.php');
 
+
+$html='';
+$csv='';
+$json='{';
 $user = get_uid();
 $db = new basis_db();
 $var = new variable();
@@ -31,6 +35,11 @@ $var->loadVariables($user);
 $stg = new studiengang();
 $stg->getAll('typ, kurzbz');
 
+if(isset($_REQUEST['outputformat']))
+	$outputformat = $_REQUEST['outputformat'];
+else
+	$outputformat = 'html';
+	
 if(isset($_REQUEST['stsem']))
 	$studiensemester_kurzbz = $_REQUEST['stsem'];
 else
@@ -39,7 +48,7 @@ else
 $stsem = new studiensemester();
 $stsem->getAll();
 
-echo '<!DOCTYPE html>
+$html.= '<!DOCTYPE html>
 <html>
 <head>
 	<meta charset="UTF-8" />
@@ -63,7 +72,7 @@ echo '<!DOCTYPE html>
 <body>
 <h2>DropOut Statistik - Studiensemester '.$db->convert_html_chars($studiensemester_kurzbz).'</h2>
 ';
-echo '<form action="'.$_SERVER['PHP_SELF'].'" METHOD="POST">
+$html.= '<form action="'.$_SERVER['PHP_SELF'].'" METHOD="POST">
 Studiensemester: <SELECT name="stsem">';
 foreach($stsem->studiensemester as $row)
 {
@@ -72,11 +81,11 @@ foreach($stsem->studiensemester as $row)
 	else
 		$selected='';
 		
-	echo '<OPTION value="'.$row->studiensemester_kurzbz.'" '.$selected.'>'.$row->studiensemester_kurzbz.'</OPTION>';
+	$html.= '<OPTION value="'.$row->studiensemester_kurzbz.'" '.$selected.'>'.$row->studiensemester_kurzbz.'</OPTION>';
 }
-echo '</SELECT>
+$html.= '</SELECT>
 <input type="submit" value="Anzeigen" /></form>';
-echo '
+$html.= '
 <table id="myTable" class="tablesorter">
 	<thead>
 		<tr>
@@ -92,6 +101,7 @@ echo '
 	</thead>
 	<tbody>	
 ';
+$csv.='"Studiengang",	"Anfaenger M",	"Anfaenger W",	"Anfaenger Gesamt",	"Abbrecher M",	"Abbrecher W",	"Abbrecher Gesamt",	"DropOut in %"'."\r\n";
 
 $summe_anfaenger_m=0;
 $summe_anfaenger_w=0;
@@ -104,8 +114,10 @@ foreach($stg->result as $row_stg)
 {
 	if($row_stg->typ!='b' && $row_stg->typ!='m')
 		continue;
-	echo "<tr>\n";
-	echo '<td>'.$db->convert_html_chars($row_stg->kuerzel).'</td>';
+	$html.= "<tr>\n";
+	$html.= '<td>'.$db->convert_html_chars($row_stg->kuerzel).'</td>';
+	$csv.='"'.$row_stg->kuerzel.'",	';
+	$json.='"'.$row_stg->kuerzel.'":{';
 	
 	//Studienanfaenger
 	$qry = "
@@ -129,10 +141,19 @@ foreach($stg->result as $row_stg)
 		while($row = $db->db_fetch_object($result))
 			$anfaenger[$row->geschlecht]=$row->anzahl;
 			
-	echo '<td align="right">'.$db->convert_html_chars($anfaenger['m']).'</td>';
-	echo '<td align="right">'.$db->convert_html_chars($anfaenger['w']).'</td>';
+	$html.= '<td align="right">'.$db->convert_html_chars($anfaenger['m']).'</td>';
+	$csv.='"'.$anfaenger['m'].'",	';
+	$json.='"Anfaenger M": "'.$anfaenger['m'].'", '; 
+	
+	$html.= '<td align="right">'.$db->convert_html_chars($anfaenger['w']).'</td>';
+	$csv.='"'.$anfaenger['w'].'",	';
+	$json.='"Anfaenger W": "'.$anfaenger['w'].'", '; 
+	
 	$anfaenger_gesamt = array_sum($anfaenger);
-	echo '<td align="right">'.$db->convert_html_chars($anfaenger_gesamt).'</td>';
+	$html.= '<td align="right">'.$db->convert_html_chars($anfaenger_gesamt).'</td>';
+	$csv.='"'.$anfaenger_gesamt.'",	';
+	$json.='"Anfaenger Gesamt": "'.$anfaenger_gesamt.'", ';
+	
 	$summe_anfaenger_m+=$anfaenger['m'];
 	$summe_anfaenger_w+=$anfaenger['w'];
 	$summe_anfaenger_gesamt+=$anfaenger_gesamt;
@@ -173,10 +194,18 @@ foreach($stg->result as $row_stg)
 		while($row = $db->db_fetch_object($result))
 			$abbrecher[$row->geschlecht]=$row->anzahl;
 			
-	echo '<td align="right">'.$db->convert_html_chars($abbrecher['m']).'</td>';
-	echo '<td align="right">'.$db->convert_html_chars($abbrecher['w']).'</td>';
+	$html.= '<td align="right">'.$db->convert_html_chars($abbrecher['m']).'</td>';
+	$csv.='"'.$abbrecher['m'].'",	';
+	$json.='"Abbrecher M": "'.$abbrecher['m'].'", ';
+	
+	$html.= '<td align="right">'.$db->convert_html_chars($abbrecher['w']).'</td>';
+	$csv.='"'.$abbrecher['w'].'",	';
+	$json.='"Abbrecher W": "'.$abbrecher['w'].'", ';	
+	
 	$abbrecher_gesamt = array_sum($abbrecher);
-	echo '<td align="right">'.$db->convert_html_chars($abbrecher_gesamt).'</td>';
+	$html.= '<td align="right">'.$db->convert_html_chars($abbrecher_gesamt).'</td>';
+	$csv.='"'.$abbrecher_gesamt.'",	';
+	$json.='"Abbrecher Gesamt": "'.$abbrecher_gesamt.'", ';	
 	
 	$summe_abbrecher_m+=$abbrecher['m'];
 	$summe_abbrecher_w+=$abbrecher['w'];
@@ -185,14 +214,17 @@ foreach($stg->result as $row_stg)
 		$dropout=0;
 	else
 		$dropout = 100/$anfaenger_gesamt*$abbrecher_gesamt;
-	echo '<td align="right">'.$db->convert_html_chars(number_format($dropout,2)).' %</td>';
-	echo "\n</tr>\n";
+	$html.= '<td align="right">'.$db->convert_html_chars(number_format($dropout,2)).' %</td>';
+	$csv.='"'.number_format($dropout,2).'"'."\n";
+	$json.='"DropOut in %": "'.number_format($dropout,2).'"}, ';	
+	
+	$html.= "\n</tr>\n";
 }
 if($summe_abbrecher_gesamt==0 || $summe_anfaenger_gesamt==0)
 	$dropout_gesamt=0;
 else
 	$dropout_gesamt = 100/$summe_anfaenger_gesamt*$summe_abbrecher_gesamt;
-echo '</tbody>
+$html.= '</tbody>
 <tfooter>
 	<tr>
 		<th></th>
@@ -207,6 +239,28 @@ echo '</tbody>
 </tfooter>		
 </table>';
 
-echo '</body>
+$html.= '</body>
 </html>';
+// JSON-Ende: letzes Komma loeschen und beenden
+$json=substr($json,0,-2).'}';
+switch ($outputformat)
+{
+	case 'csv':
+		header("Content-type: text/csv");
+		header("Content-Disposition: attachment; filename=dropout.csv");
+		header("Pragma: no-cache");
+		header("Expires: 0");
+		echo $csv;
+		break;
+	case 'json':
+		header("Content-type: application/json");
+		header("Content-Disposition: attachment; filename=dropout.json");
+		header("Pragma: no-cache");
+		header("Expires: 0");
+		echo $json;
+		//echo '{"one": "Singular sensation","two": "Beady little eyes","three": "Little birds pitch by my doorstep"}';
+		break;
+	default:
+		echo $html;
+}
 ?>

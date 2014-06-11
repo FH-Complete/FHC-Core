@@ -52,7 +52,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
 echo '<?xul-overlay href="'.APP_ROOT.'content/fasoverlay.xul.php"?>';
 ?>
 <!DOCTYPE window [
-	<?php require("../locale/de-AT/fas.dtd"); ?>
+	<?php require('../locale/'.$variable->variable->locale.'/fas.dtd'); ?>
 ]>
 
 <window
