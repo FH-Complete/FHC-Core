@@ -60,6 +60,7 @@ require_once('../../include/datum.class.php');
 require_once('../../include/pruefling.class.php');
 require_once('../../include/mail.class.php'); 
 require_once('../../include/kontakt.class.php'); 
+require_once('../../include/dms.class.php'); 
 
 $user = get_uid();
 $db = new basis_db();
@@ -1735,6 +1736,126 @@ if(!$error)
 				$return = true;
 			else
 				$return = false;
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='dokumentprestudentDetailSave')
+	{
+		//Speichert die Zuordnung von Dokumenten zu einem Prestudent
+		//Gleichzeitiges zuteilen mehrerer Dokumente auf einmal ist moeglich
+		//Dokumente werden durch ';' getrennt uebergeben
+
+		if(!$rechte->isBerechtigt('assistenz',null,'suid') &&
+		   !$rechte->isBerechtigt('admin',null, 'suid'))
+		{
+			$error = true;
+			$return = false;
+			$errormsg = 'Sie haben keine Schreibrechte fuer diesen Studiengang';
+		}
+		else
+		{
+			$akte_id = $_POST['akte_id'];
+			$errormsg = '';
+			$akte = new akte();
+			if($akte->load($akte_id))
+			{
+				$akte->new=false;
+				$akte->anmerkung_intern = $_POST['anmerkung_intern'];
+				$akte->titel_intern = $_POST['titel_intern'];
+				$akte->dokument_kurzbz = $_POST['dokument_kurzbz'];
+
+				if(!$akte->save())
+				{
+					$errormsg='Speichern fehlgeschlagen:'.$akte->errormsg;
+				}
+			}
+			
+			if($errormsg=='')
+				$return = true;
+			else
+				$return = false;
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='dokumentprestudentDeleteDokument')
+	{
+		$prestudent_id = $_POST['prestudent_id'];
+		$prestudent = new prestudent();
+		if($prestudent->load($prestudent_id))
+		{
+			$studiengang = new studiengang();
+			$studiengang->load($prestudent->studiengang_kz);
+
+			if(!$rechte->isBerechtigt('assistenz',$studiengang->oe_kurzbz,'suid') &&
+			   !$rechte->isBerechtigt('admin',$studiengang->oe_kurzbz, 'suid'))
+			{
+				$error = true;
+				$return = false;
+				$errormsg = 'Sie haben keine Schreibrechte fuer diesen Studiengang';
+			}
+			else
+			{
+			
+				$akte_id = $_POST['akte_id'];
+				$errormsg = '';
+				$akte = new akte();
+				if($akte->load($akte_id))
+				{
+					if($akte->person_id==$prestudent->person_id)
+					{
+						if($akte->dms_id!='')
+						{
+							$dms = new dms();
+							if($dms->load($akte->dms_id))
+							{
+								if($akte->delete($akte_id))
+								{
+									// Eintrag im DMS loeschen
+									if($dms->deleteDms($akte->dms_id))
+									{
+										// Datei im Filesystem loeschen
+										unlink(DMS_PATH.$dms->filename);
+									}
+									else
+									{
+										$error=true;
+										$errormsg='Fehler beim Loeschen des Dokuments';
+									}
+								}
+								else
+								{
+									$error=true;
+									$errormsg='Fehler beim Loeschen der Akte';
+								}
+							}
+							else
+							{
+								$error=true;
+								$errormsg='Fehler beim Laden des Dokuments';
+							}
+						}
+						else
+						{
+							$error=true;
+							$errormsg='Dieses Dokument darf hier nicht geloescht werden';
+						}
+					}
+					else
+					{
+						$error=true;
+						$errormsg='Akte und Prestudent passen nicht zusammen';
+					}
+				}
+			
+				if($errormsg=='')
+					$return = true;
+				else
+					$return = false;
+			}
+		}
+		else
+		{
+			$errormsg='Prestudent konnte nicht geladen werden';
+			$error=true;
+			$return=false;
 		}
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='dokumentprestudentdel')

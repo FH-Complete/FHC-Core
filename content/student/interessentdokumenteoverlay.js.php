@@ -381,7 +381,7 @@ function InteressentDokumenteUpload()
 	person_id = document.getElementById('student-prestudent-textbox-person_id').value
 	if(person_id != '')
 	{
-		window.open("<?php echo APP_ROOT; ?>content/akteupload.php?person_id="+person_id ,"","chrome, status=no, width=500, height=350, centerscreen, resizable");
+		window.open("<?php echo APP_ROOT; ?>content/akteupload.php?person_id="+person_id ,"","chrome, status=no, width=800, height=350, centerscreen, resizable");
 	}
 	else
 		alert("kein Student ausgewählt"); 
@@ -446,4 +446,202 @@ function InteressentDokumenteFilter()
 	treeStudent.database.AddDataSource(StudentTreeDatasource);
 	StudentTreeDatasource.addXMLSinkObserver(StudentTreeSinkObserver);
 	treeStudent.builder.addListener(StudentTreeListener);
+}
+
+function InteressentDokumenteNichtabgegebenBearbeiten()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	var tree = document.getElementById('interessent-dokumente-tree-nichtabgegeben');
+	var dokument_kurzbz = getTreeCellText(tree, 'interessent-dokumente-tree-nichtabgegeben-dokument_kurzbz', tree.currentIndex);
+	var akte_id = getTreeCellText(tree, 'interessent-dokumente-tree-nichtabgegeben-akte_id', tree.currentIndex);
+
+	//Prestudent_id holen
+	prestudent_id = document.getElementById('student-prestudent-textbox-prestudent_id').value;
+
+	if(akte_id!='')
+	{
+		window.open('<?php echo APP_ROOT?>content/student/interessentdokumentedialog.xul.php?prestudent_id='+prestudent_id+'&akte_id='+akte_id,"Dokumente","status=no, width=500, height=500, centerscreen, resizable");
+	}
+	else
+	{
+		alert("Es koennen nur Eintraege geaendert werden zu denen Dokumente hochgeladen wurden");
+	}
+}
+
+function InteressentDokumenteDialogSpeichern(dialog, prestudent_id, akte_id)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	var titel_intern=dialog.getElementById('interessent-dokumente-dialog-textbox-titel').value;
+	var anmerkung_intern=dialog.getElementById('interessent-dokumente-dialog-textbox-anmerkung').value;
+	var dokument_kurzbz=dialog.getElementById('interessent-dokumente-dialog-menulist-dokument_kurzbz').value;
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'dokumentprestudentDetailSave');
+
+	req.add('prestudent_id', prestudent_id);
+	req.add('akte_id', akte_id);
+	req.add('titel_intern', titel_intern);
+	req.add('anmerkung_intern', anmerkung_intern);
+	req.add('dokument_kurzbz',dokument_kurzbz);
+
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+		return false;
+	}
+	else
+	{
+		InteressentDokumentTreeNichtabgegebenDatasource.Refresh(false);
+		InteressentDokumentTreeAbgegebenDatasource.Refresh(false);
+		return true;
+	}
+}
+
+function InteressentDokumenteNichtabgegebenEntfernen()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	var tree = document.getElementById('interessent-dokumente-tree-nichtabgegeben');
+	var akte_id = getTreeCellText(tree, 'interessent-dokumente-tree-nichtabgegeben-akte_id', tree.currentIndex);
+	prestudent_id = document.getElementById('student-prestudent-textbox-prestudent_id').value;
+
+	InteressentDokumentEntfernen(akte_id, prestudent_id);
+}
+
+function InteressentDokumenteAbgegebenBearbeiten()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	var tree = document.getElementById('interessent-dokumente-tree-abgegeben');
+	var dokument_kurzbz = getTreeCellText(tree, 'interessent-dokumente-tree-abgegeben-dokument_kurzbz', tree.currentIndex);
+	var akte_id = getTreeCellText(tree, 'interessent-dokumente-tree-abgegeben-akte_id', tree.currentIndex);
+
+	//Prestudent_id holen
+	prestudent_id = document.getElementById('student-prestudent-textbox-prestudent_id').value;
+
+	if(akte_id!='')
+	{
+		window.open('<?php echo APP_ROOT?>content/student/interessentdokumentedialog.xul.php?prestudent_id='+prestudent_id+'&akte_id='+akte_id,"Dokumente","status=no, width=500, height=500, centerscreen, resizable");
+	}
+	else
+	{
+		alert("Es koennen nur Eintraege geaendert werden zu denen Dokumente hochgeladen wurden");
+	}
+}
+
+function InteressentDokumenteAbgegebenEntfernen()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	var tree = document.getElementById('interessent-dokumente-tree-abgegeben');
+	var akte_id = getTreeCellText(tree, 'interessent-dokumente-tree-abgegeben-akte_id', tree.currentIndex);
+	prestudent_id = document.getElementById('student-prestudent-textbox-prestudent_id').value;
+
+	InteressentDokumentEntfernen(akte_id, prestudent_id);
+}
+
+function InteressentDokumentEntfernen(akte_id, prestudent_id)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'dokumentprestudentDeleteDokument');
+
+	req.add('prestudent_id', prestudent_id);
+	req.add('akte_id', akte_id);
+
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+		return false;
+	}
+	else
+	{
+		InteressentDokumentTreeNichtabgegebenDatasource.Refresh(false);
+		InteressentDokumentTreeAbgegebenDatasource.Refresh(false);
+		return true;
+	}
+}
+function InteressentDokumenteAbgegebenUpload()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	var tree = document.getElementById('interessent-dokumente-tree-abgegeben');
+	var dokument_kurzbz = getTreeCellText(tree, 'interessent-dokumente-tree-abgegeben-dokument_kurzbz', tree.currentIndex);
+	var person_id = document.getElementById('student-prestudent-textbox-person_id').value
+	if(person_id != '')
+	{
+		window.open("<?php echo APP_ROOT; ?>content/akteupload.php?person_id="+person_id+"&dokument_kurzbz="+dokument_kurzbz ,"Upload","width=800, height=350, centerscreen, resizable");
+	}
+	else
+		alert("kein Student ausgewählt"); 
+}
+function InteressentDokumenteNichtabgegebenUpload()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	var tree = document.getElementById('interessent-dokumente-tree-nichtabgegeben');
+	var dokument_kurzbz = getTreeCellText(tree, 'interessent-dokumente-tree-nichtabgegeben-dokument_kurzbz', tree.currentIndex);
+	var person_id = document.getElementById('student-prestudent-textbox-person_id').value
+	if(person_id != '')
+	{
+		window.open("<?php echo APP_ROOT; ?>content/akteupload.php?person_id="+person_id+"&dokument_kurzbz="+dokument_kurzbz ,"Upload","width=800, height=350, centerscreen, resizable");
+	}
+	else
+		alert("kein Student ausgewählt"); 
+}
+
+function InteressentDokumenteTreeNichtAbgegebenPopupShowing()
+{
+	var tree = document.getElementById('interessent-dokumente-tree-nichtabgegeben');
+	var akte_id = getTreeCellText(tree, 'interessent-dokumente-tree-nichtabgegeben-akte_id', tree.currentIndex);
+	if(akte_id!='')
+	{
+		document.getElementById('interessent-dokumente-tree-nichtabgegeben-popup-edit').hidden=false;
+		document.getElementById('interessent-dokumente-tree-nichtabgegeben-popup-remove').hidden=false;
+		document.getElementById('interessent-dokumente-tree-nichtabgegeben-popup-upload').hidden=true;
+	}
+	else
+	{
+		document.getElementById('interessent-dokumente-tree-nichtabgegeben-popup-edit').hidden=true;
+		document.getElementById('interessent-dokumente-tree-nichtabgegeben-popup-remove').hidden=true;
+		document.getElementById('interessent-dokumente-tree-nichtabgegeben-popup-upload').hidden=false;
+	}
+}
+
+function InteressentDokumenteTreeAbgegebenPopupShowing()
+{
+	var tree = document.getElementById('interessent-dokumente-tree-abgegeben');
+	var akte_id = getTreeCellText(tree, 'interessent-dokumente-tree-abgegeben-akte_id', tree.currentIndex);
+	if(akte_id!='')
+	{
+		document.getElementById('interessent-dokumente-tree-abgegeben-popup-edit').hidden=false;
+		document.getElementById('interessent-dokumente-tree-abgegeben-popup-remove').hidden=false;
+		document.getElementById('interessent-dokumente-tree-abgegeben-popup-upload').hidden=true;
+	}
+	else
+	{
+		document.getElementById('interessent-dokumente-tree-abgegeben-popup-edit').hidden=true;
+		document.getElementById('interessent-dokumente-tree-abgegeben-popup-remove').hidden=true;
+		document.getElementById('interessent-dokumente-tree-abgegeben-popup-upload').hidden=false;
+	}
 }

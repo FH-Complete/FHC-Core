@@ -43,7 +43,7 @@ if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz') && !$r
 	die('Keine Berechtigung');
 
 $kategorie_kurzbz = isset($_REQUEST['kategorie_kurzbz'])?$_REQUEST['kategorie_kurzbz']:'';
-
+$dokument_kurzbz = isset($_REQUEST['dokument_kurzbz'])?$_REQUEST['dokument_kurzbz']:'';
 
 if(isset($_POST['submitbild']))
 {
@@ -170,7 +170,15 @@ if(isset($_POST['submitbild']))
 			echo "<b>Fehler: $akte->errormsg</b>";
 		}
 		else
-			echo "<b>Erfolgreich gespeichert</b>"; 		
+		{
+			// Bei erfolgreichem Upload wird die Ansicht im FAS refresht
+			echo "<b>Erfolgreich gespeichert</b>
+			<script>
+				window.opener.InteressentDokumentTreeNichtabgegebenDatasourceRefresh();
+				window.opener.InteressentDokumentTreeAbgegebenDatasourceRefresh();
+				window.close();
+			</script>";
+		}
 	}
 }
 
@@ -195,7 +203,7 @@ if(isset($_GET['person_id']))
 			<table>
 				<tr>
 					<td align='right'>Dokument:</td>
-					<td><input size='45' type='file' name='file' /></td>
+					<td><input type='file' name='file' /></td>
 				</tr>
 				<tr>
 					<td align='right'>Typ:</td>
@@ -205,14 +213,18 @@ if(isset($_GET['person_id']))
 				{
 					$onclick="document.getElementById('titel_intern').value='".$dok->dokument_kurzbz."';"; 
 
-					echo '<option value="'.$dok->dokument_kurzbz.'" onclick="'.$onclick.'">'.$dok->bezeichnung."</option>\n";
+					if(isset($_GET['dokument_kurzbz']) && $_GET['dokument_kurzbz']==$dok->dokument_kurzbz)
+						$selected='selected';
+					else
+						$selected='';
+					echo '<option value="'.$dok->dokument_kurzbz.'" onclick="'.$onclick.'" '.$selected.'>'.$dok->bezeichnung."</option>\n";
 				}
 				
 	echo "	<tr>
 				<td align='right'>Titel:</td><td><input size='45' maxlength='32' type='text' name='titel_intern' id='titel_intern' length='35' ></td>
 			</tr>
 			<tr> 
-				<td align='right'>Anmerkung:</td><td><input size='45' maxlength='128' type='text' name='anmerkung_intern' id='anmerkung_intern' length='35' ></td>
+				<td align='right'>Anmerkung:</td><td><textarea name='anmerkung_intern' cols='45' id='anmerkung_intern'></textarea></td>
 			</tr>
 			<tr>
 				<td><input type='hidden' name='kategorie_kurzbz' id='kategorie_kurzbz' value='Akte'>

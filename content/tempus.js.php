@@ -89,6 +89,11 @@ function onLoad()
   		//Funktion ueberschreiben damit sie nicht nochmal aufgerufen wird
   		//wenn zb ein IFrame geladen wird
   		onLoad=function() {return false};
+
+  		//Notizen des Users laden
+		notiz = document.getElementById('box-notizen');
+		notiz.LoadNotizTree('','','','','','','', getUsername());
+
 	}
 	catch(e)
 	{

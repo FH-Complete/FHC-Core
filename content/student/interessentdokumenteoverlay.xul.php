@@ -38,6 +38,20 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 <!-- Dokumente Overlay -->
 <vbox id="interessent-dokumente" style="overflow:auto; margin:0px;" flex="1">
+<popupset>
+	<menupopup id="interessent-dokumente-tree-nichtabgegeben-popup" onpopupshowing="InteressentDokumenteTreeNichtAbgegebenPopupShowing()">
+		<menuitem label="Upload" oncommand="InteressentDokumenteNichtabgegebenUpload();" id="interessent-dokumente-tree-nichtabgegeben-popup-upload" hidden="false"/>
+		<menuitem label="Bearbeiten" oncommand="InteressentDokumenteNichtabgegebenBearbeiten();" id="interessent-dokumente-tree-nichtabgegeben-popup-edit" hidden="false"/>
+		<menuitem label="Dokument löschen" oncommand="InteressentDokumenteNichtabgegebenEntfernen();" id="interessent-dokumente-tree-nichtabgegeben-popup-remove" hidden="false"/>		
+	</menupopup>
+</popupset>
+<popupset>
+	<menupopup id="interessent-dokumente-tree-abgegeben-popup"  onpopupshowing="InteressentDokumenteTreeAbgegebenPopupShowing()">
+		<menuitem label="Upload" oncommand="InteressentDokumenteAbgegebenUpload();" id="interessent-dokumente-tree-abgegeben-popup-upload" hidden="false"/>
+		<menuitem label="Bearbeiten" oncommand="InteressentDokumenteAbgegebenBearbeiten();" id="interessent-dokumente-tree-abgegeben-popup-edit" hidden="false"/>
+		<menuitem label="Dokument löschen" oncommand="InteressentDokumenteAbgegebenEntfernen();" id="interessent-dokumente-tree-abgegeben-popup-remove" hidden="false"/>		
+	</menupopup>
+</popupset>
 <hbox flex="1">
 	<groupbox flex="1">
 		<caption label="Nicht Akzeptiert"/>
@@ -47,6 +61,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
                 flags="dont-build-content"
 				enableColumnDrag="true"
 				style="margin:10px;"
+				context="interessent-dokumente-tree-nichtabgegeben-popup"
 		>
 			<treecols>
 				<treecol id="interessent-dokumente-tree-nichtabgegeben-bezeichnung" label="Dokument" flex="1" primary="false"
@@ -60,6 +75,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<treecol id="interessent-dokumente-tree-nichtabgegeben-datum" label="Datum" flex="1" hidden="true"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/dokument/rdf#datum" onclick="InteressentDokumenteNichtAbgegebenTreeSort()"/>
+				<splitter class="tree-splitter"/>
+				<treecol id="interessent-dokumente-tree-nichtabgegeben-datumhochgeladen" label="Upload Datum" flex="1" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/dokument/rdf#datumhochgeladen" onclick="InteressentDokumenteNichtAbgegebenTreeSort()"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="interessent-dokumente-tree-nichtabgegeben-nachgereicht" label="Nachgereicht" flex="1" hidden="true"
 					class="sortDirectionIndicator"
@@ -99,6 +118,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<treecell label="rdf:http://www.technikum-wien.at/dokument/rdf#bezeichnung"   />
 								<treecell label="rdf:http://www.technikum-wien.at/dokument/rdf#dokument_kurzbz" />
 								<treecell label="rdf:http://www.technikum-wien.at/dokument/rdf#datum" />
+								<treecell label="rdf:http://www.technikum-wien.at/dokument/rdf#datumhochgeladen" />
 								<treecell label="rdf:http://www.technikum-wien.at/dokument/rdf#nachgereicht" />
 								<treecell label="rdf:http://www.technikum-wien.at/dokument/rdf#infotext" />
 								<treecell src="../skin/images/rdf:http://www.technikum-wien.at/dokument/rdf#vorhanden^.png"/>
@@ -134,6 +154,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				flags="dont-build-content"
 				enableColumnDrag="true"
 				style="margin:10px;"
+				context="interessent-dokumente-tree-abgegeben-popup"
 		>
 			<treecols>
 				<treecol id="interessent-dokumente-tree-abgegeben-bezeichnung" label="Dokument" flex="1" primary="false"
@@ -143,6 +164,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<treecol id="interessent-dokumente-tree-abgegeben-datum" label="Datum" flex="1" hidden="false"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#datum_iso" onclick="InteressentDokumenteAbgegebenTreeSort()"/>
+				<splitter class="tree-splitter"/>
+				<treecol id="interessent-dokumente-tree-abgegeben-datumhochgeladen" label="Upload Datum" flex="1" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#datumhochgeladen" onclick="InteressentDokumenteAbgegebenTreeSort()"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="interessent-dokumente-tree-abgegeben-mitarbeiter_uid" label="Abgegeben bei" flex="1" hidden="true"
 					class="sortDirectionIndicator"
@@ -155,10 +180,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<treecol id="interessent-dokumente-tree-abgegeben-prestudent_id" label="PrestudentID" flex="1" hidden="true"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#prestudent_id" onclick="InteressentDokumenteAbgegebenTreeSort()"/>
-				<splitter class="tree-splitter"/>
-				<treecol id="interessent-dokumente-tree-abgegeben-datum" label="Datum" flex="1" hidden="true"
-					class="sortDirectionIndicator"
-					sort="rdf:http://www.technikum-wien.at/dokument/rdf#datum" onclick="InteressentDokumenteNichtAbgegebenTreeSort()"/>
 				<splitter class="tree-splitter"/>
 				<treecol id="interessent-dokumente-tree-abgegeben-nachgereicht" label="Nachgereicht" flex="1" hidden="true"
 					class="sortDirectionIndicator"
@@ -176,6 +197,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/dokument/rdf#akte_id" onclick="InteressentDokumenteNichtAbgegebenTreeSort()"/>
 				<splitter class="tree-splitter"/>
+				<treecol id="interessent-dokumente-tree-abgegeben-titel_intern" label="Titel" flex="1" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/dokument/rdf#titel_intern" onclick="InteressentDokumenteNichtAbgegebenTreeSort()"/>
+				<splitter class="tree-splitter"/>
+				<treecol id="interessent-dokumente-tree-abgegeben-anmerkung_intern" label="anmerkung_intern" flex="1" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/dokument/rdf#anmerkung_intern" onclick="InteressentDokumenteNichtAbgegebenTreeSort()"/>
+				<splitter class="tree-splitter"/>
 			</treecols>
 		
 			<template>
@@ -185,14 +214,16 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<treerow>
 								<treecell label="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#bezeichnung" />
 								<treecell label="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#datum" />
+								<treecell label="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#datumhochgeladen" />
 								<treecell label="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#mitarbeiter_uid" />
 								<treecell label="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#dokument_kurzbz" />
 								<treecell label="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#prestudent_id" />
-								<treecell label="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#datum" />
 								<treecell label="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#nachgereicht" />
 								<treecell label="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#infotext" />
 								<treecell src="../skin/images/rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#vorhanden^.png"/>
 								<treecell label="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#akte_id" />
+								<treecell label="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#titel_intern" />
+								<treecell label="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#anmerkung_intern" />
 							</treerow>
 						</treeitem>
 					</treechildren>

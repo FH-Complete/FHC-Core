@@ -117,7 +117,7 @@ if(isset($radio_1) && isset($radio_2) && $radio_1>=0 && $radio_2>=0)
 			$sql_query_upd1.="UPDATE public.tbl_kontakt SET person_id=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";			
 			$sql_query_upd1.="UPDATE public.tbl_preinteressent SET person_id=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";
 			$sql_query_upd1.="UPDATE public.tbl_personfunktionstandort SET person_id=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";
-
+			$sql_query_upd1.="UPDATE public.tbl_notizzuordnung SET person_id=".$db->db_add_param($radio_2, FHC_INTEGER)." WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";
 			$sql_query_upd1.="DELETE FROM public.tbl_person WHERE person_id=".$db->db_add_param($radio_1, FHC_INTEGER).";";
 
 			if($db->db_query($sql_query_upd1))
