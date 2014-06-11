@@ -244,19 +244,19 @@ else
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#orgform" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="student-treecol-punkte" label="Reihungstestpunkte" flex="1" hidden="true" persist="hidden, width, ordinal"
+	    				<treecol id="student-treecol-punkte" label="Gesamtpunkte" flex="1" hidden="true" persist="hidden, width, ordinal"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#punkte" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="student-treecol-rt_punkte1" label="RT_Punkte1" flex="1" hidden="true" persist="hidden, width, ordinal"
+	    				<treecol id="student-treecol-rt_punkte1" label="Punkte1" flex="1" hidden="true" persist="hidden, width, ordinal"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#punkte1" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="student-treecol-rt_punkte2" label="RT_Punkte2" flex="1" hidden="true" persist="hidden, width, ordinal"
+	    				<treecol id="student-treecol-rt_punkte2" label="Punkte2" flex="1" hidden="true" persist="hidden, width, ordinal"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#punkte2" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="student-treecol-rt_punkte3" label="RT_Punkte3" flex="1" hidden="true" persist="hidden, width, ordinal"
+	    				<treecol id="student-treecol-rt_punkte3" label="Punkte3" flex="1" hidden="true" persist="hidden, width, ordinal"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#punkte3" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>

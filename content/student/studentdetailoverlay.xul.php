@@ -26,10 +26,19 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/variable.class.php');
+require_once('../../include/functions.inc.php');
+$user=get_uid();
+$variable = new variable();
+if(!$variable->loadVariables($user))
+{
+	die('Fehler beim Laden der Variablen:'.$variable->errormsg);
+}
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
-
 ?>
-
+<!DOCTYPE overlay [
+	<?php require('../../locale/'.$variable->variable->locale.'/fas.dtd'); ?>
+]>
 <overlay id="StudentDetailOverlay"
 	xmlns:html="http://www.w3.org/1999/xhtml"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
@@ -331,7 +340,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     			
     		</groupbox>
     		<groupbox id="student-detail-groupbox-reihungstest">
-			<caption label="Reihungstest" />
+			<caption label="&tab-prestudent-aufnahme.label;" />
 				<grid id="student-prestudent-grid-reihungstest" style="margin:4px;" flex="1">
 				  	<columns  >
     					<column flex="1"/>
@@ -343,13 +352,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
   					</columns>
   					<rows>
     					<row>
-    						<label value="Anmeldung zum Reihungstest am" control="student-prestudent-textbox-anmeldungreihungstest"/>
+    						<label value="&tab-prestudent-aufnahme.anmeldung;" control="student-prestudent-textbox-anmeldungreihungstest"/>
       						<hbox>
       							<box class="Datum" id="student-prestudent-textbox-anmeldungreihungstest" disabled="true"/>
       							<!--<textbox id="student-prestudent-textbox-zgvmasterdatum" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/>-->
       							<button id="student-prestudent-button-anmeldungreihungstest-heute" label="Heute" oncommand="StudentAnmeldungreihungstestHeute()" disabled="true" style="margin:0px;"/>
       						</hbox>
-      						<label value="Reihungstest" control="student-prestudent-menulist-reihungstest"/>
+      						<label value="&tab-prestudent-aufnahme.seminar;" control="student-prestudent-menulist-reihungstest"/>
       						<hbox>
 <!--								          datasources="<?php echo APP_ROOT ?>rdf/reihungstest.rdf.php?optional=true" flex="1"-->
 	      						<menulist id="student-prestudent-menulist-reihungstest" disabled="true"
@@ -370,7 +379,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							</hbox>
     					</row>
     					<row>
-      						<label value="Zum Reihungstest angetreten" control="student-prestudent-checkbox-reihungstestangetreten"/>
+      						<label value="&tab-prestudent-aufnahme.absolviert;" control="student-prestudent-checkbox-reihungstestangetreten"/>
       						<checkbox id="student-prestudent-checkbox-reihungstestangetreten" checked="true" disabled="true"/>
       						<hbox>
       							<label value="Punkte1" control="student-prestudent-textbox-punkte1" />
