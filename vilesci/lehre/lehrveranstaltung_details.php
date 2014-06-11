@@ -48,14 +48,20 @@
 	if(!$rechte->isBerechtigt('lehre/lehrveranstaltung:begrenzt',null,'s'))
 		die('Sie haben keine Berechtigung fuer diese Seite');
 
-	if(isset($_POST["schick"]))
+	if(isset($_POST["schick"]) || isset($_POST["schick_neu"]))
 	{
 		if(!$rechte->isBerechtigt('lehre/lehrveranstaltung',null,'sui'))
 			die('Sie haben keine Berechtigung fuer diese Aktion');
 			
 		$lv = new lehrveranstaltung();
 
-		if(isset($_POST['lv_id']) && $_POST['lv_id']!='')
+		if(isset($_POST["schick_neu"]))
+		{
+			$lv->new=true;
+			$lv->insertamum=date('Y-m-d H:i:s');
+			$lv->insertvon = $user;
+		}
+		elseif(isset($_POST['lv_id']) && $_POST['lv_id']!='')
 		{
 			if($lv->load($_POST['lv_id']))
 			{
@@ -167,7 +173,7 @@
 	{
 		//wenn ein Fehler beim Speichern auftritt, dann sollen die alten Daten nochmals
 		//angezeigt werden.
-		if(!isset($_POST['schick']))
+		if(!isset($_POST['schick']) && !isset($_POST["schick_neu"]))
 		{
 			$lv = new lehrveranstaltung();
 	
@@ -183,7 +189,7 @@
 		    $htmlstr .= '<br/><br/><span>Hinweis: Lehreverzeichnis existiert bereits.</span>';
 		}
 		$htmlstr .= '
-		<br><div class="kopf">Lehrveranstaltung</div>
+		<br><div class="kopf">Lehrveranstaltung '.$lv->lehrveranstaltung_id.'</div>
 		<form action="lehrveranstaltung_details.php" method="POST">
 		<input type="hidden" name="lv_id" value="'.$lv->lehrveranstaltung_id.'">
 
@@ -326,7 +332,7 @@
 			<td>LVNR</td>
 			<td><input type="text" name="lvnr" value="'.$lv->lvnr.'" /></td>
 			<td>Organisationseinheit</td>
-			<td colspan="3"><select name="oe_kurzbz" ><option value="">--keine Auswahl --</option>';
+			<td colspan="3"><SELECT name="oe_kurzbz" ><option value="">--keine Auswahl --</option>';
 		
 		$qry = "SELECT * FROM public.tbl_organisationseinheit ORDER BY organisationseinheittyp_kurzbz, oe_kurzbz";
 		if($result = $db->db_query($qry))
@@ -377,7 +383,6 @@
 			<td><input type="text" name="anzahlsemester" size="2" value="'.$lv->anzahlsemester.'" /></td>
 			<td></td>
 			<td></td>
-			<td></td>
 		</tr>
 		<tr>
 			<td>Semesterwochenstunden (SWS)</td>
@@ -386,7 +391,6 @@
 			<td><input id="lvs" type="text" name="lvs" size="3" value="'.$lv->lvs.'"></td>
 			<td>Angebotene Lehrveranstaltungsstunden (ALVS)</td>
 			<td><input id="alvs" type="text" name="alvs" size="3" value="'.$lv->alvs.'"></td>
-			<td></td>
 		</tr>
 		<tr>
 			<td>LV-Plan Stunden Summe (LVPS)</td>
@@ -395,16 +399,17 @@
 			<td><input id="las" type="text" name="las" size="3" value="'.$lv->las.'"></td>
 			<td></td>
 			<td></td>
-			<td></td>
 		</tr>
 		<tr>
 			<td></td>
 			<td></td>
 			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td><input type="submit" value="Speichern" name="schick"></td>
+			<td></td>';
+			if ($lv->lehrveranstaltung_id=='')
+				$htmlstr .= '<td colspan="2" align="right"><input type="submit" value="Speichern" name="schick" style="cursor: pointer;"></td>';								
+			else 
+				$htmlstr .= '<td colspan="2" align="right"><input type="submit" value="Als neue LV speichern" name="schick_neu" style="font-size: smaller; cursor: pointer;">&nbsp;&nbsp;<input type="submit" value="Speichern" name="schick" style="cursor: pointer;"></td>';	
+		$htmlstr .= '<td></td>
 		</tr>
 		</table>
 		</form>';
@@ -462,43 +467,44 @@
 			if($("form").size() !== 0)
 			{
 			    $("form").submit(function(e){
-				$(this).append('<input type="hidden" name="schick" value="" /> ');
-				$(".missingFormData").each(function(i,v){
-				   $(v).removeClass("missingFormData"); 
-				});
-				var self = this;
-				e.preventDefault();
-				var error = false;
-				if($('input[name="kurzbz"]').val() === "")
-				{
-				    error = true;
-				    $('input[name="kurzbz"]').addClass("missingFormData");
-				}
-				if($('input[name="bezeichnung"]').val() === "")
-				{
-				    error = true;
-				    $('input[name="bezeichnung"]').addClass("missingFormData");
-				}
-				if($('select[name="lehrform"]').val() === "")
-				{
-				    error = true;
-				    $('select[name="lehrform"]').addClass("missingFormData");
-				}
-				if($('select[name="lehrtyp_kurzbz"]').val() === "")
-				{
-				    error = true;
-				    $('select[name="lehrtyp_kurzbz"]').addClass("missingFormData");
-				}
-				if($('input[name="lehreverzeichnis"]').val() === "")
-				{
-				    error = true;
-				    $('input[name="lehreverzeichnis"]').addClass("missingFormData");
-				}
-				if(!error)
-				{
-				    self.submit();
-				}
-			    });
+					$(".missingFormData").each(function(i,v){
+					   $(v).removeClass("missingFormData"); 
+					});
+					var self = this;
+					//e.preventDefault();
+					var error = false;
+					if($('input[name="kurzbz"]').val() === "")
+					{
+					    error = true;
+					    $('input[name="kurzbz"]').addClass("missingFormData");
+					}
+					if($('input[name="bezeichnung"]').val() === "")
+					{
+					    error = true;
+					    $('input[name="bezeichnung"]').addClass("missingFormData");
+					}
+					if($('select[name="lehrform"]').val() === "")
+					{
+					    error = true;
+					    $('select[name="lehrform"]').addClass("missingFormData");
+					}
+					if($('select[name="lehrtyp_kurzbz"]').val() === "")
+					{
+					    error = true;
+					    $('select[name="lehrtyp_kurzbz"]').addClass("missingFormData");
+					}
+					if($('input[name="lehreverzeichnis"]').val() === "")
+					{
+					    error = true;
+					    $('input[name="lehreverzeichnis"]').addClass("missingFormData");
+					}
+					if(error)
+						return false;
+					if(!error)
+					{
+						$("form").submit();
+					}
+				    });
 			}
 
 			$("#farbe").ColorPicker(
@@ -531,7 +537,7 @@
 
 <?php
 	echo $htmlstr;
-	echo $reloadstr;
+	//echo $reloadstr;
 ?>
 
 </body>
