@@ -299,6 +299,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiteroverlay.xul
 				echo '<tab id="tab-mitarbeiter" label="Mitarbeiter" onclick="document.getElementById(\'menu-content-tabs\').selectedItem=document.getElementById(\'tab-menu-mitarbeiter\');" />';
 			}
 		?>
+			<tab id="tab-notizen" label="Meine Notizen" />
 		</tabs>
 		<tabpanels id="tabpanels-main" flex="1">
 		<?php
@@ -315,7 +316,11 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiteroverlay.xul
 			{
 				 echo '<vbox id="MitarbeiterEditor" />';
 			}
+			
 		?>
+		<vbox id="box-notiz">
+			<box class="Notiz" flex="1" id="box-notizen"/>
+		</vbox>
 		</tabpanels>
 	</tabbox>
 </vbox>

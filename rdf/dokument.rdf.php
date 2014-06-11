@@ -89,12 +89,11 @@ foreach ($dok->result as $row)
 	
 		foreach($akte->result as $a)
 		{
-
-			$datum=(isset($a->insertamum))?$date->formatDatum($a->insertamum, 'd.m.Y'):''; 
+			$datum='';
+			$datumhochgeladen=(isset($a->insertamum))?$date->formatDatum($a->insertamum, 'd.m.Y'):''; 
 			$nachgereicht = (isset($a->nachgereicht) && $a->nachgereicht)?'ja':''; 
 			$info = (isset($a->anmerkung))?$akte->result[0]->anmerkung:''; 
-			$vorhanden = (isset($a->dms_id))?'ja':'nein'; 
-
+			$vorhanden = (isset($a->dms_id) || $a->inhalt_vorhanden)?'ja':'nein'; 
 
 			echo 	'
 			  <RDF:li>
@@ -102,6 +101,7 @@ foreach ($dok->result as $row)
 						<DOKUMENT:dokument_kurzbz><![CDATA['.$row->dokument_kurzbz.']]></DOKUMENT:dokument_kurzbz>
 						<DOKUMENT:bezeichnung><![CDATA['.$row->bezeichnung.']]></DOKUMENT:bezeichnung>
 						<DOKUMENT:datum><![CDATA['.$datum.']]></DOKUMENT:datum>
+						<DOKUMENT:datumhochgeladen>'.$datumhochgeladen.'</DOKUMENT:datumhochgeladen>
 						<DOKUMENT:nachgereicht><![CDATA['.$nachgereicht.']]></DOKUMENT:nachgereicht>
 						<DOKUMENT:infotext><![CDATA['.$info.']]></DOKUMENT:infotext>
 						<DOKUMENT:vorhanden><![CDATA['.$vorhanden.']]></DOKUMENT:vorhanden>
@@ -122,6 +122,7 @@ foreach ($dok->result as $row)
 						<DOKUMENT:dokument_kurzbz><![CDATA['.$row->dokument_kurzbz.']]></DOKUMENT:dokument_kurzbz>
 						<DOKUMENT:bezeichnung><![CDATA['.$row->bezeichnung.']]></DOKUMENT:bezeichnung>
 						<DOKUMENT:datum></DOKUMENT:datum>
+						<DOKUMENT:datumhochgeladen></DOKUMENT:datumhochgeladen>
 						<DOKUMENT:nachgereicht></DOKUMENT:nachgereicht>
 						<DOKUMENT:infotext></DOKUMENT:infotext>
 						<DOKUMENT:vorhanden><![CDATA[nein]]></DOKUMENT:vorhanden>
@@ -143,10 +144,11 @@ if(!$akte->getAkten($prestudent->person_id, null, $prestudent->studiengang_kz, $
 foreach($akte->result as $a)
 {
 
-	$datum=(isset($a->insertamum))?$date->formatDatum($a->insertamum, 'd.m.Y'):''; 
+	$datum='';
+	$datumhochgeladen=(isset($a->insertamum))?$date->formatDatum($a->insertamum, 'd.m.Y'):'';  
 	$nachgereicht = (isset($a->nachgereicht) && $a->nachgereicht)?'ja':''; 
 	$info = (isset($a->anmerkung))?$akte->result[0]->anmerkung:''; 
-	$vorhanden = (isset($a->dms_id))?'ja':'nein'; 
+	$vorhanden = (isset($a->dms_id) || $a->inhalt_vorhanden)?'ja':'nein'; 
 	$dokument_kurzbz = $a->dokument_kurzbz; 
 	$dokument = new dokument(); 
 	$dokument->loadDokumenttyp($dokument_kurzbz); 
@@ -157,6 +159,7 @@ foreach($akte->result as $a)
 				<DOKUMENT:dokument_kurzbz><![CDATA['.$a->dokument_kurzbz.']]></DOKUMENT:dokument_kurzbz>
 				<DOKUMENT:bezeichnung><![CDATA['.$dokument->bezeichnung.']]></DOKUMENT:bezeichnung>
 				<DOKUMENT:datum>'.$datum.'</DOKUMENT:datum>
+				<DOKUMENT:datumhochgeladen>'.$datumhochgeladen.'</DOKUMENT:datumhochgeladen>
 				<DOKUMENT:nachgereicht>'.$nachgereicht.'</DOKUMENT:nachgereicht>
 				<DOKUMENT:infotext>'.$info.'</DOKUMENT:infotext>
 				<DOKUMENT:vorhanden>'.$vorhanden.'</DOKUMENT:vorhanden>

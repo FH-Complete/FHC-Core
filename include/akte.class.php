@@ -278,7 +278,8 @@ class akte extends basis_db
 	{
 		$qry = "SELECT 
 					akte_id, person_id, dokument_kurzbz, mimetype, erstelltam, gedruckt, titel_intern, anmerkung_intern,
-					titel, bezeichnung, updateamum, insertamum, updatevon, insertvon, uid, dms_id, anmerkung, nachgereicht
+					titel, bezeichnung, updateamum, insertamum, updatevon, insertvon, uid, dms_id, anmerkung, nachgereicht,
+					CASE WHEN inhalt is not null THEN true ELSE false END as inhalt_vorhanden
 				FROM public.tbl_akte WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 		if($dokument_kurzbz!=null)
 			$qry.=" AND dokument_kurzbz=".$this->db_add_param($dokument_kurzbz);
@@ -291,6 +292,7 @@ class akte extends basis_db
 		$qry.=" ORDER BY erstelltam";
 
 		$this->errormsg = $qry; 
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -301,6 +303,7 @@ class akte extends basis_db
 				$akten->person_id = $row->person_id;
 				$akten->dokument_kurzbz = $row->dokument_kurzbz;
 				//$akte->inhalt = $row->inhalt;
+				$akten->inhalt_vorhanden = $this->db_parse_bool($row->inhalt_vorhanden);
 				$akten->mimetype = $row->mimetype;
 				$akten->erstelltam = $row->erstelltam;
 				$akten->gedruckt = $this->db_parse_bool($row->gedruckt);

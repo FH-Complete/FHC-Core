@@ -43,11 +43,25 @@ if(isset($_GET['dokument_kurzbz']))
 else 
 	$dokument_kurzbz = '';
 	
+if(isset($_GET['akte_id']))
+{
+	$akte_id=$_GET['akte_id'];
+}
+
 $datum = new datum();
 
 $akten = new akte();
-if(!$akten->getAkten($person_id, $dokument_kurzbz))
-	die($akten->errormsg);
+if(!isset($akte_id))
+{
+	if(!$akten->getAkten($person_id, $dokument_kurzbz))
+		die($akten->errormsg);
+}
+else
+{
+	if(!$akten->load($akte_id))
+		die($akten->errormsg);
+	$akten->result[]=$akten;
+}
 $rdf_url='http://www.technikum-wien.at/akte';
 
 echo '
@@ -78,6 +92,10 @@ foreach ($akten->result as $row)
 			<AKTE:insertamum><![CDATA['.$row->insertamum.']]></AKTE:insertamum>
 			<AKTE:insertvon><![CDATA['.$row->insertvon.']]></AKTE:insertvon>
 			<AKTE:uid><![CDATA['.$row->uid.']]></AKTE:uid>			
+			<AKTE:anmerkung_intern><![CDATA['.$row->anmerkung_intern.']]></AKTE:anmerkung_intern>
+			<AKTE:titel_intern><![CDATA['.$row->titel_intern.']]></AKTE:titel_intern>
+			<AKTE:anmerkung><![CDATA['.$row->anmerkung.']]></AKTE:anmerkung>
+			<AKTE:nachgereicht><![CDATA['.($row->nachgereicht?'Ja':'Nein').']]></AKTE:nachgereicht>
          </RDF:Description>
       </RDF:li>
       ';
