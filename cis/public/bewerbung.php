@@ -479,7 +479,26 @@ else
 	}
 }
 
-$status_aufnahmeverfahren_text = '<span id="error"></span>'; 
+	$prestudent = new prestudent(); 
+	if(!$prestudent->getPrestudenten($person_id))
+		die('Konnte Prestudenten nicht laden');
+	
+	$status_aufnahmeverfahren = false; 
+	$status_aufnahmeverfahren_text = '<span id="error">unvollständig</span>'; 
+	
+	foreach($prestudent->result as $row)
+	{
+		if($row->reihungstest_id != '')
+		{
+			$status_aufnahmeverfahren = true; 
+			$status_aufnahmeverfahren_text = '<span id="success">vollständig</span>'; 
+		}
+		
+	}
+	
+
+
+
 
 ?><!DOCTYPE HTML>
 <html>
@@ -1365,7 +1384,7 @@ $studiengang = new studiengang();
     <?php
                 
     $disabled = 'disabled'; 
-    if($status_person == true && $status_kontakt == true && $status_dokumente == true && $status_zahlungen == true)
+    if($status_person == true && $status_kontakt == true && $status_dokumente == true && $status_zahlungen == true && $status_aufnahmeverfahren == true)
         $disabled = ''; 
     
     $prestudent_help= new prestudent(); 
