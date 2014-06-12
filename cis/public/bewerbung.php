@@ -428,7 +428,7 @@ else
 }
 
 $dokument_help = new dokument(); 
-$dokument_help->getAllDokumenteForPerson($person_id);
+$dokument_help->getAllDokumenteForPerson($person_id, true);
 $akte_person= new akte(); 
 $akte_person->getAkten($person_id);
 
@@ -1098,9 +1098,8 @@ $studiengang = new studiengang();
     $dokumente_person = new dokument(); 
     $dokumente_person->getAllDokumenteForPerson($person_id, true); 
     
-    echo '<table border="1" width="130%">
-        
-            <tr><th width="50%">Name</th><th width="10%">Status</th><th width="10%">Aktion</th><th width ="80%"></th><th>Info</th>&nbsp;</tr>';
+    echo '<table border="1" width="150%">
+      <tr><th width="30%">Name</th><th width="10%">Status</th><th width="10%">Aktion</th><th width ="20%"></th><th width="30%">Benötigt für</th>&nbsp;</tr>';
     
     foreach($dokumente_person->result as $dok)
     {
@@ -1157,20 +1156,23 @@ $studiengang = new studiengang();
             JOIN public.tbl_dokument using (dokument_kurzbz)
             WHERE dokument_kurzbz = ".$ben_stg->db_add_param($dok->dokument_kurzbz)." and person_id =".$ben_stg->db_add_param($person_id, FHC_INTEGER);
 		
-		$ben = "Benötigt für: \n";
+		$ben = "";
 		if($result = $ben_stg->db_query($qry))
 		{
 			while($row = $ben_stg->db_fetch_object($result))
 			{
+				if($ben!='')
+					$ben.=', ';
+				
 				$stg = new studiengang(); 
 				$stg->load($row->studiengang_kz); 
 				
-				$ben .= $stg->bezeichnung."\n"; 
+				$ben .= $stg->bezeichnung; 
 			}
 		}
 		
 		
-        echo "<tr><td valign='top'>".$dok->bezeichnung."</td><td valign='top' align='center'>".$status."</td><td valign='top'>".$aktion."</td><td valign='top'>".$div."</td><td><img src='".APP_ROOT."skin/images/info.png' width='20px' title='".$ben."'></td></tr>";
+        echo "<tr><td valign='top'>".$dok->bezeichnung."</td><td valign='top' align='center'>".$status."</td><td valign='top'>".$aktion."</td><td valign='top'>".$div."</td><td>".$ben."</td></tr>";
     }
     echo '</table>
             <br>
