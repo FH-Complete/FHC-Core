@@ -800,10 +800,7 @@ padding: 5px;
         echo "</select></td>
             </tr>			
             <tr>
-                <td>Sozialversicherungsnr.: </td><td><input type='text' name='svnr' id='svnr' value='".$svnr."'></td>
-            </tr>
-            <tr>
-                <td>Staatsbürgerschaft*: </td>
+                <td>Österr. Staatsbürgerschaft*: </td>
                 <td><Select name='staatsbuergerschaft' id='staatsbuergerschaft'>
                     <option value=''>-- Bitte auswählen -- </option>";
             $selected = '';
@@ -814,6 +811,9 @@ padding: 5px;
         }
 
         echo "</select></td>
+            </tr>
+			            <tr>
+                <td>Sozialversicherungsnr.: </td><td><input type='text' name='svnr' id='svnr' value='".$svnr."'></td>
             </tr>
             <tr>";
         $geschl_m = ($person->geschlecht == 'm')?'checked':'';
