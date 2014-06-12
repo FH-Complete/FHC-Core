@@ -51,6 +51,7 @@ require_once('../../include/mail.class.php');
 require_once('../../include/studiensemester.class.php'); 
 require_once('../../include/studienplan.class.php');
 require_once('../../include/basis_db.class.php'); 
+require_once('../../include/reihungstest.class.php'); 
 
 $person_id = $_SESSION['bewerbung/personId'];
 $akte_id = isset($_GET['akte_id'])?$_GET['akte_id']:'';
@@ -90,6 +91,40 @@ if($method=='delete')
         }
     }
     
+}
+
+
+if(isset($_POST['btn_aufnahmeverfahren']))
+{
+	if(isset($_POST['stg_radio']))
+	{
+		if(isset($_GET['delete']))
+		{
+			$prest = new prestudent(); 
+			$prest->load($_POST['stg_radio']); 
+			
+			$prest->reihungstest_id = ''; 
+			$prest->new = false; 
+			if(!$prest->save())
+				echo "Fehler aufgetreten"; 
+		} 
+		else 
+		{
+
+			$t_help = explode("_",$_POST['stg_radio']);
+
+			// $t_help[0] -> reihungstest_id
+			// $t_help[1] -> prestudent_id
+
+			$prest = new prestudent(); 
+			$prest->load($t_help[1]); 
+			$prest->reihungstest_id = $t_help[0]; 
+			$prest->new = false; 
+
+			if(!$prest->save())
+				echo "Fehler aufgetreten"; 
+		}
+	}
 }
 
 if(isset($_POST['btn_bewerbung_abschicken']))
@@ -444,6 +479,8 @@ else
 	}
 }
 
+$status_aufnahmeverfahren_text = '<span id="error"></span>'; 
+
 ?><!DOCTYPE HTML>
 <html>
 <head>
@@ -658,8 +695,9 @@ padding: 5px;
         <!--<li><a href="#tabs-3">&gt;|3| Zugangsvoraussetzungen<br> <?php echo $status_zgv_text; ?></a></li>-->
         <li><a href="#tabs-4">&gt;|3| Kontaktinformationen <br> <?php echo $status_kontakt_text;?></a></li>
         <li><a href="#tabs-5">&gt;|4| Dokumente <br> <?php echo $status_dokumente_text;?></a></li>
-        <li><a href="#tabs-6">&gt;|5| Zahlungen <br> <?php echo $status_zahlungen_text;?></a></li>		
-        <li><a href="#tabs-7">&gt;|6| Bewerbung abschicken <br> </a></li>
+        <li><a href="#tabs-6">&gt;|5| Zahlungen <br> <?php echo $status_zahlungen_text;?></a></li>	
+		<li><a href="#tabs-7">&gt;|6| Aufnahmeverfahren <br> <?php echo $status_aufnahmeverfahren_text;?></a></li>	
+        <li><a href="#tabs-8">&gt;|7| Bewerbung abschicken <br> </a></li>
     </ul>
 	</div>
 <div id="tabs-1">
@@ -1060,7 +1098,7 @@ $studiengang = new studiengang();
                 // wird nachgereicht
                  $status = '<img title="wird nachgereicht" src="'.APP_ROOT.'skin/images/hourglass.png" width="20px">'; 
                  $nachgereicht_help = 'checked';
-                 $div = "<form method='POST' action='".$_SERVER['PHP_SELF']."?active=3'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:true;'>".$akte->result[0]->anmerkung."</span>";
+                 $div = "<form method='POST' action='".$_SERVER['PHP_SELF']."?active=3'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:true;'>".$akte->result[0]->anmerkung."</span></form>";
 				 $aktion = '<a href="'.$_SERVER['PHP_SELF'].'?method=delete&akte_id='.$akte_id.'&active=3"><img title="löschen" src="'.APP_ROOT.'skin/images/delete.png" width="20px"></a>'; 
             }
             else 
@@ -1254,7 +1292,71 @@ $studiengang = new studiengang();
 	?>
 	</div>
 	
-    <div id="tabs-7">
+
+<div id="tabs-7">
+	<h2>Aufnahmeverfahren</h2>
+	<br>
+	<p>Sie können sich für folgende Aufnahmeverfahren anmelden: </p>
+	<?php
+	    
+	$prestudent = new prestudent(); 
+	if(!$prestudent->getPrestudenten($person_id))
+		die('Konnte Prestudenten nicht laden'); 
+
+	//var_dump($prestudent); 
+	echo "<form method='POST' action='".$_SERVER['PHP_SELF']."?active=5'>
+		<table border='1' width='150%'>
+	<tr>
+		<th width='10%'>ID</th><th>Datum</th><th>Ort</th><th width='90%'>Studiengang</th><th>anmelden</th>
+	</tr>";
+	
+	foreach($prestudent->result as $row)
+	{
+		$reihungstest = new reihungstest(); 
+		if(!$reihungstest->getStgZukuenftige($row->studiengang_kz))
+			echo "Fehler aufgetreten"; 
+		
+		foreach($reihungstest->result as $rt)
+		{
+			$stg = new studiengang(); 
+			$stg->load($rt->studiengang_kz); 
+			echo "<tr>
+				<td>".$rt->reihungstest_id."</td><td>".$rt->datum."</td><td>".$rt->ort_kurzbz."</td><td>".$stg->bezeichnung."</td><td><input type='radio' name='stg_radio' value='".$rt->reihungstest_id."_".$row->prestudent_id."'></td>
+			</tr>"; 
+		}
+		
+		
+	}
+
+	echo "</table><br><input type='submit' value='Speichern' name='btn_aufnahmeverfahren'></form>"; 	
+	echo "<br>"; 
+	echo "<p>Sie sind für folgende Aufnahmeverfahren angemeldet:"; 
+	echo "<form method='POST' action='".$_SERVER['PHP_SELF']."?active=5&delete'><table border='1' width='150%'>
+	<tr>
+		<th width='10%'>ID</th><th>Datum</th><th>Ort</th><th width='90%'>Studiengang</th><th>abmelden</th>
+	</tr>";
+	foreach($prestudent->result as $row)
+	{
+		if($row->reihungstest_id != '')
+		{
+			$rt = new reihungstest(); 
+			$rt->load($row->reihungstest_id); 
+			
+			$stg = new studiengang(); 
+			$stg->load($rt->studiengang_kz); 
+			
+			echo "<tr>
+				<td>".$rt->reihungstest_id."</td><td>".$rt->datum."</td><td>".$rt->ort_kurzbz."</td><td>".$stg->bezeichnung."</td><td><input type='radio' name='stg_radio' value='".$row->prestudent_id."'></td>
+			</tr>"; 
+		}
+		
+	}
+	echo "</table><br><input type='submit' value='Speichern' name='btn_aufnahmeverfahren'></form>"; 
+	
+	?>
+</div>
+
+    <div id="tabs-8">
     <h2>Bewerbung abschicken</h2>
     <p>Haben Sie alle Daten korrekt ausgefüllt bzw. alle Dokumente auf das System hochgeladen, können Sie Ihre Bewerbung abschicken.<br>
         Die jeweilige Studiengangsassistenz wird sich in den folgenden Tagen, bezüglich der Bewerbung, bei Ihnen Melden.
