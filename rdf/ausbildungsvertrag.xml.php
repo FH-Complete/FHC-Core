@@ -148,7 +148,8 @@ foreach($uid_arr as $uid)
 			$akadgrad = new akadgrad();
 			$akadgrad->getAkadgradStudent($student->uid);
 			
-			echo "\t\t<akadgrad>".$akadgrad->akadgrad_kurzbz."</akadgrad>\n";
+			echo "\t\t<akadgrad>".$akadgrad->titel."</akadgrad>\n";
+			echo "\t\t<akadgrad_kurzbz>".$akadgrad->akadgrad_kurzbz."</akadgrad_kurzbz>\n";
 			
 			//für ao. Studierende wird die StgKz der Lehrveranstaltungen benötigt, die sie besuchen
 			$lv_studiengang_kz='';
