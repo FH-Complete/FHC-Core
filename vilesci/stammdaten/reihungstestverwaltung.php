@@ -22,11 +22,11 @@
  *          Manfred Kindl		< manfred.kindl@technikum-wien.at >
  */
 /**
- * Reihungstestverwaltung
+ * Aufnahmeverfahren
  * 
- * - Anlegen und Bearbeiten von Reihungstestterminen
+ * - Anlegen und Bearbeiten von Terminen
  * - Export von Anwesenheitslisten als Excel
- * - Uebertragung der Reihungstestpunkte ins FAS
+ * - Uebertragung der Ergebniss-Punkte ins FAS
  * 
  * Parameter:
  * excel ... wenn gesetzt, dann wird die Anwesenheitsliste als Excel exportiert
@@ -75,16 +75,16 @@
 			$workbook = new Spreadsheet_Excel_Writer();
 			$workbook->setVersion(8);
 			// sending HTTP headers
-			$workbook->send("Anwesenheitsliste_Reihungstest_".$reihungstest->datum.".xls");
+			$workbook->send("Anwesenheitsliste_Aufnahmeverfahren_".$reihungstest->datum.".xls");
 			
 			// Creating a worksheet
-			$worksheet =& $workbook->addWorksheet("Reihungstest");
+			$worksheet =& $workbook->addWorksheet("Aufnahmeverfahren");
 			$worksheet->setInputEncoding('utf-8');
 			//Formate Definieren
 			$format_bold =& $workbook->addFormat();
 			$format_bold->setBold();
 					
-			$worksheet->write(0,0,'Anwesenheitsliste Reihungstest '.$datum_obj->convertISODate($reihungstest->datum).' '.$reihungstest->uhrzeit.' Uhr '.$reihungstest->anmerkung.', erstellt am '.date('d.m.Y'), $format_bold);
+			$worksheet->write(0,0,'Anwesenheitsliste Aufnahmeverfahren '.$datum_obj->convertISODate($reihungstest->datum).' '.$reihungstest->uhrzeit.' Uhr '.$reihungstest->anmerkung.', erstellt am '.date('d.m.Y'), $format_bold);
 			//Ueberschriften
 			$i=0;
 			$worksheet->write(2,$i,"Vorname", $format_bold);
@@ -191,7 +191,7 @@
 		}
 		else 
 		{
-			echo 'Reihungstest wurde nicht gefunden!';
+			echo 'Aufnahmeverfahren wurde nicht gefunden!';
 		}
 	}
 	else 
@@ -199,7 +199,7 @@
 		echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//DE" "http://www.w3.org/TR/html4/strict.dtd">
 				<html>
 				<head>
-					<title>Reihungstest</title>
+					<title>Aufnahmeverfahren</title>
 					<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 					<!--<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">-->
 					<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
@@ -241,9 +241,9 @@
 					</script>
 				</head>
 				<body class="Background_main">
-				<h2>Reihungstest - Verwaltung</h2>';
+				<h2>Aufnahemverfahren - Verwaltung</h2>';
 		
-		// Speichern eines Reihungstesttermines
+		// Speichern eines Termines
 		if(isset($_POST['speichern']))
 		{
 			if(!$rechte->isBerechtigt('lehre/reihungstest', null, 'sui'))
@@ -435,7 +435,7 @@
 		}
 	
 		
-		echo "<INPUT type='button' value='Neuen Reihungstesttermin anlegen' onclick='window.location.href=\"".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&neu=true\"' >";
+		echo "<INPUT type='button' value='Neuen Termin anlegen' onclick='window.location.href=\"".$_SERVER['PHP_SELF']."?stg_kz=$stg_kz&neu=true\"' >";
 		//Formular zum Bearbeiten des Reihungstests
 		echo '<HR>';
 		echo "<FORM method='POST' action='".$_SERVER['PHP_SELF']."'>";
@@ -509,7 +509,7 @@
 							<th>Einstiegssemester</th>
 							<th>Geburtsdatum</th>
 							<th>EMail</th>
-							<th>bereits absolvierte RTs</th>
+							<th>bereits absolvierte Verfahren</th>
 							<th>Ergebnis</th>
 							<th>FAS</th>
 						</tr>
