@@ -238,6 +238,9 @@ class variable extends basis_db
 				}
 			}
 		}
+		//Locale auf de_at setzen wenn nicht vorhanden
+		if (!isset($this->variable->locale))
+			$this->variable->locale='de-AT';
 		
 		if (!isset($this->variable->db_stpl_table))
 			$this->variable->db_stpl_table='stundenplandev';
