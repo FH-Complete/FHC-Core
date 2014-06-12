@@ -94,10 +94,10 @@ if(isset($_POST['schick']))
 		$art = $_POST['art'];
 		$oe_kurzbz = $_POST['oe_kurzbz'];
 		$berechtigung_kurzbz = $_POST['berechtigung_kurzbz'];
-		$rolle_kurzbz = $_POST['rolle_kurzbz'];
+		$rolle_kurzbz = (isset($_POST['rolle_kurzbz'])?$_POST['rolle_kurzbz']:'');
 		$uid = $_POST['uid'];
 		$funktion_kurzbz = $_POST['funktion_kurzbz'];
-		$studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
+		$studiensemester_kurzbz = null;//$_POST['studiensemester_kurzbz'];
 		$start = $_POST['start'];
 		$ende = $_POST['ende'];
 		$kostenstelle_id = $_POST['kostenstelle_id'];
