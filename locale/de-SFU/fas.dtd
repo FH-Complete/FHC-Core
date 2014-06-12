@@ -1,0 +1,378 @@
+<!ENTITY window.title			"FAS"> 
+<!ENTITY window.version			"3.0"> 
+
+<!-- MENUE -->
+
+<!-- Datei -->
+<!ENTITY menu-file.label              	"Datei">
+<!ENTITY menu-file.accesskey           	"D">
+
+<!ENTITY menu-file-close.key           	"D">
+<!ENTITY menu-file-close.label         	"Beenden">
+<!ENTITY menu-file-close.accesskey     	"B">
+
+<!-- Bearbeiten -->
+<!ENTITY menu-edit.label              	"Bearbeiten">
+<!ENTITY menu-edit.accesskey          	"B">
+
+<!ENTITY menu-edit-undo.key           	"">
+<!ENTITY menu-edit-undo.label         	"Undo">
+<!ENTITY menu-edit-undo.accesskey     	"">
+
+<!-- Einstellungen -->
+<!ENTITY menu-prefs.label              	"Einstellungen">
+<!ENTITY menu-prefs.accesskey          	"E">
+
+<!ENTITY menu-prefs-stpltable.label    	"Stpl-Tabelle">
+<!ENTITY menu-prefs-stpltable.accesskey	"T">
+
+<!ENTITY menu-prefs-stpltable-stundenplan.key      	"s">
+<!ENTITY menu-prefs-stpltable-stundenplan.label    	"stundenplan">
+<!ENTITY menu-prefs-stpltable-stundenplan.accesskey	"s">
+
+<!ENTITY menu-prefs-stpltable-stundenplandev.key      	"d">
+<!ENTITY menu-prefs-stpltable-stundenplandev.label    	"stundenplandev">
+<!ENTITY menu-prefs-stpltable-stundenplandev.accesskey	"d">
+
+<!ENTITY menu-prefs-kontofilterstg.key      	"B">
+<!ENTITY menu-prefs-kontofilterstg.label    	"Buchungen auf Studiengang filtern">
+<!ENTITY menu-prefs-kontofilterstg.accesskey	"B">
+
+<!-- Berichte -->
+<!ENTITY menu-statistic.label		"Berichte">
+<!ENTITY menu-statistic.accesskey	"R">
+
+<!ENTITY menu-statistic-koordinatorstunden.key			"K">
+<!ENTITY menu-statistic-koordinatorstunden.label		"Koordinatorstunden">
+<!ENTITY menu-statistic-koordinatorstunden.accesskey	"K">
+
+<!ENTITY menu-statistic-lehre.key		"L">
+<!ENTITY menu-statistic-lehre.label		"Lehre">
+<!ENTITY menu-statistic-lehre.accesskey	"L">
+
+<!ENTITY menu-statistic-mitarbeiter.key			"M">
+<!ENTITY menu-statistic-mitarbeiter.label		"MitarbeiterInnen">
+<!ENTITY menu-statistic-mitarbeiter.accesskey	"M">
+
+<!ENTITY menu-statistic-student.key			"S">
+<!ENTITY menu-statistic-student.label		"Studierende">
+<!ENTITY menu-statistic-student.accesskey	"S">
+
+<!ENTITY menu-statistic-oehbeitraege.key		"O">
+<!ENTITY menu-statistic-oehbeitraege.label		"ÖH-Beiträge">
+<!ENTITY menu-statistic-oehbeitraege.accesskey	"O">
+
+<!ENTITY menu-statistic-lehrauftraege.key		"L">
+<!ENTITY menu-statistic-lehrauftraege.label		"Lehraufträge">
+<!ENTITY menu-statistic-lehrauftraege.accesskey	"L">
+
+<!ENTITY menu-statistic-sublvplanung.key		"V">
+<!ENTITY menu-statistic-sublvplanung.label		"LV-Planung">
+<!ENTITY menu-statistic-sublvplanung.accesskey	"V">
+
+<!ENTITY menu-statistic-lvplanung.key		"H">
+<!ENTITY menu-statistic-lvplanung.label		"HTML">
+<!ENTITY menu-statistic-lvplanung.accesskey	"H">
+
+<!ENTITY menu-statistic-lvplanungexcel.key			"E">
+<!ENTITY menu-statistic-lvplanungexcel.label		"EXCEL">
+<!ENTITY menu-statistic-lvplanungexcel.accesskey	"E">
+
+<!ENTITY menu-statistic-lehrauftragsliste.key		"A">
+<!ENTITY menu-statistic-lehrauftragsliste.label		"Lehrauftragsliste">
+<!ENTITY menu-statistic-lehrauftragsliste.accesskey	"A">
+
+<!ENTITY menu-statistic-projektarbeit.key		"P">
+<!ENTITY menu-statistic-projektarbeit.label		"Projektarbeit">
+<!ENTITY menu-statistic-projektarbeit.accesskey	"P">
+
+<!ENTITY menu-statistic-abschlusspruefung.key		"B">
+<!ENTITY menu-statistic-abschlusspruefung.label		"Abschlussprüfung">
+<!ENTITY menu-statistic-abschlusspruefung.accesskey	"B">
+
+<!ENTITY menu-statistic-fehlendedokumente.key		"D">
+<!ENTITY menu-statistic-fehlendedokumente.label		"Fehlende Dokumente">
+<!ENTITY menu-statistic-fehlendedokumente.accesskey	"D">
+
+<!ENTITY menu-statistic-subnotenspiegel.key			"N">
+<!ENTITY menu-statistic-subnotenspiegel.label		"Notenspiegel">
+<!ENTITY menu-statistic-subnotenspiegel.accesskey	"N">
+
+<!ENTITY menu-statistic-notenspiegel-excel.key			"E">
+<!ENTITY menu-statistic-notenspiegel-excel.label		"Notenspiegel EXCEL">
+<!ENTITY menu-statistic-notenspiegel-excel.accesskey	"E">
+
+<!ENTITY menu-statistic-notenspiegel.key		"H">
+<!ENTITY menu-statistic-notenspiegel.label		"Notenspiegel HTML">
+<!ENTITY menu-statistic-notenspiegel.accesskey	"H">
+
+<!ENTITY menu-statistic-substatistik-bewerberstatistik.label		"BewerberInnenstatistik">
+<!ENTITY menu-statistic-substatistik-bewerberstatistik.accesskey	"B">
+
+<!ENTITY menu-statistic-bewerberstatistik-html.key			"H">
+<!ENTITY menu-statistic-bewerberstatistik-html.label		"HTML">
+<!ENTITY menu-statistic-bewerberstatistik-html.accesskey	"H">
+
+<!ENTITY menu-statistic-bewerberstatistik-excel.key			"E">
+<!ENTITY menu-statistic-bewerberstatistik-excel.label		"EXCEL">
+<!ENTITY menu-statistic-bewerberstatistik-excel.accesskey	"E">
+
+<!ENTITY menu-statistic-substatistik.key		"S">
+<!ENTITY menu-statistic-substatistik.label		"Statistik">
+<!ENTITY menu-statistic-substatistik.accesskey	"S">
+
+<!ENTITY menu-statistic-substatistik-studentenprosemester.label		"Studierende/Semester">
+<!ENTITY menu-statistic-substatistik-studentenprosemester.accesskey	"S">
+
+<!ENTITY menu-statistic-substatistik-studentenprosemester-excel.key			"E">
+<!ENTITY menu-statistic-substatistik-studentenprosemester-excel.label		"EXCEL">
+<!ENTITY menu-statistic-substatistik-studentenprosemester-excel.accesskey	"E">
+
+<!ENTITY menu-statistic-substatistik-studentenprosemester-html.key			"H">
+<!ENTITY menu-statistic-substatistik-studentenprosemester-html.label		"HTML">
+<!ENTITY menu-statistic-substatistik-studentenprosemester-html.accesskey	"H">
+
+<!ENTITY menu-statistic-substatistik-alvsstatistik.label		"ALVS-Statistik">
+<!ENTITY menu-statistic-substatistik-alvsstatistik.accesskey	"A">
+
+<!ENTITY menu-statistic-substatistik-alvsstatistik-excel.key		"E">
+<!ENTITY menu-statistic-substatistik-alvsstatistik-excel.label		"EXCEL">
+<!ENTITY menu-statistic-substatistik-alvsstatistik-excel.accesskey	"E">
+
+<!ENTITY menu-statistic-substatistik-alvsstatistik-html.key			"H">
+<!ENTITY menu-statistic-substatistik-alvsstatistik-html.label		"HTML">
+<!ENTITY menu-statistic-substatistik-alvsstatistik-html.accesskey	"H">
+
+<!ENTITY menu-statistic-substatistik-lvplanunggesamtsj.key			"L">
+<!ENTITY menu-statistic-substatistik-lvplanunggesamtsj.label		"LV-Planung Gesamt SJ">
+<!ENTITY menu-statistic-substatistik-lvplanunggesamtsj.accesskey	"L">
+
+<!ENTITY menu-statistic-substatistik-lvplanunggesamtsj-excel.key		"E">
+<!ENTITY menu-statistic-substatistik-lvplanunggesamtsj-excel.label		"EXCEL">
+<!ENTITY menu-statistic-substatistik-lvplanunggesamtsj-excel.accesskey	"E">
+
+<!ENTITY menu-statistic-abgaengerstatistik.key			"A">
+<!ENTITY menu-statistic-abgaengerstatistik.label		"AbgängerInnenstatistik">
+<!ENTITY menu-statistic-abgaengerstatistik.accesskey	"A">
+
+<!ENTITY menu-statistic-absolventenstatistik.key		"B">
+<!ENTITY menu-statistic-absolventenstatistik.label		"AbsolventInnenstatistik">
+<!ENTITY menu-statistic-absolventenstatistik.accesskey	"B">
+
+<!ENTITY menu-statistic-absolventenzahlen.key		"Z">
+<!ENTITY menu-statistic-absolventenzahlen.label		"AbsolventInnenzahlen">
+<!ENTITY menu-statistic-absolventenzahlen.accesskey	"Z">
+
+<!ENTITY menu-statistic-lektorenstatistik.key		"L">
+<!ENTITY menu-statistic-lektorenstatistik.label		"LektorInnenstatistik">
+<!ENTITY menu-statistic-lektorenstatistik.accesskey	"L">
+
+<!ENTITY menu-statistic-studentenstatistik.key			"S">
+<!ENTITY menu-statistic-studentenstatistik.label		"Studierendenstatistik">
+<!ENTITY menu-statistic-studentenstatistik.accesskey	"S">
+
+<!ENTITY menu-statistic-mitarbeiterstatistik.key		"M">
+<!ENTITY menu-statistic-mitarbeiterstatistik.label		"MitarbeiterInnenstatistik">
+<!ENTITY menu-statistic-mitarbeiterstatistik.accesskey	"M">
+
+<!ENTITY menu-statistic-studentendetails.key		"P">
+<!ENTITY menu-statistic-studentendetails.label		"Personendetails Excel">
+<!ENTITY menu-statistic-studentendetails.accesskey	"P">
+
+<!ENTITY menu-statistic-stromanalyse.key		"S">
+<!ENTITY menu-statistic-stromanalyse.label		"Stromanalyse">
+<!ENTITY menu-statistic-stromanalyse.accesskey	"S">
+
+<!-- Dokumente -->
+<!ENTITY menu-dokumente.label		"Dokumente">
+<!ENTITY menu-dokumente.accesskey	"D">
+
+<!ENTITY menu-dokumente-inskriptionsbestaetigung.key		"I">
+<!ENTITY menu-dokumente-inskriptionsbestaetigung.label		"Inskriptionsbestätigung">
+<!ENTITY menu-dokumente-inskriptionsbestaetigung.accesskey	"I">
+
+<!ENTITY menu-dokumente-zeugnis.key		"Z">
+<!ENTITY menu-dokumente-zeugnis.label		"Zeugnis">
+<!ENTITY menu-dokumente-zeugnis.accesskey	"Z">
+
+<!ENTITY menu-dokumente-zeugniseng.key		"E">
+<!ENTITY menu-dokumente-zeugniseng.label		"Zeugnis Englisch">
+<!ENTITY menu-dokumente-zeugniseng.accesskey	"E">
+
+<!ENTITY menu-dokumente-sammelzeugnis.key		"A">
+<!ENTITY menu-dokumente-sammelzeugnis.label		"Sammelzeugnis">
+<!ENTITY menu-dokumente-sammelzeugnis.accesskey	"A">
+
+<!ENTITY menu-dokumente-diplsupplement.key		"S">
+<!ENTITY menu-dokumente-diplsupplement.label	"Diploma Supplement">
+<!ENTITY menu-dokumente-diplsupplement.accesskey	"S">
+
+<!ENTITY menu-dokumente-ausbildungsvertrag.key		"A">
+<!ENTITY menu-dokumente-ausbildungsvertrag.label	"Ausbildungsvertrag">
+<!ENTITY menu-dokumente-ausbildungsvertrag.accesskey	"A">
+
+<!ENTITY menu-dokumente-studienerfolg.label	"Studienerfolgsbestaetigung">
+<!ENTITY menu-dokumente-studienerfolg.accesskey	"E">
+
+<!ENTITY menu-dokumente-studienerfolg-normal.label	"Normal">
+<!ENTITY menu-dokumente-studienerfolg-normal.accesskey	"N">
+
+<!ENTITY menu-dokumente-studienerfolg-finanzamt.label	"Finanzamt">
+<!ENTITY menu-dokumente-studienerfolg-finanzamt.accesskey	"F">
+
+<!ENTITY menu-dokumente-studienerfolg-allesemester.label	"Alle Semester">
+
+<!ENTITY menu-dokumente-studienerfolg-allesemester-normal.label	"Normal">
+<!ENTITY menu-dokumente-studienerfolg-allesemester-normal.accesskey	"N">
+
+<!ENTITY menu-dokumente-studienerfolg-allesemester-finanzamt.label	"Finanzamt">
+<!ENTITY menu-dokumente-studienerfolg-allesemester-finanzamt.accesskey	"F">
+
+<!ENTITY menu-dokumente-studienerfolgeng.label	"Studienerfolgsbestaetigung Englisch">
+<!ENTITY menu-dokumente-studienerfolgeng.accesskey	"E">
+
+<!ENTITY menu-dokumente-studienerfolgeng-normal.label	"Normal">
+<!ENTITY menu-dokumente-studienerfolgeng-normal.accesskey	"N">
+
+<!ENTITY menu-dokumente-studienerfolgeng-finanzamt.label	"Finanzamt">
+<!ENTITY menu-dokumente-studienerfolgeng-finanzamt.accesskey	"F">
+
+<!ENTITY menu-dokumente-studienerfolgeng-allesemester.label	"Alle Semester">
+
+<!ENTITY menu-dokumente-studienerfolgeng-allesemester-normal.label	"Normal">
+<!ENTITY menu-dokumente-studienerfolgeng-allesemester-normal.accesskey	"N">
+
+<!ENTITY menu-dokumente-studienerfolgeng-allesemester-finanzamt.label	"Finanzamt">
+<!ENTITY menu-dokumente-studienerfolgeng-allesemester-finanzamt.accesskey	"F">
+
+<!ENTITY menu-dokumente-accountinfoblatt.label	"Account InfoBlatt">
+<!ENTITY menu-dokumente-accountinfoblatt.accesskey	"A">
+
+<!ENTITY menu-dokumente-zutrittskarte.label	"Zutrittskarte">
+<!ENTITY menu-dokumente-zutrittskarte.accesskey	"Z">
+
+<!ENTITY menu-dokumente-pruefungsprotokoll.label		"Prüfungsprotokoll 1 (Alte Version)">
+<!ENTITY menu-dokumente-pruefungsprotokoll.accesskey	"P">
+
+<!ENTITY menu-dokumente-pruefungsprotokoll_englisch.label		"Prüfungsprotokoll Englisch 1 (Alte Version)">
+<!ENTITY menu-dokumente-pruefungsprotokoll_englisch.accesskey	"P">
+
+<!ENTITY menu-dokumente-pruefungsprotokoll2.label		"Prüfungsprotokoll 2 (Neue Version)">
+<!ENTITY menu-dokumente-pruefungsprotokoll2.accesskey	"P">
+
+<!ENTITY menu-dokumente-pruefungsprotokoll2_englisch.label		"Prüfungsprotokoll Englisch 2 (Neue Version)">
+<!ENTITY menu-dokumente-pruefungsprotokoll2_englisch.accesskey	"P">
+
+<!ENTITY menu-dokumente-pruefungszeugnis.label		"Prüfungszeugnis">
+<!ENTITY menu-dokumente-pruefungszeugnis.accesskey	"Z">
+
+<!ENTITY menu-dokumente-pruefungszeugnis_englisch.label		"Prüfungszeugnis Englisch">
+<!ENTITY menu-dokumente-pruefungszeugnis_englisch.accesskey	"G">
+
+<!ENTITY menu-dokumente-urkunde_deutsch.label		"Urkunde Deutsch">
+<!ENTITY menu-dokumente-urkunde_deutsch.accesskey	"D">
+
+<!ENTITY menu-dokumente-urkunde_englisch.label		"Urkunde Englisch">
+<!ENTITY menu-dokumente-urkunde_englisch.accesskey	"E">
+
+<!-- Extras -->
+<!ENTITY menu-extras.label		"Extras">
+<!ENTITY menu-extras.accesskey	"X">
+
+<!ENTITY menu-extras-reihungstest.key		"A">
+<!ENTITY menu-extras-reihungstest.label		"Aufnahmeseminarverwaltung">
+<!ENTITY menu-extras-reihungstest.accesskey	"A">
+
+<!ENTITY menu-extras-firma.key			"F">
+<!ENTITY menu-extras-firma.label		"Firmenverwaltung">
+<!ENTITY menu-extras-firma.accesskey	"F">
+
+<!ENTITY menu-extras-lvverwaltung.key		"L">
+<!ENTITY menu-extras-lvverwaltung.label		"Lehrveranstaltungsverwaltung">
+<!ENTITY menu-extras-lvverwaltung.accesskey	"L">
+
+<!ENTITY menu-extras-studienordnung.key		"S">
+<!ENTITY menu-extras-studienordnung.label		"Studienordnung">
+<!ENTITY menu-extras-studienordnung.accesskey	"S">
+
+<!ENTITY menu-extras-projektarbeitsbenotung.key			"P">
+<!ENTITY menu-extras-projektarbeitsbenotung.label		"Projektarbeitsbenotung">
+<!ENTITY menu-extras-projektarbeitsbenotung.accesskey	"P">
+
+<!ENTITY menu-extras-gruppenverwaltung.key			"G">
+<!ENTITY menu-extras-gruppenverwaltung.label		"Gruppenverwaltung">
+<!ENTITY menu-extras-gruppenverwaltung.accesskey	"G">
+
+<!ENTITY menu-extras-lehrfachverwaltung.key			"E">
+<!ENTITY menu-extras-lehrfachverwaltung.label		"Lehrfachverwaltung">
+<!ENTITY menu-extras-lehrfachverwaltung.accesskey	"E">
+
+<!ENTITY menu-extras-lektorenzuordnunginstitute.key			"L">
+<!ENTITY menu-extras-lektorenzuordnunginstitute.label		"Lektorenzuordnung-Institute">
+<!ENTITY menu-extras-lektorenzuordnunginstitute.accesskey	"L">
+
+<!ENTITY menu-extras-preinteressentenuebernahme.key			"I">
+<!ENTITY menu-extras-preinteressentenuebernahme.label		"Preinteressenten übernehmen">
+<!ENTITY menu-extras-preinteressentenuebernahme.accesskey	"I">
+
+<!ENTITY menu-extras-projektarbeitsabgaben.key			"A">
+<!ENTITY menu-extras-projektarbeitsabgaben.label		"Projektarbeitstermine">
+<!ENTITY menu-extras-projektarbeitsabgaben.accesskey	"A">
+
+<!-- BIS -->
+<!ENTITY menu-bis.label		"BIS">
+<!ENTITY menu-bis.accesskey	"I">
+<!ENTITY menu-bis.accesskey	"I">
+
+<!ENTITY menu-bis-mitarbeiter.key		"M">
+<!ENTITY menu-bis-mitarbeiter.label		"Mitarbeiter">
+<!ENTITY menu-bis-mitarbeiter.accesskey	"M">
+
+<!ENTITY menu-bis-mitarbeiter-import.key		"I">
+<!ENTITY menu-bis-mitarbeiter-import.label		"Import">
+<!ENTITY menu-bis-mitarbeiter-import.accesskey	"I">
+
+<!ENTITY menu-bis-mitarbeiter-export.key		"E">
+<!ENTITY menu-bis-mitarbeiter-export.label		"Meldung generieren">
+<!ENTITY menu-bis-mitarbeiter-export.accesskey	"E">
+
+<!ENTITY menu-bis-mitarbeiter-checkverwendung.key		"V">
+<!ENTITY menu-bis-mitarbeiter-checkverwendung.label		"checkVerwendung">
+<!ENTITY menu-bis-mitarbeiter-checkverwendung.accesskey	"V">
+
+<!ENTITY menu-bis-mitarbeiter-checkfunktion.key			"F">
+<!ENTITY menu-bis-mitarbeiter-checkfunktion.label		"checkFunktion">
+<!ENTITY menu-bis-mitarbeiter-checkfunktion.accesskey	"F">
+
+<!ENTITY menu-bis-studenten.key		"S">
+<!ENTITY menu-bis-studenten.label		"Studenten">
+<!ENTITY menu-bis-studenten.accesskey	"S">
+
+<!ENTITY menu-bis-studenten-export.key		"E">
+<!ENTITY menu-bis-studenten-export.label		"Meldung generieren">
+<!ENTITY menu-bis-studenten-export.accesskey	"E">
+
+<!ENTITY menu-bis-studenten-checkstudent.key		"P">
+<!ENTITY menu-bis-studenten-checkstudent.label		"Plausibilitaetspruefung">
+<!ENTITY menu-bis-studenten-checkstudent.accesskey	"P">
+
+<!-- Hilfe -->
+<!ENTITY menu-help.label              	"Hilfe">
+<!ENTITY menu-help.accesskey          	"H">
+
+<!ENTITY menu-help-about.key          	"U">
+<!ENTITY menu-help-about.label        	"Über FHComplete">
+<!ENTITY menu-help-about.accesskey    	"U">
+
+<!ENTITY menu-help-manual.key          	"H">
+<!ENTITY menu-help-manual.label        	"Handbuch">
+<!ENTITY menu-help-manual.accesskey    	"H">
+
+<!ENTITY menu-help-todo.key          	"T">
+<!ENTITY menu-help-todo.label        	"ToDo">
+<!ENTITY menu-help-todo.accesskey    	"T">
+
+<!ENTITY tab-prestudent-aufnahme.label  "Aufnahmeseminar">
+<!ENTITY tab-prestudent-aufnahme.anmeldung  "Anmeldung zum Aufnahmeseminar am">
+<!ENTITY tab-prestudent-aufnahme.absolviert  "Aufnahmeseminar absolviert">
+<!ENTITY tab-prestudent-aufnahme.seminar  "Aufnahmeseminar">
