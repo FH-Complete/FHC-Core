@@ -340,5 +340,36 @@ class reihungstest extends basis_db
 			return false;
 		}
 	}
+	
+	public function getStgZukuenftige($stg)
+	{	
+		$qry = "SELECT * from public.tbl_reihungstest where studiengang_kz = ".$this->db_add_param($stg, FHC_INTEGER)." AND datum>=now()-'1 days'::interval;"; 
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new reihungstest();
+				
+				$obj->reihungstest_id = $row->reihungstest_id;
+				$obj->studiengang_kz = $row->studiengang_kz;
+				$obj->ort_kurzbz = $row->ort_kurzbz;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->datum = $row->datum;
+				$obj->uhrzeit = $row->uhrzeit;
+				$obj->ext_id = $row->ext_id;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
+				
+				$this->result[] = $obj;
+			}
+			return true; 
+		}
+		else
+			return false; 
+	}
 }
 ?>
