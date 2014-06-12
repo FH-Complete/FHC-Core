@@ -1,0 +1,86 @@
+<!ENTITY window.title			"Planner"> 
+<!ENTITY window.version			"0.1 vom 12.April.2011"> 
+
+
+<!ENTITY menu-file.label              	"Datei">
+<!ENTITY menu-file.accesskey           	"D">
+
+<!ENTITY menu-file-close.key           	"D">
+<!ENTITY menu-file-close.label         	"Beenden">
+<!ENTITY menu-file-close.accesskey     	"B">
+
+
+<!ENTITY menu-help.label              	"Hilfe">
+<!ENTITY menu-help.accesskey          	"H">
+
+<!ENTITY menu-help-close.key          	"H">
+<!ENTITY menu-help-close.label        	"Ueber">
+<!ENTITY menu-help-close.accesskey    	"U">
+
+<!ENTITY menu-edit.label              	"Bearbeiten">
+<!ENTITY menu-edit.accesskey          	"B">
+
+<!ENTITY menu-edit-undo.key           	"">
+<!ENTITY menu-edit-undo.label         	"Undo">
+<!ENTITY menu-edit-undo.accesskey     	"">
+
+<!ENTITY menu-prefs.label              	"Einstellungen">
+<!ENTITY menu-prefs.accesskey          	"E">
+
+<!ENTITY menu-prefs-stpltable.label    	"Stpl-Tabelle">
+<!ENTITY menu-prefs-stpltable.accesskey	"T">
+
+<!ENTITY menu-prefs-stpltable-stundenplan.key      	"s">
+<!ENTITY menu-prefs-stpltable-stundenplan.label    	"stundenplan">
+<!ENTITY menu-prefs-stpltable-stundenplan.accesskey	"s">
+
+<!ENTITY menu-prefs-stpltable-stundenplandev.key      	"d">
+<!ENTITY menu-prefs-stpltable-stundenplandev.label    	"stundenplandev">
+<!ENTITY menu-prefs-stpltable-stundenplandev.accesskey	"d">
+
+<!ENTITY menu-prefs-ignore_reservierung.key      	"r">
+<!ENTITY menu-prefs-ignore_reservierung.label    	"ignore_reservierung">
+<!ENTITY menu-prefs-ignore_reservierung.accesskey	"r">
+
+<!ENTITY menu-prefs-ignore_zeitsperre.key      	"z">
+<!ENTITY menu-prefs-ignore_zeitsperre.label    	"ignore_zeitsperre">
+<!ENTITY menu-prefs-ignore_zeitsperre.accesskey	"z">
+
+<!ENTITY menu-prefs-ignore_kollision.key      	"k">
+<!ENTITY menu-prefs-ignore_kollision.label    	"ignore_kollision">
+<!ENTITY menu-prefs-ignore_kollision.accesskey	"k">
+
+<!ENTITY menu-prefs-kollision_student.key      	"s">
+<!ENTITY menu-prefs-kollision_student.label    	"kollision_student">
+<!ENTITY menu-prefs-kollision_student.accesskey	"s">
+
+<!ENTITY menu-prefs-max_kollision.key      	"m">
+<!ENTITY menu-prefs-max_kollision.label    	"max_kollision">
+<!ENTITY menu-prefs-max_kollision.accesskey	"m">
+
+<!ENTITY menu-help-about.key          	"U">
+<!ENTITY menu-help-about.label        	"Über FHComplete">
+<!ENTITY menu-help-about.accesskey    	"U">
+
+<!ENTITY menu-help-todo.key          	"T">
+<!ENTITY menu-help-todo.label        	"ToDo">
+<!ENTITY menu-help-todo.accesskey    	"T">
+
+<!ENTITY menu-help-manual.key          	"H">
+<!ENTITY menu-help-manual.label        	"Handbuch">
+<!ENTITY menu-help-manual.accesskey    	"H">
+
+<!ENTITY menu-extras.label              	"Extras">
+<!ENTITY menu-extras.accesskey           	"E">
+
+<!ENTITY menu-extras-kollisionstudent.key		"K">
+<!ENTITY menu-extras-kollisionstudent.label		"Kollision Student">
+<!ENTITY menu-extras-kollisionstudent.accesskey	"K">
+
+<!ENTITY menu-extras-lvplanwartung.key		"W">
+<!ENTITY menu-extras-lvplanwartung.label		"LVPlan Wartung">
+<!ENTITY menu-extras-lvplanwartung.accesskey	"W">
+
+<!ENTITY menu-extras-rescheck.key		"R">
+<!ENTITY menu-extras-rescheck.label		"Kollisionspruefung mit Reservierungen">
+<!ENTITY menu-extras-rescheck.accesskey	"R">
