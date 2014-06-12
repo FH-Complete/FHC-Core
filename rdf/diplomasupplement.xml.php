@@ -861,6 +861,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                             </lv>';
 
                             $ects_total +=$row_outgoing->ects;
+                            $semester_ects+=$row_outgoing->ects;
                         }
                     }
                 }
