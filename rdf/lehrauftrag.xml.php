@@ -255,7 +255,7 @@ function drawLehrauftrag($uid)
 					
 				$lv[$anzahl_lvs]['lehreinheit_id'] = $lehreinheit_id;
 				$lv[$anzahl_lvs]['lehrveranstaltung'] = $lehrveranstaltung;
-				$lv[$anzahl_lvs]['fachbereich'] = $fb_arr[$fachbereich];
+				$lv[$anzahl_lvs]['fachbereich'] = (isset($fb_arr[$fachbereich])?$fb_arr[$fachbereich]:'');
 				$lv[$anzahl_lvs]['gruppe'] = ($grp!=''?trim($grp):' ');
 				$lv[$anzahl_lvs]['stunden'] = ($stunden!=''?$stunden:' ');
 				$lv[$anzahl_lvs]['satz'] = ($satz!=''?$satz:' ');
