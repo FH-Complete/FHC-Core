@@ -94,35 +94,54 @@ if($method=='delete')
 }
 
 
-if(isset($_POST['btn_aufnahmeverfahren']))
+if(isset($_GET['rt_id']))
 {
-	if(isset($_POST['stg_radio']))
+	
+	$rt_id = isset($_GET['rt_id'])?$_GET['rt_id']:''; 
+	$pre_id = isset($_GET['pre'])?$_GET['pre']:''; 
+
+	if(isset($_GET['delete']))
 	{
-		if(isset($_GET['delete']))
+		$prestudent = new prestudent(); 
+		if(!$prestudent->getPrestudenten($person_id))
+			die('Konnte Prestudenten nicht laden'); 
+
+		foreach($prestudent->result as $row)
 		{
-			$prest = new prestudent(); 
-			$prest->load($_POST['stg_radio']); 
-			
-			$prest->reihungstest_id = ''; 
-			$prest->new = false; 
-			if(!$prest->save())
-				echo "Fehler aufgetreten"; 
-		} 
-		else 
+			if($row->prestudent_id == $pre_id)
+			{
+				$prest = new prestudent(); 
+				$prest->load($pre_id); 
+				$prest->reihungstest_id = ''; 
+				$prest->anmeldungreihungstest = ''; 
+				$prest->new = false; 
+
+				if(!$prest->save())
+					echo "Fehler aufgetreten"; 
+			}
+		}
+	}
+	else 
+	{
+		$timestamp = time();
+		
+		$prestudent = new prestudent(); 
+		if(!$prestudent->getPrestudenten($person_id))
+			die('Konnte Prestudenten nicht laden'); 
+
+		foreach($prestudent->result as $row)
 		{
+			if($row->prestudent_id == $pre_id)
+			{
+				$prest = new prestudent(); 
+				$prest->load($pre_id); 
+				$prest->reihungstest_id = $rt_id; 
+				$prest->anmeldungreihungstest = date("Y-m-d",$timestamp);
+				$prest->new = false; 
 
-			$t_help = explode("_",$_POST['stg_radio']);
-
-			// $t_help[0] -> reihungstest_id
-			// $t_help[1] -> prestudent_id
-
-			$prest = new prestudent(); 
-			$prest->load($t_help[1]); 
-			$prest->reihungstest_id = $t_help[0]; 
-			$prest->new = false; 
-
-			if(!$prest->save())
-				echo "Fehler aufgetreten"; 
+				if(!$prest->save())
+					echo "Fehler aufgetreten"; 
+			}
 		}
 	}
 }
@@ -819,7 +838,7 @@ padding: 5px;
         echo "</select></td>
             </tr>			
             <tr>
-                <td>Österr. Staatsbürgerschaft*: </td>
+                <td>Staatsbürgerschaft*: </td>
                 <td><Select name='staatsbuergerschaft' id='staatsbuergerschaft'>
                     <option value=''>-- Bitte auswählen -- </option>";
             $selected = '';
@@ -832,7 +851,7 @@ padding: 5px;
         echo "</select></td>
             </tr>
 			            <tr>
-                <td>Sozialversicherungsnr.: </td><td><input type='text' name='svnr' id='svnr' value='".$svnr."'></td>
+                <td>Österr. Sozialversicherungsnr.: </td><td><input type='text' name='svnr' id='svnr' value='".$svnr."'></td>
             </tr>
             <tr>";
         $geschl_m = ($person->geschlecht == 'm')?'checked':'';
@@ -1325,11 +1344,8 @@ $studiengang = new studiengang();
 		die('Konnte Prestudenten nicht laden'); 
 
 	//var_dump($prestudent); 
-	echo "<form method='POST' action='".$_SERVER['PHP_SELF']."?active=5'>
-		<table border='1' width='150%'>
-	<tr>
-		<th width='10%'>ID</th><th>Datum</th><th>Ort</th><th width='90%'>Studiengang</th><th>anmelden</th>
-	</tr>";
+	echo "<form method='POST' action='".$_SERVER['PHP_SELF']."?active=5'>";
+
 	
 	foreach($prestudent->result as $row)
 	{
@@ -1337,43 +1353,34 @@ $studiengang = new studiengang();
 		if(!$reihungstest->getStgZukuenftige($row->studiengang_kz))
 			echo "Fehler aufgetreten"; 
 		
+		$stg = new studiengang(); 
+		$stg->load($row->studiengang_kz); 
+		echo "<h3>Studiengang ".$stg->bezeichnung."</h3>"; 
+		echo "<table border='1' width='150%'>
+		<tr>
+			<th width='10%'>ID</th><th>Datum</th><th>Uhrzeit</th><th>Ort</th><th width='90%'>Studiengang</th><th>&nbsp;</th>
+		</tr>";
+		
 		foreach($reihungstest->result as $rt)
 		{
-			$stg = new studiengang(); 
-			$stg->load($rt->studiengang_kz); 
-			echo "<tr>
-				<td>".$rt->reihungstest_id."</td><td>".$rt->datum."</td><td>".$rt->ort_kurzbz."</td><td>".$stg->bezeichnung."</td><td><input type='radio' name='stg_radio' value='".$rt->reihungstest_id."_".$row->prestudent_id."'></td>
-			</tr>"; 
+			// bereits angenommen
+			if($row->reihungstest_id == $rt->reihungstest_id)
+			{
+				$rt_help = true; 
+				echo "<tr style='background-color:lightgrey;'>
+				<td>".$rt->reihungstest_id."</td><td>".$rt->datum."</td><td>".$rt->uhrzeit."</td><td>".$rt->ort_kurzbz."</td><td>".$stg->bezeichnung."</td><td><input type='button' name='btn_stg' value='Stornieren' onclick='location.href=\"".$_SERVER['PHP_SELF']."?active=5&rt_id=".$rt->reihungstest_id."&pre=".$row->prestudent_id."&delete\" '></td>
+				</tr>"; 
+			}
+			else 
+			{
+				echo "<tr>
+				<td>".$rt->reihungstest_id."</td><td>".$rt->datum."</td><td>".$rt->uhrzeit."</td><td>".$rt->ort_kurzbz."</td><td>".$stg->bezeichnung."</td><td><input type='button' name='btn_stg' value='Anmelden' onclick='location.href=\"".$_SERVER['PHP_SELF']."?active=5&rt_id=".$rt->reihungstest_id."&pre=".$row->prestudent_id."\" '></td>
+				</tr>"; 
+			}
 		}
-		
-		
+		echo "</table><br>"; 
 	}
 
-	echo "</table><br><input type='submit' value='Speichern' name='btn_aufnahmeverfahren'></form>"; 	
-	echo "<br>"; 
-	echo "<p>Sie sind für folgende Aufnahmeverfahren angemeldet:"; 
-	echo "<form method='POST' action='".$_SERVER['PHP_SELF']."?active=5&delete'><table border='1' width='150%'>
-	<tr>
-		<th width='10%'>ID</th><th>Datum</th><th>Ort</th><th width='90%'>Studiengang</th><th>abmelden</th>
-	</tr>";
-	foreach($prestudent->result as $row)
-	{
-		if($row->reihungstest_id != '')
-		{
-			$rt = new reihungstest(); 
-			$rt->load($row->reihungstest_id); 
-			
-			$stg = new studiengang(); 
-			$stg->load($rt->studiengang_kz); 
-			
-			echo "<tr>
-				<td>".$rt->reihungstest_id."</td><td>".$rt->datum."</td><td>".$rt->ort_kurzbz."</td><td>".$stg->bezeichnung."</td><td><input type='radio' name='stg_radio' value='".$row->prestudent_id."'></td>
-			</tr>"; 
-		}
-		
-	}
-	echo "</table><br><input type='submit' value='Speichern' name='btn_aufnahmeverfahren'></form>"; 
-	
 	?>
 </div>
 
@@ -1460,3 +1467,4 @@ function sendBewerbung($prestudent_id)
 }
 
 ?>
+
