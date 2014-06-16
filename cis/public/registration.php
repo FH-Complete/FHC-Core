@@ -362,12 +362,15 @@ if (isset($_POST['userid']))
                     
                     foreach($stg->result as $result)
                     {
-                        $checked = '';
-                        $typ = new studiengang(); 
-                        $typ->getStudiengangTyp($result->typ);
-                        if(in_array($result->studiengang_kz, $studiengaenge) || $result->studiengang_kz == $stg_auswahl)
-                            $checked = 'checked';
-                        echo '<tr><td></td><td valign="middle"><input type="checkbox" name="studiengaenge[]" value="'.$result->studiengang_kz.'" '.$checked.'>&nbsp;&nbsp;&nbsp;'.$result->bezeichnung.'</td></tr>';
+			if($result->studiengang_kz > 0)
+			{
+			    $checked = '';
+			    $typ = new studiengang(); 
+			    $typ->getStudiengangTyp($result->typ);
+			    if(in_array($result->studiengang_kz, $studiengaenge) || $result->studiengang_kz == $stg_auswahl)
+				$checked = 'checked';
+			    echo '<tr><td></td><td valign="middle"><input type="checkbox" name="studiengaenge[]" value="'.$result->studiengang_kz.'" '.$checked.'>&nbsp;&nbsp;&nbsp;'.$result->bezeichnung.'</td></tr>';
+			}
                     }
       echo'		</table></tr>
                 <tr>
