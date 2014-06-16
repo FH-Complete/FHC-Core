@@ -198,7 +198,7 @@
 
 		<tr>
 			<td>Kurzbz*</td>
-			<td><input type="text" name="kurzbz" onchange="copyToLehreVz();" value="'.$lv->kurzbz.'" /></td>
+			<td><input type="text" name="kurzbz" '.($lv->lehrveranstaltung_id==''?'onchange="copyToLehreVz();"':'onchange="return copyToLehreVzAsk();"').' value="'.$lv->kurzbz.'" /></td>
 			<td>Bezeichnung*</td>
 			<td colspan=3><input type="text" name="bezeichnung" value="'.htmlentities($lv->bezeichnung, ENT_QUOTES, 'UTF-8').'" size="60" maxlength="128"></td>
 		</tr>
@@ -310,7 +310,7 @@
 			<td><input type="checkbox" name="projektarbeit" '.($lv->projektarbeit?'checked':'').'></td>
 			<td>Organisationsform</td>
 			<td>
-			<SELECT name="orgform_kurzbz" onchange="copyToLehreVz();"><OPTION value="">-- keine Auswahl --</OPTION>';
+			<SELECT name="orgform_kurzbz" '.($lv->lehrveranstaltung_id==''?'onchange="copyToLehreVz();"':'onchange="return copyToLehreVzAsk();"').'><OPTION value="">-- keine Auswahl --</OPTION>';
 		
 		$qry_orgform = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz NOT IN ('VBB', 'ZGS') ORDER BY orgform_kurzbz";
 		if($result_orgform = $db->db_query($qry_orgform))
@@ -443,6 +443,29 @@
 		var orgform = ($('select[name="orgform_kurzbz"]').val() === "") ? "" : "_"+$('select[name="orgform_kurzbz"]').val();
 		var string = (kurzbz+orgform).toLowerCase();;
 		$("input[name=\'lehreverzeichnis\']").val(string);
+	    }
+	    function copyToLehreVzAsk()
+	    {
+	    var check = confirm("Lehreverzeichnis automatisch anpassen?");
+		    if (check == true)
+		    {
+			var kurzbz = $('input[name="kurzbz"]').val();
+			kurzbz = kurzbz.replace(/\ä/g, "ae")
+				.replace(/\ö/g, "oe")
+				.replace(/\ü/g, "ue")
+				.replace(/\ß/g, "sz")
+				.replace(/\Ä/g, "ae")
+				.replace(/\Ö/g, "oe")
+				.replace(/\Ü/g, "ue")
+				.replace(/[^a-z_\s]/gi, "");
+			var orgform = ($('select[name="orgform_kurzbz"]').val() === "") ? "" : "_"+$('select[name="orgform_kurzbz"]').val();
+			var string = (kurzbz+orgform).toLowerCase();;
+			$("input[name=\'lehreverzeichnis\']").val(string);
+		    }
+		    else
+		    {
+			return false;
+		    }
 	    }
 	    function checkInput(ele)
 	    {
