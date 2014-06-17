@@ -26,6 +26,35 @@
 	require_once('../../../include/addon.class.php');
 	
 	
+	function getBankverbindung($oe_kurzbz)
+	{
+	    $iban = "";
+	    $bic = "";
+	    $result = array();
+	    $bankverbindung=new bankverbindung();
+	    if($bankverbindung->load_oe($oe_kurzbz) && count($bankverbindung->result)>0)
+	    {
+		$result["iban"]=$bankverbindung->result[0]->iban;
+		$result["bic"]=$bankverbindung->result[0]->bic;
+		return $result;
+	    }
+	    else
+	    {
+		$organisationseinheit = new organisationseinheit();
+		$organisationseinheit->load($oe_kurzbz);
+		if($organisationseinheit->oe_parent_kurzbz !== NULL)
+		{
+		    $result = getBankverbindung($organisationseinheit->oe_parent_kurzbz);
+		    return $result;
+		}
+		else
+		{
+		    $result["iban"]="";
+		    $result["bic"]="";
+		}
+	    }
+	}
+	
 	if(isset($_GET['buchungsnr']))
 		$buchungsnr=$_GET['buchungsnr'];
 	else
@@ -37,17 +66,11 @@
 	$studiengang=new studiengang();
 	$studiengang->load($konto->studiengang_kz);
 	$bankverbindung=new bankverbindung();
-	if($bankverbindung->load_oe($studiengang->oe_kurzbz) && count($bankverbindung->result)>0)
-	{
-		$iban=$bankverbindung->result[0]->iban;
-		$bic=$bankverbindung->result[0]->bic;
-	}
-	else
-	{
-		$iban='';
-		$bic='';
-	}
-
+	
+	$kontodaten = getBankverbindung($studiengang->oe_kurzbz);
+	$iban=$kontodaten["iban"];
+	$bic=$kontodaten["bic"];
+	
 	$oe=new organisationseinheit();
 	$oe->load($studiengang->oe_kurzbz);
 	
