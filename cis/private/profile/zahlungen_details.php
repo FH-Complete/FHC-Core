@@ -23,6 +23,7 @@
 	require_once('../../../include/bankverbindung.class.php');
 	require_once('../../../include/studiengang.class.php');
 	require_once('../../../include/organisationseinheit.class.php');
+	require_once('../../../include/addon.class.php');
 	
 	
 	if(isset($_GET['buchungsnr']))
@@ -126,29 +127,35 @@ if($konto->zahlungsreferenz!='')
 
 echo '
 		</tbody>
-	</table>
-</body></html>';
+	</table>';
 
-/* EPS Beispiel
- <table class="tablesorter">
-		<thead>
-			<tr>
-				<th width="40%">Zahlung anweisen</th>
-				<th width="60%"></th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td>EPS</td>
- 				<td>
-				<a href="https://routing.eps.or.at/appl/epsSO/transinit/bankauswahl_prepare.html?lang=de
-							&amp;caiSO=%2BaDRiYhLjZXKuB19*CkCTIMQBN6sYSHmjNPQkIglglcYeFS98ZCVrvzVdGw5tF1Fzi
-							0JrGhL*WWFcSHu6PWY2FCY2BTH0umA-" target="_blank">
-							<img src="../../../skin/images/eps-logo_full.gif" width="30" height="30" alt="EPS Überweisung"></a>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-*/
- 
+$addon = new addon();
+$addon->loadAddons();
+foreach($addon->result as $a)
+{
+    if($a->kurzbz === "eps")
+    {
+	echo '<table class="tablesorter">
+	    <thead>
+		<tr>
+		    <th width="40%">Bezahlen</th>
+		    <th width="60%"></th>
+		</tr>
+	    </thead>
+	    <tbody>
+		<tr>
+		    <td>EPS</td>
+		    <td>
+		    <a href="../../../addons/eps/cis/index.php?buchungsnummer='.$buchungsnr.'"><img src="../../../skin/images/eps-logo_full.gif" width="30" height="30" alt="EPS Überweisung"></a>
+		    </td>
+		</tr>
+	    </tbody>
+	</table>';
+    }
+    
+}
+
+echo '</body></html>';
+
+
 ?>
