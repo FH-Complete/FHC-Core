@@ -343,7 +343,7 @@ if (isset($_POST['userid']))
 					<td><select id="studiensemester_kurzbz" name="studiensemester_kurzbz">
 					<option value="">'.$p->t('bewerbung/bitteWaehlen').'</option>';
                     $stsem = new studiensemester();
-					$stsem->getFutureStudiensemester('WS',2);
+					$stsem->getFutureStudiensemester('',4);
 					
 					foreach($stsem->studiensemester as $row)
 					{
