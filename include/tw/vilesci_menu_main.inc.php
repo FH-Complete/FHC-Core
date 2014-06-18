@@ -217,6 +217,7 @@ $menu=array
 		'Firmenwartung'=>array('name'=>'Firmenwartung', 'link'=>'stammdaten/firma_zusammen_uebersicht.php', 'target'=>'main'),
 		'checkStudenten'=>array('name'=>'CheckStudenten', 'link'=>'../system/checkStudenten.php', 'target'=>'main'),
 		'StudienplanZuteilung'=>array('name'=>'StudienplanZuteilung', 'link'=>'lehre/studienplan_zuteilung.php', 'target'=>'main'),
+		'DokumenteZuteilung'=>array('name'=>'DokumenteZuteilung', 'link'=>'stammdaten/studiengang_dokumente.php', 'target'=>'main')
 
 	),
 	'Auswertung'=>	array
