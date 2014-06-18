@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2006 Technikum-Wien
+/* Copyright (C) 2006 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -147,7 +147,7 @@ class dokument extends basis_db
 			return false;
 
 		if($new)
-		{			
+		{
 			$qry = 'INSERT INTO public.tbl_dokumentprestudent(dokument_kurzbz, prestudent_id, mitarbeiter_uid, datum, updateamum, 
 			        updatevon, insertamum, insertvon, ext_id) VALUES('.
 			        $this->db_add_param($this->dokument_kurzbz).','.
@@ -176,6 +176,65 @@ class dokument extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Speichert das Dokument in der Datenbank
+	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
+	 * angelegt, ansonsten der Datensatz upgedated
+	 * @return true wenn erfolgreich, false im Fehlerfall
+	 */
+	public function saveDokument($new=null)
+	{
+		if(is_null($new))
+			$new = $this->new;
+		
+		if($this->dokument_kurzbz=='')
+		{
+			$this->errormsg = 'Dokument_kurzbz muss angegeben werden';
+			return false;
+		}
+		
+		//Prüfung, ob Eintrag bereits vorhanden
+		$qry='SELECT dokument_kurzbz FROM public.tbl_dokument 
+			WHERE dokument_kurzbz='.$this->db_add_param($this->dokument_kurzbz);
+		if($this->db_query($qry))
+		{
+			if($this->db_fetch_object())
+			{
+				$this->errormsg = 'Eintrag bereits vorhanden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Durchführen der Datenbankabfrage';
+			return false;
+		}
+
+		if($new)
+		{
+			$qry = 'INSERT INTO public.tbl_dokument(dokument_kurzbz, bezeichnung, ext_id) VALUES('.
+			        $this->db_add_param($this->dokument_kurzbz).','.
+			        $this->db_add_param($this->bezeichnung).','.
+			        $this->db_add_param($this->ext_id, FHC_INTEGER).');';
+		}
+		else
+		{
+			$qry = 'UPDATE INTO public.tbl_dokument SET '.
+					'bezeichnung = '.$this->db_add_param($this->bezeichnung).
+					'WHERE dokument_kurzbz = '.$this->db_add_param($this->dokument_kurzbz);
+		}
+		
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern der Zuteilung';
+			return false;
+		}
+	}
 
 	/**
 	 * Loescht eine Zuordnung
@@ -192,6 +251,31 @@ class dokument extends basis_db
 		
 		$qry = "DELETE FROM public.tbl_dokumentprestudent 
 				WHERE dokument_kurzbz=".$this->db_add_param($dokument_kurzbz)." AND prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER).";";
+		
+		if($this->db_query($qry))
+			return true;
+		else 	
+		{
+			$this->errormsg = 'Fehler beim Loeschen der Zuteilung';
+			return false;
+		}
+	}
+	
+	/**
+	 * Loescht eine Zuordnung
+	 * @param dokument_kurzbz
+	 *        stg_kz
+	 */
+	public function deleteDokumentStg($dokument_kurzbz, $stg_kz)
+	{
+		if(!is_numeric($stg_kz))
+		{
+			$this->errormsg = 'stg_kz muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = "DELETE FROM public.tbl_dokumentstudiengang 
+				WHERE dokument_kurzbz=".$this->db_add_param($dokument_kurzbz)." AND studiengang_kz=".$this->db_add_param($stg_kz, FHC_INTEGER).";";
 		
 		if($this->db_query($qry))
 			return true;
@@ -316,6 +400,7 @@ class dokument extends basis_db
 				
 				$dok->dokument_kurzbz = $row->dokument_kurzbz;
 				$dok->bezeichnung = $row->bezeichnung;
+				$dok->onlinebewerbung = $this->db_parse_bool($row->onlinebewerbung);
 				
 				$this->result[] = $dok;
 			}
@@ -356,6 +441,40 @@ class dokument extends basis_db
 		}
 	}
 	
+	/**
+	 * fügt ein Dokument einem Studiengang hinzu
+	 * @param dokument_kurzbz
+	 *        stg_kz
+	 *        onlinebewerbung true, wenn für Online-Bewerbung relevant
+	 * @return true wenn ok false im Fehlerfall
+	 */
+	public function addDokument($dokument_kurzbz, $stg_kz, $onlinebewerbung=true)
+	{
+		//Prüfung, ob Eintrag bereits vorhanden
+		$qry='SELECT dokument_kurzbz FROM public.tbl_dokumentstudiengang 
+			WHERE dokument_kurzbz='.$this->db_add_param($dokument_kurzbz).' AND studiengang_kz='.$this->db_add_param($stg_kz,FHC_INTEGER);
+		if($this->db_query($qry))
+		{
+			if($this->db_fetch_object())
+			{
+				$this->errormsg = 'Eintrag bereits vorhanden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Durchführen der Datenbankabfrage';
+			return false;
+		}
+
+		$qry='INSERT INTO public.tbl_dokumentstudiengang (dokument_kurzbz, studiengang_kz, onlinebewerbung) 
+			VALUES ('.
+				$this->db_add_param($dokument_kurzbz).','.
+				$this->db_add_param($stg_kz,FHC_INTEGER).','.
+				$this->db_add_param($onlinebewerbung,FHC_BOOLEAN).')';
+
+		$this->db_query($qry);
+	}
 	public function loadDokumenttyp($dokument_kurzbz)
 	{
 		$qry="Select * FROM public.tbl_dokument where dokument_kurzbz =".$this->db_add_param($dokument_kurzbz).";";
