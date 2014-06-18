@@ -77,14 +77,14 @@ foreach ($mitarbeiter->untergebene as $row)
 {
 	if($untergebene!='')
 		$untergebene.=',';
-	$untergebene .= "'".$row."'";
+	$untergebene .= $db->db_add_param($row);
 }
 
 if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter/urlaube', null, 'suid'))
 {
 	if($untergebene!='')
 			$untergebene.=',';
-	$untergebene .= "'".$uid."'";
+	$untergebene .= $db->db_add_param($uid);
 }
 $qry = "SELECT * FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid in($untergebene)";
 
