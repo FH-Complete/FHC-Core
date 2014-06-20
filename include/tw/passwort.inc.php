@@ -21,7 +21,7 @@
  * Funktionen zum Pruefen der Passwort Policy und setzen des Passworts
  */
 require_once(dirname(__FILE__).'/../addon.class.php');
-require_once(dirname(__FILE__).'/../Crypt_CHAP-1.5.0/CHAP.php');
+//require_once(dirname(__FILE__).'/../Crypt_CHAP-1.5.0/CHAP.php');
 
 // die aktiven Addons werden durchsucht, ob eines davon eine eigene UID Generierung vorsieht
 // falls ja, wird die Version des Addons genommen, ansonsten die Default Generierung
@@ -146,18 +146,18 @@ if(!$passwort_addon_found)
 					$ssha_password = '{SSHA}'.$encrypted;
 
 					// LM und NT 
-					$hash = new Crypt_CHAP_MSv2();
-					$hash->password = $passwort_neu;
+					//$hash = new Crypt_CHAP_MSv2();
+					//$hash->password = $passwort_neu;
 					// $lm_password = strtoupper(bin2hex($hash->lmPasswordHash()));
-					$nt_password = strtoupper(bin2hex($hash->ntPasswordHash()));
+					//$nt_password = strtoupper(bin2hex($hash->ntPasswordHash()));
 
 					// Neues Passwort setzen
 					$data = array();
 					$data['userPassword']=$ssha_password;
 					// $data['sambaLMPassword']=$lm_password;
-					$data['sambaNTPassword']=$nt_password;
-					$data['sambaPwdLastSet']=time();
-					$data['sambaPwdMustChange']=2147483647; // 2038-01-19 04:14:07
+					//$data['sambaNTPassword']=$nt_password;
+					//$data['sambaPwdLastSet']=time();
+					//$data['sambaPwdMustChange']=2147483647; // 2038-01-19 04:14:07
 
 					if($ldap->Modify($user_dn, $data))
 						return true;

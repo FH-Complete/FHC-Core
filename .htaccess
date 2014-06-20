@@ -1,0 +1,13 @@
+#XDebug Konfiguration
+
+php_value xdebug.remote_enable 1
+php_value xdebug.remote_handler dbgp
+php_value xdebug.remote_host 10.63.0.68
+php_value xdebug.allowed_clients 10.63.0.68
+php_value xdebug.remote_port 9000
+
+#XDebug Profiler (Cachegrind)
+php_value xdebug.profiler_enable_trigger 1
+php_value xdebug.profiler_enable 0
+php_value xdebug.profiler_output_dir "/var/www/oesi/xdebug"
+php_value xdebug.profiler_append 1
