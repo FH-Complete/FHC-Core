@@ -27,7 +27,6 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/benutzer.class.php');
 require_once('../../../addons/ldap/vilesci/ldap.class.php');
 require_once('../../../include/phrasen.class.php');
-require_once('../../../include/Crypt_CHAP-1.5.0/CHAP.php');
 require_once('../../../include/'.EXT_FKT_PATH.'/passwort.inc.php');
 
 $uid = get_uid();

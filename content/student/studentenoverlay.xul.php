@@ -91,8 +91,8 @@ else
 									<menuitem id="student-toolbar-absolvent" label="-> Absolvent" oncommand="StudentAddRolle('Absolvent')" disabled="false" tooltiptext="Studenten zum Absolventen machen" hidden="true"/>
 											
 									<menuitem id="interessent-toolbar-zubewerber" label="-> Bewerber" oncommand="InteressentzuBewerber()" disabled="false" tooltiptext="Interessent zum Bewerber machen" hidden="true"/>
-									<menuitem id="interessent-toolbar-zustudent" label="-> Student" oncommand="InteressentzuStudent()" disabled="false" tooltiptext="Bewerber zu Studenten machen" hidden="true"/>
 									<menuitem id="interessent-toolbar-aufgenommener" label="-> Aufgenommener" oncommand="InteressentAddRolle('Aufgenommener')" disabled="false" tooltiptext="Interessent zum Aufgenommenen machen" hidden="true"/>
+									<menuitem id="interessent-toolbar-zustudent" label="-> Student" oncommand="InteressentzuStudent()" disabled="false" tooltiptext="Bewerber zu Studenten machen" hidden="true"/>									
 									<menuitem id="interessent-toolbar-warteliste" label="-> Warteliste" oncommand="InteressentAddRolle('Wartender')" disabled="false" tooltiptext="Interessent zum Wartenden machen" hidden="true"/>
 									<menuitem id="interessent-toolbar-absage" label="-> Absage" oncommand="InteressentAddRolle('Abgewiesener')" disabled="false" tooltiptext="Interessent zum Absager machen" hidden="true"/>    
 						      </menupopup>

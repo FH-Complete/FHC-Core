@@ -53,21 +53,21 @@
 				</fo:block-container>
 
 				<fo:block-container position="absolute" top="117mm" left="23mm" height="10mm">
-					<fo:block line-height="11pt" font-family="arial" font-size="10pt"><xsl:text>Vorname/Familienname:\n</xsl:text></fo:block>
-					<fo:block line-height="11pt" font-family="arial" font-size="10pt"><xsl:text>Geburtsdatum:</xsl:text></fo:block>
+					<fo:block line-height="10pt" font-family="arial" font-size="10pt"><xsl:text>Vorname/Familienname:\n</xsl:text></fo:block>
+					<fo:block line-height="10pt" font-family="arial" font-size="10pt"><xsl:text>Geburtsdatum:</xsl:text></fo:block>
 				</fo:block-container>
 				
 				<fo:block-container position="absolute" top="117mm" left="68mm">
-				<fo:block line-height="11pt" font-family="arial" font-size="10pt" font-weight="bold">
+				<fo:block line-height="10pt" font-family="arial" font-size="10pt" font-weight="bold">
 				<xsl:value-of select="name"/>
 				<xsl:text>\n</xsl:text>
 				</fo:block>
-				<fo:block line-height="11pt" font-family="arial" font-size="10pt">
+				<fo:block line-height="10pt" font-family="arial" font-size="10pt">
 				<xsl:value-of select="gebdatum" />
 				</fo:block>
 				</fo:block-container>
 				
-				<fo:block-container position="absolute" top="137mm" left="23mm">
+				<fo:block-container position="absolute" top="130mm" left="23mm">
 					<fo:table table-layout="fixed" border-collapse="collapse" border-width="0.2pt" border-style="solid">
 						<fo:table-column column-width="0mm"/>
 						<fo:table-column column-width="103mm"/>
@@ -143,7 +143,7 @@
 							<xsl:apply-templates select="fussnote"/>
 						</fo:table-body>
 					</fo:table>
-					<fo:block font-size="7pt">\n</fo:block>
+					<fo:block font-size="2pt">\n</fo:block>
 					<fo:table>
 						<fo:table-column column-width="15mm"/>
 						<fo:table-column column-width="155mm"/>
@@ -166,7 +166,7 @@
 							</fo:table-row>
 						</fo:table-body>
 					</fo:table>
-					<fo:block font-size="7pt">\n</fo:block>
+					<fo:block font-size="2pt">\n</fo:block>
 					<xsl:if test="abschlusspruefung_typ">
 						<fo:table table-layout="fixed" border-collapse="collapse" border-width="0.2pt" border-style="solid">
 							<fo:table-column column-width="0mm"/>
@@ -223,7 +223,7 @@
 								</fo:table-row>
 							</fo:table-body>
 						</fo:table>
-						<fo:block font-size="7pt">\n</fo:block>
+						<fo:block font-size="2pt">\n</fo:block>
 						<fo:table>
 							<fo:table-column column-width="15mm"/>
 							<fo:table-column column-width="155mm"/>
@@ -240,7 +240,7 @@
 						</fo:table>
 					</xsl:if>
 				</fo:block-container>
-				<fo:block-container position="absolute" top="252mm" left="21.5mm">
+				<fo:block-container position="absolute" top="265mm" left="21.5mm">
 					<fo:table table-layout="fixed" border-collapse="collapse">
 						<fo:table-column column-width="73mm" />
 						<fo:table-column column-width="17mm" />
@@ -283,7 +283,7 @@
 				<!-- Dummy Zelle -->
 			</fo:table-cell>
 			<fo:table-cell display-align="center" border-width="0.2mm" border-style="solid">
-				<fo:block font-size="9pt" content-width="104mm" vertical-align="center" font-family="arial">
+				<fo:block font-size="9pt" content-width="105mm" vertical-align="center" font-family="arial">
 					<xsl:text> </xsl:text>
 					<xsl:choose>
 						<xsl:when test="bisio_von">

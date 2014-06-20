@@ -1032,7 +1032,10 @@ if(!$error)
 														$stg_obj = new studiengang();
 														$stg_obj->load(ltrim($stg,'0'));
 														$uid = generateUID($stg_obj->kurzbz,$jahr,$stg_obj->typ,$matrikelnr);
-				
+														
+														$qry = "UPDATE public.tbl_person SET matr_nr=".$db->db_add_param($uid)." WHERE person_id=".$db->db_add_param($prestd->person_id, FHC_INTEGER).' AND matr_nr is null';
+														$db->db_query($qry);
+														
 														//Benutzerdatensatz anlegen
 														$benutzer = new benutzer();
 														$benutzer->uid = $uid;
