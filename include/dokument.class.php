@@ -442,42 +442,114 @@ class dokument extends basis_db
 	}
 	
 	/**
-	 * fügt ein Dokument einem Studiengang hinzu
-	 * @param dokument_kurzbz
-	 *        stg_kz
-	 *        onlinebewerbung true, wenn für Online-Bewerbung relevant
-	 * @return true wenn ok false im Fehlerfall
+	 * Laedt die Dokument Studiengang Zuordnung
+	 *
+	 * @param $dokument_kurzbz
+	 * @param $studiengang_kz
+	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function addDokument($dokument_kurzbz, $stg_kz, $onlinebewerbung=true)
+	public function loadDokumentStudiengang($dokument_kurzbz, $studiengang_kz)
 	{
-		//Prüfung, ob Eintrag bereits vorhanden
-		$qry='SELECT dokument_kurzbz FROM public.tbl_dokumentstudiengang 
-			WHERE dokument_kurzbz='.$this->db_add_param($dokument_kurzbz).' AND studiengang_kz='.$this->db_add_param($stg_kz,FHC_INTEGER);
-		if($this->db_query($qry))
+		$qry="SELECT * FROM public.tbl_dokumentstudiengang 
+				WHERE
+					studiengang_kz=".$this->db_add_param($studiengang_kz)."
+					AND dokument_kurzbz=".$this->db_add_param($dokument_kurzbz);
+
+		if($result = $this->db_query($qry))
 		{
-			if($this->db_fetch_object())
+			if($row = $this->db_fetch_object($result))
 			{
-				$this->errormsg = 'Eintrag bereits vorhanden';
+				$this->dokument_kurzbz = $row->dokument_kurzbz;
+				$this->studiengang_kz = $row->studiengang_kz;
+				$this->onlinebewerbung = $this->db_parse_bool($row->onlinebewerbung);
+				return true;
+			}
+			else
+			{
+				$this->errormsg='Fehler beim Laden der Daten';
 				return false;
 			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}				
+	}
+
+	/**
+	 * Prueft ob die Zuordnung Dokument zu Studiengang bereits vorhanden ist
+	 * @param $dokument_kurzbz
+	 * @parma $studiengang_kz
+	 * @return true wenn vorhanden, false wenn nicht vorhanden
+	 */
+	public function existsDokumentStudiengang($dokument_kurzbz, $studiengang_kz)
+	{
+		$qry='SELECT 
+				dokument_kurzbz 
+			FROM 
+				public.tbl_dokumentstudiengang 
+			WHERE 
+				dokument_kurzbz='.$this->db_add_param($dokument_kurzbz).' 
+				AND studiengang_kz='.$this->db_add_param($studiengang_kz,FHC_INTEGER);
+
+		if($result = $this->db_query($qry))
+		{
+			if($this->db_num_rows($result)>0)
+				return true;
+			else
+				return false;
 		}
 		else
 		{
 			$this->errormsg = 'Fehler beim Durchführen der Datenbankabfrage';
 			return false;
 		}
-
-		$qry='INSERT INTO public.tbl_dokumentstudiengang (dokument_kurzbz, studiengang_kz, onlinebewerbung) 
-			VALUES ('.
-				$this->db_add_param($dokument_kurzbz).','.
-				$this->db_add_param($stg_kz,FHC_INTEGER).','.
-				$this->db_add_param($onlinebewerbung,FHC_BOOLEAN).')';
-
-		$this->db_query($qry);
 	}
+
+	/**
+	 * Speichert die Zuordnung Dokument zu Studiengang
+	 * @return true wenn ok false im Fehlerfall
+	 */
+	public function saveDokumentStudiengang()
+	{
+		if(!$this->existsDokumentStudiengang($this->dokument_kurzbz, $this->studiengang_kz))
+		{
+			$qry='INSERT INTO public.tbl_dokumentstudiengang (dokument_kurzbz, studiengang_kz, onlinebewerbung) 
+				VALUES ('.
+					$this->db_add_param($this->dokument_kurzbz).','.
+					$this->db_add_param($this->studiengang_kz,FHC_INTEGER).','.
+					$this->db_add_param($this->onlinebewerbung,FHC_BOOLEAN).')';
+		}
+		else
+		{
+			$qry = 'UPDATE public.tbl_dokumentstudiengang SET
+						onlinebewerbung='.$this->db_add_param($this->onlinebewerbung,FHC_BOOLEAN).'
+					WHERE
+						dokument_kurzbz='.$this->db_add_param($this->dokument_kurzbz).'
+						AND studiengang_kz='.$this->db_add_param($this->studiengang_kz);
+		}
+
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern der Zuordnung';
+			return false;
+		}
+	}
+
+	/**
+	 * Laedt einen Dokumenttyp
+	 * @param $dokument_kurzbz
+	 * @return true wenn ok, false im Fehlerfall
+	 */
 	public function loadDokumenttyp($dokument_kurzbz)
 	{
-		$qry="Select * FROM public.tbl_dokument where dokument_kurzbz =".$this->db_add_param($dokument_kurzbz).";";
+		$qry="SELECT * FROM public.tbl_dokument 
+				WHERE dokument_kurzbz =".$this->db_add_param($dokument_kurzbz).";";
 		
 		if($this->db_query($qry))
 		{

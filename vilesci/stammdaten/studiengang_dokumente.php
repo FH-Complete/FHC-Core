@@ -1,5 +1,4 @@
 <?php
-
 /*
  * Copyright 2014 fhcomplete.org
  * 
@@ -22,10 +21,11 @@
  * Authors: Martin Tatzber <tatzberm@technikum-wien.at>
  *
  */
-
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/dokument.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
 $stg_kz=isset($_REQUEST['stg_kz'])?$_REQUEST['stg_kz']:'';
 $dokument_kurzbz=isset($_REQUEST['dokument_kurzbz'])?$_REQUEST['dokument_kurzbz']:'';
@@ -37,12 +37,22 @@ if(isset($_POST['add']))
 if(isset($_POST['saveDoc']))
 	$action='saveDoc';
 
+$uid = get_uid();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($uid);
+
+if(!$rechte->isBerechtigt('basis/studiengang', $stg_kz, 'suid'))
+	die('Sie haben keine Berechtigung für diese Seite');
+
 if($action=='add')
 {
 	if($dokument_kurzbz != '' && $stg_kz != '')
 	{
 		$dokument=new dokument();
-		$dokument->addDokument($dokument_kurzbz, $stg_kz, $onlinebewerbung);
+		$dokument->dokument_kurzbz = $dokument_kurzbz;
+		$dokument->studiengang_kz = $stg_kz;
+		$dokument->onlinebewerbung = $onlinebewerbung;
+		$dokument->saveDokumentStudiengang();
 	}
 }
 
@@ -53,6 +63,22 @@ if($action=='delete')
 		$dokument=new dokument();
 		if(!$dokument->deleteDokumentStg($dokument_kurzbz, $stg_kz))
 			echo 'Fehler beim Löschen: '.$dokument->errormsg;
+	}
+}
+
+if($action =='toggleonline')
+{
+	if($dokument_kurzbz != '' && $stg_kz != '')
+	{
+		$dokument=new dokument();
+		if($dokument->loadDokumentStudiengang($dokument_kurzbz, $stg_kz))
+		{
+			$dokument->onlinebewerbung = !$dokument->onlinebewerbung;
+			if(!$dokument->saveDokumentStudiengang())
+				echo $dokument->errormsg;
+		}
+		else
+			echo 'Zuordnung ist nicht vorhanden';
 	}
 }
 
@@ -100,7 +126,7 @@ $output .= '</select>
 
 if($stg_kz!='')
 {
-	$output .= '<table>
+	$output .= '<table id="t1" class="tablesorter">
 	<thead>
 	<tr>
 		<th>Dokumentname</th>
@@ -111,50 +137,52 @@ if($stg_kz!='')
 	<tbody>';
 	$dokStg=new dokument();
 	$dokStg->getDokumente($stg_kz);
+	$zugewieseneDokumente=array();
 	foreach($dokStg->result as $dok)
 	{
-		$checked=$dok->onlinebewerbung?' checked':'';
+		$zugewieseneDokumente[]=$dok->dokument_kurzbz;
+		$checked=$dok->onlinebewerbung?'true':'false';
 		$output .= '<tr>
 			<td>'.$dok->bezeichnung.'</td>
-			<td><input type="checkbox"'.$checked.'></td>
+			<td><a href="'.$_SERVER['PHP_SELF'].'?action=toggleonline&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'"><img src="../../skin/images/'.$checked.'.png" /></a></td>
 			<td><a href="'.$_SERVER['PHP_SELF'].'?action=delete&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'">Zuordnung löschen</a></td>
 			</td>
 		</tr>';
 	}
 	$output .= '
-		<tr>
-			<td>-</td>
-			<td></td>
-		</tr>
+	</tbody>
+	<tfoot>
 		<tr>
 			<td><select name="dokument_kurzbz">';
 	$dokAll=new dokument();
 	$dokAll->getAllDokumente();
 	foreach($dokAll->result as $dok)
 	{
-		$output .= '<option value="'.$dok->dokument_kurzbz.'">'.$dok->bezeichnung.'</option>';
+		if(!in_array($dok->dokument_kurzbz,$zugewieseneDokumente))
+			$output .= '<option value="'.$dok->dokument_kurzbz.'">'.$dok->bezeichnung.'</option>';
 	}
 	$output .= '</select></td>
 			<td><input type="checkbox" name="onlinebewerbung" checked></td>
+			<td><input type="submit" name="add" value="Hinzufügen"></td>
 		</tr>
-	</tbody>
+	</tfoot>
 	</table>
-	<input type="submit" name="add" value="Hinzufügen">
+
 </form>
 	<br/>
 	<br/>
-	<input type="button" onclick="showDocumentForm()" value="neues Dokument erstellen">
+	<input type="button" onclick="showDocumentForm()" value="neuen Dokumenttyp erstellen">
 	<div id="documentForm" style="visibility:hidden">
 	<form action="'.$_SERVER['PHP_SELF'].'" method="post">
 	<input type="hidden" name="stg_kz" value="'.$stg_kz.'">
 	<table>
 		<tr>
 			<td>Kurzbezeichnung</td>
-			<td><input type="text" id="dokument_kurzbz" name="dokument_kurzbz"></td>
+			<td><input type="text" id="dokument_kurzbz" name="dokument_kurzbz" maxlength="8" size="8"></td>
 		</tr>
 		<tr>
 			<td>Bezeichnung</td>
-			<td><input type="text" id="dokument_bezeichnung" name="dokument_bezeichnung"></td>
+			<td><input type="text" id="dokument_bezeichnung" name="dokument_bezeichnung" maxlength="128"></td>
 		</tr>
 	</table>
 	<input type="submit" name="saveDoc" value="Speichern">
@@ -165,16 +193,23 @@ else
 	$output .= '</form>';
 
 
-echo '
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+echo '<!DOCTYPE HTML>
 <html>
+<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link href="../../skin/vilesci.css" rel="stylesheet" type="text/css">
 	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css">
+	<script type="text/javascript" src="../../include/js/jquery.js"></script>
+
 	<script type="text/javascript">
 		$(document).ready(function() 
 		{ 
-			$("#t1").tablesorter(); 
+			$("#t1").tablesorter(
+			{
+				sortList: [[0,0]],
+				widgets: ["zebra"],
+				headers: {2:{sorter:false}}
+			}); 
 		}); 
 		
 		function showDocumentForm(dokument_kurzbz="",bezeichnung="",neu=true)
@@ -185,16 +220,11 @@ echo '
 			if(!neu)
 			{
 				document.getElementById("dokument_kurzbz").readOnly=true;
-				/* document.getElementById("dokument_kurzbz").style=
-					"background-color:#F2F2F2;
-					color: #C6C6C6;
-					border-color:#ddd"; */
 			}
 		}
 		
 	</script>
-<head>
-<title>Zuordnung Studiengang - Dokumente</title>
+	<title>Zuordnung Studiengang - Dokumente</title>
 </head>
 <body>
 '.$output.'
