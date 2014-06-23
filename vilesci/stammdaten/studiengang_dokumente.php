@@ -104,95 +104,6 @@ if($action=='saveDoc')
 	}
 }
 
-$studiengang=new studiengang();
-$studiengang->getAll('typ, kurzbz');
-
-$output='<h1>Zuteilung Studiengang - Dokumente</h1>
-<form action='.$_SERVER['PHP_SELF'].' method="post">
-	<select name="stg_kz">';
-foreach ($studiengang->result as $stg)
-{
-	if($stg_kz==$stg->studiengang_kz)
-		$selected=' selected';
-	else
-		$selected='';
-	$output .= '<option value="'.$stg->studiengang_kz.'"'.$selected.'>'.$stg->kurzbzlang.' '.$stg->bezeichnung.'</option>';
-}
-$output .= '</select>
-<input type="submit" value="Anzeigen">
-<br/>
-<br/>';
-
-
-if($stg_kz!='')
-{
-	$output .= '<table id="t1" class="tablesorter">
-	<thead>
-	<tr>
-		<th>Dokumentname</th>
-		<th>Online-Bewerbung</th>
-		<th></th>
-	</tr>
-	</thead>
-	<tbody>';
-	$dokStg=new dokument();
-	$dokStg->getDokumente($stg_kz);
-	$zugewieseneDokumente=array();
-	foreach($dokStg->result as $dok)
-	{
-		$zugewieseneDokumente[]=$dok->dokument_kurzbz;
-		$checked=$dok->onlinebewerbung?'true':'false';
-		$output .= '<tr>
-			<td>'.$dok->bezeichnung.'</td>
-			<td><a href="'.$_SERVER['PHP_SELF'].'?action=toggleonline&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'"><img src="../../skin/images/'.$checked.'.png" /></a></td>
-			<td><a href="'.$_SERVER['PHP_SELF'].'?action=delete&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'">Zuordnung löschen</a></td>
-			</td>
-		</tr>';
-	}
-	$output .= '
-	</tbody>
-	<tfoot>
-		<tr>
-			<td><select name="dokument_kurzbz">';
-	$dokAll=new dokument();
-	$dokAll->getAllDokumente();
-	foreach($dokAll->result as $dok)
-	{
-		if(!in_array($dok->dokument_kurzbz,$zugewieseneDokumente))
-			$output .= '<option value="'.$dok->dokument_kurzbz.'">'.$dok->bezeichnung.'</option>';
-	}
-	$output .= '</select></td>
-			<td><input type="checkbox" name="onlinebewerbung" checked></td>
-			<td><input type="submit" name="add" value="Hinzufügen"></td>
-		</tr>
-	</tfoot>
-	</table>
-
-</form>
-	<br/>
-	<br/>
-	<input type="button" onclick="showDocumentForm()" value="neuen Dokumenttyp erstellen">
-	<div id="documentForm" style="visibility:hidden">
-	<form action="'.$_SERVER['PHP_SELF'].'" method="post">
-	<input type="hidden" name="stg_kz" value="'.$stg_kz.'">
-	<table>
-		<tr>
-			<td>Kurzbezeichnung</td>
-			<td><input type="text" id="dokument_kurzbz" name="dokument_kurzbz" maxlength="8" size="8"></td>
-		</tr>
-		<tr>
-			<td>Bezeichnung</td>
-			<td><input type="text" id="dokument_bezeichnung" name="dokument_bezeichnung" maxlength="128"></td>
-		</tr>
-	</table>
-	<input type="submit" name="saveDoc" value="Speichern">
-	</form>
-	</div>';
-}
-else
-	$output .= '</form>';
-
-
 echo '<!DOCTYPE HTML>
 <html>
 <head>
@@ -226,8 +137,174 @@ echo '<!DOCTYPE HTML>
 	</script>
 	<title>Zuordnung Studiengang - Dokumente</title>
 </head>
-<body>
-'.$output.'
+<body>';
+
+
+if(isset($_GET['action']) && $_GET['action']=='dokumenttypen')
+{
+	echo '<h1>Dokumenttypen</h1>';
+
+	if(isset($_GET['type']))
+	{
+		if($_GET['type']=='delete')
+		{
+			$dokument = new dokument();
+			if(!$dokument->deleteDokumenttyp($_GET['dokument_kurzbz']))
+				echo $dokument->errormsg;
+			
+		}
+	}
+	if(isset($_POST['saveDokumenttyp']))
+	{
+		$dokument = new dokument();
+		$dokument->dokument_kurzbz=$_POST['dokument_kurzbz'];
+		$dokument->bezeichnung = $_POST['dokument_bezeichnung'];
+		if(isset($_POST['neu']) && $_POST['neu']=='true')
+			$neu=true;
+		else
+			$neu=false;
+
+		if(!$dokument->saveDokument($neu))
+			echo $dokument->errormsg;
+	}
+
+	$dokument = new dokument();
+	$dokument->getAllDokumente();
+
+	echo '
+	<form action="'.$_SERVER['PHP_SELF'].'?action=dokumenttypen" method="post">
+	<table id="t1" class="tablesorter" style="width:auto">
+	<thead>
+		<th></th>
+		<th>Kurzbz</th>
+		<th>Bezeichnung</th>
+	</thead>
+	<tbody>
+		';
+	foreach($dokument->result as $row)
+	{
+		echo '<tr>
+				<td>
+					<a href="'.$_SERVER['PHP_SELF'].'?action=dokumenttypen&type=edit&dokument_kurzbz='.$row->dokument_kurzbz.'"><img src="../../skin/images/edit.png" title="Bearbeiten" /></a>
+					';
+		// Lichtbil und Zeugnis duerfen nicht geloescht werden da diese fuer Bildupload und 
+		// Zeugnisarchivierung verwendet werden
+		if(!in_array($row->dokument_kurzbz,array('Lichtbil','Zeugnis')))
+			echo '<a href="'.$_SERVER['PHP_SELF'].'?action=dokumenttypen&type=delete&dokument_kurzbz='.$row->dokument_kurzbz.'"><img src="../../skin/images/cross.png" title="Löschen" /></a>';
+
+		echo '
+				</td>
+				<td>'.$row->dokument_kurzbz.'</td>
+				<td>'.$row->bezeichnung.'</td>				
+			</tr>';
+	}
+
+	$dokument_kurzbz='';
+	$dokument_bezeichnung='';
+
+	if(isset($_GET['type']) && $_GET['type']=='edit')
+	{
+		$dokument = new dokument();
+		if($dokument->loadDokumenttyp($_GET['dokument_kurzbz']))
+		{
+			$dokument_kurzbz = $dokument->dokument_kurzbz;
+			$dokument_bezeichnung = $dokument->bezeichnung;
+		}
+	}
+
+	echo '
+	</tbody>
+	<tfoot>
+		<tr>
+			<td></td>
+			<td>
+				<input typ="text" id="dokument_kurzbz" name="dokument_kurzbz" maxlength="8" size="8" '.($dokument_kurzbz!=''?'readonly':'').' value="'.$dokument_kurzbz.'"/>
+				<input type="hidden" id="neu" name="neu" value="'.($dokument_kurzbz==''?'true':'false').'" />
+			</td>
+			<td><input type="text" id="dokument_bezeichnung" name="dokument_bezeichnung" maxlength="128" value="'.$dokument_bezeichnung.'">
+			<input type="submit" name="saveDokumenttyp" value="Speichern"></td>
+		</tr>
+	</tfoot>
+	</table>
+	</form>';
+}
+else
+{
+	$studiengang=new studiengang();
+	$studiengang->getAll('typ, kurzbz');
+
+	echo '<h1>Zuteilung Studiengang - Dokumente</h1>
+	<table width="100%">
+	<tr>
+	<td>
+	<form action='.$_SERVER['PHP_SELF'].' method="post">
+		<select name="stg_kz">';
+	foreach ($studiengang->result as $stg)
+	{
+		if($stg_kz==$stg->studiengang_kz)
+			$selected=' selected';
+		else
+			$selected='';
+		echo '<option value="'.$stg->studiengang_kz.'"'.$selected.'>'.$stg->kurzbzlang.' '.$stg->bezeichnung.'</option>';
+	}
+	echo '</select>
+	<input type="submit" value="Anzeigen">
+	</td><td align="right">
+	<a href="'.$_SERVER['PHP_SELF'].'?action=dokumenttypen">Dokumenttypen verwalten</a>
+	</td></tr></table>
+
+	<br/>';
+
+	if($stg_kz!='')
+	{
+		echo '<table id="t1" class="tablesorter">
+		<thead>
+		<tr>
+			<th>Dokumentname</th>
+			<th>Online-Bewerbung</th>
+			<th></th>
+		</tr>
+		</thead>
+		<tbody>';
+		$dokStg=new dokument();
+		$dokStg->getDokumente($stg_kz);
+		$zugewieseneDokumente=array();
+		foreach($dokStg->result as $dok)
+		{
+			$zugewieseneDokumente[]=$dok->dokument_kurzbz;
+			$checked=$dok->onlinebewerbung?'true':'false';
+			echo '<tr>
+				<td>'.$dok->bezeichnung.'</td>
+				<td><a href="'.$_SERVER['PHP_SELF'].'?action=toggleonline&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'"><img src="../../skin/images/'.$checked.'.png" /></a></td>
+				<td><a href="'.$_SERVER['PHP_SELF'].'?action=delete&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'">Zuordnung löschen</a></td>
+				</td>
+			</tr>';
+		}
+		echo '
+		</tbody>
+		<tfoot>
+			<tr>
+				<td><select name="dokument_kurzbz">';
+		$dokAll=new dokument();
+		$dokAll->getAllDokumente();
+		foreach($dokAll->result as $dok)
+		{
+			if(!in_array($dok->dokument_kurzbz,$zugewieseneDokumente))
+				echo '<option value="'.$dok->dokument_kurzbz.'">'.$dok->bezeichnung.'</option>';
+		}
+		echo '</select></td>
+				<td><input type="checkbox" name="onlinebewerbung" checked></td>
+				<td><input type="submit" name="add" value="Hinzufügen"></td>
+			</tr>
+		</tfoot>
+		</table>
+
+	</form>';
+	}
+	else
+		echo '</form>';
+}
+echo '
 </body>
 </html>';
 

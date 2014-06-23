@@ -193,22 +193,25 @@ class dokument extends basis_db
 			$this->errormsg = 'Dokument_kurzbz muss angegeben werden';
 			return false;
 		}
-		
-		//Prüfung, ob Eintrag bereits vorhanden
-		$qry='SELECT dokument_kurzbz FROM public.tbl_dokument 
-			WHERE dokument_kurzbz='.$this->db_add_param($this->dokument_kurzbz);
-		if($this->db_query($qry))
+
+		if($new)
 		{
-			if($this->db_fetch_object())
+			//Prüfung, ob Eintrag bereits vorhanden
+			$qry='SELECT dokument_kurzbz FROM public.tbl_dokument 
+				WHERE dokument_kurzbz='.$this->db_add_param($this->dokument_kurzbz);
+			if($this->db_query($qry))
 			{
-				$this->errormsg = 'Eintrag bereits vorhanden';
+				if($this->db_fetch_object())
+				{
+					$this->errormsg = 'Eintrag bereits vorhanden';
+					return false;
+				}
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Durchführen der Datenbankabfrage';
 				return false;
 			}
-		}
-		else
-		{
-			$this->errormsg = 'Fehler beim Durchführen der Datenbankabfrage';
-			return false;
 		}
 
 		if($new)
@@ -220,7 +223,7 @@ class dokument extends basis_db
 		}
 		else
 		{
-			$qry = 'UPDATE INTO public.tbl_dokument SET '.
+			$qry = 'UPDATE public.tbl_dokument SET '.
 					'bezeichnung = '.$this->db_add_param($this->bezeichnung).
 					'WHERE dokument_kurzbz = '.$this->db_add_param($this->dokument_kurzbz);
 		}
@@ -605,6 +608,23 @@ class dokument extends basis_db
         
     }
     
-    
+	/**
+	 * Loescht einen Dokumenttyp
+	 * @parma $dokument_kurzbz
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	function deleteDokumenttyp($dokument_kurzbz)
+	{
+		$qry="DELETE FROM public.tbl_dokument WHERE dokument_kurzbz=".$this->db_add_param($dokument_kurzbz);
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg='Löschen fehlgeschlagen';
+			return false;
+		}
+	}   
 }
 ?>
