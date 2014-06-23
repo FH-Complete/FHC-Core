@@ -50,12 +50,13 @@ ini_set("soap.wsdl_cache_enabled", "0");
  */
 function saveNotiz($username, $passwort, $notiz)
 { 	
+	
 	if(!$user = check_user($username, $passwort))
 		return new SoapFault("Server", "Invalid Credentials");	
 	
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
-		
+
 	if(!$rechte->isBerechtigt('basis/notiz', null, 'sui'))
 		return new SoapFault("Server", "Sie haben keine Berechtigung zum Speichern von Notizen");
 	
@@ -82,8 +83,10 @@ function saveNotiz($username, $passwort, $notiz)
 	$notiz_obj->bearbeiter_uid = $notiz->bearbeiter_uid;
 	$notiz_obj->start = $notiz->start;
 	$notiz_obj->ende = $notiz->ende;
-	$notiz_obj->erledigt=$notiz->erledigt;
-	
+	$notiz_obj->erledigt=($notiz->erledigt=='true'?true:false);
+	$notiz_obj->updateamum = date('Y-m-d H:i:s');
+	$notiz_obj->updatevon = $username;
+
 	if($notiz_obj->save())
 	{
 		if($notiz_obj->new)
@@ -95,6 +98,7 @@ function saveNotiz($username, $passwort, $notiz)
 			$notiz_obj->person_id = $notiz->person_id;
 			$notiz_obj->prestudent_id = $notiz->prestudent_id;
 			$notiz_obj->bestellung_id = $notiz->bestellung_id;
+			$notiz_obj->lehreinheit_id = $notiz->lehreinheit_id;
 			
 			if(!$notiz_obj->saveZuordnung())
 				return new SoapFault("Server", $notiz_obj->errormsg);

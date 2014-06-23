@@ -54,11 +54,27 @@ $uid=(isset($_GET['uid'])?$_GET['uid']:null);
 $person_id=(isset($_GET['person_id'])?$_GET['person_id']:null);
 $prestudent_id=(isset($_GET['prestudent_id'])?$_GET['prestudent_id']:null);
 $bestellung_id=(isset($_GET['bestellung_id'])?$_GET['bestellung_id']:null);
+$lehreinheit_id=(isset($_GET['lehreinheit_id'])?$_GET['lehreinheit_id']:null);
+$stundenplandev_id=(isset($_GET['stundenplandev_id'])?$_GET['stundenplandev_id']:null);
 $datum_obj = new datum();
 $user=(isset($_GET['user'])?$_GET['user']:null);
 
-if(!$notiz->getNotiz($erledigt, $projekt_kurzbz, $projektphase_id, $projekttask_id, $uid, $person_id, $prestudent_id, $bestellung_id, $user))
-	die($notiz->errormsg);
+$notiz_id = (isset($_GET['notiz_id'])?$_GET['notiz_id']:null);
+
+if(is_null($notiz_id))
+{
+	if(!$notiz->getNotiz($erledigt, $projekt_kurzbz, $projektphase_id, $projekttask_id, $uid, $person_id, $prestudent_id, $bestellung_id, $user, $lehreinheit_id, $stundenplandev_id))
+		die($notiz->errormsg);
+}
+else
+{
+	if($notiz->load($notiz_id))
+	{
+		$notiz->result[] = $notiz;
+	}
+	else
+		die($notiz->errormsg);
+}
 
 foreach($notiz->result as $row)
 {	
@@ -78,7 +94,7 @@ foreach($notiz->result as $row)
 			<NOTIZ:erledigt><![CDATA['.($row->erledigt?'true':'false').']]></NOTIZ:erledigt>
 			<NOTIZ:insertamum><![CDATA['.$row->insertamum.']]></NOTIZ:insertamum>
 			<NOTIZ:insertvon><![CDATA['.$row->insertvon.']]></NOTIZ:insertvon>
-			<NOTIZ:updateamum><![CDATA['.$row->updateamum.']]></NOTIZ:updateamum>
+			<NOTIZ:updateamum><![CDATA['.$datum_obj->formatDatum($row->updateamum,'d.m.Y H:i:s').']]></NOTIZ:updateamum>
 			<NOTIZ:updatevon><![CDATA['.$row->updatevon.']]></NOTIZ:updatevon>	
          </RDF:Description>
       </RDF:li>

@@ -706,11 +706,14 @@ function LeAuswahl()
 			//Noten Tab aktivieren
 			LehrveranstaltungNotenDisableFields(false);
 
-			//Noten Tab ausblenden
+			//Noten Tab einblenden
 			//document.getElementById('lehrveranstaltung-tab-noten').collapsed=false;
 
 			//Noten Laden
 			LehrveranstaltungNotenLoad(lehrveranstaltung_id);
+
+			//Notizen Tab ausblenden
+			//document.getElementById('lehrveranstaltung-tab-notizen').collapsed=true;
 
 			LeDetailDisableFields(true);
 			//Details zuruecksetzen
@@ -723,8 +726,11 @@ function LeAuswahl()
 			LehrveranstaltungNotenDisableFields(true);
 			LehrveranstaltungNotenTreeUnload();
 
-			//Noten Tab einblenden
+			//Noten Tab ausblenden
 			//document.getElementById('lehrveranstaltung-tab-noten').collapsed=true;
+
+			//Notizen Tab einblenden
+			//document.getElementById('lehrveranstaltung-tab-notizen').collapsed=false;
 
 			document.getElementById('lehrveranstaltung-toolbar-neu').disabled=true;
 			document.getElementById('lehrveranstaltung-toolbar-del').disabled=false;
@@ -890,6 +896,11 @@ function LeAuswahl()
 	{
 		debug(e);
 	}
+
+	// Notizen Laden
+	var lehreinheitnotiz = document.getElementById('lehrveranstaltung-box-notizen');
+	lehreinheitnotiz.LoadNotizTree('','','','','','','','',lehreinheit_id);
+
 }
 
 //******** LehreinheitMitarbeiter **********//

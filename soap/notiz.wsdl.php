@@ -34,6 +34,7 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
 			<wsdl:part name="person_id" type="xsd:string"></wsdl:part>
 			<wsdl:part name="prestudent_id" type="xsd:string"></wsdl:part>
 			<wsdl:part name="bestellung_id" type="xsd:string"></wsdl:part>
+			<wsdl:part name="lehreinheit_id" type="xsd:string"></wsdl:part>
 			</xsd:all>
 	 </xsd:complexType>
 	 

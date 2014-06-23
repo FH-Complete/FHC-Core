@@ -169,25 +169,33 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 	       					tooltiptext="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#raumtypalternativ" />
 	    			</row>
 	    			<row>
+						<vbox flex="1">
 	    				<label value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehrverband"
 	    					tooltiptext="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#anmerkung" />
+						</vbox>
 	    				<toolbarbutton
-		        			label="KW: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#start_kw      "
+		        			label="KW: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#start_kw"
 	        				tooltiptext="Zu KW rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#start_kw springen"
 	        				onclick="onJumpDateRel(event);"
+							class="stplweekoverlay-toolbarbutton"
 	        				kw="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#start_kw"
 	       				/>
 	    			</row>
 	    			<row>
 	    				<label value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lektor" />
-	    				<label value="WR: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#wochenrythmus"
-	    					tooltiptext="Wochenrythmus"/>
+	    				<label value="WR: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#wochenrythmus Bl: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#stundenblockung"
+	    					tooltiptext="Wochenrythmus" />
 	    			</row>
 	    			<row>
 	    				<label value="Offen: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#offenestunden / rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#semesterstunden"
 	    					tooltiptext="Stunden: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#verplant / rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#semesterstunden" />
-	    				<label value="Block: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#stundenblockung"
-	    					tooltiptext="Stundenblockung" />
+	    				<toolbarbutton align="start"
+		        			label="Notizen: rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#anzahl_notizen"
+							lehreinheit_id="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lehreinheit_id"
+	        				onclick="StplWeekOpenNotiz(this)"
+							class="stplweekoverlay-toolbarbutton"
+	       				/>
+
 	    			</row>
 	    		</rows>
 	    	</grid>

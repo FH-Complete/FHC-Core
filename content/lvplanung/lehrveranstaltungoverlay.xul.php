@@ -229,11 +229,15 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 					<tab id="lehrveranstaltung-tab-detail" label="Details" />
 					<tab id="lehrveranstaltung-tab-lektor" label="Lektorenzuteilung" />
 					<tab id="lehrveranstaltung-tab-noten" label="Noten" />
+					<tab id="lehrveranstaltung-tab-notizen" label="Notizen" />
 				</tabs>
 				<tabpanels id="lehrveranstaltung-tabpanels-main" flex="1">
 					<vbox id="lehrveranstaltung-detail" />
 					<vbox id="lehrveranstaltung-lektorzuteilung" />
 					<vbox id="lehrveranstaltung-noten" />
+					<vbox id="lehrveranstaltung-notiz">
+						<box class="Notiz" flex="1" id="lehrveranstaltung-box-notizen"/>
+					</vbox>
 				</tabpanels>
 			</tabbox>
 		</vbox>

@@ -37,7 +37,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 echo '<?xml-stylesheet href="'.APP_ROOT.'content/bindings.css" type="text/css"?>';
 echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type="text/css"?>';
-	
+
 if(isset($_GET['id']) && is_numeric($_GET['id']))
 	$id=$_GET['id'];
 else 
@@ -60,7 +60,7 @@ $studiengang->load($stundenplan->studiengang_kz);
 
 <window id="stpl-details-dialog" title="Details"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        onload="StplDetailsInit('<?php echo $datum_obj->convertISODate($stundenplan->datum); ?>','<?php echo $stundenplan->mitarbeiter_uid; ?>'); document.getElementById('stpl-details-dialog-textbox-titel').focus();"
+        onload="StplDetailsInit('<?php echo $datum_obj->convertISODate($stundenplan->datum); ?>','<?php echo $stundenplan->mitarbeiter_uid; ?>','<?php echo $id; ?>'); document.getElementById('stpl-details-dialog-textbox-titel').focus();"
         >
 
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/lvplanung/stpl-details-dialog.js.php" />
@@ -69,10 +69,9 @@ $studiengang->load($stundenplan->studiengang_kz);
 <commandset>
   <command id="stpl-details-dialog-command-save" oncommand="StplDetailsSpeichern()"/>
 </commandset>
-
-<vbox>
-
+<vbox id="stpl-details-dialog-detail">
 <textbox id="stpl-details-dialog-textbox-id" hidden="true" value="<?php echo $id; ?>"/>
+
 
 <groupbox id="stpl-details-dialog-groupbox" flex="1">
 	<caption label="Details"/>
@@ -240,5 +239,5 @@ $studiengang->load($stundenplan->studiengang_kz);
 		<button id="stpl-details-dialog-button-speichern" command="stpl-details-dialog-command-save" label="speichern" accesskey="s"/>
 	</hbox>
 </groupbox>
-</vbox>
+</vbox>		
 </window>

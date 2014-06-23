@@ -134,3 +134,20 @@ treechildren::-moz-tree-checkbox(checked)
   list-style-image: url("../skin/images/cbox-check.gif");
 }
 
+
+toolbarbutton.stplweekoverlay-toolbarbutton
+{
+	-moz-appearance: none;
+	border: 0px;
+	margin:0px;
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+toolbarbutton.stplweekoverlay-toolbarbutton > .toolbarbutton-text
+{
+	text-align: left;
+}
+toolbarbutton.stplweekoverlay-toolbarbutton:hover
+{
+	border: 1px outset black;
+}

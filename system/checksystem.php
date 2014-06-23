@@ -1608,7 +1608,7 @@ if($result = @$db->db_query("SELECT * FROM information_schema.table_constraints 
 			echo '<br>campus.tbl_pruefungsanmeldung: Fehlenden Foreign Key zu Pruefungstermin hinzugefügt';
 	}
 }
-// Ampel boolean email
+// ort_kurzbz bei pruefungstermin
 if(!$result = @$db->db_query("SELECT ort_kurzbz FROM campus.tbl_pruefungstermin"))
 {
 	$qry = "ALTER TABLE campus.tbl_pruefungstermin ADD COLUMN ort_kurzbz varchar(16);
@@ -1671,6 +1671,20 @@ if(!$result = @$db->db_query("SELECT lvs FROM lehre.tbl_lehrveranstaltung LIMIT 
 		echo '<strong>lehre.tbl_lehrveranstaltung: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>lehre.tbl_lehrveranstaltung: neue Spalten sws, lvs,alvs,lvps,las hinzugefuegt';
+}
+
+// Notizzuordnung fuer Lehreinheit und Stundenplandev
+if(!$result = @$db->db_query("SELECT lehreinheit_id FROM public.tbl_notizzuordnung LIMIT 1"))
+{
+	$qry = "
+		ALTER TABLE public.tbl_notizzuordnung ADD COLUMN lehreinheit_id integer;
+		ALTER TABLE public.tbl_notizzuordnung ADD CONSTRAINT fk_lehreinheit_notizzuordnung FOREIGN KEY (lehreinheit_id) REFERENCES lehre.tbl_lehreinheit(lehreinheit_id) ON DELETE CASCADE ON UPDATE CASCADE;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_notizzuordnung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_notizzuordnung: neue Spalten lehreinheit_id hinzugefuegt';
 }
 
 
@@ -1836,7 +1850,7 @@ $tabellen=array(
 	"public.tbl_log"  => array("log_id","executetime","mitarbeiter_uid","beschreibung","sql","sqlundo"),
 	"public.tbl_mitarbeiter"  => array("mitarbeiter_uid","personalnummer","telefonklappe","kurzbz","lektor","fixangestellt","bismelden","stundensatz","ausbildungcode","ort_kurzbz","standort_id","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","kleriker"),
 	"public.tbl_notiz"  => array("notiz_id","titel","text","verfasser_uid","bearbeiter_uid","start","ende","erledigt","insertamum","insertvon","updateamum","updatevon"),
-	"public.tbl_notizzuordnung"  => array("notizzuordnung_id","notiz_id","projekt_kurzbz","projektphase_id","projekttask_id","uid","person_id","prestudent_id","bestellung_id"),
+	"public.tbl_notizzuordnung"  => array("notizzuordnung_id","notiz_id","projekt_kurzbz","projektphase_id","projekttask_id","uid","person_id","prestudent_id","bestellung_id","lehreinheit_id"),
 	"public.tbl_ort"  => array("ort_kurzbz","bezeichnung","planbezeichnung","max_person","lehre","reservieren","aktiv","lageplan","dislozierung","kosten","ausstattung","updateamum","updatevon","insertamum","insertvon","ext_id","stockwerk","standort_id","telefonklappe","content_id"),
 	"public.tbl_ortraumtyp"  => array("ort_kurzbz","hierarchie","raumtyp_kurzbz"),
 	"public.tbl_organisationseinheit" => array("oe_kurzbz", "oe_parent_kurzbz", "bezeichnung","organisationseinheittyp_kurzbz", "aktiv","mailverteiler","freigabegrenze","kurzzeichen","lehre"),
