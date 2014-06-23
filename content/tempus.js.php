@@ -92,7 +92,7 @@ function onLoad()
 
   		//Notizen des Users laden
 		notiz = document.getElementById('box-notizen');
-		notiz.LoadNotizTree('','','','','','','', getUsername());
+		notiz.LoadNotizTree('','','','','','','', getUsername(),'');
 
 	}
 	catch(e)

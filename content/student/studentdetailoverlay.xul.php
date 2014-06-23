@@ -124,7 +124,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								</template>
 							</menulist>
 							<label value="Matrikelnummer" control="student-detail-textbox-matr_nr"/>
-      						<hbox><textbox id="student-detail-textbox-matr_nr" disabled="true" maxlength="10" size="15"/></hbox>
+      						<hbox><textbox id="student-detail-textbox-matr_nr" disabled="true" maxlength="32" size="15"/></hbox>
 							<label value="Sprache" control="student-detail-menulist-sprache" />
 							<menulist id="student-detail-menulist-sprache" disabled="true"
 							          datasources="<?php echo APP_ROOT ?>rdf/sprache.rdf.php" flex="1"
@@ -199,7 +199,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	    					<row>
 	    						<label value="UID" control="student-detail-textbox-uid"/>
 	      						<hbox><textbox id="student-detail-textbox-uid" readonly="true" maxlength="16" size="16"/></hbox>
-	    						<label value="Personenkennzeichen" control="student-detail-textbox-matrikelnummer"/>
+	    						<hbox><label id="student-detail-label-matrikelnummer" value="Personenkennzeichen" control="student-detail-textbox-matrikelnummer"/></hbox>
 	      						<hbox><textbox id="student-detail-textbox-matrikelnummer" readonly="true" maxlength="15" size="15"/></hbox>
 	      						<!--<label value="Studiengang" control="student-detail-textbox-studiengang_kz"/>-->
 	      						<textbox id="student-detail-menulist-studiengang_kz" disabled="true" hidden="true" />

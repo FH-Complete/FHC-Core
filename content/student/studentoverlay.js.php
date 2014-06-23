@@ -1416,7 +1416,7 @@ function StudentAuswahl()
 
 	// Notizen laden
 	var studentnotiz = document.getElementById('student-box-notizen');
-	studentnotiz.LoadNotizTree('','','','',person_id,'','','');
+	studentnotiz.LoadNotizTree('','','','',person_id,'','','','');
 
 	// Selektierungsfunktion der Addons aufrufen
 	for(i in addon)

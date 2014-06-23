@@ -35,6 +35,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/lehreinheit.class.php');
+require_once('../include/notiz.class.php');
 
 $uid=get_uid();
 $error_msg='';
@@ -144,8 +145,15 @@ if ($anz>0)
 		$gruppe_kurzbz='';
 		$i=0;
 		// IDs der Lehreinheiten
-		foreach($l->lehreinheit_id as $lva_id)
+		$leids = array_unique($l->lehreinheit_id);
+		$anzahl_notizen=0;
+		foreach($leids as $lva_id)
+		{
 			$lva_ids.='&amp;lva_id'.$i++.'='.$lva_id;
+			$notiz = new notiz();
+			$anzahl_notizen+=$notiz->getAnzahlNotizen(null, null, null, null, null, null, null, null, null, $lva_id);
+			$lehreinheitids[] = $lva_id;
+		}
 		// Lektoren
 		$lektor='';
 		$l->lektor=array_unique($l->lektor);
@@ -276,6 +284,8 @@ if ($anz>0)
 					<LVA:lehrfach_farbe>#'.$l->lehrfach_farbe[0].'</LVA:lehrfach_farbe>
 					<LVA:lva_ids>'.$lva_ids.'</LVA:lva_ids>
 					<LVA:lehrverband>'.$lehrverband.'</LVA:lehrverband>
+					<LVA:anzahl_notizen>'.$anzahl_notizen.'</LVA:anzahl_notizen>
+					<LVA:lehreinheit_id>'.$l->lehreinheit_id[0].'</LVA:lehreinheit_id>
 	      		</RDF:Description>
 			</RDF:li>';
 	}

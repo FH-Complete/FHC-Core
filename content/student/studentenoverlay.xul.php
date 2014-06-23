@@ -264,7 +264,7 @@ else
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#dual_bezeichnung" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
-						<treecol id="student-treecol-dual" label="Matrikelnummer" flex="1" hidden="true" persist="hidden, width, ordinal"
+						<treecol id="student-treecol-matrnr" label="Matrikelnummer" flex="1" hidden="true" persist="hidden, width, ordinal"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#matr_nr" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>

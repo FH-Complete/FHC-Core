@@ -463,7 +463,7 @@ function STPLDetailEdit()
 	if(reservierung=='true')
 		alert('Reservierungen koennen hier nicht editiert werden');
 	else
-		window.open('<?php echo APP_ROOT; ?>content/lvplanung/stpl-details-dialog.xul.php?id='+id,'Details', 'height=500,width=450,left=100,top=100,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+		window.open('<?php echo APP_ROOT; ?>content/lvplanung/stpl-details-dialog.xul.php?id='+id,'Details', 'height=500,width=600,left=100,top=100,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
@@ -666,4 +666,9 @@ function TimetableDeleteEntries()
     
 	if (url && doIt)
 		location.href=url;
+}
+function StplWeekOpenNotiz(item)
+{
+	var lehreinheit_id=item.getAttribute('lehreinheit_id');
+	window.open('<?php echo APP_ROOT; ?>content/notizdialog.xul.php?lehreinheit_id='+lehreinheit_id,'Details', 'height=500,width=600,left=100,top=100,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }

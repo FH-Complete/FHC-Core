@@ -596,13 +596,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
   	<content>
 		<xul:vbox flex="1" style="margin: 5px;">
 			<xul:toolbar>
-			  <xul:toolbarbutton tooltiptext="Fett" image="../skin/images/bold.png" stlye="font-weight: bold;" oncommand="document.getBindingParent(this).setBold()"/>
-			  <xul:toolbarbutton tooltiptext="Kursiv" image="../skin/images/italic.png" style="font-style: italic;" oncommand="document.getBindingParent(this).setItalic()"/>
-			  <xul:toolbarbutton tooltiptext="Unterstrichen" image="../skin/images/underline.png" style="text-decoration: underline" oncommand="document.getBindingParent(this).setUnderline()"/>
+			  <xul:toolbarbutton tooltiptext="Fett" image="<?php echo APP_ROOT; ?>skin/images/bold.png" stlye="font-weight: bold;" oncommand="document.getBindingParent(this).setBold()"/>
+			  <xul:toolbarbutton tooltiptext="Kursiv" image="<?php echo APP_ROOT; ?>skin/images/italic.png" style="font-style: italic;" oncommand="document.getBindingParent(this).setItalic()"/>
+			  <xul:toolbarbutton tooltiptext="Unterstrichen" image="<?php echo APP_ROOT; ?>skin/images/underline.png" style="text-decoration: underline" oncommand="document.getBindingParent(this).setUnderline()"/>
 			  <xul:toolbarseparator />
-			  <xul:toolbarbutton tooltiptext="Linksbündig" image="../skin/images/justifyleft.png" oncommand="document.getBindingParent(this).setJustifyLeft()"/>
-			  <xul:toolbarbutton tooltiptext="Zentriert" image="../skin/images/justifycenter.png" oncommand="document.getBindingParent(this).setJustifyCenter()"/>
-			  <xul:toolbarbutton tooltiptext="Rechtsbündig" image="../skin/images/justifyright.png" oncommand="document.getBindingParent(this).setJustifyRight()"/>
+			  <xul:toolbarbutton tooltiptext="Linksbündig" image="<?php echo APP_ROOT; ?>skin/images/justifyleft.png" oncommand="document.getBindingParent(this).setJustifyLeft()"/>
+			  <xul:toolbarbutton tooltiptext="Zentriert" image="<?php echo APP_ROOT; ?>skin/images/justifycenter.png" oncommand="document.getBindingParent(this).setJustifyCenter()"/>
+			  <xul:toolbarbutton tooltiptext="Rechtsbündig" image="<?php echo APP_ROOT; ?>skin/images/justifyright.png" oncommand="document.getBindingParent(this).setJustifyRight()"/>
 			  <xul:toolbarseparator />
 			  <xul:toolbarbutton label="Format" type="menu">							
 			      <xul:menupopup>
@@ -667,18 +667,19 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			</getter>
 			<setter>
 			<![CDATA[
-
 				if(val)
 				{
-					editor = document.getAnonymousElementByAttribute(this ,'anonid', 'wysiwyg-editor');
+					var editor = document.getAnonymousElementByAttribute(this ,'anonid', 'wysiwyg-editor');
 					editor.contentDocument.designMode = 'off';
 					this.disabled_state=true;
+					editor.style.backgroundColor="#EEEEEE";
 				}
 				else
 				{
-					editor = document.getAnonymousElementByAttribute(this ,'anonid', 'wysiwyg-editor');
+					var editor = document.getAnonymousElementByAttribute(this ,'anonid', 'wysiwyg-editor');
 					editor.contentDocument.designMode = 'on';	
 					this.disabled_state=false;
+					editor.style.backgroundColor="#FFFFFF";
 				}
 			]]>
 			</setter>
@@ -757,6 +758,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 			editor = document.getAnonymousElementByAttribute(this ,'anonid', 'wysiwyg-editor');
 			editor.contentDocument.designMode = 'on';
+			editor.style.backgroundColor="#FFFFFF";
 			]]>
 			</body>
 		</method>		

@@ -40,6 +40,9 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/tempus.js.php" />
 <script type="application/x-javascript" src="chrome://global/content/nsTransferable.js"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/DragAndDrop.js"/>
+<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jquery.js"></script>
+<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jqSOAPClient.js"></script>
+<script type="text/javascript" language="JavaScript" src="<?php echo APP_ROOT; ?>include/js/jqXMLUtils.js"></script>
 
 <commandset id="maincommands">
   <command id="menu-file-close:command" oncommand="closeWindow();"/>

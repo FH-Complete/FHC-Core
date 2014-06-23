@@ -472,7 +472,7 @@ function onselectProjekttask()
 	
 	 //Notizen zu eines Tasks Laden
 	notiz = document.getElementById('box-projekttask-notizen');
-	notiz.LoadNotizTree('','',projekttask_id,'','','','', '');
+	notiz.LoadNotizTree('','',projekttask_id,'','','','', '','');
 	
 	//Mantis Tab reset
 	document.getElementById('textbox-projekttask-mantis-issue_summary').value=bezeichnung;

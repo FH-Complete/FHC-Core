@@ -170,7 +170,7 @@ function onselectProjekt()
     
     //Notizen zu einem Projekt Laden
 	notiz = document.getElementById('box-projekt-notizen');
-	notiz.LoadNotizTree(projekt_kurzbz,'','','','','','', '');
+	notiz.LoadNotizTree(projekt_kurzbz,'','','','','','', '','');
 	
 	ressource = document.getElementById('box-projekt-ressourcen');
 	ressource.LoadRessourceTree(projekt_kurzbz,'');

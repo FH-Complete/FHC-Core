@@ -63,7 +63,7 @@ class notiz extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM public.tbl_notiz WHERE notiz_id='".addslashes($notiz_id)."'";
+		$qry = "SELECT * FROM public.tbl_notiz WHERE notiz_id=".$this->db_add_param($notiz_id, FHC_INTEGER);
 
 		if($this->db_query($qry))
 		{
@@ -76,7 +76,7 @@ class notiz extends basis_db
 				$this->bearbeiter_uid=$row->bearbeiter_uid;
 				$this->start=$row->start;
 				$this->ende=$row->ende;
-				$this->erledigt=($row->erledigt=='t'?true:false);
+				$this->erledigt=$this->db_parse_bool($row->erledigt);
 				$this->insertamum=$row->insertamum;
 				$this->insertvon=$row->insertvon;
 				$this->updateamum=$row->updateamum;
@@ -110,7 +110,7 @@ class notiz extends basis_db
 			return false;
 		}
 
-		$qry = "Delete FROM public.tbl_notiz WHERE notiz_id='".addslashes($notiz_id)."'";
+		$qry = "Delete FROM public.tbl_notiz WHERE notiz_id=".$this->db_add_param($notiz_id, FHC_INTEGER);
 
 		if(!$this->db_query($qry))
 		{
@@ -149,31 +149,31 @@ class notiz extends basis_db
 			$qry='BEGIN;INSERT INTO public.tbl_notiz (titel, text, verfasser_uid,
 					bearbeiter_uid, start, ende, erledigt, insertamum, insertvon,
 					updateamum, updatevon) VALUES('.
-				$this->addslashes($this->titel).', '.
-				$this->addslashes($this->text).', '.
-				$this->addslashes($this->verfasser_uid).','.
-				$this->addslashes($this->bearbeiter_uid).','.
-				$this->addslashes($this->start).','.
-				$this->addslashes($this->ende).','.
-				($this->erledigt?'true':'false').','.
-				$this->addslashes($this->insertamum).','.
-				$this->addslashes($this->insertvon).','.
-				$this->addslashes($this->updateamum).','.
-				$this->addslashes($this->updatevon).');';
+				$this->db_add_param($this->titel).', '.
+				$this->db_add_param($this->text).', '.
+				$this->db_add_param($this->verfasser_uid).','.
+				$this->db_add_param($this->bearbeiter_uid).','.
+				$this->db_add_param($this->start).','.
+				$this->db_add_param($this->ende).','.
+				$this->db_add_param($this->erledigt,FHC_BOOLEAN).','.
+				$this->db_add_param($this->insertamum).','.
+				$this->db_add_param($this->insertvon).','.
+				$this->db_add_param($this->updateamum).','.
+				$this->db_add_param($this->updatevon).');';
 		}
 		else
 		{
 			$qry='UPDATE public.tbl_notiz SET '.
-				'titel='.$this->addslashes($this->titel).', '.
-				'text='.$this->addslashes($this->text).', '.
-				'verfasser_uid='.$this->addslashes($this->verfasser_uid).', '.
-				'bearbeiter_uid='.$this->addslashes($this->bearbeiter_uid).', '.
-				'start='.$this->addslashes($this->start).', '.
-				'ende='.$this->addslashes($this->ende).', '.
-				'erledigt='.($this->erledigt?'true':'false').', '.
-				'updateamum='.$this->addslashes($this->updateamum).', '.
-				'updatevon='.$this->addslashes($this->updatevon).' '.
-				'WHERE notiz_id='.$this->addslashes($this->notiz_id).';';
+				'titel='.$this->db_add_param($this->titel).', '.
+				'text='.$this->db_add_param($this->text).', '.
+				'verfasser_uid='.$this->db_add_param($this->verfasser_uid).', '.
+				'bearbeiter_uid='.$this->db_add_param($this->bearbeiter_uid).', '.
+				'start='.$this->db_add_param($this->start).', '.
+				'ende='.$this->db_add_param($this->ende).', '.
+				'erledigt='.$this->db_add_param($this->erledigt,FHC_BOOLEAN).', '.
+				'updateamum='.$this->db_add_param($this->updateamum).', '.
+				'updatevon='.$this->db_add_param($this->updatevon).' '.
+				'WHERE notiz_id='.$this->db_add_param($this->notiz_id,FHC_INTEGER).';';
 		}
 
 		if($this->db_query($qry))
@@ -207,7 +207,7 @@ class notiz extends basis_db
 		}
 		else
 		{
-			$this->errormsg = "Fehler beim Speichern des Datensatzes".$qry;
+			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
 			return false;
 		}
 	}
@@ -219,15 +219,16 @@ class notiz extends basis_db
 	public function saveZuordnung()
 	{
 		$qry = "INSERT INTO public.tbl_notizzuordnung(notiz_id, projekt_kurzbz, projektphase_id, projekttask_id, 
-						uid, person_id, prestudent_id, bestellung_id) VALUES(".
-				$this->addslashes($this->notiz_id).','.
-				$this->addslashes($this->projekt_kurzbz).','.
-				$this->addslashes($this->projektphase_id).','.
-				$this->addslashes($this->projekttask_id).','.
-				$this->addslashes($this->uid).','.
-				$this->addslashes($this->person_id).','.
-				$this->addslashes($this->prestudent_id).','.
-				$this->addslashes($this->bestellung_id).');';
+						uid, person_id, prestudent_id, bestellung_id, lehreinheit_id) VALUES(".
+				$this->db_add_param($this->notiz_id, FHC_INTEGER).','.
+				$this->db_add_param($this->projekt_kurzbz).','.
+				$this->db_add_param($this->projektphase_id, FHC_INTEGER).','.
+				$this->db_add_param($this->projekttask_id, FHC_INTEGER).','.
+				$this->db_add_param($this->uid).','.
+				$this->db_add_param($this->person_id, FHC_INTEGER).','.
+				$this->db_add_param($this->prestudent_id, FHC_INTEGER).','.
+				$this->db_add_param($this->bestellung_id, FHC_INTEGER).','.
+				$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).');';
 				
 		if($this->db_query($qry))
 		{
@@ -235,10 +236,9 @@ class notiz extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der Daten'.$qry;
+			$this->errormsg = 'Fehler beim Speichern der Daten';
 			return false;
 		}
-			
 	}
 
 	/**
@@ -253,9 +253,10 @@ class notiz extends basis_db
 	 * @param $prestudent_id
 	 * @param $bestellung_id
 	 * @param $user
+	 * @param $lehreinheit_id
 	 * @return boolean
 	 */
-	public function getNotiz($erledigt=null, $projekt_kurzbz=null, $projektphase_id=null, $projekttask_id=null, $uid=null, $person_id=null, $prestudent_id=null, $bestellung_id=null, $user=null)
+	public function getNotiz($erledigt=null, $projekt_kurzbz=null, $projektphase_id=null, $projekttask_id=null, $uid=null, $person_id=null, $prestudent_id=null, $bestellung_id=null, $user=null, $lehreinheit_id=null)
 	{
 		$qry = "SELECT 
 					* 
@@ -272,21 +273,24 @@ class notiz extends basis_db
 				$qry.=" AND erledigt=false";
 		}
 		if($projekt_kurzbz!='')
-			$qry.=" AND projekt_kurzbz='".addslashes($projekt_kurzbz)."'";
+			$qry.=" AND projekt_kurzbz=".$this->db_add_param($projekt_kurzbz);
 		if($projektphase_id!='')
-			$qry.=" AND projektphase_id='".addslashes($projektphase_id)."'";
+			$qry.=" AND projektphase_id=".$this->db_add_param($projektphase_id, FHC_INTEGER);
 		if($projekttask_id!='')
-			$qry.=" AND projekttask_id='".addslashes($projekttask_id)."'";
+			$qry.=" AND projekttask_id=".$this->db_add_param($projekttask_id, FHC_INTEGER);
 		if($uid!='')
-			$qry.=" AND uid='".addslashes($uid)."'";
+			$qry.=" AND uid=".$this->db_add_param($uid);
 		if($person_id!='')
-			$qry.=" AND person_id='".addslashes($person_id)."'";
+			$qry.=" AND person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 		if($prestudent_id!='')
-			$qry.=" AND prestudent_id='".addslashes($prestudent_id)."'";
+			$qry.=" AND prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);
 		if($bestellung_id!='')
-			$qry.=" AND bestellung_id='".addslashes($bestellung_id)."'";
+			$qry.=" AND bestellung_id=".$this->db_add_param($bestellung_id, FHC_INTEGER);
 		if($user!='')
-			$qry.=" AND (verfasser_uid='".addslashes($user)."' OR bearbeiter_uid='".addslashes($user)."')";
+			$qry.=" AND (verfasser_uid=".$this->db_add_param($user)." OR bearbeiter_uid=".$this->db_add_param($user).")";
+		if($lehreinheit_id!='')
+			$qry.=" AND lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER);
+
 		$qry.=' ORDER BY start, ende, titel';
 		
 		if($result = $this->db_query($qry))
@@ -302,7 +306,7 @@ class notiz extends basis_db
 				$obj->bearbeiter_uid=$row->bearbeiter_uid;
 				$obj->start=$row->start;
 				$obj->ende=$row->ende;
-				$obj->erledigt=($row->erledigt=='t'?true:false);
+				$obj->erledigt=$this->db_parse_bool($row->erledigt);
 				$obj->insertamum=$row->insertamum;
 				$obj->insertvon=$row->insertvon;
 				$obj->updateamum=$row->updateamum;
@@ -319,5 +323,73 @@ class notiz extends basis_db
 		}
 	}
 	
+	/**
+
+	 * 
+
+	 * Laedt die Notizen
+	 * @param $erledigt
+	 * @param $projekt_kurzbz
+	 * @param $projektphase_id
+	 * @param $projekttask_id
+	 * @param $uid
+	 * @param $person_id
+	 * @param $prestudent_id
+	 * @param $bestellung_id
+	 * @param $user
+	 * @param $lehreinheit_id
+	 * @return boolean
+	 */
+	public function getAnzahlNotizen($erledigt=null, $projekt_kurzbz=null, $projektphase_id=null, $projekttask_id=null, $uid=null, $person_id=null, $prestudent_id=null, $bestellung_id=null, $user=null, $lehreinheit_id=null)
+	{
+		$qry = "SELECT 
+					count(*) as anzahl
+				FROM 
+					public.tbl_notiz 
+					LEFT JOIN public.tbl_notizzuordnung USING(notiz_id)
+				WHERE 1=1";
+		
+		if(!is_null($erledigt))
+		{
+			if($erledigt)
+				$qry.=" AND erledigt=true";
+			else
+				$qry.=" AND erledigt=false";
+		}
+		if($projekt_kurzbz!='')
+			$qry.=" AND projekt_kurzbz=".$this->db_add_param($projekt_kurzbz);
+		if($projektphase_id!='')
+			$qry.=" AND projektphase_id=".$this->db_add_param($projektphase_id, FHC_INTEGER);
+		if($projekttask_id!='')
+			$qry.=" AND projekttask_id=".$this->db_add_param($projekttask_id, FHC_INTEGER);
+		if($uid!='')
+			$qry.=" AND uid=".$this->db_add_param($uid);
+		if($person_id!='')
+			$qry.=" AND person_id=".$this->db_add_param($person_id, FHC_INTEGER);
+		if($prestudent_id!='')
+			$qry.=" AND prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER);
+		if($bestellung_id!='')
+			$qry.=" AND bestellung_id=".$this->db_add_param($bestellung_id, FHC_INTEGER);
+		if($user!='')
+			$qry.=" AND (verfasser_uid=".$this->db_add_param($user)." OR bearbeiter_uid=".$this->db_add_param($user).")";
+		if($lehreinheit_id!='')
+			$qry.=" AND lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER);
+		
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+				return $row->anzahl;
+			else
+			{
+				$this->errormsg='Fehler beim Laden der Daten';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>
