@@ -241,7 +241,7 @@ if(isset($_GET['action']) && $_GET['action']=='createtestkurs')
 		//$orgform = ($lehrveranstaltung->orgform_kurzbz!=''?$lehrveranstaltung->orgform_kurzbz:$studiengang->orgform_kurzbz);
 		
 		//Kurzbezeichnung generieren Format: STSEM-STG-SEM-LV/LEID/LEID/LEID...
-		$shortname = 'TK-'.$stsem.'-'.$studiengang->kuerzel.'-'.$lehrveranstaltung->semester.'-'.$lehrveranstaltung->kurzbz;
+		$shortname = mb_strtoupper('TK-'.$stsem.'-'.$studiengang->kuerzel.'-'.$lehrveranstaltung->semester.'-'.$lehrveranstaltung->kurzbz);
 		
 		$mdl_course->lehrveranstaltung_id = $lvid;
 		$mdl_course->studiensemester_kurzbz = $stsem;
