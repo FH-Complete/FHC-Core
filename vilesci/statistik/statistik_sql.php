@@ -26,8 +26,14 @@ if(!isset($_GET['statistik_kurzbz']))
 	die('Statistik_kurzbz Parameter fehlt');
 
 $statistik_kurzbz = $_GET['statistik_kurzbz'];
-
-echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+if (isset($_GET['outputformat']))
+	$outputformat=$_GET['outputformat'];
+else
+	$outputformat='html';
+	
+$html='';
+$csv='';
+$html.='<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -54,12 +60,12 @@ $statistik = new statistik();
 if(!$statistik->load($statistik_kurzbz))
 	die($statistik->errormsg);
 
-echo '<h2>Statistik - '.$statistik->bezeichnung.'</h2>';
+$html.= '<h2>Statistik - '.$statistik->bezeichnung.'</h2>';
 
 if($statistik->sql!='')
 {
 	$sql = $statistik->sql;
-	foreach($_POST as $name=>$value)
+	foreach($_REQUEST as $name=>$value)
 	{
 		$sql = str_replace('$'.$name,addslashes($value),$sql);
 	}
@@ -67,30 +73,46 @@ if($statistik->sql!='')
 	$db = new basis_db();
 	if($result = $db->db_query($sql))
 	{
-		echo '<table class="tablesorter" id="myTable">';
-		echo '<thead><tr>';
+		$html.= '<table class="tablesorter" id="myTable">';
+		$html.= '<thead><tr>';
 		$anzahl_spalten = $db->db_num_fields($result);
 		for($spalte=0;$spalte<$anzahl_spalten;$spalte++)
 		{
-			echo '<th>'.$db->db_field_name($result,$spalte).'</th>';
+			$html.= '<th>'.$db->db_field_name($result,$spalte).'</th>';
+			$csv.='"'.$db->db_field_name($result,$spalte).'",';
 		}
-		echo '</tr></thead><tbody>';
+		$html.= '</tr></thead><tbody>';
+		$csv=substr($csv,0,-1)."\n";
 		while($row = $db->db_fetch_object($result))
 		{
-			echo '<tr>';
+			$html.= '<tr>';
 			$anzahl_spalten = $db->db_num_fields($result);
 			for($spalte=0;$spalte<$anzahl_spalten;$spalte++)
 			{
 				$name = $db->db_field_name($result,$spalte);
-				echo '<td>'.$row->$name.'</td>';
+				$html.= '<td>'.$row->$name.'</td>';
+				$csv.= '"'.$row->$name.'",';
 			}	
-			echo '</tr>';
+			$html.= '</tr>';
+			$csv=substr($csv,0,-1)."\n";
 		}
-		echo '</tbody></table>';
+		$html.= '</tbody></table>';
 	}
 }
 else
 {
-	echo 'Zu dieser Statistik gibt es keine SQL Abfrage';
+	$html.= 'Zu dieser Statistik gibt es keine SQL Abfrage';
+}
+switch ($outputformat)
+{
+	case 'html':
+		echo $html;
+		break;
+	case 'csv':
+		echo $csv;
+		break;
+	case 'json':
+		$array= array_map("str_getcsv",explode("\n", $csv));
+		echo json_encode($array);
 }
 ?>
