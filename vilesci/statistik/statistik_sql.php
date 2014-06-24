@@ -80,6 +80,7 @@ if($statistik->sql!='')
 		{
 			$html.= '<th>'.$db->db_field_name($result,$spalte).'</th>';
 			$csv.='"'.$db->db_field_name($result,$spalte).'",';
+			//$json[$db->db_field_name($result,$spalte)]=array();
 		}
 		$html.= '</tr></thead><tbody>';
 		$csv=substr($csv,0,-1)."\n";
@@ -87,11 +88,14 @@ if($statistik->sql!='')
 		{
 			$html.= '<tr>';
 			$anzahl_spalten = $db->db_num_fields($result);
-			for($spalte=0;$spalte<$anzahl_spalten;$spalte++)
+			for($spalte=1;$spalte<$anzahl_spalten;$spalte++)
 			{
 				$name = $db->db_field_name($result,$spalte);
 				$html.= '<td>'.$row->$name.'</td>';
 				$csv.= '"'.$row->$name.'",';
+				
+				$name_spalte_0 = $db->db_field_name($result,0);
+				$json[$row->$name_spalte_0][$name]=$row->$name;
 			}	
 			$html.= '</tr>';
 			$csv=substr($csv,0,-1)."\n";
@@ -112,7 +116,8 @@ switch ($outputformat)
 		echo $csv;
 		break;
 	case 'json':
-		$array= array_map("str_getcsv",explode("\n", $csv));
-		echo json_encode($array);
+		//$array= array_map("str_getcsv",explode("\n", $csv));
+		
+		echo json_encode($json);
 }
 ?>
