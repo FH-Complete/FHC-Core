@@ -113,11 +113,18 @@ switch ($outputformat)
 		echo $html;
 		break;
 	case 'csv':
+		header("Content-type: text/csv");
+		header("Content-Disposition: attachment; filename=data.csv");
+		header("Pragma: no-cache");
+		header("Expires: 0");
 		echo $csv;
 		break;
 	case 'json':
+		header("Content-type: application/json");
+		header("Content-Disposition: attachment; filename=data.json");
+		header("Pragma: no-cache");
+		header("Expires: 0");
 		//$array= array_map("str_getcsv",explode("\n", $csv));
-		
 		echo json_encode($json);
 }
 ?>
