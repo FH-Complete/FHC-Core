@@ -33,6 +33,7 @@ require_once('../../../include/datum.class.php');
 require_once('../../../include/mail.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/phrasen.class.php');
+require_once('../../../include/projektarbeit.class.php');
 
 $anzeigesprache = getSprache();
 $p = new phrasen($anzeigesprache);
@@ -85,13 +86,22 @@ else
 	$seitenanzahl = (isset($_POST['seitenanzahl'])?$_POST['seitenanzahl']:'-1');
 }
 
-//$user='if06b172';
-//$user='ti06m114';
 $user = get_uid();
 if($uid=='-1')
 {
 	exit;		
 }
+
+// Bei Studierenden pruefen ob die Uebergebene Projektarbeit zu dem Studierenden passt.
+$projektarbeit_obj = new projektarbeit();
+
+if(!$projektarbeit_obj->load($projektarbeit_id))
+	die('Ungueltiger Eintrag');
+
+$titel = $projektarbeit_obj->titel;
+$person = new person();
+$person->load($bid);
+$betreuer = $person->titelpre.' '.$person->vorname.' '.$person->nachname.' '.$person->titelpost;
 
 if($uid!=$user)
 {
@@ -121,8 +131,8 @@ if($uid!=$user)
 				JOIN lehre.tbl_projektbetreuer USING(projektarbeit_id) 
 				JOIN campus.vw_benutzer on(vw_benutzer.person_id=tbl_projektbetreuer.person_id)
 			WHERE
-				tbl_projektarbeit.student_uid='".addslashes($uid)."' AND
-				vw_benutzer.uid='".addslashes($user)."';";
+				tbl_projektarbeit.student_uid=".$db->db_add_param($uid)." AND
+				vw_benutzer.uid=".$db->db_add_param($user).";";
 	
 	if($result = $db->db_query($qry))
 	{
@@ -137,8 +147,13 @@ if($uid!=$user)
 		die($p->t('abgabetool/keineBerechtigungStudentenansicht'));
 	}
 }	
+else
+{
+	if($uid!=$projektarbeit_obj->student_uid)
+		die('Sie haben keine Berechtigung fuer diese Seite');
+}
 
-echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+echo '<!DOCTYPE HTML>
 	<html>
 	<head>
 		<title>'.$p->t('abgabetool/ueberschrift').'</title>
@@ -205,23 +220,24 @@ if($command=='add')
 	if(!$error)
 	{	
 		$qry_upd="UPDATE lehre.tbl_projektarbeit SET 
-				seitenanzahl = '".addslashes($seitenanzahl)."', 
+				seitenanzahl = ".$db->db_add_param($seitenanzahl).", 
 				abgabedatum = now(),
-				sprache = '".addslashes($sprache)."',  
-				kontrollschlagwoerter = '".addslashes($kontrollschlagwoerter)."', 
-				schlagwoerter_en = '".addslashes($schlagwoerter_en)."', 
-				schlagwoerter = '".addslashes($schlagwoerter)."',  
-				abstract = '".addslashes($abstract)."', 
-				abstract_en = '".addslashes($abstract_en)."' 
-				WHERE projektarbeit_id = '".addslashes($projektarbeit_id)."'";
+				sprache = ".$db->db_add_param($sprache).",  
+				kontrollschlagwoerter = ".$db->db_add_param($kontrollschlagwoerter).", 
+				schlagwoerter_en = ".$db->db_add_param($schlagwoerter_en).", 
+				schlagwoerter = ".$db->db_add_param($schlagwoerter).",  
+				abstract = ".$db->db_add_param($abstract).", 
+				abstract_en = ".$db->db_add_param($abstract_en)." 
+				WHERE projektarbeit_id = ".$db->db_add_param($projektarbeit_id, FHC_INTEGER);
 		
 		if($result=$db->db_query($qry_upd))
 		{
 			$qry="UPDATE campus.tbl_paabgabe SET
 							abgabedatum = now(),
-							updatevon = '".addslashes($user)."', 
+							updatevon = ".$db->db_add_param($user).", 
 							updateamum = now() 
-							WHERE paabgabe_id='".addslashes($paabgabe_id)."'";
+							WHERE paabgabe_id=".$db->db_add_param($paabgabe_id, FHC_INTEGER);
+			
 			if($db->db_query($qry))
 				echo '<font color="green">'.$p->t('global/erfolgreichgespeichert').'</font><br>';
 			$command="update";
@@ -255,9 +271,9 @@ if($command=="update" && $error!=true)
 
 					$qry="UPDATE campus.tbl_paabgabe SET
 						abgabedatum = now(),
-						updatevon = '".addslashes($user)."', 
+						updatevon = ".$db->db_add_param($user).", 
 						updateamum = now() 
-						WHERE paabgabe_id='".addslashes($paabgabe_id)."'";
+						WHERE paabgabe_id=".$db->db_add_param($paabgabe_id, FHC_INTEGER);
 					$result=$db->db_query($qry);
 					echo $p->t('global/dateiErfolgreichHochgeladen');
 				} 
@@ -284,65 +300,80 @@ if($command=="update" && $error!=true)
 					$result=$db->db_query($qry);*/
 
 					echo '<h2>'.$p->t('abgabetool/abgabeStudentenbereich').' - '.$p->t('abgabetool/abgabeZusatzdaten').'</h2>';
-					$qry_zd="SELECT * FROM lehre.tbl_projektarbeit WHERE projektarbeit_id='".addslashes($projektarbeit_id)."'";
-					$result_zd=@$db->db_query($qry_zd);
-					$row_zd=@$db->db_fetch_object($result_zd);
-					$htmlstr = "<div>".$p->t('abgabetool/betreuer').": <b>".$betreuer."</b><br>".$p->t('abgabetool/titel').": <b>".$titel."<b><br><br></div>\n";
-					$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
-					$htmlstr .= "<tr></tr>\n";
-					$htmlstr .= "<form accept-charset='UTF-8' action='".$_SERVER['PHP_SELF']."' method='POST' name='projektabgabe'>\n";
-					$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
-					$htmlstr .= "<input type='hidden' name='paabgabe_id' value='".$paabgabe_id."'>\n";
-					$htmlstr .= "<input type='hidden' name='paabgabetyp_kurzbz' value='".$paabgabetyp_kurzbz."'>\n";
-					$htmlstr .= "<input type='hidden' name='abgabedatum' value='".$abgabedatum."'>\n";
-					$htmlstr .= "<input type='hidden' name='titel' value='".$titel."'>\n";
-					$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
-					$htmlstr .= "<input type='hidden' name='betreuer' value='".$betreuer."'>\n";
-					$htmlstr .= "<input type='hidden' name='bid' value='".$bid."'>\n";
-					$htmlstr .= "<input type='hidden' name='command' value='add'>\n";
-					$htmlstr .= "<tr>\n";
-					$htmlstr .= "<td><b>".$p->t('abgabetool/spracheDerArbeit').":</b></td><td>";
-					$sprache = @$db->db_query("SELECT sprache FROM public.tbl_sprache");
-				    $num = $db->db_num_rows($sprache);
-				    if ($num > 0) 
-				    {
-				        $htmlstr .= "<SELECT NAME=\"sprache\" SIZE=1> \n";
-				        while ($mrow=@$db->db_fetch_object($sprache)) 
-				        {
-				            $htmlstr .= "<OPTION VALUE=\"$mrow->sprache\"";
-				            if ($mrow->sprache == $sprache) 
-	            			{
-	            				$htmlstr .= " SELECTED";
-	            			}
-				            $htmlstr .= ">$mrow->sprache \n";
-				        }
-				        $htmlstr .= "</SELECT> \n";
-				    }
-				    $htmlstr .= "</td></tr>\n";
-					$htmlstr .= "<tr><td width='30%'><b>".$p->t('abgabetool/kontrollierteSchlagwoerter').":*</b></td>
-								<td width='40%'><input  type='text' name='kontrollschlagwoerter'  id='kontrollschlagwoerter' value='".$kontrollschlagwoerter."' size='60' maxlength='150'></td>
-								<td  width='30%' align='left'><input type='button' name='SWD' value='    SWD    ' onclick='window.open(\"swd.php\")'></td></tr>\n";
-					$htmlstr .= "<tr><td><b>".$p->t('abgabetool/deutscheSchlagwoerter').":</b></td>
-								<td><input  type='text' name='schlagwoerter' value='".$schlagwoerter."' size='60' maxlength='150'></td></tr>\n";
-					$htmlstr .= "<tr><td><b>".$p->t('abgabetool/englischeSchlagwoerter').":</b></td>
-								<td><input  type='text' name='schlagwoerter_en' value='".$schlagwoerter_en."' size='60' maxlength='150'></td></tr>\n";
-					$htmlstr .= "<tr><td valign='top'><b>".$p->t('abgabetool/abstract')." </b>".$p->t('abgabetool/maxZeichen').":*</td>
-								<td><textarea name='abstract' cols='46'  rows='7'>$abstract</textarea></td></tr>\n";
-					$htmlstr .= "<tr><td valign='top'><b>".$p->t('abgabetool/abstractEng')."</b>".$p->t('abgabetool/maxZeichen').":*</td>
-								<td><textarea name='abstract_en' cols='46'  rows='7'>$abstract_en</textarea></td></tr>\n";
-					$htmlstr .= "<tr><td><b>".$p->t('abgabetool/seitenanzahl').":*</b></td>
-								<td><input  type='text' name='seitenanzahl' value='".$seitenanzahl."' size='5' maxlength='4'></td></tr>\n";
-					$htmlstr .="<tr><td>&nbsp;</td></tr>\n";
-					$htmlstr .="<tr><td colspan='2'><p align='justify'>".$p->t('abgabetool/eidesstattlicheErklaerung')."</p></td><td></td></tr>\n";
-					$htmlstr .= "<tr><td><b>".$p->t('abgabetool/gelesenUndAkzeptiert').":* <input type='checkbox' name='eiderklaerung'></b></td></tr>";
-					$htmlstr .="<tr></tr><td>&nbsp;</td><tr><td style='font-size:70%'>* ".$p->t('abgabetool/pflichtfeld')."</td></tr>
-								<tr><td>&nbsp;</td></tr>\n";
-					$htmlstr .= "<tr><td><input type='submit' name='schick' onclick='return checkEid();' value='".$p->t('global/abschicken')."'></td>";
-					$htmlstr .= "</tr>\n";
-					$htmlstr .= "</form>\n";
-					$htmlstr .= "</table>\n";
-					$htmlstr .= "</body></html>";
-					echo $htmlstr;
+					
+					$qry_zd="SELECT * FROM lehre.tbl_projektarbeit WHERE projektarbeit_id=".$db->db_add_param($projektarbeit_id, FHC_INTEGER);
+					
+					if($result_zd=@$db->db_query($qry_zd))
+					{
+						if($row_zd=@$db->db_fetch_object($result_zd))
+						{
+					
+							$htmlstr = "<div>".$p->t('abgabetool/betreuer').": <b>".$db->convert_html_chars($betreuer)."</b><br>".$p->t('abgabetool/titel').": <b>".$db->convert_html_chars($titel)."<b><br><br></div>\n";
+							$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
+							$htmlstr .= "<tr></tr>\n";
+							$htmlstr .= '<form accept-charset="UTF-8" action="'.htmlspecialchars($_SERVER['PHP_SELF']).'" method="POST" name="projektabgabe">'."\n";
+							$htmlstr .= '<input type="hidden" name="projektarbeit_id" value="'.$db->convert_html_chars($projektarbeit_id).'">'."\n";
+							$htmlstr .= '<input type="hidden" name="paabgabe_id" value="'.$db->convert_html_chars($paabgabe_id).'">'."\n";
+							$htmlstr .= '<input type="hidden" name="paabgabetyp_kurzbz" value="'.$db->convert_html_chars($paabgabetyp_kurzbz).'">'."\n";
+							$htmlstr .= '<input type="hidden" name="abgabedatum" value="'.$db->convert_html_chars($abgabedatum).'">'."\n";
+							$htmlstr .= '<input type="hidden" name="titel" value="'.$db->convert_html_chars($titel).'">'."\n";
+							$htmlstr .= '<input type="hidden" name="uid" value="'.$db->convert_html_chars($uid).'">'."\n";
+							$htmlstr .= '<input type="hidden" name="betreuer" value="'.$db->convert_html_chars($betreuer).'">'."\n";
+							$htmlstr .= '<input type="hidden" name="bid" value="'.$db->convert_html_chars($bid).'">'."\n";
+							$htmlstr .= '<input type="hidden" name="command" value="add">'."\n";
+							$htmlstr .= "<tr>\n";
+							$htmlstr .= "<td><b>".$p->t('abgabetool/spracheDerArbeit').":</b></td><td>";
+							$sprache = @$db->db_query("SELECT sprache FROM public.tbl_sprache");
+						    $num = $db->db_num_rows($sprache);
+						    if ($num > 0) 
+						    {
+						        $htmlstr .= "<SELECT NAME=\"sprache\" SIZE=1> \n";
+						        while ($mrow=@$db->db_fetch_object($sprache)) 
+						        {
+						            $htmlstr .= "<OPTION VALUE=\"$mrow->sprache\"";
+						            if ($mrow->sprache == $sprache) 
+			            			{
+			            				$htmlstr .= " SELECTED";
+			            			}
+						            $htmlstr .= ">$mrow->sprache \n";
+						        }
+						        $htmlstr .= "</SELECT> \n";
+						    }
+						    $htmlstr .= "</td></tr>\n";
+							$htmlstr .= '<tr><td width="30%"><b>'.$p->t('abgabetool/kontrollierteSchlagwoerter').':*</b></td>
+										<td width="40%"><input type="text" name="kontrollschlagwoerter" id="kontrollschlagwoerter" value="'.$db->convert_html_chars($kontrollschlagwoerter).'" size="60" maxlength="150"></td>
+										<td  width="30%" align="left"><input type="button" name="SWD" value="    SWD    " onclick="window.open(\'swd.php\')"></td></tr>'."\n";
+							$htmlstr .= '<tr><td><b>'.$p->t('abgabetool/deutscheSchlagwoerter').':</b></td>
+										<td><input  type="text" name="schlagwoerter" value="'.$db->convert_html_chars($schlagwoerter).'" size="60" maxlength="150"></td></tr>'."\n";
+							$htmlstr .= '<tr><td><b>'.$p->t('abgabetool/englischeSchlagwoerter').':</b></td>
+										<td><input type="text" name="schlagwoerter_en" value="'.$db->convert_html_chars($schlagwoerter_en).'" size="60" maxlength="150"></td></tr>'."\n";
+							$htmlstr .= '<tr><td valign="top"><b>'.$p->t('abgabetool/abstract').' </b>'.$p->t('abgabetool/maxZeichen').':*</td>
+										<td><textarea name="abstract" cols="46"  rows="7">'.$db->convert_html_chars($abstract).'</textarea></td></tr>'."\n";
+							$htmlstr .= '<tr><td valign="top"><b>'.$p->t('abgabetool/abstractEng').'</b>'.$p->t('abgabetool/maxZeichen').':*</td>
+										<td><textarea name="abstract_en" cols="46"  rows="7">'.$db->convert_html_chars($abstract_en).'</textarea></td></tr>'."\n";
+							$htmlstr .= '<tr><td><b>'.$p->t('abgabetool/seitenanzahl').':*</b></td>
+										<td><input  type="text" name="seitenanzahl" value="'.$db->convert_html_chars($seitenanzahl).'" size="5" maxlength="4"></td></tr>'."\n";
+							$htmlstr .="<tr><td>&nbsp;</td></tr>\n";
+							$htmlstr .="<tr><td colspan='2'><p align='justify'>".$p->t('abgabetool/eidesstattlicheErklaerung')."</p></td><td></td></tr>\n";
+							$htmlstr .= "<tr><td><b>".$p->t('abgabetool/gelesenUndAkzeptiert').":* <input type='checkbox' name='eiderklaerung'></b></td></tr>";
+							$htmlstr .="<tr></tr><td>&nbsp;</td><tr><td style='font-size:70%'>* ".$p->t('abgabetool/pflichtfeld')."</td></tr>
+										<tr><td>&nbsp;</td></tr>\n";
+							$htmlstr .= "<tr><td><input type='submit' name='schick' onclick='return checkEid();' value='".$p->t('global/abschicken')."'></td>";
+							$htmlstr .= "</tr>\n";
+							$htmlstr .= "</form>\n";
+							$htmlstr .= "</table>\n";
+							$htmlstr .= "</body></html>";
+							echo $htmlstr;
+						}
+						else
+						{
+							echo $p->t('global/dateiNichtErfolgreichHochgeladen');
+						}
+					}
+					else
+					{
+						echo $p->t('global/dateiNichtErfolgreichHochgeladen');
+					}
 				} 
 				else 
 				{
@@ -358,6 +389,7 @@ if($command=="update" && $error!=true)
 					JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
 					JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid) 
 					WHERE public.tbl_person.person_id=".$db->db_add_param($bid, FHC_INTEGER);
+				
 				if(!$betr=$db->db_query($qry_betr))
 				{
 					echo "<font color=\"#FF0000\">".$p->t('global/fehlerBeimLesenAusDatenbank')."</font><br>&nbsp;";
@@ -375,7 +407,7 @@ if($command=="update" && $error!=true)
 						{
 							$row_std=$db->db_fetch_object($result_std);
 							
-							$mail = new mail($row_betr->mitarbeiter_uid."@".DOMAIN, "vilesci@".DOMAIN, "Bachelor-/Masterarbeitsbetreuung",
+							$mail = new mail($row_betr->mitarbeiter_uid."@".DOMAIN, "no-reply@".DOMAIN, "Bachelor-/Masterarbeitsbetreuung",
 							"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\n".($row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)." hat eine Abgabe vorgenommen.\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Masterarbeitsabgabesystem generiertes Info-Mail\nCis->Mein CIS->Projektarbeiten->Bachelor- und Masterarbeitsabgabe\n--------------------------------------------------------------------------");
 							$mail->setReplyTo($user."@".DOMAIN);
 							if(!$mail->send())
@@ -404,7 +436,7 @@ if($command!="add" && $command!="update")
 	$command="update";
 }
 
-if($uid==-1||$projektarbeit_id==-1||$titel==-1)
+if($uid==-1||$projektarbeit_id==-1)
 {
 	//echo "Fehler bei der Daten&uuml;bergabe";
 	exit;
@@ -416,31 +448,33 @@ if($command!="add")
 
 	//Einlesen der Termine
 	$qry="";	
-	$htmlstr = "<div>".$p->t('abgabetool/betreuer').": <b>".$betreuer."</b><br>".$p->t('abgabetool/titel').": <b>".$titel."<b><br><br><b>".$p->t('abgabetool/abgabetermine').":</b></div>\n";
+	$htmlstr = "<div>".$p->t('abgabetool/betreuer').": <b>".$db->convert_html_chars($betreuer)."</b><br>".$p->t('abgabetool/titel').": <b>".$db->convert_html_chars($titel)."<b><br><br><b>".$p->t('abgabetool/abgabetermine').":</b></div>\n";
 	$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
 	$htmlstr .= "<tr></tr>\n";
-	$qry="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id='".addslashes($projektarbeit_id)."' AND paabgabetyp_kurzbz!='note' ORDER BY datum;";
+	
+	$qry="SELECT * FROM campus.tbl_paabgabe WHERE projektarbeit_id=".$db->db_add_param($projektarbeit_id, FHC_INTEGER)." AND paabgabetyp_kurzbz!='note' ORDER BY datum;";
+	
 	$htmlstr .= "<tr><td>".$p->t('abgabetool/fix')."</td><td>".$p->t('abgabetool/datum')." </td><td>".$p->t('abgabetool/abgabetyp')."</td><td>".$p->t('abgabetool/beschreibungAbgabe')."</td><td>".$p->t('abgabetool/abgegebenAm')."</td><td colspan='2'>".$p->t('abgabetool/dateiupload')."(<b>".$p->t('abgabetool/nurPDF')."</b>)</td><td></td></tr>\n";
 	$result=@$db->db_query($qry);
 		while ($row=@$db->db_fetch_object($result))
 		{
-			$htmlstr .= "<form accept-charset='UTF-8' action='".$_SERVER['PHP_SELF']."' method='POST' enctype='multipart/form-data' name='".$row->projektarbeit_id."'>\n";
-			$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$row->projektarbeit_id."'>\n";
-			$htmlstr .= "<input type='hidden' name='paabgabe_id' value='".$row->paabgabe_id."'>\n";
-			$htmlstr .= "<input type='hidden' name='paabgabetyp_kurzbz' value='".$row->paabgabetyp_kurzbz."'>\n";
-			$htmlstr .= "<input type='hidden' name='titel' value='".$titel."'>\n";
-			$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
-			$htmlstr .= "<input type='hidden' name='betreuer' value='".$betreuer."'>\n";
-			$htmlstr .= "<input type='hidden' name='command' value='update'>\n";
-			$htmlstr .= "<input type='hidden' name='kontrollschlagwoerter' value='".$kontrollschlagwoerter."'>\n";
-			$htmlstr .= "<input type='hidden' name='schlagwoerter' value='".$schlagwoerter."'>\n";
-			$htmlstr .= "<input type='hidden' name='schlagwoerter_en' value='".$schlagwoerter_en."'>\n";
-			$htmlstr .= "<input type='hidden' name='abstract' value='".$abstract."'>\n";
-			$htmlstr .= "<input type='hidden' name='abstract_en' value='".$abstract_en."'>\n";
-			$htmlstr .= "<input type='hidden' name='seitenanzahl' value='".$seitenanzahl."'>\n";
-			$htmlstr .= "<input type='hidden' name='sprache' value='".$sprache."'>\n";
-			$htmlstr .= "<input type='hidden' name='bid' value='".$bid."'>\n";
-			$htmlstr .= "<tr id='".$row->projektarbeit_id."'>\n";
+			$htmlstr .= '<form accept-charset="UTF-8" action="'.htmlspecialchars($_SERVER['PHP_SELF']).'" method="POST" enctype="multipart/form-data" name="'.$db->convert_html_chars($row->projektarbeit_id).'">'."\n";
+			$htmlstr .= '<input type="hidden" name="projektarbeit_id" value="'.$db->convert_html_chars($row->projektarbeit_id).'">'."\n";
+			$htmlstr .= '<input type="hidden" name="paabgabe_id" value="'.$db->convert_html_chars($row->paabgabe_id).'">'."\n";
+			$htmlstr .= '<input type="hidden" name="paabgabetyp_kurzbz" value="'.$db->convert_html_chars($row->paabgabetyp_kurzbz).'">'."\n";
+			$htmlstr .= '<input type="hidden" name="titel" value="'.$db->convert_html_chars($titel).'">'."\n";
+			$htmlstr .= '<input type="hidden" name="uid" value="'.$db->convert_html_chars($uid).'">'."\n";
+			$htmlstr .= '<input type="hidden" name="betreuer" value="'.$db->convert_html_chars($betreuer).'">'."\n";
+			$htmlstr .= '<input type="hidden" name="command" value="update">'."\n";
+			$htmlstr .= '<input type="hidden" name="kontrollschlagwoerter" value="'.$db->convert_html_chars($kontrollschlagwoerter).'">'."\n";
+			$htmlstr .= '<input type="hidden" name="schlagwoerter" value="'.$db->convert_html_chars($schlagwoerter).'">'."\n";
+			$htmlstr .= '<input type="hidden" name="schlagwoerter_en" value="'.$db->convert_html_chars($schlagwoerter_en).'">'."\n";
+			$htmlstr .= '<input type="hidden" name="abstract" value="'.$db->convert_html_chars($abstract).'">'."\n";
+			$htmlstr .= '<input type="hidden" name="abstract_en" value="'.$db->convert_html_chars($abstract_en).'">'."\n";
+			$htmlstr .= '<input type="hidden" name="seitenanzahl" value="'.$db->convert_html_chars($seitenanzahl).'">'."\n";
+			$htmlstr .= '<input type="hidden" name="sprache" value="'.$db->convert_html_chars($sprache).'">'."\n";
+			$htmlstr .= '<input type="hidden" name="bid" value="'.$db->convert_html_chars($bid).'">'."\n";
+			$htmlstr .= '<tr id="'.$db->convert_html_chars($row->projektarbeit_id).'">'."\n";
 			if(!$row->abgabedatum)
 			{
 				if ($row->datum<date('Y-m-d'))
@@ -488,7 +522,9 @@ if($command!="add")
 			}
 			$htmlstr .= "		</td>\n";
 			$htmlstr .= "		<td align='center' style='background-color:".$bgcol.";font-weight:bold; color:".$fcol."'>".$datum_obj->formatDatum($row->datum,'d.m.Y')."</td>\n";
-			$qry_typ="SELECT * FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".addslashes($row->paabgabetyp_kurzbz)."'";
+			
+			$qry_typ="SELECT * FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz=".$db->db_add_param($row->paabgabetyp_kurzbz);
+			
 			$result_typ=$db->db_query($qry_typ);
 			$row_typ=$db->db_fetch_object($result_typ);
 			$htmlstr .= "              <td>$row_typ->bezeichnung</td>\n";
