@@ -38,6 +38,7 @@ require_once('../../../include/kontakt.class.php');
 require_once('../../../include/fotostatus.class.php');
 require_once('../../../include/addon.class.php'); 
 require_once('../../../include/gruppe.class.php');
+require_once('../../../include/adresse.class.php');
 
 $sprache = getSprache(); 
 $p=new phrasen($sprache);
@@ -225,7 +226,7 @@ if(!$ansicht)
 		echo '<br><a href="'.$_SERVER['PHP_SELF'].'?action=foto_sperre" title="'.$p->t('profil/infotextSperre').'">'.$p->t('profil/fotosperren').'</a>';
 }
 	
-echo '</td><td width="30%">';
+echo '</td><td width="30%" valign="top">';
 
 echo '
 		<b>'.($type=="student"?$p->t("profil/student"):$p->t('profil/mitarbeiter')).'</b><br><br>
@@ -233,20 +234,56 @@ echo '
 		'.$p->t('global/titel').': '.$user->titelpre.' <br>
   		'.$p->t('global/vorname').': '.$user->vorname.'  '.$user->vornamen.'<br>
    		'.$p->t('global/nachname').': '.$user->nachname.'<br>
-  		'.$p->t('global/postnomen').': '.$user->titelpost.'<br>';
+  		'.$p->t('global/postnomen').': '.$user->titelpost.'<br><br>';
 		
 if(!$ansicht)
 {
 	echo '	'.$p->t('global/geburtsdatum').': '.$datum_obj->formatDatum($user->gebdatum,'d.m.Y')."<br>
-	".$p->t('global/geburtsort').": $user->gebort<br>";
+	".$p->t('global/geburtsort').": $user->gebort<br><br>";
         		
 }
+
+if(!$ansicht)
+{
+    $adresse = new adresse();
+    $adresse->load_pers($user->person_id);
+    
+    function sortAdresse($a , $b)
+    {
+	if($a->typ === $b->typ)
+	    return 0;
+	
+	return ($a->typ < $b->typ) ? -1 : 1;
+    }
+    usort($adresse->result, "sortAdresse");
+    foreach($adresse->result as $a)
+    {
+	switch ($a->typ)
+	{
+	    case "h":
+		$typ = $p->t("global/hauptwohnsitz");
+		break;
+	    case "n":
+		$typ = $p->t("global/nebenwohnsitz");
+		break;
+	    default:
+		$typ = NULL;
+		break;
+	}
+	if($typ !== NULL)
+	{
+	    echo "<b>".$typ.": </b><br>";
+	    echo $a->strasse."<br>".$a->plz." ".$a->ort."<br><br>";
+	}
+    }
+}
+
 $studiengang = new studiengang();
 if ($type=='student')
 {	
 	$studiengang->load($user->studiengang_kz);
 	
-	echo "<br>
+	echo "
 	".$p->t('global/studiengang').": $studiengang->bezeichnung<br>
 	".$p->t('global/semester').": $user->semester <a href='#' onClick='javascript:window.open(\"../stud_in_grp.php?kz=$user->studiengang_kz&sem=$user->semester\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\");return false;'>".$p->t('benotungstool/liste')."</a><br>
 	".$p->t('global/verband').": $user->verband ".($user->verband!=' '?"<a href='#' onClick='javascript:window.open(\"../stud_in_grp.php?kz=$user->studiengang_kz&sem=$user->semester&verband=$user->verband\",\"_blank\",\"width=600,height=500,location=no,menubar=no,status=no,toolbar=no,scrollbars=yes, resizable=1\");return false;'>".$p->t('benotungstool/liste')."</a>":"")."<br>
@@ -315,12 +352,47 @@ if(!$ansicht)
 	}
 	echo '<br><br>';
 }
-echo '<b>'.$p->t('profil/email').'</b><br><br>
+echo '<b>'.$p->t('profil/email').'</b><br>
     '.$p->t('profil/intern').': <a href="mailto:'.$user->uid.'@'.DOMAIN.'">'.$user->uid.'@'.DOMAIN.'</a><br>';
 
 if($user->alias!='' && (!isset($user->studiengang_kz) || !in_array($user->studiengang_kz,$noalias)))
 {
 	echo $p->t('profil/alias').": <a class='Item' href='mailto:$user->alias@".DOMAIN."'>$user->alias@".DOMAIN."</a>";
+}
+if(!$ansicht)
+{
+    function sortKontakt($a , $b)
+    {
+	if($a->kontakttyp === $b->kontakttyp)
+	    return 0;
+	
+	return ($a->kontakttyp < $b->kontakttyp) ? -1 : 1;
+    }
+    echo '<br><br><b>'.$p->t('profil/kontaktPrivat').'</b>';
+    $kontakt = new kontakt();
+    $kontakt->load_pers($user->person_id);    
+    usort($kontakt->result, "sortKontakt");
+
+    foreach($kontakt->result as $k)
+    {
+	if($k->zustellung === TRUE)
+	{
+	    switch($k->kontakttyp)
+	    {
+		case "email":
+		    echo '<br>'.$p->t('profil/email').': '.$k->kontakt;
+		    break;
+		case "mobil":
+		    echo '<br>'.$p->t('profil/mobil').': '.$k->kontakt;
+		    break;
+		case "telefon":
+		    echo '<br>'.$p->t('profil/telefon').': '.$k->kontakt;
+		    break;
+		default:
+		    break;
+	    }
+	}
+    }
 }
 
 if($user->homepage!='')
