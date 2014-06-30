@@ -327,6 +327,14 @@ else
 	echo "<td style='text-align:center; font-weight: bold'>Gesamt</td>";
 	echo "</tr>";
 
+	// Für jeden Fachbereich eine Variable definieren
+	foreach ($fachbereiche as $fb)
+	{
+		$summe_fb[$fb]["m"] = 0;
+		$summe_fb[$fb]["w"] = 0;
+	}
+	$summe_fb['betreuungen']['m'] = 0;
+	$summe_fb['betreuungen']['w'] = 0;
 	foreach ($data as $key=>$val)
 	{
 		echo "<tr>";
@@ -352,7 +360,6 @@ else
 			else
 				echo "<td>&nbsp;</td>";
 		}
-
 		if(isset($data[$key]['betreuungen']['m']))
 		{
 			echo "<td>".number_format($data[$key]['betreuungen']['m'],2)."</td>";

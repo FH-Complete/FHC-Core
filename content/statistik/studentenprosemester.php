@@ -290,9 +290,16 @@ else
 
 	//Für die Berechnung der Spaltensummen
 	$summe_m_[] = array();
-	$summe_m_[0] = 0;
 	$summe_w_[] = array();
-	$summe_w_[0] = 0;
+		//Pro Semester und Geschlecht eine Variable mit den Summen definieren
+		for ($i=1;$i<9;$i++)
+		{
+			$summe_m_[$i]= 0;
+			$summe_w_[$i]= 0;
+		}
+	$gesamtsumme = 0;
+	$gesamtsumme_m = 0;
+	$gesamtsumme_w = 0;
 	while($row = $db->db_fetch_object($result))
 	{
 		$summe_m = 0;
