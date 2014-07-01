@@ -22,6 +22,8 @@ require_once('../../../../include/ort.class.php');
 require_once('../../../../include/stunde.class.php');
 require_once('../../../../include/reservierung.class.php');
 require_once('../../../../include/mitarbeiter.class.php');
+require_once('../../../../include/pruefung.class.php');
+require_once('../../../../include/pruefungsfenster.class.php');
 
 
 $uid = get_uid();
@@ -30,7 +32,7 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
 $studiensemester = new studiensemester();
-$aktStudiensemester = $studiensemester->getakt();
+$aktStudiensemester = $studiensemester->getaktorNext();
 
 $method = isset($_REQUEST['method'])?$_REQUEST['method']:'';
 
@@ -73,7 +75,7 @@ switch($method)
 	    break;
 	case 'getPruefungenStudiengang':
 	    $studiensemester = new studiensemester();
-	    $data = getPruefungenStudiengang($uid, $studiensemester->getakt());
+	    $data = getPruefungenStudiengang($uid, $studiensemester->getaktorNext());
 	    break;
 	case 'saveKommentar':
 	    $data = saveKommentar();
@@ -333,55 +335,89 @@ function loadTermine()
 function saveAnmeldung($aktStudiensemester = null, $uid = null)
 {
     $termin = new pruefungstermin($_REQUEST["termin_id"]);
-    if($termin->teilnehmer_max > $termin->getNumberOfParticipants() || $termin->teilnehmer_max == NULL)
+    $pruefung = new pruefung();
+    $pruefung->getPruefungen($uid, NULL, $_REQUEST["lehrveranstaltung_id"]);
+    $anmeldung_moeglich = true;
+    foreach($pruefung->result as $prf)
     {
-	$pruefung = new pruefungCis();
-	$reihung = $pruefung->getLastOfReihung($_REQUEST["termin_id"]);
-	$anmeldung = new pruefungsanmeldung();
-	$anmeldung->lehrveranstaltung_id = $_REQUEST["lehrveranstaltung_id"];
-	$anmeldung->pruefungstermin_id = $_REQUEST["termin_id"];
-	$anmeldung->wuensche = $_REQUEST["bemerkung"];
-	$anmeldung->uid = $uid;
-	$anmeldung->reihung = $reihung+1;
-	$anmeldung->status_kurzbz = "angemeldet";
-	$lehrveranstaltung = new lehrveranstaltung($_REQUEST["lehrveranstaltung_id"]);
-
-	$konto = new konto();
-	$creditpoints = $konto->getCreditPoints($uid, $aktStudiensemester);
-	if($creditpoints !== false)
+	if($prf->note === '17')
 	{
-	    if($creditpoints < $lehrveranstaltung->ects)
+	    $pruefungsanmeldung = new pruefungsanmeldung($prf->pruefungsanmeldung_id);
+	    $pruefungstermin = new pruefungstermin($pruefungsanmeldung->pruefungstermin_id);
+	    $p = new pruefungCis($pruefungstermin->pruefung_id);
+	    $pruefungsfenster = new pruefungsfenster($p->pruefungsfenster_id);
+	    $studiensemester = new studiensemester();
+	    $stdsem = $studiensemester->getaktorNext();
+	    $i=0;
+	    while($i<2)
 	    {
-	    $data['error'] = 'true';
-	    $data['errormsg'] = 'Credit-Points-Guthaben ist zu gering.';
-	    return $data;
+		if($stdsem === $pruefungsfenster->studiensemester_kurzbz)
+		{
+		    $anmeldung_moeglich = false;
+		}
+		$stdsem = $studiensemester->getPreviousFrom($stdsem);
+		$i++;
 	    }
 	}
-
-	//Kollisionsprüfung
-	$anmeldungen = $anmeldung->getAnmeldungenByStudent($uid, $aktStudiensemester);
-	foreach($anmeldungen as $temp)
+    }
+    
+    if($anmeldung_moeglich)
+    {
+	if($termin->teilnehmer_max > $termin->getNumberOfParticipants() || $termin->teilnehmer_max == NULL)
 	{
-	    $datum = new datum();
-	    if(($datum->between($termin->von, $termin->bis, $temp->von)) || ($datum->between($termin->von, $termin->bis, $temp->bis)))
+	    $pruefung = new pruefungCis();
+	    $reihung = $pruefung->getLastOfReihung($_REQUEST["termin_id"]);
+	    $anmeldung = new pruefungsanmeldung();
+	    $anmeldung->lehrveranstaltung_id = $_REQUEST["lehrveranstaltung_id"];
+	    $anmeldung->pruefungstermin_id = $_REQUEST["termin_id"];
+	    $anmeldung->wuensche = $_REQUEST["bemerkung"];
+	    $anmeldung->uid = $uid;
+	    $anmeldung->reihung = $reihung+1;
+	    $anmeldung->status_kurzbz = "angemeldet";
+	    $lehrveranstaltung = new lehrveranstaltung($_REQUEST["lehrveranstaltung_id"]);
+
+	    $konto = new konto();
+	    $creditpoints = $konto->getCreditPoints($uid, $aktStudiensemester);
+	    if($creditpoints !== false)
 	    {
-		$data['result'][$temp->pruefungstermin_id] = "true";
+		if($creditpoints < $lehrveranstaltung->ects)
+		{
 		$data['error'] = 'true';
-		$data['errormsg'] = 'Kollision mit anderer Anmeldung.';
+		$data['errormsg'] = 'Credit-Points-Guthaben ist zu gering.';
+		return $data;
+		}
+	    }
+
+	    //Kollisionsprüfung
+	    $anmeldungen = $anmeldung->getAnmeldungenByStudent($uid, $aktStudiensemester);
+	    foreach($anmeldungen as $temp)
+	    {
+		$datum = new datum();
+		if(($datum->between($termin->von, $termin->bis, $temp->von)) || ($datum->between($termin->von, $termin->bis, $temp->bis)))
+		{
+		    $data['result'][$temp->pruefungstermin_id] = "true";
+		    $data['error'] = 'true';
+		    $data['errormsg'] = 'Kollision mit anderer Anmeldung.';
+		}
+	    }
+	    if(isset($data['error']) && $data['error'] = 'true')
+	    {
+		return $data;
 	    }
 	}
-	if(isset($data['error']) && $data['error'] = 'true')
+	else
 	{
+	    $data['error']='true';
+	    $data['errormsg']='Keine freien Plätze vorhanden.';
 	    return $data;
 	}
     }
     else
     {
 	$data['error']='true';
-	$data['errormsg']='Keine freien Plätze vorhanden.';
+	$data['errormsg']='Anmeldung auf Grund von Sperre nicht möglich.';
 	return $data;
     }
-
     if($anmeldung->save(true))
     {
 	$data['result'] = "Anmeldung erfolgreich!";

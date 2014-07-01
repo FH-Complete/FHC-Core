@@ -173,7 +173,7 @@ $studiensemester->getAll();
 	    echo '<h3>Filter</h3>';
 	    echo '<p>Studiensemester: ';
 	    echo '<select id="filter_studiensemester" onchange="refresh();">';
-	    $aktuellesSemester = $studiensemester->getakt();
+	    $aktuellesSemester = $studiensemester->getaktorNext();
 	    foreach($studiensemester->studiensemester as $sem)
 	    {
 		if($aktuellesSemester == $sem->studiensemester_kurzbz)

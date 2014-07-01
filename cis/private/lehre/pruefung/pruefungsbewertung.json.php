@@ -22,7 +22,7 @@ $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
 $studiensemester = new studiensemester();
-$aktStudiensemester = $studiensemester->getakt();
+$aktStudiensemester = $studiensemester->getaktorNext();
 
 $method = isset($_REQUEST['method'])?$_REQUEST['method']:'';
 
