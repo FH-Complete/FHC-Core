@@ -333,6 +333,7 @@ class pruefung extends basis_db
 			    $obj->lehrveranstaltung_bezeichnung = $row->lehrveranstaltung_bezeichnung;
 			    $obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 			    $obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+			    $obj->pruefungsanmeldung_id = $row->pruefungsanmeldung_id;
 
 			    $this->result[] = $obj;
 		    }

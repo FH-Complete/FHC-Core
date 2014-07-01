@@ -41,7 +41,7 @@ $rechte->getBerechtigungen($uid);
 
 $studiensemester = new studiensemester();
 $lehrveranstaltung = new lehrveranstaltung();
-$lehrveranstaltung->loadLVAfromMitarbeiter(0, $uid, $studiensemester->getakt());
+$lehrveranstaltung->loadLVAfromMitarbeiter(0, $uid, $studiensemester->getaktorNext());
 if(empty($lehrveranstaltung->lehrveranstaltungen) && !$rechte->isBerechtigt('lehre/pruefungsterminAdmin'))
     die('Sie haben keine Berechtigung für diese Seite');
 

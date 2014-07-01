@@ -213,7 +213,7 @@ class lehreinheit extends basis_db
 		if($fachbereich_kurzbz!='')
 			$qry .= " AND EXISTS ( SELECT 1 FROM lehre.tbl_lehrveranstaltung JOIN public.tbl_fachbereich USING(oe_kurzbz) WHERE fachbereich_kurzbz=".$this->db_add_param($fachbereich_kurzbz)." AND lehrveranstaltung_id=tbl_lehreinheit.lehrfach_id)";
 
-		$qry.= "ORDER BY lehreinheit_id;";
+		$qry.= " ORDER BY lehreinheit_id;";
 		
 		if($this->db_query($qry))
 		{

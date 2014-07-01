@@ -41,7 +41,7 @@ $rechte->getBerechtigungen($uid);
 
 $studiensemester = new studiensemester();
 $pruefung = new pruefungCis();
-$pruefung->getPruefungByMitarbeiter($uid, $studiensemester->getakt());
+$pruefung->getPruefungByMitarbeiter($uid, $studiensemester->getaktorNext());
 if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungAdmin'))
     die('Sie haben keine Berechtigung für diese Seite');
 

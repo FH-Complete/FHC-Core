@@ -30,12 +30,12 @@ switch($method)
 	break;
     case 'loadStudiensemester':
 	$studiensemester = new studiensemester();
-	$aktStudiensemester = $studiensemester->getakt();
+	$aktStudiensemester = $studiensemester->getaktorNext();
 	$data = loadStudiensemester($aktStudiensemester);
 	break;
     case 'getPruefungsfensterByStudiensemester':
 	$studiensemester = new studiensemester();
-	$aktStudiensemester = $studiensemester->getakt();
+	$aktStudiensemester = $studiensemester->getaktorNext();
 	$studiensemester_kurzbz = isset($_REQUEST["studiensemester_kurzbz"]) ? $_REQUEST["studiensemester_kurzbz"] : $aktStudiensemester;
 	$data = getPruefungsfensterByStudiensemester($studiensemester_kurzbz, $aktStudiensemester);
 	break;
