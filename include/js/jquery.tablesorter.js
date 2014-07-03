@@ -745,8 +745,7 @@
 	ts.addParser({
 		id: "DatummitUhrzeit",
 		is: function(s) {
-			alert("CHECK");
-			return s.match(new RegExp(/^[0-9]{1,2}.[0-9]{1,2}.[0-9]{4} ( (([0-2]?[0-9]:[0-5][0-9])|([0-1]?[0-9]:[0-5][0-9]))$/));
+			return s.match(new RegExp(/^[0-9]{1,2}.[0-9]{1,2}.[0-9]{4} (([0-2]?[0-9]:[0-5][0-9])|([0-1]?[0-9]:[0-5][0-9]))$/));
 		},
 		format: function(s) {
 			return $.tablesorter.formatFloat(new Date(s).getTime());

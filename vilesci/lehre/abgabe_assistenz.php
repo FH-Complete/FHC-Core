@@ -34,13 +34,15 @@ require_once('../../include/benutzer.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/variable.class.php');
+require_once('../../include/phrasen.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 			
 if (!$getuid = get_uid())
 	die('Keine UID gefunden !  <a href="javascript:history.back()">Zur&uuml;ck</a>');
-				
+
+$p=new phrasen(DEFAULT_LANGUAGE);				
 $htmlstr = "";
 $erstbegutachter='';
 $zweitbegutachter='';
@@ -92,7 +94,7 @@ $sql_query = "SELECT *,
 			WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
 			AND public.tbl_benutzer.aktiv 
 			AND lehre.tbl_projektarbeit.note IS NULL 
-			AND public.tbl_studiengang.studiengang_kz='$stg_kz'   
+			AND public.tbl_studiengang.studiengang_kz=".$db->db_add_param($stg_kz)."
 			ORDER BY tbl_projektarbeit.projektarbeit_id desc) as xy 
 		ORDER BY nachname";
 
@@ -142,7 +144,7 @@ else
 		FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
 		LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
 		LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid)    
-		WHERE projektarbeit_id='$row->projektarbeit_id' 
+		WHERE projektarbeit_id=".$db->db_add_param($row->projektarbeit_id, FHC_INTEGER)."
 		AND (tbl_projektbetreuer.betreuerart_kurzbz='Erstbegutachter' OR tbl_projektbetreuer.betreuerart_kurzbz='Betreuer')
 		UNION
 		SELECT '' as first, trim(COALESCE(nachname,'')||', '||COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(titelpost,'')) as second, 
@@ -151,7 +153,7 @@ else
 		FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
 		LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
 		LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid) 
-		WHERE projektarbeit_id='$row->projektarbeit_id' 
+		WHERE projektarbeit_id=".$db->db_add_param($row->projektarbeit_id, FHC_INTEGER)."
 		AND tbl_projektbetreuer.betreuerart_kurzbz='Zweitbegutachter'
 		";
 
@@ -199,10 +201,10 @@ else
 		$htmlstr .= "   <tr >\n";//class='liste".($i%2)."'
 		$htmlstr .= "		<td><input type='checkbox' id='mc_".$row->projektarbeit_id."' name='mc_".$row->projektarbeit_id."' ></td>";
 		//Anzeige 
-		$qry_end="SELECT * FROM campus.tbl_paabgabe WHERE paabgabetyp_kurzbz='end' AND projektarbeit_id='$row->projektarbeit_id' ORDER BY datum DESC";
+		$qry_end="SELECT * FROM campus.tbl_paabgabe WHERE paabgabetyp_kurzbz='end' AND projektarbeit_id=".$db->db_add_param($row->projektarbeit_id, FHC_INTEGER)." ORDER BY datum DESC";
 		if(!$result_end=$db->db_query($qry_end))
 		{
-			$htmlstr .= "       <td><a href='abgabe_assistenz_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&erst=".$mituid."&p2id=".$p2id."&titel=".$row->titel."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";
+			$htmlstr .= "       <td><a href='abgabe_assistenz_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&erst=".$mituid."&p2id=".$p2id."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";
 		}
 		else
 		{
@@ -239,30 +241,30 @@ else
 					}
 					if($bgcol!='')
 					{
-						$htmlstr .= "       <td style='background-color:".$bgcol."'><a href='abgabe_assistenz_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&erst=".$mituid."&p2id=".$p2id."&titel=".$row->titel."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";
+						$htmlstr .= "       <td style='background-color:".$bgcol."'><a href='abgabe_assistenz_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&erst=".$mituid."&p2id=".$p2id."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";
 					}
 					else 
 					{
-						$htmlstr .= "       <td><a href='abgabe_assistenz_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&erst=".$mituid."&p2id=".$p2id."&titel=".$row->titel."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";				
+						$htmlstr .= "       <td><a href='abgabe_assistenz_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&erst=".$mituid."&p2id=".$p2id."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";				
 					}
 				}
 				else 
 				{
-					$htmlstr .= "       <td><a href='abgabe_assistenz_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&erst=".$mituid."&p2id=".$p2id."&titel=".$row->titel."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";				
+					$htmlstr .= "       <td><a href='abgabe_assistenz_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&erst=".$mituid."&p2id=".$p2id."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";				
 				}
 			}
 			else 
 			{
-				$htmlstr .= "       <td><a href='abgabe_assistenz_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&erst=".$mituid."&p2id=".$p2id."&titel=".$row->titel."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";				
+				$htmlstr .= "       <td><a href='abgabe_assistenz_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&erst=".$mituid."&p2id=".$p2id."' target='al_detail' title='Details anzeigen'>".$row->uid."</a></td>\n";				
 			}
 		}
 		$htmlstr .= "	    <td align= center><input type='hidden' name='st_".$row->projektarbeit_id."' value='$row->uid@".DOMAIN."'><a href='mailto:$row->uid@".DOMAIN."?subject=Betreuung ".$row->prjbez." bei Studiengang $row->stgbez'><img src='../../skin/images/email.png' alt='email' title='Email an StudentIn'></a></td>";
-		$htmlstr .= "       <td>".$row->studiensemester_kurzbz."</td>\n";
-		$htmlstr .= "       <td>".$row->vorname."</td>\n";
-		$htmlstr .= "       <td>".$row->nachname."</td>\n";
-		$htmlstr .= "       <td>".$row->organisationsform."</td>\n";
-		$htmlstr .= "       <td>".$row->prjbez."</td>\n";
-		$htmlstr .= "       <td>".$row->titel."</td>\n";
+		$htmlstr .= "       <td>".$db->convert_html_chars($row->studiensemester_kurzbz)."</td>\n";
+		$htmlstr .= "       <td>".$db->convert_html_chars($row->vorname)."</td>\n";
+		$htmlstr .= "       <td>".$db->convert_html_chars($row->nachname)."</td>\n";
+		$htmlstr .= "       <td>".$db->convert_html_chars($row->organisationsform)."</td>\n";
+		$htmlstr .= "       <td>".$db->convert_html_chars($row->prjbez)."</td>\n";
+		$htmlstr .= "       <td>".$db->convert_html_chars($row->titel)."</td>\n";
 		
 		//$htmlstr.="<a href='mailto:$row->uid@".DOMAIN."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung%20von%20".$row->vorname."%20".$row->nachname."'>
 		//<img src='../../../skin/images/email.png' alt='email' title='Email an Betreuer schreiben'></a>";
@@ -289,8 +291,8 @@ else
 		$i++;
 	}
 	$htmlstr .= "</tbody></table>\n";
-	$htmlstr .= "<input type='hidden' name='stg_kz' value='".$stg_kz."'>\n";
-	$htmlstr .= "<input type='hidden' name='p2id' value='".$p2id."'>\n";
+	$htmlstr .= '<input type="hidden" name="stg_kz" value="'.$db->convert_html_chars($stg_kz).'">';
+	$htmlstr .= '<input type="hidden" name="p2id" value="'.$db->convert_html_chars($p2id).'">';
 	$htmlstr .= "<table width='100%'><tr><td>";
 	$htmlstr .= "<table><tr><td><input type='checkbox' name='alle' id='alle' onclick='markiere()'> alle markieren  </td></tr><tr><td>&nbsp;</td></tr><tr>\n";
 	$htmlstr .= "<td rowspan=2><input type='submit' name='multi' value='Terminserie anlegen' title='Termin f&uuml;r mehrere Personen anlegen.'></td>";
@@ -308,8 +310,6 @@ else
 <title>Abgabesystem_Assistenzsicht</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<!-- <link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css"> -->
-<!-- <script src="../../include/js/tablesort/table.js" type="text/javascript"></script> -->
 <link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
 <script type="text/javascript" src="../../include/js/jquery.js"></script> 
 <script language="JavaScript" type="text/javascript">
@@ -429,7 +429,7 @@ function btserienmail(trenner, stgbez)
 
 <body class="background_main">
 <?php 
-echo "<h2><div style='float:left'>Bachelor-/Diplomarbeitsbetreuungen (Studiengang $stg_kz, $stgbez)</div><div style='text-align: right;'><a href='../../cms/dms.php?id=963' target='_blank'><img src='../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0>&nbsp;Handbuch</a></div></h2>";
+echo "<h2><div style='float:left'>Bachelor-/Masterarbeitsbetreuungen (Studiengang $stg_kz, $stgbez)</div><div style='text-align: right;'><a href='../../cms/dms.php?id=".$p->t('dms_link/abgabetoolAssistenzHandbuch')."' target='_blank'><img src='../../skin/images/information.png' alt='Anleitung' title='Anleitung BaDa-Abgabe' border=0>&nbsp;Handbuch</a></div></h2>";
 
 echo $htmlstr;
 ?>

@@ -47,7 +47,13 @@ $htmlstr = "";
 
 $showall=isset($_GET['showall']);
 	
-$sql_query = "SELECT * FROM (SELECT * FROM lehre.tbl_projektarbeit LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id) 
+$sql_query = "SELECT 
+				*
+			FROM 
+			(SELECT tbl_person.vorname, tbl_person.nachname, tbl_studiengang.typ, tbl_studiengang.kurzbz,
+			tbl_projektarbeit.projekttyp_kurzbz, tbl_projektarbeit.titel, tbl_projektarbeit.projektarbeit_id,
+			tbl_projektbetreuer.betreuerart_kurzbz, tbl_benutzer.uid, tbl_student.matrikelnr, tbl_lehreinheit.studiensemester_kurzbz
+			 FROM lehre.tbl_projektarbeit LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id) 
 			LEFT JOIN public.tbl_benutzer on(uid=student_uid)
 			LEFT JOIN public.tbl_student on(public.tbl_benutzer.uid=public.tbl_student.student_uid)
 			LEFT JOIN public.tbl_person on(tbl_benutzer.person_id=tbl_person.person_id)
@@ -57,7 +63,7 @@ $sql_query = "SELECT * FROM (SELECT * FROM lehre.tbl_projektarbeit LEFT JOIN leh
 			WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
 			AND tbl_projektbetreuer.person_id IN (SELECT person_id FROM public.tbl_benutzer 
 				WHERE public.tbl_benutzer.person_id=lehre.tbl_projektbetreuer.person_id 
-				AND public.tbl_benutzer.uid='".addslashes($getuid)."')
+				AND public.tbl_benutzer.uid=".$db->db_add_param($getuid).")
 			".($showall?'':' AND public.tbl_benutzer.aktiv AND lehre.tbl_projektarbeit.note IS NULL ')."
 			AND (betreuerart_kurzbz='Betreuer' OR betreuerart_kurzbz='Begutachter' OR betreuerart_kurzbz='Erstbegutachter' 
 				OR betreuerart_kurzbz='Zweitbegutachter' OR betreuerart_kurzbz='Erstbetreuer') 
@@ -88,15 +94,15 @@ else
 	{
 		$htmlstr .= "   <tr>\n"; //class='liste".($i%2)."'
 		$htmlstr .= "		<td><input type='checkbox' name='mc_".$row->projektarbeit_id."' ></td>";
-		$htmlstr .= "       <td><a href='abgabe_lektor_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&titel=".$row->titel."&betreuerart=".$row->betreuerart_kurzbz."' target='al_detail' title='Details anzeigen'>".$row->uid."</a> / ".$row->matrikelnr."</td>\n";
+		$htmlstr .= "       <td><a href='abgabe_lektor_details.php?uid=".$row->uid."&projektarbeit_id=".$row->projektarbeit_id."&betreuerart=".$row->betreuerart_kurzbz."' target='al_detail' title='Details anzeigen'>".$row->uid."</a> / ".$row->matrikelnr."</td>\n";
 		$htmlstr .= "	    <td align= center><a href='mailto:$row->uid@".DOMAIN."?subject=".$row->projekttyp_kurzbz."arbeitsbetreuung'><img src='../../../skin/images/email.png' alt='email' title='Email an Studenten'></a></td>";
-		$htmlstr .= "       <td>".$row->vorname."</td>\n";
-		$htmlstr .= "       <td>".$row->nachname."</td>\n";
-		$htmlstr .= "       <td>".$row->projekttyp_kurzbz."</td>\n";
+		$htmlstr .= "       <td>".$db->convert_html_chars($row->vorname)."</td>\n";
+		$htmlstr .= "       <td>".$db->convert_html_chars($row->nachname)."</td>\n";
+		$htmlstr .= "       <td>".$db->convert_html_chars($row->projekttyp_kurzbz)."</td>\n";
 		$htmlstr .= "       <td>".strtoupper($row->typ.$row->kurzbz)."</td>\n";
-		$htmlstr .= "       <td>".$row->studiensemester_kurzbz."</td>\n";
-		$htmlstr .= "       <td>".$row->titel."</td>\n";
-		$htmlstr .= "       <td>".$row->betreuerart_kurzbz."</td>\n";
+		$htmlstr .= "       <td>".$db->convert_html_chars($row->studiensemester_kurzbz)."</td>\n";
+		$htmlstr .= "       <td>".$db->convert_html_chars($row->titel)."</td>\n";
+		$htmlstr .= "       <td>".$db->convert_html_chars($row->betreuerart_kurzbz)."</td>\n";
 		$htmlstr .= "   </tr>\n";
 		$i++;
 	}

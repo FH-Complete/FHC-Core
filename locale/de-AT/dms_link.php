@@ -9,6 +9,7 @@ $this->phrasen['dms_link/moodleHandbuch']='33'; //Moodle Handbuch
 $this->phrasen['dms_link/moodleHandbuch24']='1426'; //Moodle Handbuch
 $this->phrasen['dms_link/abgabetoolLektorHandbuch']='28'; //Abgabetool Handbuch fuer LektorInnen
 $this->phrasen['dms_link/abgabetoolStudentHandbuch']='27'; //Abgabetool Handbuch fuer Studierende
+$this->phrasen['dms_link/abgabetoolAssistenzHandbuch']='28'; //Abgabetool Handbuch fuer Studierende
 $this->phrasen['dms_link/iconPDF']='46'; //PDF Icon
 $this->phrasen['dms_link/bedienungsanleitungMailverteiler']='1474'; //Bedienungsanleitung Mailverteiler
 $this->phrasen['dms_link/berechtigungskonzeptMailverteiler']='1475'; //Berechtigungskonzept Mailverteiler

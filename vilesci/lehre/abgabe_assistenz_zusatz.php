@@ -94,42 +94,65 @@ $rechte->getBerechtigungen($user);
 $htmlstr='';
 
 	echo '
-					<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-					<html>
-					<head>
-					<title>Zusatzdaten PA-Abgabe</title>
-					<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-					<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-					<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-					<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
-					</head>
-					<body class="Background_main"  style="background-color:#eeeeee;">
-					<h3>Abgabe Zusatzdaten</h3>';
-					$row_zd='';
-					$qry_zd="SELECT * FROM lehre.tbl_projektarbeit WHERE projektarbeit_id='".$projektarbeit_id."'";
-					if ($result_zd=$db->db_query($qry_zd))
-						$row_zd=$db->db_fetch_object($result_zd);
-					
-					$htmlstr = "<div>Student: <b>".$uid."</b><br>Titel: <b>".(isset($row_zd->titel)?$row_zd->titel:'')."<b><br><br></div>\n";
-					$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
-					$htmlstr .= "<tr></tr>\n";
-					$htmlstr .= "<tr>\n";
-					$htmlstr .= "<td><b>Sprache der Arbeit:</b></td><td>";
-					$htmlstr .= "<input  type='text' name='sprache'  id='sprache' value='".(isset($row_zd->sprache)?$row_zd->sprache:'')."' size='10' maxlength='8' readonly='readonly'>";
-				    $htmlstr .= "</td></tr>\n";
-					$htmlstr .= "<tr><td width='30%'><b>Kontrollierte Schlagw&ouml;rter:*</b></td><td width='40%'><input  type='text' name='kontrollschlagwoerter'  id='kontrollschlagwoerter' value='".(isset($row_zd->kontrollschlagwoerter)?$row_zd->kontrollschlagwoerter:'')."' size='60' maxlength='150' readonly='readonly'></td></tr>\n";
-					$htmlstr .= "<tr><td><b>Dt. Schlagw&ouml;rter:</b></td><td><input  type='text' name='schlagwoerter' value='".(isset($row_zd->schlagwoerter)?$row_zd->schlagwoerter:'')."' size='60' maxlength='150' readonly='readonly'></td></tr>\n";
-					$htmlstr .= "<tr><td><b>Engl. Schlagw&ouml;rter:</b></td><td><input  type='text' name='schlagwoerter_en' value='".(isset($row_zd->schlagwoerter_en)?$row_zd->schlagwoerter_en:'')."' size='60' maxlength='150' readonly='readonly'></td></tr>\n";
-					$htmlstr .= "<tr><td valign='top'><b>Abstract </b>(max. 5000 Zeichen):*</td><td><textarea name='abstract' cols='46' rows='7' readonly='readonly'>".(isset($row_zd->abstract)?$row_zd->abstract:'')."</textarea></td></tr>\n";
-					$htmlstr .= "<tr><td valign='top'><b>Abstract engl.</b>(max. 5000 Zeichen):*</td><td><textarea name='abstract_en' cols='46'  rows='7' readonly='readonly'>".(isset($row_zd->abstract_en)?$row_zd->abstract_en:'')."</textarea></td></tr>\n";
-					$htmlstr .= "<tr><td><b>Seitenanzahl:*</b></td><td><input type='text' name='seitenanzahl' value='".(isset($row_zd->seitenanzahl)?$row_zd->seitenanzahl:'')."' size='5' maxlength='4' readonly='readonly'></td></tr>\n";
-					$htmlstr .= "</tr>\n";
-					$htmlstr .= "</table><table>";
-					$htmlstr .= "<tr></tr><td>&nbsp;</td><tr><td style='font-size:70%'>* Pflichtfeld</td></tr><tr><td>&nbsp;</td></tr>\n";
-					$htmlstr .= "</table>\n";	
-					$htmlstr .= "</body></html>";
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>Zusatzdaten PA-Abgabe</title>
+<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+</head>
+<body class="Background_main"  style="background-color:#eeeeee;">
+<h3>Abgabe Zusatzdaten</h3>';
+$row_zd='';
+$qry_zd="SELECT * FROM lehre.tbl_projektarbeit WHERE projektarbeit_id='".$projektarbeit_id."'";
+if ($result_zd=$db->db_query($qry_zd))
+	$row_zd=$db->db_fetch_object($result_zd);
 
-	echo $htmlstr;
-	echo '</body></html>';
+echo '<div>Student: <b>'.$uid.'</b><br>Titel: <b>'.
+	(isset($row_zd->titel)?$db->convert_html_chars($row_zd->titel):'').'<b><br><br></div>
+
+<table class="detail" style="padding-top:10px;">
+<tr></tr>
+<tr>
+	<td><b>Sprache der Arbeit:</b></td>
+	<td><input type="text" name="sprache" id="sprache" value="'.(isset($row_zd->sprache)?$db->convert_html_chars($row_zd->sprache):'').'" size="10" maxlength="8" readonly="readonly"></td>
+</tr>
+<tr>
+	<td width="30%"><b>Kontrollierte Schlagw&ouml;rter:*</b></td>
+	<td width="40%"><input type="text" name="kontrollschlagwoerter" id="kontrollschlagwoerter" value="'.(isset($row_zd->kontrollschlagwoerter)?$db->convert_html_chars($row_zd->kontrollschlagwoerter):'').'" size="60" maxlength="150" readonly="readonly"></td>
+</tr>
+<tr>
+	<td><b>Dt. Schlagw&ouml;rter:</b></td>
+	<td><input type="text" name="schlagwoerter" value="'.(isset($row_zd->schlagwoerter)?$db->convert_html_chars($row_zd->schlagwoerter):'').'" size="60" maxlength="150" readonly="readonly"></td>
+</tr>
+<tr>
+	<td><b>Engl. Schlagw&ouml;rter:</b></td>
+	<td><input  type="text" name="schlagwoerter_en" value="'.(isset($row_zd->schlagwoerter_en)?$db->convert_html_chars($row_zd->schlagwoerter_en):'').'" size="60" maxlength="150" readonly="readonly"></td>
+</tr>
+<tr>
+	<td valign="top"><b>Abstract </b>(max. 5000 Zeichen):*</td>
+	<td><textarea name="abstract" cols="46" rows="7" readonly="readonly">'.(isset($row_zd->abstract)?$db->convert_html_chars($row_zd->abstract):'').'</textarea></td>
+</tr>
+<tr>
+	<td valign="top"><b>Abstract engl.</b>(max. 5000 Zeichen):*</td>
+	<td><textarea name="abstract_en" cols="46"  rows="7" readonly="readonly">'.(isset($row_zd->abstract_en)?$db->convert_html_chars($row_zd->abstract_en):'').'</textarea></td>
+</tr>
+<tr>
+	<td><b>Seitenanzahl:*</b></td>
+	<td><input type="text" name="seitenanzahl" value="'.(isset($row_zd->seitenanzahl)?$db->convert_html_chars($row_zd->seitenanzahl):'').'" size="5" maxlength="4" readonly="readonly"></td>
+</tr>
+</table>
+<table>
+<tr>
+	<td>&nbsp;</td>
+</tr>
+<tr>
+	<td style="font-size:70%">* Pflichtfeld</td>
+</tr>
+<tr><td>&nbsp;</td></tr>
+</table>
+</body></html>';
 
 ?>

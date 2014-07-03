@@ -41,6 +41,13 @@ $p = new phrasen($anzeigesprache);
 if (!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
 
+// Wenn die Datei zu gross ist, dann ist FILES und POST leer
+if(empty($_FILES) && empty($_POST) && isset($_SERVER['REQUEST_METHOD']) && strtolower($_SERVER['REQUEST_METHOD'])=='post')
+{
+	echo $p->t('abgabetool/dateiZuGross');
+	exit;
+}
+
 if(!isset($_POST['uid']))
 {
 	$uid = (isset($_GET['uid'])?$_GET['uid']:'-1');
@@ -87,7 +94,7 @@ else
 }
 
 $user = get_uid();
-if($uid=='-1')
+if($uid=='-1' || $projektarbeit_id=='-1')
 {
 	exit;		
 }
@@ -259,7 +266,8 @@ if($command=="update" && $error!=true)
 	//Dateiupload bearbeiten
 	if ((isset($_FILES) and isset($_FILES['datei']) and ! $_FILES['datei']['error']))
 	{
-		if(strtoupper(end(explode(".", $_FILES['datei']['name'])))=='PDF')
+		$extensions = explode(".", $_FILES['datei']['name']);
+		if(strtoupper(end($extensions))=='PDF')
 		{
 			if($paabgabetyp_kurzbz!='end')
 			{

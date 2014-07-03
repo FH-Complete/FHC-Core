@@ -49,6 +49,7 @@ $this->phrasen['abgabetool/nurPDF']='nur PDF bis max. 15 MB';
 $this->phrasen['abgabetool/terminVorbei']='Termin vorbei';
 $this->phrasen['abgabetool/projektabgabeUebersicht']='Projektabgabe - Übersicht';
 $this->phrasen['abgabetool/termin']='Termin';
+$this->phrasen['abgabetool/terminVorhanden']='Dieser Termin ist bereits vohanden';
 
 $this->phrasen['abgabetool/keineTermineVorhanden']='Derzeit sind keine Termine vorhanden';
 $this->phrasen['abgabetool/TeminVorhanden']='Dieser Termin ist bereits vorhanden';

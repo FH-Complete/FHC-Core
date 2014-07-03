@@ -168,7 +168,7 @@ else
 		
 		$pdf->MultiCell(0,15,'Beurteilung Bachelorarbeit');
 	
-		$qry_beu="SELECT * FROM public.tbl_person JOIN public.tbl_benutzer using(person_id) WHERE uid='".$getuid."';";
+		$qry_beu="SELECT * FROM public.tbl_person JOIN public.tbl_benutzer using(person_id) WHERE uid=".$db->db_add_param($getuid).";";
 		if(!$erg_beu=@$db->db_query($qry_beu))
 		{
 			die('Fehler beim Laden des Betreuernamens');
@@ -428,7 +428,7 @@ else
 		$pdf->SetXY(30,150-$titelabzug);
 		$pdf->MultiCell(0,15,'Beurteilung Master Thesis - 1. BegutachterIn');
 
-		$qry_beu="SELECT * FROM public.tbl_person JOIN public.tbl_benutzer using(person_id) WHERE uid='".$getuid."';";
+		$qry_beu="SELECT * FROM public.tbl_person JOIN public.tbl_benutzer using(person_id) WHERE uid=".$db->db_add_param($getuid).";";
 		if(!$erg_beu=@$db->db_query($qry_beu))
 		{
 			die('Fehler beim Laden des Betreuernamens');
@@ -699,7 +699,7 @@ else
 
 
 
-$sql_query = "SELECT *,(SELECT abgabedatum FROM campus.tbl_paabgabe WHERE projektarbeit_id='$projektarbeit_id' AND abgabedatum is NOT NULL ORDER BY abgabedatum DESC LIMIT 1) as abgabedatum FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) tbl_studiengang.bezeichnung as stgbezeichnung, tbl_studiengang.typ as stgtyp, * 
+$sql_query = "SELECT *,(SELECT abgabedatum FROM campus.tbl_paabgabe WHERE projektarbeit_id=".$db->db_add_param($projektarbeit_id, FHC_INTEGER)." AND abgabedatum is NOT NULL ORDER BY abgabedatum DESC LIMIT 1) as abgabedatum FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) tbl_studiengang.bezeichnung as stgbezeichnung, tbl_studiengang.typ as stgtyp, * 
 	FROM lehre.tbl_projektarbeit LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id) 
 	LEFT JOIN public.tbl_benutzer on(uid=student_uid) 
 	LEFT JOIN public.tbl_student on(tbl_benutzer.uid=tbl_student.student_uid) 
@@ -710,9 +710,9 @@ $sql_query = "SELECT *,(SELECT abgabedatum FROM campus.tbl_paabgabe WHERE projek
 	WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
 	AND tbl_projektbetreuer.person_id IN (SELECT person_id FROM public.tbl_benutzer 
 							WHERE public.tbl_benutzer.person_id=lehre.tbl_projektbetreuer.person_id 
-							AND public.tbl_benutzer.uid='".addslashes($getuid)."')
+							AND public.tbl_benutzer.uid=".$db->db_add_param($getuid).")
 	AND lehre.tbl_projektarbeit.note IS NULL 
-	AND lehre.tbl_projektarbeit.projektarbeit_id='".addslashes($projektarbeit_id)."'
+	AND lehre.tbl_projektarbeit.projektarbeit_id=".$db->db_add_param($projektarbeit_id, FHC_INTEGER)."
 	ORDER BY tbl_projektarbeit.projektarbeit_id, betreuerart_kurzbz desc) as xy 
 	ORDER BY nachname";
 
@@ -907,19 +907,20 @@ else
 		
 		$htmlstr = "<br>";
 		$htmlstr .= "<table border='1'  class='detail'>\n";
-		$htmlstr .= "<form action=".$_SERVER['PHP_SELF']." method='POST' onsubmit='return inputcheck()'>";
+		$htmlstr .= '<form action="'.htmlspecialchars($_SERVER['PHP_SELF']).'" method="POST" onsubmit="return inputcheck()">';
 		$htmlstr .= "<tr><td style='font-size:16px' colspan='5'>Student: <b>".$row->matrikelnr.", ".trim($row->titelpre." ".$row->vorname." ".$row->nachname." ".$row->titelpost)."</b></td>";
-		$htmlstr .= "<tr><td style='font-size:16px' colspan='5'>Titel: <b>".$titel."</b>";
-		$htmlstr .= "<input type='hidden' name='projektarbeit_id' value='".$projektarbeit_id."'>\n";
-		$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
-		$htmlstr .= "<input type='hidden' name='matrikelnr' value='".$matrikelnr."'>\n";
-		$htmlstr .= "<input type='hidden' name='titel' value='".$titel."'>\n";
-		$htmlstr .= "<input type='hidden' name='perskz' value='".$row->matrikelnr."'>\n";
-		$htmlstr .= "<input type='hidden' name='studiengang' value='".$row->stgbezeichnung."'>\n";
-		$htmlstr .= "<input type='hidden' name='titelpre' value='".$row->titelpre."'>\n";
-		$htmlstr .= "<input type='hidden' name='titelpost' value='".$row->titelpost."'>\n";
-		$htmlstr .= "<input type='hidden' name='autor' value='".$row->vorname." ".$row->nachname."'>\n";
-		$htmlstr .= "<input type='hidden' name='ende' value='".$row->abgabedatum."'>\n";
+		$htmlstr .= "<tr><td style='font-size:16px' colspan='5'>Titel: <b>".$db->convert_html_chars($titel)."</b>";
+		$htmlstr .= '<input type="hidden" name="projektarbeit_id" value="'.$db->convert_html_chars($projektarbeit_id).'">';
+		$htmlstr .= '<input type="hidden" name="uid" value="'.$db->convert_html_chars($uid).'">';
+		$htmlstr .= '<input type="hidden" name="matrikelnr" value="'.$db->convert_html_chars($matrikelnr).'">';
+		$htmlstr .= '<input type="hidden" name="titel" value="'.$db->convert_html_chars($titel).'">';
+		$htmlstr .= '<input type="hidden" name="perskz" value="'.$db->convert_html_chars($row->matrikelnr).'">';
+		$htmlstr .= '<input type="hidden" name="studiengang" value="'.$db->convert_html_chars($row->stgbezeichnung).'">';
+		$htmlstr .= '<input type="hidden" name="titelpre" value="'.$db->convert_html_chars($row->titelpre).'">';
+		$htmlstr .= '<input type="hidden" name="titelpost" value="'.$db->convert_html_chars($row->titelpost).'">';
+		$htmlstr .= '<input type="hidden" name="autor" value="'.$db->convert_html_chars($row->vorname." ".$row->nachname).'">';
+		$htmlstr .= '<input type="hidden" name="ende" value="'.$db->convert_html_chars($row->abgabedatum).'">';
+
 		if($row->stgtyp=='b')
 		{
 			$stgtyp='Bachelor';
@@ -936,11 +937,11 @@ else
 		{
 			$stgtyp='';
 		}
-		$htmlstr .= "<input type='hidden' name='stgtyp' value='".$stgtyp."'>\n";
-		$htmlstr .= "<input type='hidden' name='projekttyp_kurzbz' value='".$row->projekttyp_kurzbz."'>\n";
-		$htmlstr .= "</td></tr>";
-		$htmlstr .= "<td>&nbsp;</td><td align='center'>Kurze schriftliche Beurteilung</td><td align='center'>Punkte (0-100)</td><td align='center'>Gewicht</td><td align='center'>Punkte x Gewicht</td>\n";
-		$htmlstr .= "<tr>\n";
+		$htmlstr .= '<input type="hidden" name="stgtyp" value="'.$db->convert_html_chars($stgtyp).'">';
+		$htmlstr .= '<input type="hidden" name="projekttyp_kurzbz" value="'.$db->convert_html_chars($row->projekttyp_kurzbz).'">';
+		$htmlstr .= '</td></tr>';
+		$htmlstr .= '<td>&nbsp;</td><td align="center">Kurze schriftliche Beurteilung</td><td align="center">Punkte (0-100)</td><td align="center">Gewicht</td><td align="center">Punkte x Gewicht</td>';
+		$htmlstr .= '<tr>';
 		if($row->projekttyp_kurzbz!='Bachelor')
 		{
 			$htmlstr .= "<td width='40%'><b>Qualit&auml;t des eigenen Beitrags<br>
@@ -963,46 +964,46 @@ else
 			Qualit&auml;t der L&ouml;sung</td>";
 			$weight1='0.6';
 		}
-		$htmlstr .= "<td width='30%'><textarea  name='qualitaet' value='".$qualitaet."' cols='50'  rows='10' 
-		onKeyDown='txtcount(this.form.qualitaet,this.form.remLen,500);' onKeyUp='txtcount(this.form.qualitaet,this.form.remLen,500);'></textarea>
-		<br>Buchstaben noch zur Verf&uuml;gung<input readonly disabled type=text name=remLen size=3 maxlength=3 value='500' style='text-align:right'> </td>\n
-		<td width='10%' align='center'><input type='hidden' name='weight' id='weight1' value='".$weight1."'>
-		<input type='text' name='punkte1' value='".$punkte1."' size='5' maxlength='5' id='punkte1' onkeyup='berechne()' style='text-align:right'></td>\n";
+		$htmlstr .= '<td width="30%"><textarea name="qualitaet" value="'.$db->convert_html_chars($qualitaet).'" cols="50" rows="10" 
+		onKeyDown="txtcount(this.form.qualitaet,this.form.remLen,500);" onKeyUp="txtcount(this.form.qualitaet,this.form.remLen,500);"></textarea>
+		<br>Buchstaben noch zur Verf&uuml;gung<input readonly disabled type=text name=remLen size=3 maxlength=3 value="500" style="text-align:right"> </td>
+		<td width="10%" align="center"><input type="hidden" name="weight" id="weight1" value="'.$db->convert_html_chars($weight1).'">
+		<input type="text" name="punkte1" value="'.$db->convert_html_chars($punkte1).'" size="5" maxlength="5" id="punkte1" onkeyup="berechne()" style="text-align:right"></td>';
 		if($row->projekttyp_kurzbz!='Bachelor')
 		{
-			$htmlstr.="<td width='10%' align='center'>0.55</td>";
+			$htmlstr.='<td width="10%" align="center">0.55</td>';
 		}
 		else 
 		{
 			$htmlstr.="<td width='10%' align='center'>0.60</td>";
 		}
-		$htmlstr .="<td width='10%' align='center'><input  type='text' name='punkteges1' value='".$punkteges1."' id='punkteges1' style='text-align:right' size='5' maxlength='5' readonly></td></tr>\n";
+		$htmlstr .='<td width="10%" align="center"><input type="text" name="punkteges1" value="'.$db->convert_html_chars($punkteges1).'" id="punkteges1" style="text-align:right" size="5" maxlength="5" readonly></td></tr>';
 		if($row->projekttyp_kurzbz!='Bachelor')
 		{
-			$htmlstr .= "<td width='40%'><b>Form / Stil</b><br>
+			$htmlstr .= '<td width="40%"><b>Form / Stil</b><br>
 			Hat die Diplomarbeit eine klare Stuktur, entspricht der Vorgabe?<br>
 			Wird einwandfrei zitiert?<br>
 			Abbildungen<br>
 			Sprache: ben&ouml;tigte &Uuml;berarbeitungen seitens der Betreuerin / des Betreuers</td>
-			<td width='30%'><textarea name='form' value='".$form."' cols='50'  rows='10' 
-			onKeyDown='txtcount(this.form.form,this.form.remLen2,500);' onKeyUp='txtcount(this.form.form,this.form.remLen2,500);'></textarea>
-			<br>Buchstaben noch zur Verf&uuml;gung<input readonly disabled type=text name=remLen2 size=3 maxlength=3 value='500' style='text-align:right'></td>\n";
+			<td width="30%"><textarea name="form" value="'.$db->convert_html_chars($form).'" cols="50" rows="10" 
+			onKeyDown="txtcount(this.form.form,this.form.remLen2,500);" onKeyUp="txtcount(this.form.form,this.form.remLen2,500);"></textarea>
+			<br>Buchstaben noch zur Verf&uuml;gung<input readonly disabled type=text name=remLen2 size=3 maxlength=3 value="500" style="text-align:right"></td>';
 			$weight2='0.2';
 		}
 		else 
 		{
-			$htmlstr .= "<td width='40%'><b>Form / Stil</b><br>
+			$htmlstr .= '<td width="40%"><b>Form / Stil</b><br>
 			Hat die Bachelorarbeit eine klare Stuktur, entspricht der Vorgabe?<br>
 			Wird einwandfrei zitiert?<br>
 			Abbildungen<br>
 			Sprache</td>
-			<td width='30%'><textarea name='form' value='".$form."' cols='50'  rows='10' 
-			onKeyDown='txtcount(this.form.form,this.form.remLen2,500);' onKeyUp='txtcount(this.form.form,this.form.remLen2,500);'></textarea>
-			<br>Buchstaben noch zur Verf&uuml;gung<input readonly disabled type=text name=remLen2 size=3 maxlength=3 value='500' style='text-align:right'></td>\n";
+			<td width="30%"><textarea name="form" value="'.$db->convert_html_chars($form).'" cols="50" rows="10"
+			onKeyDown="txtcount(this.form.form,this.form.remLen2,500);" onKeyUp="txtcount(this.form.form,this.form.remLen2,500);"></textarea>
+			<br>Buchstaben noch zur Verf&uuml;gung<input readonly disabled type=text name=remLen2 size=3 maxlength=3 value="500" style="text-align:right"></td>';
 			$weight2='0.4';
 		}
-		$htmlstr .= "<td width='10%' align='center'><input type='hidden' name='weight' id='weight2' value='".$weight2."'>
-		<input  type='text' name='punkte2' value='".$punkte2."' size='5' maxlength='5' id='punkte2' onkeyup='berechne()' style='text-align:right'></td>\n";
+		$htmlstr .= '<td width="10%" align="center"><input type="hidden" name="weight" id="weight2" value="'.$db->convert_html_chars($weight2).'">
+		<input  type="text" name="punkte2" value="'.$db->convert_html_chars($punkte2).'" size="5" maxlength="5" id="punkte2" onkeyup="berechne()" style="text-align:right"></td>';
 		if($row->projekttyp_kurzbz!='Bachelor')
 		{
 			$htmlstr .="<td width='10%' align='center'>0.20</td>";
@@ -1011,20 +1012,20 @@ else
 		{
 			$htmlstr .="<td width='10%' align='center'>0.40</td>";
 		}
-		$htmlstr .="<td width='10%' align='center'><input  type='text' name='punkteges2' value='".$punkteges2."' style='text-align:right' size='5' maxlegnth='3' id='punkteges2' readonly></td></tr>\n";
+		$htmlstr .='<td width="10%" align="center"><input type="text" name="punkteges2" value="'.$db->convert_html_chars($punkteges2).'" style="text-align:right" size="5" maxlegnth="3" id="punkteges2" readonly></td></tr>';
 		if($row->projekttyp_kurzbz!='Bachelor')
 		{
-			$htmlstr .= "<td width='40%'><b>Qualit&auml;t der Hintergrundinformation</b><br>
+			$htmlstr .= '<td width="40%"><b>Qualit&auml;t der Hintergrundinformation</b><br>
 			Werden Gesamtzusammenhänge erkannt, wird Bedeutung und Gewicht der Einflussfaktoren / Daten / Informationen richtig bewertet?<br>
 			Intelligente Darstellung des relevanten Stands der Technik und des Firmenumfelds<br>
 			Aufdecken und Darstellen von gr&ouml;&szlig;eren (z.B. wirtschaftlichen und sozialen) Zusammenh&auml;ngen und entsprechende Diskussion</td>
-			<td width='30%'><textarea name='hintergrund' value='".$hintergrund."' cols='50'  rows='10' 
-			onKeyDown='txtcount(this.form.hintergrund,this.form.remLen3,500);' onKeyUp='txtcount(this.form.hintergrund,this.form.remLen3,500);'></textarea>
-			<br>Buchstaben noch zur Verf&uuml;gung<input readonly disabled type=text name=remLen3 size=3 maxlength=3 value='500' style='text-align:right'></td>\n
-			<td width='10%' align='center'><input type='hidden' name='weight' id='weight3' value='0.25'>
-			<input  type='text' name='punkte3' value='".$punkte3."' size='5' maxlength='5' id='punkte3' style='text-align:right' onkeyup='berechne()'></td>\n
-			<td width='10%' align='center'>0.25</td>
-			<td width='10%' align='center'><input  type='text' name='punkteges3' value='".$punkteges3."' id='punkteges3' style='text-align:right' size='5' maxlength='5' readonly></td></tr>";
+			<td width="30%"><textarea name="hintergrund" value="'.$db->convert_html_chars($hintergrund).'" cols="50" rows="10" 
+			onKeyDown="txtcount(this.form.hintergrund,this.form.remLen3,500);" onKeyUp="txtcount(this.form.hintergrund,this.form.remLen3,500);"></textarea>
+			<br>Buchstaben noch zur Verf&uuml;gung<input readonly disabled type=text name=remLen3 size=3 maxlength=3 value="500" style="text-align:right"></td>\n
+			<td width="10%" align="center"><input type="hidden" name="weight" id="weight3" value="0.25">
+			<input  type="text" name="punkte3" value="'.$db->convert_html_chars($punkte3).'" size="5" maxlength="5" id="punkte3" style="text-align:right" onkeyup="berechne()"></td>\n
+			<td width="10%" align="center">0.25</td>
+			<td width="10%" align="center"><input type="text" name="punkteges3" value="'.$db->convert_html_chars($punkteges3).'" id="punkteges3" style="text-align:right" size="5" maxlength="5" readonly></td></tr>';
 		}
 		else 
 		{
@@ -1037,8 +1038,8 @@ else
 		//$htmlstr .="<td align='center'><input  type='text' name='summe1' value='".$summe1."' id='summe1' style='text-align:right' size='5' maxlength='5' readonly ></td>
 		$htmlstr .="<td align='center'>&nbsp;</td>
 			<td align='center'>&nbsp;</td>";
-		$htmlstr .= "<td align='center'><input type='text' name='summe2' value='".$summe2."' id='summe2' style='text-align:right' size='5' maxlength='5' readonly></td><tr>";
-		$htmlstr .= "<td colspan='4'>Note</td><td align='center'><input type='text' name='note' value='".$note."' id='note' style='text-align:right' size='5' maxlength='5' readonly></td></tr>";
+		$htmlstr .= '<td align="center"><input type="text" name="summe2" value="'.$db->convert_html_chars($summe2).'" id="summe2" style="text-align:right" size="5" maxlength="5" readonly></td><tr>';
+		$htmlstr .= '<td colspan="4">Note</td><td align="center"><input type="text" name="note" value="'.$db->convert_html_chars($note).'" id="note" style="text-align:right" size="5" maxlength="5" readonly></td></tr>';
 		$htmlstr .="</table>";
 				
 		$htmlstr .= "<br><table border='1' align='center' width='70%'>";
