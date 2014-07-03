@@ -72,7 +72,7 @@ $paabgabetyp_kurzbz = (isset($_POST['paabgabetyp_kurzbz'])?$_POST['paabgabetyp_k
 $stg_kz = (isset($_POST['stg_kz'])?$_POST['stg_kz']:'');
 $p2id = (isset($_POST['p2id'])?$_POST['p2id']:'');
 
-$qry_stg="SELECT * FROM public.tbl_studiengang WHERE studiengang_kz='".addslashes($stg_kz)."'";
+$qry_stg="SELECT * FROM public.tbl_studiengang WHERE studiengang_kz=".$db->db_add_param($stg_kz, FHC_INTEGER);
 if($result_stg=$db->db_query($qry_stg))
 {
 	if($row_stg=$db->db_fetch_object($result_stg))
@@ -150,8 +150,11 @@ if(isset($_POST["schick"]) && $error=='')
 		{
 			//schleife termine
 			$qrychk="SELECT * FROM campus.tbl_paabgabe 
-				WHERE projektarbeit_id='".addslashes($termine[$j])."' AND paabgabetyp_kurzbz='".addslashes($paabgabetyp_kurzbz[$x])."' 
-				AND fixtermin=".($fixtermin[$x]==1?'true':'false')." AND datum='".addslashes($datum[$x])."' AND kurzbz='".addslashes($kurzbz[$x])."'";
+				WHERE projektarbeit_id=".$db->db_add_param($termine[$j], FHC_INTEGER)." 
+				AND paabgabetyp_kurzbz=".$db->db_add_param($paabgabetyp_kurzbz[$x])." 
+				AND fixtermin=".($fixtermin[$x]==1?'true':'false')." 
+				AND datum=".$db->db_add_param($datum[$x])." 
+				AND kurzbz=".$db->db_add_param($kurzbz[$x]);
 			//echo $qrychk;
 			if($result=$db->db_query($qrychk))
 			{
@@ -162,8 +165,15 @@ if(isset($_POST["schick"]) && $error=='')
 				else 
 				{
 					//echo "neuer Termin";
-					$qry="INSERT INTO campus.tbl_paabgabe (projektarbeit_id, paabgabetyp_kurzbz, fixtermin, datum, kurzbz, abgabedatum, insertvon, insertamum, updatevon, updateamum) 
-						VALUES ('".addslashes($termine[$j])."', '".addslashes($paabgabetyp_kurzbz[$x])."', ".($fixtermin[$x]==1?'true':'false').", '".addslashes($datum[$x])."', '".addslashes($kurzbz[$x])."', NULL, '".addslashes($user)."', now(), NULL, NULL)";
+					$qry="INSERT INTO campus.tbl_paabgabe (projektarbeit_id, paabgabetyp_kurzbz, fixtermin, 
+						datum, kurzbz, abgabedatum, insertvon, insertamum, updatevon, updateamum) 
+						VALUES (".$db->db_add_param($termine[$j]).", ".
+						$db->db_add_param($paabgabetyp_kurzbz[$x]).", ".
+						($fixtermin[$x]==1?'true':'false').", ".
+						$db->db_add_param($datum[$x]).", ".
+						$db->db_add_param($kurzbz[$x]).", NULL, ".
+						$db->db_add_param($user).", now(), NULL, NULL)";
+
 					//echo $qry;	
 					if(!$result=$db->db_query($qry))
 					{
@@ -172,7 +182,7 @@ if(isset($_POST["schick"]) && $error=='')
 					else 
 					{
 						$row=@$db->db_fetch_object($result);
-						$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='".addslashes($paabgabetyp_kurzbz[$x])."'";
+						$qry_typ="SELECT bezeichnung FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz=".$db->db_add_param($paabgabetyp_kurzbz[$x]);
 						if($result_typ=$db->db_query($qry_typ))
 						{
 							$row_typ=$db->db_fetch_object($result_typ);
@@ -191,15 +201,15 @@ if(isset($_POST["schick"]) && $error=='')
 			}
 		}			
 		//Student zu projektarbeit_id suchen
-		$qry_std="SELECT * FROM campus.vw_student WHERE uid IN(SELECT student_uid FROM lehre.tbl_projektarbeit WHERE projektarbeit_id='".addslashes($termine[$j])."')";
+		$qry_std="SELECT * FROM campus.vw_student WHERE uid IN(SELECT student_uid FROM lehre.tbl_projektarbeit WHERE projektarbeit_id=".$db->db_add_param($termine[$j]).")";
 		if($result_std=$db->db_query($qry_std))
 		{
 			//Mail an Studierenden
 			$row_std=$db->db_fetch_object($result_std);
 			if($mailtermine_st !='')
 			{
-				$mail = new mail($row_std->uid."@".DOMAIN, "vilesci@".DOMAIN, "Neuer Termin Bachelor-/Diplomarbeitsbetreuung",
-				"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr Studiengang $stgbez hat (einen) neue(n) Termin(e) angelegt:".$mailtermine_st."\n\nMfG\nIhr(e) Studiengangsassistent(in)\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+				$mail = new mail($row_std->uid."@".DOMAIN, "no-reply@".DOMAIN, "Neuer Termin Bachelor-/Masterarbeitsbetreuung",
+				"Sehr geehrte".($row_std->anrede=="Herr"?"r":"")." ".$row_std->anrede." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost)."!\n\nIhr Studiengang $stgbez hat (einen) neue(n) Termin(e) angelegt:".$mailtermine_st."\n\nMfG\nIhr(e) Studiengangsassistent(in)\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Masterarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Masterarbeitsabgabe\n--------------------------------------------------------------------------");
 				$mail->setReplyTo($user."@".DOMAIN);
 				if(!$mail->send())
 				{
@@ -217,7 +227,7 @@ if(isset($_POST["schick"]) && $error=='')
 					FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
 					LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
 					LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid) 
-					WHERE projektarbeit_id='".addslashes($termine[$j])."' AND (tbl_benutzer.aktiv OR tbl_benutzer.aktiv IS NULL) 
+					WHERE projektarbeit_id=".$db->db_add_param($termine[$j])." AND (tbl_benutzer.aktiv OR tbl_benutzer.aktiv IS NULL) 
 					AND (tbl_projektbetreuer.betreuerart_kurzbz='Erstbegutachter' OR tbl_projektbetreuer.betreuerart_kurzbz='Betreuer')";
 			if(!$betr=$db->db_query($qry_betr))
 			{
@@ -230,8 +240,8 @@ if(isset($_POST["schick"]) && $error=='')
 					if($row_betr=$db->db_fetch_object($betr))
 					{
 					
-						$mail = new mail($row_betr->mitarbeiter_uid."@".DOMAIN, "vilesci@".DOMAIN, "Neuer Termin Bachelor-/Diplomarbeitsbetreuung im Studiengang $stgbez",
-						"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\nDer Studiengang $stgbez hat (einen) neue(n) Termin(e) angelegt für Ihre Betreuung von ".($row_std->anrede=="Herr"?"Herrn":$row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost).":".$mailtermine_lk."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Diplomarbeitsabgabe\n--------------------------------------------------------------------------");
+						$mail = new mail($row_betr->mitarbeiter_uid."@".DOMAIN, "no-reply@".DOMAIN, "Neuer Termin Bachelor-/Masterarbeitsbetreuung im Studiengang $stgbez",
+						"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\nDer Studiengang $stgbez hat (einen) neue(n) Termin(e) angelegt für Ihre Betreuung von ".($row_std->anrede=="Herr"?"Herrn":$row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost).":".$mailtermine_lk."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Masterarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Masterarbeitsabgabe\n--------------------------------------------------------------------------");
 						$mail->setReplyTo($user."@".DOMAIN);
 						if(!$mail->send())
 						{
@@ -257,7 +267,7 @@ if(isset($_POST["schick"]) && $error=='')
 					JOIN public.tbl_kontakt ON(tbl_person.person_id=tbl_kontakt.person_id)
 					LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id) 
 					LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid) 
-					WHERE projektarbeit_id='".addslashes($termine[$j])."' AND (tbl_benutzer.aktiv OR tbl_benutzer.aktiv IS NULL) 
+					WHERE projektarbeit_id=".$db->db_add_param($termine[$j])." AND (tbl_benutzer.aktiv OR tbl_benutzer.aktiv IS NULL) 
 					AND (tbl_projektbetreuer.betreuerart_kurzbz='Zweitbegutachter') AND kontakttyp='email' AND zustellung LIMIT 1";
 			if(!$betr=$db->db_query($qry_betr))
 			{
@@ -270,8 +280,8 @@ if(isset($_POST["schick"]) && $error=='')
 					if($row_betr=$db->db_fetch_object($betr))
 					{
 					
-						$mail = new mail($row_betr->kontakt, "vilesci@".DOMAIN, "Neuer Termin Bachelor-/Diplomarbeitsbetreuung im Studiengang $stgbez",
-						"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\nDer Studiengang $stgbez hat (einen) neue(n) Termin(e) angelegt für Ihre Betreuung von ".($row_std->anrede=="Herr"?"Herrn":$row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost).":".$mailtermine_lk."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Diplomarbeitsabgabesystem generiertes Info-Mail\n--------------------------------------------------------------------------");
+						$mail = new mail($row_betr->kontakt, "no-reply@".DOMAIN, "Neuer Termin Bachelor-/Masterarbeitsbetreuung im Studiengang $stgbez",
+						"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\nDer Studiengang $stgbez hat (einen) neue(n) Termin(e) angelegt für Ihre Betreuung von ".($row_std->anrede=="Herr"?"Herrn":$row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost).":".$mailtermine_lk."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Masterarbeitsabgabesystem generiertes Info-Mail\n--------------------------------------------------------------------------");
 						$mail->setReplyTo($user."@".DOMAIN);
 						if(!$mail->send())
 						{
@@ -299,8 +309,7 @@ if(isset($_POST["schick"]) && $error=='')
 
 $htmlstr='';
 
-	echo '
-		<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+	echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 		<html>
 		<head>
 		<title>Mehrfachtermin PA-Abgabe</title>
@@ -314,7 +323,7 @@ $htmlstr='';
 		$htmlstr .= $error;
 		$error='';
 		$htmlstr .= "<table class='detail' style='padding-top:10px;' >\n";
-		$htmlstr .= "<form action='".$_SERVER['PHP_SELF']."' method='POST' name='multitermin'>\n";
+		$htmlstr .= '<form action="'.htmlspecialchars($_SERVER['PHP_SELF']).'" method="POST" name="multitermin">';
 		$htmlstr .= "<tr></tr>\n";
 		$htmlstr .= "<tr><td>fix</td><td>Datum</td><td>Abgabetyp</td><td>Kurzbeschreibung der Abgabe</td></tr>\n";
 		for ($x=0;$x<count($paabgabetyp_kurzbz);$x++)
@@ -355,12 +364,12 @@ $htmlstr='';
 		}
 		//Eingabezeile für neuen Termin
 		//$htmlstr .= "<b>Abgabetermin:</b>\n";
-		$htmlstr .= "<input type='hidden' name='irgendwas' value='".$irgendwas."'>\n";
-		$htmlstr .= "<input type='hidden' name='stg_kz' value='".$stg_kz."'>\n";
-		$htmlstr .= "<input type='hidden' name='p2id' value='".$p2id."'>\n";
+		$htmlstr .= '<input type="hidden" name="irgendwas" value="'.$db->convert_html_chars($irgendwas).'">';
+		$htmlstr .= '<input type="hidden" name="stg_kz" value="'.$db->convert_html_chars($stg_kz).'">';
+		$htmlstr .= '<input type="hidden" name="p2id" value="'.$db->convert_html_chars($p2id).'">';
 		$htmlstr .= "<tr></tr>\n";
-		$htmlstr .= "<tr id='termin".($x+1)."'>\n";
-		$htmlstr .= "<td><input type='checkbox' name='fixterminx' onclick='if (this.checked) {document.getElementById(\"fixtermin".($x+1)."\").value=1;}else{document.getElementById(\"fixtermin".($x+1)."\").value=0;}'>";
+		$htmlstr .= '<tr id="termin'.($x+1).'">';
+		$htmlstr .= '<td><input type="checkbox" name="fixterminx" onclick="if (this.checked) {document.getElementById(\"fixtermin".($x+1)."\").value=1;}else{document.getElementById(\"fixtermin".($x+1)."\").value=0;}">';
 		$htmlstr .= "<input type='text' style='display:none;' id='fixtermin".($x+1)."' name='fixtermin[]' value='0'></td>";
 		$htmlstr .= "		<td><input  type='text' name='datum[]' size='10' maxlegth='10'></td>\n";
 		$htmlstr .= "		<td><select name='paabgabetyp_kurzbz[]'>\n";

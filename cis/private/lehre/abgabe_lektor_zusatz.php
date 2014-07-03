@@ -107,29 +107,52 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 	
 	<body class="Background_main"  style="background-color:#eeeeee;">
 	<h3>'.$p->t('abgabetool/abgabeZusatzdaten').'</h3>';
-	$qry_zd="SELECT * FROM lehre.tbl_projektarbeit WHERE projektarbeit_id='".addslashes($projektarbeit_id)."'";
+	$qry_zd="SELECT * FROM lehre.tbl_projektarbeit WHERE projektarbeit_id=".$db->db_add_param($projektarbeit_id, FHC_INTEGER);
 	$result_zd=@$db->db_query($qry_zd);
 	if ($row_zd=@$db->db_fetch_object($result_zd))
 	{
-			$htmlstr = "<div>".$p->t('abgabetool/student').": <b>".$uid."</b><br>".$p->t('abgabetool/titel').": <b>".$row_zd->titel."<b><br><br></div>\n";
-			$htmlstr .= "<table class='detail' style='padding-top:10px;'>\n";
-			$htmlstr .= "<tr></tr>\n";
-			$htmlstr .= "<tr>\n";
-			$htmlstr .= "<td><b>".$p->t('abgabetool/spracheDerArbeit').":</b></td><td>";
-			$htmlstr .= "<input  type='text' name='sprache'  id='sprache' value='".$row_zd->sprache."' size='10' maxlength='8' readonly='readonly'>";
-		    $htmlstr .= "</td></tr>\n";
-			$htmlstr .= "<tr><td width='30%'><b>".$p->t('abgabetool/kontrollierteSchlagwoerter').":*</b></td><td width='40%'><input  type='text' name='kontrollschlagwoerter'  id='kontrollschlagwoerter' value='".$row_zd->kontrollschlagwoerter."' size='60' maxlength='150' readonly='readonly'></td></tr>\n";
-			$htmlstr .= "<tr><td><b>".$p->t('abgabetool/deutscheSchlagwoerter').": </b></td><td><input  type='text' name='schlagwoerter' value='".$row_zd->schlagwoerter."' size='60' maxlength='150' readonly='readonly'></td></tr>\n";
-			$htmlstr .= "<tr><td><b>".$p->t('abgabetool/englischeSchlagwoerter').": </b></td><td><input  type='text' name='schlagwoerter_en' value='".$row_zd->schlagwoerter_en."' size='60' maxlength='150' readonly='readonly'></td></tr>\n";
-			$htmlstr .= "<tr><td valign='top'><b>".$p->t('abgabetool/abstract')." </b>".$p->t('abgabetool/maxZeichen').":*</td><td><textarea name='abstract' cols='46' rows='7' readonly='readonly'>$row_zd->abstract</textarea></td></tr>\n";
-			$htmlstr .= "<tr><td valign='top'><b>".$p->t('abgabetool/abstractEng')." </b>".$p->t('abgabetool/maxZeichen').":*</td><td><textarea name='abstract_en' cols='46'  rows='7' readonly='readonly'>$row_zd->abstract_en</textarea></td></tr>\n";
-			$htmlstr .= "<tr><td><b>".$p->t('abgabetool/seitenanzahl').":*</b></td><td><input type='text' name='seitenanzahl' value=".$row_zd->seitenanzahl." size='5' maxlength='4' readonly='readonly'></td></tr>\n";
-			$htmlstr .= "</tr>\n";
-			$htmlstr .= "</table><table>";
-			$htmlstr .= "<tr></tr><td>&nbsp;</td><tr><td style='font-size:70%'>* ".$p->t('abgabetool/pflichtfeld')."</td></tr><tr><td>&nbsp;</td></tr>\n";
-			$htmlstr .= "</table>\n";	
+		echo '<div>'.$p->t('abgabetool/student').': <b>'.$db->convert_html_chars($uid).'</b>
+			<br>'.$p->t('abgabetool/titel').': <b>'.$db->convert_html_chars($row_zd->titel).'<b>
+			<br><br></div>
+			<table class="detail" style="padding-top:10px;">
+			<tr></tr>
+			<tr>
+				<td><b>'.$p->t('abgabetool/spracheDerArbeit').':</b></td>
+				<td><input  type="text" name="sprache" id="sprache" value="'.$db->convert_html_chars($row_zd->sprache).'" size="10" maxlength="8" readonly="readonly"></td>
+			</tr>
+			<tr>
+				<td width="30%"><b>'.$p->t('abgabetool/kontrollierteSchlagwoerter').':*</b></td>
+				<td width="40%"><input type="text" name="kontrollschlagwoerter" id="kontrollschlagwoerter" value="'.$db->convert_html_chars($row_zd->kontrollschlagwoerter).'" size="60" maxlength="150" readonly="readonly"></td>
+			</tr>
+			<tr>
+				<td><b>'.$p->t('abgabetool/deutscheSchlagwoerter').': </b></td>
+				<td><input type="text" name="schlagwoerter" value="'.$db->convert_html_chars($row_zd->schlagwoerter).'" size="60" maxlength="150" readonly="readonly"></td>
+			</tr>
+			<tr>
+				<td><b>'.$p->t('abgabetool/englischeSchlagwoerter').': </b></td>
+				<td><input type="text" name="schlagwoerter_en" value="'.$db->convert_html_chars($row_zd->schlagwoerter_en).'" size="60" maxlength="150" readonly="readonly"></td>
+			</tr>
+			<tr>
+				<td valign="top"><b>'.$p->t('abgabetool/abstract').' </b>'.$p->t('abgabetool/maxZeichen').':*</td>
+				<td><textarea name="abstract" cols="46" rows="7" readonly="readonly">'.$db->convert_html_chars($row_zd->abstract).'</textarea></td>
+			</tr>
+			<tr>
+				<td valign="top"><b>'.$p->t('abgabetool/abstractEng').' </b>'.$p->t('abgabetool/maxZeichen').':*</td>
+				<td><textarea name="abstract_en" cols="46" rows="7" readonly="readonly">'.$db->convert_html_chars($row_zd->abstract_en).'</textarea></td>
+			</tr>
+			<tr>
+				<td><b>'.$p->t('abgabetool/seitenanzahl').':*</b></td>
+				<td><input type="text" name="seitenanzahl" value="'.$db->convert_html_chars($row_zd->seitenanzahl).'" size="5" maxlength="4" readonly="readonly"></td>
+			</tr>
+			</tr>
+			</table>
+			<table>
+				<tr><td>&nbsp;</td></tr>
+				<tr><td style="font-size:70%">* '.$p->t('abgabetool/pflichtfeld').'</td></tr>
+				<tr><td>&nbsp;</td></tr>
+			</table>';
 	}
-	echo $htmlstr;
+
 	echo '</body></html>';
 
 ?>
