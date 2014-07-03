@@ -121,7 +121,7 @@ class sprache extends basis_db
 	 */
 	public function loadIndexArray()
 	{
-		$qry = "SELECT sprache, index FROM public.tbl_sprache ORDER BY index";
+		$qry = "SELECT sprache, index FROM public.tbl_sprache WHERE index is not null ORDER BY index";
 		
 		if(!$this->db_query($qry))
 		{
