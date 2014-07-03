@@ -93,7 +93,7 @@ if(isset($_POST['schick']))
 		$benutzerberechtigung_id = $_POST['benutzerberechtigung_id'];
 		$art = $_POST['art'];
 		$oe_kurzbz = $_POST['oe_kurzbz'];
-		$berechtigung_kurzbz = $_POST['berechtigung_kurzbz'];
+		$berechtigung_kurzbz = (isset($_POST['berechtigung_kurzbz'])?$_POST['berechtigung_kurzbz']:'');
 		$rolle_kurzbz = (isset($_POST['rolle_kurzbz'])?$_POST['rolle_kurzbz']:'');
 		$uid = $_POST['uid'];
 		$funktion_kurzbz = $_POST['funktion_kurzbz'];
