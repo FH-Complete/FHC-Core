@@ -1673,7 +1673,7 @@ if(!$result = @$db->db_query("SELECT lvs FROM lehre.tbl_lehrveranstaltung LIMIT 
 		echo '<br>lehre.tbl_lehrveranstaltung: neue Spalten sws, lvs,alvs,lvps,las hinzugefuegt';
 }
 
-// Notizzuordnung fuer Lehreinheit und Stundenplandev
+// Notizzuordnung fuer Lehreinheit
 if(!$result = @$db->db_query("SELECT lehreinheit_id FROM public.tbl_notizzuordnung LIMIT 1"))
 {
 	$qry = "
