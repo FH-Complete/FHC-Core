@@ -2156,8 +2156,8 @@ class wochenplan extends basis_db
 					// Lehrverband
 					if ($this->type!='verband')
 					{
-						$lehrverband=array_unique($lehrverband);
-						sort($lehrverband);
+//						$lehrverband=array_unique($lehrverband);
+//						sort($lehrverband);
 						$lvb='';
 						foreach ($lehrverband as $l)
 							$lvb.=$l.' ';
