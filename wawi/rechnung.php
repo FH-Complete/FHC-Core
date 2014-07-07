@@ -612,6 +612,7 @@ if($aktion=='update')
 			die('Bestellung existiert nicht');
 		$kostenstelle_id=$bestellung->kostenstelle_id;
 		$rechnung->buchungsdatum=date('Y-m-d');
+		$rechnung->buchungstext = $bestellung->titel;
 	}
 	else
 	{

@@ -1,10 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
-<html>
-<head>
-	<title>Keyboard Test</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	
 <style type="text/css">
 <!--
 div.weiter {
@@ -255,8 +249,7 @@ td.keyboardFunkTasteON {
 
 //-->
 </script>	
-</head>
-<body>
+
 <form accept-charset="UTF-8" id="tastatur" target="_self" action="<?php echo $_SERVER['PHP_SELF'];?>"  method="post" enctype="multipart/form-data"  >
 
 <table border="0" cellpadding="1" cellspacing="1">
@@ -271,6 +264,7 @@ td.keyboardFunkTasteON {
 			<input class="verstecken" type="text" value="Login" name="work">
 			<input class="verstecken" type="text" value="<?php echo trim((isset($_REQUEST['raumtyp_kurzbz']) ? $_REQUEST['raumtyp_kurzbz']:'EDV')); ?>" name="raumtyp_kurzbz">
 			<input class="verstecken" type="text" value="<?php echo trim((isset($_REQUEST['ort_kurzbz']) ? $_REQUEST['ort_kurzbz']:'')); ?>" name="ort_kurzbz">
+			<input class="verstecken" type="text" value="<?php echo $standort_id ?>" name="standort_id">
 		</td>
 	</tr>	
 </table>
@@ -577,5 +571,4 @@ td.keyboardFunkTasteON {
 				</span>							
 	</div>
 </div>
-</body>
-</html>
+
