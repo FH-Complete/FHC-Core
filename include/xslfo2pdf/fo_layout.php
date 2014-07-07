@@ -69,7 +69,11 @@ class FO_LayoutObject extends FO_FlowContainer {
   function convert($str)
   {
   	//echo str_replace('EURO',chr(128),utf8_decode($str));
-  	return str_replace('EURO',chr(128),utf8_decode($str));
+	$str = str_replace('EURO',chr(128),$str);
+	$str = str_replace('ĉ','c',$str);
+	$str = str_replace('č','c',$str);
+
+  	return utf8_decode($str);
   }
 	
    //Spaltenhoehe Berechnen

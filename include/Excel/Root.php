@@ -45,10 +45,11 @@ class OLE_PPS_Root extends OLE_PPS
     */
     function OLE_PPS_Root($time_1st, $time_2nd, $raChild)
     {
+        $ole_obj = new OLE();
         $this->_tmp_dir = '';
         $this->OLE_PPS(
            null,
-           OLE::Asc2Ucs('Root Entry'),
+           $ole_obj->Asc2Ucs('Root Entry'),
            OLE_PPS_TYPE_ROOT,
            null,
            null,
