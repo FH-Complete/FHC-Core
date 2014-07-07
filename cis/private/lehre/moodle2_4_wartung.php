@@ -298,7 +298,7 @@ else
 				$art='le';
 		}
 	
-	echo '<b>'.$p->t('moodle/moodleKursAnlegen24').': </b><br><br>
+	echo '<b>'.$p->t('moodle/moodleKursAnlegen').': </b><br><br>
 			<form action="'.$_SERVER['PHP_SELF'].'?lvid='.$lvid.'&stsem='.$stsem.'" method="POST">
 			<input type="radio" '.$disable_lv.' name="art" value="lv" onclick="togglediv()" '.($art=='lv'?'checked':'').'>einen Moodle Kurs f&uuml;r die gesamte LV anlegen<br>
 			<input type="radio" id="radiole" name="art" value="le" onclick="togglediv()" '.($art=='le'?'checked':'').'>einen Moodle Kurs für einzelne Lehreinheiten anlegen
@@ -388,7 +388,7 @@ echo '</table>';
 echo '</td></tr></table>';
 
 echo '<br><br><br>';
-echo '<b>'.$p->t('moodle/testkurse24').'</b><br><br>';
+echo '<b>'.$p->t('moodle/testkurse').'</b><br><br>';
 $mdlcourse = new moodle24_course();
 if($mdlcourse->loadTestkurs($lvid, $stsem))
 {
