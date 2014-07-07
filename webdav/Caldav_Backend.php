@@ -159,17 +159,26 @@ class MySabre_CalDAV_Backend extends Sabre_CalDAV_Backend_Abstract
 			$unr = mb_substr($objectUri, mb_strpos($objectUri,'-')+1);
 			$dtstart = mb_substr($objectUri,0,mb_strpos($objectUri,'-'));
 
-			//dtstart: 19700325T020000Z
-			$jahr = mb_substr($dtstart,0,4);
-			$monat = mb_substr($dtstart,4,2);
-			$tag = mb_substr($dtstart,6,2);
-			$stunde = mb_substr($dtstart,9,2);
-			$minute = mb_substr($dtstart,11,2);
-			$sekunde = mb_substr($dtstart,13,2);
-			$begin = mktime($stunde, $minute, $sekunde, $monat, $tag-1, $jahr);
-			$ende = mktime($stunde, $minute, $sekunde, $monat, $tag+1, $jahr);
-			//error_log("getCalendarData unr: $unr dtstart: $dtstart");
-			//error_log($begin.'/'.$ende);	
+			if(mb_strlen($dtstart)==15)
+			{
+				//dtstart: 19700325T020000
+				$jahr = mb_substr($dtstart,0,4);
+				$monat = mb_substr($dtstart,4,2);
+				$tag = mb_substr($dtstart,6,2);
+				$stunde = mb_substr($dtstart,9,2);
+				$minute = mb_substr($dtstart,11,2);
+				$sekunde = mb_substr($dtstart,13,2);
+				$begin = mktime($stunde, $minute, $sekunde, $monat, $tag-1, $jahr);
+				$ende = mktime($stunde, $minute, $sekunde, $monat, $tag+1, $jahr);
+				//error_log("getCalendarData unr: $unr dtstart: $dtstart");
+				//error_log($begin.'/'.$ende);
+			}
+			else
+			{
+				//error_log("dtstart laenge abnormal: $dtstart");
+				$begin = mktime(0,0,0,date('m'),date('d')-14,date('Y'));
+				$ende = mktime(0,0,0,date('m')+6,date('d'),date('Y'));	
+			}
 		}
 		else
 		{

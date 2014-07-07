@@ -39,7 +39,9 @@ require_once("svg_path.php");
 
 class XslFo2PDF {
   function generatePdf($xml, $name="out.pdf", $dest='') {
-    $doc = DOMDocument::loadXML($xml);
+	$doc = new DOMDocument();
+    $doc->loadXML($xml);
+
     if ($doc === false) {		  
       echo "failed loading dom<br>";
       return false;

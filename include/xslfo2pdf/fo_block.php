@@ -49,7 +49,7 @@ class FO_Block extends FO_LayoutObject{
     return self::$CHILDNODES;
   }
 
-  function initAttributes($node) {
+  function initAttributes(DOMNode $node) {
   	global $height_of_current_row;
   	//echo $node->parentNode->nodeName.'<br>';
   	if($node->parentNode->nodeName!='fo:table-cell')
@@ -188,7 +188,7 @@ class FO_Inline extends FO_Block {
 }
 
 class FO_BasicLink extends FO_Block {
-  function initAttributes($node) {
+  function initAttributes(DOMNode $node) {
     $this->initLocalAttribute($node, "internal-destination");
     $this->initLocalAttribute($node, "external-destination");
   }
@@ -225,7 +225,7 @@ class FO_BasicLink extends FO_Block {
 //oesi - add ExternalGraphics
 class FO_ExternalGraphic extends FO_Block
 {
-  function initAttributes($node) 
+  function initAttributes(DOMNode $node) 
   {
     $this->initLocalAttribute($node, "src");
     $this->initLocalAttribute($node, "width");

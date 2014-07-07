@@ -315,7 +315,10 @@ class lehrstunde extends basis_db
 
 			// Gruppen ermitteln
 			if (is_null($this->ss))
-				$this->ss=studiensemester::getNearest();
+			{
+				$studiensemester_obj = new studiensemester();
+				$this->ss=$studiensemester_obj->getNearest();
+			}
 			$sql_query="SELECT gruppe_kurzbz FROM public.tbl_benutzergruppe WHERE uid='".addslashes($uid)."' AND (studiensemester_kurzbz='".addslashes($this->ss)."' OR studiensemester_kurzbz IS NULL)";
 
 			if (!$result_einheit=$this->db_query($sql_query))
