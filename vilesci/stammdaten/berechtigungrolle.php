@@ -38,9 +38,24 @@
 <title>Berechtigungen Uebersicht</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+<link href="../../skin/tablesort.css" rel="stylesheet" type="text/css"/>
+<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
 <script language="Javascript">
+$(document).ready(function() 
+		{ 
+			$("#t1").tablesorter(
+				{
+					sortList: [[0,0]],
+					widgets: ["zebra"],
+					headers: {3:{sorter:false}}
+				}); 
+			$("#t2").tablesorter(
+					{
+						sortList: [[0,0]],
+						widgets: ["zebra"],
+						headers: {2:{sorter:false}}
+					}); 
+		});
 function confdel()
 {
 	var value=prompt('Achtung! Sie sind dabei eine Rolle zu löschen. Die Zuordnungen gehen dadurch verloren! Um diese Rolle wirklich zu Löschen tippen Sie "LÖSCHEN" in das untenstehende Feld.');
@@ -101,9 +116,17 @@ if(isset($_GET['rolle_kurzbz']))
 	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">';
 	echo '<input type="hidden" name="rolle_kurzbz" value="'.$rolle_kurzbz.'">';
 	echo '<SELECT name="berechtigung_kurzbz">';
+	
+	$berechtigungen = new berechtigung();
+	$berechtigungen->getRolleBerechtigung($rolle_kurzbz);
+	$berechtigungen_arr = array();
+	foreach ($berechtigungen->result as $row)
+	{
+		$berechtigungen_arr[] = $row->berechtigung_kurzbz;
+	}
 	foreach ($berechtigung->result as $row)
 	{
-		echo '<OPTION value="',$row->berechtigung_kurzbz,'">',$row->berechtigung_kurzbz,'</OPTION>';
+		echo '<OPTION value="',$row->berechtigung_kurzbz,'" '.(array_search($row->berechtigung_kurzbz,$berechtigungen_arr)!==false?'disabled':'').'>',$row->berechtigung_kurzbz,'</OPTION>';
 	}
 	echo '</SELECT>';
 	echo '&nbsp;<input type="text" value="suid" size="4" name="art">';
@@ -111,21 +134,21 @@ if(isset($_GET['rolle_kurzbz']))
 	echo '</form>';
 	
 	
-	echo '<table class="liste table-autosort:0 table-stripeclass:alternate table-autostripe">
+	echo '<table id="t1" class="tablesorter">
 			<thead>
 				<tr>
-					<th class="table-sortable:default">Kurzbz</th>
-					<th class="table-sortable:default">Art</th>
-					<th class="table-sortable:default">Beschreibung</th>
+					<th>Kurzbz</th>
+					<th>Art</th>
+					<th>Beschreibung</th>
 					<th></th>
 				</tr>
 			</thead>
 			<tbody>';
 	
-	$berechtigung = new berechtigung();
-	$berechtigung->getRolleBerechtigung($rolle_kurzbz);
+	//$berechtigungen = new berechtigung();
+	//$berechtigungen->getRolleBerechtigung($rolle_kurzbz);
 	
-	foreach($berechtigung->result as $rolle)
+	foreach($berechtigungen->result as $rolle)
 	{
 		echo '<tr>';
 		echo '<td>',$rolle->berechtigung_kurzbz,'</td>';
@@ -177,11 +200,11 @@ else
 	$berechtigung->getRollen();
 	
 	echo '<h3>Rollen:</h3>';
-	echo '<table class="liste table-autosort:0 table-stripeclass:alternate table-autostripe">
+	echo '<table id="t2" class="tablesorter">
 			<thead>
 				<tr>
-					<th class="table-sortable:default">Kurzbz</th>
-					<th class="table-sortable:default">Beschreibung</th>
+					<th>Kurzbz</th>
+					<th>Beschreibung</th>
 					<th colspan="2">Aktion</th></tr>
 			</thead>
 			<tbody>';

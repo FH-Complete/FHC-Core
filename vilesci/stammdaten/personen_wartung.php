@@ -171,6 +171,20 @@ if((isset($radio_1) && !isset($radio_2))||(!isset($radio_1) && isset($radio_2)) 
 		}); 
 
 	});
+	function enable(id)
+	{
+		if (id == 'radio_1')
+			var radios = document.getElementsByName('radio_2');
+		else
+			var radios = document.getElementsByName('radio_1');
+		for (var i=0, iLen=radios.length; i<iLen; i++) {
+			radios[i].disabled = false;
+			} 
+	}
+	function disable(id)
+	{
+		document.getElementById(id).disabled = true;
+	}
 	</script>
 
 	<title>Personen-Zusammenlegung</title>
@@ -219,7 +233,7 @@ echo '<br>
 	 	echo "<td>$l->gebdatum</td>";
 	 	echo "<td>$l->svnr</td>";
 	 	echo "<td>$l->ersatzkennzeichen</td>";
-	 	echo "<td><input type='radio' name='radio_1' value='$l->person_id' ".((isset($radio_1) && $radio_1==$l->person_id)?'checked':'')."></td>";
+	 	echo "<td><input type='radio' name='radio_1' id='radio_1_$l->person_id' value='$l->person_id' ".((isset($radio_1) && $radio_1==$l->person_id)?'checked':'')." onclick='enable(\"radio_1\"); disable(\"radio_2_$l->person_id\")'></td>";
 	 	echo "</tr>";
 	 	$i++;
 	 }
@@ -245,7 +259,7 @@ echo '<br>
 	 foreach($lf->personen as $l)
 	 {
 	 	echo "<tr>";
-	 	echo "<td><input type='radio' name='radio_2' value='$l->person_id' ".((isset($radio_2) && $radio_2==$l->person_id)?'checked':'')."></td>";
+	 	echo "<td><input type='radio' name='radio_2' id='radio_2_$l->person_id' value='$l->person_id' ".((isset($radio_2) && $radio_2==$l->person_id)?'checked':'')." onclick='enable(\"radio_2\"); disable(\"radio_1_$l->person_id\")'></td>";
 	 	echo "<td>$l->person_id</td>";
 	 	echo "<td>$l->nachname</td>";
 	 	echo "<td>$l->vorname</td>";
