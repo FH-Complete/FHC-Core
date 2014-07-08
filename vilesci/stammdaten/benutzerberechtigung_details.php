@@ -92,7 +92,7 @@ if(isset($_POST['schick']))
 	{
 		$benutzerberechtigung_id = $_POST['benutzerberechtigung_id'];
 		$art = $_POST['art'];
-		$oe_kurzbz = $_POST['oe_kurzbz'];
+		$oe_kurzbz = (isset($_POST['oe_kurzbz'])?$_POST['oe_kurzbz']:'');
 		$berechtigung_kurzbz = (isset($_POST['berechtigung_kurzbz'])?$_POST['berechtigung_kurzbz']:'');
 		$rolle_kurzbz = (isset($_POST['rolle_kurzbz'])?$_POST['rolle_kurzbz']:'');
 		$uid = $_POST['uid'];
@@ -100,7 +100,7 @@ if(isset($_POST['schick']))
 		$studiensemester_kurzbz = null;//$_POST['studiensemester_kurzbz'];
 		$start = $_POST['start'];
 		$ende = $_POST['ende'];
-		$kostenstelle_id = $_POST['kostenstelle_id'];
+		$kostenstelle_id = (isset($_POST['kostenstelle_id'])?$_POST['kostenstelle_id']:'');
 		
 		$ber = new benutzerberechtigung();
 		if (isset($_POST['neu']))
