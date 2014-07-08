@@ -115,6 +115,8 @@ loadVariables($user);
 	$maxlength[$i]=12;
 	$worksheet->write($zeile,++$i,"GEBURTSORT", $format_bold);
 	$maxlength[$i]=12;
+	$worksheet->write($zeile,++$i,"GEBURTSNATION", $format_bold);
+	$maxlength[$i]=12;
 	$worksheet->write($zeile,++$i,"PERSONENKENNZEICHEN", $format_bold);
 	$maxlength[$i]=19;
 	$worksheet->write($zeile,++$i,"STAATSBÜRGERSCHAFT", $format_bold);
@@ -306,6 +308,12 @@ loadVariables($user);
 		if(mb_strlen($row->gebort)>$maxlength[$i])
 			$maxlength[$i] = mb_strlen($row->gebort);
 		$worksheet->write($zeile,$i,$row->gebort);
+		$i++;
+
+		//Geburtsnation
+		if(mb_strlen($row->geburtsnation)>$maxlength[$i])
+			$maxlength[$i] = mb_strlen($row->geburtsnation);
+		$worksheet->write($zeile,$i,$row->geburtsnation);
 		$i++;
 		
 		//Personenkennzeichen
