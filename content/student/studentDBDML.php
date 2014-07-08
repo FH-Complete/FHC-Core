@@ -536,31 +536,6 @@ if(!$error)
 					
 					if(!$error)
 					{
-						// wenn kein fehler und status bewerber und "email senden an bewerber" eingestellt ist
-						if($_POST['status_kurzbz']=='Bewerber' && SEND_BEWERBER_INFOMAIL)
-						{
-							// hole Email Adresse
-							$kontakt = new kontakt(); 
-							$kontakt->load_persKontakttyp($prestd->person_id, 'email'); 
-							
-							// Wenn zumindest eine Email Adresse gefunden wurde
-							if(count($kontakt->result)>0)
-							{
-								$email = "Sehr geehrter Frau/Herr ".$prestd->vorname." ".$prestd->nachname.",<br><br> "; 
-								
-								$email.= INFOMAIL_BEWERBER; 								
-								foreach($kontakt->result as $k)
-								{
-									$mail = new mail($k->kontakt, 'no-reply', 'Infomail', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
-									$mail->setHTMLContent($email); 
-									if(!$mail->send())
-									{
-										$errormsg= 'Fehler beim Senden des Mails!';
-										$anzahl_fehler++; 
-									}
-								}
-							}
-						}
 						
 						if($prestd->getLastStatus($prestudent_id))
 						{
@@ -613,10 +588,39 @@ if(!$error)
 									$prestd_neu->studienplan_id = $prestd->studienplan_id;
 									$prestd_neu->insertamum = date('Y-m-d H:i:s');
 									$prestd_neu->insertvon = $user;
+									$prestd_neu->bestaetigtam = date('Y-m-d');
+									$prestd_neu->bestaetigtvon = $user;
 									$prestd_neu->new = true;
 		
 									if($prestd_neu->save_rolle())
 									{
+										// wenn kein fehler und status bewerber und "email senden an bewerber" eingestellt ist
+										if($_POST['status_kurzbz']=='Bewerber' && SEND_BEWERBER_INFOMAIL)
+										{
+											// hole Email Adresse
+											$kontakt = new kontakt(); 
+											$kontakt->load_persKontakttyp($prestd->person_id, 'email'); 
+							
+											// Wenn zumindest eine Email Adresse gefunden wurde
+											if(count($kontakt->result)>0)
+											{
+												$email = "Sehr geehrter Frau/Herr ".$prestd->vorname." ".$prestd->nachname.",<br><br> "; 
+								
+												$email.= INFOMAIL_BEWERBER; 								
+												foreach($kontakt->result as $k)
+												{
+													$mail = new mail($k->kontakt, 'no-reply', 'Infomail', 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.');
+
+													$mail->setHTMLContent($email); 
+													if(!$mail->send())
+													{
+														$errormsg= 'Fehler beim Senden des Mails!';
+														$anzahl_fehler++; 
+													}
+												}
+											}
+										}
+
 										//Unterbrecher und Abbrecher werden ins 0. Semester verschoben
 										if($_POST['status_kurzbz']=='Unterbrecher' || $_POST['status_kurzbz']=='Abbrecher')
 										{
@@ -896,6 +900,8 @@ if(!$error)
 						$rolle->insertamum = date('Y-m-d H:i:s');
 						$rolle->insertvon = $user;
 						$rolle->status_kurzbz = $_POST['status_kurzbz'];
+						$rolle->bestaetigtam = date('Y-m-d');
+						$rolle->bestaetigtvon = $user;
 
 						if($_POST['status_kurzbz']=='Student')
 						{
@@ -1033,9 +1039,11 @@ if(!$error)
 														$stg_obj->load(ltrim($stg,'0'));
 														$uid = generateUID($stg_obj->kurzbz,$jahr,$stg_obj->typ,$matrikelnr);
 														
-														$qry = "UPDATE public.tbl_person SET matr_nr=".$db->db_add_param($uid)." WHERE person_id=".$db->db_add_param($prestd->person_id, FHC_INTEGER).' AND matr_nr is null';
-														$db->db_query($qry);
-														
+														if(defined('SET_UID_AS_MATRIKELNUMMER') && SET_UID_AS_MATRIKELNUMMER)
+														{
+															$qry = "UPDATE public.tbl_person SET matr_nr=".$db->db_add_param($uid)." WHERE person_id=".$db->db_add_param($prestd->person_id, FHC_INTEGER).' AND matr_nr is null';
+															$db->db_query($qry);
+														}														
 														//Benutzerdatensatz anlegen
 														$benutzer = new benutzer();
 														$benutzer->uid = $uid;
@@ -1104,6 +1112,8 @@ if(!$error)
 																	$rolle->datum = date('Y-m-d');
 																	$rolle->insertamum = date('Y-m-d H:i:s');
 																	$rolle->insertvon = $user;
+																	$rolle->bestaetigtam = date('Y-m-d');
+																	$rolle->bestaetigtvon = $user;
 																	$rolle->new = true;
 					
 																	if($rolle->save_rolle())

@@ -52,12 +52,10 @@ define('REIHUNGSTEST_CHECK', true);
 define('SEND_BEWERBER_INFOMAIL', false); 
 
 // Infotext der an Bewerber gesendet wird
-define('INFOMAIL_BEWERBER', 'Sehr geehrter Frau/Herr Muster,
-
-vielen Dank für Ihr Interesse an einem Studium an der Katholisch-Theologischen Privatuniversität Linz!
+define('INFOMAIL_BEWERBER', 'Vielen Dank für Ihr Interesse an einem Studium
 
 Ihre Bewerbung ist vollständig und wurde akzeptiert.
-Um die Anmeldung zum Studium abzuschließen, bitten wir Sie, innerhalb der Anmelde- und Zulassungsfrist zu den genannten Öffnungszeiten im Sekretariat (1. OG) persönlich vorbeizukommen.
+Um die Anmeldung zum Studium abzuschließen, bitten wir Sie, innerhalb der Anmelde- und Zulassungsfrist zu den genannten Öffnungszeiten im Sekretariat persönlich vorbeizukommen.
 
 Anmelde- und Zulassungsfrist:
 1.9.2014 - 31.10.2014
@@ -67,9 +65,8 @@ Mo-Fr 9:00-12:00 Uhr
 Mi 13:30-15:30 Uhr
 
 Mit freundlichen Grüßen,
+Ihre Fachhochschule'); 
 
-Sekretariat KTU
-Bethlehemstraße 20
-4020 Linz'); 
-
+// Bei neuen Studierenden UID automatisch als Matrikelnummer setzen (true|false)
+define('SET_UID_AS_MATRIKELNUMMER',false);
 ?>
