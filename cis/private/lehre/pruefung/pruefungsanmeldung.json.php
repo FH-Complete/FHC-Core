@@ -360,11 +360,9 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 	    switch($lehrveranstaltung->oe_kurzbz)
 	    {
 		case $fakultaeten[0]["fakultaet"]:
-		    //TODO Konstante für Semesterzeitraum
 		    $semCounter = $fakultaeten[0]["sem"];
 		    break;
 		case $fakultaeten[1]["fakultaet"]:
-		    //TODO Konstante für Semesterzeitraum
 		    $semCounter = $fakultaeten[1]["sem"];
 		    break;
 		default: 
@@ -428,7 +426,6 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 	}
 	else
 	{
-	    //TODO Codierung in config!???
 	    if($note->positiv === FALSE && $anzahlPruefungen >= $maxAnzahlVersuche)
 	    {
 		$anmeldung_moeglich = false;
