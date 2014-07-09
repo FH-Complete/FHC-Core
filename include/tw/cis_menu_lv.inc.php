@@ -347,7 +347,7 @@ function checkZeilenUmbruch()
 	checkZeilenUmbruch();
 
 
-	if(!defined('CIS_LEHRVERANSTALTUNG_UEBUNGSTOOL_ANZEIGE') || CIS_LEHRVERANSTALTUNG_UEBUNGSTOOL_ANZEIGEN)
+	if(!defined('CIS_LEHRVERANSTALTUNG_UEBUNGSTOOL_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_UEBUNGSTOOL_ANZEIGEN)
 	{
 		$eintraegeprozeile++;
 		echo '<td class="tdvertical" align="center">';
