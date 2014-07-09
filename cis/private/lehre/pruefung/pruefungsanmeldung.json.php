@@ -24,7 +24,8 @@ require_once('../../../../include/reservierung.class.php');
 require_once('../../../../include/mitarbeiter.class.php');
 require_once('../../../../include/pruefung.class.php');
 require_once('../../../../include/pruefungsfenster.class.php');
-
+require_once('../../../../include/note.class.php');
+require_once('../../../../include/addon.class.php');
 
 $uid = get_uid();
 
@@ -134,10 +135,13 @@ function getPruefungByLv($aktStudiensemester = null, $uid = null)
 	    }
 	    $prf->pruefung = $temp;
 	    $prf->lehrveranstaltung = $lehrveranstaltung;
-	    $lveranstaltung = new lehrveranstaltung($lehreinheiten[0]->lehrfach_id);
-	    $oe = new organisationseinheit($lveranstaltung->oe_kurzbz);
-	    $prf->organisationseinheit = $oe->bezeichnung;
-	    array_push($pruefungen, $prf);
+	    if(!empty($lehreinheiten))
+	    {
+		$lveranstaltung = new lehrveranstaltung($lehreinheiten[0]->lehrfach_id);
+		$oe = new organisationseinheit($lveranstaltung->oe_kurzbz);
+		$prf->organisationseinheit = $oe->bezeichnung;
+		array_push($pruefungen, $prf);
+	    }
 	}
 	$anmeldung = new pruefungsanmeldung();
 	$anmeldungen = $anmeldung->getAnmeldungenByStudent($uid, $aktStudiensemester);
@@ -336,11 +340,74 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 {
     $termin = new pruefungstermin($_REQUEST["termin_id"]);
     $pruefung = new pruefung();
-    $pruefung->getPruefungen($uid, NULL, $_REQUEST["lehrveranstaltung_id"]);
+    $lehrveranstaltung = new lehrveranstaltung($_REQUEST["lehrveranstaltung_id"]);
+    $studiensemester = new studiensemester();
+    $stdsem = $studiensemester->getLastOrAktSemester(0);
+    $lv_besucht = false;
+    
+    //Defaulteinstellung für Anzahlprüfungsversuche (wird durch Addon "ktu" überschrieben)
+    $maxAnzahlVersuche = 0;
+    
+    //Defaulteinstellung für Code Note "unetnschuldigt ferngeblieben" (wird durch Addon "ktu" überschrieben)
+    $noteCode_uef = -1;
+    
+    $addon = new addon();
+    foreach ($addon->aktive_addons as $a)
+    {
+	if($a === "ktu")
+	{
+	    require '../../../../addons/ktu/cis/prfVerwaltung_array.php';
+	    switch($lehrveranstaltung->oe_kurzbz)
+	    {
+		case $fakultaeten[0]["fakultaet"]:
+		    //TODO Konstante für Semesterzeitraum
+		    $semCounter = $fakultaeten[0]["sem"];
+		    break;
+		case $fakultaeten[1]["fakultaet"]:
+		    //TODO Konstante für Semesterzeitraum
+		    $semCounter = $fakultaeten[1]["sem"];
+		    break;
+		default: 
+		    $semCounter = 2;
+		    break;
+	    }
+	}
+	else
+	{
+	    $semCounter = 99;
+	}
+    }
+    $i=0;
+    do
+    {
+	$lehrveranstaltung->load_lva_student($uid, $stdsem);
+	foreach($lehrveranstaltung->lehrveranstaltungen as $lv)
+	{
+	    if($lv->lehrveranstaltung_id === $lehrveranstaltung->lehrveranstaltung_id)
+	    {
+		$lv_besucht = true;
+	    }
+	}
+	$stdsem = $studiensemester->getPreviousFrom($stdsem);
+	$lehrveranstaltung->lehrveranstaltungen = array();
+	$i++;
+    }
+    while($i<=$semCounter && $lv_besucht === FALSE);
+    
+    if(!$lv_besucht)
+    {
+	$data['error']='true';
+	$data['errormsg']='Besuch der Lehrveranstaltung liegt zu weit in der Vergangenheit.';
+	return $data;
+    }
+    
+    $pruefung->getPruefungen($uid, NULL, $lehrveranstaltung->lehrveranstaltung_id);
     $anmeldung_moeglich = true;
+    $anzahlPruefungen = count($pruefung->result);
     foreach($pruefung->result as $prf)
     {
-	if($prf->note === '17')
+	$note = new note($prf->note);
+	if($note->note === $noteCode_uef)
 	{
 	    $pruefungsanmeldung = new pruefungsanmeldung($prf->pruefungsanmeldung_id);
 	    $pruefungstermin = new pruefungstermin($pruefungsanmeldung->pruefungstermin_id);
@@ -357,6 +424,14 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 		}
 		$stdsem = $studiensemester->getPreviousFrom($stdsem);
 		$i++;
+	    }
+	}
+	else
+	{
+	    //TODO Codierung in config!???
+	    if($note->positiv === FALSE && $anzahlPruefungen >= $maxAnzahlVersuche)
+	    {
+		$anmeldung_moeglich = false;
 	    }
 	}
     }
@@ -461,10 +536,13 @@ function getAllPruefungen($aktStudiensemester = null, $uid = null)
 	    }
 	    $prf->pruefung = $temp;
 	    $prf->lehrveranstaltung = $lehrveranstaltung;
-	    $lveranstaltung = new lehrveranstaltung($lehreinheiten[0]->lehrfach_id);
-	    $oe = new organisationseinheit($lveranstaltung->oe_kurzbz);
-	    $prf->organisationseinheit = $oe->bezeichnung;
-	    array_push($pruefungen, $prf);
+	    if(!empty($lehreinheiten))
+	    {
+		$lveranstaltung = new lehrveranstaltung($lehreinheiten[0]->lehrfach_id);
+		$oe = new organisationseinheit($lveranstaltung->oe_kurzbz);
+		$prf->organisationseinheit = $oe->bezeichnung;
+		array_push($pruefungen, $prf);
+	    }
 	}
 
 	$anmeldung = new pruefungsanmeldung();
