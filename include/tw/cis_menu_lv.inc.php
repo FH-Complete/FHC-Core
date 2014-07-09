@@ -470,7 +470,9 @@ function checkZeilenUmbruch()
 		{
 			if(!$is_lector)
 			{
+				$moodle->result=array();
 				$moodle->getCourse($lvid, $angezeigtes_stsem, $user);
+
 				if(count($moodle->result)==1)
 					$link = $moodle->getPfad($moodle->result[0]->moodle_version).'course/view.php?id='.$moodle->result[0]->mdl_course_id;
 				else 
