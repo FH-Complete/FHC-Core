@@ -500,8 +500,10 @@ class lehrveranstaltung extends basis_db
 											  WHERE uid=" . $this->db_add_param($student_uid);
 		if($studiensemester_kurzbz !== NULL)
 		    $qry .= " AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
-		$qry .= ") OR lehrveranstaltung_id IN(SELECT lehrveranstaltung_id FROM lehre.tbl_zeugnisnote WHERE student_uid=" . $this->db_add_param($student_uid) . ")
-				ORDER BY semester, bezeichnung";
+		$qry .= ") OR lehrveranstaltung_id IN(SELECT lehrveranstaltung_id FROM lehre.tbl_zeugnisnote WHERE student_uid=" . $this->db_add_param($student_uid);
+		if($studiensemester_kurzbz !== NULL)
+		    $qry .= ' AND studiensemester_kurzbz='.$this->db_add_param ($studiensemester_kurzbz);
+		$qry .= ") ORDER BY semester, bezeichnung";
 
 		//Datensaetze laden
 		if (!$this->db_query($qry)) 
