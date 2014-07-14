@@ -30,6 +30,7 @@ require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/fachbereich.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
+require_once('../../include/benutzerfunktion.class.php');
 require_once('../../include/berechtigung.class.php');
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/person.class.php');
@@ -206,6 +207,30 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		$name = new benutzer();
 		$name->load($uid);
 		$htmlstr .= "Berechtigungen von <b>".$name->nachname." ".$name->vorname." (".$uid.")</b>\n";
+		$i = 0;
+		
+		$benutzerfunktion = new benutzerfunktion();
+		$benutzerfunktion->getBenutzerFunktionByUid($uid,null,'now()','now()');
+		if($benutzerfunktion!='')
+		{
+			foreach($benutzerfunktion->result as $recht)
+			{
+				$rechte_funktion = new benutzerberechtigung();
+				$rechte_funktion->loadBenutzerRollen(null, $recht->funktion_kurzbz);
+				$funktionsrecht = $rechte_funktion->berechtigungen;
+				$funktion_bezeichnung = new funktion();
+				$funktion_bezeichnung->load($recht->funktion_kurzbz);
+				if(!empty($funktionsrecht))
+				{
+					$i++;
+					if ($i==1)
+					{
+						$htmlstr .= "<br/>Geerbte Berechtigungen aus Funktion\n";
+					}
+					$htmlstr .= ($i>1?"</a>, <a href='benutzerberechtigung_details.php?funktion_kurzbz=$funktion_bezeichnung->funktion_kurzbz'>":"<a href='benutzerberechtigung_details.php?funktion_kurzbz=$funktion_bezeichnung->funktion_kurzbz'>").$funktion_bezeichnung->beschreibung."</a>";
+				}
+			}
+		}
 	}
 	elseif(isset($_REQUEST['funktion_kurzbz']) && $_REQUEST['funktion_kurzbz']!='')
 	{
