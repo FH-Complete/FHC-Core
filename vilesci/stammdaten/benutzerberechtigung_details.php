@@ -210,7 +210,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		$i = 0;
 		
 		$benutzerfunktion = new benutzerfunktion();
-		$benutzerfunktion->getBenutzerFunktionByUid($uid,null,'now()','now()');
+		$benutzerfunktion->getBenutzerFunktionByUid($uid,null,'now()',null);
 		if($benutzerfunktion!='')
 		{
 			foreach($benutzerfunktion->result as $recht)
