@@ -30,7 +30,7 @@ require_once('../../include/basis_db.class.php');
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
-$sql_query="SELECT funktion_kurzbz, beschreibung FROM public.tbl_funktion ORDER BY funktion_kurzbz";
+$sql_query="SELECT beschreibung,funktion_kurzbz FROM public.tbl_funktion ORDER BY funktion_kurzbz";
 $result_funktion=$db->db_query($sql_query);
 if(!$result_funktion)
 	die("funktion not found!" .$db->db_last_error());
@@ -41,12 +41,23 @@ if(!$result_funktion)
 	<title>Funktion</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-	<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-	<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+	<link href="../../skin/tablesort.css" rel="stylesheet" type="text/css"/>
+	<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
+	<script language="Javascript">
+	$(document).ready(function() 
+			{ 
+				$("#t1").tablesorter(
+					{
+						sortList: [[0,0]],
+						widgets: ["zebra"],
+						headers: {2:{sorter:false},3:{sorter:false}}
+					}); 
+			});
+</script>
 <body>
 <H2>Funktionen</H2>
 <h3>&Uuml;bersicht</h3>
-<table class="liste table-autosort:0 table-stripeclass:alternate table-autostripe">
+<table id="t1" class="tablesorter">
 
 <?php
 if ($result_funktion!=0)
@@ -56,9 +67,9 @@ if ($result_funktion!=0)
 
 	echo '<thead>
 			<tr>';
-	echo '<th></th>';
 	for ($i=0;$i<$num_fields; $i++)
 	    echo "<th class='table-sortable:default'>".$db->db_field_name($result_funktion,$i)."</th>";
+	echo '<th></th>';
 	echo '<th></th>';
 	echo '</tr></thead><tbody>';
 	for ($j=0; $j<$num_rows;$j++)
@@ -66,10 +77,10 @@ if ($result_funktion!=0)
 		$row=$db->db_fetch_row($result_funktion,$j);
 		
 		echo "<tr>";
-		echo "<td><a href=\"funktion_det.php?kurzbz=$row[0]\">Details</a></td>";
 	    for ($i=0; $i<$num_fields; $i++)
 			echo "<td>$row[$i]</td>";
 			
+		echo "<td><a href=\"funktion_det.php?kurzbz=$row[0]\">Details</a></td>";
 		echo "<td><a href=\"../stammdaten/benutzerberechtigung_details.php?funktion_kurzbz=$row[0]\">Berechtigungen</a></td>";
 	    echo "</tr>\n";
 	}
