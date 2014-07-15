@@ -448,8 +448,7 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 											var conf = confirm("Wollen Sie \""+this.get_text(obj)+"\" wirklich aus diesem Studienplan löschen?");
 											if(conf)
 											{
-												this.remove(obj);
-												deleteLehrveranstaltungFromStudienplan(obj.attr("studienplan_lehrveranstaltung_id"));
+												deleteLehrveranstaltungFromStudienplan(obj.attr("studienplan_lehrveranstaltung_id"), this, obj);
 											}
 										}
 										else
@@ -1078,7 +1077,7 @@ function TreeSaveError(xhr, textStatus, errorThrown)
 /**
  * Entfernt eine LV Zuordnung
  */
-function deleteLehrveranstaltungFromStudienplan(lehrveranstaltung_studienplan_id)
+function deleteLehrveranstaltungFromStudienplan(lehrveranstaltung_studienplan_id, tree, obj)
 {
 	$.ajax({
 		dataType: "json",
@@ -1086,16 +1085,41 @@ function deleteLehrveranstaltungFromStudienplan(lehrveranstaltung_studienplan_id
 		type: "POST",
 		data: {
 			"typ": "json",
-			"class": "studienplan",
-			"method": "deleteStudienplanLehrveranstaltung",
-			"parameter_0" : lehrveranstaltung_studienplan_id
+			"class": "lvregel",
+			"method": "exists",
+			"parameter_0": lehrveranstaltung_studienplan_id
 		},
 		error: loadError
-	}).success(function(data)
-	{
-		if(data.error==true)
+	}).success(function(data){
+		console.log(data);
+		if(data.return === false)
 		{
-			alert('Fehler beim Entfernen:'+data.errormsg);
+			$.ajax({
+				dataType: "json",
+				url: "../../soap/fhcomplete.php",
+				type: "POST",
+				data: {
+					"typ": "json",
+					"class": "studienplan",
+					"method": "deleteStudienplanLehrveranstaltung",
+					"parameter_0" : lehrveranstaltung_studienplan_id
+				},
+				error: loadError
+			}).success(function(data)
+			{
+				if(data.error==true)
+				{
+					alert('Fehler beim Entfernen:'+data.errormsg);
+				}
+				else
+				{
+					tree.remove(obj);
+				}
+			});
+		}
+		else
+		{
+			alert("Es müssen zuerst die LV-Regeln gelöscht werden.");
 		}
 	});
 }
