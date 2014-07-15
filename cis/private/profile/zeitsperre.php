@@ -134,7 +134,7 @@ require_once('../../../include/Excel/excel.php');
 			if (is_null($funktion))
 				$mitarbeiter=$ma->getMitarbeiter($lektor,$fix);
 			else
-				$mitarbeiter=$ma->getMitarbeiterStg(false,null,$stge,$funktion,'nachname,vorname');
+				$mitarbeiter=$ma->getMitarbeiterStg(null,null,$stge,$funktion,'nachname,vorname');
 		}
 	}
 
