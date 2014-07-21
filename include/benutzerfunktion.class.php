@@ -410,11 +410,11 @@ class benutzerfunktion extends basis_db
 	    }
 	    if(!is_null($startZeitraum))
 	    {
-		$qry .=' AND (datum_bis IS NULL OR datum_bis >'.$this->db_add_param($startZeitraum).")";
+		$qry .=' AND (datum_bis IS NULL OR datum_bis >='.$this->db_add_param($startZeitraum).")";
 	    }
 	    if(!is_null($endeZeitraum))
 	    {
-		$qry .=' AND datum_von <'.$this->db_add_param($endeZeitraum);
+		$qry .=' AND (datum_von IS NULL OR datum_von <='.$this->db_add_param($endeZeitraum).")";
 	    }
 
 	    $qry .= ";";
