@@ -80,8 +80,8 @@ if ($result_funktion!=0)
 	    for ($i=0; $i<$num_fields; $i++)
 			echo "<td>$row[$i]</td>";
 			
-		echo "<td><a href=\"funktion_det.php?kurzbz=$row[0]\">Details</a></td>";
-		echo "<td><a href=\"../stammdaten/benutzerberechtigung_details.php?funktion_kurzbz=$row[0]\">Berechtigungen</a></td>";
+		echo "<td><a href=\"funktion_det.php?kurzbz=$row[1]\">Details</a></td>";
+		echo "<td><a href=\"../stammdaten/benutzerberechtigung_details.php?funktion_kurzbz=$row[1]\">Berechtigungen</a></td>";
 	    echo "</tr>\n";
 	}
 }
