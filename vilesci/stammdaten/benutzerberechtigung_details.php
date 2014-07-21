@@ -197,8 +197,6 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		{
 			$berechtigung_user_arr[] = $berechtigung->berechtigung_kurzbz;
 		}
-		//$berechtigung_user_arr[] = array_unique($berechtigung_user_arr[]);
-		//var_dump($berechtigung_user_arr);
 		$ben = new benutzer();
 		if (!$ben->load($uid))
 			die('Benutzer existiert nicht');
@@ -209,17 +207,24 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		$htmlstr .= "Berechtigungen von <b>".$name->nachname." ".$name->vorname." (".$uid.")</b>\n";
 		$i = 0;
 		
+		// Zusätzlich jede Funktion mit einer gültigen Berechtigung anzeigen
 		$benutzerfunktion = new benutzerfunktion();
-		$benutzerfunktion->getBenutzerFunktionByUid($uid,null,'now()',null);
+		$benutzerfunktion->getBenutzerFunktionByUid($uid,null,'now()','now()');
+		$bnfkt = array();
+		foreach ($benutzerfunktion->result as $recht)
+		{
+			$bnfkt[] = $recht->funktion_kurzbz;
+		}
+		$bnfkt = array_unique($bnfkt); // Um doppelte Funktionen zB mehrere Assistenzfunktionen zu entfernen
 		if($benutzerfunktion!='')
 		{
-			foreach($benutzerfunktion->result as $recht)
+			foreach($bnfkt as $recht)
 			{
 				$rechte_funktion = new benutzerberechtigung();
-				$rechte_funktion->loadBenutzerRollen(null, $recht->funktion_kurzbz);
-				$funktionsrecht = $rechte_funktion->berechtigungen;
+				$rechte_funktion->loadBenutzerRollen(null, $recht); 
+				$funktionsrecht = $rechte_funktion->berechtigungen; // Hat die Funktion ein Recht?
 				$funktion_bezeichnung = new funktion();
-				$funktion_bezeichnung->load($recht->funktion_kurzbz);
+				$funktion_bezeichnung->load($recht);
 				if(!empty($funktionsrecht))
 				{
 					$i++;
