@@ -287,7 +287,7 @@ if($format=='HTML')
 	if($type=='ort')
 		echo '<H1>Ort: '.$ort_kurzbz.' - '.$stdplan->ort_bezeichnung.'</H1>';
 	if($type=='lektor')
-		echo '<H1>Lektor: '.$stdplan->pers_titelpre.' '.$stdplan->pers_vornamen.' '.$stdplan->pers_nachname.' '.$stdplan->pers_titelpost.'</H1>';
+		echo '<H1>Lektor: '.$stdplan->pers_titelpre.' '.$stdplan->pers_vorname.' '.$stdplan->pers_nachname.' '.$stdplan->pers_titelpost.'</H1>';
 }
 
 
