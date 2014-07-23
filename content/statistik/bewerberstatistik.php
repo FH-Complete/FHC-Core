@@ -135,10 +135,10 @@ if(isset($_GET['excel']))
 	$worksheet->write(1,$i,"Aufgenommene bereinigt", $format_bold);
 	$worksheet->mergeCells(1,$i,1,$i+2);
 	$i=$i+3;
-	$worksheet->write(1,$i,"StudentIn 1S", $format_bold);
+	$worksheet->write(1,$i,"StudentIn 1.S", $format_bold);
 	$worksheet->mergeCells(1,$i,1,$i+2);
 	$i=$i+3;
-	$worksheet->write(1,$i,"StudentIn 3S", $format_bold);
+	$worksheet->write(1,$i,"StudentIn 3.S", $format_bold);
 	$worksheet->mergeCells(1,$i,1,$i+2);
 	
 	//Überschriften 2.Zeile
@@ -294,22 +294,22 @@ if(isset($_GET['excel']))
 					$qry.=") AS aufgenommenerber_w, 
 						
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_student USING(prestudent_id) JOIN public.tbl_benutzer ON(uid=student_uid)
-					WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1 AND tbl_benutzer.aktiv
+					WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1
 				) AS student1sem,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN public.tbl_student USING(prestudent_id) JOIN public.tbl_benutzer ON(uid=student_uid)
-					WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1 AND geschlecht='m' AND tbl_benutzer.aktiv
+					WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1 AND geschlecht='m'
 				) AS student1sem_m,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN public.tbl_student USING(prestudent_id) JOIN public.tbl_benutzer ON(uid=student_uid)
-					WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1 AND geschlecht='w' AND tbl_benutzer.aktiv
+					WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1 AND geschlecht='w'
 				) AS student1sem_w,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_student USING(prestudent_id) JOIN public.tbl_benutzer ON(uid=student_uid)
-					WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=3 AND tbl_benutzer.aktiv
+					WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=3
 				) AS student3sem,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN public.tbl_student USING(prestudent_id) JOIN public.tbl_benutzer ON(uid=student_uid)
-					WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=3 AND geschlecht='m' AND tbl_benutzer.aktiv
+					WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=3 AND geschlecht='m'
 				) AS student3sem_m,
 				(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN public.tbl_student USING(prestudent_id) JOIN public.tbl_benutzer ON(student_uid=uid)
-					WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=3 AND geschlecht='w' AND tbl_benutzer.aktiv
+					WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=3 AND geschlecht='w'
 				) AS student3sem_w
 	
 			FROM
@@ -720,10 +720,10 @@ if(isset($_GET['excel']))
 				$worksheet->write($zeile,$i,"Aufgenommene bereinigt", $format_bold);
 				$worksheet->mergeCells($zeile,$i,$zeile,$i+3);
 				$i=$i+4;
-				$worksheet->write($zeile,$i,"StudentIn 1S", $format_bold);
+				$worksheet->write($zeile,$i,"StudentIn 1.S", $format_bold);
 				$worksheet->mergeCells($zeile,$i,$zeile,$i+3);				
 				$i=$i+4;
-				$worksheet->write($zeile,$i,"StudentIn 3S", $format_bold);
+				$worksheet->write($zeile,$i,"StudentIn 3.S", $format_bold);
 				$worksheet->mergeCells($zeile,$i,$zeile,$i+3);
 				
 				//Überschriften 2.Zeile
@@ -1336,10 +1336,10 @@ if(isset($_GET['excel']))
 			$worksheet2->write(1,$i,"Aufgenommene bereinigt", $format_bold);
 			$worksheet2->mergeCells(1,$i,1,$i+2);
 			$i=$i+3;
-			$worksheet2->write(1,$i,"StudentIn 1S", $format_bold);
+			$worksheet2->write(1,$i,"StudentIn 1.S", $format_bold);
 			$worksheet2->mergeCells(1,$i,1,$i+2);
 			$i=$i+3;
-			$worksheet2->write(1,$i,"StudentIn 3S", $format_bold);
+			$worksheet2->write(1,$i,"StudentIn 3.S", $format_bold);
 			$worksheet2->mergeCells(1,$i,1,$i+2);
 			
 			//Überschriften 2.Zeile
@@ -1922,22 +1922,22 @@ else
 						$qry.=") AS aufgenommenerber_w, 
 							
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_student USING(prestudent_id) JOIN public.tbl_benutzer ON(uid=student_uid)
-						WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1 AND tbl_benutzer.aktiv
+						WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1
 					) AS student1sem,
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN public.tbl_student USING(prestudent_id) JOIN public.tbl_benutzer ON(uid=student_uid)
-						WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1 AND geschlecht='m' AND tbl_benutzer.aktiv
+						WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1 AND geschlecht='m'
 					) AS student1sem_m,
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN public.tbl_student USING(prestudent_id) JOIN public.tbl_benutzer ON(uid=student_uid)
-						WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1 AND geschlecht='w' AND tbl_benutzer.aktiv
+						WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=1 AND geschlecht='w'
 					) AS student1sem_w,
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_student USING(prestudent_id) JOIN public.tbl_benutzer ON(uid=student_uid)
-						WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=3 AND tbl_benutzer.aktiv
+						WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=3
 					) AS student3sem,
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN public.tbl_student USING(prestudent_id) JOIN public.tbl_benutzer ON(uid=student_uid)
-						WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=3 AND geschlecht='m' AND tbl_benutzer.aktiv
+						WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=3 AND geschlecht='m'
 					) AS student3sem_m,
 					(SELECT count(*) FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING (prestudent_id) JOIN public.tbl_person USING(person_id) JOIN public.tbl_student USING(prestudent_id) JOIN public.tbl_benutzer ON(student_uid=uid)
-						WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=3 AND geschlecht='w' AND tbl_benutzer.aktiv
+						WHERE tbl_prestudent.studiengang_kz=stg.studiengang_kz AND status_kurzbz='Student' AND studiensemester_kurzbz='$stsem' AND ausbildungssemester=3 AND geschlecht='w'
 					) AS student3sem_w
 	
 				FROM
@@ -1958,8 +1958,8 @@ else
 							<th class='table-sortable:numeric'>BewerberIn (m/w)</th>
 							<th class='table-sortable:numeric'>Aufgenommene (m/w)</th>
 							<th class='table-sortable:numeric'>Aufgenommene bereinigt (m/w)</th>
-							<th class='table-sortable:numeric'>StudentIn 1S (m/w)</th>
-							<th class='table-sortable:numeric'>StudentIn 3S (m/w)</th>
+							<th class='table-sortable:numeric'>StudentIn 1.S (m/w)</th>
+							<th class='table-sortable:numeric'>StudentIn 3.S (m/w)</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -2215,11 +2215,11 @@ else
 								<th class='table-sortable:numeric'>InteressentInnen VZ / BB / DL / DDP</th>
 								<th class='table-sortable:numeric'>InteressentInnen mit ZGV VZ / BB / DL / DDP</th>
 								<th class='table-sortable:numeric'>InteressentInnen mit RT Anmeldung VZ / BB / DL / DDP</th>
-								<th class='table-sortable:numeric'>BewerberInnen 1S VZ / BB / DL / DDP</th>
+								<th class='table-sortable:numeric'>BewerberInnen 1.S VZ / BB / DL / DDP</th>
 								<th class='table-sortable:numeric'>Aufgenommene VZ / BB / DL / DDP</th>
 								<th class='table-sortable:numeric'>Aufgenommene bereinigt VZ / BB / DL / DDP</th>
-								<th class='table-sortable:numeric'>StudentIn 1S VZ / BB / DL / DDP</th>
-								<th class='table-sortable:numeric'>StudentIn 3S VZ / BB / DL / DDP</th>
+								<th class='table-sortable:numeric'>StudentIn 1.S VZ / BB / DL / DDP</th>
+								<th class='table-sortable:numeric'>StudentIn 3.S VZ / BB / DL / DDP</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -2528,8 +2528,8 @@ else
 							<th class='table-sortable:numeric'>BewerberIn (m/w)</th>
 							<th class='table-sortable:numeric'>Aufgenommene (m/w)</th>
 							<th class='table-sortable:numeric'>Aufgenommene bereinigt(m/w)</th>
-							<th class='table-sortable:numeric'>StudentIn 1S (m/w)</th>
-							<th class='table-sortable:numeric'>StudentIn 3S (m/w)</th>
+							<th class='table-sortable:numeric'>StudentIn 1.S (m/w)</th>
+							<th class='table-sortable:numeric'>StudentIn 3.S (m/w)</th>
 						</tr>
 					</thead>
 					<tbody>
