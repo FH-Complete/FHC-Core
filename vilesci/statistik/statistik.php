@@ -27,6 +27,7 @@
  */
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/statistik.class.php');
+require_once('../../include/filter.class.php');
 require_once('../../include/functions.inc.php');
 
 if(!isset($_GET['statistik_kurzbz']))
@@ -49,7 +50,7 @@ $statistik = new statistik();
 if(!$statistik->load($statistik_kurzbz))
 	die($statistik->errormsg);
 
-echo '<h2>Statistik - '.$statistik->bezeichnung.'</h2>';
+echo '<h2>Report - '.$statistik->bezeichnung.'</h2>';
 
 //Beschreibung zu der Statistik anzeigen
 if($statistik->content_id!='')
@@ -96,12 +97,18 @@ echo '
 <form action="'.$action.'" method="POST" target="detail_statistik" onsubmit="return doit();">
 	<table>
 ';
+// Filter parsen
+$fltr=new filter();
+$fltr->loadAll();
+echo '<tr>';
 foreach($vars as $var)
 {
-	echo '<tr>';
-	echo "<td>$var</td><td><input type=\"text\" id=\"$var\" name=\"$var\" value=\"\"></td>";
-	echo '</tr>';
+	if ($fltr->isFilter($var))
+		echo "<td>$var</td><td>".$fltr->getHtmlWidget($var)."</td>\n";
+	else
+		echo "<td>$var</td><td><input type=\"text\" id=\"$var\" name=\"$var\" value=\"\"></td>";
 }
+echo '</tr>';
 echo '
 	<tr>
 		<td></td>

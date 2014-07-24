@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2011 FH Technikum Wien
+/* Copyright (C) 2011 fhcomplete.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -62,54 +62,15 @@ if(!$statistik->load($statistik_kurzbz))
 
 $html.= '<h2>Statistik - '.$statistik->bezeichnung.'</h2>';
 
-if($statistik->sql!='')
+if ($statistik->loadData())
 {
-	$sql = $statistik->sql;
-	foreach($_REQUEST as $name=>$value)
-	{
-		$sql = str_replace('$'.$name,addslashes($value),$sql);
-	}
-	
-	$db = new basis_db();
-	if($result = $db->db_query($sql))
-	{
-		$html.= '<table class="tablesorter" id="myTable">';
-		$html.= '<thead><tr>';
-		$anzahl_spalten = $db->db_num_fields($result);
-		for($spalte=0;$spalte<$anzahl_spalten;$spalte++)
-		{
-			$html.= '<th>'.$db->db_field_name($result,$spalte).'</th>';
-			$csv.='"'.$db->db_field_name($result,$spalte).'",';
-			//$json[$db->db_field_name($result,$spalte)]=array();
-		}
-		$html.= '</tr></thead><tbody>';
-		$csv=substr($csv,0,-1)."\n";
-		while($row = $db->db_fetch_object($result))
-		{
-			$html.= '<tr>';
-			$anzahl_spalten = $db->db_num_fields($result);
-			for($spalte=0;$spalte<$anzahl_spalten;$spalte++)
-			{
-				$name = $db->db_field_name($result,$spalte);
-				$html.= '<td>'.$row->$name.'</td>';
-				$csv.= '"'.$row->$name.'",';
-				
-				if($spalte>0)
-				{
-					$name_spalte_0 = $db->db_field_name($result,0);
-					$json[$row->$name_spalte_0][$name]=$row->$name;
-				}
-			}	
-			$html.= '</tr>';
-			$csv=substr($csv,0,-1)."\n";
-		}
-		$html.= '</tbody></table>';
-	}
+	$html.=$statistik->getHtmlTable('myTable','tablesorter');
+	$csv=$statistik->getCSV();
+	$json=$statistik->getJSON();
 }
 else
-{
-	$html.= 'Zu dieser Statistik gibt es keine SQL Abfrage';
-}
+	echo $statistik->error_msg;
+
 switch ($outputformat)
 {
 	case 'html':
@@ -128,6 +89,6 @@ switch ($outputformat)
 		header("Pragma: no-cache");
 		header("Expires: 0");
 		//$array= array_map("str_getcsv",explode("\n", $csv));
-		echo json_encode($json);
+		echo $json;
 }
 ?>
