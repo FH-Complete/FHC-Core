@@ -47,6 +47,12 @@ class statistik extends basis_db
 	public $studiensemester_kurzbz;// varchar(16)
 	public $ausbildungssemester;// smallint
 	
+	// Daten der Statistik
+	public $data;
+	public $html;
+	public $csv;
+	public $json;
+	
 	/**
 	 * Konstruktor
 	 */
@@ -394,6 +400,81 @@ class statistik extends basis_db
 		}
 		
 		return true;
+	}
+	
+	/**
+	 * Laedt die Daten einer Statistik (derzeit nur SQL)
+	 * @param $statistik_kurzbz
+	 */
+	public function loadData()
+	{
+		$this->html='';
+		$this->csv='';
+		$this->json=array();
+		
+		if($this->sql!='')
+		{
+			$sql = $this->sql;
+			foreach($_REQUEST as $name=>$value)
+			{
+				$sql = str_replace('$'.$name,addslashes($value),$sql);
+			}
+			
+			if($this->data = $this->db_query($sql))
+			{
+				$this->html.= '<thead><tr>';
+				$anzahl_spalten = $this->db_num_fields($this->data);
+				for($spalte=0;$spalte<$anzahl_spalten;$spalte++)
+				{
+					$this->html.= '<th>'.$this->db_field_name($this->data,$spalte).'</th>';
+					$this->csv.='"'.$this->db_field_name($this->data,$spalte).'",';
+				}
+				$this->html.= '</tr></thead><tbody>';
+				$this->csv=substr($this->csv,0,-1)."\n";
+				while($row = $this->db_fetch_object($this->data))
+				{
+					$this->html.= '<tr>';
+					$anzahl_spalten = $this->db_num_fields($this->data);
+					for($spalte=0;$spalte<$anzahl_spalten;$spalte++)
+					{
+						$name = $this->db_field_name($this->data,$spalte);
+						$this->html.= '<td>'.$row->$name.'</td>';
+						$this->csv.= '"'.$row->$name.'",';
+						
+						if($spalte>0)
+						{
+							$name_spalte_0 = $this->db_field_name($this->data,0);
+							$this->json[$row->$name_spalte_0][$name]=$row->$name;
+						}
+					}	
+					$this->html.= '</tr>';
+					$this->csv=substr($this->csv,0,-1)."\n";
+				}
+				$this->html.= '</tbody>';
+			}
+			return true;
+		}
+		else
+		{
+			$this->error_msg= 'Zu dieser Statistik gibt es keine SQL Abfrage';
+			return false;
+		}
+	}
+	
+	function getHtmlTable($id, $class='')
+	{
+				
+		return '<table class="'.$class.'" id="'.$id.'">'.$this->html.'</table>';
+	}
+	
+	function getCSV()
+	{
+		return $this->csv;
+	}
+	
+	function getJSON()
+	{
+		return json_encode($this->json);
 	}
 }
 ?>
