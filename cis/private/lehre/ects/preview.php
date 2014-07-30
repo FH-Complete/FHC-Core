@@ -34,9 +34,12 @@ require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/lvinfo.class.php');
 require_once('../../../../include/studiengang.class.php');
 require_once('../../../../include/safehtml/safehtml.class.php');
+require_once '../../../../include/phrasen.class.php';
 
 if (!$db = new basis_db())
 			die('Fehler beim Herstellen der Datenbankverbindung');
+
+$phrasen = new phrasen();
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
@@ -329,7 +332,7 @@ if (!$db = new basis_db())
 		echo '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>';
 		if(($anz=count($lehrendearray))>0)
 		{
-			echo "<tr valign='top'><td><nobr>Lehrbeauftragte(r): </nobr></td><td>";
+			echo "<tr valign='top'><td><nobr>".$phrasen->t('lehre/Lehrbeauftrager').": </nobr></td><td>";
 
 			foreach($lehrendearray as $elem)
 			{

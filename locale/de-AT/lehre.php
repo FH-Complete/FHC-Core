@@ -2,6 +2,7 @@
 $this->phrasen['lehre/keineLektorenZugeordnet']='Derzeit sind keine Lektoren für dieses Fach zugeteilt';
 
 $this->phrasen['lehre/lehrveranstaltungsinformation']='Lehrveranstaltungsinformation';
+$this->phrasen['lehre/Lehrbeauftrager']='Lehrbeauftrage(r)';
 $this->phrasen['lehre/lvInfoBearbeiten']='Bearbeiten';
 
 $this->phrasen['lehre/semesterplan']='Semesterplan';
