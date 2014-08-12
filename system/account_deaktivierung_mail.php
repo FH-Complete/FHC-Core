@@ -154,7 +154,7 @@ if($result = $db->db_query($qry))
 		$message .= "Fachhochschule Technikum Wien\n";
 		$message .= "Höchstädtplatz 5\n";
 		$message .= "1200 Wien \n";
-		$to = 'wienerro@technikum-wien.at, astfaell@technikum-wien.at, rapold@technikum-wien.at';
+		$to = 'wienerro@technikum-wien.at, astfaell@technikum-wien.at, ganzera@technikum-wien.at';
 		$mail = new mail($to,'no-reply@'.DOMAIN,'Abbrecher Information', $message);
 		if($mail->send())
 			$text.="Abbrecher Infomail an $to verschickt\n";
