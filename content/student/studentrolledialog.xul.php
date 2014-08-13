@@ -27,6 +27,7 @@ header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../config/global.config.inc.php');
 require_once('../../include/person.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/studienplan.class.php');
@@ -125,13 +126,21 @@ $db = new basis_db();
 					<menulist id="student-rolle-menulist-ausbildungssemester" >
 						<menupopup>
 						<?php
-							$maxsem=10;
-							$qry = "SELECT max(semester) as maxsem FROM public.tbl_lehrverband WHERE studiengang_kz=(SELECT studiengang_kz FROM public.tbl_prestudent WHERE prestudent_id=".$db->db_add_param($prestudent_id).")";
-							if($result = $db->db_query($qry))
+						
+							if(defined('VORRUECKUNG_STATUS_MAX_SEMESTER') && VORRUECKUNG_STATUS_MAX_SEMESTER==false)
 							{
-								if($row = $db->db_fetch_object($result))
+								$maxsem=100;
+							}
+							else
+							{
+								$maxsem=10;
+								$qry = "SELECT max(semester) as maxsem FROM public.tbl_lehrverband WHERE studiengang_kz=(SELECT studiengang_kz FROM public.tbl_prestudent WHERE prestudent_id=".$db->db_add_param($prestudent_id).")";
+								if($result = $db->db_query($qry))
 								{
-									$maxsem = $row->maxsem;
+									if($row = $db->db_fetch_object($result))
+									{
+										$maxsem = $row->maxsem;
+									}
 								}
 							}
 														
