@@ -36,6 +36,7 @@ require_once('../include/mitarbeiter.class.php');
 require_once('../include/konto.class.php');
 require_once('../include/studiensemester.class.php');
 require_once('../include/student.class.php');
+require_once('../include/studiengang.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -128,6 +129,8 @@ if(copy($zipfile, $tempname_zip))
 				$student = new student();
 				$student->load($bn->uid);
 				$konto = new konto();
+				$studiengang = new studiengang();
+				$studiengang->load($student->studiengang_kz);
 				
 				$stsem_obj = new studiensemester();
 				$stsem = $stsem_obj->getaktorNext();
@@ -161,8 +164,10 @@ if(copy($zipfile, $tempname_zip))
 						<nachname>".$bn->nachname."</nachname>
 						<titelpre>".$bn->titelpre."</titelpre>
 						<titelpost>".$bn->titelpost."</titelpost>
+						<studiengang>".$studiengang->kurzbzlang."</studiengang>
 						<gebdatum>".$datum_obj->formatDatum($bn->gebdatum,'d.m.Y')."</gebdatum>
 						<matrikelnummer>".$student->matrikelnr."</matrikelnummer>
+						<ausstellungsdatum>".date('M.Y')."</ausstellungsdatum>
 						<gueltigbis>".$datum_obj->formatDatum($gueltigbis,'d.m.Y')."</gueltigbis>
 					</student>";
 				}
