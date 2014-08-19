@@ -167,6 +167,9 @@ define('MAIL_INTERNATIONAL_OUTGOING', 'invalid@technikum-wien.at');
 
 define('ANZAHL_PREINTERESSENT','5');
 
+//Name der aktiven Addons getrennt mit ;
+define('ACTIVE_ADDONS','');
+
 // ***** MOODLE *****
 // Moodle verwenden Ja/Nein
 define('MOODLE',true);
