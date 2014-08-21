@@ -536,16 +536,19 @@ class studiensemester extends basis_db
 		{
 			$op='>';
 			$sort='ASC';
+			$sort2='DESC';
 		}
 		elseif($wert<0)
 		{
 			$op='<';
 			$sort='DESC';
+			$sort2='ASC';
 		}
 		else
 		{
 			$op='=';
 			$sort='';
+			$sort2='';
 		}
 
 		$qry = "SELECT studiensemester_kurzbz
@@ -558,7 +561,7 @@ class studiensemester extends basis_db
 					ORDER BY start $sort
 					LIMIT ".abs($wert)."
 					) as foo
-				ORDER BY start DESC LIMIT 1";
+				ORDER BY start $sort2 LIMIT 1";
 
 		if($this->db_query($qry))
 		{

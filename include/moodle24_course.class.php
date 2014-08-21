@@ -28,6 +28,7 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/moodle.class.php');
 require_once(dirname(__FILE__).'/datum.class.php');
 require_once(dirname(__FILE__).'/studiensemester.class.php');
+require_once(dirname(__FILE__).'/../config/global.config.inc.php');
 
 class moodle24_course extends basis_db
 {
@@ -212,7 +213,8 @@ class moodle24_course extends basis_db
 			$lvid = $this->lehrveranstaltung_id;
 		
 		//Studiengang und Semester holen
-		$qry = "SELECT tbl_lehrveranstaltung.semester, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stg 
+		$qry = "SELECT tbl_lehrveranstaltung.semester, UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stg,
+				studiengang_kz, tbl_studiengang.oe_kurzbz
 				FROM lehre.tbl_lehrveranstaltung JOIN public.tbl_studiengang USING(studiengang_kz)
 				WHERE lehrveranstaltung_id=".$this->db_add_param($lvid, FHC_INTEGER);
 		
@@ -222,6 +224,8 @@ class moodle24_course extends basis_db
 			{
 				$semester = $row->semester;
 				$stg = $row->stg;
+				$stg_kz = $row->studiengang_kz;
+				$oe_kurzbz = $row->oe_kurzbz;
 			}
 			else 
 			{
@@ -235,32 +239,109 @@ class moodle24_course extends basis_db
 			return false;
 		}
 		
-		//Studiensemester Categorie holen
-		if(!$id_stsem = $this->getCategorie($this->studiensemester_kurzbz, '0'))
+		// Kategoriebau Aufbauen
+		if(defined('MOODLE_COURSE_SCHEMA') && MOODLE_COURSE_SCHEMA=='DEP-STG-JG-STSEM')
 		{
-			if(!$id_stsem = $this->createCategorie($this->studiensemester_kurzbz, '0'))
-				echo "<br>Fehler beim Anlegen des Studiensemesters";
-		}
-		//Studiengang Categorie holen
-		if(!$id_stg = $this->getCategorie($stg, $id_stsem))
-		{
-			if(!$id_stg = $this->createCategorie($stg, $id_stsem))
-				echo "<br>$this->errormsg";
-		}
-		//Semester Categorie holen
-		if(!$id_sem = $this->getCategorie($semester, $id_stg))
-		{
-			if(!$id_sem = $this->createCategorie($semester, $id_stg))
-				echo "<br>$this->errormsg";
-		}
 		
+			// Struktur: Department -> STG -> Jahrgang -> StSem (Informationstechnologie und Informationsmanagement -> BIMK -> Jahrgang 2014 -> WS2014)
+			
+			// Studiengang der Lehrveranstaltung holen
+			// Uebergeordnetes Department ermitteln
+			$qry = 'SELECT 
+						bezeichnung 
+					FROM 
+						public.tbl_organisationseinheit 
+					WHERE 
+						oe_kurzbz=(SELECT oe_parent_kurzbz FROM public.tbl_organisationseinheit WHERE oe_kurzbz='.$this->db_add_param($oe_kurzbz).')';
+			
+			if($result_department = $this->db_query($qry))
+			{
+				if($row_department = $this->db_fetch_object($result_department))
+				{
+					$department = $row_department->bezeichnung;
+				}
+				else
+				{
+					$this->errormsg = 'Fehler beim Ermitteln des Departments';
+					return false;
+				}
+			}
+			// Department
+			if(!$id_department = $this->getCategorie($department, '0'))
+			{
+				if(!$id_department = $this->createCategorie($department, '0'))
+					echo "<br>$this->errormsg";
+			}
+			
+			// Studiengang
+			if(!$id_stg = $this->getCategorie($stg, $id_department))
+			{
+				if(!$id_stg = $this->createCategorie($stg, $id_department))
+					echo "<br>$this->errormsg";
+			}
+			
+			// Jahrgang - 1. Studiensemester ermitteln (Stsem um Ausbsem -1 zurückspringen) und das Jahr ermitteln
+			$studiensemester = new studiensemester();
+			if($semester!=0)
+			{
+				$jahrgangstsem = $studiensemester->jump($this->studiensemester_kurzbz, ($semester-1)*-1);
+				$studiensemester->load($jahrgangstsem);
+			}
+			else
+			{
+				$jahrgangstsem=$this->studiensemester_kurzbz;
+				$studiensemester->load($jahrgangstsem);
+			}
+
+			$datum = new Datum();
+			$jahr = $datum->formatDatum($studiensemester->start, 'Y');
+			
+			if(!$id_jahrgang = $this->getCategorie('Jahrgang '.$jahr, $id_stg))
+			{
+				if(!$id_jahrgang = $this->createCategorie('Jahrgang '.$jahr, $id_stg))
+					echo "<br>$this->errormsg";
+			}
+			
+			// Studiensemester
+			if(!$id_stsem = $this->getCategorie($this->studiensemester_kurzbz, $id_jahrgang))
+			{
+				if(!$id_stsem = $this->createCategorie($this->studiensemester_kurzbz, $id_jahrgang))
+					echo "<br>Fehler beim Anlegen des Studiensemesters";
+			}
+			
+			$categoryid=$id_stsem;
+		}
+		else
+		{
+			// Struktur: STSEM -> STG -> Ausbsemester (WS2014 -> BEL -> 1)
+			
+			//Studiensemester Categorie holen
+			if(!$id_stsem = $this->getCategorie($this->studiensemester_kurzbz, '0'))
+			{
+				if(!$id_stsem = $this->createCategorie($this->studiensemester_kurzbz, '0'))
+					echo "<br>Fehler beim Anlegen des Studiensemesters";
+			}
+			//Studiengang Categorie holen
+			if(!$id_stg = $this->getCategorie($stg, $id_stsem))
+			{
+				if(!$id_stg = $this->createCategorie($stg, $id_stsem))
+					echo "<br>$this->errormsg";
+			}
+			//Semester Categorie holen
+			if(!$id_sem = $this->getCategorie($semester, $id_stg))
+			{
+				if(!$id_sem = $this->createCategorie($semester, $id_stg))
+					echo "<br>$this->errormsg";
+			}
+			$categoryid=$id_sem;
+		}
 		
 		$client = new SoapClient($this->serverurl); 
 
 		$data = new stdClass();
 		$data->fullname=$this->mdl_fullname;
 		$data->shortname=$this->mdl_shortname;
-		$data->categoryid=$id_sem;
+		$data->categoryid=$categoryid;
 		$data->format='topics';
 
 		$stsem = new studiensemester();
