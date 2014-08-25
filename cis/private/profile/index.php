@@ -542,7 +542,8 @@ if(!$ansicht && (!defined('CIS_PROFIL_BETRIEBSMITTEL_ANZEIGEN') || CIS_PROFIL_BE
   	</tr>
   	</table>
   	</td>';
-	echo '<td class="menubox">';
+	$menubox='';
+	
         //Überprüfung ob Addon vorhanden ist
         $addon = new addon();         
 		
@@ -558,7 +559,7 @@ if(!$ansicht && (!defined('CIS_PROFIL_BETRIEBSMITTEL_ANZEIGEN') || CIS_PROFIL_BE
                 {
                     foreach($menu as $entry)
                     {
-                        echo "<p><a href=".$entry['link']." target=".$entry['target'].">".$entry['name']."</a></p>"; 
+                        $menubox.= "<p><a href=".$entry['link']." target=".$entry['target'].">".$entry['name']."</a></p>"; 
                     }
                 }
              }
@@ -566,8 +567,11 @@ if(!$ansicht && (!defined('CIS_PROFIL_BETRIEBSMITTEL_ANZEIGEN') || CIS_PROFIL_BE
 	
     //Überprüfung ob Hilfe-Link vorhanden
     if ($p->t("dms_link/profilhilfe")!='')
-        echo '<p><a href="../../../cms/content.php?content_id='.$p->t("dms_link/profilhilfe").'" target="_blank">'.$p->t('global/hilfe').'</a></p>';
-        
+        $menubox.= '<p><a href="../../../cms/content.php?content_id='.$p->t("dms_link/profilhilfe").'" target="_blank">'.$p->t('global/hilfe').'</a></p>';
+    if($menubox!='')
+		echo '<td class="menubox">'.$menubox;
+	else
+		echo '<td>';
 	echo'</td></tr>
 		<tr>
 		<td class="teambox" style="width: 20%;">';
