@@ -23,6 +23,7 @@
  * Erstellt eine Liste mit dem Lehrveranstaltungen und Betreuungen denen der Lektor zugeteilt ist
  */
 require_once('../../../config/cis.config.inc.php');
+require_once('../../../config/global.config.inc.php');
 require_once('../../../include/basis_db.class.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/studiengang.class.php');
@@ -151,8 +152,10 @@ require_once('../../../include/studiensemester.class.php');
 		echo '
 		<table class="tablesorter" id="t1">
 			<thead>
-			<tr>
-				<th>'.$p->t('lvaliste/gesamtnote').'</th>
+			<tr>';
+		if(!defined('CIS_LVALISTE_NOTENEINGABE_ANZEIGEN') || CIS_LVALISTE_NOTENEINGABE_ANZEIGEN)
+			echo '<th>'.$p->t('lvaliste/gesamtnote').'</th>';
+		echo '
 				<th>'.$p->t('lvaliste/lehrfach').'</th>
 				<th>'.$p->t('lvaliste/lehrform').'</th>
 				<th>'.$p->t('lvaliste/lvBezeichnung').'</th>				
@@ -179,7 +182,8 @@ require_once('../../../include/studiensemester.class.php');
 			$row=$db->db_fetch_object($result);
 
 			echo '<tr>';
-			echo '<td nowrap><a href="../lehre/benotungstool/lvgesamtnoteverwalten.php?lvid='.$row->lehrveranstaltung_id.'&stsem='.$stdsem.'">'.$p->t('lvaliste/gesamtnote').'</a></td>';
+			if(!defined('CIS_LVALISTE_NOTENEINGABE_ANZEIGEN') || CIS_LVALISTE_NOTENEINGABE_ANZEIGEN)
+				echo '<td nowrap><a href="../lehre/benotungstool/lvgesamtnoteverwalten.php?lvid='.$row->lehrveranstaltung_id.'&stsem='.$stdsem.'">'.$p->t('lvaliste/gesamtnote').'</a></td>';
 			echo '<td>'.$row->lehrfach.'</td>';
 			echo '<td>'.$row->le_lehrform_kurzbz.'</td>';	
 			if ($row->lehrfach_bez!=$row->lv_bezeichnung)			
@@ -217,7 +221,8 @@ require_once('../../../include/studiensemester.class.php');
 		echo '</tbody>';
 		echo '<tfoot>';
 		echo '<tr>';
-		echo '<td>&nbsp;</td>';
+		if(!defined('CIS_LVALISTE_NOTENEINGABE_ANZEIGEN') || CIS_LVALISTE_NOTENEINGABE_ANZEIGEN)
+			echo '<td>&nbsp;</td>';
 		echo '<td>&nbsp;</td>';
 		echo '<td>&nbsp;</td>';
 		echo '<td>&nbsp;</td>';

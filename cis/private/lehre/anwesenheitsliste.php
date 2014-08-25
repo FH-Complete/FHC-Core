@@ -28,6 +28,7 @@
  * anwesenheitsliste.php?stg_kz=222&sem=1&lvid=1234
  */
 	require_once('../../../config/cis.config.inc.php');
+	require_once('../../../config/global.config.inc.php');
 	require_once('../../../include/functions.inc.php');
 	require_once('../../../include/studiengang.class.php');
 	require_once('../../../include/lehrveranstaltung.class.php');
@@ -105,13 +106,13 @@
 	  	echo "</table>";
 
 	  	$qry = "SELECT *, tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitgruppe USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
-	  			WHERE lehrveranstaltung_id='$lvid' AND studiensemester_kurzbz='".addslashes($stsem)."'";
+	  			WHERE lehrveranstaltung_id='$lvid' AND studiensemester_kurzbz=".$db->db_add_param($stsem);
 
 	  	$qry = "SELECT *, tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester ,tbl_lehreinheit.lehrform_kurzbz
 				 FROM lehre.tbl_lehreinheit 
 				JOIN lehre.tbl_lehreinheitgruppe USING(lehreinheit_id) 
 				JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
-	  			WHERE lehrveranstaltung_id='$lvid' AND studiensemester_kurzbz='".addslashes($stsem)."'";
+	  			WHERE lehrveranstaltung_id='$lvid' AND studiensemester_kurzbz=".$db->db_add_param($stsem);
 					  		  	
 	  	if($result = $db->db_query($qry))
 	  	{
@@ -126,7 +127,7 @@
 		  				if($lastlehreinheit!='')
 		  				{
 			  				$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid)
-			  						WHERE lehreinheit_id='$lastlehreinheit'";
+			  						WHERE lehreinheit_id=".$db->db_add_param($lastlehreinheit);
 			  				$lektoren = '';
 			  				
 			  				if($result_lkt = $db->db_query($qry))
@@ -162,7 +163,7 @@
 		  			$kurzbz = $row->kurzbz;
 		  		}
 		  		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid)
-						WHERE lehreinheit_id='$lastlehreinheit'";
+						WHERE lehreinheit_id=".$db->db_add_param($lastlehreinheit);
 				$lektoren = '';
 				if($result_lkt = $db->db_query($qry))
 				{
@@ -202,6 +203,9 @@
 		  		$nt_content = $p->t('anwesenheitsliste/keineStudentenVorhanden');
 		  	echo $p->t('anwesenheitsliste/erstellenDerListeKlicken');
 		  	echo "<br /><br/>";
+
+			if(defined('CIS_ANWESENHEITSLISTE_NOTENLISTE_ANZEIGEN') && !CIS_ANWESENHEITSLISTE_NOTENLISTE_ANZEIGEN)
+				$nt_content='';
 		  	echo "<table cellpadding='0' cellspacing='0'>
 		  		
 		  		<tr>

@@ -136,7 +136,10 @@ if (isset($_GET["handbuch"])){
 		<td class="tdwidth10">&nbsp;</td>
 		<td style="vertical-align:top; height: 10px"><h1>
 		<?php
-		echo $lv_obj->bezeichnung_arr[$sprache].' '.$lv_obj->lehrform_kurzbz.' / '.$kurzbz.'-'.$semester.' '.$lv_obj->orgform_kurzbz;
+		echo $lv_obj->bezeichnung_arr[$sprache].' '.$lv_obj->lehrform_kurzbz;
+
+		if(!defined('CIS_LEHRVERANSTALTUNG_SEMESTERINFO_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_SEMESTERINFO_ANZEIGEN)
+			echo ' / '.$kurzbz.'-'.$semester.' '.$lv_obj->orgform_kurzbz;
 
 		$qry = "SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
 				WHERE lehrveranstaltung_id='".addslashes($lvid)."' ORDER BY ende DESC LIMIT 1";

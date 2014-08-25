@@ -21,6 +21,7 @@
  *          Gerald Simane-Sequens <	gerald.simane-sequens@technikum-wien.at>.
  */
 require_once('../../../config/cis.config.inc.php');
+require_once('../../../config/global.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/globals.inc.php');
 require_once('../../../include/studiengang.class.php');
@@ -120,14 +121,8 @@ if ($type=='mitarbeiter')
 	$kontakt->loadFirmaKontakttyp($user->standort_id,'telefon');
 	$vorwahl = $kontakt->kontakt;	
 }
-
-// Mail-Groups
-if(!($erg_mg=$db->db_query("SELECT gruppe_kurzbz, beschreibung FROM campus.vw_persongruppe WHERE mailgrp AND uid='$uid'  ".(isset($semester)?" and semester=$semester ":'')."  ORDER BY gruppe_kurzbz")))
-	die($db->db_last_error());
-$nr_mg=$db->db_num_rows($erg_mg);
 	
-echo '
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+echo '<!DOCTYPE HTML>
 <html>
 <head>
 	<title>'.$p->t('profil/profil').'</title>
@@ -250,36 +245,39 @@ if(!$ansicht)
     
     function sortAdresse($a , $b)
     {
-	if($a->typ === $b->typ)
-	    return 0;
+		if($a->typ === $b->typ)
+	    	return 0;
 	
-	return ($a->typ < $b->typ) ? -1 : 1;
+		return ($a->typ < $b->typ) ? -1 : 1;
     }
     usort($adresse->result, "sortAdresse");
     foreach($adresse->result as $a)
     {
-	switch ($a->typ)
-	{
-	    case "h":
-		$typ = $p->t("global/hauptwohnsitz");
-		break;
-	    case "n":
-		$typ = $p->t("global/nebenwohnsitz");
-		break;
-	    default:
-		$typ = NULL;
-		break;
-	}
-	if($typ !== NULL)
-	{
-	    echo "<b>".$typ.": </b><br>";
-	    echo $a->strasse."<br>".$a->plz." ".$a->ort."<br><br>";
-	}
+		if($a->zustelladresse)
+		{
+			switch ($a->typ)
+			{
+				case "h":
+				$typ = $p->t("global/hauptwohnsitz");
+				break;
+				case "n":
+				$typ = $p->t("global/nebenwohnsitz");
+				break;
+				default:
+				$typ = NULL;
+				break;
+			}
+			if($typ !== NULL)
+			{
+				echo "<b>".$typ.": </b><br>";
+				echo $a->strasse."<br>".$a->plz." ".$a->ort."<br><br>";
+			}
+		}
     }
 }
 
 $studiengang = new studiengang();
-if ($type=='student')
+if ($type=='student' && (!defined('CIS_PROFIL_STUDIENINFORMATION_ANZEIGEN') || CIS_PROFIL_STUDIENINFORMATION_ANZEIGEN))
 {	
 	$studiengang->load($user->studiengang_kz);
 	
@@ -299,14 +297,14 @@ if ($type=='mitarbeiter')
 	if($user->telefonklappe!='')
 	{
 		echo $p->t('profil/telefonTw').": $vorwahl - $user->telefonklappe<BR>";
-		echo $p->t('profil/faxTw').": $vorwahl - 99 $user->telefonklappe<BR>";
+		//echo $p->t('profil/faxTw').": $vorwahl - 99 $user->telefonklappe<BR>";
 	}
 	if ($user->ort_kurzbz!='')
 		echo $p->t('profil/buero').': '.$user->ort_kurzbz.'<br>';
 }  
 echo '</td>';
 echo '<td valign="top">';
-if(!$ansicht)
+if(!$ansicht && (!defined('CIS_PROFIL_FHAUSWEIS_ANZEIGEN') || CIS_PROFIL_FHAUSWEIS_ANZEIGEN))
 {	
 	echo '<b>'.$p->t('profil/fhausweisStatus').'</b><br>';
 	$bm = new betriebsmittel();
@@ -423,11 +421,16 @@ if(!$ansicht)
 			%0AGeburtsort:%20$user->gebort%0ATitelPre:%20$user->titelpre%0ATitelPost:%20$user->titelpost
 			%0A%0A***%0DPlatz fuer weitere (nicht angefuehrte Daten)%0D***\">".$p->t('profil/zustaendigeAssistenz')."</a><br><br>";
 		}
-		
-echo '<table width="100%">
-    <tr>
-    <td valign="top">';
 
+echo '<table width="100%">';	
+
+echo '<tr>
+		<td valign="top">';
+
+if(!defined('CIS_PROFIL_FUNKTIONEN_ANZEIGEN') || CIS_PROFIL_FUNKTIONEN_ANZEIGEN)
+{	
+
+	
 	//Funktionen
 	$qry = "SELECT 
 				*, tbl_benutzerfunktion.oe_kurzbz as oe_kurzbz, tbl_organisationseinheit.bezeichnung as oe_bezeichnung,
@@ -454,7 +457,9 @@ echo '<table width="100%">
 			echo '</tbody></table><br>';
 		}
 	}
-if(!$ansicht)
+}
+
+if(!$ansicht && (!defined('CIS_PROFIL_BETRIEBSMITTEL_ANZEIGEN') || CIS_PROFIL_BETRIEBSMITTEL_ANZEIGEN))
 {
     // Betriebsmittel Personen
     $oBetriebsmittelperson = new betriebsmittelperson();
@@ -538,47 +543,25 @@ if(!$ansicht)
   	</table>
   	</td>';
 	echo '<td class="menubox">';
-	if ($type=='student')
-	{		
-	    if(!$ansicht)
-	    {
-	    	echo "<p><A class='Item' href='../lehre/notenliste.php'>".$p->t('profil/leistungsbeurteilung')."</a></p>";
-	    }
-	    echo '<p><A href="../lvplan/stpl_week.php?pers_uid='.$user->uid.'&type=student">'.$p->t('profil/lvplanVon').' '.$user->nachname.'</A></p>';
-	}
-	if ($type=='mitarbeiter')
-	{
-		if(!$ansicht)
-		{
-			echo '<p><A href="zeitwunsch.php?uid='.$user->uid.'">'.$p->t('profil/zeitwuensche').'</A></p>
-				<p><A  href="lva_liste.php?uid='.$user->uid.'">'.$p->t('lvaliste/lehrveranstaltungen').'</A></p>';
-		}
-		if(check_lektor(get_uid()))
-		{
-			echo '<p><A href="zeitsperre_days.php?days=30&lektor='.$user->uid.'">'.$p->t('profil/zeitsperrenVon').' '.$user->nachname.'</A></p>';
-		}
-		if($uid!=get_uid())
-		{
-			echo '<p><A href="../lvplan/stpl_week.php?pers_uid='.$user->uid.'&type=lektor">'.$p->t('profil/lvplanVon').' '.$user->nachname.'</A></p>';
-		}
-	}
         //Überprüfung ob Addon vorhanden ist
         $addon = new addon();         
+		
         foreach($addon->aktive_addons as $ad)
         {
             // checken ob es file profil_array.php gibt
             if(file_exists(DOC_ROOT.'/addons/'.$ad.'/cis/profil_array.php'))
             {
+				$menu=array();
                 include(DOC_ROOT.'/addons/'.$ad.'/cis/profil_array.php');
                 // Wenn Mitarbeiter count == 0
                 if(count($menu >0))
                 {
                     foreach($menu as $entry)
                     {
-                        echo "<p><a href=".APP_ROOT."addons/".$ad."/cis/".$entry['link']." target=".$entry['target'].">".$entry['name']."</a></p>"; 
+                        echo "<p><a href=".$entry['link']." target=".$entry['target'].">".$entry['name']."</a></p>"; 
                     }
                 }
-            }
+             }
         }
 	
     //Überprüfung ob Hilfe-Link vorhanden
@@ -587,37 +570,53 @@ if(!$ansicht)
         
 	echo'</td></tr>
 		<tr>
-		<td class="teambox" style="width: 20%;">
-		<B>'.$p->t('mailverteiler/mailverteiler').'</B><BR><BR>
-    	';
-	//Mailverteiler
-	if(!$ansicht)
-		echo "<SMALL>".$p->t('profil/sieSindMitgliedInFolgendenVerteilern').":</SMALL>";
-	else
-		echo "<SMALL>".$p->t('profil/derUserIstInFolgendenVerteilern',array($user->uid)).":</SMALL>";
-       
-	echo '<table>';
-	  		
-  	for($i=0;$i<$nr_mg;$i++)
+		<td class="teambox" style="width: 20%;">';
+	if(!defined('CIS_PROFIL_MAILVERTEILER_ANZEIGEN') || CIS_PROFIL_MAILVERTEILER_ANZEIGEN)
 	{
-		$row=$db->db_fetch_object($erg_mg,$i);
-		echo '<TR><TD><A href="mailto:'.strtolower(trim($row->gruppe_kurzbz)).'@'.DOMAIN.'">'.strtolower($row->gruppe_kurzbz).'&nbsp;</TD>';
-    	echo "<TD>&nbsp;$row->beschreibung</TD></TR>";
-	}
+		echo '<B>'.$p->t('mailverteiler/mailverteiler').'</B><BR><BR>';
+		//Mailverteiler
+		if(!$ansicht)
+			echo "<SMALL>".$p->t('profil/sieSindMitgliedInFolgendenVerteilern').":</SMALL>";
+		else
+			echo "<SMALL>".$p->t('profil/derUserIstInFolgendenVerteilern',array($user->uid)).":</SMALL>";
+		   
+		echo '<table>';
+		  		
+		// Mail-Groups
+		$qry_gruppen = "
+			SELECT 
+				gruppe_kurzbz, beschreibung 
+			FROM 
+				campus.vw_persongruppe 
+			WHERE 
+				mailgrp 
+				AND uid=".$db->db_add_param($uid);
+
+		if(!($erg_mg=$db->db_query($qry_gruppen)))
+			die($db->db_last_error());
+		$nr_mg=$db->db_num_rows($erg_mg);
 	
-	if (isset($user->matrikelnr))
-	{
-		echo '<TR><TD><A href="mailto:'.strtolower(trim($studiengang->kuerzel)).'_std@'.DOMAIN.'">'.strtolower($studiengang->kuerzel).'_std&nbsp;</TD>';
-    	echo "<TD>&nbsp;".$p->t('profil/alleStudentenVon')." $studiengang->kuerzel</TD></TR>";
-		echo '<TR><TD><A href="mailto:'.strtolower(trim($studiengang->kuerzel)).trim($user->semester).'@'.DOMAIN.'">'.strtolower($studiengang->kuerzel).$user->semester.'&nbsp;</TD>';
-   		echo "<TD>&nbsp;".$p->t('profil/alleStudentenVon')." $studiengang->kuerzel $user->semester</TD></TR>";
-		echo '<TR><TD><A href="mailto:'.strtolower(trim($studiengang->kuerzel)).trim($user->semester).strtolower(trim($user->verband)).'@'.DOMAIN.'">'.strtolower($studiengang->kuerzel).$user->semester.strtolower($user->verband).'&nbsp;</TD>';
-   		echo "<TD>&nbsp;".$p->t('profil/alleStudentenVon')." $studiengang->kuerzel $user->semester$user->verband</TD></TR>";
-   		if(trim($user->gruppe)!='')
-   		{
-			echo '<TR><TD><A href="mailto:'.strtolower(trim($studiengang->kuerzel)).trim($user->semester).strtolower(trim($user->verband)).trim($user->gruppe).'@'.DOMAIN.'">'.strtolower($studiengang->kuerzel).$user->semester.strtolower($user->verband).$user->gruppe.'&nbsp;</TD>';
-   			echo "<TD>&nbsp;".$p->t('profil/alleStudentenVon')." $studiengang->kuerzel $user->semester$user->verband$user->gruppe</TD><TD></TD></TR>";
-   		}
+	  	for($i=0;$i<$nr_mg;$i++)
+		{
+			$row=$db->db_fetch_object($erg_mg,$i);
+			echo '<TR><TD><A href="mailto:'.strtolower(trim($row->gruppe_kurzbz)).'@'.DOMAIN.'">'.strtolower($row->gruppe_kurzbz).'&nbsp;</TD>';
+			echo "<TD>&nbsp;$row->beschreibung</TD></TR>";
+		}
+	
+		if (isset($user->matrikelnr))
+		{
+			echo '<TR><TD><A href="mailto:'.strtolower(trim($studiengang->kuerzel)).'_std@'.DOMAIN.'">'.strtolower($studiengang->kuerzel).'_std&nbsp;</TD>';
+			echo "<TD>&nbsp;".$p->t('profil/alleStudentenVon')." $studiengang->kuerzel</TD></TR>";
+			echo '<TR><TD><A href="mailto:'.strtolower(trim($studiengang->kuerzel)).trim($user->semester).'@'.DOMAIN.'">'.strtolower($studiengang->kuerzel).$user->semester.'&nbsp;</TD>';
+	   		echo "<TD>&nbsp;".$p->t('profil/alleStudentenVon')." $studiengang->kuerzel $user->semester</TD></TR>";
+			echo '<TR><TD><A href="mailto:'.strtolower(trim($studiengang->kuerzel)).trim($user->semester).strtolower(trim($user->verband)).'@'.DOMAIN.'">'.strtolower($studiengang->kuerzel).$user->semester.strtolower($user->verband).'&nbsp;</TD>';
+	   		echo "<TD>&nbsp;".$p->t('profil/alleStudentenVon')." $studiengang->kuerzel $user->semester$user->verband</TD></TR>";
+	   		if(trim($user->gruppe)!='')
+	   		{
+				echo '<TR><TD><A href="mailto:'.strtolower(trim($studiengang->kuerzel)).trim($user->semester).strtolower(trim($user->verband)).trim($user->gruppe).'@'.DOMAIN.'">'.strtolower($studiengang->kuerzel).$user->semester.strtolower($user->verband).$user->gruppe.'&nbsp;</TD>';
+	   			echo "<TD>&nbsp;".$p->t('profil/alleStudentenVon')." $studiengang->kuerzel $user->semester$user->verband$user->gruppe</TD><TD></TD></TR>";
+	   		}
+		}
 	}
 	echo '	</table>
 			</td>
