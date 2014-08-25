@@ -478,7 +478,7 @@
 			.replace(/\Ä/g, "ae")
 			.replace(/\Ö/g, "oe")
 			.replace(/\Ü/g, "ue")
-			.replace(/[^a-z_\s]/gi, "");
+			.replace(/[^a-z_0-9\s]/gi, "");
 		ele.value = string;
 	    }
 	    function getFarbe()
