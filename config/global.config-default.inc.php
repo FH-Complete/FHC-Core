@@ -16,6 +16,30 @@ define('CIS_LEHRVERANSTALTUNG_MAILSTUDIERENDE_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_STUDENTENUPLOAD_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_SEMESTERPLAN_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_LVINFO_ANZEIGEN',true);
+define('CIS_LEHRVERANSTALTUNG_SEMESTERINFO_ANZEIGEN',true);
+
+//Anzeigeoptionen für Profil im CIS
+define('CIS_PROFIL_MAILVERTEILER_ANZEIGEN',true);
+define('CIS_PROFIL_FHAUSWEIS_ANZEIGEN',true);
+define('CIS_PROFIL_FUNKTIONEN_ANZEIGEN',true);
+define('CIS_PROFIL_BETRIEBSMITTEL_ANZEIGEN',true);
+define('CIS_PROFIL_STUDIENINFORMATION_ANZEIGEN',true);
+
+// Anzeige des Links zur Noteneingabe in der LVA Uebersicht
+define('CIS_LVALISTE_NOTENEINGABE_ANZEIGEN',true);
+
+// Anzeige des LV-Plan Links bei globaler Suche
+define('CIS_SUCHE_LVPLAN_ANZEIGEN',true);
+
+// Link zu den Excel Notenlisten im CIS Anzeigen
+define('CIS_ANWESENHEITSLISTE_NOTENLISTE_ANZEIGEN',true);
+
+// Anzeigeoptionen für LV-Plan Menü
+define('CIS_LVPLAN_EXPORT_ANZEIGEN',true);
+define('CIS_LVPLAN_PERSONENAUSWAHL_ANZEIGEN',true);
+define('CIS_LVPLAN_LEHRVERBANDAUSWAHL_ANZEIGEN',true);
+define('CIS_LVPLAN_ARCHIVAUSWAHL_ANZEIGEN',true);
+define('CIS_LVPLAN_ZUSATZMENUE_ANZEIGEN',true);
 
 //Anmerkung bei Unterrichtseinheiten im LV-Plan anzeigen. Anmerkungen bei LV-Plan Sync mitkopieren.
 define('LVPLAN_ANMERKUNG_ANZEIGEN',true);

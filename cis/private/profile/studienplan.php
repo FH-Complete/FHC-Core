@@ -182,6 +182,8 @@ if(isset($_POST['action']) && $_POST['action']=='anmeldung')
 					if($bngruppe->save())
 					{
 						echo '<span class="ok">'.$p->t('studienplan/einschreibungErfolgreich').'</span>';
+						// Menue neu Laden damit die LV unter Meine LV gleich angezeigt wird
+						echo '<script>window.parent.menu.location.reload();</script>';
 					}
 				}
 				else

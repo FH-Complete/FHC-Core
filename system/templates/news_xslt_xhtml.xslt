@@ -22,17 +22,13 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						</xsl:choose>
 					</div>
 				</td>
-				<xsl:if test="content/stg_extras" >
-					<td class="menubox">					
+				<xsl:if test="content/stg_extras" >	
 						<xsl:apply-templates select="content/stg_extras/cis_ext_menu" />
-					</td>
 				</xsl:if>
 			</tr>
 			<tr>
 				<xsl:if test="content/stg_extras" >
-					<td class="teambox" style="width: 20%;">
 						<xsl:apply-templates select="content/stg_extras" />
-					</td>
 				</xsl:if>
 			</tr>
 			</table>
@@ -70,12 +66,13 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 		<br />
 	</xsl:template>
 	<xsl:template match="stg_extras">
-			<!-- <h1><xsl:value-of select="stg_header" /></h1>-->
+		<xsl:if test="stg_ltg!='' or ass!='' or stdv!='' or zusatzinfo!=''">
+			<td class="teambox" style="width: 20%;">
 			<font face='Arial, Helvetica, sans-serif' size='2'>
-			
-			<h2><xsl:value-of select="stg_ltg_name" /></h2>
-			<xsl:apply-templates select="stg_ltg" />
-			
+			<xsl:if test="stg_ltg">			
+				<h2><xsl:value-of select="stg_ltg_name" /></h2>
+				<xsl:apply-templates select="stg_ltg" />
+			</xsl:if>		
 			<xsl:if test="gf_ltg">
 				<h2><xsl:value-of select="gf_ltg_name" /></h2>
 				<xsl:apply-templates select="gf_ltg" />
@@ -99,6 +96,8 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 				
 			</xsl:if>
 			</font>
+			</td>
+		</xsl:if>
 	</xsl:template>
 
 	<xsl:template match="stg_ltg">
@@ -140,8 +139,10 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:template match="cis_ext_menu">
 			<xsl:variable name="kurzbz" select="kurzbz"></xsl:variable>
 			<xsl:variable name="kurzbzlang" select="kurzbzlang"></xsl:variable>
+			<td class="menubox">	
 			<p><xsl:text> </xsl:text><a href="../documents/{kurzbz}/lehrziele/" class="Item" target="_blank"><xsl:value-of select="lehrziele_name" /></a></p>
 			<p><xsl:text> </xsl:text><a href="../documents/{kurzbz}/download/" class="Item" target="_blank"><xsl:value-of select="download_name" /></a></p>
 			<p><xsl:text> </xsl:text><a href="news://news.technikum-wien.at/{kurzbzlang}" class="Item" target="_blank"><xsl:value-of select="newsgroup_name" /></a></p>
+			</td>
 	</xsl:template>
 </xsl:stylesheet >

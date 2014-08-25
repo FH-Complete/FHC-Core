@@ -24,6 +24,7 @@
  */
  
 require_once('../../../config/cis.config.inc.php');
+require_once('../../../config/global.config.inc.php');
 require_once('../../../include/basis_db.class.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/phrasen.class.php');
@@ -197,148 +198,170 @@ $(document).ready(function()
 		else
 			echo $p->t('lvplan/nichtVorhanden').' '.$p->t('lvplan/bitteWendenSieSichAn').'<A href="mailto:'.MAIL_ADMIN.'">Admin</A>!';
 	?>
-  	<a class="Item" href="stpl_week.php?pers_uid=<?php echo $uid; ?>"><?php echo $p->t("lvplan/persoenlicherLvPlan");?></a>
+  	<a class="Item" href="stpl_week.php?pers_uid=<?php echo $uid; ?>"><?php echo $p->t("lvplan/persoenlicherLvPlan");?></a><br><br>
 	</td><td valign="top">	
 	<?php
-	echo' 
-	<h2>'.$p->t('lvplan/persoenlichenAbonnieren').'</h2>
-	<div>	
-	<a class="Item" href="../../../cms/content.php?content_id='.$p->t('dms_link/lvplanSyncFAQ').'" target="_blank">'.$p->t('lvplan/anleitungLVPlanSync').'</a>
-	<br>';
+	if(!defined('CIS_LVPLAN_EXPORT_ANZEIGEN') || CIS_LVPLAN_EXPORT_ANZEIGEN)
+	{
+		echo' 
+		<h2>'.$p->t('lvplan/persoenlichenAbonnieren').'</h2>
+		<div>	
+		<a class="Item" href="../../../cms/content.php?content_id='.$p->t('dms_link/lvplanSyncFAQ').'" target="_blank">'.$p->t('lvplan/anleitungLVPlanSync').'</a>
+		<br>';
 
-	echo '<ul>';
-	$caldavurl = APP_ROOT.'webdav/lvplan.php/calendars/'.$uid.'/LVPlan-'.$uid;
-  	echo '<li><a class="Item" href="'.$caldavurl.'">'.$p->t('lvplan/caldavURL').'</a></li>';
-  	echo '<li><a class="Item" href="'.APP_ROOT.'webdav/lvplan.php/principals/'.$uid.'">'.$p->t('lvplan/caldavURLMac').'</a></li>';
-  	echo '<li><a class="Item" href="'.APP_ROOT.'webdav/google.php?cal='.encryptData($uid,LVPLAN_CYPHER_KEY).'&'.microtime(true).'">'.$p->t('lvplan/googleURL').'</a></li>';
-  	echo '</ul>';
-  	echo '	</div>';
-  	?>
+		echo '<ul>';
+		$caldavurl = APP_ROOT.'webdav/lvplan.php/calendars/'.$uid.'/LVPlan-'.$uid;
+	  	echo '<li><a class="Item" href="'.$caldavurl.'">'.$p->t('lvplan/caldavURL').'</a></li>';
+	  	echo '<li><a class="Item" href="'.APP_ROOT.'webdav/lvplan.php/principals/'.$uid.'">'.$p->t('lvplan/caldavURLMac').'</a></li>';
+	  	echo '<li><a class="Item" href="'.APP_ROOT.'webdav/google.php?cal='.encryptData($uid,LVPLAN_CYPHER_KEY).'&'.microtime(true).'">'.$p->t('lvplan/googleURL').'</a></li>';
+	  	echo '</ul>';
+	  	echo '	</div>';
+	}
+
+	echo '
   	</td></tr>
 	
 		<tr>
 			<td width="30%">
-				<h2><?php echo $p->t("lvplan/saalplan")." (".$p->t("lvplan/saalreservierung"); ?>)</h2>
+				<h2>'.$p->t("lvplan/saalplan").'</h2>
 			</td>
-			<td>
-				<h2><?php echo $p->t("lvplan/lektorInStudentIn"); ?></h2>
+			<td>';
+			
+		if(!defined('CIS_LVPLAN_PERSONENAUSWAHL_ANZEIGEN') || CIS_LVPLAN_PERSONENAUSWAHL_ANZEIGEN)
+		{
+			echo '<h2>'.$p->t("lvplan/lektorInStudentIn").'</h2>';
+		}
+
+		echo '
 			</td>
 		</tr>
 		<tr>
 			<td valign="top">
-			<select name="select" style="width:200px;" onChange="MM_jumpMenu('self',this,0)">
-        		<option value="stpl_week.php" selected><?php echo $p->t('lvplan/raumAuswaehlen'); ?></option>
-        	  	<?php
-				for ($i=0;$i<$num_rows_ort;$i++)
-				{
-					$row=$db->db_fetch_object ($result_ort, $i);
-					echo "<option value=\"stpl_week.php?type=ort&amp;ort_kurzbz=$row->ort_kurzbz\">$row->ort_kurzbz ($row->bezeichnung)</option>";
-				}
-				?>
-			</select>
-			<?php 
-			if ($raumres)
-			{
-				echo '<BR><BR><A class="Item" href="stpl_reserve_list.php">'.$p->t("lvplan/reservierungenLoeschen").'</A><BR>';
-				//echo '<A class="Item" href="raumsuche.php">'.$p->t('lvplan/raumsuche').'</A><BR>'; Findet sich nun rechts in der menubox
-			}			
-			?>
-			</td>
-			<td valign="top">
-			<?php
+			<select name="select" style="width:200px;" onChange="MM_jumpMenu(\'self\',this,0)">
+        		<option value="stpl_week.php" selected>'.$p->t('lvplan/raumAuswaehlen').'</option>';
+
+        for ($i=0;$i<$num_rows_ort;$i++)
+		{
+			$row=$db->db_fetch_object ($result_ort, $i);
+			echo "<option value=\"stpl_week.php?type=ort&amp;ort_kurzbz=$row->ort_kurzbz\">$row->ort_kurzbz ($row->bezeichnung)</option>";
+		}
+				
+		echo '</select>';
+			 
+		if ($raumres)
+		{
+			echo '<BR><BR><A class="Item" href="stpl_reserve_list.php">'.$p->t("lvplan/reservierungenLoeschen").'</A><BR>';
+		}			
+
+		echo'</td>
+			<td valign="top">';
+
+		if(!defined('CIS_LVPLAN_PERSONENAUSWAHL_ANZEIGEN') || CIS_LVPLAN_PERSONENAUSWAHL_ANZEIGEN)
+		{
 			echo "<input class='search' placeholder='".$p->t('lvplan/nameEingeben')."' type='text' id='benutzer' size='32' value=''>";
 			echo "<input type='hidden' id='mitarbeiter_uid' name='pers_uid'>";
 			echo "<input type='hidden' id='uid' name='type' value='student'>";			
 			echo "<input type='submit' value='Go' onclick='return checkSetBenutzer();'>";
-			?>
+		}
+			
+		echo '
 			</td>
 		</tr>
 		</table>
 		</FORM>
-		<br>
-		<FORM name="Auswahl" action="stpl_week.php">
-		<table class="tabcontent"><tr><td><h2><?php echo $p->t('lvplan/lehrverband');?></h2></td></tr></table>
-		<table width="10%" border="0" cellpadding="0" cellspacing="3">
-		<tr>
-		<td width="20%" valign="middle">
-			<select style="width:200px;" id="stg_kz" name="stg_kz">
-				<option value="" selected><?php echo $p->t('lvplan/studiengangAuswaehlen');?></option>
-				<?php
-				$num_rows=$db->db_num_rows($result_stg);
-				for ($i=0;$i<$num_rows;$i++)
-				{
-					$row=$db->db_fetch_object ($result_stg, $i);
-					echo '<option value="'.$row->studiengang_kz.'">'.strtoupper($row->typ.$row->kurzbz).' ('.($sprache=='English' && $row->english!=''?$row->english:$row->bezeichnung).')</option>';
-				}
-				?>
-			</select>
-		</td>
-		<td valign="middle">
-			<select name="sem">
-			<option value="0"><?php echo $p->t('lvplan/sem');?></option>
-			<option value="1">1</option>
-			<option value="2">2</option>
-			<option value="3">3</option>
-			<option value="4">4</option>
-			<option value="5">5</option>
-			<option value="6">6</option>
-			<option value="7">7</option>
-			<option value="8">8</option>
-			</select>
-		</td>
-		<td valign="middle">
-			<select name="ver">
-			<option value="0" selected><?php echo $p->t('lvplan/ver');?></option>
-			<option value="A">A</option>
-			<option value="B">B</option>
-			<option value="C">C</option>
-			<option value="D">D</option>
-			<option value="E">E</option>
-			<option value="F">F</option>
-			<option value="V">V</option>
-			</select>
-		</td>
-		<td valign="middle" >
-			<select name="grp">
-			<option value="0" selected><?php echo $p->t('lvplan/grp');?></option>
-			<option value="1">1</option>
-			<option value="2">2</option>
-			<option value="3">3</option>
-			<option value="4">4</option>
-			<option value="4">5</option>
-			<option value="4">6</option>
-			</select>
-		</td>
-		<td valign="bottom">
-			<input type="hidden" name="type" value="verband">
-			<input type="submit" name="Abschicken" value="Go" onclick="return checkSetStudiengang();">
-		</td>
-		</tr>
-		</table>
-	</form>
-	<br>
-	<!--<a class="Item" href="verband_uebersicht.php"><?php echo $p->t('lvplan/uebersichtDerLehrverbaende');?></a><BR>  Auskommentiert, da vemutlich nicht mehr benötigt-->
-	
-<form name="Auswahl" action="stpl_kalender.php">
-		<table class="tabcontent"><tr><td><h2><?php echo $p->t('lvplan/semesterplaenearchiv');?></h2></td></tr></table>
+		<br>';
+
+		if(!defined('CIS_LVPLAN_LEHRVERBANDAUSWAHL_ANZEIGEN') || CIS_LVPLAN_LEHRVERBANDAUSWAHL_ANZEIGEN)
+		{
+			echo '<FORM name="Auswahl" action="stpl_week.php">
+			<table class="tabcontent"><tr><td><h2>'.$p->t('lvplan/lehrverband').'</h2></td></tr></table>
+			<table width="10%" border="0" cellpadding="0" cellspacing="3">
+			<tr>
+			<td width="20%" valign="middle">
+				<select style="width:200px;" id="stg_kz" name="stg_kz">
+					<option value="" selected>'.$p->t('lvplan/studiengangAuswaehlen').'</option>';
+				
+			$num_rows=$db->db_num_rows($result_stg);
+			for ($i=0;$i<$num_rows;$i++)
+			{
+				$row=$db->db_fetch_object ($result_stg, $i);
+				echo '<option value="'.$row->studiengang_kz.'">'.strtoupper($row->typ.$row->kurzbz).' ('.($sprache=='English' && $row->english!=''?$row->english:$row->bezeichnung).')</option>';
+			}
+				
+			echo '
+				</select>
+			</td>
+			<td valign="middle">
+				<select name="sem">
+				<option value="0">'.$p->t('lvplan/sem').'</option>
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+				<option value="5">5</option>
+				<option value="6">6</option>
+				<option value="7">7</option>
+				<option value="8">8</option>
+				</select>
+			</td>
+			<td valign="middle">
+				<select name="ver">
+				<option value="0" selected>'.$p->t('lvplan/ver').'</option>
+				<option value="A">A</option>
+				<option value="B">B</option>
+				<option value="C">C</option>
+				<option value="D">D</option>
+				<option value="E">E</option>
+				<option value="F">F</option>
+				<option value="V">V</option>
+				</select>
+			</td>
+			<td valign="middle" >
+				<select name="grp">
+				<option value="0" selected>'.$p->t('lvplan/grp').'</option>
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+				<option value="4">5</option>
+				<option value="4">6</option>
+				</select>
+			</td>
+			<td valign="bottom">
+				<input type="hidden" name="type" value="verband">
+				<input type="submit" name="Abschicken" value="Go" onclick="return checkSetStudiengang();">
+			</td>
+			</tr>
+			</table>
+			</form>';
+		}
+
+	echo '<br>';
+
+if(!defined('CIS_LVPLAN_ARCHIVAUSWAHL_ANZEIGEN') || CIS_LVPLAN_ARCHIVAUSWAHL_ANZEIGEN)
+{
+	echo '
+	<form name="Auswahl" action="stpl_kalender.php">
+		<table class="tabcontent"><tr><td><h2>'.$p->t('lvplan/semesterplaenearchiv').'</h2></td></tr></table>
 		<table border="0" cellpadding="0" cellspacing="3">
 		<tr>
 		<td valign="bottom">
 			<select style="width:200px;" name="stg_kz_semplan" id="stg_kz_semplan">
-				<option value="" selected><?php echo $p->t('lvplan/studiengangAuswaehlen');?></option>
-				<?php
-				$num_rows=$db->db_num_rows($result_stg);
-				for ($i=0;$i<$num_rows;$i++)
-				{
-					$row=$db->db_fetch_object ($result_stg, $i);
-					echo '<option value="'.$row->studiengang_kz.'">'.strtoupper($row->typ.$row->kurzbz).' ('.($sprache=='English' && $row->english!=''?$row->english:$row->bezeichnung).')</option>';
-				}
-				?>
+				<option value="" selected>'.$p->t('lvplan/studiengangAuswaehlen').'</option>';
+				
+	$num_rows=$db->db_num_rows($result_stg);
+	for ($i=0;$i<$num_rows;$i++)
+	{
+		$row=$db->db_fetch_object ($result_stg, $i);
+		echo '<option value="'.$row->studiengang_kz.'">'.strtoupper($row->typ.$row->kurzbz).' ('.($sprache=='English' && $row->english!=''?$row->english:$row->bezeichnung).')</option>';
+	}
+	
+	echo '
 			</select>
 		</td>
 		<td valign="middle">
 			<select name="sem" id="sem">
-			<option value="01"><?php echo $p->t('lvplan/sem');?></option>
+			<option value="01">'.$p->t('lvplan/sem').'</option>
 			<option value="1">1</option>
 			<option value="2">2</option>
 			<option value="3">3</option>
@@ -351,7 +374,7 @@ $(document).ready(function()
 		</td>
 		<td valign="middle">
 			<select name="ver" id="ver">
-			<option value="0" selected><?php echo $p->t('lvplan/ver');?></option>
+			<option value="0" selected>'.$p->t('lvplan/ver').'</option>
 			<option value="A">A</option>
 			<option value="B">B</option>
 			<option value="C">C</option>
@@ -363,7 +386,7 @@ $(document).ready(function()
 		</td>
 		<td valign="middle" >
 			<select name="grp" id="grp">
-			<option value="0" selected><?php echo $p->t('lvplan/grp');?></option>
+			<option value="0" selected>'.$p->t('lvplan/grp').'</option>
 			<option value="1">1</option>
 			<option value="2">2</option>
 			<option value="3">3</option>
@@ -372,34 +395,43 @@ $(document).ready(function()
 			<option value="4">6</option>
 			</select>
 		</td></tr><tr>
-		<td valign="middle" >
-		<?php
+		<td valign="middle" >';
+		
 		$studiensemester = new studiensemester();
 		$studiensemester->getFinished();	
 				
 		echo '<SELECT style="width:200px;" name="begin" id="studiensemester">';
 		echo '<OPTION value="" selected>'.$p->t('lvplan/studiensemesterAuswaehlen').'</OPTION>';
 		foreach($studiensemester->studiensemester as $row)
-				{
-					$studiensemester->getTimestamp($row->studiensemester_kurzbz);
-					echo '<OPTION value="'.$studiensemester->begin->start.'&amp;ende='.$studiensemester->ende->ende.'">'.$row->studiensemester_kurzbz.'</OPTION>';
-				}
+		{
+			$studiensemester->getTimestamp($row->studiensemester_kurzbz);
+			echo '<OPTION value="'.$studiensemester->begin->start.'&amp;ende='.$studiensemester->ende->ende.'">'.$row->studiensemester_kurzbz.'</OPTION>';
+		}
 				
 		echo '</SELECT>';
-		?>
-		</td>
+		
+		echo '</td>
 		<td colspan="3" valign="bottom">
-			<input type="button" name="Abschicken" value="<?php echo $p->t('lvplan/semesterplanLaden');?>" onClick="jumpKalender()">
+			<input type="button" name="Abschicken" value="'.$p->t('lvplan/semesterplanLaden').'" onClick="jumpKalender()">
 		</td>
 		</tr>
 		</table>
-	</form>
-</td>
-<td class="menubox">
-<p><a href="raumsuche.php"><?php echo $p->t('lvplan/raumsuche');?></a></p>
-<p><a class="Item" href="mailto:<?php echo MAIL_LVPLAN?>"><?php echo $p->t('lvplan/fehlerUndFeedback');?></a></p>
-<p><a href="../../../cms/content.php?content_id=<?php echo $p->t('dms_link/lvPlanFAQ');?>" class="hilfe" target="_blank"><?php echo $p->t('global/hilfe');?></a></p>
-</td>
+	</form>';
+}
+
+echo '</td>';
+
+if(!defined('CIS_LVPLAN_ZUSATZMENUE_ANZEIGEN') || CIS_LVPLAN_ZUSATZMENUE_ANZEIGEN)
+{
+	echo '
+	<td class="menubox">
+	<p><a href="raumsuche.php">'.$p->t('lvplan/raumsuche').'</a></p>
+	<p><a class="Item" href="mailto:'.MAIL_LVPLAN.'">'.$p->t('lvplan/fehlerUndFeedback').'</a></p>
+	<p><a href="../../../cms/content.php?content_id='.$p->t('dms_link/lvPlanFAQ').'" class="hilfe" target="_blank">'.$p->t('global/hilfe').'</a></p>
+	</td>';
+}
+
+echo '
 </tr>
 <tr>
 <td class="teambox" style="width: 20%;"></td>
@@ -407,4 +439,5 @@ $(document).ready(function()
 </tbody>
 </table>
 </body>
-</html>
+</html>';
+?>

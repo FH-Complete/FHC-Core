@@ -21,6 +21,7 @@
  * Globale Suche
  */
 require_once('../../../config/cis.config.inc.php');
+require_once('../../../config/global.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/content.class.php');
@@ -116,8 +117,11 @@ function searchPerson($searchItems)
 					<th>',$p->t('freebusy/typ'),'</th>
 					<th>',$p->t('global/telefonnummer'),'</th>
 					<th>',$p->t('lvplan/raum'),'</th>
-					<th>',$p->t('global/mail'),'</th>	
-					<th>',$p->t('lvplan/lvPlan'),'</th>				
+					<th>',$p->t('global/mail'),'</th>';
+
+			if(!defined('CIS_SUCHE_LVPLAN_ANZEIGEN') || CIS_SUCHE_LVPLAN_ANZEIGEN)
+				echo '<th>',$p->t('lvplan/lvPlan'),'</th>';
+			echo '
 				</tr>
 			</thead>
 			<tbody>
@@ -138,7 +142,8 @@ function searchPerson($searchItems)
 			else
 				$mail = $row->uid.'@'.DOMAIN;
 			echo '<td><a href="mailto:',$mail,'">',$mail,'</a></td>';
-			echo '<td><a href="../../../cis/private/lvplan/stpl_week.php?pers_uid='.$row->uid.($row->mitarbeiter_uid==NULL?'&type=student':'&type=lektor').'">'.$p->t('lvplan/lvPlan').'</a></td>';
+			if(!defined('CIS_SUCHE_LVPLAN_ANZEIGEN') || CIS_SUCHE_LVPLAN_ANZEIGEN)
+				echo '<td><a href="../../../cis/private/lvplan/stpl_week.php?pers_uid='.$row->uid.($row->mitarbeiter_uid==NULL?'&type=student':'&type=lektor').'">'.$p->t('lvplan/lvPlan').'</a></td>';
 			echo '</tr>';
 			echo "\n";
 		}
