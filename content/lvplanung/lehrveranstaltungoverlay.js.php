@@ -1843,3 +1843,22 @@ function LeMitarbeiterGesamtkosten()
 	else
 		document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-label-gesamtkosten').setAttribute("style",'color: black');
 }
+
+/*
+ * Oeffnet alle Subtrees
+ */
+function LvTreeOpenAllSubtrees()
+{
+	var tree=document.getElementById('lehrveranstaltung-tree');
+
+	if(tree.view)
+		var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+	else
+		return false;
+
+	for(var i=items-1;i>=0;i--)
+	{
+		if(!tree.view.isContainerOpen(i))
+			tree.view.toggleOpenState(i);
+	}
+}

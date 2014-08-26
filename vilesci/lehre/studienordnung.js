@@ -295,7 +295,10 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 					children.push(GenerateTreeChilds(item));
 				}
 			}
-
+			// Sortieren nach der Bezeichnung
+			children.sort(function(a,b){
+				return a.data>b.data;
+			});
 			var obj = {
 			"data":sem+'. Semester',
 			"attr":{"id":"Semester"+sem,"rel":"semester","semester":sem},
@@ -933,9 +936,20 @@ function loadSemester()
 		}
 		var html = "<select id='semesterDropdown' onchange='loadFilteredLehrveranstaltungen();'>";
 		html += "<option value='null'>-- Alle --</option>";
+		var semesterselected=false;
+		var selected='';
 		for(i in data.result)
 		{
-			html+="<option value='"+data.result[i]+"'>"+data.result[i]+". Semester</option>";
+			// Der erste Eintrag im Drop Down wird markiert da sonst alle Semester geladen werden
+			// was in manchen Studiengaengen sehr lange dauern kann
+			if(!semesterselected)
+			{
+				selected='selected';
+				semesterselected=true;
+			}
+			else
+				selected='';
+			html+="<option value='"+data.result[i]+"' "+selected+">"+data.result[i]+". Semester</option>";
 		}
 		html+="</select>";
 		$("#semesterListe").html(html);
