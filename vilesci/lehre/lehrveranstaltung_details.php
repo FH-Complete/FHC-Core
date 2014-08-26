@@ -189,7 +189,9 @@
 		    $htmlstr .= '<br/><br/><span>Hinweis: Lehreverzeichnis existiert bereits.</span>';
 		}
 		$htmlstr .= '
-		<br><div class="kopf">Lehrveranstaltung '.$lv->lehrveranstaltung_id.'</div>
+		<br><div class="kopf">Lehrveranstaltung '.$lv->lehrveranstaltung_id.'</div>';
+
+		$htmlstr.='
 		<form action="lehrveranstaltung_details.php" method="POST">
 		<input type="hidden" name="lv_id" value="'.$lv->lehrveranstaltung_id.'">
 
@@ -229,7 +231,7 @@
 				$sel = '';
 			$htmlstr .= '<option value="'.$stg_key.'" '.$sel.'>'.$stg_kurzbz.'</option>';
 		}
-		
+	
 		$htmlstr .= '</select></td>
 			<td>Semester</td>
 			<td><select name="semester">';
@@ -242,7 +244,7 @@
 				$sel = '';
 			$htmlstr .= '<option value="'.$i.'" '.$sel.'>'.$i.'</option>';
 		}
-		
+	
 		$htmlstr .= '</select></td>
 			<td>Lehrform*</td>
 			<td><select name="lehrform"><option value="">-- keine Auswahl --</option>';
@@ -264,7 +266,7 @@
 			<td><input type="text" name="semesterstunden" value="'.$lv->semesterstunden.'" maxlength="3"></td>
 			<td>Lehrtyp*</td>
 			<td><select name="lehrtyp_kurzbz"><option value="">-- keine Auswahl --</option>';
-		
+	
 		$lehrtyp_arr=new lehrtyp();
 		$lehrtyp_arr->getAll();
 		foreach ($lehrtyp_arr->result as $lehrtyp)
@@ -311,7 +313,7 @@
 			<td>Organisationsform</td>
 			<td>
 			<SELECT name="orgform_kurzbz" '.($lv->lehrveranstaltung_id==''?'onchange="copyToLehreVz();"':'onchange="return copyToLehreVzAsk();"').'><OPTION value="">-- keine Auswahl --</OPTION>';
-		
+	
 		$qry_orgform = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz NOT IN ('VBB', 'ZGS') ORDER BY orgform_kurzbz";
 		if($result_orgform = $db->db_query($qry_orgform))
 		{
@@ -321,7 +323,7 @@
 					$selected='selected';
 				else 
 					$selected='';
-					
+				
 				$htmlstr .= '<OPTION value="'.$row_orgform->orgform_kurzbz.'" '.$selected.'>'.$row_orgform->bezeichnung.'</OPTION>';
 			}
 		}
@@ -333,7 +335,7 @@
 			<td><input type="text" name="lvnr" value="'.$lv->lvnr.'" /></td>
 			<td>Organisationseinheit</td>
 			<td colspan="3"><SELECT name="oe_kurzbz" ><option value="">--keine Auswahl --</option>';
-		
+	
 		$qry = "SELECT * FROM public.tbl_organisationseinheit ORDER BY organisationseinheittyp_kurzbz, oe_kurzbz";
 		if($result = $db->db_query($qry))
 		{
@@ -343,7 +345,7 @@
 					$selected='selected';
 				else 
 					$selected='';
-					
+				
 				if($row->aktiv=='f')
 				{
 					$htmlstr .= '<option value="'.$row->oe_kurzbz.'" '.$selected.' style="color: red;">'.$row->organisationseinheittyp_kurzbz.' '.$row->bezeichnung.'</option>';
@@ -413,6 +415,57 @@
 		</tr>
 		</table>
 		</form>';
+		
+
+		// Details
+			$htmlstr.='<span style="font-size:small">';
+			$htmlstr.='<br>
+			<b>Anlage</b>: '.$lv->insertamum.' '.$lv->insertvon.' <b>/ Letzte Aenderung:</b> '.$lv->updateamum.' '.$lv->updatevon.'<br>
+			<b>Lehraufträge zu dieser LV</b>: ';
+			$qry ="SELECT distinct studiensemester_kurzbz, tbl_studiensemester.start
+					FROM 
+						lehre.tbl_lehreinheit
+						JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
+					WHERE lehrveranstaltung_id=".$db->db_add_param($lv->lehrveranstaltung_id).'
+					ORDER BY tbl_studiensemester.start desc';
+			if($result = $db->db_query($qry))
+			{
+				while($row = $db->db_fetch_object($result))
+				{
+					$htmlstr.= $row->studiensemester_kurzbz.'; ';
+				}
+			}
+			$htmlstr.='<br><b>Noten zu dieser LV</b>: ';
+			$qry ="SELECT distinct studiensemester_kurzbz, tbl_studiensemester.start
+					FROM 
+						lehre.tbl_zeugnisnote
+						JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
+					WHERE lehrveranstaltung_id=".$db->db_add_param($lv->lehrveranstaltung_id).'
+					ORDER BY tbl_studiensemester.start desc';
+			if($result = $db->db_query($qry))
+			{
+				while($row = $db->db_fetch_object($result))
+				{
+					$htmlstr.= $row->studiensemester_kurzbz.'; ';
+				}
+			}
+
+			$htmlstr.='<br><b>Verwendung als Lehrfach</b>: ';
+			$qry ="SELECT distinct studiensemester_kurzbz, tbl_studiensemester.start
+					FROM 
+						lehre.tbl_lehreinheit
+						JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
+					WHERE lehrfach_id=".$db->db_add_param($lv->lehrveranstaltung_id).'
+					ORDER BY tbl_studiensemester.start desc';
+			if($result = $db->db_query($qry))
+			{
+				while($row = $db->db_fetch_object($result))
+				{
+					$htmlstr.= $row->studiensemester_kurzbz.'; ';
+				}
+			}
+			$htmlstr.='</span>';
+			// Details Ende
 	}
 	$htmlstr .= '
 		<div class="inserterror">'.$errorstr.'</div>';

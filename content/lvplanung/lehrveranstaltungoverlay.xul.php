@@ -57,7 +57,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 			<toolbarbutton id="lehrveranstaltung-toolbar-del" label="Loeschen" oncommand="LeDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Lehreinheiten löschen"/>
 			<toolbarbutton id="lehrveranstaltung-toolbar-refresh" label="Aktualisieren" oncommand="LvTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 			<toolbarbutton id="lehrveranstaltung-toolbar-lehrauftrag" label="Lehrauftrag" oncommand="LvCreateLehrauftrag()" disabled="false" image="../skin/images/person.gif" tooltiptext="Lehrauftrag ausdrucken" hidden="true"/>
-			<!--<toolbarbutton id="lehrveranstaltung-toolbar-refresh" label="Load" oncommand="debugload()" disabled="false"/>-->
+			<spacer flex="1" />
+			<toolbarbutton id="lehrveranstaltung-toolbar-opensubtrees" label="Aufklappen" tooltiptext="Klappt die Untermenüs auf - mehrmaliges klicken möglich um weiter aufzuklappen" oncommand="LvTreeOpenAllSubtrees()" disabled="false" image="../skin/images/tree-diagramm.png" />
 			</toolbar>
 		</toolbox>
 
