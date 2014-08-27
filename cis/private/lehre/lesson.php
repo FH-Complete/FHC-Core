@@ -58,6 +58,11 @@ $lv_obj = new lehrveranstaltung();
 $lv_obj->load($lvid);
 $lv=$lv_obj;
 
+if(isset($_GET['studiensemester_kurzbz']))
+	$studiensemester_kurzbz=$_GET['studiensemester_kurzbz'];
+else
+	$studiensemester_kurzbz='';
+
 $studiengang_kz = $lv->studiengang_kz;
 $semester = $lv->semester;
 $short = $lv->lehreverzeichnis;
@@ -135,19 +140,71 @@ if (isset($_GET["handbuch"])){
 	<tr>
 		<td class="tdwidth10">&nbsp;</td>
 		<td style="vertical-align:top; height: 10px"><h1>
-		<?php
-		echo $lv_obj->bezeichnung_arr[$sprache].' '.$lv_obj->lehrform_kurzbz;
+		<?php		
+		$stsem = new studiensemester();
+		if($studiensemester_kurzbz!='')
+			$angezeigtes_stsem=$studiensemester_kurzbz;
+		else
+		{
+			if($lv->studiengang_kz==0)
+				$angezeigtes_stsem = $stsem->getNearest();
+			else
+				$angezeigtes_stsem = $stsem->getNearest($semester);
+		}
+		
+		if(defined('CIS_LEHRVERANSTALTUNG_LEHRFACH_ANZEIGEN') && CIS_LEHRVERANSTALTUNG_LEHRFACH_ANZEIGEN)
+		{
+			// Wenn der eingeloggte User zu einer der Lehreinheiten zugeteilt ist
+			// wird zusätzlich das Lehrfach der Lehreinheit angezeigt.
+			if($is_lector)
+			{
+				$qry = "SELECT 
+					distinct lehrfach_id 
+					FROM 
+						lehre.tbl_lehreinheit
+						JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
+					WHERE
+						studiensemester_kurzbz=".$db->db_add_param($angezeigtes_stsem)."
+						AND mitarbeiter_uid=".$db->db_add_param($user); 
+			}
+			else
+			{
+				$qry = "SELECT distinct lehrfach_id
+					FROM 
+						campus.vw_student_lehrveranstaltung
+					WHERE 
+						lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." 
+						AND studiensemester_kurzbz=".$db->db_add_param($angezeigtes_stsem)."
+						AND uid=".$db->db_add_param($user);
+			}
+			
+			if($result = $db->db_query($qry))
+			{
+				// Wenn die LV mehrere verschiedenen Lehrfaecher hat, und der User zu mehreren davon zugeteilt ist
+				// wird das Lehrfach nicht angezeigt damit es nicht zu verwirrungen kommt.
+				if($db->db_num_rows($result)==1)
+				{
+					if($row = $db->db_fetch_object($result))
+					{
+						$lehrfach = new lehrveranstaltung();
+						$lehrfach->load($row->lehrfach_id);
+						
+						echo $lehrfach->bezeichnung_arr[$sprache].' - '.$lv_obj->bezeichnung_arr[$sprache]; 
+					}
+				}
+				else
+					echo $lv_obj->bezeichnung_arr[$sprache];
+			}
+		}
+		else
+			echo $lv_obj->bezeichnung_arr[$sprache];
+			
+		echo ' '.$lv_obj->lehrform_kurzbz;
 
 		if(!defined('CIS_LEHRVERANSTALTUNG_SEMESTERINFO_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_SEMESTERINFO_ANZEIGEN)
 			echo ' / '.$kurzbz.'-'.$semester.' '.$lv_obj->orgform_kurzbz;
 
-		$qry = "SELECT studiensemester_kurzbz FROM lehre.tbl_lehreinheit JOIN public.tbl_studiensemester USING(studiensemester_kurzbz) 
-				WHERE lehrveranstaltung_id='".addslashes($lvid)."' ORDER BY ende DESC LIMIT 1";
-		$stsem = new studiensemester();
-		if($lv->studiengang_kz==0)
-			$angezeigtes_stsem = $stsem->getNearest();
-		else
-			$angezeigtes_stsem = $stsem->getNearest($semester);
+		
 						
 	    echo "&nbsp;($angezeigtes_stsem)";
 	    echo '</h1></td>
@@ -163,10 +220,10 @@ if (isset($_GET["handbuch"])){
 	    			tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND 
 	    			tbl_lehreinheitmitarbeiter.mitarbeiter_uid=tbl_benutzer.uid AND 
 	    			tbl_person.person_id=tbl_benutzer.person_id AND 
-	    			lehrveranstaltung_id='".addslashes($lvid)."' AND 
+	    			lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND 
 	    			tbl_lehreinheitmitarbeiter.mitarbeiter_uid NOT like '_Dummy%' AND 
 	    			tbl_benutzer.aktiv=true AND tbl_person.aktiv=true AND 
-	    			studiensemester_kurzbz='".addslashes($angezeigtes_stsem)."' 
+	    			studiensemester_kurzbz=".$db->db_add_param($angezeigtes_stsem)." 
 	    		ORDER BY uid, lvleiter desc) as a ORDER BY lvleiter desc, nachname, vorname";
 
 		if(!$result = $db->db_query($qry))
@@ -209,10 +266,10 @@ if (isset($_GET["handbuch"])){
 	  			JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) 
 	  			JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
 	  			JOIN public.tbl_fachbereich ON(tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz) 
-	  		WHERE tbl_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lvid)."'";
+	  		WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER);
 
 	  if(isset($angezeigtes_stsem) && $angezeigtes_stsem!='')
-	  	$qry .= " AND studiensemester_kurzbz='".addslashes($angezeigtes_stsem)."'";
+	  	$qry .= " AND studiensemester_kurzbz=".$db->db_add_param($angezeigtes_stsem);
 
 	  if($result = $db->db_query($qry))
 	  {
