@@ -105,16 +105,45 @@ class menu_addon extends basis_db
 		
 		if(count($this->items)>0)
 		{
+			$this->outputItems1($this->items);
+			
+		}
+	}
+	
+	private function outputItems1($item, $child=false)
+	{
+		$menu=false;
+		foreach($item as $row)
+		{
+			if(isset($row['childs']))
+				$menu=true;
+		}
+		if($menu || $child)
+			echo '<ul class="menu">';
+		else
 			echo '<ul>';
 			
-			foreach($this->items as $row)
+		foreach($item as $row)
+		{
+			if($menu || $child)
+				echo '<li>';
+			else
+				echo '<li style="margin:0px">';
+		
+			if(isset($row['childs']))
+				$class='item2';
+			else
+				$class='leaf';
+			
+			echo '<a class="'.$class.' " title="'.$row['title'].'" href="'.$row['link'].'" target="'.$row['target'].'">'.$row['name'].'</a>';
+			
+			if(isset($row['childs']))
 			{
-				echo '<li style="margin:0px;">
-					<a class="item2 " title="'.$row['title'].'" href="'.$row['link'].'" target="'.$row['target'].'">'.$row['name'].'</a>
-					</li>';
+				$this->outputItems1($row['childs'],true);
 			}
-			echo '</ul>';
+			echo '	</li>';
 		}
+		echo '</ul>';
 	}
 	
 	/**
