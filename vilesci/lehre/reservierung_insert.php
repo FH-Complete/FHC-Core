@@ -153,7 +153,7 @@ $(document).ready(function()
     Verband
     <select name="verband">
 	  <option value=NULL>*</option>
-      <?php $verbaende=array("'A'","'B'","'C'","'D'","'F'","'V'");
+      <?php $verbaende=array("'A'","'B'","'C'","'D'","'E'","'F'","'V'");
 		foreach ($verbaende as $i)
 		{
 			if ($verband==$i)

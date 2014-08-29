@@ -979,6 +979,7 @@ class wochenplan extends basis_db
 						<OPTION value="B">B</OPTION>
 						<OPTION value="C">C</OPTION>
 						<OPTION value="D">D</OPTION>
+						<OPTION value="E">E</OPTION>
 						<OPTION value="F">F</OPTION>
 						<OPTION value="V">V</OPTION>
 					</SELECT>
