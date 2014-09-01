@@ -68,19 +68,20 @@ class FO_LayoutObject extends FO_FlowContainer {
   //oesi - convertiert die daten von utf8 nach latin1 und ersetzt 'EURO' durch das eurosymbol
   function convert($str)
   {
+  	
+  	$str = str_replace('ĉ','c',$str);
+  	$str = str_replace('Č','C',$str);
+  	$str = str_replace('č','c',$str);
+  	$str = str_replace('ć','c',$str);
+  	$str = str_replace('Š','S',$str);
+  	$str = str_replace('š','s',$str);
+  	$str = str_replace('ň','n',$str);
+  	$str = str_replace('ř','r',$str);
+  	$str = utf8_decode($str);
   	//echo str_replace('EURO',chr(128),utf8_decode($str));
-	$str = str_replace('EURO',chr(128),$str);
-	$str = str_replace('ĉ','c',$str);
-	$str = str_replace('Č','C',$str);	
-	$str = str_replace('č','c',$str);
-	$str = str_replace('ć','c',$str);
-	$str = str_replace('Š','S',$str);
-	$str = str_replace('š','s',$str);
-	$str = str_replace('ň','n',$str);
-	$str = str_replace('ř','r',$str);
-	
+	$str = str_replace('EURO',chr(128),$str);	
 
-  	return utf8_decode($str);
+  	return $str;
   }
 	
    //Spaltenhoehe Berechnen
