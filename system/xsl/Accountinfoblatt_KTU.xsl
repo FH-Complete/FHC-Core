@@ -64,7 +64,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 				            <fo:table-row line-height="14pt">
 								<fo:table-cell>
 									<fo:block font-weight="bold" font-family="sans-serif" font-size="12pt" content-width="40mm" text-align="left">
-										Username:
+										Benutzername:
 									</fo:block>
 								</fo:table-cell>
 								<fo:table-cell>
@@ -100,27 +100,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 							</fo:table-row>
 						</fo:table-body>
 					</fo:table>
-					<xsl:if test="bezeichnung">
-						<fo:table table-layout="fixed" border-collapse="separate">
-						    <fo:table-column column-width="40mm"/>
-							<fo:table-column column-width="300mm"/>
-							
-							<fo:table-body>
-					            <fo:table-row line-height="14pt">
-									<fo:table-cell>
-										<fo:block font-weight="bold" font-family="sans-serif" font-size="12pt" content-width="40" text-align="left">
-											Studiengang:
-										</fo:block>
-									</fo:table-cell>
-									<fo:table-cell>
-										<fo:block font-weight="bold" font-family="sans-serif" font-size="12pt" content-width="300mm" text-align="left">
-											<xsl:value-of select="bezeichnung" />
-										</fo:block>
-									</fo:table-cell>
-								</fo:table-row>
-							</fo:table-body>
-						</fo:table>
-					</xsl:if>
+					
 						<fo:table table-layout="fixed" border-collapse="separate">
 						    <fo:table-column column-width="40mm"/>
 							<fo:table-column column-width="300mm"/>
@@ -150,80 +130,36 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 				
 				<fo:block-container position="absolute" top="90mm" left="15mm">
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt" font-weight="bold">
-						Wie aktiviere ich meinen Acccount?
+						Wie aktiviere ich meinen Account?
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
-						Öffnen Sie mit ihrem Web-Browser die Adresse https://cis.ktu-linz.ac.at/cis/public/accountactivation.php\n
-						Tragen Sie in das Formular Ihren Usernamen und Aktivierungscode ein und vergeben Sie ein Passwort für Ihren Account.\n
+						Zum Aktivieren Ihres Zugangs öffnen Sie mit Ihrem Web-Browser die Adresse https://cis.ktu-linz.ac.at/cis/public/accountactivation.php\n
+						Tragen Sie in das Formular Ihren Benutzernamen und den Aktivierungscode ein und vergeben Sie ein Passwort für Ihren Account.\n\n
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt" font-weight="bold">
-						Ändern des Passwortes
+						Wie kann ich mein Kennwort ändern?
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
-						Windows XP/7: In den EDV-Räumen.\n
-						Loggen Sie sich mit Ihrem Account unter Windows XP/7 ein, drücken Sie &lt;STRG&gt; + &lt;ALT&gt; + &lt;ENTF&gt; und wählen Sie den Punkt "Kennwort ändern".\n
+						Zum Ändern des Kennworts, öffnen Sie bitte die Seite: https://cis.ktu-linz.ac.at/cis/private/profile/change_password.php 
+						Melden Sie sich bitte mit Ihren bestehenden Zugangsdaten (Benutzername und Passwort) an. Dies funktioniert nur, wenn Sie den Zugang bereits aktiviert haben.\n\n
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt" font-weight="bold">
-						Wie kann ich meine Mails von zu Hause aus abrufen?
+						Wie kann ich meine Mails abrufen?
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
-						Eine Anleitung zur Einrichtung Ihres Mail-Clients finden Sie auf http://www.ktu-linz.ac.at unter dem Punkt FAQ.\n
+						Ihre Mails können Sie unter http://email.ktu-linz.ac.at abrufen. Melden Sie sich bitte auf dieser Seite mit E-Mailadresse und dem von Ihnen gewählten Passwort an.\n\n
 					</fo:block>
 					
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt" font-weight="bold">
 						Wo erhalte ich weitere Informationen?
 					</fo:block>
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
-						Die primäre Anlaufstelle für Fragen rund um den Netzwerkbetrieb ist die Webseite\n
+						Bei Fragen oder Problemen stehe ich Ihnen gerne unter sinn@ktu-linz.ac.at oder telefonisch unter +43 / (0)70 / 78 42 93 - 4135 zur Verfügung.\n\n
 					</fo:block>
-					<fo:block text-align="center" content-width='180mm' font-family="sans-serif" font-size="10pt">
-						http://www.ktu-linz.ac.at\n
-					</fo:block>
+					
 					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
-						Verwenden Sie die Informationen auf dieser Seite, um einen Überblick über die vorhandenen Möglichkeiten zu erhalten.
-					</fo:block>
-				</fo:block-container>
-				
-				<!-- Englische Version -->
-				<fo:block font-size="16pt" 
-					font-family="sans-serif" 
-					space-after.optimum="15pt"
-					text-align="center"
-                    >
-                    <!--break-before="page" -->
-			  </fo:block>
-			  <fo:block-container position="absolute" top="180mm" left="80mm">
-					<fo:block text-align="left" font-family="sans-serif" font-size="12pt" font-weight="bold">
-						Account Mini FAQ
-					</fo:block>
-				</fo:block-container>
-				<fo:block-container position="absolute" top="190mm" left="15mm">
-					<fo:block text-align="left" font-family="sans-serif" font-size="10pt" font-weight="bold">
-						Account activation:
-					</fo:block>
-					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
-						Open your web browser and go to https://cis.ktu-linz.ac.at/cis/public/accountactivation.php\n
-						Enter your user name and activation key. Enter a new password for your account.\n
-					</fo:block>
-					<fo:block text-align="left" font-family="sans-serif" font-size="10pt" font-weight="bold">
-						Password Change:
-					</fo:block>
-					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
-						In the computer labs of KTU Linz\n
-						In Windows XP and Windows 7, hold down &lt;ctrl&gt; + &lt;alt&gt; + &lt;delete&gt; simultaneously. Select "Kennwort ändern" (Change Password). Then change your password.\n
-					</fo:block>
-										
-					<fo:block text-align="left" font-family="sans-serif" font-size="10pt" font-weight="bold">
-						Looking for further information?
-					</fo:block>
-					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
-						For questions concerning the KTU Linz network services, see\n
-					</fo:block>
-					<fo:block text-align="center" content-width='180mm' font-family="sans-serif" font-size="10pt">
-						http://www.ktu-linz.ac.at\n
-					</fo:block>
-					<fo:block text-align="left" font-family="sans-serif" font-size="10pt">
-						These pages will give you a detailed overview of all services available
+						Lukas Haselgrübler\n
+						Studierendenverwaltung der KTU Linz
 					</fo:block>
 				</fo:block-container>
 				
