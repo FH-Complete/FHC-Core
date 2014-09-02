@@ -534,23 +534,37 @@ function drawAllVersions($id)
 	$dms = new dms(); 
 	$dms->getAllVersions($id); 
 	
-	echo '<table >
-		 <tr align="center">
-		 	<td>Version</td>
-		 	<td>Name</td>
-		 	<td>Kategorie</td>
-		 	<td>Datum</td>
-		 	<td>User</td>
-		 </tr>';
+		echo '<script>
+			$(document).ready(function() 
+			{ 
+				$("#t3").tablesorter(
+				{
+					sortList: [[0,0]], headers: {6:{sorter:false}},
+					widgets: ["zebra"]
+				});
+			});
+			</script>
+			<table style="width:50%" class="tablesorter" id="t3">
+			<thead>
+			 <tr align="center">
+			 	<th>Version</th>
+			 	<th>Name</th>
+			 	<th>Beschreibung</th>
+			 	<th>Kategorie</th>
+			 	<th>Datum</th>
+			 	<th>User</th>
+			 </tr>
+			 </thead><tbody>';
 	foreach ($dms->result as $dms_help)
 	{
 		echo '<tr>
-			  	<td align="center">'.$dms_help->version.'</td>
-			  	<td>'.$dms_help->name.'</td>
-			  	<td align="center">'.$dms_help->kategorie_kurzbz.'</td>
-			  	<td>'.$dms_help->insertamum.'</td>
-			  	<td>'.$dms_help->insertvon.'</td>
-		        <td>
+			  	<td style="padding: 1px; vertical-align:middle" align="center">'.$dms_help->version.'</td>
+			  	<td style="padding: 1px; vertical-align:middle">'.$dms_help->name.'</td>
+			  	<td style="padding: 1px; vertical-align:middle">'.$dms_help->beschreibung.'</td>
+			  	<td style="padding: 1px; vertical-align:middle" align="center">'.$dms_help->kategorie_kurzbz.'</td>
+			  	<td style="padding: 1px; vertical-align:middle">'.$dms_help->insertamum.'</td>
+			  	<td style="padding: 1px; vertical-align:middle;">'.$dms_help->insertvon.'</td>
+		        <td style="padding: 1px; vertical-align:middle;">
 		        	<ul class="sf-menu">
 						<li><a style="font-size:small">Erweitert</a>
 							<ul>
@@ -562,7 +576,7 @@ function drawAllVersions($id)
 		        </td>
 			  </tr>'; 
 	}
-	echo '</table>'; 	 		
+	echo '</tbody></table>'; 	 		
 }
 
 /**
