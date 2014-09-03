@@ -693,6 +693,28 @@ function checkZeilenUmbruch()
 		echo '</td>';
 	}
 	
+	checkZeilenUmbruch();
+
+	if(!defined('CIS_LEHRVERANSTALTUNG_ABMELDUNG_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_ABMELDUNG_ANZEIGEN)
+	{
+		if(!$is_lector)
+		{
+			$lvangebot = new lvangebot();
+			$gruppen = $lvangebot->AbmeldungMoeglich($lvid, $angezeigtes_stsem, $user);
+			if(count($gruppen)>0)
+			{
+				//Abmelden von der Lehrveranstaltung
+				$eintraegeprozeile++;
+				echo '<td class="tdvertical" align="center">';
+				echo '<a href="abmeldung.php?lvid='.$lvid.'&stsem='.$angezeigtes_stsem.'">';
+				echo '<img class="lv" src="../../../skin/images/button_studiupload.png"><br>';
+
+				echo "<b>".$p->t('lehre/abmelden')."</b></a><br>";
+				echo '</td>';
+			}
+		}
+	}
+	
 	//Anzeigen von zusaetzlichen Lehre-Tools
 	
 	$lehretools = new lehre_tools();
