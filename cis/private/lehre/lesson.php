@@ -30,6 +30,7 @@ require_once('../../../include/studiengang.class.php');
 require_once('../../../include/moodle.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/lehre_tools.class.php');
+require_once('../../../include/lvangebot.class.php');
 
 $sprache = getSprache();
 $p = new phrasen($sprache);
@@ -151,7 +152,7 @@ if (isset($_GET["handbuch"])){
 			else
 				$angezeigtes_stsem = $stsem->getNearest($semester);
 		}
-		
+		$lehrfach_id='';
 		if(defined('CIS_LEHRVERANSTALTUNG_LEHRFACH_ANZEIGEN') && CIS_LEHRVERANSTALTUNG_LEHRFACH_ANZEIGEN)
 		{
 			// Wenn der eingeloggte User zu einer der Lehreinheiten zugeteilt ist
@@ -165,7 +166,8 @@ if (isset($_GET["handbuch"])){
 						JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
 					WHERE
 						studiensemester_kurzbz=".$db->db_add_param($angezeigtes_stsem)."
-						AND mitarbeiter_uid=".$db->db_add_param($user); 
+						AND mitarbeiter_uid=".$db->db_add_param($user)."
+						AND lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER);
 			}
 			else
 			{
@@ -188,8 +190,11 @@ if (isset($_GET["handbuch"])){
 					{
 						$lehrfach = new lehrveranstaltung();
 						$lehrfach->load($row->lehrfach_id);
-						
-						echo $lehrfach->bezeichnung_arr[$sprache].' - '.$lv_obj->bezeichnung_arr[$sprache]; 
+						$lehrfach_id=$row->lehrfach_id;
+						if($lehrfach->bezeichnung_arr[$sprache]==$lv_obj->bezeichnung_arr[$sprache])
+							echo $lv_obj->bezeichnung_arr[$sprache];
+						else
+							echo $lehrfach->bezeichnung_arr[$sprache].' - '.$lv_obj->bezeichnung_arr[$sprache]; 
 					}
 				}
 				else
@@ -223,8 +228,14 @@ if (isset($_GET["handbuch"])){
 	    			lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND 
 	    			tbl_lehreinheitmitarbeiter.mitarbeiter_uid NOT like '_Dummy%' AND 
 	    			tbl_benutzer.aktiv=true AND tbl_person.aktiv=true AND 
-	    			studiensemester_kurzbz=".$db->db_add_param($angezeigtes_stsem)." 
-	    		ORDER BY uid, lvleiter desc) as a ORDER BY lvleiter desc, nachname, vorname";
+	    			studiensemester_kurzbz=".$db->db_add_param($angezeigtes_stsem);
+
+		// Wenn das Lehrfach angezeigt werden nur die Lektoren angezeigt die dieser 
+		// Lehreinheit / Lehrfach zugeordnet sind
+		if($lehrfach_id!='')
+			$qry.=" AND tbl_lehreinheit.lehrfach_id=".$db->db_add_param($lehrfach_id);
+
+		$qry.=" ORDER BY uid, lvleiter desc) as a ORDER BY lvleiter desc, nachname, vorname";
 
 		if(!$result = $db->db_query($qry))
 		{

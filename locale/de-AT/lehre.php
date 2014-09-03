@@ -35,4 +35,9 @@ $this->phrasen['lehre/mail']='E-Mail an Studierende';
 $this->phrasen['lehre/keinMailverteiler']='Für die Gruppe(n) %s existiert kein Verteiler! Die Studierenden in diesen Gruppen bekommen kein Mail.';
 
 $this->phrasen['lehre/pinboard']='Pinboard';
+$this->phrasen['lehre/abmelden']='Abmelden';
+$this->phrasen['lehre/abmeldung']='Abmeldung';
+$this->phrasen['lehre/AbmeldungErfolgreich']='Sie wurden erfolgreich von der Lehrveranstaltung abgemeldet';
+$this->phrasen['lehre/AbmeldungAusGruppeNichtMoeglich']='Sie können sich nicht von dieser Lehrveranstaltung abmelden';
+$this->phrasen['lehre/confirmAbmeldung']='Wollen Sie sich wirklich von der Lehrveranstaltung "%s" abmelden?';
 ?>

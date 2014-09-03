@@ -448,5 +448,46 @@ class lvangebot extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Prueft ob eine Abmeldung von einer Lehrveranstaltung moeglich ist
+	 * und liefert die Gruppen von denen sich abgemeldet werden kann
+	 * @param $lehrveranstaltung_id
+	 * @param $studiensemester_kurzbz
+	 * @param $uid
+	 * @return $gruppen Array mit den Gruppen
+	 */
+	public function AbmeldungMoeglich($lehrveranstaltung_id, $studiensemester_kurzbz, $uid)
+	{
+		$qry = "SELECT 
+					gruppe_kurzbz
+				FROM 
+					lehre.tbl_lvangebot
+					JOIN public.tbl_benutzergruppe USING(studiensemester_kurzbz, gruppe_kurzbz)
+				WHERE
+					tbl_lvangebot.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+					AND tbl_benutzergruppe.uid=".$this->db_add_param($uid)."
+					AND (tbl_lvangebot.lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)."
+						OR tbl_lvangebot.lehrveranstaltung_id IN(SELECT lehrveranstaltung_id_kompatibel 
+							FROM lehre.tbl_lehrveranstaltung_kompatibel 
+							WHERE lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)."
+							)
+						)";
+		
+		if($result = $this->db_query($qry))
+		{
+			$gruppen=array();
+			while($row = $this->db_fetch_object($result))
+			{
+				$gruppen[] = $row->gruppe_kurzbz;
+			}
+			return $gruppen;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>
