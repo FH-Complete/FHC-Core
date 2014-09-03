@@ -1605,6 +1605,59 @@ function PrintZutrittskarte()
 }
 
 // ****
+// * Druckt das Studienblatt
+// ****
+function PrintStudienblatt()
+{
+
+	if(document.getElementById('main-content-tabs').selectedItem==document.getElementById('tab-studenten'))
+	{
+		//STUDENTEN
+		var tree = document.getElementById('student-tree');
+		var data='';
+
+		var start = new Object();
+		var end = new Object();
+		var numRanges = tree.view.selection.getRangeCount();
+		var paramList= '';
+		var error=0;
+
+		//alle markierten personen holen
+		for (var t = 0; t < numRanges; t++)
+		{
+	  		tree.view.selection.getRangeAt(t,start,end);
+			for (var v = start.value; v <= end.value; v++)
+			{
+				col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+				uid = tree.view.getCellText(v,col);
+				if(uid!='')
+					data = data+';'+uid;
+				else
+					error = error+1;
+			}
+		}
+	}
+	else
+	{
+		//MITARBEITER
+		alert('Das Studienblatt kann nur für Studierende erstellt werden');
+		return false;
+	}
+
+	if(data!='')
+	{
+		if(error>0)
+			alert(error+' der ausgewaehlten Personen haben keinen Account');
+		action = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl=Studienblatt&xml=studienblatt.xml.php&output=pdf&&uid='+data;
+		window.open(action,'Studienblatt','height=520,width=500,left=350,top=350,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	}
+	else
+	{
+		alert('Bitte zuerst einen Studenten auswaehlen');
+	}
+}
+
+// ****
 // * Aktualisiert den Fachbereich Tree
 // ****
 function FachbereichTreeRefresh()
