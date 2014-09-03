@@ -669,5 +669,55 @@ class studienordnung extends basis_db
 		}
 		return false;
 	}
+	
+	/**
+	 * Laedt die Studienordnung zu der uebergebenen studienplan_id
+	 * @param  $studienplan_id der zu ladenden Studienordnung
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getStudienordnungFromStudienplan($studienplan_id)
+	{
+		//Pruefen ob studienplan_id eine gueltige Zahl ist
+		if(!is_numeric($studienplan_id) || $studienplan_id == '')
+		{
+			$this->errormsg = 'Studienplan_id muss eine Zahl sein';
+			return false;
+		}
+
+		//Daten aus der Datenbank lesen
+		$qry = "SELECT tbl_studienordnung.* FROM lehre.tbl_studienordnung JOIN lehre.tbl_studienplan USING (studienordnung_id) WHERE studienplan_id=".$this->db_add_param($studienplan_id, FHC_INTEGER, false);
+
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler bei einer Datenbankabfrage';
+			return false;
+		}
+
+		if($row = $this->db_fetch_object())
+		{
+			$this->studienordnung_id= $row->studienordnung_id;
+			$this->studiengang_kz	= $row->studiengang_kz;
+			$this->version			= $row->version;
+			$this->bezeichnung		= $row->bezeichnung;
+			$this->ects				= $row->ects;
+			$this->gueltigvon		= $row->gueltigvon;
+			$this->gueltigbis		= $row->gueltigbis;
+			$this->studiengangbezeichnung	= $row->studiengangbezeichnung;
+			$this->studiengangbezeichnung_englisch	= $row->studiengangbezeichnung_englisch;
+			$this->studiengangkurzbzlang	= $row->studiengangkurzbzlang;
+			$this->akadgrad_id		= $row->akadgrad_id;
+			$this->updateamum		= $row->updateamum;
+			$this->updatevon		= $row->updatevon;
+			$this->insertamum		= $row->insertamum;
+			$this->insertvon		= $row->insertvon;
+		}
+		else
+		{
+			$this->errormsg = 'Es ist kein Datensatz mit dieser ID vorhanden';
+			return false;
+		}
+		$this->new=false;
+		return true;
+	}
 }
 ?>
