@@ -111,6 +111,10 @@ if(count($gruppen)>0)
 		}
 	}
 }
+else
+{
+	echo $p->t('lehre/nichtzugeteilt');
+}
 
 echo '</body>
 </html>';
