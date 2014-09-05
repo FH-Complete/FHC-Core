@@ -1355,6 +1355,18 @@ if(!$result = @$db->db_query("SELECT anmeldung_von FROM campus.tbl_pruefungsterm
 
 }
 
+// neue Spalte für Sammelklausur
+if(!$result = @$db->db_query("SELECT sammelklausur FROM campus.tbl_pruefungstermin LIMIT 1"))
+{
+	$qry = "ALTER TABLE campus.tbl_pruefungstermin ADD COLUMN sammelklausur boolean;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_pruefungstermin: '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'campus.tbl_pruefungstermin: Spalte sammelklausur hinzugefügt';
+
+}
+
 // NOT NULL Constraint bei tbl_mitarbeiter.kleriker entfernt
 if($result = @$db->db_query("SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='tbl_mitarbeiter' AND column_name='kleriker' AND is_nullable='NO'"))
 {
