@@ -21,7 +21,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	
 					<fo:block-container position="absolute" top="40pt" left="30pt" height="30pt">
 						<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="14pt">
-							Studienbest‰tigung Katholisch-Theologische Privatuniversit‰t Linz
+							Studienbest√§tigung Katholisch-Theologische Privatuniversit√§t Linz
 						</fo:block>
 					</fo:block-container> 
 									
@@ -33,7 +33,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						                    <fo:table-cell border-align="right" border-width="0.2mm" border-style="solid" >
 											<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="6pt"> 
 												<fo:inline vertical-align="super">
-													Zur Vorlage an (Stelle an der die Best‰tigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)
+													Zur Vorlage an (Stelle an der die Best√§tigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)
 												</fo:inline>
 											</fo:block>
 									</fo:table-cell>
@@ -57,7 +57,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						            <fo:table-row line-height="25pt">
 										<fo:table-cell border-align="right" border-width="0.2mm" border-style="solid" >
 										<fo:block line-height="12pt" font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="center">
-											<xsl:value-of select="svnr" />
+											<xsl:value-of select="svnr" /><xsl:value-of select="ersatzkennzeichen" />
 										</fo:block>
 									</fo:table-cell>
 								</fo:table-row>      
@@ -90,7 +90,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 					<fo:block-container position="absolute" top="150pt" left="300pt" height="30pt">
 						<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="8pt">
-							F¸r das Rektorat: <xsl:text> </xsl:text><xsl:value-of select="rektor" />
+							F√ºr das Rektorat: <xsl:text> </xsl:text><xsl:value-of select="rektor" />
                         </fo:block>
 					</fo:block-container> 
 
@@ -103,7 +103,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 					<fo:block-container position="absolute" top="190pt" left="30pt" height="30pt">
 						<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="14pt">
-							Studienbest‰tigung Katholisch-Theologische Privatuniversit‰t Linz
+							Studienbest√§tigung Katholisch-Theologische Privatuniversit√§t Linz
 						</fo:block>
 					</fo:block-container> 
 
@@ -115,7 +115,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						                    <fo:table-cell border-align="right" border-width="0.2mm" border-style="solid" >
 											<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="6pt"> 
 												<fo:inline vertical-align="super">
-													Zur Vorlage an (Stelle an der die Best‰tigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)
+													Zur Vorlage an (Stelle an der die Best√§tigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)
 												</fo:inline>
 											</fo:block>
 									</fo:table-cell>
@@ -139,7 +139,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						            <fo:table-row line-height="25pt">
 										<fo:table-cell border-align="right" border-width="0.2mm" border-style="solid" >
 										<fo:block line-height="12pt" font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="center">
-											<xsl:value-of select="svnr" />
+											<xsl:value-of select="svnr" /><xsl:value-of select="ersatzkennzeichen" />
 										</fo:block>
 									</fo:table-cell>
 								</fo:table-row>      
@@ -171,7 +171,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 					<fo:block-container position="absolute" top="300pt" left="300pt" height="30pt">
 						<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="8pt">
-							F¸r das Rektorat: <xsl:text> </xsl:text><xsl:value-of select="rektor" />
+							F√ºr das Rektorat: <xsl:text> </xsl:text><xsl:value-of select="rektor" />
                         </fo:block>
 					</fo:block-container> 
 
@@ -185,7 +185,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 					<fo:block-container position="absolute" top="340pt" left="30pt" height="30pt">
 						<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="14pt">
-					Studienbest‰tigung Katholisch-Theologische Privatuniversit‰t Linz
+					Studienbest√§tigung Katholisch-Theologische Privatuniversit√§t Linz
 						</fo:block>
 					</fo:block-container> 
 
@@ -197,7 +197,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						                    <fo:table-cell border-align="right" border-width="0.2mm" border-style="solid" >
 											<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="6pt"> 
 												<fo:inline vertical-align="super">
-													Zur Vorlage an (Stelle an der die Best‰tigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)
+													Zur Vorlage an (Stelle an der die Best√§tigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)
 												</fo:inline>
 											</fo:block>
 									</fo:table-cell>
@@ -222,7 +222,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						            <fo:table-row line-height="25pt">
 										<fo:table-cell border-align="right" border-width="0.2mm" border-style="solid" >
 										<fo:block line-height="12pt" font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="center">
-											<xsl:value-of select="svnr" />
+											<xsl:value-of select="svnr" /><xsl:value-of select="ersatzkennzeichen" />
 										</fo:block>
 									</fo:table-cell>
 								</fo:table-row>      
@@ -254,7 +254,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 					<fo:block-container position="absolute" top="450pt" left="300pt" height="30pt">
 						<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="8pt">
-							F¸r das Rektorat: <xsl:text> </xsl:text><xsl:value-of select="rektor" />
+							F√ºr das Rektorat: <xsl:text> </xsl:text><xsl:value-of select="rektor" />
                         </fo:block>
 					</fo:block-container> 
 
@@ -268,7 +268,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 					<fo:block-container position="absolute" top="490pt" left="30pt" height="30pt">
 						<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="14pt">
-							Studienbest‰tigung Katholisch-Theologische Privatuniversit‰t Linz
+							Studienbest√§tigung Katholisch-Theologische Privatuniversit√§t Linz
                         </fo:block>
 					</fo:block-container> 
 
@@ -280,7 +280,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						                    <fo:table-cell border-align="right" border-width="0.2mm" border-style="solid" >
 											<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="6pt"> 
 												<fo:inline vertical-align="super">
-													Zur Vorlage an (Stelle an der die Best‰tigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)
+													Zur Vorlage an (Stelle an der die Best√§tigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)
 												</fo:inline>
 											</fo:block>
 									</fo:table-cell>
@@ -305,7 +305,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						            <fo:table-row line-height="25pt">
 										<fo:table-cell border-align="right" border-width="0.2mm" border-style="solid" >
 										<fo:block line-height="12pt" font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="center">
-											<xsl:value-of select="svnr" />
+											<xsl:value-of select="svnr" /><xsl:value-of select="ersatzkennzeichen" />
 										</fo:block>
 									</fo:table-cell>
 								</fo:table-row>      
@@ -338,7 +338,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 					<fo:block-container position="absolute" top="600pt" left="300pt" height="30pt">
 						<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="8pt">
-							F¸r das Rektorat: <xsl:text> </xsl:text><xsl:value-of select="rektor" />
+							F√ºr das Rektorat: <xsl:text> </xsl:text><xsl:value-of select="rektor" />
 						</fo:block>
 					</fo:block-container> 
 
@@ -352,7 +352,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 					<fo:block-container position="absolute" top="640pt" left="30pt" height="30pt">
 						<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="14pt">
-							Studienbest‰tigung Katholisch-Theologische Privatuniversit‰t Linz
+							Studienbest√§tigung Katholisch-Theologische Privatuniversit√§t Linz
                         </fo:block>
 					</fo:block-container> 
 
@@ -364,7 +364,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						                    <fo:table-cell border-align="right" border-width="0.2mm" border-style="solid" >
 											<fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="6pt"> 
 												<fo:inline vertical-align="super">
-													Zur Vorlage an (Stelle an der die Best‰tigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)
+													Zur Vorlage an (Stelle an der die Best√§tigung vorgelegt wird und deren Bezugszahl, z.B. Sozialversicherungsnr.)
 												</fo:inline>
 											</fo:block>
 									</fo:table-cell>
@@ -389,7 +389,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 						            <fo:table-row line-height="25pt">
 										<fo:table-cell border-align="right" border-width="0.2mm" border-style="solid" >
 										<fo:block line-height="12pt" font-family="sans-serif" font-size="10pt" content-width="45mm" text-align="center">
-											<xsl:value-of select="svnr" />
+											<xsl:value-of select="svnr" /><xsl:value-of select="ersatzkennzeichen" />
 										</fo:block>
 									</fo:table-cell>
 								</fo:table-row>      
@@ -422,7 +422,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 					<fo:block-container position="absolute" top="750pt" left="300pt" height="30pt">
                             <fo:block text-align="left" line-height="12pt" font-family="sans-serif" font-size="8pt">
-								F¸r das Rektorat: <xsl:text> </xsl:text><xsl:value-of select="rektor" />
+								F√ºr das Rektorat: <xsl:text> </xsl:text><xsl:value-of select="rektor" />
 							</fo:block>
 					</fo:block-container> 
 
