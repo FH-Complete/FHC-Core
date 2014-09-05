@@ -37,6 +37,7 @@ require_once('../include/vorlage.class.php');
 require_once('../include/student.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/variable.class.php');
+require_once('../include/addon.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -300,7 +301,23 @@ if (!isset($_REQUEST["archive"]))
 			file_put_contents('styles.xml', $stylebuffer);
 		}
 
-		$zipfile = DOC_ROOT.'system/vorlage_zip/'.$vorlage->vorlage_kurzbz.'.'.$endung;
+		$vorlage_found=false;
+		$addons = new addon();
+
+		foreach($addons->aktive_addons as $addon)
+		{
+			$zipfile = DOC_ROOT.'addons/'.$addon.'/system/vorlage_zip/'.$vorlage->vorlage_kurzbz.'.'.$endung;
+			
+			if(file_exists($zipfile))
+			{
+				$vorlage_found=true;
+				break;
+			}
+		}
+		
+		if(!$vorlage_found)
+			$zipfile = DOC_ROOT.'system/vorlage_zip/'.$vorlage->vorlage_kurzbz.'.'.$endung;
+		
 		$tempname_zip = 'out.zip';
 		if(copy($zipfile, $tempname_zip))
 		{
