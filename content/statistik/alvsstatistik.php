@@ -233,13 +233,21 @@ if($format=='xls')
 			$summe_w=0;
 			foreach ($data[$key] as $fb=>$stunden)
 			{
+				if(!isset($stunden['m']))
+					$stunden['m']=0;
 				$summe_m+=$stunden['m'];
+				if(!isset($summe_fb[$fb]['m']))
+					$summe_fb[$fb]['m']=0;
 				$summe_fb[$fb]['m']+=$stunden['m'];
 				$worksheet->write($zeile,$fachbereiche[$fb],$stunden['m'],$format_data);
 				//if($maxlength[$fachbereiche[$fb]]<strlen($stunden['m']))
 				//	$maxlength[$fachbereiche[$fb]]=strlen($stunden['m']);
 				
+				if(!isset($stunden['w']))
+					$stunden['w']=0;
 				$summe_w+=$stunden['w'];
+				if(!isset($summe_fb[$fb]['w']))
+					$summe_fb[$fb]['w']=0;
 				$summe_fb[$fb]['w']+=$stunden['w'];
 				$worksheet->write($zeile,$fachbereiche[$fb]+1,$stunden['w'],$format_data);
 				//if($maxlength[$fachbereiche[$fb]]<strlen($stunden['w']))
@@ -259,6 +267,11 @@ if($format=='xls')
 	//foreach ($summe_fb as $fb=>$summe)
 	foreach ($summe_fb as $fb=>$summe)
 	{
+		if(!isset($summe['m']))
+			$summe['m']=0;
+		if(!isset($summe['w']))
+			$summe['w']=0;
+		
 		if(isset($fachbereiche[$fb]))
 			$worksheet->write($zeile,$fachbereiche[$fb],number_format($summe['m'],2,'.',''), $format_bold_center_data);
 			$worksheet->write($zeile,$fachbereiche[$fb]+1,number_format($summe['w'],2,'.',''), $format_bold_center_data);

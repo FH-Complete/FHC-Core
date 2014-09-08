@@ -202,9 +202,21 @@ if($format=='xls')
 		{
 			$var_m = 's'.$i.'_m';
 			$var_w = 's'.$i.'_w';
+			if(!isset($summe_m_[$i]))
+				$summe_m_[$i]=0;
+			if(!isset($summe_w_[$i]))
+				$summe_w_[$i]=0;
+			
 			$summe_m_[$i]+= $row->$var_m;
 			$summe_w_[$i]+= $row->$var_w;
 		}
+		if(!isset($gesamtsumme))
+			$gesamtsumme=0;
+		if(!isset($gesamtsumme_m))
+			$gesamtsumme_m=0;
+		if(!isset($gesamtsumme_w))
+			$gesamtsumme_w=0;
+		
 		$gesamtsumme+= $row->all;
 		$gesamtsumme_m+= $summe_m;
 		$gesamtsumme_w+= $summe_w;
