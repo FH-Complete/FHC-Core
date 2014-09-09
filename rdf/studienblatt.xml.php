@@ -34,6 +34,7 @@ require_once('../include/studienordnung.class.php');
 require_once('../include/studienplan.class.php');
 require_once('../include/mitarbeiter.class.php');
 require_once('../include/organisationsform.class.php');
+require_once('../include/zgv.class.php');
 
 $uid_arr = (isset($_REQUEST['uid'])?$_REQUEST['uid']:null);
 
@@ -83,7 +84,7 @@ foreach($uid_arr as $uid)
 	{
 			$datum_aktuell = date('d.m.Y');
 			$gebdatum = date('d.m.Y',strtotime($student->gebdatum));
-			$prestudent = new prestudent();
+			$prestudent = new prestudent($student->prestudent_id);
 			$prestudent->getLastStatus($student->prestudent_id,null,'Student');
 			$studienordnung = new studienordnung();
 			$studienordnung->getStudienordnungFromStudienplan($prestudent->studienplan_id);
@@ -186,6 +187,8 @@ foreach($uid_arr as $uid)
             }
             
             echo "\t\t<studierendenstatus_aktuell>".$studierendenstatus_aktuell."</studierendenstatus_aktuell>\n";
+	    echo "\t\t<datum_reifepruefung>".$prestudent->zgvdatum."</datum_reifepruefung>\n";
+	    echo "\t\t<schulform_zgv>".$prestudent->zgv_code."</schulform_zgv>\n";
             
             switch($studiengang->typ)
             {
