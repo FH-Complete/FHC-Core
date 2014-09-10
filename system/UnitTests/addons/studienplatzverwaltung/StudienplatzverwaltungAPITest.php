@@ -91,6 +91,14 @@ class StudienplatzverwaltungAPITest extends PHPUnit_Framework_TestCase
 		
 	}
 	
+	public function testGetInfoData()
+	{
+		$api = StudienplatzverwaltungAPI::init();
+		$appdaten = $api->getInfoDaten('2011/12',3);
+		$this->assertNotNull($appdaten);
+		var_dump($appdaten);		
+	}
+	
 	
 	
 	public function testGetMetadata() {		
