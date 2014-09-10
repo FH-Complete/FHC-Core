@@ -240,7 +240,7 @@
 						</fo:table>
 					</xsl:if>
 				</fo:block-container>
-				<fo:block-container position="absolute" top="265mm" left="21.5mm">
+				<fo:block-container position="absolute" top="255mm" left="21.5mm">
 					<fo:table table-layout="fixed" border-collapse="collapse">
 						<fo:table-column column-width="73mm" />
 						<fo:table-column column-width="17mm" />
