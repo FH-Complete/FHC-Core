@@ -305,6 +305,9 @@
 			<fo:table-cell border-width="0.2mm" border-style="solid" display-align="center">
 				<fo:block font-size="9pt" content-width="20mm" text-align="center" vertical-align="center" font-family="arial">
 					<xsl:text> </xsl:text>
+					<xsl:if test="sws=''">
+						<xsl:text>-</xsl:text>
+					</xsl:if>
 					<xsl:value-of select="sws"/>
 				</fo:block>
 			</fo:table-cell>
