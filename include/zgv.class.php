@@ -53,15 +53,15 @@ class zgv extends basis_db
      */
     public function load($zgv_code)
     {
-        $qry = 'SELECT * FROM bis.tbl_zgv WHERE zgv_code = '.$this->db_add_param($zgv_code).';';
+        $qry = 'SELECT * FROM bis.tbl_zgv WHERE zgv_code = '.$this->db_add_param($zgv_code, FHC_INTEGER).';';
         
         if($result = $this->db_query($qry))
         {
             if($row = $this->db_fetch_object($result))
             {
-                $this->zgv_code; 
-                $this->zgv_bez; 
-                $this->zgv_kurzbz; 
+                $this->zgv_code = $row->zgv_code; 
+                $this->zgv_bez = $row->zgv_bez; 
+                $this->zgv_kurzbz = $row->zgv_kurzbz; 
                 
             }
             return true; 
