@@ -188,8 +188,10 @@ foreach($uid_arr as $uid)
             
             echo "\t\t<studierendenstatus_aktuell>".$studierendenstatus_aktuell."</studierendenstatus_aktuell>\n";
 	    echo "\t\t<datum_reifepruefung>".$prestudent->zgvdatum."</datum_reifepruefung>\n";
-	    echo "\t\t<schulform_zgv>".$prestudent->zgv_code."</schulform_zgv>\n";
-            
+	    $zgv = new zgv($prestudent->zgv_code);
+	    echo "\t\t<schulform_zgv>".$zgv->zgv_kurzbz."</schulform_zgv>\n";
+	    echo "\t\t<studienplan_bezeichnung>".$studienplan->bezeichnung."</studienplan_bezeichnung>\n";
+	    
             switch($studiengang->typ)
             {
                 case 'b':
