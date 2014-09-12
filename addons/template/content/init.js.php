@@ -27,6 +27,7 @@ addon.push(
 	{
 		// Diese Funktion wird nach dem Laden des FAS aufgerufen
 
+		/*
 
 		// Hinzufuegen eines zusaetzlichen Tabs bei Mitarbeitern mit einem Label darin
 		var tabitem = document.createElement("tab");
@@ -58,6 +59,8 @@ addon.push(
 		menuentry.addEventListener("command",AddonTemplateMenuEntry, true);
 	
 		statistikmenue.appendChild(menuentry);
+		
+		*/
 	},
 	selectMitarbeiter: function(person_id, mitarbeiter_uid)
 	{
