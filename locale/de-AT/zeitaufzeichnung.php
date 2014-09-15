@@ -27,4 +27,5 @@ $this->phrasen['zeitaufzeichnung/alsEndzeitUebernehmen']='Als Endzeit übernehme
 $this->phrasen['zeitaufzeichnung/uebersicht']='Übersicht';
 $this->phrasen['zeitaufzeichnung/zeitraumAuffallendHoch']='Achtung, eingegebener Zeitraum ist auffallend hoch. \nDaten wurden gespeichert.';
 $this->phrasen['zeitaufzeichnung/bisDatumKleinerAlsVonDatum']='Das Bis-Datum darf nicht kleiner als das Von-Datum sein';
+$this->phrasen['zeitaufzeichnung/tagessumme']='Tagessumme:';
 ?>

@@ -307,7 +307,7 @@ class zeitaufzeichnung extends basis_db
 	 */
 	public function getListeUser($user, $days='40')
 	{		 
-		$where = "uid='$user'";
+		$where = "uid=".$this->db_add_param($user);
 		if ($days!='')
 		$where.= " AND ende>(now() - INTERVAL '".$days." days')";
 		
