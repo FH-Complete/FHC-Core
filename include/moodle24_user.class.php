@@ -364,20 +364,25 @@ class moodle24_user extends basis_db
 						//Gruppenzuteilung
 						if($gruppensync)
 						{
-							if(!array_search($gruppenbezeichnung, $vorhandenegruppen))
+							if(!isset($vorhandenegruppen[$gruppenbezeichnung]))
 							{
 								//Schauen ob die Gruppe vorhanden ist
 								if(!$groupid = $this->getGroup($mdl_course_id, $gruppenbezeichnung))
 								{
 									//wenn nicht dann anlegen
 									if(!$groupid = $this->createGroup($mdl_course_id, $gruppenbezeichnung))
+									{
+										$this->log.="\nGruppen Anlegen Failed $gruppenbezeichnung $mdl_course_id $groupid";
 										continue;
+									}
 									$this->group_update++;
-									$this->log.="\nes wurde eine neue Gruppe angelgt: $gruppenbezeichnung";
+									$this->log.="\nes wurde eine neue Gruppe angelgt: $gruppenbezeichnung ID $groupid";
 									$this->log_public.="\nes wurde eine neue Gruppe angelgt: $gruppenbezeichnung";
 								}
-								$vorhandenegruppen[]=$gruppenbezeichnung;
+								$vorhandenegruppen[$gruppenbezeichnung]=$groupid;
 							}
+							else
+								$groupid=$vorhandenegruppen[$gruppenbezeichnung];
 
 							//if($this->mdl_user_id=='')
 							//	$this->loaduser($row_user->student_uid);
@@ -388,23 +393,28 @@ class moodle24_user extends basis_db
 								$groupmembertoadd[] = array('groupid'=>$groupid,'userid'=>$this->mdl_user_id);
 								//$this->createGroupMember($groupid, $this->mdl_user_id);
 								$this->group_update++;
-								$this->log.="\nStudentIn $row_user->student_uid wurde der Gruppe $gruppenbezeichnung zugeordnet";
+								$this->log.="\nStudentIn $row_user->student_uid wurde der Gruppe $gruppenbezeichnung ($groupid) zugeordnet";
 								$this->log_public.="\nStudentIn $row_user->student_uid wurde der Gruppe $gruppenbezeichnung zugeordnet";
 							}
 						}						
 					}
 				}
 			}
+
 			if(count($userstoenroll)>0)
 			{
 				$client = new SoapClient($this->serverurl); 
 				$client->enrol_manual_enrol_users($userstoenroll);
+				// Wenn User zum Kurs hinzugefuegt werden, muss eine kleine Pause eingelegt werden
+				// damit sich Moodle wieder beruhigt, sonst werden die Gruppenzuordnungen nicht korrekt gesetzt
+				sleep(1);
 			}
 
 			if(count($groupmembertoadd)>0)
 			{
 				$client = new SoapClient($this->serverurl); 
-				$client->core_group_add_group_members($groupmembertoadd);
+				$groupresult = $client->core_group_add_group_members($groupmembertoadd);
+				//$this->log.="\n\n".print_r($groupmembertoadd,true)."\n".print_r($groupresult,true);
 			}
 				
 			return true;
