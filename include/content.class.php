@@ -347,7 +347,8 @@ class content extends basis_db
 					campus.tbl_contentgruppe 
 					JOIN public.vw_gruppen USING(gruppe_kurzbz) 
 				WHERE
-					tbl_contentgruppe.content_id=".$this->db_add_param($content_id, FHC_INTEGER)."
+					(tbl_contentgruppe.content_id=".$this->db_add_param($content_id, FHC_INTEGER)."
+						OR NOT EXISTS (SELECT 1 FROM campus.tbl_contentgruppe WHERE content_id=".$this->db_add_param($content_id, FHC_INTEGER)."))
 					AND vw_gruppen.uid=".$this->db_add_param($uid);
 		if($result = $this->db_query($qry))
 		{
@@ -1274,7 +1275,7 @@ class content extends basis_db
 	public function search($searchItems, $limit=null)
 	{
 		$qry = "SELECT 
-					distinct on(content_id) *
+					distinct on(content_id,sprache) *
 				FROM 
 					campus.tbl_contentsprache
 					JOIN campus.tbl_content USING(content_id)
@@ -1298,8 +1299,8 @@ class content extends basis_db
 							)
 						)
 					";
-		$qry.=" ORDER BY content_id DESC";
-		
+		$qry.=" ORDER BY sprache,content_id DESC";
+
 		if(!is_null($limit) && is_numeric($limit))
 			$qry.=" LIMIT ".$limit;
 		
@@ -1311,6 +1312,7 @@ class content extends basis_db
 				$obj->content_id = $row->content_id;
 				$obj->content = $row->content;
 				$obj->titel = $row->titel;
+				$obj->sprache = $row->sprache;
 				
 				$this->result[] = $obj;
 			}

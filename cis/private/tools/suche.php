@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at>
+ * Authors:	Andreas Oesterreicher 	<andreas.oesterreicher@technikum-wien.at>
+ * 			Manfred Kindl			<manfred.kindl@technikum-wien.at>
  */
 /**
  * Globale Suche
@@ -45,12 +46,9 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 	<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 	<script type="text/javascript" src="../../../include/js/jquery.js"></script>
-	<script type="text/javascript" src="../../../include/js/flexcroll.js"></script>
-	<link href="../../../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" /> 
 	<title>Globale Suche</title>
 </head>
-<body>
-<div class="flexcroll" style="outline: none;">';
+<body>';
 
 echo '<h1>',$p->t('tools/suche'),'</h1>';
 
@@ -63,15 +61,22 @@ echo '<form action="',$_SERVER['PHP_SELF'],'" name="searchform" method="GET">
 
 if($search=='')
 	exit;
-	
+
+// String aufsplitten und Sonderzeichen entfernen
+$searchItems = explode(' ',TRIM(str_replace(',', '', $search),'!.?'));
+
+// Wenn nach dem TRIM keine Zeichen uebrig bleiben, dann abbrechen
+if(implode(',', $searchItems)=='')
+	exit;
+
 //Easter Egg
-if(($search=='the answer to life the universe and everything') || ($search=='answer to life the universe and everything'))
+$easteregg = array ('antwort','leben','universum','rest','answer','universe','life','everything');
+$easteregg_intersect = array_intersect(array_map('strtolower',$searchItems), $easteregg);
+if (count($easteregg_intersect)==4)
 {
 	echo '<table width="100%"><tr><td align="center"><br><br><br><p style="align:center; font-size: 2000%;"><strong>42</strong></p></td></tr></table>';
 	exit;
 }
-
-$searchItems = explode(' ',TRIM($search));
 
 $searchPerson = searchPerson($searchItems);
 $searchOrt = searchOrt($search);
@@ -237,9 +242,9 @@ function searchDms($searchItems)
 		'image/png'=>'img_icon.png',
 	);
 	$searchstring = $searchItems;
-	global $db, $p;
+	global $db, $p, $uid;
 	$dms = new dms();
-	$dms->searchLastVersion($searchstring, 41);	
+	$dms->searchLastVersion($searchstring, 41);
 	
 	if(count($dms->result)>0)
 	{
@@ -273,14 +278,32 @@ function searchDms($searchItems)
 			';
 		foreach($dms->result as $row)
 		{
-			echo '<tr>';
-			if(array_key_exists($row->mimetype,$mimetypes))
-				echo '<td width="20px" height="20px" style="vertical-align:middle;"><img src="../../../skin/images/'.$mimetypes[$row->mimetype].'" style="height: 20px; vertical-align:middle;"></td><td height="20px" style="vertical-align:middle;"><a href="../../../cms/dms.php?id='.$row->dms_id.'" title="'.$row->name.'">',$row->beschreibung,'</a></td>';
-			else
-				echo '<td width="20px" height="20px" style="vertical-align:middle;"><img src="../../../skin/images/blank.gif" style="height: 18px; vertical-align:middle;"></td><td height="20px" style="vertical-align:middle;"><a href="../../../cms/dms.php?id='.$row->dms_id.'">',$row->beschreibung,'</a></td>';
-			echo '<td style="vertical-align:middle;">',$row->version,'</td>';
-			echo '</tr>';
-			echo "\n";
+			// Berechtigung pruefen
+			if ($dms->isLocked($row->dms_id))
+			{
+				if ($dms->isBerechtigt($row->dms_id, $uid))
+				{
+					echo '<tr>';
+					if(array_key_exists($row->mimetype,$mimetypes))
+						echo '<td width="20px" height="20px" style="vertical-align:middle;"><img src="../../../skin/images/'.$mimetypes[$row->mimetype].'" style="height: 20px; vertical-align:middle;"></td><td height="20px" style="vertical-align:middle;"><a href="../../../cms/dms.php?id='.$row->dms_id.'" title="'.$row->name.'">',$row->beschreibung,'</a></td>';
+					else
+						echo '<td width="20px" height="20px" style="vertical-align:middle;"><img src="../../../skin/images/blank.gif" style="height: 18px; vertical-align:middle;"></td><td height="20px" style="vertical-align:middle;"><a href="../../../cms/dms.php?id='.$row->dms_id.'">',$row->beschreibung,'</a></td>';
+					echo '<td style="vertical-align:middle;">',$row->version,'</td>';
+					echo '</tr>';
+					echo "\n";
+				}
+			}
+			else 
+			{
+				echo '<tr>';
+					if(array_key_exists($row->mimetype,$mimetypes))
+						echo '<td width="20px" height="20px" style="vertical-align:middle;"><img src="../../../skin/images/'.$mimetypes[$row->mimetype].'" style="height: 20px; vertical-align:middle;"></td><td height="20px" style="vertical-align:middle;"><a href="../../../cms/dms.php?id='.$row->dms_id.'" title="'.$row->name.'">',$row->beschreibung,'</a></td>';
+					else
+						echo '<td width="20px" height="20px" style="vertical-align:middle;"><img src="../../../skin/images/blank.gif" style="height: 18px; vertical-align:middle;"></td><td height="20px" style="vertical-align:middle;"><a href="../../../cms/dms.php?id='.$row->dms_id.'">',$row->beschreibung,'</a></td>';
+					echo '<td style="vertical-align:middle;">',$row->version,'</td>';
+					echo '</tr>';
+					echo "\n";
+			}
 		}
 		echo '</tbody></table><br>';
 		return true;
@@ -290,7 +313,7 @@ function searchDms($searchItems)
 }
 function searchContent($searchItems)
 {
-	global $db,$p;
+	global $db,$p,$sprache,$uid;
 	$cms = new content();
 	$cms->search($searchItems, 21);
 
@@ -301,16 +324,57 @@ function searchContent($searchItems)
 		{
 			echo '<p style="color:red;">'.$p->t("tools/esWurdenMehrAlsXInhalteGefunden").'</p>';
 		}
-		echo '<ul>';
+		// Jede Sprache getrennt anzeigen aber zuerst die eingestellte Sprache
+		$anzeigesprache='';
 		foreach($cms->result as $row)
 		{
-			echo '<li><div class="suchergebnis">';
-			echo '<a href="../../../cms/content.php?content_id=',$db->convert_html_chars($row->content_id),'">',$db->convert_html_chars($row->titel),'</a><br>';
-			$preview = findAndMark($row->content, $searchItems);
-			
-			echo $preview;
-			echo '<br /><br /></div></li>';
-		}	
+			if ($sprache==$row->sprache)
+			{
+				if ($anzeigesprache!=$row->sprache)
+				{
+					$anzeigesprache=$row->sprache;
+					echo '<h3>',$row->sprache,'</h3>';
+					echo '<ul>';
+				}
+				$berechtigt = new content();
+				$berechtigt = $berechtigt->berechtigt($row->content_id, $uid);
+				if ($berechtigt)
+				{
+					echo '<li><div class="suchergebnis">';
+					echo '<a href="../../../cms/content.php?content_id=',$db->convert_html_chars($row->content_id),'&sprache=',$db->convert_html_chars($row->sprache),'">',$db->convert_html_chars($row->titel),'</a><br>';
+					$preview = findAndMark($row->content, $searchItems);
+					
+					echo $preview;
+					echo '<br /><br /></div></li>';
+				}
+			}
+		}
+		echo '</ul>';	
+		$anzeigesprache='';
+		foreach($cms->result as $row)
+		{
+			if ($sprache!=$row->sprache)
+			{
+				if ($anzeigesprache!=$row->sprache)
+				{
+					$anzeigesprache=$row->sprache;
+					echo '</ul>';
+					echo '<h3>',$row->sprache,'</h3>';
+					echo '<ul>';
+				}
+				$berechtigt = new content();
+				$berechtigt = $berechtigt->berechtigt($row->content_id, $uid);
+				if ($berechtigt)
+				{
+					echo '<li><div class="suchergebnis">';
+					echo '<a href="../../../cms/content.php?content_id=',$db->convert_html_chars($row->content_id),'&sprache=',$db->convert_html_chars($row->sprache),'">',$db->convert_html_chars($row->titel),'</a><br>';
+					$preview = findAndMark($row->content, $searchItems);
+					
+					echo $preview;
+					echo '<br /><br /></div></li>';
+				}
+			}
+		}
 		echo '</ul>';
 		return true;
 	}
@@ -368,5 +432,5 @@ function findAndMark($content, $items)
 	return $preview;
 }
 
-echo '</div></body></html>';
+echo '</body></html>';
 ?>
