@@ -95,8 +95,8 @@ if(!$rechte->isBerechtigt('admin',0) &&
 {
 	$qry = "SELECT lehreinheit_id FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id)
 			JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) 
-			WHERE tbl_lehrveranstaltung.lehrveranstaltung_id='".addslashes($lvid)."' AND
-			tbl_lehreinheit.studiensemester_kurzbz='".addslashes($stsem)."' AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid='".addslashes($user)."'";
+			WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
+			tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stsem)." AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid=".$db->db_add_param($user);
 	if($result = $db->db_query($qry))
 	{
 		if($db->db_num_rows($result)==0)
@@ -113,7 +113,7 @@ function savenote($db,$lvid, $student_uid, $note)
 	global $stsem, $user, $p;
 	$jetzt = date("Y-m-d H:i:s");
 	//Ermitteln ob der Student diesem Kurs zugeteilt ist
-	$qry = "SELECT 1 FROM campus.vw_student_lehrveranstaltung WHERE uid='".addslashes($student_uid)."' AND lehrveranstaltung_id='".addslashes($lvid)."'";
+	$qry = "SELECT 1 FROM campus.vw_student_lehrveranstaltung WHERE uid=".$db->db_add_param($student_uid)." AND lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER);
 	if($result = $db->db_query($qry))
 		if($db->db_num_rows($result)==0)
 		{
@@ -168,11 +168,11 @@ if (isset($_REQUEST["submit"]))
 		$student_uid = $_REQUEST["student_uid"];
 		$note = $_REQUEST["note"];
 		
-		if((($note>0) && ($note < 6)) || ($note == 7) || ($note==16) || ($note==10) || ($note==14))
+		//if((($note>0) && ($note < 6)) || ($note == 7) || ($note==16) || ($note==10) || ($note==14))
 			$response = savenote($db,$lvid, $student_uid, $note);
-		else
+		/*else
 			$response = $p->t('benotungstool/noteEingeben')."!";
-		
+		*/
 		echo $response;
 	}
 	else
@@ -201,12 +201,12 @@ if (isset($_REQUEST["submit"]))
 					else
 						$znote = null;	
 					
-					if(((($note>0) && ($note < 6)) || ($note == 7) || ($note==16) || ($note==10) || ($note==14)))
-					{
+					/*if(((($note>0) && ($note < 6)) || ($note == 7) || ($note==16) || ($note==10) || ($note==14)))
+					{*/
 						$val=savenote($db,$lvid, $student_uid, $note);
 						if($val!='neu' && $val!='update' && $val!='update_f')
 							$response.=$val;
-					}
+					/*}
 					else
 					{
 						// Wenn Zeugnisnote schon 6 ist -> keine Fehlermeldung mehr
@@ -215,7 +215,7 @@ if (isset($_REQUEST["submit"]))
 							$student->load($student_uid);						
 							$response .= "\n".$p->t('benotungstool/fehlerhafteNoteBeiStudent', array($student->vorname, $student->nachname))." ".$p->t('benotungstool/noteEingeben');
 						}
-					}
+					}*/
 				}
 				else 
 				{
