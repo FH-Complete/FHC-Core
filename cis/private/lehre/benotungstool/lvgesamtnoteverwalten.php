@@ -42,6 +42,7 @@ require_once('../../../../include/moodle19_course.class.php');
 require_once('../../../../include/moodle24_course.class.php');
 require_once('../../../../include/mail.class.php');
 require_once('../../../../include/phrasen.class.php');
+require_once('../../../../include/note.class.php');
 
 $summe_stud=0;
 $summe_t2=0;
@@ -93,6 +94,10 @@ $datum_obj = new datum();
 
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 $uid = (isset($_GET['uid'])?$_GET['uid']:'');
+
+$noten_obj = new note();
+$noten_obj->getAll();
+
 ?><!DOCTYPE HTML>
 <html>
 <head>
@@ -114,6 +119,16 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 </STYLE>
 <script language="JavaScript" type="text/javascript">
 <!--
+<?php 
+	echo "var noten_array=Array();\n";
+	$noten_array=array();
+	foreach($noten_obj->result as $row)
+	{
+		echo "noten_array['".$row->note."']='".$row->bezeichnung."';\n";
+		$noten_array[$row->note]=$row->bezeichnung;
+	}
+?>
+
 	function MM_jumpMenu(targ, selObj, restore)
 	{
 		eval(targ + ".location='" + selObj.options[selObj.selectedIndex].value + "'");
@@ -190,17 +205,14 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 	function saveLVNote(uid)
 	{
 		note = document.getElementById(uid).note.value;	
+		note_label = document.getElementById(uid).note.label;
+
 		note_orig = document.getElementById(uid).note_orig.value;
 		//wenn die Note gleich bleibt dann abbrechen
 		if 	(note == note_orig && note != "")
 		{
 			alert('<?php echo $p->t('gesamtnote/noteUnveraendert');?>');
 			return true;
-		}
-		else if ((note < 0) || (note > 5 && note != 7 && note!=16 && note!=10 && note!=14))
-		{
-			alert('<?php echo $p->t('benotungstool/noteEingeben');?>');
-			document.getElementById(uid).note.value="";
 		}
 		else
 		{	
@@ -214,7 +226,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 		    anfrage.open("GET", url, true);
 		    anfrage.onreadystatechange = updateSeite;
 		    anfrage.send(null);
-		    document.getElementById(uid).note_orig.value=note;
+		    document.getElementById(uid).note_orig.value=noten_array[note];
 	    }
 	}
 	
@@ -238,7 +250,7 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 	            	{
 						notentd.removeChild(notentd.lastChild);
 	            	}
-	            	notenode = document.createTextNode(note);
+	            	notenode = document.createTextNode(noten_array[note]);
                     notentd.appendChild(notenode);
 					notenstatus = document.getElementById("status_"+uid);
 					if (resp == "update_f")
@@ -712,15 +724,15 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 }
 
 echo '<table width="100%" height="10px"><tr><td>';
-echo "<h3><a href='javascript:window.history.back()'>".$p->t('global/zurueck')."</a></h3>";
+//echo "<h3><a href='javascript:window.history.back()'>".$p->t('global/zurueck')."</a></h3>";
 echo '</td><td align="right">';
 echo '<a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/benotungstoolHandbuch').'" class="Item" target="_blank">'.$p->t('benotungstool/handbuch').' (PDF)</a>';
 echo '</td></tr></table>';
 
 
 echo '<table width="100%" height="10px"><tr><td>';
-	echo "<h3>".$p->t('benotungstool/lvGesamtnoteVerwalten')."</h3>";
-	echo $p->t('benotungstool/noten');
+	//echo "<h3>".$p->t('benotungstool/lvGesamtnoteVerwalten')."</h3>";
+	//echo $p->t('benotungstool/noten');
 echo '</td></tr></table>';
 
 // alle Pruefungen für die LV holen
@@ -753,6 +765,7 @@ if ($pr_komm->getPruefungenLV($lvid,"kommPruef",$stsem))
 	}
 }
 $summe_komm=count($studpruef_komm);
+
 //Studentenliste
 echo '<table>';
 		echo "<tr>
@@ -862,7 +875,7 @@ echo '<table>';
 					//Moodle 1.9
 
 					// Alle Moodlekursdaten zu Lehreinheit und Semester lesen wenn noch nicht belegt.
-					if (is_null($mdldaten))
+					if (is_null($mdldaten) && defined('CONN_STRING_MOODLE'))
 					{
 						//Noten aus Moodle
 						if (!isset($moodle_course))
@@ -939,12 +952,15 @@ echo '<table>';
 					}		
 					else
 					{
-						//den Error nur einmal anzeigen und nicht fuer jeden Studenten
-						$moodle_course->errormsg=trim($moodle_course->errormsg);
-						if(!$errorshown && !empty($moodle_course->errormsg) )
+						if(defined('CONN_STRING_MOODLE'))
 						{
-							//echo '<br><b>'.$moodle_course->errormsg.'</b><br>';
-							$errorshown=true;
+							//den Error nur einmal anzeigen und nicht fuer jeden Studenten
+							$moodle_course->errormsg=trim($moodle_course->errormsg);
+							if(!$errorshown && !empty($moodle_course->errormsg) )
+							{
+								//echo '<br><b>'.$moodle_course->errormsg.'</b><br>';
+								$errorshown=true;
+							}
 						}
 					}
 
@@ -1004,7 +1020,7 @@ echo '<table>';
     			else
     				$note_lv = null;
 				
-				if ($note_lv)
+				if (!is_null($note_lv))
 					$note_vorschlag = $note_lv;
 				else if ($le_anz > 0)
 					$note_vorschlag = round($note_le/$le_anz);
@@ -1023,7 +1039,30 @@ echo '<table>';
 				else
 					$hide = "style='display:block;visibility:visible;'";				
 
-				echo "<td valign='bottom' nowrap><form name='$row_stud->uid' id='$row_stud->uid' method='POST' action='".$_SERVER['PHP_SELF']."?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><span id='lvnoteneingabe_".$row_stud->uid."' ".$hide."><input type='hidden' name='student_uid' value='$row_stud->uid'><input type='text' size='1' value='$note_vorschlag' name='note'><input type='hidden' name='note_orig' value='$note_lv'><input type='button' value='->' onclick=\"saveLVNote('".$row_stud->uid."');\"></span></form></td>";
+				echo "<td valign='bottom' nowrap>
+					<form name='$row_stud->uid' id='$row_stud->uid' method='POST' action='".$_SERVER['PHP_SELF']."?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'>
+						<span id='lvnoteneingabe_".$row_stud->uid."' ".$hide.">
+							<input type='hidden' name='student_uid' value='$row_stud->uid'>";
+
+				echo '<select name="note">';
+				echo '<option value="">-- keine Auswahl --</option>';
+				foreach($noten_obj->result as $row_note)
+				{
+					if($row_note->note == $note_vorschlag)
+						$selected='selected';
+					else
+						$selected='';
+
+					echo '<option value="'.$row_note->note.'" '.$selected.'>'.$row_note->bezeichnung.'</option>';
+
+					//<input type='text' size='1' value='$note_vorschlag' name='note'>
+				}
+				echo '</select>';
+				echo "
+							<input type='hidden' name='note_orig' value='$note_lv'>
+							<input type='button' value='->' onclick=\"saveLVNote('".$row_stud->uid."');\">
+						</span>
+					</form></td>";
 				
 					
 				if ($note_lv == 5)
@@ -1031,7 +1070,7 @@ echo '<table>';
 				else
 					$negmarkier = "";			
 				
-				echo "<td align='center' id='note_$row_stud->uid'><span ".$negmarkier.">$note_lv</span></td>";
+				echo "<td align='center' id='note_$row_stud->uid'><span ".$negmarkier.">".(isset($noten_array[$note_lv])?$noten_array[$note_lv]:'')."</span></td>";
 				
 				//status //////////////////////////////////////////////////////////////////////////////////
 				echo "<td align='center' id='status_$row_stud->uid'>";				
@@ -1047,7 +1086,7 @@ echo '<table>';
 					$stylestr = " style='color:red; border-color:red; border-style:solid; border-width:1px;'";
 				else
 					$stylestr ="";
-				echo "<td".$stylestr." align='center'>".$znote."</td>";
+				echo "<td".$stylestr." align='center'>".(isset($noten_array[$znote])?$noten_array[$znote]:'')."</td>";
 				if($znote==5 || $znote==7 || $znote==9 || $znote==13 || $znote==13 || $znote=='')
 				{
 					$summe_ng++;
@@ -1079,7 +1118,7 @@ echo '<table>';
 				}
 				else
 				{
-					if ($note_lv)				
+					if (!is_null($note_lv))				
 						echo "<td colspan='2'><span id='span_".$row_stud->uid."'><input type='button' name='anlegen' value='".$p->t('benotungstool/anlegen')."' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"\",\"\",\"\")'></span></td>";
 					else
 						echo "<td colspan='2'></td>";	
