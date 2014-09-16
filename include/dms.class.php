@@ -1029,7 +1029,7 @@ class dms extends basis_db
 	/**
 	 * 
 	 * Prueft ob der User fuer das Dokument berechtigt ist
-	 * Vorher sollte mit isLocked geprueft werden ob das Dokument gesperrt ist
+	 * Vorher muss mit isLocked geprueft werden ob das Dokument gesperrt ist
 	 * 
 	 * @param $dms_id
 	 * @param $user
