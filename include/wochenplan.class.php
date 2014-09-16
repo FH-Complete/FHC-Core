@@ -41,6 +41,7 @@ require_once(dirname(__FILE__).'/zeitsperre.class.php');
 require_once(dirname(__FILE__).'/phrasen.class.php'); 
 require_once(dirname(__FILE__).'/globals.inc.php'); 
 require_once(dirname(__FILE__).'/sprache.class.php');
+require_once(dirname(__FILE__).'/functions.inc.php');
 
 class wochenplan extends basis_db
 {
@@ -623,6 +624,7 @@ class wochenplan extends basis_db
 	  		echo '<tr><td>'.$tagbez[$spracheLoad->index][$i].'<br>'.strftime("%e. %b %Y",$datum).'<br></td>'.$this->crlf; //.strftime("%A %d %B %Y",$this->datum)
 	  		for ($k=0; $k<$num_rows_stunde; $k++)
 			{
+				
 				$row = $this->db_fetch_object($result_stunde, $k);
 				$j = $row->stunde;
 				// Stunde aufbereiten
@@ -1206,26 +1208,37 @@ class wochenplan extends basis_db
 									FROM (  SELECT stpl.unr, stpl.datum, stpl.stunde, tbl_benutzergruppe.uid AS student_uid
 									               FROM lehre.tbl_stundenplandev stpl
 									          JOIN public.tbl_benutzergruppe USING (gruppe_kurzbz)
-									         WHERE tbl_benutzergruppe.studiensemester_kurzbz::text = ".$this->db_add_param($studiensemester)."
+									         WHERE tbl_benutzergruppe.studiensemester_kurzbz::text = ".$this->db_add_param($studiensemester)."											
 									         GROUP BY stpl.unr, stpl.datum, stpl.stunde, tbl_benutzergruppe.uid
 									UNION 
 									             SELECT stpl.unr, stpl.datum, stpl.stunde, tbl_studentlehrverband.student_uid
 									               FROM lehre.tbl_stundenplandev stpl
 									          JOIN public.tbl_studentlehrverband ON stpl.gruppe_kurzbz IS NULL AND stpl.studiengang_kz = tbl_studentlehrverband.studiengang_kz AND stpl.semester = tbl_studentlehrverband.semester AND (stpl.verband = tbl_studentlehrverband.verband OR stpl.verband = ' '::bpchar AND stpl.verband <> tbl_studentlehrverband.verband) AND (stpl.gruppe = tbl_studentlehrverband.gruppe OR stpl.gruppe = ' '::bpchar AND stpl.gruppe <> tbl_studentlehrverband.gruppe)
 									         WHERE tbl_studentlehrverband.studiensemester_kurzbz::text = ".$this->db_add_param($studiensemester)."
-									         GROUP BY stpl.unr, stpl.datum, stpl.stunde, tbl_studentlehrverband.student_uid) sub_stpl_uid
+											GROUP BY stpl.unr, stpl.datum, stpl.stunde, tbl_studentlehrverband.student_uid) sub_stpl_uid
 									GROUP BY sub_stpl_uid.unr, sub_stpl_uid.datum, sub_stpl_uid.stunde, sub_stpl_uid.student_uid
 
 								) as a
 								WHERE datum='".date('Y-m-d',$datum)."' AND stunde=".$this->db_add_param($j)."
 								GROUP BY datum, stunde, student_uid
-								HAVING count(student_uid)>1
-								ORDER BY datum, stunde, student_uid LIMIT 1; 
-							   ";
+								HAVING count(student_uid)>1 ";
+
+								if(count($a_unr)>0)
+								{
+									// Nur die Eintraege als kollision anzeigen, die auch aktuell im Tempus sichtbar sind
+									// Dazu werden die UNRs der betroffenen Studierenden zuerst ein ein Array gruppiert und danach
+									// verglichen ob die angezeigte UNR dabei ist. 
+									// Etwas kompliziert aber performanter als wenn die betroffenen UNRs zusätzlich zum WHERE hinzugefügt werden
+									
+									$qry.=" AND array_agg(unr) && ARRAY[".implode('::bigint,',$a_unr)."::bigint] ";
+									// ==>  AND array_agg(unr) && ARRAY[123::bigint,345::bigint]
+								}
+								$qry.="ORDER BY datum, stunde, student_uid LIMIT 1;";
 
 						if($this->db_query($qry))
 							if($this->db_num_rows()>0)
 								$kollision++;
+							
 					}
 					else 
 					{
