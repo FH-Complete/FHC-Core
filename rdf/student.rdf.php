@@ -684,7 +684,7 @@ else
 								break;
 				}
 			}
-			
+			$prestudent = new prestudent($student->prestudent_id);
 			echo '
 			<student>
 				<uid><![CDATA['.$student->uid.']]></uid>
@@ -719,6 +719,7 @@ else
 				<studienbeginn_aktuell><![CDATA['.$datum_obj->convertISODate($stsem->start).']]></studienbeginn_aktuell>
 				<tagesdatum><![CDATA['.date('d.m.Y').']]></tagesdatum>
 				<max_semester><![CDATA['.$studiengang->max_semester.']]></max_semester>
+				<anmerkungpre><![CDATA['.$prestudent->anmerkung.']]></anmerkungpre>
 	    	</student>';
 		}
 	}
