@@ -114,6 +114,7 @@ foreach($uid_arr as $uid)
             }
             
 			echo "\t\t<quote>1</quote>\n"; 
+			echo "\t\t<personenkz>".$uid."</personenkz>\n";
 			echo "\t\t<geschlecht>".$geschlecht."</geschlecht>\n";
 			echo "\t\t<anrede>".$student->anrede."</anrede>\n";
 			echo "\t\t<vorname>".$student->vorname." ".$student->vornamen."</vorname>\n";
