@@ -259,6 +259,16 @@ foreach($uid_arr as $uid)
 					break;
 				}
 			}
+			foreach($adresse->result as $row_adresse)
+			{
+				if($row_adresse->heimatadresse)
+				{
+					echo "\t\t<heimat_strasse>".$row_adresse->strasse."</heimat_strasse>\n";
+					echo "\t\t<heimat_plz>".$row_adresse->plz." ".$row_adresse->ort."</heimat_plz>\n";
+					echo "\t\t<heimat_nation>".$row_adresse->nation."</heimat_nation>\n";
+					break;
+				}
+			}
 			$prestudent = new prestudent();
 			$prestudent->getLastStatus($student->prestudent_id, null, 'Student');
 			
