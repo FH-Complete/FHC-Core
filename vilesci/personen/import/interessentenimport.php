@@ -21,6 +21,7 @@
  */
 
 require_once('../../../config/vilesci.config.inc.php');
+require_once('../../../config/global.config.inc.php');
 require_once('../../../include/'.EXT_FKT_PATH.'/generateuid.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/benutzerberechtigung.class.php');
@@ -890,12 +891,17 @@ if(isset($_POST['save']))
 		$nachname_clean = str_replace(' ','_', $nachname_clean);
 		$vorname_clean = str_replace(' ','_', $vorname_clean);
 		
-		$qry_alias = "SELECT * FROM public.tbl_benutzer WHERE alias=LOWER('".$vorname_clean.".".$nachname_clean."')";
-		$result_alias = $db->db_query($qry_alias);
-		if($db->db_num_rows($result_alias)==0)								
-			$benutzer->alias =$vorname_clean.'.'.$nachname_clean;
-		else 
-			$benutzer->alias = '';
+		if(!defined('GENERATE_ALIAS_STUDENT') || GENERATE_ALIAS_STUDENT===true)
+		{
+			$qry_alias = "SELECT * FROM public.tbl_benutzer WHERE alias=LOWER('".$vorname_clean.".".$nachname_clean."')";
+			$result_alias = $db->db_query($qry_alias);
+			if($db->db_num_rows($result_alias)==0)								
+				$benutzer->alias =$vorname_clean.'.'.$nachname_clean;
+			else 
+				$benutzer->alias = '';
+		}
+		else
+			$benutzer->alias='';
 									
 		$benutzer->insertamum = date('Y-m-d H:i:s');
 		$benutzer->insertvon = $user;
