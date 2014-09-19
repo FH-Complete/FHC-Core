@@ -183,6 +183,9 @@ foreach($uid_arr as $uid)
                 case 'Diplomand':
                     $studierendenstatus_aktuell = 'DiplomandIn'; 
                     break; 
+                case 'Abbrecher':
+                    $studierendenstatus_aktuell = 'AbbrecherIn';
+                    break;
                 default: 
                     $studierendenstatus_aktuell =''; 
             }
