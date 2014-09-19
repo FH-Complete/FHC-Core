@@ -31,9 +31,20 @@ jquery.js
 
 
 
-jquery-1.9.min.js
+jquery1.9.min.js
 	-> jqueryUI (autocomplete, datepicker, etc)
 	-> Deutsches Schema für datepicker
 	-> tablesorter
 
+
+Tablesorter
+**************
+$(document).ready(function() 
+{ 
+	$("#t1").tablesorter(
+	{
+		sortList: [[2,1]],
+		widgets: ["zebra"]
+	});
+});
 
