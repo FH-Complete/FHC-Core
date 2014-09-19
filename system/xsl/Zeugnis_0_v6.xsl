@@ -283,7 +283,7 @@
 				<!-- Dummy Zelle -->
 			</fo:table-cell>
 			<fo:table-cell display-align="center" border-width="0.2mm" border-style="solid">
-				<fo:block font-size="9pt" content-width="105mm" vertical-align="center" font-family="arial">
+				<fo:block font-size="9pt" content-width="102mm" vertical-align="center" font-family="arial">
 					<xsl:text> </xsl:text>
 					<xsl:choose>
 						<xsl:when test="bisio_von">
