@@ -77,7 +77,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 							geboren am<xsl:text> </xsl:text><xsl:value-of select="geburtsdatum" /><xsl:text> </xsl:text>
 							ist im<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /><xsl:text> </xsl:text>(Beginn <xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
 							als ordentliche(r) Studierende(r) (Studienbeginn,<xsl:text> </xsl:text><xsl:value-of select="studiensemester_beginn" /> Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_beginn" />)
-							der Studienrichtung <xsl:text> </xsl:text>0050007<xsl:text> </xsl:text><xsl:value-of select="studiengang_art" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_bezeichnung" /> im
+							der Studienrichtung <xsl:text> </xsl:text>0050012<xsl:text> </xsl:text><xsl:value-of select="studiengang_art" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_bezeichnung" /> im
 							<xsl:text> </xsl:text><xsl:value-of select="semester -1" />. Semester gemeldet.
                         </fo:block>
 					</fo:block-container> 
@@ -158,7 +158,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 							geboren am<xsl:text> </xsl:text><xsl:value-of select="geburtsdatum" /><xsl:text> </xsl:text>
 							ist im<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /><xsl:text> </xsl:text>(Beginn <xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
 							als ordentliche(r) Studierende(r) (Studienbeginn,<xsl:text> </xsl:text><xsl:value-of select="studiensemester_beginn" /> Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_beginn" />)
-							der Studienrichtung <xsl:text> </xsl:text>0050007<xsl:text> </xsl:text><xsl:value-of select="studiengang_art" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_bezeichnung" /> im
+							der Studienrichtung <xsl:text> </xsl:text>0050012<xsl:text> </xsl:text><xsl:value-of select="studiengang_art" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_bezeichnung" /> im
 							<xsl:text> </xsl:text><xsl:value-of select="semester -1" />. Semester gemeldet.
                         </fo:block>
 					</fo:block-container> 
@@ -241,7 +241,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 							geboren am<xsl:text> </xsl:text><xsl:value-of select="geburtsdatum" /><xsl:text> </xsl:text>
 							ist im<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /><xsl:text> </xsl:text>(Beginn <xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
 							als ordentliche(r) Studierende(r) (Studienbeginn,<xsl:text> </xsl:text><xsl:value-of select="studiensemester_beginn" /> Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_beginn" />)
-							der Studienrichtung <xsl:text> </xsl:text>0050007<xsl:text> </xsl:text><xsl:value-of select="studiengang_art" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_bezeichnung" /> im
+							der Studienrichtung <xsl:text> </xsl:text>0050012<xsl:text> </xsl:text><xsl:value-of select="studiengang_art" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_bezeichnung" /> im
 							<xsl:text> </xsl:text><xsl:value-of select="semester -1" />. Semester gemeldet.
                         </fo:block>
 					</fo:block-container> 
@@ -325,7 +325,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 							geboren am<xsl:text> </xsl:text><xsl:value-of select="geburtsdatum" /><xsl:text> </xsl:text>
 							ist im<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /><xsl:text> </xsl:text>(Beginn <xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
 							als ordentliche(r) Studierende(r) (Studienbeginn,<xsl:text> </xsl:text><xsl:value-of select="studiensemester_beginn" /> Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_beginn" />)
-							der Studienrichtung <xsl:text> </xsl:text>0050007<xsl:text> </xsl:text><xsl:value-of select="studiengang_art" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_bezeichnung" /> im
+							der Studienrichtung <xsl:text> </xsl:text>0050012<xsl:text> </xsl:text><xsl:value-of select="studiengang_art" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_bezeichnung" /> im
 							<xsl:text> </xsl:text><xsl:value-of select="semester -1" />. Semester gemeldet.
                         </fo:block>
 					</fo:block-container> 
@@ -409,7 +409,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 								geboren am<xsl:text> </xsl:text><xsl:value-of select="geburtsdatum" /><xsl:text> </xsl:text>
 								ist im<xsl:text> </xsl:text><xsl:value-of select="studiensemester_aktuell" /><xsl:text> </xsl:text>(Beginn <xsl:text> </xsl:text><xsl:value-of select="studienbeginn_aktuell" />)
 								als ordentliche(r) Studierende(r) (Studienbeginn,<xsl:text> </xsl:text><xsl:value-of select="studiensemester_beginn" /> Beginn<xsl:text> </xsl:text><xsl:value-of select="studienbeginn_beginn" />)
-								der Studienrichtung <xsl:text> </xsl:text>0050007<xsl:text> </xsl:text><xsl:value-of select="studiengang_art" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_bezeichnung" /> im
+								der Studienrichtung <xsl:text> </xsl:text>0050012<xsl:text> </xsl:text><xsl:value-of select="studiengang_art" /><xsl:text> </xsl:text><xsl:value-of select="studiengang_bezeichnung" /> im
 								<xsl:text> </xsl:text><xsl:value-of select="semester -1" />. Semester gemeldet.
 							</fo:block>
 					</fo:block-container> 
