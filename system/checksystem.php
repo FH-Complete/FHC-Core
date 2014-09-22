@@ -2034,6 +2034,7 @@ $berechtigungen = array(
 	array('basis/cms_sperrfreigabe','Berechtigung zum Freigeben von gesperrtem Content'),
 	array('basis/cronjob','Cronjobverwaltung'),
 	array('basis/dms','DMS Download'),
+	array('basis/ferien','Verwaltung der Ferien und Feiertage im System'),
 	array('basis/fhausweis','Verwaltungstools für FH Ausweis – Kartentausch, Bildpruefung, Druck'),
 	array('basis/firma','Firmenverwaltung'),
 	array('basis/firma:begrenzt','Firmenverwaltung'),
