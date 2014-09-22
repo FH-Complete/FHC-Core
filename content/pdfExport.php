@@ -71,7 +71,7 @@ else
 		// in dem der 1. Studierende in der Liste ist
 		if(isset($_GET['uid']) && $_GET['uid']!='')
 		{
-			if(strstr(';',$_GET['uid']))
+			if(strstr($_GET['uid'],';'))
 				$uids = explode(';',$_GET['uid']);
 			else 
 				$uids = $_GET['uid'];
