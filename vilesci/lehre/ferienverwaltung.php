@@ -43,12 +43,14 @@
 	$stg_kz = (isset($_GET['stg_kz'])?$_GET['stg_kz']:'-2');
 	$action = (isset($_GET['action'])?$_GET['action']:'');
 	$bezeichnung=(isset($_REQUEST['bezeichnung'])?$_REQUEST['bezeichnung']:'');
+	$von = (isset($_POST['vondatum'])?$_POST['vondatum']:date('d.m.Y'));
+	$bis = (isset($_POST['bisdatum'])?$_POST['bisdatum']:date('d.m.Y'));
 	$stg_arr = array();
 	
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
 	
-	if(!$rechte->isBerechtigt('admin'))
+	if(!$rechte->isBerechtigt('basis/ferien'))
 		die('Sie haben keine Berechtigung fuer diese Seite');
 	
 	$studiengang = new studiengang();
@@ -59,9 +61,26 @@
 				<head>
 					<title>Ferienverwaltung</title>
 					<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-					<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
+					<link href="../../skin/tablesort.css" rel="stylesheet" type="text/css"/>
 					<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+					<link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css"/>
 					<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+					<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>
+					<script type="text/javascript">
+					$(document).ready(function() 
+					{		
+						$( ".datepicker" ).datepicker({
+							dateFormat: "dd.mm.yy",
+							changeMonth: true,
+							changeYear: true,		 
+							 });
+						 $("#t1").tablesorter({
+							sortList: [[2,1]],
+							widgets: ["zebra"],
+							headers: {4:{sorter:false}}
+							}); 							
+								});
+					</script>
 				</head>
 				<body class="Background_main">
 				<h2>Ferienverwaltung</h2>';
@@ -69,9 +88,11 @@
 	// Speichern eines Ferieneintrags
 	if(isset($_POST['speichern']))
 	{
+		if(!$rechte->isBerechtigt('basis/ferien', null, 'sui'))
+			die('Sie haben keine Berechtigung zum anlegen oder ändern von Ferien');
+		
 		$sql_query="SELECT bezeichnung FROM lehre.tbl_ferien WHERE bezeichnung='".$_POST['bezeichnung']."';";
 		$db->db_num_rows($db->db_query($sql_query));		
-		//echo $sql_query;
 			
 		//Formulardaten pruefen
 		if(!$datum_obj->checkDatum($_POST['vondatum']) || !$datum_obj->checkDatum($_POST['bisdatum']))
@@ -79,7 +100,7 @@
 			echo '<span class="input_error">Datum ist ungültig. Das Datum muss im Format DD.MM.JJJJ eingegeben werden<br></span>';
 			$stg_kz = $_POST['studiengang_kz'];
 		}
-		elseif($_POST['vondatum']>$_POST['bisdatum'])
+		elseif($datum_obj->mktime_datum($von) > $datum_obj->mktime_datum($bis))
 		{
 			echo '<span class="input_error"><i>Datum bis</i> darf nicht kleiner als <i>Datum von</i> sein<br></span>';
 			$stg_kz = $_POST['studiengang_kz'];
@@ -110,12 +131,11 @@
 			$db->db_query($sql_query);
 			$stg_kz = $_POST['studiengang_kz'];
 		}
-		$neu=false;
 	}
 	//Löschen von Ferieneinträgen
 	if($action=='delete')
 	{
-		if(!$rechte->isBerechtigt('admin', null, 'suid'))
+		if(!$rechte->isBerechtigt('basis/ferien', null, 'suid'))
 			die('Sie haben keine Berechtigung zum löschen von Ferien');
 			
 		$sql_query = "DELETE FROM lehre.tbl_ferien WHERE bezeichnung='$bezeichnung' AND studiengang_kz='$stg_kz'";
@@ -163,34 +183,39 @@
 
 	//Formular zum Bearbeiten von Ferieneinträgen
 	echo '<HR>';
-	echo "<FORM method='POST' action='".$_SERVER['PHP_SELF']."'?stg_kz='.$row->studiengang_kz.'>";
-	echo "<input type='hidden' value='$stg_kz' name='studiengang' />";
-	echo "<table>";
-	
-		//Studiengang DropDown
-		echo "<tr><td>Studiengang</td><td><SELECT name='studiengang_kz'>";
-		if($row->studiengang_kz=='')
-			$selected = 'selected';
-		else 
-			$selected = '';
-			
-		echo "<OPTION value='' $selected>-- keine Auswahl --</OPTION>";
-		foreach ($studiengang->result as $row)
-		{
-			if($row->studiengang_kz==$stg_kz)
+	if($rechte->isBerechtigt('basis/ferien', null, 'sui'))
+	{
+		echo "<FORM method='POST' action='".$_SERVER['PHP_SELF']."'?stg_kz='.$row->studiengang_kz.'>";
+		echo "<input type='hidden' value='$stg_kz' name='studiengang' />";
+		echo "<table>";
+		
+			//Studiengang DropDown
+			echo "<tr><td>Studiengang</td><td><SELECT name='studiengang_kz'>";
+			if($row->studiengang_kz=='')
 				$selected = 'selected';
 			else 
 				$selected = '';
-			
-			echo "<OPTION value='$row->studiengang_kz' $selected>".$db->convert_html_chars($row->kuerzel)."</OPTION>";
-		}
-	echo "</SELECT></TD></TR>";
-	echo '<tr><td>Bezeichnung</td><td><input type="text" name="bezeichnung" value="" size="68" maxlength="64"></td></tr>';
-	echo '<tr><td>Datum von</td><td><input type="text" name="vondatum" value="'.$datum_obj->convertISODate($db->vondatum).'"></td></tr>';
-	echo '<tr><td>Datum bis</td><td><input type="text" name="bisdatum" value="'.$datum_obj->convertISODate($db->bisdatum).'"></td></tr>';	
-	echo '<tr><td></td><td><input type="submit" name="speichern" value="Speichern"></td></tr>';
-	echo '</table>';
-	echo '</FORM>';	
+				
+			echo "<OPTION value='' $selected>-- keine Auswahl --</OPTION>";
+			foreach ($studiengang->result as $row)
+			{
+				if($row->studiengang_kz==$stg_kz)
+					$selected = 'selected';
+				else 
+					$selected = '';
+				
+				echo "<OPTION value='$row->studiengang_kz' $selected>".$db->convert_html_chars($row->kuerzel)."</OPTION>";
+			}
+		echo "</SELECT></TD></TR>";
+		echo '<tr><td>Bezeichnung</td><td><input type="text" name="bezeichnung" value="'.$bezeichnung.'" size="68" maxlength="64"></td></tr>';
+		echo '<tr><td>Datum von</td><td><input type="text" class="datepicker" name="vondatum" value="'.$von.'"></td></tr>';
+		echo '<tr><td>Datum bis</td><td><input type="text" class="datepicker" name="bisdatum" value="'.$bis.'"></td></tr>';	
+		echo '<tr><td></td><td><input type="submit" name="speichern" value="Speichern"></td></tr>';
+		echo '</table>';
+		echo '</FORM>';	
+	}
+	else
+		echo 'Sie haben keine Berechtigung zum anlegen oder ändern von Ferien';
 	echo '<HR>';
 	
 	//Liste der eingetragenen Ferien
@@ -208,19 +233,14 @@
 			echo 'Anzahl: '.$db->db_num_rows($result);
 			$pruefling = new pruefling();
 			
-			echo "<table class='liste table-autosort:# table-stripeclass:alternate table-autostripe'>
+			echo "<table id='t1' class='tablesorter'>
 					<thead>
-					<tr class='liste'>
-						<th class='table-sortable:default'>Studiengang</th>
-						<th class='table-sortable:default'>Datum von</th>
-						<th class='table-sortable:default'>Datum bis</th>
-						<th class='table-sortable:default'>Bezeichnung</th>
-					</tr>
-					<tr class='liste'>
-						<th>&nbsp;</th>
+					<tr>
+						<th>Studiengang</th>
+						<th>Datum von</th>
+						<th>Datum bis</th>
+						<th>Bezeichnung</th>
 						<th></th>
-						<th></th>
-						<th>Filter <input name='filter' size='30' onkeyup='Table.filter(this,this)'></th>
 					</tr>
 					</thead>
 					<tbody>";
@@ -231,9 +251,12 @@
 						<td>'.$db->convert_html_chars($stg_arr[$row->studiengang_kz]).'</td>
 						<td>'.$db->convert_html_chars($row->vondatum).'</td>
 						<td>'.$db->convert_html_chars($row->bisdatum).'</td>
-						<td>'.$db->convert_html_chars($row->bezeichnung).'</td>
-						<td><a href='.$_SERVER["PHP_SELF"].'?action=delete&stg_kz='.$row->studiengang_kz.'&bezeichnung='.urlencode($row->bezeichnung).'>delete</a></td>
-					</tr>';
+						<td>'.$db->convert_html_chars($row->bezeichnung).'</td>';
+						if($rechte->isBerechtigt('basis/ferien', null, 'suid'))
+							echo '<td><a href='.$_SERVER["PHP_SELF"].'?action=delete&stg_kz='.$row->studiengang_kz.'&bezeichnung='.urlencode($row->bezeichnung).'>delete</a></td>';
+						else 
+							echo '<td><span style="color:grey">delete</span></td>';
+				echo '	</tr>';
 			}
 			echo "</tbody></table>";
 		}
