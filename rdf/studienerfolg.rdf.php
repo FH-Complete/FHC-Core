@@ -96,6 +96,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	$xml .= "		<studiensemester_aktuell>".$studiensemester_aktuell."</studiensemester_aktuell>";
 	$xml .=	"		<semester>".$row->semester."</semester>";
 	$xml .=	"		<semester_aktuell>".$semester_aktuell.($semester_aktuell!=''?'. Semester':'')."</semester_aktuell>";
+	$xml .=	"		<semester_aktuell_semester>".$semester_aktuell."</semester_aktuell_semester>";
 	$xml .= "		<studiengang>".$row->bezeichnung."</studiengang>";
 	$xml .= "		<studiengang_englisch>".$row->bezeichnung_englisch."</studiengang_englisch>";
 	$xml .= "		<studiengang_kz>".sprintf('%04s',$row->studiengang_kz)."</studiengang_kz>";
