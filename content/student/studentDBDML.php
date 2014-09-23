@@ -1038,6 +1038,11 @@ if(!$error)
 														$stg_obj = new studiengang();
 														$stg_obj->load(ltrim($stg,'0'));
 														$uid = generateUID($stg_obj->kurzbz,$jahr,$stg_obj->typ,$matrikelnr);
+																												
+														if(defined('SET_UID_AS_PERSONENKENNZEICHEN') && SET_UID_AS_PERSONENKENNZEICHEN)
+														{
+															$matrikelnr = $uid;
+														}
 														
 														if(defined('SET_UID_AS_MATRIKELNUMMER') && SET_UID_AS_MATRIKELNUMMER)
 														{
