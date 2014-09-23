@@ -148,7 +148,7 @@ else
 				lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach, lehre.tbl_lehreinheitmitarbeiter
 			WHERE 
 				tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER)." AND
-				tbl_lehreinheit.lehrfach_id = lehrfach.lehrfach_id AND
+				tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id AND
 				tbl_lehreinheit.lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id) WHERE mitarbeiter_uid=".$db->db_add_param($user).") AND
 				tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($stsem);
