@@ -67,7 +67,7 @@ class authentication extends auth
 		else
 		{
 			if(isset($_SESSION['user']))
-				return mb_strtolower($_SESSION['user']);
+				return mb_strtolower(trim($_SESSION['user']));
 			else
 				return $this->RequireLogin();
 		}
@@ -149,7 +149,7 @@ class authentication extends auth
 		}
 		else
 		{
-			return mb_strtolower($_SERVER['PHP_AUTH_USER']);
+			return mb_strtolower(trim($_SERVER['PHP_AUTH_USER']));
 		}
 	}
 
