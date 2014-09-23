@@ -130,10 +130,13 @@ if($db->db_query($qry))
 		$studentOrgform = $row->studentorgkz; 
 
 		$orgArray = $orgForm->checkOrgForm($studOrgform); 
-		if(!in_array($studentOrgform, $orgArray))
+		if(is_array($orgArray))
 		{
-			$ausgabe[$row->studiengang][3][]= $row->student_uid; 
-			$text.= "Student_uid: $student_uid <br>";
+			if(!in_array($studentOrgform, $orgArray))
+			{
+				$ausgabe[$row->studiengang][3][]= $row->student_uid; 
+				$text.= "Student_uid: $student_uid <br>";
+			}
 		}
 	}
 }
