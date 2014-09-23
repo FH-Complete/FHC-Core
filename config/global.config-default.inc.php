@@ -101,6 +101,9 @@ Ihre Fachhochschule');
 // Bei neuen Studierenden UID automatisch als Matrikelnummer setzen (true|false)
 define('SET_UID_AS_MATRIKELNUMMER',false);
 
+// Bei neuen Studierenden UID automatisch als Personenkennzeichen setzen (true|false)
+define('SET_UID_AS_PERSONENKENNZEICHEN',false);
+
 // Legt fest ob fuer Studierende eine Alias EMail Adresse generiert wird (true|false)
 define('GENERATE_ALIAS_STUDENT',true);
 ?>
