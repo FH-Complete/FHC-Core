@@ -41,33 +41,6 @@ echo '<H2>DB-Updates!</H2>';
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
-// **************** Tabelle public.tbl_filter
-if(!$result = @$db->db_query("SELECT filter_id FROM public.tbl_filter LIMIT 1;"))
-{
-	$qry = 'CREATE TABLE public.tbl_filter
-			(
-			  filter_id serial,
-			  kurzbz character varying(32),
-			  sql text,
-			  valuename character varying(512),
-			  showvalue boolean DEFAULT true,
-			  insertamum Timestamp DEFAULT now(),
-			  insertvon Character varying(32),
-			  updateamum Timestamp DEFAULT now(),
-			  updatevon Character varying(32),
-			  CONSTRAINT tbl_filter_pkey PRIMARY KEY (filter_id)
-			)
-			WITH (
-			  OIDS=FALSE
-			);
-			
-			';
-	if(!$db->db_query($qry))
-		echo '<strong>public.tbl_filter: '.$db->db_last_error().'</strong><br>';
-	else 
-		echo ' public.tbl_filter: Tabelle public.tbl_filter hinzugefuegt!<br>';
-}
-
 // **************** Spalte scrumsprint_id Tabelle fue.tbl_projekttask
 if(!$result = @$db->db_query("SELECT scrumsprint_id FROM fue.tbl_projekttask LIMIT 1;"))
 {
@@ -1727,6 +1700,205 @@ if(!$result = @$db->db_query("SELECT lehreinheit_id FROM public.tbl_notizzuordnu
 }
 
 
+// Tabelle public.tbl_filter
+if(!$result = @$db->db_query("SELECT filter_id FROM public.tbl_filter LIMIT 1;"))
+{
+	$qry = 'CREATE TABLE public.tbl_filter
+	(
+	filter_id serial,
+	kurzbz character varying(32),
+	sql text,
+	valuename character varying(512),
+	showvalue boolean DEFAULT true,
+	insertamum Timestamp DEFAULT now(),
+	insertvon Character varying(32),
+	updateamum Timestamp DEFAULT now(),
+	updatevon Character varying(32),
+	CONSTRAINT tbl_filter_pkey PRIMARY KEY (filter_id)
+	)
+	WITH (
+	OIDS=FALSE
+	);
+		
+	';
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_filter: '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' public.tbl_filter: Tabelle public.tbl_filter hinzugefuegt!<br>';
+}
+
+// Tabelle lehre.tbl_vertrag
+if(!$result = @$db->db_query("SELECT vertrag_id FROM lehre.tbl_vertrag;"))
+{
+	$qry = "CREATE TABLE lehre.tbl_vertragstyp
+	(
+		vertragstyp_kurzbz varchar(32) NOT NULL,
+		bezeichnung varchar(256)
+	);
+
+	ALTER TABLE lehre.tbl_vertragstyp ADD CONSTRAINT pk_vertragstyp PRIMARY KEY (vertragstyp_kurzbz);
+	
+	CREATE TABLE lehre.tbl_vertragsstatus
+	(
+		vertragsstatus_kurzbz varchar(32) NOT NULL,
+		bezeichnung varchar(256)
+	);
+
+	ALTER TABLE lehre.tbl_vertragsstatus ADD CONSTRAINT pk_vertragstatus PRIMARY KEY (vertragsstatus_kurzbz);
+	
+	CREATE TABLE lehre.tbl_vertrag
+	(
+		vertrag_id bigint NOT NULL,
+		person_id bigint NOT NULL,
+		vertragstyp_kurzbz varchar(32),
+		bezeichnung varchar(256),
+		betrag numeric(8,2) NOT NULL,
+		insertamum timestamp,
+		insertvon varchar(32),
+		updateamum timestamp,
+		updatevon varchar(32),
+		ext_id bigint
+	);
+	
+	ALTER TABLE lehre.tbl_vertrag ADD CONSTRAINT pk_vertrag PRIMARY KEY (vertrag_id);
+	
+	CREATE SEQUENCE lehre.seq_vertrag_vertrag_id
+		 INCREMENT BY 1
+		 NO MAXVALUE
+		 NO MINVALUE
+		 CACHE 1;
+		 
+	ALTER TABLE lehre.tbl_vertrag ALTER COLUMN vertrag_id SET DEFAULT nextval('lehre.seq_vertrag_vertrag_id');
+	ALTER TABLE lehre.tbl_vertrag ADD CONSTRAINT fk_person_vertrag FOREIGN KEY (person_id) REFERENCES public.tbl_person(person_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE lehre.tbl_vertrag ADD CONSTRAINT fk_vertragstyp_vertrag FOREIGN KEY (vertragstyp_kurzbz) REFERENCES lehre.tbl_vertragstyp(vertragstyp_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	
+	
+	CREATE TABLE lehre.tbl_vertrag_vertragsstatus
+	(
+		vertragsstatus_kurzbz varchar(32) NOT NULL,
+		vertrag_id bigint NOT NULL,
+		uid varchar(32),
+		datum timestamp NOT NULL
+	);
+	
+	ALTER TABLE lehre.tbl_vertrag_vertragsstatus ADD CONSTRAINT pk_vertrag_vertragstatus PRIMARY KEY (vertragsstatus_kurzbz, vertrag_id);
+	ALTER TABLE lehre.tbl_vertrag_vertragsstatus ADD CONSTRAINT fk_vertrag_vertrag_vertragsstatus FOREIGN KEY (vertrag_id) REFERENCES lehre.tbl_vertrag(vertrag_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE lehre.tbl_vertrag_vertragsstatus ADD CONSTRAINT fk_benutzer_vertrag_vertragsstatus FOREIGN KEY (uid) REFERENCES public.tbl_benutzer(uid) ON DELETE RESTRICT ON UPDATE CASCADE;
+	
+	
+	GRANT SELECT, UPDATE, INSERT, DELETE on lehre.tbl_vertrag TO vilesci;
+	GRANT SELECT, UPDATE, INSERT, DELETE on lehre.tbl_vertragstyp TO vilesci;
+	GRANT SELECT, UPDATE, INSERT, DELETE on lehre.tbl_vertragsstatus TO vilesci;
+	GRANT SELECT, UPDATE, INSERT, DELETE on lehre.tbl_vertrag_vertragsstatus TO vilesci;
+	GRANT SELECT, UPDATE ON lehre.seq_vertrag_vertrag_id TO vilesci;
+	
+	GRANT SELECT on lehre.tbl_vertrag TO web;
+	GRANT SELECT on lehre.tbl_vertragstyp TO web;
+	GRANT SELECT on lehre.tbl_vertragsstatus TO web;
+	GRANT SELECT, UPDATE, INSERT, DELETE on lehre.tbl_vertrag_vertragsstatus TO web;
+	
+	ALTER TABLE lehre.tbl_lehreinheitmitarbeiter ADD COLUMN vertrag_id bigint;
+	ALTER TABLE lehre.tbl_lehreinheitmitarbeiter ADD CONSTRAINT fk_vertrag_lehreinheitmitarbeiter FOREIGN KEY (vertrag_id) REFERENCES lehre.tbl_vertrag(vertrag_id) ON DELETE RESTRICT ON UPDATE CASCADE;	
+
+	ALTER TABLE lehre.tbl_projektbetreuer ADD COLUMN vertrag_id bigint;
+	ALTER TABLE lehre.tbl_projektbetreuer ADD CONSTRAINT fk_vertrag_projektbetreuer FOREIGN KEY (vertrag_id) REFERENCES lehre.tbl_vertrag(vertrag_id) ON DELETE RESTRICT ON UPDATE CASCADE;	
+	
+	";
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_vertrag: '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' lehre.tbl_vertrag: Tabelle lehre.tbl_vertrag hinzugefuegt!<br>';
+}
+
+// Tabelle wawi.tbl_buchung
+if(!$result = @$db->db_query("SELECT buchung_id FROM wawi.tbl_buchung;"))
+{
+	$qry = "CREATE TABLE wawi.tbl_buchungstyp
+	(
+		buchungstyp_kurzbz varchar(32) NOT NULL,
+		bezeichnung varchar(256)
+	);
+
+	ALTER TABLE wawi.tbl_buchungstyp ADD CONSTRAINT pk_buchungstyp PRIMARY KEY (buchungstyp_kurzbz);
+	
+	CREATE TABLE wawi.tbl_buchung
+	(
+	buchung_id bigint NOT NULL,
+	konto_id bigint NOT NULL,
+	kostenstelle_id bigint,
+	buchungstyp_kurzbz varchar(32) NOT NULL,
+	buchungsdatum date,
+	buchungstext varchar(512),
+	betrag numeric(8,2) NOT NULL,
+	insertamum timestamp,
+	insertvon varchar(32),
+	updateamum timestamp,
+	updatevon varchar(32)
+	);
+
+	ALTER TABLE wawi.tbl_buchung ADD CONSTRAINT pk_buchung PRIMARY KEY (buchung_id);
+
+	CREATE SEQUENCE wawi.seq_buchung_buchung_id
+	INCREMENT BY 1
+	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+		
+	ALTER TABLE wawi.tbl_buchung ALTER COLUMN buchung_id SET DEFAULT nextval('wawi.seq_buchung_buchung_id');
+	ALTER TABLE wawi.tbl_buchung ADD CONSTRAINT fk_konto_buchung FOREIGN KEY (konto_id) REFERENCES wawi.tbl_konto(konto_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE wawi.tbl_buchung ADD CONSTRAINT fk_kostenstelle_buchung FOREIGN KEY (kostenstelle_id) REFERENCES wawi.tbl_kostenstelle(kostenstelle_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE wawi.tbl_buchung ADD CONSTRAINT fk_buchungstyp_buchung FOREIGN KEY (buchungstyp_kurzbz) REFERENCES wawi.tbl_buchungstyp(buchungstyp_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+	GRANT SELECT, UPDATE, INSERT, DELETE on wawi.tbl_buchungstyp TO vilesci;
+	GRANT SELECT, UPDATE, INSERT, DELETE on wawi.tbl_buchung TO vilesci;
+	GRANT SELECT, UPDATE ON wawi.seq_buchung_buchung_id TO vilesci;
+
+	
+	ALTER TABLE wawi.tbl_konto ADD COLUMN person_id bigint;
+	ALTER TABLE wawi.tbl_konto ADD CONSTRAINT fk_person_konto FOREIGN KEY (person_id) REFERENCES public.tbl_person(person_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+	";
+	if(!$db->db_query($qry))
+		echo '<strong>wawi.tbl_buchung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' wawi.tbl_buchung: Tabelle wawi.tbl_buchung hinzugefuegt!<br>';
+}
+
+// Tabelle campus.tbl_anwesenheit
+if(!$result = @$db->db_query("SELECT anwesenheit_id FROM campus.tbl_anwesenheit"))
+{
+	$qry = "CREATE TABLE campus.tbl_anwesenheit
+	(
+		anwesenheit_id bigint NOT NULL,
+		uid varchar(32) NOT NULL,
+		einheiten numeric(3,1),
+		datum date NOT NULL,
+		anwesend boolean NOT NULL,
+		lehreinheit_id bigint
+	);
+
+	ALTER TABLE campus.tbl_anwesenheit ADD CONSTRAINT pk_anwesenheit PRIMARY KEY (anwesenheit_id);
+
+	CREATE SEQUENCE campus.seq_anwesenheit_anwesenheit_id
+	INCREMENT BY 1
+	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+
+	ALTER TABLE campus.tbl_anwesenheit ALTER COLUMN anwesenheit_id SET DEFAULT nextval('campus.seq_anwesenheit_anwesenheit_id');
+	ALTER TABLE campus.tbl_anwesenheit ADD CONSTRAINT fk_benutzer_anwesenheit FOREIGN KEY (uid) REFERENCES public.tbl_benutzer(uid) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE campus.tbl_anwesenheit ADD CONSTRAINT fk_lehreinheit_anwesenheit FOREIGN KEY (lehreinheit_id) REFERENCES lehre.tbl_lehreinheit(lehreinheit_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+	GRANT SELECT, UPDATE, INSERT, DELETE on campus.tbl_anwesenheit TO vilesci;
+	GRANT SELECT, UPDATE ON campus.seq_anwesenheit_anwesenheit_id TO vilesci;
+
+	";
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_anwesenheit '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' campus.tbl_anwesenheit: Tabelle campus.tbl_anwesenheit hinzugefuegt!<br>';
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -1753,6 +1925,7 @@ $tabellen=array(
 	"bis.tbl_zweck"  => array("zweck_code","kurzbz","bezeichnung"),
     "bis.tbl_zgvdoktor" => array("zgvdoktor_code", "zgvdoktor_bez", "zgvdoktor_kurzbz"),
 	"campus.tbl_abgabe"  => array("abgabe_id","abgabedatei","abgabezeit","anmerkung"),
+	"campus.tbl_anwesenheit"  => array("anwesenheit_id","uid","einheiten","datum","anwesend","lehreinheit_id"),
 	"campus.tbl_beispiel"  => array("beispiel_id","uebung_id","nummer","bezeichnung","punkte","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_benutzerlvstudiensemester"  => array("uid","studiensemester_kurzbz","lehrveranstaltung_id"),
 	"campus.tbl_content"  => array("content_id","template_kurzbz","updatevon","updateamum","insertamum","insertvon","oe_kurzbz","menu_open","aktiv","beschreibung"),
@@ -1788,7 +1961,7 @@ $tabellen=array(
 	"campus.tbl_paabgabe"  => array("paabgabe_id","projektarbeit_id","paabgabetyp_kurzbz","fixtermin","datum","kurzbz","abgabedatum", "insertvon","insertamum","updatevon","updateamum"),
 	"campus.tbl_pruefungsfenster" => array("pruefungsfenster_id","studiensemester_kurzbz","oe_kurzbz","start","ende"),
 	"campus.tbl_pruefung" => array("pruefung_id","mitarbeiter_uid","studiensemester_kurzbz","pruefungsfenster_id","pruefungstyp_kurzbz","titel","beschreibung","methode","einzeln","storniert","insertvon","insertamum","updatevon","updateamum","pruefungsintervall"),
-	"campus.tbl_pruefungstermin" => array("pruefungstermin_id","pruefung_id","von","bis","teilnehmer_max","teilnehmer_min","anmeldung_von","anmeldung_bis","ort_kurzbz"),
+	"campus.tbl_pruefungstermin" => array("pruefungstermin_id","pruefung_id","von","bis","teilnehmer_max","teilnehmer_min","anmeldung_von","anmeldung_bis","ort_kurzbz","sammelklausur"),
 	"campus.tbl_pruefungsanmeldung" => array("pruefungsanmeldung_id","uid","pruefungstermin_id","lehrveranstaltung_id","status_kurzbz","wuensche","reihung","kommentar","statusupdatevon","statusupdateamum"),
 	"campus.tbl_pruefungsstatus" => array("status_kurzbz","bezeichnung"),
 	"campus.tbl_reservierung"  => array("reservierung_id","ort_kurzbz","studiengang_kz","uid","stunde","datum","titel","beschreibung","semester","verband","gruppe","gruppe_kurzbz","veranstaltung_id","insertamum","insertvon"),
@@ -1845,7 +2018,7 @@ $tabellen=array(
 	"lehre.tbl_projekttyp"  => array("projekttyp_kurzbz","bezeichnung"),
 	"lehre.tbl_pruefung"  => array("pruefung_id","lehreinheit_id","student_uid","mitarbeiter_uid","note","pruefungstyp_kurzbz","datum","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","pruefungsanmeldung_id"),
 	"lehre.tbl_pruefungstyp"  => array("pruefungstyp_kurzbz","beschreibung","abschluss"),
-	"lehre.tbl_studienordnung"  => array("studienordnung_id","studiengang_kz","version","gueltigvon","gueltigbis","bezeichnung","ects","studiengangbezeichnung","studiengangbezeichnung_englisch","studiengangkurzbzlang","akadgrad_id","insertamum","insertvon","updateamum","updatevon","max_semester"),
+	"lehre.tbl_studienordnung"  => array("studienordnung_id","studiengang_kz","version","gueltigvon","gueltigbis","bezeichnung","ects","studiengangbezeichnung","studiengangbezeichnung_englisch","studiengangkurzbzlang","akadgrad_id","insertamum","insertvon","updateamum","updatevon"),
 	"lehre.tbl_studienordnung_semester"  => array("studienordnung_semester_id","studienordnung_id","studiensemester_kurzbz","semester"),
 	"lehre.tbl_studienplan" => array("studienplan_id","studienordnung_id","orgform_kurzbz","version","regelstudiendauer","sprache","aktiv","bezeichnung","insertamum","insertvon","updateamum","updatevon","semesterwochen","testtool_sprachwahl"),
 	"lehre.tbl_studienplan_lehrveranstaltung" => array("studienplan_lehrveranstaltung_id","studienplan_id","lehrveranstaltung_id","semester","studienplan_lehrveranstaltung_id_parent","pflicht","koordinator","insertamum","insertvon","updateamum","updatevon"),
@@ -1853,6 +2026,10 @@ $tabellen=array(
 	"lehre.tbl_stunde"  => array("stunde","beginn","ende"),
 	"lehre.tbl_stundenplan"  => array("stundenplan_id","unr","mitarbeiter_uid","datum","stunde","ort_kurzbz","gruppe_kurzbz","titel","anmerkung","lehreinheit_id","studiengang_kz","semester","verband","gruppe","fix","updateamum","updatevon","insertamum","insertvon"),
 	"lehre.tbl_stundenplandev"  => array("stundenplandev_id","lehreinheit_id","unr","studiengang_kz","semester","verband","gruppe","gruppe_kurzbz","mitarbeiter_uid","ort_kurzbz","datum","stunde","titel","anmerkung","fix","updateamum","updatevon","insertamum","insertvon","ext_id"),
+	"lehre.tbl_vertrag"  => array("vertrag_id","person_id","vertragstyp_kurzbz","bezeichnung","betrag","insertamum","insertvon","updateamum","updatevon","ext_id"),
+	"lehre.tbl_vertrag_vertragsstatus"  => array("vertragsstatus_kurzbz","vertrag_id","uid","datum"),
+	"lehre.tbl_vertragstyp"  => array("vertragstyp_kurzbz","bezeichnung"),
+	"lehre.tbl_vertragsstatus"  => array("vertragsstatus_kurzbz","bezeichnung"),
 	"lehre.tbl_zeitfenster"  => array("wochentag","stunde","ort_kurzbz","studiengang_kz","gewicht"),
 	"lehre.tbl_zeugnis"  => array("zeugnis_id","student_uid","zeugnis","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_zeugnisnote"  => array("lehrveranstaltung_id","student_uid","studiensemester_kurzbz","note","uebernahmedatum","benotungsdatum","bemerkung","updateamum","updatevon","insertamum","insertvon","ext_id"),
@@ -1872,6 +2049,7 @@ $tabellen=array(
 	"public.tbl_dokumentstudiengang"  => array("dokument_kurzbz","studiengang_kz","ext_id", "onlinebewerbung"),
 	"public.tbl_erhalter"  => array("erhalter_kz","kurzbz","bezeichnung","dvr","logo","zvr"),
 	"public.tbl_fachbereich"  => array("fachbereich_kurzbz","bezeichnung","farbe","studiengang_kz","aktiv","ext_id","oe_kurzbz"),
+	"public.tbl_filter" => array("filter_id","kurzbz","sql","valuename","showvalue","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_firma"  => array("firma_id","name","anmerkung","firmentyp_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id","schule","finanzamt","steuernummer","gesperrt","aktiv"),
 	"public.tbl_firma_mobilitaetsprogramm" => array("firma_id","mobilitaetsprogramm_code"),
 	"public.tbl_firma_organisationseinheit"  => array("firma_organisationseinheit_id","firma_id","oe_kurzbz","bezeichnung","kundennummer","updateamum","updatevon","insertamum","insertvon","ext_id"),
@@ -1953,7 +2131,7 @@ $tabellen=array(
 	"wawi.tbl_betriebsmitteltyp"  => array("betriebsmitteltyp","beschreibung","anzahl","kaution","typ_code","mastershapename"),
 	"wawi.tbl_budget"  => array("geschaeftsjahr_kurzbz","kostenstelle_id","budget"),
 	"wawi.tbl_zahlungstyp"  => array("zahlungstyp_kurzbz","bezeichnung"),
-	"wawi.tbl_konto"  => array("konto_id","kontonr","beschreibung","kurzbz","aktiv","person_id","insertamum","insertvon","updateamum","updatevon","ext_id"),
+	"wawi.tbl_konto"  => array("konto_id","kontonr","beschreibung","kurzbz","aktiv","person_id","insertamum","insertvon","updateamum","updatevon","ext_id","person_id"),
 	"wawi.tbl_konto_kostenstelle"  => array("konto_id","kostenstelle_id","insertamum","insertvon"),
 	"wawi.tbl_kostenstelle"  => array("kostenstelle_id","oe_kurzbz","bezeichnung","kurzbz","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","kostenstelle_nr","deaktiviertvon","deaktiviertamum"),
 	"wawi.tbl_bestellungtag"  => array("tag","bestellung_id","insertamum","insertvon"),
@@ -1963,6 +2141,8 @@ $tabellen=array(
 	"wawi.tbl_bestelldetail"  => array("bestelldetail_id","bestellung_id","position","menge","verpackungseinheit","beschreibung","artikelnummer","preisprove","mwst","erhalten","sort","text","updateamum","updatevon","insertamum","insertvon"),
 	"wawi.tbl_bestellung_bestellstatus"  => array("bestellung_bestellstatus_id","bestellung_id","bestellstatus_kurzbz","uid","oe_kurzbz","datum","insertamum","insertvon","updateamum","updatevon"),
 	"wawi.tbl_bestellstatus"  => array("bestellstatus_kurzbz","beschreibung"),
+	"wawi.tbl_buchung"  => array("buchung_id","konto_id","kostenstelle_id","buchungstyp_kurzbz","buchungsdatum","buchungstext","betrag","insertamum","insertvon","updateamum","updatevon"),
+	"wawi.tbl_buchungstyp"  => array("buchungstyp_kurzbz","bezeichnung"),
 	"wawi.tbl_rechnungstyp"  => array("rechnungstyp_kurzbz","beschreibung","berechtigung_kurzbz"),
 	"wawi.tbl_rechnung"  => array("rechnung_id","bestellung_id","buchungsdatum","rechnungsnr","rechnungsdatum","transfer_datum","buchungstext","insertamum","insertvon","updateamum","updatevon","rechnungstyp_kurzbz","freigegeben","freigegebenvon","freigegebenamum"),
 	"wawi.tbl_rechnungsbetrag"  => array("rechnungsbetrag_id","rechnung_id","mwst","betrag","bezeichnung","ext_id"),
