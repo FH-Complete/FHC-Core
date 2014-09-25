@@ -265,6 +265,20 @@ class mantis extends basis_db
 				$obj->issue_project->id = $row->id;
 
 				$this->result[] = $obj;
+				
+				if(isset($row->subprojects))
+				{
+					foreach($row->subprojects as $row_sub)
+					{
+						$obj = new mantis();
+						$obj->issue_project = new stdclass();
+						$obj->issue_project->name = $row_sub->name;
+						$obj->issue_project->id = $row_sub->id;
+		
+						$this->result[] = $obj;
+								
+					}
+				}				
 			}
 			return true;
 		} 
