@@ -150,6 +150,7 @@ class moodle24_user extends basis_db
 					WHERE
 						moodle_version='2.4' 
 						AND mdl_course_id=".$this->db_add_param($mdl_course_id, FHC_INTEGER)."
+						AND mitarbeiter_uid not like '_Dummy%'
 					UNION
 					SELECT 
 						mitarbeiter_uid 
@@ -159,7 +160,8 @@ class moodle24_user extends basis_db
 					WHERE 
 						moodle_version='2.4'
 						AND tbl_lehreinheit.studiensemester_kurzbz=tbl_moodle.studiensemester_kurzbz
-						AND mdl_course_id=".$this->db_add_param($mdl_course_id, FHC_INTEGER);
+						AND mdl_course_id=".$this->db_add_param($mdl_course_id, FHC_INTEGER)."
+						AND mitarbeiter_uid not like '_Dummy%'";
 		}
 		$mitarbeiter='';
 
