@@ -139,8 +139,8 @@ foreach($vertrag->result as $row)
 
         echo '
                         </td>
-                        <td>'.$row->vertragtyp_kurzbz.'</td>
-                        <td>'.$row->vertragtyp_bezeichnung.'</td>				
+                        <td>'.$vertrag->convert_html_chars($row->vertragtyp_kurzbz).'</td>
+                        <td>'.$vertrag->convert_html_chars($row->vertragtyp_bezeichnung).'</td>				
                 </tr>';
 }
 
@@ -166,7 +166,7 @@ echo '
                         <input typ="text" id="vertragtyp_kurzbz" name="vertragtyp_kurzbz" maxlength="8" size="8" '.($vertragtyp_kurzbz!=''?'readonly':'').' value="'.$vertragtyp_kurzbz.'"/>
                         <input type="hidden" id="neu" name="neu" value="'.($vertragtyp_kurzbz==''?'true':'false').'" />
                 </td>
-                <td><input type="text" id="vertragtyp_bezeichnung" name="vertragtyp_bezeichnung" maxlength="128" value="'.$vertragtyp_bezeichnung.'">
+                <td><input type="text" id="vertragtyp_bezeichnung" name="vertragtyp_bezeichnung" maxlength="128" value="'.$vertrag->convert_html_chars($vertragtyp_bezeichnung).'">
                 <input type="submit" name="saveVertragtyp" value="Speichern"></td>
         </tr>
 </tfoot>
