@@ -195,7 +195,8 @@ foreach($uid_arr as $uid)
 	    $zgv = new zgv($prestudent->zgv_code);
 	    echo "\t\t<schulform_zgv>".$zgv->zgv_kurzbz."</schulform_zgv>\n";
 	    echo "\t\t<studienplan_bezeichnung>".$studienplan->bezeichnung."</studienplan_bezeichnung>\n";
-	    
+	    echo "\t\t<anmerkungpre>".$prestudent->anmerkung."</anmerkungpre>\n";
+	   
             switch($studiengang->typ)
             {
                 case 'b':

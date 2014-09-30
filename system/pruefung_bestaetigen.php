@@ -18,6 +18,7 @@
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *	    Stefan Puraner <stefan.puraner@technikum-wien.at>.
  */
 
 require_once('../config/vilesci.config.inc.php');
@@ -38,26 +39,30 @@ echo '=====<br>';
 echo 'Start<br>';
 foreach($pruefungen->result as $p)
 {
-	if($p->storniert)
-		continue;
+    if($p->storniert)
+	continue;
 	
-	$p->getTermineByPruefung();
-	foreach($p->termine as $termin)
+    $p->getTermineByPruefung();
+    foreach($p->termine as $termin)
+    {
+//	    echo $date->formatDatum($termin->von,'Y-m-d');
+	if($date->formatDatum($termin->von,'Y-m-d') == date('Y-m-d',strtotime('now + 1 day')))	//Datumsüberprüfung
 	{
-//		echo $date->formatDatum($termin->von,'Y-m-d');
-		if($date->formatDatum($termin->von,'Y-m-d') == date('Y-m-d',strtotime('now + 1 day')))	//Datumsüberprüfung
+	    $anm_obj=new pruefungsanmeldung();
+	    $anmeldungen=$anm_obj->getAnmeldungenByTermin($termin->pruefungstermin_id, null, null, "bestaetigt");
+	    if(empty($anmeldungen))
+	    {
+		$anmeldungen=$anm_obj->getAnmeldungenByTermin($termin->pruefungstermin_id, null, null, "angemeldet");
+		foreach($anmeldungen as $anm)
 		{
-			$anm_obj=new pruefungsanmeldung();
-			$anmeldungen=$anm_obj->getAnmeldungenByTermin($termin->pruefungstermin_id);
-			foreach($anmeldungen as $anm)
-			{
-				$anm_obj->changeState($anm->pruefungsanmeldung_id,'bestaetigt');
-			}
-			echo 'true<br>';
+		    $anm_obj->changeState($anm->pruefungsanmeldung_id,'bestaetigt');
 		}
-		else
-			echo 'false<br>';
+		echo 'true<br>';
+	    }
 	}
+	else
+	    echo 'false<br>';
+    }
 }
 echo 'Ende';
 ?>

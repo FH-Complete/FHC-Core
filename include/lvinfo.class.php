@@ -70,7 +70,7 @@ class lvinfo extends basis_db
 	 */
 	public function getAll()
 	{
-		$qry = 'SELECT * FROM campus.tbl_lvinfo ORDER BY lvinfo_id;';
+		$qry = 'SELECT * FROM campus.tbl_lvinfo ORDER BY lehrveranstaltung_id;';
 
 		if(!$this->db_query($qry))
 		{
