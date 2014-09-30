@@ -2357,7 +2357,7 @@ if($_GET['method']=='update')
 		echo '<input type="button" class="cursor" onclick="window.location.href=\'bestellung.php?'.$_SESSION['wawi/lastsearch'].'\'" value="Zurück zur Liste" /><br><br>';
 	
 	if($status->isStatiVorhanden($bestellung->bestellung_id, 'Abgeschickt'))
-		echo "Bestellung wurde am ".$date->formatDatum($status->datum,'d.m.Y')." abgeschickt."; 
+		echo "Bestellung wurde am ".$date->formatDatum($status->datum,'d.m.Y')." zur Freigabe abgeschickt."; 
 
 	if($bestellung->isFreigegeben($bestellung->bestellung_id))
 		echo "<p class='freigegeben'>Die Bestellung wurde vollständig freigegeben</p>"; 
