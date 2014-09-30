@@ -97,11 +97,29 @@ class buchung extends basis_db
 	}
 
 	/**
-	 * Loescht einen Buchungstyp
+	 * Loescht einen Buchungstyp wenn er noch nicht verwendet wird
 	 * @param buchungstyp_kurzbz
 	 */
 	public function deleteBuchungstyp($buchungstyp_kurzbz)
 	{
+		// prüfen ob Buchungstyp bereits verwenet wird
+		$qry = "SELECT buchungstyp_kurzbz FROM wawi.tbl_buchung
+			WHERE buchungstyp_kurzbz = " . $this->db_add_param($buchungstyp_kurzbz);
+		
+		if($this->db_query($qry))
+		{
+			if($this->db_fetch_object())
+			{
+				$this->errormsg = "Der Buchungstyp kann nicht gelöscht werden da er bereits verwendet wird";
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = "Fehler beim Durchführen der Datenbankabfrage";
+			return false;
+		}
+		
 		if(is_null($buchungstyp_kurzbz))
 		{
 			$this->errormsg = 'Buchungstyp_kurzbz darf nicht leer sein';

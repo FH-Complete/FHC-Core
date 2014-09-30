@@ -97,12 +97,30 @@ class vertrag extends basis_db
 	}
 
 	/**
-	 * Loescht einen Vertragstyp
+	 * Loescht einen Vertragstyp wenn er noch nicht verwendet wird
 	 * @param vertragtyp_kurzbz
 	 */
 	public function deleteVertragtyp($vertragtyp_kurzbz)
 	{
-		if(is_null($vertragtyp_kurzbz))
+		// prüfen ob Vertrag bereits verwendet wird
+		$qry = "SELECT vertragstyp_kurzbz FROM lehre.tbl_vertrag
+			WHERE vertragstyp_kurzbz = " . $this->db_add_param($vertragtyp_kurzbz);
+		
+		if($this->db_query($qry))
+		{
+			if($this->db_fetch_object())
+			{
+				$this->errormsg = "Der Vertragstyp kann nicht gelöscht werden da er bereits verwendet wird";
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = "Fehler beim Durchführen der Datenbankabfrage";
+			return false;
+		}
+            
+                if(is_null($vertragtyp_kurzbz))
 		{
 			$this->errormsg = 'Vertragtyp_kurzbz darf nicht leer sein';
 			return false;
