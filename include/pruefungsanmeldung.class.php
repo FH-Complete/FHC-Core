@@ -226,6 +226,11 @@ class pruefungsanmeldung extends basis_db {
 	{
 	    $qry .= ' AND lehrveranstaltung_id='.$this->db_add_param($lehrveranstaltung_id);
 	}
+	
+	if($status_kurzbz !== null)
+	{
+	    $qry .= ' AND status_kurzbz='.$this->db_add_param($status_kurzbz);
+	}
 	$qry .=' ORDER BY reihung';
 	$qry .=';';
 	
