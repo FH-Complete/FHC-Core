@@ -199,7 +199,7 @@ $menu=array
 	),
 	'Wartung'=>	array
 	(
-		'name'=>'Wartung', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support','basis/firma'), 'image'=>'vilesci_wartung.png',
+		'name'=>'Wartung', 'opener'=>'true', 'hide'=>'true', 'DokumenteZuteilung'=>array('name'=>'DokumenteZuteilung', 'link'=>'stammdaten/studiengang_dokumente.php', 'target'=>'main'), 'image'=>'vilesci_wartung.png',
 		'link'=>'left.php?categorie=Wartung', 'target'=>'nav',
 		'Vorrueckung'=>	array
 		(
@@ -217,7 +217,9 @@ $menu=array
 		'Firmenwartung'=>array('name'=>'Firmenwartung', 'link'=>'stammdaten/firma_zusammen_uebersicht.php', 'target'=>'main'),
 		'checkStudenten'=>array('name'=>'CheckStudenten', 'link'=>'../system/checkStudenten.php', 'target'=>'main'),
 		'StudienplanZuteilung'=>array('name'=>'StudienplanZuteilung', 'link'=>'lehre/studienplan_zuteilung.php', 'target'=>'main'),
-		'DokumenteZuteilung'=>array('name'=>'DokumenteZuteilung', 'link'=>'stammdaten/studiengang_dokumente.php', 'target'=>'main')
+		'DokumenteZuteilung'=>array('name'=>'DokumenteZuteilung', 'link'=>'stammdaten/studiengang_dokumente.php', 'target'=>'main'),
+		'Buchungstypen'=>array('name'=>'Buchungstypen', 'link'=>'stammdaten/buchung_typ.php', 'target'=>'main','permissions'=>array('buchung/typen')),
+		'Vertragstypen'=>array('name'=>'Vertragstypen', 'link'=>'stammdaten/vertrag_typ.php', 'target'=>'main','permissions'=>array('vertrag/typen'))
 
 	),
 	'Auswertung'=>	array
