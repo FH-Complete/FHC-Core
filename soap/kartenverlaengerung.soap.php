@@ -26,6 +26,7 @@ require_once('../include/studiensemester.class.php');
 require_once('../include/benutzer.class.php'); 
 require_once('../include/webservicelog.class.php'); 
 require_once('../include/datum.class.php'); 
+require_once('../include/'.EXT_FKT_PATH.'/serviceterminal.inc.php');
 
 ini_set("soap.wsdl_cache_enabled", "0");
 
@@ -57,38 +58,8 @@ function getNumber($cardNr)
         $objArray = array('datum'=>'', 'errorMessage'=>'Die Person kann nicht geladen werden. Bitte wenden Sie sich an den Service Desk.');  
         return $objArray;   
     }
-    /*
-    // lädt das aktuelle semester und nach 75 Tagen nach Anfang des Semesters das nächste
-    $studSemester = new studiensemester(); 
-    if(!$aktSemester= $studSemester->getNextOrAktSemester('75'))
-    {
-        $objArray = array('datum'=>'', 'errorMessage'=>'Konnte Semester nicht laden. Bitte wenden Sie sich an den Service Desk.');  
-        return $objArray;   
-    }
-    */
-    // hole Semester des letzten eingezahlten Studienbeitrages
-    $konto = new konto(); 
-    if(!$aktSemester= $konto->getLastStudienbeitrag($cardPerson->uid))
-    {
-        $objArray = array('datum'=>'', 'errorMessage'=>'Fehler beim Auslesen des Studienganges. Bitte wenden Sie sich an den Service Desk.');  
-        return $objArray;
-    }  
-    
-    /*
-    // überprüft ob Studienbeitrag bezahlt wurde
-    if(!$konto->checkStudienbeitrag($cardPerson->uid, $aktSemester))
-    {
-        $objArray = array('datum'=>'', 'errorMessage'=>'Studienbeitrag noch nicht gezahlt.');  
-        return $objArray;
-    }
-    */
-    $studSemester = new studiensemester(); 
-    $studSemester->load($aktSemester); 
-    $datum = new datum(); 
-    
-    //$objArray = array('datum'=>'Gueltig bis/valid thru '.$datum->formatDatum($studSemester->ende, 'd.m.Y'), 'errorMessage'=>'');  
-    $objArray = array('datum'=>'Gueltig fuer/valid for '.$studSemester->studiensemester_kurzbz, 'errorMessage'=>'');  
-    return $objArray;  
+
+	return ServiceTerminalGetDrucktext($cardUser->uid);
     
 }
 ?>
