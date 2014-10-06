@@ -492,7 +492,40 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             <text:p text:style-name="P17"><xsl:value-of select="note"/></text:p>
           </table:table-cell>
           <table:table-cell table:style-name="Lehrveranstaltungen.I3" office:value-type="string">
-            <text:p text:style-name="P17">TODO</text:p>
+            <text:p text:style-name="P17">
+            	<xsl:choose>
+            		<xsl:when test="noteidx=0">
+            			<xsl:text>A</xsl:text>
+            		</xsl:when>
+            		<xsl:when test="noteidx=1">
+            			<xsl:text>B</xsl:text>
+            		</xsl:when>
+            		<xsl:when test="noteidx=2">
+            			<xsl:text>C</xsl:text>
+            		</xsl:when>
+            		<xsl:when test="noteidx=3">
+            			<xsl:text>D</xsl:text>
+            		</xsl:when>
+            		<xsl:when test="noteidx=4">
+            			<xsl:text>E</xsl:text>
+            		</xsl:when>
+            		<xsl:when test="noteidx=5">
+            			<xsl:text>F</xsl:text>
+            		</xsl:when>
+            		<xsl:when test="noteidx=6">
+            			<xsl:text>cr</xsl:text>
+            		</xsl:when>
+            		<xsl:when test="noteidx=7">
+            			<xsl:text>p.w.s.</xsl:text>
+            		</xsl:when>
+            		<xsl:when test="noteidx=8">
+            			<xsl:text>p.wo.s.</xsl:text>
+            		</xsl:when>
+            		<xsl:otherwise>
+	         			<xsl:value-of select="noteidx" />
+	         		</xsl:otherwise>
+            	</xsl:choose>
+			</text:p>
           </table:table-cell>
         </table:table-row>
 		</xsl:otherwise>
@@ -533,7 +566,40 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             <text:p text:style-name="P17"><xsl:value-of select="note"/></text:p>
           </table:table-cell>
           <table:table-cell table:style-name="Lehrveranstaltungen.I3" office:value-type="string">
-            <text:p text:style-name="P17">TODO</text:p>
+            <text:p text:style-name="P17">
+            <xsl:choose>
+            		<xsl:when test="noteidx=0">
+            			<xsl:text>A</xsl:text>
+            		</xsl:when>
+            		<xsl:when test="noteidx=1">
+            			<xsl:text>B</xsl:text>
+            		</xsl:when>
+            		<xsl:when test="noteidx=2">
+            			<xsl:text>C</xsl:text>
+            		</xsl:when>
+            		<xsl:when test="noteidx=3">
+            			<xsl:text>D</xsl:text>
+            		</xsl:when>
+            		<xsl:when test="noteidx=4">
+            			<xsl:text>E</xsl:text>
+            		</xsl:when>
+            		<xsl:when test="noteidx=5">
+            			<xsl:text>F</xsl:text>
+            		</xsl:when>
+            		<xsl:when test="noteidx=6">
+            			<xsl:text>cr</xsl:text>
+            		</xsl:when>
+            		<xsl:when test="noteidx=7">
+            			<xsl:text>p.w.s.</xsl:text>
+            		</xsl:when>
+            		<xsl:when test="noteidx=8">
+            			<xsl:text>p.wo.s.</xsl:text>
+            		</xsl:when>
+            		<xsl:otherwise>
+         				<xsl:value-of select="noteidx" />
+         			</xsl:otherwise>
+            	</xsl:choose>
+			</text:p>
           </table:table-cell>
         </table:table-row>       
 	
@@ -572,7 +638,40 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         <text:p text:style-name="P17"><xsl:value-of select="note"/></text:p>
       </table:table-cell>
       <table:table-cell table:style-name="Lehrveranstaltungen.I4" office:value-type="string">
-        <text:p text:style-name="P17">TODO</text:p>
+        <text:p text:style-name="P17">
+      	 <xsl:choose>
+         		<xsl:when test="noteidx=0">
+         			<xsl:text>A</xsl:text>
+         		</xsl:when>
+         		<xsl:when test="noteidx=1">
+         			<xsl:text>B</xsl:text>
+         		</xsl:when>
+         		<xsl:when test="noteidx=2">
+         			<xsl:text>C</xsl:text>
+         		</xsl:when>
+         		<xsl:when test="noteidx=3">
+         			<xsl:text>D</xsl:text>
+         		</xsl:when>
+         		<xsl:when test="noteidx=4">
+         			<xsl:text>E</xsl:text>
+         		</xsl:when>
+         		<xsl:when test="noteidx=5">
+         			<xsl:text>F</xsl:text>
+         		</xsl:when>
+         		<xsl:when test="noteidx=6">
+           			<xsl:text>cr</xsl:text>
+           		</xsl:when>
+           		<xsl:when test="noteidx=7">
+           			<xsl:text>p.w.s.</xsl:text>
+           		</xsl:when>
+           		<xsl:when test="noteidx=8">
+           			<xsl:text>p.wo.s.</xsl:text>
+           		</xsl:when>
+         		<xsl:otherwise>
+         			<xsl:value-of select="noteidx" />
+         		</xsl:otherwise>
+         	</xsl:choose>
+        </text:p>
       </table:table-cell>
     </table:table-row>
 	
