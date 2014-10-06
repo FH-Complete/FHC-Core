@@ -234,6 +234,7 @@ function getLVRow($obj)
 		$xml .= "\n				<stsem_kurz><![CDATA[".$stsem_kurz."]]></stsem_kurz>";
 		$xml .= "\n				<semester><![CDATA[".$row->studienplan_lehrveranstaltung_semester."]]></semester>";
 		$xml .= "\n				<note>".$note."</note>";
+		$xml .= "\n				<noteidx>".$row->note."</noteidx>";
 		$xml .= "\n				<positiv>".($note_arr[$row->note]['positiv']?'Ja':'Nein')."</positiv>";
 		$xml .= "\n				<sws>".($row->semesterstunden==0?'':number_format(sprintf('%.1F',$row->semesterstunden/$wochen),1))."</sws>";
 		$ectspunkte='';
