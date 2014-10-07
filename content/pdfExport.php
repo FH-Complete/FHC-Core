@@ -71,7 +71,7 @@ else
 		// in dem der 1. Studierende in der Liste ist
 		if(isset($_GET['uid']) && $_GET['uid']!='')
 		{
-			if(strstr($_GET['uid'],';'))
+			if(strstr(';',$_GET['uid']))
 				$uids = explode(';',$_GET['uid']);
 			else 
 				$uids = $_GET['uid'];
@@ -178,7 +178,7 @@ elseif(in_array($xsl,array('Zertifikat','Diplomurkunde','Diplomzeugnis','Bakkurk
 'PrProtokollBakk','PrProtokollDipl','Lehrauftrag','DiplomurkundeEng','Zeugnis','ZeugnisEng','StudienerfolgEng',
 'Sammelzeugnis','PrProtDiplEng','PrProtBakkEng','BakkzeugnisEng','DiplomzeugnisEng','statusbericht','Uebernahme',
 'DiplSupplement','Zutrittskarte','Projektbeschr','Ausbildungsver','AusbildStatus','PrProtBA','PrProtMA',
-'PrProtBAEng','PrProtMAEng','Studienordnung','Erfolgsnachweis','ErfolgsnwHead','Studienblatt')))
+'PrProtBAEng','PrProtMAEng','Studienordnung','Erfolgsnachweis','ErfolgsnwHead','Studienblatt','lvInfo')))
 {
 	if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz'))
 	{
@@ -266,6 +266,7 @@ if (!isset($_REQUEST["archive"]))
 
 		// Load the XSL source
 		$xsl_doc = new DOMDocument;
+
 		if(!$xsl_doc->loadXML($xsl_content))
 			die('unable to load xsl');
 		
@@ -314,9 +315,9 @@ if (!isset($_REQUEST["archive"]))
 				break;
 			}
 		}
-		
 		if(!$vorlage_found)
 			$zipfile = DOC_ROOT.'system/vorlage_zip/'.$vorlage->vorlage_kurzbz.'.'.$endung;
+		
 		
 		$tempname_zip = 'out.zip';
 		if(copy($zipfile, $tempname_zip))
