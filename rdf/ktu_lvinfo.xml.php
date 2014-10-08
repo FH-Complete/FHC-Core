@@ -68,7 +68,8 @@ $lv_arr = array();
 if($lvid == null)
 {
     // TODO Abfrage zum einschränker der Daten
-    if($studiengang->studiengang_kz != 0 && $studiengang->studiengang_kz <999 && $studiengang->studiengang_kz > 0)
+//    if($studiengang->studiengang_kz != 0 && $studiengang->studiengang_kz <999 && $studiengang->studiengang_kz > 0)
+    if($studiengang->studiengang_kz > 0)
     {
 	$lehrveranstaltung->load_lva($studiengang->studiengang_kz);
 	$i=0;
@@ -92,7 +93,7 @@ if($lvid == null)
     }
     else
     {
-	unset($studiengang->lehrveranstaltungen[$key]);
+//	unset($studiengang->lehrveranstaltungen[$key]);
     }
 }
 else 
@@ -106,13 +107,16 @@ echo "<studiengang>";
 $i = 0;
 echo "<studiengang_kz>".$studiengang->studiengang_kz."</studiengang_kz>";
 echo "<studiengang_bezeichnung>".$studiengang->bezeichnung."</studiengang_bezeichnung>";
+$studiensemester->load($std_sem);
+echo "<studiensemester>".$studiensemester->bezeichnung."</studiensemester>";
 echo "<lehrveranstaltungen>";
 foreach($studiengang->lehrveranstaltungen as $lv)
 {
     echo "<lv>";
     echo "<lvid>".$lv->lehrveranstaltung_id."</lvid>";
     echo "<lv_bezeichnung>".str_replace("&","&amp;",$lv->bezeichnung)."</lv_bezeichnung>";
-    echo "<lv_lehrfach_bez>".str_replace("&","&amp;",$lv->lehrfach_bez)."</lv_lehrfach_bez>";
+    if(isset($lv->lehrfach_bez))
+	echo "<lv_lehrfach_bez>".str_replace("&","&amp;",$lv->lehrfach_bez)."</lv_lehrfach_bez>";
     echo "<lvInfo>";
     if($lv->lvinfo->errormsg === NULL)
     {
@@ -134,34 +138,6 @@ foreach($studiengang->lehrveranstaltungen as $lv)
     echo "</lv>";
 }
 echo "</lehrveranstaltungen>";
-
-//foreach($result as $stg)
-//{
-//    echo "<STG>";
-//    echo "<STG_bezeichnung>".$stg->bezeichnung."</STG_bezeichnung>";
-//    echo "<lehrveranstaltungen>";
-//    foreach($stg->lehrveranstaltungen as $lv)
-//    {
-//	if($lv->lvinfo->errormsg == "")
-//	{
-//	    echo "<lv>";
-//	    echo "<LV_id>".$lv->lehrveranstaltung_id."</LV_id>";
-//	    echo "<LV_bez>".str_replace("&","&amp;",$lv->lvinfo->lv_bezeichnung)."</LV_bez>";
-//	    echo "<LVINFO_titel>".str_replace("&","&amp;", htmlentities($lv->lvinfo->titel))."</LVINFO_titel>";
-//	    echo "<LVINFO_kurzbz>".str_replace("&","&amp;", htmlentities($lv->lvinfo->kurzbeschreibung))."</LVINFO_kurzbz>";
-//	    echo "<LVINFO_lehrziele>".str_replace("&","&amp;", htmlentities($lv->lvinfo->lehrziele))."</LVINFO_lehrziele>";
-//	    echo "<LVINFO_lehrinhalte>".str_replace("&","&amp;", htmlentities($lv->lvinfo->lehrinhalte))."</LVINFO_lehrinhalte>";
-//	    echo "</lv>";
-//	}
-//	
-//	$i++;
-////	if($i==2)
-////	    break;
-//    }
-//    echo "</lehrveranstaltungen>";
-//    echo "</STG>";
-//    
-//}
 echo "</studiengang>";
 
 
