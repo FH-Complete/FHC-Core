@@ -1703,24 +1703,33 @@ if(!$result = @$db->db_query("SELECT lehreinheit_id FROM public.tbl_notizzuordnu
 // Tabelle public.tbl_filter
 if(!$result = @$db->db_query("SELECT filter_id FROM public.tbl_filter LIMIT 1;"))
 {
-	$qry = 'CREATE TABLE public.tbl_filter
+	$qry = "CREATE TABLE public.tbl_filter
 	(
-	filter_id serial,
-	kurzbz character varying(32),
-	sql text,
-	valuename character varying(512),
-	showvalue boolean DEFAULT true,
-	insertamum Timestamp DEFAULT now(),
-	insertvon Character varying(32),
-	updateamum Timestamp DEFAULT now(),
-	updatevon Character varying(32),
-	CONSTRAINT tbl_filter_pkey PRIMARY KEY (filter_id)
-	)
-	WITH (
-	OIDS=FALSE
+		filter_id bigint,
+		kurzbz character varying(32),
+		sql text,
+		valuename character varying(512),
+		showvalue boolean DEFAULT true,
+		insertamum Timestamp DEFAULT now(),
+		insertvon Character varying(32),
+		updateamum Timestamp DEFAULT now(),
+		updatevon Character varying(32)
 	);
+
+	ALTER TABLE public.tbl_filter ADD CONSTRAINT pk_filter PRIMARY KEY (filter_id);
+
+	CREATE SEQUENCE public.seq_filter_filter_id
+	INCREMENT BY 1
+	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
 		
-	';
+	ALTER TABLE public.tbl_filter ALTER COLUMN filter_id SET DEFAULT nextval('public.seq_filter_filter_id');
+	
+	GRANT SELECT, UPDATE, INSERT, DELETE ON public.tbl_filter TO vilesci;
+	GRANT SELECT, UPDATE on public.seq_filter_filter_id TO vilesci;
+	";
+
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_filter: '.$db->db_last_error().'</strong><br>';
 	else
@@ -1778,7 +1787,8 @@ if(!$result = @$db->db_query("SELECT vertrag_id FROM lehre.tbl_vertrag;"))
 		vertragsstatus_kurzbz varchar(32) NOT NULL,
 		vertrag_id bigint NOT NULL,
 		uid varchar(32),
-		datum timestamp NOT NULL
+		datum timestamp NOT NULL,
+		ext_id bigint
 	);
 	
 	ALTER TABLE lehre.tbl_vertrag_vertragsstatus ADD CONSTRAINT pk_vertrag_vertragstatus PRIMARY KEY (vertragsstatus_kurzbz, vertrag_id);
@@ -1899,6 +1909,16 @@ if(!$result = @$db->db_query("SELECT anwesenheit_id FROM campus.tbl_anwesenheit"
 		echo ' campus.tbl_anwesenheit: Tabelle campus.tbl_anwesenheit hinzugefuegt!<br>';
 }
 
+// Tabelle public.tbl_benutzerfunktion Spalte wochenstunden
+if(!$result = @$db->db_query("SELECT wochenstunden FROM public.tbl_benutzerfunktion"))
+{
+	$qry = "ALTER TABLE public.tbl_benutzerfunktion ADD COLUMN wochenstunden numeric(5,2);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_benutzerfunktion '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' public.tbl_benutzerfunktion: Spalte wochenstunden hinzugefuegt!<br>';
+}
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -2027,7 +2047,7 @@ $tabellen=array(
 	"lehre.tbl_stundenplan"  => array("stundenplan_id","unr","mitarbeiter_uid","datum","stunde","ort_kurzbz","gruppe_kurzbz","titel","anmerkung","lehreinheit_id","studiengang_kz","semester","verband","gruppe","fix","updateamum","updatevon","insertamum","insertvon"),
 	"lehre.tbl_stundenplandev"  => array("stundenplandev_id","lehreinheit_id","unr","studiengang_kz","semester","verband","gruppe","gruppe_kurzbz","mitarbeiter_uid","ort_kurzbz","datum","stunde","titel","anmerkung","fix","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_vertrag"  => array("vertrag_id","person_id","vertragstyp_kurzbz","bezeichnung","betrag","insertamum","insertvon","updateamum","updatevon","ext_id"),
-	"lehre.tbl_vertrag_vertragsstatus"  => array("vertragsstatus_kurzbz","vertrag_id","uid","datum"),
+	"lehre.tbl_vertrag_vertragsstatus"  => array("vertragsstatus_kurzbz","vertrag_id","uid","datum","ext_id"),
 	"lehre.tbl_vertragstyp"  => array("vertragstyp_kurzbz","bezeichnung"),
 	"lehre.tbl_vertragsstatus"  => array("vertragsstatus_kurzbz","bezeichnung"),
 	"lehre.tbl_zeitfenster"  => array("wochentag","stunde","ort_kurzbz","studiengang_kz","gewicht"),
@@ -2041,7 +2061,7 @@ $tabellen=array(
 	"public.tbl_aufnahmeschluessel"  => array("aufnahmeschluessel"),
 	"public.tbl_bankverbindung"  => array("bankverbindung_id","person_id","name","anschrift","bic","blz","iban","kontonr","typ","verrechnung","updateamum","updatevon","insertamum","insertvon","ext_id","oe_kurzbz"),
 	"public.tbl_benutzer"  => array("uid","person_id","aktiv","alias","insertamum","insertvon","updateamum","updatevon","ext_id","updateaktivvon","updateaktivam","aktivierungscode"),
-	"public.tbl_benutzerfunktion"  => array("benutzerfunktion_id","fachbereich_kurzbz","uid","oe_kurzbz","funktion_kurzbz","semester", "datum_von","datum_bis", "updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung"),
+	"public.tbl_benutzerfunktion"  => array("benutzerfunktion_id","fachbereich_kurzbz","uid","oe_kurzbz","funktion_kurzbz","semester", "datum_von","datum_bis", "updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung","wochenstunden"),
 	"public.tbl_benutzergruppe"  => array("uid","gruppe_kurzbz","studiensemester_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_buchungstyp"  => array("buchungstyp_kurzbz","beschreibung","standardbetrag","standardtext","aktiv","credit_points"),
 	"public.tbl_dokument"  => array("dokument_kurzbz","bezeichnung","ext_id"),
@@ -2231,6 +2251,8 @@ $berechtigungen = array(
 	array('basis/testtool','Administrationseite, Gebiete löschen/zurücksetzen'),
 	array('basis/variable','Variablenverwaltung'),
 	array('basis/vilesci','Grundrecht, um in VileSci irgendwelche Menüpunkte zu sehen'),
+	array('buchung/typen','Verwaltung von Buchungstypen'),
+	array('buchung/mitarbeiter','Verwaltung von Buchungen fuer Mitarbeiter'),
 	array('inout/incoming','Incomingverwaltung'),
 	array('inout/outgoing','Outgoingverwaltung'),
 	array('inout/uebersicht','Verbandsanzeige fuer Incoming/Outgoing im FAS'),
@@ -2281,6 +2303,7 @@ $berechtigungen = array(
 	array('system/loginasuser','Berechtigung zum Einloggen als anderer User'),
 	array('user','Normale User ohne besonere Rechte'),
 	array('veranstaltung','Berechtigungen fuer Veranstaltungen wie Jahresplan'),
+	array('vertrag/typen','Verwalten von Vertragstypen'),
 	array('wawi/berichte','Alle Berichte anzeigen'),
 	array('wawi/bestellung','Bestellungen verwalten'),
 	array('wawi/bestellung_advanced','Bestellungen editieren nach dem Abschicken'),

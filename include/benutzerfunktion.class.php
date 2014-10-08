@@ -46,6 +46,7 @@ class benutzerfunktion extends basis_db
 	public $datum_von;			//  date
 	public $datum_bis;			//  date
 	public $bezeichnung;		//  varchar(64)
+	public $wochenstunden; 		//  numeric(5,2)
 
 
 	/**
@@ -92,6 +93,7 @@ class benutzerfunktion extends basis_db
 			$pfunktion_obj->datum_von = $row->datum_von;
 			$pfunktion_obj->datum_bis = $row->datum_bis;
 			$pfunktion_obj->bezeichnung = $row->bezeichnung;
+			$pfunktion_obj->wochenstunden = $row->wochenstunden;
 
 			$this->result[] = $pfunktion_obj;
 		}
@@ -150,6 +152,8 @@ class benutzerfunktion extends basis_db
 				$this->datum_von = $row->datum_von;
 				$this->datum_bis = $row->datum_bis;
 				$this->bezeichnung = $row->bezeichnung;
+				$this->wochenstunden = $row->wochenstunden;
+
 				return true;
 			}
 			else
@@ -206,6 +210,7 @@ class benutzerfunktion extends basis_db
 				$obj->datum_von = $row->datum_von;
 				$obj->datum_bis = $row->datum_bis;
 				$obj->bezeichnung = $row->bezeichnung;
+				$obj->wochenstunden = $row->wochenstunden;
 				
 				$this->result[] = $obj;
 				
@@ -255,6 +260,7 @@ class benutzerfunktion extends basis_db
 			$this->datum_von = $row->datum_von;
 			$this->datum_bis = $row->datum_bis;
 			$this->bezeichnung = $row->bezeichnung;
+			$this->wochenstunden = $row->wochenstunden;
 		}
 		else
 		{
@@ -316,7 +322,7 @@ class benutzerfunktion extends basis_db
 				}
 			}
 			$qry = 'BEGIN;INSERT INTO public.tbl_benutzerfunktion (fachbereich_kurzbz, uid, oe_kurzbz, funktion_kurzbz, insertamum, insertvon,
-				updateamum, updatevon, semester, datum_von, datum_bis, bezeichnung) VALUES ('.
+				updateamum, updatevon, semester, datum_von, datum_bis, bezeichnung, wochenstunden) VALUES ('.
 				$this->db_add_param($this->fachbereich_kurzbz).', '.
 				$this->db_add_param($this->uid).', '.
 				$this->db_add_param($this->oe_kurzbz).', '.
@@ -328,7 +334,8 @@ class benutzerfunktion extends basis_db
 				$this->db_add_param($this->semester).','.
 				$this->db_add_param($this->datum_von).','.
 				$this->db_add_param($this->datum_bis).','.
-				$this->db_add_param($this->bezeichnung).'); ';
+				$this->db_add_param($this->bezeichnung).','.
+				$this->db_add_param($this->wochenstunden).'); ';
 		}
 		else
 		{
@@ -354,7 +361,8 @@ class benutzerfunktion extends basis_db
 				'datum_von='.$this->db_add_param($this->datum_von).',  '.
 				'datum_bis='.$this->db_add_param($this->datum_bis).',  '.
 				'bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
-				'semester='.$this->db_add_param($this->semester).'  '.
+				'semester='.$this->db_add_param($this->semester).',  '.
+				'wochenstunden='.$this->db_add_param($this->wochenstunden).' '.
 				'WHERE benutzerfunktion_id = '.$this->db_add_param($this->benutzerfunktion_id, FHC_INTEGER).';';
 		}
 
@@ -437,6 +445,7 @@ class benutzerfunktion extends basis_db
 		    $obj->datum_von = $row->datum_von;
 		    $obj->datum_bis = $row->datum_bis;
 		    $obj->bezeichnung = $row->bezeichnung;
+			$obj->wochenstunden = $row->wochenstunden;
 
 		    $this->result[] = $obj;
 
