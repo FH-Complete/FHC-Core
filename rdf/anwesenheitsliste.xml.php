@@ -43,9 +43,11 @@ if(isset($_GET['typ']) && $_GET['typ'] == 'lehreinheit')
 	$db = new basis_db();
 	
 	// Daten der Lehreinheit ermitteln
-	$qry = "SELECT le.lehrveranstaltung_id, lv.lvnr, bezeichnung, stundenblockung, sp.ort_kurzbz, datum, beginn, ende "
+	$qry = "SELECT le.lehrveranstaltung_id, lv.lvnr, lv.bezeichnung AS lvbez, stg.bezeichnung AS stgbez, "
+		. "sp.ort_kurzbz, datum, beginn, ende "
 		. "FROM lehre.tbl_lehreinheit le "
 		. "JOIN lehre.tbl_lehrveranstaltung lv ON lv.lehrveranstaltung_id = le.lehrveranstaltung_id "
+		. "JOIN public.tbl_studiengang stg ON stg.studiengang_kz = lv.studiengang_kz "
 		. "JOIN lehre.tbl_stundenplan sp ON sp.unr = le.unr "
 		. "JOIN lehre.tbl_stunde stu ON stu.stunde = sp.stunde "
 		. "WHERE le.lehreinheit_id = " . $db->db_add_param($lehreinheit_id) . " "
@@ -53,22 +55,27 @@ if(isset($_GET['typ']) && $_GET['typ'] == 'lehreinheit')
 
 	if($db->db_query($qry))
 	{
+		$stundenblockung = $db->db_num_rows();
+		
 		while($row = $db->db_fetch_object())
 		{
 			if(empty($row))
 				die("Lehreinheit $lehreinheit_id am $datum nicht gefunden");
 			
-			// Ausgabe der Lehrveranstaltung
-			echo "\n		<lehreinheit>";
-			echo "\n			<bezeichnung><![CDATA[".$row->bezeichnung."]]></bezeichnung>";
-			echo "\n			<kuerzel><![CDATA[".$row->lvnr."]]></kuerzel>";
-			echo "\n			<stundenblockung><![CDATA[".$row->stundenblockung."]]></stundenblockung>";
-			echo "\n			<ort><![CDATA[".$row->ort_kurzbz."]]></ort>";
-			echo "\n			<datum><![CDATA[".date('d.m.Y', strtotime($row->datum))."]]></datum>";
-			echo "\n			<beginn><![CDATA[".mb_substr($row->beginn, 0, 5)."]]></beginn>";
-			echo "\n			<ende><![CDATA[".mb_substr($row->ende, 0, 5)."]]></ende>";
-			echo "\n		</lehreinheit>";
+			$lehreinheiten[] = $row;
 		}
+		
+		// Ausgabe der Lehrveranstaltung
+		echo "\n		<lehreinheit>";
+		echo "\n			<studiengang><![CDATA[".$lehreinheiten[0]->stgbez."]]></studiengang>";
+		echo "\n			<bezeichnung><![CDATA[".$lehreinheiten[0]->lvbez."]]></bezeichnung>";
+		echo "\n			<kuerzel><![CDATA[".$lehreinheiten[0]->lvnr."]]></kuerzel>";
+		echo "\n			<stundenblockung><![CDATA[".$stundenblockung."]]></stundenblockung>";
+		echo "\n			<ort><![CDATA[".$lehreinheiten[0]->ort_kurzbz."]]></ort>";
+		echo "\n			<datum><![CDATA[".date('d.m.Y', strtotime($lehreinheiten[0]->datum))."]]></datum>";
+		echo "\n			<beginn><![CDATA[".mb_substr($lehreinheiten[0]->beginn, 0, 5)."]]></beginn>";
+		echo "\n			<ende><![CDATA[".mb_substr($lehreinheiten[count($lehreinheiten) - 1]->ende, 0, 5)."]]></ende>";
+		echo "\n		</lehreinheit>";
 	}
 	
 	// Daten der Vortragenden ermitteln
@@ -94,10 +101,12 @@ if(isset($_GET['typ']) && $_GET['typ'] == 'lehreinheit')
 		
 
 	// Daten der Teilnehmer ermitteln
-	$qry = "SELECT vorname, nachname, titelpre, titelpost "
+	$qry = "SELECT vorname, nachname, titelpre, titelpost, "
+		. "CASE WHEN note IS NOT NULL THEN 'angerechnet' END AS notiz "
 		. "FROM campus.vw_student_lehrveranstaltung stlv "
 		. "JOIN public.tbl_benutzer be ON be.uid = stlv.uid "
 		. "JOIN public.tbl_person pe ON pe.person_id = be.person_id "
+		. "LEFT JOIN campus.tbl_lvgesamtnote lvgn ON (lvgn.lehrveranstaltung_id = stlv.lehrveranstaltung_id AND lvgn.student_uid = stlv.uid) "
 		. "WHERE stlv.lehreinheit_id = " . $db->db_add_param($lehreinheit_id);
 	
 	if($db->db_query($qry))
@@ -110,6 +119,7 @@ if(isset($_GET['typ']) && $_GET['typ'] == 'lehreinheit')
 			echo "\n			<nachname><![CDATA[".$row->nachname."]]></nachname>";
 			echo "\n			<titelpre><![CDATA[".$row->titelpre."]]></titelpre>";
 			echo "\n			<titelpost><![CDATA[".$row->titelpost."]]></titelpost>";
+			echo "\n			<notiz><![CDATA[".$row->notiz."]]></notiz>";
 			echo "\n		</teilnehmer>";
 		}
 	}
