@@ -425,7 +425,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       						<label value="Aufmerksam durch" control="student-prestudent-menulist-aufmerksamdurch"/>
       						<menulist id="student-prestudent-menulist-aufmerksamdurch" disabled="true"
 							          datasources="<?php echo APP_ROOT ?>rdf/aufmerksamdurch.rdf.php" flex="1"
-						              ref="http://www.technikum-wien.at/aufmerksamdurch/alle" >
+						              ref="http://www.technikum-wien.at/aufmerksamdurch/alle">
 								<template>
 									<menupopup>
 										<menuitem value="rdf:http://www.technikum-wien.at/aufmerksamdurch/rdf#aufmerksamdurch_kurzbz"
