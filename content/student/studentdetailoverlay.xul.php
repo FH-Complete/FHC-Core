@@ -429,7 +429,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<template>
 									<menupopup>
 										<menuitem value="rdf:http://www.technikum-wien.at/aufmerksamdurch/rdf#aufmerksamdurch_kurzbz"
-							        		      label="rdf:http://www.technikum-wien.at/aufmerksamdurch/rdf#aufmerksamdurch_kurzbz"
+							        		      label="rdf:http://www.technikum-wien.at/aufmerksamdurch/rdf#beschreibung"
 										  		  uri="rdf:*"/>
 										</menupopup>
 								</template>
