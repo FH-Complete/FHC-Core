@@ -34,7 +34,7 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/aufmerksamdurch.class.php');
 
 $ad=new aufmerksamdurch();
-$ad->getAll();
+$ad->getAll('beschreibung');
 $rdf_url='http://www.technikum-wien.at/aufmerksamdurch';
 
 ?>
