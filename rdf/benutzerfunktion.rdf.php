@@ -56,16 +56,17 @@ $fkt->getAll();
 foreach ($fkt->result as $row) 
 	$fkt_arr[$row->funktion_kurzbz] = $row->beschreibung;
 
+$db = new basis_db();
+
 if($uid!='')
 {
-	$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE uid='".addslashes($uid)."' ORDER BY funktion_kurzbz";
+	$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE uid=".$db->db_add_param($uid)." ORDER BY funktion_kurzbz";
 }
 else 
 {
-	$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE benutzerfunktion_id='".addslashes($benutzerfunktion_id)."'";
+	$qry = "SELECT * FROM public.tbl_benutzerfunktion WHERE benutzerfunktion_id=".$db->db_add_param($benutzerfunktion_id);
 }
 
-$db = new basis_db();
 if($db->db_query($qry))
 {	
 	while($row = $db->db_fetch_object())
@@ -87,6 +88,7 @@ if($db->db_query($qry))
 		        <BNFUNKTION:datum_bis><![CDATA['.$datum_obj->convertISODate($row->datum_bis).']]></BNFUNKTION:datum_bis>
 		        <BNFUNKTION:datum_bis_iso><![CDATA['.$row->datum_bis.']]></BNFUNKTION:datum_bis_iso>
 		        <BNFUNKTION:bezeichnung><![CDATA['.$row->bezeichnung.']]></BNFUNKTION:bezeichnung>
+		        <BNFUNKTION:wochenstunden><![CDATA['.$row->wochenstunden.']]></BNFUNKTION:wochenstunden>
 		     </RDF:Description>
 		  </RDF:li>';
 	}

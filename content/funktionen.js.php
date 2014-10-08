@@ -187,6 +187,7 @@ function FunktionNeu()
 	document.getElementById('funktion-box-datum_von').value=Tag+'.'+Monat+'.'+Jahr;
 	document.getElementById('funktion-box-datum_bis').value='';
 	document.getElementById('funktion-textbox-bezeichnung').value='';
+	document.getElementById('funktion-textbox-wochenstunden').value='';
 	FunktionToggleFachbereich();
 }
 
@@ -260,6 +261,7 @@ function FunktionDetailSpeichern()
 	var datum_von = document.getElementById('funktion-box-datum_von').value;
 	var datum_bis = document.getElementById('funktion-box-datum_bis').value;
 	var bezeichnung = document.getElementById('funktion-textbox-bezeichnung').value;
+	var wochenstunden = document.getElementById('funktion-textbox-wochenstunden').value;
 		
 	//Bei Mitarbeitern wird kein Studiengang mitgeschickt
 	if(window.parent.document.getElementById('main-content-tabs').selectedItem==window.parent.document.getElementById('tab-mitarbeiter'))
@@ -287,7 +289,8 @@ function FunktionDetailSpeichern()
 	req.add('datum_von', ConvertDateToISO(datum_von));
 	req.add('datum_bis', ConvertDateToISO(datum_bis));
 	req.add('bezeichnung', bezeichnung);
-	
+	req.add('wochenstunden', wochenstunden);
+
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response)
@@ -349,6 +352,7 @@ function FunktionBearbeiten()
 	var datum_von = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#datum_von" ));
 	var datum_bis = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#datum_bis" ));
 	var bezeichnung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bezeichnung" ));
+	var wochenstunden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#wochenstunden" ));
 	
 	document.getElementById('funktion-menulist-fachbereich').value=fachbereich_kurzbz;
 	document.getElementById('funktion-menulist-oe_kurzbz').value=oe_kurzbz;
@@ -359,6 +363,7 @@ function FunktionBearbeiten()
 	document.getElementById('funktion-box-datum_von').value=datum_von;
 	document.getElementById('funktion-box-datum_bis').value=datum_bis;
 	document.getElementById('funktion-textbox-bezeichnung').value=bezeichnung;
+	document.getElementById('funktion-textbox-wochenstunden').value=wochenstunden;
 	
 	FunktionBezeichnungChanged=true;
 	FunktionDetailDisableFields(false);
@@ -390,6 +395,7 @@ function FunktionDetailDisableFields(val)
 	document.getElementById('funktion-box-datum_von').disabled=val;
 	document.getElementById('funktion-box-datum_bis').disabled=val;
 	document.getElementById('funktion-textbox-bezeichnung').disabled=val;
+	document.getElementById('funktion-textbox-wochenstunden').disabled=val;
 }
 
 // ****
@@ -410,6 +416,7 @@ function FunktionDetailResetFields()
 	document.getElementById('funktion-box-datum_von').value=Tag+'.'+Monat+'.'+Jahr;
 	document.getElementById('funktion-box-datum_bis').value='';
 	document.getElementById('funktion-textbox-bezeichnung').value='';
+	document.getElementById('funktion-textbox-wochenstunden').value='';
 	FunktionBezeichnungChanged=false;
 }
 
