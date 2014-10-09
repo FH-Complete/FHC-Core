@@ -65,6 +65,11 @@ function sortArray($a, $b)
     return ($a->lv_bezeichnung < $b->lv_bezeichnung) ? -1 : 1;
 }
 
+function removeTags($string)
+{
+    return preg_replace("/<(.*?)>/im"," ", str_replace(["</li><li>","</li><br></ul>"], ". ", $string));
+}
+
 if($lvid == null)
 {
     if($studiengang->studiengang_kz > 0)
@@ -117,13 +122,13 @@ foreach($studiengang->lehrveranstaltungen as $lv)
     if($lv->lvinfo->errormsg === NULL)
     {
 	echo "<lvInfo_titel><![CDATA[".$lv->lvinfo->titel."]]></lvInfo_titel>";
-	echo "<lvInfo_lehrziele><![CDATA[".$lv->lvinfo->lehrziele."]]></lvInfo_lehrziele>";
-	echo "<lvInfo_lehrinhalte><![CDATA[".$lv->lvinfo->lehrinhalte."]]></lvInfo_lehrinhalte>";
-	echo "<lvInfo_methodik><![CDATA[".$lv->lvinfo->methodik."]]></lvInfo_methodik>";
+	echo "<lvInfo_lehrziele><![CDATA[".removeTags($lv->lvinfo->lehrziele)."]]></lvInfo_lehrziele>";
+	echo "<lvInfo_lehrinhalte><![CDATA[".removeTags($lv->lvinfo->lehrinhalte)."]]></lvInfo_lehrinhalte>";
+	echo "<lvInfo_methodik><![CDATA[".removeTags($lv->lvinfo->methodik)."]]></lvInfo_methodik>";
 	echo "<lvInfo_sprache><![CDATA[".$lv->lvinfo->sprache."]]></lvInfo_sprache>";
-	echo "<lvInfo_voraussetzungen><![CDATA[".$lv->lvinfo->voraussetzungen."]]></lvInfo_voraussetzungen>";
-	echo "<lvInfo_unterlagen><![CDATA[".$lv->lvinfo->voraussetzungen."]]></lvInfo_unterlagen>";
-	echo "<lvInfo_pruefung><![CDATA[".$lv->lvinfo->pruefungsordnung."]]></lvInfo_pruefung>";
+	echo "<lvInfo_voraussetzungen><![CDATA[".removeTags($lv->lvinfo->voraussetzungen)."]]></lvInfo_voraussetzungen>";
+	echo "<lvInfo_unterlagen><![CDATA[".removeTags($lv->lvinfo->voraussetzungen)."]]></lvInfo_unterlagen>";
+	echo "<lvInfo_pruefung><![CDATA[".removeTags($lv->lvinfo->pruefungsordnung)."]]></lvInfo_pruefung>";
     }
     else
     {
