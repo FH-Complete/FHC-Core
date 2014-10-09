@@ -64,11 +64,9 @@ function sortArray($a, $b)
     }
     return ($a->lv_bezeichnung < $b->lv_bezeichnung) ? -1 : 1;
 }
-$lv_arr = array();
+
 if($lvid == null)
 {
-    // TODO Abfrage zum einschränker der Daten
-//    if($studiengang->studiengang_kz != 0 && $studiengang->studiengang_kz <999 && $studiengang->studiengang_kz > 0)
     if($studiengang->studiengang_kz > 0)
     {
 	$lehrveranstaltung->load_lva($studiengang->studiengang_kz);
@@ -86,14 +84,12 @@ if($lvid == null)
 	    $i++;
 	    $lvinfo->load($lv->lehrveranstaltung_id, $sprache);
 	    $lehrveranstaltung->lehrveranstaltungen[$lv_key]->lvinfo = $lvinfo;
-//		if($i==2)
-//		    break;
 	}
 	$studiengang->lehrveranstaltungen = $lehrveranstaltung->lehrveranstaltungen;
     }
     else
     {
-//	unset($studiengang->lehrveranstaltungen[$key]);
+	unset($studiengang->lehrveranstaltungen[$key]);
     }
 }
 else 
@@ -121,7 +117,6 @@ foreach($studiengang->lehrveranstaltungen as $lv)
     if($lv->lvinfo->errormsg === NULL)
     {
 	echo "<lvInfo_titel><![CDATA[".$lv->lvinfo->titel."]]></lvInfo_titel>";
-//	echo "<lvInfo_kurzbz><![CDATA[".$lv->lvinfo->kurzbeschreibung."]]></lvInfo_kurzbz>";
 	echo "<lvInfo_lehrziele><![CDATA[".$lv->lvinfo->lehrziele."]]></lvInfo_lehrziele>";
 	echo "<lvInfo_lehrinhalte><![CDATA[".$lv->lvinfo->lehrinhalte."]]></lvInfo_lehrinhalte>";
 	echo "<lvInfo_methodik><![CDATA[".$lv->lvinfo->methodik."]]></lvInfo_methodik>";
