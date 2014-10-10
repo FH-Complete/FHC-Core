@@ -620,6 +620,66 @@ class konto extends basis_db
 	}
 	
 	/**
+	 * ueberprueft, ob studiengebuehr gebucht ist fuer
+	 * student_uid und studiensemester
+	 * gibt true/false zurueck und setzt bei true das buchungsdatum $this->buchungsdatum
+	 */
+	public function getLastStSemBuchungstypen($uid, $buchungstyp_kurzbz_array)
+	{
+		$subqry = "SELECT tbl_konto.buchungsnr, tbl_konto.buchungsdatum, tbl_konto.buchungsnr_verweis, tbl_konto.studiensemester_kurzbz 
+					FROM 
+						public.tbl_konto
+						JOIN public.tbl_benutzer USING(person_id)
+						JOIN public.tbl_student ON(uid=student_uid)
+						JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
+					WHERE 
+						tbl_benutzer.uid = ".$this->db_add_param($uid)."
+						AND tbl_konto.studiengang_kz=tbl_student.studiengang_kz
+						AND tbl_konto.buchungstyp_kurzbz in(".$this->db_implode4SQL($buchungstyp_kurzbz_array).") 
+					ORDER BY tbl_studiensemester.start DESC";
+		
+		if($result = $this->db_query($subqry))
+		{
+			if ($this->db_num_rows($result)==0)
+				return false;
+			else
+			{
+				while ($subrow = $this->db_fetch_object($result))
+				{
+                    if($subrow->buchungsnr_verweis != '')
+                    {
+                        $qry = "SELECT sum(betrag) as differenz FROM public.tbl_konto 
+
+                            WHERE buchungsnr=".$this->db_add_param($subrow->buchungsnr_verweis, FHC_INTEGER)." OR buchungsnr_verweis=".$this->db_add_param($subrow->buchungsnr_verweis, FHC_INTEGER).";";
+                        
+                        if($result_test = $this->db_query($qry))
+                        {
+                            if($row = $this->db_fetch_object($result_test))
+                            {
+                                if ($row->differenz == 0)
+                                {
+                                    return $subrow->studiensemester_kurzbz;
+                                }
+                            }
+
+                        }
+                        else
+                        {
+                            $this->errormsg = 'Fehler beim Ermitteln der Differenz';
+                            return false;
+                        }
+                    }
+				}
+			}
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler bei einer Abfrage';
+			return false;
+		}
+	}
+
+	/**
 	 * 
 	 * Gibt den Betrag der Bezahlten Studiengebühr eines Semesters zurück
 	 * @param $uid StudentUID

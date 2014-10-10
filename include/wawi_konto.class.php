@@ -42,7 +42,7 @@ class wawi_konto extends basis_db
 	public $updateamum;         	//  timestamp
 	public $updatevon;				//  string
 	
-	static public $sprache; 
+	public $sprache; 
 	
 	
 	/**
@@ -503,6 +503,53 @@ class wawi_konto extends basis_db
 			$this->result[] = $obj; 
 		}
 		return true; 
+	}
+
+	/**
+	 * Liefert alle Konten einer Person
+	 * @param $person_id Person ID
+	 * @return array mit Konten oder false wenn ein Fehler auftritt
+	 */
+	public function getKontoPerson($person_id)
+	{
+		$sprache = new sprache();
+		$beschreibung = $sprache->getSprachQuery('beschreibung');
+				
+		$sql_query = "SELECT 
+						*, $beschreibung
+					  FROM 
+					  	wawi.tbl_konto"; 
+		
+		$sql_query.=" WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
+
+		$sql_query .= " ORDER BY kurzbz;";
+		
+		if($this->db_query($sql_query))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new wawi_konto();
+				
+				$obj->konto_id = $row->konto_id; 
+				$obj->kontonr = $row->kontonr;
+				$obj->beschreibung = $sprache->parseSprachResult('beschreibung', $row);
+				$obj->kurzbz = $row->kurzbz;
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				
+				$this->result[] = $obj; 
+
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+		return true;
 	}
 }
 ?>

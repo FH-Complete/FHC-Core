@@ -686,6 +686,11 @@ function MitarbeiterAuswahl()
 		document.getElementById('mitarbeiter-funktionen').setAttribute('src',url);
 	}
 	
+	if(document.getElementById('mitarbeiter-tab-buchung'))
+	{
+		MitarbeiterBuchungLoad(person_id)
+	}
+
 	// Selektierungsfunktion der Addons aufrufen
 	for(i in addon)
 	{

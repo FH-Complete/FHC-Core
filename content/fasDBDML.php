@@ -418,7 +418,7 @@ if(!$error)
 				$benutzerfunktion->datum_von = $_POST['datum_von'];
 				$benutzerfunktion->datum_bis = $_POST['datum_bis'];
 				$benutzerfunktion->bezeichnung = $_POST['bezeichnung'];
-				$benutzerfunktion->wochenstunden = $_POST['wochenstunden'];
+				$benutzerfunktion->wochenstunden = str_replace(',','.',$_POST['wochenstunden']);
 				
 				if($benutzerfunktion->save())
 				{
