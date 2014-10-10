@@ -24,17 +24,208 @@ class buchung extends basis_db
 	public $new;
 	public $result = array();
 	
+	public $buchung_id;
+	public $konto_id;
+	public $kostenstelle_id;
+	public $buchungsdatum;	
+	public $buchungstext;
+	public $betrag;
+	public $insertamum;
+	public $insertvon;
+	public $updateamum;
+	public $updatevon;
+
 	public $buchungstyp_kurzbz;
 	public $buchungstyp_bezeichnung;
         
-        /**
+	/**
 	 * Konstruktor
 	 */
 	public function __construct()
 	{
 		parent::__construct();
 	}
+
+
+	/**
+	 * Laedt eine Buchung
+	 *
+	 * @param $buchung_id ID der Buchung
+	 * @return boolean true wenn ok, false im Fehlerfall
+	 */
+	public function load($buchung_id)
+	{
+		$qry = "SELECT
+					tbl_buchung.* 
+				FROM 
+					wawi.tbl_buchung 
+				WHERE 
+					buchung_id=".$this->db_add_param($buchung_id, FHC_INTEGER);
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				$this->buchung_id = $row->buchung_id;
+				$this->konto_id = $row->konto_id;
+				$this->kostenstelle_id = $row->kostenstelle_id;
+				$this->buchungstyp_kurzbz = $row->buchungstyp_kurzbz;
+				$this->buchungsdatum = $row->buchungsdatum;	
+				$this->buchungstext = $row->buchungstext;
+				$this->betrag = $row->betrag;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				return true;
+			}
+			else
+			{
+				$this->errormsg='Es wurde kein Datensatz mit dieser ID gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}	
+
+	/**
+	 * Prueft die Daten vor dem speichern auf Gueltigkeit
+	 * @return true wenn gueltig, false wenn ungueltig
+	 */
+	public function validate()
+	{
+		if(mb_strlen($this->buchungstext)>512)
+		{
+			$this->errormsg = 'Der Buchungstext darf nicht laenger als 512 Zeichen sein';
+			return false;
+		}
+		
+		if(mb_strlen($this->betrag)>9)
+		{
+			$this->errormsg='Betrag ist ungueltig';
+			return false;
+		}
+		if(!is_numeric($this->betrag))
+		{
+			$this->errormsg='Betrag ist keine Zahl';
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Speichert eine Buchung in der Datenbank
+	 *
+	 * @param $new wenn true wird eine neuer Datensatz erstellt
+	 * @return boolean true wenn ok, false im Fehlerfall
+	 */
+	public function save($new=null)
+	{
+		if(is_null($new))
+			$new = $this->new;
+
+		if(!$this->validate())
+			return false;
 	
+		if($new)
+		{
+			$qry = 'BEGIN;INSERT INTO wawi.tbl_buchung(konto_id, kostenstelle_id, buchungstyp_kurzbz, 
+					buchungsdatum, buchungstext, betrag, insertamum, insertvon, updateamum, updatevon) VALUES('.
+					$this->db_add_param($this->konto_id, FHC_INTEGER).','.
+					$this->db_add_param($this->kostenstelle_id, FHC_INTEGER).','.
+					$this->db_add_param($this->buchungstyp_kurzbz).','.
+					$this->db_add_param($this->buchungsdatum).','.
+					$this->db_add_param($this->buchungstext).','.
+					$this->db_add_param($this->betrag).','.
+					$this->db_add_param($this->insertamum).','.
+					$this->db_add_param($this->insertvon).','.
+					$this->db_add_param($this->updateamum).','.
+					$this->db_add_param($this->updatevon).');';
+		}	
+		else
+		{
+			if($this->buchung_id=='')
+			{
+				$this->errormsg='BuchungID ist ungueltig';
+				return false;
+			}
+			$qry = 'UPDATE wawi.tbl_buchung SET'.
+					' konto_id = '.$this->db_add_param($this->konto_id, FHC_INTEGER).','.
+					' kostenstelle_id='.$this->db_add_param($this->kostenstelle_id,FHC_INTEGER).','.
+					' buchungstyp_kurzbz='.$this->db_add_param($this->buchungstyp_kurzbz).','.
+					' buchungsdatum='.$this->db_add_param($this->buchungsdatum).','.
+					' buchungstext='.$this->db_add_param($this->buchungstext).','.
+					' betrag='.$this->db_add_param($this->betrag).','.
+					' updateamum='.$this->db_add_param($this->updateamum).','.
+					' updatevon='.$this->db_add_param($this->updatevon).' '.
+					' WHERE buchung_id='.$this->db_add_param($this->buchung_id, FHC_INTEGER,false);
+		}
+	
+		if($this->db_query($qry))
+		{
+			if($new)
+			{
+				//Sequence auslesen
+				$qry = "SELECT currval('wawi.seq_buchung_buchung_id') as id";
+				if($this->db_query($qry))
+				{
+					if($row = $this->db_fetch_object())
+					{
+						$this->buchung_id = $row->id;
+						$this->db_query('COMMIT');
+						return true;
+					}
+					else 
+					{
+						$this->errormsg = 'Fehler beim Auslesen der Sequence';
+						$this->db_query('ROLLBACK');
+						return false;
+					}
+				}
+			}
+			else
+			{
+				return true;
+			}
+		}
+		else
+		{
+			$this->errromsg = 'Fehler beim Speichern der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Loescht eine Buchung
+	 * 
+	 * @param $buchung_id ID der Buchung die entfernt werden soll
+	 * @return boolean true wenn ok, false im Fehlerfall
+	 */
+	public function delete($buchung_id)
+	{
+		if($buchung_id=='' || !is_numeric($buchung_id))
+		{
+			$this->errormsg='BuchungID ist ungueltig';
+			return false;
+		}
+
+		$qry = 'DELETE FROM wawi.tbl_buchung WHERE buchung_id='.$this->db_add_param($buchung_id, FHC_INTEGER, false);
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Loeschen der Buchung';
+			return false;
+		}
+	}
+
 	/**
 	 * Speichert den Buchungstyp in der Datenbank
 	 * Wenn $new auf true gesetzt ist wird ein neuer Datensatz
@@ -150,12 +341,11 @@ class buchung extends basis_db
 		{
 			while($row = $this->db_fetch_object())
 			{
-				$buchung = new buchung();
-                                
-                                $buchung->buchungstyp_kurzbz = $row->buchungstyp_kurzbz;
-                                $buchung->buchungstyp_bezeichnung = $row->bezeichnung;
+				$buchung = new buchung();                
+				$buchung->buchungstyp_kurzbz = $row->buchungstyp_kurzbz;
+				$buchung->buchungstyp_bezeichnung = $row->bezeichnung;
                             
-                                $this->result[] = $buchung;
+				$this->result[] = $buchung;
 			}
 			return true;
 		}
@@ -198,5 +388,50 @@ class buchung extends basis_db
 			return false;
 		}				
 	} 
+
+	/**
+	 * Laedt die Buchungen einer Person
+	 *
+	 * @param person_id ID der Person
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getBuchungPerson($person_id)
+	{
+		$qry = "SELECT
+					tbl_buchung.* 
+				FROM 
+					wawi.tbl_buchung 
+					JOIN wawi.tbl_konto USING(konto_id)
+				WHERE 
+					tbl_konto.person_id=".$this->db_add_param($person_id, FHC_INTEGER)." 
+				ORDER BY buchungsdatum";
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new buchung();
+				$obj->buchung_id = $row->buchung_id;
+				$obj->konto_id = $row->konto_id;
+				$obj->kostenstelle_id = $row->kostenstelle_id;
+				$obj->buchungstyp_kurzbz = $row->buchungstyp_kurzbz;
+				$obj->buchungsdatum = $row->buchungsdatum;	
+				$obj->buchungstext = $row->buchungstext;
+				$obj->betrag = $row->betrag;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>

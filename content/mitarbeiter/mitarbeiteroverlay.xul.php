@@ -27,10 +27,18 @@ header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/benutzerberechtigung.class.php');
+
+$user = get_uid();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterdetailoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterfunktionoverlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterbuchungoverlay.xul.php"?>';
 ?>
 <!DOCTYPE overlay >
 
@@ -235,6 +243,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterfunktionove
 				<tab id="mitarbeiter-tab-funktionen" label="BIS-Daten" />
 				<tab id="mitarbeiter-tab-betriebsmittel" label="Betriebsmittel" />
 				<tab id="mitarbeiter-tab-funktionen" label="Funktionen"  oncommand="MitarbeiterFunktionIFrameLoad()"/>
+				<?php 
+				if($rechte->isBerechtigt('buchung/mitarbeiter'))
+					echo '<tab id="mitarbeiter-tab-buchung" label="Buchungen" />';
+				?>
 			</tabs>
 			<tabpanels id="mitarbeiter-tabpanels-main" flex="1">
 				<vbox id="mitarbeiter-detail-stammdaten"  style="margin-top:10px;" />
@@ -242,6 +254,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterfunktionove
 				<vbox id="mitarbeiter-detail-funktionen"  style="margin-top:10px;" />
 				<iframe id="mitarbeiter-betriebsmittel" src="" style="margin-top:10px;" />
 				<iframe id="mitarbeiter-funktionen" src="" style="margin-top:10px;"/>
+				<?php 
+				if($rechte->isBerechtigt('buchung/mitarbeiter'))
+					echo '<vbox id="mitarbeiter-buchung" style="margin-top:10px;" />';
+				?>				
 			</tabpanels>
 		</tabbox>	
 	</vbox>

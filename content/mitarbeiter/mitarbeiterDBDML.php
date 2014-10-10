@@ -19,16 +19,9 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-
-// ****************************************
-// * Script sorgt fuer den Datenbanzugriff
-// * der folgender FASonline Daten:
-// *
-// * - Adressen
-// * - Kontakte
-// * - Bankverbindungen
-// ****************************************
-
+/**
+ * Script zur Veränderung von Mitarbeiterdaten in der Datenbank
+ */
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../config/global.config.inc.php');
 require_once('../../include/functions.inc.php');
@@ -41,6 +34,7 @@ require_once('../../include/bisverwendung.class.php');
 require_once('../../include/bisfunktion.class.php');
 require_once('../../include/entwicklungsteam.class.php');
 require_once('../../include/resturlaub.class.php');
+require_once('../../include/buchung.class.php');
 
 $user = get_uid();
 
@@ -341,6 +335,71 @@ if(!$error)
 		{
 			$return = false;
 			$errormsg = $entwt->errormsg;
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='buchungsave')
+	{
+		if(!$rechte->isBerechtigt('buchung/mitarbeiter',null,'sui'))
+		{
+			$return = false;
+			$errormsg = 'Sie haben keine Berechtigung für diesen Vorgang';
+		}
+		else
+		{
+			//Speichert die Buchungen eines Mitarbeiters
+			$buchung = new buchung();
+
+			$buchung->buchung_id = $_POST['buchung_id'];
+			$buchung->buchungstyp_kurzbz = $_POST['buchungstyp_kurzbz'];
+			$buchung->konto_id = $_POST['konto_id'];
+			$buchung->kostenstelle_id = $_POST['kostenstelle_id'];
+			$buchung->betrag = str_replace(',','.',$_POST['betrag']);
+			$buchung->buchungstext = $_POST['buchungstext'];
+			$buchung->buchungsdatum = $_POST['buchungsdatum'];
+			if($buchung->buchung_id=='')
+			{
+				$buchung->new=true;
+				$buchung->insertamum = date('Y-m-d H:i:s');
+				$buchung->insertvon = $user;
+			}
+			else
+			{
+				$buchung->new=false;
+				$buchung->updateamum = date('Y-m-d H:i:s');
+				$buchung->updatevon = $user;
+			}
+			
+			if($buchung->save())
+			{
+				$return = true;
+			}
+			else 
+			{
+				$errormsg = $buchung->errormsg;
+				$return = false;
+			}
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='buchungdelete')
+	{
+		if(!$rechte->isBerechtigt('buchung/mitarbeiter',null,'suid'))
+		{
+			$return = false;
+			$errormsg = 'Sie haben keine Berechtigung für diesen Vorgang';
+		}
+		else
+		{
+			//Loescht eine Buchung
+			$buchung = new buchung();
+			if($buchung->delete($_POST['buchung_id']))
+			{
+				$return = true;
+			}
+			else 
+			{
+				$return = false;
+				$errormsg = $buchung->errormsg;
+			}
 		}
 	}
 	else
