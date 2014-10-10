@@ -25,6 +25,7 @@ header("Content-type: application/xhtml+xml");
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/basis_db.class.php');
+require_once('ean13.php');
 
 if(isset($_GET['typ']) && $_GET['typ'] == 'lehreinheit')
 {
@@ -55,7 +56,7 @@ if(isset($_GET['typ']) && $_GET['typ'] == 'lehreinheit')
 
 	if($db->db_query($qry))
 	{
-		$stundenblockung = $db->db_num_rows();
+		$einheiten = $db->db_num_rows();
 		
 		while($row = $db->db_fetch_object())
 		{
@@ -70,7 +71,7 @@ if(isset($_GET['typ']) && $_GET['typ'] == 'lehreinheit')
 		echo "\n			<studiengang><![CDATA[".$lehreinheiten[0]->stgbez."]]></studiengang>";
 		echo "\n			<bezeichnung><![CDATA[".$lehreinheiten[0]->lvbez."]]></bezeichnung>";
 		echo "\n			<kuerzel><![CDATA[".$lehreinheiten[0]->lvnr."]]></kuerzel>";
-		echo "\n			<stundenblockung><![CDATA[".$stundenblockung."]]></stundenblockung>";
+		echo "\n			<einheiten><![CDATA[".$einheiten."]]></einheiten>";
 		echo "\n			<ort><![CDATA[".$lehreinheiten[0]->ort_kurzbz."]]></ort>";
 		echo "\n			<datum><![CDATA[".date('d.m.Y', strtotime($lehreinheiten[0]->datum))."]]></datum>";
 		echo "\n			<beginn><![CDATA[".mb_substr($lehreinheiten[0]->beginn, 0, 5)."]]></beginn>";
@@ -87,6 +88,8 @@ if(isset($_GET['typ']) && $_GET['typ'] == 'lehreinheit')
 	
 	if($db->db_query($qry))
 	{
+		echo "\n		<vortragende>";
+		
 		while($row = $db->db_fetch_object())
 		{
 			// Ausgabe der Vortragenden
@@ -97,31 +100,37 @@ if(isset($_GET['typ']) && $_GET['typ'] == 'lehreinheit')
 			echo "\n			<titelpost><![CDATA[".$row->titelpost."]]></titelpost>";
 			echo "\n		</vortragender>";
 		}
+		
+		echo "\n		</vortragende>";
 	}
 		
 
-	// Daten der Teilnehmer ermitteln
-	$qry = "SELECT vorname, nachname, titelpre, titelpost, "
-		. "CASE WHEN note IS NOT NULL THEN 'angerechnet' END AS notiz "
+	// Daten der Studenten ermitteln
+	$qry = "SELECT pe.person_id, vorname, nachname, titelpre, titelpost, note "
 		. "FROM campus.vw_student_lehrveranstaltung stlv "
 		. "JOIN public.tbl_benutzer be ON be.uid = stlv.uid "
 		. "JOIN public.tbl_person pe ON pe.person_id = be.person_id "
-		. "LEFT JOIN campus.tbl_lvgesamtnote lvgn ON (lvgn.lehrveranstaltung_id = stlv.lehrveranstaltung_id AND lvgn.student_uid = stlv.uid) "
+		. "LEFT JOIN lehre.tbl_zeugnisnote zn ON (zn.lehrveranstaltung_id = stlv.lehrveranstaltung_id AND zn.student_uid = stlv.uid) "
 		. "WHERE stlv.lehreinheit_id = " . $db->db_add_param($lehreinheit_id);
 	
 	if($db->db_query($qry))
 	{
+		echo "\n		<studenten>";
+		
 		while($row = $db->db_fetch_object())
 		{
-			// Ausgabe der Teilnehmer
-			echo "\n		<teilnehmer>";
+			// Ausgabe der Studenten
+			echo "\n		<student>";
+			//echo "\n			<barcode><![CDATA[".ean13($row->person_id)."]]></barcode>";
 			echo "\n			<vorname><![CDATA[".$row->vorname."]]></vorname>";
 			echo "\n			<nachname><![CDATA[".$row->nachname."]]></nachname>";
 			echo "\n			<titelpre><![CDATA[".$row->titelpre."]]></titelpre>";
 			echo "\n			<titelpost><![CDATA[".$row->titelpost."]]></titelpost>";
-			echo "\n			<notiz><![CDATA[".$row->notiz."]]></notiz>";
-			echo "\n		</teilnehmer>";
+			echo "\n			<note><![CDATA[".$row->note."]]></note>";
+			echo "\n		</student>";
 		}
+		
+		echo "\n		</studenten>";
 	}
 
 	echo '</anwesenheitslisten>';
