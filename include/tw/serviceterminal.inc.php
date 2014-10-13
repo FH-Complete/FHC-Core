@@ -41,6 +41,23 @@ foreach($serviceterminal_addons->aktive_addons as $addon)
 
 if(!$serviceterminal_addon_found)
 {
+
+	// Raumtyp der per Default am Infoterminal angezeigt wird
+	$ServiceTerminalDefaultRaumtyp='EDV';
+
+	// Liste der Raumtypen die am Infoterminal angezeigt werden
+	$ServiceTerminalRaumtypen=array(
+			array("type"=>"EDV","beschreibung"=>"&nbsp;Freie&nbsp;<br>&nbsp;PC R&auml;ume&nbsp;","img"=>""),
+			array("type"=>"HS","beschreibung"=>"&nbsp;Freie&nbsp;<br>&nbsp;H&ouml;rs&auml;le&nbsp;","img"=>""),
+			array("type"=>"SEM","beschreibung"=>"&nbsp;Freie&nbsp;<br>&nbsp;Seminarr&auml;ume&nbsp;","img"=>""),
+			array("type"=>"Lab","beschreibung"=>"&nbsp;Freie&nbsp;<br>&nbsp;Laborr&auml;ume&nbsp;","img"=>""),
+			);		
+
+	/**
+	 * Prueft ob die Karte verlaengert werden darf
+	 * @param $uid
+	 * @return Array mit boolean und Errormsg
+	 */
 	function ServiceTerminalCheckVerlaengerung($uid)
 	{
 		if(!check_lektor($uid))	
@@ -60,6 +77,11 @@ if(!$serviceterminal_addon_found)
 			return array(false,'Für Mitarbeiter ist eine Kartenverlängerung nicht möglich');
 	}
 
+	/**
+	 * Liefert den Text der auf die Karte gedruckt werden soll oder einer Errormsg
+	 * @param $uid UID des Users
+	 * @return array mit Datum/Drucktext und errorMessage
+	 */ 
 	function ServiceTerminalGetDrucktext($uid)
 	{
 		// hole Semester des letzten eingezahlten Studienbeitrages
