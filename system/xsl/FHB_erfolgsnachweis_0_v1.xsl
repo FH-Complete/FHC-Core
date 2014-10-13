@@ -20,10 +20,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <style:table-properties style:width="17.006cm" fo:margin-left="0cm" table:align="left"/>
     </style:style>
     <style:style style:name="Lehrveranstaltungen.A" style:family="table-column">
-      <style:table-column-properties style:column-width="1.633cm"/>
+      <style:table-column-properties style:column-width="2.200cm"/>
     </style:style>
     <style:style style:name="Lehrveranstaltungen.B" style:family="table-column">
-      <style:table-column-properties style:column-width="0.526cm"/>
+      <style:table-column-properties style:column-width="0.326cm"/>
     </style:style>
     <style:style style:name="Lehrveranstaltungen.C" style:family="table-column">
       <style:table-column-properties style:column-width="7.549cm"/>
@@ -78,7 +78,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       </style:table-cell-properties>
     </style:style>
     <style:style style:name="Lehrveranstaltungen.A3" style:family="table-cell">
-      <style:table-cell-properties fo:padding="0.097cm" fo:border="none"/>
+      <style:table-cell-properties fo:padding="0.147cm" fo:border="none"/>
     </style:style>
     <style:style style:name="Lehrveranstaltungen.B3" style:family="table-cell">
       <style:table-cell-properties fo:padding="0.097cm" fo:border="none"/>
