@@ -34,6 +34,8 @@ require_once('../include/prestudent.class.php');
 $datum = new datum();
 $db = new basis_db();
 
+$lehrveranstaltungen = array();
+
 	if(isset($_GET['uid']))
 		$uid = $_GET['uid'];
 	else 
@@ -249,7 +251,8 @@ function getLVRow($obj)
 			else 	
 				$ectspunkte=number_format($row->ects,2);
 		}
-		$ects_gesamt+=$ectspunkte; 
+		if($row->lv_lehrform_kurzbz!='MOD')
+			$ects_gesamt+=$ectspunkte; 
 		
 		if($note_arr[$row->note]['positiv'])
 			$ects_absolviert+=$ectspunkte;
