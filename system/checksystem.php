@@ -1919,6 +1919,19 @@ if(!$result = @$db->db_query("SELECT wochenstunden FROM public.tbl_benutzerfunkt
 	else
 		echo ' public.tbl_benutzerfunktion: Spalte wochenstunden hinzugefuegt!<br>';
 }
+
+// Tabelle public.tbl_anwesenheit Spalte anmerkung
+if(!$result = @$db->db_query("SELECT anmerkung FROM campus.tbl_anwesenheit"))
+{
+	$qry = "ALTER TABLE campus.tbl_anwesenheit ADD COLUMN anmerkung varchar(256);
+			ALTER TABLE campus.tbl_anwesenheit ADD COLUMN ext_id bigint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_anwesenheit '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' campus.tbl_anwesenheit: Spalte anmerkung, ext_id hinzugefuegt!<br>';
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -1945,7 +1958,7 @@ $tabellen=array(
 	"bis.tbl_zweck"  => array("zweck_code","kurzbz","bezeichnung"),
     "bis.tbl_zgvdoktor" => array("zgvdoktor_code", "zgvdoktor_bez", "zgvdoktor_kurzbz"),
 	"campus.tbl_abgabe"  => array("abgabe_id","abgabedatei","abgabezeit","anmerkung"),
-	"campus.tbl_anwesenheit"  => array("anwesenheit_id","uid","einheiten","datum","anwesend","lehreinheit_id"),
+	"campus.tbl_anwesenheit"  => array("anwesenheit_id","uid","einheiten","datum","anwesend","lehreinheit_id","anmerkung","ext_id"),
 	"campus.tbl_beispiel"  => array("beispiel_id","uebung_id","nummer","bezeichnung","punkte","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_benutzerlvstudiensemester"  => array("uid","studiensemester_kurzbz","lehrveranstaltung_id"),
 	"campus.tbl_content"  => array("content_id","template_kurzbz","updatevon","updateamum","insertamum","insertvon","oe_kurzbz","menu_open","aktiv","beschreibung"),
