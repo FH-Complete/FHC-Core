@@ -25,7 +25,7 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 class anwesenheit extends basis_db
 {
 	public $new=true;			//  boolean
-	public $result = array();	//  adresse Objekt
+	public $result = array();
 
 	public $anwesenheit_id; 	// serial
 	public $uid; 				// varchar(32)
@@ -117,7 +117,7 @@ class anwesenheit extends basis_db
 	/**
 	 * Speichert den aktuellen Datensatz in die Datenbank
 	 * Wenn $neu auf true gesetzt ist wird ein neuer Datensatz angelegt
-	 * andernfalls wird der Datensatz mit der ID in $adresse_id aktualisiert
+	 * andernfalls wird der bestehende Datensatz aktualisiert
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	public function save()
