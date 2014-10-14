@@ -70,8 +70,8 @@ class AqaClientTest extends PHPUnit_Framework_TestCase
 	public function testPing() {
         $params->userName = AQA_USERNAME;
         $params->passWord = AQA_PASSWORD;
-        $params->stgKz = '0256';
-        $params->studJahrCode = '20';
+        $params->stgKz = '0227';
+        $params->studJahrCode = '19';
         $params->runde = '2';
 
         $client = new SoapClient(AQA_ERHALTERSERVICE,array( 
@@ -90,9 +90,9 @@ class AqaClientTest extends PHPUnit_Framework_TestCase
 	}
 	
 	public function testClient() {
-		$stgKz = '0256';
-		$studjahrCode = 2013;
-		$runde = 2;
+		$stgKz = '0228';
+		$studjahrCode = 2012;
+		$runde = 3;
 		$client = new AqaFoebisClient();
 		$result = $client->listFoebisAbrechnungStudiengang($stgKz,$studjahrCode,$runde);
 	}
