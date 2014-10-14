@@ -518,7 +518,7 @@ function checkZeilenUmbruch()
 	checkZeilenUmbruch();
 	
 	//Gesamtnote
-	if($is_lector)
+	if($is_lector && (!defined('CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN))
 	{
 		$eintraegeprozeile++;
 		echo '<td class="tdvertical" align="center">';
