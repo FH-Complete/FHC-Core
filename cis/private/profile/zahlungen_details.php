@@ -161,7 +161,7 @@ foreach($addon->result as $a)
 	echo '<table class="tablesorter">
 	    <thead>
 		<tr>
-		    <th width="40%">Bezahlen</th>
+		    <th width="40%">Zahlung anweisen</th>
 		    <th width="60%"></th>
 		</tr>
 	    </thead>
