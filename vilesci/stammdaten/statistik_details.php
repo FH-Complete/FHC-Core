@@ -63,7 +63,7 @@ if(!$rechte->isBerechtigt('basis/statistik'))
 		$content_id = (isset($_POST['content_id'])?$_POST['content_id']:die('ContentID fehlt'));
 		$php = (isset($_POST['php'])?$_POST['php']:die('PHP fehlt'));
 		$r = (isset($_POST['r'])?$_POST['r']:die('R fehlt'));
-		$publish = (isset($_POST['publish'])?$_POST['publish']:die('Publish fehlt'));
+		$publish = (isset($_POST['publish'])?true:false);
 		$new = (isset($_POST['new'])?$_POST['new']:die('New fehlt'));
 		$berechtigung_kurzbz = (isset($_POST['berechtigung_kurzbz'])?$_POST['berechtigung_kurzbz']:die('Berechtigungkurzbz fehlt'));
 		
@@ -182,7 +182,7 @@ if(!$rechte->isBerechtigt('basis/statistik'))
 	echo '<tr valign="top">';
 	echo '   <td></td>';
 	echo '   <td>Publish</td>';
-	echo '   <td><input type="text" name="publish" value="'.$statistik->publish.'"></td>';
+	echo '   <td><input type="checkbox" name="publish" '.($statistik->publish?'checked="checked"':'').'></td>';
 	echo '</tr>';
 	
 	echo '<tr>';

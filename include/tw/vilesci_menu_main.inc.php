@@ -226,23 +226,12 @@ $menu=array
 	(
 		'name'=>'Auswertung', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support','assistenz','wawi/inventar','basis/statistik'), 'image'=>'vilesci_statistik.png',
 		'link'=>'left.php?categorie=Auswertung', 'target'=>'nav',
-	/*
-		'Raumauslastung'=>array('name'=>'Raumauslastung...', 'link'=>'lehre/raumauslastung.php', 'target'=>'main'),
-		'Verplanungsuebersicht'=>array('name'=>'Verplanungsübersicht...', 'link'=>'lehre/check/verplanungsuebersicht.php', 'target'=>'main'),
-		'Zeitwünsche'=>array('name'=>'Zeitwünsche', 'link'=>'lehre/zeitwuensche.php', 'target'=>'main'),
-		'Institute'=>array('name'=>'Institute (+)', 'link'=>'personen/institutsliste.php', 'target'=>'main'),
-		'Student/Semester'=>array('name'=>'Student/Semester', 'link'=>'https://vilesci.technikum-wien.at/content/statistik/studentenprosemester.php', 'target'=>'main'),
-		'ALVS-Statistik'=>array('name'=>'ALVS-Statistik', 'link'=>'https://vilesci.technikum-wien.at/content/statistik/alvsstatistik.php', 'target'=>'main'),
-		'LV-Planung Gesamt'=>array('name'=>'LV-Planung Gesamt (+)', 'link'=>'https://vilesci.technikum-wien.at/content/statistik/lvplanunggesamtsj.php', 'target'=>'main'),
-		'Bewerberstatistik'=>array('name'=>'Bewerberstatistik (+)', 'link'=>'https://vilesci.technikum-wien.at/content/statistik/bewerberstatistik.php', 'target'=>'main'),
-		'Abgängerstatistik'=>array('name'=>'Abgängerstatistik... (~)', 'link'=>'https://vilesci.technikum-wien.at/content/statistik/abgaengerstatistik.php', 'target'=>'main'),
-		'Absolventenstatistik'=>array('name'=>'Absolventenstatistik(~)', 'link'=>'https://vilesci.technikum-wien.at/content/statistik/absolventenstatistik.php', 'target'=>'main'),
-		'Absolventenzahlen'=>array('name'=>'Absolventenzahlen', 'link'=>'https://vilesci.technikum-wien.at/content/statistik/absolventenzahlen.php', 'target'=>'main'),
-		'Studentenstatistik'=>array('name'=>'Studentenstatistik (+)', 'link'=>'https://vilesci.technikum-wien.at/content/statistik/studentenstatistik.php', 'target'=>'main'),
-		'Lektorenstatistik'=>array('name'=>'Lektorenstatistik', 'link'=>'https://vilesci.technikum-wien.at/content/statistik/lektorenstatistik.php', 'target'=>'main'),
-		'Mitarbeiterstatistik'=>array('name'=>'Mitarbeiterstatistik', 'link'=>'https://vilesci.technikum-wien.at/content/statistik/mitarbeiterstatistik.php', 'target'=>'main'),
-		'Stromanalyse'=>array('name'=>'Stromanalyse...', 'link'=>'https://vilesci.technikum-wien.at/content/statistik/bama_stromanalyse.php', 'target'=>'main'),
-	*/		
+		'Administration'=>	array
+		(
+			'name'=>'Administration', 'permissions'=>array('basis/statistik'),
+			'Statistik'=>array('name'=>'Statistik', 'link'=>'stammdaten/statistik_frameset.html', 'target'=>'main','permissions'=>array('basis/statistik')),
+			'Filter'=>array('name'=>'Filter', 'link'=>'statistik/filter_frameset.html', 'target'=>'main','permissions'=>array('basis/statistik')),
+		),
 	),
 	'Inventar'=>	array
 	(
