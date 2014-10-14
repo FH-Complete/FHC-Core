@@ -75,7 +75,7 @@ class statistik extends basis_db
 				FROM
 					public.tbl_statistik
 				WHERE
-					statistik_kurzbz='".addslashes($statistik_kurzbz)."'";
+					statistik_kurzbz=".$this->db_add_param($statistik_kurzbz);
 		
 		if($result = $this->db_query($qry))
 		{
@@ -89,7 +89,7 @@ class statistik extends basis_db
 				$this->php = $row->php;
 				$this->r = $row->r;
 				$this->gruppe = $row->gruppe;
-				$this->publish = $row->publish;
+				$this->publish = $this->db_parse_bool($row->publish);
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
@@ -133,7 +133,7 @@ class statistik extends basis_db
 				$obj->php = $row->php;
 				$obj->r = $row->r;
 				$obj->gruppe = $row->gruppe;
-				$obj->publish = $row->publish;
+				$obj->publish = $this->db_parse_bool($row->publish);
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
@@ -158,9 +158,9 @@ class statistik extends basis_db
 	public function getAnzahlGruppe($publish=null)
 	{
 		$qry = 'SELECT gruppe, count(*) AS anzahl FROM public.tbl_statistik ';
-		if ($publish=='true')
+		if ($publish==true)
 			$qry.='WHERE publish ';
-		elseif ($publish=='false')
+		elseif ($publish==false)
 			$qry.='WHERE NOT publish ';
 		$qry.=' GROUP BY gruppe ORDER BY gruppe;';
 		// echo $qry;
@@ -206,7 +206,7 @@ class statistik extends basis_db
 					$this->db_add_param($this->php).','.
 					$this->db_add_param($this->r).','.
 					$this->db_add_param($this->gruppe).','.
-					$this->db_add_param($this->publish).','.
+					$this->db_add_param($this->publish, FHC_BOOLEAN).','.
 					$this->db_add_param($this->insertamum).','.
 					$this->db_add_param($this->insertvon).','.
 					$this->db_add_param($this->updateamum).','.
@@ -226,7 +226,7 @@ class statistik extends basis_db
 				' php='.$this->db_add_param($this->php).','.
 				' r='.$this->db_add_param($this->r).','.
 				' gruppe='.$this->db_add_param($this->gruppe).','.
-				' publish='.$this->db_add_param($this->publish).','.
+				' publish='.$this->db_add_param($this->publish, FHC_BOOLEAN).','.
 				' insertamum='.$this->db_add_param($this->insertamum).','.
 				' insertvon='.$this->db_add_param($this->insertvon).','.
 				' updateamum='.$this->db_add_param($this->updateamum).','.
@@ -297,7 +297,7 @@ class statistik extends basis_db
 	 */
 	public function delete($statistik_kurzbz)
 	{
-		$qry = "DELETE FROM public.tbl_statistik WHERE statistik_kurzbz='".addslashes($statistik_kurzbz)."';";
+		$qry = "DELETE FROM public.tbl_statistik WHERE statistik_kurzbz=".$this->db_add_param($statistik_kurzbz).";";
 		
 		if($this->db_query($qry))
 		{
@@ -345,17 +345,17 @@ class statistik extends basis_db
 			WHERE 
 				status_kurzbz='Student'
 				AND NOT EXISTS(SELECT 1 FROM public.tbl_prestudentstatus WHERE status_kurzbz='Student' AND datum<status.datum AND prestudent_id=status.prestudent_id) 
-				AND studiengang_kz=".$studiengang_kz;
+				AND studiengang_kz=".$this->db_add_param($studiengang_kz);
 		if($ausbildungssemester!='')
-			$qry.="	AND ausbildungssemester=".$ausbildungssemester;
+			$qry.="	AND ausbildungssemester=".$this->db_add_param($ausbildungssemester);
 		
-		$qry.="	AND ((studiensemester_kurzbz='".$studiensemester_kurzbz."'";
+		$qry.="	AND ((studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 		if (!is_null($datum_stichtag))
-			$qry.="	AND datum <='".$datum_stichtag."'";
+			$qry.="	AND datum <=".$this->db_add_param($datum_stichtag);
 		$qry.=') ';
-		$qry.=" OR (studiensemester_kurzbz='".$studiensemester_kurzbz."'";
+		$qry.=" OR (studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 		if (!is_null($datum_stichtag))
-			$qry.="	AND datum <='".$datum_stichtag."'";
+			$qry.="	AND datum <=".$this->db_add_param($datum_stichtag);
 		$qry.="))";
 		$qry.=" ORDER BY prestudent_id;";
 		
@@ -409,13 +409,13 @@ class statistik extends basis_db
 		$qry="SELECT DISTINCT prestudent_id, geschlecht, studiengang_kz, ausbildungssemester, studiensemester_kurzbz
 			FROM tbl_prestudent JOIN tbl_prestudentstatus USING (prestudent_id) JOIN tbl_person USING (person_id) 
 			WHERE (status_kurzbz='Abbrecher') 
-			AND studiengang_kz=".$studiengang_kz;
+			AND studiengang_kz=".$this->db_add_param($studiengang_kz);
 		if($ausbildungssemester!='')
-			$qry.="	AND ausbildungssemester=".$ausbildungssemester;
+			$qry.="	AND ausbildungssemester=".$this->db_add_param($ausbildungssemester);
 		
-		$qry.="	AND (studiensemester_kurzbz='".$studiensemester_kurzbz."'";
+		$qry.="	AND (studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 		if (!is_null($datum_stichtag))
-			$qry.="	AND datum <='".$datum_stichtag."'";
+			$qry.="	AND datum <=".$this->db_add_param($datum_stichtag);
 		$qry.=') ';
 		$qry.=" ORDER BY prestudent_id;";
 		
