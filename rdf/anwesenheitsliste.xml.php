@@ -66,10 +66,16 @@ if(isset($_GET['typ']) && $_GET['typ'] == 'lehreinheit')
 			$lehreinheiten[] = $row;
 		}
 		
+		// Barcode erstellen
+		$paddedLehreinheitId = str_pad($lehreinheit_id, 6, "0", STR_PAD_LEFT);
+		$convertableString = date('ymd', strtotime($datum)) . $paddedLehreinheitId;
+		$barcode = ean13($convertableString);
+		
 		// Ausgabe der Lehrveranstaltung
 		echo "\n		<lehreinheit>";
 		echo "\n			<studiengang><![CDATA[".$lehreinheiten[0]->stgbez."]]></studiengang>";
 		echo "\n			<bezeichnung><![CDATA[".$lehreinheiten[0]->lvbez."]]></bezeichnung>";
+		echo "\n			<barcode><![CDATA[".ean13($convertableString)."]]></barcode>";
 		echo "\n			<kuerzel><![CDATA[".$lehreinheiten[0]->lvnr."]]></kuerzel>";
 		echo "\n			<einheiten><![CDATA[".$einheiten."]]></einheiten>";
 		echo "\n			<ort><![CDATA[".$lehreinheiten[0]->ort_kurzbz."]]></ort>";
@@ -119,9 +125,13 @@ if(isset($_GET['typ']) && $_GET['typ'] == 'lehreinheit')
 		
 		while($row = $db->db_fetch_object())
 		{
+			// Barcode erstellen
+			$paddedPersonId = str_pad($row->person_id, 12, "0", STR_PAD_LEFT);
+			$barcode = ean13($paddedPersonId);
+
 			// Ausgabe der Studenten
 			echo "\n		<student>";
-			//echo "\n			<barcode><![CDATA[".ean13($row->person_id)."]]></barcode>";
+			echo "\n			<barcode><![CDATA[".$barcode."]]></barcode>";
 			echo "\n			<vorname><![CDATA[".$row->vorname."]]></vorname>";
 			echo "\n			<nachname><![CDATA[".$row->nachname."]]></nachname>";
 			echo "\n			<titelpre><![CDATA[".$row->titelpre."]]></titelpre>";
