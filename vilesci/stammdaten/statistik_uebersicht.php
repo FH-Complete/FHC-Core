@@ -90,6 +90,7 @@ echo '<table class="tablesorter" id="myTable">
 			<th>Kurzbz</th>
 			<th>Bezeichnung</th>
 			<th>Gruppe</th>
+			<th>Publish</th>
 			<th>ContentID</th>
 			<th colspan="2">Aktion</th>
 		</tr>
@@ -102,6 +103,7 @@ foreach($statistik->result as $row)
 	echo '<td><a href="statistik_details.php?action=update&statistik_kurzbz=',$row->statistik_kurzbz,' " target="detail_statistik">',$row->statistik_kurzbz,'</a></td>';
 	echo '<td>',$row->bezeichnung,'</td>';
 	echo '<td>',$row->gruppe,'</td>';
+	echo '<td>',$row->publish,'</td>';
 	echo '<td>',$row->content_id,'</td>';
 	echo '<td><a href="statistik_details.php?action=update&statistik_kurzbz=',$row->statistik_kurzbz,' " target="detail_statistik">bearbeiten</a></td>';
 	echo '<td><a href="statistik_uebersicht.php?action=delete&statistik_kurzbz=',$row->statistik_kurzbz,' " onclick="return confdel()">entfernen</a></td>';

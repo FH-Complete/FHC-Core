@@ -41,6 +41,16 @@ echo '<H2>DB-Updates!</H2>';
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
 
+// **************** Spalte publish Tabelle public.tbl_statistik
+if(!$result = @$db->db_query("SELECT publish FROM public.tbl_statistik LIMIT 1;"))
+{
+	$qry = 'ALTER TABLE public.tbl_statistik ADD COLUMN publish boolean DEFAULT false;';
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_statistik: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' public.tbl_statistik: Spalte publish hinzugefuegt!<br>';
+}
+
 // **************** Spalte scrumsprint_id Tabelle fue.tbl_projekttask
 if(!$result = @$db->db_query("SELECT scrumsprint_id FROM fue.tbl_projekttask LIMIT 1;"))
 {
