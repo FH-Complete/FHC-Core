@@ -411,7 +411,7 @@ function submitable()
 
 <?php
 	echo $htmlstr;
-	echo $reloadstr;
+	//echo $reloadstr;
 ?>
 
 </body>
