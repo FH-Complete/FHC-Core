@@ -112,10 +112,14 @@ if(isset($_GET['typ']) && $_GET['typ'] == 'lehreinheit')
 		
 
 	// Daten der Studenten ermitteln
-	$qry = "SELECT pe.person_id, vorname, nachname, titelpre, titelpost, note "
+	$qry = "SELECT pe.person_id, vorname, nachname, titelpre, titelpost, note, "
+		. "CASE WHEN preincoming_id IS NULL THEN '0' "
+		. "ELSE '1' "
+		. "END AS incoming "
 		. "FROM campus.vw_student_lehrveranstaltung stlv "
 		. "JOIN public.tbl_benutzer be ON be.uid = stlv.uid "
 		. "JOIN public.tbl_person pe ON pe.person_id = be.person_id "
+		. "LEFT JOIN public.tbl_preincoming inc ON inc.person_id = pe.person_id "
 		. "LEFT JOIN lehre.tbl_zeugnisnote zn ON (zn.lehrveranstaltung_id = stlv.lehrveranstaltung_id AND zn.student_uid = stlv.uid) "
 		. "WHERE stlv.lehreinheit_id = " . $db->db_add_param($lehreinheit_id);
 	
@@ -137,6 +141,7 @@ if(isset($_GET['typ']) && $_GET['typ'] == 'lehreinheit')
 			echo "\n			<titelpre><![CDATA[".$row->titelpre."]]></titelpre>";
 			echo "\n			<titelpost><![CDATA[".$row->titelpost."]]></titelpost>";
 			echo "\n			<note><![CDATA[".$row->note."]]></note>";
+			echo "\n			<incoming><![CDATA[".$row->incoming."]]></incoming>";
 			echo "\n		</student>";
 		}
 		
