@@ -226,8 +226,14 @@ echo '</td><td width="30%" valign="top">';
 echo '
 		<b>'.($type=="student"?$p->t("profil/student"):$p->t('profil/mitarbeiter')).'</b><br><br>
 		'.$p->t('global/username').': '.$user->uid.'<br>
-		'.$p->t('global/titel').': '.$user->titelpre.' <br>
-  		'.$p->t('global/vorname').': '.$user->vorname.'  '.$user->vornamen.'<br>
+		'.$p->t('global/titel').': '.$user->titelpre.' <br>';
+
+if(!$ansicht)
+	echo $p->t('global/vorname').': '.$user->vorname.'  '.$user->vornamen.'<br>';
+else
+	echo $p->t('global/vorname').': '.$user->vorname.'  <br>';
+
+echo '
    		'.$p->t('global/nachname').': '.$user->nachname.'<br>
   		'.$p->t('global/postnomen').': '.$user->titelpost.'<br><br>';
 		

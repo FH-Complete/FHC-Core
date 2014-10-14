@@ -44,7 +44,7 @@ $uid=get_uid();
 <HTML>
 <HEAD>
 	<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<TITLE><?php echo $p->t('lvplan/lehrveranstaltungsplan');?> Technikum-Wien</TITLE>
+	<TITLE><?php echo $p->t('lvplan/lehrveranstaltungsplan').' '.CAMPUS_NAME;?></TITLE>
 	<script type="text/javascript">
 		<!--
 		function MM_jumpMenu(targ,selObj,restore)
