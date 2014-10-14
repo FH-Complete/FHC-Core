@@ -35,6 +35,7 @@ class statistik extends basis_db
 	public $php;
 	public $r;
 	public $gruppe;
+	public $publish;
 	public $insertamum;
 	public $insertvon;
 	public $updateamum;
@@ -46,6 +47,8 @@ class statistik extends basis_db
 	public $geschlecht;			// char(1)
 	public $studiensemester_kurzbz;// varchar(16)
 	public $ausbildungssemester;// smallint
+	
+	public $anzahl; //Hilfsvariable fuer Group BY Abfragen
 	
 	// Daten der Statistik
 	public $data;
@@ -86,6 +89,7 @@ class statistik extends basis_db
 				$this->php = $row->php;
 				$this->r = $row->r;
 				$this->gruppe = $row->gruppe;
+				$this->publish = $row->publish;
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
@@ -129,6 +133,7 @@ class statistik extends basis_db
 				$obj->php = $row->php;
 				$obj->r = $row->r;
 				$obj->gruppe = $row->gruppe;
+				$obj->publish = $row->publish;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
@@ -146,7 +151,39 @@ class statistik extends basis_db
 			return false;
 		}			
 	}
-	
+	/**
+	 * Laedt alle Statistik Gruppen, Parameter publish zum Filtern.
+	 * @return true wenn ok, sonst false
+	 */
+	public function getAnzahlGruppe($publish=null)
+	{
+		$qry = 'SELECT gruppe, count(*) AS anzahl FROM public.tbl_statistik ';
+		if ($publish=='true')
+			$qry.='WHERE publish ';
+		elseif ($publish=='false')
+			$qry.='WHERE NOT publish ';
+		$qry.=' GROUP BY gruppe ORDER BY gruppe;';
+		// echo $qry;
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new statistik();
+				
+				$obj->gruppe = $row->gruppe;
+				$obj->anzahl = $row->anzahl;
+				
+				$this->result[] = $obj;
+			}
+			
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}			
+	}
 	/**
 	 * Speichert einen Statistik Datensatz
 	 * @param $new boolean
@@ -160,42 +197,44 @@ class statistik extends basis_db
 		if($new)
 		{
 			$qry = 'INSERT INTO public.tbl_statistik(statistik_kurzbz, content_id, bezeichnung, url, sql, 
-					php, r, gruppe, insertamum, insertvon, updateamum, updatevon, berechtigung_kurzbz) VALUES('.
-					$this->addslashes($this->statistik_kurzbz).','.
-					$this->addslashes($this->content_id).','.
-					$this->addslashes($this->bezeichnung).','.
-					$this->addslashes($this->url).','.
-					$this->addslashes($this->sql).','.
-					$this->addslashes($this->php).','.
-					$this->addslashes($this->r).','.
-					$this->addslashes($this->gruppe).','.
-					$this->addslashes($this->insertamum).','.
-					$this->addslashes($this->insertvon).','.
-					$this->addslashes($this->updateamum).','.
-					$this->addslashes($this->updatevon).','.
-					$this->addslashes($this->berechtigung_kurzbz).');';
+					php, r, gruppe, publish, insertamum, insertvon, updateamum, updatevon, berechtigung_kurzbz) VALUES('.
+					$this->db_add_param($this->statistik_kurzbz).','.
+					$this->db_add_param($this->content_id,FHC_INTEGER).','.
+					$this->db_add_param($this->bezeichnung).','.
+					$this->db_add_param($this->url).','.
+					$this->db_add_param($this->sql).','.
+					$this->db_add_param($this->php).','.
+					$this->db_add_param($this->r).','.
+					$this->db_add_param($this->gruppe).','.
+					$this->db_add_param($this->publish).','.
+					$this->db_add_param($this->insertamum).','.
+					$this->db_add_param($this->insertvon).','.
+					$this->db_add_param($this->updateamum).','.
+					$this->db_add_param($this->updatevon).','.
+					$this->db_add_param($this->berechtigung_kurzbz).');';
 		}
 		else
 		{
 			if($this->statistik_kurzbz_orig=='')
 				$this->statistik_kurzbz_orig=$this->statistik_kurzbz;
 			$qry = 'UPDATE public.tbl_statistik SET
-				content_id='.$this->addslashes($this->content_id).','.
-				' bezeichnung='.$this->addslashes($this->bezeichnung).','.
-				' statistik_kurzbz='.$this->addslashes($this->statistik_kurzbz).','.
-				' url='.$this->addslashes($this->url).','.
-				' sql='.$this->addslashes($this->sql).','.
-				' php='.$this->addslashes($this->php).','.
-				' r='.$this->addslashes($this->r).','.
-				' gruppe='.$this->addslashes($this->gruppe).','.
-				' insertamum='.$this->addslashes($this->insertamum).','.
-				' insertvon='.$this->addslashes($this->insertvon).','.
-				' updateamum='.$this->addslashes($this->updateamum).','.
-				' updatevon='.$this->addslashes($this->updatevon).','.
-				' berechtigung_kurzbz='.$this->addslashes($this->berechtigung_kurzbz).
-				" WHERE statistik_kurzbz='".addslashes($this->statistik_kurzbz_orig)."'";
+				content_id='.$this->db_add_param($this->content_id,FHC_INTEGER).','.
+				' bezeichnung='.$this->db_add_param($this->bezeichnung).','.
+				' statistik_kurzbz='.$this->db_add_param($this->statistik_kurzbz).','.
+				' url='.$this->db_add_param($this->url).','.
+				' sql='.$this->db_add_param($this->sql).','.
+				' php='.$this->db_add_param($this->php).','.
+				' r='.$this->db_add_param($this->r).','.
+				' gruppe='.$this->db_add_param($this->gruppe).','.
+				' publish='.$this->db_add_param($this->publish).','.
+				' insertamum='.$this->db_add_param($this->insertamum).','.
+				' insertvon='.$this->db_add_param($this->insertvon).','.
+				' updateamum='.$this->db_add_param($this->updateamum).','.
+				' updatevon='.$this->db_add_param($this->updatevon).','.
+				' berechtigung_kurzbz='.$this->db_add_param($this->berechtigung_kurzbz).
+				' WHERE statistik_kurzbz='.$this->db_add_param($this->statistik_kurzbz_orig,FHC_STRING,false);
 		}
-		
+		//echo $qry;
 		if($this->db_query($qry))
 		{
 			return true;
