@@ -330,7 +330,7 @@ class filter extends basis_db
 			if($this->new)
 			{
 				//naechste ID aus der Sequence holen
-				$qry="SELECT currval('system.seq_filter_filter_id') as id;";
+				$qry="SELECT currval('public.seq_filter_filter_id') as id;";
 				if($this->db_query($qry))
 				{
 					if($row = $this->db_fetch_object())
@@ -380,7 +380,7 @@ class filter extends basis_db
 		}
 
 		//loeschen des Datensatzes
-		$qry="DELETE FROM system.tbl_filter WHERE filter_id=".$this->db_add_param($filter_id, FHC_INTEGER, false).";";
+		$qry="DELETE FROM public.tbl_filter WHERE filter_id=".$this->db_add_param($filter_id, FHC_INTEGER, false).";";
 
 		if($this->db_query($qry))
 		{
