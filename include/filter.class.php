@@ -294,7 +294,7 @@ class filter extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 			$qry='INSERT INTO public.tbl_filter (kurzbz, sql, valuename,
-					showvalue, type, htmlattr insertamum, insertvon) VALUES ('.
+					showvalue, type, htmlattr, insertamum, insertvon) VALUES ('.
 			      $this->db_add_param($this->kurzbz).', '.
 			      $this->db_add_param($this->sql).', '.
 			      $this->db_add_param($this->valuename).', '.
