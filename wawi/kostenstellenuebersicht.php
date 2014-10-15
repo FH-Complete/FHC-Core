@@ -202,7 +202,7 @@ if(isset($_GET['method']))
 	 	 	echo "</tr>\n";
 	 	 	echo "<tr>\n";
 	 	 	echo "<td>Kurzbezeichnung</td>\n";
-	 	 	echo "<td><input type=\"text\" size=\"32\" maxlength =\"32\" name=\"kurzbezeichnung\" value=\"\"></td>\n";
+	 	 	echo "<td><input type=\"text\" size=\"32\" maxlength =\"7\" name=\"kurzbezeichnung\" value=\"\"></td>\n";
 	 	 	echo "</tr>\n";
 	 	 	echo "<tr>\n";
 	 	 	echo "<td>Kostenstellen Nr.</td>\n";
