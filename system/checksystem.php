@@ -1955,6 +1955,70 @@ if(!$result = @$db->db_query("SELECT fgm FROM public.tbl_prestudentstatus LIMIT 
 	else 
 		echo ' public.tbl_prestudentstatus: Spalte fgm und faktiv hinzugefuegt!<br>';
 }
+
+// Spalte type und htmlattr Tabelle public.tbl_filter
+if(!$result = @$db->db_query("SELECT type FROM public.tbl_filter LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_filter ADD COLUMN type varchar(256);
+			ALTER TABLE public.tbl_filter ADD COLUMN htmlattr text;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_filter: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' public.tbl_filter: Spalte type und htmlattr hinzugefuegt!<br>';
+}
+
+// Tabelle Aufnahmetermin und Aufnahmetermintyp
+if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_aufnahmetermin LIMIT 1;"))
+{
+	$qry = "
+	CREATE TABLE public.tbl_aufnahmetermin
+	(
+		aufnahmetermin_id bigint NOT NULL,
+		aufnahmetermintyp_kurzbz varchar(32) NOT NULL,
+		prestudent_id integer NOT NULL,
+		termin timestamp,
+		teilgenommen boolean NOT NULL,
+		bewertung text,
+		protokoll text,
+		insertamum timestamp,
+		insertvon varchar(32),
+		updateamum timestamp,
+		updatevon varchar(32),
+		ext_id bigint
+	);
+	COMMENT ON TABLE public.tbl_aufnahmetermin IS 'Termine fuer Erstgespraeche, Reihungstests, Inskriptionstermine, etc';
+
+	ALTER TABLE public.tbl_aufnahmetermin ADD CONSTRAINT pk_aufnahmetermin PRIMARY KEY (aufnahmetermin_id);
+	CREATE SEQUENCE public.seq_aufnahmetermin_aufnahmetermin_id
+	INCREMENT BY 1
+	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+
+	ALTER TABLE public.tbl_aufnahmetermin ALTER COLUMN aufnahmetermin_id SET DEFAULT nextval('public.seq_aufnahmetermin_aufnahmetermin_id');
+	ALTER TABLE public.tbl_aufnahmetermin ADD CONSTRAINT fk_aufnahmetermin_prestudent FOREIGN KEY (prestudent_id) REFERENCES public.tbl_prestudent(prestudent_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+	CREATE TABLE public.tbl_aufnahmetermintyp
+	(
+		aufnahmetermintyp_kurzbz Character varying(32) NOT NULL,
+		bezeichnung Character varying(256)
+	);
+
+	ALTER TABLE public.tbl_aufnahmetermintyp ADD CONSTRAINT pk_aufnahmetermintyp PRIMARY KEY (aufnahmetermintyp_kurzbz);
+	ALTER TABLE public.tbl_aufnahmetermin ADD CONSTRAINT fk_aufnahmetermin_aufnahmetermintyp FOREIGN KEY (aufnahmetermintyp_kurzbz) REFERENCES public.tbl_aufnahmetermintyp(aufnahmetermintyp_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_aufnahmetermin TO vilesci;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_aufnahmetermintyp TO vilesci;
+	GRANT SELECT, UPDATE ON public.seq_aufnahmetermin_aufnahmetermin_id TO vilesci;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_aufnahmetermin: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' public.tbl_aufnahmetermin: Tabelle public.tbl_aufnahmetermin und public.tbl_aufnahmetermintyp hinzugefuegt!<br>';
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -2095,6 +2159,8 @@ $tabellen=array(
 	"public.tbl_ampel_benutzer_bestaetigt"  => array("ampel_benutzer_bestaetigt_id","ampel_id","uid","insertamum","insertvon"),
 	"public.tbl_aufmerksamdurch"  => array("aufmerksamdurch_kurzbz","beschreibung","ext_id"),
 	"public.tbl_aufnahmeschluessel"  => array("aufnahmeschluessel"),
+	"public.tbl_aufnahmetermin" => array("aufnahmetermin_id","aufnahmetermintyp_kurzbz","prestudent_id","termin","teilgenommen","bewertung","protokoll","insertamum","insertvon","updateamum","updatevon","ext_id"),
+	"public.tbl_aufnahmetermintyp" => array("aufnahmetermintyp_kurzbz","bezeichnung"),
 	"public.tbl_bankverbindung"  => array("bankverbindung_id","person_id","name","anschrift","bic","blz","iban","kontonr","typ","verrechnung","updateamum","updatevon","insertamum","insertvon","ext_id","oe_kurzbz"),
 	"public.tbl_benutzer"  => array("uid","person_id","aktiv","alias","insertamum","insertvon","updateamum","updatevon","ext_id","updateaktivvon","updateaktivam","aktivierungscode"),
 	"public.tbl_benutzerfunktion"  => array("benutzerfunktion_id","fachbereich_kurzbz","uid","oe_kurzbz","funktion_kurzbz","semester", "datum_von","datum_bis", "updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung","wochenstunden"),
@@ -2105,7 +2171,7 @@ $tabellen=array(
 	"public.tbl_dokumentstudiengang"  => array("dokument_kurzbz","studiengang_kz","ext_id", "onlinebewerbung"),
 	"public.tbl_erhalter"  => array("erhalter_kz","kurzbz","bezeichnung","dvr","logo","zvr"),
 	"public.tbl_fachbereich"  => array("fachbereich_kurzbz","bezeichnung","farbe","studiengang_kz","aktiv","ext_id","oe_kurzbz"),
-	"public.tbl_filter" => array("filter_id","kurzbz","sql","valuename","showvalue","insertamum","insertvon","updateamum","updatevon"),
+	"public.tbl_filter" => array("filter_id","kurzbz","sql","valuename","showvalue","insertamum","insertvon","updateamum","updatevon","type","htmlattr"),
 	"public.tbl_firma"  => array("firma_id","name","anmerkung","firmentyp_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id","schule","finanzamt","steuernummer","gesperrt","aktiv"),
 	"public.tbl_firma_mobilitaetsprogramm" => array("firma_id","mobilitaetsprogramm_code"),
 	"public.tbl_firma_organisationseinheit"  => array("firma_organisationseinheit_id","firma_id","oe_kurzbz","bezeichnung","kundennummer","updateamum","updatevon","insertamum","insertvon","ext_id"),
