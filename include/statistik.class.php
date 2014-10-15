@@ -152,6 +152,46 @@ class statistik extends basis_db
 		}			
 	}
 	/**
+	 * Laedt alle Statistiken
+	 * @return true wenn ok, sonst false
+	 */
+	public function getGruppe($gruppe)
+	{
+		$qry = "SELECT * FROM public.tbl_statistik WHERE gruppe='$gruppe'";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new statistik();
+				
+				$obj->statistik_kurzbz = $row->statistik_kurzbz;
+				$obj->content_id = $row->content_id;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->url = $row->url;
+				$obj->sql = $row->sql;
+				$obj->php = $row->php;
+				$obj->r = $row->r;
+				$obj->gruppe = $row->gruppe;
+				$obj->publish = $this->db_parse_bool($row->publish);
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->udpatevon = $row->updatevon;
+				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
+				
+				$this->result[] = $obj;
+			}
+			
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}			
+	}
+	/**
 	 * Laedt alle Statistik Gruppen, Parameter publish zum Filtern.
 	 * @return true wenn ok, sonst false
 	 */
