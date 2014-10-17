@@ -22,12 +22,6 @@
  *
  * Authors: Christian Paminger <pam@technikum-wien.at
  */
-class value
-{
-	public $value;
-	public $text;
-}
-
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class filter extends basis_db
@@ -78,7 +72,7 @@ class filter extends basis_db
 	{
 		if(!is_numeric($filter_id))
 		{
-			$this->errormsg = 'Appdaten_id muss eine gueltige Zahl sein';
+			$this->errormsg = 'Filter_id muss eine gueltige Zahl sein';
 			return false;
 		}
 
@@ -92,7 +86,7 @@ class filter extends basis_db
 				$this->kurzbz=$row->kurzbz;
 				$this->sql=$row->sql;
 				$this->valuename=$row->valuename;
-				$this->showvalue=$row->showvalue;
+				$this->showvalue=$this->db_parse_bool($row->showvalue);
 				$this->type=$row->type;
 				$this->htmlattr=$row->htmlattr;
 				$this->insertamum=$row->insertamum;
@@ -132,10 +126,7 @@ class filter extends basis_db
 				$obj->kurzbz=$row->kurzbz;
 				$obj->sql=$row->sql;
 				$obj->valuename=$row->valuename;
-				if ($row->showvalue=='t')
-					$obj->showvalue=true;
-				else
-					$obj->showvalue=false;
+				$obj->showvalue = $this->db_parse_bool($row->showvalue);
 				$obj->type=$row->type;
 				$obj->htmlattr=$row->htmlattr;	
 				$obj->insertamum=$row->insertamum;
@@ -214,7 +205,7 @@ class filter extends basis_db
 		{
 			while($row = $this->db_fetch_row())
 			{
-				$obj=new value();
+				$obj=new stdClass();
 				$obj->text='';
 				for ($i=0; $i<$this->db_num_fields(); $i++)
 				{
@@ -222,12 +213,12 @@ class filter extends basis_db
 					{
 						$obj->value=$row[$i];
 						if ($showvalue)
-							$obj->text.='('.$row[$i].') ';
+							$obj->text.=' ('.$row[$i].') ';
 					}
 					else
 						$obj->text.='- '.$row[$i].' ';
 				}
-				
+				$obj->text = mb_substr($obj->text,1);
 				$this->values[] = $obj;			   
 			}
 			//var_dump($this);
