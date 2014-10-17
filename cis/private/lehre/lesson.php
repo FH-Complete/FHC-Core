@@ -147,7 +147,7 @@ if (isset($_GET["handbuch"])){
 			$angezeigtes_stsem=$studiensemester_kurzbz;
 		else
 		{
-			if($lv->studiengang_kz==0)
+			if($lv->studiengang_kz==0 || (defined('CIS_LEHRVERANSTALTUNG_AKTUELLES_STUDIENSEMESTER_ANZEIGEN') && CIS_LEHRVERANSTALTUNG_AKTUELLES_STUDIENSEMESTER_ANZEIGEN))
 				$angezeigtes_stsem = $stsem->getNearest();
 			else
 				$angezeigtes_stsem = $stsem->getNearest($semester);
