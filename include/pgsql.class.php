@@ -126,6 +126,30 @@ class basis_db extends db
 		}			
 	}
 	
+	public function db_getResultJSON($result = null)
+	{
+		$rows=array();
+		if(is_null($result))
+		{
+			while($r = pg_fetch_assoc($this->db_result)) 
+				$rows[] = $r;
+			
+			//print json_encode($rows);
+		}
+		else 
+		{
+			pg_result_seek($result, 0);
+			//var_dump($result);
+			while($r = pg_fetch_assoc($result)) 
+			{
+				$rows[] = $r;
+			}
+			
+			//print json_encode($rows);
+		}		
+		return json_encode($rows);	
+	}
+	
 	public function db_last_error()
 	{
 		return pg_last_error();
