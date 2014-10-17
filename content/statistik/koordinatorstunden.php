@@ -42,12 +42,12 @@ $user = get_uid();
 loadVariables($user);
 $db = new basis_db();
 
-if(isset($_GET['fachbereich_kurzbz']))
-	$fachbereich_kurzbz = $_GET['fachbereich_kurzbz'];
+if(isset($_GET['oe_kurzbz']))
+	$oe_kurzbz = $_GET['oe_kurzbz'];
 else 
 	die('Falsche Parameteruebergabe');
 	
-echo '<h2>Koordinatorstunden - Fachbereich '.$fachbereich_kurzbz.'</h2>';
+echo '<h2>Koordinatorstunden - Organisationseinheit '.$oe_kurzbz.'</h2>';
 
 $stg_arr = array();
 $data = array();
@@ -70,25 +70,17 @@ $qry = "SELECT
 			tbl_person.vorname,
 			tbl_person.nachname
 		FROM 
-			public.tbl_benutzerfunktion, 
-			lehre.tbl_lehreinheitmitarbeiter, 
-			lehre.tbl_lehreinheit, 
-			lehre.tbl_lehrveranstaltung,
-			public.tbl_benutzer,
-			public.tbl_person,
-			lehre.tbl_lehrveranstaltung as lehrfach,
-			public.tbl_fachbereich
-			WHERE 
-			tbl_benutzerfunktion.uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid AND
-			tbl_lehreinheit.lehreinheit_id=tbl_lehreinheitmitarbeiter.lehreinheit_id AND
-			tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
-			tbl_benutzerfunktion.fachbereich_kurzbz=".$db->db_add_param($fachbereich_kurzbz)." AND
+			public.tbl_benutzerfunktion
+			JOIN lehre.tbl_lehreinheitmitarbeiter ON(tbl_benutzerfunktion.uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid)
+			JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+			JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+			JOIN public.tbl_benutzer ON(tbl_benutzer.uid=tbl_benutzerfunktion.uid)
+			JOIN public.tbl_person ON(tbl_person.person_id=tbl_benutzer.person_id)
+			JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
+			JOIN public.tbl_fachbereich ON(tbl_benutzerfunktion.fachbereich_kurzbz=tbl_fachbereich.fachbereich_kurzbz)
+		WHERE 
 			tbl_benutzerfunktion.funktion_kurzbz='fbk' AND
-			tbl_benutzerfunktion.uid=tbl_benutzer.uid AND
-			tbl_benutzer.person_id=tbl_person.person_id AND
-			lehrfach.lehrveranstaltung_id=tbl_lehreinheit.lehrfach_id AND
-			tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz AND
-			tbl_fachbereich.fachbereich_kurzbz=".$db->db_add_param($fachbereich_kurzbz)." AND
+			tbl_fachbereich.oe_kurzbz=".$db->db_add_param($oe_kurzbz)." AND
 			tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
 			(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now()) AND
 			(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())

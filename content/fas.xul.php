@@ -856,8 +856,9 @@ foreach($addon_obj->result as $addon)
 		<?php
 			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('assistenz'))
 			{
-				echo '<tab id="tab-verband" label="Verband" onclick="ChangeTabVerband()"/>';
-				echo '<tab id="tab-fachbereich" label="Institut" onclick="ChangeTabsToLehrveranstaltung()"/>';
+				echo '<tab id="tab-verband" label="Verband" onclick="ChangeTabVerband();"/>';
+				//echo '<tab id="tab-fachbereich" label="Institut" onclick="ChangeTabsToLehrveranstaltung()"/>';
+				echo '<tab id="tab-organisationseinheit" label="Org.einheit" tooltiptext="Organisationseinheit" onclick="ChangeTabsToLehrveranstaltung()"/>';
 				echo '<tab id="tab-lektor" label="Lektor" onclick="ChangeTabsToLehrveranstaltung()"/>';
 			}
 			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter'))
@@ -871,7 +872,8 @@ foreach($addon_obj->result as $addon)
 			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('assistenz'))
 			{
 				echo '<tree id="tree-verband" />';
-				echo '<vbox id="vbox-fachbereich" />';
+				//echo '<vbox id="vbox-fachbereich" />';
+				echo '<vbox id="vbox-organisationseinheit" />';
 				echo '<tree id="tree-lektor" />';
 			}
 			if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt('mitarbeiter'))

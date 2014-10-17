@@ -144,6 +144,34 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiteroverlay.xul
 	</tree>
 </vbox>
 
+<vbox id="vbox-organisationseinheit">
+	<tree id="tree-organisationseinheit" onmouseup="onOrganisationseinheitSelect(event);"
+		seltype="single" hidecolumnpicker="false" flex="1"
+		datasources="../rdf/organisationseinheit_menue.rdf.php" ref="http://www.technikum-wien.at/organisationseinheit">
+		<treecols>
+		    <treecol id="organisationseinheit-treecol-typ" label="Typ" flex="2" hidden="false"/>
+		    <splitter class="tree-splitter"/>
+		    <treecol id="organisationseinheit-treecol-bezeichnung" label="Bezeichnung" flex="3"/>
+		    <splitter class="tree-splitter"/>
+		    <treecol id="organisationseinheit-treecol-oe_kurzbz" label="oe_kurzbz" hidden="true" flex="1"/>
+		</treecols>
+	
+		<template>
+		    <rule>
+		      <treechildren>
+		       <treeitem uri="rdf:*">
+		         <treerow>
+		           <treecell label="rdf:http://www.technikum-wien.at/organisationseinheit/rdf#typ"/>
+		           <treecell label="rdf:http://www.technikum-wien.at/organisationseinheit/rdf#bezeichnung"/>
+		           <treecell label="rdf:http://www.technikum-wien.at/organisationseinheit/rdf#oe_kurzbz"/>
+		         </treerow>
+		       </treeitem>
+		      </treechildren>
+		    </rule>
+	  </template>
+	</tree>
+</vbox>
+
 <tree id="tree-lektor" onmouseup="onLektorSelect(event);"
 	seltype="multi" hidecolumnpicker="false" flex="1"
 	enableColumnDrag="true"

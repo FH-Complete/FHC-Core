@@ -57,6 +57,22 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 			<toolbarbutton id="lehrveranstaltung-toolbar-del" label="Loeschen" oncommand="LeDelete();" disabled="true" image="../skin/images/DeleteIcon.png" tooltiptext="Lehreinheiten löschen"/>
 			<toolbarbutton id="lehrveranstaltung-toolbar-refresh" label="Aktualisieren" oncommand="LvTreeRefresh()" disabled="false" image="../skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 			<toolbarbutton id="lehrveranstaltung-toolbar-lehrauftrag" label="Lehrauftrag" oncommand="LvCreateLehrauftrag()" disabled="false" image="../skin/images/person.gif" tooltiptext="Lehrauftrag ausdrucken" hidden="true"/>
+
+			<toolbarbutton label="Ausbildungssemester " id="lehrveranstaltung-toolbar-filter-ausbildungssemester" type="menu" hidden="true">	
+				<menupopup id="lehrveranstaltung-toolbar-popup-filter-ausbildungssemester" >
+					<menuitem id="lehrveranstaltung-toolbar-filter-ausbildungssemester-alle" type="radio" checked="true" label="Alle Semester" oncommand="FilterLehrveranstaltungAusbsem('')" disabled="false" tooltiptext="Alle Semester anzeigen"/>
+					<menuitem id="lehrveranstaltung-toolbar-filter-ausbildungssemester-1" type="radio" label="1. Semester" oncommand="FilterLehrveranstaltungAusbsem('1')" disabled="false"/>
+					<menuitem id="lehrveranstaltung-toolbar-filter-ausbildungssemester-2" type="radio" label="2. Semester" oncommand="FilterLehrveranstaltungAusbsem('2')" disabled="false"/>
+					<menuitem id="lehrveranstaltung-toolbar-filter-ausbildungssemester-3" type="radio" label="3. Semester" oncommand="FilterLehrveranstaltungAusbsem('3')" disabled="false"/>
+					<menuitem id="lehrveranstaltung-toolbar-filter-ausbildungssemester-4" type="radio" label="4. Semester" oncommand="FilterLehrveranstaltungAusbsem('4')" disabled="false"/>
+					<menuitem id="lehrveranstaltung-toolbar-filter-ausbildungssemester-5" type="radio" label="5. Semester" oncommand="FilterLehrveranstaltungAusbsem('5')" disabled="false"/>
+					<menuitem id="lehrveranstaltung-toolbar-filter-ausbildungssemester-6" type="radio" label="6. Semester" oncommand="FilterLehrveranstaltungAusbsem('6')" disabled="false"/>
+					<menuitem id="lehrveranstaltung-toolbar-filter-ausbildungssemester-7" type="radio" label="7. Semester" oncommand="FilterLehrveranstaltungAusbsem('7')" disabled="false"/>
+					<menuitem id="lehrveranstaltung-toolbar-filter-ausbildungssemester-8" type="radio" label="8. Semester" oncommand="FilterLehrveranstaltungAusbsem('8')" disabled="false"/>
+					<menuitem id="lehrveranstaltung-toolbar-filter-ausbildungssemester-9" type="radio" label="9. Semester" oncommand="FilterLehrveranstaltungAusbsem('9')" disabled="false"/>
+					<menuitem id="lehrveranstaltung-toolbar-filter-ausbildungssemester-10" type="radio" label="10. Semester" oncommand="FilterLehrveranstaltungAusbsem('10')" disabled="false"/>
+			    </menupopup>
+			</toolbarbutton>
 			<spacer flex="1" />
 			<toolbarbutton id="lehrveranstaltung-toolbar-opensubtrees" label="Aufklappen" tooltiptext="Klappt die Untermenüs auf - mehrmaliges klicken möglich um weiter aufzuklappen" oncommand="LvTreeOpenAllSubtrees()" disabled="false" image="../skin/images/tree-diagramm.png" />
 			</toolbar>
@@ -185,7 +201,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 				<treechildren flex="1" >
    					<treeitem uri="rdf:*">
 						<treerow properties="lehrveranstaltung_rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrtyp_kurzbz" dbID="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrveranstaltung_id" >
-							<treecell src="../skin/images/rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrtyp_kurzbz^.png" label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#kurzbz"/>
+							<treecell src="../skin/images/lehrtyp_rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#lehrtyp_kurzbz^.png" label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#kurzbz"/>
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#bezeichnung"/>
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#bezeichnung_english"/>
 							<treecell label="rdf:http://www.technikum-wien.at/lehrveranstaltung_einheiten/rdf#sprache"/>

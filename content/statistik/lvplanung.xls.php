@@ -49,10 +49,10 @@ if(isset($_GET['semester']))
 else 
 	$semester='';
 
-if(isset($_GET['institut']))
-	$institut = $_GET['institut'];
+if(isset($_GET['oe_kurzbz']))
+	$oe_kurzbz = $_GET['oe_kurzbz'];
 else 
-	$institut = '';
+	$oe_kurzbz = '';
 	
 if(isset($_GET['uid']))
 	$uid = $_GET['uid'];
@@ -123,8 +123,8 @@ WHERE
 if($studiengang_kz!='')
 	$qry.=" AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
 	
-if($institut!='')
-	$qry.=" AND tbl_fachbereich.fachbereich_kurzbz=".$db->db_add_param($institut);
+if($oe_kurzbz!='')
+	$qry.=" AND tbl_fachbereich.oe_kurzbz=".$db->db_add_param($oe_kurzbz);
 
 if($semester!='')
 	$qry.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester, FHC_INTEGER);
@@ -394,8 +394,8 @@ if($result = $db->db_query($qry))
 		$qry.=" AND tbl_projektbetreuer.person_id=".$db->db_add_param($mitarbeiter->person_id, FHC_INTEGER);
 	}
 
-	if($institut!='')
-		$qry.=" AND tbl_fachbereich.fachbereich_kurzbz=".$db->db_add_param($institut);
+	if($oe_kurzbz!='')
+		$qry.=" AND tbl_fachbereich.oe_kurzbz=".$db->db_add_param($oe_kurzbz);
 		
 	if($studiengang_kz!='')
 		$qry.=" AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);

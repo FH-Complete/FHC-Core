@@ -45,6 +45,7 @@ $stg_kz=(isset($_GET['stg_kz'])?$_GET['stg_kz']:-1);
 $uid=(isset($_GET['uid'])?$_GET['uid']:'');
 $fachbereich_kurzbz=(isset($_GET['fachbereich_kurzbz'])?$_GET['fachbereich_kurzbz']:'');
 $orgform=(isset($_GET['orgform'])?$_GET['orgform']:'');
+$oe_kurzbz = (isset($_GET['oe_kurzbz'])?$_GET['oe_kurzbz']:'');
 
 loadVariables($user);
 
@@ -138,6 +139,33 @@ elseif($fachbereich_kurzbz!='') // Alle LVs eines Fachbereiches
 			AND tbl_studienordnung_semester.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell).")";
 	}
 
+}
+elseif($oe_kurzbz!='') // Alle LVs einer Organisationseinheit
+{
+	$qry="
+		SELECT
+			distinct on (lehrveranstaltung_id)
+			tbl_lehrveranstaltung.studiengang_kz as lv_studiengang_kz, tbl_lehrveranstaltung.semester as lv_semester,
+			tbl_lehrveranstaltung.kurzbz as lv_kurzbz, tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung, tbl_lehrveranstaltung.ects as lv_ects,
+			tbl_lehrveranstaltung.lehreverzeichnis as lv_lehreverzeichnis, tbl_lehrveranstaltung.planfaktor as lv_planfaktor,
+			tbl_lehrveranstaltung.planlektoren as lv_planlektoren, tbl_lehrveranstaltung.planpersonalkosten as lv_planpersonalkosten,
+			tbl_lehrveranstaltung.plankostenprolektor as lv_plankostenprolektor, tbl_lehrveranstaltung.orgform_kurzbz as lv_orgform_kurzbz,
+			tbl_lehrveranstaltung.lehrveranstaltung_id,
+			tbl_lehrveranstaltung.lehrform_kurzbz as lehrform_kurzbz, 
+			tbl_lehrveranstaltung.lehrform_kurzbz as lv_lehrform_kurzbz,
+			tbl_lehrveranstaltung.bezeichnung_english as lv_bezeichnung_english,
+			tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.semester, tbl_lehrveranstaltung.anmerkung, tbl_lehrveranstaltung.sprache, tbl_lehrveranstaltung.semesterstunden,
+			tbl_lehrveranstaltung.lehre, tbl_lehrveranstaltung.aktiv, 
+			'' as studienplan_id, '' as studienplan_bezeichnung, tbl_lehrveranstaltung.lehrtyp_kurzbz
+		FROM
+			lehre.tbl_lehrveranstaltung
+		WHERE
+			tbl_lehrveranstaltung.oe_kurzbz=".$db->db_add_param($oe_kurzbz)."
+			AND tbl_lehrveranstaltung.aktiv
+		";
+
+	if(isset($sem) && $sem!='')
+		$qry.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($sem);
 }
 else
 {
