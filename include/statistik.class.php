@@ -496,21 +496,13 @@ class statistik extends basis_db
 			$sql = $this->sql;
 			foreach($_REQUEST as $name=>$value)
 			{
-				//echo '<pre>'.var_dump($name).'</pre>';
 				if (is_array($value))
 				{
-					$modifier="'";
-					if (is_numeric($value[0]))
-						$modifier="";
-					$in='';
-					foreach ($value as $v)
-						$in.=$modifier.addslashes($v).$modifier.',';
-					$in=substr($in,0,-1);
+					$in = $this->db_implode4SQL($value);
 					$sql = str_replace('$'.$name,$in,$sql);
-					echo '<pre>'.var_dump($sql).'</pre>';
 				}
 				else
-					$sql = str_replace('$'.$name,addslashes($value),$sql);
+					$sql = str_replace('$'.$name,$this->db_add_param($value),$sql);
 			}
 			
 			if($this->data = $this->db_query($sql))

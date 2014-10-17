@@ -32,9 +32,16 @@ $user = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-if($rechte->isBerechtigt('addon/reports', 'suid'))
-	$write_admin=true;
+if(!$rechte->isBerechtigt('basis/statistik', 'suid'))
+	die('Sie haben keine Berechtigung für diese Seite');
 
+
+if(isset($_POST['action']) && $_POST['action']=='delete' && isset($_POST['filter_id']))
+{
+	$filter = new filter();
+	$filter->delete($_POST['filter_id']);
+		
+}
 $filter = new filter();
 if (!$filter->loadAll())
     die($filter->errormsg);
@@ -45,11 +52,12 @@ $htmlstr .= "   <thead><tr>\n";
 $htmlstr .= '    <th onmouseup="document.formular.check.value=0">ID</th>
 		<th title="Kurzbezeichnung des Filters">KurzBz</th>
 		<th>ValueName</th>
-		<th>ShowV</th>
+		<th>Show Value</th>
 		<th>Type</th>
 		<th>HTMLAttributes</th>
 		<th>SQL</th>
-		<th>Reserve</th>';
+		<th>Action</th>';
+		
 $htmlstr .= "   </tr></thead><tbody>\n";
 $i = 0;
 foreach ($filter->result as $filter)
@@ -57,17 +65,17 @@ foreach ($filter->result as $filter)
     //$htmlstr .= "   <tr class='liste". ($i%2) ."'>\n";
 	$htmlstr .= "   <tr>\n";
 	$htmlstr .= "       <td align='right'><a href='filter_details.php?filter_id=".$filter->filter_id."' target='frame_filter_details'>".$filter->filter_id." </a>
-							<a href='../data/".$filter->filter_id.".html' target='_blank'>
-								<img title='".$filter->kurzbz." anzeigen' src='x-office-presentation.svg' height='15' />
-							</a>
+						<a href='filter_vorschau.php?filter_id=".$filter->filter_id."' target='_blank'>
+							<img src='../../skin/images/x-office-presentation.png' height='15px'/>
+						</a>
 						</td>\n";
 	$htmlstr .= "       <td><a href='filter_details.php?filter_id=".$filter->filter_id."' target='frame_filter_details'>".$filter->kurzbz."</a></td>\n";
-	$htmlstr .= "       <td>".$filter->valuename."</td>\n";
-	$htmlstr .= "       <td>".$filter->showvalue."</td>\n";
-	$htmlstr .= "       <td>".$filter->type."</td>\n";
-	$htmlstr .= "       <td>".$filter->htmlattr."</td>\n";
-	$htmlstr .= "       <td>".substr($filter->sql,0,32)."...</td>\n";
-	$htmlstr .= "       <td>".substr($filter->sql,0,16)."...</td>\n";
+	$htmlstr .= "       <td>".$db->convert_html_chars($filter->valuename)."</td>\n";
+	$htmlstr .= "       <td>".($filter->showvalue?'Ja':'Nein')."</td>\n";
+	$htmlstr .= "       <td>".$db->convert_html_chars($filter->type)."</td>\n";
+	$htmlstr .= "       <td>".$db->convert_html_chars($filter->htmlattr)."</td>\n";
+	$htmlstr .= "       <td>".$db->convert_html_chars(substr($filter->sql,0,32))."...</td>\n";
+	$htmlstr .=	'		<td><form action="'.$_SERVER['PHP_SELF'].'" style="display: inline" name="form_'.$filter->filter_id.'" method="POST"><input type="hidden" name="filter_id" value="'.$filter->filter_id.'"><input type="hidden" name="action" value="delete"/><a href="#Loeschen" onclick="ConfirmDelete('.$filter->filter_id.');">Delete</a></form></td>';
 	$htmlstr .= "   </tr>\n";
 	$i++;
 }
@@ -77,82 +85,34 @@ $htmlstr .= "</tbody></table>\n";
 ?>
 <html>
 <head>
-<title>R&auml;ume &Uuml;bersicht</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<!--<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>-->
-<script type="text/javascript" src="../../include/js/jquery.js"></script>
-<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
-<style>
-table.tablesorter tbody td
-{
-	margin: 0;
-	padding: 0;
-	vertical-align: middle;
-}
-</style>
-<script language="JavaScript" type="text/javascript">
-$(document).ready(function() 
-		{ 
-			$("#t1").tablesorter(
-			{
-				sortList: [[2,0]],
-				widgets: ["zebra"]
-			}); 
-		});
-		
-function confdel()
-{
-	if(confirm("Diesen Datensatz wirklick loeschen?"))
-	  return true;
-	return false;
-}
-
-function changeboolean(ort_kurzbz, name)
-{
-	value=document.getElementById(name+ort_kurzbz).value;
-	
-	var dataObj = {};
-	dataObj["ort_kurzbz"]=ort_kurzbz;
-	dataObj[name]=value;
-
-	$.ajax({
-		type:"POST",
-		url:"raum_uebersicht.php", 
-		data:dataObj,
-		success: function(data) 
+	<title>Filter &Uuml;bersicht</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+	<script type="text/javascript" src="../../include/js/jquery.js"></script>
+	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
+	<script language="JavaScript" type="text/javascript">
+	$(document).ready(function() 
+			{ 
+				$("#t1").tablesorter(
+				{
+					sortList: [[2,0]],
+					widgets: ["zebra"]
+				}); 
+			});
+	function ConfirmDelete(filter_id)
+	{
+		if(confirm("Wollen Sie diesen Filter wirklich löschen?"))
 		{
-			if(data=="true")
-			{
-				//Image und Value aendern
-				if(value=="true")
-					value="false";
-				else
-					value="true";
-				document.getElementById(name+ort_kurzbz).value=value;
-				document.getElementById(name+"img"+ort_kurzbz).src="../../skin/images/"+value+".png";
-			}
-			else 
-				alert("ERROR:"+data)
-		},
-		error: function() { alert("error"); }
-	});
-}
-
-</script>
-
+			document.forms['form_'+filter_id].submit();
+		}
+	}
+	</script>
 </head>
 
-<body class="background_main">
-<a href="filter_details.php" target="frame_report_details">Neuer Filter</a>
-
-
+<body>
+<a href="filter_details.php" target="frame_filter_details">Neuer Filter</a>
 <?php 
     echo $htmlstr;
 ?>
-
-
-
 </body>
 </html>
