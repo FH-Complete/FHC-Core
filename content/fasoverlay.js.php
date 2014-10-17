@@ -518,6 +518,78 @@ function onFachbereichSelect(event)
 	}
 }
 
+/*
+ * Wird bei einer Auswahl der Organisationseinheit aufgerufen und laedt die Lehrveranstaltungen der 
+ * markierten Organisationseinheit
+ */
+function onOrganisationseinheitSelect(event)
+{
+	var tree=document.getElementById('tree-organisationseinheit');
+
+	//Wenn nichts markiert wurde -> beenden
+	if(tree.currentIndex==-1)
+		return;
+
+	if(typeof(event)!='undefined')
+	{
+		var row = { };
+		var col = { };
+		var child = { };
+
+		tree.treeBoxObject.getCellAt(event.pageX, event.pageY, row, col, child)
+
+		//Wenn es keine Row ist sondern ein Header oder Scrollbar dann abbrechen
+		if (!col.value)
+		   	return false;
+
+		//Wenn eine andere row markiert ist als angeklickt wurde -> beenden.
+		//Dies kommt vor wenn ein Subtree geoeffnet wird
+		if(row.value!=tree.currentIndex)
+			return;
+	}
+
+	col = tree.columns ? tree.columns["organisationseinheit-treecol-oe_kurzbz"] : "organisationseinheit-treecol-oe_kurzbz";
+	var kurzbz=tree.view.getCellText(tree.currentIndex,col);
+	
+	// Lehrveranstaltung
+    document.getElementById('statusbar-progressmeter').setAttribute('mode','undetermined');
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	try
+	{
+		// Semesterfilter aus dem Lehrveranstaltungsoverlay wird beim Laden beruecksichtigt
+		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?oe_kurzbz='+kurzbz+'&sem='+LehrveranstaltungAusbildungssemesterFilter+'&'+gettimestamp();
+		var treeLV=document.getElementById('lehrveranstaltung-tree');
+		try
+		{
+			LvTreeDatasource.removeXMLSinkObserver(LvTreeSinkObserver);
+			treeLV.builder.removeListener(LvTreeListener);
+		}
+		catch(e)
+		{}
+		
+		//Alte DS entfernen
+		var oldDatasources = treeLV.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			treeLV.database.RemoveDataSource(oldDatasources.getNext());
+		}
+
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		LvTreeDatasource = rdfService.GetDataSource(url);
+		LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		LvTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		treeLV.database.AddDataSource(LvTreeDatasource);
+		LvTreeDatasource.addXMLSinkObserver(LvTreeSinkObserver);
+		treeLV.builder.addListener(LvTreeListener);
+		document.getElementById('lehrveranstaltung-toolbar-lehrauftrag').hidden=true;
+	}
+	catch(e)
+	{
+		debug(e);
+	}
+}
+
 function onOrtSelect()
 {
 	var contentFrame=document.getElementById('iframeTimeTableWeek');
@@ -643,22 +715,16 @@ function parseRDFString(str, url)
 // ****
 function StatistikPrintKoordinatorstunden()
 {
-	tree = document.getElementById('tree-fachbereich');
+	tree = document.getElementById('tree-organisationseinheit');
 
 	try
 	{
-		//Fachbereich holen
+		//Organisationseinheit holen
 		var col;
-		col = tree.columns ? tree.columns["fachbereich-treecol-kurzbz"] : "fachbereich-treecol-kurzbz";
-		var fachbereich_kurzbz=tree.view.getCellText(tree.currentIndex,col);
-		
-		col = tree.columns ? tree.columns["fachbereich-treecol-uid"] : "fachbereich-treecol-uid";
-		var uid=tree.view.getCellText(tree.currentIndex,col);
-	
-		if(uid=='')
-			window.open('<?php echo APP_ROOT ?>content/statistik/koordinatorstunden.php?fachbereich_kurzbz='+fachbereich_kurzbz,'Koordinatorstunden');
-		else
-			alert('Bitte einen Fachbereich auswaehlen');
+		col = tree.columns ? tree.columns["organisationseinheit-treecol-oe_kurzbz"] : "organisationseinheit-treecol-oe_kurzbz";
+		var oe_kurzbz=tree.view.getCellText(tree.currentIndex,col);
+			
+		window.open('<?php echo APP_ROOT ?>content/statistik/koordinatorstunden.php?oe_kurzbz='+oe_kurzbz,'Koordinatorstunden');
 	}
 	catch(e)
 	{
@@ -715,21 +781,21 @@ function StatistikPrintLVPlanung()
 		var semester=tree.view.getCellText(tree.currentIndex,col);
 		var url = '<?php echo APP_ROOT ?>content/statistik/lvplanung.php?studiengang_kz='+studiengang_kz+'&semester='+semester;
 	}
-	else if(document.getElementById('menu-content-tabs').selectedItem == document.getElementById('tab-fachbereich'))
+	else if(document.getElementById('menu-content-tabs').selectedItem == document.getElementById('tab-organisationseinheit'))
 	{
-		tree = document.getElementById('tree-fachbereich');
+		tree = document.getElementById('tree-organisationseinheit');
 
 		if(tree.currentIndex==-1)
 		{
-			alert('Bitte zuerst einen Fachbereich auswaehlen');
+			alert('Bitte zuerst eine Organisationseinheit auswaehlen');
 			return;
 		}
 
-		//Fachbereich holen
+		//OE holen
 		var col;
-		col = tree.columns ? tree.columns["fachbereich-treecol-kurzbz"] : "fachbereich-treecol-kurzbz";
-		var fachbereich_kurzbz=tree.view.getCellText(tree.currentIndex,col);
-		var url = '<?php echo APP_ROOT ?>content/statistik/lvplanung.php?fachbereich_kurzbz='+fachbereich_kurzbz;
+		col = tree.columns ? tree.columns["organisationseinheit-treecol-oe_kurzbz"] : "organisationseinheit-treecol-oe_kurzbz";
+		var oe_kurzbz=tree.view.getCellText(tree.currentIndex,col);
+		var url = '<?php echo APP_ROOT ?>content/statistik/lvplanung.php?oe_kurzbz='+oe_kurzbz;
 	}
 	else if(document.getElementById('menu-content-tabs').selectedItem == document.getElementById('tab-lektor'))
 	{
@@ -780,21 +846,21 @@ function StatistikPrintLVPlanungExcel()
 		var semester=tree.view.getCellText(tree.currentIndex,col);
 		var url = '<?php echo APP_ROOT ?>content/statistik/lvplanung.xls.php?studiengang_kz='+studiengang_kz+'&semester='+semester+'&studiensemester_kurzbz='+studiensemester;
 	}
-	else if(document.getElementById('menu-content-tabs').selectedItem == document.getElementById('tab-fachbereich'))
+	else if(document.getElementById('menu-content-tabs').selectedItem == document.getElementById('tab-organisationseinheit'))
 	{
-		tree = document.getElementById('tree-fachbereich');
+		tree = document.getElementById('tree-organisationseinheit');
 
 		if(tree.currentIndex==-1)
 		{
-			alert('Bitte zuerst einen Fachbereich auswaehlen');
+			alert('Bitte zuerst eine OE auswaehlen');
 			return;
 		}
 
 		//Fachbereich holen
 		var col;
-		col = tree.columns ? tree.columns["fachbereich-treecol-kurzbz"] : "fachbereich-treecol-kurzbz";
-		var fachbereich_kurzbz=tree.view.getCellText(tree.currentIndex,col);
-		var url = '<?php echo APP_ROOT ?>content/statistik/lvplanung.xls.php?institut='+fachbereich_kurzbz+'&studiensemester_kurzbz='+studiensemester;
+		col = tree.columns ? tree.columns["organisationseinheit-treecol-oe_kurzbz"] : "organisationseinheit-treecol-oe_kurzbz";
+		var oe_kurzbz=tree.view.getCellText(tree.currentIndex,col);
+		var url = '<?php echo APP_ROOT ?>content/statistik/lvplanung.xls.php?oe_kurzbz='+oe_kurzbz+'&studiensemester_kurzbz='+studiensemester;
 	}
 	else if(document.getElementById('menu-content-tabs').selectedItem == document.getElementById('tab-lektor'))
 	{
@@ -1376,20 +1442,32 @@ function StatistikPrintStudentenProSemester(format)
 
 // ****
 // * Wenn der Tab Mitarbeiter aktiviert ist und der Prestudent-, Student- oder Lehrveranstaltungstab
-// * markiert wird, dann wird im Menue auf den Verband Tag gewechselt
+// * markiert wird, dann wird im Menue auf den Verband Tab gewechselt
 // ****
 function ChangeTabsToVerband()
 {
-	if(document.getElementById('menu-content-tabs').selectedItem==document.getElementById('tab-menu-mitarbeiter'))
+	if(document.getElementById('menu-content-tabs').selectedItem==document.getElementById('tab-mitarbeiter'))
 		document.getElementById('menu-content-tabs').selectedItem=document.getElementById('tab-verband');
+
+	// Ausbildungssemester Filter wird nur im OE Tab angezeigt
+	if(document.getElementById('menu-content-tabs').selectedItem==document.getElementById('tab-organisationseinheit'))
+		document.getElementById('lehrveranstaltung-toolbar-filter-ausbildungssemester').hidden=false;
+	else
+		document.getElementById('lehrveranstaltung-toolbar-filter-ausbildungssemester').hidden=true;
 }
 
 // ****
-// * Wenn der Tab Fachbereich oder Lektor gewaehlt wird, dann wird auf den Tab Lehrveranstaltung gewechselt
+// * Wenn der Tab OE oder Lektor gewaehlt wird, dann wird auf den Tab Lehrveranstaltung gewechselt
 // ****
 function ChangeTabsToLehrveranstaltung()
 {
 	document.getElementById('main-content-tabs').selectedItem=document.getElementById('tab-lfvt');
+
+	// Ausbildungssemester Filter wird nur im OE Tab angezeigt
+	if(document.getElementById('menu-content-tabs').selectedItem==document.getElementById('tab-organisationseinheit'))
+		document.getElementById('lehrveranstaltung-toolbar-filter-ausbildungssemester').hidden=false;
+	else
+		document.getElementById('lehrveranstaltung-toolbar-filter-ausbildungssemester').hidden=true;
 }
 
 // ****
@@ -1400,6 +1478,13 @@ function ChangeTabVerband()
 {
 	if(document.getElementById('main-content-tabs').selectedItem==document.getElementById('tab-mitarbeiter'))
 		document.getElementById('main-content-tabs').selectedItem=document.getElementById('tab-studenten');
+
+	// Ausbildungssemester Filter wird nur im OE Tab angezeigt
+	if(document.getElementById('menu-content-tabs').selectedItem==document.getElementById('tab-organisationseinheit'))
+		document.getElementById('lehrveranstaltung-toolbar-filter-ausbildungssemester').hidden=false;
+	else
+		document.getElementById('lehrveranstaltung-toolbar-filter-ausbildungssemester').hidden=true;
+
 }
 
 // ****
@@ -1678,4 +1763,27 @@ function FachbereichTreeRefresh()
 	fb_datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
 	fb_datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
 	tree.database.AddDataSource(fb_datasource);
+}
+
+// ****
+// * Aktualisiert/Laedt den Organisationseinheit Tree
+// ****
+function OrganisationseinheitTreeRefresh()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	tree = document.getElementById('tree-organisationseinheit');
+	
+	var oldDatasources = tree.database.GetDataSources();	
+	while(oldDatasources.hasMoreElements())
+	{
+		tree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	tree.builder.rebuild();
+	
+	url = '<?php echo APP_ROOT; ?>rdf/organisationseinheit_menue.rdf.php?'+gettimestamp();
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var oe_datasource = rdfService.GetDataSource(url);
+	oe_datasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+	oe_datasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+	tree.database.AddDataSource(oe_datasource);
 }

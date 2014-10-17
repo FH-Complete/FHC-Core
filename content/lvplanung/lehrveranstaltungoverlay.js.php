@@ -40,6 +40,7 @@ var lehrveranstaltungLvGesamtNotenTreeDatasource; //Datasource des Noten Trees
 var lehrveranstaltungLvGesamtNotenSelectUID=null; //LehreinheitID des Noten Eintrages der nach dem Refresh markiert werden soll
 var lehrveranstaltungNotenTreeloaded=false;
 var lehrveranstaltungGesamtNotenTreeloaded=false;
+var LehrveranstaltungAusbildungssemesterFilter='';
 // ********** Observer und Listener ************* //
 
 // ****
@@ -1861,4 +1862,25 @@ function LvTreeOpenAllSubtrees()
 		if(!tree.view.isContainerOpen(i))
 			tree.view.toggleOpenState(i);
 	}
+}
+
+/**
+ * Filtert die Liste der Lehrveranstaltungen auf ein Ausbildungssemester
+ * in der OE Ansicht
+ */
+function FilterLehrveranstaltungAusbsem(semester)
+{
+	// Auswahl speichern
+	LehrveranstaltungAusbildungssemesterFilter=semester;
+
+	// Label aktualisieren
+	var label='Filter:';
+	if(semester=='')
+		label='Filter: Alle Semester';
+	else
+		label='Filter: '+semester+'.Semester';
+	document.getElementById('lehrveranstaltung-toolbar-filter-ausbildungssemester').label=label;
+
+	// Daten neu laden
+	onOrganisationseinheitSelect();
 }
