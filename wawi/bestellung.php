@@ -741,65 +741,72 @@ if($aktion == 'suche')
 
 		if(($evon || $evon === '') && ($ebis || $ebis === '' ) && ($bvon || $bvon === '') && ($bbis || $bbis === ''))
 		{
-			// Filter firma oder firma id werden angezeigt
-			if($bestellung->getAllSearch($bestellnummer, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $filter_konto, $mitarbeiter_uid, $rechnung, $filter_firma, $filter_kostenstelle, $tag, $zahlungstyp, $tagsNotExists, $bestellposition, $ohneFreigabe))
+			if($bestellnummer=='' && $titel=='' && $evon=='' && $ebis=='' && $bvon=='' && $bbis=='' && $firma_id=='' && $oe_kurzbz=='' && $filter_konto=='' && $mitarbeiter_uid=='' && $filter_firma=='' && $filter_kostenstelle=='' && $tag=='' && $zahlungstyp=='' && $bestellposition=='')
 			{
-				$brutto = 0; 
-				$gesamtpreis =0; 
-				$firma = new firma();
-				$date = new datum(); 
-				
-				echo "<table id='myTable' class='tablesorter' width ='100%'> <thead>\n";		
-				echo "<tr>
-						<th></th>
-						<th>Bestellnr.</th>
-						<th>Bestell_ID</th>
-						<th>Firma</th>
-						<th>Erstellung</th>
-						<th>Freigegeben</th>
-						<th>Geliefert</th>
-						<th>Brutto</th>
-						<th>Titel</th>
-						<th>Letzte Änderung</th>
-					  </tr></thead><tbody>\n";
-			
-				foreach($bestellung->result as $row)
-				{	
-					$geliefert = 'nein';
-					$brutto = $bestellung->getBrutto($row->bestellung_id);
-					$gesamtpreis +=$brutto; 
-					if($status->isStatiVorhanden($row->bestellung_id, 'Lieferung'))
-						$geliefert = 'ja';
-					$firmenname = '';
-					if(is_numeric($row->firma_id))
-					{
-						$firma->load($row->firma_id);	
-						$firmenname = $firma->name; 
-					}
-
-                    // freigegebene oder bestellte Bestellungen können nur vom Zentraleinkauf gelöscht werden
-                    $bestellung_status_help = new wawi_bestellstatus(); 
-                    
-					//Zeilen der Tabelle ausgeben
-					echo "<tr>\n";
-					echo "<td nowrap> <a href= \"bestellung.php?method=update&id=$row->bestellung_id\" title=\"Bestellung bearbeiten\"> <img src=\"../skin/images/edit_wawi.gif\"> </a><a href=\"bestellung.php?method=delete&id=$row->bestellung_id\" onclick='return conf_del()' title='Bestellung löschen' > <img src=\"../skin/images/delete_x.png\" ></a><a href= \"rechnung.php?method=update&bestellung_id=$row->bestellung_id\" title=\"Neue Rechnung anlegen\"> <img src=\"../skin/images/Calculator.png\"> </a><a href= \"bestellung.php?method=copy&id=$row->bestellung_id\" title=\"Bestellung kopieren\"> <img src=\"../skin/images/copy.png\"> </a></td>";
-					echo '<td>'.$row->bestell_nr."</td>\n";
-					echo '<td>'.$row->bestellung_id."</td>\n";
-					echo '<td>'.$firmenname."</td>\n";
-					echo '<td>'.$date->formatDatum($row->insertamum, 'd.m.Y')."</td>\n";
-					echo '<td>'.($row->freigegeben?'ja':'nein')."</td>\n"; 
-					echo '<td>'.$geliefert.'</td>'; 
-					echo '<td class="number">'.number_format($brutto, 2, ",",".")."</td>\n"; 
-					echo '<td>'.$row->titel."</td>\n";
-					echo '<td>'.$date->formatDatum($row->updateamum,'d.m.Y').' '.$row->updatevon ."</td>\n"; 
-		
-					echo "</tr>\n";	
-				}
-				echo "</tbody>\n";
-				echo "<tfooter><tr><td></td><td></td><td></td><td></td><td></td><td><td>Summe:</td><td colspan='2'>".number_format($gesamtpreis,2, ",",".")." €</td></tr></tfooter></table>\n";	
+				echo "Bitte grenzen Sie Ihre Suche weiter ein";	
 			}
-			else 
-			echo $bestellung->errormsg;
+			else
+			{
+				// Filter firma oder firma id werden angezeigt
+				if($bestellung->getAllSearch($bestellnummer, $titel, $evon, $ebis, $bvon, $bbis, $firma_id, $oe_kurzbz, $filter_konto, $mitarbeiter_uid, $rechnung, $filter_firma, $filter_kostenstelle, $tag, $zahlungstyp, $tagsNotExists, $bestellposition, $ohneFreigabe))
+				{
+					$brutto = 0; 
+					$gesamtpreis =0; 
+					$firma = new firma();
+					$date = new datum(); 
+					
+					echo "<table id='myTable' class='tablesorter' width ='100%'> <thead>\n";		
+					echo "<tr>
+							<th></th>
+							<th>Bestellnr.</th>
+							<th>Bestell_ID</th>
+							<th>Firma</th>
+							<th>Erstellung</th>
+							<th>Freigegeben</th>
+							<th>Geliefert</th>
+							<th>Brutto</th>
+							<th>Titel</th>
+							<th>Letzte Änderung</th>
+						  </tr></thead><tbody>\n";
+				
+					foreach($bestellung->result as $row)
+					{	
+						$geliefert = 'nein';
+						$brutto = $bestellung->getBrutto($row->bestellung_id);
+						$gesamtpreis +=$brutto; 
+						if($status->isStatiVorhanden($row->bestellung_id, 'Lieferung'))
+							$geliefert = 'ja';
+						$firmenname = '';
+						if(is_numeric($row->firma_id))
+						{
+							$firma->load($row->firma_id);	
+							$firmenname = $firma->name; 
+						}
+	
+	                    // freigegebene oder bestellte Bestellungen können nur vom Zentraleinkauf gelöscht werden
+	                    $bestellung_status_help = new wawi_bestellstatus(); 
+	                    
+						//Zeilen der Tabelle ausgeben
+						echo "<tr>\n";
+						echo "<td nowrap> <a href= \"bestellung.php?method=update&id=$row->bestellung_id\" title=\"Bestellung bearbeiten\"> <img src=\"../skin/images/edit_wawi.gif\"> </a><a href=\"bestellung.php?method=delete&id=$row->bestellung_id\" onclick='return conf_del()' title='Bestellung löschen' > <img src=\"../skin/images/delete_x.png\" ></a><a href= \"rechnung.php?method=update&bestellung_id=$row->bestellung_id\" title=\"Neue Rechnung anlegen\"> <img src=\"../skin/images/Calculator.png\"> </a><a href= \"bestellung.php?method=copy&id=$row->bestellung_id\" title=\"Bestellung kopieren\"> <img src=\"../skin/images/copy.png\"> </a></td>";
+						echo '<td>'.$row->bestell_nr."</td>\n";
+						echo '<td>'.$row->bestellung_id."</td>\n";
+						echo '<td>'.$firmenname."</td>\n";
+						echo '<td>'.$date->formatDatum($row->insertamum, 'd.m.Y')."</td>\n";
+						echo '<td>'.($row->freigegeben?'ja':'nein')."</td>\n"; 
+						echo '<td>'.$geliefert.'</td>'; 
+						echo '<td class="number">'.number_format($brutto, 2, ",",".")."</td>\n"; 
+						echo '<td>'.$row->titel."</td>\n";
+						echo '<td>'.$date->formatDatum($row->updateamum,'d.m.Y').' '.$row->updatevon ."</td>\n"; 
+			
+						echo "</tr>\n";	
+					}
+					echo "</tbody>\n";
+					echo "<tfooter><tr><td></td><td></td><td></td><td></td><td></td><td><td>Summe:</td><td colspan='2'>".number_format($gesamtpreis,2, ",",".")." €</td></tr></tfooter></table>\n";	
+				}
+				else 
+					echo $bestellung->errormsg;
+			}
 		}
 		else
 		echo "ungültiges Datumsformat";
