@@ -2019,6 +2019,73 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_aufnahmetermin LIMIT 1;")
 		echo ' public.tbl_aufnahmetermin: Tabelle public.tbl_aufnahmetermin und public.tbl_aufnahmetermintyp hinzugefuegt!<br>';
 }
 
+// Spalte dv_art Tabelle bis.tbl_bisverwendung
+if(!$result = @$db->db_query("SELECT dv_art FROM bis.tbl_bisverwendung LIMIT 1;"))
+{
+	$qry = "ALTER TABLE bis.tbl_bisverwendung ADD COLUMN dv_art varchar(32);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>bis.tbl_bisverwendung: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' bis.tbl_bisverwendung: Spalte dv_art hinzugefuegt!<br>';
+}
+
+// Spalte mentor Tabelle public.tbl_prestudent
+if(!$result = @$db->db_query("SELECT mentor FROM public.tbl_prestudent LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_prestudent ADD COLUMN mentor varchar(256);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_prestudent: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' public.tbl_prestudent: Spalte mentor hinzugefuegt!<br>';
+}
+
+// Spalte ext_id Tabelle lehre.tbl_stundenplandev
+if(!$result = @$db->db_query("SELECT ext_id FROM lehre.tbl_stundenplandev LIMIT 1;"))
+{
+	$qry = "ALTER TABLE lehre.tbl_stundenplandev ADD COLUMN ext_id bigint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_stundenplandev: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' lehre.tbl_stundenplandev: Spalte ext_id hinzugefuegt!<br>';
+}
+
+// Spalte ext_id Tabelle public.tbl_notiz
+if(!$result = @$db->db_query("SELECT ext_id FROM public.tbl_notiz LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_notiz ADD COLUMN ext_id bigint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_notiz: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' public.tbl_notiz: Spalte ext_id hinzugefuegt!<br>';
+}
+
+// Spalte ext_id Tabelle public.tbl_notizzuordnung
+if(!$result = @$db->db_query("SELECT ext_id FROM public.tbl_notizzuordnung LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_notizzuordnung ADD COLUMN ext_id bigint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_notizzuordnung: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' public.tbl_notizzuordnung: Spalte ext_id hinzugefuegt!<br>';
+}
+
+// Spalte ext_id Tabelle wawi.tbl_konto
+if(!$result = @$db->db_query("SELECT ext_id FROM wawi.tbl_konto LIMIT 1;"))
+{
+	$qry = "ALTER TABLE wawi.tbl_konto ADD COLUMN ext_id bigint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>wawi.tbl_konto: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' wawi.tbl_konto: Spalte ext_id hinzugefuegt!<br>';
+}
+
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -2206,7 +2273,7 @@ $tabellen=array(
 	"public.tbl_preoutgoing_lehrveranstaltung" => array("preoutgoing_lehrveranstaltung_id","preoutgoing_id","bezeichnung","ects","endversion","insertamum","insertvon","updateamum","updatevon","wochenstunden","unitcode"),
 	"public.tbl_preoutgoing_preoutgoing_status" => array("status_id","preoutgoing_status_kurzbz","preoutgoing_id","datum","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preoutgoing_status" => array("preoutgoing_status_kurzbz","bezeichnung"),
-	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat","rt_punkte3", "zgvdoktor_code", "zgvdoktorort", "zgvdoktordatum"),
+	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat","rt_punkte3", "zgvdoktor_code", "zgvdoktorort", "zgvdoktordatum","mentor"),
 	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id","studienplan_id","bestaetigtam","bestaetigtvon","fgm","faktiv"),
 	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung"),
 	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet"),
