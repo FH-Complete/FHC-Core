@@ -797,6 +797,16 @@ if(!$error)
 							if($rolle->delete_rolle($_POST['prestudent_id'],$_POST['status_kurzbz'],$_POST['studiensemester_kurzbz'], $_POST['ausbildungssemester']))
 							{
 								$return = true;
+								if($return)
+								{
+								    $student = new student();
+								    $temp_uid = $student->getUid($rolle->prestudent_id);
+								    if(!$student->delete_studentLehrverband($temp_uid, $_POST['studiengang_kz'], $rolle->studiensemester_kurzbz, $rolle->ausbildungssemester))
+								    {
+									$return = false;
+									$errormsg = "Fehler beim Löschen der Lehrverbandszuordnung.";
+								    }
+								}
 							}
 							else
 							{
@@ -945,6 +955,123 @@ if(!$error)
 							$return = false;
 							$errormsg = $rolle->errormsg;
 						}
+					}
+				}
+			}
+			else
+			{
+				$return = false;
+				$errormsg = 'Prestudent_id muss angegeben werden';
+			}
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='rolleVorruecken')
+	{
+	    $errormsg='';
+		//Prestudentrolle speichern
+		if(!$error)
+		{
+			if(isset($_POST['prestudent_id']))
+			{
+				$rolle = new prestudent();
+				if(!$rolle->load($_POST['prestudent_id']))
+				{
+					$error = true;
+					$errormsg = 'Prestudent wurde nicht gefunden';
+				}
+				else
+				{
+					//Berechtigung pruefen
+					if(!$rechte->isBerechtigt('assistenz',$rolle->studiengang_kz,'suid') &&
+					   !$rechte->isBerechtigt('admin',$rolle->studiengang_kz, 'suid'))
+					{
+						$error = true;
+						$errormsg = 'Sie haben keine Schreibrechte fuer diesen Studiengang';
+					}
+				}
+
+				$rolle = new prestudent();
+				$rolle->prestudent_id = $_POST['prestudent_id'];
+				
+				if(!$error)
+				{
+				    $studiensem = new studiensemester();
+				    $stdsem = $studiensem->getNextFrom($_POST["studiensemester_kurzbz"]);
+//				    $stdsem = ($stdesm==false ? $_POST["studiensemester_kurzbz"]:$stdsem);
+				    $semester = $_POST["ausbildungssemester"];
+				    $semester++;
+					if((!$rolle->load_rolle($_POST['prestudent_id'], $_POST['status_kurzbz'], $stdsem, $semester)))
+					{
+						$rolle->new = true;
+						$rolle->insertamum = date('Y-m-d H:i:s');
+						$rolle->insertvon = $user;
+						$rolle->status_kurzbz = $_POST['status_kurzbz'];
+						$rolle->bestaetigtam = date('Y-m-d');
+						$rolle->bestaetigtvon = $user;
+
+						if($_POST['status_kurzbz']=='Student')
+						{
+							//Die Rolle Student darf nur eingefuegt werden, wenn schon eine Studentenrolle vorhanden ist
+							$qry = "SELECT count(*) as anzahl FROM public.tbl_student WHERE prestudent_id='".addslashes($_POST['prestudent_id'])."'";
+							if($result = $db->db_query($qry))
+							{
+								if($row = $db->db_fetch_object($result))
+								{
+									if($row->anzahl==0)
+									{
+										$error = true;
+										$errormsg = 'Ein Studentenstatus kann hier nur hinzugefuegt werden wenn die Person bereits Student ist. Um einen Bewerber zum Studenten zu machen waehlen Sie bitte unter "Status aendern" den Punkt "Student".';
+										$return = false;
+									}
+								}
+							}
+						}
+					}
+					else
+					{
+					    //Rolle existiert bereits
+					    $error = true;
+					    $errormsg = "Rolle existiert bereits.";
+					    $return = false;
+					}
+
+					if(!$error)
+					{
+						$rolle->ausbildungssemester = $semester;
+						$rolle->studiensemester_kurzbz = $stdsem;
+						$rolle->datum = date("Y-m-d");
+						$rolle->orgform_kurzbz = $_POST['orgform_kurzbz'];
+						$rolle->studienplan_id = $_POST['studienplan_id'];
+						
+						if($rolle->save_rolle())
+						{
+							$return = true;
+						}
+						else
+						{
+							$return = false;
+							$errormsg = $rolle->errormsg;
+						}
+					}
+					$student = new student();
+					$temp_uid = $student->getUid($rolle->prestudent_id);
+					if(!$student->studentlehrverband_exists($temp_uid, $stdsem))
+					{
+					    $lehrverband = new lehrverband();
+					    $student->load_studentlehrverband($temp_uid, $_POST["studiensemester_kurzbz"]);
+					    
+					    if(!$lehrverband->exists($student->studiengang_kz, $student->semester, $student->verband, $student->gruppe))
+					    {
+						$lehrverband->studiengang_kz = $student->studiengang_kz;
+						$lehrverband->semester = $student->semester;
+						$lehrverband->verband = $student->verband;
+						$lehrverband->gruppe = $student->gruppe;
+						$lehrverband->save(true);
+					    }
+					    
+					    $student->studiensemester_kurzbz = $stdsem;
+					    $student->semester = $semester;
+					    $student->save_studentlehrverband(true);
 					}
 				}
 			}

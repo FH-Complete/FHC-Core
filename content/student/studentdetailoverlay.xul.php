@@ -252,6 +252,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		<menuitem label="Status bestaetigen" oncommand="StudentPrestudentRolleBestaetigen();" id="student-prestudent-rolle-tree-popup-approve" hidden="false"/>		
 		<menuitem label="Neuen Status hinzufuegen" oncommand="StudentRolleAdd();" id="student-prestudent-rolle-tree-popup-add" hidden="false"/>
 		<menuitem label="Entfernen" oncommand="StudentPrestudentRolleDelete();" id="student-prestudent-rolle-tree-popup-delete" hidden="false"/>		
+		<menuitem label="Status vorrücken" oncommand="StudentPrestudentRolleVorruecken();" id="student-prestudent-rolle-tree-popup-move_forward" hidden="false"/>		
 	</menupopup>
 </popupset>
 		<vbox hidden="true">
