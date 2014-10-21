@@ -31,7 +31,10 @@
 			<style:table-properties style:width="17cm" table:align="margins" style:shadow="none"/>
 		</style:style>
 		<style:style style:name="Tabelle1.A" style:family="table-column">
-			<style:table-column-properties style:column-width="8.5cm" style:rel-column-width="32767*"/>
+			<style:table-column-properties style:column-width="4cm" />
+		</style:style>
+		<style:style style:name="Tabelle1.B" style:family="table-column">
+			<style:table-column-properties style:column-width="13cm" />
 		</style:style>
 		<style:style style:name="Tabelle1.A1" style:family="table-cell">
 			<style:table-cell-properties fo:padding="0.097cm" fo:border="none"/>
@@ -129,10 +132,11 @@
 			</text:p>
 			<text:p text:style-name="P5">
 				<text:span text:style-name="T4"><xsl:value-of select="lehreinheit/kuerzel" /></text:span><text:tab/>
-				<text:span text:style-name="T4"><xsl:value-of select="lehreinheit/einheiten" /> LE</text:span></text:p>
+				<text:span text:style-name="T4"><xsl:value-of select="lehreinheit/einheiten" /> LE</text:span>
+			</text:p>
+			<text:p text:style-name="P3" />
 			<text:p text:style-name="P3">
-				<text:span text:style-name="T7"><xsl:value-of select="lehreinheit/bezeichnung" /></text:span><text:tab/>
-				<text:tab/>
+				<text:span text:style-name="T7"><xsl:value-of select="lehreinheit/bezeichnung" /></text:span>
 			</text:p>
 			<text:p text:style-name="Barcode"><xsl:value-of select="lehreinheit/barcode" /></text:p>
 			<text:p text:style-name="P13">
@@ -156,8 +160,8 @@
 			<text:p text:style-name="P4"/>
 			<text:p text:style-name="P4"/>
 			<table:table table:name="Tabelle1" table:style-name="Tabelle1">
-				<table:table-column table:style-name="Tabelle1.A" table:number-columns-repeated="2"/>
-				
+				<table:table-column table:style-name="Tabelle1.A" />
+				<table:table-column table:style-name="Tabelle1.B" />
 				<xsl:apply-templates select="studenten"/>				
 			</table:table>
 			<text:p text:style-name="P14"></text:p>
@@ -171,6 +175,8 @@
 	<table:table-row>
 		<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
 			<text:p text:style-name="Barcode"><xsl:value-of select="barcode" /></text:p>
+		</table:table-cell>
+		<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
 			<text:p text:style-name="P10">
 				<xsl:value-of select="titelpre" />
 				<xsl:text> </xsl:text>
@@ -182,9 +188,7 @@
 			<text:p text:style-name="P10">
 				<text:span text:style-name="T5">Status: <xsl:value-of select="status" /></text:span>
 			</text:p>
-		</table:table-cell>
-		<table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
-			<text:p text:style-name="P11"/>
+			<text:p text:style-name="P10" />
 		</table:table-cell>
 	</table:table-row>
 </xsl:template>
