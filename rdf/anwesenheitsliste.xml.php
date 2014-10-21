@@ -25,12 +25,12 @@ header("Content-type: application/xhtml+xml");
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/basis_db.class.php');
-require_once('ean13.php');
+require_once('../include/ean13.function.php');
 
 // Optionen abfragen
 isset($_GET['von']) ? $von = $_GET['von'] : $von = date('Y-m-d', time());
 isset($_GET['bis']) ? $bis = $_GET['bis'] : $bis = $von;
-isset($_GET['studiengang']) ? $studiengang = $_GET['studiengang'] : $studiengang = NULL;
+isset($_GET['stg_kz']) ? $studiengang = $_GET['stg_kz'] : $studiengang = NULL;
 isset($_GET['semester']) ? $semester = $_GET['semester'] : $semester = NULL;
 isset($_GET['lehreinheit']) ? $lehreinheit = $_GET['lehreinheit'] : $lehreinheit = NULL;
 
