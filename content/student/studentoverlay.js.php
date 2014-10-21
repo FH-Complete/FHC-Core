@@ -4539,3 +4539,60 @@ function StudentReihungstestDropDownSelect()
 	if(document.getElementById('student-prestudent-textbox-anmeldungreihungstest').value=='')
 		StudentAnmeldungreihungstestHeute();
 }
+
+
+// ****
+// * Funktion um Status vorzurücken
+// ****
+function StudentPrestudentRolleVorruecken()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-prestudent-tree-rolle');
+
+	if (tree.currentIndex==-1)
+	{
+	    return;
+	}
+
+	//markierte Rolle holen
+	var status_kurzbz = getTreeCellText(tree, 'student-prestudent-tree-rolle-status_kurzbz', tree.currentIndex);
+	var studiensemester_kurzbz = getTreeCellText(tree, 'student-prestudent-tree-rolle-studiensemester_kurzbz', tree.currentIndex);
+	var prestudent_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-prestudent_id', tree.currentIndex);	
+	var ausbildungssemester = getTreeCellText(tree, 'student-prestudent-tree-rolle-ausbildungssemester', tree.currentIndex);
+	var orgform_kurzbz = getTreeCellText(tree, 'student-prestudent-tree-rolle-orgform_kurzbz', tree.currentIndex);
+	var studienplan_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-studienplan_id', tree.currentIndex);
+	
+	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+	
+	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'rolleVorruecken');
+
+	req.add('status_kurzbz', status_kurzbz);
+	req.add('prestudent_id', prestudent_id);
+	req.add('studiensemester_kurzbz', studiensemester_kurzbz);
+	req.add('ausbildungssemester', ausbildungssemester);
+	req.add('orgform_kurzbz', orgform_kurzbz);
+	req.add('studienplan_id', studienplan_id);
+
+	var response = req.executePOST();
+
+	var val = new ParseReturnValue(response);
+	debug("Return: "+val.dbdml_return);
+	debug("Msg: "+val.dbdml_errormsg);
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+		return false;
+	}
+	else
+	{
+		StudentDetailRolleTreeDatasource.Refresh(false);
+		SetStatusBarText('Daten wurden gespeichert');
+		return true;
+	}
+}

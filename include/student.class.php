@@ -769,5 +769,33 @@ class student extends benutzer
 	}
 	return false;
     }
+    
+    /**
+     * Löscht die Zuordnung eines Studenten zu einer Lehrverbandsgruppe
+     * @param type $uid
+     * @param type $studiengang_kz
+     * @param type $studiensemester
+     * @param type $semester
+     * @param type $verband
+     * @param type $gruppe
+     */
+    public function delete_studentLehrverband($uid, $studiengang_kz, $studiensemester, $semester)
+    {
+	$qry = 'DELETE FROM public.tbl_studentlehrverband '
+		. 'WHERE student_uid='.$this->db_add_param($uid)
+		. ' AND studiensemester_kurzbz='.$this->db_add_param($studiensemester)
+		. ' AND studiengang_kz='.$this->db_add_param($studiengang_kz)
+		. ' AND semester='.$this->db_add_param($semester).';';
+	
+	if($this->db_query($qry))
+	{
+		return true;
+	}
+	else
+	{
+		$this->errormsg = 'StudentLehrverband konnte nicht gelöscht werden.';
+		return false;
+	}
+    }
 }
 ?>
