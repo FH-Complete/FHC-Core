@@ -67,7 +67,7 @@ if($db->db_query($qry))
 		if(empty($row))
 			die("Lehreinheit $lehreinheit am $von nicht gefunden");
 		
-		$data[$row->lehreinheit_id]['einheiten'][] = $row;
+		$data[$row->lehreinheit_id]['tage'][$row->datum][] = $row;
 	}
 }
 		
@@ -116,60 +116,63 @@ echo "<anwesenheitslisten>";
 
 foreach($data as $lehreinheit_id => $value)
 {
-	echo "<anwesenheitsliste>";
-	
-	// Barcode erstellen
-	$paddedLehreinheitId = str_pad($lehreinheit_id, 6, "0", STR_PAD_LEFT);
-	$convertableString = date('ymd', strtotime($value['einheiten'][0]->datum)) . $paddedLehreinheitId;
-	$barcode = ean13($convertableString);
+	foreach($value['tage'] as $tag)
+	{
+		echo "<anwesenheitsliste>";
 
-	// Ausgabe der Lehrveranstaltung
-	echo "\n		<lehreinheit>";
-	echo "\n			<lehreinheit_id><![CDATA[".$value['einheiten'][0]->lehreinheit_id."]]></lehreinheit_id>";
-	echo "\n			<studiengang><![CDATA[".$value['einheiten'][0]->stgbez."]]></studiengang>";
-	echo "\n			<bezeichnung><![CDATA[".$value['einheiten'][0]->lvbez."]]></bezeichnung>";
-	echo "\n			<barcode><![CDATA[".ean13($convertableString)."]]></barcode>";
-	echo "\n			<kuerzel><![CDATA[".$value['einheiten'][0]->lvnr."]]></kuerzel>";
-	echo "\n			<einheiten><![CDATA[".count($value['einheiten'])."]]></einheiten>";
-	echo "\n			<ort><![CDATA[".$value['einheiten'][0]->ort_kurzbz."]]></ort>";
-	echo "\n			<datum><![CDATA[".date('d.m.Y', strtotime($value['einheiten'][0]->datum))."]]></datum>";
-	echo "\n			<beginn><![CDATA[".mb_substr($value['einheiten'][0]->beginn, 0, 5)."]]></beginn>";
-	echo "\n			<ende><![CDATA[".mb_substr($value['einheiten'][count($value['einheiten']) - 1]->ende, 0, 5)."]]></ende>";
-	echo "\n		</lehreinheit>";
-	
-	// Ausgabe der Vortragenden
-	echo "<vortragende>";
-	foreach($value['vortragende'] as $vortragender)
-	{
-		echo "\n		<vortragender>";
-		echo "\n			<vorname><![CDATA[".$vortragender->vorname."]]></vorname>";
-		echo "\n			<nachname><![CDATA[".$vortragender->nachname."]]></nachname>";
-		echo "\n			<titelpre><![CDATA[".$vortragender->titelpre."]]></titelpre>";
-		echo "\n			<titelpost><![CDATA[".$vortragender->titelpost."]]></titelpost>";
-		echo "\n		</vortragender>";
-	}
-	echo "</vortragende>";
-	
-	// Ausgabe der Studenten
-	echo "<studenten>";
-	foreach($value['studenten'] as $student)
-	{
 		// Barcode erstellen
-		$paddedPersonId = str_pad($student->person_id, 12, "0", STR_PAD_LEFT);
-		$barcode = ean13($paddedPersonId);
+		$paddedLehreinheitId = str_pad($lehreinheit_id, 6, "0", STR_PAD_LEFT);
+		$convertableString = date('ymd', strtotime($tag[0]->datum)) . $paddedLehreinheitId;
+		$barcode = ean13($convertableString);
 
-		echo "\n		<student>";
-		echo "\n			<barcode><![CDATA[".$barcode."]]></barcode>";
-		echo "\n			<vorname><![CDATA[".$student->vorname."]]></vorname>";
-		echo "\n			<nachname><![CDATA[".$student->nachname."]]></nachname>";
-		echo "\n			<titelpre><![CDATA[".$student->titelpre."]]></titelpre>";
-		echo "\n			<titelpost><![CDATA[".$student->titelpost."]]></titelpost>";
-		echo "\n			<note><![CDATA[".$student->note."]]></note>";
-		echo "\n			<status><![CDATA[".$student->laststatus."]]></status>";
-		echo "\n		</student>";
+		// Ausgabe der Lehrveranstaltung
+		echo "\n		<lehreinheit>";
+		echo "\n			<lehreinheit_id><![CDATA[".$tag[0]->lehreinheit_id."]]></lehreinheit_id>";
+		echo "\n			<studiengang><![CDATA[".$tag[0]->stgbez."]]></studiengang>";
+		echo "\n			<bezeichnung><![CDATA[".$tag[0]->lvbez."]]></bezeichnung>";
+		echo "\n			<barcode><![CDATA[".ean13($convertableString)."]]></barcode>";
+		echo "\n			<kuerzel><![CDATA[".$tag[0]->lvnr."]]></kuerzel>";
+		echo "\n			<einheiten><![CDATA[".count($tag)."]]></einheiten>";
+		echo "\n			<ort><![CDATA[".$tag[0]->ort_kurzbz."]]></ort>";
+		echo "\n			<datum><![CDATA[".date('d.m.Y', strtotime($tag[0]->datum))."]]></datum>";
+		echo "\n			<beginn><![CDATA[".mb_substr($tag[0]->beginn, 0, 5)."]]></beginn>";
+		echo "\n			<ende><![CDATA[".mb_substr($tag[count($tag) - 1]->ende, 0, 5)."]]></ende>";
+		echo "\n		</lehreinheit>";
+
+		// Ausgabe der Vortragenden
+		echo "<vortragende>";
+		foreach($value['vortragende'] as $vortragender)
+		{
+			echo "\n		<vortragender>";
+			echo "\n			<vorname><![CDATA[".$vortragender->vorname."]]></vorname>";
+			echo "\n			<nachname><![CDATA[".$vortragender->nachname."]]></nachname>";
+			echo "\n			<titelpre><![CDATA[".$vortragender->titelpre."]]></titelpre>";
+			echo "\n			<titelpost><![CDATA[".$vortragender->titelpost."]]></titelpost>";
+			echo "\n		</vortragender>";
+		}
+		echo "</vortragende>";
+
+		// Ausgabe der Studenten
+		echo "<studenten>";
+		foreach($value['studenten'] as $student)
+		{
+			// Barcode erstellen
+			$paddedPersonId = str_pad($student->person_id, 12, "0", STR_PAD_LEFT);
+			$barcode = ean13($paddedPersonId);
+
+			echo "\n		<student>";
+			echo "\n			<barcode><![CDATA[".$barcode."]]></barcode>";
+			echo "\n			<vorname><![CDATA[".$student->vorname."]]></vorname>";
+			echo "\n			<nachname><![CDATA[".$student->nachname."]]></nachname>";
+			echo "\n			<titelpre><![CDATA[".$student->titelpre."]]></titelpre>";
+			echo "\n			<titelpost><![CDATA[".$student->titelpost."]]></titelpost>";
+			echo "\n			<note><![CDATA[".$student->note."]]></note>";
+			echo "\n			<status><![CDATA[".$student->laststatus."]]></status>";
+			echo "\n		</student>";
+		}
+		echo "</studenten>";
+		echo "</anwesenheitsliste>";
 	}
-	echo "</studenten>";
-	echo "</anwesenheitsliste>";
 }
 
 echo "</anwesenheitslisten>";
