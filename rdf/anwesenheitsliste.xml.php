@@ -28,10 +28,10 @@ require_once('../include/basis_db.class.php');
 require_once('../include/ean13.function.php');
 
 // Optionen abfragen
-isset($_GET['von']) ? $von = $_GET['von'] : $von = date('Y-m-d', time());
+isset($_GET['von']) ? $von = $_GET['von'] : $von = NULL;
 isset($_GET['bis']) ? $bis = $_GET['bis'] : $bis = $von;
 isset($_GET['stg_kz']) ? $studiengang = $_GET['stg_kz'] : $studiengang = NULL;
-isset($_GET['semester']) ? $semester = $_GET['semester'] : $semester = NULL;
+isset($_GET['ss']) ? $semester = $_GET['ss'] : $semester = NULL;
 isset($_GET['lehreinheit']) ? $lehreinheit = $_GET['lehreinheit'] : $lehreinheit = NULL;
 
 $db = new basis_db();
@@ -48,16 +48,17 @@ $qry = "SELECT le.lehreinheit_id, le.lehrveranstaltung_id, lv.lvnr, lv.bezeichnu
 	. "JOIN public.tbl_studiengang stg ON stg.studiengang_kz = lv.studiengang_kz "
 	. "JOIN lehre.tbl_stundenplan sp ON sp.unr = le.unr "
 	. "JOIN lehre.tbl_stunde stu ON stu.stunde = sp.stunde "
-	. "WHERE stg.studiengang_kz = " . $db->db_add_param($studiengang) . " "
-	. "AND (sp.datum <= " . $db->db_add_param($von) . "::DATE AND sp.datum >= " . $db->db_add_param($bis) . "::DATE) ";
+	. "WHERE stg.studiengang_kz = " . $db->db_add_param($studiengang) . " ";
 
 // Optionen zu Query hinzufügen
 if($lehreinheit)
 	$qry .= " AND le.lehreinheit_id = " . $db->db_add_param($lehreinheit);
 if($semester)
 	$qry .= " AND lv.semester = " . $db->db_add_param($semester);
+if($von)
+	$qry .= " AND (sp.datum >= " . $db->db_add_param($von) . "::DATE AND sp.datum <= " . $db->db_add_param($bis) . "::DATE) ";
 
-$qry .= " ORDER BY stu.stunde ASC";
+$qry .= " ORDER BY datum, beginn";
 
 if($db->db_query($qry))
 {
@@ -90,13 +91,14 @@ foreach($data as $key => $value)
 
 	// Daten der Studenten ermitteln
 	$qry = "SELECT pe.person_id, vorname, nachname, titelpre, titelpost, note, "
-		. "get_rolle_prestudent(pre.prestudent_id, null) as laststatus "
+		. "get_rolle_prestudent(pre.prestudent_id, null) AS laststatus "
 		. "FROM campus.vw_student_lehrveranstaltung stlv "
 		. "JOIN public.tbl_benutzer be ON be.uid = stlv.uid "
 		. "JOIN public.tbl_person pe ON pe.person_id = be.person_id "
 		. "JOIN public.tbl_prestudent pre ON (pre.person_id = pe.person_id AND pre.studiengang_kz = " . $db->db_add_param($studiengang) . ") "
 		. "LEFT JOIN lehre.tbl_zeugnisnote zn ON (zn.lehrveranstaltung_id = stlv.lehrveranstaltung_id AND zn.student_uid = stlv.uid) "
 		. "WHERE stlv.lehreinheit_id = " . $db->db_add_param($key) . " "
+		. "AND get_rolle_prestudent(pre.prestudent_id, null) NOT IN ('Abbrecher', 'Unterbrecher') "
 		. "ORDER BY nachname ASC";
 
 	if($db->db_query($qry))
