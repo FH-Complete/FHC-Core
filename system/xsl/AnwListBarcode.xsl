@@ -68,7 +68,7 @@
 			<style:text-properties fo:font-size="14pt" officeooo:rsid="00262b16" officeooo:paragraph-rsid="00262b16" style:font-size-asian="12.25pt" style:font-size-complex="14pt"/>
 		</style:style>
 		<style:style style:name="P10" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-			<style:text-properties fo:font-size="10pt" officeooo:rsid="00262b16" officeooo:paragraph-rsid="00296a84" style:font-size-asian="12.25pt" style:font-size-complex="10pt"/>
+			<style:text-properties fo:font-size="10pt" officeooo:rsid="00262b16" officeooo:paragraph-rsid="00296a84" style:font-size-asian="10pt" style:font-size-complex="10pt"/>
 		</style:style>
 		<style:style style:name="P11" style:family="paragraph" style:parent-style-name="Table_20_Contents">
 			<style:text-properties fo:font-size="11pt" officeooo:rsid="00262b16" officeooo:paragraph-rsid="00262b16" style:font-size-asian="11pt" style:font-size-complex="11pt"/>
@@ -97,7 +97,7 @@
 			<style:text-properties officeooo:rsid="0021913e"/>
 		</style:style>
 		<style:style style:name="T5" style:family="text">
-			<style:text-properties fo:font-size="11pt" style:font-size-asian="11pt" style:font-size-complex="11pt"/>
+			<style:text-properties fo:font-size="10pt" style:font-size-asian="10pt" style:font-size-complex="10pt"/>
 		</style:style>
 		<style:style style:name="T6" style:family="text">
 			<style:text-properties style:font-name="Arial" fo:font-size="8pt" style:font-size-asian="8pt"/>
