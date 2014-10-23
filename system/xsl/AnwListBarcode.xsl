@@ -37,7 +37,7 @@
 			<style:table-column-properties style:column-width="13cm" />
 		</style:style>
 		<style:style style:name="Tabelle1.A1" style:family="table-cell">
-			<style:table-cell-properties fo:padding="0.097cm" fo:border="none"/>
+			<style:table-cell-properties fo:padding="0.097cm" fo:border-left="none" fo:border-right="none" fo:border-top="none" fo:border-bottom="1pt dashed #000000"/>
 		</style:style>
 		<style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard">
 			<style:text-properties fo:font-size="18pt" officeooo:rsid="001ef933" officeooo:paragraph-rsid="001ef933" style:font-size-asian="18pt" style:font-size-complex="18pt"/>
@@ -68,7 +68,7 @@
 			<style:text-properties fo:font-size="14pt" officeooo:rsid="00262b16" officeooo:paragraph-rsid="00262b16" style:font-size-asian="12.25pt" style:font-size-complex="14pt"/>
 		</style:style>
 		<style:style style:name="P10" style:family="paragraph" style:parent-style-name="Table_20_Contents">
-			<style:text-properties fo:font-size="14pt" officeooo:rsid="00262b16" officeooo:paragraph-rsid="00296a84" style:font-size-asian="12.25pt" style:font-size-complex="14pt"/>
+			<style:text-properties fo:font-size="10pt" officeooo:rsid="00262b16" officeooo:paragraph-rsid="00296a84" style:font-size-asian="12.25pt" style:font-size-complex="10pt"/>
 		</style:style>
 		<style:style style:name="P11" style:family="paragraph" style:parent-style-name="Table_20_Contents">
 			<style:text-properties fo:font-size="11pt" officeooo:rsid="00262b16" officeooo:paragraph-rsid="00262b16" style:font-size-asian="11pt" style:font-size-complex="11pt"/>
