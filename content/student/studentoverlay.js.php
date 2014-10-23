@@ -966,6 +966,7 @@ function StudentAuswahl()
 	punkte3 = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte3" ));
 	bismelden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bismelden" ));
 	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkungpre" ));
+	mentor = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#mentor" ));
 	dual = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#dual" ));
 
 	document.getElementById('student-prestudent-menulist-aufmerksamdurch').value=aufmerksamdurch_kurzbz;
@@ -1010,6 +1011,7 @@ function StudentAuswahl()
 	document.getElementById('student-prestudent-menulist-studiengang_kz').value=studiengang_kz_prestudent;
 	
 	document.getElementById('student-prestudent-textbox-anmerkung').value=anmerkung;
+	document.getElementById('student-prestudent-textbox-mentor').value=mentor;
 
 	document.getElementById('student-detail-groupbox-caption').label='Zugangsvoraussetzung für '+nachname+' '+vorname;
 	rollentree = document.getElementById('student-prestudent-tree-rolle');
@@ -1456,6 +1458,7 @@ function StudentPrestudentDisableFields(val)
 	document.getElementById('student-prestudent-button-save').disabled=val;
 	//document.getElementById('student-prestudent-menulist-studiengang_kz').disabled=val;
 	document.getElementById('student-prestudent-textbox-anmerkung').disabled=val;
+	document.getElementById('student-prestudent-textbox-mentor').disabled=val;
 	
 	//Status Tree leeren
 	rollentree = document.getElementById('student-prestudent-tree-rolle');
@@ -1508,6 +1511,7 @@ function StudentPrestudentSave()
 	neu = document.getElementById('student-prestudent-checkbox-new').checked;
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 	anmerkung = document.getElementById('student-prestudent-textbox-anmerkung').value;
+	mentor = document.getElementById('student-prestudent-textbox-mentor').value;
 
 	if(zgvdatum!='' && !CheckDatum(zgvdatum))
 	{
@@ -1561,6 +1565,7 @@ function StudentPrestudentSave()
 	req.add('prestudent_id', prestudent_id);
 	req.add('studiengang_kz', studiengang_kz);
 	req.add('anmerkung', anmerkung);
+	req.add('mentor', mentor);
 
 	var response = req.executePOST();
 

@@ -512,6 +512,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		      					<checkbox id="student-prestudent-checkbox-dual" checked="false" disabled="true"/>
 		      				</hbox>
 						</row>
+						<row>
+						<label value="Mentor" control="student-prestudent-textbox-mentor"/>
+						<textbox id="student-prestudent-textbox-mentor" disabled="true"/>
+						</row>
 					</rows>
 				</grid>      			
     		</groupbox>

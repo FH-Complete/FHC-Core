@@ -80,6 +80,7 @@ if(isset($_GET['prestudent_id']) && is_numeric($_GET['prestudent_id']))
 				<PRESTD:punkte><![CDATA[<?php echo $prestd->punkte;  ?>]]></PRESTD:punkte>
 				<PRESTD:bismelden><![CDATA[<?php echo ($prestd->bismelden?'true':'false');  ?>]]></PRESTD:bismelden>
 				<PRESTD:anmerkung><![CDATA[<?php echo $prestd->anmerkung;  ?>]]></PRESTD:anmerkung>
+				<PRESTD:mentor><![CDATA[<?php echo $prestd->mentor;  ?>]]></PRESTD:mentor>
 	      	</RDF:Description>
 	      </RDF:li>
 <?php
