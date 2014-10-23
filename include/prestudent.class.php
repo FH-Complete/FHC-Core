@@ -47,6 +47,7 @@ class prestudent extends person
 	public $rt_punkte3=0;
 	public $bismelden=true;
 	public $anmerkung;
+	public $mentor;
 	public $ext_id_prestudent;
 	public $dual=false;
     public $zgvdoktor_code; 
@@ -127,6 +128,7 @@ class prestudent extends person
 				$this->bismelden = $this->db_parse_bool($row->bismelden);
 				$this->person_id = $row->person_id;
 				$this->anmerkung = $row->anmerkung;
+				$this->mentor = $row->mentor;
 				$this->ext_id_prestudent = $row->ext_id;
 				$this->dual = $this->db_parse_bool($row->dual);
 				$this->ausstellungsstaat = $row->ausstellungsstaat;
@@ -206,7 +208,7 @@ class prestudent extends person
 					zgvmas_code, zgvmaort, zgvmadatum, aufnahmeschluessel, facheinschlberuf, 
 					reihungstest_id, anmeldungreihungstest, reihungstestangetreten, rt_gesamtpunkte, 
 					rt_punkte1, rt_punkte2, rt_punkte3, bismelden, insertamum, insertvon, 
-					updateamum, updatevon, ext_id, anmerkung, dual, ausstellungsstaat) VALUES('.
+					updateamum, updatevon, ext_id, anmerkung, dual, ausstellungsstaat, mentor) VALUES('.
 			       $this->db_add_param($this->aufmerksamdurch_kurzbz).",".
 			       $this->db_add_param($this->person_id).",".
 			       $this->db_add_param($this->studiengang_kz).",".
@@ -235,7 +237,8 @@ class prestudent extends person
 			       $this->db_add_param($this->ext_id_prestudent).",".
 			       $this->db_add_param($this->anmerkung).",".
 			       $this->db_add_param($this->dual, FHC_BOOLEAN).",".
-			       $this->db_add_param($this->ausstellungsstaat).");";
+			       $this->db_add_param($this->ausstellungsstaat).",".
+			       $this->db_add_param($this->mentor).");";
 		}
 		else
 		{
@@ -265,6 +268,7 @@ class prestudent extends person
 			       ' updatevon='.$this->db_add_param($this->updatevon).",".
 			       ' ext_id='.$this->db_add_param($this->ext_id_prestudent).",".
 			       ' anmerkung='.$this->db_add_param($this->anmerkung).",".
+			       ' mentor='.$this->db_add_param($this->mentor).",".
 			       ' dual='.$this->db_add_param($this->dual, FHC_BOOLEAN).",".
 				   ' ausstellungsstaat='.$this->db_add_param($this->ausstellungsstaat).
 			       " WHERE prestudent_id=".$this->db_add_param($this->prestudent_id).";";
@@ -1045,6 +1049,7 @@ class prestudent extends person
 				$obj->bismelden = $this->db_parse_bool($row->bismelden);
 				$obj->person_id = $row->person_id;
 				$obj->anmerkung = $row->anmerkung;
+				$obj->mentor = $row->mentor;
 				$obj->ext_id_prestudent = $row->ext_id;
 				$obj->dual = $this->db_parse_bool($row->dual);
 				$obj->ausstellungsstaat = $row->ausstellungsstaat;

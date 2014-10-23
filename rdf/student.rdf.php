@@ -287,6 +287,7 @@ function draw_prestudent($row)
 			<STUDENT:dual><![CDATA['.($row->dual?'true':'false').']]></STUDENT:dual>
 			<STUDENT:dual_bezeichnung><![CDATA['.($row->dual?'Ja':'Nein').']]></STUDENT:dual_bezeichnung>
 			<STUDENT:anmerkungpre><![CDATA['.$row->anmerkung.']]></STUDENT:anmerkungpre>
+			<STUDENT:mentor><![CDATA['.$row->mentor.']]></STUDENT:mentor>
       	</RDF:Description>
       </RDF:li>';
 	}

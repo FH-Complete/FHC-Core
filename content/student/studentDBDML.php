@@ -443,6 +443,7 @@ if(!$error)
 				$prestudent->bismelden = ($_POST['bismelden']=='true'?true:false);
 				$prestudent->dual = ($_POST['dual']=='true'?true:false);
 				$prestudent->anmerkung = $_POST['anmerkung'];
+				$prestudent->mentor = $_POST['mentor'];
 				//$prestudent->insertamum = date('Y-m-d H:i:s');
 				//$prestudent->insertvon = $user;
 				$prestudent->updateamum = date('Y-m-d H:i:s');
