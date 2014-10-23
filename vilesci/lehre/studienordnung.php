@@ -200,6 +200,7 @@ echo '
 					<li><a href="#tab-lehrveranstaltungdetail">LV Details</a></li>
 					<li><a href="#tab-regel">Regeln</a></li>
 					<li><a href="#tab-kompatibel">Kompatibilität</a></li>
+					<li><a href="#tab-sortierung">Sortierung</a></li>
 				</ul>
 				<div id="tab-lehrveranstaltungdetail">
 					<p>Klicken Sie auf eine Lehrveranstaltung um die Details anzuzeigen</p>
@@ -209,6 +210,9 @@ echo '
 				</div>
 				<div id="tab-kompatibel">
 					<p>Klicken Sie auf eine Lehrveranstaltung um die kompatiblen Lehrveranstaltungen anzuzeigen</p>
+				</div>
+				<div id="tab-sortierung">
+					<p>Klicken Sie auf eine Lehrveranstaltung um die Sortierung innerhalb der Studienplanansicht im CIS zu ändern.</p>
 				</div>
 			</div>
 			<!-- Tabs ende -->
