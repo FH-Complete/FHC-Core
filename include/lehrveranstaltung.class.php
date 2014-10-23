@@ -1145,7 +1145,8 @@ class lehrveranstaltung extends basis_db
 			tbl_studienplan_lehrveranstaltung.semester as stpllv_semester, 
 			tbl_studienplan_lehrveranstaltung.pflicht as stpllv_pflicht, 
 			tbl_studienplan_lehrveranstaltung.koordinator as stpllv_koordinator, 
-			tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent 
+			tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent,
+			tbl_studienplan_lehrveranstaltung.sort stpllv_sort
 		FROM lehre.tbl_lehrveranstaltung 
 		JOIN lehre.tbl_studienplan_lehrveranstaltung 
 		USING(lehrveranstaltung_id) 
@@ -1155,7 +1156,7 @@ class lehrveranstaltung extends basis_db
 		{
 			$qry.=" AND tbl_studienplan_lehrveranstaltung.semester=" . $this->db_add_param($semester, FHC_INTEGER);
 		}
-		$qry.=" ORDER BY semester, sort";
+		$qry.=" ORDER BY stpllv_sort, semester, sort";
 		$this->lehrveranstaltungen = array();
 		if ($result = $this->db_query($qry)) 
 		{

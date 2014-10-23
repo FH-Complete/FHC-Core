@@ -54,6 +54,7 @@ class studienplan extends basis_db
     protected $studienplan_lehrveranstaltung_id_parent;	//integer
     protected $pflicht;									//boolean
     protected $koordinator;								//varchar(32)
+    protected $sort;
 
 
 
@@ -388,7 +389,8 @@ class studienplan extends basis_db
 			    $obj->semester = $row->semester;
 			    $obj->studienplan_lehrveranstaltung_id_parent = $row->studienplan_lehrveranstaltung_id_parent;
 			    $obj->pflicht = $row->pflicht;
-			    $obj->koordinator = $row->koordinator;	
+			    $obj->koordinator = $row->koordinator;
+			    $obj->sort = $row->sort;	
 			    $data[]=$obj;
 		    }
 	    }
@@ -415,6 +417,7 @@ class studienplan extends basis_db
 		    $obj->studienplan_lehrveranstaltung_id_parent = $this->studienplan_lehrveranstaltung_id_parent;
 		    $obj->pflicht = $this->pflicht;
 		    $obj->koordinator = $this->koordinator;
+		    $obj->sort = $this->sort;	
 		    $data[]=$obj;
 	    }
 	    return $data;
@@ -580,6 +583,7 @@ class studienplan extends basis_db
 			    $this->insertvon = $row->insertvon;
 			    $this->updateamum = $row->updateamum;
 			    $this->updatevon = $row->updatevon;
+			    $this->sort = $row->sort;
 			    $this->new=false;
 			    return true;
 		    }
@@ -737,6 +741,37 @@ class studienplan extends basis_db
 	    }
 	    return true;			
 	}
+    }
+    
+    /**
+     * Speichert die Sortierung
+     * @param type $tudienplan_lehrveranstaltung_id
+     * @param type $sort
+     */
+    function saveSortierung($studienplan_lehrveranstaltung_id, $sort)
+    {
+	if($studienplan_lehrveranstaltung_id==NULL)
+	    $studienplan_lehrveranstaltung_id = $this->studienplan_lehrveranstaltung_id;
+	
+	if($sort==NULL)
+	    $sort = $this->sort;
+	
+	if(!(is_numeric($sort) || is_null($sort)))
+	{
+	    $this->errormsg = "Es muss eine Zahl als Sortierungswert angegeben werden.";
+	    return false;
+	}
+	$qry = 'UPDATE lehre.tbl_studienplan_lehrveranstaltung '
+		. 'SET sort='.$this->db_add_param($sort)
+		. ' WHERE studienplan_lehrveranstaltung_id='.$this->db_add_param($studienplan_lehrveranstaltung_id).';';
+	
+	$this->orgform_kurzbz = $qry;
+	if(!$this->db_query($qry))
+	{
+	    $this->errormsg = "Fehler beim speichern der Sortierung.";
+	    return false;
+	}
+	return true;
     }
 }
 ?>

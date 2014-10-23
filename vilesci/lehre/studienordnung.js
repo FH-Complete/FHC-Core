@@ -573,6 +573,17 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 				{
 					$("#tab-kompatibel").html("<p>Klicken Sie auf eine Lehrveranstaltung um die kompatiblen Lehrveranstaltungen anzuzeigen</p>");
 				}
+				
+				// Sortierung laden
+				if(data.rslt.obj.attr("rel") !== "semester")
+				{
+					if(lvid!==undefined)
+						loadSTPLSortierung(stpllvid);
+				}
+				else
+				{
+					$("#tab-sortierung").html("<p>Klicken Sie auf eine Lehrveranstaltung um die Sortierung innerhalb der Studienplanansicht im CIS zu ändern.</p>");
+				}
 		});
 
 		if(!isLVFilterLoaded)
@@ -676,6 +687,68 @@ function loadLVKompatibilitaet(lvid)
 		$("#tab-kompatibel").html(html);
 		
 	});	
+}
+/*
+ * lädt die Sortierung einer Lehrveranstaltung innerhalb eines Studienplans
+ * @param {type} lvid
+ * @returns {undefined}
+ */
+function loadSTPLSortierung(stpllvid)
+{
+	$.ajax(
+	{
+		dataType: "json",
+		url: "../../soap/fhcomplete.php",
+		data: {
+				"typ": "json",
+				"class": "studienplan",
+				"method": "loadStudienplanLehrveranstaltung",
+				"parameter_0":stpllvid
+			},
+		error: loadError
+	}).success(function(data)
+	{
+		console.log(data);
+		var html='';
+		for(i in data.result)
+		{
+			if(data.result[i])
+			{
+				lvdata = data.result[i];
+				html += 'Sortierung: <input type="number" id="stplSort" value="'+ClearNull(lvdata.sort)+'"><br/><input type="button" onclick="saveSortierung(\''+stpllvid+'\');" value="Speichern">';
+			}
+		}
+		$("#tab-sortierung").html(html);
+	});
+}
+
+function saveSortierung(stpllvid)
+{
+	var sort = $('#stplSort').val();
+	if(sort === "")
+		sort=null;
+	
+	
+	console.log(sort);
+	savedata = {
+		"studienplan_lehrveranstaltung_id": stpllvid,
+		"sort": sort
+	};
+	$.ajax(
+	{	
+		dataType: "json",
+		url: "../../soap/fhcomplete.php",
+		type: "POST",
+		data: {
+			"typ": "json",
+			"class": "studienplan",
+			"method": "saveSortierung",
+			"savedata": JSON.stringify(savedata)
+		}
+	}).success(function(d)
+	{
+		console.log(d);
+	});
 }
 
 
