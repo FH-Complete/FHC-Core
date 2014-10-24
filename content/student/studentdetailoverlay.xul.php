@@ -514,7 +514,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						</row>
 						<row>
 						<label value="Mentor" control="student-prestudent-textbox-mentor"/>
-						<textbox id="student-prestudent-textbox-mentor" disabled="true"/>
+						<hbox><textbox id="student-prestudent-textbox-mentor" disabled="true" size="40" maxlength="256"/></hbox>
 						</row>
 					</rows>
 				</grid>      			
