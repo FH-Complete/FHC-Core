@@ -498,7 +498,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			where student_uid = ".$db->db_add_param($uid_arr[$i])." AND
             zeugnis = true AND
 			status.ausbildungssemester = ".$db->db_add_param($start)." AND
-            status.status_kurzbz NOT IN('Unterbrecher', 'Interessent','Bewerber','Aufgenommener','Abgewiesener')
+            status.status_kurzbz NOT IN('Unterbrecher', 'Interessent','Bewerber','Aufgenommener','Abgewiesener','Wartender')
             ORDER BY datum ASC";
 			
            $semester_kurzbz = array(); 
