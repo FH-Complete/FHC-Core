@@ -141,6 +141,7 @@ function draw_content_liste($row)
 	$prestudent->getLastStatus($row->prestudent_id);
 	$status = $prestudent->status_kurzbz;
 	$orgform = $prestudent->orgform_kurzbz;
+	$studienplan_bezeichnung=$prestudent->studienplan_bezeichnung;
 
 	echo '
 	  <RDF:li>
@@ -158,26 +159,27 @@ function draw_content_liste($row)
     		<STUDENT:ersatzkennzeichen>'.($row->ersatzkennzeichen==''?'&#xA0;':'<![CDATA['.$row->ersatzkennzeichen.']]>').'</STUDENT:ersatzkennzeichen>
     		<STUDENT:geburtsdatum><![CDATA['.$datum_obj->convertISODate($row->gebdatum).']]></STUDENT:geburtsdatum>
     		<STUDENT:geburtsdatum_iso><![CDATA['.$row->gebdatum.']]></STUDENT:geburtsdatum_iso>
-			<STUDENT:semester><![CDATA['.(isset($row->semester)?$row->semester:'').']]></STUDENT:semester>
+		<STUDENT:semester><![CDATA['.(isset($row->semester)?$row->semester:'').']]></STUDENT:semester>
     		<STUDENT:verband><![CDATA['.(isset($row->verband)?$row->verband:'').']]></STUDENT:verband>
     		<STUDENT:gruppe><![CDATA['.(isset($row->gruppe)?$row->gruppe:'').']]></STUDENT:gruppe>
-			<STUDENT:matrikelnummer><![CDATA['.(isset($row->matrikelnr)?$row->matrikelnr:'').']]></STUDENT:matrikelnummer>
+		<STUDENT:matrikelnummer><![CDATA['.(isset($row->matrikelnr)?$row->matrikelnr:'').']]></STUDENT:matrikelnummer>
     		<STUDENT:mail_privat><![CDATA['.$row->email_privat.']]></STUDENT:mail_privat>
     		<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
-			<STUDENT:status><![CDATA['.$status.']]></STUDENT:status>
+		<STUDENT:status><![CDATA['.$status.']]></STUDENT:status>
     		<STUDENT:anmerkungen>'.($row->anmerkungen==''?'&#xA0;':'<![CDATA['.$row->anmerkungen.']]>').'</STUDENT:anmerkungen>
     		<STUDENT:anmerkungpre>'.($row->anmerkung==''?'&#xA0;':'<![CDATA['.$row->anmerkung.']]>').'</STUDENT:anmerkungpre>
     		<STUDENT:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></STUDENT:studiengang_kz>
-			<STUDENT:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></STUDENT:studiengang>
-			<STUDENT:orgform><![CDATA['.$orgform.']]></STUDENT:orgform>
-			<STUDENT:aufmerksamdurch_kurzbz><![CDATA['.$row->aufmerksamdurch_kurzbz.']]></STUDENT:aufmerksamdurch_kurzbz>
-			<STUDENT:punkte><![CDATA['.$row->punkte.']]></STUDENT:punkte>
-			<STUDENT:punkte1><![CDATA['.$row->rt_punkte1.']]></STUDENT:punkte1>
-			<STUDENT:punkte2><![CDATA['.$row->rt_punkte2.']]></STUDENT:punkte2>
-			<STUDENT:punkte3><![CDATA['.$row->rt_punkte3.']]></STUDENT:punkte3>
-			<STUDENT:dual><![CDATA['.($row->dual=='t'?'true':'false').']]></STUDENT:dual>
-			<STUDENT:dual_bezeichnung><![CDATA['.($row->dual=='t'?'Ja':'Nein').']]></STUDENT:dual_bezeichnung>
-			<STUDENT:matr_nr><![CDATA['.$row->matr_nr.']]></STUDENT:matr_nr>
+		<STUDENT:studiengang><![CDATA['.$stg_arr[$row->studiengang_kz].']]></STUDENT:studiengang>
+		<STUDENT:orgform><![CDATA['.$orgform.']]></STUDENT:orgform>
+    		<STUDENT:studienplan_bezeichnung><![CDATA['.$studienplan_bezeichnung.']]></STUDENT:studienplan_bezeichnung>
+		<STUDENT:aufmerksamdurch_kurzbz><![CDATA['.$row->aufmerksamdurch_kurzbz.']]></STUDENT:aufmerksamdurch_kurzbz>
+		<STUDENT:punkte><![CDATA['.$row->punkte.']]></STUDENT:punkte>
+		<STUDENT:punkte1><![CDATA['.$row->rt_punkte1.']]></STUDENT:punkte1>
+		<STUDENT:punkte2><![CDATA['.$row->rt_punkte2.']]></STUDENT:punkte2>
+		<STUDENT:punkte3><![CDATA['.$row->rt_punkte3.']]></STUDENT:punkte3>
+		<STUDENT:dual><![CDATA['.($row->dual=='t'?'true':'false').']]></STUDENT:dual>
+		<STUDENT:dual_bezeichnung><![CDATA['.($row->dual=='t'?'Ja':'Nein').']]></STUDENT:dual_bezeichnung>
+		<STUDENT:matr_nr><![CDATA['.$row->matr_nr.']]></STUDENT:matr_nr>
       	</RDF:Description>
       </RDF:li>';
 }
@@ -204,6 +206,7 @@ function draw_content($row)
 		$prestudent->getLastStatus($row->prestudent_id);
 		$status = $prestudent->status_kurzbz;
 		$orgform = $prestudent->orgform_kurzbz;
+		$studienplan_bezeichnung=$prestudent->studienplan_bezeichnung;
 		
 		if($status=='Aufgenommener' || $status=='Bewerber' || $status=='Wartender' || $status=='Interessent')
 			$semester_prestudent = $prestudent->ausbildungssemester;
@@ -235,6 +238,7 @@ function draw_content($row)
     		<STUDENT:sprache><![CDATA['.$row->sprache.']]></STUDENT:sprache>
     		<STUDENT:status><![CDATA['.$status.']]></STUDENT:status>
     		<STUDENT:orgform><![CDATA['.$orgform.']]></STUDENT:orgform>
+    		<STUDENT:studienplan_bezeichnung><![CDATA['.$studienplan_bezeichnung.']]></STUDENT:studienplan_bezeichnung>
     		<STUDENT:mail_privat><![CDATA['.$mail_privat.']]></STUDENT:mail_privat>
     		<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
 
