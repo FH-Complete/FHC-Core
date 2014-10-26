@@ -268,7 +268,7 @@ else
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#matr_nr" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
-						<treecol id="student-treecol-studienplan" label="Studienplan" flex="1" hidden="true" persist="hidden, width, ordinal"
+						<treecol id="student-treecol-studienplan" label="Studienplan" flex="1" hidden="false" persist="hidden, width, ordinal"
 						class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#studienplan_bezeichnung" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
