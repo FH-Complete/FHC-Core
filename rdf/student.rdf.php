@@ -180,6 +180,7 @@ function draw_content_liste($row)
 		<STUDENT:dual><![CDATA['.($row->dual=='t'?'true':'false').']]></STUDENT:dual>
 		<STUDENT:dual_bezeichnung><![CDATA['.($row->dual=='t'?'Ja':'Nein').']]></STUDENT:dual_bezeichnung>
 		<STUDENT:matr_nr><![CDATA['.$row->matr_nr.']]></STUDENT:matr_nr>
+		<STUDENT:mentor><![CDATA['.$row->mentor.']]></STUDENT:mentor>
       	</RDF:Description>
       </RDF:li>';
 }
@@ -401,7 +402,7 @@ if($xmlformat=='rdf')
 		$sql_query="SELECT p.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,	vorname, vornamen, geschlecht,
 						nachname, gebdatum, tbl_prestudent.anmerkung,ersatzkennzeichen,svnr, tbl_student.matrikelnr, p.anmerkung as anmerkungen,
 						tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
-						tbl_student.studiengang_kz, aufmerksamdurch_kurzbz, 
+						tbl_student.studiengang_kz, aufmerksamdurch_kurzbz, mentor,
 						(	SELECT kontakt
 							FROM public.tbl_kontakt
 							WHERE kontakttyp='email' AND person_id=p.person_id AND zustellung

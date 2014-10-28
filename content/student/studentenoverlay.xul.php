@@ -271,6 +271,10 @@ else
 						<treecol id="student-treecol-studienplan" label="Studienplan" flex="1" hidden="false" persist="hidden, width, ordinal"
 						class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#studienplan_bezeichnung" onclick="StudentTreeSort()"/>
+					<splitter class="tree-splitter"/>
+						<treecol id="student-treecol-mentor" label="Mentor" flex="1" hidden="true" persist="hidden, width, ordinal"
+						class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#mentor" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 					</treecols>
 
@@ -311,6 +315,7 @@ else
 	           							<treecell label="rdf:http://www.technikum-wien.at/student/rdf#dual_bezeichnung" />
 									<treecell label="rdf:http://www.technikum-wien.at/student/rdf#matr_nr" />
 									<treecell label="rdf:http://www.technikum-wien.at/student/rdf#studienplan_bezeichnung" />
+									<treecell label="rdf:http://www.technikum-wien.at/student/rdf#mentor" />
 	         						</treerow>
 	       						</treeitem>
 	      					</treechildren>
