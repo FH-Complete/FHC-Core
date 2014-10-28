@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Nikolaus Krondraf <nikolaus.krondraf@technikum-wien.at>.
+ * Authors: Nikolaus Krondraf <nikolaus.krondraf@technikum-wien.at>
  */
 /**
  * Erstellt das XML fuer die Anwesenheitsliste
@@ -28,11 +28,14 @@ require_once('../include/basis_db.class.php');
 require_once('../include/ean13.function.php');
 
 // Optionen abfragen
-isset($_GET['von']) ? $von = $_GET['von'] : $von = NULL;
-isset($_GET['bis']) ? $bis = $_GET['bis'] : $bis = $von;
+isset($_GET['von']) ? $von = date('Y-m-d', strtotime($_GET['von'])) : $von = NULL;
+isset($_GET['bis']) ? $bis = date('Y-m-d', strtotime($_GET['bis'])) : $bis = $von;
 isset($_GET['stg_kz']) ? $studiengang = $_GET['stg_kz'] : $studiengang = NULL;
 isset($_GET['ss']) ? $semester = $_GET['ss'] : $semester = NULL;
 isset($_GET['lehreinheit']) ? $lehreinheit = $_GET['lehreinheit'] : $lehreinheit = NULL;
+
+if($von)
+	$studiensemester = getStudiensemesterFromDatum($von);
 
 $db = new basis_db();
 $data = array();
@@ -91,14 +94,14 @@ foreach($data as $key => $value)
 
 	// Daten der Studenten ermitteln
 	$qry = "SELECT pe.person_id, vorname, nachname, titelpre, titelpost, note, "
-		. "get_rolle_prestudent(pre.prestudent_id, null) AS laststatus "
+		. "get_rolle_prestudent(pre.prestudent_id, " . $db->db_add_param($studiensemester) . ") AS laststatus "
 		. "FROM campus.vw_student_lehrveranstaltung stlv "
 		. "JOIN public.tbl_benutzer be ON be.uid = stlv.uid "
 		. "JOIN public.tbl_person pe ON pe.person_id = be.person_id "
 		. "JOIN public.tbl_prestudent pre ON (pre.person_id = pe.person_id AND pre.studiengang_kz = " . $db->db_add_param($studiengang) . ") "
 		. "LEFT JOIN lehre.tbl_zeugnisnote zn ON (zn.lehrveranstaltung_id = stlv.lehrveranstaltung_id AND zn.student_uid = stlv.uid) "
 		. "WHERE stlv.lehreinheit_id = " . $db->db_add_param($key) . " "
-		. "AND get_rolle_prestudent(pre.prestudent_id, null) NOT IN ('Abbrecher', 'Unterbrecher') "
+		. "AND get_rolle_prestudent(pre.prestudent_id, " . $db->db_add_param($studiensemester) . ") NOT IN ('Abbrecher', 'Unterbrecher') "
 		. "ORDER BY nachname ASC";
 
 	if($db->db_query($qry))
