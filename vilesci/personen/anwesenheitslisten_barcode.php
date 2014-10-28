@@ -23,7 +23,7 @@ require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
 
 $studiengang = new studiengang;
-$studiengang->getAll("bezeichnung");
+$studiengang->getAll("typ, kurzbz");
 
 ?>
 
@@ -31,44 +31,78 @@ $studiengang->getAll("bezeichnung");
 <html>
 <head>
 	<title>Anwesenheitslisten mit Barcodes</title>
-	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-	<!--<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">-->
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-	<!--<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>-->
-	<script type="text/javascript" src="../../include/js/jquery.js"></script>
-	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
-	<link href="../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
-	<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script> 
+	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+	<link rel="stylesheet" href="../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
+	<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script> 
+	
 	<script type="text/javascript">
 	$(document).ready(function() 
-		{ 
-		    $(".datepicker").datepicker($.datepicker.regional['de']).datepicker("setDate", new Date());
-		});
+	{ 
+	    $(".datepicker").datepicker($.datepicker.regional['de']).datepicker("setDate", new Date());
+	});
+	
+	function checkDates()
+	{
+		var result = true;
+		
+		if($("#von").val() == '' || $("#bis").val() == '')
+		{
+			result = false;
+		}
+		else
+		{
+			var von = $("#von").val().split('.');
+			var bis = $("#bis").val().split('.');
+
+			var vonObj = new Date(von[2] + "-" + von[1] + "-" + von[0]);
+			var bisObj = new Date(bis[2] + "-" + bis[1] + "-" + bis[0]);
+
+			if(Math.round((bisObj - vonObj) / 1000 / 60 / 60 / 24) > 14)
+			{
+				$("#error").show();
+				result = false;
+			}
+			else
+			{
+				$("#error").hide();
+				result = true;
+			}
+		}
+		
+		return result;
+	}
 	</script>
 </head>
 <body class="Background_main">
 <h2>Anwesenheitslisten mit Barcodes</h2>
-	<form method="get" action="../../content/pdfExport.php?xsl=AnwListBarcode&output=pdf">
+	<p id="error" style="display: none; font-weight: bold; color: red;">Die gewählte Zeitspanne darf nicht größer als 14 Tage sein!</p>
+	
+	<form method="get" action="../../content/pdfExport.php?xsl=AnwListBarcode&output=pdf" onsubmit="return checkDates();">
+		<input type="hidden" name="xsl" value="AnwListBarcode" />
+		<input type="hidden" name="output" value="pdf" />
+		<input type="hidden" name="xml" value="anwesenheitsliste.xml.php" />
+		
 		<table>
 		<tbody>
 			<tr>
 				<td>von</td>
-				<td><input type="text" name="von" class="datepicker" id="von" /></td>
+				<td><input type="text" name="von" class="datepicker" id="von" autocomplete="off" /></td>
 			</tr>
 			<tr>
 				<td>bis</td>
-				<td><input type="text" name="bis" class="datepicker" id="bis" /></td>
+				<td><input type="text" name="bis" class="datepicker" id="bis" autocomplete="off" /></td>
 			</tr>
 			<tr>
 				<td>Studiengang</td>
 				<td>
 					<select name="stg_kz">
-						<?php foreach($studiengang->result as $value) echo "<option value='$value->studiengang_kz'>$value->bezeichnung</option>\n"; ?>
+						<?php foreach($studiengang->result as $value) echo "<option value='$value->studiengang_kz'>$value->kuerzel ($value->bezeichnung)</option>\n"; ?>
 					</select>
 				</td>
 			</tr>
 			<tr>
-				<td>Ausbildungssemster</td>
+				<td>Ausbildungssemester</td>
 				<td>
 					<select name="ss">
 						<?php for($x = 1; $x <= 10; $x++) echo "<option value='$x'>$x</option>\n"; ?>
@@ -76,15 +110,11 @@ $studiengang->getAll("bezeichnung");
 				</td>
 			</tr>
 			<tr>
-				<td colspan="2"><input type="submit" value="Liste erstellen" /></td>
+				<td></td>
+				<td><input type="submit" value="Liste erstellen" /></td>
 			</tr>
 		</tbody>
 		</table>
-		
-		<input type="hidden" name="xsl" value="AnwListBarcode" />
-		<input type="hidden" name="output" value="pdf" />
-		<input type="hidden" name="xml" value="anwesenheitsliste.xml.php" />
 	</form>
 </body>
 </html>
-
