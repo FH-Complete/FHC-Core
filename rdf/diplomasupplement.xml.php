@@ -335,6 +335,9 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
         // Hole Datum der Sponsion -> wenn keine vorhanden nimm aktuelles datum
         $qry = "SELECT sponsion, tbl_abschlussbeurteilung.bezeichnung_english,datum FROM lehre.tbl_abschlusspruefung JOIN lehre.tbl_abschlussbeurteilung USING(abschlussbeurteilung_kurzbz) WHERE student_uid='".$uid_arr[$i]."' ORDER BY datum DESC LIMIT 1";
         $sponsion_datum = date('d.m.Y');
+        $abschlusspruefungsdatum = '';
+        $abschlussbeurteilung='';
+        
         if($db->db_query($qry))
         {
             if($row1= $db->db_fetch_object())
@@ -405,6 +408,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$noten_anzahl += $noteArrayPrev[7];
 		$noten_anzahl += $noteArrayPrev[12];
 
+		// Division durch 0 verhindern
+		if($noten_anzahl==0)
+			$noten_anzahl=1;
+		
 		// Noten: 1-5, angerechnet, nicht beurteilt, erfolgreich absolviert anzeigen
 		echo "  <gradeLastYear1>".sprintf("%01.1f",($noteArrayPrev[1]/$noten_anzahl*100))."</gradeLastYear1>";
 		echo "  <gradeLastYear2>".sprintf("%01.1f",($noteArrayPrev[2]/$noten_anzahl*100))."</gradeLastYear2>";
@@ -443,6 +450,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$noten_anzahl += $noteArrayPrev[7];
 		$noten_anzahl += $noteArrayPrev[12];
 
+		// Division durch 0 verhindern
+		if($noten_anzahl==0)
+			$noten_anzahl=1;
+		
 		// Noten: 1-5, angerechnet, nicht beurteilt, erfolgreich absolviert anzeigen
 		echo "  <gradePrevLastYear1>".sprintf("%01.1f",($noteArrayPrev[1]/$noten_anzahl*100))."</gradePrevLastYear1>";
 		echo "  <gradePrevLastYear2>".sprintf("%01.1f",($noteArrayPrev[2]/$noten_anzahl*100))."</gradePrevLastYear2>";
