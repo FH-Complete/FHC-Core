@@ -2051,6 +2051,108 @@ class lehrveranstaltung extends basis_db
 			$this->errormsg = "Fehler beim Laden der Daten";
 			return false;
 		}
-	}	
+	}
+	
+	/**
+	 * Lädt alle Lehrveranstaltungen eine Studienplans
+	 * Optionale Filterung nach Lehrtyp und Semester
+	 * @param type $studienplan_id
+	 * @param type $lehrtyp_kurzbz
+	 * @param type $semester
+	 * @return boolean
+	 */
+	public function getLVFromStudienplanByLehrtyp($studienplan_id, $lehrtyp_kurzbz=NULL, $semester=NULL)
+	{
+	    if (!is_numeric($studienplan_id) || $studienplan_id === '') 
+	    {
+		    $this->errormsg = 'StudienplanID ist ungueltig';
+		    return false;
+	    }
+
+	    $qry = "SELECT DISTINCT tbl_lehrveranstaltung.*
+		FROM lehre.tbl_lehrveranstaltung 
+		JOIN lehre.tbl_studienplan_lehrveranstaltung 
+		USING(lehrveranstaltung_id) 
+		WHERE tbl_studienplan_lehrveranstaltung.studienplan_id=" . $this->db_add_param($studienplan_id, FHC_INTEGER);
+	    
+	    if (!is_null($lehrtyp_kurzbz))
+	    {
+		$qry.=" AND tbl_lehrveranstaltung.lehrtyp_kurzbz=" . $this->db_add_param($lehrtyp_kurzbz, FHC_STRING);
+	    }
+
+	    if (!is_null($semester)) 
+	    {
+		$qry.=" AND tbl_studienplan_lehrveranstaltung.semester=" . $this->db_add_param($semester, FHC_INTEGER);
+	    }
+	    $qry.=" ORDER BY bezeichnung;";
+	    //TODO
+	    $this->errormsg = $qry;
+	    $this->lehrveranstaltungen = array();
+	    if ($result = $this->db_query($qry)) 
+	    {
+		while ($row = $this->db_fetch_object($result)) 
+		{
+		    $obj = new lehrveranstaltung();
+
+		    $obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+		    $obj->studiengang_kz = $row->studiengang_kz;
+		    $obj->bezeichnung = $row->bezeichnung;
+		    $obj->kurzbz = $row->kurzbz;
+		    $obj->lehrform_kurzbz = $row->lehrform_kurzbz;
+		    $obj->semester = $row->semester;
+		    $obj->ects = $row->ects;
+		    $obj->semesterstunden = $row->semesterstunden;
+		    $obj->anmerkung = $row->anmerkung;
+		    $obj->lehre = $this->db_parse_bool($row->lehre);
+		    $obj->lehreverzeichnis = $row->lehreverzeichnis;
+		    $obj->aktiv = $this->db_parse_bool($row->aktiv);
+		    $obj->ext_id = $row->ext_id;
+		    $obj->insertamum = $row->insertamum;
+		    $obj->insertvon = $row->insertvon;
+		    $obj->planfaktor = $row->planfaktor;
+		    $obj->planlektoren = $row->planlektoren;
+		    $obj->planpersonalkosten = $row->planpersonalkosten;
+		    $obj->plankostenprolektor = $row->plankostenprolektor;
+		    $obj->updateamum = $row->updateamum;
+		    $obj->updatevon = $row->updatevon;
+		    $obj->sprache = $row->sprache;
+		    $obj->sort = $row->sort;
+		    $obj->incoming = $row->incoming;
+		    $obj->zeugnis = $this->db_parse_bool($row->zeugnis);
+		    $obj->projektarbeit = $this->db_parse_bool($row->projektarbeit);
+		    $obj->koordinator = $row->koordinator;
+		    $obj->bezeichnung_english = $row->bezeichnung_english;
+		    $obj->orgform_kurzbz = $row->orgform_kurzbz;
+		    $obj->lehrtyp_kurzbz = $row->lehrtyp_kurzbz;
+		    $obj->oe_kurzbz = $row->oe_kurzbz;
+		    $obj->raumtyp_kurzbz = $row->raumtyp_kurzbz;
+		    $obj->anzahlsemester = $row->anzahlsemester;
+		    $obj->semesterwochen = $row->semesterwochen;
+		    $obj->lvnr = $row->lvnr;
+		    $obj->semester_alternativ = $row->semester_alternativ;
+		    $obj->farbe = $row->farbe;
+
+		    $obj->bezeichnung_arr['German'] = $row->bezeichnung;
+		    $obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
+		    if ($obj->bezeichnung_arr['English'] == '')
+			$obj->bezeichnung_arr['English'] = $obj->bezeichnung_arr['German'];
+
+		    $obj->stpllv_semester = $row->stpllv_semester;
+		    $obj->stpllv_pflicht = $this->db_parse_bool($row->stpllv_pflicht);
+		    $obj->stpllv_koordinator = $row->stpllv_koordinator;
+		    $obj->studienplan_lehrveranstaltung_id = $row->studienplan_lehrveranstaltung_id;
+		    $obj->studienplan_lehrveranstaltung_id_parent = $row->studienplan_lehrveranstaltung_id_parent;
+		    $obj->new = false;
+
+		    $this->lehrveranstaltungen[] = $obj;
+		}
+		return true;
+	    }
+	    else 
+	    {
+		$this->errormsg = 'Fehler beim Laden der Daten';
+		return false;
+	    }
+	}
 }
 ?>
