@@ -78,7 +78,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       </style:table-cell-properties>
     </style:style>
     <style:style style:name="Lehrveranstaltungen.A3" style:family="table-cell">
-      <style:table-cell-properties fo:padding="0.147cm" fo:border="none"/>
+      <style:table-cell-properties fo:padding="0.147cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="none" fo:border-bottom="none"/>
     </style:style>
     <style:style style:name="Lehrveranstaltungen.B3" style:family="table-cell">
       <style:table-cell-properties fo:padding="0.097cm" fo:border="none"/>
@@ -105,7 +105,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <style:table-cell-properties fo:padding="0.097cm" fo:border="0.05pt solid #000000"/>
     </style:style>
     <style:style style:name="Lehrveranstaltungen.A4" style:family="table-cell">
-      <style:table-cell-properties fo:padding="0.097cm" fo:border="none"/>
+      <style:table-cell-properties fo:padding="0.097cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="none" fo:border-bottom="none"/>
     </style:style>
     <style:style style:name="Lehrveranstaltungen.B4" style:family="table-cell">
       <style:table-cell-properties fo:padding="0.097cm" fo:border="none"/>
@@ -399,7 +399,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <text:p text:style-name="P3"/>
       <text:p text:style-name="PLegend"><text:soft-page-break/>Legende: WS=Wintersemester, SS=Sommersemester, SWS=Semesterwochenstunden, LV-Art=Lehrveranstaltungsart, VO=Vorlesung, UE=Übung, BP=Praktikum, SE=Seminar, EX=Exkursion, PT=Projekt, AWPF=Wahlpflichtfach, RU=Rechenübung, ILV=integr. LV, LB=Laborübung, PS=Proseminar, WK=Workshop, WA=Wiss. Arbeit, WP=Wirtschaftspraktikum, MT=Managementtechniken, MODUL=gemeinsame Bewertung mehrerer Lehrveranstaltungen mit einer Modulnote</text:p>
       <text:p text:style-name="PLegend"/>
-      <text:p text:style-name="PLegend">1 SWS=15 Lehrveranstaltungsstunden, m.E.tg.=mit Erfolg teilgenommen, o.E.tg.=ohne Erfolg teilgenommen</text:p>
+      <text:p text:style-name="PLegend">1 SWS=15 Lehrveranstaltungsstunden, m.E.tg.=mit Erfolg teilgenommen, o.E.tg.=ohne Erfolg teilgenommen, an=anerkannt</text:p>
       <text:p text:style-name="PLegend">Nationale Beurteilung: 1=Sehr Gut, 2=Gut, 3=Befriedigend, 4=Genügend, 5=Nicht Genügend</text:p>
       <text:p text:style-name="PLegend">Internationale Beurteilung (ECTS Notenskala): A/B=Sehr Gut, C=Gut, D=Befriedigend, E=Genügend, F=Nicht Genügend</text:p>
       <text:p text:style-name="PLegendEmpty"/>
