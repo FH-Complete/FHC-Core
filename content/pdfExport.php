@@ -121,6 +121,12 @@ if(isset($_GET['version']) && is_numeric($_GET['version']))
 	$version = $_GET['version'];
 else 
 	$version ='';
+if(isset($_GET['von']))
+	$params.='&von='.urlencode($_GET['von']);
+if(isset($_GET['bis']))
+	$params.='&bis='.urlencode($_GET['bis']);
+if(isset($_GET['lehreinheit']))
+	$params.='&lehreinheit='.urlencode($_GET['lehreinheit']);
 
 $output = (isset($_GET['output'])?$_GET['output']:'odt');
 
@@ -178,7 +184,7 @@ elseif(in_array($xsl,array('Zertifikat','Diplomurkunde','Diplomzeugnis','Bakkurk
 'PrProtokollBakk','PrProtokollDipl','Lehrauftrag','DiplomurkundeEng','Zeugnis','ZeugnisEng','StudienerfolgEng',
 'Sammelzeugnis','PrProtDiplEng','PrProtBakkEng','BakkzeugnisEng','DiplomzeugnisEng','statusbericht','Uebernahme',
 'DiplSupplement','Zutrittskarte','Projektbeschr','Ausbildungsver','AusbildStatus','PrProtBA','PrProtMA',
-'PrProtBAEng','PrProtMAEng','Studienordnung','Erfolgsnachweis','ErfolgsnwHead','Studienblatt','LV_Informationen','LVZeugnis')))
+'PrProtBAEng','PrProtMAEng','Studienordnung','Erfolgsnachweis','ErfolgsnwHead','Studienblatt','LV_Informationen','LVZeugnis','AnwListBarcode')))
 {
 	if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz'))
 	{
