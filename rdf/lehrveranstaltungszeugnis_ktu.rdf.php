@@ -35,6 +35,7 @@ require_once('../include/lehreinheit.class.php');
 require_once('../include/studienplan.class.php');
 require_once('../include/student.class.php');
 require_once('../include/prestudent.class.php');
+require_once('../include/organisationseinheit.class.php');
 
 $datum = new datum();
 $db = new basis_db();
@@ -151,6 +152,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	$lvbezeichnung = $lehrveranstaltung->bezeichnung;
 	$lvstg = $lehrveranstaltung->studiengang_kz;
 	$lehrform_kurzbz=$lehrveranstaltung->lehrform_kurzbz;
+	$organisationseinheit = new organisationseinheit($lehrveranstaltung->oe_kurzbz);
 	
 	$lehreinheit=new lehreinheit();
 	$lehreinheit->load_lehreinheiten($lehrveranstaltung_id, $studiensemester_kurzbz);
@@ -254,7 +256,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		foreach($prestudent->result as $status)
 		{
 			if($status->studienplan_bezeichnung != '')
-				$studienplan_bezeichnung=$status->studienplan_bezeichnung;
+			    $studienplan_bezeichnung=$status->studienplan_bezeichnung;
+			
+			if($status->studienplan_id != NULL)
+			    $studienplan_id = $status->studienplan_id;
 		}
 		
 		$xml .= "\n	<zertifikat>";
@@ -308,9 +313,35 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml .= "				<ects>".number_format($ects,1)."</ects>";
 		$xml .= "				<lvleiter>".$leiter_titel." ".$leiter_vorname." ".$leiter_nachname.($leiter_titelpost!=''?', '.$leiter_titelpost:'')."</lvleiter>";
 		$xml .= "				<lehrinhalte><![CDATA[".clearHtmlTags($lehrinhalte)."]]></lehrinhalte>";
-
+		$xml .= "				<kompatible_lvs>";
+		$lehrveranstaltung->getLVkompatibel($lehrveranstaltung_id);
+		foreach($lehrveranstaltung->lehrveranstaltungen as $lv_kompatibel)
+		{
+		    $xml .= "<lv>".$lv_kompatibel->bezeichnung."</lv>";
+		}
+		$xml .= "	</kompatible_lvs>";
 		
+		$return = $lehrveranstaltung->getLVFromStudienplanByLehrtyp($studienplan_id, "modul");
+		$xml .= "	<module>";
+		
+		//Variable wird zur korrekten Darstellung im Dokument benötigt
+		$count=0;
+		foreach($lehrveranstaltung->lehrveranstaltungen as $modul)
+		{
+		    $xml .= "<modul>";
+			$xml.= "<modul_count>".$count."</modul_count>";
+			$xml.= "<modul_id>".$modul->lehrveranstaltung_id."</modul_id>";
+			$xml.= "<modul_bezeichnung>".$modul->bezeichnung."</modul_bezeichnung>";
+		    $xml .= "</modul>";
+		    $count++;
+		}
+		$xml .= "	</module>";
+		$xml .= "<oe>";
+		$xml .= "<oe_typ>".$organisationseinheit->organisationseinheittyp_kurzbz."</oe_typ>";
+		$xml .= "<oe_bezeichnung>".$organisationseinheit->bezeichnung."</oe_bezeichnung>";
+		$xml .= "</oe>";
 		$xml .= "	</zertifikat>";
+//		var_dump($lehrveranstaltung->errormsg);
 	}
 	$xml .= "</zertifikate>";
 	echo $xml;
