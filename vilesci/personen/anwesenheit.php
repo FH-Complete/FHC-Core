@@ -72,7 +72,7 @@ echo '<!DOCTYPE HTML>
 		{ 
 			$("#t1").tablesorter(
 			{
-				sortList: [[2,1]],
+				sortList: [[4,1]],
 				widgets: ["zebra"]
 			});
 		});
@@ -274,7 +274,7 @@ if($work=='')
 
 	echo '<form name="sendform" action="'.$_SERVER["PHP_SELF"].'" method="post">
 	Bitte scannen Sie den Lehreinheiten Barcode<br>
-	<input type="text" id="lvcode" name="lvcode" value="" size="13"/> (ID zum Testen: 140918056945 )
+	<input type="text" id="lvcode" name="lvcode" value="" size="13"/>
 	<input type="hidden" name="work" value="loadAnwesenheit" />
 	</form>';
 }
