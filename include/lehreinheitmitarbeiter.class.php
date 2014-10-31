@@ -42,6 +42,7 @@ class lehreinheitmitarbeiter extends basis_db
 	public $updateamum;				// timestamp
 	public $updatevon;				// varchar(16)
 	public $ext_id; 				// bigint
+	public $vertrag_id;
 
 	/**
 	 * Konstruktor - Laedt optional einee LEMitarbeiterzuordnung
@@ -91,6 +92,7 @@ class lehreinheitmitarbeiter extends basis_db
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
+				$this->new=false;
 				return true;
 			}
 			else
@@ -228,7 +230,7 @@ class lehreinheitmitarbeiter extends basis_db
 			
 			//ToDo ID entfernen
 			$qry = 'INSERT INTO lehre.tbl_lehreinheitmitarbeiter (lehreinheit_id, mitarbeiter_uid, semesterstunden, planstunden,
-			                                                stundensatz, faktor, anmerkung, lehrfunktion_kurzbz, bismelden, ext_id, insertamum, insertvon)
+			                                                stundensatz, faktor, anmerkung, lehrfunktion_kurzbz, bismelden, ext_id, insertamum, insertvon, vertrag_id)
 			        VALUES('.$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).','.
 					$this->db_add_param($this->mitarbeiter_uid).','.
 					$this->db_add_param($this->semesterstunden).','.
@@ -240,7 +242,8 @@ class lehreinheitmitarbeiter extends basis_db
 					$this->db_add_param($this->bismelden, FHC_BOOLEAN).','.
 					$this->db_add_param($this->ext_id, FHC_INTEGER).','.
 					$this->db_add_param($this->insertamum).','.
-					$this->db_add_param($this->insertvon).');';
+					$this->db_add_param($this->insertvon).','.
+					$this->db_add_param($this->vertrag_id).');';
 		}
 		else
 		{
@@ -266,12 +269,13 @@ class lehreinheitmitarbeiter extends basis_db
 			       ' bismelden='.$this->db_add_param($this->bismelden, FHC_BOOLEAN).','.
 			       ' updateamum='.$this->db_add_param($this->updateamum).','.
 			       ' updatevon='.$this->db_add_param($this->updatevon).','.
+				   ' vertrag_id='.$this->db_add_param($this->vertrag_id).','.
 			       ' ext_id = '.$this->db_add_param($this->ext_id, FHC_INTEGER).
 			       $setinsert.
 			       " WHERE lehreinheit_id=".$this->db_add_param($this->lehreinheit_id, FHC_INTEGER)." AND
 			               mitarbeiter_uid=".$this->db_add_param($this->mitarbeiter_uid_old).";";
 		}
-						
+
 		if($this->db_query($qry))
 		{
 			return true;

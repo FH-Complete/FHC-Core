@@ -685,11 +685,14 @@ function MitarbeiterAuswahl()
 		url = '<?php echo APP_ROOT; ?>content/funktionen.xul.php?uid='+uid;
 		document.getElementById('mitarbeiter-funktionen').setAttribute('src',url);
 	}
-	
+
+	// Buchungen laden falls vorhanden	
 	if(document.getElementById('mitarbeiter-tab-buchung'))
-	{
 		MitarbeiterBuchungLoad(person_id)
-	}
+
+	// Vertraege laden falls vorhanden
+	if(document.getElementById('mitarbeiter-tab-vertrag'))
+		MitarbeiterVertragLoad(person_id)
 
 	// Selektierungsfunktion der Addons aufrufen
 	for(i in addon)

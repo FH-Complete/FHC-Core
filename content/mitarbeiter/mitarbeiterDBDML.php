@@ -35,6 +35,10 @@ require_once('../../include/bisfunktion.class.php');
 require_once('../../include/entwicklungsteam.class.php');
 require_once('../../include/resturlaub.class.php');
 require_once('../../include/buchung.class.php');
+require_once('../../include/pruefung.class.php');
+require_once('../../include/projektbetreuer.class.php');
+require_once('../../include/vertrag.class.php');
+require_once('../../include/lehreinheitmitarbeiter.class.php');
 
 $user = get_uid();
 
@@ -400,6 +404,259 @@ if(!$error)
 				$return = false;
 				$errormsg = $buchung->errormsg;
 			}
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='vertraggenerate')
+	{
+		if(!$rechte->isBerechtigt('vertrag/mitarbeiter',null,'suid'))
+		{
+			$return = false;
+			$errormsg = 'Sie haben keine Berechtigung für diesen Vorgang';
+		}
+		else
+		{
+			$errormsg='';
+
+			$person_id = $_POST['person_id'];
+
+			$person = new person();
+			$person->load($person_id);
+
+			$vertrag = new vertrag();
+			$neu = false;
+			if($_POST['vertrag_id']!='')
+			{
+				// Bearbeiten eines Vertrags
+				$vertrag_id=$_POST['vertrag_id'];				
+
+				if($vertrag->load($vertrag_id))
+				{
+					$vertrag->updatevon = $user;
+					$vertrag->updateamum = date('Y-m-d H:i:s');
+				}
+				else
+				{
+					$errormsg.=$vertrag->errormsg;
+				}
+			}
+			else
+			{
+				// Neuen Vertrag erstellen
+				$vertrag->person_id = $person_id;
+				$vertrag->inservon = $user;
+				$vertrag->insertamum = date('Y-m-d H:i:s');
+				$neu = true;
+			}
+
+			$vertrag->vertragstyp_kurzbz=$_POST['vertragstyp_kurzbz'];
+			$vertrag->betrag=str_replace(',','.',$_POST['betrag']);
+			$vertrag->bezeichnung = $_POST['bezeichnung'];
+
+			if($errormsg=='')
+			{
+				if($vertrag->save())
+				{
+					$vertrag_id = $vertrag->vertrag_id;
+
+					// Vertragselemente zuordnen
+					foreach($_POST as $key=>$value)
+					{
+						if(strstr($key, 'type_'))
+						{
+							$index = mb_substr($key,5);
+
+							$type = $_POST['type_'.$index];
+							$projektarbeit_id = $_POST['projektarbeit_id_'.$index];
+							$betreuerart_kurzbz = $_POST['betreuerart_kurzbz_'.$index];
+							$pruefung_id = $_POST['pruefung_id_'.$index];
+							$lehreinheit_id = $_POST['lehreinheit_id_'.$index];
+							$mitarbeiter_uid = $_POST['mitarbeiter_uid_'.$index];
+							$stsem = $_POST['stsem_'.$index];
+							switch($type)
+							{
+								case 'Lehrauftrag':
+									$lehreinheitmitarbeiter = new lehreinheitmitarbeiter();
+									if($lehreinheitmitarbeiter->load($lehreinheit_id, $mitarbeiter_uid))
+									{
+										$lehreinheitmitarbeiter->vertrag_id=$vertrag_id;
+										if(!$lehreinheitmitarbeiter->save())
+											$errormsg.=$lehreinheitmitarbeiter->errormsg;
+									}
+									else
+										$errormsg.=$lehreinheitmitarbeiter->errormsg;
+
+									break;
+								case 'Pruefung':
+									$pruefung = new pruefung();
+									if($pruefung->load($pruefung_id))
+									{
+										$pruefung->vertrag_id=$vertrag_id;
+										if(!$pruefung->save())
+											$errormsg.=$pruefung->errormsg;
+									}
+									else
+										$errormsg.=$pruefung->errormsg;
+									break;
+								case 'Betreuung':
+									$projektbetreuer = new projektbetreuer();
+									if($projektbetreuer->load($person_id, $projektarbeit_id, $betreuerart_kurzbz))
+									{
+										$projektbetreuer->vertrag_id=$vertrag_id;
+										if(!$projektbetreuer->save())
+											$errormsg.=$projektbetreuer->errormsg;
+									}
+									else
+										$errormsg.=$projektbetreuer->errormsg;
+									break;
+								default:
+									$errormsg.='Unknown type '.$type;
+									break;
+							}
+						}
+					}
+
+					if($errormsg=='' && $neu)
+					{
+						// Neu Status setzen
+						$vertrag = new vertrag();
+			
+						$vertrag->vertrag_id = $vertrag_id;
+						$vertrag->vertragsstatus_kurzbz = 'neu';
+						$vertrag->datum = date('Y-m-d H:i:s');
+						$vertrag->uid = $user;
+			
+						if(!$vertrag->saveVertragsstatus(true))
+							$errormsg.=$vertrag->erromsg;
+					}
+
+					if($errormsg=='')
+						$return=true;
+					else
+						$return=false;
+				
+				}
+				else
+				{
+					$return = false; 
+					$errormsg = $vertrag->errormsg;
+				}
+			}
+			else
+			{
+				$return = false;
+			}
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='vertragsstatusadd')
+	{
+		if(!$rechte->isBerechtigt('vertrag/mitarbeiter',null,'suid'))
+		{
+			$return = false;
+			$errormsg = 'Sie haben keine Berechtigung für diesen Vorgang';
+		}
+		else
+		{
+			$vertrag_id = $_POST['vertrag_id'];
+			$status = $_POST['status'];
+			
+			$vertrag = new vertrag();
+			
+			$vertrag->vertrag_id = $vertrag_id;
+			$vertrag->vertragsstatus_kurzbz = $status;
+			$vertrag->datum = date('Y-m-d H:i:s');
+			$vertrag->uid = $user;
+			
+			if($vertrag->saveVertragsstatus(true))
+			{
+				$return=true;	
+			}
+			else
+			{
+				$return = false; 
+				$errormsg = $vertrag->errormsg;
+			}
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='vertragsdetaildelete')
+	{
+		if(!$rechte->isBerechtigt('vertrag/mitarbeiter',null,'suid'))
+		{
+			$return = false;
+			$errormsg = 'Sie haben keine Berechtigung für diesen Vorgang';
+		}
+		else
+		{
+			$errormsg='';
+
+			$vertragstype = $_POST['vertragstype'];
+			$projektarbeit_id = $_POST['projektarbeit_id'];
+			$betreuerart_kurzbz = $_POST['betreuerart_kurzbz'];
+			$pruefung_id = $_POST['pruefung_id'];
+			$lehreinheit_id = $_POST['lehreinheit_id'];
+			$mitarbeiter_uid = $_POST['mitarbeiter_uid'];
+			$stsem = $_POST['stsem'];
+			$vertrag_id = $_POST['vertrag_id'];
+			$betrag = $_POST['betrag'];
+
+			switch($vertragstype)
+			{
+				case 'Lehrauftrag':
+					$lehreinheitmitarbeiter = new lehreinheitmitarbeiter();
+					if($lehreinheitmitarbeiter->load($lehreinheit_id, $mitarbeiter_uid))
+					{
+						$lehreinheitmitarbeiter->vertrag_id='';
+						if(!$lehreinheitmitarbeiter->save())
+							$errormsg.=$lehreinheitmitarbeiter->errormsg;
+					}
+					else
+						$errormsg.=$lehreinheitmitarbeiter->errormsg;
+
+					break;
+				case 'Pruefung':
+					$pruefung = new pruefung();
+					if($pruefung->load($pruefung_id))
+					{
+						$pruefung->vertrag_id='';
+						if(!$pruefung->save())
+							$errormsg.=$pruefung->errormsg;
+					}
+					else
+						$errormsg.=$pruefung->errormsg;
+					break;
+				case 'Betreuung':
+					$projektbetreuer = new projektbetreuer();
+					if($projektbetreuer->load($person_id, $projektarbeit_id, $betreuerart_kurzbz))
+					{
+						$projektbetreuer->vertrag_id='';
+						if(!$projektbetreuer->save())
+							$errormsg.=$projektbetreuer->errormsg;
+					}
+					else
+						$errormsg.=$projektbetreuer->errormsg;
+					break;
+				default:
+					$errormsg.='Unknown type '.$vertragstype;
+					break;
+			}
+			if($errormsg=='')
+			{
+				$vertrag = new vertrag();
+				if($vertrag->load($vertrag_id))
+				{
+					$vertrag->betrag = $vertrag->betrag-$betrag;
+					if($vertrag->save(false))
+					{
+						$return =true;
+					}
+					else
+					{
+						$errormsg.=$vertrag->errormsg;
+						$return =false;
+					}
+				}
+			}
+			else
+				$return = false;
 		}
 	}
 	else

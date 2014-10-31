@@ -40,7 +40,8 @@ class pruefung extends basis_db
     public $updateamum;				// timestamp
     public $updatevon;				// varchar(16)
     public $ext_id;					// bigint
-    public $pruefungsanmeldung_id;			// bigint
+    public $pruefungsanmeldung_id;	// bigint
+	public $vertrag_id;				// bigint
 
     public $lehrveranstaltung_bezeichnung;
     public $lehrveranstaltung_id;
@@ -93,6 +94,7 @@ class pruefung extends basis_db
 			    $this->updateamum=$row->updateamum;
 			    $this->updatevon=$row->updatevon;
 			    $this->ext_id=$row->ext_id;
+				$this->vertrag_id = $row->vertrag_id;
 			    $this->pruefungsanmeldung_id=$row->pruefungsanmeldung_id;
 			    $this->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 			    $this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
@@ -111,11 +113,11 @@ class pruefung extends basis_db
      * Liefert alle Pruefungen
      * @return true wenn ok, false im Fehlerfall
      */
-    public function getAll($order=null, $student=null)
+    public function getAll($order=null, $student_uid=null)
     {
 	    $qry = 'SELECT * FROM lehre.tbl_pruefung';
-	    if ($student)
-		    $qry.=' WHERE student ="'.addslashes($student).'"';
+	    if ($student_uid)
+		    $qry.=" WHERE student_uid =".$this->db_add_param($student);
 
 	    if($order!=null)
 		    $qry .=" ORDER BY $order";
@@ -142,6 +144,7 @@ class pruefung extends basis_db
 		    $pruef_obj->updatevon=$row->updatevon;
 		    $pruef_obj->ext_id=$row->ext_id;
 		    $pruef_obj->pruefungsanmeldung_id=$row->pruefungsanmeldung_id;
+			$pruef_obj->vertrag_id = $row->vertrag_id;
 
 		    $this->result[] = $pruef_obj;
 	    }
@@ -206,20 +209,21 @@ class pruefung extends basis_db
 	    if($this->new)
 	    {
 		    //Neuen Datensatz anlegen
-		    $qry = 'BEGIN;INSERT INTO lehre.tbl_pruefung (lehreinheit_id, student_uid, mitarbeiter_uid, note, pruefungstyp_kurzbz, datum, anmerkung, insertamum, insertvon, updateamum, updatevon, ext_id, pruefungsanmeldung_id) VALUES ('.
-			    $this->addslashes($this->lehreinheit_id).', '.
-			    $this->addslashes($this->student_uid).', '.
-			    $this->addslashes($this->mitarbeiter_uid).', '.
-			    $this->addslashes($this->note).', '.
-			    $this->addslashes($this->pruefungstyp_kurzbz).', '.
-			    $this->addslashes($this->datum).', '.
-			    $this->addslashes($this->anmerkung).', '.
-			    $this->addslashes($this->insertamum).', '.
-			    $this->addslashes($this->insertvon).', '.
-			    $this->addslashes($this->updateamum).', '.
-			    $this->addslashes($this->updatevon).', '.
-			    $this->addslashes($this->ext_id).', '.
-			    $this->addslashes($this->pruefungsanmeldung_id).');';
+		    $qry = 'BEGIN;INSERT INTO lehre.tbl_pruefung (lehreinheit_id, student_uid, mitarbeiter_uid, note, pruefungstyp_kurzbz, datum, anmerkung, insertamum, insertvon, updateamum, updatevon, ext_id, pruefungsanmeldung_id, vertrag_id) VALUES ('.
+			    $this->db_add_param($this->lehreinheit_id).', '.
+			    $this->db_add_param($this->student_uid).', '.
+			    $this->db_add_param($this->mitarbeiter_uid).', '.
+			    $this->db_add_param($this->note).', '.
+			    $this->db_add_param($this->pruefungstyp_kurzbz).', '.
+			    $this->db_add_param($this->datum).', '.
+			    $this->db_add_param($this->anmerkung).', '.
+			    $this->db_add_param($this->insertamum).', '.
+			    $this->db_add_param($this->insertvon).', '.
+			    $this->db_add_param($this->updateamum).', '.
+			    $this->db_add_param($this->updatevon).', '.
+			    $this->db_add_param($this->ext_id).', '.
+			    $this->db_add_param($this->pruefungsanmeldung_id).','.
+				$this->db_add_param($this->vertrag_id).');';
 	    }
 	    else
 	    {
@@ -233,20 +237,21 @@ class pruefung extends basis_db
 		    }
 
 		    $qry = 'UPDATE lehre.tbl_pruefung SET '.
-			    'lehreinheit_id='.$this->addslashes($this->lehreinheit_id).', '.
-			    'student_uid='.$this->addslashes($this->student_uid).', '.
-			    'mitarbeiter_uid='.$this->addslashes($this->mitarbeiter_uid).', '.
-			    'note='.$this->addslashes($this->note).', '.
-			    'pruefungstyp_kurzbz='.$this->addslashes($this->pruefungstyp_kurzbz).', '.
-			    'datum='.$this->addslashes($this->datum).', '.
-			    'anmerkung='.$this->addslashes($this->anmerkung).', '.
-			    'insertamum='.$this->addslashes($this->insertamum).', '.
-			    'insertvon='.$this->addslashes($this->insertvon).', '.
-			    'updateamum='.$this->addslashes($this->updateamum).', '.
-			    'updatevon='.$this->addslashes($this->updatevon).', '.
-			    'ext_id='.$this->addslashes($this->ext_id).', '.
-			    'pruefungsanmeldung_id='.$this->addslashes($this->pruefungsanmeldung_id).' '.
-			    'WHERE pruefung_id='.$this->addslashes($this->pruefung_id).';';
+			    'lehreinheit_id='.$this->db_add_param($this->lehreinheit_id).', '.
+			    'student_uid='.$this->db_add_param($this->student_uid).', '.
+			    'mitarbeiter_uid='.$this->db_add_param($this->mitarbeiter_uid).', '.
+			    'note='.$this->db_add_param($this->note).', '.
+			    'pruefungstyp_kurzbz='.$this->db_add_param($this->pruefungstyp_kurzbz).', '.
+			    'datum='.$this->db_add_param($this->datum).', '.
+			    'anmerkung='.$this->db_add_param($this->anmerkung).', '.
+			    'insertamum='.$this->db_add_param($this->insertamum).', '.
+			    'insertvon='.$this->db_add_param($this->insertvon).', '.
+			    'updateamum='.$this->db_add_param($this->updateamum).', '.
+			    'updatevon='.$this->db_add_param($this->updatevon).', '.
+			    'ext_id='.$this->db_add_param($this->ext_id).', '.
+			    'pruefungsanmeldung_id='.$this->db_add_param($this->pruefungsanmeldung_id).', '.
+				'vertrag_id='.$this->db_add_param($this->vertrag_id).' '.
+			    'WHERE pruefung_id='.$this->db_add_param($this->pruefung_id).';';
 	    }
 
 	    if($this->db_query($qry))
@@ -297,17 +302,17 @@ class pruefung extends basis_db
 	    $qry = "SELECT tbl_pruefung.*, tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung, tbl_lehrveranstaltung.lehrveranstaltung_id,
 			    tbl_note.bezeichnung as note_bezeichnung, tbl_pruefungstyp.beschreibung as typ_beschreibung, tbl_lehreinheit.studiensemester_kurzbz as studiensemester_kurzbz
 			    FROM lehre.tbl_pruefung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, lehre.tbl_note, lehre.tbl_pruefungstyp
-			    WHERE student_uid='".addslashes($student_uid)."'
+			    WHERE student_uid=".$this->db_add_param($student_uid)."
 			    AND tbl_pruefung.lehreinheit_id=tbl_lehreinheit.lehreinheit_id
 			    AND tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id
 			    AND tbl_pruefung.note = tbl_note.note
 			    AND tbl_pruefung.pruefungstyp_kurzbz=tbl_pruefungstyp.pruefungstyp_kurzbz";
 	    if ($pruefungstyp != null)
-		    $qry .= " AND tbl_pruefungstyp.pruefungstyp_kurzbz = '".addslashes($pruefungstyp)."'";
+		    $qry .= " AND tbl_pruefungstyp.pruefungstyp_kurzbz = ".$this->db_add_param($pruefungstyp);
 	    if ($lv_id != null)
-		    $qry .= " AND tbl_lehrveranstaltung.lehrveranstaltung_id = '".addslashes($lv_id)."'";
+		    $qry .= " AND tbl_lehrveranstaltung.lehrveranstaltung_id = ".$this->db_add_param($lv_id);
 	    if ($stsem != null)
-		    $qry .= " AND tbl_lehreinheit.studiensemester_kurzbz = '".addslashes($stsem)."'";
+		    $qry .= " AND tbl_lehreinheit.studiensemester_kurzbz = ".$this->db_add_param($stsem);
 
 	    $qry .= " ORDER BY datum DESC";
 	    if($this->db_query($qry))
@@ -364,11 +369,11 @@ class pruefung extends basis_db
 			    AND tbl_pruefung.note = tbl_note.note
 			    AND tbl_pruefung.pruefungstyp_kurzbz=tbl_pruefungstyp.pruefungstyp_kurzbz";
 	    if ($pruefungstyp != null)
-		    $qry .= " AND tbl_pruefungstyp.pruefungstyp_kurzbz = '".addslashes($pruefungstyp)."'";
+		    $qry .= " AND tbl_pruefungstyp.pruefungstyp_kurzbz = ".$this->db_add_param($pruefungstyp);
 	    if ($lv_id != null)
-		    $qry .= " AND tbl_lehrveranstaltung.lehrveranstaltung_id = '".addslashes($lv_id)."'";
+		    $qry .= " AND tbl_lehrveranstaltung.lehrveranstaltung_id = ".$this->db_add_param($lv_id);
 	    if ($stsem != null)
-		    $qry .= " AND tbl_lehreinheit.studiensemester_kurzbz = '".addslashes($stsem)."'";
+		    $qry .= " AND tbl_lehreinheit.studiensemester_kurzbz = ".$this->db_add_param($stsem);
 
 	    $qry .= " ORDER BY datum DESC";
 

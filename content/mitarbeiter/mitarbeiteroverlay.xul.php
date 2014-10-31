@@ -39,6 +39,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterdetailoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterfunktionoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterbuchungoverlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragoverlay.xul.php"?>';
 ?>
 <!DOCTYPE overlay >
 
@@ -246,6 +247,9 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterbuchungover
 				<?php 
 				if($rechte->isBerechtigt('buchung/mitarbeiter'))
 					echo '<tab id="mitarbeiter-tab-buchung" label="Buchungen" />';
+				if($rechte->isBerechtigt('vertrag/mitarbeiter'))
+					echo '<tab id="mitarbeiter-tab-vertrag" label="Verträge" />';
+
 				?>
 			</tabs>
 			<tabpanels id="mitarbeiter-tabpanels-main" flex="1">
@@ -257,6 +261,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeiterbuchungover
 				<?php 
 				if($rechte->isBerechtigt('buchung/mitarbeiter'))
 					echo '<vbox id="mitarbeiter-buchung" style="margin-top:10px;" />';
+				if($rechte->isBerechtigt('vertrag/mitarbeiter'))
+					echo '<vbox id="mitarbeiter-vertrag" style="margin-top:10px;" />';
 				?>				
 			</tabpanels>
 		</tabbox>	

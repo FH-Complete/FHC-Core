@@ -45,6 +45,7 @@ class projektbetreuer extends basis_db
 	public $insertvon;			// bigint
 	public $updateamum;			// timestamp
 	public $updatevon;			// bigint
+	public $vertrag_id;			// bigint
 
 	public $person_id_old;
 	
@@ -80,7 +81,14 @@ class projektbetreuer extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * FROM lehre.tbl_projektbetreuer WHERE person_id='$person_id' AND projektarbeit_id='$projektarbeit_id' AND betreuerart_kurzbz='".addslashes($betreuerart_kurzbz)."'";
+		$qry = "SELECT
+					* 
+				FROM 
+					lehre.tbl_projektbetreuer 
+				WHERE 
+					person_id=".$this->db_add_param($person_id, FHC_INTEGER)."
+					AND projektarbeit_id=".$this->db_add_param($projektarbeit_id, FHC_INTEGER)."
+					AND betreuerart_kurzbz=".$this->db_add_param($betreuerart_kurzbz);
 		
 		if($this->db_query($qry))
 		{
@@ -100,6 +108,8 @@ class projektbetreuer extends basis_db
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
+				$this->vertrag_id = $row->vertrag_id;
+				$this->new=false;
 				return true;
 			}
 			else 
@@ -193,19 +203,20 @@ class projektbetreuer extends basis_db
 		{
 			//Neuen Datensatz einfuegen								
 			$qry='INSERT INTO lehre.tbl_projektbetreuer (person_id, projektarbeit_id, note, betreuerart_kurzbz, faktor, name,
-				 punkte, stunden, stundensatz, ext_id, insertamum, insertvon, updateamum, updatevon) VALUES('.
-			     $this->addslashes($this->person_id).', '.
-			     $this->addslashes($this->projektarbeit_id).', '.
-			     $this->addslashes($this->note).', '.
-			     $this->addslashes($this->betreuerart_kurzbz).', '.
-			     $this->addslashes($this->faktor).', '.
-			     $this->addslashes($this->name).', '.
-			     $this->addslashes($this->punkte).', '.
-			     $this->addslashes($this->stunden).', '.
-			     $this->addslashes($this->stundensatz).', '.
-			     $this->addslashes($this->ext_id).',  now(), '.
-			     $this->addslashes($this->insertvon).', now(), '.
-			     $this->addslashes($this->updatevon).');';			
+				 punkte, stunden, stundensatz, ext_id, insertamum, insertvon, updateamum, updatevon, vertrag_id) VALUES('.
+			     $this->db_add_param($this->person_id).', '.
+			     $this->db_add_param($this->projektarbeit_id).', '.
+			     $this->db_add_param($this->note).', '.
+			     $this->db_add_param($this->betreuerart_kurzbz).', '.
+			     $this->db_add_param($this->faktor).', '.
+			     $this->db_add_param($this->name).', '.
+			     $this->db_add_param($this->punkte).', '.
+			     $this->db_add_param($this->stunden).', '.
+			     $this->db_add_param($this->stundensatz).', '.
+			     $this->db_add_param($this->ext_id).',  now(), '.
+			     $this->db_add_param($this->insertvon).', now(), '.
+			     $this->db_add_param($this->updatevon).', '.
+				 $this->db_add_param($this->vertrag_id).');';			
 		}
 		else
 		{
@@ -213,21 +224,24 @@ class projektbetreuer extends basis_db
 			if($this->person_id_old=='')
 				$this->person_id_old = $this->person_id;
 			
-			if($this->betreuerart_kurzbz_old=='')
+			if(!isset($this->betreuerart_kurzbz_old) || $this->betreuerart_kurzbz_old=='')
 				$this->betreuerart_kurzbz_old = $this->betreuerart_kurzbz;
 			
 			$qry='UPDATE lehre.tbl_projektbetreuer SET '.
-				'person_id='.$this->addslashes($this->person_id).', '. 
-				'note='.$this->addslashes($this->note).', '.
-				'betreuerart_kurzbz='.$this->addslashes($this->betreuerart_kurzbz).', '.
-				'faktor='.$this->addslashes($this->faktor).', '.
-				'name='.$this->addslashes($this->name).', '.
-				'punkte='.$this->addslashes($this->punkte).', '.
-				'stunden='.$this->addslashes($this->stunden).', '.
-				'stundensatz='.$this->addslashes($this->stundensatz).', '.
-				'updateamum='.$this->addslashes($this->updateamum).', '.
-			    'updatevon='.$this->addslashes($this->updatevon).' '.
-				"WHERE projektarbeit_id='".addslashes($this->projektarbeit_id)."' AND person_id='".addslashes($this->person_id_old)."' AND betreuerart_kurzbz='".addslashes($this->betreuerart_kurzbz_old)."';";
+				'person_id='.$this->db_add_param($this->person_id).', '. 
+				'note='.$this->db_add_param($this->note).', '.
+				'betreuerart_kurzbz='.$this->db_add_param($this->betreuerart_kurzbz).', '.
+				'faktor='.$this->db_add_param($this->faktor).', '.
+				'name='.$this->db_add_param($this->name).', '.
+				'punkte='.$this->db_add_param($this->punkte).', '.
+				'stunden='.$this->db_add_param($this->stunden).', '.
+				'stundensatz='.$this->db_add_param($this->stundensatz).', '.
+				'updateamum='.$this->db_add_param($this->updateamum).', '.
+			    'updatevon='.$this->db_add_param($this->updatevon).', '.
+				'vertrag_id='.$this->db_add_param($this->vertrag_id).' '.
+				"WHERE projektarbeit_id=".$this->db_add_param($this->projektarbeit_id, FHC_INTEGER,false).
+				" AND person_id=".$this->db_add_param($this->person_id_old, FHC_INTEGER,false).
+				" AND betreuerart_kurzbz=".$this->db_add_param($this->betreuerart_kurzbz_old).";";
 		}
 		
 		if($this->db_query($qry))
@@ -261,7 +275,7 @@ class projektbetreuer extends basis_db
 			return false;
 		}
 		
-		$qry = "DELETE FROM lehre.tbl_projektbetreuer WHERE person_id='".$person_id."' AND projektarbeit_id='".$projektarbeit_id."' AND betreuerart_kurzbz='".addslashes($betreuerart_kurzbz)."';";
+		$qry = "DELETE FROM lehre.tbl_projektbetreuer WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER)." AND projektarbeit_id=".$this->db_add_param($projektarbeit_id, FHC_INTEGER)." AND betreuerart_kurzbz=".$this->db_add_param($betreuerart_kurzbz).";";
 		
 		if($this->db_query($qry))
 		{
@@ -308,7 +322,8 @@ class projektbetreuer extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->ext_id = $row->ext_id;
-				
+				$obj->vertrag_id = $row->vertrag_id;
+
 				$this->result[] = $obj;
 			}
 			return true;
