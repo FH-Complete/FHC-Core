@@ -234,21 +234,21 @@ if ($num_rows_stpl>0)
 	    
 	    echo '
 	    <tr class="liste'.($i%2).'">
-	        <td>'.$unr.'</td>
-	        <td><A class="Item" href="mailto:'.$pers_email.'">'.$titelpre.' '.$pers_vorname.' '.$pers_nachname.' '.$titelpost.'</A></td>
-	        <td  title="'.$ort->bezeichnung.'">'.(!empty($ortkurzbz)?($ort->content_id!=''?'<a href="../../../cms/content.php?content_id='.$ort->content_id.'" target="_self" onClick="window.resizeTo(1200,880)">'.$ortkurzbz.'</a>':$ortkurzbz):$ortkurzbz).'</td>
-	        <td>'.$lehrfachkurzbz.'</td>
-	        <td>'.$bezeichnung.'</td>
-	       	<td title="'.$stgkurzbz.$semester.mb_strtolower($verband).$gruppe.'">
+	        <td>'.$db->convert_html_chars($unr).'</td>
+	        <td><A class="Item" href="mailto:'.$pers_email.'">'.$db->convert_html_chars($titelpre.' '.$pers_vorname.' '.$pers_nachname.' '.$titelpost).'</A></td>
+	        <td  title="'.$db->convert_html_chars($ort->bezeichnung).'">'.(!empty($ortkurzbz)?($ort->content_id!=''?'<a href="../../../cms/content.php?content_id='.$ort->content_id.'" target="_self" onClick="window.resizeTo(1200,880)">'.$db->convert_html_chars($ortkurzbz).'</a>':$db->convert_html_chars($ortkurzbz)):$db->convert_html_chars($ortkurzbz)).'</td>
+	        <td>'.$db->convert_html_chars($lehrfachkurzbz).'</td>
+	        <td>'.$db->convert_html_chars($bezeichnung).'</td>
+	       	<td title="'.$db->convert_html_chars($stgkurzbz.$semester.mb_strtolower($verband).$gruppe).'">
 				'.(!is_null($semester) && !empty($semester)?'<A class="Item" title="'.$anzahl_lvb.' '.$p->t('lvplan/studierende').'" href="mailto:'.$stgkurzbz.$semester.mb_strtolower($verband).$gruppe.'@'.DOMAIN .'">':'');
-		echo $stgkurzbz.'-'.$semester.$verband.$gruppe;
+		echo $db->convert_html_chars($stgkurzbz.'-'.$semester.$verband.$gruppe);
 		echo (!is_null($semester) && !empty($semester)?'</A>':'');
 		echo '
 			</td>
 	
 	        <td><A class="Item" title="'.$anzahl_grp.' Studierende" href="mailto:'.mb_strtolower($gruppe_kurzbz).'@'.DOMAIN.'">
-	        '.$gruppe_kurzbz.'</A></td>
-			<td>'.$titel.'</td>
+	        '.$db->convert_html_chars($gruppe_kurzbz).'</A></td>
+			<td>'.$db->convert_html_chars($titel).'</td>
 	        
 	    </tr>';    
 	}
@@ -277,12 +277,12 @@ if ($num_rows_repl>0)
     	$ort->load($ortkurzbz);
     	
         echo '<tr class="liste'.($i%2).'">';
-        echo '<td >'.$titel.'</td>';
-        echo '<td>'.(!empty($ortkurzbz)?($ort->content_id!=''?'<a href="../../../cms/content.php?content_id='.$ort->content_id.'" target="_self" onClick="window.resizeTo(1200,880)">'.$ortkurzbz.'</a>':$ortkurzbz):$ortkurzbz).'</td>';
-        echo '<td  ><A href="mailto:'.$pers_email.'">'.$titelpre.' '.$pers_vorname.' '.$pers_nachname.' '.$titelpost.'</A></td>';
-        echo '<td >'.$beschreibung.'</td></tr>';
+        echo '<td >'.$db->convert_html_chars($titel).'</td>';
+        echo '<td>'.(!empty($ortkurzbz)?($ort->content_id!=''?'<a href="../../../cms/content.php?content_id='.$ort->content_id.'" target="_self" onClick="window.resizeTo(1200,880)">'.$db->convert_html_chars($ortkurzbz).'</a>':$db->convert_html_chars($ortkurzbz)):$db->convert_html_chars($ortkurzbz)).'</td>';
+        echo '<td  ><A href="mailto:'.$pers_email.'">'.$db->convert_html_chars($titelpre.' '.$pers_vorname.' '.$pers_nachname.' '.$titelpost).'</A></td>';
+        echo '<td >'.$db->convert_html_chars($beschreibung).'</td></tr>';
     }
-    echo '</table>';
+    echo '</table><br>';
 }
 echo '<P>'.$p->t('lvplan/fehlerUndFeedback').' <A class="Item" href="mailto:'.MAIL_LVPLAN.'">'.$p->t('lvplan/lvKoordinationsstelle').'</A>.</P>
 </body></html>';

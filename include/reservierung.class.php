@@ -62,6 +62,11 @@ class reservierung extends basis_db
 	 */
 	protected function validate()
 	{
+		if($this->ort_kurzbz=='')
+		{
+			$this->errormsg = 'Es muss ein Ort angegeben werden';
+			return false;
+		}
 		if(mb_strlen($this->ort_kurzbz)>16)
 		{
 			$this->errormsg = 'Ort_Kurzbz darf nicht laenger als 16 Zeichen sein';

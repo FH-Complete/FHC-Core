@@ -733,7 +733,7 @@ class wochenplan extends basis_db
 							$anm='';
 							foreach ($anmerkung as $a)
 								if ($a!='')
-									$anm.='<BR />'.$a;
+									$anm.='<BR />'.$this->convert_html_chars($a);
 								else
 									$anm='';
 						}
