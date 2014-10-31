@@ -110,4 +110,10 @@ define('SET_UID_AS_PERSONENKENNZEICHEN',false);
 
 // Legt fest ob fuer Studierende eine Alias EMail Adresse generiert wird (true|false)
 define('GENERATE_ALIAS_STUDENT',true);
+
+// Wie viele Tage nach Semesterstart soll bei der Neuanlage von Studierenden noch das aktuelle Semester vorgeschlagen werden.
+define('VILESCI_PERSON_NEU_STUDIENSEMESTER_UEBERGANGSFRIST',30);
+
+// Legt fest ob beim Anlegen von neuen Studierenden nur Wintersemester als Default vorgeschlagen werden oder auch Sommersemester (true | false)
+define('VILESCI_PERSON_NEU_STUDIENSEMESTER_WINTERONLY',false);
 ?>

@@ -549,15 +549,32 @@ function generateMatrikelnummer($studiengang_kz, $studiensemester_kurzbz)
 if($studiensemester_kurzbz == '')
 {
 	//Im September wird das Aktuelle Studiensemester vorgeschlagen sonst immer das naechste WS
-	$stsem = new studiensemester();
+	/*$stsem = new studiensemester();
 	if(date('m')=='9')
 		$studiensemester_kurzbz = $stsem->getaktorNext();
 	else
 	{
 		$stsem->getNextStudiensemester('WS');
 		$studiensemester_kurzbz = $stsem->studiensemester_kurzbz;
+	}*/
+
+	$stsem = new studiensemester();
+	if(defined('VILESCI_PERSON_NEU_STUDIENSEMESTER_UEBERGANGSFRIST') && VILESCI_PERSON_NEU_STUDIENSEMESTER_UEBERGANGSFRIST>0)
+	{
+		$studiensemester_kurzbz = $stsem->getNextOrAktSemester(VILESCI_PERSON_NEU_STUDIENSEMESTER_UEBERGANGSFRIST);
+
+		if(defined('VILESCI_PERSON_NEU_STUDIENSEMESTER_WINTERONLY') 
+		   && VILESCI_PERSON_NEU_STUDIENSEMESTER_WINTERONLY 
+		   && mb_substr($studiensemester_kurzbz,0,2)=='SS')
+		{
+			$studiensemester_kurzbz = $stsem->getNextFrom($studiensemester_kurzbz);
+		}
 	}
-	
+	else
+	{
+		$studiensemester_kurzbz = $stsem->getaktorNext();
+	}
+
 }
 
 // *** Speichern der Daten ***
