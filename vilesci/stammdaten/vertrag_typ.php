@@ -26,8 +26,8 @@ require_once('../../include/functions.inc.php');
 require_once('../../include/vertrag.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 
-$vertragtyp_kurzbz=isset($_REQUEST['vertragtyp_kurzbz'])?$_REQUEST['vertragtyp_kurzbz']:'';
-$vertragtyp_bezeichnung=isset($_REQUEST['vertragtyp_bezeichnung'])?$_REQUEST['vertragtyp_bezeichnung']:'';
+$vertragstyp_kurzbz=isset($_REQUEST['vertragstyp_kurzbz'])?$_REQUEST['vertragstyp_kurzbz']:'';
+$vertragstyp_bezeichnung=isset($_REQUEST['vertragstyp_bezeichnung'])?$_REQUEST['vertragstyp_bezeichnung']:'';
 
 $action=isset($_GET['action'])?$_GET['action']:'';
 if(isset($_POST['add']))
@@ -44,21 +44,21 @@ if(!$rechte->isBerechtigt('vertrag/typen', $stg_kz, 'suid'))
 
 if($action=='add')
 {
-	if($vertragtyp_kurzbz != '')
+	if($vertragstyp_kurzbz != '')
 	{
 		$vertrag = new vertrag();
-                $vertrag->vertragtyp_kurzbz = $vertragtyp_kurzbz;
-                $vertrag->vertragtyp_bezeichnung = $vertragtyp_bezeichnung;
-                $vertrag->saveVertragtyp();
+                $vertrag->vertragstyp_kurzbz = $vertragstyp_kurzbz;
+                $vertrag->vertragstyp_bezeichnung = $vertragstyp_bezeichnung;
+                $vertrag->savevertragstyp();
 	}
 }
 
 if($action=='delete')
 {
-	if($vertragtyp_kurzbz != '')
+	if($vertragstyp_kurzbz != '')
         {
                 $vertrag = new vertrag();
-                if(!$vertrag->deleteVertragtyp($vertragtyp_kurzbz))
+                if(!$vertrag->deletevertragstyp($vertragstyp_kurzbz))
                     echo 'Fehler beim Löschen: ' . $vertrag->errormsg;
         }
 }
@@ -95,29 +95,29 @@ if(isset($_GET['type']))
         if($_GET['type']=='delete')
         {
                 $vertrag = new vertrag();
-                if(!$vertrag->deleteVertragtyp($_GET['vertragtyp_kurzbz']))
+                if(!$vertrag->deletevertragstyp($_GET['vertragstyp_kurzbz']))
                         echo $vertrag->errormsg;
         }
 }
-if(isset($_POST['saveVertragtyp']))
+if(isset($_POST['savevertragstyp']))
 {
         $vertrag = new vertrag();
-        $vertrag->vertragtyp_kurzbz=$_POST['vertragtyp_kurzbz'];
-        $vertrag->vertragtyp_bezeichnung = $_POST['vertragtyp_bezeichnung'];
+        $vertrag->vertragstyp_kurzbz=$_POST['vertragstyp_kurzbz'];
+        $vertrag->vertragstyp_bezeichnung = $_POST['vertragstyp_bezeichnung'];
         if(isset($_POST['neu']) && $_POST['neu']=='true')
                 $neu=true;
         else
                 $neu=false;
 
-        if(!$vertrag->saveVertragtyp($neu))
+        if(!$vertrag->savevertragstyp($neu))
                 echo $vertrag->errormsg;
 }
 
 $vertrag = new vertrag();
-$vertrag->getAllVertragtypen();
+$vertrag->getAllvertragstypen();
 
 echo '
-<form action="'.$_SERVER['PHP_SELF'].'?action=vertragtypen" method="post">
+<form action="'.$_SERVER['PHP_SELF'].'?action=vertragstypen" method="post">
 <table id="t1" class="tablesorter" style="width:auto">
 <thead>
         <th></th>
@@ -130,30 +130,30 @@ foreach($vertrag->result as $row)
 {
         echo '<tr>
                         <td>
-                                <a href="'.$_SERVER['PHP_SELF'].'?action=vertragtypen&type=edit&vertragtyp_kurzbz='.$row->vertragtyp_kurzbz.'"><img src="../../skin/images/edit.png" title="Bearbeiten" /></a>
+                                <a href="'.$_SERVER['PHP_SELF'].'?action=vertragstypen&type=edit&vertragstyp_kurzbz='.$row->vertragstyp_kurzbz.'"><img src="../../skin/images/edit.png" title="Bearbeiten" /></a>
                                 ';
         // Lichtbil und Zeugnis duerfen nicht geloescht werden da diese fuer Bildupload und 
         // Zeugnisarchivierung verwendet werden
-        if(!in_array($row->vertragtyp_kurzbz,array('Lichtbil','Zeugnis')))
-                echo '<a href="'.$_SERVER['PHP_SELF'].'?action=vertragtypen&type=delete&vertragtyp_kurzbz='.$row->vertragtyp_kurzbz.'"><img src="../../skin/images/cross.png" title="Löschen" /></a>';
+        if(!in_array($row->vertragstyp_kurzbz,array('Lichtbil','Zeugnis')))
+                echo '<a href="'.$_SERVER['PHP_SELF'].'?action=vertragstypen&type=delete&vertragstyp_kurzbz='.$row->vertragstyp_kurzbz.'"><img src="../../skin/images/cross.png" title="Löschen" /></a>';
 
         echo '
                         </td>
-                        <td>'.$vertrag->convert_html_chars($row->vertragtyp_kurzbz).'</td>
-                        <td>'.$vertrag->convert_html_chars($row->vertragtyp_bezeichnung).'</td>				
+                        <td>'.$vertrag->convert_html_chars($row->vertragstyp_kurzbz).'</td>
+                        <td>'.$vertrag->convert_html_chars($row->vertragstyp_bezeichnung).'</td>				
                 </tr>';
 }
 
-$vertragtyp_kurzbz='';
-$vertragtyp_bezeichnung='';
+$vertragstyp_kurzbz='';
+$vertragstyp_bezeichnung='';
 
 if(isset($_GET['type']) && $_GET['type']=='edit')
 {
         $vertrag = new vertrag();
-        if($vertrag->loadVertragtyp($_GET['vertragtyp_kurzbz']))
+        if($vertrag->loadvertragstyp($_GET['vertragstyp_kurzbz']))
         {
-                $vertragtyp_kurzbz = $vertrag->vertragtyp_kurzbz;
-                $vertragtyp_bezeichnung = $vertrag->vertragtyp_bezeichnung;
+                $vertragstyp_kurzbz = $vertrag->vertragstyp_kurzbz;
+                $vertragstyp_bezeichnung = $vertrag->vertragstyp_bezeichnung;
         }
 }
 
@@ -163,11 +163,11 @@ echo '
         <tr>
                 <td></td>
                 <td>
-                        <input typ="text" id="vertragtyp_kurzbz" name="vertragtyp_kurzbz" maxlength="8" size="8" '.($vertragtyp_kurzbz!=''?'readonly':'').' value="'.$vertragtyp_kurzbz.'"/>
-                        <input type="hidden" id="neu" name="neu" value="'.($vertragtyp_kurzbz==''?'true':'false').'" />
+                        <input typ="text" id="vertragstyp_kurzbz" name="vertragstyp_kurzbz" maxlength="8" size="8" '.($vertragstyp_kurzbz!=''?'readonly':'').' value="'.$vertragstyp_kurzbz.'"/>
+                        <input type="hidden" id="neu" name="neu" value="'.($vertragstyp_kurzbz==''?'true':'false').'" />
                 </td>
-                <td><input type="text" id="vertragtyp_bezeichnung" name="vertragtyp_bezeichnung" maxlength="128" value="'.$vertrag->convert_html_chars($vertragtyp_bezeichnung).'">
-                <input type="submit" name="saveVertragtyp" value="Speichern"></td>
+                <td><input type="text" id="vertragstyp_bezeichnung" name="vertragstyp_bezeichnung" maxlength="128" value="'.$vertrag->convert_html_chars($vertragstyp_bezeichnung).'">
+                <input type="submit" name="savevertragstyp" value="Speichern"></td>
         </tr>
 </tfoot>
 </table>
