@@ -119,7 +119,7 @@ echo '</select>
 	</p>
     <p>Semester
     <select name="semester">
-		<option value=NULL>*</option>
+		<option value="">*</option>
 ';
 
 for ($i=1;$i<9;$i++)
