@@ -63,7 +63,13 @@ if($student_help->load($uid))
             break; 
         case 'd':
             $studTyp = 'Diplom'; 
-            break; 
+            break;
+        case 'l':
+            $studTyp = 'Lehrgang'; 
+            break;
+        case 'k':
+            $studTyp = 'Kurzstudium'; 
+            break;
         default: 
             $studTyp =''; 
             $titel_kurzbz = ''; 
@@ -130,7 +136,7 @@ foreach($uid_arr as $uid)
 			echo "\t\t<studiengang>".$studienordnung->studiengangbezeichnung."</studiengang>\n";
 			echo "\t\t<studiengang_englisch>".$studienordnung->studiengangbezeichnung_englisch."</studiengang_englisch>\n";
             echo "\t\t<studiengang_kurzbz>".$studienordnung->studiengangkurzbzlang."</studiengang_kurzbz>\n";
-			echo "\t\t<studiengang_kz>".sprintf('%04s', $studienordnung->studiengang_kz)."</studiengang_kz>\n";
+			echo "\t\t<studiengang_kz>".sprintf('%04s', abs($studienordnung->studiengang_kz))."</studiengang_kz>\n";
             echo "\t\t<studiengangSprache>".$studienplan->sprache."</studiengangSprache>"; 
             echo "\t\t<ects_gesamt>".$studienordnung->ects."</ects_gesamt>"; 
             echo "\t\t<ects_pro_semester>".($studienplan->regelstudiendauer!=0?$studienordnung->ects/$studienplan->regelstudiendauer:0)."</ects_pro_semester>";
