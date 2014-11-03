@@ -2137,11 +2137,6 @@ class lehrveranstaltung extends basis_db
 		    if ($obj->bezeichnung_arr['English'] == '')
 			$obj->bezeichnung_arr['English'] = $obj->bezeichnung_arr['German'];
 
-		    $obj->stpllv_semester = $row->stpllv_semester;
-		    $obj->stpllv_pflicht = $this->db_parse_bool($row->stpllv_pflicht);
-		    $obj->stpllv_koordinator = $row->stpllv_koordinator;
-		    $obj->studienplan_lehrveranstaltung_id = $row->studienplan_lehrveranstaltung_id;
-		    $obj->studienplan_lehrveranstaltung_id_parent = $row->studienplan_lehrveranstaltung_id_parent;
 		    $obj->new = false;
 
 		    $this->lehrveranstaltungen[] = $obj;
