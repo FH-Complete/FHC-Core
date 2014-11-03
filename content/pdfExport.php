@@ -38,6 +38,8 @@ require_once('../include/student.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/variable.class.php');
 require_once('../include/addon.class.php');
+require_once('../include/studiengang.class.php');
+require_once('../include/studiensemester.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -335,7 +337,16 @@ if (!isset($_REQUEST["archive"]))
 			clearstatcache(); 
             if($output == 'pdf')
             {
-                $tempPdfName = $vorlage->vorlage_kurzbz.'.pdf';
+		if($xsl == 'LV_Informationen')
+		{
+		    $studiengang = new studiengang($_GET['stg_kz']);
+		    $studiensemester = new studiensemester($_GET['ss']);
+		    $tempPdfName = $vorlage->vorlage_kurzbz.'_'.$studiengang->kurzbzlang.'_'.$studiensemester->studiensemester_kurzbz.'.pdf';
+		}
+		else
+		{
+		    $tempPdfName = $vorlage->vorlage_kurzbz.'.pdf';
+		}
                 exec("unoconv -e IsSkipEmptyPages=false --stdout -f pdf $tempname_zip > $tempPdfName");
                 
                 $fsize = filesize($tempPdfName); 

@@ -40,6 +40,7 @@ require_once('../../../include/note.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/benutzergruppe.class.php');
 require_once('../../../include/konto.class.php');
+require_once('../../../include/lvinfo.class.php');
 
 $uid = get_uid();
 
@@ -375,9 +376,23 @@ function drawTree($tree, $depth)
 			else
 				$abgeschlossen=false;
 		}
-
+		$lvinfo = new lvinfo();
+		switch(getSprache())
+		{
+		    case 'German':
+			$sprache = 'de';
+			break;
+		    case 'English':
+			$sprach = 'en';
+			break;
+		    default:
+			$sprache = 'de';
+		}
+		if($lvinfo->exists($row_tree->lehrveranstaltung_id, getSprache()))
+		    echo $icon."<a href=\"#\" class='Item' onClick=\"javascript:window.open('../lehre/ects/preview.php?lv=$row_tree->lehrveranstaltung_id&language=$sprache','Lehrveranstaltungsinformation','width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes');\">".$row_tree->kurzbz.' - '.$row_tree->bezeichnung."</a>";
+		else
 		// Bezeichnung der Lehrveranstaltung
-		echo $icon.$row_tree->kurzbz.' - '.$row_tree->bezeichnung;
+		    echo $icon.$row_tree->kurzbz.' - '.$row_tree->bezeichnung;
 		echo $bende.'</td>';
 		
 		// ECTS Punkte
