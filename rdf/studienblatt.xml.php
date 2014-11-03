@@ -216,6 +216,12 @@ foreach($uid_arr as $uid)
                 case 'd':
                     $studTyp = 'Diplom'; 
                     break; 
+                case 'l':
+            		$studTyp = 'Lehrgang'; 
+           			break;
+        		case 'k':
+            		$studTyp = 'Kurzstudium'; 
+            		break;
                 default: 
                     $studTyp =''; 
                     $titel_kurzbz = ''; 
