@@ -50,7 +50,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
 	</head>
 	<body class="Background_main">
-		<h2>Liste der MitarbeiterInnen der Institute an der Fachhochschule Technikum Wien</h2>';
+		<h2>Liste der MitarbeiterInnen der Institute</h2>';
 
 $stsem = new studiensemester();
 if(isset($_GET['ws']) && check_stsem($_GET['ws']))
