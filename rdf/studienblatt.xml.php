@@ -203,6 +203,7 @@ foreach($uid_arr as $uid)
 	    echo "\t\t<studienplan_bezeichnung>".$studienplan->bezeichnung."</studienplan_bezeichnung>\n";
 	    echo "\t\t<anmerkungpre>".$prestudent->anmerkung."</anmerkungpre>\n";
 	   
+	    $titel_kurzbz = '';
             switch($studiengang->typ)
             {
                 case 'b':
