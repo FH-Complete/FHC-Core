@@ -433,7 +433,7 @@ while ($row=$dbo->db_fetch_object())
 		$stg_kurzbz=strtoupper($row->typ.$row->kurzbz);
 		?>
 		<RDF:Description RDF:about="<?php echo $rdf_url.$stg_kurzbz; ?>" >
-			<VERBAND:name><?php echo $row->kurzbzlang.' ('.$stg_kurzbz.') - '.$row->bezeichnung; ?></VERBAND:name>
+			<VERBAND:name><?php echo $row->kurzbzlang.' ('.$stg_kurzbz.') - '.htmlspecialchars($row->bezeichnung); ?></VERBAND:name>
 			<VERBAND:stg><?php echo $stg_kurzbz; ?></VERBAND:stg>
 			<VERBAND:stg_kz NC:parseType="Integer"><?php echo $row->studiengang_kz; ?></VERBAND:stg_kz>
 		</RDF:Description>
