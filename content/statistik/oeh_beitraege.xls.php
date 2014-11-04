@@ -30,6 +30,16 @@ require_once('../../include/datum.class.php');
 require_once('../../include/Excel/excel.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/studiensemester.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
+
+
+$uid = get_uid();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($uid);
+if(!$rechte->isBerechtigt('assistenz') && !$rechte->isBerechtigt('admin'))
+	die('Sie haben keine Berechtigung fuer diese Seite');
+
 $erhalter='';
 $heute=date("d.m.Y");
 
@@ -135,7 +145,7 @@ if($studiensemester_kurzbz!='')
 		
 	// Daten holen - Alle Personen mit akt. Status Student, Diplomand oder Praktikant
 	$qry="SELECT DISTINCT ON (matrikelnr) matrikelnr AS personenkennzahl, tbl_student.studiengang_kz, geschlecht, vorname, nachname, gebdatum AS geburtsdatum, 
-		geburtsnation AS nation, titelpre, uid || '@technikum-wien.at' AS email, 
+		geburtsnation AS nation, titelpre, uid || '@".DOMAIN."' AS email, 
 		(SELECT kontakt FROM public.tbl_kontakt WHERE person_id=public.tbl_person.person_id and (kontakttyp='mobil' OR kontakttyp='telefon') LIMIT 1) AS telefon, 
 		(SELECT nation FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse ASC  LIMIT 1) AS s_nation, 
 		(SELECT plz FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse ASC  LIMIT 1) AS s_plz, 
@@ -145,15 +155,15 @@ if($studiensemester_kurzbz!='')
 		(SELECT plz FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS w_plz, 
 		(SELECT ort FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS w_ort, 
 		(SELECT strasse FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS w_strasse, 
-		titelpost, get_rolle_prestudent(tbl_prestudent.prestudent_id, '".addslashes($studiensemester_kurzbz)."') as status, 
+		titelpost, get_rolle_prestudent(tbl_prestudent.prestudent_id, ".$db->db_add_param($studiensemester_kurzbz).") as status, 
 		(SELECT ausbildungssemester FROM public.tbl_prestudentstatus WHERE prestudent_id=public.tbl_prestudent.prestudent_id AND tbl_prestudentstatus.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' ORDER BY datum desc LIMIT 1) AS semester  
 		FROM public.tbl_person 
 		JOIN public.tbl_benutzer using(person_id) 
 		JOIN public.tbl_student on(uid=student_uid)
 		JOIN public.tbl_prestudent using(prestudent_id)
 		JOIN public.tbl_prestudentstatus on(tbl_prestudentstatus.prestudent_id=tbl_student.prestudent_id)
-		WHERE tbl_prestudentstatus.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' 
-		AND get_rolle_prestudent(tbl_prestudent.prestudent_id, '".addslashes($studiensemester_kurzbz)."') in('Student','Diplomand','Praktikant')
+		WHERE tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." 
+		AND get_rolle_prestudent(tbl_prestudent.prestudent_id, ".$db->db_add_param($studiensemester_kurzbz).") in('Student','Diplomand','Praktikant')
 		AND tbl_student.studiengang_kz<999 AND tbl_prestudent.bismelden=true";
 	// AND tbl_benutzer.aktiv=true
 
@@ -309,7 +319,7 @@ if($studiensemester_kurzbz!='')
 	
 	// Daten holen - Alle Personen mit akt. Status Student, Diplomand oder Praktikant, die bezahlt haben
 	$qry="SELECT DISTINCT ON (matrikelnr) matrikelnr AS personenkennzahl, tbl_student.studiengang_kz, geschlecht, vorname, nachname, gebdatum AS geburtsdatum, 
-	geburtsnation AS nation, titelpre, uid || '@technikum-wien.at' AS email, 
+	geburtsnation AS nation, titelpre, uid || '@".DOMAIN."' AS email, 
 	(SELECT kontakt FROM public.tbl_kontakt WHERE person_id=public.tbl_person.person_id and (kontakttyp='mobil' OR kontakttyp='telefon') LIMIT 1) AS telefon, 
 	(SELECT nation FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse ASC  LIMIT 1) AS s_nation, 
 	(SELECT plz FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse ASC  LIMIT 1) AS s_plz, 
@@ -319,7 +329,7 @@ if($studiensemester_kurzbz!='')
 	(SELECT plz FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS w_plz, 
 	(SELECT ort FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS w_ort, 
 	(SELECT strasse FROM public.tbl_adresse WHERE person_id=public.tbl_person.person_id ORDER BY heimatadresse desc LIMIT 1) AS w_strasse, 
-	titelpost, get_rolle_prestudent(tbl_prestudent.prestudent_id, '".addslashes($studiensemester_kurzbz)."') as status, 
+	titelpost, get_rolle_prestudent(tbl_prestudent.prestudent_id, ".$db->db_add_param($studiensemester_kurzbz).") as status, 
 	(SELECT ausbildungssemester FROM public.tbl_prestudentstatus WHERE prestudent_id=public.tbl_prestudent.prestudent_id AND tbl_prestudentstatus.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' ORDER BY datum desc LIMIT 1) AS semester  
 	FROM public.tbl_person 
 	JOIN public.tbl_konto as ka using(person_id) 
@@ -328,11 +338,11 @@ if($studiensemester_kurzbz!='')
 	JOIN public.tbl_student on(uid=student_uid)
 	JOIN public.tbl_prestudent using(prestudent_id)
 	JOIN public.tbl_prestudentstatus on(tbl_prestudentstatus.prestudent_id=tbl_student.prestudent_id)
-	WHERE tbl_prestudentstatus.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' 
-	AND get_rolle_prestudent(tbl_prestudent.prestudent_id, '".addslashes($studiensemester_kurzbz)."') in('Student','Diplomand','Praktikant')
+	WHERE tbl_prestudentstatus.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." 
+	AND get_rolle_prestudent(tbl_prestudent.prestudent_id, ".$db->db_add_param($studiensemester_kurzbz).") in('Student','Diplomand','Praktikant')
 	AND tbl_student.studiengang_kz<999 AND
-	ka.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND ka.buchungstyp_kurzbz='OEH' AND tbl_student.studiengang_kz=ka.studiengang_kz 
-	AND kb.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND kb.buchungstyp_kurzbz='OEH' AND tbl_student.studiengang_kz=kb.studiengang_kz 
+	ka.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND ka.buchungstyp_kurzbz='OEH' AND tbl_student.studiengang_kz=ka.studiengang_kz 
+	AND kb.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND kb.buchungstyp_kurzbz='OEH' AND tbl_student.studiengang_kz=kb.studiengang_kz 
 	AND kb.buchungsnr_verweis=ka.buchungsnr";
 	//AND tbl_benutzer.aktiv=true
 
