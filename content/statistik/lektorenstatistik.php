@@ -67,7 +67,7 @@ if(isset($_GET['details']) && isset($_GET['fachbereich_kurzbz']))
 			FROM lehre.tbl_lehreinheitmitarbeiter 
 				JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
 				JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id) 
-				JOIN public.tbl_fachbereich ON(lehrfach.oe_kurzbz=fachbereich.oe_kurzbz)
+				JOIN public.tbl_fachbereich ON(lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz)
 				JOIN public.tbl_mitarbeiter USING(mitarbeiter_uid)
 				JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid)
 				JOIN public.tbl_person USING(person_id)
