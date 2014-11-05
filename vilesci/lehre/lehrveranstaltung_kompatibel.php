@@ -184,15 +184,8 @@ if (!$db = new basis_db())
 				{
 					alert(data.errormsg);
 				}
-				if($.isFunction("loadLVKompatibilitaet"))
-				{
-					loadLVKompatibilitaet(lehrveranstaltung_id);
-				}
-				else
-				{
-					var iframe = parent.document.getElementById("lv_detail");
-					iframe.src = "lehrveranstaltung_kompatibel.php?lehrveranstaltung_id="+lehrveranstaltung_id+"&type=edit";
-				}
+				
+				location.reload();
 			}).error(function(data)
 			{
 				alert(data.responseText);
@@ -219,15 +212,8 @@ if (!$db = new basis_db())
 				{
 					alert(data.errormsg);
 				}
-				if($.isFunction("loadLVKompatibilitaet"))
-				{
-					loadLVKompatibilitaet(lehrveranstaltung_id);
-				}
-				else
-				{
-					var iframe = parent.document.getElementById("lv_detail");
-					iframe.src = "lehrveranstaltung_kompatibel.php?lehrveranstaltung_id="+lehrveranstaltung_id+"&type=edit";
-				}
+				
+				location.reload();
 			}).error(function(data)
 			{
 				alert(data.responseText);
