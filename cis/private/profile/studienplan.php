@@ -25,6 +25,7 @@
  * Dabei werden Regeln und Anmeldezeiträume der Lehrveranstaltungen berücksichtigt.
  */
 require_once('../../../config/cis.config.inc.php');
+require_once('../../../config/global.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/studienordnung.class.php');
 require_once('../../../include/studienplan.class.php');
@@ -301,9 +302,13 @@ echo '<h1>'.$p->t('studienplan/studienplan').": $studienplan->bezeichnung ($stud
 echo '<table style="border: 1px solid black">
 	<thead>
 	<tr style="border: 1px solid black" valign="top">
-		<th>'.$p->t('global/lehrveranstaltung').'</th>
-		<th>'.$p->t('studienplan/ects').'</th>
-		<th>'.$p->t('studienplan/status').'</th>';
+		<th>'.$p->t('global/lehrveranstaltung').'</th>';
+
+if(CIS_STUDIENPLAN_SEMESTER_ANZEIGEN)
+	echo '<th>'.$p->t('global/semester').'</th>';
+  
+echo '<th>'.$p->t('studienplan/ects').'</th>
+	  <th>'.$p->t('studienplan/status').'</th>';
 
 foreach($stsem_arr as $stsem)
 {
@@ -394,6 +399,10 @@ function drawTree($tree, $depth)
 		// Bezeichnung der Lehrveranstaltung
 		    echo $icon.$row_tree->kurzbz.' - '.$row_tree->bezeichnung;
 		echo $bende.'</td>';
+		
+		// Semester
+		if(CIS_STUDIENPLAN_SEMESTER_ANZEIGEN)
+			echo '<td>'.$row_tree->semester.'</td>';
 		
 		// ECTS Punkte
 		echo '<td>'.$row_tree->ects.'</td>';
