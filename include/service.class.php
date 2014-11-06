@@ -155,6 +155,80 @@ class service extends basis_db
 		}
 	}
 	
+	/**
+	 * Laedt alle vorhandenen Services, sortiert nach den am haeufigsten vom User in der Zeitaufzeichnung verwendeten
+	 * 
+	 * <p>Optionaler Zeitraum (Tage in die Vergangenheit), in denen das Service vorkommt<br>
+	 * Optionale Anzahl an Ereignissen im angegebenen Zeitraum, um das Service zu beruecksichtigen</p>
+	 * 
+	 * @param string $user uid
+	 * @param integer $zeitraum Anzahl Tage in die Vergangenheit, die fuer das Auftreten des Service beruecksichtigt werden sollen
+	 * @param integer $anzahl_ereignisse default: 3 Wie oft soll dieses Service mindestens in $zeitraum vorkommen, um beruecksichtigt zu werden
+	 */
+	public function getFrequentServices($user, $zeitraum=null, $anzahl_ereignisse='3')
+	{	
+		if(!is_numeric($anzahl_ereignisse))
+		{
+			$this->errormsg = 'anzahl_ereignisse muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		if (!is_null($zeitraum) && $zeitraum>0 && is_numeric($zeitraum))
+			$zeit = "AND tbl_zeitaufzeichnung.start>=(now()::date-$zeitraum)";
+		else 
+			$zeit = "";
+		
+		$qry = "	SELECT service_id,oe_kurzbz,bezeichnung,beschreibung,ext_id,content_id, sum(a.anzahl) AS anzahl FROM (
+						SELECT 
+						tbl_service.*,
+						  (SELECT COUNT (tbl_zeitaufzeichnung.service_id) FROM campus.tbl_zeitaufzeichnung 
+						   WHERE tbl_service.service_id=tbl_zeitaufzeichnung.service_id AND tbl_zeitaufzeichnung.uid=".$this->db_add_param($user)." 
+						   $zeit
+						   ) AS anzahl
+						FROM public.tbl_service
+						WHERE 
+						  (SELECT COUNT (tbl_zeitaufzeichnung.service_id) FROM campus.tbl_zeitaufzeichnung
+						   WHERE tbl_service.service_id=tbl_zeitaufzeichnung.service_id AND tbl_zeitaufzeichnung.uid=".$this->db_add_param($user)." 
+						   $zeit
+						   ) > $anzahl_ereignisse
+						GROUP BY tbl_service.service_id,tbl_service.beschreibung,tbl_service.ext_id,tbl_service.oe_kurzbz,tbl_service.bezeichnung,tbl_service.content_id,anzahl
+											
+						UNION
+						SELECT tbl_service.*, '0' AS anzahl
+						FROM public.tbl_service
+					) AS a
+					GROUP BY service_id,oe_kurzbz,bezeichnung,beschreibung,ext_id,content_id
+					ORDER BY anzahl DESC,bezeichnung,oe_kurzbz";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new service();
+					
+				$obj->service_id = $row->service_id;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->ext_id = $row->ext_id;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->anzahl = $row->anzahl;
+					
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg='Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Laedt die Services der uebergebenen OE
+	 * 
+	 * @param $oe_kurzbz
+	 */
 	public function getServicesOrganisationseinheit($oe_kurzbz)
 	{	
 		$qry = 'SELECT 
