@@ -302,8 +302,8 @@ class zeitaufzeichnung extends basis_db
 	
 	/**
 	 * Laedt die Zeitaufzeichnungen eines Users. Default: Die letzten 40 Tage
-	 * @param $user
-	 * @param $days deafult: 40 Tage
+	 * @param string $user
+	 * @param integer $days deafult: 40 Tage
 	 */
 	public function getListeUser($user, $days='40')
 	{		 

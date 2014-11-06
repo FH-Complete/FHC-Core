@@ -384,6 +384,8 @@ class benutzerberechtigung extends basis_db
 				FROM 
 					system.tbl_benutzerrolle JOIN public.tbl_benutzerfunktion USING(funktion_kurzbz)
 				WHERE tbl_benutzerfunktion.uid=".$this->db_add_param($uid)."
+					AND (tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=now())
+					AND (tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=now())
 				
 				UNION
 				
