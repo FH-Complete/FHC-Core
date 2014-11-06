@@ -624,7 +624,12 @@ class organisationseinheit extends basis_db
 				lehre,
 				sum(a.anzahl) AS anzahl FROM (
 					SELECT 
-					tbl_organisationseinheit.*,
+					tbl_organisationseinheit.oe_kurzbz,
+					tbl_organisationseinheit.oe_parent_kurzbz,
+					tbl_organisationseinheit.bezeichnung,
+					tbl_organisationseinheit.organisationseinheittyp_kurzbz,
+					tbl_organisationseinheit.aktiv,		
+					tbl_organisationseinheit.lehre,			
 					  (SELECT COUNT (tbl_zeitaufzeichnung.*) FROM campus.tbl_zeitaufzeichnung 
 					   WHERE tbl_organisationseinheit.oe_kurzbz IN (tbl_zeitaufzeichnung.oe_kurzbz_1,tbl_zeitaufzeichnung.oe_kurzbz_2) AND tbl_zeitaufzeichnung.uid=".$this->db_add_param($user)." 
 					   $zeit) AS anzahl
@@ -638,7 +643,12 @@ class organisationseinheit extends basis_db
 					UNION
 					
 					SELECT
-					tbl_organisationseinheit.*,
+					tbl_organisationseinheit.oe_kurzbz,
+					tbl_organisationseinheit.oe_parent_kurzbz,
+					tbl_organisationseinheit.bezeichnung,
+					tbl_organisationseinheit.organisationseinheittyp_kurzbz,
+					tbl_organisationseinheit.aktiv,		
+					tbl_organisationseinheit.lehre,	
 					'0' AS anzahl
 					FROM public.tbl_organisationseinheit";
 
@@ -648,7 +658,7 @@ class organisationseinheit extends basis_db
 		$qry .=" ) AS a
 				GROUP BY oe_kurzbz,oe_parent_kurzbz,bezeichnung,organisationseinheittyp_kurzbz,aktiv,lehre
 				ORDER BY anzahl DESC, bezeichnung";
-	    
+	    echo $qry;
 	    if($this->db_query($qry))
 	    {
 		while($row = $this->db_fetch_object())
