@@ -658,7 +658,7 @@ class organisationseinheit extends basis_db
 		$qry .=" ) AS a
 				GROUP BY oe_kurzbz,oe_parent_kurzbz,bezeichnung,organisationseinheittyp_kurzbz,aktiv,lehre
 				ORDER BY anzahl DESC, bezeichnung";
-	    echo $qry;
+
 	    if($this->db_query($qry))
 	    {
 		while($row = $this->db_fetch_object())
