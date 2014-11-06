@@ -116,4 +116,7 @@ define('VILESCI_PERSON_NEU_STUDIENSEMESTER_UEBERGANGSFRIST',30);
 
 // Legt fest ob beim Anlegen von neuen Studierenden nur Wintersemester als Default vorgeschlagen werden oder auch Sommersemester (true | false)
 define('VILESCI_PERSON_NEU_STUDIENSEMESTER_WINTERONLY',false);
+
+// Anzeigeoptionen für den Studienplan im CIS
+define('CIS_STUDIENPLAN_SEMESTER_ANZEIGEN', false);
 ?>
