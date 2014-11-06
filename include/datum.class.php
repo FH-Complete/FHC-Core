@@ -239,6 +239,37 @@ class datum
 	}
 	
 	/**
+	 * Subtrahiert 2 Zeiten ($zeit1-$zeit2) Stunde:Minute
+	 * Es liefert keine Uhrzeit zurueck sondern Stunden und Minuten
+	 * zB 12:10 + 23:15 = 35:25
+	 *
+	 * @param $zeit1
+	 * @param $zeit2
+	 * @return subtraktion der beiden zeiten im Format Stunden:Minuten
+	 */
+	public function subZeit($zeit1, $zeit2)
+	{
+		list($h1, $m1) = explode(':', $zeit1);
+		list($h2, $m2) = explode(':', $zeit2);
+
+		$m1 -=$m2;
+//echo $h1.','.$m1.','.$h2.','.$m2;
+		if($m1>=60)
+		{
+			$uebertrag = (int)($m1/60);
+			$h1+= $uebertrag;
+		}
+		$m1=$m1%60;
+		$h1+=-$h2;
+		if($m1<10)
+			$m1='0'.$m1;
+		if($h1<10)
+			$h1='0'.$h1;
+
+		return $h1.':'.$m1;
+	}
+	
+	/**
 	 * Prueft und Liefert ein Datum im angegeben Format
 	 *   		fuer die Formatierung wird die Funktion formatDatum verwendet
 	 * @param $datum

@@ -2108,6 +2108,17 @@ if(!$result = @$db->db_query("SELECT sort FROM lehre.tbl_studienplan_lehrveranst
 		echo ' lehre.tbl_studienplan_lehrveranstaltung: Spalte sort hinzugefuegt!<br>';
 }
 
+// Spalte sort in fue.tbl_aktivitaet
+if(!$result = @$db->db_query("SELECT sort FROM fue.tbl_aktivitaet LIMIT 1;"))
+{
+	$qry = "ALTER TABLE fue.tbl_aktivitaet ADD COLUMN sort integer;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>fue.tbl_aktivitaet: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' fue.tbl_aktivitaet: Spalte sort hinzugefuegt!<br>';
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(

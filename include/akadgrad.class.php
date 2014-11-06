@@ -117,7 +117,7 @@ class akadgrad extends basis_db
 	}
 	
 	/**
-	 * Liefert den Akademischen Grad eines Studenten gemaess Studienordnung
+	 * Liefert den Akademischen Grad eines Studenten aus der Tabelle Akadgrad
 	 * @param student_uid
 	 */
 	public function getAkadgradStudent($student_uid)

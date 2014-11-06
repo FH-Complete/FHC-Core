@@ -388,15 +388,19 @@ class mitarbeiter extends benutzer
 	}
 
 	/**
-	 * Liefert Mitarbeiter die einem eine Funktion in den uebergebenen Studiengaengen haben
+	 * Liefert Mitarbeiter, die eine Funktion in den uebergebenen Studiengaengen haben.
+	 * Optional datum_von und datum_bis fuer die Funktion ansonsten now()
 	 *
 	 * @param $lektor
 	 * @param $fixangestellt
 	 * @param $stge Array mit Studiengaengen
 	 * @param $fkt_kurzbz
+	 * @param $order
+	 * @param $datum_von
+	 * @param $datum_bis
 	 * @return boolean
 	 */
-	public function getMitarbeiterStg($lektor=true,$fixangestellt, $stge, $fkt_kurzbz, $order='studiengang_kz, nachname, vorname, kurzbz')
+	public function getMitarbeiterStg($lektor=true,$fixangestellt, $stge, $fkt_kurzbz, $order='studiengang_kz, nachname, vorname, kurzbz', $datum_von='', $datum_bis='')
 	{
 		$sql_query='SELECT DISTINCT campus.vw_mitarbeiter.*, studiengang_kz FROM campus.vw_mitarbeiter
 					JOIN public.tbl_benutzerfunktion USING (uid) JOIN public.tbl_studiengang USING(oe_kurzbz)
@@ -419,6 +423,20 @@ class mitarbeiter extends benutzer
 		if($fkt_kurzbz!='')
 		{
 			$sql_query.=" AND funktion_kurzbz=".$this->db_add_param($fkt_kurzbz);
+		}
+		if(!is_null($datum_von))
+		{
+			if($datum_von=='')
+				$sql_query.=" AND (tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=now())";
+			else 
+				$sql_query.=" AND (tbl_benutzerfunktion.datum_von IS NULL OR tbl_benutzerfunktion.datum_von<=".$this->db_add_param($datum_von).")";
+		}
+		if(!is_null($datum_bis))
+		{
+			if($datum_bis=='')
+				$sql_query.=" AND (tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=now())";
+			else 
+				$sql_query.=" AND (tbl_benutzerfunktion.datum_bis IS NULL OR tbl_benutzerfunktion.datum_bis>=".$this->db_add_param($datum_bis).")";
 		}
 		if ($stge!=null)
 		{

@@ -61,9 +61,12 @@ class organisationseinheit extends basis_db
 
 	/**
 	 * Liefert alle Organisationseinheiten
+	 * @param $aktiv
+	 * @param $lehre
+	 * @param $order Sortierreihenfolge. Standard: organisationseinheittyp_kurzbz, oe_kurzbz
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getAll($aktiv=null, $lehre=null)
+	public function getAll($aktiv=null, $lehre=null, $order='organisationseinheittyp_kurzbz, oe_kurzbz')
 	{
 		$qry = "SELECT * FROM public.tbl_organisationseinheit WHERE 1=1";
 
@@ -73,7 +76,7 @@ class organisationseinheit extends basis_db
 		if(!is_null($lehre))		
 			$qry.=" AND lehre=".$this->db_add_param($lehre, FHC_BOOLEAN);
 
-		$qry .=" ORDER BY organisationseinheittyp_kurzbz, oe_kurzbz";
+		$qry .=" ORDER BY ".$order;
 		
 		if($this->db_query($qry))
 		{
@@ -539,6 +542,126 @@ class organisationseinheit extends basis_db
 		    $obj->aktiv = $this->db_parse_bool($row->aktiv);
 		    $obj->mailverteiler = $this->db_parse_bool($row->mailverteiler);
 		    $obj->lehre = $this->db_parse_bool($row->lehre);
+
+		    $this->result[] = $obj;
+		}
+		return true;
+	    }
+	    else 
+	    {
+		$this->errormsg = 'Fehler beim Laden der Organisationseinheiten';
+		return false;
+	    }
+	}
+	
+	/**
+	 * Sucht nach einer Organisationseinheit
+	 * @param type $oetyp_kurzbz
+	 * @return boolean true, wenn ok; false, im Fehlerfall
+	 */
+	public function search($searchItem)
+	{
+	    $qry = 'SELECT * FROM public.tbl_organisationseinheit WHERE 
+	    		(LOWER(bezeichnung) LIKE LOWER(\'%'.(implode(' ',$searchItem)).'%\') OR
+	    		LOWER(organisationseinheittyp_kurzbz) LIKE LOWER(\'%'.(implode(' ',$searchItem)).'%\'))
+	    		ORDER BY organisationseinheittyp_kurzbz, bezeichnung;';
+	    
+	    if($this->db_query($qry))
+	    {
+		while($row = $this->db_fetch_object())
+		{
+		    $obj = new organisationseinheit();
+
+		    $obj->oe_kurzbz = $row->oe_kurzbz;
+		    $obj->oe_parent_kurzbz = $row->oe_parent_kurzbz;
+		    $obj->bezeichnung = $row->bezeichnung;
+		    $obj->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
+		    $obj->aktiv = $this->db_parse_bool($row->aktiv);
+		    $obj->mailverteiler = $this->db_parse_bool($row->mailverteiler);
+		    $obj->lehre = $this->db_parse_bool($row->lehre);
+
+		    $this->result[] = $obj;
+		}
+		return true;
+	    }
+	    else 
+	    {
+		$this->errormsg = 'Fehler beim Laden der Organisationseinheiten';
+		return false;
+	    }
+	}
+	
+	/**
+	 * Laedt alle Organisationseinheiten, sortiert nach den am haeufigsten vom User in der Zeitaufzeichnung verwendeten
+	 * 
+	 * <p>Optionaler Zeitraum (Tage in die Vergangenheit), in denen die OE verwendet wurde<br>
+	 * Optionale Anzahl an Ereignissen im angegebenen Zeitraum, um die OE zu beruecksichtigen</p>
+	 * 
+	 * @param string $user uid
+	 * @param integer $zeitraum Anzahl Tage in die Vergangenheit, die fuer das Auftreten der OE beruecksichtigt werden sollen
+	 * @param integer $anzahl_ereignisse default: 3 Wie oft soll diese OE mindestens in $zeitraum vorkommen, um beruecksichtigt zu werden
+	 * @param boolean $aktiv
+	 */
+	public function getFrequent($user, $zeitraum=null, $anzahl_ereignisse='3', $aktiv=null)
+	{
+		if(!is_numeric($anzahl_ereignisse))
+		{
+			$this->errormsg = "anzahl_ereignisse muss eine gueltige Zahl sein";
+			return false;
+		}
+		
+		if (!is_null($zeitraum) && $zeitraum>0 && is_numeric($zeitraum))
+			$zeit = "AND tbl_zeitaufzeichnung.start>=(now()::date-$zeitraum)";
+		else 
+			$zeit = "";
+		
+		$qry = "SELECT 
+				oe_kurzbz,
+				oe_parent_kurzbz,
+				bezeichnung,
+				organisationseinheittyp_kurzbz,
+				aktiv,
+				lehre,
+				sum(a.anzahl) AS anzahl FROM (
+					SELECT 
+					tbl_organisationseinheit.*,
+					  (SELECT COUNT (tbl_zeitaufzeichnung.*) FROM campus.tbl_zeitaufzeichnung 
+					   WHERE tbl_organisationseinheit.oe_kurzbz IN (tbl_zeitaufzeichnung.oe_kurzbz_1,tbl_zeitaufzeichnung.oe_kurzbz_2) AND tbl_zeitaufzeichnung.uid=".$this->db_add_param($user)." 
+					   $zeit) AS anzahl
+					FROM public.tbl_organisationseinheit
+					WHERE 
+					  (SELECT COUNT (tbl_zeitaufzeichnung.*) FROM campus.tbl_zeitaufzeichnung 
+					   WHERE tbl_organisationseinheit.oe_kurzbz IN (tbl_zeitaufzeichnung.oe_kurzbz_1,tbl_zeitaufzeichnung.oe_kurzbz_2) AND tbl_zeitaufzeichnung.uid=".$this->db_add_param($user)." 
+					   $zeit) > $anzahl_ereignisse
+					GROUP BY tbl_organisationseinheit.oe_kurzbz, tbl_organisationseinheit.oe_parent_kurzbz, tbl_organisationseinheit.bezeichnung, tbl_organisationseinheit.organisationseinheittyp_kurzbz, tbl_organisationseinheit.aktiv, tbl_organisationseinheit.lehre, anzahl
+					
+					UNION
+					
+					SELECT
+					tbl_organisationseinheit.*,
+					'0' AS anzahl
+					FROM public.tbl_organisationseinheit";
+
+		if(!is_null($aktiv))
+			$qry.=" WHERE aktiv=".$this->db_add_param($aktiv, FHC_BOOLEAN);
+
+		$qry .=" ) AS a
+				GROUP BY oe_kurzbz,oe_parent_kurzbz,bezeichnung,organisationseinheittyp_kurzbz,aktiv,lehre
+				ORDER BY anzahl DESC, bezeichnung";
+	    
+	    if($this->db_query($qry))
+	    {
+		while($row = $this->db_fetch_object())
+		{
+		    $obj = new organisationseinheit();
+
+		    $obj->oe_kurzbz = $row->oe_kurzbz;
+		    $obj->oe_parent_kurzbz = $row->oe_parent_kurzbz;
+		    $obj->bezeichnung = $row->bezeichnung;
+		    $obj->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
+		    $obj->aktiv = $this->db_parse_bool($row->aktiv);
+		    $obj->lehre = $this->db_parse_bool($row->lehre);
+		    $obj->anzahl = $row->anzahl;
 
 		    $this->result[] = $obj;
 		}
