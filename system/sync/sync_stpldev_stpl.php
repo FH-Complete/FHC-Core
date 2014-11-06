@@ -681,7 +681,7 @@ if(defined('LVPLAN_HORDE_SYNC') && LVPLAN_HORDE_SYNC===true)
 	$users = array_unique($users);
 	if(count($users)>0)
 	{
-		if($fp = fopen($uidfile, 'w'))
+		if($fp = fopen($uidfile, 'a'))
 		{
 			foreach($users as $uid)
 			{
@@ -690,8 +690,8 @@ if(defined('LVPLAN_HORDE_SYNC') && LVPLAN_HORDE_SYNC===true)
 			fclose($fp);
 
 			//Horde Syncro starten
-			chdir(DOC_ROOT.'../system/hordelvplansync/');
-			exec('php5 synchordelvplan.php lvplanupdate.txt >>/var/log/sync/synchordelvplan.log 2>&1');
+			//chdir(DOC_ROOT.'../system/hordelvplansync/');
+			//exec('php5 synchordelvplan.php lvplanupdate.txt >>/var/log/sync/synchordelvplan.log 2>&1');
 		}
 	}
 }
