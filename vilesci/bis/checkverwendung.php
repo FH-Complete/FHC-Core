@@ -25,11 +25,20 @@
  *
  */
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/basis_db.class.php');
-require('../../include/studiensemester.class.php');
+require_once('../../include/studiensemester.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+
+$uid = get_uid();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($uid);
+
+if(!$rechte->isBerechtigt('mitarbeiter/stammdaten', null,'suid'))
+	die('Sie haben keine Berechtigung für diese Seite');
 
 $error_log='';
 $fehler=0;
@@ -332,7 +341,7 @@ if($resultall = $db->db_query($qryall))
 			AND mitarbeiter_uid='".$rowall->mitarbeiter_uid."';";
 		if($result = $db->db_query($qry))
 		{
-			while($row=_fetch_object($result))
+			while($row=$db->db_fetch_object($result))
 			{
 				echo "Verwendung Code ".$row->verwendung_code.", ".$row->anfang." - ".$row->zuende.", Habilitation ".($row->habilitation=='t'?'ja':'nein')." <-> Entwicklungsteam-bes.Qualifikation:(Stg. ".$row->studiengang_kz.") '".$row->besqualbez."'.<br>";
 			}
