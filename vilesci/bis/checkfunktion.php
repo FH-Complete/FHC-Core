@@ -30,6 +30,13 @@ require_once('../../include/studiengang.class.php');
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
+$uid = get_uid();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($uid);
+
+if(!$rechte->isBerechtigt('mitarbeiter/stammdaten',null,'suid'))
+	die('Sie haben keine Berechtigung für diese Seite');
 
 $funktion_geaendert=0;
 $funktion_hinzugefuegt=0;
