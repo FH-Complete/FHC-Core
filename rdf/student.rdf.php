@@ -51,7 +51,7 @@ function convdate($date)
 	return $y.'-'.$m.'-'.$d;
 }
 
-function checkfilter($row, $filter2)
+function checkfilter($row, $filter2, $buchungstyp = null)
 {
 	global $studiensemester_kurzbz, $kontofilterstg;
 	$db = new basis_db();
@@ -74,7 +74,9 @@ function checkfilter($row, $filter2)
 		$qry = "SELECT sum(betrag) as summe FROM tbl_konto WHERE person_id='$row->person_id'";
 		if($kontofilterstg=='true')
 			$qry.=" AND studiengang_kz='$row->studiengang_kz'";
-		//echo $qry;
+		if($buchungstyp != null && $buchungstyp != "alle")
+			$qry.=" AND buchungstyp_kurzbz='$buchungstyp'";
+		
 		if($db->db_query($qry))
 			if($row_filter = $db->db_fetch_object())
 				if($row_filter->summe=='0.00' || $row_filter->summe=='' || $row_filter->summe=='0')
@@ -320,6 +322,7 @@ $filter = (isset($_GET['filter'])?$_GET['filter']:null);
 $ss = (isset($_GET['ss'])?$_GET['ss']:null);
 $filter2 = (isset($_GET['filter2'])?$_GET['filter2']:null);
 $orgform = (isset($_GET['orgform'])?$_GET['orgform']:null);
+$buchungstyp_filter = (isset($_GET['buchungstyp'])?$_GET['buchungstyp']:null);
 
 $db = new basis_db();
 
@@ -426,7 +429,7 @@ if($xmlformat=='rdf')
 		{
 			while($row = $db->db_fetch_object())
 			{
-				if(checkfilter($row, $filter2))
+				if(checkfilter($row, $filter2, $buchungstyp_filter))
 					draw_content_liste($row);
 			}
 		}

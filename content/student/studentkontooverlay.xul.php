@@ -54,7 +54,9 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<button id="student-konto-button-filter" value="alle" oncommand="StudentKontoFilter()" label="offene anzeigen" disabled="true"/>
 					</hbox>
 					<hbox>
+						<!--
 						<button id="student-konto-button-filterstudenten" oncommand="StudentKontoFilterStudenten('konto')" label="Studentenliste auf offene Buchungen filtern" tooltiptext="Liste aller Studenten mit offenen Buchungen"/>
+						-->
 						<!--
 						<button id="student-konto-button-filterstudiengebuehr" oncommand="StudentKontoFilterStudenten('studiengebuehr')" label="nicht gebuchte Studiengebuehr" tooltiptext="Liste aller Studenten ohne Studiengebuehrbelastung"/>
 						-->
@@ -80,6 +82,35 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<spacer flex="1" />
 						</vbox>
 						<button id="student-konto-button-filterbuchungstyp" oncommand="StudentKontoFilterBuchungstyp()" label="filtern"/>
+						
+					</hbox>
+				</row>
+				<row>
+					<hbox></hbox>
+					<hbox>
+						<vbox>
+							<spacer flex="1" />
+							<label value="Liste auf offene"/>
+							<sapcer flex="1" />
+						</vbox>
+						<vbox flex="1">
+							<spacer flex="1" />
+							<menulist id="student-konto-menulist-filter-buchungstyp-offen" disabled="false"
+							          datasources="<?php echo APP_ROOT ?>rdf/buchungstyp.rdf.php" flex="1"
+							          ref="http://www.technikum-wien.at/buchungstyp/liste" >
+								<template>
+									<menupopup>
+										<menuitem value="alle"
+												  label="alle Buchungstypen"/>
+										<menuitem value="rdf:http://www.technikum-wien.at/buchungstyp/rdf#buchungstyp_kurzbz"
+							        		      label="rdf:http://www.technikum-wien.at/buchungstyp/rdf#beschreibung"
+										  		  uri="rdf:*"/>
+									</menupopup>
+								</template>
+							</menulist>
+							<spacer flex="1" />
+						</vbox>
+						<button id="student-konto-button-filterbuchungstypoffen" oncommand="StudentKontoFilterStudenten('konto')" label="filtern"/>
 						
 					</hbox>
 				</row>
