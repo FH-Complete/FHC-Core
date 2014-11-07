@@ -2258,6 +2258,8 @@ function StudentKontoFilterStudenten(filter)
 		return;
 	}
 	
+	buchungstyp = document.getElementById('student-konto-menulist-filter-buchungstyp-offen').value;
+	
     // Progressmeter starten. Ab jetzt keine 'return's mehr.
     document.getElementById('statusbar-progressmeter').setAttribute('mode','undetermined');
     //globalProgressmeter.StartPM();
@@ -2274,7 +2276,7 @@ function StudentKontoFilterStudenten(filter)
 		stsem = getStudiensemester();
 	if(typ=='')
 		typ='student';
-	url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ="+typ+"&filter2="+filter+"&"+gettimestamp();
+	url = "<?php echo APP_ROOT; ?>rdf/student.rdf.php?studiengang_kz="+stg_kz+"&semester="+sem+"&verband="+ver+"&gruppe="+grp+"&gruppe_kurzbz="+gruppe+"&studiensemester_kurzbz="+stsem+"&typ="+typ+"&filter2="+filter+"&buchungstyp="+buchungstyp+"&"+gettimestamp();
 	var treeStudent=document.getElementById('student-tree');
 
 	try
