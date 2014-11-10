@@ -167,11 +167,19 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 			document.getElementById("bis").value=document.getElementById("von").value;
 		}
 		
-		function addieren(timestamp)
+		function addieren()
 		{
-			var tag,monat,jahr,stunde,minute,vonDatum,bisDatum,diff,foo;
-			
-			vonDatum = new Date(timestamp*1000);
+			var von_tag,von_monat,von_jahr,von_stunden,von_minuten,tag,monat,jahr,stunde,minute,vonDatum,bisDatum,diff,foo;
+			//Von-Datum auslesen
+			Datum = document.getElementById("von").value;
+		    von_tag = Datum.substring(0,2); 
+		    von_monat = Datum.substring(3,5);
+		    von_jahr = Datum.substring(6,10);
+		    von_stunden = Datum.substring(11,13);
+		    von_minuten = Datum.substring(14,18);
+		    //Neues Datumsobjekt aus Von-Datum erzeugen
+			vonDatum = new Date(von_jahr, von_monat, von_tag, von_stunden, von_minuten);
+			//Falls diff kein Integer, dann 0
 			diff = document.getElementById("diff").value;
 			if (!isNaN(parseInt(diff)))
 				diff = parseInt(diff);
@@ -238,9 +246,12 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 			{
 				if (diff>9999)  
 				{
-					alert("'.$p->t("zeitaufzeichnung/zeitraumAuffallendHoch").'");
+					Check = confirm("'.$p->t("zeitaufzeichnung/zeitraumAuffallendHoch").'");
 					document.getElementById("bis").focus();
-				  	return true;
+					if (Check == false)
+				  		return false;
+				  	else
+				  		return true;
 				}
 			}
 			else
@@ -417,8 +428,8 @@ if($projekt->getProjekteMitarbeiter($user))
 		echo '</SELECT><input type="button" value="'.$p->t("zeitaufzeichnung/uebersicht").'" onclick="loaduebersicht();"></td>';
 		echo '</tr><tr>';
 		//OE_KURZBZ_1
-		echo '<td>'.$p->t("zeitaufzeichnung/organisationseinheiten").'</td>
-			<td colspan="3"><SELECT name="oe_kurzbz_1">';
+		echo '<td nowrap>'.$p->t("zeitaufzeichnung/organisationseinheiten").'</td>
+			<td colspan="3"><SELECT style="width:200px;" name="oe_kurzbz_1">';
 		$oe = new organisationseinheit();
 		$oe->getFrequent($user,'180','3',true);
 		$trennlinie = true;
@@ -443,14 +454,10 @@ if($projekt->getProjekteMitarbeiter($user))
 			}
 			echo '<option value="'.$db->convert_html_chars($row->oe_kurzbz).'" '.$selected.' '.$class.'>'.$db->convert_html_chars($row->bezeichnung.' ('.$row->organisationseinheittyp_kurzbz).')</option>';
 		}
-		echo '</SELECT>';
-		//echo '</td>';
-		//echo '</tr>';
-		//echo '<tr>';
+		echo '</SELECT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
 	
 		//OE_KURZBZ_2
-		//echo '<td>'.$p->t("zeitaufzeichnung/organisationseinheit2").'</td>';
-		echo '<td><SELECT name="oe_kurzbz_2">';
+		echo '<SELECT style="width:200px;" name="oe_kurzbz_2">';
 		echo '<option value="">-- '.$p->t("zeitaufzeichnung/keineAuswahl").' --</option>';
 		
 		$oe = new organisationseinheit();
@@ -554,7 +561,7 @@ if($projekt->getProjekteMitarbeiter($user))
 				<img style="vertical-align:bottom; cursor:pointer" src="../../../skin/images/arrow-next.png" title="'.$p->t("zeitaufzeichnung/alsEndzeitUebernehmen").'" onclick="uebernehmen()">
 			</td>
 			<td align="center">&nbsp;&nbsp;+
-				<input type="text" style="width: 25px;" maxlength="3" id="diff" name="diff" value="'.$db->convert_html_chars($diff/60).'" oninput="addieren('.$von_ts.')">
+				<input type="text" style="width: 25px;" maxlength="3" id="diff" name="diff" value="'.$db->convert_html_chars($diff/60).'" oninput="addieren()">
 				min.
 			</td><td>
 				<img style="vertical-align:bottom; cursor:pointer" src="../../../skin/images/arrow-previous.png" title="'.$p->t("zeitaufzeichnung/alsStartzeitUebernehmen").'" onclick="uebernehmen1()">&nbsp;
@@ -644,7 +651,7 @@ if($projekt->getProjekteMitarbeiter($user))
 					list($h1, $m1) = explode(':', $pausesumme);
 					$pausesumme = $h1*3600+$m1*60;
 					$tagessaldo = $datum->mktime_fromtimestamp($datum->formatDatum($tagesende, $format='Y-m-d H:i:s'))-$datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn, $format='Y-m-d H:i:s'))-3600;
-					if ($tagessaldo>=18000 && $pflichtpause==false)
+					if ($tagessaldo>18000 && $pflichtpause==false)
 					{
 						$pausesumme = $pausesumme+1800;
 					}
@@ -653,11 +660,11 @@ if($projekt->getProjekteMitarbeiter($user))
 					$tagessaldo = date('H:i', ($tagessaldo));
 					echo '<tr>
 					<td '.$style.' colspan="7"></td>
-			        <td align="right" colspan="2" '.$style.'>'.$p->t("zeitaufzeichnung/summeEintraege").':<br>
+			        <td align="right" colspan="2" '.$style.'>
 			        	<b>'.$p->t("zeitaufzeichnung/arbeitszeit").': '.$datum->formatDatum($tagesbeginn, $format='H:i').'-'.$datum->formatDatum($tagesende, $format='H:i').' '.$p->t("eventkalender/uhr").'</b><br>
 			        	'.$p->t("zeitaufzeichnung/pause").' '.($pflichtpause==false?$p->t("zeitaufzeichnung/inklusivePflichtpause"):'').':
 			        </td>
-			        <td '.$style.' align="right">'.$tagessumme.'<br><b>'.$tagessaldo.'</b><br>'.date('H:i', ($pausesumme-3600)).'</td>
+			        <td '.$style.' align="right"><b>'.$tagessaldo.'</b><br>'.date('H:i', ($pausesumme-3600)).'</td>
 			        <td '.$style.' colspan="3"></td>';
 					
 					$tag=$datumtag;
@@ -679,8 +686,8 @@ if($projekt->getProjekteMitarbeiter($user))
 					<tfoot>
 							<tr>
 								<th colspan="7"></th>
-								<th align="right" colspan="2" style="font-weight: normal;">'.$p->t("zeitaufzeichnung/wochensummeEintraege").':<br><b>'.$p->t("zeitaufzeichnung/wochensummeArbeitszeit").':</b></th>
-								<th align="right" style="font-weight: normal;">'.$wochensumme.'<br><b>'.$wochensaldo.'</b></th>
+								<th align="right" colspan="2" style="font-weight: normal;"><b>'.$p->t("zeitaufzeichnung/wochensummeArbeitszeit").':</b></th>
+								<th align="right" style="font-weight: normal;"><b>'.$wochensaldo.'</b></th>
 								<th colspan="3"></th>
 							</tr>
 					</tfoot>
