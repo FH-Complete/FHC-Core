@@ -179,12 +179,12 @@ class filter extends basis_db
 				switch ($filter->type)
 				{
 				case 'select':
-					$html.='<select name="'.$filter->kurzbz.'[]" ';
+					$html.='<select class="form-control" name="'.$filter->kurzbz.'[]" ';
 					$html.=$filter->htmlattr;
 					$html.=' >';
 					$this->loadValues($filter->sql, $filter->valuename, $filter->showvalue);
 					foreach ($this->values as $value)
-						$html.="\n\t\t\t\t".'<option value="'.$value->value.'">'.$value->text.'</option>';
+						$html.="\n\t\t\t\t".'<option class="form-control" value="'.$value->value.'">'.$value->text.'</option>';
 					$html.="\n\t\t\t</select>";
 				}
 				return $html;
@@ -209,16 +209,23 @@ class filter extends basis_db
 				$obj->text='';
 				for ($i=0; $i<$this->db_num_fields(); $i++)
 				{
-					if ($this->db_field_name(null,$i)==$valuename)
+					if ($this->db_field_name(null,$i)=='value')
 					{
 						$obj->value=$row[$i];
 						if ($showvalue)
 							$obj->text.=' ('.$row[$i].') ';
 					}
+					elseif ($this->db_field_name(null,$i)=='name')
+					{
+						if ($showvalue)
+							$obj->text.=' - '.$row[$i];
+						else
+							$obj->text.=$row[$i];
+					}
 					else
-						$obj->text.='- '.$row[$i].' ';
+						$obj->text.=' - '.$row[$i];
 				}
-				$obj->text = mb_substr($obj->text,1);
+				//$obj->text = mb_substr($obj->text,1);
 				$this->values[] = $obj;			   
 			}
 			//var_dump($this);
@@ -382,6 +389,27 @@ class filter extends basis_db
 			$this->errormsg = 'Fehler beim Löschen der Daten'."\n";
 			return false;
 		}
+	}
+	
+	/**
+	 * Ermittelt alle POST/GET-Variablen
+	 * @return Zeichenkette fuer eine GET-Methode, false im Fehlerfall
+	 */
+	public function getVars()
+	{
+		$vars='';
+		foreach($_REQUEST as $name=>$value)
+		{
+			if (is_array($value))
+			{
+				foreach($value AS $val)
+					$vars.='&'.$name.'='.$val;
+			}
+			else
+				$vars.='&'.$name.'='.$value;
+		}
+		//$vars.='&statistik_kurzbz='.$_REQUEST['statistik_kurzbz'];
+		return $vars;
 	}
 	
 }

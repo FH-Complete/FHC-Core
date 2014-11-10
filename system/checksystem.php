@@ -2112,12 +2112,22 @@ if(!$result = @$db->db_query("SELECT sort FROM lehre.tbl_studienplan_lehrveranst
 if(!$result = @$db->db_query("SELECT sort FROM fue.tbl_aktivitaet LIMIT 1;"))
 {
 	$qry = "ALTER TABLE fue.tbl_aktivitaet ADD COLUMN sort integer;";
-
 	if(!$db->db_query($qry))
 		echo '<strong>fue.tbl_aktivitaet: '.$db->db_last_error().'</strong><br>';
 	else 
 		echo ' fue.tbl_aktivitaet: Spalte sort hinzugefuegt!<br>';
 }
+
+// Spalte studienjahr_kurzbz in public.tbl_studiensemester
+if(!$result = @$db->db_query("SELECT studienjahr_kurzbz FROM public.tbl_studiensemester LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_studiensemester ADD COLUMN studienjahr_kurzbz varchar(16);";
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_studiensemester: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' public.tbl_studiensemester: Spalte studienjahr_kurzbz hinzugefuegt!<br>';
+}
+
 
 echo '<br><br><br>';
 
@@ -2320,7 +2330,7 @@ $tabellen=array(
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige"),
 	"public.tbl_studiengangstyp" => array("typ","bezeichnung","beschreibung"),
-	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","ext_id"),
+	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","studienjahr_kurzbz","ext_id"),
 	"public.tbl_tag"  => array("tag"),
 	"public.tbl_variable"  => array("name","uid","wert"),
 	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung","mimetype"),

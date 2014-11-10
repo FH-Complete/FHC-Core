@@ -32,8 +32,8 @@ $user = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
-if(!$rechte->isBerechtigt('basis/statistik', 'suid'))
-	die('Sie haben keine Berechtigung für diese Seite');
+if(!$rechte->isBerechtigt('basis/statistik', 's'))
+	die('Sie haben keine Berechtigung (basis/statistik) für diese Seite');
 
 
 if(isset($_POST['action']) && $_POST['action']=='delete' && isset($_POST['filter_id']))
