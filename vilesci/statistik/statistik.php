@@ -70,7 +70,7 @@ elseif($statistik->sql!='')
 	$variablenstring = $statistik->sql;
 }
 
-$vars = parseVars($variablenstring);
+$vars = $statistik->parseVars($variablenstring);
 //var_dump($vars);
 echo '
 <script type="text/javascript">
@@ -120,29 +120,5 @@ echo '
 echo '</body>
 </html>';
 
-/***FUNCTIONS***/
 
-/**
- * 
- * Parst Variablen aus einem String und liefert diese als Array zurueck
- * @param $value String mit Variablen
- * z.B.: "Select * from tbl_person where person_id<'$person_id'"
- * oder "../content/statistik/bewerberstatistik.php?stsem=$StSem&stg_kz=$stg_kz"
- * 
- * @return Array mit den Variablennamen
- */
-function parseVars($value)
-{
-	$result = array();
-
-	$check = '/\$[0-9A-z]+/';
-	preg_match_all($check, $value, $result);
-	$result = $result[0];
-	
-	for($i=0;$i<count($result);$i++)
-	{
-		$result[$i] = mb_str_replace('$','',$result[$i]);
-	}
-	return array_unique($result);
-}
 ?>

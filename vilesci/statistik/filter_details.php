@@ -43,7 +43,7 @@
 	$filter = new filter();
 	$filter->filter_id		= '';
 	$filter->kurzbz			= 'NewFilter';
-	$filter->sql			= '';
+	$filter->sql			= 'SELECT foo AS value, bar AS name FROM foobar WHERE ... ORDER BY name';
 	$filter->valuename		= '';
 	$filter->showvalue		= true;
 	$filter->type			= 'select';

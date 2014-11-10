@@ -152,12 +152,17 @@ class statistik extends basis_db
 		}			
 	}
 	/**
-	 * Laedt alle Statistiken
+	 * Laedt alle Statistiken einer Gruppe, Parameter publish zum Filtern.
 	 * @return true wenn ok, sonst false
 	 */
-	public function getGruppe($gruppe)
+	public function getGruppe($gruppe,$publish=null)
 	{
 		$qry = "SELECT * FROM public.tbl_statistik WHERE gruppe='$gruppe'";
+		if ($publish==true)
+			$qry.=' AND publish ';
+		elseif ($publish==false)
+			$qry.=' AND NOT publish ';
+		$qry.=' ORDER BY bezeichnung;';
 		
 		if($result = $this->db_query($qry))
 		{
@@ -561,5 +566,28 @@ class statistik extends basis_db
 	{
 		return json_encode($this->json);
 	}
+	/**
+ * 
+ * Parst Variablen aus einem String und liefert diese als Array zurueck
+ * @param $value String mit Variablen
+ * z.B.: "Select * from tbl_person where person_id<'$person_id'"
+ * oder "../content/statistik/bewerberstatistik.php?stsem=$StSem&stg_kz=$stg_kz"
+ * 
+ * @return Array mit den Variablennamen
+ */
+function parseVars($value)
+{
+	$result = array();
+
+	$check = '/\$[0-9A-z]+/';
+	preg_match_all($check, $value, $result);
+	$result = $result[0];
+	
+	for($i=0;$i<count($result);$i++)
+	{
+		$result[$i] = mb_str_replace('$','',$result[$i]);
+	}
+	return array_unique($result);
+}
 }
 ?>
