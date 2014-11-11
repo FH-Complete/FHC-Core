@@ -1201,6 +1201,7 @@ class lehrveranstaltung extends basis_db
 				$obj->lvnr = $row->lvnr;
 				$obj->semester_alternativ = $row->semester_alternativ;
 				$obj->farbe = $row->farbe;
+				$obj->stpllv_sort = $row->stpllv_sort;
 
 				$obj->bezeichnung_arr['German'] = $row->bezeichnung;
 				$obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
@@ -1338,6 +1339,7 @@ class lehrveranstaltung extends basis_db
 				$obj->stpllv_pflicht = $lv->stpllv_pflicht;
 				$obj->stpllv_koordinator = $lv->stpllv_koordinator;
 				$obj->lvnr = $lv->lvnr;
+				$obj->stpllv_sort = $lv->stpllv_sort;
 				
 				$obj->children = array();
 				if(count($lv->childs) > 0)
