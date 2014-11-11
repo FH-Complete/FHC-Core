@@ -229,7 +229,7 @@ function GenerateTreeChilds(data)
 	}
 	var obj = {
 	"data":data.bezeichnung,
-	"metadata":	{"lehrveranstaltung_id":data.lehrveranstaltung_id,"bezeichnung":data.bezeichnung,"ects":data.ects,"semesterstunden":data.semesterstunden,"lehrform_kurzbz":data.lehrform_kurzbz,"lvnr":data.lvnr},
+	"metadata":	{"lehrveranstaltung_id":data.lehrveranstaltung_id,"bezeichnung":data.bezeichnung,"ects":data.ects,"semesterstunden":data.semesterstunden,"lehrform_kurzbz":data.lehrform_kurzbz,"lvnr":data.lvnr,"sortierung":data.stpllv_sort},
 	"attr":{"id":data.studienplan_lehrveranstaltung_id,"rel":data.lehrtyp_kurzbz,"lvID":data.lehrveranstaltung_id,"studienplan_lehrveranstaltung_id":data.studienplan_lehrveranstaltung_id},
 	"children":children
 	};
@@ -408,7 +408,8 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 						{width: 50, header: "ECTS", value: "ects", source: "metadata", wideCellClass: "col_ects", headerClass: "header_ects"},
 						{width: 120, header: "Semesterstunden", value: "semesterstunden", source: "metadata", cellClass: "col_semesterstunden"},
 						{width: 120, header: "Lehrform", value: "lehrform_kurzbz", source: "metadata", cellClass: "col_lehrform"},
-						{width: 120, header: "LVNR", value: "lvnr", source: "metadata", cellClass: "col_lvnr"}
+						{width: 120, header: "LVNR", value: "lvnr", source: "metadata", cellClass: "col_lvnr"},
+						{width: 120, header: "Sortierung", value: "sortierung", source: "metadata", cellClass: "col_sortierung"},
 					],
 					resizable: true
 				},
@@ -708,7 +709,6 @@ function loadSTPLSortierung(stpllvid)
 		error: loadError
 	}).success(function(data)
 	{
-		console.log(data);
 		var html='';
 		for(i in data.result)
 		{
@@ -727,9 +727,6 @@ function saveSortierung(stpllvid)
 	var sort = $('#stplSort').val();
 	if(sort === "")
 		sort=null;
-	
-	
-	console.log(sort);
 	savedata = {
 		"studienplan_lehrveranstaltung_id": stpllvid,
 		"sort": sort
@@ -747,7 +744,7 @@ function saveSortierung(stpllvid)
 		}
 	}).success(function(d)
 	{
-		console.log(d);
+		//console.log(d);
 	});
 }
 
@@ -1178,7 +1175,6 @@ function deleteLehrveranstaltungFromStudienplan(lehrveranstaltung_studienplan_id
 		},
 		error: loadError
 	}).success(function(data){
-		console.log(data);
 		if(data.return === false)
 		{
 			$.ajax({
