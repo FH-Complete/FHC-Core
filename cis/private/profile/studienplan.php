@@ -77,6 +77,7 @@ if(isset($_GET['getAnmeldung']))
 	// Die Anmeldung ist zur Lehrveranstaltung selbst und zu den dazu kompatiblen Lehrveranstaltungen moeglich
 	$kompatibel = $lehrveranstaltung->loadLVkompatibel($lehrveranstaltung_id);
 	
+	$datum = new datum();
 	$kompatibel[]=$lehrveranstaltung_id;
 	$kompatibel = array_unique($kompatibel);
 	foreach($kompatibel as $lvid)
@@ -103,7 +104,7 @@ if(isset($_GET['getAnmeldung']))
 					$konto = new konto();
 					$cp = $konto->getCreditPoints($uid, $stsem);
 					if($cp===false || $cp>=$lv->ects)
-						echo '<br><input type="radio" value="'.$lvid.'" name="lv"/>'.$lv->bezeichnung;
+						echo '<br><input type="radio" value="'.$lvid.'" name="lv"/>'.$lv->bezeichnung.' (Anmeldung bis '.$datum->formatDatum($angebot->anmeldefenster_ende,"d.m.Y").')';
 					else
 						echo '<br><input type="radio" disabled="true" value="'.$lvid.'" name="lv" /><span style="color:gray;">'.$lv->bezeichnung.'</span><img src="../../../skin/images/information.png" title="'.$p->t('studienplan/zuWenigCP').'" />';
 				}
@@ -140,7 +141,7 @@ echo '<!DOCTYPE html>
 
 	<script type="text/javascript">
 	$(document).ready(function() {
-		$("#dialog").dialog({ autoOpen: false });
+		$("#dialog").dialog({ autoOpen: false, width: "auto" });
 	});
 
 	function OpenAnmeldung(lehrveranstaltung_id, stsem)
