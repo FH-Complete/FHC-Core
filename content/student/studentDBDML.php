@@ -1035,44 +1035,42 @@ if(!$error)
 					    $errormsg = "Rolle existiert bereits.";
 					    $return = false;
 					}
+					
+					$student = new student();
+					$temp_uid = $student->getUid($rolle->prestudent_id);
 
 					if(!$error)
 					{
-						$rolle->ausbildungssemester = $semester;
-						$rolle->studiensemester_kurzbz = $stdsem;
-						$rolle->datum = date("Y-m-d");
-						$rolle->orgform_kurzbz = $_POST['orgform_kurzbz'];
-						$rolle->studienplan_id = $_POST['studienplan_id'];
-						
-						if($rolle->save_rolle())
-						{
-							$return = true;
-						}
-						else
-						{
-							$return = false;
-							$errormsg = $rolle->errormsg;
-						}
-					}
-					$student = new student();
-					$temp_uid = $student->getUid($rolle->prestudent_id);
-					if(!$student->studentlehrverband_exists($temp_uid, $stdsem))
-					{
-					    $lehrverband = new lehrverband();
 					    $student->load_studentlehrverband($temp_uid, $_POST["studiensemester_kurzbz"]);
-					    
-					    if(!$lehrverband->exists($student->studiengang_kz, $student->semester, $student->verband, $student->gruppe))
+					    $lehrverband = new lehrverband();
+					    if(!$lehrverband->exists($student->studiengang_kz, $semester, $student->verband, $student->gruppe))
 					    {
-						$lehrverband->studiengang_kz = $student->studiengang_kz;
-						$lehrverband->semester = $student->semester;
-						$lehrverband->verband = $student->verband;
-						$lehrverband->gruppe = $student->gruppe;
-						$lehrverband->save(true);
+						$student->studiensemester_kurzbz = $stdsem;
+						$return = false;
+						$errormsg = $student->errormsg;
+					    }
+					    else
+					    {
+						$student->studiensemester_kurzbz = $stdsem;
+						$student->semester = $semester;
 					    }
 					    
-					    $student->studiensemester_kurzbz = $stdsem;
-					    $student->semester = $semester;
 					    $student->save_studentlehrverband(true);
+					    $rolle->ausbildungssemester = $semester;
+					    $rolle->studiensemester_kurzbz = $stdsem;
+					    $rolle->datum = date("Y-m-d");
+					    $rolle->orgform_kurzbz = $_POST['orgform_kurzbz'];
+					    $rolle->studienplan_id = $_POST['studienplan_id'];
+
+					    if($rolle->save_rolle())
+					    {
+						    $return = true;
+					    }
+					    else
+					    {
+						    $return = false;
+						    $errormsg = $rolle->errormsg;
+					    }
 					}
 				}
 			}
