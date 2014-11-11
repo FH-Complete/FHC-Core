@@ -147,13 +147,13 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 				$xml .= "				<bezeichnung><![CDATA[".$row->lehrveranstaltung_bezeichnung."]]></bezeichnung>";
 				$xml .= "				<bezeichnung_englisch><![CDATA[".$row->lehrveranstaltung_bezeichnung_english."]]></bezeichnung_englisch>";
 				$xml .= "				<note>".$note."</note>";
-				$xml .= "				<sws>".sprintf('%.1f',$row->semesterstunden)."</sws>"; ///$wochen
+				$xml .= "				<sws>".sprintf('%.1f',$row->semesterstunden/$wochen)."</sws>";
 				$xml .= "				<ects>".$row->ects."</ects>";
 				if($row->benotungsdatum!='')
 					$xml .= "				<benotungsdatum>".date('d.m.Y',$datum->mktime_fromtimestamp($row->benotungsdatum))."</benotungsdatum>";
 				$xml .= "			</unterrichtsfach>";
 
-				$gesamtstunden +=$row->semesterstunden;
+				$gesamtstunden +=$row->semesterstunden/$wochen;
 				$gesamtects += $row->ects;
 				if(is_numeric($note))
 				{
