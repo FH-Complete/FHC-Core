@@ -142,8 +142,8 @@ if($stsem!='')
 				studiengang_kz>0 AND studiengang_kz<10000 AND aktiv $stgwhere
 			ORDER BY kurzbzlang; ";
 	if($db->db_query($qry))
-	{
-		echo "<table class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>
+	{ ?>
+		<table class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>
 				<thead>
 					<tr>
 						<th></th>
@@ -170,28 +170,27 @@ if($stsem!='')
 					</tr>
 				</thead>
 				<tbody>
-			 ";
 		
-		while($row = $db->db_fetch_object())
-		{
-			echo '<tr>';
-			echo "<td>".strtoupper($row->typ.$row->kurzbz)." ($row->kurzbzlang)</td>";
-			echo "<td align='center'>$row->abgewiesene_maennlich</td>";
-			echo "<td align='center'>$row->abgewiesene_weiblich</td>";
-			echo "<td align='center'>$row->abgewiesene</td>";
-			echo "<td align='center'>$row->abbrecher_maennlich</td>";
-			echo "<td align='center'>$row->abbrecher_weiblich</td>";
-			echo "<td align='center'>$row->abbrecher</td>";
-			echo "<td align='center'>$row->unterbrecher_maennlich</td>";
-			echo "<td align='center'>$row->unterbrecher_weiblich</td>";
-			echo "<td align='center'>$row->unterbrecher</td>";
-			echo "<td align='center'>$row->absolvent_maennlich</td>";
-			echo "<td align='center'>$row->absolvent_weiblich</td>";
-			echo "<td align='center'>$row->absolvent</td>";
-			echo "</tr>";
-		}
-		echo '</tbody></table>';
-	}
+		<?php while($row = $db->db_fetch_object())
+		{ ?>
+			<tr>
+				<td><?= strtoupper($row->typ.$row->kurzbz)?> (<?= $row->kurzbzlang ?>)</td>
+				<td align='center'><?= $row->abgewiesene_maennlich ?></td>
+				<td align='center'><?= $row->abgewiesene_weiblich ?></td>
+				<td align='center'><?= $row->abgewiesene ?></td>
+				<td align='center'><?= $row->abbrecher_maennlich ?></td>
+				<td align='center'><?= $row->abbrecher_weiblich ?></td>
+				<td align='center'><?= $row->abbrecher ?></td>
+				<td align='center'><?= $row->unterbrecher_maennlich ?></td>
+				<td align='center'><?= $row->unterbrecher_weiblich ?></td>
+				<td align='center'><?= $row->unterbrecher ?></td>
+				<td align='center'><?= $row->absolvent_maennlich ?></td>
+				<td align='center'><?= $row->absolvent_weiblich ?></td>
+				<td align='center'><?= $row->absolvent ?></td>
+			</tr>
+		<?php } ?>
+		</tbody></table>
+	<?php }
 }
 ?>
 </body>

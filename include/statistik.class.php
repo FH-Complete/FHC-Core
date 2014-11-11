@@ -525,18 +525,15 @@ class statistik extends basis_db
 				{
 					$this->html.= '<tr>';
 					$anzahl_spalten = $this->db_num_fields($this->data);
+
 					for($spalte=0;$spalte<$anzahl_spalten;$spalte++)
 					{
 						$name = $this->db_field_name($this->data,$spalte);
 						$this->html.= '<td>'.$row->$name.'</td>';
 						$this->csv.= '"'.$row->$name.'",';
-						
-						if($spalte>0)
-						{
-							$name_spalte_0 = $this->db_field_name($this->data,0);
-							$this->json[$row->$name_spalte_0][$name]=$row->$name;
-						}
-					}	
+					}
+
+					$this->json[] = $row;
 					$this->html.= '</tr>';
 					$this->csv=substr($this->csv,0,-1)."\n";
 				}
@@ -590,4 +587,3 @@ function parseVars($value)
 	return array_unique($result);
 }
 }
-?>
