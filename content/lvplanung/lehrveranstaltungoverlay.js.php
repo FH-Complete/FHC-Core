@@ -1884,3 +1884,14 @@ function FilterLehrveranstaltungAusbsem(semester)
 	// Daten neu laden
 	onOrganisationseinheitSelect();
 }
+
+// ****************** LV-ANGEBOT ****************** //
+
+function ToggleGruppe()
+{
+	if(document.getElementById('lehrveranstaltung-lvangebot-checkbox-gruppe').checked == false)
+		document.getElementById('lehrveranstaltung-lvangebot-textbox-gruppe').disabled = true;
+	else
+		document.getElementById('lehrveranstaltung-lvangebot-textbox-gruppe').disabled = false;
+}
+	

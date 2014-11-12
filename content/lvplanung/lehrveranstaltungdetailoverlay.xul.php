@@ -419,7 +419,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						<textbox id="lehrveranstaltung-lvangebot-textbox-gruppe" tooltiptext=""/>
 					</row>
 					<row>
-						<checkbox label="Neue Gruppe anlegen"/>
+						<checkbox label="Neue Gruppe anlegen" id="lehrveranstaltung-lvangebot-checkbox-gruppe" onclick="ToggleGruppe();"/>
 					</row>
 					<row>
 						<label value="Plätze Incoming" />
