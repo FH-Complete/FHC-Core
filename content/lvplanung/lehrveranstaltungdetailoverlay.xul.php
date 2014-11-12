@@ -401,4 +401,54 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		<spacer flex="1" />
 	</hbox>
 </vbox>
+
+<!-- *************************** LV-ANGEBOT ************************* -->
+<vbox id="lehrveranstaltung-lvangebot" style="margin:0px;" >
+	<hbox>
+	<groupbox orientation="horizontal" flex="1">
+		<caption id="lehrveranstaltung-lvangebot-groupbox-caption" label="LV-Angebot" />
+		<hbox flex="1">
+			<grid>
+				<columns>
+					<column></column>
+					<column></column>
+				</columns>
+				<rows>
+					<row>
+						<label value="Gruppe" />
+						<textbox id="lehrveranstaltung-lvangebot-textbox-gruppe" tooltiptext=""/>
+					</row>
+					<row>
+						<checkbox label="Neue Gruppe anlegen"/>
+					</row>
+					<row>
+						<label value="Plätze Incoming" />
+						<textbox id="lehrveranstaltung-lvangebot-textbox-incoming" tooltiptext=""/>
+					</row>
+					<row>
+						<label value="Plätze gesamt" />
+						<textbox id="lehrveranstaltung-lvangebot-textbox-gesamt" tooltiptext=""/>
+					</row>
+					<row>
+						<label value="Anmeldefenster Start" />
+						<hbox>
+							<box class="Datum" id="lehrveranstaltung-lvangebot-textbox-start"/>
+						</hbox>
+					</row>
+					<row>
+						<label value="Anmeldefenster Ende" />
+						<hbox>
+							<box class="Datum" id="lehrveranstaltung-lvangebot-textbox-ende"/>
+						</hbox>
+					</row>
+					<row>
+						<spacer flex="1" />
+						<button id="lehrveranstaltung-lvangebot-button-save" label="speichern" oncommand=""/>
+					</row>
+				</rows>
+			</grid>
+		</hbox>
+	</groupbox>
+	</hbox>
+</vbox>
 </overlay>
