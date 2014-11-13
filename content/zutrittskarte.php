@@ -37,6 +37,8 @@ require_once('../include/konto.class.php');
 require_once('../include/studiensemester.class.php');
 require_once('../include/student.class.php');
 require_once('../include/studiengang.class.php');
+require_once('../include/benutzerfunktion.class.php');
+require_once('../include/organisationseinheit.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -113,6 +115,16 @@ if(copy($zipfile, $tempname_zip))
 			{
 				$ma = new mitarbeiter();
 				$ma->load($uid);
+				$benutzerfunktion = new benutzerfunktion();
+				$benutzerfunktion->getBenutzerFunktionByUid($uid, NULL, date("Y-m-d"), date("Y-m-d"));
+				if(!empty($benutzerfunktion->result[0]))
+				{
+				    $oe = new organisationseinheit($benutzerfunktion->result[0]->oe_kurzbz);
+				}
+				else
+				{
+				    $oe = NULL;
+				}
 				$xml.="
 				<mitarbeiter>
 					<uid>".$bn->uid."</uid>
@@ -122,6 +134,8 @@ if(copy($zipfile, $tempname_zip))
 					<titelpost>".$bn->titelpost."</titelpost>
 					<personalnummer>".$ma->personalnummer."</personalnummer>
 					<ausstellungsdatum>".date('d.m.Y')."</ausstellungsdatum>
+					<gebdatum>".$datum_obj->formatDatum($ma->gebdatum,'d.m.Y')."</gebdatum>
+					<organisationseinheit>".$oe->bezeichnung."</organisationseinheit>
 				</mitarbeiter>";
 			}
 			else
