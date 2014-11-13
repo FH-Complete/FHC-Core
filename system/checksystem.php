@@ -2507,6 +2507,8 @@ $berechtigungen = array(
 	array('soap/pruefungsfenster','Recht für Pruefungsfenster Webservice'),
 	array('soap/student','Recht für Student Webservice'),
 	array('soap/studienordnung','Recht für Studienordnung Webservice'),
+	array('soap/benutzer','Berechtigung für Bentutzerabfrage Addon Kontoimport'),
+	array('soap/buchungen','Berechtigung für Buchungsabfrage Addon Kontoimport'),
 	array('student/bankdaten','Bankdaten des Studenten'),
 	array('student/dokumente','Wenn SUID dann dürfen Dokumente auch wieder entfernt werden'),
 	array('student/stammdaten','Stammdaten der Studenten'),
@@ -2625,7 +2627,10 @@ $webservicerecht = array(
 	array('soap/studienordnung','getLVkompatibel','lehrveranstaltung'),
 	array('soap/studienordnung','getLvTree','lehrveranstaltung'),
 	array('soap/pruefungsfenster','getByStudiensemester','pruefungsfenster'),
-	array('soap/studienordnung','exists','lvregel')
+	array('soap/studienordnung','exists','lvregel'),
+	array('soap/studienordnung','saveSortierung','studienplan'),
+	array('soap/benutzer','search','benutzer'),
+	array('soap/buchungen','getBuchungen','konto')
 );
 
 foreach($webservicerecht as $row)
