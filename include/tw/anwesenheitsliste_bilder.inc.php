@@ -110,7 +110,7 @@ $pdf->SetFont('Arial','',8);
 		$maxX +=20;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->SetFont('Arial','B',8);
-		$pdf->MultiCell(130,$lineheight,'HörerIn/Name',1,'L',0);
+		$pdf->MultiCell(130,$lineheight,mb_convert_encoding('Hörer/Name','ISO-8859-15','UTF-8'),1,'L',0);
 		$maxX +=130;
 		$pdf->SetXY($maxX,$maxY);
 		$pdf->MultiCell(65,$lineheight,'Kennzeichen',1,'C',0);
