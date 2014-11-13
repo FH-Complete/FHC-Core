@@ -196,7 +196,7 @@ else
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#gruppe" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="student-treecol-studiengang" label="Studiengang" flex="1" hidden="true" persist="hidden, width, ordinal"
+	    				<treecol id="student-treecol-studiengang" label="Studiengang" flex="1" hidden="false" persist="hidden, width, ordinal"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#studiengang" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
@@ -236,7 +236,7 @@ else
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#anmerkungpre" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
-	    				<treecol id="student-treecol-orgform" label="OrgForm" flex="1" hidden="true" persist="hidden, width, ordinal"
+	    				<treecol id="student-treecol-orgform" label="OrgForm" flex="1" hidden="false" persist="hidden, width, ordinal"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#orgform" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
