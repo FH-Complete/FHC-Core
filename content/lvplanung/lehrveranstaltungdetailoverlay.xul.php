@@ -416,7 +416,18 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				<rows>
 					<row>
 						<label value="Gruppe" />
-						<textbox id="lehrveranstaltung-lvangebot-textbox-gruppe" tooltiptext=""/>
+						<menulist id="lehrveranstaltung-lvangebot-textbox-gruppe"
+							editable="true" datasources="rdf:null" flex="1"
+							ref="http://www.technikum-wien.at/gruppen/liste" 
+							oninput="LvAngebotGruppenLoad(this)">
+								<template>
+									<menupopup>
+										<menuitem value="rdf:http://www.technikum-wien.at/gruppen/rdf#gruppe_kurzbz"
+											label="rdf:http://www.technikum-wien.at/gruppen/rdf#gruppe_kurzbz"
+											uri="rdf:*"/>
+									</menupopup>
+								</template>
+						</menulist>
 					</row>
 					<row>
 						<checkbox label="Neue Gruppe anlegen" id="lehrveranstaltung-lvangebot-checkbox-gruppe" onclick="ToggleGruppe();"/>
