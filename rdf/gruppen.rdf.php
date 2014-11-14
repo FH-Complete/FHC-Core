@@ -33,15 +33,23 @@ require_once('../config/vilesci.config.inc.php');
 require_once('../include/datum.class.php');
 require_once('../include/basis_db.class.php');
 
-if(isset($_GET['uid']))
-	$uid = $_GET['uid'];
-else 
-	die('uid muss uebergeben werden');
-	
-if(isset($_GET['studiensemester_kurzbz']))
-	$studiensemester_kurzbz = $_GET['studiensemester_kurzbz'];
+$filter = null;
+if(isset($_GET['filter']))
+{
+	$filter = strtolower($_GET['filter']);
+}
 else
-	die('studiensemester_kurzbz muss uebergeben werden');
+{
+	if(isset($_GET['uid']))
+		$uid = $_GET['uid'];
+	else 
+		die('uid muss uebergeben werden');
+
+	if(isset($_GET['studiensemester_kurzbz']))
+		$studiensemester_kurzbz = $_GET['studiensemester_kurzbz'];
+	else
+		die('studiensemester_kurzbz muss uebergeben werden');
+}
 
 $datum = new datum();
 
@@ -57,25 +65,43 @@ echo '
    <RDF:Seq about="'.$rdf_url.'/liste">
 ';
 
-$qry = "SELECT * FROM public.tbl_benutzergruppe JOIN tbl_gruppe using(gruppe_kurzbz) WHERE uid='".addslashes($uid)."' AND (studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' OR studiensemester_kurzbz is null)";
+if($filter)
+	$qry = "SELECT * FROM tbl_gruppe WHERE LOWER(gruppe_kurzbz) LIKE '%" . $filter . "%'";
+else
+	$qry = "SELECT * FROM public.tbl_benutzergruppe JOIN tbl_gruppe using(gruppe_kurzbz) WHERE uid='".addslashes($uid)."' AND (studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' OR studiensemester_kurzbz is null)";
+
 $db = new basis_db();
 
 if($db->db_query($qry))
 {
 	while($row = $db->db_fetch_object())
 	{
-		
-		echo '
-	      <RDF:li>
-	         <RDF:Description  id="'.$row->uid.'/'.$row->gruppe_kurzbz.'"  about="'.$rdf_url.'/'.$row->uid.'/'.$row->gruppe_kurzbz.'" >
-	            <GRP:gruppe_kurzbz><![CDATA['.$row->gruppe_kurzbz.']]></GRP:gruppe_kurzbz>
-	            <GRP:bezeichnung><![CDATA['.$row->bezeichnung.']]></GRP:bezeichnung>
-	            <GRP:generiert><![CDATA['.($row->generiert=='t'?'Ja':'Nein').']]></GRP:generiert>
-	            <GRP:uid><![CDATA['.$row->uid.']]></GRP:uid>
-	            <GRP:studiensemester_kurzbz><![CDATA['.$row->studiensemester_kurzbz.']]></GRP:studiensemester_kurzbz>
-	         </RDF:Description>
-	      </RDF:li>
-	      ';
+		if($filter)
+		{
+			echo '
+				<RDF:li>
+				   <RDF:Description  id="'.$row->gruppe_kurzbz.'"  about="'.$rdf_url.'/'.$row->gruppe_kurzbz.'" >
+					  <GRP:gruppe_kurzbz><![CDATA['.$row->gruppe_kurzbz.']]></GRP:gruppe_kurzbz>
+					  <GRP:bezeichnung><![CDATA['.$row->bezeichnung.']]></GRP:bezeichnung>
+					  <GRP:generiert><![CDATA['.($row->generiert=='t'?'Ja':'Nein').']]></GRP:generiert>
+				   </RDF:Description>
+				</RDF:li>
+				';
+		}
+		else
+		{
+			echo '
+				<RDF:li>
+				   <RDF:Description  id="'.$row->uid.'/'.$row->gruppe_kurzbz.'"  about="'.$rdf_url.'/'.$row->uid.'/'.$row->gruppe_kurzbz.'" >
+					  <GRP:gruppe_kurzbz><![CDATA['.$row->gruppe_kurzbz.']]></GRP:gruppe_kurzbz>
+					  <GRP:bezeichnung><![CDATA['.$row->bezeichnung.']]></GRP:bezeichnung>
+					  <GRP:generiert><![CDATA['.($row->generiert=='t'?'Ja':'Nein').']]></GRP:generiert>
+					  <GRP:uid><![CDATA['.$row->uid.']]></GRP:uid>
+					  <GRP:studiensemester_kurzbz><![CDATA['.$row->studiensemester_kurzbz.']]></GRP:studiensemester_kurzbz>
+				   </RDF:Description>
+				</RDF:li>
+				';
+		}
 	}
 }
 ?>
