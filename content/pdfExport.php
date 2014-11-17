@@ -184,7 +184,7 @@ if($xsl=='AccountInfo')
 }
 elseif(in_array($xsl,array('Zertifikat','Diplomurkunde','Diplomzeugnis','Bakkurkunde','BakkurkundeEng','Bakkzeugnis',
 'PrProtokollBakk','PrProtokollDipl','Lehrauftrag','DiplomurkundeEng','Zeugnis','ZeugnisEng','StudienerfolgEng',
-'Sammelzeugnis','PrProtDiplEng','PrProtBakkEng','BakkzeugnisEng','DiplomzeugnisEng','statusbericht','Uebernahme',
+'Sammelzeugnis','PrProtDiplEng','PrProtBakkEng','BakkzeugnisEng','DiplomzeugnisEng','statusbericht',
 'DiplSupplement','Zutrittskarte','Projektbeschr','Ausbildungsver','AusbildStatus','PrProtBA','PrProtMA',
 'PrProtBAEng','PrProtMAEng','Studienordnung','Erfolgsnachweis','ErfolgsnwHead','Studienblatt','LV_Informationen','LVZeugnis','AnwListBarcode')))
 {
@@ -197,6 +197,14 @@ elseif(in_array($xsl,array('Zertifikat','Diplomurkunde','Diplomzeugnis','Bakkurk
 elseif(in_array($xsl,array('Inskription','Studienerfolg','OutgoingLearning','OutgoingChangeL','LearningAgree','Zahlung')))
 {
 	if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz'))
+	{
+		echo 'Sie haben keine Berechtigung dieses Dokument zu erstellen';
+		exit;
+	}
+}
+elseif($xsl=='Uebernahme')
+{
+	if(!$rechte->isBerechtigt('wawi/inventar') && !$rechte->isBerechtigt('assistenz'))
 	{
 		echo 'Sie haben keine Berechtigung dieses Dokument zu erstellen';
 		exit;
