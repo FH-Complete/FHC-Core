@@ -118,7 +118,7 @@ function printDropDown()
 	global $rechte, $studiengang_kz;		
 	//Studiengang Drop Down anzeigen
 	$stud = new studiengang();
-	if(!$stud->getAll('typ, kurzbzlang'))
+	if(!$stud->getAll('typ, kurzbz'))
 		echo 'Fehler beim Laden der Studiengaenge:'.$stud->errormsg;
 	
 	// Studiengang AuswahlFilter
@@ -132,7 +132,7 @@ function printDropDown()
 			if($studiengang_kz=='')
 				$studiengang_kz=$row->studiengang_kz;
 			
-			echo '<OPTION value="'.$row->studiengang_kz.'"'.($studiengang_kz==$row->studiengang_kz?'selected':'').'>'.$row->kuerzel.' - '.$row->kurzbzlang.'</OPTION>';
+			echo '<OPTION value="'.$row->studiengang_kz.'"'.($studiengang_kz==$row->studiengang_kz?'selected':'').'>'.$row->kuerzel.' - '.$row->bezeichnung.'</OPTION>';
 		}
 	}
 	
