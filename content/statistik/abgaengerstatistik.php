@@ -174,19 +174,19 @@ if($stsem!='')
 		<?php while($row = $db->db_fetch_object())
 		{ ?>
 			<tr>
-				<td><?= strtoupper($row->typ.$row->kurzbz)?> (<?= $row->kurzbzlang ?>)</td>
-				<td align='center'><?= $row->abgewiesene_maennlich ?></td>
-				<td align='center'><?= $row->abgewiesene_weiblich ?></td>
-				<td align='center'><?= $row->abgewiesene ?></td>
-				<td align='center'><?= $row->abbrecher_maennlich ?></td>
-				<td align='center'><?= $row->abbrecher_weiblich ?></td>
-				<td align='center'><?= $row->abbrecher ?></td>
-				<td align='center'><?= $row->unterbrecher_maennlich ?></td>
-				<td align='center'><?= $row->unterbrecher_weiblich ?></td>
-				<td align='center'><?= $row->unterbrecher ?></td>
-				<td align='center'><?= $row->absolvent_maennlich ?></td>
-				<td align='center'><?= $row->absolvent_weiblich ?></td>
-				<td align='center'><?= $row->absolvent ?></td>
+				<td><?php echo strtoupper($row->typ.$row->kurzbz)?> (<?php echo $row->kurzbzlang ?>)</td>
+				<td align='center'><?php echo $row->abgewiesene_maennlich ?></td>
+				<td align='center'><?php echo $row->abgewiesene_weiblich ?></td>
+				<td align='center'><?php echo $row->abgewiesene ?></td>
+				<td align='center'><?php echo $row->abbrecher_maennlich ?></td>
+				<td align='center'><?php echo $row->abbrecher_weiblich ?></td>
+				<td align='center'><?php echo $row->abbrecher ?></td>
+				<td align='center'><?php echo $row->unterbrecher_maennlich ?></td>
+				<td align='center'><?php echo $row->unterbrecher_weiblich ?></td>
+				<td align='center'><?php echo $row->unterbrecher ?></td>
+				<td align='center'><?php echo $row->absolvent_maennlich ?></td>
+				<td align='center'><?php echo $row->absolvent_weiblich ?></td>
+				<td align='center'><?php echo $row->absolvent ?></td>
 			</tr>
 		<?php } ?>
 		</tbody></table>
