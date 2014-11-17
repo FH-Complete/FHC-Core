@@ -64,13 +64,21 @@ if(!$rechte->isBerechtigt('lehre/gruppe'))
 		<title>Gruppe-Verwaltung</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+		<script type="text/javascript" src="../../include/js/jquery.js"></script>
+		<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css">
 		<script language="JavaScript" type="text/javascript">
 		function conf_del()
 		{
 			return confirm('Diese Gruppe wirklich löschen?');
 		}
+		$(document).ready(function() 
+		{ 
+			$("#t1").tablesorter(
+			{
+				sortList: [[0,0]],
+				widgets: ["zebra"]
+			}); 
+		}); 
 		</script>
 	</head>
 <body>
@@ -253,18 +261,24 @@ function getUebersicht()
 	
 	echo '<h3>&Uuml;bersicht</h3>';
 
-	echo "<table  class='liste table-autosort:0 table-stripeclass:alternate table-autostripe'>";
+	echo "<table id='t1' class='tablesorter'>";
 
 	$num_rows=count($gruppeen);
 	$foo = 0;
 	echo "<thead>
 			<tr class='liste'>
-				<th class='table-sortable:default'>Kurzbz.</th>
-				<th class='table-sortable:default'>Bezeichnung</th>
-				<th class='table-sortable:default'>Stg.</th>
-				<th class='table-sortable:default'>Sem.</th>
-				<th class='table-sortable:default'>Mailgrp</th>
-				<th class='table-sortable:default'>Anzahl</th>
+				<th>Kurzbz.</th>
+				<th>Bezeichnung</th>
+				<th>Beschreibung</th>
+				<th>Stg.</th>
+				<th>Sem.</th>
+				<th>Mailgrp</th>
+				<th>Sichtbar</th>
+				<th>Generiert</th>
+				<th>Aktiv</th>
+				<th>ContentVisible</th>
+				<th>Gesperrt</th>
+				<th>Zutrittssystem</th>
 				<th colspan=\"3\">Aktion</th>
 			</tr>
 			</thead><tbody>";
@@ -282,13 +296,21 @@ function getUebersicht()
 
 		echo "<td>$e->gruppe_kurzbz </td>";
 		echo "<td>$e->bezeichnung </td>";
+		echo "<td>$e->beschreibung </td>";
 		echo "<td>".$stg->kuerzel_arr[$e->studiengang_kz]."</td>";
 		echo "<td>$e->semester </td>";
-		echo "<td>".($e->mailgrp?'Ja':'Nein')."</td>";
-		echo "<td>".$gruppe->countStudenten($e->gruppe_kurzbz)."</td>";
-		echo "<td class='button'><a href='einheit_det.php?kurzbz=$e->gruppe_kurzbz'>Details</a></td>";
-		echo "<td class='button'><a href=\"einheit_menu.php?edit=1&kurzbz=$e->gruppe_kurzbz\">Edit</a></td>";
-	   	echo "<td class='button'><a href=\"einheit_menu.php?einheit_id=$e->gruppe_kurzbz&studiengang_kz=$e->studiengang_kz&type=delete\" onclick='return conf_del()'>Delete</a></td>";
+		echo "<td><img height='16px' src='../../skin/images/".($e->mailgrp?"true.png":"false.png")."' alt='".($e->mailgrp?"true.png":"false.png")."'></td>";
+		echo "<td><img height='16px' src='../../skin/images/".($e->sichtbar?"true.png":"false.png")."' alt='".($e->sichtbar?"true.png":"false.png")."'></td>";
+		echo "<td><img height='16px' src='../../skin/images/".($e->generiert?"true.png":"false.png")."' alt='".($e->generiert?"true.png":"false.png")."'></td>";
+		echo "<td><img height='16px' src='../../skin/images/".($e->aktiv?"true.png":"false.png")."' alt='".($e->aktiv?"true.png":"false.png")."'></td>";
+		echo "<td><img height='16px' src='../../skin/images/".($e->content_visible?"true.png":"false.png")."' alt='".($e->content_visible?"true.png":"false.png")."'></td>";
+		echo "<td><img height='16px' src='../../skin/images/".($e->gesperrt?"true.png":"false.png")."' alt='".($e->gesperrt?"true.png":"false.png")."'></td>";
+		echo "<td><img height='16px' src='../../skin/images/".($e->zutrittssystem?"true.png":"false.png")."' alt='".($e->zutrittssystem?"true.png":"false.png")."'></td>";
+		// src="../../skin/images/'.($row->projektarbeit=='t'?'true.png':'false.png').'"
+		//echo "<td>".$gruppe->countStudenten($e->gruppe_kurzbz)."</td>"; Auskommentiert, da sonst die Ladezeit der Seite zu lange ist
+		echo "<td><a href='einheit_det.php?kurzbz=$e->gruppe_kurzbz'>Details</a></td>";
+		echo "<td><a href=\"einheit_menu.php?edit=1&kurzbz=$e->gruppe_kurzbz\">Edit</a></td>";
+	   	echo "<td><a href=\"einheit_menu.php?einheit_id=$e->gruppe_kurzbz&studiengang_kz=$e->studiengang_kz&type=delete\" onclick='return conf_del()'>Delete</a></td>";
 	   	echo "</tr>\n";
 	}
 	
