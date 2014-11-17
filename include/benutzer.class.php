@@ -362,6 +362,7 @@ class benutzer extends person
 				
 				$this->result[] = $obj;
 			}
+			$this->errormsg = $qry;
 			return true;
 		}
 		else
@@ -428,6 +429,35 @@ class benutzer extends person
 			$this->errormsg = 'Fehler beim Loeschen des Aktivierungscodes';
 			return false;
 		}
+	}
+	
+	/**
+	 * Baut die Datenstruktur für senden als JSON Objekt auf
+	 */
+	public function cleanResult()
+	{
+		$values = array();
+		if (count($this->result) > 0)
+		{
+			foreach ($this->result as $ben)
+			{
+				$obj = new stdClass();
+				$obj->uid = $ben->uid;
+				$obj->vorname = $ben->vorname;
+				$obj->nachname = $ben->nachname;
+				$values[] = $obj;
+
+			}
+		}
+		else
+		{
+			$obj = new stdClass();
+			$obj->uid = $this->uid;
+			$obj->vorname = $this->vorname;
+			$obj->nachname = $this->nachname;
+			$values[] = $obj;
+		}
+		return $values;
 	}
 }
 ?>

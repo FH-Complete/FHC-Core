@@ -26,6 +26,7 @@ require_once('../../../../include/pruefung.class.php');
 require_once('../../../../include/pruefungsfenster.class.php');
 require_once('../../../../include/note.class.php');
 require_once('../../../../include/addon.class.php');
+require_once('../../../../include/mail.class.php');
 
 $uid = get_uid();
 
@@ -492,6 +493,20 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
     }
     if($anmeldung->save(true))
     {
+	$to = $uid."@".DOMAIN;
+	$from = "noreply@".DOMAIN;
+	$subject = "Anmeldung zur Prüfung";
+	$mail = new mail($to, $from, $subject, "Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.");
+	
+	$student = new student($uid);
+	$datum = new datum();
+	$pruefung = new pruefungCis($termin->pruefung_id);
+	$lv = new lehrveranstaltung($anmeldung->lehrveranstaltung_id);
+	
+	$html = "StudentIn ".$student->vorname." ".$student->nachname." hat sich zur Prüfung ".$lv->bezeichnung." am ".$datum->formatDatum($termin->von, "m.d.Y")." von ".$datum->formatDatum($termin->von,"h:m")." Uhr bis ".$datum->formatDatum($termin->bis,"h:m")." Uhr angemeldet.";
+	$mail->setHTMLContent($html);
+	$mail->send();
+	
 	$data['result'] = "Anmeldung erfolgreich!";
 	$data['error']='false';
 	$data['errormsg']='';
@@ -667,6 +682,29 @@ function anmeldungBestaetigen($uid)
     $anmeldung = new pruefungsanmeldung();
     if($anmeldung->changeState($pruefungsanmeldung_id, $status, $uid))
     {
+	$anmeldung = new pruefungsanmeldung($pruefungsanmeldung_id);
+	$termin = new pruefungstermin($anmeldung->pruefungstermin_id);
+	$lv = new lehrveranstaltung($anmeldung->lehrveranstaltung_id);
+	$ma = new mitarbeiter($uid);
+	$datum = new datum();
+	$ort = new ort($termin->ort_kurzbz);
+	
+	$to = $anmeldung->uid."@".DOMAIN;
+	$from = "noreply@".DOMAIN;
+	$subject = "Anmeldungsbestätigung zur Prüfung";
+	$html = "Ihre Anmeldung zur Prüfung wurde von ".$ma->vorname." ".$ma->nachname." bestätigt.<br>";
+	$html .= "<br>";
+	$html .= "Prüfung: ".$lv->bezeichnung."<br>";
+	$html .= "Termin: ".$datum->formatDatum($termin->von, "d.m.Y")." um ".$datum->formatDatum($termin->von, "h:m")."<br>";
+	$html .= "Ort: ".$ort->bezeichnung."<br>";
+	$html .= "<br>";
+	$html .= "<a href='".APP_ROOT."cis/private/lehre/pruefung/pruefungsanmeldung.php'>Link zur Anmeldung</a><br>";
+	$html .= "<br>";
+	
+	$mail = new mail($to, $from, $subject,"Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.");
+	$mail->setHTMLContent($html);
+	$mail->send();
+	
 	$data['result']=true;
 	$data['error']='false';
 	$data['errormsg']='';
