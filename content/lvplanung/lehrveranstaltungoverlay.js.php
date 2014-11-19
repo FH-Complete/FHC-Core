@@ -1948,15 +1948,24 @@ function LvAngebotGruppeSave()
 
 	//Werte holen
 	var lehrveranstaltung_id = tree.view.getCellText(tree.currentIndex,col);
+	var neue_gruppe = document.getElementById('lehrveranstaltung-lvangebot-checkbox-gruppe').checked;
 	var gruppe = document.getElementById('lehrveranstaltung-lvangebot-textbox-gruppe').value;
 	var incomingplaetze = document.getElementById('lehrveranstaltung-lvangebot-textbox-incoming').value;
 	var gesamtplaetze = document.getElementById('lehrveranstaltung-lvangebot-textbox-gesamt').value;
 	var anmeldefenster_start = document.getElementById('lehrveranstaltung-lvangebot-textbox-start').value;
 	var anmeldefenster_ende = document.getElementById('lehrveranstaltung-lvangebot-textbox-ende').value;
+	
+	//Eingaben validieren
+	if(neue_gruppe == false && gruppe == "")
+	{
+		alert('Es muss eine Gruppe ausgewaehlt werden');
+		return false;
+	}
 		
 	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
 	
 	req.add('type', 'lvangebot-gruppe-save');
+	req.add('neue_gruppe', neue_gruppe);
 	req.add('gruppe', gruppe);
 	req.add('incomingplaetze', incomingplaetze);
 	req.add('gesamtplaetze', gesamtplaetze);
@@ -1971,7 +1980,10 @@ function LvAngebotGruppeSave()
 
 	if (!val.dbdml_return)
 	{
-		alert(val.dbdml_errormsg);
+		if (val.dbdml_errormsg == "")
+			alert('Es ist ein unbekannter Fehler aufgetreten');
+		else
+			alert(val.dbdml_errormsg);
 	}
 	else
 	{

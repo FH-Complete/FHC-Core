@@ -1115,30 +1115,38 @@ if(!$error)
 		if(!$studiengang->load($lehrveranstaltung_obj->studiengang_kz))
 			$errormsg = 'Fehler beim Laden des Studienganges';
 
-		$gruppe_kurzbz = mb_strtoupper(substr($studiengang->kuerzel.$lehrveranstaltung_obj->semester.'-'.$_POST['studiensemester_kurzbz'].'-'.$lehrveranstaltung_obj->kurzbz,0,32));
-		$gruppe = new gruppe();
-		$gruppe->gruppe_kurzbz=$gruppe_kurzbz;
-		$gruppe->studiengang_kz=$studiengang->studiengang_kz;
-		$gruppe->bezeichnung=mb_substr($lehrveranstaltung_obj->bezeichnung,0,30);
-		$gruppe->semester=$lehrveranstaltung_obj->semester;
-		$gruppe->sort='';
-		$gruppe->mailgrp=false;
-		$gruppe->beschreibung=$lehrveranstaltung_obj->bezeichnung;
-		$gruppe->sichtbar=true;
-		$gruppe->generiert=false;
-		$gruppe->aktiv=true;
-		$gruppe->lehre=true;
-		$gruppe->content_visible=false;
-		$gruppe->orgform_kurzbz=$lehrveranstaltung_obj->orgform_kurzbz;
-		$gruppe->gesperrt=false;
-		$gruppe->zutrittssystem=false;
-		$gruppe->insertamum=date('Y-m-d H:i:s');
-		$gruppe->insertvon=$user;
-
-		if(!$gruppe->save(true))
+		if($_POST['neue_gruppe'] == "false")
 		{
-			$errormsg = 'Fehler beim Erstellen der Gruppe'.$gruppe->errormsg;
-			$return = false;
+			$gruppe_kurzbz = $_POST['gruppe'];
+		}
+		else
+		{
+			$gruppe = new gruppe();
+			$gruppe_kurzbz = mb_strtoupper(substr($studiengang->kuerzel.$lehrveranstaltung_obj->semester.'-'.$_POST['studiensemester_kurzbz'].'-'.$lehrveranstaltung_obj->kurzbz,0,32));
+			$gruppe_kurzbz = $gruppe->getNummerierteGruppenbez($gruppe_kurzbz);
+			$gruppe->gruppe_kurzbz=$gruppe_kurzbz;
+			$gruppe->studiengang_kz=$studiengang->studiengang_kz;
+			$gruppe->bezeichnung=mb_substr($lehrveranstaltung_obj->bezeichnung,0,30);
+			$gruppe->semester=$lehrveranstaltung_obj->semester;
+			$gruppe->sort='';
+			$gruppe->mailgrp=false;
+			$gruppe->beschreibung=$lehrveranstaltung_obj->bezeichnung;
+			$gruppe->sichtbar=true;
+			$gruppe->generiert=false;
+			$gruppe->aktiv=true;
+			$gruppe->lehre=true;
+			$gruppe->content_visible=false;
+			$gruppe->orgform_kurzbz=$lehrveranstaltung_obj->orgform_kurzbz;
+			$gruppe->gesperrt=false;
+			$gruppe->zutrittssystem=false;
+			$gruppe->insertamum=date('Y-m-d H:i:s');
+			$gruppe->insertvon=$user;
+
+			if(!$gruppe->save(true))
+			{
+				$errormsg = 'Fehler beim Erstellen der Gruppe'.$gruppe->errormsg;
+				$return = false;
+			}
 		}
 		
 		$lvangebot->lehrveranstaltung_id = $_POST['lehrveranstaltung_id'];

@@ -119,8 +119,9 @@ if(isset($_POST["schick"]))
 			if(!$studiengang->load($lehrveranstaltung_obj->studiengang_kz))
 				die('Fehler beim Laden des Studienganges');
 
-			$gruppe_kurzbz = mb_strtoupper(substr($studiengang->kuerzel.$lehrveranstaltung_obj->semester.'-'.$_POST['studiensemester_kurzbz'].'-'.$lehrveranstaltung_obj->kurzbz,0,32));
 			$gruppe = new gruppe();
+			$gruppe_kurzbz = mb_strtoupper(substr($studiengang->kuerzel.$lehrveranstaltung_obj->semester.'-'.$_POST['studiensemester_kurzbz'].'-'.$lehrveranstaltung_obj->kurzbz,0,32));
+			$gruppe_kurzbz = $gruppe->getNummerierteGruppenbez($gruppe_kurzbz);
 			$gruppe->gruppe_kurzbz=$gruppe_kurzbz;
 			$gruppe->studiengang_kz=$studiengang->studiengang_kz;
 			$gruppe->bezeichnung=mb_substr($lehrveranstaltung_obj->bezeichnung,0,30);

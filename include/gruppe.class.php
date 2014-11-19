@@ -540,5 +540,32 @@ class gruppe extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Prüft ob die Gruppenbezeichnung bereits vorhanden ist
+	 * und gibt bei Bedarf die Bezeichnung inkl. Nummerierung zurück
+	 *
+	 * @param $gruppe_kurzbz zu prüfende Gruppenbezeichnung
+	 */
+	public function getNummerierteGruppenbez($gruppe_kurzbz)
+	{
+		$gruppe_kurzbz_regex = $gruppe_kurzbz . '-[0-9]+$';
+		
+		$qry = 'SELECT COUNT(gruppe_kurzbz) AS anzahl
+				FROM public.tbl_gruppe
+				WHERE gruppe_kurzbz = ' . $this->db_add_param($gruppe_kurzbz) . '
+				OR gruppe_kurzbz ~ ' . $this->db_add_param($gruppe_kurzbz_regex);
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				if($row->anzahl > 0)
+					$gruppe_kurzbz = $gruppe_kurzbz . "-" . $row->anzahl;
+			}
+		}
+		
+		return $gruppe_kurzbz;
+	}
 }
 ?>
