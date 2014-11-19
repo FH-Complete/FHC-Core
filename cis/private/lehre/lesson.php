@@ -96,8 +96,6 @@ if (isset($_GET["handbuch"])){
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
-	<script type="text/javascript" src="../../../include/js/flexcroll.js"></script>
-	<link href="../../../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />
 	<style type="text/css">
 	.transparent {
 	    filter:alpha(opacity=90);
@@ -118,7 +116,6 @@ if (isset($_GET["handbuch"])){
 	</script>   
 </head>
 <body>
-<div class="flexcroll" style="outline: none;">
 <div id="semplanhelp" style="position:absolute; top:200px; left:200px; width:500px; height:250px; background-color:#cccccc; visibility:hidden; border-style:solid; border-width:1px; border-color:#333333;" class="transparent">
 <table width="100%">
 <tr><td valign="top"><h2>&nbsp;Erstellung des Semesterplanes</h2></td><td align="right" valign="top"><a href="#" onclick="hideSemPlanHelp();">X</a>&nbsp;</td></tr>
@@ -140,7 +137,7 @@ if (isset($_GET["handbuch"])){
 <table class="tabcontent" height="100%" id="inhalt">
 	<tr>
 		<td class="tdwidth10">&nbsp;</td>
-		<td style="vertical-align:top; height: 10px"><h1>
+		<td style="vertical-align:top; height: 10px"><h1 style="white-space:normal;">
 		<?php		
 		$stsem = new studiensemester();
 		if($studiensemester_kurzbz!='')
@@ -306,6 +303,5 @@ if (isset($_GET["handbuch"])){
 		<td class="tdwidth30">&nbsp;</td>
 	</tr>
 </table>
-</div>
 </body>
 </html>
