@@ -46,6 +46,8 @@ require_once('../../include/mitarbeiter.class.php');
 require_once('../../include/lehrstunde.class.php');
 require_once('../../include/lvangebot.class.php');
 require_once('../../include/gruppe.class.php');
+require_once('../../include/lehrveranstaltung.class.php');
+require_once('../../include/datum.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -167,7 +169,7 @@ function getStundenproInstitut($mitarbeiter_uid, $studiensemester_kurzbz)
 
 if(!$error)
 {
-
+	
 	if(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_save')
 	{
 		//Lehreinheitmitarbeiter Zuteilung
@@ -1095,6 +1097,66 @@ if(!$error)
 		{
 			$errormsg = 'MitarbeiterUID muss uebergeben werden';
 			$return = false;
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='lvangebot-gruppe-save')
+	{
+		$datum_obj = new datum();
+		$lvangebot = new lvangebot();
+		$lvangebot->new = true;
+		$lvangebot->insertamum = date('Y-m-d H:i:s');
+		$lvangebot->insertvon = $user;
+		
+		$lehrveranstaltung_obj = new lehrveranstaltung();
+		if(!$lehrveranstaltung_obj->load($_POST['lehrveranstaltung_id']))
+			$errormsg = 'Fehler beim Laden der Lehrveranstaltung';
+
+		$studiengang = new studiengang();
+		if(!$studiengang->load($lehrveranstaltung_obj->studiengang_kz))
+			$errormsg = 'Fehler beim Laden des Studienganges';
+
+		$gruppe_kurzbz = mb_strtoupper(substr($studiengang->kuerzel.$lehrveranstaltung_obj->semester.'-'.$_POST['studiensemester_kurzbz'].'-'.$lehrveranstaltung_obj->kurzbz,0,32));
+		$gruppe = new gruppe();
+		$gruppe->gruppe_kurzbz=$gruppe_kurzbz;
+		$gruppe->studiengang_kz=$studiengang->studiengang_kz;
+		$gruppe->bezeichnung=mb_substr($lehrveranstaltung_obj->bezeichnung,0,30);
+		$gruppe->semester=$lehrveranstaltung_obj->semester;
+		$gruppe->sort='';
+		$gruppe->mailgrp=false;
+		$gruppe->beschreibung=$lehrveranstaltung_obj->bezeichnung;
+		$gruppe->sichtbar=true;
+		$gruppe->generiert=false;
+		$gruppe->aktiv=true;
+		$gruppe->lehre=true;
+		$gruppe->content_visible=false;
+		$gruppe->orgform_kurzbz=$lehrveranstaltung_obj->orgform_kurzbz;
+		$gruppe->gesperrt=false;
+		$gruppe->zutrittssystem=false;
+		$gruppe->insertamum=date('Y-m-d H:i:s');
+		$gruppe->insertvon=$user;
+
+		if(!$gruppe->save(true))
+		{
+			$errormsg = 'Fehler beim Erstellen der Gruppe'.$gruppe->errormsg;
+			$return = false;
+		}
+		
+		$lvangebot->lehrveranstaltung_id = $_POST['lehrveranstaltung_id'];
+		$lvangebot->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
+		$lvangebot->gruppe_kurzbz = $gruppe_kurzbz;
+		$lvangebot->incomingplaetze = $_POST['incomingplaetze'];
+		$lvangebot->gesamtplaetze = $_POST['gesamtplaetze'];
+		$lvangebot->anmeldefenster_start = $datum_obj->formatDatum($_POST['anmeldefenster_start'], 'Y-m-d');
+		$lvangebot->anmeldefenster_ende = $datum_obj->formatDatum($_POST['anmeldefenster_ende'],'Y-m-d');
+
+		if(!$lvangebot->save())
+		{
+			$errormsg = $lvangebot->errormsg;
+			$return = false;
+		}
+		else
+		{
+			$return = true;
 		}
 	}
 	else

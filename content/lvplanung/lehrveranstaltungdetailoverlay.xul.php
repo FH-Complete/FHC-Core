@@ -454,7 +454,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					</row>
 					<row>
 						<spacer flex="1" />
-						<button id="lehrveranstaltung-lvangebot-button-save" label="speichern" oncommand=""/>
+						<button id="lehrveranstaltung-lvangebot-button-save" label="speichern" oncommand="LvAngebotGruppeSave();"/>
 					</row>
 				</rows>
 			</grid>
