@@ -1887,6 +1887,9 @@ function FilterLehrveranstaltungAusbsem(semester)
 
 // ****************** LV-ANGEBOT ****************** //
 
+// ****
+// * Aktiviert bzw. deaktiviert das Eingabfeld für die Gruppenbezeichnung
+// ****
 function ToggleGruppe()
 {
 	if(document.getElementById('lehrveranstaltung-lvangebot-checkbox-gruppe').checked == false)
@@ -1932,6 +1935,48 @@ function LvAngebotGruppenLoad(menulist, filter)
 		menulist.database.AddDataSource(datasource);
 		if(typeof(filter) != 'undefined')
 			menulist.builder.rebuild();
+	}
+}
+
+// ****
+// * Speichert eine neue Gruppe
+// ****
+function LvAngebotGruppeSave()
+{
+	var tree = document.getElementById('lehrveranstaltung-tree');
+	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrveranstaltung_id"] : "lehrveranstaltung-treecol-lehrveranstaltung_id";
+
+	//Werte holen
+	var lehrveranstaltung_id = tree.view.getCellText(tree.currentIndex,col);
+	var gruppe = document.getElementById('lehrveranstaltung-lvangebot-textbox-gruppe').value;
+	var incomingplaetze = document.getElementById('lehrveranstaltung-lvangebot-textbox-incoming').value;
+	var gesamtplaetze = document.getElementById('lehrveranstaltung-lvangebot-textbox-gesamt').value;
+	var anmeldefenster_start = document.getElementById('lehrveranstaltung-lvangebot-textbox-start').value;
+	var anmeldefenster_ende = document.getElementById('lehrveranstaltung-lvangebot-textbox-ende').value;
+		
+	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
+	
+	req.add('type', 'lvangebot-gruppe-save');
+	req.add('gruppe', gruppe);
+	req.add('incomingplaetze', incomingplaetze);
+	req.add('gesamtplaetze', gesamtplaetze);
+	req.add('anmeldefenster_start', anmeldefenster_start);
+	req.add('anmeldefenster_ende', anmeldefenster_ende);
+	req.add('lehrveranstaltung_id', lehrveranstaltung_id);
+	req.add('studiensemester_kurzbz', getStudiensemester());
+	
+	var response = req.executePOST();
+
+	var val = new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		alert(val.dbdml_errormsg);
+	}
+	else
+	{
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		SetStatusBarText('Daten wurden gespeichert');
 	}
 }
 	
