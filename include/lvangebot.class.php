@@ -219,20 +219,6 @@ class lvangebot extends basis_db
 
 		if($this->new)
 		{
-			//prüfen, ob Datensatz schon vorhanden
-			$qry='SELECT studiensemester_kurzbz
-				FROM lehre.tbl_lvangebot
-				WHERE studiensemester_kurzbz='.$this->db_add_param($this->studiensemester_kurzbz).'
-				AND lehrveranstaltung_id='.$this->db_add_param($this->lehrveranstaltung_id);
-			if($this->db_query($qry))
-			{
-				if($row=$this->db_fetch_object())
-				{
-					$this->errormsg = 'Eintrag für '.$this->studiensemester_kurzbz.' existiert bereits';
-					return false;
-				}
-			}
-			
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO lehre.tbl_lvangebot (lehrveranstaltung_id, studiensemester_kurzbz,
 				gruppe_kurzbz, incomingplaetze, gesamtplaetze, anmeldefenster_start, anmeldefenster_ende,
