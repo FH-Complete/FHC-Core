@@ -684,7 +684,7 @@ function LeAuswahl()
 	document.getElementById('lehrveranstaltung-detail-tree-lehreinheitgruppe').hidden=false;
 	document.getElementById('lehrveranstaltung-detail-label-lehreinheitgruppe').hidden=false;
 	document.getElementById('lehrveranstaltung-tab-lektor').collapsed=false;
-
+	
 	lehrveranstaltungNotenTreeloaded=false;
 	lehrveranstaltungGesamtNotenTreeloaded=false;
 
@@ -715,6 +715,9 @@ function LeAuswahl()
 
 			//Notizen Tab ausblenden
 			//document.getElementById('lehrveranstaltung-tab-notizen').collapsed=true;
+			
+			//LV-Angebot Tab einblenden
+			document.getElementById('lehrveranstaltung-tab-lvangebot').collapsed=false;
 
 			LeDetailDisableFields(true);
 			//Details zuruecksetzen
@@ -732,9 +735,19 @@ function LeAuswahl()
 
 			//Notizen Tab einblenden
 			//document.getElementById('lehrveranstaltung-tab-notizen').collapsed=false;
+			
+			//LV-Angebot Tab ausblenden
+			document.getElementById('lehrveranstaltung-tab-lvangebot').collapsed=true;
 
 			document.getElementById('lehrveranstaltung-toolbar-neu').disabled=true;
 			document.getElementById('lehrveranstaltung-toolbar-del').disabled=false;
+			
+			//Wenn ein Tab markiert ist der nun ausgeblendet wurde, 
+			//dann wird der Detail Tab markiert
+			if(document.getElementById('lehrveranstaltung-tabs').selectedItem.collapsed)
+			{
+				document.getElementById('lehrveranstaltung-tabs').selectedItem=document.getElementById('lehrveranstaltung-tab-detail');
+			}
 		}
 
 		var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrveranstaltung_id"] : "lehrveranstaltung-treecol-lehrveranstaltung_id";
