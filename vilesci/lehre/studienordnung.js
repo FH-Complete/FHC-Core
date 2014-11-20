@@ -407,9 +407,9 @@ function loadLehrveranstaltungSTPL(studienplan_id, bezeichnung, max_semester)
 						{width: 300, header: "Lehrveranstaltung", value: "bezeichnung", source: "metadata", headerClass: "header_lv"},
 						{width: 50, header: "ECTS", value: "ects", source: "metadata", wideCellClass: "col_ects", headerClass: "header_ects"},
 						{width: 120, header: "Semesterstunden", value: "semesterstunden", source: "metadata", cellClass: "col_semesterstunden"},
-						{width: 120, header: "Lehrform", value: "lehrform_kurzbz", source: "metadata", cellClass: "col_lehrform"},
-						{width: 120, header: "LVNR", value: "lvnr", source: "metadata", cellClass: "col_lvnr"},
-						{width: 120, header: "Sortierung", value: "sortierung", source: "metadata", cellClass: "col_sortierung"},
+						{width: 80, header: "Lehrform", value: "lehrform_kurzbz", source: "metadata", cellClass: "col_lehrform"},
+						{width: 80, header: "LVNR", value: "lvnr", source: "metadata", cellClass: "col_lvnr"},
+						{width: 80, header: "Sortierung", value: "sortierung", source: "metadata", cellClass: "col_sortierung"},
 					],
 					resizable: true
 				},
