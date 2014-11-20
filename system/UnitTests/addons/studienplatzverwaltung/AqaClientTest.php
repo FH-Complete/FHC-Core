@@ -96,7 +96,21 @@ class AqaClientTest extends PHPUnit_Framework_TestCase
 		$client = new AqaFoebisClient();
 		$result = $client->listFoebisAbrechnungStudiengang($stgKz,$studjahrCode,$runde);
 	}
-	
+
+	public function testPersonClient() {
+		$personKz = '1110256020';		
+		$client = new AqaFoebisClient();
+		$result = $client->listFoebisAbrechnungPerson($personKz);
+	}
+
+	public function testSemesterClient() {
+		$stgKz = 256;
+		$semester = 'WS2013';		
+		$client = new AqaFoebisClient();
+		$result = $client->listFoebisAbrechnungSemester($stgKz, $semester);
+		$this->assertTrue($result);
+	}
+
 	public function testSyncAll() {
 
 		$client = StudienplatzverwaltungAPI::init();

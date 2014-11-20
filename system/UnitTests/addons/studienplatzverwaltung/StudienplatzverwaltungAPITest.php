@@ -90,6 +90,16 @@ class StudienplatzverwaltungAPITest extends PHPUnit_Framework_TestCase
 		printf($result);
 		
 	}
+
+	public function testExportCSV()
+	{
+		$api = StudienplatzverwaltungAPI::init();
+		$appdaten = $api->newUV('2013/14',3, $this->uid);
+		$this->assertNotNull($appdaten);
+		$result = $api->exportCSV('2013/14',1, $this->uid);
+		printf($result);
+		
+	}
 	
 	public function testGetInfoData()
 	{
