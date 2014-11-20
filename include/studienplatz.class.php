@@ -199,8 +199,8 @@ class studienplatz extends basis_db
 	 * Liefert Array mit GPZ und NPZ für die FÖBis relevanten Orgformen (BB, VZ, VBB).
 	 * Dient als Ersatz für load_studiengang_studiensemester_orgform weil hiermit
 	 * alle Daten mit einer Abfrage geholt werden können.
-	 * @param type $studienjahr  z.B: 2013
-	 * @param type $zeitraum     z.B: 10  [Semester]
+	 * @param string $studienjahr  z.B: 2013
+	 * @param int $zeitraum     z.B: 10  [Semester]
 	 * @return boolean|array  false bei Fehler
 	 */
 	public function getAnzahlAlleOrgformen($studienjahr, $zeitraum)
@@ -217,9 +217,9 @@ class studienplatz extends basis_db
 				sum(case when orgform_kurzbz='BB' then npz else 0 end) as npz_bb,
 				sum(case when orgform_kurzbz='VBB' then npz else 0 end) as npz_vbb,
 				sum(npz) as npz_gesamt,
-				sum(case when orgform_kurzbz='VZ' then npz else 0 end) as gpz_vz,
-				sum(case when orgform_kurzbz='BB' then npz else 0 end) as gpz_bb,
-				sum(case when orgform_kurzbz='VBB' then npz else 0 end) as gpz_vbb,
+				sum(case when orgform_kurzbz='VZ' then gpz else 0 end) as gpz_vz,
+				sum(case when orgform_kurzbz='BB' then gpz else 0 end) as gpz_bb,
+				sum(case when orgform_kurzbz='VBB' then gpz else 0 end) as gpz_vbb,
 				sum(gpz) as gpz_gesamt 
 				FROM lehre.tbl_studienplatz 
 				WHERE ausbildungssemester is null and studiensemester_kurzbz IN ($semesterList_comma_separated) 
@@ -236,7 +236,7 @@ class studienplatz extends basis_db
 			$result[$row->studiensemester_kurzbz][$row->studiengang_kz]['VZ']['NPZ'] = $row->npz_vz;		
 			$result[$row->studiensemester_kurzbz][$row->studiengang_kz]['VBB']['NPZ'] = $row->npz_vbb;		
 			$result[$row->studiensemester_kurzbz][$row->studiengang_kz]['gesamt']['NPZ'] = $row->npz_gesamt;		
-			$result[$row->studiensemester_kurzbz][$row->studiengang_kz]['BB']['GPZ'] = $row->npz_bb;		
+			$result[$row->studiensemester_kurzbz][$row->studiengang_kz]['BB']['GPZ'] = $row->gpz_bb;		
 			$result[$row->studiensemester_kurzbz][$row->studiengang_kz]['VZ']['GPZ'] = $row->gpz_vz;		
 			$result[$row->studiensemester_kurzbz][$row->studiengang_kz]['VBB']['GPZ'] = $row->gpz_vbb;		
 			$result[$row->studiensemester_kurzbz][$row->studiengang_kz]['gesamt']['GPZ'] = $row->gpz_gesamt;		
