@@ -201,6 +201,9 @@ class filter extends basis_db
 	 */
 	public function loadValues($sql, $valuename, $showvalue)
 	{
+
+		$this->values = array();
+
 		if($this->db_query($sql))
 		{
 			while($row = $this->db_fetch_row())
