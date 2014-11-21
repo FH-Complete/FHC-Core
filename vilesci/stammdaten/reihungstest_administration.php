@@ -374,8 +374,8 @@ if(isset($_GET['action']) && $_GET['action']=='deletedummyanswers')
 	if(!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
 		die('<span class="error">Sie haben keine Berechtigung für diese Aktion. <a href="reihungstest_administration.php">Seite neu laden</a></span>');
 		
-	$qry = "DELETE FROM testtool.tbl_antwort WHERE pruefling_id=841;
-			DELETE FROM testtool.tbl_pruefling_frage where pruefling_id=841;";
+	$qry = "DELETE FROM testtool.tbl_antwort WHERE pruefling_id=(SELECT pruefling_id FROM testtool.tbl_pruefling WHERE prestudent_id=".$db->db_add_param(PRESTUDENT_ID_DUMMY_STUDENT).");
+			DELETE FROM testtool.tbl_pruefling_frage where pruefling_id=(SELECT pruefling_id FROM testtool.tbl_pruefling WHERE prestudent_id=".$db->db_add_param(PRESTUDENT_ID_DUMMY_STUDENT).");";
 	if($db->db_query($qry))
 		echo ' <b>Antworten wurden gelöscht</b>';
 	else 
@@ -389,8 +389,8 @@ if(isset($_POST['savedummystg']) && isset($_POST['stg']))
 	if(!$rechte->isBerechtigt('basis/testtool', null, 'su'))
 		die('<span class="error">Sie haben keine Berechtigung für diese Aktion. <a href="reihungstest_administration.php">Seite neu laden</a></span>');
 		
-	$qry = "UPDATE public.tbl_prestudent SET studiengang_kz=".$db->db_add_param($_POST['stg'])." WHERE prestudent_id='13478';
-	UPDATE testtool.tbl_pruefling SET studiengang_kz=".$db->db_add_param($_POST['stg'])." WHERE prestudent_id='13478';";	
+	$qry = "UPDATE public.tbl_prestudent SET studiengang_kz=".$db->db_add_param($_POST['stg'])." WHERE prestudent_id=".$db->db_add_param(PRESTUDENT_ID_DUMMY_STUDENT).";
+	UPDATE testtool.tbl_pruefling SET studiengang_kz=".$db->db_add_param($_POST['stg'])." WHERE prestudent_id=".$db->db_add_param(PRESTUDENT_ID_DUMMY_STUDENT).";";	
 	if($db->db_query($qry))
 		echo '<b>Studiengang geändert!</b><br>';
 	else 
@@ -398,7 +398,7 @@ if(isset($_POST['savedummystg']) && isset($_POST['stg']))
 }
 $name='';
 $dummystg='';
-$qry = "SELECT studiengang_kz, vorname, nachname FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE prestudent_id='13478'";
+$qry = "SELECT studiengang_kz, vorname, nachname FROM public.tbl_prestudent JOIN public.tbl_person USING(person_id) WHERE prestudent_id=".$db->db_add_param(PRESTUDENT_ID_DUMMY_STUDENT);
 if($result = $db->db_query($qry))
 {
 	if($row = $db->db_fetch_object($result))

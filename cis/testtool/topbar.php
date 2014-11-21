@@ -15,10 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
- * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> ,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>,
- *          Manfred Kindl <manfred.kindl@technikum-wien.at>
+ * Authors: Manfred Kindl <manfred.kindl@technikum-wien.at>.
  */
 
 require_once('../../config/cis.config.inc.php');
@@ -28,7 +25,12 @@ require_once '../../include/phrasen.class.php';
 
   if (!$db = new basis_db())
       die('Fehler beim Oeffnen der Datenbankverbindung');
+  
+require_once('../../include/gebiet.class.php');
 
+//if(isset($_GET['lang']))
+	//setSprache($_GET['lang']);
+	
 function getSpracheUser()
 {
 	if(isset($_SESSION['sprache_user']))
@@ -68,20 +70,69 @@ if(isset($_GET['sprache_user']))
 }
 
 $sprache_user = getSpracheUser(); 
+
 $p = new phrasen($sprache_user);
 
 ?>
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
+
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
-
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 </head>
+<script type="text/javascript">
+function changeSprache(sprache)
+{
+	var content = '';
+	content = parent.content.location.pathname+parent.content.location.search;
+	
+	window.location.href="topbar.php?sprache_user="+sprache;
+	parent.menu.location.href="menu.php?sprache_user="+sprache;
 
+	if (parent.content.location.search=='')
+		parent.content.location.href=content+"?sprache_user="+sprache;
+	else
+		parent.content.location.href=content+"&sprache_user="+sprache;
+}
+</script>
 <body>
-<br><br><br><br><br>
-<center><h2><?php echo $p->t('testtool/zeitAbgelaufen');?></h2>
-</center>
+<?php
+echo '	<table style="background-image: url(../../skin/images/header_testtool.png); background-repeat: repeat-x;" width="100%" height="100%" cellspacing="0" cellpadding="0">
+		<tr>
+    		<td valign="top" align="left">
+    			<a href="index.html" target="_top"><img class="header_logo" style="height:70%; left: 16px; top: 10%;" src="../../skin/styles/'.EXT_FKT_PATH.'/logo_klein.png" alt="logo"></a>
+    		</td>
+    		<td align="right">
+    		<select style="text-align: left; color: #0086CC; border: 1;" name="select">';
+			$sprache = new sprache();
+			$sprache->getAll(true);
+			foreach($sprache->result as $row)
+			{
+				echo ' <option onclick="changeSprache(\''.$row->sprache.'\'); return false;" '.($row->sprache==$sprache_user?'selected':'').'>'.($row->bezeichnung_arr[getSprache()]).'&nbsp;&nbsp;</option>';
+			}
+			echo '	</select>&nbsp;&nbsp;</div>
+  		</tr>
+		</table>';
+?>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
