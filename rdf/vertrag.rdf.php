@@ -37,8 +37,16 @@ if(isset($_GET['person_id']))
 {
 	$person_id=$_GET['person_id'];
 	$vertrag = new vertrag();
-	if(!$vertrag->loadVertrag($person_id))
-		die('Fehlgeschlagen:'.$vertrag->errormsg);
+	if(isset($_GET['filter']) && $_GET['filter']=='offen')
+	{
+		if(!$vertrag->loadVertrag($person_id, false))
+			die('Fehlgeschlagen:'.$vertrag->errormsg);
+	}
+	else
+	{
+		if(!$vertrag->loadVertrag($person_id))
+			die('Fehlgeschlagen:'.$vertrag->errormsg);
+	}
 }
 elseif(isset($_GET['vertrag_id']))
 {
@@ -62,6 +70,7 @@ foreach($vertrag->result as $row)
 	$oRdf->obj[$i]->setAttribut('vertragstyp_kurzbz',$row->vertragstyp_kurzbz,true);
 	$oRdf->obj[$i]->setAttribut('vertragstyp_bezeichnung',$row->vertragstyp_bezeichnung,true);
 	$oRdf->obj[$i]->setAttribut('betrag',$row->betrag,true);
+	$oRdf->obj[$i]->setAttribut('status',$row->status,true);
 
 	$oRdf->addSequence($row->vertrag_id);
 }

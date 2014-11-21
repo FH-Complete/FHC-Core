@@ -67,7 +67,7 @@ class benutzer extends person
 			}
 			else 
 			{
-				$this->errormsg = "Kein Eintrag gefunden fuer $uid";
+				$this->errormsg = "Benutzer nicht gefunden";
 				return false;
 			}				
 		}

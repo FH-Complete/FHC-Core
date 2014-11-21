@@ -53,7 +53,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 <!-- **************** -->
 <!-- *  MITARBEITER * -->
 <!-- **************** -->
-<vbox id="MitarbeiterEditor" persist="height">
+<vbox id="MitarbeiterEditor" persist="height" flex="1">
 <popupset>
 	<menupopup id="mitarbeiter-tree-popup">
 		<menuitem label="EMail versenden" oncommand="MitarbeiterSendMail();" id="mitarbeiter-tree-popup-mail" hidden="false"/>
@@ -73,7 +73,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 			</toolbar>
 		</toolbox>
 	</hbox>
-
+	<box style="height: 100px;">
 	<!-- ************ -->
 	<!-- *   TREE   * -->
 	<!-- ************ -->
@@ -82,7 +82,6 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 			onselect="MitarbeiterAuswahl();"
 			flags="dont-build-content"
 			enableColumnDrag="true"
-			style="margin:0px;"
 			persist="hidden, height"
 			context="mitarbeiter-tree-popup"				
 	>
@@ -228,7 +227,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 				</rule>
 			</template>
 	</tree>
-
+	</box>
 	<splitter collapse="after" persist="state">
 		<grippy />
 	</splitter>
@@ -236,8 +235,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 	<!-- ************ -->
 	<!-- *   TABS   * -->
 	<!-- ************ -->
-	<vbox flex="1"  style="overflow:auto;margin:0px;" persist="height">
-		<tabbox id="mitarbeiter-tabbox" flex="3" orient="vertical">
+	<vbox persist="height" flex="1">
+		<tabbox id="mitarbeiter-tabbox" orient="vertical" flex="1">
 			<tabs orient="horizontal" id="mitarbeiter-tabs">
 				<tab id="mitarbeiter-tab-detail" label="Stammdaten" />
 				<tab id="mitarbeiter-tab-kontakt" label="Kontaktdaten" />

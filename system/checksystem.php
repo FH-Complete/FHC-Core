@@ -2108,6 +2108,20 @@ if(!$result = @$db->db_query("SELECT sort FROM lehre.tbl_studienplan_lehrveranst
 		echo ' lehre.tbl_studienplan_lehrveranstaltung: Spalte sort hinzugefuegt!<br>';
 }
 
+// Spalte sort in lehre.tbl_studienplan_lehrveranstaltung
+if($result = $db->db_query("select * from information_schema.key_column_usage where constraint_name='fk_vertragsstatus_vertrag_vertragsstatus'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "ALTER TABLE lehre.tbl_vertrag_vertragsstatus ADD CONSTRAINT fk_vertragsstatus_vertrag_vertragsstatus FOREIGN KEY (vertragsstatus_kurzbz) REFERENCES lehre.tbl_vertragsstatus(vertragsstatus_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>lehre.tbl_vertrag_vertragsstatus: '.$db->db_last_error().'</strong><br>';
+		else 
+			echo ' lehre.tbl_vertrag_vertragsstatus: fehlenden FK hinzugefuegt!<br>';
+	}
+}
+
 // Spalte sort in fue.tbl_aktivitaet
 if(!$result = @$db->db_query("SELECT sort FROM fue.tbl_aktivitaet LIMIT 1;"))
 {
@@ -2517,6 +2531,7 @@ $berechtigungen = array(
 	array('system/loginasuser','Berechtigung zum Einloggen als anderer User'),
 	array('user','Normale User ohne besonere Rechte'),
 	array('veranstaltung','Berechtigungen fuer Veranstaltungen wie Jahresplan'),
+	array('vertrag/mitarbeiter','Verwalten von Vertraegen'),
 	array('vertrag/typen','Verwalten von Vertragstypen'),
 	array('wawi/berichte','Alle Berichte anzeigen'),
 	array('wawi/bestellung','Bestellungen verwalten'),
