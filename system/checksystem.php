@@ -2108,6 +2108,16 @@ if(!$result = @$db->db_query("SELECT sort FROM lehre.tbl_studienplan_lehrveranst
 		echo ' lehre.tbl_studienplan_lehrveranstaltung: Spalte sort hinzugefuegt!<br>';
 }
 
+// Spalte studienjahr_kurzbz in public.tbl_studiensemester
+if(!$result = @$db->db_query("SELECT studienjahr_kurzbz FROM public.tbl_studiensemester LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_studiensemester ADD COLUMN studienjahr_kurzbz varchar(16);";
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_studiensemester: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' public.tbl_studiensemester: Spalte studienjahr_kurzbz hinzugefuegt!<br>';
+}
+
 // Spalte sort in lehre.tbl_studienplan_lehrveranstaltung
 if($result = $db->db_query("select * from information_schema.key_column_usage where constraint_name='fk_vertragsstatus_vertrag_vertragsstatus'"))
 {
@@ -2132,16 +2142,65 @@ if(!$result = @$db->db_query("SELECT sort FROM fue.tbl_aktivitaet LIMIT 1;"))
 		echo ' fue.tbl_aktivitaet: Spalte sort hinzugefuegt!<br>';
 }
 
-// Spalte studienjahr_kurzbz in public.tbl_studiensemester
-if(!$result = @$db->db_query("SELECT studienjahr_kurzbz FROM public.tbl_studiensemester LIMIT 1;"))
+// Tabelle testtool.tbl_ablauf_vorgaben
+if(!$result = @$db->db_query("SELECT 1 FROM testtool.tbl_ablauf_vorgaben LIMIT 1;"))
 {
-	$qry = "ALTER TABLE public.tbl_studiensemester ADD COLUMN studienjahr_kurzbz varchar(16);";
+	$qry = "
+	CREATE TABLE testtool.tbl_ablauf_vorgaben
+	(
+		ablauf_vorgaben_id integer NOT NULL,
+		studiengang_kz integer NOT NULL,
+		sprache varchar(16),
+		sprachwahl boolean NOT NULL,
+		content_id bigint,
+		insertamum timestamp,
+		insertvon varchar(32),
+		updateamum timestamp,
+		updatevon varchar(32)
+	);
+	COMMENT ON TABLE testtool.tbl_ablauf_vorgaben IS 'Einstellungen und Variablen fuer den Ablauf der Gebiete';
+	COMMENT ON COLUMN testtool.tbl_ablauf_vorgaben.content_id IS 'Einfuehrungsseite aus dem CMS';
+	COMMENT ON COLUMN testtool.tbl_ablauf_vorgaben.sprache IS 'Sprache, in der die Fragen gestellt werden';
+	COMMENT ON COLUMN testtool.tbl_ablauf_vorgaben.sprachwahl IS 'Soll der Pruefling die Sprache der Testfragen aendern koennen?';
+
+	ALTER TABLE testtool.tbl_ablauf_vorgaben ADD CONSTRAINT pk_ablauf_vorgaben PRIMARY KEY (ablauf_vorgaben_id);
+	CREATE SEQUENCE testtool.tbl_ablauf_vorgaben_ablauf_vorgaben_id_seq
+	INCREMENT BY 1
+	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+
+	ALTER TABLE testtool.tbl_ablauf_vorgaben ALTER COLUMN ablauf_vorgaben_id SET DEFAULT nextval('testtool.tbl_ablauf_vorgaben_ablauf_vorgaben_id_seq');
+	ALTER TABLE testtool.tbl_ablauf_vorgaben ADD CONSTRAINT fk_ablauf_vorgaben_studiengang_kz FOREIGN KEY (studiengang_kz) REFERENCES public.tbl_studiengang(studiengang_kz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE testtool.tbl_ablauf_vorgaben ADD CONSTRAINT fk_ablauf_vorgaben_sprache FOREIGN KEY (sprache) REFERENCES public.tbl_sprache(sprache) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE testtool.tbl_ablauf_vorgaben ADD CONSTRAINT fk_ablauf_vorgaben_content_id FOREIGN KEY (content_id) REFERENCES campus.tbl_content(content_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+	GRANT SELECT, INSERT, UPDATE, DELETE ON testtool.tbl_ablauf_vorgaben TO vilesci;
+	GRANT SELECT, UPDATE ON testtool.tbl_ablauf_vorgaben_ablauf_vorgaben_id_seq TO vilesci;
+	
+	GRANT SELECT, INSERT, UPDATE, DELETE ON testtool.tbl_ablauf_vorgaben TO web;
+	GRANT SELECT, UPDATE ON testtool.tbl_ablauf_vorgaben_ablauf_vorgaben_id_seq TO web;
+	";
+
 	if(!$db->db_query($qry))
-		echo '<strong>public.tbl_studiensemester: '.$db->db_last_error().'</strong><br>';
+		echo '<strong>testtool.tbl_ablauf_vorgaben: '.$db->db_last_error().'</strong><br>';
 	else 
-		echo ' public.tbl_studiensemester: Spalte studienjahr_kurzbz hinzugefuegt!<br>';
+		echo 'testtool.tbl_ablauf_vorgaben: Tabelle und Sequenz hinzugefuegt!<br>';
 }
 
+// Vorgaben fuer Testtool Ablauf
+if(!$result = @$db->db_query("SELECT ablauf_vorgaben_id FROM testtool.tbl_ablauf LIMIT 1"))
+{
+	$qry = "
+		ALTER TABLE testtool.tbl_ablauf ADD COLUMN ablauf_vorgaben_id integer;
+		ALTER TABLE testtool.tbl_ablauf ADD CONSTRAINT fk_ablauf_vorgaben_id FOREIGN KEY (ablauf_vorgaben_id) REFERENCES testtool.tbl_ablauf_vorgaben(ablauf_vorgaben_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>testtool.tbl_ablauf: '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'testtool.tbl_ablauf: Neue Spalte ablauf_vorgaben_id hinzugefuegt<br>';
+}
 
 echo '<br><br><br>';
 
@@ -2349,7 +2408,8 @@ $tabellen=array(
 	"public.tbl_variable"  => array("name","uid","wert"),
 	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung","mimetype"),
 	"public.tbl_vorlagestudiengang"  => array("vorlagestudiengang_id","vorlage_kurzbz","studiengang_kz","version","text","oe_kurzbz"),
-	"testtool.tbl_ablauf"  => array("ablauf_id","gebiet_id","studiengang_kz","reihung","gewicht","semester", "insertamum","insertvon","updateamum", "updatevon"),
+	"testtool.tbl_ablauf"  => array("ablauf_id","gebiet_id","studiengang_kz","reihung","gewicht","semester", "insertamum","insertvon","updateamum", "updatevon","ablauf_vorgaben_id"),
+	"testtool.tbl_ablauf_vorgaben"  => array("ablauf_vorgaben_id","studiengang_kz","sprache","sprachwahl","content_id","insertamum","insertvon","updateamum", "updatevon"),		
 	"testtool.tbl_antwort"  => array("antwort_id","pruefling_id","vorschlag_id"),
 	"testtool.tbl_frage"  => array("frage_id","kategorie_kurzbz","gebiet_id","level","nummer","demo","insertamum","insertvon","updateamum","updatevon"),
 	"testtool.tbl_gebiet"  => array("gebiet_id","kurzbz","bezeichnung","beschreibung","zeit","multipleresponse","kategorien","maxfragen","zufallfrage","zufallvorschlag","levelgleichverteilung","maxpunkte","insertamum", "insertvon", "updateamum", "updatevon", "level_start","level_sprung_auf","level_sprung_ab","antwortenprozeile"),

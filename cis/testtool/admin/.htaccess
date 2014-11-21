@@ -13,3 +13,5 @@ Require user pam
 require user oesi
 require user ruhan
 Require user tw01e061
+Require user if10b066
+require ldap-user if10b066

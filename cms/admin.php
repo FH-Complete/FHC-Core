@@ -64,6 +64,10 @@ $berechtigte_oe = $rechte->getOEkurzbz('basis/cms')
 		mode : "textareas",
 		theme : "advanced",
 		language : "de",
+		protect: [ /\<\/?(audio[^>]+|audio)\>/g, 	// Protect <audio...> und </audio>],
+		           /\<\/?(source[^>]+)\>/g 			// Protect <source...>],
+			   		],  
+		   		
 		file_browser_callback: "FHCFileBrowser",
 		
 		plugins : "spellchecker,pagebreak,style,layer,table,advhr,advimage,advlink,inlinepopups,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras",
@@ -78,7 +82,7 @@ $berechtigte_oe = $rechte->getOEkurzbz('basis/cms')
         theme_advanced_statusbar_location : "bottom",
         theme_advanced_resizing : true,
         theme_advanced_styles : "Contenttabelle=cmstable;Hauptcontent=cmscontent;Menuebox=menubox;Teambox=teambox;Schatteneffekt Grafiken=screenshot_boxshadow;Tablesorter=tablesorter tablesorter_col_0 tablesorter_sort_0",
-        advimage_update_dimensions_onchange : false,
+        advimage_update_dimensions_onchange : false, //funktioniert aus irgendeinem Grund nicht. Grafiken sollten nach aendern der ID die eingestellte groesse behalten.
         force_br_newlines : true,
         force_p_newlines : false,
         forced_root_block : '',
@@ -523,7 +527,7 @@ if(!is_null($method))
 				$texthtml = "Dies ist eine automatisch generierte E-Mail.<br><br>
 						Es wurde ein Artikel angelegt/bearbeitet. Dieser kann nun übersetzt werden: '$content->titel'<br>
 						<br>
-						<a href=\"".APP_ROOT."cms/admin.php?content_id=".$content->content_id."&sprache=$sprache&version=$version)&action=content\">zum Artikel</a>
+						<a href=\"".APP_ROOT."cms/admin.php?content_id=".$content->content_id."&sprache=$sprache&version=$version&action=content\">zum Artikel</a>
 						<br>
 						<br>
 						Mit freundlichen Grüßen<br>
@@ -1204,7 +1208,7 @@ function print_content()
 	if($content->template_kurzbz=='redirect')
 		echo '<a href="content.php?content_id='.$content_id.'&version='.$version.'&sprache='.$sprache.'&sichtbar" target="_blank">Vorschau in eigenem Fenster öffnen</a>';
 	else
-		echo '<iframe src="content.php?content_id='.$content_id.'&version='.$version.'&sprache='.$sprache.'&sichtbar" style="width: 800px; height: 500px; border: 1px solid black;">';
+		echo '<iframe src="content.php?content_id='.$content_id.'&version='.$version.'&sprache='.$sprache.'" style="width: 800px; height: 500px; border: 1px solid black;">';
 }
 
 /**
