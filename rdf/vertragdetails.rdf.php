@@ -73,7 +73,7 @@ foreach($vertrag->result as $row)
 	}
 	$i=$oRdf->newObjekt($key);
 	$oRdf->obj[$i]->setAttribut('type',$row->type,true);
-	$oRdf->obj[$i]->setAttribut('betrag',number_format($row->betrag,2),true);
+	$oRdf->obj[$i]->setAttribut('betrag',number_format($row->betrag,2,'.',''),true);
 	$oRdf->obj[$i]->setAttribut('studiensemester_kurzbz',$row->studiensemester_kurzbz,true);
 	$oRdf->obj[$i]->setAttribut('lehreinheit_id',$row->lehreinheit_id,true);
 	$oRdf->obj[$i]->setAttribut('pruefung_id',$row->pruefung_id,true);

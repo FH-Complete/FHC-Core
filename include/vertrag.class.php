@@ -82,16 +82,23 @@ class vertrag extends basis_db
 	 * @param $person_id
 	 * @return boolean true wenn ok ,false im Fehlerfall
 	 */	
-	public function loadVertrag($person_id)
+	public function loadVertrag($person_id, $abgerechnet=null)
 	{
 		$qry = "SELECT 
 					*, 
 					tbl_vertrag.bezeichnung as bezeichnung,
-					tbl_vertragstyp.bezeichnung as vertragstyp_bezeichnung
+					tbl_vertragstyp.bezeichnung as vertragstyp_bezeichnung,
+					(SELECT bezeichnung FROM lehre.tbl_vertragsstatus JOIN lehre.tbl_vertrag_vertragsstatus USING(vertragsstatus_kurzbz) 
+						WHERE vertrag_id=tbl_vertrag.vertrag_id ORDER BY datum desc limit 1) as status
 				FROM 
 					lehre.tbl_vertrag 
 					LEFT JOIN lehre.tbl_vertragstyp USING(vertragstyp_kurzbz)
 				WHERE person_id=".$this->db_add_param($person_id);
+
+		if($abgerechnet===true)
+			$qry.=" AND EXISTS (SELECT 1 FROM lehre.tbl_vertrag_vertragsstatus WHERE vertrag_id=tbl_vertrag.vertrag_id AND vertragsstatus_kurzbz='abgerechnet')";
+		if($abgerechnet===false)
+			$qry.=" AND NOT EXISTS (SELECT 1 FROM lehre.tbl_vertrag_vertragsstatus WHERE vertrag_id=tbl_vertrag.vertrag_id AND vertragsstatus_kurzbz='abgerechnet')";
 
 		if($result = $this->db_query($qry))
 		{
@@ -108,6 +115,7 @@ class vertrag extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+				$obj->status = $row->status;
 			
 				$obj->vertragstyp_bezeichnung = $row->vertragstyp_bezeichnung;
 		

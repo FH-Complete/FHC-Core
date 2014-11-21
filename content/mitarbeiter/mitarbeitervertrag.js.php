@@ -29,14 +29,30 @@ var MitarbeiterVertragLoadedPerson=null
 
 function MitarbeiterVertragLoad(person_id)
 {
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	if(typeof(person_id)=='undefined' && MitarbeiterVertragLoadedPerson!='')
+	{
+		person_id = MitarbeiterVertragLoadedPerson;
+	}
 	if(person_id=='')
 		return;
+
 	MitarbeiterVertragLoadedPerson=person_id;
 
-	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	// Aktiven Filter Eintrag holen
+	var filterpopup = document.getElementById('mitarbeiter-vertrag-menupopup-filter');
+	var e = filterpopup.getElementsByTagName("menuitem");
+	var filter;
+	for (var i = 0; i < e.length; i++)
+	{
+	   if (e[i].getAttribute("checked")) 
+			filter=e[i].value
+	}
+
 	// *** Vertrag ***	
 	var treevertrag = document.getElementById('mitarbeiter-vertrag-tree');
-	url='<?php echo APP_ROOT;?>rdf/vertrag.rdf.php?person_id='+person_id+"&"+gettimestamp();
+	url='<?php echo APP_ROOT;?>rdf/vertrag.rdf.php?person_id='+person_id+"&filter="+filter+"&"+gettimestamp();
 
 	//Alte DS entfernen
 	var oldDatasources = treevertrag.database.GetDataSources();

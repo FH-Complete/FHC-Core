@@ -58,9 +58,18 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	<vbox flex="1">
 		<vbox flex="1">
 			<hbox>
-				<description>Verträge</description>
-				<spacer flex="1" />
-				<button label="Neuen Vertrag erstellen" oncommand="MitarbeiterVertragAddVertrag()" />
+				<toolbox flex="1">
+					<toolbar>
+						<toolbarbutton label="Filter " id="mitarbeiter-vertrag-filter" type="menu">	
+							<menupopup id="mitarbeiter-vertrag-menupopup-filter">
+									<menuitem type="radio" value="alle" label="Alle Verträge anzeigen" oncommand="MitarbeiterVertragLoad()"/>
+									<menuitem type="radio" value="offen" label="Offene Verträge anzeigen" checked="true" oncommand="MitarbeiterVertragLoad()"/>
+							</menupopup>
+						</toolbarbutton>
+						<spacer flex="1" />
+						<toolbarbutton id="mitarbeiter-vertrag-toolbarbutton-neu" tooltiptext="Neu" image="../skin/images/NeuDokument.png" label="Neuen Vertrag erstellen" oncommand="MitarbeiterVertragAddVertrag()" />
+					</toolbar>
+				</toolbox>
 			</hbox>
 			<tree id="mitarbeiter-vertrag-tree" hidecolumnpicker="false" flex="1"
 			datasources="rdf:null" ref="http://www.technikum-wien.at/vertrag"
@@ -84,6 +93,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<treecol id="mitarbeiter-vertrag-tree-vertragstyp" label="Vertragstyp" flex="2" hidden="false"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragstyp_bezeichnung" />
+					<splitter class="tree-splitter"/>					
+					<treecol id="mitarbeiter-vertrag-tree-status" label="Status" flex="2" hidden="false"
+						class="sortDirectionIndicator"
+						sort="rdf:http://www.technikum-wien.at/vertrag/rdf#status" />
 					<splitter class="tree-splitter"/>
 					<treecol id="mitarbeiter-vertrag-tree-vertragstyp_kurzbz" label="VertragstypKurzbz" flex="2" hidden="true"
 						class="sortDirectionIndicator"
@@ -102,6 +115,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#bezeichnung"/>
 								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#betrag"/>
 								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragstyp_bezeichnung"/>
+								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#status"/>
 								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragstyp_kurzbz"/>
 								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#vertrag_id"/>
 							</treerow>

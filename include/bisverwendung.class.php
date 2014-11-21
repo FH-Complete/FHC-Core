@@ -44,6 +44,7 @@ class bisverwendung extends basis_db
 	public $insertamum;
 	public $insertvon;
 	public $ext_id;	
+	public $dv_art;
 	
 	public $ba1bez;
 	public $ba2bez;
@@ -360,6 +361,106 @@ class bisverwendung extends basis_db
 				$obj->vertragsstunden = $row->vertragsstunden;
 				
 				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei der Datenbankabfrage';
+			return false;
+		}			
+	}
+
+	/**
+	 * Laedt alle Verwendungen eines Mitarbeiters deren Datumsbereich das Datum einschliesst
+	 * @param $uid UID des Mitarbeiters
+	 * @param $monat Monat in dem die Verwendung liegen soll
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getVerwendungDatum($uid, $datum)
+	{
+		//laden des Datensatzes
+		$qry = "SELECT 
+					* 
+				FROM 
+					bis.tbl_bisverwendung 
+				WHERE 
+					mitarbeiter_uid=".$this->db_add_param($uid)."
+					AND (beginn<=".$this->db_add_param($datum)." OR beginn is null)
+					AND (ende>=".$this->db_add_param($datum)." OR ende is null)
+				ORDER BY beginn;";
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new bisverwendung();
+				
+				$obj->bisverwendung_id = $row->bisverwendung_id;
+				$obj->ba1code = $row->ba1code;
+				$obj->ba2code = $row->ba2code;
+				$obj->beschausmasscode = $row->beschausmasscode;
+				$obj->verwendung_code = $row->verwendung_code;
+				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$obj->hauptberufcode = $row->hauptberufcode;
+                $obj->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
+                $obj->habilitation = $this->db_parse_bool($row->habilitation);
+				$obj->beginn = $row->beginn;
+				$obj->ende = $row->ende;
+				$obj->updatevon = $row->updatevon;
+				$obj->updateamum = $row->updateamum;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->vertragsstunden = $row->vertragsstunden;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei der Datenbankabfrage';
+			return false;
+		}			
+	}
+
+	/**
+	 * Laedt alle Verwendungen eines Mitarbeiters
+	 * @param $uid UID des Mitarbeiters
+	 * @return true wenn ok, false wenn Fehler
+	 */
+	public function getLastVerwendung($uid)
+	{
+		//laden des Datensatzes
+		$qry = "SELECT 
+					* 
+				FROM 
+					bis.tbl_bisverwendung 
+				WHERE 
+					mitarbeiter_uid=".$this->db_add_param($uid)." 
+				ORDER BY beginn DESC LIMIT 1;";
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->bisverwendung_id = $row->bisverwendung_id;
+				$this->ba1code = $row->ba1code;
+				$this->ba2code = $row->ba2code;
+				$this->beschausmasscode = $row->beschausmasscode;
+				$this->verwendung_code = $row->verwendung_code;
+				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$this->hauptberufcode = $row->hauptberufcode;
+                $this->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);                
+                $this->habilitation = $this->db_parse_bool($row->habilitation);
+				$this->beginn = $row->beginn;
+				$this->ende = $row->ende;
+				$this->updatevon = $row->updatevon;
+				$this->updateamum = $row->updateamum;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->vertragsstunden = $row->vertragsstunden;
+
 			}
 			return true;
 		}

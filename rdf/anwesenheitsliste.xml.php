@@ -49,7 +49,7 @@ $qry = "SELECT le.lehreinheit_id, le.lehrveranstaltung_id, lv.lvnr, lv.bezeichnu
 	. "FROM lehre.tbl_lehreinheit le "
 	. "JOIN lehre.tbl_lehrveranstaltung lv ON lv.lehrveranstaltung_id = le.lehrveranstaltung_id "
 	. "JOIN public.tbl_studiengang stg ON stg.studiengang_kz = lv.studiengang_kz "
-	. "JOIN lehre.tbl_stundenplan sp ON (sp.unr = le.unr AND sp.studiengang_kz = " . $db->db_add_param($studiengang) . ") "
+	. "JOIN lehre.tbl_stundenplan sp ON (sp.lehreinheit_id=le.lehreinheit_id) "
 	. "JOIN lehre.tbl_stunde stu ON stu.stunde = sp.stunde "
 	. "WHERE stg.studiengang_kz = " . $db->db_add_param($studiengang) . " ";
 

@@ -707,7 +707,7 @@ class studiensemester extends basis_db
 		}
 	} 
     /**
-     * untersucht das �bergebene datum in welchem semester es sich befindet
+     * untersucht das uebergebene datum in welchem semester es sich befindet
      * @param type $datum
      * @return boolean 
      */
@@ -715,7 +715,7 @@ class studiensemester extends basis_db
     {
         if($datum == '')
         {
-            $this->errormsg = "Ungueltiges Datum �bergeben"; 
+            $this->errormsg = "Ungueltiges Datum uebergeben"; 
             return false; 
         }
         $qry = "SELECT * FROM public.tbl_studiensemester WHERE start <=".$this->db_add_param($datum, FHC_STRING)." AND ende >= ".$this->db_add_param($datum).';'; 

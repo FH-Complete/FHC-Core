@@ -231,5 +231,55 @@ class anwesenheit extends basis_db
 			return false;
 		}
 	}
+
+	public function loadAnwesenheitMitarbeiter($mitarbeiter_uid, $lehreinheit_id)
+	{
+		$qry = "SELECT 
+					datum, a.einheiten, 
+					(SELECT true FROM campus.tbl_anwesenheit 
+					 WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id)." AND datum=a.datum) as anwesend,
+					(SELECT stundensatz FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id)."
+					AND mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid).") as stundensatz
+				FROM
+					(SELECT datum, count(stunde) as einheiten FROM lehre.tbl_stundenplan
+					 WHERE 
+						lehreinheit_id=".$this->db_add_param($lehreinheit_id)." 
+						AND mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid)."
+					GROUP by datum) as a
+				";
+
+		if($result = $this->db_query($qry))
+		{
+			$this->anzahl_termine=0;
+			$this->anzahl_anwesend=0;
+			$this->anwesenheit = array();
+
+			while($row = $this->db_fetch_object($result))
+			{
+				$anwesend = $this->db_parse_bool($row->anwesend);
+				$key = $lehreinheit_id.'/'.$row->datum;
+
+				$this->anwesenheit[$key]['anwesend'] = ($anwesend?true:false);
+				$this->anwesenheit[$key]['lehreinheit_id'] = $lehreinheit_id;
+				$this->anwesenheit[$key]['datum']=$row->datum;
+				$this->anwesenheit[$key]['einheiten']=$row->einheiten;
+				$this->anwesenheit[$key]['stundensatz']=$row->stundensatz;
+
+				$this->anzahl_termine++;
+				if($anwesend)
+					$this->anzahl_anwesend++;
+			}
+			if($this->anzahl_termine>0)
+			{
+				$this->prozent_anwesend=$this->anzahl_anwesend/$this->anzahl_termine*100;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg='Fehler beim Laden der Daten';	
+			return false;
+		}
+	}
 }
 ?>
