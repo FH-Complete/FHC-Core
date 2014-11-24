@@ -342,7 +342,7 @@ if(!empty ($_GET))
 {
 	$preinteressent = new preinteressent();
 	//if($filter=='')
-	if($datum_obj->formatDatum($filter, 'Y-m-d', true))
+	if($datum_obj->formatDatum($filter, 'Y-m-d', true) && is_numeric($filter))
 		$filter = $datum_obj->formatDatum($filter, 'Y-m-d', true);
 	$preinteressent->loadPreinteressenten($studiengang_kz, ($studiensemester_kurzbz!='-1'?$studiensemester_kurzbz:null), $filter, $bool_nichtfreigegeben, $bool_uebernommen, $kontaktmedium, $bool_absage, $erfassungsdatum_von, $erfassungsdatum_bis, $bool_einverstaendnis, $bool_preinteressent);
 }
