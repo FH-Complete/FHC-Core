@@ -1101,12 +1101,22 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='lvangebot-gruppe-save')
 	{
+		isset($_POST['lvangebot_id']) ? $lvangebot_id = $_POST['lvangebot_id'] : $lvangebot_id = null;
 		$datum_obj = new datum();
 		$lvangebot = new lvangebot();
-		$lvangebot->new = true;
 		$lvangebot->insertamum = date('Y-m-d H:i:s');
 		$lvangebot->insertvon = $user;
 		
+		if($lvangebot_id)
+		{
+			$lvangebot->load($lvangebot_id);
+			$lvangebot->new = false;
+		}
+		else
+		{
+			$lvangebot->new = true;
+		}
+				
 		$lehrveranstaltung_obj = new lehrveranstaltung();
 		if(!$lehrveranstaltung_obj->load($_POST['lehrveranstaltung_id']))
 			$errormsg = 'Fehler beim Laden der Lehrveranstaltung';
@@ -1160,6 +1170,19 @@ if(!$error)
 		if(!$lvangebot->save())
 		{
 			$errormsg = $lvangebot->errormsg;
+			$return = false;
+		}
+		else
+		{
+			$return = true;
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='lvangebot_gruppe_del')
+	{
+		$lvangebot = new lvangebot();
+		if(!$lvangebot->delete($_POST['lvangebot_id']))
+		{
+			$errormsg = $this->errormsg;
 			$return = false;
 		}
 		else
