@@ -404,8 +404,63 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 <!-- *************************** LV-ANGEBOT ************************* -->
 <vbox id="lehrveranstaltung-lvangebot" style="margin:0px;" >
-	<hbox>
-	<groupbox orientation="horizontal" flex="1">
+	<hbox style="padding: 10px;">
+	<vbox width="600">
+		<hbox flex="1">
+			<tree id="lehrveranstaltung-lvangebot-tree-gruppen" seltype="single" hidecolumnpicker="false" flex="1"
+					datasources="rdf:null"
+					ref="http://www.technikum-wien.at/lvangebot/liste"
+					onselect="LvAngebotGruppeAuswahl();" flags="dont-build-content"
+					style="border: 1px solid black;"
+					context="lehrveranstaltung-lektor-tree-popup"
+					onkeypress="LvAngebotTreeKeyPress(event)"
+			>
+				<treecols>
+					<treecol id="lehrveranstaltung-lvangebot-treecol-lvangebot_id" label="Lvangebot_id" flex="2" hidden="true"
+						class="sortDirectionIndicator"
+						sort="rdf:http://www.technikum-wien.at/lvangebot/rdf#lvangebot_id"/>
+					<splitter class="tree-splitter"/>
+					<treecol id="lehrveranstaltung-lvangebot-treecol-gruppe" label="Gruppe" flex="2" hidden="false"
+						class="sortDirectionIndicator"
+						sort="rdf:http://www.technikum-wien.at/lvangebot/rdf#gruppe_kurzbz"/>
+					<splitter class="tree-splitter"/>
+					<treecol id="lehrveranstaltung-lvangebot-treecol-plaetze_inc" label="Plätze Incoming" flex="2" hidden="false"
+						class="sortDirectionIndicator"
+						sort="rdf:http://www.technikum-wien.at/lvangebot/rdf#plaetze_inc"/>
+					<splitter class="tree-splitter"/>
+					<treecol id="lehrveranstaltung-lvangebot-treecol-plaetze_gesamt" label="Plätze gesamt" flex="2" hidden="false"
+						class="sortDirectionIndicator"
+						sort="rdf:http://www.technikum-wien.at/lvangebot/rdf#plaetze_gesamt"/>
+					<splitter class="tree-splitter"/>
+					<treecol id="lehrveranstaltung-lvangebot-treecol-anmeldefenster_start" label="Anmeldefenster Start" flex="2" hidden="false"
+						class="sortDirectionIndicator"
+						sort="rdf:http://www.technikum-wien.at/lvangebot/rdf#anmeldefenster_start"/>
+					<treecol id="lehrveranstaltung-lvangebot-treecol-anmeldefenster_ende" label="Anmeldefenster Ende" flex="2" hidden="false"
+						class="sortDirectionIndicator"
+						sort="rdf:http://www.technikum-wien.at/lvangebot/rdf#anmeldefenster_ende"/>
+					<splitter class="tree-splitter"/>
+				</treecols>
+				<template>
+					<rule>
+						<treechildren>
+							<treeitem uri="rdf:*">
+								<treerow>
+									<treecell label="rdf:http://www.technikum-wien.at/lvangebot/rdf#lvangebot_id"/>
+									<treecell label="rdf:http://www.technikum-wien.at/lvangebot/rdf#gruppe_kurzbz"/>
+									<treecell label="rdf:http://www.technikum-wien.at/lvangebot/rdf#plaetze_inc"/>
+									<treecell label="rdf:http://www.technikum-wien.at/lvangebot/rdf#plaetze_gesamt"/>
+									<treecell label="rdf:http://www.technikum-wien.at/lvangebot/rdf#anmeldefenster_start"/>
+									<treecell label="rdf:http://www.technikum-wien.at/lvangebot/rdf#anmeldefenster_ende"/>
+								</treerow>
+							</treeitem>
+						</treechildren>
+					</rule>
+				</template>
+			</tree>
+			<spacer />
+		</hbox>
+	</vbox>
+	<groupbox orientation="horizontal">
 		<caption id="lehrveranstaltung-lvangebot-groupbox-caption" label="LV-Angebot" />
 		<hbox flex="1">
 			<grid>

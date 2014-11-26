@@ -30,6 +30,7 @@ var LeDetailLehrfach_id; //Lehrfach_id die nach dem Laden markiert werden soll
 var LeDetailLehrfach_label; //Bezeichnung des Lehrfachs das markiert werden soll
 var LeDetailGruppeDatasource; //Datasource fuer Gruppen DropDown
 var LeDetailLektorDatasource; //Datasource fuer Lektren DropDown
+var LvAngebotGruppenDatasource; //Datasource fuer LV-Angebot Gruppen
 var LvSelectLehreinheit_id; //Lehreinheit_id die nach dem Rebuild des Trees markiert werden soll
 var LvOpenLehrveranstaltung_id; //Lehrveranstaltung_id der Lehreinheit die gerade gespeichert wurde. Diese LV muss vor dem Select im Tree geoeffnet werden
 var leDetailLektorUid; // UID der Lektorzuordnung die nach dem Rebuild markiert werden soll
@@ -96,6 +97,18 @@ var LvLektorTreeListener =
   }
 };
 
+// ****
+// * Nach dem Rebuild wird die LV-Angebot Gruppe
+// * wieder markiert
+// ****
+var LvAngebotTreeListener =
+{
+  willRebuild : function(builder) {  },
+  didRebuild : function(builder)
+  {
+      window.setTimeout(LvAngebotTreeSelectGruppe,10);
+  }
+};
 
 // ****
 // * Observer fuer Lehrfachdropdown
@@ -256,6 +269,17 @@ function LvDetailMitarbeiterTreeKeyPress(event)
 }
 
 // ****
+// * Wird ausgefuehrt wenn eine Taste gedrueckt wird und der Focus
+// * im LV-Angebot-tree ist
+// * Beim Druecken von ENTF wird die markierte Gruppe geloescht
+// ****
+function LvAngebotTreeKeyPress(event)
+{
+	if(event.keyCode==46) //Entf
+		LvAngebotGruppeDel();
+}
+
+// ****
 // * Erstellt den Lehrauftrag fuer
 // * einen Mitarbeiter
 // ****
@@ -367,6 +391,7 @@ function LeNeu()
 	//Defaultwert fuer Anmerkung
 	document.getElementById('lehrveranstaltung-detail-textbox-anmerkung').value='<?php echo str_replace("'","\'",LEHREINHEIT_ANMERKUNG_DEFAULT);?>';
 }
+
 // ****
 // * Selectiert die Lektorzuordnung nachdem der Tree
 // * rebuildet wurde.
@@ -399,6 +424,15 @@ function LeLektorTreeSelectLektor()
 			}
 	   	}
 	}
+}
+
+// ****
+// * Selectiert die LV-Angebot Gruppe nachdem der Tree
+// * rebuildet wurde.
+// ****
+function LvAngebotTreeSelectGruppe()
+{
+	
 }
 
 // ****
@@ -716,8 +750,9 @@ function LeAuswahl()
 			//Notizen Tab ausblenden
 			//document.getElementById('lehrveranstaltung-tab-notizen').collapsed=true;
 			
-			//LV-Angebot Tab einblenden
+			//LV-Angebot Tab einblenden und Gruppen laden
 			document.getElementById('lehrveranstaltung-tab-lvangebot').collapsed=false;
+			LvAngebotLoad(lehrveranstaltung_id);
 
 			LeDetailDisableFields(true);
 			//Details zuruecksetzen
@@ -883,7 +918,7 @@ function LeAuswahl()
 	{
 		debug(e);
 	}
-
+	
 	//Lehreinheitgruppe tree setzen
 	url='<?php echo APP_ROOT; ?>rdf/lehreinheitgruppe.rdf.php?lehreinheit_id='+lehreinheit_id+"&"+gettimestamp();
 
@@ -1977,6 +2012,17 @@ function LvAngebotGruppeSave()
 		
 	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
 	
+	//Wenn ein Angebot gewaehlt wurde dann ID fuer Update ermitteln
+	tree = document.getElementById('lehrveranstaltung-lvangebot-tree-gruppen');
+	var idx;
+	if(tree.currentIndex >= 0)
+	{
+		idx = tree.currentIndex;
+		var col = tree.columns ? tree.columns["lehrveranstaltung-lvangebot-treecol-lvangebot_id"] : "lehrveranstaltung-lvangebot-treecol-lvangebot_id";
+		var lvangebot_id = tree.view.getCellText(idx,col);
+		req.add('lvangebot_id', lvangebot_id);
+	}	
+	
 	req.add('type', 'lvangebot-gruppe-save');
 	req.add('neue_gruppe', neue_gruppe);
 	req.add('gruppe', gruppe);
@@ -2002,6 +2048,176 @@ function LvAngebotGruppeSave()
 	{
 		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 		SetStatusBarText('Daten wurden gespeichert');
+		LvAngebotGruppeTreeRefresh();
+		LvAngebotReset();
 	}
 }
+
+// ****
+// * Laedt alle Gruppen fuer die LV
+// ****
+function LvAngebotLoad(lehrveranstaltung_id)
+{
+	url='<?php echo APP_ROOT;?>rdf/lvangebot.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+"&"+gettimestamp();
+	try
+	{
+		lvangebottree = document.getElementById('lehrveranstaltung-lvangebot-tree-gruppen');
+
+		try
+		{
+			lvangebottree.builder.removeListener(LvAngebotTreeListener);
+		}
+		catch(e)
+		{}
+
+		//Alte DS entfernen
+		var oldDatasources = lvangebottree.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			lvangebottree.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		lvangebottree.builder.rebuild();
+
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		LvAngebotGruppenDatasource = rdfService.GetDataSource(url);
+		LvAngebotGruppenDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		LvAngebotGruppenDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		lvangebottree.database.AddDataSource(LvAngebotGruppenDatasource);
+		lvangebottree.builder.addListener(LvAngebotTreeListener);
+		
+		//Eingefelder leeren
+		LvAngebotReset();
+	}
+	catch(e)
+	{
+		debug(e);
+	}
+}
+
+// ****
+// * Loescht die Gruppe
+// ****
+function LvAngebotGruppeDel()
+{
+	tree = document.getElementById('lehrveranstaltung-lvangebot-tree-gruppen');
+
+	//Nachsehen ob Gruppe markiert wurde
+	var idx;
+	if(tree.currentIndex>=0)
+		idx = tree.currentIndex;
+	else
+	{
+		alert('Bitte zuerst eine Gruppe markieren');
+		return false;
+	}
+
+	try
+	{
+		//ID holen
+		var col = tree.columns ? tree.columns["lehrveranstaltung-lvangebot-treecol-lvangebot_id"] : "lehrveranstaltung-lvangebot-treecol-lvangebot_id";
+		var lvangebot_id = tree.view.getCellText(idx,col);
+	}
+	catch(e)
+	{
+		alert(e);
+		return false;
+	}
 	
+	var req = new phpRequest('lvplanung/lehrveranstaltungDBDML.php','','');
+
+	req.add('type', 'lvangebot_gruppe_del');
+	req.add('lvangebot_id', lvangebot_id);
+	
+	var response = req.executePOST();
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		alert(val.dbdml_errormsg)
+	}
+	else
+	{
+		//Refresh des Trees
+		LvAngebotGruppeTreeRefresh();
+	}
+}
+
+// ****
+// * Refresht den LV-Angebot Gruppen Tree
+// ****
+function LvAngebotGruppeTreeRefresh()
+{
+    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+    try
+    {
+    	LvAngebotGruppenDatasource.Refresh(true); //Blocking
+    	lvangebottree = document.getElementById('lehrveranstaltung-lvangebot-tree-gruppen');
+    	lvangebottree.builder.rebuild();
+    }
+    catch(e)
+    {
+    	debug(e);
+    }
+}
+
+// ****
+// * Bei Auswaehlen einer Gruppe werden Eingabefelder
+// * zum Bearbeiten befuellt
+// ****
+function LvAngebotGruppeAuswahl()
+{
+	tree = document.getElementById('lehrveranstaltung-lvangebot-tree-gruppen');
+	//Falls kein Eintrag gewaehlt wurde, den ersten auswaehlen
+	var idx;
+	if(tree.currentIndex>=0)
+		idx = tree.currentIndex;
+	else
+		idx = 0;
+
+	try
+	{
+		//Daten holen
+		var col = tree.columns ? tree.columns["lehrveranstaltung-lvangebot-treecol-gruppe"] : "lehrveranstaltung-lvangebot-treecol-gruppe";
+		var gruppe = tree.view.getCellText(idx,col);
+		var col = tree.columns ? tree.columns["lehrveranstaltung-lvangebot-treecol-plaetze_inc"] : "lehrveranstaltung-lvangebot-treecol-plaetze_inc";
+		var plaetze_inc = tree.view.getCellText(idx,col);
+		var col = tree.columns ? tree.columns["lehrveranstaltung-lvangebot-treecol-plaetze_gesamt"] : "lehrveranstaltung-lvangebot-treecol-plaetze_gesamt";
+		var plaetze_gesamt = tree.view.getCellText(idx,col);
+		var col = tree.columns ? tree.columns["lehrveranstaltung-lvangebot-treecol-anmeldefenster_start"] : "lehrveranstaltung-lvangebot-treecol-anmeldefenster_start";
+		var anmeldefenster_start = tree.view.getCellText(idx,col);
+		var col = tree.columns ? tree.columns["lehrveranstaltung-lvangebot-treecol-anmeldefenster_ende"] : "lehrveranstaltung-lvangebot-treecol-anmeldefenster_ende";
+		var anmeldefenster_ende = tree.view.getCellText(idx,col);
+	}
+	catch(e)
+	{
+		return false;
+	}
+
+	//Felder befuellen
+	document.getElementById('lehrveranstaltung-lvangebot-textbox-gruppe').value = gruppe;
+	document.getElementById('lehrveranstaltung-lvangebot-textbox-incoming').value = plaetze_inc;
+	document.getElementById('lehrveranstaltung-lvangebot-textbox-gesamt').value = plaetze_gesamt;
+	document.getElementById('lehrveranstaltung-lvangebot-textbox-start').value = anmeldefenster_start;
+	document.getElementById('lehrveranstaltung-lvangebot-textbox-ende').value = anmeldefenster_ende;
+	
+	//Felder deaktivieren
+	document.getElementById('lehrveranstaltung-lvangebot-textbox-gruppe').disabled = true;
+	document.getElementById('lehrveranstaltung-lvangebot-checkbox-gruppe').disabled = true;
+	document.getElementById('lehrveranstaltung-lvangebot-checkbox-gruppe').checked = false;
+}
+
+// ****
+// * Setzt alle Eingebfelder zurueck
+// ****
+function LvAngebotReset()
+{
+	document.getElementById('lehrveranstaltung-lvangebot-textbox-gruppe').value = '';
+	document.getElementById('lehrveranstaltung-lvangebot-textbox-gruppe').disabled = false;
+	document.getElementById('lehrveranstaltung-lvangebot-checkbox-gruppe').disabled = false;
+	document.getElementById('lehrveranstaltung-lvangebot-checkbox-gruppe').checked = false;
+	document.getElementById('lehrveranstaltung-lvangebot-textbox-incoming').value = '';
+	document.getElementById('lehrveranstaltung-lvangebot-textbox-gesamt').value = '';
+	document.getElementById('lehrveranstaltung-lvangebot-textbox-start').value = '';
+	document.getElementById('lehrveranstaltung-lvangebot-textbox-ende').value = '';
+}
