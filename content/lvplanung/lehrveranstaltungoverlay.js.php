@@ -2216,3 +2216,15 @@ function LvAngebotReset()
 	document.getElementById('lehrveranstaltung-lvangebot-textbox-start').value = '';
 	document.getElementById('lehrveranstaltung-lvangebot-textbox-ende').value = '';
 }
+
+// ****
+// * Setzt alle Eingebfelder zurueck und entfernt
+// * Markierung der Gruppe
+// ****
+function LvAngebotNew()
+{
+	LvAngebotReset();
+	
+	tree = document.getElementById('lehrveranstaltung-lvangebot-tree-gruppen');
+	tree.currentIndex = -1;
+}

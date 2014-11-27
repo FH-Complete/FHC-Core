@@ -509,7 +509,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					</row>
 					<row>
 						<spacer flex="1" />
-						<button id="lehrveranstaltung-lvangebot-button-save" label="speichern" oncommand="LvAngebotGruppeSave();"/>
+						<hbox>
+							<button id="lehrveranstaltung-lvangebot-button-save" label="speichern" oncommand="LvAngebotGruppeSave();" flex="3"/>
+							<button id="lehrveranstaltung-lvangebot-button-new" label="neuer Eintrag" oncommand="LvAngebotNew();" flex="1"/>
+						</hbox>
 					</row>
 				</rows>
 			</grid>
