@@ -409,124 +409,123 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 <!-- *************************** LV-ANGEBOT ************************* -->
 <vbox id="lehrveranstaltung-lvangebot" style="margin:0px;" >
 	<hbox style="padding: 10px;">
-	<vbox width="600">
-		<hbox flex="1">
-			<tree id="lehrveranstaltung-lvangebot-tree-gruppen" seltype="single" hidecolumnpicker="false" flex="1"
-					datasources="rdf:null"
-					ref="http://www.technikum-wien.at/lvangebot/liste"
-					onselect="LvAngebotGruppeAuswahl();" flags="dont-build-content"
-					style="border: 1px solid black;"
-					context="lehrveranstaltung-lvangebot-tree-popup"
-					onkeypress="LvAngebotTreeKeyPress(event)"
-			>
-				<treecols>
-					<treecol id="lehrveranstaltung-lvangebot-treecol-lvangebot_id" label="Lvangebot_id" flex="2" hidden="true"
-						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/lvangebot/rdf#lvangebot_id"/>
-					<splitter class="tree-splitter"/>
-					<treecol id="lehrveranstaltung-lvangebot-treecol-gruppe" label="Gruppe" flex="2" hidden="false"
-						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/lvangebot/rdf#gruppe_kurzbz"/>
-					<splitter class="tree-splitter"/>
-					<treecol id="lehrveranstaltung-lvangebot-treecol-plaetze_inc" label="Plätze Incoming" flex="2" hidden="false"
-						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/lvangebot/rdf#plaetze_inc"/>
-					<splitter class="tree-splitter"/>
-					<treecol id="lehrveranstaltung-lvangebot-treecol-plaetze_gesamt" label="Plätze gesamt" flex="2" hidden="false"
-						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/lvangebot/rdf#plaetze_gesamt"/>
-					<splitter class="tree-splitter"/>
-					<treecol id="lehrveranstaltung-lvangebot-treecol-anmeldefenster_start" label="Anmeldefenster Start" flex="2" hidden="false"
-						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/lvangebot/rdf#anmeldefenster_start"/>
-					<treecol id="lehrveranstaltung-lvangebot-treecol-anmeldefenster_ende" label="Anmeldefenster Ende" flex="2" hidden="false"
-						class="sortDirectionIndicator"
-						sort="rdf:http://www.technikum-wien.at/lvangebot/rdf#anmeldefenster_ende"/>
-					<splitter class="tree-splitter"/>
-				</treecols>
-				<template>
-					<rule>
-						<treechildren>
-							<treeitem uri="rdf:*">
-								<treerow>
-									<treecell label="rdf:http://www.technikum-wien.at/lvangebot/rdf#lvangebot_id"/>
-									<treecell label="rdf:http://www.technikum-wien.at/lvangebot/rdf#gruppe_kurzbz"/>
-									<treecell label="rdf:http://www.technikum-wien.at/lvangebot/rdf#plaetze_inc"/>
-									<treecell label="rdf:http://www.technikum-wien.at/lvangebot/rdf#plaetze_gesamt"/>
-									<treecell label="rdf:http://www.technikum-wien.at/lvangebot/rdf#anmeldefenster_start"/>
-									<treecell label="rdf:http://www.technikum-wien.at/lvangebot/rdf#anmeldefenster_ende"/>
-								</treerow>
-							</treeitem>
-						</treechildren>
-					</rule>
-				</template>
-			</tree>
-			<spacer />
-		</hbox>
-	</vbox>
-	<groupbox orientation="horizontal">
-		<caption id="lehrveranstaltung-lvangebot-groupbox-caption" label="LV-Angebot" />
-		<hbox flex="1">
-			<grid>
-				<columns>
-					<column></column>
-					<column></column>
-				</columns>
-				<rows>
-					<row>
-						<hbox align="left">
-							<button id="lehrveranstaltung-lvangebot-button-new" label="neuer Eintrag" oncommand="LvAngebotNew();" width="130"/>
-						</hbox>
-						<spacer flex="1"/>
-					</row>
-					<row>
-						<label value="Gruppe" />
-						<menulist id="lehrveranstaltung-lvangebot-textbox-gruppe"
-							editable="true" datasources="rdf:null" flex="1"
-							ref="http://www.technikum-wien.at/gruppen/liste" 
-							oninput="LvAngebotGruppenLoad(this)">
-								<template>
-									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/gruppen/rdf#gruppe_kurzbz"
-											label="rdf:http://www.technikum-wien.at/gruppen/rdf#gruppe_kurzbz"
-											uri="rdf:*"/>
-									</menupopup>
-								</template>
-						</menulist>
-					</row>
-					<row>
-						<checkbox label="Neue Gruppe anlegen" id="lehrveranstaltung-lvangebot-checkbox-gruppe" onclick="ToggleGruppe();"/>
-					</row>
-					<row>
-						<label value="Plätze Incoming" />
-						<textbox id="lehrveranstaltung-lvangebot-textbox-incoming" tooltiptext=""/>
-					</row>
-					<row>
-						<label value="Plätze gesamt" />
-						<textbox id="lehrveranstaltung-lvangebot-textbox-gesamt" tooltiptext=""/>
-					</row>
-					<row>
-						<label value="Anmeldefenster Start" />
-						<hbox>
-							<box class="Datum" id="lehrveranstaltung-lvangebot-textbox-start"/>
-						</hbox>
-					</row>
-					<row>
-						<label value="Anmeldefenster Ende" />
-						<hbox>
-							<box class="Datum" id="lehrveranstaltung-lvangebot-textbox-ende"/>
-						</hbox>
-					</row>
-					<row>
-						<spacer flex="1" />
-						<hbox align="right">
-							<button id="lehrveranstaltung-lvangebot-button-save" label="speichern" oncommand="LvAngebotGruppeSave();" width="130"/>
-						</hbox>
-					</row>
-				</rows>
-			</grid>
-		</hbox>
-	</groupbox>
+		<vbox width="600">
+			<hbox flex="1">
+				<tree id="lehrveranstaltung-lvangebot-tree-gruppen" seltype="single" hidecolumnpicker="false" flex="1"
+						datasources="rdf:null"
+						ref="http://www.technikum-wien.at/lvangebot/liste"
+						onselect="LvAngebotGruppeAuswahl();" flags="dont-build-content"
+						style="border: 1px solid black;"
+						context="lehrveranstaltung-lvangebot-tree-popup"
+						onkeypress="LvAngebotTreeKeyPress(event)"
+				>
+					<treecols>
+						<treecol id="lehrveranstaltung-lvangebot-treecol-lvangebot_id" label="Lvangebot_id" flex="2" hidden="true"
+							class="sortDirectionIndicator"
+							sort="rdf:http://www.technikum-wien.at/lvangebot/rdf#lvangebot_id"/>
+						<splitter class="tree-splitter"/>
+						<treecol id="lehrveranstaltung-lvangebot-treecol-gruppe" label="Gruppe" flex="2" hidden="false"
+							class="sortDirectionIndicator"
+							sort="rdf:http://www.technikum-wien.at/lvangebot/rdf#gruppe_kurzbz"/>
+						<splitter class="tree-splitter"/>
+						<treecol id="lehrveranstaltung-lvangebot-treecol-plaetze_inc" label="Plätze Incoming" flex="2" hidden="false"
+							class="sortDirectionIndicator"
+							sort="rdf:http://www.technikum-wien.at/lvangebot/rdf#plaetze_inc"/>
+						<splitter class="tree-splitter"/>
+						<treecol id="lehrveranstaltung-lvangebot-treecol-plaetze_gesamt" label="Plätze gesamt" flex="2" hidden="false"
+							class="sortDirectionIndicator"
+							sort="rdf:http://www.technikum-wien.at/lvangebot/rdf#plaetze_gesamt"/>
+						<splitter class="tree-splitter"/>
+						<treecol id="lehrveranstaltung-lvangebot-treecol-anmeldefenster_start" label="Anmeldefenster Start" flex="2" hidden="false"
+							class="sortDirectionIndicator"
+							sort="rdf:http://www.technikum-wien.at/lvangebot/rdf#anmeldefenster_start"/>
+						<treecol id="lehrveranstaltung-lvangebot-treecol-anmeldefenster_ende" label="Anmeldefenster Ende" flex="2" hidden="false"
+							class="sortDirectionIndicator"
+							sort="rdf:http://www.technikum-wien.at/lvangebot/rdf#anmeldefenster_ende"/>
+						<splitter class="tree-splitter"/>
+					</treecols>
+					<template>
+						<rule>
+							<treechildren>
+								<treeitem uri="rdf:*">
+									<treerow>
+										<treecell label="rdf:http://www.technikum-wien.at/lvangebot/rdf#lvangebot_id"/>
+										<treecell label="rdf:http://www.technikum-wien.at/lvangebot/rdf#gruppe_kurzbz"/>
+										<treecell label="rdf:http://www.technikum-wien.at/lvangebot/rdf#plaetze_inc"/>
+										<treecell label="rdf:http://www.technikum-wien.at/lvangebot/rdf#plaetze_gesamt"/>
+										<treecell label="rdf:http://www.technikum-wien.at/lvangebot/rdf#anmeldefenster_start"/>
+										<treecell label="rdf:http://www.technikum-wien.at/lvangebot/rdf#anmeldefenster_ende"/>
+									</treerow>
+								</treeitem>
+							</treechildren>
+						</rule>
+					</template>
+				</tree>
+				<spacer />
+			</hbox>
+		</vbox>
+		<vbox>
+			<hbox>
+				<button id="lehrveranstaltung-lvangebot-button-new" label="neuer Eintrag" oncommand="LvAngebotNew();" width="130"/>
+			</hbox>
+			<groupbox orientation="horizontal">
+				<caption id="lehrveranstaltung-lvangebot-groupbox-caption" label="LV-Angebot" />
+				<hbox flex="1">
+					<grid>
+						<columns>
+							<column></column>
+							<column></column>
+						</columns>
+						<rows>
+							<row>
+								<label value="Gruppe" />
+								<menulist id="lehrveranstaltung-lvangebot-textbox-gruppe"
+									editable="true" datasources="rdf:null" flex="1"
+									ref="http://www.technikum-wien.at/gruppen/liste" 
+									oninput="LvAngebotGruppenLoad(this)">
+										<template>
+											<menupopup>
+												<menuitem value="rdf:http://www.technikum-wien.at/gruppen/rdf#gruppe_kurzbz"
+													label="rdf:http://www.technikum-wien.at/gruppen/rdf#gruppe_kurzbz"
+													uri="rdf:*"/>
+											</menupopup>
+										</template>
+								</menulist>
+							</row>
+							<row>
+								<checkbox label="Neue Gruppe anlegen" id="lehrveranstaltung-lvangebot-checkbox-gruppe" onclick="ToggleGruppe();"/>
+							</row>
+							<row>
+								<label value="Plätze Incoming" />
+								<textbox id="lehrveranstaltung-lvangebot-textbox-incoming" tooltiptext=""/>
+							</row>
+							<row>
+								<label value="Plätze gesamt" />
+								<textbox id="lehrveranstaltung-lvangebot-textbox-gesamt" tooltiptext=""/>
+							</row>
+							<row>
+								<label value="Anmeldefenster Start" />
+								<hbox>
+									<box class="Datum" id="lehrveranstaltung-lvangebot-textbox-start"/>
+								</hbox>
+							</row>
+							<row>
+								<label value="Anmeldefenster Ende" />
+								<hbox>
+									<box class="Datum" id="lehrveranstaltung-lvangebot-textbox-ende"/>
+								</hbox>
+							</row>
+							<row>
+								<spacer flex="1" />
+								<hbox align="right">
+									<button id="lehrveranstaltung-lvangebot-button-save" label="speichern" oncommand="LvAngebotGruppeSave();" width="130"/>
+								</hbox>
+							</row>
+						</rows>
+					</grid>
+				</hbox>
+			</groupbox>
+		</vbox>
 	</hbox>
 </vbox>
 </overlay>
