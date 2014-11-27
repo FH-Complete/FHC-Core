@@ -1993,7 +1993,13 @@ function LvAngebotGruppeSave()
 {
 	var tree = document.getElementById('lehrveranstaltung-tree');
 	var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrveranstaltung_id"] : "lehrveranstaltung-treecol-lehrveranstaltung_id";
-
+	
+	if(tree.currentIndex == -1)
+	{
+		alert('Bitte zuerst eine Lehrveranstaltung auswaehlen');
+		return false;
+	}
+	
 	//Werte holen
 	var lehrveranstaltung_id = tree.view.getCellText(tree.currentIndex,col);
 	var neue_gruppe = document.getElementById('lehrveranstaltung-lvangebot-checkbox-gruppe').checked;
@@ -2224,7 +2230,5 @@ function LvAngebotReset()
 function LvAngebotNew()
 {
 	LvAngebotReset();
-	
-	tree = document.getElementById('lehrveranstaltung-lvangebot-tree-gruppen');
-	tree.currentIndex = -1;
+	LvAngebotGruppeTreeRefresh();
 }
