@@ -46,7 +46,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			<menuitem label="Entfernen" oncommand="LeMitarbeiterDel();" />
 		</menupopup>
 	</popupset>
-
+	<popupset>
+		<menupopup id="lehrveranstaltung-lvangebot-tree-popup">
+			<menuitem label="Entfernen" oncommand="LvAngebotGruppeDel();" />
+		</menupopup>
+	</popupset>
 	<!-- Hidden Fields -->
 	<vbox hidden="true">
 		<grid flex="1" style="padding:5px;">
@@ -412,7 +416,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					ref="http://www.technikum-wien.at/lvangebot/liste"
 					onselect="LvAngebotGruppeAuswahl();" flags="dont-build-content"
 					style="border: 1px solid black;"
-					context="lehrveranstaltung-lektor-tree-popup"
+					context="lehrveranstaltung-lvangebot-tree-popup"
 					onkeypress="LvAngebotTreeKeyPress(event)"
 			>
 				<treecols>
@@ -470,6 +474,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				</columns>
 				<rows>
 					<row>
+						<hbox align="left">
+							<button id="lehrveranstaltung-lvangebot-button-new" label="neuer Eintrag" oncommand="LvAngebotNew();" width="130"/>
+						</hbox>
+						<spacer flex="1"/>
+					</row>
+					<row>
 						<label value="Gruppe" />
 						<menulist id="lehrveranstaltung-lvangebot-textbox-gruppe"
 							editable="true" datasources="rdf:null" flex="1"
@@ -509,9 +519,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					</row>
 					<row>
 						<spacer flex="1" />
-						<hbox>
-							<button id="lehrveranstaltung-lvangebot-button-save" label="speichern" oncommand="LvAngebotGruppeSave();" flex="3"/>
-							<button id="lehrveranstaltung-lvangebot-button-new" label="neuer Eintrag" oncommand="LvAngebotNew();" flex="1"/>
+						<hbox align="right">
+							<button id="lehrveranstaltung-lvangebot-button-save" label="speichern" oncommand="LvAngebotGruppeSave();" width="130"/>
 						</hbox>
 					</row>
 				</rows>
