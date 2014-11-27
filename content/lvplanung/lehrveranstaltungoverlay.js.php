@@ -2140,6 +2140,7 @@ function LvAngebotGruppeDel()
 	{
 		//Refresh des Trees
 		LvAngebotGruppeTreeRefresh();
+		LvAngebotReset();
 	}
 }
 
@@ -2200,11 +2201,6 @@ function LvAngebotGruppeAuswahl()
 	document.getElementById('lehrveranstaltung-lvangebot-textbox-gesamt').value = plaetze_gesamt;
 	document.getElementById('lehrveranstaltung-lvangebot-textbox-start').value = anmeldefenster_start;
 	document.getElementById('lehrveranstaltung-lvangebot-textbox-ende').value = anmeldefenster_ende;
-	
-	//Felder deaktivieren
-	document.getElementById('lehrveranstaltung-lvangebot-textbox-gruppe').disabled = true;
-	document.getElementById('lehrveranstaltung-lvangebot-checkbox-gruppe').disabled = true;
-	document.getElementById('lehrveranstaltung-lvangebot-checkbox-gruppe').checked = false;
 }
 
 // ****
@@ -2214,7 +2210,6 @@ function LvAngebotReset()
 {
 	document.getElementById('lehrveranstaltung-lvangebot-textbox-gruppe').value = '';
 	document.getElementById('lehrveranstaltung-lvangebot-textbox-gruppe').disabled = false;
-	document.getElementById('lehrveranstaltung-lvangebot-checkbox-gruppe').disabled = false;
 	document.getElementById('lehrveranstaltung-lvangebot-checkbox-gruppe').checked = false;
 	document.getElementById('lehrveranstaltung-lvangebot-textbox-incoming').value = '';
 	document.getElementById('lehrveranstaltung-lvangebot-textbox-gesamt').value = '';
