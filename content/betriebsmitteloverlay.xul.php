@@ -181,12 +181,16 @@ else
 										<label value="Typ" control="betriebsmittel-menulist-betriebsmitteltyp"/>
 										<menulist id="betriebsmittel-menulist-betriebsmitteltyp" 
 											disabled="true" flex="1"
+											datasources="<?php echo APP_ROOT ?>rdf/betriebsmitteltyp.rdf.php"
+											ref="http://www.technikum-wien.at/betriebsmitteltyp/liste"
 											oncommand="BetriebsmittelTypChange();">
-											<menupopup>
-													<menuitem value="Zutrittskarte" label="Zutrittskarte"/>
-													<menuitem value="Schluessel" label="Schluessel"/>
-													<menuitem value="Inventar" label="Inventar"/>
-											</menupopup>
+											<template>
+												<menupopup>
+													<menuitem value="rdf:http://www.technikum-wien.at/betriebsmitteltyp/rdf#betriebsmitteltyp"
+										        		      label="rdf:http://www.technikum-wien.at/betriebsmitteltyp/rdf#beschreibung"
+													  		  uri="rdf:*"/>
+												</menupopup>
+											</template>
 										</menulist>
 									</row>
 									<row id="betriebsmittel-row-nummer">
