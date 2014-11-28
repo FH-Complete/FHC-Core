@@ -360,3 +360,47 @@ function MitarbeiterBuchungDetailReset()
 
 	document.getElementById('mitarbeiter-buchung-textbox-buchungsdatum').value=tag+'.'+monat+'.'+jahr;
 }
+
+// ****
+// * Legt ein neues Konto für den Mitarbeiter an
+// ****
+function MitarbeiterBuchungKontoAnlegen()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	
+	var tree = document.getElementById('mitarbeiter-tree');
+	if (tree.currentIndex == -1)
+	{
+		alert('Bitte waehlen Sie einen Mitarbeiter aus');
+		return false;
+	}
+
+	// Daten holen
+	vorname = getTreeCellText(tree, 'mitarbeiter-treecol-vorname', tree.currentIndex);
+	nachname = getTreeCellText(tree, 'mitarbeiter-treecol-nachname', tree.currentIndex);
+	uid = getTreeCellText(tree, 'mitarbeiter-treecol-uid', tree.currentIndex);
+	kurzbz = getTreeCellText(tree, 'mitarbeiter-treecol-kurzbz', tree.currentIndex);
+	
+	var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'kontosave');
+	req.add('beschreibung', vorname + ' ' + nachname + ' ' + uid);
+	req.add('kurzbz', kurzbz);
+	
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+	}
+	else
+	{
+		SetStatusBarText('Daten wurden gespeichert');
+	}
+}

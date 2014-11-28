@@ -227,6 +227,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							</grid>
 							<hbox>
 								<spacer flex="1" />
+								<button id="mitarbeiter-buchung-button-konto" oncommand="MitarbeiterBuchungKontoAnlegen()" label="Konto anlegen"/>
 								<button id="mitarbeiter-buchung-button-speichern" oncommand="MitarbeiterBuchungDetailSpeichern()" label="Speichern" disabled="true"/>
 							</hbox>
 						</groupbox>

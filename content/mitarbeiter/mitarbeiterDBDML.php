@@ -39,6 +39,7 @@ require_once('../../include/pruefung.class.php');
 require_once('../../include/projektbetreuer.class.php');
 require_once('../../include/vertrag.class.php');
 require_once('../../include/lehreinheitmitarbeiter.class.php');
+require_once('../../include/wawi_konto.class.php');
 
 $user = get_uid();
 
@@ -657,6 +658,30 @@ if(!$error)
 			}
 			else
 				$return = false;
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='kontosave')
+	{
+		// Legt ein neues Konto für den Mitarbeiter an
+		$konto = new wawi_konto;
+		$konto->new = true;
+		$konto->aktiv = true;
+		$konto->insertamum = date('Y-m-d H:i:s');
+		$konto->insertvon = $user;
+		$konto->beschreibung['German'] = $_POST['beschreibung'];
+		$konto->kurzbz = $_POST['kurzbz'];
+		
+		if (!$konto->save())
+		{
+			$error = true;
+			$return = false;
+			$errormsg = $konto->errormsg;
+		}
+		else
+		{
+			$error = false;
+			$return = true;
+			$errormsg = "";
 		}
 	}
 	else
