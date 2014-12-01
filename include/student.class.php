@@ -63,12 +63,12 @@ class student extends benutzer
 		if(!benutzer::load($uid))
 			return false;
 		if(is_null($studiensemester_kurzbz))
-			$qry = "SELECT * FROM public.tbl_student WHERE student_uid='".addslashes($uid)."'";
+			$qry = "SELECT * FROM public.tbl_student WHERE student_uid=".$this->db_add_param($uid);
 		else
 			$qry = "SELECT *, tbl_studentlehrverband.studiengang_kz as studiengang_kz, tbl_studentlehrverband.semester as semester,
 					tbl_studentlehrverband.verband as verband, tbl_studentlehrverband.gruppe as gruppe  
 					FROM public.tbl_student JOIN public.tbl_studentlehrverband USING(student_uid) 
-					WHERE studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND student_uid='".addslashes($uid)."'";
+					WHERE studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)." AND student_uid=".$this->db_add_param($uid);
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -96,7 +96,7 @@ class student extends benutzer
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Auslesen des Studenten '.$qry;
+			$this->errormsg = 'Fehler beim Auslesen des Studenten';
 			return false;
 		}
 	}
@@ -190,33 +190,32 @@ class student extends benutzer
 			//Neuen Datensatz anlegen
 			$qry = "INSERT INTO public.tbl_student(student_uid, matrikelnr, updateamum, updatevon, prestudent_id,
 			                    studiengang_kz, semester, ext_id, verband, gruppe, insertamum, insertvon)
-			        VALUES('".addslashes($this->uid)."',".
-			 	 	$this->addslashes($this->matrikelnr).",".
-			 	 	$this->addslashes($this->updateamum).','.
-			 	 	$this->addslashes($this->updatevon).','.
-			 	 	$this->addslashes($this->prestudent_id).','.
-					$this->studiengang_kz.','.
-					$this->semester.','.
-					($this->ext_id_student!=''?$this->ext_id_student:'null').','.
-					($this->verband!=''?"'".addslashes($this->verband)."'":"' '").','.
-					($this->gruppe!=''?"'".addslashes($this->gruppe)."'":"' '").','.
-					$this->addslashes($this->insertamum).','.
-					$this->addslashes($this->insertvon).');';
+			        VALUES(".$this->db_add_param($this->uid).",".
+			 	 	$this->db_add_param($this->matrikelnr).",".
+			 	 	$this->db_add_param($this->updateamum).','.
+			 	 	$this->db_add_param($this->updatevon).','.
+			 	 	$this->db_add_param($this->prestudent_id, FHC_INTEGER).','.
+					$this->db_add_param($this->studiengang_kz).','.
+					$this->db_add_param($this->semester).','.
+					$this->db_add_param($this->ext_id_student).','.
+					$this->db_add_param(($this->verband==''?' ':$this->verband)).','.
+					$this->db_add_param(($this->gruppe==''?' ':$this->gruppe)).','.
+					$this->db_add_param($this->insertamum).','.
+					$this->db_add_param($this->insertvon).');';
 		}
 		else
 		{
 			//Bestehenden Datensatz updaten
 			$qry = 'UPDATE public.tbl_student SET'.
-			       ' matrikelnr='.$this->addslashes($this->matrikelnr).','.
-			       ' updateamum='.$this->addslashes($this->updateamum).','.
-			       ' updatevon='.$this->addslashes($this->updatevon).','.
-			       //' prestudent_id='.$this->addslashes($this->prestudent_id).','.
-			       ' studiengang_kz='.$this->studiengang_kz.','.
-			       ' semester='.$this->semester.','.
-			       ' ext_id='.($this->ext_id_student!=''?$this->ext_id_student:'null').','.
-			       ' verband='.($this->verband!=''?"'".addslashes($this->verband)."'":"' '").','.
-			       ' gruppe='.($this->gruppe!=''?"'".addslashes($this->gruppe)."'":"' '").
-			       " WHERE student_uid='".addslashes($this->uid)."';";
+			       ' matrikelnr='.$this->db_add_param($this->matrikelnr).','.
+			       ' updateamum='.$this->db_add_param($this->updateamum).','.
+			       ' updatevon='.$this->db_add_param($this->updatevon).','.
+			       ' studiengang_kz='.$this->db_add_param($this->studiengang_kz).','.
+			       ' semester='.$this->db_add_param($this->semester).','.
+			       ' ext_id='.$this->db_add_param($this->ext_id_student).','.
+			       ' verband='.$this->db_add_param(($this->verband==''?' ':$this->verband)).','.
+			       ' gruppe='.$this->db_add_param(($this->gruppe==''?' ':$this->gruppe)).
+			       " WHERE student_uid=".$this->db_add_param($this->uid).";";
 		}
 		
 		if($this->db_query($qry))
@@ -228,7 +227,7 @@ class student extends benutzer
 		else
 		{
 			$this->db_query('ROLLBACK;');
-			$this->errormsg = 'Fehler beim Speichern des Studenten-Datensatzes'.$qry;
+			$this->errormsg = 'Fehler beim Speichern des Studenten-Datensatzes';
 			return false;
 		}
 	}
@@ -249,25 +248,24 @@ class student extends benutzer
 		$where = '';
 		if ($gruppe!=null)
 		{
-			$where=" gruppe_kurzbz='".addslashes($gruppe)."' AND tbl_benutzer.uid=tbl_benutzergruppe.uid";
+			$where=" gruppe_kurzbz=".$this->db_add_param($gruppe)." AND tbl_benutzer.uid=tbl_benutzergruppe.uid";
 			if($stsem!=null)
-				$where.=" AND tbl_benutzergruppe.studiensemester_kurzbz='".addslashes($stsem)."'";
+				$where.=" AND tbl_benutzergruppe.studiensemester_kurzbz=".$this->db_add_param($stsem);
 		}
 		else
 		{
-			$where.=" tbl_studentlehrverband.studiengang_kz='".addslashes($stg_kz)."'";
+			$where.=" tbl_studentlehrverband.studiengang_kz=".$this->db_add_param($stg_kz);
 			if ($sem!=null)
-				$where.=" AND tbl_studentlehrverband.semester='".addslashes($sem)."'";
+				$where.=" AND tbl_studentlehrverband.semester=".$this->db_add_param($sem);
 			if ($ver!=null)
-				$where.=" AND tbl_studentlehrverband.verband='".addslashes($ver)."'";
+				$where.=" AND tbl_studentlehrverband.verband=".$this->db_add_param($ver);
 			if ($grp!=null)
-				$where.=" AND tbl_studentlehrverband.gruppe='".addslashes($grp)."'";
+				$where.=" AND tbl_studentlehrverband.gruppe=".$this->db_add_param($grp);
 		}			
 
 		if($stsem!=null)
-				$where.=" AND tbl_studentlehrverband.studiensemester_kurzbz='".addslashes($stsem)."'";
+				$where.=" AND tbl_studentlehrverband.studiensemester_kurzbz=".$this->db_add_param($stsem);
 		
-		//$sql_query="SELECT * FROM campus.vw_student WHERE $where ORDER by nachname,vorname";
 		$sql_query = "SELECT *, tbl_student.semester as std_semester, tbl_student.verband as std_verband, tbl_student.gruppe as std_gruppe, tbl_student.studiengang_kz as std_studiengang_kz,
 					  tbl_studentlehrverband.studiengang_kz as lvb_studiengang_kz, tbl_studentlehrverband.semester as lvb_semester, tbl_studentlehrverband.verband as lvb_verband, tbl_studentlehrverband.gruppe as lvb_gruppe 
 					  FROM public.tbl_person, public.tbl_student, public.tbl_benutzer, public.tbl_studentlehrverband, public.tbl_prestudent";
@@ -301,7 +299,7 @@ class student extends benutzer
 			$l->svnr=$row->svnr;
 			$l->foto=$row->foto;
 			$l->anmerkungen=$row->anmerkung;
-			$l->aktiv=$row->aktiv=='t'?true:false;
+			$l->aktiv=$this->db_parse_bool($row->aktiv);
 			$l->alias=$row->alias;
 			$l->homepage=$row->homepage;
 			$l->updateamum=(isset($row->updateamum)?$row->updateamum:'');
@@ -394,7 +392,7 @@ class student extends benutzer
 	public function studentlehrverband_exists($student_uid, $studiensemester_kurzbz)
 	{
 		$qry = "SELECT count(*) as anzahl FROM public.tbl_studentlehrverband 
-				WHERE student_uid='".addslashes($student_uid)."' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+				WHERE student_uid=".$this->db_add_param($student_uid)." AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 		
 		if($this->db_query($qry))
 		{
@@ -428,8 +426,8 @@ class student extends benutzer
 	public function load_studentlehrverband($student_uid, $studiensemester_kurzbz)
 	{
 		$qry = "SELECT * FROM public.tbl_studentlehrverband 
-				WHERE student_uid='".addslashes($student_uid)."' 
-				AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+				WHERE student_uid=".$this->db_add_param($student_uid)."
+				AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 		
 		if($this->db_query($qry))
 		{
@@ -474,27 +472,27 @@ class student extends benutzer
 		if($new)
 		{
 			$qry = "INSERT INTO public.tbl_studentlehrverband (student_uid, studiensemester_kurzbz, studiengang_kz, semester, verband, gruppe, updateamum, updatevon, insertamum, insertvon)
-					VALUES(".$this->addslashes($this->uid).','.
-					$this->addslashes($this->studiensemester_kurzbz).','.
-					$this->addslashes($this->studiengang_kz).','.
-					$this->addslashes($this->semester).','.
-					$this->addslashes(($this->verband==''?' ':$this->verband)).','.
-					$this->addslashes(($this->gruppe==''?' ':$this->gruppe)).','.
-					$this->addslashes($this->updateamum).','.
-					$this->addslashes($this->updatevon).','.
-					$this->addslashes($this->insertamum).','.
-					$this->addslashes($this->insertvon).');';
+					VALUES(".$this->db_add_param($this->uid).','.
+					$this->db_add_param($this->studiensemester_kurzbz).','.
+					$this->db_add_param($this->studiengang_kz).','.
+					$this->db_add_param($this->semester).','.
+					$this->db_add_param(($this->verband==''?' ':$this->verband)).','.
+					$this->db_add_param(($this->gruppe==''?' ':$this->gruppe)).','.
+					$this->db_add_param($this->updateamum).','.
+					$this->db_add_param($this->updatevon).','.
+					$this->db_add_param($this->insertamum).','.
+					$this->db_add_param($this->insertvon).');';
 		}
 		else 
 		{
 			$qry = "UPDATE public.tbl_studentlehrverband SET".
-					" studiengang_kz=".$this->addslashes($this->studiengang_kz).",".
-					" semester=".$this->addslashes($this->semester).",".
-					" verband=".$this->addslashes(($this->verband==''?' ':$this->verband)).",".
-					" gruppe=".$this->addslashes(($this->gruppe==''?' ':$this->gruppe)).",".
-					" updateamum=".$this->addslashes($this->updateamum).",".
-					" updatevon=".$this->addslashes($this->updatevon).
-					" WHERE student_uid='".addslashes($this->uid)."' AND studiensemester_kurzbz='".addslashes($this->studiensemester_kurzbz)."'";
+					" studiengang_kz=".$this->db_add_param($this->studiengang_kz).",".
+					" semester=".$this->db_add_param($this->semester).",".
+					" verband=".$this->db_add_param(($this->verband==''?' ':$this->verband)).",".
+					" gruppe=".$this->db_add_param(($this->gruppe==''?' ':$this->gruppe)).",".
+					" updateamum=".$this->db_add_param($this->updateamum).",".
+					" updatevon=".$this->db_add_param($this->updatevon).
+					" WHERE student_uid=".$this->db_add_param($this->uid)." AND studiensemester_kurzbz=".$this->db_add_param($this->studiensemester_kurzbz);
 		}
 		
 		if($this->db_query($qry))
@@ -521,7 +519,7 @@ class student extends benutzer
 			return false;
 		}
 		
-		$qry = "SELECT student_uid FROM public.tbl_student WHERE prestudent_id='$prestudent_id'";
+		$qry = "SELECT student_uid FROM public.tbl_student WHERE prestudent_id=".$this->db_add_param($prestudent_id);
 		
 		if($this->db_query($qry))
 		{
@@ -549,7 +547,7 @@ class student extends benutzer
 	 */
 	public function getUidFromMatrikelnummer($matrikelnummer)
 	{
-		$qry = "SELECT student_uid FROM public.tbl_student WHERE matrikelnr='".addslashes($matrikelnummer)."'";
+		$qry = "SELECT student_uid FROM public.tbl_student WHERE matrikelnr=".$this->db_add_param($matrikelnummer);
 		
 		if($this->db_query($qry))
 		{
@@ -581,7 +579,7 @@ class student extends benutzer
 	public function load_person($person_id, $studiengang_kz)
 	{
 		$qry = "SELECT tbl_student.* FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid)
-				WHERE person_id='".addslashes($person_id)."' AND studiengang_kz='".addslashes($studiengang_kz)."'
+				WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER)." AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER)."
 				ORDER BY prestudent_id DESC LIMIT 1";
 		
 		if($this->db_query($qry))
@@ -611,7 +609,7 @@ class student extends benutzer
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Auslesen des Studenten '.$qry;
+			$this->errormsg = 'Fehler beim Auslesen des Studenten';
 			return false;
 		}
 	}
@@ -639,10 +637,10 @@ class student extends benutzer
 		
 		if($filter!='')
 		{
-			$sql_query.=" AND 	nachname ~* '".addslashes($filter)."' OR 
-								vorname ~* '".addslashes($filter)."' OR
-								(nachname || ' ' || vorname) ~* '".addslashes($filter)."' OR
-								(vorname || ' ' || nachname) ~* '".addslashes($filter)."'";
+			$sql_query.=" AND 	nachname ~* ".$this->db_add_param($filter)." OR 
+								vorname ~* ".$this->db_add_param($filter)." OR
+								(nachname || ' ' || vorname) ~* ".$this->db_add_param($filter)." OR
+								(vorname || ' ' || nachname) ~* ".$this->db_add_param($filter);
 		}
 
 		$sql_query .= " ORDER BY $order";
@@ -674,9 +672,9 @@ class student extends benutzer
 				$l->familienstand = $row->familienstand;
 				$l->geschlecht = $row->geschlecht;
 				$l->anzahlkinder = $row->anzahlkinder;
-				$l->aktiv = ($row->aktiv=='t'?true:false);
+				$l->aktiv = $this->db_parse_bool($row->aktiv);
 				$l->kurzbeschreibung = $row->kurzbeschreibung;
-				$l->bnaktiv = ($row->bnaktiv=='t'?true:false);
+				$l->bnaktiv = $this->db_parse_bool($row->bnaktiv);
 				$l->studiengang_kz = $row->studiengang_kz;
 				$l->semester = $row->semester;
 				$l->verband = $row->verband;

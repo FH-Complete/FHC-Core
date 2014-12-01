@@ -285,8 +285,8 @@ if(!$error)
 		$data = '';
 	}
 }
-?>
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <RDF:RDF
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	xmlns:NC="http://home.netscape.com/NC-rdf#"
@@ -295,10 +295,12 @@ if(!$error)
   <RDF:Seq RDF:about="http://www.technikum-wien.at/dbdml/msg">
 	<RDF:li>
     	<RDF:Description RDF:about="http://www.technikum-wien.at/dbdml/0" >
-    		<DBDML:return><?php echo ($return?'true':'false'); ?></DBDML:return>
-        	<DBDML:errormsg><![CDATA[<?php echo $errormsg; ?>]]></DBDML:errormsg>
-        	<DBDML:data><![CDATA[<?php echo $data ?>]]></DBDML:data>
+    		<DBDML:return>'.($return?'true':'false').'</DBDML:return>
+        	<DBDML:errormsg><![CDATA['.$errormsg.']]></DBDML:errormsg>
+        	<DBDML:data><![CDATA['.$data.']]></DBDML:data>
         </RDF:Description>
 	</RDF:li>
   </RDF:Seq>
 </RDF:RDF>
+';
+?>

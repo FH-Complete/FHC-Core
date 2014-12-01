@@ -195,7 +195,7 @@ class organisationseinheit extends basis_db
 			WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as 
 			(
 				SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit 
-				WHERE oe_kurzbz='".addslashes($oe_kurzbz)."'
+				WHERE oe_kurzbz=".$this->db_add_param($oe_kurzbz)."
 				UNION ALL
 				SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes 
 				WHERE o.oe_parent_kurzbz=oes.oe_kurzbz
@@ -219,7 +219,7 @@ class organisationseinheit extends basis_db
 		else 
 		{		
 			//vor 8.4 muss die Rekursion in PHP aufgeloest werden
-			$qry = "SELECT * FROM public.tbl_organisationseinheit WHERE oe_parent_kurzbz = '$oe_kurzbz'";
+			$qry = "SELECT * FROM public.tbl_organisationseinheit WHERE oe_parent_kurzbz = ".$this->db_add_param($oe_kurzbz);
 		
 			if($myresult = $this->db_query($qry))
 			{
@@ -245,7 +245,7 @@ class organisationseinheit extends basis_db
 	public function getDirectChilds($oe_kurzbz)
 	{		
 		$childs = array();
-		$qry = "SELECT * FROM public.tbl_organisationseinheit WHERE oe_parent_kurzbz = '$oe_kurzbz' ORDER BY organisationseinheittyp_kurzbz DESC, bezeichnung";
+		$qry = "SELECT * FROM public.tbl_organisationseinheit WHERE oe_parent_kurzbz = ".$this->db_add_param($oe_kurzbz)." ORDER BY organisationseinheittyp_kurzbz DESC, bezeichnung";
 		
 		if($this->db_query($qry))
 		{
@@ -531,26 +531,26 @@ class organisationseinheit extends basis_db
 	    
 	    if($this->db_query($qry))
 	    {
-		while($row = $this->db_fetch_object())
-		{
-		    $obj = new organisationseinheit();
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new organisationseinheit();
 
-		    $obj->oe_kurzbz = $row->oe_kurzbz;
-		    $obj->oe_parent_kurzbz = $row->oe_parent_kurzbz;
-		    $obj->bezeichnung = $row->bezeichnung;
-		    $obj->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
-		    $obj->aktiv = $this->db_parse_bool($row->aktiv);
-		    $obj->mailverteiler = $this->db_parse_bool($row->mailverteiler);
-		    $obj->lehre = $this->db_parse_bool($row->lehre);
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->oe_parent_kurzbz = $row->oe_parent_kurzbz;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$obj->mailverteiler = $this->db_parse_bool($row->mailverteiler);
+				$obj->lehre = $this->db_parse_bool($row->lehre);
 
-		    $this->result[] = $obj;
-		}
-		return true;
+				$this->result[] = $obj;
+			}
+			return true;
 	    }
 	    else 
 	    {
-		$this->errormsg = 'Fehler beim Laden der Organisationseinheiten';
-		return false;
+			$this->errormsg = 'Fehler beim Laden der Organisationseinheiten';
+			return false;
 	    }
 	}
 	
@@ -562,32 +562,32 @@ class organisationseinheit extends basis_db
 	public function search($searchItem)
 	{
 	    $qry = 'SELECT * FROM public.tbl_organisationseinheit WHERE 
-	    		(LOWER(bezeichnung) LIKE LOWER(\'%'.(implode(' ',$searchItem)).'%\') OR
-	    		LOWER(organisationseinheittyp_kurzbz) LIKE LOWER(\'%'.(implode(' ',$searchItem)).'%\'))
+	    		(LOWER(bezeichnung) LIKE LOWER(\'%'.$this->db_escape((implode(' ',$searchItem))).'%\') OR
+	    		LOWER(organisationseinheittyp_kurzbz) LIKE LOWER(\'%'.$this->db_escape((implode(' ',$searchItem))).'%\'))
 	    		ORDER BY organisationseinheittyp_kurzbz, bezeichnung;';
 	    
 	    if($this->db_query($qry))
 	    {
-		while($row = $this->db_fetch_object())
-		{
-		    $obj = new organisationseinheit();
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new organisationseinheit();
 
-		    $obj->oe_kurzbz = $row->oe_kurzbz;
-		    $obj->oe_parent_kurzbz = $row->oe_parent_kurzbz;
-		    $obj->bezeichnung = $row->bezeichnung;
-		    $obj->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
-		    $obj->aktiv = $this->db_parse_bool($row->aktiv);
-		    $obj->mailverteiler = $this->db_parse_bool($row->mailverteiler);
-		    $obj->lehre = $this->db_parse_bool($row->lehre);
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->oe_parent_kurzbz = $row->oe_parent_kurzbz;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$obj->mailverteiler = $this->db_parse_bool($row->mailverteiler);
+				$obj->lehre = $this->db_parse_bool($row->lehre);
 
-		    $this->result[] = $obj;
-		}
-		return true;
+				$this->result[] = $obj;
+			}
+			return true;
 	    }
 	    else 
 	    {
-		$this->errormsg = 'Fehler beim Laden der Organisationseinheiten';
-		return false;
+			$this->errormsg = 'Fehler beim Laden der Organisationseinheiten';
+			return false;
 	    }
 	}
 	
@@ -661,26 +661,26 @@ class organisationseinheit extends basis_db
 
 	    if($this->db_query($qry))
 	    {
-		while($row = $this->db_fetch_object())
-		{
-		    $obj = new organisationseinheit();
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new organisationseinheit();
 
-		    $obj->oe_kurzbz = $row->oe_kurzbz;
-		    $obj->oe_parent_kurzbz = $row->oe_parent_kurzbz;
-		    $obj->bezeichnung = $row->bezeichnung;
-		    $obj->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
-		    $obj->aktiv = $this->db_parse_bool($row->aktiv);
-		    $obj->lehre = $this->db_parse_bool($row->lehre);
-		    $obj->anzahl = $row->anzahl;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->oe_parent_kurzbz = $row->oe_parent_kurzbz;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->organisationseinheittyp_kurzbz = $row->organisationseinheittyp_kurzbz;
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$obj->lehre = $this->db_parse_bool($row->lehre);
+				$obj->anzahl = $row->anzahl;
 
-		    $this->result[] = $obj;
-		}
-		return true;
+				$this->result[] = $obj;
+			}
+			return true;
 	    }
 	    else 
 	    {
-		$this->errormsg = 'Fehler beim Laden der Organisationseinheiten';
-		return false;
+			$this->errormsg = 'Fehler beim Laden der Organisationseinheiten';
+			return false;
 	    }
 	}
 }

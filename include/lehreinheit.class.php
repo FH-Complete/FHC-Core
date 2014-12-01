@@ -329,7 +329,6 @@ class lehreinheit extends basis_db
 		}
 		if($this->raumtypalternativ=='')
 		{
-			//TODO
 			$this->raumtypalternativ='Dummy';
 		}
 		if(!is_bool($this->lehre))
@@ -491,16 +490,16 @@ class lehreinheit extends basis_db
 		//Lektoren SQL
 		$sql_lkt='';
 		foreach ($this->mitarbeiter_uid as $lkt)
-			$sql_lkt.="OR mitarbeiter_uid='".addslashes($lkt)."' ";
+			$sql_lkt.="OR mitarbeiter_uid=".$this->db_add_param($lkt).' ';
 		$sql_lkt=mb_substr($sql_lkt,3);
 		$sql_lkt="(($sql_lkt) AND mitarbeiter_uid!='_DummyLektor')";
 
 		// Datenbank abfragen
 		$sql_query="SELECT $stpl_id FROM $stpl_table
-					WHERE datum='".addslashes($datum)."' AND stunde='".addslashes($stunde)."'
-					AND (ort_kurzbz='".addslashes($ort)."' OR $sql_lkt)";
+					WHERE datum=".$this->db_add_param($datum)." AND stunde=".$this->db_add_param($stunde)."
+					AND (ort_kurzbz=".$this->db_add_param($ort)." OR $sql_lkt)";
 		if (is_numeric($this->unr))
-			$sql_query.=" AND unr!='".addslashes($this->unr)."'";
+			$sql_query.=" AND unr!=".$this->db_add_param($this->unr);
 				
 		if (!$this->db_query($sql_query))
 		{
@@ -515,22 +514,22 @@ class lehreinheit extends basis_db
 		{
 			//Gruppen / Verbaende pruefen
 			$sql_query="SELECT $stpl_id, studiengang_kz, semester, verband, gruppe_kurzbz, stunde, gruppe FROM $stpl_table
-					WHERE datum='".addslashes($datum)."' AND stunde='".addslashes($stunde)."'";
+					WHERE datum=".$this->db_add_param($datum)." AND stunde=".$this->db_add_param($stunde);
 			if (is_numeric($this->unr))
-				$sql_query.=" AND unr!='".addslashes($this->unr)."' AND (1=2 ";
+				$sql_query.=" AND unr!=".$this->db_add_param($this->unr)." AND (1=2 ";
 				
 			for($anz=0;$anz<count($this->studiengang_kz);$anz++)
 			{	
-				$sql_query.=" OR ((studiengang_kz=".$this->studiengang_kz[$anz]." AND semester=".$this->semester[$anz].")";
+				$sql_query.=" OR ((studiengang_kz=".$this->db_add_param($this->studiengang_kz[$anz])." AND semester=".$this->db_add_param($this->semester[$anz]).")";
 			
 				if ($this->gruppe_kurzbz[$anz]!=null && $this->gruppe_kurzbz[$anz]!='' && $this->gruppe_kurzbz[$anz]!=' ')
-					$sql_query.=" OR (gruppe_kurzbz='".$this->gruppe_kurzbz[$anz]."')";
+					$sql_query.=" OR (gruppe_kurzbz=".$this->db_add_param($this->gruppe_kurzbz[$anz]).")";
 				else
 				{
 					if ($this->verband[$anz]!=null && $this->verband[$anz]!='' && $this->verband[$anz]!=' ')
-						$sql_query.=" AND (verband='".$this->verband[$anz]."' OR verband IS NULL OR verband='' OR verband=' ')";
+						$sql_query.=" AND (verband=".$this->db_add_param($this->verband[$anz])." OR verband IS NULL OR verband='' OR verband=' ')";
 					if ($this->gruppe[$anz]!=null && $this->gruppe[$anz]!='' && $this->gruppe[$anz]!=' ')
-						$sql_query.=" AND (gruppe='".$this->gruppe[$anz]."' OR gruppe IS NULL OR gruppe='' OR gruppe=' ')";
+						$sql_query.=" AND (gruppe=".$this->db_add_param($this->gruppe[$anz])." OR gruppe IS NULL OR gruppe='' OR gruppe=' ')";
 				}
 				$sql_query.=')';
 			}	
@@ -558,8 +557,8 @@ class lehreinheit extends basis_db
 					$sql_lkt="(($sql_lkt) AND uid!='_DummyLektor')";
 					$sql_query="SELECT reservierung_id AS id, uid AS lektor, stg_kurzbz, ort_kurzbz, semester, verband, gruppe, gruppe_kurzbz, datum, stunde 
 								FROM lehre.vw_reservierung
-								WHERE datum='".addslashes($datum)."' AND stunde='".addslashes($stunde)."' 
-								AND (ort_kurzbz='".addslashes($ort)."' OR $sql_lkt)";
+								WHERE datum=".$this->db_add_param($datum)." AND stunde=".$this->db_add_param($stunde)."
+								AND (ort_kurzbz=".$this->db_add_param($ort)." OR $sql_lkt)";
 					
 					if (!$this->db_query($sql_query))
 					{
@@ -578,14 +577,14 @@ class lehreinheit extends basis_db
 							//Lektoren SQL
 							$sql_lkt='';
 							foreach ($this->mitarbeiter_uid as $lkt)
-								$sql_lkt.="OR mitarbeiter_uid='$lkt' ";
+								$sql_lkt.="OR mitarbeiter_uid=".$this->db_add_param($lkt)." ";
 							$sql_lkt=mb_substr($sql_lkt,3);
 							$sql_query="SELECT * FROM campus.tbl_zeitsperre
 											WHERE ($sql_lkt) AND 
-												(  (vondatum<'$datum' AND bisdatum>'$datum') 
-												OR (vondatum='$datum' AND bisdatum='$datum' AND vonstunde<=$stunde AND bisstunde>=$stunde)
-												OR (vondatum='$datum' AND bisdatum>'$datum' AND vonstunde<=$stunde)
-												OR (vondatum<'$datum' AND bisdatum='$datum' AND bisstunde>=$stunde) )";	
+												(  (vondatum<".$this->db_add_param($datum)." AND bisdatum>".$this->db_add_param($datum).") 
+												OR (vondatum=".$this->db_add_param($datum)." AND bisdatum=".$this->db_add_param($datum)." AND vonstunde<=".$this->db_add_param($stunde)." AND bisstunde>=".$this->db_add_param($stunde).")
+												OR (vondatum=".$this->db_add_param($datum)." AND bisdatum>".$this->db_add_param($datum)." AND vonstunde<=".$this->db_add_param($stunde).")
+												OR (vondatum<".$this->db_add_param($datum)." AND bisdatum=".$this->db_add_param($datum)." AND bisstunde>=".$this->db_add_param($stunde).") )";	
 							//echo $sql_query.'<br>';
 							if (!$this->db_query($sql_query))
 							{
@@ -661,17 +660,24 @@ class lehreinheit extends basis_db
 			$sql_query="INSERT INTO $stpl_table
 				(unr,mitarbeiter_uid,datum,	stunde,	ort_kurzbz,lehreinheit_id,studiengang_kz,semester,verband,
 				gruppe,	gruppe_kurzbz,	titel, updatevon)
-				VALUES ($this->unr,'".$this->mitarbeiter_uid[$i]."','$datum',$stunde,
-				'$ort',$this->lehreinheit_id, ".$this->studiengang_kz[$i].",".$this->semester[$i].",
-				'".$this->verband[$i]."','".$this->gruppe[$i]."'";
+				VALUES (".$this->db_add_param($this->unr).",".
+						$this->db_add_param($this->mitarbeiter_uid[$i]).",".
+						$this->db_add_param($datum).",".
+						$this->db_add_param($stunde).",".
+						$this->db_add_param($ort).",".
+						$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).", ".
+						$this->db_add_param($this->studiengang_kz[$i]).",".
+						$this->db_add_param($this->semester[$i]).",".
+						$this->db_add_param(trim($this->verband[$i]), FHC_STRING, false).",".
+						$this->db_add_param(trim($this->gruppe[$i]), FHC_STRING, false);
 			if ($this->gruppe_kurzbz[$i]==null)
 				$sql_query.=',NULL';
 			else
-				$sql_query.=",'".$this->gruppe_kurzbz[$i]."'";
-			$sql_query.=",'".$this->titel[$i]."','$user')";
+				$sql_query.=",".$this->db_add_param($this->gruppe_kurzbz[$i]);
+			$sql_query.=",".$this->db_add_param($this->titel[$i]).",".$this->db_add_param($user).")";
 			if (!$this->db_query($sql_query))
 			{
-				$this->errormsg=$this->db_last_error();
+				$this->errormsg=$this->db_last_error().$sql_query;
 				return false;
 			}
 		}

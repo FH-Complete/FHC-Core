@@ -25,12 +25,12 @@
 /*
  * Formular zum Senden eins Feedbacks an die CIS-Administratoren
  */
-    require_once('../../../config/cis.config.inc.php');
-	require_once('../../../include/basis_db.class.php');	  	
-    require_once('../../../include/functions.inc.php');
-    require_once('../../../include/mail.class.php');
-	require_once('../../../include/phrasen.class.php');
-	
+require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/basis_db.class.php');	  	
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/mail.class.php');
+require_once('../../../include/phrasen.class.php');
+
 $sprache = getSprache(); 
 $p=new phrasen($sprache); 
 
@@ -49,7 +49,7 @@ if (!$user=get_uid())
 	{
 		$destination = MAIL_CIS;
 
-		$sql_query = "SELECT DISTINCT vorname, nachname, (uid || '@".DOMAIN."') AS emailtw FROM campus.vw_benutzer WHERE uid='$user' LIMIT 1";
+		$sql_query = "SELECT DISTINCT vorname, nachname, (uid || '@".DOMAIN."') AS emailtw FROM campus.vw_benutzer WHERE uid=".$db->db_add_param($user)." LIMIT 1";
 
 		$feedback_message = chop($txtFeedbackMessage);
 

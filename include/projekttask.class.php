@@ -72,7 +72,7 @@ class projekttask extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * FROM fue.tbl_projekttask WHERE projekttask_id='$projekttask_id'";
+		$qry = "SELECT * FROM fue.tbl_projekttask WHERE projekttask_id=".$this->db_add_param($projekttask_id, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 		{
@@ -89,7 +89,7 @@ class projekttask extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
-				$this->erledigt = ($row->erledigt=='t'?true:false);
+				$this->erledigt = $this->db_parse_bool($row->erledigt);
 				$this->projekttask_fk = $row->projekttask_fk;
 				$this->ende = $row->ende; 
 				$this->ressource_id = $row->ressource_id; 
@@ -109,7 +109,7 @@ class projekttask extends basis_db
 		}
 	}
 
-/**
+	/**
 	 * Laedt die Projekttasks für den Statusbericht -> 3 nächsten Tasks eines Projektes
 	 * @param  $projektphase_id ID der Projektphase, wenn null greift $projekt_kurzbz
 	 * @return true wenn ok, false im Fehlerfall
@@ -118,7 +118,7 @@ class projekttask extends basis_db
 	{
 			$qry ="SELECT task.* FROM fue.tbl_projekttask task
 			JOIN fue.tbl_projektphase phase ON(phase.projektphase_id = task.projektphase_id)
-			JOIN fue.tbl_projekt projekt USING(projekt_kurzbz) where projekt_kurzbz = '".addslashes($projekt_kurzbz)."' 
+			JOIN fue.tbl_projekt projekt USING(projekt_kurzbz) where projekt_kurzbz = ".$this->db_add_param($projekt_kurzbz)."
 			and erledigt = false and task.ende >= CURRENT_DATE ORDER BY ende LIMIT 3;";
 
 		if($this->db_query($qry))
@@ -139,7 +139,7 @@ class projekttask extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
-				$obj->erledigt = ($row->erledigt=='t'?true:false);
+				$obj->erledigt = $this->db_parse_bool($row->erledigt);
 				$obj->projekttask_fk = $row->projekttask_fk;
 				$obj->ende = $row->ende; 
 				$obj->ressource_id = $row->ressource_id; 
@@ -170,10 +170,10 @@ class projekttask extends basis_db
 		{
 			$qry ="SELECT task.* FROM fue.tbl_projekttask task
 			JOIN fue.tbl_projektphase phase ON(phase.projektphase_id = task.projektphase_id)
-			JOIN fue.tbl_projekt projekt USING(projekt_kurzbz) where projekt_kurzbz = '".addslashes($projekt_kurzbz)."'";
+			JOIN fue.tbl_projekt projekt USING(projekt_kurzbz) where projekt_kurzbz = ".$this->db_add_param($projekt_kurzbz);
 			
 		}elseif (!is_null($projektphase_id))
-			$qry = "SELECT * FROM fue.tbl_projekttask WHERE projektphase_id='".addslashes($projektphase_id)."'";
+			$qry = "SELECT * FROM fue.tbl_projekttask WHERE projektphase_id=".$this->db_add_param($projektphase_id, FHC_INTEGER);
 		else
         	$qry='';
 
@@ -205,7 +205,7 @@ class projekttask extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
-				$obj->erledigt = ($row->erledigt=='t'?true:false);
+				$obj->erledigt = $this->db_parse_bool($row->erledigt);
 				$obj->projekttask_fk = $row->projekttask_fk;
 				$obj->ende = $row->ende; 
 				$obj->ressource_id = $row->ressource_id; 
@@ -258,8 +258,8 @@ class projekttask extends basis_db
 			return false; 
 		}
 		
-		$qry ="UPDATE fue.tbl_projekttask SET projektphase_id = ".addslashes($projektphase_id)." 
-		WHERE projekttask_id = ".addslashes($projekttask_id)." OR projekttask_fk =".addslashes($projekttask_id); 
+		$qry ="UPDATE fue.tbl_projekttask SET projektphase_id = ".$this->db_add_param($projektphase_id, FHC_INTEGER)." 
+		WHERE projekttask_id = ".$this->db_add_param($projekttask_id, FHC_INTEGER)." OR projekttask_fk =".$this->db_add_param($projekttask_id, FHC_INTEGER); 
 		
 		if($this->db_query($qry))
 			return true; 
@@ -291,37 +291,37 @@ class projekttask extends basis_db
 
 			$qry='BEGIN; INSERT INTO fue.tbl_projekttask (projektphase_id, bezeichnung, beschreibung, aufwand, mantis_id, scrumsprint_id, projekttask_fk, ende, ressource_id, erledigt, insertamum, 
 				insertvon, updateamum, updatevon) VALUES('.
-			     $this->addslashes($this->projektphase_id).', '.
-			     $this->addslashes($this->bezeichnung).', '.
-			     $this->addslashes($this->beschreibung).', '.
-			     $this->addslashes($this->aufwand).', '.
-			     $this->addslashes($this->mantis_id).','.
-			     $this->addslashes($this->scrumsprint_id).','.
-			     $this->addslashes($this->projekttask_fk).','.
-			     $this->addslashes($this->ende).','.
-			     $this->addslashes($this->ressource_id).','.
-			     ($this->erledigt?'true':'false').',  
+			     $this->db_add_param($this->projektphase_id).', '.
+			     $this->db_add_param($this->bezeichnung).', '.
+			     $this->db_add_param($this->beschreibung).', '.
+			     $this->db_add_param($this->aufwand).', '.
+			     $this->db_add_param($this->mantis_id).','.
+			     $this->db_add_param($this->scrumsprint_id).','.
+			     $this->db_add_param($this->projekttask_fk).','.
+			     $this->db_add_param($this->ende).','.
+			     $this->db_add_param($this->ressource_id).','.
+			     $this->db_add_param($this->erledigt, FHC_BOOLEAN).',  
 			     now(), '.
-			     $this->addslashes($this->insertvon).', 
+			     $this->db_add_param($this->insertvon).', 
 			     now(), '.
-			     $this->addslashes($this->updatevon).');';
+			     $this->db_add_param($this->updatevon).');';
 		}
 		else
 		{
 			$qry='UPDATE fue.tbl_projekttask SET '.
-				'projektphase_id='.$this->addslashes($this->projektphase_id).', '.
-				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
-				'beschreibung='.$this->addslashes($this->beschreibung).', '.
-				'aufwand='.$this->addslashes($this->aufwand).', '.
-				'mantis_id='.$this->addslashes($this->mantis_id).', '.
-				'scrumsprint_id='.$this->addslashes($this->scrumsprint_id).', '.
-				'projekttask_fk='.$this->addslashes($this->projekttask_fk).', '.
-				'ende='.$this->addslashes($this->ende).', '.
-				'ressource_id='.$this->addslashes($this->ressource_id).', '.
-				'erledigt='.($this->erledigt?'true':'false').', '.
+				'projektphase_id='.$this->db_add_param($this->projektphase_id).', '.
+				'bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
+				'beschreibung='.$this->db_add_param($this->beschreibung).', '.
+				'aufwand='.$this->db_add_param($this->aufwand).', '.
+				'mantis_id='.$this->db_add_param($this->mantis_id).', '.
+				'scrumsprint_id='.$this->db_add_param($this->scrumsprint_id).', '.
+				'projekttask_fk='.$this->db_add_param($this->projekttask_fk).', '.
+				'ende='.$this->db_add_param($this->ende).', '.
+				'ressource_id='.$this->db_add_param($this->ressource_id).', '.
+				'erledigt='.$this->db_add_param($this->erledigt, FHC_BOOLEAN).', '.
 				'updateamum= now(), '.
-				'updatevon='.$this->addslashes($this->updatevon).' '.
-				'WHERE projekttask_id='.$this->addslashes($this->projekttask_id).';';
+				'updatevon='.$this->db_add_param($this->updatevon).' '.
+				'WHERE projekttask_id='.$this->db_add_param($this->projekttask_id).';';
 		}
 		
 		if($this->db_query($qry))
@@ -375,7 +375,7 @@ class projekttask extends basis_db
 			return true;
 		}
 		
-		$qry = "DELETE FROM fue.tbl_projekttask WHERE projekttask_id=".addslashes($projekttask_id);
+		$qry = "DELETE FROM fue.tbl_projekttask WHERE projekttask_id=".$this->db_add_param($projekttask_id, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 		{

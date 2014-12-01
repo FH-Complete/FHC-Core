@@ -363,7 +363,7 @@ class firma extends basis_db
 		
 		if (!empty($firma_search))
 		{
-			$matchcode=mb_strtoupper(addslashes(str_replace(array('<','>',' ',';','*','_','-',',',"'",'"'),"%",$firma_search)));
+			$matchcode=mb_strtoupper(str_replace(array('<','>',' ',';','*','_','-',',',"'",'"'),"%",$firma_search));
 			//Zuerst werden die Ergebnisse geliefert, die mit $filter_search beginnen
 			//danach jene Ergebnisse bei denen $filter_search innerhalb des Namens vorkommt
 			$qry = "
@@ -373,15 +373,15 @@ class firma extends basis_db
 					ext_id, schule, steuernummer, gesperrt, aktiv, finanzamt, '1' as sort 
 				FROM public.tbl_firma 
 				WHERE 
-				UPPER(trim(public.tbl_firma.name)) like '".$matchcode."%'
+				UPPER(trim(public.tbl_firma.name)) like '".$this->db_escape($matchcode)."%'
 				UNION 
 				SELECT 
 					firma_id, name, anmerkung, firmentyp_kurzbz, updateamum, updatevon, insertamum, insertvon,
 					ext_id, schule, steuernummer, gesperrt, aktiv, finanzamt, '2' as sort 
 				FROM public.tbl_firma 
 				WHERE 
-				UPPER(trim(public.tbl_firma.name)) like '%".$matchcode."%'
-				AND UPPER(trim(public.tbl_firma.name)) NOT like '".$matchcode."%'
+				UPPER(trim(public.tbl_firma.name)) like '%".$this->db_escape($matchcode)."%'
+				AND UPPER(trim(public.tbl_firma.name)) NOT like '".$this->db_escape($matchcode)."%'
 				ORDER BY sort, name, firma_id;";
 		}
 		else
@@ -513,19 +513,19 @@ class firma extends basis_db
 		$qry.=" WHERE 1=1";
 
 		if($filter!='')
-			$qry.= " and ( lower(tbl_firma.name) like lower('%$filter%') 
-					OR lower(kurzbz) like lower('%$filter%') 			
+			$qry.= " and ( lower(tbl_firma.name) like lower('%".$this->db_escape($filter)."%') 
+					OR lower(kurzbz) like lower('%".$this->db_escape($filter)."%') 			
 					
-					OR lower(tbl_adresse.name) like lower('%$filter%') 
-					OR lower(plz) like lower('%$filter%') 
-					OR lower(ort) like lower('%$filter%') 
-					OR lower(strasse) like lower('%$filter%') 
+					OR lower(tbl_adresse.name) like lower('%".$this->db_escape($filter)."%') 
+					OR lower(plz) like lower('%".$this->db_escape($filter)."%') 
+					OR lower(ort) like lower('%".$this->db_escape($filter)."%') 
+					OR lower(strasse) like lower('%".$this->db_escape($filter)."%') 
 					
-					OR lower(bezeichnung) like lower('%$filter%') 
-					OR lower(anmerkung) like lower('%$filter%')
-					".(is_numeric($filter)?" OR tbl_firma.firma_id='$filter'":'')."
+					OR lower(bezeichnung) like lower('%".$this->db_escape($filter)."%') 
+					OR lower(anmerkung) like lower('%".$this->db_escape($filter)."%')
+					".(is_numeric($filter)?" OR tbl_firma.firma_id='".$this->db_escape($filter)."'":'')."
 					OR tbl_firma.firma_id IN (SELECT firma_id FROM public.tbl_firmatag 
-											  WHERE firma_id=tbl_firma.firma_id AND lower(tag) like lower('%$filter%'))
+											  WHERE firma_id=tbl_firma.firma_id AND lower(tag) like lower('%".$this->db_escape($filter)."%'))
 					 ) ";
 		
 		if($firmentyp_kurzbz!='')

@@ -35,10 +35,24 @@ require_once('../../include/dms.class.php');
 
 header("Content-Type: text/html; charset=utf-8");
 
+session_cache_limiter('none'); //muss gesetzt werden sonst funktioniert der Download mit IE8 nicht
+session_start();
+if (!isset($_SESSION['bewerbung/user']) || $_SESSION['bewerbung/user']=='') 
+{
+    header('Location: registration.php?method=allgemein');
+    exit;
+}
+
 if(isset($_GET['lang']))
 	setSprache($_GET['lang']);
 
 $person_id = isset($_GET['person_id'])?$_GET['person_id']:'';
+
+if(!isset($_SESSION['bewerbung/personId']))
+	die('Sie haben keine Berechtigung für diese Seite');
+
+if($person_id!=$_SESSION['bewerbung/personId'])
+	die('Sie haben keine Berechtigung für diese Seite');
 	
 $dokumenttyp = (isset($_GET['dokumenttyp']))? $_GET['dokumenttyp'] : '';
 $kategorie_kurzbz = isset($_REQUEST['kategorie_kurzbz'])?$_REQUEST['kategorie_kurzbz']:'';

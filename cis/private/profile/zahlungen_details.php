@@ -17,112 +17,93 @@
  *
  * Authors: Martin Tatzber <tatzberm@technikum-wien.at>, 
  */
+require_once('../../../config/cis.config.inc.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/konto.class.php');
+require_once('../../../include/bankverbindung.class.php');
+require_once('../../../include/studiengang.class.php');
+require_once('../../../include/organisationseinheit.class.php');
+require_once('../../../include/addon.class.php');
+require_once('../../../include/benutzer.class.php');
+	
+$uid = get_uid();
+	
+$benutzer = new benutzer();
+if(!$benutzer->load($uid))
+	die('Benutzer nicht gefunden');
 
-	require_once('../../../config/cis.config.inc.php');
-	require_once('../../../include/konto.class.php');
-	require_once('../../../include/bankverbindung.class.php');
-	require_once('../../../include/studiengang.class.php');
-	require_once('../../../include/organisationseinheit.class.php');
-	require_once('../../../include/addon.class.php');
-	
-	
-	function getBankverbindung($oe_kurzbz)
-	{
-	    $iban = "";
-	    $bic = "";
-	    $result = array();
-	    $bankverbindung=new bankverbindung();
-	    if($bankverbindung->load_oe($oe_kurzbz) && count($bankverbindung->result)>0)
-	    {
-		$result["iban"]=$bankverbindung->result[0]->iban;
-		$result["bic"]=$bankverbindung->result[0]->bic;
-		return $result;
-	    }
-	    else
-	    {
-		$organisationseinheit = new organisationseinheit();
-		$organisationseinheit->load($oe_kurzbz);
-		if($organisationseinheit->oe_parent_kurzbz !== NULL)
-		{
-		    $result = getBankverbindung($organisationseinheit->oe_parent_kurzbz);
-		    return $result;
-		}
-		else
-		{
-		    $result["iban"]="";
-		    $result["bic"]="";
-		}
-	    }
-	}
-	
-	if(isset($_GET['buchungsnr']))
-		$buchungsnr=$_GET['buchungsnr'];
-	else
-		$buchungsnr='';
-	
-	$konto=new konto();
-	$konto->load($buchungsnr);
-	
-	$studiengang=new studiengang();
-	$studiengang->load($konto->studiengang_kz);
-	$bankverbindung=new bankverbindung();
-	
-	$kontodaten = getBankverbindung($studiengang->oe_kurzbz);
-	$iban=$kontodaten["iban"];
-	$bic=$kontodaten["bic"];
-	
-	$oe=new organisationseinheit();
-	$oe->load($studiengang->oe_kurzbz);
-	
-	$konto->getBuchungstyp();
-	$buchungstyp = array();	
-	foreach ($konto->result as $row)
-		$buchungstyp[$row->buchungstyp_kurzbz]=$row->beschreibung;
-	
-	echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-			<html>
-			<head>
-				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-				<title>Zahlungsdetails</title>
-				<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
-				<link href="../../../skin/fhcomplete.css.php" rel="stylesheet" type="text/css">
-				<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
-			</head>
-			<body>';
-	
-	echo '<h1>Einzahlung für '.$konto->vorname.' '.$konto->nachname.'</h1>
-	<table class="tablesorter">
-		<thead>
-			<tr>
-				<th width="40%">Zahlungsinformationen</th>
-				<th width="60%"></th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td>Buchungstyp</td>
-				<td>'.$buchungstyp[$konto->buchungstyp_kurzbz].'</td>
-			</tr><tr>
-				<td>Buchungstext</td>
-				<td>'.$konto->buchungstext.'</td>
-			</tr><tr>
-				<td>Betrag</td>
-				<td>'.abs($konto->betrag).' €</td>
-			</tr>
-		</tbody>
-	</table>
-	<table class="tablesorter">
-		<thead>
-			<tr>
-				<th width="40%">Zahlung an</th>
-				<th width="60%"></th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td>Empfänger</td>
- 				<td>'.$oe->organisationseinheittyp_kurzbz.' '.$oe->bezeichnung.'</td>
-			</tr>';
+if(isset($_GET['buchungsnr']))
+	$buchungsnr=$_GET['buchungsnr'];
+else
+	$buchungsnr='';
+
+$konto=new konto();
+$konto->load($buchungsnr);
+
+if($konto->person_id!=$benutzer->person_id)
+	die('Sie haben keine Berechtigung fuer diese Seite');
+
+$studiengang=new studiengang();
+$studiengang->load($konto->studiengang_kz);
+$bankverbindung=new bankverbindung();
+
+$kontodaten = getBankverbindung($studiengang->oe_kurzbz);
+$iban=$kontodaten["iban"];
+$bic=$kontodaten["bic"];
+
+$oe=new organisationseinheit();
+$oe->load($studiengang->oe_kurzbz);
+
+$konto->getBuchungstyp();
+$buchungstyp = array();	
+foreach ($konto->result as $row)
+	$buchungstyp[$row->buchungstyp_kurzbz]=$row->beschreibung;
+
+echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+		<html>
+		<head>
+			<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+			<title>Zahlungsdetails</title>
+			<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
+			<link href="../../../skin/fhcomplete.css.php" rel="stylesheet" type="text/css">
+			<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
+		</head>
+		<body>';
+
+echo '<h1>Einzahlung für '.$konto->vorname.' '.$konto->nachname.'</h1>
+<table class="tablesorter">
+	<thead>
+		<tr>
+			<th width="40%">Zahlungsinformationen</th>
+			<th width="60%"></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Buchungstyp</td>
+			<td>'.$buchungstyp[$konto->buchungstyp_kurzbz].'</td>
+		</tr><tr>
+			<td>Buchungstext</td>
+			<td>'.$konto->buchungstext.'</td>
+		</tr><tr>
+			<td>Betrag</td>
+			<td>'.abs($konto->betrag).' €</td>
+		</tr>
+	</tbody>
+</table>
+<table class="tablesorter">
+	<thead>
+		<tr>
+			<th width="40%">Zahlung an</th>
+			<th width="60%"></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Empfänger</td>
+			<td>'.$oe->organisationseinheittyp_kurzbz.' '.$oe->bezeichnung.'</td>
+		</tr>';
+
 if($iban!='')
 {
 	echo '
@@ -180,5 +161,32 @@ foreach($addon->result as $a)
 
 echo '</body></html>';
 
-
+function getBankverbindung($oe_kurzbz)
+{
+    $iban = "";
+    $bic = "";
+    $result = array();
+    $bankverbindung=new bankverbindung();
+    if($bankverbindung->load_oe($oe_kurzbz) && count($bankverbindung->result)>0)
+    {
+	$result["iban"]=$bankverbindung->result[0]->iban;
+	$result["bic"]=$bankverbindung->result[0]->bic;
+	return $result;
+    }
+    else
+    {
+	$organisationseinheit = new organisationseinheit();
+	$organisationseinheit->load($oe_kurzbz);
+	if($organisationseinheit->oe_parent_kurzbz !== NULL)
+	{
+	    $result = getBankverbindung($organisationseinheit->oe_parent_kurzbz);
+	    return $result;
+	}
+	else
+	{
+	    $result["iban"]="";
+	    $result["bic"]="";
+	}
+    }
+}
 ?>

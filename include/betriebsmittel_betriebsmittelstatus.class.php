@@ -66,7 +66,7 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 		$this->errormsg='';
 		
 		$qry='SELECT * FROM wawi.tbl_betriebsmittel_betriebsmittelstatus
-			WHERE betriebsmittelbetriebsmittelstatus_id='.$this->addslashes(trim($betriebsmittelbetriebsmittelstatus_id));
+			WHERE betriebsmittelbetriebsmittelstatus_id='.$this->db_add_param(trim($betriebsmittelbetriebsmittelstatus_id), FHC_INTEGER);
 
 		if($this->db_query($qry))
 		{
@@ -91,7 +91,7 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim Laden der Daten '.($this->debug?$this->db_last_error()."<br />$qry<br />":'');
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
@@ -113,10 +113,10 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 		}
 		
 		$qry='SELECT * FROM wawi.tbl_betriebsmittel_betriebsmittelstatus
-			WHERE betriebsmittel_id='.$this->addslashes(trim($betriebsmittel_id));
+			WHERE betriebsmittel_id='.$this->db_add_param(trim($betriebsmittel_id), FHC_INTEGER);
 		
 		if (!is_null($betriebsmittelstatus_kurzbz) && !empty($betriebsmittelstatus_kurzbz))
-			$qry.=" and trim(betriebsmittelstatus_kurzbz)=".$this->addslashes(trim($betriebsmittelstatus_kurzbz)) ;
+			$qry.=" and trim(betriebsmittelstatus_kurzbz)=".$this->db_add_param(trim($betriebsmittelstatus_kurzbz)) ;
 		
 		// Sortierung
 		$qry.=' ORDER BY datum desc,updateamum desc,insertamum desc';
@@ -142,7 +142,7 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim Laden der Daten '.($this->debug?$this->db_last_error()."<br />$qry<br />":'');
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
@@ -166,7 +166,7 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 		}
 		
 		$qry=' SELECT * FROM wawi.tbl_betriebsmittel_betriebsmittelstatus
-			WHERE betriebsmittel_id='.$this->addslashes(trim($this->betriebsmittel_id)).'
+			WHERE betriebsmittel_id='.$this->db_add_param(trim($this->betriebsmittel_id), FHC_INTEGER).'
 			ORDER BY betriebsmittelbetriebsmittelstatus_id DESC LIMIT 1';
 		
 		if($this->db_query($qry))
@@ -192,7 +192,7 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim Laden der Daten '.($this->debug?$this->db_last_error()."<br />$qry<br />":'');
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
@@ -229,7 +229,7 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim Laden der Daten '.($this->debug?$this->db_last_error()."<br />$qry<br />":'');
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
@@ -253,25 +253,25 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 			$this->betriebsmittelbetriebsmittelstatus_id='';
 			$qry='BEGIN;INSERT INTO wawi.tbl_betriebsmittel_betriebsmittelstatus 
 			(betriebsmittel_id,betriebsmittelstatus_kurzbz,anmerkung,datum,insertamum,insertvon,updateamum,updatevon ) VALUES('.
-						$this->addslashes($this->betriebsmittel_id).','.
-						$this->addslashes($this->betriebsmittelstatus_kurzbz).','.
-						$this->addslashes($this->anmerkung).','.
-						($this->datum?$this->addslashes($this->datum):'now()').', '.
-					    ($this->insertamum?$this->addslashes($this->insertamum):'now()').', '.
-					    $this->addslashes($this->insertvon).', '.
-			    		($this->updateamum?$this->addslashes($this->updateamum):'now()').', '.
-					     $this->addslashes((empty($this->updatevon)?$this->updatevon:$this->insertvon))	.'); ';
+						$this->db_add_param($this->betriebsmittel_id, FHC_INTEGER).','.
+						$this->db_add_param($this->betriebsmittelstatus_kurzbz).','.
+						$this->db_add_param($this->anmerkung).','.
+						($this->datum?$this->db_add_param($this->datum):'now()').', '.
+					    ($this->insertamum?$this->db_add_param($this->insertamum):'now()').', '.
+					    $this->db_add_param($this->insertvon).', '.
+			    		($this->updateamum?$this->db_add_param($this->updateamum):'now()').', '.
+					     $this->db_add_param((empty($this->updatevon)?$this->updatevon:$this->insertvon))	.'); ';
 		}
 		else 
 		{
 			$qry='UPDATE wawi.tbl_betriebsmittel_betriebsmittelstatus SET '.
-					"betriebsmittel_id =".$this->addslashes($this->betriebsmittel_id).', '.
-					"betriebsmittelstatus_kurzbz =".$this->addslashes($this->betriebsmittelstatus_kurzbz).', '.
-					"anmerkung =".$this->addslashes($this->anmerkung).', '.					
-					"datum =".($this->datum?$this->addslashes($this->datum):'now()').', '.
-					"updateamum =".($this->updateamum?$this->addslashes($this->updateamum):'now()').', '.
-					"updatevon =".$this->addslashes((empty($this->updatevon)?$this->updatevon:$this->insertvon)).' '.
-					" WHERE betriebsmittelbetriebsmittelstatus_id=".$this->addslashes($this->betriebsmittelbetriebsmittelstatus_id);
+					"betriebsmittel_id =".$this->db_add_param($this->betriebsmittel_id, FHC_INTEGER).', '.
+					"betriebsmittelstatus_kurzbz =".$this->db_add_param($this->betriebsmittelstatus_kurzbz).', '.
+					"anmerkung =".$this->db_add_param($this->anmerkung).', '.					
+					"datum =".($this->datum?$this->db_add_param($this->datum):'now()').', '.
+					"updateamum =".($this->updateamum?$this->db_add_param($this->updateamum):'now()').', '.
+					"updatevon =".$this->db_add_param((empty($this->updatevon)?$this->updatevon:$this->insertvon)).' '.
+					" WHERE betriebsmittelbetriebsmittelstatus_id=".$this->db_add_param($this->betriebsmittelbetriebsmittelstatus_id, FHC_INTEGER, false);
 		}
 
 		
@@ -291,14 +291,14 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 					else 
 					{
 						$this->db_query('ROLLBACK;');
-						$this->errormsg = 'Fehler beim Lesen der Sequence '.($this->debug?$this->db_last_error()."<br />$qry<br />":'');
+						$this->errormsg = 'Fehler beim Lesen der Sequence';
 						return false;
 					}
 				}
 				else 
 				{
 					$this->db_query('ROLLBACK;');
-					$this->errormsg = 'Fehler beim Lesen der Sequence '.($this->debug?$this->db_last_error()."<br />$qry<br />":'');
+					$this->errormsg = 'Fehler beim Lesen der Sequence';
 					return false;
 				}
 			}
@@ -306,7 +306,7 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim Speichern des Betriebsmittel Betriebsmittelstatus-Datensatzes '.($this->debug?$this->db_last_error()."<br />$qry<br />":'');
+			$this->errormsg = 'Fehler beim Speichern des Betriebsmittel Betriebsmittelstatus-Datensatzes';
 			return false;
 		}
 	}
@@ -328,14 +328,14 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 		}
 
 		$qry='DELETE from wawi.tbl_betriebsmittel_betriebsmittelstatus '.
-			' WHERE betriebsmittelbetriebsmittelstatus_id='.$this->addslashes($this->betriebsmittelbetriebsmittelstatus_id);
+			' WHERE betriebsmittelbetriebsmittelstatus_id='.$this->db_add_param($this->betriebsmittelbetriebsmittelstatus_id, FHC_INTEGER);
 		if($this->db_query($qry))
 		{
 			return true;
 		}
 		else
 		{			
-			$this->errormsg = 'Fehler beim Entfernen des Betriebsmittel Betriebsmittelstatus-Datensatzes '.($this->debug?$this->db_last_error()."<br />$qry<br />":'');
+			$this->errormsg = 'Fehler beim Entfernen des Betriebsmittel Betriebsmittelstatus-Datensatzes';
 			return false;
 		}	
 	}	
@@ -358,14 +358,14 @@ class betriebsmittel_betriebsmittelstatus extends basis_db
 		}
 
 		$qry='DELETE from wawi.tbl_betriebsmittel_betriebsmittelstatus '.
-			' WHERE betriebsmittel_id='.$this->addslashes($betriebsmittel_id);
+			' WHERE betriebsmittel_id='.$this->db_add_param($betriebsmittel_id, FHC_INTEGER);
 		if($this->db_query($qry))
 		{
 			return true;
 		}
 		else
 		{			
-			$this->errormsg = 'Fehler beim Entfernen des Betriebsmittel Betriebsmittelstatus-Datensatzes '.($this->debug?$this->db_last_error()."<br />$qry<br />":'');
+			$this->errormsg = 'Fehler beim Entfernen des Betriebsmittel Betriebsmittelstatus-Datensatzes';
 			return false;
 		}	
 	}	

@@ -67,8 +67,6 @@ class fachbereich extends basis_db
 			return false;
 		}
 
-		// Don't turn to garbage when getAll is called twice.
-		// TODO: Should most likely also be done in 'loadArray' [and every other file], but I don't know what it's used for.
 		$this->result = array();
 		
 		while($row = $this->db_fetch_object())
@@ -101,8 +99,7 @@ class fachbereich extends basis_db
 		if(count($kurzbzs)==0)
 			return true;
 		
-		$kurzbzs = "'".implode("','",$kurzbzs)."'";
-		$qry = 'SELECT * FROM public.tbl_fachbereich WHERE fachbereich_kurzbz in('.$kurzbzs.')';
+		$qry = 'SELECT * FROM public.tbl_fachbereich WHERE fachbereich_kurzbz in('.$this->implode4SQL($kurzbzs).')';
 		if ($aktiv)
 			$qry.=' AND aktiv=true';
 

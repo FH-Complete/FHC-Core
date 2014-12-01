@@ -602,7 +602,7 @@ class benutzerberechtigung extends basis_db
 					{
 						$childoes = $oe->getChilds($b->oe_kurzbz);
 						foreach($childoes as $row)
-							$not .="'".addslashes($row)."',";
+							$not .="'".$this->db_escape($row)."',";
 					}
 					else 
 						return array();
@@ -613,7 +613,7 @@ class benutzerberechtigung extends basis_db
 					{
 						$childoes = $oe->getChilds($b->oe_kurzbz);
 						foreach($childoes as $row)
-							$in .= "'".addslashes($row)."',"; 
+							$in .= "'".$this->db_escape($row)."',"; 
 					}
 					else 
 					{

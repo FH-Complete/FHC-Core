@@ -93,7 +93,7 @@ class standort extends basis_db
 		}
 
 		//Daten aus der Datenbank lesen
-		$qry = "SELECT * FROM public.tbl_standort WHERE standort_id='".addslashes($standort_id)."'";
+		$qry = "SELECT * FROM public.tbl_standort WHERE standort_id=".$this->db_add_param($standort_id, FHC_INTEGER);
 
 		if(!$this->db_query($qry))
 		{
@@ -141,7 +141,7 @@ class standort extends basis_db
 		}
 
 		//Lesen der Daten aus der Datenbank
-		$qry = "SELECT * FROM public.tbl_standort WHERE adresse_id='".addslashes($adress_id)."'";
+		$qry = "SELECT * FROM public.tbl_standort WHERE adresse_id=".$this->db_add_param($adress_id, FHC_INTEGER);
 
 		if(!$this->db_query($qry))
 		{
@@ -186,7 +186,7 @@ class standort extends basis_db
 		}
 
 		//Lesen der Daten aus der Datenbank
-		$qry = "SELECT * FROM public.tbl_standort WHERE firma_id='".addslashes($firma_id)."' ORDER BY standort_id";
+		$qry = "SELECT * FROM public.tbl_standort WHERE firma_id=".$this->db_add_param($firma_id, FHC_INTEGER)." ORDER BY standort_id";
 
 		if(!$this->db_query($qry))
 		{
@@ -273,13 +273,13 @@ class standort extends basis_db
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO public.tbl_standort (adresse_id,kurzbz,  bezeichnung, insertamum, insertvon
 			    , updateamum, updatevon, ext_id, firma_id) VALUES('.
-			      ($this->adresse_id!=null?$this->addslashes($this->adresse_id):'null').', '.				
-			      $this->addslashes($this->kurzbz).', '.
-			      $this->addslashes($this->bezeichnung).', now(), '.
-			      $this->addslashes($this->insertvon).', now(), '.
-			      $this->addslashes($this->updatevon).', '.
-			      ($this->ext_id!=null?$this->addslashes($this->ext_id):'null').', '.
-			      ($this->firma_id!=null?$this->addslashes($this->firma_id):'null').');'; 
+			      $this->db_add_param($this->adresse_id, FHC_INTEGER).', '.
+			      $this->db_add_param($this->kurzbz).', '.
+			      $this->db_add_param($this->bezeichnung).', now(), '.
+			      $this->db_add_param($this->insertvon).', now(), '.
+			      $this->db_add_param($this->updatevon).', '.
+			      $this->db_add_param($this->ext_id).', '.
+			      $this->db_add_param($this->firma_id).');'; 
 		}
 		else
 		{
@@ -290,12 +290,12 @@ class standort extends basis_db
 				return false;
 			}
 			$qry='UPDATE public.tbl_standort SET'.
-				' adresse_id='.$this->addslashes($this->adresse_id).', '.
-				' kurzbz='.$this->addslashes($this->kurzbz).', '.				
-				' bezeichnung='.$this->addslashes($this->bezeichnung).', '.
-		      	' firma_id='.$this->addslashes($this->firma_id).','.
+				' adresse_id='.$this->db_add_param($this->adresse_id).', '.
+				' kurzbz='.$this->db_add_param($this->kurzbz).', '.				
+				' bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
+		      	' firma_id='.$this->db_add_param($this->firma_id).','.
 		      	' updateamum= now(), '.
-		      	' updatevon='.$this->addslashes($this->updatevon).' '.
+		      	' updatevon='.$this->db_add_param($this->updatevon).' '.
 		      	'WHERE standort_id='.$this->standort_id.';';
 		}
 
@@ -351,7 +351,7 @@ class standort extends basis_db
 			return false;
 		}
 		//loeschen des Datensatzes
-		$qry="DELETE FROM public.tbl_standort WHERE standort_id='".addslashes($standort_id)."';";
+		$qry="DELETE FROM public.tbl_standort WHERE standort_id=".$this->db_add_param($standort_id, FHC_INTEGER).";";
 		if($this->db_query($qry))
 		{
 			return true;
@@ -414,15 +414,15 @@ class standort extends basis_db
 			";
 			
 		if ($personfunktionstandort_id!='' && is_numeric($personfunktionstandort_id))
-			$qry.="	AND personfunktionstandort_id='".addslashes($personfunktionstandort_id)."'";
+			$qry.="	AND personfunktionstandort_id=".$this->db_add_param($personfunktionstandort_id, FHC_INTEGER);
 		if ($firma_id!='' && is_numeric($firma_id))
-			$qry.="	AND tbl_standort.firma_id='".addslashes($firma_id)."'";
+			$qry.="	AND tbl_standort.firma_id=".$this->db_add_param($firma_id, FHC_INTEGER);
 		if ($standort_id!='' && is_numeric($standort_id))
-			$qry.="	AND tbl_standort.standort_id='".addslashes($standort_id)."'";
+			$qry.="	AND tbl_standort.standort_id=".$this->db_add_param($standort_id, FHC_INTEGER);
 		if ($adress_id!='' && is_numeric($adress_id))
-			$qry.="	AND tbl_standort.adress_id='".addslashes($adress_id)."'";
+			$qry.="	AND tbl_standort.adress_id=".$this->db_add_param($adress_id, FHC_INTEGER);
 		if ($person_id!='' && is_numeric($person_id))
-			$qry.="	AND tbl_standort.person_id='".addslashes($person_id)."'";
+			$qry.="	AND tbl_standort.person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 
 		if(!$this->db_query($qry))
 		{
@@ -503,21 +503,21 @@ class standort extends basis_db
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN;INSERT INTO public.tbl_personfunktionstandort (funktion_kurzbz,person_id,position,anrede,standort_id) 
 				VALUES('.
-			      ($this->funktion_kurzbz!=null?$this->addslashes($this->funktion_kurzbz):'null').', '.				
-			      ($this->person_id!=null?$this->addslashes($this->person_id):'null').', '.				
-			      $this->addslashes($this->position).', '.
-			      $this->addslashes($this->anrede).', '.
-			      ($this->standort_id!=null?$this->addslashes($this->standort_id):'null').');'; 
+			      $this->db_add_param($this->funktion_kurzbz).', '.				
+			      $this->db_add_param($this->person_id, FHC_INTEGER).', '.				
+			      $this->db_add_param($this->position).', '.
+			      $this->db_add_param($this->anrede).', '.
+			      $this->db_add_param($this->standort_id, FHC_INTEGER).');'; 
 		}
 		else
 		{
 			$qry='UPDATE public.tbl_personfunktionstandort SET'.
-				' funktion_kurzbz='.($this->funktion_kurzbz!=null?$this->addslashes($this->funktion_kurzbz):'null').', '.
-				' person_id='.($this->person_id!=null?$this->addslashes($this->person_id):'null').', '.				
-				' position='.$this->addslashes($this->position).', '.
-		      	' anrede='.$this->addslashes($this->anrede).','.
-		      	' standort_id='.($this->standort_id!=null?$this->addslashes($this->standort_id):'null').' '.
-		      	' WHERE personfunktionstandort_id='.$this->personfunktionstandort_id.';';
+				' funktion_kurzbz='.$this->db_add_param($this->funktion_kurzbz).', '.
+				' person_id='.$this->db_add_param($this->person_id, FHC_INTEGER).', '.				
+				' position='.$this->db_add_param($this->position).', '.
+		      	' anrede='.$this->db_add_param($this->anrede).','.
+		      	' standort_id='.$this->db_add_param($this->standort_id, FHC_INTEGER).' '.
+		      	' WHERE personfunktionstandort_id='.$this->db_add_param($this->personfunktionstandort_id, FHC_INTEGER).';';
 		}
 
 		if($this->db_query($qry))
@@ -578,9 +578,9 @@ class standort extends basis_db
 		}
 		
 		if($personfunktionstandort_id != '')
-			$qry="DELETE FROM public.tbl_personfunktionstandort WHERE personfunktionstandort_id='".addslashes($personfunktionstandort_id)."';";
+			$qry="DELETE FROM public.tbl_personfunktionstandort WHERE personfunktionstandort_id=".$this->db_add_param($personfunktionstandort_id, FHC_INTEGER).";";
 		else if($standort_id != '')
-			$qry="DELETE FROM public.tbl_personfunktionstandort WHERE standort_id='".addslashes($standort_id)."';";
+			$qry="DELETE FROM public.tbl_personfunktionstandort WHERE standort_id=".$this->db_add_param($standort_id, FHC_INTEGER);
 		else
 		{
 			$this->errormsg = 'personfunktionstandort_id oder standort_id muss eingegeben werden'."\n";
@@ -608,7 +608,7 @@ class standort extends basis_db
 		$qry ="select standort.* from public.tbl_firma as firma, public.tbl_adresse as adresse, public.tbl_standort as standort where 
 		firma.firma_id = standort.firma_id  and 
 		standort.adresse_id = adresse.adresse_id and 
-		firma.firmentyp_kurzbz = '".addslashes($typ)."';";
+		firma.firmentyp_kurzbz = ".$this->db_add_param($typ).";";
 		
 		if($this->db_query($qry))
 		{

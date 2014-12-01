@@ -103,7 +103,7 @@
 // Lesen WettbewerbTypen und Wettbewerbe
 	$oWettbewerb->wbtyp_kurzbz='';
 	$oWettbewerb->wettbewerb_kurzbz='';
-	kommune_funk_wettbewerb(&$oWettbewerb);	
+	kommune_funk_wettbewerb($oWettbewerb);	
 // ------------------------------------------------------------------------------------------
 // Aktuelle Datenlesen
 // ------------------------------------------------------------------------------------------

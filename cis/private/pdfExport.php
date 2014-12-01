@@ -114,7 +114,7 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 	//echo ':'.$xml_doc->saveXML().':';
 	
 	//XSL aus der DB holen
-	$qry = "SELECT text FROM public.tbl_vorlagestudiengang WHERE (studiengang_kz=0 OR studiengang_kz='".addslashes($xsl_stg_kz)."') AND vorlage_kurzbz='$xsl' ORDER BY studiengang_kz DESC, version DESC LIMIT 1";
+	$qry = "SELECT text FROM public.tbl_vorlagestudiengang WHERE (studiengang_kz=0 OR studiengang_kz=".$db->db_add_param($xsl_stg_kz).") AND vorlage_kurzbz=".$db->db_add_param($xsl)." ORDER BY studiengang_kz DESC, version DESC LIMIT 1";
 	
 	if(!$result = $db->db_query($qry))
 		die('Fehler beim laden der Vorlage'.$db->db_last_error());
@@ -145,7 +145,7 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 	if(isset($_GET['uid']) && $_GET['uid']!='')
 	{
 		$uid = str_replace(';','',$_GET['uid']);
-		$qry = "SELECT nachname FROM campus.vw_benutzer WHERE uid='".addslashes($uid)."'";
+		$qry = "SELECT nachname FROM campus.vw_benutzer WHERE uid=".$db->db_add_param($uid);
 		
 		if($result = $db->db_query($qry))
 		{

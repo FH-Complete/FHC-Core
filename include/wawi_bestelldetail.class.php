@@ -227,12 +227,12 @@ class wawi_bestelldetail extends basis_db
 			$this->db_add_param($this->preisprove).', '.
 			$this->db_add_param($mwst).', 
 			false, '.
-			$this->addslashes($this->sort).',  
+			$this->db_add_param($this->sort).',  
 			false , '.
-			$this->addslashes($this->insertamum).', '.
-			$this->addslashes($this->insertvon).', '.
-			$this->addslashes($this->updateamum).', '.
-			$this->addslashes($this->updatevon).'); ';
+			$this->db_add_param($this->insertamum).', '.
+			$this->db_add_param($this->insertvon).', '.
+			$this->db_add_param($this->updateamum).', '.
+			$this->db_add_param($this->updatevon).'); ';
 			
 		}
 		else

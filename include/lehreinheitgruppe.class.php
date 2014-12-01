@@ -187,7 +187,7 @@ class lehreinheitgruppe extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der GruppeLE:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern der GruppeLE';
 			return false;
 		}
 	}

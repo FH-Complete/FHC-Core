@@ -140,35 +140,35 @@ class reservierung extends basis_db
 		{
 			$qry = 'INSERT INTO campus.tbl_reservierung (ort_kurzbz, studiengang_kz, uid, stunde, datum, titel,
 			                                      beschreibung, semester, verband, gruppe, gruppe_kurzbz, insertamum, insertvon)
-			        VALUES('.$this->addslashes($this->ort_kurzbz).','.
-					$this->addslashes($this->studiengang_kz).','.
-					$this->addslashes($this->uid).','.
-					$this->addslashes($this->stunde).','.
-					$this->addslashes($this->datum).','.
-					$this->addslashes($this->titel).','.
-					$this->addslashes($this->beschreibung).','.
-					$this->addslashes($this->semester).','.
-					$this->addslashes($this->verband).','.
-					$this->addslashes($this->gruppe).','.
-					$this->addslashes($this->gruppe_kurzbz).','.
-					$this->addslashes($this->insertamum).','.
-					$this->addslashes($this->insertvon).');';
+			        VALUES('.$this->db_add_param($this->ort_kurzbz).','.
+					$this->db_add_param($this->studiengang_kz).','.
+					$this->db_add_param($this->uid).','.
+					$this->db_add_param($this->stunde).','.
+					$this->db_add_param($this->datum).','.
+					$this->db_add_param($this->titel).','.
+					$this->db_add_param($this->beschreibung).','.
+					$this->db_add_param($this->semester).','.
+					$this->db_add_param($this->verband).','.
+					$this->db_add_param($this->gruppe).','.
+					$this->db_add_param($this->gruppe_kurzbz).','.
+					$this->db_add_param($this->insertamum).','.
+					$this->db_add_param($this->insertvon).');';
 		}
 		else
 		{
 			$qry = 'UPDATE campus.tbl_reservierung SET'.
-			       ' ort_kurzbz='.$this->addslashes($this->ort_kurzbz).','.
-			       ' studiengang_kz='.$this->addslashes($this->studiengang_kz).','.
-			       ' uid='.$this->addslashes($this->uid).','.
-			       ' stunde='.$this->addslashes($this->stunde).','.
-			       ' datum='.$this->addslashes($this->datum).','.
-			       ' titel='.$this->addslashes($this->titel).','.
-			       ' beschreibung='.$this->addslashes($this->beschreibung).','.
-			       ' semester='.$this->addslashes($this->semester).','.
-			       ' verband='.$this->addslashes($this->verband).','.
-			       ' gruppe='.$this->addslashes($this->gruppe).','.
-			       ' gruppe_kurzbz='.$this->addslashes($this->gruppe_kurzbz).
-			       " WHERE reservierung_id='".addslashes($this->reservierung_id)."'";
+			       ' ort_kurzbz='.$this->db_add_param($this->ort_kurzbz).','.
+			       ' studiengang_kz='.$this->db_add_param($this->studiengang_kz).','.
+			       ' uid='.$this->db_add_param($this->uid).','.
+			       ' stunde='.$this->db_add_param($this->stunde).','.
+			       ' datum='.$this->db_add_param($this->datum).','.
+			       ' titel='.$this->db_add_param($this->titel).','.
+			       ' beschreibung='.$this->db_add_param($this->beschreibung).','.
+			       ' semester='.$this->db_add_param($this->semester).','.
+			       ' verband='.$this->db_add_param($this->verband).','.
+			       ' gruppe='.$this->db_add_param($this->gruppe).','.
+			       ' gruppe_kurzbz='.$this->db_add_param($this->gruppe_kurzbz).
+			       " WHERE reservierung_id=".$this->db_add_param($this->reservierung_id, FHC_INTEGER);
 		}
 
 		if($this->db_query($qry))
@@ -179,7 +179,7 @@ class reservierung extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der Reservierung:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern der Reservierung';
 			return false;
 		}
 	}
@@ -197,7 +197,7 @@ class reservierung extends basis_db
 			return false;
 		}
 		
-		$qry = "DELETE FROM campus.tbl_reservierung WHERE reservierung_id='$reservierung_id'";
+		$qry = "DELETE FROM campus.tbl_reservierung WHERE reservierung_id=".$this->db_add_param($reservierung_id, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 			return true;
@@ -233,9 +233,9 @@ class reservierung extends basis_db
 				
 		$qry = "SELECT * FROM campus.tbl_reservierung 
 				WHERE 
-					ort_kurzbz='".addslashes($ort_kurzbz)."' AND 
-					datum='".addslashes($datum)."' AND  
-					stunde='".addslashes($stunde)."'";
+					ort_kurzbz=".$this->db_add_param($ort_kurzbz)." AND 
+					datum=".$this->db_add_param($datum)." AND  
+					stunde=".$this->db_add_param($stunde);
 		if($result = $this->db_query($qry))
 		{
 			if($this->db_num_rows($result)>0)

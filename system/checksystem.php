@@ -2194,6 +2194,9 @@ if(!$result = @$db->db_query("SELECT ablauf_vorgaben_id FROM testtool.tbl_ablauf
 	$qry = "
 		ALTER TABLE testtool.tbl_ablauf ADD COLUMN ablauf_vorgaben_id integer;
 		ALTER TABLE testtool.tbl_ablauf ADD CONSTRAINT fk_ablauf_vorgaben_id FOREIGN KEY (ablauf_vorgaben_id) REFERENCES testtool.tbl_ablauf_vorgaben(ablauf_vorgaben_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+		INSERT INTO testtool.tbl_ablauf_vorgaben(studiengang_kz, sprache, sprachwahl) SELECT studiengang_kz, sprache, testtool_sprachwahl FROM public.tbl_studiengang;
+		UPDATE testtool.tbl_ablauf SET ablauf_vorgaben_id = (SELECT ablauf_vorgaben_id FROM testtool.tbl_ablauf_vorgaben WHERE studiengang_kz=tbl_ablauf.studiengang_kz);
 	";
 
 	if(!$db->db_query($qry))
@@ -2279,7 +2282,7 @@ $tabellen=array(
 	"campus.tbl_zeitsperre"  => array("zeitsperre_id","zeitsperretyp_kurzbz","mitarbeiter_uid","bezeichnung","vondatum","vonstunde","bisdatum","bisstunde","vertretung_uid","updateamum","updatevon","insertamum","insertvon","erreichbarkeit_kurzbz","freigabeamum","freigabevon"),
 	"campus.tbl_zeitsperretyp"  => array("zeitsperretyp_kurzbz","beschreibung","farbe"),
 	"campus.tbl_zeitwunsch"  => array("stunde","mitarbeiter_uid","tag","gewicht","updateamum","updatevon","insertamum","insertvon"),
-	"fue.tbl_aktivitaet"  => array("aktivitaet_kurzbz","beschreibung"),
+	"fue.tbl_aktivitaet"  => array("aktivitaet_kurzbz","beschreibung","sort"),
 	"fue.tbl_aufwandstyp" => array("aufwandstyp_kurzbz","bezeichnung"),
 	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz","budget","farbe","aufwandstyp_kurzbz"),
 	"fue.tbl_projektphase"  => array("projektphase_id","projekt_kurzbz","projektphase_fk","bezeichnung","beschreibung","start","ende","budget","insertamum","insertvon","updateamum","updatevon","personentage","farbe"),

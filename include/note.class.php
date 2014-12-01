@@ -67,7 +67,7 @@ class note extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM lehre.tbl_note WHERE note='".$note."'";
+		$qry = "SELECT * FROM lehre.tbl_note WHERE note=".$this->db_add_param($note);
 
 		if($this->db_query($qry))
 		{

@@ -103,18 +103,6 @@ class bisverwendung extends basis_db
 				$this->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$this->hauptberufcode = $row->hauptberufcode;
                 $this->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
-                /**
-                
-				if($row->hauptberuflich=='t')
-					$this->hauptberuflich = true;
-				elseif($row->hauptberuflich=='f')
-					$this->hauptberuflich = false;
-				else 
-					$this->hauptberuflich = '';
-
-				$this->habilitation = ($row->habilitation=='t'?true:false);
-                  
-                 */
                 $this->habilitation = $this->db_parse_bool($row->habilitation); 
 				$this->beginn = $row->beginn;
 				$this->ende = $row->ende;
@@ -334,17 +322,7 @@ class bisverwendung extends basis_db
 				$obj->verwendung_code = $row->verwendung_code;
 				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$obj->hauptberufcode = $row->hauptberufcode;
-                $obj->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);
-                
-                /**
-				if($row->hauptberuflich=='t')
-					$obj->hauptberuflich = true;
-				elseif($row->hauptberuflich=='f')
-					$obj->hauptberuflich = false;
-				else 
-					$obj->hauptberuflich = '';
-				$obj->habilitation = ($row->habilitation=='t'?true:false);
-                 **/ 
+                $obj->hauptberuflich = $this->db_parse_bool($row->hauptberuflich);                
                 $obj->habilitation = $this->db_parse_bool($row->habilitation);
 				$obj->beginn = $row->beginn;
 				$obj->ende = $row->ende;

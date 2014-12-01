@@ -219,7 +219,8 @@ class appdaten extends basis_db
 	 * @param type $target
 	 * @param type $row
 	 */
-	private function mapRow($target,$row) {		
+	private function mapRow($target,$row) 
+	{		
 		$target->appdaten_id=$row->appdaten_id;
 		$target->uid=$row->uid;
 		$target->app=$row->app;

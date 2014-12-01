@@ -65,7 +65,7 @@ class projekt extends basis_db
 	 */
 	public function load($projekt_kurzbz)
 	{
-		$qry = "SELECT * FROM fue.tbl_projekt WHERE projekt_kurzbz='".addslashes($projekt_kurzbz)."'";
+		$qry = "SELECT * FROM fue.tbl_projekt WHERE projekt_kurzbz=".$this->db_add_param($projekt_kurzbz);
 		
 		if($this->db_query($qry))
 		{
@@ -154,7 +154,7 @@ class projekt extends basis_db
     {
 		$qry = 'select * from fue.tbl_projekt where beginn <= '.$this->db_add_param($ende).' and ende >= '.$this->db_add_param($beginn);
 		if (!is_null($oe))
-			$qry.= " AND oe_kurzbz='".addslashes($oe)."'";
+			$qry.= " AND oe_kurzbz=".$this->db_add_param($oe);
 		$qry.= ' ORDER BY oe_kurzbz;';
 		//echo $qry;
 		if($this->db_query($qry))
@@ -194,7 +194,7 @@ class projekt extends basis_db
 	{
 		$qry = 'SELECT * FROM fue.tbl_projekt';
 		if (!is_null($oe))
-			$qry.= " WHERE oe_kurzbz='".addslashes($oe)."'";
+			$qry.= " WHERE oe_kurzbz=".$this->db_add_param($oe);
 		$qry.= ' ORDER BY oe_kurzbz;';
 		//echo $qry;
 		if($this->db_query($qry))
@@ -281,33 +281,33 @@ class projekt extends basis_db
 			//Neuen Datensatz einfuegen
 
 			$qry='INSERT INTO fue.tbl_projekt (projekt_kurzbz, nummer, titel,beschreibung, beginn, ende, budget, farbe, oe_kurzbz, aufwandstyp_kurzbz) VALUES('.
-		     $this->addslashes($this->projekt_kurzbz).', '.
-		     $this->addslashes($this->nummer).', '.
-		     $this->addslashes($this->titel).', '.
-		     $this->addslashes($this->beschreibung).', '.
-		     $this->addslashes($this->beginn).', '.
-		     $this->addslashes($this->ende).', '.
-		     $this->addslashes($this->budget).', '.
-             $this->addslashes($this->farbe).', '.
-		     $this->addslashes($this->oe_kurzbz).','.
-		     $this->addslashes($this->aufwandstyp_kurzbz).');';
+		     $this->db_add_param($this->projekt_kurzbz).', '.
+		     $this->db_add_param($this->nummer).', '.
+		     $this->db_add_param($this->titel).', '.
+		     $this->db_add_param($this->beschreibung).', '.
+		     $this->db_add_param($this->beginn).', '.
+		     $this->db_add_param($this->ende).', '.
+		     $this->db_add_param($this->budget).', '.
+             $this->db_add_param($this->farbe).', '.
+		     $this->db_add_param($this->oe_kurzbz).','.
+		     $this->db_add_param($this->aufwandstyp_kurzbz).');';
 		}
 		else
 		{
 			//Updaten des bestehenden Datensatzes
 
 			$qry='UPDATE fue.tbl_projekt SET '.
-				'projekt_kurzbz='.$this->addslashes($this->projekt_kurzbz).', '.
-				'nummer='.$this->addslashes($this->nummer).', '.
-				'titel='.$this->addslashes($this->titel).', '.
-				'beschreibung='.$this->addslashes($this->beschreibung).', '.
-				'beginn='.$this->addslashes($this->beginn).', '.
-				'ende='.$this->addslashes($this->ende).', '.
-				'budget='.$this->addslashes($this->budget).', '.
-                'farbe='.$this->addslashes($this->farbe).', '.
-				'oe_kurzbz='.$this->addslashes($this->oe_kurzbz).', '.
-				'aufwandstyp_kurzbz='.$this->addslashes($this->aufwandstyp_kurzbz).' '.
-				'WHERE projekt_kurzbz='.$this->addslashes($this->projekt_kurzbz).';';
+				'projekt_kurzbz='.$this->db_add_param($this->projekt_kurzbz).', '.
+				'nummer='.$this->db_add_param($this->nummer).', '.
+				'titel='.$this->db_add_param($this->titel).', '.
+				'beschreibung='.$this->db_add_param($this->beschreibung).', '.
+				'beginn='.$this->db_add_param($this->beginn).', '.
+				'ende='.$this->db_add_param($this->ende).', '.
+				'budget='.$this->db_add_param($this->budget).', '.
+                'farbe='.$this->db_add_param($this->farbe).', '.
+				'oe_kurzbz='.$this->db_add_param($this->oe_kurzbz).', '.
+				'aufwandstyp_kurzbz='.$this->db_add_param($this->aufwandstyp_kurzbz).' '.
+				'WHERE projekt_kurzbz='.$this->db_add_param($this->projekt_kurzbz).';';
 		}
 		
 		if($this->db_query($qry))
@@ -316,7 +316,7 @@ class projekt extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern der Daten'.$qry;
+			$this->errormsg = 'Fehler beim Speichern der Daten';
 			return false;
 		}
 	}
@@ -329,7 +329,7 @@ class projekt extends basis_db
 	public function delete($projekt_kurzbz)
 	{
 
-		$qry = "DELETE FROM lehre.tbl_projek WHERE projekt_kurzbz='".addslashes($projekt_kurzbz)."'";
+		$qry = "DELETE FROM lehre.tbl_projek WHERE projekt_kurzbz=".$this->db_add_param($projekt_kurzbz);
 		
 		if($this->db_query($qry))
 		{
@@ -356,7 +356,7 @@ class projekt extends basis_db
 					JOIN fue.tbl_projekt USING(projekt_kurzbz) 
 				WHERE (beginn<=now() or beginn is null) 
 				AND (ende>=now() OR ende is null) 
-				AND mitarbeiter_uid='".addslashes($mitarbeiter_uid)."'";
+				AND mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid);
 		
 		if($result = $this->db_query($qry))
 		{
@@ -382,11 +382,11 @@ class projekt extends basis_db
 			return false;
 		}
 	}
-	public function getProjektFromBestellung($bestellungID)
+	public function getProjektFromBestellung($bestellung_id)
 	{
 		$qry ="select * from fue.tbl_projekt 
 				join wawi.tbl_projekt_bestellung USING (projekt_kurzbz) 
-				where bestellung_id= '".addslashes($bestellungID)."'"; 
+				where bestellung_id= ".$this->db_add_param($bestellung_id); 
 		
 		if($this->db_query($qry))
 		{

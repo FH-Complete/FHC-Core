@@ -766,8 +766,8 @@ class content extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
-				$obj->aktiv = ($row->aktiv=='t'?true:false);
-				$obj->menu_open = ($row->menu_open=='t'?true:false);
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$obj->menu_open = $this->db_parse_bool($row->menu_open);
 				$obj->beschreibung = $row->beschreibung;
 				
 				$this->result[] = $obj;
@@ -809,8 +809,8 @@ class content extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
-				$obj->aktiv = ($row->aktiv=='t'?true:false);
-				$obj->menu_open = ($row->menu_open=='t'?true:false);
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$obj->menu_open = $this->db_parse_bool($row->menu_open);
 				$obj->beschreibung = $row->beschreibung;
 				
 				$this->result[] = $obj;

@@ -181,7 +181,7 @@
 	// Fuer die Bildfunktion werden keine Datenbenoetigt, und nach Verarbeitung beenden
     if (trim($oWettbewerb->workSITE)==constKommuneDisplayIMAGE) 
 	{	
-		createIMGfromHEX(&$oWettbewerb);
+		createIMGfromHEX($oWettbewerb);
 		exit;
 	}		
 	
@@ -397,7 +397,7 @@ function doIt(user,nameID)
 	callURL=callURL+\'?userSel='.constKommuneUserXML.'&client_encode=UTF8&user=\'+user;
 	req.open("GET", callURL , true);
 
-       //Beim abschliessen des request wird diese Funktion ausgeführt
+       //Beim abschliessen des request wird diese Funktion ausgefuhrt
                 req.onreadystatechange = function(){            
                     switch(req.readyState) {
                             case 4:
@@ -429,7 +429,7 @@ function neuAufbau () {
 	    location.href = location.href;
 }
 
-/* Überwachung von Netscape initialisieren */
+/* uberwachung von Netscape initialisieren */
 if (!window.Weite && window.innerWidth) {
   	window.onresize = neuAufbau;
   
@@ -442,7 +442,7 @@ if (!window.Weite && window.innerWidth) {
 <body id="hauptbody">
 <script type="text/javascript">
 <!--
-/* Überwachung von Internet Explorer initialisieren */
+/* uberwachung von Internet Explorer initialisieren */
 if (!window.Weite && document.body && document.body.offsetWidth) 
 	{
 	  window.onresize = neuAufbau;
@@ -456,15 +456,15 @@ if (!window.Weite && document.body && document.body.offsetWidth)
 		
 	//-------------- Datenlesen	
 	// Daten Wettbewerb ermitteln /include kommune_funktionen.inc.php
-	kommune_funk_wettbewerb(&$oWettbewerb);	
+	kommune_funk_wettbewerb($oWettbewerb);	
 	
-	kommune_funk_eigene_wettbewerb(&$oWettbewerb);		
-	kommune_funk_team_wettbewerbe(&$oWettbewerb);
+	kommune_funk_eigene_wettbewerb($oWettbewerb);		
+	kommune_funk_team_wettbewerbe($oWettbewerb);
 
 	// Daten Teams ermitteln /include kommune_funktionen.inc.php
-	kommune_funk_teams(&$oWettbewerb);	// TeamGesamt
-	kommune_funk_anwenderteams(&$oWettbewerb); // TeamAnwender	
-	kommune_funk_teambenutzer(&$oWettbewerb); // Team, TeamBenutzer	
+	kommune_funk_teams($oWettbewerb);	// TeamGesamt
+	kommune_funk_anwenderteams($oWettbewerb); // TeamAnwender	
+	kommune_funk_teambenutzer($oWettbewerb); // Team, TeamBenutzer	
 	
 
 		

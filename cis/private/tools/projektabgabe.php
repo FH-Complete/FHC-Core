@@ -211,7 +211,6 @@ if(isset($_REQUEST['ok']) || (isset($_REQUEST['aktion']) && $_REQUEST['aktion']=
 	if($rechte->isBerechtigt('admin') || $rechte->isBerechtigt($berechtigung_kurzbz, $s->oe_kurzbz))
 	{
 		$qry="";
-##		$qry.="SELECT * 	FROM (";
  
 		$qry.="	SELECT public.tbl_studiengang.bezeichnung as stgbez, campus.tbl_paabgabe.datum as termin,* FROM lehre.tbl_projektarbeit 
 			JOIN campus.tbl_paabgabe USING(projektarbeit_id)
@@ -223,22 +222,20 @@ if(isset($_REQUEST['ok']) || (isset($_REQUEST['aktion']) && $_REQUEST['aktion']=
 			WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom') 
 			 			
 			";
-			//AND public.tbl_benutzer.aktiv
-			//AND lehre.tbl_projektarbeit.note IS NULL
+
 			if ($stg_kz!='')
-				$qry.=" AND public.tbl_studiengang.studiengang_kz='".addslashes($stg_kz)."'";
+				$qry.=" AND public.tbl_studiengang.studiengang_kz=".$db->db_add_param($stg_kz);
 			if ($abgabetyp!='')
-				$qry.=" AND campus.tbl_paabgabe.paabgabetyp_kurzbz='".addslashes($abgabetyp)."'";
+				$qry.=" AND campus.tbl_paabgabe.paabgabetyp_kurzbz=".$db->db_add_param($abgabetyp);
 			if ($termin!='')
-				$qry.=" AND campus.tbl_paabgabe.datum='".addslashes($termin)."'";
+				$qry.=" AND campus.tbl_paabgabe.datum=".$db->db_add_param($termin);
 		$qry.=" ORDER BY nachname  ";
-##		$qry.=" ORDER BY tbl_projektarbeit.projektarbeit_id desc) as xy ";		
-##		$qry.=" ORDER BY nachname";	
+
 		if($stg_kz=='' && $abgabetyp=='' && $termin=='')
 		{
 			$qry.=" limit 100 ";				
 		}
-		//echo $qry."<br>";
+
 		if(!$erg=$db->db_query($qry))
 		{
 			die('Fehler beim Laden der Betreuungen!');
@@ -304,6 +301,11 @@ if($zipfile=='')
 }
 else
 {
+	if(!$rechte->isBerechtigt($berechtigung_kurzbz))
+	{
+		die($p->t('global/keineBerechtigungFuerDieseSeite'));
+	}
+
 	//Zip File erstellen
 	chdir(PAABGABE_PATH);
 	$zipausgabe=tempnam("/tmp", "PAA").".zip";

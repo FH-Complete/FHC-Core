@@ -91,8 +91,9 @@ else
 
 $save_vorschlag_error=false;
 /*<?xml-stylesheet type="text/xsl" href="../mathml.xsl"?>*/
+
+echo '<?xml version="1.0" encoding="UTF-8"?>';
 ?>
-<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html
   PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN"
          "http://www.w3.org/Math/DTD/mathml2/xhtml-math11-f.dtd">
@@ -174,7 +175,7 @@ if(isset($_GET['type']) && $_GET['type']=='changesprache')
 }
 
 if(!isset($_SESSION['sprache']))
-	$_SESSION['sprache']='German';
+	$_SESSION['sprache']=DEFAULT_LANGUAGE;
 	
 $sprache = $_SESSION['sprache'];
 
@@ -592,7 +593,7 @@ if (($anzahl!==0) || ($stg_kz=='-1') && ($stg_kz!==''))
 	echo '<br />';
 	
 	// Liste der Fragen
-	$qry = "SELECT distinct nummer FROM testtool.tbl_frage WHERE gebiet_id='".addslashes($gebiet_id)."' ORDER BY nummer";
+	$qry = "SELECT distinct nummer FROM testtool.tbl_frage WHERE gebiet_id=".$db->db_add_param($gebiet_id)." ORDER BY nummer";
 	
 	if($result = $db->db_query($qry))
 	{

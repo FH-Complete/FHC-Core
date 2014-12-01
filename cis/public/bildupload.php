@@ -86,6 +86,14 @@ function resize($filename, $width, $height)
 if(!isset($_GET['person_id']))
 	die($p->t('global/fehlerBeiDerParameteruebergabe'));
 
+$person = new person();
+if(isset($_SESSION['prestudent/user']))
+	$person_id=$person->checkZugangscode($_SESSION['prestudent/user']); 
+if(isset($_SESSION['incoming/user']))
+	$person_id=$person->checkZugangscode($_SESSION['prestudent/user']); 
+if($person_id!=$_GET['person_id'])
+	die('Sie haben keine Berechtigung für diese Seite');
+
 //Bei Upload des Bildes
 if(isset($_POST['submitbild']))
 {

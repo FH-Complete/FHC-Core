@@ -50,7 +50,7 @@ class schluesseltyp extends basis_db
 	 */
 	public function save()
 	{
-		$qry1='SELECT * FROM public.tbl_schluesseltyp WHERE beschreibung='.$this->addslashes($this->beschreibung).';';
+		$qry1='SELECT * FROM public.tbl_schluesseltyp WHERE beschreibung='.$this->db_add_param($this->beschreibung).';';
 		if($this->db_query($qry1))
 		{
 			if($this->db_num_rows()>0) //eintrag gefunden
@@ -66,19 +66,17 @@ class schluesseltyp extends basis_db
 						$dbanzahl=$row1->anzahl;
 					}
 					$qry='UPDATE public.tbl_schluesseltyp SET '.
-					'anzahl ='.$dbanzahl."+".$this->anzahl.' '.
-					'WHERE beschreibung='.$this->addslashes($this->beschreibung).';';
-					echo nl2br($qry."\n");
+					'anzahl ='.($this->db_add_param($dbanzahl+$this->anzahl)).' '.
+					'WHERE beschreibung='.$this->db_add_param($this->beschreibung).';';
 				}
 			}
 			else
 			{
 				$qry='INSERT INTO public.tbl_schluesseltyp (schluesseltyp, beschreibung, anzahl, kaution) VALUES('.
-					$this->addslashes($this->schluesseltyp).', '.
-					$this->addslashes($this->beschreibung).', '.
-					$this->addslashes($this->anzahl).', '.
-					$this->addslashes($this->kaution).');';
-					echo nl2br($qry."\n");
+					$this->db_add_param($this->schluesseltyp).', '.
+					$this->db_add_param($this->beschreibung).', '.
+					$this->db_add_param($this->anzahl).', '.
+					$this->db_add_param($this->kaution).');';
 			}
 			if($this->db_query($qry))
 			{

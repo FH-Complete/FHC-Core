@@ -46,7 +46,7 @@ class berechtigung extends basis_db
 	 */
 	public function load($berechtigung_kurzbz)
 	{
-		$qry = "SELECT * FROM system.tbl_berechtigung WHERE berechtigung_kurzbz='".addslashes($berechtigung_kurzbz)."'";
+		$qry = "SELECT * FROM system.tbl_berechtigung WHERE berechtigung_kurzbz=".$this->db_add_param($berechtigung_kurzbz);
 		
 		if($result = $this->db_query($qry))
 		{
@@ -81,14 +81,14 @@ class berechtigung extends basis_db
 		if($new)
 		{
 			$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES(".
-					$this->addslashes($this->berechtigung_kurzbz).','.
-					$this->addslashes($this->beschreibung).');';
+					$this->db_add_param($this->berechtigung_kurzbz).','.
+					$this->db_add_param($this->beschreibung).');';
 		}
 		else 
 		{
 			$qry = 'UPDATE system.tbl_berechtigung 
-					SET beschreibung='.$this->addslashes($this->beschreibung).'
-					WHERE berechtigung_kurzbz='.$this->addslashes($this->berechtigung_kurzbz).';';
+					SET beschreibung='.$this->db_add_param($this->beschreibung).'
+					WHERE berechtigung_kurzbz='.$this->db_add_param($this->berechtigung_kurzbz).';';
 		}
 		
 		if($this->db_query($qry))
@@ -138,7 +138,7 @@ class berechtigung extends basis_db
 	public function getRolleBerechtigung($rolle_kurzbz)
 	{
 		$qry = "SELECT * FROM system.tbl_rolleberechtigung JOIN system.tbl_berechtigung USING(berechtigung_kurzbz)
-				WHERE rolle_kurzbz='".addslashes($rolle_kurzbz)."' ORDER BY berechtigung_kurzbz, beschreibung";
+				WHERE rolle_kurzbz=".$this->db_add_param($rolle_kurzbz)." ORDER BY berechtigung_kurzbz, beschreibung";
 		
 		if($this->db_query($qry))
 		{
@@ -200,7 +200,7 @@ class berechtigung extends basis_db
 	 */
 	public function deleteRolleBerechtigung($rolle_kurzbz, $berechtigung_kurzbz)
 	{
-		$qry = "DELETE FROM system.tbl_rolleberechtigung WHERE rolle_kurzbz='".addslashes($rolle_kurzbz)."' AND berechtigung_kurzbz='".addslashes($berechtigung_kurzbz)."';";
+		$qry = "DELETE FROM system.tbl_rolleberechtigung WHERE rolle_kurzbz=".$this->db_add_param($rolle_kurzbz)." AND berechtigung_kurzbz=".$this->db_add_param($berechtigung_kurzbz).";";
 		
 		if($this->db_query($qry))
 		{
@@ -220,9 +220,9 @@ class berechtigung extends basis_db
 	 */
 	public function deleteRolle($rolle_kurzbz)
 	{
-		$qry = "DELETE FROM system.tbl_rolleberechtigung WHERE rolle_kurzbz='".addslashes($rolle_kurzbz)."';
-				DELETE FROM system.tbl_benutzerrolle WHERE rolle_kurzbz='".addslashes($rolle_kurzbz)."';
-				DELETE FROM system.tbl_rolle WHERE rolle_kurzbz='".addslashes($rolle_kurzbz)."';";
+		$qry = "DELETE FROM system.tbl_rolleberechtigung WHERE rolle_kurzbz=".$this->db_add_param($rolle_kurzbz).";
+				DELETE FROM system.tbl_benutzerrolle WHERE rolle_kurzbz=".$this->db_add_param($rolle_kurzbz).";
+				DELETE FROM system.tbl_rolle WHERE rolle_kurzbz=".$this->db_add_param($rolle_kurzbz).";";
 		
 		if($this->db_query($qry))
 		{
@@ -242,23 +242,23 @@ class berechtigung extends basis_db
 	public function saveRolleBerechtigung()
 	{
 		$qry = "SELECT 1 FROM system.tbl_rolleberechtigung 
-				WHERE rolle_kurzbz='".addslashes($this->rolle_kurzbz)."'
-				AND berechtigung_kurzbz='".addslashes($this->berechtigung_kurzbz)."'";
+				WHERE rolle_kurzbz=".$this->db_add_param($this->rolle_kurzbz)."
+				AND berechtigung_kurzbz=".$this->db_add_param($this->berechtigung_kurzbz);
 		
 		if($this->db_query($qry))
 		{
 			if($this->db_num_rows()>0)
 			{
 				//Update
-				$qry = "UPDATE system.tbl_rolleberechtigung SET art='".addslashes($this->art)."' WHERE rolle_kurzbz='".addslashes($this->rolle_kurzbz)."' AND berechtigung_kurzbz='".addslashes($this->berechtigung_kurzbz)."';";
+				$qry = "UPDATE system.tbl_rolleberechtigung SET art=".$this->db_add_param($this->art)." WHERE rolle_kurzbz=".$this->db_add_param($this->rolle_kurzbz)." AND berechtigung_kurzbz=".$this->db_add_param($this->berechtigung_kurzbz).";";
 			}
 			else 
 			{
 				//Insert
-				$qry = "INSERT INTO system.tbl_rolleberechtigung (rolle_kurzbz, berechtigung_kurzbz, art) VALUES('".
-						addslashes($this->rolle_kurzbz)."','".
-						addslashes($this->berechtigung_kurzbz)."','".
-						addslashes($this->art)."');";
+				$qry = "INSERT INTO system.tbl_rolleberechtigung (rolle_kurzbz, berechtigung_kurzbz, art) VALUES(".
+						$this->db_add_param($this->rolle_kurzbz).",".
+						$this->db_add_param($this->berechtigung_kurzbz).",".
+						$this->db_add_param($this->art).");";
 			}
 			
 			if($this->db_query($qry))
@@ -290,14 +290,14 @@ class berechtigung extends basis_db
 		if($new)
 		{
 			$qry = "INSERT INTO system.tbl_rolle(rolle_kurzbz, beschreibung) VALUES(".
-					$this->addslashes($this->rolle_kurzbz).','.
-					$this->addslashes($this->beschreibung).');';
+					$this->db_add_param($this->rolle_kurzbz).','.
+					$this->db_add_param($this->beschreibung).');';
 		}
 		else 
 		{
 			$qry = 'UPDATE system.tbl_rolle 
-					SET beschreibung='.$this->addslashes($this->beschreibung).'
-					WHERE rolle_kurzbz='.$this->addslashes($this->rolle_kurzbz).';';
+					SET beschreibung='.$this->db_add_param($this->beschreibung).'
+					WHERE rolle_kurzbz='.$this->db_add_param($this->rolle_kurzbz).';';
 		}
 		
 		if($this->db_query($qry))

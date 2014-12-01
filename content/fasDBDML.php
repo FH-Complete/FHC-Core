@@ -112,7 +112,8 @@ if(!$error)
 			{
 				if(is_numeric($_POST['plz']) && $_POST['plz']<32000)
 				{
-					$qry = "SELECT * FROM bis.tbl_gemeinde WHERE lower(name)=lower('".addslashes($_POST['gemeinde'])."') AND plz='".addslashes($_POST['plz'])."'";
+					$qry = "SELECT * FROM bis.tbl_gemeinde WHERE lower(name)=lower(".$db->db_add_param($_POST['gemeinde']).") 
+							AND plz=".$db->db_add_param($_POST['plz']);
 					if($db->db_query($qry))
 					{
 						if($row = $db->db_fetch_object())

@@ -443,7 +443,7 @@ class mitarbeiter extends benutzer
 			$in='';
 			foreach ($stge as $stg)
 			{
-				$in.=','.$stg;
+				$in.=','.$this->db_add_param($stg, FHC_INTEGER);
 				if($stg==0)
 				{
 					$in='';

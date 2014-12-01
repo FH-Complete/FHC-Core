@@ -279,7 +279,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 		$typ->getStudiengangTyp($stg_obj->typ);	
 		
 		//Sprachwahl des Studiengangs
-		$qry = "SELECT sprachwahl FROM testtool.tbl_ablauf_vorgaben WHERE studiengang_kz=".addslashes($prestudent->studiengang_kz)." LIMIT 1";
+		$qry = "SELECT sprachwahl FROM testtool.tbl_ablauf_vorgaben WHERE studiengang_kz=".$db->db_add_param($prestudent->studiengang_kz)." LIMIT 1";
 		$result = $db->db_query($qry);
 		$sprachwahl = $db->db_fetch_object($result);
 		$sprachwahl = $db->db_parse_bool($sprachwahl->sprachwahl);
@@ -317,7 +317,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 							JOIN testtool.tbl_frage USING(gebiet_id)
 							JOIN testtool.tbl_frage_sprache USING(frage_id)						
 						WHERE
-							tbl_pruefling.pruefling_id='".addslashes($pruefling->pruefling_id)."'
+							tbl_pruefling.pruefling_id=".$db->db_add_param($pruefling->pruefling_id)."
 						ORDER BY sprache DESC";
 				echo $p->t('testtool/spracheDerTestfragen').':';
 				if($result = $db->db_query($qry))
@@ -346,9 +346,10 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 	}
 	else
 	{
+		$prestudent_id_dummy_student = (defined('PRESTUDENT_ID_DUMMY_STUDENT')?PRESTUDENT_ID_DUMMY_STUDENT:'');
 		echo '<form method="post">
 				<SELECT name="prestudent">';
-		echo '<OPTION value="'.PRESTUDENT_ID_DUMMY_STUDENT.'">'.$p->t('testtool/nameAuswaehlen').'</OPTION>\n';
+		echo '<OPTION value="'.$prestudent_id_dummy_student.'">'.$p->t('testtool/nameAuswaehlen').'</OPTION>\n';
 		foreach($ps->result as $prestd)
 		{
 			$stg = new studiengang();

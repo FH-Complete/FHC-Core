@@ -150,7 +150,7 @@
 // Lesen WettbewerbTypen und Wettbewerbe
    	$oWettbewerb->wbtyp_kurzbz=trim((isset($_REQUEST['wbtyp_kurzbz_sel']) ? $_REQUEST['wbtyp_kurzbz_sel']:''));
 	$oWettbewerb->wettbewerb_kurzbz='';
-	kommune_funk_wettbewerb(&$oWettbewerb);	
+	kommune_funk_wettbewerb($oWettbewerb);	
 	
 #var_dump($oWettbewerb);	
 	
