@@ -380,6 +380,7 @@ function MitarbeiterBuchungKontoAnlegen()
 	nachname = getTreeCellText(tree, 'mitarbeiter-treecol-nachname', tree.currentIndex);
 	uid = getTreeCellText(tree, 'mitarbeiter-treecol-uid', tree.currentIndex);
 	kurzbz = getTreeCellText(tree, 'mitarbeiter-treecol-kurzbz', tree.currentIndex);
+	person_id = getTreeCellText(tree, 'mitarbeiter-treecol-person_id', tree.currentIndex);
 	
 	var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
 	var req = new phpRequest(url,'','');
@@ -387,6 +388,7 @@ function MitarbeiterBuchungKontoAnlegen()
 	req.add('type', 'kontosave');
 	req.add('beschreibung', vorname + ' ' + nachname + ' ' + uid);
 	req.add('kurzbz', kurzbz);
+	req.add('person_id', person_id);
 	
 	var response = req.executePOST();
 
