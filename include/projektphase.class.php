@@ -72,7 +72,7 @@ class projektphase extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * FROM fue.tbl_projektphase WHERE projektphase_id='$projektphase_id'";
+		$qry = "SELECT * FROM fue.tbl_projektphase WHERE projektphase_id=".$this->db_add_param($projektphase_id, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 		{
@@ -116,16 +116,16 @@ class projektphase extends basis_db
 	public function getProjektphasenForFk($projekt_kurzbz, $projektphase_id)
 	{
 		$this->result=array();
-		$qry = "Select * from fue.tbl_projektphase where projekt_kurzbz = '".addslashes($projekt_kurzbz)."' and projektphase_id not in (
+		$qry = "Select * from fue.tbl_projektphase where projekt_kurzbz = ".$this->db_add_param($projekt_kurzbz)." and projektphase_id not in (
 		WITH RECURSIVE tasks(projektphase_fk) as 
 		(
 			SELECT projektphase_id FROM fue.tbl_projektphase
-			WHERE projektphase_fk='".addslashes($projektphase_id)."'
+			WHERE projektphase_fk=".$this->db_add_param($projektphase_id, FHC_INTEGER)."
 			UNION ALL
 			SELECT p.projektphase_id FROM fue.tbl_projektphase p, tasks 
 			WHERE p.projektphase_fk=tasks.projektphase_fk
 		) SELECT *
-		FROM tasks) and projektphase_id not in ('".addslashes($projektphase_id)."')";
+		FROM tasks) and projektphase_id not in (".$this->db_add_param($projektphase_id, FHC_INTEGER).")";
 		//echo "\n".$qry."\n";
 		
 		if($this->db_query($qry))
@@ -170,7 +170,7 @@ class projektphase extends basis_db
 	public function getProjektphasen($projekt_kurzbz, $foreignkey = null)
 	{
 		$this->result=array();
-		$qry = "SELECT * FROM fue.tbl_projektphase WHERE projekt_kurzbz='$projekt_kurzbz'";
+		$qry = "SELECT * FROM fue.tbl_projektphase WHERE projekt_kurzbz=".$this->db_add_param($projekt_kurzbz);
 		//echo "\n".$qry."\n";
 		
 		if(!is_null($foreignkey))
@@ -297,35 +297,35 @@ class projektphase extends basis_db
 
 			$qry='BEGIN; INSERT INTO fue.tbl_projektphase (projekt_kurzbz, projektphase_fk, bezeichnung, 
 				beschreibung, start, ende, budget, insertvon, insertamum, updatevon, updateamum, farbe, personentage) VALUES ('.
-			     $this->addslashes($this->projekt_kurzbz).', '.
-			     $this->addslashes($this->projektphase_fk).', '.
-				 $this->addslashes($this->bezeichnung).', '.
-			     $this->addslashes($this->beschreibung).', '.
-			     $this->addslashes($this->start).', '.
-			     $this->addslashes($this->ende).', '.
-			     $this->addslashes($this->budget).', '.
-			     $this->addslashes($this->insertvon).', now(), '.
-			     $this->addslashes($this->updatevon).', now(), '.
-                 $this->addslashes($this->farbe).', '.
-			     $this->addslashes($this->personentage).' );';
+			     $this->db_add_param($this->projekt_kurzbz).', '.
+			     $this->db_add_param($this->projektphase_fk).', '.
+				 $this->db_add_param($this->bezeichnung).', '.
+			     $this->db_add_param($this->beschreibung).', '.
+			     $this->db_add_param($this->start).', '.
+			     $this->db_add_param($this->ende).', '.
+			     $this->db_add_param($this->budget).', '.
+			     $this->db_add_param($this->insertvon).', now(), '.
+			     $this->db_add_param($this->updatevon).', now(), '.
+                 $this->db_add_param($this->farbe).', '.
+			     $this->db_add_param($this->personentage).' );';
 		}
 		else
 		{
 			//Updaten des bestehenden Datensatzes
 
 			$qry='UPDATE fue.tbl_projektphase SET '.
-				'projekt_kurzbz='.$this->addslashes($this->projekt_kurzbz).', '.
-				'projektphase_fk='.$this->addslashes($this->projektphase_fk).', '.
-				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
-				'beschreibung='.$this->addslashes($this->beschreibung).', '.
-				'start='.$this->addslashes($this->start).', '.
-				'ende='.$this->addslashes($this->ende).', '.
-				'budget='.$this->addslashes($this->budget).', '.
-                'farbe='.$this->addslashes($this->farbe).', '.
-				'personentage='.$this->addslashes($this->personentage).', '.
+				'projekt_kurzbz='.$this->db_add_param($this->projekt_kurzbz).', '.
+				'projektphase_fk='.$this->db_add_param($this->projektphase_fk).', '.
+				'bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
+				'beschreibung='.$this->db_add_param($this->beschreibung).', '.
+				'start='.$this->db_add_param($this->start).', '.
+				'ende='.$this->db_add_param($this->ende).', '.
+				'budget='.$this->db_add_param($this->budget).', '.
+                'farbe='.$this->db_add_param($this->farbe).', '.
+				'personentage='.$this->db_add_param($this->personentage).', '.
 				'updateamum= now(), '.
-				'updatevon='.$this->addslashes($this->updatevon).' '.
-				'WHERE projektphase_id='.$this->addslashes($this->projektphase_id).';';
+				'updatevon='.$this->db_add_param($this->updatevon).' '.
+				'WHERE projektphase_id='.$this->db_add_param($this->projektphase_id, FHC_INTEGER).';';
 		}
 		
 		if($this->db_query($qry))
@@ -388,19 +388,19 @@ class projektphase extends basis_db
 		
 		// Beginne Transaktion und lösche alle Tasks der Phase
 		$qry1 ="Begin; DELETE FROM fue.tbl_projekttask 
-		WHERE projektphase_id ='".addslashes($projektphase_id)."';";
+		WHERE projektphase_id =".$this->db_add_param($projektphase_id, FHC_INTEGER).";";
 		
 		if($this->db_query($qry1))
 		{
 			// Lösche alle zugewiesenen Ressourcen
 			$qry2 = "DELETE FROM fue.tbl_projekt_ressource 
-			WHERE projektphase_id ='".addslashes($projektphase_id)."';";
+			WHERE projektphase_id =".$this->db_add_param($projektphase_id, FHC_INTEGER).";";
 			
 			if($this->db_query($qry2))
 			{
 				// Lösche den Phaseneintrag
 				$qry3 = "DELETE FROM fue.tbl_projektphase 
-				WHERE projektphase_id = '".addslashes($projektphase_id)."';";
+				WHERE projektphase_id = ".$this->db_add_param($projektphase_id, FHC_INTEGER).";";
 				
 				if($this->db_query($qry3))
 				{
@@ -434,7 +434,7 @@ class projektphase extends basis_db
 	 */
 	public function existPhaseFk($projektphase_id)
 	{
-		$qry = "SELECT * FROM fue.tbl_projektphase WHERE projektphase_fk ='".addslashes($projektphase_id)."';";
+		$qry = "SELECT * FROM fue.tbl_projektphase WHERE projektphase_fk =".$this->db_add_param($projektphase_id, FHC_INTEGER).";";
 		
 		if($this->db_query($qry))
 		{
@@ -464,17 +464,17 @@ class projektphase extends basis_db
 				return false;
 			}
 			$qry ="DELETE from fue.tbl_projekt_ressource 
-					WHERE projektphase_id ='".addslashes($projektphase_id)."' and 
-					ressource_id='".addslashes($ressource_id)."';";
+					WHERE projektphase_id =".$this->db_add_param($projektphase_id, FHC_INTEGER)." and 
+					ressource_id=".$this->db_add_param($ressource_id, FHC_INTEGER).";";
 		}else
 		{
 			// gesamte Ressourcen von Phase werden gelöscht
 			if(!is_numeric($projektphase_id))
 			{
-				$htis->errormsg ="Keine gültige ID übergeben";
+				$this->errormsg ="Keine gültige ID übergeben";
 			}
 			$qry ="DELETE from fue.tbl_projekt_ressource 
-					WHERE projektphase_id ='".addslashes($projektphase_id)."';";
+					WHERE projektphase_id =".$this->db_add_param($projektphase_id, FHC_INTEGER).";";
 		}
 
 		if($this->db_query($qry))
@@ -497,13 +497,13 @@ class projektphase extends basis_db
 	{
 		$qry = "Select * from fue.tbl_projektphase phase 
 		join fue.tbl_projekttask task using(projektphase_id) 
-		where task.projektphase_id = '".addslashes($projektphase_id)."'
+		where task.projektphase_id = ".$this->db_add_param($projektphase_id, FHC_INTEGER)."
 		OR task.projektphase_id IN (
 		
 		WITH RECURSIVE tasks(projektphase_fk) as 
 		(
 			SELECT projektphase_id FROM fue.tbl_projektphase
-			WHERE projektphase_fk='".addslashes($projektphase_id)."'
+			WHERE projektphase_fk=".$this->db_add_param($projektphase_id, FHC_INTEGER)."
 			UNION ALL
 			SELECT p.projektphase_id FROM fue.tbl_projektphase p, tasks 
 			WHERE p.projektphase_fk=tasks.projektphase_fk

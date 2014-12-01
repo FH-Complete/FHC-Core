@@ -194,7 +194,7 @@ class lehrverband extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Lesen der Lehrverbaende '.$qry;
+			$this->errormsg = 'Fehler beim Lesen der Lehrverbaende ';
 			return false;
 		}
 	}
@@ -222,7 +222,7 @@ class lehrverband extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Lesen der Semester '.$qry;
+			$this->errormsg = 'Fehler beim Lesen der Semester ';
 			return false;
 		}
 	}
@@ -249,7 +249,7 @@ class lehrverband extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Lesen der Lehrverbaende '.$qry;
+			$this->errormsg = 'Fehler beim Lesen der Lehrverbaende ';
 			return false;
 		}
 	}
@@ -279,7 +279,7 @@ class lehrverband extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Lesen der Lehrverbaende '.$qry;
+			$this->errormsg = 'Fehler beim Lesen der Lehrverbaende ';
 			return false;
 		}
 	}
@@ -329,7 +329,7 @@ class lehrverband extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern des Lehrverbands:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern des Lehrverbands:';
 			return false;
 		}
 	}

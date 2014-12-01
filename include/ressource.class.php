@@ -70,7 +70,7 @@ class ressource extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * FROM fue.tbl_ressource WHERE ressource_id='".addslashes($ressource_id)."'";
+		$qry = "SELECT * FROM fue.tbl_ressource WHERE ressource_id=".$this->db_add_param($ressource_id, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 		{
@@ -152,7 +152,7 @@ class ressource extends basis_db
 	{
 		$qry = "SELECT ressource.*, project.projekt_ressource_id, project.aufwand FROM fue.tbl_ressource as ressource
 		JOIN fue.tbl_projekt_ressource project ON(project.ressource_id = ressource.ressource_id) 
-		WHERE project.projekt_kurzbz ='".addslashes($project_kurzbz)."';";
+		WHERE project.projekt_kurzbz =".$this->db_add_param($project_kurzbz).";";
 		
 		$this->result=array();
 			
@@ -198,7 +198,7 @@ class ressource extends basis_db
 	{
 		$qry = "SELECT ressource.*, project.aufwand, project.projekt_ressource_id FROM fue.tbl_ressource as ressource
 		JOIN fue.tbl_projekt_ressource project ON(project.ressource_id = ressource.ressource_id) 
-		WHERE project.projektphase_id ='".addslashes($projektphase_id)."';";
+		WHERE project.projektphase_id =".$this->db_add_param($projektphase_id, FHC_INTEGER).";";
 		
 		$this->result=array();
 			
@@ -249,24 +249,24 @@ class ressource extends basis_db
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN; INSERT INTO fue.tbl_projekt_ressource (projektphase_id, projekt_kurzbz, 
 				ressource_id, funktion_kurzbz, beschreibung, aufwand) VALUES ('.
-			     $this->addslashes($this->projektphase_id).', '.
-				 $this->addslashes($this->projekt_kurzbz).', '.
-			     $this->addslashes($this->ressource_id).', '.
-			     $this->addslashes($this->funktion_kurzbz).', '.
-			     $this->addslashes($this->beschreibung).', '.
-				 $this->addslashes($this->aufwand, FHC_INTEGER).'); ';
+			     $this->db_add_param($this->projektphase_id, FHC_INTEGER).', '.
+				 $this->db_add_param($this->projekt_kurzbz).', '.
+			     $this->db_add_param($this->ressource_id, FHC_INTEGER).', '.
+			     $this->db_add_param($this->funktion_kurzbz).', '.
+			     $this->db_add_param($this->beschreibung).', '.
+				 $this->db_add_param($this->aufwand, FHC_INTEGER).'); ';
 		}
 		else
 		{
 			//Updaten des bestehenden Datensatzes
 			$qry='UPDATE fue.tbl_projekt_ressource SET '.
-				'projektphase_id='.$this->addslashes($this->projektphase_id).', '.
-				'projekt_kurzbz='.$this->addslashes($this->projekt_kurzbz).', '.
-				'ressource_id='.$this->addslashes($this->ressource_id).', '.
-				'funktion_kurzbz='.$this->addslashes($this->funktion_kurzbz).', '.
-				'beschreibung='.$this->addslashes($this->beschreibung).', '.
-				'aufwand='.$this->addslashes($this->aufwand).' '.
-				'WHERE projekt_ressource_id='.$this->addslashes($this->projekt_ressource_id).';';
+				'projektphase_id='.$this->db_add_param($this->projektphase_id, FHC_INTEGER).', '.
+				'projekt_kurzbz='.$this->db_add_param($this->projekt_kurzbz).', '.
+				'ressource_id='.$this->db_add_param($this->ressource_id, FHC_INTEGER).', '.
+				'funktion_kurzbz='.$this->db_add_param($this->funktion_kurzbz).', '.
+				'beschreibung='.$this->db_add_param($this->beschreibung).', '.
+				'aufwand='.$this->db_add_param($this->aufwand).' '.
+				'WHERE projekt_ressource_id='.$this->db_add_param($this->projekt_ressource_id, FHC_INTEGER).';';
 		}
 		
 		if($this->db_query($qry))
@@ -323,28 +323,28 @@ class ressource extends basis_db
 			//Neuen Datensatz einfuegen
 			$qry='BEGIN; INSERT INTO fue.tbl_ressource (bezeichnung, beschreibung, 
 				mitarbeiter_uid, student_uid, betriebsmittel_id, firma_id, insertvon, insertamum, updatevon, updateamum) VALUES ('.
-			     $this->addslashes($this->bezeichnung).', '.
-				 $this->addslashes($this->beschreibung).', '.
-			     $this->addslashes($this->mitarbeiter_uid).', '.
-			     $this->addslashes($this->student_uid).', '.
-			     $this->addslashes($this->betriebsmittel_id).', '.
-			     $this->addslashes($this->firma_id).', '.
-			     $this->addslashes($this->insertvon).', now(), '.
-			     $this->addslashes($this->updatevon).', now()); ';
+			     $this->db_add_param($this->bezeichnung).', '.
+				 $this->db_add_param($this->beschreibung).', '.
+			     $this->db_add_param($this->mitarbeiter_uid).', '.
+			     $this->db_add_param($this->student_uid).', '.
+			     $this->db_add_param($this->betriebsmittel_id, FHC_INTEGER).', '.
+			     $this->db_add_param($this->firma_id, FHC_INTEGER).', '.
+			     $this->db_add_param($this->insertvon).', now(), '.
+			     $this->db_add_param($this->updatevon).', now()); ';
 		}
 		else
 		{
 			//Updaten des bestehenden Datensatzes
 			$qry='UPDATE fue.tbl_ressource SET '.
-				'bezeichnung='.$this->addslashes($this->bezeichnung).', '.
-				'beschreibung='.$this->addslashes($this->beschreibung).', '.
-				'mitarbeiter_uid='.$this->addslashes($this->mitarbeiter_uid).', '.
-				'student_uid='.$this->addslashes($this->student_uid).', '.
-				'betriebsmittel_id='.$this->addslashes($this->betriebsmittel_id).', '.
-				'firma_id='.$this->addslashes($this->firma_id).', '.
+				'bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
+				'beschreibung='.$this->db_add_param($this->beschreibung).', '.
+				'mitarbeiter_uid='.$this->db_add_param($this->mitarbeiter_uid).', '.
+				'student_uid='.$this->db_add_param($this->student_uid).', '.
+				'betriebsmittel_id='.$this->db_add_param($this->betriebsmittel_id, FHC_INTEGER).', '.
+				'firma_id='.$this->db_add_param($this->firma_id, FHC_INTEGER).', '.
 				'updateamum= now(), '.
-				'updatevon='.$this->addslashes($this->updatevon).' '.
-				'WHERE ressource_id='.$this->addslashes($this->ressource_id).';';
+				'updatevon='.$this->db_add_param($this->updatevon).' '.
+				'WHERE ressource_id='.$this->db_add_param($this->ressource_id, FHC_INTEGER).';';
 		}
 		
 		if($this->db_query($qry))
@@ -399,7 +399,7 @@ class ressource extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * FROM fue.tbl_projekt_ressource WHERE projekt_ressource_id='".addslashes($projekt_ressource_id)."'";
+		$qry = "SELECT * FROM fue.tbl_projekt_ressource WHERE projekt_ressource_id=".$this->db_add_param($projekt_ressource_id, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 		{

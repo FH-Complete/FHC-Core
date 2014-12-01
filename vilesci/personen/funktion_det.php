@@ -181,7 +181,7 @@ if (!$funktion->load($kurzbz))
 					public.tbl_benutzer, 
 					public.tbl_organisationseinheit
 				WHERE 
-					funktion_kurzbz='".addslashes($kurzbz)."' AND
+					funktion_kurzbz=".$db->db_add_param($kurzbz)." AND
 					tbl_benutzerfunktion.uid=tbl_benutzer.uid AND
 					tbl_benutzer.person_id=tbl_person.person_id AND
 					tbl_benutzerfunktion.oe_kurzbz=tbl_organisationseinheit.oe_kurzbz";

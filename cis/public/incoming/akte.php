@@ -24,11 +24,17 @@
 require_once 'auth.php';
 require_once('../../../config/vilesci.config.inc.php');
 require_once('../../../include/akte.class.php');
+require_once('../../../include/person.class.php');
 
+$person = new person();
+$person_id=$person->checkZugangscode($_SESSION['incoming/user']); 
+		
 //base64 Dump aus der DB holen
 if(isset($_GET['id']) && is_numeric($_GET['id']))
 {
 	$akte = new akte($_GET['id']);
+	if($person_id!=$akte->person_id)
+		die('Sie haben keine Berechtigung fuer diese Datei');
 
 	//Header fuer Bild schicken
 	header("Content-type: $akte->mimetype");

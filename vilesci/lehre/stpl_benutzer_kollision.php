@@ -19,23 +19,19 @@
  *          Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
- */
- 
- 
- 
+ */ 
 /*
  * Fuehrt eine Kollisionspruefung im Stundenplan auf Studentenebene durch
  */
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
-			
-	require_once('../../include/studiensemester.class.php');
-	require_once('../../include/functions.inc.php');
-	require_once('../../include/studiengang.class.php');
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/basis_db.class.php');			
+require_once('../../include/studiensemester.class.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/studiengang.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 $beginn = (isset($_GET['beginn'])?$_GET['beginn']:'');
 $ende = (isset($_GET['ende'])?$_GET['ende']:'');
@@ -43,9 +39,16 @@ $stg_kz = (isset($_GET['stg_kz'])?$_GET['stg_kz']:'');
 $dontloadcontent=false;
 
 $user = get_uid();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('lehre/lvplan'))
+	die('Sie haben keine Berechtigung für diese Seite');
+
 loadVariables($user);
 if (empty($db_stpl_table))
-	die("Bitte die Variablenwarten! db_stpl_table ist leer");
+	die("Bitte die Variablen warten! db_stpl_table ist leer");
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
@@ -125,7 +128,7 @@ if($stg_kz=='')
 {
 	$qry = "SELECT datum, stunde, student_uid, count(student_uid) AS anzahl
 			FROM lehre.vw_".$db_stpl_table."_student_unr
-			WHERE datum>='$beginn' AND datum<='$ende'
+			WHERE datum>=".$db->db_add_param($beginn)." AND datum<=".$db->db_add_param($ende)."
 			GROUP BY datum, stunde, student_uid
 			HAVING count(student_uid)>1
 			ORDER BY datum, stunde, student_uid LIMIT 30; 
@@ -135,7 +138,7 @@ else
 {
 	$qry = "SELECT datum, stunde, student_uid, count(student_uid) AS anzahl
 			FROM lehre.vw_".$db_stpl_table."_student_unr JOIN public.tbl_student USING(student_uid)
-			WHERE datum>='$beginn' AND datum<='$ende' AND studiengang_kz='$stg_kz'
+			WHERE datum>=".$db->db_add_param($beginn)." AND datum<=".$db->db_add_param($ende)." AND studiengang_kz=".$db->db_add_param($stg_kz)."
 			GROUP BY datum, stunde, student_uid
 			HAVING count(student_uid)>1
 			ORDER BY datum, stunde, student_uid LIMIT 30; 

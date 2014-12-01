@@ -73,13 +73,11 @@ if (count($berechtigt_studiengang)>0)
 {
 	if ($berechtigt_studiengang[0]!='')
 	{
-		foreach ($berechtigt_studiengang as $b_stg)
-			$stg_kz_query.="'".$b_stg."',";
-		$stg_kz_query='AND tbl_studiengang.studiengang_kz IN ('.substr($stg_kz_query,0,strlen($stg_kz_query)-1).')';
+		$stg_kz_query='AND tbl_studiengang.studiengang_kz IN ('.$dbo->implode4SQL($berechtigt_studiengang).')';
 	}
 
 	if (isset($_GET['studiengang_kz']))
-		$stg_kz_query='AND tbl_lehrverband.studiengang_kz='.$_GET['studiengang_kz'];
+		$stg_kz_query='AND tbl_lehrverband.studiengang_kz='.$dbo->db_add_param($_GET['studiengang_kz'], FHC_INTEGER);
 	
 	$sql_query="SELECT tbl_lehrverband.studiengang_kz, tbl_studiengang.bezeichnung, kurzbz,kurzbzlang, typ, tbl_lehrverband.semester, verband, gruppe, gruppe_kurzbz, tbl_lehrverband.bezeichnung AS lvb_bezeichnung, tbl_gruppe.bezeichnung AS grp_bezeichnung
 				FROM (public.tbl_studiengang JOIN public.tbl_lehrverband USING (studiengang_kz))
@@ -276,11 +274,11 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 	}
 	
 	$data = array();
-	$qry = "SELECT semester, verband, gruppe,'' as gruppe_kurzbz, bezeichnung, null as sort FROM public.tbl_lehrverband WHERE orgform_kurzbz='$orgform' AND studiengang_kz='$stg_kz' AND aktiv
+	$qry = "SELECT semester, verband, gruppe,'' as gruppe_kurzbz, bezeichnung, null as sort FROM public.tbl_lehrverband WHERE orgform_kurzbz=".$stg_obj->db_add_param($orgform)." AND studiengang_kz=".$stg_obj->db_add_param($stg_kz)." AND aktiv
 			UNION
-			SELECT semester, '' as verband, '' as gruppe, gruppe_kurzbz, bezeichnung, sort FROM public.tbl_gruppe WHERE studiengang_kz='$stg_kz' AND orgform_kurzbz='$orgform' AND lehre AND sichtbar
+			SELECT semester, '' as verband, '' as gruppe, gruppe_kurzbz, bezeichnung, sort FROM public.tbl_gruppe WHERE studiengang_kz=".$stg_obj->db_add_param($stg_kz)." AND orgform_kurzbz=".$stg_obj->db_add_param($orgform)." AND lehre AND sichtbar
 			UNION
-			SELECT semester, verband, gruppe,'' as gruppe_kurzbz, bezeichnung, null as sort FROM public.tbl_lehrverband WHERE studiengang_kz='$stg_kz' AND semester=0 AND aktiv
+			SELECT semester, verband, gruppe,'' as gruppe_kurzbz, bezeichnung, null as sort FROM public.tbl_lehrverband WHERE studiengang_kz=".$stg_obj->db_add_param($stg_kz)." AND semester=0 AND aktiv
 			ORDER BY semester, verband, gruppe, sort, gruppe_kurzbz";
 	$sem='';
 	$ver='';
@@ -313,7 +311,7 @@ function draw_orgformsubmenu($stg_kz, $orgform)
 		   		
 		   		$orgform_sequence[$stg_kz].= "\t\t\t<RDF:li>";
 				$orgform_sequence[$stg_kz].= "\n\t\t\t\t<RDF:Seq RDF:about=\"$rdf_url$stg_kurzbz/$orgform/$sem\">\n";
-				$qry_bez = "SELECT bezeichnung FROM public.tbl_lehrverband WHERE studiengang_kz='$stg_kz' AND semester='$sem' AND trim(verband)='' AND trim(gruppe)=''";
+				$qry_bez = "SELECT bezeichnung FROM public.tbl_lehrverband WHERE studiengang_kz=".$stg_obj->db_add_param($stg_kz)." AND semester=".$stg_obj->db_add_param($sem)." AND trim(verband)='' AND trim(gruppe)=''";
 				$bezeichnung = '';
 				if($result_bez = $stg_obj->db_query($qry_bez))
 					if($row_bez = $stg_obj->db_fetch_object($result_bez))

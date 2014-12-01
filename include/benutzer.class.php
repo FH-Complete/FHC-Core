@@ -92,7 +92,7 @@ class benutzer extends person
 		}
 		if($this->uid == '')
 		{
-			$this->errormsg = 'UID muss eingegeben werden '.$this->uid;
+			$this->errormsg = 'UID muss eingegeben werden';
 			return false;
 		}
 		if(mb_strlen($this->alias)>256)
@@ -199,7 +199,7 @@ class benutzer extends person
 		}
 		else 
 		{	
-			$this->errormsg = 'Fehler beim Speichern des Benutzer-Datensatzes:'.$qry;
+			$this->errormsg = 'Fehler beim Speichern des Benutzer-Datensatzes';
 			return false;
 		}
 	}
@@ -326,10 +326,10 @@ class benutzer extends person
 				elseif($aktiv==false)
 					$qry.=" tbl_benutzer.aktiv=false AND (";
 		
-		$qry.=" lower(vorname || ' ' || nachname) like lower('%".addslashes(implode(' ',$searchItems))."%')"; 
-		$qry.=" OR lower(nachname || ' ' || vorname) like lower('%".addslashes(implode(' ',$searchItems))."%')";
-		$qry.=" OR lower(uid) like lower('%".addslashes(implode(' ',$searchItems))."%')";
-		$qry.=" OR lower(telefonklappe) like lower('%".addslashes(implode(' ',$searchItems))."%')";
+		$qry.=" lower(vorname || ' ' || nachname) like lower('%".$this->db_escape(implode(' ',$searchItems))."%')"; 
+		$qry.=" OR lower(nachname || ' ' || vorname) like lower('%".$this->db_escape(implode(' ',$searchItems))."%')";
+		$qry.=" OR lower(uid) like lower('%".$this->db_escape(implode(' ',$searchItems))."%')";
+		$qry.=" OR lower(telefonklappe) like lower('%".$this->db_escape(implode(' ',$searchItems))."%')";
 		
 		foreach($searchItems as $value)
 		{

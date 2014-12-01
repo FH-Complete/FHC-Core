@@ -60,10 +60,10 @@ class betriebsmitteltyp extends basis_db
 	{		
 		$this->result=array();
 		$this->errormsg = '';
-		$search = mb_strtoupper(trim(addslashes(str_replace(array('*',';',' ',"'",'"'),'%',trim($betriebsmitteltyp)))));
+		$search = mb_strtoupper(trim(str_replace(array('*',';',' ',"'",'"'),'%',trim($betriebsmitteltyp))));
 		$qry=" 
 			SELECT * FROM wawi.tbl_betriebsmitteltyp 
-			WHERE trim(UPPER(betriebsmitteltyp)) like '%".$search."%'
+			WHERE trim(UPPER(betriebsmitteltyp)) like '%".$this->db_escape($search)."%'
 			ORDER BY betriebsmitteltyp";
 		
 		if($this->db_query($qry))
@@ -82,7 +82,7 @@ class betriebsmitteltyp extends basis_db
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim Laden der Daten '.($this->debug?$this->db_last_error():'');
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
@@ -95,7 +95,9 @@ class betriebsmitteltyp extends basis_db
 	{
 		$this->result=array();
 		$this->errormsg = '';
-		$qry = "SELECT * FROM wawi.tbl_betriebsmitteltyp ORDER BY ".$order;
+		$qry = "SELECT * FROM wawi.tbl_betriebsmitteltyp";
+		if($order!='')
+			$qry.=" ORDER BY ".$order;
 		
 		if($this->db_query($qry))
 		{
@@ -115,7 +117,7 @@ class betriebsmitteltyp extends basis_db
 		}
 		else 
 		{
-			$this->errormsg = 'Fehler beim Laden der Daten '.($this->debug?$this->db_last_error():'');
+			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
 	}
@@ -134,20 +136,20 @@ class betriebsmitteltyp extends basis_db
 		if($new)
 		{
 			$qry="INSERT INTO wawi.tbl_betriebsmitteltyp (betriebsmitteltyp, beschreibung, anzahl, kaution , typ_code)
-					VALUES(".$this->addslashes($this->betriebsmitteltyp).",".
-						$this->addslashes($this->beschreibung).",".
-						$this->addslashes($this->anzahl).",".
-						$this->addslashes($this->kaution).",".
-						$this->addslashes($this->typ_code).");";
+					VALUES(".$this->db_add_param($this->betriebsmitteltyp).",".
+						$this->db_add_param($this->beschreibung).",".
+						$this->db_add_param($this->anzahl).",".
+						$this->db_add_param($this->kaution).",".
+						$this->db_add_param($this->typ_code).");";
 		}
 		else 
 		{
 			$qry='UPDATE wawi.tbl_betriebsmitteltyp SET '.
-				'beschreibung ='.$this->addslashes($this->beschreibung).', '.
-				'anzahl ='.$this->addslashes($this->anzahl).', '.
-				'kaution ='.$this->addslashes($this->kaution).', '.
-				'typ_code ='.$this->addslashes($this->typ_code).' '.
-				'WHERE betriebsmitteltyp='.$this->addslashes($this->betriebsmitteltyp).'; ' ;	
+				'beschreibung ='.$this->db_add_param($this->beschreibung).', '.
+				'anzahl ='.$this->db_add_param($this->anzahl).', '.
+				'kaution ='.$this->db_add_param($this->kaution).', '.
+				'typ_code ='.$this->db_add_param($this->typ_code).' '.
+				'WHERE betriebsmitteltyp='.$this->db_add_param($this->betriebsmitteltyp).'; ' ;	
 		}
 		
 		if($this->db_query($qry))
@@ -156,7 +158,7 @@ class betriebsmitteltyp extends basis_db
 		}
 		else
 		{			
-			$this->errormsg = 'Fehler beim Speichern des Betriebsmitteltypen-Datensatzes '.($this->debug?$this->db_last_error():'');
+			$this->errormsg = 'Fehler beim Speichern des Betriebsmitteltypen-Datensatzes';
 			return false;
 		}	
 	}
@@ -177,7 +179,7 @@ class betriebsmitteltyp extends basis_db
 		}
 		else
 		{			
-			$this->errormsg = 'Fehler beim Pruefen der Beschreibung des Betriebsmitteltypen-Datensatzes '.($this->debug?$this->db_last_error():'');
+			$this->errormsg = 'Fehler beim Pruefen der Beschreibung des Betriebsmitteltypen-Datensatzes';
 			return false;
 		}	
 	}

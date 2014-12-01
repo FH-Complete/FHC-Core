@@ -159,6 +159,9 @@ if(mb_strstr($vorlage->mimetype, 'application/vnd.oasis.opendocument'))
         fclose($handle);
 
         unlink('content.xml');
+		unlink('styles.xml');
+		unlink('Pictures/20000001000071B00000242C6CF7933F.svg');
+		rmdir('Pictures');
         unlink($tempname_zip);
         if($output=='pdf')
             unlink($tempPdfName);

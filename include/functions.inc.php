@@ -104,7 +104,7 @@ function check_lektor($uid)
 	$db = new basis_db();
 	
 	// uid von View 'Lektor' holen
-	$sql_query="SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid='".addslashes($uid)."'";
+	$sql_query="SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter WHERE mitarbeiter_uid=".$db->db_add_param($uid);
 	//echo $sql_query;
 	if($db->db_query($sql_query))
 	{
@@ -128,9 +128,9 @@ function check_lektor_lehrveranstaltung($uid, $lehrveranstaltung_id, $studiensem
 	
 	// uid von View 'Lektor' holen
 	$sql_query="SELECT mitarbeiter_uid FROM campus.vw_lehreinheit
-				WHERE mitarbeiter_uid='".addslashes($uid)."' AND 
-				lehrveranstaltung_id = '".addslashes($lehrveranstaltung_id)."' AND 
-				studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+				WHERE mitarbeiter_uid=".$db->db_add_param($uid)." AND 
+				lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER)." AND 
+				studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz);
 	
 	//echo $sql_query;
 	if($db->db_query($sql_query))
@@ -154,7 +154,7 @@ function check_student($uid)
 	$db = new basis_db();
 	
 	// uid von Tabelle 'Student' holen
-	$sql_query="SELECT student_uid FROM public.tbl_student WHERE student_uid='".addslashes($uid)."'";
+	$sql_query="SELECT student_uid FROM public.tbl_student WHERE student_uid=".$this->db_add_param($uid);
 	//echo $sql_query;
 	if($db->db_query($sql_query))
 	{

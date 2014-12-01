@@ -20,16 +20,16 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
-			
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/basis_db.class.php');			
 require_once('../../include/studiensemester.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/stundenplan.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
+
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 
 $student_uid = (isset($_GET['uid'])?$_GET['uid']:'');
@@ -37,6 +37,13 @@ $datum = (isset($_GET['datum'])?$_GET['datum']:'');
 $stunde = (isset($_GET['stunde'])?$_GET['stunde']:'');
 
 $user = get_uid();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('lehre/lvplan'))
+	die('Sie haben keine Berechtigung für diese Seite');
+
 loadVariables($user);
 
 echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
@@ -84,7 +91,7 @@ if($student_uid!='')
 	echo "<h2>UNR - $db_stpl_table</h2>";
 	$qry = "SELECT datum, stunde, student_uid, unr
 			FROM  lehre.vw_".$db_stpl_table."_student_unr
-			WHERE datum='$datum' AND stunde='$stunde' AND student_uid='$student_uid'
+			WHERE datum=".$db->db_add_param($datum)." AND stunde=".$db->db_add_param($stunde)." AND student_uid=".$db->db_add_param($student_uid)."
 			ORDER BY unr LIMIT 30; 
 		   ";
 	
@@ -105,7 +112,7 @@ if($student_uid!='')
 		{
 			$gruppen='';
 			$qry = "SELECT distinct studiengang_kz, semester, verband, gruppe, gruppe_kurzbz FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitgruppe USING(lehreinheit_id) 
-			        WHERE unr='$row->unr'";
+			        WHERE unr=".$db->db_add_param($row->unr);
 			if($result_grp = $db->db_query($qry))
 			{
 				while($row_grp = $db->db_fetch_object($result_grp))
@@ -135,7 +142,7 @@ else
 	echo "<h2>Stundenplaneinträge - $db_stpl_table</h2>";
 	
 	
-	$qry = "SELECT * FROM lehre.tbl_$db_stpl_table WHERE datum='$datum' AND stunde='$stunde'";
+	$qry = "SELECT * FROM lehre.tbl_$db_stpl_table WHERE datum=".$db->db_add_param($datum)." AND stunde=".$db->db_add_param($stunde);
 	
 	echo '<table class="liste table-autosort:0 table-stripeclass:alternate table-autostripe">
 		<thead>';

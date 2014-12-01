@@ -236,7 +236,7 @@ if(isset($_POST['submitantwort']) && isset($_GET['frage_id']))
 		// alle vorhandenen Antworten zu dieser Frage loeschen
 		$qry = "DELETE FROM testtool.tbl_antwort WHERE antwort_id in(
 					SELECT antwort_id FROM testtool.tbl_antwort JOIN testtool.tbl_vorschlag USING(vorschlag_id)
-					WHERE frage_id='".addslashes($_GET['frage_id'])."' AND pruefling_id='".addslashes($_SESSION['pruefling_id'])."')";
+					WHERE frage_id=".$db->db_add_param($_GET['frage_id'])." AND pruefling_id=".$db->db_add_param($_SESSION['pruefling_id']).")";
 	
 		$db->db_query($qry);
 		
@@ -314,7 +314,7 @@ if(isset($_POST['submitantwort']) && isset($_GET['frage_id']))
 $qry = "SELECT begintime
 		FROM 
 			testtool.tbl_pruefling_frage JOIN testtool.tbl_frage USING(frage_id)
-		WHERE pruefling_id='".addslashes($_SESSION['pruefling_id'])."' AND gebiet_id='".addslashes($gebiet_id)."'
+		WHERE pruefling_id=".$db->db_add_param($_SESSION['pruefling_id'], FHC_INTEGER)." AND gebiet_id=".$db->db_add_param($gebiet_id, FHC_INTEGER)."
 		ORDER BY begintime ASC LIMIT 1";
 
 if($result = $db->db_query($qry))
@@ -344,7 +344,7 @@ $info='';
 $qry_pruefling = "SELECT vorname, nachname, stg_bez, tbl_studiengangstyp.bezeichnung FROM testtool.vw_pruefling 
 					JOIN public.tbl_studiengang USING (studiengang_kz)
 					JOIN public.tbl_studiengangstyp USING (typ)
-					WHERE pruefling_id='".addslashes($_SESSION['pruefling_id'])."'";
+					WHERE pruefling_id=".$db->db_add_param($_SESSION['pruefling_id']);
 
 if($result_pruefling = $db->db_query($qry_pruefling))
 {
@@ -360,8 +360,8 @@ if($levelgebiet)
 	$max = $gebiet->maxfragen;
 	$aktuell=0;
 	$qry = "SELECT count(*) as anzahl FROM testtool.tbl_pruefling_frage JOIN testtool.tbl_frage USING(frage_id)
-			WHERE pruefling_id='".addslashes($_SESSION['pruefling_id'])."'
-			AND gebiet_id='$gebiet_id'";
+			WHERE pruefling_id=".$db->db_add_param($_SESSION['pruefling_id'], FHC_INTEGER)."
+			AND gebiet_id=".$db->db_add_param($gebiet_id, FHC_INTEGER);
 	
 	if($result_aktuell = $db->db_query($qry))
 	{
@@ -405,7 +405,7 @@ else
 	//Wenn es sich um eine Testfrage handelt, dann wird die verbleibende Zeit angezeigt
 	$qry = "SELECT '$gebiet->zeit'-(now()-min(begintime)) as time 
 			FROM testtool.tbl_pruefling_frage JOIN testtool.tbl_frage USING(frage_id) 
-			WHERE gebiet_id='".addslashes($gebiet_id)."' AND pruefling_id='".addslashes($_SESSION['pruefling_id'])."'";
+			WHERE gebiet_id=".$db->db_add_param($gebiet_id, FHC_INTEGER)." AND pruefling_id=".$db->db_add_param($_SESSION['pruefling_id'], FHC_INTEGER);
 	$result = $db->db_query($qry);
 	$row = $db->db_fetch_object($result);
 	//Zeit in Sekunden umrechnen
@@ -441,7 +441,7 @@ else
 		// wenn keine Frage uebergeben wurde und die maximale Fragenanzahl erreicht wurde
 		// dann ist das Gebiet fertig
 		$qry = "SELECT count(*) as anzahl FROM testtool.tbl_pruefling_frage JOIN testtool.tbl_frage USING(frage_id) 
-				WHERE gebiet_id='".addslashes($gebiet_id)."' AND pruefling_id='".addslashes($_SESSION['pruefling_id'])."' AND tbl_pruefling_frage.endtime is not null";
+				WHERE gebiet_id=".$db->db_add_param($gebiet_id, FHC_INTEGER)." AND pruefling_id=".$db->db_add_param($_SESSION['pruefling_id'], FHC_INTEGER)." AND tbl_pruefling_frage.endtime is not null";
 		$result = $db->db_query($qry);
 		$row = $db->db_fetch_object($result);
 		
@@ -488,7 +488,7 @@ if($frage->frage_id!='')
 	{
 		$qry = "SELECT tbl_pruefling_frage.nummer, tbl_pruefling_frage.frage_id 
 				FROM testtool.tbl_pruefling_frage JOIN testtool.tbl_frage USING(frage_id) 
-				WHERE gebiet_id='".addslashes($gebiet_id)."' AND pruefling_id='".addslashes($_SESSION['pruefling_id'])."' AND demo=false ORDER BY nummer";
+				WHERE gebiet_id=".$db->db_add_param($gebiet_id, FHC_INTEGER)." AND pruefling_id=".$db->db_add_param($_SESSION['pruefling_id'], FHC_INTEGER)." AND demo=false ORDER BY nummer";
 
 		echo " <table><tr>";
 		//Nummern der Fragen Anzeigen
@@ -524,7 +524,7 @@ if($frage->frage_id!='')
 			if($demo)
 			{
 				$qry = "SELECT count(*) as anzahl FROM testtool.tbl_frage 
-						WHERE tbl_frage.gebiet_id='".addslashes($gebiet_id)."' 
+						WHERE tbl_frage.gebiet_id=".$db->db_add_param($gebiet_id, FHC_INTEGER)." 
 						AND demo ";
 				if($row = $db->db_fetch_object($db->db_query($qry)))
 				{
@@ -563,7 +563,7 @@ if($frage->frage_id!='')
 				//$nextfrage = $frage->getNextFrage($gebiet_id, $_SESSION['pruefling_id'], $frage_id, $demo);
 				
 				$qry = "SELECT count(*) as anzahl FROM testtool.tbl_frage 
-						WHERE tbl_frage.gebiet_id='".addslashes($gebiet_id)."' 
+						WHERE tbl_frage.gebiet_id=".$db->db_add_param($gebiet_id, FHC_INTEGER)."
 						AND demo ";
 				if($row = $db->db_fetch_object($db->db_query($qry)))
 				{

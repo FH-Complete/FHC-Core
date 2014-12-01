@@ -21,29 +21,38 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  *			Manfred Kindl < manfred.kindl@technikum-wien.at >
  */
- 
-	/**
-	 *	@updated 11.09.2012 kindl
-	 *
-	 */
-		require_once('../../config/vilesci.config.inc.php');
-		require_once('../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-				die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+/**
+ *	@updated 11.09.2012 kindl
+ *
+ */
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/basis_db.class.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/benutzerberechtigung.class.php');
+
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+
+$user = get_uid();
 			
-	//Spezialgruppen für DropDown
-	$sql_query="SELECT gruppe_kurzbz FROM public.tbl_gruppe WHERE studiengang_kz=10006 AND aktiv=true AND sichtbar=true ORDER BY gruppe_kurzbz";
-	//echo $sql_query."<br>";
-	$result_incgrp=$db->db_query($sql_query);
-	if(!$result_incgrp)
-		die("Keine Incoming-Gruppen gefunden! ".$db->db_last_error());
-		
-	$incgrp=(isset($_REQUEST['incgrp'])?$_REQUEST['incgrp']:'');	
-	$lehreinheit_id=(isset($_REQUEST['lehreinheit_id'])?$_REQUEST['lehreinheit_id']:'');	
-	$type=(isset($_REQUEST['type'])?$_REQUEST['type']:'');
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('lehre/lvplan', null, 'suid'))
+	die('Sie haben keine Berechtigung für diese Seite');
+
+//Spezialgruppen für DropDown
+$sql_query="SELECT gruppe_kurzbz FROM public.tbl_gruppe WHERE studiengang_kz=10006 AND aktiv=true AND sichtbar=true ORDER BY gruppe_kurzbz";
+//echo $sql_query."<br>";
+$result_incgrp=$db->db_query($sql_query);
+if(!$result_incgrp)
+	die("Keine Incoming-Gruppen gefunden! ".$db->db_last_error());
+	
+$incgrp=(isset($_REQUEST['incgrp'])?$_REQUEST['incgrp']:'');	
+$lehreinheit_id=(isset($_REQUEST['lehreinheit_id'])?$_REQUEST['lehreinheit_id']:'');	
+$type=(isset($_REQUEST['type'])?$_REQUEST['type']:'');
 
 ?>
-
 <html>
 <head>
 <title>Incoming löschen</title>
@@ -96,16 +105,16 @@ if ($type=="save")
 	if (!$error)
 	{
 			$sql_query="DELETE FROM lehre.tbl_stundenplandev 
-						WHERE lehreinheit_id=".$_POST['lehreinheit_id']."						
-						AND gruppe_kurzbz='".$_POST['incgrp']."';
+						WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)."						
+						AND gruppe_kurzbz=".$db->db_add_param($_POST['incgrp']).";
 						
 						DELETE FROM lehre.tbl_stundenplan 
-						WHERE lehreinheit_id=".$_POST['lehreinheit_id']."						
-						AND gruppe_kurzbz='".$_POST['incgrp']."';
+						WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)."						
+						AND gruppe_kurzbz=".$db->db_add_param($_POST['incgrp'], FHC_INTEGER).";
 						
 						DELETE FROM lehre.tbl_lehreinheitgruppe 
-						WHERE lehreinheit_id=".$_POST['lehreinheit_id']."						
-						AND gruppe_kurzbz='".$_POST['incgrp']."';";
+						WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'])."						
+						AND gruppe_kurzbz=".$db->db_add_param($_POST['incgrp']).";";
 			//echo $sql_query;
 			$result=$db->db_query($sql_query);
 			if(!$result)
@@ -114,7 +123,7 @@ if ($type=="save")
 				$error=true;
 			}
 			else
-				echo "<strong>Lehreinheit:</strong> ".$_POST['lehreinheit_id']." - <strong>Gruppe:</strong> ".$_POST['incgrp']." -- <strong>Gelöscht!</strong><br>";
+				echo "<strong>Lehreinheit:</strong> ".$db->convert_html_chars($_POST['lehreinheit_id'])." - <strong>Gruppe:</strong> ".$db->convert_html_chars($_POST['incgrp'])." -- <strong>Gelöscht!</strong><br>";
 
 		if (!$error)
 			echo "<br><font style='color:green'><strong>Gruppe erfolgreich gelöscht</strong></font><br>";

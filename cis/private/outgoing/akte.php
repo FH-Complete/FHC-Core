@@ -23,13 +23,24 @@
 // um und gibt das Dokument zurueck.
 
 require_once('../../../config/vilesci.config.inc.php');
+require_once('../../../include/functions.inc.php');
 require_once('../../../include/akte.class.php');
+require_once('../../../include/benutzer.class.php');
+
+
+$uid = get_uid();
+
+$benutzer = new benutzer();
+if(!$benutzer->load($uid))
+	die('Benutzer nicht gefunden');
 
 //base64 Dump aus der DB holen
 if(isset($_GET['id']) && is_numeric($_GET['id']))
 {
 	$akte = new akte($_GET['id']);
-
+	if($akte->person_id!=$benutzer->person_id)
+		die('Sie haben keine Berechtigung fuer diese Datei');
+	
 	//Header fuer Bild schicken
 	header("Content-type: $akte->mimetype");
 	header('Content-Disposition: attachment; filename="'.$akte->titel.'"');

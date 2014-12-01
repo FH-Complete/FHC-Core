@@ -20,7 +20,11 @@
  *          Karl Burkhart <karl.burkhart@technikum-wien.at>.
  */
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
 require_once('../../include/statistik.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
+
+$uid = get_uid();
 
 if(!isset($_GET['statistik_kurzbz']))
 	die('Statistik_kurzbz Parameter fehlt');
@@ -59,6 +63,14 @@ $html.='<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 $statistik = new statistik();
 if(!$statistik->load($statistik_kurzbz))
 	die($statistik->errormsg);
+
+if($statistik->berechtigung_kurzbz!='')
+{
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($uid);
+	if(!$rechte->isBerechtigt($statistik->berechtigung_kurzbz))
+		die('Sie haben keine Berechtigung für diese Seite');
+}
 
 $html.= '<h2>Statistik - '.$statistik->bezeichnung.'</h2>';
 

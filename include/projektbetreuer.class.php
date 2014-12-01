@@ -300,7 +300,7 @@ class projektbetreuer extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id='".$projektarbeit_id."' ORDER BY name";
+		$qry = "SELECT * FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id=".$this->db_add_param($projektarbeit_id, FHC_INTEGER)." ORDER BY name";
 		
 		if($this->db_query($qry))
 		{

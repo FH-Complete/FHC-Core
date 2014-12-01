@@ -118,7 +118,7 @@ class benutzerfunktion extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Laden der Bentuzerfunktionen';
+			$this->errormsg = 'Fehler beim Laden der Benutzerfunktionen';
 			return false;
 		}
 	}
@@ -164,7 +164,7 @@ class benutzerfunktion extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Laden der Bentuzerfunktionen';
+			$this->errormsg = 'Fehler beim Laden der Benutzerfunktionen';
 			return false;
 		}
 	}
@@ -219,7 +219,7 @@ class benutzerfunktion extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Laden der Bentuzerfunktionen';
+			$this->errormsg = 'Fehler beim Laden der Benutzerfunktionen';
 			return false;
 		}
 	}
@@ -395,7 +395,7 @@ class benutzerfunktion extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Fehler beim Speichern des Datensatzes - '.$this->db_last_error();
+			$this->errormsg = 'Fehler beim Speichern des Datensatzes';
 			return false;
 		}
 	}
@@ -454,7 +454,7 @@ class benutzerfunktion extends basis_db
 	    }
 	    else
 	    {
-		$this->errormsg = 'Fehler beim Laden der Bentuzerfunktionen';
+		$this->errormsg = 'Fehler beim Laden der Benutzerfunktionen';
 		return false;
 	    }
 	}

@@ -633,11 +633,11 @@ class dms extends basis_db
 	public function search($suchstring)
 	{
 		$qry = "SELECT * FROM campus.tbl_dms  JOIN campus.tbl_dms_version USING(dms_id)
-				WHERE lower(name) like lower('%".addslashes($suchstring)."%')
-				OR lower(beschreibung) like lower('%".addslashes($suchstring)."%')
+				WHERE lower(name) like lower('%".$this->db_escape($suchstring)."%')
+				OR lower(beschreibung) like lower('%".$this->db_escape($suchstring)."%')
 				";
 		if (is_numeric($suchstring))
-			$qry.= "OR dms_id = ".addslashes($suchstring)."";
+			$qry.= "OR dms_id = ".$this->db_escape($suchstring)."";
 
 			$qry.=";";
 		

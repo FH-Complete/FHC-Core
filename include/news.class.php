@@ -84,15 +84,15 @@ class news extends basis_db
 			if(is_null($fachbereich_kurzbz) || trim($fachbereich_kurzbz)=='')
 				$qry.=' AND fachbereich_kurzbz is null';	
 			else 
-				$qry.=" AND fachbereich_kurzbz='".addslashes(trim($fachbereich_kurzbz))."'";
+				$qry.=" AND fachbereich_kurzbz=".$this->db_add_param(trim($fachbereich_kurzbz));
 		}
 				
 		if(trim($studiengang_kz)=='0')
-			$qry.=" AND studiengang_kz='".$studiengang_kz."' ".(trim($semester)!=''?(trim($semester)=='0'?' AND semester=0':''):' AND semester is null');
+			$qry.=" AND studiengang_kz=".$this->db_add_param($studiengang_kz)." ".(trim($semester)!=''?(trim($semester)=='0'?' AND semester=0':''):' AND semester is null');
 		elseif(trim($studiengang_kz)=='')
 			$qry.='';
 		else
-			$qry.=" AND ((studiengang_kz='".trim($studiengang_kz)."' AND semester='".trim($semester)."') OR (studiengang_kz='".trim($studiengang_kz)."' AND semester=0) OR (studiengang_kz=0 AND semester='".trim($semester)."') ".($mischen===true?"OR (studiengang_kz=0 and semester is null)":"").")";	
+			$qry.=" AND ((studiengang_kz=".$this->db_add_param(trim($studiengang_kz))." AND semester=".$this->db_add_param(trim($semester)).") OR (studiengang_kz=".$this->db_add_param(trim($studiengang_kz))." AND semester=0) OR (studiengang_kz=0 AND semester=".$this->db_add_param(trim($semester)).") ".($mischen===true?"OR (studiengang_kz=0 and semester is null)":"").")";	
 		$qry.=' ORDER BY datum DESC';
 		if(trim($maxnews)!='0')
 			$qry.= " LIMIT ".trim($maxnews);
@@ -144,7 +144,7 @@ class news extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * FROM campus.tbl_news WHERE news_id = '$news_id';";
+		$qry = "SELECT * FROM campus.tbl_news WHERE news_id=".$this->db_add_param($news_id, FHC_INTEGER).";";
 		
 		if(!$this->db_query($qry))
 		{
@@ -196,10 +196,9 @@ class news extends basis_db
 		if($this->load($news_id))
 		{
 			$qry = "
-				DELETE FROM campus.tbl_news WHERE news_id='".addslashes($news_id)."';
-				DELETE FROM campus.tbl_contentsprache WHERE content_id='".addslashes($this->content_id)."';
-				DELETE FROM campus.tbl_content WHERE content_id='".addslashes($this->content_id)."';
-				";
+				DELETE FROM campus.tbl_news WHERE news_id=".$this->db_add_param($news_id, FHC_INTEGER)."
+				DELETE FROM campus.tbl_contentsprache WHERE content_id=".$this->db_add_param($this->content_id, FHC_INTEGER)."
+				DELETE FROM campus.tbl_content WHERE content_id=".$this->db_add_param($this->content_id, FHC_INTEGER);
 			
 			if($this->db_query($qry))
 				return true;
@@ -241,17 +240,17 @@ class news extends basis_db
 						
 			$qry = 'BEGIN;INSERT INTO campus.tbl_news (semester, fachbereich_kurzbz, uid, studiengang_kz, datum, datum_bis, 
 						insertamum, insertvon, updateamum, updatevon, content_id) VALUES ('.
-				$this->addslashes($this->semester).', '.
-				$this->addslashes($this->fachbereich_kurzbz).', '.
-				$this->addslashes($this->uid).', '.
-				$this->addslashes($this->studiengang_kz).', '.
-				$this->addslashes($this->datum).', '.
-				$this->addslashes($this->datum_bis).', '.
-				$this->addslashes($this->insertamum).', '.
-				$this->addslashes($this->insertvon).', '.
-				$this->addslashes($this->updateamum).', '.
-				$this->addslashes($this->updatevon).','.
-				$this->addslashes($this->content_id).'); ';
+				$this->db_add_param($this->semester).', '.
+				$this->db_add_param($this->fachbereich_kurzbz).', '.
+				$this->db_add_param($this->uid).', '.
+				$this->db_add_param($this->studiengang_kz).', '.
+				$this->db_add_param($this->datum).', '.
+				$this->db_add_param($this->datum_bis).', '.
+				$this->db_add_param($this->insertamum).', '.
+				$this->db_add_param($this->insertvon).', '.
+				$this->db_add_param($this->updateamum).', '.
+				$this->db_add_param($this->updatevon).','.
+				$this->db_add_param($this->content_id, FHC_INTEGER).'); ';
 				
 		}
 		else 
@@ -266,18 +265,18 @@ class news extends basis_db
 			}
 			
 			$qry = 'UPDATE campus.tbl_news SET '. 
-				'semester='.$this->addslashes($this->semester).', '.
-				'fachbereich_kurzbz='.$this->addslashes($this->fachbereich_kurzbz).', '.
-				'uid='.$this->addslashes($this->uid).', '.
-				'studiengang_kz='.$this->addslashes($this->studiengang_kz).', '.
-				'datum='.$this->addslashes($this->datum).', '.
-				'datum_bis='.$this->addslashes($this->datum_bis).', '.
-				'insertamum='.$this->addslashes($this->insertamum).', '.
-				'insertvon='.$this->addslashes($this->insertvon).', '.
-				'updateamum='.$this->addslashes($this->updateamum).', '.
-				'updatevon='.$this->addslashes($this->updatevon).', '.
-				'content_id='.$this->addslashes($this->content_id).' '.
-				'WHERE news_id = '.$this->addslashes($this->news_id).';';
+				'semester='.$this->db_add_param($this->semester).', '.
+				'fachbereich_kurzbz='.$this->db_add_param($this->fachbereich_kurzbz).', '.
+				'uid='.$this->db_add_param($this->uid).', '.
+				'studiengang_kz='.$this->db_add_param($this->studiengang_kz).', '.
+				'datum='.$this->db_add_param($this->datum).', '.
+				'datum_bis='.$this->db_add_param($this->datum_bis).', '.
+				'insertamum='.$this->db_add_param($this->insertamum).', '.
+				'insertvon='.$this->db_add_param($this->insertvon).', '.
+				'updateamum='.$this->db_add_param($this->updateamum).', '.
+				'updatevon='.$this->db_add_param($this->updatevon).', '.
+				'content_id='.$this->db_add_param($this->content_id, FHC_INTEGER).' '.
+				'WHERE news_id = '.$this->db_add_param($this->news_id, FHC_INTEGER).';';
 		}
 		
 		if($this->db_query($qry))

@@ -224,26 +224,26 @@ class projektarbeit extends basis_db
 			$qry='BEGIN; INSERT INTO lehre.tbl_projektarbeit (projekttyp_kurzbz, titel, lehreinheit_id, student_uid, firma_id, note, punkte, 
 				beginn, ende, faktor, freigegeben, gesperrtbis, stundensatz, gesamtstunden, themenbereich, anmerkung, 
 				ext_id, insertamum, insertvon, updateamum, updatevon, titel_english) VALUES('.
-			     $this->addslashes($this->projekttyp_kurzbz).', '.
-			     $this->addslashes($this->titel).', '.
-			     $this->addslashes($this->lehreinheit_id).', '.
-			     $this->addslashes($this->student_uid).', '.
-			     $this->addslashes($this->firma_id).', '.
-			     $this->addslashes($this->note).', '.
-			     $this->addslashes($this->punkte).', '.
-			     $this->addslashes($this->beginn).', '.
-			     $this->addslashes($this->ende).', '.
-			     $this->addslashes($this->faktor).', '.
-			     ($this->freigegeben?'true':'false').', '.
-			     $this->addslashes($this->gesperrtbis).', '.
-			     $this->addslashes($this->stundensatz).', '.
-			     $this->addslashes($this->gesamtstunden).', '.
-			     $this->addslashes($this->themenbereich).', '.
-			     $this->addslashes($this->anmerkung).', '.
-			     $this->addslashes($this->ext_id).',  now(), '.
-			     $this->addslashes($this->insertvon).', now(), '.
-			     $this->addslashes($this->updatevon).','.
-			     $this->addslashes($this->titel_english).');';
+			     $this->db_add_param($this->projekttyp_kurzbz).', '.
+			     $this->db_add_param($this->titel).', '.
+			     $this->db_add_param($this->lehreinheit_id, FHC_INTEGER).', '.
+			     $this->db_add_param($this->student_uid).', '.
+			     $this->db_add_param($this->firma_id, FHC_INTEGER).', '.
+			     $this->db_add_param($this->note).', '.
+			     $this->db_add_param($this->punkte).', '.
+			     $this->db_add_param($this->beginn).', '.
+			     $this->db_add_param($this->ende).', '.
+			     $this->db_add_param($this->faktor).', '.
+			     $this->db_add_param($this->freigegeben, FHC_BOOLEAN).', '.
+			     $this->db_add_param($this->gesperrtbis).', '.
+			     $this->db_add_param($this->stundensatz).', '.
+			     $this->db_add_param($this->gesamtstunden).', '.
+			     $this->db_add_param($this->themenbereich).', '.
+			     $this->db_add_param($this->anmerkung).', '.
+			     $this->db_add_param($this->ext_id).',  now(), '.
+			     $this->db_add_param($this->insertvon).', now(), '.
+			     $this->db_add_param($this->updatevon).','.
+			     $this->db_add_param($this->titel_english).');';
 		}
 		else
 		{
@@ -257,26 +257,26 @@ class projektarbeit extends basis_db
 			}
 
 			$qry='UPDATE lehre.tbl_projektarbeit SET '.
-				'projekttyp_kurzbz='.$this->addslashes($this->projekttyp_kurzbz).', '.
-				'titel='.$this->addslashes($this->titel).', '.
-				'titel_english='.$this->addslashes($this->titel_english).', '.
-				'lehreinheit_id='.$this->addslashes($this->lehreinheit_id).', '.
-				'student_uid='.$this->addslashes($this->student_uid).', '.
-				'firma_id='.$this->addslashes($this->firma_id).', '.
-				'note='.$this->addslashes($this->note).', '.
-				'punkte='.$this->addslashes($this->punkte).', '.
-				'beginn='.$this->addslashes($this->beginn).', '.
-				'ende='.$this->addslashes($this->ende).', '.
-				'faktor='.$this->addslashes($this->faktor).', '.
-				'freigegeben='.($this->freigegeben?'true':'false').', '.
-				'gesperrtbis='.$this->addslashes($this->gesperrtbis).', '.
-				'stundensatz='.$this->addslashes($this->stundensatz).', '.
-				'gesamtstunden='.$this->addslashes($this->gesamtstunden).', '.
-				'themenbereich='.$this->addslashes($this->themenbereich).', '.
-				'anmerkung='.$this->addslashes($this->anmerkung).', '.
+				'projekttyp_kurzbz='.$this->db_add_param($this->projekttyp_kurzbz).', '.
+				'titel='.$this->db_add_param($this->titel).', '.
+				'titel_english='.$this->db_add_param($this->titel_english).', '.
+				'lehreinheit_id='.$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).', '.
+				'student_uid='.$this->db_add_param($this->student_uid).', '.
+				'firma_id='.$this->db_add_param($this->firma_id, FHC_INTEGER).', '.
+				'note='.$this->db_add_param($this->note).', '.
+				'punkte='.$this->db_add_param($this->punkte).', '.
+				'beginn='.$this->db_add_param($this->beginn).', '.
+				'ende='.$this->db_add_param($this->ende).', '.
+				'faktor='.$this->db_add_param($this->faktor).', '.
+				'freigegeben='.$this->db_add_param($this->freigegeben, FHC_BOOLEAN).', '.
+				'gesperrtbis='.$this->db_add_param($this->gesperrtbis).', '.
+				'stundensatz='.$this->db_add_param($this->stundensatz).', '.
+				'gesamtstunden='.$this->db_add_param($this->gesamtstunden).', '.
+				'themenbereich='.$this->db_add_param($this->themenbereich).', '.
+				'anmerkung='.$this->db_add_param($this->anmerkung).', '.
 				'updateamum= now(), '.
-				'updatevon='.$this->addslashes($this->updatevon).' '.
-				'WHERE projektarbeit_id='.$this->addslashes($this->projektarbeit_id).';';
+				'updatevon='.$this->db_add_param($this->updatevon).' '.
+				'WHERE projektarbeit_id='.$this->db_add_param($this->projektarbeit_id, FHC_INTEGER).';';
 		}
 		
 		if($this->db_query($qry))
@@ -330,7 +330,7 @@ class projektarbeit extends basis_db
 			return true;
 		}
 		
-		$qry = "DELETE FROM lehre.tbl_projektarbeit WHERE projektarbeit_id='$projektarbeit_id'";
+		$qry = "DELETE FROM lehre.tbl_projektarbeit WHERE projektarbeit_id=".$this->db_add_param($projektarbeit_id, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 		{
@@ -350,7 +350,8 @@ class projektarbeit extends basis_db
 	 */
 	public function getProjektarbeit($student_uid)
 	{
-		$qry = "SELECT * FROM lehre.tbl_projektarbeit JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz) WHERE student_uid='".addslashes($student_uid)."'";
+		$qry = "SELECT * FROM lehre.tbl_projektarbeit JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz) 
+				WHERE student_uid=".$this->db_add_param($student_uid);
 		
 		if($this->db_query($qry))
 		{
@@ -371,7 +372,7 @@ class projektarbeit extends basis_db
 				$obj->beginn = $row->beginn;
 				$obj->ende = $row->ende;
 				$obj->faktor = $row->faktor;
-				$obj->freigegeben = ($row->freigegeben=='t'?true:false);
+				$obj->freigegeben = $this->db_parse_bool($row->freigegeben);
 				$obj->gesperrtbis = $row->gesperrtbis;
 				$obj->stundensatz = $row->stundensatz;
 				$obj->gesamtstunden = $row->gesamtstunden;
@@ -411,8 +412,8 @@ class projektarbeit extends basis_db
 				WHERE 
 					tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
 					tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
-					tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."' AND
-					tbl_lehreinheit.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+					tbl_lehrveranstaltung.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER)." AND
+					tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 		
 		if($this->db_query($qry))
 		{
@@ -433,7 +434,7 @@ class projektarbeit extends basis_db
 				$obj->beginn = $row->beginn;
 				$obj->ende = $row->ende;
 				$obj->faktor = $row->faktor;
-				$obj->freigegeben = ($row->freigegeben=='t'?true:false);
+				$obj->freigegeben = $this->db_parse_bool($row->freigegeben);
 				$obj->gesperrtbis = $row->gesperrtbis;
 				$obj->stundensatz = $row->stundensatz;
 				$obj->gesamtstunden = $row->gesamtstunden;

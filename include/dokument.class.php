@@ -483,7 +483,7 @@ class dokument extends basis_db
 	/**
 	 * Prueft ob die Zuordnung Dokument zu Studiengang bereits vorhanden ist
 	 * @param $dokument_kurzbz
-	 * @parma $studiengang_kz
+	 * @param $studiengang_kz
 	 * @return true wenn vorhanden, false wenn nicht vorhanden
 	 */
 	public function existsDokumentStudiengang($dokument_kurzbz, $studiengang_kz)
@@ -610,7 +610,7 @@ class dokument extends basis_db
     
 	/**
 	 * Loescht einen Dokumenttyp
-	 * @parma $dokument_kurzbz
+	 * @param $dokument_kurzbz
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	function deleteDokumenttyp($dokument_kurzbz)

@@ -88,7 +88,7 @@ session_start();
 if (isset($_SESSION['pruefling_id']))
 {
 	//content_id fuer Einfuehrung auslesen
-	$qry = "SELECT content_id FROM testtool.tbl_ablauf_vorgaben WHERE studiengang_kz='".addslashes($_SESSION['studiengang_kz'])."' LIMIT 1";
+	$qry = "SELECT content_id FROM testtool.tbl_ablauf_vorgaben WHERE studiengang_kz=".$db->db_add_param($_SESSION['studiengang_kz'])." LIMIT 1";
 	$result = $db->db_query($qry);
 	
 	echo '<table width="100%"  border="0" cellspacing="0" cellpadding="0" style="border-right-width:1px;border-right-color:#BCBCBC;">';
@@ -96,11 +96,12 @@ if (isset($_SESSION['pruefling_id']))
 			<a href="login.php" target="content">'.$p->t('testtool/startseite').'</a>
 		</td></tr>';
 	if ($content_id = $db->db_fetch_object($result))
-		echo '<tr><td style="padding-left: 20px;"><a href="../../cms/content.php?content_id='.$content_id->content_id.'&sprache='.$sprache.'" target="content">'.$p->t('testtool/einleitung').'</a></td></tr>';
+		if($content_id->content_id!='')
+			echo '<tr><td style="padding-left: 20px;"><a href="../../cms/content.php?content_id='.$content_id->content_id.'&sprache='.$sprache.'" target="content">'.$p->t('testtool/einleitung').'</a></td></tr>';	
 	echo '<tr><td>&nbsp;</td></tr>';
 	echo '<tr><td style="padding-left: 20px;" nowrap>';
 	  	
-	$qry = "SELECT * FROM testtool.vw_ablauf WHERE studiengang_kz='".addslashes($_SESSION['studiengang_kz'])."' ORDER BY semester,reihung";
+	$qry = "SELECT * FROM testtool.vw_ablauf WHERE studiengang_kz=".$db->db_add_param($_SESSION['studiengang_kz'])." ORDER BY semester,reihung";
 	
 	$result = $db->db_query($qry);
 	$lastsemester = '';
@@ -126,9 +127,9 @@ if (isset($_SESSION['pruefling_id']))
 			//Status der Gebiete Pruefen
 			$gebiet->load($row->gebiet_id);
 			
-			$qry = "SELECT extract('epoch' from '$gebiet->zeit'-(now()-min(begintime))) as time
+			$qry = "SELECT extract('epoch' from '".$gebiet->zeit."'-(now()-min(begintime))) as time
 					FROM testtool.tbl_pruefling_frage JOIN testtool.tbl_frage USING(frage_id) 
-					WHERE gebiet_id='".addslashes($row->gebiet_id)."' AND pruefling_id='".addslashes($_SESSION['pruefling_id'])."'";
+					WHERE gebiet_id=".$db->db_add_param($row->gebiet_id)." AND pruefling_id=".$db->db_add_param($_SESSION['pruefling_id']);
 			if($result_time = $db->db_query($qry))
 			{
 				if($row_time = $db->db_fetch_object($result_time))
@@ -180,7 +181,6 @@ if (isset($_SESSION['pruefling_id']))
 		else 
 		{
 			echo '<tr>
-						<td width="10" nowrap>&nbsp;</td>
 				   		<td nowrap>
 				   			<span class="error"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;'.$row->gebiet_bez.' (invalid)</span>
 				   		</td>

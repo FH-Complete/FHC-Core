@@ -64,7 +64,7 @@ else
 			else 
 				$uids = $_GET['uid'];
 
-			$qry = "SELECT student_uid, studiengang_kz FROM public.tbl_student WHERE student_uid='".addslashes($uids[1])."'";
+			$qry = "SELECT student_uid, studiengang_kz FROM public.tbl_student WHERE student_uid=".$db->db_add_param($uids[1]);
 			if($result_std = $db->db_query($qry))
 				if($db->db_num_rows($result_std)==1)
 				{
@@ -207,6 +207,7 @@ if (!isset($_REQUEST["archive"]))
 			fclose($handle);
 
 			unlink('content.xml');
+			unlink('styles.xml');
 			unlink($tempname_zip);
             if($output=='pdf')
                 unlink($tempPdfName);

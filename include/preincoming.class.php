@@ -96,7 +96,7 @@ class preincoming extends basis_db
 		}
 
 		//Daten aus der Datenbank lesen
-		$qry = "SELECT * FROM public.tbl_preincoming WHERE preincoming_id='".addslashes($preincoming_id)."'";
+		$qry = "SELECT * FROM public.tbl_preincoming WHERE preincoming_id=".$this->db_add_param($preincoming_id, FHC_INTEGER);
 
 		if(!$this->db_query($qry))
 		{
@@ -113,13 +113,13 @@ class preincoming extends basis_db
 			$this->firma_id = $row->firma_id;
 			$this->anmerkung = $row->anmerkung;
 			$this->universitaet = $row->universitaet;
-			$this->aktiv = ($row->aktiv=='t'?true:false);
-			$this->bachelorthesis = ($row->bachelorthesis=='t'?true:false);
-			$this->masterthesis = ($row->masterthesis=='t'?true:false);
+			$this->aktiv = $this->db_parse_bool($row->aktiv);
+			$this->bachelorthesis = $this->db_parse_bool($row->bachelorthesis);
+			$this->masterthesis = $this->db_parse_bool($row->masterthesis);
 			$this->von = $row->von;
 			$this->bis = $row->bis;
 			$this->code = $row->code; 
-			$this->uebernommen = ($row->uebernommen=='t'?true:false);
+			$this->uebernommen = $this->db_parse_bool($row->uebernommen);
 			$this->updateamum = $row->updateamum;
 			$this->updatevon = $row->updatevon;
 			$this->insertamum = $row->insertamum;
@@ -134,15 +134,15 @@ class preincoming extends basis_db
 			$this->zgvmaster_datum = $row->zgvmaster_datum; 
 			$this->zgvmaster_ort = $row->zgvmaster_ort; 
 			$this->program_name = $row->program_name; 
-			$this->bachelor = ($row->bachelor=='t'?true:false);
-			$this->master = ($row->master=='t'?true:false); 
+			$this->bachelor = $this->db_parse_bool($row->bachelor);
+			$this->master = $this->db_parse_bool($row->master); 
 			$this->jahre = $row->jahre; 
 			$this->person_id_emergency = $row->person_id_emergency; 
 			$this->person_id_coordinator_dep = $row->person_id_coordinator_dep; 
 			$this->person_id_coordinator_int = $row->person_id_coordinator_int; 
-			$this->deutschkurs1 = ($row->deutschkurs1=='t'?true:false);
-			$this->deutschkurs2 = ($row->deutschkurs2=='t'?true:false);
-			$this->deutschkurs3 = ($row->deutschkurs3=='t'?true:false);
+			$this->deutschkurs1 = $this->db_parse_bool($row->deutschkurs1);
+			$this->deutschkurs2 = $this->db_parse_bool($row->deutschkurs2);
+			$this->deutschkurs3 = $this->db_parse_bool($row->deutschkurs3);
 			$this->research_area = $row->research_area; 
 		}
 		else
@@ -161,7 +161,7 @@ class preincoming extends basis_db
 	 */
 	public function loadFromPerson($person_id)
 	{
-		$qry = "SELECT * FROM public.tbl_preincoming WHERE person_id='".addslashes($person_id)."'";
+		$qry = "SELECT * FROM public.tbl_preincoming WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 		
 		if($result = $this->db_query($qry))
 		{
@@ -176,13 +176,13 @@ class preincoming extends basis_db
 				$obj->firma_id = $row->firma_id;
 				$obj->anmerkung = $row->anmerkung;
 				$obj->universitaet = $row->universitaet;
-				$obj->aktiv = ($row->aktiv=='t'?true:false);
-				$obj->bachelorthesis = ($row->bachelorthesis=='t'?true:false);
-				$obj->masterthesis = ($row->masterthesis=='t'?true:false);
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$obj->bachelorthesis = $this->db_parse_bool($row->bachelorthesis);
+				$obj->masterthesis = $this->db_parse_bool($row->masterthesis);
 				$obj->von = $row->von;
 				$obj->bis = $row->bis;
 				$obj->code = $row->code; 
-				$obj->uebernommen = ($row->uebernommen=='t'?true:false);
+				$obj->uebernommen = $this->db_parse_bool($row->uebernommen);
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;
@@ -197,15 +197,15 @@ class preincoming extends basis_db
 				$obj->zgvmaster_datum = $row->zgvmaster_datum; 
 				$obj->zgvmaster_ort = $row->zgvmaster_ort; 
 				$obj->program_name = $row->program_name; 
-				$obj->bachelor = ($row->bachelor=='t'?true:false); 
-				$obj->master = ($row->master=='t'?true:false); 
+				$obj->bachelor = $this->db_parse_bool($row->bachelor); 
+				$obj->master = $this->db_parse_bool($row->master); 
 				$obj->jahre = $row->jahre; 
 				$obj->person_id_emergency = $row->person_id_emergency; 
 				$obj->person_id_coordinator_dep = $row->person_id_coordinator_dep; 
 				$obj->person_id_coordinator_int = $row->person_id_coordinator_int; 
-				$obj->deutschkurs1 = ($row->deutschkurs1=='t'?true:false);
-				$obj->deutschkurs2 = ($row->deutschkurs2=='t'?true:false);
-				$obj->deutschkurs3 = ($row->deutschkurs3=='t'?true:false);
+				$obj->deutschkurs1 = $this->db_parse_bool($row->deutschkurs1);
+				$obj->deutschkurs2 = $this->db_parse_bool($row->deutschkurs2);
+				$obj->deutschkurs3 = $this->db_parse_bool($row->deutschkurs3);
 				$obj->research_area = $row->research_area; 
 			
 				$this->result[] = $obj;
@@ -265,40 +265,40 @@ class preincoming extends basis_db
 					bachelor, master, jahre, person_id_emergency, person_id_coordinator_dep, person_id_coordinator_int,
 					deutschkurs1, deutschkurs2, deutschkurs3, research_area)
 				  VALUES('.
-			      $this->addslashes($this->person_id).', '.
-			      $this->addslashes($this->mobilitaetsprogramm_code).', '.
-			      $this->addslashes($this->zweck_code).', '.
-			      $this->addslashes($this->firma_id).', '.
-			      $this->addslashes($this->anmerkung).', '.
-			      $this->addslashes($this->universitaet).', '.
-			      ($this->aktiv?'true':'false').', '.
-			      ($this->bachelorthesis?'true':'false').', '.
-			      ($this->masterthesis?'true':'false').', '.
-			      $this->addslashes($this->von).', '.
-			      $this->addslashes($this->bis).', '.
-			      $this->addslashes($this->code).', '.
-			      ($this->uebernommen?'true':'false').', now(), '.
-			      $this->addslashes($this->insertvon).', now(), '.
-			      $this->addslashes($this->updatevon).', '.  
-			      $this->addslashes($this->zgv).', '. 
-				  $this->addslashes($this->zgv_ort).', '.
-				  $this->addslashes($this->zgv_datum).', '. 
-				  $this->addslashes($this->zgv_name).', '. 
-				  $this->addslashes($this->zgvmaster).', '.
-				  $this->addslashes($this->zgvmaster_name).', '.
-				  $this->addslashes($this->zgvmaster_datum).', '. 
-				  $this->addslashes($this->zgvmaster_ort).', '.
-				  $this->addslashes($this->program_name).', '.
-				   ($this->bachelor?'true':'false').', '.
-				   ($this->master?'true':'false').', '.
-				  $this->addslashes($this->jahre).', '.
-				  $this->addslashes($this->person_id_emergency).', '.
-				  $this->addslashes($this->person_id_coordinator_dep).', '.
-				  $this->addslashes($this->person_id_coordinator_int).', '.
-				  ($this->deutschkurs1?'true':'false').', '.
-				  ($this->deutschkurs2?'true':'false').', '.
-				  ($this->deutschkurs3?'true':'false').', '.				  
-				  $this->addslashes($this->research_area).' );';  		      
+			      $this->db_add_param($this->person_id).', '.
+			      $this->db_add_param($this->mobilitaetsprogramm_code).', '.
+			      $this->db_add_param($this->zweck_code).', '.
+			      $this->db_add_param($this->firma_id).', '.
+			      $this->db_add_param($this->anmerkung).', '.
+			      $this->db_add_param($this->universitaet).', '.
+			      $this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
+			      $this->db_add_param($this->bachelorthesis, FHC_BOOLEAN).', '.
+			      $this->db_add_param($this->masterthesis, FHC_BOOLEAN).', '.
+			      $this->db_add_param($this->von).', '.
+			      $this->db_add_param($this->bis).', '.
+			      $this->db_add_param($this->code).', '.
+			      $this->db_add_param($this->uebernommen, FHC_BOOLEAN).', now(), '.
+			      $this->db_add_param($this->insertvon).', now(), '.
+			      $this->db_add_param($this->updatevon).', '.  
+			      $this->db_add_param($this->zgv).', '. 
+				  $this->db_add_param($this->zgv_ort).', '.
+				  $this->db_add_param($this->zgv_datum).', '. 
+				  $this->db_add_param($this->zgv_name).', '. 
+				  $this->db_add_param($this->zgvmaster).', '.
+				  $this->db_add_param($this->zgvmaster_name).', '.
+				  $this->db_add_param($this->zgvmaster_datum).', '. 
+				  $this->db_add_param($this->zgvmaster_ort).', '.
+				  $this->db_add_param($this->program_name).', '.
+				  $this->db_add_param($this->bachelor, FHC_BOOLEAN).', '.
+				  $this->db_add_param($this->master, FHC_BOOLEAN).', '.
+				  $this->db_add_param($this->jahre).', '.
+				  $this->db_add_param($this->person_id_emergency).', '.
+				  $this->db_add_param($this->person_id_coordinator_dep).', '.
+				  $this->db_add_param($this->person_id_coordinator_int).', '.
+				  $this->db_add_param($this->deutschkurs1, FHC_BOOLEAN).', '.
+				  $this->db_add_param($this->deutschkurs2, FHC_BOOLEAN).', '.
+				  $this->db_add_param($this->deutschkurs3, FHC_BOOLEAN).', '.				  
+				  $this->db_add_param($this->research_area).' );';  		      
 		}
 		else
 		{
@@ -309,41 +309,41 @@ class preincoming extends basis_db
 				return false;
 			}
 			$qry='UPDATE public.tbl_preincoming SET'.
-				' person_id='.$this->addslashes($this->person_id).', '.
-				' mobilitaetsprogramm_code='.$this->addslashes($this->mobilitaetsprogramm_code).', '.
-				' zweck_code='.$this->addslashes($this->zweck_code).', '.
-				' firma_id='.$this->addslashes($this->firma_id).', '.
-		      	' anmerkung='.$this->addslashes($this->anmerkung).', '.
-		      	' universitaet='.$this->addslashes($this->universitaet).', '.
-		      	' aktiv='.($this->aktiv?'true':'false').', '.
-				' bachelorthesis='.($this->bachelorthesis?'true':'false').', '.
-				' masterthesis='.($this->masterthesis?'true':'false').', '.
-		      	' von='.$this->addslashes($this->von).', '.
-		      	' bis='.$this->addslashes($this->bis).','.
-				' code='.$this->addslashes($this->code).','.
-				' uebernommen='.($this->uebernommen?'true':'false').', '.
+				' person_id='.$this->db_add_param($this->person_id).', '.
+				' mobilitaetsprogramm_code='.$this->db_add_param($this->mobilitaetsprogramm_code).', '.
+				' zweck_code='.$this->db_add_param($this->zweck_code).', '.
+				' firma_id='.$this->db_add_param($this->firma_id).', '.
+		      	' anmerkung='.$this->db_add_param($this->anmerkung).', '.
+		      	' universitaet='.$this->db_add_param($this->universitaet).', '.
+		      	' aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
+				' bachelorthesis='.$this->db_add_param($this->bachelorthesis, FHC_BOOLEAN).', '.
+				' masterthesis='.$this->db_add_param($this->masterthesis, FHC_BOOLEAN).', '.
+		      	' von='.$this->db_add_param($this->von).', '.
+		      	' bis='.$this->db_add_param($this->bis).','.
+				' code='.$this->db_add_param($this->code).','.
+				' uebernommen='.$this->db_add_param($this->uebernommen, FHC_BOOLEAN).', '.
 		      	' updateamum=now() ,'.
-		      	' updatevon='.$this->addslashes($this->updatevon).', '.
+		      	' updatevon='.$this->db_add_param($this->updatevon).', '.
 
-				' zgv='.$this->addslashes($this->zgv).', '. 
-				' zgv_ort='.$this->addslashes($this->zgv_ort).', '.
-				' zgv_datum='.$this->addslashes($this->zgv_datum).', '. 
-				' zgv_name='.$this->addslashes($this->zgv_name).', '. 
-				' zgvmaster='.$this->addslashes($this->zgvmaster).', '.
-				' zgvmaster_name='.$this->addslashes($this->zgvmaster_name).', '.			
-				' zgvmaster_datum='.$this->addslashes($this->zgvmaster_datum).', '. 
-				' zgvmaster_ort='.$this->addslashes($this->zgvmaster_ort).', '.
-				' program_name='.$this->addslashes($this->program_name).', '.
-				' bachelor='.($this->bachelor?'true':'false').', '.
-				' master='.($this->master?'true':'false').', '.
-				' jahre='.$this->addslashes($this->jahre).', '.
-				' person_id_emergency='.$this->addslashes($this->person_id_emergency).', '.
-				' person_id_coordinator_dep='.$this->addslashes($this->person_id_coordinator_dep).', '.
-				' person_id_coordinator_int='.$this->addslashes($this->person_id_coordinator_int).', '.
-				' deutschkurs1='.($this->deutschkurs1?'true':'false').', '.
-				' deutschkurs2='.($this->deutschkurs2?'true':'false').', '.
-				' deutschkurs3='.($this->deutschkurs3?'true':'false').', '.			
-				' research_area='.$this->addslashes($this->research_area).' '.  	
+				' zgv='.$this->db_add_param($this->zgv).', '. 
+				' zgv_ort='.$this->db_add_param($this->zgv_ort).', '.
+				' zgv_datum='.$this->db_add_param($this->zgv_datum).', '. 
+				' zgv_name='.$this->db_add_param($this->zgv_name).', '. 
+				' zgvmaster='.$this->db_add_param($this->zgvmaster).', '.
+				' zgvmaster_name='.$this->db_add_param($this->zgvmaster_name).', '.			
+				' zgvmaster_datum='.$this->db_add_param($this->zgvmaster_datum).', '. 
+				' zgvmaster_ort='.$this->db_add_param($this->zgvmaster_ort).', '.
+				' program_name='.$this->db_add_param($this->program_name).', '.
+				' bachelor='.$this->db_add_param($this->bachelor, FHC_BOOLEAN).', '.
+				' master='.$this->db_add_param($this->master, FHC_BOOLEAN).', '.
+				' jahre='.$this->db_add_param($this->jahre).', '.
+				' person_id_emergency='.$this->db_add_param($this->person_id_emergency).', '.
+				' person_id_coordinator_dep='.$this->db_add_param($this->person_id_coordinator_dep).', '.
+				' person_id_coordinator_int='.$this->db_add_param($this->person_id_coordinator_int).', '.
+				' deutschkurs1='.$this->db_add_param($this->deutschkurs1, FHC_BOOLEAN).', '.
+				' deutschkurs2='.$this->db_add_param($this->deutschkurs2, FHC_BOOLEAN).', '.
+				' deutschkurs3='.$this->db_add_param($this->deutschkurs3, FHC_BOOLEAN).', '.			
+				' research_area='.$this->db_add_param($this->research_area).' '.  	
 		      	' WHERE preincoming_id='.$this->preincoming_id.';';
 		}
 		
@@ -399,7 +399,7 @@ class preincoming extends basis_db
 		}
 
 		//loeschen des Datensatzes
-		$qry="DELETE FROM public.tbl_preincoming WHERE preincoming_id='".addslashes($preincoming_id)."';";
+		$qry="DELETE FROM public.tbl_preincoming WHERE preincoming_id=".$this->db_add_param($preincoming_id, FHC_INTEGER).";";
 
 		if($this->db_query($qry))
 		{
@@ -428,7 +428,7 @@ class preincoming extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_preincoming_lehrveranstaltung WHERE preincoming_id='".addslashes($preincoming_id)."';";
+		$qry = "SELECT * FROM public.tbl_preincoming_lehrveranstaltung WHERE preincoming_id=".$this->db_add_param($preincoming_id, FHC_INTEGER).";";
 		
 		if($result = $this->db_query($qry))
 		{
@@ -466,8 +466,8 @@ class preincoming extends basis_db
 		}
 		
 		$qry = "DELETE FROM public.tbl_preincoming_lehrveranstaltung 
-				WHERE preincoming_id='".addslashes($preincoming_id)."' 
-				AND lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."';";
+				WHERE preincoming_id=".$this->db_add_param($preincoming_id, FHC_INTEGER)." 
+				AND lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER).";";
 		if($this->db_query($qry))
 		{
 			return true;
@@ -490,8 +490,8 @@ class preincoming extends basis_db
 	{
 		$qry = "SELECT 1 FROM public.tbl_preincoming_lehrveranstaltung 
 				WHERE 
-					preincoming_id='".addslashes($preincoming_id)."' 
-					AND lehrveranstaltung_id='".addslashes($lehrveranstaltung_id)."';";
+					preincoming_id=".$this->db_add_param($preincoming_id, FHC_INTEGER)."
+					AND lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER).";";
 
 		if($result = $this->db_query($qry))
 		{
@@ -518,10 +518,10 @@ class preincoming extends basis_db
 	{
 		$qry = "INSERT INTO public.tbl_preincoming_lehrveranstaltung(lehrveranstaltung_id, 
 					preincoming_id, insertamum, insertvon) VALUES(".
-				$this->addslashes($lehrveranstaltung_id).','.
-				$this->addslashes($preincoming_id).','.
-				$this->addslashes($insertamum).','.
-				$this->addslashes($insertvon).');';
+				$this->db_add_param($lehrveranstaltung_id).','.
+				$this->db_add_param($preincoming_id).','.
+				$this->db_add_param($insertamum).','.
+				$this->db_add_param($insertvon).');';
 				
 		if($this->db_query($qry))
 		{
@@ -556,20 +556,20 @@ class preincoming extends basis_db
 		
 		if($filter!='')
 		{
-			$qry.=" AND (lower(nachname) like lower('%".addslashes($filter)."%') 
-						OR lower(vorname) like lower('%".addslashes($filter)."%')
-						OR lower(nachname || ' ' || vorname) like lower('%".addslashes($filter)."%')
-						OR lower(vorname || ' ' || nachname) like lower('%".addslashes($filter)."%'))";
+			$qry.=" AND (lower(nachname) like lower('%".$this->db_escape($filter)."%') 
+						OR lower(vorname) like lower('%".$this->db_escape($filter)."%')
+						OR lower(nachname || ' ' || vorname) like lower('%".$this->db_escape($filter)."%')
+						OR lower(vorname || ' ' || nachname) like lower('%".$this->db_escape($filter)."%'))";
 		}
 		
 		if(!is_null($aktiv))
-			$qry.=" AND tbl_preincoming.aktiv=".($aktiv?'true':'false');
+			$qry.=" AND tbl_preincoming.aktiv=".$this->db_add_param($aktiv, FHC_BOOLEAN);
 		if(!is_null($uebernommen))
-			$qry.=" AND tbl_preincoming.uebernommen=".($uebernommen?'true':'false');
+			$qry.=" AND tbl_preincoming.uebernommen=".$this->db_add_param($uebernommen, FHC_BOOLEAN);
 		if($von!='')
-			$qry.=" AND tbl_preincoming.von>='".addslashes($von)."'";
+			$qry.=" AND tbl_preincoming.von>=".$this->db_add_param($von);
 		if($bis!='')
-			$qry.=" AND tbl_preincoming.bis<='".addslashes($bis)."'";
+			$qry.=" AND tbl_preincoming.bis<=".$this->db_add_param($bis);
 			
 		if($result = $this->db_query($qry))
 		{
@@ -584,13 +584,13 @@ class preincoming extends basis_db
 				$obj->firma_id = $row->firma_id;
 				$obj->anmerkung = $row->anmerkung;
 				$obj->universitaet = $row->universitaet;
-				$obj->aktiv = ($row->aktiv=='t'?true:false);
-				$obj->bachelorthesis = ($row->bachelorthesis=='t'?true:false);
-				$obj->masterthesis = ($row->masterthesis=='t'?true:false);
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$obj->bachelorthesis = $this->db_parse_bool($row->bachelorthesis);
+				$obj->masterthesis = $this->db_parse_bool($row->masterthesis);
 				$obj->von = $row->von;
 				$obj->bis = $row->bis;
 				$obj->code = $row->code; 
-				$obj->uebernommen = ($row->uebernommen=='t'?true:false);
+				$obj->uebernommen = $this->db_parse_bool($row->uebernommen);
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->insertamum = $row->insertamum;
@@ -605,16 +605,16 @@ class preincoming extends basis_db
 				$obj->zgvmaster_datum = $row->zgvmaster_datum; 
 				$obj->zgvmaster_ort = $row->zgvmaster_ort; 
 				$obj->program_name = $row->program_name; 
-				$obj->bachelor = ($row->bachelor=='t'?true:false);
-				$obj->master = ($row->master=='t'?true:false);
+				$obj->bachelor = $this->db_parse_bool($row->bachelor);
+				$obj->master = $this->db_parse_bool($row->master);
 				$obj->jahre = $row->jahre; 
 				$obj->person_id_emergency = $row->person_id_emergency; 
 				$obj->person_id_coordinator_dep = $row->person_id_coordinator_dep; 
 				$obj->person_id_coordinator_int = $row->person_id_coordinator_int;
 				 
-				$obj->deutschkurs1 = ($row->deutschkurs1=='t'?true:false);
-				$obj->deutschkurs2 = ($row->deutschkurs2=='t'?true:false);
-				$obj->deutschkurs3 = ($row->deutschkurs3=='t'?true:false);				
+				$obj->deutschkurs1 = $this->db_parse_bool($row->deutschkurs1);
+				$obj->deutschkurs2 = $this->db_parse_bool($row->deutschkurs2);
+				$obj->deutschkurs3 = $this->db_parse_bool($row->deutschkurs3);
 				$obj->research_area = $row->research_area;
 				
 				$obj->vorname = $row->vorname;

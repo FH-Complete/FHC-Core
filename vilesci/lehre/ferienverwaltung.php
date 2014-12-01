@@ -91,7 +91,7 @@
 		if(!$rechte->isBerechtigt('basis/ferien', null, 'sui'))
 			die('Sie haben keine Berechtigung zum anlegen oder ändern von Ferien');
 		
-		$sql_query="SELECT bezeichnung FROM lehre.tbl_ferien WHERE bezeichnung='".$_POST['bezeichnung']."';";
+		$sql_query="SELECT bezeichnung FROM lehre.tbl_ferien WHERE bezeichnung=".$db->db_add_param($_POST['bezeichnung']).";";
 		$db->db_num_rows($db->db_query($sql_query));		
 			
 		//Formulardaten pruefen
@@ -123,10 +123,10 @@
 		else
 		{
 			$sql_query="INSERT INTO lehre.tbl_ferien (studiengang_kz, bezeichnung, vondatum, bisdatum) VALUES(
-			'".$_POST['studiengang_kz']."',
+			".$db->db_add_param($_POST['studiengang_kz'], FHC_INTEGER).",
 			".$db->db_add_param($_POST['bezeichnung']).",
-			'".$datum_obj->formatDatum($_POST['vondatum'],'Y-m-d')."',
-			'".$datum_obj->formatDatum($_POST['bisdatum'],'Y-m-d')."');";
+			".$db->db_add_param($datum_obj->formatDatum($_POST['vondatum'],'Y-m-d')).",
+			".$db->db_add_param($datum_obj->formatDatum($_POST['bisdatum'],'Y-m-d')).");";
 			//echo $sql_query;
 			$db->db_query($sql_query);
 			$stg_kz = $_POST['studiengang_kz'];
@@ -138,7 +138,7 @@
 		if(!$rechte->isBerechtigt('basis/ferien', null, 'suid'))
 			die('Sie haben keine Berechtigung zum löschen von Ferien');
 			
-		$sql_query = "DELETE FROM lehre.tbl_ferien WHERE bezeichnung='$bezeichnung' AND studiengang_kz='$stg_kz'";
+		$sql_query = "DELETE FROM lehre.tbl_ferien WHERE bezeichnung=".$db->db_add_param($bezeichnung)." AND studiengang_kz=".$db->db_add_param($stg_kz, FHC_INTEGER);
 		$result = $db->db_query($sql_query);
 		if ($db->db_affected_rows($result)==1)
 		 echo '<span class="insertok">Eintrag erfolgreich gelöscht</span><br>';
@@ -223,7 +223,7 @@
 	{		
 		$qry="SELECT * FROM lehre.tbl_ferien ";
 		if ($stg_kz!=-1)
-			$qry.=" WHERE studiengang_kz='".$stg_kz."'";
+			$qry.=" WHERE studiengang_kz=".$db->db_add_param($stg_kz, FHC_INTEGER);
 					
 		$qry.=" ORDER BY vondatum DESC;";	
 		//echo $qry;

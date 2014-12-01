@@ -77,7 +77,7 @@ class preinteressent extends basis_db
 		}
 		
 		//laden des Datensatzes
-		$qry = "SELECT * FROM public.tbl_preinteressent WHERE preinteressent_id='$preinteressent_id';";
+		$qry = "SELECT * FROM public.tbl_preinteressent WHERE preinteressent_id=".$this->db_add_param($preinteressent_id, FHC_INTEGER).";";
 		
 		if($this->db_query($qry))
 		{
@@ -89,7 +89,7 @@ class preinteressent extends basis_db
 				$this->firma_id = $row->firma_id;
 				$this->anmerkung = $row->anmerkung;
 				$this->erfassungsdatum = $row->erfassungsdatum;
-				$this->einverstaendnis = ($row->einverstaendnis=='t'?true:false);
+				$this->einverstaendnis = $this->db_parse_bool($row->einverstaendnis);
 				$this->maturajahr = $row->maturajahr;
 				$this->infozusendung = $row->infozusendung;
 				$this->absagedatum = $row->absagedatum;
@@ -132,7 +132,7 @@ class preinteressent extends basis_db
 		//UNDO Befehl zusammenbauen
 		$this->db_query('BEGIN;');
 		
-		$qry = "SELECT * FROM public.tbl_preinteressent WHERE preinteressent_id = '$preinteressent_id'";
+		$qry = "SELECT * FROM public.tbl_preinteressent WHERE preinteressent_id = ".$this->db_add_param($preinteressent_id, FHC_INTEGER);
 		if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -140,22 +140,22 @@ class preinteressent extends basis_db
 				$undo.=" INSERT INTO public.tbl_preinteressent(preinteressent_id, person_id, studiensemester_kurzbz, 
 						aufmerksamdurch_kurzbz, firma_id, erfassungsdatum, einverstaendnis, absagedatum, anmerkung, 
 						insertamum, insertvon, updateamum, updatevon, maturajahr, infozusendung, kontaktmedium_kurzbz) VALUES (".
-				 		$this->addslashes($row->preinteressent_id).', '.
-				 		$this->addslashes($row->person_id).', '.
-						$this->addslashes($row->studiensemester_kurzbz).', '.
-						$this->addslashes($row->aufmerksamdurch_kurzbz).', '.
-						$this->addslashes($row->firma_id).', '.
-						$this->addslashes($row->erfassungsdatum).', '.
-						($row->einverstaendnis?'true':'false').', '.
-						$this->addslashes($row->absagedatum).', '.
-						$this->addslashes($row->anmerkung).', '.
-						$this->addslashes($row->insertamum).', '.
-						$this->addslashes($row->insertvon).','.
-						$this->addslashes($row->updateamum).', '.
-						$this->addslashes($row->updatevon).', '.
-						$this->addslashes($row->maturajahr).', '.
-						$this->addslashes($row->infozusendung).', '.
-						$this->addslashes($row->kontaktmedium_kurzbz).');';
+				 		$this->db_add_param($row->preinteressent_id, FHC_INTEGER).', '.
+				 		$this->db_add_param($row->person_id, FHC_INTEGER).', '.
+						$this->db_add_param($row->studiensemester_kurzbz).', '.
+						$this->db_add_param($row->aufmerksamdurch_kurzbz).', '.
+						$this->db_add_param($row->firma_id, FHC_INTEGER).', '.
+						$this->db_add_param($row->erfassungsdatum).', '.
+						$this->db_add_param($row->einverstaendnis, FHC_BOOLEAN).', '.
+						$this->db_add_param($row->absagedatum).', '.
+						$this->db_add_param($row->anmerkung).', '.
+						$this->db_add_param($row->insertamum).', '.
+						$this->db_add_param($row->insertvon).','.
+						$this->db_add_param($row->updateamum).', '.
+						$this->db_add_param($row->updatevon).', '.
+						$this->db_add_param($row->maturajahr).', '.
+						$this->db_add_param($row->infozusendung).', '.
+						$this->db_add_param($row->kontaktmedium_kurzbz).');';
 			}
 		}
 		else 
@@ -166,22 +166,22 @@ class preinteressent extends basis_db
 		}
 		
 		
-		$qry = "SELECT * FROM public.tbl_preinteressentstudiengang WHERE preinteressent_id='$preinteressent_id'";
+		$qry = "SELECT * FROM public.tbl_preinteressentstudiengang WHERE preinteressent_id=".$this->db_add_param($preinteressent_id, FHC_INTEGER);
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
 				$undo.=" INSERT INTO public.tbl_preinteressentstudiengang(studiengang_kz, preinteressent_id, prioritaet, 
 						freigabedatum, uebernahmedatum, insertamum, insertvon, updateamum, updatevon) VALUES(".
-						$this->addslashes($row->studiengang_kz).','.
-						$this->addslashes($row->preinteressent_id).','.
-						$this->addslashes($row->prioritaet).','.
-						$this->addslashes($row->freigabedatum).','.
-						$this->addslashes($row->uebernahmedatum).','.
-						$this->addslashes($row->insertamum).','.
-						$this->addslashes($row->insertvon).','.
-						$this->addslashes($row->updateamum).','.
-						$this->addslashes($row->updatevon).');';
+						$this->db_add_param($row->studiengang_kz, FHC_INTEGER).','.
+						$this->db_add_param($row->preinteressent_id, FHC_INTEGER).','.
+						$this->db_add_param($row->prioritaet).','.
+						$this->db_add_param($row->freigabedatum).','.
+						$this->db_add_param($row->uebernahmedatum).','.
+						$this->db_add_param($row->insertamum).','.
+						$this->db_add_param($row->insertvon).','.
+						$this->db_add_param($row->updateamum).','.
+						$this->db_add_param($row->updatevon).');';
 			}
 		}
 		else 
@@ -191,8 +191,8 @@ class preinteressent extends basis_db
 			return false;
 		}
 		
-		$qry = "DELETE FROM public.tbl_preinteressentstudiengang WHERE preinteressent_id='$preinteressent_id';
-				DELETE FROM public.tbl_preinteressent WHERE preinteressent_id = '$preinteressent_id';";
+		$qry = "DELETE FROM public.tbl_preinteressentstudiengang WHERE preinteressent_id=".$this->db_add_param($preinteressent_id, FHC_INTEGER).";
+				DELETE FROM public.tbl_preinteressent WHERE preinteressent_id = ".$this->db_add_param($preinteressent_id, FHC_INTEGER).";";
 		
 		if($this->db_query($qry))
 		{
@@ -264,40 +264,40 @@ class preinteressent extends basis_db
 			$qry = "BEGIN;INSERT INTO public.tbl_preinteressent (studiensemester_kurzbz, 
 					aufmerksamdurch_kurzbz, firma_id, anmerkung, erfassungsdatum, einverstaendnis, absagedatum,
 					maturajahr, infozusendung, person_id, updateamum, updatevon, insertamum, insertvon, kontaktmedium_kurzbz) VALUES (".
-			       $this->addslashes($this->studiensemester_kurzbz).', '.
-			       $this->addslashes($this->aufmerksamdurch_kurzbz).', '.
-			       $this->addslashes($this->firma_id).', '.
-			       $this->addslashes($this->anmerkung).', '.
-			       $this->addslashes($this->erfassungsdatum).', '.
-			       ($this->einverstaendnis?'true':'false').', '.
-			       $this->addslashes($this->absagedatum).', '.
-			       $this->addslashes($this->maturajahr).', '.
-			       $this->addslashes($this->infozusendung).', '.
-			       $this->addslashes($this->person_id).', '.
-			       $this->addslashes($this->updateamum).', '.
-			       $this->addslashes($this->updatevon).', '.
-			       $this->addslashes($this->insertamum).', '.
-			       $this->addslashes($this->insertvon).', '.
-			       $this->addslashes($this->kontaktmedium_kurzbz).');';
+			       $this->db_add_param($this->studiensemester_kurzbz).', '.
+			       $this->db_add_param($this->aufmerksamdurch_kurzbz).', '.
+			       $this->db_add_param($this->firma_id, FHC_INTEGER).', '.
+			       $this->db_add_param($this->anmerkung).', '.
+			       $this->db_add_param($this->erfassungsdatum).', '.
+			       $this->db_add_param($this->einverstaendnis, FHC_BOOLEAN).', '.
+			       $this->db_add_param($this->absagedatum).', '.
+			       $this->db_add_param($this->maturajahr).', '.
+			       $this->db_add_param($this->infozusendung).', '.
+			       $this->db_add_param($this->person_id, FHC_INTEGER).', '.
+			       $this->db_add_param($this->updateamum).', '.
+			       $this->db_add_param($this->updatevon).', '.
+			       $this->db_add_param($this->insertamum).', '.
+			       $this->db_add_param($this->insertvon).', '.
+			       $this->db_add_param($this->kontaktmedium_kurzbz).');';
 		}
 		else 
 		{
 			//Bestehenden Datensatz aktualisieren
 			$qry= "UPDATE public.tbl_preinteressent SET".
-				  " studiensemester_kurzbz=".$this->addslashes($this->studiensemester_kurzbz).",".
-				  " aufmerksamdurch_kurzbz=".$this->addslashes($this->aufmerksamdurch_kurzbz).",".
-				  " firma_id=".$this->addslashes($this->firma_id).",".
-				  " anmerkung=".$this->addslashes($this->anmerkung).",".
-				  " erfassungsdatum=".$this->addslashes($this->erfassungsdatum).",".
-				  " einverstaendnis=".($this->einverstaendnis?'true':'false').",".
-				  " absagedatum=".$this->addslashes($this->absagedatum).",".
-				  " maturajahr=".$this->addslashes($this->maturajahr).",".
-				  " infozusendung=".$this->addslashes($this->infozusendung).",".
-				  " person_id=".$this->addslashes($this->person_id).",".
-				  " updatevon=".$this->addslashes($this->updatevon).",".
-				  " updateamum=".$this->addslashes($this->updateamum).','.
-				  " kontaktmedium_kurzbz=".$this->addslashes($this->kontaktmedium_kurzbz).
-				  " WHERE preinteressent_id='".addslashes($this->preinteressent_id)."'";
+				  " studiensemester_kurzbz=".$this->db_add_param($this->studiensemester_kurzbz).",".
+				  " aufmerksamdurch_kurzbz=".$this->db_add_param($this->aufmerksamdurch_kurzbz).",".
+				  " firma_id=".$this->db_add_param($this->firma_id, FHC_INTEGER).",".
+				  " anmerkung=".$this->db_add_param($this->anmerkung).",".
+				  " erfassungsdatum=".$this->db_add_param($this->erfassungsdatum).",".
+				  " einverstaendnis=".$this->db_add_param($this->einverstaendnis, FHC_BOOLEAN).",".
+				  " absagedatum=".$this->db_add_param($this->absagedatum).",".
+				  " maturajahr=".$this->db_add_param($this->maturajahr).",".
+				  " infozusendung=".$this->db_add_param($this->infozusendung).",".
+				  " person_id=".$this->db_add_param($this->person_id, FHC_INTEGER).",".
+				  " updatevon=".$this->db_add_param($this->updatevon).",".
+				  " updateamum=".$this->db_add_param($this->updateamum).','.
+				  " kontaktmedium_kurzbz=".$this->db_add_param($this->kontaktmedium_kurzbz).
+				  " WHERE preinteressent_id=".$this->db_add_param($this->preinteressent_id, FHC_INTEGER);
 		}
 		
 		if($this->db_query($qry))
@@ -349,9 +349,9 @@ class preinteressent extends basis_db
 	{
 		$qry = "SELECT tbl_preinteressent.*, tbl_preinteressentstudiengang.* FROM public.tbl_preinteressent JOIN public.tbl_preinteressentstudiengang USING(preinteressent_id) JOIN public.tbl_person USING(person_id) WHERE
 				(studiengang_kz, person_id) NOT IN (SELECT studiengang_kz, person_id FROM public.tbl_prestudent WHERE person_id=tbl_person.person_id) AND freigabedatum is not null AND
-				tbl_preinteressentstudiengang.studiengang_kz='$studiengang_kz'";
+				tbl_preinteressentstudiengang.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
 		if($studiensemester_kurzbz!='')
-			$qry.=" AND tbl_preinteressent.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+			$qry.=" AND tbl_preinteressent.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 		
 		if($this->db_query($qry))
 		{
@@ -365,7 +365,7 @@ class preinteressent extends basis_db
 				$obj->firma_id = $row->firma_id;
 				$obj->anmerkung = $row->anmerkung;
 				$obj->erfassungsdatum = $row->erfassungsdatum;
-				$obj->einverstaendnis = ($row->einverstaendnis=='t'?true:false);
+				$obj->einverstaendnis = $this->db_parse_bool($row->einverstaendnis);
 				$obj->absagedatum = $row->absagedatum;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
@@ -414,23 +414,23 @@ class preinteressent extends basis_db
 					LEFT JOIN public.tbl_kontakt USING(person_id) WHERE true";
 				
 		if($studiengang_kz!='')
-			$qry.=" AND tbl_preinteressentstudiengang.studiengang_kz='".addslashes($studiengang_kz)."'";
+			$qry.=" AND tbl_preinteressentstudiengang.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
 		
 		if(!is_null($studiensemester_kurzbz))
 		{
 			if($studiensemester_kurzbz=='')
 				$qry.=" AND tbl_preinteressent.studiensemester_kurzbz is null";
 			else
-				$qry.=" AND tbl_preinteressent.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+				$qry.=" AND tbl_preinteressent.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 		}
 		
 		if($filter!='')
 		{
 			$datum_obj = new datum();
 		
-			$qry.=" AND (lower(nachname) like lower('%".addslashes($filter)."%') OR lower(vorname) like lower('%".addslashes($filter)."%') OR lower(kontakt) like lower('%".addslashes($filter)."%')";
+			$qry.=" AND (lower(nachname) like lower('%".$this->db_escape($filter)."%') OR lower(vorname) like lower('%".$this->db_escape($filter)."%') OR lower(kontakt) like lower('%".$this->db_escape($filter)."%')";
 			if($filter = $datum_obj->formatDatum($filter))
-				$qry.=" OR erfassungsdatum = '".addslashes($filter)."'";
+				$qry.=" OR erfassungsdatum = ".$this->db_escape($filter);
 			$qry.=")";
 		}
 		if($nichtfreigegeben==true)
@@ -442,14 +442,14 @@ class preinteressent extends basis_db
 			if($kontaktmedium=='-1')
 				$qry.=" AND tbl_preinteressent.kontaktmedium_kurzbz is null";
 			else
-				$qry.=" AND tbl_preinteressent.kontaktmedium_kurzbz='".addslashes($kontaktmedium)."'";
+				$qry.=" AND tbl_preinteressent.kontaktmedium_kurzbz=".$this->db_add_param($kontaktmedium);
 		}
 
 		if(!is_null($erfassungsdatum_bis))
-			$qry.=" AND erfassungsdatum<='".addslashes($erfassungsdatum_bis)."'";
+			$qry.=" AND erfassungsdatum<=".$this->db_add_param($erfassungsdatum_bis);
 		
 		if(!is_null($erfassungsdatum_von))
-			$qry.=" AND erfassungsdatum>='".addslashes($erfassungsdatum_von)."'";
+			$qry.=" AND erfassungsdatum>=".$this->db_add_param($erfassungsdatum_von);
 		
 		if($absage)
 			$qry.=" AND absagedatum is not null";
@@ -474,7 +474,7 @@ class preinteressent extends basis_db
 				$obj->firma_id = $row->firma_id;
 				$obj->anmerkung = $row->anmerkung;
 				$obj->erfassungsdatum = $row->erfassungsdatum;
-				$obj->einverstaendnis = ($row->einverstaendnis=='t'?true:false);
+				$obj->einverstaendnis = $this->db_parse_bool($row->einverstaendnis);
 				$obj->absagedatum = $row->absagedatum;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
@@ -510,7 +510,7 @@ class preinteressent extends basis_db
 		}
 		
 		$qry = "SELECT * FROM public.tbl_preinteressentstudiengang 
-				WHERE preinteressent_id='$preinteressent_id' ORDER BY studiengang_kz";
+				WHERE preinteressent_id=".$this->db_add_param($preinteressent_id, FHC_INTEGER)." ORDER BY studiengang_kz";
 		
 		if($this->db_query($qry))
 		{
@@ -558,7 +558,8 @@ class preinteressent extends basis_db
 		}
 		
 		$qry = "SELECT * FROM public.tbl_preinteressentstudiengang 
-				WHERE preinteressent_id='$preinteressent_id' AND studiengang_kz='$studiengang_kz'";
+				WHERE preinteressent_id=".$this->db_add_param($preinteressent_id, FHC_INTEGER)." 
+				AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 		{
@@ -603,26 +604,27 @@ class preinteressent extends basis_db
 			//Neuen Datensatz anlegen	
 			$qry = "INSERT INTO public.tbl_preinteressentstudiengang (studiengang_kz, preinteressent_id, 
 					prioritaet, freigabedatum, uebernahmedatum, updateamum, updatevon, insertamum, insertvon) VALUES (".
-			       $this->addslashes($this->studiengang_kz).', '.
-			       $this->addslashes($this->preinteressent_id).', '.
-			       $this->addslashes($this->prioritaet).', '.
-			       $this->addslashes($this->freigabedatum).', '.
-			       $this->addslashes($this->uebernahmedatum).', '.
-			       $this->addslashes($this->updateamum).', '.
-			       $this->addslashes($this->updatevon).', '.
-			       $this->addslashes($this->insertamum).', '.
-			       $this->addslashes($this->insertvon).');';
+			       $this->db_add_param($this->studiengang_kz).', '.
+			       $this->db_add_param($this->preinteressent_id, FHC_INTEGER).', '.
+			       $this->db_add_param($this->prioritaet).', '.
+			       $this->db_add_param($this->freigabedatum).', '.
+			       $this->db_add_param($this->uebernahmedatum).', '.
+			       $this->db_add_param($this->updateamum).', '.
+			       $this->db_add_param($this->updatevon).', '.
+			       $this->db_add_param($this->insertamum).', '.
+			       $this->db_add_param($this->insertvon).');';
 		}
 		else 
 		{
 			//Bestehenden Datensatz aktualisieren
 			$qry= "UPDATE public.tbl_preinteressentstudiengang SET".
-				  " prioritaet=".$this->addslashes($this->prioritaet).",".
-				  " freigabedatum=".$this->addslashes($this->freigabedatum).",".
-				  " uebernahmedatum=".$this->addslashes($this->uebernahmedatum).",".
-				  " updatevon=".$this->addslashes($this->updatevon).",".
-				  " updateamum=".$this->addslashes($this->updateamum).
-				  " WHERE preinteressent_id='".addslashes($this->preinteressent_id)."' AND studiengang_kz='".addslashes($this->studiengang_kz)."'";
+				  " prioritaet=".$this->db_add_param($this->prioritaet).",".
+				  " freigabedatum=".$this->db_add_param($this->freigabedatum).",".
+				  " uebernahmedatum=".$this->db_add_param($this->uebernahmedatum).",".
+				  " updatevon=".$this->db_add_param($this->updatevon).",".
+				  " updateamum=".$this->db_add_param($this->updateamum).
+				  " WHERE preinteressent_id=".$this->db_add_param($this->preinteressent_id, FHC_INTEGER)."
+					AND studiengang_kz=".$this->db_add_param($this->studiengang_kz, FHC_INTEGER);
 		}
 		
 		if($this->db_query($qry))
@@ -655,7 +657,7 @@ class preinteressent extends basis_db
 		}
 		
 		$qry = "DELETE FROM public.tbl_preinteressentstudiengang 
-				WHERE preinteressent_id='$preinteressent_id' AND studiengang_kz='$studiengang_kz'";
+				WHERE preinteressent_id=".$this->db_add_param($preinteressent_id, FHC_INTEGER)." AND studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 		{
@@ -680,7 +682,7 @@ class preinteressent extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_preinteressent WHERE person_id='$person_id'";
+		$qry = "SELECT * FROM public.tbl_preinteressent WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 		{
@@ -694,7 +696,7 @@ class preinteressent extends basis_db
 				$obj->firma_id = $row->firma_id;
 				$obj->anmerkung = $row->anmerkung;
 				$obj->erfassungsdatum = $row->erfassungsdatum;
-				$obj->einverstaendnis = ($row->einverstaendnis=='t'?true:false);
+				$obj->einverstaendnis = $this->db_parse_bool($row->einverstaendnis);
 				$obj->maturajahr = $row->maturajahr;
 				$obj->infozusendung = $row->infozusendung;
 				$obj->absagedatum = $row->absagedatum;

@@ -169,7 +169,7 @@ class studentnote extends basis_db
 				{					
 					$qry = "SELECT sum(tbl_beispiel.punkte) as punktegesamt_alle FROM campus.tbl_beispiel, campus.tbl_uebung
 							WHERE tbl_uebung.uebung_id=tbl_beispiel.uebung_id AND
-							tbl_uebung.lehreinheit_id='$lehreinheit_id' and tbl_uebung.liste_id = '$ueb1->uebung_id'";
+							tbl_uebung.lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER)." and tbl_uebung.liste_id = ".$this->db_add_param($ueb1->uebung_id, FHC_INTEGER);
 					$punkte_moeglich=1;
 					if($this->db_query($qry))
 						if($row = $this->db_fetch_object())
@@ -182,7 +182,7 @@ class studentnote extends basis_db
 					$punkte_ns = $punkte_gesamt;
 
 				//Prozentpunkte
-				$qry = "SELECT min(note) as note FROM campus.tbl_notenschluesseluebung WHERE punkte <= '".$punkte_ns."' AND uebung_id = '".$ueb1->uebung_id."'";
+				$qry = "SELECT min(note) as note FROM campus.tbl_notenschluesseluebung WHERE punkte <= ".$this->db_add_param($punkte_ns)." AND uebung_id = ".$this->db_add_param($ueb1->uebung_id);
 				
 				if($this->db_query($qry))
 				{
@@ -303,7 +303,8 @@ class studentnote extends basis_db
 			$ueb = new uebung();
 			
 			//Eingetragen diese Kreuzerlliste
-			$qry = "SELECT sum(punkte) as punkteeingetragen FROM campus.tbl_beispiel JOIN campus.tbl_studentbeispiel USING(beispiel_id) WHERE uebung_id='$uebung_id' AND student_uid='$student_uid' AND vorbereitet=true";
+			$qry = "SELECT sum(punkte) as punkteeingetragen FROM campus.tbl_beispiel JOIN campus.tbl_studentbeispiel USING(beispiel_id) 
+				WHERE uebung_id=".$this->db_add_param($uebung_id, FHC_INTEGER)." AND student_uid=".$this->db_add_param($student_uid)." AND vorbereitet=true";
 			$punkte_eingetragen=0;
 			if($this->db_query($qry))
 				if($row = $this->db_fetch_object())

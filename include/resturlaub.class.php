@@ -63,7 +63,7 @@ class resturlaub extends basis_db
 	 */
 	public function load($mitarbeiter_uid)
 	{
-		$qry = "SELECT * FROM campus.tbl_resturlaub WHERE mitarbeiter_uid='".addslashes($mitarbeiter_uid)."'";
+		$qry = "SELECT * FROM campus.tbl_resturlaub WHERE mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid);
 		
 		if($this->db_query($qry))
 		{
@@ -134,25 +134,25 @@ class resturlaub extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 			$qry = 'INSERT INTO campus.tbl_resturlaub  (mitarbeiter_uid, resturlaubstage, mehrarbeitsstunden, urlaubstageprojahr, insertamum, insertvon, updateamum, updatevon) VALUES('.
-			       $this->addslashes($this->mitarbeiter_uid).', '.
-			       $this->addslashes($this->resturlaubstage).', '.
-			       $this->addslashes($this->mehrarbeitsstunden).', '.
-			       $this->addslashes($this->urlaubstageprojahr).', '.
-			       $this->addslashes($this->insertamum).', '.
-			       $this->addslashes($this->insertvon).', '.
-			       $this->addslashes($this->updateamum).', '.
-			       $this->addslashes($this->updatevon).');';
+			       $this->db_add_param($this->mitarbeiter_uid).', '.
+			       $this->db_add_param($this->resturlaubstage).', '.
+			       $this->db_add_param($this->mehrarbeitsstunden).', '.
+			       $this->db_add_param($this->urlaubstageprojahr).', '.
+			       $this->db_add_param($this->insertamum).', '.
+			       $this->db_add_param($this->insertvon).', '.
+			       $this->db_add_param($this->updateamum).', '.
+			       $this->db_add_param($this->updatevon).');';
 		}
 		else
 		{
 			//Updaten des bestehenden Datensatzes
 			$qry='UPDATE campus.tbl_resturlaub SET '.
-			'resturlaubstage='.$this->addslashes($this->resturlaubstage).', '.
-			'mehrarbeitsstunden='.$this->addslashes($this->mehrarbeitsstunden).', '.
-			'urlaubstageprojahr='.$this->addslashes($this->urlaubstageprojahr).', '.
- 			'updateamum='.$this->addslashes($this->updateamum).', '.
- 			'updatevon='.$this->addslashes($this->updatevon).
- 			' WHERE mitarbeiter_uid='.$this->addslashes($this->mitarbeiter_uid).';';
+			'resturlaubstage='.$this->db_add_param($this->resturlaubstage).', '.
+			'mehrarbeitsstunden='.$this->db_add_param($this->mehrarbeitsstunden).', '.
+			'urlaubstageprojahr='.$this->db_add_param($this->urlaubstageprojahr).', '.
+ 			'updateamum='.$this->db_add_param($this->updateamum).', '.
+ 			'updatevon='.$this->db_add_param($this->updatevon).
+ 			' WHERE mitarbeiter_uid='.$this->db_add_param($this->mitarbeiter_uid).';';
 		}
 
 		if($this->db_query($qry))

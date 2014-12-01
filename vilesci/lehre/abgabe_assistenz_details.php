@@ -34,6 +34,7 @@ require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/mail.class.php');
 require_once('../../include/projektarbeit.class.php');
+require_once('../../include/benutzer.class.php');
 
 $user = get_uid();
 $datum_obj = new datum();
@@ -49,7 +50,11 @@ if(isset($_GET['id']) && isset($_GET['uid']) && isset($_GET['pdfread']))
 	//PDF-Ausgabe vom Aufruf Zeile 689
 	if(!is_numeric($_GET['id']) || $_GET['id']=='')
 		die('Fehler bei Parameteruebergabe');
-	
+
+	$benutzer = new benutzer();
+	if(!$benutzer->load($_GET['uid']))
+		die('User existiert nicht');
+
 	$file = $_GET['id'].'_'.$_GET['uid'].'.pdf';
 	$filename = PAABGABE_PATH.$file;
 

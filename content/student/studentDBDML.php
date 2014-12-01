@@ -402,9 +402,9 @@ if(!$error)
 								JOIN public.tbl_studiengang USING(studiengang_kz) 
 								LEFT JOIN public.tbl_reihungstest USING(reihungstest_id) 
 							WHERE 
-								person_id='".addslashes($prestudent->person_id)."' 
+								person_id=".$db->db_add_param($prestudent->person_id, FHC_INTEGER)." 
 								AND reihungstest_id is not null 
-								AND tbl_studiengang.typ='".$stg->typ."'";
+								AND tbl_studiengang.typ=".$db->db_add_param($stg->typ);
 					
 					if($result = $db->db_query($qry))
 					{
@@ -564,7 +564,7 @@ if(!$error)
 								//muss ein Bewerberstatus vorhanden sein
 								if($_POST['status_kurzbz']=='Aufgenommener' || $_POST['status_kurzbz']=='Wartender')
 								{
-									$qry = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id='".$prestudent_id."' AND status_kurzbz='Bewerber'";
+									$qry = "SELECT * FROM public.tbl_prestudentstatus WHERE prestudent_id=".$db->db_add_param($prestudent_id, FHC_INTEGER)." AND status_kurzbz='Bewerber'";
 									if($result_bw = $db->db_query($qry))
 									{
 										if($db->db_num_rows($result_bw)==0)
@@ -762,7 +762,7 @@ if(!$error)
 			}
 			else
 			{
-				$qry = "SELECT count(*) as anzahl FROM public.tbl_prestudentstatus WHERE prestudent_id='".$db->db_add_param($_POST['prestudent_id'], FHC_INTEGER)."'";
+				$qry = "SELECT count(*) as anzahl FROM public.tbl_prestudentstatus WHERE prestudent_id=".$db->db_add_param($_POST['prestudent_id'], FHC_INTEGER);
 				if($result = $db->db_query($qry))
 				{
 					if($row = $db->db_fetch_object($result))
@@ -818,7 +818,7 @@ if(!$error)
 						else
 						{
 							$return = false;
-							$errormsg = 'Sie haben keine Berechtigung zum Loeschen dieser Rolle:'.$_POST['studiengang_kz'];
+							$errormsg = 'Sie haben keine Berechtigung zum Loeschen dieser Rolle';
 						}
 					}
 					else
@@ -917,7 +917,7 @@ if(!$error)
 						if($_POST['status_kurzbz']=='Student')
 						{
 							//Die Rolle Student darf nur eingefuegt werden, wenn schon eine Studentenrolle vorhanden ist
-							$qry = "SELECT count(*) as anzahl FROM public.tbl_student WHERE prestudent_id='".addslashes($_POST['prestudent_id'])."'";
+							$qry = "SELECT count(*) as anzahl FROM public.tbl_student WHERE prestudent_id=".$db->db_add_param($_POST['prestudent_id'], FHC_INTEGER);
 							if($result = $db->db_query($qry))
 							{
 								if($row = $db->db_fetch_object($result))
@@ -1013,7 +1013,7 @@ if(!$error)
 						if($_POST['status_kurzbz']=='Student')
 						{
 							//Die Rolle Student darf nur eingefuegt werden, wenn schon eine Studentenrolle vorhanden ist
-							$qry = "SELECT count(*) as anzahl FROM public.tbl_student WHERE prestudent_id='".addslashes($_POST['prestudent_id'])."'";
+							$qry = "SELECT count(*) as anzahl FROM public.tbl_student WHERE prestudent_id=".$db->db_add_param($_POST['prestudent_id'], FHC_INTEGER);
 							if($result = $db->db_query($qry))
 							{
 								if($row = $db->db_fetch_object($result))
@@ -1189,7 +1189,7 @@ if(!$error)
 														
 														if(!defined('GENERATE_ALIAS_STUDENT') || GENERATE_ALIAS_STUDENT===true)
 														{
-															$qry_alias = "SELECT * FROM public.tbl_benutzer WHERE alias=LOWER('".$vorname_clean.".".$nachname_clean."')";
+															$qry_alias = "SELECT * FROM public.tbl_benutzer WHERE alias=LOWER(".$db->db_add_param($vorname_clean.".".$nachname_clean).")";
 															$result_alias = $db->db_query($qry_alias);
 															if($db->db_num_rows($result_alias)==0)
 																$benutzer->alias = $vorname_clean.'.'.$nachname_clean;
@@ -1541,7 +1541,7 @@ if(!$error)
 				{
 					if($uid!='')
 					{
-						$qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid='".addslashes($uid)."'";
+						$qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid=".$db->db_add_param($uid);
 						if($result = $db->db_query($qry))
 						{
 							if($row = $db->db_fetch_object($result))
@@ -1697,7 +1697,7 @@ if(!$error)
 						{
 							$error = true;
 							$return = false;
-							$errormsg = "\nSie haben keine Schreibrechte fuer diese Buchung: ".$buchung->buchungsnr;
+							$errormsg = "\nSie haben keine Schreibrechte fuer diese Buchung";
 						}
 						else
 						{
@@ -1733,7 +1733,7 @@ if(!$error)
 					}
 					else
 					{
-						$errormsg .= "\n".'Buchung wurde nicht gefunden:'.$_POST['buchungsnr'];
+						$errormsg .= "\n".'Buchung wurde nicht gefunden';
 						$return = false;
 					}
 				}
@@ -1750,7 +1750,7 @@ if(!$error)
 		else
 		{
 			$return = false;
-			$errormsg  = 'Fehlerhafte Parameteruebergabe'.$_POST['buchungsnr'];
+			$errormsg  = 'Fehlerhafte Parameteruebergabe';
 		}
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='deletebuchung')
@@ -1791,7 +1791,7 @@ if(!$error)
 		else
 		{
 			$return = false;
-			$errormsg  = 'Fehlerhafte Parameteruebergabe'.$_POST['buchungsnr'];
+			$errormsg  = 'Fehlerhafte Parameteruebergabe';
 		}
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='neuebuchung')
@@ -2202,8 +2202,8 @@ if(!$error)
 							$qry = "SELECT vorname, nachname, uid 
 									FROM public.vw_betriebsmittelperson 
 									WHERE betriebsmitteltyp='Zutrittskarte' AND 
-										nummer='".$_POST['nummer']."'::varchar AND 
-										person_id<>".$_POST['person_id']." AND
+										nummer='".$db->db_escape($_POST['nummer'])."'::varchar AND 
+										person_id<>".$db->db_add_param($_POST['person_id'], FHC_INTEGER)." AND
 										retouram is null";
 							if($result_bmp = $db->db_query($qry))
 							{
@@ -2381,7 +2381,7 @@ if(!$error)
 		if(isset($_POST['lehrveranstaltung_id']) && isset($_POST['student_uid']) && isset($_POST['studiensemester_kurzbz']))
 		{
 			//Berechtigung pruefen
-			$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='".addslashes($_POST['lehrveranstaltung_id'])."'";
+			$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=".$db->db_add_param($_POST['lehrveranstaltung_id'], FHC_INTEGER);
 			if($result = $db->db_query($qry))
 			{
 				if($row = $db->db_fetch_object($result))
@@ -2402,7 +2402,7 @@ if(!$error)
 				$errormsg = 'Fehler beim Ermitteln der LVA';
 			}
 
-			$qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid='".addslashes($_POST['student_uid'])."'";
+			$qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid=".$db->db_add_param($_POST['student_uid']);
 			if($result = $db->db_query($qry))
 			{
 				if($row = $db->db_fetch_object($result))
@@ -2486,7 +2486,7 @@ if(!$error)
 			$zeugnisnote = new zeugnisnote();
 
 			//Berechtigung pruefen
-			$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='".addslashes($_POST['lehrveranstaltung_id_'.$i])."'";
+			$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=".$db->db_add_param($_POST['lehrveranstaltung_id_'.$i], FHC_INTEGER);
 			if($result = $db->db_query($qry))
 			{
 				if($row = $db->db_fetch_object($result))
@@ -2507,7 +2507,7 @@ if(!$error)
 				$errormsg = 'Fehler beim Ermitteln der LVA';
 			}
 
-			$qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid='".addslashes($_POST['student_uid_'.$i])."'";
+			$qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid=".$db->db_add_param($_POST['student_uid_'.$i], FHC_INTEGER);
 			if($result = $db->db_query($qry))
 			{
 				if($row = $db->db_fetch_object($result))
@@ -2613,7 +2613,7 @@ if(!$error)
 
 				if(!$error)
 				{
-					$qry = "SELECT student_uid, studiengang_kz FROM public.tbl_student WHERE trim(matrikelnr)='".trim($_POST['matrikelnummer_'.$i])."'";
+					$qry = "SELECT student_uid, studiengang_kz FROM public.tbl_student WHERE trim(matrikelnr)=".$db->db_add_param(trim($_POST['matrikelnummer_'.$i]));
 					if($result = $db->db_query($qry))
 					{
 						if($row = $db->db_fetch_object($result))
@@ -2634,7 +2634,7 @@ if(!$error)
 					}
 
 					//Berechtigung pruefen
-					$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='".addslashes($_POST['lehrveranstaltung_id'])."'";
+					$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=".$db->db_add_param($_POST['lehrveranstaltung_id'], FHC_INTEGER);
 					if($result = $db->db_query($qry))
 					{
 						if($row = $db->db_fetch_object($result))
@@ -2720,7 +2720,7 @@ if(!$error)
 		if(isset($_POST['lehrveranstaltung_id']) && isset($_POST['student_uid']) && isset($_POST['studiensemester_kurzbz']))
 		{
 			//Berechtigung pruefen
-			$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id='".addslashes($_POST['lehrveranstaltung_id'])."'";
+			$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=".$db->db_add_param($_POST['lehrveranstaltung_id'], FHC_INTEGER);
 			if($result = $db->db_query($qry))
 			{
 				if($row = $db->db_fetch_object($result))
@@ -2741,7 +2741,7 @@ if(!$error)
 				$errormsg = 'Fehler beim Ermitteln der LVA';
 			}
 
-			$qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid='".addslashes($_POST['student_uid'])."'";
+			$qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid=".$db->db_add_param($_POST['student_uid']);
 			if($result = $db->db_query($qry))
 			{
 				if($row = $db->db_fetch_object($result))
@@ -2864,16 +2864,16 @@ if(!$error)
 				//Wenn ein 2. Termin angelegt wird, und kein 1. Termin vorhanden ist,
 				//dann wird auch ein 1. Termin angelegt mit der derzeitigen Zeugnisnote
 				$qry = "SELECT * FROM lehre.tbl_pruefung WHERE
-						student_uid='".addslashes($_POST['student_uid'])."' AND
-						lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."' AND
+						student_uid=".$db->db_add_param($_POST['student_uid'])." AND
+						lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)." AND
 						pruefungstyp_kurzbz='Termin1'";
 				if($result = $db->db_query($qry))
 				{
 					if($db->db_num_rows($result)==0)
 					{
 						$qry = "SELECT note, benotungsdatum FROM lehre.tbl_zeugnisnote JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) WHERE
-								student_uid='".addslashes($_POST['student_uid'])."' AND
-								tbl_lehreinheit.lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."' AND
+								student_uid=".$db->db_add_param($_POST['student_uid'])." AND
+								tbl_lehreinheit.lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)." AND
 								tbl_lehreinheit.studiensemester_kurzbz = tbl_zeugnisnote.studiensemester_kurzbz";
 						if($result = $db->db_query($qry))
 						{
@@ -2931,7 +2931,8 @@ if(!$error)
 					$return = true;
 					$data = $pruefung->pruefung_id;
 					//Zeugnisnote aktualisieren
-					$qry = "SELECT lehrveranstaltung_id, studiensemester_kurzbz FROM lehre.tbl_lehreinheit WHERE lehreinheit_id='".addslashes($_POST['lehreinheit_id'])."'";
+					$qry = "SELECT lehrveranstaltung_id, studiensemester_kurzbz FROM lehre.tbl_lehreinheit 
+							WHERE lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER);
 					if($result_le = $db->db_query($qry))
 					{
 						if($row_le = $db->db_fetch_object($result_le))
@@ -3212,7 +3213,9 @@ if(!$error)
 			{
 				$projektarbeit = new projektarbeit();
 
-				$qry = "SELECT count(*) as anzahl FROM lehre.tbl_projektbetreuer WHERE projektarbeit_id='".$_POST['projektarbeit_id']."'";
+				$qry = "SELECT count(*) as anzahl FROM lehre.tbl_projektbetreuer 
+					WHERE projektarbeit_id=".$db->db_add_param($_POST['projektarbeit_id'], FHC_INTEGER);
+
 				if($result = $db->db_query($qry))
 				{
 					if($row = $db->db_fetch_object($result))
@@ -3224,7 +3227,9 @@ if(!$error)
 						}
 						else
 						{
-							$qry = "SELECT count(*) as anzahl FROM campus.tbl_paabgabe WHERE projektarbeit_id='".$_POST['projektarbeit_id']."';";
+							$qry = "SELECT count(*) as anzahl FROM campus.tbl_paabgabe 
+									WHERE projektarbeit_id=".$db->db_add_param($_POST['projektarbeit_id'], FHC_INTEGER).";";
+
 							if($result = $db->db_query($qry))
 							{
 								if($row = $db->db_fetch_object($result))
@@ -3378,7 +3383,8 @@ if(!$error)
 			{
 				if(is_numeric($person_id))
 				{
-					$qry = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id='$person_id' AND zustellung=true LIMIT 1";
+					$qry = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' 
+						AND person_id=".$db->db_add_param($person_id, FHC_INTEGER)." AND zustellung=true LIMIT 1";
 					if($result = $db->db_query($qry))
 					{
 						if($row = $db->db_fetch_object($result))
@@ -3431,7 +3437,8 @@ if(!$error)
 	{
 		if(isset($_POST['person_id']))
 		{
-			$qry = "SELECT stundensatz FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid) WHERE person_id='".addslashes($_POST['person_id'])."'";
+			$qry = "SELECT stundensatz FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON(uid=mitarbeiter_uid) 
+					WHERE person_id=".$db->db_add_param($_POST['person_id'], FHC_INTEGER);
 			if($result = $db->db_query($qry))
 			{
 				if($row = $db->db_fetch_object($result))
@@ -3455,7 +3462,7 @@ if(!$error)
 	else
 	{
 		$return = false;
-		$errormsg = 'Unkown type: "'.$_POST['type'].'"';
+		$errormsg = 'Unkown type: "'.$db->convert_html_chars($_POST['type']).'"';
 		$data = '';
 	}
 }

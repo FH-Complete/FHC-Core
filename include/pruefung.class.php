@@ -75,7 +75,7 @@ class pruefung extends basis_db
 	    }
 
 	    $qry = "SELECT tbl_pruefung.*, tbl_lehreinheit.lehrveranstaltung_id, tbl_lehreinheit.studiensemester_kurzbz as studiensemester_kurzbz
-			    FROM lehre.tbl_pruefung JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) WHERE pruefung_id=$pruefung_id";
+			    FROM lehre.tbl_pruefung JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) WHERE pruefung_id=".$this->db_add_param($pruefung_id, FHC_INTEGER);
 
 	    if($this->db_query($qry))
 	    {
@@ -165,7 +165,7 @@ class pruefung extends basis_db
 		    return false;
 	    }
 
-	    $qry = "DELETE FROM lehre.tbl_pruefung WHERE pruefung_id='$pruefung_id'";
+	    $qry = "DELETE FROM lehre.tbl_pruefung WHERE pruefung_id=".$this->db_add_param($pruefung_id, FHC_INTEGER);
 
 	    if($this->db_query($qry))
 	    {

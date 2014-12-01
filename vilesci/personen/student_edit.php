@@ -29,14 +29,13 @@
  *                      (WM)
  */
 
-	require_once('../../config/vilesci.config.inc.php');
-
-	require_once('../../include/functions.inc.php');
-	require_once('../../include/person.class.php');
-	require_once('../../include/benutzer.class.php');
-	require_once('../../include/student.class.php');
-	require_once('../../include/studiengang.class.php');
-
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/person.class.php');
+require_once('../../include/benutzer.class.php');
+require_once('../../include/student.class.php');
+require_once('../../include/studiengang.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
 echo '
 <html>
@@ -50,6 +49,12 @@ echo '
 ';
 
 $user = get_uid();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('student/stammdaten',null, 'suid'))
+	die('Sie haben keine Berechtigung für diese Seite');
 
 echo '<h2>Student ';
 if (isset($_GET['new']))

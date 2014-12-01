@@ -26,6 +26,7 @@ require_once 'auth.php';
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/person.class.php');
+require_once('../../../include/benutzer.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/akte.class.php');
 require_once('../../../include/dokument.class.php');
@@ -37,6 +38,14 @@ header("Content-Type: text/html; charset=utf-8");
 if(isset($_GET['lang']))
 	setSprache($_GET['lang']);
 	
+$code = $_SESSION['incoming/user'];
+
+$person = new person();
+$person_id = $person->checkZugangscode($code);
+
+if($person_id!=$_GET['person_id'])
+	die('Sie haben keine Berechtigung für diese Seite');
+
 $dokumenttyp = (isset($_GET['dokumenttyp']))? $_GET['dokumenttyp'] : 'LearnAgr';
 $sprache = getSprache(); 
 $p=new phrasen($sprache); 

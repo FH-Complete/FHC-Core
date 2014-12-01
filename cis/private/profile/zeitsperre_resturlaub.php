@@ -406,7 +406,11 @@ if(count($zeit->result)>0)
 	{
 		$i++;
 		//name der vertretung holen
-		$qry = "SELECT vorname || ' ' || nachname as kurzbz FROM public.tbl_mitarbeiter, public.tbl_benutzer, public.tbl_person WHERE tbl_benutzer.uid=tbl_mitarbeiter.mitarbeiter_uid AND tbl_benutzer.person_id=tbl_person.person_id AND mitarbeiter_uid='$row->vertretung_uid'";
+		$qry = "SELECT vorname || ' ' || nachname as kurzbz FROM public.tbl_mitarbeiter, public.tbl_benutzer, public.tbl_person 
+				WHERE tbl_benutzer.uid=tbl_mitarbeiter.mitarbeiter_uid 
+					AND tbl_benutzer.person_id=tbl_person.person_id 
+					AND mitarbeiter_uid=".$db->db_add_param($row->vertretung_uid);
+
 		$result_vertretung = $db->db_query($qry);
 		$row_vertretung = $db->db_fetch_object($result_vertretung);
 		$content_table.= "<tr class='liste".($i%2)."'>
@@ -619,9 +623,9 @@ if(URLAUB_TOOLS)
 	$gebuchterurlaub=0;
 	//Urlaub berechnen (date_part('month', vondatum)>9 AND date_part('year', vondatum)='".(date('Y')-1)."') OR (date_part('month', vondatum)<9 AND date_part('year', vondatum)='".date('Y')."')
 	$qry = "SELECT sum(bisdatum-vondatum+1) as anzahltage FROM campus.tbl_zeitsperre
-				WHERE zeitsperretyp_kurzbz='Urlaub' AND mitarbeiter_uid='$uid' AND
+				WHERE zeitsperretyp_kurzbz='Urlaub' AND mitarbeiter_uid=".$db->db_add_param($uid)." AND
 				(
-					vondatum>='$datum_beginn_iso' AND bisdatum<='$datum_ende_iso'
+					vondatum>=".$db->db_add_param($datum_beginn_iso)." AND bisdatum<=".$db->db_add_param($datum_ende_iso)."
 				)";
 	$tttt="\n";
 	$result = $db->db_query($qry);

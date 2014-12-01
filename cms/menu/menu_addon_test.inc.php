@@ -57,7 +57,7 @@ class menu_addon_test extends menu_addon
 			</form>
 			';
 		if(isset($_POST['stg_kz']))
-			$this->block.='KZ:'.$_POST['stg_kz'];
+			$this->block.='KZ:'.$this->convert_html_chars($_POST['stg_kz']);
 			
 		
 		$this->output();

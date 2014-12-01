@@ -55,7 +55,7 @@ if(trim($typ)=="m")
 			AND public.tbl_person.person_id IN(SELECT public.tbl_person.person_id FROM public.tbl_person 
 			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
 			JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id) 
-			WHERE studiengang_kz=".$studiengang_kz."  
+			WHERE studiengang_kz=".$db->db_add_param($studiengang_kz)."  
 			AND studiensemester_kurzbz='WS".(substr(trim($stsem),-4)-$i)."' 
 			AND status_kurzbz='Student' 
 			AND ausbildungssemester='1') 
@@ -74,7 +74,7 @@ if(trim($typ)=="m")
 		$qry_anzahl="SELECT count(*) as anzahl FROM public.tbl_person 
 		JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
 		JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id) 
-		WHERE studiengang_kz=".$studiengang_kz."  
+		WHERE studiengang_kz=".$db->db_add_param($studiengang_kz)."  
 			AND studiensemester_kurzbz='WS".(substr(trim($stsem),-4)-$i)."' 
 			AND status_kurzbz='Student' 
 			AND ausbildungssemester='1'";
@@ -122,7 +122,7 @@ if(trim($typ)=="b")
 			AND public.tbl_person.person_id IN(SELECT public.tbl_person.person_id FROM public.tbl_person 
 			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
 			JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id) 
-			WHERE studiengang_kz='".$studiengang_kz."'  
+			WHERE studiengang_kz=".$db->db_add_param($studiengang_kz)."
 			AND status_kurzbz='Absolvent'
 			AND (studiensemester_kurzbz='WS".(substr(trim($stsem),-4)-$i)."' OR studiensemester_kurzbz='SS".(substr(trim($stsem),-4)-$i)."') )) as b 
 		GROUP BY studiengang_kz, typ, bezeichnung, kurzbz ORDER BY stgkurz";
@@ -140,7 +140,7 @@ if(trim($typ)=="b")
 		$qry_anzahl="SELECT count(*) as anzahl FROM public.tbl_person 
 			JOIN public.tbl_prestudent ON(public.tbl_person.person_id=public.tbl_prestudent.person_id) 
 			JOIN public.tbl_prestudentstatus ON(public.tbl_prestudent.prestudent_id=public.tbl_prestudentstatus.prestudent_id) 
-			WHERE studiengang_kz='".$studiengang_kz."' 
+			WHERE studiengang_kz=".$db->db_add_param($studiengang_kz)."
 			AND status_kurzbz='Absolvent'
 			AND (studiensemester_kurzbz='WS".(substr(trim($stsem),-4)-$i)."' OR studiensemester_kurzbz='SS".(substr(trim($stsem),-4)-$i)."')";
 		if($result_anzahl=$db->db_query($qry_anzahl))

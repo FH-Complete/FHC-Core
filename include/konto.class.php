@@ -87,7 +87,7 @@ class konto extends basis_db
 		}
 
 		$qry = "SELECT tbl_konto.*, anrede, titelpost, titelpre, nachname, vorname, vornamen, credit_points
-			FROM public.tbl_konto JOIN public.tbl_person USING (person_id) WHERE buchungsnr='$buchungsnr'";
+			FROM public.tbl_konto JOIN public.tbl_person USING (person_id) WHERE buchungsnr=".$this->db_add_param($buchungsnr, FHC_INTEGER);
 
 		if($this->db_query($qry))
 		{
@@ -348,17 +348,17 @@ class konto extends basis_db
 									(betrag + (SELECT CASE WHEN sum(betrag) is null THEN 0
 											            ELSE sum(betrag) END
 										         FROM public.tbl_konto WHERE buchungsnr_verweis=konto_a.buchungsnr))<>0
-									AND person_id='$person_id') OR
+									AND person_id=".$this->db_add_param($person_id, FHC_INTEGER).") OR
 					buchungsnr_verweis in (SELECT buchungsnr FROM public.tbl_konto as konto_a WHERE
 									(betrag + (SELECT CASE WHEN sum(betrag) is null THEN 0
 														ELSE sum(betrag) END
 												 FROM public.tbl_konto WHERE buchungsnr_verweis=konto_a.buchungsnr))<>0
-									AND person_id='$person_id')) $stgwhere ORDER BY buchungsdatum";
+									AND person_id=".$this->db_add_param($person_id, FHC_INTEGER).")) $stgwhere ORDER BY buchungsdatum";
 		}
 		else
 			$qry = "SELECT tbl_konto.*, anrede, titelpost, titelpre, nachname, vorname, vornamen
 					FROM public.tbl_konto JOIN public.tbl_person USING (person_id)
-					WHERE person_id='".$person_id."' $stgwhere ORDER BY buchungsdatum";
+					WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER)." $stgwhere ORDER BY buchungsdatum";
 		
 		if($this->db_query($qry))
 		{
@@ -415,7 +415,7 @@ class konto extends basis_db
 		$qry = "SELECT * FROM public.tbl_buchungstyp";
 		
 		if(!is_null($aktiv))
-			$qry.=" WHERE aktiv=".($aktiv?'true':'false');
+			$qry.=" WHERE aktiv=".$this->db_add_param($aktiv, FHC_BOOLEAN);
 		$qry.=" ORDER BY beschreibung";
 
 		if($this->db_query($qry))
@@ -429,7 +429,7 @@ class konto extends basis_db
 				$typ->standardbetrag = $row->standardbetrag;
 				$typ->standardtext = $row->standardtext;
 				$typ->credit_points = $row->credit_points;
-				$typ->aktiv = ($row->aktiv=='t'?true:false);
+				$typ->aktiv = $this->db_parse_bool($row->aktiv);
 
 				$this->result[] = $typ;
 			}
@@ -506,7 +506,7 @@ class konto extends basis_db
 
 
 		$qry = "SELECT sum(betrag) as differenz FROM public.tbl_konto 
-				WHERE buchungsnr='".$buch_nr[0]."' OR buchungsnr_verweis='".$buch_nr[0]."'";
+				WHERE buchungsnr=".$this->db_add_param($buch_nr[0])." OR buchungsnr_verweis=".$this->db_add_param($buch_nr[0]);
 
 		if($this->db_query($qry))
 		{
