@@ -45,6 +45,11 @@ tr.liste1
 {
 	background-color: #EFEFDD;
 }
+
+table.tablesorter tr:hover td {
+	background-color: rgb(226, 255, 226) !important;
+}
+
 td.button 
 {
 	color: #000000;

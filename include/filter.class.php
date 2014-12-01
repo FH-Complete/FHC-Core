@@ -179,7 +179,7 @@ class filter extends basis_db
 				switch ($filter->type)
 				{
 				case 'select':
-					$html.='<select class="form-control" name="'.$filter->kurzbz.'[]" ';
+					$html.='<select id="' . $filter->kurzbz . '" class="form-control" name="'.$filter->kurzbz.'[]" ';
 					$html.=$filter->htmlattr;
 					$html.=' >';
 					$this->loadValues($filter->sql, $filter->valuename, $filter->showvalue);
@@ -416,4 +416,3 @@ class filter extends basis_db
 	}
 	
 }
-?>
