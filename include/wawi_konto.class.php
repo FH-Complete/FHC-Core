@@ -41,6 +41,7 @@ class wawi_konto extends basis_db
 	public $insertvon;				//  string
 	public $updateamum;         	//  timestamp
 	public $updatevon;				//  string
+	public $person_id;				//  integer
 	
 	public $sprache; 
 	
@@ -224,7 +225,7 @@ class wawi_konto extends basis_db
 				$qry.=" beschreibung[$idx],";
 			}
 			$qry.=' kurzbz, aktiv, insertamum, 
-			insertvon, updateamum, updatevon) VALUES('.
+			insertvon, updateamum, updatevon, person_id) VALUES('.
 			      $this->db_add_param($this->kontonr).', ';
 			      
 			reset($this->beschreibung);
@@ -236,7 +237,8 @@ class wawi_konto extends basis_db
 			      $this->db_add_param($this->insertamum).', '.
 			      $this->db_add_param($this->insertvon).', '.
 				  $this->db_add_param($this->updateamum).', '.
-			      $this->db_add_param($this->updatevon).');';
+			      $this->db_add_param($this->updatevon).', '.
+				  $this->db_add_param($this->person_id).');';
 		}
 		else
 		{

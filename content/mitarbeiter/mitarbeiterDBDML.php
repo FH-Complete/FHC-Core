@@ -670,6 +670,7 @@ if(!$error)
 		$konto->insertvon = $user;
 		$konto->beschreibung['German'] = $_POST['beschreibung'];
 		$konto->kurzbz = $_POST['kurzbz'];
+		$konto->person_id = isset($_POST['person_id']) ? $_POST['person_id'] : null;
 		
 		if (!$konto->save())
 		{
