@@ -115,9 +115,13 @@ class statistik extends basis_db
 	 * Laedt alle Statistiken
 	 * @return true wenn ok, sonst false
 	 */
-	public function getAll()
+	public function getAll($order = FALSE)
 	{
 		$qry = 'SELECT * FROM public.tbl_statistik';
+
+		if($order) {
+			$qry .= ' ORDER BY ' . $order;
+		}
 		
 		if($result = $this->db_query($qry))
 		{
