@@ -2205,6 +2205,16 @@ if(!$result = @$db->db_query("SELECT ablauf_vorgaben_id FROM testtool.tbl_ablauf
 		echo 'testtool.tbl_ablauf: Neue Spalte ablauf_vorgaben_id hinzugefuegt<br>';
 }
 
+// Spalte preferences in public.tbl_statistik
+if(!$result = @$db->db_query("SELECT preferences FROM public.tbl_statistik LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_statistik ADD COLUMN preferences text;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_statistik: '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'public.tbl_statistik: Neue Spalte preferences hinzugefuegt<br>';
+}
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -2401,7 +2411,7 @@ $tabellen=array(
 	"public.tbl_service" => array("service_id", "bezeichnung","beschreibung","ext_id","oe_kurzbz","content_id"),
 	"public.tbl_sprache"  => array("sprache","locale","flagge","index","content","bezeichnung"),
 	"public.tbl_standort"  => array("standort_id","adresse_id","kurzbz","bezeichnung","insertvon","insertamum","updatevon","updateamum","ext_id", "firma_id"),
-	"public.tbl_statistik"  => array("statistik_kurzbz","bezeichnung","url","r","gruppe","sql","php","content_id","insertamum","insertvon","updateamum","updatevon","berechtigung_kurzbz","publish"),
+	"public.tbl_statistik"  => array("statistik_kurzbz","bezeichnung","url","r","gruppe","sql","php","content_id","insertamum","insertvon","updateamum","updatevon","berechtigung_kurzbz","publish","preferences"),
 	"public.tbl_student"  => array("student_uid","matrikelnr","prestudent_id","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige"),
