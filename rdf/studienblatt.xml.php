@@ -35,6 +35,7 @@ require_once('../include/studienplan.class.php');
 require_once('../include/mitarbeiter.class.php');
 require_once('../include/organisationsform.class.php');
 require_once('../include/zgv.class.php');
+require_once('../include/konto.class.php');
 
 $uid_arr = (isset($_REQUEST['uid'])?$_REQUEST['uid']:null);
 
@@ -45,6 +46,7 @@ echo "<studienblaetter>\n";
 
 $uid = isset($uid_arr[1])?$uid_arr[1]:$uid_arr[0];
 
+$konto =  new konto();
 $student_help = new student(); 
 // an 2ter stelle da im Aufruf vom FAS ;<uid>; der erste immer '' ist
 if($student_help->load($uid))
@@ -149,6 +151,10 @@ foreach($uid_arr as $uid)
             $studiensemester_aktuell->load($prestudent->studiensemester_kurzbz);
             
             echo "\t\t<studiensemester_aktuell>".$studiensemester_aktuell->bezeichnung."</studiensemester_aktuell>";
+			
+			// check ob Oeh-Beitrag bezahlt wurde
+			$oehbeitrag = $konto->getOehBeitragGesamt($uid, $studiensemester_aktuell->studiensemester_kurzbz);
+			echo "\t\t<oehbeitrag>".str_replace('.', ',', $oehbeitrag)."</oehbeitrag>";
             
             // check ob Quereinsteiger
             $ausbildungssemester = ($prestudent->getFirstStatus($student->prestudent_id, 'Student'))?$prestudent->ausbildungssemester:'';           
