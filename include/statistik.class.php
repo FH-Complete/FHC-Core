@@ -41,6 +41,7 @@ class statistik extends basis_db
 	public $updateamum;
 	public $udpatevon;
 	public $berechtigung_kurzbz;
+	public $preferences;
 				
 	public $studiengang_kz;		// integer
 	public $prestudent_id;		// integer
@@ -75,7 +76,7 @@ class statistik extends basis_db
 				FROM
 					public.tbl_statistik
 				WHERE
-					statistik_kurzbz=".$this->db_add_param($statistik_kurzbz);
+					statistik_kurzbz = " . $this->db_add_param($statistik_kurzbz);
 		
 		if($result = $this->db_query($qry))
 		{
@@ -95,6 +96,8 @@ class statistik extends basis_db
 				$this->updateamum = $row->updateamum;
 				$this->udpatevon = $row->updatevon;
 				$this->berechtigung_kurzbz = $row->berechtigung_kurzbz;
+				$this->preferences = $row->preferences;
+				$this->new = false;
 				
 				return true;
 			}
@@ -143,6 +146,7 @@ class statistik extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->udpatevon = $row->updatevon;
 				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
+				$obj->preferences = $row->preferences;
 				
 				$this->result[] = $obj;
 			}
@@ -188,6 +192,7 @@ class statistik extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->udpatevon = $row->updatevon;
 				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
+				$obj->preferences = $row->preferences;
 				
 				$this->result[] = $obj;
 			}
@@ -204,15 +209,21 @@ class statistik extends basis_db
 	 * Laedt alle Statistik Gruppen, Parameter publish zum Filtern.
 	 * @return true wenn ok, sonst false
 	 */
-	public function getAnzahlGruppe($publish=null)
+	public function getAnzahlGruppe($publish = null)
 	{
 		$qry = 'SELECT gruppe, count(*) AS anzahl FROM public.tbl_statistik ';
-		if ($publish==true)
-			$qry.='WHERE publish ';
-		elseif ($publish==false)
-			$qry.='WHERE NOT publish ';
-		$qry.=' GROUP BY gruppe ORDER BY gruppe;';
-		// echo $qry;
+
+		if($publish === true)
+		{
+			$qry .= 'WHERE publish ';
+		}
+		elseif($publish === false)
+		{
+			$qry .= 'WHERE NOT publish ';
+		}
+
+		$qry .= ' GROUP BY gruppe ORDER BY gruppe;';
+
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
@@ -246,7 +257,7 @@ class statistik extends basis_db
 		if($new)
 		{
 			$qry = 'INSERT INTO public.tbl_statistik(statistik_kurzbz, content_id, bezeichnung, url, sql, 
-					php, r, gruppe, publish, insertamum, insertvon, updateamum, updatevon, berechtigung_kurzbz) VALUES('.
+					php, r, gruppe, publish, insertamum, insertvon, updateamum, updatevon, preferences, berechtigung_kurzbz) VALUES('.
 					$this->db_add_param($this->statistik_kurzbz).','.
 					$this->db_add_param($this->content_id,FHC_INTEGER).','.
 					$this->db_add_param($this->bezeichnung).','.
@@ -260,6 +271,7 @@ class statistik extends basis_db
 					$this->db_add_param($this->insertvon).','.
 					$this->db_add_param($this->updateamum).','.
 					$this->db_add_param($this->updatevon).','.
+					$this->db_add_param($this->preferences).','.
 					$this->db_add_param($this->berechtigung_kurzbz).');';
 		}
 		else
@@ -280,6 +292,7 @@ class statistik extends basis_db
 				' insertvon='.$this->db_add_param($this->insertvon).','.
 				' updateamum='.$this->db_add_param($this->updateamum).','.
 				' updatevon='.$this->db_add_param($this->updatevon).','.
+				' preferences='.$this->db_add_param($this->preferences).','.
 				' berechtigung_kurzbz='.$this->db_add_param($this->berechtigung_kurzbz).
 				' WHERE statistik_kurzbz='.$this->db_add_param($this->statistik_kurzbz_orig,FHC_STRING,false);
 		}
