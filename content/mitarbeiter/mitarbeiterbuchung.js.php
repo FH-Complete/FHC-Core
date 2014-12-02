@@ -233,6 +233,7 @@ function MitarbeiterBuchungDetailDisableFields(val)
 	document.getElementById('mitarbeiter-buchung-menulist-konto').disabled=val;
 	document.getElementById('mitarbeiter-buchung-menulist-kostenstelle').disabled=val;
 	document.getElementById('mitarbeiter-buchung-button-speichern').disabled=val;
+	document.getElementById('mitarbeiter-buchung-button-konto').disabled=val;
 }
 
 // ****
@@ -337,6 +338,7 @@ function MitarbeiterBuchungNeu()
 {
 	MitarbeiterBuchungDetailDisableFields(false);
 	MitarbeiterBuchungDetailReset();
+	MitarbeiterBuchungKontoRefresh();
 }
 
 // ****
@@ -404,5 +406,33 @@ function MitarbeiterBuchungKontoAnlegen()
 	else
 	{
 		SetStatusBarText('Daten wurden gespeichert');
+		MitarbeiterBuchungKontoRefresh();
 	}
+}
+
+// ****
+// * Aktualisiert die Konto Dropdown-Liste
+// ****
+function MitarbeiterBuchungKontoRefresh()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");	
+	var menulistkonto = document.getElementById('mitarbeiter-buchung-menulist-konto');
+	url='<?php echo APP_ROOT;?>rdf/wawi_konto.rdf.php?person_id='+person_id+"&"+gettimestamp();
+	
+	//alle Eintraege entfernen
+	menulistkonto.removeAllItems();
+
+	//Alte DS entfernen
+	var oldDatasources = menulistkonto.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		menulistkonto.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	menulistkonto.builder.rebuild();
+
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var myDatasource = rdfService.GetDataSourceBlocking(url);
+	menulistkonto.database.AddDataSource(myDatasource);
+	menulistkonto.builder.rebuild();
 }
