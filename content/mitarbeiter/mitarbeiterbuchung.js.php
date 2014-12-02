@@ -233,7 +233,13 @@ function MitarbeiterBuchungDetailDisableFields(val)
 	document.getElementById('mitarbeiter-buchung-menulist-konto').disabled=val;
 	document.getElementById('mitarbeiter-buchung-menulist-kostenstelle').disabled=val;
 	document.getElementById('mitarbeiter-buchung-button-speichern').disabled=val;
-	document.getElementById('mitarbeiter-buchung-button-konto').disabled=val;
+			
+	var menulistkonto = document.getElementById('mitarbeiter-buchung-menulist-konto');
+	if((val == false && menulistkonto.itemCount < 1) || val == true)
+	{
+		document.getElementById('mitarbeiter-buchung-button-konto').hidden=val;	
+		document.getElementById('mitarbeiter-buchung-button-konto').disabled=val;
+	}
 }
 
 // ****
@@ -405,6 +411,7 @@ function MitarbeiterBuchungKontoAnlegen()
 	}
 	else
 	{
+		document.getElementById('mitarbeiter-buchung-button-konto').disabled = true;
 		SetStatusBarText('Daten wurden gespeichert');
 		MitarbeiterBuchungKontoRefresh();
 	}
