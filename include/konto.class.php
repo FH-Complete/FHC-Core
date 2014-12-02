@@ -532,7 +532,7 @@ class konto extends basis_db
 			return false;
 		}
 	}
-    
+	
 	/**
 	 * Überprüft, ob das Konto einer Person ausgeglichen ist, oder ob noch Zahlungen offen sind
 	 * @param $person_id ID der Person, die geprüft werden soll
@@ -692,6 +692,36 @@ class konto extends basis_db
 				join public.tbl_benutzer benutzer using(person_id)
 				where uid=".$this->db_add_param($uid)." and studiensemester_kurzbz = ".$this->db_add_param($stsem)." 
 				and buchungstyp_kurzbz = 'Studiengebuehr' and betrag > 0";
+		if($studiengang_kz!= null)
+		$qry.=" and studiengang_kz = ".$this->db_add_param($studiengang_kz, FHC_INTEGER).";";
+		
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				return $row->betrag; 
+			}
+			return false; 
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei der Abfrage aufgetreten';
+			return false; 
+		}
+	}
+	
+	/**
+	 * Gibt den Betrag des bezahlten ÖH-Beitrags eines Semesters zurück
+	 * @param $uid StudentUID
+	 * @param $stsem Studiensemester_kurzbz
+	 * @param $studiengang_kz Studiengang kurzbz
+	 */
+	public function getOehBeitragGesamt($uid, $stsem, $studiengang_kz = null)
+	{
+		$qry = "select sum(betrag) as betrag from public.tbl_konto 
+				join public.tbl_benutzer benutzer using(person_id)
+				where uid=".$this->db_add_param($uid)." and studiensemester_kurzbz = ".$this->db_add_param($stsem)." 
+				and buchungstyp_kurzbz = 'OEH' and betrag > 0";
 		if($studiengang_kz!= null)
 		$qry.=" and studiengang_kz = ".$this->db_add_param($studiengang_kz, FHC_INTEGER).";";
 		
