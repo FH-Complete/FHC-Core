@@ -71,6 +71,7 @@ foreach($vertrag->result as $row)
 	$oRdf->obj[$i]->setAttribut('vertragstyp_bezeichnung',$row->vertragstyp_bezeichnung,true);
 	$oRdf->obj[$i]->setAttribut('betrag',$row->betrag,true);
 	$oRdf->obj[$i]->setAttribut('status',$row->status,true);
+	$oRdf->obj[$i]->setAttribut('anmerkung',$row->anmerkung,true);
 
 	$oRdf->addSequence($row->vertrag_id);
 }

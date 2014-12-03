@@ -170,17 +170,23 @@ function MitarbeiterVertragGenerateVertrag(windowdocument)
 	var vertragstyp_kurzbz = windowdocument.getElementById('mitarbeiter-vertrag-neu-menulist-vertragstyp').value;
 	var bezeichnung = windowdocument.getElementById('mitarbeiter-vertrag-neu-textbox-bezeichnung').value;
 	var vertrag_id = windowdocument.getElementById('mitarbeiter-vertrag-neu-textbox-vertrag_id').value;
+	var anmerkung = windowdocument.getElementById('mitarbeiter-vertrag-neu-textbox-anmerkung').value;
+	var fahrten = windowdocument.getElementById("mitarbeiter-vertrag-neu-textbox-fahrten").value;
 
 	if(betrag=='')
 	{
 		alert('Bitte geben Sie einen Betrag ein');
 		return false;
 	}
+	
+	if(vertragstyp_kurzbz == 'fahrtkosten')
+	    betrag = betrag * fahrten;
 
 	req.add('betrag',betrag);
 	req.add('vertragstyp_kurzbz',vertragstyp_kurzbz);
 	req.add('bezeichnung',bezeichnung);
 	req.add('vertrag_id',vertrag_id);
+	req.add('anmerkung',anmerkung);
 
 	var anzahl=0;
 	for (var t = 0; t < numRanges; t++)

@@ -25,6 +25,7 @@ $user = get_uid();
 
 ?>
 var MitarbeiterVertragNeuBetragOld=0;
+var addon = Array();
 
 function MitarbeiterVertragNeuInit(person_id, vertrag_id)
 {
@@ -80,6 +81,7 @@ function MitarbeiterVertragNeuInit(person_id, vertrag_id)
 		vertragstyp_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vertragstyp_kurzbz" ));
 		betrag = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#betrag" ));
 		bezeichnung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bezeichnung" ));
+		anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
 
 		MitarbeiterVertragNeuBetragOld = betrag;
 
@@ -87,7 +89,15 @@ function MitarbeiterVertragNeuInit(person_id, vertrag_id)
 		document.getElementById('mitarbeiter-vertrag-neu-textbox-betrag').value=betrag;
 		MenulistSelectItemOnValue('mitarbeiter-vertrag-neu-menulist-vertragstyp', vertragstyp_kurzbz)
 		document.getElementById('mitarbeiter-vertrag-neu-textbox-vertrag_id').value=vertrag_id;
+		document.getElementById('mitarbeiter-vertrag-neu-textbox-anmerkung').value=anmerkung;
 
+	}
+	for(i in addon)
+	{
+	    if(typeof addon[i].AddonKtuaddEventlistenerVertrag == 'function')
+	    {
+		addon[i].AddonKtuaddEventlistenerVertrag();
+	    }
 	}
 }
 
