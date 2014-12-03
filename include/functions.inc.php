@@ -154,7 +154,7 @@ function check_student($uid)
 	$db = new basis_db();
 	
 	// uid von Tabelle 'Student' holen
-	$sql_query="SELECT student_uid FROM public.tbl_student WHERE student_uid=".$this->db_add_param($uid);
+	$sql_query="SELECT student_uid FROM public.tbl_student WHERE student_uid=".$db->db_add_param($uid);
 	//echo $sql_query;
 	if($db->db_query($sql_query))
 	{
