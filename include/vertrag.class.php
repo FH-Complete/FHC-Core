@@ -37,7 +37,7 @@ class vertrag extends basis_db
 	public $updateamum;			// timestamp
 	public $updatevon;			// varchar(32)
 	public $ext_id; 			// bigint     
-
+	public $anmerkung; 			// text  
 
     /**
 	 * Konstruktor
@@ -60,6 +60,7 @@ class vertrag extends basis_db
 				$this->bezeichnung = $row->bezeichnung;
 				$this->betrag = $row->betrag;
 				$this->person_id = $row->person_id;
+				$this->anmerkung = $row->anmerkung;
 				$this->new=false;
 
 				return true;
@@ -116,6 +117,7 @@ class vertrag extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->status = $row->status;
+				$obj->anmerkung = $row->anmerkung;
 			
 				$obj->vertragstyp_bezeichnung = $row->vertragstyp_bezeichnung;
 		
@@ -375,7 +377,6 @@ class vertrag extends basis_db
 			mitarbeiter_uid IN (SELECT uid FROM public.tbl_benutzer WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER).")
 			AND vertrag_id IS NULL
 		";
-
 		if($result = $this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object($result))
@@ -391,6 +392,7 @@ class vertrag extends basis_db
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$obj->betreuerart_kurzbz = $row->betreuerart_kurzbz;
 				$obj->bezeichnung = $row->bezeichnung;
+				$obj->anmerkung = $row->anmerkung;
 				$this->result[] = $obj;
 			}
 			return true;
@@ -496,6 +498,7 @@ class vertrag extends basis_db
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$obj->betreuerart_kurzbz = $row->betreuerart_kurzbz;
 				$obj->bezeichnung = $row->bezeichnung;
+				$obj->anmerkung = $row->anmerkung;
 				$this->result[] = $obj;
 			}
 			return true;
@@ -518,7 +521,7 @@ class vertrag extends basis_db
 
 		if($new)
 		{
-			$qry = "BEGIN;INSERT INTO lehre.tbl_vertrag(bezeichnung, person_id, vertragstyp_kurzbz, betrag, insertamum, insertvon, updateamum, updatevon)
+			$qry = "BEGIN;INSERT INTO lehre.tbl_vertrag(bezeichnung, person_id, vertragstyp_kurzbz, betrag, insertamum, insertvon, updateamum, updatevon, anmerkung)
 					VALUES(".
 					$this->db_add_param($this->bezeichnung).','.
 					$this->db_add_param($this->person_id,FHC_INTEGER).','.
@@ -527,7 +530,8 @@ class vertrag extends basis_db
 					$this->db_add_param($this->insertamum).','.
 					$this->db_add_param($this->insertvon).','.
 					$this->db_add_param($this->updateamum).','.
-					$this->db_add_param($this->updatevon).');';
+					$this->db_add_param($this->updatevon).','.
+					$this->db_add_param($this->anmerkung).');';
 
 		}
 		else
@@ -539,6 +543,7 @@ class vertrag extends basis_db
 			" betrag=".$this->db_add_param($this->betrag).','.
 			" updateamum=".$this->db_add_param($this->updateamum).','.
 			" updatevon=".$this->db_add_param($this->updatevon).
+			" anmerkung=".$this->db_add_param($this->anmerkung).
 			" WHERE vertrag_id=".$this->db_add_param($this->vertrag_id, FHC_INTEGER,false);
 		}
 

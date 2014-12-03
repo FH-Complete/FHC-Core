@@ -25,6 +25,8 @@ header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
 include('../../config/vilesci.config.inc.php');
+include('../../include/addon.class.php');
+
 echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
 
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
@@ -39,7 +41,6 @@ if(isset($_GET['vertrag_id']) && is_numeric($_GET['vertrag_id']))
 	$vertrag_id = $_GET['vertrag_id'];
 else
 	$vertrag_id='';
-
 ?>
 
 <window id="mitarbeiter-vertrag-neu-dialog" title="Neu"
@@ -49,6 +50,15 @@ else
 
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/mitarbeiter/mitarbeitervertragneudialog.js.php" />
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/functions.js.php" />
+<?php
+// ADDONS
+$addon_obj = new addon();
+$addon_obj->loadAddons();
+foreach($addon_obj->result as $addon)
+{
+	echo '<script type="application/x-javascript" src="'.APP_ROOT.'addons/'.$addon->kurzbz.'/content/init.js.php" />';
+}
+?>
 
 <vbox flex="1">
 	<hbox hidden="true">
@@ -128,7 +138,7 @@ else
 				<column flex="1"/>
 				<column flex="8"/>
 			</columns>
-			<rows>			
+			<rows id="mitarbeiter-buchung-grid-detail-rows">			
 				<row>
 					<label value="Bezeichnung" control="mitarbeiter-vertrag-neu-textbox-bezeichnung" />
 					<hbox>
@@ -140,7 +150,7 @@ else
 					<label value="Typ" control="mitarbeiter-vertrag-neu-menulist-vertragstyp"/>
 					<menulist id="mitarbeiter-vertrag-neu-menulist-vertragstyp" disabled="false"
 							  datasources="<?php echo APP_ROOT ?>rdf/vertragstyp.rdf.php"
-							  ref="http://www.technikum-wien.at/vertragstyp" >
+							  ref="http://www.technikum-wien.at/vertragstyp">
 						<menupopup>
 							<menuitem value=""
 						   		      label="-- Keine Auswahl --"
@@ -164,9 +174,16 @@ else
 						<spacer />
 					</hbox>
 				</row>
+				<row>
+					<label value="Anmerkung" control="mitarbeiter-vertrag-neu-textbox-anmerkung" />
+					<hbox>
+						<textbox id="mitarbeiter-vertrag-neu-textbox-anmerkung" value="" size="80" />
+						<spacer />
+					</hbox>
+				</row>
 			</rows>
 		</grid>
 	</hbox>	
-	<button label="Vertrag erstellen" oncommand="MitarbeiterVertragNeuGenerateVertrag()" />
+	<button id="mitarbeiter-vertrag-neu-button-speichern" label="Vertrag erstellen" oncommand="MitarbeiterVertragNeuGenerateVertrag()" />
 </vbox>
 </window>

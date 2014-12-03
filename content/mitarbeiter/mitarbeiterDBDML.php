@@ -452,6 +452,7 @@ if(!$error)
 			$vertrag->vertragstyp_kurzbz=$_POST['vertragstyp_kurzbz'];
 			$vertrag->betrag=str_replace(',','.',$_POST['betrag']);
 			$vertrag->bezeichnung = $_POST['bezeichnung'];
+			$vertrag->anmerkung = $_POST['anmerkung'];
 
 			if($errormsg=='')
 			{

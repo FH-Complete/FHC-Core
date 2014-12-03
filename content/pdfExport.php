@@ -129,7 +129,15 @@ if(isset($_GET['bis']))
 	$params.='&bis='.urlencode($_GET['bis']);
 if(isset($_GET['lehreinheit']))
 	$params.='&lehreinheit='.urlencode($_GET['lehreinheit']);
-
+if(isset($_GET['mitarbeiter_uid']))
+	$params.='&mitarbeiter_uid='.urlencode($_GET['mitarbeiter_uid']);
+if(isset($_GET['vertrag_id']))
+{
+    foreach($_GET['vertrag_id'] as $id)
+    {
+	$params.='&vertrag_id[]='.urlencode($id);
+    }
+}
 $output = (isset($_GET['output'])?$_GET['output']:'odt');
 
 $rechte = new benutzerberechtigung();
@@ -186,7 +194,7 @@ elseif(in_array($xsl,array('Zertifikat','Diplomurkunde','Diplomzeugnis','Bakkurk
 'PrProtokollBakk','PrProtokollDipl','Lehrauftrag','DiplomurkundeEng','Zeugnis','ZeugnisEng','StudienerfolgEng',
 'Sammelzeugnis','PrProtDiplEng','PrProtBakkEng','BakkzeugnisEng','DiplomzeugnisEng','statusbericht',
 'DiplSupplement','Zutrittskarte','Projektbeschr','Ausbildungsver','AusbildStatus','PrProtBA','PrProtMA',
-'PrProtBAEng','PrProtMAEng','Studienordnung','Erfolgsnachweis','ErfolgsnwHead','Studienblatt','LV_Informationen','LVZeugnis','AnwListBarcode')))
+'PrProtBAEng','PrProtMAEng','Studienordnung','Erfolgsnachweis','ErfolgsnwHead','Studienblatt','LV_Informationen','LVZeugnis','AnwListBarcode','Honorarvertrag')))
 {
 	if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz'))
 	{
@@ -227,7 +235,6 @@ else
 
 
 $xml_url=XML_ROOT.$xml.$params;
-
 // Load the XML source
 $xml_doc = new DOMDocument;
 
