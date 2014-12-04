@@ -358,6 +358,10 @@ if (!isset($_REQUEST["archive"]))
 		    $studiensemester = new studiensemester($_GET['ss']);
 		    $tempPdfName = $vorlage->vorlage_kurzbz.'_'.$studiengang->kurzbzlang.'_'.$studiensemester->studiensemester_kurzbz.'.pdf';
 		}
+		elseif($xsl == "Honorarvertrag")
+		{
+		    $tempPdfName = $vorlage->vorlage_kurzbz.'_'.$benutzer_obj->nachname.'_'.$benutzer_obj->vorname.'.pdf';
+		}
 		else
 		{
 		    $tempPdfName = $vorlage->vorlage_kurzbz.'.pdf';
