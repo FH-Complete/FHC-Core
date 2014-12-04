@@ -171,7 +171,8 @@ function MitarbeiterVertragGenerateVertrag(windowdocument)
 	var bezeichnung = windowdocument.getElementById('mitarbeiter-vertrag-neu-textbox-bezeichnung').value;
 	var vertrag_id = windowdocument.getElementById('mitarbeiter-vertrag-neu-textbox-vertrag_id').value;
 	var anmerkung = windowdocument.getElementById('mitarbeiter-vertrag-neu-textbox-anmerkung').value;
-	var fahrten = windowdocument.getElementById("mitarbeiter-vertrag-neu-textbox-fahrten").value;
+	if(windowdocument.getElementById("mitarbeiter-vertrag-neu-textbox-fahrten") != null)
+	    var fahrten = windowdocument.getElementById("mitarbeiter-vertrag-neu-textbox-fahrten").value;
 
 	if(betrag=='')
 	{
