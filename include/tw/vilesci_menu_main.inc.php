@@ -86,6 +86,7 @@ $menu=array
             'Kursverwaltung24'=>array('name'=>'Kurs entfernen 2.4', 'link'=>'moodle/kurs_verwaltung24.php', 'target'=>'main'),
             'Rollenzuteilung24'=>array('name'=>'Rollenzuteilung 2.4', 'link'=>'moodle/rollenzuteilung24.php', 'target'=>'main'),
             'UserSync24'=>array('name'=>'User Sync 2.4', 'link'=>'moodle/user_sync24.php', 'target'=>'main'),
+			'UserMassCreate'=>array('name'=>'User Massenanlage', 'link'=>'moodle/account_masscreate24.php', 'target'=>'main'),
 		),
 				
 		

@@ -23,10 +23,20 @@
  * Bestehende Moodle IDs werden angezeigt, fuer alle anderen wird die Moeglichkeit
  * der Neuanlage geboten.
  */
-require_once('../../config/vilesci.config.inc.php');	
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
 require_once('../../include/basis_db.class.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/moodle24_user.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
+
+$user = get_uid();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('basis/moodle'))
+	die('Sie haben keine Berechtigung für diese Seite');
 
 if (!$db = new basis_db())
 	die('Fehler bei der Datenbankverbindung');
