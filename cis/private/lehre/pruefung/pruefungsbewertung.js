@@ -191,8 +191,17 @@ function saveBeurteilung(ele, datum, pruefungsanmeldung_id, pruefung_id, lehrver
 		},
 		error: loadError
 	}).success(function(data){
-		markAsSaved(ele);
-		$(ele).attr("onclick", "updateBeurteilung(this,\""+data.result+"\")");
+		console.log(data.error);
+		if(data.error != 'true')
+		{
+			markAsSaved(ele);
+			$(ele).attr("onclick", "updateBeurteilung(this,\""+data.result+"\")");
+		}
+		else
+		{
+			messageBox("message",data.errormsg, "red", "highlight", 1000);
+			$(ele).parent().find("select").val(null);
+		}
 	}).complete(function(event, xhr, settings){
 		
 	});
