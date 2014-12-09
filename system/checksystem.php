@@ -2225,6 +2225,17 @@ if(!$result = @$db->db_query("SELECT anmerkung FROM lehre.tbl_vertrag LIMIT 1;")
 		echo ' lehre.tbl_vertrag: Spalte anmerkung hinzugefuegt!<br>';
 }
 
+// Spalte anmerkung in system.tbl_benutzerrolle
+if(!$result = @$db->db_query("SELECT anmerkung FROM system.tbl_benutzerrolle LIMIT 1"))
+{
+	$qry = "ALTER TABLE system.tbl_benutzerrolle ADD COLUMN anmerkung varchar(256);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>system.tbl_benutzerrolle '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' system.tbl_benutzerrolle: Spalte anmerkung hinzugefuegt!<br>';
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
