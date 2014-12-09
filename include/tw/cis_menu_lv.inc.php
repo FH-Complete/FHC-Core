@@ -88,9 +88,29 @@ function checkZeilenUmbruch()
 	{
 		exec('mkdir -m 755 "'.$dir_name.'"');
 		exec('sudo chown www-data:teacher "'.$dir_name.'"');
-	}					
+	}
+	$angemeldet = true;
+	if(defined('CIS_LEHRVERANSTALTUNG_WENNANGEMELDET_DETAILS_ANZEIGEN') && CIS_LEHRVERANSTALTUNG_WENNANGEMELDET_DETAILS_ANZEIGEN && !$is_lector)
+	{
+	    $angemeldet = false;
+	    $studiensemester = new studiensemester($angezeigtes_stsem);
 
-	if(!defined('CIS_LEHRVERANSTALTUNG_SEMESTERPLAN_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_SEMESTERPLAN_ANZEIGEN)
+	    $lvangebot = new lvangebot();
+	    $lvangebot->getAllFromLvId($lvid, $studiensemester->studiensemester_kurzbz);
+
+	    if(!empty($lvangebot->result))
+	    {
+		$bngruppe = new benutzergruppe();
+		$bngruppe->load($user, $lvangebot->result[0]->gruppe_kurzbz, $studiensemester->studiensemester_kurzbz);
+
+		if(!is_null($bngruppe->gruppe_kurzbz))
+		{
+		    $angemeldet = true;
+		}
+	    }
+	}
+
+	if((!defined('CIS_LEHRVERANSTALTUNG_SEMESTERPLAN_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_SEMESTERPLAN_ANZEIGEN) && $angemeldet)
 	{
 		// ** Semesterplan
 		$eintraegeprozeile++;
@@ -171,7 +191,7 @@ function checkZeilenUmbruch()
 
 	checkZeilenUmbruch();
 
-	if(!defined('CIS_LEHRVERANSTALTUNG_DOWNLOAD_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_DOWNLOAD_ANZEIGEN)
+	if((!defined('CIS_LEHRVERANSTALTUNG_DOWNLOAD_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_DOWNLOAD_ANZEIGEN) && $angemeldet)
 	{
 		//DOWNLOAD
 		$eintraegeprozeile++;
@@ -257,7 +277,9 @@ function checkZeilenUmbruch()
 	$eintraegeprozeile++;
 	echo '<td class="tdvertical" align="center">';
 
-    echo '<img class="lv" src="../../../skin/images/button_listen.png"><br>';
+	if($angemeldet || $is_lector)
+	    echo '<img class="lv" src="../../../skin/images/button_listen.png"><br>';
+	
   	if($is_lector)
   	{
 		//Anwesenheitsliste
@@ -306,16 +328,18 @@ function checkZeilenUmbruch()
 			}
 		}
 	}
-
-	if(isset($dest_dir) && isset($dir_empty) && $dir_empty == false)
+	if($angemeldet || $is_lector)
 	{
-		echo '<a href="'.$dest_dir->path.'" target="_blank">';
-		echo '<strong>'.$p->t('lehre/leistungsuebersicht').'</strong>';
-		echo '</a>';
-	}
-	else
-	{
-		echo '<strong>'.$p->t('lehre/leistungsuebersicht').'</strong>';
+	    if(isset($dest_dir) && isset($dir_empty) && $dir_empty == false)
+	    {
+		    echo '<a href="'.$dest_dir->path.'" target="_blank">';
+		    echo '<strong>'.$p->t('lehre/leistungsuebersicht').'</strong>';
+		    echo '</a>';
+	    }
+	    else
+	    {
+		    echo '<strong>'.$p->t('lehre/leistungsuebersicht').'</strong>';
+	    }
 	}
 
 	echo '</td>';
@@ -323,7 +347,7 @@ function checkZeilenUmbruch()
 	checkZeilenUmbruch();
 
 	//Keine Newsgroups fuer Studiengang '0' (Freifaecher) anzeigen
-	if($studiengang_kz!='0' && CIS_LEHRVERANSTALTUNG_NEWSGROUPS_ANZEIGEN)
+	if($studiengang_kz!='0' && CIS_LEHRVERANSTALTUNG_NEWSGROUPS_ANZEIGEN  && $angemeldet)
 	{
 		$eintraegeprozeile++;
 		echo '<td class="tdvertical" align="center">';
@@ -336,7 +360,7 @@ function checkZeilenUmbruch()
 
 	checkZeilenUmbruch();
 	//FEEDBACK
-	if(!defined('CIS_LEHRVERANSTALTUNG_FEEDBACK_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_FEEDBACK_ANZEIGEN)
+	if((!defined('CIS_LEHRVERANSTALTUNG_FEEDBACK_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_FEEDBACK_ANZEIGEN) && $angemeldet)
 	{
 		$eintraegeprozeile++;
 		echo '<td class="tdvertical" align="center">';
@@ -347,7 +371,7 @@ function checkZeilenUmbruch()
 	checkZeilenUmbruch();
 
 
-	if(!defined('CIS_LEHRVERANSTALTUNG_UEBUNGSTOOL_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_UEBUNGSTOOL_ANZEIGEN)
+	if((!defined('CIS_LEHRVERANSTALTUNG_UEBUNGSTOOL_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_UEBUNGSTOOL_ANZEIGEN) && $angemeldet)
 	{
 		$eintraegeprozeile++;
 		echo '<td class="tdvertical" align="center">';
@@ -460,65 +484,68 @@ function checkZeilenUmbruch()
 	}
 	else 
 		$showmoodle=false;
-	if($showmoodle)
-	{
-		$eintraegeprozeile++;
-		echo '<td class="tdvertical" align="center">';
-
-		$link = "moodle_choice.php?lvid=$lvid&stsem=$angezeigtes_stsem";
-		if(count($moodle->result)>0)
-		{
-			if(!$is_lector)
-			{
-				$moodle->result=array();
-				$moodle->getCourse($lvid, $angezeigtes_stsem, $user);
-
-				if(count($moodle->result)==1)
-					$link = $moodle->getPfad($moodle->result[0]->moodle_version).'course/view.php?id='.$moodle->result[0]->mdl_course_id;
-				else 
-					$link = "moodle_choice.php?lvid=$lvid&stsem=$angezeigtes_stsem";
-			}
-			else 
-			{
-				if(count($moodle->result)==1)
-				{
-					$link = $moodle->getPfad($moodle->result[0]->moodle_version).'course/view.php?id='.$moodle->result[0]->mdl_course_id;
-				}
-				else 
-					$link = "moodle_choice.php?lvid=$lvid&stsem=$angezeigtes_stsem";
-			}
-			echo '<a href="'.$link.'" target="_blank">
-			    	<img class="lv" src="../../../skin/images/button_moodle.png"><br>
-			    	<strong>'.$p->t('lehre/moodle').'</strong></a><br>';
-		}
-		else 
-		{
-			echo '<img class="lv" src="../../../skin/images/button_moodle.png"><br>
-			    	<strong>'.$p->t('lehre/moodle').'</strong><br>';
-		}
-	    if($is_lector)
-			echo '	<a href="moodle2_4_wartung.php?lvid='.$lvid.'&stsem='.$angezeigtes_stsem.'" class="Item">'.$p->t('lehre/moodleWartung').'</a>
-	    			<br /><a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/moodleHandbuch24').'" class="Item" target="_blank">'.$p->t('lehre/moodleHandbuch').'</a>';
-		
-		echo '</td>';
-	}
-	else 
-	{
-		if($is_lector)
-		{
-			$eintraegeprozeile++;
-			echo '<td class="tdvertical" align="center">';
-			echo '<a href="#" onclick="alert(\''.$p->t('lehre/moodleMitKreuzerltoolInfo').'\'); return false">
-			    	<img class="lv" src="../../../skin/images/button_moodle.png"><br>
-			    	<strong>'.$p->t('lehre/moodle').'</strong></a><br>';
-			echo '</td>';
-		}
-	}
 	
+	if($angemeldet)
+	{
+	    if($showmoodle )
+	    {
+		    $eintraegeprozeile++;
+		    echo '<td class="tdvertical" align="center">';
+
+		    $link = "moodle_choice.php?lvid=$lvid&stsem=$angezeigtes_stsem";
+		    if(count($moodle->result)>0)
+		    {
+			    if(!$is_lector)
+			    {
+				    $moodle->result=array();
+				    $moodle->getCourse($lvid, $angezeigtes_stsem, $user);
+
+				    if(count($moodle->result)==1)
+					    $link = $moodle->getPfad($moodle->result[0]->moodle_version).'course/view.php?id='.$moodle->result[0]->mdl_course_id;
+				    else 
+					    $link = "moodle_choice.php?lvid=$lvid&stsem=$angezeigtes_stsem";
+			    }
+			    else 
+			    {
+				    if(count($moodle->result)==1)
+				    {
+					    $link = $moodle->getPfad($moodle->result[0]->moodle_version).'course/view.php?id='.$moodle->result[0]->mdl_course_id;
+				    }
+				    else 
+					    $link = "moodle_choice.php?lvid=$lvid&stsem=$angezeigtes_stsem";
+			    }
+			    echo '<a href="'.$link.'" target="_blank">
+				    <img class="lv" src="../../../skin/images/button_moodle.png"><br>
+				    <strong>'.$p->t('lehre/moodle').'</strong></a><br>';
+		    }
+		    else 
+		    {
+			    echo '<img class="lv" src="../../../skin/images/button_moodle.png"><br>
+				    <strong>'.$p->t('lehre/moodle').'</strong><br>';
+		    }
+		if($is_lector)
+			    echo '	<a href="moodle2_4_wartung.php?lvid='.$lvid.'&stsem='.$angezeigtes_stsem.'" class="Item">'.$p->t('lehre/moodleWartung').'</a>
+				    <br /><a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/moodleHandbuch24').'" class="Item" target="_blank">'.$p->t('lehre/moodleHandbuch').'</a>';
+
+		    echo '</td>';
+	    }
+	    else 
+	    {
+		    if($is_lector)
+		    {
+			    $eintraegeprozeile++;
+			    echo '<td class="tdvertical" align="center">';
+			    echo '<a href="#" onclick="alert(\''.$p->t('lehre/moodleMitKreuzerltoolInfo').'\'); return false">
+				    <img class="lv" src="../../../skin/images/button_moodle.png"><br>
+				    <strong>'.$p->t('lehre/moodle').'</strong></a><br>';
+			    echo '</td>';
+		    }
+	    }
+	}
 	checkZeilenUmbruch();
 	
 	//Gesamtnote
-	if($is_lector && (!defined('CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN))
+	if($is_lector && ((!defined('CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN) && $angemeldet))
 	{
 		$eintraegeprozeile++;
 		echo '<td class="tdvertical" align="center">';
@@ -532,7 +559,7 @@ function checkZeilenUmbruch()
 	checkZeilenUmbruch();
 
 
-	if(!defined('CIS_LEHRVERANSTALTUNG_STUDENTENUPLOAD_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_STUDENTENUPLOAD_ANZEIGEN)
+	if((!defined('CIS_LEHRVERANSTALTUNG_STUDENTENUPLOAD_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_STUDENTENUPLOAD_ANZEIGEN) && $angemeldet)
 	{
 		//Studentenupload 
 		$eintraegeprozeile++;
@@ -635,7 +662,7 @@ function checkZeilenUmbruch()
 	
 	checkZeilenUmbruch();
 
-	if(!defined('CIS_LEHRVERANSTALTUNG_MAILSTUDIERENDE_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_MAILSTUDIERENDE_ANZEIGEN)
+	if((!defined('CIS_LEHRVERANSTALTUNG_MAILSTUDIERENDE_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_MAILSTUDIERENDE_ANZEIGEN) && $angemeldet)
 	{
 		// Email an Studierende
 	
@@ -680,7 +707,7 @@ function checkZeilenUmbruch()
 	
 	checkZeilenUmbruch();
 
-	if(!defined('CIS_LEHRVERANSTALTUNG_PINBOARD_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_PINBOARD_ANZEIGEN)
+	if((!defined('CIS_LEHRVERANSTALTUNG_PINBOARD_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_PINBOARD_ANZEIGEN) && $angemeldet)
 	{
 		//Pinboard
 		$eintraegeprozeile++;

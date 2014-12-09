@@ -31,6 +31,7 @@ require_once('../../../include/moodle.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/lehre_tools.class.php');
 require_once('../../../include/lvangebot.class.php');
+require_once('../../../include/benutzergruppe.class.php');
 
 $sprache = getSprache();
 $p = new phrasen($sprache);
