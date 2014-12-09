@@ -51,10 +51,12 @@ $p = new phrasen(getSprache());
 // Beginn und Ende des aktuellen Semesters ermitteln
 $studiensemester->getTimestamp($studiensemester->getakt());
 
-isset($_GET['von']) ? $von = $_GET['von'] : $von = $studiensemester->begin->start;
-isset($_GET['bis']) ? $bis = $_GET['bis'] : $bis = $studiensemester->ende->ende;
+!empty($_GET['von']) ? $von = $_GET['von'] : $von = date('d.m.Y', $studiensemester->begin->start);
+!empty($_GET['bis']) ? $bis = $_GET['bis'] : $bis = date('d.m.Y', $studiensemester->ende->ende);
 
-$buchung->getBuchungPerson($benutzer->person_id);
+$options['von'] = $datum->formatDatum($von);
+$options['bis'] = $datum->formatDatum($bis);
+$buchung->getBuchungPerson($benutzer->person_id, $options);
 
 // Ausgabe
 ?>
@@ -72,14 +74,23 @@ $buchung->getBuchungPerson($benutzer->person_id);
 	{ 
 		$("#t1").tablesorter(
 		{
+			sortList: [[0,0]],
 			widgets: ["zebra"]
 		});
+		
+		$("#von, #bis").datepicker($.datepicker.regional["de"]);
 	});
 	-->
 	</script>
 </head>
 <body id="inhalt">
 <H1><?php echo $p->t('buchungen/titel'); ?></H1>
+
+<form method="get" action="mitarbeiter_buchung.php">
+	von <input type="text" id="von" name="von" value="<?php echo $von; ?>" />
+	bis <input type="text" id="bis" name="bis" value="<?php echo $bis; ?>" />
+	<input type="submit" value="filtern" />
+</form>
 
 <table id="t1" class="tablesorter">
 	<thead>
@@ -90,19 +101,27 @@ $buchung->getBuchungPerson($benutzer->person_id);
 			<th><?php echo $p->t('buchungen/buchgstyp'); ?></th>
 		</tr>
 	</thead>
+	<tbody>
 	<?php
 	foreach($buchung->result as $row)
 	{
 		echo '<tr>';
 		echo '<td>' . $datum->formatDatum($row->buchungsdatum, 'd.m.Y') . '</td>';
 		echo '<td>' . $row->buchungstext . '</td>';
-		echo '<td>' . $row->betrag . '</td>';
+		echo '<td>' . str_replace('.', ',', $row->betrag) . '</td>';
 		echo '<td>' . $row->buchungstyp_kurzbz . '</td>';
 		echo '</tr>';
 		
 		$summe += $row->betrag;
 	}
 	?>
+	</tbody>
+	<tfoot>
+		<tr>
+			<td colspan="2" align="right"><b>Summe</b></td>
+			<th class="header"><?php echo number_format($summe, 2, ',', '') ?></th>
+		</tr>
+	</tfoot>
 </table>
 </body>
 </html>
