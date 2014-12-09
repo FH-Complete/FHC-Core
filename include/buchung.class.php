@@ -395,15 +395,24 @@ class buchung extends basis_db
 	 * @param person_id ID der Person
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getBuchungPerson($person_id)
+	public function getBuchungPerson($person_id, $options = null)
 	{
+		// Filter für Query aufbereiten
+		$filter = "";
+		if(!empty($options['von']))
+			$filter .= " AND buchungsdatum >= " . $this->db_add_param($options['von']) . " ";
+		
+		if(!empty($options['bis']))
+			$filter .= " AND buchungsdatum <= " . $this->db_add_param($options['bis']) . " ";
+					
 		$qry = "SELECT
 					tbl_buchung.* 
 				FROM 
 					wawi.tbl_buchung 
 					JOIN wawi.tbl_konto USING(konto_id)
 				WHERE 
-					tbl_konto.person_id=".$this->db_add_param($person_id, FHC_INTEGER)." 
+					tbl_konto.person_id=".$this->db_add_param($person_id, FHC_INTEGER).
+					$filter ."
 				ORDER BY buchungsdatum";
 
 		if($result = $this->db_query($qry))
