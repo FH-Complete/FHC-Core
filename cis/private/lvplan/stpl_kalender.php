@@ -74,6 +74,7 @@ $version=(isset($_GET['version'])?$_GET['version']:2);
 $target=(isset($_GET['target'])?$_GET['target']:null);
 
 $stsem=(isset($_GET['stsem'])?$_GET['stsem']:'');
+$lva=(isset($_GET['lva'])?$_GET['lva']:'');
 
 
 if(isset($_GET["cal"]))
@@ -269,7 +270,7 @@ $stdplan = new wochenplan($type);
 $stdplan->crlf=$crlf;
 
 // Zusaetzliche Daten laden
-if(!$stdplan->load_data($type,$pers_uid,$ort_kurzbz,$stg_kz,$sem,$ver,$grp,$gruppe_kurzbz) )
+if(!$stdplan->load_data($type,$pers_uid,$ort_kurzbz,$stg_kz,$sem,$ver,$grp,$gruppe_kurzbz,null,$lva) )
 {
 	die($stdplan->errormsg);
 }

@@ -353,9 +353,11 @@ function drawTree($tree, $depth)
 			case 'modul':
 				$icon='<img src="../../../skin/images/modul.png"> ';
 				$style=' style="background-color:#CCCCCC"';
+				$termine='';
 				break;
 			case 'lv':
 				$icon='<img src="../../../skin/images/lv.png"> ';
+				$termine="<a href='../lvplan/stpl_week.php?type=lva&lva=" . $row_tree->lehrveranstaltung_id . "' target='_blank'><img src='../../../skin/images/date_magnify.png' title='Termine' alt='Termine'></a>";
 				break;
 			default:
 				$icon='';
@@ -395,10 +397,10 @@ function drawTree($tree, $depth)
 			$sprache = 'de';
 		}
 		if($lvinfo->exists($row_tree->lehrveranstaltung_id, getSprache()))
-		    echo $icon."<a href=\"#\" class='Item' onClick=\"javascript:window.open('../lehre/ects/preview.php?lv=$row_tree->lehrveranstaltung_id&language=$sprache','Lehrveranstaltungsinformation','width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes');\">".$row_tree->kurzbz.' - '.$row_tree->bezeichnung."</a>";
+		    echo $icon." ".$termine." <a href=\"#\" class='Item' onClick=\"javascript:window.open('../lehre/ects/preview.php?lv=$row_tree->lehrveranstaltung_id&language=$sprache','Lehrveranstaltungsinformation','width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes');\">".$row_tree->kurzbz.' - '.$row_tree->bezeichnung."</a>";
 		else
 		// Bezeichnung der Lehrveranstaltung
-		    echo $icon.$row_tree->kurzbz.' - '.$row_tree->bezeichnung;
+		    echo $icon." ".$termine." ".$row_tree->kurzbz.' - '.$row_tree->bezeichnung;
 		echo $bende.'</td>';
 		
 		// Semester

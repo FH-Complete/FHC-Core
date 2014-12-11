@@ -114,7 +114,7 @@ if ($type=='lektor')
 {
     $sql_query.=" AND vw_stundenplan.uid=".$db->db_add_param($pers_uid);
 }
-elseif ($type=='ort')
+elseif ($type=='ort' || $type=='lva')
     $sql_query.=" AND vw_stundenplan.ort_kurzbz=".$db->db_add_param($ort_kurzbz);
 else
 {
