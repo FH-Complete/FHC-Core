@@ -137,7 +137,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	{
 		if($row->zeugnis)
 		{
-			if ($row->note)
+			if (trim($row->note)!=='')
 				$note = $note_arr[$row->note];
 			else
 				$note = "";

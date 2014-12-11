@@ -1142,6 +1142,7 @@ function MitarbeiterVerwendungSpeichern(dialog, bisverwendung_id, mitarbeiter_ui
 	beginn = dialog.getElementById('mitarbeiter-verwendung-detail-datum-beginn').value;
 	ende = dialog.getElementById('mitarbeiter-verwendung-detail-datum-ende').value;
 	vertragsstunden = dialog.getElementById('mitarbeiter-verwendung-detail-textbox-vertragsstunden').value;
+	dv_art = dialog.getElementById('mitarbeiter-verwendung-detail-textbox-dv_art').value;
 		
 	if(verwendung_code=='1' || verwendung_code=='5' || verwendung_code=='6')
 	{
@@ -1197,6 +1198,7 @@ function MitarbeiterVerwendungSpeichern(dialog, bisverwendung_id, mitarbeiter_ui
 	req.add('beginn', ConvertDateToISO(beginn));
 	req.add('ende', ConvertDateToISO(ende));
 	req.add('vertragsstunden', vertragsstunden);
+	req.add('dv_art', dv_art);
 
 	var response = req.executePOST();
 

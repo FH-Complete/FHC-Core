@@ -2224,6 +2224,15 @@ if(!$result = @$db->db_query("SELECT anmerkung FROM lehre.tbl_vertrag LIMIT 1;")
 	else 
 		echo ' lehre.tbl_vertrag: Spalte anmerkung hinzugefuegt!<br>';
 }
+// Spalte vertragsdatum in lehre.tbl_vertrag
+if(!$result = @$db->db_query("SELECT vertragsdatum FROM lehre.tbl_vertrag LIMIT 1;"))
+{
+	$qry = "ALTER TABLE lehre.tbl_vertrag ADD COLUMN vertragsdatum date;";
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_vertrag: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' lehre.tbl_vertrag: Spalte vertragsdatum hinzugefuegt!<br>';
+}
 
 // Spalte anmerkung in system.tbl_benutzerrolle
 if(!$result = @$db->db_query("SELECT anmerkung FROM system.tbl_benutzerrolle LIMIT 1"))
@@ -2363,7 +2372,7 @@ $tabellen=array(
 	"lehre.tbl_stunde"  => array("stunde","beginn","ende"),
 	"lehre.tbl_stundenplan"  => array("stundenplan_id","unr","mitarbeiter_uid","datum","stunde","ort_kurzbz","gruppe_kurzbz","titel","anmerkung","lehreinheit_id","studiengang_kz","semester","verband","gruppe","fix","updateamum","updatevon","insertamum","insertvon"),
 	"lehre.tbl_stundenplandev"  => array("stundenplandev_id","lehreinheit_id","unr","studiengang_kz","semester","verband","gruppe","gruppe_kurzbz","mitarbeiter_uid","ort_kurzbz","datum","stunde","titel","anmerkung","fix","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"lehre.tbl_vertrag"  => array("vertrag_id","person_id","vertragstyp_kurzbz","bezeichnung","betrag","insertamum","insertvon","updateamum","updatevon","ext_id","anmerkung"),
+	"lehre.tbl_vertrag"  => array("vertrag_id","person_id","vertragstyp_kurzbz","bezeichnung","betrag","insertamum","insertvon","updateamum","updatevon","ext_id","anmerkung","vertragsdatum"),
 	"lehre.tbl_vertrag_vertragsstatus"  => array("vertragsstatus_kurzbz","vertrag_id","uid","datum","ext_id"),
 	"lehre.tbl_vertragstyp"  => array("vertragstyp_kurzbz","bezeichnung"),
 	"lehre.tbl_vertragsstatus"  => array("vertragsstatus_kurzbz","bezeichnung"),

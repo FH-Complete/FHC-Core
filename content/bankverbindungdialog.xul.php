@@ -74,21 +74,21 @@ else
 					<textbox id="bankverbindung-textbox-anschrift" maxlength="128"/>
       			</row>
 				<row>
-					<label value="BIC" control="bankverbindung-textbox-bic"/>
-   					<textbox id="bankverbindung-textbox-bic" maxlength="64"/>
-				</row>				
-      			<row>
-					<label value="BLZ" control="bankverbindung-textbox-blz"/>
-   					<textbox id="bankverbindung-textbox-blz" checked="true"/>
-      			</row>
-				<row>
 					<label value="IBAN" control="bankverbindung-textbox-iban"/>
    					<textbox id="bankverbindung-textbox-iban" checked="true"/>
       			</row>
 				<row>
+					<label value="BIC" control="bankverbindung-textbox-bic"/>
+   					<textbox id="bankverbindung-textbox-bic" maxlength="64"/>
+				</row>
+				<row>
 					<label value="Kontonummer" control="bankverbindung-textbox-kontonr"/>
    					<textbox id="bankverbindung-textbox-kontonr" checked="true"/>
-      			</row>
+      			</row>				
+      			<row>
+					<label value="BLZ" control="bankverbindung-textbox-blz"/>
+   					<textbox id="bankverbindung-textbox-blz" checked="true"/>
+      			</row>				
       			<row>
 					<label value="Typ" control="bankverbindung-textbox-typ"/>
    					<menulist id="bankverbindung-menulist-typ" flex="1">

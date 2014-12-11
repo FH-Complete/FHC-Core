@@ -192,7 +192,8 @@ if(!$error)
 			$verwendung->ende = $_POST['ende'];
 			$verwendung->vertragsstunden = str_replace(',','.',$_POST['vertragsstunden']);
 			$verwendung->updateamum = date('Y-m-d H:i:s');
-			$verwendung->updatevon = $user;				
+			$verwendung->updatevon = $user;		
+			$verwendung->dv_art = $_POST['dv_art'];		
 			
 			if($verwendung->save())
 			{
@@ -453,6 +454,7 @@ if(!$error)
 			$vertrag->betrag=str_replace(',','.',$_POST['betrag']);
 			$vertrag->bezeichnung = $_POST['bezeichnung'];
 			$vertrag->anmerkung = $_POST['anmerkung'];
+			$vertrag->vertragsdatum = $_POST['vertragsdatum'];
 
 			if($errormsg=='')
 			{

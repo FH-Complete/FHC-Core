@@ -140,6 +140,13 @@ foreach($addon_obj->result as $addon)
 			</columns>
 			<rows id="mitarbeiter-buchung-grid-detail-rows">			
 				<row>
+					<label value="Vertragsdatum" control="mitarbeiter-vertrag-neu-box-vertragsdatum" />
+					<hbox>
+						<box class="Datum" id="mitarbeiter-vertrag-neu-box-vertragsdatum"/>
+						<spacer />
+					</hbox>
+				</row>	
+				<row>
 					<label value="Bezeichnung" control="mitarbeiter-vertrag-neu-textbox-bezeichnung" />
 					<hbox>
 						<textbox id="mitarbeiter-vertrag-neu-textbox-bezeichnung" value=""/>
@@ -176,10 +183,7 @@ foreach($addon_obj->result as $addon)
 				</row>
 				<row>
 					<label value="Anmerkung" control="mitarbeiter-vertrag-neu-textbox-anmerkung" />
-					<hbox>
-						<textbox id="mitarbeiter-vertrag-neu-textbox-anmerkung" value="" size="80" />
-						<spacer />
-					</hbox>
+					<textbox id="mitarbeiter-vertrag-neu-textbox-anmerkung" value="" size="100" multiline="true"/>
 				</row>
 			</rows>
 		</grid>

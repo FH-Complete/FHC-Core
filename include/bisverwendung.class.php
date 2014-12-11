@@ -117,6 +117,7 @@ class bisverwendung extends basis_db
 				$this->verwendung = $row->verwendungbez;
 				$this->hauptberuf = $row->bezeichnung;
 				$this->vertragsstunden = $row->vertragsstunden;
+				$this->dv_art = $row->dv_art;
 				return true;		
 			}
 			else 
@@ -209,7 +210,7 @@ class bisverwendung extends basis_db
 			//Neuen Datensatz anlegen	
 			$qry = "BEGIN;INSERT INTO bis.tbl_bisverwendung (ba1code, ba2code, beschausmasscode, 
 					verwendung_code, mitarbeiter_uid, hauptberufcode, hauptberuflich, habilitation, beginn, ende, vertragsstunden, 
-					updateamum, updatevon, insertamum, insertvon, ext_id) VALUES (".
+					updateamum, updatevon, insertamum, insertvon, ext_id, dv_art) VALUES (".
 			       $this->db_add_param($this->ba1code, FHC_INTEGER).', '.
 			       $this->db_add_param($this->ba2code, FHC_INTEGER).', '.
 			       $this->db_add_param($this->beschausmasscode, FHC_INTEGER).', '.
@@ -225,7 +226,8 @@ class bisverwendung extends basis_db
 			       $this->db_add_param($this->updatevon).', '.
 			       $this->db_add_param($this->insertamum).', '.
 			       $this->db_add_param($this->insertvon).', '.
-			       $this->db_add_param($this->ext_id, FHC_INTEGER).');';
+			       $this->db_add_param($this->ext_id, FHC_INTEGER).','.
+				   $this->db_add_param($this->dv_art).');';
 			       
 		}
 		else 
@@ -247,7 +249,8 @@ class bisverwendung extends basis_db
 				  " updatevon=".$this->db_add_param($this->updatevon).",".
 				  " insertamum=".$this->db_add_param($this->insertamum).",".
 				  " insertvon=".$this->db_add_param($this->insertvon).",".
-				  " ext_id=".$this->db_add_param($this->ext_id, FHC_INTEGER).
+				  " ext_id=".$this->db_add_param($this->ext_id, FHC_INTEGER).",".
+				  " dv_art=".$this->db_add_param($this->dv_art).
 				  " WHERE bisverwendung_id=".$this->db_add_param($this->bisverwendung_id, FHC_INTEGER);
 		}
 		
@@ -337,7 +340,8 @@ class bisverwendung extends basis_db
 				$obj->verwendung = $row->verwendungbez;
 				$obj->hauptberuf = $row->bezeichnung;
 				$obj->vertragsstunden = $row->vertragsstunden;
-				
+				$obj->dv_art = $row->dv_art;
+
 				$this->result[] = $obj;
 			}
 			return true;
@@ -390,6 +394,7 @@ class bisverwendung extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->vertragsstunden = $row->vertragsstunden;
+				$obj->dv_art = $row->dv_art;
 				
 				$this->result[] = $obj;
 			}
@@ -438,7 +443,7 @@ class bisverwendung extends basis_db
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->vertragsstunden = $row->vertragsstunden;
-
+				$this->dv_art = $row->dv_art;
 			}
 			return true;
 		}

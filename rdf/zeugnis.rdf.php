@@ -232,7 +232,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		{
 			if($row->zeugnis)
 			{
-				if ($row->note)
+				if (trim($row->note)!=='')
 					$note = $note_arr[$row->note];
 				else
 					$note = "";

@@ -260,19 +260,19 @@ echo '
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/bankverbindung/rdf#anschrift" onclick="KontaktBankverbindungTreeSort()"/>
 					<splitter class="tree-splitter"/>
-					<treecol id="kontakt-bankverbindung-treecol-bic" label="BIC" flex="1" hidden="true"
+					<treecol id="kontakt-bankverbindung-treecol-bic" label="BIC" flex="1" hidden="false"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/bankverbindung/rdf#bic" onclick="KontaktBankverbindungTreeSort()"/>
 					<splitter class="tree-splitter"/>
-					<treecol id="kontakt-bankverbindung-treecol-blz" label="BLZ" flex="1" hidden="false"
+					<treecol id="kontakt-bankverbindung-treecol-blz" label="BLZ" flex="1" hidden="true"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/bankverbindung/rdf#blz" onclick="KontaktBankverbindungTreeSort()"/>
 					<splitter class="tree-splitter"/>
-					<treecol id="kontakt-bankverbindung-treecol-iban" label="IBAN" flex="1" hidden="true"
+					<treecol id="kontakt-bankverbindung-treecol-iban" label="IBAN" flex="1" hidden="false"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/bankverbindung/rdf#iban" onclick="KontaktBankverbindungTreeSort()"/>
 					<splitter class="tree-splitter"/>
-					<treecol id="kontakt-bankverbindung-treecol-kontonr" label="Kontonummer" flex="1" hidden="false"
+					<treecol id="kontakt-bankverbindung-treecol-kontonr" label="Kontonummer" flex="1" hidden="true"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/bankverbindung/rdf#kontonr" onclick="KontaktBankverbindungTreeSort()"/>
 					<splitter class="tree-splitter"/>

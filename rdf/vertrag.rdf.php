@@ -25,6 +25,7 @@ require_once('../include/rdf.class.php');
 require_once('../include/vertrag.class.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
+require_once('../include/datum.class.php');
 
 $uid = get_uid();
 $rechte = new benutzerberechtigung();
@@ -32,6 +33,8 @@ $rechte->getBerechtigungen($uid);
 
 if(!$rechte->isBerechtigt('vertrag/mitarbeiter'))
 	die('Sie haben keine Berechtigung für diese Seite');
+
+$datum_obj = new datum();
 
 if(isset($_GET['person_id']))
 {
@@ -70,8 +73,11 @@ foreach($vertrag->result as $row)
 	$oRdf->obj[$i]->setAttribut('vertragstyp_kurzbz',$row->vertragstyp_kurzbz,true);
 	$oRdf->obj[$i]->setAttribut('vertragstyp_bezeichnung',$row->vertragstyp_bezeichnung,true);
 	$oRdf->obj[$i]->setAttribut('betrag',$row->betrag,true);
-	$oRdf->obj[$i]->setAttribut('status',$row->status,true);
+	if(isset($row->status))
+		$oRdf->obj[$i]->setAttribut('status',$row->status,true);
 	$oRdf->obj[$i]->setAttribut('anmerkung',$row->anmerkung,true);
+	$oRdf->obj[$i]->setAttribut('vertragsdatum_iso',$row->vertragsdatum,true);
+	$oRdf->obj[$i]->setAttribut('vertragsdatum',$datum_obj->formatDatum($row->vertragsdatum,'d.m.Y'),true);
 
 	$oRdf->addSequence($row->vertrag_id);
 }

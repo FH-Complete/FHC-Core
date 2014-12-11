@@ -111,6 +111,7 @@ function draw_row($row)
             <VERWENDUNG:updatevon><![CDATA['.$row->updatevon.']]></VERWENDUNG:updatevon>
             <VERWENDUNG:insertamum><![CDATA['.$row->insertamum.']]></VERWENDUNG:insertamum>
             <VERWENDUNG:insertvon><![CDATA['.$row->insertvon.']]></VERWENDUNG:insertvon>
+			<VERWENDUNG:dv_art><![CDATA['.$row->dv_art.']]></VERWENDUNG:dv_art>
          </RDF:Description>
       </RDF:li>
       ';

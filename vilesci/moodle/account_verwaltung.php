@@ -30,18 +30,23 @@
 */
 
 // ---------------- Standart Include Dateien einbinden
-#	require_once('../config.inc.php');
-	require_once('../../config/vilesci.config.inc.php');	
-	require_once('../../include/basis_db.class.php');
+require_once('../../config/vilesci.config.inc.php');	
+require_once('../../include/basis_db.class.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/globals.inc.php');
+require_once('../../include/moodle19_user.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 
-		
-	require_once('../../include/functions.inc.php');
-	require_once('../../include/globals.inc.php');
-// ---------------- Moodle Daten Classe
-	require_once('../../include/moodle19_user.class.php');
+$user = get_uid();
 
-		if (!$db = new basis_db())
-		die('<div style="text-align:center;"><br />MOODLE Datenbank zurzeit NICHT Online.<br />Bitte etwas Geduld.<br />Danke</div>');
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('basis/moodle'))
+	die('Sie haben keine Berechtigung für diese Seite');
+
+if (!$db = new basis_db())
+	die('<div style="text-align:center;"><br />MOODLE Datenbank zurzeit NICHT Online.<br />Bitte etwas Geduld.<br />Danke</div>');
 // ***********************************************************************************************	
 // Variable Initialisieren
 // ***********************************************************************************************
