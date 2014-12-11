@@ -371,13 +371,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			   		 	</menulist>
 					</row>
 			    	<row>
-    					<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden" value="Semesterstunden: "/>
+    					<label id="lehrveranstaltung-lehreinheitmitarbeiter-label-semesterstunden" control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden" value="Semesterstunden: "/>
     					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-semesterstunden" disabled="true" maxlength="6" flex="1" oninput="LeMitarbeiterValueChanged();LeMitarbeiterGesamtkosten(); if(parseInt(this.value)) document.getElementById('lehrveranstaltung-lehreinheitmitarbeiter-textbox-planstunden').value= parseInt(this.value)"/>
     					<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-planstunden" value="Planstunden: "/>
     					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-planstunden" disabled="true" maxlength="3" flex="1" oninput="LeMitarbeiterValueChanged();"/>
     				</row>
 			    	<row>
-			    		<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz" value="Stundensatz: "/>
+			    		<label id="lehrveranstaltung-lehreinheitmitarbeiter-label-stundensatz" control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz" value="Stundensatz: "/>
     					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-stundensatz" disabled="true" maxlength="6" flex="1" oninput="LeMitarbeiterValueChanged();LeMitarbeiterGesamtkosten()"/>
     					<label control="lehrveranstaltung-lehreinheitmitarbeiter-textbox-faktor" hidden="true" value="Faktor: "/>
     					<textbox id="lehrveranstaltung-lehreinheitmitarbeiter-textbox-faktor" hidden="true" disabled="true" maxlength="3" flex="1" oninput="LeMitarbeiterValueChanged();LeMitarbeiterGesamtkosten()"/>
