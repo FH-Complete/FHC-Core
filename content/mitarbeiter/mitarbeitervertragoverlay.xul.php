@@ -98,6 +98,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/vertrag/rdf#status" />
 					<splitter class="tree-splitter"/>
+					<treecol id="mitarbeiter-vertrag-tree-vertragsdatum" label="Vertragsdatum" flex="2" hidden="false"
+						class="sortDirectionIndicator"
+						sort="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragsdatum_iso" />
+					<splitter class="tree-splitter"/>
 					<treecol id="mitarbeiter-vertrag-tree-vertragstyp_kurzbz" label="VertragstypKurzbz" flex="2" hidden="true"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragstyp_kurzbz" />
@@ -105,6 +109,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<treecol id="mitarbeiter-vertrag-tree-vertrag_id" label="vertragID" flex="2" hidden="true"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/vertrag/rdf#vertrag_id" />
+					<splitter class="tree-splitter"/>
+					<treecol id="mitarbeiter-vertrag-tree-vertragsdatumiso" label="VertragsdatumISO" flex="2" hidden="true"
+						class="sortDirectionIndicator"
+						sort="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragsdatum_iso" />
 					<splitter class="tree-splitter"/>
 				</treecols>
 		
@@ -116,8 +124,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#betrag"/>
 								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragstyp_bezeichnung"/>
 								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#status"/>
+								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragsdatum"/>	
 								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragstyp_kurzbz"/>
 								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#vertrag_id"/>
+								<treecell label="rdf:http://www.technikum-wien.at/vertrag/rdf#vertragsdatum_iso"/>	
 							</treerow>
 						</treeitem>
 					</treechildren>

@@ -63,6 +63,7 @@ function MitarbeiterVertragNeuInit(person_id, vertrag_id)
 		tag = ((tag<10)?"0":"")+tag;
 
 		document.getElementById('mitarbeiter-vertrag-neu-textbox-bezeichnung').value=jahr+monat+tag+'';
+		document.getElementById('mitarbeiter-vertrag-neu-box-vertragsdatum').value=tag+'.'+monat+'.'+jahr;
 	}
 	else
 	{
@@ -82,6 +83,7 @@ function MitarbeiterVertragNeuInit(person_id, vertrag_id)
 		betrag = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#betrag" ));
 		bezeichnung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bezeichnung" ));
 		anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
+		vertragsdatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vertragsdatum" ));
 
 		MitarbeiterVertragNeuBetragOld = betrag;
 
@@ -90,6 +92,7 @@ function MitarbeiterVertragNeuInit(person_id, vertrag_id)
 		MenulistSelectItemOnValue('mitarbeiter-vertrag-neu-menulist-vertragstyp', vertragstyp_kurzbz)
 		document.getElementById('mitarbeiter-vertrag-neu-textbox-vertrag_id').value=vertrag_id;
 		document.getElementById('mitarbeiter-vertrag-neu-textbox-anmerkung').value=anmerkung;
+		document.getElementById('mitarbeiter-vertrag-neu-box-vertragsdatum').value=vertragsdatum;
 
 	}
 	for(i in addon)

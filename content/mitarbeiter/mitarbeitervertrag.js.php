@@ -171,8 +171,12 @@ function MitarbeiterVertragGenerateVertrag(windowdocument)
 	var bezeichnung = windowdocument.getElementById('mitarbeiter-vertrag-neu-textbox-bezeichnung').value;
 	var vertrag_id = windowdocument.getElementById('mitarbeiter-vertrag-neu-textbox-vertrag_id').value;
 	var anmerkung = windowdocument.getElementById('mitarbeiter-vertrag-neu-textbox-anmerkung').value;
+	var vertragsdatum = windowdocument.getElementById('mitarbeiter-vertrag-neu-box-vertragsdatum').iso;
+
 	if(windowdocument.getElementById("mitarbeiter-vertrag-neu-textbox-fahrten") != null)
 	    var fahrten = windowdocument.getElementById("mitarbeiter-vertrag-neu-textbox-fahrten").value;
+	else
+		var fahrten = 1;
 
 	if(betrag=='')
 	{
@@ -188,6 +192,7 @@ function MitarbeiterVertragGenerateVertrag(windowdocument)
 	req.add('bezeichnung',bezeichnung);
 	req.add('vertrag_id',vertrag_id);
 	req.add('anmerkung',anmerkung);
+	req.add('vertragsdatum',vertragsdatum);
 
 	var anzahl=0;
 	for (var t = 0; t < numRanges; t++)
@@ -238,7 +243,7 @@ function MitarbeiterVertragGenerateVertrag(windowdocument)
  */
 function MitarbeiterVertragAddVertrag()
 {
-		window.open('<?php echo APP_ROOT?>content/mitarbeiter/mitarbeitervertragneudialog.xul.php?person_id='+MitarbeiterVertragLoadedPerson,"Vertrag","status=no, width=500, height=300, centerscreen, resizable");
+		window.open('<?php echo APP_ROOT?>content/mitarbeiter/mitarbeitervertragneudialog.xul.php?person_id='+MitarbeiterVertragLoadedPerson,"Vertrag","status=no, width=500, height=400, centerscreen, resizable");
 }
 
 /**
@@ -293,7 +298,7 @@ function MitarbeiterVertragEdit()
 	
 	var vertrag_id=tree.view.getCellText(tree.currentIndex,col);
 
-	window.open('<?php echo APP_ROOT?>content/mitarbeiter/mitarbeitervertragneudialog.xul.php?person_id='+MitarbeiterVertragLoadedPerson+'&vertrag_id='+vertrag_id,"Vertrag","status=no, width=500, height=300, centerscreen, resizable");
+	window.open('<?php echo APP_ROOT?>content/mitarbeiter/mitarbeitervertragneudialog.xul.php?person_id='+MitarbeiterVertragLoadedPerson+'&vertrag_id='+vertrag_id,"Vertrag","status=no, width=500, height=400, centerscreen, resizable");
 }
 
 function MitarbeiterVertragDetailDelete()

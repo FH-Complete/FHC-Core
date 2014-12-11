@@ -155,6 +155,10 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type
       			<label value="Vertragsstunden" control="mitarbeiter-verwendung-detail-textbox-vertragsstunden" />
       			<textbox id="mitarbeiter-verwendung-detail-textbox-vertragsstunden" />
       		</row>
+			<row>
+      			<label value="DV-Art" control="mitarbeiter-verwendung-detail-textbox-dv_art" />
+      			<textbox id="mitarbeiter-verwendung-detail-textbox-dv_art" />
+      		</row>
       		<row>
       			<spacer />
       			<hbox>

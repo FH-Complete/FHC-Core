@@ -67,6 +67,7 @@ function MitarbeiterVerwendungInit(mitarbeiter_uid, bisverwendung_id)
 		beginn = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#beginn" ));
 		ende = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ende" ));
 		vertragsstunden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vertragsstunden" ));
+		dv_art = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#dv_art" ));
 	}
 	else
 	{
@@ -84,6 +85,7 @@ function MitarbeiterVerwendungInit(mitarbeiter_uid, bisverwendung_id)
 		beginn = '<?php echo date('d.m.Y') ?>';
 		ende='';
 		vertragsstunden='38.5';
+		dv_art='';
 	}
 	
 	document.getElementById('mitarbeiter-verwendung-detail-menulist-beschart1').value=ba1code;
@@ -104,6 +106,7 @@ function MitarbeiterVerwendungInit(mitarbeiter_uid, bisverwendung_id)
 	document.getElementById('mitarbeiter-verwendung-detail-datum-beginn').value=beginn;
 	document.getElementById('mitarbeiter-verwendung-detail-datum-ende').value=ende;
 	document.getElementById('mitarbeiter-verwendung-detail-textbox-vertragsstunden').value=vertragsstunden;
+	document.getElementById('mitarbeiter-verwendung-detail-textbox-dv_art').value=dv_art;
 	
 	MitarbeiterVerwendungDetailToggleHauptberuf();
 	MitarbeiterVerwendungVerwendungChange();

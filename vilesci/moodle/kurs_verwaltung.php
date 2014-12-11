@@ -34,16 +34,21 @@
 // ***********************************************************************************************
 #	require_once('../config.inc.php');
 // ---------------- Vilesci Include Dateien einbinden
-	require_once('../../config/vilesci.config.inc.php');	
-		
-// ---------------- Standart Include Dateien einbinden
-	require_once('../../include/functions.inc.php');
-	require_once('../../include/globals.inc.php');
-// ---------------- Moodle Daten Classe
-	include_once('../../include/moodle19_course.class.php');
+require_once('../../config/vilesci.config.inc.php');	
+require_once('../../include/functions.inc.php');
+require_once('../../include/globals.inc.php');
+include_once('../../include/moodle19_course.class.php');
+require_once('../../include/studiensemester.class.php');
+require_once('../../include/studiengang.class.php');	
+require_once('../../include/benutzerberechtigung.class.php');
 
-	require_once('../../include/studiensemester.class.php');
-	require_once('../../include/studiengang.class.php');	
+$user = get_uid();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('basis/moodle'))
+	die('Sie haben keine Berechtigung für diese Seite');
 
 
 // ***********************************************************************************************	
