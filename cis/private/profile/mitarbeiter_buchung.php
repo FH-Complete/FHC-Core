@@ -63,7 +63,7 @@ $buchung->getBuchungPerson($benutzer->person_id, $options);
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title><?php echo $p->t('lvaliste/titel'); ?></title>
+	<title><?php echo $p->t('buchungen/titel'); ?></title>
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 	<link rel="stylesheet" href="../../../skin/jquery.css" type="text/css"/>
 	<script type="text/javascript" src="../../../include/js/jquery.js"></script>
