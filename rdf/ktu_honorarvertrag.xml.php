@@ -148,13 +148,19 @@ else
 	    }
 	    if($vertrag->vertragstyp_kurzbz == "fahrtkosten" && $status->vertragsstatus_kurzbz == "genehmigt")
 	    {
-		$anzahl_fahrten = explode(" ", $vertrag->anmerkung);
+		$anzahl_fahrten = explode(";", $vertrag->anmerkung);
+		$anzahl_fahrten = explode(" ", $anzahl_fahrten[0]);
 		echo "<fahrtkosten>";
 		    echo "<genehmigungs_datum>".$datum->formatDatum($status->datum,'d.m.Y')."</genehmigungs_datum>";
 		    echo "<summe>".$vertrag->betrag."</summe>";
 		    echo "<anzahl_fahrten>".$anzahl_fahrten[0]."</anzahl_fahrten>";
 		    echo "<preis_je_fahrt>".$anzahl_fahrten[5]."</preis_je_fahrt>";
-		    echo "<abfahrt>".$anzahl_fahrten[7]."</abfahrt>";
+		    echo "<abfahrt>";
+		    for($i = 7; $i < count($anzahl_fahrten); $i++)
+		    {
+			echo $anzahl_fahrten[$i]." ";
+		    }    
+		    echo "</abfahrt>";
 		echo "</fahrtkosten>";
 	    }
 	}
