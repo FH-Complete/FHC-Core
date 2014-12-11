@@ -131,6 +131,13 @@ else if (isset($_POST['stg_kz']))
 else
 	$stg_kz=null;
 
+if (isset($_GET['lva']))
+	$lva=$_GET['lva'];
+else if (isset($_POST['lva']))
+	$lva=$_POST['lva'];
+else
+	$lva=null;
+
 if (isset($_POST['sem']))
 	$sem=$_POST['sem'];
 else if (isset($_GET['sem']))
@@ -298,7 +305,7 @@ $stdplan->user=$user;
 $stdplan->user_uid=$uid;
 
 // Zusaetzliche Daten laden
-if (! $stdplan->load_data($type,$pers_uid,$ort_kurzbz,$stg_kz,$sem,$ver,$grp,$gruppe_kurzbz) )
+if (! $stdplan->load_data($type,$pers_uid,$ort_kurzbz,$stg_kz,$sem,$ver,$grp,$gruppe_kurzbz,null,$lva) )
 {
 	die($stdplan->errormsg);
 }

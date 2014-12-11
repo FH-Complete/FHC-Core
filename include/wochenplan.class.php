@@ -60,6 +60,7 @@ class wochenplan extends basis_db
 	public $sem;			// @brief Semester
 	public $ver;			// @brief Verband (A,B,C,...)
 	public $grp;			// @brief Gruppe (1,2)
+	public $lva;			// @brief ID der Lehrveranstaltung
 
 	public $pers_uid;		// @brief Account Name der Person (PK)
 	public $pers_titelpost;	// @brief Titel der Person
@@ -147,11 +148,11 @@ class wochenplan extends basis_db
 	 * @param $grp
 	 * @param $gruppe
 	 */
-	public function load_data($type, $uid, $ort_kurzbz=NULL, $studiengang_kz=NULL, $sem=NULL, $ver=NULL, $grp=NULL, $gruppe=NULL, $fachbereich_kurzbz=NULL)
+	public function load_data($type, $uid, $ort_kurzbz=NULL, $studiengang_kz=NULL, $sem=NULL, $ver=NULL, $grp=NULL, $gruppe=NULL, $fachbereich_kurzbz=NULL, $lva=NULL)
 	{
 		// Parameter Checken
 		// Typ des Stundenplans
-		if ($type=='student' || $type=='lektor' || $type=='verband' || $type=='gruppe' || $type=='ort' || $type=='fachbereich')
+		if ($type=='student' || $type=='lektor' || $type=='verband' || $type=='gruppe' || $type=='ort' || $type=='fachbereich' || $type=='lva')
 			$this->type=$type;
 		else
 		{
@@ -212,6 +213,18 @@ class wochenplan extends basis_db
 			$this->fachbereich_kurzbz=$fachbereich_kurzbz;
 			
 		}
+		
+		// LVA
+		if($type=='lva' && $lva==NULL)
+		{
+			$this->errormsg='Fehler: LVA-ID ist nicht gesetzt';
+			return false;
+		}
+		elseif($type=='lva')
+		{
+			$this->lva=$lva;
+		}
+		
 		// Zusaetzliche Daten ermitteln
 		//personendaten
 		if ($this->type=='student' || $this->type=='lektor')
@@ -280,7 +293,7 @@ class wochenplan extends basis_db
 		}
 
 		// Studiengangsdaten ermitteln
-		if ($this->type=='student' || $this->type=='verband')
+		if ($this->type=='student' || $this->type=='verband' || $this->type=='lva')
 		{
 			$sql_query="SELECT bezeichnung, kurzbz, kurzbzlang, typ, UPPER(typ||kurzbz) AS kuerzel, english FROM public.tbl_studiengang WHERE studiengang_kz=".$this->db_add_param($this->stg_kz);
 			//echo $sql_query;
@@ -358,7 +371,7 @@ class wochenplan extends basis_db
 
 		// Stundenplandaten ermittlen
 		$this->wochenplan=new lehrstunde();
-		$anz=$this->wochenplan->load_lehrstunden($this->type,$this->datum_begin,$this->datum_end,$this->pers_uid,$this->ort_kurzbz,$this->stg_kz,$this->sem,$this->ver,$this->grp,$this->gruppe_kurzbz, $stpl_view, null,$this->fachbereich_kurzbz);
+		$anz=$this->wochenplan->load_lehrstunden($this->type,$this->datum_begin,$this->datum_end,$this->pers_uid,$this->ort_kurzbz,$this->stg_kz,$this->sem,$this->ver,$this->grp,$this->gruppe_kurzbz, $stpl_view, null,$this->fachbereich_kurzbz,$this->lva);
 		if ($anz<0)
 		{
 			$this->errormsg=$this->wochenplan->errormsg;
@@ -442,13 +455,15 @@ class wochenplan extends basis_db
 		}
 		if ($this->type=='ort')
 			echo '<strong>'.$p->t('lvplan/raum').': </strong>'.$this->ort_kurzbz.' - '.$this->ort_bezeichnung.' - '.($this->ort_max_person!=''?'( '.$this->ort_max_person.' '.$p->t('lvplan/personen').' )':'').($this->ort_content_id!=''?' - <a href="../../../cms/content.php?content_id='.$this->ort_content_id.'" target="_self">'.$p->t('lvplan/rauminformationenAnzeigen').'</a>':'').'<br>'.$this->ort_ausstattung;
+		if ($this->type=='lva')
+			$this->link.='&lva='.$this->lva;
 		echo '</P>'.$this->crlf;
 		echo '			<table class="stdplan" style="width: auto; margin: auto;" valign="bottom" align="center">';
 		//echo '			<tr><td colspan="2" class="stdplan" style="padding:3px;" align="center">'.$p->t('lvplan/semesterplaene').'</td></tr>';
 		echo '			<tr><td  style="padding:3px 15px 0px 15px; margin: 0,0,20px,0;" align="center">'.$this->crlf;
 
 		//Kalender
-		$this->kal_link.='&pers_uid='.$this->pers_uid.'&ort_kurzbz='.$this->ort_kurzbz.'&stg_kz='.$this->stg_kz.'&sem='.$this->sem.'&ver='.$this->ver.'&grp='.$this->grp.'&gruppe_kurzbz='.$this->gruppe_kurzbz;
+		$this->kal_link.='&pers_uid='.$this->pers_uid.'&ort_kurzbz='.$this->ort_kurzbz.'&stg_kz='.$this->stg_kz.'&sem='.$this->sem.'&ver='.$this->ver.'&grp='.$this->grp.'&gruppe_kurzbz='.$this->gruppe_kurzbz.'&lva='.$this->lva;
 		//global $kalender_begin_ws, $kalender_ende_ws, $kalender_begin_ss, $kalender_ende_ss;
 		$kal_link_ws=$this->kal_link.'&begin='.$this->studiensemester_now->start.'&ende='.$this->studiensemester_now->ende;
 		$kal_link_ss=$this->kal_link.'&begin='.$this->studiensemester_next->start.'&ende='.$this->studiensemester_next->ende;
@@ -484,6 +499,8 @@ class wochenplan extends basis_db
 			$link_parameter='&stg_kz='.$this->stg_kz.'&sem='.$this->sem.'&ver='.$this->ver.'&grp='.$this->grp;
 		if ($this->type=='student' || $this->type=='lektor')
 			$link_parameter='&pers_uid='.$this->pers_uid;
+		if ($this->type=='lva')
+			$link_parameter='&lva='.$this->lva;
 
 		// Ort Jump
 		if ($this->type=='ort')

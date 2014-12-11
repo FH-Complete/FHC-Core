@@ -232,7 +232,7 @@ class lehrstunde extends basis_db
 	 * @param gruppe_kurzbz
 	 *
 	 */
-	public function load_lehrstunden($type, $datum_von, $datum_bis, $uid, $ort_kurzbz=NULL, $studiengang_kz=NULL, $sem=NULL, $ver=NULL, $grp=NULL, $gruppe_kurzbz=NULL, $stpl_view='stundenplan', $idList=null, $fachbereich_kurzbz=null)
+	public function load_lehrstunden($type, $datum_von, $datum_bis, $uid, $ort_kurzbz=NULL, $studiengang_kz=NULL, $sem=NULL, $ver=NULL, $grp=NULL, $gruppe_kurzbz=NULL, $stpl_view='stundenplan', $idList=null, $fachbereich_kurzbz=null, $lva=NULL)
 	{
 		$num_rows_einheit=0;
 		// Parameter Checken
@@ -279,6 +279,12 @@ class lehrstunde extends basis_db
 		if ($type=='verband' && ($studiengang_kz==NULL || !is_numeric($studiengang_kz)))
 		{
 			$this->errormsg='Fehler: Studiengang ist nicht gesetzt';
+			return -1;
+		}
+		// LVA
+		if ($type=='lva' && $lva==NULL)
+		{
+			$this->errormsg='Fehler: LVA-ID ist nicht gesetzt';
 			return -1;
 		}
 		// Type
@@ -335,8 +341,11 @@ class lehrstunde extends basis_db
 		$sql_query_stdplan='SELECT * FROM '.$stpl_view;
 		if ($type!='idList')
 		{
+			$sql_query_lva="";
 			$sql_query=" WHERE datum>=".$this->db_add_param($datum_von)." AND datum<".$this->db_add_param($datum_bis);
-			if ($type=='lektor')
+			if ($type == 'lva')
+				$sql_query_lva=" AND lehrveranstaltung_id=".$this->db_add_param($lva);
+			elseif ($type=='lektor')
 				$sql_query.=" AND uid=".$this->db_add_param($uid);
 			elseif ($type=='ort')
 				$sql_query.=" AND ort_kurzbz=".$this->db_add_param($ort_kurzbz);
@@ -369,8 +378,8 @@ class lehrstunde extends basis_db
 				}
 				$sql_query.=')';
 			}
-			$sql_query.=' ORDER BY  datum, stunde, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, uid';
-			$sql_query_stdplan.=$sql_query;
+			$sql_query_orderby=' ORDER BY  datum, stunde, studiengang_kz, semester, verband, gruppe, gruppe_kurzbz, uid';
+			$sql_query_stdplan.=$sql_query . $sql_query_lva . $sql_query_orderby;
 		}
 		else
 		{
@@ -432,7 +441,7 @@ class lehrstunde extends basis_db
 		{
 			// Datenbankabfrage generieren
 			$sql_query_reservierung='SELECT * FROM campus.vw_reservierung';
-			$sql_query_reservierung.=$sql_query;
+			$sql_query_reservierung.=$sql_query . $sql_query_orderby;
 
 			//Datenbankabfrage
 			if (!$this->db_query($sql_query_reservierung))
