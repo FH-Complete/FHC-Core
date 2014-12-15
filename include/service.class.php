@@ -34,6 +34,7 @@ class service extends basis_db
 	public $beschreibung; 	// text
 	public $ext_id;			// bigint
 	public $oe_kurzbz;		// varchar(32)
+	public $content_id;		// integer
 	 
 	/**
 	 * Konstruktor - Laedt optional ein Service
@@ -73,6 +74,7 @@ class service extends basis_db
 				$this->beschreibung = $row->beschreibung;
 				$this->ext_id = $row->ext_id;
 				$this->oe_kurzbz = $row->oe_kurzbz;
+				$this->content_id = $row->content_id;
 				
 				return true;
 			}
@@ -107,6 +109,7 @@ class service extends basis_db
 				$obj->beschreibung = $row->beschreibung;
 				$obj->ext_id = $row->ext_id;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->content_id = $row->content_id;
 					
 				$this->result[] = $obj;
 			}
@@ -143,6 +146,7 @@ class service extends basis_db
 				$obj->beschreibung = $row->beschreibung;
 				$obj->ext_id = $row->ext_id;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->content_id = $row->content_id;
 					
 				$this->result[] = $obj;
 			}
@@ -199,6 +203,7 @@ class service extends basis_db
 					) AS a
 					GROUP BY service_id,oe_kurzbz,bezeichnung,beschreibung,ext_id,content_id
 					ORDER BY anzahl DESC,bezeichnung,oe_kurzbz";
+						   echo $qry;
 		
 		if($result = $this->db_query($qry))
 		{
@@ -212,6 +217,7 @@ class service extends basis_db
 				$obj->ext_id = $row->ext_id;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
 				$obj->anzahl = $row->anzahl;
+				$obj->content_id = $row->content_id;
 					
 				$this->result[] = $obj;
 			}
@@ -250,6 +256,47 @@ class service extends basis_db
 				$obj->beschreibung = $row->beschreibung;
 				$obj->ext_id = $row->ext_id;
 				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->content_id = $row->content_id;
+					
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg='Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Laedt die Services der uebergebenen OE und alle Services, die dieser OE untergliedert sind
+	 * 
+	 * @param $oe_kurzbz
+	 * @param $order Default: oe_kurzbz,bezeichnung
+	 */
+	public function getSubServicesOrganisationseinheit($oe_kurzbz, $order='oe_kurzbz,bezeichnung')
+	{	
+		$qry = 'SELECT
+					* 
+				FROM 
+					public.tbl_service 
+				WHERE 
+					oe_kurzbz IN (SELECT oe_kurzbz FROM public.tbl_organisationseinheit WHERE oe_parent_kurzbz='.$this->db_add_param($oe_kurzbz).')
+				ORDER BY '.$order;
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new service();
+					
+				$obj->service_id = $row->service_id;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->ext_id = $row->ext_id;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->content_id = $row->content_id;
 					
 				$this->result[] = $obj;
 			}
@@ -285,12 +332,13 @@ class service extends basis_db
 					
 		if($new)
 		{
-			$qry = "BEGIN;INSERT INTO public.tbl_service (bezeichnung, beschreibung, ext_id, oe_kurzbz)
+			$qry = "BEGIN;INSERT INTO public.tbl_service (bezeichnung, beschreibung, ext_id, oe_kurzbz, content_id)
 					VALUES(".
 				$this->db_add_param($this->bezeichnung).','.
 				$this->db_add_param($this->beschreibung).','.
 				$this->db_add_param($this->ext_id).','.
-				$this->db_add_param($this->oe_kurzbz).');';
+				$this->db_add_param($this->oe_kurzbz).','.
+				$this->db_add_param($this->content_id).');';
 		}
 		else
 		{
@@ -298,7 +346,8 @@ class service extends basis_db
 				' bezeichnung = '.$this->db_add_param($this->bezeichnung).','.
 				' beschreibung = '.$this->db_add_param($this->beschreibung).','.
 				' ext_id = '.$this->db_add_param($this->ext_id).','.
-				' oe_kurzbz = '.$this->db_add_param($this->oe_kurzbz).
+				' oe_kurzbz = '.$this->db_add_param($this->oe_kurzbz).','.
+				' content_id = '.$this->db_add_param($this->content_id).
 				' WHERE service_id='.$this->db_add_param($this->service_id, FHC_INTEGER).';';					
 		}
 		
