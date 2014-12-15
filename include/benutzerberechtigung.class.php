@@ -49,6 +49,7 @@ class benutzerberechtigung extends basis_db
 	public $insertamum;
 	public $insertvon;
 	public $kostenstelle_id;
+	public $anmerkung;					// varchar(256)
 	
 	public $starttimestamp;
 	public $endetimestamp;
@@ -103,6 +104,7 @@ class benutzerberechtigung extends basis_db
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->kostenstelle_id = $row->kostenstelle_id;
+				$this->anmerkung = $row->anmerkung;
 				
 				return true;
 			}
@@ -191,6 +193,12 @@ class benutzerberechtigung extends basis_db
 			return false;
 		}
 		
+		if(mb_strlen($this->anmerkung)>256)
+		{
+			$this->errormsg = 'Anmerkung darf nicht laenger als 256 Zeichen sein';
+			return false;
+		}
+		
 		return true;
 	}
 	
@@ -210,7 +218,7 @@ class benutzerberechtigung extends basis_db
 		{
 			$qry = 'INSERT INTO system.tbl_benutzerrolle (rolle_kurzbz, berechtigung_kurzbz, uid, funktion_kurzbz, 
 						oe_kurzbz, art, studiensemester_kurzbz, start, ende, negativ, updateamum, updatevon, 
-						insertamum, insertvon, kostenstelle_id)
+						insertamum, insertvon, kostenstelle_id, anmerkung)
 			        VALUES('.$this->db_add_param($this->rolle_kurzbz).','.
 					$this->db_add_param($this->berechtigung_kurzbz).','.
 					$this->db_add_param($this->uid).','.
@@ -225,6 +233,7 @@ class benutzerberechtigung extends basis_db
 					$this->db_add_param($this->updatevon).','.
 					$this->db_add_param($this->insertamum).','.
 					$this->db_add_param($this->insertvon).','.
+					$this->db_add_param($this->kostenstelle_id, FHC_INTEGER).','.
 					$this->db_add_param($this->kostenstelle_id, FHC_INTEGER).');';
 		}
 		else
@@ -241,6 +250,7 @@ class benutzerberechtigung extends basis_db
 			       ' ende='.$this->db_add_param($this->ende).','.
 			       ' negativ='.$this->db_add_param($this->negativ, FHC_BOOLEAN).','.
 				   ' kostenstelle_id='.$this->db_add_param($this->kostenstelle_id).','.
+			       ' anmerkung='.$this->db_add_param($this->anmerkung).','.
 			       ' updateamum='.$this->db_add_param($this->updateamum).','.
 			       ' updatevon='.$this->db_add_param($this->updatevon).
 			       " WHERE benutzerberechtigung_id=".$this->db_add_param($this->benutzerberechtigung_id, FHC_INTEGER, false);
@@ -322,6 +332,7 @@ class benutzerberechtigung extends basis_db
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->kostenstelle_id = $row->kostenstelle_id;
+				$obj->anmerkung = $row->anmerkung;
 				
 				$this->berechtigungen[] = $obj;
 			}
@@ -354,7 +365,7 @@ class benutzerberechtigung extends basis_db
 					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
 					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
-					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id
+					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id,tbl_benutzerrolle.anmerkung
 				FROM 
 					system.tbl_benutzerrolle JOIN system.tbl_berechtigung USING(berechtigung_kurzbz) 
 				WHERE uid=".$this->db_add_param($uid)."
@@ -366,7 +377,7 @@ class benutzerberechtigung extends basis_db
 					tbl_benutzerrolle.rolle_kurzbz, tbl_berechtigung.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_rolleberechtigung.art art1,
 					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
-					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id
+					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id,tbl_benutzerrolle.anmerkung
 				FROM 
 					system.tbl_benutzerrolle JOIN system.tbl_rolle USING(rolle_kurzbz) 
 					JOIN system.tbl_rolleberechtigung USING(rolle_kurzbz) 
@@ -380,7 +391,7 @@ class benutzerberechtigung extends basis_db
 					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
 					tbl_benutzerfunktion.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
-					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id
+					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id,tbl_benutzerrolle.anmerkung
 				FROM 
 					system.tbl_benutzerrolle JOIN public.tbl_benutzerfunktion USING(funktion_kurzbz)
 				WHERE tbl_benutzerfunktion.uid=".$this->db_add_param($uid)."
@@ -394,7 +405,7 @@ class benutzerberechtigung extends basis_db
 					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
 					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
-					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id
+					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id,tbl_benutzerrolle.anmerkung
 				FROM 
 					system.tbl_benutzerrolle
 				WHERE 
@@ -408,7 +419,7 @@ class benutzerberechtigung extends basis_db
 					tbl_benutzerrolle.rolle_kurzbz, tbl_benutzerrolle.berechtigung_kurzbz, tbl_benutzerrolle.art, tbl_benutzerrolle.art art1,
 					tbl_benutzerrolle.oe_kurzbz, tbl_benutzerrolle.studiensemester_kurzbz, tbl_benutzerrolle.start,
 					tbl_benutzerrolle.ende, tbl_benutzerrolle.negativ, tbl_benutzerrolle.updateamum, tbl_benutzerrolle.updatevon,
-					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id
+					tbl_benutzerrolle.insertamum, tbl_benutzerrolle.insertvon,tbl_benutzerrolle.kostenstelle_id,tbl_benutzerrolle.anmerkung
 				FROM 
 					system.tbl_benutzerrolle
 				WHERE 
@@ -449,6 +460,7 @@ class benutzerberechtigung extends basis_db
 			$b->insertamum = $row->insertamum;
 			$b->insertvon = $row->insertvon;
 			$b->kostenstelle_id = $row->kostenstelle_id;
+			$b->anmerkung = $row->anmerkung;
 			
 			$this->berechtigungen[]=$b;
 		}

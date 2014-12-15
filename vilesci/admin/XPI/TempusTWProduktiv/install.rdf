@@ -7,7 +7,7 @@
 		<em:version>2.0</em:version>
 		<em:description>Tempus</em:description>
 		<em:file>
-			<Description about="urn:mozilla:extension:file:tempus.jar">
+			<Description about="urn:mozilla:extension:file:tempusdev.jar">
 			<em:package>content/</em:package>
 			<em:skin>skin/</em:skin>
 			</Description>
