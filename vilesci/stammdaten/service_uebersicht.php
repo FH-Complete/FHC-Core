@@ -120,6 +120,7 @@ echo '<table class="tablesorter" id="myTable">
 			<th>Bezeichnung</th>
 			<th>Beschreibung</th>
 			<th>Organisationseinheit</th>
+			<th>Content_ID</th>
 			<th colspan="3">Aktion</th>
 		</tr>
 	</thead>
@@ -132,6 +133,7 @@ foreach($service->result as $row)
 	echo '<td>',$row->bezeichnung,'</td>';
 	echo '<td>',$row->beschreibung,'</td>';
 	echo '<td>',$row->oe_kurzbz,'</td>';
+	echo '<td>',$row->content_id,'</td>';
 	echo '<td><a href="service_details.php?action=update&service_id=',$row->service_id,' " target="detail_service">bearbeiten</a></td>';
 	echo '<td><a href="service_uebersicht.php?action=delete&service_id=',$row->service_id,' " onclick="return confdel()">entfernen</a></td>';
 	echo '</tr>';

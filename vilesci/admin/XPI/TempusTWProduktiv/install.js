@@ -1,12 +1,12 @@
 /* !!!
  * DIESE WERTE MUESSEN GEAENDERT WERDEN
  */
-const APP_DISPLAY_NAME = "Tempus";
-const APP_NAME = "Tempus";
-const APP_PACKAGE = "/tw/tempus";
+const APP_DISPLAY_NAME = "Tempusdev";
+const APP_NAME = "Tempusdev";
+const APP_PACKAGE = "/tw/tempusdev";
 const APP_VERSION = "V2.0";
 
-const APP_JAR_FILE = "tempus.jar";
+const APP_JAR_FILE = "tempusdev.jar";
 const APP_CONTENT_FOLDER = "content/";
 const APP_LOCALE_FOLDER  = "locale/de-AT/Tempus/";
 const APP_SKIN_FOLDER  = "skin/";

@@ -42,7 +42,7 @@ $datum_obj = new datum();
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<title>Ampel - Details</title>
+	<title>Service - Details</title>
 	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 </head>
@@ -58,6 +58,7 @@ $datum_obj = new datum();
 		$bezeichnung = (isset($_POST['bezeichnung'])?$_POST['bezeichnung']:die('Bezeichnung fehlt'));
 		$beschreibung = (isset($_POST['beschreibung'])?$_POST['beschreibung']:die('Beschreibung fehlt'));
 		$oe_kurzbz = (isset($_POST['oe_kurzbz'])?$_POST['oe_kurzbz']:die('Organisationseinheit fehlt'));
+		$content_id = (isset($_POST['content_id'])?$_POST['content_id']:die('Content_id fehlt'));
 		$ext_id = (isset($_POST['ext_id'])?$_POST['ext_id']:die('ext_id fehlt'));
 		$new = (isset($_POST['new'])?$_POST['new']:'true');
 		if($new=='true')
@@ -76,12 +77,13 @@ $datum_obj = new datum();
 		$service->beschreibung = $beschreibung;
 		$service->ext_id = $ext_id;
 		$service->oe_kurzbz = $oe_kurzbz;
+		$service->content_id = $content_id;
 		
 		if($service->save())
 		{		
 			echo '<span class="ok">Daten erfolgreich gespeichert</span>';
 			echo "<script type='text/javascript'>\n";
-			echo "	parent.uebersicht_service.location.href='service_uebersicht.php';";
+			echo "	parent.uebersicht_service.location.href='service_uebersicht.php?oe_kurzbz=$oe_kurzbz';";
 			echo "</script>\n";
 			$action='update';
 			$service_id = $service->service_id;
@@ -141,6 +143,10 @@ $datum_obj = new datum();
 	echo '<tr valign="top">';
 	echo '   <td>Beschreibung</td>';
 	echo '   <td><textarea name="beschreibung" cols="60" rows="5">'.htmlspecialchars($service->beschreibung).'</textarea></td>';
+	echo '</tr>';
+	echo '<tr valign="top">';
+	echo '   <td>Content_ID</td>';
+	echo '   <td><input type="text" name="content_id" size="8" maxlength="10" value="'.htmlspecialchars($service->content_id).'"></td>';
 	echo '</tr>';
 	echo '<tr valign="top">';
 	echo '   <td>Externe ID</td>';

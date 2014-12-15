@@ -326,7 +326,7 @@ class datum
 	 *       zB '---'
 	 * @param $datum
 	 * @param $format
-	 * @param $strict wenn das Datum aus einem Suchfeld komment, dann strict auf TRUE setzen da sonst
+	 * @param $strict wenn das Datum aus einem Suchfeld kommt, dann strict auf TRUE setzen da sonst
 	 * 				  Eintraege wie zB 'last Monday' oder 'a' auch in ein Datum umgewandelt werden.
 	 * @return Formatierten Timestamp wenn ok, false im Fehlerfall
 	 */

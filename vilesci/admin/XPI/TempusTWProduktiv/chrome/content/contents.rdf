@@ -3,14 +3,14 @@
               xmlns:chrome="http://www.mozilla.org/rdf/chrome#">
 	
 	<RDF:Seq about="urn:mozilla:package:root">
-		<RDF:li resource="urn:mozilla:package:tempus" />
+		<RDF:li resource="urn:mozilla:package:tempusdev" />
 	</RDF:Seq>
 
 
-	<RDF:Description about="urn:mozilla:package:tempus"
+	<RDF:Description about="urn:mozilla:package:tempusdev"
 		chrome:extension="false" 
-	 	chrome:name="Tempus"
-	 	chrome:displayName="Tempus"
+	 	chrome:name="Tempusdev"
+	 	chrome:displayName="Tempusdev"
 	 	chrome:author="TW"	
 	/>
 

@@ -11,5 +11,5 @@
 	<keyset id="mainkeys1">
 		<key id="keycode_ignore_kollision1" keycode="VK_F9" oncommand="document.getElementById('tempus_browser').contentWindow.toggleIgnoreKollision()"/>
 	</keyset>
-	<browser id="tempus_browser" type="content-primary" flex="1" src="https://vilesci.technikum-wien.at/content/tempus.xul.php"/>
+	<browser id="tempus_browser" type="content-primary" flex="1" src="http://calva.technikum-wien.at/kindlm/fhcomplete/trunk/content/tempus.xul.php"/>
 </window>
