@@ -122,4 +122,7 @@ define('CIS_STUDIENPLAN_SEMESTER_ANZEIGEN', false);
 
 //Legt fest ob ein User zu einer LV angemeldet sein muss um Detailinformationen abrufen zu können. (true|false)
 define('CIS_LEHRVERANSTALTUNG_WENNANGEMELDET_DETAILS_ANZEIGEN', true);
+
+// Prestudent_ID des Dummy_Studenten (zB fuer Testtool)
+define('PRESTUDENT_ID_DUMMY_STUDENT', 13478);
 ?>
