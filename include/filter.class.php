@@ -1,7 +1,7 @@
 <?php
 /*
  * filter.class.php
- * 
+ *
  * Copyright 2014 fhcomplete.org
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,7 @@
  * 
  *
  * Authors: Christian Paminger <pam@technikum-wien.at
+ *			Robert Hofer <robert.hofer@technikum-wien.at>
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 
@@ -178,14 +179,21 @@ class filter extends basis_db
 				$html.="\n\t\t\t";
 				switch ($filter->type)
 				{
-				case 'select':
-					$html.='<select id="' . $filter->kurzbz . '" class="form-control" name="'.$filter->kurzbz.'[]" ';
-					$html.=$filter->htmlattr;
-					$html.=' >';
-					$this->loadValues($filter->sql, $filter->valuename, $filter->showvalue);
-					foreach ($this->values as $value)
-						$html.="\n\t\t\t\t".'<option class="form-control" value="'.$value->value.'">'.$value->text.'</option>';
-					$html.="\n\t\t\t</select>";
+					case 'select':
+						$html.='<select id="' . $filter->kurzbz . '" class="form-control" name="'.$filter->kurzbz.'[]" ';
+						$html.=$filter->htmlattr;
+						$html.=' >';
+						$this->loadValues($filter->sql, $filter->valuename, $filter->showvalue);
+						foreach ($this->values as $value)
+							$html.="\n\t\t\t\t".'<option class="form-control" value="'.$value->value.'">'.$value->text.'</option>';
+						$html.="\n\t\t\t</select>";
+						break;
+					case 'datepicker':
+						$html .= '<input type="text" id="' . $filter->kurzbz . '" name="' . $filter->kurzbz . '">';
+						$html .= '<script>';
+						$html .= '$("#' . $filter->kurzbz . '").datepicker();';
+						$html .= '</script>';
+						break;
 				}
 				return $html;
 			}

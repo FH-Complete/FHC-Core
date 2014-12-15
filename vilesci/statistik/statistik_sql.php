@@ -24,77 +24,53 @@ require_once('../../include/functions.inc.php');
 require_once('../../include/statistik.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 
-$uid = get_uid();
-
-if(!isset($_GET['statistik_kurzbz']))
-	die('Statistik_kurzbz Parameter fehlt');
-
-$statistik_kurzbz = $_GET['statistik_kurzbz'];
-if (isset($_GET['outputformat']))
-	$outputformat=$_GET['outputformat'];
-else
-	$outputformat='html';
-	
-$html='';
-$csv='';
-$html.='<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-"http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-	<title>Statistik</title>	
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
-	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css"/>
-	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css"/>
-	<script type="text/javascript" src="../../include/js/jquery.js"></script> 
-	<script type="text/javascript">
-		$(document).ready(function() 
-		{ 
-		    $("#myTable").tablesorter(
-			{
-				widgets: [\'zebra\']
-			}); 
-		}); 
-	
-	</script>
-</head>
-<body>';
+$statistik_kurzbz = filter_input(INPUT_GET, 'statistik_kurzbz');
+$outputformat = filter_input(INPUT_GET, 'outputformat');
 
 $statistik = new statistik();
 if(!$statistik->load($statistik_kurzbz))
-	die($statistik->errormsg);
-
-if($statistik->berechtigung_kurzbz!='')
 {
-	$rechte = new benutzerberechtigung();
-	$rechte->getBerechtigungen($uid);
-	if(!$rechte->isBerechtigt($statistik->berechtigung_kurzbz))
-		die('Sie haben keine Berechtigung für diese Seite');
+	die($statistik->errormsg);
 }
 
-$html.= '<h2>Statistik - '.$statistik->bezeichnung.'</h2>';
+if (!isset($outputformat))
+{
+	$outputformat='html';
+}
+	
+if($statistik->berechtigung_kurzbz != '')
+{
+	$uid = get_uid();
+
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($uid);
+
+	if(!$rechte->isBerechtigt($statistik->berechtigung_kurzbz))
+	{
+		die('Sie haben keine Berechtigung für diese Seite');
+	}
+}
 
 if ($statistik->loadData())
 {
-	$html.=$statistik->getHtmlTable('myTable','tablesorter');
-	$csv=$statistik->getCSV();
-	$json=$statistik->getJSON();
+	$csv = $statistik->getCSV();
+	$json = $statistik->getJSON();
 }
 else
+{
 	echo $statistik->error_msg;
+	return;
+}
 
 switch ($outputformat)
 {
-	case 'html':
-		echo $html;
-		break;
 	case 'csv':
 		header("Content-type: text/csv");
 		header("Content-Disposition: attachment; filename=data.csv");
 		header("Pragma: no-cache");
 		header("Expires: 0");
 		echo $csv;
-		break;
+		return;
 	case 'json':
 		header("Content-type: application/json");
 		header("Content-Disposition: attachment; filename=data.json");
@@ -102,5 +78,28 @@ switch ($outputformat)
 		header("Expires: 0");
 		//$array= array_map("str_getcsv",explode("\n", $csv));
 		echo $json;
+		return;
 }
 ?>
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Statistik</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
+		<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css"/>
+		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css"/>
+		<script type="text/javascript" src="../../include/js/jquery.js"></script>
+		<script type="text/javascript">
+			$(function() {
+				$("#myTable").tablesorter({
+					widgets: ['zebra']
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<h2>Statistik - <?php echo $statistik->bezeichnung ?></h2>
+			<?php echo $statistik->getHtmlTable('myTable', 'tablesorter'); ?>
+	</body>
+</html>
