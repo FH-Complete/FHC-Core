@@ -20,13 +20,13 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <style:table-properties style:width="17.006cm" fo:margin-left="0cm" table:align="left"/>
     </style:style>
     <style:style style:name="Lehrveranstaltungen.A" style:family="table-column">
-      <style:table-column-properties style:column-width="2.700cm"/>
+      <style:table-column-properties style:column-width="3.000cm"/>
     </style:style>
     <style:style style:name="Lehrveranstaltungen.B" style:family="table-column">
-      <style:table-column-properties style:column-width="0.126cm"/>
+      <style:table-column-properties style:column-width="0.026cm"/>
     </style:style>
     <style:style style:name="Lehrveranstaltungen.C" style:family="table-column">
-      <style:table-column-properties style:column-width="7.249cm"/>
+      <style:table-column-properties style:column-width="7.049cm"/>
     </style:style>
     <style:style style:name="Lehrveranstaltungen.D" style:family="table-column">
       <style:table-column-properties style:column-width="1.362cm"/>
