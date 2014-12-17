@@ -145,31 +145,31 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <style:table-column-properties style:column-width="4.256cm"/>
     </style:style>
     <style:style style:name="Tabelle1.A1" style:family="table-cell">
-      <style:table-cell-properties fo:padding="0.097cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="0.05pt solid #000000" fo:border-bottom="none"/>
+      <style:table-cell-properties fo:padding="0.097cm" fo:border-left="0.30pt solid #000000" fo:border-right="none" fo:border-top="0.30pt solid #000000" fo:border-bottom="none"/>
     </style:style>
     <style:style style:name="Tabelle1.B1" style:family="table-cell">
-      <style:table-cell-properties fo:padding="0.097cm" fo:border-left="none" fo:border-right="none" fo:border-top="0.05pt solid #000000" fo:border-bottom="none"/>
+      <style:table-cell-properties fo:padding="0.097cm" fo:border-left="none" fo:border-right="none" fo:border-top="0.30pt solid #000000" fo:border-bottom="none"/>
     </style:style>
     <style:style style:name="Tabelle1.D1" style:family="table-cell">
-      <style:table-cell-properties fo:padding="0.097cm" fo:border-left="none" fo:border-right="0.05pt solid #000000" fo:border-top="0.05pt solid #000000" fo:border-bottom="none"/>
+      <style:table-cell-properties fo:padding="0.097cm" fo:border-left="none" fo:border-right="0.30pt solid #000000" fo:border-top="0.30pt solid #000000" fo:border-bottom="none"/>
     </style:style>
     <style:style style:name="Tabelle1.A2" style:family="table-cell">
-      <style:table-cell-properties fo:padding="0.097cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="none" fo:border-bottom="none"/>
+      <style:table-cell-properties fo:padding="0.097cm" fo:border-left="0.30pt solid #000000" fo:border-right="none" fo:border-top="none" fo:border-bottom="none"/>
     </style:style>
     <style:style style:name="Tabelle1.B2" style:family="table-cell">
       <style:table-cell-properties fo:padding="0.097cm" fo:border="none"/>
     </style:style>
     <style:style style:name="Tabelle1.D2" style:family="table-cell">
-      <style:table-cell-properties fo:padding="0.097cm" fo:border-left="none" fo:border-right="0.05pt solid #000000" fo:border-top="none" fo:border-bottom="none"/>
+      <style:table-cell-properties fo:padding="0.097cm" fo:border-left="none" fo:border-right="0.30pt solid #000000" fo:border-top="none" fo:border-bottom="none"/>
     </style:style>
     <style:style style:name="Tabelle1.A3" style:family="table-cell">
-      <style:table-cell-properties fo:padding="0.097cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="none" fo:border-bottom="0.05pt solid #000000"/>
+      <style:table-cell-properties fo:padding="0.097cm" fo:border-left="0.30pt solid #000000" fo:border-right="none" fo:border-top="none" fo:border-bottom="0.30pt solid #000000"/>
     </style:style>
     <style:style style:name="Tabelle1.B3" style:family="table-cell">
-      <style:table-cell-properties fo:padding="0.097cm" fo:border-left="none" fo:border-right="none" fo:border-top="none" fo:border-bottom="0.05pt solid #000000"/>
+      <style:table-cell-properties fo:padding="0.097cm" fo:border-left="none" fo:border-right="none" fo:border-top="none" fo:border-bottom="0.30pt solid #000000"/>
     </style:style>
     <style:style style:name="Tabelle1.D3" style:family="table-cell">
-      <style:table-cell-properties fo:padding="0.097cm" fo:border-left="none" fo:border-right="0.05pt solid #000000" fo:border-top="none" fo:border-bottom="0.05pt solid #000000"/>
+      <style:table-cell-properties fo:padding="0.097cm" fo:border-left="none" fo:border-right="0.30pt solid #000000" fo:border-top="none" fo:border-bottom="0.30pt solid #000000"/>
     </style:style>
     <style:style style:name="MP1" style:family="paragraph" style:parent-style-name="Standard">
       <style:paragraph-properties fo:text-align="end" style:justify-single-word="false"/>

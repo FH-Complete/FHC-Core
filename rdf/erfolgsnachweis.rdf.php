@@ -167,34 +167,45 @@ $lehrveranstaltungen = array();
 			$stpllv[$row->studienplan_lehrveranstaltung_id] = $row->lehrveranstaltung_id;
 		}
 		
-		foreach($obj->result as $row)
+		$durchlauf=0;
+		
+		// Zweimal durchlaufen weil sonst manche Submodule nicht richtig erfasst werden
+		while($durchlauf<2)
 		{
-			if($row->studienplan_lehrveranstaltung_semester==$ausbildungssemester || $row->studienplan_lehrveranstaltung_semester==$ausbildungssemester2)
+			foreach($obj->result as $row)
 			{
-				//Gruppieren der Module
-				//$lvs['1']['childs']['2']=$obj;
-				if($row->studienplan_lehrveranstaltung_id_parent=='')
+				// Nur die betreffenden Semester mitnehmen da sonst ein durcheinander entsteht wenn die gleiche LV in verschiedenen Semester in unterschiedlichen
+				// Modulen verwendet wird
+				if($row->studienplan_lehrveranstaltung_semester==$ausbildungssemester || $row->studienplan_lehrveranstaltung_semester==$ausbildungssemester2)
 				{
-					$lehrveranstaltungen[$row->lehrveranstaltung_id]['data']=$row;
-				}
-				else
-				{
-					if(isset($lehrveranstaltungen[$stpllv[$row->studienplan_lehrveranstaltung_id_parent]]))
+					//Gruppieren der Module
+					//$lvs['1']['childs']['2']=$obj;
+					if($row->studienplan_lehrveranstaltung_id_parent=='') // 1. Ebene (Module)
 					{
-						$lehrveranstaltungen[$stpllv[$row->studienplan_lehrveranstaltung_id_parent]]['childs'][$row->lehrveranstaltung_id]['data'] = $row;
+						$lehrveranstaltungen[$row->lehrveranstaltung_id]['data']=$row;
 					}
 					else
 					{
-						foreach($lehrveranstaltungen as $key=>$row_module)
+						// 2. Ebene
+						if(isset($lehrveranstaltungen[$stpllv[$row->studienplan_lehrveranstaltung_id_parent]]))
 						{
-							if(isset($lehrveranstaltungen[$key]['childs'][$stpllv[$row->studienplan_lehrveranstaltung_id_parent]]))
+							$lehrveranstaltungen[$stpllv[$row->studienplan_lehrveranstaltung_id_parent]]['childs'][$row->lehrveranstaltung_id]['data'] = $row;
+						}
+						else
+						{
+							// 3. Ebene
+							foreach($lehrveranstaltungen as $key=>$row_module)
 							{
-								$lehrveranstaltungen[$key]['childs'][$stpllv[$row->studienplan_lehrveranstaltung_id_parent]]['childs'][$row->lehrveranstaltung_id]['data']=$row;
+								if(isset($lehrveranstaltungen[$key]['childs'][$stpllv[$row->studienplan_lehrveranstaltung_id_parent]]))
+								{
+									$lehrveranstaltungen[$key]['childs'][$stpllv[$row->studienplan_lehrveranstaltung_id_parent]]['childs'][$row->lehrveranstaltung_id]['data']=$row;
+								}
 							}
 						}
 					}
 				}
 			}
+			$durchlauf++;
 		}
 		
         $ects_gesamt = 0;
