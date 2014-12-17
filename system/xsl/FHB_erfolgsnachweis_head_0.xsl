@@ -64,6 +64,14 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         </style:tab-stops>
       </style:paragraph-properties>
     </style:style>
+     <style:style style:name="Footer" style:family="paragraph" style:parent-style-name="Standard" style:class="extra">
+      <style:paragraph-properties text:number-lines="false" text:line-number="0">
+        <style:tab-stops>
+          <style:tab-stop style:position="8.5cm" style:type="center"/>
+          <style:tab-stop style:position="17cm" style:type="right"/>
+        </style:tab-stops>
+      </style:paragraph-properties>
+    </style:style>
     <text:outline-style style:name="Outline">
       <text:outline-level-style text:level="1" style:num-format="">
         <style:list-level-properties text:list-level-position-and-space-mode="label-alignment">
@@ -274,6 +282,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         </table:table>
         <text:p text:style-name="MP4"/>
       </style:header>
+      <style:footer>
+        <text:p text:style-name="Footer"></text:p>
+        <text:p text:style-name="Footer"></text:p>
+      </style:footer>
     </style:master-page>
   </office:master-styles>
 </office:document-styles>
