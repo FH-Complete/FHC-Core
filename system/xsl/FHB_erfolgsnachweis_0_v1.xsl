@@ -20,13 +20,13 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <style:table-properties style:width="17.006cm" fo:margin-left="0cm" table:align="left"/>
     </style:style>
     <style:style style:name="Lehrveranstaltungen.A" style:family="table-column">
-      <style:table-column-properties style:column-width="2.200cm"/>
+      <style:table-column-properties style:column-width="2.700cm"/>
     </style:style>
     <style:style style:name="Lehrveranstaltungen.B" style:family="table-column">
-      <style:table-column-properties style:column-width="0.326cm"/>
+      <style:table-column-properties style:column-width="0.126cm"/>
     </style:style>
     <style:style style:name="Lehrveranstaltungen.C" style:family="table-column">
-      <style:table-column-properties style:column-width="7.549cm"/>
+      <style:table-column-properties style:column-width="7.249cm"/>
     </style:style>
     <style:style style:name="Lehrveranstaltungen.D" style:family="table-column">
       <style:table-column-properties style:column-width="1.362cm"/>
@@ -404,7 +404,16 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <text:p text:style-name="PLegend">Internationale Beurteilung (ECTS Notenskala): A/B=Sehr Gut, C=Gut, D=Befriedigend, E=Genügend, F=Nicht Genügend</text:p>
       <text:p text:style-name="PLegendEmpty"/>
       <text:p text:style-name="PLegendEmpty"/>
-      <text:p text:style-name="PDatumOrt">Pinkafeld, am <xsl:value-of select="datum_aktuell"/></text:p>
+         
+      <xsl:choose>
+		<xsl:when test="studiengang_kz='265' or studiengang_kz='268' or studiengang_kz='761' or studiengang_kz='760' or studiengang_kz='266' or studiengang_kz='267' or studiengang_kz='764' or studiengang_kz='269' or studiengang_kz='400'">
+			<text:p text:style-name="PDatumOrt">Pinkafeld, am <xsl:value-of select="datum_aktuell"/></text:p>
+		</xsl:when>
+		<xsl:otherwise>
+			<text:p text:style-name="PDatumOrt">Eisenstadt, am <xsl:value-of select="datum_aktuell"/></text:p>
+		</xsl:otherwise>
+      </xsl:choose>
+      
       <table:table table:name="Tabelle2" table:style-name="Tabelle2">
         <table:table-column table:style-name="Tabelle2.A"/>
         <table:table-column table:style-name="Tabelle2.B"/>

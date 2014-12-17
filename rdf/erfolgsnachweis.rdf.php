@@ -108,7 +108,11 @@ $lehrveranstaltungen = array();
 				$ausbildungssemester = $row_sem->semester;
 			}
 		}
-
+		if($ausbildungssemester/2==0)
+			$ausbildungssemester2=$ausbildungssemester-1;
+		else
+			$ausbildungssemester2=$ausbildungssemester+1;
+			
 		$student_studienjahr = round($ausbildungssemester/2);
 		
 		$jahr1=mb_substr($studiensemester_kurzbz,2);
@@ -155,7 +159,7 @@ $lehrveranstaltungen = array();
 		
 		$obj = new zeugnisnote();
 		
-
+		
 		$obj->getZeugnisnotenStudienplan($uid, array($studiensemester_kurzbz, $studiensemester_kurzbz2),$prestudent->studienplan_id);
 		
 		foreach ($obj->result as $row)
@@ -165,25 +169,28 @@ $lehrveranstaltungen = array();
 		
 		foreach($obj->result as $row)
 		{
-			//Gruppieren der Module
-			//$lvs['1']['childs']['2']=$obj;
-			if($row->studienplan_lehrveranstaltung_id_parent=='')
+			if($row->studienplan_lehrveranstaltung_semester==$ausbildungssemester || $row->studienplan_lehrveranstaltung_semester==$ausbildungssemester2)
 			{
-				$lehrveranstaltungen[$row->lehrveranstaltung_id]['data']=$row;
-			}
-			else
-			{
-				if(isset($lehrveranstaltungen[$stpllv[$row->studienplan_lehrveranstaltung_id_parent]]))
+				//Gruppieren der Module
+				//$lvs['1']['childs']['2']=$obj;
+				if($row->studienplan_lehrveranstaltung_id_parent=='')
 				{
-					$lehrveranstaltungen[$stpllv[$row->studienplan_lehrveranstaltung_id_parent]]['childs'][$row->lehrveranstaltung_id]['data'] = $row;
+					$lehrveranstaltungen[$row->lehrveranstaltung_id]['data']=$row;
 				}
 				else
 				{
-					foreach($lehrveranstaltungen as $key=>$row_module)
+					if(isset($lehrveranstaltungen[$stpllv[$row->studienplan_lehrveranstaltung_id_parent]]))
 					{
-						if(isset($lehrveranstaltungen[$key]['childs'][$stpllv[$row->studienplan_lehrveranstaltung_id_parent]]))
+						$lehrveranstaltungen[$stpllv[$row->studienplan_lehrveranstaltung_id_parent]]['childs'][$row->lehrveranstaltung_id]['data'] = $row;
+					}
+					else
+					{
+						foreach($lehrveranstaltungen as $key=>$row_module)
 						{
-							$lehrveranstaltungen[$key]['childs'][$stpllv[$row->studienplan_lehrveranstaltung_id_parent]]['childs'][$row->lehrveranstaltung_id]['data']=$row;
+							if(isset($lehrveranstaltungen[$key]['childs'][$stpllv[$row->studienplan_lehrveranstaltung_id_parent]]))
+							{
+								$lehrveranstaltungen[$key]['childs'][$stpllv[$row->studienplan_lehrveranstaltung_id_parent]]['childs'][$row->lehrveranstaltung_id]['data']=$row;
+							}
 						}
 					}
 				}
@@ -210,7 +217,7 @@ function getLVRow($obj)
 	$row = $obj['data'];
 	if($row->zeugnis)
 	{
-		if ($row->note)
+		if ($row->note!=='')
 			$note = $note_arr[$row->note]['anmerkung'];
 		else
 			$note = "";
