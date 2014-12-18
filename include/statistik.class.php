@@ -254,6 +254,10 @@ class statistik extends basis_db
 		if(is_null($new))
 			$new = $this->new;
 
+		/* Da derzeit die statistik_kurzbz der primary key in der DB ist,
+		 * darf er vorerst nur [a-zA-Z0-9_] (\w) enthalten. (bis auf autoincrement
+		 * integer umgestellt ist)
+		 */
 		$this->statistik_kurzbz = preg_replace('/\W/', '', $this->statistik_kurzbz);
 			
 		if($new)
