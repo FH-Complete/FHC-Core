@@ -253,6 +253,8 @@ class statistik extends basis_db
 	{
 		if(is_null($new))
 			$new = $this->new;
+
+		$this->statistik_kurzbz = preg_replace('/\W/', '', $this->statistik_kurzbz);
 			
 		if($new)
 		{
