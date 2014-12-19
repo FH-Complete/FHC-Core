@@ -96,6 +96,8 @@ class wochenplan extends basis_db
 	public $wochenplan;
 	public $errormsg;
 	public $fachbereich_kurzbz;
+	
+	public $raeume = array();
 
 	/**
 	 * Konstruktor
@@ -171,8 +173,9 @@ class wochenplan extends basis_db
 		// Ort
 		if ($type=='ort' && $ort_kurzbz==NULL)
 		{
-			$this->errormsg='Fehler: Kurzbezeichnung des Orts ist nicht gesetzt';
-			return false;
+			//$this->errormsg='Fehler: Kurzbezeichnung des Orts ist nicht gesetzt';
+			//return false;
+			$this->ort_kurzbz = "all";
 		}
 		elseif ($type=='ort')
 			$this->ort_kurzbz=$ort_kurzbz;
@@ -265,7 +268,7 @@ class wochenplan extends basis_db
 		}
 
 		//ortdaten ermitteln
-		if ($this->type=='ort')
+		if ($this->type=='ort' && $this->ort_kurzbz != 'all')
 		{
 			$sql_query="SELECT bezeichnung, ort_kurzbz, planbezeichnung, ausstattung, max_person, content_id FROM public.tbl_ort WHERE ort_kurzbz=".$this->db_add_param($this->ort_kurzbz);
 			//echo $sql_query;
@@ -290,6 +293,30 @@ class wochenplan extends basis_db
 				$this->errormsg="Dieser Ort existiert nicht";
 				return false;
 			}
+		}
+		
+		if ($this->type=='ort' && $this->ort_kurzbz == 'all')
+		{
+		    $sql_query="SELECT bezeichnung, ort_kurzbz, planbezeichnung, ausstattung, max_person, content_id FROM public.tbl_ort WHERE lehre AND ort_kurzbz != 'Dummy'";
+		    //echo $sql_query;
+		    if (!$this->db_query($sql_query))
+		    {
+			    $this->errormsg=$this->db_last_error();
+			    return false;
+		    }
+
+		    while($row = $this->db_fetch_object())
+		    {
+			$obj = new stdClass();
+			$obj->ort_bezeichnung = $row->bezeichnung;
+			$obj->ort_kurzbz = $row->ort_kurzbz;
+			$obj->ort_planbezeichnung = $row->planbezeichnung;
+			$obj->ort_ausstattung = $row->ausstattung;
+			$obj->ort_max_person = $row->max_person;
+			$obj->ort_content_id = $row->content_id;
+			$obj->link.='&ort_kurzbz='.$this->ort_kurzbz;	//Link erweitern
+			array_push($this->raeume, $obj);
+		    }
 		}
 
 		// Studiengangsdaten ermitteln
@@ -377,7 +404,7 @@ class wochenplan extends basis_db
 			$this->errormsg=$this->wochenplan->errormsg;
 			return false;
 		}
-
+		
 		// Stundenplandaten aufbereiten
 		for($i=0;$i<$anz;$i++)
 		{
@@ -453,7 +480,7 @@ class wochenplan extends basis_db
 				echo $p->t('global/gruppe').': '.$this->grp.'<br>';
 			$this->link.='&stg_kz='.$this->stg_kz.'&sem='.$this->sem.'&ver='.$this->ver.'&grp='.$this->grp;
 		}
-		if ($this->type=='ort')
+		if ($this->type=='ort' && $this->ort_kurzbz != 'all')
 			echo '<strong>'.$p->t('lvplan/raum').': </strong>'.$this->ort_kurzbz.' - '.$this->ort_bezeichnung.' - '.($this->ort_max_person!=''?'( '.$this->ort_max_person.' '.$p->t('lvplan/personen').' )':'').($this->ort_content_id!=''?' - <a href="../../../cms/content.php?content_id='.$this->ort_content_id.'" target="_self">'.$p->t('lvplan/rauminformationenAnzeigen').'</a>':'').'<br>'.$this->ort_ausstattung;
 		if ($this->type=='lva')
 			$this->link.='&lva='.$this->lva;
@@ -887,7 +914,7 @@ class wochenplan extends basis_db
 								foreach($uEinheit['lektor'] as $ueLektor)
 									echo $ueLektor."<BR />";
 							}
-							if ($this->type!='ort')
+							if ($this->type!='ort' || $this->ort_kurzbz == 'all')
 							{
 								$uEinheit['ort']=array_unique($uEinheit['ort']);
 								foreach($uEinheit['ort'] as $ueOrt)

@@ -84,4 +84,5 @@ $this->phrasen['lvplan/persoenlichenAbonnieren']='Persönlichen LV-Plan abonnier
 $this->phrasen['lvplan/aktuelleKW']='Aktuelle Kalenderwoche';
 $this->phrasen['lvplan/rauminformationenAnzeigen']='Rauminformationen anzeigen';
 $this->phrasen['lvplan/personen']='Personen';
+$this->phrasen['lvplan/alleRaeume']='Alle Räume';
 ?>

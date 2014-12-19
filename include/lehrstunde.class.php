@@ -347,8 +347,10 @@ class lehrstunde extends basis_db
 				$sql_query_lva=" AND lehrveranstaltung_id=".$this->db_add_param($lva);
 			elseif ($type=='lektor')
 				$sql_query.=" AND uid=".$this->db_add_param($uid);
-			elseif ($type=='ort')
+			elseif ($type=='ort' && $ort_kurzbz != 'all')
 				$sql_query.=" AND ort_kurzbz=".$this->db_add_param($ort_kurzbz);
+			elseif ($type=='ort' && $ort_kurzbz == 'all')
+				$sql_query.=" AND ort_kurzbz IS NOT NULL AND ort_kurzbz !='Dummy'";
 			elseif ($type=='gruppe')
 				$sql_query.=" AND gruppe_kurzbz=".$this->db_add_param($gruppe_kurzbz);
 			elseif($type=='fachbereich')
@@ -435,7 +437,7 @@ class lehrstunde extends basis_db
 			$stunde->reservierung=false;
 			$this->lehrstunden[$i]=$stunde;
 		}
-
+		
 		// Reservierungsdaten ermitteln
 		if ($type!='idList' && $type!='fachbereich')
 		{

@@ -324,7 +324,10 @@ if (! $stdplan->draw_header())
 }
 
 // Stundenplan der Woche drucken
-$stdplan->draw_week($raumres,$uid);
+if($ort_kurzbz == 'all')
+    $stdplan->draw_week ($raumres, $uid, false);
+else
+    $stdplan->draw_week($raumres,$uid);
 
 if (isset($count))
 	echo "Es wurde".($count!=1?'n':'')." $count Stunde".($count!=1?'n':'')." reserviert!<BR>";
