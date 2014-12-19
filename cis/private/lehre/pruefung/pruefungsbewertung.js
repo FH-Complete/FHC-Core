@@ -117,11 +117,11 @@ function showTeilnehmer(pruefungstermin_id, lehrveranstaltung_id, lehrveranstalt
 						var datum = d.von.split(" ");	
 						if(d.pruefung.note===null)
 						{
-							entry = "<div class='anmeldung' id="+d.student.uid+"><div>"+d.student.vorname+" "+d.student.nachname+"</div>"+notenSelect+"<input type='button' onclick='saveBeurteilung(this,\""+datum[0]+"\",\""+d.pruefungsanmeldung_id+"\",\""+d.pruefung_id+"\",\""+d.lehrveranstaltung_id+"\");' value='speichern'/></div>";
+							entry = "<div class='anmeldung' id="+d.student.uid+"><div>"+d.student.vorname+" "+d.student.nachname+"</div>"+notenSelect+"<input type='button' onclick='saveBeurteilung(this,\""+datum[0]+"\",\""+d.pruefungsanmeldung_id+"\",\""+d.pruefung_id+"\",\""+d.lehrveranstaltung_id+"\");' value='speichern'/></br><input id='note_anmerkung_"+d.student.uid+"' placeholder='Anmerkung' /></div>";
 						}
 						else
 						{
-							entry = "<div class='anmeldung' id="+d.student.uid+"><div>"+d.student.vorname+" "+d.student.nachname+"</div>"+notenSelect+"<input type='button' onclick='updateBeurteilung(this,\""+d.pruefung.pruefung_id+"\");' value='speichern'/></div>";
+							entry = "<div class='anmeldung' id="+d.student.uid+"><div>"+d.student.vorname+" "+d.student.nachname+"</div>"+notenSelect+"<input type='button' onclick='updateBeurteilung(this,\""+d.pruefung.pruefung_id+"\");' value='speichern'/></br><input id='note_anmerkung_"+d.student.uid+"' placeholder='Anmerkung' value='"+d.pruefung.anmerkung+"' /></div>";
 						}
 						$("#anmeldeDaten").append(entry);
 						if(d.pruefung.note!==null)
@@ -133,6 +133,8 @@ function showTeilnehmer(pruefungstermin_id, lehrveranstaltung_id, lehrveranstalt
 						{
 							markAsUnsaved(document.getElementById(d.student.uid).firstChild);
 						}
+						var t = $("#note_anmerkung_"+d.student.uid).parent().find('select').first().width();
+						$("#note_anmerkung_"+d.student.uid).width(t);
 					}
 				});
 				if(entry === "")
@@ -171,7 +173,7 @@ function saveBeurteilung(ele, datum, pruefungsanmeldung_id, pruefung_id, lehrver
 		messageBox("message", "Keine Note ausgewählt.", "red", "highlight", 1000);
 		return false;
 	}
-	var anmerkung = "";
+	var anmerkung = $("#note_anmerkung_"+student_uid).val();
 	
 	$.ajax({
 		dataType: 'json',
@@ -191,7 +193,6 @@ function saveBeurteilung(ele, datum, pruefungsanmeldung_id, pruefung_id, lehrver
 		},
 		error: loadError
 	}).success(function(data){
-		console.log(data.error);
 		if(data.error != 'true')
 		{
 			markAsSaved(ele);
@@ -218,7 +219,7 @@ function updateBeurteilung(ele, pruefung_id)
 	var student_uid = $(ele).parent().attr("id");
 	var mitarbeiter_uid = $("#mitarbeiter_uid").val();
 	var note = $(ele).parent().find("select").val();
-	var anmerkung = "";
+	var anmerkung = $("#note_anmerkung_"+student_uid).val();
 	if((note === "null") || (note===null))
 	{
 		messageBox("message", "Keine Note ausgewählt.", "red", "highlight", 1000);
