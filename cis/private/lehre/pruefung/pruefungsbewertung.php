@@ -134,7 +134,7 @@ if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungA
 	    .anmeldung {
 		font-size: 1.2em;
 		border-bottom: 1px solid black;
-		height: 1.8em;
+		height: 3.5em;
 		clear: both;
 		padding: 0.5em 0 0 0.5em;
 	    }

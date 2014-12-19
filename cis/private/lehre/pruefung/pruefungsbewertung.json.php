@@ -26,14 +26,14 @@ $rechte->getBerechtigungen($uid);
 $studiensemester = new studiensemester();
 $aktStudiensemester = $studiensemester->getaktorNext();
 
-$method = isset($_REQUEST['method'])?$_REQUEST['method']:'';
+$method = filter_input(INPUT_POST, 'method');
 
 switch($method)
 {
 	case 'getPruefungMitarbeiter':
 	    if($rechte->isBerechtigt('lehre/pruefungsbeurteilungAdmin'))
 	    {
-		$mitarbeiter_uid = $_REQUEST["mitarbeiter_uid"];
+		$mitarbeiter_uid = filter_input(INPUT_POST, 'mitarbeiter_uid');
 	    }
 	    else
 	    {
@@ -45,39 +45,40 @@ switch($method)
 	    $data = getNoten();
 	    break;
 	case 'saveBeurteilung':
-	    $lehrveranstaltung_id = $_REQUEST["lehrveranstaltung_id"];
-	    $student_uid = $_REQUEST["student_uid"];
+	    $lehrveranstaltung_id = filter_input(INPUT_POST, 'lehrveranstaltung_id');
+	    $student_uid = filter_input(INPUT_POST, 'student_uid');
 	    if($rechte->isBerechtigt('lehre/pruefungsbeurteilungAdmin'))
 	    {
-		$mitarbeiter_uid = $_REQUEST["mitarbeiter_uid"];
+		$mitarbeiter_uid = filter_input(INPUT_POST, 'mitarbeiter_uid');
 	    }
 	    else
 	    {
 		$mitarbeiter_uid = $uid;
 	    }
-	    $note = $_REQUEST["note"];
-	    $pruefung_id = $_REQUEST["pruefung_id"];
-	    $datum = $_REQUEST["datum"];
-	    $anmerkung = $_REQUEST["anmerkung"];
-	    $pruefungsanmeldung_id = $_REQUEST["pruefungsanmeldung_id"];
+	    $note = filter_input(INPUT_POST, 'note');
+	    $pruefung_id = filter_input(INPUT_POST, 'pruefung_id');
+	    $datum = filter_input(INPUT_POST, 'datum');
+	    $anmerkung = filter_input(INPUT_POST, 'anmerkung');
+	    $pruefungsanmeldung_id = filter_input(INPUT_POST, 'pruefungsanmeldung_id');
 	    $data = saveBeurteilung($lehrveranstaltung_id, $student_uid, $mitarbeiter_uid, $note, $pruefung_id, $datum, $anmerkung, $pruefungsanmeldung_id, $uid);
 	    break;
 	case 'updateBeurteilung':
-	    $pruefung_id = $_REQUEST["pruefung_id"];
-	    $note = $_REQUEST["note"];
-	    $data = updateBeurteilung($pruefung_id, $note, $uid);
+	    $pruefung_id = filter_input(INPUT_POST, 'pruefung_id');
+	    $note = filter_input(INPUT_POST, 'note');
+	    $anmerkung = filter_input(INPUT_POST, 'anmerkung');
+	    $data = updateBeurteilung($pruefung_id, $note, $uid, $anmerkung);
 	    break;
 	case 'loadPruefung':
-	    $pruefung_id=$_REQUEST["pruefung_id"];
+	    $pruefung_id = filter_input(INPUT_POST, 'pruefung_id');
 	    $data = loadPruefung($pruefung_id);
 	    break;
 	case 'getBeurteilung':
-	    $pruefungsanmeldung_id = $_REQUEST["pruefungsanmeldung_id"];
+	    $pruefungsanmeldung_id = filter_input(INPUT_POST, 'pruefungsanmeldung_id');
 	    $data = getBeurteilung($pruefungsanmeldung_id);
 	    break;
 	case 'getAnmeldungenTermin':
-	    $lehrveranstaltung_id = $_REQUEST["lehrveranstaltung_id"];
-	    $pruefungstermin_id = $_REQUEST["pruefungstermin_id"];
+	    $lehrveranstaltung_id = filter_input(INPUT_POST, 'lehrveranstaltung_id');
+	    $pruefungstermin_id = filter_input(INPUT_POST, 'pruefungstermin_id');
 	    $data = getAnmeldungenTermin($lehrveranstaltung_id, $pruefungstermin_id);
 	    break;
 	default:
@@ -188,6 +189,8 @@ function saveBeurteilung($lehrveranstaltung_id, $student_uid, $mitarbeiter_uid, 
 	$pruefungstermin = new pruefungstermin($pruefungsanmeldung->pruefungstermin_id);
 
 	$datum = new datum();
+//	var_dump(date("Y-m-d", time()));
+//	var_dump($pruefungstermin->von);
 	if($datum->between("", date("Y-m-d", time()), $pruefungstermin->von))
 	{
 	    if($pruefung->save())
@@ -224,11 +227,12 @@ function saveBeurteilung($lehrveranstaltung_id, $student_uid, $mitarbeiter_uid, 
  * @param String $uid UID des aktuellen Benutzers
  * @return Array
  */
-function updateBeurteilung($pruefung_id, $note, $uid)
+function updateBeurteilung($pruefung_id, $note, $uid, $anmerkung)
 {
     $pruefung = new pruefung($pruefung_id);
     $pruefung->new = FALSE;
     $pruefung->note = $note;
+    $pruefung->anmerkung = $anmerkung;
     $pruefung->updatevon = $uid;
     $pruefung->updateamum = date('Y-m-d H:i:s');
     if($pruefung->save())
