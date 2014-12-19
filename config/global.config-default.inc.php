@@ -125,4 +125,8 @@ define('CIS_LEHRVERANSTALTUNG_WENNANGEMELDET_DETAILS_ANZEIGEN', true);
 
 // Prestudent_ID des Dummy_Studenten (zB fuer Testtool)
 define('PRESTUDENT_ID_DUMMY_STUDENT', 13478);
+
+//Legt fest ob die Option für alle Räume im Saalplan Dropdown angezeigt werden soll. (true|false)
+define('CIS_SAALPLAN_ALLERAEUME_OPTION', false);
+
 ?>

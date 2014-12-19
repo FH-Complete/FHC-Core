@@ -239,7 +239,11 @@ $(document).ready(function()
 			<td valign="top">
 			<select name="select" style="width:200px;" onChange="MM_jumpMenu(\'self\',this,0)">
         		<option value="stpl_week.php" selected>'.$p->t('lvplan/raumAuswaehlen').'</option>';
-
+		if(defined('CIS_SAALPLAN_ALLERAEUME_OPTION') && CIS_SAALPLAN_ALLERAEUME_OPTION)
+		    echo '<option value="stpl_week.php?type=ort&amp;ort_kurzbz=all" value="all">'.$p->t('lvplan/alleRaeume').'</option>';
+		
+		
+		    
         for ($i=0;$i<$num_rows_ort;$i++)
 		{
 			$row=$db->db_fetch_object ($result_ort, $i);
