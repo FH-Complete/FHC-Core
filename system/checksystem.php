@@ -2256,6 +2256,17 @@ if(!$result = @$db->db_query("SELECT anmerkung FROM lehre.tbl_pruefung LIMIT 1;"
 		echo ' lehre.tbl_pruefung: Spalte anmerkung hinzugefuegt!<br>';
 }
 
+// Spalte max_teilnehmer in public.tbl_benutzerrolle
+if(!$result = @$db->db_query("SELECT max_teilnehmer FROM public.tbl_reihungstest LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_reihungstest ADD COLUMN max_teilnehmer integer;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_reihungstest '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' public.tbl_reihungstest: Spalte max_teilnehmer hinzugefuegt!<br>';
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
