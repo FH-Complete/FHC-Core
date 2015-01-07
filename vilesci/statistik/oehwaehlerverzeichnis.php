@@ -91,7 +91,7 @@ WHERE
 	AND tbl_student.studiengang_kz!='9".$erhalter_row->erhalter_kz."'
 	AND ka.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND ka.buchungstyp_kurzbz='OEH' AND tbl_student.studiengang_kz=ka.studiengang_kz 
 	AND kb.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND kb.buchungstyp_kurzbz='OEH' AND tbl_student.studiengang_kz=kb.studiengang_kz 
-	AND kb.buchungsnr_verweis=ka.buchungsnr
+	AND kb.buchungsnr_verweis=ka.buchungsnr AND bismelden
 ) a
 ORDER BY person_id";
 
