@@ -105,7 +105,7 @@ if(isset($_POST['schick']))
 		$start = $_POST['start'];
 		$ende = $_POST['ende'];
 		$kostenstelle_id = (isset($_POST['kostenstelle_id'])?$_POST['kostenstelle_id']:'');
-		$anmerkung = $_POST['anmerkung'];
+		$anmerkung = (isset($_POST['anmerkung'])?$_POST['anmerkung']:'');
 		
 		$ber = new benutzerberechtigung();
 		if (isset($_POST['neu']))
