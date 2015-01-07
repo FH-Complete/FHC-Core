@@ -18,11 +18,15 @@
  * Authors: Karl Burkhart <burkhart@technikum-wien.at>,
  */
 require_once("../../../config/cis.config.inc.php");
+require_once('../../../include/basis_db.class.php');
 require_once("../../../include/gebiet.class.php");
 require_once("../../../include/frage.class.php");
 require_once("../../../include/vorschlag.class.php");
 require_once('../../../include/functions.inc.php');
 require_once("../../../include/benutzerberechtigung.class.php");
+
+if (!$db = new basis_db())
+      die('Fehler beim Oeffnen der Datenbankverbindung');
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de">
@@ -84,6 +88,12 @@ if(isset($_REQUEST['AuswahlGebiet']))
 	$gebietdetails = new gebiet();
 	$gebietdetails->load($gebiet_id);
 	
+	$qry = "SELECT DISTINCT UPPER(typ||kurzbz) AS studiengang 
+			FROM testtool.tbl_ablauf JOIN public.tbl_studiengang USING (studiengang_kz)
+			WHERE gebiet_id=".$db->db_add_param($gebiet_id)."
+			ORDER BY studiengang";
+	$result = $db->db_query($qry);
+	
 	if ($gebietdetails)
 	{
 		echo '
@@ -91,6 +101,19 @@ if(isset($_REQUEST['AuswahlGebiet']))
 		<tr>
 			<td align="right">Gebiet:</td>
 			<td>'.$gebietdetails->bezeichnung.'</td>
+		</tr>
+		<tr>
+			<td valign="top">Verwendet in den Studiengängen:</td>
+			<td>';
+			$i=1;
+			while ($row = $db->db_fetch_object($result))
+			{
+				echo $row->studiengang.($db->db_num_rows($result)>1 && $db->db_num_rows($result)>$i?', ':'');
+				$i++;
+				if ($i % 10 == 0)
+					echo '<br>';
+			}
+			echo '</td>
 		</tr>
 		<tr>
 			<td>&nbsp;</td>
