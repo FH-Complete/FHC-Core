@@ -119,28 +119,23 @@ if(isset($_REQUEST['AuswahlGebiet']))
 		<tr>
 			<td align="right">Zufallsvorschlag:</td>
 			<td>'.($gebietdetails->zufallvorschlag==true?'Ja':'Nein').'</td>
-		</tr>';
-		if ($gebietdetails->level_start!='')
-		{
-			echo'
-			<tr>
-				<td align="right">Startlevel:</td>
-				<td>'.$gebietdetails->level_start.'</td>
-			</tr>
-			<tr>
-				<td align="right">Höheres Level nach:</td>
-				<td>'.$gebietdetails->level_sprung_auf.' Fragen</td>
-			</tr>
-			<tr>
-				<td align="right">Niedrigeres Level nach:</td>
-				<td>'.$gebietdetails->level_sprung_ab.' Fragen</td>
-			</tr>
-			<tr>
-				<td align="right">Levelgleichverteilung:</td>
-				<td>'.($gebietdetails->levelgleichverteilung==true?'Ja':'Nein').'</td>
-			</tr>';
-		}
-		echo'
+		</tr>
+		<tr>
+			<td align="right">Startlevel:</td>
+			<td>'.($gebietdetails->level_start!=''?$gebietdetails->level_start:'Keines').'</td>
+		</tr>
+		<tr>
+			<td align="right">Höheres Level nach:</td>
+			<td>'.($gebietdetails->level_sprung_auf!=''?$gebietdetails->level_sprung_auf.' richtigen Antwort(en)':'-').'</td>
+		</tr>
+		<tr>
+			<td align="right">Niedrigeres Level nach:</td>
+			<td>'.($gebietdetails->level_sprung_ab!=''?$gebietdetails->level_sprung_ab.' falschen Antwort(en)':'-').'</td>
+		</tr>
+		<tr>
+			<td align="right">Levelgleichverteilung:</td>
+			<td>'.($gebietdetails->levelgleichverteilung==true?'Ja':'Nein').'</td>
+		</tr>
 		<tr>
 			<td align="right">Maximalpunkte:</td>
 			<td>'.$gebietdetails->maxpunkte.'</td>
