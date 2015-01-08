@@ -2256,7 +2256,7 @@ if(!$result = @$db->db_query("SELECT anmerkung FROM lehre.tbl_pruefung LIMIT 1;"
 		echo ' lehre.tbl_pruefung: Spalte anmerkung hinzugefuegt!<br>';
 }
 
-// Spalte max_teilnehmer in public.tbl_benutzerrolle
+// Spalte max_teilnehmer in public.tbl_reihungstest
 if(!$result = @$db->db_query("SELECT max_teilnehmer FROM public.tbl_reihungstest LIMIT 1"))
 {
 	$qry = "ALTER TABLE public.tbl_reihungstest ADD COLUMN max_teilnehmer integer;";
@@ -2265,6 +2265,17 @@ if(!$result = @$db->db_query("SELECT max_teilnehmer FROM public.tbl_reihungstest
 		echo '<strong>public.tbl_reihungstest '.$db->db_last_error().'</strong><br>';
 	else
 		echo ' public.tbl_reihungstest: Spalte max_teilnehmer hinzugefuegt!<br>';
+}
+
+// Spalte oeffentlich in public.tbl_reihungstest
+if(!$result = @$db->db_query("SELECT oeffentlich FROM public.tbl_reihungstest LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_reihungstest ADD COLUMN oeffentlich boolean NOT NULL DEFAULT FALSE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_reihungstest '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' public.tbl_reihungstest: Spalte oeffentlich hinzugefuegt!<br>';
 }
 
 echo '<br><br><br>';
@@ -2457,7 +2468,7 @@ $tabellen=array(
 	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat","rt_punkte3", "zgvdoktor_code", "zgvdoktorort", "zgvdoktordatum","mentor"),
 	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id","studienplan_id","bestaetigtam","bestaetigtvon","fgm","faktiv"),
 	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung"),
-	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet","max_teilnehmer"),
+	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet","max_teilnehmer","oeffentlich"),
 	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id"),
 	"public.tbl_semesterwochen"  => array("semester","studiengang_kz","wochen"),
 	"public.tbl_service" => array("service_id", "bezeichnung","beschreibung","ext_id","oe_kurzbz","content_id"),
