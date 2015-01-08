@@ -28,7 +28,10 @@ $user = get_uid();
 
 $variable = new variable();
 $variable->loadVariables($user);
-?>
+
+// Syntaxhighlighting in IDE
+if(false): ?> <script type="text/javascript"><?php endif; ?>
+
 // *********** Globale Variablen *****************//
 var StudentSelectID=null; //Student der nach dem Refresh markiert werden soll
 var StudentKontoSelectBuchung=null; //Buchung die nach dem Refresh markiert werden soll

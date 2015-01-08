@@ -971,3 +971,39 @@ table.hoverbox
 	border-color:grey;
 }
 */
+
+body.bewerbung table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+body.bewerbung table.reihungstest {
+	table-layout: fixed;
+}
+
+body.bewerbung table th,
+body.bewerbung table td {
+	padding: 3px;
+	border: 1px solid black;
+	text-align: center;
+}
+
+body.bewerbung table.reihungstest td:nth-child(5) {
+	text-align: left;
+}
+
+body.bewerbung .ui-tabs-vertical .ui-tabs-panel {
+	width: 75em;
+}
+
+body.bewerbung table.reihungstest th:nth-child(1),
+body.bewerbung table.reihungstest th:nth-child(2),
+body.bewerbung table.reihungstest th:nth-child(3),
+body.bewerbung table.reihungstest th:nth-child(4),
+body.bewerbung table.reihungstest th:nth-child(6) {
+	width: 10%;
+}
+
+body.bewerbung table.reihungstest th:nth-child(5) {
+	width: 50%;
+}

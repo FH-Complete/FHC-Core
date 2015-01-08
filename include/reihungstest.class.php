@@ -44,6 +44,8 @@ class reihungstest extends basis_db
 	public $updateamum;		//  timestamp
 	public $updatevon;		//  bigint
 	public $freigeschaltet=false;	//  boolean
+	public $oeffentlich=false;	//  boolean
+	public $max_teilnehmer;	//  integer
 	
 	/**
 	 * Konstruktor
@@ -59,7 +61,7 @@ class reihungstest extends basis_db
 	
 	/**
 	 * Laedt den Reihungstest mit der ID $reihungstest_id
-	 * @param  $sreihungstest_id ID des zu ladenden Reihungstests
+	 * @param  $reihungstest_id ID des zu ladenden Reihungstests
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	public function load($reihungstest_id)
@@ -87,6 +89,8 @@ class reihungstest extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
+				$this->max_teilnehmer = $row->max_teilnehmer;
+				$this->oeffentlich = $row->oeffentlich;
 				$this->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
 				return true;				
 			}
@@ -132,6 +136,8 @@ class reihungstest extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+				$obj->max_teilnehmer = $row->max_teilnehmer;
+				$obj->oeffentlich = $row->oeffentlich;
 				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
 				
 				$this->result[] = $obj;
@@ -189,7 +195,7 @@ class reihungstest extends basis_db
 			//Neuen Datensatz einfuegen
 					
 			$qry='BEGIN; INSERT INTO public.tbl_reihungstest (studiengang_kz, ort_kurzbz, anmerkung, datum, uhrzeit, 
-				ext_id, insertamum, insertvon, updateamum, updatevon, freigeschaltet) VALUES('.
+				ext_id, insertamum, insertvon, updateamum, updatevon, max_teilnehmer, oeffentlich, freigeschaltet) VALUES('.
 			     $this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
 			     $this->db_add_param($this->ort_kurzbz).', '.
 			     $this->db_add_param($this->anmerkung).', '.
@@ -198,6 +204,8 @@ class reihungstest extends basis_db
 			     $this->db_add_param($this->ext_id, FHC_INTEGER).',  now(), '.
 			     $this->db_add_param($this->insertvon).', now(), '.
 			     $this->db_add_param($this->updatevon).','.
+			     $this->db_add_param($this->max_teilnehmer).','.
+			     $this->db_add_param($this->oeffentlich).','.
 			     $this->db_add_param($this->freigeschaltet, FHC_BOOLEAN).');';
 		}
 		else
@@ -211,6 +219,8 @@ class reihungstest extends basis_db
 				'ext_id='.$this->db_add_param($this->ext_id, FHC_INTEGER).', '. 
 		     	'updateamum= now(), '.
 		     	'updatevon='.$this->db_add_param($this->updatevon).', '.
+		     	'max_teilnehmer='.$this->db_add_param($this->max_teilnehmer).', '.
+		     	'oeffentlich='.$this->db_add_param($this->oeffentlich).', '.
 				'freigeschaltet='.$this->db_add_param($this->freigeschaltet, FHC_BOOLEAN).' '.
 				'WHERE reihungstest_id='.$this->db_add_param($this->reihungstest_id, FHC_INTEGER, false).';';					
 		}
@@ -282,6 +292,8 @@ class reihungstest extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+				$obj->max_teilnehmer = $row->max_teilnehmer;
+				$obj->oeffentlich = $row->oeffentlich;
 				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
 				
 				$this->result[] = $obj;
@@ -328,6 +340,8 @@ class reihungstest extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+				$obj->max_teilnehmer = $row->max_teilnehmer;
+				$obj->oeffentlich = $row->oeffentlich;
 				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
 				
 				$this->result[] = $obj;
@@ -343,7 +357,11 @@ class reihungstest extends basis_db
 	
 	public function getStgZukuenftige($stg)
 	{	
-		$qry = "SELECT * from public.tbl_reihungstest where studiengang_kz = ".$this->db_add_param($stg, FHC_INTEGER)." AND datum>=now()-'1 days'::interval;"; 
+		$qry = "SELECT * "
+				. "FROM public.tbl_reihungstest "
+				. "WHERE studiengang_kz = ".$this->db_add_param($stg, FHC_INTEGER)." "
+				. "AND datum>=now()-'1 days'::interval "
+				. "AND oeffentlich;";
 		
 		if($result = $this->db_query($qry))
 		{
@@ -362,6 +380,8 @@ class reihungstest extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+				$obj->max_teilnehmer = $row->max_teilnehmer;
+				$obj->oeffentlich = $row->oeffentlich;
 				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
 				
 				$this->result[] = $obj;
@@ -371,5 +391,17 @@ class reihungstest extends basis_db
 		else
 			return false; 
 	}
+
+	public function getTeilnehmerAnzahl($reihungstest_id) {
+
+		$qry = 'SELECT count(*) AS anzahl '
+				. 'FROM public.tbl_prestudent '
+				. 'WHERE reihungstest_id = ' . $reihungstest_id;
+
+		$result = $this->db_query($qry);
+
+		$obj = $this->db_fetch_object($result);
+
+		return $obj->anzahl;
+	}
 }
-?>

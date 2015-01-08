@@ -96,9 +96,9 @@ if($method=='delete')
 
 if(isset($_GET['rt_id']))
 {
-	
-	$rt_id = isset($_GET['rt_id'])?$_GET['rt_id']:''; 
-	$pre_id = isset($_GET['pre'])?$_GET['pre']:''; 
+
+	$rt_id = filter_input(INPUT_GET, 'rt_id', FILTER_VALIDATE_INT);
+	$pre_id = filter_input(INPUT_GET, 'pre', FILTER_VALIDATE_INT);
 
 	if(isset($_GET['delete']))
 	{
@@ -123,6 +123,14 @@ if(isset($_GET['rt_id']))
 	}
 	else 
 	{
+		$reihungstest = new reihungstest;
+		$reihungstest->load($rt_id);
+
+		if($reihungstest->max_teilnehmer && $reihungstest->getTeilnehmerAnzahl($rt_id) >= $reihungstest->max_teilnehmer)
+		{
+			die("max. Teilnehmeranzahl erreicht.");
+		}
+
 		$timestamp = time();
 		
 		$prestudent = new prestudent(); 
@@ -545,31 +553,31 @@ function activeTab(tab_nr)
 
 function checkKontakt()
 {
-	if($("#telefonnummer").val() == '')
+	if($("#telefonnummer").val() === '')
     {
         alert("Telefonnummer darf nicht leer sein!"); 
         return false; 
     }
 	
-	if($("#email").val() == '')
+	if($("#email").val() === '')
     {
         alert("Email-Adresse darf nicht leer sein!"); 
         return false; 
     }
 	
-	if($("#strasse").val() == '')
+	if($("#strasse").val() === '')
     {
         alert("Strasse darf nicht leer sein!"); 
         return false; 
     }
 	
-	if($("#plz").val() == '')
+	if($("#plz").val() === '')
     {
         alert("Postleitzahl darf nicht leer sein!"); 
         return false; 
     }
 	
-	if($("#ort").val() == '')
+	if($("#ort").val() === '')
     {
         alert("Ort darf nicht leer sein!"); 
         return false; 
@@ -580,24 +588,24 @@ function checkKontakt()
 
 function checkPerson()
 {
-    if($("#nachname").val() == '')
+    if($("#nachname").val() === '')
     {
         alert("Ungültiger Nachname!"); 
         return false; 
     }
-    if($("#vorname").val() == '')
+    if($("#vorname").val() === '')
     {
         alert("Ungültiger Vorname!"); 
         return false; 
     }
     
-    if($("#staatsbuergerschaft").val() == '')
+    if($("#staatsbuergerschaft").val() === '')
     {
         alert("Bitte Staatsbürgerschaft auswählen");
         return false; 
     }
 
-    if($("#gebdatum").val() != '')
+    if($("#gebdatum").val() !== '')
     {
         var patt1=new RegExp("([0-9]{1,2}).([0-9]{1,2}).([0-9]{4})");
         if(!patt1.test($("#gebdatum").val()))
@@ -608,9 +616,9 @@ function checkPerson()
     }
 	
 	// Berechnung der Sozialversicherungsnummer wenn AT
-	if($("#staatsbuergerschaft").val() == 'A')
+	if($("#staatsbuergerschaft").val() === 'A')
     {
-		if($("#svnr").val().length != '10')
+		if($("#svnr").val().length !== '10')
         {
             alert("Ungültige Sozialversicherungsnummer!"); 
             return false; 
@@ -619,10 +627,10 @@ function checkPerson()
 		var checksum = 0; 
 		var soz_nr = $("#svnr").val(); 
 		
-		checksum = (3*soz_nr[0])+(7*soz_nr[1])+(9*soz_nr[2])+(5*soz_nr[4])+(8*soz_nr[5])+(4*soz_nr[6])+(2*soz_nr[7])+(1*soz_nr[8])+(6*soz_nr[9])
+		checksum = (3*soz_nr[0])+(7*soz_nr[1])+(9*soz_nr[2])+(5*soz_nr[4])+(8*soz_nr[5])+(4*soz_nr[6])+(2*soz_nr[7])+(1*soz_nr[8])+(6*soz_nr[9]);
 		checksum = checksum%11; 
 		
-		if(checksum != soz_nr[3])
+		if(checksum !== soz_nr[3])
 		{
 			alert("Ungültige Sozialversicherungsnummer!"); 
 			return false; 
@@ -724,23 +732,23 @@ padding: 5px;
 </style>
 
 </head>
-<body>
+<body class="bewerbung">
 <div id="tabs" style="width:auto">
 	<div id="tabs-0" style="width:100%">    
-    <ul>
-        <li><a href="#tabs-1">&gt;|1| Allgemein <br> </a></li>
-        <li><a href="#tabs-2">&gt;|2| Persönliche Daten <br> <?php echo $status_person_text;?></a></li>
-        <!--<li><a href="#tabs-3">&gt;|3| Zugangsvoraussetzungen<br> <?php echo $status_zgv_text; ?></a></li>-->
-        <li><a href="#tabs-4">&gt;|3| Kontaktinformationen <br> <?php echo $status_kontakt_text;?></a></li>
-        <li><a href="#tabs-5">&gt;|4| Dokumente <br> <?php echo $status_dokumente_text;?></a></li>
-        <li><a href="#tabs-6">&gt;|5| Zahlungen <br> <?php echo $status_zahlungen_text;?></a></li>	
-		<li><a href="#tabs-7">&gt;|6| Aufnahmeverfahren <br> <?php echo $status_aufnahmeverfahren_text;?></a></li>	
-        <li><a href="#tabs-8">&gt;|7| Bewerbung abschicken <br> </a></li>
-    </ul>
+		<ul>
+			<li><a href="#tabs-1">&gt;|1| Allgemein <br> </a></li>
+			<li><a href="#tabs-2">&gt;|2| Persönliche Daten <br> <?php echo $status_person_text;?></a></li>
+			<!--<li><a href="#tabs-3">&gt;|3| Zugangsvoraussetzungen<br> <?php //echo $status_zgv_text; ?></a></li>-->
+			<li><a href="#tabs-4">&gt;|3| Kontaktinformationen <br> <?php echo $status_kontakt_text;?></a></li>
+			<li><a href="#tabs-5">&gt;|4| Dokumente <br> <?php echo $status_dokumente_text;?></a></li>
+			<li><a href="#tabs-6">&gt;|5| Zahlungen <br> <?php echo $status_zahlungen_text;?></a></li>
+			<li><a href="#tabs-7">&gt;|6| Aufnahmeverfahren <br> <?php echo $status_aufnahmeverfahren_text;?></a></li>
+			<li><a href="#tabs-8">&gt;|7| Bewerbung abschicken <br> </a></li>
+		</ul>
 	</div>
 <div id="tabs-1">
-<h2>Allgemein</h2>
-<p>Wir freuen uns dass Sie sich für einen oder mehrere unserer Studiengänge bewerben. <br><br>
+	<h2>Allgemein</h2>
+	<p>Wir freuen uns dass Sie sich für einen oder mehrere unserer Studiengänge bewerben. <br><br>
     Bitte füllen Sie das Formular vollständig aus und schicken Sie es danach ab.<br><br>
     <b>Bewerbungsmodus:</b><br>
     <p style="text-align:justify;">Füllen Sie alle Punkte aus. Sind alle Werte vollständig eingetragen, können Sie unter "Bewerbung abschicken" Ihre Bewerbung and die zuständige Assistenz schicken.<br>
@@ -1352,33 +1360,65 @@ $studiengang = new studiengang();
 		$reihungstest = new reihungstest(); 
 		if(!$reihungstest->getStgZukuenftige($row->studiengang_kz))
 			echo "Fehler aufgetreten"; 
-		
+
 		$stg = new studiengang(); 
-		$stg->load($row->studiengang_kz); 
-		echo "<h3>Studiengang ".$stg->bezeichnung."</h3>"; 
-		echo "<table border='1' width='150%'>
+		$stg->load($row->studiengang_kz); ?>
+		<h3>Studiengang <?php echo $stg->bezeichnung ?></h3>
+		<table class="reihungstest">
 		<tr>
-			<th width='10%'>ID</th><th>Datum</th><th>Uhrzeit</th><th>Ort</th><th width='90%'>Studiengang</th><th>&nbsp;</th>
-		</tr>";
-		
+			<th>angemeldet / Plätze</th>
+			<th>Datum</th>
+			<th>Uhrzeit</th>
+			<th>Ort</th>
+			<th title="<?php echo $row->studiengang_kz ?>">Studiengang</th>
+			<th>&nbsp;</th>
+		</tr>
+		<?php
 		foreach($reihungstest->result as $rt)
 		{
+			$teilnehmer_anzahl = $reihungstest->getTeilnehmerAnzahl($rt->reihungstest_id);
+			$spalte1 = $rt->max_teilnehmer ? $teilnehmer_anzahl . '/' . $rt->max_teilnehmer : '';
+
 			// bereits angenommen
 			if($row->reihungstest_id == $rt->reihungstest_id)
 			{
-				$rt_help = true; 
-				echo "<tr style='background-color:lightgrey;'>
-				<td>".$rt->reihungstest_id."</td><td>".$rt->datum."</td><td>".$rt->uhrzeit."</td><td>".$rt->ort_kurzbz."</td><td>".$stg->bezeichnung."</td><td><input type='button' name='btn_stg' value='Stornieren' onclick='location.href=\"".$_SERVER['PHP_SELF']."?active=5&rt_id=".$rt->reihungstest_id."&pre=".$row->prestudent_id."&delete\" '></td>
-				</tr>"; 
+				$rt_help = true; ?>
+				<tr style='background-color:lightgrey;'>
+					<td><?php echo $spalte1 ?></td>
+					<td><?php echo $rt->datum ?></td>
+					<td><?php echo $rt->uhrzeit ?></td>
+					<td><?php echo $rt->ort_kurzbz ?></td>
+					<td><?php echo $stg->bezeichnung ?></td>
+					<td>
+						<input type='button' name='btn_stg'
+							value='Stornieren'
+							onclick='location.href="<?php echo $_SERVER['PHP_SELF'] ?>?active=5&rt_id=<?php echo $rt->reihungstest_id ?>&pre=<?php echo $row->prestudent_id ?>&delete"'>
+					</td>
+				</tr>
+				<?php
 			}
 			else 
 			{
-				echo "<tr>
-				<td>".$rt->reihungstest_id."</td><td>".$rt->datum."</td><td>".$rt->uhrzeit."</td><td>".$rt->ort_kurzbz."</td><td>".$stg->bezeichnung."</td><td><input type='button' name='btn_stg' value='Anmelden' onclick='location.href=\"".$_SERVER['PHP_SELF']."?active=5&rt_id=".$rt->reihungstest_id."&pre=".$row->prestudent_id."\" '></td>
-				</tr>"; 
+				?>
+				<tr>
+					<td><?php echo $spalte1 ?></td>
+					<td><?php echo $rt->datum ?></td>
+					<td><?php echo $rt->uhrzeit ?></td>
+					<td><?php echo $rt->ort_kurzbz ?></td>
+					<td><?php echo $stg->bezeichnung ?></td>
+					<td>
+						<input type='button' name='btn_stg'
+							<?php echo isset($rt->max_teilnehmer) && $teilnehmer_anzahl >= $rt->max_teilnehmer ? 'disabled' : '' ?>
+							value='Anmelden'
+							onclick='location.href="<?php echo $_SERVER['PHP_SELF'] ?>?active=5&rt_id=<?php echo $rt->reihungstest_id ?>&pre=<?php echo $row->prestudent_id ?>"'>
+					</td>
+				</tr>
+				<?php
 			}
 		}
-		echo "</table><br>"; 
+		?>
+		</table><br>
+		<?php
 	}
 
 	?>
@@ -1465,6 +1505,3 @@ function sendBewerbung($prestudent_id)
 		return true; 
     
 }
-
-?>
-
