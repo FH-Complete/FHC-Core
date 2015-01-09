@@ -513,16 +513,16 @@ if($frage->frage_id!='')
 		if($nextfrage)
 		{
 			if($demo)
-				$value=$p->t('testtool/demo');
+				$value='';
 			else 
-				$value=$p->t('testtool/blaettern');
+				$value=$p->t('testtool/blaettern').' &gt;&gt;';
 			
-			echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$nextfrage' class='Item'>$value &gt;&gt;</a>";
+			echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$nextfrage' class='Item'>$value</a>";
 		}
 		else
 		{
-			if($demo)
-			{
+			if(!$demo)
+			/*{
 				$qry = "SELECT count(*) as anzahl FROM testtool.tbl_frage 
 						WHERE tbl_frage.gebiet_id=".$db->db_add_param($gebiet_id, FHC_INTEGER)." 
 						AND demo ";
@@ -531,18 +531,18 @@ if($frage->frage_id!='')
 					if($row->anzahl>1)
 					{
 						//Bei Demos den Weiter-Button nur anzeigen, wenn ausser der Startseite noch andere Demoseiten vorhanden sind
-						echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id' class='Item'>".$p->t("testtool/startseite")." &gt;&gt;</a>";
+						echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id' class='Item'>".$p->t("testtool/zurueckZurStartseite")." &gt;&gt;</a>";
 					}
 				}
-			}
-			else
+			}*/
+			//else
 			{
 				//Wenns der letzte Eintrag ist, wieder zum ersten springen
 				echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id' class='Item'>".$p->t('testtool/blaettern')." &gt;&gt;</a>";
 			}
 		}
 	}
-	else 
+	/*else 
 	{
 		//Naechste Frage holen und Weiter-Button anzeigen
 		if($demo)
@@ -570,12 +570,12 @@ if($frage->frage_id!='')
 					if($row->anzahl>1)
 					{
 						//Bei Demos den Weiter-Button nur anzeigen, wenn ausser der Startseite noch andere Demoseiten vorhanden sind
-						echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id' class='Item'>".$p->t("testtool/startseite")." &gt;&gt;</a>";
+						echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id' class='Item'>".$p->t("testtool/zurueckZurStartseite")." &gt;&gt;</a>";
 					}
 				}
 			}
 		}
-	}
+	}*/
 	if(!$demo && !$levelgebiet)
 		echo " </tr></table>";
 	
@@ -679,6 +679,34 @@ if($frage->frage_id!='')
 	if(!$demo)
 	{
 		echo '<input style="width:180px; white-space:normal" type="submit" name="submitantwort" value="'.$p->t('testtool/speichernUndWeiter').'" />';
+	}
+	else
+	{
+		$frage2 = new frage();
+		$nextfrage = $frage2->getNextFrage($gebiet_id, $_SESSION['pruefling_id'], $frage_id, $demo);
+
+		if($nextfrage)
+		{
+			echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$nextfrage' class='Item'>".$p->t("testtool/demo")."</a>";
+		}
+		else
+		{
+			//Naechste Frage holen und Weiter-Button anzeigen
+			//$frage = new frage();
+			//$nextfrage = $frage->getNextFrage($gebiet_id, $_SESSION['pruefling_id'], $frage_id, $demo);
+			
+			$qry = "SELECT count(*) as anzahl FROM testtool.tbl_frage 
+					WHERE tbl_frage.gebiet_id=".$db->db_add_param($gebiet_id, FHC_INTEGER)."
+					AND demo ";
+			if($row = $db->db_fetch_object($db->db_query($qry)))
+			{
+				if($row->anzahl>1)
+				{
+					//Bei Demos den Weiter-Button nur anzeigen, wenn ausser der Startseite noch andere Demoseiten vorhanden sind
+					echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id' class='Item'>".$p->t("testtool/zurueckZurStartseite")."</a>";
+				}
+			}
+		}
 	}
 	echo "</form>";
 	echo '<br/><br/><br/>';
