@@ -247,6 +247,7 @@ if(empty($lehrveranstaltung->lehrveranstaltungen) && !$rechte->isBerechtigt('leh
                                             <th>bis</th>
                                             <th>min. Teilnehmer</th>
                                             <th>max. Teilnehmer</th>
+					    <th>Sammelklausur</th>
 					    <th></th>
                                         </tr>
                                     </thead>
@@ -267,6 +268,12 @@ if(empty($lehrveranstaltung->lehrveranstaltungen) && !$rechte->isBerechtigt('leh
                                             <td>
                                                 <input type="number" id="termin1max" placeholder="10" min="0" name="termin1maxTeilnehmer[]">
                                             </td>
+					    <td>
+                                                <input type="number" id="termin1max" placeholder="10" min="0" name="termin1maxTeilnehmer[]">
+                                            </td>
+					    <td>
+						<input id="termin1sammelklausur" type="checkbox" name="sammelklausur">
+					    </td>
                                         </tr>
                                     </tbody>
                                 </table>

@@ -823,8 +823,20 @@ function getAllFreieRaeume($terminId)
     $datum_bis = explode(" ", $pruefungstermin->bis);
     $teilnehmer = $pruefungstermin->getNumberOfParticipants();
     $teilnehmer = $teilnehmer !== false ? $teilnehmer : 0;
+    $pruefungstermin->getAll($pruefungstermin->von, $pruefungstermin->bis, TRUE);
+    
     if($ort->search($datum_von[0], $datum_von[1], $datum_bis[1], null, $teilnehmer, true))
     {	
+	foreach($pruefungstermin->result as $termin)
+	{
+	    if($termin->pruefungstermin_id != $pruefungstermin->pruefungstermin_id && !is_null($termin->ort_kurzbz))
+	    {
+		$o = new ort($termin->ort_kurzbz);
+		$o->ort_kurzbz .= " (Sammelklausur)";
+		array_push($ort->result, $o);
+	    }
+	}
+	
 	usort($ort->result, "compareRaeume");
 	$data['result']=$ort->result;
 	$data['error']='false';
@@ -863,7 +875,7 @@ function saveRaum($terminId, $ort_kurzbz, $uid)
 	if($reservierung->isReserviert($ort_kurzbz, $datum_von[0], $h))
 	    $reserviert = true;
     }
-    if(!$reserviert)
+    if(!$reserviert || $pruefungstermin->sammelklausur == TRUE)
     {	
 	$pruefung = new pruefungCis($pruefungstermin->pruefung_id);
 	$mitarbeiter = new mitarbeiter($pruefung->mitarbeiter_uid);
