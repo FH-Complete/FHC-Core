@@ -37,6 +37,7 @@ class pruefungstermin extends basis_db{
     public $anmeldung_von;	    //date
     public $anmeldung_bis;	    //date
     public $ort_kurzbz;		    //varchar(16)
+    public $sammelklausur;		//boolean
     
     /**
      * Konstruktor
@@ -92,6 +93,7 @@ class pruefungstermin extends basis_db{
 		$this->anmeldung_von= $row->anmeldung_von;
                 $this->anmeldung_bis = $row->anmeldung_bis;
 		$this->ort_kurzbz = $row->ort_kurzbz;
+		$this->sammelklausur = $row->sammelklausur;
             }
             return true;
         }
@@ -184,5 +186,55 @@ class pruefungstermin extends basis_db{
 	}
 	
 	return false;
+    }
+    
+    /**
+     * lädt alle Prüfungstermine
+     */
+    public function getAll($beginn=NULL, $ende=NULL, $sammelklausur=NULL)
+    {
+	$qry = 'SELECT * FROM campus.tbl_pruefungstermin';
+	
+	if(!is_null($beginn) && !is_null($ende))
+	{
+	    $qry .= ' WHERE von <='.$this->db_add_param($beginn).' '
+		. 'AND bis >='.$this->db_add_param($ende);
+	}
+	if(!is_null($sammelklausur) && !is_null($beginn))
+	{
+	    $qry .= ' AND sammelklausur='.$this->db_add_param($sammelklausur);
+	}
+	else
+	{
+	    $qry .= ' WHERE sammelklausur='.$this->db_add_param($sammelklausur);
+	}
+	
+	$qry .= ';';
+	
+	if($this->db_query($qry))
+	{
+	    while($row = $this->db_fetch_object())
+            {
+		$obj = new stdClass();
+		$obj->pruefungstermin_id = $row->pruefungstermin_id;
+                $obj->pruefung_id = $row->pruefung_id;
+                $obj->von = $row->von;
+                $obj->bis = $row->bis;
+                $obj->teilnehmer_max = $row->teilnehmer_max;
+                $obj->teilnehmer_min = $row->teilnehmer_min;
+		$obj->anmeldung_von= $row->anmeldung_von;
+                $obj->anmeldung_bis = $row->anmeldung_bis;
+		$obj->ort_kurzbz = $row->ort_kurzbz;
+		$obj->sammelklausur = $row->sammelklausur;
+		array_push($this->result, $obj);
+	    }
+	    return true;
+	}
+	else
+	{
+	    $this->errormsg = 'Termine konnten nicht geladen werden.';
+	    return false;
+	}
+	
     }
 }

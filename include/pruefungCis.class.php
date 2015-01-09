@@ -200,7 +200,7 @@ class pruefungCis extends basis_db
                         }
                         foreach ($this->termine as $termin)
                         {
-                            if(!$this->saveTerminPruefung($this->pruefung_id, $termin->beginn, $termin->ende, $termin->max, $termin->min))
+                            if(!$this->saveTerminPruefung($this->pruefung_id, $termin->beginn, $termin->ende, $termin->max, $termin->min, $termin->sammelklausur))
                             {
                                 $this->errormsg = 'Fehler beim Speichern der Termine.';
                                 $this->db_query('ROLLBACK');
@@ -417,7 +417,7 @@ class pruefungCis extends basis_db
      * @param type $min minimale Teilnehmerzahl
      * @return boolean true, wenn ok; false im Fehlerfall
      */
-    public function saveTerminPruefung($pruefung_id, $beginn, $ende, $max, $min)
+    public function saveTerminPruefung($pruefung_id, $beginn, $ende, $max, $min, $sammelklausur)
     {
         if(!is_numeric($pruefung_id))
         {
@@ -425,12 +425,13 @@ class pruefungCis extends basis_db
             return false;
         }
         
-        $qry = 'INSERT INTO campus.tbl_pruefungstermin (pruefung_id, von, bis, teilnehmer_max, teilnehmer_min) VALUES ('
+        $qry = 'INSERT INTO campus.tbl_pruefungstermin (pruefung_id, von, bis, teilnehmer_max, teilnehmer_min, sammelklausur) VALUES ('
                 . $this->db_add_param($pruefung_id).', '
                 . $this->db_add_param($beginn).', '
                 . $this->db_add_param($ende).', '
                 . $this->db_add_param($max).', '
-                . $this->db_add_param($min).');';
+                . $this->db_add_param($min).', '
+		. $this->db_add_param($sammelklausur).');';
         
         if(!$this->db_query($qry))
         {
@@ -462,6 +463,7 @@ class pruefungCis extends basis_db
 		$obj->anmeldung_von= $row->anmeldung_von;
                 $obj->anmeldung_bis = $row->anmeldung_bis;
 		$obj->ort_kurzbz = $row->ort_kurzbz;
+		$obj->sammelklausur = $row->sammelklausur;
                 array_push($this->termine, $obj);
             }
             return true;

@@ -62,12 +62,12 @@ function terminHinzufuegen(htmlTag)
 	{
 		case 'input':
 			var count = $("#prfTermin tr").length+1;
-			$("#prfTermin").append('<tr id="row'+count+'"><td><input type="text" id="termin'+count+'" name="termin[]"></td><td><input type="time" id="termin'+count+'Beginn" placeholder="00:00" name="termin'+count+'Beginn[]"></td><td><input type="time" id="termin'+count+'Ende" placeholder="00:00" name="termin'+count+'Ende[]"></td><td><input type="number" id="termin'+count+'min" placeholder="0" min="0" name="termin'+count+'minTeilnehmer[]"></td><td><input type="number" id="termin'+count+'max" placeholder="10" min="0" name="termin'+count+'maxTeilnehmer[]"></td></tr>');
+			$("#prfTermin").append('<tr id="row'+count+'"><td><input type="text" id="termin'+count+'" name="termin[]"></td><td><input type="time" id="termin'+count+'Beginn" placeholder="00:00" name="termin'+count+'Beginn[]"></td><td><input type="time" id="termin'+count+'Ende" placeholder="00:00" name="termin'+count+'Ende[]"></td><td><input type="number" id="termin'+count+'min" placeholder="0" min="0" name="termin'+count+'minTeilnehmer[]"></td><td><input type="number" id="termin'+count+'max" placeholder="10" min="0" name="termin'+count+'maxTeilnehmer[]"></td><td><input id="termin'+count+'sammelklausur" type="checkbox" name="sammelklausur"></td></tr>');
 			setDatePicker();
 			break;
 		case 'span':
 			var count = $("#prfTermin tr").length+1;
-			$("#prfTermin").append('<tr id="row'+count+'"><td><span style="visibility: hidden;" id="termin'+count+'Id"></span><span id="termin'+count+'" name="termin[]"></span></td><td><span id="termin'+count+'Beginn" name="termin'+count+'Beginn[]"></span></td><td><span id="termin'+count+'Ende" name="termin'+count+'Ende[]"></span></td><td><span id="termin'+count+'min" name="termin'+count+'minTeilnehmer[]"></span></td><td><span id="termin'+count+'max" name="termin'+count+'maxTeilnehmer[]"></span></td></tr>');
+			$("#prfTermin").append('<tr id="row'+count+'"><td><span style="visibility: hidden;" id="termin'+count+'Id"></span><span id="termin'+count+'" name="termin[]"></span></td><td><span id="termin'+count+'Beginn" name="termin'+count+'Beginn[]"></span></td><td><span id="termin'+count+'Ende" name="termin'+count+'Ende[]"></span></td><td><span id="termin'+count+'min" name="termin'+count+'minTeilnehmer[]"></span></td><td><span id="termin'+count+'max" name="termin'+count+'maxTeilnehmer[]"></span></td><td><span id="termin'+count+'sammelklausur" name="termin'+count+'sammelklausur"></td></tr>');
 			break;
 	}
 	
@@ -1065,6 +1065,9 @@ function savePruefungstermin()
 				case 4:
 					termin.max = $(w).val();
 					break;
+				case 5:
+					termin.sammelklausur = $(w).prop("checked");
+					break;
 			}
 		});
 		if(!checkTermin(termin))
@@ -1353,6 +1356,14 @@ function loadPruefungsDetails(prfId)
 								$("#termin"+j+"Ende").text(bis);
 								$("#termin"+j+"min").text(min);
 								$("#termin"+j+"max").text(max);
+								if(t.sammelklausur)
+								{
+									$("#termin"+j+"sammelklausur").text("true");
+								}
+								else
+								{
+									$("#termin"+j+"sammelklausur").text("false");
+								}
 								$("#termin"+j+"Id").closest("tr").append("<td><a href='#' onclick='terminLoeschen(\""+d.pruefung.pruefung_id+"\", \""+t.pruefungstermin_id+"\");'>löschen</a></td>");
 								terminHinzufuegen("span");
 							}
@@ -1458,6 +1469,9 @@ function updatePruefung(prfId)
 				case 5:
 					termin.max = $(w).text();
 					break;
+				case 6:
+					termin.sammelklausur = $(w).prop("checked");
+					break;
 			}
 		});
 		if(!checkTermin(termin))
@@ -1495,6 +1509,9 @@ function updatePruefung(prfId)
 					break;
 				case 4:
 					termin.max = $(w).val();
+					break;
+				case 5:
+					termin.sammelklausur = $(w).prop("checked");
 					break;
 			}
 		});

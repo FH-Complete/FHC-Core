@@ -229,6 +229,7 @@ function savePruefungstermin($uid, $studiensemester_kurzbz, $pruefungsfenster_id
 	$termin->max = $t["max"];
 	$termin->beginn = date('Y-m-d H:i', strtotime($date." ".$beginn));
 	$termin->ende = date('Y-m-d H:i', strtotime($date." ".$ende));
+	$termin->sammelklausur = $t["sammelklausur"];
 //	if(checkTerminPruefungsfenster($pruefungsfenster_id, $date))
 //	{
 	    if(!(checkCollision($uid, $termin->beginn, $termin->ende)))
@@ -372,6 +373,7 @@ function updatePruefungstermin($uid, $pruefung_id, $studiensemester_kurzbz, $pru
 	    $termin->max = $t["max"];
 	    $termin->beginn = date('Y-m-d H:i', strtotime($date." ".$beginn));
 	    $termin->ende = date('Y-m-d H:i', strtotime($date." ".$ende));
+	    $termin->sammelklausur = $t["sammelklausur"];
 //	    if(checkTerminPruefungsfenster($pruefungsfenster_id, $date))
 //	    {
 		if(!(checkCollision($uid, $termin->beginn, $termin->ende)))
@@ -394,7 +396,7 @@ function updatePruefungstermin($uid, $pruefung_id, $studiensemester_kurzbz, $pru
 	}
 	foreach ($termineNeuArray as $t)
 	{
-	    $pruefung->saveTerminPruefung($pruefung_id, $t->beginn, $t->ende, $t->max, $t->min);
+	    $pruefung->saveTerminPruefung($pruefung_id, $t->beginn, $t->ende, $t->max, $t->min, $t->sammelklausur);
 	}
     }
     
