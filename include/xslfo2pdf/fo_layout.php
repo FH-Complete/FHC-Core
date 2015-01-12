@@ -76,6 +76,7 @@ class FO_LayoutObject extends FO_FlowContainer {
   	$str = str_replace('Š','S',$str);
   	$str = str_replace('š','s',$str);
   	$str = str_replace('ň','n',$str);
+  	$str = str_replace('ń','n',$str);
   	$str = str_replace('ř','r',$str);
   	$str = utf8_decode($str);
   	//echo str_replace('EURO',chr(128),utf8_decode($str));
