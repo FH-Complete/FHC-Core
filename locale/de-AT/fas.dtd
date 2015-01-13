@@ -208,8 +208,12 @@
 <!ENTITY menu-dokumente-diplsupplement.accesskey	"S">
 
 <!ENTITY menu-dokumente-ausbildungsvertrag.key		"A">
-<!ENTITY menu-dokumente-ausbildungsvertrag.label	"Ausbildungsvertrag">
+<!ENTITY menu-dokumente-ausbildungsvertrag.label	"Ausbildungsvertrag Deutsch">
 <!ENTITY menu-dokumente-ausbildungsvertrag.accesskey	"A">
+
+<!ENTITY menu-dokumente-ausbildungsvertrag_englisch.key		"U">
+<!ENTITY menu-dokumente-ausbildungsvertrag_englisch.label	"Ausbildungsvertrag Englisch">
+<!ENTITY menu-dokumente-ausbildungsvertrag_englisch.accesskey	"U">
 
 <!ENTITY menu-dokumente-studienerfolg.label	"Studienerfolgsbestaetigung">
 <!ENTITY menu-dokumente-studienerfolg.accesskey	"E">
