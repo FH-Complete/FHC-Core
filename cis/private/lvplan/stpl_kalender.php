@@ -119,7 +119,7 @@ if(!isset($begin))
 	$datum_obj = new datum();
 	$diff = $datum_obj->DateDiff($objSS->ende, date('Y-m-d H:i:s'));
 	
-	if($diff<=30 & $diff>0)
+	if($diff>=-30)
 	{
 		$objSS->getNextFrom($ss);
 		$ende = $datum_obj->mktime_fromdate($objSS->ende);
