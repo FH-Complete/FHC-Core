@@ -170,7 +170,7 @@ class datum
 		$datetime1 = new DateTime($datum1);
 		$datetime2 = new DateTime($datum2);
 		$interval = $datetime1->diff($datetime2);
-		return $interval->format('%R%d');
+		return $interval->format('%R%a');
 	}
 
 	/**
