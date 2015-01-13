@@ -64,6 +64,7 @@ if($student_help->load($uid))
     }
     echo "\t<studiengang_typ>".$studTyp."</studiengang_typ>\n";
     echo "\t<studiengang>".$studiengang->bezeichnung."</studiengang>\n";
+    echo "\t<studiengang_englisch>".$studiengang->english."</studiengang_englisch>\n";
 }
 
 foreach($uid_arr as $uid)
