@@ -58,6 +58,10 @@ foreach($vertrag->result as $row)
 	$oRdf->obj[$i]->setAttribut('datum',$datum_obj->formatDatum($row->datum,'d.m.Y H:i'),true);
 	$oRdf->obj[$i]->setAttribut('datum_iso',$row->datum,true);	
 	$oRdf->obj[$i]->setAttribut('uid',$row->uid,true);
+	$oRdf->obj[$i]->setAttribut('insertvon', $row->insertvon, true);
+	$oRdf->obj[$i]->setAttribut('insertamum', $row->insertamum, true);
+	$oRdf->obj[$i]->setAttribut('updatevon', $row->updatevon, true);
+	$oRdf->obj[$i]->setAttribut('updateamum', $row->updateamum, true);
 
 	$oRdf->addSequence($key);
 }

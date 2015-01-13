@@ -233,6 +233,22 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<treecol id="mitarbeiter-vertrag-tree-vertragsstatus-vertragsstatus_kurzbz" label="VertragsstatusKurzbz" flex="1" hidden="true"
 						class="sortDirectionIndicator"
 						sort="rdf:http://www.technikum-wien.at/vertragsstatus/rdf#vertragsstatus_kurzbz" />
+					<splitter class="tree-splitter"/>
+					<treecol id="mitarbeiter-vertrag-tree-vertragsstatus-insertvon" label="insertvon" flex="1" hidden="true"
+						class="sortDirectionIndicator"
+						sort="rdf:http://www.technikum-wien.at/vertragsstatus/rdf#insertvon" />
+					<splitter class="tree-splitter"/>
+					<treecol id="mitarbeiter-vertrag-tree-vertragsstatus-insertamum" label="insertamum" flex="1" hidden="true"
+						class="sortDirectionIndicator"
+						sort="rdf:http://www.technikum-wien.at/vertragsstatus/rdf#insertamum" />
+					<splitter class="tree-splitter"/>
+					<treecol id="mitarbeiter-vertrag-tree-vertragsstatus-updatevon" label="updatevon" flex="1" hidden="true"
+						class="sortDirectionIndicator"
+						sort="rdf:http://www.technikum-wien.at/vertragsstatus/rdf#updatevon" />
+					<splitter class="tree-splitter"/>
+					<treecol id="mitarbeiter-vertrag-tree-vertragsstatus-updateamum" label="updateamum" flex="1" hidden="true"
+						class="sortDirectionIndicator"
+						sort="rdf:http://www.technikum-wien.at/vertragsstatus/rdf#updateamum" />
 
 				</treecols>
 
@@ -245,6 +261,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								<treecell label="rdf:http://www.technikum-wien.at/vertragsstatus/rdf#vertrag_id"/>
 								<treecell label="rdf:http://www.technikum-wien.at/vertragsstatus/rdf#uid"/>
 								<treecell label="rdf:http://www.technikum-wien.at/vertragsstatus/rdf#vertragsstatus_kurzbz"/>
+								<treecell label="rdf:http://www.technikum-wien.at/vertragsstatus/rdf#insertvon"/>
+								<treecell label="rdf:http://www.technikum-wien.at/vertragsstatus/rdf#insertamum"/>
+								<treecell label="rdf:http://www.technikum-wien.at/vertragsstatus/rdf#updatevon"/>
+								<treecell label="rdf:http://www.technikum-wien.at/vertragsstatus/rdf#updateamum"/>
 							</treerow>
 						</treeitem>
 					</treechildren>

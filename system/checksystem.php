@@ -2278,6 +2278,50 @@ if(!$result = @$db->db_query("SELECT oeffentlich FROM public.tbl_reihungstest LI
 		echo ' public.tbl_reihungstest: Spalte oeffentlich hinzugefuegt!<br>';
 }
 
+// Spalte insertvon in lehre.tbl_vertrag_vertragsstatus
+if(!$result = @$db->db_query("SELECT insertvon FROM lehre.tbl_vertrag_vertragsstatus LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_vertrag_vertragsstatus ADD COLUMN insertvon varchar(32);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_vertrag_vertragsstatus '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' lehre.tbl_vertrag_vertragsstatus: Spalte insertvon hinzugefuegt!<br>';
+}
+
+// Spalte updatevon in lehre.tbl_vertrag_vertragsstatus
+if(!$result = @$db->db_query("SELECT updatevon FROM lehre.tbl_vertrag_vertragsstatus LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_vertrag_vertragsstatus ADD COLUMN updatevon varchar(32);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_vertrag_vertragsstatus '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' lehre.tbl_vertrag_vertragsstatus: Spalte updatevon hinzugefuegt!<br>';
+}
+
+// Spalte insertamum in lehre.tbl_vertrag_vertragsstatus
+if(!$result = @$db->db_query("SELECT insertamum FROM lehre.tbl_vertrag_vertragsstatus LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_vertrag_vertragsstatus ADD COLUMN insertamum timestamp without time zone DEFAULT now();";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_vertrag_vertragsstatus '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' lehre.tbl_vertrag_vertragsstatus: Spalte insertamum hinzugefuegt!<br>';
+}
+
+// Spalte updateamum in lehre.tbl_vertrag_vertragsstatus
+if(!$result = @$db->db_query("SELECT updateamum FROM lehre.tbl_vertrag_vertragsstatus LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_vertrag_vertragsstatus ADD COLUMN updateamum timestamp without time zone;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_vertrag_vertragsstatus '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' lehre.tbl_vertrag_vertragsstatus: Spalte updateamum hinzugefuegt!<br>';
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(

@@ -617,6 +617,10 @@ class vertrag extends basis_db
 				$obj->vertragsstatus_bezeichnung = $row->bezeichnung;
 				$obj->datum = $row->datum;
 				$obj->uid = $row->uid;
+				$obj->insertvon = $row->insertvon;
+				$obj->insertamum = $row->insertamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->updateamum = $row->updateamum;
 
 				$this->result[] = $obj;
 			}
@@ -636,11 +640,14 @@ class vertrag extends basis_db
 	
 		if($new)
 		{
-			$qry = "INSERT INTO lehre.tbl_vertrag_vertragsstatus(vertragsstatus_kurzbz, vertrag_id, uid, datum) VALUES(".
+			$qry = "INSERT INTO lehre.tbl_vertrag_vertragsstatus(vertragsstatus_kurzbz, vertrag_id, uid, datum, insertvon, updatevon, updateamum) VALUES(".
 					$this->db_add_param($this->vertragsstatus_kurzbz).','.
 					$this->db_add_param($this->vertrag_id).','.
 					$this->db_add_param($this->uid).','.
-					$this->db_add_param($this->datum).');';
+					$this->db_add_param($this->datum).','.
+					$this->db_add_param($this->insertvon).','.
+					$this->db_add_param($this->updatevon).','.
+					$this->db_add_param($this->updateamum).');';
 		}
 		else
 		{
