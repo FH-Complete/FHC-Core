@@ -101,7 +101,7 @@ if (!$db = new basis_db())
 					var html = "";
 					data.result.forEach(function(option)
 					{
-						html+="<option value='"+ option.lehrveranstaltung_id +"'>"+ option.bezeichnung +"</option>";
+						html+="<option value='"+ option.lehrveranstaltung_id +"'>"+ option.bezeichnung + " (" + option.lehrveranstaltung_id + "/" + option.oe_kurzbz + ") </option>";
 					});
 					$("#lvDropdown").html(html);
 				});
