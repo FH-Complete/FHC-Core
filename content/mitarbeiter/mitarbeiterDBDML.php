@@ -569,6 +569,7 @@ if(!$error)
 			$vertrag->vertragsstatus_kurzbz = $status;
 			$vertrag->datum = date('Y-m-d H:i:s');
 			$vertrag->uid = $user;
+			$vertrag->insertvon = $user;
 			
 			if($vertrag->saveVertragsstatus(true))
 			{
