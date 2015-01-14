@@ -582,6 +582,37 @@ if(!$error)
 			}
 		}
 	}
+	elseif(isset($_POST['type']) && $_POST['type']=='vertragsstatusupdate')
+	{
+		if(!$rechte->isBerechtigt('vertrag/mitarbeiter',null,'suid'))
+		{
+			$return = false;
+			$errormsg = 'Sie haben keine Berechtigung für diesen Vorgang';
+		}
+		else
+		{
+			$vertrag_id = filter_input(INPUT_POST, "vertrag_id");
+			$status = filter_input(INPUT_POST, "status");
+			$datum = filter_input(INPUT_POST, "datum");
+			
+			$vertrag = new vertrag($vertrag_id);
+			$vertrag->getStatus($vertrag_id,$status);
+			
+			$vertrag->datum = $datum;
+			$vertrag->updatevon = $user;
+			$vertrag->updateamum = date('Y-m-d H:i:s');
+			
+			if($vertrag->saveVertragsstatus(false))
+			{
+				$return=true;	
+			}
+			else
+			{
+				$return = false; 
+				$errormsg = $vertrag->errormsg;
+			}
+		}
+	}
 	elseif(isset($_POST['type']) && $_POST['type']=='vertragsdetaildelete')
 	{
 		if(!$rechte->isBerechtigt('vertrag/mitarbeiter',null,'suid'))

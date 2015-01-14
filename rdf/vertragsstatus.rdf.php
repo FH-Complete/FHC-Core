@@ -39,32 +39,60 @@ if(isset($_GET['vertrag_id']))
 else
 	die('Falsche Parameterübergabe');
 
+$vertragsstatus_kurzbz = filter_input(INPUT_GET, "vertragsstatus_kurzbz");
+
 $datum_obj = new datum();
 
 $vertrag = new vertrag();
-if(!$vertrag->getAllStatus($vertrag_id))
-	die('Fehlgeschlagen:'.$vertrag->errormsg);
 
-$oRdf = new rdf('VER','http://www.technikum-wien.at/vertragsstatus');
-$oRdf->sendHeader();
+if(is_bool($vertragsstatus_kurzbz) || is_null($vertragsstatus_kurzbz))
+{
+    if(!$vertrag->getAllStatus($vertrag_id))
+	    die('Fehlgeschlagen:'.$vertrag->errormsg);
 
-foreach($vertrag->result as $row)
-{	
-	$key = $row->vertragsstatus_kurzbz.'/'.$row->vertrag_id;
-	$i=$oRdf->newObjekt($key);
-	$oRdf->obj[$i]->setAttribut('vertrag_id',$row->vertrag_id,true);
-	$oRdf->obj[$i]->setAttribut('vertragsstatus_kurzbz',$row->vertragsstatus_kurzbz,true);
-	$oRdf->obj[$i]->setAttribut('vertragsstatus_bezeichnung',$row->vertragsstatus_bezeichnung,true);
-	$oRdf->obj[$i]->setAttribut('datum',$datum_obj->formatDatum($row->datum,'d.m.Y H:i'),true);
-	$oRdf->obj[$i]->setAttribut('datum_iso',$row->datum,true);	
-	$oRdf->obj[$i]->setAttribut('uid',$row->uid,true);
-	$oRdf->obj[$i]->setAttribut('insertvon', $row->insertvon, true);
-	$oRdf->obj[$i]->setAttribut('insertamum', $row->insertamum, true);
-	$oRdf->obj[$i]->setAttribut('updatevon', $row->updatevon, true);
-	$oRdf->obj[$i]->setAttribut('updateamum', $row->updateamum, true);
+    $oRdf = new rdf('VER','http://www.technikum-wien.at/vertragsstatus');
+    $oRdf->sendHeader();
 
-	$oRdf->addSequence($key);
+    foreach($vertrag->result as $row)
+    {	
+	    $key = $row->vertragsstatus_kurzbz.'/'.$row->vertrag_id;
+	    $i=$oRdf->newObjekt($key);
+	    $oRdf->obj[$i]->setAttribut('vertrag_id',$row->vertrag_id,true);
+	    $oRdf->obj[$i]->setAttribut('vertragsstatus_kurzbz',$row->vertragsstatus_kurzbz,true);
+	    $oRdf->obj[$i]->setAttribut('vertragsstatus_bezeichnung',$row->vertragsstatus_bezeichnung,true);
+	    $oRdf->obj[$i]->setAttribut('datum',$datum_obj->formatDatum($row->datum,'d.m.Y H:i'),true);
+	    $oRdf->obj[$i]->setAttribut('datum_iso',$row->datum,true);	
+	    $oRdf->obj[$i]->setAttribut('uid',$row->uid,true);
+	    $oRdf->obj[$i]->setAttribut('insertvon', $row->insertvon, true);
+	    $oRdf->obj[$i]->setAttribut('insertamum', $row->insertamum, true);
+	    $oRdf->obj[$i]->setAttribut('updatevon', $row->updatevon, true);
+	    $oRdf->obj[$i]->setAttribut('updateamum', $row->updateamum, true);
+
+	    $oRdf->addSequence($key);
+    }
 }
+else
+{
+    if(!$vertrag->getStatus($vertrag_id, $vertragsstatus_kurzbz))
+	    die('Fehlgeschlagen:'.$vertrag->errormsg);
+    
+    $oRdf = new rdf('VER','http://www.technikum-wien.at/vertragsstatus');
+    $oRdf->sendHeader();
 
+    $key = $vertrag->vertragsstatus_kurzbz.'/'.$vertrag->vertrag_id;
+    $i=$oRdf->newObjekt($key);
+    $oRdf->obj[$i]->setAttribut('vertrag_id',$vertrag->vertrag_id,true);
+    $oRdf->obj[$i]->setAttribut('vertragsstatus_kurzbz',$vertrag->vertragsstatus_kurzbz,true);
+    $oRdf->obj[$i]->setAttribut('vertragsstatus_bezeichnung',$vertrag->vertragsstatus_bezeichnung,true);
+    $oRdf->obj[$i]->setAttribut('datum',$datum_obj->formatDatum($vertrag->datum,'d.m.Y H:i'),true);
+    $oRdf->obj[$i]->setAttribut('datum_iso',$vertrag->datum,true);	
+    $oRdf->obj[$i]->setAttribut('uid',$vertrag->uid,true);
+    $oRdf->obj[$i]->setAttribut('insertvon', $vertrag->insertvon, true);
+    $oRdf->obj[$i]->setAttribut('insertamum', $vertrag->insertamum, true);
+    $oRdf->obj[$i]->setAttribut('updatevon', $vertrag->updatevon, true);
+    $oRdf->obj[$i]->setAttribut('updateamum', $vertrag->updateamum, true);
+
+    $oRdf->addSequence($key);
+}
 $oRdf->sendRdfText();
 ?>

@@ -38,7 +38,7 @@ class vertrag extends basis_db
 	public $updatevon;			// varchar(32)
 	public $ext_id; 			// bigint     
 	public $anmerkung; 			// text  
-	public $vertragsdatu;		// date
+	public $vertragsdatum;		// date
 
     /**
 	 * Konstruktor
@@ -632,6 +632,58 @@ class vertrag extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Laedt alle Stati eines Vertrags
+	 *
+	 * @param $vertrag_id
+	 * @return boolean
+	 */
+	public function getStatus($vertrag_id, $status=NULL)
+	{
+		$qry="SELECT
+					*
+			FROM 
+				lehre.tbl_vertrag_vertragsstatus
+				JOIN lehre.tbl_vertragsstatus USING(vertragsstatus_kurzbz)
+			WHERE
+				tbl_vertrag_vertragsstatus.vertrag_id=".$this->db_add_param($vertrag_id);
+		
+		if(!is_null($status))
+		{
+		    $qry .= " AND tbl_vertrag_vertragsstatus.vertragsstatus_kurzbz=".$this->db_add_param($status);
+		}
+		
+		$qry .= " ORDER BY datum DESC;";
+
+		if($result = $this->db_query($qry))
+		{
+		    if($row = $this->db_fetch_object($result))
+		    {
+			$this->vertrag_id = $row->vertrag_id;
+			$this->vertragsstatus_kurzbz = $row->vertragsstatus_kurzbz;
+			$this->vertragsstatus_bezeichnung = $row->bezeichnung;
+			$this->datum = $row->datum;
+			$this->uid = $row->uid;
+			$this->insertvon = $row->insertvon;
+			$this->insertamum = $row->insertamum;
+			$this->updatevon = $row->updatevon;
+			$this->updateamum = $row->updateamum;
+			$this->new=false;
+			return true;
+		    }
+		    else
+		    {
+			    $this->errormsg = 'Eintrag wurde nicht gefunden';
+			    return false;
+		    }
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 
 	public function saveVertragsstatus($new=null)
 	{
@@ -651,9 +703,15 @@ class vertrag extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Update not implemented';			
-			return false;
+		    $qry = "UPDATE lehre.tbl_vertrag_vertragsstatus"
+			    . " SET updatevon=".$this->db_add_param($this->updatevon).','
+			    . " updateamum=".$this->db_add_param($this->updateamum).','
+			    . " datum=".$this->db_add_param($this->datum)
+			    . " WHERE vertrag_id=".$this->db_add_param($this->vertrag_id)
+			    . " AND vertragsstatus_kurzbz=".$this->db_add_param($this->vertragsstatus_kurzbz).";";
 		}
+		
+		
 
 		if($this->db_query($qry))
 		{
@@ -662,6 +720,7 @@ class vertrag extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim Speichern der Daten';
+			$this->errormsg = $qry;
 			return false;
 		}
 	}

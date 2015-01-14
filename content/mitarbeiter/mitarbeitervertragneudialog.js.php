@@ -23,7 +23,8 @@ require_once('../../include/functions.inc.php');
 
 $user = get_uid();
 
-?>
+if(false): ?> <script type="text/javascript"><?php endif; ?>
+    
 var MitarbeiterVertragNeuBetragOld=0;
 var addon = Array();
 
