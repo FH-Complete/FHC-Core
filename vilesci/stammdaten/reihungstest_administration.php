@@ -20,7 +20,8 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-require_once('../../config/vilesci.config.inc.php');			
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../config/global.config.inc.php');			
 require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/datum.class.php');
 require_once('../../include/functions.inc.php');

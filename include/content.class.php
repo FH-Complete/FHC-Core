@@ -599,6 +599,7 @@ class content extends basis_db
 				$obj->content_id = $row->content_id;
 				$obj->child_content_id = $row->child_content_id;
 				$obj->sort = $row->sort;
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
 				
 				$this->result[] = $obj;
 			}
@@ -1029,7 +1030,7 @@ class content extends basis_db
 		{
 			$this->errormsg='Fehler beim Ermitteln der hoechsten Version';
 			return false;
-		}			
+		}	
 	}
 	
 	/**
@@ -1275,7 +1276,7 @@ class content extends basis_db
 	public function search($searchItems, $limit=null)
 	{
 		$qry = "SELECT 
-					distinct on(content_id,sprache) *
+					distinct on(content_id,sprache,version) *
 				FROM 
 					campus.tbl_contentsprache
 					JOIN campus.tbl_content USING(content_id)
@@ -1313,6 +1314,7 @@ class content extends basis_db
 				$obj->content = $row->content;
 				$obj->titel = $row->titel;
 				$obj->sprache = $row->sprache;
+				$obj->version = $row->version;
 				
 				$this->result[] = $obj;
 			}
@@ -1492,6 +1494,58 @@ class content extends basis_db
 			}
 			return $childs;
 		}
+	}
+	
+	/**
+	 * Durchsucht das CMS nach Contents (Titel und Content_ID), in denen $searchItems vorkommt. Limit optional.
+	 * 
+	 * @param array $searchItems
+	 * @param $limit (optional)
+	 * @return content_id
+	 */
+	public function searchCMS($searchItems, $limit=null)
+	{
+		$qry = "SELECT 
+					DISTINCT content_id 
+				FROM 
+					campus.tbl_content 
+				WHERE
+					content_id IN
+					(
+						SELECT 
+							DISTINCT ON(content_id,sprache,version) tbl_content.content_id
+						FROM 
+							campus.tbl_contentsprache
+							JOIN campus.tbl_content USING(content_id)
+						WHERE 
+							tbl_content.template_kurzbz<>'news' AND (";
+		foreach($searchItems as $value)
+			$qry.="	(
+						content_id::text = lower('".$this->db_escape($value)."')
+						OR lower(titel::text) like lower('%".$this->db_escape($value)."%') 
+					) OR";
+			
+		$qry.=" 1<>1)) ORDER BY content_id";
+
+		if(!is_null($limit) && is_numeric($limit))
+			$qry.=" LIMIT ".$limit;
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new content();
+				$obj->content_id = $row->content_id;
+				
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}					
 	}
 }
 ?>

@@ -57,7 +57,7 @@ if (isset($_POST['userid']))
 ?>
 <html>
 	<head>
-		<title>Inoming-Verwaltung</title>
+		<title>Incoming-Verwaltung</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<meta name="robots" content="noindex">
 		<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
