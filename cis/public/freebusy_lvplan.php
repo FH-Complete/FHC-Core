@@ -45,7 +45,7 @@ header("Content-Type: text/calendar; charset=UTF-8");
 
 echo "BEGIN:VCALENDAR\n";
 echo "VERSION:2.0\n";
-echo "PRODID:-//FH TECHNIKUM WIEN//EN\n";
+echo "PRODID:-//FHCOMPLETE//EN\n";
 echo "METHOD:PUBLISH\n";
 echo 'ORGANIZER;CN=',$bn->vorname,' ',$bn->nachname,':mailto:',$uid,'@',DOMAIN,"\n";
 echo 'DTSTAMP;TZID=Europe/Vienna:',date('Ymd', mktime(date('H'),date('i'),date('s'),date('m'),date('d')-5,date('Y'))),'T',date('Hms'),"\n";
