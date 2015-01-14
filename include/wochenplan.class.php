@@ -2390,11 +2390,19 @@ class wochenplan extends basis_db
 							$sta = explode(":",$start_time);	 //sta start time array
 							$eda = explode(".",$end_date);    //eda end date array
 							$eta = explode(":",$end_time);	 //eta end time array
-														
-							//Die Zeitzone muss angegeben werden, da sonst der Google Kalender die Endzeiten nicht richtig erkennt 
-							// diese wird in stpl_kalender global definiert und bei den Start und Ende Zeiten mitangegeben
+							
 							$start_date_time_ical = $sda[2].$sda[1].$sda[0].'T'.sprintf('%02s',($sta[0])).$sta[1].$sta[2];  //neu gruppieren der Startzeit und des Startdatums
 							$end_date_time_ical = $eda[2].$eda[1].$eda[0].'T'.sprintf('%02s',($eta[0])).$eta[1].$eta[2];  //neu gruppieren der Startzeit und des Startdatums
+							
+							// Zeit in UTC umwandeln
+							$date = new DateTime($start_date_time_ical, new DateTimeZone('Europe/Vienna'));
+							$date->setTimezone(new DateTimeZone('UTC'));
+							$start_date_time_ical = $date->format('Ymd\THis').'Z';
+							
+							$date = new DateTime($end_date_time_ical, new DateTimeZone('Europe/Vienna'));
+							$date->setTimezone(new DateTimeZone('UTC'));
+							$end_date_time_ical = $date->format('Ymd\THis').'Z';
+							
 							echo $this->crlf,'FREEBUSY: ',$start_date_time_ical,'/',$end_date_time_ical;
 						}
 						elseif ($target=='return')

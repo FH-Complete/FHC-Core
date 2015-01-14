@@ -32,17 +32,18 @@ class note extends basis_db
 	public $result=array();
 
 	//Tabellenspalten
-	public $note;				// smallint
-	public $bezeichnung;		// varchar(32)
-	public $anmerkung;			// varchar(256)
-	public $farbe;
-	public $positiv=true;		// boolean
+	public $note;			// smallint
+	public $bezeichnung;	// varchar(32)
+	public $anmerkung;		// varchar(256)
+	public $farbe;			// varchar(6)
+	public $positiv=true;	// boolean
+	public $notenwert;		// boolean
+	public $aktiv;			// boolean
+	public $lehre;			// boolean
 
 	/**
 	 * Konstruktor
-	 * @param $lehrveranstaltung_id
-	 *        $student_uid
-	 *        $studiensemester_kurzbz
+	 * @param $note
 	 */
 	public function __construct($note = null)
 	{
@@ -54,9 +55,7 @@ class note extends basis_db
 
 	/**
 	 * Laedt eine Note
-	 * @param  $lehrveranstaltung_id
-	 *         $student_uid
-	 *         $studiensemester_kurzbz
+	 * @param  $note
 	 * @return true wenn ok, false im Fehlerfall
 	 */
 	public function load($note)
@@ -77,7 +76,10 @@ class note extends basis_db
 				$this->bezeichnung = $row->bezeichnung;
 				$this->anmerkung = $row->anmerkung;
 				$this->farbe = $row->farbe;
+				$this->notenwert = $row->notenwert;
 				$this->positiv = $this->db_parse_bool($row->positiv);
+				$this->lehre = $this->db_parse_bool($row->lehre);
+				$this->aktiv = $this->db_parse_bool($row->aktiv);
 				return true;
 			}
 			else
@@ -124,11 +126,14 @@ class note extends basis_db
 		if($new)
 		{
 			//Neuen Datensatz einfuegen
-			$qry='INSERT INTO lehre.tbl_note (note, bezeichnung, anmerkung, positiv) VALUES('.
+			$qry='INSERT INTO lehre.tbl_note (note, bezeichnung, anmerkung, positiv, notenwert, aktiv, lehre) VALUES('.
 			     $this->db_add_param($this->note).', '.
 			     $this->db_add_param($this->bezeichnung).', '.
 			     $this->db_add_param($this->anmerkung).', '.
-				 $this->db_add_param($this->positiv, FHC_BOOLEAN).');';
+				 $this->db_add_param($this->positiv, FHC_BOOLEAN).','.
+				 $this->db_add_param($this->notenwert).','.
+				 $this->db_add_parma($this->aktiv, FHC_BOOLEAN).','.
+				 $this->db_add_param($htis->lehre, FHC_BOOLEAN).');';
 		}
 		else
 		{
@@ -136,7 +141,10 @@ class note extends basis_db
 				'note='.$this->db_add_param($this->note).', '.
 				'bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
 				'anmerkung='.$this->db_add_param($this->anmerkung).', '.
-				'positiv='.$this->db_add_param($this->positiv, FHC_BOOLEAN).' '.
+				'positiv='.$this->db_add_param($this->positiv, FHC_BOOLEAN).', '.
+				'notenwert='.$this->db_add_param($this->notenwert).', '.
+				'aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
+				'lehre='.$this->db_add_param($this->lehre, FHC_BOOLEAN).' '.
 				'WHERE note='.$this->db_add_param($this->note).';';
 		}
 
@@ -170,6 +178,9 @@ class note extends basis_db
 				$n->anmerkung = $row->anmerkung;
 				$n->farbe = $row->farbe;
 				$n->positiv = $this->db_parse_bool($row->positiv);
+				$n->notenwert = $row->notenwert;
+				$n->aktiv = $this->db_parse_bool($row->aktiv);
+				$n->lehre = $this->db_parse_bool($row->lehre);
 
 				$this->result[] = $n;
 			}
