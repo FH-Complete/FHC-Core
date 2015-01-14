@@ -14,20 +14,16 @@ set_error_handler("exception_error_handler");
 */
 // Backends
 $authBackend = new myAuth();
-$principalBackend = new MySabre_DAVACL_PrincipalBackend($authBackend);
+$principalBackend = new  MySabre_DAVACL_PrincipalBackend($authBackend);
 $calendarBackend = new MySabre_CalDAV_Backend($authBackend);
 
-/*$tree = array(
-	new Sabre_DAVACL_PrincipalCollection($principalBackend),
-	new Sabre_CalDAV_CalendarRootNode($principalBackend, $calendarBackend)
-);*/
 $tree = array(
-	new Sabre_CalDAV_Principal_Collection($principalBackend),
-	new Sabre_CalDAV_CalendarRootNode($principalBackend, $calendarBackend)
+	new \Sabre\CalDAV\Principal\Collection($principalBackend),
+	new \Sabre\CalDAV\CalendarRootNode($principalBackend, $calendarBackend)
 );
 
 // The object tree needs in turn to be passed to the server class
-$server = new Sabre_DAV_Server($tree);
+$server = new \Sabre\DAV\Server($tree);
 
 // You are highly encouraged to set your WebDAV server base url. Without it,
 // SabreDAV will guess, but the guess is not always correct. Putting the
@@ -36,19 +32,19 @@ $path = str_replace($_SERVER['DOCUMENT_ROOT'],'',__FILE__).'/';
 $server->setBaseUri($path);
 
 // Authentication plugin
-$authPlugin = new Sabre_DAV_Auth_Plugin($authBackend,'SabreDAV');
+$authPlugin = new \Sabre\DAV\Auth\Plugin($authBackend,'SabreDAV');
 $server->addPlugin($authPlugin);
 
 // CalDAV plugin
-$caldavPlugin = new Sabre_CalDAV_Plugin();
+$caldavPlugin = new \Sabre\CalDAV\Plugin();
 $server->addPlugin($caldavPlugin);
 
 // ACL plugin
-$aclPlugin = new Sabre_DAVACL_Plugin();
+$aclPlugin = new \Sabre\DAVACL\Plugin();
 $server->addPlugin($aclPlugin);
 
 // Support for html frontend
-$browser = new Sabre_DAV_Browser_Plugin();
+$browser = new \Sabre\DAV\Browser\Plugin();
 $server->addPlugin($browser);
 
 // And off we go!

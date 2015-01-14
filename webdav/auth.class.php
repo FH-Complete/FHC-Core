@@ -23,7 +23,7 @@
 require_once(dirname(__FILE__).'/../config/cis.config.inc.php');
 require_once(dirname(__FILE__).'/../include/functions.inc.php');
 
-class myauth extends Sabre_DAV_Auth_Backend_AbstractBasic
+class myauth extends \Sabre\DAV\Auth\Backend\AbstractBasic
 {
 	function validateUserPass($username, $password)
 	{
