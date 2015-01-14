@@ -2731,7 +2731,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <text:p text:style-name="P20"/>
       <text:p text:style-name="P20">Date of Birth: <xsl:value-of select="geburtsdatum"/></text:p>
       <text:p text:style-name="P20"/>
-      <text:p text:style-name="P21">Within the period of studies at the University of Applied Science Technikum Wien from <xsl:value-of select="start_semester"/> to <xsl:value-of select="end_semester"/> in the <xsl:value-of select="studiengang_typ"/>’s degree program <xsl:value-of select="studiengang_bezeichnung_englisch"/> examinations in the following subjects were passed:</text:p>
+      <text:p text:style-name="P21">Within the period of studies at the University of Applied Sciences Technikum Wien from <xsl:value-of select="start_semester"/> to <xsl:value-of select="end_semester"/> in the <xsl:value-of select="studiengang_typ"/>’s degree program <xsl:value-of select="studiengang_bezeichnung_englisch"/> examinations in the following subjects were passed:</text:p>
       <text:p text:style-name="P20"/>
       <table:table table:name="Table12" table:style-name="Table12">
         <table:table-column table:style-name="Table12.A"/>
