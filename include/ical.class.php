@@ -104,12 +104,24 @@ class ical extends basis_db
 						$doppelpunktpos = mb_strpos($row, ':');
 						$row = mb_substr($row, $doppelpunktpos+1);
 						$slashpos = mb_strpos($row, '/');
-						$dtstart = mb_substr($row, 0, $slashpos);
-						$dtend = mb_substr($row, $slashpos+1);
+						$dtstart = $this->ConvertTimezoneUTC(mb_substr($row, 0, $slashpos));
+						$dtend = $this->ConvertTimezoneUTC(mb_substr($row, $slashpos+1));
 						$this->dtresult[]=array('dtstart'=>trim($dtstart),'dtend'=>trim($dtend));
 						
 						$dtstart = $this->ConvertTimezoneUTC($dtstart);
 						$dtend = $this->ConvertTimezoneUTC($dtend);
+						$this->result[$idx].='FREEBUSY:'.$dtstart.'/'.$dtend."\n";
+						$dtstart='';
+						$dtend='';
+					}
+				}
+				elseif($typ=='LVPLAN')
+				{
+					// Freebusy Eintrag mit UTC Timestamps
+					if(mb_strstr($row,'FREEBUSY:'))
+					{
+						$dtstart = $this->ConvertTimezoneUTC(mb_substr($row,9,17));
+						$dtend = $this->ConvertTimezoneUTC(mb_substr($row,27));
 						$this->result[$idx].='FREEBUSY:'.$dtstart.'/'.$dtend."\n";
 						$dtstart='';
 						$dtend='';
@@ -166,7 +178,7 @@ class ical extends basis_db
 				$len = mb_strlen($row);
 				
 				$slashpos = mb_strpos($row, '/');
-				$dtstart = mb_substr($row, 0, $len-$slashpos);
+				$dtstart = mb_substr($row, 0, $len-$slashpos-1);
 				$dtend = mb_substr($row, $slashpos+1);
 				$dtstart = $this->ConvertTimezoneLocal(trim($dtstart));
 				$dtend = $this->ConvertTimezoneLocal(trim($dtend));
