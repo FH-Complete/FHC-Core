@@ -123,9 +123,12 @@ $version = isset($_GET['version'])?$_GET['version']:null;
 $content_id = isset($_GET['content_id'])?$_GET['content_id']:null;
 $action = isset($_GET['action'])?$_GET['action']:'';
 $method = isset($_GET['method'])?$_GET['method']:null;
+$filter = isset($_GET['filter'])?$_GET['filter']:null;
 $message = '';
 $submenu_depth=0;
 $datum_obj = new datum();
+
+$filterstr = explode(' ',TRIM(str_replace(array('!','.','?',','), '', $filter)));
 
 //Inhalt Speichern
 if(isset($_POST['XSDFormPrinter_XML']))
@@ -649,7 +652,7 @@ echo '<table width="100%">
 		</td>
 	</tr>
 	<tr>
-		<td valign="top" width="200px">';
+		<td valign="top" width="300px">';
 
 
 $db = new basis_db();
@@ -659,10 +662,17 @@ echo '
 <br><br>
 
 <a href="admin.php?content_id='.$content_id.'&action='.$action.'&sprache='.$sprache.'&menu=content">Content</a> | 
-<a href="admin.php?content_id='.$content_id.'&action='.$action.'&sprache='.$sprache.'&menu=news">News</a>
-
+<a href="admin.php?content_id='.$content_id.'&action='.$action.'&sprache='.$sprache.'&menu=news">News</a><br>
+<form accept-charset="UTF-8" name="filterstr" action="'.$_SERVER['PHP_SELF'].'" method="GET">
+	<input type="hidden" name="content_id" value="'.$content_id.'">
+	<input type="hidden" name="sprache" value="'.$sprache.'">
+	<input type="hidden" name="action" value="'.$action.'">
+	<input type="hidden" name="version" value="'.$version.'">
+	Filter: 
+	<input type="text" id="filter" name="filter" size="25" value="'.implode(' ', $filterstr).'" placeholder="Suchtext oder Content_ID">
+	<input type="submit" value="Filter">
+</form>
 <table class="treetable" >';
-
 $menu='content';
 if(isset($_GET['menu']))
 {
@@ -685,7 +695,11 @@ if($menu=='news')
 else
 {
 	$rootcontent = new content();
-	$rootcontent->getRootContent();
+	
+	if($filter!=null)
+		$rootcontent->searchCMS($filterstr);
+	else
+		$rootcontent->getRootContent();
 }
 
 foreach($rootcontent->result as $row)
@@ -703,14 +717,14 @@ foreach($rootcontent->result as $row)
 	if($content->template_kurzbz=='news')
 	{
 		$output.= '<td>';
-		$output.= drawmenulink($row->content_id, mb_substr($content->titel,0,15).' '.$datum_obj->formatDatum($content->insertamum,'d.m.Y'), $content->oe_kurzbz);
+		$output.= drawmenulink($row->content_id, mb_substr($content->titel,0,15).' '.$datum_obj->formatDatum($content->insertamum,'d.m.Y'), $content->oe_kurzbz, $content->aktiv);
 		
 		$output.= '</td>';
 	}
 	else
 	{
 		$output.= '<td><br>';
-		$output.= drawmenulink($row->content_id, $content->titel, $content->oe_kurzbz);
+		$output.= drawmenulink($row->content_id, $content->titel, $content->oe_kurzbz, $content->aktiv);
 		
 		$output.= '</td>';
 		$submenu_depth=0;
@@ -779,7 +793,7 @@ echo '</body>
  */
 function drawheader()
 {
-	global $content_id, $action, $sprache, $version, $action;
+	global $content_id, $action, $sprache, $version, $action, $filterstr;
 	
 	//vorhandene Versionen dieser Sprache anzeigen
 	$content = new content();
@@ -799,7 +813,7 @@ function drawheader()
 		else
 			$class='';
 		
-		echo ' <a href="'.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&version='.$row->version.'&action='.$action.'" class="'.$class.'">';
+		echo ' <a href="'.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&version='.$row->version.'&action='.$action.'&filter='.implode(' ', $filterstr).'" class="'.$class.'" style="'.($row->sichtbar?'':'color:grey').'">';
 		echo $row->version;
 		echo '</a>, ';
 	}
@@ -815,12 +829,12 @@ function drawheader()
 			$class='marked';
 		else
 			$class='';
-		echo ' <a href="'.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$lang.'&action='.$action.'" class="'.$class.'">'; //&version='.$version.'
+		echo ' <a href="'.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$lang.'&action='.$action.'&filter='.implode(' ', $filterstr).'" class="'.$class.'">'; //&version='.$version.'
 		echo $lang;
 		echo '</a>,';
 	}
 	echo '</td><td align="center" width="33%">';
-	echo '<form action="'.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&action='.$action.'&method=add_newversion" method="POST">';
+	echo '<form action="'.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&action='.$action.'&filter='.implode(' ', $filterstr).'&method=add_newversion" method="POST">';
 	echo '<input type="submit" value="Neue Version anlegen">';
 	echo '</form>';
 	echo '</td><td align="right" width="33%">';
@@ -831,7 +845,7 @@ function drawheader()
 	//wird ein Formular zum Erstellen der Uebersetzung angezeigt.
 	if(count($vorhandene_sprachen)!=count($sprache_obj->result))
 	{	
-		echo '<form action="'.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&action='.$action.'&method=add_uebersetzung" method="POST">';
+		echo '<form action="'.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&action='.$action.'&filter='.implode(' ', $filterstr).'&method=add_uebersetzung" method="POST">';
 		echo 'Übersetzung in <SELECT name="sprache">';
 		foreach($sprache_obj->result as $row)
 		{
@@ -856,11 +870,26 @@ function drawheader()
  * @param $id
  * @param $titel
  */
-function drawmenulink($id, $titel, $oe_kurzbz)
+function drawmenulink($id, $titel, $oe_kurzbz, $aktiv)
 {
-	global $content_id, $action, $sprache, $berechtigte_oe;
+	global $content_id, $action, $sprache, $berechtigte_oe, $filterstr;
+	$content = new content();
+	$content->loadGruppen($id);
+	$berechtigte = '';
+	
+	if(count($content->result)>0)
+	{
+		foreach($content->result as $row)
+		{
+			$berechtigte.= $row->gruppe_kurzbz.(count($content->result)>1?', ':'');
+		}
+	}
+	else 
+		$berechtigte = '';
+		
 	if(in_array($oe_kurzbz, $berechtigte_oe))
-		return '<a href="admin.php?content_id='.$id.'&action='.$action.'&sprache='.$sprache.'" '.($content_id==$id?'class="marked"':'').'>'.$titel.'</a> ('.$id.')';
+		return '<a href="admin.php?content_id='.$id.'&action='.$action.'&sprache='.$sprache.'&filter='.implode(' ', $filterstr).'" style="'.($aktiv?'':'color:grey').'" '.($content_id==$id?'class="marked"':'').'>
+				'.$titel.'</a> '.($berechtigte!=''?'<img src="../skin/images/lock.png" alt="lock" title="'.$berechtigte.'" style="vertical-align:bottom;">':'').'('.$id.')';
 	else
 		return $titel.' ('.$id.')';
 }
@@ -891,7 +920,7 @@ function drawsubmenu($content_id, $einrueckung="&nbsp;&nbsp;")
 		$output.= "<tr>\n";
 		$output.= '<td>';
 		$output.= $einrueckung;
-		$output.=drawmenulink($row->child_content_id, $content->titel, $content->oe_kurzbz);
+		$output.=drawmenulink($row->child_content_id, $content->titel, $content->oe_kurzbz, $row->aktiv);
 		$output.=drawsubmenu($row->child_content_id, $einrueckung."&nbsp;&nbsp;");
 		$output.= "</td>\n";
 		$output.= "</tr>\n";
@@ -906,8 +935,8 @@ function drawsubmenu($content_id, $einrueckung="&nbsp;&nbsp;")
  */
 function get_content_link($key, $name)
 {
-	global $action, $content_id, $sprache, $version;	
-	return '<a href="'.$_SERVER['PHP_SELF'].'?action='.$key.'&content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'" '.($action==$key?'class="marked"':'').'>'.$name.'</a>';
+	global $action, $content_id, $sprache, $version, $filterstr;	
+	return '<a href="'.$_SERVER['PHP_SELF'].'?action='.$key.'&content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&filter='.implode(' ', $filterstr).'" '.($action==$key?'class="marked"':'').'>'.$name.'</a>';
 }
 
 /**
@@ -915,7 +944,7 @@ function get_content_link($key, $name)
  */
 function print_childs()
 {
-	global $content_id, $sprache, $version, $action;
+	global $content_id, $sprache, $version, $action, $filterstr;
 	
 	$content = new content();
 	$content->getChilds($content_id);
@@ -949,14 +978,14 @@ function print_childs()
 		
 		echo '<tr>';
 		echo '<td>',$row->sort;
-		echo '   <a href="'.$_SERVER['PHP_SELF'].'?action=childs&content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&contentchild_id='.$row->contentchild_id.'&method=childs_sort_up" title="Nach oben sortieren"><img src="../skin/images/up.png" alt="up"></a>';
-		echo '   <a href="'.$_SERVER['PHP_SELF'].'?action=childs&content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&contentchild_id='.$row->contentchild_id.'&method=childs_sort_down" title="Nach unten sortieren"><img src="../skin/images/down.png" alt="down"></a>';
+		echo '   <a href="'.$_SERVER['PHP_SELF'].'?action=childs&content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&contentchild_id='.$row->contentchild_id.'&method=childs_sort_up&filter='.implode(' ', $filterstr).'" title="Nach oben sortieren"><img src="../skin/images/up.png" alt="up"></a>';
+		echo '   <a href="'.$_SERVER['PHP_SELF'].'?action=childs&content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&contentchild_id='.$row->contentchild_id.'&method=childs_sort_down&filter='.implode(' ', $filterstr).'" title="Nach unten sortieren"><img src="../skin/images/down.png" alt="down"></a>';
 		echo '</td>';
 		echo '<td>',$row->child_content_id,'</td>';
 		echo '<td><a href="'.$_SERVER['PHP_SELF'].'?action='.$action.'&sprache='.$sprache.'&content_id='.$row->child_content_id.'">',$child->titel,'</a></td>';
 		
 		echo '<td>
-				<a href="'.$_SERVER['PHP_SELF'].'?action=childs&content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&contentchild_id='.$row->contentchild_id.'&method=childs_delete" title="entfernen">
+				<a href="'.$_SERVER['PHP_SELF'].'?action=childs&content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&contentchild_id='.$row->contentchild_id.'&method=childs_delete&filter='.implode(' ', $filterstr).'" title="entfernen">
 					<img src="../skin/images/delete_x.png">
 				</a>
 			</td>';
@@ -966,7 +995,7 @@ function print_childs()
 	
 	$content = new content();
 	$content->getpossibleChilds($content_id);
-	echo '<form action="'.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&action=childs&method=childs_add" method="POST">';
+	echo '<form action="'.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&action=childs&method=childs_add&filter='.implode(' ', $filterstr).'" method="POST">';
 	
 	echo '<select name="child_content_id">';
 	foreach($content->result as $row)
@@ -984,19 +1013,19 @@ function print_childs()
  */
 function print_prefs()
 {
-	global $content_id, $sprache, $version, $user, $rechte;
+	global $content_id, $sprache, $version, $user, $rechte, $filterstr;
 	
 	$content = new content();
 	if(!$content->getContent($content_id, $sprache, $version))
 		die($content->errormsg);
 		
-	echo '<form name="form_pref" action="'.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&action=prefs&method=prefs_save" method="POST">
+	echo '<form name="form_pref" action="'.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&action=prefs&method=prefs_save&filter='.implode(' ', $filterstr).'" method="POST">
 	<table>
 		
 		<tr>
 			<td>Vorlage</td>
 			<td>
-				<SELECT name="template_kurzbz" onchange="alert(\'Achtung: Das Ändern der Vorlage kann zum Datenverlust des Contents führen!\n\nÄndern Sie die Vorlage nur wenn Sie wirklich wissen was sie tun.\');">';
+				<SELECT name="template_kurzbz" onchange="document.getElementById(\'warnhinweis\').innerHTML=\'Achtung: Das Ändern der Vorlage kann zum Datenverlust des Contents führen! Ändern Sie die Vorlage nur, wenn Sie wirklich wissen, was sie tun.\'">';
 	$template = new template();
 	$template->getAll();
 	foreach($template->result as $row)
@@ -1009,7 +1038,7 @@ function print_prefs()
 		echo '<OPTION value="'.$row->template_kurzbz.'" '.$selected.'>'.$row->bezeichnung.'</OPTION>';
 	}
 	echo '	
-				</SELECT>
+				</SELECT>&nbsp;<span style="color:red" id="warnhinweis">&nbsp;</span>
 			</td>
 		</tr>
 		<tr>
@@ -1070,12 +1099,12 @@ function print_prefs()
 	}
 	
 	echo '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-	echo '<input type="submit" value="Review anfordern" onclick="document.form_pref.action=\''.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&action=prefs&method=prefs_requestreview\'">';
+	echo '<input type="submit" value="Review anfordern" onclick="document.form_pref.action=\''.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&filter='.implode(' ', $filterstr).'&action=prefs&method=prefs_requestreview\'">';
 	$bf = new benutzerfunktion();
 	if($bf->benutzerfunktion_exists($user, 'review')  || $rechte->isBerechtigt('basis/cms_review'))
-		echo '<input type="submit" value="Review OK / Publish" onclick="document.form_pref.action=\''.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&action=prefs&method=prefs_reviewed\'">';
+		echo '<input type="submit" value="Review OK / Publish" onclick="document.form_pref.action=\''.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&filter='.implode(' ', $filterstr).'&action=prefs&method=prefs_reviewed\'">';
 	
-	echo '<input type="submit" value="Übersetzer benachrichtigen" onclick="document.form_pref.action=\''.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&action=prefs&method=prefs_requesttranslate\'">';
+	echo '<input type="submit" value="Übersetzer benachrichtigen" onclick="document.form_pref.action=\''.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&filter='.implode(' ', $filterstr).'&action=prefs&method=prefs_requesttranslate\'">';
 	
 	
 	echo '
@@ -1092,7 +1121,7 @@ function print_prefs()
  */
 function print_rights()
 {
-	global $content_id, $sprache, $version;
+	global $content_id, $sprache, $version, $filterstr;
 	$content = new content();
 	$content->loadGruppen($content_id);
 	
@@ -1125,7 +1154,7 @@ function print_rights()
 			echo '<td>',$row->gruppe_kurzbz,'</td>';
 			echo '<td>',$row->bezeichnung,'</td>';
 			echo '<td>
-					<a href="'.$_SERVER['PHP_SELF'].'?action=rights&content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&gruppe_kurzbz='.$row->gruppe_kurzbz.'&method=rights_delete_group" title="entfernen">
+					<a href="'.$_SERVER['PHP_SELF'].'?action=rights&content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&gruppe_kurzbz='.$row->gruppe_kurzbz.'&method=rights_delete_group&filter='.implode(' ', $filterstr).'" title="entfernen">
 						<img src="../skin/images/delete_x.png">
 					</a>
 				</td>';
@@ -1139,7 +1168,7 @@ function print_rights()
 	$gruppe = new gruppe();
 	$gruppe->getgruppe(null, null, null, null, true);
 	
-	echo '<form action="'.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&action=rights&method=rights_add_group" method="POST">';
+	echo '<form action="'.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&action=rights&method=rights_add_group&filter='.implode(' ', $filterstr).'" method="POST">';
 	echo 'Gruppe <select name="gruppe_kurzbz">';
 	foreach($gruppe->result as $row)
 	{
@@ -1159,7 +1188,7 @@ function print_rights()
  */
 function print_content()
 {
-	global $content_id, $sprache, $version, $user, $rechte;
+	global $content_id, $sprache, $version, $user, $rechte, $filterstr;
 
 	$content = new content();
 
@@ -1173,7 +1202,7 @@ function print_content()
 		
 		if($rechte->isBerechtigt('basis/cms_sperrfreigabe',null,'su'))
 		{
-			echo '<br><br><form action="'.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&contentsprache_id='.$content->contentsprache_id.'&sprache='.$sprache.'&version='.$version.'&action=content&method=content_sperrfreigabe" method="POST">';
+			echo '<br><br><form action="'.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&contentsprache_id='.$content->contentsprache_id.'&sprache='.$sprache.'&version='.$version.'&action=content&method=content_sperrfreigabe&filter='.implode(' ', $filterstr).'" method="POST">';
 			echo '<input type="submit" value="Freigabe erzwingen" name="freigeben">';
 			echo '</form>';
 		}
@@ -1181,7 +1210,7 @@ function print_content()
 	}
 	
 	
-	echo '<form action="'.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&contentsprache_id='.$content->contentsprache_id.'&sprache='.$sprache.'&version='.$version.'&action=content&method=content_sperre" method="POST">';
+	echo '<form action="'.$_SERVER['PHP_SELF'].'?content_id='.$content_id.'&contentsprache_id='.$content->contentsprache_id.'&sprache='.$sprache.'&version='.$version.'&action=content&method=content_sperre&filter='.implode(' ', $filterstr).'" method="POST">';
 	if($content->gesperrt_uid=='')
 		echo '<input type="submit" value="Zur Bearbeitung sperren" name="sperren">';
 	else
@@ -1195,7 +1224,7 @@ function print_content()
 		$template->load($content->template_kurzbz);
 	
 		$xfp = new XSDFormPrinter();
-		$xfp->getparams='?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&action=content';
+		$xfp->getparams='?content_id='.$content_id.'&sprache='.$sprache.'&version='.$version.'&action=content&filter='.implode(' ', $filterstr).'';
 		$xfp->output($template->xsd,$content->content);
 		echo '</div>';
 	}
@@ -1206,9 +1235,9 @@ function print_content()
 	// Javascript in der Vorschau die CMS Seite geschlossen wird.
 
 	if($content->template_kurzbz=='redirect')
-		echo '<a href="content.php?content_id='.$content_id.'&version='.$version.'&sprache='.$sprache.'&sichtbar" target="_blank">Vorschau in eigenem Fenster öffnen</a>';
+		echo '<a href="content.php?content_id='.$content_id.'&version='.$version.'&sprache='.$sprache.'&sichtbar&filter='.implode(' ', $filterstr).'" target="_blank">Vorschau in eigenem Fenster öffnen</a>';
 	else
-		echo '<iframe src="content.php?content_id='.$content_id.'&version='.$version.'&sprache='.$sprache.'" style="width: 800px; height: 500px; border: 1px solid black;">';
+		echo '<iframe src="content.php?content_id='.$content_id.'&version='.$version.'&sprache='.$sprache.'&filter='.implode(' ', $filterstr).'" style="width: 800px; height: 500px; border: 1px solid black;">';
 }
 
 /**
@@ -1217,7 +1246,7 @@ function print_content()
  */
 function print_history()
 {
-	global $content_id, $sprache, $version, $method;
+	global $content_id, $sprache, $version, $method, $filterstr;
 	if($method=='history_changes')
 	{
 		if(!isset($_GET['v1']) || !isset($_GET['v2']))
@@ -1263,6 +1292,7 @@ function print_history()
 			<input type="hidden" name="method" value="history_changes">
 			<input type="hidden" name="sprache" value="'.$sprache.'">
 			<input type="hidden" name="version" value="'.$version.'">
+			<input type="hidden" name="filter" value="'.implode(' ', $filterstr).'">
 			<input type="hidden" name="content_id" value="'.$content_id.'">';
 		echo 'Änderungen von Version
 			<input type="text" value="1" size="2" name="v1"> zu 

@@ -549,7 +549,7 @@ else if($method=="lehrveranstaltungen")
 						AND 
 						(von is null OR von >= '$stsem->start') 
 						AND 
-						(bis is null OR bis <= '$stsem->ende') 
+						(bis is null OR bis <= (DATE '$stsem->ende' + INTERVAL '6 MONTH')) 
 						AND aktiv = true				
 						)a ) as anzahl
 					FROM 
