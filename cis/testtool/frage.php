@@ -98,13 +98,14 @@ else
 	$frage_id = '';
 
 //$MAX_VORSCHLAEGE_PRO_ZEILE=4;
-?>
+
+echo '
 <!--[IF !IE]>
 <?xml version="1.0" ?>
 <?xml-stylesheet type="text/xsl" href="mathml.xsl" ?>
- -->
+ -->';
 
-
+?>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/xhtml; charset=UTF-8" />
