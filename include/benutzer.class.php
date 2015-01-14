@@ -459,5 +459,40 @@ class benutzer extends person
 		}
 		return $values;
 	}
+
+	/**
+	 * Laedt Benutzer anhand des Alias
+	 * @param $alias Alias der Person die geladen werden soll
+	 */
+	public function loadAlias($alias)
+	{
+		$qry = "SELECT * FROM public.tbl_benutzer WHERE alias=".$this->db_add_param($alias);
+		
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->uid = $row->uid;
+				$this->bnaktiv = $this->db_parse_bool($row->aktiv);
+				$this->alias = $row->alias;
+				$this->aktivierungscode = $row->aktivierungscode;
+
+				if(!person::load($row->person_id))
+					return false;
+				else 
+					return true;
+			}
+			else 
+			{
+				$this->errormsg = "Benutzer nicht gefunden";
+				return false;
+			}				
+		}
+		else 
+		{
+			$this->errormsg = "Fehler beim Laden der Benutzerdaten";
+			return false;
+		}		
+	}
 }
 ?>

@@ -20,7 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 /**
- * Klasse Zeugnisnote
+ * Klasse LVGesamtnote
  * @create 2007-06-06
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
@@ -43,7 +43,8 @@ class lvgesamtnote extends basis_db
 	public $insertamum;					// timestamp
 	public $insertvon;					// varchar(16)
 	public $bemerkung;					// text
-	public $freigabevon_uid;			//varchar(16)
+	public $freigabevon_uid;			// varchar(16)
+	public $punkte;						// numeric(8,4)
 	
 	public $lehrveranstaltung_bezeichung;
 	public $note_bezeichnung;
@@ -99,6 +100,7 @@ class lvgesamtnote extends basis_db
 				$this->inservon = $row->insertvon;
 				$this->bemerkung = $row->bemerkung;
 				$this->freigabevon_uid = $row->freigabevon_uid;
+				$this->punkte = $row->punkte;
 				return true;				
 			}
 			else 
@@ -170,7 +172,9 @@ class lvgesamtnote extends basis_db
 		if($new)
 		{
 			//Neuen Datensatz einfuegen					
-			$qry='INSERT INTO campus.tbl_lvgesamtnote (lehrveranstaltung_id, student_uid, studiensemester_kurzbz, mitarbeiter_uid, note, freigabedatum, freigabevon_uid, benotungsdatum, bemerkung, updateamum, updatevon, insertamum, insertvon) VALUES('.
+			$qry='INSERT INTO campus.tbl_lvgesamtnote (lehrveranstaltung_id, student_uid, studiensemester_kurzbz, 
+				mitarbeiter_uid, note, freigabedatum, freigabevon_uid, benotungsdatum, bemerkung, updateamum, 
+				updatevon, insertamum, insertvon, punkte) VALUES('.
 			     $this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER).', '.
 			     $this->db_add_param($this->student_uid).', '.
 			     $this->db_add_param($this->studiensemester_kurzbz).', '.
@@ -183,12 +187,14 @@ class lvgesamtnote extends basis_db
 			     $this->db_add_param($this->updateamum).', '.
 			     $this->db_add_param($this->updatevon).', '.
 			     $this->db_add_param($this->insertamum).', '.
-			     $this->db_add_param($this->insertvon).');';
+			     $this->db_add_param($this->insertvon).','.
+			     $this->db_add_param($this->punkte).');';
 		}
 		else
 		{			
 			$qry='UPDATE campus.tbl_lvgesamtnote SET '.
-				'note='.$this->db_add_param($this->note, FHC_INTEGER).', '. 
+				'note='.$this->db_add_param($this->note, FHC_INTEGER).', '.
+				'punkte='.$this->db_add_param($this->punkte).','. 
 				'freigabedatum='.$this->db_add_param($this->freigabedatum).', '.
 				'freigabevon_uid='.$this->db_add_param($this->freigabevon_uid).', '.
 				'benotungsdatum='.$this->db_add_param($this->benotungsdatum).', '.
