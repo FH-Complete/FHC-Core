@@ -63,6 +63,10 @@ if($studiensemester_kurzbz!='')
 	
 	$format_bold =& $workbook->addFormat();
 	$format_bold->setBold();
+	
+	$format_number =& $workbook->addFormat();
+	$format_number->setNumFormat('0,0.00');
+
 		
 	$spalte=0;
 	$zeile=0;
@@ -76,6 +80,8 @@ if($studiensemester_kurzbz!='')
 	$worksheet->write($zeile,++$spalte,'Abmeldedatum',$format_bold);
 	$maxlength[$spalte]=15;
 	$worksheet->write($zeile,++$spalte,'Gesamthonorar',$format_bold);
+	$maxlength[$spalte]=15;
+	$worksheet->write($zeile,++$spalte,'Fiktivmonatsbezug',$format_bold);
 	$maxlength[$spalte]=15;
 	
 	$stsem = new studiensemester($studiensemester_kurzbz);
@@ -122,9 +128,27 @@ if($studiensemester_kurzbz!='')
 			if(mb_strlen($row->ende)>$maxlength[$spalte])
 				$maxlength[$spalte]=mb_strlen($row->ende);
 
-			$worksheet->write($zeile,++$spalte, $row->gesamthonorar);
-			if(mb_strlen($row->gesamthonorar)>$maxlength[$spalte])
-				$maxlength[$spalte]=mb_strlen($row->gesamthonorar);
+			$gesamthonorar = number_format($row->gesamthonorar,2,'.','');
+			
+			$worksheet->write($zeile,++$spalte, $gesamthonorar, $format_number);
+			if(mb_strlen($gesamthonorar)>$maxlength[$spalte])
+				$maxlength[$spalte]=mb_strlen($gesamthonorar);
+				
+			// Fiktivmonatsbezug berechnen
+			// (Honorar gesamt/ Tage offen) * 30 / 7 * 6
+			$tageoffen = BerechneGesamtTage($row->beginn, $row->ende);
+			if($tageoffen!=0)
+			{
+				$fiktivmonatsbezug = ($row->gesamthonorar / $tageoffen) * 30 / 7 * 6;
+				$fiktivmonatsbezug = number_format($fiktivmonatsbezug, 2,'.','');
+			}
+			else
+				$fiktivmonatsbezug = '';
+						
+						
+			$worksheet->write($zeile,++$spalte, $fiktivmonatsbezug,$format_number);
+			if(mb_strlen($fiktivmonatsbezug)>$maxlength[$spalte])
+				$maxlength[$spalte]=mb_strlen($fiktivmonatsbezug);
 		}
 	}
 	
@@ -149,5 +173,32 @@ else
 	</body>
 	</html>
 	';
+}
+
+function BerechneGesamtTage($startdatum, $endedatum)
+{
+	$gesamttage=0;
+
+	$datum = new DateTime($startdatum);
+	$ende = new DateTime($endedatum);
+
+	$i=0;
+	while($datum<$ende)
+	{
+		$i++;
+		if($i>100)
+			die('Rekursion? Abbruch');
+
+		$tag = $datum->format('d');
+		if($tag==31)
+			$gesamttage+=1;
+		else
+			$gesamttage+=31-$tag;
+
+		$datum = new DateTime(date('Y-m-t',$datum->getTimestamp())); // Letzten Tag im Monat
+		$datum->add(new DateInterval('P1D')); // 1 Tag dazuzaehlen
+	}
+
+	return $gesamttage;
 }
 ?>
