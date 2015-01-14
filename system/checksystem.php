@@ -2322,6 +2322,121 @@ if(!$result = @$db->db_query("SELECT updateamum FROM lehre.tbl_vertrag_vertragss
 		echo ' lehre.tbl_vertrag_vertragsstatus: Spalte updateamum hinzugefuegt!<br>';
 }
 
+// Notenschluessel
+if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_notenschluessel LIMIT 1;"))
+{
+	$qry = "
+
+	CREATE TABLE lehre.tbl_notenschluessel
+	(
+		notenschluessel_kurzbz varchar(32),
+		bezeichnung varchar(256)
+	);
+
+	ALTER TABLE lehre.tbl_notenschluessel ADD CONSTRAINT pk_notenschluessel PRIMARY KEY (notenschluessel_kurzbz);
+
+	CREATE TABLE lehre.tbl_notenschluesselaufteilung
+	(
+		notenschluesselaufteilung_id bigint,
+		notenschluessel_kurzbz varchar(32),
+		note smallint,
+		punkte numeric(8,4)
+	);
+
+	ALTER TABLE lehre.tbl_notenschluesselaufteilung ADD CONSTRAINT pk_notenschluesselaufteilung PRIMARY KEY (notenschluesselaufteilung_id);
+
+	CREATE SEQUENCE lehre.seq_notenschluesselaufteilung_notenschluesselaufteilung_id
+	INCREMENT BY 1
+	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+
+	ALTER TABLE lehre.tbl_notenschluesselaufteilung ALTER COLUMN notenschluesselaufteilung_id SET DEFAULT nextval('lehre.seq_notenschluesselaufteilung_notenschluesselaufteilung_id');
+	ALTER TABLE lehre.tbl_notenschluesselaufteilung ADD CONSTRAINT fk_notenschluesselaufteilung_notenschluessel FOREIGN KEY (notenschluessel_kurzbz) REFERENCES lehre.tbl_notenschluessel(notenschluessel_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+	CREATE TABLE lehre.tbl_notenschluesselzuordnung
+	(
+		notenschluesselzuordnung_id bigint,
+		notenschluessel_kurzbz varchar(32),
+		lehrveranstaltung_id integer,
+		studienplan_id integer,
+		oe_kurzbz varchar(32),
+		studiensemester_kurzbz varchar(16)
+	);
+
+	ALTER TABLE lehre.tbl_notenschluesselzuordnung ADD CONSTRAINT pk_notenschluesselzuordnung PRIMARY KEY (notenschluesselzuordnung_id);
+	CREATE SEQUENCE lehre.seq_notenschluesselzuordnung_notenschluesselzuordnung_id
+	INCREMENT BY 1
+	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+
+	ALTER TABLE lehre.tbl_notenschluesselzuordnung ALTER COLUMN notenschluesselzuordnung_id SET DEFAULT nextval('lehre.seq_notenschluesselzuordnung_notenschluesselzuordnung_id');
+	ALTER TABLE lehre.tbl_notenschluesselzuordnung ADD CONSTRAINT fk_notenschluesselzuordnung_notenschluessel FOREIGN KEY (notenschluessel_kurzbz) REFERENCES lehre.tbl_notenschluessel(notenschluessel_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE lehre.tbl_notenschluesselzuordnung ADD CONSTRAINT fk_notenschluesselzuordnung_lehrveranstaltung FOREIGN KEY (lehrveranstaltung_id) REFERENCES lehre.tbl_lehrveranstaltung(lehrveranstaltung_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE lehre.tbl_notenschluesselzuordnung ADD CONSTRAINT fk_notenschluesselzuordnung_studienplan FOREIGN KEY (studienplan_id) REFERENCES lehre.tbl_studienplan(studienplan_id) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE lehre.tbl_notenschluesselzuordnung ADD CONSTRAINT fk_notenschluesselzuordnung_oe_kurzbz FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit(oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE lehre.tbl_notenschluesselzuordnung ADD CONSTRAINT fk_notenschluesselzuordnung_studiensemester FOREIGN KEY (studiensemester_kurzbz) REFERENCES public.tbl_studiensemester(studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+	ALTER TABLE lehre.tbl_note ADD COLUMN notenwert smallint;
+	ALTER TABLE lehre.tbl_note ADD COLUMN aktiv boolean NOT NULL DEFAULT true;
+	ALTER TABLE lehre.tbl_note ADD COLUMN lehre boolean NOT NULL DEFAULT true;
+
+	ALTER TABLE lehre.tbl_zeugnisnote ADD COLUMN punkte numeric(8,4);
+	ALTER TABLE campus.tbl_lvgesamtnote ADD COLUMN punkte numeric(8,4);
+
+	GRANT SELECT, INSERT, UPDATE, DELETE ON lehre.tbl_notenschluessel TO vilesci;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON lehre.tbl_notenschluesselzuordnung TO vilesci;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON lehre.tbl_notenschluesselaufteilung TO vilesci;
+	
+	GRANT SELECT ON lehre.tbl_notenschluessel TO web;
+	GRANT SELECT ON lehre.tbl_notenschluesselzuordnung TO web;
+	GRANT SELECT ON lehre.tbl_notenschluesselaufteilung TO web;
+	
+	GRANT SELECT, UPDATE ON lehre.seq_notenschluesselzuordnung_notenschluesselzuordnung_id TO vilesci;
+	GRANT SELECT, UPDATE ON lehre.seq_notenschluesselaufteilung_notenschluesselaufteilung_id TO vilesci;
+	";
+	if(!$db->db_query($qry))
+		echo '<strong>Noten: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' Tabellen fuer Notenspiegel hinzugefuegt!<br>';
+}
+
+// Eigene Berechtigung fuer Tempus / FAS / Planner
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz='basis/fas' LIMIT 1"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "
+		INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('basis/fas','FAS Zugriff');
+		INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('basis/tempus','Tempus Zugriff');
+		INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('basis/planner','Planner Zugriff');
+
+		INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('basis/fas','assistenz','suid');
+		INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('basis/fas','admin','suid');
+		INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('basis/tempus','lv-plan','suid');
+		INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('basis/tempus','admin','suid');
+		INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('basis/planner','admin','suid');
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Eigene Berechtigungen fuer FAS / Tempus / Planner hinzugefuegt!<br>';
+	}
+}
+
+// Spalte oeffentlich in public.tbl_reihungstest
+if(!$result = @$db->db_query("SELECT oeffentlich FROM public.tbl_reihungstest LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_reihungstest ADD COLUMN oeffentlich boolean NOT NULL DEFAULT FALSE;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_reihungstest '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' public.tbl_reihungstest: Spalte oeffentlich hinzugefuegt!<br>';
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -2375,7 +2490,7 @@ $tabellen=array(
 	"campus.tbl_lehre_tools" => array("lehre_tools_id","bezeichnung","kurzbz","basis_url","logo_dms_id"),
 	"campus.tbl_lehre_tools_organisationseinheit" => array("lehre_tools_id","oe_kurzbz","aktiv"),
 	"campus.tbl_lehrveranstaltung_pruefung" => array("lehrveranstaltung_pruefung_id","lehrveranstaltung_id","pruefung_id"),
-	"campus.tbl_lvgesamtnote"  => array("lehrveranstaltung_id","studiensemester_kurzbz","student_uid","note","mitarbeiter_uid","benotungsdatum","freigabedatum","freigabevon_uid","bemerkung","updateamum","updatevon","insertamum","insertvon"),
+	"campus.tbl_lvgesamtnote"  => array("lehrveranstaltung_id","studiensemester_kurzbz","student_uid","note","mitarbeiter_uid","benotungsdatum","freigabedatum","freigabevon_uid","bemerkung","updateamum","updatevon","insertamum","insertvon","punkte"),
 	"campus.tbl_lvinfo"  => array("lehrveranstaltung_id","sprache","titel","lehrziele","lehrinhalte","methodik","voraussetzungen","unterlagen","pruefungsordnung","anmerkung","kurzbeschreibung","genehmigt","aktiv","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_news"  => array("news_id","uid","studiengang_kz","fachbereich_kurzbz","semester","betreff","text","datum","verfasser","updateamum","updatevon","insertamum","insertvon","datum_bis","content_id"),
 	"campus.tbl_notenschluessel"  => array("lehreinheit_id","note","punkte"),
@@ -2435,7 +2550,10 @@ $tabellen=array(
 	"lehre.tbl_lvregeltyp" => array("lvregeltyp_kurzbz","bezeichnung"),
 	"lehre.tbl_moodle"  => array("lehrveranstaltung_id","lehreinheit_id","moodle_id","mdl_course_id","studiensemester_kurzbz","gruppen","insertamum","insertvon","moodle_version"),
 	"lehre.tbl_moodle_version"  => array("moodle_version","bezeichnung","pfad"),
-	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe","positiv"),
+	"lehre.tbl_notenschluessel" => array("notenschluessel_kurzbz","bezeichnung"),
+	"lehre.tbl_notenschluesselaufteilung" => array("notenschluesselaufteilung_id","notenschluessel_kurzbz","note","punkte"),
+	"lehre.tbl_notenschluesselzuordnung" => array("notenschluesselzuordnung_id","notenschluessel_kurzbz","lehrveranstaltung_id","studienplan_id","oe_kurzbz","studiensemester_kurzbz"),
+	"lehre.tbl_note"  => array("note","bezeichnung","anmerkung","farbe","positiv","notenwert","aktiv","lehre"),
 	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","titel_english","seitenanzahl","abgabedatum","kontrollschlagwoerter","schlagwoerter","schlagwoerter_en","abstract", "abstract_en", "sprache"),
 	"lehre.tbl_projektbetreuer"  => array("person_id","projektarbeit_id","betreuerart_kurzbz","note","faktor","name","punkte","stunden","stundensatz","updateamum","updatevon","insertamum","insertvon","ext_id","vertrag_id"),
 	"lehre.tbl_projekttyp"  => array("projekttyp_kurzbz","bezeichnung"),
@@ -2450,12 +2568,12 @@ $tabellen=array(
 	"lehre.tbl_stundenplan"  => array("stundenplan_id","unr","mitarbeiter_uid","datum","stunde","ort_kurzbz","gruppe_kurzbz","titel","anmerkung","lehreinheit_id","studiengang_kz","semester","verband","gruppe","fix","updateamum","updatevon","insertamum","insertvon"),
 	"lehre.tbl_stundenplandev"  => array("stundenplandev_id","lehreinheit_id","unr","studiengang_kz","semester","verband","gruppe","gruppe_kurzbz","mitarbeiter_uid","ort_kurzbz","datum","stunde","titel","anmerkung","fix","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_vertrag"  => array("vertrag_id","person_id","vertragstyp_kurzbz","bezeichnung","betrag","insertamum","insertvon","updateamum","updatevon","ext_id","anmerkung","vertragsdatum"),
-	"lehre.tbl_vertrag_vertragsstatus"  => array("vertragsstatus_kurzbz","vertrag_id","uid","datum","ext_id"),
+	"lehre.tbl_vertrag_vertragsstatus"  => array("vertragsstatus_kurzbz","vertrag_id","uid","datum","ext_id","insertamum","insertvon","updateaum","updatevon"),
 	"lehre.tbl_vertragstyp"  => array("vertragstyp_kurzbz","bezeichnung"),
 	"lehre.tbl_vertragsstatus"  => array("vertragsstatus_kurzbz","bezeichnung"),
 	"lehre.tbl_zeitfenster"  => array("wochentag","stunde","ort_kurzbz","studiengang_kz","gewicht"),
 	"lehre.tbl_zeugnis"  => array("zeugnis_id","student_uid","zeugnis","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"lehre.tbl_zeugnisnote"  => array("lehrveranstaltung_id","student_uid","studiensemester_kurzbz","note","uebernahmedatum","benotungsdatum","bemerkung","updateamum","updatevon","insertamum","insertvon","ext_id"),
+	"lehre.tbl_zeugnisnote"  => array("lehrveranstaltung_id","student_uid","studiensemester_kurzbz","note","uebernahmedatum","benotungsdatum","bemerkung","updateamum","updatevon","insertamum","insertvon","ext_id","punkte"),
 	"public.tbl_adresse"  => array("adresse_id","person_id","name","strasse","plz","ort","gemeinde","nation","typ","heimatadresse","zustelladresse","firma_id","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_akte"  => array("akte_id","person_id","dokument_kurzbz","uid","inhalt","mimetype","erstelltam","gedruckt","titel","bezeichnung","updateamum","updatevon","insertamum","insertvon","ext_id","dms_id","nachgereicht","anmerkung","titel_intern","anmerkung_intern"),
 	"public.tbl_ampel"  => array("ampel_id","kurzbz","beschreibung","benutzer_select","deadline","vorlaufzeit","verfallszeit","insertamum","insertvon","updateamum","updatevon","email"),
