@@ -23,7 +23,8 @@ require_once('../../include/functions.inc.php');
 
 $user = get_uid();
 
-?>
+if(false): ?> <script type="text/javascript"><?php endif; ?>
+    
 var MitarbeiterVertragLoadedPerson=null
 // ****************** FUNKTIONEN ************************** //
 
@@ -353,4 +354,97 @@ function MitarbeiterVertragDetailDelete()
 		MitarbeiterVertragLoad(MitarbeiterVertragLoadedPerson);
 		return true;
 	}
+}
+
+function MitarbeiterVertragSelectVertragsstatus()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree=document.getElementById('mitarbeiter-vertrag-tree-vertragsstatus');
+	var col = tree.columns ? tree.columns["mitarbeiter-vertrag-tree-vertragsstatus-vertrag_id"] : "mitarbeiter-vertrag-tree-vertragsstatus-vertrag_id";
+	var col_status = tree.columns ? tree.columns["mitarbeiter-vertrag-tree-vertragsstatus-vertragsstatus_kurzbz"] : "mitarbeiter-vertrag-tree-vertragsstatus-vertragsstatus_kurzbz";
+	
+	if(tree.currentIndex==-1)
+		return false;
+	
+	var vertrag_id=tree.view.getCellText(tree.currentIndex,col);
+	var vertrag_status=tree.view.getCellText(tree.currentIndex,col_status);
+	
+	// *** Zugeordnete Vertragselemente laden
+
+	vertragstatustree = document.getElementById('mitarbeiter-vertrag-tree-vertragsstatus');
+	url='<?php echo APP_ROOT;?>rdf/vertragsstatus.rdf.php?vertrag_id='+vertrag_id+'&vertragsstatus_kurzbz='+vertrag_status+'&'+gettimestamp();
+
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	
+	var dsource = rdfService.GetDataSourceBlocking(url);
+	var subject = rdfService.GetResource("http://www.technikum-wien.at/vertragsstatus/"+vertrag_status +"/"+ vertrag_id);
+
+	var predicateNS = "http://www.technikum-wien.at/vertragsstatus/rdf";
+
+	//Daten holen
+	vertragsdatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#datum" ));
+
+	document.getElementById('mitarbeiter-vertrag-vertragsstatus-textbox-vertragsdatum').value=vertragsdatum;
+	document.getElementById('mitarbeiter-vertrag-vertragsstatus-textbox-vertragsdatum').disabled=false;
+	
+	
+//	var datasource = rdfService.GetDataSource(url);
+//	vertragstatustree.database.AddDataSource(datasource);
+
+}
+
+function MitarbeiterVertragVertragsstatusUpdate(){
+    var tree=document.getElementById('mitarbeiter-vertrag-tree-vertragsstatus');
+    var col = tree.columns ? tree.columns["mitarbeiter-vertrag-tree-vertragsstatus-vertrag_id"] : "mitarbeiter-vertrag-tree-vertragsstatus-vertrag_id";
+    var col_status = tree.columns ? tree.columns["mitarbeiter-vertrag-tree-vertragsstatus-vertragsstatus_kurzbz"] : "mitarbeiter-vertrag-tree-vertragsstatus-vertragsstatus_kurzbz";
+
+    if(tree.currentIndex==-1)
+	    return false;
+
+    var vertrag_id=tree.view.getCellText(tree.currentIndex,col);
+    var vertrag_status=tree.view.getCellText(tree.currentIndex,col_status);
+    
+    var vertrag_datum = document.getElementById("mitarbeiter-vertrag-vertragsstatus-textbox-vertragsdatum").iso;
+
+    var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
+    var req = new phpRequest(url,'','');
+
+    req.add('type', 'vertragsstatusupdate');
+    req.add('vertrag_id',vertrag_id);
+    req.add('status',vertrag_status);
+    req.add('datum',vertrag_datum);
+
+    var response = req.executePOST();
+
+    var val =  new ParseReturnValue(response)
+
+    if (!val.dbdml_return)
+    {
+	    if(val.dbdml_errormsg=='')
+		    alert(response)
+	    else
+		    alert(val.dbdml_errormsg)
+    }
+    else
+    {
+	// *** Status laden
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var vertragsstatustree = document.getElementById('mitarbeiter-vertrag-tree-vertragsstatus');
+	url='<?php echo APP_ROOT;?>rdf/vertragsstatus.rdf.php?vertrag_id='+vertrag_id+"&"+gettimestamp();
+
+	//Alte DS entfernen
+	var oldDatasources = vertragsstatustree.database.GetDataSources();
+	while(oldDatasources.hasMoreElements())
+	{
+		vertragsstatustree.database.RemoveDataSource(oldDatasources.getNext());
+	}
+	//Refresh damit die entfernten DS auch wirklich entfernt werden
+	vertragsstatustree.builder.rebuild();
+
+	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+	var datasource = rdfService.GetDataSource(url);
+	vertragsstatustree.database.AddDataSource(datasource);
+	
+	return true;
+    }
 }

@@ -55,7 +55,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			<menuitem label="Entfernen" oncommand="MitarbeiterVertragDetailDelete()" />
 		</menupopup>
 	</popupset>
-	<vbox flex="1">
+	<vbox flex="3">
 		<vbox flex="1">
 			<hbox>
 				<toolbox flex="1">
@@ -135,8 +135,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 			</tree>
 		</vbox>
 	</vbox>
-	<hbox flex="1" id="mitarbeiter-vertrag-vbox-vertragsdetails">
-		<vbox flex="1">
+	<hbox flex="2" id="mitarbeiter-vertrag-vbox-vertragsdetails">
+		<vbox flex="2">
 			<description>Vertragsdetails</description>	
 			<tree id="mitarbeiter-vertrag-tree-zugeordnet" hidecolumnpicker="false" flex="1"
 			datasources="rdf:null" ref="http://www.technikum-wien.at/vertragdetails"
@@ -203,13 +203,15 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				</template>
 			</tree>
 		</vbox>
-		<vbox flex="1">
+		<vbox flex="2">
+		    <vbox flex="1">
 			<description>Vertragsstatus</description>	
 			<tree id="mitarbeiter-vertrag-tree-vertragsstatus" hidecolumnpicker="false" flex="1"
 			datasources="rdf:null" ref="http://www.technikum-wien.at/vertragsstatus"
 				enableColumnDrag="true"
 				context="mitarbeiter-vertrag-tree-vertragsstatus-popup"
 				flags="dont-build-content"
+				onselect="MitarbeiterVertragSelectVertragsstatus();"
 			>
 				<treecols>
 					<treecol id="mitarbeiter-vertrag-tree-vertragsstatus-vertragsstatus_bezeichnung" label="Status" flex="2" hidden="false" primary="true"
@@ -270,6 +272,31 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					</treechildren>
 				</template>
 			</tree>
+		    </vbox>
+		    <vbox flex="1">
+			<groupbox id='groupbox-vertragsdatum'>
+			    <caption label="Vertragsdatum" />
+			    <grid align="end" flex="1"
+				     flags="dont-build-content"
+				    enableColumnDrag="true"
+				    style="margin:4px;"
+				    >
+				<columns  >
+				    <column flex="1"/>
+				    <column flex="5"/>
+				</columns>
+				<rows>
+				    <row>
+					<label value="Vertragsdatum" control="mitarbeiter-vertrag-vertragsstatus-textbox-vertragsdatum"/>
+					<hbox>
+					    <box class="Datum" id="mitarbeiter-vertrag-vertragsstatus-textbox-vertragsdatum" disabled="true" oninput="alert('test');"/>
+					    <button id="mitarbeiter-vertrag-vertragsstatus-datum-speichern" label="Speichern" oncommand="MitarbeiterVertragVertragsstatusUpdate()" />
+					</hbox>
+				    </row>
+				</rows>
+			    </grid>
+			</groupbox>
+		    </vbox>
 		</vbox>
 	</hbox>
 </vbox>
