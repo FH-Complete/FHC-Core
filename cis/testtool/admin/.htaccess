@@ -1,9 +1,0 @@
-AuthBasicProvider ldap
-AuthName "Technikum-Wien"
-AuthType Basic
-AuthBasicProvider ldap
-AuthBasicAuthoritative Off
-AuthLDAPURL "ldap://localhost:389/ou=People,dc=oesi,dc=org?uid?one?objectclass=posixAccount"
-AuthLDAPGroupAttributeIsDN Off
-AuthLDAPGroupAttribute memberuid
-require user oesi
