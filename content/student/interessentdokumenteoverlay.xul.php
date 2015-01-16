@@ -169,7 +169,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#datumhochgeladen" onclick="InteressentDokumenteAbgegebenTreeSort()"/>
 				<splitter class="tree-splitter"/>
-				<treecol id="interessent-dokumente-tree-abgegeben-mitarbeiter_uid" label="Abgegeben bei" flex="1" hidden="true"
+				<treecol id="interessent-dokumente-tree-abgegeben-mitarbeiter_uid" label="akzeptiert von" flex="1" hidden="true"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/dokumentprestudent/rdf#mitarbeiter_uid" onclick="InteressentDokumenteAbgegebenTreeSort()"/>
 				<splitter class="tree-splitter"/>
