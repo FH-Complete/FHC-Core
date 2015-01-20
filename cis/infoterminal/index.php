@@ -78,7 +78,7 @@
   	$pwd=trim((isset($_REQUEST['pwd']) ? $_REQUEST['pwd']:''));
   	$debug=trim((isset($_REQUEST['debug']) ? $_REQUEST['debug']:''));
   	$sdtools=trim((isset($_REQUEST['sdtools']) ? $_REQUEST['sdtools']:false));	
-  	$standort_id = (isset($_REQUEST['standort_id']) ? $_REQUEST['standort_id']:'');
+  	$standort_id = (isset($_COOKIE['standort_id']) ? $_COOKIE['standort_id']:'');
 	if ($sdtools)
 		$work='login';
 
