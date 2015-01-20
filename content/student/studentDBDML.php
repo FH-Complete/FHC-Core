@@ -2530,8 +2530,7 @@ if(!$error)
 
 			if(!$error)
 			{
-				if(!$rechte->isBerechtigt('admin', $stg_lva, 'suid') && !$rechte->isBerechtigt('admin', $stg_std, 'suid') &&
-				   !$rechte->isBerechtigt('assistenz', $stg_lva, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_std, 'suid'))
+				if(!$rechte->isBerechtigt('student/noten', $stg_lva, 'suid') && !$rechte->isBerechtigt('student/noten', $stg_std, 'suid'))
 				{
 					$return = false;
 					$error = true;
@@ -2564,6 +2563,7 @@ if(!$error)
 						}
 
 						$zeugnisnote->note = $lvgesamtnote->note;
+						$zeugnisnote->punkte = $lvgesamtnote->punkte;
 						$zeugnisnote->uebernahmedatum = date('Y-m-d H:i:s');
 						$zeugnisnote->benotungsdatum = $lvgesamtnote->benotungsdatum;
 						$zeugnisnote->bemerkung = $lvgesamtnote->bemerkung;

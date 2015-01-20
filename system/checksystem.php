@@ -2557,6 +2557,25 @@ if(!$result = @$db->db_query("SELECT oe_kurzbz FROM public.tbl_ort LIMIT 1;"))
 		echo ' public.tbl_ort: Spalte m2, gebteil, oe_kurzbz hinzugefuegt!<br>';
 }
 
+// Eigene Berechtigung fuer Noten
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz='student/noten' LIMIT 1"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "
+		INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('student/noten','FAS Zugriff');
+
+		INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('student/noten','assistenz','suid');
+		INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('student/noten','admin','suid');
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Eigene Berechtigungen fuer Notenverwaltung im FAS hinzugefuegt student/noten!<br>';
+	}
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -2879,6 +2898,7 @@ $berechtigungen = array(
 	array('basis/cms_sperrfreigabe','Berechtigung zum Freigeben von gesperrtem Content'),
 	array('basis/cronjob','Cronjobverwaltung'),
 	array('basis/dms','DMS Download'),
+	array('basis/fas','FAS Zugriff'),
 	array('basis/ferien','Verwaltung der Ferien und Feiertage im System'),
 	array('basis/fhausweis','Verwaltungstools für FH Ausweis – Kartentausch, Bildpruefung, Druck'),
 	array('basis/firma','Firmenverwaltung'),
@@ -2890,9 +2910,11 @@ $berechtigungen = array(
 	array('basis/organisationseinheit','Organisationseinheiten Verwalten'),
 	array('basis/ort','Raum-/Ortverwaltung'),
 	array('basis/person','Personen Zusammenlegen, Stg-Wiederholer anlegen, etc'),
+	array('basis/planner','Planner Zugriff'),
 	array('basis/service','Services Administrieren (SLAs)'),
 	array('basis/statistik','Statistiken Administrieren'),
 	array('basis/studiengang','Studiengangsverwaltung'),
+	array('basis/tempus','Tempus zugriff'),
 	array('basis/testtool','Administrationseite, Gebiete löschen/zurücksetzen'),
 	array('basis/variable','Variablenverwaltung'),
 	array('basis/vilesci','Grundrecht, um in VileSci irgendwelche Menüpunkte zu sehen'),
@@ -2944,6 +2966,7 @@ $berechtigungen = array(
 	array('soap/buchungen','Berechtigung für Buchungsabfrage Addon Kontoimport'),
 	array('student/bankdaten','Bankdaten des Studenten'),
 	array('student/dokumente','Wenn SUID dann dürfen Dokumente auch wieder entfernt werden'),
+	array('student/noten','Notenverwaltung'),
 	array('student/stammdaten','Stammdaten der Studenten'),
 	array('student/vorrueckung','Studentenvorrückung'),
 	array('system/developer','Anzeige zusätzlicher Developerinfos'),

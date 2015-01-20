@@ -36,12 +36,19 @@ require_once('../include/benutzer.class.php');
 require_once('../include/student.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/lehrveranstaltung.class.php');
+require_once('../include/benutzerberechtigung.class.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
 $user = get_uid();
 loadVariables($user);
 $datum = new datum();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('student/noten'))
+	die('Sie haben keine Berechtigung fuer diese Seite');
 
 $stg_arr = array();
 $stg_obj = new studiengang();
@@ -108,6 +115,7 @@ foreach ($obj->result as $row)
 				<NOTE:studiengang_kz><![CDATA['.$benutzer->studiengang_kz.']]></NOTE:studiengang_kz>
 				<NOTE:studiengang_lv><![CDATA['.$stg_arr[$lv_obj->studiengang_kz].']]></NOTE:studiengang_lv>
 				<NOTE:student_semester><![CDATA['.$benutzer->semester.']]></NOTE:student_semester>
+				<NOTE:punkte><![CDATA['.$row->punkte.']]></NOTE:punkte>
 	         </RDF:Description>
 	      </RDF:li>';
 }

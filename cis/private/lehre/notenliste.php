@@ -124,7 +124,10 @@ else
 
 	//Lehrveranstaltungen und Noten holen
 	$qry = "SELECT
-				tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_zeugnisnote.note, tbl_lvgesamtnote.note as lvnote, tbl_zeugnisnote.benotungsdatum, tbl_lvgesamtnote.freigabedatum, tbl_lvgesamtnote.benotungsdatum as lvbenotungsdatum
+				tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_zeugnisnote.note, tbl_zeugnisnote.punkte,
+				tbl_lvgesamtnote.note as lvnote, tbl_lvgesamtnote.punkte as lvpunkte,
+				tbl_zeugnisnote.benotungsdatum, tbl_lvgesamtnote.freigabedatum, 
+				tbl_lvgesamtnote.benotungsdatum as lvbenotungsdatum
 			FROM
 				lehre.tbl_lehrveranstaltung, lehre.tbl_zeugnisnote
 			LEFT OUTER JOIN
@@ -160,6 +163,9 @@ else
 				else
 					$tbl.=$row->lvnote;
 			}
+			if($row->lvpunkte!='')
+				$tbl.=' ('.((float)$row->lvpunkte).')';
+
 			$tbl.= "</td>";
 			if ($row->note != $row->lvnote && $row->lvnote != NULL)
 				$markier = " style='border: 1px solid red;'";
@@ -173,6 +179,8 @@ else
 			else
 				$tbl.=$row->note;
 		
+			if($row->punkte!='')
+				$tbl.=' ('.((float)$row->punkte).')';
 			
 			$tbl .= "</td>";
 			$tbl .= '<td>'.$datum_obj->formatDatum($row->benotungsdatum,'d.m.Y').'</td>';

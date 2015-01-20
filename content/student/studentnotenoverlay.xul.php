@@ -114,6 +114,10 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#lehrveranstaltung_kurzbz" />
 			<splitter class="tree-splitter"/>
+			<treecol id="student-noten-tree-punkte" label="Punkte" flex="2" hidden="true" persist="hidden, width, ordinal"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#punkte" />
+			<splitter class="tree-splitter"/>
 		</treecols>
 	
 		<template>
@@ -134,6 +138,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang_lv"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#lehrveranstaltung_lehrform"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#lehrveranstaltung_kurzbz"/>
+						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#punkte"/>
 					</treerow>
 				</treeitem>
 			</treechildren>
@@ -197,6 +202,10 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#lehrveranstaltung_id" />
 			<splitter class="tree-splitter"/>
+			<treecol id="student-lvgesamtnoten-tree-punkte" label="Punkte" flex="2" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#punkte" />
+			<splitter class="tree-splitter"/>
 		</treecols>
 	
 		<template>
@@ -213,6 +222,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#note"/>
 						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#student_uid"/>
 						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#lehrveranstaltung_id"/>
+						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#punkte"/>
 					</treerow>
 				</treeitem>
 			</treechildren>

@@ -21,6 +21,7 @@
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
 require_once('../../../../config/cis.config.inc.php');
+require_once('../../../../config/global.config.inc.php');
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/studiengang.class.php');
@@ -98,35 +99,50 @@ $uid = (isset($_GET['uid'])?$_GET['uid']:'');
 $noten_obj = new note();
 $noten_obj->getAll();
 
-?><!DOCTYPE HTML>
+echo '<!DOCTYPE HTML>
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
-<title>Gesamtnote</title>
-<STYLE TYPE="text/css">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="../../../../skin/style.css.php" rel="stylesheet" type="text/css">
+	<title>Gesamtnote</title>
+    <link href="../../../../skin/jquery.css" rel="stylesheet"  type="text/css"/>
+    <link href="../../../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
+    <script src="../../../../include/js/jquery1.9.min.js" type="text/javascript"></script> 
 
-.td_datum 
-{
-	width:70px;
-	text-align: left;
-}
-.td_note{
-	width:50px;
-	text-align:center;
-}
-
-</STYLE>
-<script language="JavaScript" type="text/javascript">
-<!--
-<?php 
-	echo "var noten_array=Array();\n";
-	$noten_array=array();
-	foreach($noten_obj->result as $row)
+	<style type="text/css">
+	.td_datum 
 	{
-		echo "noten_array['".$row->note."']='".$row->bezeichnung."';\n";
-		$noten_array[$row->note]=$row->bezeichnung;
+		width:70px;
+		text-align: left;
 	}
+	.td_note{
+		width:50px;
+		text-align:center;
+	}
+	.gradetable
+	{
+		background:#DCE4EF;
+		border: 1px solid #FFF;
+		font-size: 8pt;
+		padding: 4px;
+	}
+	
+	</style>
+	<script language="JavaScript" type="text/javascript">
+	
+	var noten_array=Array();
+';
+
+$noten_array=array();
+foreach($noten_obj->result as $row)
+{
+	echo "	noten_array['".$row->note."']='".addslashes($row->bezeichnung)."';\n";
+	$noten_array[$row->note]['bezeichnung']=$row->bezeichnung;
+	$noten_array[$row->note]['positiv']=$row->positiv;
+	$noten_array[$row->note]['aktiv']=$row->aktiv;
+	$noten_array[$row->note]['lehre']=$row->lehre;
+}
+	
 ?>
 
 	function MM_jumpMenu(targ, selObj, restore)
@@ -206,42 +222,31 @@ $noten_obj->getAll();
 	{
 		note = document.getElementById(uid).note.value;	
 		note_label = document.getElementById(uid).note.label;
-
-		note_orig = document.getElementById(uid).note_orig.value;
-		//wenn die Note gleich bleibt dann abbrechen
-		if 	(note == note_orig && note != "")
-		{
-			alert('<?php echo $p->t('gesamtnote/noteUnveraendert');?>');
-			return true;
-		}
+		if(document.getElementById(uid).punkte)
+			punkte = document.getElementById(uid).punkte.value;
 		else
-		{	
-			//Request erzeugen und die Note speichern
-			erzeugeAnfrage(); 
-		    stud_uid = uid;
-		    var jetzt = new Date();
-			var ts = jetzt.getTime();
-		    var url= '<?php echo "lvgesamtnoteeintragen.php?lvid=".addslashes($lvid)."&stsem=".addslashes($stsem); ?>';
-		    url += '&submit=1&student_uid='+uid+"&note="+note+"&"+ts;
-		    anfrage.open("GET", url, true);
-		    anfrage.onreadystatechange = updateSeite;
-		    anfrage.send(null);
-		    document.getElementById(uid).note_orig.value=noten_array[note];
-	    }
-	}
+			punkte='';
 	
-	// *****************************************************
-	// * Update der Seite nachdem die Note gespeichert wurde
-	// *****************************************************
-	function updateSeite()
-	{
-	    if (anfrage.readyState == 4)
-	    {
-	        if (anfrage.status == 200) 
-	        {
-	        	uid = stud_uid;
+		note_orig = document.getElementById(uid).note_orig.value;
+		
+		//Request erzeugen und die Note speichern
+	    stud_uid = uid;
+	
+		var jetzt = new Date();
+		var ts = jetzt.getTime();
+	    
+		var url= '<?php echo "lvgesamtnoteeintragen.php?lvid=".urlencode($lvid)."&stsem=".urlencode($stsem); ?>';
+	    url += '&submit=1&student_uid='+encodeURIComponent(uid)+"&note="+encodeURIComponent(note)+"&punkte="+encodeURIComponent(punkte)+"&"+ts;
+	    
+		$.ajax({
+			type:"GET",
+			url: url,
+			success:function(result)
+			{
+				document.getElementById(uid).note_orig.value=noten_array[note];
+		     	uid = stud_uid;
 				var note = document.getElementById(uid).note.value;
-	            var resp = anfrage.responseText;
+	            var resp = result;
 	            if (resp == "neu" || resp == "update" || resp == "update_f")
 	            {
 					            	
@@ -250,7 +255,11 @@ $noten_obj->getAll();
 	            	{
 						notentd.removeChild(notentd.lastChild);
 	            	}
-	            	notenode = document.createTextNode(noten_array[note]);
+					if(punkte!='')
+						notentext = noten_array[note]+'('+punkte+')';
+					else
+						notentext = noten_array[note];
+	            	notenode = document.createTextNode(notentext);
                     notentd.appendChild(notenode);
 					notenstatus = document.getElementById("status_"+uid);
 					if (resp == "update_f")
@@ -261,11 +270,14 @@ $noten_obj->getAll();
              		alert(resp);
              		document.getElementById(uid).note.value="";
          		}
-	        } 
-	        else alert("Request status:" + anfrage.status);
-	    }
+  			},
+  			error:function(result)
+  			{
+  				alert('Speichern der Note fehlgeschlagen');
+  			}
+  		});
 	}
-	
+		
 	// *************************************************
 	// * Formular zum Eintragen einer Pruefung erstellen
 	// *************************************************
@@ -317,68 +329,55 @@ $noten_obj->getAll();
 			var uid = document.nachpruefung_form.uid.value;
 			var lehreinheit_id = document.nachpruefung_form.le_id.value;
 			
-			erzeugeAnfrage(); 
 		    var jetzt = new Date();
 			var ts = jetzt.getTime();
 		    var url= '<?php echo "nachpruefungeintragen.php?lvid=$lvid&stsem=$stsem"; ?>';
 		    //&lehreinheit_id=$lehreinheit_id
 		    url += '&submit=1&student_uid='+uid+'&note='+note+'&datum='+datum+'&lehreinheit_id_pr='+lehreinheit_id+'&'+ts;
-		    //alert(url);
-		    anfrage.open("GET", url, true);
-		    anfrage.onreadystatechange = updateSeitePruefung;
-		    anfrage.send(null);
-	    }
-	}
-
-	// ***********************************************************
-	// * Nach dem Eintragen einer Pruefung die Seite aktualisieren
-	// ***********************************************************
-    function updateSeitePruefung()
-    {
-	    if (anfrage.readyState == 4)
-	    {
-	        if (anfrage.status == 200) 
-	        {
-	        	var anlegendiv = document.getElementById("nachpruefung_div");	
-				var datum = 	document.nachpruefung_form.datum.value;
-				var note = document.nachpruefung_form.note.value;
-				var uid = document.nachpruefung_form.uid.value;
-				var lehreinheit_id = document.nachpruefung_form.le_id.value;
-				//var note = document.getElementById(uid).note.value;
-	            var resp = anfrage.responseText;
+			
+			$.ajax({
+				type:"GET",
+				url: url,
+				success:function(result)
+				{
+					var anlegendiv = document.getElementById("nachpruefung_div");	
+					var datum = 	document.nachpruefung_form.datum.value;
+					var note = document.nachpruefung_form.note.value;
+					var uid = document.nachpruefung_form.uid.value;
+					var lehreinheit_id = document.nachpruefung_form.le_id.value;
+					//var note = document.getElementById(uid).note.value;
+		            var resp = result;
 	            
-	            if (resp == "neu" || resp == "update" || resp == "update_f" || resp == "update_pr")
-	            {
-		     	
-	            	if (resp != "update_pr")
-	            	{
-		                notentd = document.getElementById("note_"+uid);	            	
-		            	while (notentd.childNodes.length>0)
+		            if (resp == "neu" || resp == "update" || resp == "update_f" || resp == "update_pr")
+		            {
+			     	
+		            	if (resp != "update_pr")
 		            	{
-							notentd.removeChild(notentd.lastChild);
-		            	}
-		            	notenode = document.createTextNode(note);
-	                    notentd.appendChild(notenode);
-					}					
-					notenstatus = document.getElementById("status_"+uid);
-					if (resp == "update_f")
-                    	notenstatus.innerHTML = "<img src='../../../../skin/images/changed.png'>";
-                    document.getElementById("lvnoteneingabe_"+uid).style.visibility = "hidden";
-                    
-   			 		anlegendiv.innerHTML = "";
-					anlegendiv.style.visibility = "hidden";
-					//if (note == 9)
-					//	note = " ";
-					document.getElementById("span_"+uid).innerHTML = "<table><tr><td class='td_datum'>"+datum+"</td><td class='td_note'>"+note+"<td><input type='button' name='anlegen' value='&Auml;ndern' onclick='pruefungAnlegen(\""+uid+"\",\""+datum+"\",\""+note+"\",\""+lehreinheit_id+"\")'></td></tr></table>";
-                }
-                else
-         		{
-             		alert(resp);
-             		document.getElementById(uid).note.value="";
-         		}
-	        } 
-	        else 
-	        	alert("Request status:" + anfrage.status);
+			                notentd = document.getElementById("note_"+uid);	            	
+			            	while (notentd.childNodes.length>0)
+			            	{
+								notentd.removeChild(notentd.lastChild);
+			            	}
+			            	notenode = document.createTextNode(note);
+		                    notentd.appendChild(notenode);
+						}					
+						notenstatus = document.getElementById("status_"+uid);
+						if (resp == "update_f")
+	                    	notenstatus.innerHTML = "<img src='../../../../skin/images/changed.png'>";
+	                    document.getElementById("lvnoteneingabe_"+uid).style.visibility = "hidden";
+	                    
+	   			 		anlegendiv.innerHTML = "";
+						anlegendiv.style.visibility = "hidden";
+						//if (note == 9)
+						//	note = " ";
+						document.getElementById("span_"+uid).innerHTML = "<table><tr><td class='td_datum'>"+datum+"</td><td class='td_note'>"+note+"<td><input type='button' name='anlegen' value='&Auml;ndern' onclick='pruefungAnlegen(\""+uid+"\",\""+datum+"\",\""+note+"\",\""+lehreinheit_id+"\")'></td></tr></table>";
+					}
+	  			},
+	  			error:function(result)
+	  			{
+	  				alert('Request fehlgeschlagen');
+	  			}
+	  		});
 	    }
 	}
 
@@ -399,6 +398,46 @@ $noten_obj->getAll();
 		return true;
 	}
 	
+	/**
+	 * Wird bei der Punkteeingabe aufgerufen und laedt 
+	 * die dazupassende Noten anhand des Notenschluessels
+	 */
+	function PunkteEingabe(idx)
+	{
+		var punkte = $('#textbox-punkte-'+idx).val();
+		
+		// Request absetzen und Note zu den Punkten holen
+		if(punkte!='')
+		{
+			$.ajax({
+				type:"POST",
+				url:"lvgesamtnote_worker.php",
+				data: { lehrveranstaltung_id: '<?php echo $lvid; ?>', 
+						punkte: punkte, 
+						work: 'getGradeFromPoints',
+						studiensemester_kurzbz: '<?php echo $stsem;?>'
+					},
+				success:function(result)
+				{
+				    note=result;
+				
+					var notendropdown = $('#dropdown-note-'+idx);
+					notendropdown.val(note);
+					notendropdown.prop('disabled',true);
+	  			},
+	  			error:function(result)
+	  			{
+	  				alert('Noten ermittlung fehlgeschlagen');
+	  			}
+	  		});
+		}
+		else
+		{
+			var notendropdown = $('#dropdown-note-'+idx);
+			notendropdown.prop('disabled',false);
+		}
+	}
+
 	// ****
 	// * Liefert die Daten aus der Zwischenablage fuer IE und Firefox
 	// * Opera und Safari unterstuetzen dies nicht
@@ -479,16 +518,31 @@ $noten_obj->getAll();
 		
 		if(i>0)
 		{
-			erzeugeAnfrage(); 
+			
 		    var jetzt = new Date();
 			var ts = jetzt.getTime();
 		    var url= '<?php echo "lvgesamtnoteeintragen.php?lvid=".addslashes($lvid)."&stsem=".addslashes($stsem); ?>';
 		    url += '&submit=1&'+ts;
-		    anfrage.open("POST", url, true);
-		    anfrage.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-		    anfrage.setRequestHeader("Connection", "close");
-		    anfrage.onreadystatechange = updateSeiteMatrikelnr;
-		    anfrage.send('test='+params);
+		    
+		    $.ajax({
+				type:"POST",
+				url: url,
+				data: { test: params },
+				success:function(result)
+				{
+				    var resp = anfrage.responseText;
+		            if (resp!='')
+		            {
+						alert(resp);
+	                }
+	                window.location.href=window.location.href;
+	  			},
+	  			error:function(result)
+	  			{
+	  				alert('Request fehlgeschlagen');
+	  			}
+	  		});
+		    
 		}
 		else
 		{
@@ -496,29 +550,6 @@ $noten_obj->getAll();
 		}
 	}
 
-	// **************************************************************
-	// * Seite neu laden nachdem der Request gesendet wurde und ggf 
-	// * Errormsg ausgeben
-	// **************************************************************
-	function updateSeiteMatrikelnr()
-	{
-	    if (anfrage.readyState == 4)
-	    {
-	        if (anfrage.status == 200) 
-	        {
-	            var resp = anfrage.responseText;
-	            if (resp!='')
-	            {
-					alert(resp);
-                }
-                //QuickNDirty
-                //ToDo: Aktualisierung der geaenderten Felder per JS anstatt reload
-         		//window.location.reload();
-         		window.location.href=window.location.href;
-	        } 
-	        else alert("Request status:" + anfrage.status);
-	    }
-	}
 //-->
 </script>
 <style type="text/css">
@@ -767,30 +798,29 @@ if ($pr_komm->getPruefungenLV($lvid,"kommPruef",$stsem))
 $summe_komm=count($studpruef_komm);
 
 //Studentenliste
-echo '<table>';
-		echo "<tr>
-				<td colspan='11'>&nbsp;</td>
-			</tr>
+
+echo '<table class="gradetable">';
+		echo "
 			<tr>
-				<td class='ContentHeader2'></td>
-				<td class='ContentHeader2'>".$p->t('global/uid')."</td>
-				<td class='ContentHeader2'>".$p->t('global/nachname')."</td>
-				<td class='ContentHeader2'>".$p->t('global/vorname')."</td>
-				<td class='ContentHeader2'>".($grade_from_moodle?''.$p->t('benotungstool/moodleNote').'':''.$p->t('benotungstool/leNoten').' (LE-ID)')."</td>
-				<td class='ContentHeader2'></td>
-				<td class='ContentHeader2'>".$p->t('benotungstool/lvNote')."<br><input type='button' onclick='readNotenAusZwischenablage()' value='".$p->t('benotungstool/importieren')."'></td>
-				<td class='ContentHeader2' align='right'>
+				<th></th>
+				<th>".$p->t('global/uid')."</th>
+				<th>".$p->t('global/nachname')."</th>
+				<th>".$p->t('global/vorname')."</th>
+				<th>".($grade_from_moodle?''.$p->t('benotungstool/moodleNote').'':''.$p->t('benotungstool/leNoten').' (LE-ID)')."</th>
+				<th>".$p->t('benotungstool/punkte').' / '.$p->t('benotungstool/note')."</th>
+				<th rowspan=2>".$p->t('benotungstool/lvNote')."<br><input type='button' onclick='readNotenAusZwischenablage()' value='".$p->t('benotungstool/importieren')."'></th>
+				<th align='right' rowspan=2>
 				<form name='freigabeform' action='".$_SERVER['PHP_SELF']."?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem' method='POST' onsubmit='return OnFreigabeSubmit()'><input type='hidden' name='freigabe' value='1'>
-				".$p->t('global/passwort').": <input type='password' size='8' id='textbox-freigabe-passwort' name='passwort'><br><input type='submit' name='frei' value='Freigabe'>
+				<span style='white-space:nowrap;'>".$p->t('global/passwort').": <input type='password' size='8' id='textbox-freigabe-passwort' name='passwort'></span><br><input type='submit' name='frei' value='Freigabe'>
 				</form>
-				</td>
-				<td class='ContentHeader2'>".$p->t('benotungstool/zeugnisnote')."</td>
-				<td class='ContentHeader2' colspan='2'>".$p->t('benotungstool/nachpruefung')."</td>
-				<td class='ContentHeader2' colspan='2'>".$p->t('benotungstool/kommissionellePruefung')."</td>
+				</th>
+				<th>".$p->t('benotungstool/zeugnisnote')."</th>
+				<th colspan='2'>".$p->t('benotungstool/nachpruefung')."</th>
+				<th colspan='2'>".$p->t('benotungstool/kommissionellePruefung')."</th>
 			</tr>
 			<tr>
-				<td colspan='9'>&nbsp;</td>
-				<td colspan='2'>
+				<th colspan='9'>&nbsp;</th>
+				<th colspan='2'>
 					<table>
 					<tr>
 						<td class='td_datum'>".$p->t('global/datum')."</td>
@@ -798,8 +828,8 @@ echo '<table>';
 						<td></td>
 					</tr>
 					</table>
-				</td>
-				<td colspan='2'>
+				</th>
+				<th colspan='2'>
 					<table>
 					<tr>
 						<td class='td_datum'>".$p->t('global/datum')."</td>
@@ -807,11 +837,9 @@ echo '<table>';
 						<td></td>
 					</tr>
 					</table>
-				</td>
+				</th>
 			</tr>
-			<tr>
-				<td colspan='11'>&nbsp;</td>
-			</tr>";
+			";
 
 
 		if($grade_from_moodle)
@@ -1016,12 +1044,16 @@ echo '<table>';
     			if ($lvgesamtnote = new lvgesamtnote($lvid,$row_stud->uid,$stsem))
     			{
     				$note_lv = $lvgesamtnote->note;
+					$punkte_lv = $lvgesamtnote->punkte;
     			}
     			else
+				{
     				$note_lv = null;
+					$punkte_lv = null;
+				}
 				
 				if (!is_null($note_lv))
-					$note_vorschlag = $note_lv;
+				$note_vorschlag = $note_lv;
 				else if ($le_anz > 0)
 					$note_vorschlag = round($note_le/$le_anz);
 				else
@@ -1044,7 +1076,11 @@ echo '<table>';
 						<span id='lvnoteneingabe_".$row_stud->uid."' ".$hide.">
 							<input type='hidden' name='student_uid' value='$row_stud->uid'>";
 
-				echo '<select name="note">';
+				if(CIS_GESAMTNOTE_PUNKTE)
+					echo '<input type="text" name="punkte" id="textbox-punkte-'.$i.'" value="'.$punkte_lv.'" size="3" oninput="PunkteEingabe('.$i.')"/>';
+				
+				// Noten DropDown
+				echo '<select name="note" id="dropdown-note-'.$i.'">';
 				echo '<option value="">-- keine Auswahl --</option>';
 				foreach($noten_obj->result as $row_note)
 				{
@@ -1053,9 +1089,8 @@ echo '<table>';
 					else
 						$selected='';
 
-					echo '<option value="'.$row_note->note.'" '.$selected.'>'.$row_note->bezeichnung.'</option>';
-
-					//<input type='text' size='1' value='$note_vorschlag' name='note'>
+					if($row_note->lehre && $row_note->aktiv)
+						echo '<option value="'.$row_note->note.'" '.$selected.'>'.$row_note->bezeichnung.'</option>';
 				}
 				echo '</select>';
 				echo "
@@ -1064,15 +1099,20 @@ echo '<table>';
 						</span>
 					</form></td>";
 				
-					
-				if ($note_lv == 5)
+				if(isset($noten_array[$note_lv]) && $noten_array[$note_lv]['positiv']==false)
 					$negmarkier = " style='color:red; font-weight:bold;'";
 				else
 					$negmarkier = "";			
 				
-				echo "<td align='center' id='note_$row_stud->uid'><span ".$negmarkier.">".(isset($noten_array[$note_lv])?$noten_array[$note_lv]:'')."</span></td>";
+				// LV Note
+				echo '<td align="center" id="note_'.$row_stud->uid.'"><span '.$negmarkier.'>';
+				if(isset($noten_array[$note_lv]))
+					echo $noten_array[$note_lv]['bezeichnung'];
+				if($punkte_lv!='')
+					echo ' ('.number_format($punkte_lv,2).')';
+				echo '</span></td>';
 				
-				//status //////////////////////////////////////////////////////////////////////////////////
+				//status
 				echo "<td align='center' id='status_$row_stud->uid'>";				
 				if (!$lvgesamtnote->freigabedatum)
 					echo "<img src='../../../../skin/images/offen.png'>";				
@@ -1082,16 +1122,16 @@ echo '<table>';
 					echo "<img src='../../../../skin/images/ok.png'>";
 					
 				echo "</td>";
-				if (($znote) and ($note_lv != $znote))
+				if (($znote) && ($note_lv != $znote))
 					$stylestr = " style='color:red; border-color:red; border-style:solid; border-width:1px;'";
 				else
 					$stylestr ="";
-				echo "<td".$stylestr." align='center'>".(isset($noten_array[$znote])?$noten_array[$znote]:'')."</td>";
-				if($znote==5 || $znote==7 || $znote==9 || $znote==13 || $znote==13 || $znote=='')
+				echo "<td".$stylestr." align='center'>".(isset($noten_array[$znote])?$noten_array[$znote]['bezeichnung']:'')."</td>";
+				if(isset($noten_array[$znote]) && $noten_array[$znote]['positiv']==false)
 				{
 					$summe_ng++;
 				}
-				// Pruefung 2.Termin ///////////////////////////////////////////////////////////////////////////
+				// Pruefung 2.Termin
 				if (key_exists($row_stud->uid, $studpruef_arr))			
 				{
 					echo "<td colspan='2'>";
@@ -1123,7 +1163,7 @@ echo '<table>';
 					else
 						echo "<td colspan='2'></td>";	
 				}
-				// komm Pruefung ///////////////////////////////////////////////////////////////////////////
+				// komm Pruefung
 				if (key_exists($row_stud->uid,$studpruef_komm))			
 				{
 					echo "<td colspan='2'>";
@@ -1161,12 +1201,12 @@ echo '<table>';
 //}
 echo "
 <tr style='font-weight:bold;' align='center'>
-<td class='ContentHeader2' style='font-weight:bold;'>&Sigma;</td>
-<td class='ContentHeader2' style='font-weight:bold;' title='".$p->t('benotungstool/anzahlDerStudenten')."'>$summe_stud</td>
-<td class='ContentHeader2' colspan='6'></td>
-<td class='ContentHeader2' style='color:red; font-weight:bold;' title='".$p->t('benotungstool/anzahlNegativerBeurteilungen')."'>$summe_ng</td>
-<td class='ContentHeader2' style='font-weight:bold;' colspan='2' title='".$p->t('benotungstool/anzahlNachpruefungen')."'>$summe_t2</td>
-<td class='ContentHeader2' style='font-weight:bold;' colspan='2' title='".$p->t('benotungstool/anzahlKommisionellePruefungen')."'>$summe_komm</td>
+<th style='font-weight:bold;'>&Sigma;</th>
+<th style='font-weight:bold;' title='".$p->t('benotungstool/anzahlDerStudenten')."'>$summe_stud</th>
+<th colspan='6'></td>
+<th style='color:red; font-weight:bold;' title='".$p->t('benotungstool/anzahlNegativerBeurteilungen')."'>$summe_ng</th>
+<th style='font-weight:bold;' colspan='2' title='".$p->t('benotungstool/anzahlNachpruefungen')."'>$summe_t2</th>
+<th style='font-weight:bold;' colspan='2' title='".$p->t('benotungstool/anzahlKommisionellePruefungen')."'>$summe_komm</th>
 </tr>
 </table>
 </td></tr>

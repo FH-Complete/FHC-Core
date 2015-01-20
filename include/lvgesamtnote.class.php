@@ -283,6 +283,7 @@ class lvgesamtnote extends basis_db
 				$obj->mitarbeiter_uid = $row->mitarbeiter_uid;
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$obj->note = $row->note;
+				$obj->punkte = $row->punkte;
 				$obj->freigabedatum = $row->freigabedatum;
 				$obj->freigabevon_uid = $row->freigabevon_uid;
 				$obj->benotungsdatum = $row->benotungsdatum;

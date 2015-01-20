@@ -167,4 +167,5 @@ $this->phrasen['benotungstool/mussPositivSein']='* muss positiv sein';
 $this->phrasen['benotungstool/eingetrageneNoten']='Eingetragene Noten';
 $this->phrasen['benotungstool/zeunis']='Zeugnis';
 $this->phrasen['benotungstool/handbuch']='Handbuch';
+$this->phrasen['benotungstool/punkte']='Punkte';
 ?>

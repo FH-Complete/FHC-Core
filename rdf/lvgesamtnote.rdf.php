@@ -32,12 +32,19 @@ require_once('../include/functions.inc.php');
 require_once('../include/lvgesamtnote.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/studiengang.class.php');
+require_once('../include/benutzerberechtigung.class.php');
 
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
 $user = get_uid();
 loadVariables($user);
 $datum = new datum();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('student/noten'))
+	die('Sie haben keine Berechtigung fuer diese Seite');
 
 $stg_arr = array();
 $stg_obj = new studiengang();
@@ -78,7 +85,7 @@ foreach ($obj->result as $row)
 	{
 		$vorname = '';
 		$nachname = '';
-		$qry_name = "SELECT vorname, nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid='$row->student_uid'";
+		$qry_name = "SELECT vorname, nachname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=".$db->db_add_param($row->student_uid);
 		if($db->db_query($qry_name))
 		{
 			if($row_name = $db->db_fetch_object())
@@ -96,6 +103,7 @@ foreach ($obj->result as $row)
 					<NOTE:mitarbeiter_uid><![CDATA['.$row->mitarbeiter_uid.']]></NOTE:mitarbeiter_uid>
 					<NOTE:studiensemester_kurzbz><![CDATA['.$row->studiensemester_kurzbz.']]></NOTE:studiensemester_kurzbz>
 					<NOTE:note><![CDATA['.$row->note.']]></NOTE:note>
+					<NOTE:punkte><![CDATA['.$row->punkte.']]></NOTE:punkte>
 					<NOTE:freigabedatum_iso><![CDATA['.$row->freigabedatum.']]></NOTE:freigabedatum_iso>
 					<NOTE:freigabedatum><![CDATA['.$datum->convertISODate($row->freigabedatum).']]></NOTE:freigabedatum>
 					<NOTE:benotungsdatum_iso><![CDATA['.$row->benotungsdatum.']]></NOTE:benotungsdatum_iso>

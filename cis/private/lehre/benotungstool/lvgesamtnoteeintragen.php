@@ -108,7 +108,7 @@ if(!$rechte->isBerechtigt('admin',0) &&
 	}
 }
 
-function savenote($db,$lvid, $student_uid, $note)
+function savenote($db,$lvid, $student_uid, $note, $punkte=null)
 {
 	global $stsem, $user, $p;
 	$jetzt = date("Y-m-d H:i:s");
@@ -138,12 +138,14 @@ function savenote($db,$lvid, $student_uid, $note)
 		$lvgesamtnote->updatevon = null;
 		$lvgesamtnote->insertamum = $jetzt;
 		$lvgesamtnote->insertvon = $user;
+		$lvgesamtnote->punkte = $punkte;
 		$new = true;
 		$response = "neu";
     }
     else
     {
 		$lvgesamtnote->note = trim($note);
+		$lvgesamtnote->punkte = $punkte;
 		$lvgesamtnote->benotungsdatum = $jetzt;
 		$lvgesamtnote->updateamum = $jetzt;
 		$lvgesamtnote->updatevon = $user;
@@ -167,9 +169,10 @@ if (isset($_REQUEST["submit"]))
 	{
 		$student_uid = $_REQUEST["student_uid"];
 		$note = $_REQUEST["note"];
+		$punkte = $_REQUEST["punkte"];
 		
 		//if((($note>0) && ($note < 6)) || ($note == 7) || ($note==16) || ($note==10) || ($note==14))
-			$response = savenote($db,$lvid, $student_uid, $note);
+			$response = savenote($db,$lvid, $student_uid, $note, $punkte);
 		/*else
 			$response = $p->t('benotungstool/noteEingeben')."!";
 		*/
