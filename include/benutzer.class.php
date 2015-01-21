@@ -310,7 +310,7 @@ class benutzer extends person
 					WHERE 
 						mitarbeiter_uid=tbl_benutzer.uid
 						AND (tbl_kontakt.kontakttyp='telefon' OR tbl_kontakt.kontakttyp is null)
-						) as klappe,
+						limit 1) as klappe,
 					(SELECT planbezeichnung FROM public.tbl_mitarbeiter
 					LEFT JOIN public.tbl_ort USING (ort_kurzbz) 
 					WHERE mitarbeiter_uid=tbl_benutzer.uid) as raum
