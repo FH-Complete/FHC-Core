@@ -169,17 +169,14 @@ if (isset($_REQUEST["submit"]))
 	{
 		$student_uid = $_REQUEST["student_uid"];
 		$note = $_REQUEST["note"];
-		$punkte = $_REQUEST["punkte"];
+		$punkte = (isset($_REQUEST["punkte"])?$_REQUEST["punkte"]:'');
 		
-		//if((($note>0) && ($note < 6)) || ($note == 7) || ($note==16) || ($note==10) || ($note==14))
-			$response = savenote($db,$lvid, $student_uid, $note, $punkte);
-		/*else
-			$response = $p->t('benotungstool/noteEingeben')."!";
-		*/
+		$response = savenote($db,$lvid, $student_uid, $note, $punkte);
 		echo $response;
 	}
 	else
 	{
+
 		foreach ($_POST as $row=>$val)
 		{
 			if(mb_strstr(mb_strtolower($row), 'matrikelnr_'))
@@ -189,7 +186,6 @@ if (isset($_REQUEST["submit"]))
 				{
 					$matrikelnummer = $_POST['matrikelnr_'.$id];
 					$note = $_POST['note_'.$id];
-					
 					//UID ermitteln
 					$student = new student();
 					if(!$student_uid = $student->getUidFromMatrikelnummer($matrikelnummer))
@@ -204,21 +200,9 @@ if (isset($_REQUEST["submit"]))
 					else
 						$znote = null;	
 					
-					/*if(((($note>0) && ($note < 6)) || ($note == 7) || ($note==16) || ($note==10) || ($note==14)))
-					{*/
-						$val=savenote($db,$lvid, $student_uid, $note);
-						if($val!='neu' && $val!='update' && $val!='update_f')
-							$response.=$val;
-					/*}
-					else
-					{
-						// Wenn Zeugnisnote schon 6 ist -> keine Fehlermeldung mehr
-						if($znote != 6)
-						{	
-							$student->load($student_uid);						
-							$response .= "\n".$p->t('benotungstool/fehlerhafteNoteBeiStudent', array($student->vorname, $student->nachname))." ".$p->t('benotungstool/noteEingeben');
-						}
-					}*/
+					$val=savenote($db,$lvid, $student_uid, $note);
+					if($val!='neu' && $val!='update' && $val!='update_f')
+						$response.=$val;
 				}
 				else 
 				{

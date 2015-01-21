@@ -144,22 +144,6 @@ foreach($noten_obj->result as $row)
 }
 	
 ?>
-
-	function MM_jumpMenu(targ, selObj, restore)
-	{
-		eval(targ + ".location='" + selObj.options[selObj.selectedIndex].value + "'");
-
-		if(restore)
-		{
-			selObj.selectedIndex = 0;
-		}
-	}
-	
-	function confirmdelete()
-	{
-		return confirm('<?php echo $p->t('gesamtnote/wollenSieWirklichLoeschen').'!!'; ?>');
-	}
-
 	function getTopOffset()
 	{
 		var x,y;
@@ -181,39 +165,6 @@ foreach($noten_obj->result as $row)
 		}
 		return y;
 	}
-
-	// **************************************
-	// * XMLHttpRequest Objekt erzeugen
-	// **************************************
-    var anfrage = null;
-
-	function erzeugeAnfrage()
-	{
-		try
-		{
-			anfrage = new XMLHttpRequest();
-		}
-		catch (versuchmicrosoft)
-		{
-			try
-			{
-				anfrage = new ActiveXObject("Msxml12.XMLHTTP");
-			}
-			catch (anderesmicrosoft)
-			{
-				try
-				{
-					anfrage = new ActiveXObject("Microsoft.XMLHTTP");
-				}
-				catch (fehlschlag)
-				{
-					anfrage = null;
-                }
-            }
-        }
-		if (anfrage == null)
-			alert('<?php echo $p->t('global/fehleraufgetreten');?>');
-    }
 
     // ******************************************
     // * Note eines Studenten Speichern
@@ -248,8 +199,7 @@ foreach($noten_obj->result as $row)
 				var note = document.getElementById(uid).note.value;
 	            var resp = result;
 	            if (resp == "neu" || resp == "update" || resp == "update_f")
-	            {
-					            	
+	            {				            	
 	            	notentd = document.getElementById("note_"+uid);
 	            	while (notentd.childNodes.length>0)
 	            	{
@@ -289,16 +239,29 @@ foreach($noten_obj->result as $row)
 		var y = getTopOffset();
 		y = y+50;		
 		anlegendiv.style.top = y+"px";
-	
+
 		str += "<tr><td colspan='2'><b><?php echo $p->t('benotungstool/pruefungAnlegenFuer');?> "+uid+":</b></td></tr>";
-		str += "<tr><td>Datum:</td>";
-		str += "<td><input type='hidden' name='uid' value='"+uid+"'><input type='hidden' name='le_id' value='"+lehreinheit_id+"'><input type='text' name='datum' value='"+datum+"'> [DD.MM.YYYY]</td>";
-		str += "</tr><tr><td>Note:</td>";
-		str += "<td><input type='text' name='note' value='"+note+"'></td>";
+		str += "<tr><td><?php echo $p->t('global/datum');?>:</td>";
+		str += "<td><input type='hidden' name='uid' value='"+uid+"'><input type='hidden' name='le_id' value='"+lehreinheit_id+"'>";
+		str += "<input type='text' id='pruefungsdatum' name='datum' size='10' value='"+datum+"'> [DD.MM.YYYY]";
+		str += "</td></tr><tr><td><?php echo $p->t('benotungstool/note');?>:</td>";
+
+		str +='<?php
+			echo '<td><select name="note" id="pruefungnoteselect">';
+			echo '<option value="">-- keine Auswahl --</option>';
+			foreach($noten_obj->result as $row_note)
+			{
+				if($row_note->lehre && $row_note->aktiv)
+					echo '<option value="'.$row_note->note.'">'.$row_note->bezeichnung.'</option>';
+			}
+			echo '</select></td>';
+		?>';
 		str += "</tr><tr><td colspan='2' align='center'><input type='button' name='speichern' value='<?php echo $p->t('global/speichern');?>' onclick='pruefungSpeichern();'></td></tr>";
-		str += "</table></cehter></form>";		
+		str += "</table></center></form>";		
 		anlegendiv.innerHTML = str;	
-		anlegendiv.style.visibility = "visible";	
+		anlegendiv.style.visibility = "visible";
+		$('#pruefungsdatum').datepicker();
+		$('#pruefungnoteselect').val(note);
 	}
 	
 	// **********************************************
@@ -307,15 +270,10 @@ foreach($noten_obj->result as $row)
 	function pruefungSpeichern()
 	{
 		var note = document.nachpruefung_form.note.value;
-		if ((note < 0) || (note > 5 && note != 7 && note != 9 && note!=16 && note!=10 && note!=14 && note != ""))
-		{
-			alert("<?php echo $p->t('benotungstool/noteEingebenOderLeer');?>!");
-			document.getElementById(uid).note.value="";
-		}		
 		var datum = document.nachpruefung_form.datum.value;		
 		var datum_test = datum.split(".");
 		if (datum_test[0].length != 2 || datum_test[1].length != 2 || datum_test[2].length!=4 || isNaN(datum_test[2]) || datum_test[1]>12 || datum_test[1]<1 || datum_test[0]>31 || datum_test[0]<1)
-			alert("Invalid Date. Format: DD.MM.YYYY");
+			alert("Invalid Date Format: DD.MM.YYYY");
 		else
 		{
 			var anlegendiv = document.getElementById("nachpruefung_div");			
@@ -323,8 +281,8 @@ foreach($noten_obj->result as $row)
 			var note = document.nachpruefung_form.note.value;
 			if (note == "" || isNaN(note))
 			{
-					document.nachpruefung_form.note.value = "9";
-					note = "9";
+				document.nachpruefung_form.note.value = "9";
+				note = "9";
 			}		
 			var uid = document.nachpruefung_form.uid.value;
 			var lehreinheit_id = document.nachpruefung_form.le_id.value;
@@ -332,7 +290,6 @@ foreach($noten_obj->result as $row)
 		    var jetzt = new Date();
 			var ts = jetzt.getTime();
 		    var url= '<?php echo "nachpruefungeintragen.php?lvid=$lvid&stsem=$stsem"; ?>';
-		    //&lehreinheit_id=$lehreinheit_id
 		    url += '&submit=1&student_uid='+uid+'&note='+note+'&datum='+datum+'&lehreinheit_id_pr='+lehreinheit_id+'&'+ts;
 			
 			$.ajax({
@@ -345,12 +302,10 @@ foreach($noten_obj->result as $row)
 					var note = document.nachpruefung_form.note.value;
 					var uid = document.nachpruefung_form.uid.value;
 					var lehreinheit_id = document.nachpruefung_form.le_id.value;
-					//var note = document.getElementById(uid).note.value;
 		            var resp = result;
 	            
 		            if (resp == "neu" || resp == "update" || resp == "update_f" || resp == "update_pr")
 		            {
-			     	
 		            	if (resp != "update_pr")
 		            	{
 			                notentd = document.getElementById("note_"+uid);	            	
@@ -358,7 +313,7 @@ foreach($noten_obj->result as $row)
 			            	{
 								notentd.removeChild(notentd.lastChild);
 			            	}
-			            	notenode = document.createTextNode(note);
+			            	notenode = document.createTextNode(noten_array[note]);
 		                    notentd.appendChild(notenode);
 						}					
 						notenstatus = document.getElementById("status_"+uid);
@@ -368,9 +323,7 @@ foreach($noten_obj->result as $row)
 	                    
 	   			 		anlegendiv.innerHTML = "";
 						anlegendiv.style.visibility = "hidden";
-						//if (note == 9)
-						//	note = " ";
-						document.getElementById("span_"+uid).innerHTML = "<table><tr><td class='td_datum'>"+datum+"</td><td class='td_note'>"+note+"<td><input type='button' name='anlegen' value='&Auml;ndern' onclick='pruefungAnlegen(\""+uid+"\",\""+datum+"\",\""+note+"\",\""+lehreinheit_id+"\")'></td></tr></table>";
+						document.getElementById("span_"+uid).innerHTML = "<table><tr><td class='td_datum'>"+datum+"</td><td class='td_note'>"+noten_array[note]+"<td><input type='button' name='anlegen' value='<?php echo $p->t('global/aendern'); ?>' onclick='pruefungAnlegen(\""+uid+"\",\""+datum+"\",\""+note+"\",\""+lehreinheit_id+"\")'></td></tr></table>";
 					}
 	  			},
 	  			error:function(result)
@@ -439,79 +392,47 @@ foreach($noten_obj->result as $row)
 	}
 
 	// ****
-	// * Liefert die Daten aus der Zwischenablage fuer IE und Firefox
-	// * Opera und Safari unterstuetzen dies nicht
+	// * Oeffnet ein Fenster fuer den Import von Noten aus dem Excel
 	// ****
-	function getDataFromClipboard()
+	function GradeImport()
 	{	
-		if (navigator.appName.indexOf('Microsoft') > -1) 
-		{
-			//IE
-			return clipboardData.getData("Text");
-		}
-		else
-		{
-			if(!!window.Components)
-			{
-				//Firefox, Mozilla, Gecko
-				try
-				{
-					netscape.security.PrivilegeManager.enablePrivilege('UniversalXPConnect');
-				}
-				catch(e)
-				{
-					//alert('Um den Import nutzen zu können müssen sie Ihre Sicherheitseinstellungen Ändern!\n Geben Sie hierzu in der Adresszeile ihres Browsers "about:config" ein und setzen sie, in der angezeigten Liste, den Eintrag "signed.applets.codebase_pricipal_support" auf true.');
-					alert("Ihr Browser unterstuetzt diese Funktion nicht. Bitte verwenden Sie für den Noten Import einen Internet Explorer");
-				}
-				var clip = Components.classes["@mozilla.org/widget/clipboard;1"].getService(Components.interfaces.nsIClipboard); 
-				if (!clip) 
-					return false; 
-				var trans = Components.classes["@mozilla.org/widget/transferable;1"].createInstance(Components.interfaces.nsITransferable); 
-				if (!trans) 
-					return false; 
-				
-				trans.addDataFlavor("text/unicode");
-				
-				clip.getData(trans,clip.kGlobalClipboard); 
-				var str = new Object(); 
-				var strLength = new Object(); 
-				trans.getTransferData("text/unicode",str,strLength);
-			
-				if (str) str = str.value.QueryInterface(Components.interfaces.nsISupportsString); 
-				if (str) pastetext = str.data.substring(0,strLength.value / 2);
-				
-				return pastetext;
-			}
-			else
-			{
-				//Safari, Opera, etc
-				alert("Ihr Browser unterstuetzt diese Funktion nicht. Bitte verwenden Sie für den Noten Import einen Internet Explorer");
-			}
-		}
-	}
-	
-	// *******************************************************************************
-	// * holt die Daten aus der Zwischenablage parst diese und speichert sie in der DB
-	// * Ablauf fuer den Import:
-	// * - die Spalten Matrikelnummer und Note im Excel markieren
-	// * - in die Zwischenablage kopieren (strg-c)
-	// * - auf import klicken
-	// *******************************************************************************
-	function readNotenAusZwischenablage()
-	{
-		var data = getDataFromClipboard();
+		var str = "<form name='gradeimport_form'><center><table style='width:95%'><tr><td colspan='2' align='right'><a href='#' onclick='closeDiv();'>X</a></td></tr>";
 		
+		var anlegendiv = document.getElementById("nachpruefung_div");
+		var y = getTopOffset();
+		y = y+50;		
+		anlegendiv.style.top = y+"px";
+
+		str += '<tr><td>Kopieren Sie die Spalten Matrikelnummer und Note aus dem Excel File und fügen Sie diese in folgendes Feld ein:</td>';
+		str += '<td></td><tr><td><textarea id="noteimporttextarea" name="notenimport"></textarea></td></tr>';
+		str += "<tr><td><input type='button' name='speichern' value='<?php echo $p->t('global/speichern');?>' onclick='saveGradeBulk();'>";
+		str += "</td><td></td></tr></table></center></form>";	
+		anlegendiv.innerHTML = str;	
+		anlegendiv.style.visibility = "visible";
+		$('#noteimporttextarea').focus();
+	}
+
+	// Speichert die Noten ueber den Import	
+	function saveGradeBulk()
+	{
+		data = $('#noteimporttextarea').val();
+		closeDiv();
+ 	
 		//Reihen ermitteln
 		var rows = data.split("\n");
 		var i=0;
 		var params='';
+
+		var gradedata = {};
+
 		for(row in rows)
 		{
 			zeile = rows[row].split("	");
 	
 			if(zeile[0]!='' && zeile[1]!='')
 			{
-				params=params+'&matrikelnr_'+i+'='+zeile[0]+'&note_'+i+'='+zeile[1];
+				gradedata['matrikelnr_'+i]=zeile[0];
+				gradedata['note_'+i]= zeile[1];
 				i++;
 			}
 		}
@@ -521,21 +442,20 @@ foreach($noten_obj->result as $row)
 			
 		    var jetzt = new Date();
 			var ts = jetzt.getTime();
-		    var url= '<?php echo "lvgesamtnoteeintragen.php?lvid=".addslashes($lvid)."&stsem=".addslashes($stsem); ?>';
+		    var url= '<?php echo "lvgesamtnoteeintragen.php?lvid=".urlencode($lvid)."&stsem=".urlencode($stsem); ?>';
 		    url += '&submit=1&'+ts;
-		    
 		    $.ajax({
 				type:"POST",
 				url: url,
-				data: { test: params },
+				data: gradedata,
 				success:function(result)
 				{
-				    var resp = anfrage.responseText;
+				    var resp = result;
 		            if (resp!='')
 		            {
 						alert(resp);
 	                }
-	                window.location.href=window.location.href;
+	                window.location.reload();
 	  			},
 	  			error:function(result)
 	  			{
@@ -552,13 +472,6 @@ foreach($noten_obj->result as $row)
 
 //-->
 </script>
-<style type="text/css">
-.transparent {
-    filter:alpha(opacity=90);
-    -moz-opacity:0.9;
-    -khtml-opacity: 0.9;
-    opacity: 0.9;
-</style>        
 </head>
 
 <body>
@@ -615,7 +528,7 @@ if($stsem=='')
 $stsem_obj->getAll();
 
 //Studiensemester DropDown
-$stsem_content = $p->t('global/studiensemester').": <SELECT name='stsem' onChange=\"MM_jumpMenu('self',this,0)\">";
+$stsem_content = $p->t('global/studiensemester').": <SELECT name='stsem' onChange=\"self.location=this.options[this.selectedIndex].value\">";
 foreach($stsem_obj->studiensemester as $studiensemester)
 {
 	$selected = ($stsem == $studiensemester->studiensemester_kurzbz?'selected':'');
@@ -755,15 +668,12 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 }
 
 echo '<table width="100%" height="10px"><tr><td>';
-//echo "<h3><a href='javascript:window.history.back()'>".$p->t('global/zurueck')."</a></h3>";
 echo '</td><td align="right">';
 echo '<a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/benotungstoolHandbuch').'" class="Item" target="_blank">'.$p->t('benotungstool/handbuch').' (PDF)</a>';
 echo '</td></tr></table>';
 
 
 echo '<table width="100%" height="10px"><tr><td>';
-	//echo "<h3>".$p->t('benotungstool/lvGesamtnoteVerwalten')."</h3>";
-	//echo $p->t('benotungstool/noten');
 echo '</td></tr></table>';
 
 // alle Pruefungen für die LV holen
@@ -777,7 +687,6 @@ if ($pr_all->getPruefungenLV($lvid,"Termin2",$stsem))
 		{		
 			$studpruef_arr[$pruefung->student_uid][$pruefung->lehreinheit_id]["note"] = $pruefung->note;
 			$studpruef_arr[$pruefung->student_uid][$pruefung->lehreinheit_id]["datum"] = $datum_obj->formatDatum($pruefung->datum,'d.m.Y');
-			//echo print_r($studpruef_arr[$pruefung->student_uid]);
 		}	
 	}
 }
@@ -808,7 +717,7 @@ echo '<table class="gradetable">';
 				<th>".$p->t('global/vorname')."</th>
 				<th>".($grade_from_moodle?''.$p->t('benotungstool/moodleNote').'':''.$p->t('benotungstool/leNoten').' (LE-ID)')."</th>
 				<th>".$p->t('benotungstool/punkte').' / '.$p->t('benotungstool/note')."</th>
-				<th rowspan=2>".$p->t('benotungstool/lvNote')."<br><input type='button' onclick='readNotenAusZwischenablage()' value='".$p->t('benotungstool/importieren')."'></th>
+				<th rowspan=2>".$p->t('benotungstool/lvNote')."<br><input type='button' onclick='GradeImport()' value='".$p->t('benotungstool/importieren')."'></th>
 				<th align='right' rowspan=2>
 				<form name='freigabeform' action='".$_SERVER['PHP_SELF']."?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem' method='POST' onsubmit='return OnFreigabeSubmit()'><input type='hidden' name='freigabe' value='1'>
 				<span style='white-space:nowrap;'>".$p->t('global/passwort').": <input type='password' size='8' id='textbox-freigabe-passwort' name='passwort'></span><br><input type='submit' name='frei' value='Freigabe'>
@@ -1146,7 +1055,7 @@ echo '<table class="gradetable">';
 						$pr_le_id = $le_id_stud;
 						
 						echo "<tr><td class='td_datum'>";
-						echo $pr_datum."</td><td class='td_note'>".$pr_note."</td><td>";
+						echo $pr_datum."</td><td class='td_note'>".$noten_array[$pr_note]['bezeichnung']."</td><td>";
 						echo "<input type='button' name='anlegen' value='".$p->t('global/aendern')."' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"".$pr_datum."\",\"".$pr_note."\",\"".$pr_le_id."\")'>";					
 						echo "<td></tr>";
 					}
@@ -1178,15 +1087,12 @@ echo '<table class="gradetable">';
 						$pr_le_id = $le_id_stud;
 						
 						echo "<tr><td class='td_datum'>";
-						echo $pr_datum."</td><td class='td_note'>".$pr_note."</td>";
-						//echo "<td><input type='button' name='anlegen' value='Ändern' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"".$pr_datum."\",\"".$pr_note."\",\"".$pr_le_id."\")'></td>";					
+						echo $pr_datum."</td><td class='td_note'>".$noten_array[$pr_note]['bezeichnung']."</td>";
 						echo "</tr>";
 					}
 					echo "</table>";			
 					echo "</span>";
-					//echo "<div id='nachpruefung_div_".$row_stud->uid."' style='position:relative; top:0px; left 5px; background-color:#cccccc; visibility:collapse;' class='transparent'></div>";
 					echo "</td>";
-					//echo "</form>";
 				}
 				else
 				{
@@ -1197,8 +1103,6 @@ echo '<table class="gradetable">';
 				$i++;
 			}
 		}
-//	}
-//}
 echo "
 <tr style='font-weight:bold;' align='center'>
 <th style='font-weight:bold;'>&Sigma;</th>
@@ -1216,7 +1120,7 @@ echo "
 echo $htmlOutput;
 ?>
 
-<div id="nachpruefung_div" style="position:absolute; top:100px; left:200px; width:400px; height:150px; background-color:#cccccc; visibility:hidden; border-style:solid; border-width:1px; border-color:#333333;" class="transparent"></div>
+<div id="nachpruefung_div" style="position:absolute; top:100px; left:200px; width:400px; height:150px; background-color:#cccccc; visibility:hidden; border-style:solid; border-width:1px; border-color:#333333;" ></div>
 
 </body>
 </html>
