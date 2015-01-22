@@ -28,6 +28,7 @@ require_once('../include/datum.class.php');
 require_once('../include/note.class.php');
 require_once('../include/studiensemester.class.php');
 require_once('../include/studiengang.class.php');
+require_once('../include/mitarbeiter.class.php');
 
 $datum = new datum();
 $db = new basis_db();
@@ -42,7 +43,8 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 				tbl_studentlehrverband.semester, tbl_person.titelpre, tbl_person.titelpost, 
 				tbl_person.vorname, tbl_person.nachname,tbl_person.gebdatum, 
 				tbl_studiensemester.bezeichnung as sembezeichnung,
-				tbl_studiengang.english as bezeichnung_englisch
+				tbl_studiengang.english as bezeichnung_englisch,
+				tbl_studiengang.orgform_kurzbz
 			FROM 
 				public.tbl_person, public.tbl_student, public.tbl_studiengang, public.tbl_benutzer, 
 				public.tbl_studentlehrverband, public.tbl_studiensemester 
@@ -54,7 +56,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 				and tbl_studentlehrverband.student_uid=tbl_student.student_uid 
 				and tbl_studiensemester.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz 
 				and tbl_studentlehrverband.studiensemester_kurzbz = ".$db->db_add_param($studiensemester_kurzbz);
-	
+
 	if($db->db_query($query))
 	{
 		if(!$row = $db->db_fetch_object())
@@ -80,15 +82,34 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	if($semester_aktuell=='')
 		$studiensemester_aktuell='';
 		
-	$qry_semester = "SELECT tbl_prestudentstatus.ausbildungssemester as semester FROM public.tbl_student, public.tbl_prestudentstatus 
+	$qry_semester = "SELECT tbl_prestudentstatus.ausbildungssemester as semester, tbl_prestudentstatus.orgform_kurzbz FROM public.tbl_student, public.tbl_prestudentstatus 
 					WHERE tbl_student.prestudent_id=tbl_prestudentstatus.prestudent_id 
 						AND tbl_prestudentstatus.status_kurzbz in('Student','Incoming','Outgoing','Praktikant','Diplomand') 
 						AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." 
 						AND tbl_student.student_uid = ".$db->db_add_param($uid);
 		
+	$orgform='';
 	if($db->db_query($qry_semester))
+	{
 		if($row_semester = $db->db_fetch_object())
+		{
 			$row->semester=$row_semester->semester;
+			$orgform = $row_semester->orgform_kurzbz;
+		}
+	}
+
+	// Wenn der Studiernede keine Orgform eingetragen hat, wird die Orgform des Studiengang genommen
+	if($orgform=='')
+		$orgform = $row->orgform_kurzbz;
+	
+	$studiengang = new studiengang();
+	$stgleiter = $studiengang->getLeitung($row->studiengang_kz);
+	$stgl='';
+	foreach ($stgleiter as $stgleiter_uid)
+	{
+		$stgl_ma = new mitarbeiter($stgleiter_uid);
+		$stgl .= trim($stgl_ma->titelpre.' '.$stgl_ma->vorname.' '.$stgl_ma->nachname.' '.$stgl_ma->titelpost);
+	}
 	
 	$xml .= "	<studienerfolg>";
 	$xml .= "		<logopath>".DOC_ROOT."skin/images/</logopath>";
@@ -110,6 +131,8 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	$xml .= "		<studiensemester_kurzbz>".$studiensemester_kurzbz."</studiensemester_kurzbz>";
 	$datum_aktuell = date('d.m.Y');
 	$xml .= "		<datum>".$datum_aktuell."</datum>";
+	$xml .= "		<orgform>".$orgform."</orgform>";
+	$xml .= "		<studiengangsleitung>".$stgl."</studiengangsleitung>";
 
 	if(isset($_REQUEST['typ']) && $_REQUEST['typ']=='finanzamt')
 		$xml .= "		<finanzamt>(gemäß §2 Abs. 1 lit.b des Familienlastenausgleichsgesetzes 1967 zur Vorlage beim Wohnsitzfinanzamt)</finanzamt>";

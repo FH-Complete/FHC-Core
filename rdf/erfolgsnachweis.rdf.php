@@ -187,7 +187,7 @@ $lehrveranstaltungen = array();
 					else
 					{
 						// 2. Ebene
-						if(isset($lehrveranstaltungen[$stpllv[$row->studienplan_lehrveranstaltung_id_parent]]))
+						if(isset($stpllv[$row->studienplan_lehrveranstaltung_id_parent]) && isset($lehrveranstaltungen[$stpllv[$row->studienplan_lehrveranstaltung_id_parent]]))
 						{
 							$lehrveranstaltungen[$stpllv[$row->studienplan_lehrveranstaltung_id_parent]]['childs'][$row->lehrveranstaltung_id]['data'] = $row;
 						}
@@ -196,7 +196,7 @@ $lehrveranstaltungen = array();
 							// 3. Ebene
 							foreach($lehrveranstaltungen as $key=>$row_module)
 							{
-								if(isset($lehrveranstaltungen[$key]['childs'][$stpllv[$row->studienplan_lehrveranstaltung_id_parent]]))
+								if(isset($stpllv[$row->studienplan_lehrveranstaltung_id_parent]) && isset($lehrveranstaltungen[$key]['childs'][$stpllv[$row->studienplan_lehrveranstaltung_id_parent]]))
 								{
 									$lehrveranstaltungen[$key]['childs'][$stpllv[$row->studienplan_lehrveranstaltung_id_parent]]['childs'][$row->lehrveranstaltung_id]['data']=$row;
 								}

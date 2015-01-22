@@ -406,7 +406,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <text:p text:style-name="PLegendEmpty"/>
          
       <xsl:choose>
-		<xsl:when test="studiengang_kz='265' or studiengang_kz='268' or studiengang_kz='761' or studiengang_kz='760' or studiengang_kz='266' or studiengang_kz='267' or studiengang_kz='764' or studiengang_kz='269' or studiengang_kz='400'">
+		<xsl:when test="studiengang_kz=265 or studiengang_kz=268 or studiengang_kz=761 or studiengang_kz=760 or studiengang_kz=266 or studiengang_kz=267 or studiengang_kz=764 or studiengang_kz=269 or studiengang_kz=400">
 			<text:p text:style-name="PDatumOrt">Pinkafeld, am <xsl:value-of select="datum_aktuell"/></text:p>
 		</xsl:when>
 		<xsl:otherwise>
@@ -498,7 +498,16 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</text:p>
           </table:table-cell>
           <table:table-cell table:style-name="Lehrveranstaltungen.H3" office:value-type="string">
-            <text:p text:style-name="P17"><xsl:value-of select="note"/></text:p>
+            <text:p text:style-name="P17">
+				<xsl:choose>
+					<xsl:when test="noteidx=9"> <!-- noch nicht eingetragen nicht anzeigen -->
+						<xsl:text></xsl:text>
+					</xsl:when>
+					<xsl:otherwise>
+	         			<xsl:value-of select="note"/>
+	         		</xsl:otherwise>
+            	</xsl:choose>						
+			</text:p>
           </table:table-cell>
           <table:table-cell table:style-name="Lehrveranstaltungen.I3" office:value-type="string">
             <text:p text:style-name="P17">
@@ -529,6 +538,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             		</xsl:when>
             		<xsl:when test="noteidx=8">
             			<xsl:text>p.wo.s.</xsl:text>
+            		</xsl:when>
+					<xsl:when test="noteidx=9">
+            			<xsl:text></xsl:text>
             		</xsl:when>
             		<xsl:otherwise>
 	         			<xsl:value-of select="noteidx" />
@@ -572,7 +584,16 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</text:p>
           </table:table-cell>
           <table:table-cell table:style-name="Lehrveranstaltungen.H3" office:value-type="string">
-            <text:p text:style-name="P17"><xsl:value-of select="note"/></text:p>
+            <text:p text:style-name="P17">
+				<xsl:choose>
+					<xsl:when test="noteidx=9"> <!-- noch nicht eingetragen nicht anzeigen -->
+						<xsl:text></xsl:text>
+					</xsl:when>
+					<xsl:otherwise>
+	         			<xsl:value-of select="note"/>
+	         		</xsl:otherwise>
+            	</xsl:choose>			
+			</text:p>
           </table:table-cell>
           <table:table-cell table:style-name="Lehrveranstaltungen.I3" office:value-type="string">
             <text:p text:style-name="P17">
@@ -603,6 +624,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             		</xsl:when>
             		<xsl:when test="noteidx=8">
             			<xsl:text>p.wo.s.</xsl:text>
+            		</xsl:when>
+					<xsl:when test="noteidx=9">
+            			<xsl:text></xsl:text>
             		</xsl:when>
             		<xsl:otherwise>
          				<xsl:value-of select="noteidx" />
@@ -638,16 +662,26 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       </table:table-cell>
       <table:table-cell table:style-name="Lehrveranstaltungen.G4" office:value-type="string">
         <text:p text:style-name="P17">
+			<!-- keine ECTS in 3. Ebene sondern nur einen Strich
 			<xsl:if test="positiv='Ja'">
 				<xsl:value-of select="ects"/>
 			</xsl:if>
+			-->
+			<xsl:text>-</xsl:text>
 		</text:p>
       </table:table-cell>
       <table:table-cell table:style-name="Lehrveranstaltungen.H4" office:value-type="string">
-        <text:p text:style-name="P17"><xsl:value-of select="note"/></text:p>
+        <text:p text:style-name="P17">
+			<!--
+			Keine Note in 3. Ebene anzeigen sondern nur einen Strich
+			<xsl:value-of select="note"/>
+			-->
+			<xsl:text>-</xsl:text>
+		</text:p>
       </table:table-cell>
       <table:table-cell table:style-name="Lehrveranstaltungen.I4" office:value-type="string">
         <text:p text:style-name="P17">
+		<!-- Keine Note in 3. Ebene anzeigen sondern nur einen Strich
       	 <xsl:choose>
          		<xsl:when test="noteidx=0">
          			<xsl:text>A</xsl:text>
@@ -680,6 +714,8 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
          			<xsl:value-of select="noteidx" />
          		</xsl:otherwise>
          	</xsl:choose>
+		-->
+		<xsl:text>-</xsl:text>
         </text:p>
       </table:table-cell>
     </table:table-row>
