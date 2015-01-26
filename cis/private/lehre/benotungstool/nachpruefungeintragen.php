@@ -59,8 +59,6 @@ else
 
 if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id'])) //Lehreinheit_id
 	$lehreinheit_id = $_GET['lehreinheit_id'];
-//else
-//	die('Fehlerhafte Parameteruebergabe');
 
 if(isset($_GET['lehreinheit_id_pr']) && is_numeric($_GET['lehreinheit_id_pr'])) //Lehreinheit_id der pruefung
 	$lehreinheit_id = $_GET['lehreinheit_id_pr'];
@@ -87,13 +85,8 @@ if(isset($_GET['stsem']))
 else
 	$stsem = '';
 	
-//Vars
-
 $uebung_id = (isset($_GET['uebung_id'])?$_GET['uebung_id']:'');
 $uid = (isset($_GET['uid'])?$_GET['uid']:'');
-
-//Kopfzeile
-
 
 //Studiensemester laden
 $stsem_obj = new studiensemester();
@@ -102,78 +95,93 @@ if($stsem=='')
 
 $student_uid = $_REQUEST["student_uid"];
 
-
-//if($lehreinheit_id=='')
-//	die('Es wurde keine passende Lehreinheit in diesem Studiensemester gefunden');
-
 $note = $_REQUEST["note"];
-if ( (($note>0) && ($note < 6)) || ($note == 7) || ($note==16) || ($note==10) || ($note==14))
-	$note = $_REQUEST["note"];
+if(isset($_REQUEST['punkte']))
+	$punkte = $_REQUEST['punkte'];
 else
+	$punkte = '';
+
+if($note=='')
 	$note = 9;
 
 $old_note = $note;
 
 // lvgesamtnote für studenten speichern
-if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  ){
-	
-		// lehreinheiten holen, in denen der student ist	
-		$le_arr = array();			
-		$qry_stud = "SELECT DISTINCT lehreinheit_id, lehrform_kurzbz FROM campus.vw_student_lehrveranstaltung JOIN campus.vw_student using(uid) WHERE  studiensemester_kurzbz = '".$stsem."' and lehrveranstaltung_id = '".$lvid."' and uid='".$student_uid."' ORDER BY lehrform_kurzbz DESC";
-		 if($result_stud = $db->db_query($qry_stud))
-			{
-				$i=1;
-				while($row_stud = $db->db_fetch_object($result_stud))
-				{
-					$le_arr[] = $row_stud->lehreinheit_id;
-				}
-			}
+if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  )
+{
+	// Die Pruefung muss einer Lehreinheit zugeordnet werden
+	// deshalb wird hier versucht eine passende Lehreinheit zu ermitteln.
+	$le_arr = array();			
+	$qry_stud = "SELECT DISTINCT lehreinheit_id, lehrform_kurzbz 
+		FROM 
+			campus.vw_student_lehrveranstaltung 
+			JOIN campus.vw_student using(uid) 
+		WHERE  
+			studiensemester_kurzbz = ".$db->db_add_param($stsem)."
+			AND lehrveranstaltung_id = ".$db->db_add_param($lvid, FHC_INTEGER)."
+			AND uid=".$db->db_add_param($student_uid)."
+		ORDER BY lehrform_kurzbz DESC";
 
-		if (!in_array($lehreinheit_id,$le_arr))
-			$lehreinheit_id = $le_arr[0];
+	if($result_stud = $db->db_query($qry_stud))
+	{
+		$i=1;
+		while($row_stud = $db->db_fetch_object($result_stud))
+		{
+			$le_arr[] = $row_stud->lehreinheit_id;
+		}
+	}
+
+	if (!in_array($lehreinheit_id,$le_arr))
+		$lehreinheit_id = $le_arr[0];
 	
 	$jetzt = date("Y-m-d H:i:s");
 
 	$pr = new Pruefung();
 
+	// Wenn eine Pruefung angelegt wird, wird  zuerst eine Pruefung mit 1. Termin angelegt
+	// und dort die Zeugnisnote gespeichert
 	if($pr->getPruefungen($student_uid, "Termin1", $lvid, $stsem))
 	{
 		if ($pr->result)
 			$termin1 = 1;
 		else
+		{
+			$lvnote = new lvgesamtnote();
+			if ($lvnote->load($lvid, $student_uid, $stsem))
 			{
-				$lvnote = new lvgesamtnote();
-				if ($lvnote->load($lvid, $student_uid, $stsem))
-				{
-					$pr_note = $lvnote->note;
-					$benotungsdatum = $lvnote->benotungsdatum;
-				}
-				else
-				{
-					$pr_note = 9;
-					$benotungsdatum = $jetzt;
-				}
-				$pr_1 = new Pruefung();
-				$pr_1->lehreinheit_id = $lehreinheit_id;
-				$pr_1->student_uid = $student_uid;
-				$pr_1->mitarbeiter_uid = $user;
-				$pr_1->note = $pr_note;
-				$pr_1->pruefungstyp_kurzbz = "Termin1";
-				$pr_1->datum = $benotungsdatum;
-				$pr_1->anmerkung = "";
-				$pr_1->insertamum = $jetzt;
-				$pr_1->insertvon = $user;
-				$pr_1->updateamum = Null;
-				$pr_1->updatevon = Null;
-				$pr_1->ext_id = Null;
-				$pr_1->new = 1;
-				$pr_1->save();
+				$pr_note = $lvnote->note;
+				$pr_punkte = $lvnote->punkte;
+				$benotungsdatum = $lvnote->benotungsdatum;
 			}
+			else
+			{
+				$pr_note = 9;
+				$benotungsdatum = $jetzt;
+			}
+
+			$pr_1 = new Pruefung();
+			$pr_1->lehreinheit_id = $lehreinheit_id;
+			$pr_1->student_uid = $student_uid;
+			$pr_1->mitarbeiter_uid = $user;
+			$pr_1->note = $pr_note;
+			$pr_1->punkte = $pr_punkte;
+			$pr_1->pruefungstyp_kurzbz = "Termin1";
+			$pr_1->datum = $benotungsdatum;
+			$pr_1->anmerkung = "";
+			$pr_1->insertamum = $jetzt;
+			$pr_1->insertvon = $user;
+			$pr_1->updateamum = null;
+			$pr_1->updatevon = null;
+			$pr_1->ext_id = null;
+			$pr_1->new = true;
+			$pr_1->save();
+		}
 	}
 
 	$prTermin2 = new Pruefung();
 	$pr_2 = new Pruefung();
 
+	// Die Pruefung wird als Termin2 eingetragen
 	if ($prTermin2->getPruefungen($student_uid, "Termin2", $lvid, $stsem))
 	{
 		if	($prTermin2->result)
@@ -184,6 +192,7 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  ){
 			$pr_2->updatevon = $user;
 			$old_note = $pr_2->note;
 			$pr_2->note = $note;
+			$pr_2->punkte = $punkte;
 			$pr_2->datum = $datum;
 			$pr_2->anmerkung = "";
 		}
@@ -193,125 +202,65 @@ if (isset($_REQUEST["submit"]) && ($_REQUEST["student_uid"] != '')  ){
 			$pr_2->student_uid = $student_uid;
 			$pr_2->mitarbeiter_uid = $user;
 			$pr_2->note = $note;
+			$pr_2->punkte = $punkte;
 			$pr_2->pruefungstyp_kurzbz = "Termin2";
 			$pr_2->datum = $datum;
 			$pr_2->anmerkung = "";
 			$pr_2->insertamum = $jetzt;
 			$pr_2->insertvon = $user;
-			$pr_2->updateamum = Null;
-			$pr_2->updatevon = Null;
-			$pr_2->ext_id = Null;
-			$pr_2->new = 1;
+			$pr_2->updateamum = null;
+			$pr_2->updatevon = null;
+			$pr_2->ext_id = null;
+			$pr_2->new = true;
 			$old_note = -1;		
 		}
 		$pr_2->save();
 	}
 
 
-	if ( (($note>0) && ($note < 6)) || ($note == 7) || ($note==16) || ($note==10) || ($note==14))
-	{
+	// Wenn eine Pruefung eingetragen wird, wird danach die LV-Note korrigiert
+	$jetzt = date("Y-m-d H:i:s");	
 
-		$jetzt = date("Y-m-d H:i:s");	
-	
-		$lvid = $_REQUEST["lvid"];
-		$lvgesamtnote = new lvgesamtnote();
-	    if (!$lvgesamtnote->load($lvid, $student_uid, $stsem))
-	    {
-			$lvgesamtnote->student_uid = $student_uid;
-			$lvgesamtnote->lehrveranstaltung_id = $lvid;
-			$lvgesamtnote->studiensemester_kurzbz = $stsem;
-			$lvgesamtnote->note = $_REQUEST["note"];
-			$lvgesamtnote->mitarbeiter_uid = $user;
-			$lvgesamtnote->benotungsdatum = $jetzt;
-			$lvgesamtnote->freigabedatum = null;
-			$lvgesamtnote->freigabevon_uid = null;
-			$lvgesamtnote->bemerkung = null;
-			$lvgesamtnote->updateamum = null;
-			$lvgesamtnote->updatevon = null;
-			$lvgesamtnote->insertamum = $jetzt;
-			$lvgesamtnote->insertvon = $user;
-			$new = true;
-			$response = "neu";
-	    }
-	    else
-	    {
-			$lvgesamtnote->note = $_REQUEST["note"];
-			$lvgesamtnote->benotungsdatum = $jetzt;
-			$lvgesamtnote->updateamum = $jetzt;
-			$lvgesamtnote->updatevon = $user;
-			$new = false;
-			if ($lvgesamtnote->freigabedatum)		
-				$response = "update_f";
-			else
-				$response = "update";
-		}
-		if (!$lvgesamtnote->save($new))
-			echo "<span class='error'>".$lvgesamtnote->errormsg."</span>";
-		else 
-			echo $response;
+	$lvid = $_REQUEST["lvid"];
+	$lvgesamtnote = new lvgesamtnote();
+    if (!$lvgesamtnote->load($lvid, $student_uid, $stsem))
+    {
+		$lvgesamtnote->student_uid = $student_uid;
+		$lvgesamtnote->lehrveranstaltung_id = $lvid;
+		$lvgesamtnote->studiensemester_kurzbz = $stsem;
+		$lvgesamtnote->note = $note;
+		$lvgesamtnote->punkte = $punkte;
+		$lvgesamtnote->mitarbeiter_uid = $user;
+		$lvgesamtnote->benotungsdatum = $jetzt;
+		$lvgesamtnote->freigabedatum = null;
+		$lvgesamtnote->freigabevon_uid = null;
+		$lvgesamtnote->bemerkung = null;
+		$lvgesamtnote->updateamum = null;
+		$lvgesamtnote->updatevon = null;
+		$lvgesamtnote->insertamum = $jetzt;
+		$lvgesamtnote->insertvon = $user;
+		$new = true;
+		$response = "neu";
+    }
+    else
+    {
+		$lvgesamtnote->note = $note;
+		$lvgesamtnote->punkte = $punkte;
+		$lvgesamtnote->benotungsdatum = $jetzt;
+		$lvgesamtnote->updateamum = $jetzt;
+		$lvgesamtnote->updatevon = $user;
+		$new = false;
+		if ($lvgesamtnote->freigabedatum)		
+			$response = "update_f";
+		else
+			$response = "update";
 	}
-	else
-		echo "update_pr";
+	if (!$lvgesamtnote->save($new))
+		echo "<span class='error'>".$lvgesamtnote->errormsg."</span>";
+	else 
+		echo $response;
 }
 else
 	echo "Fehler beim Eintragen der Pr&uuml;fungen";
 
-/*
-Beim Eintragen von Nachpruefungen wird ein Mail an die Assistenz geschickt.
-
-17.06.2010 auf Wunsch der Assistenz werden keine Mails mehr versendet
-
-if ($old_note != $note)
-{
-	    $qry = "SELECT distinct on(uid) vorname, nachname, tbl_benutzer.uid as uid, oe_kurzbz 
-	    		FROM lehre.tbl_lehreinheit
-	    		JOIN lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id)
-	    		JOIN public.tbl_benutzer ON (uid=mitarbeiter_uid)
-	    		JOIN public.tbl_person USING (person_id)
-	    		JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
-	    		JOIN public.tbl_studiengang USING (studiengang_kz)
-	    		WHERE 
-	    			lehrveranstaltung_id='$lvid' AND 
-	    			tbl_lehreinheitmitarbeiter.mitarbeiter_uid NOT like '_Dummy%' AND 
-	    			tbl_benutzer.aktiv=true AND tbl_person.aktiv=true AND 
-	    			studiensemester_kurzbz='$stsem'";
-
-    $mailto = '';
-    if(($result = $db->db_query($qry)) != FALSE)
-    {
-        if ($db->db_num_rows($result) > 0)
-        {
-            $row_lector = $db->db_fetch_object($result);
-            $oe_kurzbz = $row_lector->oe_kurzbz;
-            $mailto = $row_lector->uid.'@'.DOMAIN;
-            while (($row_lector = $db->db_fetch_object($result)) != FALSE)
-                $mailto .= ','.$row_lector->uid.'@'.DOMAIN;
-        }        
-    }
-    
-    $ass = new benutzerfunktion();
-    if ($ass->getBenutzerFunktionen("ass",$oe_kurzbz))
-        foreach ($ass->result as $res) $mailto .= (empty($mailto) ? "" : ",").$res->uid.'@'.DOMAIN;
-        
-    if($mailto != '')
-    {
-        $culprit = new benutzer($user);
-        $victim = new student($student_uid);
-
-        $mail = new mail(	$mailto,
-        					'CIS-System@do.not.reply',
-        					'[CIS-System] Note der Nachprüfung wurde '.($old_note < 0 ? 'eingetragen' : 'geändert'),
-        					"Automatische Benachrichtigung:\n\nDie Nachprüfungsnote von\n\n$victim->vorname $victim->nachname ($student_uid)\n\nwurde im Studiensemester $stsem von $culprit->vorname $culprit->nachname ($user)\n\n".
-                            ($old_note < 0
-                            ? "mit '$note' eingetragen."
-                            : "von '$old_note' auf '$note' geändert.").
-                            "\n");
-        if (!$mail->send())
-        {
-            sleep(3);
-            $mail->send();    // Desperate second attempt. 
-        }
-    }
-}
-*/
 ?>

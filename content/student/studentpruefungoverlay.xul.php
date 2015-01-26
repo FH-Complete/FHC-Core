@@ -26,6 +26,14 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../config/global.config.inc.php');
+
+
+if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
+	$punktehidden = 'false';
+else
+	$punktehidden = 'true';
+
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 ?>
@@ -97,6 +105,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/pruefung/rdf#mitarbeiter_uid" />
 							<splitter class="tree-splitter"/>
+							<treecol id="student-pruefung-tree-punkte" label="Punkte" flex="2" hidden="true"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/pruefung/rdf#punkte" />
+							<splitter class="tree-splitter"/>
 						</treecols>
 					
 						<template>
@@ -113,6 +125,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										<treecell label="rdf:http://www.technikum-wien.at/pruefung/rdf#lehreinheit_id"/>
 										<treecell label="rdf:http://www.technikum-wien.at/pruefung/rdf#student_uid"/>
 										<treecell label="rdf:http://www.technikum-wien.at/pruefung/rdf#mitarbeiter_uid"/>
+										<treecell label="rdf:http://www.technikum-wien.at/pruefung/rdf#punkte"/>
 									</treerow>
 								</treeitem>
 							</treechildren>
@@ -207,6 +220,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 													</menupopup>
 											</template>
 										</menulist>
+									</row>
+									<row hidden="<?php echo $punktehidden; ?>">
+										<label value="Punkte" control="student-pruefung-textbox-punkte"/>
+										<hbox>
+											<textbox id="student-pruefung-textbox-punkte" disabled="true" checked="false"/>
+											<spacer flex="1" />
+										</hbox>
 									</row>
 									<row>
 										<label value="Datum" control="student-pruefung-textbox-datum"/>

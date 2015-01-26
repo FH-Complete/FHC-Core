@@ -26,7 +26,13 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../config/global.config.inc.php');
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
+
+if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
+	$punktehidden = 'false';
+else
+	$punktehidden = 'true';
 
 echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css\" ?>";
 ?>
@@ -52,9 +58,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 		style="margin-bottom:5px;" height="100%" enableColumnDrag="true"
 		context="student-noten-tree-popup"
 		flags="dont-build-content"
-	>
-	<!-- onselect="StudentNotenAuswahl()" - wird jetzt per JS gesetzt -->
-	
+	>	
 		<treecols>
 			<treecol id="student-noten-tree-lehrveranstaltung_bezeichnung" label="Lehrveranstaltung" flex="2" hidden="false" primary="true" persist="hidden, width, ordinal"
 				class="sortDirectionIndicator"
@@ -244,8 +248,10 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				</menupopup>
 		</template>
 	</menulist>
+	<label value="Punkte" control="student-noten-textbox-punkte" hidden="<?php echo $punktehidden; ?>"/>
+	<textbox id="student-noten-textbox-punkte" disabled="true" hidden="<?php echo $punktehidden; ?>"/>
 	
-	<button id="student-noten-button-speichern" oncommand="StudentNoteSpeichern()" label="Speichern" disabled="true" hidden="true"/>
+	<button id="student-noten-button-speichern" oncommand="StudentNoteSpeichern()" label="Speichern" disabled="true" hidden="<?php echo $punktehidden; ?>"/>
 	
 	<spacer flex="1" />
 </hbox>

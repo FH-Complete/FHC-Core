@@ -3496,6 +3496,7 @@ function StudentNoteDisableFields(val)
 function StudentNoteDetailDisableFields(val)
 {
 	document.getElementById('student-noten-menulist-note').disabled=val;
+	document.getElementById('student-noten-textbox-punkte').disabled=val;
 	document.getElementById('student-noten-button-speichern').disabled=val;
 }
 
@@ -3542,11 +3543,13 @@ function StudentNotenAuswahl()
 	//Daten holen
 
 	note = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#note" ));
+	punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
 
 	if(note=='')
 		note='9';
 
 	document.getElementById('student-noten-menulist-note').value=note;
+	document.getElementById('student-noten-textbox-punkte').value=punkte;
 }
 
 // ****
@@ -3572,6 +3575,7 @@ function StudentNoteSpeichern()
 	var studiensemester_kurzbz=tree.view.getCellText(tree.currentIndex,col);
 
 	note = document.getElementById('student-noten-menulist-note').value;
+	punkte = document.getElementById('student-noten-textbox-punkte').value;
 
 
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
@@ -3583,6 +3587,7 @@ function StudentNoteSpeichern()
 	req.add('student_uid', student_uid);
 	req.add('studiensemester_kurzbz', studiensemester_kurzbz);
 	req.add('note', note);
+	req.add('punkte', punkte);
 
 	var response = req.executePOST();
 
@@ -3779,6 +3784,7 @@ function StudentPruefungDetailDisableFields(val)
 	document.getElementById('student-pruefung-menulist-note').disabled=val;
 	document.getElementById('student-pruefung-textbox-datum').disabled=val;
 	document.getElementById('student-pruefung-textbox-anmerkung').disabled=val;
+	document.getElementById('student-pruefung-textbox-punkte').disabled=val;
 	document.getElementById('student-pruefung-button-speichern').disabled=val;
 }
 
@@ -3979,6 +3985,7 @@ function StudentPruefungDetailSpeichern()
 	neu = document.getElementById('student-pruefung-checkbox-neu').checked;
 	pruefung_id = document.getElementById('student-pruefung-textbox-pruefung_id').value;
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
+	punkte = document.getElementById('student-pruefung-textbox-punkte').value;
 
 	if(lehreinheit_id=='')
 	{
@@ -4022,6 +4029,7 @@ function StudentPruefungDetailSpeichern()
 	req.add('pruefung_id', pruefung_id);
 	req.add('student_uid', student_uid);
 	req.add('studiengang_kz', studiengang_kz);
+	req.add('punkte', punkte);
 
 	var response = req.executePOST();
 
@@ -4088,6 +4096,7 @@ function StudentPruefungAuswahl()
 	datum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#datum" ));
 	anmerkung = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkung" ));
 	studiensemester_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#studiensemester_kurzbz" ));
+	punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
 
 	try
 	{
@@ -4194,6 +4203,7 @@ function StudentPruefungAuswahl()
 	document.getElementById('student-pruefung-textbox-anmerkung').value=anmerkung;
 	document.getElementById('student-pruefung-checkbox-neu').checked=false;
 	document.getElementById('student-pruefung-textbox-pruefung_id').value=pruefung_id;
+	document.getElementById('student-pruefung-textbox-punkte').value=punkte;
 }
 
 // ****

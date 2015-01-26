@@ -168,4 +168,6 @@ $this->phrasen['benotungstool/eingetrageneNoten']='Eingetragene Noten';
 $this->phrasen['benotungstool/zeunis']='Zeugnis';
 $this->phrasen['benotungstool/handbuch']='Handbuch';
 $this->phrasen['benotungstool/punkte']='Punkte';
+$this->phrasen['benotungstool/importAnweisung']='Kopieren Sie die Spalten Kennzahl und Note aus der Notenliste und fügen Sie diese in folgendes Feld ein';
+$this->phrasen['benotungstool/pruefung']='Prüfung';
 ?>

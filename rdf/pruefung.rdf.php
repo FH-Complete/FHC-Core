@@ -24,14 +24,20 @@ header("Cache-Control: no-cache");
 header("Cache-Control: post-check=0, pre-check=0",false);
 header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
-// content type setzen
 header("Content-type: application/xhtml+xml");
-// xml
-echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-// DAO
+
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/pruefung.class.php');
 require_once('../include/datum.class.php');
+require_once('../include/functions.inc.php');
+require_once('../include/benutzerberechtigung.class.php');
+
+$uid = get_uid();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($uid);
+
+if(!$rechte->isBerechtigt('assistenz') && !$rechte->isBerechtigt('admin'))
+	die('Sie haben keine Berechtigung für diese Seite');
 
 if(isset($_GET['student_uid']))
 	$student_uid = $_GET['student_uid'];
@@ -48,6 +54,8 @@ $datum_obj = new datum();
 $pruefung = new pruefung();
 
 $rdf_url='http://www.technikum-wien.at/pruefung';
+
+echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
 echo '
 <RDF:RDF
@@ -92,6 +100,7 @@ function draw_rdf($row)
             <PRUEFUNG:pruefungstyp_beschreibung><![CDATA['.$row->pruefungstyp_beschreibung.']]></PRUEFUNG:pruefungstyp_beschreibung>
             <PRUEFUNG:lehrveranstaltung_id><![CDATA['.$row->lehrveranstaltung_id.']]></PRUEFUNG:lehrveranstaltung_id>
             <PRUEFUNG:studiensemester_kurzbz><![CDATA['.$row->studiensemester_kurzbz.']]></PRUEFUNG:studiensemester_kurzbz>
+            <PRUEFUNG:punkte><![CDATA['.($row->punkte!=''?(float)$row->punkte:'').']]></PRUEFUNG:punkte>
          </RDF:Description>
       </RDF:li>
       ';

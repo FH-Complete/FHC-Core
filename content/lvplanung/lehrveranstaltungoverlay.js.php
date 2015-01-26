@@ -1322,6 +1322,7 @@ function LehrveranstaltungNotenDetailDisableFields(val)
 {
 	document.getElementById('lehrveranstaltung-noten-button-speichern').disabled=val;
 	document.getElementById('lehrveranstaltung-noten-menulist-note').disabled=val;
+	document.getElementById('lehrveranstaltung-noten-textbox-punkte').disabled=val;
 }
 
 // ****
@@ -1645,6 +1646,7 @@ function LehrveranstaltungNoteSpeichern()
 	var studiensemester_kurzbz=tree.view.getCellText(tree.currentIndex,col);
 
 	note = document.getElementById('lehrveranstaltung-noten-menulist-note').value;
+	punkte = document.getElementById('lehrveranstaltung-noten-textbox-punkte').value;
 
 
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
@@ -1656,6 +1658,7 @@ function LehrveranstaltungNoteSpeichern()
 	req.add('student_uid', student_uid);
 	req.add('studiensemester_kurzbz', studiensemester_kurzbz);
 	req.add('note', note);
+	req.add('punkte', punkte);
 
 	var response = req.executePOST();
 
@@ -1712,11 +1715,13 @@ function LehrveranstaltungNotenAuswahl()
 	//Daten holen
 
 	note = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#note" ));
+	punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
 
 	if(note=='')
 		note='9';
 
 	document.getElementById('lehrveranstaltung-noten-menulist-note').value=note;
+	document.getElementById('lehrveranstaltung-noten-textbox-punkte').value=punkte;
 }
 
 // ****

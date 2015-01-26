@@ -231,7 +231,7 @@ foreach($noten_obj->result as $row)
 	// *************************************************
 	// * Formular zum Eintragen einer Pruefung erstellen
 	// *************************************************
-	function pruefungAnlegen(uid,datum,note,lehreinheit_id)
+	function pruefungAnlegen(uid,datum,note,lehreinheit_id,punkte)
 	{
 		var str = "<form name='nachpruefung_form'><center><table style='width:95%'><tr><td colspan='2' align='right'><a href='#' onclick='closeDiv();'>X</a></td></tr>";
 		
@@ -243,8 +243,17 @@ foreach($noten_obj->result as $row)
 		str += "<tr><td colspan='2'><b><?php echo $p->t('benotungstool/pruefungAnlegenFuer');?> "+uid+":</b></td></tr>";
 		str += "<tr><td><?php echo $p->t('global/datum');?>:</td>";
 		str += "<td><input type='hidden' name='uid' value='"+uid+"'><input type='hidden' name='le_id' value='"+lehreinheit_id+"'>";
-		str += "<input type='text' id='pruefungsdatum' name='datum' size='10' value='"+datum+"'> [DD.MM.YYYY]";
-		str += "</td></tr><tr><td><?php echo $p->t('benotungstool/note');?>:</td>";
+		str += "<input type='text' id='pruefungsdatum' name='datum' size='10' value='"+datum+"'> [DD.MM.YYYY]</td></tr>";
+
+		<?php
+		if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
+		{
+			echo 'str += "<tr><td>'.$p->t('benotungstool/punkte').':</td>";';
+			echo 'str += "<td><input type=\'text\' id=\'pruefungspunkte\' name=\'punkte\' size=\'10\' value=\'"+punkte+"\' oninput=\'PruefungPunkteEingabe()\'></td></tr>";';
+		}
+		?>
+
+		str += "<tr><td><?php echo $p->t('benotungstool/note');?>:</td>";
 
 		str +='<?php
 			echo '<td><select name="note" id="pruefungnoteselect">';
@@ -270,6 +279,7 @@ foreach($noten_obj->result as $row)
 	function pruefungSpeichern()
 	{
 		var note = document.nachpruefung_form.note.value;
+		var punkte = document.nachpruefung_form.punkte.value;
 		var datum = document.nachpruefung_form.datum.value;		
 		var datum_test = datum.split(".");
 		if (datum_test[0].length != 2 || datum_test[1].length != 2 || datum_test[2].length!=4 || isNaN(datum_test[2]) || datum_test[1]>12 || datum_test[1]<1 || datum_test[0]>31 || datum_test[0]<1)
@@ -290,7 +300,7 @@ foreach($noten_obj->result as $row)
 		    var jetzt = new Date();
 			var ts = jetzt.getTime();
 		    var url= '<?php echo "nachpruefungeintragen.php?lvid=$lvid&stsem=$stsem"; ?>';
-		    url += '&submit=1&student_uid='+uid+'&note='+note+'&datum='+datum+'&lehreinheit_id_pr='+lehreinheit_id+'&'+ts;
+		    url += '&submit=1&student_uid='+uid+'&note='+note+'&datum='+datum+'&lehreinheit_id_pr='+lehreinheit_id+'&punkte='+punkte+'&'+ts;
 			
 			$.ajax({
 				type:"GET",
@@ -300,6 +310,7 @@ foreach($noten_obj->result as $row)
 					var anlegendiv = document.getElementById("nachpruefung_div");	
 					var datum = 	document.nachpruefung_form.datum.value;
 					var note = document.nachpruefung_form.note.value;
+					var punkte = document.nachpruefung_form.punkte.value;
 					var uid = document.nachpruefung_form.uid.value;
 					var lehreinheit_id = document.nachpruefung_form.le_id.value;
 		            var resp = result;
@@ -313,7 +324,8 @@ foreach($noten_obj->result as $row)
 			            	{
 								notentd.removeChild(notentd.lastChild);
 			            	}
-			            	notenode = document.createTextNode(noten_array[note]);
+							var notentext = noten_array[note]+'('+punkte+')';
+			            	notenode = document.createTextNode(notentext);
 		                    notentd.appendChild(notenode);
 						}					
 						notenstatus = document.getElementById("status_"+uid);
@@ -391,6 +403,46 @@ foreach($noten_obj->result as $row)
 		}
 	}
 
+	/**
+	 * Wird bei der Punkteeingabe aufgerufen und laedt 
+	 * die dazupassende Noten anhand des Notenschluessels
+	 */
+	function PruefungPunkteEingabe()
+	{
+		var punkte = $('#pruefungspunkte').val();
+		
+		// Request absetzen und Note zu den Punkten holen
+		if(punkte!='')
+		{
+			$.ajax({
+				type:"POST",
+				url:"lvgesamtnote_worker.php",
+				data: { lehrveranstaltung_id: '<?php echo $lvid; ?>', 
+						punkte: punkte, 
+						work: 'getGradeFromPoints',
+						studiensemester_kurzbz: '<?php echo $stsem;?>'
+					},
+				success:function(result)
+				{
+				    note=result;
+				
+					var notendropdown = $('#pruefungnoteselect');
+					notendropdown.val(note);
+					notendropdown.prop('disabled',true);
+	  			},
+	  			error:function(result)
+	  			{
+	  				alert('Noten ermittlung fehlgeschlagen');
+	  			}
+	  		});
+		}
+		else
+		{
+			var notendropdown = $('#pruefungnoteselect');
+			notendropdown.prop('disabled',false);
+		}
+	}
+
 	// ****
 	// * Oeffnet ein Fenster fuer den Import von Noten aus dem Excel
 	// ****
@@ -403,7 +455,7 @@ foreach($noten_obj->result as $row)
 		y = y+50;		
 		anlegendiv.style.top = y+"px";
 
-		str += '<tr><td>Kopieren Sie die Spalten Matrikelnummer und Note aus dem Excel File und fügen Sie diese in folgendes Feld ein:</td>';
+		str += '<tr><td><?php echo $p->t('benotungstool/importAnweisung');?>:</td>';
 		str += '<td></td><tr><td><textarea id="noteimporttextarea" name="notenimport"></textarea></td></tr>';
 		str += "<tr><td><input type='button' name='speichern' value='<?php echo $p->t('global/speichern');?>' onclick='saveGradeBulk();'>";
 		str += "</td><td></td></tr></table></center></form>";	
@@ -513,8 +565,6 @@ if($result = $db->db_query($qry))
 }
 else 
 	die($p->t('global/fehleraufgetreten'));
-
-$htmlOutput='';
 	
 //Kopfzeile
 echo '
@@ -564,6 +614,7 @@ echo "<td>";
 echo "<b>".$lv_obj->bezeichnung_arr[$sprache]."</b>";
 
 // lvgesamtnote für Studenten speichern
+/* Auskommentiert weil es vermutlich nicht verwendet wird 21.1.2015
 if (isset($_REQUEST["submit"]) && ($_POST["student_uid"] != ''))
 {	
 	$jetzt = date("Y-m-d H:i:s");	
@@ -598,6 +649,7 @@ if (isset($_REQUEST["submit"]) && ($_POST["student_uid"] != ''))
 	if (!$lvgesamtnote->save($new))
 		echo "<span class='error'>".$lvgesamtnote->errormsg."</span>";
 }
+*/
 
 // eingetragene lv-gesamtnoten freigeben
 if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
@@ -668,6 +720,8 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 }
 
 echo '<table width="100%" height="10px"><tr><td>';
+if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
+	echo '<a href="#" onclick="window.open(\'notenschluessel.php?lehrveranstaltung_id='.$lvid.'&stsem='.$stsem.'\',\'Grades\', \'height=200,width=350,left=50,top=50,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\'); return false;">'.$p->t('gesamtnote/notenschluesselanzeigen').'</a>';
 echo '</td><td align="right">';
 echo '<a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/benotungstoolHandbuch').'" class="Item" target="_blank">'.$p->t('benotungstool/handbuch').' (PDF)</a>';
 echo '</td></tr></table>';
@@ -686,6 +740,7 @@ if ($pr_all->getPruefungenLV($lvid,"Termin2",$stsem))
 		foreach ($pr_all->result as $pruefung)
 		{		
 			$studpruef_arr[$pruefung->student_uid][$pruefung->lehreinheit_id]["note"] = $pruefung->note;
+			$studpruef_arr[$pruefung->student_uid][$pruefung->lehreinheit_id]["punkte"] = $pruefung->punkte;
 			$studpruef_arr[$pruefung->student_uid][$pruefung->lehreinheit_id]["datum"] = $datum_obj->formatDatum($pruefung->datum,'d.m.Y');
 		}	
 	}
@@ -700,6 +755,7 @@ if ($pr_komm->getPruefungenLV($lvid,"kommPruef",$stsem))
 		foreach ($pr_komm->result as $kpruefung)
 		{		
 			$studpruef_komm[$kpruefung->student_uid][$kpruefung->lehreinheit_id]["note"] = $kpruefung->note;
+			$studpruef_komm[$kpruefung->student_uid][$kpruefung->lehreinheit_id]["punkte"] = $kpruefung->punkte;
 			$studpruef_komm[$kpruefung->student_uid][$kpruefung->lehreinheit_id]["datum"] = $datum_obj->formatDatum($kpruefung->datum,'d.m.Y');
 		}	
 	}
@@ -709,24 +765,28 @@ $summe_komm=count($studpruef_komm);
 //Studentenliste
 
 echo '<table class="gradetable">';
-		echo "
-			<tr>
-				<th></th>
-				<th>".$p->t('global/uid')."</th>
-				<th>".$p->t('global/nachname')."</th>
-				<th>".$p->t('global/vorname')."</th>
-				<th>".($grade_from_moodle?''.$p->t('benotungstool/moodleNote').'':''.$p->t('benotungstool/leNoten').' (LE-ID)')."</th>
-				<th>".$p->t('benotungstool/punkte').' / '.$p->t('benotungstool/note')."</th>
-				<th rowspan=2>".$p->t('benotungstool/lvNote')."<br><input type='button' onclick='GradeImport()' value='".$p->t('benotungstool/importieren')."'></th>
-				<th align='right' rowspan=2>
-				<form name='freigabeform' action='".$_SERVER['PHP_SELF']."?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem' method='POST' onsubmit='return OnFreigabeSubmit()'><input type='hidden' name='freigabe' value='1'>
-				<span style='white-space:nowrap;'>".$p->t('global/passwort').": <input type='password' size='8' id='textbox-freigabe-passwort' name='passwort'></span><br><input type='submit' name='frei' value='Freigabe'>
+echo "
+		<tr>
+			<th></th>
+			<th>".$p->t('global/uid')."</th>
+			<th>".$p->t('global/nachname')."</th>
+			<th>".$p->t('global/vorname')."</th>
+			<th>".($grade_from_moodle?''.$p->t('benotungstool/moodleNote').'':''.$p->t('benotungstool/leNoten').' (LE-ID)')."</th>
+			<th>".$p->t('benotungstool/punkte').' / '.$p->t('benotungstool/note')."</th>
+			<th rowspan=2>".$p->t('benotungstool/lvNote')."<br>
+				<input type='button' onclick='GradeImport()' value='".$p->t('benotungstool/importieren')."'>
+			</th>
+			<th align='right' rowspan=2>
+				<form name='freigabeform' action='".$_SERVER['PHP_SELF']."?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem' method='POST' onsubmit='return OnFreigabeSubmit()'>
+				<input type='hidden' name='freigabe' value='1'>
+				<span style='white-space:nowrap;'>".$p->t('global/passwort').": <input type='password' size='8' id='textbox-freigabe-passwort' name='passwort'></span>
+				<br><input type='submit' name='frei' value='Freigabe'>
 				</form>
-				</th>
-				<th>".$p->t('benotungstool/zeugnisnote')."</th>
-				<th colspan='2'>".$p->t('benotungstool/nachpruefung')."</th>
-				<th colspan='2'>".$p->t('benotungstool/kommissionellePruefung')."</th>
-			</tr>
+			</th>
+			<th>".$p->t('benotungstool/zeugnisnote')."</th>
+			<th colspan='2'>".$p->t('benotungstool/nachpruefung')."</th>
+			<th colspan='2'>".$p->t('benotungstool/kommissionellePruefung')."</th>
+		</tr>
 			<tr>
 				<th colspan='9'>&nbsp;</th>
 				<th colspan='2'>
@@ -983,8 +1043,9 @@ echo '<table class="gradetable">';
 				echo "<td valign='bottom' nowrap>
 					<form name='$row_stud->uid' id='$row_stud->uid' method='POST' action='".$_SERVER['PHP_SELF']."?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'>
 						<span id='lvnoteneingabe_".$row_stud->uid."' ".$hide.">
-							<input type='hidden' name='student_uid' value='$row_stud->uid'>";
+						<input type='hidden' name='student_uid' value='$row_stud->uid'>";
 
+				// Punkte
 				if(CIS_GESAMTNOTE_PUNKTE)
 					echo '<input type="text" name="punkte" id="textbox-punkte-'.$i.'" value="'.$punkte_lv.'" size="3" oninput="PunkteEingabe('.$i.')"/>';
 				
@@ -1035,11 +1096,13 @@ echo '<table class="gradetable">';
 					$stylestr = " style='color:red; border-color:red; border-style:solid; border-width:1px;'";
 				else
 					$stylestr ="";
+
+				// Zeugnisnote
 				echo "<td".$stylestr." align='center'>".(isset($noten_array[$znote])?$noten_array[$znote]['bezeichnung']:'')."</td>";
+
 				if(isset($noten_array[$znote]) && $noten_array[$znote]['positiv']==false)
-				{
 					$summe_ng++;
-				}
+
 				// Pruefung 2.Termin
 				if (key_exists($row_stud->uid, $studpruef_arr))			
 				{
@@ -1051,27 +1114,33 @@ echo '<table class="gradetable">';
 					foreach ($le_id_arr as $le_id_stud)
 					{					
 						$pr_note = $studpruef_arr[$row_stud->uid][$le_id_stud]["note"];
+						$pr_punkte = $studpruef_arr[$row_stud->uid][$le_id_stud]["punkte"];
 						$pr_datum = $studpruef_arr[$row_stud->uid][$le_id_stud]["datum"];
 						$pr_le_id = $le_id_stud;
 						
-						echo "<tr><td class='td_datum'>";
-						echo $pr_datum."</td><td class='td_note'>".$noten_array[$pr_note]['bezeichnung']."</td><td>";
-						echo "<input type='button' name='anlegen' value='".$p->t('global/aendern')."' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"".$pr_datum."\",\"".$pr_note."\",\"".$pr_le_id."\")'>";					
-						echo "<td></tr>";
+						if($pr_punkte!='')
+							$pr_notenbezeichnung = $noten_array[$pr_note]['bezeichnung'].' ('.$pr_punkte.')';
+						else
+							$pr_notenbezeichnung = $noten_array[$pr_note]['bezeichnung'];
+
+						echo '<tr>
+								<td class="td_datum">'.$pr_datum.'</td>
+								<td class="td_note">'.$pr_notenbezeichnung.'</td>
+								<td><input type="button" name="anlegen" value="'.$p->t('global/aendern').'" onclick="pruefungAnlegen(\''.$row_stud->uid.'\',\''.$pr_datum.'\',\''.$pr_note.'\',\''.$pr_le_id.'\',\''.$pr_punkte.'\')"><td>
+							</tr>';
 					}
 					echo "</table>";			
 					echo "</span>";
-					//echo "<div id='nachpruefung_div_".$row_stud->uid."' style='position:relative; top:0px; left 5px; background-color:#cccccc; visibility:collapse;' class='transparent'></div>";
 					echo "</td>";
-					//echo "</form>";
 				}
 				else
 				{
 					if (!is_null($note_lv))				
-						echo "<td colspan='2'><span id='span_".$row_stud->uid."'><input type='button' name='anlegen' value='".$p->t('benotungstool/anlegen')."' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"\",\"\",\"\")'></span></td>";
+						echo "<td colspan='2'><span id='span_".$row_stud->uid."'><input type='button' name='anlegen' value='".$p->t('benotungstool/anlegen')."' onclick='pruefungAnlegen(\"".$row_stud->uid."\",\"\",\"\",\"\",\"\")'></span></td>";
 					else
 						echo "<td colspan='2'></td>";	
 				}
+
 				// komm Pruefung
 				if (key_exists($row_stud->uid,$studpruef_komm))			
 				{
@@ -1083,12 +1152,19 @@ echo '<table class="gradetable">';
 					foreach ($le_id_arr as $le_id_stud)
 					{					
 						$pr_note = $studpruef_komm[$row_stud->uid][$le_id_stud]["note"];
+						$pr_punkte = $studpruef_komm[$row_stud->uid][$le_id_stud]["punkte"];
 						$pr_datum = $studpruef_komm[$row_stud->uid][$le_id_stud]["datum"];
 						$pr_le_id = $le_id_stud;
 						
-						echo "<tr><td class='td_datum'>";
-						echo $pr_datum."</td><td class='td_note'>".$noten_array[$pr_note]['bezeichnung']."</td>";
-						echo "</tr>";
+						if($pr_punkte!='')
+							$pr_notenbezeichnung = $noten_array[$pr_note]['bezeichnung'].' ('.$pr_punkte.')';
+						else
+							$pr_notenbezeichnung = $noten_array[$pr_note]['bezeichnung'];
+
+						echo '<tr>
+								<td class="td_datum">'.$pr_datum.'</td>
+								<td class="td_note">'.$pr_notenbezeichnung.'</td>
+							</tr>';
 					}
 					echo "</table>";			
 					echo "</span>";
@@ -1103,24 +1179,25 @@ echo '<table class="gradetable">';
 				$i++;
 			}
 		}
+
+// Fusszeile
 echo "
-<tr style='font-weight:bold;' align='center'>
-<th style='font-weight:bold;'>&Sigma;</th>
-<th style='font-weight:bold;' title='".$p->t('benotungstool/anzahlDerStudenten')."'>$summe_stud</th>
-<th colspan='6'></td>
-<th style='color:red; font-weight:bold;' title='".$p->t('benotungstool/anzahlNegativerBeurteilungen')."'>$summe_ng</th>
-<th style='font-weight:bold;' colspan='2' title='".$p->t('benotungstool/anzahlNachpruefungen')."'>$summe_t2</th>
-<th style='font-weight:bold;' colspan='2' title='".$p->t('benotungstool/anzahlKommisionellePruefungen')."'>$summe_komm</th>
-</tr>
+	<tr style='font-weight:bold;' align='center'>
+		<th style='font-weight:bold;'>&Sigma;</th>
+		<th style='font-weight:bold;' title='".$p->t('benotungstool/anzahlDerStudenten')."'>$summe_stud</th>
+		<th colspan='6'></td>
+		<th style='color:red; font-weight:bold;' title='".$p->t('benotungstool/anzahlNegativerBeurteilungen')."'>$summe_ng</th>
+		<th style='font-weight:bold;' colspan='2' title='".$p->t('benotungstool/anzahlNachpruefungen')."'>$summe_t2</th>
+		<th style='font-weight:bold;' colspan='2' title='".$p->t('benotungstool/anzahlKommisionellePruefungen')."'>$summe_komm</th>
+	</tr>
 </table>
 </td></tr>
 
 </table>
 ";
-echo $htmlOutput;
 ?>
 
-<div id="nachpruefung_div" style="position:absolute; top:100px; left:200px; width:400px; height:150px; background-color:#cccccc; visibility:hidden; border-style:solid; border-width:1px; border-color:#333333;" ></div>
+<div id="nachpruefung_div" style="position:absolute; top:100px; left:200px; width:400px; height:200px; background-color:#cccccc; visibility:hidden; border-style:solid; border-width:1px; border-color:#333333;" ></div>
 
 </body>
 </html>

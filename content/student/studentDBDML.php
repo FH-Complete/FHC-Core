@@ -2453,6 +2453,8 @@ if(!$error)
 					$noten->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
 					$noten->benotungsdatum = date('Y-m-d H:i:s');
 					$noten->note = $_POST['note'];
+					if(isset($_POST['punkte']))
+						$noten->punkte=$_POST['punkte'];
 
 					if($noten->save())
 					{
@@ -2871,7 +2873,7 @@ if(!$error)
 				{
 					if($db->db_num_rows($result)==0)
 					{
-						$qry = "SELECT note, benotungsdatum FROM lehre.tbl_zeugnisnote JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) WHERE
+						$qry = "SELECT note,punkte, benotungsdatum FROM lehre.tbl_zeugnisnote JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) WHERE
 								student_uid=".$db->db_add_param($_POST['student_uid'])." AND
 								tbl_lehreinheit.lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)." AND
 								tbl_lehreinheit.studiensemester_kurzbz = tbl_zeugnisnote.studiensemester_kurzbz";
@@ -2888,6 +2890,7 @@ if(!$error)
 								$ersttermin->student_uid = $_POST['student_uid'];
 								$ersttermin->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
 								$ersttermin->note = $row->note;
+								$ersttermin->punkte = $row->punkte;
 								$ersttermin->pruefungstyp_kurzbz = 'Termin1';
 								$ersttermin->datum = $row->benotungsdatum;
 								$ersttermin->anmerkung = '';
@@ -2919,6 +2922,8 @@ if(!$error)
 				$pruefung->student_uid = $_POST['student_uid'];
 				$pruefung->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
 				$pruefung->note = $_POST['note'];
+				if(isset($_POST['punkte']))
+					$pruefung->punkte = $_POST['punkte'];
 				$pruefung->pruefungstyp_kurzbz = $_POST['pruefungstyp_kurzbz'];
 				$pruefung->datum = $_POST['datum'];
 				$pruefung->anmerkung = $_POST['anmerkung'];
@@ -2978,7 +2983,7 @@ if(!$error)
 							}
 							else
 							{
-								@$zeungisnote->new = false;
+								$zeugnisnote->new = false;
 							}
 						}
 						else
@@ -2994,6 +2999,10 @@ if(!$error)
 							$zeugnisnote->lehrveranstaltung_id = $lehrveranstaltung_id;
 							$zeugnisnote->studiensemester_kurzbz = $studiensemester_kurzbz;
 							$zeugnisnote->note = $_POST['note'];
+							if(isset($_POST['punkte']))
+								$zeugnisnote->punkte = $_POST['punkte'];
+							else
+								$zeugnisnote->punkte='';
 							$zeugnisnote->uebernahmedatum = date('Y-m-d H:i:s');
 							$zeugnisnote->benotungsdatum = date('Y-m-d',$datum_obj->mktime_fromdate($_POST['datum']));
 							$zeugnisnote->updateamum = date('Y-m-d H:i:s');
