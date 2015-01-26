@@ -32,6 +32,7 @@ require_once('../../include/xslfo2pdf/xslfo2pdf.php');
 require_once('../../include/akte.class.php');
 require_once('../../include/konto.class.php');
 require_once('../../include/benutzer.class.php');
+require_once('../../include/vorlage.class.php');
 
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
@@ -55,6 +56,16 @@ if(isset($_GET['xsl_stg_kz']))
 	$xsl_stg_kz=$_GET['xsl_stg_kz'];
 else
 	$xsl_stg_kz=0;
+
+if(isset($_GET['version']) && is_numeric($_GET['version']))
+	$version = $_GET['version'];
+else 
+	$version ='';
+	
+if(isset($_GET['xsl_oe_kurzbz']))
+	$xsl_oe_kurzbz=$_GET['xsl_oe_kurzbz'];
+else
+	$xsl_oe_kurzbz='';
 
 //Parameter setzen
 $params='?xmlformat=xml';
@@ -112,19 +123,25 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 	if(!$xml_doc->load($xml_url))
 		die('unable to load xml');
 	//echo ':'.$xml_doc->saveXML().':';
-	
+		
 	//XSL aus der DB holen
-	$qry = "SELECT text FROM public.tbl_vorlagestudiengang WHERE (studiengang_kz=0 OR studiengang_kz=".$db->db_add_param($xsl_stg_kz).") AND vorlage_kurzbz=".$db->db_add_param($xsl)." ORDER BY studiengang_kz DESC, version DESC LIMIT 1";
+	$vorlage = new vorlage();
+	if($xsl_oe_kurzbz!='')
+	{
+		$vorlage->getAktuelleVorlage($xsl_oe_kurzbz, $xsl, $version);
+	}
+	else
+	{
+		if($xsl_stg_kz=='')
+			$xsl_stg_kz='0';
 	
-	if(!$result = $db->db_query($qry))
-		die('Fehler beim laden der Vorlage'.$db->db_last_error());
-	if(!$row = $db->db_fetch_object($result))
-		die('Vorlage wurde nicht gefunden'.$qry);
+		$vorlage->getAktuelleVorlage($xsl_stg_kz, $xsl, $version);
+	}
 	
 	// Load the XSL source
 	$xsl_doc = new DOMDocument;
 	
-	if(!$xsl_doc->loadXML($row->text))
+	if(!$xsl_doc->loadXML($vorlage->text))
 		die('unable to load xsl');
 	
 	// Configure the transformer

@@ -178,13 +178,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$xml .= "		<name>".trim($row->titelpre.' '.trim($row->vorname.' '.$row->vornamen).' '.mb_strtoupper($row->nachname).($row->titelpost!=''?', '.$row->titelpost:''))."</name>";
 		$gebdatum = date('d.m.Y',strtotime($row->gebdatum));
 		$xml .= "		<gebdatum>".$gebdatum."</gebdatum>";
-		$xml .= "		<matrikelnr>".$row->matrikelnr."</matrikelnr>";
+		$xml .= "		<matrikelnr>".trim($row->matrikelnr)."</matrikelnr>";
 		$xml .= "		<studiengangsleiter>".$stgl."</studiengangsleiter>";
 		$datum_aktuell = date('d.m.Y');
 		$xml .= "		<ort_datum>".$datum_aktuell."</ort_datum>";
 		$xml .= "		<projektarbeit_note_anzeige>".($row->projektarbeit_note_anzeige=='t'?'true':'false')."</projektarbeit_note_anzeige>";
 		
-		$qry_proj = "SELECT lehrveranstaltung_id, titel, themenbereich, note, titel_english FROM lehre.tbl_projektarbeit JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) WHERE student_uid='".addslashes($uid_arr[$i])."' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND projekttyp_kurzbz in('Bachelor', 'Diplom') ORDER BY beginn ASC, projektarbeit_id ASC";
+		$qry_proj = "SELECT lehrveranstaltung_id, titel, themenbereich, note, titel_english, tbl_projekttyp.bezeichnung, projekttyp_kurzbz FROM lehre.tbl_projektarbeit JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz) WHERE student_uid='".addslashes($uid_arr[$i])."' AND studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."' AND projekttyp_kurzbz in('Bachelor', 'Diplom') ORDER BY beginn ASC, projektarbeit_id ASC";
 		if($result_proj = $db->db_query($qry_proj))
 		{
 			while($row_proj = $db->db_fetch_object($result_proj))
@@ -193,6 +193,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$projektarbeit[$row_proj->lehrveranstaltung_id]['titel_en']=$row_proj->titel_english;
 				$projektarbeit[$row_proj->lehrveranstaltung_id]['themenbereich']=$row_proj->themenbereich;
 				$projektarbeit[$row_proj->lehrveranstaltung_id]['note']=$row_proj->note;
+				$projektarbeit[$row_proj->lehrveranstaltung_id]['projekttyp_bezeichnung']=$row_proj->bezeichnung;
+				$projektarbeit[$row_proj->lehrveranstaltung_id]['projekttyp_kurzbz']=$row_proj->projekttyp_kurzbz;
 			}
 		}
 		
@@ -278,20 +280,21 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					$nl2='';
 					if($projektarbeit[$row->lehrveranstaltung_id]['themenbereich']!='')
 					{
-						$xml_fussnote .="       <themenbereich_bezeichnung>Themenbereich: </themenbereich_bezeichnung>";
-						$xml_fussnote .="       <themenbereich><![CDATA[".$projektarbeit[$row->lehrveranstaltung_id]['themenbereich'].'\n]]></themenbereich>';
+						//$xml_fussnote .="       <themenbereich_bezeichnung>Themenbereich: </themenbereich_bezeichnung>";
+						$xml_fussnote .="       <themenbereich><![CDATA[".$projektarbeit[$row->lehrveranstaltung_id]['themenbereich'].']]></themenbereich>';
 						$anzahl_nl++;
 						$nl2='\n';
 					}
 					
-					if($studiengang_typ=='b')
+					/*if($studiengang_typ=='b')
 						$typ = 'Bachelorarbeit:';
 					else 
-						$typ = 'Master Thesis:';
+						$typ = 'Master Thesis:';*/
 						
 					$nl='';
 					$nl2='';
-					$xml_fussnote .="      <titel_bezeichnung>$typ</titel_bezeichnung>";
+					$xml_fussnote .="      <titel_bezeichnung><![CDATA[".$projektarbeit[$row->lehrveranstaltung_id]['projekttyp_bezeichnung']."]]></titel_bezeichnung>";
+					$xml_fussnote .="      <titel_kurzbz><![CDATA[".$projektarbeit[$row->lehrveranstaltung_id]['projekttyp_kurzbz']."]]></titel_kurzbz>";
 					$xml_fussnote .="      <titel><![CDATA[".$projektarbeit[$row->lehrveranstaltung_id]['titel'].$nl2."]]></titel>";
 					$xml_fussnote .="      <titel_en><![CDATA[".$projektarbeit[$row->lehrveranstaltung_id]['titel_en'].$nl2."]]></titel_en>";
 					//$note = $note_arr[$projektarbeit[$row->lehrveranstaltung_id]['note']];
