@@ -78,8 +78,30 @@ $num_rows_stunde=$db->db_num_rows($result_stunde);
 <title><?php echo $p->t('zeitsperre/zeitsperre');?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
-<link href="../../../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />
-<script src="../../../include/js/flexcroll.js" type="text/javascript" ></script>
+<script src="../../../include/js/jquery1.9.min.js" type="text/javascript"></script>
+
+<?php
+// ADDONS laden
+$addon_obj = new addon();
+$addon_obj->loadAddons();
+foreach($addon_obj->result as $addon)
+{
+	echo '<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
+}
+
+// Wenn Seite fertig geladen ist Addons aufrufen
+echo '
+<script>
+$( document ).ready(function() 
+{
+	for(i in addon)
+	{
+		addon[i].init("cis/private/profile/urlaubstool.php", {uid:\''.$uid.'\'});
+	}
+});
+</script>';
+?>
+
 <script language="Javascript">
 function conf_del()
 {
@@ -646,7 +668,7 @@ echo '<tr>';
 echo "<td class='tdvertical'>";
 echo $content_form;
 echo '</td>';
-echo "<td class='tdvertical'>$content_resturlaub</td>";
+echo "<td class='tdvertical'><div id='resturlaub'>$content_resturlaub</div></td>";
 echo '</tr><tr><td colspan=2>';
 echo $content_table;
 echo '</td>';

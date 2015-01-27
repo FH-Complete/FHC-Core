@@ -60,7 +60,7 @@ $filter = (isset($_GET['filter'])?$_GET['filter']:'foo');
 $alle = (isset($_POST['alle'])?(isset($_POST['normal'])?false:true):false);
 $angezeigte_tage = '50';
 
-echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+echo '<!DOCTYPE HTML>
 <html>
 	<head>
 		<title>'.$p->t("zeitaufzeichnung/zeitaufzeichnung").'</title>
@@ -70,8 +70,31 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 		<link href="../../../skin/jquery.css" rel="stylesheet" type="text/css"/>
         <link href="../../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet"  type="text/css">
 		<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
-        <script src="../../../include/js/jquery1.9.min.js" type="text/javascript" ></script> 
+        <script src="../../../include/js/jquery1.9.min.js" type="text/javascript" ></script>
+		 ';
 
+// ADDONS laden
+$addon_obj = new addon();
+$addon_obj->loadAddons();
+foreach($addon_obj->result as $addon)
+{
+	echo '<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
+}
+
+// Wenn Seite fertig geladen ist Addons aufrufen
+echo '
+<script>
+$( document ).ready(function() 
+{
+	for(i in addon)
+	{
+		addon[i].init("cis/private/tools/zeitaufzeichnung.php", {uid:\''.$user.'\'});
+	}
+});
+</script>
+';
+
+echo '
         <script type="text/javascript">
 		$(document).ready(function() 
 		{ 
@@ -407,7 +430,10 @@ if($projekt->getProjekteMitarbeiter($user))
 		
 		//Formular
 		echo '<br><form action="'.$_SERVER['PHP_SELF'].'?zeitaufzeichnung_id='.$zeitaufzeichnung_id.'" method="POST" onsubmit="return checkdatum()">';
-		
+
+		echo '<table>
+			<tr>
+				<td>';		
 		echo '<table>';
 		//Projekt
 		echo '<tr>
@@ -464,7 +490,7 @@ if($projekt->getProjekteMitarbeiter($user))
 		$oe->getFrequent($user,'180','3',true);
 		$trennlinie = true;
 		
-		foreach ($oe->result as $row) 
+		foreach ($oe->result as $row)
 		{
 			if($oe_kurzbz_2 == $row->oe_kurzbz)
 				$selected = 'selected';
@@ -581,9 +607,13 @@ if($projekt->getProjekteMitarbeiter($user))
 			echo '<input type="submit" value="'.$p->t("global/aendern").'" name="edit">&nbsp;&nbsp;';
 			echo '<input type="submit" value="'.$p->t("zeitaufzeichnung/alsNeuenEintragSpeichern").'" name="save"></td></tr>';
 		}
-		echo '</table>'; 
+		echo '</table>';
+		echo '</td><td valign="top"><span id="zeitsaldo"></span></td></tr>
+			</table>';
+ 
 		echo '<hr>';
-		echo '<h3>'.($alle===true?$p->t('zeitaufzeichnung/alleEintraege'):$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage))).'</h3> <input type="submit" value="'.($alle===true?$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage)):$p->t('zeitaufzeichnung/alleAnzeigen')).'" name="'.($alle===true?'normal':'alle').'">';
+		echo '<h3>'.($alle===true?$p->t('zeitaufzeichnung/alleEintraege'):$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage))).'</h3>';
+		echo '<input type="submit" value="'.($alle===true?$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage)):$p->t('zeitaufzeichnung/alleAnzeigen')).'" name="'.($alle===true?'normal':'alle').'">';
 		echo '</form>';
 		
 		$za = new zeitaufzeichnung();
@@ -659,7 +689,12 @@ if($projekt->getProjekteMitarbeiter($user))
 					$tagessaldo = $tagessaldo-$pausesumme;
 					$tagessaldo = date('H:i', ($tagessaldo));
 					echo '<tr>
-					<td '.$style.' colspan="7"></td>
+					<td '.$style.' colspan="7">';
+
+					// Zusaetzlicher span fuer Addon Informationen
+					echo '<span id="tag_'.$datum->formatDatum($tagesbeginn,'d_m_Y').'"></span>';
+
+					echo '</td>
 			        <td align="right" colspan="2" '.$style.'>
 			        	<b>'.$p->t("zeitaufzeichnung/arbeitszeit").': '.$datum->formatDatum($tagesbeginn, $format='H:i').'-'.$datum->formatDatum($tagesende, $format='H:i').' '.$p->t("eventkalender/uhr").'</b><br>
 			        	'.$p->t("zeitaufzeichnung/pause").' '.($pflichtpause==false?$p->t("zeitaufzeichnung/inklusivePflichtpause"):'').':
@@ -796,6 +831,8 @@ else
 	echo $p->t("zeitaufzeichnung/fehlerBeimErmittelnDerProjekte");
 }
 
-echo '</body>
+echo '
+<span id="globalmessages"></span>
+</body>
 </html>'; 
 ?>
