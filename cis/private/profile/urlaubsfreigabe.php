@@ -28,6 +28,7 @@ require_once('../../../include/benutzer.class.php');
 require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/resturlaub.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/addon.class.php');
 
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
@@ -61,6 +62,29 @@ echo '<html>
 	<title>Urlaubsfreigabe</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
+	<script src="../../../include/js/jquery1.9.min.js" type="text/javascript"></script>';
+
+// ADDONS laden
+$addon_obj = new addon();
+$addon_obj->loadAddons();
+foreach($addon_obj->result as $addon)
+{
+	echo '<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
+}
+
+// Wenn Seite fertig geladen ist Addons aufrufen
+echo '
+<script>
+$( document ).ready(function() 
+{
+	for(i in addon)
+	{
+		addon[i].init("cis/private/profile/urlaubsfreigabe.php", {uid:\''.$uid.'\'});
+	}
+});
+</script>';
+
+echo '
 </head>
 
 <body>
@@ -258,6 +282,7 @@ if($uid!='')
 	if($gebuchterurlaub=='')
 		$gebuchterurlaub=0;
 
+	echo '<div id="resturlaub">';
 	echo "<table ><tr><td   nowrap><h3>Urlaub im Gesch&auml;ftsjahr $geschaeftsjahr</h3></td></tr>";
 	echo "<tr><td nowrap>Anspruch</td><td align='right'  nowrap>$anspruch Tage</td><td class='grey'   nowrap>&nbsp;&nbsp;&nbsp( j&auml;hrlich )</td></tr>";
 	echo "<tr><td nowrap>+ Resturlaub</td><td align='right'  nowrap>";
@@ -276,6 +301,7 @@ if($uid!='')
 	echo "<tr><td nowrap>- aktuell gebuchter Urlaub&nbsp;</td><td align='right'  nowrap>$gebuchterurlaub Tage</td><td class='grey'  nowrap>&nbsp;&nbsp;&nbsp;( $datum_beginn - $datum_ende )</td></tr>";
 	echo "<tr><td style='border-top: 1px solid black;'  nowrap>aktueller Stand</td><td style='border-top: 1px solid black;' align='right' nowrap>".($anspruch+$resturlaubstage-$gebuchterurlaub)." Tage</td><td class='grey'  nowrap>&nbsp;&nbsp;&nbsp;( Stichtag: $datum_ende )</td></tr>";
 	echo "</table>";
+	echo '</div>';
 	
 	echo '</td></tr></table>';
 }
