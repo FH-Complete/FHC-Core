@@ -170,6 +170,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 				$xml .= "				<bezeichnung><![CDATA[".$row->lehrveranstaltung_bezeichnung."]]></bezeichnung>";
 				$xml .= "				<bezeichnung_englisch><![CDATA[".$row->lehrveranstaltung_bezeichnung_english."]]></bezeichnung_englisch>";
 				$xml .= "				<note>".$note."</note>";
+				$xml .= "				<note_idx>".$row->note."</note_idx>";
 				$xml .= "				<sws>".sprintf('%.1f',$row->semesterstunden/$wochen)."</sws>";
 				$xml .= "				<ects>".$row->ects."</ects>";
 				if($row->benotungsdatum!='')

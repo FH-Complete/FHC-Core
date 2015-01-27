@@ -403,7 +403,7 @@ class zeugnisnote extends basis_db
 			tbl_lehrveranstaltung.lehrform_kurzbz as lv_lehrform_kurzbz,
 			tbl_zeugnisnote.studiensemester_kurzbz, tbl_zeugnisnote.uebernahmedatum, tbl_zeugnisnote.benotungsdatum,
 			tbl_zeugnisnote.note, tbl_zeugnisnote.updateamum, tbl_zeugnisnote.updatevon, tbl_zeugnisnote.insertamum, tbl_zeugnisnote.insertvon,
-			tbl_note.bezeichnung as note_bezeichnung, tbl_zeugnisnote.bemerkung, tbl_lehrveranstaltung.lvnr
+			tbl_note.bezeichnung as note_bezeichnung, tbl_zeugnisnote.bemerkung, tbl_lehrveranstaltung.lvnr, tbl_studienplan_lehrveranstaltung.sort as studienplan_lehrveranstaltung_sort
 		FROM 
 			lehre.tbl_lehrveranstaltung 
 			LEFT JOIN lehre.tbl_zeugnisnote ON(tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_zeugnisnote.lehrveranstaltung_id AND tbl_zeugnisnote.student_uid=".$this->db_add_param($student_uid)." AND tbl_zeugnisnote.studiensemester_kurzbz IN(".$stsem."))
@@ -445,6 +445,7 @@ class zeugnisnote extends basis_db
 				$obj->studienplan_lehrveranstaltung_id = $row->studienplan_lehrveranstaltung_id;
 				$obj->studienplan_lehrveranstaltung_id_parent = $row->studienplan_lehrveranstaltung_id_parent;
 				$obj->studienplan_lehrveranstaltung_semester = $row->semester;
+				$obj->studienplan_lehrveranstaltung_sort = $row->studienplan_lehrveranstaltung_sort;
 			
 				$this->result[] = $obj;
 			}
