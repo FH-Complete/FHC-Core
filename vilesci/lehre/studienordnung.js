@@ -1057,11 +1057,16 @@ function hideAllTreeColumns()
  */
 function saveJsondataFromTree(nodeId, studienplan_id, studienplan_lehrveranstaltung_id)
 {
-	var obj = $("#treeData").find("li[id="+nodeId+"]");
-	var jsonData = $("#treeData").jstree("get_json", $("#treeData").find("li[id="+nodeId+"]"));
+	var jsonData=Array();
 
+	// Wenn eine verschiebung innerhalb des Studienplans stattfindet wird der Eintrag aus dem Tree geholt
+	if(studienplan_lehrveranstaltung_id!='')
+	{
+		jsonData = $("#treeData").jstree("get_json", $("#treeData").find("li[id="+nodeId+"]"));
+	}
 	var copy = false;
 
+	// Wenn die Lehrveranstaltung aus dem Lehrveranstaltungstree kommt ist diese mit copy_ geprefixt
 	if(jsonData.length !== 1)
 	{
 		jsonData = $("#treeData").jstree("get_json", $("#copy_"+nodeId));
