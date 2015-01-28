@@ -1,12 +1,6 @@
-reports
-datenimport
-kompetenzen
-abrechnung
-casetime
-ldap
-kontoimport
-studienplatzverwaltung
-eps
-lbs
-fhb
-bfi
+#ignore all addons
+*
+#except template addon
+!template/*
+!CodingGuidelines.txt
+!index.html
