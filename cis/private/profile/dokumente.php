@@ -25,6 +25,7 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/konto.class.php');
 require_once('../../../include/phrasen.class.php');
+require_once('../../../include/student.class.php');
 
 $sprache = getSprache();
 $p = new phrasen($sprache);
@@ -38,6 +39,10 @@ else
 	$stsem = '';
 
 $uid=get_uid();	
+
+$student_studiengang = new student();
+$student_studiengang->load($uid);
+$xsl_stg_kz = $student_studiengang->studiengang_kz;
 
 $stg = '';
 
@@ -132,7 +137,7 @@ echo $p->t('global/studiensemester')."</b> <SELECT name='stsem' onChange=\"MM_ju
 $konto = new konto();
 if ($konto->checkStudienbeitrag($uid, $stsem))
 {
-	echo "<a href='../pdfExport.php?xsl=Inskription&xml=student.rdf.php&ss=".$stsem."&uid=".$uid."'>".$p->t('tools/inskriptionsbestaetigung')."</a>";
+	echo "<a href='../pdfExport.php?xsl=Inskription&xml=student.rdf.php&ss=".$stsem."&uid=".$uid."&xsl_stg_kz=".$xsl_stg_kz."'>".$p->t('tools/inskriptionsbestaetigung')."</a>";
 	echo ' - '.$p->t('tools/studienbeitragFuerSSBezahltAmDatum',array($stsem, $konto->buchungsdatum));
 }
 else
