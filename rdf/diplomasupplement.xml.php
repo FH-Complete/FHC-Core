@@ -86,7 +86,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		echo '		<vornamen><![CDATA['.$row->vornamen.']]></vornamen>';
         echo '      <name><![CDATA['.$row->vorname.' '.$row->nachname.']]></name>';
 		echo '		<geburtsdatum><![CDATA['.$datum->convertISODate($row->gebdatum).']]></geburtsdatum>';
-		echo '		<matrikelnummer>'.$row->matrikelnr.'</matrikelnummer>';
+		echo '		<matrikelnummer>'.TRIM($row->matrikelnr).'</matrikelnummer>';
 		echo '		<studiengang_kz>'.$studiengang_kz.'</studiengang_kz>';
 		echo '		<studiengang_bezeichnung_deutsch><![CDATA['.$row->bezeichnung.']]></studiengang_bezeichnung_deutsch>';
 		echo '		<studiengang_bezeichnung_englisch><![CDATA['.$row->english.']]></studiengang_bezeichnung_englisch>';
