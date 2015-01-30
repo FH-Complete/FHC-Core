@@ -4408,6 +4408,46 @@ function StudentCreateDiplSupplement()
 }
 
 // ****
+// * Archiviert das Diplomasupplement einer Person
+// ****
+function StudentDiplomasupplementArchivieren()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	tree = document.getElementById('student-tree');
+
+	//Markierte Studenten holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var paramList= '';
+	var errormsg='';
+
+	var labelalt = document.getElementById('student-zeugnis-button-archivieren-diplomasupplement').label;
+	document.getElementById('student-zeugnis-button-archivieren-diplomasupplement').label='Loading...';
+	for (var t = 0; t < numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+			var uid=tree.view.getCellText(v,col);
+			stg_kz=getTreeCellText(tree,"student-treecol-studiengang_kz", v);
+
+			url = '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=diplomasupplement.xml.php&output=pdf&xsl=DiplSupplement&xsl_stg_kz='+stg_kz+'&uid='+uid+'&archive=true';
+			var req = new phpRequest(url,'','');
+		
+			var response = req.execute();
+			if(response!='')
+				errormsg = errormsg + response;
+		}
+	}
+
+	document.getElementById('student-zeugnis-button-archivieren-diplomasupplement').label=labelalt;
+	StudentAkteTreeDatasource.Refresh(false);   
+}
+
+// ****
 // * Erstellt den Ausbildungsvertrag fuer einen oder mehrere Studenten
 // ****
 function StudentPrintAusbildungsvertrag()

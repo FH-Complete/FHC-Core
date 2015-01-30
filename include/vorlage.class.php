@@ -70,7 +70,7 @@ class vorlage extends basis_db
 		if($studiengang_kz!='')
 		{
 			$qry = "SELECT 
-						tbl_vorlagestudiengang.*, tbl_vorlage.mimetype 
+						tbl_vorlagestudiengang.*, tbl_vorlage.mimetype, tbl_vorlage.bezeichnung
 					FROM 
 						public.tbl_vorlagestudiengang 
 						JOIN public.tbl_vorlage USING(vorlage_kurzbz) 
@@ -93,7 +93,7 @@ class vorlage extends basis_db
 		else
 		{
 			$qry = "SELECT 
-						tbl_vorlagestudiengang.*, tbl_vorlage.mimetype
+						tbl_vorlagestudiengang.*, tbl_vorlage.mimetype, tbl_vorlage.bezeichnung
 					FROM 
 						public.tbl_vorlagestudiengang 
 						JOIN public.tbl_vorlage USING(vorlage_kurzbz)
@@ -115,6 +115,7 @@ class vorlage extends basis_db
 				$this->version = $row->version;
 				$this->text = $row->text;
 				$this->mimetype = $row->mimetype;
+				$this->bezeichnung = $row->bezeichnung;
 				return true;
 			}
 			else 
