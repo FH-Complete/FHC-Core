@@ -94,6 +94,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		<spacer flex="1"/>
 		<button id="student-zeugnis-button-archivieren" label="aktuelles Zeugnis archivieren" disabled="false" oncommand="StudentZeugnisArchivieren()"/>
 		<button id="student-zeugnis-button-archivieren-englisch" label="aktuelles Zeugnis archivieren (englisch)" disabled="false" oncommand="StudentZeugnisArchivieren('eng')"/>
+		<button id="student-zeugnis-button-archivieren-diplomasupplement" label="Diplomasupplement archivieren" disabled="false" oncommand="StudentDiplomasupplementArchivieren()"/>
 		<spacer flex="1"/>
 	</vbox>
 </hbox>

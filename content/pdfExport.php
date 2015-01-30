@@ -195,7 +195,7 @@ elseif(in_array($xsl,array('Zertifikat','Diplomurkunde','Diplomzeugnis','Bakkurk
 'Sammelzeugnis','PrProtDiplEng','PrProtBakkEng','BakkzeugnisEng','DiplomzeugnisEng','statusbericht',
 'DiplSupplement','Zutrittskarte','Projektbeschr','Ausbildungsver','AusbildStatus','PrProtBA','PrProtMA',
 'PrProtBAEng','PrProtMAEng','Studienordnung','Erfolgsnachweis','ErfolgsnwHead','Studienblatt','LV_Informationen',
-'LVZeugnis','AnwListBarcode','Honorarvertrag','AusbVerEng','AusbVerEngHead','Zeugnis')))
+'LVZeugnis','AnwListBarcode','Honorarvertrag','AusbVerEng','AusbVerEngHead','Zeugnis','ErfolgsnachweisE','ErfolgsnwHeadE')))
 {
 	if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz'))
 	{
@@ -443,73 +443,174 @@ if (!isset($_REQUEST["archive"]))
 }
 else
 {
+	// Archivieren von Dokumenten
 	$uid = $_REQUEST["uid"];
-	$ss = $_REQUEST["ss"];
 	$heute = date('Y-m-d');
-	
+
 	$student=new student();
 	$student->load($uid);
-	$prestudent=new prestudent();
-	$prestudent->getLastStatus($student->prestudent_id,$ss);
-	$semester=$prestudent->ausbildungssemester;
-	
-	$query = "SELECT 
-				tbl_studiengang.studiengang_kz, tbl_studentlehrverband.semester, tbl_studiengang.typ, 
-				tbl_studiengang.kurzbz, tbl_person.person_id FROM tbl_person, tbl_benutzer, 
-				tbl_studentlehrverband, tbl_studiengang 
-			WHERE 
-				tbl_studentlehrverband.student_uid = tbl_benutzer.uid 
-				AND tbl_benutzer.person_id = tbl_person.person_id 
-				AND tbl_studentlehrverband.studiengang_kz = tbl_studiengang.studiengang_kz 
-				AND tbl_studentlehrverband.student_uid = ".$db->db_add_param($uid)." 
-				AND tbl_studentlehrverband.studiensemester_kurzbz = ".$db->db_add_param($ss);
 
-	if($result = $db->db_query($query))
+	if(isset($_REQUEST['ss']))
 	{
-		if($row = $db->db_fetch_object($result))
+		$ss = $_REQUEST["ss"];
+
+		$prestudent=new prestudent();
+		$prestudent->getLastStatus($student->prestudent_id,$ss);
+		$semester=$prestudent->ausbildungssemester;
+
+		$query = "SELECT 
+					tbl_studiengang.studiengang_kz, tbl_studentlehrverband.semester, tbl_studiengang.typ, 
+					tbl_studiengang.kurzbz, tbl_person.person_id FROM tbl_person, tbl_benutzer, 
+					tbl_studentlehrverband, tbl_studiengang 
+				WHERE 
+					tbl_studentlehrverband.student_uid = tbl_benutzer.uid 
+					AND tbl_benutzer.person_id = tbl_person.person_id 
+					AND tbl_studentlehrverband.studiengang_kz = tbl_studiengang.studiengang_kz 
+					AND tbl_studentlehrverband.student_uid = ".$db->db_add_param($uid)." 
+					AND tbl_studentlehrverband.studiensemester_kurzbz = ".$db->db_add_param($ss);
+
+		if($result = $db->db_query($query))
 		{
-			$person_id = $row->person_id;
-			$titel = $xsl."_".strtoupper($row->typ).strtoupper($row->kurzbz)."_".$semester;
-			$bezeichnung = $xsl." ".strtoupper($row->typ).strtoupper($row->kurzbz)." ".$semester.". Semester";
-			$studiengang_kz = $row->studiengang_kz;
+			if($row = $db->db_fetch_object($result))
+			{
+				$person_id = $row->person_id;
+				$titel = $xsl."_".strtoupper($row->typ).strtoupper($row->kurzbz)."_".$semester;
+				$bezeichnung = $xsl." ".strtoupper($row->typ).strtoupper($row->kurzbz)." ".$semester.". Semester";
+				$studiengang_kz = $row->studiengang_kz;
+			}
+			else
+			{
+				$echo = 'Datensatz wurde nicht gefunden';
+			}
 		}
-		else
-		{
-			$echo = 'Datensatz wurde nicht gefunden';
-		}
+	}
+	else
+	{
+		$studiengang = new studiengang();
+		$studiengang->load($student->studiengang_kz);
+		$studiengang_kz=$student->studiengang_kz;
+		$person_id = $student->person_id;
+		$titel = $vorlage->bezeichnung.'_'.$studiengang->kuerzel;
+		$bezeichnung = $vorlage->bezeichnung.'_'.$studiengang->kuerzel;
 	}
 
 	if($rechte->isBerechtigt('admin', $studiengang_kz, 'suid') || $rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid'))
 	{
-		if(PDF_CREATE_FUNCTION=='FOP')
+		if(mb_strstr($vorlage->mimetype, 'application/vnd.oasis.opendocument'))
 		{
-			$fop = new fop();
-			$file = $fop->generatePdf($xml_doc->saveXML(), $xsl_content, $filename, "F");
-		}
-		else 
-		{
-			$filename = $user;
-			$fo2pdf = new XslFo2Pdf();
-			
+			switch($vorlage->mimetype)
+			{
+				case 'application/vnd.oasis.opendocument.text':
+						$endung = 'odt';
+						break; 
+				case 'application/vnd.oasis.opendocument.spreadsheet':
+						$endung = 'ods'; 
+						break;               
+				default:
+						$endung = 'pdf'; 
+			}
+
 			// Load the XSL source
 			$xsl_doc = new DOMDocument;
-			
+
 			if(!$xsl_doc->loadXML($xsl_content))
 				die('unable to load xsl');
-				
+		
 			// Configure the transformer
 			$proc = new XSLTProcessor;
 			$proc->importStyleSheet($xsl_doc); // attach the xsl rules
-			
-			$buffer = $proc->transformToXml($xml_doc);
-			
-			if (!$fo2pdf->generatePdf($buffer, $filename, 'F'))
-			{
-				echo('Failed to generate PDF');
-			}
-			$file = "/tmp/".$filename.".pdf";
-		}
 		
+			$buffer = $proc->transformToXml($xml_doc);
+			//echo $buffer;
+			//exit;
+			$tempfolder = '/tmp/'.uniqid();
+			mkdir($tempfolder);
+			chdir($tempfolder);
+			file_put_contents('content.xml', $buffer);
+
+			// Wenn ein Style XSL uebergeben wurde wird ein zweites XML File erstellt mit den
+			// Styleanweisungen und ebenfalls zum Zip hinzugefuegt        
+			if(isset($_GET['style_xsl']))
+			{
+				$style_xsl=$_GET['style_xsl'];
+				$style_vorlage = new vorlage();
+				$style_vorlage->getAktuelleVorlage($xsl_stg_kz, $style_xsl, $version);
+			    $style_xsl_doc = new DOMDocument;
+				if(!$style_xsl_doc->loadXML($style_vorlage->text))
+					die('unable to load xsl');
+				
+				// Configure the transformer
+				$style_proc = new XSLTProcessor;
+				$style_proc->importStyleSheet($style_xsl_doc); // attach the xsl rules
+		
+				$stylebuffer = $style_proc->transformToXml($xml_doc);
+
+				file_put_contents('styles.xml', $stylebuffer);
+			}
+
+			$vorlage_found=false;
+			$addons = new addon();
+
+			foreach($addons->aktive_addons as $addon)
+			{
+				$zipfile = DOC_ROOT.'addons/'.$addon.'/system/vorlage_zip/'.$vorlage->vorlage_kurzbz.'.'.$endung;
+			
+				if(file_exists($zipfile))
+				{
+					$vorlage_found=true;
+					break;
+				}
+			}
+			if(!$vorlage_found)
+				$zipfile = DOC_ROOT.'system/vorlage_zip/'.$vorlage->vorlage_kurzbz.'.'.$endung;
+		
+		
+			$tempname_zip = 'out.zip';
+			if(copy($zipfile, $tempname_zip))
+			{
+				exec("zip $tempname_zip content.xml");
+				if(isset($_GET['style_xsl']))
+					exec("zip $tempname_zip styles.xml");
+
+				clearstatcache(); 
+
+				$tempPdfName = $vorlage->vorlage_kurzbz.'.pdf';
+	            exec("unoconv -e IsSkipEmptyPages=false --stdout -f pdf $tempname_zip > $tempPdfName");		            
+			}
+			$file = $tempfolder.'/'.$tempPdfName;
+		}
+		else
+		{
+			if(PDF_CREATE_FUNCTION=='FOP')
+			{
+				$fop = new fop();
+				$file = $fop->generatePdf($xml_doc->saveXML(), $xsl_content, $filename, "F");
+			}
+			else 
+			{
+				$filename = $user;
+				$fo2pdf = new XslFo2Pdf();
+			
+				// Load the XSL source
+				$xsl_doc = new DOMDocument;
+			
+				if(!$xsl_doc->loadXML($xsl_content))
+					die('unable to load xsl');
+				
+				// Configure the transformer
+				$proc = new XSLTProcessor;
+				$proc->importStyleSheet($xsl_doc); // attach the xsl rules
+			
+				$buffer = $proc->transformToXml($xml_doc);
+			
+				if (!$fo2pdf->generatePdf($buffer, $filename, 'F'))
+				{
+					echo('Failed to generate PDF');
+				}
+				$file = "/tmp/".$filename.".pdf";
+			}
+		}
+	
 		$handle = fopen($file, "rb");
 		$string = fread($handle, filesize($file));
 		fclose($handle);

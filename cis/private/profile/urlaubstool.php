@@ -442,6 +442,28 @@ $datum_obj = new datum();
 		<link rel="stylesheet" href="../../../skin/jquery-ui-1.9.2.custom.min.css" type="text/css">
 		<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
 		<script src="../../../include/js/jquery1.9.min.js" type="text/javascript"></script>
+
+<?php
+// ADDONS laden
+$addon_obj = new addon();
+$addon_obj->loadAddons();
+foreach($addon_obj->result as $addon)
+{
+	echo '<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
+}
+
+// Wenn Seite fertig geladen ist Addons aufrufen
+echo '
+<script>
+$( document ).ready(function() 
+{
+	for(i in addon)
+	{
+		addon[i].init("cis/private/profile/urlaubstool.php", {uid:\''.$uid.'\'});
+	}
+});
+</script>';
+?>
 		<script language="Javascript">
 		function conf_del()
 		{
@@ -547,6 +569,7 @@ $datum_obj = new datum();
 	if($gebuchterurlaub=='')
 		$gebuchterurlaub=0;
 
+$content_resturlaub.='<div id="resturlaub">';
 $content_resturlaub.="<table><tr><td   nowrap><h3>".$p->t('urlaubstool/urlaubImGeschaeftsjahr')." $geschaeftsjahr</h3></td><td></td></tr>";
 $content_resturlaub.="<tr><td nowrap>".$p->t('urlaubstool/anspruch')."</td><td align='right'  nowrap>$anspruch ".$p->t('urlaubstool/tage')."</td><td class='grey'   nowrap>&nbsp;&nbsp;&nbsp( ".$p->t('urlaubstool/jaehrlich')." )</td></tr>";
 $content_resturlaub.="<tr><td nowrap>+ ".$p->t('urlaubstool/resturlaub')."</td><td align='right'  nowrap>$resturlaubstage ".$p->t('urlaubstool/tage')."</td><td class='grey'   nowrap>&nbsp;&nbsp;&nbsp;( ".$p->t('urlaubstool/stichtag').": $datum_beginn )</td>";
@@ -554,6 +577,7 @@ $content_resturlaub.="<tr><td nowrap>- ".$p->t('urlaubstool/aktuellGebuchterUrla
 $content_resturlaub .="</tr>";
 $content_resturlaub.="<tr><td style='border-top: 1px solid black;'  nowrap>".$p->t('urlaubstool/aktuellerStand')."</td><td style='border-top: 1px solid black;' align='right' nowrap>".($anspruch+$resturlaubstage-$gebuchterurlaub)." ".$p->t('urlaubstool/tage')."</td><td class='grey'  nowrap>&nbsp;&nbsp;&nbsp;( ".$p->t('urlaubstool/stichtag').": $datum_ende )</td></tr>";
 $content_resturlaub.="</table>";
+$content_resturlaub.='</div>';
 
 //Formular Auswahl Monat und Jahr für Kalender
 echo '<table width="95%" align="left">';

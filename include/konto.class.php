@@ -512,7 +512,7 @@ class konto extends basis_db
 		{
 			if($row = $this->db_fetch_object())
 			{
-				if ($row->differenz == 0)
+				if ($row->differenz >= 0)
 				{
 					$this->buchungsdatum = isset($buch_date[1])?$buch_date[1]:'';
 					return true;
