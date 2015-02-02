@@ -327,10 +327,12 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 <text:sequence-decl text:display-outline-level="0" text:name="Text"/>
                 <text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
             </text:sequence-decls>
-			
+			<!-- Wichtig für Mehrfachdruck (mehrere Studenten ausgewählt): Wenn ein Element (in diesem Fall Stempel und Unterschriftenblock) relativ zur SEITE ausgerichtet werden soll, 
+			muss für jedes Dokument (jeder neue Durchlauf der Schleife) ein draw:frame-Tag definiert werden. Diese müssen ALLE VOR den ersten text:p-Elementen stehen.
+			Deshalb wirde erst die Schleife für die draw:frames aufgerufen, dann folg tder Inhalt -->
 			<xsl:if test="position()=1">
 				<xsl:for-each select="../zeugnis">
-					<xsl:variable select="position()" name="number"/>
+					<xsl:variable select="position()" name="number"/><!-- Variable number definieren, die nach jedem Dokument um eines erhöht wird (position) -->
 						<draw:frame draw:style-name="fr1" draw:name="Rahmen{$number}" text:anchor-type="page" text:anchor-page-number="{$number}" svg:y="21.001cm" draw:z-index="0">
 		                <draw:text-box fo:min-height="0.499cm" fo:min-width="2cm">
 		                    <table:table table:name="Tabelle3" table:style-name="Tabelle3">
