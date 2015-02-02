@@ -118,9 +118,9 @@ foreach($service->result as $row)
 {
 	echo '<tr>';
 	echo '<td>',$row->oe_kurzbz,'</td>';
-	echo '<td>',$row->bezeichnung,'</td>';
+	echo '<td>'.($row->content_id!=''?'<a href="../../../cms/content.php?content_id='.$row->content_id.'">'.$row->bezeichnung.'</a>':$row->bezeichnung).'</td>';
 	echo '<td>',$row->beschreibung,'</td>';
-	echo '<td><a href="../../../cms/content.php?content_id='.$row->content_id.'" onclick="ContentPopUp(this.href); return false">',$row->content_id,'</a></td>';
+	echo '<td>'.($row->content_id!=''?'<a href="../../../cms/content.php?content_id='.$row->content_id.'">Details</a>':'').'</td>';
 	echo '</tr>';
 }
 echo '</tbody>
