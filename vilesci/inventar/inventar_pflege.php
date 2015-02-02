@@ -155,7 +155,7 @@
 
 	$oBetriebsmittelstatus = new betriebsmittelstatus();
 	$oBetriebsmittelstatus->result=array();
-	$oBetriebsmittelstatus->debug=$debug;
+	//$oBetriebsmittelstatus->debug=$debug;
 	$oBetriebsmittelstatus->errormsg='';
 
 	$oBetriebsmittel_betriebsmittelstatus = new betriebsmittel_betriebsmittelstatus();
@@ -165,7 +165,7 @@
 
 	$oBetriebsmittelperson = new betriebsmittelperson();
 	$oBetriebsmittelperson->result=array();
-	$oBetriebsmittelperson->debug=$debug;
+	//$oBetriebsmittelperson->debug=$debug;
 	$oBetriebsmittelperson->errormsg='';
 
 // ------------------------------------------------------------------------------------------
