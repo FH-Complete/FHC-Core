@@ -1,5 +1,7 @@
 <?php
 $this->phrasen['lvaliste/titel']='Lehrveranstaltungsübersicht';
+$this->phrasen['lvaliste/anwesenheit']='Anwesenheit';
+$this->phrasen['lvaliste/anwesenheit/studenten']='Anwesenheit der Studenten';
 $this->phrasen['lvaliste/hilfeText']='Erklärung\n\nStg-Sem: Studiengang-Semester\nGruppen: Teilnehmende Gruppen\nBlock: Blockung (1->Einzelstunden; 2->Doppelstunden; ...)\nWR: Wochenrhythmus (1->jede Woche; 2->jede 2. Woche; ...)\nStd: gesamte Semesterstunden\nKW: Kalenderwoche in der die Lehrveranstaltung startet';
 $this->phrasen['lvaliste/hilfeAnzeigen']='Hilfe anzeigen';
 
@@ -30,4 +32,3 @@ $this->phrasen['lvaliste/koordination']='Koordination';
 $this->phrasen['lvaliste/gesamtnote']='Noten eintragen';
 $this->phrasen['lvaliste/anzahl']='Anzahl';
 $this->phrasen['lvaliste/summe']='Summe';
-?>

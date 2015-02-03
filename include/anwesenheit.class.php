@@ -281,5 +281,72 @@ class anwesenheit extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Liefert für Student und Einheit wieviel Einheiten als anwesend/abwesend
+	 * eingetragen sind.
+	 *
+	 * @param string $uid
+	 * @param int $lehreinheit_id
+	 * @param bool $anwesend
+	 * @return int
+	 */
+	public function getAnwesenheit($uid, $lehreinheit_id, $anwesend = FALSE)
+	{
+		$qry = 'SELECT sum(einheiten) AS einheiten '
+				. 'FROM campus.tbl_anwesenheit '
+				. 'WHERE uid = ' . $this->db_add_param($uid)
+				. ' AND lehreinheit_id = ' . $this->db_add_param($lehreinheit_id, FHC_INTEGER)
+				. ' AND anwesend = ' . $this->db_add_param($anwesend, FHC_BOOLEAN);
+
+		$result = $this->db_query($qry);
+		$row = $this->db_fetch_object($result);
+
+		return $row->einheiten;
+	}
+
+	/**
+	 * Liefert die Termine an denen eine Abwesenheit eingetragen ist.
+	 *
+	 * @param string $uid
+	 * @param int $lehreinheit_id
+	 * @return array
+	 */
+	public function getAbwesendTermine($uid, $lehreinheit_id)
+	{
+
+		$qry = 'SELECT datum, einheiten '
+				. 'FROM campus.tbl_anwesenheit '
+				. 'WHERE uid = ' . $this->db_add_param($uid)
+				. ' AND lehreinheit_id = ' . $this->db_add_param($lehreinheit_id)
+				. ' AND anwesend = FALSE '
+				. 'ORDER BY datum';
+
+		$result = $this->db_query($qry);
+		$ret_obj = array();
+		
+		while($row = $this->db_fetch_object($result))
+		{
+			$ret_obj[] = $row;
+		}
+
+		return $ret_obj;
+	}
+
+	public function getAmpel($anwesenheit_relativ)
+	{
+
+		if($anwesenheit_relativ < 70)
+		{
+			return 'red';
+		}
+		elseif($anwesenheit_relativ < 90)
+		{
+			return 'yellow';
+		}
+		else
+		{
+			return 'green';
+		}
+	}
 }
-?>

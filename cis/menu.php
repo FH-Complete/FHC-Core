@@ -43,75 +43,82 @@ ob_start();
 <link href="../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="../include/js/jquery.js"></script>
 <script type="text/javascript">
-function treemenu(obj) 
-{
-	if (!obj.length) return;
-	obj.find("ul.menu").each(function() 
+	function treemenu(obj)
 	{
-		if(!$(this).parent().find("a:first").hasClass("selected"))
+		if (!obj.length)
 		{
-//			$(this).children(".menublock").each(function(){alert("a"+$(this).html())});
-
-	//		if(!$(this).children(".menublock"))
-				$(this).css("display", "none");
+			return;
 		}
-	});
 
-	$("li:not(:has(ul))").find("a").addClass("leaf");
-	
-	obj.find("a").click(function(e) 
-	{
-		//e.preventDefault();
-		if($(this).hasClass("selected"))
+		obj.find("ul.menu").each(function()
 		{
-			$(this).removeClass("selected");
-			$(this).parent().find("ul.menu:first").slideUp(400);
-		}
-		else
-		{
-			$(this).parent().siblings().each(function()
+			if(!$(this).parent().find("a:first").hasClass("selected"))
 			{
-				$(this).find("a:first").removeClass("selected");
-				$(this).find("ul.menu:first").slideUp(400);
-			});
-			$(this).parent().find("ul.menu:first").slideDown(400);
-			if (!$(this).hasClass("leaf")) 
-			{
-				$(this).addClass("selected");
+	//			$(this).children(".menublock").each(function(){alert("a"+$(this).html())});
+
+		//		if(!$(this).children(".menublock"))
+					$(this).css("display", "none");
 			}
-		}
-		//window.setTimeout(function(){fleXenv.updateScrollBars();},500);
+		});
+
+		$("li:not(:has(ul))").find("a").addClass("leaf");
+
+		obj.find("a").click(function(e)
+		{
+			//e.preventDefault();
+			if($(this).hasClass("selected"))
+			{
+				$(this).removeClass("selected");
+				$(this).parent().find("ul.menu:first").slideUp(400);
+			}
+			else
+			{
+				$(this).parent().siblings().each(function()
+				{
+					$(this).find("a:first").removeClass("selected");
+					$(this).find("ul.menu:first").slideUp(400);
+				});
+				$(this).parent().find("ul.menu:first").slideDown(400);
+				if (!$(this).hasClass("leaf"))
+				{
+					$(this).addClass("selected");
+				}
+			}
+			//window.setTimeout(function(){fleXenv.updateScrollBars();},500);
+		});
+	}
+
+	$(document).ready(function()
+	{
+		treemenu($("#menu"));
 	});
-}
-$(document).ready(function() 
-{
-	treemenu($("#menu"));
-});
 	
 </script>
 
 </head>
 <body style="margin:0; padding:0">
-<div class="flexcroll">
-<?php
-		
-	if(isset($_GET['content_id']) && $_GET['content_id']!='')
-		$content_id=$_GET['content_id'];
-	else
-		$content_id=CIS_MENU_ENTRY_CONTENT;
-	
-	echo '<ul id="menu">';
-	if($content_id!=CIS_MENU_ENTRY_CONTENT)
-	{
-		echo '<li><a href="?content_id='.CIS_MENU_ENTRY_CONTENT.'">&lt;&lt; '.$p->t('global/zurueck').'</a><br></li>';
-	}
-	require_once('../cms/menu.inc.php');
-	drawSubmenu($content_id);
-	
-	//Gepufferten Output ausgeben
-	ob_end_flush();
-	echo '</ul>';
-?>
-</div>
+	<div class="flexcroll">
+	<?php
+
+		if(isset($_GET['content_id']) && $_GET['content_id'] != '')
+		{
+			$content_id = $_GET['content_id'];
+		}
+		else
+		{
+			$content_id = CIS_MENU_ENTRY_CONTENT;
+		} ?>
+
+		<ul id="menu">
+			<?php if($content_id != CIS_MENU_ENTRY_CONTENT): ?>
+				<li><a href="?content_id=<?php echo CIS_MENU_ENTRY_CONTENT ?>">&lt;&lt; <?php echo $p->t('global/zurueck') ?></a><br></li>
+			<?php endif;
+			require_once('../cms/menu.inc.php');
+			drawSubmenu($content_id);
+
+			//Gepufferten Output ausgeben
+			ob_end_flush(); ?>
+		</ul>
+	</div>
 </body>
 </html>

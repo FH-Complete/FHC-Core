@@ -5,7 +5,6 @@ body
 	background-color: white;	
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 13px;
-	height: 100%;
 	width: 100%;
 	margin:0px;
 	border-width:0px;
@@ -972,17 +971,21 @@ table.hoverbox
 }
 */
 
-body.bewerbung table {
+body.bewerbung table,
+body.anwesenheit table {
 	border-collapse: collapse;
 	width: 100%;
 }
 
-body.bewerbung table.reihungstest {
+body.bewerbung table.reihungstest,
+body.anwesenheit table {
 	table-layout: fixed;
 }
 
 body.bewerbung table th,
-body.bewerbung table td {
+body.bewerbung table td,
+body.anwesenheit table th,
+body.anwesenheit table td {
 	padding: 3px;
 	border: 1px solid black;
 	text-align: center;
@@ -1006,4 +1009,56 @@ body.bewerbung table.reihungstest th:nth-child(6) {
 
 body.bewerbung table.reihungstest th:nth-child(5) {
 	width: 50%;
+}
+
+body.anwesenheit {
+	padding-bottom: 20px;
+}
+
+body.anwesenheit div.lv {
+	margin: 10px;
+	padding-top: 10px;
+}
+
+body.anwesenheit div.lv + div.lv {
+	border-top: 1px dashed rgb(193,193,193);
+}
+
+body.anwesenheit div.lv > div {
+	width: 300px;
+	display: inline-block;
+	vertical-align: middle;
+}
+
+body.anwesenheit div.progress-wrapper {
+	border: 1px solid black;
+}
+
+body.anwesenheit div.progress {
+	height: 20px;
+}
+
+body.anwesenheit div.progress.green {
+	background-color: lightgreen;
+}
+
+body.anwesenheit div.progress.yellow {
+	background-color: yellow;
+}
+
+body.anwesenheit div.progress.red {
+	background-color: red;
+}
+
+body.anwesenheit span.fehlstunden-details {
+	cursor: pointer;
+	font-weight: bold;
+}
+
+body.anwesenheit table {
+	margin: 5px;
+}
+
+body.anwesenheit form {
+	margin: 10px;
 }

@@ -741,31 +741,31 @@ class student extends benutzer
     
     public function getStudentUidsForMeldung($studiensemester1, $studiensemester2, $studiensemester3, $zeitraumStart, $zeitraumEnde)
     {
-	$qry = "SELECT DISTINCT ON(student_uid)* FROM public.tbl_student 
-		    JOIN public.tbl_benutzer ON(student_uid = uid) 
-		    JOIN public.tbl_person USING(person_id) 
-		    JOIN public.tbl_prestudent USING(prestudent_id) 
-		    JOIN public.tbl_prestudentstatus ps USING(prestudent_id) 
-		WHERE
-		    bismelden
-		    AND ps.studiensemester_kurzbz 
-			IN(".$this->db_add_param($studiensemester1).","
-			.$this->db_add_param($studiensemester2).","
-			.$this->db_add_param($studiensemester3).")
-		    AND ps.datum > ".$this->db_add_param($zeitraumStart)."
-		    AND ps.datum <= ".$this->db_add_param($zeitraumEnde)."
-		    AND ps.status_kurzbz IN('Student','Unterbrecher','Abbrecher','Absolvent');";
-	
-	if($result = $this->db_query($qry))
-	{
-	    $uids = array();
-	    while($row = $this->db_fetch_object($result))
-	    {
-		array_push($uids, $row->student_uid);
-	    }
-	    return $uids;
-	}
-	return false;
+		$qry = "SELECT DISTINCT ON(student_uid)* FROM public.tbl_student
+				JOIN public.tbl_benutzer ON(student_uid = uid)
+				JOIN public.tbl_person USING(person_id)
+				JOIN public.tbl_prestudent USING(prestudent_id)
+				JOIN public.tbl_prestudentstatus ps USING(prestudent_id)
+			WHERE
+				bismelden
+				AND ps.studiensemester_kurzbz
+				IN(".$this->db_add_param($studiensemester1).","
+				.$this->db_add_param($studiensemester2).","
+				.$this->db_add_param($studiensemester3).")
+				AND ps.datum > ".$this->db_add_param($zeitraumStart)."
+				AND ps.datum <= ".$this->db_add_param($zeitraumEnde)."
+				AND ps.status_kurzbz IN('Student','Unterbrecher','Abbrecher','Absolvent');";
+
+		if($result = $this->db_query($qry))
+		{
+			$uids = array();
+			while($row = $this->db_fetch_object($result))
+			{
+			array_push($uids, $row->student_uid);
+			}
+			return $uids;
+		}
+		return false;
     }
     
     /**
@@ -779,21 +779,57 @@ class student extends benutzer
      */
     public function delete_studentLehrverband($uid, $studiengang_kz, $studiensemester, $semester)
     {
-	$qry = 'DELETE FROM public.tbl_studentlehrverband '
-		. 'WHERE student_uid='.$this->db_add_param($uid)
-		. ' AND studiensemester_kurzbz='.$this->db_add_param($studiensemester)
-		. ' AND studiengang_kz='.$this->db_add_param($studiengang_kz)
-		. ' AND semester='.$this->db_add_param($semester).';';
-	
-	if($this->db_query($qry))
-	{
-		return true;
-	}
-	else
-	{
-		$this->errormsg = 'StudentLehrverband konnte nicht gelöscht werden.';
-		return false;
-	}
+		$qry = 'DELETE FROM public.tbl_studentlehrverband '
+			. 'WHERE student_uid='.$this->db_add_param($uid)
+			. ' AND studiensemester_kurzbz='.$this->db_add_param($studiensemester)
+			. ' AND studiengang_kz='.$this->db_add_param($studiengang_kz)
+			. ' AND semester='.$this->db_add_param($semester).';';
+
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'StudentLehrverband konnte nicht gelöscht werden.';
+			return false;
+		}
     }
+
+	/**
+	 * Lädt alle LV eines Studenten für ein Semester (standardmäßig aktuelles Semester)
+	 *
+	 * @param string $uid
+	 * @param string $studiensemester
+	 * @return boolean
+	 */
+	public function get_lv($uid, $studiensemester = null)
+	{
+
+		if(!$studiensemester)
+		{
+			$sem = new studiensemester;
+			$studiensemester = $sem->getNearest();
+		}
+
+		$qry = 'SELECT * '
+				. 'FROM campus.vw_student_lehrveranstaltung '
+				. 'WHERE uid = ' . $this->db_add_param($uid)
+				. 'AND studiensemester_kurzbz = ' . $this->db_add_param($studiensemester)
+				. ' ORDER BY bezeichnung';
+
+        if($result = $this->db_query($qry))
+        {
+            while($row = $this->db_fetch_object($result))
+            {
+                $this->result[] = $row;
+            }
+            return true;
+        }
+        else
+        {
+            $this->errormsg = "Fehler bei der Abfrage aufgetreten";
+            return false;
+        }
+	}
 }
-?>

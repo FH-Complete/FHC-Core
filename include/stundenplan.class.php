@@ -252,5 +252,23 @@ class stundenplan extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Liefert Gesamtstunden einer Lehreinheit
+	 *
+	 * @param int $lehreinheit_id
+	 * @param string $uid
+	 */
+	public function getStunden($lehreinheit_id)
+	{
+
+		$qry = 'SELECT count(*) AS stunden '
+				. 'FROM lehre.tbl_stundenplan '
+				. 'WHERE lehreinheit_id = ' . $this->db_add_param($lehreinheit_id);
+
+		$result = $this->db_query($qry);
+
+		$row = $this->db_fetch_object($result);
+		return $row->stunden;
+	}
 }
-?>

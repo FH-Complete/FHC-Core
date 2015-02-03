@@ -59,7 +59,7 @@ function drawSubmenu($content_id)
 	
 	// Baumstruktur laden
 	$childsobject = $content->getChildArray($content_id);
-	
+
 	// Menue rausschreiben
 	drawSubmenu1($content_id);
 

@@ -52,7 +52,7 @@ class lehreinheitmitarbeiter extends basis_db
 	public function __construct($lehreinheit_id=null, $mitarbeiter_uid=null)
 	{
 		parent::__construct();
-		
+
 		if(!is_null($lehreinheit_id) && !is_null($mitarbeiter_uid))
 			$this->load($lehreinheit_id, $mitarbeiter_uid);
 	}
@@ -71,9 +71,9 @@ class lehreinheitmitarbeiter extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter 
+		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter
 				WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER)." AND mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid).';';
-		
+
         if($this->db_query($qry))
 		{
 			if($row = $this->db_fetch_object())
@@ -120,7 +120,7 @@ class lehreinheitmitarbeiter extends basis_db
 			$this->errormsg = 'Lehreinheit_id ist ungueltig';
 			return false;
 		}
-		
+
 		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER);
 		if($mitarbeiter_uid!=null)
 			$qry.=" AND mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid);
@@ -171,7 +171,7 @@ class lehreinheitmitarbeiter extends basis_db
 			$this->errormsg = 'Planstunden muss eine gueltige Zahl sein';
 			return false;
 		}
-		
+
 		if($this->semesterstunden!='' && !is_numeric($this->semesterstunden))
 		{
 			$this->errormsg = 'Semesterstunden muss eine gueltige Zahl sein';
@@ -209,7 +209,7 @@ class lehreinheitmitarbeiter extends basis_db
 		if(!$this->planstunden=='')
 			$this->planstunden = (int)mb_str_replace(',', '.', $this->planstunden);
 		$this->semesterstunden = mb_str_replace(',', '.', $this->semesterstunden);
-		
+
 		if($new)
 		{
 			//Pruefen ob dieser Mitarbeiter schon zugeordnet ist
@@ -222,12 +222,12 @@ class lehreinheitmitarbeiter extends basis_db
 					return false;
 				}
 			}
-			else 
+			else
 			{
 				$this->errormsg='Fehler beim Pruefen der Zuordnung';
 				return false;
 			}
-			
+
 			//ToDo ID entfernen
 			$qry = 'INSERT INTO lehre.tbl_lehreinheitmitarbeiter (lehreinheit_id, mitarbeiter_uid, semesterstunden, planstunden,
 			                                                stundensatz, faktor, anmerkung, lehrfunktion_kurzbz, bismelden, ext_id, insertamum, insertvon, vertrag_id)
@@ -249,7 +249,7 @@ class lehreinheitmitarbeiter extends basis_db
 		{
 			if($this->mitarbeiter_uid_old=='')
 				$this->mitarbeiter_uid_old = $this->mitarbeiter_uid;
-				
+
 			//Wenn der Lektor geaendert wird, dann wird insertamum und insertvon neu gesetzt
 			//damit in den Cronjobs erkannt wird welche Lektoren an diesem Tag geaendert wurden.
 			$setinsert='';
@@ -302,7 +302,7 @@ class lehreinheitmitarbeiter extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter 
+		$qry = "SELECT * FROM lehre.tbl_lehreinheitmitarbeiter
 				WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER)." AND mitarbeiter_uid=".$this->db_add_param($uid).';';
 		if($this->db_query($qry))
 		{
@@ -333,13 +333,13 @@ class lehreinheitmitarbeiter extends basis_db
 			return false;
 		}
 
-		$qry = "SELECT 
-					1 
-				FROM 
-					lehre.tbl_lehreinheitmitarbeiter 
+		$qry = "SELECT
+					1
+				FROM
+					lehre.tbl_lehreinheitmitarbeiter
 					JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
-				WHERE 
-					lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)." 
+				WHERE
+					lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)."
 					AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
 					AND mitarbeiter_uid=".$this->db_add_param($uid).';';
 
@@ -433,5 +433,58 @@ class lehreinheitmitarbeiter extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Lädt alle Semester in der ein Lektor aktiv war.
+	 *
+	 * @param string $uid
+	 * @return array
+	 */
+	public function getSemesterZuLektor($uid)
+	{
+		$qry = 'SELECT DISTINCT studiensemester_kurzbz, bezeichnung, start '
+				. 'FROM lehre.tbl_lehreinheitmitarbeiter '
+				. 'JOIN lehre.tbl_lehreinheit '
+				. 'USING (lehreinheit_id) '
+				. 'JOIN public.tbl_studiensemester '
+				. 'USING (studiensemester_kurzbz) '
+				. 'WHERE mitarbeiter_uid = ' . $this->db_add_param($uid)
+				. ' ORDER BY start ';
+
+		$result = $this->db_query($qry);
+		$ret = array();
+
+		while($row = $this->db_fetch_object($result))
+		{
+			$ret[$row->studiensemester_kurzbz] = $row->bezeichnung;
+		}
+
+		return $ret;
+	}
+
+	/**
+	 * Lädt die Lehreinheiten eines Mitarbeiters für ein bestimmtes Semester.
+	 *
+	 * @param string $mitarbeiter_uid
+	 * @param string $studiensemester_kurzbz
+	 * @return array
+	 */
+	public function getLehreinheiten($mitarbeiter_uid, $studiensemester_kurzbz)
+	{
+		$qry = 'SELECT DISTINCT lehreinheit_id, lv_bezeichnung, lv_kurzbz, unr, lv_lehrform_kurzbz '
+				. 'FROM campus.vw_lehreinheit '
+				. 'WHERE mitarbeiter_uid = ' . $this->db_add_param($mitarbeiter_uid)
+				. ' AND studiensemester_kurzbz = ' . $this->db_add_param($studiensemester_kurzbz)
+				. ' ORDER BY lv_bezeichnung, unr ';
+
+		$result = $this->db_query($qry);
+		$ret = array();
+
+		while($row = $this->db_fetch_object($result))
+		{
+			$ret[$row->lehreinheit_id] = $row;
+		}
+
+		return $ret;
+	}
 }
-?>

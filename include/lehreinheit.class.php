@@ -1006,5 +1006,30 @@ class lehreinheit extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Liefert Studenten die einer Lehreinheit zugeordnet sind.
+	 *
+	 * @param int $lehreinheit_id
+	 * @return array
+	 */
+	public function getStudenten($lehreinheit_id)
+	{
+		$qry = 'SELECT uid, vorname, nachname '
+				. 'FROM campus.vw_student_lehrveranstaltung '
+				. 'JOIN campus.vw_student '
+				. 'USING (uid) '
+				. 'WHERE lehreinheit_id = ' . $this->db_add_param($lehreinheit_id, FHC_INTEGER)
+				. ' ORDER BY nachname';
+
+		$result = $this->db_query($qry);
+		$ret = array();
+
+		while($row = $this->db_fetch_object($result))
+		{
+			$ret[] = $row;
+		}
+
+		return $ret;
+	}
 }
-?>

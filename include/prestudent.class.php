@@ -1562,7 +1562,31 @@ class prestudent extends person
 			return false;
 		}
 	}
-	
-	
+
+	public function getSemesterZuUid($uid) {
+
+		$qry = 'SELECT studiensemester_kurzbz, bezeichnung '
+				. 'FROM public.tbl_prestudentstatus '
+				. 'JOIN public.tbl_prestudent '
+				. 'USING (prestudent_id) '
+				. 'JOIN public.tbl_student '
+				. 'USING (prestudent_id) '
+				. 'JOIN public.tbl_studiensemester '
+				. 'USING (studiensemester_kurzbz) '
+				. 'WHERE status_kurzbz IN ('
+					. $this->db_add_param("Student") . ', '
+					. $this->db_add_param("Diplomand") . ', '
+					. $this->db_add_param("Incoming") . ')'
+				. ' AND student_uid = ' . $this->db_add_param($uid)
+				. ' ORDER BY ausbildungssemester';
+
+		$result = $this->db_query($qry);
+		$semester = array();
+
+		while($row = $this->db_fetch_object($result)) {
+			$semester[$row->studiensemester_kurzbz] = $row->bezeichnung;
+		}
+
+		return $semester;
+	}
 }
-?>
