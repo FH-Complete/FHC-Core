@@ -78,7 +78,8 @@ $addon_obj = new addon();
 $addon_obj->loadAddons();
 foreach($addon_obj->result as $addon)
 {
-	echo '<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
+	if(file_exists('../../../addons/'.$addon->kurzbz.'/cis/init.js.php'))
+		echo '<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
 }
 
 // Wenn Seite fertig geladen ist Addons aufrufen
@@ -86,9 +87,12 @@ echo '
 <script>
 $( document ).ready(function() 
 {
-	for(i in addon)
+	if(typeof addon  !== \'undefined\')
 	{
-		addon[i].init("cis/private/tools/zeitaufzeichnung.php", {uid:\''.$user.'\'});
+		for(i in addon)
+		{
+			addon[i].init("cis/private/tools/zeitaufzeichnung.php", {uid:\''.$user.'\'});
+		}
 	}
 });
 </script>
