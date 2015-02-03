@@ -22,7 +22,7 @@
  *          Manfred Kindl		< manfred.kindl@technikum-wien.at >
  */
 /**
- * Aufnahmeverfahren
+ * Reihnugstest
  * 
  * - Anlegen und Bearbeiten von Terminen
  * - Export von Anwesenheitslisten als Excel
@@ -79,16 +79,16 @@ if(isset($_GET['excel']))
 		$workbook = new Spreadsheet_Excel_Writer();
 		$workbook->setVersion(8);
 		// sending HTTP headers
-		$workbook->send("Anwesenheitsliste_Aufnahmeverfahren_".$reihungstest->datum.".xls");
+		$workbook->send("Anwesenheitsliste_Reihnugstest_".$reihungstest->datum.".xls");
 
 		// Creating a worksheet
-		$worksheet =& $workbook->addWorksheet("Aufnahmeverfahren");
+		$worksheet =& $workbook->addWorksheet("Reihnugstest");
 		$worksheet->setInputEncoding('utf-8');
 		//Formate Definieren
 		$format_bold =& $workbook->addFormat();
 		$format_bold->setBold();
 
-		$worksheet->write(0,0,'Anwesenheitsliste Aufnahmeverfahren '.$datum_obj->convertISODate($reihungstest->datum).' '.$reihungstest->uhrzeit.' Uhr '.$reihungstest->anmerkung.', erstellt am '.date('d.m.Y'), $format_bold);
+		$worksheet->write(0,0,'Anwesenheitsliste Reihnugstest '.$datum_obj->convertISODate($reihungstest->datum).' '.$reihungstest->uhrzeit.' Uhr '.$reihungstest->anmerkung.', erstellt am '.date('d.m.Y'), $format_bold);
 		//Ueberschriften
 		$i=0;
 		$worksheet->write(2,$i,"Vorname", $format_bold);
@@ -195,14 +195,14 @@ if(isset($_GET['excel']))
 	}
 	else
 	{
-		echo 'Aufnahmeverfahren wurde nicht gefunden!';
+		echo 'Reihnugstest wurde nicht gefunden!';
 	}
 	return;
 } ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//DE" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 	<head>
-		<title>Aufnahmeverfahren</title>
+		<title>Reihungstest</title>
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<!--<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">-->
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
@@ -297,7 +297,7 @@ if(isset($_POST['speichern']))
 		$reihungstest->updateamum = date('Y-m-d H:i:s');
 		$reihungstest->freigeschaltet = isset($_POST['freigeschaltet']);
 		$reihungstest->max_teilnehmer = filter_input(INPUT_POST, 'max_teilnehmer', FILTER_VALIDATE_INT);
-		$reihungstest->oeffentlich = filter_input(INPUT_POST, 'oeffentlich', FILTER_VALIDATE_INT);
+		$reihungstest->oeffentlich = filter_input(INPUT_POST, 'oeffentlich', FILTER_VALIDATE_BOOLEAN);
 		$reihungstest->updatevon = $user;
 
 		if($reihungstest->save())
@@ -493,7 +493,10 @@ else
 		</tr>
 		<tr>
 			<td>max Teilnehmer</td>
-			<td><input type="number" name="max_teilnehmer" id="max_teilnehmer" value="<?php echo $db->convert_html_chars($reihungstest->max_teilnehmer) ?>"> (optional - nur Zahlen)</td>
+			<td>
+				<input type="number" name="max_teilnehmer" id="max_teilnehmer" value="<?php echo $db->convert_html_chars($reihungstest->max_teilnehmer) ?>">
+				(optional - nur Zahlen)
+			</td>
 		</tr>
 		<tr>
 			<td>Öffentlich</td>
