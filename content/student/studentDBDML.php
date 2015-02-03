@@ -2507,7 +2507,7 @@ if(!$error)
 				$errormsg = 'Fehler beim Ermitteln der LVA';
 			}
 
-			$qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid=".$db->db_add_param($_POST['student_uid_'.$i], FHC_INTEGER);
+			$qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid=".$db->db_add_param($_POST['student_uid_'.$i]);
 			if($result = $db->db_query($qry))
 			{
 				if($row = $db->db_fetch_object($result))
