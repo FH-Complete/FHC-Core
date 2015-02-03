@@ -50,8 +50,13 @@ $projekt_kurzbz = (isset($_POST['projekt'])?$_POST['projekt']:'');
 $oe_kurzbz_1 = (isset($_POST['oe_kurzbz_1'])?$_POST['oe_kurzbz_1']:'');
 $oe_kurzbz_2 = (isset($_POST['oe_kurzbz_2'])?$_POST['oe_kurzbz_2']:'');
 $aktivitaet_kurzbz = (isset($_POST['aktivitaet'])?$_POST['aktivitaet']:'');
-$von = (isset($_POST['von'])?$_POST['von']:date('d.m.Y H:i'));
-$bis = (isset($_POST['bis'])?$_POST['bis']:date('d.m.Y H:i', mktime(date('H'), date('i')+10, 0, date('m'),date('d'),date('Y'))));
+$von_datum = (isset($_POST['von_datum'])?$_POST['von_datum']:date('d.m.Y'));
+$von_uhrzeit = (isset($_POST['von_uhrzeit'])?$_POST['von_uhrzeit']:date('H:i'));
+$von = $von_datum.' '.$von_uhrzeit;
+$bis_datum = (isset($_POST['bis_datum'])?$_POST['bis_datum']:date('d.m.Y'));
+$bis_uhrzeit = (isset($_POST['bis_uhrzeit'])?$_POST['bis_uhrzeit']:date('H:i',mktime(date('H'), date('i')+10)));
+$bis = $bis_datum.' '.$bis_uhrzeit;
+//$bis = (isset($_POST['bis'])?$_POST['bis']:date('d.m.Y H:i', mktime(date('H'), date('i')+10, 0, date('m'),date('d'),date('Y'))));
 $beschreibung = (isset($_POST['beschreibung'])?$_POST['beschreibung']:'');
 $service_id = (isset($_POST['service_id'])?$_POST['service_id']:'');
 $kunde_uid = (isset($_POST['kunde_uid'])?$_POST['kunde_uid']:'');
@@ -68,9 +73,11 @@ echo '<!DOCTYPE HTML>
 		<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 		<link href="../../../skin/tablesort.css" rel="stylesheet" type="text/css"/>
 		<link href="../../../skin/jquery.css" rel="stylesheet" type="text/css"/>
+		<link href="../../../skin/jquery.ui.timepicker.css" rel="stylesheet" type="text/css"/>
         <link href="../../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet"  type="text/css">
 		<script src="../../../include/js/tablesort/table.js" type="text/javascript"></script>
         <script src="../../../include/js/jquery1.9.min.js" type="text/javascript" ></script>
+        <script src="../../../include/js/jquery.ui.timepicker.js" type="text/javascript" ></script>
 		 ';
 
 // ADDONS laden
@@ -102,7 +109,21 @@ echo '
         <script type="text/javascript">
 		$(document).ready(function() 
 		{ 
-		    $(".tablesorter").each(function(i,v)
+		    $( ".datepicker_datum" ).datepicker({
+					 changeMonth: true,
+					 changeYear: true, 
+					 dateFormat: "dd.mm.yy",
+					 });
+			
+			$( ".timepicker" ).timepicker({
+					showPeriodLabels: false,
+					hourText: "'.$p->t("global/stunde").'",
+					minuteText: "'.$p->t("global/minute").'",
+					hours: {starts: 7,ends: 22},
+					rows: 4,
+					});
+			
+			$(".tablesorter").each(function(i,v)
 			{
 				$("#"+v.id).tablesorter(
 				{
@@ -140,33 +161,37 @@ echo '
 		function setbisdatum()
 		{
 			var now = new Date();
-			var ret = "";
+			var ret_datum = "";
+			var ret_uhrzeit = "";
 			var monat = now.getMonth();
 			monat++;
-			ret = foo(now.getDate());
-			ret = ret + "." + foo(monat);
-			ret = ret + "." + now.getFullYear();
-			ret = ret + " " + foo(now.getHours());
-			ret = ret + ":" + foo(now.getMinutes());
-			//ret = ret + ":" + foo(now.getSeconds());
+			ret_datum = foo(now.getDate());
+			ret_datum = ret_datum + "." + foo(monat);
+			ret_datum = ret_datum + "." + now.getFullYear();
+			
+			ret_uhrzeit = foo(now.getHours());
+			ret_uhrzeit = ret_uhrzeit + ":" + foo(now.getMinutes());
 				
-			document.getElementById("bis").value=ret;
+			document.getElementById("bis_datum").value=ret_datum;
+			document.getElementById("bis_uhrzeit").value=ret_uhrzeit;
 		}
 		
 		function setvondatum()
 		{
 			var now = new Date();
-			var ret = "";
+			var ret_datum = "";
+			var ret_uhrzeit = "";
 			var monat = now.getMonth();
 			monat++;
-			ret = foo(now.getDate());
-			ret = ret + "." + foo(monat);
-			ret = ret + "." + now.getFullYear();
-			ret = ret + " " + foo(now.getHours());
-			ret = ret + ":" + foo(now.getMinutes());
-			//ret = ret + ":" + foo(now.getSeconds());
+			ret_datum = foo(now.getDate());
+			ret_datum = ret_datum + "." + foo(monat);
+			ret_datum = ret_datum + "." + now.getFullYear();
+			
+			ret_uhrzeit = foo(now.getHours());
+			ret_uhrzeit = ret_uhrzeit + ":" + foo(now.getMinutes());
 				
-			document.getElementById("von").value=ret;
+			document.getElementById("von_datum").value=ret_datum;
+			document.getElementById("von_uhrzeit").value=ret_uhrzeit;
 		}
 		
 		function foo(val)
@@ -191,19 +216,22 @@ echo '
 		
 		function uebernehmen()
 		{
-			document.getElementById("bis").value=document.getElementById("von").value;
+			document.getElementById("bis_datum").value=document.getElementById("von_datum").value;
+			document.getElementById("bis_uhrzeit").value=document.getElementById("von_uhrzeit").value;
 		}
 		
 		function addieren()
 		{
-			var von_tag,von_monat,von_jahr,von_stunden,von_minuten,tag,monat,jahr,stunde,minute,vonDatum,bisDatum,diff,foo;
+			var von_tag,von_monat,von_jahr,von_stunden,von_minuten,tag,monat,jahr,stunde,minute,vonDatum,bisDatum,bisUhrzeit,diff,foo;
 			//Von-Datum auslesen
-			Datum = document.getElementById("von").value;
+			Datum = document.getElementById("von_datum").value;
+			Uhrzeit = document.getElementById("von_uhrzeit").value;
 		    von_tag = Datum.substring(0,2); 
 		    von_monat = Datum.substring(3,5);
+		    von_monat = von_monat-1;
 		    von_jahr = Datum.substring(6,10);
-		    von_stunden = Datum.substring(11,13);
-		    von_minuten = Datum.substring(14,18);
+		    von_stunden = Uhrzeit.substring(0,2);
+		    von_minuten = Uhrzeit.substring(3,5);
 		    //Neues Datumsobjekt aus Von-Datum erzeugen
 			vonDatum = new Date(von_jahr, von_monat, von_tag, von_stunden, von_minuten);
 			//Falls diff kein Integer, dann 0
@@ -239,33 +267,38 @@ echo '
 			jahr = vonDatum.getFullYear();
 			stunde = (stunde < 10 ? "0"+stunde : stunde);
 			
-			bisDatum = tag+\'.\'+monat+\'.\'+jahr+\' \'+stunde+\':\'+minute;
-			document.getElementById("bis").value = bisDatum;
+			bisDatum = tag+\'.\'+monat+\'.\'+jahr;
+			bisUhrzeit = stunde+\':\'+minute;
+			document.getElementById("bis_datum").value = bisDatum;
+			document.getElementById("bis_uhrzeit").value = bisUhrzeit;
 		}
 
 		function uebernehmen1()
 		{
-			document.getElementById("von").value=document.getElementById("bis").value;
+			document.getElementById("von_datum").value=document.getElementById("bis_datum").value;
+			document.getElementById("von_uhrzeit").value=document.getElementById("bis_uhrzeit").value;
 		}
 
 		function checkdatum()
 		{
 			var Datum,Tag,Monat,Jahr,Stunde,Minute,vonDatum,bisDatum,diff;
 		
-			Datum=document.getElementById("von").value;
+			Datum=document.getElementById("von_datum").value;
+			Uhrzeit=document.getElementById("von_uhrzeit").value;
 		    Tag=Datum.substring(0,2); 
 		    Monat=Datum.substring(3,5);
 		    Jahr=Datum.substring(6,10);
-		    Stunde=Datum.substring(11,13);
-		    Minute=Datum.substring(14,18);
+		    Stunde=Uhrzeit.substring(0,2);
+		    Minute=Uhrzeit.substring(3,5);
 		    vonDatum=Jahr+\'\'+Monat+\'\'+Tag+\'\'+Stunde+\'\'+Minute;
 		    
-		    Datum=document.getElementById("bis").value;
+		    Datum=document.getElementById("bis_datum").value;
+		    Uhrzeit=document.getElementById("bis_uhrzeit").value;
 		    Tag=Datum.substring(0,2); 
 		    Monat=Datum.substring(3,5);
 		    Jahr=Datum.substring(6,10);
-		    Stunde=Datum.substring(11,13);
-		    Minute=Datum.substring(14,18);
+		    Stunde=Uhrzeit.substring(0,2);
+		    Minute=Uhrzeit.substring(3,5);
 		    bisDatum=Jahr+\'\'+Monat+\'\'+Tag+\'\'+Stunde+\'\'+Minute;
 		    diff=bisDatum-vonDatum;
 		    
@@ -274,7 +307,7 @@ echo '
 				if (diff>9999)  
 				{
 					Check = confirm("'.$p->t("zeitaufzeichnung/zeitraumAuffallendHoch").'");
-					document.getElementById("bis").focus();
+					document.getElementById("bis_datum").focus();
 					if (Check == false)
 				  		return false;
 				  	else
@@ -284,7 +317,7 @@ echo '
 			else
 			{
 				alert("'.$p->t("zeitaufzeichnung/bisDatumKleinerAlsVonDatum").'");
-				document.getElementById("bis").focus();
+				document.getElementById("bis_datum").focus();
 			  	return false;
 			}
 			return true;
@@ -586,7 +619,8 @@ if($projekt->getProjekteMitarbeiter($user))
 		<tr>
 			<td>'.$p->t("global/von").' - '.$p->t("global/bis").'</td>
 			<td style="width:50px; white-space: nowrap">
-				<input type="text" id="von" name="von" value="'.$db->convert_html_chars($von).'">
+				<input type="text" class="datepicker_datum" id="von_datum" name="von_datum" value="'.$db->convert_html_chars($datum->formatDatum($von, $format='d.m.Y')).'" size="9">
+				<input type="text" class="timepicker" id="von_uhrzeit" name="von_uhrzeit" value="'.$db->convert_html_chars($datum->formatDatum($von, $format='H:i')).'" size="4">
 				<img style="vertical-align:bottom; cursor:pointer" src="../../../skin/images/timetable.png" title="'.$p->t("zeitaufzeichnung/aktuelleZeitLaden").'" onclick="setvondatum()">&nbsp;
 				<img style="vertical-align:bottom; cursor:pointer" src="../../../skin/images/arrow-next.png" title="'.$p->t("zeitaufzeichnung/alsEndzeitUebernehmen").'" onclick="uebernehmen()">
 			</td>
@@ -596,7 +630,8 @@ if($projekt->getProjekteMitarbeiter($user))
 			</td><td>
 				<img style="vertical-align:bottom; cursor:pointer" src="../../../skin/images/arrow-previous.png" title="'.$p->t("zeitaufzeichnung/alsStartzeitUebernehmen").'" onclick="uebernehmen1()">&nbsp;
 				<img style="vertical-align:bottom; cursor:pointer" src="../../../skin/images/timetable.png" title="'.$p->t("zeitaufzeichnung/aktuelleZeitLaden").'" onclick="setbisdatum()">
-				<input type="text" id="bis" name="bis" value="'.$db->convert_html_chars($bis).'">
+				<input type="text" class="datepicker_datum" id="bis_datum" name="bis_datum" value="'.$db->convert_html_chars($datum->formatDatum($bis, $format='d.m.Y')).'" size="9">
+				<input type="text" class="timepicker" id="bis_uhrzeit" name="bis_uhrzeit" value="'.$db->convert_html_chars($datum->formatDatum($bis, $format='H:i')).'" size="4">
 			</td>
 		<tr>';
 		//Beschreibung

@@ -81,6 +81,7 @@ $this->phrasen['global/fax']='Fax';
 $this->phrasen['global/bezeichnung']='Description'; 
 $this->phrasen['global/datum']='Date'; 
 $this->phrasen['global/stunde']='Hour'; 
+$this->phrasen['global/minute']='Minute'; 
 $this->phrasen['global/person']='Person'; 
 $this->phrasen['global/personenkz']='StudentID'; 
 $this->phrasen['global/personen']='Number of Persons'; 
