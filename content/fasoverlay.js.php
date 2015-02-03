@@ -1692,7 +1692,7 @@ function PrintZutrittskarte()
 // ****
 // * Druckt das Studienblatt
 // ****
-function PrintStudienblatt()
+function PrintStudienblatt(event)
 {
 
 	if(document.getElementById('main-content-tabs').selectedItem==document.getElementById('tab-studenten'))
@@ -1728,12 +1728,27 @@ function PrintStudienblatt()
 		alert('Das Studienblatt kann nur für Studierende erstellt werden');
 		return false;
 	}
-
+	var output = 'pdf';
+	if(typeof(event)!=='undefined')
+	{
+		if (event.shiftKey) 
+		{
+		    var output = 'odt';
+		} 
+		else if (event.ctrlKey)
+		{
+			var output = 'doc';
+		}
+		else
+		{
+			var output = 'pdf';
+		}
+	}
 	if(data!='')
 	{
 		if(error>0)
 			alert(error+' der ausgewaehlten Personen haben keinen Account');
-		action = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl=Studienblatt&xml=studienblatt.xml.php&output=pdf&&uid='+data;
+		action = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl=Studienblatt&xml=studienblatt.xml.php&output='+output+'&&uid='+data;
 		window.open(action,'Studienblatt','height=520,width=500,left=350,top=350,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 	}
 	else

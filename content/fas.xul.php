@@ -132,7 +132,7 @@ foreach($addon_obj->result as $addon)
   <command id="menu-dokumente-studienerfolgeng-allesemester-finanzamt:command" oncommand="StudentCreateStudienerfolg('StudienerfolgEng','finanzamt', '', 'true');"/>
   <command id="menu-dokumente-accountinfoblatt:command" oncommand="PrintAccountInfoBlatt();"/>  
   <command id="menu-dokumente-zutrittskarte:command" oncommand="PrintZutrittskarte();"/>
-  <command id="menu-dokumente-studienblatt:command" oncommand="PrintStudienblatt();"/>
+  <command id="menu-dokumente-studienblatt:command" oncommand="PrintStudienblatt(event);"/>
   <command id="menu-dokumente-pruefungsprotokoll:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple('de');"/>
   <command id="menu-dokumente-pruefungsprotokoll_englisch:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple('en');"/>
   <command id="menu-dokumente-pruefungsprotokoll2:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple('de2');"/>
