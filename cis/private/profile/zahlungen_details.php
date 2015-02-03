@@ -65,7 +65,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www
 			<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 			<title>Zahlungsdetails</title>
 			<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
-			<link href="../../../skin/fhcomplete.css.php" rel="stylesheet" type="text/css">
+			<link href="../../../skin/fhcomplete.css" rel="stylesheet" type="text/css">
 			<link rel="stylesheet" href="../../../skin/tablesort.css" type="text/css"/>
 		</head>
 		<body>';
