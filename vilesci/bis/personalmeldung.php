@@ -417,5 +417,6 @@ foreach($mitarbeiter_gesamt as $row)
 	echo '</tr>';
 }
 echo '</tbody></table><br>';
+echo '<a href="archiv.php?meldung='.$ddd.'&sem='.$stsem.'&typ=mitarbeiter&action=archivieren">Mitarbeiter-BIS-Meldung archivieren</a><br>';
 echo "<a href=$ddd>XML-Datei f&uuml;r Mitarbeiter-BIS-Meldung</a><br><br>";
 ?>

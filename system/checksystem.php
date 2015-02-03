@@ -2437,9 +2437,52 @@ if(!$result = @$db->db_query("SELECT oeffentlich FROM public.tbl_reihungstest LI
 		echo ' public.tbl_reihungstest: Spalte oeffentlich hinzugefuegt!<br>';
 }
 
+// BIS-Archiv
+if(!$result = @$db->db_query("SELECT 1 FROM bis.tbl_archiv LIMIT 1;"))
+{
+	$qry = "
+
+	CREATE TABLE bis.tbl_archiv
+	(
+		id integer,
+		studiensemester varchar(6),
+		meldung xml,
+		html text,
+		studiengang_kz bigint,
+		insertamum timestamp,
+		insertvon varchar(32),
+		typ varchar(16)
+	);
+
+	ALTER TABLE bis.tbl_archiv ADD CONSTRAINT pk_archiv PRIMARY KEY (id);
+
+	CREATE SEQUENCE bis.seq_archiv_id
+	INCREMENT BY 1
+	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+	
+	ALTER TABLE bis.tbl_archiv ALTER COLUMN id SET DEFAULT nextval('bis.seq_archiv_id');
+	ALTER TABLE bis.tbl_archiv ADD CONSTRAINT fk_archiv_studiensemester FOREIGN KEY (studiensemester) REFERENCES public.tbl_studiensemester(studiensemester_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE bis.tbl_archiv ADD CONSTRAINT fk_archiv_studiengang_kz FOREIGN KEY (studiengang_kz) REFERENCES public.tbl_studiengang(studiengang_kz) ON DELETE RESTRICT ON UPDATE CASCADE;
+	ALTER TABLE bis.tbl_archiv ADD CONSTRAINT fk_benutzer_archiv FOREIGN KEY (insertvon) REFERENCES public.tbl_benutzer(uid) ON DELETE RESTRICT ON UPDATE CASCADE;
+	
+	GRANT SELECT, INSERT, UPDATE, DELETE ON bis.tbl_archiv TO vilesci;
+	GRANT SELECT, UPDATE ON bis.seq_archiv_id TO vilesci;
+	
+	GRANT SELECT, INSERT, UPDATE, DELETE ON bis.tbl_archiv TO web;
+	GRANT SELECT, UPDATE ON bis.seq_archiv_id TO web;
+	";
+	if(!$db->db_query($qry))
+		echo '<strong>BIS-Archiv: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' Tabellen fuer BIS-Archiv hinzugefuegt!<br>';
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
+	"bis.tbl_archiv"  => array("id","studiensemester","meldung","html","studiengang_kz","insertamum","insertvon","typ"),
 	"bis.tbl_ausbildung"  => array("ausbildungcode","ausbildungbez","ausbildungbeschreibung"),
 	"bis.tbl_berufstaetigkeit"  => array("berufstaetigkeit_code","berufstaetigkeit_bez","berufstaetigkeit_kurzbz"),
 	"bis.tbl_beschaeftigungsart1"  => array("ba1code","ba1bez","ba1kurzbz"),

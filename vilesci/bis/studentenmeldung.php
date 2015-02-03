@@ -503,6 +503,7 @@ fclose($dateiausgabe);
 
 if(file_exists($ddd))
 {
+	echo '<a href="archiv.php?meldung='.$ddd.'&html='.$eee.'&stg='.$stg_kz.'&sem='.$ssem.'&typ=studenten&action=archivieren">BIS-Meldung Stg '.$stg_kz.' archivieren</a><br>';
 	echo '<a href="'.$ddd.'">XML-Datei f&uuml;r BIS-Meldung Stg '.$stg_kz.'</a><br>';
 }
 if(file_exists($eee))
