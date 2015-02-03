@@ -244,7 +244,7 @@ if(isset($_GET['excel']))
 		</script>
 	</head>
 	<body class="Background_main">
-		<h2>Aufnahemverfahren - Verwaltung</h2>
+		<h2>Reihungstest - Verwaltung</h2>
 <?php
 // Speichern eines Termines
 if(isset($_POST['speichern']))
