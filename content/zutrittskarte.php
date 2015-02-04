@@ -127,15 +127,15 @@ if(copy($zipfile, $tempname_zip))
 				}
 				$xml.="
 				<mitarbeiter>
-					<uid>".$bn->uid."</uid>
-					<vorname>".$bn->vorname."</vorname>
-					<nachname>".$bn->nachname."</nachname>
-					<titelpre>".$bn->titelpre."</titelpre>
-					<titelpost>".$bn->titelpost."</titelpost>
-					<personalnummer>".$ma->personalnummer."</personalnummer>
-					<ausstellungsdatum>".date('d.m.Y')."</ausstellungsdatum>
-					<gebdatum>".$datum_obj->formatDatum($ma->gebdatum,'d.m.Y')."</gebdatum>
-					<organisationseinheit>".$oe->bezeichnung."</organisationseinheit>
+					<uid><![CDATA[".$bn->uid."]]></uid>
+					<vorname><![CDATA[".$bn->vorname."]]></vorname>
+					<nachname><![CDATA[".$bn->nachname."]]></nachname>
+					<titelpre><![CDATA[".$bn->titelpre."]]></titelpre>
+					<titelpost><![CDATA[".$bn->titelpost."]]></titelpost>
+					<personalnummer><![CDATA[".$ma->personalnummer."]]></personalnummer>
+					<ausstellungsdatum><![CDATA[".date('d.m.Y')."]]></ausstellungsdatum>
+					<gebdatum><![CDATA[".$datum_obj->formatDatum($ma->gebdatum,'d.m.Y')."]]></gebdatum>
+					<organisationseinheit><![CDATA[".$oe->bezeichnung."]]></organisationseinheit>
 				</mitarbeiter>";
 			}
 			else
@@ -165,7 +165,7 @@ if(copy($zipfile, $tempname_zip))
 					//Nur der Datumsstempel wird erstellt
 					$xml.="
 					<datum>
-						<gueltigbis>".$datum_obj->formatDatum($gueltigbis,'d/m/Y')."</gueltigbis>
+						<gueltigbis><![CDATA[".$datum_obj->formatDatum($gueltigbis,'d/m/Y')."]]></gueltigbis>
 					</datum>";
 				}
 				else
@@ -173,16 +173,16 @@ if(copy($zipfile, $tempname_zip))
 					//Student
 					$xml.="
 					<student>
-						<uid>".$bn->uid."</uid>
-						<vorname>".$bn->vorname."</vorname>
-						<nachname>".$bn->nachname."</nachname>
-						<titelpre>".$bn->titelpre."</titelpre>
-						<titelpost>".$bn->titelpost."</titelpost>
-						<studiengang>".$studiengang->kurzbzlang."</studiengang>
-						<gebdatum>".$datum_obj->formatDatum($bn->gebdatum,'d.m.Y')."</gebdatum>
-						<matrikelnummer>".$student->matrikelnr."</matrikelnummer>
-						<ausstellungsdatum>".date('M.Y')."</ausstellungsdatum>
-						<gueltigbis>".$datum_obj->formatDatum($gueltigbis,'d.m.Y')."</gueltigbis>
+						<uid><![CDATA[".$bn->uid."]]></uid>
+						<vorname><![CDATA[".$bn->vorname."]]></vorname>
+						<nachname><![CDATA[".$bn->nachname."]]></nachname>
+						<titelpre><![CDATA[".$bn->titelpre."]]></titelpre>
+						<titelpost><![CDATA[".$bn->titelpost."]]></titelpost>
+						<studiengang><![CDATA[".$studiengang->kurzbzlang."]]></studiengang>
+						<gebdatum><![CDATA[".$datum_obj->formatDatum($bn->gebdatum,'d.m.Y')."]]></gebdatum>
+						<matrikelnummer><![CDATA[".$student->matrikelnr."]]></matrikelnummer>
+						<ausstellungsdatum><![CDATA[".date('M.Y')."]]></ausstellungsdatum>
+						<gueltigbis><![CDATA[".$datum_obj->formatDatum($gueltigbis,'d.m.Y')."]]></gueltigbis>
 					</student>";
 				}
 			}
