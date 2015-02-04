@@ -1818,8 +1818,46 @@ function LehrveranstaltungFFZertifikatPrint()
 		}
 	}
 	var ss = getStudiensemester();
+	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-studiengang_kz"] : "lehrveranstaltung-noten-tree-studiengang_kz";
+	stg_kz = tree.view.getCellText(tree.currentIndex,col);
 
-	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat.rdf.php&xsl=Zertifikat&uid='+paramList+'&ss='+ss+'&lvid='+lvid+'&'+gettimestamp();
+	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zertifikat.rdf.php&xsl=Zertifikat&stg_kz='+stg_kz+'&uid='+paramList+'&ss='+ss+'&lvid='+lvid+'&'+gettimestamp();
+	window.location.href = url;
+	//prompt('test:',url);
+}
+
+// ****
+// * Erstellt ein Lehrveranstaltungszeugnis fuer die LV
+// ****
+function LehrveranstaltungLVZeugnisPrint()
+{
+	tree = document.getElementById('lehrveranstaltung-noten-tree');
+	//Alle markierten Noten holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var paramList= '';
+	var anzahl=0;
+	var lvid='';
+
+	for (var t = 0; t < numRanges; t++)
+	{
+  		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-student_uid"] : "lehrveranstaltung-noten-tree-student_uid";
+			uid = tree.view.getCellText(v,col);
+			paramList += ';'+uid;
+			anzahl = anzahl+1;
+			col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
+			lvid = tree.view.getCellText(v,col);
+		}
+	}
+	var ss = getStudiensemester();
+	col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-studiengang_kz"] : "lehrveranstaltung-noten-tree-studiengang_kz";
+	stg_kz = tree.view.getCellText(tree.currentIndex,col);
+
+	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrveranstaltungszeugnis.rdf.php&xsl=LVZeugnis&stg_kz='+stg_kz+'&uid='+paramList+'&ss='+ss+'&lvid='+lvid+'&'+gettimestamp();
 	window.location.href = url;
 	//prompt('test:',url);
 }

@@ -41,6 +41,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 	<menupopup id="student-noten-tree-popup">
 		<menuitem label="Entfernen" oncommand="StudentNotenDelete();" id="student-noten-tree-popup-delete" hidden="false"/>
 		<menuitem label="Zertifikat erstellen" oncommand="StudentFFZertifikatPrint();" id="student-noten-tree-popup-ffzertifikat" hidden="false"/>
+		<menuitem label="Lehrveranstaltungszeugnis erstellen" oncommand="StudentLVZeugnisPrint();" id="student-noten-tree-popup-lvzeugnis" hidden="false"/>
 	</menupopup>
 </popupset>
 <hbox flex="1" style="margin-top: 10px;">

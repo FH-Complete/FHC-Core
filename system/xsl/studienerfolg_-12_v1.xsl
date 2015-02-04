@@ -106,7 +106,7 @@
 						            <fo:table-row line-height="14pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
 											<fo:block font-family="sans-serif" font-size="8pt" content-width="45mm" text-align="left">
-												<xsl:text> Studiengang\n</xsl:text>
+												<xsl:text> Lehrgang zur Weiterbildung nach §9 FHStG idgF\n</xsl:text>
 											</fo:block>
 										</fo:table-cell>
 										<fo:table-cell border-width="0.2mm" border-style="solid">

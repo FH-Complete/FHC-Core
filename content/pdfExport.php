@@ -73,7 +73,7 @@ else
 		// in dem der 1. Studierende in der Liste ist
 		if(isset($_GET['uid']) && $_GET['uid']!='')
 		{
-			if(strstr(';',$_GET['uid']))
+			if(strstr($_GET['uid'],';'))
 				$uids = explode(';',$_GET['uid']);
 			else 
 				$uids = $_GET['uid'];
@@ -190,7 +190,7 @@ if($xsl=='AccountInfo')
 		exit;
 	}
 }
-elseif(in_array($xsl,array('Zertifikat','Diplomurkunde','Diplomzeugnis','Bakkurkunde','BakkurkundeEng','Bakkzeugnis',
+elseif(in_array($xsl,array('Lehrveranstaltungszeugnis','Zertifikat','Diplomurkunde','Diplomzeugnis','Bakkurkunde','BakkurkundeEng','Bakkzeugnis',
 'PrProtokollBakk','PrProtokollDipl','Lehrauftrag','DiplomurkundeEng','Zeugnis','ZeugnisEng','StudienerfolgEng',
 'Sammelzeugnis','PrProtDiplEng','PrProtBakkEng','BakkzeugnisEng','DiplomzeugnisEng','statusbericht',
 'DiplSupplement','Zutrittskarte','Projektbeschr','Ausbildungsver','AusbildStatus','PrProtBA','PrProtMA',

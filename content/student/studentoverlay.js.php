@@ -374,6 +374,31 @@ function StudentFFZertifikatPrint()
 	window.location.href = url;
 }
 
+//****
+//* Erstellt ein Lehrveranstaltungszeugnis fuer die LV
+//****
+function StudentLVZeugnisPrint()
+{
+//	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-noten-tree');
+			
+	col = tree.columns ? tree.columns["student-noten-tree-student_uid"] : "student-noten-tree-student_uid";
+	uid = tree.view.getCellText(tree.currentIndex,col);
+	
+	col = tree.columns ? tree.columns["student-noten-tree-lehrveranstaltung_id"] : "student-noten-tree-lehrveranstaltung_id";
+	lvid = tree.view.getCellText(tree.currentIndex,col);
+	
+	col = tree.columns ? tree.columns["student-noten-tree-studiensemester_kurzbz"] : "student-noten-tree-studiensemester_kurzbz";
+	stsem = tree.view.getCellText(tree.currentIndex,col);
+
+	col = tree.columns ? tree.columns["student-noten-tree-studiengang_kz"] : "student-noten-tree-studiengang_kz";
+	stg_kz = tree.view.getCellText(tree.currentIndex,col);
+
+	url =  '<?php echo APP_ROOT; ?>content/pdfExport.php?xml=lehrveranstaltungszeugnis.rdf.php&xsl=LVZeugnis&stg_kz='+stg_kz+'&uid=;'+uid+'&ss='+stsem+'&lvid='+lvid+'&'+gettimestamp();
+	
+	window.location.href = url;
+}
+
 // ****
 // * Asynchroner (Nicht blockierender) Refresh des StudentenTrees
 // ****
