@@ -83,88 +83,95 @@ if($lehreinheit_id)
 
 	<body class="anwesenheit">
 
-		<form id="anwesenheitAuswahl" method="GET">
-			<select name="semester" id="semester">
-				<?php foreach($alle_semester as $kurzbz => $sem): ?>
-					<option value="<?php echo $kurzbz ?>" <?php echo $kurzbz === $semester ? 'selected' : '' ?>>
-						<?php echo $sem ?>
-					</option>
-				<?php endforeach; ?>
-			</select>
-			<select name="lehreinheit" id="lehreinheit">
-				<option value=""></option>
-				<?php foreach($lehreinheiten as $le): ?>
-					<option value="<?php echo $le->lehreinheit_id ?>" <?php echo $le->lehreinheit_id === $lehreinheit_id ? 'selected' : '' ?>>
-						<?php echo $le->lv_bezeichnung ?>
-						(<?php echo ($le->lv_lehrform_kurzbz ? $le->lv_lehrform_kurzbz . ', '  : '') . $le->unr ?>)
-					</option>
-				<?php endforeach ?>
-			</select>
-		</form>
-		<?php
-		if($lehreinheit_id)
-		{
-			$stunden_gesamt = $stundenplan->getStunden($lehreinheit_id);
-		}
+		<?php if(!count($alle_semester)): ?>
 
-		if(!$lehreinheit_id): ?>
-			Bitte LV auswählen.
-		<?php elseif(!$stunden_gesamt): ?>
-			Keine Stunden eingetragen.
-		<?php else:
+			Keine Lehreinheiten gefunden.
 
-			foreach($studenten as $student):
+		<?php else: ?>
 
-				$fehlstunden = $anwesenheit->getAnwesenheit($student->uid, $lehreinheit_id);
-				$le_erledigt = $fehlstunden + $anwesenheit->getAnwesenheit($student->uid, $lehreinheit_id, true);
-				$anwesenheit_relativ = ($stunden_gesamt - $fehlstunden) / $stunden_gesamt * 100;
-				?>
-
-				<div class="lv">
-					<div>
-						<?php echo $student->nachname ?>
-						<?php echo $student->vorname ?>
-					</div>
-					<div>
-						<div class="progress-wrapper">
-							<div class="progress <?php echo $anwesenheit->getAmpel($anwesenheit_relativ) ?>" style="width: <?php echo (int) round($anwesenheit_relativ) ?>%;"></div>
-						</div>
-						<?php echo round($anwesenheit_relativ, 1) ?>%
-						LE abgeschlossen: [<?php echo $le_erledigt ?>/<?php echo $stunden_gesamt ?>]
-
-						<?php if($fehlstunden): ?>
-
-							<span class="fehlstunden-details" title="eingetragene Fehlstunden">&gt;&gt;</span>
-							<div style="display: none;">
-								<?php $abwesend_termine = $anwesenheit->getAbwesendTermine($uid, $lv->lehreinheit_id); ?>
-								<table>
-									<?php foreach($abwesend_termine as $termin): ?>
-										<tr>
-											<td><?php echo $termin->datum ?></td>
-											<td><?php echo $termin->einheiten ?></td>
-										</tr>
-									<?php endforeach; ?>
-								</table>
-							</div>
-
-						<?php endif; ?>
-					</div>
-				</div>
-
+			<form id="anwesenheitAuswahl" method="GET">
+				<select name="semester" id="semester">
+					<?php foreach($alle_semester as $kurzbz => $sem): ?>
+						<option value="<?php echo $kurzbz ?>" <?php echo $kurzbz === $semester ? 'selected' : '' ?>>
+							<?php echo $sem ?>
+						</option>
+					<?php endforeach; ?>
+				</select>
+				<select name="lehreinheit" id="lehreinheit">
+					<option value=""></option>
+					<?php foreach($lehreinheiten as $le): ?>
+						<option value="<?php echo $le->lehreinheit_id ?>" <?php echo $le->lehreinheit_id === $lehreinheit_id ? 'selected' : '' ?>>
+							<?php echo $le->lv_bezeichnung ?>
+							(<?php echo ($le->lv_lehrform_kurzbz ? $le->lv_lehrform_kurzbz . ', '  : '') . $le->unr ?>)
+						</option>
+					<?php endforeach ?>
+				</select>
+			</form>
 			<?php
-			endforeach;
-		endif; ?>
+			if($lehreinheit_id)
+			{
+				$stunden_gesamt = $stundenplan->getStunden($lehreinheit_id);
+			}
 
-		<script type="text/javascript">
-			$('#anwesenheitAuswahl > *').on('change', function() {
+			if(!$lehreinheit_id): ?>
+				Bitte LV auswählen.
+			<?php elseif(!$stunden_gesamt): ?>
+				Keine Stunden eingetragen.
+			<?php else:
 
-				if(this.id === 'semester') {
-					$('#lehreinheit').val('');
-				}
+				foreach($studenten as $student):
 
-				$('#anwesenheitAuswahl').trigger('submit');
-			});
-		</script>
+					$fehlstunden = $anwesenheit->getAnwesenheit($student->uid, $lehreinheit_id);
+					$le_erledigt = $fehlstunden + $anwesenheit->getAnwesenheit($student->uid, $lehreinheit_id, true);
+					$anwesenheit_relativ = ($stunden_gesamt - $fehlstunden) / $stunden_gesamt * 100;
+					?>
+
+					<div class="lv">
+						<div>
+							<?php echo $student->nachname ?>
+							<?php echo $student->vorname ?>
+						</div>
+						<div>
+							<div class="progress-wrapper">
+								<div class="progress <?php echo $anwesenheit->getAmpel($anwesenheit_relativ) ?>" style="width: <?php echo (int) round($anwesenheit_relativ) ?>%;"></div>
+							</div>
+							<?php echo round($anwesenheit_relativ, 1) ?>%
+							LE abgeschlossen: [<?php echo $le_erledigt ?>/<?php echo $stunden_gesamt ?>]
+
+							<?php if($fehlstunden): ?>
+
+								<span class="fehlstunden-details" title="eingetragene Fehlstunden">&gt;&gt;</span>
+								<div style="display: none;">
+									<?php $abwesend_termine = $anwesenheit->getAbwesendTermine($uid, $lv->lehreinheit_id); ?>
+									<table>
+										<?php foreach($abwesend_termine as $termin): ?>
+											<tr>
+												<td><?php echo $termin->datum ?></td>
+												<td><?php echo $termin->einheiten ?></td>
+											</tr>
+										<?php endforeach; ?>
+									</table>
+								</div>
+
+							<?php endif; ?>
+						</div>
+					</div>
+
+				<?php
+				endforeach;
+			endif; ?>
+
+			<script type="text/javascript">
+				$('#anwesenheitAuswahl > *').on('change', function() {
+
+					if(this.id === 'semester') {
+						$('#lehreinheit').val('');
+					}
+
+					$('#anwesenheitAuswahl').trigger('submit');
+				});
+			</script>
+		<?php endif; ?>
 
 	</body>
 </html>

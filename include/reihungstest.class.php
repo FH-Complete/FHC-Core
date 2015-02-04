@@ -90,7 +90,7 @@ class reihungstest extends basis_db
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
 				$this->max_teilnehmer = $row->max_teilnehmer;
-				$this->oeffentlich = $row->oeffentlich;
+				$this->oeffentlich = $this->db_parse_bool($row->oeffentlich);
 				$this->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
 				return true;				
 			}
@@ -137,7 +137,7 @@ class reihungstest extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->max_teilnehmer = $row->max_teilnehmer;
-				$obj->oeffentlich = $row->oeffentlich;
+				$obj->oeffentlich = $this->db_parse_bool($row->oeffentlich);
 				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
 				
 				$this->result[] = $obj;
@@ -205,7 +205,7 @@ class reihungstest extends basis_db
 			     $this->db_add_param($this->insertvon).', now(), '.
 			     $this->db_add_param($this->updatevon).','.
 			     $this->db_add_param($this->max_teilnehmer).','.
-			     $this->db_add_param($this->oeffentlich).','.
+			     $this->db_add_param($this->oeffentlich, FHC_BOOLEAN).','.
 			     $this->db_add_param($this->freigeschaltet, FHC_BOOLEAN).');';
 		}
 		else
@@ -220,7 +220,7 @@ class reihungstest extends basis_db
 		     	'updateamum= now(), '.
 		     	'updatevon='.$this->db_add_param($this->updatevon).', '.
 		     	'max_teilnehmer='.$this->db_add_param($this->max_teilnehmer).', '.
-		     	'oeffentlich='.$this->db_add_param($this->oeffentlich).', '.
+				'oeffentlich='.$this->db_add_param($this->oeffentlich, FHC_BOOLEAN).', '.
 				'freigeschaltet='.$this->db_add_param($this->freigeschaltet, FHC_BOOLEAN).' '.
 				'WHERE reihungstest_id='.$this->db_add_param($this->reihungstest_id, FHC_INTEGER, false).';';					
 		}
@@ -293,7 +293,7 @@ class reihungstest extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->max_teilnehmer = $row->max_teilnehmer;
-				$obj->oeffentlich = $row->oeffentlich;
+				$obj->oeffentlich = $this->db_parse_bool($row->oeffentlich);
 				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
 				
 				$this->result[] = $obj;
@@ -341,7 +341,7 @@ class reihungstest extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->max_teilnehmer = $row->max_teilnehmer;
-				$obj->oeffentlich = $row->oeffentlich;
+				$obj->oeffentlich = $this->db_parse_bool($row->oeffentlich);
 				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
 				
 				$this->result[] = $obj;
@@ -381,7 +381,7 @@ class reihungstest extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
 				$obj->max_teilnehmer = $row->max_teilnehmer;
-				$obj->oeffentlich = $row->oeffentlich;
+				$obj->oeffentlich = $this->db_parse_bool($row->oeffentlich);
 				$obj->freigeschaltet = $this->db_parse_bool($row->freigeschaltet);
 				
 				$this->result[] = $obj;
