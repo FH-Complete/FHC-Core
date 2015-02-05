@@ -3722,6 +3722,46 @@ function StudentNotenDelete()
 	}
 }
 
+/**
+ * Wird aufgerufen wenn Punkte zu einer Note eingetragen werden
+ * Laedt die Note anhand des Notenschluessels
+ */
+function StudentNotenPunkteChange()
+{
+	var punkte = document.getElementById('student-noten-textbox-punkte').value;
+	punkte = punkte.replace(',','.');
+	if(punkte!='')
+	{
+		var tree=document.getElementById('student-noten-tree');
+		//Ausgewaehlte LV holen
+		var col = tree.columns ? tree.columns["student-noten-tree-lehrveranstaltung_id"] : "student-noten-tree-lehrveranstaltung_id";
+		var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
+
+		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+		var req = new phpRequest(url,'','');
+	
+		req.add('type', 'getnotenotenschluessel');
+	
+		req.add('lehrveranstaltung_id', lehrveranstaltung_id);
+		req.add('punkte', punkte);
+		
+		var response = req.executePOST();
+	
+		var val =  new ParseReturnValue(response)
+	
+		if (!val.dbdml_return)
+		{
+			if(val.dbdml_errormsg=='')
+				alert(response);
+			else
+				alert(val.dbdml_errormsg);				
+		}
+		else
+		{
+			document.getElementById('student-noten-menulist-note').value=val.dbdml_data;
+		}
+	}
+}
 
 // **************** PRUEFUNG ************** //
 

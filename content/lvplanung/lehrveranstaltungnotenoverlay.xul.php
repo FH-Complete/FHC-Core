@@ -259,7 +259,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 		</template>
 	</menulist>
 	<label value="Punkte" control="lehrveranstaltung-noten-textbox-punkte" hidden="<?php echo $punktehidden; ?>"/>
-	<textbox id="lehrveranstaltung-noten-textbox-punkte" disabled="true" hidden="<?php echo $punktehidden; ?>"/>
+	<textbox id="lehrveranstaltung-noten-textbox-punkte" oninput="LehrveranstaltungNotenPunkteChange()" disabled="true" hidden="<?php echo $punktehidden; ?>"/>
 	<button id="lehrveranstaltung-noten-button-speichern" oncommand="LehrveranstaltungNoteSpeichern()" label="Speichern" disabled="true" hidden="<?php echo $punktehidden; ?>"/>
 	<spacer flex="1" />
 	<button id="lehrveranstaltung-noten-button-import" label="Notenimport" oncommand="LehrveranstaltungNotenImport();" />

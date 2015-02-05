@@ -40,6 +40,7 @@ require_once('../../../../include/benutzer.class.php');
 require_once('../../../../include/student.class.php');
 require_once('../../../../include/phrasen.class.php');
 require_once('../../../../include/zeugnisnote.class.php');
+require_once('../../../../include/notenschluessel.class.php');
 
 if (!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
@@ -115,13 +116,22 @@ function savenote($db,$lvid, $student_uid, $note, $punkte=null)
 	//Ermitteln ob der Student diesem Kurs zugeteilt ist
 	$qry = "SELECT 1 FROM campus.vw_student_lehrveranstaltung WHERE uid=".$db->db_add_param($student_uid)." AND lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER);
 	if($result = $db->db_query($qry))
+	{
 		if($db->db_num_rows($result)==0)
 		{
 			$student = new student();
 			$student->load($student_uid);
 			return $p->t('benotungstool/studentIstLvNichtZugeordnet', array($student->nachname, $student->vorname, trim($student->matrikelnr)))."\n";
 		}
-	
+	}
+
+	// Wenn punkte vorhanden sind, dann die note dazu ermitteln
+	if($punkte!='' && $note=='')
+	{
+		$notenschluessel = new notenschluessel();
+		$note = $notenschluessel->getNote($punkte, $lvid, $stsem);
+	}
+
 	$lvgesamtnote = new lvgesamtnote();
     if (!$lvgesamtnote->load($lvid, $student_uid, $stsem))
     {
@@ -182,10 +192,21 @@ if (isset($_REQUEST["submit"]))
 			if(mb_strstr(mb_strtolower($row), 'matrikelnr_'))
 			{
 				$id=mb_substr($row, mb_strlen('matrikelnr_'));
-				if(isset($_POST['matrikelnr_'.$id]) && isset($_POST['note_'.$id]))
+				if(isset($_POST['matrikelnr_'.$id]) && (isset($_POST['note_'.$id]) || isset($_POST['punkte_'.$id])))
 				{
 					$matrikelnummer = $_POST['matrikelnr_'.$id];
-					$note = $_POST['note_'.$id];
+					$note=null;
+					$punkte=null;
+					if(isset($_POST['note_'.$id]))
+						$note = $_POST['note_'.$id];
+					elseif(isset($_POST['punkte_'.$id]))
+						$punkte = $_POST['punkte_'.$id];
+					else
+					{
+						$response.="\nNote oder Punkte fehlen";
+						continue;
+					}
+					$punkte=str_replace(',','.', $punkte);
 					//UID ermitteln
 					$student = new student();
 					if(!$student_uid = $student->getUidFromMatrikelnummer($matrikelnummer))
@@ -195,12 +216,13 @@ if (isset($_REQUEST["submit"]))
 					}
 					
 					// Hole Zeugnisnote wenn schon eine eingetragen ist
+					/*
 					if ($zeugnisnote = new zeugnisnote($lvid, $student_uid, $stsem))
 						$znote = $zeugnisnote->note;
 					else
 						$znote = null;	
-					
-					$val=savenote($db,$lvid, $student_uid, $note);
+					*/
+					$val=savenote($db,$lvid, $student_uid, $note, $punkte);
 					if($val!='neu' && $val!='update' && $val!='update_f')
 						$response.=$val;
 				}

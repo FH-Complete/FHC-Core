@@ -61,6 +61,7 @@ require_once('../../include/pruefling.class.php');
 require_once('../../include/mail.class.php'); 
 require_once('../../include/kontakt.class.php'); 
 require_once('../../include/dms.class.php'); 
+require_once('../../include/notenschluessel.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -2372,6 +2373,37 @@ if(!$error)
 			}
 		}
 	}
+	elseif(isset($_POST['type']) && $_POST['type']=='getnotenotenschluessel')
+	{
+		if(!$rechte->isBerechtigt('admin', null, 's') && !$rechte->isBerechtigt('assistenz', null, 's') &&
+		   !$rechte->isBerechtigt('student/noten', null, 's'))
+		{
+			$return = false;
+			$error = true;
+			$errormsg = 'Sie haben keine Berechtigung';
+		}
+		else
+		{
+
+			$punkte=$_POST['punkte'];
+			$lehrveranstaltung_id=$_POST['lehrveranstaltung_id'];
+			$studiensemester_kurzbz=$semester_aktuell;
+
+			$notenschluessel = new notenschluessel();
+			if($note = $notenschluessel->getNote($punkte, $lehrveranstaltung_id, $studiensemester_kurzbz))
+			{
+				$return = true;
+				$error = false;
+				$data = $note;
+			}
+			else
+			{
+				$return = false;
+				$error = true;
+				$errormsg=$notenschluessel->errormsg;
+			}
+		}
+	}
 	elseif(isset($_POST['type']) && $_POST['type']=='savenote')
 	{
 		//Speichert einen Noteneintrag
@@ -2607,7 +2639,7 @@ if(!$error)
 			{
 				$zeugnisnote = new zeugnisnote();
 				$error = false;
-				if(!is_numeric(trim($_POST['matrikelnummer_'.$i])) || !is_numeric($_POST['note_'.$i]))
+				if(!is_numeric(trim($_POST['matrikelnummer_'.$i])) || (isset($_POST['note_'.$i]) && !is_numeric($_POST['note_'.$i])))
 				{
 					$error = true;
 					$errormsg = "\nMatrikelnummer oder Note ist ungueltig: ".$_POST['matrikelnummer_'.$i].' - '.$_POST['note_'.$i];
@@ -2690,7 +2722,19 @@ if(!$error)
 								$zeugnisnote->studiensemester_kurzbz = $semester_aktuell;
 							}
 
-							$zeugnisnote->note = $_POST['note_'.$i];
+							if(isset($_POST['note_'.$i]))
+							{
+								$zeugnisnote->note = $_POST['note_'.$i];
+								$zeugnisnote->punkte = null;
+							}
+							elseif(isset($_POST['punkte_'.$i]))
+							{
+								$zeugnisnote->punkte=$_POST['punkte_'.$i];
+								$zeugnisnote->punkte = str_replace(',','.', $zeugnisnote->punkte);
+								$notenschluessel = new notenschluessel();
+								$note = $notenschluessel->getNote($zeugnisnote->punkte, $_POST['lehrveranstaltung_id'], $semester_aktuell);
+								$zeugnisnote->note = $note;
+							}
 							$zeugnisnote->uebernahmedatum = date('Y-m-d H:i:s');
 							$zeugnisnote->benotungsdatum = date('Y-m-d H:i:s');
 

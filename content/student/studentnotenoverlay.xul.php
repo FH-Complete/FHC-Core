@@ -249,7 +249,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 		</template>
 	</menulist>
 	<label value="Punkte" control="student-noten-textbox-punkte" hidden="<?php echo $punktehidden; ?>"/>
-	<textbox id="student-noten-textbox-punkte" disabled="true" hidden="<?php echo $punktehidden; ?>"/>
+	<textbox id="student-noten-textbox-punkte" oninput="StudentNotenPunkteChange()" disabled="true" hidden="<?php echo $punktehidden; ?>"/>
 	
 	<button id="student-noten-button-speichern" oncommand="StudentNoteSpeichern()" label="Speichern" disabled="true" hidden="<?php echo $punktehidden; ?>"/>
 	

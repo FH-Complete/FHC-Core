@@ -486,7 +486,13 @@ foreach($noten_obj->result as $row)
 			if(zeile[0]!='' && zeile[1]!='')
 			{
 				gradedata['matrikelnr_'+i]=zeile[0];
-				gradedata['note_'+i]= zeile[1];
+				<?php
+				if(CIS_GESAMTNOTE_PUNKTE)
+					echo "gradedata['punkte_'+i]= zeile[1];";
+				else
+					echo "gradedata['note_'+i]= zeile[1];";
+				?>
+
 				i++;
 			}
 		}
