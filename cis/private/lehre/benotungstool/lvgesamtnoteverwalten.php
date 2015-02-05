@@ -44,6 +44,7 @@ require_once('../../../../include/moodle24_course.class.php');
 require_once('../../../../include/mail.class.php');
 require_once('../../../../include/phrasen.class.php');
 require_once('../../../../include/note.class.php');
+require_once('../../../../include/notenschluessel.class.php');
 
 $summe_stud=0;
 $summe_t2=0;
@@ -206,7 +207,7 @@ foreach($noten_obj->result as $row)
 						notentd.removeChild(notentd.lastChild);
 	            	}
 					if(punkte!='')
-						notentext = noten_array[note]+'('+punkte+')';
+						notentext = noten_array[note]+' ('+punkte+')';
 					else
 						notentext = noten_array[note];
 	            	notenode = document.createTextNode(notentext);
@@ -324,7 +325,7 @@ foreach($noten_obj->result as $row)
 			            	{
 								notentd.removeChild(notentd.lastChild);
 			            	}
-							var notentext = noten_array[note]+'('+punkte+')';
+							var notentext = noten_array[note]+' ('+punkte+')';
 			            	notenode = document.createTextNode(notentext);
 		                    notentd.appendChild(notenode);
 						}					
@@ -370,7 +371,7 @@ foreach($noten_obj->result as $row)
 	function PunkteEingabe(idx)
 	{
 		var punkte = $('#textbox-punkte-'+idx).val();
-		
+		punkte = punkte.replace(',','.');
 		// Request absetzen und Note zu den Punkten holen
 		if(punkte!='')
 		{
@@ -410,7 +411,8 @@ foreach($noten_obj->result as $row)
 	function PruefungPunkteEingabe()
 	{
 		var punkte = $('#pruefungspunkte').val();
-		
+		punkte = punkte.replace(',','.');
+
 		// Request absetzen und Note zu den Punkten holen
 		if(punkte!='')
 		{
@@ -612,44 +614,6 @@ echo '<table width="100%"><tr>';
 echo '<td class="tdwidth10">&nbsp;</td>';
 echo "<td>";
 echo "<b>".$lv_obj->bezeichnung_arr[$sprache]."</b>";
-
-// lvgesamtnote für Studenten speichern
-/* Auskommentiert weil es vermutlich nicht verwendet wird 21.1.2015
-if (isset($_REQUEST["submit"]) && ($_POST["student_uid"] != ''))
-{	
-	$jetzt = date("Y-m-d H:i:s");	
-	$student_uid = $_POST["student_uid"];
-	$lvid = $_REQUEST["lvid"];
-	$lvgesamtnote = new lvgesamtnote();
-    if (!$lvgesamtnote->load($lvid, $student_uid, $stsem))
-    {
-		$lvgesamtnote->student_uid = $student_uid;
-		$lvgesamtnote->lehrveranstaltung_id = $lvid;
-		$lvgesamtnote->studiensemester_kurzbz = $stsem;
-		$lvgesamtnote->note = $_POST["note"];
-		$lvgesamtnote->mitarbeiter_uid = $user;
-		$lvgesamtnote->benotungsdatum = $jetzt;
-		$lvgesamtnote->freigabedatum = null;
-		$lvgesamtnote->freigabevon_uid = null;
-		$lvgesamtnote->bemerkung = null;
-		$lvgesamtnote->updateamum = null;
-		$lvgesamtnote->updatevon = null;
-		$lvgesamtnote->insertamum = $jetzt;
-		$lvgesamtnote->insertvon = $user;
-		$new = true;
-    }
-    else
-    {
-		$lvgesamtnote->note = $_POST["note"];
-		$lvgesamtnote->benotungsdatum = $jetzt;
-		$lvgesamtnote->updateamum = $jetzt;
-		$lvgesamtnote->updatevon = $user;
-		$new = false;
-	}
-	if (!$lvgesamtnote->save($new))
-		echo "<span class='error'>".$lvgesamtnote->errormsg."</span>";
-}
-*/
 
 // eingetragene lv-gesamtnoten freigeben
 if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
@@ -891,15 +855,10 @@ echo "
 							{	
 
 								$mdldata=$mdldaten[$imdldaten]->result;
-	#							$error=(isset($mdldata[1])?$mdldata[1]:"Kurs Info ");
 								$kursArr=(isset($mdldata[2])?$mdldata[2]:array());
 								$kursasObj=(isset($mdldata[3])?$mdldata[3]:array());
-	#							$userArr=(isset($mdldata[4])?$mdldata[4]:array());
-	#							$userasObj=(isset($mdldata[5])?$mdldata[5]:array());
-	#							$id=(isset($mdldata[6])?$mdldata[6]:'');
 								$kursname=(isset($mdldata[7])?$mdldata[7]:'');
 								$shortname=(isset($mdldata[8])?$mdldata[8]:'');
-	#							$courseArr=(isset($mdldata[9])?$mdldata[9]:array());
 
 								$note=0;
 								$userGef=false;
@@ -909,7 +868,6 @@ echo "
 								{	
 									if (isset($kursArr[$iKurs]) && isset($kursArr[$iKurs][2]) && isset($kursArr[$iKurs][6]) && strtolower(trim($row_stud->uid))==strtolower(trim($kursArr[$iKurs][2])) )
 									{
-																	
 									    $note=trim($kursArr[$iKurs][6]);
 										$userGef=true;
 										
@@ -970,11 +928,11 @@ echo "
 							{
 								$note_le+=$moodle24_noten->note;
 								$le_anz+=1;
-								if ($moodle24_noten->note == 5)
-									$leneg = " style='color:red; font-weight:bold'";
-								else
+								//if ($moodle24_noten->note == 5)
+								//	$leneg = " style='color:red; font-weight:bold'";
+								//else
 									$leneg = ' style="font-weight: bold;"';
-								$title="Moodle 2.4 KursID: ".$moodle24_noten->mdl_course_id.
+								$title="Moodle KursID: ".$moodle24_noten->mdl_course_id.
 								"\nKursbezeichnung: ".$moodle24_course_bezeichnung[$moodle24_noten->mdl_course_id].
 								"\nUser: ".$moodle24_noten->uid.
 								"\nNote: $moodle24_noten->note";
@@ -1021,10 +979,22 @@ echo "
 					$punkte_lv = null;
 				}
 				
+				$punkte_vorschlag='';
 				if (!is_null($note_lv))
-				$note_vorschlag = $note_lv;
+					$note_vorschlag = $note_lv;
 				else if ($le_anz > 0)
-					$note_vorschlag = round($note_le/$le_anz);
+				{
+					if(CIS_GESAMTNOTE_PUNKTE)
+					{
+						$punkte_vorschlag = round($note_le/$le_anz);
+						$notenschluessel = new notenschluessel();
+						$note_vorschlag = $notenschluessel->getNote($punkte_vorschlag, $lvid, $stsem);
+					}
+					else
+					{
+						$note_vorschlag = round($note_le/$le_anz);						
+					}
+				}
 				else
 					$note_vorschlag = null;
 				if ($zeugnisnote = new zeugnisnote($lvid, $row_stud->uid, $stsem))
@@ -1047,10 +1017,17 @@ echo "
 
 				// Punkte
 				if(CIS_GESAMTNOTE_PUNKTE)
-					echo '<input type="text" name="punkte" id="textbox-punkte-'.$i.'" value="'.$punkte_lv.'" size="3" oninput="PunkteEingabe('.$i.')"/>';
+				{
+					//$punkte_lv = $punkte_vorschlag;
+					echo '<input type="text" name="punkte" id="textbox-punkte-'.$i.'" value="'.$punkte_vorschlag.'" size="3" oninput="PunkteEingabe('.$i.')"/>';
+				}
 				
 				// Noten DropDown
-				echo '<select name="note" id="dropdown-note-'.$i.'">';
+				if($punkte_vorschlag!='' && CIS_GESAMTNOTE_PUNKTE)
+					$disabled='disabled="disabled"';
+				else
+					$disabled='';
+				echo '<select name="note" id="dropdown-note-'.$i.'" '.$disabled.'>';
 				echo '<option value="">-- keine Auswahl --</option>';
 				foreach($noten_obj->result as $row_note)
 				{
@@ -1119,7 +1096,7 @@ echo "
 						$pr_le_id = $le_id_stud;
 						
 						if($pr_punkte!='')
-							$pr_notenbezeichnung = $noten_array[$pr_note]['bezeichnung'].' ('.$pr_punkte.')';
+							$pr_notenbezeichnung = $noten_array[$pr_note]['bezeichnung'].' ('.number_format($pr_punkte,2).')';
 						else
 							$pr_notenbezeichnung = $noten_array[$pr_note]['bezeichnung'];
 

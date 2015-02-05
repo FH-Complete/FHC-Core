@@ -32,7 +32,10 @@ class local_fhcompletews_external extends external_api
 	public static function get_course_grades_parameters() 
 	{
         return new external_function_parameters(
-                array('courseid' => new external_value(PARAM_INT, 'CourseID')), 'ID of the Course'
+                array(
+					'courseid' => new external_value(PARAM_INT, 'Moodle CourseID'),
+					'type' => new external_value(PARAM_INT,'Type 1=Punkte, 2=Prozent, 3=Endnote lt Skala')
+				), 'Get Course Grades'
         );
     }
 
@@ -41,7 +44,7 @@ class local_fhcompletews_external extends external_api
      * @param int courseid
      * @return array
      */
-    public static function get_course_grades($courseid) 
+    public static function get_course_grades($courseid, $type) 
 	{
         global $CFG, $DB;
         require_once($CFG->dirroot . "/course/lib.php");
@@ -49,9 +52,10 @@ class local_fhcompletews_external extends external_api
 
         //validate parameter
         $params = self::validate_parameters(self::get_course_grades_parameters(),
-                        array('courseid' => $courseid));
+                        array('courseid' => $courseid, 'type'=>$type));
 
-		$notenart=3; // 2=Prozent; 3=Endnote nach Skala
+		$notenart = $type;
+		//$notenart=2; // 1=Punkte; 2=Prozent; 3=Endnote nach Skala
 		$gui=array();	  
 		$final_id='';
 		$data = array();
@@ -72,12 +76,41 @@ class local_fhcompletews_external extends external_api
 		$context = get_context_instance(CONTEXT_COURSE, $courseid);
 		require_once($CFG->dirroot.'/grade/export/ods/grade_export_ods.php');
 
-		if (!$export = new grade_export_ods($course, 0, 0, false, false, $notenart, 2))
+		$moodle28=false;
+
+		try
 		{
-			throw new moodle_exception('Fehler', '', '', null, "Moodle-Kurs ".$id." ".$shortname." - keine Export Information gefunden");
-			return false;
+			$method = new ReflectionMethod('grade_export_ods','__construct');
+		
+			if(count($method->getParameters())==3)
+				$moodle28=true;
+		}
+		catch(ReflectionException $e)
+		{
 		}
 
+		if($moodle28)
+		{
+			//ab Moodle 2.8 hat grade_export_ods nur noch 3 Parameter		
+			$formdata = new stdClass();
+			$formdata->display=$notenart;
+			$formdata->itemids=0;
+			$formdata->decimals=2;
+			$formdata->export_feedback=false;
+			if (!$export = new grade_export_ods($course, 0, $formdata))
+			{
+				throw new moodle_exception('Fehler', '', '', null, "Moodle-Kurs ".$id." ".$shortname." - keine Export Information gefunden");
+				return false;
+			}
+		}
+		else
+		{
+			if (!$export = new grade_export_ods($course, 0, 0, false, false, $notenart, 2))
+			{
+				throw new moodle_exception('Fehler', '', '', null, "Moodle-Kurs ".$id." ".$shortname." - keine Export Information gefunden");
+				return false;
+			}
+		}
 		$grad =$export->columns;
 	
 		// Im Export sind die Noten fuer alle Abgaben, Quiz, etc enthalten
@@ -120,6 +153,10 @@ class local_fhcompletews_external extends external_api
 			{
 			  	$gradestr = $export->format_grade($userdata->grades[$final_id]);
 		     	$user_item['note']=$gradestr;
+				
+				// Wenn Prozent dann Prozentzeichen entfernen
+				if(strpos($user_item['note'],'%')!==false)
+			     	$user_item['note']=trim(str_replace('%','',$user_item['note']));
 
 				// nur zurueckliefern wenn eine Note gefunden wurde und diese nicht '-' ist
 				if($user_item['note']!='-')
