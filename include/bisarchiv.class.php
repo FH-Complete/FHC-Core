@@ -25,8 +25,8 @@ class bisarchiv extends basis_db
 	public $result;
 
 	// Tabellenspalten
-	public $id;
-	public $studiensemster;
+	public $archiv_id;
+	public $studiensemester_kurzbz;
 	public $meldung;
 	public $html;
 	public $studiengang_kz;
@@ -48,7 +48,7 @@ class bisarchiv extends basis_db
 	 */
 	protected function validate()
 	{
-		if($this->studiensemster == null || mb_strlen($this->studiensemster) > 6)
+		if($this->studiensemster_kurzbz == null || mb_strlen($this->studiensemster_kurzbz) > 6)
 		{
 			$this->errormsg = "Studiensemester ist ungueltig";
 			return false;
@@ -106,8 +106,8 @@ class bisarchiv extends basis_db
 		if(!$this->validate())
 			return false;
 		
-		$qry = "INSERT INTO bis.tbl_archiv (studiensemester, meldung, html, studiengang_kz, insertamum, insertvon, typ) VALUES ("
-			. $this->db_add_param($this->studiensemster) . ","
+		$qry = "INSERT INTO bis.tbl_archiv (studiensemester_kurzbz, meldung, html, studiengang_kz, insertamum, insertvon, typ) VALUES ("
+			. $this->db_add_param($this->studiensemster_kurzbz) . ","
 			. $this->db_add_param($this->meldung) . ","
 			. $this->db_add_param($this->html) . ","
 			. $this->db_add_param($this->studiengang_kz) . ","
@@ -173,9 +173,9 @@ class bisarchiv extends basis_db
 	 */
 	public function getBisData($sem)
 	{
-		$qry = "SELECT id, meldung, html, studiengang_kz, insertamum, typ "
+		$qry = "SELECT archiv_id, meldung, html, studiengang_kz, insertamum, typ "
 				. "FROM bis.tbl_archiv "
-				. "WHERE studiensemester = " . $this->db_add_param($sem) . ""
+				. "WHERE studiensemester_kurzbz = " . $this->db_add_param($sem) . ""
 				. "ORDER BY insertamum DESC";
 		
 		if($this->db_query($qry))
@@ -206,15 +206,15 @@ class bisarchiv extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT id, meldung, html, studiengang_kz, insertamum, typ "
+		$qry = "SELECT archiv_id, meldung, html, studiengang_kz, insertamum, typ "
 				. "FROM bis.tbl_archiv "
-				. "WHERE id = " . $this->db_add_param($id);
+				. "WHERE archiv_id = " . $this->db_add_param($id);
 		
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
 			{
-				$this->id = $id;
+				$this->archiv_id = $id;
 				$this->meldung = $row->meldung;
 				$this->html = $row->html;
 				$this->studiengang_kz = $row->studiengang_kz;
