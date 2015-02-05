@@ -105,7 +105,7 @@
 								<fo:table-body>
 						            <fo:table-row line-height="14pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="8pt" content-width="45mm" text-align="left">
+											<fo:block font-family="sans-serif" font-size="8pt" content-width="70mm" text-align="left">
 												<xsl:text> Lehrgang zur Weiterbildung nach §9 FHStG idgF\n</xsl:text>
 											</fo:block>
 										</fo:table-cell>
@@ -154,20 +154,20 @@
 					
 					<fo:block-container position="absolute" top="87mm" left="16mm">
 						<fo:block text-align="left" line-height="10pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
-							<xsl:value-of select="studiensemester_aktuell" />
+							<xsl:value-of select="studiensemester" />
 						</fo:block>
 					</fo:block-container>
 					
 					<fo:block-container position="absolute" top="87mm" left="137mm">
 						<fo:block text-align="left" line-height="10pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
-							<xsl:value-of select="semester_aktuell_semester -1" /><xsl:text>. Semester</xsl:text>
+							<xsl:value-of select="semester -1" /><xsl:text>. Semester</xsl:text>
 						</fo:block>
 					</fo:block-container>
 					
 					<!-- TABELLE -->
 					<fo:block-container position="absolute" top="110mm" left="15mm">
 						<fo:block text-align="left" line-height="14pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
-							<xsl:text>Folgende Prüfungen wurden erfolgreich abgelegt:</xsl:text>
+							<xsl:text>Folgende Prüfungen wurden abgelegt:</xsl:text>
 						</fo:block>
 					</fo:block-container>
 					
