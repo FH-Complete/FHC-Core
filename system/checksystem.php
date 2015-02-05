@@ -2482,7 +2482,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM bis.tbl_archiv LIMIT 1;"))
 echo '<br><br><br>';
 
 $tabellen=array(
-	"bis.tbl_archiv"  => array("id","studiensemester","meldung","html","studiengang_kz","insertamum","insertvon","typ"),
+	"bis.tbl_archiv"  => array("archiv_id","studiensemester_kurzbz","meldung","html","studiengang_kz","insertamum","insertvon","typ"),
 	"bis.tbl_ausbildung"  => array("ausbildungcode","ausbildungbez","ausbildungbeschreibung"),
 	"bis.tbl_berufstaetigkeit"  => array("berufstaetigkeit_code","berufstaetigkeit_bez","berufstaetigkeit_kurzbz"),
 	"bis.tbl_beschaeftigungsart1"  => array("ba1code","ba1bez","ba1kurzbz"),
