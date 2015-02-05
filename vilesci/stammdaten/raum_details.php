@@ -36,7 +36,7 @@
 	$rechte = new benutzerberechtigung();
 	$rechte->getBerechtigungen($user);
 	
-	if(!$rechte->isBerechtigt('basis/ort',null,'suid'))
+	if(!$rechte->isBerechtigt('basis/ort',null,'s'))
 		die('Sie haben keine Berechtigung fuer diese Seite');
 	
 	$reloadstr = '';  // neuladen der liste im oberen frame
@@ -154,6 +154,9 @@
 
 		if(isset($_GET['method']))
 		{
+			if(!$rechte->isBerechtigt('basis/ort',null,'suid'))
+				die('Sie haben keine Berechtigung fuer diese Seite');
+
 			switch($_GET['method'])
 			{
 				case 'delete':
