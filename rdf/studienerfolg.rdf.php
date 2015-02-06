@@ -173,6 +173,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 				$xml .= "				<note_idx>".$row->note."</note_idx>";
 				$xml .= "				<sws>".sprintf('%.1f',$row->semesterstunden/$wochen)."</sws>";
 				$xml .= "				<ects>".$row->ects."</ects>";
+				$xml .= "				<lehrform><![CDATA[".$row->lv_lehrform_kurzbz."]]></lehrform>";
 				if($row->benotungsdatum!='')
 					$xml .= "				<benotungsdatum>".date('d.m.Y',$datum->mktime_fromtimestamp($row->benotungsdatum))."</benotungsdatum>";
 				$xml .= "			</unterrichtsfach>";
