@@ -113,7 +113,7 @@ if($action != null)
 	}
 	$bisarchiv->readFile($meldung, 'xml');
 	$bisarchiv->studiengang_kz = $stg;
-	$bisarchiv->studiensemster = $sem;
+	$bisarchiv->studiensemster_kurzbz = $sem;
 	$bisarchiv->insertvon = $uid;
 	$bisarchiv->typ = $typ;
 	$result = $bisarchiv->save();
@@ -258,9 +258,9 @@ $bisarchiv->getBisData($anzeige);
 				echo '<td>' . $stgbez . '</td>';
 				echo '<td>' . $data->studiengang_kz . '</td>';
 				echo '<td>' . $datum->convertISODate($data->insertamum) . '</td>';
-				echo '<td><a href="archiv.php?id=' . $data->id . '&action=xml">XML-Datei downloaden</a></td>';
+				echo '<td><a href="archiv.php?id=' . $data->archiv_id . '&action=xml">XML-Datei downloaden</a></td>';
 				if($data->html != '')
-					echo '<td><a href="archiv.php?id=' . $data->id . '&action=html" target="_blank">ansehen</a></td>';
+					echo '<td><a href="archiv.php?id=' . $data->archiv_id . '&action=html" target="_blank">ansehen</a></td>';
 				else
 					echo '<td></td>';
 				echo '</tr>';
