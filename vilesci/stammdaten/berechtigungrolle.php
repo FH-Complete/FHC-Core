@@ -20,121 +20,127 @@
  *          Rudolf Hangl 			< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-	require_once('../../config/vilesci.config.inc.php');
-	require_once('../../include/functions.inc.php');
-    require_once('../../include/berechtigung.class.php');
-    require_once('../../include/benutzerberechtigung.class.php');
-    
-    $user = get_uid();
-    
-    $rechte = new benutzerberechtigung();
-    $rechte->getBerechtigungen($user);
-    
-    if(!$rechte->isBerechtigt('basis/berechtigung'))
-    	die('Sie habe keine Rechte um diese Seite anzuzeigen');
+require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/berechtigung.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
+
+$user = get_uid();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('basis/berechtigung'))
+	die('Sie habe keine Rechte um diese Seite anzuzeigen');
+
+$rolle_kurzbz = filter_input(INPUT_GET, 'rolle_kurzbz');
+$delete = filter_input(INPUT_GET, 'delete', FILTER_VALIDATE_BOOLEAN);
 ?>
 <html>
-<head>
-<title>Berechtigungen Uebersicht</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<link href="../../skin/tablesort.css" rel="stylesheet" type="text/css"/>
-<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
-<script language="Javascript">
-$(document).ready(function() 
-		{ 
-			$("#t1").tablesorter(
-				{
-					sortList: [[0,0]],
-					widgets: ["zebra"],
-					headers: {3:{sorter:false}}
-				}); 
-			$("#t2").tablesorter(
+	<head>
+		<title>Berechtigungen Uebersicht</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
+		<link href="../../skin/tablesort.css" rel="stylesheet" type="text/css"/>
+		<script src="../../include/js/jquery1.9.min.js" type="text/javascript"></script>
+		<script language="Javascript">
+			$(document).ready(function()
 					{
-						sortList: [[0,0]],
-						widgets: ["zebra"],
-						headers: {2:{sorter:false}}
-					}); 
-		});
-function confdel()
-{
-	var value=prompt('Achtung! Sie sind dabei eine Rolle zu löschen. Die Zuordnungen gehen dadurch verloren! Um diese Rolle wirklich zu Löschen tippen Sie "LÖSCHEN" in das untenstehende Feld.');
-	
-	if(value=='LÖSCHEN')
-		return true;
-	else
-		return false;
-}
-</script>
-</head>
-
-<body class="background_main">
-<h2>Berechtigung - Rolle - &Uuml;bersicht</h2>
-
-<?php 
-if(isset($_GET['rolle_kurzbz']))
-{
-	$rolle_kurzbz = $_GET['rolle_kurzbz'];
-	$berechtigung_kurzbz = (isset($_GET['berechtigung_kurzbz'])?$_GET['berechtigung_kurzbz']:'');
-	$art = (isset($_GET['art'])?$_GET['art']:'');
-	
-	if(isset($_GET['save']))
-	{
-		if($rolle_kurzbz!='' && $berechtigung_kurzbz!='' && $art!='')
-		{
-			$berechtigung = new berechtigung();
-			$berechtigung->rolle_kurzbz = $rolle_kurzbz;
-			$berechtigung->berechtigung_kurzbz = $berechtigung_kurzbz;
-			$berechtigung->art = $art;
-			
-			if($berechtigung->saveRolleBerechtigung())
+						$("#t1").tablesorter(
+							{
+								sortList: [[0,0]],
+								widgets: ["zebra"],
+								headers: {3:{sorter:false}}
+							});
+						$("#t2").tablesorter(
+								{
+									sortList: [[0,0]],
+									widgets: ["zebra"],
+									headers: {2:{sorter:false}}
+								});
+					});
+			function confdel()
 			{
-				echo '<b>Zuteilung gespeichert</b>';
+				var value=prompt('Achtung! Sie sind dabei eine Rolle zu löschen. Die Zuordnungen gehen dadurch verloren! Um diese Rolle wirklich zu Löschen tippen Sie "LÖSCHEN" in das untenstehende Feld.');
+
+				if(value=='LÖSCHEN')
+					return true;
+				else
+					return false;
 			}
-			else 
+		</script>
+	</head>
+
+	<body class="background_main">
+		<h2>Berechtigung - Rolle - Übersicht</h2>
+
+	<?php
+	if(isset($rolle_kurzbz))
+	{
+		$berechtigung_kurzbz = filter_input(INPUT_GET, 'berechtigung_kurzbz');
+		$art = filter_input(INPUT_GET, 'art');
+		$save = filter_input(INPUT_GET, 'save');
+
+		if(isset($save))
+		{
+			if($rolle_kurzbz && $berechtigung_kurzbz && $art)
 			{
-				echo '<b>Fehler beim Speichern der Zuteilung:',$berechtigung->errormsg;
+				$berechtigung = new berechtigung();
+				$berechtigung->rolle_kurzbz = $rolle_kurzbz;
+				$berechtigung->berechtigung_kurzbz = $berechtigung_kurzbz;
+				$berechtigung->art = $art;
+
+				if($berechtigung->saveRolleBerechtigung()): ?>
+					<b>Zuteilung gespeichert</b>
+				<?php else: ?>
+					<b>Fehler beim Speichern der Zuteilung: <?php echo $berechtigung->errormsg ?>
+				<?php endif;
 			}
 		}
-	}
-	
-	if(isset($_GET['delete']))
-	{
+
+		if(isset($delete))
+		{
+			$berechtigung = new berechtigung();
+			if(!$berechtigung->deleteRolleBerechtigung($rolle_kurzbz, $berechtigung_kurzbz)): ?>
+				<b>Fehler beim Löschen: </b><?php echo $berechtigung->errormsg ?>
+			<?php else: ?>
+				<b>Berechtigung gelöscht!</b>
+			<?php endif;
+		} ?>
+
+		<br>
+		<a href="<?php echo basename(__FILE__) ?>">
+			Zurück
+		</a>
+		<h3>RolleBerechtigung "<?php echo $rolle_kurzbz ?>":</h3>
+
+		<?php
 		$berechtigung = new berechtigung();
-		if(!$berechtigung->deleteRolleBerechtigung($rolle_kurzbz, $berechtigung_kurzbz))
-			echo '<b>Fehler beim Löschen: </b>',$berechtigung->errormsg;
-		else 
-			echo '<b>Berechtigung gelöscht!</b>';
-	}
-	
-	echo '<br><a href="'.$_SERVER['PHP_SELF'].'">Zurück</a>';
-	echo '<h3>RolleBerechtigung "',$rolle_kurzbz,'":</h3>';
-	
-	$berechtigung = new berechtigung();
-	$berechtigung->getBerechtigungen();
-	
-	echo '<form action="'.$_SERVER['PHP_SELF'].'" method="GET">';
-	echo '<input type="hidden" name="rolle_kurzbz" value="'.$rolle_kurzbz.'">';
-	echo '<SELECT name="berechtigung_kurzbz">';
-	
-	$berechtigungen = new berechtigung();
-	$berechtigungen->getRolleBerechtigung($rolle_kurzbz);
-	$berechtigungen_arr = array();
-	foreach ($berechtigungen->result as $row)
-	{
-		$berechtigungen_arr[] = $row->berechtigung_kurzbz;
-	}
-	foreach ($berechtigung->result as $row)
-	{
-		echo '<OPTION value="',$row->berechtigung_kurzbz,'" '.(array_search($row->berechtigung_kurzbz,$berechtigungen_arr)!==false?'disabled':'').'>',$row->berechtigung_kurzbz,'</OPTION>';
-	}
-	echo '</SELECT>';
-	echo '&nbsp;<input type="text" value="suid" size="4" name="art">';
-	echo '&nbsp;<input type="submit" name="save" value="Hinzufügen">';
-	echo '</form>';
-	
-	
-	echo '<table id="t1" class="tablesorter">
+		$berechtigung->getBerechtigungen();
+		?>
+		<form action="<?php echo basename(__FILE__) ?>" method="GET">
+			<input type="hidden" name="rolle_kurzbz" value="<?php echo $rolle_kurzbz ?>">
+			<SELECT name="berechtigung_kurzbz">
+		<?php
+		$berechtigungen = new berechtigung();
+		$berechtigungen->getRolleBerechtigung($rolle_kurzbz);
+		$berechtigungen_arr = array();
+		foreach ($berechtigungen->result as $row)
+		{
+			$berechtigungen_arr[] = $row->berechtigung_kurzbz;
+		}
+		foreach ($berechtigung->result as $row): ?>
+				<OPTION value="<?php echo $row->berechtigung_kurzbz ?>"
+						<?php echo array_search($row->berechtigung_kurzbz,$berechtigungen_arr)!==false ? 'disabled' : '' ?>>
+					<?php echo $row->berechtigung_kurzbz ?>
+				</OPTION>
+		<?php endforeach; ?>
+			</SELECT>
+			<input type="text" value="suid" size="4" name="art">
+			<input type="submit" name="save" value="Hinzufügen">
+		</form>
+
+		<table id="t1" class="tablesorter">
 			<thead>
 				<tr>
 					<th>Kurzbz</th>
@@ -143,90 +149,142 @@ if(isset($_GET['rolle_kurzbz']))
 					<th></th>
 				</tr>
 			</thead>
-			<tbody>';
-	
-	//$berechtigungen = new berechtigung();
-	//$berechtigungen->getRolleBerechtigung($rolle_kurzbz);
-	
-	foreach($berechtigungen->result as $rolle)
-	{
-		echo '<tr>';
-		echo '<td>',$rolle->berechtigung_kurzbz,'</td>';
-		echo '<td>',$rolle->art,'</td>';
-		echo '<td>',$rolle->beschreibung,'</td>';		
-		echo '<td><a href="'.$_SERVER['PHP_SELF'].'?delete=1&rolle_kurzbz='.$rolle->rolle_kurzbz.'&berechtigung_kurzbz='.$rolle->berechtigung_kurzbz.'">entfernen</a></td>';
-		echo '</td>';	
+			<tbody>
+		<?php
+
+		foreach($berechtigungen->result as $rolle): ?>
+				<tr>
+					<td><?php echo $rolle->berechtigung_kurzbz ?></td>
+					<td><?php echo $rolle->art ?></td>
+					<td><?php echo $rolle->beschreibung ?></td>
+					<td>
+						<a href="<?php echo basename(__FILE__) ?>?delete=1&rolle_kurzbz=<?php echo $rolle->rolle_kurzbz ?>&berechtigung_kurzbz=<?php echo $rolle->berechtigung_kurzbz ?>">
+							entfernen
+						</a>
+					</td>
+				</tr>
+		<?php endforeach; ?>
+			</tbody>
+		</table>
+		<?php
 	}
-	echo '</tbody></table>';
-	
-}
-else 
-{
-	if(isset($_POST['save']))
+	else
 	{
-		if(isset($_POST['kurzbz']) && isset($_POST['beschreibung']))
+		$save = filter_input(INPUT_POST, 'save');
+		$edit = filter_input(INPUT_POST, 'edit');
+
+		if(isset($save))
+		{
+			$kurzbz = filter_input(INPUT_POST, 'kurzbz');
+			$beschreibung = filter_input(INPUT_POST, 'beschreibung');
+
+			if(isset($kurzbz) && isset($beschreibung))
+			{
+				$berechtigung = new berechtigung();
+				$berechtigung->rolle_kurzbz = $kurzbz;
+				$berechtigung->beschreibung = $beschreibung;
+				$berechtigung->new = true;
+
+				if($berechtigung->saveRolle())
+				{
+					echo 'Daten wurden gespeichert';
+				}
+				else
+				{
+					echo 'Fehler beim Speichern:'.$berechtigung->errormsg;
+				}
+			}
+			else
+			{
+				echo 'Zum Speichern der Daten muss die kurzbz und die Beschreibung angegeben werden';
+			}
+		}
+
+		$kurzbz = filter_input(INPUT_GET, 'kurzbz');
+
+		if(isset($delete) && isset($kurzbz))
 		{
 			$berechtigung = new berechtigung();
-			$berechtigung->rolle_kurzbz = $_POST['kurzbz'];
-			$berechtigung->beschreibung = $_POST['beschreibung'];
-			$berechtigung->new = true;
-			
-			if($berechtigung->saveRolle())
-			{
-				echo 'Daten wurden gespeichert';
-			}
-			else 
-			{
-				echo 'Fehler beim Speichern:'.$berechtigung->errormsg;
-			}
+			if($berechtigung->deleteRolle($kurzbz))
+				echo 'Rolle wurde entfernt';
+			else
+				echo 'Fehler beim Löschen:'.$berechtigung->errormsg;
 		}
-		else 
+
+		if(isset($edit))
 		{
-			echo 'Zum Speichern der Daten muss die kurzbz und die Beschreibung angegeben werden';
+			$beschreibung = filter_input(INPUT_POST, 'beschreibung');
+
+			$berechtigung = new berechtigung();
+			$berechtigung->rolle_kurzbz = $kurzbz;
+			$berechtigung->beschreibung = $beschreibung;
+			$berechtigung->saveRolle(false);
 		}
-	}
-	
-	if(isset($_GET['delete']) && isset($_GET['kurzbz']))
-	{
+
+		//Tabelle mit Rollen anzeigen
 		$berechtigung = new berechtigung();
-		if($berechtigung->deleteRolle($_GET['kurzbz']))
-			echo 'Rolle wurde entfernt';
-		else 
-			echo 'Fehler beim Löschen:'.$berechtigung->errormsg;
-	}
-	
-	//Tabelle mit Rollen anzeigen
-	$berechtigung = new berechtigung();
-	$berechtigung->getRollen();
-	
-	echo '<h3>Rollen:</h3>';
-	echo '<table id="t2" class="tablesorter">
+		$berechtigung->getRollen(); ?>
+
+		<h3>Rollen:</h3>
+		<table id="t2" class="tablesorter">
 			<thead>
 				<tr>
 					<th>Kurzbz</th>
 					<th>Beschreibung</th>
-					<th colspan="2">Aktion</th></tr>
+					<th colspan="2">Aktion</th>
+				</tr>
 			</thead>
-			<tbody>';
-	
-	foreach($berechtigung->result as $rolle)
-	{
-		echo '<tr>';
-		echo '<td>',$rolle->rolle_kurzbz,'</td>';
-		echo '<td>',$rolle->beschreibung,'</td>';
-		echo '<td><a href="'.$_SERVER['PHP_SELF'].'?rolle_kurzbz='.$rolle->rolle_kurzbz.'">Berechtigungen zuordnen</a></td>';
-		echo '<td><a href="'.$_SERVER['PHP_SELF'].'?kurzbz='.$rolle->rolle_kurzbz.'&delete=true" onclick="return confdel()">Rolle löschen</a></td>';
-		echo '</td>';	
-	}
-	echo '</tbody></table>';
-	
-	echo '<br><form method="POST">
-			Kurzbz: <input type="text" name="kurzbz" value="" />
-			Beschreibung: <input type="text" name="beschreibung" value="" />
-			&nbsp;<input type="submit" name="save" value="Anlegen"/>
-		</form>';
-}
-?>
+			<tbody>
 
-</body>
+			<?php
+			$edit = filter_input(INPUT_GET, 'edit');
+			$kurzbz = filter_input(INPUT_GET, 'kurzbz');
+			foreach($berechtigung->result as $rolle):
+				if($edit && $rolle->rolle_kurzbz == $kurzbz)
+				{
+					$rolle_edit = $rolle;
+				}
+				?>
+				<tr>
+					<td>
+						<a href="<?php echo basename(__FILE__) ?>?kurzbz=<?php echo $rolle->rolle_kurzbz ?>&edit=1">
+							<?php echo $rolle->rolle_kurzbz ?>
+						</a>
+					</td>
+					<td><?php echo $rolle->beschreibung ?></td>
+					<td>
+						<a href="<?php echo basename(__FILE__) ?>?rolle_kurzbz=<?php echo $rolle->rolle_kurzbz ?>">
+							Berechtigungen zuordnen
+						</a>
+					</td>
+					<td>
+						<a href="<?php echo basename(__FILE__) ?>?kurzbz=<?php echo $rolle->rolle_kurzbz ?>&delete=1" onclick="return confdel()">
+							Rolle löschen
+						</a>
+					</td>
+				</tr>
+			<?php endforeach; ?>
+			</tbody>
+		</table>
+
+		<br>
+			<?php
+			if($edit):
+				?>
+				<form method="POST">
+					Kurzbz: <input type="text" name="kurzbz" value="<?php echo $rolle_edit->rolle_kurzbz ?>" disabled />
+					Beschreibung: <input type="text" name="beschreibung" value="<?php echo $rolle_edit->beschreibung ?>" />
+					&nbsp;<input type="submit" name="edit" value="Speichern" />
+				</form>
+		<a href="<?php echo basename(__FILE__) ?>">Neue Rolle anlegen</a>
+			<?php else: ?>
+				<form method="POST">
+					Kurzbz: <input type="text" name="kurzbz" value="" />
+					Beschreibung: <input type="text" name="beschreibung" value="" />
+					&nbsp;<input type="submit" name="save" value="Anlegen" />
+				</form>
+			<?php endif; ?>
+	<?php } ?>
+
+	</body>
 </html>
