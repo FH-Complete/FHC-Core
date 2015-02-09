@@ -574,7 +574,7 @@ if (($anzahl!==0) || ($stg_kz=='-1') && ($stg_kz!==''))
 	
 	//Liste der Sprachen
 	
-	$qry = "SELECT sprache FROM public.tbl_sprache ORDER BY sprache DESC";
+	$qry = "SELECT sprache FROM public.tbl_sprache WHERE content ORDER BY sprache DESC";
 	
 	if($result = $db->db_query($qry))
 	{
