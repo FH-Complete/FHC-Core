@@ -36,6 +36,7 @@ require_once('../../include/studiensemester.class.php');
 require_once('../../include/person.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/funktion.class.php');
+require_once('../../include/wawi_kostenstelle.class.php');
 
 $user = get_uid();
 
@@ -53,6 +54,7 @@ $htmlstr = '';
 $errorstr = ''; //fehler beim insert
 $sel = '';
 $chk = '';
+$oe_arr = array();
 $rolle_arr = array();
 $berechtigung_arr = array();
 $st_arr = array();
@@ -60,6 +62,7 @@ $berechtigung_user_arr = array();
 
 $benutzerberechtigung_id = '';
 $art = '';
+$oe_kurzbz = '';
 $studiengang_kurzbz = '';
 $berechtigung_kurzbz = '';
 $uid = '';
@@ -93,6 +96,7 @@ if(isset($_POST['schick']))
 	{
 		$benutzerberechtigung_id = $_POST['benutzerberechtigung_id'];
 		$art = $_POST['art'];
+		$oe_kurzbz = (isset($_POST['oe_kurzbz'])?$_POST['oe_kurzbz']:'');
 		$berechtigung_kurzbz = (isset($_POST['berechtigung_kurzbz'])?$_POST['berechtigung_kurzbz']:'');
 		$rolle_kurzbz = (isset($_POST['rolle_kurzbz'])?$_POST['rolle_kurzbz']:'');
 		$uid = $_POST['uid'];
@@ -100,6 +104,7 @@ if(isset($_POST['schick']))
 		$studiensemester_kurzbz = null;//$_POST['studiensemester_kurzbz'];
 		$start = $_POST['start'];
 		$ende = $_POST['ende'];
+		$kostenstelle_id = (isset($_POST['kostenstelle_id'])?$_POST['kostenstelle_id']:'');
 		$anmerkung = (isset($_POST['anmerkung'])?$_POST['anmerkung']:'');
 		
 		$ber = new benutzerberechtigung();
@@ -121,6 +126,7 @@ if(isset($_POST['schick']))
 		
 		$ber->benutzerberechtigung_id = $benutzerberechtigung_id;
 		$ber->art = $art;
+		$ber->oe_kurzbz = $oe_kurzbz;
 		$ber->berechtigung_kurzbz = $berechtigung_kurzbz;
 		$ber->rolle_kurzbz = $rolle_kurzbz;
 		$ber->uid = $uid;
@@ -130,6 +136,7 @@ if(isset($_POST['schick']))
 		$ber->ende = $ende;
 		$ber->updateamum = date('Y-m-d H:i:s');
 		$ber->updatevon = $user;
+		$ber->kostenstelle_id = $kostenstelle_id;
 		$ber->anmerkung = $anmerkung;
 		
 		if(!$ber->save()){
@@ -173,6 +180,12 @@ foreach($st->studiensemester as $studiensemester)
 {
 	$st_arr[] = $studiensemester->studiensemester_kurzbz;
 }
+
+$oe = new organisationseinheit();
+$oe->getAll();
+	
+$kostenstelle = new wawi_kostenstelle();
+$kostenstelle->getAll();
 
 if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 {
@@ -254,6 +267,8 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 					<th>Rolle</th>
 					<th>Berechtigung</th>
 					<th>Art</th>
+					<th class='oe_column'>Organisationseinheit</th>
+					<th class='ks_column'>Kostenstelle</th>
 					<!--<th>Semester</th>-->
 					<th>Neg</th>
 					<th>Gültig ab</th>
@@ -316,6 +331,57 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		//Art
 		$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><input id='art_$b->benutzerberechtigung_id' type='text' name='art' value='".$b->art."' size='5' maxlength='5' onChange='validateArt(\"art_$b->benutzerberechtigung_id\"); markier(\"td_".$b->benutzerberechtigung_id."\")'></td>\n";
 		
+		//Organisationseinheit
+		$htmlstr .= "		<td class='oe_column' name='td_$b->benutzerberechtigung_id'><select id='oe_".$b->benutzerberechtigung_id."' name='oe_kurzbz' ".($b->kostenstelle_id!=''?'disabled':'')." onchange='markier(\"td_".$b->benutzerberechtigung_id."\")' style='width: 200px;'>\n";
+		$htmlstr .= "		<option value='' onclick='enable(\"kostenstelle_".$b->benutzerberechtigung_id."\");'>-- Alle --</option>\n";
+
+		foreach ($oe->result as $oekey)
+		{
+			if ($b->oe_kurzbz == $oekey->oe_kurzbz && $b->oe_kurzbz != null)
+				$sel = " selected";
+			else
+				$sel = "";
+			if(!$oekey->aktiv)
+				$class='class="inactive"';
+			else
+				$class='';
+			$htmlstr .= "	<option value='".$oekey->oe_kurzbz."' ".$sel." ".$class." onclick='disable(\"kostenstelle_".$b->benutzerberechtigung_id."\");'>".$oekey->organisationseinheittyp_kurzbz.' '.$oekey->bezeichnung.'</option>';
+		}
+		$htmlstr .= "		</select></td>\n";
+		
+		//Kostenstelle
+		$htmlstr .= "		<td class='ks_column' name='td_$b->benutzerberechtigung_id'><select id='kostenstelle_".$b->benutzerberechtigung_id."'name='kostenstelle_id' ".($b->oe_kurzbz!=''?'disabled':'')." onchange='markier(\"td_".$b->benutzerberechtigung_id."\")' style='width: 200px;'>\n";
+		$htmlstr .= "		<option value='' onclick='enable(\"oe_".$b->benutzerberechtigung_id."\");'>&nbsp;</option>\n";
+
+		foreach ($kostenstelle->result as $kst)
+		{
+			if ($b->kostenstelle_id == $kst->kostenstelle_id)
+				$sel = " selected";
+			else
+				$sel = "";
+			if(!$kst->aktiv)
+				$class='class="inactive"';
+			else
+				$class='';
+			
+			$htmlstr .= "	<option value='".$kst->kostenstelle_id."' ".$sel." ".$class." onclick='disable(\"oe_".$b->benutzerberechtigung_id."\");'>".$kst->bezeichnung.'</option>';
+		}
+		$htmlstr .= "		</select></td>\n";
+		
+		//Studiensemester	
+		/*$htmlstr .= "		<td><select name='studiensemester_kurzbz' onchange='markier(\"".$b->benutzerberechtigung_id."\")'>\n";
+		$htmlstr .= "			<option value=''></option>\n";
+		for ($i = 0; $i < sizeof($st_arr); $i++)
+		{
+			if ($b->studiensemester_kurzbz == $st_arr[$i])
+				$sel = " selected";
+			else
+				$sel = "";
+			$htmlstr .= "				<option value='".$st_arr[$i]."' ".$sel.">".$st_arr[$i]."</option>";
+		}
+		$htmlstr .= "		</select></td>\n";*/
+		
+		
 		$htmlstr .= "		<td align='center' name='td_$b->benutzerberechtigung_id'><input type='checkbox' name='negativ' ".($b->negativ?'checked="checked"':'')." onchange='markier(\"td_".$b->benutzerberechtigung_id."\")'></td>\n";				
 		$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><input class='datepicker_datum' type='text' name='start' value='".$b->start."' size='10' maxlength='10' onchange='markier(\"td_".$b->benutzerberechtigung_id."\")'></td>\n";
 		$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><input class='datepicker_datum' type='text' name='ende' value='".$b->ende."' size='10' maxlength='10' onchange='markier(\"td_".$b->benutzerberechtigung_id."\")'></td>\n";
@@ -359,6 +425,45 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 	//Art
 	$htmlstr .= "		<td style='padding-top: 15px;'><input id='art_neu' type='text' name='art' value='' size='5' maxlength='5' onBlur='checkrequired(\"art_neu\")' onChange='validateArt(\"art_neu\")' placeholder='suid'></td>\n";
 	
+	//Organisationseinheit
+	$htmlstr .= "		<td class='oe_column' style='padding-top: 15px;'><select id='oe_kurzbz_neu' name='oe_kurzbz' onchange='markier(\"neu\")' style='width: 200px;'>\n";
+	$htmlstr .= "			<option value='' onclick='enable(\"kostenstelle_neu\");'>-- Alle --</option>\n";
+	
+	foreach ($oe->result as $oekey)
+	{
+		if(!$oekey->aktiv)
+				$class='class="inactive"';
+			else
+				$class='';
+		$htmlstr .= "				<option value='".$oekey->oe_kurzbz."' ".$class." onclick='disable(\"kostenstelle_neu\");'>".$oekey->organisationseinheittyp_kurzbz.' '.$oekey->bezeichnung.'</option>';
+	}
+	$htmlstr .= "		</select></td>\n";
+	
+	//Kostenstelle
+	$htmlstr .= "		<td class='ks_column' style='padding-top: 15px;'><select id='kostenstelle_neu' name='kostenstelle_id' onchange='markier(\"".(isset($b->benutzerberechtigung_id)?$b->benutzerberechtigung_id:'')."\")' style='width: 200px;'>\n";
+	$htmlstr .= "			<option value='' onclick='enable(\"oe_kurzbz_neu\");'>&nbsp;</option>\n";
+
+	foreach ($kostenstelle->result as $kst)
+	{
+		if(!$kst->aktiv)
+			$class='class="inactive"';
+		else
+			$class='';
+		
+		$htmlstr .= "		<option value='".$kst->kostenstelle_id."' ".$class." onclick='disable(\"oe_kurzbz_neu\");'>".$kst->bezeichnung.'</option>';
+	}
+	$htmlstr .= "		</select></td>\n";
+		
+	//Studiensemester			
+	/*$htmlstr .= "		<td style='padding-top: 10px;'><select name='studiensemester_kurzbz' onchange='markier(\"neu\")'>\n";
+	$htmlstr .= "			<option value=''></option>\n";
+	for ($i = 0; $i < sizeof($st_arr); $i++)
+	{
+		$sel = "";
+		$htmlstr .= "				<option value='".$st_arr[$i]."' ".$sel.">".$st_arr[$i]."</option>";
+	}
+	$htmlstr .= "		</select></td>\n";*/
+		
 	$htmlstr .= "		<td align='center' style='padding-top: 15px;'><input type='checkbox' name='negativ' onchange='markier(\"neu\")'></td>\n";
 	$htmlstr .= "		<td style='padding-top: 15px;'><input class='datepicker_datum' type='text' name='start' value='' size='10' maxlength='10' onchange='markier(\"neu\")'></td>\n";
 	$htmlstr .= "		<td style='padding-top: 15px;'><input class='datepicker_datum' type='text' name='ende' value='' size='10' maxlength='10' onchange='markier(\"neu\")'></td>\n";
@@ -431,7 +536,18 @@ $htmlstr .= "<div class='inserterror'>".$errorstr."</div>\n";
 	TD,TH 
 	{
 		font-size: 9pt;
-	}	
+	}
+
+	<?php if(!$uid): ?>
+		th.oe_column,
+		td.oe_column,
+		th.ks_column,
+		td.ks_column
+		{
+			display: none;
+		}
+	<?php endif; ?>
+
 	</style>	
 	<script type="text/javascript">
 		$(document).ready(function() 
