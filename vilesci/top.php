@@ -51,7 +51,7 @@
 
 
 
-<body  style="background-color:#eeeeee; margin:0; padding:0;">
+<body  style="background-color:#cecf9c; margin:0; padding:0;">
 
 <div class="logo">
 <table class="logo">
