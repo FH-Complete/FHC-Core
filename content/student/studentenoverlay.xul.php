@@ -345,7 +345,7 @@ else
 							<tab id="student-tab-betriebsmittel" label="Betriebsmittel" />
 							<tab id="student-tab-io" label="In/Out" />
 							<tab id="student-tab-noten" label="Noten" />
-							<tab id="student-tab-zeugnis" label="Zeugnis" />
+							<tab id="student-tab-zeugnis" label="Archiv" />
 							<tab id="student-tab-pruefung" label="Prüfung" />
 							<tab id="student-tab-abschlusspruefung" label="AbschlussPrüfung" />
 							<tab id="student-tab-projektarbeit" label="Projektarbeit" />

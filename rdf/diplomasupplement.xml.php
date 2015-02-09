@@ -86,7 +86,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		echo '		<vornamen><![CDATA['.$row->vornamen.']]></vornamen>';
         echo '      <name><![CDATA['.$row->vorname.' '.$row->nachname.']]></name>';
 		echo '		<geburtsdatum><![CDATA['.$datum->convertISODate($row->gebdatum).']]></geburtsdatum>';
-		echo '		<matrikelnummer>'.$row->matrikelnr.'</matrikelnummer>';
+		echo '		<matrikelnummer>'.TRIM($row->matrikelnr).'</matrikelnummer>';
 		echo '		<studiengang_kz>'.$studiengang_kz.'</studiengang_kz>';
 		echo '		<studiengang_bezeichnung_deutsch><![CDATA['.$row->bezeichnung.']]></studiengang_bezeichnung_deutsch>';
 		echo '		<studiengang_bezeichnung_englisch><![CDATA['.$row->english.']]></studiengang_bezeichnung_englisch>';
@@ -850,12 +850,27 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                             $datum = new datum(); 
                             $datum_von = $datum->formatDatum($row_outgoing->von, 'Y.m.d');
                             $datum_bis = $datum->formatDatum($row_outgoing->bis, 'Y.m.d'); 
-                            
+                            $auslandssemester_start = 'th'; //Zur englischen Nummerierung der Semester (1st, 2nd, 3rd, 4th, ...)
                             
                             $sws = number_format(sprintf('%.1F',($row_outgoing->semesterstunden/$wochen)),2); 
                             if($sws == '0.0')
                                 $sws = '';
-                            
+	                        switch ($start) 
+					        {
+					            case '1':
+					                $auslandssemester_start = 'st';
+					                break;
+					            case '2':
+					                $auslandssemester_start = 'nd';
+					                break;
+					            case '3':
+					                $auslandssemester_start = 'rd';
+					                break;
+					            default:
+					                $auslandssemester_start = 'th';
+					                break;
+					        }
+                            	
                             echo '<lv>
                                 <lehrform_kurzbz></lehrform_kurzbz>
                                 <benotungsdatum>'.$benotungsdatum_outgoing.'</benotungsdatum>
@@ -864,7 +879,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
                                 <kurzbz>'.$lehrform_kurzbz_outgoing.'</kurzbz>
                                 <stsem></stsem>
                                 <bezeichnung><![CDATA[]]></bezeichnung>
-                                <bezeichnung_englisch><![CDATA[International Semester Abroad: '.$datum_von.'-'.$datum_bis.', at '.$row_outgoing->ort.', '.$row_outgoing->universitaet.'. All credits earned during the International Semester Abroad (ISA) are fully credited for the '.$start.'th semester at the UAS Fachhochschule Technikum Wien.]]></bezeichnung_englisch>
+                                <bezeichnung_englisch><![CDATA[International Semester Abroad: '.$datum_von.'-'.$datum_bis.', at '.$row_outgoing->ort.', '.$row_outgoing->universitaet.'. All credits earned during the International Semester Abroad (ISA) are fully credited for the '.$start.$auslandssemester_start.' semester at the UAS Technikum Wien.]]></bezeichnung_englisch>
                                 <ects>'.$row_outgoing->ects.'</ects>
                                 <semesterstunden>'.$row_outgoing->semesterstunden.'</semesterstunden>
                                 <note>'.$note_outgoing.'</note>

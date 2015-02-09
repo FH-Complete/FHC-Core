@@ -2678,10 +2678,10 @@ function StudentKontoZahlungsbestaetigung()
 // ****
 // * Erstellt das Zeugnis fuer einen oder mehrere Studenten
 // ****
-function StudentCreateZeugnis(xsl)
+function StudentCreateZeugnis(xsl,event)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
-
+	
 	tree = document.getElementById('student-tree');
 
 	//Markierte Studenten holen
@@ -2708,9 +2708,24 @@ function StudentCreateZeugnis(xsl)
 		alert('Bitte einen Studenten auswaehlen');
 		return false;
 	}
-	
+	var output = 'pdf';
+	if(typeof(event)!=='undefined')
+	{
+		if (event.shiftKey) 
+		{
+		    var output = 'odt';
+		} 
+		else if (event.ctrlKey)
+		{
+			var output = 'doc';
+		}
+		else
+		{
+			var output = 'pdf';
+		}
+	}
 	//PDF erzeugen
-	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zeugnis.rdf.php&output=pdf&xsl='+xsl+'&uid='+paramList+'&ss='+ss+'&xsl_stg_kz='+xsl_stg_kz,'Zeugnis', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=zeugnis.rdf.php&output='+output+'&xsl='+xsl+'&uid='+paramList+'&ss='+ss+'&xsl_stg_kz='+xsl_stg_kz,'Zeugnis', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
@@ -2779,7 +2794,7 @@ function StudentZeugnisAnzeigen()
 }
 
 // ****
-// * Loescht ein Zeugnis
+// * Loescht ein Dokument aus dem Archiv
 // ****
 function StudentAkteDel()
 {
@@ -2803,7 +2818,7 @@ function StudentAkteDel()
 
 	studiengang_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
 	//Abfrage ob wirklich geloescht werden soll
-	if (confirm('Zeugnis wirklich entfernen?'))
+	if (confirm('Dokument wirklich entfernen?'))
 	{
 		//Script zum loeschen aufrufen
 		var req = new phpRequest('student/studentDBDML.php','','');
@@ -4398,7 +4413,7 @@ function StudentShowPersonendetails()
 // ****
 // * Erstellt das Diploma Supplement fuer einen oder mehrere Studenten
 // ****
-function StudentCreateDiplSupplement()
+function StudentCreateDiplSupplement(event)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
@@ -4427,9 +4442,20 @@ function StudentCreateDiplSupplement()
 		alert('Bitte einen Studenten auswaehlen');
 		return false;
 	}
-	
+	if (event.shiftKey) 
+	{
+	    var output='odt';
+	} 
+	else if (event.ctrlKey)
+	{
+		var output='doc';
+	}
+	else
+	{
+		var output='pdf';
+	}
 	//PDF erzeugen 
-	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=diplomasupplement.xml.php&output=pdf&xsl=DiplSupplement&xsl_stg_kz='+stg_kz+'&uid='+paramList,'DiplomaSupplement', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=diplomasupplement.xml.php&output='+output+'&xsl=DiplSupplement&xsl_stg_kz='+stg_kz+'&uid='+paramList,'DiplomaSupplement', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****

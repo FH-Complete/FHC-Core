@@ -43,7 +43,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 </popupset>
 <hbox>
 	<groupbox id="student-zeugnis-groupbox" flex="1">
-	<caption label="Zeugnis"/>
+	<caption label="Dokumente"/>
 	<tree id="student-zeugnis-tree" seltype="single" hidecolumnpicker="false" flex="1"
 		datasources="rdf:null" ref="http://www.technikum-wien.at/akte/liste"
 		style="margin-left:10px;margin-right:10px;margin-bottom:5px;" height="150px" enableColumnDrag="true"
