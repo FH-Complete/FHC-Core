@@ -108,7 +108,7 @@ echo '<table class="tablesorter" id="myTable">
 		<tr>
 			<th>'.$p->t("global/organisationseinheit").'</th>
 			<th>'.$p->t("global/bezeichnung").'</th>
-			<th>'.$p->t("global/beschreibung").'</th>
+			<th>'.$p->t("services/leistung").'</th>
 			<th>'.$p->t("services/details").'</th>
 		</tr>
 	</thead>
