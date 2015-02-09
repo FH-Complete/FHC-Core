@@ -1516,7 +1516,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           <table:table-cell table:style-name="Table3.C4" office:value-type="string">
             <text:p text:style-name="P44">
               <text:span text:style-name="Tabelleninhalt">
-                <text:span text:style-name="T2">Fachhochschule Technikum Wien, Verleihung des Status „Fachhochschule" im November 2000</text:span>
+                <text:span text:style-name="T2">Fachhochschule Technikum Wien, Verleihung des Status "Fachhochschule" im November 2000</text:span>
               </text:span>
               <text:span text:style-name="Tabelleninhalt"> </text:span>
             </text:p>
@@ -1551,7 +1551,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           </table:table-cell>
           <table:table-cell table:style-name="Table3.C5" office:value-type="string">
             <text:p text:style-name="P44">
-              <text:span text:style-name="Tabelleninhalt">Fachhochschule Technikum Wien, Verleihung des Status „Fachhochschule" im November 2000 </text:span>
+              <text:span text:style-name="Tabelleninhalt">Fachhochschule Technikum Wien, Verleihung des Status "Fachhochschule" im November 2000 </text:span>
             </text:p>
             <text:p text:style-name="P44">
               <text:span text:style-name="Tabelleninhalt">
@@ -2298,7 +2298,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <text:p text:style-name="P41">Der postsekundäre Sektor in Österreich</text:p>
       <text:list xml:id="list2030519318" text:style-name="WW8Num16">
         <text:list-item>
-          <text:p text:style-name="P52">In Österreich umfasst der postsekundäre Sektor auf <text:span text:style-name="T14">Universitätsniveau</text:span> („Hochschulsektor")</text:p>
+          <text:p text:style-name="P52">In Österreich umfasst der postsekundäre Sektor auf <text:span text:style-name="T14">Universitätsniveau</text:span> ("Hochschulsektor")</text:p>
         </text:list-item>
       </text:list>
       <text:list xml:id="list2065892677" text:style-name="WW8Num13">
@@ -2311,7 +2311,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
               <text:p text:style-name="P49">die Privatuniversitäten, erhalten von privaten Trägern mit staatlicher Akkreditierung;</text:p>
             </text:list-item>
             <text:list-item>
-              <text:p text:style-name="P49">die Erhalter von Fachhochschul-Studiengängen, erhalten von privatrechtlich organisierten und staatlich subventionierten oder von öffentlichen Trägern, mit staatlicher Akkreditierung (manche Trägern wurde die Berechtigung zur Führung der Bezeichnung „Fachhochschule" verliehen);</text:p>
+              <text:p text:style-name="P49">die Erhalter von Fachhochschul-Studiengängen, erhalten von privatrechtlich organisierten und staatlich subventionierten oder von öffentlichen Trägern, mit staatlicher Akkreditierung (manche Trägern wurde die Berechtigung zur Führung der Bezeichnung "Fachhochschule" verliehen);</text:p>
             </text:list-item>
             <text:list-item>
               <text:p text:style-name="P49">die Pädagogischen Hochschulen, erhalten vom Staat oder von privaten Trägern mit staatlicher Akkreditierung;</text:p>
@@ -2350,7 +2350,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         </text:list-item>
       </text:list>
       <text:p text:style-name="P14"/>
-      <text:p text:style-name="P24">Im Folgenden wird ausschließlich auf den „Hochschulsektor" eingegangen.</text:p>
+      <text:p text:style-name="P24">Im Folgenden wird ausschließlich auf den "Hochschulsektor" eingegangen.</text:p>
       <text:p text:style-name="P24"/>
       <text:p text:style-name="P41">Allgemeine Struktur des Hochschulwesens</text:p>
       <text:p text:style-name="P24">Es gibt ein neues und ein altes System der österreichischen ordentlichen Studien: das neue im Sinne des Europäischen Hochschulraums (Bologna-Prozess) und das alte aus der Zeit vor dem Europäischen Hochschulraum.</text:p>
@@ -2368,7 +2368,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       </text:list>
       <text:p text:style-name="P24">Einige Studien für das Lehramt werden gemeinsam zwischen Universitäten und Pädagogischen Hochschulen eingerichtet.</text:p>
       <text:p text:style-name="P16"/>
-      <text:p text:style-name="P24">Die Inhaber/innen dieser Diplomgrade oder Mastergrade (einschließlich Fachhochschul-Diplomgraden oder Fachhochschul-Mastergraden) sind zur Zulassung zum Doktoratsstudium an einer Universität berechtigt. Der <text:span text:style-name="T15">Doktorgrad</text:span> mit dem Wortlaut „Doktor/in ..." oder „Doctor of Philosophy" („PhD") wird nach einem mindestens dreijährigen Studium verliehen.</text:p>
+      <text:p text:style-name="P24">Die Inhaber/innen dieser Diplomgrade oder Mastergrade (einschließlich Fachhochschul-Diplomgraden oder Fachhochschul-Mastergraden) sind zur Zulassung zum Doktoratsstudium an einer Universität berechtigt. Der <text:span text:style-name="T15">Doktorgrad</text:span> mit dem Wortlaut "Doktor/in ..." oder "Doctor of Philosophy" ("PhD") wird nach einem mindestens dreijährigen Studium verliehen.</text:p>
       <text:p text:style-name="P24"/>
       <text:p text:style-name="P25">Neben den ordentlichen Studien, die oben beschrieben wurden, gibt es auch außerordentliche Studien, die an Universitäten entweder ein Universitätslehrgang oder der Besuch einzelner Lehrveranstaltungen, im Fachhochschulbereich ein Lehrgang zur Weiterbildung und an Pädagogischen Hochschulen ein Hochschullehrgang sein können.</text:p>
       <text:p text:style-name="P24"/>
@@ -2554,7 +2554,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       <text:p text:style-name="P15"/>
       <text:list xml:id="list1119633922" text:continue-list="list471845522" text:style-name="WW8Num16">
         <text:list-item>
-          <text:p text:style-name="P53">The <text:span text:style-name="T14">new system</text:span> is based on the distinction between undergraduate and graduate studies. Upon completion of an undergraduate program (<text:span text:style-name="T15">Bachelorstudium</text:span> at universities and university colleges of education or, respectively, <text:span text:style-name="T15">Fachhochschul-Bachelorstudiengang</text:span> at universities of applied sciences, comprising 180 to 240 ECTS credits), a bachelor’s degree (designation: „Bachelor of/in ..." ) is awarded. Upon completion of a graduate program (<text:span text:style-name="T15">Masterstudium</text:span> at universities and university colleges of education or, respectively, <text:span text:style-name="T15">Fachhochschul-Masterstudiengang</text:span> at universities of applied sciences, comprising 60 to 120 ECTS credits), a master’s degree (designation: „Master of/in ..." ) is awarded. In the fields of engineering, the designation of the master’s degree can also be „Diplom-Ingenieur/in".</text:p>
+          <text:p text:style-name="P53">The <text:span text:style-name="T14">new system</text:span> is based on the distinction between undergraduate and graduate studies. Upon completion of an undergraduate program (<text:span text:style-name="T15">Bachelorstudium</text:span> at universities and university colleges of education or, respectively, <text:span text:style-name="T15">Fachhochschul-Bachelorstudiengang</text:span> at universities of applied sciences, comprising 180 to 240 ECTS credits), a bachelor’s degree (designation: "Bachelor of/in ..." ) is awarded. Upon completion of a graduate program (<text:span text:style-name="T15">Masterstudium</text:span> at universities and university colleges of education or, respectively, <text:span text:style-name="T15">Fachhochschul-Masterstudiengang</text:span> at universities of applied sciences, comprising 60 to 120 ECTS credits), a master’s degree (designation: "Master of/in ..." ) is awarded. In the fields of engineering, the designation of the master’s degree can also be "Diplom-Ingenieur/in".</text:p>
         </text:list-item>
         <text:list-item>
           <text:p text:style-name="P53">Under the auspices of the <text:span text:style-name="T14">older system</text:span> of diploma degree programs (<text:span text:style-name="T15">Diplomstudien</text:span>), the first degree awarded is the diploma degree (<text:span text:style-name="T15">Diplomgrad</text:span>). An Austrian higher secondary school leaving certificate or its equivalent is the general qualification necessary for enrolling in a diploma degree programme; conclusion of a diploma degree programme entitles degree holders to enroll in doctoral programmes. A diploma degree (<text:span text:style-name="T15">Diplomgrad</text:span>) is awarded by Austrian universities after a course of study consisting of 240 to 360 ECTS credits. Full degree titles are gender specific designations: <text:span text:style-name="T15">Magister</text:span> for men; <text:span text:style-name="T15">Magistra</text:span> for women. Degree titles also include a general description of the field of study in which they were obtained, e.g. <text:span text:style-name="T15">Magister philosophiae</text:span>. In the fields of engineering, the degree titles are <text:span text:style-name="T15">Diplom-Ingenieur/in</text:span>. 
