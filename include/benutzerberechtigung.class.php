@@ -234,7 +234,7 @@ class benutzerberechtigung extends basis_db
 					$this->db_add_param($this->insertamum).','.
 					$this->db_add_param($this->insertvon).','.
 					$this->db_add_param($this->kostenstelle_id, FHC_INTEGER).','.
-					$this->db_add_param($this->anmerkung, FHC_INTEGER).');';
+					$this->db_add_param($this->anmerkung).');';
 		}
 		else
 		{
