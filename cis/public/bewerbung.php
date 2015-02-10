@@ -63,6 +63,9 @@ if(!$person->load($person_id))
 
 $message = '&nbsp;';
 
+$vollstaendig = '<span class="badge alert-success">vollständig <span class="glyphicon glyphicon-ok"></span></span>';
+$unvollstaendig = '<span class="badge alert-danger">unvollständig <span class="glyphicon glyphicon-remove"></span></span>';
+
 if($method=='delete')
 {
     $akte= new akte();
@@ -408,30 +411,30 @@ if(isset($_POST['btn_zgv']))
 
 
 // Abfrage ob ein Punkt schon vollständig ist
- if($person->vorname != '' && $person->nachname != '' && $person->gebdatum != '' && $person->staatsbuergerschaft != '' && $person->geschlecht != '')
+ if($person->vorname && $person->nachname && $person->gebdatum && $person->staatsbuergerschaft && $person->geschlecht)
  {
      $status_person = true;
-     $status_person_text = '<span id="success">vollständig</span>';
+     $status_person_text = $vollstaendig;
  }
  else
  {
      $status_person = false;
-     $status_person_text = '<span id="error">unvollständig</span>';
+     $status_person_text = $unvollstaendig;
  }
 
 $kontakt = new kontakt();
 $kontakt->load_persKontakttyp($person->person_id, 'email');
 $adresse = new adresse();
 $adresse->load_pers($person->person_id);
-if(count($kontakt->result)>0 && count($adresse->result)>0)
+if(count($kontakt->result) && count($adresse->result))
 {
     $status_kontakt = true;
-    $status_kontakt_text = '<span id="success">vollständig</span>';
+    $status_kontakt_text = $vollstaendig;
 }
 else
 {
     $status_kontakt = false;
-    $status_kontakt_text = '<span id="error">unvollständig</span>';
+    $status_kontakt_text = $unvollstaendig;
 }
 
 $prestudent = new prestudent();
@@ -448,15 +451,15 @@ foreach($prestudent->result as $pre)
 }
 
 
-if(!$zgv_auswahl)
+if($zgv_auswahl)
 {
-    $status_zgv = false;
-    $status_zgv_text = '<span id="error">unvollständig</span>';
+	$status_zgv = true;
+	$status_zgv_text = $vollstaendig;
 }
 else
 {
-    $status_zgv = true;
-    $status_zgv_text = '<span id="success">vollständig</span>';
+	$status_zgv = false;
+	$status_zgv_text = $unvollstaendig;
 }
 
 $dokument_help = new dokument();
@@ -483,31 +486,31 @@ foreach($dokument_help->result as $dok)
 if($missing)
 {
     $status_dokumente = false;
-    $status_dokumente_text = '<span id="error">unvollständig</span>';
+    $status_dokumente_text = $unvollstaendig;
 }
 else
 {
     $status_dokumente = true;
-    $status_dokumente_text = '<span id="success">vollständig</span>';
+    $status_dokumente_text = $vollstaendig;
 }
 
 $konto = new konto();
 if($konto->checkKontostand($person_id))
 {
 	$status_zahlungen = true;
-	$status_zahlungen_text = '<span id="success">vollständig</span>';
+	$status_zahlungen_text = $vollstaendig;
 }
 else
 {
 	if($konto->errormsg=='')
 	{
 		$status_zahlungen = false;
-	    $status_zahlungen_text = '<span id="error">unvollständig</span>';
+	    $status_zahlungen_text = $unvollstaendig;
 	}
 	else
 	{
 		$status_zahlungen = false;
-		$status_zahlungen_text = '<span id="error">Fehler: '.$konto->errormsg.'</span>';
+		$status_zahlungen_text = $unvollstaendig . $konto->errormsg;
 	}
 }
 
@@ -516,14 +519,14 @@ if(!$prestudent->getPrestudenten($person_id))
 	die('Konnte Prestudenten nicht laden');
 
 $status_aufnahmeverfahren = false;
-$status_aufnahmeverfahren_text = '<span id="error">unvollständig</span>';
+$status_aufnahmeverfahren_text = $unvollstaendig;
 
 foreach($prestudent->result as $row)
 {
 	if($row->reihungstest_id != '')
 	{
 		$status_aufnahmeverfahren = true;
-		$status_aufnahmeverfahren_text = '<span id="success">vollständig</span>';
+		$status_aufnahmeverfahren_text = $vollstaendig;
 	}
 
 }
