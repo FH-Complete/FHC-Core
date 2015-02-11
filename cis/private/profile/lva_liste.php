@@ -32,6 +32,10 @@ require_once('../../../include/benutzer.class.php');
 require_once('../../../include/mail.class.php');
 require_once('../../../include/phrasen.class.php');
 require_once('../../../include/studiensemester.class.php');
+require_once('../../../include/datum.class.php');
+require_once('../../../include/datum.class.php');
+require_once('../../../include/lvangebot.class.php');
+
 
 	if (!$db = new basis_db())
       die('Fehler beim Oeffnen der Datenbankverbindung');
@@ -50,6 +54,8 @@ require_once('../../../include/studiensemester.class.php');
 		$stdsem=$_GET['stdsem'];
 	else
 		$stdsem=$studiensemester->getaktorNext();
+	
+	$datum = new datum();
 
 	//Studiensemester abfragen. Letzten 5, aktuelles und naechstes.
 	$sql_query='SELECT * FROM public.tbl_studiensemester WHERE (start<=(now()::date+240) AND ende>=(now()::date-900)) ORDER BY start';
@@ -89,7 +95,7 @@ require_once('../../../include/studiensemester.class.php');
 		JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 		JOIN public.tbl_studiengang USING(studiengang_kz)
 		JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
-		WHERE studiensemester_kurzbz=".$db->db_add_param($stdsem)." AND mitarbeiter_uid=".$db->db_add_param($uid);
+		WHERE tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stdsem)." AND mitarbeiter_uid=".$db->db_add_param($uid);
  	$sql_query.=" ORDER BY stg_kurzbz,lv_semester,lv_bezeichnung";
 	$result=$db->db_query($sql_query);
 	$num_rows=$db->db_num_rows($result);
@@ -168,7 +174,9 @@ require_once('../../../include/studiensemester.class.php');
 				<th>'.$p->t('lvaliste/blockung').'</th>
 				<th>'.$p->t('lvaliste/wochenrythmus').'</th>
 				<th>'.$p->t('lvaliste/stunden').'</th>
-				<th>'.$p->t('lvaliste/kalenderwoche').'</th>';
+				<th>'.$p->t('lvaliste/kalenderwoche').'</th>
+				<th>Anm. von</th>
+				<th>Anm. bis</th>';
 				//<th>'.$p->t('lvaliste/anmerkung').'</th> Lektoren sollen die Anmerkung dzt. nicht sehen, da nur für intern gedacht
 
 			echo '</tr>
@@ -180,7 +188,7 @@ require_once('../../../include/studiensemester.class.php');
 		for ($i=0; $i<$num_rows; $i++)
 		{
 			$row=$db->db_fetch_object($result);
-
+			$lvangebot = new lvangebot();
 			echo '<tr>';
 			if(!defined('CIS_LVALISTE_NOTENEINGABE_ANZEIGEN') || CIS_LVALISTE_NOTENEINGABE_ANZEIGEN)
 				echo '<td nowrap><a href="../lehre/benotungstool/lvgesamtnoteverwalten.php?lvid='.$row->lehrveranstaltung_id.'&stsem='.$stdsem.'">'.$p->t('lvaliste/gesamtnote').'</a></td>';
@@ -213,6 +221,13 @@ require_once('../../../include/studiensemester.class.php');
 			echo '<td>'.$row->wochenrythmus.'</td>';
 			echo '<td>'.$row->semesterstunden.'</td>';
 			echo '<td>'.$row->start_kw.'</td>';
+			
+			$lvangebot->getAllFromLvId($row->lehrveranstaltung_id, $row->studiensemester_kurzbz);
+			if(!empty($lvangebot->result))
+			{
+			    echo '<td>'.$datum->formatDatum($lvangebot->result[0]->anmeldefenster_start, "d.m.Y").'</td>';
+			    echo '<td>'.$datum->formatDatum($lvangebot->result[0]->anmeldefenster_ende, "d.m.Y").'</td>';
+			}
 			//echo '<td>'.$row->le_anmerkung.'</td>'; Lektoren sollen die Anmerkung dzt. nicht sehen, da nur für intern gedacht
 
 			echo '</tr>';

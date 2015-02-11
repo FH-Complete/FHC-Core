@@ -720,7 +720,6 @@ class vertrag extends basis_db
 		else
 		{
 			$this->errormsg = 'Fehler beim Speichern der Daten';
-			$this->errormsg = $qry;
 			return false;
 		}
 	}

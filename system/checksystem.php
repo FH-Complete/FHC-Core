@@ -1315,6 +1315,22 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	}
 }
 
+// Berechtigungen fuer web User erteilen
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_konto' AND table_schema='public' AND grantee='web' AND privilege_type='UPDATE'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "GRANT INSERT, UPDATE ON public.tbl_konto TO web;"
+		    . " GRANT SELECT, UPDATE on public.tbl_konto_buchungsnr_seq TO web;";
+	
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_konto: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_konto: Schreibrechte fuer User web erteilt';
+	}		
+}
+
 // Anmeldefrist fuer Pruefungstermine
 if(!$result = @$db->db_query("SELECT anmeldung_von FROM campus.tbl_pruefungstermin LIMIT 1"))
 {

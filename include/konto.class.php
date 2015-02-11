@@ -410,12 +410,19 @@ class konto extends basis_db
 	 * Liefert alle Buchungstypen
 	 * @return true wenn ok, false wenn Fehler
 	 */
-	public function getBuchungstyp($aktiv=null)
+	public function getBuchungstyp($aktiv=null, $typ=null)
 	{
 		$qry = "SELECT * FROM public.tbl_buchungstyp";
 		
 		if(!is_null($aktiv))
 			$qry.=" WHERE aktiv=".$this->db_add_param($aktiv, FHC_BOOLEAN);
+		
+		if(!is_null($typ) && is_null($aktiv))
+			$qry.=" WHERE buchungstyp_kurzbz=".$this->db_add_param($typ, FHC_STRING);
+		
+		if(!is_null($typ) && !is_null($aktiv))
+			$qry.=" AND buchungstyp_kurzbz=".$this->db_add_param($typ, FHC_STRING);
+		
 		$qry.=" ORDER BY beschreibung";
 
 		if($this->db_query($qry))

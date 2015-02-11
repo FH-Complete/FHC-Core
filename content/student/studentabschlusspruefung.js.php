@@ -21,6 +21,7 @@
  */
 
 require_once('../../config/vilesci.config.inc.php');
+if(false):?> <script><?php endif;
 
 ?>
 // *********** Globale Variablen *****************//

@@ -289,7 +289,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				    <row>
 					<label value="Vertragsdatum" control="mitarbeiter-vertrag-vertragsstatus-textbox-vertragsdatum"/>
 					<hbox>
-					    <box class="Datum" id="mitarbeiter-vertrag-vertragsstatus-textbox-vertragsdatum" disabled="true" oninput="alert('test');"/>
+					    <box class="Datum" id="mitarbeiter-vertrag-vertragsstatus-textbox-vertragsdatum" disabled="true"/>
 					    <button id="mitarbeiter-vertrag-vertragsstatus-datum-speichern" label="Speichern" oncommand="MitarbeiterVertragVertragsstatusUpdate()" />
 					</hbox>
 				    </row>

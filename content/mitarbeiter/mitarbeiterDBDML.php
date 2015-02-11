@@ -594,6 +594,10 @@ if(!$error)
 			$vertrag_id = filter_input(INPUT_POST, "vertrag_id");
 			$status = filter_input(INPUT_POST, "status");
 			$datum = filter_input(INPUT_POST, "datum");
+			$time = date('H:i');
+			$time = explode(":",$time);
+			$datum = explode("-", $datum);
+			$datum = date('Y-m-d H:i:s', mktime($time[0],$time[1],0,$datum[1],$datum[2],$datum[0]));
 			
 			$vertrag = new vertrag($vertrag_id);
 			$vertrag->getStatus($vertrag_id,$status);
@@ -604,7 +608,7 @@ if(!$error)
 			
 			if($vertrag->saveVertragsstatus(false))
 			{
-				$return=true;	
+				$return=true; 
 			}
 			else
 			{
