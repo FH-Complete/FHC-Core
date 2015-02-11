@@ -50,7 +50,7 @@ $stsem = $stsem_obj->getAktOrNext();
 $qry = "SELECT distinct lehrveranstaltung_id, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.kurzbz, 
 		tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.orgform_kurzbz, tbl_lehrveranstaltung.semester
 		FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
-		WHERE studiensemester_kurzbz=".$db->db_add_param($stsem);
+		WHERE studiensemester_kurzbz=".$db->db_add_param($stsem)." AND semester is not null AND semester!=0";
 
 if($result = $db->db_query($qry))
 {
@@ -64,9 +64,9 @@ if($result = $db->db_query($qry))
 			$studiengang = new studiengang();
 			$studiengang->load($row->studiengang_kz);
 
-			$shortname = $studiengang->kuerzel.'-'.$row->orgform_kurzbz.'-'.$row->semester.'-'.$stsem.'-'.$row->kurzbz;
-			$bezeichnung = $studiengang->kuerzel.'-'.$row->orgform_kurzbz.'-'.$row->semester.'-'.$stsem.' - '.$row->bezeichnung;
-			
+			$shortname = $studiengang->kuerzel.($row->orgform_kurzbz!=''?'-'.$row->orgform_kurzbz:'').($row->semester!=''?'-'.$row->semester:'').'-'.$stsem.'-'.$row->kurzbz;
+			$bezeichnung = $studiengang->kuerzel.($row->orgform_kurzbz!=''?'-'.$row->orgform_kurzbz:'').($row->semester!=''?'-'.$row->semester:'').'-'.$stsem.'-'.$row->bezeichnung;
+
 			$mdl_course->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 			$mdl_course->studiensemester_kurzbz = $stsem;
 			$mdl_course->mdl_fullname = $bezeichnung;
@@ -74,6 +74,8 @@ if($result = $db->db_query($qry))
 			$mdl_course->insertamum = date('Y-m-d H:i:s');
 			$mdl_course->insertvon = 'auto';
 			$mdl_course->gruppen = true;
+			
+			echo "\nCreate Course: $bezeichnung";
 
 			//Moodlekurs anlegen
 			if($mdl_course->create_moodle())
