@@ -2479,6 +2479,50 @@ if(!$result = @$db->db_query("SELECT 1 FROM bis.tbl_archiv LIMIT 1;"))
 		echo ' Tabellen fuer BIS-Archiv hinzugefuegt!<br>';
 }
 
+// Spalte ext_id in lehre.tbl_studienplan_lehrveranstaltung
+if(!$result = @$db->db_query("SELECT ext_id FROM lehre.tbl_studienplan_lehrveranstaltung LIMIT 1;"))
+{
+	$qry = "ALTER TABLE lehre.tbl_studienplan_lehrveranstaltung ADD COLUMN ext_id bigint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_studienplan_lehrveranstaltung: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' lehre.tbl_studienplan_lehrveranstaltung: Spalte ext_id hinzugefuegt!<br>';
+}
+
+// Spalte ext_id in lehre.tbl_studienordnung
+if(!$result = @$db->db_query("SELECT ext_id FROM lehre.tbl_studienordnung LIMIT 1;"))
+{
+	$qry = "ALTER TABLE lehre.tbl_studienordnung ADD COLUMN ext_id bigint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_studienordnung: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' lehre.tbl_studienordnung: Spalte ext_id hinzugefuegt!<br>';
+}
+
+// Spalte ext_id in lehre.tbl_studienplan
+if(!$result = @$db->db_query("SELECT ext_id FROM lehre.tbl_studienplan LIMIT 1;"))
+{
+	$qry = "ALTER TABLE lehre.tbl_studienplan ADD COLUMN ext_id bigint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_studienplan: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' lehre.tbl_studienplan: Spalte ext_id hinzugefuegt!<br>';
+}
+
+// Spalte ext_id in campus.tbl_lvgesamtnote
+if(!$result = @$db->db_query("SELECT ext_id FROM campus.tbl_lvgesamtnote LIMIT 1;"))
+{
+	$qry = "ALTER TABLE campus.tbl_lvgesamtnote ADD COLUMN ext_id bigint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_lvgesamtnote: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' campus.tbl_lvgesamtnote: Spalte ext_id hinzugefuegt!<br>';
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -2533,7 +2577,7 @@ $tabellen=array(
 	"campus.tbl_lehre_tools" => array("lehre_tools_id","bezeichnung","kurzbz","basis_url","logo_dms_id"),
 	"campus.tbl_lehre_tools_organisationseinheit" => array("lehre_tools_id","oe_kurzbz","aktiv"),
 	"campus.tbl_lehrveranstaltung_pruefung" => array("lehrveranstaltung_pruefung_id","lehrveranstaltung_id","pruefung_id"),
-	"campus.tbl_lvgesamtnote"  => array("lehrveranstaltung_id","studiensemester_kurzbz","student_uid","note","mitarbeiter_uid","benotungsdatum","freigabedatum","freigabevon_uid","bemerkung","updateamum","updatevon","insertamum","insertvon","punkte"),
+	"campus.tbl_lvgesamtnote"  => array("lehrveranstaltung_id","studiensemester_kurzbz","student_uid","note","mitarbeiter_uid","benotungsdatum","freigabedatum","freigabevon_uid","bemerkung","updateamum","updatevon","insertamum","insertvon","punkte","ext_id"),
 	"campus.tbl_lvinfo"  => array("lehrveranstaltung_id","sprache","titel","lehrziele","lehrinhalte","methodik","voraussetzungen","unterlagen","pruefungsordnung","anmerkung","kurzbeschreibung","genehmigt","aktiv","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_news"  => array("news_id","uid","studiengang_kz","fachbereich_kurzbz","semester","betreff","text","datum","verfasser","updateamum","updatevon","insertamum","insertvon","datum_bis","content_id"),
 	"campus.tbl_notenschluessel"  => array("lehreinheit_id","note","punkte"),
@@ -2602,10 +2646,10 @@ $tabellen=array(
 	"lehre.tbl_projekttyp"  => array("projekttyp_kurzbz","bezeichnung"),
 	"lehre.tbl_pruefung"  => array("pruefung_id","lehreinheit_id","student_uid","mitarbeiter_uid","note","pruefungstyp_kurzbz","datum","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","pruefungsanmeldung_id","vertrag_id"),
 	"lehre.tbl_pruefungstyp"  => array("pruefungstyp_kurzbz","beschreibung","abschluss"),
-	"lehre.tbl_studienordnung"  => array("studienordnung_id","studiengang_kz","version","gueltigvon","gueltigbis","bezeichnung","ects","studiengangbezeichnung","studiengangbezeichnung_englisch","studiengangkurzbzlang","akadgrad_id","insertamum","insertvon","updateamum","updatevon"),
+	"lehre.tbl_studienordnung"  => array("studienordnung_id","studiengang_kz","version","gueltigvon","gueltigbis","bezeichnung","ects","studiengangbezeichnung","studiengangbezeichnung_englisch","studiengangkurzbzlang","akadgrad_id","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"lehre.tbl_studienordnung_semester"  => array("studienordnung_semester_id","studienordnung_id","studiensemester_kurzbz","semester"),
-	"lehre.tbl_studienplan" => array("studienplan_id","studienordnung_id","orgform_kurzbz","version","regelstudiendauer","sprache","aktiv","bezeichnung","insertamum","insertvon","updateamum","updatevon","semesterwochen","testtool_sprachwahl"),
-	"lehre.tbl_studienplan_lehrveranstaltung" => array("studienplan_lehrveranstaltung_id","studienplan_id","lehrveranstaltung_id","semester","studienplan_lehrveranstaltung_id_parent","pflicht","koordinator","insertamum","insertvon","updateamum","updatevon","sort"),
+	"lehre.tbl_studienplan" => array("studienplan_id","studienordnung_id","orgform_kurzbz","version","regelstudiendauer","sprache","aktiv","bezeichnung","insertamum","insertvon","updateamum","updatevon","semesterwochen","testtool_sprachwahl","ext_id"),
+	"lehre.tbl_studienplan_lehrveranstaltung" => array("studienplan_lehrveranstaltung_id","studienplan_id","lehrveranstaltung_id","semester","studienplan_lehrveranstaltung_id_parent","pflicht","koordinator","insertamum","insertvon","updateamum","updatevon","sort","ext_id"),
 	"lehre.tbl_studienplatz" => array("studienplatz_id","studiengang_kz","studiensemester_kurzbz","orgform_kurzbz","ausbildungssemester","gpz","npz","insertamum","insertvon","updateamum","updatevon"),
 	"lehre.tbl_stunde"  => array("stunde","beginn","ende"),
 	"lehre.tbl_stundenplan"  => array("stundenplan_id","unr","mitarbeiter_uid","datum","stunde","ort_kurzbz","gruppe_kurzbz","titel","anmerkung","lehreinheit_id","studiengang_kz","semester","verband","gruppe","fix","updateamum","updatevon","insertamum","insertvon"),
