@@ -105,7 +105,7 @@
 								<fo:table-body>
 						            <fo:table-row line-height="14pt">
 										<fo:table-cell border-width="0.2mm" border-style="solid">
-											<fo:block font-family="sans-serif" font-size="8pt" content-width="70mm" text-align="left">
+											<fo:block font-family="sans-serif" font-size="8pt" content-width="100mm" text-align="left">
 												<xsl:text> Lehrgang zur Weiterbildung nach §9 FHStG idgF\n</xsl:text>
 											</fo:block>
 										</fo:table-cell>
@@ -121,12 +121,12 @@
 					
 					<fo:block-container position="absolute" top="76mm" left="16mm">
 						<fo:block text-align="left" line-height="14pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
-							<xsl:value-of select="studiengang" />
+							<xsl:text> Akademischer Social Media Manager\n</xsl:text>
 						</fo:block>
 					</fo:block-container>
 					<fo:block-container position="absolute" top="76mm" left="167mm">
 						<fo:block text-align="left" line-height="14pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
-							0050007
+							0050005
 						</fo:block>
 					</fo:block-container>
 					
@@ -154,13 +154,13 @@
 					
 					<fo:block-container position="absolute" top="87mm" left="16mm">
 						<fo:block text-align="left" line-height="10pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
-							<xsl:value-of select="studiensemester" />
+							<xsl:value-of select="studiensemester_aktuell" />
 						</fo:block>
 					</fo:block-container>
 					
 					<fo:block-container position="absolute" top="87mm" left="137mm">
 						<fo:block text-align="left" line-height="10pt" font-family="sans-serif" font-size="10pt" font-weight="bold">
-							<xsl:value-of select="semester -1" /><xsl:text>. Semester</xsl:text>
+							<xsl:value-of select="semester_aktuell_semester -1" /><xsl:text>. Semester</xsl:text>
 						</fo:block>
 					</fo:block-container>
 					

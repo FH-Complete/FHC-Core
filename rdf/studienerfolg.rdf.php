@@ -29,6 +29,8 @@ require_once('../include/note.class.php');
 require_once('../include/studiensemester.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/mitarbeiter.class.php');
+require_once('../include/prestudent.class.php');
+require_once('../include/student.class.php');
 
 $datum = new datum();
 $db = new basis_db();
@@ -67,7 +69,14 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 
 	$studiensemester = new studiensemester();
 	$studiensemester_aktuell = $studiensemester->getNearest();
-
+	$student = new student();
+	$student->load($uid);
+	$prestudentstatus = new prestudent();
+	$prestudentstatus->getLastStatus($student->prestudent_id,'','Student');
+	
+	if($studiensemester_aktuell!=$prestudentstatus->studiensemester_kurzbz)
+		$studiensemester_aktuell = $prestudentstatus->studiensemester_kurzbz;
+	
 	$semester_aktuell='';
 	$qry_semester = "SELECT tbl_prestudentstatus.ausbildungssemester as semester FROM public.tbl_student, public.tbl_prestudentstatus 
 					WHERE tbl_student.prestudent_id=tbl_prestudentstatus.prestudent_id 

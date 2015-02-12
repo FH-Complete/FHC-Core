@@ -290,6 +290,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         <style:style style:name="P27" style:family="paragraph" style:parent-style-name="Standard">
             <style:text-properties fo:font-size="5pt" officeooo:rsid="000f65a0" officeooo:paragraph-rsid="000f65a0" style:font-size-asian="1.75pt" style:font-size-complex="2pt"/>
         </style:style>
+        <style:style style:name="P28" style:family="paragraph" style:parent-style-name="Standard">
+            <style:text-properties fo:font-size="12pt" officeooo:rsid="000f65a0" officeooo:paragraph-rsid="000f65a0" style:font-size-asian="12pt" style:font-size-complex="12pt"/>
+        </style:style>
         <style:style style:name="T1" style:family="text">
             <style:text-properties fo:font-weight="bold" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
         </style:style>
@@ -349,7 +352,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                             </table:table-cell>
                             <table:table-cell table:style-name="Tabelle3.C2" office:value-type="string">
                                 <text:p text:style-name="P17"><xsl:value-of select="studiengangsleiter" /></text:p>
-                                <text:p text:style-name="P17">Studiengangsleitung</text:p>
+                                <text:p text:style-name="P17">Lehrgangsleitung</text:p>
                             </table:table-cell>
                         </table:table-row>
                     </table:table>
@@ -365,17 +368,17 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 						<xsl:value-of select="stsem"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:value-of select="semester_bezeichnung"/>
-						<xsl:text> (</xsl:text>
+						<xsl:value-of select="semester -1"/>
+						<xsl:text>. Semester (</xsl:text>
 						<xsl:value-of select="stsem"/>
 						<xsl:text>)</xsl:text>
 					</xsl:otherwise>
 				</xsl:choose>
             </text:p>
             <text:p text:style-name="P5"/>
-            <text:p text:style-name="P5">Lehrgang</text:p>
+            <text:p text:style-name="P28">Lehrgang zur Weiterbildung nach §9 FHStG idgF</text:p>
             <text:p text:style-name="P1">
-                <draw:frame draw:style-name="fr2" draw:name="Rahmen2" text:anchor-type="paragraph" svg:width="17.999cm" draw:z-index="2">
+                <draw:frame draw:style-name="fr2" draw:name="Rahmen2" text:anchor-type="paragraph" svg:width="8.999cm" draw:z-index="2">
                     <draw:text-box fo:min-height="0.499cm">
                         <text:p text:style-name="P6">Akademisch geprüfter Social Media Manager</text:p>
                     </draw:text-box>
@@ -387,7 +390,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             <text:p text:style-name="P1"/>
             <text:p text:style-name="P1"/>
             <text:p text:style-name="P2">Personenkennzeichen: <xsl:value-of select="matrikelnr" /></text:p>
-            <text:p text:style-name="P2">Kennzahl des Lehrgangs: <xsl:value-of select="studiengang_kz" /></text:p>
+            <text:p text:style-name="P2">Kennzahl des Lehrgangs: 0050005</text:p>
             <text:p text:style-name="P2"/>
             <text:p text:style-name="P3"/>
             <text:p text:style-name="P3"/>
