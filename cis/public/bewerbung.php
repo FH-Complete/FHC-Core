@@ -502,16 +502,8 @@ if($konto->checkKontostand($person_id))
 }
 else
 {
-	if($konto->errormsg=='')
-	{
-		$status_zahlungen = false;
-	    $status_zahlungen_text = $unvollstaendig;
-	}
-	else
-	{
-		$status_zahlungen = false;
-		$status_zahlungen_text = $unvollstaendig . $konto->errormsg;
-	}
+	$status_zahlungen = false;
+	$status_zahlungen_text = $unvollstaendig;
 }
 
 $prestudent = new prestudent();
@@ -535,6 +527,8 @@ foreach($prestudent->result as $row)
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<meta http-equiv="X-UA-Compatible" content="chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Bewerbung für einen Studiengang</title>
 		<link href="../../include/css/bootstrap.min.css" rel="stylesheet" type="text/css">
 		<script src="../../include/js/jquery.min.1.11.1.js"></script>
@@ -588,33 +582,37 @@ foreach($prestudent->result as $row)
 							die('Konnte Prestudenten nicht laden'); ?>
 
 
-						<table class="table">
-							<tr>
-								<th>Studiengang</th>
-								<th>Status</th>
-								<th>Datum</th>
-								<th>Aktion</th>
-								<th>Bewerbungsstatus</th>
-							</tr>
-							<?php foreach($prestudent->result as $row):
-								$stg = new studiengang();
-								if(!$stg->load($row->studiengang_kz))
-									die('Konnte Studiengang nicht laden');
-
-								$prestudent_status = new prestudent();
-								$prestatus_help= ($prestudent_status->getLastStatus($row->prestudent_id))?$prestudent_status->status_kurzbz:'Noch kein Status vorhanden';
-								$bewerberstatus =($prestudent_status->bestaetigtam != '' || $prestudent_status->bestaetigtvon != '')?'bestätigt':'noch nicht bestätigt'; ?>
+						<div class="table-responsive">
+							<table class="table">
 								<tr>
-									<td><?php echo $stg->bezeichnung ?></td>
-									<td><?php echo $prestatus_help ?></td>
-									<td><?php echo $datum->formatDatum($prestudent_status->datum, 'd.m.Y') ?></td>
-									<td></td>
-									<td><?php echo $bewerberstatus ?></td>
+									<th>Studiengang</th>
+									<th>Status</th>
+									<th>Datum</th>
+									<th>Aktion</th>
+									<th>Bewerbungsstatus</th>
 								</tr>
-							<?php endforeach; ?>
-						</table>
+								<?php foreach($prestudent->result as $row):
+									$stg = new studiengang();
+									if(!$stg->load($row->studiengang_kz))
+										die('Konnte Studiengang nicht laden');
+
+									$prestudent_status = new prestudent();
+									$prestatus_help= ($prestudent_status->getLastStatus($row->prestudent_id))?$prestudent_status->status_kurzbz:'Noch kein Status vorhanden';
+									$bewerberstatus =($prestudent_status->bestaetigtam != '' || $prestudent_status->bestaetigtvon != '')?'bestätigt':'noch nicht bestätigt'; ?>
+									<tr>
+										<td><?php echo $stg->bezeichnung ?></td>
+										<td><?php echo $prestatus_help ?></td>
+										<td><?php echo $datum->formatDatum($prestudent_status->datum, 'd.m.Y') ?></td>
+										<td></td>
+										<td><?php echo $bewerberstatus ?></td>
+									</tr>
+								<?php endforeach; ?>
+							</table>
+						</div>
 					<br>
-					<button class="btn_weiter btn btn-default" type='button' data-next-tab="daten">Weiter</button>
+					<button class="btn-nav btn btn-default" type="button" data-jump-tab="daten">
+						Weiter
+					</button>
 				</div>
 				<div role="tabpanel" class="tab-pane" id="daten">
 					<h2>Persönliche Daten</h2>
@@ -715,10 +713,14 @@ foreach($prestudent->result as $row)
 								w: <input type="radio" name="geschlecht" value="w" <?php echo $geschl_w ?>>
 							</div>
 						</div>
-						<input class="btn btn-default" type="submit" value="Speichern" name="btn_person" onclick="return checkPerson();">
-						<button class="btn_weiter btn btn-default" type="button" data-next-tab="kontakt">Weiter</button>
+						<button class="btn-nav btn btn-default" type="button" data-jump-tab="allgemein">
+							Zurück
+						</button>
+						<button class="btn-nav btn btn-default" type="button" data-jump-tab="kontakt">
+							Weiter
+						</button>
 					</form>
-						<?php echo $message; ?>
+					<?php echo $message; ?>
 				</div>
 				<div role="tabpanel" class="tab-pane" id="kontakt">
 					<h2>Kontaktinformationen</h2>
@@ -796,8 +798,10 @@ foreach($prestudent->result as $row)
 								</div>
 							</div>
 						</fieldset>
-						<input class="btn btn-default" type="submit" value="Speichern" name="btn_kontakt" onclick="return checkKontakt();"> &nbsp;
-						<button class="btn_weiter btn btn-default" type="button" data-next-tab="dokumente">
+						<button class="btn-nav btn btn-default" type="button" data-jump-tab="daten">
+							Zurück
+						</button>
+						<button class="btn-nav btn btn-default" type="button" data-jump-tab="dokumente">
 							Weiter
 						</button>
 					</form>
@@ -814,97 +818,99 @@ foreach($prestudent->result as $row)
 					$dokumente_person = new dokument();
 					$dokumente_person->getAllDokumenteForPerson($person_id, true); ?>
 
-					<table class="table table-striped">
-						<thead>
-							<tr>
-								<th width="30%">Name</th>
-								<th width="10%">Status</th>
-								<th width="10%">Aktion</th>
-								<th width="20%"></th>
-								<th width="30%">Benötigt für</th>
-							</tr>
-						</thead>
-						<tbody>
-					<?php
-					foreach($dokumente_person->result as $dok):
-						$akte = new akte;
-						$akte->getAkten($person_id, $dok->dokument_kurzbz);
+					<div class="table-responsive">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th>Name</th>
+									<th>Status</th>
+									<th>Aktion</th>
+									<th></th>
+									<th>Benötigt für</th>
+								</tr>
+							</thead>
+							<tbody>
+						<?php
+						foreach($dokumente_person->result as $dok):
+							$akte = new akte;
+							$akte->getAkten($person_id, $dok->dokument_kurzbz);
 
-						if(count($akte->result)>0)
-						{
-							$akte_id = isset($akte->result[0]->akte_id)?$akte->result[0]->akte_id:'';
+							if(count($akte->result)>0)
+							{
+								$akte_id = isset($akte->result[0]->akte_id)?$akte->result[0]->akte_id:'';
 
-							// check ob status "wird nachgereicht"
-							if($akte->result[0]->nachgereicht == true)
-							{
-								// wird nachgereicht
-								$status = '<img title="wird nachgereicht" src="'.APP_ROOT.'skin/images/hourglass.png" width="20px">';
-								$nachgereicht_help = 'checked';
-								$div = "<form method='POST' action='".$_SERVER['PHP_SELF']."?active=dokumente'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:true;'>".$akte->result[0]->anmerkung."</span></form>";
-								$aktion = '<a href="'.$_SERVER['PHP_SELF'].'?method=delete&akte_id='.$akte_id.'&active=dokumente"><img title="löschen" src="'.APP_ROOT.'skin/images/delete.png" width="20px"></a>';
-							}
-							else
-							{
-								$dokument = new dokument();
-								if($dokument->load($akte->result[0]->dokument_kurzbz,$prestudent->prestudent_id))
+								// check ob status "wird nachgereicht"
+								if($akte->result[0]->nachgereicht == true)
 								{
-									// Dokument wurde bereits überprüft
-									$status = '<img title="abgegeben" src="'.APP_ROOT.'skin/images/true_green.png" width="20px">';
-									$nachgereicht_help = '';
-									$div = "<form method='POST' action='".$_SERVER['PHP_SELF']."&active=dokumente'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:none;'>wird nachgereicht:<input type='checkbox' name='check_nachgereicht' ".$nachgereicht_help."><input type='text' size='15' name='txt_anmerkung'><input type='submit' value='OK' name='submit_nachgereicht' class='btn btn-default'></span><input type='hidden' name='dok_kurzbz' value='".$dok->dokument_kurzbz."'><input type='hidden' name='akte_id' value='".$akte_id."'></form>";
-									$aktion = '';
+									// wird nachgereicht
+									$status = '<img title="wird nachgereicht" src="'.APP_ROOT.'skin/images/hourglass.png" width="20px">';
+									$nachgereicht_help = 'checked';
+									$div = "<form method='POST' action='".$_SERVER['PHP_SELF']."?active=dokumente'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:true;'>".$akte->result[0]->anmerkung."</span></form>";
+									$aktion = '<a href="'.$_SERVER['PHP_SELF'].'?method=delete&akte_id='.$akte_id.'&active=dokumente"><img title="löschen" src="'.APP_ROOT.'skin/images/delete.png" width="20px"></a>';
 								}
 								else
 								{
-									// Dokument hochgeladen ohne überprüfung der Assistenz
-									$status = '<img title="abgegeben" src="'.APP_ROOT.'skin/images/check_black.png" width="20px">';
-									$nachgereicht_help = '';
-									$div = "<form method='POST' action='".$_SERVER['PHP_SELF']."&active=dokumente'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:none;'>wird nachgereicht:<input type='checkbox' name='check_nachgereicht' ".$nachgereicht_help."><input type='text' size='15' name='txt_anmerkung'><input type='submit' value='OK' name='submit_nachgereicht' class='btn btn-default'></span><input type='hidden' name='dok_kurzbz' value='".$dok->dokument_kurzbz."'><input type='hidden' name='akte_id' value='".$akte_id."'></form>";
-									$aktion = '<a href="'.$_SERVER['PHP_SELF'].'?method=delete&akte_id='.$akte_id.'&active=dokumente"><img title="löschen" src="'.APP_ROOT.'skin/images/delete.png" width="20px"></a>';
+									$dokument = new dokument();
+									if($dokument->load($akte->result[0]->dokument_kurzbz,$prestudent->prestudent_id))
+									{
+										// Dokument wurde bereits überprüft
+										$status = '<img title="abgegeben" src="'.APP_ROOT.'skin/images/true_green.png" width="20px">';
+										$nachgereicht_help = '';
+										$div = "<form method='POST' action='".$_SERVER['PHP_SELF']."&active=dokumente'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:none;'>wird nachgereicht:<input type='checkbox' name='check_nachgereicht' ".$nachgereicht_help."><input type='text' size='15' name='txt_anmerkung'><input type='submit' value='OK' name='submit_nachgereicht' class='btn btn-default'></span><input type='hidden' name='dok_kurzbz' value='".$dok->dokument_kurzbz."'><input type='hidden' name='akte_id' value='".$akte_id."'></form>";
+										$aktion = '';
+									}
+									else
+									{
+										// Dokument hochgeladen ohne überprüfung der Assistenz
+										$status = '<img title="abgegeben" src="'.APP_ROOT.'skin/images/check_black.png" width="20px">';
+										$nachgereicht_help = '';
+										$div = "<form method='POST' action='".$_SERVER['PHP_SELF']."&active=dokumente'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:none;'>wird nachgereicht:<input type='checkbox' name='check_nachgereicht' ".$nachgereicht_help."><input type='text' size='15' name='txt_anmerkung'><input type='submit' value='OK' name='submit_nachgereicht' class='btn btn-default'></span><input type='hidden' name='dok_kurzbz' value='".$dok->dokument_kurzbz."'><input type='hidden' name='akte_id' value='".$akte_id."'></form>";
+										$aktion = '<a href="'.$_SERVER['PHP_SELF'].'?method=delete&akte_id='.$akte_id.'&active=dokumente"><img title="löschen" src="'.APP_ROOT.'skin/images/delete.png" width="20px"></a>';
 
+									}
 								}
 							}
-						}
-						else
-						{
-							// Dokument fehlt noch
-							$status = '<img title="offen" src="'.APP_ROOT.'skin/images/upload.png" width="20px">';
-							$aktion = '<img src="'.APP_ROOT.'skin/images/delete.png" width="20px" title="löschen"> <a href="'.APP_ROOT.'cis/public/dms_akteupload.php?person_id='.$person_id.'&dokumenttyp='.$dok->dokument_kurzbz.'" onclick="FensterOeffnen(this.href); return false;"><img src="'.APP_ROOT.'skin/images/upload.png" width="20px" title="upload"></a><a href="#" onclick="toggleDiv(\'nachgereicht_'.$dok->dokument_kurzbz.'\');"><img src="'.APP_ROOT.'skin/images/hourglass.png" width="20px" title="wird nachgereicht"></a>';
-							$div = "<form method='POST' action='".$_SERVER['PHP_SELF']."?active=dokumente'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:none;'>wird nachgereicht:<input type='checkbox' name='check_nachgereicht'><input type='text' size='15' name='txt_anmerkung'><input type='submit' value='OK' name='submit_nachgereicht' class='btn btn-default'></span><input type='hidden' name='dok_kurzbz' value='".$dok->dokument_kurzbz."'></form>";
-
-						}
-
-						$ben_stg = new basis_db();
-						$qry = "SELECT studiengang_kz FROM public.tbl_dokumentstudiengang
-							JOIN public.tbl_prestudent using (studiengang_kz)
-							JOIN public.tbl_dokument using (dokument_kurzbz)
-							WHERE dokument_kurzbz = ".$ben_stg->db_add_param($dok->dokument_kurzbz)." and person_id =".$ben_stg->db_add_param($person_id, FHC_INTEGER);
-
-						$ben = "";
-						if($result = $ben_stg->db_query($qry))
-						{
-							while($row = $ben_stg->db_fetch_object($result))
+							else
 							{
-								if($ben!='')
-									$ben.=', ';
+								// Dokument fehlt noch
+								$status = '<img title="offen" src="'.APP_ROOT.'skin/images/upload.png" width="20px">';
+								$aktion = '<img src="'.APP_ROOT.'skin/images/delete.png" width="20px" title="löschen"> <a href="'.APP_ROOT.'cis/public/dms_akteupload.php?person_id='.$person_id.'&dokumenttyp='.$dok->dokument_kurzbz.'" onclick="FensterOeffnen(this.href); return false;"><img src="'.APP_ROOT.'skin/images/upload.png" width="20px" title="upload"></a><a href="#" onclick="toggleDiv(\'nachgereicht_'.$dok->dokument_kurzbz.'\');"><img src="'.APP_ROOT.'skin/images/hourglass.png" width="20px" title="wird nachgereicht"></a>';
+								$div = "<form method='POST' action='".$_SERVER['PHP_SELF']."?active=dokumente'><span id='nachgereicht_".$dok->dokument_kurzbz."' style='display:none;'>wird nachgereicht:<input type='checkbox' name='check_nachgereicht'><input type='text' size='15' name='txt_anmerkung'><input type='submit' value='OK' name='submit_nachgereicht' class='btn btn-default'></span><input type='hidden' name='dok_kurzbz' value='".$dok->dokument_kurzbz."'></form>";
 
-								$stg = new studiengang();
-								$stg->load($row->studiengang_kz);
-
-								$ben .= $stg->bezeichnung;
 							}
-						} ?>
 
-						<tr>
-							<td><?php echo $dok->bezeichnung ?></td>
-							<td><?php echo $status ?></td>
-							<td><?php echo $aktion ?></td>
-							<td><?php echo $div ?></td>
-							<td><?php echo $ben ?></td>
-						</tr>
-					<?php endforeach; ?>
-						</tbody>
-					</table>
+							$ben_stg = new basis_db();
+							$qry = "SELECT studiengang_kz FROM public.tbl_dokumentstudiengang
+								JOIN public.tbl_prestudent using (studiengang_kz)
+								JOIN public.tbl_dokument using (dokument_kurzbz)
+								WHERE dokument_kurzbz = ".$ben_stg->db_add_param($dok->dokument_kurzbz)." and person_id =".$ben_stg->db_add_param($person_id, FHC_INTEGER);
+
+							$ben = "";
+							if($result = $ben_stg->db_query($qry))
+							{
+								while($row = $ben_stg->db_fetch_object($result))
+								{
+									if($ben!='')
+										$ben.=', ';
+
+									$stg = new studiengang();
+									$stg->load($row->studiengang_kz);
+
+									$ben .= $stg->bezeichnung;
+								}
+							} ?>
+
+							<tr>
+								<td><?php echo $dok->bezeichnung ?></td>
+								<td><?php echo $status ?></td>
+								<td><?php echo $aktion ?></td>
+								<td><?php echo $div ?></td>
+								<td><?php echo $ben ?></td>
+							</tr>
+						<?php endforeach; ?>
+							</tbody>
+						</table>
+					</div>
 							<br>
 					<h2>Status</h2>
 					<table class="table">
@@ -933,6 +939,12 @@ foreach($prestudent->result as $row)
 							<td>Dokument wurde bereits überprüft</td>
 						</tr>
 					</table>
+					<button class="btn-nav btn btn-default" type="button" data-jump-tab="kontakt">
+						Zurück
+					</button>
+					<button class="btn-nav btn btn-default" type="button" data-jump-tab="zahlungen">
+						Weiter
+					</button>
 					<br><?php echo $message ?>
 				</div>
 
@@ -966,72 +978,79 @@ foreach($prestudent->result as $row)
 					$konto = new konto();
 					$konto->getBuchungen($person_id);
 					if(count($konto->result)>0): ?>
-						<br><br>
-						<table class="table table-striped">
-							<thead>
-								<tr>
-									<th><?php echo $p->t('global/datum') ?></th>
-									<th><?php echo $p->t('tools/zahlungstyp') ?></th>
-									<th><?php echo $p->t('lvplan/stg') ?></th>
-									<th><?php echo $p->t('global/studiensemester') ?></th>
-									<th><?php echo $p->t('tools/buchungstext') ?></th>
-									<th><?php echo $p->t('tools/betrag') ?></th>
-									<th><?php echo 'Zahlungsinformation' ?></th>
-								</tr>
-							</thead>
-							<tbody>
-								<?php
-								foreach ($konto->result as $row):
-									$betrag = $row['parent']->betrag;
-
-									if(isset($row['childs']))
-									{
-										foreach ($row['childs'] as $row_child)
-										{
-											$betrag += $row_child->betrag;
-										}
-									}
-
-									if($betrag<0)
-									{
-										$class = 'danger';
-									}
-									elseif($betrag>0)
-									{
-										$class = 'success';
-									}
-									else
-									{
-										$class = '';
-									}
-									?>
-									<tr class="<?php echo $class ?>">
-										<td><?php echo date('d.m.Y',$datum_obj->mktime_fromdate($row['parent']->buchungsdatum)) ?></td>
-										<td><?php echo $buchungstyp[$row['parent']->buchungstyp_kurzbz] ?></td>
-										<td><?php echo $stg_arr[$row['parent']->studiengang_kz] ?></td>
-										<td><?php echo $row['parent']->studiensemester_kurzbz ?></td>
-
-										<td nowrap><?php echo $row['parent']->buchungstext ?></td>
-										<td align="right" nowrap><?php echo ($betrag<0?'-':($betrag>0?'+':'')).sprintf('%.2f',abs($row['parent']->betrag)) ?> €</td>
-										<td align="center">
-										<?php if($betrag==0 && $row['parent']->betrag<0): ?>
-											bezahlt
-										<?php else: ?>
-												<a onclick="window.open('zahlungen_details.php?buchungsnr=<?php echo $row['parent']->buchungsnr ?>',
-															'Zahlungsdetails',
-															'height=320,width=550,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=no,toolbar=no,location=no,menubar=no,dependent=yes');
-													return false;" href="#">
-														<?php echo $p->t('tools/offen') ?>
-												</a>
-											</td>
-										<?php endif; ?>
+						<div class="table-responsive">
+							<table class="table table-striped">
+								<thead>
+									<tr>
+										<th><?php echo $p->t('global/datum') ?></th>
+										<th><?php echo $p->t('tools/zahlungstyp') ?></th>
+										<th><?php echo $p->t('lvplan/stg') ?></th>
+										<th><?php echo $p->t('global/studiensemester') ?></th>
+										<th><?php echo $p->t('tools/buchungstext') ?></th>
+										<th><?php echo $p->t('tools/betrag') ?></th>
+										<th><?php echo 'Zahlungsinformation' ?></th>
 									</tr>
-								<?php endforeach; ?>
-							</tbody>
-						</table>
-					<?php else:
-						echo $p->t('tools/keineZahlungenVorhanden');
-					endif; ?>
+								</thead>
+								<tbody>
+									<?php
+									foreach ($konto->result as $row):
+										$betrag = $row['parent']->betrag;
+
+										if(isset($row['childs']))
+										{
+											foreach ($row['childs'] as $row_child)
+											{
+												$betrag += $row_child->betrag;
+											}
+										}
+
+										if($betrag<0)
+										{
+											$class = 'danger';
+										}
+										elseif($betrag>0)
+										{
+											$class = 'success';
+										}
+										else
+										{
+											$class = '';
+										}
+										?>
+										<tr class="<?php echo $class ?>">
+											<td><?php echo date('d.m.Y',$datum_obj->mktime_fromdate($row['parent']->buchungsdatum)) ?></td>
+											<td><?php echo $buchungstyp[$row['parent']->buchungstyp_kurzbz] ?></td>
+											<td><?php echo $stg_arr[$row['parent']->studiengang_kz] ?></td>
+											<td><?php echo $row['parent']->studiensemester_kurzbz ?></td>
+
+											<td nowrap><?php echo $row['parent']->buchungstext ?></td>
+											<td align="right" nowrap><?php echo ($betrag<0?'-':($betrag>0?'+':'')).sprintf('%.2f',abs($row['parent']->betrag)) ?> €</td>
+											<td align="center">
+											<?php if($betrag==0 && $row['parent']->betrag<0): ?>
+												bezahlt
+											<?php else: ?>
+													<a onclick="window.open('zahlungen_details.php?buchungsnr=<?php echo $row['parent']->buchungsnr ?>',
+																'Zahlungsdetails',
+																'height=320,width=550,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=no,toolbar=no,location=no,menubar=no,dependent=yes');
+														return false;" href="#">
+															<?php echo $p->t('tools/offen') ?>
+													</a>
+												</td>
+											<?php endif; ?>
+										</tr>
+									<?php endforeach; ?>
+								</tbody>
+							</table>
+						</div>
+					<?php else: ?>
+						<p><?php echo $p->t('tools/keineZahlungenVorhanden') ?></p>
+					<?php endif; ?>
+					<button class="btn-nav btn btn-default" type="button" data-jump-tab="dokumente">
+						Zurück
+					</button>
+					<button class="btn-nav btn btn-default" type="button" data-jump-tab="aufnahme">
+						Weiter
+					</button>
 				</div>
 
 				<div role="tabpanel" class="tab-pane" id="aufnahme">
@@ -1053,74 +1072,84 @@ foreach($prestudent->result as $row)
 						$stg = new studiengang();
 						$stg->load($row->studiengang_kz); ?>
 						<h3>Studiengang <?php echo $stg->bezeichnung ?></h3>
-						<table class="reihungstest table">
-						<tr>
-							<th>angemeldet / Plätze</th>
-							<th>Datum</th>
-							<th>Uhrzeit</th>
-							<th>Ort</th>
-							<th title="<?php echo $row->studiengang_kz ?>">Studiengang</th>
-							<th>&nbsp;</th>
-						</tr>
-						<?php
-						foreach($reihungstest->result as $rt)
-						{
-							$teilnehmer_anzahl = $reihungstest->getTeilnehmerAnzahl($rt->reihungstest_id);
-							$spalte1 = $rt->max_teilnehmer ? $teilnehmer_anzahl . '/' . $rt->max_teilnehmer : '';
 
-							// bereits angenommen
-							if($row->reihungstest_id == $rt->reihungstest_id)
-							{
-								$rt_help = true; ?>
-								<tr style='background-color:lightgrey;'>
-									<td><?php echo $spalte1 ?></td>
-									<td><?php echo $rt->datum ?></td>
-									<td><?php echo $rt->uhrzeit ?></td>
-									<td><?php echo $rt->ort_kurzbz ?></td>
-									<td><?php echo $stg->bezeichnung ?></td>
-									<td>
-										<input type='button' name='btn_stg'
-											value='Stornieren'
-											onclick='location.href="<?php echo $_SERVER['PHP_SELF'] ?>?active=aufnahme&rt_id=<?php echo $rt->reihungstest_id ?>&pre=<?php echo $row->prestudent_id ?>&delete"'>
-									</td>
-								</tr>
-								<?php
-							}
-							else
-							{
-								?>
+						<div class="table-responsive">
+							<table class="reihungstest table">
 								<tr>
-									<td><?php echo $spalte1 ?></td>
-									<td><?php echo $rt->datum ?></td>
-									<td><?php echo $rt->uhrzeit ?></td>
-									<td><?php echo $rt->ort_kurzbz ?></td>
-									<td><?php echo $stg->bezeichnung ?></td>
-									<td>
-										<input type='button' name='btn_stg'
-											<?php echo isset($rt->max_teilnehmer) && $teilnehmer_anzahl >= $rt->max_teilnehmer ? 'disabled' : '' ?>
-											value='Anmelden'
-											onclick='location.href="<?php echo $_SERVER['PHP_SELF'] ?>?active=aufnahme&rt_id=<?php echo $rt->reihungstest_id ?>&pre=<?php echo $row->prestudent_id ?>"'>
-									</td>
+									<th>angemeldet / Plätze</th>
+									<th>Datum</th>
+									<th>Uhrzeit</th>
+									<th>Ort</th>
+									<th title="<?php echo $row->studiengang_kz ?>">Studiengang</th>
+									<th>&nbsp;</th>
 								</tr>
-								<?php
+							<?php
+							foreach($reihungstest->result as $rt)
+							{
+								$teilnehmer_anzahl = $reihungstest->getTeilnehmerAnzahl($rt->reihungstest_id);
+								$spalte1 = $rt->max_teilnehmer ? $teilnehmer_anzahl . '/' . $rt->max_teilnehmer : '';
+
+								// bereits angenommen
+								if($row->reihungstest_id == $rt->reihungstest_id)
+								{
+									$rt_help = true; ?>
+									<tr style='background-color:lightgrey;'>
+										<td><?php echo $spalte1 ?></td>
+										<td><?php echo $rt->datum ?></td>
+										<td><?php echo $rt->uhrzeit ?></td>
+										<td><?php echo $rt->ort_kurzbz ?></td>
+										<td><?php echo $stg->bezeichnung ?></td>
+										<td>
+											<input type='button' name='btn_stg'
+												value='Stornieren'
+												onclick='location.href="<?php echo $_SERVER['PHP_SELF'] ?>?active=aufnahme&rt_id=<?php echo $rt->reihungstest_id ?>&pre=<?php echo $row->prestudent_id ?>&delete"'>
+										</td>
+									</tr>
+									<?php
+								}
+								else
+								{
+									?>
+									<tr>
+										<td><?php echo $spalte1 ?></td>
+										<td><?php echo $rt->datum ?></td>
+										<td><?php echo $rt->uhrzeit ?></td>
+										<td><?php echo $rt->ort_kurzbz ?></td>
+										<td><?php echo $stg->bezeichnung ?></td>
+										<td>
+											<input type='button' name='btn_stg'
+												<?php echo isset($rt->max_teilnehmer) && $teilnehmer_anzahl >= $rt->max_teilnehmer ? 'disabled' : '' ?>
+												value='Anmelden'
+												onclick='location.href="<?php echo $_SERVER['PHP_SELF'] ?>?active=aufnahme&rt_id=<?php echo $rt->reihungstest_id ?>&pre=<?php echo $row->prestudent_id ?>"'>
+										</td>
+									</tr>
+									<?php
+								}
 							}
-						}
-						?>
-						</table><br>
+							?>
+							</table>
+						</div><br>
 						<?php
 					}
 
 					?>
+					<button class="btn-nav btn btn-default" type="button" data-jump-tab="zahlungen">
+						Zurück
+					</button>
+					<button class="btn-nav btn btn-default" type="button" data-jump-tab="abschicken">
+						Weiter
+					</button>
 				</div>
 
 				<div role="tabpanel" class="tab-pane" id="abschicken">
 					<h2>Bewerbung abschicken</h2>
-					<p>Haben Sie alle Daten korrekt ausgefüllt bzw. alle Dokumente auf das System hochgeladen, können Sie Ihre Bewerbung abschicken.<br>
+					<p>
+						Haben Sie alle Daten korrekt ausgefüllt bzw. alle Dokumente auf das System hochgeladen, können Sie Ihre Bewerbung abschicken.<br>
 						Die jeweilige Studiengangsassistenz wird sich in den folgenden Tagen, bezüglich der Bewerbung, bei Ihnen Melden.
 						<br><br>
 						Bitte überprüfen Sie nochmals Ihre Daten.<br>
 						Um Ihre Bewerbung jetzt abzuschließen klicken auf folgenden Link:
-					</p><br><br>
+					</p>
 					<?php
 
 					$disabled = 'disabled';
@@ -1134,17 +1163,24 @@ foreach($prestudent->result as $row)
 
 					foreach($prestudent_help->result as $prest):
 						$stg->load($prest->studiengang_kz); ?>
-						<br>Bewerbung abschicken für <?php echo $stg->bezeichnung ?><br>
-
-						<form method="POST" action="<?php echo $_SERVER['PHP_SELF'] ?>">
-							<input class="btn btn-default" type="submit" value="Bewerbung abschicken (<?php echo $stg->kurzbzlang ?>)" name="btn_bewerbung_abschicken" <?php echo $disabled ?>>
-							<input type="hidden" name="prestudent_id" value="<?php echo $prest->prestudent_id ?>">
-						</form>
+						<div class="row">
+							<div class="col-md-6 col-sm-8 col-xs-10">
+								<form method="POST" action="<?php echo basename(__FILE__) ?>">
+									<div class="form-group">
+										<label for="<?php echo $stg->kurzbzlang ?>">Bewerbung abschicken für <?php echo $stg->bezeichnung ?></label>
+										<input id="<?php echo $stg->kurzbzlang ?>" class="btn btn-default form-control" type="submit" value="Bewerbung abschicken (<?php echo $stg->kurzbzlang ?>)" name="btn_bewerbung_abschicken" <?php echo $disabled ?>>
+										<input type="hidden" name="prestudent_id" value="<?php echo $prest->prestudent_id ?>">
+									</div>
+								</form>
+							</div>
+						</div>
 					<?php endforeach; ?>
+					<button class="btn-nav btn btn-default" type="button" data-jump-tab="aufnahme">
+						Zurück
+					</button>
 				</div>
 			</div>
 		</div>
-
 	</body>
 </html>
 

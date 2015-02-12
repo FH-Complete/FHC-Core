@@ -152,15 +152,6 @@ input.search input.text
 	border-color: #A5AFB6;
 	height: 25px;
 }
-/* Formularfelder Bewerberportal */
-input.input_bewerbung					
-{
-	background-color: #E9ECEE;
-	border-width: 1px;
-	border-style:solid;
-	border-color: #A5AFB6;
-	height: 20px;
-}
 /* Login-Button CIS-Seite */
 input.cis_login
 {

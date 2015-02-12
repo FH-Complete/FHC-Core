@@ -111,8 +111,12 @@ $(function() {
 		$('#bewerber-navigation a[href="#' + activeTab + '"]').tab('show');
 	}
 
-	$('.btn_weiter').on('click', function() {
-		var tabname = $(this).attr('data-next-tab');
+	$('.btn-nav').on('click', function() {
+		var tabname = $(this).attr('data-jump-tab');
 		$('#bewerber-navigation a[href="#' + tabname + '"]').tab('show');
+	});
+
+	$('#bewerber-navigation a').on('click', function() {
+		$(this).closest('.collapse').collapse('hide');
 	});
 });

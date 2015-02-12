@@ -30,6 +30,15 @@ $this->phrasen['bewerbung/bitteGeburtsdatumEintragen']='Bitte tragen Sie Ihr Geb
 $this->phrasen['bewerbung/bitteGeschlechtWaehlen']='Bitte geben Sie Ihr Geschlecht ein.'; //noch zu übersetzen
 $this->phrasen['bewerbung/bitteEmailAngeben']='Bitte geben Sie eine gültige eMail-Adresse ein.'; //noch zu übersetzen
 $this->phrasen['bewerbung/bitteStudienbeginnWaehlen']='Bitte wählen Sie den gewünschten Studienbeginn.'; //noch zu übersetzen
-$this->phrasen['bewerbung/captcha']='Please enter the text as seen in the picture (Spamschutz).'; //Nur gefühlsmäßig übersetzt
+$this->phrasen['bewerbung/captcha']='Please enter the text as seen in the picture (spam protection).'; //Nur gefühlsmäßig übersetzt
 $this->phrasen['bewerbung/andereGrafik']='Reload picture'; //Nur gefühlsmäßig übersetzt
-?>
+$this->phrasen['bewerbung/datumFormat']='dd.mm.yyyy';
+$this->phrasen['bewerbung/egal']='no preference';
+$this->phrasen['bewerbung/orgform']='Organisationsform';
+$this->phrasen['bewerbung/orgform/berufsbegleitend']='extra-occupational';
+$this->phrasen['bewerbung/orgform/vollzeit']='Full time';
+$this->phrasen['bewerbung/sprache']='Language';
+$this->phrasen['bewerbung/sprache/deutsch']='German';
+$this->phrasen['bewerbung/sprache/englisch']='English';
+$this->phrasen['bewerbung/topprio']='Top priority';
+$this->phrasen['bewerbung/alternative']='Alternative';
