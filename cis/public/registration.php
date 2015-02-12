@@ -309,12 +309,14 @@ if ($userid)
 							<?php echo $p->t('bewerbung/zugangscode') ?> <?php echo $p->t('bewerbung/fallsVorhanden') ?>
 						</label>
 						<div class="col-sm-4">
-							<input type="text" class="form-control" id="zugangscode" name="userid" placeholder="<?php echo $p->t('bewerbung/zugangscode') ?>">
-						</div>
-						<div class="col-sm-3">
-							<button type="submit" class="btn btn-default" value="Login">
-								<?php echo $p->t('bewerbung/login') ?>
-							</button>
+							<div class="input-group">
+								<input type="text" class="form-control" id="zugangscode" name="userid" placeholder="<?php echo $p->t('bewerbung/zugangscode') ?>">
+								<span class="input-group-btn">
+									<button type="submit" class="btn btn-primary" value="Login">
+										<?php echo $p->t('bewerbung/login') ?>
+									</button>
+								</span>
+							</div>
 						</div>
 					</div>
 
@@ -413,6 +415,7 @@ if ($userid)
 										<label>
 											<input type="checkbox" name="studiengaenge[]" value="<?php echo $result->studiengang_kz ?>" <?php echo $checked ?>>
 											<?php echo $result->bezeichnung ?>
+											<span class="badge" id="badge<?php echo $result->studiengang_kz ?>"></span>
 											<input type="hidden" id="anmerkung<?php echo $result->studiengang_kz ?>">
 										</label>
 									</div>
@@ -436,7 +439,7 @@ if ($userid)
 					</div>
 					<div class="form-group">
 						<div class="col-sm-4 col-sm-offset-3">
-							<input type="submit" name="submit" value="<?php echo $p->t('bewerbung/registrieren') ?>" onclick="return checkRegistration()" class="btn btn-default">
+							<input type="submit" name="submit" value="<?php echo $p->t('bewerbung/registrieren') ?>" onclick="return checkRegistration()" class="btn btn-primary">
 						</div>
 					</div>
 				</form>
@@ -451,11 +454,15 @@ if ($userid)
 							<img class="center-block img-responsive" src="../../skin/styles/<?php echo DEFAULT_STYLE ?>/logo.png">
 							<p class="text-center"><?php echo $p->t('bewerbung/registrierenOderZugangscode') ?></p>
 							<div class="form-group">
-								<input class="form-control" type="text" placeholder="<?php echo $p->t('bewerbung/zugangscode') ?>" name="userid">
+								<div class="input-group">
+									<input class="form-control" type="text" placeholder="<?php echo $p->t('bewerbung/zugangscode') ?>" name="userid">
+									<span class="input-group-btn">
+										<button class="btn btn-primary" type="submit" name="submit">
+											Login
+										</button>
+									</span>
+								</div>
 							</div>
-							<button class="center-block btn btn-default" type="submit" name="submit">
-								Login
-							</button>
 							<?php
 							if(isset($errormsg))
 							{
@@ -487,13 +494,13 @@ if ($userid)
 							</div>
 							<div class="radio">
 								<label>
-									<input type="radio" name="<?php echo $prio ?>Orgform" value="vz">
+									<input type="radio" name="<?php echo $prio ?>Orgform" value="VZ">
 									<?php echo $p->t('bewerbung/orgform/vollzeit') ?>
 								</label>
 							</div>
 							<div class="radio">
 								<label>
-									<input type="radio" name="<?php echo $prio ?>Orgform" value="bb">
+									<input type="radio" name="<?php echo $prio ?>Orgform" value="BB">
 									<?php echo $p->t('bewerbung/orgform/berufsbegleitend') ?>
 								</label>
 							</div>
@@ -508,13 +515,13 @@ if ($userid)
 							</div>
 							<div class="radio">
 								<label>
-									<input type="radio" name="<?php echo $prio ?>Sprache" value="de">
+									<input type="radio" name="<?php echo $prio ?>Sprache" value="De">
 									<?php echo $p->t('bewerbung/sprache/deutsch') ?>
 								</label>
 							</div>
 							<div class="radio">
 								<label>
-									<input type="radio" name="<?php echo $prio ?>Sprache" value="en">
+									<input type="radio" name="<?php echo $prio ?>Sprache" value="En">
 									<?php echo $p->t('bewerbung/sprache/englisch') ?>
 								</label>
 							</div>
@@ -523,7 +530,7 @@ if ($userid)
 				<?php endforeach; ?>
 					<div class="modal-footer">
 						<button class="btn btn-default cancel-prio" data-dismiss="modal"><?php echo $p->t('bewerbung/abbrechen') ?></button>
-						<button class="btn btn-default ok-prio" data-dismiss="modal"><?php echo $p->t('bewerbung/ok') ?></button>
+						<button class="btn btn-primary ok-prio" data-dismiss="modal"><?php echo $p->t('bewerbung/ok') ?></button>
 					</div>
 				</div>
 		</div></div></div>
@@ -559,15 +566,17 @@ if ($userid)
 				{
 					var gebDat = document.RegistrationLoginForm.geb_datum.value;
 					gebDat = gebDat.split(".");
+
 					if(gebDat.length !== 3)
 					{
-					alert("<?php echo $p->t('bewerbung/bitteGeburtsdatumEintragen')?>");
-					return false;
+						alert("<?php echo $p->t('bewerbung/bitteGeburtsdatumEintragen')?>");
+						return false;
 					}
+
 					if(gebDat[0].length !==2 && gebDat[1].length !== 2 && gebDat[2].length !== 4)
 					{
-					alert("<?php echo $p->t('bewerbung/bitteGeburtsdatumEintragen')?>");
-					return false;
+						alert("<?php echo $p->t('bewerbung/bitteGeburtsdatumEintragen')?>");
+						return false;
 					}
 
 					var date = new Date(gebDat[2], gebDat[1], gebDat[0]);
@@ -579,8 +588,8 @@ if ($userid)
 
 					if(!(date.getFullYear() === gebDat[2] && date.getMonth() === gebDat[1] && date.getDate() === gebDat[0]))
 					{
-					alert("<?php echo $p->t('bewerbung/bitteGeburtsdatumEintragen')?>");
-					return false;
+						alert("<?php echo $p->t('bewerbung/bitteGeburtsdatumEintragen')?>");
+						return false;
 					}
 				}
 				if((document.getElementById('geschlechtm').checked == false)&&(document.getElementById('geschlechtw').checked == false))
@@ -612,7 +621,8 @@ if ($userid)
 						.addClass('inactive')
 						.slideUp(slideDuration);
 
-					anm.val('orgForm/Sprache: egal');
+					anm.val('keine Prio');
+					$('#badge' + stgkz).html(anm.val());
 
 				} else {
 
@@ -622,17 +632,15 @@ if ($userid)
 
 					anm.val('');
 
-					$('#prio-dialog input:checked').each(function(i, v) {
+					anm.val('Prio: ' + $('#topprio input[name="topprioOrgform"]:checked').val() + '/'
+							+ $('#topprio input[name="topprioSprache"]:checked').val());
 
-						var id = $(v).attr('name'),
-							value = $(v).val();
+					if($('#alternative input:checked[value="egal"]').length !== 2) {
+						anm.val(anm.val() + '; Alt: ' + $('#alternative input[name="alternativeOrgform"]:checked').val() + '/'
+							+ $('#alternative input[name="alternativeSprache"]:checked').val());
+					}
 
-						if(anm.val()) {
-							anm.val(anm.val() + '; ' + id + ': ' + value);
-						} else {
-							anm.val(id + ': ' + value);
-						}
-					});
+					$('#badge' + stgkz).html(anm.val());
 				}
 			}
 
@@ -646,19 +654,19 @@ if ($userid)
 
 				$('#liste-studiengaenge input').on('change', function() {
 
+					var stgkz = $(this).val();
+					$('#prio-dialog').data({stgkz: stgkz});
+
 					if($(this).prop('checked')) {
 
 						$('#prio-dialog input[value="egal"]').prop('checked', true);
 						checkPrios(0);
 
-						$('#prio-dialog')
-							.data({stgkz: $(this).val()})
-							.modal('show');
+						$('#prio-dialog').modal('show');
+					} else {
+
+						$('#badge' + stgkz).html('');
 					}
-				});
-
-				$('#prio-dialog').on('hide.bs.modal', function() {
-
 				});
 
 				$('#prio-dialog button.cancel-prio').on('click', function() {
@@ -666,9 +674,11 @@ if ($userid)
 					var stgkz = $('#prio-dialog').data('stgkz');
 
 					$('#liste-studiengaenge input[value="' + stgkz + '"]').prop('checked', false);
+					$('#badge' + stgkz).html('');
 				});
 
 				$('#prio-dialog button.ok-prio').on('click', function() {
+
 					checkPrios(0);
 				});
 
