@@ -42,3 +42,6 @@ $this->phrasen['bewerbung/sprache/deutsch']='German';
 $this->phrasen['bewerbung/sprache/englisch']='English';
 $this->phrasen['bewerbung/topprio']='Top priority';
 $this->phrasen['bewerbung/alternative']='Alternative';
+$this->phrasen['bewerbung/priowaehlen']='Select primary and alternative course of studies';
+$this->phrasen['bewerbung/ok']='OK';
+$this->phrasen['bewerbung/abbrechen']='Cancel';

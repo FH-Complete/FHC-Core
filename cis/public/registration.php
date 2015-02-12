@@ -97,7 +97,6 @@ if ($userid)
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<meta name="robots" content="noindex">
 		<link href="../../include/css/bootstrap.min.css" rel="stylesheet" type="text/css">
-		<link href="../../include/css/jquery-ui.1.11.2.min.css" rel="stylesheet" type="text/css">
 		<link href="../../include/css/registration.css" rel="stylesheet" type="text/css">
 	</head>
 	<body class="main">
@@ -468,59 +467,67 @@ if ($userid)
 				</div>
 			<?php endif; ?>
 		</div>
-		<div id="prio-dialog">
-			<?php foreach(array('topprio', 'alternative') as $prio): ?>
-				<div class="row" id="<?php echo $prio ?>">
-					<div class="col-sm-12">
-						<h3><?php echo $p->t('bewerbung/' . $prio) ?></h3>
+		<div class="modal fade" id="prio-dialog"><div class="modal-dialog"><div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close cancel-prio" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title"><?php echo $p->t('bewerbung/priowaehlen') ?></h4>
+				</div>
+				<div class="model-body">
+				<?php foreach(array('topprio', 'alternative') as $prio): ?>
+					<div class="" id="<?php echo $prio ?>">
+						<div class="col-sm-6">
+							<h4><?php echo $p->t('bewerbung/orgform') ?></h4>
+							<div class="radio">
+								<label>
+									<input type="radio" name="<?php echo $prio ?>Orgform" value="egal">
+									<?php echo $p->t('bewerbung/egal') ?>
+								</label>
+							</div>
+							<div class="radio">
+								<label>
+									<input type="radio" name="<?php echo $prio ?>Orgform" value="vz">
+									<?php echo $p->t('bewerbung/orgform/vollzeit') ?>
+								</label>
+							</div>
+							<div class="radio">
+								<label>
+									<input type="radio" name="<?php echo $prio ?>Orgform" value="bb">
+									<?php echo $p->t('bewerbung/orgform/berufsbegleitend') ?>
+								</label>
+							</div>
+						</div>
+						<div class="col-sm-6">
+							<h4><?php echo $p->t('bewerbung/sprache') ?></h4>
+							<div class="radio">
+								<label>
+									<input type="radio" name="<?php echo $prio ?>Sprache" value="egal">
+									<?php echo $p->t('bewerbung/egal') ?>
+								</label>
+							</div>
+							<div class="radio">
+								<label>
+									<input type="radio" name="<?php echo $prio ?>Sprache" value="de">
+									<?php echo $p->t('bewerbung/sprache/deutsch') ?>
+								</label>
+							</div>
+							<div class="radio">
+								<label>
+									<input type="radio" name="<?php echo $prio ?>Sprache" value="en">
+									<?php echo $p->t('bewerbung/sprache/englisch') ?>
+								</label>
+							</div>
+						</div>
 					</div>
-					<div class="col-sm-6">
-						<h4><?php echo $p->t('bewerbung/orgform') ?></h4>
-						<div class="radio">
-							<label>
-								<input type="radio" name="<?php echo $prio ?>Orgform" value="egal">
-								<?php echo $p->t('bewerbung/egal') ?>
-							</label>
-						</div>
-						<div class="radio">
-							<label>
-								<input type="radio" name="<?php echo $prio ?>Orgform" value="vz">
-								<?php echo $p->t('bewerbung/orgform/vollzeit') ?>
-							</label>
-						</div>
-						<div class="radio">
-							<label>
-								<input type="radio" name="<?php echo $prio ?>Orgform" value="bb">
-								<?php echo $p->t('bewerbung/orgform/berufsbegleitend') ?>
-							</label>
-						</div>
-					</div>
-					<div class="col-sm-6">
-						<h4><?php echo $p->t('bewerbung/sprache') ?></h4>
-						<div class="radio">
-							<label>
-								<input type="radio" name="<?php echo $prio ?>Sprache" value="egal">
-								<?php echo $p->t('bewerbung/egal') ?>
-							</label>
-						</div>
-						<div class="radio">
-							<label>
-								<input type="radio" name="<?php echo $prio ?>Sprache" value="de">
-								<?php echo $p->t('bewerbung/sprache/deutsch') ?>
-							</label>
-						</div>
-						<div class="radio">
-							<label>
-								<input type="radio" name="<?php echo $prio ?>Sprache" value="en">
-								<?php echo $p->t('bewerbung/sprache/englisch') ?>
-							</label>
-						</div>
+				<?php endforeach; ?>
+					<div class="modal-footer">
+						<button class="btn btn-default cancel-prio" data-dismiss="modal"><?php echo $p->t('bewerbung/abbrechen') ?></button>
+						<button class="btn btn-default ok-prio" data-dismiss="modal"><?php echo $p->t('bewerbung/ok') ?></button>
 					</div>
 				</div>
-			<?php endforeach; ?>
-		</div>
+		</div></div></div>
 		<script src="../../include/js/jquery.min.1.11.1.js"></script>
-		<script src="../../include/js/jquery-ui.1.11.2.min.js"></script>
 		<script src="../../include/js/bootstrap.min.js"></script>
 		<script type="text/javascript">
 
@@ -594,13 +601,6 @@ if ($userid)
 				return true;
 			}
 
-			function savePreferences() {
-
-				$('#prio-dialog').dialog('close');
-
-				checkPrios(0);
-			}
-
 			function checkPrios(slideDuration) {
 
 				var stgkz = $('#prio-dialog').data('stgkz'),
@@ -652,26 +652,24 @@ if ($userid)
 						checkPrios(0);
 
 						$('#prio-dialog')
-								.data({stgkz: $(this).val()})
-								.dialog('open');
+							.data({stgkz: $(this).val()})
+							.modal('show');
 					}
 				});
 
-				$('#prio-dialog').dialog({
-					modal: true,
-					autoOpen: false,
-					width: 600,
-					height: 600,
-					buttons: {
-						OK: savePreferences,
-						Cancel: function() {
+				$('#prio-dialog').on('hide.bs.modal', function() {
 
-							var stgkz = $('#prio-dialog').data('stgkz');
+				});
 
-							$('#prio-dialog').dialog('close');
-							$('#liste-studiengaenge input[value="' + stgkz + '"]').prop('checked', false);
-						}
-					}
+				$('#prio-dialog button.cancel-prio').on('click', function() {
+
+					var stgkz = $('#prio-dialog').data('stgkz');
+
+					$('#liste-studiengaenge input[value="' + stgkz + '"]').prop('checked', false);
+				});
+
+				$('#prio-dialog button.ok-prio').on('click', function() {
+					checkPrios(0);
 				});
 
 				$('#prio-dialog input').on('change', function() {
