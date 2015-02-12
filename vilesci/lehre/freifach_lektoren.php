@@ -56,9 +56,17 @@ else
 <title>Lehrveranstaltung Verwaltung</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
-<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+<link rel="stylesheet" href="../../skin/tablesort.css" type="text/css">
+<script type="text/javascript" src="../../include/js/jquery.js"></script>
 <script  type="text/javascript">
+$(document).ready(function() 
+{ 
+	$("#t1").tablesorter(
+	{
+		sortList: [[0,0],[2,0]],
+		widgets: ["zebra"]
+	}); 
+}); 
 function selectAll()
 {
 	var a = document.getElementById("anmeldungen");
@@ -100,15 +108,25 @@ function selectAll()
 
 	echo "</td></tr>";
 	echo "</table>";
-	
-	echo "<table border='1'>";
+	echo "<br>";
+	echo "<table style='width:10%' id='t1' class='tablesorter'>";
+	echo "<thead>";
+	echo "<tr>";				
+	echo "<th>UID</th>";
+	echo "<th>LV-ID</th>";
+	echo "<th>Bezeichnung</th>";
+	echo "<th title='Stundensatz'>Satz</th>";
+	echo "<th title='Semesterstunden'>SS</th>";
+	echo "<th title='Planstunden'>PS</th>";
+	echo "<th>Summe</td>";
+	echo "</tr></thead><tbody>";
 	$emailstr = "";
 	$emailarr = array();
 
 	$qry = "SELECT 
 				tbl_lehreinheitmitarbeiter.mitarbeiter_uid,  tbl_lehrveranstaltung.lehrveranstaltung_id, 
 				tbl_lehrveranstaltung.bezeichnung, tbl_lehreinheitmitarbeiter.stundensatz, 
-				tbl_lehreinheitmitarbeiter.semesterstunden 
+				tbl_lehreinheitmitarbeiter.semesterstunden, tbl_lehreinheitmitarbeiter.planstunden
 			FROM
 				lehre.tbl_lehreinheitmitarbeiter, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung 
 			WHERE 
@@ -116,8 +134,9 @@ function selectAll()
 				tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND 
 				tbl_lehrveranstaltung.studiengang_kz = 0 AND 
 				tbl_lehrveranstaltung.lehre = TRUE AND 
-				tbl_lehreinheitmitarbeiter.stundensatz > 0 AND 
-				tbl_lehreinheitmitarbeiter.semesterstunden > 0 AND 
+				((tbl_lehreinheitmitarbeiter.stundensatz > 0 AND 
+				tbl_lehreinheitmitarbeiter.semesterstunden > 0) OR 
+				tbl_lehreinheitmitarbeiter.planstunden > 0) AND
 				tbl_lehreinheit.studiensemester_kurzbz = '".$stsem."' 
 			ORDER BY mitarbeiter_uid, lehrveranstaltung_id;";
 
@@ -129,9 +148,10 @@ function selectAll()
 			echo "<tr>";				
 			echo "<td><b>".$row->mitarbeiter_uid."</b></td>";
 			echo "<td>".$row->lehrveranstaltung_id."</td>";
-			echo "<td>".$row->bezeichnung."</td>";
+			echo "<td><nobr>".$row->bezeichnung."</nobr></td>";
 			echo "<td>".$row->stundensatz."</td>";
 			echo "<td>".$row->semesterstunden."</td>";
+			echo "<td>".$row->planstunden."</td>";
 			$gesamt = $row->semesterstunden * $row->stundensatz;
 			echo "<td align='right'><b>".$gesamt."</b></td>";
 			echo "</tr>";
@@ -140,7 +160,7 @@ function selectAll()
 		}
 	}	
 
-	echo "</table>";
+	echo "</tbody></table>";
 	echo "<br><br>";
 	foreach ($emailarr as $mail)
 		$emailstr .= $mail.'@'.DOMAIN.', ';
