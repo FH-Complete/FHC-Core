@@ -239,17 +239,23 @@ if(isset($_POST["schick"]) && $error=='')
 				{
 					if($row_betr=$db->db_fetch_object($betr))
 					{
-					
-						$mail = new mail($row_betr->mitarbeiter_uid."@".DOMAIN, "no-reply@".DOMAIN, "Neuer Termin Bachelor-/Masterarbeitsbetreuung im Studiengang $stgbez",
-						"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\nDer Studiengang $stgbez hat (einen) neue(n) Termin(e) angelegt für Ihre Betreuung von ".($row_std->anrede=="Herr"?"Herrn":$row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost).":".$mailtermine_lk."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Masterarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Masterarbeitsabgabe\n--------------------------------------------------------------------------");
-						$mail->setReplyTo($user."@".DOMAIN);
-						if(!$mail->send())
+						if($row_betr->mitarbeiter_uid!='')
 						{
-							echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den (Erst-)Begutachter(in)! ($row_betr->first)</font><br>&nbsp;<br>";	
+							$mail = new mail($row_betr->mitarbeiter_uid."@".DOMAIN, "no-reply@".DOMAIN, "Neuer Termin Bachelor-/Masterarbeitsbetreuung im Studiengang $stgbez",
+							"Sehr geehrte".($row_betr->anrede=="Herr"?"r":"")." ".$row_betr->anrede." ".$row_betr->first."!\n\nDer Studiengang $stgbez hat (einen) neue(n) Termin(e) angelegt für Ihre Betreuung von ".($row_std->anrede=="Herr"?"Herrn":$row_std->anrede)." ".trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost).":".$mailtermine_lk."\n\nMfG\nDie Studiengangsassistenz\n\n--------------------------------------------------------------------------\nDies ist ein vom Bachelor-/Masterarbeitsabgabesystem generiertes Info-Mail\ncis->Mein CIS->Bachelor- und Masterarbeitsabgabe\n--------------------------------------------------------------------------");
+							$mail->setReplyTo($user."@".DOMAIN);
+							if(!$mail->send())
+							{
+								echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den (Erst-)Begutachter(in)! ($row_betr->first)</font><br>&nbsp;<br>";	
+							}
+							else 
+							{
+								echo "Mail verschickt an Erstbegutachter(in): ".$row_betr->first."<br>";
+							}
 						}
-						else 
+						else
 						{
-							echo "Mail verschickt an Erstbegutachter(in): ".$row_betr->first."<br>";
+							echo "<font color=\"#FF0000\">Fehler beim Versenden des Mails an den (Erst-)Begutachter(in)! ($row_betr->first ist kein Mitarbeiter)</font><br>&nbsp;<br>";	
 						}
 					}
 					else 
@@ -317,6 +323,17 @@ $htmlstr='';
 		<link rel="stylesheet" href="../../include/js/tablesort/table.css" type="text/css">
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 		<script src="../../include/js/tablesort/table.js" type="text/javascript"></script>
+		<script>
+			function checkdatum(datum)
+			{
+				if(!datum.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/))
+				{
+					alert("Datum muss im Format dd.mm.YYYY eingegeben werden");
+					return false;
+				}
+				return true;
+			}
+		</script>
 		</head>
 		<body class="Background_main"  style="background-color:#eeeeee;">
 		<h3>Eingabe von Terminen f&uuml;r mehrere Personen</h3><br>';
@@ -342,7 +359,7 @@ $htmlstr='';
 				$htmlstr .= "<td><input type='checkbox' name='fixterminx' onclick='if (this.checked) {document.getElementById(\"fixtermin".($x+1)."\").value=1;}else{document.getElementById(\"fixtermin".($x+1)."\").value=0;}'>";
 			}
 			$htmlstr .= "<input type='text'  style='display:none;' id='fixtermin".($x+1)."'  name='fixtermin[]' value='".$fixtermin[$x]."'></td>";
-			$htmlstr .= "		<td><input  type='text' name='datum[]' size='10' maxlegth='10' value='".$datum_obj->checkformatDatum($datum[$x],'d.m.Y')."'></td>\n";
+			$htmlstr .= "		<td><input  type='text' name='datum[]' size='10' onchange='checkdatum(this.value)' maxlegth='10' value='".$datum_obj->checkformatDatum($datum[$x],'d.m.Y')."'></td>\n";
 			$htmlstr .= "		<td><select name='paabgabetyp_kurzbz[]'>\n";
 			$qry_typ = "SELECT * FROM campus.tbl_paabgabetyp";
 			$result_typ=$db->db_query($qry_typ);
@@ -371,7 +388,7 @@ $htmlstr='';
 		$htmlstr .= '<tr id="termin'.($x+1).'">';
 		$htmlstr .= '<td><input type="checkbox" name="fixterminx" onclick="if (this.checked) {document.getElementById(\"fixtermin".($x+1)."\").value=1;}else{document.getElementById(\"fixtermin".($x+1)."\").value=0;}">';
 		$htmlstr .= "<input type='text' style='display:none;' id='fixtermin".($x+1)."' name='fixtermin[]' value='0'></td>";
-		$htmlstr .= "		<td><input  type='text' name='datum[]' size='10' maxlegth='10'></td>\n";
+		$htmlstr .= "		<td><input  type='text' name='datum[]' onchange='checkdatum(this.value)' size='10' maxlegth='10'></td>\n";
 		$htmlstr .= "		<td><select name='paabgabetyp_kurzbz[]'>\n";
 		$qry_typ = "SELECT * FROM campus.tbl_paabgabetyp";
 		$result_typ=$db->db_query($qry_typ);
