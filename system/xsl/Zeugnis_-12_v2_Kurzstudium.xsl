@@ -290,6 +290,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
         <style:style style:name="P27" style:family="paragraph" style:parent-style-name="Standard">
             <style:text-properties fo:font-size="5pt" officeooo:rsid="000f65a0" officeooo:paragraph-rsid="000f65a0" style:font-size-asian="1.75pt" style:font-size-complex="2pt"/>
         </style:style>
+        <style:style style:name="P28" style:family="paragraph" style:parent-style-name="Standard">
+            <style:text-properties fo:font-size="12pt" officeooo:rsid="000f65a0" officeooo:paragraph-rsid="000f65a0" style:font-size-asian="12pt" style:font-size-complex="12pt"/>
+        </style:style>
         <style:style style:name="T1" style:family="text">
             <style:text-properties fo:font-weight="bold" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
         </style:style>
@@ -373,7 +376,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				</xsl:choose>
             </text:p>
             <text:p text:style-name="P5"/>
-            <text:p text:style-name="P5">Kurzstudium</text:p>
+            <text:p text:style-name="P28">Lehrgang zur Weiterbildung nach §9 FHStG idgF</text:p>
             <text:p text:style-name="P1">
                 <draw:frame draw:style-name="fr2" draw:name="Rahmen2" text:anchor-type="paragraph" svg:width="10.999cm" draw:z-index="2">
                     <draw:text-box fo:min-height="0.499cm">

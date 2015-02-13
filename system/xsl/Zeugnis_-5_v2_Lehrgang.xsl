@@ -380,7 +380,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             <text:p text:style-name="P1">
                 <draw:frame draw:style-name="fr2" draw:name="Rahmen2" text:anchor-type="paragraph" svg:width="8.999cm" draw:z-index="2">
                     <draw:text-box fo:min-height="0.499cm">
-                        <text:p text:style-name="P6">Akademisch geprüfter Social Media Manager</text:p>
+                        <text:p text:style-name="P6">Social Media Management</text:p>
                     </draw:text-box>
                 </draw:frame>
             </text:p>

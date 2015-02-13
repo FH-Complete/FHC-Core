@@ -349,7 +349,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                             </table:table-cell>
                             <table:table-cell table:style-name="Tabelle3.C2" office:value-type="string">
                                 <text:p text:style-name="P17"><xsl:value-of select="studiengangsleiter" /></text:p>
-                                <text:p text:style-name="P17">Studiengangsleitung</text:p>
+                                <text:p text:style-name="P17">Lehrgangsleitung</text:p>
                             </table:table-cell>
                         </table:table-row>
                     </table:table>
@@ -365,19 +365,19 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 						<xsl:value-of select="stsem"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<xsl:value-of select="semester_bezeichnung"/>
-						<xsl:text> (</xsl:text>
+						<xsl:value-of select="semester -1"/>
+						<xsl:text>. Semester (</xsl:text>
 						<xsl:value-of select="stsem"/>
 						<xsl:text>)</xsl:text>
 					</xsl:otherwise>
 				</xsl:choose>
             </text:p>
             <text:p text:style-name="P5"/>
-            <text:p text:style-name="P5"/>
+            <text:p text:style-name="P5">Kurzstudium</text:p>
             <text:p text:style-name="P1">
                 <draw:frame draw:style-name="fr2" draw:name="Rahmen2" text:anchor-type="paragraph" svg:width="10.999cm" draw:z-index="2">
                     <draw:text-box fo:min-height="0.499cm">
-                        <text:p text:style-name="P6"><xsl:value-of select="studiengang"/></text:p>
+                        <text:p text:style-name="P6">App-/Web-Developer</text:p>
                     </draw:text-box>
                 </draw:frame>
             </text:p>
@@ -387,7 +387,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             <text:p text:style-name="P1"/>
             <text:p text:style-name="P1"/>
             <text:p text:style-name="P2">Personenkennzeichen: <xsl:value-of select="matrikelnr" /></text:p>
-            <text:p text:style-name="P2">Kennzahl des Studienganges: <xsl:value-of select="studiengang_kz" /></text:p>
+            <text:p text:style-name="P2">Kennzahl des Lehrgangs: 0050007</text:p>
             <text:p text:style-name="P2"/>
             <text:p text:style-name="P3"/>
             <text:p text:style-name="P3"/>
