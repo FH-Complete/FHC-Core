@@ -37,7 +37,7 @@ $db = new basis_db();
 
 function draw_studienerfolg($uid, $studiensemester_kurzbz)
 {
-	global $xml, $note_arr, $datum;
+	global $xml, $note_arr, $datum, $note_wert;
 
 	$db = new basis_db();
 	$query = "SELECT 
@@ -198,9 +198,9 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 
 				$gesamtstunden +=$sws;
 				$gesamtects += $row->ects;
-				if(is_numeric($note))
+				if($note_wert[$row->note]!='')
 				{
-					$notensumme += $note;
+					$notensumme += $note_wert[$row->note];
 					$anzahl++;
 				}
 			}
@@ -214,7 +214,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	}
 	else
 		$schnitt = 0;
-	$xml .= "		<gesamtstunden>$gesamtstunden</gesamtstunden>";
+	$xml .= "		<gesamtstunden>".$gesamtstunden."</gesamtstunden>";
 	$xml .= "		<gesamtects>$gesamtects</gesamtects>";
 	$xml .= "		<schnitt>".sprintf('%.2f',$schnitt)."</schnitt>";
 	$xml .= "	</studienerfolg>";
@@ -237,10 +237,14 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 	}
 
 	$note_arr = array();
+	$note_wert = array();
 	$note = new note();
 	$note->getAll();
 	foreach ($note->result as $n)
+	{
 		$note_arr[$n->note] = $n->anmerkung;
+		$note_wert[$n->note] = $n->notenwert;
+	}
 
 	if(isset($_GET['ss']))
 		$studiensemester_kurzbz = $_GET['ss'];
