@@ -524,6 +524,40 @@ class studiensemester extends basis_db
 	}
 
 	/**
+	 * Liefert das Studiensemester das aktuell am naehesten zu $studiensemester_kurzbz liegt
+	 * 
+	 * @param $studiensemester_kurzbz
+	 * @return $studiensemester_kurzbz oder false wenn Fehler
+	 */
+	public function getNearestFrom($studiensemester_kurzbz)
+	{
+		$qry = "SELECT studiensemester_kurzbz, start, ende FROM public.vw_studiensemester
+				WHERE studiensemester_kurzbz<>".$this->db_add_param($studiensemester_kurzbz)."
+		        ORDER BY delta LIMIT 1";
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$this->start = $row->start;
+				$this->ende = $row->ende;
+				return $row->studiensemester_kurzbz;
+			}
+			else
+			{
+				$this->errormsg = 'Es wurde kein folgendes Studiensemester gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Ermitteln des folgenden Studiensemesters';
+			return false;
+		}
+	}
+
+	/**
 	 * Springt von Studiensemester $studiensemester_kurzbz um $wert Studiensemester vor/zurueck
 	 * 
 	 * @param $studiensemester_kurzbz
