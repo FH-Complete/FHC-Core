@@ -34,19 +34,29 @@ require_once('../include/basis_db.class.php');
 require_once('../include/functions.inc.php');
 
 $rdf_url='http://www.technikum-wien.at/lvinfo';
+$request=false;
 
 ?>
-
 <RDF:RDF
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	xmlns:LVINFO="<?php echo $rdf_url; ?>/rdf#"
 >
-
 <?php
 if(isset($_GET['stg_kz']) && is_numeric($_GET['stg_kz']))
-	$stg_kz=$_GET['stg_kz'];
+	{
+		$stg_kz=$_GET['stg_kz'];
+		$request=true;
+	}
 else 
 	unset($stg_kz);
+	
+if(isset($_GET['mitarbeiter_uid']))
+	{
+		$mitarbeiter_uid=$_GET['mitarbeiter_uid'];
+		$request=true;
+	}
+else 
+	unset($mitarbeiter_uid);
 
 if(isset($_GET['semester']))
 	if(is_numeric($_GET['semester']))
@@ -55,16 +65,21 @@ if(isset($_GET['semester']))
 		die('Semester muss eine gueltige Zahl sein');
 else 
 	unset($sem);
+	
+if(isset($_GET['studiensemester_kurzbz']))
+	$studiensemester_kurzbz=$_GET['studiensemester_kurzbz'];
+else 
+	unset($studiensemester_kurzbz);
 
 $qry = "
-SELECT 
+SELECT DISTINCT
 tbl_lehrveranstaltung.lehrveranstaltung_id as lv_lehrveranstaltung_id, 
-tbl_lehrveranstaltung.kurzbz as lv_kurzbz,
-tbl_lehrveranstaltung.lehreverzeichnis as lv_lehrevz,
-tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung,
-tbl_lehrveranstaltung.bezeichnung_english as lv_bezeichnung_english,
-tbl_lehrveranstaltung.studiengang_kz as lv_studiengang_kz,
-tbl_lehrveranstaltung.semester as lv_semester,
+tbl_lehrveranstaltung.kurzbz as lv_kurzbz, 
+tbl_lehrveranstaltung.lehreverzeichnis as lv_lehrevz, 
+tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung, 
+tbl_lehrveranstaltung.bezeichnung_english as lv_bezeichnung_english, 
+tbl_lehrveranstaltung.studiengang_kz as lv_studiengang_kz, 
+tbl_lehrveranstaltung.semester as lv_semester, 
 tbl_lehrveranstaltung.sprache as unterrichtssprache,
 tbl_lehrveranstaltung.ects as ects,
 tbl_lehrveranstaltung.semesterstunden as lv_semesterstunden,
@@ -72,8 +87,13 @@ tbl_lehrveranstaltung.orgform_kurzbz as orgform_kurzbz,
 tbl_lehrveranstaltung.incoming as incoming,
 lower(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stg_kuerzel,
 tbl_lvinfo.*
-FROM (lehre.tbl_lehrveranstaltung JOIN campus.tbl_lvinfo USING(lehrveranstaltung_id)) JOIN public.tbl_studiengang USING(studiengang_kz)
-WHERE 
+FROM (lehre.tbl_lehrveranstaltung JOIN campus.tbl_lvinfo USING (lehrveranstaltung_id)) 
+JOIN public.tbl_studiengang USING (studiengang_kz)";
+if(isset($mitarbeiter_uid) || isset($studiensemester_kurzbz))
+	$qry.= " JOIN lehre.tbl_lehreinheit USING (lehrveranstaltung_id) ";
+if(isset($mitarbeiter_uid))
+	$qry.= " JOIN lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id) ";
+$qry.="WHERE 
 tbl_lehrveranstaltung.aktiv=true AND
 tbl_lehrveranstaltung.lehre=true AND
 tbl_lvinfo.aktiv=true AND
@@ -81,11 +101,20 @@ tbl_lvinfo.genehmigt=true ";
 
 if(isset($stg_kz))
 	$qry.= " AND tbl_lehrveranstaltung.studiengang_kz='".addslashes($stg_kz)."'";
-
+	
+if(isset($mitarbeiter_uid))
+	$qry.= " AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid='".addslashes($mitarbeiter_uid)."'";
+	
+if(isset($studiensemester_kurzbz))
+	$qry.= " AND tbl_lehreinheit.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+	
 if(isset($sem))
 	$qry .= " AND tbl_lehrveranstaltung.semester='".addslashes($sem)."'";
 
-$qry .= "ORDER BY lv_studiengang_kz, lv_semester, lv_kurzbz, sprache";
+$qry .= " ORDER BY lv_studiengang_kz, lv_semester, lv_kurzbz, sprache";
+//echo $qry;
+if (!$request)
+	$qry='SELECT 1 WHERE 1=2;';
 $db = new basis_db();
 
 if($db->db_query($qry))

@@ -158,18 +158,31 @@ Attribute:</span><br>
   <li>anmerkung</li>
 </ul>
 <br>
+
 <h2>LVInfo</h2>
-Liefert das RDF fuer die Lehrveranstaltungsinformationen<br>
+Liefert das RDF fuer die Lehrveranstaltungsinformationen.<br>
+<br>
 <span style="font-weight: bold;">Aufruf:</span>
 lvinfo.rdf.php?stg_kz=...&amp;semester=...<br><br>
 <strong>Beispiele:</strong>
 <ul>
 	<li><a target="_blank" href="lvinfo.rdf.php?stg_kz=258&amp;semester=2">lvinfo.rdf.php?stg_kz=258&amp;semester=2</a></li>
-	<li><a target="_blank" href="lvinfo.rdf.php?stg_kz=258&amp;semester=2">lvinfo.rdf.php?mitarbeiter_uid=pam&amp;studiensemester_kurzbz=WS2014</a></li>
+	<li><a target="_blank" href="lvinfo.rdf.php?stg_kz=258&amp;studiensemester_kurzbz=WS2014">lvinfo.rdf.php?stg_kz=258&amp;studiensemester_kurzbz=WS2014</a></li>
+	<li><a target="_blank" href="lvinfo.rdf.php?mitarbeiter_uid=pam&studiensemester_kurzbz=WS2014">lvinfo.rdf.php?mitarbeiter_uid=pam&amp;studiensemester_kurzbz=WS2014</a></li>
 </ul>
+<strong>Standardfilter:</strong><br>
+<ul>
+	<li>tbl_lehrveranstaltung.aktiv=true</li>
+	<li>tbl_lehrveranstaltung.lehre=true</li>
+	<li>tbl_lvinfo.aktiv=true</li>
+	<li>tbl_lvinfo.genehmigt=true</li
+	<li>tbl_lehreinheitmitarbeiter muss gesetzt sein</li>
+</ul> 
 <span style="font-weight: bold;">Parameter</span>: <br>
 <ul>
-  <li>stg_kz - Studiengangskennzahl</li>
+  <li>stg_kz - Studiengangskennzahl (optional wenn Mitarbeiter gesetzt)</li>
+  <li>studiensemester_kurzbz - Studiensemester (optional)</li>
+  <li>mitarbeiter_uid - Lehrbeauftragter (optional wenn Studiengang gesetzt)</li>
   <li>semester - Semester (optional)</li>
 </ul>
 <span style="font-weight: bold;">
