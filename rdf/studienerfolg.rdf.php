@@ -153,12 +153,7 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 	if(!$obj->getZeugnisnoten($lehrveranstaltung_id=null, $uid, $studiensemester_kurzbz))
 		die('Fehler beim Laden der Noten:'.$obj->errormsg);
 
-	$qry = "SELECT wochen FROM public.tbl_semesterwochen 
-			WHERE studiengang_kz=".$db->db_add_param($row->studiengang_kz)." AND semester=".$db->db_add_param($row->semester);
-	$wochen = 15;
-	if($db->db_query($qry))
-		if($row_wochen = $db->db_fetch_object())
-			$wochen = $row_wochen->wochen;
+	
 
 	$gesamtstunden=0;
 	$gesamtects=0;
@@ -175,19 +170,33 @@ function draw_studienerfolg($uid, $studiensemester_kurzbz)
 				$note = "";
 			if($note!='')
 			{
+				$qry = "SELECT 
+							wochen 
+						FROM 
+							public.tbl_semesterwochen
+							JOIN lehre.tbl_lehrveranstaltung USING(studiengang_kz, semester)
+						WHERE 
+							tbl_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($row->lehrveranstaltung_id);
+
+				$wochen = 15;
+				if($db->db_query($qry))
+					if($row_wochen = $db->db_fetch_object())
+						$wochen = $row_wochen->wochen;
+
 				$xml .= "			<unterrichtsfach>";
 				$xml .= "				<bezeichnung><![CDATA[".$row->lehrveranstaltung_bezeichnung."]]></bezeichnung>";
 				$xml .= "				<bezeichnung_englisch><![CDATA[".$row->lehrveranstaltung_bezeichnung_english."]]></bezeichnung_englisch>";
 				$xml .= "				<note>".$note."</note>";
 				$xml .= "				<note_idx>".$row->note."</note_idx>";
-				$xml .= "				<sws>".sprintf('%.1f',$row->semesterstunden/$wochen)."</sws>";
+				$sws = sprintf('%.1F',$row->semesterstunden/$wochen);
+				$xml .= "				<sws>".$sws."</sws>";
 				$xml .= "				<ects>".$row->ects."</ects>";
 				$xml .= "				<lehrform><![CDATA[".$row->lv_lehrform_kurzbz."]]></lehrform>";
 				if($row->benotungsdatum!='')
 					$xml .= "				<benotungsdatum>".date('d.m.Y',$datum->mktime_fromtimestamp($row->benotungsdatum))."</benotungsdatum>";
 				$xml .= "			</unterrichtsfach>";
 
-				$gesamtstunden +=$row->semesterstunden/$wochen;
+				$gesamtstunden +=$sws;
 				$gesamtects += $row->ects;
 				if(is_numeric($note))
 				{
