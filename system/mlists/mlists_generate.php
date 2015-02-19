@@ -135,7 +135,7 @@ $error_msg='';
 		$error_msg.= $db->db_last_error();
 	while($row = $db->db_fetch_object($result))
 	{
-     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES (".$db->db_add_param($row->uid).",".$db->db_add_param(strtoupper($mlist_name))."', now(), 'mlists_generate')";
+     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES (".$db->db_add_param($row->uid).",".$db->db_add_param(strtoupper($mlist_name)).", now(), 'mlists_generate')";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
