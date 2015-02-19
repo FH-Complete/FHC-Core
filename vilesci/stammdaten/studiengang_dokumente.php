@@ -27,7 +27,7 @@ require_once('../../include/studiengang.class.php');
 require_once('../../include/dokument.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 
-$stg_kz=isset($_REQUEST['stg_kz'])?$_REQUEST['stg_kz']:'';
+$stg_kz=isset($_REQUEST['stg_kz'])?$_REQUEST['stg_kz']:'0';
 $dokument_kurzbz=isset($_REQUEST['dokument_kurzbz'])?$_REQUEST['dokument_kurzbz']:'';
 $onlinebewerbung=isset($_REQUEST['onlinebewerbung']);
 
