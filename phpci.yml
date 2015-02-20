@@ -7,6 +7,9 @@ setup:
 test:
     codeception:
         config: "tests"
+    php_loc:
+    php_docblock_checker:
+        allowed_warnings: -1
 #    php_unit:
 #        directory: "tests/phpunit/"
 #        args: "--bootstrap 'test/phpunit/bootstrap.php' --configuration 'tests/phpunit/phpunit.xml'"
