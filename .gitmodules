@@ -1,0 +1,3 @@
+[submodule "submodules/tablesorter"]
+	path = submodules/tablesorter
+	url = git@github.com:christianbach/tablesorter.git
