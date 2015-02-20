@@ -1,0 +1,14 @@
+build_settings:
+    verbose: false
+    prefer_symlink: false
+
+setup:
+
+test:
+	codeception:
+    	config: "."
+    php_unit:
+        directory: "tests/phpunit/"
+        args: "--bootstrap 'test/phpunit/bootstrap.php' --configuration 'tests/phpunit/phpunit.xml'"
+
+complete:
