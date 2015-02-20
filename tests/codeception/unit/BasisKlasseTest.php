@@ -1,5 +1,5 @@
 <?php
-require_once('basis.class.php');
+require_once('../../include/basis.class.php');
 
 class ExampleTest extends \Codeception\TestCase\Test
 {
