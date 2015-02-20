@@ -5,7 +5,7 @@ build_settings:
 setup:
 
 test:
-	codeception:
+    codeception:
     	config: "."
     php_unit:
         directory: "tests/phpunit/"
