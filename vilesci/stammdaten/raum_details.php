@@ -85,6 +85,9 @@
 		$content_id = $_POST['content_id'];
 		$ort_kurzbz_old = $_POST["ort_kurzbz_old"];
 		
+		$m2 = str_replace(',','.',$_POST["m2"]);
+		$oe_kurzbz = $_POST["oe_kurzbz"];
+		$gebteil = $_POST["gebteil"];
 		
 		$sg_update = new ort();
 		$sg_update->ort_kurzbz = $ort_kurzbz;
@@ -103,7 +106,9 @@
 		$sg_update->standort_id = $standort_id;
 		$sg_update->content_id = $content_id;
 		$sg_update->ort_kurzbz_old = $ort_kurzbz_old;
-
+		$sg_update->m2 = $m2;
+		$sg_update->gebteil = $gebteil;
+		$sg_update->oe_kurzbz = $oe_kurzbz;
 		
 		if ($_POST["neu"] == "true")
 			$sg_update->new = 1;
@@ -140,6 +145,9 @@
 		$standort_id = $sg->standort_id;
 		$telefonklappe = $sg->telefonklappe;
 		$content_id = $sg->content_id;
+		$gebteil = $sg->gebteil;
+		$m2 = $sg->m2;
+		$oe_kurzbz = $sg->oe_kurzbz;
 		$neu = "false";
 	}
 
@@ -301,8 +309,8 @@
 		$htmlstr .= '
 							</SELECT>
 						</td>
-						<td>Telefonklappe</td>
-						<td><input class="detail" type="text" name="telefonklappe" size="3" maxlength="8" value="'.$telefonklappe.'" onchange="submitable()"></td>
+						<td>Gebäudeteil</td>
+						<td><input class="detail" type="text" name="gebteil" size="5" maxlength="32" value="'.$gebteil.'" onchange="submitable()"></td>					
 					</tr>
 					<tr>
 						<td valign="top">Lehre</td>
@@ -338,6 +346,31 @@
 			$chk3 = '';
 		}
 		$htmlstr .= '<input type="checkbox" name="aktiv" value="t"'.$chk3.' onchange="submitable()"></td>
+					</tr>
+					<tr>
+						<td>Quadratmeter</td>
+						<td><input class="detail" type="text" name="m2" size="6" maxlength="9" value="'.$m2.'" onchange="submitable()"></td>
+						<td>Organisationseinheit</td>
+						<td colspan="3">';
+		$oe=new organisationseinheit();
+		$oe->getAll();
+		$htmlstr.='<select name="oe_kurzbz">';
+		$htmlstr.='<option value="">-- keine Auswahl --</option>';
+		foreach($oe->result as $row_oe)
+		{
+			if($row_oe->oe_kurzbz==$oe_kurzbz)
+				$selected='selected';
+			else
+				$selected='';
+			$htmlstr.='<option value="'.$row_oe->oe_kurzbz.'" '.$selected.'>'.$row_oe->organisationseinheittyp_kurzbz.' '.$row_oe->bezeichnung.'</option>';
+		}
+		$htmlstr.='</select>';
+		$htmlstr.='
+						</td>						
+					</tr>
+					<tr>
+						<td>Telefonklappe</td>
+						<td><input class="detail" type="text" name="telefonklappe" size="3" maxlength="8" value="'.$telefonklappe.'" onchange="submitable()"></td>
 					</tr>
 					<tr>
 						<td valign="top">Lageplan</td>

@@ -2539,6 +2539,24 @@ if(!$result = @$db->db_query("SELECT ext_id FROM campus.tbl_lvgesamtnote LIMIT 1
 		echo ' campus.tbl_lvgesamtnote: Spalte ext_id hinzugefuegt!<br>';
 }
 
+// Spalte oe_kurzbz, m2, gebteil in public.tbl_ort
+if(!$result = @$db->db_query("SELECT oe_kurzbz FROM public.tbl_ort LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_ort ADD COLUMN m2 numeric(8,2);
+			ALTER TABLE public.tbl_ort ADD COLUMN gebteil varchar(32);
+			ALTER TABLE public.tbl_ort ADD COLUMN oe_kurzbz varchar(32);
+
+			COMMENT ON COLUMN public.tbl_ort.m2 IS 'Quadratmeter';
+			COMMENT ON COLUMN public.tbl_ort.m2 IS 'Gebaeudeteil';
+			ALTER TABLE public.tbl_ort ADD CONSTRAINT fk_ort_organisationseinheit FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit(oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;	
+			";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_ort: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' public.tbl_ort: Spalte m2, gebteil, oe_kurzbz hinzugefuegt!<br>';
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -2714,7 +2732,7 @@ $tabellen=array(
 	"public.tbl_mitarbeiter"  => array("mitarbeiter_uid","personalnummer","telefonklappe","kurzbz","lektor","fixangestellt","bismelden","stundensatz","ausbildungcode","ort_kurzbz","standort_id","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","kleriker"),
 	"public.tbl_notiz"  => array("notiz_id","titel","text","verfasser_uid","bearbeiter_uid","start","ende","erledigt","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_notizzuordnung"  => array("notizzuordnung_id","notiz_id","projekt_kurzbz","projektphase_id","projekttask_id","uid","person_id","prestudent_id","bestellung_id","lehreinheit_id","ext_id"),
-	"public.tbl_ort"  => array("ort_kurzbz","bezeichnung","planbezeichnung","max_person","lehre","reservieren","aktiv","lageplan","dislozierung","kosten","ausstattung","updateamum","updatevon","insertamum","insertvon","ext_id","stockwerk","standort_id","telefonklappe","content_id"),
+	"public.tbl_ort"  => array("ort_kurzbz","bezeichnung","planbezeichnung","max_person","lehre","reservieren","aktiv","lageplan","dislozierung","kosten","ausstattung","updateamum","updatevon","insertamum","insertvon","ext_id","stockwerk","standort_id","telefonklappe","content_id","m2","gebteil","oe_kurzbz"),
 	"public.tbl_ortraumtyp"  => array("ort_kurzbz","hierarchie","raumtyp_kurzbz"),
 	"public.tbl_organisationseinheit" => array("oe_kurzbz", "oe_parent_kurzbz", "bezeichnung","organisationseinheittyp_kurzbz", "aktiv","mailverteiler","freigabegrenze","kurzzeichen","lehre"),
 	"public.tbl_organisationseinheittyp" => array("organisationseinheittyp_kurzbz", "bezeichnung", "beschreibung"),
