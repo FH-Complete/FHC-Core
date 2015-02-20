@@ -6,9 +6,9 @@ setup:
 
 test:
     codeception:
-        config: "."
-    php_unit:
-        directory: "tests/phpunit/"
-        args: "--bootstrap 'test/phpunit/bootstrap.php' --configuration 'tests/phpunit/phpunit.xml'"
+        config: "tests"
+#    php_unit:
+#        directory: "tests/phpunit/"
+#        args: "--bootstrap 'test/phpunit/bootstrap.php' --configuration 'tests/phpunit/phpunit.xml'"
 
 complete:
