@@ -63,6 +63,9 @@
 	$telefonklappe = '';
 	$content_id='';
 	$ort_kurzbz_old = '';
+	$oe_kurzbz='';
+	$gebteil='';
+	$m2='';
 	
 	$neu = "true";
 	
