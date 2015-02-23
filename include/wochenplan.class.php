@@ -1210,7 +1210,7 @@ class wochenplan extends basis_db
 				echo '<vbox style="border:1px solid black; background-color:'.$bgcolor.'"';
 				if($tooltip!='')
 				{
-					echo ' tooltiptext="'.str_replace('"','&quot;',$tooltip).'"';
+					echo ' tooltiptext="'.$this->convert_html_chars($tooltip).'"';
 				}
 				echo '					
 					ondragdrop="nsDragAndDrop.drop(event,boardObserver)"
