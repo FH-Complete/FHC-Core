@@ -934,8 +934,14 @@ function StudentAbschlusspruefungPrintUrkunde(sprache)
 		xsl='Diplomurkunde';
 	else if(pruefungstyp_kurzbz=='Diplom' && sprache=='englisch')
 		xsl='DiplomurkundeEng';
+	else if(pruefungstyp_kurzbz=='Defensio' && sprache=='deutsch')
+		xsl='Defensiourkunde';
+	else if(pruefungstyp_kurzbz=='Master' && sprache=='deutsch')
+		xsl='Masterurkunde';
+	else if(pruefungstyp_kurzbz=='Abschluss' && sprache=='deutsch')
+	    xsl='Magisterurkunde';
 
-	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid=;'+uid+'&abschlusspruefung_id='+abschlusspruefung_id,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid=;'+uid+'&abschlusspruefung_id='+abschlusspruefung_id+'&output=pdf','Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 function StudentAbschlusspruefungTypChange()

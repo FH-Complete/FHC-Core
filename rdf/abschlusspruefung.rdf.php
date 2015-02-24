@@ -38,6 +38,11 @@ require_once('../include/nation.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/akadgrad.class.php');
+require_once('../include/organisationseinheit.class.php');
+require_once('../include/projektarbeit.class.php');
+require_once('../include/lehreinheit.class.php');
+require_once('../include/lehrveranstaltung.class.php');
+require_once('../include/note.class.php');
 
 $xmlformat='rdf';
 if(isset($_GET['xmlformat']))
@@ -88,7 +93,10 @@ if($db->db_query($qry))
 		$akadgrad = new akadgrad($row->akadgrad_id);
 		
 		if($mitarbeiter->load($row->vorsitz))
-			$vorsitz = trim($mitarbeiter->titelpre.' '.$mitarbeiter->vorname.' '.$mitarbeiter->nachname.' '.$mitarbeiter->titelpost);
+		{
+		    $vorsitz = trim($mitarbeiter->titelpre.' '.$mitarbeiter->vorname.' '.$mitarbeiter->nachname.' '.$mitarbeiter->titelpost);
+		    $vorsitz_geschlecht = $mitarbeiter->geschlecht;
+		}
 		if($person->load($row->pruefer1))
 			$pruefer1 = trim($person->titelpre.' '.$person->vorname.' '.$person->nachname.' '.$person->titelpost);
 		if($person->load($row->pruefer2))
@@ -104,7 +112,7 @@ if($db->db_query($qry))
 			if($row_rek = $db->db_fetch_object())
 				$rektor = $row_rek->titelpre.' '.$row_rek->vorname.' '.$row_rek->nachname.' '.$row_rek->titelpost;
 		$qry = "SELECT * FROM (SELECT titel as themenbereich, ende, projektarbeit_id, note, beginn FROM lehre.tbl_projektarbeit a 
-							WHERE student_uid='$student->uid' AND (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom') 
+							WHERE student_uid='$student->uid' AND (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom' OR projekttyp_kurzbz='Master' OR projekttyp_kurzbz='Dissertation' OR projekttyp_kurzbz='Lizenziat' OR projekttyp_kurzbz='Magister') 
 							ORDER BY beginn DESC, projektarbeit_id ASC LIMIT 2) as a ORDER BY beginn asc";
 		$themenbereich='';
 		$datum_projekt='';
@@ -127,6 +135,10 @@ if($db->db_query($qry))
 				$themenbereich = $row_proj->themenbereich;
 				$note = (isset($note_arr[$row_proj->note])?$note_arr[$row_proj->note]:$row_proj->note);
 				$datum_projekt = $datum_obj->convertISODate($row_proj->ende);
+				$projektarbeit = new projektarbeit($row_proj->projektarbeit_id);
+				$lehreinheit = new lehreinheit($projektarbeit->lehreinheit_id);
+				$lehrveranstaltung = new lehrveranstaltung($lehreinheit->lehrveranstaltung_id);
+				$projektnote = new note($note);
 			}
 			
 			if($row_proj = $db->db_fetch_object($result_proj))
@@ -175,11 +187,29 @@ if($db->db_query($qry))
 			$stg_art_engl='diploma';
 		}
 		
+		$oe = new organisationseinheit();
+		$parents = $oe->getParents($studiengang->oe_kurzbz);
+		$oe_parent = "";
+		
+		foreach ($parents as $parent)
+		{
+		    $oe_temp = new organisationseinheit();
+		    $oe_temp->load($parent);
+		    if($oe_temp->organisationseinheittyp_kurzbz == 'Fakultät')
+		    {
+			$oe_parent = $oe_temp->bezeichnung;
+			break;
+		    }
+		}
+		
+		$studiengang_bezeichnung2 = explode(" ", $studiengang->bezeichnung, 2);
+		
 		echo "\t<pruefung>".'
 		<abschlusspruefung_id><![CDATA['.$row->abschlusspruefung_id.']]></abschlusspruefung_id>
 		<student_uid><![CDATA['.$row->student_uid.']]></student_uid>
 		<vorsitz><![CDATA['.$row->vorsitz.']]></vorsitz>
 		<vorsitz_nachname><![CDATA['.$vorsitz.']]></vorsitz_nachname>
+		<vorsitz_geschlecht><![CDATA['.$vorsitz_geschlecht.']]></vorsitz_geschlecht>
 		<pruefer1><![CDATA['.$row->pruefer1.']]></pruefer1>
 		<pruefer1_nachname><![CDATA['.$pruefer1.']]></pruefer1_nachname>
 		<pruefer2><![CDATA['.$row->pruefer2.']]></pruefer2>
@@ -194,6 +224,7 @@ if($db->db_query($qry))
 		<sponsion><![CDATA['.$datum_obj->convertISODate($row->sponsion).']]></sponsion>
 		<sponsion_iso><![CDATA['.$row->sponsion.']]></sponsion_iso>
 		<pruefungstyp_kurzbz><![CDATA['.$row->pruefungstyp_kurzbz.']]></pruefungstyp_kurzbz>
+		<pruefungstyp_beschreibung><![CDATA['.$row->beschreibung.']]></pruefungstyp_beschreibung>
 		<anrede><![CDATA['.$anrede.']]></anrede>
 		<anrede_engl><![CDATA['.$anrede_engl.']]></anrede_engl>
 		<titelpre><![CDATA['.$student->titelpre.']]></titelpre>
@@ -203,6 +234,7 @@ if($db->db_query($qry))
 		<titelpost><![CDATA['.$student->titelpost.']]></titelpost>
 		<matrikelnr><![CDATA['.$student->matrikelnr.']]></matrikelnr>
 		<gebdatum_iso><![CDATA['.$student->gebdatum.']]></gebdatum_iso>
+		<geschlecht><![CDATA['.$student->geschlecht.']]></geschlecht>
 		<gebdatum><![CDATA['.$datum_obj->convertISODate($student->gebdatum).']]></gebdatum>
 		<gebort><![CDATA['.$student->gebort.']]></gebort>
 		<staatsbuergerschaft><![CDATA['.$staatsbuergerschaft.']]></staatsbuergerschaft>
@@ -211,7 +243,9 @@ if($db->db_query($qry))
 		<geburtsnation_engl><![CDATA['.$geburtsnation_engl.']]></geburtsnation_engl>
 		<studiengang_kz><![CDATA['.sprintf('%04s',$student->studiengang_kz).']]></studiengang_kz>
 		<stg_bezeichnung><![CDATA['.$studiengang->bezeichnung.']]></stg_bezeichnung>
+		<stg_bezeichnung2><![CDATA['.$studiengang_bezeichnung2[1].']]></stg_bezeichnung2>
 		<stg_bezeichnung_engl><![CDATA['.$studiengang->english.']]></stg_bezeichnung_engl>
+		<stg_oe_parent><![CDATA['.$oe_parent.']]></stg_oe_parent>
 		<stg_art><![CDATA['.$stg_art.']]></stg_art>
 		<stg_art_engl><![CDATA['.$stg_art_engl.']]></stg_art_engl>
 		<akadgrad_kurzbz><![CDATA['.$akadgrad->akadgrad_kurzbz.']]></akadgrad_kurzbz>
@@ -225,10 +259,14 @@ if($db->db_query($qry))
 		<titelbescheidvom><![CDATA['.$datum_obj->convertISODate($studiengang->titelbescheidvom).']]></titelbescheidvom>
 		<rektor><![CDATA['.$rektor.']]></rektor>
 		<themenbereich><![CDATA['.$themenbereich.']]></themenbereich>
+		<projekt_typ><![CDATA['.$projektarbeit->projekttyp_bezeichnung.']]></projekt_typ>
+		<projekt_fach><![CDATA['.$lehrveranstaltung->bezeichnung.']]></projekt_fach>
+		<projekt_titel><![CDATA['.$projektarbeit->titel.']]></projekt_titel>
 		<themenbereich_2><![CDATA['.$themenbereich_2.']]></themenbereich_2>
 		<betreuer><![CDATA['.$betreuer.']]></betreuer>
 		<betreuer_2><![CDATA['.$betreuer_2.']]></betreuer_2>
 		<note><![CDATA['.$note.']]></note>
+		<note_bezeichnung><![CDATA['.$projektnote->bezeichnung.']]></note_bezeichnung>
 		<note2><![CDATA['.$note2.']]></note2>
 		<notekommpruef><![CDATA['.$row->note.']]></notekommpruef>
 		<datum_projekt><![CDATA['.$datum_projekt.']]></datum_projekt>

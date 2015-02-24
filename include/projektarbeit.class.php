@@ -82,7 +82,9 @@ class projektarbeit extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * FROM lehre.tbl_projektarbeit WHERE projektarbeit_id=".$this->db_add_param($projektarbeit_id, FHC_INTEGER);
+		$qry = "SELECT * FROM lehre.tbl_projektarbeit "
+			. "JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz) "
+			. "WHERE projektarbeit_id=".$this->db_add_param($projektarbeit_id, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 		{
@@ -111,6 +113,7 @@ class projektarbeit extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
+				$this->projekttyp_bezeichnung = $row->bezeichnung;
 				return true;
 			}
 			else 

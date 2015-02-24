@@ -725,6 +725,7 @@ else
 				<studienbeginn_beginn><![CDATA['.$datum_obj->convertISODate($studienbeginn).']]></studienbeginn_beginn>
 				<studiensemester_beginn><![CDATA['.$studiensemester.']]></studiensemester_beginn>
 				<studiensemester_aktuell><![CDATA['.$stsem->studiensemester_kurzbz.']]></studiensemester_aktuell>
+				<studiensemester_aktuell_bezeichnung><![CDATA['.$stsem->bezeichnung.']]></studiensemester_aktuell_bezeichnung>
 				<studienbeginn_aktuell><![CDATA['.$datum_obj->convertISODate($stsem->start).']]></studienbeginn_aktuell>
 				<tagesdatum><![CDATA['.date('d.m.Y').']]></tagesdatum>
 				<max_semester><![CDATA['.$studiengang->max_semester.']]></max_semester>
