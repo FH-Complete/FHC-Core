@@ -467,5 +467,49 @@ class zeitsperre extends basis_db
 			return false;
 		}
 	}
+	 
+	 /**
+	 * Liefert die Zeitsperren eines Users für die Zeitaufzeichnung
+	 *
+	 * @param $uid
+	 * @param $anz_tage
+	 * @return array 'datum'->'zeitsperre_kurzbz' 
+	 */
+	public function getZeitsperrenForZeitaufzeichnung($uid, $anz_tage=50)
+	{
+		unset($this->result);
+		$this->result=array();
+
+		$qry = "select datum::date, freigabevon, zeitsperretyp_kurzbz 
+					from  (SELECT generate_series(vondatum::timestamp, bisdatum::timestamp, '1 day') as datum, freigabevon,  mitarbeiter_uid, zeitsperretyp_kurzbz FROM campus.tbl_zeitsperre ) a 
+					where a.mitarbeiter_uid = ".$this->db_add_param($uid)." and datum>(now() - interval '50 Days') and zeitsperretyp_kurzbz in ('Krank','Urlaub')";
+		
+
+
+		
+		if($this->db_query($qry))
+		{
+
+			while($row = $this->db_fetch_object())
+			{
+
+				if ($row->zeitsperretyp_kurzbz == 'Urlaub' && $row->freigabevon == NULL)				
+					$result[$row->datum] = "Urlaubsantrag (Freigabe fehlt)";
+				else 
+					$result[$row->datum] = $row->zeitsperretyp_kurzbz;
+
+				$this->result = $result;
+
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Zeitsperren';
+			return false;
+		}
+	}	
+	
+	
 }
 ?>

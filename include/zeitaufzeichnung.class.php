@@ -309,9 +309,9 @@ class zeitaufzeichnung extends basis_db
 	{		 
 		$where = "uid=".$this->db_add_param($user);
 		if ($days!='')
-		$where.= " AND ende>(now() - INTERVAL '".$days." days')";
+			$where.= " AND ende>(now() - INTERVAL '".$days." days')";
 		
-	    $qry = "SELECT 
+	   $qry = "SELECT 
 	    			*, to_char ((ende-start),'HH24:MI') as diff, 
 	    			(SELECT (to_char(sum(ende-start),'DD')::integer)*24+to_char(sum(ende-start),'HH24')::integer || ':' || to_char(sum(ende-start),'MI')
 	    			 FROM campus.tbl_zeitaufzeichnung 
@@ -343,6 +343,71 @@ class zeitaufzeichnung extends basis_db
 				$obj->kunde_uid = $row->kunde_uid;
 				$obj->summe = $row->summe;
 				$obj->diff = $row->diff;
+				$obj->datum = $row->start;
+				
+				$this->result[] = $obj;
+	    	}
+	    	return true;
+	    }
+	    else
+	    {
+	    	$this->errormsg = 'Fehler beim Laden der Daten';
+	    	return false;
+	    }
+	}
+
+	/**
+	 * Laedt die Zeitaufzeichnungen eines Users aufgefüllt mit lehren Tagen. 
+	 * Default: Die letzten 40 Tage
+	 * @param string $user
+	 * @param integer $days deafult: 40 Tage
+	 */
+	public function getListeUserFull($user, $days='40')
+	{		 
+		$where = "uid=".$this->db_add_param($user);
+		if ($days!='')
+			$where.= " AND ende>(now() - INTERVAL '".$days." days')";
+		$where_join = "and z.uid=".$this->db_add_param($user);
+		if ($days!='')
+			$where_join.= " AND z.ende>(now() - INTERVAL '".$days." days')";
+		if ($days=='')
+			$max_anz = 180;
+		else 
+			$max_anz = $days;
+	   $qry = "SELECT 
+	    			d.dates, z.*, to_char ((z.ende-z.start),'HH24:MI') as diff, 
+	    			(SELECT (to_char(sum(ende-start),'DD')::integer)*24+to_char(sum(ende-start),'HH24')::integer || ':' || to_char(sum(ende-start),'MI')
+	    			 FROM campus.tbl_zeitaufzeichnung 
+	    			 WHERE $where ) as summe 	    
+	    		FROM campus.tbl_zeitaufzeichnung z
+	    		right join (select current_date - s.a as dates from generate_series(0,$max_anz,1) as s(a)) d on date(z.ende) = d.dates $where_join order by d.dates desc
+	    		";
+
+	    if($result = $this->db_query($qry))
+	    {
+	    	while($row = $this->db_fetch_object($result))
+	    	{
+	    		$obj = new zeitaufzeichnung();
+	    		
+	    		$obj->zeitaufzeichnung_id = $row->zeitaufzeichnung_id;
+				$obj->uid = $row->uid;
+				$obj->aktivitaet_kurzbz = $row->aktivitaet_kurzbz;
+				$obj->start = $row->start;
+				$obj->ende = $row->ende;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->oe_kurzbz_1 = $row->oe_kurzbz_1;
+				$obj->oe_kurzbz_2 = $row->oe_kurzbz_2;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->projekt_kurzbz = $row->projekt_kurzbz;
+				$obj->ext_id = $row->ext_id;
+				$obj->service_id = $row->service_id;
+				$obj->kunde_uid = $row->kunde_uid;
+				$obj->summe = $row->summe;
+				$obj->diff = $row->diff;
+				$obj->datum = $row->dates;
 				
 				$this->result[] = $obj;
 	    	}
