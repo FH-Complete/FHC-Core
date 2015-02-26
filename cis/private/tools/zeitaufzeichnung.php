@@ -20,6 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>
  *          Karl Burkhart <burkhart@technikum-wien.at>
  *          Manfred Kindl <kindlm@technikum.wien.at>.
+ *          Gerald Raab <raab@technikum-wien.at> 
  */
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
@@ -47,6 +48,7 @@ if (!$db = new basis_db())
 $user = get_uid();
 $datum = new datum();
 
+
 $zeitaufzeichnung_id = (isset($_GET['zeitaufzeichnung_id'])?$_GET['zeitaufzeichnung_id']:'');
 $projekt_kurzbz = (isset($_POST['projekt'])?$_POST['projekt']:'');
 $oe_kurzbz_1 = (isset($_POST['oe_kurzbz_1'])?$_POST['oe_kurzbz_1']:'');
@@ -67,7 +69,7 @@ $alle = (isset($_POST['alle'])?(isset($_POST['normal'])?false:true):false);
 $angezeigte_tage = '50';
 
 $zs = new zeitsperre();
-$zs->getZeitsperrenForZeitaufzeichnung('raab',$angezeigte_tage);
+$zs->getZeitsperrenForZeitaufzeichnung($user,$angezeigte_tage);
 $zeitsperren = $zs->result;
 
 echo '<!DOCTYPE HTML>
