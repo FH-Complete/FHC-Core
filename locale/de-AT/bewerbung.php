@@ -45,3 +45,6 @@ $this->phrasen['bewerbung/alternative']='Alternative';
 $this->phrasen['bewerbung/priowaehlen']='Primären und alternative Variante auswählen';
 $this->phrasen['bewerbung/ok']='OK';
 $this->phrasen['bewerbung/abbrechen']='Abbrechen';
+$this->phrasen['bewerbung/prioBeschreibungstext'] = 'Bitte wählen Sie die Organisationsform und Sprache. Für den Fall dass es keine Plätze mehr gibt können Sie auch eine Alternative auswählen.';
+$this->phrasen['bewerbung/prioUeberschrifttopprio'] = 'Oberste Priorität';
+$this->phrasen['bewerbung/prioUeberschriftalternative'] = 'Alternative';

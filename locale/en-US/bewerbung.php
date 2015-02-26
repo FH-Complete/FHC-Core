@@ -45,3 +45,6 @@ $this->phrasen['bewerbung/alternative']='Alternative';
 $this->phrasen['bewerbung/priowaehlen']='Select primary and alternative course of studies';
 $this->phrasen['bewerbung/ok']='OK';
 $this->phrasen['bewerbung/abbrechen']='Cancel';
+$this->phrasen['bewerbung/prioBeschreibungstext'] = 'Please choose the type of program. If possible, choose an alternative in case it\'s fully booked.';
+$this->phrasen['bewerbung/prioUeberschrifttopprio'] = 'Top priority';
+$this->phrasen['bewerbung/prioUeberschriftalternative'] = 'Alternative';
