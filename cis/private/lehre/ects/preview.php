@@ -78,11 +78,8 @@ function getLastStundeByDatum(Array $array, $filterDatum)
 <title>ECTS - European Course Credit Transfer Systems (ECTS)</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../../../skin/style.css.php" type="text/css" rel="stylesheet" />
-<script type="text/javascript" src="../../../../include/js/flexcroll.js"></script>
-<link href="../../../../skin/flexcrollstyles.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
-<div class="flexcroll" style="outline: none;">
 <table align="right">
 	<tr>
 		<td>
@@ -123,6 +120,7 @@ function getLastStundeByDatum(Array $array, $filterDatum)
 		//$titel_de = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['titel_de']));
 		$methodik_de = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['methodik_de']));
 		$kurzbeschreibung_de = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['kurzbeschreibung_de']));
+		$anwesenheit_de = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['anwesenheit_de']));
 		$lehrziele_de = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['lehrziele_de']));
 		$lehrinhalte_de = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['lehrinhalte_de']));
 		$voraussetzungen_de = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['voraussetzungen_de']));
@@ -145,12 +143,15 @@ function getLastStundeByDatum(Array $array, $filterDatum)
 		$parser = new SafeHTML();
 		$kurzbeschreibung_de = $parser->parse($kurzbeschreibung_de);
 		$parser = new SafeHTML();
+		$anwesenheit_de = $parser->parse($anwesenheit_de);
+		$parser = new SafeHTML();
 		$methodik_de = $parser->parse($methodik_de);
 		
 		// Englisch content variables
 		//$titel_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['titel_en']));
 		$methodik_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['methodik_en']));
 		$kurzbeschreibung_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['kurzbeschreibung_en']));
+		$anwesenheit_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['anwesenheit_en']));
 		$lehrziele_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['lehrziele_en']));
 		$lehrinhalte_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['lehrinhalte_en']));
 		$voraussetzungen_en = mb_eregi_replace("\r\n","<br>",stripslashes($_POST['voraussetzungen_en']));
@@ -173,6 +174,8 @@ function getLastStundeByDatum(Array $array, $filterDatum)
 		$parser = new SafeHTML();
 		$kurzbeschreibung_en = $parser->parse($kurzbeschreibung_en);
 		$parser = new SafeHTML();
+		$anwesenheit_en = $parser->parse($anwesenheit_en);
+		$parser = new SafeHTML();
 		$methodik_en = $parser->parse($methodik_en);
 	}
 	elseif(isset($_GET['lv'])) //LV Id wird uebergeben (zB bei Ansicht fuer alle von lesson.php)
@@ -189,6 +192,7 @@ function getLastStundeByDatum(Array $array, $filterDatum)
 			//$titel_de = $lvinfo_obj->titel;
 			$methodik_de = $lvinfo_obj->methodik;
 			$kurzbeschreibung_de = $lvinfo_obj->kurzbeschreibung;
+			$anwesenheit_de = $lvinfo_obj->anwesenheit;
 			$lehrziele_de = $lvinfo_obj->lehrziele;
 			$lehrinhalte_de = $lvinfo_obj->lehrinhalte;
 			$voraussetzungen_de = $lvinfo_obj->voraussetzungen;
@@ -203,6 +207,7 @@ function getLastStundeByDatum(Array $array, $filterDatum)
 			//$titel_en = $lvinfo_obj->titel;
 			$methodik_en = $lvinfo_obj->methodik;
 			$kurzbeschreibung_en = $lvinfo_obj->kurzbeschreibung;
+			$anwesenheit_en = $lvinfo_obj->anwesenheit;
 			$lehrziele_en = $lvinfo_obj->lehrziele;
 			$lehrinhalte_en = $lvinfo_obj->lehrinhalte;
 			$voraussetzungen_en = $lvinfo_obj->voraussetzungen;
@@ -477,6 +482,12 @@ function getLastStundeByDatum(Array $array, $filterDatum)
 			echo "<tr><td align='left' valign='top'><h2>Literatur</h2></td></tr>";
 			echo "<tr><td>".stripslashes($unterlagen_de)."<br /><br /></td></tr>";
 		}
+		
+		if ($anwesenheit_de)
+		{
+			echo "<tr><td align='left' valign='top'><h2>Anwesenheit</h2></td></tr>";
+			echo "<tr><td>".stripslashes($anwesenheit_de)."<br /><br /></td></tr>";
+		}
 
 		if ($anmerkungen_de)
 		{
@@ -624,6 +635,12 @@ function getLastStundeByDatum(Array $array, $filterDatum)
 			echo "<tr><td align='left' valign='top'><h2>Recommended Reading and Material</h2></td></tr>";
 			echo "<tr><td>".stripslashes($unterlagen_en)."<br /><br /></td></tr>";
 		}
+		
+		if ($anwesenheit_en)
+		{
+			echo "<tr><td align='left' valign='top'><h2>Attendance</h2></td></tr>";
+			echo "<tr><td>".stripslashes($anwesenheit_en)."<br /><br /></td></tr>";
+		}
 
 		if ($anmerkungen_en)
 		{
@@ -694,5 +711,4 @@ function getLastStundeByDatum(Array $array, $filterDatum)
 <td width="3%">&nbsp;</td>
 </tr>
 </table>
-</div>
 </body></html>

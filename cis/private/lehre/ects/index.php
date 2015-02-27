@@ -127,6 +127,7 @@ if (!$db = new basis_db())
 	$pruefungsordnung_de = (isset($_POST['pruefungsordnung_de'])?$_POST['pruefungsordnung_de']:'');
 	$anmerkungen_de = (isset($_POST['anmerkungen_de'])?$_POST['anmerkungen_de']:'');
 	$kurzbeschreibung_de = (isset($_POST['kurzbeschreibung_de'])?$_POST['kurzbeschreibung_de']:'');
+	$anwesenheit_de = (isset($_POST['anwesenheit_de'])?$_POST['anwesenheit_de']:'');
 	$freig_de = (isset($_POST['freig_de'])?($_POST['freig_de']=='on'?true:false):'');
 	$methodik_de = (isset($_POST['methodik_de'])?$_POST['methodik_de']:'');
 	//$titel_de = (isset($_POST['titel_de'])?$_POST['titel_de']:'');
@@ -146,6 +147,8 @@ if (!$db = new basis_db())
 	$parser = new SafeHTML();
 	$kurzbeschreibung_de = $parser->parse($kurzbeschreibung_de);
 	$parser = new SafeHTML();
+	$anwesenheit_de = $parser->parse($anwesenheit_de);
+	$parser = new SafeHTML();
 	$freig_de = $parser->parse($freig_de);
 	$parser = new SafeHTML();
 	$methodik_de = $parser->parse($methodik_de);
@@ -157,6 +160,7 @@ if (!$db = new basis_db())
 	$pruefungsordnung_en = (isset($_POST['pruefungsordnung_en'])?$_POST['pruefungsordnung_en']:'');
 	$anmerkungen_en = (isset($_POST['anmerkungen_en'])?$_POST['anmerkungen_en']:'');
 	$kurzbeschreibung_en = (isset($_POST['kurzbeschreibung_en'])?$_POST['kurzbeschreibung_en']:'');
+	$anwesenheit_en = (isset($_POST['anwesenheit_en'])?$_POST['anwesenheit_en']:'');
 	$freig_en = (isset($_POST['freig_en'])?($_POST['freig_en']=='on'?true:false):'');
 	$methodik_en = (isset($_POST['methodik_en'])?$_POST['methodik_en']:'');
 	//$titel_en = (isset($_POST['titel_en'])?$_POST['titel_en']:'');
@@ -175,6 +179,8 @@ if (!$db = new basis_db())
 	$anmerkungen_en = $parser->parse($anmerkungen_en);
 	$parser = new SafeHTML();
 	$kurzbeschreibung_en = $parser->parse($kurzbeschreibung_en);
+	$parser = new SafeHTML();
+	$anwesenheit_en = $parser->parse($anwesenheit_en);
 	$parser = new SafeHTML();
 	$freig_en = $parser->parse($freig_en);
 	$parser = new SafeHTML();
@@ -217,6 +223,7 @@ if (!$db = new basis_db())
 			$lv_obj_sav->pruefungsordnung=mb_eregi_replace("\r\n", "<br>", $pruefungsordnung_de);
 			$lv_obj_sav->anmerkungen=mb_eregi_replace("\r\n", "<br>", $anmerkungen_de);
 			$lv_obj_sav->kurzbeschreibung=mb_eregi_replace("\r\n", "<br>", $kurzbeschreibung_de);
+			$lv_obj_sav->anwesenheit=mb_eregi_replace("\r\n", "<br>", $anwesenheit_de);
 			
 			$lv_obj_sav->genehmigt = ($freig_de?true:false);
 			$lv_obj_sav->updateamum=date('Y-m-d H:i:s');
@@ -249,6 +256,7 @@ if (!$db = new basis_db())
 			$lv_obj_sav->pruefungsordnung=mb_eregi_replace("\r\n", "<br>", $pruefungsordnung_en);
 			$lv_obj_sav->anmerkungen=mb_eregi_replace("\r\n", "<br>", $anmerkungen_en);
 			$lv_obj_sav->kurzbeschreibung=mb_eregi_replace("\r\n", "<br>", $kurzbeschreibung_en);
+			$lv_obj_sav->anwesenheit=mb_eregi_replace("\r\n", "<br>", $anwesenheit_en);
 			$lv_obj_sav->genehmigt = ($freig_en?true:false);
 			$lv_obj_sav->aktiv=true;
 			$lv_obj_sav->updateamum=date('Y-m-d H:i:s');
@@ -460,6 +468,7 @@ if (!$db = new basis_db())
 			$pruefungsordnung_de = $lv_de->pruefungsordnung;
 			$anmerkungen_de = $lv_de->anmerkungen;
 			$kurzbeschreibung_de = $lv_de->kurzbeschreibung;
+			$anwesenheit_de = $lv_de->anwesenheit;
 			$freig_de = $lv_de->genehmigt;
 			$titel_de = $lv_de->titel;
 			$methodik_de = $lv_de->methodik;
@@ -474,6 +483,7 @@ if (!$db = new basis_db())
 			$pruefungsordnung_en = $lv_en->pruefungsordnung;
 			$anmerkungen_en = $lv_en->anmerkungen;
 			$kurzbeschreibung_en = $lv_en->kurzbeschreibung;
+			$anwesenheit_en = $lv_en->anwesenheit;
 			$freig_en = $lv_en->genehmigt;
 			$titel_en = $lv_en->titel;
 			$methodik_en = $lv_en->methodik;
@@ -664,7 +674,13 @@ if (!$db = new basis_db())
          <td><i>Assessment Methods</i> </td>
          <td align="right"><textarea rows="5" cols="40" name="pruefungsordnung_en">'. (isset($pruefungsordnung_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$pruefungsordnung_en)):'').'</textarea></td>
        </tr>
-       <tr class="liste1">
+        <tr class="liste1">
+         <td><i>Anwesenheit</i></td>
+         <td align="right"><textarea rows="5" cols="40" name="anwesenheit_de">'. (isset($anwesenheit_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$anwesenheit_de)):'').'</textarea></td>
+         <td><i>Attendance</i></td>
+         <td align="right"><textarea rows="5" cols="40" name="anwesenheit_en">'. (isset($anwesenheit_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$anwesenheit_en)):'').'</textarea></td>
+       </tr>
+       <tr class="liste0">
          <td><i>Anmerkungen</i></td>
          <td align="right"><textarea rows="5" cols="40" name="anmerkungen_de">'. (isset($anmerkungen_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$anmerkungen_de)):'').'</textarea></td>
          <td><i>Comments</i></td>
@@ -672,8 +688,6 @@ if (!$db = new basis_db())
        </tr>
        <tr class="liste0">
          <td align=center colspan=2><br><input type="checkbox" name="freig_de" '. (isset($freig_de) && ($freig_de==true || $freig_de=='1')?'checked':'').'/><i>'.$p->t('courseInformation/freigeben').'</i><br><br></td>
-
-
          <td align=center colspan=2><input type="checkbox" name="freig_en" '. (isset($freig_en) && ($freig_en==true || $freig_en=='1')?'checked':'').'/><i>'.$p->t('courseInformation/freigeben').'</i> </td>
          <td ></td>
        </tr>';

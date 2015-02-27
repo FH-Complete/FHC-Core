@@ -2598,6 +2598,17 @@ if(!$result = @$db->db_query("SELECT anmerkung FROM public.tbl_prestudentstatus 
 		echo 'public.tbl_prestudentstatus: Spalte "anmerkung" hinzugefuegt!<br>';
 }
 
+// Spalte Anwesenheit in tbl_lvinfo
+if(!$result = @$db->db_query("SELECT anwesenheit FROM campus.tbl_lvinfo LIMIT 1"))
+{
+	$qry = "ALTER TABLE campus.tbl_lvinfo ADD COLUMN anwesenheit text";
+
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_lvinfo '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'campus.tbl_lvinfo: Spalte "anwesenheit" hinzugefuegt!<br>';
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -2653,7 +2664,7 @@ $tabellen=array(
 	"campus.tbl_lehre_tools_organisationseinheit" => array("lehre_tools_id","oe_kurzbz","aktiv"),
 	"campus.tbl_lehrveranstaltung_pruefung" => array("lehrveranstaltung_pruefung_id","lehrveranstaltung_id","pruefung_id"),
 	"campus.tbl_lvgesamtnote"  => array("lehrveranstaltung_id","studiensemester_kurzbz","student_uid","note","mitarbeiter_uid","benotungsdatum","freigabedatum","freigabevon_uid","bemerkung","updateamum","updatevon","insertamum","insertvon","punkte","ext_id"),
-	"campus.tbl_lvinfo"  => array("lehrveranstaltung_id","sprache","titel","lehrziele","lehrinhalte","methodik","voraussetzungen","unterlagen","pruefungsordnung","anmerkung","kurzbeschreibung","genehmigt","aktiv","updateamum","updatevon","insertamum","insertvon"),
+	"campus.tbl_lvinfo"  => array("lehrveranstaltung_id","sprache","titel","lehrziele","lehrinhalte","methodik","voraussetzungen","unterlagen","pruefungsordnung","anmerkung","kurzbeschreibung","genehmigt","aktiv","updateamum","updatevon","insertamum","insertvon","anwesenheit"),
 	"campus.tbl_news"  => array("news_id","uid","studiengang_kz","fachbereich_kurzbz","semester","betreff","text","datum","verfasser","updateamum","updatevon","insertamum","insertvon","datum_bis","content_id"),
 	"campus.tbl_notenschluessel"  => array("lehreinheit_id","note","punkte"),
 	"campus.tbl_notenschluesseluebung"  => array("uebung_id","note","punkte"),

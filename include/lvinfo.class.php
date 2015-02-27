@@ -48,6 +48,7 @@ class lvinfo extends basis_db
 	public $updatevon=0;		// string
 	public $insertamum;			// timestamp
 	public $insertvon=0;		// string
+	public $anwesenheit;	// string
 
 	public $lastqry;			//zuletzt ausgefuehrte qry (benoetigt fuer log)
 	
@@ -92,6 +93,7 @@ class lvinfo extends basis_db
 			$lvinfo_obj->pruefungsordnung 	= $row->pruefungsordnung;
 			$lvinfo_obj->anmerkungen 		= $row->anmerkung;
 			$lvinfo_obj->kurzbeschreibung	= $row->kurzbeschreibung;
+			$lvinfo_obj->anwesenheit		= $row->anwesenheit;
 			$lvinfo_obj->genehmigt 			= $this->db_parse_bool($row->genehmigt);
 			$lvinfo_obj->aktiv 				= $this->db_parse_bool($row->aktiv);
 			$lvinfo_obj->sprache 			= $row->sprache;
@@ -139,6 +141,7 @@ class lvinfo extends basis_db
 			$this->pruefungsordnung 	= $row->pruefungsordnung;
 			$this->anmerkungen 			= $row->anmerkung;
 			$this->kurzbeschreibung		= $row->kurzbeschreibung;
+			$this->anwesenheit			= $row->anwesenheit;
 			$this->genehmigt 			= $this->db_parse_bool($row->genehmigt);
 			$this->aktiv 				= $this->db_parse_bool($row->aktiv);
 			$this->sprache 				= $row->sprache;
@@ -217,7 +220,7 @@ class lvinfo extends basis_db
 		{
 			//Neuen Datensatz anlegen
 			$qry = 'INSERT INTO campus.tbl_lvinfo (lehrveranstaltung_id, sprache, titel, methodik, lehrziele, lehrinhalte, voraussetzungen, unterlagen, pruefungsordnung, anmerkung,
-				kurzbeschreibung, genehmigt, aktiv,  insertamum, insertvon, updateamum,
+				kurzbeschreibung, anwesenheit, genehmigt, aktiv,  insertamum, insertvon, updateamum,
 				updatevon) VALUES ('.
 				$this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER).','.
 				$this->db_add_param($this->sprache).', '.
@@ -230,6 +233,7 @@ class lvinfo extends basis_db
 				$this->db_add_param($this->pruefungsordnung).', '.
 				$this->db_add_param($this->anmerkungen).', '.
 				$this->db_add_param($this->kurzbeschreibung).', '.
+				$this->db_add_param($this->anwesenheit).', '.
 				$this->db_add_param($this->genehmigt, FHC_BOOLEAN).', '.
 				$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
 				$this->db_add_param($this->insertamum).', '.
@@ -258,6 +262,7 @@ class lvinfo extends basis_db
 				'pruefungsordnung='.$this->db_add_param($this->pruefungsordnung).', '.
 				'anmerkung='.$this->db_add_param($this->anmerkungen).', '.
 				'kurzbeschreibung='.$this->db_add_param($this->kurzbeschreibung).', '.
+				'anwesenheit='.$this->db_add_param($this->anwesenheit).', '.
 				'unterlagen='.$this->db_add_param($this->unterlagen).', '.
 				'genehmigt='.$this->db_add_param($this->genehmigt, FHC_BOOLEAN) .', '.
 				'aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN) .', '.
@@ -347,10 +352,10 @@ class lvinfo extends basis_db
 		
 		$qry = "
 		INSERT INTO campus.tbl_lvinfo(lehrveranstaltung_id, sprache, titel, lehrziele,
-			lehrinhalte, methodik, voraussetzungen, unterlagen, pruefungsordnung, anmerkung, kurzbeschreibung, genehmigt,
+			lehrinhalte, methodik, voraussetzungen, unterlagen, pruefungsordnung, anmerkung, kurzbeschreibung, anwesenheit, genehmigt,
 			aktiv, updateamum, updatevon, insertamum, insertvon) 
 		SELECT $target, sprache, titel, lehrziele,
-		lehrinhalte, methodik, voraussetzungen, unterlagen, pruefungsordnung, anmerkung, kurzbeschreibung, genehmigt,
+		lehrinhalte, methodik, voraussetzungen, unterlagen, pruefungsordnung, anmerkung, kurzbeschreibung, anwesenheit, genehmigt,
 		aktiv, updateamum, updatevon, insertamum, insertvon FROM campus.tbl_lvinfo WHERE lehrveranstaltung_id=".$this->db_add_param($source).';';
 		
 		if($this->db_query($qry))
