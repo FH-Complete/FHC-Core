@@ -635,9 +635,9 @@ if (!$db = new basis_db())
          <td align="right"><textarea rows="5" cols="40" name="methodik_en">'. (isset($methodik_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$methodik_en)):'').'</textarea></td>
        </tr>';
        echo '<tr class="liste0">
-         <td><i>Kompetenzerwerb <font style="color:black">(Pflichtfeld)</font></i></td>
+         <td><i>Lernergebnisse <font style="color:black">(Pflichtfeld)</font></i></td>
          <td align="right"><textarea rows="5" cols="40" name="lehrziele_de">'. (isset($lehrziele_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrziele_de)):'').'</textarea></td>
-         <td><i>Learning outcome <font style="color:black">(Required)</font></i> </td>
+         <td><i>Learning outcomes <font style="color:black">(Required)</font></i> </td>
          <td align="right"><textarea rows="5" cols="40" name="lehrziele_en">'. (isset($lehrziele_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrziele_en)):'').'</textarea></td>
        </tr>
        <tr class="liste1">
@@ -667,12 +667,8 @@ if (!$db = new basis_db())
        <tr class="liste1">
          <td><i>Anmerkungen</i></td>
          <td align="right"><textarea rows="5" cols="40" name="anmerkungen_de">'. (isset($anmerkungen_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$anmerkungen_de)):'').'</textarea></td>
-         <td><i>Comments
-
-         </i></td>
-         <td align="right">
-           <textarea rows="5" cols="40" name="anmerkungen_en">'. (isset($anmerkungen_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$anmerkungen_en)):'').'</textarea>
-         </td>
+         <td><i>Comments</i></td>
+         <td align="right"><textarea rows="5" cols="40" name="anmerkungen_en">'. (isset($anmerkungen_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$anmerkungen_en)):'').'</textarea></td>
        </tr>
        <tr class="liste0">
          <td align=center colspan=2><br><input type="checkbox" name="freig_de" '. (isset($freig_de) && ($freig_de==true || $freig_de=='1')?'checked':'').'/><i>'.$p->t('courseInformation/freigeben').'</i><br><br></td>
