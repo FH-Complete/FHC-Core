@@ -54,10 +54,10 @@ $projekt_kurzbz = (isset($_POST['projekt'])?$_POST['projekt']:'');
 $oe_kurzbz_1 = (isset($_POST['oe_kurzbz_1'])?$_POST['oe_kurzbz_1']:'');
 $oe_kurzbz_2 = (isset($_POST['oe_kurzbz_2'])?$_POST['oe_kurzbz_2']:'');
 $aktivitaet_kurzbz = (isset($_POST['aktivitaet'])?$_POST['aktivitaet']:'');
-$von_datum = (isset($_POST['von_datum'])?$_POST['von_datum']:date('d.m.Y'));
+$von_datum = (isset($_REQUEST['von_datum'])?$_REQUEST['von_datum']:date('d.m.Y'));
 $von_uhrzeit = (isset($_POST['von_uhrzeit'])?$_POST['von_uhrzeit']:date('H:i'));
 $von = $von_datum.' '.$von_uhrzeit;
-$bis_datum = (isset($_POST['bis_datum'])?$_POST['bis_datum']:date('d.m.Y'));
+$bis_datum = (isset($_REQUEST['bis_datum'])?$_REQUEST['bis_datum']:date('d.m.Y'));
 $bis_uhrzeit = (isset($_POST['bis_uhrzeit'])?$_POST['bis_uhrzeit']:date('H:i',mktime(date('H'), date('i')+10)));
 $bis = $bis_datum.' '.$bis_uhrzeit;
 $beschreibung = (isset($_POST['beschreibung'])?$_POST['beschreibung']:'');
@@ -65,7 +65,7 @@ $service_id = (isset($_POST['service_id'])?$_POST['service_id']:'');
 $kunde_uid = (isset($_POST['kunde_uid'])?$_POST['kunde_uid']:'');
 $kartennummer = (isset($_POST['kartennummer'])?$_POST['kartennummer']:'');
 $filter = (isset($_GET['filter'])?$_GET['filter']:'foo');
-$alle = (isset($_POST['alle'])?(isset($_POST['normal'])?false:true):false);
+$alle = (isset($_GET['alle'])?(isset($_GET['normal'])?false:true):false);
 $angezeigte_tage = '50';
 
 $zs = new zeitsperre();
@@ -495,7 +495,7 @@ if($projekt->getProjekteMitarbeiter($user))
 			
 			echo '<option value="'.$db->convert_html_chars($row_projekt->projekt_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row_projekt->titel).'</option>';
 		}
-		echo '</SELECT><input type="button" value="'.$p->t("zeitaufzeichnung/uebersicht").'" onclick="loaduebersicht();"></td>';
+		echo '</SELECT><!--<input type="button" value="'.$p->t("zeitaufzeichnung/uebersicht").'" onclick="loaduebersicht();">--></td>';
 		echo '</tr><tr>';
 		//OE_KURZBZ_1
 		echo '<td nowrap>'.$p->t("zeitaufzeichnung/organisationseinheiten").'</td>
@@ -659,7 +659,11 @@ if($projekt->getProjekteMitarbeiter($user))
  
 		echo '<hr>';
 		echo '<h3>'.($alle===true?$p->t('zeitaufzeichnung/alleEintraege'):$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage))).'</h3>';
-		echo '<input type="submit" value="'.($alle===true?$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage)):$p->t('zeitaufzeichnung/alleAnzeigen')).'" name="'.($alle===true?'normal':'alle').'">';
+		if ($alle===true)		
+			echo '<a href="?normal" style="text-decoration:none"><input type="button" value="'.$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage)).'"></a>';
+		else 
+			echo '<a href="?alle" style="text-decoration:none"><input type="button" value="'.$p->t('zeitaufzeichnung/alleAnzeigen').'"></a>';
+		//echo '<input type="submit" value="'.($alle===true?$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage)):$p->t('zeitaufzeichnung/alleAnzeigen')).'" name="'.($alle===true?'normal':'alle').'">';
 		echo '</form>';
 		
 		$za = new zeitaufzeichnung();
@@ -740,7 +744,9 @@ if($projekt->getProjekteMitarbeiter($user))
 						else 
 							$zeitsperre_text = '';
 						//var_dump($zs->result);						
-						
+						if (isset($_GET["von_datum"]) && $datum->formatDatum($tag, 'd.m.Y') == $_GET["von_datum"])
+							$style = 'style="border-top: 3px solid #8DBDD8; border-bottom: 3px solid #8DBDD8"';
+							
 						list($h1, $m1) = explode(':', $pausesumme);
 						$pausesumme = $h1*3600+$m1*60;
 						$tagessaldo = $datum->mktime_fromtimestamp($datum->formatDatum($tagesende, $format='Y-m-d H:i:s'))-$datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn, $format='Y-m-d H:i:s'))-3600;
@@ -768,7 +774,7 @@ if($projekt->getProjekteMitarbeiter($user))
 				        	'.$p->t("zeitaufzeichnung/pause").' '.($pflichtpause==false?$p->t("zeitaufzeichnung/inklusivePflichtpause"):'').':
 				        </td>
 				        <td '.$style.' align="right"><b>'.$tagessaldo.'</b><br>'.date('H:i', ($pausesumme-3600)).'</td>
-				        <td '.$style.' colspan="3"></td>';
+				        <td '.$style.' colspan="3" align="right"><a href="?von_datum='.$datum->formatDatum($tag,'d.m.Y').'&bis_datum='.$datum->formatDatum($tag,'d.m.Y').'" class="item">&lt;-</a></td>';
 						
 						$tag=$datumtag;
 						$tagessumme='00:00';

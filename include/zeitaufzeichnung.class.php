@@ -378,9 +378,9 @@ class zeitaufzeichnung extends basis_db
 	    			d.dates, z.*, to_char ((z.ende-z.start),'HH24:MI') as diff, 
 	    			(SELECT (to_char(sum(ende-start),'DD')::integer)*24+to_char(sum(ende-start),'HH24')::integer || ':' || to_char(sum(ende-start),'MI')
 	    			 FROM campus.tbl_zeitaufzeichnung 
-	    			 WHERE $where ) as summe 	    
+	    			 WHERE $where) as summe 	    
 	    		FROM campus.tbl_zeitaufzeichnung z
-	    		right join (select current_date - s.a as dates from generate_series(0,$max_anz,1) as s(a)) d on date(z.ende) = d.dates $where_join order by d.dates desc
+	    		right join (select current_date - s.a as dates from generate_series(0,$max_anz,1) as s(a)) d on date(z.ende) = d.dates $where_join order by d.dates desc, z.start desc
 	    		";
 
 	    if($result = $this->db_query($qry))
