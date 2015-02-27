@@ -1322,6 +1322,7 @@ function LehrveranstaltungNotenDetailDisableFields(val)
 {
 	document.getElementById('lehrveranstaltung-noten-button-speichern').disabled=val;
 	document.getElementById('lehrveranstaltung-noten-menulist-note').disabled=val;
+	document.getElementById('lehrveranstaltung-noten-textbox-punkte').disabled=val;
 }
 
 // ****
@@ -1645,6 +1646,7 @@ function LehrveranstaltungNoteSpeichern()
 	var studiensemester_kurzbz=tree.view.getCellText(tree.currentIndex,col);
 
 	note = document.getElementById('lehrveranstaltung-noten-menulist-note').value;
+	punkte = document.getElementById('lehrveranstaltung-noten-textbox-punkte').value;
 
 
 	var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
@@ -1656,6 +1658,7 @@ function LehrveranstaltungNoteSpeichern()
 	req.add('student_uid', student_uid);
 	req.add('studiensemester_kurzbz', studiensemester_kurzbz);
 	req.add('note', note);
+	req.add('punkte', punkte);
 
 	var response = req.executePOST();
 
@@ -1712,11 +1715,13 @@ function LehrveranstaltungNotenAuswahl()
 	//Daten holen
 
 	note = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#note" ));
+	punkte = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#punkte" ));
 
 	if(note=='')
 		note='9';
 
 	document.getElementById('lehrveranstaltung-noten-menulist-note').value=note;
+	document.getElementById('lehrveranstaltung-noten-textbox-punkte').value=punkte;
 }
 
 // ****
@@ -1762,7 +1767,13 @@ function LehrveranstaltungNotenImport()
 		if(zeile[0]!='' && zeile[1]!='')
 		{
 			req.add('matrikelnummer_'+i, zeile[0]);
-			req.add('note_'+i, zeile[1]);
+			<?php
+			if(CIS_GESAMTNOTE_PUNKTE)
+				echo "req.add('punkte_'+i, zeile[1]);";
+			else
+				echo "req.add('note_'+i, zeile[1]);";
+			?>
+
 			i++;
 		}
 	}
@@ -1787,6 +1798,47 @@ function LehrveranstaltungNotenImport()
 	{
 		LehrveranstaltungNotenTreeDatasource.Refresh(false); //non blocking
 		SetStatusBarText('Daten wurden gespeichert');
+	}
+}
+
+/**
+ * Wird aufgerufen wenn Punkte zu einer Note eingetragen werden
+ * Laedt die Note anhand des Notenschluessels
+ */
+function LehrveranstaltungNotenPunkteChange()
+{
+	var punkte = document.getElementById('lehrveranstaltung-noten-textbox-punkte').value;
+	punkte = punkte.replace(',','.');
+	if(punkte!='')
+	{
+		var tree=document.getElementById('lehrveranstaltung-noten-tree');
+		//Ausgewaehlte LV holen
+		var col = tree.columns ? tree.columns["lehrveranstaltung-noten-tree-lehrveranstaltung_id"] : "lehrveranstaltung-noten-tree-lehrveranstaltung_id";
+		var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
+
+		var url = '<?php echo APP_ROOT ?>content/student/studentDBDML.php';
+		var req = new phpRequest(url,'','');
+	
+		req.add('type', 'getnotenotenschluessel');
+	
+		req.add('lehrveranstaltung_id', lehrveranstaltung_id);
+		req.add('punkte', punkte);
+		
+		var response = req.executePOST();
+	
+		var val =  new ParseReturnValue(response)
+	
+		if (!val.dbdml_return)
+		{
+			if(val.dbdml_errormsg=='')
+				alert(response);
+			else
+				alert(val.dbdml_errormsg);				
+		}
+		else
+		{
+			document.getElementById('lehrveranstaltung-noten-menulist-note').value=val.dbdml_data;
+		}
 	}
 }
 

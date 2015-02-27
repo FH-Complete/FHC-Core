@@ -660,7 +660,13 @@ class moodle24_course extends basis_db
 			try
 			{
 				$client = new SoapClient($this->serverurl); 
-				$response = $client->fhcomplete_get_course_grades($row_moodle->mdl_course_id);
+				if(CIS_GESAMTNOTE_PUNKTE)
+					$type=2; // Prozentpunkte
+				else
+					$type=3; // Noten aufgrund Skala
+				// 1 = Punkte, 2 = Prozentpunkte, 3 = Note laut Skala
+
+				$response = $client->fhcomplete_get_course_grades($row_moodle->mdl_course_id, $type);
 
 				if (count($response)>0) 	
 				{
@@ -682,7 +688,10 @@ class moodle24_course extends basis_db
 				}
 			}
 			catch(SoapFault $e)
-			{}
+			{
+				//echo print_r($e, true);
+				//return false;
+			}
 
 		}
 		return true;

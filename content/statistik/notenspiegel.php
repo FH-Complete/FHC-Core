@@ -41,16 +41,23 @@ require_once('../../include/student.class.php');
 require_once('../../include/prestudent.class.php');
 require_once('../../include/note.class.php');
 require_once('../../include/lehrveranstaltung.class.php');
+require_once('../../include/benutzerberechtigung.class.php');
 require_once('../../include/Excel/excel.php');
 
 $db = new basis_db();
 $user = get_uid();
 loadVariables($user);
 
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
 if(!isset($_GET['studiengang_kz']))
 	die('Falsche Parameteruebergabe');
 else 
 	$studiengang_kz = $_GET['studiengang_kz'];
+
+if(!$rechte->isBerechtigt('student/noten',$studiengang_kz, 's'))
+	die('Sie haben keine Berechtigung fuer diese Seite');
 
 $semester = isset($_GET['semester'])?$_GET['semester']:'';
 $typ = isset($_GET['typ'])?$_GET['typ']:'';
@@ -76,7 +83,7 @@ foreach ($result_student as $row)
 {
 	if($uids!='')
 		$uids.=',';
-	$uids.="'".addslashes($row->uid)."'";
+	$uids.=$db->db_add_param($row->uid);
 }
 if($uids=='')
 	die('Es befinden sich keine Studierende in diesem Semester');
@@ -93,9 +100,9 @@ $qry = "SELECT
 				FROM 
 					campus.vw_student_lehrveranstaltung, public.tbl_studentlehrverband
 	        	WHERE 
-	        		tbl_studentlehrverband.studiengang_kz='".addslashes($studiengang_kz)."' AND 
-	        		tbl_studentlehrverband.semester='".addslashes($semester)."' AND 
-	        		vw_student_lehrveranstaltung.studiensemester_kurzbz='".addslashes($semester_aktuell)."' AND
+	        		tbl_studentlehrverband.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND 
+	        		tbl_studentlehrverband.semester=".$db->db_add_param($semester, FHC_INTEGER)." AND 
+	        		vw_student_lehrveranstaltung.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
 	        		uid=student_uid AND 
 	        		vw_student_lehrveranstaltung.studiensemester_kurzbz=tbl_studentlehrverband.studiensemester_kurzbz
 	        ) 
@@ -106,11 +113,11 @@ $qry = "SELECT
 	    FROM
 	    	lehre.tbl_lehrveranstaltung JOIN lehre.tbl_zeugnisnote USING(lehrveranstaltung_id)
 	    WHERE
-	    	tbl_lehrveranstaltung.studiengang_kz='".addslashes($studiengang_kz)."' AND
+	    	tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND
 	    	tbl_zeugnisnote.student_uid in($uids) AND
-	    	tbl_zeugnisnote.studiensemester_kurzbz='".addslashes($semester_aktuell)."'
+	    	tbl_zeugnisnote.studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)."
 		ORDER BY bezeichnung";
-//tbl_lehrveranstaltung.semester='".addslashes($semester)."' AND
+
 if(!$result_lva = $db->db_query($qry))
 	die('Fehler beim Ermitteln der Lehrveranstaltungen');
 
@@ -122,6 +129,7 @@ $noten_farben = array();
 foreach ($noten->result as $row)
 {
 	$noten_arr[$row->note]=$row->anmerkung;
+	$noten_wert[$row->note]=$row->notenwert;
 	$noten_farben[$row->note]=$row->farbe;
 }
 
@@ -174,9 +182,24 @@ if($typ=='xls')
 		{
 			$workbook->setCustomColor($note+10, 255, 255, 255);
 		}
+
+		$format_colored[$note] =& $workbook->addFormat();
+		$format_colored[$note]->setFgColor($note+10);
+		$format_colored[$note]->setBorder(1);
+		$format_colored[$note]->setAlign('center');
 	}
 	//30 = Grau = Nicht teilgenommen
 	$workbook->setCustomColor(30,90,90,90);
+
+	$format_colored_nichtzugeteilt =& $workbook->addFormat();
+	$format_colored_nichtzugeteilt->setFgColor(30);
+	$format_colored_nichtzugeteilt->setBorder(1);
+	$format_colored_nichtzugeteilt->setAlign('center');
+
+	$format_colored_nichteingetragen =& $workbook->addFormat();
+	$format_colored_nichteingetragen->setFgColor(19);
+	$format_colored_nichteingetragen->setBorder(1);
+	$format_colored_nichteingetragen->setAlign('center');
 	
 	$spalte=0;
 	$zeile=1;
@@ -233,7 +256,7 @@ if($typ=='xls')
 				
 		//Alle Zeugnisnoten des Studierenden holen
 		$noten = array();
-		$qry = "SELECT * FROM lehre.tbl_zeugnisnote WHERE student_uid='".addslashes($row_student->uid)."' AND studiensemester_kurzbz='".addslashes($semester_aktuell)."'";
+		$qry = "SELECT * FROM lehre.tbl_zeugnisnote WHERE student_uid=".$db->db_add_param($row_student->uid)." AND studiensemester_kurzbz=".$db->db_add_param($semester_aktuell);
 		if($result = $db->db_query($qry))
 			while($row = $db->db_fetch_object($result))
 				$noten[$row->lehrveranstaltung_id] = $row->note;
@@ -244,8 +267,8 @@ if($typ=='xls')
 					FROM 
 						campus.vw_student_lehrveranstaltung 
 					WHERE 
-						uid='".addslashes($row_student->uid)."' AND 
-						studiensemester_kurzbz='".addslashes($semester_aktuell)."'";
+						uid=".$db->db_add_param($row_student->uid)." AND 
+						studiensemester_kurzbz=".$db->db_add_param($semester_aktuell);
 		
 		if($result = $db->db_query($qry))
 			while($row = $db->db_fetch_object($result))
@@ -256,36 +279,31 @@ if($typ=='xls')
 		$rowcount=0;
 		$summeects=0;
 		$gewichtetenote=0;
+
 		while($rowcount<$db->db_num_rows($result_lva))
 		{
 			$row_lva = $db->db_fetch_object($result_lva,$rowcount);
 			$rowcount++;
 			if(isset($noten[$row_lva->lehrveranstaltung_id]))
 			{								
-				unset($format_colored);
-				$format_colored =& $workbook->addFormat();
-				$format_colored->setFgColor($noten[$row_lva->lehrveranstaltung_id]+10);
-				$format_colored->setBorder(1);
-				$format_colored->setAlign('center');
-				
-				if(isset($format_colored))
-					$worksheet->write($zeile,++$spalte,$noten_arr[$noten[$row_lva->lehrveranstaltung_id]],$format_colored);
+				if(isset($format_colored[$noten[$row_lva->lehrveranstaltung_id]]))
+					$worksheet->write($zeile,++$spalte,$noten_arr[$noten[$row_lva->lehrveranstaltung_id]],$format_colored[$noten[$row_lva->lehrveranstaltung_id]]);
 				else 
 					$worksheet->write($zeile,++$spalte,$noten_arr[$noten[$row_lva->lehrveranstaltung_id]]);
 				
-				if(is_numeric($noten_arr[$noten[$row_lva->lehrveranstaltung_id]]))
+				if($noten_wert[$noten[$row_lva->lehrveranstaltung_id]]!='')
 				{
 					if(!isset($summe_lv[$row_lva->lehrveranstaltung_id]))
 					{
 						$summe_lv[$row_lva->lehrveranstaltung_id]=0;
 						$anzahl_lv[$row_lva->lehrveranstaltung_id]=0;
 					}
-					$summe_lv[$row_lva->lehrveranstaltung_id] += $noten[$row_lva->lehrveranstaltung_id];
+					$summe_lv[$row_lva->lehrveranstaltung_id] += $noten_wert[$noten[$row_lva->lehrveranstaltung_id]];
 					$anzahl_lv[$row_lva->lehrveranstaltung_id]++;
-					$summe+=$noten[$row_lva->lehrveranstaltung_id];
+					$summe+=$noten_wert[$noten[$row_lva->lehrveranstaltung_id]];
 					if(is_numeric($row_lva->ects))
 					{
-						$gewichtetenote += $noten[$row_lva->lehrveranstaltung_id]*$row_lva->ects;
+						$gewichtetenote += $noten_wert[$noten[$row_lva->lehrveranstaltung_id]]*$row_lva->ects;
 						$summeects+=$row_lva->ects;
 					}
 					$anzahl++;
@@ -293,21 +311,16 @@ if($typ=='xls')
 			}
 			else 
 			{
-				//Keine Note fuer diese LV vorhanden
-				unset($format_colored);
-				
-				$format_colored =& $workbook->addFormat();
-				
+				//Keine Note fuer diese LV vorhanden				
 				if(in_array($row_lva->lehrveranstaltung_id, $zugeteilte_lvs))
-					$format_colored->setFgColor(19); // zugeteilt zur LV aber noch nicht eingetragen
+				{
+					$worksheet->write($zeile,++$spalte,'',$format_colored_nichteingetragen);
+				}
 				else
-					$format_colored->setFgColor(30); //Grau - nicht zugeteilt zur LV
-				
-				$format_colored->setBorder(1);
-				$format_colored->setAlign('center');
-			
-				$worksheet->write($zeile,++$spalte,'',$format_colored);
-				unset($format_colored);
+				{
+					$worksheet->write($zeile,++$spalte,'',$format_colored_nichtzugeteilt);
+				}
+
 			}
 		}
 		if($anzahl!=0)
@@ -320,8 +333,11 @@ if($typ=='xls')
 		
 		$worksheet->write($zeile,++$spalte,sprintf("%.2f",$schnitt), $format_number);
 		$worksheet->write($zeile,++$spalte,sprintf("%.2f",$gewichtetenote), $format_number);
-		$summegewichtet+=$gewichtetenote;
-		$anzahlgewichtet++;
+		if($gewichtetenote!=0)
+		{
+			$summegewichtet+=$gewichtetenote;
+			$anzahlgewichtet++;
+		}
 	}
 	
 	$zeile++;
@@ -428,7 +444,7 @@ else
 		echo "<tr><td>$i</td><td>$row_student->nachname $row_student->vorname</td><td>$row_student->matrikelnr</td>";
 		
 		$noten = array();
-		$qry = "SELECT * FROM lehre.tbl_zeugnisnote WHERE student_uid='".addslashes($row_student->uid)."' AND studiensemester_kurzbz='".addslashes($semester_aktuell)."'";
+		$qry = "SELECT * FROM lehre.tbl_zeugnisnote WHERE student_uid=".$db->db_add_param($row_student->uid)." AND studiensemester_kurzbz=".$db->db_add_param($semester_aktuell);
 		if($result = $db->db_query($qry))
 			while($row = $db->db_fetch_object($result))
 				$noten[$row->lehrveranstaltung_id] = $row->note;
@@ -439,8 +455,8 @@ else
 					FROM 
 						campus.vw_student_lehrveranstaltung 
 					WHERE 
-						uid='".addslashes($row_student->uid)."' AND 
-						studiensemester_kurzbz='".addslashes($semester_aktuell)."'";
+						uid=".$db->db_add_param($row_student->uid)." AND 
+						studiensemester_kurzbz=".$db->db_add_param($semester_aktuell);
 		
 		if($result = $db->db_query($qry))
 			while($row = $db->db_fetch_object($result))
@@ -464,19 +480,19 @@ else
 				
 				echo "<td $farbe>".$noten_arr[$noten[$row_lva->lehrveranstaltung_id]]."</td>";
 				
-				if(is_numeric($noten_arr[$noten[$row_lva->lehrveranstaltung_id]]))
+				if($noten_wert[$noten[$row_lva->lehrveranstaltung_id]]!='')
 				{
 					if(!isset($summe_lv[$row_lva->lehrveranstaltung_id]))
 					{
 						$summe_lv[$row_lva->lehrveranstaltung_id]=0;
 						$anzahl_lv[$row_lva->lehrveranstaltung_id]=0;
 					}
-					$summe_lv[$row_lva->lehrveranstaltung_id] += $noten[$row_lva->lehrveranstaltung_id];
+					$summe_lv[$row_lva->lehrveranstaltung_id] += $noten_wert[$noten[$row_lva->lehrveranstaltung_id]];
 					$anzahl_lv[$row_lva->lehrveranstaltung_id]++;
-					$summe+=$noten[$row_lva->lehrveranstaltung_id];
+					$summe+=$noten_wert[$noten[$row_lva->lehrveranstaltung_id]];
 					if(is_numeric($row_lva->ects))
 					{
-						$gewichtetenote += $noten[$row_lva->lehrveranstaltung_id]*$row_lva->ects;
+						$gewichtetenote += $noten_wert[$noten[$row_lva->lehrveranstaltung_id]]*$row_lva->ects;
 						$summeects+=$row_lva->ects;
 					}
 					$anzahl++;
@@ -501,8 +517,11 @@ else
 			$gewichtetenote /= $summeects;
 		echo "<td>".($schnitt==0?'&nbsp;':sprintf("%.2f", $schnitt))."</td>";
 		echo "<td>".($gewichtetenote==0?'&nbsp;':sprintf("%.2f", $gewichtetenote))."</td>";
-		$summegewichtet+=$gewichtetenote;
-		$anzahlgewichtet++;
+		if($gewichtetenote!=0)
+		{
+			$summegewichtet+=$gewichtetenote;
+			$anzahlgewichtet++;
+		}
 		echo '</tr>';
 	}
 	

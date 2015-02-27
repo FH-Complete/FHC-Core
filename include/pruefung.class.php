@@ -42,6 +42,7 @@ class pruefung extends basis_db
     public $ext_id;					// bigint
     public $pruefungsanmeldung_id;	// bigint
 	public $vertrag_id;				// bigint
+	public $punkte;					// numeric(8,4)
 
     public $lehrveranstaltung_bezeichnung;
     public $lehrveranstaltung_id;
@@ -74,8 +75,15 @@ class pruefung extends basis_db
 		    return false;
 	    }
 
-	    $qry = "SELECT tbl_pruefung.*, tbl_lehreinheit.lehrveranstaltung_id, tbl_lehreinheit.studiensemester_kurzbz as studiensemester_kurzbz
-			    FROM lehre.tbl_pruefung JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) WHERE pruefung_id=".$this->db_add_param($pruefung_id, FHC_INTEGER);
+	    $qry = "SELECT 
+					tbl_pruefung.*, 
+					tbl_lehreinheit.lehrveranstaltung_id, 
+					tbl_lehreinheit.studiensemester_kurzbz as studiensemester_kurzbz
+			    FROM 
+					lehre.tbl_pruefung 
+					JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
+				WHERE 
+					pruefung_id=".$this->db_add_param($pruefung_id, FHC_INTEGER);
 
 	    if($this->db_query($qry))
 	    {
@@ -98,6 +106,7 @@ class pruefung extends basis_db
 			    $this->pruefungsanmeldung_id=$row->pruefungsanmeldung_id;
 			    $this->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 			    $this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$this->punkte = $row->punkte;
 		    }
 	    }
 	    else
@@ -145,6 +154,7 @@ class pruefung extends basis_db
 		    $pruef_obj->ext_id=$row->ext_id;
 		    $pruef_obj->pruefungsanmeldung_id=$row->pruefungsanmeldung_id;
 			$pruef_obj->vertrag_id = $row->vertrag_id;
+			$pruef_obj->punkte = $row->punkte;
 
 		    $this->result[] = $pruef_obj;
 	    }
@@ -209,7 +219,8 @@ class pruefung extends basis_db
 	    if($this->new)
 	    {
 		    //Neuen Datensatz anlegen
-		    $qry = 'BEGIN;INSERT INTO lehre.tbl_pruefung (lehreinheit_id, student_uid, mitarbeiter_uid, note, pruefungstyp_kurzbz, datum, anmerkung, insertamum, insertvon, updateamum, updatevon, ext_id, pruefungsanmeldung_id, vertrag_id) VALUES ('.
+		    $qry = 'BEGIN;INSERT INTO lehre.tbl_pruefung (lehreinheit_id, student_uid, mitarbeiter_uid, note, pruefungstyp_kurzbz, 
+				datum, anmerkung, insertamum, insertvon, updateamum, updatevon, ext_id, pruefungsanmeldung_id, vertrag_id, punkte) VALUES ('.
 			    $this->db_add_param($this->lehreinheit_id).', '.
 			    $this->db_add_param($this->student_uid).', '.
 			    $this->db_add_param($this->mitarbeiter_uid).', '.
@@ -223,7 +234,8 @@ class pruefung extends basis_db
 			    $this->db_add_param($this->updatevon).', '.
 			    $this->db_add_param($this->ext_id).', '.
 			    $this->db_add_param($this->pruefungsanmeldung_id).','.
-				$this->db_add_param($this->vertrag_id).');';
+				$this->db_add_param($this->vertrag_id).','.
+				$this->db_add_param($this->punkte).');';
 	    }
 	    else
 	    {
@@ -237,7 +249,7 @@ class pruefung extends basis_db
 		    }
 
 		    $qry = 'UPDATE lehre.tbl_pruefung SET '.
-			    'lehreinheit_id='.$this->db_add_param($this->lehreinheit_id).', '.
+			    'lehreinheit_id='.$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).', '.
 			    'student_uid='.$this->db_add_param($this->student_uid).', '.
 			    'mitarbeiter_uid='.$this->db_add_param($this->mitarbeiter_uid).', '.
 			    'note='.$this->db_add_param($this->note).', '.
@@ -249,9 +261,10 @@ class pruefung extends basis_db
 			    'updateamum='.$this->db_add_param($this->updateamum).', '.
 			    'updatevon='.$this->db_add_param($this->updatevon).', '.
 			    'ext_id='.$this->db_add_param($this->ext_id).', '.
-			    'pruefungsanmeldung_id='.$this->db_add_param($this->pruefungsanmeldung_id).', '.
-				'vertrag_id='.$this->db_add_param($this->vertrag_id).' '.
-			    'WHERE pruefung_id='.$this->db_add_param($this->pruefung_id).';';
+			    'pruefungsanmeldung_id='.$this->db_add_param($this->pruefungsanmeldung_id, FHC_INTEGER).', '.
+				'vertrag_id='.$this->db_add_param($this->vertrag_id, FHC_INTEGER).', '.
+				'punkte='.$this->db_add_param($this->punkte).' '.
+			    'WHERE pruefung_id='.$this->db_add_param($this->pruefung_id, FHC_INTEGER).';';
 	    }
 
 	    if($this->db_query($qry))
@@ -339,6 +352,7 @@ class pruefung extends basis_db
 			    $obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 			    $obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 			    $obj->pruefungsanmeldung_id = $row->pruefungsanmeldung_id;
+				$obj->punkte = $row->punkte;
 
 			    $this->result[] = $obj;
 		    }
@@ -400,6 +414,7 @@ class pruefung extends basis_db
 			    $obj->lehrveranstaltung_bezeichnung = $row->lehrveranstaltung_bezeichnung;
 			    $obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 			    $obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$obj->punkte = $row->punkte;
 
 			    $this->result[] = $obj;
 		    }
@@ -419,41 +434,42 @@ class pruefung extends basis_db
      */
     public function getPruefungByAnmeldung($pruefungsanmeldung_id)
     {
-	if(!is_numeric($pruefungsanmeldung_id))
-	{
-	    $this->errormsg = 'pruefungsanmeldung_id muss eine gueltige Zahl sein';
-	    return false;
-	}
+		if(!is_numeric($pruefungsanmeldung_id))
+		{
+			$this->errormsg = 'pruefungsanmeldung_id muss eine gueltige Zahl sein';
+			return false;
+		}
 
-	$qry = "SELECT * FROM lehre.tbl_pruefung WHERE pruefungsanmeldung_id=".$this->db_add_param($pruefungsanmeldung_id).";";
+		$qry = "SELECT * FROM lehre.tbl_pruefung WHERE pruefungsanmeldung_id=".$this->db_add_param($pruefungsanmeldung_id).";";
 
-	if($this->db_query($qry))
-	{
-	    if($row = $this->db_fetch_object())
-	    {
-		$this->pruefung_id = $row->pruefung_id;
-		$this->lehreinheit_id=$row->lehreinheit_id;
-		$this->student_uid=$row->student_uid;
-		$this->mitarbeiter_uid=$row->mitarbeiter_uid;
-		$this->note=$row->note;
-		$this->pruefungstyp_kurzbz=$row->pruefungstyp_kurzbz;
-		$this->datum=$row->datum;
-		$this->anmerkung=$row->anmerkung;
-		$this->insertamum=$row->insertamum;
-		$this->insertvon=$row->insertvon;
-		$this->updateamum=$row->updateamum;
-		$this->updatevon=$row->updatevon;
-		$this->ext_id=$row->ext_id;
-		$this->pruefungsanmeldung_id=$row->pruefungsanmeldung_id;
-	    }
-	}
-	else
-	{
-	    $this->errormsg = 'Datensatz konnte nicht geladen werden';
-	    return false;
-	}
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->pruefung_id = $row->pruefung_id;
+				$this->lehreinheit_id=$row->lehreinheit_id;
+				$this->student_uid=$row->student_uid;
+				$this->mitarbeiter_uid=$row->mitarbeiter_uid;
+				$this->note=$row->note;
+				$this->pruefungstyp_kurzbz=$row->pruefungstyp_kurzbz;
+				$this->datum=$row->datum;
+				$this->anmerkung=$row->anmerkung;
+				$this->insertamum=$row->insertamum;
+				$this->insertvon=$row->insertvon;
+				$this->updateamum=$row->updateamum;
+				$this->updatevon=$row->updatevon;
+				$this->ext_id=$row->ext_id;
+				$this->pruefungsanmeldung_id=$row->pruefungsanmeldung_id;
+				$this->punkte = $row->punkte;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Datensatz konnte nicht geladen werden';
+			return false;
+		}
 
-	return true;
+		return true;
     }
 }
 ?>

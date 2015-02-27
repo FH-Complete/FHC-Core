@@ -123,7 +123,7 @@ if(copy($zipfile, $tempname_zip))
 				}
 				else
 				{
-				    $oe = NULL;
+				    $oe = new organisationseinheit();
 				}
 				$xml.="
 				<mitarbeiter>

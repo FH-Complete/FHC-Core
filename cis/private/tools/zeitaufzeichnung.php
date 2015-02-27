@@ -20,6 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>
  *          Karl Burkhart <burkhart@technikum-wien.at>
  *          Manfred Kindl <kindlm@technikum.wien.at>.
+ *          Gerald Raab <raab@technikum-wien.at> 
  */
 require_once('../../../config/cis.config.inc.php');
 require_once('../../../include/functions.inc.php');
@@ -28,6 +29,7 @@ require_once('../../../include/benutzer.class.php');
 require_once('../../../include/studiengang.class.php');
 require_once('../../../include/fachbereich.class.php');
 require_once('../../../include/zeitaufzeichnung.class.php');
+require_once('../../../include/zeitsperre.class.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/projekt.class.php');
 require_once('../../../include/phrasen.class.php'); 
@@ -35,6 +37,7 @@ require_once('../../../include/organisationseinheit.class.php');
 require_once('../../../include/service.class.php');
 require_once('../../../include/mitarbeiter.class.php');
 require_once('../../../include/betriebsmittelperson.class.php');
+require_once('../../../include/globals.inc.php');
 
 $sprache = getSprache(); 
 $p=new phrasen($sprache); 
@@ -45,15 +48,16 @@ if (!$db = new basis_db())
 $user = get_uid();
 $datum = new datum();
 
+
 $zeitaufzeichnung_id = (isset($_GET['zeitaufzeichnung_id'])?$_GET['zeitaufzeichnung_id']:'');
 $projekt_kurzbz = (isset($_POST['projekt'])?$_POST['projekt']:'');
 $oe_kurzbz_1 = (isset($_POST['oe_kurzbz_1'])?$_POST['oe_kurzbz_1']:'');
 $oe_kurzbz_2 = (isset($_POST['oe_kurzbz_2'])?$_POST['oe_kurzbz_2']:'');
 $aktivitaet_kurzbz = (isset($_POST['aktivitaet'])?$_POST['aktivitaet']:'');
-$von_datum = (isset($_POST['von_datum'])?$_POST['von_datum']:date('d.m.Y'));
+$von_datum = (isset($_REQUEST['von_datum'])?$_REQUEST['von_datum']:date('d.m.Y'));
 $von_uhrzeit = (isset($_POST['von_uhrzeit'])?$_POST['von_uhrzeit']:date('H:i'));
 $von = $von_datum.' '.$von_uhrzeit;
-$bis_datum = (isset($_POST['bis_datum'])?$_POST['bis_datum']:date('d.m.Y'));
+$bis_datum = (isset($_REQUEST['bis_datum'])?$_REQUEST['bis_datum']:date('d.m.Y'));
 $bis_uhrzeit = (isset($_POST['bis_uhrzeit'])?$_POST['bis_uhrzeit']:date('H:i',mktime(date('H'), date('i')+10)));
 $bis = $bis_datum.' '.$bis_uhrzeit;
 $beschreibung = (isset($_POST['beschreibung'])?$_POST['beschreibung']:'');
@@ -61,8 +65,12 @@ $service_id = (isset($_POST['service_id'])?$_POST['service_id']:'');
 $kunde_uid = (isset($_POST['kunde_uid'])?$_POST['kunde_uid']:'');
 $kartennummer = (isset($_POST['kartennummer'])?$_POST['kartennummer']:'');
 $filter = (isset($_GET['filter'])?$_GET['filter']:'foo');
-$alle = (isset($_POST['alle'])?(isset($_POST['normal'])?false:true):false);
+$alle = (isset($_GET['alle'])?(isset($_GET['normal'])?false:true):false);
 $angezeigte_tage = '50';
+
+$zs = new zeitsperre();
+$zs->getZeitsperrenForZeitaufzeichnung($user,$angezeigte_tage);
+$zeitsperren = $zs->result;
 
 echo '<!DOCTYPE HTML>
 <html>
@@ -487,7 +495,7 @@ if($projekt->getProjekteMitarbeiter($user))
 			
 			echo '<option value="'.$db->convert_html_chars($row_projekt->projekt_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($row_projekt->titel).'</option>';
 		}
-		echo '</SELECT><input type="button" value="'.$p->t("zeitaufzeichnung/uebersicht").'" onclick="loaduebersicht();"></td>';
+		echo '</SELECT><!--<input type="button" value="'.$p->t("zeitaufzeichnung/uebersicht").'" onclick="loaduebersicht();">--></td>';
 		echo '</tr><tr>';
 		//OE_KURZBZ_1
 		echo '<td nowrap>'.$p->t("zeitaufzeichnung/organisationseinheiten").'</td>
@@ -651,7 +659,11 @@ if($projekt->getProjekteMitarbeiter($user))
  
 		echo '<hr>';
 		echo '<h3>'.($alle===true?$p->t('zeitaufzeichnung/alleEintraege'):$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage))).'</h3>';
-		echo '<input type="submit" value="'.($alle===true?$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage)):$p->t('zeitaufzeichnung/alleAnzeigen')).'" name="'.($alle===true?'normal':'alle').'">';
+		if ($alle===true)		
+			echo '<a href="?normal" style="text-decoration:none"><input type="button" value="'.$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage)).'"></a>';
+		else 
+			echo '<a href="?alle" style="text-decoration:none"><input type="button" value="'.$p->t('zeitaufzeichnung/alleAnzeigen').'"></a>';
+		//echo '<input type="submit" value="'.($alle===true?$p->t('zeitaufzeichnung/xTageAnsicht', array($angezeigte_tage)):$p->t('zeitaufzeichnung/alleAnzeigen')).'" name="'.($alle===true?'normal':'alle').'">';
 		echo '</form>';
 		
 		$za = new zeitaufzeichnung();
@@ -660,9 +672,9 @@ if($projekt->getProjekteMitarbeiter($user))
 	    else
 	    {
 	    	if ($alle==true)
-	    		$za->getListeUser($user, '');
+	    		$za->getListeUserFull($user, '');
 	    	else 
-	    		$za->getListeUser($user, $angezeigte_tage);
+	    		$za->getListeUserFull($user, $angezeigte_tage);
 	    }
 	   
 		$summe=0;
@@ -672,24 +684,24 @@ if($projekt->getProjekteMitarbeiter($user))
 			//Uebersichtstabelle
 			$woche=date('W');
 			echo '
-			<table id="t1" class="tablesorter">
+			<table id="t1" class="" style="width:100%">
 				<thead>
 					<tr>
 						<th style="background-color: #8DBDD8;" align="center" class="{sorter: false}" colspan="13">'.$p->t("eventkalender/kw").' '.$woche.'</th>
 					</tr>
 					<tr>
-						<th>'.$p->t("zeitaufzeichnung/id").'</th>
-						<th>'.$p->t("zeitaufzeichnung/user").'</th>
-						<th>'.$p->t("zeitaufzeichnung/projekt").'</th>
-						<th>'.$p->t("zeitaufzeichnung/oe").' 1</th>
-						<th>'.$p->t("zeitaufzeichnung/oe").' 2</th>
-						<th>'.$p->t("zeitaufzeichnung/aktivitaet").'</th>
-						<th>'.$p->t("zeitaufzeichnung/service").'</th>
-						<th>'.$p->t("zeitaufzeichnung/start").'</th>
-						<th>'.$p->t("zeitaufzeichnung/ende").'</th>
-						<th>'.$p->t("zeitaufzeichnung/dauer").'</th>
-						<th>'.$p->t("global/beschreibung").'</th>
-						<th colspan="2">'.$p->t("global/aktion").'</th>
+						<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/id").'</th>
+						<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/user").'</th>
+						<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/projekt").'</th>
+						<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/oe").' 1</th>
+						<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/oe").' 2</th>
+						<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/aktivitaet").'</th>
+						<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/service").'</th>
+						<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/start").'</th>
+						<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/ende").'</th>
+						<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/dauer").'</th>
+						<th style="background-color:#DCE4EF" align="center">'.$p->t("global/beschreibung").'</th>
+						<th style="background-color:#DCE4EF" align="center" colspan="2">'.$p->t("global/aktion").'</th>
 		    		</tr>
 		    	</thead>
 		    <tbody>';
@@ -704,52 +716,81 @@ if($projekt->getProjekteMitarbeiter($user))
 			$tagesende = '';
 			$wochensaldo = '00:00';
 			$pflichtpause = false;
-
+			
 			foreach($za->result as $row)
 			{
-				$datumtag = $datum_obj->formatDatum($row->start, 'Y-m-d');
+				$datumtag = $datum_obj->formatDatum($row->datum, 'Y-m-d');
+								
+				//echo '<tr><th colspan="13">foo<th></tr>';				
 				
 				// Nach jedem Tag eine Summenzeile einfuegen
 				if(is_null($tag))
 					$tag = $datumtag;
 				if($tag!=$datumtag)
 				{
-					$style = '';
-					$style = 'style="background-color:#DCE4EF; font-size: 8pt;"';
-					list($h1, $m1) = explode(':', $pausesumme);
-					$pausesumme = $h1*3600+$m1*60;
-					$tagessaldo = $datum->mktime_fromtimestamp($datum->formatDatum($tagesende, $format='Y-m-d H:i:s'))-$datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn, $format='Y-m-d H:i:s'))-3600;
-					if ($tagessaldo>18000 && $pflichtpause==false)
-					{
-						$pausesumme = $pausesumme+1800;
-					}
-					
-					$tagessaldo = $tagessaldo-$pausesumme;
-					$tagessaldo = date('H:i', ($tagessaldo));
-					echo '<tr>
-					<td '.$style.' colspan="7">';
-
-					// Zusaetzlicher span fuer Addon Informationen
-					echo '<span id="tag_'.$datum->formatDatum($tagesbeginn,'d_m_Y').'"></span>';
-
-					echo '</td>
-			        <td align="right" colspan="2" '.$style.'>
-			        	<b>'.$p->t("zeitaufzeichnung/arbeitszeit").': '.$datum->formatDatum($tagesbeginn, $format='H:i').'-'.$datum->formatDatum($tagesende, $format='H:i').' '.$p->t("eventkalender/uhr").'</b><br>
-			        	'.$p->t("zeitaufzeichnung/pause").' '.($pflichtpause==false?$p->t("zeitaufzeichnung/inklusivePflichtpause"):'').':
-			        </td>
-			        <td '.$style.' align="right"><b>'.$tagessaldo.'</b><br>'.date('H:i', ($pausesumme-3600)).'</td>
-			        <td '.$style.' colspan="3"></td>';
-					
-					$tag=$datumtag;
-					$tagessumme='00:00';
-					$pausesumme='00:00';
-					$tagesbeginn = '';
-					$tagesende = '';
-					$pflichtpause = false;
-					$wochensaldo = $datum_obj->sumZeit($wochensaldo,$tagessaldo );
+					//if ($row->uid)
+					//{
+						if ($datum->formatDatum($tag,'N') == '6' || $datum->formatDatum($tag,'N') == '7')
+							$style = 'style="background-color:#eeeeee; font-size: 8pt;"';
+						else 
+							$style = 'style="background-color:#DCE4EF; font-size: 8pt;"';
+						
+						// zeitsperren anzeigen
+						if (array_key_exists($datum->formatDatum($tag,'Y-m-d'), $zeitsperren))
+						{
+							$zeitsperre_text = " -- ".$zeitsperren[$datum->formatDatum($tag,'Y-m-d')]." -- ";
+							$style = 'style="background-color:#cccccc; font-size: 8pt;"';
+						}						
+						else 
+							$zeitsperre_text = '';
+						//var_dump($zs->result);						
+						if (isset($_GET["von_datum"]) && $datum->formatDatum($tag, 'd.m.Y') == $_GET["von_datum"])
+							$style = 'style="border-top: 3px solid #8DBDD8; border-bottom: 3px solid #8DBDD8"';
+							
+						list($h1, $m1) = explode(':', $pausesumme);
+						$pausesumme = $h1*3600+$m1*60;
+						$tagessaldo = $datum->mktime_fromtimestamp($datum->formatDatum($tagesende, $format='Y-m-d H:i:s'))-$datum->mktime_fromtimestamp($datum->formatDatum($tagesbeginn, $format='Y-m-d H:i:s'))-3600;
+						if ($tagessaldo>18000 && $pflichtpause==false)
+						{
+							$pausesumme = $pausesumme+1800;
+						}
+						
+						$tagessaldo = $tagessaldo-$pausesumme;
+						$tagessaldo = date('H:i', ($tagessaldo));
+						echo '<tr id="tag_row_'.$datum->formatDatum($tag,'d_m_Y').'"><td '.$style.' colspan="7">';
+	
+						// Zusaetzlicher span fuer Addon Informationen
+						
+						$lang = getSprache();
+						if ($lang == 'German')
+							$langindex = 1;
+						else 
+							$langindex = 2;
+						echo '<b>'.$tagbez[$langindex][$datum->formatDatum($tag,'N')].' '.$datum->formatDatum($tag,'d.m.Y').'</b> <span id="tag_'.$datum->formatDatum($tag,'d_m_Y').'">'.$zeitsperre_text.'</span>';
+	
+						echo '</td>
+				        <td align="right" colspan="2" '.$style.'>
+				        	<b>'.$p->t("zeitaufzeichnung/arbeitszeit").': '.$datum->formatDatum($tagesbeginn, $format='H:i').'-'.$datum->formatDatum($tagesende, $format='H:i').' '.$p->t("eventkalender/uhr").'</b><br>
+				        	'.$p->t("zeitaufzeichnung/pause").' '.($pflichtpause==false?$p->t("zeitaufzeichnung/inklusivePflichtpause"):'').':
+				        </td>
+				        <td '.$style.' align="right"><b>'.$tagessaldo.'</b><br>'.date('H:i', ($pausesumme-3600)).'</td>
+				        <td '.$style.' colspan="3" align="right"><a href="?von_datum='.$datum->formatDatum($tag,'d.m.Y').'&bis_datum='.$datum->formatDatum($tag,'d.m.Y').'" class="item">&lt;-</a></td>';
+						
+						$tag=$datumtag;
+						$tagessumme='00:00';
+						$pausesumme='00:00';
+						$tagesbeginn = '';
+						$tagesende = '';
+						$pflichtpause = false;
+						$wochensaldo = $datum_obj->sumZeit($wochensaldo,$tagessaldo );
+					//}
+					//else
+					//{
+					//	echo '<tr><td style="background-color:#DCE4EF; font-size: 8pt;" colspan="13"><b>'.$datum->formatDatum($row->datum,'D d.m.Y').'</b></b> <span id="tag_'.$datum->formatDatum($row->datum,'d_m_Y').'"></span></td></tr>';
+					//}
 				}
 				// Nach jeder Woche eine Summenzeile einfuegen und eine neue Tabelle beginnen
-				$datumwoche = $datum_obj->formatDatum($row->start, 'W');
+				$datumwoche = $datum_obj->formatDatum($row->datum, 'W');
 				if(is_null($woche))
 					$woche = $datumwoche;
 				if($woche!=$datumwoche)
@@ -758,33 +799,35 @@ if($projekt->getProjekteMitarbeiter($user))
 					</tbody>
 					<tfoot>
 							<tr>
-								<th colspan="7"></th>
-								<th align="right" colspan="2" style="font-weight: normal;"><b>'.$p->t("zeitaufzeichnung/wochensummeArbeitszeit").':</b></th>
-								<th align="right" style="font-weight: normal;"><b>'.$wochensaldo.'</b></th>
-								<th colspan="3"></th>
+								<th colspan="7" style="background-color: #8DBDD8;"></th>
+								<th style="background-color: #8DBDD8;" align="right" colspan="2" style="font-weight: normal;"><b>'.$p->t("zeitaufzeichnung/wochensummeArbeitszeit").':</b></th>
+								<th style="background-color: #8DBDD8;" align="right" style="font-weight: normal;"><b>'.$wochensaldo.'</b></th>
+								<th style="background-color: #8DBDD8;" colspan="3"></th>
 							</tr>
+							
 					</tfoot>
-					</table>';
+					<!--</table>-->';
 
 					echo '
-					<table id="t'.$datumwoche.'" class="tablesorter">
+					<!--<table id="t'.$datumwoche.'" class="tablesorter">-->
+					<tr><th colspan="13">&nbsp;</th></tr>
 						<thead>
 							<tr>
 								<th style="background-color: #8DBDD8;" align="center" class="{sorter: false}" colspan="13">'.$p->t("eventkalender/kw").' '.$datumwoche.'</th>
 							</tr>
 							<tr>
-								<th>'.$p->t("zeitaufzeichnung/id").'</th>
-								<th>'.$p->t("zeitaufzeichnung/user").'</th>
-								<th>'.$p->t("zeitaufzeichnung/projekt").'</th>
-								<th>'.$p->t("zeitaufzeichnung/oe").' 1</th>
-								<th>'.$p->t("zeitaufzeichnung/oe").' 2</th>
-								<th>'.$p->t("zeitaufzeichnung/aktivitaet").'</th>
-								<th>'.$p->t("zeitaufzeichnung/service").'</th>
-								<th>'.$p->t("zeitaufzeichnung/start").'</th>
-								<th>'.$p->t("zeitaufzeichnung/ende").'</th>
-								<th>'.$p->t("zeitaufzeichnung/dauer").'</th>
-								<th>'.$p->t("global/beschreibung").'</th>
-								<th colspan="2">'.$p->t("global/aktion").'</th>
+								<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/id").'</th>
+								<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/user").'</th>
+								<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/projekt").'</th>
+								<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/oe").' 1</th>
+								<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/oe").' 2</th>
+								<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/aktivitaet").'</th>
+								<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/service").'</th>
+								<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/start").'</th>
+								<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/ende").'</th>
+								<th style="background-color:#DCE4EF" align="center">'.$p->t("zeitaufzeichnung/dauer").'</th>
+								<th style="background-color:#DCE4EF" align="center">'.$p->t("global/beschreibung").'</th>
+								<th style="background-color:#DCE4EF" align="center" colspan="2">'.$p->t("global/aktion").'</th>
 							</tr>
 						</thead>
 					<tbody>';
@@ -796,7 +839,8 @@ if($projekt->getProjekteMitarbeiter($user))
 					$pausesumme='00:00';
 					$wochensaldo = '00:00';
 				}
-				
+				if ($row->uid)
+				{
 				$wochensumme = $datum_obj->sumZeit($wochensumme, $row->diff);
 				if ($row->aktivitaet_kurzbz=='Pause')
 				{
@@ -825,8 +869,8 @@ if($projekt->getProjekteMitarbeiter($user))
 			        <td '.$style.'>'.$db->convert_html_chars($row->oe_kurzbz_2).'</td>
 			        <td '.$style.'>'.$db->convert_html_chars($row->aktivitaet_kurzbz).'</td>
 			        <td '.$style.' title="'.$service->bezeichnung.'">'.StringCut($db->convert_html_chars($service->bezeichnung),20,null,'...').'</td>
-			        <td '.$style.' nowrap>'.date('d.m.Y H:i', $datum->mktime_fromtimestamp($row->start)).'</td>
-			        <td '.$style.' nowrap>'.date('d.m.Y H:i', $datum->mktime_fromtimestamp($row->ende)).'</td>
+			        <td '.$style.' nowrap>'.date('H:i', $datum->mktime_fromtimestamp($row->start)).'</td>
+			        <td '.$style.' nowrap>'.date('H:i', $datum->mktime_fromtimestamp($row->ende)).'</td>
 			        <td '.$style.' align="right">'.$db->convert_html_chars($row->diff).'</td>
 			        <td '.$style.' title="'.$db->convert_html_chars(mb_eregi_replace("\r\n",' ',$row->beschreibung)).'">'.StringCut($db->convert_html_chars($row->beschreibung),20,null,'...').'</td>
 			        <td '.$style.'>';
@@ -844,18 +888,22 @@ if($projekt->getProjekteMitarbeiter($user))
 					
 				if ($tagesende=='' || $datum->mktime_fromtimestamp($datum->formatDatum($tagesende, $format='Y-m-d H:i:s')) < $datum->mktime_fromtimestamp($datum->formatDatum($row->ende, $format='Y-m-d H:i:s')))
 					$tagesende = $row->ende;
+				}	    
 		    }
 			echo '</tbody>';
 			if ($alle===false)
+			{				
 				echo	'<tfoot>
 								<tr>
 									<th align="center" colspan="13">'.$p->t('zeitaufzeichnung/endeXTageAnsicht', array($angezeigte_tage)).'</th>
 								</tr>
 						</tfoot>';
-			echo '</table>';
+			}
+			//echo '</table>';
 		
 	    //echo $p->t("zeitaufzeichnung/gesamtdauer").": ".$db->convert_html_chars($summe); Aukommentiert. Irrelevant
 		}
+		echo '</table>';
 	/* 
 	}
 	else 
@@ -868,6 +916,8 @@ else
 {
 	echo $p->t("zeitaufzeichnung/fehlerBeimErmittelnDerProjekte");
 }
+
+
 
 echo '
 <span id="globalmessages"></span>

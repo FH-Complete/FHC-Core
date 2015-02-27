@@ -26,6 +26,14 @@ header("Expires Mon, 26 Jul 1997 05:00:00 GMT");
 header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../config/global.config.inc.php');
+
+
+if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
+	$punktehidden = 'false';
+else
+	$punktehidden = 'true';
+
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css\" ?>";
@@ -112,6 +120,10 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#student_semester" />
 			<splitter class="tree-splitter"/>
+			<treecol id="lehrveranstaltung-noten-tree-punkte" label="Punkte" flex="2" hidden="true" persist="hidden, width, ordinal"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#punkte" />
+			<splitter class="tree-splitter"/>
 		</treecols>
 	
 		<template>
@@ -132,6 +144,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#studiengang_kz"/>
 						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#student_semester"/>
+						<treecell label="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#punkte"/>
 					</treerow>
 				</treeitem>
 			</treechildren>
@@ -201,6 +214,10 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#lehrveranstaltung_id" />
 			<splitter class="tree-splitter"/>
+			<treecol id="lehrveranstaltung-lvgesamtnoten-tree-punkte" label="Punkte" flex="2" hidden="true"
+				class="sortDirectionIndicator"
+				sort="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#punkte" />
+			<splitter class="tree-splitter"/>
 		</treecols>
 	
 		<template>
@@ -219,6 +236,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#note"/>
 						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#student_uid"/>
 						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#lehrveranstaltung_id"/>
+						<treecell label="rdf:http://www.technikum-wien.at/lvgesamtnote/rdf#punkte"/>
 					</treerow>
 				</treeitem>
 			</treechildren>
@@ -240,7 +258,9 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 				</menupopup>
 		</template>
 	</menulist>
-	<button id="lehrveranstaltung-noten-button-speichern" oncommand="LehrveranstaltungNoteSpeichern()" label="Speichern" disabled="true" hidden="true"/>
+	<label value="Punkte" control="lehrveranstaltung-noten-textbox-punkte" hidden="<?php echo $punktehidden; ?>"/>
+	<textbox id="lehrveranstaltung-noten-textbox-punkte" oninput="LehrveranstaltungNotenPunkteChange()" disabled="true" hidden="<?php echo $punktehidden; ?>"/>
+	<button id="lehrveranstaltung-noten-button-speichern" oncommand="LehrveranstaltungNoteSpeichern()" label="Speichern" disabled="true" hidden="<?php echo $punktehidden; ?>"/>
 	<spacer flex="1" />
 	<button id="lehrveranstaltung-noten-button-import" label="Notenimport" oncommand="LehrveranstaltungNotenImport();" />
 </hbox>

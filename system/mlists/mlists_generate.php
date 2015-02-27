@@ -59,11 +59,14 @@ $error_msg='';
 	
 	$stsem_obj = new studiensemester();
 	
+	/*
 	if(mb_substr($studiensemester,0,1)=='W')
 		$stsem2 = $stsem_obj->getPreviousFrom($studiensemester);
 	else 
 		$stsem2 = $stsem_obj->getNextFrom($studiensemester);
-	
+	*/
+	$stsem2 = $stsem_obj->getNearestFrom($studiensemester);
+
 	function setGeneriert($gruppe)
 	{
 		$db = new basis_db();
@@ -99,6 +102,40 @@ $error_msg='';
 	while($row = $db->db_fetch_object($result))
 	{
      	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES ('$row->uid','".strtoupper($mlist_name)."', now(), 'mlists_generate')";
+		if(!$db->db_query($sql_query))
+			$error_msg.=$db->db_last_error().$sql_query;
+		echo '-';
+		flush();
+	}
+
+	// **************************************************************
+	// Weibliche Mitarbeiterinnen Verteiler abgleichen
+	$mlist_name='tw_ma_w';
+	setGeneriert($mlist_name);
+	// MitarbeiterInnen holen die nicht mehr in den Verteiler gehoeren
+	echo $mlist_name.' wird abgeglichen!<BR>';
+	flush();
+	$sql_query="SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER(".$db->db_add_param($mlist_name).") AND uid NOT IN (SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) JOIN public.tbl_person USING(person_id) WHERE tbl_benutzer.aktiv AND geschlecht='w' AND personalnummer >=0)";
+	
+	if(!($result = $db->db_query($sql_query)))
+		$error_msg.=$db->db_last_error();
+
+	while($row = $db->db_fetch_object($result))
+	{
+     	$sql_query="DELETE FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER(".$db->db_add_param($mlist_name).") AND uid=".$db->db_add_param($row->uid);
+		if(!$db->db_query($sql_query))
+			$error_msg.=$db->db_last_error().$sql_query;
+		echo '-';
+		flush();
+	}
+	// MitarbeiterInnen holen die nicht im Verteiler sind
+	echo '<BR>';
+	$sql_query="SELECT mitarbeiter_uid AS uid FROM public.tbl_mitarbeiter JOIN public.tbl_benutzer ON (mitarbeiter_uid=uid) JOIN public.tbl_person USING(person_id) WHERE tbl_benutzer.aktiv AND geschlecht='w' AND personalnummer >=0 AND mitarbeiter_uid NOT IN (SELECT uid FROM public.tbl_benutzergruppe WHERE UPPER(gruppe_kurzbz)=UPPER(".$db->db_add_param($mlist_name)."))";
+	if(!($result = $db->db_query($sql_query)))
+		$error_msg.= $db->db_last_error();
+	while($row = $db->db_fetch_object($result))
+	{
+     	$sql_query="INSERT INTO public.tbl_benutzergruppe(uid, gruppe_kurzbz, insertamum, insertvon) VALUES (".$db->db_add_param($row->uid).",".$db->db_add_param(strtoupper($mlist_name)).", now(), 'mlists_generate')";
 		if(!$db->db_query($sql_query))
 			$error_msg.=$db->db_last_error().$sql_query;
 		echo '-';
@@ -349,7 +386,7 @@ $error_msg='';
 	echo '<BR>Lektoren-Verteiler der Studiengaenge werden abgeglichen!<BR>';
 	flush();
 	$sql_query="SELECT uid, gruppe_kurzbz FROM public.tbl_benutzergruppe
-		WHERE gruppe_kurzbz LIKE '%\\\\_LKT' AND UPPER(gruppe_kurzbz)!=UPPER('tw_lkt') AND UPPER(gruppe_kurzbz)!=UPPER('tw_fix_lkt') AND UPPER(gruppe_kurzbz)!=UPPER('tw_ext_lkt')
+		WHERE gruppe_kurzbz LIKE '%\\\\_LKT' AND UPPER(gruppe_kurzbz)!=UPPER('tw_lkt') AND UPPER(gruppe_kurzbz)!=UPPER('tw_fix_lkt') AND UPPER(gruppe_kurzbz)!=UPPER('tw_ext_lkt') AND UPPER(gruppe_kurzbz)!=UPPER('moodle_lkt')
 		AND (uid,UPPER(gruppe_kurzbz)) NOT IN
 		(SELECT mitarbeiter_uid,UPPER(typ::varchar(1) || tbl_studiengang.kurzbz || '_lkt')
 			FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehreinheitmitarbeiter, public.tbl_studiengang
@@ -678,6 +715,7 @@ WHERE
 		$error_msg.=$db->db_last_error().' '.$sql_querys;
 	}
 	
+	$sql_query.=" AND NOT EXISTS(SELECT 1 FROM public.tbl_benutzergruppe WHERE gruppe_kurzbz=UPPER(".$db->db_add_param($mlist_name).") AND uid=vw_lehreinheit.mitarbeiter_uid)";
 	if(!($result = $db->db_query($sql_query)))
 		$error_msg.=$db->db_last_error().' '.$sql_query;
 	// Lektoren holen die nicht im Verteiler sind

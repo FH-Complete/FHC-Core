@@ -1374,7 +1374,8 @@ function writeEctsSum(parent)
  */
 function writeOverallSum(root)
 {
-	$("#treeData").append('<div id="stplDetails" style="padding-top: 1.0em"></div>');
+	if(!$('#stplDetails').length)
+		$("#treeData").append('<div id="stplDetails" style="padding-top: 1.0em"></div>');
 	var cells = $(root).find(".jstree-grid-col-1");
 	var sum = 0;
 

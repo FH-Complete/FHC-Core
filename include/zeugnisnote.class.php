@@ -43,6 +43,7 @@ class zeugnisnote extends basis_db
 	public $insertvon;					// varchar(16)
 	public $ext_id;						// bigint
 	public $bemerkung;					// text
+	public $punkte;						// numeric(8,4)
 
 	public $lehrveranstaltung_bezeichung;
 	public $note_bezeichnung;
@@ -106,6 +107,7 @@ class zeugnisnote extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->ext_id = $row->ext_id;
 				$this->bemerkung = $row->bemerkung;
+				$this->punkte = $row->punkte;
 				return true;
 			}
 			else
@@ -179,7 +181,7 @@ class zeugnisnote extends basis_db
 			//Neuen Datensatz einfuegen
 			$qry='INSERT INTO lehre.tbl_zeugnisnote (lehrveranstaltung_id, student_uid, 
 				studiensemester_kurzbz, note, uebernahmedatum, benotungsdatum, bemerkung,
-				updateamum, updatevon, insertamum, insertvon, ext_id) VALUES('.
+				updateamum, updatevon, insertamum, insertvon, ext_id, punkte) VALUES('.
 			     $this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER).', '.
 			     $this->db_add_param($this->student_uid).', '.
 			     $this->db_add_param($this->studiensemester_kurzbz).', '.
@@ -191,12 +193,14 @@ class zeugnisnote extends basis_db
 			     $this->db_add_param($this->updatevon).', '.
 			     $this->db_add_param($this->insertamum).', '.
 			     $this->db_add_param($this->insertvon).', '.
-			     $this->db_add_param($this->ext_id).');';
+			     $this->db_add_param($this->ext_id).','.
+			     $this->db_add_param($this->punkte).');';
 		}
 		else
 		{
 			$qry='UPDATE lehre.tbl_zeugnisnote SET '.
 				'note='.$this->db_add_param($this->note).', '.
+				'punkte='.$this->db_add_param($this->punkte).','.
 				'uebernahmedatum='.$this->db_add_param($this->uebernahmedatum).', '.
 				'benotungsdatum='.$this->db_add_param($this->benotungsdatum).', '.
 				'bemerkung='.$this->db_add_param($this->bemerkung).', '.
@@ -266,7 +270,7 @@ class zeugnisnote extends basis_db
 			$where2.=" AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 
 		$qry = "SELECT vw_student_lehrveranstaltung.lehrveranstaltung_id, uid,
-					   vw_student_lehrveranstaltung.studiensemester_kurzbz, note, uebernahmedatum, benotungsdatum,
+					   vw_student_lehrveranstaltung.studiensemester_kurzbz, note, punkte, uebernahmedatum, benotungsdatum,
 					   vw_student_lehrveranstaltung.ects, vw_student_lehrveranstaltung.semesterstunden,
 					   tbl_zeugnisnote.updateamum, tbl_zeugnisnote.updatevon, tbl_zeugnisnote.insertamum,
 					   tbl_zeugnisnote.insertvon, tbl_zeugnisnote.ext_id,
@@ -288,7 +292,7 @@ class zeugnisnote extends basis_db
 				) LEFT JOIN lehre.tbl_note USING(note)
 				WHERE true $where
 				UNION
-				SELECT lehre.tbl_lehrveranstaltung.lehrveranstaltung_id,student_uid AS uid,studiensemester_kurzbz, note,
+				SELECT lehre.tbl_lehrveranstaltung.lehrveranstaltung_id,student_uid AS uid,studiensemester_kurzbz, note, punkte,
 					uebernahmedatum, benotungsdatum,lehre.tbl_lehrveranstaltung.ects,lehre.tbl_lehrveranstaltung.semesterstunden, tbl_zeugnisnote.updateamum, tbl_zeugnisnote.updatevon, tbl_zeugnisnote.insertamum,
 					tbl_zeugnisnote.insertvon, tbl_zeugnisnote.ext_id, lehre.tbl_lehrveranstaltung.bezeichnung as lehrveranstaltung_bezeichnung, lehre.tbl_lehrveranstaltung.bezeichnung_english as lehrveranstaltung_bezeichnung_english,
 					tbl_note.bezeichnung as note_bezeichnung, tbl_zeugnisnote.bemerkung as bemerkung, tbl_lehrveranstaltung.sort, tbl_lehrveranstaltung.zeugnis, tbl_lehrveranstaltung.studiengang_kz,
@@ -310,6 +314,7 @@ class zeugnisnote extends basis_db
 				$obj->student_uid = $row->uid;
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$obj->note = $row->note;
+				$obj->punkte = $row->punkte;
 				$obj->uebernahmedatum = $row->uebernahmedatum;
 				$obj->benotungsdatum = $row->benotungsdatum;
 				$obj->updateamum = $row->updateamum;

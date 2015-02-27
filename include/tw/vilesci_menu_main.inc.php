@@ -183,8 +183,9 @@ $menu=array
 	),
 	'Wartung'=>	array
 	(
-		'name'=>'Wartung', 'opener'=>'true', 'hide'=>'true', 'DokumenteZuteilung'=>array('name'=>'DokumenteZuteilung', 'link'=>'stammdaten/studiengang_dokumente.php', 'target'=>'main'), 'image'=>'vilesci_wartung.png',
-		'link'=>'left.php?categorie=Wartung', 'target'=>'nav',
+		'name'=>'Wartung', 'opener'=>'true', 'hide'=>'true', 'image'=>'vilesci_wartung.png', 'link'=>'left.php?categorie=Wartung', 'target'=>'nav', 
+
+		'DokumenteZuteilung'=>array('name'=>'Dokumente Zuteilung', 'link'=>'stammdaten/studiengang_dokumente.php', 'target'=>'main', 'permissions'=>array('basis/studiengang')), 
 		'Vorrueckung'=>	array
 		(
 			'name'=>'Vorrueckung', 'permissions'=>array('admin','lv-plan','support'),
@@ -192,13 +193,10 @@ $menu=array
 			'Studenten'=>array('name'=>'Studenten', 'link'=>'personen/student_vorrueckung.php', 'target'=>'main')
 		),
 		'LVWartung'=>array('name'=>'LVwartung', 'link'=>'stammdaten/lv_wartung.php', 'target'=>'main'),
-		'LehreinheitWartung'=>array('name'=>'Lehreinheitwartung', 'link'=>'stammdaten/le_wartung.php', 'target'=>'main'),
-		'lvverteilung'=>array('name'=>'LVVerteilung', 'link'=>'lehre/lv_verteilung/lv_verteilung.php', 'target'=>'main'),
 		'Kreuzerllistekopieren'=>array('name'=>'Kreuzerllisten kopieren', 'link'=>CIS_ROOT.'cis/private/lehre/benotungstool/copy_uebung.php', 'target'=>'_blank'),
 		'Firmenwartung'=>array('name'=>'Firmenwartung', 'link'=>'stammdaten/firma_zusammen_uebersicht.php', 'target'=>'main'),
 		'checkStudenten'=>array('name'=>'CheckStudenten', 'link'=>'../system/checkStudenten.php', 'target'=>'main'),
-		'StudienplanZuteilung'=>array('name'=>'StudienplanZuteilung', 'link'=>'lehre/studienplan_zuteilung.php', 'target'=>'main'),
-		'DokumenteZuteilung'=>array('name'=>'DokumenteZuteilung', 'link'=>'stammdaten/studiengang_dokumente.php', 'target'=>'main'),
+		'StudienplanZuteilung'=>array('name'=>'Studienplan Zuteilung', 'link'=>'lehre/studienplan_zuteilung.php', 'target'=>'main'),
 	),
 	'Auswertung'=>	array
 	(
@@ -229,21 +227,6 @@ $menu=array
 	(
 		'name'=>'Admin', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('admin','lv-plan','support'), 'image'=>'vilesci_admin.png',
 		'link'=>'left.php?categorie=Admin', 'target'=>'nav',
-		'Tools'=>	array
-		(
-			'name'=>'Tools', 'permissions'=>array('admin'),
-			'phpPgAdmin'=>array('name'=>'phpPgAdmin', 'link'=>APP_ROOT.'phppgadmin/index.php', 'target'=>'_blank'),
-			'phpMyAdmin'=>array('name'=>'phpMyAdmin', 'link'=>APP_ROOT.'phpmyadmin/index.php', 'target'=>'_blank'),
-			'SiPassDB'=>array('name'=>'SiPass Datenbank', 'link'=>'admin/sipassdb.php', 'target'=>'main'),
-			'ServerTests'=>array('name'=>'Server-Tests', 'link'=>'admin/test/index.php', 'target'=>'main'),
-			'htaccessGenerator'=>array('name'=>'.htaccess-Generator', 'link'=>'admin/htaccess/access.php', 'target'=>'main'),
-		),
-		'Hilfe'=>	array
-		(
-			'name'=>'Hilfe',
-			'FAS-Installation'=>array('name'=>'FAS-Installation', 'link'=>'admin/fasinstall.html', 'target'=>'main'),
-			'ViReferenz'=>array('name'=>'VI-Kurzreferenz', 'link'=>'admin/VI-Kurzreferenz.html', 'target'=>'main'),
-		),
 		'Cronjobs'=>array('name'=>'Cronjobs', 'link'=>'stammdaten/cronjobverwaltung.php', 'target'=>'main','permissions'=>array('basis/cronjob')),
 	),
 	'SD-Tools'=>	array

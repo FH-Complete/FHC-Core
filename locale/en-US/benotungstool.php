@@ -167,4 +167,6 @@ $this->phrasen['benotungstool/mussPositivSein']='* must be positive';
 $this->phrasen['benotungstool/eingetrageneNoten']='Submitted Grades';
 $this->phrasen['benotungstool/zeunis']='Transcript';
 $this->phrasen['benotungstool/handbuch']='Handbook';
+$this->phrasen['benotungstool/punkte']='Points';
+$this->phrasen['benotungstool/importAnweisung']='Kopieren Sie die Spalten Kennzahl und Note aus der Notenliste und fügen Sie diese in folgendes Feld ein';
 ?>

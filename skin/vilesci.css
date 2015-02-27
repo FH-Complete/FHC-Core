@@ -598,3 +598,32 @@ option.inactive
 {
 	text-decoration:line-through;
 }
+
+html.reports, html.reports body {
+	height: 100%;
+}
+
+html.reports .icons strong {
+	font-size: 26px;
+	vertical-align: middle;
+}
+
+html.reports .icons img {
+	width: 48px;
+	vertical-align: middle;
+}
+
+#rp_main {
+	width: 100%;
+	border: 0;
+	height: 85%;
+}
+
+img.mini-icon {
+	width: 15px;
+	vertical-align: middle;
+}
+
+td.overview-id {
+	text-align: right;
+}

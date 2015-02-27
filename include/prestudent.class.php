@@ -47,6 +47,7 @@ class prestudent extends person
 	public $rt_punkte3=0;
 	public $bismelden=true;
 	public $anmerkung;
+	public $anmerkung_status;
 	public $mentor;
 	public $ext_id_prestudent;
 	public $dual=false;
@@ -733,7 +734,8 @@ class prestudent extends person
 
 			$qry = 'INSERT INTO public.tbl_prestudentstatus (prestudent_id, status_kurzbz, 
 					studiensemester_kurzbz, ausbildungssemester, datum, insertamum, insertvon, 
-					updateamum, updatevon, ext_id, orgform_kurzbz, bestaetigtam, bestaetigtvon, studienplan_id) VALUES('.
+					updateamum, updatevon, ext_id, orgform_kurzbz, bestaetigtam, bestaetigtvon, anmerkung,
+					studienplan_id) VALUES('.
 			       $this->db_add_param($this->prestudent_id).",".
 			       $this->db_add_param($this->status_kurzbz).",".
 			       $this->db_add_param($this->studiensemester_kurzbz).",".
@@ -747,6 +749,7 @@ class prestudent extends person
 			       $this->db_add_param($this->orgform_kurzbz).",".
 			       $this->db_add_param($this->bestaetigtam).",".
 			       $this->db_add_param($this->bestaetigtvon).",".
+			       $this->db_add_param($this->anmerkung_status).",".
 				   $this->db_add_param($this->studienplan_id,FHC_INTEGER).");";
 		}
 		else
@@ -774,6 +777,7 @@ class prestudent extends person
 			       ' bestaetigtam='.$this->db_add_param($this->bestaetigtam).",".
 			       ' bestaetigtvon='.$this->db_add_param($this->bestaetigtvon).",".
 				   ' studienplan_id='.$this->db_add_param($this->studienplan_id, FHC_INTEGER).",".
+				   ' anmerkung_status='.$this->db_add_param($this->anmerkung_status).",".
 			       ' orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).
 			       " WHERE 
 						prestudent_id=".$this->db_add_param($this->prestudent_id, FHC_INTEGER, false)." 
@@ -827,8 +831,9 @@ class prestudent extends person
 			$log->beschreibung = 'Loeschen der Rolle '.$status_kurzbz.' bei '.$prestudent_id;
 			$log->mitarbeiter_uid = get_uid();
 			$log->sql = $qry;
-			$log->sqlundo = 'INSERT INTO public.tbl_prestudentstatus(prestudent_id, status_kurzbz, studiensemester_kurzbz,'.
-							' ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz, bestaetigtam, bestaetigtvon, studienplan_id) VALUES('.
+			$log->sqlundo = 'INSERT INTO public.tbl_prestudentstatus(prestudent_id, status_kurzbz, studiensemester_kurzbz,'
+							. ' ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz,'
+							. ' bestaetigtam, bestaetigtvon, anmerkung_status, studienplan_id) VALUES('.
 							$this->db_add_param($this->prestudent_id).','.
 							$this->db_add_param($this->status_kurzbz).','.
 							$this->db_add_param($this->studiensemester_kurzbz).','.
@@ -842,6 +847,7 @@ class prestudent extends person
 							$this->db_add_param($this->orgform_kurzbz).','.
 							$this->db_add_param($this->bestaetigtam).','.
 							$this->db_add_param($this->bestaetigtvon).','.
+							$this->db_add_param($this->anmerkung_status).','.
 							$this->db_add_param($this->studienplan_id, FHC_INTEGER).');';
 			if($log->save(true))
 			{

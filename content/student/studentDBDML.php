@@ -61,6 +61,7 @@ require_once('../../include/pruefling.class.php');
 require_once('../../include/mail.class.php'); 
 require_once('../../include/kontakt.class.php'); 
 require_once('../../include/dms.class.php'); 
+require_once('../../include/notenschluessel.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -2372,6 +2373,37 @@ if(!$error)
 			}
 		}
 	}
+	elseif(isset($_POST['type']) && $_POST['type']=='getnotenotenschluessel')
+	{
+		if(!$rechte->isBerechtigt('admin', null, 's') && !$rechte->isBerechtigt('assistenz', null, 's') &&
+		   !$rechte->isBerechtigt('student/noten', null, 's'))
+		{
+			$return = false;
+			$error = true;
+			$errormsg = 'Sie haben keine Berechtigung';
+		}
+		else
+		{
+
+			$punkte=$_POST['punkte'];
+			$lehrveranstaltung_id=$_POST['lehrveranstaltung_id'];
+			$studiensemester_kurzbz=$semester_aktuell;
+
+			$notenschluessel = new notenschluessel();
+			if($note = $notenschluessel->getNote($punkte, $lehrveranstaltung_id, $studiensemester_kurzbz))
+			{
+				$return = true;
+				$error = false;
+				$data = $note;
+			}
+			else
+			{
+				$return = false;
+				$error = true;
+				$errormsg=$notenschluessel->errormsg;
+			}
+		}
+	}
 	elseif(isset($_POST['type']) && $_POST['type']=='savenote')
 	{
 		//Speichert einen Noteneintrag
@@ -2453,6 +2485,8 @@ if(!$error)
 					$noten->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
 					$noten->benotungsdatum = date('Y-m-d H:i:s');
 					$noten->note = $_POST['note'];
+					if(isset($_POST['punkte']))
+						$noten->punkte=$_POST['punkte'];
 
 					if($noten->save())
 					{
@@ -2530,8 +2564,7 @@ if(!$error)
 
 			if(!$error)
 			{
-				if(!$rechte->isBerechtigt('admin', $stg_lva, 'suid') && !$rechte->isBerechtigt('admin', $stg_std, 'suid') &&
-				   !$rechte->isBerechtigt('assistenz', $stg_lva, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_std, 'suid'))
+				if(!$rechte->isBerechtigt('student/noten', $stg_lva, 'suid') && !$rechte->isBerechtigt('student/noten', $stg_std, 'suid'))
 				{
 					$return = false;
 					$error = true;
@@ -2564,6 +2597,7 @@ if(!$error)
 						}
 
 						$zeugnisnote->note = $lvgesamtnote->note;
+						$zeugnisnote->punkte = $lvgesamtnote->punkte;
 						$zeugnisnote->uebernahmedatum = date('Y-m-d H:i:s');
 						$zeugnisnote->benotungsdatum = $lvgesamtnote->benotungsdatum;
 						$zeugnisnote->bemerkung = $lvgesamtnote->bemerkung;
@@ -2605,7 +2639,7 @@ if(!$error)
 			{
 				$zeugnisnote = new zeugnisnote();
 				$error = false;
-				if(!is_numeric(trim($_POST['matrikelnummer_'.$i])) || !is_numeric($_POST['note_'.$i]))
+				if(!is_numeric(trim($_POST['matrikelnummer_'.$i])) || (isset($_POST['note_'.$i]) && !is_numeric($_POST['note_'.$i])))
 				{
 					$error = true;
 					$errormsg = "\nMatrikelnummer oder Note ist ungueltig: ".$_POST['matrikelnummer_'.$i].' - '.$_POST['note_'.$i];
@@ -2688,7 +2722,19 @@ if(!$error)
 								$zeugnisnote->studiensemester_kurzbz = $semester_aktuell;
 							}
 
-							$zeugnisnote->note = $_POST['note_'.$i];
+							if(isset($_POST['note_'.$i]))
+							{
+								$zeugnisnote->note = $_POST['note_'.$i];
+								$zeugnisnote->punkte = null;
+							}
+							elseif(isset($_POST['punkte_'.$i]))
+							{
+								$zeugnisnote->punkte=$_POST['punkte_'.$i];
+								$zeugnisnote->punkte = str_replace(',','.', $zeugnisnote->punkte);
+								$notenschluessel = new notenschluessel();
+								$note = $notenschluessel->getNote($zeugnisnote->punkte, $_POST['lehrveranstaltung_id'], $semester_aktuell);
+								$zeugnisnote->note = $note;
+							}
 							$zeugnisnote->uebernahmedatum = date('Y-m-d H:i:s');
 							$zeugnisnote->benotungsdatum = date('Y-m-d H:i:s');
 
@@ -2871,7 +2917,7 @@ if(!$error)
 				{
 					if($db->db_num_rows($result)==0)
 					{
-						$qry = "SELECT note, benotungsdatum FROM lehre.tbl_zeugnisnote JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) WHERE
+						$qry = "SELECT note,punkte, benotungsdatum FROM lehre.tbl_zeugnisnote JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) WHERE
 								student_uid=".$db->db_add_param($_POST['student_uid'])." AND
 								tbl_lehreinheit.lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER)." AND
 								tbl_lehreinheit.studiensemester_kurzbz = tbl_zeugnisnote.studiensemester_kurzbz";
@@ -2888,6 +2934,7 @@ if(!$error)
 								$ersttermin->student_uid = $_POST['student_uid'];
 								$ersttermin->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
 								$ersttermin->note = $row->note;
+								$ersttermin->punkte = $row->punkte;
 								$ersttermin->pruefungstyp_kurzbz = 'Termin1';
 								$ersttermin->datum = $row->benotungsdatum;
 								$ersttermin->anmerkung = '';
@@ -2919,6 +2966,8 @@ if(!$error)
 				$pruefung->student_uid = $_POST['student_uid'];
 				$pruefung->mitarbeiter_uid = $_POST['mitarbeiter_uid'];
 				$pruefung->note = $_POST['note'];
+				if(isset($_POST['punkte']))
+					$pruefung->punkte = $_POST['punkte'];
 				$pruefung->pruefungstyp_kurzbz = $_POST['pruefungstyp_kurzbz'];
 				$pruefung->datum = $_POST['datum'];
 				$pruefung->anmerkung = $_POST['anmerkung'];
@@ -2978,7 +3027,7 @@ if(!$error)
 							}
 							else
 							{
-								@$zeungisnote->new = false;
+								$zeugnisnote->new = false;
 							}
 						}
 						else
@@ -2994,6 +3043,10 @@ if(!$error)
 							$zeugnisnote->lehrveranstaltung_id = $lehrveranstaltung_id;
 							$zeugnisnote->studiensemester_kurzbz = $studiensemester_kurzbz;
 							$zeugnisnote->note = $_POST['note'];
+							if(isset($_POST['punkte']))
+								$zeugnisnote->punkte = $_POST['punkte'];
+							else
+								$zeugnisnote->punkte='';
 							$zeugnisnote->uebernahmedatum = date('Y-m-d H:i:s');
 							$zeugnisnote->benotungsdatum = date('Y-m-d',$datum_obj->mktime_fromdate($_POST['datum']));
 							$zeugnisnote->updateamum = date('Y-m-d H:i:s');

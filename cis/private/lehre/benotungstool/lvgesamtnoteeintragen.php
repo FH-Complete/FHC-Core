@@ -40,6 +40,7 @@ require_once('../../../../include/benutzer.class.php');
 require_once('../../../../include/student.class.php');
 require_once('../../../../include/phrasen.class.php');
 require_once('../../../../include/zeugnisnote.class.php');
+require_once('../../../../include/notenschluessel.class.php');
 
 if (!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
@@ -108,20 +109,29 @@ if(!$rechte->isBerechtigt('admin',0) &&
 	}
 }
 
-function savenote($db,$lvid, $student_uid, $note)
+function savenote($db,$lvid, $student_uid, $note, $punkte=null)
 {
 	global $stsem, $user, $p;
 	$jetzt = date("Y-m-d H:i:s");
 	//Ermitteln ob der Student diesem Kurs zugeteilt ist
 	$qry = "SELECT 1 FROM campus.vw_student_lehrveranstaltung WHERE uid=".$db->db_add_param($student_uid)." AND lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER);
 	if($result = $db->db_query($qry))
+	{
 		if($db->db_num_rows($result)==0)
 		{
 			$student = new student();
 			$student->load($student_uid);
 			return $p->t('benotungstool/studentIstLvNichtZugeordnet', array($student->nachname, $student->vorname, trim($student->matrikelnr)))."\n";
 		}
-	
+	}
+
+	// Wenn punkte vorhanden sind, dann die note dazu ermitteln
+	if($punkte!='' && $note=='')
+	{
+		$notenschluessel = new notenschluessel();
+		$note = $notenschluessel->getNote($punkte, $lvid, $stsem);
+	}
+
 	$lvgesamtnote = new lvgesamtnote();
     if (!$lvgesamtnote->load($lvid, $student_uid, $stsem))
     {
@@ -138,12 +148,14 @@ function savenote($db,$lvid, $student_uid, $note)
 		$lvgesamtnote->updatevon = null;
 		$lvgesamtnote->insertamum = $jetzt;
 		$lvgesamtnote->insertvon = $user;
+		$lvgesamtnote->punkte = $punkte;
 		$new = true;
 		$response = "neu";
     }
     else
     {
 		$lvgesamtnote->note = trim($note);
+		$lvgesamtnote->punkte = $punkte;
 		$lvgesamtnote->benotungsdatum = $jetzt;
 		$lvgesamtnote->updateamum = $jetzt;
 		$lvgesamtnote->updatevon = $user;
@@ -167,26 +179,34 @@ if (isset($_REQUEST["submit"]))
 	{
 		$student_uid = $_REQUEST["student_uid"];
 		$note = $_REQUEST["note"];
+		$punkte = (isset($_REQUEST["punkte"])?$_REQUEST["punkte"]:'');
 		
-		//if((($note>0) && ($note < 6)) || ($note == 7) || ($note==16) || ($note==10) || ($note==14))
-			$response = savenote($db,$lvid, $student_uid, $note);
-		/*else
-			$response = $p->t('benotungstool/noteEingeben')."!";
-		*/
+		$response = savenote($db,$lvid, $student_uid, $note, $punkte);
 		echo $response;
 	}
 	else
 	{
+
 		foreach ($_POST as $row=>$val)
 		{
 			if(mb_strstr(mb_strtolower($row), 'matrikelnr_'))
 			{
 				$id=mb_substr($row, mb_strlen('matrikelnr_'));
-				if(isset($_POST['matrikelnr_'.$id]) && isset($_POST['note_'.$id]))
+				if(isset($_POST['matrikelnr_'.$id]) && (isset($_POST['note_'.$id]) || isset($_POST['punkte_'.$id])))
 				{
 					$matrikelnummer = $_POST['matrikelnr_'.$id];
-					$note = $_POST['note_'.$id];
-					
+					$note=null;
+					$punkte=null;
+					if(isset($_POST['note_'.$id]))
+						$note = $_POST['note_'.$id];
+					elseif(isset($_POST['punkte_'.$id]))
+						$punkte = $_POST['punkte_'.$id];
+					else
+					{
+						$response.="\nNote oder Punkte fehlen";
+						continue;
+					}
+					$punkte=str_replace(',','.', $punkte);
 					//UID ermitteln
 					$student = new student();
 					if(!$student_uid = $student->getUidFromMatrikelnummer($matrikelnummer))
@@ -196,26 +216,15 @@ if (isset($_REQUEST["submit"]))
 					}
 					
 					// Hole Zeugnisnote wenn schon eine eingetragen ist
+					/*
 					if ($zeugnisnote = new zeugnisnote($lvid, $student_uid, $stsem))
 						$znote = $zeugnisnote->note;
 					else
 						$znote = null;	
-					
-					/*if(((($note>0) && ($note < 6)) || ($note == 7) || ($note==16) || ($note==10) || ($note==14)))
-					{*/
-						$val=savenote($db,$lvid, $student_uid, $note);
-						if($val!='neu' && $val!='update' && $val!='update_f')
-							$response.=$val;
-					/*}
-					else
-					{
-						// Wenn Zeugnisnote schon 6 ist -> keine Fehlermeldung mehr
-						if($znote != 6)
-						{	
-							$student->load($student_uid);						
-							$response .= "\n".$p->t('benotungstool/fehlerhafteNoteBeiStudent', array($student->vorname, $student->nachname))." ".$p->t('benotungstool/noteEingeben');
-						}
-					}*/
+					*/
+					$val=savenote($db,$lvid, $student_uid, $note, $punkte);
+					if($val!='neu' && $val!='update' && $val!='update_f')
+						$response.=$val;
 				}
 				else 
 				{

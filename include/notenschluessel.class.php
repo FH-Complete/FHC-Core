@@ -131,5 +131,37 @@ class notenschluessel extends basis_db
 
 		return false;			
 	}
+
+	/**
+	 * Laedt die Aufteilung eines Notenschluessels
+	 */
+	public function loadAufteilung($notenschluessel_kurzbz)
+	{
+		$qry = 'SELECT
+					tbl_notenschluesselaufteilung.*, tbl_notenschluessel.bezeichnung,
+					tbl_note.bezeichnung as notenbezeichnung
+				FROM 
+					lehre.tbl_notenschluesselaufteilung
+					JOIN lehre.tbl_notenschluessel USING(notenschluessel_kurzbz)
+					JOIN lehre.tbl_note USING(note)
+				WHERE 
+					notenschluessel_kurzbz='.$this->db_add_param($notenschluessel_kurzbz).'
+				ORDER BY punkte desc';
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new notenschluessel();
+				$obj->notenschluessel_kurzbz = $row->notenschluessel_kurzbz;
+				$obj->punkte = $row->punkte;
+				$obj->note = $row->note;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->notenbezeichnung = $row->notenbezeichnung;
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+	}
 }
 ?>

@@ -39,6 +39,9 @@ define('CIS_SUCHE_LVPLAN_ANZEIGEN',true);
 // Link zu den Excel Notenlisten im CIS Anzeigen
 define('CIS_ANWESENHEITSLISTE_NOTENLISTE_ANZEIGEN',true);
 
+// Punkte bei der Noteneingabe anzeigen
+define('CIS_GESAMTNOTE_PUNKTE',false);
+
 // Anzeigeoptionen für LV-Plan Menü
 define('CIS_LVPLAN_EXPORT_ANZEIGEN',true);
 define('CIS_LVPLAN_PERSONENAUSWAHL_ANZEIGEN',true);

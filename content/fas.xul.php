@@ -19,8 +19,6 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
-header("Content-type: application/vnd.mozilla.xul+xml");
-echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
@@ -46,6 +44,11 @@ if(!$variable->loadVariables($user))
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($user);
 
+if(!$rechte->isBerechtigt('basis/fas'))
+	die('Sie haben keine Berechtigung für diese Seite');
+
+header("Content-type: application/vnd.mozilla.xul+xml");
+echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 echo '<?xml-stylesheet href="'.APP_ROOT.'content/bindings.css" type="text/css" ?>';
 echo '<?xml-stylesheet href="'.APP_ROOT.'content/datepicker/datepicker.css" type="text/css"?>';

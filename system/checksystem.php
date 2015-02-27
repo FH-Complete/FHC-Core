@@ -2539,6 +2539,65 @@ if(!$result = @$db->db_query("SELECT ext_id FROM campus.tbl_lvgesamtnote LIMIT 1
 		echo ' campus.tbl_lvgesamtnote: Spalte ext_id hinzugefuegt!<br>';
 }
 
+// Spalte oe_kurzbz, m2, gebteil in public.tbl_ort
+if(!$result = @$db->db_query("SELECT oe_kurzbz FROM public.tbl_ort LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_ort ADD COLUMN m2 numeric(8,2);
+			ALTER TABLE public.tbl_ort ADD COLUMN gebteil varchar(32);
+			ALTER TABLE public.tbl_ort ADD COLUMN oe_kurzbz varchar(32);
+
+			COMMENT ON COLUMN public.tbl_ort.m2 IS 'Quadratmeter';
+			COMMENT ON COLUMN public.tbl_ort.m2 IS 'Gebaeudeteil';
+			ALTER TABLE public.tbl_ort ADD CONSTRAINT fk_ort_organisationseinheit FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit(oe_kurzbz) ON DELETE RESTRICT ON UPDATE CASCADE;	
+			";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_ort: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' public.tbl_ort: Spalte m2, gebteil, oe_kurzbz hinzugefuegt!<br>';
+}
+
+// Eigene Berechtigung fuer Noten
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz='student/noten' LIMIT 1"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "
+		INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('student/noten','FAS Zugriff');
+
+		INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('student/noten','assistenz','suid');
+		INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('student/noten','admin','suid');
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Eigene Berechtigungen fuer Notenverwaltung im FAS hinzugefuegt student/noten!<br>';
+	}
+}
+
+// Punkte bei Pruefungen
+if(!$result = @$db->db_query("SELECT punkte FROM lehre.tbl_pruefung LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_pruefung ADD COLUMN punkte numeric(8,4)";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_pruefung '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'lehre.tbl_pruefung: Spalte Punkte hinzugefuegt!<br>';
+}
+
+// Anmerkung bei prestudent
+if(!$result = @$db->db_query("SELECT anmerkung FROM public.tbl_prestudentstatus LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_prestudentstatus ADD COLUMN anmerkung text";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_prestudentstatus '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'public.tbl_prestudentstatus: Spalte "anmerkung" hinzugefuegt!<br>';
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -2660,7 +2719,7 @@ $tabellen=array(
 	"lehre.tbl_projektarbeit"  => array("projektarbeit_id","projekttyp_kurzbz","titel","lehreinheit_id","student_uid","firma_id","note","punkte","beginn","ende","faktor","freigegeben","gesperrtbis","stundensatz","gesamtstunden","themenbereich","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","titel_english","seitenanzahl","abgabedatum","kontrollschlagwoerter","schlagwoerter","schlagwoerter_en","abstract", "abstract_en", "sprache"),
 	"lehre.tbl_projektbetreuer"  => array("person_id","projektarbeit_id","betreuerart_kurzbz","note","faktor","name","punkte","stunden","stundensatz","updateamum","updatevon","insertamum","insertvon","ext_id","vertrag_id"),
 	"lehre.tbl_projekttyp"  => array("projekttyp_kurzbz","bezeichnung"),
-	"lehre.tbl_pruefung"  => array("pruefung_id","lehreinheit_id","student_uid","mitarbeiter_uid","note","pruefungstyp_kurzbz","datum","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","pruefungsanmeldung_id","vertrag_id"),
+	"lehre.tbl_pruefung"  => array("pruefung_id","lehreinheit_id","student_uid","mitarbeiter_uid","note","pruefungstyp_kurzbz","datum","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","pruefungsanmeldung_id","vertrag_id", "punkte"),
 	"lehre.tbl_pruefungstyp"  => array("pruefungstyp_kurzbz","beschreibung","abschluss"),
 	"lehre.tbl_studienordnung"  => array("studienordnung_id","studiengang_kz","version","gueltigvon","gueltigbis","bezeichnung","ects","studiengangbezeichnung","studiengangbezeichnung_englisch","studiengangkurzbzlang","akadgrad_id","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"lehre.tbl_studienordnung_semester"  => array("studienordnung_semester_id","studienordnung_id","studiensemester_kurzbz","semester"),
@@ -2714,7 +2773,7 @@ $tabellen=array(
 	"public.tbl_mitarbeiter"  => array("mitarbeiter_uid","personalnummer","telefonklappe","kurzbz","lektor","fixangestellt","bismelden","stundensatz","ausbildungcode","ort_kurzbz","standort_id","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","kleriker"),
 	"public.tbl_notiz"  => array("notiz_id","titel","text","verfasser_uid","bearbeiter_uid","start","ende","erledigt","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_notizzuordnung"  => array("notizzuordnung_id","notiz_id","projekt_kurzbz","projektphase_id","projekttask_id","uid","person_id","prestudent_id","bestellung_id","lehreinheit_id","ext_id"),
-	"public.tbl_ort"  => array("ort_kurzbz","bezeichnung","planbezeichnung","max_person","lehre","reservieren","aktiv","lageplan","dislozierung","kosten","ausstattung","updateamum","updatevon","insertamum","insertvon","ext_id","stockwerk","standort_id","telefonklappe","content_id"),
+	"public.tbl_ort"  => array("ort_kurzbz","bezeichnung","planbezeichnung","max_person","lehre","reservieren","aktiv","lageplan","dislozierung","kosten","ausstattung","updateamum","updatevon","insertamum","insertvon","ext_id","stockwerk","standort_id","telefonklappe","content_id","m2","gebteil","oe_kurzbz"),
 	"public.tbl_ortraumtyp"  => array("ort_kurzbz","hierarchie","raumtyp_kurzbz"),
 	"public.tbl_organisationseinheit" => array("oe_kurzbz", "oe_parent_kurzbz", "bezeichnung","organisationseinheittyp_kurzbz", "aktiv","mailverteiler","freigabegrenze","kurzzeichen","lehre"),
 	"public.tbl_organisationseinheittyp" => array("organisationseinheittyp_kurzbz", "bezeichnung", "beschreibung"),
@@ -2731,7 +2790,7 @@ $tabellen=array(
 	"public.tbl_preoutgoing_preoutgoing_status" => array("status_id","preoutgoing_status_kurzbz","preoutgoing_id","datum","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preoutgoing_status" => array("preoutgoing_status_kurzbz","bezeichnung"),
 	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat","rt_punkte3", "zgvdoktor_code", "zgvdoktorort", "zgvdoktordatum","mentor"),
-	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id","studienplan_id","bestaetigtam","bestaetigtvon","fgm","faktiv"),
+	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id","studienplan_id","bestaetigtam","bestaetigtvon","fgm","faktiv", "anmerkung"),
 	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung"),
 	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet","max_teilnehmer","oeffentlich"),
 	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id"),
@@ -2861,6 +2920,7 @@ $berechtigungen = array(
 	array('basis/cms_sperrfreigabe','Berechtigung zum Freigeben von gesperrtem Content'),
 	array('basis/cronjob','Cronjobverwaltung'),
 	array('basis/dms','DMS Download'),
+	array('basis/fas','FAS Zugriff'),
 	array('basis/ferien','Verwaltung der Ferien und Feiertage im System'),
 	array('basis/fhausweis','Verwaltungstools für FH Ausweis – Kartentausch, Bildpruefung, Druck'),
 	array('basis/firma','Firmenverwaltung'),
@@ -2872,9 +2932,11 @@ $berechtigungen = array(
 	array('basis/organisationseinheit','Organisationseinheiten Verwalten'),
 	array('basis/ort','Raum-/Ortverwaltung'),
 	array('basis/person','Personen Zusammenlegen, Stg-Wiederholer anlegen, etc'),
+	array('basis/planner','Planner Zugriff'),
 	array('basis/service','Services Administrieren (SLAs)'),
 	array('basis/statistik','Statistiken Administrieren'),
 	array('basis/studiengang','Studiengangsverwaltung'),
+	array('basis/tempus','Tempus zugriff'),
 	array('basis/testtool','Administrationseite, Gebiete löschen/zurücksetzen'),
 	array('basis/variable','Variablenverwaltung'),
 	array('basis/vilesci','Grundrecht, um in VileSci irgendwelche Menüpunkte zu sehen'),
@@ -2926,6 +2988,7 @@ $berechtigungen = array(
 	array('soap/buchungen','Berechtigung für Buchungsabfrage Addon Kontoimport'),
 	array('student/bankdaten','Bankdaten des Studenten'),
 	array('student/dokumente','Wenn SUID dann dürfen Dokumente auch wieder entfernt werden'),
+	array('student/noten','Notenverwaltung'),
 	array('student/stammdaten','Stammdaten der Studenten'),
 	array('student/vorrueckung','Studentenvorrückung'),
 	array('system/developer','Anzeige zusätzlicher Developerinfos'),

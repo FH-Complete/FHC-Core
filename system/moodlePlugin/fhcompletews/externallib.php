@@ -32,7 +32,10 @@ class local_fhcompletews_external extends external_api
 	public static function get_course_grades_parameters() 
 	{
         return new external_function_parameters(
-                array('courseid' => new external_value(PARAM_INT, 'CourseID')), 'ID of the Course'
+                array(
+					'courseid' => new external_value(PARAM_INT, 'Moodle CourseID'),
+					'type' => new external_value(PARAM_INT,'Type 1=Punkte, 2=Prozent, 3=Endnote lt Skala')
+				), 'Get Course Grades'
         );
     }
 
@@ -41,7 +44,7 @@ class local_fhcompletews_external extends external_api
      * @param int courseid
      * @return array
      */
-    public static function get_course_grades($courseid) 
+    public static function get_course_grades($courseid, $type) 
 	{
         global $CFG, $DB;
         require_once($CFG->dirroot . "/course/lib.php");
@@ -49,9 +52,10 @@ class local_fhcompletews_external extends external_api
 
         //validate parameter
         $params = self::validate_parameters(self::get_course_grades_parameters(),
-                        array('courseid' => $courseid));
+                        array('courseid' => $courseid, 'type'=>$type));
 
-		$notenart=3; // 2=Prozent; 3=Endnote nach Skala
+		$notenart = $type;
+		//$notenart=3; // 1=Punkte, 2=Prozent; 3=Endnote nach Skala
 		$gui=array();	  
 		$final_id='';
 		$data = array();
@@ -120,6 +124,10 @@ class local_fhcompletews_external extends external_api
 			{
 			  	$gradestr = $export->format_grade($userdata->grades[$final_id]);
 		     	$user_item['note']=$gradestr;
+
+				// Wenn Prozent dann Prozentzeichen entfernen
+				if(strpos($user_item['note'],'%')!==false)
+			     	$user_item['note']=trim(str_replace('%','',$user_item['note']));
 
 				// nur zurueckliefern wenn eine Note gefunden wurde und diese nicht '-' ist
 				if($user_item['note']!='-')
