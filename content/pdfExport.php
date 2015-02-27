@@ -40,6 +40,7 @@ require_once('../include/variable.class.php');
 require_once('../include/addon.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/studiensemester.class.php');
+require_once('../include/studienordnung.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -138,6 +139,8 @@ if(isset($_GET['vertrag_id']))
 	$params.='&vertrag_id[]='.urlencode($id);
     }
 }
+if(isset($_GET['studienordnung_id']))
+	$params.='&studienordnung_id='.urlencode($_GET['studienordnung_id']);
 $output = (isset($_GET['output'])?$_GET['output']:'odt');
 
 $rechte = new benutzerberechtigung();
@@ -351,47 +354,77 @@ if (!isset($_REQUEST["archive"]))
 				exec("zip $tempname_zip styles.xml");
 
 			clearstatcache(); 
+			if($vorlage->bezeichnung!='')
+				$filename = $vorlage->bezeichnung;
+			else 
+				$filename = $vorlage->vorlage_kurzbz;
             if($output == 'pdf')
             {
-		if($xsl == 'LV_Informationen')
-		{
-		    $studiengang = new studiengang($_GET['stg_kz']);
-		    $studiensemester = new studiensemester($_GET['ss']);
-		    $tempPdfName = $vorlage->vorlage_kurzbz.'_'.$studiengang->kurzbzlang.'_'.$studiensemester->studiensemester_kurzbz.'.pdf';
-		}
-		elseif($xsl == "Honorarvertrag")
-		{
-		    $tempPdfName = $vorlage->vorlage_kurzbz.'_'.$benutzer_obj->nachname.'_'.$benutzer_obj->vorname.'.pdf';
-		}
-		else
-		{
-		    $tempPdfName = $vorlage->vorlage_kurzbz.'.pdf';
-		}
+				if($xsl == 'LV_Informationen')
+				{
+				    $studiengang = new studiengang($_GET['stg_kz']);
+				    $studiensemester = new studiensemester($_GET['ss']);
+				    $tempPdfName = $vorlage->vorlage_kurzbz.'_'.$studiengang->kurzbzlang.'_'.$studiensemester->studiensemester_kurzbz.'.pdf';
+				    $filename = $filename.'_'.$studiengang->kurzbzlang.'_'.$studiensemester->studiensemester_kurzbz.'.pdf';
+				}
+				elseif($xsl == "Honorarvertrag")
+				{
+				    $tempPdfName = $vorlage->vorlage_kurzbz.'_'.$benutzer_obj->nachname.'_'.$benutzer_obj->vorname.'.pdf';
+				    $filename = $filename.'_'.$benutzer_obj->nachname.'_'.$benutzer_obj->vorname.'.pdf';
+				}
+            	elseif($xsl == "Studienordnung")
+				{
+				    $studienordnung = new studienordnung();
+					$studienordnung->loadStudienordnung($_GET['studienordnung_id']);
+					$filename = $filename.'_'.$studienordnung->studiengangkurzbzlang.'.pdf';
+					$tempPdfName = $vorlage->vorlage_kurzbz.'.pdf';
+				}
+				else
+				{
+				    $tempPdfName = $vorlage->vorlage_kurzbz.'.pdf';
+				    $filename = $filename.'.pdf';
+				}
                 exec("unoconv -e IsSkipEmptyPages=false --stdout -f pdf $tempname_zip > $tempPdfName");
                 
                 $fsize = filesize($tempPdfName); 
                 $handle = fopen($tempPdfName,'r');
                 header('Content-type: application/pdf');
-                header('Content-Disposition: attachment; filename="'.$tempPdfName.'"');
+                header('Content-Disposition: attachment; filename="'.$filename.'"');
                 header('Content-Length: '.$fsize); 
             }
             else if($output =='odt')
             {
-                $fsize = filesize($tempname_zip);
+            	if($xsl == "Studienordnung")
+				{
+				    $studienordnung = new studienordnung();
+					$studienordnung->loadStudienordnung($_GET['studienordnung_id']);
+					$filename = $filename.'_'.$studienordnung->studiengangkurzbzlang;
+				}
+            	$fsize = filesize($tempname_zip);
                 $handle = fopen($tempname_zip,'r');
                 header('Content-type: '.$vorlage->mimetype);
-                header('Content-Disposition: attachment; filename="'.$vorlage->vorlage_kurzbz.'.'.$endung.'"');
+                header('Content-Disposition: attachment; filename="'.$filename.'.'.$endung.'"');
                 header('Content-Length: '.$fsize); 
            } 
            else if($output =='doc')
            {
                 $tempPdfName = $vorlage->vorlage_kurzbz.'.doc';
+           		if($xsl == "Studienordnung")
+				{
+				    $studienordnung = new studienordnung();
+					$studienordnung->loadStudienordnung($_GET['studienordnung_id']);
+					$filename = $filename.'_'.$studienordnung->studiengangkurzbzlang.'.doc';
+				}
+				else 
+				{
+					$filename = $filename.'.doc';
+				}
                 exec("unoconv -e IsSkipEmptyPages=false --stdout -f doc $tempname_zip > $tempPdfName");
                 
                 $fsize = filesize($tempPdfName); 
                 $handle = fopen($tempPdfName,'r');
                 header('Content-type: application/vnd.ms-word');
-                header('Content-Disposition: attachment; filename="'.$tempPdfName.'"');
+                header('Content-Disposition: attachment; filename="'.$filename.'"');
                 header('Content-Length: '.$fsize); 
            }
 		    while (!feof($handle)) 
@@ -405,7 +438,7 @@ if (!isset($_REQUEST["archive"]))
 				unlink('styles.xml');
 			unlink($tempname_zip);
             if($output=='pdf' || $output=='doc')
-                unlink($tempPdfName);
+                unlink($filename);
 			rmdir($tempfolder);
 		}
 	}
