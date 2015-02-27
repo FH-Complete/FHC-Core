@@ -4,3 +4,6 @@
 [submodule "submodules/bootstrap"]
 	path = submodules/bootstrap
 	url = https://github.com/twbs/bootstrap.git
+[submodule "submodules/pivottable"]
+	path = submodules/pivottable
+	url = https://github.com/nicolaskruchten/pivottable.git
