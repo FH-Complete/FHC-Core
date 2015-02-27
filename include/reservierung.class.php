@@ -112,9 +112,9 @@ class reservierung extends basis_db
 			$this->errormsg = 'Gruppe darf nicht laenger als 1 Zeichen sein';
 			return false;
 		}
-		if(mb_strlen($this->gruppe_kurzbz)>10)
+		if(mb_strlen($this->gruppe_kurzbz)>32)
 		{
-			$this->gruppe_kurzbz = 'Gruppe_kurzbz darf nicht laenger als 10 Zeichen sein';
+			$this->errormsg = 'Gruppe_kurzbz darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
 

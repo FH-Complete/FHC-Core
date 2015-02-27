@@ -233,17 +233,27 @@ class service extends basis_db
 	/**
 	 * Laedt die Services der uebergebenen OE
 	 * 
-	 * @param $oe_kurzbz
+	 * @param string $oe_kurzbz OE_Kurzbezeichnung der zu suchenden Services.
+	 * @param integer $content_id Default: null. Wenn true, werden nur OEs mit eingetragener Content_id zurückgegeben. 
+	 * 						Wenn content_id übergeben wird, wird nur das entsprechende Service zurückgegeben. 
 	 */
-	public function getServicesOrganisationseinheit($oe_kurzbz)
+	public function getServicesOrganisationseinheit($oe_kurzbz, $content_id=null)
 	{	
 		$qry = 'SELECT 
 					* 
 				FROM 
 					public.tbl_service 
 				WHERE 
-					oe_kurzbz='.$this->db_add_param($oe_kurzbz).' 
-				ORDER BY bezeichnung';
+					oe_kurzbz='.$this->db_add_param($oe_kurzbz);
+		
+		if (!is_null($content_id) && is_numeric($content_id))
+			$qry.= ' AND content_id='.$this->db_add_param($content_id);
+		elseif ($content_id==true)
+			$qry.= ' AND content_id IS NOT NULL';
+		else 
+			$qry.= '';
+				
+		$qry.= ' ORDER BY bezeichnung';
 		
 		if($result = $this->db_query($qry))
 		{
@@ -272,18 +282,28 @@ class service extends basis_db
 	/**
 	 * Laedt die Services der uebergebenen OE und alle Services, die dieser OE untergliedert sind
 	 * 
-	 * @param $oe_kurzbz
-	 * @param $order Default: oe_kurzbz,bezeichnung
+	 * @param string $oe_kurzbz
+	 * @param string $order Default: oe_kurzbz,bezeichnung
+	 * @param integer $content_id Default: null. Wenn true, werden nur OEs mit eingetragener Content_id zurückgegeben. 
+	 * 						Wenn content_id übergeben wird, wird nur das entsprechende Service zurückgegeben.
 	 */
-	public function getSubServicesOrganisationseinheit($oe_kurzbz, $order='oe_kurzbz,bezeichnung')
+	public function getSubServicesOrganisationseinheit($oe_kurzbz, $order='oe_kurzbz,bezeichnung', $content_id=null)
 	{	
 		$qry = 'SELECT
 					* 
 				FROM 
 					public.tbl_service 
 				WHERE 
-					oe_kurzbz IN (SELECT oe_kurzbz FROM public.tbl_organisationseinheit WHERE oe_parent_kurzbz='.$this->db_add_param($oe_kurzbz).')
-				ORDER BY '.$order;
+					oe_kurzbz IN (SELECT oe_kurzbz FROM public.tbl_organisationseinheit WHERE oe_parent_kurzbz='.$this->db_add_param($oe_kurzbz).')';
+		if (!is_null($content_id) && is_numeric($content_id))
+			$qry.= ' AND content_id='.$this->db_add_param($content_id);
+		elseif ($content_id==true)
+			$qry.= ' AND content_id IS NOT NULL';
+		else 
+			$qry.= '';
+
+		if (!is_null($order))
+			$qry.= ' ORDER BY '.$order;
 		
 		if($result = $this->db_query($qry))
 		{

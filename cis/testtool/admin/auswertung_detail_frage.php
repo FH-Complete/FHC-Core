@@ -40,6 +40,13 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 	<h1>Testtool Auswertung - Frage Detail</h1>
 ';
 
+$user = get_uid();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
+if(!$rechte->isBerechtigt('basis/testtool',null,'s'))
+	die('Sie haben keine Berechtigung für diese Seite');
+	
 $frage_id = (isset($_GET['frage_id'])?$_GET['frage_id']:'');
 $sprache = (isset($_GET['sprache'])?$_GET['sprache']:'German');
 $db = new basis_db();
@@ -54,7 +61,8 @@ if($frage_id!='' && is_numeric($frage_id))
 				tbl_vorschlag_sprache.text as vorschlag_text,
 				tbl_vorschlag_sprache.audio as vorschlag_audio,
 				tbl_vorschlag_sprache.bild as vorschlag_bild,
-				(SELECT count(*) FROM testtool.tbl_antwort WHERE vorschlag_id=tbl_vorschlag.vorschlag_id) as anzahl,
+				tbl_frage.level,
+				/*(SELECT count(*) FROM testtool.tbl_antwort WHERE vorschlag_id=tbl_vorschlag.vorschlag_id) as anzahl,*/
 				(SELECT count(*) FROM testtool.tbl_pruefling_frage WHERE frage_id='$frage_id') as gesamt_anzahl
 			FROM 
 				testtool.tbl_frage 
@@ -78,7 +86,8 @@ if($frage_id!='' && is_numeric($frage_id))
 			{
 				//Fragen Details
 				echo "
-					Anzahl der Personen die diese Frage bekommen haben (alle Stg): $row->gesamt_anzahl<br>
+					Anzahl der Personen, die diese Frage bekommen haben (alle Stg): $row->gesamt_anzahl<br>
+					Level der Frage: $row->level
 					<br /><br />
 					";
 				echo '<center>';
@@ -103,7 +112,7 @@ if($frage_id!='' && is_numeric($frage_id))
 			}
 			
 			//Vorschlaege
-			echo '<center><div style="border: 1px solid black">';
+			echo '<center><div style="width: 90%; padding: 5px; background-color: #eee;border: 1px solid black">';
 			//echo "<b>Vorschlag $i: </b>";
 			$first=false;
 			echo $row->vorschlag_text;
@@ -122,7 +131,7 @@ if($frage_id!='' && is_numeric($frage_id))
 			if($row->vorschlag_bild!='')
 				echo "<img class='testtoolfrage' src='../bild.php?src=vorschlag&amp;vorschlag_id=$row->vorschlag_id&amp;sprache=".$sprache."' /><br/><br/>\n";
 			echo "<br /><br /><br /><b>Punkte:</b> ".number_format($row->punkte,2);
-			echo "<br /><b>Anzahl beantwortet (alle Stg):</b> $row->anzahl";
+			//echo "<br /><b>Anzahl beantwortet (alle Stg):</b> $row->anzahl";
 			echo '</div></center><br /><br />';
 		}
 	}

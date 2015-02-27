@@ -121,6 +121,7 @@ $berechtigte_oe = $rechte->getOEkurzbz('basis/cms')
 $sprache = isset($_GET['sprache'])?$_GET['sprache']:DEFAULT_LANGUAGE;
 $version = isset($_GET['version'])?$_GET['version']:null;
 $content_id = isset($_GET['content_id'])?$_GET['content_id']:null;
+$parent_content_id = isset($_GET['parent_content_id'])?$_GET['parent_content_id']:null;
 $action = isset($_GET['action'])?$_GET['action']:'';
 $method = isset($_GET['method'])?$_GET['method']:null;
 $filter = isset($_GET['filter'])?$_GET['filter']:null;
@@ -236,7 +237,21 @@ if(!is_null($method))
 			{
 				if($content->saveContentSprache())
 				{
-					$message .= '<span class="ok">Eintrag wurde erfolgreich angelegt</span>';
+					if ($parent_content_id!=null)
+					{
+						$parent_content = new content();
+						$parent_content->content_id = $parent_content_id;
+						$parent_content->child_content_id = $content->content_id;
+						$parent_content->insertamum = date('Y-m-d');
+						$parent_content->insertvon = $user;
+						$parent_content->sort=$parent_content->getMaxSort($parent_content_id)+1;
+						
+						if($parent_content->addChild())
+							$message.='<span class="ok">Erfolgreich als Child von Content '.$parent_content_id.' angelegt</span><br>';
+						else
+							$message.='<span class="error">'.$content->errormsg.'</span>';
+					}					
+					$message .= '<span class="ok">Neuer Eintrag wurde erfolgreich angelegt</span>';
 					$action='prefs';
 					$content_id=$content->content_id;
 					$version=1;
@@ -658,7 +673,8 @@ echo '<table width="100%">
 $db = new basis_db();
 
 echo '
-<a href="'.$_SERVER['PHP_SELF'].'?action=prefs&method=add_new_content">Neuen Eintrag hinzufügen</a>
+<a href="'.$_SERVER['PHP_SELF'].'?action=prefs&method=add_new_content">Neuen Eintrag hinzufügen</a><br>
+<a href="'.$_SERVER['PHP_SELF'].'?action=prefs&method=add_new_content&filter='.$filter.'&parent_content_id='.$content_id.'">Neuen Child-Eintrag hinzufügen</a>
 <br><br>
 
 <a href="admin.php?content_id='.$content_id.'&action='.$action.'&sprache='.$sprache.'&menu=content">Content</a> | 

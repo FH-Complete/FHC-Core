@@ -76,7 +76,8 @@ echo '<SELECT name="oe_kurzbz">
 <OPTION value="">-- '.$p->t("global/alle").' --</OPTION>';
 
 $oe = new organisationseinheit();
-$oe->getAll();
+//$oe->getAll();
+$oe->loadArray($oe->getChilds('Infrastruktur'),'bezeichnung');
 foreach($oe->result as $row)
 {
 	if($row->oe_kurzbz==$oe_kurzbz)
@@ -93,9 +94,9 @@ echo '</SELECT>
 if($oe_kurzbz!='')
 {
 	// Wenn der OE keine Services zugeteilt sind, dann die Services der untergeordneten OE laden
-	if($service->getServicesOrganisationseinheit($oe_kurzbz))
+	if($service->getServicesOrganisationseinheit($oe_kurzbz, true))
 		if (empty($service->result))
-			if(!$service->getSubServicesOrganisationseinheit($oe_kurzbz))
+			if(!$service->getSubServicesOrganisationseinheit($oe_kurzbz,'oe_kurzbz,bezeichnung',true))
 				die($service->errormsg);
 }
 else
@@ -116,12 +117,15 @@ echo '<table class="tablesorter" id="myTable">
 
 foreach($service->result as $row)
 {
-	echo '<tr>';
-	echo '<td>',$row->oe_kurzbz,'</td>';
-	echo '<td>'.($row->content_id!=''?'<a href="../../../cms/content.php?content_id='.$row->content_id.'">'.$row->bezeichnung.'</a>':$row->bezeichnung).'</td>';
-	echo '<td>',$row->beschreibung,'</td>';
-	echo '<td>'.($row->content_id!=''?'<a href="../../../cms/content.php?content_id='.$row->content_id.'">Details</a>':'').'</td>';
-	echo '</tr>';
+	if ($row->content_id!='')
+	{
+		echo '<tr>';
+		echo '<td>',$row->oe_kurzbz,'</td>';
+		echo '<td>'.($row->content_id!=''?'<a href="../../../cms/content.php?content_id='.$row->content_id.'">'.$row->bezeichnung.'</a>':$row->bezeichnung).'</td>';
+		echo '<td>',$row->beschreibung,'</td>';
+		echo '<td>'.($row->content_id!=''?'<a href="../../../cms/content.php?content_id='.$row->content_id.'">Details</a>':'').'</td>';
+		echo '</tr>';
+	}
 }
 echo '</tbody>
 </table>
