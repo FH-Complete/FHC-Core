@@ -449,7 +449,7 @@ function getLastStundeByDatum(Array $array, $filterDatum)
 
 	    if ($lehrziele_de)
 		{
-	     	echo "<tr><td align='left' valign='top'><h2>Kompetenzerwerb</h2></td></tr>";
+	     	echo "<tr><td align='left' valign='top'><h2>Lernergebnisse</h2></td></tr>";
 	     	echo "<tr><td>".stripslashes($lehrziele_de)."<br /><br /></td></tr>";
 		}
 
