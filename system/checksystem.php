@@ -2609,6 +2609,20 @@ if(!$result = @$db->db_query("SELECT anwesenheit FROM campus.tbl_lvinfo LIMIT 1"
 		echo 'campus.tbl_lvinfo: Spalte "anwesenheit" hinzugefuegt!<br>';
 }
 
+// Notizzuordnung fuer Anrechnung
+if(!$result = @$db->db_query("SELECT anrechnung_id FROM public.tbl_notizzuordnung LIMIT 1"))
+{
+	$qry = "
+		ALTER TABLE public.tbl_notizzuordnung ADD COLUMN anrechnung_id integer;
+		ALTER TABLE public.tbl_notizzuordnung ADD CONSTRAINT fk_anrechnung_notizzuordnung FOREIGN KEY (anrechnung_id) REFERENCES lehre.tbl_anrechnung(anrechnung_id) ON DELETE CASCADE ON UPDATE CASCADE;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_notizzuordnung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_notizzuordnung: neue Spalten anrechnung_id hinzugefuegt';
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(

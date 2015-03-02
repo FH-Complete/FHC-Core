@@ -35,6 +35,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentkontooverlay.xul.ph
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentiooverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentnotenoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentpruefungoverlay.xul.php"?>';
+echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentanrechnungenoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentabschlusspruefungoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentprojektarbeitoverlay.xul.php"?>';
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentgruppenoverlay.xul.php"?>';
@@ -347,6 +348,7 @@ else
 							<tab id="student-tab-noten" label="Noten" />
 							<tab id="student-tab-zeugnis" label="Archiv" />
 							<tab id="student-tab-pruefung" label="Prüfung" />
+							<tab id="student-tab-anrechnungen" label="Anrechnungen" />
 							<tab id="student-tab-abschlusspruefung" label="AbschlussPrüfung" />
 							<tab id="student-tab-projektarbeit" label="Projektarbeit" />
 							<tab id="student-tab-gruppen" label="Gruppen" onclick="StudentGruppenLoadData();"/>
@@ -364,6 +366,7 @@ else
 							<vbox id="student-noten"  style="margin-top:10px;" />
 							<vbox id="student-zeugnis"  style="margin-top:10px;" />
 							<vbox id="student-pruefung"  style="margin-top:10px;" />
+							<vbox id="student-anrechnungen"  style="margin-top:10px;" />
 							<vbox id="student-abschlusspruefung"  style="margin-top:10px;" />
 							<vbox id="student-projektarbeit"  style="margin-top:10px;" />
 							<vbox id="student-gruppen"  style="margin-top:10px;" />

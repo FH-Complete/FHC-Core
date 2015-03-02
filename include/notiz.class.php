@@ -219,7 +219,7 @@ class notiz extends basis_db
 	public function saveZuordnung()
 	{
 		$qry = "INSERT INTO public.tbl_notizzuordnung(notiz_id, projekt_kurzbz, projektphase_id, projekttask_id, 
-						uid, person_id, prestudent_id, bestellung_id, lehreinheit_id) VALUES(".
+						uid, person_id, prestudent_id, bestellung_id, lehreinheit_id, anrechnung_id) VALUES(".
 				$this->db_add_param($this->notiz_id, FHC_INTEGER).','.
 				$this->db_add_param($this->projekt_kurzbz).','.
 				$this->db_add_param($this->projektphase_id, FHC_INTEGER).','.
@@ -228,7 +228,8 @@ class notiz extends basis_db
 				$this->db_add_param($this->person_id, FHC_INTEGER).','.
 				$this->db_add_param($this->prestudent_id, FHC_INTEGER).','.
 				$this->db_add_param($this->bestellung_id, FHC_INTEGER).','.
-				$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).');';
+				$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).','.
+				$this->db_add_param($this->anrechnung_id, FHC_INTEGER).');';
 				
 		if($this->db_query($qry))
 		{
@@ -254,9 +255,10 @@ class notiz extends basis_db
 	 * @param $bestellung_id
 	 * @param $user
 	 * @param $lehreinheit_id
+	 * @param $anrechnung_id
 	 * @return boolean
 	 */
-	public function getNotiz($erledigt=null, $projekt_kurzbz=null, $projektphase_id=null, $projekttask_id=null, $uid=null, $person_id=null, $prestudent_id=null, $bestellung_id=null, $user=null, $lehreinheit_id=null)
+	public function getNotiz($erledigt=null, $projekt_kurzbz=null, $projektphase_id=null, $projekttask_id=null, $uid=null, $person_id=null, $prestudent_id=null, $bestellung_id=null, $user=null, $lehreinheit_id=null, $stundenplandev_id=null, $anrechnung_id=null)
 	{
 		$qry = "SELECT 
 					* 
@@ -290,6 +292,8 @@ class notiz extends basis_db
 			$qry.=" AND (verfasser_uid=".$this->db_add_param($user)." OR bearbeiter_uid=".$this->db_add_param($user).")";
 		if($lehreinheit_id!='')
 			$qry.=" AND lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER);
+		if($anrechnung_id!='')
+			$qry.=" AND anrechnung_id=".$this->db_add_param($anrechnung_id, FHC_INTEGER);
 
 		$qry.=' ORDER BY start, ende, titel';
 		
@@ -338,9 +342,10 @@ class notiz extends basis_db
 	 * @param $bestellung_id
 	 * @param $user
 	 * @param $lehreinheit_id
+	 * @param $anrechnung_id
 	 * @return boolean
 	 */
-	public function getAnzahlNotizen($erledigt=null, $projekt_kurzbz=null, $projektphase_id=null, $projekttask_id=null, $uid=null, $person_id=null, $prestudent_id=null, $bestellung_id=null, $user=null, $lehreinheit_id=null)
+	public function getAnzahlNotizen($erledigt=null, $projekt_kurzbz=null, $projektphase_id=null, $projekttask_id=null, $uid=null, $person_id=null, $prestudent_id=null, $bestellung_id=null, $user=null, $lehreinheit_id=null, $anrechnung_id=null)
 	{
 		$qry = "SELECT 
 					count(*) as anzahl
@@ -374,6 +379,8 @@ class notiz extends basis_db
 			$qry.=" AND (verfasser_uid=".$this->db_add_param($user)." OR bearbeiter_uid=".$this->db_add_param($user).")";
 		if($lehreinheit_id!='')
 			$qry.=" AND lehreinheit_id=".$this->db_add_param($lehreinheit_id, FHC_INTEGER);
+		if($anrechnung_id!='')
+			$qry.=" AND anrechnung_id=".$this->db_add_param($anrechnung_id, FHC_INTEGER);
 		
 		if($result = $this->db_query($qry))
 		{

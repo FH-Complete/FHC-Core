@@ -76,11 +76,16 @@ if(isset($_GET['lehreinheit_id']) && is_numeric($_GET['lehreinheit_id']))
 else 
 	$lehreinheit_id='';
 
+if(isset($_GET['anrechnung_id']) && is_numeric($_GET['anrechnung_id']))
+	$anrechnung_id=$_GET['anrechnung_id'];
+else 
+	$anrechnung_id='';
+
 ?>
 
 <window id="notiz-dialog" title="Notiz"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        onload="NotizInit(<?php echo "'".$projekt_kurzbz."','".$projektphase_id."','".$projekttask_id."','".$uid."','".$person_id."','".$prestudent_id."','".$bestellung_id."','".$user."','".$lehreinheit_id."'";?>)"
+        onload="NotizInit(<?php echo "'".$projekt_kurzbz."','".$projektphase_id."','".$projekttask_id."','".$uid."','".$person_id."','".$prestudent_id."','".$bestellung_id."','".$user."','".$lehreinheit_id."','".$anrechnung_id."'";?>)"
         >
 
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/notizdialog.js.php" />

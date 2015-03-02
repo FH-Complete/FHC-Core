@@ -62,6 +62,7 @@ require_once('../../include/mail.class.php');
 require_once('../../include/kontakt.class.php'); 
 require_once('../../include/dms.class.php'); 
 require_once('../../include/notenschluessel.class.php');
+require_once('../../include/anrechnung.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -3510,6 +3511,63 @@ if(!$error)
 				$return = false;
 				$errormsg = 'Unbekannter Fehler';
 			}
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='saveanrechnung')
+	{
+		$anrechnung = new anrechnung();
+		
+		$anrechnung->new = $_POST['neu'];
+		$anrechnung->anrechnung_id = $_POST['anrechnung_id'];
+		$anrechnung->prestudent_id = $_POST['prestudent_id'];
+		$anrechnung->lehrveranstaltung_id = $_POST['lehrveranstaltung_id'];
+		$anrechnung->begruendung_id = $_POST['begruendung_id'];
+		isset($_POST['lehrveranstaltung_id_kompatibel']) ? $anrechnung->lehrveranstaltung_id_kompatibel = $_POST['lehrveranstaltung_id_kompatibel'] : $anrechnung->lehrveranstaltung_id_kompatibel = null;
+		isset($_POST['notiz_id']) ? $anrechnung->notiz_id = $_POST['notiz_id'] : $anrechnung->notiz_id = null;
+		$anrechnung->genehmigt_von = $_POST['genehmigt_von'];
+		$anrechnung->insertvon = $user;
+		$anrechnung->updatevon = $user;
+		
+		if($anrechnung->save())
+		{
+			$return = true;
+		}
+		else
+		{
+			$return = false;
+			$errormsg = $anrechnung->errormsg;
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='deleteanrechnung')
+	{
+		//Loescht eine Anrechunng
+		if(isset($_POST['anrechnung_id']) && is_numeric($_POST['anrechnung_id']))
+		{
+			if(!$rechte->isBerechtigt('admin', $_POST['studiengang_kz'], 'suid') && !$rechte->isBerechtigt('assistenz', $_POST['studiengang_kz'], 'suid'))
+			{
+				$return = false;
+				$error = true;
+				$errormsg = 'Sie haben keine Berechtigung';
+			}
+			else
+			{
+				$anrechnung = new anrechnung();
+
+				if($anrechnung->delete($_POST['anrechnung_id']))
+				{
+					$return = true;
+				}
+				else
+				{
+					$errormsg = $anrechnung->errormsg;
+					$return = false;
+				}
+			}
+		}
+		else
+		{
+			$return = false;
+			$errormsg  = 'Fehlerhafte Parameteruebergabe';
 		}
 	}
 	else
