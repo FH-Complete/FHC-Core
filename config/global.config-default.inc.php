@@ -20,6 +20,9 @@ define('CIS_LEHRVERANSTALTUNG_SEMESTERINFO_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_LEHRFACH_ANZEIGEN',false);
 define('CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN', true);
 
+// Legt fest, ob bei den LV-Infos der Block mit den Terminen zu den einzelnen LVs (laut Stundenplan) angezeigt werden soll
+define ('CIS_LVINFO_TERMINE_ANZEIGEN', false);
+
 // Legt fest ob bei den LVs im CIS das aktuelle Semester angezeigt wird oder das zum Semester dazupassende (zB Sommersemester im 2. Semester)
 define('CIS_LEHRVERANSTALTUNG_AKTUELLES_STUDIENSEMESTER_ANZEIGEN',true);
 

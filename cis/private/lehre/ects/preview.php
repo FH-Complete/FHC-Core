@@ -29,6 +29,7 @@
 */
 
 require_once('../../../../config/cis.config.inc.php');
+require_once('../../../../config/global.config.inc.php');
 require_once('../../../../include/studiensemester.class.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
 require_once('../../../../include/lvinfo.class.php');
@@ -655,52 +656,55 @@ function getLastStundeByDatum(Array $array, $filterDatum)
     $studiensemester = new studiensemester();
 
     $lehreinheit->load_lehreinheiten($lv, $studiensemester->getaktorNext());
-    if(!empty($lehreinheit->lehreinheiten))
+    if (CIS_LVINFO_TERMINE_ANZEIGEN == true)
     {
-	$lehrstunde = new lehrstunde();
-	$lehrstunde->load_lehrstunden_le($lehreinheit->lehreinheiten[0]->lehreinheit_id);
-	$i = 1;
-	echo "<h2>Termine</h2><table><tr><td><ul>";
-	
-	$result = $lehrstunde->lehrstunden;
-	$last = "";
-	$bis = "";
-	usort($result, "cmp");
-	$datum = new datum();
-	$std_von = new stunde();
-	$std_bis = new stunde();
-	foreach($result as $key=>$stunde)
-	{
-	    if($last !== $stunde->datum)
+	    if(!empty($lehreinheit->lehreinheiten))
 	    {
-		$temp = array_values(getLastStundeByDatum($result, $stunde->datum));
-		$size = count($temp);
-		if($size != 0)
-		{
-		    $std_von->load($temp[0]->stunde);
-		    $std_bis->load($temp[$size-1]->stunde);
-		    echo "<li>".$datum->formatDatum($temp[0]->datum,"d.m.Y")." von ".mb_substr($std_von->beginn,0,5)." bis ".mb_substr($std_bis->ende,0,5)."</li>";
-		}
-		$i++;
+			$lehrstunde = new lehrstunde();
+			$lehrstunde->load_lehrstunden_le($lehreinheit->lehreinheiten[0]->lehreinheit_id);
+			$i = 1;
+			echo "<h2>Termine</h2><table><tr><td><ul>";
+			
+			$result = $lehrstunde->lehrstunden;
+			$last = "";
+			$bis = "";
+			usort($result, "cmp");
+			$datum = new datum();
+			$std_von = new stunde();
+			$std_bis = new stunde();
+			foreach($result as $key=>$stunde)
+			{
+			    if($last !== $stunde->datum)
+			    {
+				$temp = array_values(getLastStundeByDatum($result, $stunde->datum));
+				$size = count($temp);
+				if($size != 0)
+				{
+				    $std_von->load($temp[0]->stunde);
+				    $std_bis->load($temp[$size-1]->stunde);
+				    echo "<li>".$datum->formatDatum($temp[0]->datum,"d.m.Y")." von ".mb_substr($std_von->beginn,0,5)." bis ".mb_substr($std_bis->ende,0,5)."</li>";
+				}
+				$i++;
+			    }
+			    elseif($last == "")
+			    {
+				$temp = getLastStundeByDatum($result, $stunde->datum);
+				var_dump($temp);
+			    }
+			    else
+			    {
+				$bis = $stunde->stunde;
+			    }
+				
+			    if($i % 5 === 0)
+			    {
+		//		echo "</ul></td><td><ul>";
+		//		$i++;
+			    }
+			    $last = $stunde->datum;
+			}
+			echo "</ul></td></tr></table>";
 	    }
-	    elseif($last == "")
-	    {
-		$temp = getLastStundeByDatum($result, $stunde->datum);
-		var_dump($temp);
-	    }
-	    else
-	    {
-		$bis = $stunde->stunde;
-	    }
-		
-	    if($i % 5 === 0)
-	    {
-//		echo "</ul></td><td><ul>";
-//		$i++;
-	    }
-	    $last = $stunde->datum;
-	}
-	echo "</ul></td></tr></table>";
     }
 
     //Ein paar Zeilenumbrueche damit er beim Sprung zum Anker weit genug nach unten springt
