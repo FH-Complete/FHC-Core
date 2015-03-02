@@ -47,8 +47,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					<xul:toolbarbutton anonid="toolbarbutton-notiz-aktualisieren" label="Aktualisieren" oncommand="document.getBindingParent(this).RefreshNotiz()" image="<?php echo APP_ROOT;?>skin/images/refresh.png" tooltiptext="Liste neu laden"/>
 					<xul:toolbarbutton anonid="toolbarbutton-notiz-filter" label="Filter" type="menu">							
 				      <xul:menupopup>
-						    <xul:menuitem label="Alle Notizen anzeigen" oncommand="document.getBindingParent(this).LoadNotizTree(document.getBindingParent(this).getAttribute('projekt_kurzbz'),document.getBindingParent(this).getAttribute('projektphase_id'),document.getBindingParent(this).getAttribute('projekttask_id'),document.getBindingParent(this).getAttribute('uid'),document.getBindingParent(this).getAttribute('person_id'),document.getBindingParent(this).getAttribute('prestudent_id'),document.getBindingParent(this).getAttribute('bestellung_id'), document.getBindingParent(this).getAttribute('user'), null);" tooltiptext="Alle Notizen anzeigen"/>
-							<xul:menuitem label="nur offene Notizen anzeigen" oncommand="document.getBindingParent(this).LoadNotizTree(document.getBindingParent(this).getAttribute('projekt_kurzbz'),document.getBindingParent(this).getAttribute('projektphase_id'),document.getBindingParent(this).getAttribute('projekttask_id'),document.getBindingParent(this).getAttribute('uid'),document.getBindingParent(this).getAttribute('person_id'),document.getBindingParent(this).getAttribute('prestudent_id'),document.getBindingParent(this).getAttribute('bestellung_id'), document.getBindingParent(this).getAttribute('user'), false);" tooltiptext="nur offene Notizen anzeigen"/>
+						    <xul:menuitem label="Alle Notizen anzeigen" oncommand="document.getBindingParent(this).LoadNotizTree(document.getBindingParent(this).getAttribute('projekt_kurzbz'),document.getBindingParent(this).getAttribute('projektphase_id'),document.getBindingParent(this).getAttribute('projekttask_id'),document.getBindingParent(this).getAttribute('uid'),document.getBindingParent(this).getAttribute('person_id'),document.getBindingParent(this).getAttribute('prestudent_id'),document.getBindingParent(this).getAttribute('bestellung_id'), document.getBindingParent(this).getAttribute('user'), document.getBindingParent(this).getAttribute('lehreinheit_id'), null, document.getBindingParent(this).getAttribute('anrechnung_id'));" tooltiptext="Alle Notizen anzeigen"/>
+							<xul:menuitem label="nur offene Notizen anzeigen" oncommand="document.getBindingParent(this).LoadNotizTree(document.getBindingParent(this).getAttribute('projekt_kurzbz'),document.getBindingParent(this).getAttribute('projektphase_id'),document.getBindingParent(this).getAttribute('projekttask_id'),document.getBindingParent(this).getAttribute('uid'),document.getBindingParent(this).getAttribute('person_id'),document.getBindingParent(this).getAttribute('prestudent_id'),document.getBindingParent(this).getAttribute('bestellung_id'), document.getBindingParent(this).getAttribute('user'), document.getBindingParent(this).getAttribute('lehreinheit_id'), false, document.getBindingParent(this).getAttribute('anrechnung_id'));" tooltiptext="nur offene Notizen anzeigen"/>
 				      </xul:menupopup>
 				    </xul:toolbarbutton>
 				</xul:toolbar>
@@ -334,6 +334,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				var prestudent_id = this.getAttribute('prestudent_id');
 				var bestellung_id = this.getAttribute('bestellung_id');
 				var lehreinheit_id = this.getAttribute('lehreinheit_id');
+				var anrechnung_id = this.getAttribute('anrechnung_id');
 				
 				var soapBody = new SOAPObject("saveNotiz");
 				//soapBody.appendChild(new SOAPObject("username")).val('joe');
@@ -357,6 +358,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				notiz.appendChild(new SOAPObject("prestudent_id")).val(prestudent_id);
 				notiz.appendChild(new SOAPObject("bestellung_id")).val(bestellung_id);
 				notiz.appendChild(new SOAPObject("lehreinheit_id")).val(lehreinheit_id);
+				notiz.appendChild(new SOAPObject("anrechnung_id")).val(anrechnung_id);
 				soapBody.appendChild(notiz);
 								
 				var sr = new SOAPRequest("saveNotiz",soapBody);
@@ -647,6 +649,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			<parameter name="user"/>
 			<parameter name="lehreinheit_id"/>
 			<parameter name="erledigt"/>
+			<parameter name="anrechnung_id"/>
 			<body>
 			<![CDATA[
 				//debug('LoadNotizTree');
@@ -672,7 +675,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					this.setAttribute('bestellung_id',bestellung_id);
 					this.setAttribute('user',user);
 					this.setAttribute('lehreinheit_id',lehreinheit_id);
-					
+										
 					//Wenn kein Erledigt Parameter uebergeben wird, dann wird die zuletzt 
 					//verwendete Einstellung verwendet
 					if(typeof erledigt=="undefined")
@@ -680,8 +683,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 
 					if(typeof erledigt!="undefined")
 						this.setAttribute('erledigt',erledigt);
+						
+					if(typeof anrechnung_id=="undefined")
+						anrechnung_id = '';
+						
+					if(typeof anrechnung_id!="undefined")
+						this.setAttribute('anrechnung_id',anrechnung_id);
 
-				
 					var datasource="<?php echo APP_ROOT; ?>rdf/notiz.rdf.php?ts="+gettimestamp();
 					datasource = datasource+"&projekt_kurzbz="+encodeURIComponent(projekt_kurzbz);
 					datasource = datasource+"&projektphase_id="+encodeURIComponent(projektphase_id);
@@ -698,7 +706,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 						datasource = datasource+"&erledigt=true";
 					else if((typeof erledigt=="boolean" && erledigt==false)	|| (typeof erledigt=="string" && erledigt=='false'))
 						datasource = datasource+"&erledigt=false";
-					
+						
+					datasource = datasource+"&anrechnung_id="+encodeURIComponent(anrechnung_id);
 					
 					//debug('Source:'+datasource);
 	                var tree = document.getAnonymousElementByAttribute(this ,'anonid', 'tree-notiz');
@@ -797,41 +806,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			]]>
 			</body>
 		</method>
-		<method name="openNotiz">
-			<parameter name="id"/>
-			<body>
-			<![CDATA[
-				var projekt_kurzbz = this.getAttribute('projekt_kurzbz');
-				var projektphase_id = this.getAttribute('projektphase_id');
-				var projekttask_id = this.getAttribute('projekttask_id');
-				var uid = this.getAttribute('uid');
-				var person_id = this.getAttribute('person_id');
-				var prestudent_id = this.getAttribute('prestudent_id');
-				var bestellung_id = this.getAttribute('bestellung_id');
-				var lehreinheit_id = this.getAttribute('lehreinheit_id');
-				
-				var opener_id = this.getAttribute('id');
-				
-				var param = ''; 
-				
-				param = param+'?projekt_kurzbz='+encodeURIComponent(projekt_kurzbz);
-				param = param+'&projektphase_id='+encodeURIComponent(projektphase_id);
-				param = param+'&projekttask_id='+encodeURIComponent(projekttask_id);
-				param = param+'&uid='+encodeURIComponent(uid);
-				param = param+'&person_id='+encodeURIComponent(person_id);
-				param = param+'&prestudent_id='+encodeURIComponent(prestudent_id);
-				param = param+'&bestellung_id='+encodeURIComponent(bestellung_id);
-				param = param+'&lehreinheit_id='+encodeURIComponent(lehreinheit_id);
-				
-				param = param+'&opener_id='+encodeURIComponent(opener_id);
-				if(id!=undefined)
-					param = param+'&id='+id;  
-				
-				
-			    window.open('<?php echo APP_ROOT; ?>content/notiz.window.xul.php'+param,'Notiz','chrome, status=no, width=500, height=350, centerscreen, resizable');
-			]]>
-			</body>
-		</method>
 		
 		<constructor>
 			//debug('load notiz:'+this.getAttribute('id'));
@@ -846,11 +820,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			var bestellung_id = this.getAttribute('bestellung_id');
 			var user = this.getAttribute('user');
 			var lehreinheit_id = this.getAttribute('lehreinheit_id');
+			var anrechnung_id = this.getAttribute('anrechnung_id');
 			
 			if(projekt_kurzbz!='' || projektphase_id!='' || projekttask_id!='' 
-			   || uid!='' || person_id!='' || prestudent_id!='' || bestellung_id!='' || user!='' || lehreinheit_id!='')
+			   || uid!='' || person_id!='' || prestudent_id!='' || bestellung_id!='' || user!='' || lehreinheit_id!='' || anrechnung_id!='')
 			{
-				this.LoadNotizTree(projekt_kurzbz,projektphase_id,projekttask_id,uid,person_id,prestudent_id,bestellung_id, user, lehreinheit_id);
+				this.LoadNotizTree(projekt_kurzbz,projektphase_id,projekttask_id,uid,person_id,prestudent_id,bestellung_id, user, lehreinheit_id, null, anrechnung_id);
 			}
 			document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-verfasser').value=getUsername();
 		</constructor>

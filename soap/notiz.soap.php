@@ -99,6 +99,7 @@ function saveNotiz($username, $passwort, $notiz)
 			$notiz_obj->prestudent_id = $notiz->prestudent_id;
 			$notiz_obj->bestellung_id = $notiz->bestellung_id;
 			$notiz_obj->lehreinheit_id = $notiz->lehreinheit_id;
+			$notiz_obj->anrechnung_id = $notiz->anrechnung_id;
 			
 			if(!$notiz_obj->saveZuordnung())
 				return new SoapFault("Server", $notiz_obj->errormsg);

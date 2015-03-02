@@ -22,8 +22,8 @@
 // ****
 // * Laedt die zu bearbeitenden Daten
 // ****
-function NotizInit(projekt_kurzbz, projektphase_id, projekttask_id, uid, person_id, prestudent_id, bestellung_id, user, lehreinheit_id)
+function NotizInit(projekt_kurzbz, projektphase_id, projekttask_id, uid, person_id, prestudent_id, bestellung_id, user, lehreinheit_id, anrechnung_id)
 {
 	var notizbox = document.getElementById('notiz-dialog-box-notiz');
-	notizbox.LoadNotizTree(projekt_kurzbz,projektphase_id, projekttask_id, uid, person_id, prestudent_id, bestellung_id, user, lehreinheit_id);
+	notizbox.LoadNotizTree(projekt_kurzbz,projektphase_id, projekttask_id, uid, person_id, prestudent_id, bestellung_id, user, lehreinheit_id, null, anrechnung_id);
 }

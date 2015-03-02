@@ -1,0 +1,259 @@
+<?php
+/* Copyright (C) 2015 Technikum-Wien
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * Authors: Nikolaus Krondraf <nikolaus.krondraf@technikum-wien.at>
+ */
+require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/datum.class.php');
+require_once(dirname(__FILE__).'/lehrveranstaltung.class.php');
+
+class anrechnung extends basis_db 
+{
+	public $errormsg;
+	public $new;
+	public $result;
+
+	// Tabellenspalten
+	public $anrechnung_id;	// integer
+	public $prestudent_id;	// integer
+	public $lehrveranstaltung_id;	// integer
+	public $begruendung_id;	// integer
+	public $lehrveranstaltung_id_kompatibel;	// integer
+	public $genehmigt_von;	// varchar(32)
+	public $insertamum;		// timestamp
+	public $insertvon;		// varchar(32)
+	public $updateamum;		// timestamp
+	public $updatevon;		// varchar(32)
+	
+	public function validate() 
+	{
+		if(!is_numeric($this->prestudent_id))
+		{
+			$this->errormsg = "Prestudent_id ist ungueltig";
+			return false;
+		}
+		
+		if(!is_numeric($this->lehrveranstaltung_id))
+		{
+			$this->errormsg = "Wählen Sie eine Lehrveranstaltung aus";
+			return false;
+		}
+		
+		if(!is_numeric($this->begruendung_id))
+		{
+			$this->errormsg = "Wählen Sie eine Begründung aus";
+			return false;
+		}
+		
+		if($this->begruendung_id == "2" && !is_numeric($this->lehrveranstaltung_id_kompatibel))
+		{
+			$this->errormsg = "Wählen Sie eine kompatible Lehrveranstaltung aus";
+			return false;
+		}
+		
+		if(empty($this->genehmigt_von))
+		{
+			$this->errormsg = "Wählen Sie die Person aus, die die Anrechnung genehmigt hat";
+			return false;
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Lädt eine Anrechnung
+	 * @param $anrechnung_id ID der Anrechnung
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getAnrechnung($anrechnung_id) 
+	{
+		$qry = "SELECT anrechnung_id, prestudent_id, lehrveranstaltung_id, begruendung_id, bezeichnung AS begruendung, "
+				. "lehrveranstaltung_id_kompatibel, genehmigt_von, insertamum, insertvon, updateamum, updatevon "
+				. "FROM lehre.tbl_anrechnung "
+				. "JOIN lehre.tbl_anrechnung_begruendung USING (begruendung_id) "
+				. "WHERE anrechnung_id = " . $this->db_add_param($anrechnung_id);
+		
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				$datum = new datum();
+				$lehrveranstaltung = new lehrveranstaltung($row->lehrveranstaltung_id);
+				$row->insertamum = $datum->convertISODate($row->insertamum);
+				$row->lehrveranstaltung_bez = $lehrveranstaltung->bezeichnung;
+				if($row->lehrveranstaltung_id_kompatibel != '')
+				{
+					$lehrveranstaltung = new lehrveranstaltung($row->lehrveranstaltung_id_kompatibel);
+					$row->lehrveranstaltung_bez_kompatibel = $lehrveranstaltung->bezeichnung;
+				}
+				else
+					$row->lehrveranstaltung_bez_kompatibel = null;
+								
+				$this->result[] = $row;
+			}
+			else
+			{
+				$this->errormsg = 'Es wurde kein Datensatz mit dieser ID gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+	
+	/**
+	 * Speichert eine Anrechnung
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function save() 
+	{
+		if(!$this->validate())
+			return false;
+		
+		if($this->new == "1")
+	    {
+		    // Neuen Datensatz anlegen
+		    $qry = 'INSERT INTO lehre.tbl_anrechnung (prestudent_id, lehrveranstaltung_id, begruendung_id, lehrveranstaltung_id_kompatibel, genehmigt_von, insertamum, insertvon, updateamum, updatevon) VALUES ('.
+			    $this->db_add_param($this->prestudent_id).', '.
+			    $this->db_add_param($this->lehrveranstaltung_id).', '.
+			    $this->db_add_param($this->begruendung_id).', '.
+			    $this->db_add_param($this->lehrveranstaltung_id_kompatibel).', '.
+			    $this->db_add_param($this->genehmigt_von).', '.
+				'NOW(),'.
+			    $this->db_add_param($this->insertvon).', '.
+			    'NOW(),'.
+			    $this->db_add_param($this->updatevon).');';
+	    }
+		else
+		{
+			// Datensatz aktualisieren
+			$qry = 'UPDATE lehre.tbl_anrechnung SET '
+					. 'lehrveranstaltung_id = ' . $this->db_add_param($this->lehrveranstaltung_id) . ', '
+					. 'begruendung_id = ' . $this->db_add_param($this->begruendung_id) . ', '
+					. 'lehrveranstaltung_id_kompatibel = ' . $this->db_add_param($this->lehrveranstaltung_id_kompatibel) . ', '
+					. 'genehmigt_von = ' . $this->db_add_param($this->genehmigt_von) . ', '
+					. 'updateamum = NOW(), '
+					. 'updatevon = ' . $this->db_add_param($this->updatevon) . ' '
+					. 'WHERE anrechnung_id = ' . $this->db_add_param($this->anrechnung_id);
+		}
+		
+		if($this->db_query($qry))
+	    {
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern der Anrechnung: '.$this->db_last_error();
+			return false;
+		}
+	}
+	
+	/**
+	 * Gibt alle Anrechnungen eines Prestudenten zurück
+	 * @param $prestudent_id
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function getAnrechnungPrestudent($prestudent_id) 
+	{
+		$qry = "SELECT anrechnung_id, prestudent_id, lehrveranstaltung_id, begruendung_id, bezeichnung AS begruendung, "
+				. "lehrveranstaltung_id_kompatibel, genehmigt_von , insertamum, insertvon, updateamum, updatevon "
+				. "FROM lehre.tbl_anrechnung "
+				. "JOIN lehre.tbl_anrechnung_begruendung USING (begruendung_id) "
+				. "WHERE prestudent_id = " . $this->db_add_param($prestudent_id);
+
+		if($this->db_query($qry))
+		{
+			$datum = new datum();
+						
+			while($row = $this->db_fetch_object())
+			{
+				$row->insertamum = $datum->convertISODate($row->insertamum);
+				$lehrveranstaltung = new lehrveranstaltung($row->lehrveranstaltung_id);
+				$row->lehrveranstaltung_bez = $lehrveranstaltung->bezeichnung;
+				if($row->lehrveranstaltung_id_kompatibel != '')
+				{
+					$lehrveranstaltung = new lehrveranstaltung($row->lehrveranstaltung_id_kompatibel);
+					$row->lehrveranstaltung_bez_kompatibel = $lehrveranstaltung->bezeichnung;
+				}
+				else
+					$row->lehrveranstaltung_bez_kompatibel = null;
+								
+				$this->result[] = $row;
+			}
+			
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Datensatz konnte nicht geladen werden';
+		    return false;
+		}
+	}
+	
+	/**
+	 * Loescht eine Anrechnung
+	 * @param $anrechnung_id
+	 * @return true wenn ok, false im Fehlerfall
+	 */
+	public function delete($anrechnung_id) 
+	{
+		$qry = "DELETE FROM lehre.tbl_anrechnung WHERE anrechnung_id = " . $this->db_add_param($anrechnung_id);
+		
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Datensatz konnte nicht geloescht werden';
+		    return false;
+		}
+	}
+	
+	/**
+	 * Gibt die Anzahl der Notizen für eine Anrechnung zurück
+	 * @param $anrechung_id
+	 * @return Anzahl der Notizen, false im Fehlerfall
+	 */
+	public function getAnzahlNotizen($anrechung_id) 
+	{
+		$qry = "SELECT COUNT(*) AS anzahl "
+				. "FROM public.tbl_notizzuordnung "
+				. "WHERE anrechnung_id = " . $this->db_add_param($anrechung_id);
+		
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				return $row->anzahl;
+			}
+			else
+			{
+				$this->errormsg = 'Daten konnten nicht geladen werden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Daten konnten nicht geladen werden';
+		    return false;
+		}
+	}
+}
