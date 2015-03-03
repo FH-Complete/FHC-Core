@@ -39,12 +39,12 @@ class preincoming extends basis_db
 	public $anmerkung;			// text
 	public $universitaet;		// varchar(256)
 	public $aktiv;				// boolean
-	public $bachelorthesis;		// boolean
-	public $masterthesis;		// boolean
+	public $bachelorthesis=false;		// boolean
+	public $masterthesis=false;		// boolean
 	public $von;				// date
 	public $bis;				// date
 	public $code; 				// varchar
-	public $uebernommen;		// boolean
+	public $uebernommen=false;		// boolean
 	public $updateamum;			// timestamp
 	public $updatevon;			// string
 	public $insertamum;      	// timestamp
@@ -58,8 +58,8 @@ class preincoming extends basis_db
 	public $zgvmaster_ort; 
 	public $zgvmaster_name; 
 	public $program_name; 
-	public $bachelor; 
-	public $master; 
+	public $bachelor=false; 
+	public $master=false; 
 	public $jahre; 
 	public $person_id_emergency; 
 	public $person_id_coordinator_dep; 
