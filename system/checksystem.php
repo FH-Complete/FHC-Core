@@ -2609,6 +2609,79 @@ if(!$result = @$db->db_query("SELECT anwesenheit FROM campus.tbl_lvinfo LIMIT 1"
 		echo 'campus.tbl_lvinfo: Spalte "anwesenheit" hinzugefuegt!<br>';
 }
 
+// Anrechnungen
+if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnung LIMIT 1;"))
+{
+	$qry = "
+
+	CREATE TABLE lehre.tbl_anrechnung_begruendung
+	(
+		begruendung_id integer NOT NULL,
+		bezeichnung varchar(128) NOT NULL
+	);
+
+	ALTER TABLE lehre.tbl_anrechnung_begruendung ADD CONSTRAINT pk_begruendung PRIMARY KEY (begruendung_id);
+
+	CREATE SEQUENCE lehre.seq_anrechnung_begruendung_begruendung_id
+	INCREMENT BY 1
+	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+	
+	ALTER TABLE lehre.tbl_anrechnung_begruendung ALTER COLUMN begruendung_id SET DEFAULT nextval('lehre.seq_anrechnung_begruendung_begruendung_id');
+	
+    INSERT INTO lehre.tbl_anrechnung_begruendung(bezeichnung) VALUES('externes Zeugnis');
+    INSERT INTO lehre.tbl_anrechnung_begruendung(bezeichnung) VALUES('kompatible Lehrveranstaltung');
+    INSERT INTO lehre.tbl_anrechnung_begruendung(bezeichnung) VALUES('Prüfung');
+	
+    GRANT SELECT, INSERT, UPDATE, DELETE ON lehre.tbl_anrechnung_begruendung TO vilesci;
+	GRANT SELECT, UPDATE ON lehre.seq_anrechnung_begruendung_begruendung_id TO vilesci;
+	
+	GRANT SELECT, INSERT, UPDATE, DELETE ON lehre.tbl_anrechnung_begruendung TO web;
+	GRANT SELECT, UPDATE ON lehre.seq_anrechnung_begruendung_begruendung_id TO web;
+    
+    CREATE TABLE lehre.tbl_anrechnung
+	(
+		anrechnung_id integer NOT NULL,
+        prestudent_id integer NOT NULL,
+        lehrveranstaltung_id integer NOT NULL,
+        begruendung_id integer NOT NULL,
+        lehrveranstaltung_id_kompatibel integer,
+        genehmigt_von varchar(32) NOT NULL,
+        insertamum timestamp, 	
+        insertvon varchar(32), 	
+        updateamum timestamp,
+        updatevon varchar(32)
+	);
+    
+    ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT pk_anrechnung PRIMARY KEY (anrechnung_id);
+    
+    CREATE SEQUENCE lehre.seq_anrechnung_anrechnung_id
+	INCREMENT BY 1
+	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+    
+    ALTER TABLE lehre.tbl_anrechnung ALTER COLUMN anrechnung_id SET DEFAULT nextval('lehre.seq_anrechnung_anrechnung_id');
+    ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT fk_anrechnung_anrechnung_begruendung FOREIGN KEY (begruendung_id) REFERENCES lehre.tbl_anrechnung_begruendung (begruendung_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+    ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT fk_anrechnung_lehrveranstaltung FOREIGN KEY (lehrveranstaltung_id) REFERENCES lehre.tbl_lehrveranstaltung (lehrveranstaltung_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+    ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT fk_anrechnung_lehrveranstaltung_kompatibel FOREIGN KEY (lehrveranstaltung_id_kompatibel) REFERENCES lehre.tbl_lehrveranstaltung (lehrveranstaltung_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+    ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT fk_anrechnung_mitarbeiter FOREIGN KEY (genehmigt_von) REFERENCES public.tbl_mitarbeiter (mitarbeiter_uid) ON UPDATE CASCADE ON DELETE CASCADE;
+    ALTER TABLE lehre.tbl_anrechnung ADD CONSTRAINT fk_anrechnung_prestudent FOREIGN KEY (prestudent_id) REFERENCES public.tbl_prestudent (prestudent_id) ON UPDATE CASCADE ON DELETE RESTRICT;
+    
+    GRANT SELECT, INSERT, UPDATE, DELETE ON lehre.tbl_anrechnung TO vilesci;
+	GRANT SELECT, UPDATE ON lehre.seq_anrechnung_anrechnung_id TO vilesci;
+	
+	GRANT SELECT, INSERT, UPDATE, DELETE ON lehre.tbl_anrechnung TO web;
+	GRANT SELECT, UPDATE ON lehre.seq_anrechnung_anrechnung_id TO web;
+	";
+    
+	if(!$db->db_query($qry))
+		echo '<strong>Anrechnungen: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' Tabellen fuer Anrechnungen hinzugefuegt!<br>';
+}
+
 // Notizzuordnung fuer Anrechnung
 if(!$result = @$db->db_query("SELECT anrechnung_id FROM public.tbl_notizzuordnung LIMIT 1"))
 {
@@ -2720,6 +2793,8 @@ $tabellen=array(
 	"lehre.tbl_abschlussbeurteilung"  => array("abschlussbeurteilung_kurzbz","bezeichnung","bezeichnung_english"),
 	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note"),
 	"lehre.tbl_akadgrad"  => array("akadgrad_id","akadgrad_kurzbz","studiengang_kz","titel","geschlecht"),
+    "lehre.tbl_anrechnung"  => array("anrechnung_id","prestudent_id","lehrveranstaltung_id","begruendung_id","lehrveranstaltung_id_kompatibel","genehmigt_von","insertamum","insertvon","updateamum","updatevon"),
+    "lehre.tbl_anrechnung_begruendung"  => array("begruendung_id","bezeichnung"),
 	"lehre.tbl_betreuerart"  => array("betreuerart_kurzbz","beschreibung"),
 	"lehre.tbl_ferien"  => array("bezeichnung","studiengang_kz","vondatum","bisdatum"),
 	"lehre.tbl_lehreinheit"  => array("lehreinheit_id","lehrveranstaltung_id","studiensemester_kurzbz","lehrfach_id","lehrform_kurzbz","stundenblockung","wochenrythmus","start_kw","raumtyp","raumtypalternativ","sprache","lehre","anmerkung","unr","lvnr","updateamum","updatevon","insertamum","insertvon","ext_id","lehrfach_id_old"),
