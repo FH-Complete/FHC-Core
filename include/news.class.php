@@ -196,8 +196,8 @@ class news extends basis_db
 		if($this->load($news_id))
 		{
 			$qry = "
-				DELETE FROM campus.tbl_news WHERE news_id=".$this->db_add_param($news_id, FHC_INTEGER)."
-				DELETE FROM campus.tbl_contentsprache WHERE content_id=".$this->db_add_param($this->content_id, FHC_INTEGER)."
+				DELETE FROM campus.tbl_news WHERE news_id=".$this->db_add_param($news_id, FHC_INTEGER).";
+				DELETE FROM campus.tbl_contentsprache WHERE content_id=".$this->db_add_param($this->content_id, FHC_INTEGER).";
 				DELETE FROM campus.tbl_content WHERE content_id=".$this->db_add_param($this->content_id, FHC_INTEGER);
 			
 			if($this->db_query($qry))
