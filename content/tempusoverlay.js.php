@@ -59,6 +59,8 @@ function onVerbandSelect()
 	var typ=tree.view.getCellText(tree.currentIndex,col);
 	col = tree.columns ? tree.columns["stsem"] : "stsem";
 	var stsem=tree.view.getCellText(tree.currentIndex,col);
+	col = tree.columns ? tree.columns["orgform"] : "orgform";
+	var orgform=tree.view.getCellText(tree.currentIndex,col);
 
 	var daten=window.TimeTableWeek.document.getElementById('TimeTableWeekData');
 	var datum=parseInt(daten.getAttribute("datum"));
@@ -101,7 +103,7 @@ function onVerbandSelect()
 	var order = LehrstundeGetSortOrder();
 	// LVAs
 	var vboxLehrveranstalungPlanung=document.getElementById('vboxLehrveranstalungPlanung');
-	var attribute='../rdf/lehreinheit-lvplan.rdf.php'+type+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe+"&order="+order;
+	var attribute='../rdf/lehreinheit-lvplan.rdf.php'+type+"&stg_kz="+stg_kz+"&sem="+sem+"&ver="+ver+"&grp="+grp+"&gruppe="+gruppe+"&order="+order+"&orgform="+orgform;
 
 	vboxLehrveranstalungPlanung.setAttribute('datasources',attribute);
 
@@ -152,7 +154,7 @@ function onVerbandSelect()
 	// Lehrveranstaltung
 	try
 	{
-		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?stg_kz='+stg_kz+'&sem='+sem+'&ver='+ver+'&grp='+grp+'&gruppe='+gruppe+'&'+gettimestamp();
+		url = '<?php echo APP_ROOT; ?>rdf/lehrveranstaltung_einheiten.rdf.php?stg_kz='+encodeURIComponent(stg_kz)+'&sem='+encodeURIComponent(sem)+'&ver='+encodeURIComponent(ver)+'&grp='+encodeURIComponent(grp)+'&gruppe='+encodeURIComponent(gruppe)+'&orgform='+encodeURIComponent(orgform)+'&'+gettimestamp();
 		var treeLV=document.getElementById('lehrveranstaltung-tree');
 
 		//Alte DS entfernen

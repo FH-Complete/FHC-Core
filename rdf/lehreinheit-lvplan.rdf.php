@@ -84,6 +84,11 @@ if (isset($_GET['fachbereich_kurzbz']))
 else
 	$fachbereich_kurzbz=null;
 
+if (isset($_GET['orgform']))
+	$orgform=$_GET['orgform'];
+else
+	$orgform=null;
+
 //Sortierreihenfolge
 if(isset($_GET['order']))
 {
@@ -119,7 +124,7 @@ else
 $lva=array();
 $lehreinheit=new lehreinheit();
 if (!$error_msg)
-	if (!$lehreinheit->getLehreinheitLVPL($db_stpl_table,$studiensemester,$type,$stg_kz,$sem,$lektor,$ver,$grp,$gruppe_kurzbz, $order, $fachbereich_kurzbz))
+	if (!$lehreinheit->getLehreinheitLVPL($db_stpl_table,$studiensemester,$type,$stg_kz,$sem,$lektor,$ver,$grp,$gruppe_kurzbz, $order, $fachbereich_kurzbz, $orgform))
 		die ('Fehler bei Methode getLehreinheitLVPL(): '.$lehreinheit->errormsg);
 $lva=$lehreinheit->lehreinheiten;
 $rdf_url='http://www.technikum-wien.at/lehreinheit-lvplan/';
