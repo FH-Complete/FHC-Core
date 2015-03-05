@@ -172,8 +172,13 @@ foreach($noten_obj->result as $row)
     // ******************************************
 	function saveLVNote(uid)
 	{
-		note = document.getElementById(uid).note.value;	
+		note = document.getElementById(uid).note.value;
 		note_label = document.getElementById(uid).note.label;
+		if(note=='')
+		{
+			alert('Bitte wählen Sie eine Note aus');
+			return false;
+		}
 		if(document.getElementById(uid).punkte)
 			punkte = document.getElementById(uid).punkte.value;
 		else
@@ -992,7 +997,7 @@ echo "
 				{
 					if(CIS_GESAMTNOTE_PUNKTE)
 					{
-						$punkte_vorschlag = round($note_le/$le_anz);
+						$punkte_vorschlag = round($note_le/$le_anz,2);
 						$notenschluessel = new notenschluessel();
 						$note_vorschlag = $notenschluessel->getNote($punkte_vorschlag, $lvid, $stsem);
 					}

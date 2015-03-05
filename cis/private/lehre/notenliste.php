@@ -25,6 +25,7 @@
  * das betreffende Studiensemester kann ausgewaehlt werden
  */
 require_once('../../../config/cis.config.inc.php');
+require_once('../../../config/global.config.inc.php');
 require_once('../../../include/functions.inc.php');
 require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/datum.class.php');
@@ -153,8 +154,15 @@ else
 		$tbl= "<table>
 			<tr class='liste'>
 				<th>".$p->t('global/lehrveranstaltung')."</th>
-				<th>".$p->t('benotungstool/lvNote')."</th>
-				<th>".$p->t('benotungstool/zeugnisnote')."</th>
+				<th>".$p->t('benotungstool/lvNote')."</th>";
+		if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
+			$tbl.="<th>".$p->t('benotungstool/punkte')."</th>";
+
+		$tbl.="	<th>".$p->t('benotungstool/zeugnisnote')."</th>";
+		if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
+			$tbl.="<th>".$p->t('benotungstool/punkte')."</th>";
+
+		$tbl.="
 				<th>".$p->t('tools/benotungsdatumDerZeugnisnote')."</th>
 				<th>".$p->t('benotungstool/pruefung')."</th>
 			</tr>";
@@ -176,10 +184,16 @@ else
 				else
 					$tbl.=$row->lvnote;
 			}
-			if($row->lvpunkte!='')
-				$tbl.=' ('.((float)$row->lvpunkte).')';
 
 			$tbl.= "</td>";
+
+			// LV Gesamtnote Punkte
+			if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
+			{
+				$lvpunkte = ($row->lvpunkte!=''?(float)$row->lvpunkte:'');
+				$tbl.="<td>".$lvpunkte."</td>";
+			}
+
 			if ($row->note != $row->lvnote && $row->lvnote != NULL)
 				$markier = " style='border: 1px solid red;'";
 			else
@@ -190,11 +204,15 @@ else
 				$tbl.=$notenarr[$row->note];
 			else
 				$tbl.=$row->note;
-		
-			if($row->punkte!='')
-				$tbl.=' ('.((float)$row->punkte).')';
 			
 			$tbl .= "</td>";
+
+			if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
+			{
+				$punkte = ($row->punkte!=''?((float)$row->punkte):'');
+				$tbl.="<td>".$punkte."</td>";
+			}
+
 			$tbl .= '<td>'.$datum_obj->formatDatum($row->benotungsdatum,'d.m.Y').'</td>';
 
 			$pruefung = new pruefung();
@@ -220,6 +238,8 @@ else
 				}
 				$tbl.='</td>';
 			}
+			else
+				$tbl.='<td></td>';
 
 			$tbl .= "</tr>";
 		}

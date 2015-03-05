@@ -2391,7 +2391,7 @@ if(!$error)
 			$studiensemester_kurzbz=$semester_aktuell;
 
 			$notenschluessel = new notenschluessel();
-			if($note = $notenschluessel->getNote($punkte, $lehrveranstaltung_id, $studiensemester_kurzbz))
+			if(($note = $notenschluessel->getNote($punkte, $lehrveranstaltung_id, $studiensemester_kurzbz))!==false)
 			{
 				$return = true;
 				$error = false;
