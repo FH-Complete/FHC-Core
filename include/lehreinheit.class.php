@@ -694,7 +694,7 @@ class lehreinheit extends basis_db
 	 * @param integer stg_kz    Kennzahl des Studiengangs
 	 * @return boolean
 	 */
-	public function getLehreinheitLVPL($db_stpl_table,$studiensemester, $type, $stg_kz, $sem, $lektor, $ver=null, $grp=null, $gruppe=null, $order=null, $fachbereich_kurzbz=null)
+	public function getLehreinheitLVPL($db_stpl_table,$studiensemester, $type, $stg_kz, $sem, $lektor, $ver=null, $grp=null, $gruppe=null, $order=null, $fachbereich_kurzbz=null, $orgform_kurzbz=null)
 	{
 		$this->errormsg='';
 		$this->lehreinheiten=array();
@@ -731,13 +731,14 @@ class lehreinheit extends basis_db
 				lehre.'.$lva_stpl_view.' 
 				JOIN lehre.tbl_lehrform ON '.$lva_stpl_view.'.lehrform=tbl_lehrform.lehrform_kurzbz
 			WHERE '.$where.' AND verplanen';
-		
+		if($orgform_kurzbz!='')
+			$sql_query.=" AND ".$this->db_add_param($orgform_kurzbz)."=(Select orgform_kurzbz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=(SELECT lehrveranstaltung_id FROM lehre.tbl_lehreinheit WHERE lehreinheit_id=".$lva_stpl_view.".lehreinheit_id))";
 
 		if($order=='')
 			$order='offenestunden DESC, lehrfach, lehrform, semester, verband, gruppe, gruppe_kurzbz';
 		
 		$sql_query.=" ORDER BY $order;";
-	    
+
 		if(!$this->db_query($sql_query))
 		{
 			$this->errormsg=$this->db_last_error().$sql_query;
