@@ -907,7 +907,8 @@ function StudentAuswahl()
 			StudentNoteDisableFields(false);
 			document.getElementById('student-detail-button-save').disabled=false;
 			StudentPruefungDisableFileds(false);
-			StudentAnrechnungenDisableFields(false);
+			if(document.getElementById('student-tab-anrechnungen'))
+                StudentAnrechnungenDisableFields(false);
 		}
 		else
 		{
@@ -1452,37 +1453,41 @@ function StudentAuswahl()
 		StudentPruefungDetailDisableFields(true);
 	}
 	
-	// ****** Anrechnungen ****** //
-	StudentAnrechnungDetailDisableFields(true);
-	
-	anrechnungtree = document.getElementById('student-anrechnungen-tree');
-	
-	url='<?php echo APP_ROOT;?>rdf/anrechnung.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
+	if(document.getElementById('student-tab-anrechnungen'))
+    {
+        // ****** Anrechnungen ****** //
+        StudentAnrechnungDetailDisableFields(true);
+        StudentAnrechnungResetNotizLabel();
 
-	try
-	{
-		StudentAnrechnungTreeDatasource.removeXMLSinkObserver(StudentAnrechnungTreeSinkObserver);
-		anrechnungtree.builder.removeListener(StudentAnrechnungTreeListener);
-	}
-	catch(e)
-	{}
+        anrechnungtree = document.getElementById('student-anrechnungen-tree');
 
-	//Alte DS entfernen
-	var oldDatasources = anrechnungtree.database.GetDataSources();
-	while(oldDatasources.hasMoreElements())
-	{
-		anrechnungtree.database.RemoveDataSource(oldDatasources.getNext());
-	}
-	//Refresh damit die entfernten DS auch wirklich entfernt werden
-	anrechnungtree.builder.rebuild();
+        url='<?php echo APP_ROOT;?>rdf/anrechnung.rdf.php?prestudent_id='+prestudent_id+"&"+gettimestamp();
 
-	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
-	StudentAnrechnungTreeDatasource = rdfService.GetDataSource(url);
-	StudentAnrechnungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
-	StudentAnrechnungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
-	anrechnungtree.database.AddDataSource(StudentAnrechnungTreeDatasource);
-	StudentAnrechnungTreeDatasource.addXMLSinkObserver(StudentAnrechnungTreeSinkObserver);
-	anrechnungtree.builder.addListener(StudentAnrechnungTreeListener);
+        try
+        {
+            StudentAnrechnungTreeDatasource.removeXMLSinkObserver(StudentAnrechnungTreeSinkObserver);
+            anrechnungtree.builder.removeListener(StudentAnrechnungTreeListener);
+        }
+        catch(e)
+        {}
+
+        //Alte DS entfernen
+        var oldDatasources = anrechnungtree.database.GetDataSources();
+        while(oldDatasources.hasMoreElements())
+        {
+            anrechnungtree.database.RemoveDataSource(oldDatasources.getNext());
+        }
+        //Refresh damit die entfernten DS auch wirklich entfernt werden
+        anrechnungtree.builder.rebuild();
+
+        var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+        StudentAnrechnungTreeDatasource = rdfService.GetDataSource(url);
+        StudentAnrechnungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+        StudentAnrechnungTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+        anrechnungtree.database.AddDataSource(StudentAnrechnungTreeDatasource);
+        StudentAnrechnungTreeDatasource.addXMLSinkObserver(StudentAnrechnungTreeSinkObserver);
+        anrechnungtree.builder.addListener(StudentAnrechnungTreeListener);
+    }
 	
 	if(uid!='')
 	{
@@ -4421,6 +4426,7 @@ function StudentAnrechnungNeu()
 	
 	document.getElementById("student-anrechnungen-menulist-kompatible_lehrveranstaltung-row").hidden = true;
 	StudentAnrechnungDetailDisableFields(false);
+    StudentAnrechnungResetNotizLabel();
 	
 	// Prestudent-ID in hidden field speichern
 	var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
@@ -4490,6 +4496,9 @@ function StudentAnrechnungNeu()
 	document.getElementById('student-anrechnungen-neu').value = 1;
 }
 
+// ****
+// * Laedt die kompatiblen Lehrveranstaltungen
+// ****
 function StudentLoadKompatibleLvaDropDown()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
@@ -4515,6 +4524,9 @@ function StudentLoadKompatibleLvaDropDown()
 	LVKompDropDown.selectedItem='';
 }
 
+// ****
+// * Zeigt bzw. versteckt das Dropdown fuer die kompatiblen Lehrveranstaltungen
+// ****
 function StudentAnrechnungShowKompatibleLvaDropDown()
 {
 	if(document.getElementById("student-anrechnungen-menulist-begruendung").value == 2)
@@ -4523,6 +4535,9 @@ function StudentAnrechnungShowKompatibleLvaDropDown()
 		document.getElementById("student-anrechnungen-menulist-kompatible_lehrveranstaltung-row").hidden = true;
 }
 
+// ****
+// * Speichert eine Anrechnung
+// ****
 function StudentAnrechnungDetailSpeichern()
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
@@ -4632,6 +4647,14 @@ function StudentAnrechnungDelete()
 			StudentAnrechnungDetailDisableFields(true);
 		}
 	}
+}
+
+// ****
+// * Setzt das Label des Notizen-Buttons zurueck
+// ****
+function StudentAnrechnungResetNotizLabel()
+{
+    document.getElementById('student-anrechnungen-button-notiz').label = "Notiz hinzufügen";
 }
 
 // ****

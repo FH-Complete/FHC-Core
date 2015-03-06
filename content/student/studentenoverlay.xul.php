@@ -27,6 +27,13 @@ header("Pragma: no-cache");
 header("Content-type: application/vnd.mozilla.xul+xml");
 
 require_once('../../config/vilesci.config.inc.php');
+require_once('../../include/functions.inc.php');
+require_once('../../include/benutzerberechtigung.class.php');
+
+$user = get_uid();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($user);
+
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 echo '<?xul-overlay href="'.APP_ROOT.'content/student/studentdetailoverlay.xul.php"?>';
@@ -348,7 +355,10 @@ else
 							<tab id="student-tab-noten" label="Noten" />
 							<tab id="student-tab-zeugnis" label="Archiv" />
 							<tab id="student-tab-pruefung" label="Prüfung" />
-							<tab id="student-tab-anrechnungen" label="Anrechnungen" />
+							<?php 
+                            if($rechte->isBerechtigt('student/anrechnung'))
+                                echo '<tab id="student-tab-anrechnungen" label="Anrechnungen" />';
+                            ?>
 							<tab id="student-tab-abschlusspruefung" label="AbschlussPrüfung" />
 							<tab id="student-tab-projektarbeit" label="Projektarbeit" />
 							<tab id="student-tab-gruppen" label="Gruppen" onclick="StudentGruppenLoadData();"/>
@@ -366,7 +376,10 @@ else
 							<vbox id="student-noten"  style="margin-top:10px;" />
 							<vbox id="student-zeugnis"  style="margin-top:10px;" />
 							<vbox id="student-pruefung"  style="margin-top:10px;" />
-							<vbox id="student-anrechnungen"  style="margin-top:10px;" />
+							<?php 
+                            if($rechte->isBerechtigt('student/anrechnung'))
+                                echo '<vbox id="student-anrechnungen"  style="margin-top:10px;" />';
+                            ?>
 							<vbox id="student-abschlusspruefung"  style="margin-top:10px;" />
 							<vbox id="student-projektarbeit"  style="margin-top:10px;" />
 							<vbox id="student-gruppen"  style="margin-top:10px;" />
