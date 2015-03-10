@@ -249,6 +249,59 @@ class studiengang extends basis_db
 	}
 
 	/**
+	 * Gibt aktive OrgFormen eines Studiengangs zurück.
+	 * @return array
+	 */
+	public function getOrgForm($studiengang_kz)
+	{
+		$qry = 'SELECT distinct orgform_kurzbz '
+				. 'FROM lehre.tbl_studienordnung '
+				. 'JOIN lehre.tbl_studienplan '
+				. 'USING (studienordnung_id) '
+				. 'WHERE aktiv '
+				. 'AND studiengang_kz = ' . $this->db_add_param($studiengang_kz, FHC_INTEGER)
+				. ' AND orgform_kurzbz NOT IN (' . $this->db_add_param('DDP') . ', ' . $this->db_add_param('DL') . ')';
+
+		if($result = $this->db_query($qry))
+		{
+			$ret = array();
+
+			while($row = $this->db_fetch_object($result))
+			{
+				$ret[] = $row->orgform_kurzbz;
+			}
+		}
+
+		return $ret;
+	}
+
+	/**
+	 * Gibt aktive Sprachen eines Studiengangs zurück.
+	 * @return array
+	 */
+	public function getSprache($studiengang_kz)
+	{
+		$qry = 'SELECT distinct sprache '
+				. 'FROM lehre.tbl_studienordnung '
+				. 'JOIN lehre.tbl_studienplan '
+				. 'USING (studienordnung_id) '
+				. 'WHERE aktiv '
+				. 'AND studiengang_kz = ' . $this->db_add_param($studiengang_kz, FHC_INTEGER);
+
+		if($result = $this->db_query($qry))
+		{
+			$ret = array();
+
+			while($row = $this->db_fetch_object($result))
+			{
+				$ret[] = $row->sprache;
+			}
+		}
+
+		return $ret;
+	}
+
+	/**
 	 * Laedt die Studiengaenge die als Array uebergeben werden
 	 * @param $stgs Array mit den Kennzahlen
 	 * @param $order Sortierreihenfolge
