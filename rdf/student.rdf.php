@@ -43,6 +43,8 @@ require_once('../include/studiensemester.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/lehrveranstaltung.class.php');
+require_once('../include/mitarbeiter.class.php');
+require_once('../include/organisationsform.class.php');
 
 // *********** Funktionen *************************
 function convdate($date)
@@ -613,6 +615,16 @@ else
 
 			$studiengang = new studiengang();
 			$studiengang->load($student->studiengang_kz);
+			
+			$stgleiter = $studiengang->getLeitung($student->studiengang_kz);
+			$stgl='';
+			$i = 0;
+			foreach ($stgleiter as $stgleiter_uid)
+			{
+				$stgl_ma = new mitarbeiter($stgleiter_uid);
+				$stgl .= trim(($i>0?', ':'').$stgl_ma->titelpre.' '.$stgl_ma->vorname.' '.$stgl_ma->nachname.' '.$stgl_ma->titelpost);
+				$i++;
+			}
 
 //			$stg_typ = new studiengang(); 
 //			$stg_typ->getStudiengangTyp($studiengang->typ); 
@@ -694,6 +706,10 @@ else
 				}
 			}
 			$prestudent = new prestudent($student->prestudent_id);
+			
+			$orgform_bezeichnung = new organisationsform();
+			$orgform_bezeichnung->load($studiengang->orgform_kurzbz);
+			
 			echo '
 			<student>
 				<uid><![CDATA['.$student->uid.']]></uid>
@@ -713,6 +729,9 @@ else
 				<studiengang_bezeichnung><![CDATA['.$studiengang->bezeichnung.']]></studiengang_bezeichnung>
 				<studiengang_art><![CDATA['.$typ.']]></studiengang_art>
                 <studiengang_typ><![CDATA['.$studiengang->typ.']]></studiengang_typ>
+                <studiengang_orgform_kurzbz><![CDATA['.$studiengang->orgform_kurzbz.']]></studiengang_orgform_kurzbz>
+                <studiengang_orgform_bezeichnung><![CDATA['.$orgform_bezeichnung->bezeichnung.']]></studiengang_orgform_bezeichnung>
+                <studiengang_studiengangsleitung><![CDATA['.$stgl.']]></studiengang_studiengangsleitung>
 				<lv_studiengang_kz><![CDATA['.sprintf("%04d",abs($lv_studiengang_kz)).']]></lv_studiengang_kz>
 				<lv_studiengang_bezeichnung><![CDATA['.$lv_studiengang_bezeichnung.']]></lv_studiengang_bezeichnung>
                 <lv_studiengang_typ><![CDATA['.$lv_studiengang_typ.']]></lv_studiengang_typ>

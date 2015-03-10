@@ -65,7 +65,8 @@ $berechtigte_oe = $rechte->getOEkurzbz('basis/cms')
 		theme : "advanced",
 		language : "de",
 		protect: [ /\<\/?(audio[^>]+|audio)\>/g, 	// Protect <audio...> und </audio>],
-		           /\<\/?(source[^>]+)\>/g 			// Protect <source...>],
+		           /\<\/?(source[^>]+)\>/g, 		// Protect <source...>],
+		        	/\<\/?(video[^>]+|video)\>/g 	// Protect <video...> und </video>],
 			   		],  
 		   		
 		file_browser_callback: "FHCFileBrowser",
