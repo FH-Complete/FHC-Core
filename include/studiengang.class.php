@@ -52,6 +52,7 @@ class studiengang extends basis_db
 	public $testtool_sprachwahl;// boolean
 	public $studienplaetze;		// smallint
 	public $oe_kurzbz;			// varchar(32)
+	public $onlinebewerbung;	// boolean
 
 	public $kuerzel;	// = typ + kurzbz (Bsp: BBE)
 	private $studiengang_typ_arr = array(); 	// Array mit den Studiengangstypen
@@ -115,25 +116,25 @@ class studiengang extends basis_db
 		{
 			if($row = $this->db_fetch_object())
 			{
-				$this->studiengang_kz=$row->studiengang_kz;
-				$this->kurzbz=$row->kurzbz;
-				$this->kurzbzlang=$row->kurzbzlang;
-				$this->bezeichnung=$row->bezeichnung;
-				$this->english=$row->english;
-				$this->typ=$row->typ;
-				$this->farbe=$row->farbe;
-				$this->email=$row->email;
-				$this->max_semester=$row->max_semester;
-				$this->max_verband=$row->max_verband;
-				$this->max_gruppe=$row->max_gruppe;
-				$this->erhalter_kz=$row->erhalter_kz;
-				$this->bescheid=$row->bescheid;
-				$this->bescheidbgbl1=$row->bescheidbgbl1;
-				$this->bescheidbgbl2=$row->bescheidbgbl2;
-				$this->bescheidgz=$row->bescheidgz;
-				$this->bescheidvom=$row->bescheidvom;
-				$this->ext_id=$row->ext_id;
-				$this->kuerzel = mb_strtoupper($row->typ.$row->kurzbz);
+				$this->studiengang_kz = $row->studiengang_kz;
+				$this->kurzbz = $row->kurzbz;
+				$this->kurzbzlang = $row->kurzbzlang;
+				$this->bezeichnung = $row->bezeichnung;
+				$this->english = $row->english;
+				$this->typ = $row->typ;
+				$this->farbe = $row->farbe;
+				$this->email = $row->email;
+				$this->max_semester = $row->max_semester;
+				$this->max_verband = $row->max_verband;
+				$this->max_gruppe = $row->max_gruppe;
+				$this->erhalter_kz = $row->erhalter_kz;
+				$this->bescheid = $row->bescheid;
+				$this->bescheidbgbl1 = $row->bescheidbgbl1;
+				$this->bescheidbgbl2 = $row->bescheidbgbl2;
+				$this->bescheidgz = $row->bescheidgz;
+				$this->bescheidvom = $row->bescheidvom;
+				$this->ext_id = $row->ext_id;
+				$this->kuerzel = mb_strtoupper($row->typ . $row->kurzbz);
 				$this->orgform_kurzbz = $row->orgform_kurzbz;
 				$this->zusatzinfo_html = $row->zusatzinfo_html;
 				$this->sprache = $row->sprache;
@@ -141,15 +142,16 @@ class studiengang extends basis_db
 				$this->studienplaetze = $row->studienplaetze;
 				$this->oe_kurzbz = $row->oe_kurzbz;
 				$this->lgartcode = $row->lgartcode;
-				$this->telefon=$row->telefon;
-            	$this->titelbescheidvom=$row->titelbescheidvom;
-            	$this->aktiv=$this->db_parse_bool($row->aktiv);
-            	$this->moodle=$this->db_parse_bool($row->moodle);
-				$this->mischform=$this->db_parse_bool($row->mischform);
-				$this->projektarbeit_note_anzeige=$this->db_parse_bool($row->projektarbeit_note_anzeige);
-				
-				$this->bezeichnung_arr['German']=$this->bezeichnung;
-				$this->bezeichnung_arr['English']=$this->english;
+				$this->telefon = $row->telefon;
+				$this->titelbescheidvom = $row->titelbescheidvom;
+				$this->aktiv = $this->db_parse_bool($row->aktiv);
+				$this->onlinebewerbung = $this->db_parse_bool($row->onlinebewerbung);
+				$this->moodle = $this->db_parse_bool($row->moodle);
+				$this->mischform = $this->db_parse_bool($row->mischform);
+				$this->projektarbeit_note_anzeige = $this->db_parse_bool($row->projektarbeit_note_anzeige);
+
+				$this->bezeichnung_arr['German'] = $this->bezeichnung;
+				$this->bezeichnung_arr['English'] = $this->english;
 			}
 		}
 		else
@@ -186,25 +188,25 @@ class studiengang extends basis_db
 		{
 			$stg_obj = new studiengang();
 
-			$stg_obj->studiengang_kz=$row->studiengang_kz;
-			$stg_obj->kurzbz=$row->kurzbz;
-			$stg_obj->kurzbzlang=$row->kurzbzlang;
-			$stg_obj->bezeichnung=$row->bezeichnung;
-			$stg_obj->english=$row->english;
-			$stg_obj->typ=$row->typ;
-			$stg_obj->farbe=$row->farbe;
-			$stg_obj->email=$row->email;
-			$stg_obj->max_semester=$row->max_semester;
-			$stg_obj->max_verband=$row->max_verband;
-			$stg_obj->max_gruppe=$row->max_gruppe;
-			$stg_obj->erhalter_kz=$row->erhalter_kz;
-			$stg_obj->bescheid=$row->bescheid;
-			$stg_obj->bescheidbgbl1=$row->bescheidbgbl1;
-			$stg_obj->bescheidbgbl2=$row->bescheidbgbl2;
-			$stg_obj->bescheidgz=$row->bescheidgz;
-			$stg_obj->bescheidvom=$row->bescheidvom;
-			$stg_obj->ext_id=$row->ext_id;
-			$stg_obj->kuerzel = mb_strtoupper($row->typ.$row->kurzbz);
+			$stg_obj->studiengang_kz = $row->studiengang_kz;
+			$stg_obj->kurzbz = $row->kurzbz;
+			$stg_obj->kurzbzlang = $row->kurzbzlang;
+			$stg_obj->bezeichnung = $row->bezeichnung;
+			$stg_obj->english = $row->english;
+			$stg_obj->typ = $row->typ;
+			$stg_obj->farbe = $row->farbe;
+			$stg_obj->email = $row->email;
+			$stg_obj->max_semester = $row->max_semester;
+			$stg_obj->max_verband = $row->max_verband;
+			$stg_obj->max_gruppe = $row->max_gruppe;
+			$stg_obj->erhalter_kz = $row->erhalter_kz;
+			$stg_obj->bescheid = $row->bescheid;
+			$stg_obj->bescheidbgbl1 = $row->bescheidbgbl1;
+			$stg_obj->bescheidbgbl2 = $row->bescheidbgbl2;
+			$stg_obj->bescheidgz = $row->bescheidgz;
+			$stg_obj->bescheidvom = $row->bescheidvom;
+			$stg_obj->ext_id = $row->ext_id;
+			$stg_obj->kuerzel = mb_strtoupper($row->typ . $row->kurzbz);
 			$stg_obj->orgform_kurzbz = $row->orgform_kurzbz;
 			$stg_obj->zusatzinfo_html = $row->zusatzinfo_html;
 			$stg_obj->sprache = $row->sprache;
@@ -212,17 +214,18 @@ class studiengang extends basis_db
 			$stg_obj->studienplaetze = $row->studienplaetze;
 			$stg_obj->oe_kurzbz = $row->oe_kurzbz;
 			$stg_obj->lgartcode = $row->lgartcode;
-            $stg_obj->telefon=$row->telefon;
-            $stg_obj->titelbescheidvom=$row->titelbescheidvom;
-            $stg_obj->aktiv=$this->db_parse_bool($row->aktiv);
-			$stg_obj->moodle=$this->db_parse_bool($row->moodle);
-			$stg_obj->mischform=$this->db_parse_bool($row->mischform);
-			$stg_obj->projektarbeit_note_anzeige=$this->db_parse_bool($row->projektarbeit_note_anzeige);
-			
-			$stg_obj->bezeichnung_arr['German']=$row->bezeichnung;
-			$stg_obj->bezeichnung_arr['English']=$row->english;
+			$stg_obj->telefon = $row->telefon;
+			$stg_obj->titelbescheidvom = $row->titelbescheidvom;
+			$stg_obj->aktiv = $this->db_parse_bool($row->aktiv);
+			$stg_obj->onlinebewerbung = $this->db_parse_bool($row->onlinebewerbung);
+			$stg_obj->moodle = $this->db_parse_bool($row->moodle);
+			$stg_obj->mischform = $this->db_parse_bool($row->mischform);
+			$stg_obj->projektarbeit_note_anzeige = $this->db_parse_bool($row->projektarbeit_note_anzeige);
+
+			$stg_obj->bezeichnung_arr['German'] = $row->bezeichnung;
+			$stg_obj->bezeichnung_arr['English'] = $row->english;
 			$this->result[] = $stg_obj;
-			$this->kuerzel_arr[$row->studiengang_kz]=$stg_obj->kuerzel;
+			$this->kuerzel_arr[$row->studiengang_kz] = $stg_obj->kuerzel;
 		}
 
 		return true;
@@ -276,25 +279,25 @@ class studiengang extends basis_db
 		{
 			$stg_obj = new studiengang();
 
-			$stg_obj->studiengang_kz=$row->studiengang_kz;
-			$stg_obj->kurzbz=$row->kurzbz;
-			$stg_obj->kurzbzlang=$row->kurzbzlang;
-			$stg_obj->bezeichnung=$row->bezeichnung;
-			$stg_obj->english=$row->english;
-			$stg_obj->typ=$row->typ;
-			$stg_obj->farbe=$row->farbe;
-			$stg_obj->email=$row->email;
-			$stg_obj->max_semester=$row->max_semester;
-			$stg_obj->max_verband=$row->max_verband;
-			$stg_obj->max_gruppe=$row->max_gruppe;
-			$stg_obj->erhalter_kz=$row->erhalter_kz;
-			$stg_obj->bescheid=$row->bescheid;
-			$stg_obj->bescheidbgbl1=$row->bescheidbgbl1;
-			$stg_obj->bescheidbgbl2=$row->bescheidbgbl2;
-			$stg_obj->bescheidgz=$row->bescheidgz;
-			$stg_obj->bescheidvom=$row->bescheidvom;
-			$stg_obj->ext_id=$row->ext_id;
-			$stg_obj->kuerzel = mb_strtoupper($row->typ.$row->kurzbz);
+			$stg_obj->studiengang_kz = $row->studiengang_kz;
+			$stg_obj->kurzbz = $row->kurzbz;
+			$stg_obj->kurzbzlang = $row->kurzbzlang;
+			$stg_obj->bezeichnung = $row->bezeichnung;
+			$stg_obj->english = $row->english;
+			$stg_obj->typ = $row->typ;
+			$stg_obj->farbe = $row->farbe;
+			$stg_obj->email = $row->email;
+			$stg_obj->max_semester = $row->max_semester;
+			$stg_obj->max_verband = $row->max_verband;
+			$stg_obj->max_gruppe = $row->max_gruppe;
+			$stg_obj->erhalter_kz = $row->erhalter_kz;
+			$stg_obj->bescheid = $row->bescheid;
+			$stg_obj->bescheidbgbl1 = $row->bescheidbgbl1;
+			$stg_obj->bescheidbgbl2 = $row->bescheidbgbl2;
+			$stg_obj->bescheidgz = $row->bescheidgz;
+			$stg_obj->bescheidvom = $row->bescheidvom;
+			$stg_obj->ext_id = $row->ext_id;
+			$stg_obj->kuerzel = mb_strtoupper($row->typ . $row->kurzbz);
 			$stg_obj->orgform_kurzbz = $row->orgform_kurzbz;
 			$stg_obj->zusatzinfo_html = $row->zusatzinfo_html;
 			$stg_obj->sprache = $row->sprache;
@@ -302,18 +305,19 @@ class studiengang extends basis_db
 			$stg_obj->studienplaetze = $row->studienplaetze;
 			$stg_obj->oe_kurzbz = $row->oe_kurzbz;
 			$stg_obj->lgartcode = $row->lgartcode;
-            $stg_obj->telefon=$row->telefon;
-            $stg_obj->titelbescheidvom=$row->titelbescheidvom;
-            $stg_obj->aktiv=$this->db_parse_bool($row->aktiv);
-			$stg_obj->moodle=$this->db_parse_bool($row->moodle);
-			$stg_obj->mischform=$this->db_parse_bool($row->mischform);
-			$stg_obj->projektarbeit_note_anzeige=$this->db_parse_bool($row->projektarbeit_note_anzeige);
-			
-			$stg_obj->bezeichnung_arr['German']=$row->bezeichnung;
-			$stg_obj->bezeichnung_arr['English']=$row->english;
-			
+			$stg_obj->telefon = $row->telefon;
+			$stg_obj->titelbescheidvom = $row->titelbescheidvom;
+			$stg_obj->aktiv = $this->db_parse_bool($row->aktiv);
+			$stg_obj->onlinebewerbung = $this->db_parse_bool($row->onlinebewerbung);
+			$stg_obj->moodle = $this->db_parse_bool($row->moodle);
+			$stg_obj->mischform = $this->db_parse_bool($row->mischform);
+			$stg_obj->projektarbeit_note_anzeige = $this->db_parse_bool($row->projektarbeit_note_anzeige);
+
+			$stg_obj->bezeichnung_arr['German'] = $row->bezeichnung;
+			$stg_obj->bezeichnung_arr['English'] = $row->english;
+
 			$this->result[] = $stg_obj;
-			$this->kuerzel_arr[$row->studiengang_kz]=$stg_obj->kuerzel;
+			$this->kuerzel_arr[$row->studiengang_kz] = $stg_obj->kuerzel;
 		}
 
 		return true;
@@ -376,7 +380,7 @@ class studiengang extends basis_db
 			//Neuen Datensatz anlegen
 			$qry = 'INSERT INTO public.tbl_studiengang (studiengang_kz, kurzbz, kurzbzlang, bezeichnung, english,
 				typ, farbe, email, telefon, max_verband, max_semester, max_gruppe, erhalter_kz, bescheid, bescheidbgbl1,
-				bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, aktiv, ext_id, orgform_kurzbz, zusatzinfo_html, 
+				bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, aktiv, onlinebewerbung, ext_id, orgform_kurzbz, zusatzinfo_html,
 				oe_kurzbz, moodle, sprache, testtool_sprachwahl, studienplaetze, lgartcode, mischform,projektarbeit_note_anzeige) VALUES ('.
 				$this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
 				$this->db_add_param($this->kurzbz).', '.
@@ -398,6 +402,7 @@ class studiengang extends basis_db
 				$this->db_add_param($this->bescheidvom).', '.
 				$this->db_add_param($this->titelbescheidvom).', '.
 				$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
+				$this->db_add_param($this->onlinebewerbung, FHC_BOOLEAN).', '.
 				$this->db_add_param($this->ext_id).', '.
 				$this->db_add_param($this->orgform_kurzbz).', '.
 				$this->db_add_param($this->zusatzinfo_html).', '.
@@ -437,6 +442,7 @@ class studiengang extends basis_db
 				'telefon='.$this->db_add_param($this->telefon).', '.
 				'orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).', '.
 				'aktiv='.$this->db_add_param($this->aktiv, FHC_BOOLEAN).', '.
+				'onlinebewerbung='.$this->db_add_param($this->onlinebewerbung, FHC_BOOLEAN).', '.
 				'oe_kurzbz='.$this->db_add_param($this->oe_kurzbz).','.
 				'zusatzinfo_html='.$this->db_add_param($this->zusatzinfo_html).', '.
 				'moodle='.$this->db_add_param($this->moodle, FHC_BOOLEAN).', '.
@@ -537,25 +543,25 @@ class studiengang extends basis_db
 		{
 			if($row = $this->db_fetch_object())
 			{
-				$this->studiengang_kz=$row->studiengang_kz;
-				$this->kurzbz=$row->kurzbz;
-				$this->kurzbzlang=$row->kurzbzlang;
-				$this->bezeichnung=$row->bezeichnung;
-				$this->english=$row->english;
-				$this->typ=$row->typ;
-				$this->farbe=$row->farbe;
-				$this->email=$row->email;
-				$this->max_semester=$row->max_semester;
-				$this->max_verband=$row->max_verband;
-				$this->max_gruppe=$row->max_gruppe;
-				$this->erhalter_kz=$row->erhalter_kz;
-				$this->bescheid=$row->bescheid;
-				$this->bescheidbgbl1=$row->bescheidbgbl1;
-				$this->bescheidbgbl2=$row->bescheidbgbl2;
-				$this->bescheidgz=$row->bescheidgz;
-				$this->bescheidvom=$row->bescheidvom;
-				$this->ext_id=$row->ext_id;
-				$this->kuerzel = mb_strtoupper($row->typ.$row->kurzbz);
+				$this->studiengang_kz = $row->studiengang_kz;
+				$this->kurzbz = $row->kurzbz;
+				$this->kurzbzlang = $row->kurzbzlang;
+				$this->bezeichnung = $row->bezeichnung;
+				$this->english = $row->english;
+				$this->typ = $row->typ;
+				$this->farbe = $row->farbe;
+				$this->email = $row->email;
+				$this->max_semester = $row->max_semester;
+				$this->max_verband = $row->max_verband;
+				$this->max_gruppe = $row->max_gruppe;
+				$this->erhalter_kz = $row->erhalter_kz;
+				$this->bescheid = $row->bescheid;
+				$this->bescheidbgbl1 = $row->bescheidbgbl1;
+				$this->bescheidbgbl2 = $row->bescheidbgbl2;
+				$this->bescheidgz = $row->bescheidgz;
+				$this->bescheidvom = $row->bescheidvom;
+				$this->ext_id = $row->ext_id;
+				$this->kuerzel = mb_strtoupper($row->typ . $row->kurzbz);
 				$this->orgform_kurzbz = $row->orgform_kurzbz;
 				$this->zusatzinfo_html = $row->zusatzinfo_html;
 				$this->sprache = $row->sprache;
@@ -563,16 +569,16 @@ class studiengang extends basis_db
 				$this->studienplaetze = $row->studienplaetze;
 				$this->oe_kurzbz = $row->oe_kurzbz;
 				$this->lgartcode = $row->lgartcode;
-	            $this->telefon=$row->telefon;
-	            $this->titelbescheidvom=$row->titelbescheidvom;
-	            $this->aktiv=$this->db_parse_bool($row->aktiv);
-				$this->moodle=$this->db_parse_bool($row->moodle);
-				$this->mischform=$this->db_parse_bool($row->mischform);
-				$this->projektarbeit_note_anzeige=$this->db_parse_bool($row->projektarbeit_note_anzeige);
-				
-				$this->bezeichnung_arr['German']=$this->bezeichnung;
-				$this->bezeichnung_arr['English']=$this->english;
-				return true; 
+				$this->telefon = $row->telefon;
+				$this->titelbescheidvom = $row->titelbescheidvom;
+				$this->onlinebewerbung = $this->db_parse_bool($row->onlinebewerbung);
+				$this->moodle = $this->db_parse_bool($row->moodle);
+				$this->mischform = $this->db_parse_bool($row->mischform);
+				$this->projektarbeit_note_anzeige = $this->db_parse_bool($row->projektarbeit_note_anzeige);
+
+				$this->bezeichnung_arr['German'] = $this->bezeichnung;
+				$this->bezeichnung_arr['English'] = $this->english;
+				return true;
 			}
 		}
 		else 
@@ -623,4 +629,3 @@ class studiengang extends basis_db
         }
     }
 }
-?>

@@ -2696,6 +2696,17 @@ if(!$result = @$db->db_query("SELECT anrechnung_id FROM public.tbl_notizzuordnun
 		echo '<br>public.tbl_notizzuordnung: neue Spalten anrechnung_id hinzugefuegt';
 }
 
+// Spalte onlinebewerbung in public.tbl_studiengang
+if(!$result = @$db->db_query("SELECT onlinebewerbung FROM public.tbl_studiengang LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_studiengang ADD COLUMN onlinebewerbung boolean NOT NULL DEFAULT false";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_studiengang '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'public.tbl_studiengang: Spalte "onlinebewerbung" hinzugefuegt!<br>';
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -2901,7 +2912,7 @@ $tabellen=array(
 	"public.tbl_statistik"  => array("statistik_kurzbz","bezeichnung","url","r","gruppe","sql","php","content_id","insertamum","insertvon","updateamum","updatevon","berechtigung_kurzbz","publish","preferences"),
 	"public.tbl_student"  => array("student_uid","matrikelnr","prestudent_id","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige"),
+	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige", "onlinebewerbung"),
 	"public.tbl_studiengangstyp" => array("typ","bezeichnung","beschreibung"),
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","studienjahr_kurzbz","ext_id"),
 	"public.tbl_tag"  => array("tag"),
