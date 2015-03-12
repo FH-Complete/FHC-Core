@@ -90,7 +90,7 @@ class prestudent extends person
 	
 	/**
 	 * Laedt Prestudent mit der uebergebenen ID
-	 * @param $uid ID der Person die geladen werden soll
+	 * @param $prestudent_id ID des Prestudenten der geladen werden soll
 	 */
 	public function load($prestudent_id)
 	{
@@ -100,7 +100,9 @@ class prestudent extends person
 			return false;
 		}
 		
-		$qry = "SELECT * FROM public.tbl_prestudent WHERE prestudent_id=".$this->db_add_param($prestudent_id);
+		$qry = 'SELECT * '
+				. 'FROM public.tbl_prestudent '
+				. 'WHERE prestudent_id = '.$this->db_add_param($prestudent_id, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 		{
