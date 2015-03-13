@@ -779,7 +779,7 @@ class prestudent extends person
 			       ' bestaetigtam='.$this->db_add_param($this->bestaetigtam).",".
 			       ' bestaetigtvon='.$this->db_add_param($this->bestaetigtvon).",".
 				   ' studienplan_id='.$this->db_add_param($this->studienplan_id, FHC_INTEGER).",".
-				   ' anmerkung_status='.$this->db_add_param($this->anmerkung_status).",".
+				   ' anmerkung='.$this->db_add_param($this->anmerkung_status).",".
 			       ' orgform_kurzbz='.$this->db_add_param($this->orgform_kurzbz).
 			       " WHERE 
 						prestudent_id=".$this->db_add_param($this->prestudent_id, FHC_INTEGER, false)." 
@@ -835,7 +835,7 @@ class prestudent extends person
 			$log->sql = $qry;
 			$log->sqlundo = 'INSERT INTO public.tbl_prestudentstatus(prestudent_id, status_kurzbz, studiensemester_kurzbz,'
 							. ' ausbildungssemester, datum, insertamum, insertvon, updateamum, updatevon, ext_id, orgform_kurzbz,'
-							. ' bestaetigtam, bestaetigtvon, anmerkung_status, studienplan_id) VALUES('.
+							. ' bestaetigtam, bestaetigtvon, anmerkung, studienplan_id) VALUES('.
 							$this->db_add_param($this->prestudent_id).','.
 							$this->db_add_param($this->status_kurzbz).','.
 							$this->db_add_param($this->studiensemester_kurzbz).','.
