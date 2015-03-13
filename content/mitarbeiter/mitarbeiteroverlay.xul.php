@@ -240,7 +240,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 			<tabs orient="horizontal" id="mitarbeiter-tabs">
 				<tab id="mitarbeiter-tab-detail" label="Stammdaten" />
 				<tab id="mitarbeiter-tab-kontakt" label="Kontaktdaten" />
-				<tab id="mitarbeiter-tab-funktionen" label="BIS-Daten" />
+				<tab id="mitarbeiter-tab-bis" label="BIS-Daten" />
 				<tab id="mitarbeiter-tab-betriebsmittel" label="Betriebsmittel" />
 				<tab id="mitarbeiter-tab-funktionen" label="Funktionen"  oncommand="MitarbeiterFunktionIFrameLoad()"/>
 				<?php 
