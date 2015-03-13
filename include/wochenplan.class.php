@@ -1967,6 +1967,7 @@ class wochenplan extends basis_db
 			return false;
 		}
 		$num_orte=$this->db_num_rows();
+		$orte = array();
 		for ($i=0;$i<$num_orte;$i++)
 		{
 			$row = $this->db_fetch_object(null, $i);	
@@ -2083,10 +2084,13 @@ class wochenplan extends basis_db
 						//Kollision mit Gruppe
 						if($raster[$t][$s]->kollision)
 						{
-							foreach ($this->std_plan[$t][$s][0]->frei_orte as $ort=>$value)
+							if(isset($this->std_plan[$t][$s][0]->frei_orte))
 							{
-								if(in_array($ort, $orte))
-									$this->std_plan[$t][$s][0]->frei_orte[$ort]=(isset($this->std_plan[$t][$s][0]->frei_orte[$ort])?$this->std_plan[$t][$s][0]->frei_orte[$ort]+1:1);
+								foreach ($this->std_plan[$t][$s][0]->frei_orte as $ort=>$value)
+								{
+									if(in_array($ort, $orte))
+										$this->std_plan[$t][$s][0]->frei_orte[$ort]=(isset($this->std_plan[$t][$s][0]->frei_orte[$ort])?$this->std_plan[$t][$s][0]->frei_orte[$ort]+1:1);
+								}
 							}
 						}
 					
@@ -2104,9 +2108,12 @@ class wochenplan extends basis_db
 							}
 							else
 							{
-								// Bei Gruppenkollision den Wert bei allen Raumen erhoehen
-								foreach ($this->std_plan[$t][$s][0]->frei_orte as $ort=>$value)
-									$this->std_plan[$t][$s][0]->frei_orte[$ort]=(isset($this->std_plan[$t][$s][0]->frei_orte[$ort])?$this->std_plan[$t][$s][0]->frei_orte[$ort]+1:1);
+								if(isset($this->std_plan[$t][$s][0]->frei_orte))
+								{
+									// Bei Gruppenkollision den Wert bei allen Raumen erhoehen
+									foreach ($this->std_plan[$t][$s][0]->frei_orte as $ort=>$value)
+										$this->std_plan[$t][$s][0]->frei_orte[$ort]=(isset($this->std_plan[$t][$s][0]->frei_orte[$ort])?$this->std_plan[$t][$s][0]->frei_orte[$ort]+1:1);
+								}
 							}
 						}
 					}
