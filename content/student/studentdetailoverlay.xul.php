@@ -533,14 +533,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#status_kurzbz"/>
 							<splitter class="tree-splitter"/>
-							<treecol id="student-prestudent-tree-rolle-studiensemester_kurzbz" label="StSem" flex="5" hidden="false" persist="hidden, width, ordinal"
+							<treecol id="student-prestudent-tree-rolle-studiensemester_kurzbz" label="StSem" flex="3" hidden="false" persist="hidden, width, ordinal"
 							   class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#studiensemester_kurzbz"/>
 							<splitter class="tree-splitter"/>
-							<treecol id="student-prestudent-tree-rolle-ausbildungssemester" label="Semester" flex="2" hidden="false" persist="hidden, width, ordinal"
+							<treecol id="student-prestudent-tree-rolle-ausbildungssemester" label="Semester" flex="1" hidden="false" persist="hidden, width, ordinal"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#ausbildungssemester" 
-                                                                sorthints="integer"/>
+                                sorthints="integer"/>
 							<splitter class="tree-splitter"/>
 							<treecol id="student-prestudent-tree-rolle-datum" label="Datum" flex="2" hidden="false" persist="hidden, width, ordinal"
 								class="sortDirectionIndicator"
@@ -562,11 +562,15 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#studienplan_bezeichnung" />
 							<splitter class="tree-splitter"/>
-							<treecol id="student-prestudent-tree-rolle-bestaetigt_von" label="BestaetigtVon" flex="2" hidden="false" persist="hidden, width, ordinal"
+							<treecol id="student-prestudent-tree-rolle-anmerkung" label="Anmerkung" flex="2" hidden="false" persist="hidden, width, ordinal"
+								class="sortDirectionIndicator"
+								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#anmerkung" />
+							<splitter class="tree-splitter"/>
+							<treecol id="student-prestudent-tree-rolle-bestaetigt_von" label="BestaetigtVon" flex="1" hidden="true" persist="hidden, width, ordinal"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#bestaetigt_von" />
 							<splitter class="tree-splitter"/>
-							<treecol id="student-prestudent-tree-rolle-bestaetigt_am" label="BestaetigtAm" flex="2" hidden="false" persist="hidden, width, ordinal"
+							<treecol id="student-prestudent-tree-rolle-bestaetigt_am" label="BestaetigtAm" flex="1" hidden="false" persist="hidden, width, ordinal"
 								class="sortDirectionIndicator"
 								sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#bestaetigt_Am" />
 							<splitter class="tree-splitter"/>
@@ -585,6 +589,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#prestudent_id"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#studienplan_id"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#studienplan_bezeichnung"/>
+											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#anmerkung"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#bestaetigt_von"/>
 											<treecell label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#bestaetigt_am"/>
 										</treerow>

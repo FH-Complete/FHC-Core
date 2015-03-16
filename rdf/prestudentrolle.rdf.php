@@ -87,6 +87,7 @@ foreach($ps->result as $row)
         	<ROLLE:studienplan_bezeichnung><![CDATA['.$row->studienplan_bezeichnung.']]></ROLLE:studienplan_bezeichnung>
         	<ROLLE:bestaetigt_von><![CDATA['.$row->bestaetigtvon.']]></ROLLE:bestaetigt_von>
         	<ROLLE:bestaetigt_am><![CDATA['.$datum->convertISODate($row->bestaetigtam).']]></ROLLE:bestaetigt_am>
+        	<ROLLE:anmerkung><![CDATA['.$row->anmerkung_status.']]></ROLLE:anmerkung>
       	</RDF:Description>
       </RDF:li>
 	';

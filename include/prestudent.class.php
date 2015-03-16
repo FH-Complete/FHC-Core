@@ -445,6 +445,7 @@ class prestudent extends person
 				$rolle->studienplan_bezeichnung = $row->studienplan_bezeichnung;
 				$rolle->bestaetigtam = $row->bestaetigtam;
 				$rolle->bestaetigtvon = $row->bestaetigtvon;
+				$rolle->anmerkung_status = $row->anmerkung;
 				$this->result[] = $rolle;
 			}
 			return true;

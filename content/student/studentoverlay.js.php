@@ -1833,6 +1833,7 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 	datum = dialog.getElementById('student-rolle-datum-datum').value;
 	orgform_kurzbz = dialog.getElementById('student-rolle-menulist-orgform_kurzbz').value;
 	studienplan_id = dialog.getElementById('student-rolle-menulist-studienplan').value;
+	anmerkung = dialog.getElementById('student-rolle-textbox-anmerkung').value;
 	
 	if(!CheckDatum(datum))
 	{
@@ -1854,6 +1855,7 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 	req.add('datum', ConvertDateToISO(datum));
 	req.add('orgform_kurzbz', orgform_kurzbz);
 	req.add('studienplan_id', studienplan_id);
+	req.add('anmerkung', anmerkung);
 
 	var response = req.executePOST();
 
