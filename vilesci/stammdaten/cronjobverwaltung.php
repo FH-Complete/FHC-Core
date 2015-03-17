@@ -279,7 +279,9 @@ if(isset($_GET['type']) && ($_GET['type']=='edit' || $_GET['type']=='new'))
 	echo '				
 					</SELECT>
 				</td>
-				<td><label for="file">Datei</a></td>
+				<td><label for="file">Datei
+					<img src="../../skin/images/information.png" title="absoluter Pfad im Filesystem zB /var/www/vilesci/job.php" />
+					</label></td>
 				<td colspan="8"><input type="text" size="80" id="file" name="file" value="'.htmlspecialchars($cj->file).'"></td>
 			</tr>
 			<tr>
@@ -289,7 +291,9 @@ if(isset($_GET['type']) && ($_GET['type']=='edit' || $_GET['type']=='new'))
 				<td><input type="text" name="monat" id="monat" maxlength="4" size="4" value="'.htmlspecialchars($cj->monat).'"></td>
 				<td><label for="tag">Tag</label></td>
 				<td><input type="text" name="tag" id="tag" maxlength="4" size="4" value="'.htmlspecialchars($cj->tag).'"></td>
-				<td><label for="wochentag">Wochentag</label></td>
+				<td><label for="wochentag">Wochentag
+					<img src="../../skin/images/information.png" title="Wenn Wochentag ausgewaehlt ist, wird Jahr, Monat und Tag nicht beruecksichtigt" />
+					</label></td>
 				<td>
 					<SELECT name="wochentag" id="wochentag">
 						<OPTION value="">-- keine Auswahl --</OPTION>';
@@ -307,7 +311,9 @@ if(isset($_GET['type']) && ($_GET['type']=='edit' || $_GET['type']=='new'))
 	echo '						
 					</SELECT>
 				</td>
-				<td><label for="stunde">Stunde</label></td>
+				<td><label for="stunde">Stunde
+					<img src="../../skin/images/information.png" title="Beispiele: \'2\' im Feld Stunde für 2 Uhr. \'*/2\' im Feld Stunde für alle 2 Stunden. Kein Eintrag im Feld Stunde fuer jede Stunde " />
+					</label></td>
 				<td><input type="text" name="stunde" id="stunde" maxlength="4" size="4" value="'.htmlspecialchars($cj->stunde).'"></td>
 				<td><label for="minute">Minute</label></td>
 				<td><input type="text" name="minute" id="minute" maxlength="4" size="4" value="'.htmlspecialchars($cj->minute).'"></td>
