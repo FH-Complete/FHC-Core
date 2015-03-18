@@ -348,8 +348,8 @@ class preinteressent extends basis_db
 	public function loadFreigegebene($studiengang_kz, $studiensemester_kurzbz='')
 	{
 		$qry = "SELECT tbl_preinteressent.*, tbl_preinteressentstudiengang.* FROM public.tbl_preinteressent JOIN public.tbl_preinteressentstudiengang USING(preinteressent_id) JOIN public.tbl_person USING(person_id) WHERE
-				(studiengang_kz, person_id) NOT IN (SELECT studiengang_kz, person_id FROM public.tbl_prestudent WHERE person_id=tbl_person.person_id) AND freigabedatum is not null AND
-				tbl_preinteressentstudiengang.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER);
+		(studiengang_kz, person_id) NOT IN (SELECT studiengang_kz, person_id FROM public.tbl_prestudent JOIN public.tbl_prestudentstatus USING(prestudent_id) WHERE status_kurzbz='Interessent' AND studiensemester_kurzbz=tbl_preinteressent.studiensemester_kurzbz AND person_id=tbl_person.person_id) AND freigabedatum is not null AND
+		tbl_preinteressentstudiengang.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER)." AND tbl_preinteressentstudiengang.uebernahmedatum is null"; 
 		if($studiensemester_kurzbz!='')
 			$qry.=" AND tbl_preinteressent.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 		
