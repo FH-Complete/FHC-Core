@@ -181,16 +181,25 @@ if(isset($_POST['submitbild']))
 	//	$akte->insertvon = $user;
 		$akte->uid = '';
                 $akte->dms_id = $dms_id;
-		$akte->new = true; 
-		
-        
-		if(!$akte->save())
-		{
-			echo "<b>Fehler: $akte->errormsg</b>";
-		}
-		else
-			echo "<b>".$p->t('global/erfolgreichgespeichert')."</b>"; 
-		echo "<script>window.opener.location='bewerbung.php?active=4';</script>"; 			
+		$akte->new = true;
+
+
+        if (!$akte->save()) {
+            echo "<b>Fehler: $akte->errormsg</b>";
+        } else {
+            echo "<b>" . $p->t('global/erfolgreichgespeichert') . "</b>";
+        }
+
+		echo "<script>
+
+                var loc = window.opener.location;
+
+                if(!/active/.test(loc.href)) {
+                    window.opener.location = loc + '?active=dokumente';
+                } else {
+                    window.opener.location.reload();
+                }
+            </script>";
 	}
 }
 
