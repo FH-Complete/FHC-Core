@@ -942,23 +942,47 @@ if(!$error)
 						$rolle->updatevon = $user;
 						$rolle->new = false;
 					}
+					
+					$student = new student();
+					$temp_uid = $student->getUid($rolle->prestudent_id);
+					$student->load($temp_uid);
+					//$studiensemester = new studiensemester();
+					$stdsem_new = filter_input(INPUT_POST, "studiensemester_kurzbz");
+					$semester = filter_input(INPUT_POST, "ausbildungssemester");
 
 					if(!$error)
 					{
-						$rolle->ausbildungssemester = $_POST['ausbildungssemester'];
-						$rolle->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
-						$rolle->datum = $_POST['datum'];
-						$rolle->orgform_kurzbz = $_POST['orgform_kurzbz'];
-						$rolle->studienplan_id = $_POST['studienplan_id'];
-						$rolle->anmerkung_status = $_POST['anmerkung'];
-						
-						if($rolle->save_rolle())
-							$return = true;
-						else
-						{
-							$return = false;
-							$errormsg = $rolle->errormsg;
-						}
+					    $prestudent_temp = new prestudent();
+					    $prestudent_temp->getLastStatus($rolle->prestudent_id, "", "Student");
+					    $student->load_studentlehrverband($temp_uid, $prestudent_temp->studiensemester_kurzbz);
+					    $lehrverband = new lehrverband();
+					    if(!$lehrverband->exists($student->studiengang_kz, $semester, $student->verband, $student->gruppe))
+					    {
+						$student->studiensemester_kurzbz = $stdsem_new;
+						$return = false;
+						$errormsg = $student->errormsg;
+					    }
+					    else
+					    {
+						$student->studiensemester_kurzbz = $stdsem_new;
+						$student->semester = $semester;
+						$student->updatevon = get_uid();
+					    }
+					    
+					    $student->save_studentlehrverband(true);
+					    $rolle->ausbildungssemester = $_POST['ausbildungssemester'];
+					    $rolle->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
+					    $rolle->datum = $_POST['datum'];
+					    $rolle->orgform_kurzbz = $_POST['orgform_kurzbz'];
+					    $rolle->studienplan_id = $_POST['studienplan_id'];
+
+					    if($rolle->save_rolle())
+						    $return = true;
+					    else
+					    {
+						    $return = false;
+						    $errormsg = $rolle->errormsg;
+					    }
 					}
 				}
 			}

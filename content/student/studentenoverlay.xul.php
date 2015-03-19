@@ -284,6 +284,10 @@ else
 						class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#mentor" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
+						<treecol id="student-treecol-aktiv" label="Aktiv" flex="1" hidden="false" persist="hidden, width, ordinal"
+						class="sortDirectionIndicator"
+	    					sort="rdf:http://www.technikum-wien.at/student/rdf#aktiv" onclick="StudentTreeSort()"/>
+	    				<splitter class="tree-splitter"/>
 					</treecols>
 
 					<template>
@@ -324,6 +328,7 @@ else
 									<treecell label="rdf:http://www.technikum-wien.at/student/rdf#matr_nr" />
 									<treecell label="rdf:http://www.technikum-wien.at/student/rdf#studienplan_bezeichnung" />
 									<treecell label="rdf:http://www.technikum-wien.at/student/rdf#mentor" />
+									<treecell label="rdf:http://www.technikum-wien.at/student/rdf#aktiv" />
 	         						</treerow>
 	       						</treeitem>
 	      					</treechildren>
