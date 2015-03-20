@@ -2609,6 +2609,17 @@ if(!$result = @$db->db_query("SELECT anwesenheit FROM campus.tbl_lvinfo LIMIT 1"
 		echo 'campus.tbl_lvinfo: Spalte "anwesenheit" hinzugefuegt!<br>';
 }
 
+// Spalte pflicht in tbl_dokumentstudiengang
+if(!$result = @$db->db_query("SELECT pflicht FROM public.tbl_dokumentstudiengang LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_dokumentstudiengang ADD COLUMN pflicht BOOLEAN NOT NULL DEFAULT FALSE";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_dokumentstudiengang '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'public.tbl_dokumentstudiengang: Spalte "pflicht" hinzugefuegt!<br>';
+}
+
 // Anrechnungen
 if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnung LIMIT 1;"))
 {
@@ -2939,7 +2950,7 @@ $tabellen=array(
 	"public.tbl_buchungstyp"  => array("buchungstyp_kurzbz","beschreibung","standardbetrag","standardtext","aktiv","credit_points"),
 	"public.tbl_dokument"  => array("dokument_kurzbz","bezeichnung","ext_id"),
 	"public.tbl_dokumentprestudent"  => array("dokument_kurzbz","prestudent_id","mitarbeiter_uid","datum","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_dokumentstudiengang"  => array("dokument_kurzbz","studiengang_kz","ext_id", "onlinebewerbung"),
+	"public.tbl_dokumentstudiengang"  => array("dokument_kurzbz","studiengang_kz","ext_id", "onlinebewerbung", "pflicht"),
 	"public.tbl_erhalter"  => array("erhalter_kz","kurzbz","bezeichnung","dvr","logo","zvr"),
 	"public.tbl_fachbereich"  => array("fachbereich_kurzbz","bezeichnung","farbe","studiengang_kz","aktiv","ext_id","oe_kurzbz"),
 	"public.tbl_filter" => array("filter_id","kurzbz","sql","valuename","showvalue","insertamum","insertvon","updateamum","updatevon","type","htmlattr"),
