@@ -681,4 +681,33 @@ class studiengang extends basis_db
             return false; 
         }
     }
+
+    /**
+     * @param $studiengaenge array
+     * @return array|bool
+     */
+    public function getTypes($studiengaenge) {
+
+        $qry = 'SELECT distinct typ ' .
+            'FROM public.tbl_studiengang ' .
+            'WHERE studiengang_kz IN (' . implode(',', $studiengaenge) . ')';
+
+        $types = array();
+
+        if($result = $this->db_query($qry))
+        {
+            while($row = $this->db_fetch_object($result)) {
+
+                $types[] = $row->typ;
+
+            }
+
+            return $types;
+        }
+        else
+        {
+            $this->errormsg = "Fehler bei der Abfrage aufgetreten";
+            return false;
+        }
+    }
 }
