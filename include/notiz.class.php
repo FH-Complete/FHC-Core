@@ -37,6 +37,16 @@ class notiz extends basis_db
 	public $insertvon;
 	public $updateamum;
 	public $updatevon;
+
+    public $projekt_kurzbz;
+    public $projektphase_id;
+    public $projekttask_id;
+    public $uid;
+    public $person_id;
+    public $prestudent_id;
+    public $bestellung_id;
+    public $lehreinheit_id;
+    public $anrechnung_id;
 	
 	/**
 	 * Konstruktor
@@ -326,7 +336,54 @@ class notiz extends basis_db
 			return false;
 		}
 	}
-	
+
+	/**
+	 *
+	 * Laedt die Notizen vom Bewerbungstool
+	 * @param $person_id int
+	 * @return boolean
+	 */
+	public function getBewerbungstoolNotizen($person_id)
+	{
+		$qry = 'SELECT
+					*
+				FROM
+					public.tbl_notiz
+					LEFT JOIN public.tbl_notizzuordnung USING(notiz_id)
+				WHERE person_id = ' . $this->db_add_param($person_id, FHC_INTEGER) .
+                ' AND insertvon = ' . $this->db_add_param('Bewerbungstool') .
+                ' ORDER BY notiz_id';
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new notiz();
+
+				$obj->notiz_id=$row->notiz_id;
+				$obj->titel=$row->titel;
+				$obj->text=$row->text;
+				$obj->verfasser_uid=$row->verfasser_uid;
+				$obj->bearbeiter_uid=$row->bearbeiter_uid;
+				$obj->start=$row->start;
+				$obj->ende=$row->ende;
+				$obj->erledigt=$this->db_parse_bool($row->erledigt);
+				$obj->insertamum=$row->insertamum;
+				$obj->insertvon=$row->insertvon;
+				$obj->updateamum=$row->updateamum;
+				$obj->updatevon=$row->updatevon;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
 	/**
 
 	 * 
@@ -399,4 +456,3 @@ class notiz extends basis_db
 		}
 	}
 }
-?>
