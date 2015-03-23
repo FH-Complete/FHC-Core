@@ -2795,6 +2795,24 @@ if(!$result = @$db->db_query("SELECT ext_id FROM public.tbl_preoutgoing LIMIT 1;
 		echo ' public.tbl_preoutgoing: Spalte ext_id hinzugefuegt!<br>';
 }
 
+// Notizen Berechtigungen fuer web User erteilen
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_notiz' AND table_schema='public' AND grantee='web' AND privilege_type='UPDATE'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_notiz TO web;
+				GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_notizzuordnung TO web;
+				GRANT SELECT, UPDATE ON public.seq_notiz_notiz_id TO web;
+				GRANT SELECT, UPDATE ON public.seq_notizzuordnung_notizzuordnung_id TO web;";
+	
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_notiz: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_notiz / public.tbl_notizzuordnung: Schreibrechte fuer User web erteilt';
+	}		
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
