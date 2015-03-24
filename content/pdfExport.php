@@ -198,7 +198,8 @@ elseif(in_array($xsl,array('Lehrveranstaltungszeugnis','Zertifikat','Diplomurkun
 'Sammelzeugnis','PrProtDiplEng','PrProtBakkEng','BakkzeugnisEng','DiplomzeugnisEng','statusbericht',
 'DiplSupplement','Zutrittskarte','Projektbeschr','Ausbildungsver','AusbildStatus','PrProtBA','PrProtMA',
 'PrProtBAEng','PrProtMAEng','Studienordnung','Erfolgsnachweis','ErfolgsnwHead','Studienblatt','LV_Informationen',
-'LVZeugnis','AnwListBarcode','Honorarvertrag','AusbVerEng','AusbVerEngHead','Zeugnis','ErfolgsnachweisE','ErfolgsnwHeadE','Magisterurkunde','Masterurkunde','Defensiourkunde')))
+'LVZeugnis','AnwListBarcode','Honorarvertrag','AusbVerEng','AusbVerEngHead','Zeugnis','ErfolgsnachweisE','ErfolgsnwHeadE','Magisterurkunde',
+'Masterurkunde','Defensiourkunde','Laufzettel')))
 {
 	if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz'))
 	{
@@ -237,8 +238,23 @@ else
 }
 
 
+$xml_found = false;
+$addons = new addon();
 
-$xml_url=XML_ROOT.$xml.$params;
+foreach($addons->aktive_addons as $addon)
+{
+	$xmlfile = DOC_ROOT.'addons/'.$addon.'/rdf/'.$xml;
+	if(file_exists($xmlfile))
+	{
+		$xml_found = true;
+		$xml_url = XML_ROOT.'../addons/'.$addon.'/rdf/'.$xml.$params;
+		break;
+	}
+}
+if(!$xml_found)
+	$xml_url=XML_ROOT.$xml.$params;
+			
+			
 // Load the XML source
 $xml_doc = new DOMDocument;
 

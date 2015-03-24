@@ -269,8 +269,8 @@ class akte extends basis_db
 	 *
 	 * @param $person_id
 	 * @param $dokument_kurzbz
-	 * @param $stg_kz -> wenn gesetzt werden  nur alle akten angezeigt die ZUSÄTLICH zum Studiengang abgegeben worden sind ohne Zeugnis
-	 * @param $prestudent_id -> gesetzt wenn auch stg_kz gesetzt ist. Um sicherzugehen dass akten die er schon für seinen studiengang abgegeben hat, 
+	 * @param $stg_kz -> wenn gesetzt werden nur Akten angezeigt die ZUSÄTZLICH zum Studiengang abgegeben worden sind ohne Zeugnis
+	 * @param $prestudent_id -> gesetzt wenn auch stg_kz gesetzt ist um sicherzugehen, dass Akten, die er schon für seinen Studiengang abgegeben hat, 
 	 * nicht mehr angezeigt werden
 	 * @return true wenn ok, sonst false
 	 */

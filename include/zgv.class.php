@@ -74,6 +74,34 @@ class zgv extends basis_db
         
     }
     
+	/**
+     * Lädt eine Master-ZGV von tbl_zgvmaster
+     * @param  $zgvmas_code
+     * @return boolean 
+     */
+    public function load_mas($zgvmas_code)
+    {
+        $qry = 'SELECT * FROM bis.tbl_zgvmaster WHERE zgvmas_code = '.$this->db_add_param($zgvmas_code, FHC_INTEGER).';';
+        
+        if($result = $this->db_query($qry))
+        {
+            if($row = $this->db_fetch_object($result))
+            {
+                $this->zgvmas_code = $row->zgvmas_code; 
+                $this->zgvmas_bez = $row->zgvmas_bez; 
+                $this->zgvmas_kurzbz = $row->zgvmas_kurzbz; 
+                
+            }
+            return true; 
+        }
+        else
+        {
+            $this->errormsg = "Fehler bei der Abfrage aufgetreten"; 
+            return false; 
+        }
+        
+    }
+    
     /**
      * lädt alle ZGVs von tbl_zgv
      * @return boolean 
