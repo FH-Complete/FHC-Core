@@ -108,11 +108,28 @@ $lehrveranstaltungen = array();
 				$ausbildungssemester = $row_sem->semester;
 			}
 		}
-		if($ausbildungssemester/2==0)
-			$ausbildungssemester2=$ausbildungssemester-1;
-		else
-			$ausbildungssemester2=$ausbildungssemester+1;
-			
+
+		$qry ="SELECT ausbildungssemester as semester FROM public.tbl_prestudentstatus 
+				WHERE 
+				prestudent_id=".$db->db_add_param($student->prestudent_id)." AND 
+				studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz2)." AND
+				status_kurzbz not in('Incoming','Aufgenommener','Bewerber','Wartender', 'Interessent')
+				ORDER BY DATUM DESC LIMIT 1";
+		if($result_sem = $db->db_query($qry))
+		{
+			if($row_sem = $db->db_fetch_object($result_sem))
+			{
+				$ausbildungssemester2 = $row_sem->semester;
+			}
+			else
+			{
+				if($ausbildungssemester/2==0)
+					$ausbildungssemester2=$ausbildungssemester-1;
+				else
+					$ausbildungssemester2=$ausbildungssemester+1;
+			}
+		}
+
 		$student_studienjahr = round($ausbildungssemester/2);
 		
 		$jahr1=mb_substr($studiensemester_kurzbz,2);
@@ -157,6 +174,8 @@ $lehrveranstaltungen = array();
 		$datum_aktuell = date('d.m.Y');
 		$xml .= "\n		<datum_aktuell>".$datum_aktuell."</datum_aktuell>";
 		
+
+		$xml .= "\n		<debug>".$studiensemester_kurzbz.'/'.$studiensemester_kurzbz2.'|'.$ausbildungssemester.'/'.$ausbildungssemester2."</debug>";
 		$obj = new zeugnisnote();
 		
 		
