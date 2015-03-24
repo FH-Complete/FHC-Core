@@ -12,7 +12,7 @@ $this->phrasen['bewerbung/mailtextHtml']='Bitte sehen Sie sich die Nachricht in 
 $this->phrasen['bewerbung/mailtext']='Sehr geehrteR Herr/Frau %1$s %2$s.<br><br>
         Vielen Dank für Ihr Interesse an einem Studiengang der '.CAMPUS_NAME.'. <br> 
         Um sich für einen Studiengang zu bewerben verwenden Sie bitte folgenden Link und Zugangscode: <br><br>
-        <a href="'.APP_ROOT.'cis/public/registration.php">Link zur Bewerbung</a><br>
+        <a href="'.APP_ROOT.'addons/bewerbung/cis/registration.php">Link zur Bewerbung</a><br>
         Zugangscode: %3$s <br><br>
         Mit freundlichen Grüßen, <br>
         '.CAMPUS_NAME;
