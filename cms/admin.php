@@ -1258,7 +1258,7 @@ function print_content()
 	if($content->template_kurzbz=='redirect')
 		echo '<a href="content.php?content_id='.$content_id.'&version='.$version.'&sprache='.$sprache.'&sichtbar&filter='.implode(' ', $filterstr).'" target="_blank">Vorschau in eigenem Fenster öffnen</a>';
 	else
-		echo '<iframe src="content.php?content_id='.$content_id.'&version='.$version.'&sprache='.$sprache.'&filter='.implode(' ', $filterstr).'&sichtbar=true" style="width: 800px; height: 500px; border: 1px solid black;">';
+		echo '<iframe src="content.php?content_id='.$content_id.'&version='.$version.'&sprache='.$sprache.'&filter='.implode(' ', $filterstr).'" style="width: 800px; height: 500px; border: 1px solid black;">';
 }
 
 /**
