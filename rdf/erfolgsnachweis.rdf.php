@@ -174,8 +174,6 @@ $lehrveranstaltungen = array();
 		$datum_aktuell = date('d.m.Y');
 		$xml .= "\n		<datum_aktuell>".$datum_aktuell."</datum_aktuell>";
 		
-
-		$xml .= "\n		<debug>".$studiensemester_kurzbz.'/'.$studiensemester_kurzbz2.'|'.$ausbildungssemester.'/'.$ausbildungssemester2."</debug>";
 		$obj = new zeugnisnote();
 		
 		
