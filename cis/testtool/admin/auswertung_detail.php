@@ -117,35 +117,40 @@ if(isset($_GET['show']))
 		$qry.=" AND gebiet_id='".addslashes($gebiet_id)."'";
 	$qry.=") as a ORDER BY gebiet_id, nummer";
 	
-	//echo $qry.'<br><br>';
 	if($result = $db->db_query($qry))
 	{
-		if($row = $db->db_fetch_object($result,0))
+		if($db->db_num_rows($result)>0)
 		{
-			echo '<br />
-				Bearbeitungszeit: '.$row->zeit.'<br>
-				Multipleresponse: '.($row->multipleresponse==true?'Ja':'Nein').'<br>
-				Gestellte Fragen: '.$row->maxfragen.'<br>
-				Zufallsfrage: '.($row->zufallfrage==true?'Ja':'Nein').'<br>
-				Zufallsvorschlag: '.($row->zufallvorschlag==true?'Ja':'Nein').'<br>
-				Startlevel: '.($row->level_start!=''?$row->level_start:'Keines').'<br>
-				Höheres Level nach: '.($row->level_sprung_auf!=''?$row->level_sprung_auf.' richtigen Antwort(en)':'-').'<br>
-				Niedrigeres Level nach: '.($row->level_sprung_ab!=''?$row->level_sprung_ab.' falschen Antwort(en)':'-').'<br>
-				Levelgleichverteilung: '.($row->levelgleichverteilung==true?'Ja':'Nein').'<br>
-				Maximalpunkte: '.$row->maxpunkte.'<br>
-				Antworten pro Zeile: '.$row->antwortenprozeile.'<br>
-				<br>
-				<table>
-					<tr class="liste">
-						<th></th>
-						<th>Gebiet</th>
-						<th>Nummer</th>
-						<th>Level</th>
-						<th>Frage</th>
-						<th title="Anzahl der Personen die diese Frage gestellt bekommen haben">Gesamt (m/w)</th>
-						<th colspan="30">Nummer | Punkte | Gesamt | Männlich | Weiblich</th>
-					</tr>';
-		}
+			if($row = $db->db_fetch_object($result,0))
+			{
+				echo '<br />
+					Bearbeitungszeit: '.$row->zeit.'<br>
+					Multipleresponse: '.($db->db_parse_bool($row->multipleresponse)==true?'Ja':'Nein').'<br>
+					Gestellte Fragen: '.$row->maxfragen.'<br>
+					Zufallsfrage: '.($db->db_parse_bool($row->zufallfrage)==true?'Ja':'Nein').'<br>
+					Zufallsvorschlag: '.($db->db_parse_bool($row->zufallvorschlag)==true?'Ja':'Nein').'<br>
+					Startlevel: '.($row->level_start!=''?$row->level_start:'Keines').'<br>
+					Höheres Level nach: '.($row->level_sprung_auf!=''?$row->level_sprung_auf.' richtigen Antwort(en)':'-').'<br>
+					Niedrigeres Level nach: '.($row->level_sprung_ab!=''?$row->level_sprung_ab.' falschen Antwort(en)':'-').'<br>
+					Levelgleichverteilung: '.($db->db_parse_bool($row->levelgleichverteilung)==true?'Ja':'Nein').'<br>
+					Maximalpunkte: '.$row->maxpunkte.'<br>
+					Antworten pro Zeile: '.$row->antwortenprozeile.'<br>
+					<br>
+					<table>
+						<tr class="liste">
+							<th></th>
+							<th>Gebiet</th>
+							<th>Nummer</th>
+							<th>Level</th>
+							<th>Frage</th>
+							<th title="Anzahl der Personen die diese Frage gestellt bekommen haben">Gesamt (m/w)</th>
+							<th colspan="30">Nummer | Punkte | Gesamt | Männlich | Weiblich</th>
+						</tr>';
+			}
+		}		
+		else 
+			echo '<br>Keine Detaildaten vorhanden';
+			
 		$i=0;
 		while($row = $db->db_fetch_object($result))
 		{
@@ -255,6 +260,8 @@ if(isset($_GET['show']))
 		}
 		echo '</table>';
 	}
+	else 
+		echo 'Keine Detailauswertung vorhanden';
 }
 ?>
 	</body>

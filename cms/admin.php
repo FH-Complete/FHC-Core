@@ -1248,13 +1248,17 @@ function print_content()
 	echo '
 	<br>
 	<h3>Vorschau</h3>';
+	if($content->sichtbar!=true)
+	{
+		echo '<p style="color:red">(Unsichtbar im Livesystem)</p>';
+	}
 	//Bei Redirects wird die Vorschau nicht im IFrame gezeigt, da durch eventuelles weiterleiten durch 
 	// Javascript in der Vorschau die CMS Seite geschlossen wird.
 
 	if($content->template_kurzbz=='redirect')
 		echo '<a href="content.php?content_id='.$content_id.'&version='.$version.'&sprache='.$sprache.'&sichtbar&filter='.implode(' ', $filterstr).'" target="_blank">Vorschau in eigenem Fenster öffnen</a>';
 	else
-		echo '<iframe src="content.php?content_id='.$content_id.'&version='.$version.'&sprache='.$sprache.'&filter='.implode(' ', $filterstr).'" style="width: 800px; height: 500px; border: 1px solid black;">';
+		echo '<iframe src="content.php?content_id='.$content_id.'&version='.$version.'&sprache='.$sprache.'&filter='.implode(' ', $filterstr).'&sichtbar=true" style="width: 800px; height: 500px; border: 1px solid black;">';
 }
 
 /**
