@@ -61,6 +61,8 @@ else
     echo "<person>";
 	echo "<vorname>".$ma->vorname."</vorname>";
 	echo "<nachname>".$ma->nachname."</nachname>";
+	echo "<titelpre>".$ma->titelpre."</titelpre>";
+	echo "<titelpost>".$ma->titelpost."</titelpost>";
 	foreach($adresse->result as $adr)
 	{
 	    if($adr->heimatadresse)
@@ -124,12 +126,12 @@ else
 
 //	$vertrag->getAllStatus($vertrag_id);
     $summe = 0;
+    $studiensemester = "";
     foreach($vertrag_data as $vertrag_id)
     {
 	$vertrag = new vertrag();
 	$vertrag->load($vertrag_id);
 	$vertrag->getAllStatus($vertrag_id);
-	$studiensemester = "";
 	foreach($vertrag->result as $status)
 	{
 	    if($vertrag->vertragstyp_kurzbz == "lehre" && $status->vertragsstatus_kurzbz == "genehmigt")
@@ -170,6 +172,16 @@ else
     }
     echo "</vertraege>";
     echo "<studiensemester>".$studiensemester->bezeichnung."</studiensemester>";
+    switch(substr($studiensemester->studiensemester_kurzbz, 0,2))
+    {
+	case "WS":
+	    echo "<zeitraum>von Semptember bis Februar</zeitraum>";
+	    break;
+	
+	case "SS":
+	    echo "<zeitraum>von März bis August</zeitraum>";
+	    break;
+    }
 }
 echo "</honorarvertrag>";
 echo "</honorarvertraege>";

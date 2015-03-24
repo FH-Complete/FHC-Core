@@ -20,12 +20,23 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-		require_once('../../../config/vilesci.config.inc.php');
-		require_once('../../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+require_once('../../../config/vilesci.config.inc.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/basis_db.class.php');
+
+$uid = get_uid();
+
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($uid);
+
+if(!$rechte->isBerechtigt('lehre/lvplan',null,'suid'))
+	die('Sie haben keine Berechtigung für diese Seite');
+
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 		
-$cfgBorder=1;
+$cfgBorder=0;
 $cfgBgcolorOne='liste0';
 $cfgBgcolorTwo='liste1';		
 ?>
@@ -63,7 +74,7 @@ $cfgBgcolorTwo='liste1';
 			echo "<tr class='liste".($j%2)."'>";
 	    	for ($i=0; $i<$num_fields; $i++)
 				echo "<td>$row[$i]</td>";
-			echo "<td><a href=\"res_check_det.php?datum=$row[1]&stunde=$row[2]&ort_kurzbz=$row[3]\">Details</a></td>";
+			//echo "<td><a href=\"res_check_det.php?datum=$row[1]&stunde=$row[2]&ort_kurzbz=$row[3]\">Details</a></td>";
 	    	echo "</tr>\n";
 			$foo++;
 		}
@@ -87,7 +98,7 @@ $cfgBgcolorTwo='liste1';
 		for ($r=0;$r<$num_rows_res;$r++)
 		{
 			$row_res=$db->db_fetch_object($result_res,$r);
-			$sql_query="SELECT * FROM lehre.vw_stundenplan WHERE datum='$row_res->datum' AND stunde=$row_res->stunde AND ort_kurzbz='$row_res->ort_kurzbz'";
+			$sql_query="SELECT * FROM lehre.vw_stundenplan WHERE datum=".$db->db_add_param($row_res->datum)." AND stunde=".$db->db_add_param($row_res->stunde)." AND ort_kurzbz=".$db->db_add_param($row_res->ort_kurzbz);
 			//echo $sql_query."<br>";
 			$result=$db->db_query($sql_query);
 			$num_rows=$db->db_num_rows($result);
@@ -105,7 +116,7 @@ $cfgBgcolorTwo='liste1';
 					$row=$db->db_fetch_row($result,$j);
 					$rowo=$db->db_fetch_object($result,$j);
 					echo "<tr class='liste".($j%2)."'>";
-					echo "<td><a href=\"res_check_det.php?datum=$rowo->datum&stunde=$rowo->stunde&ort_kurzbz=$rowo->ort_kurzbz\">Reservierung</a></td>";
+					//echo "<td><a href=\"res_check_det.php?datum=$rowo->datum&stunde=$rowo->stunde&ort_kurzbz=$rowo->ort_kurzbz\">Reservierung</a></td>";
 	    			for ($i=0; $i<$num_fields; $i++)
 								echo "<td>$row[$i]</td>";
 					echo "</tr>\n";

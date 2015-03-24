@@ -146,7 +146,7 @@ function draw_content_liste($row)
 	$status = $prestudent->status_kurzbz;
 	$orgform = $prestudent->orgform_kurzbz;
 	$studienplan_bezeichnung=$prestudent->studienplan_bezeichnung;
-
+	
 	echo '
 	  <RDF:li>
       	<RDF:Description  id="'.$row->prestudent_id.'"  about="'.$rdf_url.'/'.$row->prestudent_id.'" >
@@ -185,6 +185,7 @@ function draw_content_liste($row)
 		<STUDENT:dual_bezeichnung><![CDATA['.($row->dual=='t'?'Ja':'Nein').']]></STUDENT:dual_bezeichnung>
 		<STUDENT:matr_nr><![CDATA['.$row->matr_nr.']]></STUDENT:matr_nr>
 		<STUDENT:mentor><![CDATA['.$row->mentor.']]></STUDENT:mentor>
+		<STUDENT:aktiv><![CDATA['.((isset($row->bnaktiv) && $row->bnaktiv=='t')?'true':'false').']]></STUDENT:aktiv>
       	</RDF:Description>
       </RDF:li>';
 }
@@ -203,6 +204,22 @@ function draw_content($row)
 		{
 			$mail_privat = $row_mail->kontakt;
 		}
+	}
+	
+	$aktiv = "-";
+	if(isset($row->bnaktiv))
+	{
+	    switch($row->bnaktiv)
+	    {
+		case "t":
+		    $aktiv = "true";
+		    break;
+		case "f":
+		    $aktiv = "false";
+		    break;
+		default:
+		    $aktiv = "-";
+	    }
 	}
 
 	if($row->prestudent_id!='')
@@ -247,7 +264,7 @@ function draw_content($row)
     		<STUDENT:mail_privat><![CDATA['.$mail_privat.']]></STUDENT:mail_privat>
     		<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
 
-    		<STUDENT:aktiv><![CDATA['.((isset($row->bnaktiv) && $row->bnaktiv)?'true':'false').']]></STUDENT:aktiv>
+    		<STUDENT:aktiv><![CDATA['.$aktiv.']]></STUDENT:aktiv>
     		<STUDENT:uid><![CDATA['.(isset($row->uid)?$row->uid:'').']]></STUDENT:uid>
     		<STUDENT:matrikelnummer><![CDATA['.(isset($row->matrikelnr)?$row->matrikelnr:'').']]></STUDENT:matrikelnummer>
 			<STUDENT:alias><![CDATA['.(isset($row->alias)?$row->alias:'').']]></STUDENT:alias>
@@ -407,7 +424,7 @@ if($xmlformat=='rdf')
 		$sql_query="SELECT p.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,	vorname, vornamen, geschlecht,
 						nachname, gebdatum, tbl_prestudent.anmerkung,ersatzkennzeichen,svnr, tbl_student.matrikelnr, p.anmerkung as anmerkungen,
 						tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
-						tbl_student.studiengang_kz, aufmerksamdurch_kurzbz, mentor,
+						tbl_student.studiengang_kz, aufmerksamdurch_kurzbz, mentor, public.tbl_benutzer.aktiv AS bnaktiv, 
 						(	SELECT kontakt
 							FROM public.tbl_kontakt
 							WHERE kontakttyp='email' AND person_id=p.person_id AND zustellung
@@ -426,7 +443,7 @@ if($xmlformat=='rdf')
 		$sql_query.="LEFT JOIN public.tbl_studentlehrverband ON (tbl_studentlehrverband.student_uid=tbl_student.student_uid AND tbl_studentlehrverband.studiensemester_kurzbz='$studiensemester_kurzbz')";
 		$sql_query.="WHERE ".$where.' ORDER BY nachname, vorname';
 		
-		
+
 		if($db->db_query($sql_query))
 		{
 			while($row = $db->db_fetch_object())
@@ -749,6 +766,7 @@ else
 				<tagesdatum><![CDATA['.date('d.m.Y').']]></tagesdatum>
 				<max_semester><![CDATA['.$studiengang->max_semester.']]></max_semester>
 				<anmerkungpre><![CDATA['.$prestudent->anmerkung.']]></anmerkungpre>
+				<aktiv><![CDATA['.$student->aktiv.']]></aktiv>
 	    	</student>';
 		}
 	}

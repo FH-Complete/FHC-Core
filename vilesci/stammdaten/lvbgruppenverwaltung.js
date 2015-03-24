@@ -16,7 +16,7 @@
  *
  * Authors: Stefan Puraner		< puraner@technikum-wien.at >
  */
-
+var loadTreeJumpAnchor='';
 $(document).ready(function() {
 	var stdkz = $('select[name=studiengang_kz]').val();
 
@@ -54,6 +54,10 @@ function loadTree() {
 		$("#treeContainer").jstree({
 			plugins: ["themes", "html_data", "cookies"]
 		});
+		if(loadTreeJumpAnchor!='')
+		{
+			window.setTimeout(function(){ window.location.hash=loadTreeJumpAnchor}, 200);
+		}
 	});
 }
 ;
@@ -103,8 +107,14 @@ function newGroup(id) {
 		url: "lvbgruppenverwaltungDetail.php",
 		data: {studiengang_kz: studiengang_kz, semester: semester, verband: verband, type: type, gruppe_neu: gruppe_neu}
 	}).done(function(data) {
+		obj = jQuery.parseJSON(data);
+		if(obj.status=='ok')
+		{
+			// Sprung zur neuen Gruppe
+			loadTreeJumpAnchor = obj.gruppe;
+		}
 		loadTree();
-		$("#ajaxData").html("<div class='detailsDiv'>"+data+"</div>");
+		$("#ajaxData").html("<div class='detailsDiv'>"+obj.message+"</div>");
 	});
 }
 ;
@@ -119,8 +129,14 @@ function newVerband(id) {
 		url: "lvbgruppenverwaltungDetail.php",
 		data: {studiengang_kz: studiengang_kz, semester: semester, type: type, verband_neu: verband_neu}
 	}).done(function(data) {
+		obj = jQuery.parseJSON(data);
+		if(obj.status=='ok')
+		{
+			// Sprung zur neuen Gruppe
+			loadTreeJumpAnchor = obj.gruppe;
+		}
 		loadTree();
-		$("#ajaxData").html("<div class='detailsDiv'>"+data+"</div>");
+		$("#ajaxData").html("<div class='detailsDiv'>"+obj.message+"</div>");
 	});
 }
 ;
@@ -134,8 +150,14 @@ function newSemester(id) {
 		url: "lvbgruppenverwaltungDetail.php",
 		data: {studiengang_kz: studiengang_kz, type: type, semester_neu: semester_neu}
 	}).done(function(data) {
+		obj = jQuery.parseJSON(data);
+		if(obj.status=='ok')
+		{
+			// Sprung zur neuen Gruppe
+			loadTreeJumpAnchor = obj.gruppe;
+		}
 		loadTree();
-		$("#ajaxData").html("<div class='detailsDiv'>"+data+"</div>");
+		$("#ajaxData").html("<div class='detailsDiv'>"+obj.message+"</div>");
 	});
 }
 ;
@@ -149,8 +171,14 @@ function newSemesterForNewStudiengang(stdkz) {
 		url: "lvbgruppenverwaltungDetail.php",
 		data: {studiengang_kz: studiengang_kz, type: type, semester_neu: semester_neu}
 	}).done(function(data) {
+		obj = jQuery.parseJSON(data);
+		if(obj.status=='ok')
+		{
+			// Sprung zur neuen Gruppe
+			loadTreeJumpAnchor = obj.gruppe;
+		}
 		loadTree();
-		$("#ajaxData").html("<div class='detailsDiv'>"+data+"</div>");
+		$("#ajaxData").html("<div class='detailsDiv'>"+obj.message+"</div>");
 	});
 }
 ;
@@ -165,8 +193,15 @@ function newSpezGroup(id) {
 		url: "lvbgruppenverwaltungDetail.php",
 		data: {studiengang_kz: studiengang_kz, type: type, semester: semester, spzgruppe_neu: spzgruppe_neu}
 	}).done(function(data) {
+		obj = jQuery.parseJSON(data);
+		if(obj.status=='ok')
+		{
+			// Sprung zur neuen Gruppe
+			loadTreeJumpAnchor = obj.gruppe_kurzbz;
+		}
+
 		loadTree();
-		$("#ajaxData").html("<div class='detailsDiv'>"+data+"</div>");
+		$("#ajaxData").html("<div class='detailsDiv'>"+obj.message+"</div>");
 	});
 }
 ;

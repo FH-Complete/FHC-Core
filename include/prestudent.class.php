@@ -445,6 +445,7 @@ class prestudent extends person
 				$rolle->studienplan_bezeichnung = $row->studienplan_bezeichnung;
 				$rolle->bestaetigtam = $row->bestaetigtam;
 				$rolle->bestaetigtvon = $row->bestaetigtvon;
+				$rolle->anmerkung_status = $row->anmerkung;
 				$this->result[] = $rolle;
 			}
 			return true;
@@ -1078,6 +1079,53 @@ class prestudent extends person
 			return false;
 		}
 	}
+
+    /**
+     * Gibt die eingetragenen ZGV zurück
+     * @return array
+     */
+    public function getZgv() {
+
+        $zgv = array(
+            'bachelor' => array(),
+            'master' => array(),
+//            'doktor' => array(),
+        );
+        $attribute = array(
+            'art',
+            'ort',
+            'datum',
+        );
+        $db_attribute = array(
+            'zgv_code',
+            'zgvort',
+            'zgvdatum',
+            'zgvmas_code',
+            'zgvmaort',
+            'zgvmadatum',
+            'zgvdoktor_code',
+            'zgvdoktorort',
+            'zgvdoktordatum',
+        );
+
+        foreach($this->result as $prestudent) {
+
+            foreach($zgv as &$value) {
+
+                foreach($attribute as $attribut) {
+                    $db_attribute_name = current($db_attribute);
+
+                    if($prestudent->$db_attribute_name) {
+                        $value[$attribut] = $prestudent->$db_attribute_name;
+                    }
+                    next($db_attribute);
+                }
+            }
+            reset($db_attribute);
+        }
+
+        return $zgv;
+    }
 
 	/**
 	 * Liefert die Anzahl der Bewerber im ausgewaehlten Bereich

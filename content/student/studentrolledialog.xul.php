@@ -198,6 +198,10 @@ $db = new basis_db();
 						</menupopup>
 					</menulist>
 				</row>
+				<row>
+					<label value="Anmerkung"/>
+					<textbox id="student-rolle-textbox-anmerkung" multiline="true" />
+				</row>
 			</rows>
 	</grid>
 	<hbox>

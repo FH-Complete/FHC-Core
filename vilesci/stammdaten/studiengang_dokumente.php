@@ -27,9 +27,9 @@ require_once('../../include/studiengang.class.php');
 require_once('../../include/dokument.class.php');
 require_once('../../include/benutzerberechtigung.class.php');
 
-$stg_kz=isset($_REQUEST['stg_kz'])?$_REQUEST['stg_kz']:'0';
-$dokument_kurzbz=isset($_REQUEST['dokument_kurzbz'])?$_REQUEST['dokument_kurzbz']:'';
-$onlinebewerbung=isset($_REQUEST['onlinebewerbung']);
+$stg_kz = isset($_REQUEST['stg_kz']) ? $_REQUEST['stg_kz'] : '0';
+$dokument_kurzbz = isset($_REQUEST['dokument_kurzbz']) ? $_REQUEST['dokument_kurzbz'] : '';
+$onlinebewerbung = isset($_REQUEST['onlinebewerbung']);
 
 $action=isset($_GET['action'])?$_GET['action']:'';
 if(isset($_POST['add']))
@@ -52,6 +52,7 @@ if($action=='add')
 		$dokument->dokument_kurzbz = $dokument_kurzbz;
 		$dokument->studiengang_kz = $stg_kz;
 		$dokument->onlinebewerbung = $onlinebewerbung;
+        $dokument->pflicht = filter_input(INPUT_POST, 'pflicht', FILTER_VALIDATE_BOOLEAN);
 		$dokument->saveDokumentStudiengang();
 	}
 }
@@ -80,6 +81,21 @@ if($action =='toggleonline')
 		else
 			echo 'Zuordnung ist nicht vorhanden';
 	}
+}
+
+if($action === 'togglepflicht') {
+    if($dokument_kurzbz != '' && $stg_kz != '')
+    {
+        $dokument=new dokument();
+        if($dokument->loadDokumentStudiengang($dokument_kurzbz, $stg_kz))
+        {
+            $dokument->pflicht = !$dokument->pflicht;
+            if(!$dokument->saveDokumentStudiengang())
+                echo $dokument->errormsg;
+        }
+        else
+            echo 'Zuordnung ist nicht vorhanden';
+    }
 }
 
 if($action=='saveDoc')
@@ -262,6 +278,7 @@ else
 		<tr>
 			<th>Dokumentname</th>
 			<th>Online-Bewerbung</th>
+			<th>Pflicht</th>
 			<th></th>
 		</tr>
 		</thead>
@@ -272,10 +289,12 @@ else
 		foreach($dokStg->result as $dok)
 		{
 			$zugewieseneDokumente[]=$dok->dokument_kurzbz;
-			$checked=$dok->onlinebewerbung?'true':'false';
+            $checked_onlinebewerbung = $dok->onlinebewerbung ? 'true' : 'false';
+            $checked_pflicht = $dok->pflicht ? 'true' : 'false';
 			echo '<tr>
 				<td>'.$dok->bezeichnung.'</td>
-				<td><a href="'.$_SERVER['PHP_SELF'].'?action=toggleonline&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'"><img src="../../skin/images/'.$checked.'.png" /></a></td>
+				<td><a href="'.$_SERVER['PHP_SELF'].'?action=toggleonline&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'"><img src="../../skin/images/'.$checked_onlinebewerbung.'.png" /></a></td>
+				<td><a href="'.$_SERVER['PHP_SELF'].'?action=togglepflicht&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'"><img src="../../skin/images/'.$checked_pflicht.'.png" /></a></td>
 				<td><a href="'.$_SERVER['PHP_SELF'].'?action=delete&dokument_kurzbz='.$dok->dokument_kurzbz.'&stg_kz='.$stg_kz.'">Zuordnung löschen</a></td>
 				</td>
 			</tr>';
@@ -294,6 +313,10 @@ else
 		}
 		echo '</select></td>
 				<td><input type="checkbox" name="onlinebewerbung" checked></td>
+				<td>
+				    <input type="hidden" name="pflicht" value="0">
+				    <input type="checkbox" name="pflicht" value="1" checked>
+				</td>
 				<td><input type="submit" name="add" value="Hinzufügen"></td>
 			</tr>
 		</tfoot>

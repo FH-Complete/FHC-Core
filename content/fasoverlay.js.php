@@ -26,7 +26,7 @@ require_once('../include/variable.class.php');
 
 $variable = new variable();
 $variable->loadVariables(get_uid());
-
+if(false): ?> <script type="text/javascript"> <?php endif;
 ?>
 
 var currentAuswahl=new auswahlValues();

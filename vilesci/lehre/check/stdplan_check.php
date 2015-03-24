@@ -20,10 +20,20 @@
  *          Rudolf Hangl 		< rudolf.hangl@technikum-wien.at >
  *          Gerald Simane-Sequens 	< gerald.simane-sequens@technikum-wien.at >
  */
-		require_once('../../../config/vilesci.config.inc.php');
-		require_once('../../../include/basis_db.class.php');
-		if (!$db = new basis_db())
-			die('Es konnte keine Verbindung zum Server aufgebaut werden.');
+require_once('../../../config/vilesci.config.inc.php');
+require_once('../../../include/basis_db.class.php');
+require_once('../../../include/functions.inc.php');
+require_once('../../../include/benutzerberechtigung.class.php');
+
+$uid = get_uid();
+$rechte = new benutzerberechtigung();
+$rechte->getBerechtigungen($uid);
+
+if(!$rechte->isBerechtigt('lehre/lvplan',null,'suid'))
+	die('Sie haben keine Berechtigung für diese Seite');
+
+if (!$db = new basis_db())
+	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
 
 
 	//Stundenplandaten ermitteln welche mehrfach vorkommen
@@ -37,7 +47,7 @@
 		die($db->db_last_error().' <a href="javascript:history.back()">Zur&uuml;ck</a>');			
 			
 		
-$cfgBorder=1;
+$cfgBorder=0;
 $cfgBgcolorOne='liste0';
 $cfgBgcolorTwo='liste1';		
 ?>
@@ -66,8 +76,7 @@ if ($num_rows>0)
 		$foo % 2  ? 0: $bgcolor = $cfgBgcolorTwo;
 		echo "<tr class='liste".($j%2)."'>";
 	    for ($i=0; $i<$num_fields; $i++)
-			echo "<td>$row[$i]</td>";
-		echo "<td><a href=\"stdplan_check_det.php?datum=$row[1]&stunde_id=$row[2]&ort_id=$row[3]&studiengang_id=$row[4]&semester=$row[5]&verband=$row[6]&gruppe=$row[7]\">Details</a><td>";
+			echo "<td>$row[$i]</td>";		
 	    echo "</tr>\n";
 		$foo++;
 	}

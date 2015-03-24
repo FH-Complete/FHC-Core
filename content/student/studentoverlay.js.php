@@ -1833,6 +1833,7 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 	datum = dialog.getElementById('student-rolle-datum-datum').value;
 	orgform_kurzbz = dialog.getElementById('student-rolle-menulist-orgform_kurzbz').value;
 	studienplan_id = dialog.getElementById('student-rolle-menulist-studienplan').value;
+	anmerkung = dialog.getElementById('student-rolle-textbox-anmerkung').value;
 	
 	if(!CheckDatum(datum))
 	{
@@ -1854,6 +1855,7 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 	req.add('datum', ConvertDateToISO(datum));
 	req.add('orgform_kurzbz', orgform_kurzbz);
 	req.add('studienplan_id', studienplan_id);
+	req.add('anmerkung', anmerkung);
 
 	var response = req.executePOST();
 
@@ -2066,7 +2068,7 @@ function StudentAddRolle(rolle, semester, studiensemester)
 // ****
 // * Druckt die Instkriptionsbestaetigung
 // ****
-function StudentPrintInskriptionsbestaetigung()
+function StudentPrintInskriptionsbestaetigung(event)
 {
 	tree = document.getElementById('student-tree');
 	//Alle markierten Studenten holen
@@ -2095,8 +2097,15 @@ function StudentPrintInskriptionsbestaetigung()
 		return false;
 	}
 	
+	if (event.shiftKey) 
+	    var output='odt';
+	else if (event.ctrlKey)
+		var output='doc';
+	else
+		var output='pdf';
+
 	if(anzahl>0)
-		window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=student.rdf.php&xsl=Inskription&stg_kz='+stg_kz+'&uid='+paramList+'&ss='+stsem,'Inskriptionsbestaetigung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+		window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=student.rdf.php&xsl=Inskription&stg_kz='+stg_kz+'&uid='+paramList+'&ss='+stsem+'&output='+output,'Inskriptionsbestaetigung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 	else
 		alert('Bitte einen Studenten auswaehlen');
 }

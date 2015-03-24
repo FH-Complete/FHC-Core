@@ -2609,6 +2609,17 @@ if(!$result = @$db->db_query("SELECT anwesenheit FROM campus.tbl_lvinfo LIMIT 1"
 		echo 'campus.tbl_lvinfo: Spalte "anwesenheit" hinzugefuegt!<br>';
 }
 
+// Spalte pflicht in tbl_dokumentstudiengang
+if(!$result = @$db->db_query("SELECT pflicht FROM public.tbl_dokumentstudiengang LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_dokumentstudiengang ADD COLUMN pflicht BOOLEAN NOT NULL DEFAULT FALSE";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_dokumentstudiengang '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'public.tbl_dokumentstudiengang: Spalte "pflicht" hinzugefuegt!<br>';
+}
+
 // Anrechnungen
 if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnung LIMIT 1;"))
 {
@@ -2705,6 +2716,101 @@ if(!$result = @$db->db_query("SELECT onlinebewerbung FROM public.tbl_studiengang
 		echo '<strong>public.tbl_studiengang '.$db->db_last_error().'</strong><br>';
 	else
 		echo 'public.tbl_studiengang: Spalte "onlinebewerbung" hinzugefuegt!<br>';
+}
+
+// Spalte ext_id in wawi.tbl_buchung
+if(!$result = @$db->db_query("SELECT ext_id FROM wawi.tbl_buchung LIMIT 1;"))
+{
+	$qry = "ALTER TABLE wawi.tbl_buchung ADD COLUMN ext_id bigint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>wawi.tbl_buchung: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' wawi.tbl_buchung: Spalte ext_id hinzugefuegt!<br>';
+}
+
+// Spalte ext_id in public.tbl_preoutgoing_firma
+if(!$result = @$db->db_query("SELECT ext_id FROM public.tbl_preoutgoing_firma LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_preoutgoing_firma ADD COLUMN ext_id bigint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_preoutgoing_firma: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' public.tbl_preoutgoing_firma: Spalte ext_id hinzugefuegt!<br>';
+}
+
+// Spalte ext_id in public.tbl_firma_mobilitaetsprogramm
+if(!$result = @$db->db_query("SELECT ext_id FROM public.tbl_firma_mobilitaetsprogramm LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_firma_mobilitaetsprogramm ADD COLUMN ext_id bigint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_firma_mobilitaetsprogramm: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' public.tbl_firma_mobilitaetsprogramm: Spalte ext_id hinzugefuegt!<br>';
+}
+
+// Spalte ext_id in lehre.tbl_studienplatz
+if(!$result = @$db->db_query("SELECT ext_id FROM lehre.tbl_studienplatz LIMIT 1;"))
+{
+	$qry = "ALTER TABLE lehre.tbl_studienplatz ADD COLUMN ext_id bigint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_studienplatz: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' lehre.tbl_studienplatz: Spalte ext_id hinzugefuegt!<br>';
+}
+
+// Spalte ext_id in lehre.tbl_anrechnung
+if(!$result = @$db->db_query("SELECT ext_id FROM lehre.tbl_anrechnung LIMIT 1;"))
+{
+	$qry = "ALTER TABLE lehre.tbl_anrechnung ADD COLUMN ext_id bigint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_anrechnung: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' lehre.tbl_anrechnung: Spalte ext_id hinzugefuegt!<br>';
+}
+
+// Spalte ext_id in public.tbl_preincoming
+if(!$result = @$db->db_query("SELECT ext_id FROM public.tbl_preincoming LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_preincoming ADD COLUMN ext_id bigint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_preincoming: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' public.tbl_preincoming: Spalte ext_id hinzugefuegt!<br>';
+}
+
+// Spalte ext_id in public.tbl_preoutgoing
+if(!$result = @$db->db_query("SELECT ext_id FROM public.tbl_preoutgoing LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_preoutgoing ADD COLUMN ext_id bigint;";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_preoutgoing: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' public.tbl_preoutgoing: Spalte ext_id hinzugefuegt!<br>';
+}
+
+// Notizen Berechtigungen fuer web User erteilen
+if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants WHERE table_name='tbl_notiz' AND table_schema='public' AND grantee='web' AND privilege_type='UPDATE'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+
+		$qry = "GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_notiz TO web;
+				GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_notizzuordnung TO web;
+				GRANT SELECT, UPDATE ON public.seq_notiz_notiz_id TO web;
+				GRANT SELECT, UPDATE ON public.seq_notizzuordnung_notizzuordnung_id TO web;";
+	
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_notiz: '.$db->db_last_error().'</strong><br>';
+		else
+			echo 'public.tbl_notiz / public.tbl_notizzuordnung: Schreibrechte fuer User web erteilt';
+	}		
 }
 
 echo '<br><br><br>';
@@ -2804,7 +2910,7 @@ $tabellen=array(
 	"lehre.tbl_abschlussbeurteilung"  => array("abschlussbeurteilung_kurzbz","bezeichnung","bezeichnung_english"),
 	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note"),
 	"lehre.tbl_akadgrad"  => array("akadgrad_id","akadgrad_kurzbz","studiengang_kz","titel","geschlecht"),
-    "lehre.tbl_anrechnung"  => array("anrechnung_id","prestudent_id","lehrveranstaltung_id","begruendung_id","lehrveranstaltung_id_kompatibel","genehmigt_von","insertamum","insertvon","updateamum","updatevon"),
+    "lehre.tbl_anrechnung"  => array("anrechnung_id","prestudent_id","lehrveranstaltung_id","begruendung_id","lehrveranstaltung_id_kompatibel","genehmigt_von","insertamum","insertvon","updateamum","updatevon","ext_id"),
     "lehre.tbl_anrechnung_begruendung"  => array("begruendung_id","bezeichnung"),
 	"lehre.tbl_betreuerart"  => array("betreuerart_kurzbz","beschreibung"),
 	"lehre.tbl_ferien"  => array("bezeichnung","studiengang_kz","vondatum","bisdatum"),
@@ -2836,7 +2942,7 @@ $tabellen=array(
 	"lehre.tbl_studienordnung_semester"  => array("studienordnung_semester_id","studienordnung_id","studiensemester_kurzbz","semester"),
 	"lehre.tbl_studienplan" => array("studienplan_id","studienordnung_id","orgform_kurzbz","version","regelstudiendauer","sprache","aktiv","bezeichnung","insertamum","insertvon","updateamum","updatevon","semesterwochen","testtool_sprachwahl","ext_id"),
 	"lehre.tbl_studienplan_lehrveranstaltung" => array("studienplan_lehrveranstaltung_id","studienplan_id","lehrveranstaltung_id","semester","studienplan_lehrveranstaltung_id_parent","pflicht","koordinator","insertamum","insertvon","updateamum","updatevon","sort","ext_id"),
-	"lehre.tbl_studienplatz" => array("studienplatz_id","studiengang_kz","studiensemester_kurzbz","orgform_kurzbz","ausbildungssemester","gpz","npz","insertamum","insertvon","updateamum","updatevon"),
+	"lehre.tbl_studienplatz" => array("studienplatz_id","studiengang_kz","studiensemester_kurzbz","orgform_kurzbz","ausbildungssemester","gpz","npz","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"lehre.tbl_stunde"  => array("stunde","beginn","ende"),
 	"lehre.tbl_stundenplan"  => array("stundenplan_id","unr","mitarbeiter_uid","datum","stunde","ort_kurzbz","gruppe_kurzbz","titel","anmerkung","lehreinheit_id","studiengang_kz","semester","verband","gruppe","fix","updateamum","updatevon","insertamum","insertvon"),
 	"lehre.tbl_stundenplandev"  => array("stundenplandev_id","lehreinheit_id","unr","studiengang_kz","semester","verband","gruppe","gruppe_kurzbz","mitarbeiter_uid","ort_kurzbz","datum","stunde","titel","anmerkung","fix","updateamum","updatevon","insertamum","insertvon","ext_id"),
@@ -2862,12 +2968,12 @@ $tabellen=array(
 	"public.tbl_buchungstyp"  => array("buchungstyp_kurzbz","beschreibung","standardbetrag","standardtext","aktiv","credit_points"),
 	"public.tbl_dokument"  => array("dokument_kurzbz","bezeichnung","ext_id"),
 	"public.tbl_dokumentprestudent"  => array("dokument_kurzbz","prestudent_id","mitarbeiter_uid","datum","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"public.tbl_dokumentstudiengang"  => array("dokument_kurzbz","studiengang_kz","ext_id", "onlinebewerbung"),
+	"public.tbl_dokumentstudiengang"  => array("dokument_kurzbz","studiengang_kz","ext_id", "onlinebewerbung", "pflicht"),
 	"public.tbl_erhalter"  => array("erhalter_kz","kurzbz","bezeichnung","dvr","logo","zvr"),
 	"public.tbl_fachbereich"  => array("fachbereich_kurzbz","bezeichnung","farbe","studiengang_kz","aktiv","ext_id","oe_kurzbz"),
 	"public.tbl_filter" => array("filter_id","kurzbz","sql","valuename","showvalue","insertamum","insertvon","updateamum","updatevon","type","htmlattr"),
 	"public.tbl_firma"  => array("firma_id","name","anmerkung","firmentyp_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id","schule","finanzamt","steuernummer","gesperrt","aktiv"),
-	"public.tbl_firma_mobilitaetsprogramm" => array("firma_id","mobilitaetsprogramm_code"),
+	"public.tbl_firma_mobilitaetsprogramm" => array("firma_id","mobilitaetsprogramm_code","ext_id"),
 	"public.tbl_firma_organisationseinheit"  => array("firma_organisationseinheit_id","firma_id","oe_kurzbz","bezeichnung","kundennummer","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_firmentyp"  => array("firmentyp_kurzbz","beschreibung"),
 	"public.tbl_firmatag"  => array("firma_id","tag","insertamum","insertvon"),
@@ -2883,7 +2989,7 @@ $tabellen=array(
 	"public.tbl_log"  => array("log_id","executetime","mitarbeiter_uid","beschreibung","sql","sqlundo"),
 	"public.tbl_mitarbeiter"  => array("mitarbeiter_uid","personalnummer","telefonklappe","kurzbz","lektor","fixangestellt","bismelden","stundensatz","ausbildungcode","ort_kurzbz","standort_id","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","kleriker"),
 	"public.tbl_notiz"  => array("notiz_id","titel","text","verfasser_uid","bearbeiter_uid","start","ende","erledigt","insertamum","insertvon","updateamum","updatevon","ext_id"),
-	"public.tbl_notizzuordnung"  => array("notizzuordnung_id","notiz_id","projekt_kurzbz","projektphase_id","projekttask_id","uid","person_id","prestudent_id","bestellung_id","lehreinheit_id","ext_id"),
+	"public.tbl_notizzuordnung"  => array("notizzuordnung_id","notiz_id","projekt_kurzbz","projektphase_id","projekttask_id","uid","person_id","prestudent_id","bestellung_id","lehreinheit_id","ext_id","anrechnung_id"),
 	"public.tbl_ort"  => array("ort_kurzbz","bezeichnung","planbezeichnung","max_person","lehre","reservieren","aktiv","lageplan","dislozierung","kosten","ausstattung","updateamum","updatevon","insertamum","insertvon","ext_id","stockwerk","standort_id","telefonklappe","content_id","m2","gebteil","oe_kurzbz"),
 	"public.tbl_ortraumtyp"  => array("ort_kurzbz","hierarchie","raumtyp_kurzbz"),
 	"public.tbl_organisationseinheit" => array("oe_kurzbz", "oe_parent_kurzbz", "bezeichnung","organisationseinheittyp_kurzbz", "aktiv","mailverteiler","freigabegrenze","kurzzeichen","lehre"),
@@ -2891,12 +2997,12 @@ $tabellen=array(
 	"public.tbl_person"  => array("person_id","staatsbuergerschaft","geburtsnation","sprache","anrede","titelpost","titelpre","nachname","vorname","vornamen","gebdatum","gebort","gebzeit","foto","anmerkung","homepage","svnr","ersatzkennzeichen","familienstand","geschlecht","anzahlkinder","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","bundesland_code","kompetenzen","kurzbeschreibung","zugangscode", "foto_sperre","matr_nr"),
 	"public.tbl_person_fotostatus"  => array("person_fotostatus_id","person_id","fotostatus_kurzbz","datum","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_personfunktionstandort"  => array("personfunktionstandort_id","funktion_kurzbz","person_id","standort_id","position","anrede"),
-	"public.tbl_preincoming"  => array("preincoming_id","person_id","mobilitaetsprogramm_code","zweck_code","firma_id","universitaet","aktiv","bachelorthesis","masterthesis","von","bis","uebernommen","insertamum","insertvon","updateamum","updatevon","anmerkung","zgv","zgv_ort","zgv_datum","zgv_name","zgvmaster","zgvmaster_datum","zgvmaster_ort","zgvmaster_name","program_name","bachelor","master","jahre","person_id_emergency","person_id_coordinator_dep","person_id_coordinator_int","code","deutschkurs1","deutschkurs2","research_area","deutschkurs3"),
+	"public.tbl_preincoming"  => array("preincoming_id","person_id","mobilitaetsprogramm_code","zweck_code","firma_id","universitaet","aktiv","bachelorthesis","masterthesis","von","bis","uebernommen","insertamum","insertvon","updateamum","updatevon","anmerkung","zgv","zgv_ort","zgv_datum","zgv_name","zgvmaster","zgvmaster_datum","zgvmaster_ort","zgvmaster_name","program_name","bachelor","master","jahre","person_id_emergency","person_id_coordinator_dep","person_id_coordinator_int","code","deutschkurs1","deutschkurs2","research_area","deutschkurs3","ext_id"),
 	"public.tbl_preincoming_lehrveranstaltung"  => array("preincoming_id","lehrveranstaltung_id","insertamum","insertvon"),
 	"public.tbl_preinteressent"  => array("preinteressent_id","person_id","studiensemester_kurzbz","firma_id","erfassungsdatum","einverstaendnis","absagedatum","anmerkung","maturajahr","infozusendung","aufmerksamdurch_kurzbz","kontaktmedium_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_preinteressentstudiengang"  => array("studiengang_kz","preinteressent_id","freigabedatum","uebernahmedatum","prioritaet","insertamum","insertvon","updateamum","updatevon"),
-	"public.tbl_preoutgoing" => array("preoutgoing_id","uid","dauer_von","dauer_bis","ansprechperson","bachelorarbeit","masterarbeit","betreuer","sprachkurs","intensivsprachkurs","sprachkurs_von","sprachkurs_bis","praktikum","praktikum_von","praktikum_bis","behinderungszuschuss","studienbeihilfe","anmerkung_student", "anmerkung_admin", "studienrichtung_gastuniversitaet", "insertamum","insertvon","updateamum","updatevon","projektarbeittitel"),
-	"public.tbl_preoutgoing_firma" => array("preoutgoing_firma_id","preoutgoing_id","mobilitaetsprogramm_code","firma_id","name","auswahl"),
+	"public.tbl_preoutgoing" => array("preoutgoing_id","uid","dauer_von","dauer_bis","ansprechperson","bachelorarbeit","masterarbeit","betreuer","sprachkurs","intensivsprachkurs","sprachkurs_von","sprachkurs_bis","praktikum","praktikum_von","praktikum_bis","behinderungszuschuss","studienbeihilfe","anmerkung_student", "anmerkung_admin", "studienrichtung_gastuniversitaet", "insertamum","insertvon","updateamum","updatevon","projektarbeittitel","ext_id"),
+	"public.tbl_preoutgoing_firma" => array("preoutgoing_firma_id","preoutgoing_id","mobilitaetsprogramm_code","firma_id","name","auswahl","ext_id"),
 	"public.tbl_preoutgoing_lehrveranstaltung" => array("preoutgoing_lehrveranstaltung_id","preoutgoing_id","bezeichnung","ects","endversion","insertamum","insertvon","updateamum","updatevon","wochenstunden","unitcode"),
 	"public.tbl_preoutgoing_preoutgoing_status" => array("status_id","preoutgoing_status_kurzbz","preoutgoing_id","datum","insertamum","insertvon","updateamum","updatevon"),
 	"public.tbl_preoutgoing_status" => array("preoutgoing_status_kurzbz","bezeichnung"),
@@ -2958,7 +3064,7 @@ $tabellen=array(
 	"wawi.tbl_bestelldetail"  => array("bestelldetail_id","bestellung_id","position","menge","verpackungseinheit","beschreibung","artikelnummer","preisprove","mwst","erhalten","sort","text","updateamum","updatevon","insertamum","insertvon"),
 	"wawi.tbl_bestellung_bestellstatus"  => array("bestellung_bestellstatus_id","bestellung_id","bestellstatus_kurzbz","uid","oe_kurzbz","datum","insertamum","insertvon","updateamum","updatevon"),
 	"wawi.tbl_bestellstatus"  => array("bestellstatus_kurzbz","beschreibung"),
-	"wawi.tbl_buchung"  => array("buchung_id","konto_id","kostenstelle_id","buchungstyp_kurzbz","buchungsdatum","buchungstext","betrag","insertamum","insertvon","updateamum","updatevon"),
+	"wawi.tbl_buchung"  => array("buchung_id","konto_id","kostenstelle_id","buchungstyp_kurzbz","buchungsdatum","buchungstext","betrag","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"wawi.tbl_buchungstyp"  => array("buchungstyp_kurzbz","bezeichnung"),
 	"wawi.tbl_rechnungstyp"  => array("rechnungstyp_kurzbz","beschreibung","berechtigung_kurzbz"),
 	"wawi.tbl_rechnung"  => array("rechnung_id","bestellung_id","buchungsdatum","rechnungsnr","rechnungsdatum","transfer_datum","buchungstext","insertamum","insertvon","updateamum","updatevon","rechnungstyp_kurzbz","freigegeben","freigegebenvon","freigegebenamum"),

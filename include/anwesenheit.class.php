@@ -237,7 +237,7 @@ class anwesenheit extends basis_db
 		$qry = "SELECT 
 					datum, a.einheiten, 
 					(SELECT true FROM campus.tbl_anwesenheit 
-					 WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id)." AND datum=a.datum) as anwesend,
+					 WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id)." AND datum=a.datum LIMIT 1) as anwesend,
 					(SELECT stundensatz FROM lehre.tbl_lehreinheitmitarbeiter WHERE lehreinheit_id=".$this->db_add_param($lehreinheit_id)."
 					AND mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid).") as stundensatz
 				FROM

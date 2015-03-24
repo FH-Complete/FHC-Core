@@ -60,33 +60,49 @@ $studiengang = new studiengang();
 $studiengang->load($studiengang_kz);
 
 //Aenderung des Aktiv Status
-if ($changeState != '') {
+if ($changeState != '') 
+{
 	if (!$admin)
 		die('Sie haben keine Berechtigung zum Speichern');
 
-	if ($gruppe_kurzbz != '') {
+	if ($gruppe_kurzbz != '') 
+	{
 		$gruppe = new gruppe();
-		if ($gruppe->load($gruppe_kurzbz)) {
+		if ($gruppe->load($gruppe_kurzbz)) 
+		{
 			$gruppe->aktiv = !$gruppe->aktiv;
-			if ($gruppe->save(false)) {
+			if ($gruppe->save(false)) 
+			{
 				echo "erfolgreich";
-			} else {
+			} 
+			else 
+			{
 				echo "Fehler beim Aendern des Aktiv-Feldes: $gruppe->errormsg";
 			}
-		} else {
+		} 
+		else 
+		{
 			echo "Spezialgruppe wurde nicht gefunden";
 		}
-	} else {
+	} 
+	else 
+	{
 		$lvb = new lehrverband();
 
-		if ($lvb->load($studiengang_kz, $semester, $verband, $gruppe)) {
+		if ($lvb->load($studiengang_kz, $semester, $verband, $gruppe)) 
+		{
 			$lvb->aktiv = !$lvb->aktiv;
-			if ($lvb->save(false)) {
+			if ($lvb->save(false)) 
+			{
 				echo "erfolgreich";
-			} else {
+			} 
+			else 
+			{
 				echo "Fehler beim Aendern des Aktiv-Feldes: $lvb->errormsg";
 			}
-		} else {
+		} 
+		else 
+		{
 			echo "<span class='error'>Lehrverband wurde nicht gefunden</span>";
 		}
 	}
@@ -94,17 +110,21 @@ if ($changeState != '') {
 
 
 //Anzeigen der Gruppen Details
-if ($type == 'edit') {
-	if ($gruppe_kurzbz != '') {
+if ($type == 'edit') 
+{
+	if ($gruppe_kurzbz != '') 
+	{
 		$gruppe = new gruppe();
-		if ($gruppe->load($gruppe_kurzbz)) {
+		if ($gruppe->load($gruppe_kurzbz)) 
+		{
 
 			echo "<div class='detailsDiv'>Details von $gruppe_kurzbz<br><br>";
 								//echo "<form action='" . $_SERVER['PHP_SELF'] . "?type=save&studiengang_kz=$studiengang_kz&gruppe_kurzbz=$gruppe_kurzbz' method='POST'>
 
 			echo "<form id='formSpzSave' action='javascript:saveSpzGroup(\"".$gruppe->studiengang_kz."\",\"".$gruppe->gruppe_kurzbz."\",\"save\");' method='POST'>
 		  <table>";
-		  if ($admin) {
+			if ($admin) 
+			{
 				echo "<tr>
 					<td><b>Kurzbezeichnung:</b></td>
 					<td><input id='spzKurzBz' type='text' name='kurzbezeichnung' size='30' maxlength='128' value='$gruppe->gruppe_kurzbz'/></td>
@@ -112,12 +132,13 @@ if ($type == 'edit') {
 				<tr>
 					<td>&nbsp;</td>
 				</tr>";
-		  }
+			}
 			echo "<tr>
 				<td>Bezeichnung:</td>
 				<td><input id='spzBezeichnung' type='text' name='bezeichnung' size='30' maxlength='32' value='$gruppe->bezeichnung'/> (max. 32 Zeichen)</td>
 			</tr>";
-			if ($admin) {
+			if ($admin) 
+			{
 				echo "
 				<tr>
 					<td>Beschreibung:</td>
@@ -140,7 +161,8 @@ if ($type == 'edit') {
 					<td><input id='spzSort' type='text' name='sort' size='2' maxlength='2' value='$gruppe->sort' /></td>
 				</tr>";
 				$stg_obj = new studiengang($studiengang_kz);
-				if ($stg_obj->mischform) {
+				if ($stg_obj->mischform) 
+				{
 					echo "
 				<tr>
 					<td>OrgForm</td>
@@ -148,8 +170,10 @@ if ($type == 'edit') {
 					echo "	<SELECT id='spzOrgform' name='orgform_kurzbz'>";
 					echo "		<OPTION value=''>-- keine Auswahl --</OPTION>";
 					$qry_orgform = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz NOT IN ('VBB', 'ZGS') ORDER BY orgform_kurzbz";
-					if ($result_orgform = $db->db_query($qry_orgform)) {
-						while ($row_orgform = $db->db_fetch_object($result_orgform)) {
+					if ($result_orgform = $db->db_query($qry_orgform)) 
+					{
+						while ($row_orgform = $db->db_fetch_object($result_orgform))
+						{
 							if ($row_orgform->orgform_kurzbz == $gruppe->orgform_kurzbz)
 								$selected = 'selected';
 							else
@@ -184,9 +208,11 @@ if ($type == 'edit') {
 		  </form></div>";
 		}
 	}
-	else {
+	else 
+	{
 		$lvb = new lehrverband();
-		if ($lvb->load($studiengang_kz, $semester, $verband, $gruppe)) {
+		if ($lvb->load($studiengang_kz, $semester, $verband, $gruppe)) 
+		{
 
 			echo "<div class='detailsDiv'>Details von $studiengang->kuerzel - $semester$verband$gruppe<br><br>";
 			echo "<form id='formSave' action='javascript:saveGroup(\"".$lvb->studiengang_kz."\",\"".$lvb->semester."\",\"".$lvb->verband."\",\"".$lvb->gruppe."\",\"save\");' method='POST'>
@@ -204,14 +230,16 @@ if ($type == 'edit') {
 					<input type='hidden' name='type' value='save'/>
 				</td>
 			</tr>";
-			if ($admin) {
+			if ($admin) 
+			{
 				echo "
 			<tr>
 				<td>Aktiv:</td>
 				<td><input id='aktiv' type='checkbox' name='aktiv' " . ($lvb->aktiv ? 'checked' : '') . " /></td>
 			</tr>";
 				$stg_obj = new studiengang($studiengang_kz);
-				if ($stg_obj->mischform) {
+				if ($stg_obj->mischform) 
+				{
 					echo "
 			<tr>
 				<td>OrgForm</td>
@@ -219,8 +247,10 @@ if ($type == 'edit') {
 					echo "	<SELECT name='orgform_kurzbz' id='orgform_kurzbz'>";
 					echo "		<OPTION value=''>-- keine Auswahl --</OPTION>";
 					$qry_orgform = "SELECT * FROM bis.tbl_orgform WHERE orgform_kurzbz NOT IN ('VBB', 'ZGS') ORDER BY orgform_kurzbz";
-					if ($result_orgform = $db->db_query($qry_orgform)) {
-						while ($row_orgform = $db->db_fetch_object($result_orgform)) {
+					if ($result_orgform = $db->db_query($qry_orgform)) 
+					{
+						while ($row_orgform = $db->db_fetch_object($result_orgform)) 
+						{
 							if ($row_orgform->orgform_kurzbz == $lvb->orgform_kurzbz)
 								$selected = 'selected';
 							else
@@ -252,56 +282,84 @@ if ($type == 'edit') {
 }
 
 //Anlegen einer neuen Gruppe
-if ($type == 'neu') {
+if ($type == 'neu') 
+{
 	if (!$admin)
 		die('Sie haben keine Berechtigung zum Speichern');
 
-	if (isset($_POST['spzgruppe_neu'])) {
-		//neue Spezialgruppe anlegen
-		$gruppe_kurzbz = $studiengang->kuerzel . '-' . $semester . strtoupper($_POST['spzgruppe_neu']);
+	if (isset($_POST['spzgruppe_neu'])) 
+	{
+		if(preg_match('/^[A-Z0-9a-z\-\_]*$/', $_POST['spzgruppe_neu']))
+		{
+			//neue Spezialgruppe anlegen
+			$gruppe_kurzbz = $studiengang->kuerzel . '-' . $semester . strtoupper($_POST['spzgruppe_neu']);
 
-		$gruppe = new gruppe();
-		if (!$gruppe->exists($gruppe_kurzbz)) {
-			$gruppe->gruppe_kurzbz = $gruppe_kurzbz;
-			$gruppe->studiengang_kz = $studiengang_kz;
-			$gruppe->semester = $semester;
-			$gruppe->bezeichnung = "";
-			$gruppe->beschreibung = "";
-			$gruppe->aktiv = true;
-			$gruppe->sichtbar = true;
-			$gruppe->lehre = true;
-			$gruppe->sort = '';
-			$gruppe->mailgrp = true;
-			$gruppe->generiert = false;
-			$gruppe->insertamum = date('Y-m-d H:i:s');
-			$gruppe->insertvon = $user;
+			$gruppe = new gruppe();
+			if (!$gruppe->exists($gruppe_kurzbz)) 
+			{
+				$gruppe->gruppe_kurzbz = $gruppe_kurzbz;
+				$gruppe->studiengang_kz = $studiengang_kz;
+				$gruppe->semester = $semester;
+				$gruppe->bezeichnung = "";
+				$gruppe->beschreibung = "";
+				$gruppe->aktiv = true;
+				$gruppe->sichtbar = true;
+				$gruppe->lehre = true;
+				$gruppe->sort = '';
+				$gruppe->mailgrp = true;
+				$gruppe->generiert = false;
+				$gruppe->insertamum = date('Y-m-d H:i:s');
+				$gruppe->insertvon = $user;
 
-			if ($gruppe->save(true)) {
-				echo "Gruppe wurde angelegt";
-			} else {
-				echo "<span class='error'>Fehler beim anlegen der Gruppe:$gruppe->errormsg</span>";
+				if ($gruppe->save(true)) 
+				{
+					$returndata = array('status'=>'ok','gruppe_kurzbz'=>$gruppe->gruppe_kurzbz,'message'=>'Gruppe wurde angelegt');
+					echo json_encode($returndata);
+				} 
+				else 
+				{
+					$returndata = array('status'=>'failed','message'=>"<span class='error'>Fehler beim anlegen der Gruppe:$gruppe->errormsg</span>");
+					echo json_encode($returndata);
+				}
+			} 
+			else 
+			{
+				$returndata = array('status'=>'failed','message'=>"<span class='error'>Diese Gruppe Existiert bereits: $gruppe_kurzbz</span>");
+				echo json_encode($returndata);
 			}
-		} else {
-			echo "<span class='error'>Diese Gruppe Existiert bereits: $gruppe_kurzbz</span>";
 		}
-	} else {
+		else
+		{
+			$returndata = array('status'=>'failed','message'=>"<span class='error'>Bitte verwenden Sie für den Gruppennamen keine Sonderzeichen oder Umlaute</span>");
+			echo json_encode($returndata);
+		}
+	
+	} 
+	else 
+	{
 		$lvb = new lehrverband();
 
-		if (isset($_POST['semester_neu'])) {
+		if (isset($_POST['semester_neu'])) 
+		{
 			//Neues Semester anlegen
 			$semester = $_POST['semester_neu'];
 			$verband = ' ';
 			$gruppe = ' ';
-		} elseif (isset($_POST['verband_neu'])) {
+		} 
+		elseif (isset($_POST['verband_neu'])) 
+		{
 			//neuen Verband anlegen
 			$verband = $_POST['verband_neu'];
 			$gruppe = ' ';
-		} elseif (isset($_POST['gruppe_neu'])) {
+		}
+		elseif (isset($_POST['gruppe_neu'])) 
+		{
 			//neue Gruppe anlegen
 			$gruppe = $_POST['gruppe_neu'];
 		}
 
-		if (!$lvb->exists($studiengang_kz, $semester, $verband, $gruppe)) {
+		if (!$lvb->exists($studiengang_kz, $semester, $verband, $gruppe)) 
+		{
 			$lvb->studiengang_kz = $studiengang_kz;
 			$lvb->semester = $semester;
 			$lvb->verband = $verband;
@@ -309,25 +367,37 @@ if ($type == 'neu') {
 			$lvb->aktiv = true;
 			$lvb->bezeichnung = '';
 
-			if ($lvb->save(true)) {
-				echo 'Daten wurden erfolgreich angelegt';
-			} else {
-				echo "<span class='error'>Fehler beim Anlegen der Gruppe: $lvb->errormsg</span>";
+			if ($lvb->save(true)) 
+			{
+				$returndata = array('status'=>'ok','gruppe'=>trim($studiengang_kz.$semester.$verband.$gruppe),'message'=>"Daten wurden erfolgreich angelegt");
+				echo json_encode($returndata);
+			} 
+			else 
+			{
+				$returndata = array('status'=>'failed','gruppe'=>trim($studiengang_kz.$semester.$verband.$gruppe),'message'=>"<span class='error'>Fehler beim Anlegen der Gruppe: $lvb->errormsg</span>");
+				echo json_encode($returndata);
 			}
-		} else {
-			echo "<span class='error'>Diese Gruppe Existiert bereits</span>";
+		} 
+		else 
+		{
+			$returndata = array('status'=>'failed','gruppe'=>trim($studiengang_kz.$semester.$verband.$gruppe),'message'=>"<span class='error'>Diese Gruppe Existiert bereits</span>");
+			echo json_encode($returndata);
 		}
 	}
 }
 
 //Speichern der geaenderten Gruppendaten
-if ($type == 'save') {
+if ($type == 'save') 
+{
 	//Spezialgruppe speichern
-	if ($gruppe_kurzbz != '') {
+	if ($gruppe_kurzbz != '') 
+	{
 		$gruppe = new gruppe();
-		if ($gruppe->load($gruppe_kurzbz)) {
+		if ($gruppe->load($gruppe_kurzbz)) 
+		{
 			$gruppe->bezeichnung = $_POST['bezeichnung'];
-			if ($admin) {
+			if ($admin) 
+			{
 				$gruppe->gruppe_kurbzNeu = (isset($_POST['kurzBzNeu']) ? $_POST['kurzBzNeu'] : $gruppe_kurzbz);
 				$gruppe->beschreibung = $_POST['beschreibung'];
 				$gruppe->sichtbar = isset($_POST['sichtbar']);
@@ -341,9 +411,12 @@ if ($type == 'save') {
 			}
 			$gruppe->updateamum = date('Y-m-d H:i:s');
 			$gruppe->updatevon = $user;
-			if ($gruppe->save(false)) {
+			if ($gruppe->save(false)) 
+			{
 				echo 'Daten wurden erfolgreich geaendert';
-			} else {
+			}
+			else 
+			{
 				echo "Fehler beim Speichern der Daten: $gruppe->errormsg";
 			}
 
@@ -352,25 +425,33 @@ if ($type == 'save') {
 		else
 			echo "Gruppe konnte nicht geladen werden";
 	}
-	else {
+	else 
+	{
 		//Lehrverbandsgruppe speichern
 		$lvb = new lehrverband();
-		if ($lvb->load($studiengang_kz, $semester, $verband, $gruppe)) {
+		if ($lvb->load($studiengang_kz, $semester, $verband, $gruppe)) 
+		{
 			$lvb->bezeichnung = $_POST['bezeichnung'];
 
-			if ($admin) {
+			if ($admin) 
+			{
 
 				$lvb->aktiv = isset($_POST['aktiv']);
 				if (isset($_POST['orgform_kurzbz']))
 					$lvb->orgform_kurzbz = $_POST['orgform_kurzbz'];
 			}
 
-			if ($lvb->save(false)) {
+			if ($lvb->save(false)) 
+			{
 				echo 'Daten wurden erfolgreich geaendert';
-			} else {
+			}
+			else 
+			{
 				echo "Fehler beim Speichern der Daten: $lvb->errormsg";
 			}
-		} else {
+		}
+		else 
+		{
 			echo "Gruppe konnte nicht geladen werden";
 		}
 	}
