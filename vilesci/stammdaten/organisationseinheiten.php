@@ -53,10 +53,10 @@ echo '
 						$(this).css("color","red");
 					},
 					out: function(event, ui) {
-						$(this).css("color","#336699");
+						$(this).css("color","#0086cc");
 					},
 					drop: function(event, ui) {
-						$(this).css("color","#336699");
+						$(this).css("color","#0086cc");
 						var kurzbz = encodeURIComponent(ui.helper[0].id);
 						var parent_kurzbz = encodeURIComponent(this.id);
 						window.location.href="'.$_SERVER['PHP_SELF'].'?action=updateparent&kurzbz="+kurzbz+"&parent_kurzbz="+parent_kurzbz;
@@ -72,9 +72,12 @@ echo '
 			margin: 0px;
 			padding: 2px;
 		}
-		a:hover
-		{
-			color:#336611;
+
+		a.Item:hover 
+		{ 
+			color:#0086cc;
+			text-decoration:underline;
+			cursor:pointer;
 		}
 		</style>
 	</head>
@@ -311,7 +314,7 @@ function getChilds($foo)
 //Zeigt das Array in einer Verschachtelten Tabelle an
 function display($arr)
 {
-	//Wenn eines der Element noch Unterelemente hat, dann das Array sortieren, damit
+	//Wenn eines der Elemente noch Unterelemente hat, dann das Array sortieren, damit
 	//die Eintraege mit den Untereintraegen zuerst kommen
 	$sort = false;
 	foreach ($arr as $row)
@@ -327,8 +330,8 @@ function display($arr)
 	else 
 	{
 		$style='background-color: #b1b1b1;';
-		
 	}
+	
 	echo "\n   ";
 	echo '<table style="'.$style.'" cellspacing=0 cellpadding=5><tr>';
 	$td=false;
@@ -341,7 +344,7 @@ function display($arr)
 		if($obj->aktiv)
 			$aktivstyle='';
 		else 
-			$aktivstyle='background-color: pink;';
+			$aktivstyle='color:grey;';
 		
 		if(is_array($val) && count($val)>0)
 			echo '<td valign="top"><div style="background-color: #b1b1b1; padding: 0px; margin:0px"><br><span style="font-weight: bold;">';
@@ -356,7 +359,7 @@ function display($arr)
 				echo '<br>';
 		}
 		//echo '<span class="ui-widget-content" style=" padding: 0px; margin:0px;'.$aktivstyle.'" >';
-		echo '<a href="'.$_SERVER['PHP_SELF'].'?action=edit&kurzbz='.$obj->oe_kurzbz.'" class="Item ui-widget-content" id="'.$obj->oe_kurzbz.'">';
+		echo '<a href="'.$_SERVER['PHP_SELF'].'?action=edit&kurzbz='.$obj->oe_kurzbz.'" style="'.$aktivstyle.'" class="Item ui-widget-content" id="'.$obj->oe_kurzbz.'">';
 		echo $obj->organisationseinheittyp_kurzbz.' - ';
 		if($obj->organisationseinheittyp_kurzbz=='Institut')
 			echo $obj->oe_kurzbz;

@@ -105,12 +105,12 @@ a.h1:hover
 }
 a
 { 
-	color:#00A4D2;
+	color:#0086cc;
 	text-decoration:none;
 }
 a:hover 
 { 
-	color:#00A4D2;
+	color:#0086cc;
 	text-decoration:underline;
 	cursor:pointer;
 }
@@ -431,7 +431,7 @@ a:active
 	text-decoration: underline;
 }
 
-a,a:link
+a:link
 {
 	color: #0086cc;
 	text-decoration: none;
@@ -443,11 +443,6 @@ a:visited
 	text-decoration: none;
 }
 
-a:hover
-{
-	color: #cc0000;
-	text-decoration: none;
-}
 a.toplink, a.toplink:visited, a.toplink:active
 {
 	color: #747C82;
