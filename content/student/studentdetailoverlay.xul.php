@@ -275,8 +275,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
     					<column flex="1"/>
     					<column flex="5"/>
     					<column flex="1"/>
-    					<column flex="5"/>    					
-  					</columns>
+    					<column flex="5"/>
+                        <column flex="1"/>
+                        <column flex="5"/>
+                    </columns>
   					<rows>
     					<row>
       						<label value="ZGV" control="student-prestudent-menulist-zgvcode"/>
@@ -298,6 +300,20 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       							<box class='Datum' id="student-prestudent-textbox-zgvdatum" disabled="true"/>
       							<!--<textbox id="student-prestudent-textbox-zgvdatum" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/>-->
       						</hbox>
+                            <label value="Land" control="student-prestudent-menulist-zgvnation"/>
+                            <hbox>
+                                <menulist id="student-prestudent-menulist-zgvnation" disabled="true"
+                                          datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php?optional=true" flex="1"
+                                          ref="http://www.technikum-wien.at/nation/liste">
+                                    <template>
+                                        <menupopup>
+                                            <menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
+                                                      label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
+                                                      uri="rdf:*"/>
+                                        </menupopup>
+                                    </template>
+                                </menulist>
+                            </hbox>
     					</row>
     					<row>
       						<label value="ZGV Master" control="student-prestudent-menulist-zgvmastercode"/>
@@ -319,7 +335,21 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       							<box class='Datum' id="student-prestudent-textbox-zgvmasterdatum" disabled="true"/>
       							<!--<textbox id="student-prestudent-textbox-zgvmasterdatum" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/>-->
       						</hbox>
-    					</row>
+                            <label value="Land" control="student-prestudent-menulist-zgvmasternation"/>
+                            <hbox>
+                                <menulist id="student-prestudent-menulist-zgvmasternation" disabled="true"
+                                          datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php?optional=true" flex="1"
+                                          ref="http://www.technikum-wien.at/nation/liste" >
+                                    <template>
+                                        <menupopup>
+                                            <menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
+                                                      label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
+                                                      uri="rdf:*"/>
+                                        </menupopup>
+                                    </template>
+                                </menulist>
+                            </hbox>
+                        </row>
     					<row>
     						<spacer />
     						<spacer />

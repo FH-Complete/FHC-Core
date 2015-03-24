@@ -66,12 +66,14 @@ if(isset($_GET['prestudent_id']) && is_numeric($_GET['prestudent_id']))
 				<PRESTD:zgv_code><![CDATA[<?php echo $prestd->zgv_code;  ?>]]></PRESTD:zgv_code>
 				<PRESTD:zgvort><![CDATA[<?php echo $prestd->zgvort;  ?>]]></PRESTD:zgvort>
 				<PRESTD:zgvdatum_iso><![CDATA[<?php echo $prestd->zgvdatum;  ?>]]></PRESTD:zgvdatum_iso>
-				<PRESTD:zgvdatum><![CDATA[<?php echo $datum->convertISODate($prestd->zgvdatum);  ?>]]></PRESTD:zgvdatum>
-				<PRESTD:zgvmas_code><![CDATA[<?php echo $prestd->zgvmas_code;  ?>]]></PRESTD:zgvmas_code>
+                <PRESTD:zgvdatum><![CDATA[<?php echo $datum->convertISODate($prestd->zgvdatum);  ?>]]></PRESTD:zgvdatum>
+                <PRESTD:zgvnation><![CDATA[<?php echo $prestd->zgvnation;  ?>]]></PRESTD:zgvnation>
+                <PRESTD:zgvmas_code><![CDATA[<?php echo $prestd->zgvmas_code;  ?>]]></PRESTD:zgvmas_code>
 				<PRESTD:zgvmaort><![CDATA[<?php echo $prestd->zgvmaort;  ?>]]></PRESTD:zgvmaort>
 				<PRESTD:zgvmadatum_iso><![CDATA[<?php echo $prestd->zgvmadatum;  ?>]]></PRESTD:zgvmadatum_iso>
-				<PRESTD:zgvmadatum><![CDATA[<?php echo $datum->convertISODate($prestd->zgvmadatum);  ?>]]></PRESTD:zgvmadatum>
-				<PRESTD:aufnahmeschluessel><![CDATA[<?php echo $prestd->aufnahmeschluessel;  ?>]]></PRESTD:aufnahmeschluessel>
+                <PRESTD:zgvmadatum><![CDATA[<?php echo $datum->convertISODate($prestd->zgvmadatum);  ?>]]></PRESTD:zgvmadatum>
+                <PRESTD:zgvmanation><![CDATA[<?php echo $prestd->zgvmanation;  ?>]]></PRESTD:zgvmanation>
+                <PRESTD:aufnahmeschluessel><![CDATA[<?php echo $prestd->aufnahmeschluessel;  ?>]]></PRESTD:aufnahmeschluessel>
 				<PRESTD:facheinschlberuf><![CDATA[<?php echo ($prestd->facheinschlberuf?'true':'false');  ?>]]></PRESTD:facheinschlberuf>
 				<PRESTD:reihungstest_id><![CDATA[<?php echo $prestd->reihungstest_id;  ?>]]></PRESTD:reihungstest_id>
 				<PRESTD:anmeldungreihungstest_iso><![CDATA[<?php echo $prestd->anmeldungreihungstest;  ?>]]></PRESTD:anmeldungreihungstest_iso>

@@ -32,9 +32,11 @@ class prestudent extends person
 	public $zgv_code;
 	public $zgvort;
 	public $zgvdatum;
+	public $zgvnation;
 	public $zgvmas_code;
 	public $zgvmaort;
 	public $zgvmadatum;
+	public $zgvmanation;
 	public $ausstellungsstaat;
 	public $aufnahmeschluessel;
 	public $facheinschlberuf;
@@ -44,17 +46,18 @@ class prestudent extends person
 	public $punkte; //rt_gesamtpunkte
 	public $rt_punkte1;
 	public $rt_punkte2;
-	public $rt_punkte3=0;
-	public $bismelden=true;
+    public $rt_punkte3 = 0;
+    public $bismelden = true;
 	public $anmerkung;
 	public $anmerkung_status;
 	public $mentor;
 	public $ext_id_prestudent;
-	public $dual=false;
+    public $dual = false;
     public $zgvdoktor_code; 
     public $zgvdoktorort; 
     public $zgvdoktordatum; 
-    
+    public $zgvdoktornation;
+
 	public $status_kurzbz;
 	public $studiensemester_kurzbz;
 	public $ausbildungssemester;
@@ -68,13 +71,13 @@ class prestudent extends person
 	public $studienplan_bezeichnung;
 	public $bestaetigtam;
 	public $bestaetigtvon;
-	
-	public $studiensemester_old='';
-	public $ausbildungssemester_old='';
-	
-	// ErgebnisArray
-	public $result=array();
-	public $num_rows=0;
+
+    public $studiensemester_old = '';
+    public $ausbildungssemester_old = '';
+
+    // ErgebnisArray
+    public $result = array();
+    public $num_rows = 0;
 		
 	/**
 	 * Konstruktor - Uebergibt die Connection und laedt optional einen Prestudent
@@ -116,10 +119,12 @@ class prestudent extends person
 				$this->zgv_code = $row->zgv_code;
 				$this->zgvort = $row->zgvort;
 				$this->zgvdatum = $row->zgvdatum;
+				$this->zgvnation = $row->zgvnation;
 				$this->zgvmas_code = $row->zgvmas_code;
 				$this->zgvmaort = $row->zgvmaort;
-				$this->zgvmadatum = $row->zgvmadatum;
-				$this->aufnahmeschluessel = $row->aufnahmeschluessel;
+                $this->zgvmadatum = $row->zgvmadatum;
+                $this->zgvmanation = $row->zgvmanation;
+                $this->aufnahmeschluessel = $row->aufnahmeschluessel;
 				$this->facheinschlberuf = $this->db_parse_bool($row->facheinschlberuf);
 				$this->anmeldungreihungstest = $row->anmeldungreihungstest;
 				$this->reihungstestangetreten = $this->db_parse_bool($row->reihungstestangetreten);
@@ -136,10 +141,11 @@ class prestudent extends person
 				$this->dual = $this->db_parse_bool($row->dual);
 				$this->ausstellungsstaat = $row->ausstellungsstaat;
                 $this->zgvdoktor_code = $row->zgvdoktor_code; 
-                $this->zgvdoktorort = $row->zgvdoktorort; 
-                $this->zgvdoktordatum = $row->zgvdoktordatum; 
-				
-				if(!person::load($row->person_id))
+                $this->zgvdoktorort = $row->zgvdoktorort;
+                $this->zgvdoktordatum = $row->zgvdoktordatum;
+                $this->zgvdoktornation = $row->zgvdoktornation;
+
+                if(!person::load($row->person_id))
 					return false;
 				else 
 					return true;
@@ -207,8 +213,8 @@ class prestudent extends person
 		if($this->new) //Wenn new true ist dann ein INSERT absetzen ansonsten ein UPDATE
 		{
 			$qry = 'BEGIN;INSERT INTO public.tbl_prestudent (aufmerksamdurch_kurzbz, person_id, 
-					studiengang_kz, berufstaetigkeit_code, ausbildungcode, zgv_code, zgvort, zgvdatum, 
-					zgvmas_code, zgvmaort, zgvmadatum, aufnahmeschluessel, facheinschlberuf, 
+					studiengang_kz, berufstaetigkeit_code, ausbildungcode, zgv_code, zgvort, zgvdatum, zgvnation,
+					zgvmas_code, zgvmaort, zgvmadatum, zgvmanation, aufnahmeschluessel, facheinschlberuf,
 					reihungstest_id, anmeldungreihungstest, reihungstestangetreten, rt_gesamtpunkte, 
 					rt_punkte1, rt_punkte2, rt_punkte3, bismelden, insertamum, insertvon, 
 					updateamum, updatevon, ext_id, anmerkung, dual, ausstellungsstaat, mentor) VALUES('.
@@ -220,9 +226,11 @@ class prestudent extends person
 			       $this->db_add_param($this->zgv_code).",".
 			       $this->db_add_param($this->zgvort).",".
 			       $this->db_add_param($this->zgvdatum).",".
+			       $this->db_add_param($this->zgvnation).",".
 			       $this->db_add_param($this->zgvmas_code).",".
 			       $this->db_add_param($this->zgvmaort).",".
 			       $this->db_add_param($this->zgvmadatum).",".
+                   $this->db_add_param($this->zgvmanation).",".
 			       $this->db_add_param($this->aufnahmeschluessel).",".
 			       $this->db_add_param($this->facheinschlberuf, FHC_BOOLEAN).",".
 			       $this->db_add_param($this->reihungstest_id).",".
@@ -254,9 +262,11 @@ class prestudent extends person
 			       ' zgv_code='.$this->db_add_param($this->zgv_code).",".
 			       ' zgvort='.$this->db_add_param($this->zgvort).",".
 			       ' zgvdatum='.$this->db_add_param($this->zgvdatum).",".
+			       ' zgvnation='.$this->db_add_param($this->zgvnation).",".
 			       ' zgvmas_code='.$this->db_add_param($this->zgvmas_code).",".
 			       ' zgvmaort='.$this->db_add_param($this->zgvmaort).",".
 			       ' zgvmadatum='.$this->db_add_param($this->zgvmadatum).",".
+			       ' zgvmanation='.$this->db_add_param($this->zgvmanation).",".
 			       ' aufnahmeschluessel='.$this->db_add_param($this->aufnahmeschluessel).",".
 			       ' facheinschlberuf='.$this->db_add_param($this->facheinschlberuf, FHC_BOOLEAN).",".
 			       ' reihungstest_id='.$this->db_add_param($this->reihungstest_id).",".
@@ -372,9 +382,11 @@ class prestudent extends person
 			$ps->zgv_code = $row->zgv_code;
 			$ps->zgvort = $row->zgvort;
 			$ps->zgvdatum = $row->zgvdatum;
+			$ps->zgvnation = $row->zgvnation;
 			$ps->zgvmas_code = $row->zgvmas_code;
 			$ps->zgvmaort = $row->zgvmaort;
 			$ps->zgvmadatum = $row->zgvmadatum;
+			$ps->zgvmanation = $row->zgvmanation;
 			$ps->aufnahmeschluessel = $row->aufnahmeschluessel;
 			$ps->facheinschlberuf = $this->db_parse_bool($row->facheinschlberuf);
 			$ps->anmeldungreihungstest = $row->anmeldungreihungstest;
@@ -631,9 +643,11 @@ class prestudent extends person
 				$ps->zgv_code = $row->zgv_code;
 				$ps->zgvort = $row->zgvort;
 				$ps->zgvdatum = $row->zgvdatum;
+				$ps->zgvnation = $row->zgvnation;
 				$ps->zgvmas_code = $row->zgvmas_code;
 				$ps->zgvmaort = $row->zgvmaort;
 				$ps->zgvmadatum = $row->zgvmadatum;
+				$ps->zgvmanation = $row->zgvmanation;
 				$ps->ausstellungsstaat = $row->ausstellungsstaat;
 				$ps->aufnahmeschluessel = $row->aufnahmeschluessel;
 				$ps->facheinschlberuf = $this->db_parse_bool($row->facheinschlberuf);
@@ -1046,9 +1060,11 @@ class prestudent extends person
 				$obj->zgv_code = $row->zgv_code;
 				$obj->zgvort = $row->zgvort;
 				$obj->zgvdatum = $row->zgvdatum;
+				$obj->zgvnation = $row->zgvnation;
 				$obj->zgvmas_code = $row->zgvmas_code;
 				$obj->zgvmaort = $row->zgvmaort;
 				$obj->zgvmadatum = $row->zgvmadatum;
+				$obj->zgvmanation = $row->zgvmanation;
 				$obj->aufnahmeschluessel = $row->aufnahmeschluessel;
 				$obj->facheinschlberuf = $this->db_parse_bool($row->facheinschlberuf);
 				$obj->anmeldungreihungstest = $row->anmeldungreihungstest;
@@ -1095,17 +1111,21 @@ class prestudent extends person
             'art',
             'ort',
             'datum',
+            'nation',
         );
         $db_attribute = array(
             'zgv_code',
             'zgvort',
             'zgvdatum',
+            'zgvnation',
             'zgvmas_code',
             'zgvmaort',
             'zgvmadatum',
+            'zgvmanation',
             'zgvdoktor_code',
             'zgvdoktorort',
             'zgvdoktordatum',
+            'zgvdoktornation',
         );
 
         foreach($this->result as $prestudent) {

@@ -2620,6 +2620,19 @@ if(!$result = @$db->db_query("SELECT pflicht FROM public.tbl_dokumentstudiengang
 		echo 'public.tbl_dokumentstudiengang: Spalte "pflicht" hinzugefuegt!<br>';
 }
 
+// Spalten zgvnation, zgvmanation, zgvdoktornation in public.tbl_prestudent
+if(!$result = @$db->db_query("SELECT pflicht FROM public.tbl_prestudent LIMIT 1"))
+{
+	$qry = "ALTER TABLE public.tbl_prestudent ADD COLUMN zgvnation character varying(3);
+            ALTER TABLE public.tbl_prestudent ADD COLUMN zgvmanation character varying(3) ;
+            ALTER TABLE public.tbl_prestudent ADD COLUMN zgvdoktornation character varying(3);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_prestudent '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'public.tbl_prestudent: Spalten "zgvnation", "zgvmanation", "zgvdoktornation" hinzugefuegt!<br>';
+}
+
 // Anrechnungen
 if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_anrechnung LIMIT 1;"))
 {
