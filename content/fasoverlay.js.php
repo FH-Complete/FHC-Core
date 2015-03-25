@@ -1545,7 +1545,7 @@ function EinstellungenKontoFilterStgChange()
 // ****
 // * Druckt das AccountInfoBlatt
 // ****
-function PrintAccountInfoBlatt()
+function PrintAccountInfoBlatt(event)
 {
 
 	if(document.getElementById('main-content-tabs').selectedItem==document.getElementById('tab-studenten'))
@@ -1603,11 +1603,28 @@ function PrintAccountInfoBlatt()
 		}
 	}
 
+	var output = 'pdf';
+	if(typeof(event)!=='undefined')
+	{
+		if (event.shiftKey) 
+		{
+		    var output = 'odt';
+		} 
+		else if (event.ctrlKey)
+		{
+			var output = 'doc';
+		}
+		else
+		{
+			var output = 'pdf';
+		}
+	}
+
 	if(data!='')
 	{
 		if(error>0)
 			alert(error+' der ausgewaehlten Personen haben keinen Account');
-		action = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl=AccountInfo&xml=accountinfoblatt.xml.php&uid='+data;
+		action = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl=AccountInfo&xml=accountinfoblatt.xml.php&output='+output+'&uid='+data;
 		window.open(action,'AccountInfoBlatt','height=520,width=500,left=350,top=350,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 	}
 	else
