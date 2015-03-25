@@ -205,7 +205,9 @@ class prestudent extends person
 		//Personen Datensatz speichern
 		//if(!person::save())
 		//	return false;
-			
+
+        $this->checkAusstellungsstaat();
+
 		//Variablen auf Gueltigkeit pruefen
 		if(!prestudent::validate())
 			return false;
@@ -323,6 +325,25 @@ class prestudent extends person
 			return false;
 		}
 	}
+
+    /**
+     * Falls ZGV vorhanden, setze Ausstellungsstaat (für BIS-Meldung)
+     * auf Nation der höchsten angegebenen ZGV
+     */
+    private function checkAusstellungsstaat()
+    {
+
+        if ($this->zgvmas_code && $this->zgvmanation) {
+
+            $this->ausstellungsstaat = $this->zgvmanation;
+
+        } elseif ($this->zgv_code && $this->zgvnation) {
+
+            $this->ausstellungsstaat = $this->zgvnation;
+
+        }
+
+    }
 
 	/**
 	 * Laden aller Prestudenten, die an $datum zum Reihungstest geladen sind.

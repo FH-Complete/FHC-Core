@@ -350,22 +350,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
                                 </menulist>
                             </hbox>
                         </row>
-    					<row>
-    						<spacer />
-    						<spacer />
-			    			<label value="Ausstellungsstaat" control="student-prestudent-menulist-ausstellungsstaat"/>
-			    			<menulist id="student-prestudent-menulist-ausstellungsstaat" disabled="true"
-							          datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php?optional=true" flex="1"
-						              ref="http://www.technikum-wien.at/nation/liste" >
-								<template>
-									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
-							        		      label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
-										  		  uri="rdf:*"/>
-										</menupopup>
-								</template>
-							</menulist>		
-    					</row>
     				</rows>
     			</grid>
     			

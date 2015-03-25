@@ -26,7 +26,8 @@
  */
 require_once('../config/vilesci.config.inc.php');
 require_once('../include/functions.inc.php');
-?>
+
+if(false): ?><script><?php endif; ?>
 
 // ****
 // * Liefert den Value aus einer XML-Datasource
@@ -202,7 +203,7 @@ function getStudiensemester()
 function MenulistSelectItemOnValue(id, data)
 {
 	var children = document.getElementById(id).getElementsByAttribute('value',data);
-	document.getElementById(id).selectedItem=children[0];	
+	document.getElementById(id).selectedItem=children[0];
 }
 
 // ****
