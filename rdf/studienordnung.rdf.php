@@ -275,6 +275,7 @@ function printLehrveranstaltungTree($tree)
 		echo '              <lv_semester><![CDATA['.$lv->semester.']]></lv_semester>';
 		echo '              <lv_lehrtyp_kurzbz><![CDATA['.$lv->lehrtyp_kurzbz.']]></lv_lehrtyp_kurzbz>';
 		echo '              <lv_bezeichnung><![CDATA['.$lv->bezeichnung.']]></lv_bezeichnung>';
+		echo '              <lv_bezeichnung_en><![CDATA['.$lv->bezeichnung_english.']]></lv_bezeichnung_en>';
 		echo '              <lv_kurzbz><![CDATA['.$lv->kurzbz.']]></lv_kurzbz>';
 		echo '              <lv_lehrform_kurzbz><![CDATA['.$lv->lehrform_kurzbz.']]></lv_lehrform_kurzbz>';
 		echo '              <lv_lehrform_langbz><![CDATA['.$lehrform_kurzbz->bezeichnung.']]></lv_lehrform_langbz>';
@@ -290,7 +291,7 @@ function printLehrveranstaltungTree($tree)
 		if ($objLVInfo->exists($lv->lehrveranstaltung_id,'German'))
 		{
 			if(!$objLVInfo->load($lv->lehrveranstaltung_id,'German'))
-				die('Fehler beim laden der Lehrveranstaltungen');
+				die('Fehler beim laden der deutschen LV-Informationen');
 			//var_dump($objLVInfo);
 			echo '              <lvinfo_sprache><![CDATA['.clearHtmlTags($objLVInfo->sprache).']]></lvinfo_sprache>';
 			echo '              <lvinfo_titel><![CDATA['.clearHtmlTags($objLVInfo->titel).']]></lvinfo_titel>';
@@ -302,6 +303,24 @@ function printLehrveranstaltungTree($tree)
 			echo '              <lvinfo_pruefungsordnung><![CDATA['.clearHtmlTags($objLVInfo->pruefungsordnung).']]></lvinfo_pruefungsordnung>';
 			echo '              <lvinfo_kurzbeschreibung><![CDATA['.clearHtmlTags($objLVInfo->kurzbeschreibung).']]></lvinfo_kurzbeschreibung>';
 			echo '              <lvinfo_anmerkungen><![CDATA['.clearHtmlTags($objLVInfo->anmerkungen).']]></lvinfo_anmerkungen>';
+			echo '              <lvinfo_anwesenheit><![CDATA['.clearHtmlTags($objLVInfo->anmerkungen).']]></lvinfo_anwesenheit>';
+		}
+		if ($objLVInfo->exists($lv->lehrveranstaltung_id,'English'))
+		{
+			if(!$objLVInfo->load($lv->lehrveranstaltung_id,'English'))
+				die('Fehler beim laden der englischen LV-Informationen');
+			//var_dump($objLVInfo);
+			echo '              <lvinfo_sprache><![CDATA['.clearHtmlTags($objLVInfo->sprache).']]></lvinfo_sprache>';
+			echo '              <lvinfo_titel_en><![CDATA['.clearHtmlTags($objLVInfo->titel).']]></lvinfo_titel_en>';
+			echo '              <lvinfo_lehrziele_en><![CDATA['.clearHtmlTags($objLVInfo->lehrziele).']]></lvinfo_lehrziele_en>';
+			echo '              <lvinfo_methodik_en><![CDATA['.clearHtmlTags($objLVInfo->methodik).']]></lvinfo_methodik_en>';
+			echo '              <lvinfo_lehrinhalte_en><![CDATA['.clearHtmlTags($objLVInfo->lehrinhalte).']]></lvinfo_lehrinhalte_en>';
+			echo '              <lvinfo_voraussetzungen_en><![CDATA['.clearHtmlTags($objLVInfo->voraussetzungen).']]></lvinfo_voraussetzungen_en>';
+			echo '              <lvinfo_unterlagen_en><![CDATA['.clearHtmlTags($objLVInfo->unterlagen).']]></lvinfo_unterlagen_en>';
+			echo '              <lvinfo_pruefungsordnung_en><![CDATA['.clearHtmlTags($objLVInfo->pruefungsordnung).']]></lvinfo_pruefungsordnung_en>';
+			echo '              <lvinfo_kurzbeschreibung_en><![CDATA['.clearHtmlTags($objLVInfo->kurzbeschreibung).']]></lvinfo_kurzbeschreibung_en>';
+			echo '              <lvinfo_anmerkungen_en><![CDATA['.clearHtmlTags($objLVInfo->anmerkungen).']]></lvinfo_anmerkungen_en>';
+			echo '              <lvinfo_anwesenheit_en><![CDATA['.clearHtmlTags($objLVInfo->anmerkungen).']]></lvinfo_anwesenheit_en>';
 		}
 		if ($lv->lehrtyp_kurzbz!='modul')
 		{
