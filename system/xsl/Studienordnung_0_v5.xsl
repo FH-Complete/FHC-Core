@@ -531,6 +531,11 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<style:background-image/>
 			</style:table-cell-properties>
 		</style:style>
+		<style:style style:name="Tabelle7.D2" style:family="table-cell">
+			<style:table-cell-properties fo:background-color="#8fd2ff" fo:padding-left="0cm" fo:padding-right="0cm" fo:padding-top="0.101cm" fo:padding-bottom="0.101cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="none" fo:border-bottom="0.05pt solid #000000">
+				<style:background-image/>
+			</style:table-cell-properties>
+		</style:style>
 		<style:style style:name="Tabelle7.i2" style:family="table-cell">
 			<style:table-cell-properties fo:background-color="#8fd2ff" fo:padding-left="0cm" fo:padding-right="0cm" fo:padding-top="0.101cm" fo:padding-bottom="0.101cm" fo:border-left="0.05pt solid #000000" fo:border-right="0.05pt solid #000000" fo:border-top="none" fo:border-bottom="0.05pt solid #000000">
 				<style:background-image/>
@@ -2045,6 +2050,13 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				</style:tab-stops>
 			</style:paragraph-properties>
 		</style:style>
+		<style:style style:name="Seitenumbruch" style:family="paragraph" style:parent-style-name="Standard">
+            <style:paragraph-properties fo:break-before="page"/>
+        </style:style>
+        <style:style style:name="Numbering_20_3" style:display-name="Numbering 3" style:family="paragraph" style:parent-style-name="List" style:default-outline-level="3" style:list-style-name="Numbering_20_2" style:class="list">
+			<style:paragraph-properties fo:margin-left="0cm" fo:margin-right="0cm" fo:text-indent="0cm" style:auto-text-indent="false"/>
+			<style:text-properties fo:color="#0086cb" fo:font-size="16pt"/>
+		</style:style>
 		<style:style style:name="T1" style:family="text">
 			<style:text-properties fo:background-color="#ffff00" loext:char-shading-value="0"/>
 		</style:style>
@@ -3201,10 +3213,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				</text:table-of-content-entry-template>
 			</text:table-of-content-source>
 			<text:index-body>
-				<text:p text:style-name="P51">
+				<!-- <text:p text:style-name="P51">
 					<text:a xlink:type="simple" xlink:href="#__RefHeading__3656_462112980" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">
 						<text:tab/>Inhaltsverzeichnis<text:tab/>2</text:a>
-				</text:p>
+				</text:p>-->
 				<text:p text:style-name="P51">
 					<text:a xlink:type="simple" xlink:href="#__RefHeading__3658_462112980" text:style-name="Index_20_Link" text:visited-style-name="Index_20_Link">1.<text:tab/>Studienplan Organisationsform Berufsbegleitend<text:tab/>3</text:a>
 				</text:p>
@@ -3694,46 +3706,46 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 					<table:table-cell table:style-name="Tabelle7.B1" office:value-type="string">
 						<text:p text:style-name="P45"/>
 					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
+					<table:table-cell table:style-name="Tabelle7.D2" office:value-type="string">
 						<text:p text:style-name="P44">M41</text:p>
 					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
+					<table:table-cell table:style-name="Tabelle7.D2" office:value-type="string">
 						<text:p text:style-name="P44">M42</text:p>
 					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
+					<table:table-cell table:style-name="Tabelle7.D2" office:value-type="string">
 						<text:p text:style-name="P44">M43</text:p>
 					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
+					<table:table-cell table:style-name="Tabelle7.D2" office:value-type="string">
 						<text:p text:style-name="P44">M44</text:p>
 					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
+					<table:table-cell table:style-name="Tabelle7.D2" office:value-type="string">
 						<text:p text:style-name="P44">M45</text:p>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle7.B1" office:value-type="string">
 						<text:p text:style-name="P45"/>
 					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
+					<table:table-cell table:style-name="Tabelle7.D2" office:value-type="string">
 						<text:p text:style-name="P44">M51</text:p>
 					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
+					<table:table-cell table:style-name="Tabelle7.D2" office:value-type="string">
 						<text:p text:style-name="P44">M52</text:p>
 					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
+					<table:table-cell table:style-name="Tabelle7.D2" office:value-type="string">
 						<text:p text:style-name="P44">M53</text:p>
 					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
+					<table:table-cell table:style-name="Tabelle7.D2" office:value-type="string">
 						<text:p text:style-name="P44">M54</text:p>
 					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
+					<table:table-cell table:style-name="Tabelle7.D2" office:value-type="string">
 						<text:p text:style-name="P44">M55</text:p>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle7.B1" office:value-type="string">
 						<text:p text:style-name="P45"/>
 					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
+					<table:table-cell table:style-name="Tabelle7.D2" office:value-type="string">
 						<text:p text:style-name="P44">M61</text:p>
 					</table:table-cell>
-					<table:table-cell table:style-name="Tabelle7.C2" office:value-type="string">
+					<table:table-cell table:style-name="Tabelle7.D2" office:value-type="string">
 						<text:p text:style-name="P44">M62</text:p>
 					</table:table-cell>
 					<table:table-cell table:style-name="Tabelle7.i2" office:value-type="string">
@@ -5078,11 +5090,13 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</table:table-cell>
 		</table:table-row>
 	</table:table>
+	<text:p text:style-name="Seitenumbruch" />
 </xsl:template>
 
 <xsl:template match="lehrveranstaltung" mode="matrix">
 <xsl:choose>
 	<xsl:when test="lv_lehrtyp_kurzbz='modul'">
+		
 		<table:table-row>
 			<table:table-cell table:style-name="Tabelle1.A3" office:value-type="string">
 				<text:p text:style-name="P16"><xsl:value-of select="lv_bezeichnung"/></text:p>
@@ -5123,16 +5137,19 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 </xsl:template>
 
 <xsl:template match="semester" mode="modulbeschreibung">
-	<table:table table:name="Tabelle6" table:style-name="Tabelle6">
-		<table:table-column table:style-name="Tabelle6.A"/>
-		<table:table-column table:style-name="Tabelle6.B"/>
-			<xsl:apply-templates match="lehrveranstaltung" mode="modulbeschreibung" />
-	</table:table>
+<text:h text:style-name="Numbering_20_3" text:outline-level="2">
+	<text:bookmark-start text:name="__RefHeading__3660_462112980"/><xsl:value-of select="semester_nr"/>. Semester<text:bookmark-end text:name="__RefHeading__3660_462112980"/>
+</text:h>
+	<xsl:apply-templates match="lehrveranstaltung" mode="modulbeschreibung" />
 </xsl:template>
 
+  
 <xsl:template match="lehrveranstaltung" mode="modulbeschreibung">
-<xsl:choose>
-	<xsl:when test="lv_lehrtyp_kurzbz='modul'">
+<table:table table:name="Tabelle6" table:style-name="Tabelle6">
+	<table:table-column table:style-name="Tabelle6.A"/>
+	<table:table-column table:style-name="Tabelle6.B"/>
+	<xsl:choose>
+	<xsl:when test="lv_lehrtyp_kurzbz='modul'">		
 		<table:table-row>
 			<table:table-cell table:style-name="Tabelle6.A1" office:value-type="string">
 				<text:p text:style-name="P40">Modul-Bezeichnung</text:p>
@@ -5377,9 +5394,9 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P29">Assessment Methods</text:p>
 			</table:table-cell>
 			<table:table-cell table:style-name="Tabelle6.B15" office:value-type="string">
-				<text:p text:style-name="P67">LV-Immanente Leistungsbeurteilung oder</text:p>
-				<text:p text:style-name="P67">LV-Immanente Leistungsbeurteilung und/ oder Abschlussprüfung oder</text:p>
-				<text:p text:style-name="P67">Abschlussprüfung</text:p>
+				<text:p text:style-name="P67">Course immanent assessment method or</text:p>
+				<text:p text:style-name="P67">Course immanent assessment method and/ or end exam or</text:p>
+				<text:p text:style-name="P67">End exam</text:p>
 				<text:p/>
 				<text:p text:style-name="P30"><xsl:value-of select="lvinfo_pruefungsordnung_en"/></text:p>
 			</table:table-cell>
@@ -5417,12 +5434,16 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</table:table-cell>
 		</table:table-row>
 	</xsl:otherwise>
-</xsl:choose>
-	<xsl:apply-templates match="lehrveranstaltungen" mode="modulbeschreibung" />		
+	</xsl:choose>
+</table:table>
+
+	<xsl:apply-templates match="lehrveranstaltungen" mode="modulbeschreibung" />
+	
 </xsl:template>
 
 <xsl:template match="lehrveranstaltungen" mode="modulbeschreibung">
 	<xsl:apply-templates match="lehrveranstaltung" mode="modulbeschreibung" />
+	<text:p text:style-name="Seitenumbruch"/>
 </xsl:template>
 
 </xsl:stylesheet>

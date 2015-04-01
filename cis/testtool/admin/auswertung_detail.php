@@ -143,7 +143,7 @@ if(isset($_GET['show']))
 							<th>Nummer</th>
 							<th>Level</th>
 							<th>Frage</th>
-							<th title="Anzahl der Personen die diese Frage gestellt bekommen haben">Gesamt (m/w)</th>
+							<th colspan="3" title="Anzahl der Personen die diese Frage gestellt bekommen haben">Gesamt (m/w)</th>
 							<th colspan="30">Nummer | Punkte | Gesamt | Männlich | Weiblich</th>
 						</tr>';
 			}
@@ -255,7 +255,7 @@ if(isset($_GET['show']))
 					$gesamt_w = $row_vorschlag->anzahl_gesamt_w;
 				}
 			}
-			echo $hlp."<td><b>$gesamt ($gesamt_m/$gesamt_w)</b></td>".$hlp2;
+			echo $hlp."<td><b>$gesamt</b></td><td><b>$gesamt_m</b></td><td><b>$gesamt_w</b></td>".$hlp2;
 			echo '</tr>';
 		}
 		echo '</table>';
