@@ -542,7 +542,12 @@ function LeDelete()
 // ****
 function LeDetailReset()
 {
-	document.getElementById('lehrveranstaltung-detail-textbox-lvnr').value='';
+	//Sprache der LVA holen
+    var tree = document.getElementById('lehrveranstaltung-tree');
+    var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-sprache"] : "lehrveranstaltung-treecol-sprache";
+    var sprache = tree.view.getCellText(tree.currentIndex,col);
+
+    document.getElementById('lehrveranstaltung-detail-textbox-lvnr').value='';
 	document.getElementById('lehrveranstaltung-detail-textbox-unr').value='';
 	document.getElementById('lehrveranstaltung-detail-textbox-lehrveranstaltung').value='';
 	document.getElementById('lehrveranstaltung-detail-checkbox-lehre').checked=true;
@@ -550,7 +555,7 @@ function LeDetailReset()
 	document.getElementById('lehrveranstaltung-detail-textbox-wochenrythmus').value='';
 	document.getElementById('lehrveranstaltung-detail-textbox-startkw').value='';
 	document.getElementById('lehrveranstaltung-detail-textbox-anmerkung').value='';
-	document.getElementById('lehrveranstaltung-detail-menulist-sprache').value='<?php echo DEFAULT_LEHREINHEIT_SPRACHE; ?>';
+	document.getElementById('lehrveranstaltung-detail-menulist-sprache').value=sprache;
 	document.getElementById('lehrveranstaltung-detail-menulist-raumtyp').value='<?php echo DEFAULT_LEHREINHEIT_RAUMTYP; ?>';
 	document.getElementById('lehrveranstaltung-detail-menulist-raumtypalternativ').value='<?php echo DEFAULT_LEHREINHEIT_RAUMTYP_ALTERNATIV; ?>';
 	document.getElementById('lehrveranstaltung-detail-menulist-studiensemester').value=getStudiensemester();
