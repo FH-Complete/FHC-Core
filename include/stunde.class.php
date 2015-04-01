@@ -34,9 +34,13 @@ class stunde extends basis_db
 	/**
 	 * Konstruktor
 	 */
-	public function __construct()
+	public function __construct($load=false)
 	{
 		parent::__construct();
+		if (is_numeric($load))
+			$this->load($load);
+		elseif($load)
+			$this->loadAll();
 	}
 
 
@@ -150,6 +154,54 @@ class stunde extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Laedt alle Stunden
+	 */
+	public function loadAll()
+	{
+		$qry = 'SELECT * FROM lehre.tbl_stunde ORDER BY stunde;';
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$stunde = new stunde();
+				$beginn = date_create('2001-01-01');
+				$ende = date_create('2001-01-01');
+				date_time_set($beginn,substr($row->beginn,0,2), substr($row->beginn,3,2));
+				date_time_set($ende,substr($row->ende,0,2), substr($row->ende,3,2));
+				$stunde->beginn = $beginn;
+				$stunde->ende = $ende;
+				$stunde->stunde = $row->stunde;
+				$this->stunden[] = $stunde;
+			}
+		}
+		else
+		{
+			$this->errormsg ='Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 	
+	/**
+	 * 
+	 * Liefert die Stunde einer uebergebenen Uhrzeiten
+	 * @param $uhrzeit
+	 * @return integer $stunde->stunde
+	 */
+	public function getStundeByTime($uhrzeit)
+	{
+		$time = date_create('2001-01-01');
+		if (!date_time_set($time,substr($uhrzeit,0,2), substr($uhrzeit,3,2)))
+			return false;
+		foreach($this->stunden as $stunde)
+		{
+			if($time >= $stunde->beginn && $time < $stunde->ende)
+			{
+				return $stunde->stunde;
+			}
+		} 
+		return false;
+	}
 }
 ?>
