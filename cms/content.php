@@ -36,7 +36,7 @@ else
 
 $version = (isset($_GET['version'])?$_GET['version']:null);
 $sprache = (isset($_GET['sprache'])?$_GET['sprache']:getSprache());
-$sichtbar = (isset($_GET['sichtbar'])?($_GET['sichtbar']=='true'?true:($_GET['sichtbar']=='false'?false:null)):null);
+$sichtbar = (isset($_GET['sichtbar'])?($_GET['sichtbar']=='true'?true:($_GET['sichtbar']=='false'?false:null)):true);
 
 $p = new phrasen($sprache);
 //XML Content laden
