@@ -86,8 +86,8 @@ function checkZeilenUmbruch()
 	$dir_name=$DOC_ROOT.'/documents';
 	if(!is_dir($dir_name))
 	{
-		exec('mkdir -m 755 "'.$dir_name.'"');
-		exec('sudo chown www-data:teacher "'.$dir_name.'"');
+		exec('mkdir -m 755 '.escapeshellarg($dir_name));
+		exec('sudo chown www-data:teacher '.escapeshellarg($dir_name));
 	}
 	$angemeldet = true;
 	if(defined('CIS_LEHRVERANSTALTUNG_WENNANGEMELDET_DETAILS_ANZEIGEN') && CIS_LEHRVERANSTALTUNG_WENNANGEMELDET_DETAILS_ANZEIGEN && !$is_lector)
@@ -123,23 +123,23 @@ function checkZeilenUmbruch()
 		{
 			if(!@is_dir(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz)))
 			{
-				exec('mkdir -m 755 "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'"');
-				exec('sudo chown www-data:teacher "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'"');
+				exec('mkdir -m 755 '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz)));
+				exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz)));
 			}
 			if(!@is_dir(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester))
 			{
-				exec('mkdir -m 755 "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'"');
-				exec('sudo chown www-data:teacher "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'"');
+				exec('mkdir -m 755 '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester));
+				exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester));
 			}
 			if(!@is_dir(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name)))
 			{
-				exec('mkdir -m 755 "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'"');
-				exec('sudo chown www-data:teacher "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'"');
+				exec('mkdir -m 755 '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name)));
+				exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name)));
 			}
 			if(!@is_dir(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/semesterplan'))
 			{
-				exec('mkdir -m 775 "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/semesterplan"');
-				exec('sudo chown www-data:teacher "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/semesterplan"');
+				exec('mkdir -m 775 '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/semesterplan'));
+				exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/semesterplan'));
 			}
 		}
 
@@ -206,23 +206,23 @@ function checkZeilenUmbruch()
 		{
 			if(!@is_dir(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz)))
 			{
-				exec('mkdir -m 755 "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'"');
-				exec('sudo chown www-data:teacher "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'"');
+				exec('mkdir -m 755 '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz)));
+				exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz)));
 			}
 			if(!@is_dir(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester))
 			{
-				exec('mkdir -m 755 "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'"');
-				exec('sudo chown www-data:teacher "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'"');
+				exec('mkdir -m 755 '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester));
+				exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester));
 			}
 			if(!@is_dir(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name)))
 			{
-				exec('mkdir -m 755 "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'"');
-				exec('sudo chown www-data:teacher "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'"');
+				exec('mkdir -m 755 '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name)));
+				exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name)));
 			}
 			if(!@is_dir(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/download'))
 			{
-				exec('mkdir -m 775 "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/download"');
-				exec('sudo chown www-data:teacher "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/download"');
+				exec('mkdir -m 775 '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/download'));
+				exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/download'));
 			}
 		}
 
@@ -294,23 +294,23 @@ function checkZeilenUmbruch()
 	{
 		if(!@is_dir(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz)))
 		{
-			exec('mkdir -m 755 "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'"');
-			exec('sudo chown www-data:teacher "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'"');
+			exec('mkdir -m 755 '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz)));
+			exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz)));
 		}
 		if(!@is_dir(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester))
 		{
-			exec('mkdir -m 755 "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'"');
-			exec('sudo chown www-data:teacher "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'"');
+			exec('mkdir -m 755 '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester));
+			exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester));
 		}
 		if(!@is_dir(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name)))
 		{
-			exec('mkdir -m 755 "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'"');
-			exec('sudo chown www-data:teacher "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'"');
+			exec('mkdir -m 755 '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name)));
+			exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name)));
 		}
 		if(!@is_dir(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/leistung'))
 		{
-			exec('mkdir -m 775 "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/leistung"');
-			exec('sudo chown www-data:teacher "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/leistung"');
+			exec('mkdir -m 775 '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/leistung'));
+			exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/leistung'));
 		}
 	}
 
@@ -453,7 +453,7 @@ function checkZeilenUmbruch()
 	//Moodle
 	$showmoodle=false;
 	//Schauen ob Moodle fuer diesen Studiengang freigeschaltet ist
-	$qry = "SELECT moodle FROM public.tbl_studiengang JOIN lehre.tbl_lehrveranstaltung USING(studiengang_kz) WHERE lehrveranstaltung_id='".addslashes($lvid)."'";
+	$qry = "SELECT moodle FROM public.tbl_studiengang JOIN lehre.tbl_lehrveranstaltung USING(studiengang_kz) WHERE lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER);
 	if($result = $db->db_query($qry))
 	{
 		if($row = $db->db_fetch_object($result))
@@ -572,23 +572,23 @@ function checkZeilenUmbruch()
 		{
 			if(!@is_dir(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz)))
 			{
-				exec('mkdir -m 755 "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'"');
-				exec('sudo chown www-data:teacher "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'"');
+				exec('mkdir -m 755 '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz)));
+				exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz)));
 			}
 			if(!@is_dir(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester))
 			{
-				exec('mkdir -m 755 "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'"');
-				exec('sudo chown www-data:teacher "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'"');
+				exec('mkdir -m 755 '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester));
+				exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester));
 			}
 			if(!@is_dir(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name)))
 			{
-				exec('mkdir -m 755 "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'"');
-				exec('sudo chown www-data:teacher "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'"');
+				exec('mkdir -m 755 '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name)));
+				exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name)));
 			}
 			if(!@is_dir(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/upload'))
 			{
-				exec('mkdir -m 775 "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/upload"');
-				exec('sudo chown www-data:student "'.DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/upload"');
+				exec('mkdir -m 775 '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/upload'));
+				exec('sudo chown www-data:student '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/upload'));
 			}
 		}
 

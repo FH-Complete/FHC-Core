@@ -102,7 +102,7 @@ $openpath = DOC_ROOT.'/documents/'.strtolower($stg_obj->kuerzel).'/'.$lv_obj->se
 				if(is_file($openpath . $inhalt))
 				{
 					writeCISlog('DELETE', "rm -r '$openpath$inhalt'");
-					exec("rm -r '$openpath$inhalt'");
+					exec("rm -r ".escapeshellarg($openpath.$inhalt));
 					echo '<center>'.$p->t('global/erfolgreichgelöscht').'</center>';
 				}
 				else
@@ -132,11 +132,11 @@ $openpath = DOC_ROOT.'/documents/'.strtolower($stg_obj->kuerzel).'/'.$lv_obj->se
 			{
 				if(!stristr($fn, '.php') && !stristr($fn, '.php3') &&
 				   !stristr($fn,'.php4') && !stristr($fn, '.php5') &&
-				   !stristr($fn, '.cgi') && !stristr($fn, '.pl'))
+				   !stristr($fn, '.cgi') && !stristr($fn, '.pl') && !stristr($fn, '.phtml'))
 				{
 					if(move_uploaded_file($_FILES['userfile']['tmp_name'],$openpath . $fn))
 					{
-						exec('sudo chown www-data:teacher "'.$openpath.$fn.'"');
+						exec('sudo chown www-data:teacher '.escapeshellarg($openpath.$fn));
 						echo '<center>'.$p->t('semesterplan/fileErfolgreichHochgeladen').'</center>';
 					}
 					else
