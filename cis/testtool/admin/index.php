@@ -518,7 +518,7 @@ echo '<table width="100%"><tr><td>';
 
 //Liste der Studiengänge
 echo 'Studiengang: <select onchange="window.location.href=this.value">';
-		echo '<option value="'.$PHP_SELF.'?" '.$selected.'>Alle Studiengänge</option>';
+		echo '<option value="'.$PHP_SELF.'?" >Alle Studiengänge</option>';
 		foreach ($studiengang->result as $row) 
 		{
 			$stg_arr[$row->studiengang_kz] = $row->kuerzel;
