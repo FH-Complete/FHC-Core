@@ -2438,6 +2438,8 @@ class wochenplan extends basis_db
 							'Description'=>$description,
 							'dtstart'=>$start_date_time_ical,
 							'dtend'=>$end_date_time_ical,
+							'reservierung'=>$this->std_plan[$i][$j][$idx]->reservierung,
+							'reservierung_id'=>($this->std_plan[$i][$j][$idx]->reservierung?$this->std_plan[$i][$j][$idx]->stundenplan_id:''),
 							'updateamum'=>$this->std_plan[$i][$j][$idx]->updateamum,
 							'data'=>'BEGIN:VEVENT'.$this->crlf
 								.'UID:'.$UID.$this->crlf
@@ -2488,7 +2490,8 @@ class wochenplan extends basis_db
 			$lektor1 = $this->std_plan[$tag][$stunde][$idx]->lektor;
 			$lektor2 = $this->std_plan[$tag][$stunde][$idx1]->lektor;
 			
-			if($unr1==$unr2 && ($ort1==$ort2 || $lektor1==$lektor2))
+			if($unr1==$unr2 && ($ort1==$ort2 || $lektor1==$lektor2) 
+				&& !$this->std_plan[$tag][$stunde][$idx]->reservierung && !$this->std_plan[$tag][$stunde][$idx1]->reservierung)
 				return true;
 			else
 				return false;
