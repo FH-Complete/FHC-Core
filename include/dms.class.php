@@ -254,6 +254,10 @@ class dms extends basis_db
      */
     public function deleteDms($dms_id)
     {
+        $this->load($dms_id);
+        $this->getAllVersions($dms_id);
+        $error = false;
+
         // lösche Versionen
         $qry ="BEGIN;DELETE FROM campus.tbl_dms_version WHERE dms_id =".$this->db_add_param($dms_id, FHC_INTEGER)."; ";
         $qry.="DELETE FROM fue.tbl_projekt_dokument WHERE dms_id=".$this->db_add_param($dms_id, FHC_INTEGER)."; ";
@@ -261,12 +265,28 @@ class dms extends basis_db
         if($this->db_query($qry))
         {
            $this->db_query('COMMIT;');
-           return true; 
+           
+           // Alle Versionen der Datei im Filesystem löschen
+           foreach($this->result as $obj)
+           {
+               if(is_file(DMS_PATH.$obj->filename) && !unlink(DMS_PATH.$obj->filename))
+                   $error = true;
+           }
+           
+           if($error)
+           {
+               $this->errormsg = "Fehler beim Löschen des Dokuments aufgetreten";
+               return false;
+           }
+           else
+           {
+               return true;
+           }
         }
         else
         {
             $this->db_query('ROLLBACK;');
-            $this->errormsg = "Fehler beim Löschen des Eintrages aufgetreten"; 
+            $this->errormsg = "Fehler beim Löschen des Eintrages aufgetreten";
             return false; 
         }
     }
@@ -841,6 +861,55 @@ class dms extends basis_db
 			return false;
 		}
 	}
+    
+    /**
+     * Gibt die Dokumente einer Notiz zurück
+     * @param int $notiz_id
+     * @return boolean
+     */
+    public function getDokumenteNotiz($notiz_id) 
+    {
+        $qry = "SELECT * 
+				FROM 
+					campus.tbl_dms 
+					JOIN campus.tbl_dms_version USING(dms_id)
+					JOIN public.tbl_notiz_dokument USING(dms_id) 
+				WHERE (dms_id, version) in(
+					SELECT dms_id, max(version)
+					FROM campus.tbl_dms_version 
+					GROUP BY dms_id)
+				AND tbl_notiz_dokument.notiz_id=".$this->db_add_param($notiz_id)."
+				ORDER BY name;";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new dms();
+				
+				$obj->dms_id = $row->dms_id;
+				$obj->version = $row->version; 
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->dokument_kurzbz = $row->dokument_kurzbz;
+				$obj->kategorie_kurzbz = $row->kategorie_kurzbz;
+				$obj->filename = $row->filename;
+				$obj->mimetype = $row->mimetype;
+				$obj->name = $row->name;
+				$obj->beschreibung = $row->beschreibung;
+				$obj->letzterzugriff = $row->letzterzugriff;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				
+				$this->result[] = $obj;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+    }
 	
 	/**
 	 * Laedt die Dokumente einer Projektphase

@@ -2826,6 +2826,30 @@ if($result = @$db->db_query("SELECT * FROM information_schema.role_table_grants 
 	}		
 }
 
+// Dokumentenupload für Notizen
+if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_notiz_dokument LIMIT 1;"))
+{
+	$qry = "
+
+	CREATE TABLE public.tbl_notiz_dokument
+	(
+		notiz_id integer NOT NULL,
+        dms_id integer NOT NULL
+	);
+
+	ALTER TABLE public.tbl_notiz_dokument ADD CONSTRAINT fk_notiz_dokument_notiz FOREIGN KEY (notiz_id) REFERENCES public.tbl_notiz (notiz_id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ALTER TABLE public.tbl_notiz_dokument ADD CONSTRAINT fk_notiz_dokument_dms FOREIGN KEY (dms_id) REFERENCES campus.tbl_dms (dms_id) ON UPDATE CASCADE ON DELETE CASCADE;
+	
+    GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_notiz_dokument TO vilesci;
+	GRANT SELECT, INSERT, UPDATE, DELETE ON public.tbl_notiz_dokument TO web;
+	";
+    
+	if(!$db->db_query($qry))
+		echo '<strong>Dokumentenupload fuer Notizen: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' Tabellen fuer Dokumentenupload fuer Notizen hinzugefuegt!<br>';
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -3003,7 +3027,8 @@ $tabellen=array(
 	"public.tbl_mitarbeiter"  => array("mitarbeiter_uid","personalnummer","telefonklappe","kurzbz","lektor","fixangestellt","bismelden","stundensatz","ausbildungcode","ort_kurzbz","standort_id","anmerkung","insertamum","insertvon","updateamum","updatevon","ext_id","kleriker"),
 	"public.tbl_notiz"  => array("notiz_id","titel","text","verfasser_uid","bearbeiter_uid","start","ende","erledigt","insertamum","insertvon","updateamum","updatevon","ext_id"),
 	"public.tbl_notizzuordnung"  => array("notizzuordnung_id","notiz_id","projekt_kurzbz","projektphase_id","projekttask_id","uid","person_id","prestudent_id","bestellung_id","lehreinheit_id","ext_id","anrechnung_id"),
-	"public.tbl_ort"  => array("ort_kurzbz","bezeichnung","planbezeichnung","max_person","lehre","reservieren","aktiv","lageplan","dislozierung","kosten","ausstattung","updateamum","updatevon","insertamum","insertvon","ext_id","stockwerk","standort_id","telefonklappe","content_id","m2","gebteil","oe_kurzbz"),
+	"public.tbl_notiz_dokument" => array("notiz_id","dms_id"),
+    "public.tbl_ort"  => array("ort_kurzbz","bezeichnung","planbezeichnung","max_person","lehre","reservieren","aktiv","lageplan","dislozierung","kosten","ausstattung","updateamum","updatevon","insertamum","insertvon","ext_id","stockwerk","standort_id","telefonklappe","content_id","m2","gebteil","oe_kurzbz"),
 	"public.tbl_ortraumtyp"  => array("ort_kurzbz","hierarchie","raumtyp_kurzbz"),
 	"public.tbl_organisationseinheit" => array("oe_kurzbz", "oe_parent_kurzbz", "bezeichnung","organisationseinheittyp_kurzbz", "aktiv","mailverteiler","freigabegrenze","kurzzeichen","lehre"),
 	"public.tbl_organisationseinheittyp" => array("organisationseinheittyp_kurzbz", "bezeichnung", "beschreibung"),

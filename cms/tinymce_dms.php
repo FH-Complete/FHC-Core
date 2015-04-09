@@ -373,7 +373,7 @@ if(isset($_REQUEST['delete']))
             // Alle Versionen der Datei vom Filesystem löschen
             foreach($dms->result as $obj)
             {
-                if(!unlink(DMS_PATH.$obj->filename))
+                if(is_file(DMS_PATH.$obj->filename) && !unlink(DMS_PATH.$obj->filename))
                     $error = true; 
             }
             if($error)

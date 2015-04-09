@@ -49,6 +49,14 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
     <wsdl:message name="deleteNotizResponse">
   		<wsdl:part name="message" type="xsd:string"></wsdl:part>
   	</wsdl:message>
+    <wsdl:message name="deleteDokumentRequest">
+		<wsdl:part name="username" type="xsd:string" minOccurs="0"></wsdl:part>
+		<wsdl:part name="passwort" type="xsd:string" minOccurs="0"></wsdl:part>  	
+  		<wsdl:part name="dms_id" type="xsd:string"></wsdl:part>
+  	</wsdl:message>
+    <wsdl:message name="deleteDokumentResponse">
+  		<wsdl:part name="message" type="xsd:string"></wsdl:part>
+  	</wsdl:message>
   	<wsdl:message name="setErledigtRequest">
   		<wsdl:part name="notiz_id" type="xsd:string"></wsdl:part>
   		<wsdl:part name="erledigt" type="xsd:boolean"></wsdl:part>
@@ -65,6 +73,10 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
        <wsdl:operation name="deleteNotiz">
            <wsdl:input message="tns:deleteNotizRequest"></wsdl:input>
            <wsdl:output message="tns:deleteNotizResponse"></wsdl:output>        
+       </wsdl:operation>
+       <wsdl:operation name="deleteDokument">
+           <wsdl:input message="tns:deleteDokumentRequest"></wsdl:input>
+           <wsdl:output message="tns:deleteDokumentResponse"></wsdl:output>        
        </wsdl:operation>
        <wsdl:operation name="setErledigt">
            <wsdl:input message="tns:setErledigtRequest"></wsdl:input>
@@ -85,6 +97,15 @@ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
        </wsdl:operation> 
        <wsdl:operation name="deleteNotiz">
            <soap:operation soapAction="<?php echo APP_ROOT."soap/deleteNotiz";?>" />
+           <wsdl:input> 
+               <soap:body use="encoded" namespace="http://www.technikum-wien.at/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+           </wsdl:input>
+           <wsdl:output>
+               <soap:body use="encoded" namespace="http://www.technikum-wien.at/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+           </wsdl:output>
+       </wsdl:operation>
+       <wsdl:operation name="deleteDokument">
+           <soap:operation soapAction="<?php echo APP_ROOT."soap/deleteDokument";?>" />
            <wsdl:input> 
                <soap:body use="encoded" namespace="http://www.technikum-wien.at/soap/" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
            </wsdl:input>
