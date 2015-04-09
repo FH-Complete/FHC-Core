@@ -37,6 +37,7 @@ $this->phrasen['bewerbung/egal']='egal';
 $this->phrasen['bewerbung/orgform']='Organisationsform';
 $this->phrasen['bewerbung/orgform/berufsbegleitend']='Berufsbegleitend';
 $this->phrasen['bewerbung/orgform/vollzeit']='Vollzeit';
+$this->phrasen['bewerbung/orgform/distance']='Fernstudium';
 $this->phrasen['bewerbung/sprache']='Sprache';
 $this->phrasen['bewerbung/sprache/deutsch']='Deutsch';
 $this->phrasen['bewerbung/sprache/englisch']='Englisch';
