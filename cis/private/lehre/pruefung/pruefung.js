@@ -453,9 +453,14 @@ function openDialog(lehrveranstaltung_id, termin_id, lvBezeichnung, terminVon, t
  */
 function saveAnmeldung(lehrveranstaltung_id, termin_id)
 {
-	var lehrveranstaltung_id = $("#lehrveranstaltungHidden").val();
-	var termin_id = $("#terminHidden").val();
+	var uid = $("#anmeldung_hinzufuegen_uid").val();
+	if(lehrveranstaltung_id === undefined)
+		lehrveranstaltung_id = $("#lehrveranstaltungHidden").val();
+	if(termin_id === undefined)
+		termin_id = $("#terminHidden").val();
 	var bemerkungen = $("#anmeldungBemerkung").val();
+	if(bemerkungen === undefined)
+		bemerkungen = "von Lektor hinzugefügt";
 	
 	$.ajax({
 		dataType: 'json',
@@ -465,7 +470,8 @@ function saveAnmeldung(lehrveranstaltung_id, termin_id)
 			method: "saveAnmeldung",
 			termin_id: termin_id,
 			lehrveranstaltung_id: lehrveranstaltung_id,
-			bemerkung: bemerkungen
+			bemerkung: bemerkungen,
+			uid: uid
 		},
 		error: loadError
 	}).success(function(data){
@@ -480,7 +486,17 @@ function saveAnmeldung(lehrveranstaltung_id, termin_id)
 		resetForm();
 	}).complete(function(event, xhr, settings){
 		$("#saveDialog").dialog("close");
-		refresh();
+		
+		if(uid === undefined)
+		{
+			//Wenn Anmeldung durch Student
+			refresh();
+		}
+		else
+		{
+			//Wenn Anmeldung durch Lektor
+			showAnmeldungen(termin_id, lehrveranstaltung_id);
+		}			
 	});
 }
 
@@ -653,6 +669,7 @@ function writeAnmeldungen(data)
 		var ort_kurzbz = data.result.ort_kurzbz;
 		var liste = "<ul id='sortable'>";
 		var count = 0;
+		var studiensemester = $("#filter_studiensemester option:selected").val();
 		data.result.anmeldungen.forEach(function(d){
 			count++;
 			var vorname = d.student.vorname !== "null" ? d.student.vorname : "";
@@ -683,8 +700,10 @@ function writeAnmeldungen(data)
 
 		});
 		liste += "</ul>";
+		$("#anmeldung_hinzufuegen").html("<input id='anmeldung_hinzufuegen_uid' type='text' placeholder='StudentIn-UID' /><input type='button' value='hinzufügen' onclick='saveAnmeldung(\""+lehrveranstaltung_id+"\",\""+terminId+"\");'/>");
 		$("#reihungSpeichernButton").html("<input type='button' value='Reihung speichern' onclick='saveReihung(\""+terminId+"\", \""+lehrveranstaltung_id+"\");'>");
 		$("#anmeldeDaten").html(liste);
+		$("#listeDrucken").html("<a href='./pruefungsanmeldungen_liste.php?termin_id="+terminId+"&lehrveranstaltung_id="+lehrveranstaltung_id+"&studiensemester="+studiensemester+"' target='_blank'>Liste drucken</a>");
 		if(ort_kurzbz !== null)
 		{
 			$("#raumLink").html("<span>Prüfungsraum: </span>"+ort_kurzbz);
@@ -829,11 +848,12 @@ function loadStudiengaenge()
 		$("#stgListe").empty();
 		if(data.error === 'false')
 		{
-			var liste = "";	
+			var liste = "<select id='select_studiengang' onchange='loadPruefungStudiengang();'><option>Studiengang auswählen</option>";
 			data.result.forEach(function(e){
 				var kuerzel = e.typ+e.kurzbz
-				liste += "<li id='stg"+e.studiengang_kz+"'><span class='studiengang'><a href='#' onclick='loadPruefungStudiengang(\""+e.studiengang_kz+"\");'>"+e.bezeichnung+" ("+kuerzel.toUpperCase()+")</a></span></li>";
+				liste += "<option id='stg"+e.studiengang_kz+"' value='"+e.studiengang_kz+"'>"+e.bezeichnung+" ("+kuerzel.toUpperCase()+")</option>";
 			});
+			liste += "</select>";
 			$("#stgListe").append(liste);
 		}
 		else
@@ -848,15 +868,22 @@ function loadStudiengaenge()
  * @param {type} studiengang_kz Studiengangskennzahl
  * @returns {undefined}
  */
-function loadPruefungStudiengang(studiengang_kz)
+function loadPruefungStudiengang(studiengang_kz, studiensemester)
 {
+	if(studiengang_kz === undefined)
+		studiengang_kz = $("#select_studiengang option:selected").val();
+	
+	if(studiensemester === undefined)
+		studiensemester = $("#filter_studiensemester option:selected").val();
+	
 	$.ajax({
 		dataType: 'json',
 		url: "./pruefungsanmeldung.json.php",
 		type: "POST",
 		data: {
 			method: "getPruefungenStudiengang",
-			studiengang_kz: studiengang_kz
+			studiengang_kz: studiengang_kz,
+			studiensemester: studiensemester
 		},
 		error: loadError
 	}).success(function(data){
@@ -867,6 +894,7 @@ function loadPruefungStudiengang(studiengang_kz)
 			{
 				var liste = "";
 				data.result.forEach(function(e){
+					console.log(e);
 					liste += "<ul><li>"+e.bezeichnung+"<ul>";
 					e.pruefung[0].termine.forEach(function(d){
 						liste += "<li> <a onclick='showAnmeldungen(\""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung_id+"\");'>"+convertDateTime(d.von)+" "+convertDateTime(d.von, "time")+" - "+convertDateTime(d.bis, "time")+"</a></li>";

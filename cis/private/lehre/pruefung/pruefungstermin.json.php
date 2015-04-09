@@ -230,6 +230,7 @@ function savePruefungstermin($uid, $studiensemester_kurzbz, $pruefungsfenster_id
 	$termin->beginn = date('Y-m-d H:i', strtotime($date." ".$beginn));
 	$termin->ende = date('Y-m-d H:i', strtotime($date." ".$ende));
 	$termin->sammelklausur = $t["sammelklausur"];
+	//Termin soll auch außerhalb eines Prüfungsfensters angelegt werden können
 //	if(checkTerminPruefungsfenster($pruefungsfenster_id, $date))
 //	{
 	    if(!(checkCollision($uid, $termin->beginn, $termin->ende)))

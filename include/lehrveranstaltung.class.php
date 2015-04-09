@@ -2088,8 +2088,7 @@ class lehrveranstaltung extends basis_db
 		$qry.=" AND tbl_studienplan_lehrveranstaltung.semester=" . $this->db_add_param($semester, FHC_INTEGER);
 	    }
 	    $qry.=" ORDER BY bezeichnung;";
-	    //TODO
-	    $this->errormsg = $qry;
+
 	    $this->lehrveranstaltungen = array();
 	    if ($result = $this->db_query($qry)) 
 	    {

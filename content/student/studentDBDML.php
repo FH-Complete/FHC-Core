@@ -2436,11 +2436,14 @@ if(!$error)
 		//Speichert einen Noteneintrag
 
 		$noten = new zeugnisnote();
+		$lehrveranstaltung_id = filter_input(INPUT_POST, 'lehrveranstaltung_id');
+		$student_uid = filter_input(INPUT_POST, 'student_uid');
+		$studiensemester_kurzbz = filter_input(INPUT_POST, 'studiensemester_kurzbz');
 
-		if(isset($_POST['lehrveranstaltung_id']) && isset($_POST['student_uid']) && isset($_POST['studiensemester_kurzbz']))
+		if(!is_null($lehrveranstaltung_id) && !is_null($student_uid) && !is_null($studiensemester_kurzbz))
 		{
 			//Berechtigung pruefen
-			$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=".$db->db_add_param($_POST['lehrveranstaltung_id'], FHC_INTEGER);
+			$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
 			if($result = $db->db_query($qry))
 			{
 				if($row = $db->db_fetch_object($result))
@@ -2461,7 +2464,7 @@ if(!$error)
 				$errormsg = 'Fehler beim Ermitteln der LVA';
 			}
 
-			$qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid=".$db->db_add_param($_POST['student_uid']);
+			$qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid=".$db->db_add_param($student_uid);
 			if($result = $db->db_query($qry))
 			{
 				if($row = $db->db_fetch_object($result))
@@ -2494,11 +2497,28 @@ if(!$error)
 				else
 				{
 
-					if($noten->load($_POST['lehrveranstaltung_id'], $_POST['student_uid'], $_POST['studiensemester_kurzbz']))
+					if($noten->load($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz))
 					{
 						$noten->new = false;
 						$noten->updateamum = date('Y-m-d H:i:s');
 						$noten->updatevon = $user;
+						$log = new log();
+						$log->executetime = date('Y-m-d H:i:s');
+						$log->mitarbeiter_uid = $user;
+						$log->beschreibung = "Ändern der Note ".$noten->note." bei ".$noten->student_uid;
+						$log->sql = 'UPDATE lehre.tbl_zeugnisnote SET '.
+								'note='.$db->db_add_param($noten->note).', '.
+								'punkte='.$db->db_add_param($noten->punkte).','.
+								'uebernahmedatum='.$db->db_add_param($noten->uebernahmedatum).', '.
+								'benotungsdatum='.$db->db_add_param($noten->benotungsdatum).', '.
+								'bemerkung='.$db->db_add_param($noten->bemerkung).', '.
+								'updateamum= '.$db->db_add_param($noten->updateamum).', '.
+								'updatevon='.$db->db_add_param($noten->updatevon).' '.
+								'WHERE lehrveranstaltung_id='.$db->db_add_param($noten->lehrveranstaltung_id, FHC_INTEGER).' '.
+								'AND student_uid='.$db->db_add_param($noten->student_uid).' '.
+								'AND studiensemester_kurzbz='.$db->db_add_param($noten->studiensemester_kurzbz).';';
+						$log->sqlundo = $noten->getUndo('update');
+						$log->save(true);
 					}
 					else
 					{
@@ -2789,11 +2809,14 @@ if(!$error)
 		//Loescht einen Noteneintrag
 
 		$noten = new zeugnisnote();
+		$lehrveranstaltung_id = filter_input(INPUT_POST, 'lehrveranstaltung_id');
+		$student_uid = filter_input(INPUT_POST, 'student_uid');
+		$studiensemester_kurzbz = filter_input(INPUT_POST, 'studiensemester_kurzbz');
 
-		if(isset($_POST['lehrveranstaltung_id']) && isset($_POST['student_uid']) && isset($_POST['studiensemester_kurzbz']))
+		if(!is_null($lehrveranstaltung_id) && !is_null($student_uid) && !is_null($studiensemester_kurzbz))
 		{
 			//Berechtigung pruefen
-			$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=".$db->db_add_param($_POST['lehrveranstaltung_id'], FHC_INTEGER);
+			$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
 			if($result = $db->db_query($qry))
 			{
 				if($row = $db->db_fetch_object($result))
@@ -2814,7 +2837,7 @@ if(!$error)
 				$errormsg = 'Fehler beim Ermitteln der LVA';
 			}
 
-			$qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid=".$db->db_add_param($_POST['student_uid']);
+			$qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid=".$db->db_add_param($student_uid);
 			if($result = $db->db_query($qry))
 			{
 				if($row = $db->db_fetch_object($result))
@@ -2846,9 +2869,19 @@ if(!$error)
 				}
 				else
 				{
-
-					if($noten->delete($_POST['lehrveranstaltung_id'], $_POST['student_uid'], $_POST['studiensemester_kurzbz']))
+					$noten->load($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz);
+					if($noten->delete($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz))
 					{
+						$log = new log();
+						$log->executetime = date('Y-m-d H:i:s');
+						$log->mitarbeiter_uid = $user;
+						$log->beschreibung = "Löschen der Note ".$noten->note." bei ".$noten->student_uid;
+						$log->sql = "DELETE FROM lehre.tbl_zeugnisnote WHERE
+								lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER, false)." AND
+								student_uid=".$db->db_add_param($student_uid)." AND
+								studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz).";";
+						$log->sqlundo = $noten->getUndo('insert');
+						$log->save(true);
 						$return = true;
 					}
 					else

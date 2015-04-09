@@ -298,6 +298,7 @@ class studiensemester extends basis_db
 				$stsem_obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$stsem_obj->start = $row->start;
 				$stsem_obj->ende = $row->ende;
+				$stsem_obj->bezeichnung = $row->bezeichnung;
 
 				$this->studiensemester[] = $stsem_obj;
 			}

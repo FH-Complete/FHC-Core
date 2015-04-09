@@ -33,6 +33,7 @@ require_once('../../include/akte.class.php');
 require_once('../../include/konto.class.php');
 require_once('../../include/benutzer.class.php');
 require_once('../../include/vorlage.class.php');
+require_once('../../include/addon.class.php');
 
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
@@ -89,31 +90,34 @@ if(isset($_GET['abschlusspruefung_id']))
 	$params.='&abschlusspruefung_id='.$_GET['abschlusspruefung_id'];
 if(isset($_GET['typ']))
 	$params.='&typ='.$_GET['typ'];
-
+if(isset($_GET['output']))
+	$output=$_GET['output'];
+else
+	$output='pdf';
 
 $konto = new konto();
 if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 {
-	if($xsl=='Inskription' && (!$konto->checkStudienbeitrag($user, $_GET["ss"])))
-		die('Der Studienbeitrag wurde noch nicht bezahlt');		
+	if(($xsl=='Inskription' || $xsl == 'Studienblatt') && (!$konto->checkStudienbeitrag($user, $_GET["ss"])))
+	    die('Der Studienbeitrag wurde noch nicht bezahlt');		
 	
 	if(isset($_GET['buchungsnummern']))
 	{
-		//Beim Drucken von Buchungsbestaetigungen pruefen ob diese Buchungen auch zu diesem Benutzer gehoeren
-		$buchungsnr = explode(';',$_GET['buchungsnummern']);
-		$user_obj = new benutzer();
-		$user_obj->load($user);
-		foreach($buchungsnr as $bnr)
+	    //Beim Drucken von Buchungsbestaetigungen pruefen ob diese Buchungen auch zu diesem Benutzer gehoeren
+	    $buchungsnr = explode(';',$_GET['buchungsnummern']);
+	    $user_obj = new benutzer();
+	    $user_obj->load($user);
+	    foreach($buchungsnr as $bnr)
+	    {
+		if($bnr!='')
 		{
-			if($bnr!='')
-			{
-				$konto->load($bnr);
-				if($konto->person_id!=$user_obj->person_id)
-					die('Sie haben keine Berechtigung fuer diese Buchung');
-				if($konto->getDifferenz($bnr)!=0)
-					die('Diese Zahlung wurde noch nicht beglichen');
-			}
+		    $konto->load($bnr);
+		    if($konto->person_id!=$user_obj->person_id)
+			die('Sie haben keine Berechtigung fuer diese Buchung');
+		    if($konto->getDifferenz($bnr)!=0)
+			die('Diese Zahlung wurde noch nicht beglichen');
 		}
+	    }
 	}
 	$xml_url=XML_ROOT.$xml.$params;
 	//echo $xml_url;
@@ -134,49 +138,217 @@ if (($user == $_GET["uid"]) || $rechte->isBerechtigt('admin'))
 	{
 		if($xsl_stg_kz=='')
 			$xsl_stg_kz='0';
-	
+		
 		$vorlage->getAktuelleVorlage($xsl_stg_kz, $xsl, $version);
 	}
-	
-	// Load the XSL source
-	$xsl_doc = new DOMDocument;
-	
-	if(!$xsl_doc->loadXML($vorlage->text))
-		die('unable to load xsl');
-	
-	// Configure the transformer
-	$proc = new XSLTProcessor;
-	$proc->importStyleSheet($xsl_doc); // attach the xsl rules
-	
-	$buffer = $proc->transformToXml($xml_doc);
-	//in $buffer steht nun das xsl-fo file mit den daten
-	$buffer = '<?xml version="1.0" encoding="utf-8" ?>'.substr($buffer, strpos($buffer,"\n"),strlen($buffer));
-	
-	//Pdf erstellen
-	$fo2pdf = new XslFo2Pdf();
-	
-	//wenn uid gefunden wird, dann den Nachnamen zum Dateinamen dazuhaengen
-	$nachname='';
+
+	if(mb_strstr($vorlage->mimetype, 'application/vnd.oasis.opendocument'))
+	{
+		switch($vorlage->mimetype)
+		{
+		    case 'application/vnd.oasis.opendocument.text':
+			$endung = 'odt';
+			break; 
+		    case 'application/vnd.oasis.opendocument.spreadsheet':
+			$endung = 'ods'; 
+			break;               
+		    default:
+			$endung = 'pdf'; 
+		}
+
+		// Load the XSL source
+		$xsl_doc = new DOMDocument;
+
+		if(!$xsl_doc->loadXML($vorlage->text))
+		    die('unable to load xsl');
+		
+		// Configure the transformer
+		$proc = new XSLTProcessor;
+		$proc->importStyleSheet($xsl_doc); // attach the xsl rules
+		
+		$buffer = $proc->transformToXml($xml_doc);
+		//echo $buffer;
+		//exit;
+		$tempfolder = '/tmp/'.uniqid();
+		mkdir($tempfolder);
+		chdir($tempfolder);
+		file_put_contents('content.xml', $buffer);
+
+		// Wenn ein Style XSL uebergeben wurde wird ein zweites XML File erstellt mit den
+		// Styleanweisungen und ebenfalls zum Zip hinzugefuegt        
+		if(isset($_GET['style_xsl']))
+		{
+		    $style_xsl=$_GET['style_xsl'];
+		    $style_vorlage = new vorlage();
+		    $style_vorlage->getAktuelleVorlage($xsl_stg_kz, $style_xsl, $version);
+		    $style_xsl_doc = new DOMDocument;
+		    if(!$style_xsl_doc->loadXML($style_vorlage->text))
+			    die('unable to load xsl');
+
+		    // Configure the transformer
+		    $style_proc = new XSLTProcessor;
+		    $style_proc->importStyleSheet($style_xsl_doc); // attach the xsl rules
+
+		    $stylebuffer = $style_proc->transformToXml($xml_doc);
+
+		    file_put_contents('styles.xml', $stylebuffer);
+		}
+
+		$vorlage_found=false;
+		$addons = new addon();
+
+		foreach($addons->aktive_addons as $addon)
+		{
+		    $zipfile = DOC_ROOT.'addons/'.$addon.'/system/vorlage_zip/'.$vorlage->vorlage_kurzbz.'.'.$endung;
+
+		    if(file_exists($zipfile))
+		    {
+			$vorlage_found=true;
+			break;
+		    }
+		}
+		if(!$vorlage_found)
+		    $zipfile = DOC_ROOT.'system/vorlage_zip/'.$vorlage->vorlage_kurzbz.'.'.$endung;
+		
+		
+		$tempname_zip = 'out.zip';
+		if(copy($zipfile, $tempname_zip))
+		{
+		    exec("zip $tempname_zip content.xml");
+		    if(isset($_GET['style_xsl']))
+			    exec("zip $tempname_zip styles.xml");
+
+		    clearstatcache(); 
+		    if($vorlage->bezeichnung!='')
+			    $filename = $vorlage->bezeichnung;
+		    else 
+			    $filename = $vorlage->vorlage_kurzbz;
+            if($output == 'pdf')
+            {
+		if($xsl == 'LV_Informationen')
+		{
+		    $studiengang = new studiengang($_GET['stg_kz']);
+		    $studiensemester = new studiensemester($_GET['ss']);
+		    $tempPdfName = $vorlage->vorlage_kurzbz.'_'.$studiengang->kurzbzlang.'_'.$studiensemester->studiensemester_kurzbz.'.pdf';
+		    $filename = $filename.'_'.$studiengang->kurzbzlang.'_'.$studiensemester->studiensemester_kurzbz.'.pdf';
+		}
+		elseif($xsl == "Honorarvertrag")
+		{
+		    $tempPdfName = $vorlage->vorlage_kurzbz.'_'.$benutzer_obj->nachname.'_'.$benutzer_obj->vorname.'.pdf';
+		    $filename = $filename.'_'.$benutzer_obj->nachname.'_'.$benutzer_obj->vorname.'.pdf';
+		}
+		elseif($xsl == "Studienordnung")
+		{
+		    $studienordnung = new studienordnung();
+			$studienordnung->loadStudienordnung($_GET['studienordnung_id']);
+			$filename = $filename.'_'.$studienordnung->studiengangkurzbzlang.'.pdf';
+			$tempPdfName = $vorlage->vorlage_kurzbz.'.pdf';
+		}
+		else
+		{
+		    $tempPdfName = $vorlage->vorlage_kurzbz.'.pdf';
+		    $filename = $filename.'.pdf';
+		}
+                exec("unoconv -e IsSkipEmptyPages=false --stdout -f pdf $tempname_zip > $tempPdfName");
+                
+                $fsize = filesize($tempPdfName); 
+                $handle = fopen($tempPdfName,'r');
+                header('Content-type: application/pdf');
+                header('Content-Disposition: attachment; filename="'.$filename.'"');
+                header('Content-Length: '.$fsize); 
+            }
+            else if($output =='odt')
+            {
+            	if($xsl == "Studienordnung")
+		{
+		    $studienordnung = new studienordnung();
+		    $studienordnung->loadStudienordnung($_GET['studienordnung_id']);
+		    $filename = $filename.'_'.$studienordnung->studiengangkurzbzlang;
+		}
+            	$fsize = filesize($tempname_zip);
+                $handle = fopen($tempname_zip,'r');
+                header('Content-type: '.$vorlage->mimetype);
+                header('Content-Disposition: attachment; filename="'.$filename.'.'.$endung.'"');
+                header('Content-Length: '.$fsize); 
+           } 
+           else if($output =='doc')
+           {
+                $tempPdfName = $vorlage->vorlage_kurzbz.'.doc';
+		if($xsl == "Studienordnung")
+		{
+		    $studienordnung = new studienordnung();
+		    $studienordnung->loadStudienordnung($_GET['studienordnung_id']);
+		    $filename = $filename.'_'.$studienordnung->studiengangkurzbzlang.'.doc';
+		}
+		else 
+		{
+		    $filename = $filename.'.doc';
+		}
+                exec("unoconv -e IsSkipEmptyPages=false --stdout -f doc $tempname_zip > $tempPdfName");
+                
+                $fsize = filesize($tempPdfName); 
+                $handle = fopen($tempPdfName,'r');
+                header('Content-type: application/vnd.ms-word');
+                header('Content-Disposition: attachment; filename="'.$filename.'"');
+                header('Content-Length: '.$fsize); 
+	    }
+	    while (!feof($handle)) 
+	    {
+		echo fread($handle, 8192);
+	    }
+	    fclose($handle);
+
+	    unlink('content.xml');
+	    if(isset($_GET['style_xsl']))
+		    unlink('styles.xml');
+	    unlink($tempname_zip);
+            if($output=='pdf' || $output=='doc')
+                unlink($filename);
+		rmdir($tempfolder);
+	    }
+	}
+	else
+	{
+	    // Load the XSL source
+	    $xsl_doc = new DOMDocument;
+
+	    if(!$xsl_doc->loadXML($vorlage->text))
+		    die('unable to load xsl');
+
+	    // Configure the transformer
+	    $proc = new XSLTProcessor;
+	    $proc->importStyleSheet($xsl_doc); // attach the xsl rules
+
+	    $buffer = $proc->transformToXml($xml_doc);
+	    //in $buffer steht nun das xsl-fo file mit den daten
+	    $buffer = '<?xml version="1.0" encoding="utf-8" ?>'.substr($buffer, strpos($buffer,"\n"),strlen($buffer));
+
+	    //Pdf erstellen
+	    $fo2pdf = new XslFo2Pdf();
+
+	    //wenn uid gefunden wird, dann den Nachnamen zum Dateinamen dazuhaengen
+	    $nachname='';
 	
 
-	if(isset($_GET['uid']) && $_GET['uid']!='')
-	{
+	    if(isset($_GET['uid']) && $_GET['uid']!='')
+	    {
 		$uid = str_replace(';','',$_GET['uid']);
 		$qry = "SELECT nachname FROM campus.vw_benutzer WHERE uid=".$db->db_add_param($uid);
-		
+
 		if($result = $db->db_query($qry))
 		{
-			if($row = $db->db_fetch_object($result))
-			{
-				$nachname = '_'.$row->nachname;
-			}
+		    if($row = $db->db_fetch_object($result))
+		    {
+			$nachname = '_'.$row->nachname;
+		    }
 		}
-	}
-	$filename=$xsl.$nachname;
-	
-	if (!$fo2pdf->generatePdf($buffer, $filename, "D"))
-	{
+	    }
+	    $filename=$xsl.$nachname;
+
+	    if (!$fo2pdf->generatePdf($buffer, $filename, "D"))
+	    {
 		echo('Failed to generate PDF');
+	    }
 	}
 }
 else

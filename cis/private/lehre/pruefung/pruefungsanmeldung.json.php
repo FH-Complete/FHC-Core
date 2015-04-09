@@ -6,6 +6,7 @@ header( 'Pragma: no-cache' );
 header('Content-Type: text/html;charset=UTF-8');
 
 require_once('../../../../config/cis.config.inc.php');
+require_once('../../../../config/global.config.inc.php');
 require_once('../../../../include/functions.inc.php');
 require_once('../../../../include/pruefungCis.class.php');
 require_once('../../../../include/lehrveranstaltung.class.php');
@@ -29,6 +30,8 @@ require_once('../../../../include/addon.class.php');
 require_once('../../../../include/mail.class.php');
 
 $uid = get_uid();
+//TODO uid entfernen
+$uid = "p20132443";
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
@@ -45,7 +48,7 @@ switch($method)
 	    $data = getPruefungByLv($studiensemester, $uid);
             break;
 	case 'getPruefungByLvFromStudiengang':
-	    $studiensemester = isset($_REQUEST['studiensemester']) ? $_REQUEST['studiensemester'] : NULL;
+	    $studiensemester = isset($_REQUEST['studiensemester']) ? $_REQUEST['studiensemester'] : NULL;	    
 	    $data = getPruefungByLvFromStudiengang($studiensemester, $uid);
             break;
         case 'loadPruefung':
@@ -55,6 +58,20 @@ switch($method)
             $data = loadTermine();
             break;
         case 'saveAnmeldung':
+	    $student_uid = filter_input(INPUT_POST,"uid");
+	    if($student_uid !== "" && !is_null($student_uid))
+	    {
+		$uid = $student_uid;
+	    }
+	    
+	    if($student_uid === "")
+	    {
+		$data['result']="";
+		$data['error']='true';
+		$data['errormsg']='Studenten UID fehlt.';
+		break;
+	    }
+
             $data = saveAnmeldung($aktStudiensemester, $uid);
             break;
 	case 'getAllPruefungen':
@@ -76,8 +93,8 @@ switch($method)
 	    $data = getStudiengaenge();
 	    break;
 	case 'getPruefungenStudiengang':
-	    $studiensemester = new studiensemester();
-	    $data = getPruefungenStudiengang($uid, $studiensemester->getaktorNext());
+	    $studiensemester = filter_input(INPUT_POST,"studiensemester");
+	    $data = getPruefungenStudiengang($uid, $studiensemester);
 	    break;
 	case 'saveKommentar':
 	    $data = saveKommentar();
@@ -493,17 +510,21 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
     }
     if($anmeldung->save(true))
     {
-	$to = $uid."@".DOMAIN;
+	$pruefung = new pruefungCis($termin->pruefung_id);
+	if(defined('CIS_PRUEFUNG_MAIL_EMPFAENGER_ANMEDLUNG') && (CIS_PRUEFUNG_MAIL_EMPFAENGER_ANMEDLUNG !== ""))
+	    $to = CIS_PRUEFUNG_MAIL_EMPFAENGER_ANMEDLUNG."@".DOMAIN;
+	else
+	    $to = $pruefung->mitarbeiter_uid."@".DOMAIN;
 	$from = "noreply@".DOMAIN;
 	$subject = "Anmeldung zur Prüfung";
 	$mail = new mail($to, $from, $subject, "Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.");
 	
 	$student = new student($uid);
 	$datum = new datum();
-	$pruefung = new pruefungCis($termin->pruefung_id);
+	
 	$lv = new lehrveranstaltung($anmeldung->lehrveranstaltung_id);
 	
-	$html = "StudentIn ".$student->vorname." ".$student->nachname." hat sich zur Prüfung ".$lv->bezeichnung." am ".$datum->formatDatum($termin->von, "m.d.Y")." von ".$datum->formatDatum($termin->von,"h:m")." Uhr bis ".$datum->formatDatum($termin->bis,"h:m")." Uhr angemeldet.";
+	$html = "StudentIn ".$student->vorname." ".$student->nachname." hat sich zur Prüfung ".$lv->bezeichnung." am ".$datum->formatDatum($termin->von, "m.d.Y")." von ".$datum->formatDatum($termin->von,"h:i")." Uhr bis ".$datum->formatDatum($termin->bis,"h:i")." Uhr angemeldet.";
 	$mail->setHTMLContent($html);
 	$mail->send();
 	
@@ -688,6 +709,7 @@ function anmeldungBestaetigen($uid)
 	$ma = new mitarbeiter($uid);
 	$datum = new datum();
 	$ort = new ort($termin->ort_kurzbz);
+	$pruefung = new pruefungCis($termin->pruefung_id);
 	
 	$to = $anmeldung->uid."@".DOMAIN;
 	$from = "noreply@".DOMAIN;
@@ -695,7 +717,17 @@ function anmeldungBestaetigen($uid)
 	$html = "Ihre Anmeldung zur Prüfung wurde von ".$ma->vorname." ".$ma->nachname." bestätigt.<br>";
 	$html .= "<br>";
 	$html .= "Prüfung: ".$lv->bezeichnung."<br>";
-	$html .= "Termin: ".$datum->formatDatum($termin->von, "d.m.Y")." um ".$datum->formatDatum($termin->von, "h:m")."<br>";
+	if($pruefung->einzeln)
+	{
+	    $date = $datum->formatDatum($termin->von, "Y-m-d h:i:s");
+	    $date = strtotime($date);
+	    $date = $date+(60*$pruefung->pruefungsintervall*($anmeldung->reihung-1));
+	    $von = date("h:i",$date);
+	    $html .= "Termin: ".$datum->formatDatum($termin->von, "d.m.Y")." um ".$von."<br>";
+	    $html .= "Dauer: ".$pruefung->pruefungsintervall." Minuten</br>";
+	}
+	else
+	    $html .= "Termin: ".$datum->formatDatum($termin->von, "d.m.Y")." um ".$datum->formatDatum($termin->von, "h:i")."<br>";
 	$html .= "Ort: ".$ort->bezeichnung."<br>";
 	$html .= "<br>";
 	$html .= "<a href='".APP_ROOT."cis/private/lehre/pruefung/pruefungsanmeldung.php'>Link zur Anmeldung</a><br>";
@@ -767,7 +799,9 @@ function getPruefungenStudiengang($uid, $aktStudiensemester)
 	    foreach ($pruefung->lehrveranstaltungen as $key=>$prf)
 	    {
 		$pruefung->load($prf->pruefung_id);
-		if($pruefung->storniert === true)
+//		var_dump($aktStudiensemester);
+//		var_dump($pruefung->studiensemester_kurzbz);
+		if(($pruefung->storniert === true))
 		{
 		    unset($pruefung->lehrveranstaltungen[$key]);
 		}
@@ -777,7 +811,8 @@ function getPruefungenStudiengang($uid, $aktStudiensemester)
 		    array_push($lv->pruefung, $pruefung);
 		}
 	    }
-	    array_push($result, $lv);
+	    if($pruefung->studiensemester_kurzbz === $aktStudiensemester)
+		array_push($result, $lv);
 	}
     }
     $data['result']=$result;
