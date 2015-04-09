@@ -220,6 +220,9 @@ class dms extends basis_db
      */
     public function deleteVersion($dms_id, $version)
     {     
+        $dms = new dms(); 
+        $dms->load($dms_id, $version);
+        
         $qry ="DELETE FROM campus.tbl_dms_version WHERE dms_id = ".$this->db_add_param($dms_id, FHC_INTEGER)." and version =".$this->db_add_param($version, FHC_INTEGER).';';
         
         if($this->db_query($qry))
@@ -227,13 +230,20 @@ class dms extends basis_db
             $qry_anzahl ="SELECT 1 FROM campus.tbl_dms_version WHERE dms_id =".$this->db_add_param($dms_id, FHC_INTEGER).';';
             if($result = $this->db_query($qry_anzahl))
             {
-            // Wenn letzte Version gelöscht wurde -> lösche gesamten Eintrag
+                // File der Version im Filesystem löschen 
+                if(is_file(DMS_PATH.$dms->filename) && !unlink(DMS_PATH.$dms->filename))
+                {
+                    $this->errormsg = "Fehler beim Löschen des Dokuments aufgetreten"; 
+                    return false;
+                }
+                
+                // Wenn letzte Version gelöscht wurde -> lösche gesamten Eintrag
                 if($this->db_num_rows($result) == 0 )
                 {
                     if(!$this->deleteDms($dms_id))
                     {
                         $this->errormsg = "Fehler beim Löschen aufgetreten"; 
-                       return false;
+                        return false;
                     }
                     else
                         return true; 
