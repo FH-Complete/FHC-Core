@@ -27,9 +27,6 @@ require_once '../../include/phrasen.class.php';
       die('Fehler beim Oeffnen der Datenbankverbindung');
   
 require_once('../../include/gebiet.class.php');
-
-//if(isset($_GET['lang']))
-	//setSprache($_GET['lang']);
 	
 function getSpracheUser()
 {

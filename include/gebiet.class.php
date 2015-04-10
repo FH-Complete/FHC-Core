@@ -563,5 +563,68 @@ class gebiet extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Prueft ob das Gebiet bereits gestartet wurde.  Wahlweise pruefling_id oder prestudent_id
+	 *
+	 * @param $pruefling_id Wahlweise pruefling_id oder
+	 * @param $prestudent_id prestudent_id des Prueflings.
+	 * @param $gebiet_id Gebiet_id des Gebiets, dessen Start gefprueft werden soll
+	 * @return true wenn das Gebiet bereits gestartet wurde, false wenn nicht.
+	 */
+	public function isGestartet($gebiet_id, $pruefling_id=null, $prestudent_id=null)
+	{
+		$this->errormsg='';
+		
+		if(!is_numeric($gebiet_id) || $gebiet_id=='')
+		{
+			$this->errormsg = 'Gebiet_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		if(!is_null($pruefling_id) && (!is_numeric($pruefling_id) || $pruefling_id==''))
+		{
+			$this->errormsg = 'Pruefling_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		if(!is_null($prestudent_id) && (!is_numeric($prestudent_id) || $prestudent_id==''))
+		{
+			$this->errormsg = 'Prestudent_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		
+		$qry = '	SELECT 
+						begintime 
+					FROM 
+						testtool.tbl_pruefling_frage
+					JOIN 
+						testtool.tbl_pruefling USING (pruefling_id)
+					JOIN 
+						testtool.tbl_frage USING (frage_id)
+					WHERE ';
+		if (!is_null($pruefling_id))
+			$qry.='		pruefling_id='.$this->db_add_param($pruefling_id, FHC_INTEGER);
+		else
+			$qry.='		prestudent_id='.$this->db_add_param($prestudent_id, FHC_INTEGER);
+			
+			$qry.='	AND 
+						gebiet_id='.$this->db_add_param($gebiet_id, FHC_INTEGER).'
+					AND 
+						begintime IS NOT NULL';
+		
+	 	if($result = $this->db_query($qry))
+        {
+            if($this->db_fetch_object($result))
+                return true; 
+            else
+            { 
+                return false; 
+            }
+        }
+        else
+        {
+            $this->errormsg = 'Fehler bei der Abfrage aufgetreten'; 
+            return false; 
+        }
+	}
 }
 ?>

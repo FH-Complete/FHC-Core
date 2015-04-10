@@ -161,6 +161,7 @@ echo '
 	{
 		var check = confirm(<?php echo "'".$p->t('testtool/okKlickenUmZuStarten')."'"?>+' '+stunde+'h '+minute+'m '+sekunde+'s');
         if (check == true) {
+			var sprache_user = <?php echo "'".$sprache_user."'"?>;
         	document.location.href = 'frage.php?gebiet_id='+gebiet_id+'&start=true';
         }
         else {
@@ -192,8 +193,14 @@ else
 
 list($stunde, $minute, $sekunde) = explode(':',$gebiet->zeit);
 
+$gestartet = $gebiet->isGestartet($gebiet_id, $_SESSION['pruefling_id'], null);
+if(!$gestartet && $gebiet->errormsg!='')
+{
+	die($gebiet->errormsg.'</body></html>');
+}
+
 //Start des Pruefungsvorganges
-if(isset($_GET['start']))
+if(isset($_GET['start']) && !$gestartet)
 {
 	//Fragenpool generieren
 	$frage = new frage();
@@ -523,19 +530,6 @@ if($frage->frage_id!='')
 		else
 		{
 			if(!$demo)
-			/*{
-				$qry = "SELECT count(*) as anzahl FROM testtool.tbl_frage 
-						WHERE tbl_frage.gebiet_id=".$db->db_add_param($gebiet_id, FHC_INTEGER)." 
-						AND demo ";
-				if($row = $db->db_fetch_object($db->db_query($qry)))
-				{
-					if($row->anzahl>1)
-					{
-						//Bei Demos den Weiter-Button nur anzeigen, wenn ausser der Startseite noch andere Demoseiten vorhanden sind
-						echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id' class='Item'>".$p->t("testtool/zurueckZurStartseite")." &gt;&gt;</a>";
-					}
-				}
-			}*/
 			//else
 			{
 				//Wenns der letzte Eintrag ist, wieder zum ersten springen
@@ -543,40 +537,6 @@ if($frage->frage_id!='')
 			}
 		}
 	}
-	/*else 
-	{
-		//Naechste Frage holen und Weiter-Button anzeigen
-		if($demo)
-		{
-			
-			$frage2 = new frage();
-			$nextfrage = $frage2->getNextFrage($gebiet_id, $_SESSION['pruefling_id'], $frage_id, $demo);
-
-			if($nextfrage)
-			{
-				$value="Demo";
-				echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$nextfrage' class='Item'>$value &gt;&gt;</a>";
-			}
-			else
-			{
-				//Naechste Frage holen und Weiter-Button anzeigen
-				//$frage = new frage();
-				//$nextfrage = $frage->getNextFrage($gebiet_id, $_SESSION['pruefling_id'], $frage_id, $demo);
-				
-				$qry = "SELECT count(*) as anzahl FROM testtool.tbl_frage 
-						WHERE tbl_frage.gebiet_id=".$db->db_add_param($gebiet_id, FHC_INTEGER)."
-						AND demo ";
-				if($row = $db->db_fetch_object($db->db_query($qry)))
-				{
-					if($row->anzahl>1)
-					{
-						//Bei Demos den Weiter-Button nur anzeigen, wenn ausser der Startseite noch andere Demoseiten vorhanden sind
-						echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id' class='Item'>".$p->t("testtool/zurueckZurStartseite")." &gt;&gt;</a>";
-					}
-				}
-			}
-		}
-	}*/
 	if(!$demo && !$levelgebiet)
 		echo " </tr></table>";
 	
@@ -588,16 +548,11 @@ if($frage->frage_id!='')
 	//Sound einbinden
 	if($frage->audio!='')
 	{
-		//echo '<embed autostart="false" src="sound.php?src=frage&amp;frage_id='.$frage->frage_id.'&amp;sprache='.$_SESSION['sprache'].'" height="20" width="250"/><br />';
-		echo '
-			<script language="JavaScript" src="audio-player/audio-player.js"></script>
-			<object type="application/x-shockwave-flash" data="audio-player/player.swf" id="audioplayer1" height="24" width="290">
-			<param name="movie" value="audio_player/player.swf" />
-			<param name="FlashVars" value="playerID=audioplayer1&amp;soundFile=sound.php%3Fsrc%3Dfrage%26frage_id%3D'.$frage->frage_id.'%26sprache%3D'.$_SESSION['sprache'].'" />
-			<param name="quality" value="high" />
-			<param name="menu" value="false" />
-			<param name="wmode" value="transparent" />
-			</object>';
+		echo '	<audio src="sound.php?src=frage&amp;frage_id='.$frage->frage_id.'&amp;sprache='.$_SESSION['sprache'].'" controls="controls">
+					<div>
+						<p>Ihr Browser unterstützt dieses Audioelement leider nicht.</p>
+					</div>
+				</audio>';
 	}
 	echo "$frage->text<br/><br/>\n";
 
@@ -645,16 +600,11 @@ if($frage->frage_id!='')
 			echo "<img class='testtoolvorschlag' src='bild.php?src=vorschlag&amp;vorschlag_id=$vorschlag->vorschlag_id&amp;sprache=".$_SESSION['sprache']."' /><br/>";
 		if($vorschlag->audio!='')
 		{
-			//echo '<embed autostart="false" src="sound.php?src=vorschlag&amp;vorschlag_id='.$vorschlag->vorschlag_id.'&amp;sprache='.$_SESSION['sprache'].'" height="20" width="100"/><br />';
-			echo '
-				<script language="JavaScript" src="audio-player/audio-player.js"></script>
-				<object type="application/x-shockwave-flash" data="audio-player/player.swf" id="audioplayer1" height="24" width="290">
-				<param name="movie" value="audio_player/player.swf" />
-				<param name="FlashVars" value="playerID=audioplayer1&amp;soundFile=sound.php%3Fsrc%3Dvorschlag%26vorschlag_id%3D'.$vs->vorschlag_id.'%26sprache%3D'.$_SESSION['sprache'].'" />
-				<param name="quality" value="high" />
-				<param name="menu" value="false" />
-				<param name="wmode" value="transparent" />
-				</object>';
+			echo '	<audio src="sound.php?src=vorschlag&amp;vorschlag_id='.$vorschlag->vorschlag_id.'&amp;sprache='.$_SESSION['sprache'].'" controls="controls">
+						<div>
+							<p>Ihr Browser unterstützt dieses Audioelement leider nicht.</p>
+						</div>
+					</audio>';
 		}
 		if($vorschlag->text!='')
 			echo $vorschlag->text.'<br/>';
