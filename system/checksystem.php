@@ -2850,6 +2850,27 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_notiz_dokument LIMIT 1;")
 		echo ' Tabellen fuer Dokumentenupload fuer Notizen hinzugefuegt!<br>';
 }
 
+// Fehlende Foreign Keys fuer ZGV Nation und Ausstellungsstaat auf ZGVNation kopieren
+if($result = @$db->db_query("SELECT * FROM information_schema.table_constraints WHERE constraint_name='fk_prestudent_zgv_zgvnation'"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = 'ALTER TABLE public.tbl_prestudent ADD CONSTRAINT fk_prestudent_zgv_zgvnation FOREIGN KEY (zgvnation) REFERENCES bis.tbl_nation(nation_code) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE public.tbl_prestudent ADD CONSTRAINT fk_prestudent_zgv_zgvmanation FOREIGN KEY (zgvmanation) REFERENCES bis.tbl_nation(nation_code) ON DELETE RESTRICT ON UPDATE CASCADE;
+			ALTER TABLE public.tbl_prestudent ADD CONSTRAINT fk_prestudent_zgv_zgvdoktornation FOREIGN KEY (zgvdoktornation) REFERENCES bis.tbl_nation(nation_code) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+			UPDATE public.tbl_prestudent SET zgvnation=ausstellungsstaat WHERE zgvnation is null AND ausstellungsstaat is not null;
+			UPDATE public.tbl_prestudent SET zgvmanation=ausstellungsstaat WHERE zgvmanation is null AND ausstellungsstaat is not null AND zgvmas_code is not null;
+		';
+		
+	
+		if(!$db->db_query($qry))
+			echo '<strong>public.tbl_prestudent: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>public.tbl_prestudent: Fehlende Foreign Keys zu Nation hinzugefügt';
+	}
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
