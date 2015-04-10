@@ -211,7 +211,7 @@ class MySabre_CalDAV_Backend extends \Sabre\CalDAV\Backend\AbstractBackend
 				foreach($val as $row)
 				{
 					//einzelnen Eintrag holen
-					if($row['dtstart']==$dtstart && $row['unr'][0]==$unr)
+					if($row['dtstart']==$dtstart && ($row['unr'][0]==$unr) || $unr=='R'.$row['reservierung_id'])
 					{
 						return $row;
 					}
@@ -221,6 +221,7 @@ class MySabre_CalDAV_Backend extends \Sabre\CalDAV\Backend\AbstractBackend
 				$data=array_merge($data, $val);
 		}
 		$endtime = microtime(true);
+		//error_log("\n\nDATA".print_r($data,true));
 		//error_log("getCalendarData time:".($endtime-$starttime));
 		//$data.="\nEND:VCALENDAR";
 		return $data;	
@@ -280,9 +281,16 @@ END:VTIMEZONE\n".$event."\nEND:VCALENDAR";
 		$return  = array();
 		foreach($data as $row)
 		{
+			// Reservierungen werden mit einem R markiert und mit der ReservierungID da sonst
+			// Termine verloren gehen koennen wenn zur selben Zeit eine Reservierung und ein LVPlan Eintrag vorhanden ist
+			if($row['reservierung'])
+				$uri = $row['dtstart'].'-R'.$row['reservierung_id'];
+			else
+				$uri = $row['dtstart'].'-'.$row['unr'][0];
+
 			$return[] = array("id"=>$row['UID'],
 			"calendardata"=>$this->makeCal($row['data']),
-			"uri"=>$row['dtstart'].'-'.$row['unr'][0],
+			"uri"=>$uri,
 			"lastmodified"=>$row['updateamum'],
 			"etag"=>'"'.$row['UID'].'"',
 			"calendarid"=>$calendarId);

@@ -135,6 +135,7 @@ echo $p->t('global/studiensemester')."</b> <SELECT name='stsem' onChange=\"MM_ju
 	echo "</SELECT><br />";
 	
 $konto = new konto();
+
 if ($konto->checkStudienbeitrag($uid, $stsem))
 {
 	echo "<a href='../pdfExport.php?xsl=Inskription&xml=student.rdf.php&ss=".$stsem."&uid=".$uid."&xsl_stg_kz=".$xsl_stg_kz."'>".$p->t('tools/inskriptionsbestaetigung')."</a>";
@@ -144,6 +145,19 @@ else
 	echo $p->t('tools/inskriptionsbestaetigung')." - ".$p->t('tools/studienbeitragFuerSSNochNichtBezahlt',array($stsem));
 
 echo "<hr>";
+
+if(defined('CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN') && CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN)
+{
+    if ($konto->checkStudienbeitrag($uid, $stsem))
+    {
+	    echo "<a href='../pdfExport.php?xsl=Studienblatt&xml=studienblatt.xml.php&ss=".$stsem."&uid=".$uid."'>".$p->t('tools/studienbuchblatt')."</a>";
+	    echo ' - '.$p->t('tools/studienbeitragFuerSSBezahltAmDatum',array($stsem, $konto->buchungsdatum));
+    }
+    else
+	    echo $p->t('tools/studienbuchblatt')." - ".$p->t('tools/studienbeitragFuerSSNochNichtBezahlt',array($stsem));
+
+    echo "<hr>";
+}
 
 echo "<a href='studienerfolgsbestaetigung.php' class='Item'>".$p->t('tools/studienerfolgsbestaetigung')." Deutsch</a><br>";
 echo "<a href='studienerfolgsbestaetigung.php?lang=en' class='Item'>".$p->t('tools/studienerfolgsbestaetigung')." Englisch</a>";

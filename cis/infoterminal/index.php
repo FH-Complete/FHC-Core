@@ -533,8 +533,10 @@ $refreshtime = ($sdtools?99999:(isset($_SESSION[constSESSIONNAME]["uid"]) && !em
 	else 
 	{
 		// Lageplan
+	    if(defined('CIS_INFOSCREEN_LAGEPLAN_ANZEIGEN') && CIS_INFOSCREEN_LAGEPLAN_ANZEIGEN)
+	    {
 		echo '	   
-         <tr class="cursor_hand">
+		<tr class="cursor_hand">
 	  		<td>
 				<a href="'.htmlspecialchars($_SERVER['PHP_SELF']).'?work=lageplan&amp;standort_id='.$standort_id.'">		
 					<span class="blau_mitteText">
@@ -543,6 +545,7 @@ $refreshtime = ($sdtools?99999:(isset($_SESSION[constSESSIONNAME]["uid"]) && !em
 				</a>
 	  		</td>
  		</tr>';
+	    }
 	}
 	
 	echo '<tr><td>&nbsp;</td></tr>';

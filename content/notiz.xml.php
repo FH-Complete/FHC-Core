@@ -86,6 +86,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					class="sortDirectionIndicator" 
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#endeISO" />
 			    <xul:splitter class="tree-splitter"/>
+                <xul:treecol anonid="treecol-notiz-dokumente" label="Dokumente" flex="2" hidden="false" persist="hidden width ordinal"
+					class="sortDirectionIndicator" 
+					sort="rdf:http://www.technikum-wien.at/notiz/rdf#dokumente" />
+			    <xul:splitter class="tree-splitter"/>
 				<xul:treecol anonid="treecol-notiz-erledigt" label="Erledigt" flex="2" hidden="false" persist="hidden width ordinal"
 					class="sortDirectionIndicator" type="checkbox"
 					sort="rdf:http://www.technikum-wien.at/notiz/rdf#erledigt_boolean" />
@@ -114,6 +118,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			           <xul:treecell label="rdf:http://www.technikum-wien.at/notiz/rdf#bearbeiter_uid"/>
 			           <xul:treecell label="rdf:http://www.technikum-wien.at/notiz/rdf#start"/>
 			           <xul:treecell label="rdf:http://www.technikum-wien.at/notiz/rdf#ende"/>
+                       <xul:treecell label="rdf:http://www.technikum-wien.at/notiz/rdf#dokumente"/>
 			           <xul:treecell label="erledigt" value="rdf:http://www.technikum-wien.at/notiz/rdf#erledigt"/>
 			           <xul:treecell label="rdf:http://www.technikum-wien.at/notiz/rdf#notiz_id"/>
 			           <xul:treecell label="rdf:http://www.technikum-wien.at/notiz/rdf#startISO"/>
@@ -150,6 +155,16 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				      				<xul:label value="Text"/>
 						      		<xul:box class="WYSIWYG" anonid="textbox-notiz-text" flex="1"/>
 								</xul:row>
+                                <xul:row>
+                                    <xul:spacer flex="1" />
+                                    <xul:hbox anonid="hbox-notiz-dokumente"></xul:hbox>
+                                </xul:row>
+                                <xul:row>
+                                    <xul:spacer flex="1" />
+                                    <xul:hbox>
+                                        <xul:button anonid="button-notiz-upload-dokument" oncommand="document.getBindingParent(this).UploadDokument()" label="Dokument hinzufügen" disabled="true" />
+                                    </xul:hbox>
+                                </xul:row>
 								<xul:row>
 				      					<xul:label value="Gültig von"/>
 				      				<xul:hbox>
@@ -267,6 +282,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				document.getAnonymousElementByAttribute(this ,'anonid', 'menulist-notiz-bearbeiter').disabled=val;
 				document.getAnonymousElementByAttribute(this ,'anonid', 'checkbox-notiz-erledigt').disabled=val;
 				document.getAnonymousElementByAttribute(this ,'anonid', 'button-notiz-speichern').disabled=val;
+                if(val)
+                    document.getAnonymousElementByAttribute(this ,'anonid', 'button-notiz-upload-dokument').disabled=val;
 			]]>
 			</body>
 		</method>
@@ -292,6 +309,11 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				document.getAnonymousElementByAttribute(this ,'anonid', 'menulist-notiz-bearbeiter').value='';
 				document.getAnonymousElementByAttribute(this ,'anonid', 'checkbox-notiz-erledigt').checked=false;
 				document.getAnonymousElementByAttribute(this ,'anonid', 'label-notiz-updateamum').value='';
+                var notizdoks = document.getAnonymousElementByAttribute(this ,'anonid', 'hbox-notiz-dokumente');
+                while(notizdoks.hasChildNodes())
+                {
+                  notizdoks.removeChild(notizdoks.firstChild);
+                }
 			]]>
 			</body>
 		</method>
@@ -402,6 +424,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			<![CDATA[
 				this.ResetDetails();
 				this.DisableDetails(false);
+                document.getAnonymousElementByAttribute(this ,'anonid', 'button-notiz-upload-dokument').disabled=true;
 				document.getAnonymousElementByAttribute(this ,'anonid', 'caption-notiz-detail').label="Neue Notiz";
 			]]>
 			</body>
@@ -412,6 +435,15 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 				//debug('Refresh Notiz');
 				netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 				this.TreeNotizDatasource.Refresh(false); //non blocking
+			]]>
+			</body>
+		</method>
+		<method name="RefreshNotizBlocking">
+			<body>
+			<![CDATA[
+				//debug('Refresh Notiz');
+				netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+				this.TreeNotizDatasource.Refresh(true); //blocking
 			]]>
 			</body>
 		</method>
@@ -429,7 +461,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					//Abfrage ob wirklich geloescht werden soll
 					if (confirm('Wollen Sie die Notiz mit der ID: '+notiz_id+' wirklich loeschen?'))
 					{
-	
+                        document.getAnonymousElementByAttribute(this ,'anonid', 'button-notiz-upload-dokument').disabled=true;
 						var soapBody = new SOAPObject("deleteNotiz");
 						soapBody.appendChild(new SOAPObject("notiz_id")).val(notiz_id);
 						
@@ -536,10 +568,17 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 			<body>
 			<![CDATA[
 			    var id = this.value;
-			    
+                
 			    if(id!='')
 			    {
-			    	this.DisableDetails(false);
+			    	var notizdoks = document.getAnonymousElementByAttribute(this ,'anonid', 'hbox-notiz-dokumente');
+                    while(notizdoks.hasChildNodes())
+                    {
+                      notizdoks.removeChild(notizdoks.firstChild);
+                    }
+                    
+                    this.DisableDetails(false);
+                    document.getAnonymousElementByAttribute(this ,'anonid', 'button-notiz-upload-dokument').disabled=false;
 			    	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 			    	//Daten holen
 					var url = '<?php echo APP_ROOT ?>rdf/notiz.rdf.php?notiz_id='+id+'&'+gettimestamp();
@@ -554,8 +593,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					var predicateNS = "http://www.technikum-wien.at/notiz/rdf";
 				
 					//RDF parsen
-				
-					titel = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#titel" ));
+                    titel = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#titel" ));
 					text = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#text" ));
 					start = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#start" ));
 					ende = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ende" ));
@@ -595,7 +633,48 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 						menulist.selectedItem=null;
 					}
 					document.getAnonymousElementByAttribute(this ,'anonid', 'caption-notiz-detail').label="Bearbeiten";
+                    
+                    // Dokumente auslesen
+                    var url = '<?php echo APP_ROOT ?>rdf/dms.rdf.php?notiz_id='+id+'&'+gettimestamp();
+                    	
+                    var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
+                                   getService(Components.interfaces.nsIRDFService);
 
+                    dsource = rdfService.GetDataSourceBlocking(url);
+
+                    // Alle Elemente aus dem RDF holen
+                    var dsResources = dsource.GetAllResources(); 
+                    var thisResource = null; 
+
+                    // Durchlaufen der Elemente
+                    while(dsResources.hasMoreElements())
+                    { 
+                        thisResource = dsResources.getNext().QueryInterface( Components.interfaces.nsIRDFResource); 
+
+                        var predicateNS = "http://www.technikum-wien.at/dms/rdf";
+
+                        //Spalten holen
+                        name = getTargetHelper(dsource,thisResource,rdfService.GetResource( predicateNS + "#name" ));
+                        dms_id = getTargetHelper(dsource,thisResource,rdfService.GetResource( predicateNS + "#dms_id" ));
+                        
+                        if(dms_id!='')
+                        {
+                            // Download-Link für Dokument einfügen
+                            var dokurl = '<?php echo APP_ROOT ?>content/notizdokdownload.php?id='+dms_id;
+                            var dokbtn = document.createElement("button");
+                            dokbtn.setAttribute("label", name);
+                            dokbtn.setAttribute("onclick", "window.open('"+dokurl+"')");
+                            dokbtn.setAttribute("style", "margin-right: -5px;");
+                            document.getAnonymousElementByAttribute(this ,'anonid', 'hbox-notiz-dokumente').appendChild(dokbtn);
+                            
+                            // Link zum Löschen des Dokuments
+                            var delbtn = document.createElement("button");
+                            delbtn.setAttribute("image", "<?php echo APP_ROOT;?>skin/images/delete_x.png");
+                            delbtn.setAttribute("tooltiptext", "Datei "+name+" löschen");
+                            delbtn.setAttribute("onclick", "document.getBindingParent(this).LoeschenDokument("+dms_id+",'"+name+"')");
+                            document.getAnonymousElementByAttribute(this ,'anonid', 'hbox-notiz-dokumente').appendChild(delbtn);
+                        }
+                    }
 			    }
 			]]>
 			</body>
@@ -803,6 +882,124 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					   	}
 					}
 				}				
+			]]>
+			</body>
+		</method>
+        
+        <method name="UploadDokument">
+            <body>
+			<![CDATA[
+                notiz_id = document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-notiz_id').value;
+                                
+                if(notiz_id != '')
+                {
+					NotizDokumentUploadScope = this;
+					this.selectID=notiz_id;
+                    var new_window = window.open("<?php echo APP_ROOT; ?>content/notizdokupload.php?notiz_id="+notiz_id ,"","chrome, status=no, width=800, height=350, centerscreen, resizable");
+                }
+                else
+                    alert("keine Notiz ausgewählt");
+            ]]>
+			</body>
+        </method>
+        
+        <method name="LoeschenDokument">
+			<parameter name="dms_id"/>
+            <parameter name="dateiname"/>
+			<body>
+			<![CDATA[
+								
+				//Abfrage ob wirklich geloescht werden soll
+                if (confirm('Wollen Sie die Datei '+dateiname+' wirklich loeschen?'))
+                {
+                    var soapBody = new SOAPObject("deleteDokument");
+                    soapBody.appendChild(new SOAPObject("dms_id")).val(dms_id);
+
+                    var sr = new SOAPRequest("deleteDokument",soapBody);
+
+                    SOAPClient.Proxy="<?php echo APP_ROOT;?>soap/notiz.soap.php?"+gettimestamp();
+                    SOAPClient.AjaxAsync=false;
+
+                    function mycallb(obj) {
+                      var me=obj;
+                      this.invoke=function (respObj) {
+                        try
+                        {
+                            var result = respObj.Body[0].deleteDokumentResponse[0].message[0].Text;
+                        }
+                        catch(e)
+                        {
+                            try
+                            {
+                                var fehler = respObj.Body[0].Fault[0].faultstring[0].Text;
+                            }
+                            catch(e)
+                            {
+                                var fehler = e;
+                            }
+                            alert('Fehler: '+fehler);
+                            return;
+                        }
+                        me.RefreshNotiz();
+                      }
+                    }
+
+                    var cb=new mycallb(this);
+
+                    SOAPClient.SendRequest(sr, cb.invoke);
+                    
+                    // Alle Download-Buttons der Dokumente entfernen
+                    var notizdoks = document.getAnonymousElementByAttribute(this ,'anonid', 'hbox-notiz-dokumente');
+                    while(notizdoks.hasChildNodes())
+                    {
+                      notizdoks.removeChild(notizdoks.firstChild);
+                    }
+                    
+                    // Dokumente auslesen
+                    netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+                    var id = document.getAnonymousElementByAttribute(this ,'anonid', 'textbox-notiz-notiz_id').value;
+                    var url = '<?php echo APP_ROOT ?>rdf/dms.rdf.php?notiz_id='+id+'&'+gettimestamp();
+                    	
+                    var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
+                                   getService(Components.interfaces.nsIRDFService);
+
+                    dsource = rdfService.GetDataSourceBlocking(url);
+
+                    // Alle Elemente aus dem RDF holen
+                    var dsResources = dsource.GetAllResources(); 
+                    var thisResource = null; 
+
+                    // Durchlaufen der Elemente
+                    while(dsResources.hasMoreElements())
+                    { 
+                        thisResource = dsResources.getNext().QueryInterface( Components.interfaces.nsIRDFResource); 
+
+                        var predicateNS = "http://www.technikum-wien.at/dms/rdf";
+
+                        //Spalten holen
+                        name = getTargetHelper(dsource,thisResource,rdfService.GetResource( predicateNS + "#name" ));
+                        dms_id = getTargetHelper(dsource,thisResource,rdfService.GetResource( predicateNS + "#dms_id" ));
+                        
+                        if(dms_id!='')
+                        {
+                            // Download-Link für Dokument einfügen
+                            var dokurl = '<?php echo APP_ROOT ?>content/notizdokdownload.php?id='+dms_id;
+                            var dokbtn = document.createElement("button");
+                            dokbtn.setAttribute("label", name);
+                            dokbtn.setAttribute("onclick", "window.open('"+dokurl+"')");
+                            dokbtn.setAttribute("style", "margin-right: -5px;");
+                            document.getAnonymousElementByAttribute(this ,'anonid', 'hbox-notiz-dokumente').appendChild(dokbtn);
+                            
+                            // Link zum Löschen des Dokuments
+                            var delbtn = document.createElement("button");
+                            delbtn.setAttribute("image", "<?php echo APP_ROOT;?>skin/images/delete_x.png");
+                            delbtn.setAttribute("tooltiptext", "Datei "+name+" löschen");
+                            delbtn.setAttribute("onclick", "document.getBindingParent(this).LoeschenDokument("+dms_id+",'"+name+"')");
+                            document.getAnonymousElementByAttribute(this ,'anonid', 'hbox-notiz-dokumente').appendChild(delbtn);
+                        }
+                    }
+                }
+				
 			]]>
 			</body>
 		</method>

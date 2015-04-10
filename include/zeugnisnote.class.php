@@ -462,5 +462,50 @@ class zeugnisnote extends basis_db
 			return false;
 		}
 	}
+	
+	/**
+	 * Generiert den SQL-Befehl für eine UNDO-Aktion
+	 * @param type $crud gewünschter Typ der UNDO-Aktion
+	 */
+	public function getUndo($crud)
+	{
+	    if(strtoupper($crud) === 'INSERT')
+	    {
+		return 'INSERT INTO lehre.tbl_zeugnisnote (lehrveranstaltung_id, student_uid, 
+			    studiensemester_kurzbz, note, uebernahmedatum, benotungsdatum, bemerkung,
+			    updateamum, updatevon, insertamum, insertvon, ext_id, punkte) VALUES('.
+			    $this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER).', '.
+			    $this->db_add_param($this->student_uid).', '.
+			    $this->db_add_param($this->studiensemester_kurzbz).', '.
+			    $this->db_add_param($this->note).', '.
+			    $this->db_add_param($this->uebernahmedatum).', '.
+			    $this->db_add_param($this->benotungsdatum).', '.
+			    $this->db_add_param($this->bemerkung).', '.
+			    $this->db_add_param($this->updateamum).', '.
+			    $this->db_add_param($this->updatevon).', '.
+			    $this->db_add_param($this->insertamum).', '.
+			    $this->db_add_param($this->insertvon).', '.
+			    $this->db_add_param($this->ext_id).','.
+			    $this->db_add_param($this->punkte).');';
+	    }
+	    else if(strtoupper($crud) === 'UPDATE')
+	    {
+		return 'UPDATE lehre.tbl_zeugnisnote SET '.
+			    'note='.$this->db_add_param($this->note).', '.
+			    'punkte='.$this->db_add_param($this->punkte).','.
+			    'uebernahmedatum='.$this->db_add_param($this->uebernahmedatum).', '.
+			    'benotungsdatum='.$this->db_add_param($this->benotungsdatum).', '.
+			    'bemerkung='.$this->db_add_param($this->bemerkung).', '.
+			    'updateamum= '.$this->db_add_param($this->updateamum).', '.
+			    'updatevon='.$this->db_add_param($this->updatevon).' '.
+			    'WHERE lehrveranstaltung_id='.$this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER).' '.
+			    'AND student_uid='.$this->db_add_param($this->student_uid).' '.
+			    'AND studiensemester_kurzbz='.$this->db_add_param($this->studiensemester_kurzbz).';';
+	    }
+	    else
+	    {
+		return NULL;
+	    }
+	}
 }
 ?>

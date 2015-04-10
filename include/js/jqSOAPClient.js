@@ -14,6 +14,7 @@
 */
 //Singleton SOAP Client
 var SOAPClient = {
+    AjaxAsync: true,
 	Proxy: "",
 	SOAPServer: "",
 	ContentType: "text/xml",
@@ -44,7 +45,8 @@ var SOAPClient = {
 				}
 			}
 			$.ajax({
-				 type: "POST",
+				 async: SOAPClient.AjaxAsync,
+                 type: "POST",
 				 url: SOAPClient.Proxy,
 				 dataType: "xml",
 				 processData: false,

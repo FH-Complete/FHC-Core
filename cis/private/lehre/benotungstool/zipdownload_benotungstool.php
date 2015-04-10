@@ -25,56 +25,61 @@
  * @create 20-03-2006
  * Aufruf: zipdownload.php?stg=255&sem=1$short=eng
  */
+require_once('../../../../config/cis.config.inc.php');
+require_once('../../../../include/functions.inc.php');
 
-	require_once('../../../../config/cis.config.inc.php');
-   	require_once('../../../../include/functions.inc.php');
-	$user = get_uid(); 
+$user = get_uid(); 
 
-   //Gueltigkeit der Parameter pruefen		
-   if(!isset($_GET['uebung_id']) || !is_numeric($_GET['uebung_id']))
-   {
-   		die('Fehler bei der Parameteruebergabe');
-   }
-    if(!isset($_GET['lehreinheit_id']) || !is_numeric($_GET['lehreinheit_id']))
-   {
-   		die('Fehler bei der Parameteruebergabe');
-   }
-   if(!isset($_GET['stsem']))
-   {
-   		die('Fehler bei der Parameteruebergabe');
-   }
-    if(!isset($_GET['downloadname']))
-   {
-   		die('Fehler bei der Parameteruebergabe');
-   } 		
+if(!check_lektor($user))
+	die('Sie haben keine Berechtigung fuer diese Seite');
 
-   
-   $uebung_id   = $_GET['uebung_id'];
-	$lehreinheit_id   = $_GET['lehreinheit_id'];
-   $stsem   = $_GET['stsem'];
-	$downloadname   = $_GET['downloadname'];
-   
+//Gueltigkeit der Parameter pruefen		
+if(!isset($_GET['uebung_id']) || !is_numeric($_GET['uebung_id']))
+{
+	die('Fehler bei der Parameteruebergabe');
+}
+if(!isset($_GET['lehreinheit_id']) || !is_numeric($_GET['lehreinheit_id']))
+{
+	die('Fehler bei der Parameteruebergabe');
+}
+if(!isset($_GET['stsem']))
+{
+	die('Fehler bei der Parameteruebergabe');
+}
+if(!isset($_GET['downloadname']))
+{
+	die('Fehler bei der Parameteruebergabe');
+}
 
-   //Pfade bauen
-   $pfad = BENOTUNGSTOOL_PATH.'abgabe/';
-   $filename = 'download_'.$user.'_'.$downloadname.'.zip';
-   
-   
-   //Pfad wechseln
-   chdir($pfad);
- 
-   
-   //File loeschen falls es existiert
-   //if(file_exists("download_".$user."*"))
-   exec("rm download_".$user."*");
-   		
-   //Zip File erstellen
-   exec("zip -r ".$filename." *_[WS]S[0-9][0-9][0-9][0-9]_".$uebung_id."_*");
+$uebung_id   = $_GET['uebung_id'];
+$lehreinheit_id   = $_GET['lehreinheit_id'];
+$stsem   = $_GET['stsem'];
+$downloadname   = $_GET['downloadname'];
 
-   //Auf Zip File Verweisen
-   //header("Location: $pfad$filename");
-   	header('Content-Type: application/octet-stream');
-	header('Content-disposition: attachment; filename="'.$filename.'"');
-	readfile($filename);
-	unlink($filename);
+if(mb_strstr($downloadname,'..'))
+	die('Ungueltiger Parameter gefunden');
+
+//Pfade bauen
+$pfad = BENOTUNGSTOOL_PATH.'abgabe/';
+$filename = 'download_'.$user.'_'.$downloadname.'.zip';
+
+if(!check_filename($filename))
+	die('Ungueltiger Parameter gefunden');
+
+//Pfad wechseln
+chdir($pfad);
+
+//File loeschen falls es existiert
+//if(file_exists("download_".$user."*"))
+exec('rm download_'.$user.'*');
+	
+//Zip File erstellen
+exec("zip -r ".escapeshellarg($filename).' *_[WS]S[0-9][0-9][0-9][0-9]_'.$uebung_id.'_*');
+
+//Auf Zip File Verweisen
+//header("Location: $pfad$filename");
+header('Content-Type: application/octet-stream');
+header('Content-disposition: attachment; filename="'.$filename.'"');
+readfile($filename);
+unlink($filename);
 ?>

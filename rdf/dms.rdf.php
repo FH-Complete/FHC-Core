@@ -44,6 +44,11 @@ elseif(isset($_GET['filter']))
 	$filter = $_GET['filter'];
 	$dms->search($filter);
 }
+elseif(isset($_GET['notiz_id']))
+{
+    $notiz_id = $_GET['notiz_id'];
+    $dms->getDokumenteNotiz($notiz_id);
+}
 else
 	die('projekt_kurzbz oder projektphase_id muss uebergeben werden');
 

@@ -60,8 +60,8 @@ if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungA
 	    
 	    #stgWrapper {
 		position: absolute;
-		height: 80%;
-		width: 450px;
+		height: 70px;
+		width: 850px;
 		padding: 1.8em 1.5em 1.8em 1em;
 		border-radius: 25px;
 		/*border: 1px solid black;*/
@@ -82,9 +82,9 @@ if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungA
 	    
 	    #prfWrapper {
 		position: absolute;
-		height: 80%;
-		width: 200px;
-		left: 510px;
+		height: 70%;
+		width: 300px;
+		top: 180px;
 		padding: 1.8em 1.5em 1.8em 1em;
 		border-radius: 25px;
 		/*border: 1px solid black;*/
@@ -105,9 +105,10 @@ if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungA
 	    #anmWrapper {
 		position: absolute;
 		/*top: 45px;*/
-		left: 760px;
-		width: 400px;
-		height: 80%;
+		left: 350px;
+		top: 180px;
+		width: 500px;
+		height: 70%;
 		padding: 1.8em 1.5em 1.8em 1em;
 		border-radius: 25px;
 		/*border: 1px solid black;*/
@@ -204,12 +205,19 @@ if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungA
 		font-weight: bold;
 	    }
 	    
+	    #studiengaenge > div {
+		float: left;
+		width: 50%;
+	    }
+	    
 	</style>
     </head>
     <body>
 	<script>
 	    $(document).ready(function(){
 		loadStudiengaenge();
+		$("#filter_studiensemester").css("visibility","visible");
+		console.log($("#filter_studiensemester"));
 		$("#raumDialog").dialog({
 		    modal: true,
 		    autoOpen: false,
@@ -220,10 +228,33 @@ if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungA
 	<h1>Anmeldungen Verwalten</h1>
 	<div id='stgWrapper'>
 	    <div id='studiengaenge'>
-		<h2>Studiengänge</h2>
-		<ul id='stgListe'>
-		    
-		</ul>
+		<div>
+		    <h2>Studiengänge</h2>
+		    <div id='stgListe'>
+
+		    </div>
+		</div>
+		<div>
+		    <h2>Studiensemester</h2>
+		    <?php
+			echo '<select id="filter_studiensemester" onchange="loadPruefungStudiengang();" style="visibility: hidden;">';
+			$aktuellesSemester = $studiensemester->getaktorNext();
+			$studiensemester->getAll();
+			foreach($studiensemester->studiensemester as $sem)
+			{
+			    /*@var $sem studiensemester */
+			    if($aktuellesSemester == $sem->studiensemester_kurzbz)
+			    {
+				echo '<option selected value="'.$sem->studiensemester_kurzbz.'">'.$sem->bezeichnung.'</option>';
+			    }
+			    else
+			    {
+				echo '<option value="'.$sem->studiensemester_kurzbz.'">'.$sem->bezeichnung.'</option>';
+			    }
+			}
+		       echo '</select></p>';
+		   ?>
+		</div>
 	    </div>
 	</div>
 	<div id='prfWrapper'>
@@ -237,6 +268,9 @@ if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungA
 	<div id='anmWrapper'>
 	    <div id="anmeldungen">
 		<h2>Anmeldungen</h2>
+		<div id="anmeldung_hinzufuegen">
+		    
+		</div>
 		<div id="anmeldeDaten">
 
 		</div>
@@ -250,6 +284,9 @@ if(empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldungA
 		    
 		</div>
 		<div id="raumLink">
+		    
+		</div>
+		<div id="listeDrucken">
 		    
 		</div>
 		<div id="raumDialog">

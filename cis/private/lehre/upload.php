@@ -623,7 +623,7 @@
 													  }
 													  else
 													  {
-													  	  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl') && $file_name!='.htaccess')
+													  	  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl') && !stristr($uploadfile, '.phtml') && $file_name!='.htaccess')
 														  {
 														  	 if(copy($_FILES[$file]['tmp_name'], $uploadfile))
 														  	 {
@@ -646,7 +646,7 @@
 												  }
 												  else
 												  {
-												  	  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl') && $file_name!='.htaccess')
+												  	  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl') && !stristr($uploadfile, '.phtml') && $file_name!='.htaccess')
 													  {
 														  if(copy($_FILES[$file]['tmp_name'], $uploadfile))
 														  {
@@ -679,7 +679,7 @@
 														  }
 														  else
 														  {
-															  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl') && $file_name!='.htaccess')
+															  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl') && !stristr($uploadfile, '.phtml') && $file_name!='.htaccess')
 															  {
 															  	   if(copy($_FILES[$file]['tmp_name'], $uploadfile))
 															  	   {
@@ -702,7 +702,7 @@
 													  }
 													  else
 													  {
-													  	  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl') && $file_name!='.htaccess')
+													  	  if(!stristr($uploadfile, '.php') && !stristr($uploadfile, '.cgi') && !stristr($uploadfile, '.pl') && !stristr($uploadfile, '.phtml') && $file_name!='.htaccess')
 														  {
 															  if(copy($_FILES[$file]['tmp_name'], $uploadfile))
 															  {
@@ -1331,7 +1331,7 @@
 										{
 											if(!@file_exists($dest_dir->path.'/'.$new_file_name_) && !@is_dir($dest_dir->path.'/'.$new_file_name_))
 											{
-												if(!stristr($new_file_name_, '.php') && !stristr($new_file_name_, '.cgi') && !stristr($new_file_name_, '.pl') && $new_file_name_!='.htaccess')
+												if(!stristr($new_file_name_, '.php') && !stristr($new_file_name_, '.cgi') && !stristr($new_file_name_, '.pl') && !stristr($new_file_name_, '.phtml') && $new_file_name_!='.htaccess')
 												{
 													rename($dest_dir->path.'/'.$entry, $dest_dir->path.'/'.$new_file_name_);
 

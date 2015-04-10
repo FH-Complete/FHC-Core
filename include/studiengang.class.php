@@ -260,7 +260,7 @@ class studiengang extends basis_db
 				. 'USING (studienordnung_id) '
 				. 'WHERE aktiv '
 				. 'AND studiengang_kz = ' . $this->db_add_param($studiengang_kz, FHC_INTEGER)
-				. ' AND orgform_kurzbz NOT IN (' . $this->db_add_param('DDP') . ', ' . $this->db_add_param('DL') . ')';
+				. ' AND orgform_kurzbz!='. $this->db_add_param('DDP');
 
 		if($result = $this->db_query($qry))
 		{

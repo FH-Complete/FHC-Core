@@ -92,11 +92,42 @@ if (isset($_GET["handbuch"])){
 	readfile($filename);
 	exit;
 }
-?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+?><!DOCTYPE HTML>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
+	<link href="../../../skin/jquery.css" rel="stylesheet" type="text/css"/>
+    <script src="../../../include/js/jquery1.9.min.js" type="text/javascript" ></script>
+
+<?php
+
+// ADDONS laden
+$addon_obj = new addon();
+$addon_obj->loadAddons();
+foreach($addon_obj->result as $addon)
+{
+	if(file_exists('../../../addons/'.$addon->kurzbz.'/cis/init.js.php'))
+		echo '<script type="application/x-javascript" src="../../../addons/'.$addon->kurzbz.'/cis/init.js.php" ></script>';
+}
+
+// Wenn Seite fertig geladen ist Addons aufrufen
+echo '
+<script>
+$( document ).ready(function() 
+{
+	if(typeof addon  !== \'undefined\')
+	{
+		for(i in addon)
+		{
+			addon[i].init("cis/private/lehre/lesson.php", {uid:\''.$user.'\',lvid:\''.$lvid.'\',studiensemester_kurzbz:\''.$studiensemester_kurzbz.'\'});
+		}
+	}
+});
+</script>
+';
+
+?>
 	<style type="text/css">
 	.transparent {
 	    filter:alpha(opacity=90);

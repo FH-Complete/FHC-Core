@@ -93,6 +93,7 @@ foreach($notiz->result as $row)
 			<NOTIZ:startISO><![CDATA['.$row->start.']]></NOTIZ:startISO>
 			<NOTIZ:endeISO><![CDATA['.$row->ende.']]></NOTIZ:endeISO>
 			<NOTIZ:erledigt><![CDATA['.($row->erledigt?'true':'false').']]></NOTIZ:erledigt>
+            <NOTIZ:dokumente><![CDATA['.count($row->dokumente).']]></NOTIZ:dokumente>
 			<NOTIZ:insertamum><![CDATA['.$row->insertamum.']]></NOTIZ:insertamum>
 			<NOTIZ:insertvon><![CDATA['.$row->insertvon.']]></NOTIZ:insertvon>
 			<NOTIZ:updateamum><![CDATA['.$datum_obj->formatDatum($row->updateamum,'d.m.Y H:i:s').']]></NOTIZ:updateamum>
