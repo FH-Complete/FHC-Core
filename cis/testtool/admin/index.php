@@ -677,23 +677,17 @@ if($frage_id!='')
 	}
 	else
 	{
-		//echo "\n<tr><td align='center' width='400' height='300' style='background: #DDDDDD;'>Kein Bild vorhanden\n";
 		echo "\n<tr><td align='center' width='400' style='background: #DDDDDD;'>\n";
 		if($frage->audio=='')
 			echo "Kein Bild vorhanden\n";
 	}
 	if($frage->audio!='')
 	{
-		//echo '<br /><embed autostart="false" src="../sound.php?src=frage&amp;frage_id='.$frage->frage_id.'&amp;sprache='.$sprache.'" height="20" width="250"/>';
-		echo '
-			<script language="JavaScript" src="../audio-player/audio-player.js"></script>
-			<object type="application/x-shockwave-flash" data="../audio-player/player.swf" id="audioplayer1" height="24" width="290">
-			<param name="movie" value="../audio_player/player.swf" />
-			<param name="FlashVars" value="playerID=audioplayer1&amp;soundFile=../sound.php%3Fsrc%3Dfrage%26frage_id%3D'.$frage->frage_id.'%26sprache%3D'.$sprache.'" />
-			<param name="quality" value="high" />
-			<param name="menu" value="false" />
-			<param name="wmode" value="transparent" />
-			</object>';
+		echo '	<audio src="../sound.php?src=frage&amp;frage_id='.$frage->frage_id.'&amp;sprache='.$sprache.'" controls="controls">
+					<div>
+						<p>Ihr Browser unterstützt dieses Audioelement leider nicht.</p>
+					</div>
+				</audio>';
 	}
 	echo '</td>';
 	//Zusaetzliche EingabeFelder anzeigen
@@ -829,16 +823,11 @@ if($frage_id!='')
 			$a[] = $vs->punkte;
 			if($vs->audio!='')
 			{
-				//echo "<embed autostart='false' src='../sound.php?src=vorschlag&amp;vorschlag_id=".$vs->vorschlag_id."&amp;sprache=".$sprache."' height='20' width='150'/>";
-				echo '
-					<script language="JavaScript" src="../audio-player/audio-player.js"></script>
-					<object type="application/x-shockwave-flash" data="../audio-player/player.swf" id="audioplayer1" height="24" width="290">
-					<param name="movie" value="../audio_player/player.swf" />
-					<param name="FlashVars" value="playerID=audioplayer1&amp;soundFile=../sound.php%3Fsrc%3Dvorschlag%26vorschlag_id%3D'.$vs->vorschlag_id.'%26sprache%3D'.$sprache.'" />
-					<param name="quality" value="high" />
-					<param name="menu" value="false" />
-					<param name="wmode" value="transparent" />
-					</object>';
+				echo '	<audio src="../sound.php?src=vorschlag&amp;vorschlag_id='.$vs->vorschlag_id.'&amp;sprache='.$sprache.'" controls="controls">
+							<div>
+								<p>Ihr Browser unterstützt dieses Audioelement leider nicht.</p>
+							</div>
+						</audio>';
 			}
 			echo "	  </td>
 					  <td><a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$nummer&amp;frage_id=$frage->frage_id&amp;vorschlag_id=$vs->vorschlag_id'>edit</a></td>

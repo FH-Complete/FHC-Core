@@ -137,7 +137,6 @@ if (isset($_SESSION['pruefling_id']))
 					if($row_time->time>0)
 					{
 						//Gebiet gestartet aber noch nicht zu ende
-						//$style='text-decoration: underline;';
 						$style='';
 						$class='ItemTesttoolAktiv';
 					}
@@ -152,7 +151,6 @@ if (isset($_SESSION['pruefling_id']))
 						else
 						{
 							//Gebiet ist zu Ende
-							//$style='text-decoration:line-through;';
 							$style='';
 							$class='ItemTesttoolBeendet';
 						}
@@ -182,7 +180,7 @@ if (isset($_SESSION['pruefling_id']))
 		{
 			echo '<tr>
 				   		<td nowrap>
-				   			<span class="error"><img src="../../skin/images/menu_item.gif" width="7" height="9">&nbsp;'.$row->gebiet_bez.' (invalid)</span>
+				   			<span class="error">&nbsp;'.$row->gebiet_bez.' (invalid)</span>
 				   		</td>
 				   	</tr>';
 		}
