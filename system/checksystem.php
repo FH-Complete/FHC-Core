@@ -2836,6 +2836,8 @@ if(!$result = @$db->db_query("SELECT 1 FROM public.tbl_notiz_dokument LIMIT 1;")
 		notiz_id integer NOT NULL,
         dms_id integer NOT NULL
 	);
+    
+    ALTER TABLE public.tbl_notiz_dokument ADD CONSTRAINT pk_notiz_dokument PRIMARY KEY (notiz_id, dms_id);
 
 	ALTER TABLE public.tbl_notiz_dokument ADD CONSTRAINT fk_notiz_dokument_notiz FOREIGN KEY (notiz_id) REFERENCES public.tbl_notiz (notiz_id) ON UPDATE CASCADE ON DELETE CASCADE;
     ALTER TABLE public.tbl_notiz_dokument ADD CONSTRAINT fk_notiz_dokument_dms FOREIGN KEY (dms_id) REFERENCES campus.tbl_dms (dms_id) ON UPDATE CASCADE ON DELETE CASCADE;
