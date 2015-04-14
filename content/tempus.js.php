@@ -234,7 +234,8 @@ function toggleIgnoreKollision()
 // ****
 function variableChange(variable, id, wert)
 {
-	item = document.getElementById(id);
+	if(id!=null)
+		item = document.getElementById(id);
 	
 	if(typeof(wert)==='undefined')
 	{
@@ -294,12 +295,14 @@ function updateignorekollision()
 	{
 		panel.label='Kollisionscheck AUS';
 		panel.style.backgroundColor='red';
+		panel.style.MozAppearance = "none"
 		document.getElementById('menu-prefs-ignore_kollision').setAttribute('checked','true');
 	}
 	else
 	{
 		panel.label='Kollisionscheck AN';
 		panel.style.backgroundColor='';
+		panel.style.MozAppearance = "none"
 		document.getElementById('menu-prefs-ignore_kollision').setAttribute('checked','false');
 	}		
 }
@@ -314,11 +317,13 @@ function updatedbstpltable()
 
 	if(panel.label=='stundenplan')
 	{
-		panel.style.backgroundColor='red';
+		panel.style.backgroundColor='#FF0000';
+		panel.style.MozAppearance = "none"
 	}
 	else
 	{
 		panel.style.backgroundColor='transparent';
+		panel.style.MozAppearance = "none"
 	}		
 }
 
