@@ -207,7 +207,7 @@ foreach($uid_arr as $uid)
 	    $zgv = new zgv($prestudent->zgv_code);
 	    echo "\t\t<schulform_zgv>".$zgv->zgv_kurzbz."</schulform_zgv>\n";
 	    echo "\t\t<studienplan_bezeichnung>".$studienplan->bezeichnung."</studienplan_bezeichnung>\n";
-	    echo "\t\t<anmerkungpre>".$prestudent->anmerkung."</anmerkungpre>\n";
+	    echo "\t\t<anmerkungpre><![CDATA[$prestudent->anmerkung]]></anmerkungpre>\n";
 	   
 	    $titel_kurzbz = '';
             switch($studiengang->typ)
@@ -276,7 +276,7 @@ foreach($uid_arr as $uid)
 			{
 				if($row_adresse->zustelladresse)
 				{
-					echo "\t\t<strasse>".$row_adresse->strasse."</strasse>\n";
+					echo "\t\t<strasse><![CDATA[$row_adresse->strasse]]></strasse>\n";
 					echo "\t\t<plz>".$row_adresse->plz." ".$row_adresse->ort."</plz>\n";
 					echo "\t\t<nation>".$row_adresse->nation."</nation>\n";
 					break;
@@ -286,7 +286,7 @@ foreach($uid_arr as $uid)
 			{
 				if($row_adresse->heimatadresse)
 				{
-					echo "\t\t<heimat_strasse>".$row_adresse->strasse."</heimat_strasse>\n";
+					echo "\t\t<heimat_strasse><![CDATA[$row_adresse->strasse]]></heimat_strasse>\n";
 					echo "\t\t<heimat_plz>".$row_adresse->plz." ".$row_adresse->ort."</heimat_plz>\n";
 					echo "\t\t<heimat_nation>".$row_adresse->nation."</heimat_nation>\n";
 					break;
