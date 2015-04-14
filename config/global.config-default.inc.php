@@ -45,6 +45,9 @@ define('CIS_ANWESENHEITSLISTE_NOTENLISTE_ANZEIGEN',true);
 // Punkte bei der Noteneingabe anzeigen
 define('CIS_GESAMTNOTE_PUNKTE',false);
 
+// Gibt an ob der Lektor erneut eine LVNote eintragen kann wenn bereits eine Zeugnisnote vorhanden ist (true | false) DEFAULT true
+define('CIS_GESAMTNOTE_UEBERSCHREIBEN',true);
+
 // Anzeigeoptionen für LV-Plan Menü
 define('CIS_LVPLAN_EXPORT_ANZEIGEN',true);
 define('CIS_LVPLAN_PERSONENAUSWAHL_ANZEIGEN',true);

@@ -1021,41 +1021,48 @@ echo "
 				else
 					$hide = "style='display:block;visibility:visible;'";				
 
-				echo "<td valign='bottom' nowrap>
-					<form name='$row_stud->uid' id='$row_stud->uid' method='POST' action='".$_SERVER['PHP_SELF']."?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'>
-						<span id='lvnoteneingabe_".$row_stud->uid."' ".$hide.">
-						<input type='hidden' name='student_uid' value='$row_stud->uid'>";
-
-				// Punkte
-				if(CIS_GESAMTNOTE_PUNKTE)
+				if(!defined('CIS_GESAMTNOTE_UEBERSCHREIBEN') || CIS_GESAMTNOTE_UEBERSCHREIBEN || (!CIS_GESAMTNOTE_UEBERSCHREIBEN && is_null($znote)))
 				{
-					//$punkte_lv = $punkte_vorschlag;
-					echo '<input type="text" name="punkte" id="textbox-punkte-'.$i.'" value="'.$punkte_vorschlag.'" size="3" oninput="PunkteEingabe('.$i.')"/>';
-				}
+					echo "<td valign='bottom' nowrap>
+						<form name='$row_stud->uid' id='$row_stud->uid' method='POST' action='".$_SERVER['PHP_SELF']."?lvid=$lvid&lehreinheit_id=$lehreinheit_id&stsem=$stsem'>
+							<span id='lvnoteneingabe_".$row_stud->uid."' ".$hide.">
+							<input type='hidden' name='student_uid' value='$row_stud->uid'>";
+
+					// Punkte
+					if(CIS_GESAMTNOTE_PUNKTE)
+					{
+						//$punkte_lv = $punkte_vorschlag;
+						echo '<input type="text" name="punkte" id="textbox-punkte-'.$i.'" value="'.$punkte_vorschlag.'" size="3" oninput="PunkteEingabe('.$i.')"/>';
+					}
 				
-				// Noten DropDown
-				if($punkte_vorschlag!='' && CIS_GESAMTNOTE_PUNKTE)
-					$disabled='disabled="disabled"';
-				else
-					$disabled='';
-				echo '<select name="note" id="dropdown-note-'.$i.'" '.$disabled.'>';
-				echo '<option value="">-- keine Auswahl --</option>';
-				foreach($noten_obj->result as $row_note)
-				{
-					if($row_note->note == $note_vorschlag)
-						$selected='selected';
+					// Noten DropDown
+					if($punkte_vorschlag!='' && CIS_GESAMTNOTE_PUNKTE)
+						$disabled='disabled="disabled"';
 					else
-						$selected='';
+						$disabled='';
+					echo '<select name="note" id="dropdown-note-'.$i.'" '.$disabled.'>';
+					echo '<option value="">-- keine Auswahl --</option>';
+					foreach($noten_obj->result as $row_note)
+					{
+						if($row_note->note == $note_vorschlag)
+							$selected='selected';
+						else
+							$selected='';
 
-					if($row_note->lehre && $row_note->aktiv)
-						echo '<option value="'.$row_note->note.'" '.$selected.'>'.$row_note->bezeichnung.'</option>';
+						if($row_note->lehre && $row_note->aktiv)
+							echo '<option value="'.$row_note->note.'" '.$selected.'>'.$row_note->bezeichnung.'</option>';
+					}
+					echo '</select>';
+					echo "
+								<input type='hidden' name='note_orig' value='$note_lv'>
+								<input type='button' value='->' onclick=\"saveLVNote('".$row_stud->uid."');\">
+							</span>
+						</form></td>";
 				}
-				echo '</select>';
-				echo "
-							<input type='hidden' name='note_orig' value='$note_lv'>
-							<input type='button' value='->' onclick=\"saveLVNote('".$row_stud->uid."');\">
-						</span>
-					</form></td>";
+				else
+				{
+					echo '<td></td>';
+				}
 				
 				if(isset($noten_array[$note_lv]) && $noten_array[$note_lv]['positiv']==false)
 					$negmarkier = " style='color:red; font-weight:bold;'";
