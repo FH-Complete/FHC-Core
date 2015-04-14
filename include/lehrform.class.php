@@ -20,6 +20,7 @@
  *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/sprache.class.php');
 
 class lehrform extends basis_db
 {
@@ -30,6 +31,8 @@ class lehrform extends basis_db
 	public $lehrform_kurbz;		// varchar(8)
 	public $bezeichnung;		// varchar (256)
 	public $verplanen; 			// boolean
+	public $bezeichnung_kurz;
+	public $bezeichnung_lang;
 
 	/**
 	 * Konstruktor - Laedt optional eine Lehrform
@@ -49,7 +52,8 @@ class lehrform extends basis_db
 	 */
 	public function load($lehrform_kurzbz)
 	{
-		$qry = "SELECT * FROM lehre.tbl_lehrform WHERE lehrform_kurzbz=".$this->db_add_param($lehrform_kurzbz).";";
+		$sprache = new sprache();
+		$qry = "SELECT *,".$sprache->getSprachQuery('bezeichnung_kurz').",".$sprache->getSprachQuery('bezeichnung_lang')." FROM lehre.tbl_lehrform WHERE lehrform_kurzbz=".$this->db_add_param($lehrform_kurzbz).";";
 		
 		if(!$this->db_query($qry))
 		{
@@ -62,6 +66,8 @@ class lehrform extends basis_db
 			$this->lehrform_kurzbz = $row->lehrform_kurzbz;
 			$this->bezeichnung = $row->bezeichnung;
 			$this->verplanen = $this->db_parse_bool($row->verplanen);
+			$this->bezeichnung_kurz=$this->parseSprachResult('bezeichnung_kurz',$row);
+			$this->bezeichnung_lang=$this->parseSprachResult('bezeichnung_lang',$row);
 		}
 		else
 		{
@@ -79,7 +85,9 @@ class lehrform extends basis_db
 	 */
 	public function getAll()
 	{
-		$qry = "SELECT * FROM lehre.tbl_lehrform ORDER BY lehrform_kurzbz;";
+		$sprache = new sprache();
+
+		$qry = "SELECT *,".$sprache->getSprachQuery('bezeichnung_kurz').",".$sprache->getSprachQuery('bezeichnung_lang')." FROM lehre.tbl_lehrform ORDER BY lehrform_kurzbz;";
 		
 		if(!$this->db_query($qry))
 		{
@@ -94,6 +102,8 @@ class lehrform extends basis_db
 			$lf->lehrform_kurzbz = $row->lehrform_kurzbz;
 			$lf->bezeichnung = $row->bezeichnung;
 			$lf->verplanen = $this->db_parse_bool($row->verplanen);
+			$lf->bezeichnung_kurz=$sprache->parseSprachResult('bezeichnung_kurz',$row);
+			$lf->bezeichnung_lang=$sprache->parseSprachResult('bezeichnung_lang',$row);
 
 			$this->lehrform[] = $lf;
 		}

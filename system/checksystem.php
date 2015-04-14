@@ -2873,6 +2873,25 @@ if($result = @$db->db_query("SELECT * FROM information_schema.table_constraints 
 	}
 }
 
+// Fehlende Foreign Keys fuer ZGV Nation und Ausstellungsstaat auf ZGVNation kopieren
+if(!$result = @$db->db_query("SELECT bezeichnung_kurzbz FROM lehre.tbl_lehrform"))
+{
+	$qry = 'ALTER TABLE lehre.tbl_lehrform ADD COLUMN bezeichnung_kurz varchar(32)[];
+			ALTER TABLE lehre.tbl_lehrform ADD COLUMN bezeichnung_lang varchar(256)[];
+	UPDATE lehre.tbl_lehrform SET bezeichnung_kurz[1]=lehrform_kurzbz;
+	UPDATE lehre.tbl_lehrform SET bezeichnung_kurz[2]=lehrform_kurzbz;
+	UPDATE lehre.tbl_lehrform SET bezeichnung_lang[1]=bezeichnung;
+	UPDATE lehre.tbl_lehrform SET bezeichnung_lang[2]=bezeichnung;
+	';
+		
+	
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_lehrform: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_lehrform: neue Spalten fuer mehrsprachige Lehrformbezeichnungen hinzugefuegt';
+}
+
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -2978,7 +2997,7 @@ $tabellen=array(
 	"lehre.tbl_lehreinheitgruppe"  => array("lehreinheitgruppe_id","lehreinheit_id","studiengang_kz","semester","verband","gruppe","gruppe_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"lehre.tbl_lehreinheitmitarbeiter"  => array("lehreinheit_id","mitarbeiter_uid","lehrfunktion_kurzbz","semesterstunden","planstunden","stundensatz","faktor","anmerkung","bismelden","updateamum","updatevon","insertamum","insertvon","ext_id","standort_id","vertrag_id"),
 	"lehre.tbl_lehrfach"  => array("lehrfach_id","studiengang_kz","fachbereich_kurzbz","kurzbz","bezeichnung","farbe","aktiv","semester","sprache","updateamum","updatevon","insertamum","insertvon","ext_id"),
-	"lehre.tbl_lehrform"  => array("lehrform_kurzbz","bezeichnung","verplanen"),
+	"lehre.tbl_lehrform"  => array("lehrform_kurzbz","bezeichnung","verplanen","bezeichnung_kurz","bezeichnung_lang"),
 	"lehre.tbl_lehrfunktion"  => array("lehrfunktion_kurzbz","beschreibung","standardfaktor","sort"),
 	"lehre.tbl_lehrmittel" => array("lehrmittel_kurzbz","beschreibung","ort_kurzbz"),
 	"lehre.tbl_lehrtyp" => array("lehrtyp_kurzbz","bezeichnung"),
