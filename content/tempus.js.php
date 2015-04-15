@@ -90,10 +90,17 @@ function onLoad()
   		//wenn zb ein IFrame geladen wird
   		onLoad=function() {return false};
 
+		if(document.getElementById('statusbarpanel-ignore_kollision'))
+		{
+			// Anzeige von DBTable und Ignorekoll. aktualisieren
+			updateignorekollision();
+			updatedbstpltable();
+		}
+
   		//Notizen des Users laden
 		notiz = document.getElementById('box-notizen');
-		notiz.LoadNotizTree('','','','','','','', getUsername(),'');
-
+		if(notiz)
+			notiz.LoadNotizTree('','','','','','','', getUsername(),'');
 	}
 	catch(e)
 	{
@@ -294,7 +301,7 @@ function updateignorekollision()
 	if(getvariable('ignore_kollision')=='true')
 	{
 		panel.label='Kollisionscheck AUS';
-		panel.style.backgroundColor='red';
+		panel.style.backgroundColor='#FF0000';
 		panel.style.MozAppearance = "none"
 		document.getElementById('menu-prefs-ignore_kollision').setAttribute('checked','true');
 	}
@@ -322,7 +329,7 @@ function updatedbstpltable()
 	}
 	else
 	{
-		panel.style.backgroundColor='transparent';
+		panel.style.backgroundColor='';
 		panel.style.MozAppearance = "none"
 	}		
 }
@@ -461,14 +468,6 @@ function UnDo(log_id, bezeichnung)
 			onJumpDate(0);
 		}
 	}
-}
-
-// ****
-// * Oeffnet die ToDoListe fuers Tempus
-// ****
-function HelpOpenToDo()
-{
-	window.open('ToDo_Tempus.html','ToDo');
 }
 
 // ****
