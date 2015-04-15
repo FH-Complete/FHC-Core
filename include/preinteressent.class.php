@@ -146,7 +146,7 @@ class preinteressent extends basis_db
 						$this->db_add_param($row->aufmerksamdurch_kurzbz).', '.
 						$this->db_add_param($row->firma_id, FHC_INTEGER).', '.
 						$this->db_add_param($row->erfassungsdatum).', '.
-						$this->db_add_param($row->einverstaendnis, FHC_BOOLEAN).', '.
+						$this->db_add_param($this->db_parse_bool($row->einverstaendnis), FHC_BOOLEAN).', '.
 						$this->db_add_param($row->absagedatum).', '.
 						$this->db_add_param($row->anmerkung).', '.
 						$this->db_add_param($row->insertamum).', '.
