@@ -161,7 +161,7 @@ function getStundenproInstitut($mitarbeiter_uid, $studiensemester_kurzbz)
 	{
 		while($row = $db->db_fetch_object($result))
 		{
-			$ret .=$row->summe.' Stunden im OE '.$row->bezeichnung."\n";
+			$ret .=$row->summe.' Stunden '.$row->bezeichnung."\n";
 		}
 	}
 	return $ret;
