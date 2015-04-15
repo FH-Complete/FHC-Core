@@ -167,9 +167,35 @@ if($studiengang_kz!='' && $stsem_von!='' && $stsem_nach!='')
 	
 	if($result = $db->db_query($qry))
 	{
+		$anzahl_von = $db->db_affected_rows($result);
+	}
+	//Pruefen, ob schon eine Vorrueckung stattgefunden hat
+	$qry_nach = "SELECT tbl_lehreinheit.lehreinheit_id
+			FROM 
+				lehre.tbl_lehreinheit JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
+			WHERE
+				tbl_lehrveranstaltung.studiengang_kz='$studiengang_kz' AND
+				tbl_lehreinheit.studiensemester_kurzbz='$stsem_nach'";
+	if($semester!='')
+		$qry_nach .= " AND tbl_lehrveranstaltung.semester='$semester'";
+		
+	if($result = $db->db_query($qry_nach))
+	{
+		$anzahl_nach = $db->db_affected_rows($result);
+		$baseurl = basename($_SERVER['REQUEST_URI']);
+		if ($anzahl_nach >= $anzahl_von && !isset($_GET['continue']))
+		{
+			echo '<br><br><span style="color:red">Es sind schon Lehreinheiten fuer das '.$stsem_nach.' in '.$stg_arr[$studiengang_kz].' '.$semester.' vorhanden. Trotzdem fortsetzen?</span><br><br>
+					<form action="'.$baseurl.'&continue" method="POST"><input type="submit" value="Fortsetzen"></form>'; 
+			die ();
+		}
+	}
+	
+	if($result = $db->db_query($qry))
+	{
 		while($row = $db->db_fetch_object($result))
 		{
-			$text.="Lehreinheit $row->lehreinheit_id wird vorgerueckt<br>";
+			$text.="<br>Lehreinheit $row->lehreinheit_id wird vorgerueckt";
 			$le_obj = new lehreinheit();
 			//Lehreinheit Neu Anlegen
 			if($le_obj->load($row->lehreinheit_id))
@@ -177,7 +203,7 @@ if($studiengang_kz!='' && $stsem_von!='' && $stsem_nach!='')
 				$le_obj->new=true;
 				$le_obj->studiensemester_kurzbz=$stsem_nach;
 				$le_obj->insertamum=date('Y-m-d H:i:s');
-				$le_obj->insertvon='Vorrueckung';
+				$le_obj->insertvon='Vorrueckung_'.$user;
 				$le_obj->ext_id='';
 				$le_obj->unr='';
 				
@@ -194,10 +220,32 @@ if($studiengang_kz!='' && $stsem_von!='' && $stsem_nach!='')
 							$lem_obj = new lehreinheitmitarbeiter();
 							if($lem_obj->load($row->lehreinheit_id, $row_lem->mitarbeiter_uid))
 							{
+								// Pruefen ob der Lektor ueber die im Config festgelegte Stundengrenze kommt und Meldung ausgeben
+								$qry_stundengrenze="SELECT mitarbeiter_uid,fixangestellt,SUM(semesterstunden) AS summe FROM lehre.tbl_lehreinheitmitarbeiter 
+													JOIN lehre.tbl_lehreinheit USING (lehreinheit_id) 
+													JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid) 
+													WHERE mitarbeiter_uid='$row_lem->mitarbeiter_uid' 
+													AND studiensemester_kurzbz='$stsem_von' 
+													GROUP BY mitarbeiter_uid,fixangestellt";
+								//echo '<br>UNION<br>'.$qry_stundengrenze;
+								if($result_stundengrenze = $db->db_query($qry_stundengrenze))
+								{
+									if($row_stundengrenze = $db->db_fetch_object($result_stundengrenze))
+									{
+										if ($row_stundengrenze->fixangestellt=='f' && $row_stundengrenze->summe>WARN_SEMESTERSTD_FREI)
+										{
+											$text.=" <span style='color:red'>Stundengrenze ".WARN_SEMESTERSTD_FREI." Stunden ueberschritten von $row_lem->mitarbeiter_uid</span>";
+										}
+										elseif ($row_stundengrenze->fixangestellt=='t' && $row_stundengrenze->summe>WARN_SEMESTERSTD_FIX)
+										{
+											$text.=" <span style='color:red'>Stundengrenze ".WARN_SEMESTERSTD_FIX." Stunden ueberschritten von $row_lem->mitarbeiter_uid</span>";
+										}
+									}
+								}
 								$lem_obj->lehreinheit_id=$le_obj->lehreinheit_id;
 								$lem_obj->new = true;
 								$lem_obj->insertamum = date('Y-m-d H:i:s');
-								$lem_obj->insertvon = 'Vorrueckung';
+								$lem_obj->insertvon = 'Vorrueckung_'.$user;
 								$lem_obj->ext_id = '';
 								
 								if(!$lem_obj->save())
@@ -233,7 +281,7 @@ if($studiengang_kz!='' && $stsem_von!='' && $stsem_nach!='')
 								$leg_obj->lehreinheit_id=$le_obj->lehreinheit_id;
 								$leg_obj->new = true;
 								$leg_obj->insertamum = date('Y-m-d H:i:s');
-								$leg_obj->insertvon = 'Vorrueckung';
+								$leg_obj->insertvon = 'Vorrueckung_'.$user;
 								$leg_obj->ext_id = '';
 								
 								if(!$leg_obj->save())
@@ -286,6 +334,7 @@ if($studiengang_kz!='' && $stsem_von!='' && $stsem_nach!='')
 	
 	echo '<br><br><hr>';
 	echo $text;
+	echo '<br><br><br><br><br><br><br><br>';
 }
 
 ?>

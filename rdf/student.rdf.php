@@ -221,6 +221,17 @@ function draw_content($row)
 		    $aktiv = "-";
 	    }
 	}
+	
+	$studiengang = new studiengang();
+	$stgleiter = $studiengang->getLeitung($row->studiengang_kz);
+	$stgl='';
+	$i = 0;
+	foreach ($stgleiter as $stgleiter_uid)
+	{
+		$stgl_ma = new mitarbeiter($stgleiter_uid);
+		$stgl .= trim(($i>0?', ':'').$stgl_ma->titelpre.' '.$stgl_ma->vorname.' '.$stgl_ma->nachname.' '.$stgl_ma->titelpost);
+		$i++;
+	}
 
 	if($row->prestudent_id!='')
 	{
@@ -273,6 +284,7 @@ function draw_content($row)
     		<STUDENT:gruppe><![CDATA['.(isset($row->gruppe)?$row->gruppe:'').']]></STUDENT:gruppe>
 			<STUDENT:studiengang_kz_student><![CDATA['.(is_a($row,'student')?$row->studiengang_kz:'').']]></STUDENT:studiengang_kz_student>
 			<STUDENT:matr_nr><![CDATA['.$row->matr_nr.']]></STUDENT:matr_nr>
+			<STUDENT:studiengang_studiengangsleitung><![CDATA['.$stgl.']]></STUDENT:studiengang_studiengangsleitung>
 	';
 	}
 }
@@ -725,9 +737,13 @@ else
 				}
 			}
 			$prestudent = new prestudent($student->prestudent_id);
+			$prestudent->getLastStatus($row->prestudent_id);
 			
 			$orgform_bezeichnung = new organisationsform();
 			$orgform_bezeichnung->load($studiengang->orgform_kurzbz);
+			
+			$orgform_student_bezeichnung = new organisationsform();
+			$orgform_student_bezeichnung->load($prestudent->orgform_kurzbz);
 			
 			echo '
 			<student>
@@ -744,6 +760,8 @@ else
 				<semester><![CDATA['.$semester.']]></semester>
 				<verband><![CDATA['.$student->verband.']]></verband>
 				<gruppe><![CDATA['.$student->gruppe.']]></gruppe>
+				<student_orgform_kurzbz><![CDATA['.$prestudent->orgform_kurzbz.']]></student_orgform_kurzbz>
+                <student_orgform_bezeichnung><![CDATA['.$orgform_student_bezeichnung->bezeichnung.']]></student_orgform_bezeichnung>
 				<studiengang_kz><![CDATA['.sprintf("%04d",abs($student->studiengang_kz)).']]></studiengang_kz>
 				<studiengang_bezeichnung><![CDATA['.$studiengang->bezeichnung.']]></studiengang_bezeichnung>
 				<studiengang_art><![CDATA['.$typ.']]></studiengang_art>

@@ -327,9 +327,13 @@ if($result = $db->db_query($qry))
 		if($maxlength[$spalte]<mb_strlen($row->sws))
 			$maxlength[$spalte]=mb_strlen($row->sws);
 */
-		$worksheet->write($zeile,++$spalte,$row->semesterstunden);
-		if($maxlength[$spalte]<mb_strlen($row->semesterstunden))
-			$maxlength[$spalte]=mb_strlen($row->semesterstunden);
+		$semesterstunden = $row->semesterstunden;
+		if ($row->stundensatz==0 || $row->lemss==0 || $row->faktor==0)
+			$semesterstunden = 0;
+		
+		$worksheet->write($zeile,++$spalte,$semesterstunden);
+		if($maxlength[$spalte]<mb_strlen($semesterstunden))
+			$maxlength[$spalte]=mb_strlen($semesterstunden);
 			
 			
 		//ECTS
