@@ -22,7 +22,7 @@
  *          Manfred Kindl		< manfred.kindl@technikum-wien.at >
  */
 /**
- * Reihnugstest
+ * Reihungstest
  * 
  * - Anlegen und Bearbeiten von Terminen
  * - Export von Anwesenheitslisten als Excel
@@ -79,16 +79,16 @@ if(isset($_GET['excel']))
 		$workbook = new Spreadsheet_Excel_Writer();
 		$workbook->setVersion(8);
 		// sending HTTP headers
-		$workbook->send("Anwesenheitsliste_Reihnugstest_".$reihungstest->datum.".xls");
+		$workbook->send("Anwesenheitsliste_Reihungstest_".$reihungstest->datum.".xls");
 
 		// Creating a worksheet
-		$worksheet =& $workbook->addWorksheet("Reihnugstest");
+		$worksheet =& $workbook->addWorksheet("Reihungstest");
 		$worksheet->setInputEncoding('utf-8');
 		//Formate Definieren
 		$format_bold =& $workbook->addFormat();
 		$format_bold->setBold();
 
-		$worksheet->write(0,0,'Anwesenheitsliste Reihnugstest '.$datum_obj->convertISODate($reihungstest->datum).' '.$reihungstest->uhrzeit.' Uhr '.$reihungstest->anmerkung.', erstellt am '.date('d.m.Y'), $format_bold);
+		$worksheet->write(0,0,'Anwesenheitsliste Reihungstest '.$datum_obj->convertISODate($reihungstest->datum).' '.$reihungstest->uhrzeit.' Uhr '.$reihungstest->anmerkung.', erstellt am '.date('d.m.Y'), $format_bold);
 		//Ueberschriften
 		$i=0;
 		$worksheet->write(2,$i,"Vorname", $format_bold);
@@ -195,7 +195,7 @@ if(isset($_GET['excel']))
 	}
 	else
 	{
-		echo 'Reihnugstest wurde nicht gefunden!';
+		echo 'Reihungstest wurde nicht gefunden!';
 	}
 	return;
 } ?>
