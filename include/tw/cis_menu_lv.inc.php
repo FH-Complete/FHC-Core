@@ -25,7 +25,7 @@
  */
 
 echo '
-<table class="tabcontent">
+<table class="tabcontent" id="lvmenue">
 	<tr>';
 
 $eintraegeprozeile=0;

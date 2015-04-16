@@ -848,5 +848,24 @@ class person extends basis_db
 	
 	}
 	
+	public function getFullName($allFirstnames=FALSE)
+	{
+	    $fullname = "";
+	    if((!is_null($this->titelpre)) && ($this->titelpre!=""))
+		$fullname .= $this->titelpre." ";
+	    
+	    $fullname .= $this->vorname." ";
+	    
+	    if(($allFirstnames) && ($this->vornamen != "") && (!is_null($this->vornamen)))
+		$fullname .= $this->vornamen." ";
+	    
+	    $fullname .= $this->nachname;
+	    
+	    if((!is_null($this->titelpost)) && ($this->titelpost!=""))
+		$fullname .= " ".$this->titelpost;
+	    
+	    return $fullname;
+	}
+	
     }
 ?>

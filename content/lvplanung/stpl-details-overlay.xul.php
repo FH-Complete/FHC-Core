@@ -44,10 +44,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	<!-- ************************* -->
 	<vbox id="vboxSTPLDetailsListe">
 		<popupset>
-			<popup id="stpldetail-treestpldetail-popup">
+			<menupopup id="stpldetail-treestpldetail-popup">
 				<menuitem label="Bearbeiten" oncommand="STPLDetailEdit()" />
 				<menuitem label="Entfernen" oncommand="STPLDetailDelete()" />
-			</popup>
+			</menupopup>
 		</popupset>
 
 		<tree id="treeStplDetails" seltype="single" hidecolumnpicker="false" flex="1"

@@ -30,10 +30,12 @@ require_once('../include/notiz.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/functions.inc.php');
 require_once('../include/benutzerberechtigung.class.php');
+require_once('../include/dms.class.php');
 
 $SOAPServer = new SoapServer(APP_ROOT."/soap/notiz.wsdl.php?".microtime());
 $SOAPServer->addFunction("saveNotiz");
 $SOAPServer->addFunction("deleteNotiz");
+$SOAPServer->addFunction("deleteDokument");
 $SOAPServer->addFunction("setErledigt");
 $SOAPServer->handle();
 
@@ -131,6 +133,29 @@ function deleteNotiz($username, $passwort, $notiz_id)
 		return "OK";
 	else
 		return new SoapFault("Server", $projekttask->errormsg);
+}
+
+/**
+ * 
+ * Löscht das Dokument mit der vom Webservice übergebenen DMS-ID 
+ * @param $dms_id
+ */
+function deleteDokument($username, $passwort, $dms_id)
+{
+	if(!$user = check_user($username, $passwort))
+		return new SoapFault("Server", "Invalid Credentials");
+	
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+		
+	if(!$rechte->isBerechtigt('basis/notiz', null, 'suid'))
+		return new SoapFault("Server", "Sie haben keine Berechtigung zum Loeschen von Dokumenten");
+	
+    $dms = new dms();
+    if($dms->deleteDms($dms_id))
+        return "OK";
+    else
+        return new SoapFault("Server", $dms->errormsg);
 }
 
 /**

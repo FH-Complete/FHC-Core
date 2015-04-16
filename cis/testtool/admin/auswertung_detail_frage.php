@@ -95,15 +95,11 @@ if($frage_id!='' && is_numeric($frage_id))
 				echo $row->frage_text.'<br>';
 				if($row->frage_audio!='')
 				{
-					echo '
-						<script language="JavaScript" src="../audio-player/audio-player.js"></script>
-						<object type="application/x-shockwave-flash" data="../audio-player/player.swf" id="audioplayer1" height="24" width="290">
-							<param name="movie" value="../audio_player/player.swf" />
-							<param name="FlashVars" value="playerID=audioplayer1&amp;soundFile=../sound.php%3Fsrc%3Dfrage%26frage_id%3D'.$frage_id.'%26sprache%3D'.$sprache.'" />
-							<param name="quality" value="high" />
-							<param name="menu" value="false" />
-							<param name="wmode" value="transparent" />
-						</object>';
+					echo '	<audio src="../sound.php?src=frage&amp;frage_id='.$frage_id.'&amp;sprache='.$sprache.'" controls="controls">
+								<div>
+									<p>Ihr Browser unterstützt dieses Audioelement leider nicht.</p>
+								</div>
+							</audio>';
 				}
 				if($row->frage_bild!='')
 					echo "<img class='testtoolfrage' src='../bild.php?src=frage&amp;frage_id=$frage_id&amp;sprache=".$sprache."' /><br/><br/>\n";
@@ -118,15 +114,11 @@ if($frage_id!='' && is_numeric($frage_id))
 			echo $row->vorschlag_text;
 			if($row->vorschlag_audio!='')
 			{
-				echo '
-					<script language="JavaScript" src="../audio-player/audio-player.js"></script>
-					<object type="application/x-shockwave-flash" data="../audio-player/player.swf" id="audioplayer1" height="24" width="290">
-						<param name="movie" value="../audio_player/player.swf" />
-						<param name="FlashVars" value="playerID=audioplayer1&amp;soundFile=../sound.php%3Fsrc%3Dvorschlag%26vorschlag_id%3D'.$row->vorschlag_id.'%26sprache%3D'.$sprache.'" />
-						<param name="quality" value="high" />
-						<param name="menu" value="false" />
-						<param name="wmode" value="transparent" />
-					</object>';
+				echo '	<audio src="../sound.php?src=vorschlag&amp;vorschlag_id='.$row->vorschlag_id.'&amp;sprache='.$sprache.'" controls="controls">
+							<div>
+								<p>Ihr Browser unterstützt dieses Audioelement leider nicht.</p>
+							</div>
+						</audio>';
 			}
 			if($row->vorschlag_bild!='')
 				echo "<img class='testtoolfrage' src='../bild.php?src=vorschlag&amp;vorschlag_id=$row->vorschlag_id&amp;sprache=".$sprache."' /><br/><br/>\n";

@@ -185,15 +185,11 @@ if(isset($_REQUEST['AuswahlGebiet']))
 		//Sound einbinden
 		if($spracheFrage->audio!='')
 		{
-			echo '
-			<script language="JavaScript" src="../audio-player/audio-player.js"></script>
-			<object type="application/x-shockwave-flash" data="../audio-player/player.swf" id="audioplayer1" height="24" width="290">
-			<param name="movie" value="audio_player/player.swf" />
-			<param name="FlashVars" value="playerID=audioplayer1&amp;soundFile=../sound.php%3Fsrc%3Dfrage%26frage_id%3D'.$spracheFrage->frage_id.'%26sprache%3D'.$sprache.'" />
-			<param name="quality" value="high" />
-			<param name="menu" value="false" />
-			<param name="wmode" value="transparent" />
-			</object>';
+			echo '	<audio src="../sound.php?src=frage&amp;frage_id='.$spracheFrage->frage_id.'&amp;sprache='.$sprache.'" controls="controls">
+						<div>
+							<p>Ihr Browser unterstützt dieses Audioelement leider nicht.</p>
+						</div>
+					</audio>';
 		} 
 		// FRAGE anzeigen
 		echo "$spracheFrage->text<br/><br/>\n"; 
@@ -226,15 +222,11 @@ if(isset($_REQUEST['AuswahlGebiet']))
 			}
 			if($vorschlag->audio!='')
 			{
-				echo '
-				<script language="JavaScript" src="../audio-player/audio-player.js"></script>
-				<object type="application/x-shockwave-flash" data="../audio-player/player.swf" id="audioplayer1" height="24" width="290">
-				<param name="movie" value="audio_player/player.swf" />
-				<param name="FlashVars" value="playerID=audioplayer1&amp;soundFile=../sound.php%3Fsrc%3Dvorschlag%26vorschlag_id%3D'.$vorschlag->vorschlag_id.'%26sprache%3D'.$_SESSION['sprache'].'" />
-				<param name="quality" value="high" />
-				<param name="menu" value="false" />
-				<param name="wmode" value="transparent" />
-				</object>';
+				echo '	<audio src="../sound.php?src=vorschlag&amp;vorschlag_id='.$vorschlag->vorschlag_id.'&amp;sprache='.$sprache.'" controls="controls">
+							<div>
+								<p>Ihr Browser unterstützt dieses Audioelement leider nicht.</p>
+							</div>
+						</audio>';
 			}
 
 		}

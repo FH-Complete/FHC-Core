@@ -32,6 +32,9 @@ require_once('../../../../include/student.class.php');
 
 
 $uid = get_uid();
+//TODO uid entfernen
+
+$uid="p20132443";
 $db = new basis_db();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);

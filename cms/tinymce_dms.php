@@ -347,40 +347,16 @@ if(isset($_REQUEST['delete']))
         //  DB Eintrag löschen
         if(!$dms->deleteVersion($dms_id, $version))
             echo '<span class="error">'.$dms->errormsg.'</span>';
-        else
-        {   
-            // File im Filesystem löschen 
-            if(unlink(DMS_PATH.$dms->filename))
-                echo '<span class="ok">Erfolgreich gelöscht!</span>';
-            else
-                echo '<span class="error">Fehler beim löschen aus dem Filesystem aufgetreten!</span>';
-        }
-    }else
+    }
+    else
     {
         // lösche gesamten Eintrag
+        $dms = new dms();
         $dms_id = $_REQUEST['dms_id'];
 
-        $dms = new dms(); 
-        $error = false; 
-        
-        $dms->getAllVersions($dms_id);
-        
-        // DB Einträge löschen
+        // DB Einträge und Dokumente löschen
         if(!$dms->deleteDms($dms_id))
             echo '<span class="error">'.$dms->errormsg.'</span>';
-        else
-        {
-            // Alle Versionen der Datei vom Filesystem löschen
-            foreach($dms->result as $obj)
-            {
-                if(!unlink(DMS_PATH.$obj->filename))
-                    $error = true; 
-            }
-            if($error)
-                echo '<span class="error">Fehler beim löschen aus dem Filesystem aufgetreten!</span>';
-            else
-                echo '<span class="ok">Erfolgreich gelöscht!</span>';
-        }
     }
 }
 

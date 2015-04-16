@@ -45,6 +45,9 @@ define('CIS_ANWESENHEITSLISTE_NOTENLISTE_ANZEIGEN',true);
 // Punkte bei der Noteneingabe anzeigen
 define('CIS_GESAMTNOTE_PUNKTE',false);
 
+// Gibt an ob der Lektor erneut eine LVNote eintragen kann wenn bereits eine Zeugnisnote vorhanden ist (true | false) DEFAULT true
+define('CIS_GESAMTNOTE_UEBERSCHREIBEN',true);
+
 // Anzeigeoptionen für LV-Plan Menü
 define('CIS_LVPLAN_EXPORT_ANZEIGEN',true);
 define('CIS_LVPLAN_PERSONENAUSWAHL_ANZEIGEN',true);
@@ -134,5 +137,8 @@ define('PRESTUDENT_ID_DUMMY_STUDENT', 13478);
 
 //Legt fest ob die Option für alle Räume im Saalplan Dropdown angezeigt werden soll. (true|false)
 define('CIS_SAALPLAN_ALLERAEUME_OPTION', false);
+
+//Legt fest ob Bestätigungsmails über eine Anmelung zu einer Prüfung an eine einzelne Person erfolgt oder an den jeweiligen Lektor. (Leerstring für jeweiligen Lektro);
+define('CIS_PRUEFUNG_MAIL_EMPFAENGER_ANMEDLUNG',"p.vondrak");
 
 ?>

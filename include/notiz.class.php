@@ -18,11 +18,13 @@
  * Authors: Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/dms.class.php');
 
 class notiz extends basis_db
 {
 	public $new;
 	public $result=array();
+    public $dokumente=array();
 
 	//Tabellenspalten
 	public $notiz_id;
@@ -91,6 +93,7 @@ class notiz extends basis_db
 				$this->insertvon=$row->insertvon;
 				$this->updateamum=$row->updateamum;
 				$this->updatevon=$row->updatevon;
+                $this->getDokumente($row->notiz_id);
 				
 				return true;
 			}
@@ -119,6 +122,18 @@ class notiz extends basis_db
 			$this->errormsg = 'NotizID ist ungueltig';
 			return false;
 		}
+        
+        // Dokumente der Notiz löschen
+        $this->getDokumente($notiz_id);
+        if(!empty($this->dokumente))
+        {
+            $dms = new dms();
+            
+            foreach($this->dokumente as $dms_id)
+            {
+                $dms->deleteDms($dms_id);
+            }
+        }
 
 		$qry = "Delete FROM public.tbl_notiz WHERE notiz_id=".$this->db_add_param($notiz_id, FHC_INTEGER);
 
@@ -251,6 +266,28 @@ class notiz extends basis_db
 			return false;
 		}
 	}
+    
+    /**
+     * Speichert ein Dokument zur Notiz
+     * @param int $dms_id
+     * @return boolean
+     */
+    public function saveDokument($dms_id) 
+    {
+        $qry = "INSERT INTO public.tbl_notiz_dokument(notiz_id, dms_id) VALUES(".
+				$this->db_add_param($this->notiz_id, FHC_INTEGER).','.
+				$this->db_add_param($dms_id, FHC_INTEGER).');';
+				
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern der Daten';
+			return false;
+		}
+    }
 
 	/**
 	 * 
@@ -325,6 +362,7 @@ class notiz extends basis_db
 				$obj->insertvon=$row->insertvon;
 				$obj->updateamum=$row->updateamum;
 				$obj->updatevon=$row->updatevon;
+                $obj->getDokumente($row->notiz_id);
 	
 				$this->result[] = $obj;
 			}
@@ -455,4 +493,28 @@ class notiz extends basis_db
 			return false;
 		}
 	}
+    
+    /**
+     * Laedt die Dokumente der Notiz
+     * @return boolean
+     */
+    public function getDokumente($notiz_id) 
+    {
+        $qry = "SELECT dms_id FROM public.tbl_notiz_dokument WHERE notiz_id=".$this->db_add_param($notiz_id, FHC_INTEGER);
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$this->dokumente[] = $row->dms_id;
+			}
+            
+            return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+    }
 }

@@ -462,7 +462,7 @@ var boardObserver=
 		if (evt.target.tagName=="label")
 			evt.target.setAttribute("style","background-color:#AAFFAA;");
 		else
-			evt.target.setAttribute("style",styleNow+"border:1px dashed black;");
+			evt.target.setAttribute("style",styleNow+";border:1px dashed black;");
 	},
 	onDragExit: function (evt,flavour,session)
 	{
@@ -470,7 +470,7 @@ var boardObserver=
 		if (evt.target.tagName=="label")
 			evt.target.setAttribute("style","");
 		else
-			evt.target.setAttribute("style",styleNow+"border:1px solid black;");
+			evt.target.setAttribute("style",styleNow+";border:1px solid black;");
   	},
   	onDragOver: function(evt,flavour,session)
   	{
@@ -495,6 +495,7 @@ var boardObserver=
 
 			var stunde=evt.target.getAttribute("stunde");
 			var new_datum=evt.target.getAttribute("datum");
+
 			if (evt.target.tagName=="label")
 			{
 				var new_ort=evt.target.getAttribute("ort_kurzbz");
