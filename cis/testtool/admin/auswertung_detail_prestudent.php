@@ -47,7 +47,7 @@ echo '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//DE" "http://www
 	<body class="Background_main">
 	<h2>Auswertung Reihungstest Detailergebnis PrestudentIn '.$db->convert_html_chars($_GET['prestudent_id']).'</h2>';
 
-if(!$rechte->isBerechtigt('basis/testtool', null, 'suid'))
+if(!$rechte->isBerechtigt('lehre/reihungstest', null, 's'))
 		die('Sie haben keine Berechtigung fuer diese Seite');
 
 // Testergebnisse anzeigen

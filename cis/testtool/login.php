@@ -347,6 +347,7 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 	else
 	{
 		$prestudent_id_dummy_student = (defined('PRESTUDENT_ID_DUMMY_STUDENT')?PRESTUDENT_ID_DUMMY_STUDENT:'');
+			
 		echo '<form method="post">
 				<SELECT name="prestudent">';
 		echo '<OPTION value="'.$prestudent_id_dummy_student.'">'.$p->t('testtool/nameAuswaehlen').'</OPTION>\n';
@@ -354,7 +355,11 @@ if(isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 		{
 			$stg = new studiengang();
 			$stg->load($prestd->studiengang_kz);
-			echo '<OPTION value="'.$prestd->prestudent_id.'" '.($prestd->prestudent_id==($_POST['prestudent'])?'selected':'').'>'.$prestd->nachname.' '.$prestd->vorname.' ('.(strtoupper($stg->typ.$stg->kurzbz)).')</OPTION>\n';
+			if(isset($_POST['prestudent']) && $prestd->prestudent_id==$_POST['prestudent'])
+				$selected = 'selected';	
+			else
+				$selected='';
+			echo '<OPTION value="'.$prestd->prestudent_id.'" '.$selected.'>'.$prestd->nachname.' '.$prestd->vorname.' ('.(strtoupper($stg->typ.$stg->kurzbz)).')</OPTION>\n';
 		}
 		echo '</SELECT>';
 		echo '&nbsp; '.$p->t('global/geburtsdatum').': ';

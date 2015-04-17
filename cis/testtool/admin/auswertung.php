@@ -733,7 +733,7 @@ else
 								$selected = 'selected';
 								$select = true;
 							}
-							elseif ($prestudent_id=='' && $reihungstest=='' && $rt->datum==date('Y-m-d') && !$select)
+							elseif ($prestudent_id=='' && $reihungstest=='' && $rt->datum==date('Y-m-d') && $datum_von=='' && $datum_bis=='' && $studiengang=='' && $semester=='' && !$select)
 							{
 								$selected = 'selected';
 								$select = true;
