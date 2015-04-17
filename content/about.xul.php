@@ -38,12 +38,15 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 <vbox>
 	<hbox style="margin-top: 20px">
 		<spacer flex="1"/>
-		<image src='<?php echo APP_ROOT; ?>skin/images/fh_complete_logo.png' width="392" height="60"/>
+		<image src='<?php echo APP_ROOT; ?>skin/images/fh_complete_logo_400x61.png' width="400" height="61"/>
+		<spacer flex="1"/>
+	</hbox>
+	<hbox style="margin-top: 20px">
 		<spacer flex="1"/>
 	</hbox>
 	<hbox>
 		<spacer flex="1"/>
-		<label value="Copyright (C) 2007 Technikum-Wien" />
+		<label value="Copyright (C) 2007 FH Complete" />
 		<spacer flex="1"/>
 	</hbox>
 	<hbox>
@@ -70,6 +73,7 @@ echo '<?xml-stylesheet href="'.APP_ROOT.'skin/tempus.css" type="text/css"?>';
 			 Rudolf Hangl &lt;rudolf.hangl@technikum-wien.at&gt;,
 			 Gerald Raab &lt;gerald.raab@technikum-wien.at&gt; and
 			 Gerald Simane-Sequens &lt;gerald.simane-sequence@technikum-wien.at&gt;
+			 Manfred Kindl &lt;manfred.kindl@technikum-wien.at&gt;
 		   	</description>
 		</groupbox>
 		<spacer flex="1"/>
