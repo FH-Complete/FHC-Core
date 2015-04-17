@@ -90,11 +90,12 @@ function onLoad()
   		//wenn zb ein IFrame geladen wird
   		onLoad=function() {return false};
 
+
 		if(document.getElementById('statusbarpanel-ignore_kollision'))
 		{
 			// Anzeige von DBTable und Ignorekoll. aktualisieren
-			updateignorekollision();
-			updatedbstpltable();
+			window.setTimeout(updateignorekollision,20);
+			window.setTimeout(updatedbstpltable,20);
 		}
 
   		//Notizen des Users laden
