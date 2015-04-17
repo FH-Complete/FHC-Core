@@ -771,8 +771,8 @@ else
 						}				
 						echo '</SELECT>';
 					
-						echo ' von Datum: <INPUT class="datepicker_datum" type="text" name="datum_von" maxlength="10" size="10" value="'.$datum_von.'" />&nbsp;';
-						echo 'bis Datum: <INPUT class="datepicker_datum" type="text" name="datum_bis" maxlength="10" size="10" value="'.$datum_bis.'" /><br />';
+						echo ' von Datum: <INPUT class="datepicker_datum" type="text" name="datum_von" maxlength="10" size="10" value="'.$datum_obj->formatDatum($datum_von, 'd.m.Y').'" />&nbsp;';
+						echo 'bis Datum: <INPUT class="datepicker_datum" type="text" name="datum_bis" maxlength="10" size="10" value="'.$datum_obj->formatDatum($datum_bis, 'd.m.Y').'" /><br />';
 						echo '<hr style="color: #B3B3B3; background-color: #B3B3B3; border:none;">';
 						echo 'PrestudentIn: <INPUT id="prestudent" type="text" name="prestudent_id" size="50" value="'.$prestudent_id.'" placeholder="Name, UID oder Prestudent_id eingeben" onInput="document.getElementById(\'reihungstest\').value=\'\'" onkeyup="document.getElementById(\'prestudent_id\').value=this.value"/><input type="hidden" id="prestudent_id" name="prestudent_id" value="'.$prestudent_id.'" />';
 			echo '</td>
@@ -792,9 +792,9 @@ else
 		if (isset ($_REQUEST['semester']) && $_REQUEST['semester']!='')
 			echo $semester.'. Semester ';
 		if ($datum_von!='')
-			echo 'von '.$datum_von;
+			echo 'von '.$datum_obj->formatDatum($datum_von, 'd.m.Y');
 		if ($datum_bis!='')
-			echo ' bis '.$datum_bis;
+			echo ' bis '.$datum_obj->formatDatum($datum_bis, 'd.m.Y');
 		if ($prestudent_id!='')
 			echo ' PrestudentID: '.$prestudent_id;
 			
