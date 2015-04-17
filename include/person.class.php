@@ -28,7 +28,7 @@ require_once(dirname(__FILE__).'/datum.class.php');
 class person extends basis_db
 {
 	public $errormsg;			// string
-	public $new;      			// boolean
+	public $new=true;      		// boolean
 	public $personen = array(); // person Objekt
 	public $done=false;			// boolean
 
@@ -51,12 +51,12 @@ class person extends basis_db
 	public $ersatzkennzeichen; 	// char(10)
 	public $familienstand;     	// char(1)
 	public $anzahlkinder;      	// smalint
-	public $aktiv;             	// boolean
+	public $aktiv=true;        	// boolean
 	public $insertamum;			// timestamp
 	public $insertvon;			// varchar(16)
 	public $updateamum;			// timestamp
 	public $updatevon;			// varchar(16)
-	public $geschlecht;			// varchar(1)
+	public $geschlecht='u';		// varchar(1) - Default: undefined
 	public $staatsbuergerschaft;// varchar(3)
 	public $geburtsnation;		// varchar(3);
 	public $ext_id;				// bigint
@@ -137,7 +137,7 @@ class person extends basis_db
 				$this->errormsg = "Es ist kein Personendatensatz mit dieser ID vorhanden";
 				return false;
 			}
-
+			$this->new=false;
 			return true;
 		}
 		else

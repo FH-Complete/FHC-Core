@@ -403,11 +403,11 @@ class prestudent extends person
 			$ps->zgv_code = $row->zgv_code;
 			$ps->zgvort = $row->zgvort;
 			$ps->zgvdatum = $row->zgvdatum;
-			$ps->zgvnation = $row->zgvnation;
+			//$ps->zgvnation = $row->zgvnation;
 			$ps->zgvmas_code = $row->zgvmas_code;
 			$ps->zgvmaort = $row->zgvmaort;
 			$ps->zgvmadatum = $row->zgvmadatum;
-			$ps->zgvmanation = $row->zgvmanation;
+			//$ps->zgvmanation = $row->zgvmanation;
 			$ps->aufnahmeschluessel = $row->aufnahmeschluessel;
 			$ps->facheinschlberuf = $this->db_parse_bool($row->facheinschlberuf);
 			$ps->anmeldungreihungstest = $row->anmeldungreihungstest;

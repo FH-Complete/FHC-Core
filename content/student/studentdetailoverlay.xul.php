@@ -300,7 +300,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       							<box class='Datum' id="student-prestudent-textbox-zgvdatum" disabled="true"/>
       							<!--<textbox id="student-prestudent-textbox-zgvdatum" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/>-->
       						</hbox>
-                            <label value="Land" control="student-prestudent-menulist-zgvnation"/>
+                            <label value="ZGV Nation" control="student-prestudent-menulist-zgvnation"/>
                             <hbox>
                                 <menulist id="student-prestudent-menulist-zgvnation" disabled="true"
                                           datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php?optional=true" flex="1"
@@ -335,7 +335,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
       							<box class='Datum' id="student-prestudent-textbox-zgvmasterdatum" disabled="true"/>
       							<!--<textbox id="student-prestudent-textbox-zgvmasterdatum" disabled="true" maxlength="10" size="10" tooltiptext="Format: JJJJ-MM-DD Beispiel: 1970-01-31"/>-->
       						</hbox>
-                            <label value="Land" control="student-prestudent-menulist-zgvmasternation"/>
+                            <label value="ZGV Master Nation" control="student-prestudent-menulist-zgvmasternation"/>
                             <hbox>
                                 <menulist id="student-prestudent-menulist-zgvmasternation" disabled="true"
                                           datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php?optional=true" flex="1"

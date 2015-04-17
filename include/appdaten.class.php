@@ -171,6 +171,7 @@ class appdaten extends basis_db
 			else 
 			{
 				$this->new = true;
+				return 0;
 			}
 		}
 		else

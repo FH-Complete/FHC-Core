@@ -140,28 +140,28 @@ function getStundenproInstitut($mitarbeiter_uid, $studiensemester_kurzbz)
 {
 	global $db;
 	
-	$ret="Der Lektor ist in folgenden Instituten zugeteilt:\n";
+	$ret="Der Lektor ist in folgenden Organisationseinheiten zugeteilt:\n";
 	
 	//Liste mit den Stunden in den jeweiligen Instituten anzeigen
-	$qry = "SELECT sum(tbl_lehreinheitmitarbeiter.semesterstunden) as summe, tbl_fachbereich.bezeichnung
+	$qry = "SELECT sum(tbl_lehreinheitmitarbeiter.semesterstunden) as summe, tbl_organisationseinheit.bezeichnung
 			FROM
 				lehre.tbl_lehreinheitmitarbeiter 
 				JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
 				JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(lehrfach_id=lehrfach.lehrveranstaltung_id)
-				JOIN public.tbl_fachbereich USING(oe_kurzbz)
+				JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
 			WHERE
 				mitarbeiter_uid=".$db->db_add_param($mitarbeiter_uid)." AND
 				studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND
 				faktor>0 AND
 				stundensatz>0 AND
 				bismelden
-			GROUP BY tbl_fachbereich.bezeichnung";
+			GROUP BY tbl_organisationseinheit.bezeichnung";
 	
 	if($result = $db->db_query($qry))
 	{
 		while($row = $db->db_fetch_object($result))
 		{
-			$ret .=$row->summe.' Stunden im Institut '.$row->bezeichnung."\n";
+			$ret .=$row->summe.' Stunden '.$row->bezeichnung."\n";
 		}
 	}
 	return $ret;

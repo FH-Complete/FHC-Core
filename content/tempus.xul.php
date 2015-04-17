@@ -79,7 +79,6 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-extras-rescheck:command" oncommand="ResCheckShow();"/>
   <command id="menu-extras-synclvplan:command" oncommand="SyncLVPlan();"/>
   <command id="menu-help-about:command" oncommand="OpenAboutDialog()"/>
-  <command id="menu-help-todo:command" oncommand="HelpOpenToDo();"/>
   <command id="menu-help-manual:command" oncommand="OpenManualTempus();"/>
 </commandset>
 
@@ -264,12 +263,6 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
                label     = "&menu-help-manual.label;"
                command   =  "menu-help-manual:command"
                accesskey = "&menu-help-manual.accesskey;"/>
-            <menuitem
-               id        =  "menu-help-todo"
-               key       = "&menu-help-todo.key;"
-               label     = "&menu-help-todo.label;"
-               command   =  "menu-help-todo:command"
-               accesskey = "&menu-help-todo.accesskey;"/>
           </menupopup>
     </menu>
   </menubar>
@@ -316,7 +309,7 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
 	?>
 	<statusbarpanel id="statusbarpanel-db_table" label="<?php echo $db_stpl_table; ?>"/>
 	<statusbarpanel>
-		<toolbarbutton id="statusbarpanel-ignore_kollision" label="Kollisionscheck <?php echo ($ignore_kollision=='true'?'AUS':'AN'); ?>" <?php echo ($ignore_kollision=='true'?'style="background-color: RED;"':'');?> oncommand="updateignorekollision()"/>
+		<toolbarbutton id="statusbarpanel-ignore_kollision" label="Kollisionscheck <?php echo ($ignore_kollision=='true'?'AUS':'AN'); ?>" <?php echo ($ignore_kollision=='true'?'style="background-color: red;"':'');?> oncommand="updateignorekollision()"/>
 	</statusbarpanel>
 	<statusbarpanel id="statusbarpanel-text" label="<?php echo htmlspecialchars($error_msg); ?>" flex="4" crop="right" />
 	<statusbarpanel id="progress-panel" class="statusbarpanel-progress">
