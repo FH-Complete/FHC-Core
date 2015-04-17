@@ -2874,7 +2874,7 @@ if($result = @$db->db_query("SELECT * FROM information_schema.table_constraints 
 }
 
 // Fehlende Foreign Keys fuer ZGV Nation und Ausstellungsstaat auf ZGVNation kopieren
-if(!$result = @$db->db_query("SELECT bezeichnung_kurzbz FROM lehre.tbl_lehrform"))
+if(!$result = @$db->db_query("SELECT bezeichnung_kurz FROM lehre.tbl_lehrform"))
 {
 	$qry = 'ALTER TABLE lehre.tbl_lehrform ADD COLUMN bezeichnung_kurz varchar(32)[];
 			ALTER TABLE lehre.tbl_lehrform ADD COLUMN bezeichnung_lang varchar(256)[];
