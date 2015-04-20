@@ -63,6 +63,7 @@ require_once('../../include/kontakt.class.php');
 require_once('../../include/dms.class.php'); 
 require_once('../../include/notenschluessel.class.php');
 require_once('../../include/anrechnung.class.php');
+require_once('../../include/lehrveranstaltung.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -2453,28 +2454,7 @@ if(!$error)
 		if(!is_null($lehrveranstaltung_id) && !is_null($student_uid) && !is_null($studiensemester_kurzbz))
 		{
 			//Berechtigung pruefen
-			$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
-			if($result = $db->db_query($qry))
-			{
-				if($row = $db->db_fetch_object($result))
-				{
-					$stg_lva = $row->studiengang_kz;
-				}
-				else
-				{
-					$return = false;
-					$error = true;
-					$errormsg = 'Fehler beim Ermitteln der LVA';
-				}
-			}
-			else
-			{
-				$return = false;
-				$error = true;
-				$errormsg = 'Fehler beim Ermitteln der LVA';
-			}
-
-			$qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid=".$db->db_add_param($student_uid);
+            $qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid=".$db->db_add_param($student_uid);
 			if($result = $db->db_query($qry))
 			{
 				if($row = $db->db_fetch_object($result))
@@ -2497,8 +2477,10 @@ if(!$error)
 
 			if(!$error)
 			{
-				if(!$rechte->isBerechtigt('admin', $stg_lva, 'suid') && !$rechte->isBerechtigt('admin', $stg_std, 'suid') &&
-				   !$rechte->isBerechtigt('assistenz', $stg_lva, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_std, 'suid'))
+				$lva = new lehrveranstaltung($lehrveranstaltung_id);
+                
+                if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') && !$rechte->isBerechtigt('admin', $stg_std, 'suid') &&
+				   !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid') && !$rechte->isBerechtigt('assistenz', $stg_std, 'suid'))
 				{
 					$return = false;
 					$error = true;

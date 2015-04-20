@@ -22,6 +22,7 @@
  */
 require_once(dirname(__FILE__) . '/basis_db.class.php');
 require_once(dirname(__FILE__) . '/functions.inc.php');
+require_once(dirname(__FILE__) . '/studiengang.class.php');
 
 class lehrveranstaltung extends basis_db 
 {
@@ -2151,5 +2152,45 @@ class lehrveranstaltung extends basis_db
 		return false;
 	    }
 	}
+    
+    /**
+     * Gibt alle Organisationseinheiten der Studiengänge zurück, mit denen
+     * die Lehrveranstaltung über Studienpläne verknüpft ist
+     * @return boolean|array false im Fehlerfall, sonst ein Array
+     */
+    public function getAllOe() 
+    {
+        $oe = array();
+        
+        $qry = 'SELECT DISTINCT oe_kurzbz
+                FROM lehre.tbl_studienplan_lehrveranstaltung
+                JOIN lehre.tbl_studienplan USING(studienplan_id)
+                JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+                JOIN public.tbl_studiengang USING(studiengang_kz)
+                WHERE lehrveranstaltung_id = '.$this->db_add_param($this->lehrveranstaltung_id);
+	    
+        if($result = $this->db_query($qry))
+		{
+			while ($row = $this->db_fetch_object($result)) 
+            {
+                $oe[] = $row->oe_kurzbz;
+            }
+		}
+		else
+		{
+			$this->errormsg = "Fehler beim Laden der Daten";
+			return false;
+		}
+        
+        // oe_kurzbz des Studiengangs der LVA hinzufügen
+        $stg = new studiengang($this->studiengang_kz);
+        
+        if(!in_array($stg->oe_kurzbz, $oe))
+        {
+            $oe[] = $this->oe_kurzbz;
+        }
+        
+        return $oe;
+    }
 }
 ?>
