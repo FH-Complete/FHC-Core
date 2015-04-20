@@ -370,9 +370,9 @@ if (!isset($_REQUEST["archive"]))
 
 			clearstatcache(); 
 			if($vorlage->bezeichnung!='')
-				$filename = $vorlage->bezeichnung;
+				$filename = $vorlage->bezeichnung.$nachname;
 			else 
-				$filename = $vorlage->vorlage_kurzbz;
+				$filename = $vorlage->vorlage_kurzbz.$nachname;
             if($output == 'pdf')
             {
 				if($xsl == 'LV_Informationen')
@@ -453,7 +453,7 @@ if (!isset($_REQUEST["archive"]))
 				unlink('styles.xml');
 			unlink($tempname_zip);
             if($output=='pdf' || $output=='doc')
-                unlink($filename);
+                unlink($tempPdfName);
 			rmdir($tempfolder);
 		}
 	}
