@@ -2496,6 +2496,7 @@ function StudentKontoDisableFields(val)
 	document.getElementById('student-konto-button-gegenbuchung').disabled=val;
 	document.getElementById('student-konto-button-loeschen').disabled=val;
 	document.getElementById('student-konto-button-zahlungsbestaetigung').disabled=val;
+	document.getElementById('student-konto-textbox-gegenbuchungsdatum').disabled=val;
 	StudentKontoDetailDisableFields(true);
 }
 
@@ -2588,6 +2589,7 @@ function StudentKontoGegenbuchung()
 	var end = new Object();
 	var numRanges = tree.view.selection.getRangeCount();
 	var paramList= '';
+	var gegenbuchungsdatum = document.getElementById("student-konto-textbox-gegenbuchungsdatum").value;
 
 	for (var t = 0; t < numRanges; t++)
 	{
@@ -2605,6 +2607,7 @@ function StudentKontoGegenbuchung()
 	req.add('type', 'savegegenbuchung');
 
 	req.add('buchungsnr', paramList);
+	req.add('gegenbuchungsdatum', gegenbuchungsdatum);
 
 	var response = req.executePOST();
 

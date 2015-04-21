@@ -1721,6 +1721,16 @@ if(!$error)
 		if(isset($_POST['buchungsnr']))
 		{
 			$bnr_arr = explode(';',$_POST['buchungsnr']);
+			$gegenbuchungsdatum = filter_input(INPUT_POST, "gegenbuchungsdatum");
+			if(strlen($gegenbuchungsdatum) != 0)
+			{
+			    $gegenbuchungsdatum = date("Y-m-d", strtotime($gegenbuchungsdatum));
+			}
+			else
+			{
+			    $gegenbuchungsdatum = date('Y-m-d');
+			}
+			
 			$errormsg='';
 			foreach ($bnr_arr as $buchungsnr)
 			{
@@ -1745,7 +1755,7 @@ if(!$error)
 								$kto = new konto();
 								//$buchung->betrag*(-1);
 								$buchung->betrag = $kto->getDifferenz($buchungsnr);
-								$buchung->buchungsdatum = date('Y-m-d');
+								$buchung->buchungsdatum = $gegenbuchungsdatum;
 								$buchung->mahnspanne = '0';
 								$buchung->buchungsnr_verweis = $buchung->buchungsnr;
 								$buchung->new = true;

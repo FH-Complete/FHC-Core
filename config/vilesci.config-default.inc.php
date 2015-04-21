@@ -160,5 +160,8 @@ define('RT_PUNKTE3','false');
 define('TABLE_ID','_id');
 define('TABLE_BEGIN','tbl_');
 define('VIEW_BEGIN','vw_');
+
+//Legt fest ob die Personalnummer beim Anlegen NULL sein soll
+define('FAS_PERSONALNUMMER_GENERATE_NULL', false);
 	
 ?>
