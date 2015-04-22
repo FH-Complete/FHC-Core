@@ -644,6 +644,18 @@ if(!$error)
 												$student->verband='B';
 												$student->gruppe='';
 											}
+                                            
+                                            // noch nicht eingetragene Noten ergänzen
+                                            $noten = new zeugnisnote();
+                                            $noten->getZeugnisnoten(null, $uid, $semester_aktuell);
+                                            foreach($noten->result as $obj)
+                                            {
+                                                if($obj->note == '')
+                                                {
+                                                    $obj->note = 9;
+                                                    $obj->save(true);
+                                                }
+                                            }
 												
 											//Nachschauen ob dieser Lehrverband schon existiert, falls nicht dann anlegen
 											$lehrverband = new lehrverband();
