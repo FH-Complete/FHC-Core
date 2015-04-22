@@ -30,8 +30,6 @@ require_once('../../../../include/addon.class.php');
 require_once('../../../../include/mail.class.php');
 
 $uid = get_uid();
-//TODO uid entfernen
-$uid = "p20132443";
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
