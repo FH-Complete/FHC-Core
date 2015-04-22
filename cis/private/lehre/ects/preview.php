@@ -654,10 +654,7 @@ function getLastStundeByDatum(Array $array, $filterDatum)
     
     $lehreinheit = new lehreinheit();
     $studiensemester = new studiensemester();
-
-    //TODO
-//    $lehreinheit->load_lehreinheiten($lv, $studiensemester->getaktorNext());
-    $lehreinheit->load_lehreinheiten($lv, "WS2014");
+    $lehreinheit->load_lehreinheiten($lv, $studiensemester->getaktorNext());
 
     if (CIS_LVINFO_TERMINE_ANZEIGEN == true)
     {
