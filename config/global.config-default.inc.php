@@ -141,4 +141,9 @@ define('CIS_SAALPLAN_ALLERAEUME_OPTION', false);
 //Legt fest ob Bestätigungsmails über eine Anmelung zu einer Prüfung an eine einzelne Person erfolgt oder an den jeweiligen Lektor. (Leerstring für jeweiligen Lektro);
 define('CIS_PRUEFUNG_MAIL_EMPFAENGER_ANMEDLUNG',"p.vondrak");
 
+// Username fuer STIP Schnittstelle
+define('STIP_USER_NAME','stipendienstelle');
+// Passwort fuer STIP Schnittstelle
+define('STIP_USER_PASSWORD','password');
+
 ?>
