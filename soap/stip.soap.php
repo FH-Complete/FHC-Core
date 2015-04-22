@@ -18,7 +18,8 @@
  * Authors:		Karl Burkhart <burkhart@technikum-wien.at>.
  */
  
-require_once('../config/vilesci.config.inc.php'); 
+require_once('../config/vilesci.config.inc.php');
+require_once('../config/global.config.inc.php');  
 require_once('../include/basis_db.class.php');
 require_once('../include/prestudent.class.php');
 require_once('../include/student.class.php'); 
@@ -28,6 +29,7 @@ require_once('../include/benutzer.class.php');
 require_once('../include/webservicelog.class.php'); 
 require_once('../include/mail.class.php');
 require_once('../include/abschlusspruefung.class.php');
+require_once('../include/note.class.php');
 require_once('stip.class.php'); 
 
 ini_set("soap.wsdl_cache_enabled", "0");
@@ -57,6 +59,22 @@ function GetStipendienbezieherStip($parameters)
 	$log->request_id = $AnfrageDatenID; 
 	$log->beschreibung = "Anfrage von Stip"; 
 	$log->save(true);
+
+	$username = $parameters->userName;
+	$passwort = $parameters->passWord;
+
+	if(!($username==STIP_USER_NAME && $passwort==STIP_USER_PASSWORD))
+	{
+		// Eintrag in der LogTabelle anlegen
+		$log = new webservicelog(); 
+		$log->request_data = 'SOAP FAULT - Invalid Credentials';
+		$log->webservicetyp_kurzbz = 'stip'; 
+		$log->request_id = $AnfrageDatenID; 
+		$log->beschreibung = "Antwort an Stip"; 
+		$log->save(true);
+
+		return new SoapFault("Server", 'Invalid Credentials');	
+	}
 
 	$StipBezieherAntwort = array(); 
 
@@ -170,7 +188,8 @@ function GetStipendienbezieherStip($parameters)
 				$StipBezieherAntwort[$i] = $StipBezieher; 
 				$i++;
 
-			}else if($StipBezieher->AntwortStatusCode == 2)
+			}
+			else if($StipBezieher->AntwortStatusCode == 2)
 			{
 				// Student wurde nicht gefunden
 				$StipBezieher->PersKz_Antwort = null; 
@@ -189,10 +208,31 @@ function GetStipendienbezieherStip($parameters)
 				$i++;
 			}
 
-		}else
-		return new SoapFault("Server", $StipBezieher->errormsg);	
+		}
+		else
+		{
+			// Eintrag in der LogTabelle anlegen
+			$log = new webservicelog(); 
+			$log->request_data = 'SOAP FAULT - ValidationError: '.$StipBezieher->errormsg;
+			$log->webservicetyp_kurzbz = 'stip'; 
+			$log->request_id = $AnfrageDatenID; 
+			$log->beschreibung = "Antwort an Stip"; 
+			$log->save(true);
+
+			return new SoapFault("Server", $StipBezieher->errormsg);	
+		}
 	}
+
 	$ret = array("GetStipendienbezieherStipResult" =>array("ErhKz"=>$ErhalterKz,"AnfragedatenID"=>$AnfrageDatenID, "Stipendiumsbezieher"=>$StipBezieherAntwort));
+
+	// Eintrag in der LogTabelle anlegen
+	$log = new webservicelog(); 
+	$log->request_data = print_r($ret,true);
+	$log->webservicetyp_kurzbz = 'stip'; 
+	$log->request_id = $AnfrageDatenID; 
+	$log->beschreibung = "Antwort an Stip"; 
+	$log->save(true);
+
 	return $ret; 
 }
 
@@ -212,10 +252,8 @@ function SendStipendienbezieherStipError($parameters)
 	$log->beschreibung = "Stip Error"; 
 	$log->save(true);
 	
-	$mail = new mail('burkhart@technikum-wien.at', 'vilesci.technikum-wien.at', 'STIP - Error', $xmlData);
+	$mail = new mail(MAIL_ADMIN, 'vilesci@'.DOMAIN, 'STIP - Error', $xmlData);
 	$mail->send();
 }
 
 ?>
-
-
