@@ -66,6 +66,18 @@ class phrasen extends basis_db
 		if(file_exists($filename))
 			include($filename);
 		
+		$addons = new addon();
+		
+		foreach($addons->aktive_addons as $addon)
+		{
+			$addon_locale_filename = dirname(__FILE__).'/../addons/'.$addon.'/locale/'.$sprache->locale.'/'.$module.'.php';
+
+			if(file_exists($addon_locale_filename))
+			{
+				include($addon_locale_filename);
+			}
+		}
+
 		$sprache = new sprache();
 		$sprache->load($this->sprache);
 		//Anzeigesprache laden
@@ -74,7 +86,6 @@ class phrasen extends basis_db
 			include($filename);
 		
 
-		$addons = new addon();
 		
 		foreach($addons->aktive_addons as $addon)
 		{
