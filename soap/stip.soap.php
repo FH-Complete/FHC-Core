@@ -252,8 +252,12 @@ function SendStipendienbezieherStipError($parameters)
 	$log->beschreibung = "Stip Error"; 
 	$log->save(true);
 	
-	$mail = new mail(MAIL_ADMIN, 'vilesci@'.DOMAIN, 'STIP - Error', $xmlData);
-	$mail->send();
+	//1=successful; 2=incomplete xml document; 3=incomplete processing; 4=system-error
+	if($parameters->errorReport->ErrorStatusCode!=1)
+	{
+		$mail = new mail(MAIL_ADMIN, 'vilesci@'.DOMAIN, 'STIP - Error', $xmlData);
+		$mail->send();
+	}
 }
 
 ?>

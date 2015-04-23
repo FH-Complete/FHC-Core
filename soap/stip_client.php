@@ -34,7 +34,8 @@ $db = new basis_db();
 	</head>
 	<body>
 		<h1>Testclient für Webservice Stipendienstelle</h1>
-		<a href="stip.wsdl.php">Show WSDL</a>
+		<a href="stip.wsdl.php">Show WSDL</a> <br>
+		<a href="stip_client_error.php">Error Tester</a>
 		<br><br>
 		<form action="stip_client.php" method="post">
 		  <table border="0" cellpadding="5" cellspacing="0" bgcolor="#E0E0E0">
