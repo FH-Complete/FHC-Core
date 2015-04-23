@@ -128,6 +128,12 @@ if(isset($_GET['von']))
 	$params.='&von='.urlencode($_GET['von']);
 if(isset($_GET['bis']))
 	$params.='&bis='.urlencode($_GET['bis']);
+if(isset($_GET['stundevon']))
+	$params.='&stundevon='.urlencode($_GET['stundevon']);
+if(isset($_GET['stundebis']))
+	$params.='&stundebis='.urlencode($_GET['stundebis']);
+if(isset($_GET['sem']))
+	$params.='&sem='.urlencode($_GET['sem']);
 if(isset($_GET['lehreinheit']))
 	$params.='&lehreinheit='.urlencode($_GET['lehreinheit']);
 if(isset($_GET['mitarbeiter_uid']))
