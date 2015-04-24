@@ -8,7 +8,7 @@ test:
     codeception:
         config: "tests"
     php_parallel_lint:
-    	directory: "include"
+        directory: "include"
     php_loc:
     php_docblock_checker:
         allowed_warnings: -1
