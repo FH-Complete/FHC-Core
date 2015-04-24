@@ -101,7 +101,7 @@ if($lehreinheit_id)
 
 		if(!count($alle_semester))
 		{
-			echo $p->t('anwesenheitsliste/keinEintraegeGefunden');
+			echo $p->t('anwesenheitsliste/keineEintraegeGefunden');
 		}
 		else
 		{
