@@ -173,7 +173,10 @@ foreach($noten_obj->result as $row)
 	function saveLVNote(uid)
 	{
 		note = document.getElementById(uid).note.value;
-		note_label = document.getElementById(uid).note.label;
+		if(document.getElementById(uid).note)
+			note_label = document.getElementById(uid).note.label;
+		else
+			note_label='';
 		if(note=='')
 		{
 			alert('Bitte wählen Sie eine Note aus');
@@ -285,7 +288,10 @@ foreach($noten_obj->result as $row)
 	function pruefungSpeichern()
 	{
 		var note = document.nachpruefung_form.note.value;
-		var punkte = document.nachpruefung_form.punkte.value;
+		if(document.nachpruefung_form.punkte)
+			var punkte = document.nachpruefung_form.punkte.value;
+		else
+			var punkte='';
 		var datum = document.nachpruefung_form.datum.value;		
 		var datum_test = datum.split(".");
 		if (datum_test[0].length != 2 || datum_test[1].length != 2 || datum_test[2].length!=4 || isNaN(datum_test[2]) || datum_test[1]>12 || datum_test[1]<1 || datum_test[0]>31 || datum_test[0]<1)
@@ -316,7 +322,10 @@ foreach($noten_obj->result as $row)
 					var anlegendiv = document.getElementById("nachpruefung_div");	
 					var datum = 	document.nachpruefung_form.datum.value;
 					var note = document.nachpruefung_form.note.value;
-					var punkte = document.nachpruefung_form.punkte.value;
+					if(document.nachpruefung_form.punkte)
+						var punkte = document.nachpruefung_form.punkte.value;
+					else
+						var punkte='';
 					var uid = document.nachpruefung_form.uid.value;
 					var lehreinheit_id = document.nachpruefung_form.le_id.value;
 		            var resp = result;
