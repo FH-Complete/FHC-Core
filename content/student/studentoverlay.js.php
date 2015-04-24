@@ -5116,7 +5116,7 @@ function StudentDiplomasupplementArchivieren()
 // ****
 // * Erstellt den Ausbildungsvertrag fuer einen oder mehrere Studenten
 // ****
-function StudentPrintAusbildungsvertrag()
+function StudentPrintAusbildungsvertrag(event)
 {
     netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
@@ -5145,15 +5145,27 @@ function StudentPrintAusbildungsvertrag()
 		alert('Bitte einen Studenten auswaehlen');
 		return false;
 	}
+	if (event.shiftKey) 
+	{
+	    var output='odt';
+	} 
+	else if (event.ctrlKey)
+	{
+		var output='doc';
+	}
+	else
+	{
+		var output='pdf';
+	}
 	
 	//PDF erzeugen 
-	window.open('<?php echo APP_ROOT; ?>content/createAusbildungsvertrag.php?xml=ausbildungsvertrag.xml.php&xsl=Ausbildungsver&output=pdf&uid='+paramList,'Ausbildungsvertrag', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=ausbildungsvertrag.xml.php&xsl=Ausbildungsver&style_xsl=AusbildStatus&output='+output+'&uid='+paramList,'Ausbildungsvertrag', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 //****
 //* Erstellt den englischen Ausbildungsvertrag fuer einen oder mehrere Studenten
 //****
-function StudentPrintAusbildungsvertragEnglisch()
+function StudentPrintAusbildungsvertragEnglisch(event)
 {
  netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
@@ -5182,9 +5194,21 @@ function StudentPrintAusbildungsvertragEnglisch()
 		alert('Bitte mindestens einen Studenten auswaehlen');
 		return false;
 	}
+	if (event.shiftKey) 
+	{
+	    var output='odt';
+	} 
+	else if (event.ctrlKey)
+	{
+		var output='doc';
+	}
+	else
+	{
+		var output='pdf';
+	}
 	
 	//PDF erzeugen 
-	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=ausbildungsvertrag.xml.php&xsl=AusbVerEng&style_xsl=AusbVerEngHead&output=pdf&uid='+paramList,'AusbildungsvertragEng', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=ausbildungsvertrag.xml.php&xsl=AusbVerEng&style_xsl=AusbVerEngHead&output='+output+'&uid='+paramList,'AusbildungsvertragEng', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
