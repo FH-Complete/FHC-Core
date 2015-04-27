@@ -947,6 +947,7 @@ function MitarbeiterDetailgetSpaltenname(id)
 	if(id=='mitarbeiter-treecol-titelpost') return 'titelpost';
 	if(id=='mitarbeiter-treecol-personalnummer') return 'personalnummer';
 	if(id=='mitarbeiter-treecol-geburtsdatum') return 'gebdatum';
+	if(id=='mitarbeiter-treecol-geburtsdatum_iso') return 'gebdatum';
 	if(id=='mitarbeiter-treecol-svnr') return 'svnr';
 	if(id=='mitarbeiter-treecol-ersatzkennzeichen') return 'ersatzkennzeichen';
 	if(id=='mitarbeiter-treecol-uid') return 'uid';

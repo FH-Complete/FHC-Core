@@ -140,28 +140,28 @@ function getStundenproInstitut($mitarbeiter_uid, $studiensemester_kurzbz)
 {
 	global $db;
 	
-	$ret="Der Lektor ist in folgenden Instituten zugeteilt:\n";
+	$ret="Der Lektor ist in folgenden Organisationseinheiten zugeteilt:\n";
 	
 	//Liste mit den Stunden in den jeweiligen Instituten anzeigen
-	$qry = "SELECT sum(tbl_lehreinheitmitarbeiter.semesterstunden) as summe, tbl_fachbereich.bezeichnung
+	$qry = "SELECT sum(tbl_lehreinheitmitarbeiter.semesterstunden) as summe, tbl_organisationseinheit.bezeichnung
 			FROM
 				lehre.tbl_lehreinheitmitarbeiter 
 				JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
 				JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(lehrfach_id=lehrfach.lehrveranstaltung_id)
-				JOIN public.tbl_fachbereich USING(oe_kurzbz)
+				JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
 			WHERE
 				mitarbeiter_uid=".$db->db_add_param($mitarbeiter_uid)." AND
 				studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND
 				faktor>0 AND
 				stundensatz>0 AND
 				bismelden
-			GROUP BY tbl_fachbereich.bezeichnung";
+			GROUP BY tbl_organisationseinheit.bezeichnung";
 	
 	if($result = $db->db_query($qry))
 	{
 		while($row = $db->db_fetch_object($result))
 		{
-			$ret .=$row->summe.' Stunden im Institut '.$row->bezeichnung."\n";
+			$ret .=$row->summe.' Stunden '.$row->bezeichnung."\n";
 		}
 	}
 	return $ret;
@@ -169,11 +169,13 @@ function getStundenproInstitut($mitarbeiter_uid, $studiensemester_kurzbz)
 
 if(!$error)
 {
-	
+    if(!empty($_POST['lehrveranstaltung']))
+        $lva = new lehrveranstaltung($_POST['lehrveranstaltung']);
+    
 	if(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_save')
 	{
 		//Lehreinheitmitarbeiter Zuteilung
-		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz,
+		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.lehrveranstaltung_id,
 				(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz
 				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach
 				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
@@ -182,11 +184,13 @@ if(!$error)
 		{
 			if($row = $db->db_fetch_object($result))
 			{
-				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') &&
-				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&
-				   !$rechte->isBerechtigt('lv-plan', $row->studiengang_kz, 'suid') &&
-				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz) &&
-				   !$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz))
+				$lva = new lehrveranstaltung($row->lehrveranstaltung_id);
+                
+                if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') &&
+				   !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid') &&
+				   !$rechte->isBerechtigtMultipleOe('lv-plan', $lva->getAllOe(), 'suid') &&
+				   !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid', $row->fachbereich_kurzbz) &&
+				   !$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid', $row->fachbereich_kurzbz))
 				{
 					$error = true;
 					$return = false;
@@ -394,7 +398,7 @@ if(!$error)
 	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_add')
 	{
 		//neue Lehreinheitmitarbeiterzuteilung anlegen
-		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, 
+		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.lehrveranstaltung_id,
 				(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz
 				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach
 				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
@@ -403,11 +407,13 @@ if(!$error)
 		{
 			if($row = $db->db_fetch_object())
 			{
-				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') &&
-				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&
-				   !$rechte->isBerechtigt('lv-plan', $row->studiengang_kz, 'suid') &&
-				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz) &&
-				   !$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz))
+				$lva = new lehrveranstaltung($row->lehrveranstaltung_id);
+                
+                if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') &&
+				   !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid') &&
+				   !$rechte->isBerechtigtMultipleOe('lv-plan', $lva->getAllOe(), 'suid') &&
+				   !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid', $row->fachbereich_kurzbz) &&
+				   !$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid', $row->fachbereich_kurzbz))
 				{
 					$error = true;
 					$return = false;
@@ -584,7 +590,7 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_mitarbeiter_del')
 	{
-		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, 
+		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.lehrveranstaltung_id,
 				(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz
 				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach
 				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
@@ -593,11 +599,13 @@ if(!$error)
 		{
 			if($row = $db->db_fetch_object())
 			{
-				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') &&
-				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&
-				   !$rechte->isBerechtigt('lv-plan', $row->studiengang_kz, 'suid') &&
-				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz) &&
-				   !$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz))
+				$lva = new lehrveranstaltung($row->lehrveranstaltung_id);
+                
+                if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') &&
+				   !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid') &&
+				   !$rechte->isBerechtigtMultipleOe('lv-plan', $lva->getAllOe(), 'suid') &&
+				   !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid', $row->fachbereich_kurzbz) &&
+				   !$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid', $row->fachbereich_kurzbz))
 				{
 					$error = true;
 					$return = false;
@@ -663,7 +671,7 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_gruppe_del')
 	{
-		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, 
+		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.lehrveranstaltung_id,
 				(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz
 				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach
 				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
@@ -672,11 +680,13 @@ if(!$error)
 		{
 			if($row = $db->db_fetch_object())
 			{
-				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') &&
-				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&
-				   !$rechte->isBerechtigt('lv-plan', $row->studiengang_kz, 'suid') &&
-				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz) &&
-				   !$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz))
+				$lva = new lehrveranstaltung($row->lehrveranstaltung_id);
+                
+                if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') &&
+				   !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid') &&
+				   !$rechte->isBerechtigtMultipleOe('lv-plan', $lva->getAllOe(), 'suid') &&
+				   !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid', $row->fachbereich_kurzbz) &&
+				   !$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid', $row->fachbereich_kurzbz))
 				{
 					$error = true;
 					$return = false;
@@ -792,7 +802,7 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='lehreinheit_gruppe_add')
 	{
-		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz,
+		$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.lehrveranstaltung_id,
 				(SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz
 				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach
 				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
@@ -801,11 +811,13 @@ if(!$error)
 		{
 			if($row = $db->db_fetch_object())
 			{
-				if(!$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid') &&
-				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid') &&
-				   !$rechte->isBerechtigt('lv-plan', $row->studiengang_kz, 'suid') &&
-				   !$rechte->isBerechtigt('assistenz', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz) &&
-				   !$rechte->isBerechtigt('admin', $row->studiengang_kz, 'suid', $row->fachbereich_kurzbz))
+				$lva = new lehrveranstaltung($row->lehrveranstaltung_id);
+                
+                if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') &&
+				   !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid') &&
+				   !$rechte->isBerechtigtMultipleOe('lv-plan', $lva->getAllOe(), 'suid') &&
+				   !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid', $row->fachbereich_kurzbz) &&
+				   !$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid', $row->fachbereich_kurzbz))
 				{
 					$error = true;
 					$return = false;
@@ -878,7 +890,8 @@ if(!$error)
 	{
 		//Lehreinheit anlegen/aktualisieren
 		if(isset($_POST['lehreinheit_id']) && $_POST['lehreinheit_id']!='')
-			$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, (SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz
+			$qry = "SELECT tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.lehrveranstaltung_id,
+                    (SELECT fachbereich_kurzbz FROM public.tbl_fachbereich WHERE oe_kurzbz=lehrfach.oe_kurzbz) as fachbereich_kurzbz
 					FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach
 					WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 					tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER);
@@ -890,9 +903,11 @@ if(!$error)
 			if($row = $db->db_fetch_object())
 			{
 				$studiengang_kz = $row->studiengang_kz;
-				$fachbereich_kurzbz = 0;
+                $fachbereich_kurzbz = 0;
 				if(isset($row->fachbereich_kurzbz))
 					$fachbereich_kurzbz = $row->fachbereich_kurzbz;
+                if(!isset($lva))
+                    $lva = new lehrveranstaltung($row->lehrveranstaltung_id);
 			}
 			else
 			{
@@ -922,11 +937,10 @@ if(!$error)
 						$errormsg = 'Fehler beim Laden der Lehreinheit';
 					}
 
-					if(!$rechte->isBerechtigt('admin', $studiengang_kz, 'suid') &&
-					   !$rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid') &&
-					   !$rechte->isBerechtigt('lv-plan', $studiengang_kz, 'suid') &&
-				       !$rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid', $fachbereich_kurzbz)) /*&&
-				       !$rechte->isBerechtigt('admin', $studiengang_kz, 'suid', $fachbereich_kurzbz))*/
+					if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') &&
+					   !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid') &&
+					   !$rechte->isBerechtigtMultipleOe('lv-plan', $lva->getAllOe(), 'suid') &&
+				       !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid', $fachbereich_kurzbz))
 					{
 						$error = true;
 						$return = false;
@@ -935,8 +949,8 @@ if(!$error)
 				}
 				else
 				{
-					if(!$rechte->isBerechtigt('admin', $studiengang_kz, 'si') && !$rechte->isBerechtigt('assistenz', $studiengang_kz, 'si') &&
-					   !$rechte->isBerechtigt('admin', $studiengang_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid') && !$rechte->isBerechtigt('lv-plan', $studiengang_kz, 'suid'))
+                    if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'si') && !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'si') &&
+					   !$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') && !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid') && !$rechte->isBerechtigtMultipleOe('lv-plan', $lva->getAllOe(), 'suid'))
 					{
 						$error = true;
 						$return = false;
@@ -1023,7 +1037,9 @@ if(!$error)
 			}
 			else if ($_POST['do']=='delete') //Lehreinheit loeschen
 			{
-				if(!$rechte->isBerechtigt('admin', $studiengang_kz, 'suid') && !$rechte->isBerechtigt('assistenz', $studiengang_kz, 'suid') && !$rechte->isBerechtigt('lv-plan', $studiengang_kz, 'suid'))
+				if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') && 
+                   !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid') && 
+                   !$rechte->isBerechtigtMultipleOe('lv-plan', $lva->getAllOe(), 'suid'))
 				{
 					$return = false;
 					$error = true;
@@ -1101,94 +1117,121 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='lvangebot-gruppe-save')
 	{
-		isset($_POST['lvangebot_id']) ? $lvangebot_id = $_POST['lvangebot_id'] : $lvangebot_id = null;
-		$datum_obj = new datum();
-		$lvangebot = new lvangebot();
-		$lvangebot->insertamum = date('Y-m-d H:i:s');
-		$lvangebot->insertvon = $user;
-		
-		if($lvangebot_id)
-		{
-			$lvangebot->load($lvangebot_id);
-			$lvangebot->new = false;
-		}
-		else
-		{
-			$lvangebot->new = true;
-		}
-				
 		$lehrveranstaltung_obj = new lehrveranstaltung();
-		if(!$lehrveranstaltung_obj->load($_POST['lehrveranstaltung_id']))
-			$errormsg = 'Fehler beim Laden der Lehrveranstaltung';
+        if(!$lehrveranstaltung_obj->load($_POST['lehrveranstaltung_id']))
+            $errormsg = 'Fehler beim Laden der Lehrveranstaltung';
+        
+        if(!$rechte->isBerechtigtMultipleOe('admin', $lehrveranstaltung_obj->getAllOe(), 'suid') &&
+           !$rechte->isBerechtigtMultipleOe('assistenz', $lehrveranstaltung_obj->getAllOe(), 'suid'))
+        {
+            $error = true;
+            $return = false;
+            $errormsg = 'Keine Berechtigung';
+        }
+        
+        if(!$error)
+        {
+            isset($_POST['lvangebot_id']) ? $lvangebot_id = $_POST['lvangebot_id'] : $lvangebot_id = null;
+            $datum_obj = new datum();
+            $lvangebot = new lvangebot();
+            $lvangebot->insertamum = date('Y-m-d H:i:s');
+            $lvangebot->insertvon = $user;
 
-		$studiengang = new studiengang();
-		if(!$studiengang->load($lehrveranstaltung_obj->studiengang_kz))
-			$errormsg = 'Fehler beim Laden des Studienganges';
+            if($lvangebot_id)
+            {
+                $lvangebot->load($lvangebot_id);
+                $lvangebot->new = false;
+            }
+            else
+            {
+                $lvangebot->new = true;
+            }
 
-		if($_POST['neue_gruppe'] == "false")
-		{
-			$gruppe_kurzbz = $_POST['gruppe'];
-		}
-		else
-		{
-			$gruppe = new gruppe();
-			$gruppe_kurzbz = mb_strtoupper(substr($studiengang->kuerzel.$lehrveranstaltung_obj->semester.'-'.$_POST['studiensemester_kurzbz'].'-'.$lehrveranstaltung_obj->kurzbz,0,32));
-			$gruppe_kurzbz = $gruppe->getNummerierteGruppenbez($gruppe_kurzbz);
-			$gruppe->gruppe_kurzbz=$gruppe_kurzbz;
-			$gruppe->studiengang_kz=$studiengang->studiengang_kz;
-			$gruppe->bezeichnung=mb_substr($lehrveranstaltung_obj->bezeichnung,0,30);
-			$gruppe->semester=$lehrveranstaltung_obj->semester;
-			$gruppe->sort='';
-			$gruppe->mailgrp=false;
-			$gruppe->beschreibung=$lehrveranstaltung_obj->bezeichnung;
-			$gruppe->sichtbar=true;
-			$gruppe->generiert=false;
-			$gruppe->aktiv=true;
-			$gruppe->lehre=true;
-			$gruppe->content_visible=false;
-			$gruppe->orgform_kurzbz=$lehrveranstaltung_obj->orgform_kurzbz;
-			$gruppe->gesperrt=false;
-			$gruppe->zutrittssystem=false;
-			$gruppe->insertamum=date('Y-m-d H:i:s');
-			$gruppe->insertvon=$user;
+            $studiengang = new studiengang();
+            if(!$studiengang->load($lehrveranstaltung_obj->studiengang_kz))
+                $errormsg = 'Fehler beim Laden des Studienganges';
 
-			if(!$gruppe->save(true))
-			{
-				$errormsg = 'Fehler beim Erstellen der Gruppe'.$gruppe->errormsg;
-				$return = false;
-			}
-		}
-		
-		$lvangebot->lehrveranstaltung_id = $_POST['lehrveranstaltung_id'];
-		$lvangebot->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
-		$lvangebot->gruppe_kurzbz = $gruppe_kurzbz;
-		$lvangebot->incomingplaetze = $_POST['incomingplaetze'];
-		$lvangebot->gesamtplaetze = $_POST['gesamtplaetze'];
-		$lvangebot->anmeldefenster_start = $datum_obj->formatDatum($_POST['anmeldefenster_start'], 'Y-m-d');
-		$lvangebot->anmeldefenster_ende = $datum_obj->formatDatum($_POST['anmeldefenster_ende'],'Y-m-d');
+            if($_POST['neue_gruppe'] == "false")
+            {
+                $gruppe_kurzbz = $_POST['gruppe'];
+            }
+            else
+            {
+                $gruppe = new gruppe();
+                $gruppe_kurzbz = mb_strtoupper(substr($studiengang->kuerzel.$lehrveranstaltung_obj->semester.'-'.$_POST['studiensemester_kurzbz'].'-'.$lehrveranstaltung_obj->kurzbz,0,32));
+                $gruppe_kurzbz = $gruppe->getNummerierteGruppenbez($gruppe_kurzbz);
+                $gruppe->gruppe_kurzbz=$gruppe_kurzbz;
+                $gruppe->studiengang_kz=$studiengang->studiengang_kz;
+                $gruppe->bezeichnung=mb_substr($lehrveranstaltung_obj->bezeichnung,0,30);
+                $gruppe->semester=$lehrveranstaltung_obj->semester;
+                $gruppe->sort='';
+                $gruppe->mailgrp=false;
+                $gruppe->beschreibung=$lehrveranstaltung_obj->bezeichnung;
+                $gruppe->sichtbar=true;
+                $gruppe->generiert=false;
+                $gruppe->aktiv=true;
+                $gruppe->lehre=true;
+                $gruppe->content_visible=false;
+                $gruppe->orgform_kurzbz=$lehrveranstaltung_obj->orgform_kurzbz;
+                $gruppe->gesperrt=false;
+                $gruppe->zutrittssystem=false;
+                $gruppe->insertamum=date('Y-m-d H:i:s');
+                $gruppe->insertvon=$user;
 
-		if(!$lvangebot->save())
-		{
-			$errormsg = $lvangebot->errormsg;
-			$return = false;
-		}
-		else
-		{
-			$return = true;
-		}
+                if(!$gruppe->save(true))
+                {
+                    $errormsg = 'Fehler beim Erstellen der Gruppe'.$gruppe->errormsg;
+                    $return = false;
+                }
+            }
+
+            $lvangebot->lehrveranstaltung_id = $_POST['lehrveranstaltung_id'];
+            $lvangebot->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
+            $lvangebot->gruppe_kurzbz = $gruppe_kurzbz;
+            $lvangebot->incomingplaetze = $_POST['incomingplaetze'];
+            $lvangebot->gesamtplaetze = $_POST['gesamtplaetze'];
+            $lvangebot->anmeldefenster_start = $datum_obj->formatDatum($_POST['anmeldefenster_start'], 'Y-m-d');
+            $lvangebot->anmeldefenster_ende = $datum_obj->formatDatum($_POST['anmeldefenster_ende'],'Y-m-d');
+
+            if(!$lvangebot->save())
+            {
+                $errormsg = $lvangebot->errormsg;
+                $return = false;
+            }
+            else
+            {
+                $return = true;
+            }
+        }
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='lvangebot_gruppe_del')
 	{
 		$lvangebot = new lvangebot();
-		if(!$lvangebot->delete($_POST['lvangebot_id']))
-		{
-			$errormsg = $this->errormsg;
-			$return = false;
-		}
-		else
-		{
-			$return = true;
-		}
+        $lvangebot->load($_POST['lvangebot_id']);
+        $lva = new lehrveranstaltung($lvangebot->lehrveranstaltung_id);
+                
+        if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') &&
+           !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid') &&
+           !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid', $row->fachbereich_kurzbz) &&
+           !$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid', $row->fachbereich_kurzbz))
+        {
+            $error = true;
+            $return = false;
+            $errormsg = 'Keine Berechtigung';
+        }
+        
+        if(!$error)
+        {
+            if(!$lvangebot->delete($_POST['lvangebot_id']))
+            {
+                $errormsg = $this->errormsg;
+                $return = false;
+            }
+            else
+            {
+                $return = true;
+            }
+        }
 	}
 	else
 	{

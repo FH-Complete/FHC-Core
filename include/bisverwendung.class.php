@@ -408,7 +408,7 @@ class bisverwendung extends basis_db
 	}
 
 	/**
-	 * Laedt alle Verwendungen eines Mitarbeiters
+	 * Laedt die Letzte (aktuellste) Verwendungen eines Mitarbeiters
 	 * @param $uid UID des Mitarbeiters
 	 * @return true wenn ok, false wenn Fehler
 	 */
@@ -421,7 +421,11 @@ class bisverwendung extends basis_db
 					bis.tbl_bisverwendung 
 				WHERE 
 					mitarbeiter_uid=".$this->db_add_param($uid)." 
-				ORDER BY beginn DESC LIMIT 1;";
+				AND 
+					(beginn<=now() OR beginn IS NULL)
+				AND 
+					(ende>=now() OR ende IS NULL) 
+				ORDER BY ende DESC NULLS LAST,beginn DESC NULLS LAST LIMIT 1;";
 
 		if($this->db_query($qry))
 		{

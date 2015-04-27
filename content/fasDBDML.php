@@ -582,8 +582,16 @@ if(!$error)
 		}
 		else 
 		{
-			$return = false;
-			$errormsg = 'Fehler: '.$variable->errormsg;
+			if($variable->errormsg=='')
+			{
+				$return = true;
+				$data = '';
+			}
+			else
+			{
+				$return = false;
+				$errormsg = 'Fehler: '.$variable->errormsg;
+			}
 		}
 	}
 	else

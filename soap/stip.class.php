@@ -57,19 +57,19 @@ class stip extends basis_db
 	 */
 	function validateStipDaten($ErhKz, $Anfragedaten, $Bezieher)
 	{
-		if(strlen($ErhKz)!=3 || !is_numeric($ErhKz))
+		if(mb_strlen($ErhKz)!=3 || !is_numeric($ErhKz))
 		{
 			$this->errormsg = "Kein gültiger Wert für ErhKz"; 
 			return false; 
 		}
 			
-		if(strlen($Bezieher->Semester)!=2 || ($Bezieher->Semester != "ws" && $Bezieher->Semester != "ss" && $Bezieher->Semester != "WS" && $Bezieher->Semester != "SS"))
+		if(mb_strlen($Bezieher->Semester)!=2 || ($Bezieher->Semester != "ws" && $Bezieher->Semester != "ss" && $Bezieher->Semester != "WS" && $Bezieher->Semester != "SS"))
 		{
 			$this->errormsg = "Kein gültiger Wert für Semester"; 
 			return false; 
 		}
 	
-		if(strlen($Bezieher->Studienjahr) != 7)
+		if(mb_strlen($Bezieher->Studienjahr) != 7)
 		{
 			$this->errormsg = "Kein gültiger Wert für Studienjahr"; 
 			return false; 
@@ -79,13 +79,13 @@ class stip extends basis_db
 		if($Bezieher->PersKz != null && strlen($Bezieher->PersKz) != 10)
 		{
 			$this->errormsg = "Kein gültiger Wert für PersKz"; 
-	//		return false; 
+			//return false; 
 		}
 			
 		if(mb_strlen($Bezieher->SVNR) != 10 || !is_numeric($Bezieher->SVNR))
 		{
 			$this->errormsg = "Kein gültiger Wert für SVNR"; 
-		//	return false; 
+			//	return false; 
 		}
 			
 			// preg_match funktioniert noch nicht || preg_match_all('[^0-9]*',$Bezieher->Familienname)>0
@@ -98,7 +98,7 @@ class stip extends basis_db
 		if(mb_strlen($Bezieher->Vorname) > 255 || $Bezieher->Vorname == null || mb_strlen($Bezieher->Vorname) <2)
 		{
 			$this->errormsg = "Kein gültiger Wert für Vorname"; 
-		//	return false; 
+			//	return false; 
 		}
 			
 		if(mb_strlen($Bezieher->Typ) != 2 || ($Bezieher->Typ != "ag" && $Bezieher->Typ != "as" && $Bezieher->Typ != "AG" && $Bezieher->Typ != "AS"))
@@ -107,7 +107,7 @@ class stip extends basis_db
 			return false; 
 		}
 			
-			return true; 
+		return true; 
 	}
 		
 	
@@ -118,10 +118,13 @@ class stip extends basis_db
 	 */
 	function searchPersonKz($PersonKz)
 	{
-		$qry = "Select prestudent_id, vorname, nachname, svnr, matrikelnr from public.tbl_student student 
-		join public.tbl_benutzer benutzer on(benutzer.uid=student.student_uid)
-		join public.tbl_person person using(person_id)
-		where student.matrikelnr = '".addslashes($PersonKz)."';"; 
+		$qry = "SELECT
+			 prestudent_id, vorname, nachname, svnr, matrikelnr 
+			FROM 
+				public.tbl_student student 
+				JOIN public.tbl_benutzer benutzer on(benutzer.uid=student.student_uid)
+				JOIN public.tbl_person person using(person_id)
+			WHERE student.matrikelnr = ".$this->db_add_param($PersonKz).";"; 
 		
 		if($this->db_query($qry))
 		{
@@ -153,10 +156,13 @@ class stip extends basis_db
 	 */
 	function searchSvnr($Svnr)
 	{
-		$qry = "Select prestudent_id, vorname, nachname, svnr, matrikelnr from public.tbl_student student 
-		join public.tbl_benutzer benutzer on(benutzer.uid=student.student_uid)
-		join public.tbl_person person using(person_id)
-		where person.svnr = '".addslashes($Svnr)."';"; 
+		$qry = "SELECT 
+					prestudent_id, vorname, nachname, svnr, matrikelnr 
+				FROM 
+					public.tbl_student student 
+					JOIN public.tbl_benutzer benutzer on(benutzer.uid=student.student_uid)
+					JOIN public.tbl_person person using(person_id)
+				WHERE person.svnr = ".$this->db_add_param($Svnr).";"; 
 		
 		if($this->db_query($qry))
 		{
@@ -199,11 +205,15 @@ class stip extends basis_db
 	 */
 	function searchVorNachname($Vorname, $Nachname)
 	{
-		$qry = "Select prestudent_id, vorname, nachname, svnr, matrikelnr from public.tbl_student student 
-		join public.tbl_benutzer benutzer on(benutzer.uid=student.student_uid)
-		join public.tbl_person person using(person_id)
-		where person.vorname = '".addslashes($Vorname)."'
-		and person.nachname = '".addslashes($Nachname)."';"; 
+		$qry = "SELECT 
+					prestudent_id, vorname, nachname, svnr, matrikelnr 
+				FROM
+					public.tbl_student student 
+					JOIN public.tbl_benutzer benutzer on(benutzer.uid=student.student_uid)
+					JOIN public.tbl_person person using(person_id)
+				WHERE 
+					person.vorname = ".$this->db_add_param($Vorname)."
+					AND person.nachname = ".$this->db_add_param($Nachname).";"; 
 		
 		if($this->db_query($qry))
 		{
@@ -242,27 +252,6 @@ class stip extends basis_db
 	
 	/**
 	 * 
-	 * Gibt Erhalter_Kz für Technikum Wien zurück
-	 */
-	function getErhalterKz()
-	{
-		$qry = "Select erhalter_kz from public.tbl_erhalter where kurzbz = 'TW';";
-		
-		if($this->db_query($qry))
-		{
-			if($row = $this->db_fetch_object())
-			{
-				return $row->erhalter_kz;
-			}
-			else 
-				return false; 
-		}
-		else 
-			return false;
-	}
-	
-	/**
-	 * 
 	 * Gibt den orgform_code zurück für übergebene StudentUID und Semester
 	 * z.B. 1 für Vollzeit
 	 * z.B. 2 für Berufsbegleitend
@@ -273,17 +262,20 @@ class stip extends basis_db
 	{
 					
 		// hole mischform von studenten
-		$qry_mischform = "select studiengang.mischform 
-		from public.tbl_studiengang studiengang
-		join public.tbl_student student using(studiengang_kz)
-		join public.tbl_prestudent prestudent using(prestudent_id)
-		where student_uid='$studentUID'";
+		$qry_mischform = "
+			SELECT 
+				studiengang.mischform 
+			FROM 
+				public.tbl_studiengang studiengang
+				JOIN public.tbl_student student using(studiengang_kz)
+				JOIN public.tbl_prestudent prestudent using(prestudent_id)
+			WHERE student_uid=".$this->db_add_param($studentUID);
 
 		if($this->db_query($qry_mischform))
 		{
 			if($row= $this->db_fetch_object())
 			{
-				$mischform = ($row->mischform=='t'?true:false);
+				$mischform = $this->db_parse_bool($row->mischform);
 				
 			}
 		}
@@ -292,13 +284,18 @@ class stip extends basis_db
 		if($mischform == false)
 		{
 			
-			$qry = "select orgform.code, studiengang.orgform_kurzbz as studorgkz, student.student_uid, student.studiengang_kz studiengang
-			from public.tbl_studiengang studiengang
-			join public.tbl_student student using(studiengang_kz)
-			join public.tbl_prestudent prestudent using(prestudent_id)
-			join public.tbl_prestudentstatus status using(prestudent_id)
-			join bis.tbl_orgform orgform on(orgform.orgform_kurzbz = studiengang.orgform_kurzbz) where student_uid='$studentUID'
-			and status.studiensemester_kurzbz ='$studSemester';";
+			$qry = "
+			SELECT 	
+				orgform.code, studiengang.orgform_kurzbz as studorgkz, student.student_uid, student.studiengang_kz studiengang
+			FROM 
+				public.tbl_studiengang studiengang
+				JOIN public.tbl_student student using(studiengang_kz)
+				JOIN public.tbl_prestudent prestudent using(prestudent_id)
+				JOIN public.tbl_prestudentstatus status using(prestudent_id)
+				JOIN bis.tbl_orgform orgform on(orgform.orgform_kurzbz = studiengang.orgform_kurzbz) 
+			WHERE
+				student_uid=".$this->db_add_param($studentUID)."
+				AND status.studiensemester_kurzbz =".$this->db_add_param($studSemester);
 			
 			// Wenn kein Status gefunden wurde -> null
 			if($this->db_query($qry))
@@ -341,7 +338,7 @@ class stip extends basis_db
 	 */
 	function getOrgFormCodeFromKurzbz($orgform_kurzbz)
 	{
-		$qry = "SELECT code FROM bis.tbl_orgform WHERE orgform_kurzbz = '".addslashes($orgform_kurzbz)."';";
+		$qry = "SELECT code FROM bis.tbl_orgform WHERE orgform_kurzbz = ".$this->db_add_param($orgform_kurzbz).";";
 		
 		if($this->db_query($qry))
 		{
@@ -369,10 +366,10 @@ class stip extends basis_db
 			FROM 
 				public.tbl_prestudentstatus
 			WHERE 
-				prestudent_id='$prestudent_id' 
-				AND studiensemester_kurzbz='$studiensemester_kurzbz'";
+				prestudent_id=".$this->db_add_param($prestudent_id)."
+				AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 		if(!is_null($bisdatum))
-				$qrystatus.=" AND (tbl_prestudentstatus.datum<'$bisdatum')";
+				$qrystatus.=" AND (tbl_prestudentstatus.datum<".$this->db_add_param($bisdatum).")";
 		
 		$qrystatus.=" ORDER BY datum desc, insertamum desc, ext_id desc;";
 		
@@ -388,10 +385,10 @@ class stip extends basis_db
 					FROM 
 						public.tbl_prestudentstatus 
 					WHERE 
-						prestudent_id='$prestudent_id' 
-						AND studiensemester_kurzbz='$psem'";
+						prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER)."
+						AND studiensemester_kurzbz=".$this->db_add_param($psem)."'";
 				if(!is_null($bisdatum)) 
-					$qrystatus.=" AND (tbl_prestudentstatus.datum<'$bisdatum') ";
+					$qrystatus.=" AND (tbl_prestudentstatus.datum<".$this->db_add_param($bisdatum).") ";
 				$qrystatus.=" ORDER BY datum desc, insertamum desc, ext_id desc;";
 				
 				if(!$resultstatus = $this->db_query($qrystatus))
@@ -441,10 +438,10 @@ class stip extends basis_db
 			FROM 
 				public.tbl_prestudentstatus
 			WHERE 
-				prestudent_id='$prestudent_id' 
-				AND studiensemester_kurzbz='$studiensemester_kurzbz'";
+				prestudent_id=".$this->db_add_param($prestudent_id)."
+				AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 		if(!is_null($bisdatum))
-				$qrystatus.=" AND (tbl_prestudentstatus.datum<'$bisdatum')";
+				$qrystatus.=" AND (tbl_prestudentstatus.datum<".$this->db_add_param($bisdatum).")";
 		
 		$qrystatus.=" ORDER BY datum desc, insertamum desc, ext_id desc;";
 		
@@ -456,10 +453,10 @@ class stip extends basis_db
 				$qry1="
 					SELECT count(*) AS dipl FROM public.tbl_prestudentstatus 
 					WHERE 
-						prestudent_id='$prestudent_id' 
+						prestudent_id=".$this->db_add_param($prestudent_id, FHC_INTEGER)."
 						AND status_kurzbz='Diplomand'";
 				if(!is_null($bisdatum))
-					$qry1.=" AND (tbl_prestudentstatus.datum<'$bisdatum') ";
+					$qry1.=" AND (tbl_prestudentstatus.datum<".$this->db_add_param($bisdatum).") ";
 				
 				if($result1 = $this->db_query($qry1))
 				{
@@ -493,14 +490,21 @@ class stip extends basis_db
 		$student = new student();
 		$uid = $student->getUid($prestudent_id);
 		
+		$noten = new note();
+		$noten->getAll();
+
+		$noten_arr = array();
+		foreach($noten->result as $row_noten)
+			$noten_arr[$row_noten->note]['positiv']=$row_noten->positiv;
+
 		$obj = new zeugnisnote();
 		$ects=0;
 		if(!$obj->getZeugnisnoten($lehrveranstaltung_id=null, $uid, $studiensemester_kurzbz=null))
 			die('Fehler beim Laden der Noten:'.$obj->errormsg);
 		foreach($obj->result as $row)
 		{
-			//Note darf nicht teilnote(0), negativ(5), noch nicht eingetragen(7), nicht beurteilt (9), nicht erfolgreich absolviert (13), angerechnet(6) sein
-			if($row->zeugnis && $row->note!=0 && $row->note!=5 && $row->note!=7 && $row->note!=9 && $row->note!=13 && $row->note!=6)
+			//Note darf nicht negativ oder angerechnet(6) sein
+			if($row->zeugnis && $row->note!=6 && isset($noten_arr[$row->note]) && $noten_arr[$row->note]['positiv'])
 			{
 				$ects += $row->ects;
 			}

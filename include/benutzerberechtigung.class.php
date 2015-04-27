@@ -575,6 +575,29 @@ class benutzerberechtigung extends basis_db
 			return $this->isBerechtigt(substr($berechtigung_kurzbz,0,$pos-1), $oe_kurzbz, $art, $kostenstelle_id);
 		}
 	}
+    
+    /**
+     * Prueft ob die Berechtigung zumindest fuer eine der angegebenen OE vorhanden ist.
+     * @param $berechtigung_kurzbz
+     * @param $oe_kurzbz
+     * @param $art
+     * @param $kostenstelle_id
+     * @return boolean
+     */
+    public function isBerechtigtMultipleOe($berechtigung_kurzbz, $oe_kurzbz, $art=null, $kostenstelle_id=null) 
+    {
+        $results = array();
+        
+        foreach($oe_kurzbz as $value)
+        {
+            $results[] = $this->isBerechtigt($berechtigung_kurzbz, $value, $art, $kostenstelle_id);
+        }
+        
+        if(!in_array(true, $results))
+            return false;
+        else
+            return true;
+    }
 
 	/**
 	 * Prueft ob die Person Fixangestellt ist

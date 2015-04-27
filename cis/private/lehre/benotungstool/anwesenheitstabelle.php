@@ -376,7 +376,7 @@ echo "<h3><u>$uebung_obj->bezeichnung</u></h3>";
 echo '<table width="100%"><tr><td>';
 echo "<ul><li><a href='anwesenheitsliste.php?output=html&uebung_id=$uebung_id&lehreinheit_id=$lehreinheit_id&stsem=$stsem' target='_blank'>".$p->t('benotungstool/alleStudierenden')."</a>&nbsp;";
 if ($show_excel_link)
-	echo "<a href='anwesenheitsliste.php?output=xls&uebung_id=$uebung_id&lehreinheit_id=$lehreinheit_id'><img src='../../../../skin/images/excel.gif' width=16 height=16></a>";
+	echo "<a href='anwesenheitsliste.php?output=xls&uebung_id=$uebung_id&lehreinheit_id=$lehreinheit_id&stsem=$stsem'><img src='../../../../skin/images/excel.gif' width=16 height=16></a>";
 echo "</li>";
 echo '</ul>';
 echo "</td><!--<td valign='top'>

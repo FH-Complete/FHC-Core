@@ -45,6 +45,7 @@ require_once('../include/studiengang.class.php');
 require_once('../include/lehrveranstaltung.class.php');
 require_once('../include/mitarbeiter.class.php');
 require_once('../include/organisationsform.class.php');
+require_once('../include/konto.class.php');
 
 // *********** Funktionen *************************
 function convdate($date)
@@ -565,42 +566,77 @@ if($xmlformat=='rdf')
 	{
 		if($filter!='')
 		{
+		    if(substr_compare($filter, "#ref", 0, 4,true)==0)
+		    {
+			$zahlungsreferenz = explode(" ", $filter);
+			unset($zahlungsreferenz[0]);
+			
+			foreach($zahlungsreferenz as $ref)
+			{
+			    $konto = new konto();
+			    $konto->loadFromZahlungsreferenz($ref);
+			    $prestudent=new prestudent();
+			    $prestudent->getPrestudenten($konto->person_id);
+			    if(!empty($prestudent->result))
+			    {
+				$prestudent_temp = new prestudent($prestudent->result[0]->prestudent_id);
+				$student = new student();
+				$uid = $student->getUid($prestudent_temp->prestudent_id);
+				
+				if($uid!='' && $uid != false)
+				{
+				    if(!$student->load($uid, $studiensemester_kurzbz))
+					$student->load($uid);
+				    draw_content($student);
+				    draw_prestudent($prestudent_temp);
+				}
+				else
+				{
+				    draw_content($prestudent_temp);
+				    draw_prestudent($prestudent_temp);
+				}
+			    }
+			}
+		    }
+		    else
+		    {
 			//$filter = utf8_decode($filter);
 			$qry = "SELECT prestudent_id 
-					FROM 
-						public.tbl_person JOIN tbl_prestudent USING (person_id) LEFT JOIN tbl_student using(prestudent_id) 
-					WHERE 
-						nachname||' '||vorname ~* '".addslashes($filter)."' OR 
-						vorname||' '||nachname ~* '".addslashes($filter)."' OR
-						student_uid ~* '".addslashes($filter)."' OR
-						matrikelnr = '".addslashes($filter)."' OR
-						svnr = '".addslashes($filter)."';";
+				FROM 
+				    public.tbl_person JOIN tbl_prestudent USING (person_id) LEFT JOIN tbl_student using(prestudent_id) 
+				WHERE 
+				    nachname||' '||vorname ~* '".addslashes($filter)."' OR 
+				    vorname||' '||nachname ~* '".addslashes($filter)."' OR
+				    student_uid ~* '".addslashes($filter)."' OR
+				    matrikelnr = '".addslashes($filter)."' OR
+				    svnr = '".addslashes($filter)."';";
 			if($db->db_query($qry))
 			{
-				while($row = $db->db_fetch_object())
+			    while($row = $db->db_fetch_object())
+			    {
+				$student=new student();
+				if($uid = $student->getUid($row->prestudent_id))
 				{
-					$student=new student();
-					if($uid = $student->getUid($row->prestudent_id))
-					{
-						//Wenn kein Eintrag fuers aktuelle Studiensemester da ist, dann
-						//nochmal laden aber ohne studiensemester
-						if(!$student->load($uid, $studiensemester_kurzbz))
-							$student->load($uid);
-					}
-					$prestd = new prestudent();
-					$prestd->load($row->prestudent_id);
-					if($uid!='')
-					{
-						draw_content($student);
-						draw_prestudent($prestd);
-					}
-					else
-					{
-						draw_content($prestd);
-						draw_prestudent($prestd);
-					}
+				    //Wenn kein Eintrag fuers aktuelle Studiensemester da ist, dann
+				    //nochmal laden aber ohne studiensemester
+				    if(!$student->load($uid, $studiensemester_kurzbz))
+					$student->load($uid);
 				}
+				$prestd = new prestudent();
+				$prestd->load($row->prestudent_id);
+				if($uid!='')
+				{
+				    draw_content($student);
+				    draw_prestudent($prestd);
+				}
+				else
+				{
+				    draw_content($prestd);
+				    draw_prestudent($prestd);
+				}
+			    }
 			}
+		    }
 		}
 		elseif(isset($prestudent_id))
 		{

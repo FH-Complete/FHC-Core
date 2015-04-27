@@ -168,7 +168,7 @@ echo "<?xml version='1.0' encoding='utf-8' ?>";
   </wsdl:binding>
   <wsdl:service name="STIPServiceDecentralized">
     <wsdl:port name="STIPServiceDecentralizedSoap" binding="tns:STIPServiceDecentralizedSoap">
-      <soap:address location="<?php echo APP_ROOT."/soap/stip.soap.php?".microtime();?>"/>
+      <soap:address location="<?php echo APP_ROOT."/soap/stip.soap.php?".microtime(true);?>"/>
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

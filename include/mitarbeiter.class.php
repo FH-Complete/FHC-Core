@@ -196,6 +196,12 @@ class mitarbeiter extends benutzer
 
 		if($new)
 		{
+		    if(defined('FAS_PERSONALNUMMER_GENERATE_NULL') && FAS_PERSONALNUMMER_GENERATE_NULL)
+		    {
+			$this->personalnummer = NULL;
+		    }
+		    else
+		    {
 			if($this->personalnummer=='')
 			{
 				do
@@ -252,6 +258,7 @@ class mitarbeiter extends benutzer
 					}
 				}
 			}
+		    }
 			//Neuen Datensatz anlegen
 			$qry = "INSERT INTO public.tbl_mitarbeiter(mitarbeiter_uid, ausbildungcode, personalnummer, kurzbz, lektor, ort_kurzbz,
 			                    fixangestellt, standort_id, telefonklappe, anmerkung, stundensatz, updateamum, updatevon, insertamum, insertvon, ext_id, bismelden,kleriker)

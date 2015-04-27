@@ -59,7 +59,10 @@ elseif(isset($_GET['vertrag_id']))
 		die('Fehlgeschlagen:'.$vertrag->errormsg);
 	$vertrag->result[] = $vertrag;
 }
-
+else
+{
+	die('vertrag_id oder person_id muss uebergeben werden');
+}
 
 $oRdf = new rdf('VER','http://www.technikum-wien.at/vertrag');
 $oRdf->sendHeader();

@@ -403,11 +403,11 @@ class prestudent extends person
 			$ps->zgv_code = $row->zgv_code;
 			$ps->zgvort = $row->zgvort;
 			$ps->zgvdatum = $row->zgvdatum;
-			$ps->zgvnation = $row->zgvnation;
+			//$ps->zgvnation = $row->zgvnation;
 			$ps->zgvmas_code = $row->zgvmas_code;
 			$ps->zgvmaort = $row->zgvmaort;
 			$ps->zgvmadatum = $row->zgvmadatum;
-			$ps->zgvmanation = $row->zgvmanation;
+			//$ps->zgvmanation = $row->zgvmanation;
 			$ps->aufnahmeschluessel = $row->aufnahmeschluessel;
 			$ps->facheinschlberuf = $this->db_parse_bool($row->facheinschlberuf);
 			$ps->anmeldungreihungstest = $row->anmeldungreihungstest;
@@ -1660,30 +1660,39 @@ class prestudent extends person
 		}
 	}
 
-	public function getSemesterZuUid($uid) {
+	/**
+	 * Laedt die Studiensemester eines Studenten
+	 * @param $uid
+	 * @return array mit Studiensemestern
+	 */
+	public function getSemesterZuUid($uid) 
+	{
 
-		$qry = 'SELECT studiensemester_kurzbz, bezeichnung '
-				. 'FROM public.tbl_prestudentstatus '
-				. 'JOIN public.tbl_prestudent '
-				. 'USING (prestudent_id) '
-				. 'JOIN public.tbl_student '
-				. 'USING (prestudent_id) '
-				. 'JOIN public.tbl_studiensemester '
-				. 'USING (studiensemester_kurzbz) '
-				. 'WHERE status_kurzbz IN ('
-					. $this->db_add_param("Student") . ', '
-					. $this->db_add_param("Diplomand") . ', '
-					. $this->db_add_param("Incoming") . ')'
-				. ' AND student_uid = ' . $this->db_add_param($uid)
-				. ' ORDER BY ausbildungssemester';
+		$qry = "SELECT 
+					tbl_studiensemester.studiensemester_kurzbz, tbl_studiensemester.bezeichnung 
+				FROM 
+					public.tbl_prestudentstatus 
+					JOIN public.tbl_prestudent USING (prestudent_id)
+					JOIN public.tbl_student USING (prestudent_id) 
+					JOIN public.tbl_studiensemester USING (studiensemester_kurzbz)
+				WHERE 
+					status_kurzbz IN ('Student', 'Diplomand','Incoming')
+				 	AND student_uid = ". $this->db_add_param($uid)."
+				 ORDER BY ausbildungssemester";
 
-		$result = $this->db_query($qry);
-		$semester = array();
+		if($result = $this->db_query($qry))
+		{
+			$semester = array();
 
-		while($row = $this->db_fetch_object($result)) {
-			$semester[$row->studiensemester_kurzbz] = $row->bezeichnung;
+			while($row = $this->db_fetch_object($result)) 
+				$semester[$row->studiensemester_kurzbz] = $row->bezeichnung;
+
+			return $semester;
 		}
-
-		return $semester;
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
 	}
 }

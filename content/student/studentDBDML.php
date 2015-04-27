@@ -63,6 +63,7 @@ require_once('../../include/kontakt.class.php');
 require_once('../../include/dms.class.php'); 
 require_once('../../include/notenschluessel.class.php');
 require_once('../../include/anrechnung.class.php');
+require_once('../../include/lehrveranstaltung.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -643,6 +644,18 @@ if(!$error)
 												$student->verband='B';
 												$student->gruppe='';
 											}
+                                            
+                                            // noch nicht eingetragene Noten ergänzen
+                                            $noten = new zeugnisnote();
+                                            $noten->getZeugnisnoten(null, $uid, $semester_aktuell);
+                                            foreach($noten->result as $obj)
+                                            {
+                                                if($obj->note == '')
+                                                {
+                                                    $obj->note = 9;
+                                                    $obj->save(true);
+                                                }
+                                            }
 												
 											//Nachschauen ob dieser Lehrverband schon existiert, falls nicht dann anlegen
 											$lehrverband = new lehrverband();
@@ -944,33 +957,43 @@ if(!$error)
 						$rolle->new = false;
 					}
 					
-					$student = new student();
-					$temp_uid = $student->getUid($rolle->prestudent_id);
-					$student->load($temp_uid);
-					//$studiensemester = new studiensemester();
-					$stdsem_new = filter_input(INPUT_POST, "studiensemester_kurzbz");
-					$semester = filter_input(INPUT_POST, "ausbildungssemester");
-
 					if(!$error)
 					{
-					    $prestudent_temp = new prestudent();
-					    $prestudent_temp->getLastStatus($rolle->prestudent_id, "", "Student");
-					    $student->load_studentlehrverband($temp_uid, $prestudent_temp->studiensemester_kurzbz);
-					    $lehrverband = new lehrverband();
-					    if(!$lehrverband->exists($student->studiengang_kz, $semester, $student->verband, $student->gruppe))
-					    {
-						$student->studiensemester_kurzbz = $stdsem_new;
-						$return = false;
-						$errormsg = $student->errormsg;
-					    }
-					    else
-					    {
-						$student->studiensemester_kurzbz = $stdsem_new;
-						$student->semester = $semester;
-						$student->updatevon = get_uid();
-					    }
-					    
-					    $student->save_studentlehrverband(true);
+
+						// Bei Studenten wird der Studentlehrverband Eintrag angelegt/korrigiert
+						$student = new student();
+						if($temp_uid = $student->getUid($rolle->prestudent_id))
+						{
+							if($student->load($temp_uid))
+							{
+								$stdsem_new = filter_input(INPUT_POST, "studiensemester_kurzbz");
+								$semester = filter_input(INPUT_POST, "ausbildungssemester");
+
+								$prestudent_temp = new prestudent();
+								$prestudent_temp->getLastStatus($rolle->prestudent_id, "", "Student");
+								if($student->load_studentlehrverband($temp_uid, $prestudent_temp->studiensemester_kurzbz))
+									$student->new=false;
+								else
+									$student->new=true;
+
+								$lehrverband = new lehrverband();
+								if(!$lehrverband->exists($student->studiengang_kz, $semester, $student->verband, $student->gruppe))
+								{
+									$student->studiensemester_kurzbz = $stdsem_new;
+									$return = false;
+									$errormsg = $student->errormsg;
+								}
+								else
+								{
+									$student->studiensemester_kurzbz = $stdsem_new;
+									$student->semester = $semester;
+									$student->updatevon = $user;
+								}
+							
+								$student->save_studentlehrverband();
+							}
+						}
+					    					    
 					    $rolle->ausbildungssemester = $_POST['ausbildungssemester'];
 					    $rolle->studiensemester_kurzbz = $_POST['studiensemester_kurzbz'];
 					    $rolle->datum = $_POST['datum'];
@@ -1710,6 +1733,16 @@ if(!$error)
 		if(isset($_POST['buchungsnr']))
 		{
 			$bnr_arr = explode(';',$_POST['buchungsnr']);
+			$gegenbuchungsdatum = filter_input(INPUT_POST, "gegenbuchungsdatum");
+			if(strlen($gegenbuchungsdatum) != 0)
+			{
+			    $gegenbuchungsdatum = date("Y-m-d", strtotime($gegenbuchungsdatum));
+			}
+			else
+			{
+			    $gegenbuchungsdatum = date('Y-m-d');
+			}
+			
 			$errormsg='';
 			foreach ($bnr_arr as $buchungsnr)
 			{
@@ -1734,7 +1767,7 @@ if(!$error)
 								$kto = new konto();
 								//$buchung->betrag*(-1);
 								$buchung->betrag = $kto->getDifferenz($buchungsnr);
-								$buchung->buchungsdatum = date('Y-m-d');
+								$buchung->buchungsdatum = $gegenbuchungsdatum;
 								$buchung->mahnspanne = '0';
 								$buchung->buchungsnr_verweis = $buchung->buchungsnr;
 								$buchung->new = true;
@@ -2443,28 +2476,7 @@ if(!$error)
 		if(!is_null($lehrveranstaltung_id) && !is_null($student_uid) && !is_null($studiensemester_kurzbz))
 		{
 			//Berechtigung pruefen
-			$qry = "SELECT studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
-			if($result = $db->db_query($qry))
-			{
-				if($row = $db->db_fetch_object($result))
-				{
-					$stg_lva = $row->studiengang_kz;
-				}
-				else
-				{
-					$return = false;
-					$error = true;
-					$errormsg = 'Fehler beim Ermitteln der LVA';
-				}
-			}
-			else
-			{
-				$return = false;
-				$error = true;
-				$errormsg = 'Fehler beim Ermitteln der LVA';
-			}
-
-			$qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid=".$db->db_add_param($student_uid);
+            $qry = "SELECT studiengang_kz FROM public.tbl_student WHERE student_uid=".$db->db_add_param($student_uid);
 			if($result = $db->db_query($qry))
 			{
 				if($row = $db->db_fetch_object($result))
@@ -2487,8 +2499,10 @@ if(!$error)
 
 			if(!$error)
 			{
-				if(!$rechte->isBerechtigt('admin', $stg_lva, 'suid') && !$rechte->isBerechtigt('admin', $stg_std, 'suid') &&
-				   !$rechte->isBerechtigt('assistenz', $stg_lva, 'suid') && !$rechte->isBerechtigt('assistenz', $stg_std, 'suid'))
+				$lva = new lehrveranstaltung($lehrveranstaltung_id);
+                
+                if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') && !$rechte->isBerechtigt('admin', $stg_std, 'suid') &&
+				   !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid') && !$rechte->isBerechtigt('assistenz', $stg_std, 'suid'))
 				{
 					$return = false;
 					$error = true;

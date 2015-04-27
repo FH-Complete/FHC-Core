@@ -634,4 +634,30 @@ class dokument extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Prueft ob das Dokument bei einem der Prestudenten einer Person bereits akzeptiert wurde
+	 * @param $dokument_kurzbz
+	 * @param $person_id
+	 * @return boolean true wenn akzeptiert, false wenn noch nicht akzeptiert
+	 */ 
+	function akzeptiert($dokument_kurzbz, $person_id)
+	{
+		$qry = "SELECT 
+					* 
+				FROM 
+					public.tbl_dokumentprestudent 
+					JOIN public.tbl_prestudent USING(prestudent_id) 
+				WHERE 
+					dokument_kurzbz=".$this->db_add_param($dokument_kurzbz)."
+					AND tbl_prestudent.person_id=".$this->db_add_param($person_id);
+
+		if($result = $this->db_query($qry))
+		{
+			if($this->db_num_rows($result)>0)
+			{
+				return true;
+			}
+		}
+	}
 }

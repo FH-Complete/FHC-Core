@@ -30,6 +30,8 @@ require_once('../../include/datum.class.php');
 require_once('../../include/lehreinheit.class.php');
 require_once('../../include/lehrveranstaltung.class.php');
 require_once('../../include/anwesenheit.class.php');
+require_once('../../include/studiensemester.class.php');
+require_once('../../include/lehreinheitmitarbeiter.class.php');
 
 if (!$uid = get_uid())
 	die('Keine UID gefunden!');
@@ -43,11 +45,73 @@ $datum_obj = new datum();
 if(!$rechte->isBerechtigt('basis/person', null, 'suid'))
 	die('Sie haben keine Berechtigung für diese Seite');
 
-
 if(isset($_REQUEST['work']))
 	$work = $_REQUEST['work'];
 else
 	$work='';
+
+if($work=='getTermine')
+{
+	$stg = $_POST['stg'];
+	$sem = $_POST['sem'];
+	$stsem = $_POST['stsem'];
+	$lv = $_POST['lv'];
+	
+	// Daten der Lehreinheiten ermitteln
+	$qry = "SELECT 
+				le.lehreinheit_id, sp.ort_kurzbz, datum
+			FROM 
+				lehre.tbl_lehreinheit le 
+				JOIN lehre.tbl_lehrveranstaltung lv ON lv.lehrveranstaltung_id = le.lehrveranstaltung_id
+				JOIN lehre.tbl_stundenplan sp ON (sp.lehreinheit_id=le.lehreinheit_id) 
+			WHERE lv.studiengang_kz = " . $db->db_add_param($stg)."
+			AND lv.lehrveranstaltung_id = " . $db->db_add_param($lv)."
+			AND lv.semester = " . $db->db_add_param($sem)."
+			AND le.studiensemester_kurzbz=".$db->db_add_param($stsem)." ORDER BY datum, stunde";
+
+	$data = array();
+	$lektoren=array();
+	if($result = $db->db_query($qry))
+	{
+		while($row = $db->db_fetch_object($result))
+		{
+			$paddedLehreinheitId = str_pad($row->lehreinheit_id, 6, "0", STR_PAD_LEFT);
+			$id = date('ymd', strtotime($row->datum)) . $paddedLehreinheitId;
+
+			if(!isset($lektoren[$row->lehreinheit_id]))
+			{
+				$le_obj = new lehreinheitmitarbeiter();
+				$le_obj->getLehreinheitmitarbeiter($row->lehreinheit_id);
+				$lektoren[$row->lehreinheit_id]='';
+				foreach($le_obj->lehreinheitmitarbeiter as $row_lem)
+				{
+					$lektoren[$row->lehreinheit_id].=$row_lem->mitarbeiter_uid.' ';
+				}
+			}
+
+			$data[$id]=$datum_obj->formatDatum($row->datum,'d.m.Y').' '.$lektoren[$row->lehreinheit_id];
+		}
+	}
+	echo json_encode($data);
+	exit;
+}
+if($work=='getLVs')
+{
+	$stg = $_POST['stg'];
+	$sem = $_POST['sem'];
+	$stsem = $_POST['stsem'];
+	
+	$lv = new lehrveranstaltung();
+	$lv->load_lva_le($stg, $stsem, $sem);
+	
+	$data = array();
+	foreach($lv->lehrveranstaltungen as $row)
+	{
+		$data[$row->lehrveranstaltung_id]=$row->bezeichnung;
+	}
+	echo json_encode($data);
+	exit;
+}
 
 echo '<!DOCTYPE HTML>
 <html>
@@ -72,7 +136,7 @@ echo '<!DOCTYPE HTML>
 		{ 
 			$("#t1").tablesorter(
 			{
-				sortList: [[4,1]],
+				sortList: [[4,0]],
 				widgets: ["zebra"]
 			});
 		});
@@ -276,7 +340,142 @@ if($work=='')
 	Bitte scannen Sie den Lehreinheiten Barcode<br>
 	<input type="text" id="lvcode" name="lvcode" value="" size="13"/>
 	<input type="hidden" name="work" value="loadAnwesenheit" />
-	</form>';
+	</form>
+	';
+
+
+	$studiengang_kz='';
+	$semester='';
+	$studiensemester_kurzbz='';
+	$lv_id='';
+
+	echo '<br><hr><br>
+	<form name="sendform" action="'.$_SERVER["PHP_SELF"].'" method="post">
+	<input type="hidden" name="work" value="loadAnwesenheit" />';
+	$studiengang = new studiengang();
+	$studiengang->getAll('typ,kurzbz');
+	echo 'Studiengang <select name="studiengang" id="studiengang" style="width:250px"  onchange="loadListe()">';
+	foreach($studiengang->result as $row)
+	{
+		if($studiengang_kz=='')
+			$studiengang_kz=$row->studiengang_kz;
+
+		echo '<option value="'.$row->studiengang_kz.'">'.$row->kuerzel.' -'.$row->bezeichnung.'</option>';
+	}
+	echo '</select>';
+
+	echo 'Semester <select name="semester" id="semester"  onchange="loadListe()">';
+	for($i=1;$i<=10;$i++)
+	{
+		if($semester=='')
+			$semester = $i;
+		echo '<option value="'.$i.'">'.$i.'</option>';
+	}
+	echo '</select>';
+
+	$stsem = new studiensemester();
+	$akt = $stsem->getAktOrNext();
+	$stsem->getAll();
+	echo 'Studiensemester <select name="stsem" id="stsem" onchange="loadListe()">';
+	foreach($stsem->studiensemester as $row)
+	{
+		if($studiensemester_kurzbz=='')
+			$studiensemester_kurzbz=$row->studiensemester_kurzbz;
+
+		if($row->studiensemester_kurzbz==$akt)
+			$selected='selected';
+		else
+			$selected='';
+		echo '<option value="'.$row->studiensemester_kurzbz.'" '.$selected.'>'.$row->studiensemester_kurzbz.'</option>';
+	}
+	echo '</select>';
+
+	$lv = new lehrveranstaltung();
+	$lv->load_lva_le($studiengang_kz, $studiensemester_kurzbz, $semester);
+	echo 'LV <select name="lv" id="lv" onchange="loadListe(\'lv\')">
+		<option value="">--Auswahl--</option>';
+	foreach($lv->lehrveranstaltungen as $row)
+	{
+		if($lv_id=='')
+			$lv_id=$row->lehrveranstaltung_id;
+		echo '<option value="'.$row->lehrveranstaltung_id.'">'.$row->bezeichnung.'</option>';
+	}
+	echo '</select>';
+
+	echo 'Termin <select name="lvcode" id="termine" >';
+	
+	echo '</select>
+	<input type="submit" />';
+
+	echo '<script>
+	function loadListe(action)
+	{
+		var stg = $("#studiengang").val();
+		var sem = $("#semester").val();
+		var stsem = $("#stsem").val();
+		var lv = $("#lv").val();
+		
+		if(action=="lv" && lv!="")
+		{
+			// Termine holen
+			data = {
+				stg: stg,
+				sem: sem,
+				stsem: stsem,
+				lv: lv,
+				work: "getTermine"
+			};
+
+			$.ajax({
+				url: "anwesenheit.php",
+				data: data,
+				type: "POST",
+				dataType: "json",
+				success: function(data) 
+				{
+					$("#termine").empty();
+					$("#termine").append(\'<option value="">-- Auswahl --</option>\');
+					$.each(data, function(i, entry){
+						$("#termine").append(\'<option value="\'+i+\'">\'+entry+\'</option>\');
+					});
+				},
+				error: function(data) 
+				{
+					alert("Fehler beim Laden der Daten");
+				}
+			});
+		}
+		else
+		{
+			// LV holen
+			data = {
+				stg: stg,
+				sem: sem,
+				stsem: stsem,
+				work: "getLVs"
+			};
+
+			$.ajax({
+				url: "anwesenheit.php",
+				data: data,
+				type: "POST",
+				dataType: "json",
+				success: function(data) 
+				{
+					$("#lv").empty();
+					$("#lv").append(\'<option value="">-- Auswahl --</option>\');
+					$.each(data, function(i, entry){
+						$("#lv").append(\'<option value="\'+i+\'">\'+entry+\'</option>\');
+					});
+				},
+				error: function(data) 
+				{
+					alert("Fehler beim Laden der Daten");
+				}
+			});
+		}
+	}
+	</script>';
 }
 echo '
 </body>

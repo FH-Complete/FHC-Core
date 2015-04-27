@@ -7,6 +7,7 @@ setup:
 test:
     codeception:
         config: "tests"
+    lint:
     php_loc:
     php_docblock_checker:
         allowed_warnings: -1

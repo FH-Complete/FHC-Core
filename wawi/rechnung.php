@@ -660,11 +660,11 @@ if($aktion=='update')
 			$selected='';
 			
 		$anzahl=0;
+		$anzahl = $rechnung->count($row->bestellung_id);
 		if(!$row->freigegeben)
 			$class='rechnung_nichtfreigegeben';
 		else
 		{
-			$anzahl = $rechnung->count($row->bestellung_id);
 			if($anzahl>0)
 				$class='rechnung_freigegebenvorhanden';
 			else

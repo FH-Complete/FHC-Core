@@ -48,6 +48,9 @@ class authentication extends auth
 
 	public function checkpassword($username, $passwort)
 	{
+		if($passwort=='')
+			return false;
+
 		if($connect=ldap_connect(LDAP_SERVER))
 		{
 			// bind to ldap connection
