@@ -9,6 +9,7 @@ $this->phrasen['global/studiengangsleitung']='Program Director';
 $this->phrasen['global/lehrveranstaltung']='Subject';
 $this->phrasen['global/lehreinheit']='Teaching unit';
 $this->phrasen['global/organisationseinheit']='Organisation Unit';
+$this->phrasen['global/organisationseinheiten']='Organisation Units';
 $this->phrasen['global/fhtw']='University of Applied Sciences Technikum Wien';
 $this->phrasen['global/fhTechnikumWien']='UAS Technikum Wien';
 

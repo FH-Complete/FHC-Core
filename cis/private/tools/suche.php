@@ -32,6 +32,13 @@ require_once('../../../include/dms.class.php');
 require_once('../../../include/service.class.php');
 require_once('../../../include/ort.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
+require_once('../../../include/organisationseinheit.class.php');
+require_once('../../../include/studiengang.class.php');
+require_once('../../../include/benutzerfunktion.class.php');
+require_once('../../../include/person.class.php');
+require_once('../../../include/mitarbeiter.class.php');
+require_once('../../../include/kontakt.class.php');
+require_once('../../../include/bisverwendung.class.php');
 
 $uid = get_uid();
 $db = new basis_db();
@@ -79,11 +86,12 @@ if (count($easteregg_intersect)==4)
 }
 
 $searchPerson = searchPerson($searchItems);
+$searchOE = searchOE($searchItems);
 $searchOrt = searchOrt($search);
 $searchDms = searchDms($searchItems);
 $searchContent = searchContent($searchItems);
 
-if (!$searchPerson && !$searchOrt && !$searchDms && !$searchContent)
+if (!$searchPerson && !$searchOrt && !$searchDms && !$searchContent && !$searchOE)
 	echo $p->t('tools/esWurdenKeineErgebnisseGefunden');
 
 	
@@ -133,10 +141,18 @@ function searchPerson($searchItems)
 			';
 		foreach($bn->result as $row)
 		{
+			$bisverwendung = new bisverwendung();
+			$bisverwendung->getLastVerwendung($row->uid);
+			
 			echo '<tr>';
 			//echo '<td>',$row->titelpre,'</td>';
 			echo '<td>',$row->vorname,'</td>';
-			echo '<td><a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a></td>';
+			echo '<td><a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
+			if($row->aktiv==false)
+				echo '<span style="color: red"> (ausgeschieden)</span>';
+			elseif($bisverwendung->beschausmasscode==5)
+				echo '<span style="color: orange"> (karenziert)</span>';
+			echo '</td>';
 			//echo '<td>',$row->titelpost,'</td>';
 			echo '<td>',($row->studiengang!=''?$row->studiengang:'-'),'</td>';
 			echo '<td>',($row->mitarbeiter_uid==NULL?'StudentIn':'MitarbeiterIn'),'</td>';
@@ -153,6 +169,108 @@ function searchPerson($searchItems)
 			echo "\n";
 		}
 		echo '</tbody></table><br>';
+		return true;
+	}	
+	else 
+		return false;	
+}
+function searchOE($searchItems)
+{
+	global $db, $p, $noalias;
+	
+	//Suche nach Studiengaengen mit dem Suchbegriff und merge mit $searchItems
+	$stg_oe_array = array();
+	$stg = new studiengang();
+	$stg->search($searchItems);
+	foreach($stg->result as $row)
+	{
+		if($row->aktiv===true)
+			$stg_oe_array[].= $row->oe_kurzbz;
+	}
+	$searchItems = array_merge_recursive($stg_oe_array,$searchItems);
+	
+	$oe = new organisationseinheit();
+	$oe->search($searchItems);
+	
+	if(count($oe->result)>0)
+	{
+		echo '<h2 style="padding-bottom: 10px;">',$p->t('global/organisationseinheiten'),'</h2>';
+		echo '
+		<script type="text/javascript">	
+		$(document).ready(function() 
+			{ 
+				$(".tablesorter").each(function(i,v)
+				{
+					$("#"+v.id).tablesorter(
+					{
+						sortList: [[2,0],[1,0],[0,0]],
+						widgets: [\'zebra\'],
+						headers: {8:{sorter:false}}
+					})
+				});
+			} 
+		);
+		</script>';
+		
+		foreach($oe->result as $row)
+		{
+			if($row->aktiv==true)
+			{
+				$benutzerfunktion = new benutzerfunktion();
+				$benutzerfunktion->getOeFunktionen($row->oe_kurzbz,'ass,Leitung,stvLtg,oezuordnung','now()','now()');
+				$oebezeichnung = new organisationseinheit();
+				$oebezeichnung->load($row->oe_kurzbz);
+				echo '<h3>',$row->organisationseinheittyp_kurzbz,' ',$oebezeichnung->bezeichnung,'</h3>';
+				echo '<table class="tablesorter" id="t'.$row->oe_kurzbz.'">
+				<thead>
+					<tr>
+						<th>',$p->t('global/vorname'),'</th>
+						<th>',$p->t('global/nachname'),'</th>
+						<th>',$p->t('global/funktion'),'</th>
+						<th>',$p->t('global/telefonnummer'),'</th>
+						<th>',$p->t('lvplan/raum'),'</th>
+						<th>',$p->t('global/mail'),'</th>
+					</tr>
+				</thead>
+				<tbody>
+				';
+				foreach($benutzerfunktion->result as $bf)
+				{
+					$person = new person();
+					$person->getPersonFromBenutzer($bf->uid);
+					$mitarbeiter = new mitarbeiter();
+					$mitarbeiter->load($bf->uid);
+					$kontakt = new kontakt();
+					$kontakt->loadFirmaKontakttyp($mitarbeiter->standort_id,'telefon');
+					$bisverwendung = new bisverwendung();
+					$bisverwendung->getLastVerwendung($bf->uid);
+					echo '<tr>';
+					echo '<td>'.$person->vorname.'</td>';
+					echo '<td><a href="../profile/index.php?uid=',$person->uid,'" title="',$person->titelpre,' ',$person->vorname,' ',$person->nachname,' ',$person->titelpost,'">',$person->nachname,'</a></td>';
+					echo '<td>'.$bf->bezeichnung;
+						if($person->aktiv==false)
+							echo '<span style="color: red"> (ausgeschieden)</span>';
+						elseif($bisverwendung->beschausmasscode==5)
+							echo '<span style="color: orange"> (karenziert)</span>';
+						echo '</td>';
+					
+					echo '<td>',($mitarbeiter->telefonklappe!=''?$kontakt->kontakt.'-'.$mitarbeiter->telefonklappe:'-'),'</td>';
+					echo '<td>',($mitarbeiter->ort_kurzbz!=''?$mitarbeiter->ort_kurzbz:'-'),'</td>';
+					//if($row->alias!='' && !in_array($row->studiengang_kz, $noalias)) ??? Was macht $noalias?
+					if($person->alias!='')
+						$mail = $person->alias.'@'.DOMAIN;
+					else
+						$mail = $person->uid.'@'.DOMAIN;
+					echo '<td><a href="mailto:',$mail,'">',$mail,'</a></td>';
+					//if(!defined('CIS_SUCHE_LVPLAN_ANZEIGEN') || CIS_SUCHE_LVPLAN_ANZEIGEN)
+						//echo '<td><a href="../../../cis/private/lvplan/stpl_week.php?pers_uid='.$person->uid.($person->mitarbeiter_uid==NULL?'&type=student':'&type=lektor').'">'.$p->t('lvplan/lvPlan').'</a></td>';
+					echo '</tr>';
+					echo "\n";
+				}
+				echo "\n";
+				echo '</tbody></table><br>';
+			}
+		}
 		return true;
 	}	
 	else 

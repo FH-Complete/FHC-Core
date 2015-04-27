@@ -867,5 +867,69 @@ class person extends basis_db
 	    return $fullname;
 	}
 	
-    }
+	/**
+	 * Laedt Personendaten eines Benutzers
+	 * @param $uid
+	 */
+	function getPersonFromBenutzer($uid)
+	{
+		$qry = "SELECT 
+					*
+				FROM 
+					public.tbl_person
+					JOIN public.tbl_benutzer USING(person_id)
+				WHERE
+					uid=".$this->db_add_param($uid, FHC_STRING);
+		
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$this->person_id = $row->person_id;
+				$this->staatsbuergerschaft = $row->staatsbuergerschaft;
+				$this->geburtsnation = $row->geburtsnation;
+				$this->sprache = $row->sprache;
+				$this->anrede = $row->anrede;
+				$this->titelpost = $row->titelpost;
+				$this->titelpre = $row->titelpre;
+				$this->nachname = $row->nachname;
+				$this->vorname = $row->vorname;
+				$this->vornamen = $row->vornamen;
+				$this->gebdatum = $row->gebdatum;
+				$this->gebort = $row->gebort;
+				$this->gebzeit = $row->gebzeit;
+				$this->foto = $row->foto;
+				$this->anmerkungen = $row->anmerkung;
+				$this->homepage = $row->homepage;
+				$this->svnr = $row->svnr;
+				$this->ersatzkennzeichen = $row->ersatzkennzeichen;
+				$this->familienstand = $row->familienstand;
+				$this->geschlecht = $row->geschlecht;
+				$this->anzahlkinder = $row->anzahlkinder;
+				$this->aktiv = $this->db_parse_bool($row->aktiv);
+				$this->updateamum = $row->updateamum;
+				$this->updatevon = $row->updatevon;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->ext_id = $row->ext_id;
+				$this->kurzbeschreibung = $row->kurzbeschreibung;
+				$this->zugangscode = $row->zugangscode;
+				$this->foto_sperre = $this->db_parse_bool($row->foto_sperre);
+				$this->matr_nr = $row->matr_nr; 
+				$this->uid = $row->uid;
+				$this->aktiv = $this->db_parse_bool($row->aktiv);;
+				$this->alias = $row->alias;
+				$this->updateaktivvon = $row->updateaktivvon;
+				$this->updateaktivam = $row->updateaktivam;
+				$this->aktivierungscode = $row->aktivierungscode;
+			}
+			else
+			{
+				$this->errormsg = 'Keine Personendaten zu dieser UID gefunden'; 
+				return false; 
+			}
+		}
+	}
+	
+}
 ?>

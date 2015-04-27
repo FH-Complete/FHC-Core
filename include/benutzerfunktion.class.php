@@ -458,5 +458,68 @@ class benutzerfunktion extends basis_db
 		return false;
 	    }
 	}
+	
+	/**
+	 * Laedt alle Benutzerfunktionen in einer Organisationseinheit
+	 * @param $oe_kurzbz
+	 * @param $funktionen_kurzbz (optional) Funktionen in der OE, kommagetrennt
+	 * @param type $startZeitraum OPTIONAL Start Zeitraum in dem die Funktion aktiv ist
+	 * @param type $endeZeitraum OPTIONAL Ende Zeitraum in dem die Funktion aktiv ist
+	 * @return false wenn nicht vorhanden oder fehler
+	 *         sonst true
+	 */
+	public function getOeFunktionen($oe_kurzbz, $funktionen_kurzbz=null, $startZeitraum=null, $endeZeitraum=null)
+	{
+		$qry = "SELECT * FROM public.tbl_benutzerfunktion 
+				WHERE oe_kurzbz=".$this->db_add_param($oe_kurzbz);
+
+		if(!is_null($funktionen_kurzbz))
+	    {
+	    	$funktionen_kurzbz = explode(',', $funktionen_kurzbz);
+	    	$qry .= ' AND funktion_kurzbz IN('.$this->implode4SQL($funktionen_kurzbz).')';
+	    }
+	    if(!is_null($startZeitraum))
+	    {
+			$qry .=' AND (datum_bis IS NULL OR datum_bis >='.$this->db_add_param($startZeitraum).')';
+	    }
+	    if(!is_null($endeZeitraum))
+	    {
+			$qry .=' AND (datum_von IS NULL OR datum_von <='.$this->db_add_param($endeZeitraum).')';
+	    }
+		
+		$qry.=" ORDER BY bezeichnung, uid";
+		
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new benutzerfunktion();
+				
+				$obj->benutzerfunktion_id = $row->benutzerfunktion_id;
+				$obj->fachbereich_kurzbz = $row->fachbereich_kurzbz;
+				$obj->uid = $row->uid;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->funktion_kurzbz = $row->funktion_kurzbz;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->semester = $row->semester;
+				$obj->datum_von = $row->datum_von;
+				$obj->datum_bis = $row->datum_bis;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->wochenstunden = $row->wochenstunden;
+				
+				$this->result[] = $obj;
+				
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der OE-Funktionen';
+			return false;
+		}
+	}
 }
 ?>

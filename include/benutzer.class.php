@@ -297,23 +297,29 @@ class benutzer extends person
 	 */
 	public function search($searchItems, $limit=null, $aktiv=true)
 	{
-		$qry = "SELECT * FROM (SELECT
-					distinct on (uid) vorname, nachname, uid, mitarbeiter_uid, titelpre, titelpost, lektor, fixangestellt, alias,
-					(SELECT UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz)
-					 FROM public.tbl_student JOIN public.tbl_studiengang USING(studiengang_kz)
-					 WHERE student_uid=tbl_benutzer.uid) as studiengang,
-					 (SELECT studiengang_kz FROM public.tbl_student
-					 WHERE student_uid=tbl_benutzer.uid) as studiengang_kz,
-					(SELECT tbl_kontakt.kontakt || ' - ' ||telefonklappe 
-					FROM public.tbl_mitarbeiter
-					LEFT JOIN public.tbl_kontakt USING(standort_id) 
-					WHERE 
-						mitarbeiter_uid=tbl_benutzer.uid
-						AND (tbl_kontakt.kontakttyp='telefon' OR tbl_kontakt.kontakttyp is null)
-						limit 1) as klappe,
-					(SELECT planbezeichnung FROM public.tbl_mitarbeiter
-					LEFT JOIN public.tbl_ort USING (ort_kurzbz) 
-					WHERE mitarbeiter_uid=tbl_benutzer.uid) as raum
+		$qry = "SELECT * FROM (
+					SELECT
+						distinct on (uid) vorname, nachname, uid, mitarbeiter_uid, titelpre, titelpost, lektor, fixangestellt, alias, tbl_benutzer.aktiv, 
+							(SELECT UPPER
+								(tbl_studiengang.typ || tbl_studiengang.kurzbz)
+					 		FROM public.tbl_student 
+					 		JOIN public.tbl_studiengang USING(studiengang_kz) 
+							WHERE student_uid=tbl_benutzer.uid) as studiengang,
+							
+					 		(SELECT studiengang_kz FROM public.tbl_student 
+							WHERE student_uid=tbl_benutzer.uid) as studiengang_kz,
+							
+							(SELECT tbl_kontakt.kontakt || ' - ' ||telefonklappe 
+							FROM public.tbl_mitarbeiter
+							LEFT JOIN public.tbl_kontakt USING(standort_id) 
+							WHERE 
+								mitarbeiter_uid=tbl_benutzer.uid
+								AND (tbl_kontakt.kontakttyp='telefon' OR tbl_kontakt.kontakttyp is null)
+								limit 1) as klappe,
+								
+							(SELECT planbezeichnung FROM public.tbl_mitarbeiter
+							LEFT JOIN public.tbl_ort USING (ort_kurzbz) 
+							WHERE mitarbeiter_uid=tbl_benutzer.uid) as raum
 				FROM
 					public.tbl_person 
 					JOIN public.tbl_benutzer USING(person_id)
@@ -359,6 +365,7 @@ class benutzer extends person
 				$obj->alias = $row->alias;
 				$obj->lektor = $row->lektor;
 				$obj->fixangestellt = $row->fixangestellt;
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
 				
 				$this->result[] = $obj;
 			}

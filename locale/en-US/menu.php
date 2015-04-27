@@ -7,5 +7,6 @@ $this->phrasen['menu/organisationseinheit']='Organization Units';
 $this->phrasen['menu/assistenz']='Assistants';
 $this->phrasen['menu/lektoren']='Lector';
 $this->phrasen['menu/urlaubAlle']='All';
-$this->phrasen['menu/suchePersonOrtDokumentInhalt']='Search Person / Room / Document / Content / Extension';
+$this->phrasen['menu/suchePersonOrtDokumentInhalt']='Search Person / OU / Room / Document / Content / Ext.';
+$this->phrasen['menu/suchePersonOrtDokumentInhaltLang']='Search Person / Organisation Unit / Room / Document / Content / Extension';
 ?>
