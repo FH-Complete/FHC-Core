@@ -2891,6 +2891,25 @@ if(!$result = @$db->db_query("SELECT bezeichnung_kurz FROM lehre.tbl_lehrform"))
 		echo '<br>lehre.tbl_lehrform: neue Spalten fuer mehrsprachige Lehrformbezeichnungen hinzugefuegt';
 }
 
+// Eigene Berechtigung fuer persoenliche Daten bei den Mitarbeitern
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz='mitarbeiter/persoenlich' LIMIT 1"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "
+		INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('mitarbeiter/persoenlich','Persönliche Mitarbeiterdaten wie Geburtsdatum, Geburtsort, Staatsbürgerschaft, SVNR und Familienstand einsehen.');
+
+		INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('mitarbeiter/persoenlich','assistenz','suid');
+		INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('mitarbeiter/persoenlich','admin','suid');
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Eigene Berechtigung fuer persoenliche Daten bei den Mitarbeitern mitarbeiter/persoenlich hinzugefuegt!<br>';
+	}
+}
+
 
 echo '<br><br><br>';
 
