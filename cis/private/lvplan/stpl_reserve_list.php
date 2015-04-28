@@ -24,6 +24,7 @@ require_once('../../../include/functions.inc.php');
 require_once('../../../include/datum.class.php');
 require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/phrasen.class.php'); 
+require_once('../../../include/reservierung.class.php'); 
 
 if (!$db = new basis_db())
 	die($p->t('global/fehlerBeimOeffnenDerDatenbankverbindung'));
@@ -54,23 +55,30 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 	<link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 </head>
 <body id="inhalt">
-	<H2>
-		<table class="tabcontent">
-			<tr>
-				<td>&nbsp;<a class="Item" href="index.php"><?php echo $p->t('lvplan/lehrveranstaltungsplan');?></a> &gt;&gt; <?php echo $p->t('lvplan/reservierungen');?></td>
-				<td align="right"><A href="help/index.html" class="hilfe" target="_blank">HELP&nbsp;</A></td>
-			</tr>
-		</table>
-	</H2>
+	<h2><a class="Item" href="index.php"><?php echo $p->t('lvplan/lehrveranstaltungsplan');?></a> &gt;&gt; <?php echo $p->t('lvplan/reservierungen');?></h2>
 	<?php
+
 	//Loeschen von Reservierungen
 	if (isset($id))
 	{
 		if(!is_numeric($id))
 			die('ungueltige ID');
-		$sql_query="DELETE FROM campus.tbl_reservierung WHERE reservierung_id='".addslashes($id)."'";
-		if($db->db_query($sql_query))
-			echo '<b>'.$p->t('lvplan/reservierungWurdeGeloescht').'</b><br>';
+
+		$reservierung = new reservierung();
+		if($reservierung->load($id))
+		{
+			if($reservierung->uid==$uid || $rechte->isBerechtigt('lehre/reservierung', null, 'suid'))
+			{
+				if($reservierung->delete($id))
+					echo '<b>'.$p->t('lvplan/reservierungWurdeGeloescht').'</b><br>';
+				else
+					echo $reservierung->errormsg;
+			}
+			else
+			{
+				echo '<b>'.$p->t('global/keineBerechtigung').'</b><br>';
+			}
+		}
 		else 
 			echo '<b>'.$p->t('global/fehleraufgetreten').'!</b><br>';
 	}
@@ -81,7 +89,7 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 	
 	//EIGENE
 	$sql_query="SELECT * FROM campus.vw_reservierung 
-				WHERE datum>='$datum' AND uid='$uid'
+				WHERE datum>=".$db->db_add_param($datum)." AND uid=".$db->db_add_param($uid)."
 				ORDER BY  datum, titel, ort_kurzbz, stunde";
 
 	if (!$erg_res=$db->db_query($sql_query))
@@ -119,12 +127,12 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 			if($insertamum!='')
 				$insertamum = $datum_obj->formatDatum($insertamum, 'd.m.Y H:i:s');
 			echo '<tr class="liste'.$zeile.'" title="'.$p->t('global/angelegtAm').' '.$insertamum.$p->t('global/von').' '.$insertvon.'">';
-			echo '<td>'.$datum1.'</td>';
-			echo '<td>'.$titel.'</td>';
-			echo '<td>'.$stunde.'</td>';
-			echo '<td>'.$ort_kurzbz.'</td>';
-			echo '<td>'.$pers_uid.'</td>';
-			echo '<td>'.$beschreibung.'<a  name="liste'.$i.'">&nbsp;</a></td>';
+			echo '<td>'.$db->convert_html_chars($datum1).'</td>';
+			echo '<td>'.$db->convert_html_chars($titel).'</td>';
+			echo '<td>'.$db->convert_html_chars($stunde).'</td>';
+			echo '<td>'.$db->convert_html_chars($ort_kurzbz).'</td>';
+			echo '<td>'.$db->convert_html_chars($pers_uid).'</td>';
+			echo '<td>'.$db->convert_html_chars($beschreibung).'<a  name="liste'.$i.'">&nbsp;</a></td>';
 			$z=$i-1;
 			if (($pers_uid==$uid)|| $rechte->isBerechtigt('lehre/reservierung', null, 'suid'))
 				echo '<td><A class="Item" href="stpl_reserve_list.php?id='.$id.(isset($_GET['alle'])?'&alle=true':'').'#liste'.$z.'">Delete</A></td>';
@@ -142,7 +150,7 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 
 		//ALLE
 		$sql_query="SELECT * FROM campus.vw_reservierung 
-					WHERE datum>='$datum'
+					WHERE datum>=".$db->db_add_param($datum)."
 					ORDER BY  datum, titel, ort_kurzbz, stunde";
 		if (!$erg_res=$db->db_query($sql_query))
 			die($db->db_last_error());
@@ -180,12 +188,12 @@ if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 'suid'))
 				if($insertamum!='')
 					$insertamum = $datum_obj->formatDatum($insertamum, 'd.m.Y H:i:s');
 				echo '<tr class="liste'.$zeile.'" title="'.$p->t('global/angelegtAm').' '.$insertamum.$p->t('global/von').' '.$insertvon.'">';
-				echo '<td>'.$datum.'</td>';
-				echo '<td>'.$titel.'</td>';
-				echo '<td>'.$stunde.'</td>';
-				echo '<td>'.$ort_kurzbz.'</td>';
-				echo '<td>'.$pers_uid.'</td>';
-				echo '<td>'.$beschreibung.'<a  name="liste'.$i.'">&nbsp;</a></td>';
+				echo '<td>'.$db->convert_html_chars($datum).'</td>';
+				echo '<td>'.$db->convert_html_chars($titel).'</td>';
+				echo '<td>'.$db->convert_html_chars($stunde).'</td>';
+				echo '<td>'.$db->convert_html_chars($ort_kurzbz).'</td>';
+				echo '<td>'.$db->convert_html_chars($pers_uid).'</td>';
+				echo '<td>'.$db->convert_html_chars($beschreibung).'<a  name="liste'.$i.'">&nbsp;</a></td>';
 				$z=$i-1;
 				if (($pers_uid==$uid) || $rechte->isBerechtigt('lehre/reservierung', null, 'suid'))
 					echo '<td><A class="Item" href="stpl_reserve_list.php?id='.$id.(isset($_GET['alle'])?'&alle=true':'').'#liste'.$z.'">Delete</A></td>';

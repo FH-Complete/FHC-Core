@@ -54,7 +54,49 @@ class reservierung extends basis_db
 		if($reservierung_id!=null)
 			$this->load($reservierung_id);
 	}
-	
+
+	/**
+	 * Laedt eine Reservierung
+	 * @param $reservierung_id
+	 * @return boolean
+	 */	
+	public function load($reservierung_id)
+	{
+		$qry = "SELECT * FROM campus.tbl_reservierung WHERE reservierung_id=".$this->db_add_param($reservierung_id);
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				$this->reservierung_id = $row->reservierung_id;
+				$this->ort_kurzbz = $row->ort_kurzbz;
+				$this->studiengang_kz = $row->studiengang_kz;
+				$this->uid = $row->uid;
+				$this->stunde = $row->stunde;
+				$this->datum = $row->datum;
+				$this->titel = $row->titel;
+				$this->beschreibung = $row->beschreibung;
+				$this->semester = $row->semester;
+				$this->verband = $row->verband;
+				$this->gruppe = $row->gruppe;
+				$this->gruppe_kurzbz = $row->gruppe_kurzbz;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Eintrag wurde nicht gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Ladend er Daten';
+			return false;
+		}
+	}
+
 	/**
 	 * Prueft die Variablen vor dem Speichern
 	 * auf Gueltigkeit.
