@@ -24,14 +24,16 @@ require_once('basis_db.class.php');
 
 class studiensemester extends basis_db
 {
-	public $new;      // boolean
-	public $studiensemester = array(); // studiensemester Objekt
+	protected $new;      // boolean
+	protected $studiensemester = array(); // studiensemester Objekt
 
 	//Tabellenspalten
-	public $studiensemester_kurzbz;// varchar(16)
-	public $start; 					// date
-	public $ende; 					// date
-	public $bezeichnung;			// varchar(32)
+	protected $studiensemester_kurzbz;// varchar(16)
+	protected $start; 					// date
+	protected $ende; 					// date
+	protected $bezeichnung;			// varchar(32)
+	protected $studienjahr_kurzbz;			// varchar(16)
+	protected $studiensemester_kurzbz_alternativ;			// varchar(16)
 
 	/**
 	 * Konstruktor - Laedt optional ein StSem
@@ -44,6 +46,26 @@ class studiensemester extends basis_db
 		
 		if($studiensemester_kurzbz != null)
 			$this->load($studiensemester_kurzbz);
+	}
+	
+	public function __get($property) 
+	{
+	    if(property_exists($this, $property))
+	    {
+		return $this->$property;
+	    }
+	    else
+	    {
+		return NULL;
+	    }
+	}
+	
+	public function __set($property, $value) 
+	{
+	    if(property_exists($this, $property))
+	    {
+		$this->$property = $value;
+	    }
 	}
 
 	/**
@@ -67,6 +89,8 @@ class studiensemester extends basis_db
 			$this->start = $row->start;
 			$this->ende = $row->ende;
 			$this->bezeichnung = $row->bezeichnung;
+			$this->studienjahr_kurzbz = $row->studienjahr_kurzbz;
+			$this->studiensemester_kurzbz_alternativ = $row->studiensemester_kurzbz_alternativ;
 		}
 		else
 		{
@@ -299,6 +323,8 @@ class studiensemester extends basis_db
 				$stsem_obj->start = $row->start;
 				$stsem_obj->ende = $row->ende;
 				$stsem_obj->bezeichnung = $row->bezeichnung;
+				$stsem_obj->studienjahr_kurzbz = $row->studienjahr_kurzbz;
+				$stsem_obj->studiensemester_kurzbz_alternativ = $row->studiensemester_kurzbz_alternativ;
 
 				$this->studiensemester[] = $stsem_obj;
 			}
