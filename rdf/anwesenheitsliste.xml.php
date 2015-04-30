@@ -30,8 +30,10 @@ require_once('../include/ean13.function.php');
 // Optionen abfragen
 isset($_GET['von']) ? $von = date('Y-m-d', strtotime($_GET['von'])) : $von = NULL;
 isset($_GET['bis']) ? $bis = date('Y-m-d', strtotime($_GET['bis'])) : $bis = $von;
+isset($_GET['stundevon']) ? $stundevon = $_GET['stundevon'] : $stundevon = null;
+isset($_GET['stundebis']) ? $stundebis = $_GET['stundebis'] : $stundebis = null;
 isset($_GET['stg_kz']) ? $studiengang = $_GET['stg_kz'] : $studiengang = NULL;
-isset($_GET['ss']) ? $semester = $_GET['ss'] : $semester = NULL;
+isset($_GET['semester']) ? $semester = $_GET['semester'] : $semester = NULL;
 isset($_GET['lehreinheit']) ? $lehreinheit = $_GET['lehreinheit'] : $lehreinheit = NULL;
 
 if($von)
@@ -60,7 +62,10 @@ if($semester)
 	$qry .= " AND lv.semester = " . $db->db_add_param($semester);
 if($von)
 	$qry .= " AND (sp.datum >= " . $db->db_add_param($von) . "::DATE AND sp.datum <= " . $db->db_add_param($bis) . "::DATE) ";
-
+if(!is_null($stundevon))
+	$qry.=" AND stu.stunde>=".$db->db_add_param($stundevon);
+if(!is_null($stundebis))
+	$qry.=" AND stu.stunde<=".$db->db_add_param($stundebis);
 $qry .= " ORDER BY datum, beginn";
 
 if($db->db_query($qry))

@@ -556,15 +556,23 @@ class organisationseinheit extends basis_db
 	
 	/**
 	 * Sucht nach einer Organisationseinheit
-	 * @param type $oetyp_kurzbz
+	 * @param type $searchItem
 	 * @return boolean true, wenn ok; false, im Fehlerfall
 	 */
 	public function search($searchItem)
 	{
 	    $qry = 'SELECT * FROM public.tbl_organisationseinheit WHERE 
-	    		(LOWER(bezeichnung) LIKE LOWER(\'%'.$this->db_escape((implode(' ',$searchItem))).'%\') OR
-	    		LOWER(organisationseinheittyp_kurzbz) LIKE LOWER(\'%'.$this->db_escape((implode(' ',$searchItem))).'%\'))
-	    		ORDER BY organisationseinheittyp_kurzbz, bezeichnung;';
+	    		(
+	    			LOWER(bezeichnung) LIKE LOWER(\'%'.$this->db_escape((implode(' ',$searchItem))).'%\') 
+	    			OR
+	    			LOWER(organisationseinheittyp_kurzbz) LIKE LOWER(\'%'.$this->db_escape((implode(' ',$searchItem))).'%\')
+	    		)';
+	    		foreach($searchItem as $value)
+				{
+					$qry.=' OR (oe_kurzbz='.$this->db_add_param($value).')
+							OR (bezeichnung='.$this->db_add_param($value).')'; 
+				}
+	    $qry.=	'ORDER BY organisationseinheittyp_kurzbz, bezeichnung;';
 	    
 	    if($this->db_query($qry))
 	    {

@@ -144,8 +144,8 @@ foreach($addon_obj->result as $addon)
   <command id="menu-dokumente-pruefungszeugnis_englisch:command" oncommand="StudentAbschlusspruefungPrintPruefungszeugnisMultiple('englisch');"/>
   <command id="menu-dokumente-urkunde_deutsch:command" oncommand="StudentAbschlusspruefungPrintUrkundeMultiple('deutsch')"/>
   <command id="menu-dokumente-urkunde_englisch:command" oncommand="StudentAbschlusspruefungPrintUrkundeMultiple('englisch')"/>
-  <command id="menu-dokumente-ausbildungsvertrag:command" oncommand="StudentPrintAusbildungsvertrag();"/>
-  <command id="menu-dokumente-ausbildungsvertrag_englisch:command" oncommand="StudentPrintAusbildungsvertragEnglisch();"/>
+  <command id="menu-dokumente-ausbildungsvertrag:command" oncommand="StudentPrintAusbildungsvertrag(event);"/>
+  <command id="menu-dokumente-ausbildungsvertrag_englisch:command" oncommand="StudentPrintAusbildungsvertragEnglisch(event);"/>
   <command id="menu-extras-reihungstest:command" oncommand="ExtrasShowReihungstest();"/>
   <command id="menu-extras-firma:command" oncommand="ExtrasShowFirmenverwaltung();"/>
   <command id="menu-extras-lvverwaltung:command" oncommand="ExtrasShowLVverwaltung();"/>
@@ -836,12 +836,6 @@ foreach($addon_obj->result as $addon)
     <menu id="menu-help" label="&menu-help.label;" accesskey="&menu-help.accesskey;">
           <menupopup id="menu-about-popup">
             <menuitem
-               id        =  "menu-help-about"
-               key       =  "menu-help-about:key"
-               label     = "&menu-help-about.label;"
-               command   =  "menu-help-about:command"
-               accesskey = "&menu-help-about.accesskey;"/>
-            <menuitem
                id        =  "menu-help-manual"
                key       =  "menu-help-manual:key"
                label     = "&menu-help-manual.label;"
@@ -853,6 +847,12 @@ foreach($addon_obj->result as $addon)
                label     = "&menu-help-todo.label;"
                command   =  "menu-help-todo:command"
                accesskey = "&menu-help-todo.accesskey;"/>
+            <menuitem
+               id        =  "menu-help-about"
+               key       =  "menu-help-about:key"
+               label     = "&menu-help-about.label;"
+               command   =  "menu-help-about:command"
+               accesskey = "&menu-help-about.accesskey;"/>
           </menupopup>
     </menu>
   </menubar>

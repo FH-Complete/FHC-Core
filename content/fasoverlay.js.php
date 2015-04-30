@@ -1405,7 +1405,7 @@ function OpenAboutDialog()
 // ****
 function OpenManual()
 {
-	window.open('<?php echo APP_ROOT ?>content/FASo.pdf','Manual');
+	window.open('http://fhcomplete.technikum-wien.at/dokuwiki/doku.php?','_blank');
 }
 
 // ****
@@ -1413,7 +1413,7 @@ function OpenManual()
 // ****
 function OpenToDoDialog()
 {
-	window.open('http://fhcomplete.technikum-wien.at/mantis/login.php?username=anonymous&return=%2Fmantis%2Froadmap_page.php%3F','ToDo','height=600,width=800,left=150,top=150,hotkeys=0,resizable=yes,status=yes,scrollbars=yes,toolbar=yes,location=yes,menubar=yes,dependent=yes');
+	window.open('http://fhcomplete.technikum-wien.at/mantis/login.php?username=anonymous&return=%2Fmantis%2Froadmap_page.php%3F','_blank');
 }
 
 // ****

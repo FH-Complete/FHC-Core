@@ -372,11 +372,11 @@
 <!ENTITY menu-help-about.accesskey    	"U">
 
 <!ENTITY menu-help-manual.key          	"H">
-<!ENTITY menu-help-manual.label        	"Handbuch">
+<!ENTITY menu-help-manual.label        	"DokuWiki FHComplete">
 <!ENTITY menu-help-manual.accesskey    	"H">
 
 <!ENTITY menu-help-todo.key          	"T">
-<!ENTITY menu-help-todo.label        	"ToDo">
+<!ENTITY menu-help-todo.label        	"Mantis Bugtracker">
 <!ENTITY menu-help-todo.accesskey    	"T">
 
 <!ENTITY tab-prestudent-aufnahme.label  "Reihungstest">

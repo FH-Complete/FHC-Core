@@ -116,22 +116,26 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpost"  onclick="MitarbeiterTreeSort()"/>
 			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-geburtsdatum" label="Geburtsdatum" flex="1" persist="hidden, width, ordinal" hidden="false"
-				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#geburtsdatum_iso" onclick="MitarbeiterTreeSort()"/>
-			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-geburtsdatum_iso" label="GeburtsdatumISO" flex="1" persist="hidden, width, ordinal" hidden="true"
-				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#geburtsdatum_iso" onclick="MitarbeiterTreeSort()"/>
-			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-svnr" label="SVNR" flex="1" persist="hidden, width, ordinal" hidden="false"
-				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#svnr"  onclick="MitarbeiterTreeSort()"/> 
-			<splitter class="tree-splitter"/>
-			<treecol id="mitarbeiter-treecol-ersatzkennzeichen" label="Ersatzkennzeichen" flex="1" persist="hidden, width, ordinal" hidden="false"
-				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#ersatzkennzeichen"  onclick="MitarbeiterTreeSort()"/>
-			<splitter class="tree-splitter"/>
+			<?php 
+			if($rechte->isBerechtigt('mitarbeiter/persoenlich'))
+			echo '
+				<treecol id="mitarbeiter-treecol-geburtsdatum" label="Geburtsdatum" flex="1" persist="hidden, width, ordinal" hidden="false"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#geburtsdatum_iso" onclick="MitarbeiterTreeSort()"/>
+				<splitter class="tree-splitter"/>
+				<treecol id="mitarbeiter-treecol-geburtsdatum_iso" label="GeburtsdatumISO" flex="1" persist="hidden, width, ordinal" hidden="true"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#geburtsdatum_iso" onclick="MitarbeiterTreeSort()"/>
+				<splitter class="tree-splitter"/>
+				<treecol id="mitarbeiter-treecol-svnr" label="SVNR" flex="1" persist="hidden, width, ordinal" hidden="false"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#svnr"  onclick="MitarbeiterTreeSort()"/> 
+				<splitter class="tree-splitter"/>
+				<treecol id="mitarbeiter-treecol-ersatzkennzeichen" label="Ersatzkennzeichen" flex="1" persist="hidden, width, ordinal" hidden="false"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#ersatzkennzeichen"  onclick="MitarbeiterTreeSort()"/>
+				<splitter class="tree-splitter"/>';
+			?>
 			<treecol id="mitarbeiter-treecol-aktiv" label="Aktiv" flex="1" persist="hidden, width, ordinal" hidden="false"
 				class="sortDirectionIndicator"
 				sort="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv"  onclick="MitarbeiterTreeSort()"/>
@@ -203,10 +207,14 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
    							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vorname" />
    							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#vornamen" />   							
    							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#titelpost" />
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#geburtsdatum" />
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#geburtsdatum_iso" />
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#svnr" />
-   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#ersatzkennzeichen" />
+   							<?php 
+							if($rechte->isBerechtigt('mitarbeiter/persoenlich'))
+							echo '
+	   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#geburtsdatum" />
+	   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#geburtsdatum_iso" />
+	   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#svnr" />
+	   							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#ersatzkennzeichen" />';
+							?>
    							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#aktiv" />
    							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#personalnummer" />
    							<treecell label="rdf:http://www.technikum-wien.at/mitarbeiter/rdf#kurzbz" />

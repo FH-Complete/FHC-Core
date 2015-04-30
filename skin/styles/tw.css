@@ -1029,10 +1029,13 @@ body.anwesenheit {
 body.anwesenheit div.lv {
 	margin: 10px;
 	padding-top: 10px;
+	padding-left: 10px;
+	background-color: #f2f8ff;
+	border: 1px solid #2353b2;
 }
 
 body.anwesenheit div.lv + div.lv {
-	border-top: 1px dashed rgb(193,193,193);
+/*	border-top: 1px dashed rgb(193,193,193);*/
 }
 
 body.anwesenheit div.lv > div {
@@ -1050,15 +1053,15 @@ body.anwesenheit div.progress {
 }
 
 body.anwesenheit div.progress.green {
-	background-color: lightgreen;
+	background-color: #008000;
 }
 
 body.anwesenheit div.progress.yellow {
-	background-color: yellow;
+	background-color: #ffa500;
 }
 
 body.anwesenheit div.progress.red {
-	background-color: red;
+	background-color: #dc143c;
 }
 
 body.anwesenheit span.fehlstunden-details {

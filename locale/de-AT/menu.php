@@ -7,5 +7,6 @@ $this->phrasen['menu/organisationseinheit']='Zeitsperren nach Organisationseinhe
 $this->phrasen['menu/assistenz']='Zeitsperren aller AssistentInnen';
 $this->phrasen['menu/lektoren']='Lektoren';
 $this->phrasen['menu/urlaubAlle']='Alle';
-$this->phrasen['menu/suchePersonOrtDokumentInhalt']='Suche Person / Ort / Dokument / Inhalt / Durchwahl';
+$this->phrasen['menu/suchePersonOrtDokumentInhalt']='Suche Person / OE / Ort / Dokument / Inhalt / DW';
+$this->phrasen['menu/suchePersonOrtDokumentInhaltLang']='Suche Person / Organisationseinheit / Ort / Dokument / Inhalt / Durchwahl';
 ?>

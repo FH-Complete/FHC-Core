@@ -21,6 +21,7 @@
 require_once('../../config/vilesci.config.inc.php');
 require_once('../../include/functions.inc.php');
 require_once('../../include/studiengang.class.php');
+require_once('../../include/stunde.class.php');
 
 $studiengang = new studiengang;
 $studiengang->getAll("typ, kurzbz");
@@ -77,8 +78,8 @@ $studiengang->getAll("typ, kurzbz");
 <body class="Background_main">
 <h2>Anwesenheitslisten mit Barcodes</h2>
 	<p id="error" style="display: none; font-weight: bold; color: red;">Die gewählte Zeitspanne darf nicht größer als 14 Tage sein!</p>
-	
-	<form method="get" action="../../content/pdfExport.php?xsl=AnwListBarcode&output=pdf" onsubmit="return checkDates();">
+	<a href="anwesenheit.php">Listen erfassen</a>
+	<form method="get" action="../../content/pdfExport.php" onsubmit="return checkDates();">
 		<input type="hidden" name="xsl" value="AnwListBarcode" />
 		<input type="hidden" name="output" value="pdf" />
 		<input type="hidden" name="xml" value="anwesenheitsliste.xml.php" />
@@ -86,12 +87,37 @@ $studiengang->getAll("typ, kurzbz");
 		<table>
 		<tbody>
 			<tr>
-				<td>von</td>
-				<td><input type="text" name="von" class="datepicker" id="von" autocomplete="off" /></td>
+				<td>Von</td>
+				<td><input type="text" name="von" class="datepicker" id="von" size="10" autocomplete="off" />
+				<select name="stundevon">
+				<?php
+					$stunde = new stunde();
+					$stunde->loadAll();
+					foreach($stunde->stunden as $row)
+					{
+						echo '<option value="'.$row->stunde.'">'.$row->stunde.'. Stunde '.$row->beginn->format('H:i').' - '.$row->ende->format('H:i').'</option>';
+					}
+				?>
+					</select>
+				</td>
 			</tr>
 			<tr>
-				<td>bis</td>
-				<td><input type="text" name="bis" class="datepicker" id="bis" autocomplete="off" /></td>
+				<td>Bis</td>
+				<td><input type="text" name="bis" class="datepicker" id="bis" size="10" autocomplete="off" />
+				<select id="stundebis" name="stundebis">
+					<?php
+					foreach($stunde->stunden as $row)
+					{
+						echo '<option value="'.$row->stunde.'">'.$row->stunde.'. Stunde '.$row->beginn->format('H:i').' - '.$row->ende->format('H:i').'</option>';
+					}
+				?>
+				</select>
+				<script>
+				$(document).ready(function() {
+					$('#stundebis option:last-child').attr('selected', 'selected');
+				});
+				</script>
+			</td>
 			</tr>
 			<tr>
 				<td>Studiengang</td>
@@ -104,7 +130,8 @@ $studiengang->getAll("typ, kurzbz");
 			<tr>
 				<td>Ausbildungssemester</td>
 				<td>
-					<select name="ss">
+					<select name="sem">
+						<option value=''>-- Alle --</option>
 						<?php for($x = 1; $x <= 10; $x++) echo "<option value='$x'>$x</option>\n"; ?>
 					</select>
 				</td>
