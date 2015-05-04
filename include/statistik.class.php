@@ -539,7 +539,7 @@ class statistik extends basis_db
 				$anzahl_spalten = $this->db_num_fields($this->data);
 				for($spalte=0;$spalte<$anzahl_spalten;$spalte++)
 				{
-					$this->html.= '<th>'.$this->db_field_name($this->data,$spalte).'</th>';
+					$this->html.= '<th>'.$this->convert_html_chars($this->db_field_name($this->data,$spalte)).'</th>';
 					$this->csv.='"'.$this->db_field_name($this->data,$spalte).'",';
 				}
 				$this->html.= '</tr></thead><tbody>';
@@ -552,7 +552,7 @@ class statistik extends basis_db
 					for($spalte=0;$spalte<$anzahl_spalten;$spalte++)
 					{
 						$name = $this->db_field_name($this->data,$spalte);
-						$this->html.= '<td>'.$row->$name.'</td>';
+						$this->html.= '<td>'.$this->convert_html_chars($row->$name).'</td>';
 						$this->csv.= '"'.$row->$name.'",';
 					}
 
