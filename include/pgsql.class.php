@@ -163,6 +163,14 @@ class basis_db extends db
 			return pg_affected_rows($result);
 	}
 	
+	public function db_result_seek($result=null, $offset)
+	{
+		if(is_null($result))
+			return pg_result_seek($this->db_result, $offset);
+		else
+			return pg_result_seek($result, $offset);
+	}
+	
 	public function db_fetch_array($result=null)
 	{
 		if(is_null($result))
