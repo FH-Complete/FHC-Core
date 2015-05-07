@@ -25,7 +25,7 @@ class statistik extends basis_db
 {
 	public $new;
 	public $statistik_obj=array();
-	public $result=array();
+	public $result;
 
 	public $statistik_kurzbz;
 	public $content_id;
@@ -52,7 +52,7 @@ class statistik extends basis_db
 	public $anzahl; //Hilfsvariable fuer Group BY Abfragen
 	
 	// Daten der Statistik
-	public $data;
+	public $data; // DB ressource
 	public $html;
 	public $csv;
 	public $json;
@@ -60,9 +60,14 @@ class statistik extends basis_db
 	/**
 	 * Konstruktor
 	 */
-	public function __construct($studiengang_kz=null)
+	public function __construct($statistik_kurzbz=null)
 	{
-		parent::__construct();		
+		parent::__construct();	
+		
+		if(!is_null($statistik_kurzbz))
+			$this->load($statistik_kurzbz);
+		else
+			$this->new=true;	
 	}
 
 	/**
@@ -122,9 +127,8 @@ class statistik extends basis_db
 	{
 		$qry = 'SELECT * FROM public.tbl_statistik';
 
-		if($order) {
+		if($order) 
 			$qry .= ' ORDER BY ' . $order;
-		}
 		
 		if($result = $this->db_query($qry))
 		{
@@ -242,7 +246,7 @@ class statistik extends basis_db
 		{
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
-		}			
+		}		
 	}
 	/**
 	 * Speichert einen Statistik Datensatz
@@ -566,7 +570,7 @@ class statistik extends basis_db
 		}
 		else
 		{
-			$this->error_msg= 'Zu dieser Statistik gibt es keine SQL Abfrage';
+			$this->errormsg= 'Zu dieser Statistik gibt es keine SQL Abfrage';
 			return false;
 		}
 	}
@@ -580,6 +584,21 @@ class statistik extends basis_db
 	function getCSV()
 	{
 		return $this->csv;
+	}
+	
+	function writeCSV($filename, $delimiter=',', $enclosure='"')
+	{
+		$fh=fopen($filename,'w');
+		
+		$fieldnames=array();
+		for ($i=0; $i < $this->db_num_fields($this->data); $i++)
+			$fieldnames[]=$this->db_field_name($this->data,$i);
+		fputcsv($fh, $fieldnames, $delimiter, $enclosure);
+		$this->db_result_seek($this->data,0);
+		while ($row = $this->db_fetch_row($this->data))
+			fputcsv($fh, $row, $delimiter, $enclosure);
+		fclose($fh);
+		return true;
 	}
 	
 	function getJSON()
