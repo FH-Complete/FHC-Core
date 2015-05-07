@@ -2910,6 +2910,39 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	}
 }
 
+// View lehre.vw_studienplan erstellen
+if(!$result = @$db->db_query("SELECT * FROM lehre.vw_studienplan LIMIT 1"))
+{
+	$qry = "CREATE VIEW lehre.vw_studienplan AS
+		SELECT 
+			organisationseinheittyp_kurzbz, oe_kurzbz, studiengang_kz, studienordnung_id, studienplan_id, 
+            tbl_studienplan.orgform_kurzbz, tbl_studienplan.version, tbl_studienplan.bezeichnung, regelstudiendauer, 
+            tbl_studienplan.sprache, tbl_studienplan.aktiv, semesterwochen, tbl_studienplan.testtool_sprachwahl, 
+            tbl_studienplan.insertamum, tbl_studienplan.insertvon, tbl_studienplan.updateamum, tbl_studienplan.updatevon,
+            gueltigvon, gueltigbis,  ects, studiengangbezeichnung, studiengangbezeichnung_englisch, studiengangkurzbzlang, 
+            akadgrad_id, kurzbz, kurzbzlang, typ, english, farbe, email, telefon, max_semester, max_verband, max_gruppe, 
+            erhalter_kz, bescheid, bescheidbgbl1, bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, zusatzinfo_html, 
+            moodle, studienplaetze, lgartcode, mischform, projektarbeit_note_anzeige, onlinebewerbung, oe_parent_kurzbz,  
+            mailverteiler, freigabegrenze, kurzzeichen, lehre,  beschreibung, studienordnung_semester_id, studiensemester_kurzbz, 
+            semester
+		FROM 
+			lehre.tbl_studienplan 
+            JOIN lehre.tbl_studienordnung USING (studienordnung_id) 
+            JOIN tbl_studiengang USING (studiengang_kz) 
+            JOIN tbl_organisationseinheit USING (oe_kurzbz) 
+            JOIN tbl_organisationseinheittyp USING (organisationseinheittyp_kurzbz)
+            JOIN lehre.tbl_studienordnung_semester USING (studienordnung_id);
+            
+        GRANT SELECT ON lehre.vw_studienplan TO admin;
+		GRANT SELECT ON lehre.vw_studienplan TO vilesci;
+		GRANT SELECT ON lehre.vw_studienplan TO web;";
+
+	if(!$db->db_query($qry))
+		echo '<br><strong>lehre.vw_studienplan: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.vw_studienplan: View erstellt';
+}
+
 
 echo '<br><br><br>';
 

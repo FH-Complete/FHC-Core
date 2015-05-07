@@ -48,6 +48,9 @@ if (!$db = new basis_db())
 $user = get_uid();
 $datum = new datum();
 
+// definiert bis zu welchem Datum die Eintragung nicht mehr möglich ist
+$gesperrt_bis = '2015-01-31';
+$sperrdatum = date('c', strtotime($gesperrt_bis));
 
 $zeitaufzeichnung_id = (isset($_GET['zeitaufzeichnung_id'])?$_GET['zeitaufzeichnung_id']:'');
 $projekt_kurzbz = (isset($_POST['projekt'])?$_POST['projekt']:'');
@@ -353,54 +356,61 @@ if(isset($_POST['save']) || isset($_POST['edit']))
 {
 	$zeit = new zeitaufzeichnung();
 	
-	if(isset($_POST['edit']))
-	{
-		if(!$zeit->load($zeitaufzeichnung_id))
-			die($p->t("global/fehlerBeimLadenDesDatensatzes"));
-		
-		$zeit->new = false;
-	}
+	if ($datum->formatDatum($von, $format='Y-m-d H:i:s') < $sperrdatum)
+		echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da vor dem Sperrdatum</b></span>';
 	else 
 	{
-		$zeit->new = true;
-		$zeit->insertamum = date('Y-m-d H:i:s');
-		$zeit->insertvon = $user;
-	}
-	
-	$zeit->uid = $user;
-	$zeit->aktivitaet_kurzbz = $aktivitaet_kurzbz;
-	$zeit->start = $datum->formatDatum($von, $format='Y-m-d H:i:s');
-	$zeit->ende = $datum->formatDatum($bis, $format='Y-m-d H:i:s');
-	$zeit->beschreibung = $beschreibung;
-	$zeit->oe_kurzbz_1 = $oe_kurzbz_1;
-	$zeit->oe_kurzbz_2 = $oe_kurzbz_2;
-	$zeit->updateamum = date('Y-m-d H:i:s');
-	$zeit->updatevon = $user;
-	$zeit->projekt_kurzbz = $projekt_kurzbz;
-	$zeit->service_id = $service_id;
-	$zeit->kunde_uid = $kunde_uid;
-	
-	if(!$zeit->save())
-	{
-		echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': '.$zeit->errormsg.'</b></span>';
-	}
-	else 
-	{
-		echo '<span style="color:green"><b>'.$p->t("global/datenWurdenGespeichert").'</b></span>';
 
-		// Nach dem Speichern in den neu Modus springen und als Von Zeit
-		// das Ende des letzten Eintrages eintragen
-		$zeitaufzeichnung_id = '';
-		$uid = $zeit->uid;
-		$aktivitaet_kurzbz = '';
-		$von = date('d.m.Y H:i', $datum->mktime_fromtimestamp($zeit->ende));
-		$bis = date('d.m.Y H:i', $datum->mktime_fromtimestamp($zeit->ende)+3600);
-		$beschreibung = '';
-		$oe_kurzbz_1 = '';
-		$oe_kurzbz_2 = '';
-		$projekt_kurzbz = '';
-		$service_id = '';
-		$kunde_uid = '';
+		if(isset($_POST['edit']))
+		{
+			if(!$zeit->load($zeitaufzeichnung_id))
+				die($p->t("global/fehlerBeimLadenDesDatensatzes"));
+			
+			$zeit->new = false;
+		}
+		else 
+		{
+			$zeit->new = true;
+			$zeit->insertamum = date('Y-m-d H:i:s');
+			$zeit->insertvon = $user;
+		}
+		
+		$zeit->uid = $user;
+		$zeit->aktivitaet_kurzbz = $aktivitaet_kurzbz;
+		$zeit->start = $datum->formatDatum($von, $format='Y-m-d H:i:s');
+		$zeit->ende = $datum->formatDatum($bis, $format='Y-m-d H:i:s');
+		$zeit->beschreibung = $beschreibung;
+		$zeit->oe_kurzbz_1 = $oe_kurzbz_1;
+		$zeit->oe_kurzbz_2 = $oe_kurzbz_2;
+		$zeit->updateamum = date('Y-m-d H:i:s');
+		$zeit->updatevon = $user;
+		$zeit->projekt_kurzbz = $projekt_kurzbz;
+		$zeit->service_id = $service_id;
+		$zeit->kunde_uid = $kunde_uid;
+		
+		if(!$zeit->save())
+		{
+			echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': '.$zeit->errormsg.'</b></span>';
+		}
+		else 
+		{
+			echo '<span style="color:green"><b>'.$p->t("global/datenWurdenGespeichert").'</b></span>';
+	
+			// Nach dem Speichern in den neu Modus springen und als Von Zeit
+			// das Ende des letzten Eintrages eintragen
+			$zeitaufzeichnung_id = '';
+			$uid = $zeit->uid;
+			$aktivitaet_kurzbz = '';
+			$von = date('d.m.Y H:i', $datum->mktime_fromtimestamp($zeit->ende));
+			$bis = date('d.m.Y H:i', $datum->mktime_fromtimestamp($zeit->ende)+3600);
+			$beschreibung = '';
+			$oe_kurzbz_1 = '';
+			$oe_kurzbz_2 = '';
+			$projekt_kurzbz = '';
+			$service_id = '';
+			$kunde_uid = '';
+		}
+	
 	}
 }
 
@@ -411,15 +421,21 @@ if(isset($_GET['type']) && $_GET['type']=='delete')
 	
 	if($zeit->load($zeitaufzeichnung_id))
 	{
-		if($zeit->uid==$user)
-		{
-			if($zeit->delete($zeitaufzeichnung_id))
-				echo '<span style="color:orange"><b>'.$p->t("global/eintragWurdeGeloescht").'</b></span>';
-			else 
-				echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimLoeschenDesEintrags").'</b></span>';
-		}
+
+		if ($zeit->start < $sperrdatum)
+			echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimSpeichernDerDaten").': Eingabe nicht möglich da vor dem Sperrdatum</b></span>';		
 		else 
-			echo '<span style="color:red"><b>'.$p->t("global/keineBerechtigung").'!</b></span>';
+		{
+			if($zeit->uid==$user)
+			{
+				if($zeit->delete($zeitaufzeichnung_id))
+					echo '<span style="color:orange"><b>'.$p->t("global/eintragWurdeGeloescht").'</b></span>';
+				else 
+					echo '<span style="color:red"><b>'.$p->t("global/fehlerBeimLoeschenDesEintrags").'</b></span>';
+			}
+			else 
+				echo '<span style="color:red"><b>'.$p->t("global/keineBerechtigung").'!</b></span>';
+		}
 	}
 	else 
 		echo '<span style="color:red"><b>'.$p->t("global/datensatzWurdeNichtGefunden").'</b></span>';
@@ -774,7 +790,11 @@ if($projekt->getProjekteMitarbeiter($user))
 				        	'.$p->t("zeitaufzeichnung/pause").' '.($pflichtpause==false?$p->t("zeitaufzeichnung/inklusivePflichtpause"):'').':
 				        </td>
 				        <td '.$style.' align="right"><b>'.$tagessaldo.'</b><br>'.date('H:i', ($pausesumme-3600)).'</td>
-				        <td '.$style.' colspan="3" align="right"><a href="?von_datum='.$datum->formatDatum($tag,'d.m.Y').'&bis_datum='.$datum->formatDatum($tag,'d.m.Y').'" class="item">&lt;-</a></td>';
+				        <td '.$style.' colspan="3" align="right">';
+						if ($tag > $sperrdatum)				      
+				      	echo '<a href="?von_datum='.$datum->formatDatum($tag,'d.m.Y').'&bis_datum='.$datum->formatDatum($tag,'d.m.Y').'" class="item">&lt;-</a>';
+				      
+				      echo '</td>';
 						
 						$tag=$datumtag;
 						$tagessumme='00:00';
@@ -874,11 +894,11 @@ if($projekt->getProjekteMitarbeiter($user))
 			        <td '.$style.' align="right">'.$db->convert_html_chars($row->diff).'</td>
 			        <td '.$style.' title="'.$db->convert_html_chars(mb_eregi_replace("\r\n",' ',$row->beschreibung)).'">'.StringCut($db->convert_html_chars($row->beschreibung),20,null,'...').'</td>
 			        <td '.$style.'>';
-		        if(!isset($_GET['filter']) || $row->uid==$user)
+		        if(!isset($_GET['filter']) && ($row->uid==$user && $row->datum > $sperrdatum))
 		        	echo '<a href="'.$_SERVER['PHP_SELF'].'?type=edit&zeitaufzeichnung_id='.$row->zeitaufzeichnung_id.'" class="Item">'.$p->t("global/bearbeiten").'</a>';
 		        echo "</td>\n";
 		        echo "       <td ".$style.">";
-		        if(!isset($_GET['filter']) || $row->uid==$user)
+		        if(!isset($_GET['filter']) && ($row->uid==$user && $row->start > $sperrdatum))
 		        	echo '<a href="'.$_SERVER['PHP_SELF'].'?type=delete&zeitaufzeichnung_id='.$row->zeitaufzeichnung_id.'" class="Item"  onclick="return confdel()">'.$p->t("global/loeschen").'</a>';
 		        echo "</td>\n";
 		        echo "   </tr>\n";
