@@ -148,6 +148,6 @@ define('STIP_USER_PASSWORD','password');
 
 // Optionen für das Bewerbertool
 define('BEWERBERTOOL_STUDIENAUSWAHL_ANZEIGEN', true);
-define('BEWERBERTOOL_STANDORTAUSWAHL_ANZEIGEN', true);
+define('BEWERBERTOOL_STANDORTAUSWAHL_ANZEIGEN', false);
 
 ?>
