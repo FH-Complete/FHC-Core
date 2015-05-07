@@ -230,6 +230,31 @@ class studiengang extends basis_db
 
 		return true;
 	}
+    
+    /**
+     * Gibt alle Studiengaenge zurueck, fuer die man sich online bewerben kann
+     * @return boolean
+     */
+    public function getAllForBewerbung() 
+    {
+        $qry = 'SELECT DISTINCT studiengang_kz, typ, organisationseinheittyp_kurzbz, studiengangbezeichnung '
+                . 'FROM lehre.vw_studienplan '
+                . 'WHERE onlinebewerbung IS TRUE '
+                . 'ORDER BY studiengangbezeichnung ASC';
+		
+		if(!$result = $this->db_query($qry))
+		{
+			$this->errormsg = 'Datensatz konnte nicht geladen werden';
+			return false;
+		} 
+
+		while($row = $this->db_fetch_object($result))
+		{
+			$this->result[] = $row;
+		}
+
+		return true;
+    }
 	
 	/**
 	 * Laedt alle Studientypen in das Attribut studiengang_typ_array

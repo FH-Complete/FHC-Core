@@ -479,7 +479,7 @@
 	<link rel="stylesheet" href="../../skin/colorpicker.css" type="text/css"/>
 	<script type="text/javascript" src="../../include/js/mailcheck.js"></script>
 	<script type="text/javascript" src="../../include/js/datecheck.js"></script>
-	<script type="text/javascript" src="../../include/js/jquery.js"></script>
+	<script type="text/javascript" src="../../include/js/jquery1.9.min.js"></script>
 	<script type="text/javascript" src="../../include/js/colorpicker.js"></script>
 	<script>
 	    function copyToLehreVz()

@@ -627,14 +627,14 @@
 														  {
 														  	 if(copy($_FILES[$file]['tmp_name'], $uploadfile))
 														  	 {
-														  	 	 exec('chmod 664 "'.$uploadfile.'"');
+														  	 	 exec('chmod 664 '.escapeshellarg($uploadfile));
 																 if($islector)
 																 {
-																	exec('sudo chown :teacher "'.$uploadfile.'"');
+																	exec('sudo chown :teacher '.escapeshellarg($uploadfile));
 																 }
 																 else
 																 {
-																	exec('sudo chown :student "'.$uploadfile.'"');
+																	exec('sudo chown :student '.escapeshellarg($uploadfile));
 																 }
 														  	 }
 														  }
@@ -650,14 +650,14 @@
 													  {
 														  if(copy($_FILES[$file]['tmp_name'], $uploadfile))
 														  {
-														  	  exec('chmod 664 "'.$uploadfile.'"');
+														  	  exec('chmod 664 '.escapeshellarg($uploadfile));
 															  if($islector)
 															  {
-																exec('sudo chown :teacher "'.$uploadfile.'"');
+																exec('sudo chown :teacher '.escapeshellarg($uploadfile));
 															  }
 															  else
 															  {
-																exec('sudo chown :student "'.$uploadfile.'"');
+																exec('sudo chown :student '.escapeshellarg($uploadfile));
 															  }
 														  }
 													  }
@@ -683,14 +683,14 @@
 															  {
 															  	   if(copy($_FILES[$file]['tmp_name'], $uploadfile))
 															  	   {
-															  	   	   exec('chmod 664 "'.$uploadfile.'"');
+															  	   	   exec('chmod 664 '.escapeshellarg($uploadfile));
 																	   if($islector)
 																	   {
-																			exec('sudo chown :teacher "'.$uploadfile.'"');
+																			exec('sudo chown :teacher '.escapeshellarg($uploadfile));
 																	   }
 																	   else
 																	   {
-																			exec('sudo chown :student "'.$uploadfile.'"');
+																			exec('sudo chown :student '.escapeshellarg($uploadfile));
 																	   }
 															  	   }
 															  }
@@ -706,14 +706,14 @@
 														  {
 															  if(copy($_FILES[$file]['tmp_name'], $uploadfile))
 															  {
-															  	  exec('chmod 664 "'.$uploadfile.'"');
+															  	  exec('chmod 664 '.escapeshellarg($uploadfile));
 																  if($islector)
 																  {
-																	exec('sudo chown :teacher "'.$uploadfile.'"');
+																	exec('sudo chown :teacher '.escapeshellarg($uploadfile));
 																  }
 																  else
 																  {
-																	exec('sudo chown :student "'.$uploadfile.'"');
+																	exec('sudo chown :student '.escapeshellarg($uploadfile));
 																  }
 															  }
 														  }
@@ -848,15 +848,15 @@
 									if(!@is_dir($dest_create_dir->path.'/'.$new_dir_name_text) && !@file_exists($dest_create_dir->path.'/'.$new_dir_name_text) && $new_dir_name_text != "")
 									{
 										@mkdir($dest_create_dir->path.'/'.$new_dir_name_text);
-										exec('chmod 775 "'.$dest_create_dir->path.'/'.$new_dir_name_text.'"');
+										exec('chmod 775 '.escapeshellarg($dest_create_dir->path.'/'.$new_dir_name_text));
 	
 										if($islector)
 										{
-											exec('sudo chown :teacher "'.$dest_create_dir->path.'/'.$new_dir_name_text.'"');
+											exec('sudo chown :teacher '.escapeshellarg($dest_create_dir->path.'/'.$new_dir_name_text));
 										}
 										else
 										{
-											exec('sudo chown :student "'.$dest_create_dir->path.'/'.$new_dir_name_text.'"');
+											exec('sudo chown :student '.escapeshellarg($dest_create_dir->path.'/'.$new_dir_name_text));
 										}
 									}
 								}
@@ -1112,7 +1112,7 @@
 										if(@is_dir($dest_dir->path.'/'.$entry))
 										{
 											writeCISlog('DELETE', 'rm -r "'.$dest_dir->path.'/'.$entry.'"');
-											exec('rm -r "'.$dest_dir->path.'/'.$entry.'"');
+											exec('rm -r '.escapeshellarg($dest_dir->path.'/'.$entry));
 										}
 
 										unset($check_state);
@@ -1359,7 +1359,7 @@
 										if(!@is_dir($dest_dir->path.'/'.$entry))
 										{
 											writeCISlog('DELETE', 'rm -r "'.$dest_dir->path.'/'.$entry.'"');
-											exec('rm -r "'.$dest_dir->path.'/'.$entry.'"');
+											exec('rm -r '.escapeshellarg($dest_dir->path.'/'.$entry));
 										}
 
 										unset($check_state);
