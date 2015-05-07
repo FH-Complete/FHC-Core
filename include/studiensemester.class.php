@@ -24,16 +24,16 @@ require_once('basis_db.class.php');
 
 class studiensemester extends basis_db
 {
-	protected $new;      // boolean
-	protected $studiensemester = array(); // studiensemester Objekt
+	public $new;      // boolean
+	public $studiensemester = array(); // studiensemester Objekt
 
 	//Tabellenspalten
-	protected $studiensemester_kurzbz;// varchar(16)
-	protected $start; 					// date
-	protected $ende; 					// date
-	protected $bezeichnung;			// varchar(32)
-	protected $studienjahr_kurzbz;			// varchar(16)
-	protected $studiensemester_kurzbz_alternativ;			// varchar(16)
+	public $studiensemester_kurzbz;// varchar(16)
+	public $start; 					// date
+	public $ende; 					// date
+	public $bezeichnung;			// varchar(32)
+	public $studienjahr_kurzbz;			// varchar(16)
+	public $studiensemester_kurzbz_alternativ;			// varchar(16)
 
 	/**
 	 * Konstruktor - Laedt optional ein StSem
