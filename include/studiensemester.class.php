@@ -33,7 +33,7 @@ class studiensemester extends basis_db
 	public $ende; 					// date
 	public $bezeichnung;			// varchar(32)
 	public $studienjahr_kurzbz;			// varchar(16)
-	public $studiensemester_kurzbz_alternativ;			// varchar(16)
+	public $beschreibung;			// varchar(16)
 
 	/**
 	 * Konstruktor - Laedt optional ein StSem
@@ -90,7 +90,7 @@ class studiensemester extends basis_db
 			$this->ende = $row->ende;
 			$this->bezeichnung = $row->bezeichnung;
 			$this->studienjahr_kurzbz = $row->studienjahr_kurzbz;
-			$this->studiensemester_kurzbz_alternativ = $row->studiensemester_kurzbz_alternativ;
+			$this->beschreibung = $row->beschreibung;
 		}
 		else
 		{
@@ -324,7 +324,7 @@ class studiensemester extends basis_db
 				$stsem_obj->ende = $row->ende;
 				$stsem_obj->bezeichnung = $row->bezeichnung;
 				$stsem_obj->studienjahr_kurzbz = $row->studienjahr_kurzbz;
-				$stsem_obj->studiensemester_kurzbz_alternativ = $row->studiensemester_kurzbz_alternativ;
+				$stsem_obj->beschreibung = $row->beschreibung;
 
 				$this->studiensemester[] = $stsem_obj;
 			}

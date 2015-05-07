@@ -2943,6 +2943,16 @@ if(!$result = @$db->db_query("SELECT * FROM lehre.vw_studienplan LIMIT 1"))
 		echo '<br>lehre.vw_studienplan: View erstellt';
 }
 
+// Spalte beschreibung in public.tbl_studiensemester
+if(!$result = @$db->db_query("SELECT beschreibung FROM public.tbl_studiensemester LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_studiensemester ADD COLUMN beschreibung varchar(128);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_studiensemester: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo ' public.tbl_studiensemester: Spalte beschreibung hinzugefuegt!<br>';
+}
 
 echo '<br><br><br>';
 
