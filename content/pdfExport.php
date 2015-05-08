@@ -87,8 +87,6 @@ else
 		}
 	}
 }
-echo $xsl_stg_kz;
-exit;
 if(isset($_GET['xsl_oe_kurzbz']))
 	$xsl_oe_kurzbz=$_GET['xsl_oe_kurzbz'];
 else
