@@ -77,7 +77,7 @@ else
 			if(strstr($_GET['uid'],';'))
 				$uids = explode(';',$_GET['uid']);
 			else 
-				$uids = $_GET['uid'];
+				$uids[1] = $_GET['uid'];
 
 			$student_obj = new student();
 			if($student_obj->load($uids[1]))
@@ -87,6 +87,8 @@ else
 		}
 	}
 }
+echo $xsl_stg_kz;
+exit;
 if(isset($_GET['xsl_oe_kurzbz']))
 	$xsl_oe_kurzbz=$_GET['xsl_oe_kurzbz'];
 else
