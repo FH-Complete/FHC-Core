@@ -354,14 +354,14 @@ class gruppe extends basis_db
 			$this->errormsg = 'Aktiv muss ein boolscher Wert sein';
 			return false;
 		}
-		if(mb_strlen($this->updatevon)>16)
+		if(mb_strlen($this->updatevon)>32)
 		{
-			$this->errormsg = 'Updatevon darf nicht laenger als 16 Zeichen sein';
+			$this->errormsg = 'Updatevon darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
-		if(mb_strlen($this->insertvon)>16)
+		if(mb_strlen($this->insertvon)>32)
 		{
-			$this->errormsg = 'Insertvon darf nicht laenger als 16 Zeichen sein';
+			$this->errormsg = 'Insertvon darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
 

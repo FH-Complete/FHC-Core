@@ -77,7 +77,7 @@ else
 			if(strstr($_GET['uid'],';'))
 				$uids = explode(';',$_GET['uid']);
 			else 
-				$uids = $_GET['uid'];
+				$uids[1] = $_GET['uid'];
 
 			$student_obj = new student();
 			if($student_obj->load($uids[1]))
@@ -207,6 +207,14 @@ elseif(in_array($xsl,array('Lehrveranstaltungszeugnis','Zertifikat','Diplomurkun
 'LVZeugnis','AnwListBarcode','Honorarvertrag','AusbVerEng','AusbVerEngHead','Zeugnis','ErfolgsnachweisE','ErfolgsnwHeadE','Magisterurkunde','Masterurkunde','Defensiourkunde','Magisterzeugnis','Laufzettel')))
 {
 	if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz'))
+	{
+		echo 'Sie haben keine Berechtigung dieses Dokument zu erstellen';
+		exit;
+	}
+}
+elseif(in_array($xsl,array('Ressource')))
+{
+	if(!$rechte->isBerechtigt('lehre/lvplan'))
 	{
 		echo 'Sie haben keine Berechtigung dieses Dokument zu erstellen';
 		exit;

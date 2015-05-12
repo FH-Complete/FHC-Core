@@ -42,9 +42,9 @@ if($von)
 $db = new basis_db();
 $data = array();
 
-if(!$studiengang)
+/*if(!$studiengang)
 	die('Die ID des Studiengangs muss uebergeben werden');
-
+*/
 // Daten der Lehreinheiten ermitteln
 $qry = "SELECT le.lehreinheit_id, le.lehrveranstaltung_id, lv.lvnr, lv.bezeichnung AS lvbez, stg.bezeichnung AS stgbez, "
 	. "sp.ort_kurzbz, datum, beginn, ende "
@@ -53,7 +53,10 @@ $qry = "SELECT le.lehreinheit_id, le.lehrveranstaltung_id, lv.lvnr, lv.bezeichnu
 	. "JOIN public.tbl_studiengang stg ON stg.studiengang_kz = lv.studiengang_kz "
 	. "JOIN lehre.tbl_stundenplan sp ON (sp.lehreinheit_id=le.lehreinheit_id) "
 	. "JOIN lehre.tbl_stunde stu ON stu.stunde = sp.stunde "
-	. "WHERE stg.studiengang_kz = " . $db->db_add_param($studiengang) . " ";
+	. "WHERE 1=1";
+
+if($studiengang!='')
+	$qry.=" AND stg.studiengang_kz = " . $db->db_add_param($studiengang) . " ";
 
 // Optionen zu Query hinzufügen
 if($lehreinheit)
@@ -99,14 +102,14 @@ foreach($data as $key => $value)
 
 	// Daten der Studenten ermitteln
 	$qry = "SELECT pe.person_id, vorname, nachname, titelpre, titelpost, note, "
-		. "get_rolle_prestudent(pre.prestudent_id, " . $db->db_add_param($studiensemester) . ") AS laststatus "
+		. "get_rolle_prestudent(tbl_student.prestudent_id, " . $db->db_add_param($studiensemester) . ") AS laststatus "
 		. "FROM campus.vw_student_lehrveranstaltung stlv "
 		. "JOIN public.tbl_benutzer be ON be.uid = stlv.uid "
 		. "JOIN public.tbl_person pe ON pe.person_id = be.person_id "
-		. "JOIN public.tbl_prestudent pre ON (pre.person_id = pe.person_id AND pre.studiengang_kz = " . $db->db_add_param($studiengang) . ") "
+		. "JOIN public.tbl_student ON be.uid = tbl_student.student_uid "
 		. "LEFT JOIN lehre.tbl_zeugnisnote zn ON (zn.lehrveranstaltung_id = stlv.lehrveranstaltung_id AND zn.student_uid = stlv.uid AND zn.studiensemester_kurzbz = " . $db->db_add_param($studiensemester) . ") "
 		. "WHERE stlv.lehreinheit_id = " . $db->db_add_param($key) . " "
-		. "AND get_rolle_prestudent(pre.prestudent_id, " . $db->db_add_param($studiensemester) . ") NOT IN ('Abbrecher', 'Unterbrecher') "
+		. "AND get_rolle_prestudent(tbl_student.prestudent_id, " . $db->db_add_param($studiensemester) . ") NOT IN ('Abbrecher', 'Unterbrecher') "
 		. "ORDER BY nachname ASC";
 
 	if($db->db_query($qry))
@@ -162,21 +165,24 @@ foreach($data as $lehreinheit_id => $value)
 
 		// Ausgabe der Studenten
 		echo "<studenten>";
-		foreach($value['studenten'] as $student)
+		if(isset($value['studenten']) && is_array($value['studenten']))
 		{
-			// Barcode erstellen
-			$paddedPersonId = str_pad($student->person_id, 12, "0", STR_PAD_LEFT);
-			$barcode = ean13($paddedPersonId);
+			foreach($value['studenten'] as $student)
+			{
+				// Barcode erstellen
+				$paddedPersonId = str_pad($student->person_id, 12, "0", STR_PAD_LEFT);
+				$barcode = ean13($paddedPersonId);
 
-			echo "\n		<student>";
-			echo "\n			<barcode><![CDATA[".$barcode."]]></barcode>";
-			echo "\n			<vorname><![CDATA[".$student->vorname."]]></vorname>";
-			echo "\n			<nachname><![CDATA[".$student->nachname."]]></nachname>";
-			echo "\n			<titelpre><![CDATA[".$student->titelpre."]]></titelpre>";
-			echo "\n			<titelpost><![CDATA[".$student->titelpost."]]></titelpost>";
-			echo "\n			<note><![CDATA[".$student->note."]]></note>";
-			echo "\n			<status><![CDATA[".$student->laststatus."]]></status>";
-			echo "\n		</student>";
+				echo "\n		<student>";
+				echo "\n			<barcode><![CDATA[".$barcode."]]></barcode>";
+				echo "\n			<vorname><![CDATA[".$student->vorname."]]></vorname>";
+				echo "\n			<nachname><![CDATA[".$student->nachname."]]></nachname>";
+				echo "\n			<titelpre><![CDATA[".$student->titelpre."]]></titelpre>";
+				echo "\n			<titelpost><![CDATA[".$student->titelpost."]]></titelpost>";
+				echo "\n			<note><![CDATA[".$student->note."]]></note>";
+				echo "\n			<status><![CDATA[".$student->laststatus."]]></status>";
+				echo "\n		</student>";
+			}
 		}
 		echo "</studenten>";
 		echo "</anwesenheitsliste>";

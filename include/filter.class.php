@@ -185,13 +185,13 @@ class filter extends basis_db
 						$html.=' >';
 						$this->loadValues($filter->sql, $filter->valuename, $filter->showvalue);
 						foreach ($this->values as $value)
-							$html.="\n\t\t\t\t".'<option class="form-control" value="'.$value->value.'">'.$value->text.'</option>';
+							$html.="\n\t\t\t\t".'<option value="'.$value->value.'">'.$value->text.'</option>';
 						$html.="\n\t\t\t</select>";
 						break;
 					case 'datepicker':
 						$html .= '<input type="text" id="' . $filter->kurzbz . '" name="' . $filter->kurzbz . '">';
 						$html .= '<script>';
-						$html .= '$("#' . $filter->kurzbz . '").datepicker();';
+						$html .= '$("#' . $filter->kurzbz . '").datepicker({ dateFormat: \'yy-mm-dd\' });';
 						$html .= '</script>';
 						break;
 				}

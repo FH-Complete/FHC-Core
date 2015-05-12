@@ -32,10 +32,11 @@ require_once('../include/benutzerfunktion.class.php');
 require_once('../include/stundenplan.class.php');
 require_once('../include/studiengang.class.php');
 require_once('../include/reservierung.class.php');
+require_once('../include/betriebsmittel.class.php');
 
 $user = get_uid();
 
-error_reporting(0);
+//error_reporting(0);
 
 $return = false;
 $errormsg = 'unknown';
@@ -275,6 +276,135 @@ if(!$error)
 			{
 				$errormsg = 'Fehler beim Laden: '.$stundenplan->errormsg;
 				$return = false;
+			}
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='deleteressource')
+	{
+		if(!$rechte->isBerechtigt('lehre/lvplan', null, 'suid'))
+		{
+			$return = false;
+			$error = true;
+			$errormsg = 'keine Berechtigung';
+		}
+		else
+		{
+			if(isset($_POST['stundenplan_betriebsmittel_id']) && is_array($_POST['stundenplan_betriebsmittel_id']))
+			{
+				$return = true;
+				foreach($_POST['stundenplan_betriebsmittel_id'] as $stundenplan_betriebsmittel_id)
+				{
+					$betriebsmittel = new betriebsmittel();
+					if(!$betriebsmittel->deleteStundenplanBetriebsmittel($stundenplan_betriebsmittel_id))
+					{
+						$errormsg='Fehler beim Loeschen: '.$betriebsmittel->errormsg;
+						$return = false;
+						$data = '';
+					}
+				}
+			}
+			else 
+			{
+				$return = false;
+				$errormsg = 'ID ist ungueltig';
+			}
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='addressource')
+	{
+		if(!$rechte->isBerechtigt('lehre/lvplan', null, 'suid'))
+		{
+			$return = false;
+			$error = true;
+			$errormsg = 'keine Berechtigung';
+		}
+		else
+		{
+			$stunden = $_POST['stunden'];
+			$stpl_id = $_POST['stpl_id'];
+			$betriebsmittel_id = $_POST['betriebsmittel_id'];
+
+			$db = new basis_db();
+
+			if(isset($_POST['betriebsmittel_id']) && is_numeric($_POST['betriebsmittel_id']))
+			{
+				// Pro Stunde wird die Zuordnung nur auf eine der vorhandenen StundenplanIDs gehaengt
+				foreach($stunden as $stunde)
+				{
+					$qry = "SELECT stundenplandev_id FROM lehre.tbl_stundenplandev WHERE stunde=".$db->db_add_param($stunde)." 
+							AND stundenplandev_id in (".$db->db_implode4SQL($stpl_id).") ORDER BY stundenplandev_id LIMIT 1";
+
+					if($result = $db->db_query($qry))
+					{
+						if($row = $db->db_fetch_object($result))
+						{
+							$id = $row->stundenplandev_id;
+
+							$betriebsmittel = new betriebsmittel();
+							$betriebsmittel->stundenplandev_id=$id;
+							$betriebsmittel->betriebsmittel_id = $betriebsmittel_id;
+							$betriebsmittel->insertvon = $user;
+							$betriebsmittel->insertamum = date('Y-m-d H:i:s');
+							$betriebsmittel->new=true;
+							if($betriebsmittel->saveStundenplanBetriebsmittel())
+							{
+								$return = true;
+							}
+							else 
+							{
+								$errormsg='Fehler beim Speichern: '.$betriebsmittel->errormsg;
+								$return = false;
+								$data = '';
+							}
+						}
+					}
+				}
+			}
+			else 
+			{
+				$return = false;
+				$errormsg = 'ID ist ungueltig';
+			}
+		}
+	}
+	elseif(isset($_POST['type']) && $_POST['type']=='saveressource')
+	{
+		if(!$rechte->isBerechtigt('lehre/lvplan', null, 'suid'))
+		{
+			$return = false;
+			$error = true;
+			$errormsg = 'keine Berechtigung';
+		}
+		else
+		{
+			if(isset($_POST['stundenplan_betriebsmittel_id']) && is_numeric($_POST['stundenplan_betriebsmittel_id']))
+			{
+				$stundenplan_betriebsmittel_id = $_POST['stundenplan_betriebsmittel_id'];
+
+				
+				$betriebsmittel = new betriebsmittel();
+
+				if($betriebsmittel->loadBetriebsmittelStundenplan($stundenplan_betriebsmittel_id))
+				{
+					
+					$betriebsmittel->anmerkung =$_POST['anmerkung'];
+
+					if($betriebsmittel->saveStundenplanBetriebsmittel())
+					{
+						$return = true;
+					}
+					else 
+					{
+						$errormsg='Fehler beim Speichern: '.$betriebsmittel->errormsg;
+						$return = false;
+						$data = '';
+					}
+				}
+			}
+			else 
+			{
+				$return = false;
+				$errormsg = 'ID ist ungueltig';
 			}
 		}
 	}

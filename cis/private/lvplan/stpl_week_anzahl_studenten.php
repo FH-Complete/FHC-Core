@@ -34,14 +34,12 @@
 	$uid=isset($_GET['uid'])?$_GET['uid']:(isset($_POST['uid'])?$_POST['uid']:get_uid());
 	$uid=trim($uid);
 	
-	$berechtigung=new benutzerberechtigung();
-	$berechtigung->getBerechtigungen($uid);
-	if ($berechtigung->isBerechtigt('admin')
-	|| $berechtigung->isBerechtigt('lehre/reservierung', null, 's'))
-		$raumres=true;
-	else
-		die('Keine Berechtigung fuer Lehre/Reservierung - Anzeige');
-	unset($berechtigung);
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($uid);
+	
+	if(!$rechte->isBerechtigt('lehre/reservierung:begrenzt', null, 's') || !$rechte->isBerechtigt('admin'))
+		die('<span class="error">Sie haben keine Berechtigung für diese Seite</span>');
+	unset($rechte);
 
    	header('Content-Type: text/html;charset=UTF-8');
 ?>

@@ -5214,7 +5214,7 @@ function StudentPrintAusbildungsvertragEnglisch(event)
 // ****
 // * Erstellt die Studienerfolgsbestaetigung fuer einen oder mehrere Studenten
 // ****
-function StudentCreateStudienerfolg(xsl, finanzamt, studiensemester, all)
+function StudentCreateStudienerfolg(event, xsl, finanzamt, studiensemester, all)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
@@ -5253,8 +5253,22 @@ function StudentCreateStudienerfolg(xsl, finanzamt, studiensemester, all)
 		all='&all=true';
 	else
 		all='';
+
+	if (event.shiftKey) 
+	{
+	    var output='odt';
+	} 
+	else if (event.ctrlKey)
+	{
+		var output='doc';
+	}
+	else
+	{
+		var output='pdf';
+	}
+
 	//PDF erzeugen
-	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=studienerfolg.rdf.php&xsl='+xsl+'&uid='+paramList+'&ss='+studiensemester+'&typ='+finanzamt+all,'DiplomaSupplement', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=studienerfolg.rdf.php&xsl='+xsl+'&uid='+paramList+'&ss='+studiensemester+'&typ='+finanzamt+all+'&output='+output,'DiplomaSupplement', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ************* FUNKTIONEN ***************** //
