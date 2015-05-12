@@ -125,25 +125,25 @@ foreach($addon_obj->result as $addon)
   <command id="menu-dokumente-zeugniseng:command" oncommand="StudentCreateZeugnis('ZeugnisEng',event);"/>
   <!--<command id="menu-dokumente-sammelzeugnis:command" oncommand="StudentCreateSammelzeugnis('Sammelzeugnis');"/>-->
   <command id="menu-dokumente-diplsupplement:command" oncommand="StudentCreateDiplSupplement(event);"/>
-  <command id="menu-dokumente-studienerfolg-normal:command" oncommand="StudentCreateStudienerfolg('Studienerfolg');"/>
-  <command id="menu-dokumente-studienerfolg-finanzamt:command" oncommand="StudentCreateStudienerfolg('Studienerfolg','finanzamt');"/>
-  <command id="menu-dokumente-studienerfolg-allesemester-normal:command" oncommand="StudentCreateStudienerfolg('Studienerfolg','', '', 'true');"/>
-  <command id="menu-dokumente-studienerfolg-allesemester-finanzamt:command" oncommand="StudentCreateStudienerfolg('Studienerfolg','finanzamt', '', 'true');"/>
-  <command id="menu-dokumente-studienerfolgeng-normal:command" oncommand="StudentCreateStudienerfolg('StudienerfolgEng');"/>
-  <command id="menu-dokumente-studienerfolgeng-finanzamt:command" oncommand="StudentCreateStudienerfolg('StudienerfolgEng','finanzamt');"/>
-  <command id="menu-dokumente-studienerfolgeng-allesemester-normal:command" oncommand="StudentCreateStudienerfolg('StudienerfolgEng','', '', 'true');"/>
-  <command id="menu-dokumente-studienerfolgeng-allesemester-finanzamt:command" oncommand="StudentCreateStudienerfolg('StudienerfolgEng','finanzamt', '', 'true');"/>
+  <command id="menu-dokumente-studienerfolg-normal:command" oncommand="StudentCreateStudienerfolg(event, 'Studienerfolg');"/>
+  <command id="menu-dokumente-studienerfolg-finanzamt:command" oncommand="StudentCreateStudienerfolg(event, 'Studienerfolg','finanzamt');"/>
+  <command id="menu-dokumente-studienerfolg-allesemester-normal:command" oncommand="StudentCreateStudienerfolg(event, 'Studienerfolg','', '', 'true');"/>
+  <command id="menu-dokumente-studienerfolg-allesemester-finanzamt:command" oncommand="StudentCreateStudienerfolg(event, 'Studienerfolg','finanzamt', '', 'true');"/>
+  <command id="menu-dokumente-studienerfolgeng-normal:command" oncommand="StudentCreateStudienerfolg(event, 'StudienerfolgEng');"/>
+  <command id="menu-dokumente-studienerfolgeng-finanzamt:command" oncommand="StudentCreateStudienerfolg(event, 'StudienerfolgEng','finanzamt');"/>
+  <command id="menu-dokumente-studienerfolgeng-allesemester-normal:command" oncommand="StudentCreateStudienerfolg(event, 'StudienerfolgEng','', '', 'true');"/>
+  <command id="menu-dokumente-studienerfolgeng-allesemester-finanzamt:command" oncommand="StudentCreateStudienerfolg(event, 'StudienerfolgEng','finanzamt', '', 'true');"/>
   <command id="menu-dokumente-accountinfoblatt:command" oncommand="PrintAccountInfoBlatt(event);"/>  
   <command id="menu-dokumente-zutrittskarte:command" oncommand="PrintZutrittskarte();"/>
   <command id="menu-dokumente-studienblatt:command" oncommand="PrintStudienblatt(event);"/>
-  <command id="menu-dokumente-pruefungsprotokoll:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple('de');"/>
-  <command id="menu-dokumente-pruefungsprotokoll_englisch:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple('en');"/>
-  <command id="menu-dokumente-pruefungsprotokoll2:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple('de2');"/>
-  <command id="menu-dokumente-pruefungsprotokoll2_englisch:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple('en2');"/>
-  <command id="menu-dokumente-pruefungszeugnis:command" oncommand="StudentAbschlusspruefungPrintPruefungszeugnisMultiple('deutsch');"/>
-  <command id="menu-dokumente-pruefungszeugnis_englisch:command" oncommand="StudentAbschlusspruefungPrintPruefungszeugnisMultiple('englisch');"/>
-  <command id="menu-dokumente-urkunde_deutsch:command" oncommand="StudentAbschlusspruefungPrintUrkundeMultiple('deutsch')"/>
-  <command id="menu-dokumente-urkunde_englisch:command" oncommand="StudentAbschlusspruefungPrintUrkundeMultiple('englisch')"/>
+  <command id="menu-dokumente-pruefungsprotokoll:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple(event,'de');"/>
+  <command id="menu-dokumente-pruefungsprotokoll_englisch:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple(event,'en');"/>
+  <command id="menu-dokumente-pruefungsprotokoll2:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple(event,'de2');"/>
+  <command id="menu-dokumente-pruefungsprotokoll2_englisch:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple(event,'en2');"/>
+  <command id="menu-dokumente-pruefungszeugnis:command" oncommand="StudentAbschlusspruefungPrintPruefungszeugnisMultiple(event,'deutsch');"/>
+  <command id="menu-dokumente-pruefungszeugnis_englisch:command" oncommand="StudentAbschlusspruefungPrintPruefungszeugnisMultiple(event,'englisch');"/>
+  <command id="menu-dokumente-urkunde_deutsch:command" oncommand="StudentAbschlusspruefungPrintUrkundeMultiple(event, 'deutsch')"/>
+  <command id="menu-dokumente-urkunde_englisch:command" oncommand="StudentAbschlusspruefungPrintUrkundeMultiple(event, 'englisch')"/>
   <command id="menu-dokumente-ausbildungsvertrag:command" oncommand="StudentPrintAusbildungsvertrag(event);"/>
   <command id="menu-dokumente-ausbildungsvertrag_englisch:command" oncommand="StudentPrintAusbildungsvertragEnglisch(event);"/>
   <command id="menu-extras-reihungstest:command" oncommand="ExtrasShowReihungstest();"/>

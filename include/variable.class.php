@@ -268,6 +268,13 @@ class variable extends basis_db
 			
 		if (!isset($this->variable->max_kollision))
 			$this->variable->max_kollision='0';
+
+		if (!isset($this->variable->alle_unr_mitladen))
+			$this->variable->alle_unr_mitladen='false';
+
+		if (!isset($this->variable->allow_lehrstunde_drop))
+			$this->variable->allow_lehrstunde_drop='false';
+
 		return true;
 	}
 		

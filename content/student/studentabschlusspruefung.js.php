@@ -610,7 +610,7 @@ function StudentAbschlusspruefungLoeschen()
 // * ein Protokoll gedruckt.
 // * Den Typ (Bakk/Dipl) des Protokolls bestimmt der zuletzt markierte.
 // ****
-function StudentAbschlusspruefungPrintPruefungsprotokollMultiple(lang)
+function StudentAbschlusspruefungPrintPruefungsprotokollMultiple(event, lang)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-abschlusspruefung-tree');
@@ -682,19 +682,26 @@ function StudentAbschlusspruefungPrintPruefungsprotokollMultiple(lang)
 	}
 	var stg_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
 
-	//Uebergangsloesung bis zur fertigstellung der dokumente
-//	if(xsl=='PrProtMAEng')
-//		window.open('<?php echo APP_ROOT; ?>/content/Record_of_Master_Examination.pdf');
-//	else if(xsl=='PrProtBAEng')
-//		window.open('<?php echo APP_ROOT; ?>/content/Record_of_Bachelor_Examination.pdf');
-//	else		
-		window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid='+uids+'&xsl_stg_kz='+stg_kz+'&output=pdf','Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	if (event.shiftKey) 
+	{
+	    var output='odt';
+	} 
+	else if (event.ctrlKey)
+	{
+		var output='doc';
+	}
+	else
+	{
+		var output='pdf';
+	}
+
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid='+uids+'&xsl_stg_kz='+stg_kz+'&output='+output,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
 // * Druckt das Pruefungsprotokoll fuer eine bestimmte Abschlusspruefung
 // ****
-function StudentAbschlusspruefungPrintPruefungsprotokoll(lang)
+function StudentAbschlusspruefungPrintPruefungsprotokoll(event, lang)
 {
 	if(lang=='')
 		lang='de';
@@ -736,13 +743,21 @@ function StudentAbschlusspruefungPrintPruefungsprotokoll(lang)
 		if(lang=='en2')
 			xsl='PrProtMAEng';
 	}
-	//Uebergangsloesung bis zur fertigstellung der dokumente
-//	if(xsl=='PrProtMAEng')
-//		window.open('<?php echo APP_ROOT; ?>/content/Record_of_Master_Examination.pdf');
-//	else if(xsl=='PrProtBAEng')
-//		window.open('<?php echo APP_ROOT; ?>/content/Record_of_Bachelor_Examination.pdf');
-//	else		
-		window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&abschlusspruefung_id='+abschlusspruefung_id+'&xsl_stg_kz='+stg_kz+'&output=pdf','Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+
+	if (event.shiftKey) 
+	{
+	    var output='odt';
+	} 
+	else if (event.ctrlKey)
+	{
+		var output='doc';
+	}
+	else
+	{
+		var output='pdf';
+	}
+
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&abschlusspruefung_id='+abschlusspruefung_id+'&xsl_stg_kz='+stg_kz+'&output='+output,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
@@ -751,7 +766,7 @@ function StudentAbschlusspruefungPrintPruefungsprotokoll(lang)
 // * ein Zeugnis gedruckt.
 // * Den Typ (Bakk/Dipl) des Zeugnisses bestimmt der zuletzt markierte.
 // ****
-function StudentAbschlusspruefungPrintPruefungszeugnisMultiple(sprache)
+function StudentAbschlusspruefungPrintPruefungszeugnisMultiple(event, sprache)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-abschlusspruefung-tree');
@@ -812,13 +827,26 @@ function StudentAbschlusspruefungPrintPruefungszeugnisMultiple(sprache)
 		}
 	}
 
-	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid='+uids+'&xsl_stg_kz='+stg_kz,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	if (event.shiftKey) 
+	{
+	    var output='odt';
+	} 
+	else if (event.ctrlKey)
+	{
+		var output='doc';
+	}
+	else
+	{
+		var output='pdf';
+	}
+
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid='+uids+'&xsl_stg_kz='+stg_kz+'&output='+output,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
 // * Pruefungszeugnis fuer eine bestimmte Abschlusspruefung drucken
 // ****
-function StudentAbschlusspruefungPrintPruefungszeugnis()
+function StudentAbschlusspruefungPrintPruefungszeugnis(event)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-abschlusspruefung-tree');
@@ -838,7 +866,20 @@ function StudentAbschlusspruefungPrintPruefungszeugnis()
 	else
 		xsl='Diplomzeugnis';
 
-	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&abschlusspruefung_id='+abschlusspruefung_id,'PruefungsZeugnis', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	if (event.shiftKey) 
+	{
+	    var output='odt';
+	} 
+	else if (event.ctrlKey)
+	{
+		var output='doc';
+	}
+	else
+	{
+		var output='pdf';
+	}
+
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&abschlusspruefung_id='+abschlusspruefung_id+'&output='+output,'PruefungsZeugnis', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
@@ -847,7 +888,7 @@ function StudentAbschlusspruefungPrintPruefungszeugnis()
 // * eine Urkunde gedruckt.
 // * Den Typ (Bakk/Dipl) der Urkunde bestimmt der zuletzt markierte Student.
 // ****
-function StudentAbschlusspruefungPrintUrkundeMultiple(sprache)
+function StudentAbschlusspruefungPrintUrkundeMultiple(event, sprache)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-abschlusspruefung-tree');
@@ -903,14 +944,27 @@ function StudentAbschlusspruefungPrintUrkundeMultiple(sprache)
 		}
 	}
 
-	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl_stg_kz='+stg_kz+'&xsl='+xsl+'&uid='+uids,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	if (event.shiftKey) 
+	{
+	    var output='odt';
+	} 
+	else if (event.ctrlKey)
+	{
+		var output='doc';
+	}
+	else
+	{
+		var output='pdf';
+	}
+
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl_stg_kz='+stg_kz+'&xsl='+xsl+'&uid='+uids+'&output='+output,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
 // * Druckt eine Urkunde zu der ausgewaehlten Abschlusspruefung
 // * die Sprache der Urkunde wird als Parameter uebergeben
 // ****
-function StudentAbschlusspruefungPrintUrkunde(sprache)
+function StudentAbschlusspruefungPrintUrkunde(event, sprache)
 {
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var tree = document.getElementById('student-abschlusspruefung-tree');
@@ -941,7 +995,20 @@ function StudentAbschlusspruefungPrintUrkunde(sprache)
 	else if(pruefungstyp_kurzbz=='Abschluss' && sprache=='deutsch')
 	    xsl='Magisterurkunde';
 
-	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid=;'+uid+'&abschlusspruefung_id='+abschlusspruefung_id+'&output=pdf','Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	if (event.shiftKey) 
+	{
+	    var output='odt';
+	} 
+	else if (event.ctrlKey)
+	{
+		var output='doc';
+	}
+	else
+	{
+		var output='pdf';
+	}
+
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl='+xsl+'&uid=;'+uid+'&abschlusspruefung_id='+abschlusspruefung_id+'&output='+output,'Pruefungsprotokoll', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 function StudentAbschlusspruefungTypChange()

@@ -2954,6 +2954,44 @@ if(!$result = @$db->db_query("SELECT beschreibung FROM public.tbl_studiensemeste
 		echo ' public.tbl_studiensemester: Spalte beschreibung hinzugefuegt!<br>';
 }
 
+// Eigene Berechtigung fuer Betriebsmittel Studndenplan
+if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_stundenplan_betriebsmittel LIMIT 1"))
+{
+	$qry = "CREATE TABLE lehre.tbl_stundenplan_betriebsmittel
+	(
+		stundenplan_betriebsmittel_id bigint,
+		betriebsmittel_id bigint,
+		stundenplandev_id bigint,
+		anmerkung text,
+		insertamum timestamp,
+		insertvon varchar(32)
+	);
+
+	ALTER TABLE lehre.tbl_stundenplan_betriebsmittel ADD CONSTRAINT pk_stundenplan_betriebsmittel PRIMARY KEY (stundenplan_betriebsmittel_id);
+    
+    CREATE SEQUENCE lehre.seq_stundenplan_betriebsmittel_id
+	INCREMENT BY 1
+	NO MAXVALUE
+	NO MINVALUE
+	CACHE 1;
+
+	ALTER TABLE wawi.tbl_betriebsmittel ADD COLUMN verplanen boolean NOT NULL default false;
+    
+    ALTER TABLE lehre.tbl_stundenplan_betriebsmittel ALTER COLUMN stundenplan_betriebsmittel_id SET DEFAULT nextval('lehre.seq_stundenplan_betriebsmittel_id');
+    ALTER TABLE lehre.tbl_stundenplan_betriebsmittel ADD CONSTRAINT fk_stundenplan_betriebsmittel_stundenplandev FOREIGN KEY (stundenplandev_id) REFERENCES lehre.tbl_stundenplandev (stundenplandev_id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ALTER TABLE lehre.tbl_stundenplan_betriebsmittel ADD CONSTRAINT fk_stundenplan_betriebsmittel_betriebsmittel FOREIGN KEY (betriebsmittel_id) REFERENCES wawi.tbl_betriebsmittel (betriebsmittel_id) ON UPDATE CASCADE ON DELETE CASCADE;
+    
+    GRANT SELECT, INSERT, UPDATE, DELETE ON lehre.tbl_stundenplan_betriebsmittel TO vilesci;
+	GRANT SELECT, UPDATE ON lehre.seq_stundenplan_betriebsmittel_id TO vilesci;
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' system.tbl_berechtigung: Eigene Berechtigung fuer persoenliche Daten bei den Mitarbeitern mitarbeiter/persoenlich hinzugefuegt!<br>';
+
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -3087,6 +3125,7 @@ $tabellen=array(
 	"lehre.tbl_stunde"  => array("stunde","beginn","ende"),
 	"lehre.tbl_stundenplan"  => array("stundenplan_id","unr","mitarbeiter_uid","datum","stunde","ort_kurzbz","gruppe_kurzbz","titel","anmerkung","lehreinheit_id","studiengang_kz","semester","verband","gruppe","fix","updateamum","updatevon","insertamum","insertvon"),
 	"lehre.tbl_stundenplandev"  => array("stundenplandev_id","lehreinheit_id","unr","studiengang_kz","semester","verband","gruppe","gruppe_kurzbz","mitarbeiter_uid","ort_kurzbz","datum","stunde","titel","anmerkung","fix","updateamum","updatevon","insertamum","insertvon","ext_id"),
+	"lehre.tbl_stundenplan_betriebsmittel" => array("stundenplan_betriebsmittel_id","betriebsmittel_id","stundenplandev_id","anmerkung","insertamum","insertvon"),
 	"lehre.tbl_vertrag"  => array("vertrag_id","person_id","vertragstyp_kurzbz","bezeichnung","betrag","insertamum","insertvon","updateamum","updatevon","ext_id","anmerkung","vertragsdatum"),
 	"lehre.tbl_vertrag_vertragsstatus"  => array("vertragsstatus_kurzbz","vertrag_id","uid","datum","ext_id","insertamum","insertvon","updateamum","updatevon"),
 	"lehre.tbl_vertragstyp"  => array("vertragstyp_kurzbz","bezeichnung"),
@@ -3162,7 +3201,7 @@ $tabellen=array(
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige", "onlinebewerbung"),
 	"public.tbl_studiengangstyp" => array("typ","bezeichnung","beschreibung"),
-	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","studienjahr_kurzbz","ext_id"),
+	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","studienjahr_kurzbz","ext_id","beschreibung"),
 	"public.tbl_tag"  => array("tag"),
 	"public.tbl_variable"  => array("name","uid","wert"),
 	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung","mimetype"),
@@ -3190,7 +3229,7 @@ $tabellen=array(
 	"system.tbl_webservicetyp"  => array("webservicetyp_kurzbz","beschreibung"),
 	"system.tbl_server"  => array("server_kurzbz","beschreibung"),
 	"wawi.tbl_betriebsmittelperson"  => array("betriebsmittelperson_id","betriebsmittel_id","person_id", "anmerkung", "kaution", "ausgegebenam", "retouram","insertamum", "insertvon","updateamum", "updatevon","ext_id","uid"),
-	"wawi.tbl_betriebsmittel"  => array("betriebsmittel_id","betriebsmitteltyp","oe_kurzbz", "ort_kurzbz", "beschreibung", "nummer", "hersteller","seriennummer", "bestellung_id","bestelldetail_id", "afa","verwendung","anmerkung","reservieren","updateamum","updatevon","insertamum","insertvon","ext_id","inventarnummer","leasing_bis","inventuramum","inventurvon","anschaffungsdatum","anschaffungswert","hoehe","breite","tiefe","nummer2"),
+	"wawi.tbl_betriebsmittel"  => array("betriebsmittel_id","betriebsmitteltyp","oe_kurzbz", "ort_kurzbz", "beschreibung", "nummer", "hersteller","seriennummer", "bestellung_id","bestelldetail_id", "afa","verwendung","anmerkung","reservieren","updateamum","updatevon","insertamum","insertvon","ext_id","inventarnummer","leasing_bis","inventuramum","inventurvon","anschaffungsdatum","anschaffungswert","hoehe","breite","tiefe","nummer2","verplanen"),
 	"wawi.tbl_betriebsmittel_betriebsmittelstatus"  => array("betriebsmittelbetriebsmittelstatus_id","betriebsmittel_id","betriebsmittelstatus_kurzbz", "datum", "updateamum", "updatevon", "insertamum", "insertvon","anmerkung"),
 	"wawi.tbl_betriebsmittelstatus"  => array("betriebsmittelstatus_kurzbz","beschreibung"),
 	"wawi.tbl_betriebsmitteltyp"  => array("betriebsmitteltyp","beschreibung","anzahl","kaution","typ_code","mastershapename"),
