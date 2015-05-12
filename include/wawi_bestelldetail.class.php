@@ -198,6 +198,11 @@ class wawi_bestelldetail extends basis_db
 			$this->errormsg="Ungültige MWSt. eingegeben.";
 			return false; 
 		}
+		if($this->menge!='' && !fmod($this->menge,1)==0)
+		{
+			$this->errormsg = 'Menge muss eine ganze Zahl sein';
+			return false;
+		}
 		return true; 		
 	}
 	
