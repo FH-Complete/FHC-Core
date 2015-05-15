@@ -345,6 +345,59 @@ function TimeTableWeekGetMarkedIdList()
 }
 
 // ****
+// * Liefert die StundenplanIDs der markierten Stunden als array
+// ****
+function TimeTableWeekGetMarkedIdArray()
+{
+	var items = document.getElementsByTagName('button');
+	var ids = Array();
+	for each(var button in items)
+	{
+		if(button.id && button.id.startsWith('buttonSTPL'))
+		{
+			marked = button.getAttribute('marked');
+			if(marked=='true')
+			{
+				idlist = button.getAttribute('idList');
+
+				idarr = idlist.split(/&stundenplan_id[0-9]=/);
+
+				for(i in idarr)
+				{
+					if(idarr[i]=='')
+						continue;
+					ids.push(idarr[i]);
+				}
+			}
+		}
+	}
+	return ids;
+}
+
+// ****
+// * Liefert die IdList der Markierten Stunden
+// ****
+function TimeTableWeekGetMarkedHoursArray()
+{
+	var items = document.getElementsByTagName('button');
+	var stunden = Array();
+	var i=0;
+	for each(var button in items)
+	{
+		if(button.id && button.id.startsWith('buttonSTPL'))
+		{
+			marked = button.getAttribute('marked');
+			if(marked=='true')
+			{
+				stunden.push(button.getAttribute('stunde'));
+				i++;
+			}
+		}
+	}
+	return stunden;
+}
+
+// ****
 // * Klick auf eine Stunde im LV-Plan
 // ****
 function TimeTableWeekClick(event)
@@ -671,4 +724,44 @@ function StplWeekOpenNotiz(item)
 {
 	var lehreinheit_id=item.getAttribute('lehreinheit_id');
 	window.open('<?php echo APP_ROOT; ?>content/notizdialog.xul.php?lehreinheit_id='+lehreinheit_id,'Details', 'height=500,width=600,left=100,top=100,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+
+/**
+ * Oeffnet einen Dialog zur Zuordnung von Ressourcen zu Stundenplaneintraegen
+ */
+function BetriebsmittelZuordnen(item)
+{
+	url = '<?php echo APP_ROOT; ?>content/lvplanung/ressourcedialog.xul.php?';
+
+	var datum = item.getAttribute('datum');
+	url=url+'datum='+datum;
+
+	// Es werden die Stunden von allen markierten eintraegen geholt
+	var stunden = TimeTableWeekGetMarkedHoursArray(item);
+	if(stunden.length>0)
+	{
+		for(i in stunden)
+			url = url+'&stunde[]='+stunden[i];
+	
+		// Alle StundenplanIDs holen von den Eintraegen die markiert sind
+		var ids = TimeTableWeekGetMarkedIdArray();
+		for(i in ids)
+			url = url+'&stplid[]='+ids[i];
+	}
+	else
+	{
+		// Wenn kein eintrag markiert ist, wird der genommen auf den geklickt wurde
+		url = url+'&stunde[]'+item.getAttribute('stunde');
+		
+		idlist = item.getAttribute('idList');
+		idarr = idlist.split(/&stundenplan_id[0-9]=/);
+		for(i in idarr)
+		{
+			if(idarr[i]=='')
+				continue;
+			url = url+'&stplid[]'+idarr[i];
+		}
+
+	}			
+	window.open(url,'Details', 'height=350,width=800,left=100,top=100,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }

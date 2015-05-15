@@ -26,6 +26,7 @@ require_once('../include/studiensemester.class.php');
 require_once('../include/benutzer.class.php'); 
 require_once('../include/webservicelog.class.php'); 
 require_once('../include/datum.class.php'); 
+require_once('../include/addon.class.php');
 require_once('../include/'.EXT_FKT_PATH.'/serviceterminal.inc.php');
 
 ini_set("soap.wsdl_cache_enabled", "0");
@@ -41,6 +42,27 @@ function getNumber($cardNr)
     {
         $objArray = array('datum'=>'', 'errorMessage'=>'keine gültige  Nummer übergeben.');  
         return $objArray; 
+    }
+    
+    $addon_externeAusweise = false;
+    $addon = new addon();
+    $addon->loadAddons();
+    foreach($addon->result as $ad)
+    {
+	if($ad->kurzbz == "externeAusweise")
+	{
+	    $addon_externeAusweise = true;
+	}
+    }
+
+    if($addon_externeAusweise)
+    {
+	require_once (dirname(__FILE__).'/../addons/externeAusweise/include/idCard.class.php');
+	$idCard = new idCard();
+	if($idCard->loadByCardnumber($cardNr))
+	{
+	   return ServiceTerminalGetDrucktext($cardNr, $cardNr);
+	} 
     }
     
     // Karte ist noch nicht ausgegeben

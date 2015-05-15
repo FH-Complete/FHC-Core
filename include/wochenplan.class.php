@@ -42,6 +42,7 @@ require_once(dirname(__FILE__).'/phrasen.class.php');
 require_once(dirname(__FILE__).'/globals.inc.php'); 
 require_once(dirname(__FILE__).'/sprache.class.php');
 require_once(dirname(__FILE__).'/functions.inc.php');
+require_once(dirname(__FILE__).'/betriebsmittel.class.php');
 
 class wochenplan extends basis_db
 {
@@ -374,7 +375,7 @@ class wochenplan extends basis_db
 	 * @param datum Datum eines Tages in der angeforderten Woche
 	 * @return true oder false
 	 */
-	public function load_week($datum, $stpl_view='stundenplan')
+	public function load_week($datum, $stpl_view='stundenplan', $alle_unr_mitladen=false)
 	{
 		// Pruefung der Attribute
 		if (!isset($this->type))
@@ -398,7 +399,7 @@ class wochenplan extends basis_db
 
 		// Stundenplandaten ermittlen
 		$this->wochenplan=new lehrstunde();
-		$anz=$this->wochenplan->load_lehrstunden($this->type,$this->datum_begin,$this->datum_end,$this->pers_uid,$this->ort_kurzbz,$this->stg_kz,$this->sem,$this->ver,$this->grp,$this->gruppe_kurzbz, $stpl_view, null,$this->fachbereich_kurzbz,$this->lva);
+		$anz=$this->wochenplan->load_lehrstunden($this->type,$this->datum_begin,$this->datum_end,$this->pers_uid,$this->ort_kurzbz,$this->stg_kz,$this->sem,$this->ver,$this->grp,$this->gruppe_kurzbz, $stpl_view, null,$this->fachbereich_kurzbz,$this->lva, $alle_unr_mitladen);
 		if ($anz<0)
 		{
 			$this->errormsg=$this->wochenplan->errormsg;
@@ -612,7 +613,7 @@ class wochenplan extends basis_db
 		echo '"><img class="lvplanbutton" src="../../../skin/images/moreright_lvplan.png" title="'.$p->t('lvplan/vierWochenVor').'"></a>';
         echo '</p>';
         //Kalenderjump mit Hoverbox
-        jahreskalenderjump_hoverbox($this->link);
+        $this->jahreskalenderjump_hoverbox($this->link);
         return true;
 	}
 	
@@ -845,7 +846,7 @@ class wochenplan extends basis_db
 						$uEinheiten=array();
 						for($n=0;$n<count($unr);$n++)
 						{
-							$unrIndex=searchForId($unr[$n], $uEinheiten);
+							$unrIndex=$this->searchForId($unr[$n], $uEinheiten);
 							if($unrIndex===FALSE)
 							{
 								/*
@@ -1108,6 +1109,7 @@ class wochenplan extends basis_db
 		// Kontext Menue
 		echo '<popupset>
   				<menupopup id="stplPopupMenue">
+    				<menuitem label="Ressourcen zuordnen" oncommand="TimeTableWeekMarkiere(document.popupNode);BetriebsmittelZuordnen(document.popupNode);" />
 					<menuitem label="Raumvorschlag" oncommand="StplSearchRoom(document.popupNode);" />
     				<menuitem label="Entfernen" oncommand="TimeTableWeekMarkiere(document.popupNode);TimetableDeleteEntries()" />
   				</menupopup>
@@ -1207,7 +1209,7 @@ class wochenplan extends basis_db
 						$tooltip .= $bezeichnung;
 					}
 				}
-				echo '<vbox style="border:1px solid black; background-color:'.$bgcolor.'"';
+				echo '<vbox class="stplweek_vbox" style="border:1px solid black; background-color:'.$bgcolor.'"';
 				if($tooltip!='')
 				{
 					echo ' tooltiptext="'.$this->convert_html_chars($tooltip).'"';
@@ -1221,7 +1223,7 @@ class wochenplan extends basis_db
 					stg_kz="'.$this->stg_kz.'" sem="'.$this->sem.'" ver="'.$this->ver.'"
 					grp="'.$this->grp.'" gruppe="'.$this->gruppe_kurzbz.'"
 					pers_uid="'.$this->pers_uid.'" stpltype="'.$this->type.'">';
-
+				
 				if (isset($this->std_plan[$i][$j][0]->lehrfach))
 				{
 					// Daten aufbereiten
@@ -1229,6 +1231,7 @@ class wochenplan extends basis_db
 						unset($lvb);
 					//$lvb=array();
 					$kollision=-1;
+					unset($kollisionsmeldungen);
 					if (isset($a_unr))
 						unset($a_unr);
 					foreach ($this->std_plan[$i][$j] as $lehrstunde)
@@ -1279,9 +1282,16 @@ class wochenplan extends basis_db
 								}
 								$qry.="ORDER BY datum, stunde, student_uid LIMIT 1;";
 
-						if($this->db_query($qry))
-							if($this->db_num_rows()>0)
+						if($stud_result = $this->db_query($qry))
+						{
+							if($this->db_num_rows($stud_result)>0)
+							{
 								$kollision++;
+								$stud_row = $this->db_fetch_object($stud_result);
+								foreach($a_unr as $kollision_unr)
+									$kollisionsmeldungen[$kollision_unr][]=' Studentenkollision '.$stud_row->student_uid;
+							}
+						}
 							
 					}
 					else 
@@ -1295,26 +1305,29 @@ class wochenplan extends basis_db
 							$a=0;
 							foreach ($a_unr as $unr)
 							{
-								array_unique($a_lvb[$unr]);
+								$lvb_unr_arr[$a]=$unr;
 								$lvb[$a++]=$a_lvb[$unr];
 							}
-						
-						for ($a=0;$a<count($lvb)-1;$a++)
-							for ($b=0;$b<count($lvb[$a]);$b++)
-								for ($c=$a+1;$c<count($lvb);$c++)
-									for ($d=0;$d<count($lvb[$c]);$d++)
-									{
-										$s1=mb_substr($lvb[$a][$b],0,1);
-										$s2=mb_substr($lvb[$c][$d],0,1);
-										$v1=trim(mb_substr($lvb[$a][$b],1,1));
-										$v2=trim(mb_substr($lvb[$c][$d],1,1));
-										$g1=trim(mb_substr($lvb[$a][$b],2,1));
-										$g2=trim(mb_substr($lvb[$c][$d],2,1));
-										if ($s1==$s2 || !$s1 || $s1=='' || $s1=='0' || !$s2 || $s2=='' || $s2=='0')
-											if ($v1==$v2 || !$v1 || $v1=='' || $v1=='0' || !$v2 || $v2=='' || $v2=='0')
-												if ($g1==$g2 || !$g1 || $g1=='' || $g1=='0' || !$g2 || $g2=='' || $g2=='0')
-													$kollision++;
-									}
+							for ($a=0;$a<count($lvb)-1;$a++)
+								for ($b=0;$b<count($lvb[$a]);$b++)
+									for ($c=$a+1;$c<count($lvb);$c++)
+										for ($d=0;$d<count($lvb[$c]);$d++)
+										{
+											$s1=mb_substr($lvb[$a][$b],0,1);
+											$s2=mb_substr($lvb[$c][$d],0,1);
+											$v1=trim(mb_substr($lvb[$a][$b],1,1));
+											$v2=trim(mb_substr($lvb[$c][$d],1,1));
+											$g1=trim(mb_substr($lvb[$a][$b],2,1));
+											$g2=trim(mb_substr($lvb[$c][$d],2,1));
+											if ($s1==$s2 || !$s1 || $s1=='' || $s1=='0' || !$s2 || $s2=='' || $s2=='0')
+												if ($v1==$v2 || !$v1 || $v1=='' || $v1=='0' || !$v2 || $v2=='' || $v2=='0')
+													if ($g1==$g2 || !$g1 || $g1=='' || $g1=='0' || !$g2 || $g2=='' || $g2=='0')
+													{
+														$kollision++;
+														$kollisionsmeldungen[$lvb_unr_arr[$a]][]=' Gruppe '.trim($lvb[$a][$b]).' / '.trim($lvb[$c][$d]);
+														$kollisionsmeldungen[$lvb_unr_arr[$c]][]=' Gruppe '.trim($lvb[$a][$b]).' / '.trim($lvb[$c][$d]);
+													}
+										}
 						}
 					}
 					
@@ -1337,11 +1350,19 @@ class wochenplan extends basis_db
 							unset($updateamum);
 						if (isset($updatevon))
 							unset($updatevon);
+						$farbe='';
+						$tooltip_anmerkung=array();
 						$paramList='';
 						$z=0;
 						$reservierung=false;
+						$stundenplan_ids=array();
+
 						if(isset($raumcheck))
 							unset($raumcheck);
+
+						if(isset($lktcheck))
+							unset($lktcheck);
+
 						foreach ($this->std_plan[$i][$j] as $lehrstunde)
 						{
 							if ($lehrstunde->unr==$unr)
@@ -1374,17 +1395,34 @@ class wochenplan extends basis_db
 									$reservierung=true;
 								}
 								else
+								{
 									$paramList.='&amp;stundenplan_id'.$z++.'='.$lehrstunde->stundenplan_id;
-								if(isset($lehrstunde->farbe))
+									$stundenplan_ids[]=$lehrstunde->stundenplan_id;
+								}
+								if(isset($lehrstunde->farbe) && $farbe=='')
 									$farbe=$lehrstunde->farbe;
 								$titel=htmlspecialchars($lehrstunde->titel);
 								$anmerkung=htmlspecialchars($lehrstunde->anmerkung);
+								$tooltip_anmerkung[]=$titel.' '.$anmerkung;
 							}
 							
 							if(isset($raumcheck[$lehrstunde->ort]) && $raumcheck[$lehrstunde->ort]!=$lehrstunde->unr)
+							{
 								$kollision++;
+								$kollisionsmeldungen[$lehrstunde->unr][]=" Ort ".$lehrstunde->ort;
+								$kollisionsmeldungen[$raumcheck[$lehrstunde->ort]][]=" Ort ".$lehrstunde->ort;
+							}
 							else
 								$raumcheck[$lehrstunde->ort]=$lehrstunde->unr;
+
+							if(isset($lktcheck[$lehrstunde->lektor]) && $lktcheck[$lehrstunde->lektor]!=$lehrstunde->unr)
+							{
+								$kollision++;
+								$kollisionsmeldungen[$lehrstunde->unr][]=" LektorIn ".$lehrstunde->lektor; //." ".$lehrstunde->unr."!=".$lktcheck[$lehrstunde->lektor];
+								$kollisionsmeldungen[$lktcheck[$lehrstunde->lektor]][]=" LektorIn ".$lehrstunde->lektor; //." ".$lehrstunde->unr."!=".$lktcheck[$lehrstunde->lektor];
+							}
+							else
+								$lktcheck[$lehrstunde->lektor]=$lehrstunde->unr;
 						}
 						// Lektoren
 						//if ($this->type!='lektor')
@@ -1434,7 +1472,8 @@ class wochenplan extends basis_db
 							$updatevonam.=$u.' ';
 						
 						// Blinken oder nicht ?
-						if ($kollision)
+						if (isset($kollisionsmeldungen[$unr]) 
+					    || (isset($kollisionsmeldung) && count($kollisionsmeldungen, COUNT_RECURSIVE)==0 && $kollision>0)) 
 						{
 							$blink_ein='<html:blink>';// .$kollision;
 							$blink_aus='</html:blink>';
@@ -1447,10 +1486,15 @@ class wochenplan extends basis_db
 
 						$stg_obj = new studiengang();
 						$stg_obj->load($stg_kz);
-						
+						$tooltip_anmerkung = array_unique($tooltip_anmerkung);
+						$tooltip_gesamt = '('.$updatevonam.') '.implode(',',$tooltip_anmerkung);
+
+						if(isset($kollisionsmeldungen[$unr]))
+							$tooltip_gesamt .= ' Kollision wegen:'.implode(',',array_unique($kollisionsmeldungen[$unr]));
+
 						// Ausgabe
 						echo '<button id="buttonSTPL'.$count.'"
-							tooltiptext="('.$updatevonam.') '.$titel.' - '.$anmerkung.'"
+							tooltiptext="'.$this->convert_html_chars($tooltip_gesamt).'"
 							style="border:1px solid transparent;'.((isset($farbe) && $farbe!='')?'background-color:#'.$farbe:'').';-moz-appearance:none"
 							styleOrig="border:1px solid transparent;'.((isset($farbe) && $farbe!='')?'background-color:#'.$farbe:'').';-moz-appearance:none" ';
 						if ($berechtigung->isBerechtigt('lehre/lvplan',$stg_obj->oe_kurzbz,'uid'))
@@ -1458,6 +1502,9 @@ class wochenplan extends basis_db
 						if ($berechtigung->isBerechtigt('lehre/lvplan',$stg_obj->oe_kurzbz,'u'))
 							echo 'ondraggesture="nsDragAndDrop.startDrag(event,listObserver)" ';
 						//onclick="return onStplSearchRoom(event, event.target);"
+						$button_orte = $this->ort_kurzbz;
+						if($button_orte=='')
+							$button_orte=$ort[0];
 						echo 'ondragdrop="nsDragAndDrop.drop(event,boardObserver)"
 							ondragover="nsDragAndDrop.dragOver(event,boardObserver)"
 							oncommand="TimeTableWeekClick(event)"
@@ -1470,7 +1517,7 @@ class wochenplan extends basis_db
 							stg_kz="'.$this->stg_kz.'" sem="'.$this->sem.'" ver="'.$this->ver.'"
 							grp="'.$this->grp.'" gruppe="'.$this->gruppe_kurzbz.'"
 							datum="'.date("Y-m-d",$datum).'" stunde="'.$j.'" wochentag="'.$i.'"
-							pers_uid="'.$this->pers_uid.'" ort_kurzbz="'.$this->ort_kurzbz.'">';
+							pers_uid="'.$this->pers_uid.'" ort_kurzbz="'.$button_orte.'">';
 						
 						echo '<label align="center">'.$blink_ein;
 						$count++;
@@ -1480,6 +1527,20 @@ class wochenplan extends basis_db
 						{
 							echo '<image src="../../skin/images/sticky.png" tooltip="'.$titel.'"/>';
 						}
+
+						// Zugeteilte Ressourcen Anzeigen
+						$betriebsmittel = new betriebsmittel();
+						if($betriebsmittel->getBetriebsmittelStundenplan($stundenplan_ids))
+						{
+							if(count($betriebsmittel->result)>0)
+							{
+								$ressourceinfo='';
+								foreach($betriebsmittel->result as $row)
+									$ressourceinfo.=$row->beschreibung.' ';
+								echo '<image src="../../skin/images/group.png" tooltip="'.$this->convert_html_chars($ressourceinfo).'"/>';
+							}
+						}
+
 						echo '<html:br />';
 						echo $lvb;
 						if ($this->type!='lektor')
@@ -1526,6 +1587,7 @@ class wochenplan extends basis_db
 						}
 					}
 				}
+				echo '<description class="stplweek_tagesinfo">'.date("D",$datum).'-'.$j.'</description>';
 				echo '</vbox>'.$this->crlf;
 			}
 			echo "</row>";
@@ -1611,6 +1673,8 @@ class wochenplan extends basis_db
 				$gruppe[]=$row->gruppe_kurzbz;
 			else
 				$gruppe[]='';
+			if(!isset($lehrverband[$i]))
+				$lehrverband[$i]= new stdClass();
 			$lehrverband[$i]->stg_kz=$row->studiengang_kz;
 			$lehrverband[$i]->sem=$row->semester;
 			$lehrverband[$i]->ver=$row->verband;
@@ -1930,7 +1994,7 @@ class wochenplan extends basis_db
 			$lkt.=" OR mitarbeiter_uid=".$this->db_add_param($l);
 		$lkt=mb_substr($lkt,3);
 		//Dummy Lektor kollidiert nicht
-		$lkt='(('.$lkt.") AND mitarbeiter_uid!='_DummyLektor')";
+		$lkt='(('.$lkt.') AND mitarbeiter_uid not in ('.$this->db_implode4SQL(unserialize(KOLLISIONSFREIE_USER)).'))';
 		// Gruppen
 		$gruppen='';
 		if (isset($gruppe))
@@ -2499,48 +2563,51 @@ class wochenplan extends basis_db
 		else
 			return false;
 	}		
-}
 
-function jahreskalenderjump_hoverbox($link)	//Mit Hoverbox Effekt
-{
-	$sprache = getSprache(); 
-	$p=new phrasen($sprache); 
-	$crlf=crlf();
-	$datum=time();
-	$woche=kalenderwoche($datum);
-	$wochenmontag=montag($datum);
-	
-	echo '<table align="center"><tr valign="top"><td>
-	<div class="hoverbox">
-		<div class="preview">
-			<img src="../../../skin/images/down_lvplan.png" border="0"/>
-			<div class="hoverbox_inhalt">
-				<table class="hoverbox"><tr>'.$crlf;
-	for ($anz=1;$anz<25;$anz++)
+	protected function searchForId($id, $array) 
 	{
-		$linknew=$link.'&datum='.$datum;
-		if ($woche==53)
-			$woche=1;
-		echo '			<td style="padding: 3px;" align="center"><A HREF="'.$linknew.'"><nobr>KW '.$woche.'</nobr><br>'.date('d.m', $wochenmontag).'</A></td>'.$crlf;
-		if ($anz%8==0)
-			echo '			</tr><tr align="center">'.$crlf;
-		$datum+=60*60*24*7;
-		$woche++;
-		$wochenmontag+=60*60*24*7;
-	}
-	echo '			</tr></table></div></div></div></td></tr></table>'.$crlf;
-}
-
-function searchForId($id, $array) 
-{
-   foreach ($array as $key => $val) 
-   {
-       if ($val['unr'] == $id) 
+	   foreach ($array as $key => $val) 
 	   {
-           return $key;
-       }
-   }
-   return false;
-}
+		   if ($val['unr'] == $id) 
+		   {
+		       return $key;
+		   }
+	   }
+	   return false;
+	}
 
+	/**
+	 * Gibt einen HTML-Dialog mit den Kalenderwochen aus
+	 * @param $link
+	 */
+	protected function jahreskalenderjump_hoverbox($link)
+	{
+		$sprache = getSprache(); 
+		$p=new phrasen($sprache); 
+		$crlf=crlf();
+		$datum=time();
+		$woche=kalenderwoche($datum);
+		$wochenmontag=montag($datum);
+	
+		echo '<table align="center"><tr valign="top"><td>
+		<div class="hoverbox">
+			<div class="preview">
+				<img src="../../../skin/images/down_lvplan.png" border="0"/>
+				<div class="hoverbox_inhalt">
+					<table class="hoverbox"><tr>'.$crlf;
+		for ($anz=1;$anz<25;$anz++)
+		{
+			$linknew=$link.'&datum='.$datum;
+			if ($woche==53)
+				$woche=1;
+			echo '			<td style="padding: 3px;" align="center"><A HREF="'.$linknew.'"><nobr>KW '.$woche.'</nobr><br>'.date('d.m', $wochenmontag).'</A></td>'.$crlf;
+			if ($anz%8==0)
+				echo '			</tr><tr align="center">'.$crlf;
+			$datum+=60*60*24*7;
+			$woche++;
+			$wochenmontag+=60*60*24*7;
+		}
+		echo '			</tr></table></div></div></div></td></tr></table>'.$crlf;
+	}
+}
 ?>

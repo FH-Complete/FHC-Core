@@ -103,6 +103,27 @@ function ParseReturnValue(response)
 	//debug('data:'+this.dbdml_data+' errormsg:'+this.dbdml_errormsg+' return:'+this.dbdml_return );
 }
 
+function parseRDFString(str, url)
+{
+	try {
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	} catch(e) {
+		alert(e);
+		return;
+	}
+
+  var memoryDS = Components.classes["@mozilla.org/rdf/datasource;1?name=in-memory-datasource"].createInstance(Components.interfaces.nsIRDFDataSource);
+
+  var ios=Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
+  baseUri=ios.newURI(url,null,null);
+
+  var parser=Components.classes["@mozilla.org/rdf/xml-parser;1"].createInstance(Components.interfaces.nsIRDFXMLParser);
+  parser.parseString(memoryDS,baseUri,str);
+
+  return memoryDS;
+}
+
+
 // ****
 // * Zeigt einen Text in der Statusbar an
 // ****
@@ -260,3 +281,38 @@ function getUsername()
 {
 	return '<?php echo get_uid(); ?>';
 }
+
+// ****
+// * Laedt den Wert einer Variable aus der DB
+// ****
+function getvariable(variable)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+
+	// Request absetzen
+	
+	var url = '<?php echo APP_ROOT ?>content/fasDBDML.php';
+
+	var req = new phpRequest(url,'','');
+
+	req.add('type', 'getvariable');
+	req.add('name', variable);
+	
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response)
+		else
+			alert(val.dbdml_errormsg)
+		return false;
+	}
+	else
+	{
+		return val.dbdml_data;
+	}
+}
+

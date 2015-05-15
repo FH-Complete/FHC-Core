@@ -322,6 +322,18 @@ function loadVariables($user)
 		global $emailadressentrennzeichen;
 		$emailadressentrennzeichen=',';
 	}
+	
+	if(!isset($alle_unr_mitladen))
+	{
+		global $alle_unr_mitladen;
+		$alle_unr_mitladen='false';
+	}
+	if(!isset($allow_lehrstunde_drop))
+	{
+		global $allow_lehrstunde_drop;
+		$allow_lehrstunde_drop='false';
+	}
+
 	return $error_msg;
 }
 

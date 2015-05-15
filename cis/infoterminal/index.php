@@ -41,6 +41,7 @@
     require_once('../../include/konto.class.php'); 
     require_once('../../include/functions.inc.php'); 
     require_once('../../include/authentication.class.php'); 
+    require_once('../../include/addon.class.php'); 
 	require_once('../../include/'.EXT_FKT_PATH.'/serviceterminal.inc.php');
 
 	if (!$db = new basis_db())
@@ -92,7 +93,7 @@
 			unset($_SESSION[constSESSIONNAME]);
 		$uid='';
 		$work='raumanzeigen';
-	  	$raumtyp_kurzbz='EDV';
+	  	$raumtyp_kurzbz=$ServiceTerminalDefaultRaumtyp;
 	}
 
 	
@@ -107,22 +108,49 @@
 	// Login Prozedure wenn Anmeldung ueber einen Schluessel erfolgte 
 	// - Lesen der Betriebsmittel um Anwender zu ermitteln ( es wird hier kein Passwort benoetigt / LDAP )
 	$cardlogin=false;
+	$cardnumber = "";
 	if ($db && !empty($key_input)) // Login 
 	{
-		// Pruefen ob es sich um eine HEX Eingabe handelt 
-		
-		$betriebsmittel = new betriebsmittel(); 
-		//$key_input = $betriebsmittel->transform_kartennummer($key_input); 
+	    // Pruefen ob es sich um eine HEX Eingabe handelt 
+	    $betriebsmittel = new betriebsmittel(); 
+	    //$key_input = $betriebsmittel->transform_kartennummer($key_input); 
         
-        // führende nullen entfernen
-        $key_input = preg_replace("/^0*/", "", $key_input);
-		$uidStudent = getUidFromCardNumber($key_input); 
-		if($uidStudent != false)
+	    // führende nullen entfernen
+	    $key_input = preg_replace("/^0*/", "", $key_input);
+	    $uidStudent = getUidFromCardNumber($key_input); 
+	    if($uidStudent != false)
+	    {
+		$uid = $uidStudent; 
+		$work = "login"; 
+		$cardlogin = true;
+	    }
+	    else
+	    {
+		$addon_externeAusweise = false;
+		$addon = new addon();
+		$addon->loadAddons();
+		foreach($addon->result as $ad)
 		{
-			$uid = $uidStudent; 
-			$work = "login"; 
-			$cardlogin = true; 
+		    if($ad->kurzbz == "externeAusweise")
+		    {
+			$addon_externeAusweise = true;
+		    }
 		}
+
+		if($addon_externeAusweise)
+		{
+		    require_once (dirname(__FILE__).'/../../addons/externeAusweise/include/idCard.class.php');
+		    $idCard = new idCard();
+		    if($idCard->loadByCardnumber($key_input))
+		    {
+			$uid = "";
+			$cardnumber = $idCard->cardnumber;
+			$work = "verlaengerung";
+			$cardlogin = true;
+			$_SESSION[constSESSIONNAME]["uid"]=$cardnumber;
+		    }
+		}
+	    }
 	}
 		
 	if (mb_strtolower($work)=='login')
@@ -485,7 +513,7 @@ $refreshtime = ($sdtools?99999:(isset($_SESSION[constSESSIONNAME]["uid"]) && !em
     echo '<a href="'.htmlspecialchars($_SERVER['PHP_SELF']).'?standort_id='.$standort_id.'">
     			<img alt="Logo" src="../../skin/styles/'.DEFAULT_STYLE.'/logo.png" border="0" style="max-width: 170px; max-height: 150px">
     	  </a></td></tr>';
-	if(isset($_SESSION[constSESSIONNAME]["uid"])  && !empty($_SESSION[constSESSIONNAME]["uid"]) ) 
+	if(isset($_SESSION[constSESSIONNAME]["uid"])  && !empty($_SESSION[constSESSIONNAME]["uid"]) && !empty($_SESSION[constSESSIONNAME]["pwd"])) 
 	{
 		//Angemeldeter User -  Stundenplan der Woche
 		echo '
@@ -506,8 +534,7 @@ $refreshtime = ($sdtools?99999:(isset($_SESSION[constSESSIONNAME]["uid"]) && !em
 	
 	// Tabelle der Raumtypen	
 	echo html_output_liste_raumtypen($row_ort);
-
-	if(isset($_SESSION[constSESSIONNAME]["uid"])  && !empty($_SESSION[constSESSIONNAME]["uid"]) ) 
+	if(isset($_SESSION[constSESSIONNAME]["uid"])  && !empty($_SESSION[constSESSIONNAME]["uid"]) && empty($cardnumber)) 
 	{
 		 //Angemeldeter User -  Stundenplan der Woche	
 		 echo '
@@ -610,7 +637,7 @@ $refreshtime = ($sdtools?99999:(isset($_SESSION[constSESSIONNAME]["uid"]) && !em
 	}	
     else if (strtolower($work)==strtolower("verlaengerung") && isset($_SESSION[constSESSIONNAME]))
 	{
-		karten_verlaengerung($_SESSION[constSESSIONNAME]["uid"]);
+		karten_verlaengerung($_SESSION[constSESSIONNAME]["uid"],$cardnumber);
 	}	
 	else if (mb_strtolower($work)==mb_strtolower("stundenplan") && isset($_SESSION[constSESSIONNAME]["uid"])  && !empty($_SESSION[constSESSIONNAME]["uid"]) )
 	{
@@ -752,46 +779,46 @@ function meine_uid_informationen($db,$uid,$user="")
 * Zeigt die Oberfläche zur Kartenverlängerung an
 * @param $uid Userkurzzeichen
 */
-function karten_verlaengerung($uid)
+function karten_verlaengerung($uid, $cardnumber=NULL)
 {
-    $studienbeitrag = false; 
-
-    
-    // Mitarbeiter brauchen die Karte nicht verlängern
- 
-    $cardPerson = new benutzer(); 
-    if(!$cardPerson->load($uid))
+    if(is_null($cardnumber))
     {
-        die('Konnte User nicht laden');  
+	$studienbeitrag = false;
+	// Mitarbeiter brauchen die Karte nicht verlängern
+
+	$cardPerson = new benutzer(); 
+	if(!$cardPerson->load($uid))
+	{
+	    die('Konnte User nicht laden');  
+	}
+
+	$html_user_daten='';
+	$html_user_daten.='<h1>Verl&auml;ngerung Studienausweis</h1>';
+	$html_user_daten.='<table>
+		    <tr>
+			<td valign="top">
+			    <table>
+				<tr>
+				    <td><b><font size="+2">'.($cardPerson->titelpre?$cardPerson->titelpre.' ':'').$cardPerson->vorname.' '.$cardPerson->nachname.' '.($cardPerson->titelpost?$cardPerson->titelpost:'').'</font></b>&nbsp;</td>
+				</tr>
+				<tr>
+				    <td></td>
+				</tr>
+			    </table>
+			&nbsp;</td>
+			<td valign="top">
+			    <table>
+				<tr><td>&nbsp;</td></tr>
+			    </table>
+			&nbsp;</td>
+		    </tr>	
+	</table>';
+
+	echo $html_user_daten;
     }
-
-    $html_user_daten='';
-    $html_user_daten.='<h1>Verl&auml;ngerung Studienausweis</h1>';
-    $html_user_daten.='<table>
-                <tr>
-                    <td valign="top">
-                        <table>
-                            <tr>
-                                <td><b><font size="+2">'.($cardPerson->titelpre?$cardPerson->titelpre.' ':'').$cardPerson->vorname.' '.$cardPerson->nachname.' '.($cardPerson->titelpost?$cardPerson->titelpost:'').'</font></b>&nbsp;</td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                            </tr>
-                        </table>
-                    &nbsp;</td>
-                    <td valign="top">
-                        <table>
-                            <tr><td>&nbsp;</td></tr>
-                        </table>
-                    &nbsp;</td>
-                </tr>	
-    </table>';
-
-    echo $html_user_daten;
-
     // User zur Karte konnte nicht geladen werden
         
-	$data = ServiceTerminalCheckVerlaengerung($uid);
+	$data = ServiceTerminalCheckVerlaengerung($uid, $cardnumber);
     
 	if($data[0]===true)
     {

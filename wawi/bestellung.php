@@ -2184,7 +2184,12 @@ if($_GET['method']=='update')
 			var brutto =  $("#brutto_"+i).val(); 
 			brutto = brutto.replace(",",".");
 			var sort = $("#sort_"+i).val();
-			
+		
+			if(menge!="" && !(menge%1==0))
+			{
+				alert("Menge muss eine ganze Zahl sein");
+				return false;
+			}	
 			var detailid= $("#bestelldetailid_"+i).val();
 			if(detailid != "")
 			{ 
