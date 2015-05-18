@@ -146,7 +146,7 @@ function onselectTreeProjektphase()
     var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                getService(Components.interfaces.nsIRDFService);
     var subject = rdfService.GetResource("http://www.technikum-wien.at/projektphase/" + projektphase_id);
-	console.log(subject);
+	//console.log(subject);
     var predicateNS = "http://www.technikum-wien.at/projektphase/rdf";
 
     //Daten holen
