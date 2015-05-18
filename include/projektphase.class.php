@@ -35,12 +35,15 @@ class projektphase extends basis_db
 	public $projekt_kurzbz;	    //string
 	public $projektphase_fk;	    //string
 	public $bezeichnung;	    //string
+	public $typ='Projektphase';	    	//string
 	public $beschreibung;	    //string
 	public $start;		    //date 	
 	public $ende;		    //date 	
 	public $personentage;	    //integer
     public $farbe; 
 	public $budget;	    	// numeric
+	public $ressource_id;	    // bigint
+	public $ressource_bezeichnung;	    // string
 	public $insertamum;	    // timestamp
 	public $insertvon;	    // bigint
 	public $updateamum;	    // timestamp
@@ -72,7 +75,9 @@ class projektphase extends basis_db
 			return false;
 		}
 		
-		$qry = "SELECT * FROM fue.tbl_projektphase WHERE projektphase_id=".$this->db_add_param($projektphase_id, FHC_INTEGER);
+		$qry = "SELECT tbl_projektphase.*, tbl_ressource.bezeichnung AS ressource_bezeichnung 
+				FROM fue.tbl_projektphase LEFT OUTER JOIN fue.tbl_ressource USING (ressource_id)
+				WHERE projektphase_id=".$this->db_add_param($projektphase_id, FHC_INTEGER);
 		
 		if($this->db_query($qry))
 		{
@@ -82,12 +87,15 @@ class projektphase extends basis_db
 				$this->projektphase_id = $row->projektphase_id;
 				$this->projektphase_fk = $row->projektphase_fk;
 				$this->bezeichnung = $row->bezeichnung;
+				$this->typ = $row->typ;
 				$this->beschreibung = $row->beschreibung;
 				$this->start = $row->start;
 				$this->ende = $row->ende;
 				$this->personentage = $row->personentage;
                 $this->farbe = $row->farbe;
 				$this->budget = $row->budget;
+				$this->ressource_id = $row->ressource_id;
+				$this->ressource_bezeichnung = $row->ressource_bezeichnung;
 				$this->insertamum = $row->insertamum;
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
@@ -138,12 +146,14 @@ class projektphase extends basis_db
 				$obj->projektphase_id = $row->projektphase_id;
 				$obj->projektphase_fk = $row->projektphase_fk;
 				$obj->bezeichnung = $row->bezeichnung;
+				$obj->typ = $row->typ;
 				$obj->beschreibung = $row->beschreibung;
 				$obj->start = $row->start;
 				$obj->ende = $row->ende;
 				//$obj->personentage = $row->personentage;
                 $obj->farbe = $row->farbe;
 				$obj->budget = $row->budget;
+				$obj->ressource_id = $row->ressource_id;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
@@ -170,7 +180,9 @@ class projektphase extends basis_db
 	public function getProjektphasen($projekt_kurzbz, $foreignkey = null)
 	{
 		$this->result=array();
-		$qry = "SELECT * FROM fue.tbl_projektphase WHERE projekt_kurzbz=".$this->db_add_param($projekt_kurzbz);
+		$qry = "SELECT tbl_projektphase.*, tbl_ressource.bezeichnung AS ressource_bezeichnung
+				FROM fue.tbl_projektphase LEFT OUTER JOIN fue.tbl_ressource USING (ressource_id)
+				WHERE projekt_kurzbz=".$this->db_add_param($projekt_kurzbz);
 		//echo "\n".$qry."\n";
 		
 		if(!is_null($foreignkey))
@@ -188,12 +200,15 @@ class projektphase extends basis_db
 				$obj->projektphase_id = $row->projektphase_id;
 				$obj->projektphase_fk = $row->projektphase_fk;
 				$obj->bezeichnung = $row->bezeichnung;
+				$obj->typ = $row->typ;
 				$obj->beschreibung = $row->beschreibung;
 				$obj->start = $row->start;
 				$obj->ende = $row->ende;
 				//$obj->personentage = $row->personentage;
                 $obj->farbe = $row->farbe;
 				$obj->budget = $row->budget;
+				$obj->ressource_id = $row->ressource_id;
+				$obj->ressource_bezeichnung = $row->ressource_bezeichnung;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
@@ -218,7 +233,9 @@ class projektphase extends basis_db
      */
     public function getAllUnterphasen($phase_id)
     {
-        $qry = "SELECT * FROM fue.tbl_projektphase WHERE projektphase_fk =".$this->db_add_param($phase_id, FHC_INTEGER); 
+        $qry = "SELECT tbl_projektphase.*, tbl_ressource.bezeichnung AS ressource_bezeichung
+				FROM fue.tbl_projektphase LEFT OUTER JOIN fue.tbl_ressource USING (ressource_id)
+				WHERE projektphase_fk =".$this->db_add_param($phase_id, FHC_INTEGER); 
         
         if($result = $this->db_query($qry))
         {
@@ -230,12 +247,15 @@ class projektphase extends basis_db
 				$obj->projektphase_id = $row->projektphase_id;
 				$obj->projektphase_fk = $row->projektphase_fk;
 				$obj->bezeichnung = $row->bezeichnung;
+				$obj->typ = $row->typ;
 				$obj->beschreibung = $row->beschreibung;
 				$obj->start = $row->start;
 				$obj->ende = $row->ende;
 				//$obj->personentage = $row->personentage;
                 $obj->farbe = $row->farbe;
 				$obj->budget = $row->budget;
+				$obj->ressource_id = $row->ressource_id;
+				$obj->ressource_bezeichnung = $row->ressource_bezeichnung;
 				$obj->insertamum = $row->insertamum;
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
@@ -264,6 +284,11 @@ class projektphase extends basis_db
 		if(mb_strlen($this->bezeichnung)>32)
 		{
 			$this->errormsg='Bezeichnung darf nicht laenger als 32 Zeichen sein';
+			return false;
+		}
+		if(mb_strlen($this->typ)>32)
+		{
+			$this->errormsg='Typ darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
 		if(mb_strlen($this->projekt_kurzbz)>16)
@@ -296,14 +321,16 @@ class projektphase extends basis_db
 			//Neuen Datensatz einfuegen
 
 			$qry='BEGIN; INSERT INTO fue.tbl_projektphase (projekt_kurzbz, projektphase_fk, bezeichnung, 
-				beschreibung, start, ende, budget, insertvon, insertamum, updatevon, updateamum, farbe, personentage) VALUES ('.
+				beschreibung, start, ende, budget, ressource_id, insertvon, insertamum, updatevon, updateamum, farbe, personentage) VALUES ('.
 			     $this->db_add_param($this->projekt_kurzbz).', '.
 			     $this->db_add_param($this->projektphase_fk).', '.
 				 $this->db_add_param($this->bezeichnung).', '.
+			     $this->db_add_param($this->typ).', '.
 			     $this->db_add_param($this->beschreibung).', '.
 			     $this->db_add_param($this->start).', '.
 			     $this->db_add_param($this->ende).', '.
 			     $this->db_add_param($this->budget).', '.
+			     $this->db_add_param($this->ressource_id).', '.
 			     $this->db_add_param($this->insertvon).', now(), '.
 			     $this->db_add_param($this->updatevon).', now(), '.
                  $this->db_add_param($this->farbe).', '.
@@ -317,10 +344,12 @@ class projektphase extends basis_db
 				'projekt_kurzbz='.$this->db_add_param($this->projekt_kurzbz).', '.
 				'projektphase_fk='.$this->db_add_param($this->projektphase_fk).', '.
 				'bezeichnung='.$this->db_add_param($this->bezeichnung).', '.
+				'typ='.$this->db_add_param($this->typ).', '.
 				'beschreibung='.$this->db_add_param($this->beschreibung).', '.
 				'start='.$this->db_add_param($this->start).', '.
 				'ende='.$this->db_add_param($this->ende).', '.
 				'budget='.$this->db_add_param($this->budget).', '.
+                'ressource_id='.$this->db_add_param($this->ressource_id).', '.
                 'farbe='.$this->db_add_param($this->farbe).', '.
 				'personentage='.$this->db_add_param($this->personentage).', '.
 				'updateamum= now(), '.

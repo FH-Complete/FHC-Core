@@ -146,13 +146,15 @@ function onselectTreeProjektphase()
     var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                getService(Components.interfaces.nsIRDFService);
     var subject = rdfService.GetResource("http://www.technikum-wien.at/projektphase/" + projektphase_id);
-
+	console.log(subject);
     var predicateNS = "http://www.technikum-wien.at/projektphase/rdf";
 
     //Daten holen
     var projekt_kurzbz = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#projekt_kurzbz" ));
     var projektphase_fk=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#projektphase_fk" ));
+    var ressource_id=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ressource_id" ));
     var bezeichnung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bezeichnung" ));
+    var typ=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#typ" ));
     var beschreibung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#beschreibung" ));
     var start=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#start" ));
     var ende=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ende" ));
@@ -160,13 +162,18 @@ function onselectTreeProjektphase()
     var personentage=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#personentage" ));
     var farbe=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#farbe" ));
     
+    //alert(typ);
+    
     //Daten den Feldern zuweisen
 	var menulist = document.getElementById('menulist-projektphase-detail-projektphase_fk');
 	ProjektphaseFkLoad(menulist, projekt_kurzbz, projektphase_id);
+    menulist = document.getElementById('menulist-projektphase-detail-ressource');
+	RessourceTaskLoad(menulist, projektphase_id);
     document.getElementById('textbox-projektphase-detail-projekt_kurzbz').value=projekt_kurzbz;
     document.getElementById('textbox-projektphase-detail-projektphase_id').value=projektphase_id;
     document.getElementById('textbox-projektphase-detail-beschreibung').value=beschreibung;
     document.getElementById('textbox-projektphase-detail-bezeichnung').value=bezeichnung;
+    document.getElementById('textbox-projektphase-detail-typ').value=typ;
     document.getElementById('textbox-projektphase-detail-start').value=start;
     document.getElementById('textbox-projektphase-detail-ende').value=ende;
     document.getElementById('textbox-projektphase-detail-budget').value=budget;
@@ -174,6 +181,7 @@ function onselectTreeProjektphase()
     document.getElementById('textbox-projektphase-detail-farbe').value=farbe;
     document.getElementById('checkbox-projektphase-detail-neu').checked=false;
     MenulistSelectItemOnValue('menulist-projektphase-detail-projektphase_fk', projektphase_fk);
+	MenulistSelectItemOnValue('menulist-projektphase-detail-ressource', ressource_id);
     
     //Notizen zu einer Phase Laden
 	notiz = document.getElementById('box-projektphase-notizen');
@@ -214,8 +222,10 @@ function saveProjektphaseDetail()
 	//Werte holen
 	projektphase_id = document.getElementById('textbox-projektphase-detail-projektphase_id').value;
 	projektphase_fk = document.getElementById('menulist-projektphase-detail-projektphase_fk').value;
+	ressource_id = document.getElementById('menulist-projektphase-detail-ressource').value;
 	projekt_kurzbz = document.getElementById('textbox-projektphase-detail-projekt_kurzbz').value;
 	bezeichnung = document.getElementById('textbox-projektphase-detail-bezeichnung').value;
+	typ = document.getElementById('textbox-projektphase-detail-typ').value;
 	beschreibung = document.getElementById('textbox-projektphase-detail-beschreibung').value;
 	start = document.getElementById('textbox-projektphase-detail-start').iso;
 	ende = document.getElementById('textbox-projektphase-detail-ende').iso;
@@ -233,6 +243,7 @@ function saveProjektphaseDetail()
 	phase.appendChild(new SOAPObject("projektphase_fk")).val(projektphase_fk);
 	phase.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
 	phase.appendChild(new SOAPObject("bezeichnung")).cdataval(bezeichnung);
+	phase.appendChild(new SOAPObject("typ")).cdataval(typ);
 	phase.appendChild(new SOAPObject("beschreibung")).cdataval(beschreibung);
 	phase.appendChild(new SOAPObject("start")).val(start);
 	phase.appendChild(new SOAPObject("ende")).val(ende);
@@ -314,6 +325,7 @@ function ProjektphaseDetailReset()
 	document.getElementById('textbox-projektphase-detail-projektphase_id').value='';
 	document.getElementById('textbox-projektphase-detail-projekt_kurzbz').value='';
 	document.getElementById('textbox-projektphase-detail-bezeichnung').value='';
+	document.getElementById('textbox-projektphase-detail-typ').value='Projektphase';
 	document.getElementById('textbox-projektphase-detail-beschreibung').value='';
 	document.getElementById('textbox-projektphase-detail-start').value='';
 	document.getElementById('textbox-projektphase-detail-ende').value='';
@@ -327,7 +339,9 @@ function ProjektphaseDetailReset()
 function ProjektphaseDetailDisable(val)
 {
 	document.getElementById('menulist-projektphase-detail-projektphase_fk').disabled=val;
+	document.getElementById('menulist-projektphase-detail-ressource').disabled=val;
 	document.getElementById('textbox-projektphase-detail-bezeichnung').disabled=val;
+	document.getElementById('textbox-projektphase-detail-typ').disabled=val;
 	document.getElementById('textbox-projektphase-detail-beschreibung').disabled=val;
 	document.getElementById('textbox-projektphase-detail-start').disabled=val;
 	document.getElementById('textbox-projektphase-detail-ende').disabled=val;
@@ -359,12 +373,20 @@ function ProjektphaseNeu()
     ProjektphaseFkLoad(menulist, projekt_kurzbz);
     MenulistSelectItemOnValue('menulist-projektphase-detail-projektphase_fk', '');
     
+    
+    //Menulist fuer Ressourcen laden und optionalen Eintrag markieren
+    menulist = document.getElementById('menulist-projektphase-detail-ressource');
+    RessourceTaskLoad(menulist, projektphase_id);
+    MenulistSelectItemOnValue('menulist-projektphase-detail-ressource', '');
+    
+    
     document.getElementById('textbox-projektphase-detail-projekt_kurzbz').value=projekt_kurzbz;
     
     //Neu Status setzen
     document.getElementById('caption-projektphase-detail').label='Neue Phase';
     document.getElementById('checkbox-projektphase-detail-neu').checked=true;
     document.getElementById('textbox-projektphase-detail-farbe').value='#0000FF';
+    document.getElementById('textbox-projektphase-detail-typ').value='Projektphase';
     
     //Detail Tab auswaehlen
 	document.getElementById('projektphase-tabs').selectedItem=document.getElementById('projektphase-tab-detail');	
