@@ -92,6 +92,7 @@
   	$hoehe=isset($_REQUEST['hoehe'])?$_REQUEST['hoehe']:'';
 	$breite=isset($_REQUEST['breite'])?$_REQUEST['breite']:'';
 	$tiefe=isset($_REQUEST['tiefe'])?$_REQUEST['tiefe']:'';
+	$verplanen=isset($_REQUEST['verplanen'])?$_REQUEST['verplanen']:false;
 	
 	$jahr_monat=trim(isset($_REQUEST['jahr_monat']) ? $_REQUEST['jahr_monat']:'');
   	$inventur_jahr=trim(isset($_REQUEST['inventur_jahr']) ? $_REQUEST['inventur_jahr']:'');
@@ -236,6 +237,7 @@
 			$hoehe = $oBetriebsmittel->hoehe;
 			$breite = $oBetriebsmittel->breite;
 			$tiefe = $oBetriebsmittel->tiefe;
+			$verplanen = $oBetriebsmittel->verplanen;
 
 			$bestellung_id_old=$bestellung_id;
 			$bestelldetail_id_old=$bestelldetail_id;
@@ -829,6 +831,10 @@ if($betriebsmittel_id!='' || $anzahl_lock)
 							<td>
 								<input id="tiefe" name="tiefe" size="4" maxlength="8" value="<?php echo $tiefe;?>">
 							</td>
+							<td>&nbsp;<label for="tiefe">Verplanen</label>&nbsp;</td>
+							<td>
+								<input type="checkbox" id="verplanen" name="verplanen" <?php echo ($verplanen?'checked=checked':'');?>>
+							</td>
 						</tr>
 					</table>
 				</td>
@@ -904,6 +910,7 @@ $anschaffungswert_array=(isset($_REQUEST['anschaffungswert_array'])?$_REQUEST['a
 $hoehe_array=(isset($_REQUEST['hoehe_array'])?$_REQUEST['hoehe_array']:array());
 $breite_array=(isset($_REQUEST['breite_array'])?$_REQUEST['breite_array']:array());
 $tiefe_array=(isset($_REQUEST['tiefe_array'])?$_REQUEST['tiefe_array']:array());
+$verplanen_array=(isset($_REQUEST['verplanen_array'])?$_REQUEST['verplanen_array']:array());
 
 for ($pos=0;$pos<$anzahl;$pos++) 
 {
@@ -933,6 +940,7 @@ for ($pos=0;$pos<$anzahl;$pos++)
 	$hoehe_array[$pos]=isset($hoehe_array[$pos]) && $work=='save' ?trim($hoehe_array[$pos]):$hoehe;
 	$breite_array[$pos]=isset($breite_array[$pos]) && $work=='save' ?trim($breite_array[$pos]):$breite;
 	$tiefe_array[$pos]=isset($tiefe_array[$pos]) && $work=='save' ?trim($tiefe_array[$pos]):$tiefe;
+	//$verplanen_array[$pos]=isset($verplanen_array[$pos]) && $work=='save' ?trim($verplanen_array[$pos]):$verplanen;
 	
 	if ($work=='save')
 	{
@@ -1012,6 +1020,11 @@ for ($pos=0;$pos<$anzahl;$pos++)
 				$oBetriebsmittel->tiefe = number_format(str_replace(',','.',$tiefe_array[$pos]),2,'.','');
 			else
 				$oBetriebsmittel->tiefe = '';
+
+			if(!isset($verplanen_array[$pos]))
+				$oBetriebsmittel->verplanen = false;
+			else
+				$oBetriebsmittel->verplanen = true;
 			
 			if ($oBetriebsmittel->save())
 			{
@@ -1581,6 +1594,10 @@ for ($pos=0;$pos<$anzahl;$pos++)
 									<td>&nbsp;<label for="tiefe">Tiefe in Meter</label>&nbsp;</td>
 									<td>
 										<input id="tiefe_array<?php echo $pos; ?>" name="tiefe_array[]" size="4" maxlength="8" value="<?php echo $tiefe_array[$pos];?>">
+									</td>
+									<td>&nbsp;<label for="tiefe">Verplanbar</label>&nbsp;</td>
+									<td>
+										<input type="checkbox" id="verplanen_array<?php echo $pos; ?>" name="verplanen_array[]" <?php echo (isset($verplanen_array[$pos]) && $verplanen_array[$pos]?'checked=checked':'');?>>
 									</td>
 								</tr>
 							</table>

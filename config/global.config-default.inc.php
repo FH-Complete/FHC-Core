@@ -150,4 +150,5 @@ define('STIP_USER_PASSWORD','password');
 define('BEWERBERTOOL_STUDIENAUSWAHL_ANZEIGEN', true);
 define('BEWERBERTOOL_STANDORTAUSWAHL_ANZEIGEN', false);
 
+define('KOLLISIONSFREIE_USER',serialize(array('_DummyLektor')));
 ?>

@@ -471,11 +471,11 @@ if(isset($_GET['type']) && $_GET['type']=='edit')
 	}
 }
 
-//Projekte holen fuer zu denen der Benutzer zugeteilt ist
+//Projekte holen zu denen der Benutzer zugeteilt ist
 $projekt = new projekt();
 
 
-if($projekt->getProjekteMitarbeiter($user))
+if($projekt->getProjekteMitarbeiter($user, true))
 {
 	//if(count($projekt->result)>0)
 	//{

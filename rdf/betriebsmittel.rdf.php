@@ -43,7 +43,15 @@ if(isset($_GET['filter']))
 else 
 	$filter = '';
 
-$datum = new datum();
+if(isset($_GET['datum']))
+	$datum = $_GET['datum'];
+else 
+	$datum = '';
+
+if(isset($_GET['stunde']))
+	$stunde = $_GET['stunde'];
+else 
+	$stunde = '';
 
 $betriebsmittel = new betriebsmittel();
 
@@ -85,6 +93,16 @@ elseif($filter!='')
 		draw_rdf($row);
 	
 		
+}
+elseif($datum!='')
+{
+	$betriebsmittel->getVerplanbar($datum, $stunde);
+
+	if(isset($betriebsmittel->result) && count($betriebsmittel->result)>0)
+	{
+		foreach ($betriebsmittel->result as $row)
+			draw_rdf($row);
+	}
 }
 
 

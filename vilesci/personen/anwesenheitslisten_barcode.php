@@ -123,6 +123,7 @@ $studiengang->getAll("typ, kurzbz");
 				<td>Studiengang</td>
 				<td>
 					<select name="stg_kz">
+						<option value=''>-- Alle --</option>
 						<?php foreach($studiengang->result as $value) echo "<option value='$value->studiengang_kz'>$value->kuerzel ($value->bezeichnung)</option>\n"; ?>
 					</select>
 				</td>

@@ -67,6 +67,7 @@ class betriebsmittel extends basis_db
 	public $hoehe;
 	public $breite;
 	public $tiefe;
+	public $verplanen=false;
 	
 	public $nummer2;
 
@@ -137,7 +138,8 @@ class betriebsmittel extends basis_db
 				$this->nummer2 = $row->nummer2;
                 $this->anschaffungsdatum = $row->anschaffungsdatum;
                 $this->anschaffungswert = $row->anschaffungswert; 
-				
+				$this->verplanen = $this->db_parse_bool($row->verplanen);
+
 				return true;
 			}
 			else
@@ -276,7 +278,7 @@ class betriebsmittel extends basis_db
 				, inventarnummer, reservieren, ort_kurzbz
 				,ext_id, insertamum, insertvon, updateamum, updatevon,oe_kurzbz,hersteller,seriennummer
 				,bestellung_id,bestelldetail_id,afa,verwendung,anmerkung,leasing_bis, inventuramum, inventurvon, 
-				anschaffungsdatum, anschaffungswert, hoehe, breite, tiefe, nummer2) VALUES('.
+				anschaffungsdatum, anschaffungswert, hoehe, breite, tiefe, nummer2,verplanen) VALUES('.
 				$this->db_add_param($this->beschreibung).', '.
 				$this->db_add_param($this->betriebsmitteltyp).', '.
 				$this->db_add_param($this->nummer).', '.
@@ -304,7 +306,8 @@ class betriebsmittel extends basis_db
 				$this->db_add_param($this->hoehe).', '.
 				$this->db_add_param($this->breite).', '.
 				$this->db_add_param($this->tiefe).','.
-				$this->db_add_param($this->nummer2).');' ;				
+				$this->db_add_param($this->nummer2).','.
+				$this->db_add_param($this->verplanen, FHC_BOOLEAN).');' ;				
 		}
 		else
 		{
@@ -340,6 +343,7 @@ class betriebsmittel extends basis_db
 				'hoehe='.$this->db_add_param($this->hoehe).', '.
 				'breite='.$this->db_add_param($this->breite).', '.
 				'tiefe='.$this->db_add_param($this->tiefe).', '.
+				'verplanen='.$this->db_add_param($this->verplanen, FHC_BOOLEAN).','.
 				'nummer2='.$this->db_add_param($this->nummer2).' '.
 				'WHERE betriebsmittel_id='.$this->db_add_param($this->betriebsmittel_id).';';
 		}
@@ -1221,5 +1225,210 @@ class betriebsmittel extends basis_db
                 return false; 
         }
     }
+
+	/**
+	 * Liefert die Betriebsmittelzuordnungen zu Stundenplaneintraegen
+	 * @param $stundenplan_ids Array mit StundenplanIDs
+	 * @return boolean
+	 */
+	public function getBetriebsmittelStundenplan($stundenplan_ids)
+	{
+		if(count($stundenplan_ids)>0)
+		{
+			$qry = "SELECT 
+						tbl_stundenplan_betriebsmittel.stundenplan_betriebsmittel_id, tbl_stundenplan_betriebsmittel.anmerkung,
+						tbl_betriebsmittel.betriebsmittel_id, tbl_betriebsmittel.beschreibung, tbl_stundenplandev.stunde
+					FROM 
+						lehre.tbl_stundenplan_betriebsmittel 
+						JOIN lehre.tbl_stundenplandev USING(stundenplandev_id)
+						JOIN wawi.tbl_betriebsmittel USING(betriebsmittel_id)
+					WHERE
+						tbl_stundenplan_betriebsmittel.stundenplandev_id in( ".$this->db_implode4SQL($stundenplan_ids).")";
+	
+			if($result = $this->db_query($qry))
+			{
+				while($row = $this->db_fetch_object($result))
+				{
+					$obj = new stdclass();
+
+					$obj->betriebsmittel_id = $row->betriebsmittel_id;
+					$obj->beschreibung = $row->beschreibung;
+					$obj->stundenplan_betriebsmittel_id=$row->stundenplan_betriebsmittel_id;
+					$obj->anmerkung = $row->anmerkung;
+					$obj->stunde = $row->stunde;
+				
+					$this->result[] = $obj;
+				}
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Laden der Daten';
+				return false;
+			}
+		}
+		else
+			return true;
+	}
+
+	/**
+	 * Liefert die Betriebsmittel die zum angegebenen Datum und den Stunden frei und verplanbar ist
+	 * @param $datum Datum
+	 * @param $stunden array mit stunden
+	 * @return boolean
+	 */
+	public function getVerplanbar($datum, $stunden)
+	{
+		$qry = "SELECT 
+					* 
+				FROM 
+					wawi.tbl_betriebsmittel 
+				WHERE 
+					verplanen=true 
+					AND NOT EXISTS(SELECT 1 FROM lehre.tbl_stundenplan_betriebsmittel 
+						JOIN lehre.tbl_stundenplandev USING(stundenplandev_id)
+						WHERE 
+							betriebsmittel_id=tbl_betriebsmittel.betriebsmittel_id
+							AND tbl_stundenplandev.datum=".$this->db_add_param($datum)."
+							AND tbl_stundenplandev.stunde in(".$this->db_implode4SQL($stunden)."))";
+
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$bm = new betriebsmittel();
+
+				$bm->betriebsmittel_id = $row->betriebsmittel_id;
+				$bm->beschreibung = $row->beschreibung;
+				$bm->betriebsmitteltyp = $row->betriebsmitteltyp;
+				$bm->nummer = $row->nummer;
+				$bm->inventarnummer = $row->inventarnummer;
+				$bm->reservieren = $row->reservieren;
+				$bm->ort_kurzbz = $row->ort_kurzbz;
+				$bm->updateamum = $row->updateamum;
+				$bm->updatevon = $row->updatevon;
+				$bm->insertamum = $row->insertamum;
+				$bm->insertvon = $row->insertvon;
+				$bm->beschreibung = $row->beschreibung;
+				$bm->oe_kurzbz = $row->oe_kurzbz;
+				$bm->hersteller = $row->hersteller;
+				$bm->seriennummer = $row->seriennummer;
+				$bm->bestellung_id = $row->bestellung_id;
+				$bm->bestelldetail_id = $row->bestelldetail_id;
+				$bm->afa = $row->afa;
+				$bm->verwendung = $row->verwendung;
+				$bm->anmerkung = $row->anmerkung;
+				$bm->leasing_bis = $row->leasing_bis;
+				$bm->inventuramum = $row->inventuramum;
+				$bm->inventurvon = $row->inventurvon;
+				$bm->nummer2 = $row->nummer2;
+                $bm->anschaffungsdatum = $row->anschaffungsdatum; 
+                $bm->anschaffungswert = $row->anschaffungswert; 
+
+				$this->result[] = $bm;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Loescht eine Zuordnung
+	 * @param $stundenplan_betriebsmittel_id
+	 * @return boolean
+	 */
+	function deleteStundenplanBetriebsmittel($stundenplan_betriebsmittel_id)
+	{
+		$qry = "DELETE FROM lehre.tbl_stundenplan_betriebsmittel WHERE stundenplan_betriebsmittel_id=".$this->db_add_param($stundenplan_betriebsmittel_id, FHC_INTEGER);
+
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg ='Fehler beim Loeschen';
+			return false;
+		}
+	}
+
+	/**
+	 * Speichert die Zuordnung von Betriebsmitteln zu Stundenplaneintraegen
+	 * @return boolean
+	 */
+	function saveStundenplanBetriebsmittel()
+	{
+		if($this->new)
+		{
+			$qry = "INSERT INTO lehre.tbl_stundenplan_betriebsmittel(betriebsmittel_id, stundenplandev_id, anmerkung, insertamum, insertvon) VALUES(".
+					$this->db_add_param($this->betriebsmittel_id).','.
+					$this->db_add_param($this->stundenplandev_id).','.
+					$this->db_add_param($this->anmerkung).','.
+					$this->db_add_param($this->insertamum).','.
+					$this->db_add_param($this->insertvon).');';
+		}
+		else
+		{
+			$qry = "UPDATE lehre.tbl_stundenplan_betriebsmittel SET
+						anmerkung=".$this->db_add_param($this->anmerkung)."
+						WHERE stundenplan_betriebsmittel_id=".$this->db_add_param($this->stundenplan_betriebsmittel_id, FHC_INTEGER);
+		}
+		
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Speichern der Daten:'.$qry.$this->db_last_error();;
+			return false;
+		}
+	}
+
+	/**
+	 * Laedt die Betriebsmittel-Stundenplan Zuordnung
+	 * @param $stundenplan_betriebsmittel_id
+	 * @return boolean
+	 */
+	function loadBetriebsmittelStundenplan($stundenplan_betriebsmittel_id)
+	{
+		$qry = "SELECT 
+					tbl_stundenplan_betriebsmittel.*,
+					tbl_betriebsmittel.beschreibung as bm_beschreibung
+				FROM 
+					lehre.tbl_stundenplan_betriebsmittel 
+					JOIN wawi.tbl_betriebsmittel USING(betriebsmittel_id)
+				WHERE stundenplan_betriebsmittel_id=".$this->db_add_param($stundenplan_betriebsmittel_id, FHC_INTEGER);
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				$this->stundenplan_betriebsmittel_id = $row->stundenplan_betriebsmittel_id;
+				$this->betriebsmittel_id = $row->betriebsmittel_id;
+				$this->stundenplandev_id = $row->stundenplandev_id;
+				$this->anmerkung = $row->anmerkung;
+				$this->insertamum = $row->insertamum;
+				$this->insertvon = $row->insertvon;
+				$this->beschreibung = $row->bm_beschreibung;
+				return true;
+			}
+			else
+			{
+				$this->errormsg = 'Eintrag wurde nicht gefunden';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }
 ?>

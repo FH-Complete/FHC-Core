@@ -63,6 +63,13 @@ elseif ($ignore_kollision=='false')
 else
 	$ignore_kollision=(boolean)true;
 
+if (!isset($alle_unr_mitladen))
+	$alle_unr_mitladen=(boolean)false;
+elseif ($alle_unr_mitladen=='false')
+	$alle_unr_mitladen=(boolean)false;
+else
+	$alle_unr_mitladen=(boolean)true;
+
 // Bezeichnungen fuer Tabellen und Views
 $lva_stpl_view=VIEW_BEGIN.'lva_'.$db_stpl_table;
 
@@ -129,6 +136,15 @@ if(isset($_GET['fachbereich_kurzbz']))
 else
 	$fachbereich_kurzbz=null;
 
+if (isset($_GET['new_unr']))
+	$new_unr=$_GET['new_unr'];
+else
+	$new_unr=null;
+
+if (isset($_GET['new_blockung']))
+	$new_blockung=$_GET['new_blockung'];
+else
+	$new_blockung=null;
 ?>
 
 <!DOCTYPE page SYSTEM "chrome://tempus/locale/de-AT/tempus.dtd">
@@ -142,6 +158,7 @@ else
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/DragAndDrop.js"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/dragboard.js.php"/>
 <script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/functions.js.php"/>
+<script type="application/x-javascript" src="<?php echo APP_ROOT; ?>content/phpRequest.js.php" />
 <?php
 if (isset($semesterplan) && $semesterplan)
 	echo '<script type="application/x-javascript" src="'.APP_ROOT.'content/lvplanung/stpl-semester-overlay.js.php"/>';
@@ -386,6 +403,12 @@ elseif ($aktion=='lva_single_set')
 		{
 			$lva[$z]=new lehreinheit();
 			$lva[$z]->loadLE($le_id);
+
+			if($new_unr!='')
+				$lva[$z]->unr=$new_unr;
+			if($new_blockung!='')
+				$lva[$z]->stundenblockung=$new_blockung;
+
 			//$error_msg.='test'.$le_id.($lva[$i]->errormsg).($lva[$i]->stundenblockung);
 			for ($j=0;$j<$lva[$z]->stundenblockung && $error_msg=='';$j++)
 				if (!$lva[$z]->check_lva($new_datum,$new_stunde+$j,$new_ort,$db_stpl_table) && !$ignore_kollision)
@@ -394,9 +417,17 @@ elseif ($aktion=='lva_single_set')
 		}
 		for ($i=0;$i<$z && $error_msg=='';$i++)
 		{
+			if($new_unr!='')
+				$lva[$i]->unr=$new_unr;
+			if($new_blockung!='')
+				$lva[$i]->stundenblockung=$new_blockung;
+
 			for ($j=0;$j<$lva[$i]->stundenblockung;$j++)
+			{
+				
 				if (!$lva[$i]->save_stpl($new_datum,$new_stunde+$j,$new_ort,$db_stpl_table,$uid))
 					$error_msg.='Error: '.$lva[$i]->errormsg;
+			}
 		}
 	}
 	else
@@ -417,7 +448,7 @@ elseif ($aktion=='lva_multi_set')
 			$ferien->getAll(0);
 	
 		// Ende holen
-		if (!$result_semester=$db->db_query("SELECT * FROM public.tbl_studiensemester WHERE studiensemester_kurzbz='".addslashes($semester_aktuell)."';"))
+		if (!$result_semester=$db->db_query("SELECT * FROM public.tbl_studiensemester WHERE studiensemester_kurzbz=".$db->db_add_param($semester_aktuell).";"))
 			die ($db->db_last_error());
 		if ($db->db_num_rows()>0)
 		{
@@ -622,7 +653,7 @@ while ($begin<=$ende)
 	}
 	
 	// Stundenplan einer Woche laden
-	if (! $stdplan->load_week($datum,$db_stpl_table))
+	if (! $stdplan->load_week($datum,$db_stpl_table, $alle_unr_mitladen))
 		$error_msg.=$stdplan->errormsg;
 	
 	//Raumvorschlag setzen

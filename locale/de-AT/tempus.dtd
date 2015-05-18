@@ -50,6 +50,14 @@
 <!ENTITY menu-prefs-ignore_kollision.label    	"ignore_kollision">
 <!ENTITY menu-prefs-ignore_kollision.accesskey	"k">
 
+<!ENTITY menu-prefs-alle_unr_mitladen.key      	"a">
+<!ENTITY menu-prefs-alle_unr_mitladen.label    	"Alle Einträge laden">
+<!ENTITY menu-prefs-alle_unr_mitladen.accesskey	"a">
+
+<!ENTITY menu-prefs-allow_lehrstunde_drop.key      	"l">
+<!ENTITY menu-prefs-allow_lehrstunde_drop.label    	"Drop auf Lehrstunde">
+<!ENTITY menu-prefs-allow_lehrstunde_drop.accesskey	"l">
+
 <!ENTITY menu-prefs-kollision_student.key      	"s">
 <!ENTITY menu-prefs-kollision_student.label    	"kollision_student">
 <!ENTITY menu-prefs-kollision_student.accesskey	"s">

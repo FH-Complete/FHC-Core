@@ -501,6 +501,25 @@ var boardObserver=
 				var new_ort=evt.target.getAttribute("ort_kurzbz");
 				var kollisionsanzahl=evt.target.getAttribute("kollision");
 			}
+			else if(evt.target.tagName=="button")
+			{
+	
+				if(getvariable('allow_lehrstunde_drop')=='true')
+				{
+					// Wenn direkt auf die Stunde gezogen wird, wird der Raum uebernommen und die unr gleich gesetzt
+					ort=evt.target.getAttribute("ort_kurzbz");
+					var new_unr=evt.target.getAttribute("unr");
+					var new_ort=ort;
+
+					// zusaetzlich wird diese zu allen Stunden (gesamter Block) dazugebucht
+					var new_blockung=getNewBlockung(evt.target);
+				}
+				else
+				{
+					alert('Bitte waehlen Sie einen Ort oder aktivieren Sie die Option allow_lehrstunde_drop');
+					return false;
+				}
+			}
 			else
 			{
 				if (dropdata.flavour.contentType=="application/tempus-lehrveranstaltung")
@@ -518,11 +537,17 @@ var boardObserver=
 				url+="&new_ort="+new_ort+"&kollisionsanzahl="+kollisionsanzahl;
 			else
 				url+="&aktion=stpl_move";
+	
+			if(new_unr)
+				url+="&new_unr="+new_unr;
+			if(new_blockung)
+				url+="&new_blockung="+new_blockung;
+
 			url+="&mime="+dropdata.flavour.contentType;
-			
 			//IDs der Stunden die verschoben werden dazuhaengen
 			//idList = TimeTableWeekGetMarkedIdList();
 			//url+=idList;
+			//alert("url:"+url);
 			if(new_ort=='' && ort=='')
 			{
 				alert('Es muss ein Ort gewaehlt werden');
@@ -535,6 +560,30 @@ var boardObserver=
   	}
 };
 
+// Holt die Anzahl der Bloecke nach dem uebergebenen mit der selben unr
+function getNewBlockung(item)
+{
+	var items = document.getElementsByTagName('button');
+	var unr = item.getAttribute('unr');
+	var stunde = item.getAttribute('stunde');
+	var wochentag = item.getAttribute('wochentag');
+	var blockung=1;
+	for each(var button in items)
+	{
+		if(button.id && button.id.startsWith('buttonSTPL'))
+		{
+			buttonunr=button.getAttribute('unr');
+			buttonwochentag=button.getAttribute('wochentag');
+			buttonstunde=button.getAttribute('stunde');
+			
+			if(buttonunr==unr && buttonwochentag==wochentag && buttonstunde>stunde)
+			{
+				blockung=blockung+1;
+			}
+		}
+	}
+	return blockung;
+}
 
 // ****
 // * Observer fuer den Lehrverbandstree

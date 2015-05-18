@@ -128,8 +128,8 @@ function jumpKalender(){
 	else if (document.getElementById('studiensemester').value == '') {
 	    alert("<?php echo $p->t('lvplan/bitteEinStudiensemesterAuswaehlen');?>");
 	  } 
-	  else {window.open ('stpl_kalender.php?type=verband&stg_kz='+document.getElementById('stg_kz_semplan').value+'&sem='+document.getElementById('sem').value
-			+'&ver='+document.getElementById('ver').value+'&grp='+document.getElementById('grp').value+'&begin='+document.getElementById('studiensemester').value+'&format=html', '_blank');
+	  else {window.open ('stpl_kalender.php?type=verband&stg_kz='+document.getElementById('stg_kz_semplan').value+'&sem='+document.getElementById('sem_semplan').value
+			+'&ver='+document.getElementById('ver_semplan').value+'&grp='+document.getElementById('grp_semplan').value+'&begin='+document.getElementById('studiensemester').value+'&format=html', '_blank');
 	  }
 }
 function checkSetStudiengang(){
@@ -179,6 +179,95 @@ $(document).ready(function()
 			}
 			});
 	});
+
+function LoadSemester(type)
+{
+	if(typeof type=='undefined')
+		type='';
+
+	var studiengang_kz = $('#stg_kz'+type).val();
+	$.ajax({
+		url: "lvplan_autocomplete.php",
+		data: { 'autocomplete':'getSemester',
+				'stg_kz':studiengang_kz
+			 },
+		type: "POST",
+		dataType: "json",
+		success: function(data) 
+		{
+			$("#sem"+type).empty();
+			$("#sem"+type).append('<option value=""><?php echo $p->t('lvplan/sem'); ?></option>');
+			$.each(data, function(i, data){
+				$("#sem"+type).append('<option value="'+data+'">'+data+'</option>');
+			});
+		},
+		error: function(data) 
+		{
+			alert("Fehler beim Laden der Daten");
+		}
+	});
+}
+function LoadVerband(type)
+{
+	if(typeof type=='undefined')
+		type='';
+
+	var studiengang_kz = $('#stg_kz'+type).val();
+	var semester = $('#sem'+type).val();
+	$.ajax({
+		url: "lvplan_autocomplete.php",
+		data: { 'autocomplete':'getVerband',
+				'stg_kz':studiengang_kz,
+				'sem':semester
+			 },
+		type: "POST",
+		dataType: "json",
+		success: function(data) 
+		{
+			$("#ver"+type).empty();
+			$("#ver"+type).append('<option value=""><?php echo $p->t('lvplan/ver'); ?></option>');
+			$.each(data, function(i, data){
+				$("#ver"+type).append('<option value="'+data+'">'+data+'</option>');
+			});
+		},
+		error: function(data) 
+		{
+			alert("Fehler beim Laden der Daten");
+		}
+	});
+}
+function LoadGruppe(type)
+{
+	if(typeof type=='undefined')
+		type='';
+
+	var studiengang_kz = $('#stg_kz'+type).val();
+	var semester = $('#sem'+type).val();
+	var verband = $('#ver'+type).val();
+	$.ajax({
+		url: "lvplan_autocomplete.php",
+		data: { 'autocomplete':'getGruppe',
+				'stg_kz':studiengang_kz,
+				'sem':semester,
+				'ver':verband
+			 },
+		type: "POST",
+		dataType: "json",
+		success: function(data) 
+		{
+			$("#grp"+type).empty();
+			$("#grp"+type).append('<option value=""><?php echo $p->t('lvplan/grp'); ?></option>');
+			$.each(data, function(i, data){
+				$("#grp"+type).append('<option value="'+data+'">'+data+'</option>');
+			});
+		},
+		error: function(data) 
+		{
+			alert("Fehler beim Laden der Daten");
+		}
+	});
+}
+
 </script>
 </head>
 
@@ -282,7 +371,7 @@ $(document).ready(function()
 			<table width="10%" border="0" cellpadding="0" cellspacing="3">
 			<tr>
 			<td width="20%" valign="middle">
-				<select style="width:200px;" id="stg_kz" name="stg_kz">
+				<select style="width:200px;" id="stg_kz" name="stg_kz" onchange="LoadSemester()">
 					<option value="" selected>'.$p->t('lvplan/studiengangAuswaehlen').'</option>';
 				
 			$num_rows=$db->db_num_rows($result_stg);
@@ -296,7 +385,7 @@ $(document).ready(function()
 				</select>
 			</td>
 			<td valign="middle">
-				<select name="sem">
+				<select id="sem" name="sem" onchange="LoadVerband()">
 				<option value="0">'.$p->t('lvplan/sem').'</option>
 				<option value="1">1</option>
 				<option value="2">2</option>
@@ -309,7 +398,7 @@ $(document).ready(function()
 				</select>
 			</td>
 			<td valign="middle">
-				<select name="ver">
+				<select id="ver" name="ver" onchange="LoadGruppe()">
 				<option value="0" selected>'.$p->t('lvplan/ver').'</option>
 				<option value="A">A</option>
 				<option value="B">B</option>
@@ -321,14 +410,14 @@ $(document).ready(function()
 				</select>
 			</td>
 			<td valign="middle" >
-				<select name="grp">
+				<select id="grp" name="grp">
 				<option value="0" selected>'.$p->t('lvplan/grp').'</option>
 				<option value="1">1</option>
 				<option value="2">2</option>
 				<option value="3">3</option>
 				<option value="4">4</option>
-				<option value="4">5</option>
-				<option value="4">6</option>
+				<option value="5">5</option>
+				<option value="6">6</option>
 				</select>
 			</td>
 			<td valign="bottom">
@@ -350,7 +439,7 @@ if(!defined('CIS_LVPLAN_ARCHIVAUSWAHL_ANZEIGEN') || CIS_LVPLAN_ARCHIVAUSWAHL_ANZ
 		<table border="0" cellpadding="0" cellspacing="3">
 		<tr>
 		<td valign="bottom">
-			<select style="width:200px;" name="stg_kz_semplan" id="stg_kz_semplan">
+			<select style="width:200px;" name="stg_kz_semplan" id="stg_kz_semplan" onchange="LoadSemester(\'_semplan\')">
 				<option value="" selected>'.$p->t('lvplan/studiengangAuswaehlen').'</option>';
 				
 	$num_rows=$db->db_num_rows($result_stg);
@@ -364,7 +453,7 @@ if(!defined('CIS_LVPLAN_ARCHIVAUSWAHL_ANZEIGEN') || CIS_LVPLAN_ARCHIVAUSWAHL_ANZ
 			</select>
 		</td>
 		<td valign="middle">
-			<select name="sem" id="sem">
+			<select name="sem" id="sem_semplan" onchange="LoadVerband(\'_semplan\')">
 			<option value="01">'.$p->t('lvplan/sem').'</option>
 			<option value="1">1</option>
 			<option value="2">2</option>
@@ -377,7 +466,7 @@ if(!defined('CIS_LVPLAN_ARCHIVAUSWAHL_ANZEIGEN') || CIS_LVPLAN_ARCHIVAUSWAHL_ANZ
 			</select>
 		</td>
 		<td valign="middle">
-			<select name="ver" id="ver">
+			<select name="ver" id="ver_semplan" onchange="LoadGruppe(\'_semplan\')">
 			<option value="0" selected>'.$p->t('lvplan/ver').'</option>
 			<option value="A">A</option>
 			<option value="B">B</option>
@@ -389,14 +478,14 @@ if(!defined('CIS_LVPLAN_ARCHIVAUSWAHL_ANZEIGEN') || CIS_LVPLAN_ARCHIVAUSWAHL_ANZ
 			</select>
 		</td>
 		<td valign="middle" >
-			<select name="grp" id="grp">
+			<select name="grp" id="grp_semplan">
 			<option value="0" selected>'.$p->t('lvplan/grp').'</option>
 			<option value="1">1</option>
 			<option value="2">2</option>
 			<option value="3">3</option>
 			<option value="4">4</option>
-			<option value="4">5</option>
-			<option value="4">6</option>
+			<option value="5">5</option>
+			<option value="6">6</option>
 			</select>
 		</td></tr><tr>
 		<td valign="middle" >';

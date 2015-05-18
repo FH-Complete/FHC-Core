@@ -212,6 +212,14 @@ elseif(in_array($xsl,array('Lehrveranstaltungszeugnis','Zertifikat','Diplomurkun
 		exit;
 	}
 }
+elseif(in_array($xsl,array('Ressource')))
+{
+	if(!$rechte->isBerechtigt('lehre/lvplan'))
+	{
+		echo 'Sie haben keine Berechtigung dieses Dokument zu erstellen';
+		exit;
+	}
+}
 elseif(in_array($xsl,array('Inskription','Studienerfolg','OutgoingLearning','OutgoingChangeL','LearningAgree','Zahlung')))
 {
 	if(!$rechte->isBerechtigt('admin') && !$rechte->isBerechtigt('assistenz'))

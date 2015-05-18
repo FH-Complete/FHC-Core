@@ -72,6 +72,8 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
   <command id="menu-prefs-ignore_kollision:command" oncommand="variableChange('ignore_kollision','menu-prefs-ignore_kollision');"/>
   <command id="menu-prefs-ignore_zeitsperre:command" oncommand="variableChange('ignore_zeitsperre','menu-prefs-ignore_zeitsperre');"/>
   <command id="menu-prefs-ignore_reservierung:command" oncommand="variableChange('ignore_reservierung','menu-prefs-ignore_reservierung');"/>
+  <command id="menu-prefs-alle_unr_mitladen:command" oncommand="variableChange('alle_unr_mitladen','menu-prefs-alle_unr_mitladen');"/>
+  <command id="menu-prefs-allow_lehrstunde_drop:command" oncommand="variableChange('allow_lehrstunde_drop','menu-prefs-allow_lehrstunde_drop');"/>
   <command id="menu-prefs-kollision_student:command" oncommand="variableChange('kollision_student','menu-prefs-kollision_student');"/>
   <command id="menu-prefs-max_kollision:command" oncommand="variableChangeValue('max_kollision');"/>
   <command id="menu-extras-kollisionstudent:command" oncommand="KollisionStudentShow();"/>
@@ -207,6 +209,26 @@ echo '<?xml-stylesheet href="datepicker/datepicker.css" type="text/css"?>';
    			 accesskey 	="&menu-prefs-kollision_student.accesskey;"
    			 checkbox   ="true"
    			 checked    ="<?php echo $kollision_student;?>"
+   			 />
+		<menuitem
+			 id        	="menu-prefs-alle_unr_mitladen"
+			 type		="checkbox"
+  			 key       	="menu-prefs-alle_unr_mitladen:key"
+			 label     	="&menu-prefs-alle_unr_mitladen.label;"
+			 command   	="menu-prefs-alle_unr_mitladen:command"
+   			 accesskey 	="&menu-prefs-alle_unr_mitladen.accesskey;"
+   			 checkbox   ="true"
+   			 checked    ="<?php echo $alle_unr_mitladen;?>"
+   			 />
+		<menuitem
+			 id        	="menu-prefs-allow_lehrstunde_drop"
+			 type		="checkbox"
+  			 key       	="menu-prefs-allow_lehrstunde_drop:key"
+			 label     	="&menu-prefs-allow_lehrstunde_drop.label;"
+			 command   	="menu-prefs-allow_lehrstunde_drop:command"
+   			 accesskey 	="&menu-prefs-allow_lehrstunde_drop.accesskey;"
+   			 checkbox   ="true"
+   			 checked    ="<?php echo $allow_lehrstunde_drop;?>"
    			 />
    		<menuitem
 			 id        	="menu-prefs-max_kollision"

@@ -21,6 +21,7 @@
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/log.class.php');
+require_once(dirname(__FILE__).'/../config/global.config.inc.php');
 
 class lehreinheit extends basis_db
 {
@@ -492,7 +493,7 @@ class lehreinheit extends basis_db
 		foreach ($this->mitarbeiter_uid as $lkt)
 			$sql_lkt.="OR mitarbeiter_uid=".$this->db_add_param($lkt).' ';
 		$sql_lkt=mb_substr($sql_lkt,3);
-		$sql_lkt="(($sql_lkt) AND mitarbeiter_uid!='_DummyLektor')";
+		$sql_lkt="(($sql_lkt) AND mitarbeiter_uid not in (".$this->db_implode4SQL(unserialize(KOLLISIONSFREIE_USER))."))";
 
 		// Datenbank abfragen
 		$sql_query="SELECT $stpl_id FROM $stpl_table
@@ -554,7 +555,7 @@ class lehreinheit extends basis_db
 					foreach ($this->mitarbeiter_uid as $lkt)
 						$sql_lkt.="OR uid='$lkt' ";
 					$sql_lkt=mb_substr($sql_lkt,3);
-					$sql_lkt="(($sql_lkt) AND uid!='_DummyLektor')";
+					$sql_lkt="(($sql_lkt) AND uid not in (".$this->db_implode4SQL(unserialize(KOLLISIONSFREIE_USER))."))";
 					$sql_query="SELECT reservierung_id AS id, uid AS lektor, stg_kurzbz, ort_kurzbz, semester, verband, gruppe, gruppe_kurzbz, datum, stunde 
 								FROM lehre.vw_reservierung
 								WHERE datum=".$this->db_add_param($datum)." AND stunde=".$this->db_add_param($stunde)."

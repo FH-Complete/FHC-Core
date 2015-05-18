@@ -48,26 +48,6 @@ class studiensemester extends basis_db
 			$this->load($studiensemester_kurzbz);
 	}
 	
-	public function __get($property) 
-	{
-	    if(property_exists($this, $property))
-	    {
-		return $this->$property;
-	    }
-	    else
-	    {
-		return NULL;
-	    }
-	}
-	
-	public function __set($property, $value) 
-	{
-	    if(property_exists($this, $property))
-	    {
-		$this->$property = $value;
-	    }
-	}
-
 	/**
 	 * Laedt das Studiensemester mit der uebergebenen Kurzbz
 	 * 
