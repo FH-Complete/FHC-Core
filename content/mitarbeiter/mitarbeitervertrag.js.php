@@ -369,8 +369,6 @@ function MitarbeiterVertragSelectVertragsstatus()
 	var vertrag_id=tree.view.getCellText(tree.currentIndex,col);
 	var vertrag_status=tree.view.getCellText(tree.currentIndex,col_status);
 	
-	// *** Zugeordnete Vertragselemente laden
-
 	vertragstatustree = document.getElementById('mitarbeiter-vertrag-tree-vertragsstatus');
 	url='<?php echo APP_ROOT;?>rdf/vertragsstatus.rdf.php?vertrag_id='+vertrag_id+'&vertragsstatus_kurzbz='+vertrag_status+'&'+gettimestamp();
 
@@ -384,16 +382,15 @@ function MitarbeiterVertragSelectVertragsstatus()
 	//Daten holen
 	vertragsdatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#datum" ));
 
+	// Uhrzeit wegschneiden
+	vertragsdatum = vertragsdatum.substring(0,10);
+	
 	document.getElementById('mitarbeiter-vertrag-vertragsstatus-textbox-vertragsdatum').value=vertragsdatum;
 	document.getElementById('mitarbeiter-vertrag-vertragsstatus-textbox-vertragsdatum').disabled=false;
-	
-	
-//	var datasource = rdfService.GetDataSource(url);
-//	vertragstatustree.database.AddDataSource(datasource);
-
 }
 
-function MitarbeiterVertragVertragsstatusUpdate(){
+function MitarbeiterVertragVertragsstatusUpdate()
+{
     var tree=document.getElementById('mitarbeiter-vertrag-tree-vertragsstatus');
     var col = tree.columns ? tree.columns["mitarbeiter-vertrag-tree-vertragsstatus-vertrag_id"] : "mitarbeiter-vertrag-tree-vertragsstatus-vertrag_id";
     var col_status = tree.columns ? tree.columns["mitarbeiter-vertrag-tree-vertragsstatus-vertragsstatus_kurzbz"] : "mitarbeiter-vertrag-tree-vertragsstatus-vertragsstatus_kurzbz";
@@ -427,6 +424,50 @@ function MitarbeiterVertragVertragsstatusUpdate(){
     }
     else
     {
+		MitarbeiterVertragVertragsstatusReload(vertrag_id);
+		return true;
+    }
+}
+
+function MitarbeiterVertragStatusDelete()
+{
+	var tree=document.getElementById('mitarbeiter-vertrag-tree-vertragsstatus');
+    var col = tree.columns ? tree.columns["mitarbeiter-vertrag-tree-vertragsstatus-vertrag_id"] : "mitarbeiter-vertrag-tree-vertragsstatus-vertrag_id";
+    var col_status = tree.columns ? tree.columns["mitarbeiter-vertrag-tree-vertragsstatus-vertragsstatus_kurzbz"] : "mitarbeiter-vertrag-tree-vertragsstatus-vertragsstatus_kurzbz";
+
+    if(tree.currentIndex==-1)
+	    return false;
+
+    var vertrag_id=tree.view.getCellText(tree.currentIndex,col);
+    var vertrag_status=tree.view.getCellText(tree.currentIndex,col_status);
+    
+    var url = '<?php echo APP_ROOT ?>content/mitarbeiter/mitarbeiterDBDML.php';
+    var req = new phpRequest(url,'','');
+
+    req.add('type', 'vertragsstatusdelete');
+    req.add('vertrag_id',vertrag_id);
+    req.add('status',vertrag_status);
+
+    var response = req.executePOST();
+
+    var val =  new ParseReturnValue(response)
+
+    if (!val.dbdml_return)
+    {
+	    if(val.dbdml_errormsg=='')
+		    alert(response)
+	    else
+		    alert(val.dbdml_errormsg)
+    }
+    else
+    {
+		MitarbeiterVertragVertragsstatusReload(vertrag_id);
+		return true;
+    }
+}
+
+function MitarbeiterVertragVertragsstatusReload(vertrag_id)
+{
 	// *** Status laden
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 	var vertragsstatustree = document.getElementById('mitarbeiter-vertrag-tree-vertragsstatus');
@@ -444,7 +485,7 @@ function MitarbeiterVertragVertragsstatusUpdate(){
 	var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
 	var datasource = rdfService.GetDataSource(url);
 	vertragsstatustree.database.AddDataSource(datasource);
-	
+
 	return true;
-    }
+
 }
