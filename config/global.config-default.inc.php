@@ -42,6 +42,9 @@ define('CIS_SUCHE_LVPLAN_ANZEIGEN',true);
 // Link zu den Excel Notenlisten im CIS Anzeigen
 define('CIS_ANWESENHEITSLISTE_NOTENLISTE_ANZEIGEN',true);
 
+// Link zu den Anwesenheitslisten (ohne Bilder) im CIS Anzeigen
+define('CIS_ANWESENHEITSLISTE_ANWESENHEITSLISTE_ANZEIGEN',true);
+
 // Punkte bei der Noteneingabe anzeigen
 define('CIS_GESAMTNOTE_PUNKTE',false);
 

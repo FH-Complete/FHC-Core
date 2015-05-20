@@ -206,23 +206,21 @@
 
 			if(defined('CIS_ANWESENHEITSLISTE_NOTENLISTE_ANZEIGEN') && !CIS_ANWESENHEITSLISTE_NOTENLISTE_ANZEIGEN)
 				$nt_content='';
+			if(defined('CIS_ANWESENHEITSLISTE_ANWESENHEITSLISTE_ANZEIGEN') && !CIS_ANWESENHEITSLISTE_ANWESENHEITSLISTE_ANZEIGEN)
+				$aw_content='';
+
 		  	echo "<table cellpadding='0' cellspacing='0'>
 		  		
 		  		<tr>
 		  		   <td>$aw_content</td>
-		  		   <td width='15'>&nbsp;</td>
-		  		   <td>$nt_content</td>
-		  		</tr>
-		  		<tr>
-		  			<td>&nbsp;</td>
-		  			<td>&nbsp;</td>
-		  			<td></td>
 		  		</tr>
 		  		<tr>
 		  			<td>$awbild_content</td>
-		  			<td>&nbsp;</td>
-		  			<td></td>
 		  		</tr>
+				<tr>
+		  		   <td>$nt_content</td>
+		  		</tr>
+		  		
 		  		</table>";
 	  	}
 	}
