@@ -51,22 +51,16 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					<column flex="5"/>
 				</columns>
 				<rows>
-					<row>
-						<label value="Projektphase ID" control="textbox-projektphase-detail-projektphase_id "/>
-						<hbox>
-							<textbox id="textbox-projektphase-detail-projektphase_id" readonly="true" size="3"/>
-							<spacer />
-						</hbox>
-					</row>
+					
 					<row>
 						<label value="Projekt Kurzbz" control="textbox-projektphase-detail-projekt_kurzbz"/>
 						<hbox>
 							<textbox id="textbox-projektphase-detail-projekt_kurzbz" size="16" maxlength="16" readonly="true"/>
 							<spacer />
-						</hbox>
-					</row>
-					<row>
-	      				<label value="Übergeordnete Projektphase" control="menulist-projektphase-detail-projektphase_fk"/>
+							<label value="Projektphase ID" control="textbox-projektphase-detail-projektphase_id "/>
+							<textbox id="textbox-projektphase-detail-projektphase_id" readonly="true" size="3"/>
+							<spacer />
+							<label value="Parent Projektphase" control="menulist-projektphase-detail-projektphase_fk"/>
 				      		<menulist id="menulist-projektphase-detail-projektphase_fk"
 					          datasources="rdf:null"
 					          ref="http://www.technikum-wien.at/projektphase" 
@@ -81,44 +75,64 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	
 								</template>
 							</menulist>
+						</hbox>
 					</row>
 					<row>
 						<label value="Bezeichnung" control="textbox-projektphase-detail-bezeichnung"/>
 						<hbox>
 	   						<textbox id="textbox-projektphase-detail-bezeichnung" maxlength="32" size="32" disabled="true"/>
 	   						<spacer />
+	   						<label value="Typ" control="textbox-projektphase-detail-typ"/>
+							<hbox>
+								<textbox id="textbox-projektphase-detail-typ" maxlength="32" size="32" disabled="true"/>
+								<spacer />
+							</hbox>
 	   					</hbox>
+	   					
 					</row>
 					<row>
-						<label value="Beschreibung" control="textbox-projektphase-detail-beschreibung"/>
+						<label value="Beschreibung" control="menulist-projektphase-detail-ressource"/>
 	   					<textbox id="textbox-projektphase-detail-beschreibung" multiline="true" disabled="true" rows="10"/>
 					</row>
 					<row>
-						<label value="Start" control="textbox-projektphase-detail-start"/>
-	   					<box class="Datum" id="textbox-projektphase-detail-start" disabled="true"/>
-					</row>
-					<row>
-						<label value="Ende" control="textbox-projektphase-detail-ende"/>
-	   					<box class="Datum" id="textbox-projektphase-detail-ende" disabled="true"/>
-					</row>
-					<row>
-						<label value="Budget" control="textbox-projektphase-detail-budget"/>
-						<hbox>
-	   						<textbox id="textbox-projektphase-detail-budget" size="12" maxlength="13" disabled="true"/>
+	      				<label value="Verantwortung" control="textbox-projektphase-detail-ressource"/>
+	   					<hbox>
+				      		<menulist id="menulist-projektphase-detail-ressource"
+					          datasources="rdf:null"
+					          xmlns:RESSOURCE="http://www.technikum-wien.at/ressource/rdf#"
+					          ref="http://www.technikum-wien.at/ressource/alle" 
+					          disabled="true"
+					         >
+								<template>
+	
+										<menupopup>
+											<menuitem value="rdf:http://www.technikum-wien.at/ressource/rdf#ressource_id"
+							        			      label="rdf:http://www.technikum-wien.at/ressource/rdf#bezeichnung ( rdf:http://www.technikum-wien.at/ressource/rdf#typ )"
+										  			  uri="rdf:*"/>
+										</menupopup>
+								</template>
+							</menulist>
+							<spacer />
+							<label value="Budget" control="textbox-projektphase-detail-budget"/>
+							<textbox id="textbox-projektphase-detail-budget" size="12" maxlength="13" disabled="true"/>
 	   						<spacer />
 	   					</hbox>
 					</row>
-                    <row>
-						<label value="Farbe" control="textbox-projektphase-detail-farbe"/>
-						<hbox>
-	   						<textbox id="textbox-projektphase-detail-farbe" size="7" maxlenght="7" disabled="true"/>
-	   						<spacer />
+					<row>
+						<label value="Start" control="textbox-projektphase-detail-start"/>
+	   					<hbox>
+							<box class="Datum" id="textbox-projektphase-detail-start" disabled="true"/>
+							<label value="Ende" control="textbox-projektphase-detail-ende"/>
+							<box class="Datum" id="textbox-projektphase-detail-ende" disabled="true"/>
 	   					</hbox>
 					</row>
 					<row>
 						<label value="Personentage" control="textbox-projektphase-detail-personentage"/>
 						<hbox>
 	   						<textbox id="textbox-projektphase-detail-personentage" size="4" maxlenght="5" disabled="true"/>
+	   						<spacer />
+	   						<label value="Farbe" control="textbox-projektphase-detail-farbe"/>
+	   						<textbox id="textbox-projektphase-detail-farbe" size="7" maxlenght="7" disabled="true"/>
 	   						<spacer />
 	   					</hbox>
 					</row>

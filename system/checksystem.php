@@ -2954,7 +2954,53 @@ if(!$result = @$db->db_query("SELECT beschreibung FROM public.tbl_studiensemeste
 		echo ' public.tbl_studiensemester: Spalte beschreibung hinzugefuegt!<br>';
 }
 
-// Eigene Berechtigung fuer Betriebsmittel Studndenplan
+// Attribut typ bei Projektphase fuer Arbeitspaket, Phase, Milestone ...
+if(!$result = @$db->db_query("SELECT typ FROM fue.tbl_projektphase"))
+{
+	$qry = "ALTER TABLE fue.tbl_projektphase ADD COLUMN typ varchar(32);
+		UPDATE fue.tbl_projektphase SET typ='Projektphase';
+		ALTER TABLE fue.tbl_projektphase ALTER COLUMN typ SET NOT NULL;
+	";
+		
+	
+	if(!$db->db_query($qry))
+		echo '<strong>fue.tbl_projektphase: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>fue.tbl_projektphase: neue Spalte typ fuer Arbeitspaket, Phase, Milestone ... hinzugefuegt';
+}
+
+// Attribut typ bei Projektphase fuer Verantwortliche Ressource
+if(!$result = @$db->db_query("SELECT ressource_id FROM fue.tbl_projektphase"))
+{
+	$qry = "ALTER TABLE fue.tbl_projektphase ADD COLUMN ressource_id bigint;
+			ALTER TABLE fue.tbl_projektphase
+			  ADD CONSTRAINT fk_projektphase_ressource FOREIGN KEY (ressource_id)
+				  REFERENCES fue.tbl_ressource (ressource_id) MATCH SIMPLE
+				  ON UPDATE CASCADE ON DELETE RESTRICT;
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>fue.tbl_projektphase: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>fue.tbl_projektphase: neue Spalte ressource_id fuer Verantwortlichkeit hinzugefuegt';
+}			  
+// Attribut typ bei Projekt fuer Verantwortliche Ressource
+if(!$result = @$db->db_query("SELECT ressource_id FROM fue.tbl_projekt"))
+{
+	$qry = "ALTER TABLE fue.tbl_projekt ADD COLUMN ressource_id bigint;
+			ALTER TABLE fue.tbl_projekt
+			  ADD CONSTRAINT fk_projekt_ressource FOREIGN KEY (ressource_id)
+				  REFERENCES fue.tbl_ressource (ressource_id) MATCH SIMPLE
+				  ON UPDATE CASCADE ON DELETE RESTRICT;
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>fue.tbl_projekt: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>fue.tbl_projekt: neue Spalte ressource_id fuer Verantwortlichkeit hinzugefuegt';
+}			  
+
+// Eigene Berechtigung fuer Betriebsmittel Stundenplan
 if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_stundenplan_betriebsmittel LIMIT 1"))
 {
 	$qry = "CREATE TABLE lehre.tbl_stundenplan_betriebsmittel
@@ -3112,8 +3158,8 @@ $tabellen=array(
 	"campus.tbl_zeitwunsch"  => array("stunde","mitarbeiter_uid","tag","gewicht","updateamum","updatevon","insertamum","insertvon"),
 	"fue.tbl_aktivitaet"  => array("aktivitaet_kurzbz","beschreibung","sort"),
 	"fue.tbl_aufwandstyp" => array("aufwandstyp_kurzbz","bezeichnung"),
-	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz","budget","farbe","aufwandstyp_kurzbz"),
-	"fue.tbl_projektphase"  => array("projektphase_id","projekt_kurzbz","projektphase_fk","bezeichnung","beschreibung","start","ende","budget","insertamum","insertvon","updateamum","updatevon","personentage","farbe"),
+	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz","budget","farbe","aufwandstyp_kurzbz","ressource_id"),
+	"fue.tbl_projektphase"  => array("projektphase_id","projekt_kurzbz","projektphase_fk","bezeichnung","typ","beschreibung","start","ende","budget","insertamum","insertvon","updateamum","updatevon","personentage","farbe","ressource_id"),
 	"fue.tbl_projekttask"  => array("projekttask_id","projektphase_id","bezeichnung","beschreibung","aufwand","mantis_id","insertamum","insertvon","updateamum","updatevon","projekttask_fk","erledigt","ende","ressource_id","scrumsprint_id"),
 	"fue.tbl_projekt_dokument"  => array("projekt_dokument_id","projektphase_id","projekt_kurzbz","dms_id"),
 	"fue.tbl_projekt_ressource"  => array("projekt_ressource_id","projekt_kurzbz","projektphase_id","ressource_id","funktion_kurzbz","beschreibung","aufwand"),
@@ -3229,7 +3275,7 @@ $tabellen=array(
 	"public.tbl_preoutgoing_status" => array("preoutgoing_status_kurzbz","bezeichnung"),
 	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat","rt_punkte3", "zgvdoktor_code", "zgvdoktorort", "zgvdoktordatum","mentor","zgvnation","zgvmanation","zgvdoktornation"),
 	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id","studienplan_id","bestaetigtam","bestaetigtvon","fgm","faktiv", "anmerkung"),
-	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung"),
+	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung","kosten"),
 	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet","max_teilnehmer","oeffentlich"),
 	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id"),
 	"public.tbl_semesterwochen"  => array("semester","studiengang_kz","wochen"),

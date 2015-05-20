@@ -749,5 +749,71 @@ class vertrag extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Laedt die uebergebenen Vertraege
+	 * @param $vertrag_id_arr array mit VertragsIDs
+	 * @return boolean
+	 */
+	public function getVertraege($vertrag_id_arr)
+	{
+		if(count($vertrag_id_arr)==0)
+		{
+			$this->result = array();
+			return false;
+		}
+		$qry = "SELECT * FROM lehre.tbl_vertrag WHERE vertrag_id in (".$this->db_implode4SQL($vertrag_id_arr).')';
+
+		if($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new stdClass();
+
+				$obj->vertrag_id = $row->vertrag_id;
+				$obj->vertragstyp_kurzbz = $row->vertragstyp_kurzbz;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->betrag = $row->betrag;
+				$obj->person_id = $row->person_id;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->vertragsdatum = $row->vertragsdatum;
+
+				$this->result[]=$obj;
+			}
+
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Loescht einen Vertragsstatus
+	 * @param vertrag_id
+	 * @param vertragsstatus_kurzbz
+	 * @return boolean
+	 */
+	public function deleteVertragsstatus($vertrag_id, $vertragsstatus_kurzbz)
+	{
+		// prüfen ob Vertrag bereits verwendet wird
+		$qry = "DELETE FROM lehre.tbl_vertrag_vertragsstatus
+			WHERE 
+				vertragsstatus_kurzbz=".$this->db_add_param($vertragsstatus_kurzbz)."
+				AND vertrag_id=".$this->db_add_param($vertrag_id);
+		
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg = "Fehler beim Loeschen des Eintrages";
+			return false;
+		}
+	}
+
 }
 ?>

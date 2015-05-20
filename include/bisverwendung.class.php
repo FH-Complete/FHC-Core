@@ -361,6 +361,7 @@ class bisverwendung extends basis_db
 	 */
 	public function getVerwendungDatum($uid, $datum)
 	{
+		$datum_obj = new datum();
 		//laden des Datensatzes
 		$qry = "SELECT 
 					* 
@@ -369,7 +370,7 @@ class bisverwendung extends basis_db
 				WHERE 
 					mitarbeiter_uid=".$this->db_add_param($uid)."
 					AND (beginn<=".$this->db_add_param($datum)." OR beginn is null)
-					AND (ende>=".$this->db_add_param($datum)." OR ende is null)
+					AND (ende>=".$this->db_add_param($datum_obj->formatDatum($datum,'Y-m-01'))." OR ende is null)
 				ORDER BY beginn;";
 
 		if($this->db_query($qry))
