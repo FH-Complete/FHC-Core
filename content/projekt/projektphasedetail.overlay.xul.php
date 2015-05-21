@@ -84,7 +84,14 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	   						<spacer />
 	   						<label value="Typ" control="textbox-projektphase-detail-typ"/>
 							<hbox>
-								<textbox id="textbox-projektphase-detail-typ" maxlength="32" size="32" disabled="true"/>
+								<menulist id="textbox-projektphase-detail-typ" disabled="true">										
+										<menupopup>
+											<menuitem value="Arbeitspaket" label="Arbeitspaket"/>											
+											<menuitem value="Projektphase" label="Projektphase"/>
+											<menuitem value="Milestone" label="Milestone"/>
+										</menupopup>					
+								</menulist>						
+								
 								<spacer />
 							</hbox>
 	   					</hbox>

@@ -320,7 +320,7 @@ class projektphase extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 
-			$qry='BEGIN; INSERT INTO fue.tbl_projektphase (projekt_kurzbz, projektphase_fk, bezeichnung, 
+			$qry='BEGIN; INSERT INTO fue.tbl_projektphase (projekt_kurzbz, projektphase_fk, bezeichnung, typ, 
 				beschreibung, start, ende, budget, ressource_id, insertvon, insertamum, updatevon, updateamum, farbe, personentage) VALUES ('.
 			     $this->db_add_param($this->projekt_kurzbz).', '.
 			     $this->db_add_param($this->projektphase_fk).', '.

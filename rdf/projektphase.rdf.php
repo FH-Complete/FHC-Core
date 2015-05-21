@@ -62,6 +62,7 @@ if($projektphase_id != '')
 	$oRdf->obj[$i]->setAttribut('personentage',$phase->personentage);
     $oRdf->obj[$i]->setAttribut('farbe',$phase->farbe);
     $oRdf->obj[$i]->setAttribut('typ',$phase->typ);
+    $oRdf->obj[$i]->setAttribut('ressource_id',$phase->ressource_id);
 	
 	if($phase->projektphase_fk!='')
 		$oRdf->addSequence($phase->projektphase_id, $phase->projektphase_fk);

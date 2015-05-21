@@ -146,7 +146,7 @@ function onselectTreeProjektphase()
     var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].
                getService(Components.interfaces.nsIRDFService);
     var subject = rdfService.GetResource("http://www.technikum-wien.at/projektphase/" + projektphase_id);
-	console.log(subject);
+	//console.log(subject);
     var predicateNS = "http://www.technikum-wien.at/projektphase/rdf";
 
     //Daten holen
@@ -244,6 +244,7 @@ function saveProjektphaseDetail()
 	phase.appendChild(new SOAPObject("projekt_kurzbz")).val(projekt_kurzbz);
 	phase.appendChild(new SOAPObject("bezeichnung")).cdataval(bezeichnung);
 	phase.appendChild(new SOAPObject("typ")).cdataval(typ);
+	phase.appendChild(new SOAPObject("ressource_id")).val(ressource_id);
 	phase.appendChild(new SOAPObject("beschreibung")).cdataval(beschreibung);
 	phase.appendChild(new SOAPObject("start")).val(start);
 	phase.appendChild(new SOAPObject("ende")).val(ende);

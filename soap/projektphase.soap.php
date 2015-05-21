@@ -71,6 +71,8 @@ function saveProjektphase($username, $passwort, $phase)
 	$projektphase->projekt_kurzbz=$phase->projekt_kurzbz;
 	$projektphase->projektphase_fk=$phase->projektphase_fk;
 	$projektphase->bezeichnung = $phase->bezeichnung;
+	$projektphase->typ = $phase->typ;
+	$projektphase->ressource_id = $phase->ressource_id;
 	$projektphase->beschreibung = $phase->beschreibung;
 	$projektphase->start = $phase->start;
 	$projektphase->ende = $phase->ende;
