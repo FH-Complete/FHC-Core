@@ -444,55 +444,55 @@ function getLastStundeByDatum(Array $array, $filterDatum)
 
 	    if ($kurzbeschreibung_de)
 	    {
-			echo "<tr><td align='left' valign='top'><h2>Kurzbeschreibung</h2></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/kurzbeschreibung')."</h2></td></tr>";
 			echo "<tr><td>".stripslashes($kurzbeschreibung_de)."<br /><br /></td></tr>";
 	    }
 
 	    if ($lehrziele_de)
 		{
-	     	echo "<tr><td align='left' valign='top'><h2>Lernergebnisse</h2></td></tr>";
+	     	echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/lernergebnisse')."</h2></td></tr>";
 	     	echo "<tr><td>".stripslashes($lehrziele_de)."<br /><br /></td></tr>";
 		}
 
 	    if ($lehrinhalte_de)
 		{
-	     	echo "<tr><td align='left' valign='top'><h2>Lehrinhalte</h2></td></tr>";
+	     	echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/lehrinhalte')."</h2></td></tr>";
 	     	echo "<tr><td>".stripslashes($lehrinhalte_de)."<br /><br /></td></tr>";
 		}
 
 	    if ($voraussetzungen_de)
 		{
-			echo "<tr><td align='left' valign='top'><h2>Vorkenntnisse</h2></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/vorkenntnisse')."</h2></td></tr>";
 			echo "<tr><td>".stripslashes($voraussetzungen_de)."<br><br /></td></tr>";
 		}
 
 	    if ($methodik_de)
 		{
-			echo "<tr><td align='left' valign='top'><h2>Methodik / Didaktik</h2></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/methodik')."</h2></td></tr>";
 			echo "<tr><td>".stripslashes($methodik_de)."<br><br /></td></tr>";
 		}
 
 	    if ($pruefungsordnung_de)
 	    {
-			echo "<tr><td align='left' valign='top'><h2>Leistungsbeurteilung</h2></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/leistungsbeurteilung')."</h2></td></tr>";
 			echo "<tr><td>".stripslashes($pruefungsordnung_de)."<br /><br /></td></tr>";
 	    }
 
 		if ($unterlagen_de)
 		{
-			echo "<tr><td align='left' valign='top'><h2>Literatur</h2></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/literatur')."</h2></td></tr>";
 			echo "<tr><td>".stripslashes($unterlagen_de)."<br /><br /></td></tr>";
 		}
 		
 		if ($anwesenheit_de)
 		{
-			echo "<tr><td align='left' valign='top'><h2>Anwesenheit</h2></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/anwesenheit')."</h2></td></tr>";
 			echo "<tr><td>".stripslashes($anwesenheit_de)."<br /><br /></td></tr>";
 		}
 
 		if ($anmerkungen_de)
 		{
-			echo "<tr><td align='left' valign='top'><h2>Anmerkungen</h2></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/anmerkungen')."</h2></td></tr>";
 			echo "<tr><td>".stripslashes($anmerkungen_de)."&nbsp;<br /><br /></td></tr>";
 		}
 
@@ -597,55 +597,55 @@ function getLastStundeByDatum(Array $array, $filterDatum)
 
 	    if ($kurzbeschreibung_en)
 	    {
-			echo "<tr><td align='left' valign='top'><h2>Course Description</h2></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/kurzbeschreibungEN')."</h2></td></tr>";
 			echo "<tr><td>".stripslashes($kurzbeschreibung_en)."<br /><br /></td></tr>";
 	    }
 
 		if ($lehrziele_en)
 		{
-			echo "<tr><td align='left' valign='top'><h2>Learning outcome</h2></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/lernergebnisseEN')."</h2></td></tr>";
 			echo "<tr><td>".stripslashes($lehrziele_en)."<br /><br /></td></tr>";
 		}
 
 		if ($lehrinhalte_en)
 		{
-			echo "<tr><td align='left' valign='top'><h2>Course Contents</h2></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/lehrinhalteEN')."</h2></td></tr>";
 			echo "<tr><td>".stripslashes($lehrinhalte_en)."<br /><br /></td></tr>";
 		}
 
 		if ($voraussetzungen_en)
 		{
-			echo "<tr><td align='left' valign='top'><h2>Prerequisites</h2></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/vorkenntnisseEN')."</h2></td></tr>";
 			echo "<tr><td>".stripslashes($voraussetzungen_en)."<br /><br /></td></tr>";
 		}
 
 	    if ($methodik_en)
 		{
-			echo "<tr><td align='left' valign='top'><h2>Teaching Methods</h2></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/methodikEN')."</h2></td></tr>";
 			echo "<tr><td>".stripslashes($methodik_en)."<br><br /></td></tr>";
 		}
 
 		if ($pruefungsordnung_en)
 		{
-			echo "<tr><td align='left' valign='top'><h2>Assessment Methods</h2></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/leistungsbeurteilungEN')."</h2></td></tr>";
 			echo "<tr><td>".stripslashes($pruefungsordnung_en)."<br /><br /></td></tr>";
 		}
 
 		if ($unterlagen_en)
 		{
-			echo "<tr><td align='left' valign='top'><h2>Recommended Reading and Material</h2></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/literaturEN')."</h2></td></tr>";
 			echo "<tr><td>".stripslashes($unterlagen_en)."<br /><br /></td></tr>";
 		}
 		
 		if ($anwesenheit_en)
 		{
-			echo "<tr><td align='left' valign='top'><h2>Attendance</h2></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/anwesenheitEN')."</h2></td></tr>";
 			echo "<tr><td>".stripslashes($anwesenheit_en)."<br /><br /></td></tr>";
 		}
 
 		if ($anmerkungen_en)
 		{
-			echo "<tr><td align='left' valign='top'><h2>Comments</h2></td></tr>";
+			echo "<tr><td align='left' valign='top'><h2>".$phrasen->t('lvinfo/anmerkungeEN')."</h2></td></tr>";
 			echo "<tr><td>".stripslashes($anmerkungen_en)."&nbsp;<br /></td></tr>";
 		}
 	}
