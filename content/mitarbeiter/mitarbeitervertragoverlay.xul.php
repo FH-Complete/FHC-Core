@@ -47,6 +47,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		echo '<menuitem label="'.$row->bezeichnung.'" oncommand="MitarbeiterVertragStatusAdd(\''.$row->vertragsstatus_kurzbz.'\');" hidden="false"/>';
 	}
 ?>
+		<menuseparator />
+		<menuitem label="Eintrag löschen" oncommand="MitarbeiterVertragStatusDelete()" />
 		</menupopup>
 		<menupopup id="mitarbeiter-vertrag-tree-popup">
 			<menuitem label="Bearbeiten" oncommand="MitarbeiterVertragEdit()" />
@@ -273,14 +275,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				</template>
 			</tree>
 		    </vbox>
-		    <vbox flex="1">
-			<groupbox id='groupbox-vertragsdatum'>
-			    <caption label="Vertragsdatum" />
-			    <grid align="end" flex="1"
-				     flags="dont-build-content"
-				    enableColumnDrag="true"
-				    style="margin:4px;"
-				    >
+		    <vbox>
+			    <grid align="end" flex="1">
 				<columns  >
 				    <column flex="1"/>
 				    <column flex="5"/>
@@ -295,7 +291,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				    </row>
 				</rows>
 			    </grid>
-			</groupbox>
 		    </vbox>
 		</vbox>
 	</hbox>

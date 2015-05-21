@@ -585,15 +585,20 @@ class dokument extends basis_db
      */
     public function getAllDokumenteForPerson($person_id, $onlinebewerbung= false)
     {
-        $qry = "SELECT distinct(dokument_kurzbz), bezeichnung, pflicht FROM public.tbl_dokumentstudiengang
+		$sprache = new sprache();
+		$bezeichnung_mehrsprachig = $sprache->getSprachQuery('bezeichnung_mehrsprachig');
+        $qry = "SELECT distinct on (dokument_kurzbz) dokument_kurzbz, bezeichnung, pflicht, 
+			$bezeichnung_mehrsprachig
+            FROM public.tbl_dokumentstudiengang
             JOIN public.tbl_prestudent using (studiengang_kz)
             JOIN public.tbl_dokument using (dokument_kurzbz)
             WHERE person_id =".$this->db_add_param($person_id, FHC_INTEGER);
 
 		if($onlinebewerbung)
-			$qry.= " AND onlinebewerbung is true; ";
+			$qry.= " AND onlinebewerbung is true";
 		else
-			$qry.=";";
+			$qry.=" ";
+		$qry.=" ORDER BY dokument_kurzbz, pflicht desc";
 
         if($result = $this->db_query($qry))
         {
@@ -603,6 +608,7 @@ class dokument extends basis_db
                 $dok->dokument_kurzbz = $row->dokument_kurzbz;
                 $dok->bezeichnung = $row->bezeichnung;
                 $dok->pflicht= $this->db_parse_bool($row->pflicht);
+                $dok->bezeichnung_mehrsprachig = $sprache->parseSprachResult('bezeichnung_mehrsprachig', $row);
 
                 $this->result[] = $dok;
             }
