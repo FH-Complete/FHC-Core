@@ -792,5 +792,38 @@ class studiensemester extends basis_db
     	else
     		return $this->getPreviousFrom($studiensemester_kurzbz);
     }
+
+	/**
+	 * Laedt die Studiensemester die fuer die Onlinebewerbung aktiviert sind
+	 * 
+	 * @return true wenn ok, sonst false
+	 */
+	public function getStudiensemesterOnlinebewerbung()
+	{
+		$qry = "SELECT * FROM public.tbl_studiensemester WHERE onlinebewerbung=true
+				ORDER BY start";
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$stsem_obj = new studiensemester();
+				
+				$stsem_obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$stsem_obj->start = $row->start;
+				$stsem_obj->ende = $row->ende;
+				$stsem_obj->bezeichnung = $row->bezeichnung;
+				
+				$this->studiensemester[] = $stsem_obj;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Lesen des Studiensemesters';
+			return false;
+		}
+	}
+
 }
 ?>

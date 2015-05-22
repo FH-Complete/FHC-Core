@@ -2873,7 +2873,7 @@ if($result = @$db->db_query("SELECT * FROM information_schema.table_constraints 
 	}
 }
 
-// Fehlende Foreign Keys fuer ZGV Nation und Ausstellungsstaat auf ZGVNation kopieren
+// Mehrsprachige Spalten fuer Lehrform
 if(!$result = @$db->db_query("SELECT bezeichnung_kurz FROM lehre.tbl_lehrform"))
 {
 	$qry = 'ALTER TABLE lehre.tbl_lehrform ADD COLUMN bezeichnung_kurz varchar(32)[];
@@ -3078,6 +3078,43 @@ if(!$result = @$db->db_query("SELECT standort FROM lehre.vw_studienplan LIMIT 1"
 		echo 'lehre.vw_studienplan: Neue Spalte standort zur View hinzugefuegt<br>';
 }
 
+// Mehrsprachige bezeichnung fuer Dokumente
+if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM public.tbl_dokument"))
+{
+	$qry = 'ALTER TABLE public.tbl_dokument ADD COLUMN bezeichnung_mehrsprachig varchar(128)[];
+	UPDATE public.tbl_dokument SET bezeichnung_mehrsprachig[1]=bezeichnung;
+	UPDATE public.tbl_dokument SET bezeichnung_mehrsprachig[2]=bezeichnung;
+	';
+		
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_dokument: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_dokument: neue Spalte fuer mehrsprachige Bezeichnung hinzugefuegt';
+}
+
+// Spalte kosten fuer tbl_raumtyp
+if(!$result = @$db->db_query("SELECT kosten FROM public.tbl_raumtyp"))
+{
+	$qry = 'ALTER TABLE public.tbl_raumtyp ADD COLUMN kosten numeric(10,2);';
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_raumtyp: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_raumtyp: neue Spalte koste	n hinzugefuegt';
+}
+
+// Spalte onlinebewerbung fuer tbl_studiensemester
+if(!$result = @$db->db_query("SELECT onlinebewerbung FROM public.tbl_studiensemester"))
+{
+	$qry = 'ALTER TABLE public.tbl_studiensemester ADD COLUMN onlinebewerbung boolean NOT NULL default false;';
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_studiensemester: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_studiensemester: neue Spalte onlinebewerbung hinzugefuegt';
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -3232,7 +3269,7 @@ $tabellen=array(
 	"public.tbl_benutzerfunktion"  => array("benutzerfunktion_id","fachbereich_kurzbz","uid","oe_kurzbz","funktion_kurzbz","semester", "datum_von","datum_bis", "updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung","wochenstunden"),
 	"public.tbl_benutzergruppe"  => array("uid","gruppe_kurzbz","studiensemester_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_buchungstyp"  => array("buchungstyp_kurzbz","beschreibung","standardbetrag","standardtext","aktiv","credit_points"),
-	"public.tbl_dokument"  => array("dokument_kurzbz","bezeichnung","ext_id"),
+	"public.tbl_dokument"  => array("dokument_kurzbz","bezeichnung","ext_id","bezeichnung_mehrsprachig"),
 	"public.tbl_dokumentprestudent"  => array("dokument_kurzbz","prestudent_id","mitarbeiter_uid","datum","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_dokumentstudiengang"  => array("dokument_kurzbz","studiengang_kz","ext_id", "onlinebewerbung", "pflicht"),
 	"public.tbl_erhalter"  => array("erhalter_kz","kurzbz","bezeichnung","dvr","logo","zvr"),
@@ -3287,7 +3324,7 @@ $tabellen=array(
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige", "onlinebewerbung"),
 	"public.tbl_studiengangstyp" => array("typ","bezeichnung","beschreibung"),
-	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","studienjahr_kurzbz","ext_id","beschreibung"),
+	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","studienjahr_kurzbz","ext_id","beschreibung","onlinebewerbung"),
 	"public.tbl_tag"  => array("tag"),
 	"public.tbl_variable"  => array("name","uid","wert"),
 	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung","mimetype"),
