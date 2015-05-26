@@ -70,7 +70,7 @@ if(isset($_GET['studiensemester_kurzbz']))
 	$studiensemester_kurzbz=$_GET['studiensemester_kurzbz'];
 else 
 	unset($studiensemester_kurzbz);
-
+$db = new basis_db();
 $qry = "
 SELECT DISTINCT
 tbl_lehrveranstaltung.lehrveranstaltung_id as lv_lehrveranstaltung_id, 
@@ -100,22 +100,22 @@ tbl_lvinfo.aktiv=true AND
 tbl_lvinfo.genehmigt=true ";
 
 if(isset($stg_kz))
-	$qry.= " AND tbl_lehrveranstaltung.studiengang_kz='".addslashes($stg_kz)."'";
+	$qry.= " AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($stg_kz);
 	
 if(isset($mitarbeiter_uid))
-	$qry.= " AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid='".addslashes($mitarbeiter_uid)."'";
+	$qry.= " AND tbl_lehreinheitmitarbeiter.mitarbeiter_uid=".$db->db_add_param($mitarbeiter_uid);
 	
 if(isset($studiensemester_kurzbz))
-	$qry.= " AND tbl_lehreinheit.studiensemester_kurzbz='".addslashes($studiensemester_kurzbz)."'";
+	$qry.= " AND tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz);
 	
 if(isset($sem))
-	$qry .= " AND tbl_lehrveranstaltung.semester='".addslashes($sem)."'";
+	$qry .= " AND tbl_lehrveranstaltung.semester=".$db->db_add_param($sem);
 
 $qry .= " ORDER BY lv_studiengang_kz, lv_semester, lv_kurzbz, sprache";
 //echo $qry;
 if (!$request)
 	$qry='SELECT 1 WHERE 1=2;';
-$db = new basis_db();
+
 
 if($db->db_query($qry))
 {
@@ -145,6 +145,7 @@ if($db->db_query($qry))
 			<LVINFO:kurzbeschreibung><![CDATA[<?php echo xmlclean($row->kurzbeschreibung); ?>]]></LVINFO:kurzbeschreibung>
 			<LVINFO:orgform_kurzbz><![CDATA[<?php echo xmlclean($row->orgform_kurzbz); ?>]]></LVINFO:orgform_kurzbz>
 			<LVINFO:incoming><![CDATA[<?php echo xmlclean($row->incoming); ?>]]></LVINFO:incoming>
+			<LVINFO:anwesenheit><![CDATA[<?php echo xmlclean($row->anwesenheit); ?>]]></LVINFO:anwesenheit>
       	</RDF:Description>
 
 <?php
