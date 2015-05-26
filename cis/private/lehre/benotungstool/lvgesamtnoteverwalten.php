@@ -591,7 +591,9 @@ else
 //Kopfzeile
 echo '
 <table width="100%"><tr><td>
-<h1>&nbsp;'.$p->t('benotungstool/gesamtnote').'</h1></td><td align="right">';
+<h1>'.$p->t('benotungstool/gesamtnote').'</h1>
+<h2>'.$lv_obj->bezeichnung_arr[$sprache].'</h2>
+</td><td align="right">';
 
 //Studiensemester laden
 $stsem_obj = new studiensemester();
@@ -628,12 +630,13 @@ if(!$rechte->isBerechtigt('admin',0) &&
 	}
 }
 echo $stsem_content;
-echo '</td></tr></table>';
+echo '</td></tr>';
 
-echo '<table width="100%"><tr>';
-echo '<td class="tdwidth10">&nbsp;</td>';
+echo '<tr>';
 echo "<td>";
-echo "<b>".$lv_obj->bezeichnung_arr[$sprache]."</b>";
+echo '<a href="'.$p->t('dms_link/dokuwikiGesamtnote').'" class="Item" target="_blank">'.$p->t('global/anleitung').'</a>';
+if(defined('CIS_ANWESENHEITSLISTE_NOTENLISTE_ANZEIGEN') && CIS_ANWESENHEITSLISTE_NOTENLISTE_ANZEIGEN)
+	echo "<br><a class='Item' href='../notenliste.xls.php?stg=$stg_obj->studiengang_kz&lvid=$lvid&stsem=$stsem'>".$p->t('benotungstool/notenlisteImport')."</a>";
 
 // eingetragene lv-gesamtnoten freigeben
 if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
@@ -703,16 +706,12 @@ if (isset($_REQUEST["freigabe"]) and ($_REQUEST["freigabe"] == 1))
 	}
 }
 
-echo '<table width="100%" height="10px"><tr><td>';
 if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
-	echo '<a href="#" onclick="window.open(\'notenschluessel.php?lehrveranstaltung_id='.$lvid.'&stsem='.$stsem.'\',\'Grades\', \'height=200,width=350,left=50,top=50,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\'); return false;">'.$p->t('gesamtnote/notenschluesselanzeigen').'</a>';
-echo '</td><td align="right">';
-echo '<a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/benotungstoolHandbuch').'" class="Item" target="_blank">'.$p->t('benotungstool/handbuch').' (PDF)</a>';
-echo '</td></tr></table>';
+	echo '<br><a href="#" onclick="window.open(\'notenschluessel.php?lehrveranstaltung_id='.$lvid.'&stsem='.$stsem.'\',\'Grades\', \'height=200,width=350,left=50,top=50,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes\'); return false;">'.$p->t('gesamtnote/notenschluesselanzeigen').'</a>';
 
-
+echo '</td></tr></table><br>';
 echo '<table width="100%" height="10px"><tr><td>';
-echo '</td></tr></table>';
+
 
 // alle Pruefungen für die LV holen
 $studpruef_arr = array();
@@ -1023,7 +1022,7 @@ echo "
 					$znote = null;			
 								
 				
-				echo "<td>".$note_les_str."&nbsp;</td>";
+				echo "<td style='white-space: nowrap;'>".$note_les_str."&nbsp;</td>";
 				
 				if (key_exists($row_stud->uid,$studpruef_arr))	
 					$hide = "style='display:none;visibility:hidden;'";

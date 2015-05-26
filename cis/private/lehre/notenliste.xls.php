@@ -33,8 +33,12 @@ require_once('../../../include/studiensemester.class.php');
 require_once('../../../include/note.class.php');
 require_once('../../../include/notenschluessel.class.php');
 require_once('../../../include/Excel/excel.php');
+require_once('../../../include/phrasen.class.php');
 
 $uid = get_uid();
+
+$sprache = getSprache();
+$p = new phrasen($sprache);
 
 if(!check_lektor($uid))
 	die('Sie haben keine Berechtigung fuer diese Seite');
@@ -91,11 +95,11 @@ else
 	$workbook->setVersion(8);
 	
 	// sending HTTP headers
-	$workbook->send("Notenliste". "_" . date("d_m_Y") . ".xls");
+	$workbook->send($p->t('anwesenheitsliste/notenliste'). "_" . date("d_m_Y") . ".xls");
 	$workbook->setCustomColor (15,192,192,192); //Setzen der HG-Farbe Hellgrau
 
 	// Creating a worksheet
-	$worksheet =& $workbook->addWorksheet("Notenliste");
+	$worksheet =& $workbook->addWorksheet($p->t('anwesenheitsliste/notenliste'));
 	// Neu - UTF-8 Excel
 	$worksheet->setInputEncoding('utf-8');
 
@@ -121,7 +125,7 @@ else
 
 	$lvobj = new lehrveranstaltung($lvid);
 		
-	$worksheet->write(0,0,"Notenliste ".$lvobj->bezeichnung,$format_bold);
+	$worksheet->write(0,0,$p->t('anwesenheitsliste/notenliste')." ".($sprache=='English'?$lvobj->bezeichnung_english:$lvobj->bezeichnung),$format_bold);
 	
 	$stg_obj = new studiengang($stg);
 	
@@ -149,7 +153,7 @@ else
 		}
 	}
 			
-	$worksheet->write(1,0,"Studiengang: $stg_obj->bezeichnung $gruppen");
+	$worksheet->write(1,0,$p->t('global/studiengang').": $stg_obj->bezeichnung $gruppen");
 	$lines=2;
 	//Lektoren ermitteln
 	
@@ -179,15 +183,15 @@ else
 
 	//Studenten holen
 	$lines++;
-	$worksheet->write($lines,1,"Familiennname",$format_border_bottom);
-	$worksheet->write($lines,2,"Vorname",$format_border_bottom);
-	$worksheet->write($lines,3,"Gruppe",$format_border_bottom);
-	$worksheet->write($lines,4,"Kennzeichen",$format_border_bottom);
+	$worksheet->write($lines,1,$p->t('global/nachname'),$format_border_bottom);
+	$worksheet->write($lines,2,$p->t('global/vorname'),$format_border_bottom);
+	$worksheet->write($lines,3,$p->t('global/gruppe'),$format_border_bottom);
+	$worksheet->write($lines,4,$p->t('global/personenkennzeichen'),$format_border_bottom);
 
 	if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
-		$worksheet->write($lines,5,"Punkte",$format_border_bottom);
+		$worksheet->write($lines,5,$p->t('benotungstool/punkte'),$format_border_bottom);
 	else
-		$worksheet->write($lines,5,"Note",$format_border_bottom);
+		$worksheet->write($lines,5,$p->t('benotungstool/note'),$format_border_bottom);
 
 	$stsem_obj = new studiensemester();
 	$stsem_obj->load($stsem);
@@ -264,7 +268,7 @@ else
 	foreach($notenschluessel->result as $row)
 		$aufteilung[$row->note]=$row->punkte;	
 	
-	$worksheet->write(++$lines,0,'Noten:');
+	$worksheet->write(++$lines,0,$p->t('benotungstool/note').":");
 	foreach($note->result as $row)
 	{
 		if($row->aktiv && $row->lehre)
@@ -272,7 +276,7 @@ else
 			if(CIS_GESAMTNOTE_PUNKTE)
 			{
 				if(isset($aufteilung[$row->note]))
-					$punkte = '>='.(float)$aufteilung[$row->note].' Punkte - ';
+					$punkte = '>='.(float)$aufteilung[$row->note].' '.$p->t("benotungstool/punkte").' - ';
 				else
 					$punkte='';
 				$worksheet->write(++$lines,0,$punkte.$row->bezeichnung.' ('.$row->anmerkung.')');
@@ -284,16 +288,16 @@ else
 	
 	$worksheet->writeBlank(++$lines,0,0);
 	$worksheet->writeBlank(++$lines,0,$format_highlight);
-	$worksheet->write($lines,1,'...Kopieren Sie diese Zellen in den Zwischenspeicher, um damit die Import-Spalte des Gesamtnotenformulars zu befüllen');
+	$worksheet->write($lines,1,'...'.$p->t('anwesenheitsliste/anleitungImportFunktion'));
 	$lines++;
 	$worksheet->write(++$lines,0,'(i)  ... Incoming');	
 	$worksheet->write(++$lines,0,'(o)  ... Outgoing');
-	$worksheet->write(++$lines,0,'(ar) ... angerechnet');
+	$worksheet->write(++$lines,0,'(ar) ... '.$p->t('anwesenheitsliste/angerechnet'));
 	
 	$worksheet->setColumn(0, 0, 5);
 	$worksheet->setColumn(1, 1, 25);
 	$worksheet->setColumn(2, 2, 25);
 	$worksheet->setColumn(3, 3, 7);
-	$worksheet->setColumn(4, 4, 13);
+	$worksheet->setColumn(4, 4, 21);
 	$workbook->close();
 ?>
