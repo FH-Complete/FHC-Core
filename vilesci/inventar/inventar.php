@@ -929,6 +929,8 @@ function output_inventar($debug=false,$resultBetriebsmittel=null,$resultBetriebs
 				$resultBetriebsmittel[$pos]->oe_kurzbz=$oBetriebsmittelOrganisationseinheit->errormsg;
 		}
 		
+		if(!isset($oOrganisationseinheit))
+			$oOrganisationseinheit=new stdClass();
 		$oOrganisationseinheit->bezeichnung='';
 		$oOrganisationseinheit = new organisationseinheit($resultBetriebsmittel[$pos]->oe_kurzbz);
 		// String - Daten Leerzeichen am Ende entfernen
