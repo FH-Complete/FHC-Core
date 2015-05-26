@@ -1158,7 +1158,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				</text:p>
 				<text:p text:style-name="P22">6.2.1 Studienbeitrag </text:p>
 				<text:p text:style-name="P95">
-					<text:span text:style-name="T39">Die ao. Studentin bzw. der ao. Student ist verpflichtet, zwei Wochen vor Beginn jedes Semesters einen Studienbeitrag gemäß Fachhochschul-Studiengesetz (BGBl. Nr. 340/1993 idgF) in der Höhe von derzeit € 363,36 netto pro Semester zu entrichten. Im Falle einer Erhöhung des gesetzlichen Studienbeitrags-satzes erhöht sich der angeführte Betrag entsprechend. Bei Nichtantritt des Studiums oder Abbruch zu Beginn oder während des Semesters verfällt der Studienbeitrag.</text:span>
+					<text:span text:style-name="T39">Die ao. Studentin bzw. der ao. Student ist verpflichtet, zwei Wochen vor Beginn jedes Semesters einen Studienbeitrag gemäß Fachhochschul-Studiengesetz (BGBl. Nr. 340/1993 idgF) in der Höhe von derzeit € 363,36 netto pro Semester zu entrichten. Im Falle einer Erhöhung des gesetzlichen Studienbeitragssatzes erhöht sich der angeführte Betrag entsprechend. Bei Nichtantritt des Studiums oder Abbruch zu Beginn oder während des Semesters verfällt der Studienbeitrag.</text:span>
 				</text:p>
 				<text:p text:style-name="P95"/>
 				<text:p text:style-name="P103">6.2.2 Studierendenbeitrag („ÖH-Beitrag“)</text:p>
@@ -1218,7 +1218,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P38"/>
 				<text:p text:style-name="P95">
 					<text:span text:style-name="T39">
-						<text:s/>Der Studierendenbeitrag kann jährlich durch die ÖH indexiert werden; die genaue Höhe des Studierendenbeitrags wird von der ÖH jährlich für das folgende Studienjahr bekannt gegeben. Die Einhebung des Betrags erfolgt durch die Fachhochschule. Der Erhalter überweist in Folge die eingezahlten Beträge der Studierenden ohne Abzüge an die ÖH. Die Entrichtung des Betrags ist Voraussetzung für die Zulassung zum Studium bzw. für dessen Fortsetzung.</text:span>
+						<text:s/>Der Studierendenbeitrag kann jährlich durch die ÖH indexiert werden; die genaue Höhe des Studierendenbeitrags wird von der ÖH jährlich für das folgende Studienjahr bekannt gegeben. Die Einhebung des Betrags erfolgt durch die Fachhochschule. Der Erhalter überweist in Folge die eingezahlten Beträge der ao. Studierenden ohne Abzüge an die ÖH. Die Entrichtung des Betrags ist Voraussetzung für die Zulassung zum ao. Studium bzw. für dessen Fortsetzung.</text:span>
 				</text:p>
 				<text:p text:style-name="P22"/>
 				<text:p text:style-name="P91">6.2.3 Unkostenbeitrag </text:p>
@@ -1232,7 +1232,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P104">
 					<text:s/>The student fee can be annually indexed by the Austrian Students&apos; Union; the exact amount of the student fee for the following year is announced annually by the Austrian Students&apos; Union.</text:p>
 				<text:p text:style-name="P96">
-					<text:span text:style-name="T40">The amount is levied by the University of Applied Sciences. The operator then transfers the amounts paid by the students without deductions to the Students&apos; Union. Payment of the student fee is a pre-requisite for admission to the course or for its continuation.</text:span>
+					<text:span text:style-name="T40">The amount is levied by the University of Applied Sciences. The operator then transfers the amounts paid by the external students without deductions to the Students&apos; Union. Payment of the student fee is a pre-requisite for admission to the course or for its continuation.</text:span>
 				</text:p>
 				<text:p text:style-name="P22"/>
 				<text:p text:style-name="P100">6.2.3 Contribution towards Expenses </text:p>
@@ -1252,7 +1252,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				</text:p>
 				<text:p text:style-name="P77"/>
 				<text:p text:style-name="P77">6.2.6 Aktualisierung eigener Daten und Bezug von Informationen</text:p>
-				<text:p text:style-name="P76">Die ao. Studentin bzw. der ao. Student hat unaufgefordert dafür zu sorgen, dass die von ihr/ihm beigebrachten Daten aktuell sind. Änderungen sind der Studiengangsassistenz unverzüglich schriftlich mitzuteilen. Darüber hinaus trifft sie/ihn die Pflicht, sich von studienbezogenen Informationen, die ihr/ihm an die vom Erhalter zur Verfügung gestellte Emailadresse zugestellt werden, in geeigneter Weise Kenntnis zu verschaffen.)</text:p>
+				<text:p text:style-name="P76">Die ao. Studentin bzw. der ao. Student hat unaufgefordert dafür zu sorgen, dass die von ihr/ihm beigebrachten Daten aktuell sind. Änderungen sind der Studiengangsassistenz unverzüglich schriftlich mitzuteilen. Darüber hinaus trifft sie/ihn die Pflicht, sich von studienbezogenen Informationen, die ihr/ihm an die vom Erhalter zur Verfügung gestellte Emailadresse zugestellt werden, in geeigneter Weise Kenntnis zu verschaffen.</text:p>
 				<text:p text:style-name="P76"/>
 				<text:p text:style-name="P75">
 					<text:span text:style-name="T34">6.2.7 Verwertungsrechte</text:span>
@@ -1270,12 +1270,12 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P107"/>
 				<text:p text:style-name="P107"/>
 				<text:p text:style-name="P107">6.2.6 Updating personal data and the retrieval of information</text:p>
-				<text:p text:style-name="P107">Without being reminded, the external student must ensure that the data provided by them is up-to-date. Changes are to be immediately communicated to the administrative assistant in writing. Furthermore, it is the students’ responsibility to make themselves suitably aware of information relating to their studies which has been sent to them at the email address provided for them by the operator.</text:p>
+				<text:p text:style-name="P107">Without being reminded, the external student must ensure that the data provided by them is up-to-date. Changes are to be immediately communicated to the administrative assistant in writing. Furthermore, it is the external students’ responsibility to make themselves suitably aware of information relating to their studies which has been sent to them at the email address provided for them by the operator.</text:p>
 				<text:p text:style-name="P107"/>
 				<text:p text:style-name="P107"/>
 				<text:p text:style-name="P100">
 					<text:span text:style-name="T42">6.2.7</text:span> Exploitation Rights</text:p>
-				<text:p text:style-name="P107">Unless other arrangements have been agreed between the operator and the external student at an individual level, on written request, the student undertakes to offer the operator the rights to research and development results. </text:p>
+				<text:p text:style-name="P107">Unless other arrangements have been agreed between the operator and the external student at an individual level, on written request, the external student undertakes to offer the operator the rights to research and development results. </text:p>
 				<text:p text:style-name="P119">
 					<text:soft-page-break/>
 				</text:p>
@@ -1289,7 +1289,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P96">Die ao. Studentin bzw. der ao. Student ist zur Geheimhaltung von Forschungs- und Entwicklungsaktivitäten und -ergebnissen gegenüber Dritten verpflichtet. </text:p>
 				<text:p text:style-name="P22"/>
 				<text:p text:style-name="P100">6.2.10 Unfallmeldung </text:p>
-				<text:p text:style-name="P100">Im Falle eines Unfalles mit körperlicher Verletzung des/der ao. Studierenden im Zusammenhang mit dem Studium ist die/der Studierende verpflichtet, innerhalb von drei Tagen eine Meldung am Studiengangssekretariat einzubringen. Dies betrifft auch Wegunfälle zur oder von der FH. </text:p>
+				<text:p text:style-name="P100">Im Falle eines Unfalles mit körperlicher Verletzung des/der ao. Studierenden im Zusammenhang mit dem ao. Studium ist die/der ao. Studierende verpflichtet, innerhalb von drei Tagen eine Meldung am Studiengangssekretariat einzubringen. Dies betrifft auch Wegunfälle zur oder von der FH. </text:p>
 				<text:p text:style-name="P118"/>
 				<text:p text:style-name="P22">6.2.8 Recordings </text:p>
 				<text:p text:style-name="P96">It is expressly forbidden for the external student to record lectures in part or in total (e.g. by using film and / or sound recordings or other audio-visual means suitable for this purpose). In addition, any form of making the aforementioned recordings publically available (wired or wireless) for example in social networks such as Facebook, StudiVZ etc, but also on Youtube, etc., or by other means of communication designed for these purposes is strictly prohibited. These regulations shall apply correspondingly to scripts, other learning aids and examination data. </text:p>

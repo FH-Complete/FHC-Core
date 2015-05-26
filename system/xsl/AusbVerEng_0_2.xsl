@@ -923,7 +923,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 					<text:bookmark-end text:name="_Ref78860434"/>
 				</text:p>
 				<text:p text:style-name="P48"/>
-				<text:p text:style-name="P48">Die Ausbildungsdauer beträgt <xsl:value-of select="studiengang_maxsemester"/> Semester.</text:p>
+				<text:p text:style-name="P48">Die Ausbildungsdauer beträgt <xsl:value-of select="student_maxsemester"/> Semester.</text:p>
 				<text:p text:style-name="P61"/>
 				<text:p text:style-name="P61">Nachgewiesene erworbene Kenntnisse können auf einzelne Lehrveranstaltungen angerechnet werden bzw. zum Erlass einer Lehrveranstaltung oder des Berufspraktikums führen. Hierzu bedarf es eines Antrages der Studentin bzw. des Studenten und der nachfolgenden Feststellung der inhaltlichen und umfänglichen Gleichwertigkeit durch die Studiengangsleitung. </text:p>
 				<text:p text:style-name="P61"/>
@@ -954,7 +954,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				</text:p>
 				<text:p text:style-name="P61"/>
 				<text:p text:style-name="P48">
-					<text:span text:style-name="T45">The training period lasts <xsl:value-of select="studiengang_maxsemester"/> semesters.</text:span>
+					<text:span text:style-name="T45">The training period lasts <xsl:value-of select="student_maxsemester"/> semesters.</text:span>
 				</text:p>
 				<text:p text:style-name="P48"/>
 				<text:p text:style-name="P48">Demonstration of knowledge acquired can be accredited to individual courses or lead to exemption from a course or internship. This requires an application by the student and the subsequent establishment by the Program Director of the content and extent of equivalence. </text:p>
@@ -1255,7 +1255,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				</text:p>
 				<text:p text:style-name="P34"/>
 				<text:p text:style-name="P34">6.2.7 Aktualisierung eigener Daten und Bezug von Informationen</text:p>
-				<text:p text:style-name="P34">Die Studentin bzw. der Student hat unaufgefordert dafür zu sorgen, dass die von ihr/ihm beigebrachten Daten aktuell sind. Änderungen sind der Studiengangsassistenz unverzüglich schriftlich mitzuteilen. Darüber hinaus trifft sie/ihn die Pflicht, sich von studienbezogenen Informationen, die ihr/ihm an die vom Erhalter zur Verfügung gestellte Emailadresse zugestellt werden, in geeigneter Weise Kenntnis zu verschaffen.)</text:p>
+				<text:p text:style-name="P34">Die Studentin bzw. der Student hat unaufgefordert dafür zu sorgen, dass die von ihr/ihm beigebrachten Daten aktuell sind. Änderungen sind der Studiengangsassistenz unverzüglich schriftlich mitzuteilen. Darüber hinaus trifft sie/ihn die Pflicht, sich von studienbezogenen Informationen, die ihr/ihm an die vom Erhalter zur Verfügung gestellte Emailadresse zugestellt werden, in geeigneter Weise Kenntnis zu verschaffen.</text:p>
 				<text:p text:style-name="P36"/>
 				<text:p text:style-name="P48">6.2.6 Providing Personal Data</text:p>
 				<text:p text:style-name="P55">The student is obliged to produce personal data which must be registered because of a law, regulation or a decision by the operator, or is essential fort he fulfilling of the training contract or fort he program of studies.</text:p>
