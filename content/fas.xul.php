@@ -136,6 +136,7 @@ foreach($addon_obj->result as $addon)
   <command id="menu-dokumente-accountinfoblatt:command" oncommand="PrintAccountInfoBlatt(event);"/>  
   <command id="menu-dokumente-zutrittskarte:command" oncommand="PrintZutrittskarte();"/>
   <command id="menu-dokumente-studienblatt:command" oncommand="PrintStudienblatt(event);"/>
+  <command id="menu-dokumente-studienblatt_englisch:command" oncommand="PrintStudienblattEnglisch(event);"/>
   <command id="menu-dokumente-pruefungsprotokoll:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple(event,'de');"/>
   <command id="menu-dokumente-pruefungsprotokoll_englisch:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple(event,'en');"/>
   <command id="menu-dokumente-pruefungsprotokoll2:command" oncommand="StudentAbschlusspruefungPrintPruefungsprotokollMultiple(event,'de2');"/>
@@ -651,6 +652,12 @@ foreach($addon_obj->result as $addon)
                label     = "&menu-dokumente-studienblatt.label;"
                command   =  "menu-dokumente-studienblatt:command"
                accesskey = "&menu-dokumente-studienblatt.accesskey;"/>
+            <menuitem
+               id        =  "menu-dokumente-studienblatt_englisch"
+               key       =  "menu-dokumente-studienblatt_englisch:key"
+               label     = "&menu-dokumente-studienblatt_englisch.label;"
+               command   =  "menu-dokumente-studienblatt_englisch:command"
+               accesskey = "&menu-dokumente-studienblatt_englisch.accesskey;"/>
 			<menuseparator/>
 			<menuitem
                id        =  "menu-dokumente-pruefungsprotokoll"

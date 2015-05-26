@@ -382,19 +382,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
       </text:p>
       <text:p text:style-name="P7">Personenkennzeichen:<text:tab/><xsl:value-of select="matrikelnr"/></text:p>
       <text:p text:style-name="P11"/>
-      <text:p text:style-name="P4">(kurz „ao. Studentin“ bzw. „ao. Student“ genannt) andererseits im Rahmen des außerordentlichen Studiums bzw. des Besuchs einzelner Lehrveranstaltungen des <xsl:value-of select="studiengang_typ"/> Studienganges „<xsl:value-of select="studiengang"/>“, StgKz <xsl:value-of select="studiengang_kz"/>, in der Organisationsform eines 
-		<xsl:choose>
-			<xsl:when test="orgform = 'BB'" >
-				berufsbegleitenden Studiums.
-			</xsl:when>
-			<xsl:when test="orgform = 'VZ'" >
-				Vollzeitstudiums.
-			</xsl:when>
-			<xsl:otherwise>
-				Fernstudiums.
-			</xsl:otherwise>
-		</xsl:choose>
-		</text:p>
+      <text:p text:style-name="P4">(kurz „ao. Studentin“ bzw. „ao. Student“ genannt) andererseits im Rahmen des außerordentlichen Studiums bzw. des Besuchs einzelner Lehrveranstaltungen an der FH Technikum Wien.</text:p>
 		<text:p text:style-name="P4">Die konkreten Lehrveranstaltungen des außerordentlichen Studiums sind in der Information über die Zulassung zum außerordentlichen Studium angeführt.</text:p>
       <text:p text:style-name="P13"/>
       <text:list xml:id="list305698312" text:continue-numbering="false" text:style-name="WW8Num7">

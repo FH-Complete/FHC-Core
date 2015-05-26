@@ -258,6 +258,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
             </style:paragraph-properties>
             <style:text-properties fo:font-size="14pt" style:font-size-asian="14pt" style:font-size-complex="14pt"/>
         </style:style>
+        <style:style style:name="P19" style:family="paragraph" style:parent-style-name="Standard">
+            <style:paragraph-properties fo:text-align="end" style:justify-single-word="false" fo:margin-top="0.106cm" fo:margin-bottom="0cm" style:contextual-spacing="false"/>
+            <style:text-properties fo:font-size="9pt" style:font-size-asian="9pt" style:font-size-complex="9pt"/>
+        </style:style>
         <style:style style:name="T1" style:family="text">
             <style:text-properties fo:font-size="9pt" style:font-size-asian="9pt" style:font-size-complex="9pt"/>
         </style:style>
@@ -290,8 +294,8 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 <text:sequence-decl text:display-outline-level="0" text:name="Text"/>
                 <text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
             </text:sequence-decls>
-            <text:p text:style-name="P17">Studienblatt</text:p>
-            <text:p text:style-name="P18">Bestätigung des Studierendenstatus</text:p>
+            <text:p text:style-name="P17">Student Record</text:p>
+            <text:p text:style-name="P18">Confirmation of Student Status</text:p>
             <text:p text:style-name="P9"/>
             <table:table table:name="Tabelle1" table:style-name="Tabelle1">
                 <table:table-column table:style-name="Tabelle1.A"/>
@@ -299,18 +303,18 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 <table:table-column table:style-name="Tabelle1.C"/>
                 <table:table-row table:style-name="Tabelle1.1">
                     <table:table-cell table:style-name="Tabelle1.A1" table:number-columns-spanned="2" office:value-type="string">
-                        <text:p text:style-name="P10">Familienname, Vorname</text:p>
+                        <text:p text:style-name="P10">Surname, Given Name</text:p>
                         <text:p text:style-name="P8"><xsl:value-of select="nachname"/>, <xsl:value-of select="vorname"/></text:p>
                     </table:table-cell>
                     <table:covered-table-cell/>
                     <table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
-                        <text:p text:style-name="P10">Personenkennzeichen</text:p>
+                        <text:p text:style-name="P10">Personal ID Number</text:p>
                         <text:p text:style-name="P8"><xsl:value-of select="matrikelnr"/></text:p>
                     </table:table-cell>
                 </table:table-row>
                 <table:table-row table:style-name="Tabelle1.2">
                     <table:table-cell table:style-name="Tabelle1.A1" table:number-columns-spanned="3" office:value-type="string">
-                        <text:p text:style-name="P10">Adresse</text:p>
+                        <text:p text:style-name="P10">Adress</text:p>
                         <text:p text:style-name="P8"><xsl:value-of select="strasse"/>, <xsl:value-of select="plz"/></text:p>
                     </table:table-cell>
                     <table:covered-table-cell/>
@@ -318,15 +322,15 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 </table:table-row>
                 <table:table-row table:style-name="Tabelle1.2">
                     <table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
-                        <text:p text:style-name="P10">Geburtsdatum</text:p>
+                        <text:p text:style-name="P10">Date of Birth</text:p>
                         <text:p text:style-name="P8"><xsl:value-of select="gebdatum"/></text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
-                        <text:p text:style-name="P10">Geburtsort</text:p>
+                        <text:p text:style-name="P10">Place of Birth</text:p>
                         <text:p text:style-name="P8"><xsl:value-of select="gebort"/></text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle1.A1" office:value-type="string">
-                        <text:p text:style-name="P11">Geschlecht</text:p>
+                        <text:p text:style-name="P11">Sex</text:p>
                         <text:p text:style-name="P8"><xsl:value-of select="geschlecht"/></text:p>
                     </table:table-cell>
                 </table:table-row>
@@ -347,26 +351,26 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 </table:table-row>
                 <table:table-row table:style-name="Tabelle2.1">
                     <table:table-cell table:style-name="Tabelle2.A1" table:number-columns-spanned="2" office:value-type="string">
-                        <text:p text:style-name="P10">Studiengang</text:p>
+                        <text:p text:style-name="P10">Degree Program</text:p>
                         <text:p text:style-name="P8"><xsl:value-of select="studiengang"/></text:p>
                     </table:table-cell>
                     <table:covered-table-cell/>
                     <table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
-                        <text:p text:style-name="P10">Kennzahl</text:p>
+                        <text:p text:style-name="P10">Program Code</text:p>
                         <text:p text:style-name="P8"><xsl:value-of select="studiengang_kz"/></text:p>
                     </table:table-cell>
                 </table:table-row>
                 <table:table-row table:style-name="Tabelle2.1">
                     <table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
-                        <text:p text:style-name="P10">Studiengangsart</text:p>
+                        <text:p text:style-name="P10">Bachelor / Master</text:p>
                         <text:p text:style-name="P8"><xsl:value-of select="studiengang_typ"/></text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
-                        <text:p text:style-name="P10">Organisationsform</text:p>
+                        <text:p text:style-name="P10">Organizational Structure</text:p>
                         <text:p text:style-name="P8"><xsl:value-of select="orgform_bezeichnung"/></text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
-                        <text:p text:style-name="P10">Unterrichtssprache</text:p>
+                        <text:p text:style-name="P10">Language of Instruction</text:p>
                         <text:p text:style-name="P8"><xsl:value-of select="studiengangSprache"/></text:p>
                     </table:table-cell>
                 </table:table-row>
@@ -376,20 +380,18 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                         <text:p text:style-name="P8"><xsl:value-of select="ects_gesamt"/></text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
-                        <text:p text:style-name="P10">ECTS je Semester</text:p>
+                        <text:p text:style-name="P10">ECTS per Semester</text:p>
                         <text:p text:style-name="P8"><xsl:value-of select="ects_pro_semester"/></text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle2.A1" office:value-type="string">
-                        <text:p text:style-name="P10">Regelstudiendauer</text:p>
+                        <text:p text:style-name="P10">Usual Duration of Course</text:p>
                         <text:p text:style-name="P8"><xsl:value-of select="regelstudiendauer"/></text:p>
                     </table:table-cell>
                 </table:table-row>
                 <table:table-row table:style-name="Tabelle2.1">
                     <table:table-cell table:style-name="Tabelle2.A1" table:number-columns-spanned="3" office:value-type="string">
                         <text:p text:style-name="P6">
-                            <text:span text:style-name="T1">Akademischer</text:span>
-                            <text:span text:style-name="T3"> </text:span>
-                            <text:span text:style-name="T1">Grad</text:span>
+                            <text:span text:style-name="T1">Degree Awarded</text:span>
                         </text:p>
                         <text:p text:style-name="P8"><xsl:value-of select="akadgrad"/></text:p>
                     </table:table-cell>
@@ -404,7 +406,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 <table:table-column table:style-name="Tabelle3.B"/>
                 <table:table-row table:style-name="Tabelle3.1">
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
-                        <text:p text:style-name="P4">Studienantritt</text:p>
+                        <text:p text:style-name="P4">Date of Admission</text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
                         <text:p text:style-name="P2">
@@ -414,7 +416,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 </table:table-row>
                 <table:table-row table:style-name="Tabelle3.1">
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
-                        <text:p text:style-name="P4">Erstes Studiensemester</text:p>
+                        <text:p text:style-name="P4">First Semester of Study</text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
                         <text:p text:style-name="P2">
@@ -423,7 +425,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 </table:table-row>
                 <table:table-row table:style-name="Tabelle3.1">
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
-                        <text:p text:style-name="P4">Aktuelles Studiensemester</text:p>
+                        <text:p text:style-name="P4">Current Semester of Study</text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
                         <text:p text:style-name="P2">
@@ -432,7 +434,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 </table:table-row>
                 <table:table-row table:style-name="Tabelle3.1">
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
-                        <text:p text:style-name="P4">Aktuelles Ausbildungssemester</text:p>
+                        <text:p text:style-name="P4">Current Semester in Degree Program</text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
                         <text:p text:style-name="P2">
@@ -441,7 +443,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 </table:table-row>
                 <table:table-row table:style-name="Tabelle3.1">
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
-                        <text:p text:style-name="P4">Aktueller Studierendenstatus</text:p>
+                        <text:p text:style-name="P4">Current Student Status</text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
                         <text:p text:style-name="P2">
@@ -450,7 +452,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 </table:table-row>
                 <table:table-row table:style-name="Tabelle3.1">
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
-                        <text:p text:style-name="P4">Voraussichtlich letztes Studiensemester</text:p>
+                        <text:p text:style-name="P4">Expected Final Semester of Study</text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
                         <text:p text:style-name="P2">
@@ -459,7 +461,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                 </table:table-row>
                 <table:table-row table:style-name="Tabelle3.1">
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
-                        <text:p text:style-name="P4">Voraussichtliches Abschlussdatum</text:p>
+                        <text:p text:style-name="P4">Expected Date of Graduation</text:p>
                     </table:table-cell>
                     <table:table-cell table:style-name="Tabelle3.A1" office:value-type="string">
                         <text:p text:style-name="P15"><xsl:value-of select="voraussichtlichLetztesStudiensemester_datum"/></text:p>
@@ -477,7 +479,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                         <text:p text:style-name="P4"/>
                         <text:p text:style-name="P4"/>
                         <text:p text:style-name="P3">
-                            <text:span text:style-name="T1">Datum: </text:span>
+                            <text:span text:style-name="T1">Date: </text:span>
                             <text:span text:style-name="T2"><xsl:value-of select="datum_aktuell"/></text:span>
                         </text:p>
                     </table:table-cell>
@@ -487,12 +489,13 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
                             <text:span text:style-name="T1"><xsl:value-of select="stgl"/></text:span>
                         </text:p>
                         <text:p text:style-name="P5">
-                            <text:span text:style-name="T1">Studiengangsleitung <xsl:value-of select="studiengang"/></text:span>
+                            <text:span text:style-name="T1">Program Director <xsl:value-of select="studiengang"/></text:span>
                         </text:p>
                     </table:table-cell>
                 </table:table-row>
             </table:table>
-            <text:p text:style-name="P3"/>
+            <text:p text:style-name="P19"/>
+            <text:p text:style-name="P19">Also valid without signature and official stamp</text:p>
         </office:text>
 </xsl:template>
 </xsl:stylesheet>

@@ -908,7 +908,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</style:header-first>
 			<style:footer>
 				<text:p text:style-name="Footer">
-					<text:span text:style-name="MT1">Ausbildungsvertrag (Training Contract)<text:tab/>
+					<text:span text:style-name="MT1">Ausbildungsvertrag außerordentliches Studium/ Besuch einzelner Lehrveranstaltungen eines Studiengangs
 						<text:tab/>
 					</text:span>
 					<text:span text:style-name="Page_20_Number">
@@ -922,14 +922,14 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				</text:p>
 				<text:p text:style-name="Footer">
 					<text:span text:style-name="Page_20_Number">
-						<text:span text:style-name="MT2"><xsl:value-of select="studiengang_typ"/>-Studiengang (Degree Program) <xsl:value-of select="studiengang"/> (<xsl:value-of select="studiengang_englisch"/>)</text:span>
+						<text:span text:style-name="MT2">Training Contract for external students/ attending individual courses of a degree program</text:span>
 					</text:span>
 					<text:span text:style-name="Page_20_Number"/>
 				</text:p>
 			</style:footer>
 			<style:footer-first>
 				<text:p text:style-name="Footer">
-					<text:span text:style-name="MT1">Ausbildungsvertrag (Training Contract)<text:tab/>
+					<text:span text:style-name="MT1">Ausbildungsvertrag außerordentliches Studium/ Besuch einzelner Lehrveranstaltungen eines Studiengangs
 						<text:tab/>
 					</text:span>
 					<text:span text:style-name="Page_20_Number">
@@ -943,7 +943,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				</text:p>
 				<text:p text:style-name="Footer">
 					<text:span text:style-name="Page_20_Number">
-						<text:span text:style-name="MT2"><xsl:value-of select="studiengang_typ"/>-Studiengang (Degree Program) <xsl:value-of select="studiengang"/> (<xsl:value-of select="studiengang_englisch"/>)</text:span>
+						<text:span text:style-name="MT2">Training Contract for external students/ attending individual courses of a degree program</text:span>
 					</text:span>
 					<text:span text:style-name="Page_20_Number"/>
 				</text:p>
