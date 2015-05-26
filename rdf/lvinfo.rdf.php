@@ -145,7 +145,6 @@ if($db->db_query($qry))
 			<LVINFO:kurzbeschreibung><![CDATA[<?php echo xmlclean($row->kurzbeschreibung); ?>]]></LVINFO:kurzbeschreibung>
 			<LVINFO:orgform_kurzbz><![CDATA[<?php echo xmlclean($row->orgform_kurzbz); ?>]]></LVINFO:orgform_kurzbz>
 			<LVINFO:incoming><![CDATA[<?php echo xmlclean($row->incoming); ?>]]></LVINFO:incoming>
-			<LVINFO:incoming><![CDATA[<?php echo xmlclean($row->incoming); ?>]]></LVINFO:incoming>
 			<LVINFO:anwesenheit><![CDATA[<?php echo xmlclean($row->anwesenheit); ?>]]></LVINFO:anwesenheit>
       	</RDF:Description>
 
