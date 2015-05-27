@@ -78,6 +78,9 @@ class mail
 		$mime_boundary_mixed = 'MIXD+'.md5(time());
 		$eol="\n";
 		
+		if(defined('MAIL_FROM') && MAIL_FROM!='')
+			$this->sender = MAIL_FROM;
+
 		// Header
 		$header = '';
   		$header .= "From: {$this->sender}".$eol;
