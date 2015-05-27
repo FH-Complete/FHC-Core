@@ -2,6 +2,7 @@
 $this->phrasen['anwesenheitsliste/studiensemesterIstUngueltig']='No valid semester'; 
 $this->phrasen['anwesenheitsliste/anwesenheitslisten']='Attendance lists';
 $this->phrasen['anwesenheitsliste/notenlisten']='Grade lists';
+$this->phrasen['anwesenheitsliste/notenliste']='Grade list';
 $this->phrasen['anwesenheitsliste/anwesenheitslistenMitBildern']='Attendance lists with pictures';
 $this->phrasen['anwesenheitsliste/keineStudentenVorhanden']='There are currently no students in this degree program / semester';
 $this->phrasen['anwesenheitsliste/erstellenDerListeKlicken']='To create the list, please click on the desired group!';
@@ -10,9 +11,11 @@ $this->phrasen['anwesenheitsliste/fehlerhafteParameteruebergabe']='Incorrect par
 
 $this->phrasen['anwesenheitsliste/anwesenheit']='Attendance List';
 $this->phrasen['anwesenheitsliste/leAbgeschlossen']='LE completed';
-$this->phrasen['anwesenheitsliste/fehlstunden']='Fehlstunden';
-$this->phrasen['anwesenheitsliste/keineLVsGefunden']='Es konnten keine Lehrveranstaltungen gefunden werden';
-$this->phrasen['anwesenheitsliste/waehleLV']='Bitte wählen Sie eine Lehrveranstaltung aus';
-$this->phrasen['anwesenheitsliste/keineStundenvorhanden']='Derzeit sind keine Stunden eingetragen';
-$this->phrasen['anwesenheitsliste/keineEintraegeGefunden']='Es wurden keine Einträge gefunden';
+$this->phrasen['anwesenheitsliste/fehlstunden']='Unexcused absences';
+$this->phrasen['anwesenheitsliste/keineLVsGefunden']='No subjects have been found';
+$this->phrasen['anwesenheitsliste/waehleLV']='Please choose a subject';
+$this->phrasen['anwesenheitsliste/keineStundenvorhanden']='Currently no lessons are listed';
+$this->phrasen['anwesenheitsliste/keineEintraegeGefunden']='No entries have been found';
+$this->phrasen['anwesenheitsliste/anleitungImportFunktion']='Copy these cells to the clipboard to fill the subject grade import of the final grade form';
+$this->phrasen['anwesenheitsliste/angerechnet']='Accredited';
 ?>
