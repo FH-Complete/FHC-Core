@@ -220,19 +220,19 @@ function saveProjektphaseDetail()
 {
 
 	//Werte holen
-	projektphase_id = document.getElementById('textbox-projektphase-detail-projektphase_id').value;
-	projektphase_fk = document.getElementById('menulist-projektphase-detail-projektphase_fk').value;
-	ressource_id = document.getElementById('menulist-projektphase-detail-ressource').value;
-	projekt_kurzbz = document.getElementById('textbox-projektphase-detail-projekt_kurzbz').value;
-	bezeichnung = document.getElementById('textbox-projektphase-detail-bezeichnung').value;
-	typ = document.getElementById('textbox-projektphase-detail-typ').value;
-	beschreibung = document.getElementById('textbox-projektphase-detail-beschreibung').value;
-	start = document.getElementById('textbox-projektphase-detail-start').iso;
-	ende = document.getElementById('textbox-projektphase-detail-ende').iso;
-	budget = document.getElementById('textbox-projektphase-detail-budget').value;
-	personentage = document.getElementById('textbox-projektphase-detail-personentage').value;
-    farbe = document.getElementById('textbox-projektphase-detail-farbe').value;
-	neu = document.getElementById('checkbox-projektphase-detail-neu').checked;
+	var projektphase_id = document.getElementById('textbox-projektphase-detail-projektphase_id').value;
+	var projektphase_fk = document.getElementById('menulist-projektphase-detail-projektphase_fk').value;
+	var ressource_id = document.getElementById('menulist-projektphase-detail-ressource').value;
+	var projekt_kurzbz = document.getElementById('textbox-projektphase-detail-projekt_kurzbz').value;
+	var bezeichnung = document.getElementById('textbox-projektphase-detail-bezeichnung').value;
+	var typ = document.getElementById('textbox-projektphase-detail-typ').value;
+	var beschreibung = document.getElementById('textbox-projektphase-detail-beschreibung').value;
+	var start = document.getElementById('textbox-projektphase-detail-start').iso;
+	var ende = document.getElementById('textbox-projektphase-detail-ende').iso;
+	var budget = document.getElementById('textbox-projektphase-detail-budget').value;
+	var personentage = document.getElementById('textbox-projektphase-detail-personentage').value;
+    var farbe = document.getElementById('textbox-projektphase-detail-farbe').value;
+	var neu = document.getElementById('checkbox-projektphase-detail-neu').checked;
 
 	var soapBody = new SOAPObject("saveProjektphase");
 	//soapBody.appendChild(new SOAPObject("username")).val('joe');
@@ -374,13 +374,6 @@ function ProjektphaseNeu()
     ProjektphaseFkLoad(menulist, projekt_kurzbz);
     MenulistSelectItemOnValue('menulist-projektphase-detail-projektphase_fk', '');
     
-    
-    //Menulist fuer Ressourcen laden und optionalen Eintrag markieren
-    menulist = document.getElementById('menulist-projektphase-detail-ressource');
-    RessourceTaskLoad(menulist, projektphase_id);
-    MenulistSelectItemOnValue('menulist-projektphase-detail-ressource', '');
-    
-    
     document.getElementById('textbox-projektphase-detail-projekt_kurzbz').value=projekt_kurzbz;
     
     //Neu Status setzen
@@ -391,7 +384,13 @@ function ProjektphaseNeu()
     
     //Detail Tab auswaehlen
 	document.getElementById('projektphase-tabs').selectedItem=document.getElementById('projektphase-tab-detail');	
-    
+
+/*	    
+	//Menulist fuer Ressourcen laden und optionalen Eintrag markieren
+    menulist = document.getElementById('menulist-projektphase-detail-ressource');
+    RessourceTaskLoad(menulist, projektphase_id);
+    MenulistSelectItemOnValue('menulist-projektphase-detail-ressource', '');
+  */  
 }
 
 function ProjektphaseDelete()
