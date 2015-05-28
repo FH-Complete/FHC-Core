@@ -933,40 +933,10 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 			</text:section>
 			<text:section text:style-name="Sect1" text:name="Bereich3">
 				<text:p text:style-name="P112">
-					<text:span text:style-name="T12">im Rahmen des außerordentlichen Studiums bzw. des Besuchs einzelner Lehrveranstaltungen des <xsl:value-of select="studiengang_typ"/>-Studienganges </text:span>
-					<text:span text:style-name="T30">„<xsl:value-of select="studiengang"/>“</text:span>
-					<text:span text:style-name="T30">, StgKz <xsl:value-of select="studiengang_kz"/>, </text:span>
-					<text:span text:style-name="T29">in der Organisationsform eines </text:span>
-					<text:span text:style-name="T30">
-					<xsl:choose>
-						<xsl:when test="orgform = 'BB'" >
-							berufsbegleitenden Studiums.
-						</xsl:when>
-						<xsl:when test="orgform = 'VZ'" >
-							Vollzeitstudiums.
-						</xsl:when>
-						<xsl:otherwise>
-							Fernstudiums.
-						</xsl:otherwise>
-					</xsl:choose>
-					</text:span>
+					<text:span text:style-name="T12">im Rahmen des außerordentlichen Studiums bzw. des Besuchs einzelner Lehrveranstaltungen an der FH Technikum Wien</text:span>
 				</text:p>
 				<text:p text:style-name="P117">
-					<text:span text:style-name="T39">as part of an external course of study or attending individual courses of the <xsl:value-of select="studiengang_typ"/> degree program </text:span>
-					<text:span text:style-name="T5">„<xsl:value-of select="studiengang_englisch"/>“, program abbrev. <xsl:value-of select="studiengang_kz"/>,</text:span> in the organizational form of a 
-					<text:span text:style-name="T5">
-					<xsl:choose>
-						<xsl:when test="orgform = 'BB'" >
-							part-time course.
-						</xsl:when>
-						<xsl:when test="orgform = 'VZ'" >
-							full-time course.
-						</xsl:when>
-						<xsl:otherwise>
-							distance learning course.
-						</xsl:otherwise>
-					</xsl:choose>
-					</text:span>
+					<text:span text:style-name="T39">as part of an external course of study or attending individual courses at the UAS Technikum Wien</text:span>
 				</text:p>
 				<text:p text:style-name="P38"/>
 				<text:p text:style-name="Standard">
@@ -1046,7 +1016,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P22"/>
 				<text:p text:style-name="P102">Der Erhalter führt eine periodische Überprüfung des Studiums im Hinblick auf Relevanz und Aktualität durch und ist im Einvernehmen mit dem FH-Kollegium berechtigt, daraus Änderungen des akkreditierten Studienganges abzuleiten.</text:p>
 				<text:p text:style-name="P102"/>
-				<text:p text:style-name="P102">Der Erhalter ist berechtigt, die Daten der/des Studierenden an den FH Technikum Wien Alumni Club zu übermitteln. Der Alumni Club ist der AbsolventInnenverein der FH Technikum Wien. Er hat zum Ziel, AbsolventInnen, Studierende und Lehrende miteinander zu vernetzen sowie AbsolventInnen laufend über Aktivitäten an der FH Technikum Wien zu informieren. Einer Zusendung von Informationen durch den Alumni Club kann jederzeit widersprochen werden.</text:p>
+				<text:p text:style-name="P102">Der Erhalter ist berechtigt, die Daten der/des ao. Studierenden an den FH Technikum Wien Alumni Club zu übermitteln. Der Alumni Club ist der AbsolventInnenverein der FH Technikum Wien. Er hat zum Ziel, AbsolventInnen, Studierende und Lehrende miteinander zu vernetzen sowie AbsolventInnen laufend über Aktivitäten an der FH Technikum Wien zu informieren. Einer Zusendung von Informationen durch den Alumni Club kann jederzeit widersprochen werden.</text:p>
 				<text:p text:style-name="P23"/>
 				<text:p text:style-name="Standard">
 					<text:span text:style-name="Strong_20_Emphasis">
@@ -1104,7 +1074,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				</text:p>
 				<text:p text:style-name="P102">The operator performs a periodic review of the course in terms of relevance and topicality, and is authorized, in consultation with the University of Applied Sciences Council, to deduce from this changes in the accredited degree program.</text:p>
 				<text:p text:style-name="P102"/>
-				<text:p text:style-name="P102">The operator is entitled to communicate a student’s data to the UAS Technikum Wien Alumni Club. The Alumni Club is the graduate association of the UAS Technikum Wien. Its goal is to provide links between graduates, students and lecturers as well as to keep graduates informed of the activities at the UAS Technikum Wien. A mailing of information from the Alumni Club can be vetoed at any time.</text:p>
+				<text:p text:style-name="P102">The operator is entitled to communicate an external student’s data to the UAS Technikum Wien Alumni Club. The Alumni Club is the graduate association of the UAS Technikum Wien. Its goal is to provide links between graduates, students and lecturers as well as to keep graduates informed of the activities at the UAS Technikum Wien. A mailing of information from the Alumni Club can be vetoed at any time.</text:p>
 				<text:p text:style-name="P23"/>
 				<text:p text:style-name="P23"/>
 				<text:p text:style-name="P23"/>
@@ -1134,7 +1104,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 						<text:p text:style-name="P58">Der Erhalter ist weiters verpflichtet, das Studium auf der Grundlage höchster Qualitätsansprüche hinsichtlich der Erreichung der Ausbildungsziele zu gestalten und allfällige Änderungen des akkreditierten Studienganges bekannt zu geben.</text:p>
 					</text:list-item>
 					<text:list-item>
-						<text:p text:style-name="P64">Der Erhalter verpflichtet sich zur sorgfaltsgemäßen Verwendung der personenbezogenen Daten der Studierenden. Die Daten werden nur im Rahmen der gesetzlichen und vertraglichen Verpflichtungen sowie des Studienbetriebes verwendet und nicht an nicht berechtigte Dritte weitergegeben.</text:p>
+						<text:p text:style-name="P64">Der Erhalter verpflichtet sich zur sorgfaltsgemäßen Verwendung der personenbezogenen Daten der ao. Studierenden. Die Daten werden nur im Rahmen der gesetzlichen und vertraglichen Verpflichtungen sowie des Studienbetriebes verwendet und nicht an nicht berechtigte Dritte weitergegeben.</text:p>
 					</text:list-item>
 				</text:list>
 				<text:p text:style-name="P69"/>
@@ -1147,7 +1117,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 						<text:p text:style-name="P57">The operator also undertakes to design the study on the basis of the highest possible quality standards as regards the achievement of the educational goals and to make known any changes to the accredited degree program. </text:p>
 					</text:list-item>
 					<text:list-item>
-						<text:p text:style-name="P63">The operator is committed to use the personal data of the students carefully. The data is only to be used within the operator’s legal and contractual obligations as well as its program of studies and is not to be handed on to unauthorized third parties.</text:p>
+						<text:p text:style-name="P63">The operator is committed to use the personal data of the external students carefully. The data is only to be used within the operator’s legal and contractual obligations as well as its program of studies and is not to be handed on to unauthorized third parties.</text:p>
 					</text:list-item>
 				</text:list>
 				<text:p text:style-name="P67"/>
@@ -1188,11 +1158,12 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				</text:p>
 				<text:p text:style-name="P22">6.2.1 Studienbeitrag </text:p>
 				<text:p text:style-name="P95">
-					<text:span text:style-name="T39">Die ao. Studentin bzw. der ao. </text:span>ist verpflichtet, zwei Wochen vor Beginn jedes Semesters <text:span text:style-name="T39">e</text:span>inen Studienbeitrag gemäß Fachhochschul-Studiengesetz (BGBl. Nr. 340/1993 idgF) in der Höhe von derzeit € 363,36 netto pro Semester zu entrichten. Im Falle einer Erhöhung des gesetzlichen Studienbeitrags-satzes erhöht sich der angeführte Betrag entsprechend. Bei Nichtantritt des Studiums oder Abbruch zu Beginn oder während des Semesters verfällt der Studienbeitrag. </text:p>
+					<text:span text:style-name="T39">Die ao. Studentin bzw. der ao. Student ist verpflichtet, zwei Wochen vor Beginn jedes Semesters einen Studienbeitrag gemäß Fachhochschul-Studiengesetz (BGBl. Nr. 340/1993 idgF) in der Höhe von derzeit € 363,36 netto pro Semester zu entrichten. Im Falle einer Erhöhung des gesetzlichen Studienbeitragssatzes erhöht sich der angeführte Betrag entsprechend. Bei Nichtantritt des Studiums oder Abbruch zu Beginn oder während des Semesters verfällt der Studienbeitrag.</text:span>
+				</text:p>
 				<text:p text:style-name="P95"/>
 				<text:p text:style-name="P103">6.2.2 Studierendenbeitrag („ÖH-Beitrag“)</text:p>
 				<text:p text:style-name="P100">
-					<text:span text:style-name="T39">Gemäß § 4 Abs. 10 des Fachhochschul-Studiengesetzes (BGBl. Nr. 340/1993 idgF) gehören ordentliche und außerordentliche Studierende der Österreichischen Hochschülerinnen- und Hochschülerschaft (ÖH) gemäß Hochschülerinnen- und Hochschülerschaftsgesetz 2014 - HSG 2014, BGBl. I Nr. 45/2014, an. Daraus resultiert die Verpflichtung der Studentin oder des Studenten zur Entrichtung des ÖH-Beitrags.</text:span>
+					<text:span text:style-name="T39">Gemäß § 4 Abs. 10 des Fachhochschul-Studiengesetzes (BGBl. Nr. 340/1993 idgF) gehören ordentliche und außerordentliche Studierende der Österreichischen Hochschülerinnen- und Hochschülerschaft (ÖH) gemäß Hochschülerinnen- und Hochschülerschaftsgesetz 2014 - HSG 2014, BGBl. I Nr. 45/2014, an. Daraus resultiert die Verpflichtung der ao. Studentin oder des ao. Studenten zur Entrichtung des ÖH-Beitrags.</text:span>
 				</text:p>
 				<text:p text:style-name="P20">
 					<text:tab/>
@@ -1243,11 +1214,11 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P22">Two weeks before the beginning of each semester the <text:span text:style-name="T39">external </text:span>student undertakes to pay tuition fees according to the University of Applied Sciences Studies Act (Federal Law Gazette No 340/1993 as amended) currently to the sum of € 363.36 net payable per semester. In the event of an increase in the legal tuition fees rate, the amount quoted will increase accordingly. For non-commencement or termination of the study at the beginning or during the semester, the tuition fee is forfeited. </text:p>
 				<text:p text:style-name="P22"/>
 				<text:p text:style-name="P105">6.2.2 Student fee (&quot;Austrian Student Union fee&quot;)</text:p>
-				<text:p text:style-name="P105">Pursuant to § 4 section 10 of the Universities of Applied Sciences Studies Act (Federal Law Gazette No 340/1993 as amended and the Federal Ministries Act - 2007 amendment, Federal Law Gazette I No. 6/2007), internal and external students at universities of applied sciences degree programs are members of the Austrian Students Union in accordance with the Students Act (HSG 2014).This results in the student being obliged to pay the Austrian Student Union fee. This also applies in semesters with graduand status.</text:p>
+				<text:p text:style-name="P105">Pursuant to § 4 section 10 of the Universities of Applied Sciences Studies Act (Federal Law Gazette No 340/1993 as amended and the Federal Ministries Act - 2007 amendment, Federal Law Gazette I No. 6/2007), internal and external students at universities of applied sciences degree programs are members of the Austrian Students Union in accordance with the Students Act (HSG 2014).This results in the external student being obliged to pay the Austrian Student Union fee. This also applies in semesters with graduand status.</text:p>
 				<text:p text:style-name="P38"/>
 				<text:p text:style-name="P95">
 					<text:span text:style-name="T39">
-						<text:s/>Der Studierendenbeitrag kann jährlich durch die ÖH indexiert werden; die genaue Höhe des Studierendenbeitrags wird von der ÖH jährlich für das folgende Studienjahr bekannt gegeben. Die Einhebung des Betrags erfolgt durch die Fachhochschule. Der Erhalter überweist in Folge die eingezahlten Beträge der Studierenden ohne Abzüge an die ÖH. Die Entrichtung des Betrags ist Voraussetzung für die Zulassung zum Studium bzw. für dessen Fortsetzung.</text:span>
+						<text:s/>Der Studierendenbeitrag kann jährlich durch die ÖH indexiert werden; die genaue Höhe des Studierendenbeitrags wird von der ÖH jährlich für das folgende Studienjahr bekannt gegeben. Die Einhebung des Betrags erfolgt durch die Fachhochschule. Der Erhalter überweist in Folge die eingezahlten Beträge der ao. Studierenden ohne Abzüge an die ÖH. Die Entrichtung des Betrags ist Voraussetzung für die Zulassung zum ao. Studium bzw. für dessen Fortsetzung.</text:span>
 				</text:p>
 				<text:p text:style-name="P22"/>
 				<text:p text:style-name="P91">6.2.3 Unkostenbeitrag </text:p>
@@ -1256,12 +1227,12 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P100">Die Höhe des Unkostenbeitrages beträgt derzeit € 75,– pro Semester. Eine allfällige Anpassung wird durch Aushang bekannt gemacht. </text:p>
 				<text:p text:style-name="P100">Der Unkostenbeitrag ist gleichzeitig mit der Studiengebühr vor Beginn des Semesters zu entrichten. </text:p>
 				<text:p text:style-name="P100"/>
-				<text:p text:style-name="P100">Bei Vertragsauflösung vor Studienabschluss aus Gründen, die die <text:span text:style-name="T40">ao. </text:span>Studentin bzw. der <text:span text:style-name="T40">ao. </text:span>Student zu vertreten hat, oder auf deren bzw. dessen Wunsch, wird der Unkostenbeitrag zur Abdeckung der dem Erhalter erwachsenen administrativen Zusatzkosten einbehalten. </text:p>
+				<text:p text:style-name="P100">Bei Vertragsauflösung vor Studienabschluss aus Gründen, die die ao. Studentin bzw. der ao. Student zu vertreten hat, oder auf deren bzw. dessen Wunsch, wird der Unkostenbeitrag zur Abdeckung der dem Erhalter erwachsenen administrativen Zusatzkosten einbehalten. </text:p>
 				<text:p text:style-name="P35"/>
 				<text:p text:style-name="P104">
 					<text:s/>The student fee can be annually indexed by the Austrian Students&apos; Union; the exact amount of the student fee for the following year is announced annually by the Austrian Students&apos; Union.</text:p>
 				<text:p text:style-name="P96">
-					<text:span text:style-name="T40">The amount is levied by the University of Applied Sciences. The operator then transfers the amounts paid by the students without deductions to the Students&apos; Union. Payment of the student fee is a pre-requisite for admission to the course or for its continuation.</text:span>
+					<text:span text:style-name="T40">The amount is levied by the University of Applied Sciences. The operator then transfers the amounts paid by the external students without deductions to the Students&apos; Union. Payment of the student fee is a pre-requisite for admission to the course or for its continuation.</text:span>
 				</text:p>
 				<text:p text:style-name="P22"/>
 				<text:p text:style-name="P100">6.2.3 Contribution towards Expenses </text:p>
@@ -1277,17 +1248,16 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P24">Die Anschaffung unterrichtsbezogener Literatur und individueller Lernbehelfe ist durch den Unkostenbeitrag nicht abgedeckt. Eventuelle zusätzliche Kosten, die sich beispielsweise durch die studiengangsbezogene, gemeinsame Anschaffung von Lehr- bzw. Lernbehelfen (Skripten, CDs, Bücher, Projektmaterialien, Kopierpapier etc.) oder durch Exkursionen ergeben, werden von jedem Studiengang individuell eingehoben. </text:p>
 				<text:p text:style-name="P24"/>
 				<text:p text:style-name="P75">6.2.5 Beibringung persönlicher Daten </text:p>
-				<text:p text:style-name="P75">Die ao. Studentin bzw. der ao. Student ist verpflichtet, persönliche Daten beizubringen, die auf Grund eines Gesetzes, einer Verordnung oder eines Bescheides vom Erhalter <text:span text:style-name="T28">erfasst werden müssen oder zur Erfüllung des Ausbildungsvertrages bzw. für den Studienbetrieb unerlässlich sind.</text:span>
+				<text:p text:style-name="P75">Die ao. Studentin bzw. der ao. Student ist verpflichtet, persönliche Daten beizubringen, die auf Grund eines Gesetzes, einer Verordnung oder eines Bescheides vom Erhalter erfasst werden müssen oder zur Erfüllung des Ausbildungsvertrages bzw. für den Studienbetrieb unerlässlich sind.
 				</text:p>
 				<text:p text:style-name="P77"/>
 				<text:p text:style-name="P77">6.2.6 Aktualisierung eigener Daten und Bezug von Informationen</text:p>
-				<text:p text:style-name="P76">Die ao. Studentin bzw. der ao. Student hat unaufgefordert dafür zu sorgen, dass die von ihr/ihm beigebrachten Daten aktuell sind. Änderungen sind der Studiengangsassistenz unverzüglich schriftlich mitzuteilen. Darüber hinaus trifft sie/ihn die Pflicht, sich von studienbezogenen Informationen, die ihr/ihm an die vom Erhalter zur Verfügung gestellte Emailadresse zugestellt werden, in geeigneter Weise Kenntnis zu verschaffen.)</text:p>
+				<text:p text:style-name="P76">Die ao. Studentin bzw. der ao. Student hat unaufgefordert dafür zu sorgen, dass die von ihr/ihm beigebrachten Daten aktuell sind. Änderungen sind der Studiengangsassistenz unverzüglich schriftlich mitzuteilen. Darüber hinaus trifft sie/ihn die Pflicht, sich von studienbezogenen Informationen, die ihr/ihm an die vom Erhalter zur Verfügung gestellte Emailadresse zugestellt werden, in geeigneter Weise Kenntnis zu verschaffen.</text:p>
 				<text:p text:style-name="P76"/>
 				<text:p text:style-name="P75">
-					<text:span text:style-name="T34">6.2.7</text:span>
-					<text:span text:style-name="T34"> Verwertungsrechte</text:span>
+					<text:span text:style-name="T34">6.2.7 Verwertungsrechte</text:span>
 				</text:p>
-				<text:p text:style-name="P76">Sofern nicht im Einzelfall andere Regelungen zwischen dem Erhalter und der <text:span text:style-name="T40">ao. </text:span>Studentin oder dem <text:span text:style-name="T40">ao. </text:span>Studenten getroffen wurden, ist die <text:span text:style-name="T40">ao. </text:span>Studentin oder der <text:span text:style-name="T40">ao. </text:span>Student verpflichtet, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen auf dessen schriftliche Anfrage hin anzubieten.<text:bookmark-start text:name="_Ref78863824"/>
+				<text:p text:style-name="P76">Sofern nicht im Einzelfall andere Regelungen zwischen dem Erhalter und der ao. Studentin oder dem ao. Studenten getroffen wurden, ist die ao. Studentin oder der ao. Student verpflichtet, dem Erhalter die Rechte an Forschungs- und Entwicklungsergebnissen auf dessen schriftliche Anfrage hin anzubieten.<text:bookmark-start text:name="_Ref78863824"/>
 				</text:p>
 				<text:p text:style-name="P78"/>
 				<text:p text:style-name="P25">6.2.4 Teaching Aids and Learning Tools</text:p>
@@ -1300,12 +1270,12 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P107"/>
 				<text:p text:style-name="P107"/>
 				<text:p text:style-name="P107">6.2.6 Updating personal data and the retrieval of information</text:p>
-				<text:p text:style-name="P107">Without being reminded, the <text:span text:style-name="T40">external </text:span>student must ensure that the data provided by them is up-to-date. Changes are to be immediately communicated to the administrative assistant in writing. Furthermore, it is the students’ responsibility to make themselves suitably aware of information relating to their studies which has been sent to them at the email address provided for them by the operator.</text:p>
+				<text:p text:style-name="P107">Without being reminded, the external student must ensure that the data provided by them is up-to-date. Changes are to be immediately communicated to the administrative assistant in writing. Furthermore, it is the external students’ responsibility to make themselves suitably aware of information relating to their studies which has been sent to them at the email address provided for them by the operator.</text:p>
 				<text:p text:style-name="P107"/>
 				<text:p text:style-name="P107"/>
 				<text:p text:style-name="P100">
 					<text:span text:style-name="T42">6.2.7</text:span> Exploitation Rights</text:p>
-				<text:p text:style-name="P107">Unless other arrangements have been agreed between the operator and the <text:span text:style-name="T40">external </text:span>student at an individual level, on written request, the student undertakes to offer the operator the rights to research and development results. </text:p>
+				<text:p text:style-name="P107">Unless other arrangements have been agreed between the operator and the external student at an individual level, on written request, the external student undertakes to offer the operator the rights to research and development results. </text:p>
 				<text:p text:style-name="P119">
 					<text:soft-page-break/>
 				</text:p>
@@ -1316,13 +1286,13 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 				<text:p text:style-name="P52">
 					<text:span text:style-name="T34">6.2.9 Geheimhaltungspflicht</text:span>
 				</text:p>
-				<text:p text:style-name="P96">Die <text:span text:style-name="T40">ao. </text:span>Studentin bzw. der <text:span text:style-name="T40">ao. </text:span>Student ist zur Geheimhaltung von Forschungs- und Entwicklungsaktivitäten und -ergebnissen gegenüber Dritten verpflichtet. </text:p>
+				<text:p text:style-name="P96">Die ao. Studentin bzw. der ao. Student ist zur Geheimhaltung von Forschungs- und Entwicklungsaktivitäten und -ergebnissen gegenüber Dritten verpflichtet. </text:p>
 				<text:p text:style-name="P22"/>
 				<text:p text:style-name="P100">6.2.10 Unfallmeldung </text:p>
-				<text:p text:style-name="P100">Im Falle eines Unfalles mit körperlicher Verletzung des/der <text:span text:style-name="T40">ao. </text:span>Studierenden im Zusammenhang mit dem Studium ist die/der Studierende verpflichtet, innerhalb von drei Tagen eine Meldung am Studiengangssekretariat einzubringen. Dies betrifft auch Wegunfälle zur oder von der FH. </text:p>
+				<text:p text:style-name="P100">Im Falle eines Unfalles mit körperlicher Verletzung des/der ao. Studierenden im Zusammenhang mit dem ao. Studium ist die/der ao. Studierende verpflichtet, innerhalb von drei Tagen eine Meldung am Studiengangssekretariat einzubringen. Dies betrifft auch Wegunfälle zur oder von der FH. </text:p>
 				<text:p text:style-name="P118"/>
 				<text:p text:style-name="P22">6.2.8 Recordings </text:p>
-				<text:p text:style-name="P96">It is expressly forbidden for the <text:span text:style-name="T40">external </text:span>student to record lectures in part or in total (e.g. by using film and / or sound recordings or other audio-visual means suitable for this purpose). In addition, any form of making the aforementioned recordings publically available (wired or wireless) for example in social networks such as Facebook, StudiVZ etc, but also on Youtube, etc., or by other means of communication designed for these purposes is strictly prohibited. These regulations shall apply correspondingly to scripts, other learning aids and examination data. </text:p>
+				<text:p text:style-name="P96">It is expressly forbidden for the external student to record lectures in part or in total (e.g. by using film and / or sound recordings or other audio-visual means suitable for this purpose). In addition, any form of making the aforementioned recordings publically available (wired or wireless) for example in social networks such as Facebook, StudiVZ etc, but also on Youtube, etc., or by other means of communication designed for these purposes is strictly prohibited. These regulations shall apply correspondingly to scripts, other learning aids and examination data. </text:p>
 				<text:p text:style-name="P22">The only exception is a recording exclusively for the purpose of learning, study and research and for personal use, provided that the lecturer has expressly granted his / her prior written consent.</text:p>
 				<text:p text:style-name="P22"/>
 				<text:p text:style-name="P22"/>
@@ -1485,7 +1455,8 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
 					<text:span text:style-name="T18">7.4 Expiry</text:span>
 				</text:p>
 				<text:p text:style-name="P87">
-					<text:span text:style-name="T43">XXX</text:span>. </text:p>
+					<text:span text:style-name="T43">The training contract comes to an end when the courses visited are shown to be completed by means of a certificate of achievement or an attendance certificate. If several courses have been attended during one semester, the course which is the last to issue its certificate of achievement or attendance certificate is the deciding factor.</text:span>
+				</text:p>
 				<text:p text:style-name="P123"/>
 				<xsl:if test="studiengangSprache = 'English' or ((studiengang_kurzbz ='BEW' or studiengang_kurzbz='BWI') and orgform ='DL')">
 					<text:p text:style-name="P115">

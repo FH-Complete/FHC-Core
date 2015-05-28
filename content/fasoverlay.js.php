@@ -1690,7 +1690,26 @@ function PrintZutrittskarte()
 // ****
 function PrintStudienblatt(event)
 {
+	var tree = document.getElementById('student-prestudent-tree-rolle');
 
+	try
+	{
+		var studienplan_id = getTreeCellText(tree, "student-prestudent-tree-rolle-studienplan_id", 0);
+	}
+	catch(e)
+	{
+		check = confirm('Achtung: Beim letzten (aktuellen) PreStudent-Status ist KEIN STUDIENPLAN eingetragen.\nDas Studienblatt ist moeglicherweise unvollstaendig.\nMoechten Sie es dennoch erstellen?');
+		if (check == false)
+			return false;
+	}
+
+	if(studienplan_id=='')
+	{
+		check = confirm('Achtung: Beim letzten (aktuellen) PreStudent-Status ist KEIN STUDIENPLAN eingetragen.\nDas Studienblatt ist moeglicherweise unvollstaendig.\nMoechten Sie es dennoch erstellen?');
+		if (check == false)
+			return false;
+	}
+	
 	if(document.getElementById('main-content-tabs').selectedItem==document.getElementById('tab-studenten'))
 	{
 		//STUDENTEN
@@ -1746,6 +1765,93 @@ function PrintStudienblatt(event)
 			alert(error+' der ausgewaehlten Personen haben keinen Account');
 		action = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl=Studienblatt&xml=studienblatt.xml.php&output='+output+'&&uid='+data;
 		window.open(action,'Studienblatt','height=520,width=500,left=350,top=350,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+	}
+	else
+	{
+		alert('Bitte zuerst einen Studenten auswaehlen');
+	}
+}
+
+//****
+//* Druckt das englische Studienblatt
+//****
+function PrintStudienblattEnglisch(event)
+{
+	var tree = document.getElementById('student-prestudent-tree-rolle');
+
+	try
+	{
+		var studienplan_id = getTreeCellText(tree, "student-prestudent-tree-rolle-studienplan_id", 0);
+	}
+	catch(e)
+	{
+		check = confirm('Achtung: Beim letzten (aktuellen) PreStudent-Status ist KEIN STUDIENPLAN eingetragen.\nDas Studienblatt ist moeglicherweise unvollstaendig.\nMoechten Sie es dennoch erstellen?');
+		if (check == false)
+			return false;
+	}
+
+	if(studienplan_id=='')
+	{
+		check = confirm('Achtung: Beim letzten (aktuellen) PreStudent-Status ist KEIN STUDIENPLAN eingetragen.\nDas Studienblatt ist moeglicherweise unvollstaendig.\nMoechten Sie es dennoch erstellen?');
+		if (check == false)
+			return false;
+	}
+	
+	if(document.getElementById('main-content-tabs').selectedItem==document.getElementById('tab-studenten'))
+	{
+		//STUDENTEN
+		var tree = document.getElementById('student-tree');
+		var data='';
+
+		var start = new Object();
+		var end = new Object();
+		var numRanges = tree.view.selection.getRangeCount();
+		var paramList= '';
+		var error=0;
+
+		//alle markierten personen holen
+		for (var t = 0; t < numRanges; t++)
+		{
+	  		tree.view.selection.getRangeAt(t,start,end);
+			for (var v = start.value; v <= end.value; v++)
+			{
+				col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+				uid = tree.view.getCellText(v,col);
+				if(uid!='')
+					data = data+';'+uid;
+				else
+					error = error+1;
+			}
+		}
+	}
+	else
+	{
+		//MITARBEITER
+		alert('Das Studienblatt kann nur für Studierende erstellt werden');
+		return false;
+	}
+	var output = 'pdf';
+	if(typeof(event)!=='undefined')
+	{
+		if (event.shiftKey) 
+		{
+		    var output = 'odt';
+		} 
+		else if (event.ctrlKey)
+		{
+			var output = 'doc';
+		}
+		else
+		{
+			var output = 'pdf';
+		}
+	}
+	if(data!='')
+	{
+		if(error>0)
+			alert(error+' der ausgewaehlten Personen haben keinen Account');
+		action = '<?php echo APP_ROOT; ?>content/pdfExport.php?xsl=StudienblattEng&xml=studienblatt.xml.php&output='+output+'&&uid='+data;
+		window.open(action,'StudienblattEng','height=520,width=500,left=350,top=350,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 	}
 	else
 	{

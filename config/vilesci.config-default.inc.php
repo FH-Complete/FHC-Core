@@ -114,7 +114,12 @@ define('WARN_SEMESTERSTD_FIX','320');
 //Wochen als Grundlage zur Berechnung der Lektorenmeldung 
 define('BIS_SWS_WOCHEN', 40); 
 
+// E-Mail Einstellungen
 // Mail-Adressen (Angabe von mehreren Addressen mit ',' getrennt moeglich)
+
+// Wenn MAIL_FROM gesetzt ist, werden alle Mails mit diesem Absender versandt
+define('MAIL_FROM','');
+
 // Wenn MAIL_DEBUG gesetzt ist, werden alle Mails an diese Adresse gesendet
 define('MAIL_DEBUG','invalid@technikum-wien.at');
 // Geschaeftsstelle / Personalabteilung

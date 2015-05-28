@@ -73,6 +73,8 @@ $this->phrasen['global/geburtsort']='Place of Birth';
 $this->phrasen['global/universität']='University';
 $this->phrasen['global/code']='Code';
 $this->phrasen['global/adresse']='Address';
+$this->phrasen['global/hauptwohnsitz']='Principal residence';
+$this->phrasen['global/nebenwohnsitz']='Secondary residence';
 $this->phrasen['global/emailAdresse']='E-Mail Adress'; 
 $this->phrasen['global/mail']='Mail';
 $this->phrasen['global/telefon']='Telephone';
@@ -95,7 +97,9 @@ $this->phrasen['global/mittwoch']='Wednesday';
 $this->phrasen['global/donnerstag']='Thursday'; 
 $this->phrasen['global/freitag']='Friday'; 
 $this->phrasen['global/samstag']='Saturday'; 
-$this->phrasen['global/sonntag']='Sunday'; 
+$this->phrasen['global/sonntag']='Sunday';
+$this->phrasen['global/matrikelnummer']='Matriculation number';
+$this->phrasen['global/personenkennzeichen']='Personal identifier';
 
 $this->phrasen['global/von']='From';
 $this->phrasen['global/bis']='To';
@@ -119,6 +123,7 @@ $this->phrasen['global/betreff']='Subject';
 $this->phrasen['global/handbuch']='Manual';
 $this->phrasen['global/hilfe']='Help';
 $this->phrasen['global/benutzer']='User';
+$this->phrasen['global/anleitung']='Manual';
 
 // Statusmeldungen
 $this->phrasen['global/erfolgreichgespeichert']='Successfully saved'; 

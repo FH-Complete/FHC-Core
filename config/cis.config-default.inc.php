@@ -150,6 +150,9 @@ define('CHOOSE_LAYOUT',false);
 define('DEFAULT_LANGUAGE','German');
 
 // E-Mail Einstellungen
+// Wenn MAIL_FROM gesetzt ist, werden alle Mails mit diesem Absender versandt
+define('MAIL_FROM','');
+
 // Wenn MAIL_DEBUG gesetzt ist, werden alle Mails an diese Adresse gesendet
 define('MAIL_DEBUG','invalid@technikum-wien.at');
 // Geschaeftsstelle / Personalabteilung

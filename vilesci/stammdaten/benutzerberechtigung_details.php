@@ -264,6 +264,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 	$htmlstr .= "<table id='t1' class='tablesorter2'>\n"; //Normaler Tablesorter markiert beim Hover die Zeile, was bei den Benutzerberechtigungen nervt.
 	$htmlstr .= "<thead><tr></tr>\n";
 	$htmlstr .= "<tr>
+					<th></th>
 					<th>Rolle</th>
 					<th>Berechtigung</th>
 					<th>Art</th>
@@ -274,6 +275,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 					<th>Gültig ab</th>
 					<th>Gültig bis</th>
 					<th>Anmerkung</th>
+					<th>Info</th>
 					<th></th>
 					<th></th>
 					<!--<th></th>-->
@@ -299,7 +301,24 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		$htmlstr .= "<input type='hidden' name='uid' value='".$b->uid."'>\n";
 		$htmlstr .= "<input type='hidden' name='funktion_kurzbz' value='".$b->funktion_kurzbz."'>\n";
 		
-		
+		$heute = strtotime(date('Y-m-d'));
+		if ($b->ende!='' && strtotime($b->ende)<$heute)
+		{
+			$status="ampel_rot.png";
+			$titel="ccc";
+		}
+		elseif ($b->start!='' && strtotime($b->start)>$heute)
+		{
+			$status="ampel_gelb.png";
+			$titel="bbb";
+		}
+		else
+		{ 
+			$status="ampel_gruen.png";
+			$titel="aaa";
+		}
+		//Status
+		$htmlstr .= "		<td style='text-align: center; vertical-align: middle' name='td_$b->benutzerberechtigung_id'><img title='".$titel."' src='../../skin/images/".$status."' alt='aktiv'></td>\n";
 		//Rolle
 		$htmlstr .= "		<td style='padding: 1px;' name='td_$b->benutzerberechtigung_id'><select name='rolle_kurzbz' id='rolle_kurzbz_$b->benutzerberechtigung_id' onchange='markier(\"td_".$b->benutzerberechtigung_id."\"); setnull(\"berechtigung_kurzbz_$b->benutzerberechtigung_id\");' ".($b->berechtigung_kurzbz!=''?'disabled':'').">\n";
 		$htmlstr .= "		<option id='aaa' value='' name='' onclick='enable(\"berechtigung_kurzbz_".$b->benutzerberechtigung_id."\");'>&nbsp;</option>\n";
@@ -383,9 +402,10 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 		
 		
 		$htmlstr .= "		<td align='center' name='td_$b->benutzerberechtigung_id'><input type='checkbox' name='negativ' ".($b->negativ?'checked="checked"':'')." onchange='markier(\"td_".$b->benutzerberechtigung_id."\")'></td>\n";				
-		$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><input class='datepicker_datum' type='text' name='start' value='".$b->start."' size='10' maxlength='10' onchange='markier(\"td_".$b->benutzerberechtigung_id."\")'></td>\n";
-		$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><input class='datepicker_datum' type='text' name='ende' value='".$b->ende."' size='10' maxlength='10' onchange='markier(\"td_".$b->benutzerberechtigung_id."\")'></td>\n";
+		$htmlstr .= "		<td nowrap name='td_$b->benutzerberechtigung_id'><input class='datepicker_datum' type='text' name='start' value='".$b->start."' size='10' maxlength='10' onchange='markier(\"td_".$b->benutzerberechtigung_id."\")'></td>\n";
+		$htmlstr .= "		<td nowrap name='td_$b->benutzerberechtigung_id'><input class='datepicker_datum' type='text' name='ende' value='".$b->ende."' size='10' maxlength='10' onchange='markier(\"td_".$b->benutzerberechtigung_id."\")'></td>\n";
 		$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><input id='anmerkung_$b->benutzerberechtigung_id' type='text' name='anmerkung' value='".$b->anmerkung."' title='".$db->convert_html_chars(mb_eregi_replace('\r\n'," ",$b->anmerkung))."' size='30' maxlength='256' markier(\"td_".$b->benutzerberechtigung_id."\")'></td>\n";
+		$htmlstr .= "		<td align='center' name='td_$b->benutzerberechtigung_id'><img src='../../skin/images/information.png' alt='information' title='Angelegt von ".$b->insertvon." am ".$b->insertamum." \nZuletzt geaendert von ".$b->updatevon." am ".$b->updateamum."'></td>\n";
 		
 		$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><input type='submit' name='schick' value='speichern'></td>";
 		$htmlstr .= "		<td name='td_$b->benutzerberechtigung_id'><input type='submit' name='del' value='l&ouml;schen'></td>";
@@ -401,7 +421,8 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 	$htmlstr .= "<input type='hidden' name='uid' value='".$uid."'>\n";
 	$htmlstr .= "<input type='hidden' name='funktion_kurzbz' value='".$funktion_kurzbz."'>\n";
 	
-	
+	//Status
+	$htmlstr .= "		<td>&nbsp;</td>\n";
 	//Rolle
 	$htmlstr .= "		<td style='padding-top: 15px;'><select name='rolle_kurzbz' id='rolle_kurzbz_neu' onchange='markier(\"neu\"); setnull(\"berechtigung_kurzbz_neu\"); setnull(\"art_neu\");'>\n";
 	$htmlstr .= "			<option value='' onclick='enable(\"berechtigung_kurzbz_neu\");'>&nbsp;</option>\n";
@@ -465,8 +486,8 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 	$htmlstr .= "		</select></td>\n";*/
 		
 	$htmlstr .= "		<td align='center' style='padding-top: 15px;'><input type='checkbox' name='negativ' onchange='markier(\"neu\")'></td>\n";
-	$htmlstr .= "		<td style='padding-top: 15px;'><input class='datepicker_datum' type='text' name='start' value='' size='10' maxlength='10' onchange='markier(\"neu\")'></td>\n";
-	$htmlstr .= "		<td style='padding-top: 15px;'><input class='datepicker_datum' type='text' name='ende' value='' size='10' maxlength='10' onchange='markier(\"neu\")'></td>\n";
+	$htmlstr .= "		<td nowrap style='padding-top: 15px;'><input class='datepicker_datum' type='text' name='start' value='' size='10' maxlength='10' onchange='markier(\"neu\")'></td>\n";
+	$htmlstr .= "		<td nowrap style='padding-top: 15px;'><input class='datepicker_datum' type='text' name='ende' value='' size='10' maxlength='10' onchange='markier(\"neu\")'></td>\n";
 	
 	//Anmerkung
 	$htmlstr .= "		<td style='padding-top: 15px;'><input id='anmerkung_neu' type='text' name='anmerkung' value='' size='30' maxlength='256' onchange='markier(\"neu\")'></td>\n";
@@ -556,13 +577,17 @@ $htmlstr .= "<div class='inserterror'>".$errorstr."</div>\n";
 					 changeMonth: true,
 					 changeYear: true, 
 					 dateFormat: 'yy-mm-dd',
+					 showOn: "button",
+				     buttonImage: "../../skin/images/date_edit.png",
+				     buttonImageOnly: true,
+				     buttonText: "Select date"
 					 });
 				 
 				$("#t1").tablesorter(
 					{
-						//sortList: [[2,0]],
+						sortList: [[0,0]],
 						//widgets: ["zebra"],
-						headers: {5:{sorter:false},9:{sorter:false},10:{sorter:false}}
+						headers: {6:{sorter:false},10:{sorter:false},11:{sorter:false},12:{sorter:false}}
 					}); 
 			});
 
