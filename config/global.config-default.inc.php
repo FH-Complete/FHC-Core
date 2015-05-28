@@ -141,8 +141,8 @@ define('PRESTUDENT_ID_DUMMY_STUDENT', 13478);
 //Legt fest ob die Option für alle Räume im Saalplan Dropdown angezeigt werden soll. (true|false)
 define('CIS_SAALPLAN_ALLERAEUME_OPTION', false);
 
-//Legt fest ob Bestätigungsmails über eine Anmelung zu einer Prüfung an eine einzelne Person erfolgt oder an den jeweiligen Lektor. (Leerstring für jeweiligen Lektro);
-define('CIS_PRUEFUNG_MAIL_EMPFAENGER_ANMEDLUNG',"p.vondrak");
+//Legt fest ob Bestätigungsmails über eine Anmelung zu einer Prüfung an eine einzelne Person erfolgt oder an den jeweiligen Lektor. (Leerstring für jeweiligen Lektor | uid);
+define('CIS_PRUEFUNG_MAIL_EMPFAENGER_ANMEDLUNG',"");
 
 // Username fuer STIP Schnittstelle
 define('STIP_USER_NAME','stipendienstelle');
@@ -159,5 +159,9 @@ define('BEWERBERTOOL_DOKUMENTE_ANZEIGEN', true);
 define('BEWERBERTOOL_ZGV_ANZEIGEN', true);
 define('BEWERBERTOOL_BERUFSTAETIGKEIT_ANZEIGEN', true);
 
+// Array mit Usern die nicht Kollidieren
 define('KOLLISIONSFREIE_USER',serialize(array('_DummyLektor')));
+
+// Soll der Lageplan am Infoterminal angezeigt werden (true|false)
+define('CIS_INFOSCREEN_LAGEPLAN_ANZEIGEN', true);
 ?>

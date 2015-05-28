@@ -67,6 +67,9 @@
 //	Request Parameter 
 // ------------------------------------------------------------------------------------------
   	$timer=trim((isset($_REQUEST['timer']) ? $_REQUEST['timer']:0));
+	if(!isset($ServiceTerminalDefaultRaumtyp))
+		$ServiceTerminalDefaultRaumtyp='HS';
+
 	// Raumtyp
   	$raumtyp_kurzbz=trim((isset($_REQUEST['raumtyp_kurzbz']) ? $_REQUEST['raumtyp_kurzbz']:$ServiceTerminalDefaultRaumtyp));
 	// Saal - Raum
@@ -196,7 +199,7 @@
 // ------------------------------------------------------------------------------------------
 //	Linkes Auswahlmenue fuer Raumtypen
 // ------------------------------------------------------------------------------------------
-	if(!is_null($ServiceTerminalRaumtypen))
+	if(isset($ServiceTerminalRaumtypen) && !is_null($ServiceTerminalRaumtypen))
 		$row_ort = $ServiceTerminalRaumtypen;
 	else
 	{
