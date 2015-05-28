@@ -237,7 +237,7 @@ class studiengang extends basis_db
      */
     public function getAllForBewerbung() 
     {
-        $qry = 'SELECT DISTINCT studiengang_kz, typ, organisationseinheittyp_kurzbz, studiengangbezeichnung, standort '
+        $qry = 'SELECT DISTINCT studiengang_kz, typ, organisationseinheittyp_kurzbz, studiengangbezeichnung, standort, studiengangbezeichnung_englisch '
                 . 'FROM lehre.vw_studienplan '
                 . 'WHERE onlinebewerbung IS TRUE '
                 . 'ORDER BY studiengangbezeichnung ASC';
