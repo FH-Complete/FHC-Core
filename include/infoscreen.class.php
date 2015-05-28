@@ -39,6 +39,7 @@ class infoscreen extends basis_db
 	public $insertvon;
 	public $updateamum;
 	public $updatevon;
+	public $exklusiv;
 	
 	/**
 	 * Konstruktor
@@ -121,6 +122,7 @@ class infoscreen extends basis_db
 				$this->insertvon = $row->insertvon;
 				$this->updateamum = $row->updateamum;
 				$this->updatevon = $row->updatevon;
+				$this->exklusiv = $this->db_parse_bool($row->exklusiv);
 				return true;
 			}
 			else 
@@ -242,7 +244,7 @@ class infoscreen extends basis_db
 		if($new)
 		{
 			$qry = "BEGIN;INSERT INTO campus.tbl_infoscreen_content(infoscreen_id, content_id, 
-					gueltigvon, gueltigbis, refreshzeit, insertamum, insertvon, updateamum, updatevon) VALUES(".
+					gueltigvon, gueltigbis, refreshzeit, insertamum, insertvon, updateamum, updatevon, exklusiv) VALUES(".
 					$this->db_add_param($this->infoscreen_id, FHC_INTEGER).','.
 					$this->db_add_param($this->content_id, FHC_INTEGER).','.
 					$this->db_add_param($this->gueltigvon).','.
@@ -251,7 +253,8 @@ class infoscreen extends basis_db
 					$this->db_add_param($this->insertamum).','.
 					$this->db_add_param($this->insertvon).','.
 					$this->db_add_param($this->updateamum).','.
-					$this->db_add_param($this->updatevon).');';
+					$this->db_add_param($this->updatevon).','.
+					$this->db_add_param($this->exklusiv, FHC_BOOLEAN).');';
 		}
 		else
 		{
@@ -262,7 +265,8 @@ class infoscreen extends basis_db
 					' gueltigbis='.$this->db_add_param($this->gueltigbis).','.
 					' refreshzeit='.$this->db_add_param($this->refreshzeit).','.
 					' updateamum='.$this->db_add_param($this->updateamum).','.
-					' updatevon='.$this->db_add_param($this->updatevon).' '.
+					' updatevon='.$this->db_add_param($this->updatevon).','.
+					' exklusiv='.$this->db_add_param($this->exklusiv, FHC_BOOLEAN).' '.
 					' WHERE infoscreen_content_id='.$this->db_add_param($this->infoscreen_content_id, FHC_INTEGER).';';
 		}
 		
@@ -336,10 +340,11 @@ class infoscreen extends basis_db
 	/**
 	 * 
 	 * Liefert den Content der am betreffenden Infoscreen angezeigt werden soll
-	 * @param $infoscreen_id id des Infoscreens
-	 * @param $aktuell wenn true werden nur die aktuell gueltigen Contents geliefert
+	 * @param integer $infoscreen_id id des Infoscreens
+	 * @param boolean $aktuell Deafult:true. Wenn true, werden nur die aktuell gueltigen Contents geliefert
+	 * @param boolean $exklusiv Deafult:true. Wenn true, werden Contents, die das Attribut exklusiv=true haben, vorrangig vor normalen Terminen geliefert
 	 */
-	public function getScreenContent($infoscreen_id, $aktuell=true)
+	public function getScreenContent($infoscreen_id, $aktuell=true, $exklusiv=true)
 	{
 		if(!is_numeric($infoscreen_id))
 		{
@@ -356,6 +361,20 @@ class infoscreen extends basis_db
 			$qry.="
 					AND (gueltigvon<=now() OR gueltigvon is null)
 					AND (gueltigbis>=now() OR gueltigbis is null)";
+		if($aktuell)
+			$qry.="
+					AND CASE WHEN 
+					(
+						SELECT count(exklusiv) FROM campus.tbl_infoscreen_content 
+						WHERE (infoscreen_id=20 OR infoscreen_id is null) 
+						AND (gueltigvon<=now() OR gueltigvon is null) 
+						AND (gueltigbis>=now() OR gueltigbis is null)
+						AND exklusiv=true
+					)>0 THEN 					
+						exklusiv=true					
+					ELSE 					
+						1=1					
+					END";
 		$qry.=" ORDER BY infoscreen_content_id;";
 		if($result = $this->db_query($qry))
 		{
@@ -373,6 +392,7 @@ class infoscreen extends basis_db
 				$obj->insertvon = $row->insertvon;
 				$obj->updateamum = $row->updateamum;
 				$obj->updatevon = $row->updatevon;
+				$obj->exklusiv = $this->db_parse_bool($row->exklusiv);
 				
 				$this->result[] = $obj;
 			}

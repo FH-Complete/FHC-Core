@@ -66,8 +66,8 @@ class lehrform extends basis_db
 			$this->lehrform_kurzbz = $row->lehrform_kurzbz;
 			$this->bezeichnung = $row->bezeichnung;
 			$this->verplanen = $this->db_parse_bool($row->verplanen);
-			$this->bezeichnung_kurz=$this->parseSprachResult('bezeichnung_kurz',$row);
-			$this->bezeichnung_lang=$this->parseSprachResult('bezeichnung_lang',$row);
+			$this->bezeichnung_kurz=$sprache->parseSprachResult('bezeichnung_kurz',$row);
+			$this->bezeichnung_lang=$sprache->parseSprachResult('bezeichnung_lang',$row);
 		}
 		else
 		{
