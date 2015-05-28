@@ -369,7 +369,7 @@ class projekt extends basis_db
                                         fue.tbl_projektphase
                                         JOIN fue.tbl_projekt USING (projekt_kurzbz)
                                         JOIN fue.tbl_projekt_ressource USING (projektphase_id)
-                                        JOIN fue.tbl_ressource USING (ressource_id)
+                                        JOIN fue.tbl_ressource ON (tbl_ressource.ressource_id=tbl_projekt_ressource.ressource_id)
                                 WHERE (tbl_projekt.beginn<=now() or tbl_projekt.beginn is null) 
                                 AND (tbl_projekt.ende>=now() OR tbl_projekt.ende is null) 
                                 AND mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid);
