@@ -159,5 +159,9 @@ define('BEWERBERTOOL_DOKUMENTE_ANZEIGEN', true);
 define('BEWERBERTOOL_ZGV_ANZEIGEN', true);
 define('BEWERBERTOOL_BERUFSTAETIGKEIT_ANZEIGEN', true);
 
+// Array mit Usern die nicht Kollidieren
 define('KOLLISIONSFREIE_USER',serialize(array('_DummyLektor')));
+
+// Soll der Lageplan am Infoterminal angezeigt werden (true|false)
+define('CIS_INFOSCREEN_LAGEPLAN_ANZEIGEN', true);
 ?>
