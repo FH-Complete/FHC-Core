@@ -167,10 +167,10 @@ foreach($uid_arr as $uid)
             echo "\t\t<studiensemester_beginn>".$studiensemester_beginn->bezeichnung."</studiensemester_beginn>";
             echo "\t\t<studiensemester_beginndatum>".date('d.m.Y',strtotime($studiensemester_beginn->start))."</studiensemester_beginndatum>";
 	
+            $prestudent->getLastStatus($student->prestudent_id,null,'Student');
             $studiensemester_abschluss = new studiensemester();
             $abschluss = $studiensemester_abschluss->jump($prestudent->studiensemester_kurzbz, $studienplan->regelstudiendauer-$prestudent->ausbildungssemester);
             $studiensemester_abschluss->load($abschluss);
-            
             echo "\t\t<voraussichtlichLetztesStudiensemester>".$studiensemester_abschluss->bezeichnung."</voraussichtlichLetztesStudiensemester>";
             echo "\t\t<voraussichtlichLetztesStudiensemester_datum>".date('d.m.Y',strtotime($studiensemester_abschluss->ende))."</voraussichtlichLetztesStudiensemester_datum>";
             
