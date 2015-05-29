@@ -3101,7 +3101,7 @@ if(!$result = @$db->db_query("SELECT kosten FROM public.tbl_raumtyp"))
 	if(!$db->db_query($qry))
 		echo '<strong>public.tbl_raumtyp: '.$db->db_last_error().'</strong><br>';
 	else
-		echo '<br>public.tbl_raumtyp: neue Spalte koste	n hinzugefuegt';
+		echo '<br>public.tbl_raumtyp: neue Spalte kosten hinzugefuegt';
 }
 
 // Spalte onlinebewerbung fuer tbl_studiensemester
@@ -3113,6 +3113,17 @@ if(!$result = @$db->db_query("SELECT onlinebewerbung FROM public.tbl_studienseme
 		echo '<strong>public.tbl_studiensemester: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>public.tbl_studiensemester: neue Spalte onlinebewerbung hinzugefuegt';
+}
+
+// Spalte exklusiv fuer campus.tbl_infoscreen_content
+if(!$result = @$db->db_query("SELECT exklusiv FROM campus.tbl_infoscreen_content"))
+{
+	$qry = 'ALTER TABLE campus.tbl_infoscreen_content ADD COLUMN exklusiv boolean NOT NULL default false;';
+	
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_infoscreen_content: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>campus.tbl_infoscreen_content: neue Spalte exklusiv hinzugefuegt';
 }
 
 echo '<br><br><br>';
