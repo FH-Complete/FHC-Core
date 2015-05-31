@@ -3126,6 +3126,26 @@ if(!$result = @$db->db_query("SELECT exklusiv FROM campus.tbl_infoscreen_content
 		echo '<br>campus.tbl_infoscreen_content: neue Spalte exklusiv hinzugefuegt';
 }
 
+// Eigene Berechtigung fuer LV-Info eingabe
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz='lehre/lvinfo' LIMIT 1"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "
+		INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/lvinfo','LVinfo');
+
+		INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('lehre/lvinfo','lehre','suid');
+		INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('lehre/lvinfo','admin','suid');
+		INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('lehre/lvinfo','assistenz','suid');
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Eigene Berechtigungen fuer LV-Infos hinzugefuegt lehre/lvinfo!<br>';
+	}
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
@@ -3486,6 +3506,7 @@ $berechtigungen = array(
 	array('lehre/lehrveranstaltung','Lehrveranstaltungsverwaltung'),
 	array('lehre/lehrveranstaltung:begrenzt','nur die Felder Lehre, Sort, Zeugnis, BA/DA, FBK und LVInfo dürfen geändert werden (eventuelle Aufteilung in einzelne Berechtigungen??)'),
 	array('lehre/lvplan','Tempus'),
+	array('lehre/lvinfo','LVInfo editieren'),
 	array('lehre/pruefungsanmeldungAdmin','Erlaubt die Verwaltung der Prüfungsanmeldungen.'),
 	array('lehre/pruefungsbeurteilung','Erlaubt dem Benutzer Beurteilungen zu Prüfungen einzutragen.'),
 	array('lehre/pruefungsbeurteilungAdmin','Erlaubt dem Benutzer für alle Prüfungen Beurteilungen einzutragen.'),

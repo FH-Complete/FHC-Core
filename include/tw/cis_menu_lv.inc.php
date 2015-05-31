@@ -69,7 +69,13 @@ function checkZeilenUmbruch()
 			}
 		}
 
-		if($user_is_allowed_to_upload || $rechte->isBerechtigt('admin',$studiengang_kz) || $rechte->isBerechtigt('lehre',$studiengang_kz))
+		// Bearbeiten Button anzeigen wenn Lektor der LV und bearbeiten fuer Lektoren aktiviert ist
+		// Oder Berechtigung zum Bearbeiten eingetragen ist
+		if((!defined('CIS_LEHRVERANSTALTUNG_LVINFO_LEKTOR_EDIT') && $lektor_der_lv)
+		  || (defined('CIS_LEHRVERANSTALTUNG_LVINFO_LEKTOR_EDIT') && CIS_LEHRVERANSTALTUNG_LVINFO_LEKTOR_EDIT==true && $lektor_der_lv)
+		  || $rechte->isBerechtigt('lehre/lvinfo',$studiengang_kz)
+		  || $rechte->isBerechtigtMultipleOe('lehre/lvinfo', $lehrfach_oe_kurzbz_arr)
+		  )
 		{
 			if($need_br)
 				echo "<br>";
@@ -93,21 +99,12 @@ function checkZeilenUmbruch()
 	if(defined('CIS_LEHRVERANSTALTUNG_WENNANGEMELDET_DETAILS_ANZEIGEN') && CIS_LEHRVERANSTALTUNG_WENNANGEMELDET_DETAILS_ANZEIGEN && !$is_lector)
 	{
 	    $angemeldet = false;
-	    $studiensemester = new studiensemester($angezeigtes_stsem);
 
-	    $lvangebot = new lvangebot();
-	    $lvangebot->getAllFromLvId($lvid, $studiensemester->studiensemester_kurzbz);
+		$lehrveranstaltung_obj = new lehrveranstaltung();
+		$result = $lehrveranstaltung_obj->getLehreinheitenOfLv($lvid, $user, $angezeigtes_stsem);
 
-	    if(!empty($lvangebot->result))
-	    {
-		$bngruppe = new benutzergruppe();
-		$bngruppe->load($user, $lvangebot->result[0]->gruppe_kurzbz, $studiensemester->studiensemester_kurzbz);
-
-		if(!is_null($bngruppe->gruppe_kurzbz))
-		{
+		if(count($result)>0)
 		    $angemeldet = true;
-		}
-	    }
 	}
 
 	if((!defined('CIS_LEHRVERANSTALTUNG_SEMESTERPLAN_ANZEIGEN') || CIS_LEHRVERANSTALTUNG_SEMESTERPLAN_ANZEIGEN) && $angemeldet)
@@ -171,7 +168,9 @@ function checkZeilenUmbruch()
 			echo '<strong>'.$p->t('lehre/semesterplan').'</strong>';
 		}
 
-		if($user_is_allowed_to_upload || $rechte->isBerechtigt('admin',$studiengang_kz) || $rechte->isBerechtigt('lehre',$studiengang_kz))
+		if((!defined('CIS_LEHRVERANSTALTUNG_SEMESTERPLAN_LEKTOR_EDIT') && $user_is_allowed_to_upload)
+		 || (defined('CIS_LEHRVERANSTALTUNG_SEMESTERPLAN_LEKTOR_EDIT') && CIS_LEHRVERANSTALTUNG_SEMESTERPLAN_LEKTOR_EDIT==true && $user_is_allowed_to_upload)
+		 || $rechte->isBerechtigt('admin',$studiengang_kz) || $rechte->isBerechtigt('lehre',$studiengang_kz))
 		{
 			echo '<br><a class="Item" href="#" onClick="javascript:window.open(\'semupload.php?lvid='.$lvid.'\',\'_blank\',\'width=400,height=300,location=no,menubar=no,status=no,toolbar=no\');return false;">';
 			echo $p->t('lehre/semesterplanUpload')."</a>";
@@ -523,7 +522,8 @@ function checkZeilenUmbruch()
 			    echo '<img class="lv" src="../../../skin/images/button_moodle.png"><br>
 				    <strong>'.$p->t('lehre/moodle').'</strong><br>';
 		    }
-		if($is_lector)
+
+			if($is_lector && (!defined('CIS_LEHRVERANSTALTUNG_MOODLE_LEKTOR_EDIT') || (defined('CIS_LEHRVERANSTALTUNG_MOODLE_LEKTOR_EDIT') && CIS_LEHRVERANSTALTUNG_MOODLE_LEKTOR_EDIT)))
 			    echo '	<a href="moodle2_4_wartung.php?lvid='.$lvid.'&stsem='.$angezeigtes_stsem.'" class="Item">'.$p->t('lehre/moodleWartung').'</a>
 				    <br /><a href="'.APP_ROOT.'cms/dms.php?id='.$p->t('dms_link/moodleHandbuch24').'" class="Item" target="_blank">'.$p->t('lehre/moodleHandbuch').'</a>';
 

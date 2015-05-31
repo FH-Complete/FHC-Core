@@ -32,6 +32,7 @@ require_once('../../../include/phrasen.class.php');
 require_once('../../../include/lehre_tools.class.php');
 require_once('../../../include/lvangebot.class.php');
 require_once('../../../include/benutzergruppe.class.php');
+require_once('../../../include/lehreinheit.class.php');
 
 $sprache = getSprache();
 $p = new phrasen($sprache);
@@ -44,6 +45,7 @@ if (!$user=get_uid())
 
 // Init
 $user_is_allowed_to_upload=false;
+$lektor_der_lv=false;
 
 // Plausib
 if(check_lektor($user))
@@ -101,6 +103,43 @@ if (isset($_GET["handbuch"])){
     <script src="../../../include/js/jquery1.9.min.js" type="text/javascript" ></script>
 
 <?php
+// Angezeigtes Studiensemester ermitteln
+// Wenn ein Studiensemester uebergeben wird, wird das uebergebene angezeigt
+$stsem = new studiensemester();
+if($studiensemester_kurzbz!='')
+	$angezeigtes_stsem=$studiensemester_kurzbz;
+else
+{
+	if($lv->studiengang_kz==0 || (defined('CIS_LEHRVERANSTALTUNG_AKTUELLES_STUDIENSEMESTER_ANZEIGEN') && CIS_LEHRVERANSTALTUNG_AKTUELLES_STUDIENSEMESTER_ANZEIGEN))
+		$angezeigtes_stsem = $stsem->getNearest();
+	else
+	{
+		// wenn im nahegelegensten/aktuellen Studiensemester eine Lehreinheit angelegt ist dann diese anzeigen
+		$lehreinheit = new lehreinheit();
+		if($lehreinheit->load_lehreinheiten($lvid, $stsem->getNearest()) && count($lehreinheit->lehreinheiten)>0)
+		{
+			$lehreinheit_found=false;
+			foreach($lehreinheit->lehreinheiten as $row_lehreinheit)
+			{
+				if($row_lehreinheit->lehre)
+				{
+					$angezeigtes_stsem = $stsem->getNearest();
+					$lehreinheit_found=true;
+					break;
+				}
+			}
+			if($lehreinheit_found==false)
+			{
+				$angezeigtes_stsem = $stsem->getNearest($semester);
+			}
+		}
+		else
+		{
+			// fuer ungerade semester das naeheste WS fuer gerade semester das naeheste SS anzeigen
+			$angezeigtes_stsem = $stsem->getNearest($semester);
+		}
+	}
+}
 
 // ADDONS laden
 $addon_obj = new addon();
@@ -120,7 +159,7 @@ $( document ).ready(function()
 	{
 		for(i in addon)
 		{
-			addon[i].init("cis/private/lehre/lesson.php", {uid:\''.$user.'\',lvid:\''.$lvid.'\',studiensemester_kurzbz:\''.$studiensemester_kurzbz.'\'});
+			addon[i].init("cis/private/lehre/lesson.php", {uid:\''.$user.'\',lvid:\''.$lvid.'\',studiensemester_kurzbz:\''.$angezeigtes_stsem.'\'});
 		}
 	}
 });
@@ -170,17 +209,7 @@ $( document ).ready(function()
 	<tr>
 		<td class="tdwidth10">&nbsp;</td>
 		<td style="vertical-align:top; height: 10px"><h1 style="white-space:normal;">
-		<?php		
-		$stsem = new studiensemester();
-		if($studiensemester_kurzbz!='')
-			$angezeigtes_stsem=$studiensemester_kurzbz;
-		else
-		{
-			if($lv->studiengang_kz==0 || (defined('CIS_LEHRVERANSTALTUNG_AKTUELLES_STUDIENSEMESTER_ANZEIGEN') && CIS_LEHRVERANSTALTUNG_AKTUELLES_STUDIENSEMESTER_ANZEIGEN))
-				$angezeigtes_stsem = $stsem->getNearest();
-			else
-				$angezeigtes_stsem = $stsem->getNearest($semester);
-		}
+		<?php
 		$lehrfach_id='';
 		if(defined('CIS_LEHRVERANSTALTUNG_LEHRFACH_ANZEIGEN') && CIS_LEHRVERANSTALTUNG_LEHRFACH_ANZEIGEN)
 		{
@@ -285,7 +314,10 @@ $( document ).ready(function()
 				{
 					$i++;
 					if($user==$row_lector->uid)
+					{
+						$lektor_der_lv=true;
 						$user_is_allowed_to_upload=true;
+					}
 
 					if($row_lector->lvleiter=='t')
 						$style='style="font-weight: bold"';
@@ -298,27 +330,27 @@ $( document ).ready(function()
 			}
 		}
 
-				//Berechtigungen auf Fachbereichsebene
-	  $qry = "SELECT 
-	  			distinct fachbereich_kurzbz, tbl_lehrveranstaltung.studiengang_kz, tbl_fachbereich.oe_kurzbz 
+		//Berechtigungen auf Fachbereichsebene
+		$qry = "SELECT 
+	  			distinct lehrfach.oe_kurzbz 
 	  		FROM 
 	  			lehre.tbl_lehrveranstaltung 
 	  			JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) 
 	  			JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
-	  			JOIN public.tbl_fachbereich ON(tbl_fachbereich.oe_kurzbz=lehrfach.oe_kurzbz) 
 	  		WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lvid, FHC_INTEGER);
 
-	  if(isset($angezeigtes_stsem) && $angezeigtes_stsem!='')
-	  	$qry .= " AND studiensemester_kurzbz=".$db->db_add_param($angezeigtes_stsem);
-
-	  if($result = $db->db_query($qry))
-	  {
-	  	while($row = $db->db_fetch_object($result))
-	  	{
-	  		if($rechte->isBerechtigt('lehre',$row->oe_kurzbz) || $rechte->isBerechtigt('assistenz',$stg_obj->oe_kurzbz))
-	  			$user_is_allowed_to_upload=true;
-	  	}
-	  }
+		if(isset($angezeigtes_stsem) && $angezeigtes_stsem!='')
+			$qry .= " AND studiensemester_kurzbz=".$db->db_add_param($angezeigtes_stsem);
+		$lehrfach_oe_kurzbz_arr = array();
+		if($result = $db->db_query($qry))
+		{
+			while($row = $db->db_fetch_object($result))
+			{
+				$lehrfach_oe_kurzbz_arr[]=$row->oe_kurzbz;
+				if($rechte->isBerechtigt('lehre',$row->oe_kurzbz) || $rechte->isBerechtigt('assistenz',$stg_obj->oe_kurzbz))
+					$user_is_allowed_to_upload=true;
+			}
+		}
 		?></td>
 	</tr>
 	<tr>
