@@ -425,6 +425,27 @@ function openDialog(lehrveranstaltung_id, termin_id, lvBezeichnung, terminVon, t
 	$("#terminHidden").val(termin_id);
 	$("#lehrveranstaltung").html(lvBezeichnung);
 	
+	$.ajax({
+		dataType: 'json',
+		url: "./pruefungsanmeldung.json.php",
+		type: "POST",
+		data: {
+			method: "getLvKompatibel",
+			lehrveranstaltung_id: lehrveranstaltung_id
+		},
+		error: loadError
+	}).success(function(data){
+		var html = "";
+		data.result.forEach(function(v, i){
+			console.log(i);
+			console.log(v);
+			html += '<option id="'+v.lehrveranstaltung_id+'" value="'+v.lehrveranstaltung_id+'">';
+			html += v.bezeichnung;
+			html += "</option>";
+		});
+		$("#studienverpflichtung").html(html);
+	});
+	
 	var start = terminVon;
 	var ende = terminBis;
 	start = start.split(' ');
@@ -462,6 +483,9 @@ function saveAnmeldung(lehrveranstaltung_id, termin_id)
 	if(bemerkungen === undefined)
 		bemerkungen = "von Lektor hinzugefügt";
 	
+	var studienverpflichtung_id = $("#studienverpflichtung option:selected").val();
+	console.log(studienverpflichtung_id);
+	
 	$.ajax({
 		dataType: 'json',
 		url: "./pruefungsanmeldung.json.php",
@@ -471,7 +495,8 @@ function saveAnmeldung(lehrveranstaltung_id, termin_id)
 			termin_id: termin_id,
 			lehrveranstaltung_id: lehrveranstaltung_id,
 			bemerkung: bemerkungen,
-			uid: uid
+			uid: uid,
+			studienverpflichtung_id: studienverpflichtung_id
 		},
 		error: loadError
 	}).success(function(data){
@@ -894,7 +919,6 @@ function loadPruefungStudiengang(studiengang_kz, studiensemester)
 			{
 				var liste = "";
 				data.result.forEach(function(e){
-					console.log(e);
 					liste += "<ul><li>"+e.bezeichnung+"<ul>";
 					e.pruefung[0].termine.forEach(function(d){
 						liste += "<li> <a onclick='showAnmeldungen(\""+d.pruefungstermin_id+"\", \""+e.lehrveranstaltung_id+"\");'>"+convertDateTime(d.von)+" "+convertDateTime(d.von, "time")+" - "+convertDateTime(d.bis, "time")+"</a></li>";

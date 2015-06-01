@@ -39,6 +39,8 @@ class anrechnung extends basis_db
 	public $updateamum;		// timestamp
 	public $updatevon;		// varchar(32)
 	
+	public $begruendungen = array();
+	
 	public function validate() 
 	{
 		if(!is_numeric($this->prestudent_id))
@@ -124,45 +126,46 @@ class anrechnung extends basis_db
 	 */
 	public function save() 
 	{
-		if(!$this->validate())
-			return false;
-		
-		if($this->new == "1")
+	    if(!$this->validate())
+		return false;
+
+	    if($this->new == "1")
 	    {
-		    // Neuen Datensatz anlegen
-		    $qry = 'INSERT INTO lehre.tbl_anrechnung (prestudent_id, lehrveranstaltung_id, begruendung_id, lehrveranstaltung_id_kompatibel, genehmigt_von, insertamum, insertvon, updateamum, updatevon) VALUES ('.
-			    $this->db_add_param($this->prestudent_id).', '.
-			    $this->db_add_param($this->lehrveranstaltung_id).', '.
-			    $this->db_add_param($this->begruendung_id).', '.
-			    $this->db_add_param($this->lehrveranstaltung_id_kompatibel).', '.
-			    $this->db_add_param($this->genehmigt_von).', '.
-				'NOW(),'.
-			    $this->db_add_param($this->insertvon).', '.
+		// Neuen Datensatz anlegen
+		$qry = 'INSERT INTO lehre.tbl_anrechnung (prestudent_id, lehrveranstaltung_id, begruendung_id, lehrveranstaltung_id_kompatibel, genehmigt_von, insertamum, insertvon, updateamum, updatevon) VALUES ('.
+			$this->db_add_param($this->prestudent_id).', '.
+			$this->db_add_param($this->lehrveranstaltung_id).', '.
+			$this->db_add_param($this->begruendung_id).', '.
+			$this->db_add_param($this->lehrveranstaltung_id_kompatibel).', '.
+			$this->db_add_param($this->genehmigt_von).', '.
 			    'NOW(),'.
-			    $this->db_add_param($this->updatevon).');';
+			$this->db_add_param($this->insertvon).', '.
+			'NOW(),'.
+			$this->db_add_param($this->updatevon).') RETURNING anrechnung_id;';
 	    }
-		else
-		{
-			// Datensatz aktualisieren
-			$qry = 'UPDATE lehre.tbl_anrechnung SET '
-					. 'lehrveranstaltung_id = ' . $this->db_add_param($this->lehrveranstaltung_id) . ', '
-					. 'begruendung_id = ' . $this->db_add_param($this->begruendung_id) . ', '
-					. 'lehrveranstaltung_id_kompatibel = ' . $this->db_add_param($this->lehrveranstaltung_id_kompatibel) . ', '
-					. 'genehmigt_von = ' . $this->db_add_param($this->genehmigt_von) . ', '
-					. 'updateamum = NOW(), '
-					. 'updatevon = ' . $this->db_add_param($this->updatevon) . ' '
-					. 'WHERE anrechnung_id = ' . $this->db_add_param($this->anrechnung_id);
-		}
-		
-		if($this->db_query($qry))
+	    else
 	    {
-			return true;
-		}
-		else
-		{
-			$this->errormsg = 'Fehler beim Speichern der Anrechnung: '.$this->db_last_error();
-			return false;
-		}
+		// Datensatz aktualisieren
+		$qry = 'UPDATE lehre.tbl_anrechnung SET '
+				. 'lehrveranstaltung_id = ' . $this->db_add_param($this->lehrveranstaltung_id) . ', '
+				. 'begruendung_id = ' . $this->db_add_param($this->begruendung_id) . ', '
+				. 'lehrveranstaltung_id_kompatibel = ' . $this->db_add_param($this->lehrveranstaltung_id_kompatibel) . ', '
+				. 'genehmigt_von = ' . $this->db_add_param($this->genehmigt_von) . ', '
+				. 'updateamum = NOW(), '
+				. 'updatevon = ' . $this->db_add_param($this->updatevon) . ' '
+				. 'WHERE anrechnung_id = ' . $this->db_add_param($this->anrechnung_id);
+	    }
+	    
+	    if($this->db_query($qry))
+	    {
+		$this->anrechnung_id = $this->db_fetch_object()->anrechnung_id;
+		return true;
+	    }
+	    else
+	    {
+		$this->errormsg = 'Fehler beim Speichern der Anrechnung: '.$this->db_last_error();
+		return false;
+	    }
 	}
 	
 	/**
@@ -252,8 +255,34 @@ class anrechnung extends basis_db
 		}
 		else
 		{
-			$this->errormsg = 'Daten konnten nicht geladen werden';
+		    $this->errormsg = 'Daten konnten nicht geladen werden';
 		    return false;
 		}
+	}
+	
+	/**
+	 * Gibt alle möglichen Begründungen zurück
+	 * @return array Array der Begründungen
+	 */
+	public function getAllBegruendung()
+	{
+	    $qry = 'SELECT * FROM lehre.tbl_anrechnung_begruendung';
+	    
+	    if($this->db_query($qry))
+	    {
+		while ($row = $this->db_fetch_object())
+		{
+		    $stdobj = new stdClass();
+		    $stdobj->begruendung_id = $row->begruendung_id;
+		    $stdobj->bezeichnung = $row->bezeichnung;
+		    array_push($this->begruendungen, $stdobj);
+		}
+		return true;
+	    }
+	    else
+	    {
+		$this->errormsg = 'Daten konnten nicht geladen werden';
+		return false;
+	    }
 	}
 }
