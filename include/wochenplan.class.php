@@ -1417,9 +1417,12 @@ class wochenplan extends basis_db
 
 							if(isset($lktcheck[$lehrstunde->lektor]) && $lktcheck[$lehrstunde->lektor]!=$lehrstunde->unr)
 							{
-								$kollision++;
-								$kollisionsmeldungen[$lehrstunde->unr][]=" LektorIn ".$lehrstunde->lektor; //." ".$lehrstunde->unr."!=".$lktcheck[$lehrstunde->lektor];
-								$kollisionsmeldungen[$lktcheck[$lehrstunde->lektor]][]=" LektorIn ".$lehrstunde->lektor; //." ".$lehrstunde->unr."!=".$lktcheck[$lehrstunde->lektor];
+								if(!in_array($lehrstunde->lektor_uid, unserialize(KOLLISIONSFREIE_USER)))
+								{
+									$kollision++;
+									$kollisionsmeldungen[$lehrstunde->unr][]=" LektorIn ".$lehrstunde->lektor; //." ".$lehrstunde->unr."!=".$lktcheck[$lehrstunde->lektor];
+									$kollisionsmeldungen[$lktcheck[$lehrstunde->lektor]][]=" LektorIn ".$lehrstunde->lektor; //." ".$lehrstunde->unr."!=".$lktcheck[$lehrstunde->lektor];
+								}
 							}
 							else
 								$lktcheck[$lehrstunde->lektor]=$lehrstunde->unr;

@@ -156,6 +156,8 @@ class lehrstunde extends basis_db
 			$sql_query='UPDATE '.$stpl_table;
 			$sql_query.=" SET datum=".$this->db_add_param($this->datum).", stunde=".$this->db_add_param($this->stunde);
 			$sql_query.=", ort_kurzbz=".$this->db_add_param($this->ort_kurzbz).", mitarbeiter_uid=".$this->db_add_param($this->lektor_uid);
+			if($this->unr!='')
+				$sql_query.=", unr=".$this->db_add_param($this->unr);
 			$sql_query.=", updateamum=now(), updatevon=".$this->db_add_param($uid);
 			$sql_query.=" WHERE $stpl_id=".$this->db_add_param($this->stundenplan_id);
 
