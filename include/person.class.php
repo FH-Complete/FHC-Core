@@ -833,10 +833,20 @@ class person extends basis_db
 		}
 		return true; 
 	}
-	
-	public function checkSvnr($svnr)
+
+	/**
+	 * Prueft ob eine SVNR bereits vergeben ist, Optional kann eine Person übergeben werden die nicht
+ 	 * beruecksichtigt werden soll
+	 * @param $svnr
+	 * @param $person_id
+	 * @return true wenn bereits vorhanden sonst false
+	 */	
+	public function checkSvnr($svnr, $person_id=null)
 	{
-		$qry = "Select 1 from public.tbl_person where svnr =".$this->db_add_param($svnr).";"; 
+		$qry = "Select 1 from public.tbl_person where svnr =".$this->db_add_param($svnr);
+		if(!is_null($person_id))
+			$qry.=" AND person_id!=".$this->db_add_param($person_id);
+
 		
 		if($result = $this->db_query($qry))
 		{
@@ -845,7 +855,6 @@ class person extends basis_db
 			else
 				return false; 
 		}
-	
 	}
 	
 	public function getFullName($allFirstnames=FALSE)

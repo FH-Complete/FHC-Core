@@ -427,7 +427,7 @@ xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn
           </text:list>
         </text:list-item>
       </text:list>
-      <text:p text:style-name="P5">Die Ausbildungsdauer beträgt <xsl:value-of select="studiengang_maxsemester"/> Semester.</text:p>
+      <text:p text:style-name="P5">Die Ausbildungsdauer beträgt <xsl:value-of select="student_maxsemester"/> Semester.</text:p>
       <text:p text:style-name="P5"/>
       <text:p text:style-name="P5">Nachgewiesene erworbene Kenntnisse können auf einzelne Lehrveranstaltungen angerechnet werden bzw. zum Erlass einer Lehrveranstaltung oder des Berufspraktikums führen. Hierzu bedarf es eines Antrages der Studentin bzw. des Studenten und der nachfolgenden Feststellung der inhaltlichen und umfänglichen Gleichwertigkeit durch die Studiengangsleitung.</text:p>
       <text:p text:style-name="P15"/>

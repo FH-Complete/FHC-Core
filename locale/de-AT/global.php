@@ -98,7 +98,8 @@ $this->phrasen['global/donnerstag']='Donnerstag';
 $this->phrasen['global/freitag']='Freitag'; 
 $this->phrasen['global/samstag']='Samstag'; 
 $this->phrasen['global/sonntag']='Sonntag'; 
-
+$this->phrasen['global/matrikelnummer']='Matrikelnummer';
+$this->phrasen['global/personenkennzeichen']='Personenkennzeichen';
 
 $this->phrasen['global/von']='Von';
 $this->phrasen['global/bis']='Bis';
@@ -122,6 +123,7 @@ $this->phrasen['global/betreff']='Betreff';
 $this->phrasen['global/handbuch']='Handbuch';
 $this->phrasen['global/hilfe']='Hilfe';
 $this->phrasen['global/benutzer']='Benutzer';
+$this->phrasen['global/anleitung']='Anleitung';
 
 // Statusmeldungen
 $this->phrasen['global/erfolgreichgespeichert']='Erfolgreich gespeichert'; 

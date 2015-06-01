@@ -2873,7 +2873,7 @@ if($result = @$db->db_query("SELECT * FROM information_schema.table_constraints 
 	}
 }
 
-// Fehlende Foreign Keys fuer ZGV Nation und Ausstellungsstaat auf ZGVNation kopieren
+// Mehrsprachige Spalten fuer Lehrform
 if(!$result = @$db->db_query("SELECT bezeichnung_kurz FROM lehre.tbl_lehrform"))
 {
 	$qry = 'ALTER TABLE lehre.tbl_lehrform ADD COLUMN bezeichnung_kurz varchar(32)[];
@@ -2940,7 +2940,7 @@ if(!$result = @$db->db_query("SELECT * FROM lehre.vw_studienplan LIMIT 1"))
 	if(!$db->db_query($qry))
 		echo '<br><strong>lehre.vw_studienplan: '.$db->db_last_error().'</strong><br>';
 	else
-		echo '<br>lehre.vw_studienplan: View erstellt';
+		echo '<br>lehre.vw_studienplan: View erstellt<br>';
 }
 
 // Spalte beschreibung in public.tbl_studiensemester
@@ -2954,7 +2954,53 @@ if(!$result = @$db->db_query("SELECT beschreibung FROM public.tbl_studiensemeste
 		echo ' public.tbl_studiensemester: Spalte beschreibung hinzugefuegt!<br>';
 }
 
-// Eigene Berechtigung fuer Betriebsmittel Studndenplan
+// Attribut typ bei Projektphase fuer Arbeitspaket, Phase, Milestone ...
+if(!$result = @$db->db_query("SELECT typ FROM fue.tbl_projektphase"))
+{
+	$qry = "ALTER TABLE fue.tbl_projektphase ADD COLUMN typ varchar(32);
+		UPDATE fue.tbl_projektphase SET typ='Projektphase';
+		ALTER TABLE fue.tbl_projektphase ALTER COLUMN typ SET NOT NULL;
+	";
+		
+	
+	if(!$db->db_query($qry))
+		echo '<strong>fue.tbl_projektphase: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>fue.tbl_projektphase: neue Spalte typ fuer Arbeitspaket, Phase, Milestone ... hinzugefuegt';
+}
+
+// Attribut typ bei Projektphase fuer Verantwortliche Ressource
+if(!$result = @$db->db_query("SELECT ressource_id FROM fue.tbl_projektphase"))
+{
+	$qry = "ALTER TABLE fue.tbl_projektphase ADD COLUMN ressource_id bigint;
+			ALTER TABLE fue.tbl_projektphase
+			  ADD CONSTRAINT fk_projektphase_ressource FOREIGN KEY (ressource_id)
+				  REFERENCES fue.tbl_ressource (ressource_id) MATCH SIMPLE
+				  ON UPDATE CASCADE ON DELETE RESTRICT;
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>fue.tbl_projektphase: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>fue.tbl_projektphase: neue Spalte ressource_id fuer Verantwortlichkeit hinzugefuegt';
+}			  
+// Attribut typ bei Projekt fuer Verantwortliche Ressource
+if(!$result = @$db->db_query("SELECT ressource_id FROM fue.tbl_projekt"))
+{
+	$qry = "ALTER TABLE fue.tbl_projekt ADD COLUMN ressource_id bigint;
+			ALTER TABLE fue.tbl_projekt
+			  ADD CONSTRAINT fk_projekt_ressource FOREIGN KEY (ressource_id)
+				  REFERENCES fue.tbl_ressource (ressource_id) MATCH SIMPLE
+				  ON UPDATE CASCADE ON DELETE RESTRICT;
+	";
+	
+	if(!$db->db_query($qry))
+		echo '<strong>fue.tbl_projekt: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>fue.tbl_projekt: neue Spalte ressource_id fuer Verantwortlichkeit hinzugefuegt';
+}			  
+
+// Eigene Berechtigung fuer Betriebsmittel Stundenplan
 if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_stundenplan_betriebsmittel LIMIT 1"))
 {
 	$qry = "CREATE TABLE lehre.tbl_stundenplan_betriebsmittel
@@ -2990,6 +3036,114 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_stundenplan_betriebsmittel
 	else
 		echo ' system.tbl_berechtigung: Eigene Berechtigung fuer persoenliche Daten bei den Mitarbeitern mitarbeiter/persoenlich hinzugefuegt!<br>';
 
+}
+
+// Spalte standort in public.tbl_organisationseinheit einfügen
+if(!$result = @$db->db_query("SELECT standort FROM public.tbl_organisationseinheit LIMIT 1;"))
+{
+	$qry = "ALTER TABLE public.tbl_organisationseinheit ADD COLUMN standort varchar(32);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_organisationseinheit: '.$db->db_last_error().'</strong><br>';
+	else 
+		echo 'public.tbl_organisationseinheit: Spalte standort hinzugefuegt!<br>';
+}
+
+// Spalte standort in lehre.vw_studienplan einfügen
+if(!$result = @$db->db_query("SELECT standort FROM lehre.vw_studienplan LIMIT 1"))
+{
+	$qry = "CREATE OR REPLACE VIEW lehre.vw_studienplan AS
+		SELECT 
+			organisationseinheittyp_kurzbz, oe_kurzbz, studiengang_kz, studienordnung_id, studienplan_id, 
+            tbl_studienplan.orgform_kurzbz, tbl_studienplan.version, tbl_studienplan.bezeichnung, regelstudiendauer, 
+            tbl_studienplan.sprache, tbl_studienplan.aktiv, semesterwochen, tbl_studienplan.testtool_sprachwahl, 
+            tbl_studienplan.insertamum, tbl_studienplan.insertvon, tbl_studienplan.updateamum, tbl_studienplan.updatevon,
+            gueltigvon, gueltigbis,  ects, studiengangbezeichnung, studiengangbezeichnung_englisch, studiengangkurzbzlang, 
+            akadgrad_id, kurzbz, kurzbzlang, typ, english, farbe, email, telefon, max_semester, max_verband, max_gruppe, 
+            erhalter_kz, bescheid, bescheidbgbl1, bescheidbgbl2, bescheidgz, bescheidvom, titelbescheidvom, zusatzinfo_html, 
+            moodle, studienplaetze, lgartcode, mischform, projektarbeit_note_anzeige, onlinebewerbung, oe_parent_kurzbz,  
+            mailverteiler, freigabegrenze, kurzzeichen, lehre,  beschreibung, studienordnung_semester_id, studiensemester_kurzbz, 
+            semester, standort
+		FROM 
+			lehre.tbl_studienplan 
+            JOIN lehre.tbl_studienordnung USING (studienordnung_id) 
+            JOIN tbl_studiengang USING (studiengang_kz) 
+            JOIN tbl_organisationseinheit USING (oe_kurzbz) 
+            JOIN tbl_organisationseinheittyp USING (organisationseinheittyp_kurzbz)
+            JOIN lehre.tbl_studienordnung_semester USING (studienordnung_id);";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.vw_studienplan: '.$db->db_last_error().'</strong><br>';
+	else
+		echo 'lehre.vw_studienplan: Neue Spalte standort zur View hinzugefuegt<br>';
+}
+
+// Mehrsprachige bezeichnung fuer Dokumente
+if(!$result = @$db->db_query("SELECT bezeichnung_mehrsprachig FROM public.tbl_dokument"))
+{
+	$qry = 'ALTER TABLE public.tbl_dokument ADD COLUMN bezeichnung_mehrsprachig varchar(128)[];
+	UPDATE public.tbl_dokument SET bezeichnung_mehrsprachig[1]=bezeichnung;
+	UPDATE public.tbl_dokument SET bezeichnung_mehrsprachig[2]=bezeichnung;
+	';
+		
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_dokument: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_dokument: neue Spalte fuer mehrsprachige Bezeichnung hinzugefuegt';
+}
+
+// Spalte kosten fuer tbl_raumtyp
+if(!$result = @$db->db_query("SELECT kosten FROM public.tbl_raumtyp"))
+{
+	$qry = 'ALTER TABLE public.tbl_raumtyp ADD COLUMN kosten numeric(10,2);';
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_raumtyp: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_raumtyp: neue Spalte kosten hinzugefuegt';
+}
+
+// Spalte onlinebewerbung fuer tbl_studiensemester
+if(!$result = @$db->db_query("SELECT onlinebewerbung FROM public.tbl_studiensemester"))
+{
+	$qry = 'ALTER TABLE public.tbl_studiensemester ADD COLUMN onlinebewerbung boolean NOT NULL default false;';
+	
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_studiensemester: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_studiensemester: neue Spalte onlinebewerbung hinzugefuegt';
+}
+
+// Spalte exklusiv fuer campus.tbl_infoscreen_content
+if(!$result = @$db->db_query("SELECT exklusiv FROM campus.tbl_infoscreen_content"))
+{
+	$qry = 'ALTER TABLE campus.tbl_infoscreen_content ADD COLUMN exklusiv boolean NOT NULL default false;';
+	
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_infoscreen_content: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>campus.tbl_infoscreen_content: neue Spalte exklusiv hinzugefuegt';
+}
+
+// Eigene Berechtigung fuer LV-Info eingabe
+if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz='lehre/lvinfo' LIMIT 1"))
+{
+	if($db->db_num_rows($result)==0)
+	{
+		$qry = "
+		INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung) VALUES('lehre/lvinfo','LVinfo');
+
+		INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('lehre/lvinfo','lehre','suid');
+		INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('lehre/lvinfo','admin','suid');
+		INSERT INTO system.tbl_rolleberechtigung(berechtigung_kurzbz, rolle_kurzbz, art) VALUES('lehre/lvinfo','assistenz','suid');
+		";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung '.$db->db_last_error().'</strong><br>';
+		else
+			echo ' system.tbl_berechtigung: Eigene Berechtigungen fuer LV-Infos hinzugefuegt lehre/lvinfo!<br>';
+	}
 }
 
 echo '<br><br><br>';
@@ -3072,8 +3226,8 @@ $tabellen=array(
 	"campus.tbl_zeitwunsch"  => array("stunde","mitarbeiter_uid","tag","gewicht","updateamum","updatevon","insertamum","insertvon"),
 	"fue.tbl_aktivitaet"  => array("aktivitaet_kurzbz","beschreibung","sort"),
 	"fue.tbl_aufwandstyp" => array("aufwandstyp_kurzbz","bezeichnung"),
-	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz","budget","farbe","aufwandstyp_kurzbz"),
-	"fue.tbl_projektphase"  => array("projektphase_id","projekt_kurzbz","projektphase_fk","bezeichnung","beschreibung","start","ende","budget","insertamum","insertvon","updateamum","updatevon","personentage","farbe"),
+	"fue.tbl_projekt"  => array("projekt_kurzbz","nummer","titel","beschreibung","beginn","ende","oe_kurzbz","budget","farbe","aufwandstyp_kurzbz","ressource_id"),
+	"fue.tbl_projektphase"  => array("projektphase_id","projekt_kurzbz","projektphase_fk","bezeichnung","typ","beschreibung","start","ende","budget","insertamum","insertvon","updateamum","updatevon","personentage","farbe","ressource_id"),
 	"fue.tbl_projekttask"  => array("projekttask_id","projektphase_id","bezeichnung","beschreibung","aufwand","mantis_id","insertamum","insertvon","updateamum","updatevon","projekttask_fk","erledigt","ende","ressource_id","scrumsprint_id"),
 	"fue.tbl_projekt_dokument"  => array("projekt_dokument_id","projektphase_id","projekt_kurzbz","dms_id"),
 	"fue.tbl_projekt_ressource"  => array("projekt_ressource_id","projekt_kurzbz","projektphase_id","ressource_id","funktion_kurzbz","beschreibung","aufwand"),
@@ -3146,7 +3300,7 @@ $tabellen=array(
 	"public.tbl_benutzerfunktion"  => array("benutzerfunktion_id","fachbereich_kurzbz","uid","oe_kurzbz","funktion_kurzbz","semester", "datum_von","datum_bis", "updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung","wochenstunden"),
 	"public.tbl_benutzergruppe"  => array("uid","gruppe_kurzbz","studiensemester_kurzbz","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_buchungstyp"  => array("buchungstyp_kurzbz","beschreibung","standardbetrag","standardtext","aktiv","credit_points"),
-	"public.tbl_dokument"  => array("dokument_kurzbz","bezeichnung","ext_id"),
+	"public.tbl_dokument"  => array("dokument_kurzbz","bezeichnung","ext_id","bezeichnung_mehrsprachig"),
 	"public.tbl_dokumentprestudent"  => array("dokument_kurzbz","prestudent_id","mitarbeiter_uid","datum","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_dokumentstudiengang"  => array("dokument_kurzbz","studiengang_kz","ext_id", "onlinebewerbung", "pflicht"),
 	"public.tbl_erhalter"  => array("erhalter_kz","kurzbz","bezeichnung","dvr","logo","zvr"),
@@ -3173,7 +3327,7 @@ $tabellen=array(
 	"public.tbl_notiz_dokument" => array("notiz_id","dms_id"),
     "public.tbl_ort"  => array("ort_kurzbz","bezeichnung","planbezeichnung","max_person","lehre","reservieren","aktiv","lageplan","dislozierung","kosten","ausstattung","updateamum","updatevon","insertamum","insertvon","ext_id","stockwerk","standort_id","telefonklappe","content_id","m2","gebteil","oe_kurzbz"),
 	"public.tbl_ortraumtyp"  => array("ort_kurzbz","hierarchie","raumtyp_kurzbz"),
-	"public.tbl_organisationseinheit" => array("oe_kurzbz", "oe_parent_kurzbz", "bezeichnung","organisationseinheittyp_kurzbz", "aktiv","mailverteiler","freigabegrenze","kurzzeichen","lehre"),
+	"public.tbl_organisationseinheit" => array("oe_kurzbz", "oe_parent_kurzbz", "bezeichnung","organisationseinheittyp_kurzbz", "aktiv","mailverteiler","freigabegrenze","kurzzeichen","lehre","standort"),
 	"public.tbl_organisationseinheittyp" => array("organisationseinheittyp_kurzbz", "bezeichnung", "beschreibung"),
 	"public.tbl_person"  => array("person_id","staatsbuergerschaft","geburtsnation","sprache","anrede","titelpost","titelpre","nachname","vorname","vornamen","gebdatum","gebort","gebzeit","foto","anmerkung","homepage","svnr","ersatzkennzeichen","familienstand","geschlecht","anzahlkinder","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","bundesland_code","kompetenzen","kurzbeschreibung","zugangscode", "foto_sperre","matr_nr"),
 	"public.tbl_person_fotostatus"  => array("person_fotostatus_id","person_id","fotostatus_kurzbz","datum","insertamum","insertvon","updateamum","updatevon"),
@@ -3189,7 +3343,7 @@ $tabellen=array(
 	"public.tbl_preoutgoing_status" => array("preoutgoing_status_kurzbz","bezeichnung"),
 	"public.tbl_prestudent"  => array("prestudent_id","aufmerksamdurch_kurzbz","person_id","studiengang_kz","berufstaetigkeit_code","ausbildungcode","zgv_code","zgvort","zgvdatum","zgvmas_code","zgvmaort","zgvmadatum","aufnahmeschluessel","facheinschlberuf","reihungstest_id","anmeldungreihungstest","reihungstestangetreten","rt_gesamtpunkte","rt_punkte1","rt_punkte2","bismelden","anmerkung","dual","insertamum","insertvon","updateamum","updatevon","ext_id","ausstellungsstaat","rt_punkte3", "zgvdoktor_code", "zgvdoktorort", "zgvdoktordatum","mentor","zgvnation","zgvmanation","zgvdoktornation"),
 	"public.tbl_prestudentstatus"  => array("prestudent_id","status_kurzbz","studiensemester_kurzbz","ausbildungssemester","datum","orgform_kurzbz","insertamum","insertvon","updateamum","updatevon","ext_id","studienplan_id","bestaetigtam","bestaetigtvon","fgm","faktiv", "anmerkung"),
-	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung"),
+	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung","kosten"),
 	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet","max_teilnehmer","oeffentlich"),
 	"public.tbl_status"  => array("status_kurzbz","beschreibung","anmerkung","ext_id"),
 	"public.tbl_semesterwochen"  => array("semester","studiengang_kz","wochen"),
@@ -3201,7 +3355,7 @@ $tabellen=array(
 	"public.tbl_studentlehrverband"  => array("student_uid","studiensemester_kurzbz","studiengang_kz","semester","verband","gruppe","updateamum","updatevon","insertamum","insertvon","ext_id"),
 	"public.tbl_studiengang"  => array("studiengang_kz","kurzbz","kurzbzlang","typ","bezeichnung","english","farbe","email","telefon","max_semester","max_verband","max_gruppe","erhalter_kz","bescheid","bescheidbgbl1","bescheidbgbl2","bescheidgz","bescheidvom","orgform_kurzbz","titelbescheidvom","aktiv","ext_id","zusatzinfo_html","moodle","sprache","testtool_sprachwahl","studienplaetze","oe_kurzbz","lgartcode","mischform","projektarbeit_note_anzeige", "onlinebewerbung"),
 	"public.tbl_studiengangstyp" => array("typ","bezeichnung","beschreibung"),
-	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","studienjahr_kurzbz","ext_id","beschreibung"),
+	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","studienjahr_kurzbz","ext_id","beschreibung","onlinebewerbung"),
 	"public.tbl_tag"  => array("tag"),
 	"public.tbl_variable"  => array("name","uid","wert"),
 	"public.tbl_vorlage"  => array("vorlage_kurzbz","bezeichnung","anmerkung","mimetype"),
@@ -3352,6 +3506,7 @@ $berechtigungen = array(
 	array('lehre/lehrveranstaltung','Lehrveranstaltungsverwaltung'),
 	array('lehre/lehrveranstaltung:begrenzt','nur die Felder Lehre, Sort, Zeugnis, BA/DA, FBK und LVInfo dürfen geändert werden (eventuelle Aufteilung in einzelne Berechtigungen??)'),
 	array('lehre/lvplan','Tempus'),
+	array('lehre/lvinfo','LVInfo editieren'),
 	array('lehre/pruefungsanmeldungAdmin','Erlaubt die Verwaltung der Prüfungsanmeldungen.'),
 	array('lehre/pruefungsbeurteilung','Erlaubt dem Benutzer Beurteilungen zu Prüfungen einzutragen.'),
 	array('lehre/pruefungsbeurteilungAdmin','Erlaubt dem Benutzer für alle Prüfungen Beurteilungen einzutragen.'),

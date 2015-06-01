@@ -42,6 +42,9 @@ define('CIS_SUCHE_LVPLAN_ANZEIGEN',true);
 // Link zu den Excel Notenlisten im CIS Anzeigen
 define('CIS_ANWESENHEITSLISTE_NOTENLISTE_ANZEIGEN',true);
 
+// Link zu den Anwesenheitslisten (ohne Bilder) im CIS Anzeigen
+define('CIS_ANWESENHEITSLISTE_ANWESENHEITSLISTE_ANZEIGEN',true);
+
 // Punkte bei der Noteneingabe anzeigen
 define('CIS_GESAMTNOTE_PUNKTE',false);
 
@@ -130,7 +133,7 @@ define('VILESCI_PERSON_NEU_STUDIENSEMESTER_WINTERONLY',false);
 define('CIS_STUDIENPLAN_SEMESTER_ANZEIGEN', false);
 
 //Legt fest ob ein User zu einer LV angemeldet sein muss um Detailinformationen abrufen zu können. (true|false)
-define('CIS_LEHRVERANSTALTUNG_WENNANGEMELDET_DETAILS_ANZEIGEN', true);
+define('CIS_LEHRVERANSTALTUNG_WENNANGEMELDET_DETAILS_ANZEIGEN', false);
 
 // Prestudent_ID des Dummy_Studenten (zB fuer Testtool)
 define('PRESTUDENT_ID_DUMMY_STUDENT', 13478);
@@ -138,8 +141,8 @@ define('PRESTUDENT_ID_DUMMY_STUDENT', 13478);
 //Legt fest ob die Option für alle Räume im Saalplan Dropdown angezeigt werden soll. (true|false)
 define('CIS_SAALPLAN_ALLERAEUME_OPTION', false);
 
-//Legt fest ob Bestätigungsmails über eine Anmelung zu einer Prüfung an eine einzelne Person erfolgt oder an den jeweiligen Lektor. (Leerstring für jeweiligen Lektro);
-define('CIS_PRUEFUNG_MAIL_EMPFAENGER_ANMEDLUNG',"p.vondrak");
+//Legt fest ob Bestätigungsmails über eine Anmelung zu einer Prüfung an eine einzelne Person erfolgt oder an den jeweiligen Lektor. (Leerstring für jeweiligen Lektor | uid);
+define('CIS_PRUEFUNG_MAIL_EMPFAENGER_ANMEDLUNG',"");
 
 // Username fuer STIP Schnittstelle
 define('STIP_USER_NAME','stipendienstelle');
@@ -150,5 +153,15 @@ define('STIP_USER_PASSWORD','password');
 define('BEWERBERTOOL_STUDIENAUSWAHL_ANZEIGEN', true);
 define('BEWERBERTOOL_STANDORTAUSWAHL_ANZEIGEN', false);
 
+define('BEWERBERTOOL_REIHUNGSTEST_ANZEIGEN', true);
+define('BEWERBERTOOL_ZAHLUNGEN_ANZEIGEN', true);
+define('BEWERBERTOOL_DOKUMENTE_ANZEIGEN', true);
+define('BEWERBERTOOL_ZGV_ANZEIGEN', true);
+define('BEWERBERTOOL_BERUFSTAETIGKEIT_ANZEIGEN', true);
+
+// Array mit Usern die nicht Kollidieren
 define('KOLLISIONSFREIE_USER',serialize(array('_DummyLektor')));
+
+// Soll der Lageplan am Infoterminal angezeigt werden (true|false)
+define('CIS_INFOSCREEN_LAGEPLAN_ANZEIGEN', true);
 ?>

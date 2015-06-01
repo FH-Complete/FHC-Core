@@ -94,6 +94,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektphasedetail.overlay
 				<treecol id="treecol-projektphase-budget" label="Budget" flex="2" hidden="false" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#budget" />
+				<splitter class="tree-splitter"/>
+				<treecol id="treecol-projektphase-typ" label="Typ" flex="2" hidden="true" persist="hidden width ordinal"
+					class="sortDirectionIndicator"
+					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#typ" />
 				<treecol id="treecol-projektphase-oe_kurzbz" label="Organisationseinheit" flex="2" hidden="false" persist="hidden width ordinal"
 					class="sortDirectionIndicator"
 					sort="rdf:http://www.technikum-wien.at/projektphase/rdf#oe_kurzbz" />
@@ -120,12 +124,13 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/projektphasedetail.overlay
 					<treechildren>
 						<treeitem uri="rdf:*">
 							<treerow dbID="rdf:http://www.technikum-wien.at/projektphase/rdf#projektphase_id" >
-								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#bezeichnung"/>
+								<treecell src="../skin/images/rdf:http://www.technikum-wien.at/projektphase/rdf#typ^.png" label="rdf:http://www.technikum-wien.at/projektphase/rdf#bezeichnung"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#projekt_phase_id"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#beschreibung"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#beginn"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#ende"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#budget"/>
+								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#typ"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#oe_kurzbz"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#projekt_kurzbz"/>
 								<treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#fortschritt"/>

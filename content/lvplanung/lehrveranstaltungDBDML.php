@@ -251,7 +251,7 @@ if(!$error)
 					if(!kollision($lem->lehreinheit_id, $lem->mitarbeiter_uid, $lem->mitarbeiter_uid_old))
 					{
 						//Update im Stundenplan
-						$stpl_table='lehre.'.TABLE_BEGIN.$db_stpl_table;
+						$stpl_table='lehre.tbl_stundenplandev';
 						$qry = "UPDATE $stpl_table SET mitarbeiter_uid=".$db->db_add_param($lem->mitarbeiter_uid)." WHERE lehreinheit_id=".$db->db_add_param($lem->lehreinheit_id, FHC_INTEGER)." AND mitarbeiter_uid=".$db->db_add_param($lem->mitarbeiter_uid_old);
 						if($db->db_query($qry))
 						{

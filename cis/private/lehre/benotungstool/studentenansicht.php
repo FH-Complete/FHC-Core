@@ -917,7 +917,7 @@ if (!isset($_GET["notenuebersicht"]))
 				          		</tr>';
 						}
 						echo "</table>";
-						echo "<br><br>".$p->t('bentotungstool/esHabenStudentenEingetragen',array($gesamt));
+						echo "<br><br>".$p->t('benotungstool/esHabenStudentenEingetragen',array($gesamt));
 					}
 				}
 				else

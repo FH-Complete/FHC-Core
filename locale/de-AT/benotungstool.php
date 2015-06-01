@@ -158,7 +158,7 @@ $this->phrasen['benotungstool/nichtGespeichertKreuzerllisteNichtFreigegeben']='D
 $this->phrasen['benotungstool/freigegebenVon']='Freigegeben von';
 $this->phrasen['benotungstool/angabe']='Angabe';
 $this->phrasen['benotungstool/downloadverzeichnisAnzeigen']='Downloadverzeichnis anzeigen';
-$this->phrasen['bentotungstool/esHabenStudentenEingetragen']='Es haben insgesamt <u>%s Studenten</u> eingetragen';
+$this->phrasen['benotungstool/esHabenStudentenEingetragen']='Es haben insgesamt <u>%s Studenten</u> eingetragen';
 $this->phrasen['benotungstool/leistungsuebersichtNotenuebersichtFuer']='Leistungsuebersicht</a> / Notenübersicht für';
 $this->phrasen['benotungstool/teilnote']='Teilnote';
 $this->phrasen['benotungstool/aufgabe']='Aufgabe';
@@ -168,6 +168,7 @@ $this->phrasen['benotungstool/eingetrageneNoten']='Eingetragene Noten';
 $this->phrasen['benotungstool/zeunis']='Zeugnis';
 $this->phrasen['benotungstool/handbuch']='Handbuch';
 $this->phrasen['benotungstool/punkte']='Punkte';
-$this->phrasen['benotungstool/importAnweisung']='Kopieren Sie die Spalten Kennzahl und Note aus der Notenliste und fügen Sie diese in folgendes Feld ein';
+$this->phrasen['benotungstool/importAnweisung']='Kopieren Sie die Spalten Personenkennzeichen und Note aus der Notenliste und fügen Sie diese in folgendes Feld ein';
 $this->phrasen['benotungstool/pruefung']='Prüfung';
+$this->phrasen['benotungstool/notenlisteImport']='Notenliste für den LV-Noten-Import (Excel)';
 ?>

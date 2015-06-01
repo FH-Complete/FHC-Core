@@ -158,7 +158,7 @@ $this->phrasen['benotungstool/nichtGespeichertKreuzerllisteNichtFreigegeben']='T
 $this->phrasen['benotungstool/freigegebenVon']='Approved by';
 $this->phrasen['benotungstool/angabe']='Instruction File';
 $this->phrasen['benotungstool/downloadverzeichnisAnzeigen']='Show download directory';
-$this->phrasen['bentotungstool/esHabenStudentenEingetragen']='A total of <u>%s students</u> students have registered';
+$this->phrasen['benotungstool/esHabenStudentenEingetragen']='A total of <u>%s students</u> students have registered';
 $this->phrasen['benotungstool/leistungsuebersichtNotenuebersichtFuer']='Performance Summary</a> / Grade overview for';
 $this->phrasen['benotungstool/teilnote']='Partial grade';
 $this->phrasen['benotungstool/aufgabe']='Exercise';
@@ -168,5 +168,7 @@ $this->phrasen['benotungstool/eingetrageneNoten']='Submitted Grades';
 $this->phrasen['benotungstool/zeunis']='Transcript';
 $this->phrasen['benotungstool/handbuch']='Handbook';
 $this->phrasen['benotungstool/punkte']='Points';
-$this->phrasen['benotungstool/importAnweisung']='Kopieren Sie die Spalten Kennzahl und Note aus der Notenliste und fügen Sie diese in folgendes Feld ein';
+$this->phrasen['benotungstool/importAnweisung']='Copy the columns "personal identifier" and "grade" from the grade list and insert them in the following field';
+$this->phrasen['benotungstool/pruefung']='Examination';
+$this->phrasen['benotungstool/notenlisteImport']='Grade list for the subject grade import (Excel)';
 ?>

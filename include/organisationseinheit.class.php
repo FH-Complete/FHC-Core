@@ -691,5 +691,38 @@ class organisationseinheit extends basis_db
 			return false;
 	    }
 	}
+    
+    /**
+     * Gibt alle Standorte zurück
+     * @param $aktiv
+     * @param $lehre
+     * @return boolean|array false im Fehlerfall, ansonsten ein Array
+     */
+    public function getAllStandorte($aktiv=null, $lehre=null)
+	{
+		$result = array();
+        $qry = "SELECT DISTINCT standort FROM public.tbl_organisationseinheit WHERE standort IS NOT NULL";
+
+		if(!is_null($aktiv))
+			$qry.=" AND aktiv=".$this->db_add_param($aktiv, FHC_BOOLEAN);
+
+		if(!is_null($lehre))		
+			$qry.=" AND lehre=".$this->db_add_param($lehre, FHC_BOOLEAN);
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$result[] = $row->standort;
+			}
+			
+            return $result;
+		}
+		else 
+		{
+			$this->errormsg = 'Fehler beim Laden der Standorte';
+			return false;
+		}
+	}
 }
 ?>

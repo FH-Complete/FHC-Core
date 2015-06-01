@@ -108,7 +108,7 @@ foreach($uid_arr as $uid)
             
             // check ob Quereinsteiger
             $prestudent = new prestudent(); 
-            $ausbildungssemester = ($prestudent->getFirstStatus($student->prestudent_id, 'Student'))?$prestudent->ausbildungssemester:'';           
+            $ausbildungssemester = ($prestudent->getFirstStatus($student->prestudent_id, 'Student'))?$prestudent->ausbildungssemester:'1';           
             echo "\t\t<semesterStudent>".$ausbildungssemester."</semesterStudent>";
             
             $studiensemester_beginn = new studiensemester();
@@ -145,6 +145,11 @@ foreach($uid_arr as $uid)
 			echo "\t\t<studiengang_sprache>".$studiengang->sprache."</studiengang_sprache>\n";
 			echo "\t\t<studiengang_maxsemester>".$studiengang->max_semester."</studiengang_maxsemester>\n";
 			echo "\t\t<studiengang_anzahljahre>".($studiengang->max_semester/2)."</studiengang_anzahljahre>\n";
+			
+			//Wenn Quereinsteiger stimmt studiengang_maxsemester nicht mit der tatsaechlichen Ausbildungsdauer ueberein 
+			$student_maxsemester = ($studiengang->max_semester-$ausbildungssemester)+1;
+			echo "\t\t<student_maxsemester>".$student_maxsemester."</student_maxsemester>\n";
+			echo "\t\t<student_anzahljahre>".($student_maxsemester/2)."</student_anzahljahre>\n";
 			
 			$akadgrad = new akadgrad();
 			$akadgrad->getAkadgradStudent($student->uid);

@@ -343,13 +343,15 @@ class projekt extends basis_db
 	}
 	
 	/**
-	 * Liefert die Projekte zu denen ein Mitarbeiter zugeordnet ist
+	 * Liefert die Projekte zu denen ein Mitarbeiter zugeordnet ist.
+         * Optional auch mit den Zuteilungen zu Projektphasen.
 	 * @param $mitarbeiter_uid
+         * @param $projektphasen boolean Default false. Wenn true, werden auch Zuteilungen zu Projektphasen geliefert.
 	 */
-	function getProjekteMitarbeiter($mitarbeiter_uid)
+	function getProjekteMitarbeiter($mitarbeiter_uid, $projektphasen=false)
 	{
-		$qry = "SELECT 
-					distinct tbl_projekt.* 
+                $qry = "SELECT DISTINCT
+					tbl_projekt.* 
 				FROM 
 					fue.tbl_ressource 
 					JOIN fue.tbl_projekt_ressource USING(ressource_id)
@@ -357,6 +359,20 @@ class projekt extends basis_db
 				WHERE (beginn<=now() or beginn is null) 
 				AND (ende>=now() OR ende is null) 
 				AND mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid);
+                
+                if ($projektphasen==true)
+                    $qry.=  "UNION
+
+                             SELECT DISTINCT
+                                        tbl_projekt.* 
+                                FROM 
+                                        fue.tbl_projektphase
+                                        JOIN fue.tbl_projekt USING (projekt_kurzbz)
+                                        JOIN fue.tbl_projekt_ressource USING (projektphase_id)
+                                        JOIN fue.tbl_ressource ON (tbl_ressource.ressource_id=tbl_projekt_ressource.ressource_id)
+                                WHERE (tbl_projekt.beginn<=now() or tbl_projekt.beginn is null) 
+                                AND (tbl_projekt.ende>=now() OR tbl_projekt.ende is null) 
+                                AND mitarbeiter_uid=".$this->db_add_param($mitarbeiter_uid);
 		
 		if($result = $this->db_query($qry))
 		{

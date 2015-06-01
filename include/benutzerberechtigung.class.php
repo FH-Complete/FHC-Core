@@ -514,7 +514,7 @@ class benutzerberechtigung extends basis_db
 		
 		if($kostenstelle_id!='' && !is_numeric($kostenstelle_id))
 		{
-			$this->errormsg = 'Kostenstelle_id ist ungueltig';
+			$this->errormsg = 'Kostenstelle_id "'.$kostenstelle_id.'" is invalid';
 			return false;
 		}
 		
@@ -531,6 +531,7 @@ class benutzerberechtigung extends basis_db
 				if (($timestamp>$b->starttimestamp || $b->starttimestamp==null) 
 				 && ($timestamp<$b->endetimestamp || $b->endetimestamp==null))
 				{
+					$this->errormsg='Access denied! You need permission '.strtoupper($berechtigung_kurzbz).' '.($oe_kurzbz!=null?'in '.strtoupper($oe_kurzbz):'').' '.($art!=null?'with '.strtoupper($art):'');
 					return false;
 				}
 			}
@@ -560,7 +561,7 @@ class benutzerberechtigung extends basis_db
 			}		
 			else
 			{
-				$this->errormsg='Kostenstelle existiert nicht';
+				$this->errormsg='Cost center (ID '.$kostenstelle_id.') does not exist';
 				return false;
 			}		
 		}
@@ -568,6 +569,7 @@ class benutzerberechtigung extends basis_db
 		//wenn ein Doppelpunkt vorkommt, pruefen ob das Uebergeordnete vorhanden ist
 		if($pos=mb_strpos($berechtigung_kurzbz,':')===false)
 		{
+			$this->errormsg='Access denied! You need permission '.strtoupper($berechtigung_kurzbz).' '.($oe_kurzbz!=null?'in '.strtoupper($oe_kurzbz):'').' '.($art!=null?'with '.strtoupper($art):'');
 			return false;
 		}
 		else 

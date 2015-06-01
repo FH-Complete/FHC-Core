@@ -33,7 +33,7 @@ $user = get_uid();
 $sprache=getSprache(); 
 $p = new phrasen($sprache); 
 
-
+$is_lector=false;
 if(check_lektor($user))
 	$is_lector=true;
 

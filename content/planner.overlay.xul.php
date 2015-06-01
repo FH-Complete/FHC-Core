@@ -72,6 +72,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/ressource.overlay.xul.php"
 	    <splitter class="tree-splitter"/>
 	    <treecol id="treecol-projektmenue-titel" label="Titel" flex="2" hidden="true"/>
 	    <splitter class="tree-splitter"/>
+	    <treecol id="treecol-projektmenue-typ" label="Typ" flex="2" hidden="true"/>
+	    <splitter class="tree-splitter"/>
 	    <treecol id="treecol-projektmenue-nummer" label="Nummer" flex="1" hidden="true"/>
 	    <splitter class="tree-splitter"/>
 	    <treecol id="treecol-projektmenue-beginn" label="Beginn" flex="2" hidden="false"/>
@@ -84,12 +86,13 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/projekt/ressource.overlay.xul.php"
 	      <treechildren>
 	       <treeitem uri="rdf:*">
 	         <treerow>
-	           <treecell src="../skin/images/rdf:http://www.technikum-wien.at/projektphase/rdf#typ^.png" label="rdf:http://www.technikum-wien.at/projektphase/rdf#bezeichnung"/>
+	           <treecell src="../skin/images/rdf:http://www.technikum-wien.at/projektphase/rdf#typ^.png" label=" rdf:http://www.technikum-wien.at/projektphase/rdf#bezeichnung"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#oe_kurzbz"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#projekt_kurzbz"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#projekt_phase"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#projekt_phase_id"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#titel"/>
+	           <treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#typ"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#nummer"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#beginn"/>
 	           <treecell label="rdf:http://www.technikum-wien.at/projektphase/rdf#ende"/>

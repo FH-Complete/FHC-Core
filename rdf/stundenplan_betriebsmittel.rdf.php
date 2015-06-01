@@ -84,6 +84,9 @@ if(isset($_REQUEST['stundenplan_ids']) || isset($_REQUEST['stundenplan_betriebsm
 }
 elseif(isset($_REQUEST['von']) && isset($_REQUEST['bis']) && $_REQUEST['xmlformat']=='xml')
 {
+	$von = $datum_obj->formatDatum($_REQUEST['von'], 'Y-m-d');
+	$bis = $datum_obj->formatDatum($_REQUEST['bis'], 'Y-m-d');
+
 	$db = new basis_db();
 	$qry = '
 	SELECT
@@ -105,8 +108,8 @@ elseif(isset($_REQUEST['von']) && isset($_REQUEST['bis']) && $_REQUEST['xmlforma
 		JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 		JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 	WHERE
-		tbl_stundenplan.datum>='.$db->db_add_param($_REQUEST['von']).'
-		AND tbl_stundenplan.datum<='.$db->db_add_param($_REQUEST['bis']).'
+		tbl_stundenplan.datum>='.$db->db_add_param($von).'
+		AND tbl_stundenplan.datum<='.$db->db_add_param($bis).'
 	ORDER BY datum, ort_kurzbz, stunde';
 	
 	header("Content-type: application/xhtml+xml");

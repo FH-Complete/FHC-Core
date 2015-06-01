@@ -9,7 +9,7 @@ $this->phrasen['dms_link/moodleHandbuch']='33'; //Moodle Handbuch
 $this->phrasen['dms_link/moodleHandbuch24']='1426'; //Moodle Handbuch
 $this->phrasen['dms_link/abgabetoolLektorHandbuch']='28'; //Abgabetool Handbuch fuer LektorInnen
 $this->phrasen['dms_link/abgabetoolStudentHandbuch']='27'; //Abgabetool Handbuch fuer Studierende
-$this->phrasen['dms_link/abgabetoolAssistenzHandbuch']='28'; //Abgabetool Handbuch fuer Studierende
+$this->phrasen['dms_link/abgabetoolAssistenzHandbuch']='28'; //Abgabetool Handbuch fuer Assistenz
 $this->phrasen['dms_link/iconPDF']='46'; //PDF Icon
 $this->phrasen['dms_link/bedienungsanleitungMailverteiler']='1474'; //Bedienungsanleitung Mailverteiler
 $this->phrasen['dms_link/berechtigungskonzeptMailverteiler']='1475'; //Berechtigungskonzept Mailverteiler
@@ -23,4 +23,7 @@ $this->phrasen['dms_link/sicherheitAnDerFHTW']='6765'; //Link zum Hauptpunkt "Si
 $this->phrasen['dms_link/lvplanSyncFAQ']='7188'; //Link zur Anleitung zur Kalender Abbonierung
 $this->phrasen['dms_link/profilhilfe']=''; //Hilfe-Link aus dem Profil
 $this->phrasen['dms_link/anleitungMailverteiler']='7578'; //Anleitung für die Benutzung der Mailverteiler und der Berechtigungsschlüssel
+
+//Links auf externe Seiten
+$this->phrasen['dms_link/dokuwikiGesamtnote']='http://fhcomplete.technikum-wien.at/dokuwiki/doku.php?id=cis:gesamtnote'; //Link ins Dokuwiki zur Anleitung Gesamtnote
 ?>

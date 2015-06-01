@@ -18,9 +18,10 @@
  * Authors: Andreas Oesterreicher 	< andreas.oesterreicher@technikum-wien.at >
  */
 /**
- * Legt fuer jede Lehrveranstaltung im aktuellen Semester einen Moodle Kurs an
+ * Legt fuer jede Lehreinheit im aktuellen Semester einen Moodle Kurs an
  * falls noch keiner vorhanden ist
  * und teilt Lektoren und Studierende zu dem Kurs zu
+ * Aber nur wenn die Lehrform der Lehreinheit=Lehrform der LV
  */
 require_once('../../config/cis.config.inc.php');
 require_once('../../include/studiensemester.class.php');
@@ -47,10 +48,18 @@ $db = new basis_db();
 $stsem_obj = new studiensemester();
 $stsem = $stsem_obj->getAktOrNext();
 
-$qry = "SELECT distinct lehrveranstaltung_id, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.kurzbz, 
-		tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.orgform_kurzbz, tbl_lehrveranstaltung.semester
-		FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
-		WHERE studiensemester_kurzbz=".$db->db_add_param($stsem)." AND semester is not null AND semester!=0";
+$qry = "SELECT 
+			distinct lehrveranstaltung_id, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.kurzbz, 
+			tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.orgform_kurzbz, tbl_lehrveranstaltung.semester,
+			tbl_lehreinheit.lehreinheit_id
+		FROM 
+			lehre.tbl_lehreinheit 
+			JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
+		WHERE 
+			studiensemester_kurzbz=".$db->db_add_param($stsem)." 
+			AND semester is not null 
+			AND semester!=0
+			AND tbl_lehreinheit.lehrform_kurzbz=tbl_lehrveranstaltung.lehrform_kurzbz";
 
 if($result = $db->db_query($qry))
 {
@@ -59,16 +68,17 @@ if($result = $db->db_query($qry))
 		$mdl_course = new moodle24_course();
 		$mdl = new moodle();
 
-		if(!$mdl->course_exists_for_lv($row->lehrveranstaltung_id, $stsem))
+		if(!$mdl->course_exists_for_le($row->lehreinheit_id))
 		{
 			$studiengang = new studiengang();
 			$studiengang->load($row->studiengang_kz);
 
-			$shortname = $studiengang->kuerzel.($row->orgform_kurzbz!=''?'-'.$row->orgform_kurzbz:'').($row->semester!=''?'-'.$row->semester:'').'-'.$stsem.'-'.$row->kurzbz;
-			$bezeichnung = $studiengang->kuerzel.($row->orgform_kurzbz!=''?'-'.$row->orgform_kurzbz:'').($row->semester!=''?'-'.$row->semester:'').'-'.$stsem.'-'.$row->bezeichnung;
+			$shortname = $studiengang->kuerzel.($row->orgform_kurzbz!=''?'-'.$row->orgform_kurzbz:'').($row->semester!=''?'-'.$row->semester:'').'-'.$stsem.'-'.$row->kurzbz.'-'.$row->lehreinheit_id;
+			$bezeichnung = $studiengang->kuerzel.($row->orgform_kurzbz!=''?'-'.$row->orgform_kurzbz:'').($row->semester!=''?'-'.$row->semester:'').'-'.$stsem.'-'.$row->bezeichnung.'-'.$row->lehreinheit_id;
 
-			$mdl_course->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+			//$mdl_course->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 			$mdl_course->studiensemester_kurzbz = $stsem;
+			$mdl_course->lehreinheit_id = $row->lehreinheit_id;
 			$mdl_course->mdl_fullname = $bezeichnung;
 			$mdl_course->mdl_shortname = $shortname;
 			$mdl_course->insertamum = date('Y-m-d H:i:s');

@@ -394,6 +394,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
 					{
 						var id = respObj.Body[0].saveNotizResponse[0].message[0].Text;
 						me.selectID=id;
+						document.getAnonymousElementByAttribute(me ,'anonid', 'textbox-notiz-notiz_id').value=id;
 					}
 					catch(e)
 					{

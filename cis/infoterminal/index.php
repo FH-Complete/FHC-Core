@@ -67,6 +67,9 @@
 //	Request Parameter 
 // ------------------------------------------------------------------------------------------
   	$timer=trim((isset($_REQUEST['timer']) ? $_REQUEST['timer']:0));
+	if(!isset($ServiceTerminalDefaultRaumtyp))
+		$ServiceTerminalDefaultRaumtyp='HS';
+
 	// Raumtyp
   	$raumtyp_kurzbz=trim((isset($_REQUEST['raumtyp_kurzbz']) ? $_REQUEST['raumtyp_kurzbz']:$ServiceTerminalDefaultRaumtyp));
 	// Saal - Raum
@@ -196,7 +199,7 @@
 // ------------------------------------------------------------------------------------------
 //	Linkes Auswahlmenue fuer Raumtypen
 // ------------------------------------------------------------------------------------------
-	if(!is_null($ServiceTerminalRaumtypen))
+	if(isset($ServiceTerminalRaumtypen) && !is_null($ServiceTerminalRaumtypen))
 		$row_ort = $ServiceTerminalRaumtypen;
 	else
 	{
@@ -1651,7 +1654,7 @@ function stundenplan_raum($db,$ort_kurzbz="",$datum="",$stunde_von,$stunde_bis=0
 	$qry.=' SELECT studiengang_kz,0 as "stundenplan_id",tbl_reservierung.reservierung_id,tbl_reservierung.ort_kurzbz,tbl_reservierung.titel,tbl_reservierung.semester,tbl_reservierung.studiengang_kz,tbl_reservierung.verband, tbl_reservierung.gruppe  , to_char(tbl_reservierung.datum, \'YYYYMMDD\') as "datum_jjjjmmtt", to_char(tbl_reservierung.datum, \'IW\') as "datum_woche" , tbl_stunde.beginn, tbl_stunde.ende , to_char(tbl_stunde.beginn, \'HH24:MI\') as "beginn_anzeige" , to_char(tbl_stunde.ende, \'HH24:MI\') as "ende_anzeige" , EXTRACT(EPOCH FROM tbl_reservierung.datum) as "datum_timestamp" ,tbl_stunde.stunde ';
 	$qry.=' FROM campus.tbl_reservierung , lehre.tbl_stunde ';
 	$qry.=" WHERE tbl_stunde.stunde=tbl_reservierung.stunde  ";
-	$qry.=" and tbl_reservierung.stunde between ". $db->db_add_param(trim($stunde_von), FHC_STRING) ." and ". $db->db_add_param(trim($stunde_bis, FHC_STRING)) ;
+	$qry.=" and tbl_reservierung.stunde between ". $db->db_add_param(trim($stunde_von), FHC_STRING) ." and ". $db->db_add_param(trim($stunde_bis), FHC_STRING) ;
 
 	$datum_obj = new datum();
 	if (!empty($datum))

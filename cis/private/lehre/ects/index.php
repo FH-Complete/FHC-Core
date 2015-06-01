@@ -623,67 +623,60 @@ if (!$db = new basis_db())
          </tr>
 
        ';
-	   /* 28.01.2008 - Titel kommt jetzt aus tbl_lehrveranstaltung
-	   <tr class="liste1">
-         <td><i>Lehrveranstaltungstitel</i> </td>
-         <td align="right"><textarea rows="5" cols="40" name="titel_de">'. (isset($titel_de)?stripslashes(mb_eregi_replace("<br>","\r\n", $titel_de)):'').'</textarea></td>
-         <td><i>Course Title</i> </td>
-         <td align="right"><textarea rows="5" cols="40" name="titel_en">'. (isset($titel_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$titel_en)):'').'</textarea></td>
-       </tr>
-       */
+	 
        echo '
        <tr class="liste0">
-         <td><i>Kurzbeschreibung <font style="color:black">(Pflichtfeld)</font></i> </td>
+         <td><i>'.$p->t('lvinfo/kurzbeschreibung').' <font style="color:black">(Pflichtfeld)</font></i> </td>
          <td align="right"><textarea rows="5" cols="40" name="kurzbeschreibung_de">'. (isset($kurzbeschreibung_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$kurzbeschreibung_de)):'').'</textarea></td>
-         <td><i>Course Description <font style="color:black">(Required)</font></i> </td>
+         <td><i>'.$p->t('lvinfo/kurzbeschreibungEN').' <font style="color:black">(Required)</font></i> </td>
          <td align="right"><textarea rows="5" cols="40" name="kurzbeschreibung_en">'. (isset($kurzbeschreibung_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$kurzbeschreibung_en)):'').'</textarea></td>
        </tr>
        <tr class="liste1">
-         <td><i>Methodik / Didaktik <font style="color:black">(Pflichtfeld)</font></i> </td>
+         <td><i>'.$p->t('lvinfo/methodik').' <font style="color:black">(Pflichtfeld)</font></i> </td>
          <td align="right"><textarea rows="5" cols="40" name="methodik_de">'. (isset($methodik_de)?stripslashes(mb_eregi_replace("<br>","\r\n", $methodik_de)):'').'</textarea></td>
-         <td><i>Teaching Methods <font style="color:black">(Required)</font></i> </td>
+         <td><i>'.$p->t('lvinfo/methodikEN').' <font style="color:black">(Required)</font></i> </td>
          <td align="right"><textarea rows="5" cols="40" name="methodik_en">'. (isset($methodik_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$methodik_en)):'').'</textarea></td>
        </tr>';
        echo '<tr class="liste0">
-         <td><i>Lernergebnisse <font style="color:black">(Pflichtfeld)</font></i></td>
+         <td><i>'.$p->t('lvinfo/lernergebnisse').' <font style="color:black">(Pflichtfeld)</font></i></td>
          <td align="right"><textarea rows="5" cols="40" name="lehrziele_de">'. (isset($lehrziele_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrziele_de)):'').'</textarea></td>
-         <td><i>Learning outcomes <font style="color:black">(Required)</font></i> </td>
+         <td><i>'.$p->t('lvinfo/lernergebnisseEN').' <font style="color:black">(Required)</font></i> </td>
          <td align="right"><textarea rows="5" cols="40" name="lehrziele_en">'. (isset($lehrziele_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrziele_en)):'').'</textarea></td>
        </tr>
        <tr class="liste1">
-         <td><i>Lehrinhalte <font style="color:black">(Pflichtfeld)</font></i></td>
+         <td><i>'.$p->t('lvinfo/lehrinhalte').' <font style="color:black">(Pflichtfeld)</font></i></td>
          <td align="right"><textarea rows="5" cols="40" name="lehrinhalte_de">'. (isset($lehrinhalte_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrinhalte_de)):'').'</textarea></td>
-         <td><i>Course Contents <font style="color:black">(Required)</font></i> </td>
+         <td><i>'.$p->t('lvinfo/lehrinhalteEN').' <font style="color:black">(Required)</font></i> </td>
          <td align="right"><textarea rows="5" cols="40" name="lehrinhalte_en">'. (isset($lehrinhalte_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$lehrinhalte_en)):'').'</textarea></td>
        </tr>
        <tr class="liste0">
-         <td><i>Vorkenntnisse <font style="color:black">(Pflichtfeld)</font></i> </td>
+         <td><i>'.$p->t('lvinfo/vorkenntnisse').' <font style="color:black">(Pflichtfeld)</font></i> </td>
          <td align="right"><textarea rows="5" cols="40" name="voraussetzungen_de">'. (isset($voraussetzungen_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$voraussetzungen_de)):'').'</textarea></td>
-         <td><i>Prerequisites <font style="color:black">(Required)</font></i></td>
+         <td><i>'.$p->t('lvinfo/vorkenntnisseEN').' <font style="color:black">(Required)</font></i></td>
          <td align="right"><textarea rows="5" cols="40" name="voraussetzungen_en">'. (isset($voraussetzungen_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$voraussetzungen_en)):'').'</textarea></td>
        </tr>';
        echo '<tr class="liste1">
-         <td><i>Literatur</i> </td>
+         <td><i>'.$p->t('lvinfo/literatur').'</i> </td>
          <td align="right"><textarea rows="5" cols="40" name="unterlagen_de">'. (isset($unterlagen_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$unterlagen_de)):'').'</textarea></td>
-         <td><i>Recommended Reading and Material</i></td>
+         <td><i>'.$p->t('lvinfo/literaturEN').'</i></td>
          <td align="right"><textarea rows="5" cols="40" name="unterlagen_en">'. (isset($unterlagen_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$unterlagen_en)):'').'</textarea></td>
        </tr>
        <tr class="liste0">
-         <td><i>Leistungsbeurteilung</i></td>
+         <td><i>'.$p->t('lvinfo/leistungsbeurteilung').'</i></td>
          <td align="right"><textarea rows="5" cols="40" name="pruefungsordnung_de">'. (isset($pruefungsordnung_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$pruefungsordnung_de)):'').'</textarea></td>
-         <td><i>Assessment Methods</i> </td>
+         <td><i>'.$p->t('lvinfo/leistungsbeurteilungEN').'</i> </td>
          <td align="right"><textarea rows="5" cols="40" name="pruefungsordnung_en">'. (isset($pruefungsordnung_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$pruefungsordnung_en)):'').'</textarea></td>
        </tr>
         <tr class="liste1">
-         <td><i>Anwesenheit</i></td>
+         <td><i>'.$p->t('lvinfo/anwesenheit').'</i></td>
          <td align="right"><textarea rows="5" cols="40" name="anwesenheit_de">'. (isset($anwesenheit_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$anwesenheit_de)):'').'</textarea></td>
-         <td><i>Attendance</i></td>
+         <td><i>'.$p->t('lvinfo/anwesenheitEN').'</i></td>
          <td align="right"><textarea rows="5" cols="40" name="anwesenheit_en">'. (isset($anwesenheit_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$anwesenheit_en)):'').'</textarea></td>
        </tr>
        <tr class="liste0">
-         <td><i>Anmerkungen</i></td>
+         <td><i>'.$p->t('lvinfo/anmerkungen').'</i></td>
          <td align="right"><textarea rows="5" cols="40" name="anmerkungen_de">'. (isset($anmerkungen_de)?stripslashes(mb_eregi_replace("<br>","\r\n",$anmerkungen_de)):'').'</textarea></td>
-         <td><i>Comments</i></td>
+         <td><i>'.$p->t('lvinfo/anmerkungenEN').'</i></td>
          <td align="right"><textarea rows="5" cols="40" name="anmerkungen_en">'. (isset($anmerkungen_en)?stripslashes(mb_eregi_replace("<br>","\r\n",$anmerkungen_en)):'').'</textarea></td>
        </tr>
        <tr class="liste0">
