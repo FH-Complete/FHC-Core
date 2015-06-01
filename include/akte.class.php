@@ -342,7 +342,8 @@ class akte extends basis_db
 	{
 		$qry = "SELECT 
 					akte_id, person_id, dokument_kurzbz, mimetype, erstelltam, gedruckt, 
-					titel, bezeichnung, updateamum, insertamum, updatevon, insertvon, uid 
+					titel, bezeichnung, updateamum, insertamum, updatevon, insertvon, uid,
+					dms_id,nachgereicht,anmerkung,titel_intern,anmerkung_intern 
 				FROM public.tbl_akte WHERE person_id=".$this->db_add_param($person_id, FHC_INTEGER);
 
 			$qry.=" AND dokument_kurzbz IN ('Lebenslf','Motivat','LearnAgr')";
@@ -372,7 +373,7 @@ class akte extends basis_db
                 $akten->nachgereicht = $this->db_parse_bool($row->nachgereicht); 
                 $akten->anmerkung = $row->anmerkung; 
 				$akten->titel_intern = $row->titel_intern; 
-				$akten->anmerkung_intern = $row->anmerkung_inter; 
+				$akten->anmerkung_intern = $row->anmerkung_intern; 
 				
 				$this->result[] = $akten;
 			}
