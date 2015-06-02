@@ -273,76 +273,79 @@ function checkZeilenUmbruch()
 	checkZeilenUmbruch();
 	
 
-	$eintraegeprozeile++;
-	echo '<td class="tdvertical" align="center">';
+	if(CIS_LEHRVERANSTALTUNG_LEISTUNGSUEBERSICHT_ANZEIGEN || $is_lector)
+	{
 
-	if($angemeldet || $is_lector)
-	    echo '<img class="lv" src="../../../skin/images/button_listen.png"><br>';
+		$eintraegeprozeile++;
+		echo '<td class="tdvertical" align="center">';
+
+		if(CIS_LEHRVERANSTALTUNG_LEISTUNGSUEBERSICHT_ANZEIGEN && ($angemeldet || $is_lector))
+			echo '<img class="lv" src="../../../skin/images/button_listen.png"><br>';
 	
-  	if($is_lector)
-  	{
-		//Anwesenheitsliste
-		echo "<b><a href='anwesenheitsliste.php?stg_kz=$studiengang_kz&sem=$semester&lvid=$lvid&stsem=$angezeigtes_stsem' class='Item'>".$p->t('lehre/anwesenheitsUndNotenlisten')."</a></b><br>";
-  	}
+	  	if($is_lector)
+	  	{
+			//Anwesenheitsliste
+			echo "<b><a href='anwesenheitsliste.php?stg_kz=$studiengang_kz&sem=$semester&lvid=$lvid&stsem=$angezeigtes_stsem' class='Item'>".$p->t('lehre/anwesenheitsUndNotenlisten')."</a></b><br>";
+	  	}
 
-  	//Leistungsuebersicht
-  	$dir_name=$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/leistung';
+	  	//Leistungsuebersicht
+	  	$dir_name=$DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/leistung';
 
-  	$dest_dir = @dir($dir_name);
-  	if(!@is_dir($dest_dir->path))
-	{
-		if(!@is_dir(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz)))
+	  	$dest_dir = @dir($dir_name);
+	  	if(!@is_dir($dest_dir->path))
 		{
-			exec('mkdir -m 755 '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz)));
-			exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz)));
-		}
-		if(!@is_dir(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester))
-		{
-			exec('mkdir -m 755 '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester));
-			exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester));
-		}
-		if(!@is_dir(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name)))
-		{
-			exec('mkdir -m 755 '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name)));
-			exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name)));
-		}
-		if(!@is_dir(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/leistung'))
-		{
-			exec('mkdir -m 775 '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/leistung'));
-			exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/leistung'));
-		}
-	}
-
-	if($dest_dir)
-	{
-		$dir_empty = true;
-
-		while($entry = $dest_dir->read())
-		{
-			if($entry != "." && $entry != "..")
+			if(!@is_dir(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz)))
 			{
-				$dir_empty = false;
-
-				break;
+				exec('mkdir -m 755 '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz)));
+				exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz)));
+			}
+			if(!@is_dir(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester))
+			{
+				exec('mkdir -m 755 '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester));
+				exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester));
+			}
+			if(!@is_dir(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name)))
+			{
+				exec('mkdir -m 755 '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name)));
+				exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name)));
+			}
+			if(!@is_dir(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/leistung'))
+			{
+				exec('mkdir -m 775 '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/leistung'));
+				exec('sudo chown www-data:teacher '.escapeshellarg(DOC_ROOT.'/documents/'.mb_strtolower($kurzbz).'/'.$semester.'/'.mb_strtolower($short_short_name).'/leistung'));
 			}
 		}
-	}
-	if(CIS_LEHRVERANSTALTUNG_LEISTUNGSUEBERSICHT_ANZEIGEN && ($angemeldet || $is_lector))
-	{
-	    if(isset($dest_dir) && isset($dir_empty) && $dir_empty == false)
-	    {
-		    echo '<a href="'.$dest_dir->path.'" target="_blank">';
-		    echo '<strong>'.$p->t('lehre/leistungsuebersicht').'</strong>';
-		    echo '</a>';
-	    }
-	    else
-	    {
-		    echo '<strong>'.$p->t('lehre/leistungsuebersicht').'</strong>';
-	    }
-	}
 
-	echo '</td>';
-	  
+		if($dest_dir)
+		{
+			$dir_empty = true;
+
+			while($entry = $dest_dir->read())
+			{
+				if($entry != "." && $entry != "..")
+				{
+					$dir_empty = false;
+
+					break;
+				}
+			}
+		}
+		if(CIS_LEHRVERANSTALTUNG_LEISTUNGSUEBERSICHT_ANZEIGEN && ($angemeldet || $is_lector))
+		{
+			if(isset($dest_dir) && isset($dir_empty) && $dir_empty == false)
+			{
+				echo '<a href="'.$dest_dir->path.'" target="_blank">';
+				echo '<strong>'.$p->t('lehre/leistungsuebersicht').'</strong>';
+				echo '</a>';
+			}
+			else
+			{
+				echo '<strong>'.$p->t('lehre/leistungsuebersicht').'</strong>';
+			}
+		}
+
+		echo '</td>';
+	}	  
 	checkZeilenUmbruch();
 
 	//Keine Newsgroups fuer Studiengang '0' (Freifaecher) anzeigen
