@@ -327,7 +327,7 @@ function checkZeilenUmbruch()
 			}
 		}
 	}
-	if($angemeldet || $is_lector)
+	if(CIS_LEHRVERANSTALTUNG_LEISTUNGSUEBERSICHT_ANZEIGEN && ($angemeldet || $is_lector))
 	{
 	    if(isset($dest_dir) && isset($dir_empty) && $dir_empty == false)
 	    {
