@@ -279,7 +279,7 @@ function checkZeilenUmbruch()
 		$eintraegeprozeile++;
 		echo '<td class="tdvertical" align="center">';
 
-		if(CIS_LEHRVERANSTALTUNG_LEISTUNGSUEBERSICHT_ANZEIGEN && ($angemeldet || $is_lector))
+		if((CIS_LEHRVERANSTALTUNG_LEISTUNGSUEBERSICHT_ANZEIGEN && $angemeldet) || $is_lector)
 			echo '<img class="lv" src="../../../skin/images/button_listen.png"><br>';
 	
 	  	if($is_lector)
