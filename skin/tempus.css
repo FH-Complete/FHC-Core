@@ -154,11 +154,11 @@ toolbarbutton.stplweekoverlay-toolbarbutton:hover
 
 .stplweek_vbox:hover .stplweek_tagesinfo
 {
-	color: #AAAAAA;
 	visibility:visible;
 }
 
 .stplweek_tagesinfo
 {
+	color: #AAAAAA;
 	visibility:hidden;
 }

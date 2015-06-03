@@ -460,17 +460,53 @@ var boardObserver=
 	{
 		var styleNow=evt.target.getAttribute("style");
 		if (evt.target.tagName=="label")
+		{
 			evt.target.setAttribute("style","background-color:#AAFFAA;");
+
+			var tagesinfo = evt.target.parentNode.getElementsByClassName('stplweek_tagesinfo');
+			if(typeof tagesinfo[0]!='undefined')
+			{
+				var Tagesinfostyle = tagesinfo[0].getAttribute("style");
+				tagesinfo[0].setAttribute("style",Tagesinfostyle+";visibility:visible;");
+			}
+		}
 		else
+		{
 			evt.target.setAttribute("style",styleNow+";border:1px dashed black;");
+
+			var tagesinfo = evt.target.getElementsByClassName('stplweek_tagesinfo');
+			if(typeof tagesinfo[0]!='undefined')
+			{
+				var Tagesinfostyle = tagesinfo[0].getAttribute("style");
+				tagesinfo[0].setAttribute("style",Tagesinfostyle+";visibility:visible;");
+			}
+		}
 	},
 	onDragExit: function (evt,flavour,session)
 	{
 		var styleNow=evt.target.getAttribute("style");
 		if (evt.target.tagName=="label")
+		{
 			evt.target.setAttribute("style","");
+
+			var tagesinfo = evt.target.parentNode.getElementsByClassName('stplweek_tagesinfo');
+			if(typeof tagesinfo[0]!='undefined')
+			{
+				var Tagesinfostyle = tagesinfo[0].getAttribute("style");
+				tagesinfo[0].setAttribute("style",Tagesinfostyle+";visibility:hidden;");
+			}
+		}
 		else
+		{
 			evt.target.setAttribute("style",styleNow+";border:1px solid black;");
+
+			var tagesinfo = evt.target.getElementsByClassName('stplweek_tagesinfo');
+			if(typeof tagesinfo[0]!='undefined')
+			{
+				var Tagesinfostyle = tagesinfo[0].getAttribute("style");
+				tagesinfo[0].setAttribute("style",Tagesinfostyle+";visibility:hidden;");
+			}
+		}
   	},
   	onDragOver: function(evt,flavour,session)
   	{
