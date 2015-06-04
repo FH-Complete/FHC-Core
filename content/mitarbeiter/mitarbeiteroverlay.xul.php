@@ -258,6 +258,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 					echo '<tab id="mitarbeiter-tab-vertrag" label="Verträge" />';
 
 				?>
+				<tab id="mitarbeiter-tab-termine" label="Termine" onclick="MitarbeiterTermineIFrameLoad()" />
 			</tabs>
 			<tabpanels id="mitarbeiter-tabpanels-main" flex="1">
 				<vbox id="mitarbeiter-detail-stammdaten"  style="margin-top:10px;" />
@@ -271,6 +272,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/mitarbeiter/mitarbeitervertragover
 				if($rechte->isBerechtigt('vertrag/mitarbeiter'))
 					echo '<vbox id="mitarbeiter-vertrag" style="margin-top:10px;" />';
 				?>				
+				<iframe id="mitarbeiter-termine" src="" style="margin-top:10px;" />
 			</tabpanels>
 		</tabbox>	
 	</vbox>

@@ -349,4 +349,39 @@ class anwesenheit extends basis_db
 			return 'green';
 		}
 	}
+
+	/**
+	 * Prueft ob Anwesenheiten erfasst wurden
+	 * @param $lehreinheit_id ID der Lehreinheit
+	 * @param $datum Datum
+	 * @param $uid UID des Studierenden
+	 * @return boolean true wenn vorhanden, sonst false
+	 */
+	public function AnwesenheitExists($lehreinheit_id, $datum, $uid=null)
+	{
+		$qry = "SELECT 
+					1
+				FROM 
+					campus.tbl_anwesenheit 
+				WHERE 
+					anwesend=true
+					AND lehreinheit_id=".$this->db_add_param($lehreinheit_id)." 
+					AND datum=".$this->db_add_param($datum);
+
+		if($uid!='')
+			$qry.=" AND uid=".$this->db_add_param($uid);
+
+		if($result = $this->db_query($qry))
+		{
+			if($this->db_num_rows($result)>0)
+				return true;
+			else
+				return false;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
 }

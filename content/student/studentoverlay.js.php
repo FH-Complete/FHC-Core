@@ -1525,6 +1525,13 @@ function StudentAuswahl()
 			url = '<?php echo APP_ROOT; ?>content/funktionen.xul.php?uid='+uid;
 			document.getElementById('student-funktionen').setAttribute('src',url);
 		}
+
+		// ***** Termine *****
+		if(document.getElementById('student-content-tabs').selectedItem==document.getElementById('student-tab-termine'))
+		{
+			document.getElementById('student-termine').setAttribute('src','termine.xul.php?student_uid='+uid);
+		}
+
 	}
 
 	// Notizen laden
@@ -5286,6 +5293,19 @@ function StudentFunktionIFrameLoad()
 			url = '<?php echo APP_ROOT; ?>content/funktionen.xul.php?uid='+uid;
 			document.getElementById('student-funktionen').setAttribute('src',url);
 		}
+	}
+}
+
+// ****
+// * Laedt den Termine IFrame
+// ****
+function StudentTermineIFrameLoad()
+{
+	uid = document.getElementById('student-detail-textbox-uid').value;
+	if(uid!='')
+	{
+		url = 'termine.xul.php?student_uid='+uid+'&ts='+gettimestamp();
+		document.getElementById('student-termine').setAttribute('src',url);
 	}
 }
 

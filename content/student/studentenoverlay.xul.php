@@ -369,6 +369,7 @@ else
 							<tab id="student-tab-gruppen" label="Gruppen" onclick="StudentGruppenLoadData();"/>
 							<tab id="student-tab-funktionen" label="Funktionen" onclick="StudentFunktionIFrameLoad();"/>
 							<tab id="student-tab-notizen" label="Notizen"/>
+							<tab id="student-tab-termine" label="Termine" onclick="StudentTermineIFrameLoad();"/>
 						</tabs>
 						<tabpanels id="student-tabpanels-main" flex="1">
 							<vbox id="student-detail"  style="margin-top:10px;" />
@@ -392,6 +393,7 @@ else
 							<vbox id="student-box-notiz">
 								<box class="Notiz" flex="1" id="student-box-notizen"/>
 							</vbox>
+							<iframe id="student-termine" src="" style="margin-top:10px;" />
 						</tabpanels>
 					</tabbox>
 				</vbox>
