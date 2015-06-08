@@ -5407,3 +5407,39 @@ function StudentPrestudentRolleVorruecken()
 		return true;
 	}
 }
+
+// ****
+// * Öffnet den Studienplan des Studenten im CIS
+// ****
+function StudentCisStudienplan(event)
+{
+	var tree = document.getElementById('student-tree');
+    if (tree.currentIndex == -1)
+    {
+        alert("Bitte wählen Sie einen Studenten aus.");
+        return false;
+    }
+       
+    var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+	var uid = tree.view.getCellText(tree.currentIndex,col);
+    
+    window.open('<?php echo APP_ROOT; ?>cis/private/profile/studienplan.php?uid='+uid);
+}
+
+// ****
+// * Öffnet die Studienerfolgsbestätigung des Studenten im CIS
+// ****
+function StudentCisStudienerfolg(event)
+{
+	var tree = document.getElementById('student-tree');
+    if (tree.currentIndex == -1)
+    {
+        alert("Bitte wählen Sie einen Studenten aus.");
+        return false;
+    }
+        
+    var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+	var uid = tree.view.getCellText(tree.currentIndex,col);
+    
+    window.open('<?php echo APP_ROOT; ?>cis/private/profile/studienerfolgsbestaetigung.php?uid='+uid);
+}
