@@ -79,7 +79,10 @@ $num_rows_stunde=$db->db_num_rows($result_stunde);
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link rel="stylesheet" href="../../../skin/style.css.php" type="text/css">
 <script src="../../../include/js/jquery1.9.min.js" type="text/javascript"></script>
-
+<script src="../../../include/js/jquery.ui.timepicker.js" type="text/javascript" ></script>
+<link href="../../../skin/jquery.css" rel="stylesheet" type="text/css"/>
+<link href="../../../skin/jquery.ui.timepicker.css" rel="stylesheet" type="text/css"/>
+<link href="../../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet"  type="text/css">
 <?php
 // ADDONS laden
 $addon_obj = new addon();
@@ -102,10 +105,31 @@ $( document ).ready(function()
 			addon[i].init("cis/private/profile/urlaubstool.php", {uid:\''.$uid.'\'});
 		}
 	}
+	
+
+		    $( ".datepicker_datum" ).datepicker({
+					 changeMonth: true,
+					 changeYear: true, 
+					 dateFormat: "dd.mm.yy",
+					 });
+			
+			$( ".timepicker" ).timepicker({
+					showPeriodLabels: false,
+					hourText: "'.$p->t("global/stunde").'",
+					minuteText: "'.$p->t("global/minute").'",
+					hours: {starts: 7,ends: 22},
+					rows: 4,
+					});
+
 });
 </script>';
 ?>
-
+<style>
+.dd_breit
+{
+	width:460px;
+}
+</style>
 <script language="Javascript">
 function conf_del()
 {
@@ -180,6 +204,43 @@ function checkdatum()
 	
 	return true;
 }
+
+function showHideBezeichnungDropDown()
+{
+	var dd = document.zeitsperre_form.zeitsperretyp_kurzbz;
+	var sp = document.getElementById('dienstv_span');
+	if (dd.options[dd.selectedIndex].value == 'DienstV')
+	{
+		var str = '<select name="bezeichnung" class="dd_breit">';
+		str += '<option value="Eheschließung">a) Eigene Eheschließung</option>';
+		str += '<option value="Geburt eigenes Kind">b) Geburt eines Kindes der Ehefrau/Lebensgefährtin</option>';
+		str += '<option value="Heirat Kind/Geschwister">c) Eheschließung eines Kindes/eigener Geschwister</option>';
+		str += '<option value="Eigene Sponsion/Promotion">d) Teilnahme an eigener Sponsion/Promotion</option>';
+		str += '<option value="Lebensbedr. Erkrankung P/K/E">e) Lebensbedrohliche Erkrankung Partner/Kinder/Eltern</option>';
+		str += '<option value="Ableben P/K/E">f) Ableben Partner/Kinder/Elternteil</option>';
+		str += '<option value="Bestattung G/S/G">g) Teilnahme an Bestattung Geschwister/Schwiegereltern/eigener Großeltern</option>';
+		str += '<option value="Wohnungswechsel">h) Wohnungswechsel in eigenen Haushalt</option>';
+		str += '</select>';
+				
+		sp.innerHTML = str;
+			
+	}
+	else
+	{
+		
+		sp.innerHTML = '<input type="text" name="bezeichnung" maxlength="32" size="32" value="">';
+	}
+	if (dd.options[dd.selectedIndex].value == 'Urlaub')
+		document.getElementById('resturlaub').style.visibility = 'visible';
+	else
+		document.getElementById('resturlaub').style.visibility = 'hidden';
+}
+
+function setBisDatum()
+{
+	document.zeitsperre_form.bisdatum.value = document.zeitsperre_form.vondatum.value;
+}
+
 </script>
 </head>
 
@@ -426,7 +487,7 @@ if($result = $db->db_query($qry))
 //liste aller zeitsperren ausgeben
 if(count($zeit->result)>0)
 {
-	$content_table.= '<table><tr class="liste"><th>'.$p->t('global/bezeichnung').'</th><th>'.$p->t('zeitsperre/grund').'</th><th>'.$p->t('global/von').'</th><th>'.$p->t('global/bis').'</th><th>'.$p->t('urlaubstool/vertretung').'</th><th>'.$p->t('urlaubstool/erreichbarkeit').'</th><th>'.$p->t('zeitsperre/freigegeben').'</th></tr>';
+	$content_table.= '<table><tr class="liste"><th>'.$p->t('global/bezeichnung').'</th><th>'.$p->t('zeitsperre/grund').'</th><th>'.$p->t('global/von').'</th><th>'.$p->t('global/bis').'</th><th>'.$p->t('urlaubstool/vertretung').'</th><th>'.$p->t('urlaubstool/erreichbarkeit').'</th><th>'.$p->t('zeitsperre/freigegeben').'</th><th colspan="2"></th></tr>';
 	$i=0;
 	foreach ($zeit->result as $row)
 	{
@@ -447,11 +508,16 @@ if(count($zeit->result)>0)
 							<td>".(isset($row_vertretung->kurzbz)?$row_vertretung->kurzbz:'')."</td>
 							<td>".(isset($erreichbarkeit_arr[$row->erreichbarkeit])?$erreichbarkeit_arr[$row->erreichbarkeit]:'')."</td>
 							<td align='center'>".($row->freigabeamum!=''?'Ja':'')."</td>";
-		$content_table.="<td><a href='$PHP_SELF?type=edit&id=$row->zeitsperre_id' class='Item'>".$p->t('zeitsperre/edit')."</a></td>";
+		if ($row->zeitsperretyp_kurzbz == 'DienstV')
+			$content_table .= '<td>&nbsp;</td>';
+		else		
+			$content_table.="<td><a href='$PHP_SELF?type=edit&id=$row->zeitsperre_id' class='Item'>".$p->t('zeitsperre/edit')."</a></td>";
 		if($row->freigabeamum=='' || $row->zeitsperretyp_kurzbz!='Urlaub')
 		{
 			$content_table.="\n<td><a href='$PHP_SELF?type=delete_sperre&id=$row->zeitsperre_id' onclick='return conf_del()' class='Item'>".$p->t('zeitsperre/loeschen')."</a></td>";
 		}
+		else 
+			$content_table .= '<td>&nbsp;</td>';
 		$content_table.="</tr>";
 	}
 	$content_table.= '</table>';
@@ -485,19 +551,21 @@ if($zeitsperre->freigabeamum!='' && $zeitsperre->zeitsperretyp_kurzbz=='Urlaub')
 	$readonly=' readonly="readonly"';	//für Textfelder
 	$disabled=' disabled';				//für select-options
 	$style=' style="border: 1px solid #999; color: #999;"';	//disabled-Optik
+	$class = '';
 }
 else
 {
 	$readonly='';
 	$disabled='';
 	$style='';
+	$class = ' class="datepicker_datum"';
 }
 
 //formular zum editieren und neu anlegen der zeitsperren
 $content_form='';
-$content_form.= '<form method="POST" action="'.$action.'" onsubmit="return checkdatum()">';
+$content_form.= '<form method="POST" name="zeitsperre_form" action="'.$action.'" onsubmit="return checkdatum()">';
 $content_form.= "<table>\n";
-$content_form.= '<tr><td>'.$p->t('zeitsperre/grund').'</td><td><SELECT name="zeitsperretyp_kurzbz"'.$style.'>';
+$content_form.= '<tr><td style="width:150px">'.$p->t('zeitsperre/grund').'</td><td colspan="2" style="width:450px"><SELECT name="zeitsperretyp_kurzbz"'.$style.' onchange="showHideBezeichnungDropDown()" class="dd_breit">';
 //dropdown fuer zeitsperretyp
 $qry = "SELECT * FROM campus.tbl_zeitsperretyp ORDER BY zeitsperretyp_kurzbz";
 if($result = $db->db_query($qry))
@@ -510,13 +578,13 @@ if($result = $db->db_query($qry))
 			$content_form.= "<OPTION value='$row->zeitsperretyp_kurzbz'$disabled>$row->zeitsperretyp_kurzbz - $row->beschreibung</OPTION>";
 	}
 }
-$content_form.= '</SELECT>';
-$content_form.= '<tr><td>'.$p->t('global/bezeichnung').'</td><td><input'.$style.' type="text" name="bezeichnung" maxlength="32" value="'.$zeitsperre->bezeichnung.'"'.$readonly.'></td></tr>';
-$content_form.= '<tr><td>'.$p->t('global/von').'</td><td><input'.$style.' type="text" size="10" maxlength="10" name="vondatum" id="vondatum" value="'.($zeitsperre->vondatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->vondatum)):(!isset($_POST['vondatum'])?date('d.m.Y'):$_POST['vondatum'])).'"'.$readonly.'> ';
+$content_form.= '</SELECT></td></tr>';
+$content_form.= '<tr><td>'.$p->t('global/bezeichnung').'</td><td colspan="2"><span id="dienstv_span"><input'.$style.' type="text" size="32" name="bezeichnung" maxlength="32" value="'.$zeitsperre->bezeichnung.'"'.$readonly.'></span></td></tr>';
+$content_form.= '<tr><td>'.$p->t('global/von').'</td><td><input'.$style.' type="text" '.$class.' size="10" maxlength="10" name="vondatum" id="vondatum" value="'.($zeitsperre->vondatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->vondatum)):(!isset($_POST['vondatum'])?date('d.m.Y'):$_POST['vondatum'])).'"'.$readonly.'> <a href="javascript:void(0);" onClick="setBisDatum()">&dArr;</a></td><td  style="text-align:right;"> ';
 //dropdown fuer vonstunde
 $content_form.= $p->t('zeitsperre/stundeInklusive');
 
-$content_form.= "<SELECT name='vonstunde'$style>\n";
+$content_form.= " <SELECT name='vonstunde'$style>\n";
 if($zeitsperre->vonstunde=='')
 	$content_form.= "<OPTION value='' selectd>*</OPTION>\n";
 else
@@ -534,10 +602,10 @@ for($i=0;$i<$num_rows_stunde;$i++)
 
 $content_form.= "</SELECT></td></tr>";
 
-$content_form.= '<tr><td>'.$p->t('global/bis').'</td><td><input'.$style.' type="text" size="10" maxlength="10" name="bisdatum" id="bisdatum" value="'.($zeitsperre->bisdatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->bisdatum)):(!isset($_POST['bisdatum'])?date('d.m.Y'):$_POST['bisdatum'])).'"'.$readonly.'> ';
+$content_form.= '<tr><td>'.$p->t('global/bis').'</td><td><input'.$style.' type="text" '.$class.' size="10" maxlength="10" name="bisdatum" id="bisdatum" value="'.($zeitsperre->bisdatum!=''?date('d.m.Y',$datum_obj->mktime_fromdate($zeitsperre->bisdatum)):(!isset($_POST['bisdatum'])?date('d.m.Y'):$_POST['bisdatum'])).'"'.$readonly.'></td><td  style="text-align:right;"> ';
 //dropdown fuer bisstunde
 $content_form.= $p->t('zeitsperre/stundeInklusive');
-$content_form.= "<SELECT name='bisstunde'$style>\n";
+$content_form.= " <SELECT name='bisstunde'$style>\n";
 
 if($zeitsperre->bisstunde=='')
 	$content_form.= "<OPTION value='' selectd>*</OPTION>\n";
@@ -555,18 +623,9 @@ for($i=0;$i<$num_rows_stunde;$i++)
 
 $content_form.= "</SELECT></td></tr>";
 
-$content_form.= "<tr><td>".$p->t('urlaubstool/erreichbarkeit')."</td><td><SELECT name='erreichbarkeit'>";
-foreach ($erreichbarkeit_arr as $erreichbarkeit_key=>$erreichbarkeit_beschreibung)
-{
-	if($zeitsperre->erreichbarkeit_kurzbz == $erreichbarkeit_key)
-		$content_form.= "<OPTION value='$erreichbarkeit_key' selected>$erreichbarkeit_beschreibung</OPTION>\n";
-	else
-		$content_form.= "<OPTION value='$erreichbarkeit_key'>$erreichbarkeit_beschreibung</OPTION>\n";
-}
 
-$content_form.= '</SELECT></td></tr>';
 
-$content_form.= "<tr><td>".$p->t('urlaubstool/vertretung')."</td><td><SELECT name='vertretung_uid' id='vertretung_uid'>";
+$content_form.= "<tr><td>".$p->t('urlaubstool/vertretung')."</td><td colspan='2'><SELECT name='vertretung_uid' id='vertretung_uid' class='dd_breit'>";
 //dropdown fuer vertretung
 $qry = "SELECT * FROM campus.vw_mitarbeiter WHERE uid not LIKE '\\\_%' ORDER BY nachname, vorname";
 
@@ -583,14 +642,28 @@ if($result = $db->db_query($qry))
 	}
 }
 $content_form.= '</SELECT></td></tr>';
-$content_form.= '<tr><td>&nbsp;</td><td>';
+
+$content_form.= "<tr><td>".$p->t('urlaubstool/erreichbarkeit')."</td><td><SELECT name='erreichbarkeit'>";
+foreach ($erreichbarkeit_arr as $erreichbarkeit_key=>$erreichbarkeit_beschreibung)
+{
+	if($zeitsperre->erreichbarkeit_kurzbz == $erreichbarkeit_key)
+		$content_form.= "<OPTION value='$erreichbarkeit_key' selected>$erreichbarkeit_beschreibung</OPTION>\n";
+	else
+		$content_form.= "<OPTION value='$erreichbarkeit_key'>$erreichbarkeit_beschreibung</OPTION>\n";
+}
+
+$content_form.= '</SELECT></td>';
+
+$content_form.= '<td style="text-align:right;">';
 
 if(isset($_GET['type']) && $_GET['type']=='edit')
 	$content_form.= "<input type='submit' name='submit_zeitsperre' value='".$p->t('global/speichern')."'>";
 else
 	$content_form.= "<input type='submit' name='submit_zeitsperre' value='".$p->t('global/hinzufuegen')."'>";
 $content_form.= '</td></tr>';
-$content_form.= "<tr><td>&nbsp;</td><td style='color:red'>".$p->t('zeitsperre/achtungEsWerdenAlleEingegebenenTage')."</td</tr>";
+
+$content_form .= '<tr><td colspan="3">&nbsp;</td></tr>';
+$content_form.= "<tr><td colspan='3' style='color:red'>".$p->t('zeitsperre/achtungEsWerdenAlleEingegebenenTage')."</td></tr>";
 $content_form.= '</table></form>';
 
 // ******* RESTURLAUB ******** //
@@ -672,7 +745,7 @@ echo '<tr>';
 echo "<td class='tdvertical'>";
 echo $content_form;
 echo '</td>';
-echo "<td class='tdvertical'><div id='resturlaub'>$content_resturlaub</div></td>";
+echo "<td class='tdvertical'><div id='resturlaub' style='visibility:hidden;'>$content_resturlaub</div></td>";
 echo '</tr><tr><td colspan=2>';
 echo $content_table;
 echo '</td>';
