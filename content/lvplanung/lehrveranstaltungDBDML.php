@@ -136,26 +136,27 @@ function LehrauftragAufFirma($mitarbeiter_uid)
  * @param $studiensemester_kurzbz
  * @return string
  */
-function getStundenproInstitut($mitarbeiter_uid, $studiensemester_kurzbz)
+function getStundenproInstitut($mitarbeiter_uid, $studiensemester_kurzbz, $oe_arr)
 {
 	global $db;
 	
 	$ret="Der Lektor ist in folgenden Organisationseinheiten zugeteilt:\n";
 	
 	//Liste mit den Stunden in den jeweiligen Instituten anzeigen
-	$qry = "SELECT sum(tbl_lehreinheitmitarbeiter.semesterstunden) as summe, tbl_organisationseinheit.bezeichnung
+	$qry = "SELECT sum(tbl_lehreinheitmitarbeiter.semesterstunden) as summe, tbl_studiengang.bezeichnung
 			FROM
 				lehre.tbl_lehreinheitmitarbeiter 
 				JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
-				JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(lehrfach_id=lehrfach.lehrveranstaltung_id)
-				JOIN public.tbl_organisationseinheit USING(oe_kurzbz)
+				JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+				JOIN public.tbl_studiengang USING(studiengang_kz)
 			WHERE
 				mitarbeiter_uid=".$db->db_add_param($mitarbeiter_uid)." AND
 				studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND
 				faktor>0 AND
 				stundensatz>0 AND
-				bismelden
-			GROUP BY tbl_organisationseinheit.bezeichnung";
+				bismelden AND
+				tbl_studiengang.oe_kurzbz in(".$db->db_implode4SQL($oe_arr).")
+			GROUP BY tbl_studiengang.bezeichnung";
 	
 	if($result = $db->db_query($qry))
 	{
@@ -180,17 +181,19 @@ if(!$error)
 				FROM lehre.tbl_lehrveranstaltung, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung as lehrfach
 				WHERE tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_lehreinheit.lehrveranstaltung_id AND
 				tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id AND lehreinheit_id=".$db->db_add_param($_POST['lehreinheit_id'], FHC_INTEGER);
+
 		if($result = $db->db_query($qry))
 		{
 			if($row = $db->db_fetch_object($result))
 			{
 				$lva = new lehrveranstaltung($row->lehrveranstaltung_id);
-                
-                if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') &&
-				   !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid') &&
-				   !$rechte->isBerechtigtMultipleOe('lv-plan', $lva->getAllOe(), 'suid') &&
-				   !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'suid', $row->fachbereich_kurzbz) &&
-				   !$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid', $row->fachbereich_kurzbz))
+				$oe_arr = $lva->getAllOe();
+
+                if(!$rechte->isBerechtigtMultipleOe('admin', $oe_arr, 'suid') &&
+				   !$rechte->isBerechtigtMultipleOe('assistenz', $oe_arr, 'suid') &&
+				   !$rechte->isBerechtigtMultipleOe('lv-plan', $oe_arr, 'suid') &&
+				   !$rechte->isBerechtigtMultipleOe('assistenz', $oe_arr, 'suid', $row->fachbereich_kurzbz) &&
+				   !$rechte->isBerechtigtMultipleOe('admin', $oe_arr, 'suid', $row->fachbereich_kurzbz))
 				{
 					$error = true;
 					$return = false;
@@ -280,14 +283,18 @@ if(!$error)
 					$ma = new mitarbeiter();
 					$ma->load($lem->mitarbeiter_uid);
 					$fixangestellt=$ma->fixangestellt;
-					
+
+					$oe_obj = new organisationseinheit();					
+					$stunden_oe_kurzbz=null;
+
+					$stg_obj = new studiengang();
+					$stg_obj->load($lva->studiengang_kz);
+
 					//Maximale Stundenanzahl ermitteln
 					if($fixangestellt)
-						$max_stunden = WARN_SEMESTERSTD_FIX;
+						list($stunden_oe_kurzbz, $max_stunden) = $oe_obj->getStundengrenze($stg_obj->oe_kurzbz, true);
 					else
-					{
-						$max_stunden = WARN_SEMESTERSTD_FREI;
-					}
+						list($stunden_oe_kurzbz, $max_stunden) = $oe_obj->getStundengrenze($stg_obj->oe_kurzbz, false);
 					
 					//Summe der Stunden ermitteln
 					$le = new lehreinheit();
@@ -306,23 +313,31 @@ if(!$error)
 					//Stundenreduzierung immer moeglich
 					if(($lem->semesterstunden>$semesterstunden_alt) || $neue_stunden_eingerechnet)
 					{
+						$oe_obj = new organisationseinheit();
+						$oe_arr = $oe_obj->getChilds($stunden_oe_kurzbz);
 						$qry = "SELECT ";
 						if($alte_stunden_eingerechnet && $neue_stunden_eingerechnet)
-							$qry.=" (sum(semesterstunden)-($semesterstunden_alt)+($lem->semesterstunden)) as summe";
+							$qry.=" (sum(tbl_lehreinheitmitarbeiter.semesterstunden)-($semesterstunden_alt)+($lem->semesterstunden)) as summe";
 						elseif($alte_stunden_eingerechnet && !$neue_stunden_eingerechnet)
-							$qry.=" (sum(semesterstunden)-($semesterstunden_alt)) as summe";
+							$qry.=" (sum(tbl_lehreinheitmitarbeiter.semesterstunden)-($semesterstunden_alt)) as summe";
 						elseif(!$alte_stunden_eingerechnet && $neue_stunden_eingerechnet)
-							$qry.=" (sum(semesterstunden)+($lem->semesterstunden)) as summe";
+							$qry.=" (sum(tbl_lehreinheitmitarbeiter.semesterstunden)+($lem->semesterstunden)) as summe";
 						elseif(!$alte_stunden_eingerechnet && !$neue_stunden_eingerechnet)
-							$qry.=" (sum(semesterstunden)) as summe";
+							$qry.=" (sum(tbl_lehreinheitmitarbeiter.semesterstunden)) as summe";
 						$qry.="	FROM
-									lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+									lehre.tbl_lehreinheitmitarbeiter 
+									JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+									JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+									JOIN public.tbl_studiengang USING(studiengang_kz)
 								WHERE
 									mitarbeiter_uid=".$db->db_add_param($lem->mitarbeiter_uid)." AND
 									studiensemester_kurzbz=".$db->db_add_param($le->studiensemester_kurzbz)." AND
 									faktor>0 AND
 									stundensatz>0 AND
 									bismelden";
+
+						if(count($oe_arr)>0)
+							$qry.=" AND tbl_studiengang.oe_kurzbz in(".$db->db_implode4SQL($oe_arr).")";
 						
 						if($db->db_query($qry))
 						{
@@ -337,7 +352,7 @@ if(!$error)
 											//Warnung wenn die Stundenzahl ueberschritten wurde
 											$return = false;
 											$error = true;
-											$errormsg = "ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden wurde ueberschritten!\n Daten wurden NICHT gespeichert!\n\n";									
+											$errormsg = "ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden ($stunden_oe_kurzbz) wurde ueberschritten!\n Daten wurden NICHT gespeichert!\n\n";									
 										}
 									}
 									else 
@@ -345,10 +360,10 @@ if(!$error)
 										$return = true;
 										$error = false;
 										$warnung = true;
-										$errormsg = "Hinweis: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden wurde ueberschritten!\n Daten wurden gespeichert!\n\n";
+										$errormsg = "Hinweis: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden ($stunden_oe_kurzbz) wurde ueberschritten!\n Daten wurden gespeichert!\n\n";
 									}	
 									
-									$errormsg.=getStundenproInstitut($lem->mitarbeiter_uid, $le->studiensemester_kurzbz);
+									$errormsg.=getStundenproInstitut($lem->mitarbeiter_uid, $le->studiensemester_kurzbz, $oe_arr);
 								}
 							}
 							else
@@ -480,46 +495,62 @@ if(!$error)
 				}
 				
 				$maxstunden=9999;
-				
+
+				$oe_obj = new organisationseinheit();					
+				$stunden_oe_kurzbz=null;
+
+				$stg_obj = new studiengang();
+				$stg_obj->load($lva->studiengang_kz);
+
+				//Maximale Stundenanzahl ermitteln
 				if($fixangestellt)
-					$max_stunden = WARN_SEMESTERSTD_FIX;
+					list($stunden_oe_kurzbz, $max_stunden) = $oe_obj->getStundengrenze($stg_obj->oe_kurzbz, true);
 				else
-				{
-					$max_stunden = WARN_SEMESTERSTD_FREI;
-				}
+					list($stunden_oe_kurzbz, $max_stunden) = $oe_obj->getStundengrenze($stg_obj->oe_kurzbz, false);
+
 				//Bei freien Lektoren muss geprueft werden ob die Stundengrenze erreicht wurde
 				if(!$fixangestellt && !LehrauftragAufFirma($lem->mitarbeiter_uid))
 				{
 					//Summe der Stunden ermitteln
 					$le = new lehreinheit();
 					$le->load($lem->lehreinheit_id);
+
+					$oe_obj = new organisationseinheit();
+					$oe_arr = $oe_obj->getChilds($stunden_oe_kurzbz);
 	
 					$qry = "SELECT
-								sum(semesterstunden) as summe
+								sum(tbl_lehreinheitmitarbeiter.semesterstunden) as summe
 							FROM
-								lehre.tbl_lehreinheitmitarbeiter JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+								lehre.tbl_lehreinheitmitarbeiter 
+								JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+								JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+								JOIN public.tbl_studiengang USING(studiengang_kz)
 							WHERE
 								mitarbeiter_uid=".$db->db_add_param($lem->mitarbeiter_uid)." AND
 								studiensemester_kurzbz=".$db->db_add_param($le->studiensemester_kurzbz)." AND
 								faktor>0 AND
 								stundensatz>0 AND
 								bismelden";
+
+					if(count($oe_arr)>0)
+						$qry.=" AND tbl_studiengang.oe_kurzbz in(".$db->db_implode4SQL($oe_arr).")";
+
 					if($result_std = $db->db_query($qry))
 					{
 						if($row_std = $db->db_fetch_object($result_std))
 						{
 							//Grenze ueberschritten
-							if($row_std->summe>=WARN_SEMESTERSTD_FREI)
+							if($row_std->summe>=$max_stunden)
 							{
 								$return = false;
 								$error = true;
-								$errormsg = "ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden wurde ueberschritten!\n Daten wurden NICHT gespeichert!\n\n";
-								$errormsg.=getStundenproInstitut($lem->mitarbeiter_uid, $le->studiensemester_kurzbz);
+								$errormsg = "ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $max_stunden Stunden ($stunden_oe_kurzbz) wurde ueberschritten!\n Daten wurden NICHT gespeichert!\n\n";
+								$errormsg.=getStundenproInstitut($lem->mitarbeiter_uid, $le->studiensemester_kurzbz,$oe_arr);
 							}
 							else
 							{
 								//Stunden berechnen die noch maximal unterrichtet werden darf
-								$maxstunden = WARN_SEMESTERSTD_FREI-$row_std->summe;
+								$maxstunden = $max_stunden-$row_std->summe;
 							}
 						}
 					}

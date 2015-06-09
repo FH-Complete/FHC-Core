@@ -798,4 +798,78 @@ class studiengang extends basis_db
 			return false;
 	    }
 	}
+
+	/**
+	 * Laedt alle Studiengaenge in einer Organisationseinheit
+	 * @param varchar $oe_kurzbz Organisationseinheit
+	 * @param boolean $aktiv Wenn true dann werden nur aktive Studiengaenge geliefert
+	 * @return boolean
+	 */
+	public function getStudiengaengeFromOe($oe_kurzbz, $aktiv=true)
+	{
+		$qry ="WITH RECURSIVE oes(oe_kurzbz) as
+			   (
+					SELECT oe_kurzbz FROM public.tbl_organisationseinheit WHERE oe_kurzbz=".$this->db_add_param($oe_kurzbz)."
+					UNION
+					SELECT tbl_organisationseinheit.oe_kurzbz FROM public.tbl_organisationseinheit JOIN oes ON(oe_parent_kurzbz=oes.oe_kurzbz)
+				)
+				SELECT * FROM public.tbl_studiengang JOIN oes USING(oe_kurzbz) WHERE oe_kurzbz = oes.oe_kurzbz";
+
+		if($aktiv===true)
+		{
+			$qry.=" AND tbl_studiengang.aktiv";
+		}
+		
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new studiengang();
+
+				$obj->studiengang_kz = $row->studiengang_kz;
+				$obj->kurzbz = $row->kurzbz;
+				$obj->kurzbzlang = $row->kurzbzlang;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->english = $row->english;
+				$obj->typ = $row->typ;
+				$obj->farbe = $row->farbe;
+				$obj->email = $row->email;
+				$obj->max_semester = $row->max_semester;
+				$obj->max_verband = $row->max_verband;
+				$obj->max_gruppe = $row->max_gruppe;
+				$obj->erhalter_kz = $row->erhalter_kz;
+				$obj->bescheid = $row->bescheid;
+				$obj->bescheidbgbl1 = $row->bescheidbgbl1;
+				$obj->bescheidbgbl2 = $row->bescheidbgbl2;
+				$obj->bescheidgz = $row->bescheidgz;
+				$obj->bescheidvom = $row->bescheidvom;
+				$obj->ext_id = $row->ext_id;
+				$obj->kuerzel = mb_strtoupper($row->typ . $row->kurzbz);
+				$obj->orgform_kurzbz = $row->orgform_kurzbz;
+				$obj->zusatzinfo_html = $row->zusatzinfo_html;
+				$obj->sprache = $row->sprache;
+				$obj->testtool_sprachwahl = $this->db_parse_bool($row->testtool_sprachwahl);
+				$obj->studienplaetze = $row->studienplaetze;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->lgartcode = $row->lgartcode;
+				$obj->telefon = $row->telefon;
+				$obj->titelbescheidvom = $row->titelbescheidvom;
+				$obj->onlinebewerbung = $this->db_parse_bool($row->onlinebewerbung);
+				$obj->moodle = $this->db_parse_bool($row->moodle);
+				$obj->mischform = $this->db_parse_bool($row->mischform);
+				$obj->projektarbeit_note_anzeige = $this->db_parse_bool($row->projektarbeit_note_anzeige);
+
+				$obj->bezeichnung_arr['German'] = $obj->bezeichnung;
+				$obj->bezeichnung_arr['English'] = $obj->english;
+
+				$this->result[] = $obj;
+			}
+			return true;
+		}
+		else 
+		{
+			$this->errormsg = "Fehler bei der Datenbankabfrage aufgetreten."; 
+			return false; 
+		}
+	}
 }
