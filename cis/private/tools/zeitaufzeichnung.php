@@ -48,6 +48,19 @@ if (!$db = new basis_db())
 $user = get_uid();
 $datum = new datum();
 
+if ($user == 'foo')
+{
+	$za_simple = 1;
+	$activities = array('Arbeit', 'Pause', 'Arztbesuch', 'Dienstreise', 'Behoerde');
+}	
+else 
+{
+	$za_simple = 0;
+	$activities = 	array('Design', 'Operativ', 'Betrieb',  'Pause', 'Arztbesuch', 'Dienstreise', 'Behoerde');
+}
+
+$activities_str = "'".implode("','", $activities)."'";
+
 // definiert bis zu welchem Datum die Eintragung nicht mehr möglich ist
 $gesperrt_bis = '2015-01-31';
 $sperrdatum = date('c', strtotime($gesperrt_bis));
@@ -495,6 +508,8 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			<tr>
 				<td>';		
 		echo '<table>';
+		if($za_simple == 0)
+		{
 		//Projekt
 		echo '<tr>
 				<td>'.$p->t("zeitaufzeichnung/projekt").'</td>
@@ -570,16 +585,22 @@ if($projekt->getProjekteMitarbeiter($user, true))
 			echo '<option value="'.$db->convert_html_chars($row->oe_kurzbz).'" '.$selected.' '.$class.'>'.$db->convert_html_chars($row->bezeichnung.' ('.$row->organisationseinheittyp_kurzbz).')</option>';
 		}
 		echo '</SELECT></td></tr>';
+		}
+		
 		//Aktivitaet
 		echo '<tr>';
 		echo '<td>'.$p->t("zeitaufzeichnung/aktivitaet").'</td><td colspan="4">';
-		
-		$qry = "SELECT * FROM fue.tbl_aktivitaet ORDER by sort,beschreibung";
+		//if ($za_simple == 1)
+			$qry = "SELECT * FROM fue.tbl_aktivitaet where aktivitaet_kurzbz in (".$activities_str.") ORDER by sort,beschreibung";
+		//else 
+		//	$qry = "SELECT * FROM fue.tbl_aktivitaet where sort != 5 or sort is null ORDER by sort,beschreibung";
 		if($result = $db->db_query($qry))
 		{
-			echo '<SELECT name="aktivitaet">
-			<OPTION value="">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
-			
+			echo '<SELECT name="aktivitaet">';			
+			if ($za_simple == 0)			
+				echo '<OPTION value="">-- '.$p->t('zeitaufzeichnung/keineAuswahl').' --</OPTION>';
+			//else 				
+			//	echo '<OPTION value="Arbeit">Arbeit</OPTION>';
 			while($row = $db->db_fetch_object($result))
 			{
 				if($aktivitaet_kurzbz == $row->aktivitaet_kurzbz)
@@ -593,6 +614,8 @@ if($projekt->getProjekteMitarbeiter($user, true))
 		}
 		echo '</td></tr>';
 		
+		if ($za_simple == 0)
+		{
 		// Service
 		echo '<tr>
 			<td>'.$p->t('zeitaufzeichnung/service').'</td>
@@ -634,6 +657,8 @@ if($projekt->getProjekteMitarbeiter($user, true))
             <input type="text" id="kartennummer" name="kartennummer" placeholder="'.$p->t("zeitaufzeichnung/kartennummer").'"></td>
         </tr>'; 
 		echo '<tr><td colspan="4">&nbsp;</td></tr>';
+		}
+		
 		//Start/Ende
 		$von_ts = $datum->mktime_fromtimestamp($datum->formatDatum($von, $format='Y-m-d H:i:s'));
 		$bis_ts = $datum->mktime_fromtimestamp($datum->formatDatum($bis, $format='Y-m-d H:i:s'));
