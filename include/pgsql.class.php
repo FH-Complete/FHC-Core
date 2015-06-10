@@ -353,7 +353,7 @@ class basis_db extends db
     	if ($var == '') 
 			return;
 	    preg_match_all('/(?<=^\{|,)(([^,"{]*)|\s*"((?:[^"\\\\]|\\\\(?:.|[0-9]+|x[0-9a-f]+))*)"\s*)(,|(?<!^\{)(?=\}$))/i', $var, $matches, PREG_SET_ORDER);
-	    $values = [];
+	    $values = array();
 	    foreach ($matches as $match)
 		{
         	$values[] = $match[3] != '' ? stripcslashes($match[3]) : (strtolower($match[2]) == 'null' ? null : $match[2]);
