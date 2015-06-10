@@ -290,7 +290,7 @@ $datum_obj = new datum();
 		</form>';
 	}
 	
-	if(!$infoscreen->getScreenContent($infoscreen_id, false))
+	if(!$infoscreen->getScreenContent($infoscreen_id, false, false))
 		die('Fehler:'.$infoscreen->errormsg);
 	echo '<table class="tablesorter" id="myTable">
 			<thead>
