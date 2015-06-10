@@ -65,6 +65,7 @@ abstract class db extends basis
 	abstract function db_parse_bool($var);
 	abstract function db_implode4SQL($var);
 	abstract function db_getResultJSON($result = null);
+	abstract function db_parse_array($var);
 
 	
 	/**

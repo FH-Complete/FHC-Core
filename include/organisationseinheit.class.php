@@ -724,5 +724,42 @@ class organisationseinheit extends basis_db
 			return false;
 		}
 	}
+
+	/**
+	 * Ermittelt die Stundenobergrenze fuer Lektoren
+	 * Dabei wird im OE Baum nach oben nach Stundengrenzen gesucht und die niedrigste Stundengrenze ermittelt
+	 * @param $oe_kurzbz Organisationseinheit
+	 * @param $fixangestellt boolean legt fest ob die Grenze 
+	 *        fuer Freie oder Fixangestellte Lektoren ermittelt werden soll
+	 * @return array(oe_kurzbz, numeric Anzahl der Stunden)
+	 */
+	public function getStundengrenze($oe_kurzbz, $fixangestellt=true)
+	{
+		if($fixangestellt)
+			$fixfrei='fix';
+		else
+			$fixfrei='frei';
+
+		$qry = "
+			WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as 
+			(
+				SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit 
+				WHERE oe_kurzbz=".$this->db_add_param($oe_kurzbz)."
+				UNION ALL
+				SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes 
+				WHERE o.oe_kurzbz=oes.oe_parent_kurzbz
+			)
+			SELECT oe_kurzbz, warn_semesterstunden_".$fixfrei." as stunden
+			FROM oes JOIN public.tbl_organisationseinheit USING(oe_kurzbz) 
+			ORDER BY warn_semesterstunden_".$fixfrei." asc limit 1";
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				return array($row->oe_kurzbz, $row->stunden);
+			}
+		}
+	}
 }
 ?>

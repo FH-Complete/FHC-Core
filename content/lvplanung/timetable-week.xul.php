@@ -275,6 +275,10 @@ if ($aktion=='stpl_move' || $aktion=='stpl_set')
 				$lehrstunde->ort_kurzbz=$ort;
 			if ($aktion=='stpl_set')
 				$lehrstunde->ort_kurzbz=$new_ort;
+
+			if($new_unr!='')
+				$lehrstunde->unr = $new_unr;
+
 			$kollision=$lehrstunde->kollision($db_stpl_table);
 			if ($kollision && !$ignore_kollision)
 				$kollision_msg.=$lehrstunde->errormsg;
@@ -308,6 +312,9 @@ if ($aktion=='stpl_move' || $aktion=='stpl_set')
 						$lehrstunde->ort_kurzbz=$ort;
 					if ($aktion=='stpl_set')
 						$lehrstunde->ort_kurzbz=$new_ort;
+					if($new_unr!='')
+						$lehrstunde->unr = $new_unr;
+
 					$kollision=$lehrstunde->kollision($db_stpl_table);
 					if ($kollision && !$ignore_kollision)
 						$kollision_msg.=$lehrstunde->errormsg;

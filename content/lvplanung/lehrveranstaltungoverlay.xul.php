@@ -248,6 +248,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 					<tab id="lehrveranstaltung-tab-noten" label="Noten" />
 					<tab id="lehrveranstaltung-tab-notizen" label="Notizen" />
 					<tab id="lehrveranstaltung-tab-lvangebot" label="LV-Angebot" />
+					<tab id="lehrveranstaltung-tab-termine" label="Termine" onclick="LehrveranstaltungTermineIFrameLoad()"/>
 				</tabs>
 				<tabpanels id="lehrveranstaltung-tabpanels-main" flex="1">
 					<vbox id="lehrveranstaltung-detail" />
@@ -257,6 +258,7 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/lehrveranstaltungnotenov
 						<box class="Notiz" flex="1" id="lehrveranstaltung-box-notizen"/>
 					</vbox>
 					<vbox id="lehrveranstaltung-lvangebot" />
+					<iframe id="lehrveranstaltung-termine" src="" style="margin-top:10px;" />
 				</tabpanels>
 			</tabbox>
 		</vbox>

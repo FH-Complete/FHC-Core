@@ -43,7 +43,25 @@ if(isset($_GET['stsem']))
 else
 	$semester_aktuell  = $stsem->getaktorNext();
 
+//UID als Kommandozeilenparameter
+if(isset($_SERVER['argv']) && isset($_SERVER['argv'][1]) && !strstr($_SERVER['argv'][1],'='))
+{
+	$oe_kurzbz = $_SERVER['argv'][1];
+}
+else
+{
+	if(isset($_GET['oe_kurzbz']))
+		$oe_kurzbz = $_GET['oe_kurzbz'];
+	else
+	{
+		$stg = new studiengang();
+		$stg->load('0');
+		$oe_kurzbz = $stg->oe_kurzbz;
+	}
+}
+
 $file = 'lehrauftragsliste.xls';
+$file = tempnam('/tmp','lehrauftragsliste_').'.xls';
 
 // Creating a workbook
 echo 'Lehrauftragslisten werden erstellt. Bitte warten!<BR>';
@@ -51,6 +69,17 @@ flush();
 $workbook = new Spreadsheet_Excel_Writer($file);
 $workbook->setVersion(8);
 $db = new basis_db();
+
+$stg = new studiengang();
+$stg->getStudiengaengeFromOe($oe_kurzbz);
+$stg_arr=array();
+if(count($stg->result)>0)
+{
+	foreach($stg->result as $row)
+	{
+		$stg_arr[] = $row->studiengang_kz;
+	}
+}
 //Studiengaenge ermitteln bei denen sich die lektorzuordnung innerhalb der letzten 31 Tage geaendert haben
 $qry_stg = "SELECT distinct studiengang_kz
 			FROM (
@@ -77,13 +106,37 @@ $qry_stg = "SELECT distinct studiengang_kz
 					tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id
 				) as foo
 				";
+if(count($stg_arr)>0)
+	$qry_stg.=" WHERE studiengang_kz in (".$db->db_implode4SQL($stg_arr).")";
+
 $liste_gesamt = array();
 
 $gesamt =& $workbook->addWorksheet('Gesamt');
 $gesamt->setInputEncoding('utf-8');
 $gesamtsheet_row=1;
 
+//Formate Definieren
+$format_bold =& $workbook->addFormat();
+$format_bold->setBold();
 
+$workbook->setCustomColor(10, 255, 186, 179);
+$format_colored =& $workbook->addFormat();
+$format_colored->setFgColor(10);
+
+$format_number_colored =& $workbook->addFormat();
+$format_number_colored->setNumFormat('0,0.00');
+//$format_number_colored->setNumFormat('0.00');
+$format_number_colored->setFgColor(10);
+
+$format_number =& $workbook->addFormat();
+$format_number->setNumFormat('0,0.00');
+
+$format_number_bold =& $workbook->addFormat();
+$format_number_bold->setNumFormat('0,0.00');
+//$format_number_bold->setNumFormat('0.00');
+$format_number_bold->setBold();
+
+$format_normal = & $workbook->addFormat();
 if($result_stg = $db->db_query($qry_stg))
 {
 	while($row_stg = $db->db_fetch_object($result_stg))
@@ -96,28 +149,6 @@ if($result_stg = $db->db_query($qry_stg))
 		$worksheet =& $workbook->addWorksheet($studiengang->kuerzel);
 		$worksheet->setInputEncoding('utf-8');
 		//echo "Writing $studiengang->kuerzel ...".microtime()."<br>";
-		//Formate Definieren
-		$format_bold =& $workbook->addFormat();
-		$format_bold->setBold();
-
-		$workbook->setCustomColor(10, 255, 186, 179);
-		$format_colored =& $workbook->addFormat();
-		$format_colored->setFgColor(10);
-
-		$format_number_colored =& $workbook->addFormat();
-		$format_number_colored->setNumFormat('0,0.00');
-		//$format_number_colored->setNumFormat('0.00');
-		$format_number_colored->setFgColor(10);
-
-		$format_number =& $workbook->addFormat();
-		$format_number->setNumFormat('0,0.00');
-		
-		$format_number_bold =& $workbook->addFormat();
-		$format_number_bold->setNumFormat('0,0.00');
-		//$format_number_bold->setNumFormat('0.00');
-		$format_number_bold->setBold();
-
-		$format_normal = & $workbook->addFormat();
 
 		$i=0;
 		$gesamtsheet_row++;
@@ -449,9 +480,15 @@ if($result_stg = $db->db_query($qry_stg))
 				public.tbl_person JOIN lehre.tbl_projektbetreuer USING (person_id) 
 				JOIN lehre.tbl_projektarbeit USING (projektarbeit_id) 
 				JOIN lehre.tbl_lehreinheit USING (lehreinheit_id) 
+				JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 			WHERE 
 				studiensemester_kurzbz=".$db->db_add_param($semester_aktuell)." AND
-				stunden>0
+				stunden>0";
+
+	if(count($stg_arr)>0)
+		$qry.=" AND tbl_lehrveranstaltung.studiengang_kz IN(".$db->db_implode4SQL($stg_arr).")";
+
+	$qry.="
 			GROUP BY 
 				studiensemester_kurzbz,person_id,nachname,vorname, titelpre
 			ORDER BY 
@@ -469,6 +506,8 @@ if($result_stg = $db->db_query($qry_stg))
 	$worksheet->write(2,++$i,"Stunden", $format_bold);
 	$worksheet->write(2,++$i,"Kosten", $format_bold);
 		
+	$format = $format_normal;
+	$formatnb = $format_number;
 	if($result = $db->db_query($qry))
 	{
 		$zeile=3;
@@ -500,14 +539,21 @@ if($result_stg = $db->db_query($qry_stg))
     $subject = "Lehrauftragsliste ".date('d.m.Y');
     $message = "Dies ist eine automatische eMail!\n\nAnbei die Lehrauftragslisten vom ".date('d.m.Y');
     $message.= "\n\nJederzeit abrufbar unter ".APP_ROOT.'content/statistik/lehrauftragsliste_mail.xls.php';
+	if($oe_kurzbz!='')
+		$message.="&oe_kurzbz=".$oe_kurzbz;
+
     $fileatttype = "application/xls";
     $fileattname = "lehrauftragsliste_".date('Y_m_d').".xls";
 
-    $mail = new mail(MAIL_GST, 'noreply@'.DOMAIN, $subject, $message);
+	$empfaenger = MAIL_GST;
+	if($oe_kurzbz=='lehrgang')
+		$empfaenger = MAIL_LG;
+
+    $mail = new mail($empfaenger, 'noreply@'.DOMAIN, $subject, $message);
     $mail->addAttachmentBinary($file, $fileatttype, $fileattname);
     
     if($mail->send())
-		echo 'Email mit Lehrauftragslisten wurde an '.MAIL_GST.' versandt!';
+		echo 'Email mit Lehrauftragslisten wurde an '.$empfaenger.' versandt!';
      else
         echo "Fehler beim Versenden der Lehrauftragsliste";
 }
