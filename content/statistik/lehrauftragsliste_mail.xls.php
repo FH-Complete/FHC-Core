@@ -539,6 +539,9 @@ if($result_stg = $db->db_query($qry_stg))
     $subject = "Lehrauftragsliste ".date('d.m.Y');
     $message = "Dies ist eine automatische eMail!\n\nAnbei die Lehrauftragslisten vom ".date('d.m.Y');
     $message.= "\n\nJederzeit abrufbar unter ".APP_ROOT.'content/statistik/lehrauftragsliste_mail.xls.php';
+	if($oe_kurzbz!='')
+		$message.="&oe_kurzbz=".$oe_kurzbz;
+
     $fileatttype = "application/xls";
     $fileattname = "lehrauftragsliste_".date('Y_m_d').".xls";
 
