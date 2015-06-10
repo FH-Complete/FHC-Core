@@ -5423,13 +5423,13 @@ function StudentCisStudienplan(event)
     var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
 	var uid = tree.view.getCellText(tree.currentIndex,col);
     
-    window.open('<?php echo APP_ROOT; ?>cis/private/profile/studienplan.php?uid='+uid);
+    window.open('<?php echo CIS_ROOT; ?>cis/private/profile/studienplan.php?uid='+uid);
 }
 
 // ****
-// * Öffnet die Studienerfolgsbestätigung des Studenten im CIS
+// * Öffnet die Notenliste des Studenten im CIS
 // ****
-function StudentCisStudienerfolg(event)
+function StudentCisNotenliste(event)
 {
 	var tree = document.getElementById('student-tree');
     if (tree.currentIndex == -1)
@@ -5441,5 +5441,5 @@ function StudentCisStudienerfolg(event)
     var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
 	var uid = tree.view.getCellText(tree.currentIndex,col);
     
-    window.open('<?php echo APP_ROOT; ?>cis/private/profile/studienerfolgsbestaetigung.php?uid='+uid);
+    window.open('<?php echo CIS_ROOT; ?>cis/private/lehre/notenliste.php?uid='+uid);
 }

@@ -293,9 +293,9 @@
 <!ENTITY menu-cis-studienplan.label		"Studienplan">
 <!ENTITY menu-cis-studienplan.accesskey	"P">
 
-<!ENTITY menu-cis-studienerfolg.key		"E">
-<!ENTITY menu-cis-studienerfolg.label		"Studienerfolgsbestätigung">
-<!ENTITY menu-cis-studienerfolg.accesskey	"E">
+<!ENTITY menu-cis-notenliste.key		"N">
+<!ENTITY menu-cis-notenliste.label		"Notenliste">
+<!ENTITY menu-cis-notenliste.accesskey	"N">
 
 <!-- Extras -->
 <!ENTITY menu-extras.label		"Extras">

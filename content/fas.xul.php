@@ -148,7 +148,7 @@ foreach($addon_obj->result as $addon)
   <command id="menu-dokumente-ausbildungsvertrag:command" oncommand="StudentPrintAusbildungsvertrag(event);"/>
   <command id="menu-dokumente-ausbildungsvertrag_englisch:command" oncommand="StudentPrintAusbildungsvertragEnglisch(event);"/>
   <command id="menu-cis-studienplan:command" oncommand="StudentCisStudienplan(event);"/>
-  <command id="menu-cis-studienerfolg:command" oncommand="StudentCisStudienerfolg(event);"/>
+  <command id="menu-cis-notenliste:command" oncommand="StudentCisNotenliste(event);"/>
   <command id="menu-extras-reihungstest:command" oncommand="ExtrasShowReihungstest();"/>
   <command id="menu-extras-firma:command" oncommand="ExtrasShowFirmenverwaltung();"/>
   <command id="menu-extras-lvverwaltung:command" oncommand="ExtrasShowLVverwaltung();"/>
@@ -733,11 +733,11 @@ foreach($addon_obj->result as $addon)
                command   =  "menu-cis-studienplan:command"
                accesskey = "&menu-cis-studienplan.accesskey;"/>
             <menuitem
-               id        =  "menu-cis-studienerfolg"
-               key       =  "menu-cis-studienerfolg:key"
-               label     = "&menu-cis-studienerfolg.label;"
-               command   =  "menu-cis-studienerfolg:command"
-               accesskey = "&menu-cis-studienerfolg.accesskey;"/>
+               id        =  "menu-cis-notenliste"
+               key       =  "menu-cis-notenliste:key"
+               label     = "&menu-cis-notenliste.label;"
+               command   =  "menu-cis-notenliste:command"
+               accesskey = "&menu-cis-notenliste.accesskey;"/>
           </menupopup>
     </menu>
     <!-- ***** Zusatzmenues inkludieren ***** -->

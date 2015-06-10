@@ -38,7 +38,7 @@ $uid=get_uid();
 
 if(isset($_GET['uid']))
 {
-	// Administratoren duerfen die UID als Parameter uebergeben um den Studienplan
+	// Administratoren duerfen die UID als Parameter uebergeben um die Studienerfolgsbestätigung
 	// von anderen Personen anzuzeigen
 
 	$rechte = new benutzerberechtigung();
