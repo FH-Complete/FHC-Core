@@ -185,8 +185,15 @@ function GeburtsdatumEintragen()
 		var tag = svnr.substr(4,2);
 		var monat = svnr.substr(6,2);
 		var jahr = svnr.substr(8,2);
+		//Wenn die Person juenger als 70 ist, schreib beim Geburtsdatum 19xx sonst 20xx
+		var jahr_diff = jahr-70;
+
+		if(jahr_diff < -15 && jahr_diff < 30)
+			var jahrhundert = '20';
+		else
+			var jahrhundert = '19';
 		
-		gebdat.value='19'+jahr+'-'+monat+'-'+tag;
+		gebdat.value=jahrhundert+jahr+'-'+monat+'-'+tag;
 	}
 }
 
