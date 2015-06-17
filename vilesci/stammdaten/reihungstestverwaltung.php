@@ -447,7 +447,7 @@ else
 }
 //Formular zum Bearbeiten des Reihungstests
 ?>
-<input type='button' value='Neuen Termin anlegen' onclick='window.location.href="<?php echo $_SERVER['PHP_SELF'] ?>?stg_kz=<?php echo $stg_kz ?>&neu=true' >
+<input type='button' value='Neuen Termin anlegen' onclick='window.location.href="<?php echo $_SERVER['PHP_SELF'] ?>?stg_kz=<?php echo $stg_kz ?>&neu=true"' >
 <hr>
 <form method='POST' action='<?php echo $_SERVER['PHP_SELF'] ?>'>
 <input type='hidden' value='<?php echo $reihungstest->reihungstest_id ?>' name='reihungstest_id' />

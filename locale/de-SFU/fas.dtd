@@ -282,6 +282,18 @@
 <!ENTITY menu-dokumente-urkunde_englisch.label		"Urkunde Englisch">
 <!ENTITY menu-dokumente-urkunde_englisch.accesskey	"E">
 
+<!-- CIS -->
+<!ENTITY menu-cis.label		"CIS">
+<!ENTITY menu-cis.accesskey	"C">
+
+<!ENTITY menu-cis-studienplan.key		"P">
+<!ENTITY menu-cis-studienplan.label		"Studienplan">
+<!ENTITY menu-cis-studienplan.accesskey	"P">
+
+<!ENTITY menu-cis-notenliste.key		"N">
+<!ENTITY menu-cis-notenliste.label		"Notenliste">
+<!ENTITY menu-cis-notenliste.accesskey	"N">
+
 <!-- Extras -->
 <!ENTITY menu-extras.label		"Extras">
 <!ENTITY menu-extras.accesskey	"X">

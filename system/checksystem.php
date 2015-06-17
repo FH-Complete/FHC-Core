@@ -3146,6 +3146,7 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	}
 }
 
+
 // Spalte anrechnung_id fuer campus.tbl_pruefungsanmeldung
 if(!$result = @$db->db_query("SELECT anrechnung_id FROM campus.tbl_pruefungsanmeldung"))
 {
@@ -3155,6 +3156,19 @@ if(!$result = @$db->db_query("SELECT anrechnung_id FROM campus.tbl_pruefungsanme
 		echo '<strong>campus.tbl_pruefungsanmeldung: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>campus.tbl_pruefungsanmeldung: neue Spalte anrechnung_id hinzugefuegt';
+
+// Neue Spalte fuer maximale Stundenanzahl bei OE
+if(!$result = @$db->db_query("SELECT warn_semesterstunden_frei FROM public.tbl_organisationseinheit LIMIT 1"))
+{
+	$qry = "
+	ALTER TABLE public.tbl_organisationseinheit ADD COLUMN warn_semesterstunden_frei numeric(8,2);
+	ALTER TABLE public.tbl_organisationseinheit ADD COLUMN warn_semesterstunden_fix numeric(8,2);
+	";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_organisationseinheit '.$db->db_last_error().'</strong><br>';
+	else
+		echo ' public.tbl_organisationseinheit: neue Spalte warn_semesterstunden_frei, warn_semesterstunden_fix hinzugefuegt!<br>';
 }
 
 echo '<br><br><br>';
@@ -3206,7 +3220,7 @@ $tabellen=array(
 	"campus.tbl_freebusy"  => array("freebusy_id","uid","freebusytyp_kurzbz","url","aktiv","bezeichnung","insertamum","insertvon","updateamum","updatevon"),
 	"campus.tbl_freebusytyp" => array("freebusytyp_kurzbz","bezeichnung","beschreibung","url_vorlage"),
 	"campus.tbl_infoscreen"  => array("infoscreen_id","bezeichnung","beschreibung","ipadresse"),
-	"campus.tbl_infoscreen_content"  => array("infoscreen_content_id","infoscreen_id","content_id","gueltigvon","gueltigbis","insertamum","insertvon","updateamum","updatevon","refreshzeit"),
+	"campus.tbl_infoscreen_content"  => array("infoscreen_content_id","infoscreen_id","content_id","gueltigvon","gueltigbis","insertamum","insertvon","updateamum","updatevon","refreshzeit","exklusiv"),
 	"campus.tbl_legesamtnote"  => array("student_uid","lehreinheit_id","note","benotungsdatum","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_lehre_tools" => array("lehre_tools_id","bezeichnung","kurzbz","basis_url","logo_dms_id"),
 	"campus.tbl_lehre_tools_organisationseinheit" => array("lehre_tools_id","oe_kurzbz","aktiv"),
@@ -3338,7 +3352,7 @@ $tabellen=array(
 	"public.tbl_notiz_dokument" => array("notiz_id","dms_id"),
     "public.tbl_ort"  => array("ort_kurzbz","bezeichnung","planbezeichnung","max_person","lehre","reservieren","aktiv","lageplan","dislozierung","kosten","ausstattung","updateamum","updatevon","insertamum","insertvon","ext_id","stockwerk","standort_id","telefonklappe","content_id","m2","gebteil","oe_kurzbz"),
 	"public.tbl_ortraumtyp"  => array("ort_kurzbz","hierarchie","raumtyp_kurzbz"),
-	"public.tbl_organisationseinheit" => array("oe_kurzbz", "oe_parent_kurzbz", "bezeichnung","organisationseinheittyp_kurzbz", "aktiv","mailverteiler","freigabegrenze","kurzzeichen","lehre","standort"),
+	"public.tbl_organisationseinheit" => array("oe_kurzbz", "oe_parent_kurzbz", "bezeichnung","organisationseinheittyp_kurzbz", "aktiv","mailverteiler","freigabegrenze","kurzzeichen","lehre","standort","warn_semesterstunden_frei","warn_semesterstunden_fix"),
 	"public.tbl_organisationseinheittyp" => array("organisationseinheittyp_kurzbz", "bezeichnung", "beschreibung"),
 	"public.tbl_person"  => array("person_id","staatsbuergerschaft","geburtsnation","sprache","anrede","titelpost","titelpre","nachname","vorname","vornamen","gebdatum","gebort","gebzeit","foto","anmerkung","homepage","svnr","ersatzkennzeichen","familienstand","geschlecht","anzahlkinder","aktiv","insertamum","insertvon","updateamum","updatevon","ext_id","bundesland_code","kompetenzen","kurzbeschreibung","zugangscode", "foto_sperre","matr_nr"),
 	"public.tbl_person_fotostatus"  => array("person_fotostatus_id","person_id","fotostatus_kurzbz","datum","insertamum","insertvon","updateamum","updatevon"),

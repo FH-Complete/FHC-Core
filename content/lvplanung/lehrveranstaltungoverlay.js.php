@@ -759,6 +759,12 @@ function LeAuswahl()
 			document.getElementById('lehrveranstaltung-tab-lvangebot').collapsed=false;
 			LvAngebotLoad(lehrveranstaltung_id);
 
+			if(document.getElementById('lehrveranstaltung-tabs').selectedItem==document.getElementById('lehrveranstaltung-tab-termine'))
+			{
+				// Termine Laden
+				document.getElementById('lehrveranstaltung-termine').setAttribute('src','termine.xul.php?lehrveranstaltung_id='+lehrveranstaltung_id);
+			}
+
 			LeDetailDisableFields(true);
 			//Details zuruecksetzen
 			LeDetailReset();
@@ -778,6 +784,12 @@ function LeAuswahl()
 			
 			//LV-Angebot Tab ausblenden
 			document.getElementById('lehrveranstaltung-tab-lvangebot').collapsed=true;
+
+			if(document.getElementById('lehrveranstaltung-tabs').selectedItem==document.getElementById('lehrveranstaltung-tab-termine'))
+			{
+				// Termine Laden
+				document.getElementById('lehrveranstaltung-termine').setAttribute('src','termine.xul.php?lehreinheit_id='+lehreinheit_id);
+			}
 
 			document.getElementById('lehrveranstaltung-toolbar-neu').disabled=true;
 			document.getElementById('lehrveranstaltung-toolbar-del').disabled=false;
@@ -2326,4 +2338,30 @@ function LvAngebotNew()
 {
 	LvAngebotReset();
 	LvAngebotGruppeTreeRefresh();
+}
+
+/**
+ * Laedt die Termine einer Lehrveranstaltung/Lehreinheit wenn auf den Tab gewechselt wird
+ */
+function LehrveranstaltungTermineIFrameLoad()
+{
+	var tree = document.getElementById('lehrveranstaltung-tree');
+
+	if (tree.currentIndex==-1) 
+		return;
+	try
+	{
+		//Ausgewaehlte Lehreinheit holen
+        var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehreinheit_id"] : "lehrveranstaltung-treecol-lehreinheit_id";
+		var lehreinheit_id=tree.view.getCellText(tree.currentIndex,col);
+		var col = tree.columns ? tree.columns["lehrveranstaltung-treecol-lehrveranstaltung_id"] : "lehrveranstaltung-treecol-lehrveranstaltung_id";
+		var lehrveranstaltung_id=tree.view.getCellText(tree.currentIndex,col);
+
+		if(lehreinheit_id!='')
+			document.getElementById('lehrveranstaltung-termine').setAttribute('src','termine.xul.php?lehreinheit_id='+lehreinheit_id);
+		else
+			document.getElementById('lehrveranstaltung-termine').setAttribute('src','termine.xul.php?lehrveranstaltung_id='+lehrveranstaltung_id);
+	}
+	catch(e)
+	{}
 }

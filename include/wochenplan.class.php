@@ -1356,6 +1356,7 @@ class wochenplan extends basis_db
 						$z=0;
 						$reservierung=false;
 						$stundenplan_ids=array();
+						$titel='';
 
 						if(isset($raumcheck))
 							unset($raumcheck);
@@ -1401,7 +1402,7 @@ class wochenplan extends basis_db
 								}
 								if(isset($lehrstunde->farbe) && $farbe=='')
 									$farbe=$lehrstunde->farbe;
-								$titel=htmlspecialchars($lehrstunde->titel);
+								$titel.=htmlspecialchars($lehrstunde->titel);
 								$anmerkung=htmlspecialchars($lehrstunde->anmerkung);
 								$tooltip_anmerkung[]=$titel.' '.$anmerkung;
 							}

@@ -601,6 +601,13 @@ function MitarbeiterAuswahl()
 	// ***** BETRIEBSMITTEL *****
 	document.getElementById('mitarbeiter-betriebsmittel').setAttribute('src','betriebsmitteloverlay.xul.php?person_id='+person_id+'&uid='+uid);
 	
+
+	if(document.getElementById('mitarbeiter-tabs').selectedItem==document.getElementById('mitarbeiter-tab-termine'))
+	{
+		// ***** Termine *****
+		document.getElementById('mitarbeiter-termine').setAttribute('src','termine.xul.php?mitarbeiter_uid='+uid);
+	}
+
 	// **** VERWENDUNG ****
 	verwendungtree = document.getElementById('mitarbeiter-tree-verwendung');
 	url='<?php echo APP_ROOT;?>rdf/bisverwendung.rdf.php?uid='+uid+"&"+gettimestamp();
@@ -1884,4 +1891,14 @@ function MitarbeiterShowPersonendetails()
 {
 	person_id = document.getElementById('mitarbeiter-detail-textbox-person_id').value;
 	window.open('<?php echo APP_ROOT ?>vilesci/personen/personendetails.php?id='+person_id,'Personendetails','');
+}
+
+function MitarbeiterTermineIFrameLoad()
+{
+	uid = document.getElementById('mitarbeiter-detail-textbox-uid').value;
+	if(uid!='')
+	{
+		url = 'termine.xul.php?mitarbeiter_uid='+uid+'&ts='+gettimestamp();
+		document.getElementById('mitarbeiter-termine').setAttribute('src',url);
+	}
 }

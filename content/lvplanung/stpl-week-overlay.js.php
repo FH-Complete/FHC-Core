@@ -494,7 +494,7 @@ function onStplDetail(event)
 	window.parent.STPLlastDetailUrl = url;
 	//alert(url+' - '+window.parent.STPLlastDetailUrl);
 	var treeStplDetails=parent.document.getElementById('treeStplDetails');
-	treeStplDetails.setAttribute('datasources',url);
+	treeStplDetails.setAttribute('datasources',url+"&ts="+gettimestamp());
 }
 
 
@@ -581,7 +581,7 @@ function STPLDetailSave(dialog)
 		var treeStplDetails=parent.document.getElementById('treeStplDetails');
 		//alert('url'+STPLlastDetailUrl);
 		treeStplDetails.setAttribute('datasources', '');
-		treeStplDetails.setAttribute('datasources', STPLlastDetailUrl);
+		treeStplDetails.setAttribute('datasources', STPLlastDetailUrl+"&ts="+gettimestamp());
 		return true;
 	}
 	
@@ -642,7 +642,7 @@ function STPLDetailDelete()
 			var treeStplDetails=parent.document.getElementById('treeStplDetails');
 			//alert('url'+STPLlastDetailUrl);
 			treeStplDetails.setAttribute('datasources', '');
-			treeStplDetails.setAttribute('datasources', STPLlastDetailUrl);
+			treeStplDetails.setAttribute('datasources', STPLlastDetailUrl+"&ts="+gettimestamp());
 		}
 	}
 }

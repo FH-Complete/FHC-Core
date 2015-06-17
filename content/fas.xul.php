@@ -147,6 +147,8 @@ foreach($addon_obj->result as $addon)
   <command id="menu-dokumente-urkunde_englisch:command" oncommand="StudentAbschlusspruefungPrintUrkundeMultiple(event, 'englisch')"/>
   <command id="menu-dokumente-ausbildungsvertrag:command" oncommand="StudentPrintAusbildungsvertrag(event);"/>
   <command id="menu-dokumente-ausbildungsvertrag_englisch:command" oncommand="StudentPrintAusbildungsvertragEnglisch(event);"/>
+  <command id="menu-cis-studienplan:command" oncommand="StudentCisStudienplan(event);"/>
+  <command id="menu-cis-notenliste:command" oncommand="StudentCisNotenliste(event);"/>
   <command id="menu-extras-reihungstest:command" oncommand="ExtrasShowReihungstest();"/>
   <command id="menu-extras-firma:command" oncommand="ExtrasShowFirmenverwaltung();"/>
   <command id="menu-extras-lvverwaltung:command" oncommand="ExtrasShowLVverwaltung();"/>
@@ -719,6 +721,23 @@ foreach($addon_obj->result as $addon)
                label     = "&menu-dokumente-ausbildungsvertrag_englisch.label;"
                command   =  "menu-dokumente-ausbildungsvertrag_englisch:command"
                accesskey = "&menu-dokumente-ausbildungsvertrag_englisch.accesskey;"/>
+          </menupopup>
+    </menu>
+    <!-- ***** CIS ***** -->
+    <menu id="menu-cis" label="&menu-cis.label;" accesskey="&menu-cis.accesskey;">
+          <menupopup id="menu-cis-popup">
+            <menuitem
+               id        =  "menu-cis-studienplan"
+               key       =  "menu-cis-studienplan:key"
+               label     = "&menu-cis-studienplan.label;"
+               command   =  "menu-cis-studienplan:command"
+               accesskey = "&menu-cis-studienplan.accesskey;"/>
+            <menuitem
+               id        =  "menu-cis-notenliste"
+               key       =  "menu-cis-notenliste:key"
+               label     = "&menu-cis-notenliste.label;"
+               command   =  "menu-cis-notenliste:command"
+               accesskey = "&menu-cis-notenliste.accesskey;"/>
           </menupopup>
     </menu>
     <!-- ***** Zusatzmenues inkludieren ***** -->

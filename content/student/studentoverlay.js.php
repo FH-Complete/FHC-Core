@@ -1525,6 +1525,13 @@ function StudentAuswahl()
 			url = '<?php echo APP_ROOT; ?>content/funktionen.xul.php?uid='+uid;
 			document.getElementById('student-funktionen').setAttribute('src',url);
 		}
+
+		// ***** Termine *****
+		if(document.getElementById('student-content-tabs').selectedItem==document.getElementById('student-tab-termine'))
+		{
+			document.getElementById('student-termine').setAttribute('src','termine.xul.php?student_uid='+uid);
+		}
+
 	}
 
 	// Notizen laden
@@ -5290,6 +5297,19 @@ function StudentFunktionIFrameLoad()
 }
 
 // ****
+// * Laedt den Termine IFrame
+// ****
+function StudentTermineIFrameLoad()
+{
+	uid = document.getElementById('student-detail-textbox-uid').value;
+	if(uid!='')
+	{
+		url = 'termine.xul.php?student_uid='+uid+'&ts='+gettimestamp();
+		document.getElementById('student-termine').setAttribute('src',url);
+	}
+}
+
+// ****
 // * Funktionen IFrame ins leere zeigen lassen
 // ****
 function StudentFunktionIFrameUnLoad()
@@ -5386,4 +5406,40 @@ function StudentPrestudentRolleVorruecken()
 		SetStatusBarText('Daten wurden gespeichert');
 		return true;
 	}
+}
+
+// ****
+// * Öffnet den Studienplan des Studenten im CIS
+// ****
+function StudentCisStudienplan(event)
+{
+	var tree = document.getElementById('student-tree');
+    if (tree.currentIndex == -1)
+    {
+        alert("Bitte wählen Sie einen Studenten aus.");
+        return false;
+    }
+       
+    var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+	var uid = tree.view.getCellText(tree.currentIndex,col);
+    
+    window.open('<?php echo CIS_ROOT; ?>cis/private/profile/studienplan.php?uid='+uid);
+}
+
+// ****
+// * Öffnet die Notenliste des Studenten im CIS
+// ****
+function StudentCisNotenliste(event)
+{
+	var tree = document.getElementById('student-tree');
+    if (tree.currentIndex == -1)
+    {
+        alert("Bitte wählen Sie einen Studenten aus.");
+        return false;
+    }
+        
+    var col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+	var uid = tree.view.getCellText(tree.currentIndex,col);
+    
+    window.open('<?php echo CIS_ROOT; ?>cis/private/lehre/notenliste.php?uid='+uid);
 }

@@ -34,6 +34,7 @@ require_once('../../../include/phrasen.class.php');
 require_once('../../../include/studiengang.class.php');
 require_once('../../../include/lehrveranstaltung.class.php');
 require_once('../../../include/pruefung.class.php');
+require_once('../../../include/benutzerberechtigung.class.php');
 
 $sprache = getSprache();
 $p = new phrasen($sprache);
@@ -71,6 +72,23 @@ else
 	$stsem = '';
 	
 $user = get_uid();
+
+if(isset($_GET['uid']))
+{
+	// Administratoren duerfen die UID als Parameter uebergeben um die Notenliste
+	// von anderen Personen anzuzeigen
+
+	$rechte = new benutzerberechtigung();
+	$rechte->getBerechtigungen($user);
+	if($rechte->isBerechtigt('admin'))
+    {
+		$user = $_GET['uid'];
+        $getParam = "&uid=" . $user;
+    }
+    else
+        $getParam = "";
+}
+
 $datum_obj = new datum();
 
 $error = '';
@@ -118,12 +136,13 @@ else
 	echo "<b>".$p->t('global/name').":</b> $vorname $nachname<br />";
 	echo "<b>".$p->t('global/studiengang').":</b>  $stg_name<br />";
 	echo "<b>".$p->t('global/studiensemester')."</b> <SELECT name='stsem' onChange=\"MM_jumpMenu('self',this,0)\">";
+    echo "<OPTION value='notenliste.php?stsem=alle".$getParam."'>alle Semester</OPTION>";
 	foreach ($stsem_obj->studiensemester as $semrow)
 	{
 		if($stsem == $semrow->studiensemester_kurzbz)
-			echo "<OPTION value='notenliste.php?stsem=$semrow->studiensemester_kurzbz' selected>$semrow->studiensemester_kurzbz</OPTION>";
+			echo "<OPTION value='notenliste.php?stsem=".$semrow->studiensemester_kurzbz.$getParam."' selected>$semrow->studiensemester_kurzbz</OPTION>";
 		else
-			echo "<OPTION value='notenliste.php?stsem=$semrow->studiensemester_kurzbz'>$semrow->studiensemester_kurzbz</OPTION>";
+			echo "<OPTION value='notenliste.php?stsem=".$semrow->studiensemester_kurzbz.$getParam."'>$semrow->studiensemester_kurzbz</OPTION>";
 	}
 	echo "</SELECT><br />";
 
@@ -131,7 +150,15 @@ else
 	echo "<br />";
 
 	//Lehrveranstaltungen und Noten holen
-	$qry = "SELECT
+	if($stsem != "alle")
+    {
+        $sqlFilter = " AND tbl_zeugnisnote.studiensemester_kurzbz = ".$db->db_add_param($stsem)."
+                      AND (tbl_lvgesamtnote.studiensemester_kurzbz = ".$db->db_add_param($stsem)." OR tbl_lvgesamtnote.studiensemester_kurzbz is null) ";
+    }
+    else
+        $sqlFilter = "";
+    
+    $qry = "SELECT
 				tbl_lehrveranstaltung.lehrveranstaltung_id, tbl_zeugnisnote.note, tbl_zeugnisnote.punkte,
 				tbl_lvgesamtnote.note as lvnote, tbl_lvgesamtnote.punkte as lvpunkte,
 				tbl_zeugnisnote.benotungsdatum, tbl_lvgesamtnote.freigabedatum, 
@@ -142,9 +169,8 @@ else
 				campus.tbl_lvgesamtnote
 			USING (lehrveranstaltung_id, student_uid, studiensemester_kurzbz)
 			WHERE
-				tbl_zeugnisnote.student_uid = ".$db->db_add_param($user)."
-			AND	tbl_zeugnisnote.studiensemester_kurzbz = ".$db->db_add_param($stsem)."
-			AND	(tbl_lvgesamtnote.studiensemester_kurzbz = ".$db->db_add_param($stsem)." OR tbl_lvgesamtnote.studiensemester_kurzbz is null)
+				tbl_zeugnisnote.student_uid = ".$db->db_add_param($user)
+			.$sqlFilter."
 			AND	tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_zeugnisnote.lehrveranstaltung_id
 			ORDER BY bezeichnung";
 

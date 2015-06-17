@@ -132,6 +132,8 @@ define('MAIL_LVPLAN','invalid@technikum-wien.at');
 define('MAIL_IT','invalid@technikum-wien.at');
 // Support
 define('MAIL_SUPPORT','invalid@technikum-wien.at');
+// Lehrgaenge
+define('MAIL_LG','invalid@technikum-wien.at');
 
 // Default Anmerkung fuer neue Lehreinheiten
 // Beispiel: 'Abhaengigkeiten von anderen LV\'s\n\nSpez. Software/Equipment:\n\n'
