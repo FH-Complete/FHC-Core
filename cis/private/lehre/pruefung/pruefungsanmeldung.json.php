@@ -33,8 +33,6 @@ require_once('../../../../include/prestudent.class.php');
 require_once('../../../../include/person.class.php');
 
 $uid = get_uid();
-//TODO
-$uid = "p20132443";
 
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
@@ -544,11 +542,11 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 	    $anrechnung->lehrveranstaltung_id_kompatibel = $lv_komp->lehrveranstaltung_id;
 	    $anrechnung->prestudent_id = $prestudent_id;
 	    $anrechnung->begruendung_id = "2";
-	    //TODO welche uid übergeben?
-	    $anrechnung->genehmigt_von = "p.vondrak";
+	    $anrechnung->genehmigt_von = CIS_PRUEFUNGSANMELDUNG_USER;
 	    $anrechnung->new = true;
 	    if($anrechnung->save())
 	    {
+		$anmeldung->anrechnung_id = $anrechnung->anrechnung_id;
 		if($anmeldung->save(true))
 		{
 		    $pruefung = new pruefungCis($termin->pruefung_id);
@@ -671,12 +669,16 @@ function getAllPruefungen($aktStudiensemester = null, $uid = null)
 function stornoAnmeldung($uid = null)
 {
     $pruefungsanmeldung_id=$_REQUEST['pruefungsanmeldung_id'];
-    $pruefungsanmeldung = new pruefungsanmeldung();
+    $pruefungsanmeldung = new pruefungsanmeldung($pruefungsanmeldung_id);
+    $anrechnung = new anrechnung($pruefungsanmeldung->anrechnung_id);
     if($pruefungsanmeldung->delete($pruefungsanmeldung_id, $uid))
     {
-	$data['result']='Anmeldung erfolgreich gelöscht.';
-	$data['error']='false';
-	$data['errormsg']='';
+	if($anrechnung->delete($anrechnung->anrechnung_id))
+	{
+	    $data['result'] = 'Anmeldung erfolgreich gelöscht.';
+	    $data['error'] = 'false';
+	    $data['errormsg'] = '';
+	}
     }
     else
     {

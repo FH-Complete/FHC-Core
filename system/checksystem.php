@@ -3146,6 +3146,17 @@ if($result = @$db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berecht
 	}
 }
 
+// Spalte anrechnung_id fuer campus.tbl_pruefungsanmeldung
+if(!$result = @$db->db_query("SELECT anrechnung_id FROM campus.tbl_pruefungsanmeldung"))
+{
+	$qry = 'ALTER TABLE campus.tbl_pruefungsanmeldung ADD COLUMN anrechnung_id integer;';
+	
+	if(!$db->db_query($qry))
+		echo '<strong>campus.tbl_pruefungsanmeldung: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>campus.tbl_pruefungsanmeldung: neue Spalte anrechnung_id hinzugefuegt';
+}
+
 echo '<br><br><br>';
 
 $tabellen=array(
