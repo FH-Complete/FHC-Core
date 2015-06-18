@@ -205,4 +205,7 @@ define('CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN',false);
 //Gibt an, ob der Lageplan im Infoterminal angezeigt werden soll.
 define('CIS_INFOSCREEN_LAGEPLAN_ANZEIGEN',true);
 
+//User, welcher für das Anlegen von Anrechnungen bei der Prüfungsanmeldung verwendet wird
+define('CIS_PRUEFUNGSANMELDUNG_USER','p.pruefungsanmeldung');
+
 ?>

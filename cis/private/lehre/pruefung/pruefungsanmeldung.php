@@ -32,6 +32,7 @@ require_once('../../../../include/student.class.php');
 
 
 $uid = get_uid();
+
 $db = new basis_db();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
@@ -142,7 +143,7 @@ $studiensemester->getAll();
 		$("#saveDialog").dialog({
 		    modal: true,
 		    autoOpen: false,
-		    width: "400px"
+		    width: "auto"
 		});
 		$("#dialog").dialog({ autoOpen: false });
 		
@@ -282,6 +283,12 @@ $studiensemester->getAll();
 			<td style="vertical-align: top; font-weight: bold;">Bis: </td>
 			<td>
 			    <span type="text" id="terminBis" disabled="true"></span>
+			</td>
+		    </tr>
+		    <tr>
+			<td style="vertical-align: top; font-weight: bold;">Studienverpflichtung:* </td>
+			<td>
+			    <select id="studienverpflichtung"></select>
 			</td>
 		    </tr>
 		    <tr>
