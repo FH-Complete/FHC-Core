@@ -66,7 +66,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 	   					<textbox id="textbox-projekttask-detail-bezeichnung" disabled="true"/>
 					</row>
 					<row>
-						<label value="Beschreibung" control="textbox-projekttask-detail-beschreibung"/>
+						<button label=" Beschreibung" id="button-projekttask-beschreibung-parsedown" oncommand="showProjekttaskParsedown()" image="../skin/images/markdown_button.png" control="textbox-projekttask-detail-beschreibung"/>	
 	   					<textbox id="textbox-projekttask-detail-beschreibung" multiline="true" disabled="true" rows="10"/>
 					</row>
 					<row>

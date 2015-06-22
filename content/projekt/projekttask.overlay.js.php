@@ -325,6 +325,23 @@ function TaskDisableFields(val)
 }
 
 // ****
+// * Zeigt Vorschau der Details
+// ****
+function showProjekttaskParsedown()
+{
+
+	//Werte holen
+	projekttask_id = document.getElementById('textbox-projekttaskdetail-projekttask_id').value;
+	
+	if(!isNaN(projekttask_id) && projekttask_id != '')
+	{
+		window.open("projekt/parsedown.php?projekttask_id="+projekttask_id,"Projekttask"+projekttask_id);
+	}
+	else
+		alert('keine gueltige ProjekttaskID eingetragen');
+}
+
+// ****
 // * Speichert die Details
 // ****
 function saveProjekttaskDetail()
