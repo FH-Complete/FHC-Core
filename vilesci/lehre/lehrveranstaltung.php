@@ -85,6 +85,13 @@ if (isset($_REQUEST['oe_kurzbz']))
 else
 	$oe_kurzbz='';
 
+if (isset($_REQUEST['orgform']))
+{
+	$orgform_kurzbz = $_REQUEST['orgform'];
+}
+else
+	$orgform_kurzbz='';
+
 //Wenn kein Fachbereich und kein Studiengang gewaehlt wurde
 //dann wird der Studiengang auf 0 gesetzt da sonst die zu ladende liste zu lang wird
 
@@ -473,7 +480,15 @@ if($stg_kz!='')
 //if($oe_kurzbz!='')
 //	$sql_query.= " AND tbl_lehrveranstaltung.oe_kurzbz=".$db->db_add_param($oe_kurzbz);
 if($semester != -1)
-	$sql_query.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester, FHC_INTEGER)." $aktiv ORDER BY tbl_lehrveranstaltung.bezeichnung";
+	$sql_query.=" AND tbl_lehrveranstaltung.semester=".$db->db_add_param($semester, FHC_INTEGER);
+
+if($orgform_kurzbz != -1)
+	if($orgform_kurzbz == 'none')
+		$sql_query.=" AND (tbl_lehrveranstaltung.orgform_kurzbz IS NULL OR tbl_lehrveranstaltung.orgform_kurzbz='')";
+	else 
+		$sql_query.=" AND tbl_lehrveranstaltung.orgform_kurzbz=".$db->db_add_param($orgform_kurzbz, FHC_STRING);
+
+$sql_query.=" $aktiv ORDER BY tbl_lehrveranstaltung.bezeichnung";
 
 if($fb_kurzbz=='' && $stg_kz=='' && $semester=='0' && $oe_kurzbz=='')
 	$result_lv='';
@@ -512,6 +527,22 @@ $outp.='</SELECT>';
 $outp.= ' Semester <SELECT name="semester"><option value="-1">--Alle--</option>';
 for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
 	$outp.="<OPTION value='$i' ".($i==$semester?'selected':'').">$i</OPTION>";
+$outp.='</SELECT>';
+
+//Orgform DropDown
+$outp.= ' Orgform <SELECT name="orgform"><option value="-1">--Alle--</option>';
+$outp.= '<OPTION value="none" '.($orgform_kurzbz=='none'?'selected':'').'>Ohne Orgform</OPTION>';
+$orgform = new organisationsform();
+$orgform->getOrgformLV();
+foreach ($orgform->result as $of)
+{
+	if($orgform_kurzbz==$of->orgform_kurzbz)
+		$selected = 'selected';
+	else
+		$selected = '';
+
+		$outp.= '<OPTION value="'.$db->convert_html_chars($of->orgform_kurzbz).'" '.$selected.'>'.$db->convert_html_chars($of->orgform_kurzbz).' - '.$db->convert_html_chars($of->bezeichnung).'</OPTION>';
+}
 $outp.='</SELECT>';
 
 //Institut DropDown
@@ -805,9 +836,15 @@ else
 	$oe->load($oe_kurzbz);
 	$header=$oe->organisationseinheittyp_kurzbz.' '.$oe->bezeichnung;
 }
-$header .= ' - ';
+//$header .= ' - ';
 if($semester!='-1')
-	$header .= $semester;
+	$header .= ' - '.$semester;
+
+if($orgform_kurzbz!='-1')
+	if($orgform_kurzbz=='none')
+		$header .= ' - Ohne Orgform';
+	else 
+		$header .= ' - '.$orgform_kurzbz;
 
 echo "<H2>Lehrveranstaltung Verwaltung (".$db->convert_html_chars($header).")</H2>";
 echo $messages;
@@ -915,12 +952,12 @@ if ($result_lv!=0)
 		echo '<td>'.$db->convert_html_chars($s[$row->studiengang_kz]->kurzbz).'</td>';
 		//Organisationsform
 		echo '<td style="white-space:nowrap;">';
-		echo $db->convert_html_chars($row->orgform_kurzbz);
+		echo ($row->orgform_kurzbz!=''?$db->convert_html_chars($row->orgform_kurzbz):'&nbsp;');
 		echo '</td>';
 		//Semesterstunden
-		echo '<td>'.$db->convert_html_chars($row->semesterstunden).'</td>';
+		echo '<td>'.($row->semesterstunden!=''?$db->convert_html_chars($row->semesterstunden):'-').'</td>';
 		//ECTS
-		echo '<td>'.$db->convert_html_chars($row->ects).'</td>';
+		echo '<td>'.($row->ects!=''?$db->convert_html_chars($row->ects):'-').'</td>';
 		//Lehre
 		echo '<td align="center">
 		<div style="display: none">'.$db->convert_html_chars($row->lehre).'</div>
@@ -1016,7 +1053,7 @@ if ($result_lv!=0)
 				</td>';
 
 			echo '<td><a href="lehrveranstaltung_kompatibel.php?lehrveranstaltung_id='.$row->lehrveranstaltung_id.'&type=edit" target="lv_detail">Kompatible LV</a></td>';
-			echo '<td><a href="'.$_SERVER['PHP_SELF'].'?delete_lvid='.$row->lehrveranstaltung_id.'&stg_kz='.$stg_kz.'&semester='.$semester.'&fachbereich_kurzbz='.$oe_fachbereich.'&isaktiv='.$isaktiv.'&oe_kurzbz='.$oe_kurzbz.'" onclick="return conf_del()">löschen</a></td>';
+			echo '<td><a href="'.$_SERVER['PHP_SELF'].'?delete_lvid='.$row->lehrveranstaltung_id.'&stg_kz='.$stg_kz.'&semester='.$semester.'&fachbereich_kurzbz='.$oe_fachbereich.'&isaktiv='.$isaktiv.'&oe_kurzbz='.$oe_kurzbz.'&orgform='.$orgform_kurzbz.'" onclick="return conf_del()">löschen</a></td>';
 			echo "</tr>\n";
 		}
 	}
