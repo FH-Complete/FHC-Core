@@ -48,18 +48,26 @@ $db = new basis_db();
 $stsem_obj = new studiensemester();
 $stsem = $stsem_obj->getAktOrNext();
 
-$qry = "SELECT 
-			distinct lehrveranstaltung_id, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.kurzbz, 
-			tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.orgform_kurzbz, tbl_lehrveranstaltung.semester,
-			tbl_lehreinheit.lehreinheit_id
-		FROM 
-			lehre.tbl_lehreinheit 
-			JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id) 
-		WHERE 
-			studiensemester_kurzbz=".$db->db_add_param($stsem)." 
-			AND semester is not null 
-			AND semester!=0
-			AND tbl_lehreinheit.lehrform_kurzbz=tbl_lehrveranstaltung.lehrform_kurzbz";
+$qry = "SELECT
+                        distinct lehrveranstaltung_id, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.kurzbz,
+                        tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.orgform_kurzbz, tbl_lehrveranstaltung.semester,
+                        tbl_lehreinheit.lehreinheit_id, trim(string_agg(vorname||nachname,'_')) AS lektoren
+                FROM
+                        lehre.tbl_lehreinheit
+                        JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+JOIN lehre.tbl_lehreinheitmitarbeiter USING (lehreinheit_id)
+JOIN public.tbl_mitarbeiter USING (mitarbeiter_uid)
+JOIN public.tbl_benutzer ON (uid=mitarbeiter_uid)
+JOIN public.tbl_person USING (person_id)
+                WHERE
+                        studiensemester_kurzbz=".$db->db_add_param($stsem)."
+                        AND semester is not null
+                        AND semester!=0
+                        AND tbl_lehreinheit.lehrform_kurzbz=tbl_lehrveranstaltung.lehrform_kurzbz
+
+GROUP BY lehrveranstaltung_id, tbl_lehrveranstaltung.bezeichnung, tbl_lehrveranstaltung.kurzbz,
+                        tbl_lehrveranstaltung.studiengang_kz, tbl_lehrveranstaltung.orgform_kurzbz, tbl_lehrveranstaltung.semester,
+                        tbl_lehreinheit.lehreinheit_id;";
 
 if($result = $db->db_query($qry))
 {
@@ -73,8 +81,8 @@ if($result = $db->db_query($qry))
 			$studiengang = new studiengang();
 			$studiengang->load($row->studiengang_kz);
 
-			$shortname = $studiengang->kuerzel.($row->orgform_kurzbz!=''?'-'.$row->orgform_kurzbz:'').($row->semester!=''?'-'.$row->semester:'').'-'.$stsem.'-'.$row->kurzbz.'-'.$row->lehreinheit_id;
-			$bezeichnung = $studiengang->kuerzel.($row->orgform_kurzbz!=''?'-'.$row->orgform_kurzbz:'').($row->semester!=''?'-'.$row->semester:'').'-'.$stsem.'-'.$row->bezeichnung.'-'.$row->lehreinheit_id;
+			$shortname = $studiengang->kuerzel.($row->orgform_kurzbz!=''?'-'.$row->orgform_kurzbz:'').($row->semester!=''?'-'.$row->semester:'').'-'.$stsem.'-'.$row->kurzbz.'-'.$row->lehreinheit_id.'-'.$row->lektoren;
+			$bezeichnung = $studiengang->kuerzel.($row->orgform_kurzbz!=''?'-'.$row->orgform_kurzbz:'').($row->semester!=''?'-'.$row->semester:'').'-'.$stsem.'-'.$row->bezeichnung.'-'.$row->lehreinheit_id.'-'.$row->lektoren;
 
 			//$mdl_course->lehrveranstaltung_id = $row->lehrveranstaltung_id;
 			$mdl_course->studiensemester_kurzbz = $stsem;
