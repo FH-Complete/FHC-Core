@@ -36,7 +36,7 @@ function ean13($datatoencode)
 	//Calculate Check Digit
 	$Factor = 3;
 	$weightedTotal = "0";
-	for($i=mb_strlen($datatoencode);$i>=0;$i--)
+	for($i=mb_strlen($datatoencode)-1;$i>=0;$i--)
 	{
 		//Get the value of each number starting at the end
 		$CurrentChar = mb_substr($datatoencode, $i, 1);
@@ -91,7 +91,7 @@ function ean13($datatoencode)
 			break;
 	}
 	//add the check digit to the end of the barcode . remove the leading digit
-	$datatoencode = mb_substr($datatoencode, 0, 12) . $CheckDigit;
+	$datatoencode = mb_substr($datatoencode, 1, 12) . $CheckDigit;
 	//Now that we have the total number including the check digit, determine character to print
 	//for proper barcoding:
 	$datalen = mb_strlen($datatoencode);
