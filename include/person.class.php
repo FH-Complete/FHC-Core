@@ -467,7 +467,7 @@ class person extends basis_db
 			       ' geschlecht='.$this->db_add_param($this->geschlecht).','.
 			       ' geburtsnation='.$this->db_add_param($this->geburtsnation).','.
 			       ' staatsbuergerschaft='.$this->db_add_param($this->staatsbuergerschaft).','.
-			       ' ext_id='.$this->db_add_param($this->ext_id).','.
+			       //' ext_id='.$this->db_add_param($this->ext_id).','.
 			       ' kurzbeschreibung='.$this->db_add_param($this->kurzbeschreibung).','.
 				   ' foto_sperre='.$this->db_add_param($this->foto_sperre, FHC_BOOLEAN).','.
 				   ' zugangscode='.$this->db_add_param($this->zugangscode).','.
