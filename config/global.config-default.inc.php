@@ -159,6 +159,9 @@ define('BEWERBERTOOL_ZAHLUNGEN_ANZEIGEN', true);
 define('BEWERBERTOOL_DOKUMENTE_ANZEIGEN', true);
 define('BEWERBERTOOL_ZGV_ANZEIGEN', true);
 define('BEWERBERTOOL_BERUFSTAETIGKEIT_ANZEIGEN', true);
+// Wenn hier eine Mailadresse angegeben ist, werden die Bewerbungen aus der Onlinebwerbung an diese Adresse gesendet. 
+// Wenn leer dann wird an die Studiengangsadresse gesendet
+define('BEWERBERTOOL_MAILEMPFANG', '');
 
 // Array mit Usern die nicht Kollidieren
 define('KOLLISIONSFREIE_USER',serialize(array('_DummyLektor')));
