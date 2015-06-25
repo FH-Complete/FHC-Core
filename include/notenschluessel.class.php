@@ -119,7 +119,7 @@ class notenschluessel extends basis_db
 		SELECT notenschluessel_kurzbz
 		FROM oes JOIN lehre.tbl_notenschluesselzuordnung USING(oe_kurzbz)
 		WHERE (studiensemester_kurzbz is null OR studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz).")
-		ORDER BY tiefe desc LIMIT 1";
+		ORDER BY tiefe asc LIMIT 1";
 
 		if($result = $this->db_query($qry))
 		{
